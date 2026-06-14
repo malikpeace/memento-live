@@ -99,33 +99,12 @@
     pointer-events: none; z-index: 2;
   }
 
-  /* ── NEW: liquid color-morph layer (purple/white/green) ────────────────── */
-  /* First child, so the glass, iridescence, deboss emblem and rim read on top. */
-  .daycard-ns__liquid {
-    position: absolute; inset: -34%; pointer-events: none;
-    filter: blur(30px) saturate(1.45);
+  /* ── NEW: WebGL flowing-liquid surface (purple/white/green) ────────────── */
+  /* First child, so the rim, iridescence, sheen and deboss emblem read on top. */
+  .daycard-ns__fluid {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    display: block; pointer-events: none; border-radius: inherit;
   }
-  .daycard-ns__liquid .blob {
-    position: absolute; border-radius: 50%;
-    mix-blend-mode: screen; will-change: transform, opacity;
-    transition: opacity 0.5s ease;
-  }
-  .blob.b1 { width: 80%; height: 60%; left: -8%; top: -10%;
-    background: radial-gradient(circle, rgba(150, 116, 255, 0.95), transparent 64%);
-    opacity: var(--clar); animation: dl1 18s ease-in-out infinite; }
-  .blob.b2 { width: 64%; height: 52%; left: 20%; top: 26%;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.92), transparent 62%);
-    opacity: calc(var(--act) * 0.6); animation: dl2 15s ease-in-out infinite; }
-  .blob.b3 { width: 84%; height: 66%; right: -10%; bottom: -12%;
-    background: radial-gradient(circle, rgba(56, 232, 150, 0.95), transparent 62%);
-    opacity: var(--cons); animation: dl3 21s ease-in-out infinite; }
-  .blob.b4 { width: 60%; height: 48%; left: 4%; bottom: 8%;
-    background: radial-gradient(circle, rgba(120, 150, 255, 0.7), transparent 66%);
-    opacity: var(--mix); animation: dl4 24s ease-in-out infinite; }
-  @keyframes dl1 { 0%,100% { transform: translate(0,0) } 50% { transform: translate(16%, 12%) } }
-  @keyframes dl2 { 0%,100% { transform: translate(0,0) } 50% { transform: translate(-13%, 15%) } }
-  @keyframes dl3 { 0%,100% { transform: translate(0,0) } 50% { transform: translate(-15%, -9%) } }
-  @keyframes dl4 { 0%,100% { transform: translate(0,0) } 50% { transform: translate(18%, -13%) } }
 
   /* Iridescence + sheen (replicated, sit above the color) */
   .daycard-ns__iri {
@@ -194,9 +173,7 @@
   <div class="daycard-wrap">
     <span class="daycard-wrap__aura" aria-hidden="true"></span>
     <div class="daycard-ns" id="card" style="--clar:0; --act:0; --cons:0; --mix:0;">
-      <span class="daycard-ns__liquid" aria-hidden="true">
-        <i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i><i class="blob b4"></i>
-      </span>
+      <canvas class="daycard-ns__fluid" id="fluid" aria-hidden="true"></canvas>
       <span class="daycard-ns__iri" aria-hidden="true"></span>
       <span class="daycard-ns__sheen" aria-hidden="true"></span>
       <div class="daycard-ns__body">
@@ -227,38 +204,34 @@
   var card = document.getElementById('card');
   var s = [document.getElementById('s1'), document.getElementById('s2'), document.getElementById('s3')];
   var o = [document.getElementById('o1'), document.getElementById('o2'), document.getElementById('o3')];
-  var vars = ['--clar', '--act', '--cons'];
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Levels the fluid eases toward (0..1). cur lags target so changes morph.
+  var target = { c: 0, a: 0, n: 0 };
+  var cur = { c: 0, a: 0, n: 0 };
 
   function apply() {
     var v = s.map(function (el) { return +el.value; });
-    for (var i = 0; i < 3; i++) {
-      o[i].textContent = Math.round(v[i]);
-      card.style.setProperty(vars[i], (v[i] / 100).toFixed(3));
-    }
-    // blend blob appears only when clarity AND consistency are both present
-    card.style.setProperty('--mix', (Math.min(v[0], v[2]) / 100 * 0.7).toFixed(3));
-    // the card lifts (inset highlight) as it fills, so it feels more alive
+    for (var i = 0; i < 3; i++) o[i].textContent = Math.round(v[i]);
+    target.c = v[0] / 100; target.a = v[1] / 100; target.n = v[2] / 100;
     var tot = (v[0] + v[1] + v[2]) / 300;
     card.style.boxShadow =
-      'inset 0 1px 0 rgba(255,255,255,' + (0.22 + 0.18 * tot).toFixed(2) + '),' +
-      '0 0 44px rgba(200,210,255,' + (0.10 + 0.12 * tot).toFixed(2) + '),' +
+      'inset 0 1px 0 rgba(255,255,255,' + (0.22 + 0.20 * tot).toFixed(2) + '),' +
+      '0 0 48px rgba(200,210,255,' + (0.10 + 0.18 * tot).toFixed(2) + '),' +
       '0 26px 60px rgba(0,0,0,0.45)';
   }
+  function clearActive() { presets.querySelectorAll('button').forEach(function (b) { b.classList.remove('is-active'); }); }
   s.forEach(function (el) { el.addEventListener('input', function () { clearActive(); apply(); }); });
 
   var presets = document.getElementById('presets');
-  function clearActive() { presets.querySelectorAll('button').forEach(function (b) { b.classList.remove('is-active'); }); }
   presets.addEventListener('click', function (e) {
     var b = e.target.closest('button'); if (!b) return;
     var p = b.dataset.p.split(',');
     for (var i = 0; i < 3; i++) { s[i].value = p[i]; }
-    clearActive(); b.classList.add('is-active');
-    apply();
+    clearActive(); b.classList.add('is-active'); apply();
   });
 
-  // Pointer tilt (replicated from bindDayCardTilt): the card leans toward the
-  // pointer so the glass reads as a physical object.
-  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Pointer tilt: the card leans toward the pointer so the glass reads physical.
   if (!reduce) {
     var reset = function () { card.style.setProperty('--dc-rx', '0deg'); card.style.setProperty('--dc-ry', '0deg'); };
     card.addEventListener('pointermove', function (e) {
@@ -272,9 +245,87 @@
     card.addEventListener('pointerup', reset);
   }
 
-  // start on the first preset (Day one)
+  // ── WebGL flowing-liquid surface ──────────────────────────────────────────
+  // Domain-warped fractal noise blends purple (clarity) / white (action) /
+  // green (consistency) into an abstract liquid that flows, fills the card, and
+  // gets faster + more vibrant as the pillars rise.
+  var FRAG = `precision highp float;
+  uniform vec2 u_res; uniform float u_time;
+  uniform float u_clar; uniform float u_act; uniform float u_cons;
+  float hash(vec2 p){ p=fract(p*vec2(123.34,345.45)); p+=dot(p,p+34.345); return fract(p.x*p.y); }
+  float noise(vec2 p){ vec2 i=floor(p),f=fract(p); float a=hash(i),b=hash(i+vec2(1.,0.)),c=hash(i+vec2(0.,1.)),d=hash(i+vec2(1.,1.)); vec2 u=f*f*(3.-2.*f); return mix(mix(a,b,u.x),mix(c,d,u.x),u.y); }
+  float fbm(vec2 p){ float v=0.,a=0.5; for(int i=0;i<5;i++){ v+=a*noise(p); p=p*2.02+vec2(1.7,9.2); a*=0.5; } return v; }
+  void main(){
+    vec2 uv = gl_FragCoord.xy/u_res;
+    vec2 p = vec2(uv.x*(u_res.x/u_res.y), uv.y)*2.4;
+    float mx = max(max(u_clar,u_act),u_cons);
+    float energy = 0.7 + 2.0*mx;
+    float t = u_time*0.36*energy;
+    vec2 q = vec2(fbm(p+vec2(0.0,t)), fbm(p+vec2(5.2,1.3)-vec2(t*0.7,0.0)));
+    vec2 r = vec2(fbm(p+3.6*q+vec2(1.7,t*0.7)), fbm(p+3.6*q+vec2(8.3,2.8)-vec2(0.0,t*0.6)));
+    float f = fbm(p+4.2*r+vec2(t*0.4,0.0));
+    float total=(u_clar+u_act+u_cons)/3.0;
+    vec3 cP=vec3(0.56,0.26,1.0), cW=vec3(0.95,0.97,1.0), cG=vec3(0.06,1.0,0.48);
+    vec3 base=vec3(0.025,0.025,0.05);
+    vec3 ambient=mix(cG,cP, clamp(uv.y + 0.22*(q.x-0.5),0.0,1.0));
+    base=mix(base, ambient*0.52, total*0.74);
+    float topw=uv.y, botw=1.0-uv.y;
+    float fp=smoothstep(0.16,0.76, q.x*0.85+r.x*0.4);
+    float fg=smoothstep(0.16,0.76, r.y*0.95+q.y*0.3);
+    float fw=smoothstep(0.44,0.98, f);
+    vec3 col=base;
+    col=mix(col,cP, clamp(u_clar*fp*(0.6+0.8*topw),0.0,1.0));
+    col=mix(col,cG, clamp(u_cons*fg*(0.6+0.8*botw),0.0,1.0));
+    col=mix(col,cW, clamp(u_act*fw*0.7,0.0,1.0));
+    float glow=u_clar*fp+u_cons*fg+u_act*fw;
+    col+=0.12*glow*vec3(0.4,0.3,0.6);
+    float L=dot(col,vec3(0.299,0.587,0.114));
+    col=mix(vec3(L),col,1.42);
+    col=col/(col+0.62)*1.55;
+    gl_FragColor=vec4(col,1.0);
+  }`;
+  var VERT = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
+
+  function initFluid() {
+    var cv = document.getElementById('fluid');
+    var gl = cv.getContext('webgl') || cv.getContext('experimental-webgl');
+    if (!gl) return false;
+    function sh(type, src) { var x = gl.createShader(type); gl.shaderSource(x, src); gl.compileShader(x); return gl.getShaderParameter(x, gl.COMPILE_STATUS) ? x : null; }
+    var vs = sh(gl.VERTEX_SHADER, VERT), fs = sh(gl.FRAGMENT_SHADER, FRAG);
+    if (!vs || !fs) return false;
+    var prog = gl.createProgram(); gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return false;
+    gl.useProgram(prog);
+    var buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+    var loc = gl.getAttribLocation(prog, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+    var uRes = gl.getUniformLocation(prog, 'u_res'), uTime = gl.getUniformLocation(prog, 'u_time'),
+        uC = gl.getUniformLocation(prog, 'u_clar'), uA = gl.getUniformLocation(prog, 'u_act'), uN = gl.getUniformLocation(prog, 'u_cons');
+    function size() {
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      cv.width = Math.max(2, Math.round(card.clientWidth * dpr));
+      cv.height = Math.max(2, Math.round(card.clientHeight * dpr));
+      gl.viewport(0, 0, cv.width, cv.height);
+    }
+    size(); window.addEventListener('resize', size);
+    var t0 = null;
+    function frame(ts) {
+      if (t0 == null) t0 = ts;
+      var time = (ts - t0) / 1000;
+      cur.c += (target.c - cur.c) * 0.05; cur.a += (target.a - cur.a) * 0.05; cur.n += (target.n - cur.n) * 0.05;
+      gl.uniform2f(uRes, cv.width, cv.height);
+      gl.uniform1f(uTime, reduce ? 0.0 : time);
+      gl.uniform1f(uC, cur.c); gl.uniform1f(uA, cur.a); gl.uniform1f(uN, cur.n);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+    return true;
+  }
+
   presets.querySelector('button').classList.add('is-active');
   apply();
+  try { initFluid(); } catch (e) {}
 })();
 </script>
 </body>
