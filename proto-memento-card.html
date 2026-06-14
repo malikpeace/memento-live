@@ -122,19 +122,21 @@
      clarity (purple, which lives at the TOP) only faintly bleeds down. That is
      why the line goes green here, not purple. Vibrant colour, crisp, barely
      blurred so it reads as a real glowing line, not a wash. */
+  /* HORIZONTAL gradients so the glow stays bright right out to the element's far
+     ends (which sit well past the card) instead of fading in the middle. */
   .daycard-floor .refl-line {
-    position: absolute; left: -30%; right: -30%; top: -4px; height: 10px;
+    position: absolute; left: -32%; right: -32%; top: -4px; height: 10px;
     filter: blur(3px);
   }
-  .line-clar { background: radial-gradient(50% 130% at 50% 50%, rgba(150,116,255,1), transparent 70%); opacity: calc(var(--clar) * 0.35); }
-  .line-act  { background: radial-gradient(50% 130% at 50% 50%, rgba(236,239,255,1), transparent 70%); opacity: calc(var(--act) * 0.85); }
-  .line-cons { background: radial-gradient(50% 130% at 50% 50%, rgba(56,236,150,1), transparent 70%); opacity: var(--cons); }
-  .line-red  { background: radial-gradient(50% 130% at 50% 50%, rgba(255,72,86,1), transparent 70%); opacity: var(--red); }
+  .line-clar { background: linear-gradient(90deg, transparent 2%, rgba(150,116,255,0.8) 16%, rgba(150,116,255,1) 50%, rgba(150,116,255,0.8) 84%, transparent 98%); opacity: calc(var(--clar) * 0.35); }
+  .line-act  { background: linear-gradient(90deg, transparent 2%, rgba(236,239,255,0.8) 16%, rgba(236,239,255,1) 50%, rgba(236,239,255,0.8) 84%, transparent 98%); opacity: calc(var(--act) * 0.85); }
+  .line-cons { background: linear-gradient(90deg, transparent 2%, rgba(56,236,150,0.8) 16%, rgba(56,236,150,1) 50%, rgba(56,236,150,0.8) 84%, transparent 98%); opacity: var(--cons); }
+  .line-red  { background: linear-gradient(90deg, transparent 2%, rgba(255,72,86,0.8) 16%, rgba(255,72,86,1) 50%, rgba(255,72,86,0.8) 84%, transparent 98%); opacity: var(--red); }
   /* a subtle bright core for the hot centre, kept low so the HUE stays dominant */
   .daycard-floor .refl-core {
-    position: absolute; left: -20%; right: -20%; top: -2px; height: 4px;
+    position: absolute; left: -22%; right: -22%; top: -2px; height: 4px;
     filter: blur(2px);
-    background: radial-gradient(40% 120% at 50% 50%, rgba(248,250,255,0.85), transparent 72%);
+    background: linear-gradient(90deg, transparent 8%, rgba(248,250,255,0.8) 50%, transparent 92%);
     opacity: calc(var(--lit, 0) * 0.42);
   }
   /* the reflection BODY: short, color-matched spill that fades quickly, same
