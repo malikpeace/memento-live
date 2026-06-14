@@ -239,8 +239,8 @@
     <div class="row"><label>Action</label><span class="dot" style="background:#ffffff"></span><input id="s2" type="range" min="0" max="100" value="0" step="1"><span class="out" id="o2">0</span></div>
     <div class="row"><label>Consistency</label><span class="dot" style="background:#38e896"></span><input id="s3" type="range" min="0" max="100" value="0" step="1"><span class="out" id="o3">0</span></div>
     <div class="row"><label>Red (test)</label><span class="dot" style="background:#ff4856"></span><input id="s4" type="range" min="0" max="100" value="0" step="1"><span class="out" id="o4">0</span></div>
-    <div class="row"><label>Motion</label><span class="dot" style="background:#c9c9dc"></span><input id="sMotion" type="range" min="4" max="100" value="40" step="1"><span class="out" id="oMotion">1.0x</span></div>
-    <div class="hint">Motion scales all the drift. Tell me the x value you like and I'll bake it in.</div>
+    <div class="row"><label>Motion</label><span class="dot" style="background:#c9c9dc"></span><input id="sMotion" type="range" min="1" max="100" value="25" step="1"><span class="out" id="oMotion">2.5x</span></div>
+    <div class="hint">Motion scales all the drift, 0 to 10x. Tell me the x value you like and I'll bake it in.</div>
   </div>
 
 <script>
@@ -280,9 +280,9 @@
   // multiplier; tell me the number you like and I bake it in.
   var sM = document.getElementById('sMotion'), oM = document.getElementById('oMotion');
   function applyMotion() {
-    var sp = (+sM.value) / 40;
+    var sp = (+sM.value) / 10;            // slider 1..100 -> 0.1x .. 10x
     document.body.style.setProperty('--speed', sp.toFixed(3));
-    oM.textContent = sp.toFixed(2) + 'x';
+    oM.textContent = sp.toFixed(1) + 'x';
   }
   sM.addEventListener('input', applyMotion);
   applyMotion();
