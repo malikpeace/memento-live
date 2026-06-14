@@ -76,16 +76,6 @@
   .daycard-bloom .blob {
     position: absolute; border-radius: 50%; mix-blend-mode: screen; will-change: transform;
   }
-  /* Outward burn: two soft glows that bloom just past the TL + BR corners
-     (behind the card), so the burn light spills off only those corners. */
-  .daycard-burnout {
-    position: absolute; inset: -9%; z-index: 0; pointer-events: none;
-    background:
-      radial-gradient(24% 18% at 8% 8%, rgba(222,232,255,0.85), transparent 62%),
-      radial-gradient(24% 18% at 92% 92%, rgba(222,232,255,0.85), transparent 62%);
-    filter: blur(10px);
-    animation: ringGlimmer 3.6s ease-in-out infinite;
-  }
   .daycard-ns {
     position: relative; z-index: 1;
     width: min(86vw, 330px);
@@ -127,16 +117,27 @@
     pointer-events: none; z-index: 2;
   }
 
-  /* ── Burning light: NOT a ring. Two soft burn glows in the top-left and
-     bottom-right corners only, blooming inward. Glimmers in place.
+  /* ── Burning edge: a crisp light line traced ON the card's edge, but only
+     bright at the top-left and bottom-right corners. Conic gradient masked to
+     the perimeter (hairline ring, not a fill), bright at 315deg (TL) and
+     135deg (BR), fading to nothing at the other two corners. Glimmers in place.
      Intensity = var(--ring). ────────────────────────────────────────────── */
   .daycard-ns__burn {
     content: ""; position: absolute; inset: 0;
     border-radius: inherit; z-index: 3; pointer-events: none;
-    mix-blend-mode: screen;
-    background:
-      radial-gradient(46% 40% at -4% -4%, rgba(236,242,255,0.95), rgba(236,242,255,0) 70%),
-      radial-gradient(46% 40% at 104% 104%, rgba(236,242,255,0.95), rgba(236,242,255,0) 70%);
+    mix-blend-mode: screen; padding: 1.5px;
+    background: conic-gradient(from 0deg,
+      rgba(212,224,255,0)    0deg,
+      rgba(212,224,255,0)    70deg,
+      rgba(234,240,255,0.98) 135deg,
+      rgba(212,224,255,0)    200deg,
+      rgba(212,224,255,0)    250deg,
+      rgba(234,240,255,0.98) 315deg,
+      rgba(212,224,255,0)    360deg);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            mask-composite: exclude;
     animation: ringGlimmer 3.6s ease-in-out infinite;
   }
   /* glimmer = a gentle opacity pulse, gated by --ring (0 = off) */
@@ -262,7 +263,6 @@
     <span class="daycard-bloom" aria-hidden="true">
       <i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i><i class="blob b4"></i><i class="blob b5"></i><i class="blob b6"></i>
     </span>
-    <span class="daycard-burnout" aria-hidden="true"></span>
     <div class="daycard-ns" id="card">
       <span class="daycard-ns__liquid" aria-hidden="true">
         <i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i><i class="blob b4"></i><i class="blob b5"></i><i class="blob b6"></i>
@@ -324,7 +324,7 @@
     var innerR = Math.round(8 + 30 * g), innerA = (0.04 + 0.26 * g).toFixed(3);
     var haloR = Math.round(34 + 95 * g), haloA = ((0.06 + 0.34 * g) * lit).toFixed(3);
     // No ring glow here: a box-shadow always wraps the whole card. The burning
-    // light is drawn as two CORNER glows instead (.daycard-ns__burn + .daycard-burnout).
+    // light is drawn as a masked edge ring at TL + BR only (.daycard-ns__burn).
     card.style.boxShadow =
       'inset 0 1px 0 rgba(255,255,255,' + rimA + '),' +
       'inset 0 0 ' + innerR + 'px rgba(222,230,255,' + innerA + '),' +
