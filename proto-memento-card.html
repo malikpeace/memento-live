@@ -47,7 +47,14 @@
   .daycard-wrap, .panel { position: relative; z-index: 1; }
 
   /* ── Day Card asset (replicated from css/dashboard.css:2675-2813) ──────── */
-  .daycard-wrap { position: relative; }
+  /* Tilt lives on the WRAP so the card AND its ground reflection lean together. */
+  .daycard-wrap {
+    position: relative;
+    transform: perspective(1100px) rotateX(var(--dc-rx, 0deg)) rotateY(var(--dc-ry, 0deg));
+    transform-style: preserve-3d;
+    transition: transform 0.18s ease-out;
+    will-change: transform;
+  }
   .daycard-wrap__aura {
     position: absolute; left: 50%; top: 50%;
     width: 150%; height: 120%;
@@ -93,9 +100,6 @@
     -webkit-backdrop-filter: blur(calc(5px * var(--bx, 1))) saturate(1.25);
     backdrop-filter: blur(calc(5px * var(--bx, 1))) saturate(1.25);
     overflow: hidden;
-    transform: perspective(900px) rotateX(var(--dc-rx, 0deg)) rotateY(var(--dc-ry, 0deg));
-    transition: transform 0.18s ease-out;
-    will-change: transform;
   }
   /* Ground reflection: the card sits on a reflective surface. A bright HORIZON
      line marks where card meets ground, and below it a color-matched reflection
@@ -105,27 +109,38 @@
   .daycard-floor {
     position: absolute; left: 50%; top: 100%;
     transform: translateX(-50%);
-    width: 100%; height: 34%; z-index: 0;
+    width: 100%; height: 28%; z-index: 0;
     pointer-events: none;
     opacity: var(--lit, 0); transition: opacity 0.6s ease;
   }
-  /* the reflection glow: brightest just under the horizon, fading down + out */
+  .daycard-floor i { mix-blend-mode: screen; transition: opacity 0.6s ease; }
+  /* the glowing reflection LINE: a vibrant, hued streak right under the card,
+     extending a touch past the card's width on each side to read 3-D. Each
+     pillar adds its own colour, brightest in the centre and fading at the ends. */
+  .daycard-floor .refl-line {
+    position: absolute; left: -7%; right: -7%; top: 0; height: 12px;
+    filter: blur(4px);
+  }
+  .line-clar { background: radial-gradient(50% 130% at 50% 50%, rgba(150,116,255,0.95), transparent 70%); opacity: var(--clar); }
+  .line-act  { background: radial-gradient(50% 130% at 50% 50%, rgba(236,239,255,0.95), transparent 70%); opacity: calc(var(--act) * 0.9); }
+  .line-cons { background: radial-gradient(50% 130% at 50% 50%, rgba(56,236,150,0.98), transparent 70%); opacity: var(--cons); }
+  .line-red  { background: radial-gradient(50% 130% at 50% 50%, rgba(255,72,86,0.98), transparent 70%); opacity: var(--red); }
+  /* a bright near-white core inside the line so it glows with real energy */
+  .daycard-floor .refl-core {
+    position: absolute; left: 1%; right: 1%; top: 3px; height: 5px;
+    filter: blur(2.5px);
+    background: radial-gradient(44% 120% at 50% 50%, rgba(248,250,255,0.92), transparent 72%);
+    opacity: calc(var(--lit, 0) * 0.9);
+  }
+  /* the reflection BODY: softer colour spilling down under the line, fading out */
   .daycard-floor .refl {
-    position: absolute; left: 6%; right: 6%; top: 2px; bottom: 0;
-    mix-blend-mode: screen; filter: blur(16px);
-    transition: opacity 0.6s ease;
+    position: absolute; left: 9%; right: 9%; top: 9px; bottom: 0;
+    filter: blur(20px);
   }
-  .refl-clar { background: radial-gradient(64% 90% at 50% 0%, rgba(150,116,255,0.75), transparent 74%); opacity: var(--clar); }
-  .refl-act  { background: radial-gradient(64% 90% at 50% 0%, rgba(236,239,255,0.78), transparent 74%); opacity: calc(var(--act) * 0.8); }
-  .refl-cons { background: radial-gradient(64% 90% at 50% 0%, rgba(56,236,150,0.82), transparent 74%); opacity: var(--cons); }
-  .refl-red  { background: radial-gradient(64% 90% at 50% 0%, rgba(255,72,86,0.82), transparent 74%); opacity: var(--red); }
-  /* the horizon: a crisp bright line right where the card meets the ground */
-  .daycard-floor .horizon {
-    position: absolute; left: 4%; right: 4%; top: 0; height: 2px;
-    mix-blend-mode: screen; filter: blur(1.5px);
-    background: linear-gradient(90deg, transparent,
-      rgba(232,238,255,0.55) 22%, rgba(232,238,255,0.85) 50%, rgba(232,238,255,0.55) 78%, transparent);
-  }
+  .refl-clar { background: radial-gradient(60% 86% at 50% 0%, rgba(150,116,255,0.5), transparent 78%); opacity: var(--clar); }
+  .refl-act  { background: radial-gradient(60% 86% at 50% 0%, rgba(236,239,255,0.52), transparent 78%); opacity: calc(var(--act) * 0.7); }
+  .refl-cons { background: radial-gradient(60% 86% at 50% 0%, rgba(56,236,150,0.55), transparent 78%); opacity: var(--cons); }
+  .refl-red  { background: radial-gradient(60% 86% at 50% 0%, rgba(255,72,86,0.55), transparent 78%); opacity: var(--red); }
   /* room for the reflection so it does not crowd the controls */
   .daycard-wrap { margin-bottom: 110px; }
   /* Liquid-glass rim: a masked gradient ring (NOT a border). */
@@ -291,7 +306,8 @@
     </span>
     <span class="daycard-floor" aria-hidden="true">
       <i class="refl refl-clar"></i><i class="refl refl-act"></i><i class="refl refl-cons"></i><i class="refl refl-red"></i>
-      <i class="horizon"></i>
+      <i class="refl-line line-clar"></i><i class="refl-line line-act"></i><i class="refl-line line-cons"></i><i class="refl-line line-red"></i>
+      <i class="refl-core"></i>
     </span>
     <div class="daycard-ns" id="card">
       <span class="daycard-ns__liquid" aria-hidden="true">
@@ -421,18 +437,20 @@
   sM.addEventListener('input', applyMotion);
   applyMotion();
 
-  // Pointer tilt: the card leans toward the pointer so the glass reads physical.
+  // Pointer tilt: the whole wrap (card + its ground reflection) leans toward the
+  // pointer as one piece, so the reflection follows the card when it moves.
+  var wrap = document.querySelector('.daycard-wrap');
   if (!reduce) {
-    var reset = function () { card.style.setProperty('--dc-rx', '0deg'); card.style.setProperty('--dc-ry', '0deg'); };
-    card.addEventListener('pointermove', function (e) {
+    var reset = function () { wrap.style.setProperty('--dc-rx', '0deg'); wrap.style.setProperty('--dc-ry', '0deg'); };
+    wrap.addEventListener('pointermove', function (e) {
       var r = card.getBoundingClientRect(); if (!r.width || !r.height) return;
       var nx = ((e.clientX - r.left) / r.width) * 2 - 1;
       var ny = ((e.clientY - r.top) / r.height) * 2 - 1;
-      card.style.setProperty('--dc-rx', (ny * -3.2).toFixed(2) + 'deg');
-      card.style.setProperty('--dc-ry', (nx * 4).toFixed(2) + 'deg');
+      wrap.style.setProperty('--dc-rx', (ny * -3.2).toFixed(2) + 'deg');
+      wrap.style.setProperty('--dc-ry', (nx * 4).toFixed(2) + 'deg');
     });
-    card.addEventListener('pointerleave', reset);
-    card.addEventListener('pointerup', reset);
+    wrap.addEventListener('pointerleave', reset);
+    wrap.addEventListener('pointerup', reset);
   }
 
   // ── Inside colors: continuous RANDOM wander (no looping animation) ────────
