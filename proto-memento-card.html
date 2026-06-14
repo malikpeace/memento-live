@@ -146,18 +146,26 @@
     background: radial-gradient(circle at 30% 18%, rgba(255, 255, 255, 0.13), transparent 55%);
     mix-blend-mode: screen;
   }
+  /* The mark + name sit ABOVE the moving color (z-index 4, over the blobs and
+     the rim) and are part of the card, so they tilt with it. */
   .daycard-ns__body {
-    position: relative; flex: 1;
+    position: relative; z-index: 4; flex: 1;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     text-align: center; padding: 18px 2px;
   }
+  /* Embedded, embossed mark: a frosted translucent fill that reads over any
+     color, with a bright top edge + dark lower edge so it looks pressed into
+     the glass and catches the light. */
   .daycard-ns__emblem {
     width: 116px; height: 116px;
-    fill: rgba(255, 255, 255, 0.05);
-    filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.14)) drop-shadow(0 -1px 1px rgba(0, 0, 0, 0.32));
+    fill: rgba(255, 255, 255, 0.18);
+    filter:
+      drop-shadow(0 1.5px 0.5px rgba(255, 255, 255, 0.55))
+      drop-shadow(0 -1.5px 1.5px rgba(0, 0, 0, 0.5))
+      drop-shadow(0 0 10px rgba(255, 255, 255, 0.12));
   }
   .daycard-ns__foot {
-    position: relative; display: flex; align-items: center; justify-content: flex-end;
+    position: relative; z-index: 4; display: flex; align-items: center; justify-content: flex-end;
     gap: 10px; min-height: 26px;
   }
   .daycard-ns__name {
