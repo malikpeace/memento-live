@@ -1354,8 +1354,10 @@ body.calm-motion .welcome-intro__pillar-ground {
   /* The 66px full-screen blur is the single biggest GPU cost; the radial
      gradients already read soft, so a light blur is plenty. */
   .welcome-intro__orb, .welcome-intro__bg { filter: blur(18px) !important; }
-  /* The drifting screen-blend glow is costly to composite each frame. */
-  .welcome-intro__glow { mix-blend-mode: normal !important; animation: none !important; }
+  /* Screen-blend compositing each frame is the costly part, so drop to normal
+     blend on phones, but KEEP the drift: a transform-only animation rides the
+     GPU cheaply, so the background still visibly moves on mobile. */
+  .welcome-intro__glow { mix-blend-mode: normal !important; }
 
   /* ---- CRASH FIX: kill GPU/memory exhaustion on phones ----
      The app has ~110 frosted-glass backdrop-filter layers. On iOS each one is a
@@ -1546,7 +1548,7 @@ body.lite .welcome-intro__beacon { animation: none; opacity: 1; transform: trans
   transition: opacity 1.45s cubic-bezier(0.22,1,0.36,1), transform 1.65s cubic-bezier(0.22,1,0.36,1);
   mix-blend-mode: screen; will-change: opacity, transform;
 }
-.welcome-intro__glow.is-active { opacity: var(--glow-opacity, 1); transform: translate3d(0,0,0) scale(1); animation: welcomeGlowDrift 18s ease-in-out infinite alternate; }
+.welcome-intro__glow.is-active { opacity: var(--glow-opacity, 1); transform: translate3d(0,0,0) scale(1); animation: welcomeGlowDrift 13s ease-in-out infinite alternate; }
 /* glows pool in the corners so the center (text) stays dark and readable */
 .welcome-intro__glow--purple { background: radial-gradient(48% 44% at 7% 11%, rgba(123,97,255,0.50), transparent 62%), radial-gradient(42% 38% at 88% 90%, rgba(93,70,220,0.36), transparent 62%); }
 .welcome-intro__glow--cyan { background: radial-gradient(46% 42% at 92% 14%, rgba(64,196,230,0.46), transparent 60%), radial-gradient(42% 38% at 10% 72%, rgba(46,166,208,0.3), transparent 60%); }
@@ -1556,15 +1558,15 @@ body.lite .welcome-intro__beacon { animation: none; opacity: 1; transform: trans
   radial-gradient(40% 36% at 14% 20%, rgba(180,90,230,0.26), transparent 58%),
   radial-gradient(40% 36% at 86% 22%, rgba(70,160,235,0.24), transparent 58%),
   radial-gradient(42% 38% at 50% 90%, rgba(80,220,150,0.24), transparent 58%); }
-.welcome-intro__glow--purple { animation-duration: 20s; }
-.welcome-intro__glow--white { animation-duration: 22s; }
-.welcome-intro__glow--green { animation-duration: 24s; }
-.welcome-intro__glow--cyan { animation-duration: 26s; }
-.welcome-intro__glow--rainbow { animation-duration: 28s; }
+.welcome-intro__glow--purple { animation-duration: 13s; }
+.welcome-intro__glow--white { animation-duration: 15s; }
+.welcome-intro__glow--green { animation-duration: 17s; }
+.welcome-intro__glow--cyan { animation-duration: 19s; }
+.welcome-intro__glow--rainbow { animation-duration: 21s; }
 @keyframes welcomeGlowDrift {
-  0% { transform: translate3d(-1.5%, -1%, 0) scale(1); }
-  50% { transform: translate3d(1.25%, 1.8%, 0) scale(1.035); }
-  100% { transform: translate3d(2%, -1.25%, 0) scale(1.02); }
+  0%   { transform: translate3d(-6%, -4%, 0) scale(1); }
+  50%  { transform: translate3d(6.5%, 5.5%, 0) scale(1.12); }
+  100% { transform: translate3d(8%, -4.5%, 0) scale(1.06); }
 }
 body.calm-motion .welcome-intro__glow.is-active { animation: none; }
 @media (prefers-reduced-motion: reduce) {
