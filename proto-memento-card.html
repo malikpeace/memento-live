@@ -47,14 +47,7 @@
   .daycard-wrap, .panel { position: relative; z-index: 1; }
 
   /* ── Day Card asset (replicated from css/dashboard.css:2675-2813) ──────── */
-  /* Tilt lives on the WRAP so the card AND its ground reflection lean together. */
-  .daycard-wrap {
-    position: relative;
-    transform: perspective(1100px) rotateX(var(--dc-rx, 0deg)) rotateY(var(--dc-ry, 0deg));
-    transform-style: preserve-3d;
-    transition: transform 0.18s ease-out;
-    will-change: transform;
-  }
+  .daycard-wrap { position: relative; }
   .daycard-wrap__aura {
     position: absolute; left: 50%; top: 50%;
     width: 150%; height: 120%;
@@ -100,6 +93,10 @@
     -webkit-backdrop-filter: blur(calc(5px * var(--bx, 1))) saturate(1.25);
     backdrop-filter: blur(calc(5px * var(--bx, 1))) saturate(1.25);
     overflow: hidden;
+    /* Tilt lives on the card only, so its ground reflection stays put. */
+    transform: perspective(900px) rotateX(var(--dc-rx, 0deg)) rotateY(var(--dc-ry, 0deg));
+    transition: transform 0.18s ease-out;
+    will-change: transform;
   }
   /* Ground reflection: a true vertical MIRROR of the card's colour layer, cloned
      below the card and flipped (scaleY(-1)) so it sits BEHIND the card (z 0) and
@@ -122,11 +119,11 @@
        edge touching the card = brightest, hold then fade down) AND a horizontal
        fade so the reflection dissolves toward its far left/right edges. */
     -webkit-mask-image:
-      linear-gradient(to top, #000 18%, rgba(0,0,0,0.45) 52%, transparent 90%),
+      linear-gradient(to top, transparent 0%, #000 9%, rgba(0,0,0,0.45) 54%, transparent 90%),
       linear-gradient(to right, transparent 0%, #000 20%, #000 80%, transparent 100%);
     -webkit-mask-composite: source-in;
     mask-image:
-      linear-gradient(to top, #000 18%, rgba(0,0,0,0.45) 52%, transparent 90%),
+      linear-gradient(to top, transparent 0%, #000 9%, rgba(0,0,0,0.45) 54%, transparent 90%),
       linear-gradient(to right, transparent 0%, #000 20%, #000 80%, transparent 100%);
     mask-composite: intersect;
   }
@@ -447,17 +444,17 @@
   sM.addEventListener('input', applyMotion);
   applyMotion();
 
-  // Pointer tilt: the whole wrap (card + its ground reflection) leans toward the
-  // pointer as one piece, so the reflection follows the card when it moves.
+  // Pointer tilt: only the CARD leans toward the pointer; its ground reflection
+  // is a sibling and stays put, so the two move independently.
   var wrap = document.querySelector('.daycard-wrap');
   if (!reduce) {
-    var reset = function () { wrap.style.setProperty('--dc-rx', '0deg'); wrap.style.setProperty('--dc-ry', '0deg'); };
+    var reset = function () { card.style.setProperty('--dc-rx', '0deg'); card.style.setProperty('--dc-ry', '0deg'); };
     wrap.addEventListener('pointermove', function (e) {
       var r = card.getBoundingClientRect(); if (!r.width || !r.height) return;
       var nx = ((e.clientX - r.left) / r.width) * 2 - 1;
       var ny = ((e.clientY - r.top) / r.height) * 2 - 1;
-      wrap.style.setProperty('--dc-rx', (ny * -3.2).toFixed(2) + 'deg');
-      wrap.style.setProperty('--dc-ry', (nx * 4).toFixed(2) + 'deg');
+      card.style.setProperty('--dc-rx', (ny * -3.2).toFixed(2) + 'deg');
+      card.style.setProperty('--dc-ry', (nx * 4).toFixed(2) + 'deg');
     });
     wrap.addEventListener('pointerleave', reset);
     wrap.addEventListener('pointerup', reset);
