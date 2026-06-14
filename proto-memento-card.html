@@ -83,7 +83,11 @@
     transform: perspective(900px) rotateX(var(--dc-rx, 0deg)) rotateY(var(--dc-ry, 0deg));
     transition: transform 0.18s ease-out;
     will-change: transform;
+    /* Subtle floor reflection: a short, quickly-fading mirror of the card. */
+    -webkit-box-reflect: below 3px linear-gradient(to bottom, rgba(0,0,0,0.30), rgba(0,0,0,0) 24%);
   }
+  /* room for the reflection so it does not crowd the controls */
+  .daycard-wrap { margin-bottom: 56px; }
   /* Liquid-glass rim: a masked gradient ring (NOT a border). */
   .daycard-ns::before {
     content: ""; position: absolute; inset: 0;
@@ -140,22 +144,22 @@
   }
   .blob.b1 { width: 94%; height: 72%; left: -12%; top: -14%;
     background: radial-gradient(circle, rgba(150,116,255,1.0), transparent 66%);
-    opacity: var(--clar); animation: dl1 calc(17s / var(--speed,1)) ease-in-out infinite; }
+    opacity: var(--clar); }
   .blob.b2 { width: 74%; height: 60%; left: 14%; top: 22%;
     background: radial-gradient(circle, rgba(232,236,255,0.95), transparent 64%);
-    opacity: calc(var(--act) * 0.68); animation: dl2 calc(20s / var(--speed,1)) ease-in-out infinite; }
+    opacity: calc(var(--act) * 0.68); }
   .blob.b3 { width: 98%; height: 76%; right: -14%; bottom: -16%;
     background: radial-gradient(circle, rgba(56,236,150,1.0), transparent 64%);
-    opacity: var(--cons); animation: dl3 calc(18s / var(--speed,1)) ease-in-out infinite; }
+    opacity: var(--cons); }
   .blob.b4 { width: 72%; height: 58%; left: 0%; bottom: 4%;
     background: radial-gradient(circle, rgba(128,150,255,0.85), transparent 66%);
-    opacity: var(--mix); animation: dl4 calc(23s / var(--speed,1)) ease-in-out infinite; }
+    opacity: var(--mix); }
   .blob.b5 { width: 66%; height: 54%; right: 4%; top: 28%;
     background: radial-gradient(circle, rgba(120,255,190,0.7), transparent 68%);
-    opacity: calc(var(--cons) * 0.5); animation: dl5 calc(19s / var(--speed,1)) ease-in-out infinite; }
+    opacity: calc(var(--cons) * 0.5); }
   .blob.b6 { width: 80%; height: 62%; right: -12%; top: 6%;
     background: radial-gradient(circle, rgba(255,72,86,1.0), transparent 66%);
-    opacity: var(--red); animation: dl6 calc(17s / var(--speed,1)) ease-in-out infinite; }
+    opacity: var(--red); }
   /* 3-point wandering paths (not just back-and-forth) so the color visibly
      drifts around inside the card, calmly. */
   @keyframes dl1 { 0%,100% { transform: translate(0,0) scale(1) } 33% { transform: translate(22%,16%) scale(1.12) } 66% { transform: translate(9%,26%) scale(1.05) } }
@@ -372,6 +376,31 @@
     card.addEventListener('pointerleave', reset);
     card.addEventListener('pointerup', reset);
   }
+
+  // ── Inside colors: continuous RANDOM wander (no looping animation) ────────
+  // Each blob eases toward a fresh random target; on arrival it picks another,
+  // forever, so the motion never repeats. Pace scales with the Motion slider.
+  (function blobWander() {
+    if (reduce) return;
+    var blobs = [].slice.call(document.querySelectorAll('.daycard-ns__liquid .blob'));
+    if (!blobs.length) return;
+    var R = function (a, b) { return a + Math.random() * (b - a); };
+    var st = blobs.map(function () { return { x: 0, y: 0, sc: 1, tx: R(-20, 20), ty: R(-18, 18), tsc: R(0.92, 1.16) }; });
+    function frame() {
+      var sp = parseFloat(getComputedStyle(document.body).getPropertyValue('--speed')) || 1;
+      var k = Math.min(0.2, 0.011 * sp);
+      for (var i = 0; i < blobs.length; i++) {
+        var b = st[i];
+        b.x += (b.tx - b.x) * k; b.y += (b.ty - b.y) * k; b.sc += (b.tsc - b.sc) * k;
+        if (Math.abs(b.tx - b.x) < 1 && Math.abs(b.ty - b.y) < 1) {
+          b.tx = R(-22, 22); b.ty = R(-20, 20); b.tsc = R(0.9, 1.18);
+        }
+        blobs[i].style.transform = 'translate(' + b.x.toFixed(2) + '%,' + b.y.toFixed(2) + '%) scale(' + b.sc.toFixed(3) + ')';
+      }
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  })();
 
   presets.querySelector('button').classList.add('is-active');
   applyGlow();
