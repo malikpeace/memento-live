@@ -1378,13 +1378,20 @@ body.calm-motion .welcome-intro__pillar-ground {
     animation: none !important;
     will-change: auto !important;
   }
-  /* Landing-page exception: with the flicker animation frozen, beams sit at
-     their dimmest keyframe (--omin) and the splash reads near-black on phones.
-     Pin the splash + auth-screen beams at PEAK brightness instead. Static
-     gradients composite once, so this costs the GPU nothing. */
+  /* Landing + auth beams: give each beam the SAME per-beam shimmer the modules
+     page uses on phones (ambientBeamGlimmer, defined in dashboard.css). It is
+     opacity-ONLY, so the 8px-blurred shaft rasterizes once and only opacity
+     rides the compositor: cheap, no crash risk, and the beams visibly shimmer
+     independently (staggered by their own --d/--del) instead of the whole image
+     rocking. Tighter blur = distinct streaks like the dashboard. */
   .splash__rays .ambient__rays-beam-shaft,
   .auth-screen__rays .ambient__rays-beam-shaft {
-    opacity: var(--omax, 0.5) !important;
+    filter: blur(8px);
+    transform: none;
+    opacity: min(1, calc(var(--omax, 0.5) * 2));
+    animation: ambientBeamGlimmer calc(var(--d, 10s) * 1.8) ease-in-out infinite !important;
+    animation-delay: var(--del, 0s);
+    will-change: opacity;
   }
 }
 
@@ -2089,23 +2096,6 @@ body:has(.clarity-exp.open-content) .fullscreen-close-global {
       rgb(var(--c, 255 255 255) / 0.04) 74%,
       transparent 92%);
     filter: blur(20px);
-  }
-}
-/* The splash (first page) is worth moving even on phones. The per-beam flicker
-   stays frozen on mobile (it animates transform on a blurred layer = costly),
-   but swaying the WHOLE ray cluster is a single composited transform: it
-   rasterizes once and rides the GPU cheaply, so the light visibly sweeps with
-   no crash risk. Pivot near the top-left source so the beams fan as they turn. */
-@keyframes splashRayDrift {
-  0%   { transform: translate(-3%, -2%) rotate(-6deg) scale(1.06); }
-  50%  { transform: translate(4%, 3.5%) rotate(7deg) scale(1.14); }
-  100% { transform: translate(2.5%, -2%) rotate(-3.5deg) scale(1.08); }
-}
-@media (pointer: coarse), (max-width: 859.98px) {
-  .splash__rays {
-    transform-origin: 14% 6%;
-    animation: ambientRaysFadeIn 1.6s ease both, splashRayDrift 11s ease-in-out infinite alternate;
-    will-change: transform;
   }
 }
 @media (prefers-reduced-motion: reduce) {
