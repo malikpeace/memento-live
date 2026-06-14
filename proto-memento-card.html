@@ -122,28 +122,22 @@
      the perimeter (hairline ring, not a fill), bright at 315deg (TL) and
      135deg (BR), fading to nothing at the other two corners. Glimmers in place.
      Intensity = var(--ring). ────────────────────────────────────────────── */
-  /* --burn-rot slides the two bright bands along the edge toward the pointer;
-     --burn-x/--burn-y parallax the whole ring a touch as the card leans. Both
-     are driven by the pointer in JS. @property lets the rotation interpolate. */
-  @property --burn-rot { syntax: '<angle>'; inherits: true; initial-value: 0deg; }
   .daycard-ns__burn {
     content: ""; position: absolute; inset: 0;
     border-radius: inherit; z-index: 3; pointer-events: none;
     mix-blend-mode: screen; padding: 1.5px;
-    background: conic-gradient(from calc(315deg + var(--burn-rot, 0deg)),
-      rgba(234,240,255,0.98) 0deg,
-      rgba(212,224,255,0)    45deg,
-      rgba(212,224,255,0)    135deg,
-      rgba(234,240,255,0.98) 180deg,
-      rgba(212,224,255,0)    225deg,
-      rgba(212,224,255,0)    315deg,
-      rgba(234,240,255,0.98) 360deg);
+    background: conic-gradient(from 0deg,
+      rgba(212,224,255,0)    0deg,
+      rgba(212,224,255,0)    70deg,
+      rgba(234,240,255,0.98) 135deg,
+      rgba(212,224,255,0)    200deg,
+      rgba(212,224,255,0)    250deg,
+      rgba(234,240,255,0.98) 315deg,
+      rgba(212,224,255,0)    360deg);
     -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite: xor;
             mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
             mask-composite: exclude;
-    transform: translate(var(--burn-x, 0px), var(--burn-y, 0px));
-    transition: --burn-rot 0.22s ease-out, transform 0.22s ease-out;
     animation: ringGlimmer 3.6s ease-in-out infinite;
   }
   /* glimmer = a gentle opacity pulse, gated by --ring (0 = off) */
@@ -397,23 +391,18 @@
   sM.addEventListener('input', applyMotion);
   applyMotion();
 
-  // Pointer tilt + burn drift: the card leans toward the pointer and the two
-  // corner burns slide along the edge to catch the light. Tracked across the
-  // WHOLE window (normalized to the card's centre) so it reacts to the mouse
-  // anywhere on screen, not only while hovering the card.
+  // Pointer tilt: the card leans toward the pointer so the glass reads physical.
   if (!reduce) {
-    window.addEventListener('pointermove', function (e) {
+    var reset = function () { card.style.setProperty('--dc-rx', '0deg'); card.style.setProperty('--dc-ry', '0deg'); };
+    card.addEventListener('pointermove', function (e) {
       var r = card.getBoundingClientRect(); if (!r.width || !r.height) return;
-      // distance from card centre, in card-half units, clamped to [-1, 1]
-      var nx = Math.max(-1, Math.min(1, (e.clientX - (r.left + r.width / 2)) / (r.width / 2)));
-      var ny = Math.max(-1, Math.min(1, (e.clientY - (r.top + r.height / 2)) / (r.height / 2)));
+      var nx = ((e.clientX - r.left) / r.width) * 2 - 1;
+      var ny = ((e.clientY - r.top) / r.height) * 2 - 1;
       card.style.setProperty('--dc-rx', (ny * -3.2).toFixed(2) + 'deg');
       card.style.setProperty('--dc-ry', (nx * 4).toFixed(2) + 'deg');
-      // burns slide ~14deg along the edge toward the pointer + a small parallax
-      card.style.setProperty('--burn-rot', (nx * 14).toFixed(2) + 'deg');
-      card.style.setProperty('--burn-x', (nx * 3).toFixed(2) + 'px');
-      card.style.setProperty('--burn-y', (ny * 3).toFixed(2) + 'px');
-    }, { passive: true });
+    });
+    card.addEventListener('pointerleave', reset);
+    card.addEventListener('pointerup', reset);
   }
 
   // ── Inside colors: continuous RANDOM wander (no looping animation) ────────
