@@ -107,12 +107,11 @@ body.ns-bloom .ambient__ns-bloom { opacity: 1; }
   position: absolute; inset: 0;
   pointer-events: none;
   overflow: hidden;
-  /* Pre-Neutron-Star state: rays are a whisper. Once the user locks in their
-     star, body.ns-bloom is added and the rays bloom to full sunlight.
-     Note: no fade-in animation here (it was forcing opacity:1 via fill-mode
-     both, which fought the bloom state). The .ambient__rays-source pulse and
-     per-beam flicker animations still run independently. */
-  opacity: 0.22;
+  /* Pre-Neutron-Star state: NO rays at all. The top-left beam is earned, it
+     only blooms in once the user locks in their star (body.ns-bloom). Before
+     that the dashboard sky stays dark. The source pulse + per-beam flicker run
+     independently, but at opacity 0 they are invisible until the bloom. */
+  opacity: 0;
   z-index: 2;
   transition: opacity 1.8s ease;
 }
@@ -182,9 +181,9 @@ body.ns-bloom .ambient__rays {
    rasterizes once, so this costs none of the GPU memory the original
    transform flicker did (that one stays frozen on mobile). */
 @media (pointer: coarse), (max-width: 859.98px) {
-  /* Full-strength rays layer on phones (desktop ramps 0.22 -> 0.8 via
-     ns-bloom; mobile goes all the way so the beams read as light, not haze). */
-  .ambient .ambient__rays { opacity: 0.5; }
+  /* Phones: still NO rays before the Neutron Star (earned beam). After bloom,
+     mobile goes all the way so the beams read as light, not haze. */
+  .ambient .ambient__rays { opacity: 0; }
   body.ns-bloom .ambient .ambient__rays { opacity: 1; }
   .ambient .ambient__rays-beam-shaft {
     /* Tighter blur = visible STREAKS instead of one merged wash; brighter
@@ -2642,6 +2641,22 @@ html.theme-light body.lite .backup-nudge, html.theme-light.lowfx .backup-nudge {
   }
 }
 body.daycard-force #dayCard { display: block; max-width: 430px; }
+/* Desktop / tablet: show the card too, as a clean centered artifact at the top
+   of the dashboard. No full-screen snap-scroll here (that is mobile-only); it is
+   just a sized block the dashboard content flows beneath. */
+@media (min-width: 860px) {
+  #dayCard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 0 0 auto;
+    margin: 0 auto 40px;
+  }
+  /* platinum card sizes itself; living sizes via its stage (card fills it) */
+  #dayCard .daycard-theme-platinum .daycard-ns { width: 320px; margin: 0; }
+  #dayCard .daycard-theme-living .daycard-living-stage { width: 320px; margin: 0 0 26px; }
+  #dayCard .daycard-ns { min-height: 440px; }
+}
 /* The swipe cue: a whisper at the bottom of the hero screen. Dissolves as
    soon as scrolling starts (JS toggles .is-hidden). */
 .daycard-hint {
