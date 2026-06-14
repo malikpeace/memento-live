@@ -497,16 +497,9 @@ const WelcomeIntro = {
     setTimeout(() => this._showIdentityStep(sumIdx), 320);
   },
 
-  // thin continuous progress bar across the whole onboarding
-  _ensureProgressBar() {
-    if (!this.el || this.el.querySelector('.welcome-intro__progress')) return;
-    const bar = document.createElement('div');
-    bar.className = 'welcome-intro__progress';
-    bar.setAttribute('role', 'progressbar');
-    bar.setAttribute('aria-label', 'Setup progress');
-    bar.innerHTML = '<div class="welcome-intro__progress-fill"></div>';
-    this.el.appendChild(bar);
-  },
+  // Onboarding progress bar removed (Malik): no thin bar at the very top.
+  // Kept as a no-op so _setProgress / _hideProgressBar callers stay safe.
+  _ensureProgressBar() { return; },
   _setProgress(frac) {
     this._ensureProgressBar();
     const bar = this.el && this.el.querySelector('.welcome-intro__progress');
