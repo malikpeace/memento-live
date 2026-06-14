@@ -931,7 +931,7 @@ const WelcomeIntro = {
     { key: 'letterToFutureSelf', type: 'text',
       headline: 'Anything else Memento should know?',
       sub: 'Totally optional. A line about you, your situation, or what you want. Or just skip it.',
-      placeholder: 'Say as much or as little as you want...' },
+      placeholder: 'Type anything, or skip' },
     { type: 'summaryStepper' },
     { type: 'paywall' }
   ],
