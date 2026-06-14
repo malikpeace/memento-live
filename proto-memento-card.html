@@ -187,11 +187,12 @@
      the glass and catches the light. */
   .daycard-ns__emblem {
     width: 116px; height: 116px;
-    fill: rgba(255, 255, 255, 0.18);
+    fill: rgba(255, 255, 255, 0.2);
     filter:
-      drop-shadow(0 1.5px 0.5px rgba(255, 255, 255, 0.55))
-      drop-shadow(0 -1.5px 1.5px rgba(0, 0, 0, 0.5))
-      drop-shadow(0 0 10px rgba(255, 255, 255, 0.12));
+      drop-shadow(0 1.5px 0.5px rgba(255, 255, 255, 0.75))   /* bright lower bevel */
+      drop-shadow(0 -1.5px 1px rgba(0, 0, 0, 0.6))           /* dark upper bevel */
+      drop-shadow(0 0 6px rgba(0, 0, 0, 0.5))                /* dark halo: reads on bright areas */
+      drop-shadow(0 0 13px rgba(255, 255, 255, 0.16));       /* soft sheen: reads on dark areas */
   }
   .daycard-ns__foot {
     position: relative; z-index: 4; display: flex; align-items: center; justify-content: flex-end;
