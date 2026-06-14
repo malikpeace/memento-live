@@ -855,7 +855,7 @@ const WelcomeIntro = {
   // readable strings on state.profile and fed to the AI via buildProfileContext.
   identitySteps: [
     { key: 'runningToward', type: 'choices', multi: true,
-      headline: 'Okay, {name}. What area of your life would you like to improve?',
+      headline: 'What area of your life are you trying to improve?',
       sub: 'Tap whatever fits. You can pick more than one.',
       options: ['Work & money', 'Health & fitness', 'Discipline & focus', 'A skill or craft', 'Creative work', 'Relationships', 'Confidence & mindset', 'Purpose & direction'] },
     { key: 'story', type: 'choices', multi: false,
