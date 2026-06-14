@@ -1,0 +1,157 @@
+/* ============================================================================
+   Day Card — "Living" theme
+   A color-morph + ground-reflection layer for the Day Card whose hue tracks the
+   three pillars: CLARITY (purple), ACTION (white), CONSISTENCY (green). Ported
+   from proto-memento-card.html. EVERYTHING here is scoped under
+   `.daycard-theme-living` so the classic platinum card is untouched. The level
+   vars (--clar/--act/--cons/--mix/--lit) are set by JS from real data; the look
+   constants below are the values dialed in the prototype.
+
+   Structure (living only): .daycard-wrap.daycard-theme-living
+       > .daycard-wrap__aura  (ambient, gated by --lit/--glow)
+       > .daycard-living-stage  (sized to the card so bloom/floor align)
+           > .daycard-bloom   (color echo behind the card, z 0)
+           > .daycard-floor   (mirrored ground reflection, z 4)
+           > .daycard-ns      (the glass card, z 1)
+               > .daycard-ns__liquid (color blobs) + __burn + (iri/sheen/body/foot)
+   ============================================================================ */
+
+.daycard-theme-living {
+  /* baked look constants (the values Malik liked in the prototype) */
+  --glow: 0.4;     /* aura brightness */
+  --ring: 0.3;     /* corner edge-burn intensity */
+  --emit: 0.6;     /* color bleed / bloom strength */
+  --sat: 1.5;      /* saturation of the color layers */
+  --rfl-w: 10;     /* reflection extra width past the card (each side, %) */
+  --rfl-i: 1;      /* reflection brightness multiplier */
+  --rfl-d: 42;     /* reflection depth (% of card height) */
+}
+
+/* Ambient aura: gate by --lit so an empty living card has no surrounding glow,
+   and let --glow scale its brightness. */
+.daycard-theme-living .daycard-wrap__aura {
+  filter: blur(28px) brightness(calc((0.7 + 1.7 * var(--glow, 0.4)) * var(--lit, 0)));
+}
+
+/* The stage shrink-wraps the card so the bloom + reflection align to the card
+   (the platinum card is centered with margins inside a full-width wrap). */
+.daycard-theme-living .daycard-living-stage {
+  position: relative;
+  width: min(76%, 270px);
+  margin: 14px auto 26px;
+}
+@media (max-width: 859.98px) {
+  .daycard-theme-living .daycard-living-stage { width: min(86%, 330px); }
+}
+.daycard-theme-living .daycard-living-stage > .daycard-ns {
+  width: 100%;
+  margin: 0;
+  z-index: 1;
+  /* softer drop shadow so the reflection bleeds off the bottom with no dark seam */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 0 44px rgba(200, 210, 255, 0.10),
+    0 12px 38px rgba(0, 0, 0, 0.28);
+}
+
+/* ── Liquid color layer (inside the card) ─────────────────────────────────── */
+.daycard-theme-living .daycard-ns__liquid {
+  position: absolute; inset: -28%; pointer-events: none; z-index: 0;
+  filter: blur(30px) saturate(var(--sat, 1.5));
+}
+.daycard-theme-living .daycard-ns__liquid .blob {
+  position: absolute; border-radius: 50%;
+  mix-blend-mode: screen; will-change: transform;
+  transition: opacity 0.6s ease;
+}
+
+/* per-pillar blobs (positions/sizes from the prototype) */
+.daycard-theme-living .blob.b1 { width: 94%; height: 72%; left: -12%; top: -14%;
+  background: radial-gradient(circle, rgba(150,116,255,1.0), transparent 66%);
+  opacity: var(--clar, 0); }
+.daycard-theme-living .blob.b2 { width: 150%; height: 120%; left: -25%; top: -8%;
+  background: radial-gradient(circle, rgba(236,239,255,0.98), transparent 66%);
+  opacity: calc(var(--act, 0) * 0.82); }
+.daycard-theme-living .blob.b3 { width: 98%; height: 76%; right: -14%; bottom: -16%;
+  background: radial-gradient(circle, rgba(56,236,150,1.0), transparent 64%);
+  opacity: var(--cons, 0); }
+.daycard-theme-living .blob.b4 { width: 72%; height: 58%; left: 0%; bottom: 4%;
+  background: radial-gradient(circle, rgba(128,150,255,0.85), transparent 66%);
+  opacity: var(--mix, 0); }
+.daycard-theme-living .blob.b5 { width: 66%; height: 54%; right: 4%; top: 28%;
+  background: radial-gradient(circle, rgba(120,255,190,0.7), transparent 68%);
+  opacity: calc(var(--cons, 0) * 0.5); }
+.daycard-theme-living .blob.b6 { width: 80%; height: 62%; right: -12%; top: 6%;
+  background: radial-gradient(circle, rgba(255,72,86,1.0), transparent 66%);
+  opacity: 0; }   /* the "red test" pillar has no real data; held off in-app */
+
+/* ── Color bloom: a blurred echo behind the card that bleeds the hue out ───── */
+.daycard-theme-living .daycard-bloom {
+  position: absolute; inset: -5%; z-index: 0;
+  border-radius: calc(var(--r-card) + 12px);
+  pointer-events: none; overflow: hidden;
+  filter: blur(26px) saturate(var(--sat, 1.5));
+  opacity: calc(var(--emit, 0.55) * var(--lit, 0));
+}
+.daycard-theme-living .daycard-bloom .blob {
+  position: absolute; border-radius: 50%; mix-blend-mode: screen; will-change: transform;
+}
+
+/* ── Burning edge: crisp light at the TL + BR corners only, gated by --ring ─── */
+.daycard-theme-living .daycard-ns__burn {
+  content: ""; position: absolute; inset: 0;
+  border-radius: inherit; z-index: 3; pointer-events: none;
+  mix-blend-mode: screen; padding: 1.5px;
+  background: conic-gradient(from 0deg,
+    rgba(212,224,255,0)    0deg,
+    rgba(212,224,255,0)    70deg,
+    rgba(234,240,255,0.98) 135deg,
+    rgba(212,224,255,0)    200deg,
+    rgba(212,224,255,0)    250deg,
+    rgba(234,240,255,0.98) 315deg,
+    rgba(212,224,255,0)    360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask-composite: exclude;
+  animation: dcLivingGlimmer 3.6s ease-in-out infinite;
+}
+@keyframes dcLivingGlimmer {
+  0%,100% { opacity: calc(var(--ring, 0) * 0.72); }
+  50%     { opacity: var(--ring, 0); }
+}
+
+/* ── Ground reflection: a true vertical MIRROR of the card's color layer ───── */
+.daycard-theme-living .daycard-floor {
+  position: absolute; left: 50%; top: 100%;
+  transform: translateX(-50%) scaleY(-1);
+  transform-origin: center center;
+  width: calc(100% + var(--rfl-w, 10) * 2%);
+  height: calc(var(--rfl-d, 42) * 1%); z-index: 4;
+  pointer-events: none; overflow: hidden;
+  border-radius: var(--r-card);
+  opacity: calc(var(--lit, 0) * var(--rfl-i, 1));
+  filter: blur(22px) saturate(var(--sat, 1.5));
+  transition: opacity 0.6s ease;
+  /* vertical fade (flipped: local-bottom = the card edge = brightest, soft top
+     fade-in then fade down) intersected with a horizontal fade toward the ends */
+  -webkit-mask-image:
+    linear-gradient(to top, transparent 0%, #000 9%, rgba(0,0,0,0.45) 54%, transparent 90%),
+    linear-gradient(to right, transparent 0%, #000 20%, #000 80%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to top, transparent 0%, #000 9%, rgba(0,0,0,0.45) 54%, transparent 90%),
+    linear-gradient(to right, transparent 0%, #000 20%, #000 80%, transparent 100%);
+  mask-composite: intersect;
+}
+.daycard-theme-living .daycard-floor .blob {
+  position: absolute; border-radius: 50%;
+  mix-blend-mode: screen; will-change: transform;
+  transition: opacity 0.6s ease;
+}
+
+/* Reduced motion: hold the color state, drop the glimmer (the JS wander already
+   honors prefers-reduced-motion by not animating). */
+@media (prefers-reduced-motion: reduce) {
+  .daycard-theme-living .daycard-ns__burn { animation: none; opacity: calc(var(--ring, 0) * 0.6); }
+}

@@ -73,6 +73,9 @@ const DEFAULT_STATE = {
   },
   streak: { count: 0, lastCheckDate: null, history: [], minutesReclaimed: 0, bestEver: 0, bestEverShown: 0, milestonesShown: [], grace: { bank: 0, lastEarnMilestone: 0, used: {} } },
   flow: { items: JSON.parse(JSON.stringify(DEFAULT_FLOW_ITEMS)) },
+  // Day Card look. 'platinum' = the classic glass hero; 'living' = the
+  // color-morph + ground-reflection theme whose hue tracks the three pillars.
+  dayCard: { theme: 'platinum' },
   mori: { birthYear: null, lifeExpectancy: 80, reminderText: 'Make it count.', screenTimeHours: 4, futureSelfNote: '', lifestyle: { sleepHrs: 8, workHrs: 8, humanHrs: 2.5, screenHrs: 4, booksPerYear: 5 }, auditDone: false, people: [] },
   lifestats: { sleep: 0, diet: 0, exercise: 0, mood: 0, stress: 0, focus: 0, history: [] },
   // v23 Check-in: one light daily pulse (replaces Energy + Friction on the

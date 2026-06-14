@@ -3266,31 +3266,57 @@ function renderDayCard() {
     const el = document.getElementById('dayCard');
     if (!el) return;
     try { if (/[?&]daycard=1/.test(location.search)) document.body.classList.add('daycard-force'); } catch (e) {}
-    if ((typeof isBrandNewUser === 'function' && isBrandNewUser()) || !state.clarity || !state.clarity.completed) { el.innerHTML = ''; return; }
+    if ((typeof isBrandNewUser === 'function' && isBrandNewUser()) || !state.clarity || !state.clarity.completed) { stopLivingWander(); el.innerHTML = ''; return; }
+
+    // Theme: 'platinum' (classic glass) or 'living' (color-morph + reflection).
+    const theme = (state.dayCard && state.dayCard.theme === 'living') ? 'living' : 'platinum';
+    const living = theme === 'living';
+    const blobs = '<i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i><i class="blob b4"></i><i class="blob b5"></i><i class="blob b6"></i>';
+    // The brand mark machined INTO the glass: filled at 5% so it reads as a
+    // relief, light catching its lower edge, shadow on the upper (a deboss).
+    const emblemSvg = '<svg class="daycard-ns__emblem" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
+    const nameSpan = '<span class="daycard-ns__name">' + esc(((state.profile && state.profile.name) || '').trim()) + '</span>';
+
+    const ns =
+      '<div class="daycard-ns" id="dayCardNs">' +
+        (living ? '<span class="daycard-ns__liquid" aria-hidden="true">' + blobs + '</span>' : '') +
+        '<span class="daycard-ns__iri" aria-hidden="true"></span>' +
+        '<span class="daycard-ns__sheen" aria-hidden="true"></span>' +
+        (living ? '<span class="daycard-ns__burn" aria-hidden="true"></span>' : '') +
+        '<div class="daycard-ns__body">' + emblemSvg + '</div>' +
+        '<div class="daycard-ns__foot">' + nameSpan + '</div>' +
+      '</div>';
+
+    // Living wraps the card + its bloom + ground reflection in a stage sized to
+    // the card so the reflection aligns; platinum renders the card directly.
+    const inner = living
+      ? '<div class="daycard-living-stage">' +
+          '<span class="daycard-bloom" aria-hidden="true">' + blobs + '</span>' +
+          '<span class="daycard-floor" aria-hidden="true">' + blobs + '</span>' +
+          ns +
+        '</div>'
+      : ns;
 
     el.innerHTML =
-      '<div class="daycard-wrap">' +
+      '<div class="daycard-wrap daycard-theme-' + theme + '">' +
         '<span class="daycard-wrap__aura" aria-hidden="true"></span>' +
-        '<div class="daycard-ns" id="dayCardNs">' +
-          '<span class="daycard-ns__iri" aria-hidden="true"></span>' +
-          '<span class="daycard-ns__sheen" aria-hidden="true"></span>' +
-          '<div class="daycard-ns__body">' +
-            // The brand mark machined INTO the glass: filled at 5% so it
-            // reads as a relief, light catching its lower edge, shadow on
-            // the upper (a deboss, not a print).
-            '<svg class="daycard-ns__emblem" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>' +
-          '</div>' +
-          '<div class="daycard-ns__foot">' +
-            '<span class="daycard-ns__name">' + esc(((state.profile && state.profile.name) || '').trim()) + '</span>' +
-          '</div>' +
-        '</div>' +
+        inner +
       '</div>' +
       '<div class="daycard-hint" id="dayCardHint" aria-hidden="true">' +
         '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>' +
         '<span>Swipe up for more</span>' +
       '</div>';
 
-    bindDayCardTilt(el.querySelector('#dayCardNs'));
+    const nsEl = el.querySelector('#dayCardNs');
+    bindDayCardTilt(nsEl);
+    bindDayCardThemeToggle(nsEl);
+    if (living) {
+      const wrap = el.querySelector('.daycard-wrap');
+      setLivingCardVars(wrap);
+      startLivingWander(wrap);
+    } else {
+      stopLivingWander();
+    }
     // Page-state watcher: dissolves the swipe hint once scrolling starts,
     // and marks the body while the Memento page is on screen so the bottom
     // chrome (tab bar + capture fab) can fade itself away there. Bound
@@ -3301,6 +3327,99 @@ function renderDayCard() {
       window.addEventListener('resize', _dayCardPageState);
     }
     _dayCardPageState();
+  } catch (e) {}
+}
+
+// ── Living Day Card: data -> color, motion, theme toggle ──────────────────
+// Map real user data into the three pillar levels (0-100). "Reflects where you
+// are now": consistency = last 30 days, action = last 7 days (both can fade);
+// clarity is the one permanent foundation (locks in once Clarity is completed).
+function livingCardLevels() {
+  let clar = (state.clarity && state.clarity.completed) ? 100 : 0;
+  let act = 0;
+  try {
+    const comp = (state.action && Array.isArray(state.action.completionHistory)) ? state.action.completionHistory : [];
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const days = {};
+    comp.forEach((h) => {
+      if (!h || !h.date) return;
+      const d = new Date(h.date + 'T00:00:00');
+      const diff = Math.round((today - d) / 86400000);
+      if (diff >= 0 && diff <= 6) days[h.date] = 1;
+    });
+    act = Math.min(100, Math.round(Object.keys(days).length / 7 * 100));
+  } catch (e) {}
+  let cons = 0;
+  try { const cs = consistencyStats(); if (cs && typeof cs.pct30 === 'number') cons = cs.pct30; } catch (e) {}
+  return { clar, act, cons };
+}
+
+function setLivingCardVars(wrap) {
+  if (!wrap) return;
+  const L = livingCardLevels();
+  wrap.style.setProperty('--clar', (L.clar / 100).toFixed(3));
+  wrap.style.setProperty('--act', (L.act / 100).toFixed(3));
+  wrap.style.setProperty('--cons', (L.cons / 100).toFixed(3));
+  // blend blob appears only when clarity AND consistency are both present
+  wrap.style.setProperty('--mix', (Math.min(L.clar, L.cons) / 100 * 0.75).toFixed(3));
+  // lit gates everything outside the card (aura, bloom, reflection) by fill
+  wrap.style.setProperty('--lit', (Math.max(L.clar, L.act, L.cons) / 100).toFixed(3));
+}
+
+// Continuous random wander: each blob eases toward a fresh random target and
+// the bloom + reflection mirror blobs ride the same transform, so the color
+// drifts calmly and the reflection tracks it. One loop; restarted per render
+// with fresh nodes; cancelled when the card isn't living. Honors reduced-motion
+// and lowfx (color still shows, motion holds).
+let _dcLivingRaf = 0;
+function startLivingWander(wrap) {
+  stopLivingWander();
+  try {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (document.documentElement.classList.contains('lowfx')) return;
+    const inside = [].slice.call(wrap.querySelectorAll('.daycard-ns__liquid .blob'));
+    const bloom = [].slice.call(wrap.querySelectorAll('.daycard-bloom .blob'));
+    const mirror = [].slice.call(wrap.querySelectorAll('.daycard-floor .blob'));
+    if (!inside.length) return;
+    const R = (a, b) => a + Math.random() * (b - a);
+    const st = inside.map(() => ({ x: 0, y: 0, sc: 1, tx: R(-20, 20), ty: R(-18, 18), tsc: R(0.92, 1.16) }));
+    const SPEED = 2;  // baked pace (prototype Motion 2.0x)
+    const k = Math.min(0.2, 0.011 * SPEED);
+    function frame() {
+      for (let i = 0; i < inside.length; i++) {
+        const b = st[i];
+        b.x += (b.tx - b.x) * k; b.y += (b.ty - b.y) * k; b.sc += (b.tsc - b.sc) * k;
+        if (Math.abs(b.tx - b.x) < 1 && Math.abs(b.ty - b.y) < 1) {
+          b.tx = R(-22, 22); b.ty = R(-20, 20); b.tsc = R(0.9, 1.18);
+        }
+        const tf = 'translate(' + b.x.toFixed(2) + '%,' + b.y.toFixed(2) + '%) scale(' + b.sc.toFixed(3) + ')';
+        inside[i].style.transform = tf;
+        if (bloom[i]) bloom[i].style.transform = tf;
+        if (mirror[i]) mirror[i].style.transform = tf;
+      }
+      _dcLivingRaf = requestAnimationFrame(frame);
+    }
+    _dcLivingRaf = requestAnimationFrame(frame);
+  } catch (e) {}
+}
+function stopLivingWander() {
+  if (_dcLivingRaf) { cancelAnimationFrame(_dcLivingRaf); _dcLivingRaf = 0; }
+}
+
+// Tap the emblem (the M mark) to switch the Day Card between platinum and living.
+function bindDayCardThemeToggle(nsEl) {
+  try {
+    if (!nsEl) return;
+    const emblem = nsEl.querySelector('.daycard-ns__emblem');
+    if (!emblem) return;
+    emblem.style.cursor = 'pointer';
+    emblem.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!state.dayCard) state.dayCard = { theme: 'platinum' };
+      state.dayCard.theme = (state.dayCard.theme === 'living') ? 'platinum' : 'living';
+      try { persistState(); } catch (_) {}
+      try { renderDayCard(); } catch (_) {}
+    });
   } catch (e) {}
 }
 
