@@ -67,10 +67,11 @@
      BEHIND the card and bleeds its colors out into the surroundings. The JS
      wander drives these in lockstep with the inside blobs. */
   .daycard-bloom {
-    position: absolute; inset: -8%; z-index: 0;
-    pointer-events: none; overflow: visible;
-    filter: blur(48px) saturate(var(--sat, 1.5));
-    opacity: var(--emit, 0.6);
+    position: absolute; inset: -5%; z-index: 0;
+    border-radius: calc(var(--r-card) + 12px);
+    pointer-events: none; overflow: hidden;   /* clip the color to a tight band around the card */
+    filter: blur(26px) saturate(var(--sat, 1.5));
+    opacity: var(--emit, 0.55);
   }
   .daycard-bloom .blob {
     position: absolute; border-radius: 50%; mix-blend-mode: screen; will-change: transform;
