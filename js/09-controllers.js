@@ -3694,6 +3694,12 @@ const Splash = {
     if (go) {
       go.addEventListener('click', (e) => { e.preventDefault(); this.dismiss(); });
       go.addEventListener('touchend', (e) => { e.preventDefault(); e.stopPropagation(); this.dismiss(); }, { passive: false });
+      // Cursor-following highlight: feed the pointer position to the CSS radial.
+      go.addEventListener('pointermove', (e) => {
+        const r = go.getBoundingClientRect();
+        go.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+        go.style.setProperty('--my', (e.clientY - r.top) + 'px');
+      });
     }
     this.initBeams();
   },
