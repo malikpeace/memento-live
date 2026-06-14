@@ -2091,6 +2091,23 @@ body:has(.clarity-exp.open-content) .fullscreen-close-global {
     filter: blur(20px);
   }
 }
+/* The splash (first page) is worth moving even on phones. The per-beam flicker
+   stays frozen on mobile (it animates transform on a blurred layer = costly),
+   but swaying the WHOLE ray cluster is a single composited transform: it
+   rasterizes once and rides the GPU cheaply, so the light visibly sweeps with
+   no crash risk. Pivot near the top-left source so the beams fan as they turn. */
+@keyframes splashRayDrift {
+  0%   { transform: rotate(-2.4deg) scale(1.03); }
+  50%  { transform: rotate(2.8deg) scale(1.07); }
+  100% { transform: rotate(-1.4deg) scale(1.03); }
+}
+@media (pointer: coarse), (max-width: 859.98px) {
+  .splash__rays {
+    transform-origin: 12% 8%;
+    animation: ambientRaysFadeIn 1.6s ease both, splashRayDrift 15s ease-in-out infinite alternate;
+    will-change: transform;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .splash__rays { animation: none; }
   /* These reveal themselves via entrance animations. If motion is reduced,
