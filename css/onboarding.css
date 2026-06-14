@@ -2097,14 +2097,14 @@ body:has(.clarity-exp.open-content) .fullscreen-close-global {
    rasterizes once and rides the GPU cheaply, so the light visibly sweeps with
    no crash risk. Pivot near the top-left source so the beams fan as they turn. */
 @keyframes splashRayDrift {
-  0%   { transform: rotate(-2.4deg) scale(1.03); }
-  50%  { transform: rotate(2.8deg) scale(1.07); }
-  100% { transform: rotate(-1.4deg) scale(1.03); }
+  0%   { transform: translate(-3%, -2%) rotate(-6deg) scale(1.06); }
+  50%  { transform: translate(4%, 3.5%) rotate(7deg) scale(1.14); }
+  100% { transform: translate(2.5%, -2%) rotate(-3.5deg) scale(1.08); }
 }
 @media (pointer: coarse), (max-width: 859.98px) {
   .splash__rays {
-    transform-origin: 12% 8%;
-    animation: ambientRaysFadeIn 1.6s ease both, splashRayDrift 15s ease-in-out infinite alternate;
+    transform-origin: 14% 6%;
+    animation: ambientRaysFadeIn 1.6s ease both, splashRayDrift 11s ease-in-out infinite alternate;
     will-change: transform;
   }
 }
