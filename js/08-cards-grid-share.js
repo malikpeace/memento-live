@@ -2565,12 +2565,13 @@ function renderCommandCenter() {
     const doneToday = Array.isArray(ch) && ch.length && ch[ch.length - 1].date && isoToLocalDay(ch[ch.length - 1].date) === todayStr;
     const streak = (state.streak && state.streak.count) || 0;
 
-    // ---- Swappable Home hero (v16). Default centerpiece is Consistency ("how
-    // far you've come"); the user can flip to Today's one thing or their Neutron
-    // Star, persisted in state.ui.homeHero. The today's-action strip and the
-    // proof/checkin actions stay constant below the hero so the daily loop is
-    // always present no matter which centerpiece is showing.
-    const hero = (state.ui && state.ui.homeHero) || 'consistency';
+    // ---- Swappable Home hero (v16). In the v27 card-centered Home, Consistency
+    // has its own dedicated tile in the bento, so the command center leads with
+    // Today's one thing (the actual daily mission / focus) by default; the user
+    // can still flip to Consistency or their Neutron Star, persisted in
+    // state.ui.homeHero. The proof/checkin actions stay constant below the hero
+    // so the daily loop is always present no matter which centerpiece is showing.
+    const hero = (state.ui && state.ui.homeHero) || 'oneThing';
     const seg = (k, label) => '<button class="cc-hero-seg' + (hero === k ? ' is-active' : '') + '" data-cc-hero="' + k + '" aria-label="Show ' + esc(label) + '" aria-pressed="' + (hero === k ? 'true' : 'false') + '" style="font:inherit;font-weight:650;font-size:0.76rem;cursor:pointer;border:none;border-radius:calc(6px * var(--rx, 1));padding:7px 14px;background:transparent;color:' + (hero === k ? 'var(--text-hi)' : 'var(--text-lo)') + ';position:relative;z-index:1;transition:color .22s ease;">' + esc(label) + '</button>';
     // v19 daily bookend / weekly-review banner removed (Malik: felt like clutter
     // above the hero, and overlapped the Check-in widget). The weekly review is

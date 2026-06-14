@@ -132,12 +132,14 @@ const DEFAULT_STATE = {
   layoutPresets: [],
   introsSeen: { clarity: false, action: false, streak: false, flow: false, mori: false, vivere: false, lifestats: false, deepwork: false, reflection: false, distraction: false, checkin: false },
   meta: { onboarded: false, welcomeSeen: false, lastVisit: null },
-  // ui.homeHero: which centerpiece the Home leads with ('consistency' | 'oneThing' | 'neutron').
+  // ui.homeHero: which centerpiece the Home command-center leads with ('oneThing' |
+  // 'consistency' | 'neutron'). v27 default is 'oneThing' (today's action / focus) so
+  // the left card doesn't duplicate the dedicated Consistency tile in the bento Home.
   // ui.variants: which visual treatment each taste-heavy screen uses ('a' = today's default look).
   // ui.unlocked / unlockQueue / lastUnlockISO / pendingReveal: the unlock ladder
   // (one earned unlock per day; queue overflow fires on the next session open).
   // ui.moduleOpens counts per-module opens (powers "Pin to dashboard" in More).
-  ui: { lastView: null, homeHero: 'consistency', heatmapMode: 'rolling', heatmapShape: 'square', heatmapSpacing: 'snug', heatmapPalette: 'classic', consistencyView: 'heatmap', consistencyScale: 'week', ccHeatmapScale: 'year', layoutCustomized: false, variants: { home: 'a', streak: 'a', mori: 'a' }, moduleOpens: {}, unlocked: {}, unlockQueue: [], lastUnlockISO: '', pendingReveal: '' },
+  ui: { lastView: null, homeHero: 'oneThing', heatmapMode: 'rolling', heatmapShape: 'square', heatmapSpacing: 'snug', heatmapPalette: 'classic', consistencyView: 'heatmap', consistencyScale: 'week', ccHeatmapScale: 'year', layoutCustomized: false, variants: { home: 'a', streak: 'a', mori: 'a' }, moduleOpens: {}, unlocked: {}, unlockQueue: [], lastUnlockISO: '', pendingReveal: '' },
   // Optional, additive user preferences. Absent/empty => today's exact look.
   // accent: 'default' | 'cyan' | 'green' | 'amber' | 'rose'
   // reduceMotion: bool, density: 'comfortable' | 'compact'
@@ -1606,7 +1608,7 @@ function migrateState() {
   // ---- v16 additive state (idempotent; safe for pre-v16 stored blobs) ----
   if (!Array.isArray(state.proofEvents)) state.proofEvents = [];
   if (!state.ui || typeof state.ui !== 'object') state.ui = {};
-  if (state.ui.homeHero === undefined) state.ui.homeHero = 'consistency';
+  if (state.ui.homeHero === undefined) state.ui.homeHero = 'oneThing';
   if (!state.ui.variants || typeof state.ui.variants !== 'object') state.ui.variants = { home: 'a', streak: 'a', mori: 'a' };
   if (state.ui.variants.home === undefined) state.ui.variants.home = 'a';
   if (state.ui.variants.streak === undefined) state.ui.variants.streak = 'a';

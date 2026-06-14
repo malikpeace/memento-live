@@ -51,7 +51,7 @@ body:not(.ns-bloom) .daycard-theme-living .daycard-wrap__aura {
   width: min(76%, 270px);
   margin: 14px auto 26px;
 }
-@media (max-width: 859.98px) {
+@media (max-width: 767.98px) {
   .daycard-theme-living .daycard-living-stage { width: min(86%, 330px); }
 }
 .daycard-theme-living .daycard-living-stage > .daycard-ns {

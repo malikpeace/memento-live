@@ -3356,7 +3356,7 @@ const TabBar = {
     const SECLABEL = 'font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-2); margin-bottom: 12px;';
     const FLABEL = 'font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); margin: 16px 0 6px;';
     const rem = (state.prefs && state.prefs.reminder) || {};
-    const heroNow = (state.ui && state.ui.homeHero) || 'consistency';
+    const heroNow = (state.ui && state.ui.homeHero) || 'oneThing';
     const heroBtns = [['consistency', 'Consistency'], ['oneThing', 'Today'], ['neutron', 'Goal']].map(([k, l]) => {
       const sel = heroNow === k;
       return '<button type="button" class="pref-swatch' + (sel ? ' pref-swatch--active' : '') + '" data-hero="' + k + '" aria-pressed="' + sel + '"><span class="pref-swatch__label">' + l + '</span></button>';

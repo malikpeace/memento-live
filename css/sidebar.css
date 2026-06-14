@@ -29,8 +29,11 @@
     bottom: calc(var(--safe-b, 0px) + var(--sidebar-gap));
     width: var(--sidebar-w-expanded);
     z-index: 50;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
+    /* v27: borderless + a touch more transparent so it reads as glass resting
+       on the page, not a panel pinned with a hairline. The inset highlight in
+       the box-shadow still defines the top edge (no 1px border needed). */
+    background: rgba(0, 0, 0, 0.38);
+    border: none;
     border-radius: var(--r-sm);
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
@@ -49,6 +52,8 @@
     transform: translateX(calc(-100% - var(--sidebar-gap) - 12px));
     pointer-events: none;
   }
+  /* Light mode keeps the same borderless glass, just a lighter translucent fill. */
+  html.theme-light .sidebar { background: rgba(255, 255, 255, 0.70); }
 
   /* Floating reveal button shown only when the sidebar is collapsed. Small
      glassy pill at the top-left so the user can bring the sidebar back. */
