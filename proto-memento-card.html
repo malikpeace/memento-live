@@ -34,7 +34,7 @@
   }
 
   /* ── Drifting ambient orbs behind the card (the scene breathing) ───────── */
-  .scene-orbs { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+  .scene-orbs { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; opacity: var(--lit, 1); transition: opacity 0.6s ease; }
   .orb { position: absolute; border-radius: 50%; filter: blur(58px); mix-blend-mode: screen; will-change: transform; }
   .orb-1 { width: 58vmin; height: 58vmin; opacity: 0.72; background: radial-gradient(circle, rgba(150,116,255,0.72), transparent 68%); top: -20%; left: -6%; animation: orbA calc(22s / var(--speed,1)) ease-in-out infinite; }
   .orb-2 { width: 54vmin; height: 54vmin; opacity: 0.64; background: radial-gradient(circle, rgba(56,232,150,0.64), transparent 68%); bottom: -20%; right: -4%; animation: orbB calc(26s / var(--speed,1)) ease-in-out infinite; }
@@ -55,7 +55,7 @@
     pointer-events: none;
     background: radial-gradient(closest-side,
       rgba(215, 220, 250, 0.16), rgba(150, 160, 235, 0.06) 48%, transparent 72%);
-    filter: blur(28px) brightness(calc(0.7 + 1.7 * var(--glow, 0.4)));
+    filter: blur(28px) brightness(calc((0.7 + 1.7 * var(--glow, 0.4)) * var(--lit, 1)));
     animation: dayCardBreath calc(7s / var(--speed,1)) ease-in-out infinite alternate;
   }
   @keyframes dayCardBreath {
@@ -95,11 +95,12 @@
     transform: perspective(900px) rotateX(var(--dc-rx, 0deg)) rotateY(var(--dc-ry, 0deg));
     transition: transform 0.18s ease-out;
     will-change: transform;
-    /* Subtle floor reflection: a short, quickly-fading mirror of the card. */
-    -webkit-box-reflect: below 3px linear-gradient(to bottom, rgba(0,0,0,0.30), rgba(0,0,0,0) 24%);
+    /* Floor reflection: a faint, short mirror RIGHT under the card, like it is
+       sitting on a reflective surface / above water. Only a thin sliver shows. */
+    -webkit-box-reflect: below 1px linear-gradient(to bottom, rgba(0,0,0,0.24), rgba(0,0,0,0.06) 9%, rgba(0,0,0,0) 17%);
   }
   /* room for the reflection so it does not crowd the controls */
-  .daycard-wrap { margin-bottom: 56px; }
+  .daycard-wrap { margin-bottom: 34px; }
   /* Liquid-glass rim: a masked gradient ring (NOT a border). */
   .daycard-ns::before {
     content: ""; position: absolute; inset: 0;
@@ -259,7 +260,7 @@
     <span class="daycard-bloom" aria-hidden="true">
       <i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i><i class="blob b4"></i><i class="blob b5"></i><i class="blob b6"></i>
     </span>
-    <div class="daycard-ns" id="card" style="--clar:0; --act:0; --cons:0; --mix:0; --red:0;">
+    <div class="daycard-ns" id="card">
       <span class="daycard-ns__liquid" aria-hidden="true">
         <i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i><i class="blob b4"></i><i class="blob b5"></i><i class="blob b6"></i>
       </span>
@@ -313,14 +314,16 @@
   function renderShadow() {
     var v = s.map(function (el) { return +el.value; });
     var tot = (v[0] + v[1] + v[2] + v[3]) / 400;
+    // lit = how filled the card is. The OUTSIDE glow only appears with color.
+    var lit = Math.max(v[0], v[1], v[2], v[3]) / 100;
     var g = (+sGlow.value) / 100;
     var r = (+sRing.value) / 100;
     var rimA = (0.20 + 0.16 * tot + 0.50 * g).toFixed(3);
     var innerR = Math.round(8 + 30 * g), innerA = (0.04 + 0.26 * g).toFixed(3);
-    var haloR = Math.round(34 + 95 * g), haloA = (0.05 + 0.10 * tot + 0.34 * g).toFixed(3);
+    var haloR = Math.round(34 + 95 * g), haloA = ((0.06 + 0.34 * g) * lit).toFixed(3);
     // Burning ring's outward glow comes from the TL + BR corners only (offset
-    // shadows), matching the on-edge ring, so it reads with dimension.
-    var ringOff = (4 + 9 * r).toFixed(1), ringBlur = Math.round(8 + 30 * r), ringA = (0.7 * r).toFixed(3);
+    // shadows), matching the on-edge ring, so it reads with dimension. Gated by lit.
+    var ringOff = (4 + 9 * r).toFixed(1), ringBlur = Math.round(8 + 30 * r), ringA = (0.7 * r * lit).toFixed(3);
     card.style.boxShadow =
       'inset 0 1px 0 rgba(255,255,255,' + rimA + '),' +
       'inset 0 0 ' + innerR + 'px rgba(222,230,255,' + innerA + '),' +
@@ -331,12 +334,16 @@
   }
   function apply() {
     var v = s.map(function (el) { return +el.value; });
+    // Set the levels on BODY so both the card's inside blobs AND the bloom
+    // (a sibling of the card) inherit them and gate their opacity.
     for (var i = 0; i < 4; i++) {
       o[i].textContent = Math.round(v[i]);
-      card.style.setProperty(vars[i], (v[i] / 100).toFixed(3));
+      document.body.style.setProperty(vars[i], (v[i] / 100).toFixed(3));
     }
     // blend blob appears only when clarity AND consistency are both present
-    card.style.setProperty('--mix', (Math.min(v[0], v[2]) / 100 * 0.75).toFixed(3));
+    document.body.style.setProperty('--mix', (Math.min(v[0], v[2]) / 100 * 0.75).toFixed(3));
+    // lit gates everything OUTSIDE the card (aura, scene orbs) by how filled it is
+    document.body.style.setProperty('--lit', (Math.max(v[0], v[1], v[2], v[3]) / 100).toFixed(3));
     renderShadow();
   }
   function applyGlow() {
