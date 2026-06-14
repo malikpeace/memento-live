@@ -63,8 +63,20 @@
     50%  { opacity: 1;    transform: translate(-46%, -48%) scale(1.05); }
     100% { opacity: 0.62; transform: translate(-54%, -52%) scale(0.97); }
   }
+  /* Color emission: a blurred, color-matched echo of the inside blobs that sits
+     BEHIND the card and bleeds its colors out into the surroundings. The JS
+     wander drives these in lockstep with the inside blobs. */
+  .daycard-bloom {
+    position: absolute; inset: -8%; z-index: 0;
+    pointer-events: none; overflow: visible;
+    filter: blur(48px) saturate(var(--sat, 1.5));
+    opacity: var(--emit, 0.6);
+  }
+  .daycard-bloom .blob {
+    position: absolute; border-radius: 50%; mix-blend-mode: screen; will-change: transform;
+  }
   .daycard-ns {
-    position: relative;
+    position: relative; z-index: 1;
     width: min(86vw, 330px);
     min-height: min(64vh, 520px);
     padding: 18px 18px 16px;
@@ -244,6 +256,9 @@
   </div>
   <div class="daycard-wrap">
     <span class="daycard-wrap__aura" aria-hidden="true"></span>
+    <span class="daycard-bloom" aria-hidden="true">
+      <i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i><i class="blob b4"></i><i class="blob b5"></i><i class="blob b6"></i>
+    </span>
     <div class="daycard-ns" id="card" style="--clar:0; --act:0; --cons:0; --mix:0; --red:0;">
       <span class="daycard-ns__liquid" aria-hidden="true">
         <i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i><i class="blob b4"></i><i class="blob b5"></i><i class="blob b6"></i>
@@ -274,6 +289,7 @@
     <div class="row"><label>Red (test)</label><span class="dot" style="background:#ff4856"></span><input id="s4" type="range" min="0" max="100" value="0" step="1"><span class="out" id="o4">0</span></div>
     <div class="row"><label>Border glow</label><span class="dot" style="background:#cdd6ff"></span><input id="sGlow" type="range" min="0" max="100" value="40" step="1"><span class="out" id="oGlow">40</span></div>
     <div class="row"><label>Burning ring</label><span class="dot" style="background:#dfe6ff"></span><input id="sRing" type="range" min="0" max="100" value="30" step="1"><span class="out" id="oRing">30</span></div>
+    <div class="row"><label>Color bleed</label><span class="dot" style="background:#8ad6b0"></span><input id="sEmit" type="range" min="0" max="100" value="60" step="1"><span class="out" id="oEmit">60</span></div>
     <div class="row"><label>Saturation</label><span class="dot" style="background:#b06cff"></span><input id="sSat" type="range" min="0" max="100" value="50" step="1"><span class="out" id="oSat">1.5x</span></div>
     <div class="row"><label>Motion</label><span class="dot" style="background:#c9c9dc"></span><input id="sMotion" type="range" min="1" max="100" value="20" step="1"><span class="out" id="oMotion">2.0x</span></div>
     <div class="hint">Border glow + saturation + motion (0-10x). Tell me the values you like and I'll bake them in.</div>
@@ -290,6 +306,7 @@
   var sGlow = document.getElementById('sGlow'), oGlow = document.getElementById('oGlow');
   var sSat = document.getElementById('sSat'), oSat = document.getElementById('oSat');
   var sRing = document.getElementById('sRing'), oRing = document.getElementById('oRing');
+  var sEmit = document.getElementById('sEmit'), oEmit = document.getElementById('oEmit');
 
   // The card's edge glow: an inner ethereal ring + an outer halo (Border-glow),
   // plus the outward burn of the energy ring (Burning-ring), as box-shadows.
@@ -338,11 +355,16 @@
     oRing.textContent = Math.round(+sRing.value);
     renderShadow();
   }
+  function applyEmit() {
+    document.body.style.setProperty('--emit', ((+sEmit.value) / 100).toFixed(3));
+    oEmit.textContent = Math.round(+sEmit.value);
+  }
   function clearActive() { presets.querySelectorAll('button').forEach(function (b) { b.classList.remove('is-active'); }); }
   s.forEach(function (el) { el.addEventListener('input', function () { clearActive(); apply(); }); });
   sGlow.addEventListener('input', applyGlow);
   sSat.addEventListener('input', applySat);
   sRing.addEventListener('input', applyRing);
+  sEmit.addEventListener('input', applyEmit);
 
   var presets = document.getElementById('presets');
   presets.addEventListener('click', function (e) {
@@ -382,20 +404,23 @@
   // forever, so the motion never repeats. Pace scales with the Motion slider.
   (function blobWander() {
     if (reduce) return;
-    var blobs = [].slice.call(document.querySelectorAll('.daycard-ns__liquid .blob'));
-    if (!blobs.length) return;
+    var inside = [].slice.call(document.querySelectorAll('.daycard-ns__liquid .blob'));
+    var bloom = [].slice.call(document.querySelectorAll('.daycard-bloom .blob'));
+    if (!inside.length) return;
     var R = function (a, b) { return a + Math.random() * (b - a); };
-    var st = blobs.map(function () { return { x: 0, y: 0, sc: 1, tx: R(-20, 20), ty: R(-18, 18), tsc: R(0.92, 1.16) }; });
+    var st = inside.map(function () { return { x: 0, y: 0, sc: 1, tx: R(-20, 20), ty: R(-18, 18), tsc: R(0.92, 1.16) }; });
     function frame() {
       var sp = parseFloat(getComputedStyle(document.body).getPropertyValue('--speed')) || 1;
       var k = Math.min(0.2, 0.011 * sp);
-      for (var i = 0; i < blobs.length; i++) {
+      for (var i = 0; i < inside.length; i++) {
         var b = st[i];
         b.x += (b.tx - b.x) * k; b.y += (b.ty - b.y) * k; b.sc += (b.tsc - b.sc) * k;
         if (Math.abs(b.tx - b.x) < 1 && Math.abs(b.ty - b.y) < 1) {
           b.tx = R(-22, 22); b.ty = R(-20, 20); b.tsc = R(0.9, 1.18);
         }
-        blobs[i].style.transform = 'translate(' + b.x.toFixed(2) + '%,' + b.y.toFixed(2) + '%) scale(' + b.sc.toFixed(3) + ')';
+        var tf = 'translate(' + b.x.toFixed(2) + '%,' + b.y.toFixed(2) + '%) scale(' + b.sc.toFixed(3) + ')';
+        inside[i].style.transform = tf;
+        if (bloom[i]) bloom[i].style.transform = tf;
       }
       requestAnimationFrame(frame);
     }
@@ -406,6 +431,7 @@
   applyGlow();
   applySat();
   applyRing();
+  applyEmit();
   apply();
 })();
 </script>
