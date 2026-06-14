@@ -697,6 +697,10 @@ html.theme-light .widget--action .widget__icon { color: var(--text-hi) !importan
     grid-template-columns: repeat(12, 1fr);
     grid-auto-rows: minmax(120px, auto);
     gap: var(--dash-gap);
+    /* Cards size to their own content instead of stretching to match the
+       tallest card in their row (a long Notes entry was forcing every card in
+       its row to that height). */
+    align-items: start;
     /* Keep the glass wrapper at desktop widths. (Previously stripped padding
        and border-radius here to go edge-to-edge; now we keep the wrapper
        chrome so the modules sit inside one large glass surface.) */
