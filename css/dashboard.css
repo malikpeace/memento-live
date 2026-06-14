@@ -2663,21 +2663,6 @@ body.daycard-force #dayCard { display: block; max-width: 430px; }
   body:not(.ns-bloom) #dailyMemento,
   body:not(.ns-bloom) #dashGreetingMobile { display: none; }
 }
-/* Wide desktop: keep the ORIGINAL card-on-top + dashboard-below layout (the
-   modules render exactly as before, full width), but shift the whole column to
-   the LEFT instead of centering it, and left-align the card so it sits above
-   the dashboard on the left. */
-@media (min-width: 1024px) {
-  .app.dash-v2 {
-    margin-left: 0;
-    margin-right: auto;
-  }
-  #dayCard {
-    align-items: flex-start;
-    margin-left: 0;
-    margin-right: auto;
-  }
-}
 /* The swipe cue: a whisper at the bottom of the hero screen. Dissolves as
    soon as scrolling starts (JS toggles .is-hidden). */
 .daycard-hint {
