@@ -213,11 +213,65 @@ const WelcomeIntro = {
           ? (Array.isArray(v) ? v.join(', ') : String(v))
           : String(v || '').trim()
       });
-      if (step.key === 'runningToward') beats.push({ lines: () => ['Naming it is where most people stop.'] });
+      // Reflections branch on what was just picked (in Malik's voice) so the
+      // conversation feels custom, not one canned line everyone gets.
+      if (step.key === 'runningToward') beats.push({ lines: () => { const t = this._wcReflect('runningToward'); return t ? [t] : []; } });
       if (step.key === 'story') beats.push(birthdayBeat);   // birthday lands here, mid-conversation
-      if (step.key === 'runningFrom') beats.push({ lines: () => ['None of those are permanent.'] });
+      if (step.key === 'runningFrom') beats.push({ lines: () => { const t = this._wcReflect('runningFrom'); return t ? [t] : []; } });
+      if (step.key === 'commitment') beats.push({ lines: () => { const t = this._wcReflect('commitment'); return t ? [t] : []; } });
     });
     return beats;
+  },
+
+  // Branching reflections, written in Malik's voice (see MALIK_VOICE.md): warm,
+  // plain, validate-then-redirect, no AI cadence, no em dashes. Keyed to the
+  // chosen option so the line fits what they actually picked. `_multi` is used
+  // when more than one option is selected; `_fallback` covers anything custom.
+  _wcReflections: {
+    runningToward: {
+      'Work & money': "Money's a solid one to chase. It quietly touches almost everything else too.",
+      'Health & fitness': "Health first is smart. Everything else gets easier when your body is handled.",
+      'Discipline & focus': "Discipline and focus. That's the part most people are actually missing.",
+      'A skill or craft': "Building a real skill, love that. It compounds for the rest of your life.",
+      'Creative work': "Creative work is one of the most fulfilling things to actually go after.",
+      'Relationships': "Relationships. Honestly that's what most of this is for anyway.",
+      'Confidence & mindset': "Confidence and mindset. Get that right and a lot of the rest follows.",
+      'Purpose & direction': "Purpose and direction is the big one. Most people never stop to figure it out.",
+      _multi: "Good picks. We'll find the one that matters most as we go.",
+      _fallback: "Good one. We'll build everything around that."
+    },
+    runningFrom: {
+      'Procrastination': "Procrastination's beatable. Usually it's the task being unclear, not you being lazy.",
+      'Phone & social media': "The phone thing is real for almost everyone right now. You're not weird for it.",
+      "I don't know what to do": "Not knowing what to do is normal. That's kind of the whole point of this.",
+      "Can't stay consistent": "Consistency is hard for everyone, even the greats. Usually it's just not long enough yet.",
+      'Fear of failing': "Fear of failing is fair. But what does life look like if you do nothing instead?",
+      'Not enough time': "Time is tight for everyone. We'll keep it to one small thing a day.",
+      'Low motivation': "Motivation comes and goes. We build it so you don't have to rely on it.",
+      'Self-doubt': "Self-doubt hits everyone. It gets quieter once you start stacking small wins.",
+      _multi: "That's a lot to carry. None of those are permanent though.",
+      _fallback: "Whatever it is, it's not permanent."
+    },
+    commitment: {
+      'All in': "Locked in. That's the whole difference right there.",
+      'Pretty serious': "Pretty serious works. We'll turn that into all-in soon enough.",
+      'Testing the waters': "Testing the waters is fine. Some part of you wants more, or you wouldn't be here.",
+      'Just looking': "No worries. This only works if you actually dig in though. Some part of you wants more.",
+      'Not sure yet': "Not sure is okay. We'll figure out the direction together.",
+      _fallback: "Got it. We'll meet you wherever you're at."
+    }
+  },
+
+  _wcReflect(key) {
+    try {
+      const SEP = ' · ';
+      const raw = (state.profile && state.profile[key]) || '';
+      const picks = String(raw).split(SEP).map(s => s.trim()).filter(Boolean);
+      const m = (this._wcReflections && this._wcReflections[key]) || {};
+      if (picks.length > 1 && m._multi) return m._multi;
+      const first = picks[0] || '';
+      return m[first] || m._fallback || '';
+    } catch (e) { return ''; }
   },
 
   _wcBdayDisplay(v) {
