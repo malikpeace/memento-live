@@ -2672,6 +2672,11 @@ body.daycard-force #dayCard { display: block; max-width: 430px; }
     grid-template-columns: 360px minmax(0, 1fr);
     column-gap: 48px;
     align-items: start;
+    /* Center the whole block vertically when it is shorter than the viewport
+       (e.g. the pre-Neutron-Star state). `safe` falls back to top-alignment when
+       a full dashboard is taller than the viewport, so nothing gets clipped. */
+    align-content: safe center;
+    min-height: 100dvh;
     max-width: 1200px;
   }
   .app.dash-v2 > .dash-header,
