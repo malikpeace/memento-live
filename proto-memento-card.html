@@ -109,7 +109,7 @@
   .daycard-floor {
     position: absolute; left: 50%; top: 100%;
     transform: translateX(-50%);
-    width: 100%; height: 28%; z-index: 0;
+    width: 100%; height: 15%; z-index: 0;
     pointer-events: none;
     opacity: var(--lit, 0); transition: opacity 0.6s ease;
   }
@@ -123,7 +123,7 @@
      why the line goes green here, not purple. Vibrant colour, crisp, barely
      blurred so it reads as a real glowing line, not a wash. */
   .daycard-floor .refl-line {
-    position: absolute; left: -13%; right: -13%; top: -4px; height: 11px;
+    position: absolute; left: -30%; right: -30%; top: -4px; height: 10px;
     filter: blur(3px);
   }
   .line-clar { background: radial-gradient(50% 130% at 50% 50%, rgba(150,116,255,1), transparent 70%); opacity: calc(var(--clar) * 0.35); }
@@ -132,7 +132,7 @@
   .line-red  { background: radial-gradient(50% 130% at 50% 50%, rgba(255,72,86,1), transparent 70%); opacity: var(--red); }
   /* a subtle bright core for the hot centre, kept low so the HUE stays dominant */
   .daycard-floor .refl-core {
-    position: absolute; left: -4%; right: -4%; top: -2px; height: 4px;
+    position: absolute; left: -20%; right: -20%; top: -2px; height: 4px;
     filter: blur(2px);
     background: radial-gradient(40% 120% at 50% 50%, rgba(248,250,255,0.85), transparent 72%);
     opacity: calc(var(--lit, 0) * 0.42);
@@ -140,8 +140,8 @@
   /* the reflection BODY: short, color-matched spill that fades quickly, same
      bottom-weighting as the line so it stays the card's hue, not a white pool. */
   .daycard-floor .refl {
-    position: absolute; left: 11%; right: 11%; top: 8px; bottom: 18%;
-    filter: blur(18px);
+    position: absolute; left: -6%; right: -6%; top: 6px; bottom: 0;
+    filter: blur(16px);
   }
   .refl-clar { background: radial-gradient(60% 86% at 50% 0%, rgba(150,116,255,0.55), transparent 78%); opacity: calc(var(--clar) * 0.35); }
   .refl-act  { background: radial-gradient(60% 86% at 50% 0%, rgba(236,239,255,0.5), transparent 78%); opacity: calc(var(--act) * 0.6); }
