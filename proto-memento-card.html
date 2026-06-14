@@ -36,10 +36,10 @@
   /* ── Drifting ambient orbs behind the card (the scene breathing) ───────── */
   .scene-orbs { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
   .orb { position: absolute; border-radius: 50%; filter: blur(58px); mix-blend-mode: screen; will-change: transform; }
-  .orb-1 { width: 58vmin; height: 58vmin; opacity: 0.72; background: radial-gradient(circle, rgba(150,116,255,0.72), transparent 68%); top: -20%; left: -6%; animation: orbA 22s ease-in-out infinite; }
-  .orb-2 { width: 54vmin; height: 54vmin; opacity: 0.64; background: radial-gradient(circle, rgba(56,232,150,0.64), transparent 68%); bottom: -20%; right: -4%; animation: orbB 26s ease-in-out infinite; }
-  .orb-3 { width: 46vmin; height: 46vmin; opacity: 0.52; background: radial-gradient(circle, rgba(120,150,255,0.52), transparent 70%); top: 40%; right: -22%; animation: orbC 30s ease-in-out infinite; }
-  .orb-4 { width: 42vmin; height: 42vmin; opacity: 0.42; background: radial-gradient(circle, rgba(180,210,255,0.42), transparent 70%); bottom: 6%; left: -20%; animation: orbD 28s ease-in-out infinite; }
+  .orb-1 { width: 58vmin; height: 58vmin; opacity: 0.72; background: radial-gradient(circle, rgba(150,116,255,0.72), transparent 68%); top: -20%; left: -6%; animation: orbA calc(22s / var(--speed,1)) ease-in-out infinite; }
+  .orb-2 { width: 54vmin; height: 54vmin; opacity: 0.64; background: radial-gradient(circle, rgba(56,232,150,0.64), transparent 68%); bottom: -20%; right: -4%; animation: orbB calc(26s / var(--speed,1)) ease-in-out infinite; }
+  .orb-3 { width: 46vmin; height: 46vmin; opacity: 0.52; background: radial-gradient(circle, rgba(120,150,255,0.52), transparent 70%); top: 40%; right: -22%; animation: orbC calc(30s / var(--speed,1)) ease-in-out infinite; }
+  .orb-4 { width: 42vmin; height: 42vmin; opacity: 0.42; background: radial-gradient(circle, rgba(180,210,255,0.42), transparent 70%); bottom: 6%; left: -20%; animation: orbD calc(28s / var(--speed,1)) ease-in-out infinite; }
   @keyframes orbA { 0%,100% { transform: translate(0,0) scale(1) } 50% { transform: translate(22vmin, 16vmin) scale(1.14) } }
   @keyframes orbB { 0%,100% { transform: translate(0,0) scale(1) } 50% { transform: translate(-20vmin, -15vmin) scale(1.12) } }
   @keyframes orbC { 0%,100% { transform: translate(0,0) scale(1) } 50% { transform: translate(-18vmin, 18vmin) scale(0.88) } }
@@ -56,7 +56,7 @@
     background: radial-gradient(closest-side,
       rgba(215, 220, 250, 0.16), rgba(150, 160, 235, 0.06) 48%, transparent 72%);
     filter: blur(28px);
-    animation: dayCardBreath 7s ease-in-out infinite alternate;
+    animation: dayCardBreath calc(7s / var(--speed,1)) ease-in-out infinite alternate;
   }
   @keyframes dayCardBreath {
     0%   { opacity: 0.62; transform: translate(-54%, -52%) scale(0.97); }
@@ -113,22 +113,22 @@
   }
   .blob.b1 { width: 94%; height: 72%; left: -12%; top: -14%;
     background: radial-gradient(circle, rgba(150,116,255,1.0), transparent 66%);
-    opacity: var(--clar); animation: dl1 17s ease-in-out infinite; }
+    opacity: var(--clar); animation: dl1 calc(17s / var(--speed,1)) ease-in-out infinite; }
   .blob.b2 { width: 74%; height: 60%; left: 14%; top: 22%;
     background: radial-gradient(circle, rgba(232,236,255,0.95), transparent 64%);
-    opacity: calc(var(--act) * 0.68); animation: dl2 20s ease-in-out infinite; }
+    opacity: calc(var(--act) * 0.68); animation: dl2 calc(20s / var(--speed,1)) ease-in-out infinite; }
   .blob.b3 { width: 98%; height: 76%; right: -14%; bottom: -16%;
     background: radial-gradient(circle, rgba(56,236,150,1.0), transparent 64%);
-    opacity: var(--cons); animation: dl3 18s ease-in-out infinite; }
+    opacity: var(--cons); animation: dl3 calc(18s / var(--speed,1)) ease-in-out infinite; }
   .blob.b4 { width: 72%; height: 58%; left: 0%; bottom: 4%;
     background: radial-gradient(circle, rgba(128,150,255,0.85), transparent 66%);
-    opacity: var(--mix); animation: dl4 23s ease-in-out infinite; }
+    opacity: var(--mix); animation: dl4 calc(23s / var(--speed,1)) ease-in-out infinite; }
   .blob.b5 { width: 66%; height: 54%; right: 4%; top: 28%;
     background: radial-gradient(circle, rgba(120,255,190,0.7), transparent 68%);
-    opacity: calc(var(--cons) * 0.5); animation: dl5 19s ease-in-out infinite; }
+    opacity: calc(var(--cons) * 0.5); animation: dl5 calc(19s / var(--speed,1)) ease-in-out infinite; }
   .blob.b6 { width: 80%; height: 62%; right: -12%; top: 6%;
     background: radial-gradient(circle, rgba(255,72,86,1.0), transparent 66%);
-    opacity: var(--red); animation: dl6 17s ease-in-out infinite; }
+    opacity: var(--red); animation: dl6 calc(17s / var(--speed,1)) ease-in-out infinite; }
   /* 3-point wandering paths (not just back-and-forth) so the color visibly
      drifts around inside the card, calmly. */
   @keyframes dl1 { 0%,100% { transform: translate(0,0) scale(1) } 33% { transform: translate(22%,16%) scale(1.12) } 66% { transform: translate(9%,26%) scale(1.05) } }
@@ -239,7 +239,8 @@
     <div class="row"><label>Action</label><span class="dot" style="background:#ffffff"></span><input id="s2" type="range" min="0" max="100" value="0" step="1"><span class="out" id="o2">0</span></div>
     <div class="row"><label>Consistency</label><span class="dot" style="background:#38e896"></span><input id="s3" type="range" min="0" max="100" value="0" step="1"><span class="out" id="o3">0</span></div>
     <div class="row"><label>Red (test)</label><span class="dot" style="background:#ff4856"></span><input id="s4" type="range" min="0" max="100" value="0" step="1"><span class="out" id="o4">0</span></div>
-    <div class="hint">Drag to morph the card. Red is a test color, layer it on top of any preset.</div>
+    <div class="row"><label>Motion</label><span class="dot" style="background:#c9c9dc"></span><input id="sMotion" type="range" min="4" max="100" value="40" step="1"><span class="out" id="oMotion">1.0x</span></div>
+    <div class="hint">Motion scales all the drift. Tell me the x value you like and I'll bake it in.</div>
   </div>
 
 <script>
@@ -274,6 +275,17 @@
     for (var i = 0; i < 3; i++) { s[i].value = p[i]; }
     clearActive(); b.classList.add('is-active'); apply();
   });
+
+  // Motion: one knob scales every drift animation (--speed). The readout is the
+  // multiplier; tell me the number you like and I bake it in.
+  var sM = document.getElementById('sMotion'), oM = document.getElementById('oMotion');
+  function applyMotion() {
+    var sp = (+sM.value) / 40;
+    document.body.style.setProperty('--speed', sp.toFixed(3));
+    oM.textContent = sp.toFixed(2) + 'x';
+  }
+  sM.addEventListener('input', applyMotion);
+  applyMotion();
 
   // Pointer tilt: the card leans toward the pointer so the glass reads physical.
   if (!reduce) {
