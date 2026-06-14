@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<script>
+/* Single source of truth for the app version. Surfaced in Settings > About. */
+window.MEMENTO_VERSION = 'v24';
+/* LOWFX: touch / mobile devices get a lighter render path (no backdrop blur,
+   no will-change layers, no background canvas animations) so iOS does not kill
+   the tab from graphics-memory pressure. Desktop (fine pointer) is untouched.
+   Set as early as possible so the html.lowfx CSS applies on first paint. */
+(function () {
+  try {
+    var s = location.search || '';
+    if (/[?&]lowfx=0/.test(s)) return;                 // force full effects (override)
+    var force = /[?&]lowfx=1/.test(s);                  // force the mobile path (for testing)
+    // Primary pointer is coarse => the device's main input is a finger (phone /
+    // tablet). A touchscreen laptop still has a fine primary pointer (mouse /
+    // trackpad), so it stays on the full desktop render. Plus a mobile UA check.
+    var coarsePrimary = window.matchMedia && window.matchMedia('(pointer: coarse)').matches
+      && !(window.matchMedia('(pointer: fine)').matches);
+    var mobileUA = /iPhone|iPad|iPod|Android.*Mobile|Mobile.*Safari|Silk|Kindle/i.test(navigator.userAgent || '');
+    if (force || coarsePrimary || mobileUA) {
+      document.documentElement.classList.add('lowfx');
+      window.__LOWFX = true;
+    }
+  } catch (e) {}
+})();
+</script>
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="description" content="One goal, one daily action. A private life-direction system.">
+<title>Memento</title>
+<link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="manifest" href="manifest.json">
+<!-- Fonts are self-hosted (fonts/, downloaded from Google Fonts) so first
+     paint never waits on a third-party CDN. font-display: swap throughout. -->
+<link rel="preload" href="fonts/dmsans-1.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/sidebar.css">
+<link rel="stylesheet" href="css/dashboard.css">
+<link rel="stylesheet" href="css/misc.css">
+<link rel="stylesheet" href="css/vivere.css">
+<link rel="stylesheet" href="css/notes.css">
+<link rel="stylesheet" href="css/onboarding.css">
+<link rel="stylesheet" href="css/clarity.css">
+<link rel="stylesheet" href="css/action.css">
+</head>
+<body>
+
+<!-- Boot mask: pure black overlay that covers the entire viewport from the
+     first paint, then fades out once the saved view (dashboard / action /
+     clarity summary) has had a frame to mount. Prevents the brief flash of
+     dashboard god rays on every refresh when restoring a deeper view. The
+     reveal class .boot-revealed is added by JS at the end of the init block. -->
+<div id="bootMask" aria-hidden="true">
+  <svg class="bootmask__mark" width="64" height="64" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+    <rect width="512" height="512" rx="44" fill="#f5f5f7"/>
+    <path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z" fill="#0a0a0e" stroke="#0a0a0e" stroke-width="14" stroke-linejoin="round"/>
+  </svg>
+</div>
+
+<!-- Ambient Background -->
+<div class="ambient" id="ambientBg" aria-hidden="true">
+  <canvas class="ambient__blob-bg" id="ambientBlobBg" width="512" height="512"></canvas>
+  <div class="ambient__orb ambient__orb--purple"></div>
+  <div class="ambient__orb ambient__orb--green"></div>
+  <div class="ambient__orb ambient__orb--blue"></div>
+  <div class="ambient__orb ambient__orb--white"></div>
+  <div class="ambient__orb ambient__orb--red"></div>
+  <div class="ambient__orb ambient__orb--teal"></div>
+  <canvas class="ambient__stars" id="ambientStars"></canvas>
+  <div class="ambient__ns-bloom" id="ambientNsBloom"></div>
+  <div class="ambient__rays" aria-hidden="true">
+    <div class="ambient__rays-source"></div>
+    <div class="ambient__rays-beam" style="--a:3deg;  --h:35px;  --d:9.4s;  --del:-0.0s; --omin:0.04; --omax:0.32; --smin:0.85; --smax:1.05; --c:165 130 255;"><div class="ambient__rays-beam-shaft"></div></div>
+    <div class="ambient__rays-beam" style="--a:9deg;  --h:90px;  --d:11.6s; --del:-1.8s; --omin:0.07; --omax:0.50; --smin:0.55; --smax:1.35; --c:130 170 255;"><div class="ambient__rays-beam-shaft"></div></div>
+    <div class="ambient__rays-beam" style="--a:16deg; --h:24px;  --d:7.1s;  --del:-3.4s; --omin:0.05; --omax:0.30; --smin:0.7;  --smax:1.2;  --c:255 110 140;"><div class="ambient__rays-beam-shaft"></div></div>
+    <div class="ambient__rays-beam" style="--a:22deg; --h:75px;  --d:13.2s; --del:-2.1s; --omin:0.09; --omax:0.65; --smin:0.6;  --smax:1.3;  --c:175 140 255;"><div class="ambient__rays-beam-shaft"></div></div>
+    <div class="ambient__rays-beam" style="--a:29deg; --h:40px;  --d:10.5s; --del:-5.6s; --omin:0.05; --omax:0.34; --smin:0.5;  --smax:1.4;  --c:255 255 255;"><div class="ambient__rays-beam-shaft"></div></div>
+    <div class="ambient__rays-beam" style="--a:36deg; --h:110px; --d:8.3s;  --del:-0.7s; --omin:0.11; --omax:0.72; --smin:0.65; --smax:1.25; --c:150 120 255;"><div class="ambient__rays-beam-shaft"></div></div>
+    <div class="ambient__rays-beam" style="--a:43deg; --h:28px;  --d:14.8s; --del:-4.2s; --omin:0.04; --omax:0.28; --smin:0.8;  --smax:1.15; --c:140 180 255;"><div class="ambient__rays-beam-shaft"></div></div>
+    <div class="ambient__rays-beam" style="--a:50deg; --h:95px;  --d:9.0s;  --del:-3.0s; --omin:0.10; --omax:0.68; --smin:0.55; --smax:1.4;  --c:185 145 255;"><div class="ambient__rays-beam-shaft"></div></div>
+    <div class="ambient__rays-beam" style="--a:57deg; --h:22px;  --d:12.3s; --del:-6.5s; --omin:0.04; --omax:0.24; --smin:0.75; --smax:1.2;  --c:255 130 155;"><div class="ambient__rays-beam-shaft"></div></div>
+    <div class="ambient__rays-beam" style="--a:64deg; --h:65px;  --d:10.9s; --del:-1.2s; --omin:0.08; --omax:0.54; --smin:0.6;  --smax:1.3;  --c:120 165 255;"><div class="ambient__rays-beam-shaft"></div></div>
+    <div class="ambient__rays-beam" style="--a:72deg; --h:32px;  --d:8.6s;  --del:-4.9s; --omin:0.05; --omax:0.32; --smin:0.7;  --smax:1.2;  --c:255 255 255;"><div class="ambient__rays-beam-shaft"></div></div>
+    <div class="ambient__rays-beam" style="--a:80deg; --h:80px;  --d:11.4s; --del:-2.6s; --omin:0.09; --omax:0.58; --smin:0.55; --smax:1.35; --c:170 135 255;"><div class="ambient__rays-beam-shaft"></div></div>
+  </div>
+  <video class="ambient__video" id="bgVideo" autoplay loop muted playsinline disablepictureinpicture disableremoteplayback>
+    <source src="Abstract Black Purple Blur Mountain.mp4" type="video/mp4">
+  </video>
+</div>
+
+<!-- Custom background (Settings > Preferences > Background): a curated color,
+     gradient, or cover-fit image behind the app, under a mandatory dark scrim
+     so the glass UI stays readable. Shown only while body.custom-bg is set;
+     painted by applyCustomBackground() in js/01-state-foundation.js. -->
+<div id="customBg" aria-hidden="true">
+  <div class="custom-bg__media"></div>
+  <div class="custom-bg__scrim"></div>
+</div>
+
+<!-- Splash / Landing Page -->
+<div class="splash splash--v2" id="splash">
+  <div class="splash__bg-gradient" aria-hidden="true">
+    <div class="splash-blob splash-blob--cyan"></div>
+    <div class="splash-blob splash-blob--purple"></div>
+    <div class="splash-blob splash-blob--magenta"></div>
+    <div class="splash-blob splash-blob--violet"></div>
+  </div>
+  <!-- ── REVERT MARKER: SPLASH GOD RAYS START ──
+       Dashboard-style god rays layered over the gradient blobs. To go back to
+       the gradient-only background, delete this entire <div class="splash__rays">
+       block AND the matching CSS block in the stylesheet above. -->
+  <div class="splash__rays" aria-hidden="true">
+    <div class="ambient__rays-source"></div>
+    <div class="ambient__rays-beam" style="--a:3deg;  --h:35px;  --d:9.4s;  --del:-0.0s; --omin:0.04; --omax:0.32; --smin:0.85; --smax:1.05; --c:165 130 255;"><div class="ambient__rays-beam-shaft"></div></div>
+    <div class="ambient__rays-beam" style="--a:9deg;  --h:90px;  --d:11.6s; --del:-1.8s; --omin:0.07; --omax:0.50; --smin:0.55; --smax:1.35; --c:130 170 255;"><div class="ambient__rays-beam-shaft"></div></div>
+    <div class="ambient__rays-beam" style="--a:16deg; --h:24px;  --d:7.1s;  --del:-3.4s; --omin:0.05; --omax:0.30; --smin:0.7;  --smax:1.2;  --c:255 110 140;"><div class="ambient__rays-beam-shaft"></div></div>
+    <div class="ambient__rays-beam" style="--a:22deg; --h:75px;  --d:13.2s; --del:-2.1s; --omin:0.09; --omax:0.65; --smin:0.6;  --smax:1.3;  --c:175 140 255;"><div class="ambient__rays-beam-shaft"></div></div>
+    <div class="ambient__rays-beam" style="--a:29deg; --h:40px;  --d:10.5s; --del:-5.6s; --omin:0.05; --omax:0.34; --smin:0.5;  --smax:1.4;  --c:255 255 255;"><div class="ambient__rays-beam-shaft"></div></div>
+    <div class="ambient__rays-beam" style="--a:36deg; --h:110px; --d:8.3s;  --del:-0.7s; --omin:0.11; --omax:0.72; --smin:0.65; --smax:1.25; --c:150 120 255;"><div class="ambient__rays-beam-shaft"></div></div>
+    <div class="ambient__rays-beam" style="--a:43deg; --h:28px;  --d:14.8s; --del:-4.2s; --omin:0.04; --omax:0.28; --smin:0.8;  --smax:1.15; --c:140 180 255;"><div class="ambient__rays-beam-shaft"></div></div>
+    <div class="ambient__rays-beam" style="--a:50deg; --h:95px;  --d:9.0s;  --del:-3.0s; --omin:0.10; --omax:0.68; --smin:0.55; --smax:1.4;  --c:185 145 255;"><div class="ambient__rays-beam-shaft"></div></div>
+    <div class="ambient__rays-beam" style="--a:57deg; --h:22px;  --d:12.3s; --del:-6.5s; --omin:0.04; --omax:0.24; --smin:0.75; --smax:1.2;  --c:255 130 155;"><div class="ambient__rays-beam-shaft"></div></div>
+    <div class="ambient__rays-beam" style="--a:64deg; --h:65px;  --d:10.9s; --del:-1.2s; --omin:0.08; --omax:0.54; --smin:0.6;  --smax:1.3;  --c:120 165 255;"><div class="ambient__rays-beam-shaft"></div></div>
+    <div class="ambient__rays-beam" style="--a:72deg; --h:32px;  --d:8.6s;  --del:-4.9s; --omin:0.05; --omax:0.32; --smin:0.7;  --smax:1.2;  --c:255 255 255;"><div class="ambient__rays-beam-shaft"></div></div>
+    <div class="ambient__rays-beam" style="--a:80deg; --h:80px;  --d:11.4s; --del:-2.6s; --omin:0.09; --omax:0.58; --smin:0.55; --smax:1.35; --c:170 135 255;"><div class="ambient__rays-beam-shaft"></div></div>
+  </div>
+  <!-- ── REVERT MARKER: SPLASH GOD RAYS END ── -->
+  <div class="splash__bg" aria-hidden="true" style="display:none">
+    <div class="splash__orb splash__orb--purple"></div>
+    <div class="splash__orb splash__orb--red"></div>
+    <div class="splash__orb splash__orb--blue"></div>
+    <div class="splash__orb splash__orb--violet"></div>
+  </div>
+  <div class="splash__scene">
+    <!-- LEGACY MEMORIAL ICON (hidden in V2 splash, kept in DOM for future restore by removing display:none) -->
+    <svg class="hyperblob hyperblob--legacy" id="hyperblob" viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display:none">
+      <defs>
+        <!-- Obelisk lit face (left, hit by upper-left light) -->
+        <linearGradient id="memLit" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#e6c4ff"/>
+          <stop offset="45%"  stop-color="#b8a3ff"/>
+          <stop offset="100%" stop-color="#7d92ff"/>
+        </linearGradient>
+        <!-- Obelisk shadow face (right) -->
+        <linearGradient id="memShadow" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#9d7ad6"/>
+          <stop offset="45%"  stop-color="#6e6bc4"/>
+          <stop offset="100%" stop-color="#3a5aa8"/>
+        </linearGradient>
+        <!-- Pedestal top (most lit) -->
+        <linearGradient id="memPedTop" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#ead4ff"/>
+          <stop offset="100%" stop-color="#bea4ff"/>
+        </linearGradient>
+        <!-- Pedestal front -->
+        <linearGradient id="memPedFront" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#a08aff"/>
+          <stop offset="100%" stop-color="#5a78e0"/>
+        </linearGradient>
+        <!-- Pedestal right side (shadowed) -->
+        <linearGradient id="memPedSide" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#6a59b5"/>
+          <stop offset="100%" stop-color="#3a4ea0"/>
+        </linearGradient>
+        <!-- Ring -->
+        <linearGradient id="memRingGrad" x1="0" y1="0" x2="1" y2="0.6">
+          <stop offset="0%"   stop-color="#c084ff"/>
+          <stop offset="55%"  stop-color="#7d8cff"/>
+          <stop offset="100%" stop-color="#5dc7ff"/>
+        </linearGradient>
+        <!-- Shimmer bloom (soft halo behind sparkle) -->
+        <radialGradient id="memBloomGrad">
+          <stop offset="0%"   stop-color="#ffffff" stop-opacity="0.95"/>
+          <stop offset="45%"  stop-color="#e0d4ff" stop-opacity="0.45"/>
+          <stop offset="100%" stop-color="#c084ff" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="memRingGlow" x="-60%" y="-60%" width="220%" height="220%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="6"  result="b1"/>
+          <feGaussianBlur in="SourceGraphic" stdDeviation="14" result="b2"/>
+          <feMerge>
+            <feMergeNode in="b2"/>
+            <feMergeNode in="b1"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+        <filter id="memObeliskGlow" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="1.2" result="b"/>
+          <feMerge>
+            <feMergeNode in="b"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+      <!-- Subtle solid energy outline tracing the memorial's silhouette -->
+      <path class="memento-icon__energy"
+            d="M 160 78 L 147 112 L 143 232 L 132 232 L 132 246 L 120 246 L 120 258 L 200 258 L 200 246 L 188 246 L 188 232 L 177 232 L 173 112 Z"
+            fill="none" stroke="url(#memRingGrad)" stroke-width="2.6"
+            stroke-linecap="round" stroke-linejoin="round"
+            filter="url(#memRingGlow)" opacity="0.7"/>
+      <!-- Obelisk -->
+      <g filter="url(#memObeliskGlow)">
+        <!-- Left face of pyramid + shaft (lit) -->
+        <path d="M160 78 L147 112 L143 232 L160 232 Z" fill="url(#memLit)"/>
+        <!-- Right face of pyramid + shaft (shadow) -->
+        <path d="M160 78 L173 112 L177 232 L160 232 Z" fill="url(#memShadow)"/>
+
+        <!-- Upper pedestal (3D box) -->
+        <!-- Top face (parallelogram, slight depth back-right) -->
+        <path d="M132 232 L188 232 L185 228 L135 228 Z" fill="url(#memPedTop)"/>
+        <!-- Front face -->
+        <path d="M132 232 L188 232 L188 246 L132 246 Z" fill="url(#memPedFront)"/>
+        <!-- Right side (depth) -->
+        <path d="M188 232 L185 228 L185 242 L188 246 Z" fill="url(#memPedSide)"/>
+
+        <!-- Lower pedestal (3D box, wider) -->
+        <path d="M120 246 L200 246 L197 242 L123 242 Z" fill="url(#memPedTop)"/>
+        <path d="M120 246 L200 246 L200 258 L120 258 Z" fill="url(#memPedFront)"/>
+        <path d="M200 246 L197 242 L197 254 L200 258 Z" fill="url(#memPedSide)"/>
+      </g>
+    </svg>
+    <div class="splash-wrap">
+      <div class="splash__title">Memento</div>
+    </div>
+    <div id="splashCard" style="display:none"></div>
+  </div>
+  <!-- Direct child of #splash so absolute bottom pins to the viewport, not
+       the centered scene block. -->
+  <div class="splash__swipe">
+    <button type="button" class="splash__cta" id="splashGetStarted">Enter</button>
+  </div>
+  <!-- Optional cloud account entry. Wired by js/12-cloud-sync.js; data-cloud-keep
+       stops the splash tap-to-dismiss handlers from firing on this tap. -->
+  <button type="button" class="splash-signin" id="splashSignin" data-cloud-keep><span>Sign in</span></button>
+</div>
+
+<!-- App Shell -->
+<!-- Desktop sidebar (≥1024px). Mobile users still see the bottom tab bar. -->
+<aside class="sidebar" id="appSidebar" aria-label="Main navigation">
+  <div class="sidebar__inner">
+    <div class="sidebar__header">
+      <a class="sidebar__brand" href="#" id="sidebarBrand">
+        <span class="sidebar__brand-mark" aria-hidden="true">
+          <img src="icons/icon.svg" width="22" height="22" alt="" style="display:block;">
+        </span>
+        <span class="sidebar__brand-text">Memento</span>
+      </a>
+      <button class="sidebar__collapse" id="sidebarCollapse" type="button" aria-label="Collapse sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+    </div>
+
+    <nav class="sidebar__nav">
+      <button class="sidebar__nav-item sidebar__nav-item--active" data-tab="home" type="button">
+        <span class="sidebar__nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+          <span class="sidebar__nav-dot" id="sidebarHomeDot"></span>
+        </span>
+        <span class="sidebar__nav-label">Dashboard</span>
+      </button>
+      <button class="sidebar__nav-item" data-nav="timeblocks" type="button">
+        <span class="sidebar__nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </span>
+        <span class="sidebar__nav-label">Schedule</span>
+      </button>
+      <button class="sidebar__nav-item" data-nav="clarity" type="button">
+        <span class="sidebar__nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="0.6" fill="currentColor"/></svg>
+        </span>
+        <span class="sidebar__nav-label">Goal</span>
+      </button>
+      <button class="sidebar__nav-item" data-nav="action" type="button">
+        <span class="sidebar__nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11"/><path d="M9 12h11"/><path d="M9 18h11"/><path d="M4 5.5l1 1 2-2"/><path d="M4 11.5l1 1 2-2"/><path d="M4 17.5l1 1 2-2"/></svg>
+        </span>
+        <span class="sidebar__nav-label">Plan</span>
+      </button>
+      <button class="sidebar__nav-item" data-nav="deepwork" type="button">
+        <span class="sidebar__nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2"/><path d="M9 2h6"/></svg>
+        </span>
+        <span class="sidebar__nav-label">Focus</span>
+      </button>
+      <button class="sidebar__nav-item" data-nav="reflection" type="button">
+        <span class="sidebar__nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        </span>
+        <span class="sidebar__nav-label">Journal</span>
+      </button>
+      <button class="sidebar__nav-item" data-nav="streak" type="button">
+        <span class="sidebar__nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 7-7"/><path d="M17 8h4v4"/></svg>
+        </span>
+        <span class="sidebar__nav-label">Progress</span>
+      </button>
+      <button class="sidebar__nav-item" data-tab="memento" type="button">
+        <span class="sidebar__nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </span>
+        <span class="sidebar__nav-label">Memento</span>
+      </button>
+      <button class="sidebar__nav-item" data-nav="vivere" type="button">
+        <span class="sidebar__nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.4M12 19.6V22M2 12h2.4M19.6 12H22M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7"/></svg>
+        </span>
+        <span class="sidebar__nav-label">Vivere</span>
+      </button>
+      <button class="sidebar__nav-item" data-tab="profile" type="button">
+        <span class="sidebar__nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </span>
+        <span class="sidebar__nav-label">Settings</span>
+      </button>
+    </nav>
+
+    <!-- Identity: Neutron Star + anchor word. Click opens the clarity summary. -->
+    <div class="sidebar__section sidebar__section--clickable" id="sidebarNsSection" data-sidebar-block="neutronStar" role="button" tabindex="0" style="display:none">
+      <div class="sidebar__section-label">Neutron Star</div>
+      <div class="sidebar__ns-value" id="sidebarNsValue"></div>
+      <div class="sidebar__anchor-pill" id="sidebarAnchor" style="display:none"></div>
+    </div>
+
+    <!-- Action: Today's action (existing). -->
+    <div class="sidebar__section" id="sidebarTodaySection" style="display:none">
+      <div class="sidebar__section-label">Today's Action</div>
+      <div class="sidebar__section-value" id="sidebarTodayValue">No action set</div>
+    </div>
+
+    <!-- Time: countdown to the user's goal horizon. -->
+    <div class="sidebar__section" id="sidebarDaysSection" style="display:none">
+      <div class="sidebar__section-label">Time Left</div>
+      <div class="sidebar__days-num" id="sidebarDaysNum">0</div>
+      <div class="sidebar__days-unit" id="sidebarDaysUnit">days to your goal</div>
+    </div>
+
+    <!-- Status: streak (existing). -->
+    <div class="sidebar__section" id="sidebarStreakSection" style="display:none" title="Days you have shown up. One quiet day will not break it; the run continues.">
+      <div class="sidebar__section-label">Consistency</div>
+      <div class="sidebar__streak">
+        <span aria-hidden="true">🔥</span>
+        <span><span class="sidebar__streak-count" id="sidebarStreakCount">0</span> day streak</span>
+      </div>
+    </div>
+
+    <!-- Status: deep work sessions today. Click opens the deep work sheet. -->
+    <div class="sidebar__section sidebar__section--clickable" id="sidebarDeepworkSection" data-sidebar-block="deepwork" role="button" tabindex="0" style="display:none">
+      <div class="sidebar__section-label">Deep Work Today</div>
+      <div class="sidebar__dw">
+        <span aria-hidden="true">🧠</span>
+        <span><span class="sidebar__dw-count" id="sidebarDeepworkCount">0</span> sessions</span>
+      </div>
+    </div>
+
+    <div class="sidebar__spacer"></div>
+
+    <!-- CTA: reflection nudge. Only shown if the user hasn't reflected today. -->
+    <button class="sidebar__reflect-cta" id="sidebarReflectionCta" data-sidebar-block="reflection" type="button" style="display:none">
+      Write today's reflection
+    </button>
+
+    <!-- Slot for the relocated Cheat Code Bar (moved here by JS at desktop widths). -->
+    <div id="sidebarCreatorSlot"></div>
+
+    <!-- Profile pinned to the bottom (Polar pattern): avatar + name, nothing else. -->
+    <button class="sidebar__profile" id="sidebarProfile" type="button" aria-label="Open profile">
+      <span class="sidebar__profile-avatar" id="sidebarAvatar">M</span>
+      <span class="sidebar__profile-text">
+        <span class="sidebar__profile-name" id="sidebarName">Builder</span>
+      </span>
+    </button>
+  </div>
+</aside>
+
+<!-- Floating reveal button shown only when the sidebar is fully collapsed. -->
+<button class="sidebar-reveal" id="sidebarReveal" type="button" aria-label="Show sidebar">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="3" y1="6" x2="21" y2="6"/>
+    <line x1="3" y1="12" x2="21" y2="12"/>
+    <line x1="3" y1="18" x2="21" y2="18"/>
+  </svg>
+</button>
+
+<!-- v19 Universal Capture: always-available quick-add into the inbox (FAB + "c" shortcut). -->
+<button class="capture-fab" id="captureFab" type="button" aria-label="Capture a thought" title="Capture (c)">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <line x1="12" y1="5" x2="12" y2="19"/>
+    <line x1="5" y1="12" x2="19" y2="12"/>
+  </svg>
+  <span class="capture-fab__badge" id="captureFabBadge" aria-hidden="true" hidden></span>
+</button>
+
+<div class="app dash-v2" id="app">
+  <header class="dash-header">
+    <!-- Mobile-only brand lockup (desktop keeps the greeting up here; on
+         phones the greeting moves below the Memento card instead). -->
+    <div class="dash-header__brand" aria-hidden="true">
+      <svg class="dash-header__brand-mark" width="22" height="22" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><rect width="512" height="512" rx="118" fill="rgba(245,245,247,0.94)"/><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z" fill="#0a0a0e"/></svg>
+      <span class="dash-header__brand-name">Memento</span>
+    </div>
+    <!-- Plain container (not a button): Settings is reachable from the sidebar
+         profile and the tab bar, so the greeting itself is not a hit target. -->
+    <div class="dash-header__greeting dash-header__hub" id="dashAvatar">
+      <div class="greeting-line">
+        <span class="greeting-time" id="greetingTime">Hello,</span>
+        <span class="greeting-name" id="greetingName">Builder</span><span class="greeting-dot">.</span>
+      </div>
+      <div class="hub-headline" id="hubHeadline" role="button" tabindex="0" aria-haspopup="true" aria-expanded="false" aria-label="Change your dashboard headline"><span class="hub-headline__text" id="hubHeadlineText">What&rsquo;s the mission today?</span><svg class="hub-headline__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="hub-returncue" id="hubReturnCue" style="display:none"></div>
+    </div>
+    <div class="dash-header__right">
+      <button class="hub-search" id="hubSearch" type="button" aria-label="Search Memento" title="Search (Cmd or Ctrl + K)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </button>
+      <button class="spotify-pill" id="spotifyPill" type="button" style="display:none" aria-label="Spotify now playing">
+        <span class="spotify-pill__art" id="spotifyArt" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="#1DB954" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm4.59 14.43a.62.62 0 0 1-.86.21c-2.35-1.44-5.3-1.76-8.79-.96a.62.62 0 1 1-.28-1.22c3.81-.87 7.08-.5 9.72 1.11.3.18.39.57.21.86zm1.23-2.74a.78.78 0 0 1-1.07.26c-2.69-1.65-6.79-2.13-9.97-1.17a.78.78 0 1 1-.45-1.49c3.64-1.1 8.16-.56 11.24 1.33.37.22.49.7.25 1.07zm.11-2.85C14.83 8.95 9.4 8.77 6.3 9.71a.94.94 0 1 1-.54-1.8c3.56-1.08 9.56-.87 13.32 1.36a.94.94 0 0 1-.96 1.61z"/></svg>
+        </span>
+        <span class="spotify-pill__meta">
+          <span class="spotify-pill__title" id="spotifyTitle">Not playing</span>
+          <span class="spotify-pill__artist" id="spotifyArtist"></span>
+        </span>
+        <span class="spotify-pill__bars" id="spotifyBars" aria-hidden="true"><i></i><i></i><i></i></span>
+      </button>
+      <div class="hub-clock">
+        <span class="hub-clock__date" id="headerDate"></span>
+        <span class="hub-clock__time" id="hubClockTime"></span>
+      </div>
+    </div>
+  </header>
+  <section class="creator-box" id="creatorBox">
+    <div class="creator-box__top" id="creatorBoxToggle">
+      <div class="creator-box__label">&#127918; Cheat Code Bar</div>
+      <div class="creator-box__right">
+        <div class="creator-box__state" id="creatorState">Normal flow</div>
+        <div class="creator-box__arrow" id="creatorArrow">&#8964;</div>
+      </div>
+    </div>
+    <div class="creator-box__actions" id="creatorBoxActions">
+      <button class="creator-box__btn" id="creatorUnlockAll">Unlock All</button>
+      <button class="creator-box__btn creator-box__btn--danger" id="creatorNormal">Lock All</button>
+      <button class="creator-box__btn creator-box__btn--primary" id="creatorOpenSummary">Open Neutron Star</button>
+      <button class="creator-box__btn creator-box__btn--primary" id="creatorSkipAction">Skip to Action Plan</button>
+      <button class="creator-box__btn creator-box__btn--danger" id="creatorRestoreClarity">Restore Clarity</button>
+      <button class="creator-box__btn creator-box__btn--danger" id="creatorRestartClarity">Restart Clarity</button>
+      <button class="creator-box__btn creator-box__btn--danger" id="creatorRestartAction">Restart Action</button>
+      <button class="creator-box__btn creator-box__btn--danger" id="creatorRestartEverything">Restart Everything</button>
+    </div>
+  </section>
+  <!-- Day Card: the mobile hero prototype (Star / Ember / Hourglass themes,
+       tap the object to switch). Hidden on desktop unless ?daycard=1. -->
+  <div id="dayCard"></div>
+  <!-- Page 2 on mobile: everything below the Memento is one snap section,
+       so the card screen and the dashboard page-flip with native scroll
+       physics. display:contents on desktop = zero layout effect there. -->
+  <div id="dashBelow">
+    <!-- Mobile-only: the greeting lives between the Memento card and the
+         command center (the header carries the brand lockup instead). -->
+    <div id="dashGreetingMobile" aria-hidden="true"></div>
+    <div id="commandCenter"></div>
+    <!-- One quiet line between the hero and the grid: On this day (your own
+         words from 30/90/365 days ago) or the rotating Daily Memento. -->
+    <div id="dailyMemento"></div>
+    <main class="widget-grid" id="widgetGrid"></main>
+  </div>
+  <!-- footer removed in v5  - replaced by tab bar -->
+</div>
+
+<!-- Sheet -->
+<div class="sheet-backdrop" id="sheetBackdrop" aria-hidden="true"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" aria-hidden="true">
+  <div class="sheet__exp-bg" aria-hidden="true">
+    <div class="sheet__exp-orb sheet__exp-orb--a"></div>
+    <div class="sheet__exp-orb sheet__exp-orb--b"></div>
+    <div class="sheet__exp-orb sheet__exp-orb--c"></div>
+  </div>
+  <div class="sheet__handle-area" id="sheetHandle"><div class="sheet__handle"></div></div>
+  <div class="sheet__header">
+    <h2 class="sheet__title" id="sheetTitle"></h2>
+    <button class="sheet__close" id="sheetClose" aria-label="Close">&times;</button>
+  </div>
+  <div class="sheet__body" id="sheetBody"></div>
+</div>
+
+<!-- Clarity Full-Screen Experience -->
+<div class="clarity-exp" id="clarityExp" aria-hidden="true">
+  <div class="clarity-exp__bg" aria-hidden="true">
+    <!-- Legacy colored orbs: hidden by default, restorable via
+         body.clarity-legacy-orbs (Malik asked to keep them recoverable). -->
+    <div class="clarity-exp__bg-orb3"></div>
+    <div class="clarity-exp__bg-orb4"></div>
+    <!-- The light that builds: same god-ray anatomy as the dashboard's
+         top-left beams but with clarity-scoped classes (crays) so the
+         body:has() pause rules and mobile crash-fix freezes that target
+         .ambient__rays cannot catch it. Intensity is driven by
+         - -clarity-light (0..1), set from updateProgress() as the user goes
+         deeper; it peaks when the Neutron Star is synthesized. -->
+    <div class="crays" aria-hidden="true">
+      <div class="crays__source"></div>
+      <div class="crays__beam" style="--a:6deg;  --h:42px;  --d:9.4s;  --del:-0.0s; --omin:0.05; --omax:0.40; --c:165 130 255;"><div class="crays__shaft"></div></div>
+      <div class="crays__beam" style="--a:13deg; --h:96px;  --d:11.6s; --del:-1.8s; --omin:0.08; --omax:0.55; --c:130 170 255;"><div class="crays__shaft"></div></div>
+      <div class="crays__beam" style="--a:21deg; --h:30px;  --d:7.1s;  --del:-3.4s; --omin:0.05; --omax:0.35; --c:240 235 255;"><div class="crays__shaft"></div></div>
+      <div class="crays__beam" style="--a:29deg; --h:80px;  --d:13.2s; --del:-2.1s; --omin:0.10; --omax:0.65; --c:175 140 255;"><div class="crays__shaft"></div></div>
+      <div class="crays__beam" style="--a:38deg; --h:46px;  --d:10.5s; --del:-5.6s; --omin:0.06; --omax:0.40; --c:255 255 255;"><div class="crays__shaft"></div></div>
+      <div class="crays__beam" style="--a:47deg; --h:112px; --d:8.3s;  --del:-0.7s; --omin:0.12; --omax:0.72; --c:150 120 255;"><div class="crays__shaft"></div></div>
+      <div class="crays__beam" style="--a:56deg; --h:34px;  --d:14.8s; --del:-4.2s; --omin:0.05; --omax:0.32; --c:140 180 255;"><div class="crays__shaft"></div></div>
+      <div class="crays__beam" style="--a:66deg; --h:90px;  --d:9.0s;  --del:-3.0s; --omin:0.10; --omax:0.62; --c:185 145 255;"><div class="crays__shaft"></div></div>
+    </div>
+  </div>
+  <div class="clarity-exp__top">
+    <div></div>
+    <button class="clarity-exp__close" id="clarityExpClose" aria-label="Close" onclick="smartCloseClarity(); return false;" onpointerdown="smartCloseClarity(); return false;">&times;</button>
+  </div>
+  <div class="clarity-exp__progress" id="clarityExpProgress"></div>
+  <div class="clarity-exp__page-wrap" id="clarityExpPageWrap"></div>
+  <div class="clarity-exp__nav" id="clarityExpNav"></div>
+</div>
+
+<!-- Action Full-Screen Experience -->
+<div class="action-exp" id="actionExp" aria-hidden="true">
+  <div class="action-exp__bg" aria-hidden="true">
+    <div class="action-exp__bg-orb3"></div>
+    <canvas class="action-exp__stars" id="actionExpStars" aria-hidden="true"></canvas>
+  </div>
+  <div class="action-exp__top">
+    <div></div>
+    <button class="action-exp__close" id="actionExpClose" aria-label="Close" onclick="exitToModules('action'); return false;" onpointerdown="exitToModules('action'); return false;">&times;</button>
+  </div>
+  <div class="action-exp__progress" id="actionExpProgress"></div>
+  <div class="action-exp__page-wrap" id="actionExpPageWrap"></div>
+  <div class="action-exp__nav" id="actionExpNav"></div>
+</div>
+
+<button class="fullscreen-close-global" id="fullscreenCloseGlobal" aria-label="Close fullscreen module">&times;</button>
+
+<!-- Login -->
+<div class="login hidden" id="loginScreen">
+  <div class="login__orbs" aria-hidden="true">
+    <div class="login__orb login__orb--purple"></div>
+    <div class="login__orb login__orb--red"></div>
+    <div class="login__orb login__orb--green"></div>
+    <div class="login__orb login__orb--blue"></div>
+  </div>
+  <div class="login__card">
+    <div class="login__logo">
+      <svg viewBox="0 0 100 100" fill="none" stroke="rgba(123,97,255,0.9)" stroke-width="2.5">
+        <path d="M50 15 C30 15, 15 30, 15 50 C15 70, 30 85, 50 85 C70 85, 85 70, 85 50 C85 30, 70 15, 50 15 Z" opacity="0.3"/>
+        <path d="M50 25 C35 25, 25 38, 25 50 C25 65, 40 75, 50 75 C65 75, 75 62, 75 50 C75 35, 60 25, 50 25 Z" opacity="0.6"/>
+        <ellipse cx="50" cy="50" rx="18" ry="30" transform="rotate(45 50 50)" opacity="0.8"/>
+        <ellipse cx="50" cy="50" rx="18" ry="30" transform="rotate(-45 50 50)" opacity="0.8"/>
+        <circle cx="50" cy="50" r="4" fill="rgba(123,97,255,0.9)" stroke="none"/>
+      </svg>
+    </div>
+    <div class="login__title">Memento</div>
+    <div class="login__subtitle">Your personal system for clarity and momentum.</div>
+    <input class="login__input" id="loginName" type="text" placeholder="Your name" maxlength="30" autocomplete="given-name" aria-label="Your name">
+    <input class="login__input" id="loginEmail" type="email" placeholder="Your email" maxlength="100" autocomplete="email" aria-label="Your email">
+    <button class="login__btn" id="loginStart">Get Started</button>
+  </div>
+</div>
+
+<!-- Welcome Intro -->
+<div class="welcome-intro" id="welcomeIntro" aria-hidden="true">
+  <div class="welcome-intro__bg" aria-hidden="true">
+    <div class="welcome-intro__orb welcome-intro__orb--purple"></div>
+    <div class="welcome-intro__orb welcome-intro__orb--red"></div>
+    <div class="welcome-intro__orb welcome-intro__orb--green"></div>
+    <div class="welcome-intro__orb welcome-intro__orb--blue"></div>
+  </div>
+  <div class="welcome-intro__page-wrap" id="welcomeIntroPageWrap"></div>
+  <div class="welcome-intro__nav" id="welcomeIntroNav"></div>
+</div>
+
+<!-- Tab Bar -->
+<nav class="tab-bar hidden" id="tabBar" aria-label="Main navigation">
+  <div class="tab-bar__pill" id="tabBarPill"></div>
+  <button class="tab-bar__tab tab-bar__tab--active" data-tab="home">
+    <svg class="tab-bar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+    <span class="tab-bar__label">Home</span>
+    <span class="tab-bar__dot" id="homeTabDot" aria-hidden="true"></span>
+  </button>
+  <button class="tab-bar__tab" data-tab="memento">
+    <svg class="tab-bar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+    <span class="tab-bar__label">Memento</span>
+  </button>
+  <button class="tab-bar__tab" data-tab="profile">
+    <svg class="tab-bar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span class="tab-bar__label">Profile</span>
+  </button>
+</nav>
+
+<!-- Tab Content Panels -->
+<div class="tab-panel hidden" id="panelMemento">
+  <div class="tab-panel__inner">
+    <div class="tab-panel__header">Memento</div>
+    <div class="tab-panel__body" id="mementoBody"></div>
+  </div>
+</div>
+<div class="tab-panel hidden" id="panelProfile">
+  <div class="tab-panel__inner">
+    <div class="tab-panel__header">Profile</div>
+    <div class="tab-panel__body" id="profileBody"></div>
+  </div>
+</div>
+
+<script>
+// Manually animate --angle for orbit/comet conic-gradient animations.
+// (CSS @property + keyframe interpolation doesn't work reliably in this file.)
+(function() {
+  try { CSS.registerProperty({ name: '--angle', syntax: '<angle>', inherits: true, initialValue: '0deg' }); } catch(e) {}
+  const PERIOD_MS = 4000;
+  const root = document.documentElement;
+  // Mobile (lowfx): don't run a perpetual rAF loop spinning the gradient borders.
+  // Set a fixed angle so the borders still render, just static.
+  if (root.classList.contains('lowfx')) { root.style.setProperty('--angle', '90deg'); return; }
+  function tick(now) {
+    // Perf: while the tab/app is backgrounded, stop advancing the decorative
+    // border angle (invisible when hidden) but keep one rAF alive so it resumes
+    // seamlessly on return. No-op while visible (document.hidden is false).
+    if (document.hidden) { requestAnimationFrame(tick); return; }
+    const angle = ((now % PERIOD_MS) / PERIOD_MS) * 360;
+    root.style.setProperty('--angle', angle + 'deg');
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+</script>
+<script>
+/* Diagnostic overlay: off by default, shown only with ?perf=1 in the URL.
+   Catches any error the app throws (with line number) and shows a self-healing
+   perf HUD (anim loops, canvases, DOM nodes, heap). Kept for future debugging. */
+(function () {
+  if (!/[?&]perf=1/.test(location.search)) return;
+  var errs = [];
+  function box() {
+    var b = document.getElementById('__diagBox');
+    if (!b) {
+      b = document.createElement('div');
+      b.id = '__diagBox';
+      b.style.cssText = 'position:fixed;top:90px;left:8px;z-index:2147483647;max-width:94vw;'
+        + 'background:#000;color:#3f6;font:12px/1.45 ui-monospace,monospace;padding:9px 11px;'
+        + 'border-radius:10px;pointer-events:none;white-space:pre-wrap;border:2px solid #3f6;box-shadow:0 6px 24px rgba(0,0,0,0.7);';
+    }
+    var root = document.documentElement;
+    if (root && b.parentNode !== root) root.appendChild(b);
+    return b;
+  }
+  window.addEventListener('error', function (e) {
+    var loc = (e.filename ? ('' + e.filename).split('/').pop() : '') + ':' + (e.lineno || '?') + ':' + (e.colno || '?');
+    errs.push((e.message || 'error') + '  @' + loc);
+    if (errs.length > 4) errs.shift();
+  });
+  window.addEventListener('unhandledrejection', function (e) {
+    errs.push('PROMISE: ' + ((e.reason && e.reason.message) || e.reason || 'rejection'));
+    if (errs.length > 4) errs.shift();
+  });
+  var rafCalls = 0;
+  var origRaf = (window.requestAnimationFrame || function (cb) { return setTimeout(cb, 16); }).bind(window);
+  window.requestAnimationFrame = function (cb) { rafCalls++; return origRaf(cb); };
+  var lastNodes = 0, peakNodes = 0, lastT = (window.performance && performance.now) ? performance.now() : 0;
+  setInterval(function () {
+    var b = box();
+    var now = (window.performance && performance.now) ? performance.now() : lastT + 1000;
+    var dt = (now - lastT) / 1000; lastT = now;
+    var fps = dt > 0 ? Math.round(rafCalls / dt) : 0; rafCalls = 0;
+    var nodes = document.getElementsByTagName('*').length;
+    if (nodes > peakNodes) peakNodes = nodes;
+    var delta = nodes - lastNodes; lastNodes = nodes;
+    var heap = (window.performance && performance.memory) ? Math.round(performance.memory.usedJSHeapSize / 1048576) + ' MB' : 'n/a';
+    b.textContent =
+      'DIAG (crash hunt)\n' +
+      'anim loops/s: ' + fps + '\n' +
+      'canvases: ' + document.getElementsByTagName('canvas').length + '\n' +
+      'DOM nodes: ' + nodes + ' (' + (delta >= 0 ? '+' : '') + delta + '/s)\n' +
+      'DOM peak: ' + peakNodes + '\n' +
+      'heap: ' + heap + '\n' +
+      'errors: ' + (errs.length ? '\n  ' + errs.join('\n  ') : 'none');
+  }, 1000);
+})();
+</script>
+<!-- App, split into per-feature files. Loaded as classic <script>s (NOT modules)
+     so they share one global lexical scope exactly like the original single IIFE.
+     const/let/class stay scoped (no window pollution); top-level function decls
+     are hoisted across files at call time. Order matters: every definition file
+     must load before 11-init.js, which runs the bootstrap immediately on load. -->
+<!-- Supabase client for OPTIONAL cloud accounts + sync (js/12-cloud-sync.js).
+     If this CDN tag fails to load, the app runs fully local, unchanged. -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
+<script src="js/01-state-foundation.js"></script>
+<script src="js/02-clarity-experience.js"></script>
+<script src="js/03-ai-integration.js"></script>
+<script src="js/04-templates-proof.js"></script>
+<script src="js/05-vivere.js"></script>
+<script src="js/06-consistency-mori.js"></script>
+<script src="js/07-sheet-templates.js"></script>
+<script src="js/08-cards-grid-share.js"></script>
+<script src="js/09-controllers.js"></script>
+<script src="js/10-demo-backend.js"></script>
+<script src="js/11-init.js"></script>
+<script src="js/12-cloud-sync.js"></script>
+</body>
+</html>

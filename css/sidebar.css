@@ -1,0 +1,727 @@
+/* ============================================
+   DESKTOP SIDEBAR (≥1024px)
+   ============================================
+   Real functional sidebar that replaces the mobile bottom tab bar on
+   desktop. Glassy backdrop-blur to match the rest of Memento. Toggleable
+   between expanded (260px) and collapsed (72px) widths. Mobile is fully
+   untouched. */
+:root {
+  --sidebar-gap: 16px;
+  --sidebar-w-expanded: 260px;
+  --sidebar-w-collapsed: 0px;
+  /* Layout offset = floating panel width plus a gap on each side, so the
+     content clears the detached sidebar instead of sliding under it. */
+  --sidebar-w: calc(var(--sidebar-w-expanded) + var(--sidebar-gap) * 2);
+}
+.sidebar {
+  display: none; /* shown only at ≥860px below */
+}
+@media (min-width: 860px) {
+  /* Floating panel: detached from the window edges on all four sides with a
+     gap, fully rounded, so it reads as a glass card resting on the window
+     rather than a rail pinned to the side. */
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: calc(var(--safe-t, 0px) + var(--sidebar-gap));
+    left: var(--sidebar-gap);
+    bottom: calc(var(--safe-b, 0px) + var(--sidebar-gap));
+    width: var(--sidebar-w-expanded);
+    z-index: 50;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--r-sm);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    box-shadow:
+      var(--glass-highlight),
+      0 24px 60px rgba(0, 0, 0, 0.5);
+    transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+    overflow: hidden;
+    overflow-y: auto;
+    transform: translateX(0);
+  }
+  /* Collapsed = fully off-screen (slides past the left edge, clearing its own
+     gap and shadow). The app padding also drops to 0 so the dashboard
+     reclaims the full viewport. */
+  body.sidebar-collapsed .sidebar {
+    transform: translateX(calc(-100% - var(--sidebar-gap) - 12px));
+    pointer-events: none;
+  }
+
+  /* Floating reveal button shown only when the sidebar is collapsed. Small
+     glassy pill at the top-left so the user can bring the sidebar back. */
+  /* Ghost button (Notion/Linear pattern): a quiet icon, no pill, no border;
+     it earns a soft fill only on hover so it stays out of the way. Token
+     colors, so it follows light mode for free. */
+  .sidebar-reveal {
+    position: fixed;
+    top: calc(var(--safe-t, 0px) + 16px);
+    left: 16px;
+    z-index: 49;
+    width: 36px; height: 36px;
+    border-radius: var(--r-sm);
+    border: none;
+    background: transparent;
+    color: rgba(var(--ink), 0.45);
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    /* Constant fixture: no fade/slide entrance, so it never looks like it is
+       loading in and out. It is simply present whenever the menu is closed. */
+    opacity: 1;
+    transition: background var(--t-base) ease, color var(--t-base) ease;
+  }
+  body.sidebar-collapsed .sidebar-reveal {
+    display: flex;
+    opacity: 1;
+    transform: translateX(0);
+  }
+  .sidebar-reveal:hover {
+    background: var(--kfill-06);
+    color: rgba(var(--ink), 0.9);
+  }
+  .sidebar-reveal svg { width: 18px; height: 18px; }
+  body.sidebar-collapsed {
+    --sidebar-w: 0px;
+  }
+  /* Shift the main app + ambient bg to make room for the sidebar. Drops to
+     0 when the sidebar is collapsed so the dashboard reclaims the full
+     viewport. */
+  body.sidebar-active .ambient,
+  body.sidebar-active #ambientBg {
+    padding-left: var(--sidebar-w);
+    transition: padding-left 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  /* The app content clears the sidebar WITHOUT squishing: claim only the space
+     the free margin does not already provide. On wide screens (free margin >=
+     sidebar) the content does not move or shrink at all; on tighter screens it
+     shifts just enough, and only shrinks when the viewport genuinely cannot
+     fit sidebar + full content. */
+  body.sidebar-active .app {
+    margin-left: max(var(--sidebar-w), calc((100vw - var(--max-w)) / 2));
+    margin-right: auto;
+    transition: margin-left 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  /* Tab bar is redundant at desktop widths since the sidebar takes over. */
+  body.sidebar-active .tab-bar { display: none !important; }
+  /* Dashboard header becomes the top hub on desktop: greeting + today's
+     mission on the left, streak + live clock on the right. The brand is
+     dropped here since the sidebar already carries it. */
+  body.sidebar-active .dash-header { display: flex; }
+  body.sidebar-active .dash-header__brand { display: none; }
+  body.sidebar-active .dash-header__hub { text-align: left; align-items: flex-start; gap: 4px; }
+  body.sidebar-active .dash-header .hub-headline { display: inline-flex; }
+  body.sidebar-active .dash-header .greeting-line .greeting-time,
+  body.sidebar-active .dash-header .greeting-line .greeting-name {
+    font-size: var(--fs-md); font-weight: 400; color: var(--text-2); letter-spacing: 0;
+  }
+  body.sidebar-active .dash-header__right { display: flex; }
+  body.sidebar-active .dash-header__right .hub-clock { display: flex; }
+  /* Creator box: rendered into the sidebar at desktop, so hide its native
+     dashboard slot. */
+  body.sidebar-active #creatorBox.creator-box--moved-to-sidebar {
+    display: block;
+    margin: 0;
+    border-radius: var(--r-card);
+  }
+}
+
+/* --- Mobile drawer: below 860px the sidebar slides in as an overlay menu,
+   opened by tapping the top-left brand icon. Gives phones the same menu the
+   desktop sidebar provides (profile, nav, Neutron Star, streak, etc.). --- */
+@media (max-width: 859.98px) {
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    width: min(86vw, 320px);
+    z-index: 1000;
+    background: rgba(10, 10, 14, 0.98);
+    border-right: 1px solid var(--hairline);
+    box-shadow: 8px 0 40px rgba(0, 0, 0, 0.5);
+    transform: translateX(-100%);
+    transition: transform var(--t-slow) cubic-bezier(0.22, 1, 0.36, 1);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  body.mobile-menu-open .sidebar { transform: translateX(0); }
+  .sidebar__inner { width: 100%; }
+  /* The collapse arrow is a desktop concept; hide it in the mobile drawer. */
+  .sidebar__collapse, #sidebarCollapse { display: none !important; }
+  .mobile-menu-backdrop {
+    position: fixed; inset: 0; z-index: 999;
+    background: rgba(0, 0, 0, 0.55);
+    opacity: 0; pointer-events: none;
+    transition: opacity var(--t-slow) ease;
+  }
+  body.mobile-menu-open .mobile-menu-backdrop { opacity: 1; pointer-events: auto; }
+  .dash-header__brand { cursor: pointer; }
+}
+
+/* === Persistent top-left menu button + "menu-peek" overlay ===
+   The .sidebar-reveal hamburger is reused as a persistent menu button that is
+   reachable from ANY view, including inside full-screen experiences (Action,
+   clarity, sheets). On the dashboard it keeps its existing collapse/reveal
+   role. Inside an overlay it opens the sidebar as a peek layer that floats
+   ABOVE the overlay (which sits at z-index ~1001) via body.menu-peek. These
+   rules are global (any width) so the menu works on desktop and mobile. */
+
+/* Base visual styling so the button renders at every breakpoint (the desktop
+   media query above also styles it; this keeps mobile/overlay consistent).
+   Hidden by default everywhere; surfaced by the explicit rules below (overlay
+   open / menu-peek) and by the desktop body.sidebar-collapsed rule. On the
+   plain mobile dashboard the existing header brand opens the menu, so this
+   button stays hidden there to avoid a duplicate. */
+.sidebar-reveal {
+  display: none;
+  position: fixed;
+  top: calc(var(--safe-t, 0px) + 16px);
+  left: calc(var(--safe-l, 0px) + 16px);
+  width: 36px; height: 36px;
+  border-radius: var(--r-sm);
+  border: none;
+  background: transparent;
+  color: rgba(var(--ink), 0.45);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--t-base) ease, color var(--t-base) ease;
+}
+.sidebar-reveal svg { width: 18px; height: 18px; }
+.sidebar-reveal:hover {
+  background: var(--kfill-06);
+  color: rgba(var(--ink), 0.9);
+}
+
+/* Reachable from inside full-screen overlays: show the button above them.
+   (On the plain dashboard the desktop rule above governs visibility via
+   body.sidebar-collapsed; here we surface it whenever an overlay is open.) */
+body:not(.menu-peek):has(.action-exp.open) .sidebar-reveal,
+body:not(.menu-peek):has(.clarity-exp.open) .sidebar-reveal,
+body:not(.menu-peek):has(.sheet.open) .sidebar-reveal {
+  display: flex !important;
+  opacity: 1 !important;
+  transform: none !important;
+  z-index: 1006;
+}
+/* Once the menu is open (peeking), hide the hamburger so it does not overlap
+   the sidebar header. The backdrop, a nav tap, or Escape closes the menu. */
+body.menu-peek .sidebar-reveal { display: none !important; }
+/* During onboarding there is nothing to navigate to yet, so the menu button is
+   hidden until the user officially enters Memento. */
+body:has(.welcome-intro.open) .sidebar-reveal { display: none !important; }
+
+/* v19 Capture FAB: persistent quick-add into the inbox, bottom-right. Sharp
+   glass, accent on hover, with an untriaged-count badge. Hidden during
+   onboarding and whenever a full overlay is open so it never floats over them. */
+.capture-fab {
+  position: fixed;
+  right: calc(var(--safe-r, 0px) + 22px);
+  bottom: calc(var(--safe-b, 0px) + 22px);
+  width: 50px; height: 50px;
+  border-radius: var(--r-ctrl);
+  border: 1px solid rgba(var(--ink), 0.14);
+  background: rgba(15, 15, 18, 0.72);
+  backdrop-filter: blur(calc(16px * var(--bx, 1))) saturate(120%);
+  -webkit-backdrop-filter: blur(calc(16px * var(--bx, 1))) saturate(120%);
+  color: var(--text-hi);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 950;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.42);
+  transition: transform .16s cubic-bezier(0.2,0.8,0.2,1), border-color .16s ease, color .16s ease;
+}
+.capture-fab svg { width: 22px; height: 22px; }
+.capture-fab:hover { transform: translateY(-2px); border-color: var(--accent); color: var(--accent); }
+.capture-fab:active { transform: translateY(0) scale(0.96); }
+.capture-fab__badge {
+  position: absolute; top: -6px; right: -6px;
+  min-width: 19px; height: 19px; padding: 0 4px; box-sizing: border-box;
+  border-radius: var(--r-ctrl);
+  background: var(--success); color: #0b0b0d;
+  font-size: 0.66rem; font-weight: 800; line-height: 19px;
+  text-align: center; font-variant-numeric: tabular-nums;
+  box-shadow: 0 0 0 2px rgba(15,15,18,0.92);
+}
+html.theme-light .capture-fab { background: var(--wfill-86); }
+html.theme-light .capture-fab__badge { box-shadow: 0 0 0 2px rgba(255,255,255,0.95); }
+body:has(.splash:not(.dismissed)) .capture-fab,
+body:has(.welcome-intro.open) .capture-fab,
+body.menu-peek .capture-fab,
+body:has(.sheet.open) .capture-fab,
+body:has(.action-exp.open) .capture-fab,
+body:has(.clarity-exp.open) .capture-fab { display: none !important; }
+/* Hide the dashboard entirely behind any full-screen overlay so its module cards
+   can never bleed through (under the keyboard, below a sheet's content, during
+   overscroll). Sheets/experiences live at body level, NOT inside #app, so this
+   never hides the overlay itself. */
+body:has(.sheet.open) #app,
+body:has(.action-exp.open) #app,
+body:has(.clarity-exp.open) #app { visibility: hidden !important; }
+/* Mobile: hide the on-screen menu hamburger. The menu opens with a left-edge
+   swipe instead (handled by the touch-gesture code). */
+@media (pointer: coarse) {
+  #sidebarReveal, .sidebar-reveal { display: none !important; }
+}
+/* Mobile: drop the FAB's backdrop blur (GPU-cheap) and use a solid-ish fill,
+   matching the app's no-backdrop-filter perf rule on touch devices. */
+@media (pointer: coarse), (max-width: 859.98px) {
+  .capture-fab { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background: rgba(18, 18, 22, 0.94); }
+  html.theme-light .capture-fab { background: var(--wfill-96); }
+}
+
+/* Dim tap-away backdrop for the peek layer, above the overlay but below the
+   sidebar. */
+.menu-peek-backdrop {
+  position: fixed; inset: 0;
+  z-index: 1004;
+  background: transparent;
+  opacity: 0; pointer-events: none;
+  transition: opacity var(--t-slow) cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* The peek is ADDITIVE: the backdrop never swallows clicks. Clicking the page
+   both performs that click and dismisses the menu (see the capture-phase
+   listener in js/09). */
+body.menu-peek .menu-peek-backdrop { opacity: 1; pointer-events: none; }
+
+/* Peek mode: force the sidebar on-screen and raise it above the overlay,
+   regardless of collapsed state or breakpoint. */
+body.menu-peek .sidebar {
+  display: flex !important;
+  z-index: 1005 !important;
+  transform: translateX(0) !important;
+  pointer-events: auto !important;
+}
+/* Closing the peek: keep the sidebar elevated and visible while it slides back
+   off-screen (same transition as opening, reversed), so it never instantly
+   drops behind a full-screen overlay. The class is removed once the slide-out
+   transition finishes (see closePeek). */
+body.menu-peek-closing .sidebar {
+  display: flex !important;
+  z-index: 1005 !important;
+  transform: translateX(calc(-100% - var(--sidebar-gap, 0px) - 12px)) !important;
+  pointer-events: none !important;
+}
+@media (max-width: 859.98px) {
+  body.menu-peek-closing .sidebar { transform: translateX(-100%) !important; }
+}
+body.menu-peek-closing .menu-peek-backdrop { opacity: 0; pointer-events: none; }
+
+/* --- Sidebar internal layout --- */
+.sidebar__inner {
+  display: flex;
+  flex-direction: column;
+  width: var(--sidebar-w-expanded); /* hold expanded width so collapse hides via overflow */
+  height: 100%;
+  padding: 20px 14px;
+  gap: 14px;
+  flex-shrink: 0;
+}
+.sidebar__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px 12px;
+  border-bottom: 1px solid rgba(var(--ink), 0.06);
+}
+.sidebar__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(var(--ink), 0.96);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: var(--fs-md);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.sidebar__brand-mark {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-clarity, #8e72ff);
+}
+.sidebar__collapse {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--hairline);
+  background: var(--kfill-04);
+  color: rgba(var(--ink), 0.6);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background var(--t-fast) ease, color var(--t-fast) ease, transform var(--t-base) ease;
+}
+.sidebar__collapse:hover {
+  background: var(--kfill-10);
+  color: rgba(var(--ink), 0.92);
+}
+.sidebar__collapse svg { width: 14px; height: 14px; transition: transform var(--t-slow) ease; }
+body.sidebar-collapsed .sidebar__collapse svg { transform: rotate(180deg); }
+
+/* Profile chip: avatar + greeting + date, clickable, opens profile panel. */
+.sidebar__profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 8px;
+  border-radius: var(--r-sm);
+  background: var(--kfill-03);
+  border: 1px solid rgba(var(--ink), 0.06);
+  cursor: pointer;
+  transition: background var(--t-base) ease, border-color var(--t-base) ease;
+  width: 100%;
+  text-align: left;
+}
+.sidebar__profile:hover {
+  background: var(--kfill-06);
+  border-color: rgba(var(--ink), 0.12);
+}
+.sidebar__profile-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(140, 120, 255, 0.45), rgba(80, 60, 180, 0.65));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: var(--fs-base);
+  flex-shrink: 0;
+  border: 1px solid var(--hairline);
+}
+.sidebar__profile-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+.sidebar__profile-greeting {
+  font-size: var(--fs-sm);
+  color: rgba(var(--ink), 0.42);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sidebar__profile-name {
+  font-size: var(--fs-md);
+  color: rgba(var(--ink), 0.95);
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sidebar__profile-date {
+  font-size: 0.75rem;
+  color: rgba(var(--ink), 0.45);
+  margin-top: 2px;
+}
+
+/* Nav items (Home, Memento). */
+.sidebar__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px 0;
+}
+.sidebar__nav-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  min-height: 44px;
+  box-sizing: border-box;
+  border-radius: var(--r-ctrl);
+  background: transparent;
+  border: none;
+  color: rgba(var(--ink), 0.7);
+  font-family: var(--font);
+  font-size: var(--fs-md);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--t-base) ease, color var(--t-base) ease;
+  text-align: left;
+  width: 100%;
+}
+.sidebar__nav-item:hover {
+  background: var(--kfill-05);
+  color: rgba(var(--ink), 0.95);
+}
+.sidebar__nav-item--active {
+  background: var(--kfill-08);
+  color: rgba(var(--ink), 0.98);
+}
+.sidebar__nav-icon {
+  width: 18px; height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+}
+.sidebar__nav-icon svg { width: 100%; height: 100%; }
+/* Quiet Home nudge mirrored on the desktop sidebar: same tiny accent dot,
+   anchored to the icon so it reads in both expanded and collapsed states. */
+.sidebar__nav-dot {
+  position: absolute; top: -2px; right: -3px;
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 6px rgba(var(--accent-rgb), 0.6);
+  pointer-events: none;
+  display: none;
+}
+.sidebar__nav-item--has-dot .sidebar__nav-dot { display: block; }
+.sidebar__nav-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Live-state blocks inside the sidebar (today's action, streak). */
+.sidebar__section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 12px;
+  border-radius: var(--r-sm);
+  background: var(--kfill-025);
+  border: 1px solid rgba(var(--ink), 0.05);
+}
+.sidebar__section-label {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(var(--ink), 0.42);
+}
+.sidebar__section-value {
+  font-size: var(--fs-base);
+  color: rgba(var(--ink), 0.92);
+  line-height: 1.4;
+  font-weight: 500;
+}
+.sidebar__section-empty {
+  font-size: var(--fs-sm);
+  color: rgba(var(--ink), 0.34);
+  font-style: italic;
+}
+.sidebar__streak {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-base);
+  color: rgba(var(--ink), 0.88);
+  font-weight: 500;
+}
+.sidebar__streak-count {
+  color: var(--color-consistency, var(--success));
+  font-weight: 700;
+}
+
+/* Clickable variant: subtle background-shift on hover so the user knows
+   the block opens something. Cursor pointer + the hover lift. */
+.sidebar__section--clickable {
+  cursor: pointer;
+  transition: background var(--t-base) ease, border-color var(--t-base) ease, transform var(--t-base) ease;
+}
+.sidebar__section--clickable:hover {
+  background: var(--kfill-05);
+  border-color: rgba(var(--ink), 0.10);
+  transform: translateY(-1px);
+}
+.sidebar__section--clickable:active { transform: translateY(0); }
+
+/* Neutron Star block: keep the goal text readable as a focal element, then
+   the anchor word as a small pill at the bottom edge. */
+.sidebar__ns-value {
+  font-size: var(--fs-base);
+  line-height: 1.45;
+  color: rgba(var(--ink), 0.96);
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  /* Three-line clamp so a long Neutron Star doesn't blow up the sidebar. */
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.sidebar__anchor-pill {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(140, 120, 255, 0.10);
+  border: 1px solid rgba(180, 160, 255, 0.22);
+  color: rgba(220, 210, 255, 0.95);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+}
+
+/* Days-remaining: big number with unit underneath. */
+.sidebar__days-num {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: rgba(var(--ink), 0.95);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.sidebar__days-unit {
+  font-size: 0.75rem;
+  color: rgba(var(--ink), 0.5);
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+/* Deep work counter: tight row like the streak. */
+.sidebar__dw {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-base);
+  color: rgba(var(--ink), 0.88);
+  font-weight: 500;
+}
+.sidebar__dw-count {
+  color: var(--color-deepwork, #ff9f0a);
+  font-weight: 700;
+}
+
+/* Reflection nudge: full-width CTA-styled button inside the sidebar. */
+.sidebar__reflect-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: var(--r-sm);
+  background: rgba(120, 160, 255, 0.08);
+  border: 1px solid rgba(160, 190, 255, 0.18);
+  color: rgba(220, 230, 255, 0.95);
+  font-family: var(--font);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--t-base) ease, border-color var(--t-base) ease, transform var(--t-base) ease;
+}
+.sidebar__reflect-cta:hover {
+  background: rgba(120, 160, 255, 0.14);
+  border-color: rgba(180, 200, 255, 0.32);
+}
+.sidebar__reflect-cta:active { transform: scale(0.985); }
+.sidebar__reflect-cta::after {
+  content: '\203A';
+  font-size: var(--fs-lg);
+  opacity: 0.7;
+}
+
+/* Spacer pushes footer to the bottom. */
+.sidebar__spacer { flex: 1; }
+.sidebar__footer {
+  padding-top: 10px;
+  border-top: 1px solid rgba(var(--ink), 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* --- Collapsed state: hide labels and side widgets, keep just icons --- */
+body.sidebar-collapsed .sidebar__brand-text,
+body.sidebar-collapsed .sidebar__nav-label,
+body.sidebar-collapsed .sidebar__profile-text,
+body.sidebar-collapsed .sidebar__profile-date,
+body.sidebar-collapsed .sidebar__section,
+body.sidebar-collapsed #creatorBox.creator-box--moved-to-sidebar {
+  display: none;
+}
+body.sidebar-collapsed .sidebar__nav-item {
+  justify-content: center;
+  padding: 10px 0;
+}
+body.sidebar-collapsed .sidebar__profile {
+  justify-content: center;
+  padding: 8px 0;
+}
+body.sidebar-collapsed .sidebar__inner {
+  width: var(--sidebar-w-collapsed);
+}
+
+/* Inside the sidebar, override the creator-box dashboard styling so it
+   fits the sidebar's column layout instead of the full-width dashboard look. */
+.sidebar #creatorBox.creator-box--moved-to-sidebar .creator-box__top {
+  padding: 10px 12px;
+}
+.sidebar #creatorBox.creator-box--moved-to-sidebar .creator-box__label {
+  font-size: var(--fs-xs);
+  letter-spacing: 0.14em;
+}
+.sidebar #creatorBox.creator-box--moved-to-sidebar .creator-box__actions {
+  padding: 0 10px 10px;
+  flex-direction: column;
+  gap: 6px;
+}
+.sidebar #creatorBox.creator-box--moved-to-sidebar .creator-box__btn {
+  width: 100%;
+  font-size: var(--fs-sm);
+  padding: 8px 10px;
+  text-align: left;
+  justify-content: flex-start;
+}
+
+
+/* ============ Light theme: chrome that was hardcoded dark ============
+   The reveal pill and the mobile drawer used tuned near-black fills; in
+   light mode they must flip with the theme or they read as broken. */
+/* (sidebar-reveal is a ghost button on ink tokens now; it themes itself.) */
+@media (max-width: 859.98px) {
+  html.theme-light .sidebar {
+    background: rgba(250, 250, 252, 0.98);
+  }
+}
+
+/* Pinned menu over a full-screen module: shift the module's content right so
+   nothing hides behind the sidebar, mirroring the dashboard's own shift.
+   Desktop only; the phone drawer overlays by design. */
+@media (min-width: 860px) {
+  /* No .open in these selectors ON PURPOSE: a module opened while the menu is
+     pinned must be born already shifted (no catch-up slide), and a closing
+     module must keep its shift (no snap back). The padding only animates when
+     the MENU's own state changes.
+
+     The shift is need-based (Malik): centered content only moves when the
+     sidebar would actually intrude on it. --peek-w approximates each module's
+     centered content width; the clamp resolves to zero whenever the natural
+     centering margin already clears the sidebar, and otherwise pads by twice
+     the deficit (padding re-centers content in the remaining width, so a 2x
+     pad moves the content edge by exactly the deficit). */
+  body.menu-peek .sheet.sheet--exp,
+  body.menu-peek .action-exp,
+  body.menu-peek .clarity-exp {
+    --peek-w: 820px;
+    padding-left: clamp(0px, calc(var(--sidebar-w) * 2 - 100vw + var(--peek-w)), var(--sidebar-w)) !important;
+    transition: padding-left 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  body.menu-peek .action-exp { --peek-w: 1180px; }
+  body.menu-peek .clarity-exp { --peek-w: 800px; }
+  /* Full-bleed modules (Notes two-pane, Vivere canvas) have no free margin to
+     spend, so they always take the flat sidebar-width shift. */
+  body.menu-peek .sheet.sheet--exp[data-module="reflection"],
+  body.menu-peek .sheet.sheet--exp[data-module="vivere"] {
+    padding-left: var(--sidebar-w) !important;
+  }
+  body.menu-peek-closing .sheet.sheet--exp,
+  body.menu-peek-closing .action-exp,
+  body.menu-peek-closing .clarity-exp {
+    transition: padding-left 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}

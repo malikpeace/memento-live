@@ -1,0 +1,657 @@
+/* ============================================
+   TAB BAR
+   ============================================ */
+.tab-bar {
+  position: fixed; bottom: calc(12px + var(--safe-b)); left: 50%; transform: translateX(-50%);
+  z-index: 90;
+  display: flex; align-items: stretch; justify-content: center;
+  gap: 4px;
+  background: var(--glass-bg-heavy);
+  backdrop-filter: blur(calc(36px * var(--bx, 1))) saturate(140%);
+  -webkit-backdrop-filter: blur(calc(36px * var(--bx, 1))) saturate(140%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow), var(--glass-highlight);
+  border-radius: var(--r-card);
+  padding: 6px 8px;
+  width: auto;
+  transition: transform var(--t-slow) var(--ease-out), opacity var(--t-slow);
+}
+.tab-bar.hidden { transform: translateX(-50%) translateY(calc(100% + 20px + var(--safe-b))); opacity: 0; pointer-events: none; }
+/* Sliding pill indicator */
+.tab-bar__pill {
+  position: absolute;
+  top: 6px;
+  left: 0;
+  height: calc(100% - 12px);
+  border-radius: var(--r-ctrl);
+  background: var(--kfill-10);
+  box-shadow: inset 0 1px 0 rgba(var(--ink),0.14), 0 0 14px rgba(var(--accent-rgb), 0.18);
+  transition: left 0.35s cubic-bezier(0.16, 1, 0.3, 1), width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  z-index: 0;
+}
+.tab-bar__tab {
+  position: relative;
+  z-index: 1;
+  display: flex; align-items: center; justify-content: center;
+  padding: 12px 16px;
+  min-height: 44px;
+  background: none; border: none; color: var(--text-3);
+  font-family: var(--font); font-size: 0.5625rem; font-weight: 600;
+  cursor: pointer; transition: color var(--t-slow) var(--ease-out);
+  border-radius: var(--r-card);
+}
+.tab-bar__tab--active {
+  color: var(--text-hi);
+}
+.tab-bar__icon { width: 22px; height: 22px; }
+.tab-bar__label { display: none; }
+/* Quiet Home nudge: a tiny accent dot, shown only when a plan exists and
+   today's action is not yet done. Not a count, not a red badge. A plain
+   show/hide (no motion) so it stays calm and reduced-motion safe. */
+.tab-bar__dot {
+  position: absolute; top: 7px; right: 10px;
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 6px rgba(var(--accent-rgb), 0.6);
+  pointer-events: none;
+  display: none;
+}
+.tab-bar__tab--has-dot .tab-bar__dot { display: block; }
+
+/* ============================================
+   TAB PANELS
+   ============================================ */
+.tab-panel {
+  position: fixed; inset: 0; z-index: 1;
+  background: var(--bg-deep);
+  overflow-y: auto; overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  transition: opacity var(--t-slow) var(--ease-out);
+}
+.tab-panel.hidden { opacity: 0; pointer-events: none; display: none; }
+.tab-panel__inner {
+  max-width: 600px; margin: 0 auto;
+  padding: calc(var(--safe-t) + 20px) 16px calc(80px + var(--safe-b));
+}
+.tab-panel__inner--memento {
+  max-width: none;
+  width: 100%;
+  min-height: 100dvh;
+  padding: calc(var(--safe-t) + 12px) 12px calc(80px + var(--safe-b));
+}
+.tab-panel__header {
+  font-size: 1.625rem; font-weight: 700; letter-spacing: -0.03em;
+  margin-bottom: 24px;
+}
+.memento-flow {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100dvh - var(--safe-t) - var(--safe-b) - 92px);
+}
+.memento-visual {
+  position: relative;
+  flex: 1;
+  min-height: calc(100dvh - var(--safe-t) - var(--safe-b) - 110px);
+  border-radius: var(--r-card);
+  overflow: hidden;
+  border: 1px solid var(--hairline);
+  background:
+    radial-gradient(circle at 50% 14%, rgba(var(--ink),0.07) 0%, rgba(var(--ink),0) 18%),
+    radial-gradient(circle at 50% 70%, rgba(123,97,255,0.08) 0%, rgba(123,97,255,0) 36%),
+    linear-gradient(180deg, rgba(20,20,28,0.92), rgba(8,8,12,0.98));
+}
+.memento-visual__glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.memento-visual__glow::before,
+.memento-visual__glow::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(32px);
+}
+.memento-visual__glow::before {
+  width: 240px;
+  height: 240px;
+  background: radial-gradient(circle, rgba(123,97,255,0.18) 0%, rgba(123,97,255,0) 72%);
+  top: -8%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.memento-visual__glow::after {
+  width: 360px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(var(--ink),0.08) 0%, rgba(var(--ink),0) 72%);
+  bottom: -10%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.memento-visual__icon-wrap {
+  position: absolute;
+  top: 46px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 130px;
+  height: 130px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 0 34px rgba(160,150,255,0.45));
+}
+.memento-visual__icon-wrap::before {
+  content: '';
+  position: absolute;
+  inset: -24px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(123,97,255,0.18) 0%, rgba(123,97,255,0) 72%);
+  filter: blur(24px);
+}
+.memento-visual__icon {
+  position: relative;
+  width: 112px;
+  height: 112px;
+  border-radius: var(--r-card);
+}
+.memento-visual__beam {
+  position: absolute;
+  top: 92px;
+  width: 240px;
+  height: calc(100% - 92px);
+  opacity: 0;
+  filter: blur(8px) saturate(125%);
+  transform-origin: top center;
+  transition: opacity var(--t-slow) ease;
+}
+.memento-visual__beam::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(50% 0%, 82% 100%, 18% 100%);
+}
+.memento-visual__beam--clarity {
+  left: 50%;
+  margin-left: -118px;
+  transform: rotate(13deg);
+}
+.memento-visual__beam--clarity::before {
+  background:
+    linear-gradient(180deg, rgba(160,130,255,0.95) 0%, rgba(123,97,255,0.65) 32%, rgba(123,97,255,0.18) 72%, rgba(123,97,255,0) 100%);
+  box-shadow: 0 0 34px rgba(123,97,255,0.35);
+}
+.memento-visual__beam--action {
+  left: 50%;
+  margin-left: -120px;
+  transform: rotate(0deg);
+}
+.memento-visual__beam--action::before {
+  background:
+    linear-gradient(180deg, rgba(255,120,92,0.95) 0%, rgba(var(--ink),0.7) 32%, rgba(var(--ink),0.2) 72%, rgba(var(--ink),0) 100%);
+  box-shadow: 0 0 34px rgba(var(--ink),0.34);
+}
+.memento-visual__beam--consistency {
+  left: 50%;
+  margin-left: -122px;
+  transform: rotate(-13deg);
+}
+.memento-visual__beam--consistency::before {
+  background:
+    linear-gradient(180deg, rgba(120,255,170,0.92) 0%, rgba(var(--success-rgb),0.66) 32%, rgba(var(--success-rgb),0.18) 72%, rgba(var(--success-rgb),0) 100%);
+  box-shadow: 0 0 34px rgba(var(--success-rgb),0.32);
+}
+.memento-visual__beam.is-on {
+  opacity: 1;
+  animation: mementoBeamPulse 5.5s ease-in-out infinite;
+}
+.memento-visual__beam.is-preview {
+  opacity: 0.38;
+  animation: mementoBeamPulse 6.5s ease-in-out infinite;
+}
+.memento-visual__beam.is-off {
+  opacity: 0.04;
+  filter: blur(10px) saturate(90%);
+}
+.memento-visual__beam.is-off::before {
+  background:
+    linear-gradient(180deg, rgba(var(--ink),0.16) 0%, rgba(var(--ink),0.07) 36%, rgba(var(--ink),0.02) 72%, rgba(var(--ink),0) 100%);
+  box-shadow: none;
+}
+.memento-visual__caption {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: var(--fs-xs);
+  color: rgba(var(--ink),0.46);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.memento-visual__hover {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 220px;
+  max-width: 320px;
+  padding: 14px 16px;
+  border-radius: var(--r-card);
+  background: rgba(10,10,14,0.72);
+  border: 1px solid var(--hairline);
+  backdrop-filter: blur(calc(14px * var(--bx, 1)));
+  -webkit-backdrop-filter: blur(calc(14px * var(--bx, 1)));
+  color: rgba(var(--ink),0.88);
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--t-base) ease;
+}
+.memento-visual__hover-label {
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(var(--ink),0.45);
+  margin-bottom: 8px;
+}
+.memento-visual__hover-copy {
+  font-size: var(--fs-base);
+  line-height: 1.5;
+}
+@keyframes mementoBeamPulse {
+  0%, 100% { filter: blur(8px) saturate(125%) brightness(1); }
+  50% { filter: blur(10px) saturate(140%) brightness(1.12); }
+}
+.memento-summary-card__label {
+  font-size: var(--fs-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(var(--ink),0.42);
+  margin-bottom: 10px;
+}
+.memento-summary-card__title {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  line-height: 1.35;
+  color: rgba(var(--ink),0.94);
+}
+.memento-summary-card__copy {
+  margin-top: 10px;
+  font-size: var(--fs-md);
+  line-height: 1.58;
+  color: rgba(var(--ink),0.72);
+}
+
+/* ============================================
+   SLIDE-UP SHEET
+   ============================================ */
+.sheet-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.58);
+  backdrop-filter: blur(calc(6px * var(--bx, 1))); -webkit-backdrop-filter: blur(calc(6px * var(--bx, 1)));
+  z-index: 1001; opacity: 0; pointer-events: none;
+  transition: opacity var(--t-slow) ease;
+}
+.sheet-backdrop.active { opacity: 1; pointer-events: auto; }
+
+/* Full-screen module panel: every module opens as its own destination (like
+   Clarity and Action), not a bottom drawer. Solid premium near-black surface
+   covering the viewport; it still slides up from the bottom and can be swiped
+   down to dismiss. Inner content sits in a centered reading column (see
+   .sheet__header / .sheet__body) so it does not stretch edge to edge on wide
+   screens. */
+.sheet {
+  position: fixed; inset: 0; z-index: 1002;
+  width: 100%; height: 100dvh; max-height: none;
+  background: var(--surface-0);
+  border: none; border-radius: 0;
+  box-shadow: none;
+  transform: translateY(100%);
+  transition: transform var(--dur-sheet) var(--spring);
+  will-change: transform;
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.sheet.open { transform: translateY(0); }
+.sheet.dragging { transition: none; }
+
+.sheet__handle-area {
+  padding: calc(12px + var(--safe-t)) 0 6px; display: flex; justify-content: center;
+  cursor: grab; touch-action: none; flex-shrink: 0;
+}
+.sheet__handle { width: 36px; height: 4px; border-radius: 2px; background: var(--kfill-20); }
+
+.sheet__header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 4px 20px 16px;
+  width: 100%; max-width: 760px; margin: 0 auto; box-sizing: border-box;
+  border-bottom: 1px solid rgba(var(--ink),0.06);
+  flex-shrink: 0;
+}
+.sheet__title { font-size: var(--fs-lg); font-weight: 700; letter-spacing: -0.01em; }
+.sheet__close {
+  width: 32px; height: 32px; border-radius: 50%; border: none;
+  background: var(--kfill-08); color: var(--text-2);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: var(--fs-lg); transition: background var(--t-fast);
+  font-family: var(--font);
+}
+.sheet__close:active { background: var(--kfill-14); }
+
+.sheet__body {
+  flex: 1; overflow-y: auto; overscroll-behavior: contain;
+  width: 100%; max-width: 760px; margin: 0 auto; box-sizing: border-box;
+  /* Bottom safe-area so inputs/buttons are never trapped behind the iPhone
+     home indicator. */
+  padding: 22px 22px calc(40px + var(--safe-b)); -webkit-overflow-scrolling: touch;
+}
+/* Full-screen now, so no landscape size override is needed. */
+@media (orientation: landscape) and (max-height: 560px) {
+  .sheet__body { padding-top: 14px; }
+}
+
+/* === Full-screen "experience" mode for module sheets (Streak, Memento Mori,
+   Deep Work). Instead of sliding up as a drawer, the panel fades in over a
+   living, color-blurred ambient background, the way Clarity and Action do, so
+   each module feels like its own destination. All the existing sheet content
+   and logic are reused as-is; only the entrance and backdrop change. === */
+.sheet--exp {
+  background: #000;
+  transform: none;
+  opacity: 0;
+  /* Closed experience sheets fade via opacity (no off-screen transform), so
+     they must drop pointer-events or the invisible panel keeps swallowing every
+     click after it closes. */
+  pointer-events: none;
+  transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.sheet--exp.open { transform: none; opacity: 1; pointer-events: auto; }
+/* No drawer drag handle in experience mode. */
+.sheet--exp .sheet__handle-area { display: none; }
+/* Lift the real content above the ambient orbs and drop the drawer's header
+   divider for a cleaner, more spacious feel. */
+.sheet--exp .sheet__header,
+.sheet--exp .sheet__body { position: relative; z-index: 1; }
+.sheet--exp .sheet__header {
+  border-bottom: none;
+  padding-top: calc(18px + var(--safe-t));
+}
+.sheet--exp .sheet__title { font-size: 1.5rem; letter-spacing: -0.02em; }
+/* On mobile the floating menu hamburger (fixed top-left, ~56px wide) is surfaced
+   above any open sheet, where it overlapped the left-aligned title. Pad the open
+   sheet header so the title clears it. Desktop centers the header, so unaffected. */
+@media (max-width: 859.98px) {
+  .sheet.open .sheet__header { padding-left: 64px; }
+}
+
+/* Ambient color blur layer (hidden unless the sheet is in experience mode). */
+.sheet__exp-bg {
+  position: absolute; inset: 0; z-index: 0;
+  overflow: hidden; background: #000;
+  display: none;
+}
+.sheet--exp .sheet__exp-bg { display: block; }
+.sheet__exp-orb {
+  position: absolute; border-radius: 50%;
+  filter: blur(40px); pointer-events: none;
+}
+.sheet__exp-orb--a {
+  width: max(560px, 52vw); height: max(560px, 52vw);
+  top: -12%; left: -10%;
+  background: radial-gradient(circle, var(--sheet-exp-c1, rgba(120,120,140,0.4)) 0%, transparent 72%);
+  animation: sheetExpA 7s ease-in-out infinite;
+}
+.sheet__exp-orb--b {
+  width: max(480px, 46vw); height: max(480px, 46vw);
+  bottom: -10%; right: -8%;
+  background: radial-gradient(circle, var(--sheet-exp-c2, rgba(80,90,130,0.34)) 0%, transparent 72%);
+  animation: sheetExpB 8.5s ease-in-out infinite;
+}
+.sheet__exp-orb--c {
+  width: max(380px, 36vw); height: max(380px, 36vw);
+  top: 34%; right: -6%;
+  background: radial-gradient(circle, var(--sheet-exp-c1, rgba(120,120,140,0.4)) 0%, transparent 76%);
+  opacity: 0.5;
+  animation: sheetExpC 7.8s ease-in-out infinite;
+}
+/* Per-module ambient color. */
+.sheet--exp[data-module="streak"]   { --sheet-exp-c1: rgba(var(--success-rgb), 0.50);  --sheet-exp-c2: rgba(28, 160, 90, 0.36); }
+.sheet--exp[data-module="mori"]     { --sheet-exp-c1: rgba(150, 150, 165, 0.36); --sheet-exp-c2: rgba(90, 105, 150, 0.30); }
+.sheet--exp[data-module="deepwork"] { --sheet-exp-c1: rgba(255, 159, 10, 0.46);  --sheet-exp-c2: rgba(255, 110, 30, 0.32); }
+.sheet--exp[data-module="vivere"]   { --sheet-exp-c1: rgba(201, 162, 75, 0.34);  --sheet-exp-c2: rgba(123, 196, 127, 0.26); }
+.sheet--exp[data-module="yearbook"] { --sheet-exp-c1: rgba(201, 162, 75, 0.30);  --sheet-exp-c2: rgba(123, 196, 127, 0.22); }
+.sheet--exp[data-module="reflection"]  { --sheet-exp-c1: rgba(191, 90, 242, 0.40); --sheet-exp-c2: rgba(120, 90, 180, 0.26); }
+.sheet--exp[data-module="lifestats"]   { --sheet-exp-c1: rgba(45, 212, 191, 0.42); --sheet-exp-c2: rgba(60, 170, 140, 0.26); }
+.sheet--exp[data-module="distraction"] { --sheet-exp-c1: rgba(255, 107, 107, 0.36); --sheet-exp-c2: rgba(190, 90, 70, 0.24); }
+.sheet--exp[data-module="flow"]        { --sheet-exp-c1: rgba(56, 189, 248, 0.40); --sheet-exp-c2: rgba(70, 130, 200, 0.26); }
+@keyframes sheetExpA { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(44px, 60px) scale(1.12); } }
+@keyframes sheetExpB { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-54px, -44px) scale(1.16); } }
+@keyframes sheetExpC { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-30px, 34px) scale(1.1); } }
+body.calm-motion .sheet__exp-orb { animation: none; }
+
+/* === Shared "experience shell": one centered, vertically balanced layout that
+   every full-screen module wraps its content in, modeled on Action's .apl-wrap.
+   This is what makes the modules feel like one cohesive, intentional app and
+   fixes the old top-pinned-with-dead-space-below problem (e.g. Mori). === */
+.exp-shell {
+  position: relative; z-index: 1;
+  width: 100%;
+  display: flex; flex-direction: column; justify-content: center;
+  gap: clamp(16px, 2.6vw, 22px);
+  min-height: calc(100dvh - var(--safe-t, 0px) - var(--safe-b, 0px) - 132px);
+}
+/* Content-heavy / scrolling modules (notes list, vivere canvas, energy history)
+   top-align instead of vertically centering. */
+.exp-shell--top { justify-content: flex-start; min-height: 0; }
+/* Wide modules get a roomier body than the default 760px cap. */
+.sheet--exp[data-module="reflection"] .sheet__body,
+.sheet--exp[data-module="vivere"] .sheet__body { max-width: 1100px; }
+.exp-head { text-align: center; }
+.exp-head__eyebrow { font-size: var(--fs-2xs); letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-lo); font-weight: 700; margin-bottom: 8px; }
+.exp-head__title { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 700; letter-spacing: -0.02em; line-height: 1.12; color: var(--text-hi); }
+.exp-head__sub { font-size: var(--fs-md); line-height: 1.55; color: var(--text-mid); max-width: 50ch; margin: 10px auto 0; }
+.exp-section { width: 100%; }
+
+/* Staggered content reveal on open: each .exp-reveal child rises in sequence.
+   Set inline style="--i:0", "--i:1", ... to order the cascade. */
+@keyframes expRise { from { opacity: 0; transform: translateY(14px) scale(0.985); } to { opacity: 1; transform: none; } }
+.sheet--exp.open .exp-reveal { animation: expRise var(--dur-sheet, 0.48s) var(--ease-out, cubic-bezier(0.16,1,0.3,1)) both; animation-delay: calc(var(--i, 0) * 70ms); }
+body.calm-motion .sheet--exp.open .exp-reveal { animation: none; opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .sheet--exp.open .exp-reveal { animation: none; opacity: 1; transform: none; } }
+
+/* === Consistency module: view toggle, chain, breakdowns, milestone ladder === */
+.cview { margin-top: 2px; }
+.cview__seg { display: inline-flex; margin: 0 auto 14px; }
+.cview { text-align: center; }
+.cview__body { text-align: left; }
+/* Don't break the chain */
+.chain { text-align: center; }
+.chain__head { font-size: var(--fs-md); font-weight: 600; color: var(--text-hi); margin-bottom: 12px; }
+.chain__scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
+.chain__cols { display: inline-flex; gap: 4px; }
+.chain__col { display: flex; flex-direction: column; gap: 4px; }
+.chain__cell { width: 20px; height: 20px; border-radius: calc(4px * var(--rx, 1)); background: var(--kfill-05); display: flex; align-items: center; justify-content: center; flex: 0 0 auto; }
+.chain__cell--future { background: transparent; }
+.chain__cell--x { background: rgba(var(--success-rgb),0.13); }
+.chain__cell--today { box-shadow: 0 0 0 1px var(--surface-0), 0 0 0 2px var(--color-consistency); }
+.chain__cell--tap { cursor: pointer; }
+.chain__x { width: 14px; height: 14px; stroke: var(--color-consistency); stroke-width: 3; stroke-linecap: round; fill: none; }
+.chain__line { margin-top: 12px; font-size: var(--fs-sm); color: var(--text-mid); }
+/* Breakdowns */
+.cbreak { margin-top: 2px; }
+.cbreak__title { font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); margin-bottom: 10px; }
+.cscale { display: inline-flex; gap: 2px; margin-bottom: 14px; background: var(--kfill-05); border: 1px solid var(--hairline); border-radius: var(--r-sm); padding: 2px; }
+.cscale__btn { font: inherit; font-size: var(--fs-xs); font-weight: 600; color: var(--text-2); background: transparent; border: 0; border-radius: calc(6px * var(--rx, 1)); padding: 4px 12px; cursor: pointer; transition: background var(--t-fast) ease, color var(--t-fast) ease; }
+.cscale__btn--on { color: var(--text-hi); background: var(--kfill-10); }
+.cbk__stat { display: flex; align-items: baseline; gap: 8px; margin-bottom: 14px; }
+.cbk__num { font-size: var(--fs-2xl); font-weight: 700; color: var(--color-consistency); letter-spacing: -0.02em; line-height: 1; }
+.cbk__num span { font-size: var(--fs-md); color: var(--text-3); font-weight: 600; }
+.cbk__label { font-size: var(--fs-base); color: var(--text-mid); }
+.cbk__ctx { font-size: 0.75rem; color: var(--text-3); margin-top: 12px; }
+.cbk-week { display: flex; gap: 8px; }
+.cbk-dot { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.cbk-dot::before { content: ''; width: 100%; height: 30px; border-radius: var(--r-sm); background: var(--kfill-07); }
+.cbk-dot--on::before { background: var(--color-consistency); }
+.cbk-dot--today::before { box-shadow: 0 0 0 1px var(--surface-0), 0 0 0 2px var(--color-consistency); }
+.cbk-dot--future::before { opacity: 0.4; }
+.cbk-dot span { font-size: var(--fs-2xs); color: var(--text-3); }
+.cbk-month { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.cbk-cell { aspect-ratio: 1 / 1; border-radius: calc(4px * var(--rx, 1)); background: var(--kfill-07); }
+.cbk-cell--on { background: var(--color-consistency); }
+.cbk-cell--today { box-shadow: 0 0 0 1px var(--surface-0), 0 0 0 2px var(--color-consistency); }
+.cbk-cell--future { opacity: 0.4; }
+.cbk-year { display: flex; align-items: flex-end; gap: 6px; height: 68px; }
+.cbk-bar { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 4px; }
+.cbk-bar__fill { width: 100%; background: rgba(var(--success-rgb),0.5); border-radius: calc(4px * var(--rx, 1)); min-height: 2px; }
+.cbk-bar--cur .cbk-bar__fill { background: var(--color-consistency); }
+.cbk-bar span { font-size: 0.55rem; color: var(--text-3); }
+/* Milestone ladder */
+.mlad { margin-top: 2px; }
+.mlad__head { font-size: var(--fs-base); font-weight: 600; color: var(--text-hi); margin-bottom: 16px; text-align: center; }
+.mlad__track { display: flex; align-items: flex-start; justify-content: space-between; gap: 4px; }
+.mile { display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+.mile__node { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: var(--fs-sm); font-weight: 700; color: var(--text-3); background: var(--kfill-05); border: 1px solid var(--hairline); }
+.mile--earned .mile__node { background: var(--color-consistency); color: #04140a; border-color: transparent; }
+.mile--next .mile__node { color: var(--color-consistency); border-color: var(--color-consistency); animation: milePulse 2s ease-in-out infinite; }
+.mile__check { width: 18px; height: 18px; stroke: #04140a; stroke-width: 3; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.mile__label { font-size: 0.58rem; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.04em; }
+@keyframes milePulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(var(--success-rgb),0.5); } 50% { box-shadow: 0 0 0 6px rgba(var(--success-rgb),0); } }
+body.calm-motion .mile--next .mile__node, body.lite .mile--next .mile__node { animation: none; }
+@media (prefers-reduced-motion: reduce) { .mile--next .mile__node { animation: none; } }
+
+
+/* ============================================
+   v23: MORE SPACE (bottom glass sheet, heavier frost)
+   ============================================ */
+.more-space { position: fixed; inset: 0; z-index: 1003; }
+.more-space__backdrop {
+  position: absolute; inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  opacity: 0; transition: opacity var(--t-slow) ease;
+}
+.more-space__sheet {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  max-width: 720px; margin: 0 auto;
+  max-height: 78dvh; overflow-y: auto;
+  background: rgba(13, 14, 18, 0.82);
+  backdrop-filter: blur(calc(40px * var(--bx, 1))) saturate(1.1); -webkit-backdrop-filter: blur(calc(40px * var(--bx, 1))) saturate(1.1);
+  border: 1px solid var(--hairline-strong);
+  border-bottom: none;
+  border-radius: var(--r-card) calc(20px * var(--rx, 1)) 0 0;
+  padding: 10px 18px calc(20px + var(--safe-b, 0px));
+  transform: translateY(100%);
+  transition: transform var(--t-slow) cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 -18px 60px rgba(0, 0, 0, 0.5);
+}
+html.theme-light .more-space__sheet { background: rgba(248, 248, 250, 0.88); }
+/* Lite mode strips backdrop-filter, so the glass must go solid on phones. */
+/* Mobile fast path: the sheet already goes solid here, so the 40px live blur
+   was pure GPU burn while animating the slide-up (felt like a multi-second
+   hang on phones). Kill the blur + heavy shadow and shorten the slide. */
+body.lite .more-space__sheet, html.lowfx .more-space__sheet {
+  background: rgb(13, 14, 18);
+  -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+  box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.45);
+  transition: transform var(--t-base) ease-out;
+}
+html.theme-light body.lite .more-space__sheet, html.theme-light.lowfx .more-space__sheet { background: rgb(248, 248, 250); }
+.more-space.open .more-space__backdrop { opacity: 1; }
+.more-space.open .more-space__sheet { transform: translateY(0); }
+.more-space__handle { width: 34px; height: 4px; border-radius: 2px; background: var(--kfill-14); margin: 4px auto 14px; }
+.more-space__title { font-size: 0.66rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-lo); margin: 2px 2px 14px; }
+.more-space__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.more-card {
+  position: relative;
+  background: var(--kfill-03);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-card);
+  padding: 16px 16px 15px;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transition: border-color var(--t-base) ease, background var(--t-base) ease, transform var(--t-fast) ease;
+}
+.more-card:hover { border-color: var(--hairline-strong); background: var(--kfill-05); }
+.more-card:active { transform: scale(0.985); }
+.more-card__icon {
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--kfill-06);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-ctrl);
+  color: var(--text-hi);
+  margin-bottom: 12px;
+}
+.more-card__icon svg { width: 17px; height: 17px; display: block; }
+.more-card__name { font-size: var(--fs-base); font-weight: 650; color: var(--text-hi); letter-spacing: -0.01em; }
+.more-card__desc { font-size: 0.76rem; line-height: 1.45; color: var(--text-lo); margin-top: 4px; }
+/* Locked-next teaser: dimmed, earn condition as the caption, no padlock. */
+.more-card--locked { opacity: 0.4; }
+.more-card--locked .more-card__icon { filter: saturate(0); }
+.more-card__expand { font-size: 0.74rem; line-height: 1.45; color: var(--text-mid); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--hairline); }
+.more-card__pin {
+  margin-top: 10px; font: inherit; font-size: var(--fs-xs); font-weight: 600; cursor: pointer;
+  border: 1px solid var(--hairline-strong); border-radius: 999px; padding: 4px 12px;
+  background: transparent; color: var(--text-mid);
+}
+.more-card__pin:hover { color: var(--text-hi); }
+.more-space__empty { grid-column: 1 / -1; font-size: var(--fs-base); color: var(--text-lo); padding: 18px 4px; text-align: center; }
+.more-space__foot { margin-top: 14px; text-align: center; min-height: 18px; }
+.more-space__unlock {
+  font: inherit; font-size: 0.76rem; font-weight: 600; color: var(--text-lo);
+  background: none; border: none; cursor: pointer; padding: 6px;
+  text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(var(--ink), 0.25);
+}
+.more-space__unlock:hover { color: var(--text-mid); }
+.more-space__confirm { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; font-size: var(--fs-sm); color: var(--text-mid); }
+.more-space__confirm button { font: inherit; font-size: var(--fs-sm); font-weight: 600; cursor: pointer; border-radius: var(--r-sm); padding: 8px 12px; }
+#moreUnlockYes { border: none; background: var(--solid-bg); color: var(--solid-fg); }
+#moreUnlockNo { border: 1px solid var(--hairline-strong); background: transparent; color: var(--text-hi); }
+
+/* ============================================
+   v23: CHECK-IN SHEET (one calm glass card)
+   ============================================ */
+.ci-card {
+  background: var(--surface-1);
+  border: 1px solid var(--hairline);
+  border-radius: var(--card-r);
+  padding: 20px;
+}
+.ci-row-label { font-size: var(--fs-2xs); letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-lo); font-weight: 700; margin: 20px 0 8px; }
+.ci-moods { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+.ci-mood {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  font: inherit; font-size: var(--fs-2xs); font-weight: 600; color: var(--text-lo);
+  background: transparent; border: 1px solid var(--hairline); border-radius: var(--r-ctrl);
+  padding: 8px 4px 8px; cursor: pointer;
+  transition: border-color var(--t-base) ease, color var(--t-base) ease, background var(--t-base) ease;
+}
+.ci-mood svg { width: 22px; height: 22px; color: var(--text-mid); }
+.ci-mood.is-on { border-color: var(--color-lifestats); color: var(--text-hi); background: rgba(45, 212, 191, 0.08); }
+.ci-mood.is-on svg { color: var(--color-lifestats); }
+.ci-segs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.ci-seg {
+  height: 26px; border-radius: var(--r-ctrl); border: 1px solid var(--hairline);
+  background: transparent; cursor: pointer;
+  transition: background var(--t-base) ease, border-color var(--t-base) ease;
+}
+.ci-seg.is-on { background: rgba(45, 212, 191, 0.42); border-color: rgba(45, 212, 191, 0.5); }
+.ci-input {
+  width: 100%; box-sizing: border-box; font: inherit; font-size: var(--fs-base);
+  color: var(--text-hi); background: var(--surface-1);
+  border: 1px solid transparent; border-radius: var(--r-ctrl);
+  padding: 12px 12px; outline: none;
+}
+.ci-park { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--hairline); font-size: var(--fs-sm); color: var(--text-mid); }
+.ci-park button {
+  font: inherit; font-size: var(--fs-sm); font-weight: 600; color: var(--color-lifestats);
+  background: none; border: none; cursor: pointer; padding: 0;
+  text-decoration: underline; text-underline-offset: 3px;
+}
+.ci-week { display: flex; align-items: center; justify-content: flex-start; gap: 10px; margin-top: 14px; padding: 0 4px; font-size: 0.74rem; color: var(--text-lo); }
+.ci-week__dots { display: inline-flex; gap: 4px; }
+.ci-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--kfill-12); }
+.ci-dot.is-on { background: var(--color-lifestats); box-shadow: 0 0 6px rgba(45, 212, 191, 0.5); }
+
+/* No-blur paths (phones strip backdrop-filter for GPU survival): floating
+   chrome must go near-solid or content reads straight through it. */
+body.lite .tab-bar, html.lowfx .tab-bar { background: rgba(10, 11, 14, 0.985); }
+html.theme-light body.lite .tab-bar, html.theme-light.lowfx .tab-bar { background: rgba(250, 250, 252, 0.98); }

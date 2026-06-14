@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<!-- ============================================================================
+  MEMENTO CARD MORPH PROTOTYPE (standalone sandbox)
+  A faithful replica of the real Day Card (the Memento mobile hero) with a new
+  liquid color-morph layer: purple = clarity, white = action, green = consistency.
+  Balanced tri-color at full progress. Drag the sliders / hit a preset to preview.
+  NOT wired into the app. Pure look-and-feel. Open this file directly.
+============================================================================= -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Memento card morph prototype</title>
+<style>
+  :root {
+    --ink: 255, 255, 255;
+    --r-card: 16px;
+    --success: #30D158; --success-rgb: 48, 209, 88;
+    --color-clarity: #5550CC;
+    --text-hi: rgba(var(--ink), 0.92);
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Geist", system-ui, sans-serif;
+    --bx: 1;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; min-height: 100%; }
+  body {
+    font-family: var(--font); color: #fff;
+    min-height: 100dvh;
+    background:
+      radial-gradient(120% 80% at 50% 22%, rgba(95, 88, 222, 0.10), transparent 58%),
+      #05050b;
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 30px; padding: 40px 20px;
+  }
+
+  /* ── Day Card asset (replicated from css/dashboard.css:2675-2813) ──────── */
+  .daycard-wrap { position: relative; }
+  .daycard-wrap__aura {
+    position: absolute; left: 50%; top: 50%;
+    width: 150%; height: 120%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    background: radial-gradient(closest-side,
+      rgba(215, 220, 250, 0.16), rgba(150, 160, 235, 0.06) 48%, transparent 72%);
+    filter: blur(28px);
+    animation: dayCardBreath 7s ease-in-out infinite alternate;
+  }
+  @keyframes dayCardBreath {
+    from { opacity: 0.65; transform: translate(-50%, -50%) scale(0.97); }
+    to   { opacity: 1;    transform: translate(-50%, -50%) scale(1.04); }
+  }
+  .daycard-ns {
+    position: relative;
+    width: min(86vw, 330px);
+    min-height: min(64vh, 520px);
+    padding: 18px 18px 16px;
+    display: flex; flex-direction: column;
+    border-radius: var(--r-card);
+    background: linear-gradient(165deg,
+      rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.015) 48%, rgba(255, 255, 255, 0.05));
+    border: none;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.22),
+      0 0 44px rgba(200, 210, 255, 0.10),
+      0 26px 60px rgba(0, 0, 0, 0.45);
+    -webkit-backdrop-filter: blur(calc(5px * var(--bx, 1))) saturate(1.25);
+    backdrop-filter: blur(calc(5px * var(--bx, 1))) saturate(1.25);
+    overflow: hidden;
+    transform: perspective(900px) rotateX(var(--dc-rx, 0deg)) rotateY(var(--dc-ry, 0deg));
+    transition: transform 0.18s ease-out;
+    will-change: transform;
+  }
+  /* Liquid-glass rim: a masked gradient ring (NOT a border). */
+  .daycard-ns::before {
+    content: ""; position: absolute; inset: 0;
+    border-radius: inherit; padding: 1.5px;
+    background: linear-gradient(140deg,
+      rgba(255, 255, 255, 0.60), rgba(255, 255, 255, 0.10) 26%,
+      rgba(255, 255, 255, 0.02) 52%,
+      rgba(255, 255, 255, 0.22) 80%, rgba(255, 255, 255, 0.45));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            mask-composite: exclude;
+    pointer-events: none; z-index: 2;
+  }
+
+  /* ── NEW: liquid color-morph layer (purple/white/green) ────────────────── */
+  /* First child, so the glass, iridescence, deboss emblem and rim read on top. */
+  .daycard-ns__liquid {
+    position: absolute; inset: -34%; pointer-events: none;
+    filter: blur(30px) saturate(1.45);
+  }
+  .daycard-ns__liquid .blob {
+    position: absolute; border-radius: 50%;
+    mix-blend-mode: screen; will-change: transform, opacity;
+    transition: opacity 0.5s ease;
+  }
+  .blob.b1 { width: 80%; height: 60%; left: -8%; top: -10%;
+    background: radial-gradient(circle, rgba(150, 116, 255, 0.95), transparent 64%);
+    opacity: var(--clar); animation: dl1 18s ease-in-out infinite; }
+  .blob.b2 { width: 64%; height: 52%; left: 20%; top: 26%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.92), transparent 62%);
+    opacity: calc(var(--act) * 0.6); animation: dl2 15s ease-in-out infinite; }
+  .blob.b3 { width: 84%; height: 66%; right: -10%; bottom: -12%;
+    background: radial-gradient(circle, rgba(56, 232, 150, 0.95), transparent 62%);
+    opacity: var(--cons); animation: dl3 21s ease-in-out infinite; }
+  .blob.b4 { width: 60%; height: 48%; left: 4%; bottom: 8%;
+    background: radial-gradient(circle, rgba(120, 150, 255, 0.7), transparent 66%);
+    opacity: var(--mix); animation: dl4 24s ease-in-out infinite; }
+  @keyframes dl1 { 0%,100% { transform: translate(0,0) } 50% { transform: translate(16%, 12%) } }
+  @keyframes dl2 { 0%,100% { transform: translate(0,0) } 50% { transform: translate(-13%, 15%) } }
+  @keyframes dl3 { 0%,100% { transform: translate(0,0) } 50% { transform: translate(-15%, -9%) } }
+  @keyframes dl4 { 0%,100% { transform: translate(0,0) } 50% { transform: translate(18%, -13%) } }
+
+  /* Iridescence + sheen (replicated, sit above the color) */
+  .daycard-ns__iri {
+    position: absolute; inset: -30%; pointer-events: none;
+    background: conic-gradient(from 210deg at 50% 40%,
+      rgba(220, 225, 255, 0.10), rgba(167, 139, 250, 0.07),
+      rgba(94, 162, 247, 0.05), rgba(235, 235, 245, 0.09),
+      rgba(220, 225, 255, 0.10));
+    filter: blur(22px); mix-blend-mode: screen; opacity: 0.55;
+  }
+  .daycard-ns__sheen {
+    position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+    background: radial-gradient(circle at 30% 18%, rgba(255, 255, 255, 0.13), transparent 55%);
+    mix-blend-mode: screen;
+  }
+  .daycard-ns__body {
+    position: relative; flex: 1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 18px 2px;
+  }
+  .daycard-ns__emblem {
+    width: 116px; height: 116px;
+    fill: rgba(255, 255, 255, 0.05);
+    filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.14)) drop-shadow(0 -1px 1px rgba(0, 0, 0, 0.32));
+  }
+  .daycard-ns__foot {
+    position: relative; display: flex; align-items: center; justify-content: flex-end;
+    gap: 10px; min-height: 26px;
+  }
+  .daycard-ns__name {
+    position: absolute; left: -3px; bottom: -3px;
+    font-size: 0.62rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase;
+    color: rgba(var(--ink), 0.34); text-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60%;
+  }
+
+  /* ── Prototype-only controls (never ship) ──────────────────────────────── */
+  .panel { width: min(92vw, 360px); display: flex; flex-direction: column; gap: 16px; }
+  .presets { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+  .presets button {
+    font: inherit; font-size: 0.8rem; font-weight: 500; color: rgba(255,255,255,0.82);
+    background: rgba(255,255,255,0.05); border: none; border-radius: 10px;
+    padding: 9px 13px; cursor: pointer; transition: background 0.15s, transform 0.12s;
+  }
+  .presets button:hover { background: rgba(255,255,255,0.10); }
+  .presets button:active { transform: scale(0.97); }
+  .presets button.is-active { background: #fff; color: #0a0a0f; }
+  .row { display: flex; align-items: center; gap: 12px; }
+  .row label { font-size: 0.82rem; color: rgba(255,255,255,0.55); width: 92px; letter-spacing: 0.01em; }
+  .row .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+  .row input[type=range] { flex: 1; -webkit-appearance: none; appearance: none; height: 4px; border-radius: 999px; background: rgba(255,255,255,0.14); outline: none; }
+  .row input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #fff; cursor: pointer; }
+  .row input[type=range]::-moz-range-thumb { width: 18px; height: 18px; border: none; border-radius: 50%; background: #fff; cursor: pointer; }
+  .row .out { font-size: 0.8rem; font-weight: 500; width: 30px; text-align: right; color: rgba(255,255,255,0.7); font-variant-numeric: tabular-nums; }
+  .hint { font-size: 0.72rem; color: rgba(255,255,255,0.32); text-align: center; letter-spacing: 0.02em; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .daycard-wrap__aura, .blob { animation: none !important; }
+  }
+</style>
+</head>
+<body>
+  <div class="daycard-wrap">
+    <span class="daycard-wrap__aura" aria-hidden="true"></span>
+    <div class="daycard-ns" id="card" style="--clar:0; --act:0; --cons:0; --mix:0;">
+      <span class="daycard-ns__liquid" aria-hidden="true">
+        <i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i><i class="blob b4"></i>
+      </span>
+      <span class="daycard-ns__iri" aria-hidden="true"></span>
+      <span class="daycard-ns__sheen" aria-hidden="true"></span>
+      <div class="daycard-ns__body">
+        <svg class="daycard-ns__emblem" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+      </div>
+      <div class="daycard-ns__foot">
+        <span class="daycard-ns__name">Malik</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="presets" id="presets">
+      <button data-p="0,0,0">Day one</button>
+      <button data-p="85,10,0">Clarity found</button>
+      <button data-p="85,75,25">Taking action</button>
+      <button data-p="80,70,80">Consistent</button>
+      <button data-p="95,90,100">Fully evolved</button>
+    </div>
+    <div class="row"><label>Clarity</label><span class="dot" style="background:#9674ff"></span><input id="s1" type="range" min="0" max="100" value="0" step="1"><span class="out" id="o1">0</span></div>
+    <div class="row"><label>Action</label><span class="dot" style="background:#ffffff"></span><input id="s2" type="range" min="0" max="100" value="0" step="1"><span class="out" id="o2">0</span></div>
+    <div class="row"><label>Consistency</label><span class="dot" style="background:#38e896"></span><input id="s3" type="range" min="0" max="100" value="0" step="1"><span class="out" id="o3">0</span></div>
+    <div class="hint">Drag to morph the card. Move the pointer over the card to tilt it.</div>
+  </div>
+
+<script>
+(function () {
+  var card = document.getElementById('card');
+  var s = [document.getElementById('s1'), document.getElementById('s2'), document.getElementById('s3')];
+  var o = [document.getElementById('o1'), document.getElementById('o2'), document.getElementById('o3')];
+  var vars = ['--clar', '--act', '--cons'];
+
+  function apply() {
+    var v = s.map(function (el) { return +el.value; });
+    for (var i = 0; i < 3; i++) {
+      o[i].textContent = Math.round(v[i]);
+      card.style.setProperty(vars[i], (v[i] / 100).toFixed(3));
+    }
+    // blend blob appears only when clarity AND consistency are both present
+    card.style.setProperty('--mix', (Math.min(v[0], v[2]) / 100 * 0.7).toFixed(3));
+    // the card lifts (inset highlight) as it fills, so it feels more alive
+    var tot = (v[0] + v[1] + v[2]) / 300;
+    card.style.boxShadow =
+      'inset 0 1px 0 rgba(255,255,255,' + (0.22 + 0.18 * tot).toFixed(2) + '),' +
+      '0 0 44px rgba(200,210,255,' + (0.10 + 0.12 * tot).toFixed(2) + '),' +
+      '0 26px 60px rgba(0,0,0,0.45)';
+  }
+  s.forEach(function (el) { el.addEventListener('input', function () { clearActive(); apply(); }); });
+
+  var presets = document.getElementById('presets');
+  function clearActive() { presets.querySelectorAll('button').forEach(function (b) { b.classList.remove('is-active'); }); }
+  presets.addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    var p = b.dataset.p.split(',');
+    for (var i = 0; i < 3; i++) { s[i].value = p[i]; }
+    clearActive(); b.classList.add('is-active');
+    apply();
+  });
+
+  // Pointer tilt (replicated from bindDayCardTilt): the card leans toward the
+  // pointer so the glass reads as a physical object.
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!reduce) {
+    var reset = function () { card.style.setProperty('--dc-rx', '0deg'); card.style.setProperty('--dc-ry', '0deg'); };
+    card.addEventListener('pointermove', function (e) {
+      var r = card.getBoundingClientRect(); if (!r.width || !r.height) return;
+      var nx = ((e.clientX - r.left) / r.width) * 2 - 1;
+      var ny = ((e.clientY - r.top) / r.height) * 2 - 1;
+      card.style.setProperty('--dc-rx', (ny * -3.2).toFixed(2) + 'deg');
+      card.style.setProperty('--dc-ry', (nx * 4).toFixed(2) + 'deg');
+    });
+    card.addEventListener('pointerleave', reset);
+    card.addEventListener('pointerup', reset);
+  }
+
+  // start on the first preset (Day one)
+  presets.querySelector('button').classList.add('is-active');
+  apply();
+})();
+</script>
+</body>
+</html>

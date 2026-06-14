@@ -1,0 +1,279 @@
+/* ============================================
+   MEMENTO VIVERE  (the counterweight to Mori)
+   Minimal dark glass, sharp 8px, hairline borders, warm green/gold accent.
+   Reuses the app's surface tokens; only the accent shifts to --color-vivere.
+   ============================================ */
+.viv { --viv: var(--color-vivere); --viv-green: var(--color-vivere-green); --viv-rgb: var(--color-vivere-rgb); }
+
+/* Vivere is a full-bleed canvas, it does not want the drawer-style title banner.
+   Hide the centered title, strip the header box, and float only the close button
+   at the true top-right corner, the way the Clarity and Action experiences do. */
+.sheet--exp[data-module="vivere"] .sheet__title { display: none; }
+.sheet--exp[data-module="vivere"] .sheet__header {
+  position: absolute; top: 0; right: 0; left: auto;
+  width: auto; max-width: none; margin: 0;
+  padding: calc(12px + var(--safe-t)) 14px 0 0;
+  background: none; border: none; pointer-events: none; z-index: 7;
+}
+.sheet--exp[data-module="vivere"] .sheet__close {
+  pointer-events: auto;
+  width: 34px; height: 34px;
+  background: rgba(0,0,0,0.4); color: var(--text-hi);
+  -webkit-backdrop-filter: blur(calc(16px * var(--bx, 1))); backdrop-filter: blur(calc(16px * var(--bx, 1)));
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.sheet--exp[data-module="vivere"] .sheet__close:hover { background: rgba(0,0,0,0.6); }
+@media (max-width: 859.98px) {
+  /* Override the global hamburger-clearance pad; vivere floats its close right. */
+  .sheet.open[data-module="vivere"] .sheet__header { padding-left: 0; }
+}
+/* --- Vivere view tabs --- */
+.viv-tabs { display: inline-flex; gap: 2px; background: var(--kfill-05); border: 1px solid var(--hairline); border-radius: var(--r-sm); padding: 4px; margin: 0 0 18px; }
+.viv-tab { font: inherit; font-size: var(--fs-sm); font-weight: 600; color: var(--text-2); background: transparent; border: 0; border-radius: calc(6px * var(--rx, 1)); padding: 8px 14px; cursor: pointer; transition: background var(--t-fast) ease, color var(--t-fast) ease; }
+.viv-tab--on { color: var(--text-hi); background: rgba(201,162,75,0.16); }
+/* --- Vivere vision-board canvas --- */
+/* Full-bleed: the sheet body becomes the canvas, edge to edge. */
+.sheet__body.viv-body-fs { padding: 0 !important; max-width: none !important; overflow: hidden !important; }
+.vcanvas--fs { position: absolute; inset: 0; }
+/* v22 infinite canvas: viewport (overflow hidden) holds a viewport-fixed dot
+   grid + a transformed world layer (translate+scale). Pan/zoom move the world
+   and shift the grid background, so the dots feel endless. */
+.vcanvas--fs .vcanvas__viewport { position: absolute; inset: 0; overflow: hidden; background: var(--surface-0); cursor: grab; touch-action: none; overscroll-behavior: contain; }
+.vcanvas--fs .vcanvas__viewport.is-panning { cursor: grabbing; }
+.vcanvas__grid { position: absolute; inset: 0; pointer-events: none; z-index: 0; background-color: var(--vc-bg, var(--surface-0)); background-image: radial-gradient(circle, var(--vc-dot, rgba(var(--ink),0.15)) 1.2px, transparent 1.6px); background-size: 28px 28px; }
+.vcanvas__grid.vc-grid--lines { background-image: linear-gradient(var(--vc-dot, rgba(var(--ink),0.12)) 1px, transparent 1px), linear-gradient(90deg, var(--vc-dot, rgba(var(--ink),0.12)) 1px, transparent 1px); }
+.vcanvas__grid.vc-grid--none { background-image: none; }
+.vcanvas__world { position: absolute; top: 0; left: 0; transform-origin: 0 0; will-change: transform; z-index: 1; }
+/* Floating glass toolbar (tabs + add buttons) */
+.vcanvas--fs .vcanvas__bar { position: absolute; top: 14px; left: 14px; z-index: 6; display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; max-width: calc(100% - 72px); padding: 8px 8px; border-radius: var(--r-ctrl); background: var(--glass-bg, rgba(8,8,10,0.62)); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); border: 1px solid var(--hairline); box-shadow: var(--glass-shadow, 0 8px 30px rgba(0,0,0,0.4)); }
+.vcanvas--fs .vcanvas__bar .viv-tabs { margin: 0; background: transparent; border: 0; padding: 0; }
+.vcanvas__sep { width: 1px; height: 22px; background: var(--hairline); margin: 0 4px; }
+.vcanvas__btn { font: inherit; font-size: var(--fs-sm); font-weight: 600; color: var(--text-hi); background: rgba(201,162,75,0.14); border: 1px solid rgba(201,162,75,0.32); border-radius: var(--r-sm); padding: 8px 12px; cursor: pointer; transition: background var(--t-fast) ease; }
+.vcanvas__btn:hover { background: rgba(201,162,75,0.24); }
+/* Board switcher (left of the tabs) */
+.vcanvas__board { position: relative; display: inline-flex; align-items: center; }
+.vcanvas__board-btn { font: inherit; font-size: var(--fs-sm); font-weight: 600; color: var(--text-hi); background: var(--kfill-06); border: 1px solid var(--hairline); border-radius: var(--r-sm); padding: 8px 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; max-width: 180px; }
+.vcanvas__board-btn:hover { background: var(--kfill-12); }
+.vcanvas__board-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vcanvas__board-car { opacity: 0.6; font-size: var(--fs-xs); }
+.vcanvas__board-menu { position: absolute; top: calc(100% + 6px); left: 0; min-width: 220px; z-index: 8; padding: 6px; border-radius: var(--r-sm); background: var(--surface-1-solid, #16161c); border: 1px solid var(--hairline); box-shadow: 0 18px 50px rgba(0,0,0,0.5); display: none; flex-direction: column; gap: 2px; }
+.vcanvas__board.is-open .vcanvas__board-menu { display: flex; }
+.vcanvas__bm-item { display: flex; align-items: center; gap: 8px; font: inherit; font-size: var(--fs-sm); color: var(--text-hi); background: transparent; border: 0; border-radius: calc(6px * var(--rx, 1)); padding: 8px 10px; cursor: pointer; text-align: left; width: 100%; }
+.vcanvas__bm-item:hover { background: var(--kfill-08); }
+.vcanvas__bm-item.is-active { color: var(--color-vivere); }
+.vcanvas__bm-item--new { border-top: 1px solid var(--hairline); margin-top: 2px; padding-top: 8px; color: var(--color-vivere); }
+.vcanvas__bm-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vcanvas__bm-x { opacity: 0; color: var(--text-lo); padding: 2px 4px; border-radius: calc(4px * var(--rx, 1)); font-size: var(--fs-base); }
+.vcanvas__bm-item:hover .vcanvas__bm-x { opacity: 0.7; }
+.vcanvas__bm-x:hover { opacity: 1; background: rgba(255,107,107,0.2); color: #fff; }
+/* Zoom controls (bottom-right) */
+.vcanvas__zoombar { position: absolute; bottom: 16px; right: 16px; z-index: 6; display: inline-flex; align-items: center; gap: 4px; padding: 4px; border-radius: var(--r-sm); background: var(--glass-bg, rgba(8,8,10,0.62)); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); border: 1px solid var(--hairline); box-shadow: var(--glass-shadow, 0 8px 30px rgba(0,0,0,0.4)); }
+.vcanvas__zbtn { font: inherit; font-size: var(--fs-sm); font-weight: 700; min-width: 28px; height: 28px; padding: 0 8px; color: var(--text-hi); background: transparent; border: 0; border-radius: calc(6px * var(--rx, 1)); cursor: pointer; }
+.vcanvas__zbtn:hover { background: var(--kfill-12); }
+/* Board customize popover */
+.vc-customize { position: absolute; top: 60px; left: 14px; z-index: 9; width: 250px; padding: 12px; border-radius: var(--r-ctrl); background: var(--surface-1-solid, #16161c); border: 1px solid var(--hairline); box-shadow: 0 18px 50px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 12px; }
+.vc-cz__row { display: flex; flex-direction: column; gap: 8px; }
+.vc-cz__lbl { font-size: var(--fs-2xs); text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-lo); font-weight: 700; }
+.vc-cz__opts { display: flex; gap: 8px; flex-wrap: wrap; }
+.vc-cz__chip { font: inherit; font-size: 0.76rem; font-weight: 600; color: var(--text-mid); background: var(--kfill-05); border: 1px solid var(--hairline); border-radius: calc(6px * var(--rx, 1)); padding: 6px 12px; cursor: pointer; }
+.vc-cz__chip.is-on { color: var(--text-hi); background: rgba(201,162,75,0.18); border-color: rgba(201,162,75,0.4); }
+.vc-cz__sw { width: 26px; height: 26px; border-radius: calc(6px * var(--rx, 1)); border: 1px solid var(--hairline); cursor: pointer; padding: 0; }
+.vc-cz__sw.is-on { box-shadow: 0 0 0 2px var(--color-vivere); }
+/* Card extras (frames, captions, labels, sticky colors) */
+.vcard__caption { font-size: 0.74rem; color: var(--text-mid); margin-top: 8px; line-height: 1.4; }
+.vcard__label { position: absolute; top: -9px; left: 10px; font-size: var(--fs-2xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #fff; background: var(--color-vivere); padding: 2px 8px; border-radius: calc(4px * var(--rx, 1)); }
+.vcard--frame-thin { padding: 6px; }
+.vcard--frame-thin .vcard__img { border-radius: calc(4px * var(--rx, 1)); }
+.vcard--frame-photo { padding: 10px 10px 26px; background: #f7f5ef; border-color: rgba(0,0,0,0.1); }
+.vcard--frame-photo .vcard__img { border-radius: 2px; }
+.vcard--frame-photo .vcard__caption { color: #3a352c; }
+.vcard--paper-amber { background: #2a2113; border-color: rgba(201,162,75,0.3); }
+.vcard--paper-rose { background: #2a1620; border-color: rgba(232,122,170,0.28); }
+.vcard--paper-blue { background: #131c2a; border-color: rgba(123,151,255,0.28); }
+.vcard--paper-green { background: #122019; border-color: rgba(120,200,160,0.28); }
+.vcard--paper-mono { background: #1a1a1c; border-color: rgba(var(--ink),0.2); }
+.vcanvas__hintbar { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 6; font-size: var(--fs-xs); color: var(--text-2); background: var(--glass-bg, rgba(8,8,10,0.55)); -webkit-backdrop-filter: var(--glass-blur-soft); backdrop-filter: var(--glass-blur-soft); padding: 6px 16px; border-radius: 999px; border: 1px solid var(--hairline); pointer-events: none; white-space: nowrap; max-width: 92%; overflow: hidden; text-overflow: ellipsis; }
+.vcanvas__vignette { position: absolute; inset: 0; pointer-events: none; z-index: 4; box-shadow: inset 0 0 180px 50px rgba(0,0,0,0.55); }
+@media (max-width: 640px) {
+  .vcanvas__hintbar { display: none; }
+  .vcanvas--fs .vcanvas__bar { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; max-width: calc(100% - 64px); }
+  .vcanvas--fs .vcanvas__bar::-webkit-scrollbar { display: none; }
+  .vcanvas--fs .vcanvas__bar .viv-tab, .vcanvas--fs .vcanvas__bar .vcanvas__btn { white-space: nowrap; }
+}
+.vcanvas__links { position: absolute; left: -50000px; top: -50000px; overflow: visible; pointer-events: none; z-index: 1; }
+.vcanvas__link { fill: none; stroke: var(--vc-accent, rgba(201,162,75,0.55)); stroke-width: 2; }
+.vcanvas__link--temp { stroke: rgba(201,162,75,0.8); stroke-dasharray: 5 5; }
+.vcanvas__link-hit { fill: none; stroke: transparent; stroke-width: 16; pointer-events: stroke; cursor: pointer; }
+.vcanvas__link-hit:hover + .vcanvas__link, .vcanvas__link-hit:hover { stroke: var(--color-distraction); }
+.vcanvas__empty { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; max-width: 320px; pointer-events: none; }
+.vcanvas__empty-t { font-size: var(--fs-lg); font-weight: 600; color: var(--text-hi); margin-bottom: 8px; }
+.vcanvas__empty-s { font-size: var(--fs-base); color: var(--text-mid); line-height: 1.5; }
+.vcard { position: absolute; box-sizing: border-box; background: var(--surface-1-solid, #16161c); border: 1px solid rgba(var(--ink),0.14); border-radius: var(--r-sm); padding: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.35); z-index: 2; touch-action: none; cursor: grab; transition: box-shadow var(--t-fast) ease, border-color var(--t-fast) ease; }
+.vcard:hover { border-color: rgba(201,162,75,0.4); }
+.vcard--dragging { cursor: grabbing; box-shadow: 0 14px 38px rgba(0,0,0,0.5); }
+.vcard--droptarget { border-color: var(--color-vivere); box-shadow: 0 0 0 2px rgba(201,162,75,0.5); }
+.vcard__del { position: absolute; top: 6px; right: 6px; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--kfill-08); border: 0; color: var(--text-2); cursor: pointer; opacity: 0; transition: opacity var(--t-fast) ease, background var(--t-fast) ease; }
+.vcard:hover .vcard__del { opacity: 1; }
+.vcard__del:hover { background: rgba(255,107,107,0.22); color: #fff; }
+/* "Lived" — mark a vision as realized. Turns a wish into proof. */
+.vcard__lived-btn { position: absolute; top: -9px; left: -9px; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--kfill-08); border: 2px solid var(--surface-0); color: var(--text-2); cursor: pointer; opacity: 0; transition: opacity var(--t-fast) ease, background var(--t-fast) ease, color var(--t-fast) ease; z-index: 4; }
+.vcard:hover .vcard__lived-btn { opacity: 1; }
+.vcard__lived-btn:hover { background: rgba(201,162,75,0.22); color: var(--color-vivere); }
+.vcard--lived { border-color: rgba(201,162,75,0.5); box-shadow: 0 6px 20px rgba(0,0,0,0.35), 0 0 0 1px rgba(201,162,75,0.28); }
+.vcard--lived:hover { border-color: rgba(201,162,75,0.7); }
+.vcard--lived .vcard__lived-btn { opacity: 1; background: var(--color-vivere); color: #1a1406; }
+.vcard__lived-stamp { display: inline-flex; align-items: center; gap: 4px; margin-top: 8px; font-size: var(--fs-2xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--color-vivere); }
+.vcard__lived-stamp svg { flex: 0 0 auto; }
+.vcard__handle { position: absolute; right: -7px; bottom: -7px; width: 16px; height: 16px; border-radius: calc(4px * var(--rx, 1)); background: var(--color-vivere); border: 2px solid var(--surface-0); cursor: crosshair; z-index: 3; }
+.vcard__note { font-size: var(--fs-base); line-height: 1.5; color: var(--text-hi); outline: none; min-height: 1.5em; white-space: pre-wrap; word-break: break-word; }
+.vcard__note:empty::before { content: attr(data-ph); color: var(--text-3); }
+.vcard__img { display: block; width: 100%; border-radius: calc(6px * var(--rx, 1)); pointer-events: none; }
+/* Async IndexedDB image hydration: skeleton shimmer until the objectURL lands. */
+img.img-skeleton { min-height: 60px; background: linear-gradient(100deg, rgba(var(--ink),0.05) 30%, rgba(var(--ink),0.10) 50%, rgba(var(--ink),0.05) 70%); background-size: 200% 100%; animation: imgShimmer 1.2s ease-in-out infinite; }
+img.img-missing { min-height: 48px; background: var(--kfill-05); }
+img.img-loaded { animation: imgFadeIn 0.22s ease-out; }
+@keyframes imgShimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+@keyframes imgFadeIn { from { opacity: 0; } to { opacity: 1; } }
+body.calm-motion img.img-skeleton, body.calm-motion img.img-loaded { animation: none; }
+@media (prefers-reduced-motion: reduce) { img.img-skeleton, img.img-loaded { animation: none; } }
+.vcard__cap { font-size: var(--fs-sm); color: var(--text-mid); margin-top: 8px; }
+/* --- Rich link cards: favicon tile, title, domain in small caps --- */
+.vcard--link { padding: 12px 12px; }
+.vcard__link { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.vcard__fav-tile { flex: 0 0 auto; width: 34px; height: 34px; border-radius: var(--r-sm); background: var(--kfill-06); border: 1px solid var(--hairline); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.vcard__fav { width: 18px; height: 18px; display: block; }
+.vcard__link-body { min-width: 0; flex: 1; }
+.vcard__link-t { display: block; font-size: var(--fs-base); font-weight: 600; color: var(--text-hi); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vcard__link-h { display: block; font-size: var(--fs-2xs); font-weight: 500; letter-spacing: 0.02em; color: var(--text-lo); margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* --- YouTube facade cards: poster + glass play button, iframe only on click --- */
+.vcard--video { padding: 8px; }
+.vcard__video { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: calc(6px * var(--rx, 1)); overflow: hidden; background: #000; }
+.vcard__poster { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+.vcard__play { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; background: rgba(8,8,10,0.55); -webkit-backdrop-filter: blur(calc(8px * var(--bx, 1))); backdrop-filter: blur(calc(8px * var(--bx, 1))); border: 1px solid rgba(255,255,255,0.22); cursor: pointer; transition: background var(--t-fast) ease, transform var(--t-fast) ease; }
+.vcard__play:hover { background: rgba(8,8,10,0.78); transform: translate(-50%,-50%) scale(1.06); }
+.vcard__play svg { margin-left: 2px; }
+.vcard__video-frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
+.vcard__video-t { font-size: 0.74rem; color: var(--text-mid); margin-top: 8px; padding: 0 4px 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vcard__video-missing { padding: 24px 10px; text-align: center; font-size: var(--fs-sm); color: var(--text-lo); }
+/* --- Quote cards: typography-led, three fixed templates, hairline premium --- */
+.vcard--quote { padding: 22px 20px 16px; border-color: rgba(var(--ink),0.18); }
+.vcard__quote-text { font-family: Fraunces, Georgia, serif; font-size: 1.18rem; line-height: 1.45; color: var(--text-hi); outline: none; min-height: 1.4em; white-space: pre-wrap; word-break: break-word; }
+.vcard__quote-text:empty::before { content: attr(data-ph); color: var(--text-3); }
+.vcard__quote-attr { margin-top: 12px; font-size: var(--fs-xs); font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-hi); opacity: 0.4; outline: none; min-height: 1em; }
+.vcard__quote-attr:empty::before { content: attr(data-ph); color: var(--text-3); text-transform: none; letter-spacing: 0; }
+.vcard--quote[data-qstyle="light"] .vcard__quote-text { font-weight: 400; }
+.vcard--quote[data-qstyle="italic-deep"] { background: #070709; border-color: rgba(var(--ink),0.22); }
+.vcard--quote[data-qstyle="italic-deep"] .vcard__quote-text { font-style: italic; font-weight: 420; }
+.vcard--quote[data-qstyle="mono"] .vcard__quote-text { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: var(--fs-base); line-height: 1.6; font-weight: 500; }
+.vcard__qstyle { position: absolute; top: 6px; right: 30px; min-width: 20px; height: 20px; padding: 0 4px; border-radius: calc(6px * var(--rx, 1)); display: flex; align-items: center; justify-content: center; background: var(--kfill-08); border: 0; color: var(--text-2); font-size: var(--fs-2xs); font-weight: 700; cursor: pointer; opacity: 0; transition: opacity var(--t-fast) ease, background var(--t-fast) ease; z-index: 4; }
+.vcard:hover .vcard__qstyle { opacity: 1; }
+.vcard__qstyle:hover { background: rgba(201,162,75,0.22); color: var(--color-vivere); }
+/* --- Card patina: soft gold ring on a card's creation anniversary --- */
+.vcard--anniv { box-shadow: 0 6px 20px rgba(0,0,0,0.35), 0 0 0 2px rgba(201,162,75,0.4), 0 0 22px rgba(201,162,75,0.18); }
+/* One-shot highlight after "Take me there" / Memory lane jumps. */
+.vcard--found { border-color: rgba(201,162,75,0.8); box-shadow: 0 6px 20px rgba(0,0,0,0.35), 0 0 0 3px rgba(201,162,75,0.45), 0 0 34px rgba(201,162,75,0.3); }
+.vcanvas__viewport:focus { outline: none; }
+/* --- On This Day: one full-screen glass overlay per day --- */
+.viv-otd { position: fixed; inset: 0; z-index: 1010; display: flex; align-items: center; justify-content: center; padding: 24px; background: rgba(4,4,7,0.6); -webkit-backdrop-filter: blur(calc(24px * var(--bx, 1))) saturate(1.3); backdrop-filter: blur(calc(24px * var(--bx, 1))) saturate(1.3); animation: vivOtdIn 0.3s cubic-bezier(0.22,1,0.36,1); }
+.viv-otd__panel { width: min(420px, 100%); max-height: 86vh; overflow: auto; padding: 24px 22px 20px; border-radius: var(--r-card); background: var(--wfill-05); -webkit-backdrop-filter: blur(calc(40px * var(--bx, 1))) saturate(1.6); backdrop-filter: blur(calc(40px * var(--bx, 1))) saturate(1.6); border: 1px solid rgba(255,255,255,0.12); box-shadow: 0 40px 100px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.08); text-align: center; }
+.viv-otd__eyebrow { font-size: var(--fs-2xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: var(--color-vivere); margin-bottom: 20px; }
+.viv-otd__card { border: 1px solid var(--hairline); border-radius: var(--r-card); padding: 20px 18px; background: var(--kfill-04); }
+.viv-otd__img { display: block; width: 100%; border-radius: calc(6px * var(--rx, 1)); }
+.viv-otd__quote { font: inherit; font-size: var(--fs-lg); font-weight: 600; letter-spacing: -0.01em; line-height: 1.45; color: var(--text-hi); }
+.viv-otd__cap { font-size: 0.74rem; color: var(--text-mid); margin-top: 10px; }
+.viv-otd__meta { font-size: var(--fs-xs); color: var(--text-lo); margin-top: 12px; }
+.viv-otd__actions { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 18px; }
+.viv-otd__go { font: inherit; font-size: var(--fs-sm); font-weight: 600; color: #1a1406; background: var(--color-vivere); border: 0; border-radius: var(--r-sm); padding: 10px 18px; cursor: pointer; }
+.viv-otd__go:hover { filter: brightness(1.08); }
+.viv-otd__skip { font: inherit; font-size: var(--fs-sm); font-weight: 600; color: var(--text-2); background: transparent; border: 0; padding: 10px 8px; cursor: pointer; }
+.viv-otd__skip:hover { color: var(--text-hi); }
+@keyframes vivOtdIn { from { opacity: 0; } to { opacity: 1; } }
+body.calm-motion .viv-otd { animation: none; }
+@media (prefers-reduced-motion: reduce) { .viv-otd { animation: none; } }
+/* --- One Small Thing: a quiet daily prompt, docked bottom-left --- */
+.viv-nudge { position: absolute; left: 16px; bottom: 16px; z-index: 7; width: min(280px, calc(100% - 32px)); padding: 14px 14px 12px; border-radius: var(--r-ctrl); background: var(--glass-bg, rgba(8,8,10,0.62)); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); border: 1px solid var(--hairline); box-shadow: var(--glass-shadow, 0 8px 30px rgba(0,0,0,0.4)); animation: vivNudgeIn 0.32s ease-out; }
+.viv-nudge__x { position: absolute; top: 8px; right: 8px; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: transparent; border: 0; color: var(--text-lo); font-size: var(--fs-base); cursor: pointer; }
+.viv-nudge__x:hover { color: var(--text-hi); background: var(--kfill-10); }
+.viv-nudge__eyebrow { font-size: var(--fs-2xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--color-vivere); margin-bottom: 8px; }
+.viv-nudge__text { font-size: var(--fs-base); line-height: 1.45; color: var(--text-hi); padding-right: 14px; }
+.viv-nudge__actions { margin-top: 12px; display: flex; gap: 8px; }
+.viv-nudge__done { font: inherit; font-size: 0.76rem; font-weight: 600; color: var(--text-hi); background: rgba(201,162,75,0.14); border: 1px solid rgba(201,162,75,0.32); border-radius: var(--r-sm); padding: 6px 14px; cursor: pointer; }
+.viv-nudge__done:hover { background: rgba(201,162,75,0.24); }
+.viv-nudge__skipb { font: inherit; font-size: 0.74rem; font-weight: 600; color: var(--text-2); background: transparent; border: 0; padding: 6px 4px; cursor: pointer; }
+.viv-nudge__picks { display: flex; flex-direction: column; gap: 4px; max-height: 180px; overflow: auto; }
+.viv-nudge__pick { font: inherit; font-size: 0.76rem; color: var(--text-hi); text-align: left; background: var(--kfill-05); border: 1px solid var(--hairline); border-radius: var(--r-sm); padding: 8px 10px; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.viv-nudge__pick:hover { border-color: rgba(201,162,75,0.4); }
+@keyframes vivNudgeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+body.calm-motion .viv-nudge { animation: none; }
+@media (prefers-reduced-motion: reduce) { .viv-nudge { animation: none; } }
+/* --- Memory lane: chronological gold ledger of every Lived card --- */
+.viv-lane { max-width: 640px; margin: 0 auto; padding-bottom: 30px; }
+.viv-lane__eyebrow { font-size: var(--fs-2xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--color-vivere); margin: 4px 0 18px; }
+.viv-lane__empty { font-size: var(--fs-md); color: var(--text-mid); line-height: 1.6; padding: 26px 4px; }
+.viv-lane__list { display: flex; flex-direction: column; gap: 22px; }
+.viv-lane__item { display: flex; gap: 14px; }
+.viv-lane__rail { position: relative; flex: 0 0 14px; display: flex; justify-content: center; }
+.viv-lane__rail::before { content: ''; position: absolute; top: 18px; bottom: -22px; width: 1px; background: var(--hairline); }
+.viv-lane__item:last-child .viv-lane__rail::before { display: none; }
+.viv-lane__dot { position: relative; z-index: 1; width: 9px; height: 9px; margin-top: 4px; border-radius: 50%; background: var(--color-vivere); box-shadow: 0 0 10px rgba(201,162,75,0.45); }
+.viv-lane__body { flex: 1; min-width: 0; }
+.viv-lane__date { font-size: var(--fs-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-vivere); }
+.viv-lane__card { margin-top: 8px; padding: 14px 16px; border-radius: var(--r-ctrl); background: var(--kfill-03); border: 1px solid var(--hairline); }
+.viv-lane__thumb { display: block; width: 100%; max-width: 260px; border-radius: calc(6px * var(--rx, 1)); margin-bottom: 8px; }
+.viv-lane__text { font-size: var(--fs-base); line-height: 1.5; color: var(--text-hi); }
+.viv-lane__text--quote { font-family: Fraunces, Georgia, serif; font-size: 1.02rem; }
+.viv-lane__sub { font-size: var(--fs-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; color: var(--text-lo); margin-top: 4px; }
+.viv-lane__meta { margin-top: 8px; font-size: var(--fs-xs); color: var(--text-lo); }
+.viv-lane__go { font: inherit; font-size: var(--fs-xs); font-weight: 600; color: var(--color-vivere); background: transparent; border: 0; padding: 0; cursor: pointer; }
+.viv-lane__go:hover { text-decoration: underline; }
+
+/* === Marathon V1: canvas depth ========================================= */
+/* Floating display text: big type, zero card chrome (Freeform pattern). */
+.vcard--display { background: transparent; border: none; box-shadow: none; }
+.vcard--display .vcard__display {
+  font-size: 1.7rem; font-weight: 750; letter-spacing: -0.02em; line-height: 1.15;
+  color: var(--text-hi); outline: none; min-height: 40px; padding: 6px 4px;
+}
+.vcard--display .vcard__display:empty::before { content: attr(data-ph); color: var(--text-faint, var(--text-lo)); }
+/* Sticky notes: square, bold paper, handwriting-adjacent weight. */
+.vcard--sticky { border-radius: calc(6px * var(--rx, 1)); }
+.vcard--sticky .vcard__note {
+  min-height: 150px; font-size: 1.02rem; font-weight: 550; line-height: 1.4;
+}
+/* Board switcher covers + section eyebrow. */
+.vcanvas__bm-cover {
+  width: 44px; height: 30px; flex: none;
+  border-radius: 4px; border: 1px solid var(--hairline);
+  background: var(--kfill-03);
+  margin-right: 9px;
+}
+.vcanvas__bm-item { display: flex; align-items: center; }
+.vcanvas__bm-eyebrow {
+  font-size: 0.56rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--text-faint, var(--text-lo)); padding: 9px 10px 3px;
+}
+
+/* === Marathon mega-cycle 8: frames (tokens only) ======================== */
+.vcard--frame {
+  z-index: 0 !important;
+  background: var(--kfill-03);
+  border: 1px dashed rgba(var(--ink), 0.18);
+  box-shadow: none;
+}
+.vcard--frame .vcard__frame-label {
+  font-size: 0.62rem; font-weight: 700; letter-spacing: 0.14em;
+  text-transform: uppercase; color: rgba(var(--ink), 0.5);
+  outline: none; padding: 10px 12px; min-height: 16px;
+}
+.vcard--frame .vcard__frame-label:empty::before { content: attr(data-ph); color: rgba(var(--ink), 0.3); }
+
+/* Add menu (board-menu pattern, fixed at the pointer). */
+.vcanvas__addmenu { position: fixed; display: block; z-index: 100001; min-width: 150px; }
+
+/* Clearance for the persistent hamburger: on phone widths the menu button sits
+   fixed at the top-left, exactly where the tab strip starts. Indent the strip
+   so the two never overlap. */
+@media (max-width: 860px) {
+  .viv .viv-tabs { margin-left: 48px; margin-right: 52px; }
+  .vcanvas--fs .vcanvas__bar { padding-left: 56px; }
+}

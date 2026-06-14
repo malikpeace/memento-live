@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<!-- ============================================================================
+  CLARITY CONVERSATION PROTOTYPE v2 (standalone sandbox)
+  Opal-style flowing, minimal, typewriter conversation under a pinned glowing
+  Neutron Star. NOT wired into the app. Pure look-and-feel preview.
+  Open:  http://localhost:8090/proto-clarity-chat-v2.html  (or via the tunnel)
+============================================================================= -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Clarity — conversation prototype v2</title>
+<style>
+  :root {
+    --bg: #07070c;
+    --clarity: #8B72FF;
+    --clarity-soft: #b3a3ff;
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Geist", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; background: var(--bg); }
+  body {
+    font-family: var(--font); color: #fff;
+    height: 100dvh; overflow: hidden;
+    display: flex; flex-direction: column;
+    position: relative;
+  }
+  /* faint top ambient, violet */
+  .amb { position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background: radial-gradient(110% 60% at 50% -10%, rgba(139,114,255,0.14), transparent 60%); }
+
+  /* Hero slot: the REAL Neutron Star asset drops in here later. No fake star.
+     For now it is just breathing room so the conversation sits below the fold. */
+  .hero-slot { flex: none; height: 16vh; min-height: 90px; }
+
+  /* ── Flowing conversation ─────────────────────────────────────────────── */
+  .convo {
+    position: relative; z-index: 1; flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+    /* Newest line sits LOW and bright; history stacks upward and recedes (the
+       .dim class greys it, no mask so the current line is never pre-faded). */
+    padding: 4px 30px 30vh; display: flex; flex-direction: column; justify-content: flex-end; gap: 22px;
+  }
+  .convo::-webkit-scrollbar { display: none; }
+  .line {
+    font-size: 1.32rem; line-height: 1.4; font-weight: 600; letter-spacing: -0.02em;
+    color: #fff; white-space: pre-wrap;
+    transition: color 0.7s ease, opacity 0.55s ease, transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  /* New line rises up and fades in (settles when .line--enter is removed). */
+  .line--enter { opacity: 0; transform: translateY(16px); }
+  .line.dim { color: rgba(255,255,255,0.26); font-weight: 500; }
+  .line.user { color: var(--clarity-soft); font-weight: 600; }
+
+  /* ── Bottom dock: minimal chips or text ───────────────────────────────── */
+  .dock { position: relative; z-index: 2; padding: 8px 22px max(20px, env(safe-area-inset-bottom));
+    background: linear-gradient(to top, var(--bg) 55%, transparent); }
+  .chips { display: flex; flex-direction: column; gap: 9px; }
+  .chip {
+    width: 100%; text-align: left; font: inherit; font-size: 1.05rem; font-weight: 500;
+    color: #fff; background: rgba(255,255,255,0.045); border: none; border-radius: 12px;
+    padding: 16px 18px; cursor: pointer; transition: background 0.15s, transform 0.12s;
+    -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
+    opacity: 0; animation: rise 0.5s cubic-bezier(0.16,1,0.3,1) forwards;
+  }
+  .chip:nth-child(2){ animation-delay: 0.05s; } .chip:nth-child(3){ animation-delay: 0.1s; }
+  .chip:nth-child(4){ animation-delay: 0.15s; } .chip:nth-child(5){ animation-delay: 0.2s; }
+  .chip:active { transform: scale(0.98); background: rgba(139,114,255,0.22); }
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  .composer { display: flex; align-items: flex-end; gap: 10px; opacity: 0; animation: rise 0.5s cubic-bezier(0.16,1,0.3,1) forwards; }
+  .composer textarea {
+    flex: 1; resize: none; font: inherit; font-size: 1.1rem; font-weight: 500; line-height: 1.4;
+    color: #fff; background: rgba(255,255,255,0.025); border: none; border-radius: 12px;
+    padding: 14px 16px; max-height: 120px; outline: none;
+  }
+  .composer textarea::placeholder { color: rgba(255,255,255,0.32); }
+  .send { flex: none; width: 48px; height: 48px; border-radius: 12px; border: none; cursor: pointer;
+    background: rgba(255,255,255,0.10); color: #fff; font-size: 19px; display: flex; align-items: center; justify-content: center;
+    transition: opacity 0.15s, transform 0.12s, background 0.15s; }
+  .send:disabled { opacity: 0.3; } .send:active:not(:disabled) { transform: scale(0.9); }
+  .end { text-align: center; color: rgba(255,255,255,0.35); font-size: 0.85rem; padding: 10px; }
+</style>
+</head>
+<body>
+  <div class="amb"></div>
+  <div class="hero-slot"></div>
+  <div class="convo" id="convo"></div>
+  <div class="dock" id="dock"></div>
+
+<script>
+/* Scripted Clarity discovery in Malik's voice. Minimal, flowing.
+   types: ai lines type in; user answers appear in violet; choices = chips. */
+const TURNS = [
+  { ai: ["Before anything else, let's find the one thing that actually matters to you."] },
+  { ai: ["What do you want most right now?"], input: { kind: 'chips', options: ['Direction', 'Focus', 'Discipline', 'Meaning', 'Not sure yet'] } },
+  { ai: ["That tracks. Most people never even stop to ask."] },
+  { ai: ["What should I call you?"], input: { kind: 'text', placeholder: 'Your name', isName: true } },
+  { ai: (name) => ["Good to meet you, " + name + "."] },
+  { ai: ["When were you born?"], input: { kind: 'text', placeholder: 'Year, e.g. 1999' } },
+  { ai: ["Old enough to know what matters.", "And how fast it goes."] },
+  { ai: ["Last one. What keeps pulling you back?"], input: { kind: 'chips', options: ['My phone', 'Procrastination', 'Fear of failing', 'No time'] } },
+  { ai: ["None of those are permanent.", "Alright. Forging your Neutron Star..."], ignite: true }
+];
+
+const convo = document.getElementById('convo');
+const dock = document.getElementById('dock');
+let step = 0;
+let userName = 'you';
+
+function dimAll(){ convo.querySelectorAll('.line').forEach(l=>l.classList.add('dim')); }
+
+// FLIP: glide the existing lines from their old positions to their new ones
+// instead of snapping when a fresh line pushes the stack up.
+function flipKids(kids, before){
+  const after = kids.map(k => k.getBoundingClientRect().top);
+  kids.forEach((k, i) => {
+    const dy = before[i] - after[i];
+    if (Math.abs(dy) > 0.5) {
+      k.style.transition = 'none';
+      k.style.transform = `translateY(${dy}px)`;
+      requestAnimationFrame(() => {
+        k.style.transition = 'transform 0.55s cubic-bezier(0.22, 1, 0.36, 1)';
+        k.style.transform = '';
+      });
+    }
+  });
+}
+
+function typeLine(text){
+  return new Promise(res => {
+    dimAll();
+    const kids = [...convo.children];
+    const before = kids.map(k => k.getBoundingClientRect().top);
+    const el = document.createElement('div');
+    el.className = 'line line--enter';
+    // Reserve the line's FINAL height up front so the stack shifts ONCE
+    // (smoothly, via FLIP) instead of nudging on every typed character.
+    el.textContent = text;
+    convo.appendChild(el);
+    el.style.minHeight = el.offsetHeight + 'px';
+    el.textContent = '';
+    flipKids(kids, before);
+    requestAnimationFrame(() => el.classList.remove('line--enter'));
+    let i = 0;
+    const tick = () => {
+      el.textContent = text.slice(0, i);
+      i++;
+      if (i <= text.length) setTimeout(tick, 7 + Math.random()*9);
+      else setTimeout(res, 680); // longer beat between lines so each one lands
+    };
+    tick();
+  });
+}
+
+function addUser(text){
+  dimAll();
+  const kids = [...convo.children];
+  const before = kids.map(k => k.getBoundingClientRect().top);
+  const el = document.createElement('div');
+  el.className = 'line user line--enter';
+  el.textContent = text;
+  convo.appendChild(el);
+  flipKids(kids, before);
+  requestAnimationFrame(() => el.classList.remove('line--enter'));
+}
+
+async function aiSpeak(lines){
+  dock.innerHTML = '';
+  for (const ln of lines){ await typeLine(ln); }
+}
+
+function renderInput(input){
+  // FLIP the conversation: when the dock grows to fit the chips/box, the lines
+  // glide up to their new spot instead of popping.
+  const kids = [...convo.children];
+  const before = kids.map(k => k.getBoundingClientRect().top);
+  dock.innerHTML = '';
+  if (!input) { flipKids(kids, before); return; }
+  if (input.kind === 'chips'){
+    const wrap = document.createElement('div'); wrap.className = 'chips';
+    input.options.forEach(opt => {
+      const c = document.createElement('button'); c.className = 'chip'; c.textContent = opt;
+      c.onclick = () => answer(opt);
+      wrap.appendChild(c);
+    });
+    dock.appendChild(wrap);
+  } else {
+    const wrap = document.createElement('div'); wrap.className = 'composer';
+    const ta = document.createElement('textarea'); ta.rows = 1; ta.placeholder = input.placeholder || 'Type...';
+    const send = document.createElement('button'); send.className = 'send'; send.disabled = true; send.innerHTML = '&uarr;';
+    ta.oninput = () => { send.disabled = !ta.value.trim(); ta.style.height='auto'; ta.style.height=Math.min(120,ta.scrollHeight)+'px'; };
+    ta.onkeydown = (e) => { if (e.key==='Enter' && !e.shiftKey){ e.preventDefault(); if (ta.value.trim()) answer(ta.value.trim()); } };
+    send.onclick = () => { if (ta.value.trim()) answer(ta.value.trim()); };
+    wrap.appendChild(ta); wrap.appendChild(send); dock.appendChild(wrap);
+    setTimeout(()=>ta.focus(), 250);
+  }
+  flipKids(kids, before);
+}
+
+async function answer(text){
+  addUser(text);
+  const cur = TURNS[step];
+  if (cur && cur.input && cur.input.isName) userName = text.split(/\s+/)[0]; // remember name
+  step++;
+  await runStep();
+}
+
+async function runStep(){
+  if (step >= TURNS.length){ dock.innerHTML = '<div class="end">end of demo — just the look</div>'; return; }
+  const t = TURNS[step];
+  const lines = typeof t.ai === 'function' ? t.ai(userName) : t.ai;
+  await aiSpeak(lines);
+  if (t.ignite){ dock.innerHTML = '<div class="end">your Neutron Star ignites here (real asset)</div>'; return; }
+  if (t.input){ renderInput(t.input); }
+  else { step++; await runStep(); } // ai-only beat, continue
+}
+
+setTimeout(runStep, 600);
+</script>
+</body>
+</html>

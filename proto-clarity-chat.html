@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<!-- ============================================================================
+  CLARITY CHAT PROTOTYPE (standalone, safe sandbox)
+  A throwaway preview of the conversational "stacked chat" look for the Clarity
+  discovery, inspired by Opal-grade onboarding. NOT wired into the app. Iterate
+  here freely; we only port the look into the real module once Malik loves it.
+  Open at:  http://localhost:8090/proto-clarity-chat.html  (also via the tunnel)
+============================================================================= -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Clarity Chat — prototype</title>
+<style>
+  :root {
+    --bg: #0a0b10;
+    --ink: 255,255,255;
+    --text-hi: rgba(255,255,255,0.96);
+    --text-2: rgba(255,255,255,0.62);
+    --text-3: rgba(255,255,255,0.40);
+    --clarity: #7B61FF;
+    --surface-2: #1b1c24;
+    --r-sm: 8px; --r-ctrl: 10px; --r-card: 14px;
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Geist", "Inter", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; background: var(--bg); }
+  body {
+    font-family: var(--font);
+    color: var(--text-hi);
+    display: flex; flex-direction: column;
+    height: 100dvh; overflow: hidden;
+    position: relative;
+  }
+  /* God-ray ambient, top-left, clarity violet (Memento signature) */
+  .rays {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+  }
+  .rays::before {
+    content: ""; position: absolute;
+    top: -30%; left: -20%; width: 90%; height: 120%;
+    background:
+      conic-gradient(from 35deg at 20% 0%,
+        rgba(123,97,255,0.16) 0deg,
+        rgba(123,97,255,0.0) 22deg,
+        rgba(123,97,255,0.10) 40deg,
+        rgba(123,97,255,0.0) 60deg,
+        rgba(90,120,255,0.08) 78deg,
+        rgba(123,97,255,0.0) 100deg);
+    filter: blur(14px);
+    transform: rotate(8deg);
+    animation: drift 18s ease-in-out infinite alternate;
+  }
+  .rays::after {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(120% 80% at 18% -8%, rgba(123,97,255,0.10), transparent 55%);
+  }
+  @keyframes drift { from { opacity: 0.85; } to { opacity: 1; transform: rotate(11deg) translateY(10px); } }
+
+  /* Top bar: quiet progress + close */
+  .top {
+    position: relative; z-index: 2;
+    display: flex; align-items: center; gap: 12px;
+    padding: max(16px, env(safe-area-inset-top)) 18px 10px;
+  }
+  .bar { flex: 1; height: 3px; border-radius: 999px; background: rgba(255,255,255,0.10); overflow: hidden; }
+  .bar__fill { height: 100%; width: 8%; background: var(--clarity); border-radius: 999px; transition: width 0.5s cubic-bezier(0.16,1,0.3,1); box-shadow: 0 0 12px rgba(123,97,255,0.6); }
+  .x { width: 30px; height: 30px; border-radius: 50%; border: none; background: rgba(255,255,255,0.06); color: var(--text-2); font-size: 16px; cursor: pointer; }
+
+  /* Chat scroll area */
+  .chat {
+    position: relative; z-index: 1;
+    flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+    padding: 14px 18px 8px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .chat::-webkit-scrollbar { display: none; }
+
+  .bubble {
+    max-width: 80%;
+    padding: 13px 16px;
+    border-radius: var(--r-card);
+    font-size: 1.02rem; line-height: 1.42; letter-spacing: -0.01em;
+    white-space: pre-wrap; word-wrap: break-word;
+    animation: bubbleIn 0.42s cubic-bezier(0.34, 1.4, 0.5, 1);
+  }
+  .bubble--ai {
+    align-self: flex-start;
+    background: var(--surface-2);
+    color: var(--text-hi);
+    border-bottom-left-radius: 6px;
+    transform-origin: left bottom;
+  }
+  .bubble--user {
+    align-self: flex-end;
+    background: #f2f2f5; color: #0a0c14; font-weight: 500;
+    border-bottom-right-radius: 6px;
+    transform-origin: right bottom;
+  }
+  .bubble--faded { opacity: 0.55; transition: opacity 0.4s ease; }
+  @keyframes bubbleIn {
+    0% { opacity: 0; transform: translateY(14px) scale(0.85); }
+    60% { opacity: 1; }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  /* typing dots */
+  .typing { align-self: flex-start; display: inline-flex; gap: 5px; padding: 15px 18px; background: var(--surface-2); border-radius: var(--r-card); border-bottom-left-radius: 6px; }
+  .typing i { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.5); animation: blink 1.2s infinite both; }
+  .typing i:nth-child(2){ animation-delay: 0.2s; } .typing i:nth-child(3){ animation-delay: 0.4s; }
+  @keyframes blink { 0%,80%,100%{ opacity:0.25; transform: translateY(0);} 40%{ opacity:1; transform: translateY(-3px);} }
+
+  /* Bottom input dock: chips OR text, pinned */
+  .dock {
+    position: relative; z-index: 2;
+    padding: 10px 16px max(16px, env(safe-area-inset-bottom));
+    background: linear-gradient(to top, rgba(10,11,16,0.96) 60%, rgba(10,11,16,0));
+  }
+  .chips { display: flex; flex-direction: column; gap: 9px; }
+  .chip {
+    width: 100%; text-align: left;
+    font: inherit; font-size: 1rem; font-weight: 500;
+    color: var(--text-hi); background: rgba(255,255,255,0.05);
+    border: 1px solid transparent; border-radius: var(--r-ctrl);
+    padding: 15px 18px; cursor: pointer;
+    transition: background 0.15s ease, transform 0.12s ease;
+    -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+  }
+  .chip:active { transform: scale(0.98); background: rgba(123,97,255,0.18); }
+  .chip.is-on { background: rgba(123,97,255,0.20); color: #fff; }
+
+  .composer { display: flex; align-items: flex-end; gap: 10px; }
+  .composer textarea {
+    flex: 1; resize: none; font: inherit; font-size: 1.02rem; line-height: 1.4;
+    color: var(--text-hi); background: rgba(255,255,255,0.06);
+    border: 1px solid transparent; border-radius: var(--r-card);
+    padding: 13px 16px; max-height: 120px; outline: none;
+  }
+  .composer textarea::placeholder { color: var(--text-3); }
+  .send {
+    flex: none; width: 46px; height: 46px; border-radius: 50%;
+    border: none; cursor: pointer; background: #f2f2f5; color: #0a0c14;
+    font-size: 18px; display: flex; align-items: center; justify-content: center;
+    transition: opacity 0.15s ease, transform 0.12s ease;
+  }
+  .send:disabled { opacity: 0.3; }
+  .send:active:not(:disabled) { transform: scale(0.92); }
+  .multi-go {
+    margin-top: 4px; width: 100%; font: inherit; font-weight: 650; font-size: 1rem;
+    color: #0a0c14; background: #f2f2f5; border: none; border-radius: var(--r-ctrl);
+    padding: 15px; cursor: pointer; opacity: 0.35; pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+  .multi-go.ready { opacity: 1; pointer-events: auto; }
+
+  .hint { font-size: 0.78rem; color: var(--text-3); text-align: center; padding: 6px 0 2px; }
+</style>
+</head>
+<body>
+  <div class="rays"></div>
+
+  <div class="top">
+    <div class="bar"><div class="bar__fill" id="barFill"></div></div>
+    <button class="x" aria-label="Close">&times;</button>
+  </div>
+
+  <div class="chat" id="chat"></div>
+
+  <div class="dock" id="dock"></div>
+
+<script>
+/* ── A scripted Clarity discovery, in Malik's voice, to feel the look ──────────
+   types:  'chips'  (single pick, advances on tap)
+           'multi'  (pick several, Continue button)
+           'text'   (free type, send)
+   reply:  function(answer) -> the AI's next line(s). Returns string or array. */
+const SCRIPT = [
+  {
+    ai: "Alright, let's find the one thing that actually matters to you. No pressure, just be honest.\n\nFirst, do you know what you want to do with your life?",
+    type: 'chips',
+    options: ['Yeah, pretty much', 'Kinda', 'Not really'],
+    reply: (a) => a === 'Not really'
+      ? "I get that, and honestly most people never figure it out. That's exactly what this is for. Let's find your direction together.\n\nForget the perfect answer. What's something you'll do for hours without checking the time?"
+      : "Nice. So you've got a sense of it.\n\nWhat's the one thing you can't stop thinking about? The thing that keeps pulling at your attention.",
+    next: { type: 'text', placeholder: 'Type your answer...' }
+  },
+  {
+    ai: null, // set dynamically by previous reply
+    type: 'text',
+    reply: (a) => "Okay cool. Now let's get tangible. What would actually change in your life if you pulled this off?",
+    next: { type: 'text', placeholder: 'Be as real as you can...' }
+  },
+  {
+    ai: null,
+    type: 'text',
+    reply: (a) => "Good. And what keeps pulling you back from it right now?",
+    next: { type: 'multi', options: ['Procrastination', 'My phone', "Don't know where to start", "Can't stay consistent", 'Fear of failing', 'No time'] }
+  },
+  {
+    ai: null,
+    type: 'multi',
+    reply: (a) => "Yeah, that's most people. The good news is none of those are permanent.\n\nLast one. Out of everything you said, what's the ONE thing that matters most above all?",
+    next: { type: 'text', placeholder: 'The one thing...' }
+  },
+  {
+    ai: null,
+    type: 'text',
+    reply: (a) => "That's it. I think you already knew it, you just needed to say it out loud.\n\nForging your Neutron Star...",
+    next: null
+  }
+];
+
+const chat = document.getElementById('chat');
+const dock = document.getElementById('dock');
+const barFill = document.getElementById('barFill');
+let step = 0;
+
+function scrollDown() { requestAnimationFrame(() => { chat.scrollTop = chat.scrollHeight; }); }
+function fadeOld() { chat.querySelectorAll('.bubble').forEach(b => b.classList.add('bubble--faded')); }
+
+function addBubble(text, who) {
+  const b = document.createElement('div');
+  b.className = 'bubble bubble--' + who;
+  b.textContent = text;
+  chat.appendChild(b); scrollDown();
+  return b;
+}
+
+function showTyping() {
+  const t = document.createElement('div');
+  t.className = 'typing'; t.id = 'typing';
+  t.innerHTML = '<i></i><i></i><i></i>';
+  chat.appendChild(t); scrollDown();
+}
+function clearTyping() { const t = document.getElementById('typing'); if (t) t.remove(); }
+
+function setProgress() { barFill.style.width = Math.min(96, 8 + step * 20) + '%'; }
+
+function renderDock(stepDef) {
+  dock.innerHTML = '';
+  if (!stepDef) { dock.innerHTML = '<div class="hint">end of demo · this is just the look</div>'; return; }
+  if (stepDef.type === 'chips') {
+    const wrap = document.createElement('div'); wrap.className = 'chips';
+    stepDef.options.forEach(opt => {
+      const c = document.createElement('button'); c.className = 'chip'; c.textContent = opt;
+      c.onclick = () => answer(opt);
+      wrap.appendChild(c);
+    });
+    dock.appendChild(wrap);
+  } else if (stepDef.type === 'multi') {
+    const wrap = document.createElement('div'); wrap.className = 'chips';
+    const picked = new Set();
+    stepDef.options.forEach(opt => {
+      const c = document.createElement('button'); c.className = 'chip'; c.textContent = opt;
+      c.onclick = () => { if (picked.has(opt)) { picked.delete(opt); c.classList.remove('is-on'); } else { picked.add(opt); c.classList.add('is-on'); } go.classList.toggle('ready', picked.size > 0); };
+      wrap.appendChild(c);
+    });
+    const go = document.createElement('button'); go.className = 'multi-go'; go.textContent = 'Continue';
+    go.onclick = () => { if (picked.size) answer([...picked].join(', ')); };
+    dock.appendChild(wrap); dock.appendChild(go);
+  } else { // text
+    const wrap = document.createElement('div'); wrap.className = 'composer';
+    const ta = document.createElement('textarea'); ta.rows = 1; ta.placeholder = stepDef.placeholder || 'Type your answer...';
+    const send = document.createElement('button'); send.className = 'send'; send.disabled = true; send.innerHTML = '&uarr;';
+    ta.oninput = () => { send.disabled = !ta.value.trim(); ta.style.height = 'auto'; ta.style.height = Math.min(120, ta.scrollHeight) + 'px'; };
+    ta.onkeydown = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (ta.value.trim()) answer(ta.value.trim()); } };
+    send.onclick = () => { if (ta.value.trim()) answer(ta.value.trim()); };
+    wrap.appendChild(ta); wrap.appendChild(send);
+    dock.appendChild(wrap);
+    setTimeout(() => ta.focus(), 200);
+  }
+}
+
+function aiSay(text, after) {
+  dock.innerHTML = '';
+  showTyping();
+  setTimeout(() => { clearTyping(); addBubble(text, 'ai'); setTimeout(after, 350); }, 700 + Math.min(900, text.length * 9));
+}
+
+function answer(text) {
+  fadeOld();
+  addBubble(text, 'user');
+  const cur = SCRIPT[step];
+  const replyText = cur.reply ? cur.reply(text) : null;
+  const nextDef = cur.next;
+  step++;
+  setProgress();
+  if (replyText == null) { renderDock(null); return; }
+  aiSay(replyText, () => { renderDock(nextDef); });
+}
+
+// Boot
+function start() {
+  setProgress();
+  aiSay(SCRIPT[0].ai, () => renderDock({ type: SCRIPT[0].type, options: SCRIPT[0].options, placeholder: 'Type your answer...' }));
+}
+start();
+</script>
+</body>
+</html>
