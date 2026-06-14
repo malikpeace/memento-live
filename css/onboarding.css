@@ -1378,20 +1378,16 @@ body.calm-motion .welcome-intro__pillar-ground {
     animation: none !important;
     will-change: auto !important;
   }
-  /* Landing + auth beams: give each beam the SAME per-beam shimmer the modules
-     page uses on phones (ambientBeamGlimmer, defined in dashboard.css). It is
-     opacity-ONLY, so the 8px-blurred shaft rasterizes once and only opacity
-     rides the compositor: cheap, no crash risk, and the beams visibly shimmer
-     independently (staggered by their own --d/--del) instead of the whole image
-     rocking. Tighter blur = distinct streaks like the dashboard. */
+  /* Splash + auth beams keep their FULL desktop motion on phones: the same
+     per-beam ambientBeamFlicker (opacity + scaleY, staggered by each beam's own
+     --d/--del) that already looks good on desktop. The blanket freeze above is
+     for the ~110 always-on ambient layers across the app; the splash is a single
+     transient screen, so its dozen beams flickering is cheap and worth it. */
   .splash__rays .ambient__rays-beam-shaft,
   .auth-screen__rays .ambient__rays-beam-shaft {
-    filter: blur(8px);
-    transform: none;
-    opacity: min(1, calc(var(--omax, 0.5) * 2));
-    animation: ambientBeamGlimmer calc(var(--d, 10s) * 1.8) ease-in-out infinite !important;
+    animation: ambientBeamFlicker var(--d, 10s) ease-in-out infinite !important;
     animation-delay: var(--del, 0s);
-    will-change: opacity;
+    will-change: opacity, transform;
   }
 }
 
