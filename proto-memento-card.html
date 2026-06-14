@@ -99,6 +99,29 @@
     pointer-events: none; z-index: 2;
   }
 
+  /* ── Burning energy ring: bright arcs traced around the card edge that slowly
+     sweep + glimmer. Intensity = var(--ring). ───────────────────────────── */
+  @property --ring-rot { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+  .daycard-ns__burn {
+    content: ""; position: absolute; inset: 0;
+    border-radius: inherit; padding: 2px; z-index: 3; pointer-events: none;
+    opacity: var(--ring, 0);
+    background: conic-gradient(from var(--ring-rot),
+      rgba(190,205,255,0) 0%, rgba(210,222,255,0.95) 7%, rgba(255,255,255,0.85) 13%, rgba(190,205,255,0) 22%,
+      rgba(190,205,255,0) 47%, rgba(214,205,255,0.9) 57%, rgba(255,255,255,0.8) 64%, rgba(190,205,255,0) 76%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            mask-composite: exclude;
+    filter: drop-shadow(0 0 6px rgba(205,216,255,0.85));
+    animation: ringRot 32s linear infinite, ringGlimmer 3.6s ease-in-out infinite;
+  }
+  @keyframes ringRot { to { --ring-rot: 360deg; } }
+  @keyframes ringGlimmer {
+    0%,100% { filter: drop-shadow(0 0 4px rgba(200,212,255,0.55)); }
+    50%     { filter: drop-shadow(0 0 11px rgba(224,232,255,1)); }
+  }
+
   /* ── Liquid color layer: soft blurred blobs (purple/white/green) ───────── */
   /* Bigger + brighter than v1 so the color fills the card, with a gentle slow
      drift + breathe so it feels alive without being frantic. */
@@ -218,6 +241,7 @@
       </span>
       <span class="daycard-ns__iri" aria-hidden="true"></span>
       <span class="daycard-ns__sheen" aria-hidden="true"></span>
+      <span class="daycard-ns__burn" aria-hidden="true"></span>
       <div class="daycard-ns__body">
         <svg class="daycard-ns__emblem" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
       </div>
@@ -240,6 +264,7 @@
     <div class="row"><label>Consistency</label><span class="dot" style="background:#38e896"></span><input id="s3" type="range" min="0" max="100" value="0" step="1"><span class="out" id="o3">0</span></div>
     <div class="row"><label>Red (test)</label><span class="dot" style="background:#ff4856"></span><input id="s4" type="range" min="0" max="100" value="0" step="1"><span class="out" id="o4">0</span></div>
     <div class="row"><label>Border glow</label><span class="dot" style="background:#cdd6ff"></span><input id="sGlow" type="range" min="0" max="100" value="40" step="1"><span class="out" id="oGlow">40</span></div>
+    <div class="row"><label>Burning ring</label><span class="dot" style="background:#dfe6ff"></span><input id="sRing" type="range" min="0" max="100" value="30" step="1"><span class="out" id="oRing">30</span></div>
     <div class="row"><label>Saturation</label><span class="dot" style="background:#b06cff"></span><input id="sSat" type="range" min="0" max="100" value="50" step="1"><span class="out" id="oSat">1.5x</span></div>
     <div class="row"><label>Motion</label><span class="dot" style="background:#c9c9dc"></span><input id="sMotion" type="range" min="1" max="100" value="20" step="1"><span class="out" id="oMotion">2.0x</span></div>
     <div class="hint">Border glow + saturation + motion (0-10x). Tell me the values you like and I'll bake them in.</div>
@@ -255,19 +280,25 @@
 
   var sGlow = document.getElementById('sGlow'), oGlow = document.getElementById('oGlow');
   var sSat = document.getElementById('sSat'), oSat = document.getElementById('oSat');
+  var sRing = document.getElementById('sRing'), oRing = document.getElementById('oRing');
 
-  // The card's edge glow: an inner ethereal ring + an outer halo, both scaled by
-  // the Border-glow slider (and a touch by overall progress).
+  // The card's edge glow: an inner ethereal ring + an outer halo (Border-glow),
+  // plus the outward burn of the energy ring (Burning-ring), as box-shadows.
   function renderShadow() {
     var v = s.map(function (el) { return +el.value; });
     var tot = (v[0] + v[1] + v[2] + v[3]) / 400;
     var g = (+sGlow.value) / 100;
+    var r = (+sRing.value) / 100;
     var rimA = (0.20 + 0.16 * tot + 0.50 * g).toFixed(3);
     var innerR = Math.round(8 + 30 * g), innerA = (0.04 + 0.26 * g).toFixed(3);
     var haloR = Math.round(34 + 95 * g), haloA = (0.05 + 0.10 * tot + 0.34 * g).toFixed(3);
+    var ringSpread = (0.6 + 1.6 * r).toFixed(2), ringA = (0.85 * r).toFixed(3);
+    var ringGlowR = Math.round(6 + 34 * r), ringGlowA = (0.7 * r).toFixed(3);
     card.style.boxShadow =
       'inset 0 1px 0 rgba(255,255,255,' + rimA + '),' +
       'inset 0 0 ' + innerR + 'px rgba(222,230,255,' + innerA + '),' +
+      '0 0 0 ' + ringSpread + 'px rgba(212,224,255,' + ringA + '),' +
+      '0 0 ' + ringGlowR + 'px rgba(206,218,255,' + ringGlowA + '),' +
       '0 0 ' + haloR + 'px rgba(205,214,255,' + haloA + '),' +
       '0 26px 60px rgba(0,0,0,0.45)';
   }
@@ -292,10 +323,16 @@
     document.body.style.setProperty('--sat', sat.toFixed(3));
     oSat.textContent = sat.toFixed(1) + 'x';
   }
+  function applyRing() {
+    document.body.style.setProperty('--ring', ((+sRing.value) / 100).toFixed(3));
+    oRing.textContent = Math.round(+sRing.value);
+    renderShadow();
+  }
   function clearActive() { presets.querySelectorAll('button').forEach(function (b) { b.classList.remove('is-active'); }); }
   s.forEach(function (el) { el.addEventListener('input', function () { clearActive(); apply(); }); });
   sGlow.addEventListener('input', applyGlow);
   sSat.addEventListener('input', applySat);
+  sRing.addEventListener('input', applyRing);
 
   var presets = document.getElementById('presets');
   presets.addEventListener('click', function (e) {
@@ -333,6 +370,7 @@
   presets.querySelector('button').classList.add('is-active');
   applyGlow();
   applySat();
+  applyRing();
   apply();
 })();
 </script>
