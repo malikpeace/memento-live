@@ -96,6 +96,11 @@
     transform: perspective(900px) rotateX(var(--dc-rx, 0deg)) rotateY(var(--dc-ry, 0deg));
     transition: transform 0.18s ease-out;
     will-change: transform;
+    /* Ground reflection: a real mirror of the card on the surface below, fading
+       out over ~46% so you read the card sitting on a reflective ground (with a
+       faint horizon seam at the offset). Pairs with the coloured presence light. */
+    -webkit-box-reflect: below 4px linear-gradient(to bottom,
+      rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.30) 14%, rgba(0,0,0,0.10) 32%, rgba(0,0,0,0.02) 46%, transparent 56%);
   }
   /* Presence light: a pool of color-matched light cast on the surface UNDER the
      card's bottom edge (not a mirror). Each layer glows the card's own hue and
@@ -118,7 +123,7 @@
   .floor-cons { background: radial-gradient(62% 118% at 50% 0%, rgba(56,236,150,0.9), transparent 72%); opacity: var(--cons); }
   .floor-red  { background: radial-gradient(62% 118% at 50% 0%, rgba(255,72,86,0.9), transparent 72%); opacity: var(--red); }
   /* room for the reflection so it does not crowd the controls */
-  .daycard-wrap { margin-bottom: 34px; }
+  .daycard-wrap { margin-bottom: 90px; }
   /* Liquid-glass rim: a masked gradient ring (NOT a border). */
   .daycard-ns::before {
     content: ""; position: absolute; inset: 0;
