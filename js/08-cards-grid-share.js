@@ -3266,7 +3266,12 @@ function renderDayCard() {
     const el = document.getElementById('dayCard');
     if (!el) return;
     try { if (/[?&]daycard=1/.test(location.search)) document.body.classList.add('daycard-force'); } catch (e) {}
-    if ((typeof isBrandNewUser === 'function' && isBrandNewUser()) || !state.clarity || !state.clarity.completed) { stopLivingWander(); el.innerHTML = ''; return; }
+    // Show the card for anyone who is past the brand-new state. isBrandNewUser()
+    // already returns false once they have data (e.g. a birth year from
+    // onboarding), and its own rule is that such a user "must see their card",
+    // so we no longer also require Clarity to be completed (that left freshly
+    // onboarded users staring at an empty home).
+    if (typeof isBrandNewUser === 'function' && isBrandNewUser()) { stopLivingWander(); el.innerHTML = ''; return; }
 
     // Theme: 'platinum' (classic glass) or 'living' (color-morph + reflection).
     const theme = (state.dayCard && state.dayCard.theme === 'living') ? 'living' : 'platinum';
