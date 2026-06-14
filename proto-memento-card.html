@@ -101,58 +101,32 @@
     backdrop-filter: blur(calc(5px * var(--bx, 1))) saturate(1.25);
     overflow: hidden;
   }
-  /* Ground reflection: the card sits on a reflective surface. A bright HORIZON
-     line marks where card meets ground, and below it a color-matched reflection
-     glow fades down. Both pick up the card's own hues (per-pillar layers) and
-     the whole thing is gated by --lit, so an empty card has no ground at all and
-     a filled one is grounded by its colour mirrored onto the floor. */
+  /* Ground reflection: a true vertical MIRROR of the card's colour layer, cloned
+     below the card and flipped (scaleY(-1)) so it sits BEHIND the card (z 0) and
+     is spatially accurate, red on the card's right stays red on the right of the
+     reflection, and it tracks the colours as they wander (same JS drives it). A
+     downward fade mask makes it read as a reflection; gated by --lit so empty
+     has no ground. Width/brightness/depth are the Reflect sliders. */
   .daycard-floor {
     position: absolute; left: 50%; top: 100%;
-    transform: translateX(-50%);
-    width: 100%; height: calc(var(--rfl-d, 15) * 1%); z-index: 0;
-    pointer-events: none;
-    opacity: calc(var(--lit, 0) * var(--rfl-i, 1)); transition: opacity 0.6s ease;
+    transform: translateX(-50%) scaleY(-1);
+    transform-origin: center center;
+    width: calc(100% + var(--rfl-w, 10) * 2%);
+    height: calc(var(--rfl-d, 42) * 1%); z-index: 0;
+    pointer-events: none; overflow: hidden;
+    border-radius: 0 0 var(--r-card) var(--r-card);
+    opacity: calc(var(--lit, 0) * var(--rfl-i, 1));
+    filter: blur(9px) saturate(var(--sat, 1.5));
+    transition: opacity 0.6s ease;
+    /* flipped coords: local-bottom = the edge touching the card = brightest */
+    -webkit-mask-image: linear-gradient(to top, #000 0%, rgba(0,0,0,0.5) 42%, transparent 86%);
+            mask-image: linear-gradient(to top, #000 0%, rgba(0,0,0,0.5) 42%, transparent 86%);
   }
-  .daycard-floor i { mix-blend-mode: screen; transition: opacity 0.6s ease; }
-  /* the glowing reflection LINE: a vibrant, hued streak right under the card,
-     extending a touch past the card's width on each side to read 3-D. Each
-     pillar adds its own colour, brightest in the centre and fading at the ends. */
-  /* The line mirrors the card's BOTTOM edge, so it is weighted to the pillars
-     that live low on the card: consistency (green) and action (white) read full,
-     clarity (purple, which lives at the TOP) only faintly bleeds down. That is
-     why the line goes green here, not purple. Vibrant colour, crisp, barely
-     blurred so it reads as a real glowing line, not a wash. */
-  /* HORIZONTAL gradients so the glow stays bright right out to the element's far
-     ends (which sit well past the card) instead of fading in the middle. */
-  .daycard-floor .refl-line {
-    position: absolute;
-    left: calc(var(--rfl-w, 10) * -1%); right: calc(var(--rfl-w, 10) * -1%);
-    top: -4px; height: 10px;
-    filter: blur(3px);
+  .daycard-floor .blob {
+    position: absolute; border-radius: 50%;
+    mix-blend-mode: screen; will-change: transform;
+    transition: opacity 0.6s ease;
   }
-  .line-clar { background: linear-gradient(90deg, transparent 2%, rgba(150,116,255,0.8) 16%, rgba(150,116,255,1) 50%, rgba(150,116,255,0.8) 84%, transparent 98%); opacity: calc(var(--clar) * 0.35); }
-  .line-act  { background: linear-gradient(90deg, transparent 2%, rgba(236,239,255,0.8) 16%, rgba(236,239,255,1) 50%, rgba(236,239,255,0.8) 84%, transparent 98%); opacity: calc(var(--act) * 0.85); }
-  .line-cons { background: linear-gradient(90deg, transparent 2%, rgba(56,236,150,0.8) 16%, rgba(56,236,150,1) 50%, rgba(56,236,150,0.8) 84%, transparent 98%); opacity: var(--cons); }
-  .line-red  { background: linear-gradient(90deg, transparent 2%, rgba(255,72,86,0.8) 16%, rgba(255,72,86,1) 50%, rgba(255,72,86,0.8) 84%, transparent 98%); opacity: var(--red); }
-  /* a subtle bright core for the hot centre, kept low so the HUE stays dominant */
-  .daycard-floor .refl-core {
-    position: absolute;
-    left: calc((var(--rfl-w, 10) - 6) * -1%); right: calc((var(--rfl-w, 10) - 6) * -1%);
-    top: -2px; height: 4px;
-    filter: blur(2px);
-    background: linear-gradient(90deg, transparent 8%, rgba(248,250,255,0.8) 50%, transparent 92%);
-    opacity: calc(var(--lit, 0) * 0.42);
-  }
-  /* the reflection BODY: short, color-matched spill that fades quickly, same
-     bottom-weighting as the line so it stays the card's hue, not a white pool. */
-  .daycard-floor .refl {
-    position: absolute; left: -6%; right: -6%; top: 6px; bottom: 0;
-    filter: blur(16px);
-  }
-  .refl-clar { background: radial-gradient(60% 86% at 50% 0%, rgba(150,116,255,0.55), transparent 78%); opacity: calc(var(--clar) * 0.35); }
-  .refl-act  { background: radial-gradient(60% 86% at 50% 0%, rgba(236,239,255,0.5), transparent 78%); opacity: calc(var(--act) * 0.6); }
-  .refl-cons { background: radial-gradient(60% 86% at 50% 0%, rgba(56,236,150,0.6), transparent 78%); opacity: var(--cons); }
-  .refl-red  { background: radial-gradient(60% 86% at 50% 0%, rgba(255,72,86,0.6), transparent 78%); opacity: var(--red); }
   /* room for the reflection so it does not crowd the controls */
   .daycard-wrap { margin-bottom: 110px; }
   /* Liquid-glass rim: a masked gradient ring (NOT a border). */
@@ -317,9 +291,7 @@
       <i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i><i class="blob b4"></i><i class="blob b5"></i><i class="blob b6"></i>
     </span>
     <span class="daycard-floor" aria-hidden="true">
-      <i class="refl refl-clar"></i><i class="refl refl-act"></i><i class="refl refl-cons"></i><i class="refl refl-red"></i>
-      <i class="refl-line line-clar"></i><i class="refl-line line-act"></i><i class="refl-line line-cons"></i><i class="refl-line line-red"></i>
-      <i class="refl-core"></i>
+      <i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i><i class="blob b4"></i><i class="blob b5"></i><i class="blob b6"></i>
     </span>
     <div class="daycard-ns" id="card">
       <span class="daycard-ns__liquid" aria-hidden="true">
@@ -356,7 +328,7 @@
     <div class="row"><label>Motion</label><span class="dot" style="background:#c9c9dc"></span><input id="sMotion" type="range" min="1" max="100" value="20" step="1"><span class="out" id="oMotion">2.0x</span></div>
     <div class="row"><label>Reflect width</label><span class="dot" style="background:#9fb4ff"></span><input id="sRflW" type="range" min="0" max="60" value="10" step="1"><span class="out" id="oRflW">10</span></div>
     <div class="row"><label>Reflect glow</label><span class="dot" style="background:#cfe0ff"></span><input id="sRflI" type="range" min="0" max="200" value="100" step="1"><span class="out" id="oRflI">100</span></div>
-    <div class="row"><label>Reflect depth</label><span class="dot" style="background:#8ad6b0"></span><input id="sRflD" type="range" min="0" max="45" value="15" step="1"><span class="out" id="oRflD">15</span></div>
+    <div class="row"><label>Reflect depth</label><span class="dot" style="background:#8ad6b0"></span><input id="sRflD" type="range" min="0" max="80" value="42" step="1"><span class="out" id="oRflD">42</span></div>
     <div class="hint">Reflect width = how far past the card; glow = brightness; depth = how far down. Tell me the values you like and I'll bake them in.</div>
   </div>
 
@@ -490,6 +462,7 @@
     if (reduce) return;
     var inside = [].slice.call(document.querySelectorAll('.daycard-ns__liquid .blob'));
     var bloom = [].slice.call(document.querySelectorAll('.daycard-bloom .blob'));
+    var mirror = [].slice.call(document.querySelectorAll('.daycard-floor .blob'));
     if (!inside.length) return;
     var R = function (a, b) { return a + Math.random() * (b - a); };
     var st = inside.map(function () { return { x: 0, y: 0, sc: 1, tx: R(-20, 20), ty: R(-18, 18), tsc: R(0.92, 1.16) }; });
@@ -505,6 +478,7 @@
         var tf = 'translate(' + b.x.toFixed(2) + '%,' + b.y.toFixed(2) + '%) scale(' + b.sc.toFixed(3) + ')';
         inside[i].style.transform = tf;
         if (bloom[i]) bloom[i].style.transform = tf;
+        if (mirror[i]) mirror[i].style.transform = tf;
       }
       requestAnimationFrame(frame);
     }
