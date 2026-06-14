@@ -2663,6 +2663,28 @@ body.daycard-force #dayCard { display: block; max-width: 430px; }
   body:not(.ns-bloom) #dailyMemento,
   body:not(.ns-bloom) #dashGreetingMobile { display: none; }
 }
+/* Wide desktop: two-column layout. The Memento card sits to the LEFT (sticky),
+   the dashboard (command center + daily line + module grid) fills the right,
+   instead of the card sitting on top of everything. */
+@media (min-width: 1024px) {
+  .app.dash-v2 {
+    display: grid;
+    grid-template-columns: 360px minmax(0, 1fr);
+    column-gap: 48px;
+    align-items: start;
+    max-width: 1200px;
+  }
+  .app.dash-v2 > .dash-header,
+  .app.dash-v2 > .creator-box { grid-column: 1 / -1; }
+  .app.dash-v2 > #dayCard {
+    grid-column: 1;
+    grid-row: auto / span 50;
+    align-self: start;
+    position: sticky; top: 28px;
+    margin: 0;
+  }
+  #commandCenter, #dailyMemento, #widgetGrid, #dashGreetingMobile { grid-column: 2; }
+}
 /* The swipe cue: a whisper at the bottom of the hero screen. Dissolves as
    soon as scrolling starts (JS toggles .is-hidden). */
 .daycard-hint {
