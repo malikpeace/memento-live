@@ -16,6 +16,17 @@
                > .daycard-ns__liquid (color blobs) + __burn + (iri/sheen/body/foot)
    ============================================================================ */
 
+/* Before the Neutron Star is locked in (no body.ns-bloom), the card has NO life
+   yet: no colour, no bloom, no reflection, no edge-burn. It reads as the blank
+   platinum glass until the user has actually started. The colour is earned. */
+body:not(.ns-bloom) .daycard-theme-living .daycard-ns__liquid,
+body:not(.ns-bloom) .daycard-theme-living .daycard-bloom,
+body:not(.ns-bloom) .daycard-theme-living .daycard-floor,
+body:not(.ns-bloom) .daycard-theme-living .daycard-ns__burn,
+body:not(.ns-bloom) .daycard-theme-living .daycard-wrap__aura {
+  opacity: 0 !important;
+}
+
 .daycard-theme-living {
   /* baked look constants (the values Malik liked in the prototype) */
   --glow: 0.4;     /* aura brightness */

@@ -2656,6 +2656,12 @@ body.daycard-force #dayCard { display: block; max-width: 430px; }
   #dayCard .daycard-theme-platinum .daycard-ns { width: 320px; margin: 0; }
   #dayCard .daycard-theme-living .daycard-living-stage { width: 320px; margin: 0 0 26px; }
   #dayCard .daycard-ns { min-height: 440px; }
+  /* Before the Neutron Star, the desktop is just the (blank) card + the one
+     "Start your Neutron Star" CTA on black. The module grid and daily line are
+     hidden until the star is locked in (body.ns-bloom). */
+  body:not(.ns-bloom) #widgetGrid,
+  body:not(.ns-bloom) #dailyMemento,
+  body:not(.ns-bloom) #dashGreetingMobile { display: none; }
 }
 /* The swipe cue: a whisper at the bottom of the hero screen. Dissolves as
    soon as scrolling starts (JS toggles .is-hidden). */
