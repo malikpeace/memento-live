@@ -2835,17 +2835,9 @@ body.daycard-force #dayCard { display: block; max-width: 430px; }
   display: flex; align-items: center; justify-content: flex-end; gap: 10px;
   min-height: 26px;
 }
-/* Cardholder line, engraved: uppercase, tracked wide, sunk deep into the
-   bottom-left corner of the glass (absolute, tighter than the card padding). */
-.daycard-ns__name {
-  position: absolute; left: -3px; bottom: -3px;
-  font-size: 0.62rem; font-weight: 600; letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: rgba(var(--ink), 0.34);
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  max-width: 60%;
-}
+/* Cardholder name removed (Malik): no engraved name in the bottom-left corner
+   of the Memento card, anywhere it renders. */
+.daycard-ns__name { display: none; }
 /* Light theme: the lavender aura sits on near-white; deepen it slightly. */
 html.theme-light .daycard-wrap__aura {
   background: radial-gradient(closest-side,
