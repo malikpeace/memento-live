@@ -55,7 +55,7 @@
     pointer-events: none;
     background: radial-gradient(closest-side,
       rgba(215, 220, 250, 0.16), rgba(150, 160, 235, 0.06) 48%, transparent 72%);
-    filter: blur(28px);
+    filter: blur(28px) brightness(calc(0.7 + 1.7 * var(--glow, 0.4)));
     animation: dayCardBreath calc(7s / var(--speed,1)) ease-in-out infinite alternate;
   }
   @keyframes dayCardBreath {
@@ -104,7 +104,7 @@
      drift + breathe so it feels alive without being frantic. */
   .daycard-ns__liquid {
     position: absolute; inset: -28%; pointer-events: none;
-    filter: blur(30px) saturate(1.5);
+    filter: blur(30px) saturate(var(--sat, 1.5));
   }
   .daycard-ns__liquid .blob {
     position: absolute; border-radius: 50%;
@@ -239,8 +239,10 @@
     <div class="row"><label>Action</label><span class="dot" style="background:#ffffff"></span><input id="s2" type="range" min="0" max="100" value="0" step="1"><span class="out" id="o2">0</span></div>
     <div class="row"><label>Consistency</label><span class="dot" style="background:#38e896"></span><input id="s3" type="range" min="0" max="100" value="0" step="1"><span class="out" id="o3">0</span></div>
     <div class="row"><label>Red (test)</label><span class="dot" style="background:#ff4856"></span><input id="s4" type="range" min="0" max="100" value="0" step="1"><span class="out" id="o4">0</span></div>
-    <div class="row"><label>Motion</label><span class="dot" style="background:#c9c9dc"></span><input id="sMotion" type="range" min="1" max="100" value="25" step="1"><span class="out" id="oMotion">2.5x</span></div>
-    <div class="hint">Motion scales all the drift, 0 to 10x. Tell me the x value you like and I'll bake it in.</div>
+    <div class="row"><label>Border glow</label><span class="dot" style="background:#cdd6ff"></span><input id="sGlow" type="range" min="0" max="100" value="40" step="1"><span class="out" id="oGlow">40</span></div>
+    <div class="row"><label>Saturation</label><span class="dot" style="background:#b06cff"></span><input id="sSat" type="range" min="0" max="100" value="50" step="1"><span class="out" id="oSat">1.5x</span></div>
+    <div class="row"><label>Motion</label><span class="dot" style="background:#c9c9dc"></span><input id="sMotion" type="range" min="1" max="100" value="20" step="1"><span class="out" id="oMotion">2.0x</span></div>
+    <div class="hint">Border glow + saturation + motion (0-10x). Tell me the values you like and I'll bake them in.</div>
   </div>
 
 <script>
@@ -251,6 +253,24 @@
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var vars = ['--clar', '--act', '--cons', '--red'];
 
+  var sGlow = document.getElementById('sGlow'), oGlow = document.getElementById('oGlow');
+  var sSat = document.getElementById('sSat'), oSat = document.getElementById('oSat');
+
+  // The card's edge glow: an inner ethereal ring + an outer halo, both scaled by
+  // the Border-glow slider (and a touch by overall progress).
+  function renderShadow() {
+    var v = s.map(function (el) { return +el.value; });
+    var tot = (v[0] + v[1] + v[2] + v[3]) / 400;
+    var g = (+sGlow.value) / 100;
+    var rimA = (0.20 + 0.16 * tot + 0.50 * g).toFixed(3);
+    var innerR = Math.round(8 + 30 * g), innerA = (0.04 + 0.26 * g).toFixed(3);
+    var haloR = Math.round(34 + 95 * g), haloA = (0.05 + 0.10 * tot + 0.34 * g).toFixed(3);
+    card.style.boxShadow =
+      'inset 0 1px 0 rgba(255,255,255,' + rimA + '),' +
+      'inset 0 0 ' + innerR + 'px rgba(222,230,255,' + innerA + '),' +
+      '0 0 ' + haloR + 'px rgba(205,214,255,' + haloA + '),' +
+      '0 26px 60px rgba(0,0,0,0.45)';
+  }
   function apply() {
     var v = s.map(function (el) { return +el.value; });
     for (var i = 0; i < 4; i++) {
@@ -259,14 +279,23 @@
     }
     // blend blob appears only when clarity AND consistency are both present
     card.style.setProperty('--mix', (Math.min(v[0], v[2]) / 100 * 0.75).toFixed(3));
-    var tot = (v[0] + v[1] + v[2] + v[3]) / 400;
-    card.style.boxShadow =
-      'inset 0 1px 0 rgba(255,255,255,' + (0.22 + 0.20 * tot).toFixed(2) + '),' +
-      '0 0 48px rgba(200,210,255,' + (0.10 + 0.18 * tot).toFixed(2) + '),' +
-      '0 26px 60px rgba(0,0,0,0.45)';
+    renderShadow();
+  }
+  function applyGlow() {
+    var g = (+sGlow.value) / 100;
+    document.body.style.setProperty('--glow', g.toFixed(3));
+    oGlow.textContent = Math.round(+sGlow.value);
+    renderShadow();
+  }
+  function applySat() {
+    var sat = (+sSat.value) / 100 * 3;   // 0 .. 3.0
+    document.body.style.setProperty('--sat', sat.toFixed(3));
+    oSat.textContent = sat.toFixed(1) + 'x';
   }
   function clearActive() { presets.querySelectorAll('button').forEach(function (b) { b.classList.remove('is-active'); }); }
   s.forEach(function (el) { el.addEventListener('input', function () { clearActive(); apply(); }); });
+  sGlow.addEventListener('input', applyGlow);
+  sSat.addEventListener('input', applySat);
 
   var presets = document.getElementById('presets');
   presets.addEventListener('click', function (e) {
@@ -302,6 +331,8 @@
   }
 
   presets.querySelector('button').classList.add('is-active');
+  applyGlow();
+  applySat();
   apply();
 })();
 </script>
