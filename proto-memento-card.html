@@ -117,30 +117,36 @@
   /* the glowing reflection LINE: a vibrant, hued streak right under the card,
      extending a touch past the card's width on each side to read 3-D. Each
      pillar adds its own colour, brightest in the centre and fading at the ends. */
+  /* The line mirrors the card's BOTTOM edge, so it is weighted to the pillars
+     that live low on the card: consistency (green) and action (white) read full,
+     clarity (purple, which lives at the TOP) only faintly bleeds down. That is
+     why the line goes green here, not purple. Vibrant colour, crisp, barely
+     blurred so it reads as a real glowing line, not a wash. */
   .daycard-floor .refl-line {
-    position: absolute; left: -13%; right: -13%; top: -5px; height: 12px;
-    filter: blur(4px);
+    position: absolute; left: -13%; right: -13%; top: -4px; height: 11px;
+    filter: blur(3px);
   }
-  .line-clar { background: radial-gradient(50% 130% at 50% 50%, rgba(150,116,255,0.95), transparent 70%); opacity: var(--clar); }
-  .line-act  { background: radial-gradient(50% 130% at 50% 50%, rgba(236,239,255,0.95), transparent 70%); opacity: calc(var(--act) * 0.9); }
-  .line-cons { background: radial-gradient(50% 130% at 50% 50%, rgba(56,236,150,0.98), transparent 70%); opacity: var(--cons); }
-  .line-red  { background: radial-gradient(50% 130% at 50% 50%, rgba(255,72,86,0.98), transparent 70%); opacity: var(--red); }
-  /* a bright near-white core inside the line so it glows with real energy */
+  .line-clar { background: radial-gradient(50% 130% at 50% 50%, rgba(150,116,255,1), transparent 70%); opacity: calc(var(--clar) * 0.35); }
+  .line-act  { background: radial-gradient(50% 130% at 50% 50%, rgba(236,239,255,1), transparent 70%); opacity: calc(var(--act) * 0.85); }
+  .line-cons { background: radial-gradient(50% 130% at 50% 50%, rgba(56,236,150,1), transparent 70%); opacity: var(--cons); }
+  .line-red  { background: radial-gradient(50% 130% at 50% 50%, rgba(255,72,86,1), transparent 70%); opacity: var(--red); }
+  /* a subtle bright core for the hot centre, kept low so the HUE stays dominant */
   .daycard-floor .refl-core {
-    position: absolute; left: -6%; right: -6%; top: -2px; height: 5px;
-    filter: blur(2.5px);
-    background: radial-gradient(44% 120% at 50% 50%, rgba(248,250,255,0.92), transparent 72%);
-    opacity: calc(var(--lit, 0) * 0.9);
+    position: absolute; left: -4%; right: -4%; top: -2px; height: 4px;
+    filter: blur(2px);
+    background: radial-gradient(40% 120% at 50% 50%, rgba(248,250,255,0.85), transparent 72%);
+    opacity: calc(var(--lit, 0) * 0.42);
   }
-  /* the reflection BODY: softer colour spilling down under the line, fading out */
+  /* the reflection BODY: short, color-matched spill that fades quickly, same
+     bottom-weighting as the line so it stays the card's hue, not a white pool. */
   .daycard-floor .refl {
-    position: absolute; left: 9%; right: 9%; top: 9px; bottom: 0;
-    filter: blur(20px);
+    position: absolute; left: 11%; right: 11%; top: 8px; bottom: 18%;
+    filter: blur(18px);
   }
-  .refl-clar { background: radial-gradient(60% 86% at 50% 0%, rgba(150,116,255,0.5), transparent 78%); opacity: var(--clar); }
-  .refl-act  { background: radial-gradient(60% 86% at 50% 0%, rgba(236,239,255,0.52), transparent 78%); opacity: calc(var(--act) * 0.7); }
-  .refl-cons { background: radial-gradient(60% 86% at 50% 0%, rgba(56,236,150,0.55), transparent 78%); opacity: var(--cons); }
-  .refl-red  { background: radial-gradient(60% 86% at 50% 0%, rgba(255,72,86,0.55), transparent 78%); opacity: var(--red); }
+  .refl-clar { background: radial-gradient(60% 86% at 50% 0%, rgba(150,116,255,0.55), transparent 78%); opacity: calc(var(--clar) * 0.35); }
+  .refl-act  { background: radial-gradient(60% 86% at 50% 0%, rgba(236,239,255,0.5), transparent 78%); opacity: calc(var(--act) * 0.6); }
+  .refl-cons { background: radial-gradient(60% 86% at 50% 0%, rgba(56,236,150,0.6), transparent 78%); opacity: var(--cons); }
+  .refl-red  { background: radial-gradient(60% 86% at 50% 0%, rgba(255,72,86,0.6), transparent 78%); opacity: var(--red); }
   /* room for the reflection so it does not crowd the controls */
   .daycard-wrap { margin-bottom: 110px; }
   /* Liquid-glass rim: a masked gradient ring (NOT a border). */
