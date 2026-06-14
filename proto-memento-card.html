@@ -108,19 +108,21 @@
      downward fade mask makes it read as a reflection; gated by --lit so empty
      has no ground. Width/brightness/depth are the Reflect sliders. */
   .daycard-floor {
-    position: absolute; left: 50%; top: 100%;
+    position: absolute; left: 50%; top: calc(100% - 14px);
     transform: translateX(-50%) scaleY(-1);
     transform-origin: center center;
     width: calc(100% + var(--rfl-w, 10) * 2%);
     height: calc(var(--rfl-d, 42) * 1%); z-index: 0;
     pointer-events: none; overflow: hidden;
-    border-radius: 0 0 var(--r-card) var(--r-card);
+    border-radius: var(--r-card);
     opacity: calc(var(--lit, 0) * var(--rfl-i, 1));
-    filter: blur(9px) saturate(var(--sat, 1.5));
+    filter: blur(13px) saturate(var(--sat, 1.5));
     transition: opacity 0.6s ease;
-    /* flipped coords: local-bottom = the edge touching the card = brightest */
-    -webkit-mask-image: linear-gradient(to top, #000 0%, rgba(0,0,0,0.5) 42%, transparent 86%);
-            mask-image: linear-gradient(to top, #000 0%, rgba(0,0,0,0.5) 42%, transparent 86%);
+    /* flipped coords: local-bottom = the edge touching the card = brightest.
+       Hold full strength through the top third so it bleeds out of the card with
+       no seam, then fade. */
+    -webkit-mask-image: linear-gradient(to top, #000 18%, rgba(0,0,0,0.45) 52%, transparent 90%);
+            mask-image: linear-gradient(to top, #000 18%, rgba(0,0,0,0.45) 52%, transparent 90%);
   }
   .daycard-floor .blob {
     position: absolute; border-radius: 50%;
@@ -362,7 +364,7 @@
       'inset 0 1px 0 rgba(255,255,255,' + rimA + '),' +
       'inset 0 0 ' + innerR + 'px rgba(222,230,255,' + innerA + '),' +
       '0 0 ' + haloR + 'px rgba(205,214,255,' + haloA + '),' +
-      '0 26px 60px rgba(0,0,0,0.45)';
+      '0 12px 38px rgba(0,0,0,0.28)';
   }
   function apply() {
     var v = s.map(function (el) { return +el.value; });
