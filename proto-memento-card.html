@@ -125,12 +125,18 @@
     opacity: var(--mix); animation: dl4 23s ease-in-out infinite; }
   .blob.b5 { width: 66%; height: 54%; right: 4%; top: 28%;
     background: radial-gradient(circle, rgba(120,255,190,0.7), transparent 68%);
-    opacity: calc(var(--cons) * 0.5); animation: dl5 21s ease-in-out infinite; }
-  @keyframes dl1 { 0%,100% { transform: translate(0,0) scale(1) } 50% { transform: translate(13%, 10%) scale(1.08) } }
-  @keyframes dl2 { 0%,100% { transform: translate(0,0) scale(1) } 50% { transform: translate(-11%, 13%) scale(1.06) } }
-  @keyframes dl3 { 0%,100% { transform: translate(0,0) scale(1) } 50% { transform: translate(-13%, -9%) scale(1.07) } }
-  @keyframes dl4 { 0%,100% { transform: translate(0,0) scale(1) } 50% { transform: translate(14%, -11%) scale(1.1) } }
-  @keyframes dl5 { 0%,100% { transform: translate(0,0) scale(1) } 50% { transform: translate(-10%, 9%) scale(0.94) } }
+    opacity: calc(var(--cons) * 0.5); animation: dl5 19s ease-in-out infinite; }
+  .blob.b6 { width: 80%; height: 62%; right: -12%; top: 6%;
+    background: radial-gradient(circle, rgba(255,72,86,1.0), transparent 66%);
+    opacity: var(--red); animation: dl6 17s ease-in-out infinite; }
+  /* 3-point wandering paths (not just back-and-forth) so the color visibly
+     drifts around inside the card, calmly. */
+  @keyframes dl1 { 0%,100% { transform: translate(0,0) scale(1) } 33% { transform: translate(22%,16%) scale(1.12) } 66% { transform: translate(9%,26%) scale(1.05) } }
+  @keyframes dl2 { 0%,100% { transform: translate(0,0) scale(1) } 33% { transform: translate(-19%,21%) scale(1.08) } 66% { transform: translate(-24%,6%) scale(1.12) } }
+  @keyframes dl3 { 0%,100% { transform: translate(0,0) scale(1) } 33% { transform: translate(-21%,-15%) scale(1.1) } 66% { transform: translate(-6%,-25%) scale(1.04) } }
+  @keyframes dl4 { 0%,100% { transform: translate(0,0) scale(1) } 33% { transform: translate(24%,-17%) scale(1.14) } 66% { transform: translate(12%,-27%) scale(1.06) } }
+  @keyframes dl5 { 0%,100% { transform: translate(0,0) scale(1) } 33% { transform: translate(-18%,16%) scale(0.92) } 66% { transform: translate(-26%,-8%) scale(1.08) } }
+  @keyframes dl6 { 0%,100% { transform: translate(0,0) scale(1) } 33% { transform: translate(-22%,18%) scale(1.1) } 66% { transform: translate(-8%,28%) scale(1.04) } }
 
   /* Iridescence + sheen (replicated, sit above the color) */
   .daycard-ns__iri {
@@ -206,9 +212,9 @@
   </div>
   <div class="daycard-wrap">
     <span class="daycard-wrap__aura" aria-hidden="true"></span>
-    <div class="daycard-ns" id="card" style="--clar:0; --act:0; --cons:0; --mix:0;">
+    <div class="daycard-ns" id="card" style="--clar:0; --act:0; --cons:0; --mix:0; --red:0;">
       <span class="daycard-ns__liquid" aria-hidden="true">
-        <i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i><i class="blob b4"></i><i class="blob b5"></i>
+        <i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i><i class="blob b4"></i><i class="blob b5"></i><i class="blob b6"></i>
       </span>
       <span class="daycard-ns__iri" aria-hidden="true"></span>
       <span class="daycard-ns__sheen" aria-hidden="true"></span>
@@ -232,26 +238,27 @@
     <div class="row"><label>Clarity</label><span class="dot" style="background:#9674ff"></span><input id="s1" type="range" min="0" max="100" value="0" step="1"><span class="out" id="o1">0</span></div>
     <div class="row"><label>Action</label><span class="dot" style="background:#ffffff"></span><input id="s2" type="range" min="0" max="100" value="0" step="1"><span class="out" id="o2">0</span></div>
     <div class="row"><label>Consistency</label><span class="dot" style="background:#38e896"></span><input id="s3" type="range" min="0" max="100" value="0" step="1"><span class="out" id="o3">0</span></div>
-    <div class="hint">Drag to morph the card. Move the pointer over the card to tilt it.</div>
+    <div class="row"><label>Red (test)</label><span class="dot" style="background:#ff4856"></span><input id="s4" type="range" min="0" max="100" value="0" step="1"><span class="out" id="o4">0</span></div>
+    <div class="hint">Drag to morph the card. Red is a test color, layer it on top of any preset.</div>
   </div>
 
 <script>
 (function () {
   var card = document.getElementById('card');
-  var s = [document.getElementById('s1'), document.getElementById('s2'), document.getElementById('s3')];
-  var o = [document.getElementById('o1'), document.getElementById('o2'), document.getElementById('o3')];
+  var s = [document.getElementById('s1'), document.getElementById('s2'), document.getElementById('s3'), document.getElementById('s4')];
+  var o = [document.getElementById('o1'), document.getElementById('o2'), document.getElementById('o3'), document.getElementById('o4')];
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var vars = ['--clar', '--act', '--cons'];
+  var vars = ['--clar', '--act', '--cons', '--red'];
 
   function apply() {
     var v = s.map(function (el) { return +el.value; });
-    for (var i = 0; i < 3; i++) {
+    for (var i = 0; i < 4; i++) {
       o[i].textContent = Math.round(v[i]);
       card.style.setProperty(vars[i], (v[i] / 100).toFixed(3));
     }
     // blend blob appears only when clarity AND consistency are both present
     card.style.setProperty('--mix', (Math.min(v[0], v[2]) / 100 * 0.75).toFixed(3));
-    var tot = (v[0] + v[1] + v[2]) / 300;
+    var tot = (v[0] + v[1] + v[2] + v[3]) / 400;
     card.style.boxShadow =
       'inset 0 1px 0 rgba(255,255,255,' + (0.22 + 0.20 * tot).toFixed(2) + '),' +
       '0 0 48px rgba(200,210,255,' + (0.10 + 0.18 * tot).toFixed(2) + '),' +
