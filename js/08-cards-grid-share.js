@@ -3385,20 +3385,37 @@ function startLivingWander(wrap) {
     const mirror = [].slice.call(wrap.querySelectorAll('.daycard-floor .blob'));
     if (!inside.length) return;
     const R = (a, b) => a + Math.random() * (b - a);
-    const st = inside.map(() => ({ x: 0, y: 0, sc: 1, tx: R(-20, 20), ty: R(-18, 18), tsc: R(0.92, 1.16) }));
-    const SPEED = 1;  // slowed ~50% (Malik): the living color drifts calmly
-    const k = Math.min(0.2, 0.011 * SPEED);
+    // High-variance organic drift (Malik): each glow roams the WHOLE card (wide
+    // translate targets), pulses its OWN opacity in and out, and moves at its own
+    // random speed, so nothing reads as parked or in lockstep. base = the data
+    // opacity from CSS (--clar/--act/... ); the loop scales it by a fading factor.
+    const st = inside.map((el) => ({
+      x: R(-30, 30), y: R(-30, 30), sc: R(0.85, 1.2), op: R(0.4, 1),
+      tx: R(-58, 58), ty: R(-58, 58), tsc: R(0.65, 1.55), top: R(0.25, 1),
+      base: parseFloat(getComputedStyle(el).opacity) || 0,
+      kPos: R(0.004, 0.013),   // per-blob drift speed
+      kScl: R(0.005, 0.014),
+      kOp:  R(0.005, 0.018),   // per-blob fade speed
+    }));
     function frame() {
       for (let i = 0; i < inside.length; i++) {
         const b = st[i];
-        b.x += (b.tx - b.x) * k; b.y += (b.ty - b.y) * k; b.sc += (b.tsc - b.sc) * k;
-        if (Math.abs(b.tx - b.x) < 1 && Math.abs(b.ty - b.y) < 1) {
-          b.tx = R(-22, 22); b.ty = R(-20, 20); b.tsc = R(0.9, 1.18);
+        if (b.base <= 0) continue;   // disabled pillar (e.g. the red test) stays dark
+        b.x += (b.tx - b.x) * b.kPos;
+        b.y += (b.ty - b.y) * b.kPos;
+        b.sc += (b.tsc - b.sc) * b.kScl;
+        b.op += (b.top - b.op) * b.kOp;
+        // Each blob retargets independently when it nears its goal -> desynced,
+        // never-repeating motion. Wide ranges so the glow crosses the whole card.
+        if (Math.abs(b.tx - b.x) < 2.5 && Math.abs(b.ty - b.y) < 2.5) {
+          b.tx = R(-62, 62); b.ty = R(-62, 62); b.tsc = R(0.6, 1.6);
         }
+        if (Math.abs(b.top - b.op) < 0.05) { b.top = R(0.18, 1); }
         const tf = 'translate(' + b.x.toFixed(2) + '%,' + b.y.toFixed(2) + '%) scale(' + b.sc.toFixed(3) + ')';
-        inside[i].style.transform = tf;
-        if (bloom[i]) bloom[i].style.transform = tf;
-        if (mirror[i]) mirror[i].style.transform = tf;
+        const op = (b.base * b.op).toFixed(3);
+        inside[i].style.transform = tf; inside[i].style.opacity = op;
+        if (bloom[i]) { bloom[i].style.transform = tf; bloom[i].style.opacity = op; }
+        if (mirror[i]) { mirror[i].style.transform = tf; mirror[i].style.opacity = op; }
       }
       _dcLivingRaf = requestAnimationFrame(frame);
     }
