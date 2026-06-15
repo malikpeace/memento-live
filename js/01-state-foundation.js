@@ -2414,8 +2414,11 @@ const DragDrop = {
     // bento tiles the primary Home, so this is now the main keyboard entry point.
     grid.addEventListener('keydown', (e) => {
       if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') return;
-      const w = e.target && e.target.closest ? e.target.closest('.widget') : null;
-      if (!w || !grid.contains(w)) return;
+      // Only the tile ITSELF (the role=button article) activates on Enter/Space.
+      // If focus is on an inner control (a CTA, the reveal Open/Later buttons),
+      // let that button handle its own key, do not hijack it or open the module.
+      const w = e.target;
+      if (!w || !w.classList || !w.classList.contains('widget') || !grid.contains(w)) return;
       e.preventDefault();
       this.activateWidget(w);
     });
