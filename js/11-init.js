@@ -2246,41 +2246,36 @@ document.addEventListener('keydown', (e) => {
 // and feed it to CSS (--wi-kb-h + .wi-kb) so the flow box shrinks to the visible
 // area and the content re-centers cleanly just above the keyboard. Background
 // layers are fixed/absolute, so this never affects them.
-(function welcomeKeyboardFollow() {
+(function welcomeKeyboardHoldStill() {
   try {
-    const vv = window.visualViewport;
-    if (!vv) return;
-    // Track the TALLEST visual-viewport height we have ever seen as the
-    // keyboard-closed baseline. iOS standalone shrinks window.innerHeight WITH
-    // the keyboard, so innerHeight-vv.height comes out ~0 and the old detection
-    // never fired. vv.height vs its own max is reliable: when the keyboard opens,
-    // vv.height drops below the baseline by exactly the keyboard height.
-    let baseline = vv.height;
-    let raf = 0;
-    const apply = () => {
-      raf = 0;
-      if (vv.height > baseline) baseline = vv.height;
+    // Keep the onboarding conversation + composer at their resting position when
+    // the keyboard opens. iOS, on focusing an input inside a fixed full-screen
+    // layer, scrolls/pans the page upward to "reveal" the field, which jolted the
+    // whole screen up. The field already sits above where the keyboard appears,
+    // so we just cancel that scroll/pan and let it stay put.
+    const activeWelcomeInput = () => {
       const wi = document.querySelector('.welcome-intro.open');
-      if (!wi) return;
-      const kb = Math.max(0, Math.round(baseline - vv.height));
-      if (kb > 90) {
-        const dock = wi.querySelector('.welcome-intro__nav');
-        wi.style.setProperty('--wi-kb-h', kb + 'px');
-        if (dock) wi.style.setProperty('--wi-dock-h', dock.offsetHeight + 'px');
-        wi.classList.add('wi-kb');
-      } else if (wi.classList.contains('wi-kb')) {
-        wi.classList.remove('wi-kb');
-        wi.style.removeProperty('--wi-kb-h');
-        wi.style.removeProperty('--wi-dock-h');
-      }
+      const ae = document.activeElement;
+      return wi && ae && (ae.tagName === 'TEXTAREA' || ae.tagName === 'INPUT') && wi.contains(ae) ? wi : null;
     };
-    const schedule = () => { if (!raf) raf = requestAnimationFrame(apply); };
-    vv.addEventListener('resize', schedule);
-    vv.addEventListener('scroll', schedule);
-    // focusin/out are the reliable "keyboard is (un)docking" signals; re-measure
-    // a few times after each because iOS settles vv.height over ~300ms.
-    const ping = () => { [60, 180, 360].forEach((d) => setTimeout(schedule, d)); };
-    document.addEventListener('focusin', ping, true);
-    document.addEventListener('focusout', ping, true);
+    const hold = () => {
+      const wi = activeWelcomeInput();
+      if (!wi) return;
+      // Undo any document scroll iOS applied.
+      const se = document.scrollingElement || document.documentElement;
+      if (se && se.scrollTop) se.scrollTop = 0;
+      if (window.pageYOffset) { try { window.scrollTo(0, 0); } catch (e) {} }
+      // Undo any scroll of the conversation pane (its own overflow:auto).
+      const pw = wi.querySelector('.welcome-intro__page-wrap');
+      if (pw && pw.scrollTop) pw.scrollTop = 0;
+    };
+    window.addEventListener('scroll', hold, true);
+    document.addEventListener('scroll', hold, true);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('scroll', hold);
+      window.visualViewport.addEventListener('resize', hold);
+    }
+    // iOS settles the keyboard/viewport over ~300ms, so re-hold a few times.
+    document.addEventListener('focusin', () => { [0, 60, 180, 360, 600].forEach((d) => setTimeout(hold, d)); }, true);
   } catch (e) {}
 })();
