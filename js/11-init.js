@@ -2252,14 +2252,27 @@ document.addEventListener('keydown', (e) => {
     const vv = window.visualViewport;
     if (!vv) return;
     let raf = 0, armed = false;
+    const root = document.documentElement;
     const apply = () => {
       raf = 0;
       const wi = document.querySelector('.welcome-intro.open');
       if (!wi) return;
       if (armed) {
+        // THE fix (confirmed on-device via ?kbd=1): body min-height:100lvh is
+        // taller than the keyboard-shrunk layout viewport, so the document
+        // becomes scrollable and iOS scrolls it ~264px to reveal the field —
+        // that scroll is the "jump". Lock the document so it CANNOT scroll, and
+        // zero any scroll that slipped through.
+        root.style.overflow = 'hidden';
+        if (window.scrollY) { try { window.scrollTo(0, 0); } catch (e) {} }
+        const se = document.scrollingElement || root;
+        if (se && se.scrollTop) se.scrollTop = 0;
+        // Pin the layer to the visible area so the centered content tracks the
+        // keyboard smoothly (handles the visual-viewport pan, vv.offsetTop).
         wi.style.height = Math.round(vv.height) + 'px';
         wi.style.top = Math.round(vv.offsetTop) + 'px';
       } else {
+        root.style.overflow = '';
         wi.style.height = '';
         wi.style.top = '';
       }
@@ -2267,6 +2280,7 @@ document.addEventListener('keydown', (e) => {
     const schedule = () => { if (!raf) raf = requestAnimationFrame(apply); };
     vv.addEventListener('resize', schedule);
     vv.addEventListener('scroll', schedule);
+    window.addEventListener('scroll', schedule, true);
     document.addEventListener('focusin', (e) => {
       const wi = document.querySelector('.welcome-intro.open');
       const t = e.target;
