@@ -3323,6 +3323,13 @@ function renderDayCard() {
     const nsEl = el.querySelector('#dayCardNs');
     bindDayCardTilt(nsEl);
     bindDayCardThemeToggle(nsEl);
+    // Tap the card (anywhere but the emblem, which toggles the theme) -> the
+    // fullscreen Memento with your Clarity / Action / Consistency stats.
+    if (nsEl && !nsEl._mfBound) {
+      nsEl._mfBound = true;
+      nsEl.style.cursor = 'pointer';
+      nsEl.addEventListener('click', () => { try { openMementoFull(); } catch (e) {} });
+    }
     if (living) {
       const wrap = el.querySelector('.daycard-wrap');
       setLivingCardVars(wrap);
@@ -3330,6 +3337,114 @@ function renderDayCard() {
     } else {
       stopLivingWander();
     }
+  } catch (e) {}
+}
+
+// Fullscreen Memento: tap the card to expand it and read where you stand across
+// the three pillars - Clarity (your goal), Action (your daily follow-through),
+// Consistency (your streak). The card is the hero; the stats sit under it. A
+// snapshot clone of the live card carries its current theme + colour.
+function openMementoFull() {
+  try {
+    if (document.getElementById('mementoFull')) return;
+    const L = (typeof livingCardLevels === 'function') ? livingCardLevels() : { clar: 0, act: 0, cons: 0 };
+    let cs = { current: 0, longest: 0, totalActiveDays: 0 };
+    try { cs = consistencyStats(); } catch (e) {}
+    const streak = (state.streak && state.streak.count) || cs.current || 0;
+    const ans = (state.clarity && state.clarity.answers) || {};
+    const goal = ans.neutronStar || '';
+    const clarityDone = !!(state.clarity && state.clarity.completed);
+    const pa = (state.action && state.action.primaryAction) || {};
+    const tiers = pa.tiers || {};
+    const todayAction = tiers[pa.recommendedTier] || pa.title || '';
+    let act7 = 0;
+    try {
+      const comp = (state.action && Array.isArray(state.action.completionHistory)) ? state.action.completionHistory : [];
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const days = {};
+      comp.forEach((h) => { if (!h || !h.date) return; const d = new Date(h.date + 'T00:00:00'); const diff = Math.round((today - d) / 86400000); if (diff >= 0 && diff <= 6) days[h.date] = 1; });
+      act7 = Object.keys(days).length;
+    } catch (e) {}
+
+    const bar = (pct, color) => '<div class="mf-stat__track"><div class="mf-stat__fill" style="width:' + Math.max(2, Math.min(100, pct)) + '%;background:' + color + '"></div></div>';
+
+    const clarityBlock =
+      '<div class="mf-stat mf-stat--clarity" data-mf-open="clarity" role="button" tabindex="0">' +
+        '<div class="mf-stat__head"><span class="mf-stat__label">Clarity</span><span class="mf-stat__val">' + (clarityDone ? 'Locked in' : 'Not set') + '</span></div>' +
+        (goal ? '<div class="mf-stat__goal">' + esc(goal) + '</div>' : '<div class="mf-stat__sub">Find your Neutron Star, the one goal that actually matters.</div>') +
+        bar(clarityDone ? 100 : 0, 'var(--color-clarity)') +
+      '</div>';
+    const actionBlock =
+      '<div class="mf-stat mf-stat--action" data-mf-open="action" role="button" tabindex="0">' +
+        '<div class="mf-stat__head"><span class="mf-stat__label">Action</span><span class="mf-stat__val">' + act7 + '<span class="mf-stat__unit">/ 7 days</span></span></div>' +
+        (todayAction ? '<div class="mf-stat__sub"><span class="mf-stat__sub-key">Today</span> ' + esc(todayAction) + '</div>' : '<div class="mf-stat__sub">Turn your goal into one daily action.</div>') +
+        bar(L.act, 'rgba(236,239,255,0.9)') +
+      '</div>';
+    const consBlock =
+      '<div class="mf-stat mf-stat--cons" data-mf-open="streak" role="button" tabindex="0">' +
+        '<div class="mf-stat__head"><span class="mf-stat__label">Consistency</span><span class="mf-stat__val">' + streak + '<span class="mf-stat__unit">day streak</span></span></div>' +
+        '<div class="mf-stat__sub">' + (cs.totalActiveDays || 0) + ' active days &middot; ' + Math.round(L.cons) + '% of the last 30</div>' +
+        bar(L.cons, 'var(--color-consistency)') +
+      '</div>';
+
+    const ov = document.createElement('div');
+    ov.id = 'mementoFull';
+    ov.setAttribute('role', 'dialog');
+    ov.setAttribute('aria-label', 'Your Memento');
+    ov.innerHTML =
+      '<button class="mf__close" aria-label="Close">&times;</button>' +
+      '<div class="mf__scroll">' +
+        '<div class="mf__card" aria-hidden="true"></div>' +
+        '<div class="mf__eyebrow">Where you stand</div>' +
+        '<div class="mf__stats">' + clarityBlock + actionBlock + consBlock + '</div>' +
+        '<div class="mf__hint">Tap a pillar to dive in</div>' +
+      '</div>';
+    document.body.appendChild(ov);
+
+    // Static snapshot of the live card as the hero (strip ids to avoid dupes).
+    const liveWrap = document.querySelector('#dayCard .daycard-wrap');
+    if (liveWrap) {
+      const clone = liveWrap.cloneNode(true);
+      clone.querySelectorAll('[id]').forEach((n) => n.removeAttribute('id'));
+      clone.style.setProperty('--dc-rx', '0deg');
+      clone.style.setProperty('--dc-ry', '0deg');
+      const host = ov.querySelector('.mf__card');
+      if (host) host.appendChild(clone);
+    }
+
+    document.body.style.overflow = 'hidden';
+    // Commit the initial opacity:0 state with a forced reflow, then flip to open so
+    // the transition still plays. rAF gets throttled when the tab is backgrounded,
+    // which can leave the overlay stuck invisible; a sync reflow never stalls.
+    void ov.offsetWidth;
+    ov.classList.add('mf--open');
+
+    const close = () => {
+      ov.classList.remove('mf--open');
+      document.body.style.overflow = '';
+      document.removeEventListener('keydown', onKey);
+      setTimeout(() => { try { ov.remove(); } catch (e) {} }, 340);
+    };
+    const onKey = (e) => { if (e.key === 'Escape') close(); };
+    ov.querySelector('.mf__close').addEventListener('click', close);
+    ov.addEventListener('click', (e) => { if (e.target === ov) close(); });
+    // Each pillar opens its full module.
+    ov.querySelectorAll('[data-mf-open]').forEach((el) => {
+      const go = () => {
+        const k = el.getAttribute('data-mf-open');
+        close();
+        setTimeout(() => {
+          try {
+            if (k === 'clarity') { if (state.clarity && state.clarity.completed) ClarityExperience.openSummary(); else ClarityExperience.open(); }
+            else if (k === 'action') { ActionExperience.open(); }
+            else { Sheet.open(k); }
+          } catch (e) {}
+        }, 120);
+      };
+      el.addEventListener('click', go);
+      el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+    });
+    document.addEventListener('keydown', onKey);
   } catch (e) {}
 }
 
