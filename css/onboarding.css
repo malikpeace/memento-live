@@ -908,7 +908,12 @@ body.calm-motion .empty-state, body.lite .empty-state { animation: none; }
      standalone iOS PWA (same technique as the global .ambient backdrop). */
   position: fixed; top: 0; left: 0; right: 0; z-index: 210;
   height: 100vh; height: 100lvh;
-  background: #030208;
+  /* Bake the glow gradient straight into the layer's OWN background (was on the
+     separate, blurred .welcome-intro__bg). On a keyboard viewport-resize iOS
+     re-rasterizes the fixed layer; the blurred child repaints a frame late,
+     which flashed the dark base. A plain gradient on the base paints instantly,
+     so the color is always there, no dark flash. */
+  background: radial-gradient(125% 75% at 50% 40%, rgba(95,88,222,0.26), rgba(24,18,46,0.74) 48%, #04040a 84%), #030208;
   display: flex; flex-direction: column;
   opacity: 0; pointer-events: none;
   transition: opacity 1s ease;
@@ -917,9 +922,10 @@ body.calm-motion .empty-state, body.lite .empty-state { animation: none; }
 .welcome-intro.open { opacity: 1; pointer-events: auto; }
 .welcome-intro__bg {
   position: absolute; inset: 0; pointer-events: none; overflow: hidden;
-  /* Matches the splash scene: a soft purple cloud over near-black, so the
-     intro screens read as one cohesive glow instead of four separate dots. */
-  background: radial-gradient(125% 75% at 50% 40%, rgba(95,88,222,0.26), rgba(24,18,46,0.74) 48%, #04040a 84%);
+  /* The glow gradient now lives on .welcome-intro itself (so it paints instantly
+     and never flashes dark on a keyboard resize). This layer is kept for the
+     orbs/stage stacking but no longer paints the duplicate gradient. */
+  background: none;
 }
 .welcome-intro__orb {
   position: absolute; border-radius: 50%;
