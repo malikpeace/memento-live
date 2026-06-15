@@ -2239,17 +2239,67 @@ document.addEventListener('keydown', (e) => {
   } catch (e) {}
 })();
 
-// Onboarding keyboard follow: when the virtual keyboard opens, the welcome-intro
-// is a fixed 100lvh layer that vertically centers the conversation + composer,
-// and iOS does NOT resize that fixed layer, so the content floats high with a
-// dead gap above the keyboard. Measure the keyboard height via VisualViewport
-// and feed it to CSS (--wi-kb-h + .wi-kb) so the flow box shrinks to the visible
-// area and the content re-centers cleanly just above the keyboard. Background
-// layers are fixed/absolute, so this never affects them.
-// Onboarding keyboard: the jank ("elements scroll down, black flashes at the top,
-// then snap back up" on focusing the name field) was iOS's scroll-into-view on
-// focus, made worse by JS that fought it frame-by-frame (transforms / scroll
-// resets) and produced the visible bounce. Fixed at the SOURCE instead: every
-// onboarding auto-focus now passes { preventScroll: true } (see
-// 09-controllers.js), so iOS never scrolls on focus. No runtime JS here — letting
-// the browser do nothing is what makes it smooth.
+// Onboarding keyboard: PIN the welcome-intro to the visual viewport while an
+// input is focused, so iOS has no reason to scroll/pan the page to reveal the
+// field (that pan was the "jump up"). We size the fixed layer to exactly the
+// visible area (height = visualViewport.height, top = visualViewport.offsetTop);
+// its centered content then simply tracks the shrinking visible area as the
+// keyboard slides in — a smooth follow, not a jolt. On blur it reverts to the
+// full 100lvh. The glow is baked into the layer's own background (see CSS), so
+// resizing it never flashes. preventScroll on the auto-focus handles the rest.
+(function welcomeKeyboardPin() {
+  try {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    let raf = 0, armed = false;
+    const apply = () => {
+      raf = 0;
+      const wi = document.querySelector('.welcome-intro.open');
+      if (!wi) return;
+      if (armed) {
+        wi.style.height = Math.round(vv.height) + 'px';
+        wi.style.top = Math.round(vv.offsetTop) + 'px';
+      } else {
+        wi.style.height = '';
+        wi.style.top = '';
+      }
+    };
+    const schedule = () => { if (!raf) raf = requestAnimationFrame(apply); };
+    vv.addEventListener('resize', schedule);
+    vv.addEventListener('scroll', schedule);
+    document.addEventListener('focusin', (e) => {
+      const wi = document.querySelector('.welcome-intro.open');
+      const t = e.target;
+      if (wi && t && (t.tagName === 'TEXTAREA' || t.tagName === 'INPUT') && wi.contains(t)) {
+        armed = true;
+        [0, 50, 150, 300, 500].forEach((d) => setTimeout(schedule, d));
+      }
+    }, true);
+    document.addEventListener('focusout', () => { armed = false; [50, 300].forEach((d) => setTimeout(schedule, d)); }, true);
+  } catch (e) {}
+})();
+
+// ?kbd=1 — hidden on-screen readout of the live viewport numbers, so the exact
+// iOS keyboard behavior can be SEEN on-device (screenshot) instead of inferred.
+(function welcomeKeyboardDebug() {
+  try {
+    if (!/[?&]kbd=1/.test(location.search)) return;
+    const vv = window.visualViewport;
+    const dbg = document.createElement('div');
+    dbg.style.cssText = 'position:fixed;top:64px;left:8px;z-index:2147483647;background:rgba(0,0,0,0.82);color:#0f0;font:12px ui-monospace,monospace;padding:8px 10px;border-radius:8px;white-space:pre;pointer-events:none;';
+    document.body.appendChild(dbg);
+    const upd = () => {
+      const wi = document.querySelector('.welcome-intro.open');
+      dbg.textContent =
+        'innerH ' + window.innerHeight +
+        '\nvv.height ' + (vv ? Math.round(vv.height) : '-') +
+        '\nvv.offsetTop ' + (vv ? Math.round(vv.offsetTop) : '-') +
+        '\nscrollY ' + Math.round(window.scrollY || 0) +
+        '\nwi.top ' + (wi ? getComputedStyle(wi).top : '-') +
+        '\nwi.height ' + (wi ? getComputedStyle(wi).height : '-');
+    };
+    if (vv) { vv.addEventListener('resize', upd); vv.addEventListener('scroll', upd); }
+    window.addEventListener('scroll', upd, true);
+    setInterval(upd, 150); upd();
+  } catch (e) {}
+})();
