@@ -3393,9 +3393,9 @@ function startLivingWander(wrap) {
       x: R(-30, 30), y: R(-30, 30), sc: R(0.85, 1.2), op: R(0.4, 1),
       tx: R(-58, 58), ty: R(-58, 58), tsc: R(0.65, 1.55), top: R(0.25, 1),
       base: parseFloat(getComputedStyle(el).opacity) || 0,
-      kPos: R(0.004, 0.013),   // per-blob drift speed
-      kScl: R(0.005, 0.014),
-      kOp:  R(0.005, 0.018),   // per-blob fade speed
+      kPos: R(0.002, 0.0065),  // per-blob drift speed (slowed ~50%, Malik)
+      kScl: R(0.0025, 0.007),
+      kOp:  R(0.0025, 0.009),  // per-blob fade speed (slowed ~50%)
     }));
     function frame() {
       for (let i = 0; i < inside.length; i++) {

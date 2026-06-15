@@ -68,7 +68,8 @@ body:not(.ns-bloom) .daycard-theme-living .daycard-wrap__aura {
 /* ── Liquid color layer (inside the card) ─────────────────────────────────── */
 .daycard-theme-living .daycard-ns__liquid {
   position: absolute; inset: -28%; pointer-events: none; z-index: 0;
-  filter: blur(30px) saturate(var(--sat, 1.5));
+  /* heavier blur so the glows read as smooth, edgeless light (Malik) */
+  filter: blur(46px) saturate(var(--sat, 1.5));
 }
 .daycard-theme-living .daycard-ns__liquid .blob {
   position: absolute; border-radius: 50%;
@@ -101,7 +102,7 @@ body:not(.ns-bloom) .daycard-theme-living .daycard-wrap__aura {
   position: absolute; inset: -5%; z-index: 0;
   border-radius: calc(var(--r-card) + 12px);
   pointer-events: none; overflow: hidden;
-  filter: blur(26px) saturate(var(--sat, 1.5));
+  filter: blur(34px) saturate(var(--sat, 1.5));
   opacity: calc(var(--emit, 0.55) * var(--lit, 0));
 }
 .daycard-theme-living .daycard-bloom .blob {
@@ -125,7 +126,7 @@ body:not(.ns-bloom) .daycard-theme-living .daycard-wrap__aura {
   -webkit-mask-composite: xor;
           mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
           mask-composite: exclude;
-  animation: dcLivingGlimmer 7.2s ease-in-out infinite;
+  animation: dcLivingGlimmer 10.8s ease-in-out infinite;
 }
 @keyframes dcLivingGlimmer {
   0%,100% { opacity: calc(var(--ring, 0) * 0.72); }
