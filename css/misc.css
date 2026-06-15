@@ -442,6 +442,14 @@ body.calm-motion .sheet__exp-orb { animation: none; }
 /* Content-heavy / scrolling modules (notes list, vivere canvas, energy history)
    top-align instead of vertically centering. */
 .exp-shell--top { justify-content: flex-start; min-height: 0; }
+/* Consistency + Check-in are short enough to read centered: override the
+   top-align so they sit in the middle of the sheet (Malik's positioning ask),
+   while still scrolling from the top when the content runs tall. */
+.sheet--exp[data-module="streak"] .exp-shell--top,
+.sheet--exp[data-module="checkin"] .exp-shell--top {
+  justify-content: center;
+  min-height: calc(100dvh - var(--safe-t, 0px) - var(--safe-b, 0px) - 132px);
+}
 /* Wide modules get a roomier body than the default 760px cap. */
 .sheet--exp[data-module="reflection"] .sheet__body,
 .sheet--exp[data-module="vivere"] .sheet__body { max-width: 1100px; }
