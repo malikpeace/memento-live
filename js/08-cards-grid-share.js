@@ -3427,12 +3427,11 @@ function bindDayCardThemeToggle(nsEl) {
 }
 
 // Subtle parallax on the Day Card: it tilts a few degrees toward the
-// pointer/finger and the specular spot follows the same point, so the
-// glass reads as a physical object. Gyro drives it hands-free where the
-// browser emits deviceorientation without a permission prompt (Android,
-// some desktops); iOS gates gyro behind a prompt we deliberately skip,
-// touch still tilts it there. Skipped under reduced-motion and lowfx.
-let _dayCardOrientBound = false;
+// pointer/finger only, so the glass reads as a physical object you can play
+// with. The card is otherwise STILL - no gyro/device-orientation drive (that
+// rotated it hands-free on laptops/2-in-1s, which read as the card moving on
+// its own). Resets flat the moment the pointer leaves. Skipped under
+// reduced-motion and lowfx.
 function bindDayCardTilt(card) {
   if (!card) return;
   try {
@@ -3453,21 +3452,6 @@ function bindDayCardTilt(card) {
     });
     card.addEventListener('pointerleave', reset);
     card.addEventListener('pointerup', reset);
-    if (!_dayCardOrientBound && window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission !== 'function') {
-      _dayCardOrientBound = true;
-      let raf = 0;
-      window.addEventListener('deviceorientation', (e) => {
-        if (raf || e.gamma == null || e.beta == null) return;
-        raf = requestAnimationFrame(() => {
-          raf = 0;
-          const c = document.getElementById('dayCardNs');
-          if (!c) return;
-          const nx = Math.max(-1, Math.min(1, e.gamma / 28));
-          const ny = Math.max(-1, Math.min(1, (e.beta - 50) / 32));
-          set(c, nx, ny, 0.75);
-        });
-      });
-    }
   } catch (e) {}
 }
 

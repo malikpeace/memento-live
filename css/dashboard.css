@@ -2863,14 +2863,8 @@ body:not(.ns-bloom) .app.dash-v2 #dashGreetingMobile { display: none; }
   background: radial-gradient(closest-side,
     rgba(215, 220, 250, 0.16), rgba(150, 160, 235, 0.06) 48%, transparent 72%);
   filter: blur(28px);
-  animation: dayCardBreath 7s ease-in-out infinite alternate;
-}
-@keyframes dayCardBreath {
-  from { opacity: 0.65; transform: translate(-50%, -50%) scale(0.97); }
-  to   { opacity: 1;    transform: translate(-50%, -50%) scale(1.04); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .daycard-wrap__aura { animation: none; }
+  /* Static: the card sits still on its own; it only reacts to the pointer. */
+  opacity: 0.9;
 }
 .daycard-ns {
   position: relative;
@@ -2934,7 +2928,8 @@ body:not(.ns-bloom) .app.dash-v2 #dashGreetingMobile { display: none; }
 /* The glass catches the light pouring across the dashboard: a bright top-left
    catch plus two soft diagonal shafts angled with the ambient god-rays, screen
    blended so the card reads as luminous glass with beams streaming through it
-   (matches the hero render). A slow drift keeps it alive without looping decor. */
+   (matches the hero render). STATIC - the card stays still on its own and only
+   reacts to the pointer (the rotate/parallax tilt). */
 .daycard-ns__sheen {
   position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
   background:
@@ -2947,15 +2942,7 @@ body:not(.ns-bloom) .app.dash-v2 #dashGreetingMobile { display: none; }
       rgba(255, 255, 255, 0.32) 46%, rgba(206, 220, 255, 0.07) 56%, transparent 72%),
     linear-gradient(122deg, transparent 50%, rgba(255, 255, 255, 0.16) 60%, transparent 70%);
   mix-blend-mode: screen;
-  opacity: 0.95;
-  animation: dcSheenDrift 9s ease-in-out infinite;
-}
-@keyframes dcSheenDrift {
-  0%, 100% { opacity: 0.82; transform: translateY(-1.5%); }
-  50%      { opacity: 1;    transform: translateY(1.5%); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .daycard-ns__sheen { animation: none; opacity: 0.9; }
+  opacity: 0.9;
 }
 /* Middle of the card: the emblem centered; the body flexes so the foot
    pins to the bottom edge. */
