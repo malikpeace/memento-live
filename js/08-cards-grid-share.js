@@ -3472,9 +3472,48 @@ function bindDayCardTilt(card) {
   } catch (e) {}
 }
 
+// v27: Consistency over time on the Home, a full-width year heatmap band below
+// the hero (Malik likes the heatmap; this gives it room to breathe). Read-only:
+// the cells are made inert and the whole band opens the Consistency module. Lives
+// in #dashBelow so it is hidden until the Neutron Star is set.
+function renderDashConsistency() {
+  try {
+    const el = document.getElementById('dashConsistency');
+    if (!el) return;
+    let cs = { totalActiveDays: 0 };
+    try { cs = consistencyStats(); } catch (e) {}
+    const streak = (state.streak && state.streak.count) || 0;
+    const weeks = window.innerWidth < 768 ? 27 : 52;
+    let graph = '';
+    try { graph = renderConsistencyHeatmap(weeks, 'rolling', true); } catch (e) {}
+    el.innerHTML =
+      '<div class="dash-cgram__head">' +
+        '<div class="dash-cgram__label">Consistency</div>' +
+        '<div class="dash-cgram__meta"><b>' + streak + '</b> day streak' +
+          (cs.totalActiveDays ? ' <span>&middot; ' + cs.totalActiveDays + ' active days</span>' : '') + '</div>' +
+        '<span class="dash-cgram__open" aria-hidden="true">Open &rsaquo;</span>' +
+      '</div>' +
+      '<div class="dash-cgram__graph">' + graph + '</div>';
+    // Read-only on the Home: strip the per-cell tap affordance; the whole band
+    // opens the full Consistency module instead.
+    el.querySelectorAll('.cgraph__cell').forEach((cc) => {
+      cc.removeAttribute('role'); cc.removeAttribute('tabindex'); cc.classList.remove('cgraph__cell--tap');
+    });
+    el.setAttribute('role', 'button');
+    el.setAttribute('tabindex', '0');
+    if (!el._dashCgramBound) {
+      el._dashCgramBound = true;
+      const open = () => { try { if (typeof Sheet !== 'undefined') Sheet.open('streak'); } catch (e) {} };
+      el.addEventListener('click', open);
+      el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+    }
+  } catch (e) {}
+}
+
 function renderAll() {
   renderGreeting();
   try { renderDayCard(); } catch (e) {}
+  try { renderDashConsistency(); } catch (e) {}
   try { const _cc = document.getElementById('commandCenter'); if (_cc) { _cc.innerHTML = renderCommandCenter(); bindCommandCenter(_cc); } } catch (e) {}
   try { updateCaptureFab(); } catch (e) {}
   try { renderDailyMemento(); } catch (e) {}
