@@ -756,6 +756,13 @@ html.theme-light .widget--action .widget__icon { color: var(--text-hi) !importan
   .widget-grid > [data-area="resources"]  { grid-column: 10 / span 3; grid-row: 6; }
 }
 
+/* v27: the Home hero toggle and the duplicated "one thing to live" are retired at
+   EVERY width (incl. the 768-1023 tablet band that uses the legacy stacked layout),
+   so the command center always reads as the clean mission focus. The hero is forced
+   to oneThing in JS, so the toggle would be a dead control. */
+body.ns-bloom .app.dash-v2 #commandCenter .cc-hero-toggle { display: none !important; }
+body.ns-bloom .app.dash-v2 #commandCenter .cc-live { display: none; }
+
 /* ── v27 BENTO HOME (>=1024px, after the Neutron Star) ──────────────────────
    The Memento card is the centerpiece; the existing modules arrange around it.
    #dashBelow + #widgetGrid go display:contents so the card, command center,
