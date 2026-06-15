@@ -3402,3 +3402,22 @@ html.lowfx .auth-screen__card, body.lite .auth-screen__card { background: rgba(1
   .welcome-intro:has(.welcome-convo):not(:has(.wc-chips)) .welcome-convo { padding-top: 14px; }
   .welcome-intro:has(.welcome-convo):not(:has(.wc-chips)) .welcome-intro__nav:has(.wc-dock) { background: none; }
 }
+
+/* Virtual keyboard handling: the welcome-intro is a fixed full-screen (100lvh)
+   flex column that vertically centers the conversation + composer. When the iOS
+   keyboard opens it does NOT resize that fixed layer, so the centered content
+   floats high with a dead gap above the keyboard. JS (VisualViewport) sets
+   --wi-kb-h (keyboard height) + --wi-dock-h (composer height) and adds .wi-kb;
+   these rules then pin the conversation + composer TOGETHER just above the
+   keyboard so the input lands cleanly in reach. Background layers are
+   position:fixed/absolute, so they stay full-screen behind (no bar regression). */
+.welcome-intro.wi-kb .welcome-intro__nav:has(.wc-dock) {
+  position: fixed; left: 0; right: 0; bottom: var(--wi-kb-h, 0px); z-index: 3;
+  padding-bottom: 12px;
+}
+.welcome-intro.wi-kb .welcome-intro__page-wrap:has(.welcome-convo) {
+  position: fixed; left: 0; right: 0; top: auto;
+  bottom: calc(var(--wi-kb-h, 0px) + var(--wi-dock-h, 80px));
+  height: auto; max-height: 50vh; z-index: 2;
+  justify-content: flex-end;
+}

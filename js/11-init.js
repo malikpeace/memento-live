@@ -2238,3 +2238,39 @@ document.addEventListener('keydown', (e) => {
     });
   } catch (e) {}
 })();
+
+// Onboarding keyboard follow: when the virtual keyboard opens, the welcome-intro
+// is a fixed 100lvh layer that vertically centers the conversation + composer,
+// and iOS does NOT resize that fixed layer, so the content floats high with a
+// dead gap above the keyboard. Measure the keyboard height via VisualViewport
+// and feed it to CSS (--wi-kb-h + .wi-kb) so the flow box shrinks to the visible
+// area and the content re-centers cleanly just above the keyboard. Background
+// layers are fixed/absolute, so this never affects them.
+(function welcomeKeyboardFollow() {
+  try {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    let raf = 0;
+    const apply = () => {
+      raf = 0;
+      const wi = document.querySelector('.welcome-intro.open');
+      if (!wi) return;
+      // Keyboard overlap = how much of the layout viewport the visual viewport
+      // no longer covers at the bottom (height shrink minus any upward shift).
+      const kb = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
+      if (kb > 90) {
+        const dock = wi.querySelector('.welcome-intro__nav');
+        wi.style.setProperty('--wi-kb-h', kb + 'px');
+        if (dock) wi.style.setProperty('--wi-dock-h', dock.offsetHeight + 'px');
+        wi.classList.add('wi-kb');
+      } else if (wi.classList.contains('wi-kb')) {
+        wi.classList.remove('wi-kb');
+        wi.style.removeProperty('--wi-kb-h');
+        wi.style.removeProperty('--wi-dock-h');
+      }
+    };
+    const schedule = () => { if (!raf) raf = requestAnimationFrame(apply); };
+    vv.addEventListener('resize', schedule);
+    vv.addEventListener('scroll', schedule);
+  } catch (e) {}
+})();
