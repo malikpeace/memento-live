@@ -370,7 +370,7 @@ html.bg-flat .ambient__bloom { display: none !important; }
    or a cover-fit image; a mandatory scrim (dark linear gradient, opacity set
    from prefs.bgDim by applyCustomBackground) keeps the glass UI readable on
    any picture. Hidden entirely until body.custom-bg is set. */
-#customBg { position: fixed; top: 0; left: 0; right: 0; bottom: calc(-1 * env(safe-area-inset-bottom, 0px)); z-index: 0; pointer-events: none; overflow: hidden; display: none; }
+#customBg { position: fixed; top: 0; left: 0; right: 0; height: 100vh; height: 100lvh; z-index: 0; pointer-events: none; overflow: hidden; display: none; }
 body.custom-bg #customBg { display: block; }
 .custom-bg__media {
   position: absolute; inset: 0;
@@ -963,7 +963,7 @@ body {
   background: #000;
   color: var(--text-1);
   min-height: 100vh;
-  min-height: 100dvh;
+  min-height: 100lvh;
   overflow-x: hidden;
   /* Stop iOS rubber-band overscroll from revealing content behind fixed
      overlays (the dashboard peeking through a module while you drag). */
@@ -998,12 +998,12 @@ body::after {
    the edges + film grain (body::after) for tactile depth + NS bloom that
    illuminates once the user locks in their star. No blurry orbs. */
 .ambient {
-  /* Bleed past the bottom safe area so this universal backdrop paints the
-     home-indicator strip on EVERY screen in a standalone iOS PWA. inset:0 stops
-     at the safe-area line, leaving that strip showing body/manifest #000 (the
-     "black bar"). viewport-fit=cover makes this negative bottom real pixels. */
+  /* Fill the LARGE viewport (100lvh): the static full-screen height that reaches
+     the physical bottom edge in a standalone iOS PWA. inset:0 / 100dvh / 100svh
+     all stop short of the home-indicator strip (verified on-device), leaving the
+     "black bar". 100vh is the fallback for browsers without lvh. */
   position: fixed; top: 0; left: 0; right: 0;
-  bottom: calc(-1 * env(safe-area-inset-bottom, 0px));
+  height: 100vh; height: 100lvh;
   z-index: 0; pointer-events: none;
   overflow: hidden;
   background:
@@ -1019,7 +1019,7 @@ body::after {
 #bootMask {
   position: fixed;
   top: 0; left: 0; right: 0;
-  bottom: calc(-1 * env(safe-area-inset-bottom, 0px));
+  height: 100vh; height: 100lvh;
   background: #000;
   z-index: 999999;
   pointer-events: none;
