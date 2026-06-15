@@ -536,7 +536,9 @@ const WelcomeIntro = {
     send.addEventListener('click', submit);
     wrap.appendChild(ta); wrap.appendChild(send);
     this._wcWithFlip(() => { dock.appendChild(wrap); });
-    setTimeout(() => { try { ta.focus(); } catch (e) {} }, 250);
+    // preventScroll stops iOS's scroll-into-view jank (the screen briefly scrolling
+    // down to a black top strip then snapping back) when the field auto-focuses.
+    setTimeout(() => { try { ta.focus({ preventScroll: true }); } catch (e) { try { ta.focus(); } catch (e2) {} } }, 250);
   },
 
   // End of the conversation: fade the column out, then hand to the EXISTING
@@ -896,7 +898,7 @@ const WelcomeIntro = {
         }
       });
 
-      setTimeout(() => nameInput.focus(), 300);
+      setTimeout(() => nameInput.focus({ preventScroll: true }), 300);
     }, 250);
   },
 
@@ -995,7 +997,7 @@ const WelcomeIntro = {
       };
       if (btn) btn.addEventListener('click', submit);
       if (bday) bday.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); submit(); } });
-      setTimeout(() => { if (bday) bday.focus(); }, 300);
+      setTimeout(() => { if (bday) bday.focus({ preventScroll: true }); }, 300);
     }, 250);
   },
 
@@ -1095,7 +1097,7 @@ const WelcomeIntro = {
             this._setProgress(1);
             setTimeout(() => this._showIdentityStep(i + 1), 620);   // skip or continue both advance to the summary
           });
-          setTimeout(() => ta.focus(), 300);
+          setTimeout(() => ta.focus({ preventScroll: true }), 300);
         }
         bindBack();
         return;

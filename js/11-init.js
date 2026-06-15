@@ -2246,39 +2246,10 @@ document.addEventListener('keydown', (e) => {
 // and feed it to CSS (--wi-kb-h + .wi-kb) so the flow box shrinks to the visible
 // area and the content re-centers cleanly just above the keyboard. Background
 // layers are fixed/absolute, so this never affects them.
-(function welcomeKeyboardHoldStill() {
-  try {
-    const vv = window.visualViewport;
-    // Keep the onboarding conversation + composer visually STILL when the keyboard
-    // opens. iOS, on focusing an input inside a fixed full-screen layer, PANS the
-    // whole visual viewport up to lift the field (then settles) — a jump. Nothing
-    // is scrollable here, so we cancel the pan directly: translate the layer back
-    // down by the pan offset (vv.offsetTop) so it stays put. `armed` scopes this
-    // to while an onboarding input is focused; user-scalable=no means offsetTop>0
-    // is always the keyboard, never a pinch-zoom pan.
-    let raf = 0, armed = false;
-    const apply = () => {
-      raf = 0;
-      const wi = document.querySelector('.welcome-intro.open');
-      if (!wi) return;
-      // belt-and-suspenders: undo any document scroll too.
-      const se = document.scrollingElement || document.documentElement;
-      if (se && se.scrollTop) se.scrollTop = 0;
-      if (window.pageYOffset) { try { window.scrollTo(0, 0); } catch (e) {} }
-      const off = (armed && vv) ? Math.max(0, Math.round(vv.offsetTop)) : 0;
-      wi.style.transform = armed ? ('translateY(' + off + 'px)') : '';
-    };
-    const schedule = () => { if (!raf) raf = requestAnimationFrame(apply); };
-    if (vv) { vv.addEventListener('scroll', schedule); vv.addEventListener('resize', schedule); }
-    window.addEventListener('scroll', schedule, true);
-    document.addEventListener('focusin', (e) => {
-      const wi = document.querySelector('.welcome-intro.open');
-      const t = e.target;
-      if (wi && t && (t.tagName === 'TEXTAREA' || t.tagName === 'INPUT') && wi.contains(t)) {
-        armed = true;
-        [0, 50, 120, 250, 450].forEach((d) => setTimeout(schedule, d));
-      }
-    }, true);
-    document.addEventListener('focusout', () => { armed = false; [50, 250].forEach((d) => setTimeout(schedule, d)); }, true);
-  } catch (e) {}
-})();
+// Onboarding keyboard: the jank ("elements scroll down, black flashes at the top,
+// then snap back up" on focusing the name field) was iOS's scroll-into-view on
+// focus, made worse by JS that fought it frame-by-frame (transforms / scroll
+// resets) and produced the visible bounce. Fixed at the SOURCE instead: every
+// onboarding auto-focus now passes { preventScroll: true } (see
+// 09-controllers.js), so iOS never scrolls on focus. No runtime JS here — letting
+// the browser do nothing is what makes it smooth.
