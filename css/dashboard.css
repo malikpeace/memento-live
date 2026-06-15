@@ -775,7 +775,11 @@ body.ns-bloom .app.dash-v2 #commandCenter .cc-live { display: none; }
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
     gap: 16px;
-    align-content: start;
+    /* Center the whole dashboard vertically instead of pinning it to the top
+       (Malik's repeated ask: no dead space at the bottom). `safe` falls back to
+       top-aligned if the content ever grows taller than the viewport, so a tall
+       layout never gets its top row clipped. */
+    align-content: safe center;
     /* stretch (not start): every tile FILLS its cell so columns of different
        natural heights read as clean equal blocks instead of leaving voids next
        to the short cards. The card defines the hero band height. */
