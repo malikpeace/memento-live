@@ -2623,8 +2623,8 @@ function renderCommandCenter() {
       // Today: one clean layout. The one thing, then the daily loop (act / check
       // in / review) and the Vivere "one thing to live". This is the only tab the
       // daily loop lives in, so the Consistency and Goal tabs stay focused.
-      row += '<div style="font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-lo);margin-bottom:6px;">Today</div>';
-      row += '<div style="font-size:1.5rem;font-weight:700;line-height:1.25;letter-spacing:-0.01em;color:var(--text-hi);margin-bottom:12px;">' + esc(oneThing) + '</div>';
+      row += '<div class="cc-od-eyebrow" style="font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-lo);margin-bottom:6px;">Today</div>';
+      row += '<div class="cc-od-title" style="font-size:1.5rem;font-weight:700;line-height:1.25;letter-spacing:-0.01em;color:var(--text-hi);margin-bottom:12px;">' + esc(oneThing) + '</div>';
       // Last night's self-named action, if one was planned. Their own words
       // outrank everything else on the surface, shown first and quietly.
       {
@@ -2633,8 +2633,8 @@ function renderCommandCenter() {
           row += '<div style="font-size:0.85rem;line-height:1.45;color:var(--text-mid);margin-bottom:6px;"><span style="color:' + C + ';font-weight:650;">You planned this last night: </span>' + esc(tp.text) + '</div>';
         }
       }
-      if (tiny) row += '<div style="font-size:0.85rem;line-height:1.45;color:var(--text-mid);margin-bottom:6px;"><span style="color:var(--text-lo);">Minimum: </span>' + esc(tiny) + '</div>';
-      if (how) row += '<div style="font-size:0.85rem;line-height:1.45;color:var(--text-mid);"><span style="color:var(--text-lo);">If resistance hits: </span>' + esc(how) + '</div>';
+      if (tiny) row += '<div class="cc-od-sub" style="font-size:0.85rem;line-height:1.45;color:var(--text-mid);margin-bottom:6px;"><span style="color:var(--text-lo);">Minimum: </span>' + esc(tiny) + '</div>';
+      if (how) row += '<div class="cc-od-sub" style="font-size:0.85rem;line-height:1.45;color:var(--text-mid);"><span style="color:var(--text-lo);">If resistance hits: </span>' + esc(how) + '</div>';
       // ---- the daily loop (lives only in Today) --------------------------------
       row += '<div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--hairline);">';
       row += '<div style="display:flex;gap:8px;flex-wrap:wrap;">';

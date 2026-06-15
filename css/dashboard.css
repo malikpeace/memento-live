@@ -767,26 +767,27 @@ html.theme-light .widget--action .widget__icon { color: var(--text-hi) !importan
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 {
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: var(--dash-gap);
+    gap: 16px;
     align-content: start;
-    align-items: start;
+    /* stretch (not start): every tile FILLS its cell so columns of different
+       natural heights read as clean equal blocks instead of leaving voids next
+       to the short cards. The card defines the hero band height. */
+    align-items: stretch;
   }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashBelow,
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #widgetGrid { display: contents; }
 
   /* header full width on top; dev box + mobile greeting stay out of the grid */
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .dash-header { grid-column: 1 / -1; grid-row: 1; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .dash-header { grid-column: 1 / -1; grid-row: 1; align-self: start; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #creatorBox,
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashGreetingMobile { display: none; }
 
   /* LEFT rail: mission / focus + quote of the day */
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter { grid-column: 1 / span 3; grid-row: 2; }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dailyMemento  { grid-column: 1 / span 3; grid-row: 3; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dailyMemento  { grid-column: 1 / span 3; grid-row: 3; overflow: hidden; }
 
-  /* CENTER: the Memento card, enlarged, spanning the card band. align-items:
-     stretch (not the default center) so the wrap fills the cell width, then the
-     wrap centers the card inside it; otherwise the column-flex shrink-wraps the
-     card to content and width:100% collapses. */
+  /* CENTER: the Memento card, the centerpiece, spanning the hero band (rows
+     2-3). Its min-height sets the band height that the side rails fill to. */
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard {
     grid-column: 4 / span 6; grid-row: 2 / span 2; margin: 0;
     align-items: stretch;
@@ -795,18 +796,22 @@ html.theme-light .widget--action .widget__icon { color: var(--text-hi) !importan
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-wrap {
     width: 100%;
     display: flex;
+    align-items: center;
     justify-content: center;
   }
 
-  /* RIGHT rail: Consistency, Check-in, Notes (taller than the card) */
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="streak"]     { grid-column: 10 / span 3; grid-row: 2; }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="checkin"]    { grid-column: 10 / span 3; grid-row: 3; }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="reflection"] { grid-column: 10 / span 3; grid-row: 4; }
+  /* RIGHT rail: Consistency + Check-in, each filling half the hero band. */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="streak"]  { grid-column: 10 / span 3; grid-row: 2; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="checkin"] { grid-column: 10 / span 3; grid-row: 3; }
 
-  /* BELOW the card: Memento Mori, Clarity, Action */
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="mori"]    { grid-column: 1 / span 3; grid-row: 4; }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="clarity"] { grid-column: 4 / span 3; grid-row: 4; }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="action"]  { grid-column: 7 / span 3; grid-row: 4; }
+  /* BELOW the card: Mori, Clarity, Action, Notes - one even four-up row. */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="mori"]       { grid-column: 1 / span 3;  grid-row: 4; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="clarity"]    { grid-column: 4 / span 3;  grid-row: 4; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="action"]     { grid-column: 7 / span 3;  grid-row: 4; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="reflection"] { grid-column: 10 / span 3; grid-row: 4; }
+  /* cap the content-heavy tiles so the four-up row stays an even band */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="clarity"],
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="reflection"] { max-height: 260px; overflow: hidden; }
 
   /* BOTTOM: Memento Vivere, full-width strip */
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="vivere"] { grid-column: 1 / -1; grid-row: 5; }
@@ -818,10 +823,36 @@ html.theme-light .widget--action .widget__icon { color: var(--text-hi) !importan
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="distraction"],
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .dash-more { display: none; }
 
-  /* the card becomes the bigger centerpiece (overrides the 860px sizing) */
+  /* COMMAND CENTER compacting: on the bento Home the mission card stays a clean
+     focus card (eyebrow + today's one thing + the primary action + proof trail).
+     The secondary helper lines and the "one thing to live" block (already the
+     full-width Vivere strip below) are hidden here so it reads like the mockup
+     and matches the card's height instead of towering over it. */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-live,
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-od-sub { display: none; }
+  /* the hero toggle carries an inline display, so !important is needed to retire
+     it on the bento Home (the mission card leads with Today; Consistency has its
+     own tile and the goal lives in Clarity). */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-hero-toggle { display: none !important; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-od-title { font-size: 1.05rem !important; line-height: 1.2 !important; margin-bottom: 10px !important; }
+
+  /* cap the "On this day" / quote so it never towers over the mission card; the
+     soft bottom fade keeps a clipped line from hard-cutting at the card edge. */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dailyMemento {
+    max-height: 150px;
+    -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent);
+    mask-image: linear-gradient(to bottom, #000 72%, transparent);
+  }
+
+  /* the right-rail cards stretch to fill the hero band; center their content so a
+     taller-than-content card reads as intentional space, not a top-stuck label */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="streak"],
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="checkin"] { justify-content: center; }
+
+  /* the card is the bigger centerpiece (overrides the 860px sizing) */
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-theme-platinum .daycard-ns { width: min(100%, 460px); }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-theme-living .daycard-living-stage { width: min(100%, 460px); }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-ns { min-height: 520px; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-ns { min-height: 480px; }
 }
 
 /* ── v27 BENTO HOME, mobile (<768px, after the Neutron Star) ─────────────────
