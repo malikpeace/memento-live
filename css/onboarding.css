@@ -904,7 +904,11 @@ body.calm-motion .empty-state, body.lite .empty-state { animation: none; }
    WELCOME INTRO
    ============================================ */
 .welcome-intro {
-  position: fixed; inset: 0; z-index: 210;
+  /* Pin to the DYNAMIC viewport, not inset:0 (which iOS sizes to the large
+     viewport, so the centered content centers in a too-tall box and the bottom
+     of the layer falls below the visible screen = "cut off at the bottom"). */
+  position: fixed; inset: 0 0 auto 0; z-index: 210;
+  height: 100vh; height: 100dvh;
   background: #030208;
   display: flex; flex-direction: column;
   opacity: 0; pointer-events: none;
@@ -1948,7 +1952,10 @@ body:has(.clarity-exp.open-content) .fullscreen-close-global {
    ============================================ */
 /* ── Splash screen ── */
 .splash {
-  position: fixed; inset: 0; z-index: 250;
+  /* Dynamic viewport (not inset:0) so it fills exactly the visible screen on
+     iOS and the centered content never falls below the fold. */
+  position: fixed; inset: 0 0 auto 0; z-index: 250;
+  height: 100vh; height: 100dvh;
   display: flex; align-items: center; justify-content: center;
   background: #000;
   transition: opacity 0.6s var(--ease-out);
