@@ -35,16 +35,14 @@ const RENDERERS = {
       });
       const starCanvas = c.querySelector('#dashMissionStar');
       if (starCanvas && typeof initStarBlob === 'function') initStarBlob(starCanvas, 200);
-      el.style.background = 'linear-gradient(155deg, rgba(85, 80, 204, 0.32), rgba(37, 24, 84, 0.22) 60%, rgba(20, 22, 28, 0.7))';
-      el.style.borderColor = 'rgba(140, 120, 255, 0.28)';
+      // (no inline tint: the .widget glass rule is !important, so the modules stay
+      // flat per the design; the old purple inline gradient never showed.)
     } else {
       // Not yet completed - keep the existing prompt
       const titleEl = c.querySelector('.widget__title');
       const subEl   = c.querySelector('.widget__subtitle');
       if (titleEl) titleEl.textContent = 'Get clear on the goal';
       if (subEl)   subEl.textContent   = 'Find your Neutron Star';
-      el.style.background = '';
-      el.style.borderColor = '';
     }
   },
 
@@ -533,6 +531,11 @@ function renderGrid() {
   const hasNeutronStar = !!(state.clarity && state.clarity.answers && state.clarity.answers.neutronStar);
   document.body.classList.toggle('ns-bloom', hasNeutronStar);
 
+  // v27 bento opt-out flag (kept current above the early returns so a stale
+  // has-custom-layout can never linger on brand-new / pre-clarity renders).
+  const _customized = !!(state.ui && state.ui.layoutCustomized);
+  document.body.classList.toggle('has-custom-layout', _customized);
+
   // Brand-new user: the welcome hero (command center) is the whole dashboard.
   // No module cards, no More strip; everything appears as it unlocks.
   if (isBrandNewUser()) return;
@@ -548,15 +551,11 @@ function renderGrid() {
   // saved order with per-size spans (.is-custom overrides the designed data-area
   // placement) and hidden widgets are skipped. Otherwise the hand-tuned default
   // layout renders exactly as before.
-  const _customized = !!(state.ui && state.ui.layoutCustomized);
   const _hidden = Array.isArray(state.hiddenWidgets) ? state.hiddenWidgets : [];
+  // .is-custom on the grid pairs with body.has-custom-layout (set above): a
+  // customized layout opts OUT of the card-centered bento and renders its own
+  // saved grid (the bento gates itself off via :not(.has-custom-layout)).
   grid.classList.toggle('is-custom', _customized);
-  // v27: a customized layout opts OUT of the card-centered bento entirely. The
-  // bento flattens #widgetGrid (display:contents) and pins each tile by data-area,
-  // which would out-specify and break the saved custom order. This body flag lets
-  // the bento gate itself off (:not(.has-custom-layout)) so the grid renders as its
-  // own customized grid in the legacy stacked layout instead.
-  document.body.classList.toggle('has-custom-layout', _customized);
 
   state.widgetOrder.forEach(({ key, size }) => {
     const def = WIDGET_DEFS[key];
@@ -2566,7 +2565,7 @@ function renderCommandCenter() {
       return wrap(cb);
     }
 
-    const oneThing = tiers[pa.recommendedTier] || pa.title || '';
+    const oneThing = (tiers[pa.recommendedTier] || pa.title || '').trim() || 'Take one step toward your goal today';
     const tiny = tiers.tiny || '';
     const how = pa.howToStart || pa.recommendedWhy || '';
     const todayStr = getTodayISO();

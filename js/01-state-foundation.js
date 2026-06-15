@@ -2473,9 +2473,15 @@ const DragDrop = {
     this.sourceEl = widget;
     this.sourceKey = widget.dataset.widget;
 
-    this.longPressTimer = setTimeout(() => {
-      this.startDrag(e);
-    }, 400);
+    // Drag-to-reorder only matters in custom-layout mode. The default/bento layout
+    // places tiles by data-area and ignores DOM order, so a drag there would snap
+    // back yet silently change the saved order. Only arm the long-press drag when
+    // the layout is customized; tap-to-open (onPointerUp) still works either way.
+    if (state.ui && state.ui.layoutCustomized) {
+      this.longPressTimer = setTimeout(() => {
+        this.startDrag(e);
+      }, 400);
+    }
   },
 
   startDrag(e) {
