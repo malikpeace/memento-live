@@ -904,11 +904,12 @@ body.calm-motion .empty-state, body.lite .empty-state { animation: none; }
    WELCOME INTRO
    ============================================ */
 .welcome-intro {
-  /* height:100vh (the LARGE viewport) covers the full physical screen in a
-     standalone iOS PWA, including the home-indicator strip. inset:0 and 100dvh
-     both stop at the safe-area line there, leaving a black band at the bottom. */
+  /* Bleed past the bottom safe area (same technique as the global .ambient
+     backdrop) so this layer reaches the physical screen edge in a standalone
+     PWA. inset:0 stops at the safe-area line; the negative bottom paints the
+     home-indicator strip. viewport-fit=cover makes it resolve to real pixels. */
   position: fixed; top: 0; left: 0; right: 0; z-index: 210;
-  height: 100vh;
+  bottom: calc(-1 * env(safe-area-inset-bottom, 0px));
   background: #030208;
   display: flex; flex-direction: column;
   opacity: 0; pointer-events: none;
@@ -1549,7 +1550,7 @@ body.lite .welcome-intro--help::before, body.lite .welcome-intro--help::after { 
 }
 body.lite .welcome-intro__beacon { animation: none; opacity: 1; transform: translate(-32%,-36%); }
 /* stage lighting: crossfading colored glow layers driven per onboarding page */
-.welcome-intro__stage { position: fixed; top: 0; left: 0; right: 0; height: 100vh; z-index: 0; pointer-events: none; overflow: hidden; }
+.welcome-intro__stage { position: fixed; top: 0; left: 0; right: 0; bottom: calc(-1 * env(safe-area-inset-bottom, 0px)); z-index: 0; pointer-events: none; overflow: hidden; }
 .welcome-intro__glow {
   position: absolute; inset: -12%; opacity: 0; transform: translate3d(0,0,0) scale(0.92);
   transition: opacity 1.45s cubic-bezier(0.22,1,0.36,1), transform 1.65s cubic-bezier(0.22,1,0.36,1);
@@ -1952,10 +1953,11 @@ body:has(.clarity-exp.open-content) .fullscreen-close-global {
    ============================================ */
 /* ── Splash screen ── */
 .splash {
-  /* 100vh = full physical screen in a standalone PWA (covers the home-indicator
-     strip that inset:0 / 100dvh leave black at the bottom). */
+  /* Bleed past the bottom safe area (same as the global backdrop) so the splash
+     reaches the physical screen edge in a standalone PWA, no home-indicator
+     black strip. */
   position: fixed; top: 0; left: 0; right: 0; z-index: 250;
-  height: 100vh;
+  bottom: calc(-1 * env(safe-area-inset-bottom, 0px));
   display: flex; align-items: center; justify-content: center;
   background: #000;
   transition: opacity 0.6s var(--ease-out);

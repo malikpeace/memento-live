@@ -370,7 +370,7 @@ html.bg-flat .ambient__bloom { display: none !important; }
    or a cover-fit image; a mandatory scrim (dark linear gradient, opacity set
    from prefs.bgDim by applyCustomBackground) keeps the glass UI readable on
    any picture. Hidden entirely until body.custom-bg is set. */
-#customBg { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; display: none; }
+#customBg { position: fixed; top: 0; left: 0; right: 0; bottom: calc(-1 * env(safe-area-inset-bottom, 0px)); z-index: 0; pointer-events: none; overflow: hidden; display: none; }
 body.custom-bg #customBg { display: block; }
 .custom-bg__media {
   position: absolute; inset: 0;
@@ -998,7 +998,13 @@ body::after {
    the edges + film grain (body::after) for tactile depth + NS bloom that
    illuminates once the user locks in their star. No blurry orbs. */
 .ambient {
-  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  /* Bleed past the bottom safe area so this universal backdrop paints the
+     home-indicator strip on EVERY screen in a standalone iOS PWA. inset:0 stops
+     at the safe-area line, leaving that strip showing body/manifest #000 (the
+     "black bar"). viewport-fit=cover makes this negative bottom real pixels. */
+  position: fixed; top: 0; left: 0; right: 0;
+  bottom: calc(-1 * env(safe-area-inset-bottom, 0px));
+  z-index: 0; pointer-events: none;
   overflow: hidden;
   background:
     radial-gradient(ellipse 70% 60% at 50% 50%,
@@ -1012,7 +1018,8 @@ body::after {
    you used to get when refreshing while inside the action module. */
 #bootMask {
   position: fixed;
-  inset: 0;
+  top: 0; left: 0; right: 0;
+  bottom: calc(-1 * env(safe-area-inset-bottom, 0px));
   background: #000;
   z-index: 999999;
   pointer-events: none;
