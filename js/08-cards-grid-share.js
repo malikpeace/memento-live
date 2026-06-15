@@ -3386,7 +3386,7 @@ function startLivingWander(wrap) {
     if (!inside.length) return;
     const R = (a, b) => a + Math.random() * (b - a);
     const st = inside.map(() => ({ x: 0, y: 0, sc: 1, tx: R(-20, 20), ty: R(-18, 18), tsc: R(0.92, 1.16) }));
-    const SPEED = 2;  // baked pace (prototype Motion 2.0x)
+    const SPEED = 1;  // slowed ~50% (Malik): the living color drifts calmly
     const k = Math.min(0.2, 0.011 * SPEED);
     function frame() {
       for (let i = 0; i < inside.length; i++) {

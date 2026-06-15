@@ -125,7 +125,7 @@ body:not(.ns-bloom) .daycard-theme-living .daycard-wrap__aura {
   -webkit-mask-composite: xor;
           mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
           mask-composite: exclude;
-  animation: dcLivingGlimmer 3.6s ease-in-out infinite;
+  animation: dcLivingGlimmer 7.2s ease-in-out infinite;
 }
 @keyframes dcLivingGlimmer {
   0%,100% { opacity: calc(var(--ring, 0) * 0.72); }
