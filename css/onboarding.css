@@ -904,10 +904,13 @@ body.calm-motion .empty-state, body.lite .empty-state { animation: none; }
    WELCOME INTRO
    ============================================ */
 .welcome-intro {
-  /* Full-bleed inset:0 so the layer stretches to every screen edge, including
-     the home-indicator safe area in a standalone PWA. (height:100dvh comes up
-     short of the true bottom in standalone, leaving a black band.) */
-  position: fixed; inset: 0; z-index: 210;
+  /* Bleed PAST the bottom safe area so the background reaches the physical
+     screen edge in a standalone PWA (bottom:0 can land at the safe-area line,
+     leaving the home-indicator strip showing the black page behind). The nav's
+     own safe-area padding keeps the buttons above the indicator. */
+  position: fixed; top: 0; left: 0; right: 0;
+  bottom: calc(-1 * env(safe-area-inset-bottom, 0px));
+  z-index: 210;
   background: #030208;
   display: flex; flex-direction: column;
   opacity: 0; pointer-events: none;
@@ -1548,7 +1551,7 @@ body.lite .welcome-intro--help::before, body.lite .welcome-intro--help::after { 
 }
 body.lite .welcome-intro__beacon { animation: none; opacity: 1; transform: translate(-32%,-36%); }
 /* stage lighting: crossfading colored glow layers driven per onboarding page */
-.welcome-intro__stage { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.welcome-intro__stage { position: fixed; top: 0; left: 0; right: 0; bottom: calc(-1 * env(safe-area-inset-bottom, 0px)); z-index: 0; pointer-events: none; overflow: hidden; }
 .welcome-intro__glow {
   position: absolute; inset: -12%; opacity: 0; transform: translate3d(0,0,0) scale(0.92);
   transition: opacity 1.45s cubic-bezier(0.22,1,0.36,1), transform 1.65s cubic-bezier(0.22,1,0.36,1);
@@ -1951,9 +1954,11 @@ body:has(.clarity-exp.open-content) .fullscreen-close-global {
    ============================================ */
 /* ── Splash screen ── */
 .splash {
-  /* Full-bleed inset:0 so it covers every screen edge incl. the home-indicator
-     safe area in a standalone PWA (height:100dvh left a black band there). */
-  position: fixed; inset: 0; z-index: 250;
+  /* Bleed past the bottom safe area so the splash background reaches the
+     physical screen edge in a standalone PWA (no home-indicator black strip). */
+  position: fixed; top: 0; left: 0; right: 0;
+  bottom: calc(-1 * env(safe-area-inset-bottom, 0px));
+  z-index: 250;
   display: flex; align-items: center; justify-content: center;
   background: #000;
   transition: opacity 0.6s var(--ease-out);
