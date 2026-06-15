@@ -3398,15 +3398,25 @@ html.lowfx .auth-screen__card, body.lite .auth-screen__card { background: rgba(1
    Chip steps stay bottom-anchored because eight stacked options need the room.
    The chip<->non-chip transition is glided via FLIP in the engine, not snapped. */
 @media (max-width: 899px) {
-  .welcome-intro:has(.welcome-convo):not(:has(.wc-chips)) { justify-content: center; }
+  /* NOTHING-MOVES keyboard: rest the conversation + composer just ABOVE where the
+     keyboard will appear, with the keyboard's space pre-reserved below (the
+     padding-bottom ~ keyboard height). The composer auto-focuses, so the keyboard
+     just slides up to meet the input — no scroll, no jump, nothing shifts. The
+     document scroll is also locked in JS while focused as a hard guarantee. */
+  .welcome-intro:has(.welcome-convo):not(:has(.wc-chips)) { justify-content: flex-end; }
   .welcome-intro:has(.welcome-convo):not(:has(.wc-chips)) .welcome-intro__page-wrap:has(.welcome-convo) {
     flex: 0 1 auto;
-    max-height: 60vh;
+    max-height: 48vh;
     justify-content: flex-end;
     overflow-y: auto;
   }
   .welcome-intro:has(.welcome-convo):not(:has(.wc-chips)) .welcome-convo { padding-top: 14px; }
-  .welcome-intro:has(.welcome-convo):not(:has(.wc-chips)) .welcome-intro__nav:has(.wc-dock) { background: none; }
+  .welcome-intro:has(.welcome-convo):not(:has(.wc-chips)) .welcome-intro__nav:has(.wc-dock) {
+    background: none;
+    /* Reserve the keyboard's height below the composer so it rests right where
+       it will sit once the keyboard is up. ~43vh ≈ the iOS keyboard. */
+    padding-bottom: calc(43vh + env(safe-area-inset-bottom, 0px));
+  }
 }
 
 /* Virtual keyboard: rather than chase the keyboard (which fights iOS and ended
