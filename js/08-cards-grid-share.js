@@ -927,7 +927,10 @@ const MoreSpace = {
       const def = WIDGET_DEFS[en.key] || {};
       const info = LADDER_INFO[en.key] || {};
       const opens = (state.ui && state.ui.moduleOpens && state.ui.moduleOpens[en.key]) || 0;
-      const canPin = this._mode !== 'switcher' && !en.locked && def && !def.synthetic && opens >= 3;
+      // v27: these four are deliberately not placed on the bento Home, so pinning
+      // them would do nothing visible. Don't offer the pin for them.
+      const _bentoHidden = (en.key === 'lifestats' || en.key === 'deepwork' || en.key === 'flow' || en.key === 'distraction');
+      const canPin = this._mode !== 'switcher' && !en.locked && def && !def.synthetic && opens >= 3 && !_bentoHidden;
       html += '<div class="more-card' + (en.locked ? ' more-card--locked' : '') + '" data-more-key="' + en.key + '" role="button" tabindex="0">' +
         '<div class="more-card__icon">' + (def.icon || '') + '</div>' +
         '<div class="more-card__name">' + esc(def.label || en.key) + '</div>' +
@@ -2571,13 +2574,13 @@ function renderCommandCenter() {
     const doneToday = Array.isArray(ch) && ch.length && ch[ch.length - 1].date && isoToLocalDay(ch[ch.length - 1].date) === todayStr;
     const streak = (state.streak && state.streak.count) || 0;
 
-    // ---- Swappable Home hero (v16). In the v27 card-centered Home, Consistency
-    // has its own dedicated tile in the bento, so the command center leads with
-    // Today's one thing (the actual daily mission / focus) by default; the user
-    // can still flip to Consistency or their Neutron Star, persisted in
-    // state.ui.homeHero. The proof/checkin actions stay constant below the hero
-    // so the daily loop is always present no matter which centerpiece is showing.
-    const hero = (state.ui && state.ui.homeHero) || 'oneThing';
+    // ---- Home hero. v27 retires the old swappable centerpiece: the card-centered
+    // Home gives Consistency its own tile and the goal lives in Clarity, so the
+    // command center ALWAYS leads with Today's one thing (the daily mission/focus).
+    // Forcing it here (rather than reading state.ui.homeHero) means the retired
+    // Settings selector can't re-introduce the tall consistency/goal hero that
+    // overflowed the narrow bento column. The toggle is hidden in the bento CSS.
+    const hero = 'oneThing';
     const seg = (k, label) => '<button class="cc-hero-seg' + (hero === k ? ' is-active' : '') + '" data-cc-hero="' + k + '" aria-label="Show ' + esc(label) + '" aria-pressed="' + (hero === k ? 'true' : 'false') + '" style="font:inherit;font-weight:650;font-size:0.76rem;cursor:pointer;border:none;border-radius:calc(6px * var(--rx, 1));padding:7px 14px;background:transparent;color:' + (hero === k ? 'var(--text-hi)' : 'var(--text-lo)') + ';position:relative;z-index:1;transition:color .22s ease;">' + esc(label) + '</button>';
     // v19 daily bookend / weekly-review banner removed (Malik: felt like clutter
     // above the hero, and overlapped the Check-in widget). The weekly review is

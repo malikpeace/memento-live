@@ -3356,11 +3356,6 @@ const TabBar = {
     const SECLABEL = 'font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-2); margin-bottom: 12px;';
     const FLABEL = 'font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); margin: 16px 0 6px;';
     const rem = (state.prefs && state.prefs.reminder) || {};
-    const heroNow = (state.ui && state.ui.homeHero) || 'oneThing';
-    const heroBtns = [['consistency', 'Consistency'], ['oneThing', 'Today'], ['neutron', 'Goal']].map(([k, l]) => {
-      const sel = heroNow === k;
-      return '<button type="button" class="pref-swatch' + (sel ? ' pref-swatch--active' : '') + '" data-hero="' + k + '" aria-pressed="' + sel + '"><span class="pref-swatch__label">' + l + '</span></button>';
-    }).join('');
     body.innerHTML = `
       <div style="text-align:center; padding: 32px 0 24px;">
         <div id="profAvatar" style="width: 64px; height: 64px; border-radius: 50%; background-color: rgba(123,97,255,0.15); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-size: 1.5rem; color: var(--color-clarity); border: 1px solid var(--hairline); overflow: hidden;">${esc((state.profile.name || 'U').charAt(0).toUpperCase())}</div>
@@ -3398,12 +3393,6 @@ const TabBar = {
           <input type="text" id="profReturnCue" maxlength="80" value="${esc(state.profile.returnCue || '')}" placeholder="finish my coffee" style="${FIELD}flex:1; min-width:140px; width:auto;" />
           <span style="font-size:0.9rem; color:var(--text-2);">, I open Memento.</span>
         </div>
-      </div>
-      <div class="sheet-divider"></div>
-      <div style="padding: 20px 0;">
-        <div style="${SECLABEL}">Home centerpiece</div>
-        <div style="font-size: 0.6875rem; color: var(--text-3); margin: 0 0 10px;">What sits at the top of your dashboard.</div>
-        <div class="pref-swatches" id="prefHomeHero">${heroBtns}</div>
       </div>
       <div class="sheet-divider"></div>
       <div style="padding: 20px 0;">
@@ -3531,22 +3520,8 @@ const TabBar = {
     bindProfileField('profStory', 'story');
     bindProfileField('profLetter', 'letterToFutureSelf');
     bindProfileField('profReturnCue', 'returnCue');
-    // Home centerpiece selector: sets the default Home hero.
-    const heroWrap = document.getElementById('prefHomeHero');
-    if (heroWrap) {
-      heroWrap.querySelectorAll('[data-hero]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          if (!state.ui) state.ui = {};
-          state.ui.homeHero = btn.getAttribute('data-hero');
-          persistNow();
-          heroWrap.querySelectorAll('[data-hero]').forEach(b => {
-            const on = b === btn;
-            b.classList.toggle('pref-swatch--active', on);
-            b.setAttribute('aria-pressed', on ? 'true' : 'false');
-          });
-        });
-      });
-    }
+    // (v27: the "Home centerpiece" selector is retired - the command center always
+    // leads with Today's mission; Consistency has its own tile, the goal lives in Clarity.)
     // v19 Custom Layouts: open the Customize Dashboard sheet from settings.
     const custLayoutBtn = document.getElementById('prefCustomizeLayout');
     if (custLayoutBtn) custLayoutBtn.addEventListener('click', () => { try { if (typeof Sheet !== 'undefined' && Sheet.open) Sheet.open('layout'); } catch (e) {} });

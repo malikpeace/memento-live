@@ -1609,6 +1609,12 @@ function migrateState() {
   if (!Array.isArray(state.proofEvents)) state.proofEvents = [];
   if (!state.ui || typeof state.ui !== 'object') state.ui = {};
   if (state.ui.homeHero === undefined) state.ui.homeHero = 'oneThing';
+  // v27: the Home hero toggle is retired on the desktop bento; the mission focus
+  // (Today / oneThing) is the centerpiece, and Consistency has its own tile. Reset
+  // users still on the old 'consistency'/'neutron' default ONCE so the left card is
+  // the clean mission, not the tall heatmap hero. The flag means a deliberate later
+  // switch (still available on mobile) sticks.
+  if (!state.ui._v27HeroReset) { state.ui.homeHero = 'oneThing'; state.ui._v27HeroReset = true; }
   if (!state.ui.variants || typeof state.ui.variants !== 'object') state.ui.variants = { home: 'a', streak: 'a', mori: 'a' };
   if (state.ui.variants.home === undefined) state.ui.variants.home = 'a';
   if (state.ui.variants.streak === undefined) state.ui.variants.streak = 'a';
@@ -2333,6 +2339,10 @@ const Sheet = {
     this.isOpen = false;
     this.currentWidget = null;
     document.body.style.overflow = '';
+    // The open crossfade fades #app to opacity 0 and only restores it on a fixed
+    // 1100ms timer; closing the sheet sooner would otherwise leave the dashboard
+    // black until that timer fires. Restore it immediately on close.
+    try { const _app = document.getElementById('app'); if (_app) _app.classList.remove('app--fading-out'); } catch (e) {}
     // Refresh-survival: leaving the module hands lastView back to the active
     // tab (Settings etc.) or clears it on Home. Action/clarity manage their own.
     try {
