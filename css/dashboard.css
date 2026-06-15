@@ -320,6 +320,13 @@ html.theme-light .widget--action .widget__icon { color: var(--text-hi) !importan
   border-color: var(--glass-border-hover) !important;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5) !important;
 }
+/* Keyboard focus ring: the tiles are role="button" tabindex="0" and are the
+   primary Home in v27, so they need a visible, on-brand focus ring (WCAG 2.4.7).
+   :focus-visible keeps it keyboard-only (no ring on pointer taps). */
+.widget:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
 .widget--synthetic {
   background: var(--glass-bg) !important;
 }
@@ -757,130 +764,138 @@ html.theme-light .widget--action .widget__icon { color: var(--text-hi) !importan
    by DESCENDANT (not `>` from .app); the extra .app.dash-v2 + body.ns-bloom
    specificity out-ranks the legacy .widget-grid placement rules above. */
 @media (min-width: 1024px) {
-  body.ns-bloom .app.dash-v2 {
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 {
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
     gap: var(--dash-gap);
     align-content: start;
     align-items: start;
   }
-  body.ns-bloom .app.dash-v2 #dashBelow,
-  body.ns-bloom .app.dash-v2 #widgetGrid { display: contents; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashBelow,
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #widgetGrid { display: contents; }
 
   /* header full width on top; dev box + mobile greeting stay out of the grid */
-  body.ns-bloom .app.dash-v2 .dash-header { grid-column: 1 / -1; grid-row: 1; }
-  body.ns-bloom .app.dash-v2 #creatorBox,
-  body.ns-bloom .app.dash-v2 #dashGreetingMobile { display: none; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .dash-header { grid-column: 1 / -1; grid-row: 1; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #creatorBox,
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashGreetingMobile { display: none; }
 
   /* LEFT rail: mission / focus + quote of the day */
-  body.ns-bloom .app.dash-v2 #commandCenter { grid-column: 1 / span 3; grid-row: 2; }
-  body.ns-bloom .app.dash-v2 #dailyMemento  { grid-column: 1 / span 3; grid-row: 3; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter { grid-column: 1 / span 3; grid-row: 2; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dailyMemento  { grid-column: 1 / span 3; grid-row: 3; }
 
   /* CENTER: the Memento card, enlarged, spanning the card band. align-items:
      stretch (not the default center) so the wrap fills the cell width, then the
      wrap centers the card inside it; otherwise the column-flex shrink-wraps the
      card to content and width:100% collapses. */
-  body.ns-bloom .app.dash-v2 #dayCard {
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard {
     grid-column: 4 / span 6; grid-row: 2 / span 2; margin: 0;
     align-items: stretch;
     justify-content: center;
   }
-  body.ns-bloom .app.dash-v2 #dayCard .daycard-wrap {
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-wrap {
     width: 100%;
     display: flex;
     justify-content: center;
   }
 
   /* RIGHT rail: Consistency, Check-in, Notes (taller than the card) */
-  body.ns-bloom .app.dash-v2 [data-area="streak"]     { grid-column: 10 / span 3; grid-row: 2; }
-  body.ns-bloom .app.dash-v2 [data-area="checkin"]    { grid-column: 10 / span 3; grid-row: 3; }
-  body.ns-bloom .app.dash-v2 [data-area="reflection"] { grid-column: 10 / span 3; grid-row: 4; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="streak"]     { grid-column: 10 / span 3; grid-row: 2; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="checkin"]    { grid-column: 10 / span 3; grid-row: 3; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="reflection"] { grid-column: 10 / span 3; grid-row: 4; }
 
   /* BELOW the card: Memento Mori, Clarity, Action */
-  body.ns-bloom .app.dash-v2 [data-area="mori"]    { grid-column: 1 / span 3; grid-row: 4; }
-  body.ns-bloom .app.dash-v2 [data-area="clarity"] { grid-column: 4 / span 3; grid-row: 4; }
-  body.ns-bloom .app.dash-v2 [data-area="action"]  { grid-column: 7 / span 3; grid-row: 4; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="mori"]    { grid-column: 1 / span 3; grid-row: 4; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="clarity"] { grid-column: 4 / span 3; grid-row: 4; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="action"]  { grid-column: 7 / span 3; grid-row: 4; }
 
   /* BOTTOM: Memento Vivere, full-width strip */
-  body.ns-bloom .app.dash-v2 [data-area="vivere"] { grid-column: 1 / -1; grid-row: 5; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="vivere"] { grid-column: 1 / -1; grid-row: 5; }
 
   /* hidden from Home */
-  body.ns-bloom .app.dash-v2 [data-area="lifestats"],
-  body.ns-bloom .app.dash-v2 [data-area="deepwork"],
-  body.ns-bloom .app.dash-v2 [data-area="flow"],
-  body.ns-bloom .app.dash-v2 [data-area="distraction"],
-  body.ns-bloom .app.dash-v2 .dash-more { display: none; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="lifestats"],
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="deepwork"],
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="flow"],
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="distraction"],
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .dash-more { display: none; }
 
   /* the card becomes the bigger centerpiece (overrides the 860px sizing) */
-  body.ns-bloom .app.dash-v2 #dayCard .daycard-theme-platinum .daycard-ns { width: min(100%, 460px); }
-  body.ns-bloom .app.dash-v2 #dayCard .daycard-theme-living .daycard-living-stage { width: min(100%, 460px); }
-  body.ns-bloom .app.dash-v2 #dayCard .daycard-ns { min-height: 520px; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-theme-platinum .daycard-ns { width: min(100%, 460px); }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-theme-living .daycard-living-stage { width: min(100%, 460px); }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-ns { min-height: 520px; }
 }
 
-/* ── v27 BENTO HOME — mobile (<768px, after the Neutron Star) ────────────────
+/* ── v27 BENTO HOME, mobile (<768px, after the Neutron Star) ─────────────────
    One scrolling page. The card is the centerpiece near the top, with the
    Consistency and Check-in tiles PEEKING in from the left and right edges
    beside it; then the focus/next-step card, the Mori + Clarity row, the quote,
    and the Vivere strip. Same display:contents flatten as desktop so the card,
    command center, quote and widgets share ONE grid on .app. */
 @media (max-width: 767.98px) {
-  body.ns-bloom .app.dash-v2 {
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 {
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
     column-gap: 8px;
     row-gap: 12px;
     align-content: start;
   }
-  body.ns-bloom .app.dash-v2 #dashBelow,
-  body.ns-bloom .app.dash-v2 #widgetGrid { display: contents; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashBelow,
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #widgetGrid { display: contents; }
 
   /* header + greeting full-width at the top; dev bar off the bento */
-  body.ns-bloom .app.dash-v2 .dash-header { grid-column: 1 / -1; grid-row: 1; }
-  body.ns-bloom .app.dash-v2 #dashGreetingMobile { grid-column: 1 / -1; grid-row: 2; }
-  body.ns-bloom .app.dash-v2 #creatorBox { display: none; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .dash-header { grid-column: 1 / -1; grid-row: 1; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashGreetingMobile { grid-column: 1 / -1; grid-row: 2; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #creatorBox { display: none; }
 
   /* HERO band: card centered (z-top), Consistency peeking left + Check-in
      peeking right (pulled past the edges so only their inner halves show). */
-  body.ns-bloom .app.dash-v2 #dayCard {
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard {
     grid-column: 3 / 11; grid-row: 3; margin: 0; z-index: 3;
     align-items: stretch; justify-content: center;
   }
-  body.ns-bloom .app.dash-v2 #dayCard .daycard-wrap { width: 100%; display: flex; justify-content: center; }
-  body.ns-bloom .app.dash-v2 [data-area="streak"] {
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-wrap { width: 100%; display: flex; justify-content: center; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="streak"] {
     grid-column: 1 / 5; grid-row: 3; align-self: center; z-index: 1;
-    aspect-ratio: auto; min-height: 158px;
-    transform: translateX(-48%); opacity: 0.88;
+    aspect-ratio: auto; min-height: 158px; opacity: 0.88;
   }
-  body.ns-bloom .app.dash-v2 [data-area="checkin"] {
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="checkin"] {
     grid-column: 9 / 13; grid-row: 3; align-self: center; z-index: 1;
-    aspect-ratio: auto; min-height: 158px;
-    transform: translateX(48%); opacity: 0.88;
+    aspect-ratio: auto; min-height: 158px; opacity: 0.88;
+  }
+  /* The off-screen peek translate is applied ONLY when BOTH side tiles exist, so
+     the hero stays balanced. During the unlock ladder (streak/check-in arrive on
+     different days) or if the user hides one, the lone tile sits inline beside the
+     card instead of floating half-off-screen with an empty gutter. */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2:has([data-area="streak"]):has([data-area="checkin"]) [data-area="streak"] {
+    transform: translateX(-48%);
+  }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2:has([data-area="streak"]):has([data-area="checkin"]) [data-area="checkin"] {
+    transform: translateX(48%);
   }
 
   /* focus / next-step (Today's action) */
-  body.ns-bloom .app.dash-v2 #commandCenter { grid-column: 1 / -1; grid-row: 4; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter { grid-column: 1 / -1; grid-row: 4; }
   /* Mori + Clarity row */
-  body.ns-bloom .app.dash-v2 [data-area="mori"]    { grid-column: 1 / 7;  grid-row: 5; aspect-ratio: auto; }
-  body.ns-bloom .app.dash-v2 [data-area="clarity"] { grid-column: 7 / 13; grid-row: 5; aspect-ratio: auto; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="mori"]    { grid-column: 1 / 7;  grid-row: 5; aspect-ratio: auto; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="clarity"] { grid-column: 7 / 13; grid-row: 5; aspect-ratio: auto; }
   /* quote */
-  body.ns-bloom .app.dash-v2 #dailyMemento { grid-column: 1 / -1; grid-row: 6; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dailyMemento { grid-column: 1 / -1; grid-row: 6; }
   /* kept-but-lower extras (not in the hide list, just below the curated top) */
-  body.ns-bloom .app.dash-v2 [data-area="action"]     { grid-column: 1 / -1; grid-row: 7; aspect-ratio: auto; }
-  body.ns-bloom .app.dash-v2 [data-area="reflection"] { grid-column: 1 / -1; grid-row: 8; aspect-ratio: auto; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="action"]     { grid-column: 1 / -1; grid-row: 7; aspect-ratio: auto; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="reflection"] { grid-column: 1 / -1; grid-row: 8; aspect-ratio: auto; }
   /* Vivere strip */
-  body.ns-bloom .app.dash-v2 [data-area="vivere"] { grid-column: 1 / -1; grid-row: 9; aspect-ratio: auto; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="vivere"] { grid-column: 1 / -1; grid-row: 9; aspect-ratio: auto; }
 
   /* hidden from Home */
-  body.ns-bloom .app.dash-v2 [data-area="lifestats"],
-  body.ns-bloom .app.dash-v2 [data-area="deepwork"],
-  body.ns-bloom .app.dash-v2 [data-area="flow"],
-  body.ns-bloom .app.dash-v2 [data-area="distraction"],
-  body.ns-bloom .app.dash-v2 .dash-more { display: none; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="lifestats"],
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="deepwork"],
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="flow"],
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="distraction"],
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .dash-more { display: none; }
 
   /* card sizing inside the hero cell (fills its column, capped height) */
-  body.ns-bloom .app.dash-v2 #dayCard .daycard-theme-platinum .daycard-ns { width: 100%; }
-  body.ns-bloom .app.dash-v2 #dayCard .daycard-theme-living .daycard-living-stage { width: 100%; }
-  body.ns-bloom .app.dash-v2 #dayCard .daycard-ns { min-height: 340px; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-theme-platinum .daycard-ns { width: 100%; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-theme-living .daycard-living-stage { width: 100%; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-ns { min-height: 340px; }
 }
 
 /* Mobile (< 768px) - dense 6-column subgrid so more info fits per screen.
@@ -2751,34 +2766,9 @@ body.daycard-force #dayCard { display: block; max-width: 430px; }
 body:not(.ns-bloom) .app.dash-v2 #widgetGrid,
 body:not(.ns-bloom) .app.dash-v2 #dailyMemento,
 body:not(.ns-bloom) .app.dash-v2 #dashGreetingMobile { display: none; }
-/* The swipe cue: a whisper at the bottom of the hero screen. Dissolves as
-   soon as scrolling starts (JS toggles .is-hidden). */
-.daycard-hint {
-  display: none;
-  position: absolute;
-  left: 0; right: 0; bottom: 2px;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  font-size: 0.6rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--text-faint, rgba(var(--ink), 0.3));
-  pointer-events: none;
-  transition: opacity 0.45s ease;
-}
-/* v27: the swipe-up cue is retired with the two-page snap (Home is one scroll). */
-.daycard-hint { display: none !important; }
-.daycard-hint.is-hidden { opacity: 0; }
-.daycard-hint svg { animation: dayCardHintFloat 2.2s ease-in-out infinite; }
-@keyframes dayCardHintFloat {
-  0%, 100% { transform: translateY(2px); opacity: 0.55; }
-  50%      { transform: translateY(-2px); opacity: 1; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .daycard-hint svg { animation: none; }
-}
+/* v27: the swipe-up cue (.daycard-hint) and its float animation were retired with
+   the two-page snap. Home is one scroll, so the hint markup + its scroll watcher
+   are gone from renderDayCard. */
 /* Wrapper carries the aura glow (it must live OUTSIDE the card's
    overflow:hidden). The aura is what makes the card read as an object
    emitting light, Opal-gem style, instead of a panel. */
@@ -2928,10 +2918,9 @@ html.lowfx .daycard-ns {
   /* The greeting block (and its headline) hands the header to the brand. */
   .dash-header__greeting { display: none; }
   #dashGreetingMobile {
-    /* Greeting row at the top of the dashboard page: text left, search
-       right. The padding drops it off the very top edge when the page
-       snaps into place; the header's own search hides on mobile (the
-       Memento page stays chrome-free). */
+    /* Greeting row near the top of the dashboard: text left, search right.
+       (The header's desktop greeting is hidden in this band; the brand lockup
+       carries the header instead.) */
     display: flex;
     align-items: center;
     justify-content: space-between;

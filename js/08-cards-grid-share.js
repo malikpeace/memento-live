@@ -551,6 +551,12 @@ function renderGrid() {
   const _customized = !!(state.ui && state.ui.layoutCustomized);
   const _hidden = Array.isArray(state.hiddenWidgets) ? state.hiddenWidgets : [];
   grid.classList.toggle('is-custom', _customized);
+  // v27: a customized layout opts OUT of the card-centered bento entirely. The
+  // bento flattens #widgetGrid (display:contents) and pins each tile by data-area,
+  // which would out-specify and break the saved custom order. This body flag lets
+  // the bento gate itself off (:not(.has-custom-layout)) so the grid renders as its
+  // own customized grid in the legacy stacked layout instead.
+  document.body.classList.toggle('has-custom-layout', _customized);
 
   state.widgetOrder.forEach(({ key, size }) => {
     const def = WIDGET_DEFS[key];
@@ -3303,14 +3309,13 @@ function renderDayCard() {
         '</div>'
       : ns;
 
+    // v27: Home is one scrolling page, so the old "Swipe up for more" hint and
+    // its scroll page-state watcher are gone (the two-page snap they served was
+    // removed). The card is just the wrap.
     el.innerHTML =
       '<div class="daycard-wrap daycard-theme-' + theme + '">' +
         '<span class="daycard-wrap__aura" aria-hidden="true"></span>' +
         inner +
-      '</div>' +
-      '<div class="daycard-hint" id="dayCardHint" aria-hidden="true">' +
-        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>' +
-        '<span>Swipe up for more</span>' +
       '</div>';
 
     const nsEl = el.querySelector('#dayCardNs');
@@ -3323,16 +3328,6 @@ function renderDayCard() {
     } else {
       stopLivingWander();
     }
-    // Page-state watcher: dissolves the swipe hint once scrolling starts,
-    // and marks the body while the Memento page is on screen so the bottom
-    // chrome (tab bar + capture fab) can fade itself away there. Bound
-    // once; called immediately so first paint is correct.
-    if (!window._dayCardHintBound) {
-      window._dayCardHintBound = true;
-      window.addEventListener('scroll', _dayCardPageState, { passive: true });
-      window.addEventListener('resize', _dayCardPageState);
-    }
-    _dayCardPageState();
   } catch (e) {}
 }
 
@@ -3426,18 +3421,6 @@ function bindDayCardThemeToggle(nsEl) {
       try { persistState(); } catch (_) {}
       try { renderDayCard(); } catch (_) {}
     });
-  } catch (e) {}
-}
-
-function _dayCardPageState() {
-  try {
-    const y = window.scrollY || document.documentElement.scrollTop || 0;
-    const h = document.getElementById('dayCardHint');
-    if (h) h.classList.toggle('is-hidden', y > 24);
-    const dc = document.getElementById('dayCard');
-    const below = document.getElementById('dashBelow');
-    const onCard = !!(dc && dc.offsetHeight && below && y < below.offsetTop * 0.5);
-    document.body.classList.toggle('on-memento-page', onCard);
   } catch (e) {}
 }
 

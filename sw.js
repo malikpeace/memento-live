@@ -19,6 +19,7 @@ const PRECACHE = [
   './manifest.json',
   './css/base.css', './css/dashboard.css', './css/sidebar.css', './css/misc.css',
   './css/notes.css', './css/vivere.css', './css/onboarding.css', './css/clarity.css', './css/action.css',
+  './css/daycard-living.css',
   './js/01-state-foundation.js', './js/02-clarity-experience.js', './js/03-ai-integration.js',
   './js/04-templates-proof.js', './js/05-vivere.js', './js/06-consistency-mori.js',
   './js/07-sheet-templates.js', './js/08-cards-grid-share.js', './js/09-controllers.js',
@@ -70,7 +71,10 @@ self.addEventListener('fetch', (event) => {
         }
         return res;
       })
-      .catch(() => caches.match(req).then((hit) => {
+      // ignoreSearch so the ?v= cache-busting query on css/js requests still
+      // matches the UNVERSIONED precache keys (./css/base.css etc.) on a cold
+      // offline start, before runtime caching has stored the versioned URLs.
+      .catch(() => caches.match(req, { ignoreSearch: true }).then((hit) => {
         if (hit) return hit;
         // Navigations fall back to the cached shell.
         if (req.mode === 'navigate') return caches.match('./index.html');

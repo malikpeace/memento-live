@@ -2409,6 +2409,16 @@ const DragDrop = {
   init() {
     const grid = document.getElementById('widgetGrid');
     grid.addEventListener('pointerdown', (e) => this.onPointerDown(e));
+    // Keyboard activation: the tiles are role="button" tabindex="0", so Enter or
+    // Space must open the module just like a tap does (WCAG 2.1.1). v27 makes the
+    // bento tiles the primary Home, so this is now the main keyboard entry point.
+    grid.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') return;
+      const w = e.target && e.target.closest ? e.target.closest('.widget') : null;
+      if (!w || !grid.contains(w)) return;
+      e.preventDefault();
+      this.activateWidget(w);
+    });
     document.addEventListener('pointermove', (e) => this.onPointerMove(e));
     document.addEventListener('pointerup', (e) => this.onPointerUp(e));
     document.addEventListener('pointercancel', (e) => this.onPointerUp(e));
@@ -2537,6 +2547,50 @@ const DragDrop = {
     }
   },
 
+  // Open the module a tile represents (shared by tap and keyboard activation).
+  // Honors the same gates as a tap: nothing while a sheet/experience is open, a
+  // gate card routes into Clarity, a locked card flashes + pulses Clarity.
+  activateWidget(el) {
+    if (!el || Sheet.isOpen || ClarityExperience.isOpen || ActionExperience.isOpen) return;
+    // v23 gate card (Action before Clarity is done): the card itself is the
+    // teacher ("Define your goal first"), so it routes straight into Clarity.
+    if (el.classList.contains('widget--gate')) {
+      try { if (typeof ClarityExperience !== 'undefined') ClarityExperience.open(); } catch (e) {}
+      return;
+    }
+    // Locked modules: flash red + pulse Clarity, do not open.
+    if (el.classList.contains('widget--locked')) {
+      el.classList.remove('locked-flash');
+      void el.offsetWidth;
+      el.classList.add('locked-flash');
+      el.addEventListener('animationend', () => el.classList.remove('locked-flash'), { once: true });
+      const clarityWidget = document.querySelector('.widget--clarity');
+      if (clarityWidget) {
+        clarityWidget.classList.remove('clarity-pulse');
+        void clarityWidget.offsetWidth;
+        clarityWidget.classList.add('clarity-pulse');
+        clarityWidget.addEventListener('animationend', () => clarityWidget.classList.remove('clarity-pulse'), { once: true });
+      }
+      return;
+    }
+    const key = el.dataset.widget;
+    if (!key) return;
+    // Consistent crossfade for every module open: fade the dashboard out while
+    // the destination experience/sheet fades in simultaneously.
+    const app = document.getElementById('app');
+    if (app) app.classList.add('app--fading-out');
+    if (key === 'clarity' && !state.clarity.completed) {
+      ClarityExperience.open();
+    } else if (key === 'clarity' && state.clarity.completed) {
+      ClarityExperience.openSummary();
+    } else if (key === 'action') {
+      ActionExperience.open();
+    } else {
+      Sheet.open(key);
+    }
+    setTimeout(() => { if (app) app.classList.remove('app--fading-out'); }, 1100);
+  },
+
   onPointerUp(e) {
     clearTimeout(this.longPressTimer);
     this.longPressTimer = null;
@@ -2551,55 +2605,11 @@ const DragDrop = {
       const elapsed = Date.now() - (this.startTime || 0);
       const wasTap = dx < 16 && dy < 16 && elapsed < 400;
 
-      if (wasTap && this.sourceEl && !Sheet.isOpen && !ClarityExperience.isOpen && !ActionExperience.isOpen) {
-        // v23 gate card (Action before Clarity is done): the card itself is the
-        // teacher ("Define your goal first"), so a tap routes straight into
-        // Clarity instead of flashing a lock.
-        if (this.sourceEl.classList.contains('widget--gate')) {
-          this.sourceEl = null;
-          try { if (typeof ClarityExperience !== 'undefined') ClarityExperience.open(); } catch (e) {}
-          return;
-        }
-        // Block taps on locked modules  - flash red + message + pulse Clarity
-        if (this.sourceEl.classList.contains('widget--locked')) {
-          const el = this.sourceEl;
-          el.classList.remove('locked-flash');
-          void el.offsetWidth;
-          el.classList.add('locked-flash');
-          el.addEventListener('animationend', () => el.classList.remove('locked-flash'), { once: true });
-
-          // Pulse the Clarity widget
-          const clarityWidget = document.querySelector('.widget--clarity');
-          if (clarityWidget) {
-            clarityWidget.classList.remove('clarity-pulse');
-            void clarityWidget.offsetWidth;
-            clarityWidget.classList.add('clarity-pulse');
-            clarityWidget.addEventListener('animationend', () => clarityWidget.classList.remove('clarity-pulse'), { once: true });
-          }
-
-          this.sourceEl = null;
-          return;
-        }
-        const key = this.sourceEl.dataset.widget;
-        // Consistent crossfade for every module open: fade the dashboard out
-        // while the destination experience/sheet fades in simultaneously.
-        const openModule = () => {
-          if (key === 'clarity' && !state.clarity.completed) {
-            ClarityExperience.open();
-          } else if (key === 'clarity' && state.clarity.completed) {
-            ClarityExperience.openSummary();
-          } else if (key === 'action') {
-            ActionExperience.open();
-          } else if (key) {
-            Sheet.open(key);
-          }
-        };
-        if (key) {
-          const app = document.getElementById('app');
-          if (app) app.classList.add('app--fading-out');
-          openModule();
-          setTimeout(() => { if (app) app.classList.remove('app--fading-out'); }, 1100);
-        }
+      if (wasTap && this.sourceEl) {
+        const el = this.sourceEl;
+        this.sourceEl = null;
+        this.activateWidget(el);
+        return;
       }
       this.sourceEl = null;
       return;
