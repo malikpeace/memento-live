@@ -2250,14 +2250,19 @@ document.addEventListener('keydown', (e) => {
   try {
     const vv = window.visualViewport;
     if (!vv) return;
+    // Track the TALLEST visual-viewport height we have ever seen as the
+    // keyboard-closed baseline. iOS standalone shrinks window.innerHeight WITH
+    // the keyboard, so innerHeight-vv.height comes out ~0 and the old detection
+    // never fired. vv.height vs its own max is reliable: when the keyboard opens,
+    // vv.height drops below the baseline by exactly the keyboard height.
+    let baseline = vv.height;
     let raf = 0;
     const apply = () => {
       raf = 0;
+      if (vv.height > baseline) baseline = vv.height;
       const wi = document.querySelector('.welcome-intro.open');
       if (!wi) return;
-      // Keyboard overlap = how much of the layout viewport the visual viewport
-      // no longer covers at the bottom (height shrink minus any upward shift).
-      const kb = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
+      const kb = Math.max(0, Math.round(baseline - vv.height));
       if (kb > 90) {
         const dock = wi.querySelector('.welcome-intro__nav');
         wi.style.setProperty('--wi-kb-h', kb + 'px');
@@ -2272,5 +2277,10 @@ document.addEventListener('keydown', (e) => {
     const schedule = () => { if (!raf) raf = requestAnimationFrame(apply); };
     vv.addEventListener('resize', schedule);
     vv.addEventListener('scroll', schedule);
+    // focusin/out are the reliable "keyboard is (un)docking" signals; re-measure
+    // a few times after each because iOS settles vv.height over ~300ms.
+    const ping = () => { [60, 180, 360].forEach((d) => setTimeout(schedule, d)); };
+    document.addEventListener('focusin', ping, true);
+    document.addEventListener('focusout', ping, true);
   } catch (e) {}
 })();
