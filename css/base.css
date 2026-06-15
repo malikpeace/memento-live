@@ -949,7 +949,15 @@ body.density-compact .sidebar__inner { gap: 8px; }
 
 /* --- Reset --- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; overscroll-behavior: none; }
+html {
+  -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; overscroll-behavior: none;
+  /* Always reserve the scrollbar gutter so the page width never changes when a
+     sheet/experience locks body scroll (overflow:hidden). Without this, the
+     classic scrollbar disappears on open and the viewport widens, shifting the
+     centered tab bar + the app off-center (the "toolbar jumps when I open
+     Settings" glitch). No-op for overlay scrollbars (macOS/iOS). */
+  scrollbar-gutter: stable;
+}
 body {
   font-family: var(--font);
   background: #000;
