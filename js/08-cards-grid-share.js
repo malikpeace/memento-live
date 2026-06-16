@@ -3467,6 +3467,9 @@ function openMementoFull() {
       clone.style.setProperty('--dc-ry', '0deg');
       const host = ov.querySelector('.mf__card');
       if (host) host.appendChild(clone);
+      // Let the big card lean with the phone here too, smoothly. This repoints
+      // the single motion loop at the clone; close() restores the dashboard card.
+      try { bindDayCardMotion(clone, clone.querySelector('.daycard-ns')); } catch (e) {}
     }
 
     document.body.style.overflow = 'hidden';
@@ -3480,6 +3483,8 @@ function openMementoFull() {
       ov.classList.remove('mf--open');
       document.body.style.overflow = '';
       document.removeEventListener('keydown', onKey);
+      // Hand the motion loop back to the live dashboard card.
+      try { bindDayCardMotion(document.querySelector('#dayCard .daycard-wrap'), document.getElementById('dayCardNs')); } catch (e) {}
       setTimeout(() => { try { ov.remove(); } catch (e) {} }, 340);
     };
     const onKey = (e) => { if (e.key === 'Escape') close(); };
@@ -3508,7 +3513,8 @@ function openMementoFull() {
         dy = Math.max(0, y);
         scroll.style.transition = 'none';
         scroll.style.transform = 'translateY(' + dy + 'px)';
-        ov.style.background = 'rgba(0,0,0,' + Math.max(0, 0.6 - dy / 700) + ')';
+        // Keep the page fully opaque while dragging (do NOT reveal the dashboard
+        // behind, that read as a choppy doubled card). The content just slides.
         if (e.cancelable) e.preventDefault();
       }, { passive: false });
       const onEnd = (e) => {
@@ -3519,7 +3525,6 @@ function openMementoFull() {
         const vel = dt > 0 ? dy / dt : 0;
         scroll.style.transition = '';
         scroll.style.transform = '';
-        ov.style.background = '';
         if (dy > 150 || vel > 0.55) close();
       };
       scroll.addEventListener('touchend', onEnd, { passive: true });
@@ -3692,7 +3697,7 @@ function bindDayCardTilt(card) {
 // a small "bring it to life" pill handles that; once granted we remember it and
 // re-arm silently on the next visit's first touch. Honors reduced-motion + the
 // user pref. The card transform is cheap, so lowfx does NOT disable it.
-let _dcMotionRaf = 0, _dcMotionListener = null, _dcMotionPill = null;
+let _dcMotionRaf = 0, _dcMotionListener = null, _dcMotionPill = null, _dcMotionGranted = false;
 function stopDayCardMotion() {
   if (_dcMotionRaf) { try { cancelAnimationFrame(_dcMotionRaf); } catch (e) {} _dcMotionRaf = 0; }
   if (_dcMotionListener) { try { window.removeEventListener('deviceorientation', _dcMotionListener); } catch (e) {} _dcMotionListener = null; }
@@ -3736,13 +3741,31 @@ function bindDayCardMotion(wrap, card) {
     if (!needsPermission) { startListening(); return; }
 
     const grant = () => DeviceOrientationEvent.requestPermission()
-      .then((res) => { if (res === 'granted') { try { localStorage.setItem('memento_motion', 'on'); } catch (e) {} startListening(); return true; } return false; })
+      .then((res) => {
+        if (res === 'granted') {
+          _dcMotionGranted = true; // session: re-renders re-listen directly, no pill/touch-wait
+          try { localStorage.setItem('memento_motion', 'on'); } catch (e) {}
+          // Also persist on the synced app state, so it survives storage quirks.
+          try { if (state.prefs) { state.prefs.motionGranted = true; if (typeof persistNow === 'function') persistNow(); } } catch (e) {}
+          startListening();
+          return true;
+        }
+        return false;
+      })
       .catch(() => false);
 
-    let savedOn = false; try { savedOn = localStorage.getItem('memento_motion') === 'on'; } catch (e) {}
+    // Already granted earlier this session: just listen. This is the fix for the
+    // jitter, every dashboard re-render re-binds, and without this the live
+    // listener was torn down and only re-armed on the next touch.
+    if (_dcMotionGranted) { startListening(); return; }
+
+    let savedOn = false;
+    try { savedOn = localStorage.getItem('memento_motion') === 'on' || (state.prefs && state.prefs.motionGranted === true); } catch (e) {}
     if (savedOn) {
-      // Re-grant silently on the first touch of this visit (iOS resolves it
-      // without a prompt once the site has been granted), then it just works.
+      // Granted on a previous visit. Listen directly (works on Android, and on
+      // iOS once the site is granted), and re-grant on the first touch as an iOS
+      // belt-and-suspenders so it comes alive even if the direct listen is blocked.
+      startListening();
       const once = () => { document.removeEventListener('touchend', once); document.removeEventListener('pointerup', once); grant(); };
       document.addEventListener('touchend', once, { once: true });
       document.addEventListener('pointerup', once, { once: true });
