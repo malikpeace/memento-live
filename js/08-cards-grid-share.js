@@ -3711,7 +3711,7 @@ function bindDayCardMotion(wrap, card) {
     if (state.prefs && state.prefs.motionTilt === false) return;
     if (typeof window.DeviceOrientationEvent === 'undefined') return;
 
-    let base = null, tgtRx = 0, tgtRy = 0, curRx = 0, curRy = 0;
+    let base = null, tgtRx = 0, tgtRy = 0, curRx = 0, curRy = 0, gotData = false;
     const RANGE = 22; // degrees of phone tilt mapped to the full card tilt
 
     const loop = () => {
@@ -3724,6 +3724,7 @@ function bindDayCardMotion(wrap, card) {
     };
     const onOrient = (e) => {
       if (e.beta == null && e.gamma == null) return;
+      gotData = true; _dcMotionGranted = true; // motion is flowing; re-renders re-listen directly
       const beta = e.beta || 0, gamma = e.gamma || 0;
       if (!base) base = { beta, gamma }; // neutral = however they hold it now
       const nx = Math.max(-1, Math.min(1, (gamma - base.gamma) / RANGE));
@@ -3754,32 +3755,38 @@ function bindDayCardMotion(wrap, card) {
       })
       .catch(() => false);
 
-    // Already granted earlier this session: just listen. This is the fix for the
-    // jitter, every dashboard re-render re-binds, and without this the live
-    // listener was torn down and only re-armed on the next touch.
+    // The gentle one-tap prompt, shown ONLY when motion is not already flowing.
+    // Tapping it is a deliberate gesture, so the native dialog there is expected.
+    const showPill = () => {
+      if (document.querySelector('.daycard-motion-cta')) return;
+      const pill = document.createElement('button');
+      pill.type = 'button';
+      pill.className = 'daycard-motion-cta';
+      pill.setAttribute('aria-label', 'Bring the card to life with motion');
+      pill.innerHTML = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5" stroke="currentColor" stroke-width="1.6"/><path d="M3 9c.8 1 .8 5 0 6M21 9c-.8 1-.8 5 0 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>Bring it to life</span>';
+      pill.addEventListener('click', (e) => { e.stopPropagation(); e.preventDefault(); grant().then((ok) => { if (ok) { try { pill.remove(); } catch (e2) {} _dcMotionPill = null; } }); });
+      (wrap || card).appendChild(pill);
+      _dcMotionPill = pill;
+    };
+
+    // Motion already flowing this session: just listen (no prompt, no jitter).
     if (_dcMotionGranted) { startListening(); return; }
 
     let savedOn = false;
     try { savedOn = localStorage.getItem('memento_motion') === 'on' || (state.prefs && state.prefs.motionGranted === true); } catch (e) {}
     if (savedOn) {
-      // Granted on a previous visit. Listen directly (works on Android, and on
-      // iOS once the site is granted), and re-grant on the first touch as an iOS
-      // belt-and-suspenders so it comes alive even if the direct listen is blocked.
+      // Granted before. CRITICAL: do NOT call requestPermission again on reopen.
+      // In a home-screen PWA iOS forgets the grant per launch, and re-requesting
+      // fired the native "Allow Motion" dialog on EVERY reopen (the bug Malik
+      // hit). Instead we just listen: if iOS kept the grant, motion flows
+      // silently with zero prompt. If it did not, after a beat with no data we
+      // show the gentle pill so they can re-enable with one deliberate tap.
       startListening();
-      const once = () => { document.removeEventListener('touchend', once); document.removeEventListener('pointerup', once); grant(); };
-      document.addEventListener('touchend', once, { once: true });
-      document.addEventListener('pointerup', once, { once: true });
+      setTimeout(() => { if (!gotData && card.isConnected) showPill(); }, 1600);
       return;
     }
-    // First time on iOS: a tasteful one-tap prompt on the card.
-    const pill = document.createElement('button');
-    pill.type = 'button';
-    pill.className = 'daycard-motion-cta';
-    pill.setAttribute('aria-label', 'Bring the card to life with motion');
-    pill.innerHTML = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5" stroke="currentColor" stroke-width="1.6"/><path d="M3 9c.8 1 .8 5 0 6M21 9c-.8 1-.8 5 0 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>Bring it to life</span>';
-    pill.addEventListener('click', (e) => { e.stopPropagation(); e.preventDefault(); grant().then((ok) => { if (ok) { try { pill.remove(); } catch (e2) {} _dcMotionPill = null; } }); });
-    (wrap || card).appendChild(pill);
-    _dcMotionPill = pill;
+    // First time: the gentle pill (no auto-prompt).
+    showPill();
   } catch (e) {}
 }
 
