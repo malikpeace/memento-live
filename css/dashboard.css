@@ -3008,13 +3008,16 @@ html.theme-light .daycard-wrap__aura {
   background: radial-gradient(closest-side,
     rgba(98, 74, 178, 0.14), rgba(74, 108, 255, 0.05) 48%, transparent 72%);
 }
-/* The hero is the ONE surface that keeps real glass even in lite mode
-   (body.lite * strips backdrop-filter globally for scroll perf; a single
-   static card is cheap). lowfx still gets the near-solid fallback. */
+/* The card does NOT keep backdrop-filter on touch devices. It used to (a single
+   static card is cheap), but on iOS Safari backdrop-filter + the card's 3D tilt
+   transform ignores the border-radius, so the blurred (grey) backdrop renders as
+   a hard square that pokes past the rounded corners. The glass still reads from
+   the gradient fill + rim light; a 5px blur over a near-black backdrop was
+   invisible anyway. Desktop keeps the full real glass. */
 body.lite .daycard-ns,
 html.lowfx .daycard-ns {
-  -webkit-backdrop-filter: blur(calc(5px * var(--bx, 1))) saturate(1.25) !important;
-  backdrop-filter: blur(calc(5px * var(--bx, 1))) saturate(1.25) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
 }
 
 /* === Fullscreen Memento (tap the card) ===================================== */
