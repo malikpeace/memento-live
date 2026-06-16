@@ -3712,12 +3712,14 @@ function bindDayCardMotion(wrap, card) {
     if (typeof window.DeviceOrientationEvent === 'undefined') return;
 
     let base = null, tgtRx = 0, tgtRy = 0, curRx = 0, curRy = 0, gotData = false;
-    const RANGE = 22; // degrees of phone tilt mapped to the full card tilt
+    const RANGE = 15;     // degrees of phone tilt for full card lean (lower = more sensitive)
+    const AMP_X = 9;      // max card lean front/back (deg)
+    const AMP_Y = 12;     // max card lean left/right (deg)
 
     const loop = () => {
       if (!card.isConnected) { stopDayCardMotion(); return; }
-      curRx += (tgtRx - curRx) * 0.12;
-      curRy += (tgtRy - curRy) * 0.12;
+      curRx += (tgtRx - curRx) * 0.16;
+      curRy += (tgtRy - curRy) * 0.16;
       card.style.setProperty('--dc-rx', curRx.toFixed(2) + 'deg');
       card.style.setProperty('--dc-ry', curRy.toFixed(2) + 'deg');
       _dcMotionRaf = requestAnimationFrame(loop);
@@ -3729,8 +3731,8 @@ function bindDayCardMotion(wrap, card) {
       if (!base) base = { beta, gamma }; // neutral = however they hold it now
       const nx = Math.max(-1, Math.min(1, (gamma - base.gamma) / RANGE));
       const ny = Math.max(-1, Math.min(1, (beta - base.beta) / RANGE));
-      tgtRx = ny * -3.2;
-      tgtRy = nx * 4;
+      tgtRx = ny * -AMP_X;
+      tgtRy = nx * AMP_Y;
       if (!_dcMotionRaf) loop();
     };
     const startListening = () => {
