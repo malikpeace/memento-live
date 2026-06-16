@@ -149,7 +149,7 @@ const DEFAULT_STATE = {
   // unlockAll: the unlock-ladder escape hatch. True bypasses module gating
   // entirely (set by the user in Settings/More, or by migration for users who
   // already completed Clarity).
-  prefs: { accent: 'default', accentCustom: '#7b61ff', theme: 'dark', flatBg: false, background: { type: 'default', value: '' }, bgDim: 0.2, reduceMotion: false, density: 'comfortable', uiRadius: 1, uiGlass: 0, uiBlur: 1, anchorQuote: '', trashWindowDays: 30, guaranteeVariant: 'a', unlockAll: false, appearanceChosen: false, reminder: { enabled: false, time: '09:00', quietStart: '22:00', quietEnd: '07:00' } },
+  prefs: { accent: 'default', accentCustom: '#7b61ff', theme: 'dark', flatBg: false, background: { type: 'default', value: '' }, bgDim: 0.2, reduceMotion: false, density: 'comfortable', uiRadius: 1, uiGlass: 0, uiBlur: 1, anchorQuote: '', trashWindowDays: 30, guaranteeVariant: 'a', unlockAll: false, appearanceChosen: false, motionTilt: true, reminder: { enabled: false, time: '09:00', quietStart: '22:00', quietEnd: '07:00' } },
   // Optional, additive per-day memo of AI insight/accountability output so the
   // "Surface a pattern" button does not re-bill the API every press on the same
   // day. day is an ISO date; a mismatch (or any error) falls through to a live

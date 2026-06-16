@@ -3378,6 +3378,7 @@ function renderDayCard() {
 
     const nsEl = el.querySelector('#dayCardNs');
     bindDayCardTilt(nsEl);
+    bindDayCardMotion(el.querySelector('.daycard-wrap'), nsEl);
     bindDayCardThemeToggle(nsEl);
     // Tap the card (anywhere but the emblem, which toggles the theme) -> the
     // fullscreen Memento with your Clarity / Action / Consistency stats.
@@ -3680,6 +3681,82 @@ function bindDayCardTilt(card) {
     });
     card.addEventListener('pointerleave', reset);
     card.addEventListener('pointerup', reset);
+  } catch (e) {}
+}
+
+// ── Gyroscope tilt: the card leans in real time as you move your phone ────────
+// Feeds the phone's tilt (DeviceOrientationEvent beta/gamma, gravity-referenced
+// so it never drifts) into the SAME --dc-rx/--dc-ry the pointer tilt uses, with
+// a low-pass smoothing loop so it glides. Mobile-only (where orientation exists;
+// pointer tilt covers desktop). iOS 13+ needs a one-time tap to grant motion, so
+// a small "bring it to life" pill handles that; once granted we remember it and
+// re-arm silently on the next visit's first touch. Honors reduced-motion + the
+// user pref. The card transform is cheap, so lowfx does NOT disable it.
+let _dcMotionRaf = 0, _dcMotionListener = null, _dcMotionPill = null;
+function stopDayCardMotion() {
+  if (_dcMotionRaf) { try { cancelAnimationFrame(_dcMotionRaf); } catch (e) {} _dcMotionRaf = 0; }
+  if (_dcMotionListener) { try { window.removeEventListener('deviceorientation', _dcMotionListener); } catch (e) {} _dcMotionListener = null; }
+  if (_dcMotionPill) { try { _dcMotionPill.remove(); } catch (e) {} _dcMotionPill = null; }
+}
+function bindDayCardMotion(wrap, card) {
+  stopDayCardMotion();
+  if (!card) return;
+  try {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (state.prefs && state.prefs.motionTilt === false) return;
+    if (typeof window.DeviceOrientationEvent === 'undefined') return;
+
+    let base = null, tgtRx = 0, tgtRy = 0, curRx = 0, curRy = 0;
+    const RANGE = 22; // degrees of phone tilt mapped to the full card tilt
+
+    const loop = () => {
+      if (!card.isConnected) { stopDayCardMotion(); return; }
+      curRx += (tgtRx - curRx) * 0.12;
+      curRy += (tgtRy - curRy) * 0.12;
+      card.style.setProperty('--dc-rx', curRx.toFixed(2) + 'deg');
+      card.style.setProperty('--dc-ry', curRy.toFixed(2) + 'deg');
+      _dcMotionRaf = requestAnimationFrame(loop);
+    };
+    const onOrient = (e) => {
+      if (e.beta == null && e.gamma == null) return;
+      const beta = e.beta || 0, gamma = e.gamma || 0;
+      if (!base) base = { beta, gamma }; // neutral = however they hold it now
+      const nx = Math.max(-1, Math.min(1, (gamma - base.gamma) / RANGE));
+      const ny = Math.max(-1, Math.min(1, (beta - base.beta) / RANGE));
+      tgtRx = ny * -3.2;
+      tgtRy = nx * 4;
+      if (!_dcMotionRaf) loop();
+    };
+    const startListening = () => {
+      _dcMotionListener = onOrient;
+      window.addEventListener('deviceorientation', _dcMotionListener);
+    };
+
+    const needsPermission = typeof DeviceOrientationEvent.requestPermission === 'function'; // iOS 13+
+    if (!needsPermission) { startListening(); return; }
+
+    const grant = () => DeviceOrientationEvent.requestPermission()
+      .then((res) => { if (res === 'granted') { try { localStorage.setItem('memento_motion', 'on'); } catch (e) {} startListening(); return true; } return false; })
+      .catch(() => false);
+
+    let savedOn = false; try { savedOn = localStorage.getItem('memento_motion') === 'on'; } catch (e) {}
+    if (savedOn) {
+      // Re-grant silently on the first touch of this visit (iOS resolves it
+      // without a prompt once the site has been granted), then it just works.
+      const once = () => { document.removeEventListener('touchend', once); document.removeEventListener('pointerup', once); grant(); };
+      document.addEventListener('touchend', once, { once: true });
+      document.addEventListener('pointerup', once, { once: true });
+      return;
+    }
+    // First time on iOS: a tasteful one-tap prompt on the card.
+    const pill = document.createElement('button');
+    pill.type = 'button';
+    pill.className = 'daycard-motion-cta';
+    pill.setAttribute('aria-label', 'Bring the card to life with motion');
+    pill.innerHTML = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5" stroke="currentColor" stroke-width="1.6"/><path d="M3 9c.8 1 .8 5 0 6M21 9c-.8 1-.8 5 0 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>Bring it to life</span>';
+    pill.addEventListener('click', (e) => { e.stopPropagation(); e.preventDefault(); grant().then((ok) => { if (ok) { try { pill.remove(); } catch (e2) {} _dcMotionPill = null; } }); });
+    (wrap || card).appendChild(pill);
+    _dcMotionPill = pill;
   } catch (e) {}
 }
 
