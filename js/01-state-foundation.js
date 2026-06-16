@@ -27,7 +27,7 @@ const DEFAULT_FLOW_ITEMS = [
 ];
 
 const DEFAULT_STATE = {
-  profile: { name: '', fullName: '', birthday: '', email: '', story: '', runningToward: '', runningFrom: '', values: '', letterToFutureSelf: '', returnCue: '', heroHeadline: { mode: 'auto', value: '' }, onboarded: false, onboardedAt: null },
+  profile: { name: '', fullName: '', birthday: '', email: '', story: '', runningToward: '', runningFrom: '', values: '', clarityLevel: '', actionKnow: '', actionProgress: '', distraction: '', costOfInaction: '', weakestPillar: '', letterToFutureSelf: '', returnCue: '', heroHeadline: { mode: 'auto', value: '' }, onboarded: false, onboardedAt: null },
   dev: { previewAll: false, savedClarity: null },
   clarity: {
     completed: false,

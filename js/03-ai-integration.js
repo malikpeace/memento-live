@@ -1898,14 +1898,17 @@ function buildProfileContext() {
     const candidates = [
       p.name ? 'Name: ' + trunc(p.name, 40) : '',
       (function () { const a = ageFromBirthday(p.birthday); return a != null ? ('Age: ' + a + (a < 18 ? ' (MINOR, apply minor-safety rules strictly)' : '')) : ''; })(),
+      p.runningToward ? 'What they want to make progress in: ' + trunc(p.runningToward, 90) : '',
+      p.clarityLevel ? 'How clear they are on what they want: ' + trunc(p.clarityLevel, 40) : '',
+      p.actionKnow ? 'Whether they know the steps to get there: ' + trunc(p.actionKnow, 40) : '',
+      p.runningFrom ? 'What keeps pulling them back: ' + trunc(p.runningFrom, 90) : '',
+      p.distraction ? 'Their biggest pull on attention: ' + trunc(p.distraction, 30) : '',
+      p.costOfInaction ? 'The cost of staying stuck (what they are avoiding): ' + trunc(p.costOfInaction, 90) : '',
+      p.weakestPillar ? 'Where they need Memento most (weakest pillar): ' + trunc(p.weakestPillar, 20) : '',
+      p.letterToFutureSelf ? 'Their note to their future self: ' + trunc(p.letterToFutureSelf, 150) : '',
+      // Back-compat with pre-diagnostic onboarding answers (filtered out if empty):
       p.story ? 'Who they are right now: ' + trunc(p.story, 130) : '',
-      p.runningToward ? 'Who they want to become: ' + trunc(p.runningToward, 90) : '',
-      p.whoFor ? 'Who they are doing this for: ' + trunc(p.whoFor, 70) : '',
-      p.values ? 'How they want to feel a year out: ' + trunc(p.values, 70) : '',
-      p.runningFrom ? 'What they are running from: ' + trunc(p.runningFrom, 90) : '',
-      p.costOfInaction ? 'What they are avoiding / the cost of not changing: ' + trunc(p.costOfInaction, 90) : '',
-      p.commitment ? 'Stated commitment level: ' + trunc(p.commitment, 30) : '',
-      p.letterToFutureSelf ? 'Their note to their future self: ' + trunc(p.letterToFutureSelf, 150) : ''
+      p.whoFor ? 'Who they are doing this for: ' + trunc(p.whoFor, 70) : ''
     ].filter(Boolean);
     const MAX = 400;
     let block = '';

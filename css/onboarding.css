@@ -1479,6 +1479,13 @@ body.lite .welcome-intro__sumstar { animation: none; }
   color: #c9b8ff; margin-bottom: 14px; }
 .welcome-intro__firstwin-title { font-size: 1.95rem; font-weight: 800; color: #fff; line-height: 1.1; margin-bottom: 16px; }
 .welcome-intro__firstwin-body { font-size: 1.02rem; line-height: 1.6; color: rgba(var(--ink),0.8); }
+/* Gentle CTA prompting the tap-to-fire-fireworks easter egg below the celebration copy. */
+.welcome-intro__firstwin-tap {
+  margin-top: 22px; font-size: var(--fs-sm); letter-spacing: 0.04em;
+  color: rgba(var(--ink),0.42); animation: fwTapPulse 2.4s ease-in-out 0.9s infinite;
+}
+@keyframes fwTapPulse { 0%,100% { opacity: 0.45; } 50% { opacity: 0.9; } }
+@media (prefers-reduced-motion: reduce) { .welcome-intro__firstwin-tap { animation: none; } }
 .welcome-intro__firstwin-emoji {
   margin-top: 24px;
   font-size: 2rem;

@@ -196,6 +196,7 @@ const WelcomeIntro = {
       if (step.type !== 'choices' && step.type !== 'text') return; // stop before summaryStepper/paywall
       beats.push({
         key: step.key,
+        skipIf: step.skipIf,   // conditional steps (e.g. distraction) check live answers at walk time
         lines: (n) => {
           let h = step.headline || '';
           if (h.indexOf('{name}') !== -1) h = n ? h.replace('{name}', n) : h.replace('Okay, {name}. ', '');
@@ -216,9 +217,12 @@ const WelcomeIntro = {
       // Reflections branch on what was just picked (in Malik's voice) so the
       // conversation feels custom, not one canned line everyone gets.
       if (step.key === 'runningToward') beats.push({ lines: () => { const t = this._wcReflect('runningToward'); return t ? [t] : []; } });
-      if (step.key === 'story') beats.push(birthdayBeat);   // birthday lands here, mid-conversation
+      if (step.key === 'clarityLevel') {
+        beats.push({ lines: () => { const t = this._wcReflect('clarityLevel'); return t ? [t] : []; } });
+        beats.push(birthdayBeat);   // birthday lands here, after the clarity gap
+      }
       if (step.key === 'runningFrom') beats.push({ lines: () => { const t = this._wcReflect('runningFrom'); return t ? [t] : []; } });
-      if (step.key === 'commitment') beats.push({ lines: () => { const t = this._wcReflect('commitment'); return t ? [t] : []; } });
+      if (step.key === 'costOfInaction') beats.push({ lines: () => { const t = this._wcReflect('costOfInaction'); return t ? [t] : []; } });
     });
     return beats;
   },
@@ -252,13 +256,16 @@ const WelcomeIntro = {
       _multi: "That's a lot to carry. None of those are permanent though.",
       _fallback: "Whatever it is, it's not permanent."
     },
-    commitment: {
-      'All in': "Locked in. That's the whole difference right there.",
-      'Pretty serious': "Pretty serious works. We'll turn that into all-in soon enough.",
-      'Testing the waters': "Testing the waters is fine. Some part of you wants more, or you wouldn't be here.",
-      'Just looking': "No worries. This only works if you actually dig in though. Some part of you wants more.",
-      'Not sure yet': "Not sure is okay. We'll figure out the direction together.",
-      _fallback: "Got it. We'll meet you wherever you're at."
+    clarityLevel: {
+      'Yes, I know exactly': "Good. Knowing exactly what you want is the part most people never lock down.",
+      'I have a rough idea': "A rough idea is a real start. Memento's whole first job is making it sharp.",
+      "Not really, I'm figuring it out": "That's honest, and normal. Finding the answer is literally step one here.",
+      'No, I feel lost': "Being lost is okay. Honestly it's where almost everyone starts. We find it together.",
+      _fallback: "We'll get this clear. That's the first thing Memento does."
+    },
+    costOfInaction: {
+      _multi: "That's the weight worth using. Not to scare you, to move you.",
+      _fallback: "Hold onto that feeling. That's the fuel when motivation runs out."
     }
   },
 
@@ -286,6 +293,9 @@ const WelcomeIntro = {
     while (this._wcIndex < beats.length) {
       if (gen !== this._wcGen) return;
       const beat = beats[this._wcIndex];
+      // Conditional beats (e.g. the distraction follow-up) check the live answers
+      // at walk time; skip silently, marking the slot handled so progress is right.
+      if (beat.skipIf && beat.skipIf(state.profile)) { this._wcAns[this._wcIndex] = null; this._wcIndex++; continue; }
       const n = (state.profile && state.profile.name) ? state.profile.name : 'you';
       const lines = beat.lines ? beat.lines(n) : [];
       for (const t of lines) { if (gen !== this._wcGen) return; await this._wcTypeLine(t, instant, gen); }
@@ -312,9 +322,11 @@ const WelcomeIntro = {
     return new Promise((resolve) => { this._wcResolve = resolve; this._wcRenderInput(beat, resolve); });
   },
 
+  _wcActiveInput(beat) { return beat && beat.input && !(beat.skipIf && beat.skipIf(state.profile)); },
+
   _wcCanBack() {
     const beats = this._wcBeatsArr || [];
-    for (let i = 0; i < this._wcIndex; i++) { if (beats[i].input) return true; }
+    for (let i = 0; i < this._wcIndex; i++) { if (this._wcActiveInput(beats[i])) return true; }
     return false;
   },
 
@@ -323,7 +335,7 @@ const WelcomeIntro = {
   _wcBack() {
     const beats = this._wcBeatsArr;
     let p = this._wcIndex - 1;
-    while (p >= 0 && !beats[p].input) p--;
+    while (p >= 0 && !this._wcActiveInput(beats[p])) p--;
     if (p < 0) return;
     for (let i = p; i < beats.length; i++) { delete this._wcAns[i]; }
     this._wcRebuild(p);
@@ -543,7 +555,22 @@ const WelcomeIntro = {
 
   // End of the conversation: fade the column out, then hand to the EXISTING
   // flow at the summary stepper (confetti -> AI summary -> paywall), unchanged.
+  // The diagnostic result: which pillar is this person weakest in. Drives the
+  // "Solution" page copy now, and seeds Clarity in Build 2.
+  _computeWeakestPillar(p) {
+    p = p || {};
+    const lc = (k) => String(p[k] || '').toLowerCase();
+    const toward = lc('runningToward'), clarity = lc('clarityLevel'), know = lc('actionKnow');
+    // Clarity gap: they don't actually know what they want.
+    if (clarity.indexOf('lost') !== -1 || clarity.indexOf('not really') !== -1 || toward.indexOf('not sure') !== -1) return 'clarity';
+    // Action gap: they have a rough idea but don't know the steps.
+    if (know.indexOf("don't know the steps") !== -1 || know.indexOf('sort of') !== -1 || clarity.indexOf('rough') !== -1) return 'action';
+    // Otherwise it's follow-through.
+    return 'consistency';
+  },
+
   _wcHandoff() {
+    try { state.profile.weakestPillar = this._computeWeakestPillar(state.profile); persistNow(); } catch (e) {}
     this._wcGen = (this._wcGen || 0) + 1; // freeze the engine
     if (this._wcDockEl) this._wcDockEl.innerHTML = '';
     const col = this.pageWrap.querySelector('.welcome-convo');
@@ -909,33 +936,50 @@ const WelcomeIntro = {
   // Surface-level onboarding. Mostly tap-to-pick choices (low friction, no
   // typing off the jump) with one optional open box at the end. Stored as
   // readable strings on state.profile and fed to the AI via buildProfileContext.
+  // A 3-pillar DIAGNOSTIC (Clarity gap -> Action gap -> Consistency gap), so each
+  // answer figures out which part of Memento this person needs most. The result
+  // (weakestPillar) tailors the "Solution" page and seeds Clarity (Build 2).
   identitySteps: [
+    // ── CLARITY gap: do they even know what they want? ──────────────────────
     { key: 'runningToward', type: 'choices', multi: true,
-      headline: 'So, what area of your life are you trying to improve?',
+      headline: 'So, what do you want to make progress in?',
       sub: 'Tap whatever fits. You can pick more than one.',
-      options: ['Work & money', 'Health & fitness', 'Discipline & focus', 'A skill or craft', 'Creative work', 'Relationships', 'Confidence & mindset', 'Purpose & direction'] },
-    { key: 'story', type: 'choices', multi: false,
-      headline: 'How do you feel about where you are?',
-      sub: 'Be honest. No wrong answer.',
-      options: ['Really bad. Desperate for change', 'Stuck and frustrated', 'Just getting started', 'Building momentum', 'Doing well, but want more', 'Made it, chasing what is next'] },
-    { key: 'whoFor', type: 'choices', multi: true,
-      headline: 'Who are you doing this for?',
-      sub: 'Pick whoever actually comes to mind.',
-      options: ['Your future self', 'The younger you', 'The people who doubted you', 'Your future family', 'Your parents', 'People who count on you', 'Honestly, just me'] },
+      options: ['Work & money', 'Health & fitness', 'Discipline & focus', 'A skill or craft', 'Creative work', 'Relationships', 'Confidence & mindset', 'Purpose & direction', "I'm honestly not sure yet"] },
+    { key: 'clarityLevel', type: 'choices', multi: false,
+      headline: 'Do you actually know what you want?',
+      sub: 'Be honest. Naming it is the whole first step.',
+      options: ['Yes, I know exactly', 'I have a rough idea', "Not really, I'm figuring it out", 'No, I feel lost'] },
+    // (birthday is inserted here, after the clarity gap)
+    // ── ACTION gap: do they know the steps, and where are they? ─────────────
+    { key: 'actionKnow', type: 'choices', multi: false,
+      headline: 'Do you know what to do to get there?',
+      sub: 'The actual steps, not the dream.',
+      options: ["Yes, but I don't follow through", "Sort of, not sure it's right", "No, I don't know the steps"] },
+    { key: 'actionProgress', type: 'choices', multi: false,
+      headline: "How's it going so far?",
+      sub: 'No judgment. Just where you actually are.',
+      options: ["Haven't really started", 'Started, then stalled', 'Slow but moving', 'Actually on a roll'] },
+    // ── CONSISTENCY gap: what pulls them back, and what's the pull? ─────────
     { key: 'runningFrom', type: 'choices', multi: true,
       headline: 'What keeps pulling you back?',
       sub: 'Be honest, this is just for you.',
       options: ['Procrastination', 'Phone & social media', "I don't know what to do", "Can't stay consistent", 'Fear of failing', 'Not enough time', 'Low motivation', 'Self-doubt'] },
-    { key: 'commitment', type: 'choices', multi: false,
-      headline: 'How serious are you about this?',
-      sub: 'No judgment, promise. It just changes how Memento shows up for you.',
-      options: ['All in', 'Pretty serious', 'Testing the waters', 'Just looking', 'Not sure yet'] },
+    { key: 'distraction', type: 'choices', multi: false,
+      headline: 'What pulls your attention the most?',
+      sub: 'The honest answer, not the polite one.',
+      options: ['TikTok', 'Instagram / Reels', 'YouTube', 'Porn', 'Gaming', 'Friends / going out', 'Something else'],
+      // Only ask if the phone is what's pulling them back.
+      skipIf: (p) => String((p && p.runningFrom) || '').indexOf('Phone & social media') === -1 },
+    // ── WHY / weight: the cost of staying where they are (memento mori) ─────
+    { key: 'costOfInaction', type: 'choices', multi: true,
+      headline: 'If a year goes by and nothing changes, what does that feel like?',
+      sub: 'Sit with it for a second.',
+      options: ['Wasted potential', 'Regret', 'Watching everyone pass me', 'Letting people down', 'Running out of time', 'Stuck in the same place'] },
     { key: 'letterToFutureSelf', type: 'text',
       headline: 'Anything else Memento should know?',
       sub: 'Totally optional. A line about you, your situation, or what you want. Or just skip it.',
       placeholder: 'Type anything, or skip' },
-    { type: 'summaryStepper' },
-    { type: 'paywall' }
+    { type: 'summaryStepper' }
   ],
 
   _beginIdentity(name) {
@@ -1260,31 +1304,20 @@ const WelcomeIntro = {
 
   _solutionWantLine(profile) {
     const toward = this._phraseList(profile && profile.runningToward);
-    const story = String((profile && profile.story) || '').toLowerCase();
-    if (toward) {
-      if (story.indexOf('doing well') !== -1 || story.indexOf('made it') !== -1 || story.indexOf('momentum') !== -1) {
-        return 'You are not trying to escape your life. You want more movement in ' + toward + ' because coasting would feel like wasting what you have.';
-      }
-      if (story.indexOf('really bad') !== -1 || story.indexOf('stuck') !== -1) {
-        return 'You want a way out of the loop, especially around ' + toward + ', because staying here is starting to cost too much.';
-      }
-      return 'You want more movement in ' + toward + ', and you are done letting it stay vague.';
+    const clarity = String((profile && profile.clarityLevel) || '').toLowerCase();
+    const reallyLost = clarity.indexOf('lost') !== -1 || clarity.indexOf('not really') !== -1;
+    if (toward && toward.indexOf('not sure') === -1) {
+      if (reallyLost) return 'You want to move on ' + toward + ', you just have not pinned down exactly what that looks like yet. That is the first thing we fix.';
+      return 'You want real movement in ' + toward + ', and you are done letting it stay vague.';
     }
-    return 'You are here because some part of you knows life can be sharper than this.';
+    return 'You are here because some part of you knows life can be sharper than this, you just have not named the thing yet.';
   },
 
   _solutionNeedLine(profile) {
-    const from = String((profile && profile.runningFrom) || '').toLowerCase();
-    const toward = String((profile && profile.runningToward) || '').toLowerCase();
-    const needsClarity = from.indexOf("don't know what to do") !== -1 || toward.indexOf('purpose') !== -1 || toward.indexOf('direction') !== -1;
-    const needsAction = from.indexOf('procrastination') !== -1 || from.indexOf('phone') !== -1 || from.indexOf('social') !== -1 || from.indexOf('not enough time') !== -1;
-    const needsConsistency = from.indexOf("can't stay consistent") !== -1 || from.indexOf('low motivation') !== -1 || from.indexOf('self-doubt') !== -1 || from.indexOf('fear') !== -1;
-    const count = [needsClarity, needsAction, needsConsistency].filter(Boolean).length;
-    if (count >= 2) return 'Looks like you need the full chain: clear direction, a next move, and a way to keep showing up when motivation drops.';
-    if (needsClarity) return 'Looks like clarity is the first unlock: naming the thing clearly enough that the next move stops feeling blurry.';
-    if (needsAction) return 'Looks like action is the first unlock: one clean next move, small enough to start today.';
-    if (needsConsistency) return 'Looks like consistency is the first unlock: a way back in on the days your energy is not there.';
-    return 'Looks like you need the full chain: clarity, action, and consistency working together.';
+    const pillar = (profile && profile.weakestPillar) || this._computeWeakestPillar(profile);
+    if (pillar === 'clarity') return 'Looks like clarity is your first unlock: naming the one thing clearly enough that the next move stops feeling blurry.';
+    if (pillar === 'action') return 'Looks like action is your first unlock: turning the goal into one clean next move, small enough to start today.';
+    return 'Looks like consistency is your first unlock: a way back in on the days your energy is not there, so it actually compounds.';
   },
 
   // Background AI call: turns their onboarding answers into a short, personal
@@ -1294,17 +1327,20 @@ const WelcomeIntro = {
     this._summary = null; this._summaryFailed = false;
     const p = state.profile || {};
     const lines = [];
-    if (p.runningToward) lines.push('Wants to improve: ' + p.runningToward);
-    if (p.story) lines.push('How they feel right now: ' + p.story);
-    if (p.whoFor) lines.push('Doing it for: ' + p.whoFor);
+    if (p.runningToward) lines.push('Wants to make progress in: ' + p.runningToward);
+    if (p.clarityLevel) lines.push('How clear they are on what they want: ' + p.clarityLevel);
+    if (p.actionKnow) lines.push('Whether they know the steps to get there: ' + p.actionKnow);
+    if (p.actionProgress) lines.push('Progress so far: ' + p.actionProgress);
     if (p.runningFrom) lines.push('What pulls them back: ' + p.runningFrom);
-    if (p.commitment) lines.push('Commitment level: ' + p.commitment);
+    if (p.distraction) lines.push('Biggest pull on their attention: ' + p.distraction);
+    if (p.costOfInaction) lines.push('What it costs them to stay stuck: ' + p.costOfInaction);
+    if (p.weakestPillar) lines.push('Their weakest pillar (where Memento helps most first): ' + p.weakestPillar);
     if (p.letterToFutureSelf) lines.push('Their own note: ' + p.letterToFutureSelf);
     const sys = 'You are writing a short, personal onboarding summary for someone who just answered a few questions in Memento, an app for clarity, action, and consistency. '
       + 'Speak directly to them in second person ("you"), plain and blunt, like a sharp, honest friend. Use what they told you so it feels specific, but do NOT just list their answers back. '
       + 'VOICE RULES: never use em dashes. Never use the word "real" as a modifier (no "real talk", "real progress"). No corny hype, no engineered taglines, no "let us". Short sentences. '
       + 'Return STRICT JSON only (no markdown, no code fences) with exactly these keys, each 1 to 2 short sentences: '
-      + 'whatYouWant (reflect what they are after so they feel seen), clarity (how Memento helps them get clear on the one thing that matters), why (anchor their deeper reason, use who they are doing it for if given), action (how Memento gives them the next move so they stop guessing), consistency (how Memento helps them keep showing up given what pulls them back), together (one punchy line on how clarity, action, and consistency working together every day is when it actually gets done, made specific to them), plus (one line on supporting features that make it easier).';
+      + 'whatYouWant (reflect what they are after so they feel seen), clarity (how Memento helps them get clear on the one thing that matters), why (anchor their deeper reason, lean on the cost of staying stuck if given), action (how Memento gives them the next move so they stop guessing), consistency (how Memento helps them keep showing up given what pulls them back), together (one punchy line on how clarity, action, and consistency working together every day is when it actually gets done, made specific to them), plus (one line on supporting features that make it easier).';
     const userMsg = 'What they told us:\n' + (lines.join('\n') || 'Not much, they skipped most of it.') + '\n\nWrite their JSON summary now.';
     this._summaryPromise = callClaude([{ role: 'user', content: userMsg }], sys, { maxTokens: 600, timeout: 12000 })
       .then(raw => {
@@ -1334,9 +1370,10 @@ const WelcomeIntro = {
     this.navEl.style.gap = '10px';
     this.pageWrap.innerHTML = `<div class="welcome-intro__page-inner welcome-intro__firstwin">
       <div class="welcome-intro__firstwin-content">
-        <div class="welcome-intro__firstwin-eyebrow">First step</div>
+        <div class="welcome-intro__firstwin-eyebrow">Congrats!</div>
         <div class="welcome-intro__firstwin-title">${nm ? 'You actually started and took the first step, ' + esc(nm) : 'You actually started and took the first step'}</div>
         <div class="welcome-intro__firstwin-body">Seriously. Most people scroll past apps like this and keep doing nothing. They spend their entire lives never even thinking about their life. You just sat down and answered honestly about your life. That is the step almost no one takes. Some part of you wants to do more, have more, be more. Never ever lose that flame. Most people lose it way too soon.</div>
+        <div class="welcome-intro__firstwin-tap">(tap the screen)</div>
       </div>
     </div>`;
     // Confetti runs on mobile too: it is a bounded burst that self-terminates the
@@ -1508,8 +1545,8 @@ const WelcomeIntro = {
     const phrase = (v) => this._phraseList(v);
     if (cardIdx === 0 && !this._summaryStarted) { this._summaryStarted = true; try { this.generateSummary(); } catch (e) { this._summaryFailed = true; } }
 
-    const whoForFall = p.whoFor
-      ? `When it gets hard, you remember who this is for: ${phrase(p.whoFor)}. That is the fuel that keeps you going.`
+    const whyFall = p.costOfInaction
+      ? `When it gets hard, you remember the cost of staying here: ${phrase(p.costOfInaction)}. That is the fuel that keeps you going.`
       : 'Memento keeps your reason in front of you, so you are not leaning on motivation that comes and goes.';
     const whatFall = p.runningToward
       ? `You said you want to improve ${phrase(p.runningToward)}.${p.runningFrom ? ' And that ' + phrase(p.runningFrom) + ' keeps getting in the way.' : ''} That is enough to start.`
@@ -1517,7 +1554,7 @@ const WelcomeIntro = {
     const cards = [
       { eyebrow: 'WHAT YOU WANT', title: nm ? `Here's what we heard, ${esc(nm)}` : "Here's what we heard", aiKey: 'whatYouWant', instant: true, fallback: whatFall },
       { eyebrow: 'THE WHAT', title: 'Get clear on the one thing', aiKey: 'clarity', fallback: 'You get dead clear on the one thing that actually matters. Most people stay busy on the wrong stuff and call it progress.' },
-      { eyebrow: 'THE WHY', title: 'Anchor your why', aiKey: 'why', fallback: whoForFall },
+      { eyebrow: 'THE WHY', title: 'Anchor your why', aiKey: 'why', fallback: whyFall },
       { eyebrow: 'THE HOW', title: 'Always know the next move', aiKey: 'action', fallback: 'Every day Memento hands you the single move that matters most. No more staring at a list guessing where to start.' },
       { eyebrow: 'THE CONSISTENCY', title: 'Keep showing up', aiKey: 'consistency', fallback: 'This is where it compounds. You show up, it stacks, and the thing you keep putting off slowly becomes inevitable.' },
       { eyebrow: 'AND MORE', title: 'The tools around you', aiKey: 'plus', fallback: 'Reflections, deep-work sessions, streaks, and reminders of why you started. Quiet tools that make showing up easier.' }
@@ -1553,7 +1590,10 @@ const WelcomeIntro = {
 
     const fade = (fn) => { const inner = this.pageWrap.querySelector('.welcome-intro__page-inner'); if (inner) inner.classList.add('exit'); setTimeout(fn, 250); };
     document.getElementById('identityNext').addEventListener('click', () => {
-      if (isLast) this._showIdentityStep(stepIndex + 1);
+      // Clarity is the free first win: onboarding ends straight at the dashboard
+      // (Clarity CTA), no paywall here. (The paywall relocates to after the first
+      // Clarity win in Build 2; its render code is kept below, just not reached.)
+      if (isLast) this._finishWithName();
       else fade(() => this._showSummaryCard(stepIndex, cardIdx + 1));
     });
     const bb = document.getElementById('identityBack');
