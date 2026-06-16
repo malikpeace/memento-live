@@ -3018,6 +3018,12 @@ body.lite .daycard-ns,
 html.lowfx .daycard-ns {
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
+  /* iOS Safari does not clip overflow:hidden + border-radius on a 3D-transformed
+     element (the card always has the perspective tilt), so the square background
+     corner pokes past the rounded edge. clip-path IS honored under transforms,
+     so it clips the corners cleanly. Trade: it also clips the outer glow/drop
+     shadow on mobile (invisible over the near-black dashboard anyway). */
+  clip-path: inset(0 round var(--r-card, 14px));
 }
 
 /* === Fullscreen Memento (tap the card) ===================================== */
