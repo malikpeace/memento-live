@@ -2794,12 +2794,17 @@ html.theme-light body.lite .backup-nudge, html.theme-light.lowfx .backup-nudge {
     align-items: center;
     justify-content: center;
     position: relative;
+    width: 100%;
     margin: 0;
   }
+  /* vw, not %: #dayCard is a shrink-to-fit column, so a % width on the card
+     resolves against the card's own collapsed width and degenerates to a thin
+     bar. vw is viewport-relative, so the card keeps a proper card proportion. */
   #dayCard .daycard-ns {
-    width: min(86%, 330px);
-    min-height: min(52svh, 440px);
+    width: min(82vw, 320px);
+    min-height: 452px;
   }
+  #dayCard .daycard-theme-living .daycard-living-stage { width: min(82vw, 320px); }
 }
 body.daycard-force #dayCard { display: block; max-width: 430px; }
 /* Desktop / tablet: show the card too, as a clean centered artifact at the top

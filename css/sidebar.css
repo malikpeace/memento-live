@@ -152,6 +152,10 @@
     transition: transform var(--t-slow) cubic-bezier(0.22, 1, 0.36, 1);
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    /* Clear the iOS status bar / notch: the drawer starts at viewport top, so
+       its header must be pushed down past the safe area or MEMENTO collides
+       with the clock. */
+    padding-top: var(--safe-t, 0px);
   }
   body.mobile-menu-open .sidebar { transform: translateX(0); }
   .sidebar__inner { width: 100%; }
@@ -292,6 +296,11 @@ body:has(.clarity-exp.open) #app { visibility: hidden !important; }
    both performs that click and dismisses the menu (see the capture-phase
    listener in js/09). */
 body.menu-peek .menu-peek-backdrop { opacity: 1; pointer-events: none; }
+/* On phones the drawer is a real drawer: the dimmed area takes taps so the user
+   can dismiss it by tapping outside (paired with drag-to-close). */
+@media (max-width: 859.98px) {
+  body.menu-peek .menu-peek-backdrop { pointer-events: auto; }
+}
 
 /* Peek mode: force the sidebar on-screen and raise it above the overlay,
    regardless of collapsed state or breakpoint. */

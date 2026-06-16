@@ -2016,6 +2016,68 @@ const Sidebar = {
       });
     }
 
+    // --- iOS-like drag-to-close for the mobile drawer ---------------------------
+    // Grab the open drawer and slide it left with your finger; release past a
+    // threshold (or with a quick flick) to close, otherwise it snaps back. The
+    // menu-peek CSS sets transform with !important, so the live drag must also
+    // set it !important to win, then clear it on release to hand control back.
+    (function bindDrawerDragClose() {
+      if (!_SB) return;
+      let startX = 0, startY = 0, dx = 0, w = 320, t0 = 0;
+      let active = false, decided = false, horizontal = false;
+      const isOpenDrawer = () => _isDrawer() && document.body.classList.contains('menu-peek');
+      const setX = (px) => {
+        _SB.style.setProperty('transform', 'translateX(' + px + 'px)', 'important');
+        if (peekBackdrop) peekBackdrop.style.opacity = String(Math.max(0, 1 + px / w));
+      };
+      const clearInline = () => {
+        _SB.style.removeProperty('transform');
+        _SB.style.removeProperty('transition');
+        if (peekBackdrop) peekBackdrop.style.opacity = '';
+      };
+      _SB.addEventListener('touchstart', (e) => {
+        if (!isOpenDrawer() || !e.touches || e.touches.length !== 1) return;
+        const t = e.touches[0];
+        startX = t.clientX; startY = t.clientY; dx = 0; t0 = e.timeStamp || 0;
+        w = _SB.getBoundingClientRect().width || 320;
+        active = true; decided = false; horizontal = false;
+      }, { passive: true });
+      _SB.addEventListener('touchmove', (e) => {
+        if (!active) return;
+        const t = e.touches[0];
+        const mx = t.clientX - startX, my = t.clientY - startY;
+        if (!decided) {
+          if (Math.abs(mx) < 8 && Math.abs(my) < 8) return;
+          // Vertical intent -> let the drawer scroll; bail out of the drag.
+          if (Math.abs(my) > Math.abs(mx)) { active = false; return; }
+          decided = true; horizontal = true;
+          _SB.style.setProperty('transition', 'none', 'important');
+        }
+        dx = Math.min(0, mx); // leftward only
+        setX(dx);
+        if (e.cancelable) e.preventDefault();
+      }, { passive: false });
+      const onEnd = (e) => {
+        if (!active) return;
+        active = false;
+        if (!horizontal) { clearInline(); return; }
+        const dt = ((e && e.timeStamp) || 0) - t0;
+        const vel = dt > 0 ? Math.abs(dx) / dt : 0; // px per ms
+        clearInline(); // restore CSS-driven transform + transition
+        if (Math.abs(dx) > w * 0.32 || vel > 0.5) closePeek();
+        // else: clearing the inline transform snaps it back to translateX(0).
+      };
+      _SB.addEventListener('touchend', onEnd, { passive: true });
+      _SB.addEventListener('touchcancel', onEnd, { passive: true });
+    })();
+
+    // On mobile the drawer is a real drawer: tapping the dimmed area outside it
+    // closes it (desktop keeps the stationary peek, where outside taps do not
+    // dismiss). The CSS enables pointer-events on the peek backdrop at <=859px.
+    if (peekBackdrop) {
+      peekBackdrop.addEventListener('click', () => { if (_isDrawer() && document.body.classList.contains('menu-peek')) closePeek(); });
+    }
+
     // Keyboard shortcut: press T (or Option+T) to toggle the left menu sidebar
     // from any view. Guarded so it never fires while typing, and Cmd/Ctrl+T
     // (new browser tab) is left untouched.
