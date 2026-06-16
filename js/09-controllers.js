@@ -2929,6 +2929,12 @@ const TabBar = {
   },
 
   switchTo(tabId) {
+    // Search is an ACTION, not a destination: open Spotlight and leave the
+    // active tab where it was (the pill never moves to search).
+    if (tabId === 'search') {
+      try { if (window.Spotlight && window.Spotlight.open) window.Spotlight.open(); } catch (e) {}
+      return;
+    }
     // Middle tab, MOBILE: acts as a Modules switcher (opens the MoreSpace sheet
     // listing every module) instead of the decorative trinity panel. The sheet
     // is an overlay, so the tab does not become active; Home stays underneath.
@@ -4084,9 +4090,18 @@ const Splash = {
     const treatAsReturning = isReturning || hasRestorable;
 
     if (!treatAsReturning) {
-      // First time: slow fade out, then show welcome intro
+      // First time: slow fade out, then the "choose your look" picker (once),
+      // then the welcome intro. New users pick the feel of their Memento before
+      // they build it; returning users never see it.
       this.el.classList.add('splash--exiting');
-      setTimeout(() => WelcomeIntro.open(), 1300);
+      setTimeout(() => {
+        const startWelcome = () => WelcomeIntro.open();
+        if (typeof AppearancePicker !== 'undefined' && !(state.prefs && state.prefs.appearanceChosen)) {
+          AppearancePicker.open(startWelcome);
+        } else {
+          startWelcome();
+        }
+      }, 1300);
       setTimeout(() => {
         this.el.classList.add('dismissed');
         this.stopBeams();
