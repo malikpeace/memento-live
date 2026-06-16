@@ -2392,6 +2392,8 @@ const Sheet = {
     this.isDragging = true;
     this.startY = e.clientY;
     this.currentY = 0;
+    this._dragT0 = (typeof e.timeStamp === 'number') ? e.timeStamp : 0;
+    this._dragTLast = this._dragT0;
     this.el.classList.add('dragging');
     e.preventDefault();
   },
@@ -2399,6 +2401,7 @@ const Sheet = {
   onDragMove(e) {
     if (!this.isDragging) return;
     this.currentY = Math.max(0, e.clientY - this.startY);
+    this._dragTLast = (typeof e.timeStamp === 'number') ? e.timeStamp : this._dragTLast;
     this.el.style.transform = `translateY(${this.currentY}px)`;
     this.backdrop.style.opacity = Math.max(0, 1 - this.currentY / 400);
   },
@@ -2409,7 +2412,11 @@ const Sheet = {
     this.el.classList.remove('dragging');
     this.el.style.transform = '';
     this.backdrop.style.opacity = '';
-    if (this.currentY > 120) { this.close(); }
+    // iOS feel: dismiss on a far drag OR a quick downward flick (so a short,
+    // fast swipe closes too, not only a long slow drag past the threshold).
+    const dt = (this._dragTLast || 0) - (this._dragT0 || 0);
+    const vel = dt > 0 ? this.currentY / dt : 0; // downward px per ms
+    if (this.currentY > 120 || (this.currentY > 32 && vel > 0.5)) { this.close(); }
     else { this.el.classList.add('open'); }
   }
 };

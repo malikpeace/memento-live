@@ -564,7 +564,12 @@ body.lite .more-space__sheet, html.lowfx .more-space__sheet {
 html.theme-light body.lite .more-space__sheet, html.theme-light.lowfx .more-space__sheet { background: rgb(248, 248, 250); }
 .more-space.open .more-space__backdrop { opacity: 1; }
 .more-space.open .more-space__sheet { transform: translateY(0); }
-.more-space__handle { width: 34px; height: 4px; border-radius: 2px; background: var(--kfill-14); margin: 4px auto 14px; }
+/* While the finger is dragging the sheet, follow it 1:1 with no transition. */
+.more-space__sheet.dragging { transition: none; }
+/* A wider, comfortable grab area around the visual handle (the bar stays small,
+   the touch target is generous), so grabbing it never feels fiddly. */
+.more-space__handle { width: 38px; height: 5px; border-radius: 3px; background: var(--kfill-14); margin: 4px auto 14px; position: relative; cursor: grab; }
+.more-space__handle::before { content: ""; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 120px; height: 28px; }
 .more-space__title { font-size: 0.66rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-lo); margin: 2px 2px 14px; }
 .more-space__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .more-card {

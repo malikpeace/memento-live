@@ -881,6 +881,56 @@ const MoreSpace = {
     wrap.querySelector('.more-space__backdrop').addEventListener('click', () => this.close());
     this._esc = (e) => { if (e.key === 'Escape') this.close(); };
     document.addEventListener('keydown', this._esc);
+
+    // iOS-like swipe-down-to-dismiss. Drag down from the header (handle / title)
+    // any time, or pull down once the list is already scrolled to the top; let
+    // go past ~28% of the sheet height or with a downward flick to close, else
+    // it springs back. Otherwise the content scrolls as normal.
+    (function bindMoreSwipe() {
+      const sheet = wrap.querySelector('.more-space__sheet');
+      const backdrop = wrap.querySelector('.more-space__backdrop');
+      if (!sheet) return;
+      let startY = 0, dy = 0, t0 = 0, h = 1;
+      let active = false, decided = false, engaged = false, fromHeader = false;
+      const inHeader = (t) => !!(t && t.closest && t.closest('.more-space__handle, .more-space__title'));
+      sheet.addEventListener('touchstart', (e) => {
+        if (!e.touches || e.touches.length !== 1) return;
+        startY = e.touches[0].clientY; dy = 0; t0 = e.timeStamp || 0;
+        h = sheet.getBoundingClientRect().height || 1;
+        active = true; decided = false; engaged = false; fromHeader = inHeader(e.target);
+      }, { passive: true });
+      sheet.addEventListener('touchmove', (e) => {
+        if (!active) return;
+        const y = e.touches[0].clientY - startY;
+        if (!decided) {
+          if (Math.abs(y) < 6) return;
+          // Engage dismiss only on a downward pull from the header, or a downward
+          // pull while already at the top of the scroll. Anything else scrolls.
+          engaged = y > 0 && (fromHeader || sheet.scrollTop <= 0);
+          decided = true;
+          if (engaged) sheet.classList.add('dragging'); else { active = false; return; }
+        }
+        dy = Math.max(0, y);
+        sheet.style.transform = 'translateY(' + dy + 'px)';
+        if (backdrop) backdrop.style.opacity = String(Math.max(0, 1 - dy / (h * 0.9)));
+        if (e.cancelable) e.preventDefault();
+      }, { passive: false });
+      const end = (e) => {
+        if (!active) return;
+        active = false;
+        if (!engaged) return;
+        const dt = ((e && e.timeStamp) || 0) - t0;
+        const vel = dt > 0 ? dy / dt : 0; // downward px per ms
+        const shouldClose = dy > h * 0.28 || vel > 0.55;
+        sheet.classList.remove('dragging'); // re-enable the transition
+        sheet.style.transform = '';
+        if (backdrop) backdrop.style.opacity = '';
+        if (shouldClose) MoreSpace.close(); // synchronous: animates dy -> off-screen
+      };
+      sheet.addEventListener('touchend', end, { passive: true });
+      sheet.addEventListener('touchcancel', end, { passive: true });
+    })();
+
     this._renderInto();
     requestAnimationFrame(() => wrap.classList.add('open'));
   },
@@ -3434,6 +3484,46 @@ function openMementoFull() {
     const onKey = (e) => { if (e.key === 'Escape') close(); };
     ov.querySelector('.mf__close').addEventListener('click', close);
     ov.addEventListener('click', (e) => { if (e.target === ov) close(); });
+    // iOS-like swipe-down-to-close: pull the card view down (when scrolled to the
+    // top) and it follows the finger, then flicks away or springs back.
+    (function bindMfSwipe() {
+      const scroll = ov.querySelector('.mf__scroll');
+      if (!scroll) return;
+      let startY = 0, dy = 0, t0 = 0, active = false, decided = false, engaged = false;
+      scroll.addEventListener('touchstart', (e) => {
+        if (!e.touches || e.touches.length !== 1) return;
+        startY = e.touches[0].clientY; dy = 0; t0 = e.timeStamp || 0;
+        active = true; decided = false; engaged = false;
+      }, { passive: true });
+      scroll.addEventListener('touchmove', (e) => {
+        if (!active) return;
+        const y = e.touches[0].clientY - startY;
+        if (!decided) {
+          if (Math.abs(y) < 6) return;
+          engaged = y > 0 && scroll.scrollTop <= 0;
+          decided = true;
+          if (!engaged) { active = false; return; }
+        }
+        dy = Math.max(0, y);
+        scroll.style.transition = 'none';
+        scroll.style.transform = 'translateY(' + dy + 'px)';
+        ov.style.background = 'rgba(0,0,0,' + Math.max(0, 0.6 - dy / 700) + ')';
+        if (e.cancelable) e.preventDefault();
+      }, { passive: false });
+      const onEnd = (e) => {
+        if (!active) return;
+        active = false;
+        if (!engaged) return;
+        const dt = ((e && e.timeStamp) || 0) - t0;
+        const vel = dt > 0 ? dy / dt : 0;
+        scroll.style.transition = '';
+        scroll.style.transform = '';
+        ov.style.background = '';
+        if (dy > 150 || vel > 0.55) close();
+      };
+      scroll.addEventListener('touchend', onEnd, { passive: true });
+      scroll.addEventListener('touchcancel', onEnd, { passive: true });
+    })();
     // Each pillar opens its full module.
     ov.querySelectorAll('[data-mf-open]').forEach((el) => {
       const go = () => {
