@@ -2016,6 +2016,19 @@ const Sidebar = {
       });
     }
 
+    // Mobile: tapping the top-left Memento brand lockup also opens the drawer
+    // (it is the obvious thing to tap up there). Make it a real control.
+    const brandLockup = document.querySelector('.dash-header__brand');
+    if (brandLockup) {
+      brandLockup.setAttribute('role', 'button');
+      brandLockup.setAttribute('tabindex', '0');
+      brandLockup.setAttribute('aria-label', 'Open menu');
+      brandLockup.removeAttribute('aria-hidden');
+      const openFromBrand = (e) => { if (!_isDrawer()) return; if (e) e.preventDefault(); openPeek(); };
+      brandLockup.addEventListener('click', openFromBrand);
+      brandLockup.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') openFromBrand(e); });
+    }
+
     // --- iOS-like drag-to-close for the mobile drawer ---------------------------
     // Grab the open drawer and slide it left with your finger; release past a
     // threshold (or with a quick flick) to close, otherwise it snaps back. The
