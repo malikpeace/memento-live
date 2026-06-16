@@ -63,6 +63,17 @@ const ClarityExperience = {
 
   open() {
     if (this.isOpen) return;
+    // Free users get ONE full Clarity run. Starting a brand-new discovery (the
+    // costly AI part) when they already have a finished Neutron Star and have not
+    // paid is what we gate, so it rises the paywall instead. Viewing/continuing an
+    // existing star stays free (the dashboard routes a completed star to
+    // openSummary; a saved draft resumes below). Paid users redo freely.
+    try {
+      if (state.clarity.completed && typeof ClarityPaywall !== 'undefined' && !ClarityPaywall.isPaid()) {
+        ClarityPaywall.show();
+        return;
+      }
+    } catch (e) {}
     // Force clean slate before opening
     this._forceReset();
     this.isOpen = true;
@@ -82,6 +93,7 @@ const ClarityExperience = {
     wizardAnswers = {};
     // Reset AI state
     aiChatMessages = [];
+    try { clarityEscalated = false; } catch (e) {}
     aiChatReady = false;
     aiChatProgress = null;
     aiChatLoading = false;

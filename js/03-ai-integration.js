@@ -2062,6 +2062,15 @@ const ANTHROPIC_MODEL = 'claude-haiku-4-5';
 const ANTHROPIC_MODEL_CLARITY = 'claude-sonnet-4-6';
 const ANTHROPIC_MODEL_SYNTHESIS = 'claude-opus-4-8';
 const ANTHROPIC_MODEL_PLANS = 'claude-sonnet-4-6';
+
+// Dynamic escalation: a Clarity conversation that runs long without converging
+// is a "tough" person. Once that trips, the REST of the discovery turns get Opus
+// too (not just the synthesis), so hard cases get the best questions. Reset at
+// the start of every run. Easy/normal conversations stay all-Sonnet.
+let clarityEscalated = false;
+function clarityChatModel() {
+  return clarityEscalated ? ANTHROPIC_MODEL_SYNTHESIS : ANTHROPIC_MODEL_CLARITY;
+}
 async function callClaude(messages, systemPrompt, options = {}) {
   // Routing: a personal dev key calls Anthropic directly (local development);
   // otherwise the call goes through the ai-proxy Edge Function, which holds
@@ -2103,15 +2112,37 @@ async function callClaude(messages, systemPrompt, options = {}) {
           'anthropic-version': '2023-06-01',
           'anthropic-dangerous-direct-browser-access': 'true'
         };
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: headers,
-      body: JSON.stringify({
+    // Optional features: prompt caching (cache the big system prompt across a
+    // conversation so repeat turns read it cheap) and extended thinking (reason
+    // harder on the hardest calls). Proxy path: send a STRING system + simple
+    // flags; the new proxy applies them and an OLD proxy just ignores the flags
+    // (string system still works, zero breakage). Direct dev path: build the
+    // real Anthropic shapes here.
+    const wantCache = !!options.cache;
+    const wantThinking = (options.thinking && options.thinking.budget_tokens) ? options.thinking : null;
+    let reqBody;
+    if (useProxy) {
+      reqBody = {
         model: options.model || ANTHROPIC_MODEL,
         max_tokens: options.maxTokens || 2048,
         system: sys,
         messages: messages
-      }),
+      };
+      if (wantCache) reqBody.cache = true;
+      if (wantThinking) reqBody.thinking = { type: 'enabled', budget_tokens: wantThinking.budget_tokens };
+    } else {
+      reqBody = {
+        model: options.model || ANTHROPIC_MODEL,
+        max_tokens: options.maxTokens || 2048,
+        system: wantCache ? [{ type: 'text', text: sys, cache_control: { type: 'ephemeral' } }] : sys,
+        messages: messages
+      };
+      if (wantThinking) reqBody.thinking = { type: 'enabled', budget_tokens: wantThinking.budget_tokens };
+    }
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(reqBody),
       signal: controller.signal
     });
 
@@ -3113,7 +3144,7 @@ async function sendAiAnswer() {
       lastApiMsg.content += '\n\n[System note: For the hint field, set it to empty string "" most of the time. Only include a hint if it genuinely adds context the user needs. Most questions do not need hints.]';
     }
 
-    let response = await callClaude(apiMessages, AI_DISCOVERY_SYSTEM_PROMPT, { model: ANTHROPIC_MODEL_CLARITY });
+    let response = await callClaude(apiMessages, AI_DISCOVERY_SYSTEM_PROMPT, { model: clarityChatModel(), cache: true });
     let parsed = parseAiQuestion(response);
 
     // Duplicate detection: if the new question is too similar to a previous one, retry once
@@ -3128,7 +3159,7 @@ async function sendAiAnswer() {
       const retryMsg = { role: 'user', content: '[System: You just repeated a question you already asked. Ask a completely DIFFERENT question that moves the conversation forward. Do NOT repeat any previous question.]' };
       apiMessages.push({ role: 'assistant', content: response });
       apiMessages.push(retryMsg);
-      response = await callClaude(apiMessages, AI_DISCOVERY_SYSTEM_PROMPT, { model: ANTHROPIC_MODEL_CLARITY });
+      response = await callClaude(apiMessages, AI_DISCOVERY_SYSTEM_PROMPT, { model: clarityChatModel(), cache: true });
       parsed = parseAiQuestion(response);
     }
 
@@ -3150,6 +3181,19 @@ async function sendAiAnswer() {
       aiChatReady = true;
       aiChatProgress = 100;
     }
+
+    // Cost guards on the conversation:
+    const _userTurns = aiChatMessages.filter(m => m.role === 'user').length;
+    // 1) Dynamic Opus escalation: a long conversation still not converging means
+    //    a genuinely tough person. Give the rest of their questions Opus too.
+    //    Conservative trigger so only the real tail escalates.
+    if (!clarityEscalated && ((_userTurns >= 8 && aiChatProgress < 55) || _userTurns >= 14)) {
+      clarityEscalated = true;
+    }
+    // 2) Hard turn cap. 100 leaves enormous room for people who genuinely need a
+    //    long conversation, but stops a bot / runaway from going 500, 1000, 10000
+    //    turns, which is the only thing that actually does damage.
+    if (_userTurns >= 100) { aiChatReady = true; aiChatProgress = 100; }
 
     // No auto-ready  - AI decides when conversation is deep enough
 
@@ -3204,7 +3248,7 @@ async function rephraseAiQuestion() {
     // Add hidden rephrase request (not saved to conversation)
     apiMessages.push({ role: 'user', content: '[I don\'t understand this question. Please rephrase it completely differently using simpler, clearer language. Keep the same question TYPE (if it was "choices" use "choices" again with different/clearer options, if "text" keep "text", if "range" keep "range"). Do NOT ask a brand new question  - rephrase the SAME intent so I can actually answer it. Respond with ONLY a JSON object.]' });
 
-    const response = await callClaude(apiMessages, AI_DISCOVERY_SYSTEM_PROMPT, { model: ANTHROPIC_MODEL_CLARITY });
+    const response = await callClaude(apiMessages, AI_DISCOVERY_SYSTEM_PROMPT, { model: clarityChatModel(), cache: true });
     const parsed = parseAiQuestion(response);
 
     // Update current question with rephrased version
@@ -3496,8 +3540,11 @@ async function triggerSynthesis() {
       [{ role: 'user', content: 'Context: ' + context + '\n\nFull conversation:\n' + conversationText + '\n\nPlease synthesize this into the JSON structure.' }],
       AI_SYNTHESIS_SYSTEM_PROMPT,
       // The single most important call: read the whole conversation and distill
-      // the one-sentence Neutron Star. This one gets Opus.
-      { maxTokens: 2048, model: ANTHROPIC_MODEL_SYNTHESIS }
+      // the one-sentence Neutron Star. Opus, WITH extended thinking so it reasons
+      // hard and the final result is as close to perfect as possible. maxTokens
+      // covers the thinking budget + the JSON output. (thinking + cache are
+      // applied by the proxy; an older proxy simply ignores them, no breakage.)
+      { maxTokens: 4096, model: ANTHROPIC_MODEL_SYNTHESIS, cache: true, thinking: { budget_tokens: 2000 } }
     );
 
     // Parse JSON robustly: strip code fences anywhere, then slice from the first
