@@ -276,11 +276,11 @@ body:has(.clarity-exp.open) #app { visibility: hidden !important; }
 @media (pointer: coarse) {
   #sidebarReveal, .sidebar-reveal { display: none !important; }
 }
-/* Mobile: drop the FAB's backdrop blur (GPU-cheap) and use a solid-ish fill,
-   matching the app's no-backdrop-filter perf rule on touch devices. */
+/* Mobile: the quick-capture FAB is hidden. It crowded the bottom-right corner,
+   and capture lives in the menu / "c" shortcut on desktop. Phones get a cleaner
+   screen (the bottom tab bar is the one fixed control down there). */
 @media (pointer: coarse), (max-width: 859.98px) {
-  .capture-fab { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background: rgba(18, 18, 22, 0.94); }
-  html.theme-light .capture-fab { background: var(--wfill-96); }
+  .capture-fab { display: none !important; }
 }
 
 /* Dim tap-away backdrop for the peek layer, above the overlay but below the

@@ -3088,6 +3088,9 @@ html.lowfx .daycard-ns {
   .dash-header__right { display: none !important; }
   #dashGreetingMobile .mgreet__name { font-weight: 600; color: var(--text-hi); }
   #dashGreetingMobile .mgreet__dot { color: var(--text-lo); }
+  /* Search moved to the bottom tab bar, so drop the redundant greeting-row
+     search icon on mobile. The greeting line keeps the full width. */
+  #dashGreetingMobile .mgreet__search { display: none !important; }
 }
 
 

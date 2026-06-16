@@ -2046,16 +2046,21 @@ async function generateAccountabilityCheck() {
   return result;
 }
 
-// Model strategy, three tiers in one place:
-// - ANTHROPIC_MODEL_CLARITY runs the flagship Clarity conversation and the
-//   Neutron Star synthesis. That conversation IS the product's magic moment,
-//   so it gets the top model (claude-opus-4-8).
+// Model strategy, in one place:
+// - ANTHROPIC_MODEL_CLARITY runs the back-and-forth Clarity DISCOVERY chat.
+//   Sonnet is excellent at asking good questions + reading the person, and it
+//   is ~5x cheaper than Opus, so the free funnel stays affordable.
+// - ANTHROPIC_MODEL_SYNTHESIS runs the FINAL synthesis only: the one call that
+//   reads the whole conversation and distills the single-sentence Neutron Star.
+//   That distillation is where the top model actually earns its keep, and it is
+//   one call, so it gets Opus. Conversation cheap, the payoff sharp.
 // - ANTHROPIC_MODEL_PLANS stays pinned to the model the 2000-line action-plan
 //   prompts were tuned against, so plan quality never silently shifts.
 // - ANTHROPIC_MODEL (default) covers the cheap high-volume calls: insights,
 //   accountability check-ins, goal sharpening, star names.
 const ANTHROPIC_MODEL = 'claude-haiku-4-5';
-const ANTHROPIC_MODEL_CLARITY = 'claude-opus-4-8';
+const ANTHROPIC_MODEL_CLARITY = 'claude-sonnet-4-6';
+const ANTHROPIC_MODEL_SYNTHESIS = 'claude-opus-4-8';
 const ANTHROPIC_MODEL_PLANS = 'claude-sonnet-4-6';
 async function callClaude(messages, systemPrompt, options = {}) {
   // Routing: a personal dev key calls Anthropic directly (local development);
@@ -3490,7 +3495,9 @@ async function triggerSynthesis() {
     const response = await callClaude(
       [{ role: 'user', content: 'Context: ' + context + '\n\nFull conversation:\n' + conversationText + '\n\nPlease synthesize this into the JSON structure.' }],
       AI_SYNTHESIS_SYSTEM_PROMPT,
-      { maxTokens: 2048, model: ANTHROPIC_MODEL_CLARITY }
+      // The single most important call: read the whole conversation and distill
+      // the one-sentence Neutron Star. This one gets Opus.
+      { maxTokens: 2048, model: ANTHROPIC_MODEL_SYNTHESIS }
     );
 
     // Parse JSON robustly: strip code fences anywhere, then slice from the first
