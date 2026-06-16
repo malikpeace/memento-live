@@ -94,7 +94,33 @@ const ClarityExperience = {
       const a = state.clarity.answers;
       if (a.domains && a.domains.length) wizardAnswers.domains = a.domains;
     }
+    // Seed from onboarding so Clarity continues from what they already told us,
+    // instead of a blank start. Their diagnostic answers also reach the AI via
+    // buildProfileContext; this pre-selects the area as a reversible default.
+    try { if (!state.clarity.completed) this._seedFromOnboarding(); } catch (e) {}
     this._cinematicOpen();
+  },
+
+  // Map the onboarding "what do you want to make progress in?" answer to the
+  // Clarity discovery domains, pre-selecting it so the wizard is not blank.
+  _seedFromOnboarding() {
+    if (wizardAnswers.discoverDomain) return; // do not override a real pick
+    const prof = (state && state.profile) || {};
+    const toward = String(prof.runningToward || '').toLowerCase();
+    if (!toward || toward.indexOf('not sure') !== -1) return;
+    const map = [
+      ['health', 'fitness'], ['fitness', 'fitness'],
+      ['work', 'money'], ['money', 'money'],
+      ['creative', 'creative'],
+      ['skill', 'education'], ['craft', 'education'],
+      ['relationship', 'relationships'],
+      ['confidence', 'mental'], ['mindset', 'mental'],
+      ['purpose', 'spiritual'], ['direction', 'spiritual'],
+      ['discipline', 'mental'], ['focus', 'mental']
+    ];
+    const picked = [];
+    map.forEach(([needle, val]) => { if (toward.indexOf(needle) !== -1 && picked.indexOf(val) === -1) picked.push(val); });
+    if (picked.length) wizardAnswers.discoverDomain = picked.slice(0, 2);
   },
 
   // Tutorial-only mode: just the intro pages, no wizard
@@ -1412,6 +1438,13 @@ const ActionExperience = {
 
   open() {
     if (this.isOpen) return;
+    // Paywall gate: Action is paid. If locked, rise the paywall instead.
+    try {
+      if (typeof ClarityPaywall !== 'undefined' && ClarityPaywall.isLockedByPaywall('action')) {
+        ClarityPaywall.show();
+        return;
+      }
+    } catch (e) {}
     this.isOpen = true;
     rememberView('action');
     FullscreenClose.show('action');

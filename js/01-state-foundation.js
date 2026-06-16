@@ -29,6 +29,9 @@ const DEFAULT_FLOW_ITEMS = [
 const DEFAULT_STATE = {
   profile: { name: '', fullName: '', birthday: '', email: '', story: '', runningToward: '', runningFrom: '', values: '', clarityLevel: '', actionKnow: '', actionProgress: '', distraction: '', costOfInaction: '', weakestPillar: '', letterToFutureSelf: '', returnCue: '', heroHeadline: { mode: 'auto', value: '' }, onboarded: false, onboardedAt: null },
   dev: { previewAll: false, savedClarity: null },
+  // Entitlement: Clarity is the free first win; Action + Consistency + the rest
+  // are paid. Flipped by the post-Clarity paywall (no billing backend yet).
+  entitlements: { isPaid: false, paidAt: null, plan: '' },
   clarity: {
     completed: false,
     tutorialSeen: false,
@@ -1310,7 +1313,7 @@ function migrateState() {
     const _clone = (v) => JSON.parse(JSON.stringify(v));
     const _isObj = (v) => v && typeof v === 'object' && !Array.isArray(v);
     if (!_isObj(state)) state = _clone(DEFAULT_STATE);
-    const objKeys = ['profile', 'dev', 'clarity', 'action', 'streak', 'flow', 'mori', 'lifestats', 'reflection', 'deepwork', 'distraction', 'vivere', 'support', 'meta', 'ui', 'prefs', 'aiCache'];
+    const objKeys = ['profile', 'dev', 'entitlements', 'clarity', 'action', 'streak', 'flow', 'mori', 'lifestats', 'reflection', 'deepwork', 'distraction', 'vivere', 'support', 'meta', 'ui', 'prefs', 'aiCache'];
     objKeys.forEach(k => { if (!_isObj(state[k])) state[k] = _clone(DEFAULT_STATE[k] || {}); });
     if (!_isObj(state.clarity.answers)) state.clarity.answers = _clone(DEFAULT_STATE.clarity.answers);
     if (!Array.isArray(state.widgetOrder)) state.widgetOrder = _clone(DEFAULT_STATE.widgetOrder);
@@ -2217,6 +2220,14 @@ const Sheet = {
   },
 
   open(widgetKey) {
+    // Paywall gate: Clarity is the free first win; the rest is paid. If this
+    // module is locked, rise the paywall moment instead of opening it.
+    try {
+      if (typeof ClarityPaywall !== 'undefined' && ClarityPaywall.isLockedByPaywall(widgetKey)) {
+        ClarityPaywall.show();
+        return;
+      }
+    } catch (e) {}
     // Tear down any running timer from a previously-open sheet first.
     this._teardownTimers();
     this.currentWidget = widgetKey;

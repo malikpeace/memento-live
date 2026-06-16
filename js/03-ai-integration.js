@@ -3621,6 +3621,15 @@ function completeWizard() {
   }
   // Unlock all modules with staggered animation
   setTimeout(() => unlockModules(), 500);
+
+  // The payment moment: Clarity is the free first win. The first time they name
+  // their Neutron Star, the dashboard blooms, then the paywall rises (purple
+  // card + their star + the rest of Memento, locked). Skipped if already paid.
+  try {
+    if (typeof ClarityPaywall !== 'undefined' && !ClarityPaywall.isPaid()) {
+      setTimeout(() => { try { ClarityPaywall.show(); } catch (e) {} }, 1100);
+    }
+  } catch (e) {}
 }
 
 

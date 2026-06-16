@@ -1320,39 +1320,259 @@ const WelcomeIntro = {
     return 'Looks like consistency is your first unlock: a way back in on the days your energy is not there, so it actually compounds.';
   },
 
-  // Background AI call: turns their onboarding answers into a short, personal
-  // summary. Stored on this._summary; never blocks (templated fallback covers
-  // no-key / error / timeout). callClaude already strips em dashes.
-  async generateSummary() {
-    this._summary = null; this._summaryFailed = false;
-    const p = state.profile || {};
-    const lines = [];
-    if (p.runningToward) lines.push('Wants to make progress in: ' + p.runningToward);
-    if (p.clarityLevel) lines.push('How clear they are on what they want: ' + p.clarityLevel);
-    if (p.actionKnow) lines.push('Whether they know the steps to get there: ' + p.actionKnow);
-    if (p.actionProgress) lines.push('Progress so far: ' + p.actionProgress);
-    if (p.runningFrom) lines.push('What pulls them back: ' + p.runningFrom);
-    if (p.distraction) lines.push('Biggest pull on their attention: ' + p.distraction);
-    if (p.costOfInaction) lines.push('What it costs them to stay stuck: ' + p.costOfInaction);
-    if (p.weakestPillar) lines.push('Their weakest pillar (where Memento helps most first): ' + p.weakestPillar);
-    if (p.letterToFutureSelf) lines.push('Their own note: ' + p.letterToFutureSelf);
-    const sys = 'You are writing a short, personal onboarding summary for someone who just answered a few questions in Memento, an app for clarity, action, and consistency. '
-      + 'Speak directly to them in second person ("you"), plain and blunt, like a sharp, honest friend. Use what they told you so it feels specific, but do NOT just list their answers back. '
-      + 'VOICE RULES: never use em dashes. Never use the word "real" as a modifier (no "real talk", "real progress"). No corny hype, no engineered taglines, no "let us". Short sentences. '
-      + 'Return STRICT JSON only (no markdown, no code fences) with exactly these keys, each 1 to 2 short sentences: '
-      + 'whatYouWant (reflect what they are after so they feel seen), clarity (how Memento helps them get clear on the one thing that matters), why (anchor their deeper reason, lean on the cost of staying stuck if given), action (how Memento gives them the next move so they stop guessing), consistency (how Memento helps them keep showing up given what pulls them back), together (one punchy line on how clarity, action, and consistency working together every day is when it actually gets done, made specific to them), plus (one line on supporting features that make it easier).';
-    const userMsg = 'What they told us:\n' + (lines.join('\n') || 'Not much, they skipped most of it.') + '\n\nWrite their JSON summary now.';
-    this._summaryPromise = callClaude([{ role: 'user', content: userMsg }], sys, { maxTokens: 600, timeout: 12000 })
-      .then(raw => {
-        let s = String(raw || '').trim().replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();
-        const a = s.indexOf('{'), b = s.lastIndexOf('}');
-        if (a !== -1 && b !== -1) s = s.slice(a, b + 1);
-        const parsed = JSON.parse(s);
-        if (parsed && typeof parsed === 'object') this._summary = parsed; else this._summaryFailed = true;
-      })
-      .catch(() => { this._summaryFailed = true; })
-      .then(() => { if (typeof this._onSummaryReady === 'function') this._onSummaryReady(); });
+  // Deterministic, AI-free onboarding summary. Built locally from the user's
+  // answers, so the universal first-run is instant, free, works offline, and can
+  // never stall or fail on a network call. Same shape as before (this._summary
+  // with the 7 keys) so the cards + solution page read it unchanged.
+  generateSummary() {
+    this._summaryFailed = false;
+    try { this._summary = this._buildSummary(state.profile || {}); }
+    catch (e) { this._summary = null; this._summaryFailed = true; }
   },
+
+  // The copy engine: maps the diagnostic answers to short, personal, on-voice
+  // lines. Pure, never throws, no em dashes. Returns { whatYouWant, clarity,
+  // why, action, consistency, together, plus }.
+  _buildSummary(p) {
+    p = p || {};
+
+    // ---------- internal helpers (no "this", never throw) ----------
+    function s(v) { return (v == null ? '' : String(v)); }
+    function low(v) { return s(v).toLowerCase(); }
+    function has(v, frag) { return low(v).indexOf(frag) !== -1; }
+    function parts(v) {
+      return s(v).split('·').map(function (x) { return x.trim(); }).filter(Boolean);
+    }
+    function anyHas(v, frag) {
+      var ps = parts(v);
+      for (var i = 0; i < ps.length; i++) {
+        if (low(ps[i]).indexOf(frag) !== -1) return true;
+      }
+      return false;
+    }
+    function lc1(str) {
+      if (!str) return '';
+      return str.charAt(0).toLowerCase() + str.slice(1);
+    }
+    // "a" / "a and b" / "a, b, and c".
+    // If any item already contains " and ", fall back to pure comma
+    // separation so we never stack "X and Y and Z" into a muddy run.
+    function joinAnd(arr) {
+      var a = (arr || []).filter(Boolean);
+      if (a.length === 0) return '';
+      if (a.length === 1) return a[0];
+      var hasAnd = false;
+      for (var j = 0; j < a.length; j++) { if (a[j].indexOf(' and ') !== -1) hasAnd = true; }
+      if (hasAnd) return a.join(', ');
+      if (a.length === 2) return a[0] + ' and ' + a[1];
+      return a.slice(0, -1).join(', ') + ', and ' + a[a.length - 1];
+    }
+
+    // ---------- raw fields ----------
+    var clarityLevel = s(p.clarityLevel);
+    var actionKnow = s(p.actionKnow);
+    var actionProgress = s(p.actionProgress);
+    var distraction = s(p.distraction).trim();
+    var weakest = low(p.weakestPillar);
+
+    // ---------- runningToward (map labels to clean prose) ----------
+    var towardRaw = parts(p.runningToward);
+    var towardUnsure = false;
+    var towardClean = [];
+    var towardMap = {
+      'work & money': 'work and money',
+      'health & fitness': 'your health',
+      'discipline & focus': 'discipline and focus',
+      'a skill or craft': 'a skill you care about',
+      'creative work': 'your creative work',
+      'relationships': 'your relationships',
+      'confidence & mindset': 'your confidence',
+      'purpose & direction': 'direction'
+    };
+    for (var i = 0; i < towardRaw.length; i++) {
+      if (has(towardRaw[i], 'not sure')) { towardUnsure = true; continue; }
+      var key = low(towardRaw[i]);
+      towardClean.push(towardMap[key] || lc1(towardRaw[i]));
+    }
+    var towardPhrase = joinAnd(towardClean);
+
+    // ---------- costOfInaction ----------
+    var costRegret = anyHas(p.costOfInaction, 'regret');
+    var costTime = anyHas(p.costOfInaction, 'running out') || anyHas(p.costOfInaction, 'out of time');
+    var costPotential = anyHas(p.costOfInaction, 'potential');
+    var costPass = anyHas(p.costOfInaction, 'pass');
+    var costLetting = anyHas(p.costOfInaction, 'letting') || anyHas(p.costOfInaction, 'down');
+    var costStuck = anyHas(p.costOfInaction, 'same place') || anyHas(p.costOfInaction, 'stuck');
+    var hasCost = costRegret || costTime || costPotential || costPass || costLetting || costStuck;
+
+    // ---------- runningFrom / distraction ----------
+    var phone = anyHas(p.runningFrom, 'phone');
+    var procrast = anyHas(p.runningFrom, 'procrast');
+    var inconsistent = anyHas(p.runningFrom, 'consistent');
+    var fromLost = anyHas(p.runningFrom, "know what to do");
+    var fearFail = anyHas(p.runningFrom, 'fear');
+    var noTime = anyHas(p.runningFrom, 'enough time') || anyHas(p.runningFrom, 'not enough time');
+    var lowMot = anyHas(p.runningFrom, 'motivation');
+    var selfDoubt = anyHas(p.runningFrom, 'doubt');
+
+    var distrName = '';
+    if (phone) {
+      if (has(distraction, 'tiktok')) distrName = 'TikTok';
+      else if (has(distraction, 'instagram') || has(distraction, 'reel')) distrName = 'Instagram';
+      else if (has(distraction, 'youtube')) distrName = 'YouTube';
+      else if (has(distraction, 'porn')) distrName = 'porn';
+      else if (has(distraction, 'gaming')) distrName = 'gaming';
+      else if (has(distraction, 'friend') || has(distraction, 'going out')) distrName = 'going out';
+    }
+
+    // ====================================================================
+    // 1) whatYouWant  (Card title already says the name, so don't echo it)
+    // ====================================================================
+    var whatYouWant;
+    if (towardUnsure && towardClean.length === 0) {
+      whatYouWant = 'You came in honest, you are not sure what you are after yet. That is the thing we start with, and it is a fine place to start.';
+    } else if (towardUnsure && towardPhrase) {
+      whatYouWant = 'You want movement on ' + towardPhrase + ', even if the bigger picture is still fuzzy. We sharpen the rest from here.';
+    } else if (towardPhrase) {
+      whatYouWant = 'You want movement on ' + towardPhrase + ', and you are done letting it stay vague.';
+    } else {
+      whatYouWant = 'You came here to stop drifting and move on what actually matters to you.';
+    }
+
+    // ====================================================================
+    // 2) clarity  (S1 stands alone, tie to clarityLevel)
+    // ====================================================================
+    var clarity;
+    if (has(clarityLevel, 'know exactly')) {
+      clarity = 'You already know your one thing, so Memento points every day at it instead of letting it slip. Clear on the target, you stop spending days on the wrong work.';
+    } else if (has(clarityLevel, 'rough')) {
+      clarity = 'You have a rough idea of where you are headed, and Memento sharpens it into one clear thing to aim at. A rough direction is a fine start, we make it specific enough to act on.';
+    } else if (has(clarityLevel, 'not really') || has(clarityLevel, 'figuring')) {
+      clarity = 'You are still figuring out the direction, so Memento helps you narrow it to the one thing worth your effort right now. Naming it is the first move, and that clarity is what everything else sits on.';
+    } else if (has(clarityLevel, 'lost')) {
+      clarity = 'Feeling lost is okay, honestly it is where almost everyone starts, and Memento helps you find the one thing worth chasing. That is step one here, and most people never get this far.';
+    } else {
+      clarity = 'Memento gets you clear on the one thing that matters most right now. Everything else gets quieter once that is named.';
+    }
+
+    // ====================================================================
+    // 3) why  (lean HARD on costOfInaction, the mori weight)
+    // ====================================================================
+    var why;
+    if (hasCost) {
+      var costBits = [];
+      if (costRegret) costBits.push('the regret of looking back on this');
+      if (costTime) costBits.push('the time you do not get back');
+      if (costPotential) costBits.push('the potential you leave on the table');
+      if (costPass) costBits.push('watching everyone else move ahead of you');
+      if (costStuck) costBits.push('a year from now in the same exact place');
+      if (costLetting && !costPass) costBits.push('letting down the people counting on you');
+      var costLine = joinAnd(costBits);
+      var tail = costTime
+        ? 'The clock is the one thing you do not get back. Not to scare you, to move you while it still counts.'
+        : 'Not to scare you, to keep you moving when motivation runs out.';
+      why = 'When it gets hard, you remember what staying here costs you, ' + costLine + '. ' + tail;
+    } else {
+      why = 'Memento keeps your reason in front of you, so on the hard days you remember why you started. The cost of staying the same is what carries you when motivation is gone.';
+    }
+
+    // ====================================================================
+    // 4) action  (S1 stands alone, operator momentum, tie to actionKnow + progress)
+    // ====================================================================
+    var action;
+    var followThrough = has(actionKnow, 'follow through') || has(actionKnow, 'follow-through') || has(actionKnow, "don't follow");
+    var actionUnsure = has(actionKnow, 'sort of') || has(actionKnow, 'not sure it');
+    var noSteps = has(actionKnow, 'know the steps') || has(actionKnow, 'do not know the steps');
+    var stalled = has(actionProgress, 'stalled') || has(actionProgress, 'started, then') || has(actionProgress, 'started then');
+    var notStarted = has(actionProgress, 'haven') || has(actionProgress, 'not really started');
+    var slow = has(actionProgress, 'slow');
+    var roll = has(actionProgress, 'roll');
+
+    if (followThrough) {
+      action = 'Every day Memento hands you the single next move, so knowing what to do turns into doing it. You already know the steps, the gap is follow-through, and this closes it one day at a time.';
+    } else if (actionUnsure) {
+      action = 'Every day Memento gives you the one next move that matters, so you stop second-guessing whether you are working on the right thing. Less guessing, more ground covered.';
+    } else if (noSteps) {
+      action = 'Every day Memento hands you the single next step, so not knowing where to start stops being the thing that holds you up. You do not need the whole staircase, just the next step.';
+    } else {
+      action = 'Every day Memento gives you the single move that matters most, so you stop staring at a list guessing where to begin. One clear next step, every day.';
+    }
+    if (stalled) {
+      action += ' You started and stalled once, and the next move is how you start again.';
+    } else if (notStarted) {
+      action += ' You have not really started yet, so the first move is small enough to actually take.';
+    } else if (slow) {
+      action += ' You are already moving slow, and the next move keeps it steady.';
+    } else if (roll) {
+      action += ' You are on a roll, and this keeps it going.';
+    }
+
+    // ====================================================================
+    // 5) consistency  (S1 stands alone, name distraction, mori weight)
+    // ====================================================================
+    var consistency;
+    var cS1, cS2;
+    if (phone && distrName) {
+      cS1 = 'The phone keeps winning, especially ' + distrName + ', and Memento builds the days you show up anyway.';
+      cS2 = 'Every scroll feels free in the moment and costs you a day you wanted back. That is where it compounds, one day stacked on the last.';
+    } else if (phone) {
+      cS1 = 'The phone keeps winning right now, and Memento builds the days you show up anyway.';
+      cS2 = 'Every scroll feels free in the moment and costs you a day you wanted back. That is where it compounds, one day stacked on the last.';
+    } else if (procrast) {
+      cS1 = 'Putting it off is the habit Memento breaks, by making showing up the easy default.';
+      cS2 = 'A skipped day looks harmless, but stacked up, skipped days are how the years go missing. That is where it compounds, one day stacked on the last.';
+    } else if (inconsistent) {
+      cS1 = 'Staying consistent is the part that keeps slipping, so Memento makes the streak the thing you protect day to day.';
+      cS2 = 'A skipped day looks harmless, but stacked up, skipped days are how the years go missing. That is where it compounds, one day stacked on the last.';
+    } else if (lowMot) {
+      cS1 = 'Motivation comes and goes, so Memento builds the days you show up even when you do not feel it.';
+      cS2 = 'You cannot feel like it every day, and the streak carries you when the feeling does not. That is where it compounds, one day stacked on the last.';
+    } else if (fearFail || selfDoubt) {
+      cS1 = 'Fear keeps you from starting, so Memento makes showing up small and repeatable until it stops feeling scary.';
+      cS2 = 'A skipped day looks harmless, but stacked up, skipped days are how the years go missing. That is where it compounds, one day stacked on the last.';
+    } else if (noTime) {
+      cS1 = 'Time feels tight, so Memento keeps the daily move small enough to actually fit.';
+      cS2 = 'A skipped day looks harmless, but stacked up, skipped days are how the years go missing. That is where it compounds, one day stacked on the last.';
+    } else if (fromLost) {
+      cS1 = 'Not knowing what to do is what keeps stalling you, so Memento turns showing up into a streak you protect.';
+      cS2 = 'A skipped day looks harmless, but stacked up, skipped days are how the years go missing. That is where it compounds, one day stacked on the last.';
+    } else {
+      cS1 = 'Memento builds the days you show up, even the ones you do not feel like it.';
+      cS2 = 'A skipped day looks harmless, but stacked up, skipped days are how the years go missing. That is where it compounds, one day stacked on the last.';
+    }
+    consistency = cS1 + ' ' + cS2;
+
+    // ====================================================================
+    // 6) together  (ONE sentence, stands alone, weakestPillar shapes it)
+    // ====================================================================
+    var together;
+    var aim = towardPhrase ? towardPhrase : (towardUnsure ? 'the thing you came here for' : 'what you want');
+    if (weakest === 'clarity') {
+      together = 'Once the one thing is clear, the next move and the daily streak turn ' + aim + ' from a wish into work that ships.';
+    } else if (weakest === 'consistency') {
+      together = 'When the what is sharp, the next move is obvious, and the days actually stack, ' + aim + ' goes from someday to underway.';
+    } else if (weakest === 'action') {
+      together = 'Clear on what, given the next move on how, held to it day after day, that is when ' + aim + ' stops being a plan and starts getting done.';
+    } else {
+      together = 'Clarity, the next move, and showing up daily working together is when ' + aim + ' actually gets done.';
+    }
+
+    // ====================================================================
+    // 7) plus  (ONE line, mostly fixed)
+    // ====================================================================
+    var plus = 'Around all of it sit the quiet tools, reflections, deep-work sessions, streaks, and reminders of why you started, the things that make showing up easier.';
+
+    return {
+      whatYouWant: whatYouWant,
+      clarity: clarity,
+      why: why,
+      action: action,
+      consistency: consistency,
+      together: together,
+      plus: plus
+    };
+  },
+
 
   // The "first win" moment: fade to black, fire confetti, tell them that just
   // showing up honestly IS the first win (proof they want to change). Then it
@@ -1425,14 +1645,10 @@ const WelcomeIntro = {
       this.el.insertBefore(beacon, this.pageWrap);
     }
 
-    // No loading screen: the philosophy pages give the AI time to finish in the
-    // background. If it is somehow still cooking, render templated fallbacks now
-    // and quietly upgrade in place when the personalized copy lands.
-    if (!this._summary && !this._summaryFailed) {
-      this._onSummaryReady = () => { if (this.el && this.el.classList.contains('open') && this.el.classList.contains('welcome-intro--help')) this._showHelpPage(stepIndex); };
-    } else {
-      this._onSummaryReady = null;
-    }
+    // Summary is built locally and synchronously (no AI), so it is always ready
+    // here. If _buildSummary ever threw, the templated fallbacks below cover it.
+    if (!this._summary && !this._summaryFailed) this.generateSummary();
+    this._onSummaryReady = null;
 
     const p = state.profile || {};
     const s = this._summary || {};
@@ -1564,13 +1780,13 @@ const WelcomeIntro = {
     const card = cards[cardIdx];
     const isLast = cardIdx >= cards.length - 1;
 
-    const LOADING = '<div class="ai-synthesis__thinking action-draft-loading__dots"><span></span><span></span><span></span></div>';
+    // Local summary is always populated, so cards use the personalized line;
+    // the templated fallback is only a defensive net if _buildSummary threw.
     let body;
     if (this._summary && this._summary[card.aiKey]) body = esc(this._summary[card.aiKey]);
-    else if (card.instant || this._summaryFailed) body = esc(card.fallback);
-    else body = LOADING;
+    else body = esc(card.fallback);
 
-    this._onSummaryReady = () => { if (this.el && this.el.classList.contains('open') && this._sumCard === cardIdx) this._showSummaryCard(stepIndex, cardIdx); };
+    this._onSummaryReady = null;
     this._hideProgressBar();
 
     const sparkle = '<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="vpSumStar" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#efe9ff"/><stop offset="55%" stop-color="#9b7eff"/><stop offset="100%" stop-color="#6d3df0"/></radialGradient></defs><path d="M32 3 C34 22 42 30 61 32 C42 34 34 42 32 61 C30 42 22 34 3 32 C22 30 30 22 32 3 Z" fill="url(#vpSumStar)"/></svg>';

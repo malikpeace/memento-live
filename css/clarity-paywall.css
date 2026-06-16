@@ -1,0 +1,417 @@
+/* ───────────────────────────────────────────────────────────────────────────
+   Clarity Paywall — the payment moment.
+   Shown once the user finds their Neutron Star. The living Memento card blooms
+   purple (clarity, lit), their goal engraved beneath it, every other module
+   shown locked, and one way in. Dark, glassy, sharp, no decorative borders
+   (fills + inset highlights), purple is the only accent. Matches the design law.
+   Scoped entirely under #clarityPaywall so nothing leaks.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+#clarityPaywall {
+  position: fixed;
+  inset: 0;
+  z-index: 320;
+  background:
+    radial-gradient(120% 80% at 50% -10%, rgba(123, 97, 255, 0.16), transparent 60%),
+    radial-gradient(120% 90% at 50% 120%, rgba(123, 97, 255, 0.08), transparent 55%),
+    #07070b;
+  color: rgba(var(--ink, 235, 238, 248), 0.92);
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+#clarityPaywall.cpw--open { opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  #clarityPaywall { transition: none; }
+}
+
+.cpw__scroll {
+  min-height: 100%;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: max(40px, env(safe-area-inset-top)) 22px calc(40px + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── Hero: eyebrow → purple card → their star ───────────────────────────── */
+.cpw__hero {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-top: 14px;
+}
+.cpw__eyebrow {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: rgba(168, 150, 255, 0.92);
+  margin-bottom: 30px;
+  animation: cpwRise 0.7s ease both;
+}
+.cpw__card {
+  width: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: cpwCardRise 1s cubic-bezier(0.16, 0.84, 0.34, 1) both;
+}
+/* The clarity bloom: a pool of purple light the card floats in. This is what
+   makes the moment unmistakably purple (the living blobs inside the glass read
+   subtle on their own). Soft, breathing, behind the card. */
+.cpw__card::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  width: 150%;
+  height: 132%;
+  transform: translate(-50%, -50%);
+  background:
+    radial-gradient(46% 42% at 50% 50%, rgba(139, 110, 255, 0.62), rgba(123, 97, 255, 0.26) 42%, transparent 70%),
+    radial-gradient(70% 60% at 50% 56%, rgba(108, 92, 220, 0.3), transparent 72%);
+  filter: blur(14px);
+  pointer-events: none;
+  z-index: 0;
+  animation: cpwGlow 5.5s ease-in-out infinite;
+}
+.cpw__card > * { position: relative; z-index: 1; }
+/* The standalone living card needs explicit dimensions (the live ones live in
+   #dayCard-scoped rules). Mirror the #mementoFull hero sizing. */
+.cpw__card .daycard-wrap { width: auto; margin: 0; display: flex; justify-content: center; }
+.cpw__card .daycard-theme-living .daycard-living-stage { width: 244px; margin: 0; }
+.cpw__card .daycard-ns { width: 244px; min-height: 360px; margin: 0; }
+.cpw__star-wrap {
+  margin-top: 34px;
+  max-width: 21ch;
+  animation: cpwRise 0.8s ease 0.25s both;
+}
+.cpw__star-cap {
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: rgba(168, 150, 255, 0.78);
+  margin-bottom: 12px;
+}
+.cpw__star {
+  font-size: clamp(1.4rem, 6vw, 1.85rem);
+  font-weight: 600;
+  line-height: 1.22;
+  letter-spacing: -0.015em;
+  color: #fff;
+  text-wrap: balance;
+}
+
+/* ── Bridge line ─────────────────────────────────────────────────────────── */
+.cpw__bridge {
+  margin: 44px auto 6px;
+  max-width: 30ch;
+  text-align: center;
+  font-size: 1.02rem;
+  line-height: 1.5;
+  color: rgba(var(--ink, 235, 238, 248), 0.62);
+  animation: cpwRise 0.8s ease 0.1s both;
+}
+.cpw__bridge b { color: #fff; font-weight: 600; }
+
+/* ── Locked constellation ──────────────────────────────────────────────────── */
+.cpw__locked { width: 100%; margin-top: 30px; }
+.cpw__locked-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.cpw__locked-title {
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(var(--ink, 235, 238, 248), 0.66);
+}
+.cpw__locked-note {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: rgba(var(--ink, 235, 238, 248), 0.4);
+}
+.cpw__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.cpw__mod {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 15px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.035);
+  backdrop-filter: blur(18px) saturate(1.3);
+  -webkit-backdrop-filter: blur(18px) saturate(1.3);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+}
+.cpw__mod--wide { grid-column: 1 / -1; }
+.cpw__mod-ico {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(var(--ink, 235, 238, 248), 0.55);
+}
+.cpw__mod-ico svg { width: 16px; height: 16px; }
+.cpw__mod-txt { flex: 1; min-width: 0; display: block; }
+.cpw__mod-name {
+  display: block;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: rgba(var(--ink, 235, 238, 248), 0.82);
+  letter-spacing: -0.01em;
+}
+.cpw__mod-sub {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: rgba(var(--ink, 235, 238, 248), 0.42);
+  margin-top: 2px;
+  line-height: 1.3;
+}
+.cpw__mod-lock {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(var(--ink, 235, 238, 248), 0.5);
+}
+.cpw__mod-lock svg { width: 13px; height: 13px; }
+/* faint purple wash so the locked grid still feels part of the clarity bloom */
+.cpw__mod::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(123, 97, 255, 0.05), transparent 70%);
+  pointer-events: none;
+}
+
+/* ── Offer ─────────────────────────────────────────────────────────────────── */
+.cpw__offer { width: 100%; margin-top: 36px; }
+.cpw__offer-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.cpw__offer-title {
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(var(--ink, 235, 238, 248), 0.7);
+}
+.cpw__offer-note { font-size: 0.72rem; color: rgba(var(--ink, 235, 238, 248), 0.42); font-weight: 500; }
+.cpw__plans { display: grid; gap: 11px; }
+.cpw__plan {
+  position: relative;
+  text-align: left;
+  width: 100%;
+  border: 0;
+  border-radius: 16px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.cpw__plan:active { transform: scale(0.99); }
+.cpw__plan--flat {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 17px;
+}
+.cpw__plan.is-picked {
+  background: rgba(123, 97, 255, 0.12);
+  box-shadow: inset 0 0 0 1.5px rgba(155, 126, 255, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.cpw__plan--hero {
+  padding: 22px 19px 20px;
+  background:
+    linear-gradient(180deg, rgba(123, 97, 255, 0.14), rgba(123, 97, 255, 0.04)),
+    rgba(255, 255, 255, 0.04);
+  box-shadow:
+    inset 0 0 0 1.5px rgba(155, 126, 255, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 22px 60px -30px rgba(123, 97, 255, 0.7);
+}
+.cpw__plan-flag {
+  position: absolute;
+  top: 0; right: 0;
+  font-size: 0.56rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #0b0b12;
+  background: linear-gradient(100deg, #9b7eff, #6cc6ff);
+  padding: 6px 12px;
+  border-bottom-left-radius: 12px;
+}
+.cpw__plan-label {
+  font-size: 1.02rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: #fff;
+  margin-bottom: 3px;
+}
+.cpw__plan--flat .cpw__plan-label { font-size: 0.84rem; font-weight: 700; }
+.cpw__plan-sub { font-size: 0.76rem; color: rgba(var(--ink, 235, 238, 248), 0.5); font-weight: 500; line-height: 1.4; }
+.cpw__plan-amt { display: flex; align-items: flex-end; gap: 7px; margin: 14px 0 2px; }
+.cpw__plan--flat .cpw__plan-amt { margin: 0; }
+.cpw__plan-cur { font-size: 1.3rem; font-weight: 800; color: #fff; padding-bottom: 7px; }
+.cpw__plan-big { font-size: 3.3rem; font-weight: 800; letter-spacing: -0.05em; line-height: 0.85; color: #fff; font-variant-numeric: tabular-nums; }
+.cpw__plan--flat .cpw__plan-big { font-size: 1.7rem; }
+.cpw__plan--flat .cpw__plan-cur { font-size: 1rem; padding-bottom: 4px; }
+.cpw__plan-meta { font-size: 0.78rem; color: rgba(var(--ink, 235, 238, 248), 0.6); font-weight: 600; padding-bottom: 6px; }
+.cpw__plan-hsub {
+  font-size: 0.78rem;
+  color: rgba(var(--ink, 235, 238, 248), 0.62);
+  line-height: 1.45;
+  margin-top: 12px;
+  padding-top: 12px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+.cpw__plan-hsub b { color: #fff; font-weight: 700; }
+.cpw__plan--flat .cpw__plan-right { text-align: right; white-space: nowrap; }
+
+/* ── Primary CTA + skip ────────────────────────────────────────────────────── */
+.cpw__cta { width: 100%; margin-top: 24px; }
+.cpw__buy {
+  width: 100%;
+  border: 0;
+  border-radius: 15px;
+  padding: 17px 20px;
+  font-size: 1.02rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #0b0b12;
+  cursor: pointer;
+  background: linear-gradient(100deg, #b6a4ff, #9b7eff 55%, #6cc6ff);
+  box-shadow: 0 18px 46px -20px rgba(123, 97, 255, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.cpw__buy:active { transform: translateY(1px) scale(0.995); }
+.cpw__skip {
+  display: block;
+  margin: 14px auto 0;
+  padding: 8px 12px;
+  border: 0;
+  background: none;
+  color: rgba(var(--ink, 235, 238, 248), 0.42);
+  font-size: 0.84rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+.cpw__skip:hover { color: rgba(var(--ink, 235, 238, 248), 0.62); }
+
+/* ── Trust: guarantee + founder ────────────────────────────────────────────── */
+.cpw__trust { width: 100%; margin-top: 30px; }
+.cpw__guarantee {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: rgba(var(--ink, 235, 238, 248), 0.6);
+}
+.cpw__guarantee svg { flex: 0 0 auto; margin-top: 3px; }
+.cpw__guarantee b { color: #fff; font-weight: 700; }
+.cpw__founder {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-top: 24px;
+  padding-top: 22px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+.cpw__founder-av {
+  width: 36px; height: 36px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  color: #0b0b12;
+  background: linear-gradient(135deg, #9b7eff, #6cc6ff);
+}
+.cpw__founder p { font-size: 0.82rem; color: rgba(var(--ink, 235, 238, 248), 0.6); line-height: 1.55; margin: 0; }
+.cpw__founder-who { display: block; margin-top: 6px; font-size: 0.76rem; color: rgba(var(--ink, 235, 238, 248), 0.42); font-weight: 600; }
+
+@keyframes cpwRise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes cpwCardRise {
+  from { opacity: 0; transform: translateY(26px) scale(0.94); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes cpwGlow {
+  0%, 100% { opacity: 0.82; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+}
+
+/* ── Dashboard locked state ─────────────────────────────────────────────────
+   Once Clarity is done but unpaid, every module but Clarity reads locked on the
+   dashboard: gently dimmed with a lock badge. Tapping one rises the paywall. */
+body.cpw-locked .widget[data-widget]:not([data-widget="clarity"]) {
+  position: relative;
+  opacity: 0.6;
+  filter: saturate(0.7);
+}
+body.cpw-locked .widget[data-widget]:not([data-widget="clarity"])::after {
+  content: "";
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background-color: rgba(12, 12, 18, 0.72);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 13px 13px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Crect x='5' y='11' width='14' height='9' rx='2' stroke='%23cdbcff' stroke-width='1.8'/%3E%3Cpath d='M8 11V8a4 4 0 1 1 8 0v3' stroke='%23cdbcff' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E");
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 4;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cpw__eyebrow, .cpw__card, .cpw__star-wrap, .cpw__bridge { animation: none; }
+  .cpw__card::before { animation: none; opacity: 0.9; }
+}

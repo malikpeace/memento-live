@@ -531,6 +531,12 @@ function renderGrid() {
   const hasNeutronStar = !!(state.clarity && state.clarity.answers && state.clarity.answers.neutronStar);
   document.body.classList.toggle('ns-bloom', hasNeutronStar);
 
+  // Paywall lock: once Clarity is done but they have not paid, every module but
+  // Clarity reads as locked on the dashboard (tapping one rises the paywall).
+  let _cpwLocked = false;
+  try { _cpwLocked = (typeof ClarityPaywall !== 'undefined') && ClarityPaywall.isLockedByPaywall('action'); } catch (e) {}
+  document.body.classList.toggle('cpw-locked', _cpwLocked);
+
   // v27 bento opt-out flag (kept current above the early returns so a stale
   // has-custom-layout can never linger on brand-new / pre-clarity renders).
   const _customized = !!(state.ui && state.ui.layoutCustomized);
