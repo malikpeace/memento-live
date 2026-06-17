@@ -142,7 +142,7 @@ const DEFAULT_STATE = {
   // ui.unlocked / unlockQueue / lastUnlockISO / pendingReveal: the unlock ladder
   // (one earned unlock per day; queue overflow fires on the next session open).
   // ui.moduleOpens counts per-module opens (powers "Pin to dashboard" in More).
-  ui: { lastView: null, homeHero: 'oneThing', heatmapMode: 'rolling', heatmapShape: 'square', heatmapSpacing: 'snug', heatmapPalette: 'classic', consistencyView: 'heatmap', consistencyScale: 'week', ccHeatmapScale: 'year', layoutCustomized: false, variants: { home: 'a', streak: 'a', mori: 'a' }, moduleOpens: {}, unlocked: {}, unlockQueue: [], lastUnlockISO: '', pendingReveal: '' },
+  ui: { lastView: null, homeHero: 'oneThing', heatmapMode: 'rolling', heatmapShape: 'square', heatmapSpacing: 'snug', heatmapPalette: 'classic', consistencyView: 'heatmap', consistencyScale: 'week', ccHeatmapScale: 'year', layoutCustomized: false, bentoOrder: null, variants: { home: 'a', streak: 'a', mori: 'a' }, moduleOpens: {}, unlocked: {}, unlockQueue: [], lastUnlockISO: '', pendingReveal: '' },
   // Optional, additive user preferences. Absent/empty => today's exact look.
   // accent: 'default' | 'cyan' | 'green' | 'amber' | 'rose'
   // reduceMotion: bool, density: 'comfortable' | 'compact'
@@ -2458,6 +2458,14 @@ const DragDrop = {
     // as overlapping duplicate cards. Abort the gesture cleanly instead.
     document.addEventListener('contextmenu', () => this.cancelDrag());
     window.addEventListener('blur', () => this.cancelDrag());
+    // Re-slot (or clear) the mobile bento tiles when the viewport crosses the
+    // mobile/desktop breakpoint or the device rotates, so inline slot styles are
+    // applied on mobile and stripped on larger layouts.
+    let _rsT = null;
+    window.addEventListener('resize', () => {
+      clearTimeout(_rsT);
+      _rsT = setTimeout(() => { try { if (typeof applyBentoMobileOrder === 'function') applyBentoMobileOrder(); } catch (e) {} }, 150);
+    });
   },
 
   // Abort any pending or active drag WITHOUT dropping: full cleanup of ghosts,
@@ -2491,11 +2499,15 @@ const DragDrop = {
     this.sourceEl = widget;
     this.sourceKey = widget.dataset.widget;
 
-    // Drag-to-reorder only matters in custom-layout mode. The default/bento layout
-    // places tiles by data-area and ignores DOM order, so a drag there would snap
-    // back yet silently change the saved order. Only arm the long-press drag when
-    // the layout is customized; tap-to-open (onPointerUp) still works either way.
-    if (state.ui && state.ui.layoutCustomized) {
+    // Arm the long-press drag when reordering can actually take effect:
+    //  - custom-layout mode (the flow grid reorders by saved DOM order), or
+    //  - the mobile bento, where applyBentoMobileOrder() slots tiles by their
+    //    widgetOrder index so a drag reorders which module sits in which slot.
+    // The desktop bento pins tiles by data-area, so a drag there would snap back;
+    // we deliberately do NOT arm it. Tap-to-open (onPointerUp) works either way.
+    const canReorder = (state.ui && state.ui.layoutCustomized) ||
+      (typeof isMobileBento === 'function' && isMobileBento());
+    if (canReorder) {
       this.longPressTimer = setTimeout(() => {
         this.startDrag(e);
       }, 400);
@@ -2656,14 +2668,23 @@ const DragDrop = {
     const dragOver = document.querySelector('.widget.drag-over');
     if (dragOver) {
       const targetKey = dragOver.dataset.widget;
-      const order = state.widgetOrder;
-      const fromIdx = order.findIndex(w => w.key === this.sourceKey);
-      const toIdx = order.findIndex(w => w.key === targetKey);
-      if (fromIdx !== -1 && toIdx !== -1 && fromIdx !== toIdx) {
-        const item = order.splice(fromIdx, 1)[0];
-        order.splice(toIdx, 0, item);
-        persistNow();
-        reorderWithFLIP();
+      // Mobile bento reorders a personal slot order (state.ui.bentoOrder) so the
+      // desktop bento + custom layouts (which key off state.widgetOrder) are
+      // untouched. Everywhere else, reorder state.widgetOrder as before.
+      if (typeof isMobileBento === 'function' && isMobileBento()) {
+        if (typeof bentoMobileReorder === 'function' && bentoMobileReorder(this.sourceKey, targetKey)) {
+          reorderWithFLIP();
+        }
+      } else {
+        const order = state.widgetOrder;
+        const fromIdx = order.findIndex(w => w.key === this.sourceKey);
+        const toIdx = order.findIndex(w => w.key === targetKey);
+        if (fromIdx !== -1 && toIdx !== -1 && fromIdx !== toIdx) {
+          const item = order.splice(fromIdx, 1)[0];
+          order.splice(toIdx, 0, item);
+          persistNow();
+          reorderWithFLIP();
+        }
       }
     }
 

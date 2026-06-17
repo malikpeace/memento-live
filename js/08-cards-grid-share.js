@@ -814,6 +814,83 @@ function renderGrid() {
   setTimeout(() => {
     grid.querySelectorAll('.widget.entering').forEach(w => w.classList.remove('entering'));
   }, 1000);
+
+  // Mobile bento: place the module tiles into fixed slots so press-and-drag can
+  // reorder them (Apple-widget style) without disturbing the card/quote.
+  try { applyBentoMobileOrder(); } catch (e) {}
+}
+
+/* ============================================
+   MOBILE BENTO: drag-reorderable module slots
+   The mobile Home bento pins the card, command center, heatmap and quote to
+   fixed rows, with the module tiles slotted in between. To let the user press,
+   hold and drag a module to a new spot (like Apple home-screen widgets) WITHOUT
+   breaking that curated arrangement, we keep the slot positions fixed and just
+   reassign which module sits in which slot, by the module's index in
+   state.widgetOrder. Dragging reorders widgetOrder; modules then swap slots.
+   Inline grid styles here out-specify the per-data-area CSS rules. On desktop /
+   tablet / custom-layout this clears the inline styles so nothing changes there.
+   ============================================ */
+const BENTO_MOBILE_SLOTS = [
+  { col: '1 / 7',  row: '6' }, { col: '7 / 13', row: '6' },
+  { col: '1 / 7',  row: '7' }, { col: '7 / 13', row: '7' },
+  { col: '1 / -1', row: '9' }, { col: '1 / -1', row: '10' }, { col: '1 / -1', row: '11' }
+];
+// The curated default slot order Malik arranged: Mori | Clarity, Streak | Check-in,
+// then Action, Reflection, Vivere as full-width bars. A fresh user starts here;
+// dragging stores a personal order in state.ui.bentoOrder (mobile only) so the
+// desktop bento + custom layouts, which key off state.widgetOrder, are untouched.
+const BENTO_MOBILE_DEFAULT = ['mori', 'clarity', 'streak', 'checkin', 'action', 'reflection', 'vivere'];
+function isMobileBento() {
+  try {
+    const mobile = window.matchMedia && window.matchMedia('(max-width: 767.98px)').matches;
+    return !!mobile && document.body.classList.contains('ns-bloom') && !document.body.classList.contains('has-custom-layout');
+  } catch (e) { return false; }
+}
+// Resolve the mobile slot order: the user's saved bentoOrder if any, seeded from
+// the curated default, with any present-but-unlisted tiles appended so nothing
+// ever vanishes when modules unlock later.
+function bentoMobileOrder() {
+  const grid = document.getElementById('widgetGrid');
+  const present = grid ? [...grid.querySelectorAll('.widget')].map(t => t.dataset.widget).filter(Boolean) : [];
+  let saved = [];
+  try { if (state.ui && Array.isArray(state.ui.bentoOrder)) saved = state.ui.bentoOrder.slice(); } catch (e) {}
+  const base = saved.length ? saved : BENTO_MOBILE_DEFAULT.slice();
+  const ordered = base.filter(k => present.indexOf(k) !== -1);
+  present.forEach(k => { if (ordered.indexOf(k) === -1) ordered.push(k); });
+  return ordered;
+}
+function applyBentoMobileOrder() {
+  const grid = document.getElementById('widgetGrid');
+  if (!grid) return;
+  const tiles = [...grid.querySelectorAll('.widget')];
+  if (!isMobileBento()) {
+    // Off the mobile bento: strip any inline slot styles so the desktop bento,
+    // tablet, and custom layouts render from their own CSS untouched.
+    tiles.forEach(t => { t.style.gridColumn = ''; t.style.gridRow = ''; t.style.aspectRatio = ''; });
+    return;
+  }
+  bentoMobileOrder().forEach((key, i) => {
+    const el = grid.querySelector('[data-widget="' + key + '"]');
+    if (!el) return;
+    const slot = BENTO_MOBILE_SLOTS[Math.min(i, BENTO_MOBILE_SLOTS.length - 1)];
+    el.style.gridColumn = slot.col;
+    el.style.gridRow = slot.row;
+    el.style.aspectRatio = 'auto';
+  });
+}
+// Move a dragged module to where another sits, within the mobile slot order, and
+// persist. Returns true if the order changed (so the caller can animate).
+function bentoMobileReorder(sourceKey, targetKey) {
+  if (!sourceKey || !targetKey || sourceKey === targetKey) return false;
+  const order = bentoMobileOrder();
+  const from = order.indexOf(sourceKey);
+  const to = order.indexOf(targetKey);
+  if (from === -1 || to === -1) return false;
+  const item = order.splice(from, 1)[0];
+  order.splice(to, 0, item);
+  try { if (!state.ui) state.ui = {}; state.ui.bentoOrder = order; persistNow(); } catch (e) {}
+  return true;
 }
 
 /* ============================================
@@ -1489,6 +1566,12 @@ const CreatorTools = {
     bind('creatorRestartAction', () => this.restartAction());
     bind('creatorRestartEverything', () => this.restartEverything());
     bind('creatorSkipAction', () => this.skipActionIntake());
+    // Fast navigation (non-destructive): replay the first-run moments without
+    // wiping any data, so jumping between parts of the app is quick during dev.
+    bind('creatorJumpSplash', () => this.jumpSplash());
+    bind('creatorJumpOnboarding', () => this.jumpOnboarding());
+    bind('creatorJumpStyle', () => this.jumpStyle());
+    bind('creatorJumpDashboard', () => this.jumpDashboard());
 
     // Dropdown toggle
     const toggle = document.getElementById('creatorBoxToggle');
@@ -1628,6 +1711,55 @@ const CreatorTools = {
     // exits demo mode and lands on a fresh app at the very beginning, even when
     // opened from a demo or deep link.
     location.href = location.href.replace(/[?#].*$/, '');
+  },
+
+  // ── Fast navigation (non-destructive) ─────────────────────────────────────
+  // Jump straight to the first-run moments to preview them, WITHOUT wiping any
+  // saved data. Each just re-opens the relevant overlay; nothing is persisted,
+  // so closing it leaves the real state exactly as it was.
+  _closeCheat() { try { document.getElementById('creatorBox')?.classList.remove('creator-box--open'); } catch (e) {} },
+
+  jumpSplash() {
+    this._closeCheat();
+    // Splash has no open(); init() re-shows it (clears the 'dismissed' class and
+    // rebinds Get started, whose dismiss() is guarded so a rebind is harmless).
+    try {
+      if (typeof Splash !== 'undefined') {
+        if (Splash.init) Splash.init();
+        const sp = document.getElementById('splash');
+        if (sp) { sp.classList.remove('dismissed', 'splash--exiting'); Splash._dismissing = false; }
+      }
+    } catch (e) {}
+  },
+
+  jumpOnboarding() {
+    this._closeCheat();
+    // WelcomeIntro.open() early-returns once welcomeSeen is set, so flip it off
+    // in memory (not persisted) to force a replay. The flow re-sets it on finish.
+    try {
+      if (state.meta) state.meta.welcomeSeen = false;
+      if (typeof ClarityExperience !== 'undefined' && ClarityExperience.isOpen) ClarityExperience.close();
+      if (typeof Sheet !== 'undefined' && Sheet.isOpen) Sheet.close();
+      if (typeof WelcomeIntro !== 'undefined' && WelcomeIntro.open) WelcomeIntro.open();
+    } catch (e) {}
+  },
+
+  jumpStyle() {
+    this._closeCheat();
+    try { if (typeof AppearancePicker !== 'undefined' && AppearancePicker.open) AppearancePicker.open(); } catch (e) {}
+  },
+
+  jumpDashboard() {
+    this._closeCheat();
+    try {
+      if (typeof ClarityExperience !== 'undefined' && ClarityExperience.isOpen) ClarityExperience.close();
+      if (typeof ActionExperience !== 'undefined' && ActionExperience.isOpen) ActionExperience.close();
+      if (typeof Sheet !== 'undefined' && Sheet.isOpen) Sheet.close();
+      if (typeof WelcomeIntro !== 'undefined' && WelcomeIntro.el) WelcomeIntro.el.classList.remove('open');
+      const sp = document.getElementById('splash'); if (sp) sp.classList.add('dismissed');
+      if (typeof TabBar !== 'undefined' && TabBar.show) TabBar.show();
+      renderAll();
+    } catch (e) {}
   },
 
   // Dev shortcut: jump straight to the generated Action plan, skipping the

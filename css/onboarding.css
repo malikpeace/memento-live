@@ -787,11 +787,16 @@ body.calm-motion .empty-state, body.lite .empty-state { animation: none; }
    DRAG & DROP
    ============================================ */
 .widget.dragging-source { opacity: 0.3; transform: scale(0.95); }
-.widget.drag-over { border-color: rgba(var(--ink),0.3); }
+/* Drop target: a soft inset ring + lift (no hard border, per the design law). */
+.widget.drag-over {
+  box-shadow: inset 0 0 0 2px rgba(var(--accent-rgb), 0.55), 0 8px 28px -12px rgba(0,0,0,0.6);
+  transform: scale(1.015);
+  transition: transform 0.16s var(--ease-out), box-shadow 0.16s var(--ease-out);
+}
 .drag-ghost {
   position: fixed; z-index: 300; pointer-events: none;
-  opacity: 0.9; transform: scale(1.04);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  opacity: 0.95; transform: scale(1.06);
+  box-shadow: 0 26px 70px rgba(0,0,0,0.55);
   transition: none;
 }
 

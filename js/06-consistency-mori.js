@@ -706,6 +706,10 @@ function reorderWithFLIP() {
   });
   // Keep the v23 More row pinned to the end of the grid after a reorder.
   try { const more = grid.querySelector('#dashMore'); if (more) grid.appendChild(more); } catch (e) {}
+  // Mobile bento positions tiles by fixed slot (inline grid styles), not DOM
+  // order, so reassign slots from the new widgetOrder BEFORE measuring the FLIP
+  // end positions. No-op on desktop/tablet/custom layouts.
+  try { if (typeof applyBentoMobileOrder === 'function') applyBentoMobileOrder(); } catch (e) {}
   widgets.forEach(w => {
     const key = w.dataset.widget;
     const first = firstRects[key];

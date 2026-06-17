@@ -643,10 +643,21 @@ html.theme-light .widget--action .widget__icon { color: var(--text-hi) !importan
 .creator-box__btn--danger {
   color: rgba(255,120,120,0.92);
 }
+.creator-box__divider {
+  margin-top: 6px;
+  padding-top: 8px;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--text-lo);
+  border-top: 1px solid var(--hairline);
+}
 @media (min-width: 768px) {
   .creator-box__actions {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+  .creator-box__divider { grid-column: 1 / -1; }
 }
 .greeting-time { font-size: var(--fs-sm); font-weight: 400; color: var(--text-2); letter-spacing: 0.02em; }
 .greeting-name { font-size: 1.625rem; font-weight: 700; letter-spacing: -0.03em; margin-top: 2px; }
@@ -934,6 +945,11 @@ body.ns-bloom .app.dash-v2 #commandCenter .cc-live { display: none; }
   /* card sizing inside the hero cell (fills its column, capped height) */
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-theme-platinum .daycard-ns { width: 100%; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-theme-living .daycard-living-stage { width: 100%; }
+  /* The living card lives inside its stage; without this the bare `#dayCard
+     .daycard-ns` rule (width: min(82vw,320px)) out-specifies the living card's
+     own width:100% and the card overflows its stage, reading wider/squarer than
+     platinum. Pin it to fill the stage so both themes are the same size. */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-theme-living .daycard-living-stage > .daycard-ns { width: 100%; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-ns { min-height: 340px; }
 }
 
