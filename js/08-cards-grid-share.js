@@ -3705,6 +3705,11 @@ function stopDayCardMotion() {
 }
 function bindDayCardMotion(wrap, card) {
   stopDayCardMotion();
+  // DISABLED for now (Malik: gyroscope tilt was "going too much"). This kills
+  // the phone-motion tilt AND the "Bring it to life" pill everywhere. To bring
+  // it back, delete this single early return; the whole implementation below is
+  // intact, and the Settings toggle just needs re-adding (search prefMotionTilt).
+  return;
   if (!card) return;
   try {
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
