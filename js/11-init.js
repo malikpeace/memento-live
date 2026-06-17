@@ -2256,20 +2256,28 @@ document.addEventListener('keydown', (e) => {
     const body = document.body;
     const apply = () => {
       raf = 0;
-      if (armed) {
-        // Hard guarantee that NOTHING moves: body min-height:100lvh is taller
-        // than the keyboard-shrunk layout viewport, so the document would become
-        // scrollable and iOS would scroll it ~264px to reveal the field (the
-        // "jump", confirmed on-device via ?kbd=1). Lock both html and body so it
-        // physically cannot scroll, and zero any scroll that slips through. The
-        // composer is already positioned above the keyboard (CSS), so there is
-        // nothing for iOS to reveal — it just sits still.
+      const wi = document.querySelector('.welcome-intro.open');
+      if (armed && wi) {
+        // The fix for the "drops down, black strip on top, snaps back" jump:
+        // SHRINK the fixed onboarding layer to exactly the area the keyboard
+        // leaves visible (height = visualViewport.height, top = its offsetTop).
+        // The dock/composer then sits flush above the keyboard, so iOS has
+        // nothing to scroll into view and never pans the page. The centered
+        // copy simply recenters into the smaller area — a smooth follow, not a
+        // jolt. The glow is baked into the layer's own background (see CSS) so
+        // resizing it never flashes dark.
+        wi.style.height = vv.height + 'px';
+        wi.style.top = vv.offsetTop + 'px';
+        // Belt and suspenders: also lock document scroll so nothing behind the
+        // layer can pan, and zero any scroll iOS slipped in before the resize.
         root.style.overflow = 'hidden';
         body.style.overflow = 'hidden';
         if (window.scrollY) { try { window.scrollTo(0, 0); } catch (e) {} }
         const se = document.scrollingElement || root;
         if (se && se.scrollTop) se.scrollTop = 0;
       } else {
+        // Revert to the full-viewport layer (CSS top:0 / height:100lvh).
+        if (wi) { wi.style.height = ''; wi.style.top = ''; }
         root.style.overflow = '';
         body.style.overflow = '';
       }
