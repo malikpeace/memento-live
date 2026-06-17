@@ -37,9 +37,7 @@ const AppearancePicker = {
   // styled by the look's own class so the difference reads at a glance.
   _previewHTML() {
     return '<div class="apk-prev__sky"></div>' +
-      '<div class="apk-prev__card"><span class="apk-prev__mark"></span></div>' +
-      '<div class="apk-prev__row apk-prev__row--a"></div>' +
-      '<div class="apk-prev__row apk-prev__row--b"></div>';
+      '<div class="apk-prev__card"><span class="apk-prev__mark"></span></div>';
   },
 
   open(onDone) {
@@ -66,7 +64,7 @@ const AppearancePicker = {
         '<div class="apk__scrim"></div>' +
         '<div class="apk__sheet">' +
           '<div class="apk__head">' +
-            '<div class="apk__title">Make it yours</div>' +
+            '<div class="apk__title">Memento Style</div>' +
             '<div class="apk__sub">Pick a starting look. You can change it anytime in Settings.</div>' +
           '</div>' +
           '<div class="apk__grid" role="radiogroup" aria-label="Looks">' + cards + '</div>' +
