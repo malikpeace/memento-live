@@ -154,6 +154,19 @@ const WelcomeIntro = {
     this.navEl.innerHTML = '<div class="wc-dock" id="wcDock"></div>';
     this._wcConvoEl = document.getElementById('wcConvo');
     this._wcDockEl = document.getElementById('wcDock');
+    // Swipe up to read the conversation history: while the user is scrolled away
+    // from the newest line, clear the depth fade (.wc-reading) so every older
+    // question/answer is fully readable; restore the soft fade when they return
+    // to the bottom. Bound once to the page-wrap (the scroll container).
+    if (!this._wcScrollBound) {
+      this._wcScrollBound = true;
+      this.pageWrap.addEventListener('scroll', () => {
+        const el = this.pageWrap;
+        const atBottom = (el.scrollHeight - el.scrollTop - el.clientHeight) < 28;
+        el.classList.toggle('wc-reading', !atBottom);
+      }, { passive: true });
+    }
+    this.pageWrap.classList.remove('wc-reading');
     this._wcBeatsArr = this._wcBuild();
     this._wcQTotal = this._wcBeatsArr.filter(b => b.input).length;
     this._wcIndex = 0;
