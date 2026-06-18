@@ -312,6 +312,10 @@ const WelcomeIntro = {
       if (beat.skipIf && beat.skipIf(state.profile)) { this._wcAns[this._wcIndex] = null; this._wcIndex++; continue; }
       const n = (state.profile && state.profile.name) ? state.profile.name : 'you';
       const lines = beat.lines ? beat.lines(n) : [];
+      // Focused (Opal-style): when a new question begins, fade everything before
+      // it into faint history, so the screen is dominated by the CURRENT question
+      // + input rather than a tall stack. Swipe up brings the history back.
+      if (lines.length) this._wcMarkHistory();
       for (const t of lines) { if (gen !== this._wcGen) return; await this._wcTypeLine(t, instant, gen); }
       if (gen !== this._wcGen) return;
       // Optional extra hold after a beat's lines (e.g. let "Welcome to Memento"
@@ -368,6 +372,7 @@ const WelcomeIntro = {
         const beat = beats[i];
         const n = (state.profile && state.profile.name) ? state.profile.name : 'you';
         const lines = beat.lines ? beat.lines(n) : [];
+        if (lines.length) this._wcMarkHistory();
         for (const t of lines) { if (gen !== this._wcGen) return; await this._wcTypeLine(t, true, gen); }
         if (beat.input && this._wcAns[i] != null) this._wcAddUser(this._wcAns[i]);
       }
@@ -379,18 +384,20 @@ const WelcomeIntro = {
     })();
   },
 
-  _wcDimAll() {
+  // Focused mode: fade every existing line into faint "history" (one soft level,
+  // no blur) so a new question takes the screen. The current beat's lines are
+  // added AFTER this and stay bright. Swipe up (.wc-reading) brings it all back.
+  _wcMarkHistory() {
     if (!this._wcConvoEl) return;
-    // Dim AND progressively blur older lines: the just-previous line softens a
-    // touch, each older one more, capped, so history recedes into the
-    // background instead of crowding the screen.
     const lines = [...this._wcConvoEl.querySelectorAll('.wc-line')];
     const n = lines.length;
     lines.forEach((l, i) => {
-      l.classList.add('dim');
+      l.classList.add('wc-hist');
+      l.style.filter = '';
+      // The most recent history line is a faint hint; older lines fade out fully
+      // so the stack never grows, however long the conversation gets.
       const fromNewest = (n - 1) - i;
-      const blur = Math.min(4, 0.15 + fromNewest * 0.6);
-      l.style.filter = 'blur(' + blur.toFixed(2) + 'px)';
+      l.style.opacity = Math.max(0, 0.18 - fromNewest * 0.06).toFixed(3);
     });
   },
 
@@ -436,7 +443,6 @@ const WelcomeIntro = {
   _wcTypeLine(text, instant, gen) {
     return new Promise(res => {
       this._wcSetBusy(true);
-      this._wcDimAll();
       const kids = [...this._wcConvoEl.children];
       const before = kids.map(k => k.getBoundingClientRect().top);
       const el = document.createElement('div');
@@ -463,7 +469,6 @@ const WelcomeIntro = {
   },
 
   _wcAddUser(text) {
-    this._wcDimAll();
     const kids = [...this._wcConvoEl.children];
     const before = kids.map(k => k.getBoundingClientRect().top);
     const el = document.createElement('div');

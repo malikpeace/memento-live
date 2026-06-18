@@ -3287,8 +3287,9 @@ html.lowfx .auth-screen__card, body.lite .auth-screen__card { background: rgba(1
    user's turn. */
 .welcome-intro__page-wrap.wc-busy { touch-action: none; }
 /* While scrolled up into the history, every line is fully readable (clear the
-   per-line dim + blur the engine sets for the resting "focus newest" look). */
-.welcome-intro__page-wrap.wc-reading .wc-line { color: rgba(var(--ink),0.9) !important; filter: none !important; }
+   faint "history" fade so the whole conversation reads at full strength). */
+.welcome-intro__page-wrap.wc-reading .wc-line { opacity: 1 !important; filter: none !important; }
+.welcome-intro__page-wrap.wc-reading .wc-line.wc-hist { color: rgba(var(--ink),0.86); }
 .welcome-intro__page-wrap.wc-reading .wc-line.user { color: #fff !important; }
 /* hide the scrollbar — clean */
 .welcome-intro__page-wrap:has(.welcome-convo)::-webkit-scrollbar { width: 0; height: 0; }
@@ -3307,9 +3308,10 @@ html.lowfx .auth-screen__card, body.lite .auth-screen__card { background: rgba(1
 }
 /* A fresh line rises up and fades in (settles when .wc-line--enter is removed). */
 .wc-line--enter { opacity: 0; transform: translateY(16px); }
-/* Older lines recede: dimmed AND progressively blurred (blur set per-line in JS
-   by distance from the newest) so history softens into the background. */
-.wc-line.dim { color: rgba(var(--ink),0.26); font-weight: 500; }
+/* Focused mode: once a question is answered and the next begins, its lines become
+   faint "history" (one soft level, no blur) so the CURRENT question owns the
+   screen. Swipe up (.wc-reading) restores them to full. */
+.wc-line.wc-hist { opacity: 0.14; }
 .wc-line.user { color: #fff; font-weight: 700; }
 
 /* Bottom dock = the existing nav rail, reused. Holds chips or the composer. */
