@@ -2251,22 +2251,48 @@ document.addEventListener('keydown', (e) => {
   try {
     const vv = window.visualViewport;
     if (!vv) return;
-    let raf = 0, armed = false;
+    let raf = 0, armed = false, locked = false, lockedScrollY = 0;
     const root = document.documentElement;
     const body = document.body;
+
+    // The real cause of the "drops down, black strip on top, snaps back" jump:
+    // on iOS, focusing an input makes Safari scroll the page to reveal it, and
+    // `position:fixed` layers (the onboarding) jump along with that scroll
+    // (a long-standing iOS bug). `overflow:hidden` does NOT stop it. The only
+    // reliable lock is making the BODY itself `position:fixed` so the document
+    // genuinely cannot scroll — then iOS has nothing to scroll and nothing jumps.
+    const lockBody = () => {
+      if (locked) return;
+      locked = true;
+      lockedScrollY = window.scrollY || window.pageYOffset || 0;
+      body.style.position = 'fixed';
+      body.style.top = (-lockedScrollY) + 'px';
+      body.style.left = '0';
+      body.style.right = '0';
+      body.style.width = '100%';
+      root.style.overflow = 'hidden';
+    };
+    const unlockBody = () => {
+      if (!locked) return;
+      locked = false;
+      body.style.position = '';
+      body.style.top = '';
+      body.style.left = '';
+      body.style.right = '';
+      body.style.width = '';
+      root.style.overflow = '';
+      try { window.scrollTo(0, lockedScrollY); } catch (e) {}
+    };
+
+    // Per-frame: lift ONLY the dock, and only by however much the focused field
+    // is actually hidden behind the keyboard (zero if it already sits above it,
+    // so nothing moves). The body lock above is what prevents the jump; this just
+    // keeps the composer reachable, like a pinned chat bar.
     const apply = () => {
       raf = 0;
       const wi = document.querySelector('.welcome-intro.open');
       const nav = wi && wi.querySelector('.welcome-intro__nav');
       if (armed && wi && nav) {
-        // The fix for the "drops down, black strip on top, snaps back" jump:
-        // DON'T resize or move the whole layer (that fights iOS's own pan and
-        // overshoots). Lift ONLY the dock, and only by the amount the focused
-        // field is ACTUALLY hidden behind the keyboard. We measure the field's
-        // real bottom (untransformed) against the visible-viewport bottom; if it
-        // already sits above the keyboard the lift is zero and nothing moves.
-        // The rest of the screen stays put; the one motion is the composer
-        // riding just above the keyboard, like a pinned chat bar.
         nav.style.transform = '';
         const field = wi.querySelector('textarea:focus, input:focus') ||
                       wi.querySelector('.wc-composer') || nav;
@@ -2274,32 +2300,27 @@ document.addEventListener('keydown', (e) => {
         const visibleBottom = vv.offsetTop + vv.height;
         const lift = Math.max(0, Math.ceil(fieldBottom - visibleBottom + 10));
         nav.style.transform = lift > 0 ? ('translateY(-' + lift + 'px)') : '';
-        // Lock document scroll so iOS has nothing to pan the page TO; with the
-        // composer already above the keyboard, there is nothing to reveal.
-        root.style.overflow = 'hidden';
-        body.style.overflow = 'hidden';
-        if (window.scrollY) { try { window.scrollTo(0, 0); } catch (e) {} }
-        const se = document.scrollingElement || root;
-        if (se && se.scrollTop) se.scrollTop = 0;
-      } else {
-        if (nav) nav.style.transform = '';
-        root.style.overflow = '';
-        body.style.overflow = '';
+      } else if (nav) {
+        nav.style.transform = '';
       }
     };
     const schedule = () => { if (!raf) raf = requestAnimationFrame(apply); };
     vv.addEventListener('resize', schedule);
     vv.addEventListener('scroll', schedule);
-    window.addEventListener('scroll', schedule, true);
     document.addEventListener('focusin', (e) => {
       const wi = document.querySelector('.welcome-intro.open');
       const t = e.target;
       if (wi && t && (t.tagName === 'TEXTAREA' || t.tagName === 'INPUT') && wi.contains(t)) {
         armed = true;
+        lockBody();
         [0, 50, 150, 300, 500].forEach((d) => setTimeout(schedule, d));
       }
     }, true);
-    document.addEventListener('focusout', () => { armed = false; [50, 300].forEach((d) => setTimeout(schedule, d)); }, true);
+    document.addEventListener('focusout', () => {
+      armed = false;
+      unlockBody();
+      [50, 300].forEach((d) => setTimeout(schedule, d));
+    }, true);
   } catch (e) {}
 })();
 

@@ -93,7 +93,13 @@
   border-radius: var(--r-sm);
   overflow: visible;
   width: 100%;
+  /* The green energy ring (the ::before/::after conic gradients below) reads
+     off --angle; animate it so the light orbits the field instead of sitting
+     still. @property --angle inherits, so this drives both pseudo rings. Same
+     GPU-cheap pattern as the "Let's Find Yours" orbit button, safe on mobile. */
+  animation: orbit 5s linear infinite;
 }
+@media (prefers-reduced-motion: reduce) { .wiz__text-wrap { animation: none; } }
 /* Custom answer expand animation */
 .wiz__text-wrap--collapsible {
   max-height: 0;
