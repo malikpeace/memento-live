@@ -2249,86 +2249,42 @@ document.addEventListener('keydown', (e) => {
 // resizing it never flashes. preventScroll on the auto-focus handles the rest.
 (function welcomeKeyboardPin() {
   try {
-    // DISABLED (Malik): every active intervention here (scroll-lock, full-layer
-    // shrink, measured dock lift, body position:fixed) made the on-device jump
-    // worse, not better, because they fight iOS's own scroll-into-view. Let iOS
-    // handle the keyboard natively for now. Re-enable only once we have real
-    // device numbers from ?kbd=1 (innerHeight / vv.height / vv.offsetTop / scrollY)
-    // to base a correct fix on instead of guessing blind.
-    return;
-    // eslint-disable-next-line no-unreachable
     const vv = window.visualViewport;
     if (!vv) return;
-    let raf = 0, armed = false, locked = false, lockedScrollY = 0;
-    const root = document.documentElement;
-    const body = document.body;
-
-    // The real cause of the "drops down, black strip on top, snaps back" jump:
-    // on iOS, focusing an input makes Safari scroll the page to reveal it, and
-    // `position:fixed` layers (the onboarding) jump along with that scroll
-    // (a long-standing iOS bug). `overflow:hidden` does NOT stop it. The only
-    // reliable lock is making the BODY itself `position:fixed` so the document
-    // genuinely cannot scroll — then iOS has nothing to scroll and nothing jumps.
-    const lockBody = () => {
-      if (locked) return;
-      locked = true;
-      lockedScrollY = window.scrollY || window.pageYOffset || 0;
-      body.style.position = 'fixed';
-      body.style.top = (-lockedScrollY) + 'px';
-      body.style.left = '0';
-      body.style.right = '0';
-      body.style.width = '100%';
-      root.style.overflow = 'hidden';
-    };
-    const unlockBody = () => {
-      if (!locked) return;
-      locked = false;
-      body.style.position = '';
-      body.style.top = '';
-      body.style.left = '';
-      body.style.right = '';
-      body.style.width = '';
-      root.style.overflow = '';
-      try { window.scrollTo(0, lockedScrollY); } catch (e) {}
-    };
-
-    // Per-frame: lift ONLY the dock, and only by however much the focused field
-    // is actually hidden behind the keyboard (zero if it already sits above it,
-    // so nothing moves). The body lock above is what prevents the jump; this just
-    // keeps the composer reachable, like a pinned chat bar.
-    const apply = () => {
+    // Pin the onboarding dock to the bottom of the VISIBLE viewport, exactly like
+    // the Clarity/Action chat compose bar (_setupComposeBarPinning). The dock is
+    // position:fixed (onboarding.css), so iOS treats the focused input as already
+    // visible above the keyboard and never scroll-pans the conversation up — the
+    // content stays put, only the dock rides up with the keyboard. gap = the px
+    // between the layout-viewport bottom (where bottom:0 sits) and the visible
+    // bottom. Zero with the keyboard closed; the keyboard height while it is open.
+    // No body-lock, no transform, no scroll manipulation — that all fought iOS and
+    // backfired. This works WITH iOS, the same way the chat input already does.
+    let raf = 0;
+    const update = () => {
       raf = 0;
       const wi = document.querySelector('.welcome-intro.open');
-      const nav = wi && wi.querySelector('.welcome-intro__nav');
-      if (armed && wi && nav) {
-        nav.style.transform = '';
-        const field = wi.querySelector('textarea:focus, input:focus') ||
-                      wi.querySelector('.wc-composer') || nav;
-        const fieldBottom = field.getBoundingClientRect().bottom;
-        const visibleBottom = vv.offsetTop + vv.height;
-        const lift = Math.max(0, Math.ceil(fieldBottom - visibleBottom + 10));
-        nav.style.transform = lift > 0 ? ('translateY(-' + lift + 'px)') : '';
-      } else if (nav) {
-        nav.style.transform = '';
-      }
+      const dock = wi && wi.querySelector('.welcome-intro__nav');
+      // Only the text-composer beats use a fixed, pinned dock (matches the CSS
+      // `.welcome-intro:has(.wc-composer) ... position:fixed`). Chips/date beats
+      // stay in normal flow, so leave their dock alone.
+      if (!dock || !wi.querySelector('.wc-composer')) { if (dock) dock.style.bottom = ''; return; }
+      const gap = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      dock.style.bottom = gap + 'px';
     };
-    const schedule = () => { if (!raf) raf = requestAnimationFrame(apply); };
+    const schedule = () => { if (!raf) raf = requestAnimationFrame(update); };
     vv.addEventListener('resize', schedule);
     vv.addEventListener('scroll', schedule);
+    // Also re-pin right after focus, in case the keyboard animates in before the
+    // first visualViewport event lands.
     document.addEventListener('focusin', (e) => {
       const wi = document.querySelector('.welcome-intro.open');
       const t = e.target;
       if (wi && t && (t.tagName === 'TEXTAREA' || t.tagName === 'INPUT') && wi.contains(t)) {
-        armed = true;
-        lockBody();
-        [0, 50, 150, 300, 500].forEach((d) => setTimeout(schedule, d));
+        [0, 60, 160, 300, 500].forEach((d) => setTimeout(schedule, d));
       }
     }, true);
-    document.addEventListener('focusout', () => {
-      armed = false;
-      unlockBody();
-      [50, 300].forEach((d) => setTimeout(schedule, d));
-    }, true);
+    schedule();
   } catch (e) {}
 })();
 
