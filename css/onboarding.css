@@ -3197,6 +3197,14 @@ html.lowfx .auth-screen__card, body.lite .auth-screen__card { background: rgba(1
 }
 .auth-screen__input::placeholder { color: rgba(255,255,255,0.3); }
 .auth-screen__input:focus { border-color: rgba(255,255,255,0.26); }
+/* The 6-digit code field: big, evenly spaced digits so it reads as a code box. */
+.auth-screen__code {
+  height: 56px;
+  font-size: 1.6rem; font-weight: 700;
+  letter-spacing: 0.5em; text-indent: 0.5em;
+  font-variant-numeric: tabular-nums;
+}
+.auth-screen__code::placeholder { letter-spacing: 0.35em; font-weight: 600; }
 .auth-screen__primary, .auth-screen__google {
   width: 100%; box-sizing: border-box;
   height: 48px;

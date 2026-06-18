@@ -385,16 +385,31 @@ const CloudSync = (function () {
 
   /* ---------- auth ---------- */
 
-  async function sendLink(addr) {
+  // Email a 6-digit code (NOT a magic link). No emailRedirectTo, so Supabase
+  // sends the {{ .Token }} code from the email template and we verify it in-app
+  // with verifyCode below. This is the right flow for a phone/PWA: the user
+  // never leaves the app, so it works in the installed Home Screen app too.
+  // (Requires the Supabase "Magic Link" email template to include {{ .Token }}.)
+  async function sendCode(addr) {
     if (!client) return { ok: false, error: 'Sync is offline right now. Your data is safe on this device.' };
     try {
-      const r = await client.auth.signInWithOtp({
-        email: addr,
-        options: { emailRedirectTo: location.origin + location.pathname }
-      });
-      if (r && r.error) return { ok: false, error: r.error.message || 'Could not send the link. Try again.' };
+      const r = await client.auth.signInWithOtp({ email: addr, options: { shouldCreateUser: true } });
+      if (r && r.error) return { ok: false, error: r.error.message || 'Could not send the code. Try again.' };
       return { ok: true };
-    } catch (e) { return { ok: false, error: 'Could not send the link. Try again.' }; }
+    } catch (e) { return { ok: false, error: 'Could not send the code. Try again.' }; }
+  }
+
+  // Verify the 6-digit code the user typed in. On success Supabase establishes
+  // the session and onAuthStateChange fires (which closes the screen + syncs).
+  async function verifyCode(addr, code) {
+    if (!client) return { ok: false, error: 'Sync is offline right now.' };
+    const token = String(code || '').replace(/\D/g, '');
+    if (token.length < 6) return { ok: false, error: 'Enter the 6-digit code from your email.' };
+    try {
+      const r = await client.auth.verifyOtp({ email: addr, token: token, type: 'email' });
+      if (r && r.error) return { ok: false, error: r.error.message || 'That code did not work. Double-check it.' };
+      return { ok: true };
+    } catch (e) { return { ok: false, error: 'That code did not work. Try again.' }; }
   }
 
   // Sign out of the cloud only. Local data stays exactly as it is.
@@ -490,13 +505,15 @@ const CloudSync = (function () {
             '<input type="email" class="auth-screen__input" id="authEmail" maxlength="100" placeholder="you@email.com" autocomplete="email" autocapitalize="none" spellcheck="false" aria-label="Your email">' +
             '<button type="button" class="auth-screen__primary" id="authContinue">Continue</button>' +
             googleBtn +
-            '<div class="auth-screen__note" id="authNote">No password. We email you a link.</div>' +
+            '<div class="auth-screen__note" id="authNote">No password. We email you a 6-digit code.</div>' +
           '</div>' +
           '<div id="authStepSent" hidden>' +
-            '<div class="auth-screen__title">Check your email</div>' +
-            '<div class="auth-screen__sub">We sent you a sign-in link.<br><b class="auth-screen__addr" id="authSentTo"></b></div>' +
-            '<div class="auth-screen__note" id="authSentNote">Open it on this device to finish signing in.</div>' +
-            '<button type="button" class="auth-screen__resend" id="authResend">Resend link</button>' +
+            '<div class="auth-screen__title">Enter your code</div>' +
+            '<div class="auth-screen__sub">We sent a 6-digit code to<br><b class="auth-screen__addr" id="authSentTo"></b></div>' +
+            '<input type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]*" maxlength="6" class="auth-screen__input auth-screen__code" id="authCode" placeholder="••••••" aria-label="6-digit code">' +
+            '<button type="button" class="auth-screen__primary" id="authVerify">Sign in</button>' +
+            '<div class="auth-screen__note" id="authSentNote">Enter the code to finish signing in.</div>' +
+            '<button type="button" class="auth-screen__resend" id="authResend">Resend code</button>' +
           '</div>' +
         '</div>' +
         '<div class="auth-screen__terms">By continuing you agree to keep showing up.</div>' +
@@ -507,6 +524,10 @@ const CloudSync = (function () {
     const cont = authEl.querySelector('#authContinue');
     if (cont) cont.addEventListener('click', submitAuth);
     if (input) input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); submitAuth(); } });
+    const verify = authEl.querySelector('#authVerify');
+    if (verify) verify.addEventListener('click', submitCode);
+    const codeInput = authEl.querySelector('#authCode');
+    if (codeInput) codeInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); submitCode(); } });
     const g = authEl.querySelector('#authGoogle');
     if (g) g.addEventListener('click', async () => {
       if (!client) return;
@@ -518,14 +539,14 @@ const CloudSync = (function () {
     if (resend) resend.addEventListener('click', async () => {
       if (resend.disabled || !sentTo) return;
       resend.disabled = true; resend.textContent = 'Sending...';
-      const r = await sendLink(sentTo);
+      const r = await sendCode(sentTo);
       const note = document.getElementById('authSentNote');
       if (r.ok) {
-        if (note) note.textContent = 'Open it on this device to finish signing in.';
+        if (note) note.textContent = 'New code sent. Enter it to finish signing in.';
         startResendCooldown();
       } else {
-        resend.disabled = false; resend.textContent = 'Resend link';
-        if (note) note.textContent = r.error || 'Could not send the link. Try again.';
+        resend.disabled = false; resend.textContent = 'Resend code';
+        if (note) note.textContent = r.error || 'Could not send the code. Try again.';
       }
     });
     // Esc closes. Capture phase so it wins over the app's global key handlers.
@@ -549,7 +570,7 @@ const CloudSync = (function () {
       if (left <= 0) {
         clearInterval(resendTimer);
         btn.disabled = false;
-        btn.textContent = 'Resend link';
+        btn.textContent = 'Resend code';
       } else {
         btn.textContent = 'Resend in ' + left + 's';
       }
@@ -561,9 +582,12 @@ const CloudSync = (function () {
     const stepEmail = document.getElementById('authStepEmail');
     const stepSent = document.getElementById('authStepSent');
     const to = document.getElementById('authSentTo');
+    const code = document.getElementById('authCode');
     if (to) to.textContent = addr;
+    if (code) code.value = '';
     if (stepEmail) stepEmail.hidden = true;
     if (stepSent) stepSent.hidden = false;
+    if (code) { try { setTimeout(() => code.focus(), 80); } catch (e) {} }
     startResendCooldown();
   }
 
@@ -574,13 +598,30 @@ const CloudSync = (function () {
     const addr = String((input && input.value) || '').trim();
     if (!addr || addr.indexOf('@') < 1) { if (note) note.textContent = 'Enter your email address.'; return; }
     if (cont) { cont.disabled = true; cont.textContent = 'Sending...'; }
-    const r = await sendLink(addr);
+    const r = await sendCode(addr);
     if (cont) { cont.disabled = false; cont.textContent = 'Continue'; }
     if (r.ok) {
       showSentStep(addr);
     } else {
-      if (note) note.textContent = r.error || 'Could not send the link. Try again.';
+      if (note) note.textContent = r.error || 'Could not send the code. Try again.';
     }
+  }
+
+  async function submitCode() {
+    const input = document.getElementById('authCode');
+    const btn = document.getElementById('authVerify');
+    const note = document.getElementById('authSentNote');
+    const code = String((input && input.value) || '').trim();
+    if (code.replace(/\D/g, '').length < 6) { if (note) note.textContent = 'Enter the 6-digit code from your email.'; return; }
+    if (btn) { btn.disabled = true; btn.textContent = 'Signing in...'; }
+    const r = await verifyCode(sentTo, code);
+    if (!r.ok) {
+      if (btn) { btn.disabled = false; btn.textContent = 'Sign in'; }
+      if (note) note.textContent = r.error || 'That code did not work. Try again.';
+      return;
+    }
+    // Success: onAuthStateChange closes the screen + pulls the cloud copy.
+    if (btn) btn.textContent = 'Signed in';
   }
 
   function openDialog() {
@@ -591,7 +632,7 @@ const CloudSync = (function () {
     const note = d.querySelector('#authNote');
     if (stepEmail) stepEmail.hidden = false;
     if (stepSent) stepSent.hidden = true;
-    if (note) note.textContent = 'No password. We email you a link.';
+    if (note) note.textContent = 'No password. We email you a 6-digit code.';
     clearInterval(resendTimer);
     // Seamless splash handoff: if the splash is still up, it stays as the
     // constant background (its beams keep animating). The auth screen drops
@@ -680,7 +721,7 @@ const CloudSync = (function () {
   return {
     init, available, isLoggedIn, email,
     schedulePush, pushNow, syncNow,
-    sendLink, signOut, mergeDecision, buildMergedState, createShare, lastSyncedText,
+    sendCode, verifyCode, signOut, mergeDecision, buildMergedState, createShare, lastSyncedText,
     openDialog, closeDialog
   };
 })();
