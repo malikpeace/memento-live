@@ -40,6 +40,41 @@ const CloudSync = (function () {
   let lastCloudStamp = '';  // updated_at of the cloud row this device last wrote or adopted
   let lastSyncMs = 0;       // Date.now() of the last successful push or pull (for the UI)
 
+  // Reload-loop circuit breaker. Every adopt path ends in location.reload(),
+  // so a non-idempotent merge could blink the UI forever. We count adopt-reloads
+  // in sessionStorage (survives reload, dies with the tab): allow a couple of
+  // legitimate adopts, then refuse to reload again and fall back to pushing the
+  // local copy up. A clean load with no adopt clears the counter.
+  const ADOPT_GUARD_KEY = 'memento_sync_adopt_guard';
+  function adoptWouldLoop() {
+    try {
+      const now = Date.now();
+      let r = null;
+      try { r = JSON.parse(sessionStorage.getItem(ADOPT_GUARD_KEY) || 'null'); } catch (e) { r = null; }
+      if (!r || typeof r.first !== 'number' || (now - r.first) > 12000) r = { first: now, n: 0 };
+      r.n += 1;
+      try { sessionStorage.setItem(ADOPT_GUARD_KEY, JSON.stringify(r)); } catch (e) {}
+      return r.n > 2; // 3rd adopt-reload inside 12s = a loop; stop reloading
+    } catch (e) { return false; }
+  }
+  function clearAdoptGuard() { try { sessionStorage.removeItem(ADOPT_GUARD_KEY); } catch (e) {} }
+
+  // Order-insensitive JSON: recursively sort object keys before stringifying.
+  // The merge rebuilds objects in a different key order than the stored copy
+  // (e.g. it moves meta to the end), so a raw JSON.stringify compare reports
+  // "different" even when the content is identical, which would make the
+  // loop-breaker miss and adoptMerged reload on every boot. Stable stringify
+  // compares by content only.
+  function stableStringify(v) {
+    if (v === null || typeof v !== 'object') return JSON.stringify(v);
+    if (Array.isArray(v)) return '[' + v.map(stableStringify).join(',') + ']';
+    const keys = Object.keys(v).sort();
+    return '{' + keys.map(function (k) {
+      const sv = stableStringify(v[k]);
+      return sv === undefined ? '' : JSON.stringify(k) + ':' + sv;
+    }).filter(Boolean).join(',') + '}';
+  }
+
   function demo() { try { return typeof DEMO_MODE !== 'undefined' && !!DEMO_MODE; } catch (e) { return false; } }
   function available() { return !!client; }
   function isLoggedIn() { return !!(session && session.user); }
@@ -110,7 +145,14 @@ const CloudSync = (function () {
         // If the merge changes nothing locally, this device already holds
         // everything; just push. (Also the loop-breaker: after a merge
         // reload, the re-run lands here instead of merging forever.)
-        if (JSON.stringify(merged) === JSON.stringify(localState)) {
+        // Compare with inline media STRIPPED on both sides: the cloud copy is
+        // always media-stripped (stripInlineMediaForSync), while local carries
+        // full media, so a raw JSON compare would never match and adoptMerged
+        // would reload on every boot forever. Media-only differences mean the
+        // states are already in sync content-wise; keep local's full media and
+        // just push.
+        const sm = (typeof stripInlineMediaForSync === 'function') ? stripInlineMediaForSync : function (x) { return x; };
+        if (stableStringify(sm(merged)) === stableStringify(sm(localState))) {
           return { action: 'pushLocal', reason: 'local already contains everything' };
         }
         return { action: 'adoptMerged', merged: merged, reason: 'combined per module' };
@@ -233,6 +275,11 @@ const CloudSync = (function () {
   // and pushes the merged copy up, completing the cycle.
   function adoptMerged(merged, why) {
     if (adopting) return;
+    if (adoptWouldLoop()) {
+      try { console.warn('CloudSync: merge reload loop detected, keeping the local copy and syncing it up instead.'); } catch (e) {}
+      try { pushNow(); } catch (e) {}
+      return;
+    }
     try {
       adopting = true;
       try {
@@ -283,6 +330,11 @@ const CloudSync = (function () {
   // module re-reads state on boot). Never logs state contents.
   function adoptCloud(row, why) {
     if (adopting) return;
+    if (adoptWouldLoop()) {
+      try { console.warn('CloudSync: adopt reload loop detected, keeping the local copy and syncing it up instead.'); } catch (e) {}
+      try { pushNow(); } catch (e) {}
+      return;
+    }
     try {
       adopting = true;
       try {
@@ -311,6 +363,9 @@ const CloudSync = (function () {
       const d = mergeDecision(state, f.row);
       if (d.action === 'adoptCloud') { adoptCloud(f.row, d.reason); return; }
       if (d.action === 'adoptMerged') { adoptMerged(d.merged, d.reason); return; }
+      // Clean load, no reload needed: this device already holds everything.
+      // Reset the reload-loop guard so a future legitimate adopt isn't blocked.
+      clearAdoptGuard();
       if (f.row && f.row.updated_at) lastCloudStamp = f.row.updated_at;
       await pushNow();
     } catch (e) { pushQueued = true; }
