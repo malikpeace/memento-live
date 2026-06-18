@@ -3282,6 +3282,10 @@ html.lowfx .auth-screen__card, body.lite .auth-screen__card { background: rgba(1
   -webkit-mask: linear-gradient(to bottom, transparent 0, #000 10%, #000 100%);
   mask: linear-gradient(to bottom, transparent 0, #000 10%, #000 100%);
 }
+/* While the AI is typing, lock the scroll to the newest line (touch-action:none
+   blocks the user from scrolling off the text being typed). Freed when it is the
+   user's turn. */
+.welcome-intro__page-wrap.wc-busy { touch-action: none; }
 /* While scrolled up into the history, every line is fully readable (clear the
    per-line dim + blur the engine sets for the resting "focus newest" look). */
 .welcome-intro__page-wrap.wc-reading .wc-line { color: rgba(var(--ink),0.9) !important; filter: none !important; }

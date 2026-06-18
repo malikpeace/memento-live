@@ -161,6 +161,7 @@ const WelcomeIntro = {
     if (!this._wcScrollBound) {
       this._wcScrollBound = true;
       this.pageWrap.addEventListener('scroll', () => {
+        if (this._wcBusy) return; // pinned to bottom while the AI is typing
         const el = this.pageWrap;
         const atBottom = (el.scrollHeight - el.scrollTop - el.clientHeight) < 28;
         el.classList.toggle('wc-reading', !atBottom);
@@ -393,6 +394,24 @@ const WelcomeIntro = {
     });
   },
 
+  _wcScrollBottom() {
+    const pw = this.pageWrap;
+    if (pw) pw.scrollTop = pw.scrollHeight;
+  },
+
+  // While the AI is typing, the conversation is "busy": pin it to the newest
+  // line and block the user from scrolling up (touch-action:none), so they can
+  // never scroll off the text being typed and watch it freeze off-screen. When
+  // it is the user's turn (input shown), busy clears and they can swipe up to
+  // read history freely.
+  _wcSetBusy(busy) {
+    this._wcBusy = !!busy;
+    const pw = this.pageWrap;
+    if (!pw) return;
+    pw.classList.toggle('wc-busy', !!busy);
+    if (busy) { pw.classList.remove('wc-reading'); this._wcScrollBottom(); }
+  },
+
   // FLIP: glide existing lines from their old positions to their new ones
   // instead of snapping when a fresh line (or the growing dock) shifts the stack.
   _wcFlipKids(kids, before) {
@@ -416,6 +435,7 @@ const WelcomeIntro = {
 
   _wcTypeLine(text, instant, gen) {
     return new Promise(res => {
+      this._wcSetBusy(true);
       this._wcDimAll();
       const kids = [...this._wcConvoEl.children];
       const before = kids.map(k => k.getBoundingClientRect().top);
@@ -428,7 +448,8 @@ const WelcomeIntro = {
       el.style.minHeight = el.offsetHeight + 'px';
       el.textContent = '';
       this._wcFlipKids(kids, before);
-      requestAnimationFrame(() => el.classList.remove('wc-line--enter'));
+      this._wcScrollBottom();
+      requestAnimationFrame(() => { this._wcScrollBottom(); el.classList.remove('wc-line--enter'); });
       if (instant || this._wcReduced) { el.textContent = text; setTimeout(res, instant ? 0 : 90); return; }
       let i = 0;
       const tick = () => {
@@ -450,7 +471,8 @@ const WelcomeIntro = {
     el.textContent = text;
     this._wcConvoEl.appendChild(el);
     this._wcFlipKids(kids, before);
-    requestAnimationFrame(() => el.classList.remove('wc-line--enter'));
+    this._wcScrollBottom();
+    requestAnimationFrame(() => { this._wcScrollBottom(); el.classList.remove('wc-line--enter'); });
   },
 
   _wcSetErr(msg) { const e = this._wcDockEl && this._wcDockEl.querySelector('.wc-err'); if (e) e.textContent = msg || ''; },
@@ -458,6 +480,8 @@ const WelcomeIntro = {
   _wcCommitAnswer(beat, val, isSkip) {
     const ok = beat.commit ? beat.commit(val) : true;
     if (ok === false) return; // validation failed; error already shown, stay put
+    // The user just answered; the AI is about to type again, so pin to bottom.
+    this._wcSetBusy(true);
     const resolve = this._wcResolve; this._wcResolve = null;
     // Clear the dock inside a FLIP so the conversation glides when the layout
     // shifts (e.g. a tall chip dock collapsing and the column re-centering on
@@ -467,6 +491,9 @@ const WelcomeIntro = {
   },
 
   _wcRenderInput(beat) {
+    // The AI is done talking; it is the user's turn. Unlock scrolling so they
+    // can swipe up to read history while they think about their answer.
+    this._wcSetBusy(false);
     const spec = beat.input;
     const dock = this._wcDockEl;
     dock.innerHTML = '';
