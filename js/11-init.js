@@ -2269,8 +2269,11 @@ document.addEventListener('keydown', (e) => {
       // `.welcome-intro:has(.wc-composer) ... position:fixed`). Chips/date beats
       // stay in normal flow, so leave their dock alone.
       if (!dock || !wi.querySelector('.wc-composer')) { if (dock) dock.style.bottom = ''; return; }
+      // Rest the dock ~1/4 up (matches the CSS `bottom: 24vh`), and only lift it
+      // higher when the keyboard is actually taller than that resting position.
+      const rest = Math.round(window.innerHeight * 0.24);
       const gap = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
-      dock.style.bottom = gap + 'px';
+      dock.style.bottom = Math.max(rest, gap) + 'px';
     };
     const schedule = () => { if (!raf) raf = requestAnimationFrame(update); };
     vv.addEventListener('resize', schedule);

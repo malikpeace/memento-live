@@ -3320,13 +3320,21 @@ html.lowfx .auth-screen__card, body.lite .auth-screen__card { background: rgba(1
 .wc-composer { display: flex; align-items: flex-end; gap: 10px; opacity: 0; animation: wcRise 0.5s cubic-bezier(0.16,1,0.3,1) forwards; }
 .wc-composer textarea {
   flex: 1; resize: none; font: inherit; font-size: 1.1rem; font-weight: 500; line-height: 1.4;
-  color: rgba(var(--ink),0.97); background: rgba(var(--ink),0.025); border: none;
+  color: rgba(var(--ink),0.97); border: none;
+  /* Glass fill (fill + blur + inset highlight, no border) so the input still
+     reads as a box without the old black gradient grounding it behind. */
+  background: rgba(var(--ink),0.06);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+  -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
   border-radius: var(--r-ctrl); padding: 13px 16px; min-height: 52px; max-height: 120px; outline: none;
 }
 .wc-composer textarea::placeholder { color: rgba(var(--ink),0.32); }
 .wc-dateinput {
   flex: 1; font: inherit; font-size: 1.1rem; font-weight: 500; color: rgba(var(--ink),0.97);
-  background: rgba(var(--ink),0.025); border: none; border-radius: var(--r-ctrl);
+  border: none; border-radius: var(--r-ctrl);
+  background: rgba(var(--ink),0.06);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+  -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
   padding: 13px 16px; outline: none; color-scheme: dark; min-height: 52px;
 }
 /* Birthday: three glass Month / Day / Year pickers + a Continue row. */
@@ -3431,13 +3439,17 @@ html.lowfx .auth-screen__card, body.lite .auth-screen__card { background: rgba(1
     justify-content: flex-end;
     overflow-y: auto;
   }
-  .welcome-intro:has(.wc-composer) .welcome-convo { padding-top: 14px; padding-bottom: 100px; }
+  .welcome-intro:has(.wc-composer) .welcome-convo { padding-top: 14px; padding-bottom: calc(24vh + 96px); }
   .welcome-intro:has(.wc-composer) .welcome-intro__nav:has(.wc-dock) {
     position: fixed;
-    left: 0; right: 0; bottom: 0;
+    left: 0; right: 0;
+    /* Rest ~1/4 up from the bottom (Malik) instead of jammed at the edge. The JS
+       (welcomeKeyboardPin) keeps this as a floor and only lifts higher when the
+       keyboard is taller than this. No background — no black band at the bottom. */
+    bottom: 24vh;
     z-index: 3;
-    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
-    background: linear-gradient(to top, #030208 62%, transparent);
+    padding-bottom: 0;
+    background: none;
   }
 }
 
