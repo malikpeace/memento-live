@@ -2257,27 +2257,32 @@ document.addEventListener('keydown', (e) => {
     const apply = () => {
       raf = 0;
       const wi = document.querySelector('.welcome-intro.open');
-      if (armed && wi) {
+      const nav = wi && wi.querySelector('.welcome-intro__nav');
+      if (armed && wi && nav) {
         // The fix for the "drops down, black strip on top, snaps back" jump:
-        // SHRINK the fixed onboarding layer to exactly the area the keyboard
-        // leaves visible (height = visualViewport.height, top = its offsetTop).
-        // The dock/composer then sits flush above the keyboard, so iOS has
-        // nothing to scroll into view and never pans the page. The centered
-        // copy simply recenters into the smaller area — a smooth follow, not a
-        // jolt. The glow is baked into the layer's own background (see CSS) so
-        // resizing it never flashes dark.
-        wi.style.height = vv.height + 'px';
-        wi.style.top = vv.offsetTop + 'px';
-        // Belt and suspenders: also lock document scroll so nothing behind the
-        // layer can pan, and zero any scroll iOS slipped in before the resize.
+        // DON'T resize or move the whole layer (that fights iOS's own pan and
+        // overshoots). Lift ONLY the dock, and only by the amount the focused
+        // field is ACTUALLY hidden behind the keyboard. We measure the field's
+        // real bottom (untransformed) against the visible-viewport bottom; if it
+        // already sits above the keyboard the lift is zero and nothing moves.
+        // The rest of the screen stays put; the one motion is the composer
+        // riding just above the keyboard, like a pinned chat bar.
+        nav.style.transform = '';
+        const field = wi.querySelector('textarea:focus, input:focus') ||
+                      wi.querySelector('.wc-composer') || nav;
+        const fieldBottom = field.getBoundingClientRect().bottom;
+        const visibleBottom = vv.offsetTop + vv.height;
+        const lift = Math.max(0, Math.ceil(fieldBottom - visibleBottom + 10));
+        nav.style.transform = lift > 0 ? ('translateY(-' + lift + 'px)') : '';
+        // Lock document scroll so iOS has nothing to pan the page TO; with the
+        // composer already above the keyboard, there is nothing to reveal.
         root.style.overflow = 'hidden';
         body.style.overflow = 'hidden';
         if (window.scrollY) { try { window.scrollTo(0, 0); } catch (e) {} }
         const se = document.scrollingElement || root;
         if (se && se.scrollTop) se.scrollTop = 0;
       } else {
-        // Revert to the full-viewport layer (CSS top:0 / height:100lvh).
-        if (wi) { wi.style.height = ''; wi.style.top = ''; }
+        if (nav) nav.style.transform = '';
         root.style.overflow = '';
         body.style.overflow = '';
       }
