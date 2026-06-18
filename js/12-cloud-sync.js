@@ -25,6 +25,9 @@ const CloudSync = (function () {
   try { window.MEMENTO_SUPABASE_URL = SUPABASE_URL; window.MEMENTO_SUPABASE_ANON = SUPABASE_ANON_KEY; } catch (e) {}
   const BACKUP_KEY = 'memento_pre_sync_backup';
   const PUSH_DEBOUNCE_MS = 4000;
+  // Number of digit boxes in the sign-in code input. MUST match the Supabase
+  // "Email OTP Length" setting (Authentication > Sign In/Providers > Email).
+  const CODE_LEN = 6;
 
   let client = null;        // supabase client, or null when the CDN never loaded
   let session = null;       // current auth session (null = logged out)
@@ -404,7 +407,7 @@ const CloudSync = (function () {
   async function verifyCode(addr, code) {
     if (!client) return { ok: false, error: 'Sync is offline right now.' };
     const token = String(code || '').replace(/\D/g, '');
-    if (token.length < 6) return { ok: false, error: 'Enter the 6-digit code from your email.' };
+    if (token.length < CODE_LEN) return { ok: false, error: 'Enter the ' + CODE_LEN + '-digit code from your email.' };
     try {
       const r = await client.auth.verifyOtp({ email: addr, token: token, type: 'email' });
       if (r && r.error) return { ok: false, error: r.error.message || 'That code did not work. Double-check it.' };
@@ -510,7 +513,7 @@ const CloudSync = (function () {
           '<div id="authStepSent" hidden>' +
             '<div class="auth-screen__title">Enter your code</div>' +
             '<div class="auth-screen__sub">We sent a 6-digit code to<br><b class="auth-screen__addr" id="authSentTo"></b></div>' +
-            '<input type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]*" maxlength="6" class="auth-screen__input auth-screen__code" id="authCode" placeholder="••••••" aria-label="6-digit code">' +
+            '<div class="auth-screen__code-row" id="authCodeRow" role="group" aria-label="Verification code"></div>' +
             '<button type="button" class="auth-screen__primary" id="authVerify">Sign in</button>' +
             '<div class="auth-screen__note" id="authSentNote">Enter the code to finish signing in.</div>' +
             '<button type="button" class="auth-screen__resend" id="authResend">Resend code</button>' +
@@ -526,8 +529,7 @@ const CloudSync = (function () {
     if (input) input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); submitAuth(); } });
     const verify = authEl.querySelector('#authVerify');
     if (verify) verify.addEventListener('click', submitCode);
-    const codeInput = authEl.querySelector('#authCode');
-    if (codeInput) codeInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); submitCode(); } });
+    buildCodeBoxes();
     const g = authEl.querySelector('#authGoogle');
     if (g) g.addEventListener('click', async () => {
       if (!client) return;
@@ -577,17 +579,62 @@ const CloudSync = (function () {
     }, 1000);
   }
 
+  // Read the full code by concatenating the digit boxes.
+  function readCode() {
+    const row = document.getElementById('authCodeRow');
+    if (!row) return '';
+    return [].slice.call(row.querySelectorAll('.auth-screen__code-box')).map((b) => b.value || '').join('');
+  }
+
+  // Build CODE_LEN single-digit boxes with auto-advance, backspace-to-previous,
+  // paste-to-fill, and auto-submit once the last box is filled.
+  let _verifying = false;
+  function buildCodeBoxes() {
+    const row = document.getElementById('authCodeRow');
+    if (!row) return;
+    row.innerHTML = '';
+    const boxes = [];
+    for (let i = 0; i < CODE_LEN; i++) {
+      const b = document.createElement('input');
+      b.type = 'text'; b.inputMode = 'numeric'; b.autocomplete = 'one-time-code';
+      b.maxLength = 1; b.className = 'auth-screen__code-box'; b.setAttribute('aria-label', 'Digit ' + (i + 1));
+      row.appendChild(b); boxes.push(b);
+    }
+    const focusBox = (i) => { if (i >= 0 && i < boxes.length) { try { boxes[i].focus(); boxes[i].select(); } catch (e) {} } };
+    const maybeSubmit = () => { if (readCode().replace(/\D/g, '').length === CODE_LEN) submitCode(); };
+    boxes.forEach((b, i) => {
+      b.addEventListener('input', () => {
+        b.value = (b.value || '').replace(/\D/g, '').slice(-1);
+        if (b.value && i < boxes.length - 1) focusBox(i + 1);
+        maybeSubmit();
+      });
+      b.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace') { if (!b.value && i > 0) { e.preventDefault(); boxes[i - 1].value = ''; focusBox(i - 1); } }
+        else if (e.key === 'ArrowLeft' && i > 0) { e.preventDefault(); focusBox(i - 1); }
+        else if (e.key === 'ArrowRight' && i < boxes.length - 1) { e.preventDefault(); focusBox(i + 1); }
+        else if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); submitCode(); }
+      });
+      b.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const digits = String(((e.clipboardData || window.clipboardData) || {}).getData('text') || '').replace(/\D/g, '').slice(0, CODE_LEN);
+        if (!digits) return;
+        for (let j = 0; j < boxes.length; j++) boxes[j].value = digits[j] || '';
+        focusBox(Math.min(digits.length, boxes.length - 1));
+        maybeSubmit();
+      });
+    });
+  }
+
   function showSentStep(addr) {
     sentTo = addr;
     const stepEmail = document.getElementById('authStepEmail');
     const stepSent = document.getElementById('authStepSent');
     const to = document.getElementById('authSentTo');
-    const code = document.getElementById('authCode');
     if (to) to.textContent = addr;
-    if (code) code.value = '';
+    buildCodeBoxes();
     if (stepEmail) stepEmail.hidden = true;
     if (stepSent) stepSent.hidden = false;
-    if (code) { try { setTimeout(() => code.focus(), 80); } catch (e) {} }
+    try { setTimeout(() => { const f = document.querySelector('#authCodeRow .auth-screen__code-box'); if (f) f.focus(); }, 80); } catch (e) {}
     startResendCooldown();
   }
 
@@ -608,16 +655,20 @@ const CloudSync = (function () {
   }
 
   async function submitCode() {
-    const input = document.getElementById('authCode');
+    if (_verifying) return;
     const btn = document.getElementById('authVerify');
     const note = document.getElementById('authSentNote');
-    const code = String((input && input.value) || '').trim();
-    if (code.replace(/\D/g, '').length < 6) { if (note) note.textContent = 'Enter the 6-digit code from your email.'; return; }
+    const code = readCode();
+    if (code.replace(/\D/g, '').length < CODE_LEN) { if (note) note.textContent = 'Enter the ' + CODE_LEN + '-digit code from your email.'; return; }
+    _verifying = true;
     if (btn) { btn.disabled = true; btn.textContent = 'Signing in...'; }
     const r = await verifyCode(sentTo, code);
+    _verifying = false;
     if (!r.ok) {
       if (btn) { btn.disabled = false; btn.textContent = 'Sign in'; }
       if (note) note.textContent = r.error || 'That code did not work. Try again.';
+      buildCodeBoxes();
+      try { const f = document.querySelector('#authCodeRow .auth-screen__code-box'); if (f) f.focus(); } catch (e) {}
       return;
     }
     // Success: onAuthStateChange closes the screen + pulls the cloud copy.
