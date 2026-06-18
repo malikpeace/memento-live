@@ -193,11 +193,11 @@ const WelcomeIntro = {
     // Opal-style framing: tell them what's about to happen before the questions
     // start, so the diagnostic feels intentional, not like a form.
     beats.push({ lines: () => ['First, I want to understand where you actually are.', "A few honest questions, then I'll build your Memento around them."], pause: 900 });
-    // Birthday is asked a few questions in (not second) so the conversation
-    // warms up first. Inserted after the "story" identity question below.
+    // Birthday is the FIRST question (an easy, factual warm-up that also powers
+    // Memento Mori), then a transition line escalates into the deeper diagnostic.
     const birthdayBeat = {
       key: 'birthday',
-      lines: () => ['And when were you born?', '(this is important for building your memento)'],
+      lines: () => ['When were you born?', '(this is important for building your memento)'],
       input: { kind: 'date' },
       commit: (v) => {
         const age = (typeof ageFromBirthday === 'function') ? ageFromBirthday(v) : null;
@@ -209,6 +209,8 @@ const WelcomeIntro = {
       },
       display: (v) => this._wcBdayDisplay(v)
     };
+    beats.push(birthdayBeat);
+    beats.push({ lines: () => ['Alright, now for more serious questions.'], pause: 900 });
     this.identitySteps.forEach((step) => {
       if (step.type !== 'choices' && step.type !== 'text') return; // stop before summaryStepper/paywall
       beats.push({
@@ -234,10 +236,7 @@ const WelcomeIntro = {
       // Reflections branch on what was just picked (in Malik's voice) so the
       // conversation feels custom, not one canned line everyone gets.
       if (step.key === 'runningToward') beats.push({ lines: () => { const t = this._wcReflect('runningToward'); return t ? [t] : []; } });
-      if (step.key === 'clarityLevel') {
-        beats.push({ lines: () => { const t = this._wcReflect('clarityLevel'); return t ? [t] : []; } });
-        beats.push(birthdayBeat);   // birthday lands here, after the clarity gap
-      }
+      if (step.key === 'clarityLevel') beats.push({ lines: () => { const t = this._wcReflect('clarityLevel'); return t ? [t] : []; } });
       if (step.key === 'runningFrom') beats.push({ lines: () => { const t = this._wcReflect('runningFrom'); return t ? [t] : []; } });
       if (step.key === 'costOfInaction') beats.push({ lines: () => { const t = this._wcReflect('costOfInaction'); return t ? [t] : []; } });
     });
