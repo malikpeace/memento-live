@@ -1614,11 +1614,11 @@ const WelcomeIntro = {
       if (this._fwClick) { document.removeEventListener('click', this._fwClick, true); this._fwClick = null; }
       this._confettiVer = (this._confettiVer || 0) + 1;
       const c = document.getElementById('welcomeConfetti'); if (c) c.remove();
-      // keep the black base (welcome-intro--blackout) through the philosophy pages;
-      // the stage glows fade colors in over it per page.
-      this._afterPhilosophy = () => this._showHelpPage(stepIndex);
-      this.currentPage = 0;
-      this.renderPage(0);
+      // Skip the legacy swipe-through pillar tutorial (renderPage) — after the
+      // modern conversation it read as "the old onboarding loading up again"
+      // (Malik). Go straight from the Congrats celebration to the personalized
+      // "how Memento helps you" page.
+      this._showHelpPage(stepIndex);
     });
   },
 

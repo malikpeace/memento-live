@@ -1515,7 +1515,10 @@ body.lite .welcome-intro__sumstar { animation: none; }
     #07060d !important;
 }
 .welcome-intro--help .welcome-intro__bg { opacity: 0; }
-.welcome-intro--help .welcome-intro__page-wrap { padding-top: 16px; padding-bottom: 16px; }
+/* Clear the iOS status bar: the help page is top-aligned when its content is
+   tall, so without the safe-area inset the eyebrow/title slid under the clock
+   and battery and could not be read (Malik). */
+.welcome-intro--help .welcome-intro__page-wrap { padding-top: calc(var(--safe-t, 0px) + 24px); padding-bottom: calc(var(--safe-b, 0px) + 16px); }
 .welcome-intro__help2 { align-items: center !important; text-align: center; width: 100%; max-width: 390px; padding: 0 8px; margin: auto 0; }
 .welcome-intro__help2--loading { align-items: center !important; text-align: center; }
 .welcome-intro__help2-eyebrow { font-size: var(--fs-xs); letter-spacing: 0.26em; font-weight: 700; color: rgba(165,172,255,0.7); margin-bottom: 16px; }

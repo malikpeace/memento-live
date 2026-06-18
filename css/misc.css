@@ -7,19 +7,38 @@
 #topFade {
   position: fixed;
   top: 0; left: 0; right: 0;
-  height: calc(var(--safe-t, 0px) + 40px);
-  /* Above the module experiences / sheets / onboarding (all <= ~1010) so the
-     status bar is protected on EVERY mobile screen, not just Home. Stays below
-     the 9000+ critical alert/toast layer. pointer-events:none keeps top
-     controls tappable; they just sit over a faint vignette. */
+  height: calc(var(--safe-t, 0px) + 34px);
+  /* Above the module sheets so the status bar is protected wherever content
+     scrolls up under it. Below the 9000+ critical alert layer. */
   z-index: 2000;
   pointer-events: none;
   display: none;
-  /* Solid black across the status-bar inset itself, then a soft fade over the
-     next ~40px so nothing collides with the clock and battery. */
-  background: linear-gradient(to bottom, var(--surface-0) 0%, var(--surface-0) var(--safe-t, 0px), transparent 100%);
+  /* A frosted BLUR band, not a black strip, so scrolling content softens before
+     the clock and battery instead of colliding with them. Two stacked blur
+     layers (strong at the top, light lower) give a gradient-like falloff so the
+     bottom edge is soft, not a hard line. NOTE: a `mask` on this element would
+     isolate it and silently kill backdrop-filter, so the falloff is done with
+     stacked layers, never a mask. */
+  background: transparent;
 }
+#topFade::before, #topFade::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  -webkit-backdrop-filter: blur(14px) saturate(1.12);
+  backdrop-filter: blur(14px) saturate(1.12);
+}
+/* lighter blur over the FULL height so the lower edge fades out gently */
+#topFade::after { bottom: 0; -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px); }
+/* stronger blur only across the top (status-bar inset + a touch) */
+#topFade::before { height: calc(var(--safe-t, 0px) + 16px); z-index: 1; }
 @media (max-width: 859.98px) { #topFade { display: block; } }
+/* Only on the scrolling surfaces (Home + module sheets). Onboarding and the
+   full-screen experiences are centered/short, where a top blur reads as an odd
+   band, so hide it there (Malik). */
+body:has(.welcome-intro.open) #topFade,
+body:has(.clarity-exp.open) #topFade,
+body:has(.action-exp.open) #topFade { display: none; }
 
 /* ============================================
    TAB BAR

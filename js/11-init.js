@@ -2249,6 +2249,14 @@ document.addEventListener('keydown', (e) => {
 // resizing it never flashes. preventScroll on the auto-focus handles the rest.
 (function welcomeKeyboardPin() {
   try {
+    // DISABLED (Malik): every active intervention here (scroll-lock, full-layer
+    // shrink, measured dock lift, body position:fixed) made the on-device jump
+    // worse, not better, because they fight iOS's own scroll-into-view. Let iOS
+    // handle the keyboard natively for now. Re-enable only once we have real
+    // device numbers from ?kbd=1 (innerHeight / vv.height / vv.offsetTop / scrollY)
+    // to base a correct fix on instead of guessing blind.
+    return;
+    // eslint-disable-next-line no-unreachable
     const vv = window.visualViewport;
     if (!vv) return;
     let raf = 0, armed = false, locked = false, lockedScrollY = 0;
