@@ -190,6 +190,9 @@ const WelcomeIntro = {
       display: (v) => String(v).trim()
     });
     beats.push({ lines: (n) => ['Welcome to Memento, ' + (n || 'you') + '.'] });
+    // Opal-style framing: tell them what's about to happen before the questions
+    // start, so the diagnostic feels intentional, not like a form.
+    beats.push({ lines: () => ['First, I want to understand where you actually are.', "A few honest questions, then I'll build your Memento around them."], pause: 900 });
     // Birthday is asked a few questions in (not second) so the conversation
     // warms up first. Inserted after the "story" identity question below.
     const birthdayBeat = {
