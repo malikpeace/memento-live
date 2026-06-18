@@ -181,7 +181,7 @@ const WelcomeIntro = {
   _wcBuild() {
     const SEP = ' · ';
     const beats = [];
-    beats.push({ lines: () => ['Welcome to Memento.'], pause: 1100 });
+    beats.push({ lines: () => ['Hello 👋.'], pause: 1100 });
     beats.push({
       key: 'name',
       lines: () => ['What should I call you?'],
@@ -189,7 +189,7 @@ const WelcomeIntro = {
       commit: (v) => { state.profile.name = String(v).trim(); persistNow(); return true; },
       display: (v) => String(v).trim()
     });
-    beats.push({ lines: (n) => ['Good to meet you, ' + (n || 'you') + '.'] });
+    beats.push({ lines: (n) => ['Welcome to Memento, ' + (n || 'you') + '.'] });
     // Birthday is asked a few questions in (not second) so the conversation
     // warms up first. Inserted after the "story" identity question below.
     const birthdayBeat = {
