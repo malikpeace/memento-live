@@ -3023,11 +3023,12 @@ html.theme-light .daycard-ns__goal {
    then stays calm. Applied to the wrap so it never fights the card's tilt
    transform on .daycard-ns. */
 @keyframes daycard-materialize {
-  from { opacity: 0; transform: scale(0.955); filter: blur(9px); }
-  60%  { opacity: 1; }
-  to   { opacity: 1; transform: scale(1); filter: blur(0); }
+  from { opacity: 0; transform: scale(0.93); filter: blur(13px) saturate(0.35); }
+  45%  { opacity: 1; }
+  to   { opacity: 1; transform: scale(1); filter: blur(0) saturate(1); }
 }
-.daycard-materialize { animation: daycard-materialize 440ms cubic-bezier(0.2, 0.72, 0.2, 1) both; will-change: transform, opacity, filter; }
+/* Slower + gentler so the color blooms in smoothly (blank -> colored), never a pop. */
+.daycard-materialize { animation: daycard-materialize 760ms cubic-bezier(0.22, 1, 0.36, 1) both; will-change: transform, opacity, filter; }
 @media (prefers-reduced-motion: reduce) { .daycard-materialize { animation: none; } }
 /* Light theme: the lavender aura sits on near-white; deepen it slightly. */
 html.theme-light .daycard-wrap__aura {
@@ -3084,7 +3085,27 @@ html.lowfx .daycard-ns {
   transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 #mementoFull.mf--open .mf__scroll { transform: none; }
-.mf__card { margin: 8px 0 4px; }
+/* The card zooms open (it grows into the screen) rather than popping in, and the
+   breakdown below settles up just behind it for a layered, intentional entrance. */
+.mf__card {
+  margin: 8px 0 4px;
+  transform: scale(0.74);
+  opacity: 0;
+  transition: transform 0.52s cubic-bezier(0.34, 1.32, 0.5, 1), opacity 0.4s ease;
+}
+#mementoFull.mf--open .mf__card { transform: scale(1); opacity: 1; }
+.mf__eyebrow, .mf__stats, .mf__share, .mf__hint {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.4s ease 0.14s, transform 0.46s cubic-bezier(0.22, 1, 0.36, 1) 0.14s;
+}
+#mementoFull.mf--open .mf__eyebrow,
+#mementoFull.mf--open .mf__stats,
+#mementoFull.mf--open .mf__share,
+#mementoFull.mf--open .mf__hint { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .mf__card, .mf__eyebrow, .mf__stats, .mf__share, .mf__hint { transition: none; transform: none; opacity: 1; }
+}
 #mementoFull .daycard-ns { width: 300px; min-height: 420px; margin: 0; }
 #mementoFull .daycard-theme-living .daycard-living-stage { width: 300px; margin: 14px auto 26px; }
 .mf__eyebrow {
