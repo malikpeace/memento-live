@@ -1,0 +1,130 @@
+/* ============================================================
+   MEMENTO SHARE CARD overlay
+   The win-moment share sheet. Dark, glassy, focused: the card is
+   the hero, one primary action. Portals to <body> (see js/08
+   MementoShareCard.open). Dark-first; faithful in light mode.
+   ============================================================ */
+.msc-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000; /* above the ceremony + tab bar */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(24px, env(safe-area-inset-top)) 22px max(24px, env(safe-area-inset-bottom));
+  opacity: 0;
+  transition: opacity 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.msc-overlay.is-in { opacity: 1; }
+
+.msc-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 4, 8, 0.82);
+  -webkit-backdrop-filter: blur(28px) saturate(1.2);
+  backdrop-filter: blur(28px) saturate(1.2);
+}
+
+.msc-panel {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 384px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transform: translateY(14px) scale(0.985);
+  transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.msc-overlay.is-in .msc-panel { transform: translateY(0) scale(1); }
+
+/* The card preview, in a soft glass frame that lifts it off the scrim. */
+.msc-frame {
+  width: 100%;
+  max-width: 320px;
+  border-radius: calc(20px * var(--rx, 1));
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  /* Inset highlight + neutral deep shadow only. The card carries its own glow;
+     a colored halo here would be purple-on-purple. */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 30px 80px rgba(0, 0, 0, 0.6);
+}
+.msc-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: calc(13px * var(--rx, 1));
+}
+
+.msc-title {
+  margin-top: 26px;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-hi, rgba(255, 255, 255, 0.95));
+}
+.msc-sub {
+  margin-top: 6px;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: var(--text-2, rgba(255, 255, 255, 0.6));
+}
+
+/* Share is the single hero: full-width primary. Copy text + Not now are quiet
+   peer links beneath it, so the win moment has one clear action. */
+.msc-btn {
+  width: 100%;
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.96rem;
+  cursor: pointer;
+  border: none;
+  border-radius: calc(13px * var(--rx, 1));
+  padding: 15px 18px;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.12s ease, opacity 0.18s ease;
+}
+.msc-btn:active { transform: scale(0.97); }
+.msc-btn--primary {
+  margin-top: 22px;
+  background: var(--solid-bg, #fff);
+  color: var(--solid-fg, #000);
+}
+
+.msc-subactions {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+.msc-link {
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.86rem;
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: var(--text-lo, rgba(255, 255, 255, 0.45));
+  padding: 8px 4px;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.18s ease;
+}
+.msc-link:active { opacity: 0.6; }
+
+.msc-msg {
+  min-height: 18px;
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: rgba(180, 176, 200, 0.8);
+}
+
+/* Light mode: the scrim stays dark (the card is dark art and reads best on a
+   dark backdrop), but the title/sub use the theme tokens which already flip. */
+html.theme-light .msc-scrim { background: rgba(8, 8, 14, 0.66); }
+
+@media (prefers-reduced-motion: reduce) {
+  .msc-overlay, .msc-panel { transition: none; }
+}

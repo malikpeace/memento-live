@@ -2069,6 +2069,11 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
   gap: 12px;
   margin-top: 6px;
 }
+.ns-summary__actions-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
 .ns-summary__explore {
   display: inline-flex;
   align-items: center;

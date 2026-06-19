@@ -4189,3 +4189,347 @@ function renderAll() {
   // in sync with state. No-op on mobile since Sidebar.el is null there.
   if (typeof Sidebar !== 'undefined' && Sidebar.refresh) Sidebar.refresh();
 }
+
+/* ============================================================
+   MEMENTO SHARE CARD  (the win-moment viral lever)
+   A premium, designed PNG of the user's *living* Memento card,
+   offered right after the Neutron Star is born. Renders the same
+   pillar palette as the in-app living card (clarity purple, action
+   white, consistency green) so the shared image IS their card, with
+   their goal engraved and mortality woven in. Strictly READ-ONLY.
+   Canvas (no glass) so the export is verifiable + reliable.
+   ============================================================ */
+const MementoShareCard = {
+  _overlay: null,
+
+  // ---- read-only gatherers ----
+  _goal() {
+    const a = (state.clarity && state.clarity.answers) || {};
+    return (a.neutronStar || a.keystone || '').trim();
+  },
+  _starName() {
+    const a = (state.clarity && state.clarity.answers) || {};
+    return (a.starName || '').trim();
+  },
+  _weeksLeft() {
+    try {
+      const by = state.mori && state.mori.birthYear;
+      if (by && typeof moriWeeksLived === 'function' && typeof moriTotalWeeks === 'function') {
+        const lived = moriWeeksLived(by);
+        // A future / typo birthYear yields negative weeks-lived, which would print
+        // an absurd inflated count. Omit the Mori line entirely in that case.
+        if (lived < 0) return null;
+        const le = (state.mori && state.mori.lifeExpectancy) || 80;
+        return Math.max(0, moriTotalWeeks(le) - lived);
+      }
+    } catch (e) {}
+    return null;
+  },
+  _levels() {
+    try { if (typeof livingCardLevels === 'function') return livingCardLevels(); } catch (e) {}
+    return { clar: 100, act: 0, cons: 0 };
+  },
+
+  // ---- canvas helpers ----
+  _font(weight, px) {
+    return weight + ' ' + px + 'px Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
+  },
+  // Centered text with manual letter-spacing (canvas letterSpacing is spotty).
+  _tracked(ctx, text, cx, y, track) {
+    const chars = String(text).split('');
+    let total = 0;
+    for (let i = 0; i < chars.length; i++) total += ctx.measureText(chars[i]).width + (i < chars.length - 1 ? track : 0);
+    let x = cx - total / 2;
+    const prevAlign = ctx.textAlign;
+    ctx.textAlign = 'left';
+    for (let i = 0; i < chars.length; i++) {
+      ctx.fillText(chars[i], x, y);
+      x += ctx.measureText(chars[i]).width + track;
+    }
+    ctx.textAlign = prevAlign;
+  },
+  _wrap(ctx, text, maxWidth, maxLines) {
+    const words = String(text || '').split(/\s+/).filter(Boolean);
+    const lines = [];
+    let line = '';
+    for (let i = 0; i < words.length; i++) {
+      if (ctx.measureText(words[i]).width > maxWidth) {
+        let wtr = words[i];
+        while (wtr.length > 1 && ctx.measureText(wtr + '…').width > maxWidth) wtr = wtr.slice(0, -1);
+        words[i] = wtr + '…';
+      }
+      const test = line ? line + ' ' + words[i] : words[i];
+      if (ctx.measureText(test).width > maxWidth && line) {
+        lines.push(line);
+        line = words[i];
+        if (lines.length === maxLines - 1) {
+          let rest = words.slice(i).join(' ');
+          while (ctx.measureText(rest + '…').width > maxWidth && rest.length > 1) rest = rest.slice(0, -1);
+          if (words.slice(i).join(' ') !== rest) rest = rest.replace(/\s+\S*$/, '') + '…';
+          lines.push(rest);
+          return lines;
+        }
+      } else { line = test; }
+    }
+    if (line) lines.push(line);
+    return lines.slice(0, maxLines);
+  },
+  _bloom(ctx, x, y, r, color, alpha) {
+    if (alpha <= 0.001) return;
+    const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+    g.addColorStop(0, color.replace('ALPHA', alpha.toFixed(3)));
+    g.addColorStop(0.45, color.replace('ALPHA', (alpha * 0.45).toFixed(3)));
+    g.addColorStop(1, color.replace('ALPHA', '0'));
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, 1080, 1350);
+  },
+
+  // ---- draw the card (1080x1350, 4:5 portrait for social) ----
+  _draw(canvas) {
+    const W = 1080, H = 1350;
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    const L = this._levels();
+    const clar = Math.max(0, Math.min(1, (L.clar || 0) / 100));
+    const act = Math.max(0, Math.min(1, (L.act || 0) / 100));
+    const cons = Math.max(0, Math.min(1, (L.cons || 0) / 100));
+    // clarity is the anchor of this moment; never let the scene go fully dark.
+    const clarLit = Math.max(0.7, clar);
+
+    ctx.clearRect(0, 0, W, H);
+
+    // base near-black gradient (matches the app's dark soul)
+    const bg = ctx.createLinearGradient(0, 0, 0, H);
+    bg.addColorStop(0, '#0c0b13');
+    bg.addColorStop(0.52, '#09080f');
+    bg.addColorStop(1, '#060509');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    // Pillar blooms, additive so they read as light through glass. Colors mirror
+    // the in-app living card's blob values EXACTLY (css/daycard-living.css: clarity
+    // 150,116,255 / action 236,239,255 / consistency 56,236,150) so the exported
+    // image is literally the user's living card, not a near-miss. Clarity is the
+    // anchor and stays dominant; action/consistency are kept subordinate so a
+    // fully-lit re-share never crowds the engraved goal with opposed color masses.
+    ctx.globalCompositeOperation = 'lighter';
+    this._bloom(ctx, W * 0.66, H * 0.27, W * 0.92, 'rgba(150,116,255,ALPHA)', 0.40 * clarLit);
+    this._bloom(ctx, W * 0.70, H * 0.24, W * 0.42, 'rgba(176,150,255,ALPHA)', 0.30 * clarLit);
+    this._bloom(ctx, W * 0.30, H * 0.49, W * 0.50, 'rgba(236,239,255,ALPHA)', 0.17 * act);
+    this._bloom(ctx, W * 0.30, H * 0.74, W * 0.62, 'rgba(56,236,150,ALPHA)', 0.20 * cons);
+    // a cool reflected pool low on the card, like the living card's mirror
+    this._bloom(ctx, W * 0.52, H * 1.02, W * 0.85, 'rgba(120,140,220,ALPHA)', 0.14 * clarLit);
+    ctx.globalCompositeOperation = 'source-over';
+
+    // Star motif: a single soft luminous core at the bloom peak. No diffraction
+    // spikes (a hard cross-of-light reads as a Canva sparkle); the glow is the star.
+    const sx = W * 0.66, sy = H * 0.27;
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    const core = ctx.createRadialGradient(sx, sy, 0, sx, sy, 104);
+    core.addColorStop(0, 'rgba(249,247,255,' + (0.62 * clarLit).toFixed(3) + ')');
+    core.addColorStop(0.38, 'rgba(198,182,255,' + (0.22 * clarLit).toFixed(3) + ')');
+    core.addColorStop(1, 'rgba(198,182,255,0)');
+    ctx.fillStyle = core;
+    ctx.fillRect(0, 0, W, H);
+    ctx.restore();
+
+    // vignette: pull the edges down so the eye sits center
+    const vig = ctx.createRadialGradient(W / 2, H * 0.46, H * 0.2, W / 2, H * 0.5, H * 0.78);
+    vig.addColorStop(0, 'rgba(0,0,0,0)');
+    vig.addColorStop(1, 'rgba(0,0,0,0.55)');
+    ctx.fillStyle = vig;
+    ctx.fillRect(0, 0, W, H);
+
+    // ---- type ----
+    ctx.textBaseline = 'alphabetic';
+
+    // eyebrow
+    ctx.fillStyle = 'rgba(198,186,255,0.82)';
+    ctx.font = this._font('600', 27);
+    this._tracked(ctx, 'MY NEUTRON STAR', W / 2, 196, 5);
+
+    // goal: the engraved hero, auto-sized to fit
+    const goal = this._goal() || 'Set your Neutron Star';
+    const maxW = W - 200;
+    // Auto-size so the goal is engraved in full: pick the largest font where the
+    // wrapped goal fits within 6 lines + the height budget. Only pathological
+    // input (a single unbroken token wider than the card) is ever ellipsized.
+    let size = 78, lines = [];
+    for (; size >= 38; size -= 2) {
+      ctx.font = this._font('700', size);
+      lines = this._wrap(ctx, goal, maxW, 6);
+      const lineH = size * 1.16;
+      if (lines.length * lineH <= 600) break;
+    }
+    ctx.font = this._font('700', size);
+    ctx.fillStyle = 'rgba(247,247,252,0.98)';
+    ctx.textAlign = 'center';
+    const lineH = size * 1.16;
+    const blockH = lines.length * lineH;
+    let ty = H * 0.5 - blockH / 2 + size * 0.82;
+    lines.forEach(function (ln) { ctx.fillText(ln, W / 2, ty); ty += lineH; });
+    ctx.textAlign = 'left';
+
+    // hairline rule under the goal
+    const ruleY = H * 0.5 + blockH / 2 + 46;
+    ctx.strokeStyle = 'rgba(255,255,255,0.16)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(W / 2 - 34, ruleY);
+    ctx.lineTo(W / 2 + 34, ruleY);
+    ctx.stroke();
+
+    // star designation (if named)
+    const name = this._starName();
+    if (name) {
+      ctx.fillStyle = 'rgba(176,170,206,0.72)';
+      ctx.font = this._font('600', 24);
+      this._tracked(ctx, name.toUpperCase(), W / 2, ruleY + 52, 3);
+    }
+
+    // Mori line: mortality woven in, the reason the goal matters. Plain register,
+    // matching the in-app whisper bar ("~X weeks left"), not a motivational tail.
+    const wl = this._weeksLeft();
+    if (wl != null) {
+      ctx.fillStyle = 'rgba(174,168,200,0.62)';
+      ctx.font = this._font('500', 29);
+      ctx.textAlign = 'center';
+      ctx.fillText('~' + wl.toLocaleString() + ' weeks left.', W / 2, H - 174);
+      ctx.textAlign = 'left';
+    }
+
+    // wordmark
+    ctx.fillStyle = 'rgba(158,152,186,0.78)';
+    ctx.font = this._font('700', 28);
+    this._tracked(ctx, 'MEMENTO', W / 2, H - 92, 7);
+  },
+
+  // ---- open the share moment (dedicated premium overlay) ----
+  open() {
+    if (!this._goal()) return; // nothing to share without a star
+    // Capture the underlying overflow BEFORE removing any stale overlay, and only
+    // when none is currently open, so a re-open does not capture our own 'hidden'.
+    // The card can open OVER the Clarity ceremony, which holds its own scroll-lock;
+    // close() must restore exactly this, not blindly clear it.
+    if (!this._overlay) this._prevOverflow = document.body.style.overflow;
+    this._removeOverlay(); // remove a stale overlay's DOM only (does not touch overflow)
+    const ov = document.createElement('div');
+    ov.className = 'msc-overlay';
+    ov.setAttribute('role', 'dialog');
+    ov.setAttribute('aria-label', 'Share your Neutron Star');
+    ov.innerHTML =
+      '<div class="msc-scrim"></div>' +
+      '<div class="msc-panel">' +
+        '<div class="msc-frame"><canvas class="msc-canvas" id="mscCanvas" width="1080" height="1350"></canvas></div>' +
+        '<div class="msc-title">Your star, sealed.</div>' +
+        '<div class="msc-sub">Yours to keep, or to share.</div>' +
+        '<button type="button" class="msc-btn msc-btn--primary" id="mscShare">Share</button>' +
+        '<div class="msc-subactions">' +
+          '<button type="button" class="msc-link" id="mscCopy">Copy text</button>' +
+          '<button type="button" class="msc-link" id="mscLater">Not now</button>' +
+        '</div>' +
+        '<div class="msc-msg" id="mscMsg" aria-live="polite"></div>' +
+      '</div>';
+    document.body.appendChild(ov);
+    this._overlay = ov;
+    document.body.style.overflow = 'hidden';
+
+    const canvas = ov.querySelector('#mscCanvas');
+    const self = this;
+    const drawNow = function () { try { self._draw(canvas); } catch (e) {} };
+    drawNow();
+    // redraw once the Geist webfont is ready so the export uses the brand face
+    try { if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawNow); } catch (e) {}
+
+    requestAnimationFrame(function () { ov.classList.add('is-in'); });
+
+    const msg = ov.querySelector('#mscMsg');
+    const flash = function (t, ok) { if (!msg) return; msg.textContent = t; msg.style.color = ok ? 'rgba(120,230,170,0.95)' : 'rgba(180,176,200,0.8)'; };
+
+    ov.querySelector('#mscShare').addEventListener('click', function () { self._shareOrSave(canvas, flash); });
+    ov.querySelector('#mscCopy').addEventListener('click', function () { self._copyText(flash); });
+    ov.querySelector('#mscLater').addEventListener('click', function () { self.close(); });
+    ov.querySelector('.msc-scrim').addEventListener('click', function () { self.close(); });
+  },
+
+  // Remove the overlay DOM only. Does NOT restore overflow (open() reuses this).
+  _removeOverlay() {
+    const ov = this._overlay || document.querySelector('.msc-overlay');
+    if (ov && ov.parentNode) ov.parentNode.removeChild(ov);
+    this._overlay = null;
+  },
+
+  close() {
+    this._removeOverlay();
+    // Restore the captured value (keeps the ceremony's scroll-lock if it set one).
+    try { document.body.style.overflow = this._prevOverflow || ''; } catch (e) {}
+    this._prevOverflow = undefined;
+  },
+
+  _text() {
+    const goal = this._goal();
+    let t = 'My Neutron Star\n\n' + goal;
+    const wl = this._weeksLeft();
+    if (wl != null) t += '\n\n~' + wl.toLocaleString() + ' weeks left.';
+    return t + '\n\nMade in Memento';
+  },
+
+  _copyText(flash) {
+    const text = this._text();
+    try {
+      navigator.clipboard.writeText(text).then(
+        function () { flash('Copied.', true); },
+        function () { flash('Could not copy here.'); }
+      );
+    } catch (e) { flash('Could not copy here.'); }
+  },
+
+  // Native share sheet with the image (the real path on a phone); falls back
+  // to a PNG download on desktop / unsupported browsers.
+  _shareOrSave(canvas, flash) {
+    const self = this;
+    const fail = function () {
+      try {
+        let url = '';
+        try { url = canvas.toDataURL('image/png'); } catch (e) { url = ''; }
+        if (!(typeof url === 'string' && url.indexOf('data:image/png') === 0 && url.length > 1000)) {
+          flash("Can't make the image here. Copy the text instead.");
+          return;
+        }
+        const a = document.createElement('a');
+        a.href = url; a.download = 'my-neutron-star.png';
+        document.body.appendChild(a); a.click();
+        setTimeout(function () { if (a.parentNode) a.parentNode.removeChild(a); }, 100);
+        flash('Saved to your downloads.', true);
+      } catch (e) { flash("Can't make the image here. Copy the text instead."); }
+    };
+    try {
+      if (!canvas.toBlob) { fail(); return; }
+      canvas.toBlob(function (blob) {
+        if (!blob) { fail(); return; }
+        try {
+          const file = new File([blob], 'my-neutron-star.png', { type: 'image/png' });
+          if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
+            navigator.share({ files: [file], text: self._text() }).then(
+              function () { flash('Shared.', true); },
+              function (err) { if (err && err.name === 'AbortError') { flash(''); } else { fail(); } }
+            );
+          } else { fail(); }
+        } catch (e) { fail(); }
+      }, 'image/png');
+    } catch (e) { fail(); }
+  }
+};
+try { window.MementoShareCard = MementoShareCard; } catch (e) {}
+// One delegated listener so any [data-share-star] control (the Neutron Star
+// summary link, the hub) opens the share moment, surviving innerHTML re-renders.
+try {
+  document.addEventListener('click', function (e) {
+    const t = e.target && e.target.closest && e.target.closest('[data-share-star]');
+    if (!t) return;
+    e.preventDefault();
+    try { MementoShareCard.open(); } catch (err) {}
+  });
+} catch (e) {}

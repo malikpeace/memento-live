@@ -1134,7 +1134,10 @@ function renderNeutronStarSummary(summary, { allowContinue = false, showRestart 
           ${summary.tensionLine ? `<div class="ns-summary__tension">${esc(summary.tensionLine)}</div>` : ''}
           <div class="ns-summary__discovery">This was already true. You just had not said it out loud yet.</div>
           <div class="ns-summary__actions">
-            <button type="button" id="summaryContinue" class="ns-summary__refine-link">Refine answers</button>
+            <div class="ns-summary__actions-left">
+              <button type="button" id="summaryContinue" class="ns-summary__refine-link">Refine answers</button>
+              <button type="button" class="ns-summary__refine-link" data-share-star aria-label="Share your Neutron Star">Share</button>
+            </div>
             <button type="button" id="summaryAction" class="ns-summary__explore">
               <span class="ns-summary__explore-label">Take Action</span>
               <span class="ns-summary__explore-icon">${arrowDown}</span>
