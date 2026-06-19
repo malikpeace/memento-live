@@ -3210,6 +3210,9 @@ body.pre-clarity .capture-fab { display: none !important; }
   color: var(--text-2);
 }
 .hubcc__shown { white-space: nowrap; }
+/* Comeback / at-risk variant is a single full-width line that may wrap. */
+.hubcc--msg { justify-content: flex-start; }
+.hubcc--msg .hubcc__shown { white-space: normal; line-height: 1.4; }
 .hubcc__shown b,
 .hubcc__total b {
   font-weight: 700;

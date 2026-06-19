@@ -3313,6 +3313,22 @@ function renderHubConsistency() {
         community = '<span class="hubcc__community">' + n.toLocaleString() + ' days shown up in Memento</span>';
       }
     } catch (e) {}
+    // Warm states (no guilt, green never turns red, the total is never zeroed):
+    // comeback after a gap replaces the line with a welcome; late-in-day and not
+    // yet shown up is a gentle nudge, not a warning.
+    const todayISO = getTodayISO();
+    const doneToday = (cs.counts || {})[todayISO] !== undefined;
+    let comeback = false;
+    try { comeback = (typeof isComebackGap === 'function') && isComebackGap(); } catch (e) {}
+    const lateAndNotDone = !doneToday && !comeback && new Date().getHours() >= 14;
+    if (comeback) {
+      el.innerHTML = '<div class="hubcc hubcc--msg"><span class="hubcc__shown">Welcome back. You have shown up <b>' + total + '</b> day' + (total === 1 ? '' : 's') + '. Today makes <b>' + (total + 1) + '</b>.</span></div>' + community;
+      return;
+    }
+    if (lateAndNotDone) {
+      el.innerHTML = '<div class="hubcc hubcc--msg"><span class="hubcc__shown">Still time to show up today. The next move is right here.</span></div>' + community;
+      return;
+    }
     el.innerHTML =
       '<div class="hubcc">' +
         '<span class="hubcc__shown">Shown up <b>' + thisWeek + '</b> of 7 this week</span>' +
