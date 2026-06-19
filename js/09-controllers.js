@@ -991,7 +991,7 @@ const WelcomeIntro = {
     // Clarity leads (the real clarity-gap signal); the area question follows as
     // "what's it about", so the two no longer feel like the same question.
     { key: 'clarityLevel', type: 'choices', multi: false,
-      headline: 'Do you actually know what you want?',
+      headline: 'Do you have a goal or mission you want to achieve above everything else?',
       sub: 'Be honest. Naming it is the whole first step.',
       options: ['Yes, I know exactly', 'I have a rough idea', "Not really, I'm figuring it out", 'No, I feel lost'] },
     { key: 'runningToward', type: 'choices', multi: true,
