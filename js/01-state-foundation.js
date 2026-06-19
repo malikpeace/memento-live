@@ -78,7 +78,7 @@ const DEFAULT_STATE = {
   flow: { items: JSON.parse(JSON.stringify(DEFAULT_FLOW_ITEMS)) },
   // Day Card look. 'platinum' = the classic glass hero; 'living' = the
   // color-morph + ground-reflection theme whose hue tracks the three pillars.
-  dayCard: { theme: 'platinum' },
+  dayCard: { theme: 'living' },
   mori: { birthYear: null, lifeExpectancy: 80, reminderText: 'Make it count.', screenTimeHours: 4, futureSelfNote: '', lifestyle: { sleepHrs: 8, workHrs: 8, humanHrs: 2.5, screenHrs: 4, booksPerYear: 5 }, auditDone: false, people: [] },
   lifestats: { sleep: 0, diet: 0, exercise: 0, mood: 0, stress: 0, focus: 0, history: [] },
   // v23 Check-in: one light daily pulse (replaces Energy + Friction on the
@@ -1331,6 +1331,16 @@ function migrateState() {
     if (!Array.isArray(state.action.projects)) state.action.projects = [];
     if (!Array.isArray(state.inbox)) state.inbox = [];
     if (!Array.isArray(state.updates)) state.updates = [];
+    // One-time: the Memento card is now LIVING (color evolves with the pillars)
+    // by default. Flip anyone still on the old 'platinum' default once. After
+    // this runs, an explicit platinum pick in Settings/emblem sticks (the guard
+    // never re-flips). New users default to living via DEFAULT_STATE.
+    try {
+      if (!state.meta.livingDefaultV1) {
+        if (state.dayCard && state.dayCard.theme === 'platinum') state.dayCard.theme = 'living';
+        state.meta.livingDefaultV1 = true;
+      }
+    } catch (e) {}
     // One-time: the old Inbox captures move into a "Captures" folder in Notes.
     // The Inbox module itself becomes the quiet Updates center, so nothing a
     // user wrote is ever stranded in a module that no longer captures.

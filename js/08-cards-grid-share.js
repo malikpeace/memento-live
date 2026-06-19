@@ -3478,6 +3478,23 @@ function renderDayCard() {
     // relief, light catching its lower edge, shadow on the upper (a deboss).
     const emblemSvg = '<svg class="daycard-ns__emblem" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
     const nameSpan = '<span class="daycard-ns__name">' + esc(((state.profile && state.profile.name) || '').trim()) + '</span>';
+    // The Neutron Star goal engraved small + quiet on the card face (the artifact
+    // carries your purpose). Trimmed to one line; the full goal lives in Clarity.
+    let goalSpan = '';
+    try {
+      const _g = (state.clarity && state.clarity.completed && state.clarity.answers && state.clarity.answers.neutronStar) ? String(state.clarity.answers.neutronStar).replace(/\s+/g, ' ').trim() : '';
+      if (_g) { const _gs = _g.length > 66 ? _g.slice(0, 64).trim() + '…' : _g; goalSpan = '<div class="daycard-ns__goal">' + esc(_gs) + '</div>'; }
+    } catch (e) {}
+    // Materialize once per day: the card's signature entrance plays only on the
+    // first Home open each day, then stays calm (Malik's pick).
+    let materialize = false;
+    try {
+      const _today = (typeof getTodayISO === 'function') ? getTodayISO() : '';
+      if (_today && state.meta && state.meta.cardSeenISO !== _today) {
+        materialize = true; state.meta.cardSeenISO = _today;
+        try { if (!DEMO_MODE && typeof persistState === 'function') persistState(); } catch (e) {}
+      }
+    } catch (e) {}
 
     const ns =
       '<div class="daycard-ns" id="dayCardNs">' +
@@ -3486,7 +3503,7 @@ function renderDayCard() {
         '<span class="daycard-ns__sheen" aria-hidden="true"></span>' +
         (living ? '<span class="daycard-ns__burn" aria-hidden="true"></span>' : '') +
         '<div class="daycard-ns__body">' + emblemSvg + '</div>' +
-        '<div class="daycard-ns__foot">' + nameSpan + '</div>' +
+        '<div class="daycard-ns__foot">' + goalSpan + nameSpan + '</div>' +
       '</div>';
 
     // Living wraps the card + its bloom + ground reflection in a stage sized to
@@ -3503,7 +3520,7 @@ function renderDayCard() {
     // its scroll page-state watcher are gone (the two-page snap they served was
     // removed). The card is just the wrap.
     el.innerHTML =
-      '<div class="daycard-wrap daycard-theme-' + theme + '">' +
+      '<div class="daycard-wrap daycard-theme-' + theme + (materialize ? ' daycard-materialize' : '') + '">' +
         '<span class="daycard-wrap__aura" aria-hidden="true"></span>' +
         inner +
       '</div>';
