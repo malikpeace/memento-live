@@ -924,7 +924,9 @@ body.calm-motion .empty-state, body.lite .empty-state { animation: none; }
      re-rasterizes the fixed layer; the blurred child repaints a frame late,
      which flashed the dark base. A plain gradient on the base paints instantly,
      so the color is always there, no dark flash. */
-  background: radial-gradient(125% 75% at 50% 40%, rgba(95,88,222,0.26), rgba(24,18,46,0.74) 48%, #04040a 84%), #030208;
+  /* ~50% darker onboarding bg (Malik): the center glow was too bright. Halved
+     the glow alpha and deepened the mid-stop so the copy sits on near-black. */
+  background: radial-gradient(125% 75% at 50% 40%, rgba(95,88,222,0.13), rgba(18,14,36,0.82) 46%, #04040a 84%), #030208;
   display: flex; flex-direction: column;
   opacity: 0; pointer-events: none;
   transition: opacity 1s ease;
@@ -948,25 +950,48 @@ body.calm-motion .empty-state, body.lite .empty-state { animation: none; }
   width: 82vmin; height: 82vmin;
   background: radial-gradient(circle at center, #6d3df0 0%, rgba(109,61,240,0.30) 50%, transparent 70%);
   top: 4%; left: 28%;
-  animation: splashFloat1 38s ease-in-out infinite;
+  animation: welcOrbFloat1 30s ease-in-out infinite;
 }
 .welcome-intro__orb--red {
   width: 76vmin; height: 76vmin;
   background: radial-gradient(circle at center, #ff3e8f 0%, rgba(255,62,143,0.24) 50%, transparent 70%);
   bottom: -16%; right: -8%;
-  animation: splashFloat2 36s ease-in-out infinite;
+  animation: welcOrbFloat2 29s ease-in-out infinite;
 }
 .welcome-intro__orb--green {
   width: 70vmin; height: 70vmin;
   background: radial-gradient(circle at center, #1ea7ff 0%, rgba(30,167,255,0.26) 50%, transparent 70%);
   top: -10%; left: -10%;
-  animation: splashFloat3 40s ease-in-out infinite;
+  animation: welcOrbFloat3 32s ease-in-out infinite;
 }
 .welcome-intro__orb--blue {
   width: 62vmin; height: 62vmin;
   background: radial-gradient(circle at center, #b144ff 0%, rgba(177,68,255,0.24) 50%, transparent 72%);
   bottom: 4%; left: 14%;
-  animation: splashFloat4 42s ease-in-out infinite;
+  animation: welcOrbFloat4 33s ease-in-out infinite;
+}
+/* Onboarding-only orb drift: ~75% more travel than the splash's splashFloat
+   (and a shorter period, so it reads as livelier). Kept separate so the splash
+   orbs are untouched. Opacities match the originals so only the motion changed. */
+@keyframes welcOrbFloat1 {
+  0%, 100% { transform: translate(0, 0) scale(0.85); opacity: 0.12; }
+  33% { transform: translate(24.5vmax, 15.75vmax) scale(1); opacity: 0.2; }
+  66% { transform: translate(10.5vmax, 28vmax) scale(1.05); opacity: 0.22; }
+}
+@keyframes welcOrbFloat2 {
+  0%, 100% { transform: translate(0, 0) scale(0.85); opacity: 0.1; }
+  40% { transform: translate(-21vmax, 17.5vmax) scale(1); opacity: 0.2; }
+  75% { transform: translate(-8.75vmax, 24.5vmax) scale(0.95); opacity: 0.18; }
+}
+@keyframes welcOrbFloat3 {
+  0%, 100% { transform: translate(0, 0) scale(0.85); opacity: 0.12; }
+  35% { transform: translate(22.75vmax, -14vmax) scale(1.05); opacity: 0.22; }
+  70% { transform: translate(7vmax, -26.25vmax) scale(0.95); opacity: 0.18; }
+}
+@keyframes welcOrbFloat4 {
+  0%, 100% { transform: translate(0, 0) scale(0.85); opacity: 0.1; }
+  40% { transform: translate(-24.5vmax, -17.5vmax) scale(1); opacity: 0.2; }
+  72% { transform: translate(-8.75vmax, -28vmax) scale(1.05); opacity: 0.22; }
 }
 .welcome-intro__page-wrap {
   position: relative; z-index: 1;
@@ -1394,10 +1419,15 @@ body.calm-motion .welcome-intro__pillar-ground {
      gradient every frame) so the GPU isn't pegged the whole time. */
   .ambient__rays, .ambient__rays-source, .ambient__rays-beam, .ambient__rays-beam-shaft,
   .ambient__ns-bloom, .ambient__orb, .ambient__blob-bg, .apl-rays .ambient__rays-beam,
-  .splash-blob, .welcome-intro__orb, .login__orb, .memento-visual__beam {
+  .splash-blob, .login__orb, .memento-visual__beam {
     animation: none !important;
     will-change: auto !important;
   }
+  /* The onboarding orbs ARE allowed to drift on mobile (Malik wants them moving):
+     their welcOrbFloat animation is transform + opacity only, which is GPU-cheap
+     (compositor-only, no per-frame re-raster), and the blur is already dropped to
+     18px above. will-change stays auto so they don't hold a promoted layer. */
+  .welcome-intro__orb { will-change: auto !important; }
   /* Splash + auth beams keep their FULL desktop motion on phones: the same
      per-beam ambientBeamFlicker (opacity + scaleY, staggered by each beam's own
      --d/--del) that already looks good on desktop. The blanket freeze above is

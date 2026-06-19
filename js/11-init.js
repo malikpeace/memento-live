@@ -1893,8 +1893,11 @@ window.addEventListener('keydown', (e) => {
     // dragging the splash to ~18fps on iPad.
     'body.lite .splash-blob{filter:blur(22px)!important;animation:none!important;}',
     'body.lite .splash__bg-gradient::before,body.lite .splash__bg-gradient::after{animation:none!important;}',
-    // Welcome/onboarding screen: 4 big blur(34px) orbs were animating -> static.
-    'body.lite .welcome-intro__orb{animation:none!important;}',
+    // Welcome/onboarding screen: the 4 orbs ARE allowed to drift in lite (Malik
+    // wants them moving). The animation is transform + opacity only (GPU-cheap,
+    // compositor-only) and the blur is dropped to 18px in onboarding.css, so just
+    // keep will-change off to limit layer memory; do NOT freeze the animation.
+    'body.lite .welcome-intro__orb{will-change:auto!important;}',
     // Login screen: 4 big blur(34px) orbs (will-change:transform) drift on very
     // slow 36-42s loops. Freeze them static in lite (same fix as splash/welcome
     // orbs) and release the GPU layer. They settle to the base translucent glow;
