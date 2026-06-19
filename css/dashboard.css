@@ -3154,11 +3154,11 @@ html.lowfx .daycard-ns {
   /* The greeting block (and its headline) hands the header to the brand. */
   .dash-header__greeting { display: none; }
   #dashGreetingMobile {
-    /* Whisper bar near the top of the dashboard: date left, weeks-left right.
+    /* Whisper bar near the top of the dashboard: just the date, aligned right.
        Ambient + lowest weight, it orients without competing with the card. */
     display: flex;
     align-items: baseline;
-    justify-content: space-between;
+    justify-content: flex-end;
     flex-wrap: wrap;
     gap: 6px 12px;
     margin: 0 2px 18px;

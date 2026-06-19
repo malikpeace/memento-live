@@ -7,19 +7,29 @@
 #topFade {
   position: fixed;
   top: 0; left: 0; right: 0;
-  height: calc(var(--safe-t, 0px) + 34px);
+  height: calc(var(--safe-t, 0px) + 40px);
   /* Above the module sheets so the status bar is protected wherever content
      scrolls up under it. Below the 9000+ critical alert layer. */
   z-index: 2000;
   pointer-events: none;
   display: none;
-  /* A frosted BLUR band, not a black strip, so scrolling content softens before
-     the clock and battery instead of colliding with them. Two stacked blur
-     layers (strong at the top, light lower) give a gradient-like falloff so the
-     bottom edge is soft, not a hard line. NOTE: a `mask` on this element would
-     isolate it and silently kill backdrop-filter, so the falloff is done with
-     stacked layers, never a mask. */
-  background: transparent;
+  /* A frosted, TRANSLUCENT band (not an opaque black strip) so scrolling content
+     softens behind it before reaching the clock + battery. A subtle translucent
+     gradient tint carries the protection on devices where backdrop-filter does
+     not render (iOS lowfx), and the stacked blur layers below frost it where it
+     does. Fades to transparent at the bottom so there is no hard line.
+     NOTE: a `mask` here would isolate the element and silently kill backdrop-
+     filter, so the falloff is gradient + stacked layers, never a mask. */
+  background: linear-gradient(to bottom,
+    rgba(9, 10, 14, 0.66) 0%,
+    rgba(9, 10, 14, 0.40) 52%,
+    rgba(9, 10, 14, 0) 100%);
+}
+html.theme-light #topFade {
+  background: linear-gradient(to bottom,
+    rgba(244, 245, 248, 0.72) 0%,
+    rgba(244, 245, 248, 0.42) 52%,
+    rgba(244, 245, 248, 0) 100%);
 }
 #topFade::before, #topFade::after {
   content: '';
@@ -49,8 +59,8 @@ body:has(.action-exp.open) #topFade { display: none; }
   display: flex; align-items: stretch; justify-content: center;
   gap: 4px;
   background: var(--glass-bg-heavy);
-  backdrop-filter: blur(calc(36px * var(--bx, 1))) saturate(140%);
-  -webkit-backdrop-filter: blur(calc(36px * var(--bx, 1))) saturate(140%);
+  backdrop-filter: blur(calc(48px * var(--bx, 1))) saturate(150%);
+  -webkit-backdrop-filter: blur(calc(48px * var(--bx, 1))) saturate(150%);
   border: 0;
   box-shadow: var(--glass-shadow), var(--glass-highlight);
   border-radius: var(--r-card);
@@ -709,8 +719,10 @@ html.theme-light body.lite .more-space__sheet, html.theme-light.lowfx .more-spac
    small element) and drop the deep glass shadow so it reads flat, not lifted. */
 body.lite .tab-bar, html.lowfx .tab-bar {
   background: rgba(12, 13, 17, 0.42);
-  backdrop-filter: blur(20px) saturate(135%);
-  -webkit-backdrop-filter: blur(20px) saturate(135%);
+  /* Heavier blur so content scrolling behind the bar is well obscured (same
+     transparency, just blurrier for readability). */
+  backdrop-filter: blur(40px) saturate(140%);
+  -webkit-backdrop-filter: blur(40px) saturate(140%);
   box-shadow: var(--glass-highlight);
 }
 html.theme-light body.lite .tab-bar, html.theme-light.lowfx .tab-bar {

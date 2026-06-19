@@ -1163,21 +1163,10 @@ function renderGreeting() {
   } catch (e) {}
   const mg = document.getElementById('dashGreetingMobile');
   if (mg) {
+    // Whisper bar: just the date, aligned right. (Mori "weeks left" lives in the
+    // Memento Mori tile now; the home stays calm.)
     const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
-    const weeksBtn = (weeksLeft != null)
-      ? '<button class="wbar__weeks" id="wbarWeeks" type="button" aria-label="Weeks of life remaining">~' + weeksLeft.toLocaleString() + ' weeks left</button>'
-      : '';
-    mg.innerHTML =
-      '<span class="wbar__date">' + esc(dateStr) + '</span>' +
-      weeksBtn +
-      '<div class="wbar__sacred" id="wbarSacred" hidden></div>';
-    const wb = mg.querySelector('#wbarWeeks');
-    if (wb && weeksLeft != null) wb.addEventListener('click', () => {
-      const s = document.getElementById('wbarSacred');
-      if (!s) return;
-      if (s.hasAttribute('hidden')) { s.textContent = 'About ' + weeksLeft.toLocaleString() + ' weeks left.'; s.removeAttribute('hidden'); }
-      else { s.setAttribute('hidden', ''); }
-    });
+    mg.innerHTML = '<span class="wbar__date">' + esc(dateStr) + '</span>';
   }
   // Desktop header: date, plus the same quiet "~X weeks left" Mori line the
   // mobile whisper bar carries, so mortality is woven in on both layouts.
@@ -3703,13 +3692,9 @@ function renderDayCard() {
     // relief, light catching its lower edge, shadow on the upper (a deboss).
     const emblemSvg = '<svg class="daycard-ns__emblem" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
     const nameSpan = '<span class="daycard-ns__name">' + esc(((state.profile && state.profile.name) || '').trim()) + '</span>';
-    // The Neutron Star goal engraved small + quiet on the card face (the artifact
-    // carries your purpose). Trimmed to one line; the full goal lives in Clarity.
-    let goalSpan = '';
-    try {
-      const _g = (state.clarity && state.clarity.completed && state.clarity.answers && state.clarity.answers.neutronStar) ? String(state.clarity.answers.neutronStar).replace(/\s+/g, ' ').trim() : '';
-      if (_g) { const _gs = _g.length > 66 ? _g.slice(0, 64).trim() + '…' : _g; goalSpan = '<div class="daycard-ns__goal">' + esc(_gs) + '</div>'; }
-    } catch (e) {}
+    // The card face stays pure (no engraved goal): the living color IS the card.
+    // The goal lives in Clarity and on the share/breakdown surfaces.
+    const goalSpan = '';
     // Materialize once per day: the card's signature entrance plays only on the
     // first Home open each day, then stays calm (Malik's pick).
     let materialize = false;
