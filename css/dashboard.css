@@ -3132,25 +3132,41 @@ html.lowfx .daycard-ns {
   /* The greeting block (and its headline) hands the header to the brand. */
   .dash-header__greeting { display: none; }
   #dashGreetingMobile {
-    /* Greeting row near the top of the dashboard: text left, search right.
-       (The header's desktop greeting is hidden in this band; the brand lockup
-       carries the header instead.) */
+    /* Whisper bar near the top of the dashboard: date left, weeks-left right.
+       Ambient + lowest weight, it orients without competing with the card. */
     display: flex;
-    align-items: center;
+    align-items: baseline;
     justify-content: space-between;
-    gap: 12px;
-    margin: 0 2px 14px;
-    padding-top: 26px;
-    font-size: 1.05rem;
-    color: var(--text-mid);
+    flex-wrap: wrap;
+    gap: 6px 12px;
+    margin: 0 2px 18px;
+    padding-top: 24px;
   }
   /* !important matches the older mobile rule that force-showed this block. */
   .dash-header__right { display: none !important; }
-  #dashGreetingMobile .mgreet__name { font-weight: 600; color: var(--text-hi); }
-  #dashGreetingMobile .mgreet__dot { color: var(--text-lo); }
-  /* Search moved to the bottom tab bar, so drop the redundant greeting-row
-     search icon on mobile. The greeting line keeps the full width. */
   #dashGreetingMobile .mgreet__search { display: none !important; }
+  .wbar__date { font-size: 0.8rem; font-weight: 500; color: var(--text-lo); letter-spacing: 0.01em; }
+  .wbar__weeks {
+    font: inherit; font-size: 0.8rem; font-weight: 500;
+    font-variant-numeric: tabular-nums; letter-spacing: 0.01em;
+    color: var(--text-lo); background: none; border: none;
+    padding: 4px 2px; margin: -4px -2px;
+    cursor: pointer; -webkit-tap-highlight-color: transparent;
+    transition: color 0.18s ease;
+  }
+  .wbar__weeks:active { opacity: 0.6; }
+  /* Memento Mori, woven in: tapping the weeks reveals one quiet gold line.
+     Gold (--sacred) appears nowhere else on this screen. */
+  .wbar__sacred {
+    flex-basis: 100%; width: 100%;
+    font-size: 0.82rem; font-weight: 500; letter-spacing: 0.01em;
+    color: var(--sacred);
+    text-shadow: 0 0 20px rgba(217, 180, 92, 0.26);
+    margin-top: 1px;
+    animation: wbar-sacred-in 0.26s ease-out both;
+  }
+  .wbar__sacred[hidden] { display: none; }
+  @keyframes wbar-sacred-in { from { opacity: 0; transform: translateY(-2px); } to { opacity: 1; transform: none; } }
 }
 
 

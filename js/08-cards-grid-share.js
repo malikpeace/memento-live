@@ -1136,16 +1136,33 @@ function renderGreeting() {
   // Search rides along: the dashboard page gets its own search button on
   // the greeting row (the header one is hidden on mobile); it just proxies
   // the real #hubSearch so all Spotlight wiring stays in one place.
+  // Whisper bar (replaces the greeting): date left, "~X weeks left" right, both
+  // ambient + low-weight. The card is the first real thing the eye lands on.
+  // Tapping the weeks reveals one quiet gold line (Memento Mori, woven in).
   const mg = document.getElementById('dashGreetingMobile');
   if (mg) {
+    const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+    let weeksLeft = null;
+    try {
+      const by = state.mori && state.mori.birthYear;
+      if (by && typeof moriWeeksLived === 'function' && typeof moriTotalWeeks === 'function') {
+        const le = (state.mori && state.mori.lifeExpectancy) || 80;
+        weeksLeft = Math.max(0, moriTotalWeeks(le) - moriWeeksLived(by));
+      }
+    } catch (e) {}
+    const weeksBtn = (weeksLeft != null)
+      ? '<button class="wbar__weeks" id="wbarWeeks" type="button" aria-label="Weeks of life remaining">~' + weeksLeft.toLocaleString() + ' weeks left</button>'
+      : '';
     mg.innerHTML =
-      '<span class="mgreet__text"><span class="mgreet__time">' + esc(greet) + '</span> <span class="mgreet__name">' + esc(name) + '</span><span class="mgreet__dot">.</span></span>' +
-      '<button class="hub-search mgreet__search" type="button" aria-label="Search Memento">' +
-        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>' +
-      '</button>';
-    const sb = mg.querySelector('.mgreet__search');
-    if (sb) sb.addEventListener('click', () => {
-      try { const real = document.getElementById('hubSearch'); if (real) real.click(); } catch (e) {}
+      '<span class="wbar__date">' + esc(dateStr) + '</span>' +
+      weeksBtn +
+      '<div class="wbar__sacred" id="wbarSacred" hidden></div>';
+    const wb = mg.querySelector('#wbarWeeks');
+    if (wb && weeksLeft != null) wb.addEventListener('click', () => {
+      const s = document.getElementById('wbarSacred');
+      if (!s) return;
+      if (s.hasAttribute('hidden')) { s.textContent = 'About ' + weeksLeft.toLocaleString() + ' weeks left.'; s.removeAttribute('hidden'); }
+      else { s.setAttribute('hidden', ''); }
     });
   }
   setText('headerDate', now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }));
