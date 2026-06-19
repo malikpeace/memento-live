@@ -3699,16 +3699,25 @@ function renderDayCard() {
     // Materialize once per day: the card's signature entrance plays only on the
     // first Home open each day, then stays calm (Malik's pick).
     let materialize = false;
+    let reveal = false;
     try {
       const _today = (typeof getTodayISO === 'function') ? getTodayISO() : '';
-      // Only "spend" the once-a-day entrance when the card is actually on screen:
-      // the boot mask must be lifted (body.boot-revealed) AND #dayCard must be
-      // visible (offsetParent !== null, i.e. the dashboard is the active view, not
-      // a restored Action/Clarity view). Otherwise the 440ms animation plays under
-      // the mask or on a hidden card and is consumed invisibly. js/11 re-renders
-      // the card right after revealing so a home boot still shows it.
+      // Only "spend" an entrance when the card is actually on screen: the boot mask
+      // must be lifted (body.boot-revealed) AND #dayCard must be visible (offsetParent
+      // !== null, i.e. the dashboard is the active view, not a restored Action/Clarity
+      // view). Otherwise the animation plays under the mask / on a hidden card and is
+      // consumed invisibly. js/11 re-renders the card right after revealing.
       const visible = document.body && document.body.classList.contains('boot-revealed') && el.offsetParent !== null;
-      if (_today && visible && state.meta && state.meta.cardSeenISO !== _today) {
+      // ONE-TIME "comes to life": the first time the card is ever shown COLORED
+      // (right after Clarity is set), the colors bloom in from clear instead of
+      // popping. Fires once ever (state.meta.cardRevealed), and takes precedence
+      // over the daily materialize so the reveal is the moment that lands.
+      if (visible && living && state.clarity && state.clarity.completed && state.meta && !state.meta.cardRevealed) {
+        reveal = true; state.meta.cardRevealed = true;
+        if (_today && state.meta) state.meta.cardSeenISO = _today; // the reveal also counts as today's entrance
+        try { if (!DEMO_MODE && typeof persistState === 'function') persistState(); } catch (e) {}
+      } else if (_today && visible && state.meta && state.meta.cardSeenISO !== _today) {
+        // Materialize once per day: the signature entrance on the first Home open.
         materialize = true; state.meta.cardSeenISO = _today;
         try { if (!DEMO_MODE && typeof persistState === 'function') persistState(); } catch (e) {}
       }
@@ -3738,7 +3747,7 @@ function renderDayCard() {
     // its scroll page-state watcher are gone (the two-page snap they served was
     // removed). The card is just the wrap.
     el.innerHTML =
-      '<div class="daycard-wrap daycard-theme-' + theme + (materialize ? ' daycard-materialize' : '') + '">' +
+      '<div class="daycard-wrap daycard-theme-' + theme + (reveal ? ' daycard-reveal' : (materialize ? ' daycard-materialize' : '')) + '">' +
         '<span class="daycard-wrap__aura" aria-hidden="true"></span>' +
         inner +
       '</div>';

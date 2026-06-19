@@ -3030,6 +3030,17 @@ html.theme-light .daycard-ns__goal {
 /* Slower + gentler so the color blooms in smoothly (blank -> colored), never a pop. */
 .daycard-materialize { animation: daycard-materialize 760ms cubic-bezier(0.22, 1, 0.36, 1) both; will-change: transform, opacity, filter; }
 @media (prefers-reduced-motion: reduce) { .daycard-materialize { animation: none; } }
+
+/* "Comes to life": the one-time clear -> colored bloom the first time the card is
+   ever shown colored (right after Clarity). A slower, fuller saturate sweep (0 ->
+   1) so the platinum card floods with its earned colors, never an instant pop. */
+@keyframes daycard-reveal {
+  from { opacity: 0.35; transform: scale(0.9); filter: blur(18px) saturate(0); }
+  35%  { opacity: 1; }
+  to   { opacity: 1; transform: scale(1); filter: blur(0) saturate(1); }
+}
+.daycard-reveal { animation: daycard-reveal 1350ms cubic-bezier(0.22, 1, 0.36, 1) both; will-change: transform, opacity, filter; }
+@media (prefers-reduced-motion: reduce) { .daycard-reveal { animation: none; } }
 /* Light theme: the lavender aura sits on near-white; deepen it slightly. */
 html.theme-light .daycard-wrap__aura {
   background: radial-gradient(closest-side,
