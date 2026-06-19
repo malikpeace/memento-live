@@ -279,9 +279,9 @@ const WelcomeIntro = {
       _fallback: "Whatever it is, it's not permanent."
     },
     clarityLevel: {
-      'Yes, I know exactly': "Good. Knowing exactly what you want is the part most people never lock down.",
+      'Yes, I do and know exactly what it is': "Good. Knowing exactly what you want is the part most people never lock down.",
       'I have a rough idea': "A rough idea is a real start. Memento's whole first job is making it sharp.",
-      "Not really, I'm figuring it out": "That's honest, and normal. Finding the answer is literally step one here.",
+      "Not really... but I'm trying to figure it out": "That's honest, and normal. Finding the answer is literally step one here.",
       'No, I feel lost': "Being lost is okay. Honestly it's where almost everyone starts. We find it together.",
       _fallback: "We'll get this clear. That's the first thing Memento does."
     },
@@ -453,6 +453,15 @@ const WelcomeIntro = {
     if (pw) pw.scrollTop = pw.scrollHeight;
   },
 
+  // After the input dock mounts (chips / date / composer) it grows, which shrinks
+  // the conversation scroller above it and can clip the newest question line at
+  // the dock boundary. Re-seat the convo at the bottom once layout settles (two
+  // frames: one for the dock layout, one for the FLIP) so the question always
+  // sits fully above the answers.
+  _wcReseat() {
+    requestAnimationFrame(() => { this._wcScrollBottom(); requestAnimationFrame(() => this._wcScrollBottom()); });
+  },
+
   // While the AI is typing, the conversation is "busy": pin it to the newest
   // line and block the user from scrolling up (touch-action:none), so they can
   // never scroll off the text being typed and watch it freeze off-screen. When
@@ -585,6 +594,7 @@ const WelcomeIntro = {
       });
       actions.appendChild(cont);
       this._wcWithFlip(() => { dock.appendChild(wrap); dock.appendChild(actions); });
+      this._wcReseat();
       return;
     }
 
@@ -624,6 +634,7 @@ const WelcomeIntro = {
       actions.appendChild(cont);
       host.appendChild(selWrap); host.appendChild(err); host.appendChild(actions);
       this._wcWithFlip(() => { dock.appendChild(host); });
+      this._wcReseat();
       return;
     }
 
@@ -640,6 +651,7 @@ const WelcomeIntro = {
     send.addEventListener('click', submit);
     wrap.appendChild(ta); wrap.appendChild(send);
     this._wcWithFlip(() => { dock.appendChild(wrap); });
+    this._wcReseat();
     // preventScroll stops iOS's scroll-into-view jank (the screen briefly scrolling
     // down to a black top strip then snapping back) when the field auto-focuses.
     setTimeout(() => { try { ta.focus({ preventScroll: true }); } catch (e) { try { ta.focus(); } catch (e2) {} } }, 250);
@@ -1037,8 +1049,7 @@ const WelcomeIntro = {
     // "what's it about", so the two no longer feel like the same question.
     { key: 'clarityLevel', type: 'choices', multi: false,
       headline: 'Do you have a goal or mission you want to achieve above everything else?',
-      sub: 'Be honest. Naming it is the whole first step.',
-      options: ['Yes, I know exactly', 'I have a rough idea', "Not really, I'm figuring it out", 'No, I feel lost'] },
+      options: ['Yes, I do and know exactly what it is', 'I have a rough idea', "Not really... but I'm trying to figure it out", 'No, I feel lost'] },
     { key: 'runningToward', type: 'choices', multi: true,
       headline: 'What part of your life is this about?',
       sub: 'Tap whatever fits. You can pick more than one.',

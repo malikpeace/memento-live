@@ -152,7 +152,7 @@ const ClarityExperience = {
       if (lvl) {
         if (lvl.indexOf('know exactly') !== -1) wizardAnswers.knowDomain = 'yes';
         else if (lvl.indexOf('rough idea') !== -1) wizardAnswers.knowDomain = 'kinda';
-        else if (lvl.indexOf('figuring') !== -1 || lvl.indexOf('lost') !== -1) wizardAnswers.knowDomain = 'not_sure';
+        else if (lvl.indexOf('figur') !== -1 || lvl.indexOf('not really') !== -1 || lvl.indexOf('lost') !== -1) wizardAnswers.knowDomain = 'not_sure';
       }
     }
 
