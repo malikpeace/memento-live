@@ -169,6 +169,15 @@ const HONEST_LOADING_GATE = false;
     if (revealed) return;
     revealed = true;
     try { document.body.classList.add('boot-revealed'); } catch (_) {}
+    // The day card's once-a-day "materialize" entrance is gated on boot-revealed +
+    // visibility (see renderDayCard), so it never plays under the mask. Now that the
+    // mask is lifting, re-render the card once so the entrance actually shows on a
+    // home boot. No-op (and flag not burned) if the card is not the visible view.
+    try {
+      if (typeof renderDayCard === 'function') {
+        requestAnimationFrame(() => { try { renderDayCard(); } catch (_) {} });
+      }
+    } catch (_) {}
   };
   try {
     const hasRestorable = !!((typeof recallView === 'function') ? recallView() : (state && state.ui && state.ui.lastView));

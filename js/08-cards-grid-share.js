@@ -1150,8 +1150,13 @@ function renderGreeting() {
   try {
     const by = state.mori && state.mori.birthYear;
     if (by && typeof moriWeeksLived === 'function' && typeof moriTotalWeeks === 'function') {
-      const le = (state.mori && state.mori.lifeExpectancy) || 80;
-      weeksLeft = Math.max(0, moriTotalWeeks(le) - moriWeeksLived(by));
+      const lived = moriWeeksLived(by);
+      // A future/typo birthYear yields negative weeks-lived and would print an
+      // absurd inflated count; omit the line then (matches the share card guard).
+      if (lived >= 0) {
+        const le = (state.mori && state.mori.lifeExpectancy) || 80;
+        weeksLeft = Math.max(0, moriTotalWeeks(le) - lived);
+      }
     }
   } catch (e) {}
   const mg = document.getElementById('dashGreetingMobile');
@@ -1255,11 +1260,9 @@ function computeHeroHeadline() {
   // Pre-Clarity there is no mission yet; mission language would contradict
   // the Start-here card sitting right under it.
   if (!(state.clarity && state.clarity.completed)) return 'Welcome to Memento.';
-  let done = false;
-  try {
-    const hist = state.action && state.action.completionHistory;
-    if (Array.isArray(hist)) done = hist.some(e => (e && (e.date || e.iso || '').slice(0, 10)) === getTodayISO());
-  } catch (e) {}
+  // Local-day comparison (not a raw UTC slice) so the headline agrees with the
+  // command center and consistency line after the UTC rollover in US zones.
+  const done = (typeof actionDoneToday === 'function') ? actionDoneToday() : false;
   return done ? 'Today’s mission, done.' : 'What’s the mission today?';
 }
 function bindHeroHeadlinePicker(headlineEl) {
@@ -2756,6 +2759,40 @@ function creditTodayAction() {
   } catch (e) { return false; }
 }
 
+// Single source of truth: was today's daily ACTION completed (compared on the
+// LOCAL day)? completionHistory stores full ISO timestamps, so a raw UTC slice
+// would mis-read after the UTC rollover in negative-UTC zones; always go through
+// isoToLocalDay. Used by the hub headline, the command center, and the hub
+// consistency line so they never contradict each other on the same screen.
+function actionDoneToday() {
+  try {
+    const today = getTodayISO();
+    const h = state.action && state.action.completionHistory;
+    return Array.isArray(h) && h.some(e => e && e.date && isoToLocalDay(e.date) === today);
+  } catch (e) { return false; }
+}
+
+// Count of DISTINCT local days, within the last `win` days (including today), on
+// which the daily action was completed. Buckets by local day via isoToLocalDay
+// (never new Date(date + 'T00:00:00'): the stored value is a full ISO timestamp,
+// so that concat parses to Invalid Date and silently zeroed the action pillar).
+function actionLocalDaysInWindow(win) {
+  try {
+    const h = (state.action && Array.isArray(state.action.completionHistory)) ? state.action.completionHistory : [];
+    const todayNum = Math.floor(Date.parse(getTodayISO() + 'T00:00:00Z') / 86400000);
+    const days = {};
+    h.forEach((e) => {
+      if (!e || !e.date) return;
+      const day = (typeof isoToLocalDay === 'function') ? isoToLocalDay(e.date) : String(e.date).slice(0, 10);
+      if (!day) return;
+      const dNum = Math.floor(Date.parse(day + 'T00:00:00Z') / 86400000);
+      const diff = todayNum - dNum;
+      if (diff >= 0 && diff < win) days[day] = 1;
+    });
+    return Object.keys(days).length;
+  } catch (e) { return 0; }
+}
+
 function renderCommandCenter() {
   try {
     const hasClarity = !!(state.clarity && state.clarity.completed && state.clarity.answers && state.clarity.answers.neutronStar);
@@ -2826,8 +2863,7 @@ function renderCommandCenter() {
     const tiny = tiers.tiny || '';
     const how = pa.howToStart || pa.recommendedWhy || '';
     const todayStr = getTodayISO();
-    const ch = state.action.completionHistory;
-    const doneToday = Array.isArray(ch) && ch.length && ch[ch.length - 1].date && isoToLocalDay(ch[ch.length - 1].date) === todayStr;
+    const doneToday = actionDoneToday();
     const streak = (state.streak && state.streak.count) || 0;
 
     // ---- Home hero. v27 retires the old swappable centerpiece: the card-centered
@@ -3380,12 +3416,17 @@ function renderHubConsistency() {
     // comeback after a gap replaces the line with a welcome; late-in-day and not
     // yet shown up is a gentle nudge, not a warning.
     const todayISO = getTodayISO();
-    const doneToday = (cs.counts || {})[todayISO] !== undefined;
+    // showedUp = ANY activity today (note, check-in, action) -> fills the chain dot
+    // and means they are not "away". actionDone = the daily ACTION is complete ->
+    // the close-your-day reward. They are different: the "Today is closed" banner
+    // must track the ACTION so it never contradicts the command center's "I did it"
+    // button on the same screen (a note-only day shows up, but the loop isn't closed).
+    const showedUpToday = (cs.counts || {})[todayISO] !== undefined;
+    const actionDone = actionDoneToday();
     let comeback = false;
-    // doneToday wins over a comeback gap: if they just closed the day in place
-    // (even right after a gap), show "Today is closed", not a stale "Today makes N+1".
-    try { comeback = !doneToday && (typeof isComebackGap === 'function') && isComebackGap(); } catch (e) {}
-    const lateAndNotDone = !doneToday && !comeback && new Date().getHours() >= 14;
+    // showing up at all (even just a note) wins over a comeback-gap welcome.
+    try { comeback = !showedUpToday && (typeof isComebackGap === 'function') && isComebackGap(); } catch (e) {}
+    const lateAndNotDone = !showedUpToday && !comeback && new Date().getHours() >= 14;
     if (comeback) {
       el.innerHTML = '<div class="hubcc hubcc--msg"><span class="hubcc__shown">Welcome back. You have shown up <b>' + total + '</b> day' + (total === 1 ? '' : 's') + '. Today makes <b>' + (total + 1) + '</b>.</span></div>' + community + revisitHtml;
       return;
@@ -3394,9 +3435,9 @@ function renderHubConsistency() {
       el.innerHTML = '<div class="hubcc hubcc--msg"><span class="hubcc__shown">Still time to show up today. The next move is right here.</span></div>' + community + revisitHtml;
       return;
     }
-    if (doneToday) {
-      // Close-your-day: the quiet, earned reward once today is closed. The chain
-      // shows today's dot filled. No confetti; the point is calm, not loud.
+    if (actionDone) {
+      // Close-your-day: the quiet, earned reward once today's action is done. The
+      // chain shows today's dot filled. No confetti; the point is calm, not loud.
       el.innerHTML =
         '<div class="hubcc hubcc--done">' +
           '<span class="hubcc__shown hubcc__closed">Today is closed. You showed up.</span>' +
@@ -3672,7 +3713,14 @@ function renderDayCard() {
     let materialize = false;
     try {
       const _today = (typeof getTodayISO === 'function') ? getTodayISO() : '';
-      if (_today && state.meta && state.meta.cardSeenISO !== _today) {
+      // Only "spend" the once-a-day entrance when the card is actually on screen:
+      // the boot mask must be lifted (body.boot-revealed) AND #dayCard must be
+      // visible (offsetParent !== null, i.e. the dashboard is the active view, not
+      // a restored Action/Clarity view). Otherwise the 440ms animation plays under
+      // the mask or on a hidden card and is consumed invisibly. js/11 re-renders
+      // the card right after revealing so a home boot still shows it.
+      const visible = document.body && document.body.classList.contains('boot-revealed') && el.offsetParent !== null;
+      if (_today && visible && state.meta && state.meta.cardSeenISO !== _today) {
         materialize = true; state.meta.cardSeenISO = _today;
         try { if (!DEMO_MODE && typeof persistState === 'function') persistState(); } catch (e) {}
       }
@@ -3746,13 +3794,7 @@ function openMementoFull() {
     const tiers = pa.tiers || {};
     const todayAction = tiers[pa.recommendedTier] || pa.title || '';
     let act7 = 0;
-    try {
-      const comp = (state.action && Array.isArray(state.action.completionHistory)) ? state.action.completionHistory : [];
-      const today = new Date(); today.setHours(0, 0, 0, 0);
-      const days = {};
-      comp.forEach((h) => { if (!h || !h.date) return; const d = new Date(h.date + 'T00:00:00'); const diff = Math.round((today - d) / 86400000); if (diff >= 0 && diff <= 6) days[h.date] = 1; });
-      act7 = Object.keys(days).length;
-    } catch (e) {}
+    try { act7 = actionLocalDaysInWindow(7); } catch (e) {}
 
     const bar = (pct, color) => '<div class="mf-stat__track"><div class="mf-stat__fill" style="width:' + Math.max(2, Math.min(100, pct)) + '%;background:' + color + '"></div></div>';
 
@@ -3888,18 +3930,7 @@ function openMementoFull() {
 function livingCardLevels() {
   let clar = (state.clarity && state.clarity.completed) ? 100 : 0;
   let act = 0;
-  try {
-    const comp = (state.action && Array.isArray(state.action.completionHistory)) ? state.action.completionHistory : [];
-    const today = new Date(); today.setHours(0, 0, 0, 0);
-    const days = {};
-    comp.forEach((h) => {
-      if (!h || !h.date) return;
-      const d = new Date(h.date + 'T00:00:00');
-      const diff = Math.round((today - d) / 86400000);
-      if (diff >= 0 && diff <= 6) days[h.date] = 1;
-    });
-    act = Math.min(100, Math.round(Object.keys(days).length / 7 * 100));
-  } catch (e) {}
+  try { act = Math.min(100, Math.round(actionLocalDaysInWindow(7) / 7 * 100)); } catch (e) {}
   let cons = 0;
   try { const cs = consistencyStats(); if (cs && typeof cs.pct30 === 'number') cons = cs.pct30; } catch (e) {}
   return { clar, act, cons };
