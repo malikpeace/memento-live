@@ -1898,6 +1898,7 @@ function buildProfileContext() {
     const candidates = [
       p.name ? 'Name: ' + trunc(p.name, 40) : '',
       (function () { const a = ageFromBirthday(p.birthday); return a != null ? ('Age: ' + a + (a < 18 ? ' (MINOR, apply minor-safety rules strictly)' : '')) : ''; })(),
+      p.lifeStage ? 'What their life looks like right now: ' + trunc(p.lifeStage, 40) : '',
       p.runningToward ? 'What they want to make progress in: ' + trunc(p.runningToward, 90) : '',
       p.clarityLevel ? 'How clear they are on what they want: ' + trunc(p.clarityLevel, 40) : '',
       p.actionKnow ? 'Whether they know the steps to get there: ' + trunc(p.actionKnow, 40) : '',

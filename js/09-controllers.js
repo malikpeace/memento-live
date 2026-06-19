@@ -210,7 +210,6 @@ const WelcomeIntro = {
       display: (v) => this._wcBdayDisplay(v)
     };
     beats.push(birthdayBeat);
-    beats.push({ lines: () => ['Alright, now for more serious questions.'], pause: 900 });
     this.identitySteps.forEach((step) => {
       if (step.type !== 'choices' && step.type !== 'text') return; // stop before summaryStepper/paywall
       beats.push({
@@ -233,6 +232,8 @@ const WelcomeIntro = {
           ? (Array.isArray(v) ? v.join(', ') : String(v))
           : String(v || '').trim()
       });
+      // After the life-stage warm-up, gear-shift into the real diagnostic.
+      if (step.key === 'lifeStage') beats.push({ lines: () => ['Alright, now for more serious questions.'], pause: 900 });
       // Reflections branch on what was just picked (in Malik's voice) so the
       // conversation feels custom, not one canned line everyone gets.
       if (step.key === 'runningToward') beats.push({ lines: () => { const t = this._wcReflect('runningToward'); return t ? [t] : []; } });
@@ -987,6 +988,12 @@ const WelcomeIntro = {
   // answer figures out which part of Memento this person needs most. The result
   // (weakestPillar) tailors the "Solution" page and seeds Clarity (Build 2).
   identitySteps: [
+    // ── CONTEXT warm-up: who they are (feeds the AI's tone). Lands right after
+    //    birthday, before the "now for more serious questions" gear-shift. ─────
+    { key: 'lifeStage', type: 'choices', multi: false,
+      headline: 'How would you describe your life right now?',
+      sub: "Whatever's closest.",
+      options: ['Student', 'Building a career', 'Running my own thing', 'Creative / artist', 'Training / athletics', 'Raising a family', 'Between chapters', 'Still figuring it out'] },
     // ── CLARITY gap: do they even know what they want? ──────────────────────
     // Clarity leads (the real clarity-gap signal); the area question follows as
     // "what's it about", so the two no longer feel like the same question.
