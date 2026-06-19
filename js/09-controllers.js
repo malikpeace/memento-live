@@ -279,7 +279,7 @@ const WelcomeIntro = {
       _fallback: "Whatever it is, it's not permanent."
     },
     clarityLevel: {
-      'Yes, I do and know exactly what it is': "Good. Knowing exactly what you want is the part most people never lock down.",
+      'Yes, I do and know exactly what it is': "Good! Knowing exactly what you want is the part most people never even reach.",
       'I have a rough idea': "A rough idea is a real start. Memento's whole first job is making it sharp.",
       "Not really... but I'm trying to figure it out": "That's honest, and normal. Finding the answer is literally step one here.",
       'No, I feel lost': "Being lost is okay. Honestly it's where almost everyone starts. We find it together.",
@@ -410,25 +410,42 @@ const WelcomeIntro = {
     this._wcGen = (this._wcGen || 0) + 1;
     this._wcResolve = null;
     const gen = this._wcGen;
-    this._wcConvoEl.innerHTML = '';
-    this._wcDockEl.innerHTML = '';
     const beats = this._wcBeatsArr;
-    (async () => {
-      for (let i = 0; i < target; i++) {
-        if (gen !== this._wcGen) return;
-        const beat = beats[i];
-        const n = (state.profile && state.profile.name) ? state.profile.name : 'you';
-        const lines = beat.lines ? beat.lines(n) : [];
-        if (lines.length) this._wcMarkHistory();
-        for (const t of lines) { if (gen !== this._wcGen) return; await this._wcTypeLine(t, true, gen); }
-        if (beat.input && this._wcAns[i] != null) this._wcAddUser(this._wcAns[i]);
-      }
-      if (gen !== this._wcGen) return;
-      const answered = Object.keys(this._wcAns).length;
-      this._setProgress(0.04 + 0.9 * (answered / Math.max(1, this._wcQTotal)));
-      this._wcIndex = target;
-      this._wcWalk(gen, false);
-    })();
+    const convo = this._wcConvoEl;
+    // Smooth "back": the old path blanked the whole conversation and re-typed
+    // every prior line one-by-one (FLIP + enter animation each), which read as a
+    // choppy flash-rebuild. Instead, rebuild the prior history in ONE synchronous,
+    // settled pass into a fragment and swap it in atomically (the browser never
+    // paints a blank frame), fade it in gently, then walk the target question live.
+    const n = (state.profile && state.profile.name) ? state.profile.name : 'you';
+    const frag = document.createDocumentFragment();
+    const addLine = (text, cls) => {
+      const el = document.createElement('div');
+      el.className = 'wc-line' + (cls ? ' ' + cls : '');
+      el.textContent = text;
+      frag.appendChild(el);
+    };
+    for (let i = 0; i < target; i++) {
+      const beat = beats[i];
+      const lines = beat.lines ? beat.lines(n) : [];
+      lines.forEach((t) => addLine(t));
+      if (beat.input && this._wcAns[i] != null) addLine(this._wcAns[i], 'user');
+    }
+    convo.style.transition = 'none';
+    convo.style.opacity = '0';
+    convo.innerHTML = '';
+    convo.appendChild(frag);
+    this._wcDockEl.innerHTML = '';
+    this._wcMarkHistory();      // fade the restored history so the target owns the screen
+    this._wcScrollBottom();
+    requestAnimationFrame(() => {
+      convo.style.transition = 'opacity 0.28s ease';
+      convo.style.opacity = '1';
+    });
+    const answered = Object.keys(this._wcAns).length;
+    this._setProgress(0.04 + 0.9 * (answered / Math.max(1, this._wcQTotal)));
+    this._wcIndex = target;
+    this._wcWalk(gen, false);
   },
 
   // Focused mode: fade every existing line into faint "history" (one soft level,
