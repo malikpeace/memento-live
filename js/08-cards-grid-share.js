@@ -571,7 +571,8 @@ function renderGrid() {
     // (today's one thing). Suppress the duplicate action tile in the grid so the
     // action is not shown twice. Data + module stay intact; only the second
     // render is skipped.
-    if (key === 'action') return;
+    // Custom-layout users who deliberately placed the Action tile keep it.
+    if (key === 'action' && !(document.body && document.body.classList.contains('has-custom-layout'))) return;
 
     const sizeClass = size === 'full' ? 'widget--full' : 'widget--half';
     const el = document.createElement('article');
@@ -3283,6 +3284,9 @@ function renderHubConsistency() {
     const el = document.getElementById('hubConsistency');
     if (!el) return;
     if (isBrandNewUser()) { el.innerHTML = ''; return; }
+    // Pre-Clarity the home stays bare (card + Start CTA only). The consistency
+    // line is part of the post-Clarity hub, same gate renderDailyMemento uses.
+    if (!(state.clarity && state.clarity.completed)) { el.innerHTML = ''; return; }
     let cs = { thisWeek: 0, totalActiveDays: 0, counts: {} };
     try { cs = consistencyStats(); } catch (e) {}
     const thisWeek = Math.min(7, cs.thisWeek || 0);

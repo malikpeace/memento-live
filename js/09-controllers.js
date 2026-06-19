@@ -324,6 +324,9 @@ const WelcomeIntro = {
     try {
       const SEP = ' · ';
       const raw = (state.profile && state.profile[key]) || '';
+      // Skipped/blank answers (e.g. the conditional distraction step, or an
+      // empty letter) get no reflection, never a fabricated "thanks for sharing".
+      if (!String(raw).trim()) return '';
       const picks = String(raw).split(SEP).map(s => s.trim()).filter(Boolean);
       const m = (this._wcReflections && this._wcReflections[key]) || {};
       if (picks.length > 1 && m._multi) return m._multi;
@@ -1698,7 +1701,7 @@ const WelcomeIntro = {
       if (this._fwClick) { document.removeEventListener('click', this._fwClick, true); this._fwClick = null; }
       this._confettiVer = (this._confettiVer || 0) + 1;
       const c = document.getElementById('welcomeConfetti'); if (c) c.remove();
-      // Skip the legacy swipe-through pillar tutorial (renderPage) — after the
+      // Skip the legacy swipe-through pillar tutorial (renderPage). After the
       // modern conversation it read as "the old onboarding loading up again"
       // (Malik). Go straight from the Congrats celebration to the personalized
       // "how Memento helps you" page.

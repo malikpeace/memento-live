@@ -802,6 +802,10 @@ body.ns-bloom .app.dash-v2 #commandCenter .cc-live { display: none; }
   /* header full width on top; dev box + mobile greeting stay out of the grid */
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .dash-header { grid-column: 1 / -1; grid-row: 1; align-self: start; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #creatorBox,
+  /* The quiet consistency line is the mobile focused-home element; on desktop the
+     year heatmap (#dashConsistency) covers it, so hide it to avoid a stray
+     narrow auto-placed column in the bento. */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #hubConsistency,
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashGreetingMobile { display: none; }
 
   /* LEFT rail: mission / focus + quote of the day */
@@ -2977,11 +2981,6 @@ body.lite .daycard-motion-cta, html.lowfx .daycard-motion-cta { backdrop-filter:
   text-align: center;
   padding: 18px 2px;
 }
-.daycard-ns__goal {
-  font-size: 1.28rem; font-weight: 700; line-height: 1.22; letter-spacing: -0.02em;
-  color: var(--text-hi);
-  display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden;
-}
 /* The machined emblem: the brand mark pressed into the glass. The fill is
    barely above the card's own film; the deboss reads from the light edge
    under it and the shadow above it, like CNC'd metal under raking light. */
@@ -3011,6 +3010,12 @@ body.lite .daycard-motion-cta, html.lowfx .daycard-motion-cta { backdrop-filter:
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.30), 0 -0.5px 0 rgba(255, 255, 255, 0.07);
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
   text-wrap: balance; max-width: 88%;
+}
+/* Engraving stays legible on the light-mode card (the bluish-white deboss above
+   is tuned for the dark card). */
+html.theme-light .daycard-ns__goal {
+  color: rgba(24, 26, 42, 0.60);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.45), 0 -0.5px 0 rgba(0, 0, 0, 0.06);
 }
 /* Signature entrance: the card materializes once per day (first Home open),
    then stays calm. Applied to the wrap so it never fights the card's tilt
@@ -3154,7 +3159,7 @@ html.lowfx .daycard-ns {
     color: var(--text-lo); background: none; border: none;
     padding: 4px 2px; margin: -4px -2px;
     cursor: pointer; -webkit-tap-highlight-color: transparent;
-    transition: color 0.18s ease;
+    transition: opacity 0.18s ease;
   }
   .wbar__weeks:active { opacity: 0.6; }
   /* Memento Mori, woven in: tapping the weeks reveals one quiet gold line.
@@ -3163,10 +3168,11 @@ html.lowfx .daycard-ns {
     flex-basis: 100%; width: 100%;
     font-size: 0.82rem; font-weight: 500; letter-spacing: 0.01em;
     color: var(--sacred);
-    text-shadow: 0 0 20px rgba(217, 180, 92, 0.26);
+    text-shadow: 0 0 20px rgba(var(--sacred-rgb), 0.26);
     margin-top: 1px;
     animation: wbar-sacred-in 0.26s ease-out both;
   }
+  @media (prefers-reduced-motion: reduce) { .wbar__sacred { animation: none; } }
   .wbar__sacred[hidden] { display: none; }
   @keyframes wbar-sacred-in { from { opacity: 0; transform: translateY(-2px); } to { opacity: 1; transform: none; } }
 }
@@ -3231,4 +3237,5 @@ body.pre-clarity .capture-fab { display: none !important; }
   font-size: 0.72rem;
   color: var(--text-lo);
   letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums;
 }
