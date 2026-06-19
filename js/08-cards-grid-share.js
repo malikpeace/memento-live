@@ -567,6 +567,11 @@ function renderGrid() {
     const def = WIDGET_DEFS[key];
     if (!def) return;
     if (_hidden.indexOf(key) !== -1) return; // hidden by the user's custom layout
+    // The command center at the top of the dashboard already IS the action
+    // (today's one thing). Suppress the duplicate action tile in the grid so the
+    // action is not shown twice. Data + module stay intact; only the second
+    // render is skipped.
+    if (key === 'action') return;
 
     const sizeClass = size === 'full' ? 'widget--full' : 'widget--half';
     const el = document.createElement('article');
@@ -2704,6 +2709,22 @@ function ccScoreLineInner(cs) {
   if (typeof cs.yearConsistency === 'number') h += sc('Year score', cs.yearConsistency, 'Your consistency across the last 365 days, out of 100. A full day is 5 logged actions.');
   return h;
 }
+// One short, derived "why" under today's action. Ties the action back to the
+// goal so the daily mission never reads as busywork. Prefers the cost-of-inaction
+// framing (the mortality weight) when the user named one; otherwise a plain line
+// pointing at the Neutron Star. Returns '' when there is no goal to point at.
+function ccActionWhyLine() {
+  try {
+    const hasNs = !!(state.clarity && state.clarity.answers && state.clarity.answers.neutronStar);
+    if (!hasNs) return '';
+    let coi = (state.profile && state.profile.costOfInaction) || '';
+    if (Array.isArray(coi)) coi = coi.filter(Boolean).join(', ');
+    coi = String(coi || '').trim();
+    if (coi) return 'So a year from now is not just ' + coi.toLowerCase().replace(/\.+$/, '') + '.';
+    return 'This moves you toward your goal.';
+  } catch (e) { return ''; }
+}
+
 function renderCommandCenter() {
   try {
     const hasClarity = !!(state.clarity && state.clarity.completed && state.clarity.answers && state.clarity.answers.neutronStar);
@@ -2711,7 +2732,7 @@ function renderCommandCenter() {
     const tiers = pa.tiers || {};
     const hasPlan = !!(state.action && state.action.planGenerated && pa.title);
     const C = ccAccentColor();
-    const wrap = (inner) => '<section class="cc-card" style="margin:0 0 14px;padding:22px 22px 20px;border-radius:var(--card-r);background:var(--surface-1);border:1px solid var(--hairline);box-shadow:var(--shadow-card);">' + inner + '</section>';
+    const wrap = (inner) => '<section class="cc-card" style="margin:0 0 14px;padding:22px 22px 20px;border-radius:var(--card-r);background:var(--surface-1);box-shadow:var(--shadow-card), inset 0 1px 0 rgba(255,255,255,0.06);">' + inner + '</section>';
     const eyebrow = (t) => '<div style="font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:' + C + ';font-weight:700;margin-bottom:8px;">' + t + '</div>';
     const primaryBtn = (label, action) => '<button class="cc-primary" data-cc-action="' + action + '" style="flex:0 1 auto;min-width:180px;font:inherit;font-weight:700;font-size:0.92rem;cursor:pointer;border:none;border-radius:calc(8px * var(--rx, 1));padding:12px 40px;background:var(--solid-bg);color:var(--solid-fg);">' + esc(label) + '</button>';
 
@@ -2832,6 +2853,12 @@ function renderCommandCenter() {
       // daily loop lives in, so the Consistency and Goal tabs stay focused.
       row += '<div class="cc-od-eyebrow" style="font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-lo);margin-bottom:6px;">Today</div>';
       row += '<div class="cc-od-title" style="font-size:1.5rem;font-weight:700;line-height:1.25;letter-spacing:-0.01em;color:var(--text-hi);margin-bottom:12px;">' + esc(oneThing) + '</div>';
+      // One quiet, derived "why": ties today's action back to the goal so it
+      // never reads as busywork. Only in this normal oneThing state.
+      {
+        const _why = ccActionWhyLine();
+        if (_why) row += '<div class="cc-od-why" style="font-size:0.85rem;line-height:1.45;color:var(--text-2);margin-top:6px;">' + esc(_why) + '</div>';
+      }
       // Last night's self-named action, if one was planned. Their own words
       // outrank everything else on the surface, shown first and quietly.
       {
@@ -3245,6 +3272,49 @@ function renderDailyMemento() {
         } catch (e) {}
       });
     }
+  } catch (e) {}
+}
+
+// A single quiet consistency line under the quote: shown-up-this-week, the
+// cumulative day count (green-tinted, tabular), and a slim 7-dot chain. Green
+// never turns red. No card, no border. Hidden for brand-new users.
+function renderHubConsistency() {
+  try {
+    const el = document.getElementById('hubConsistency');
+    if (!el) return;
+    if (isBrandNewUser()) { el.innerHTML = ''; return; }
+    let cs = { thisWeek: 0, totalActiveDays: 0, counts: {} };
+    try { cs = consistencyStats(); } catch (e) {}
+    const thisWeek = Math.min(7, cs.thisWeek || 0);
+    const total = cs.totalActiveDays || 0;
+    // 7-dot chain, oldest -> today, filled green for days shown up this week.
+    let dots = '';
+    try {
+      const counts = cs.counts || {};
+      const todayNum = Math.floor(Date.parse(getTodayISO() + 'T00:00:00Z') / 86400000);
+      for (let i = 6; i >= 0; i--) {
+        const iso = new Date((todayNum - i) * 86400000).toISOString().split('T')[0];
+        const on = counts[iso] !== undefined;
+        dots += '<span class="hubcc__dot' + (on ? ' is-on' : '') + '"></span>';
+      }
+    } catch (e) {}
+    // Community counter: real number wired by the orchestrator later. Read from
+    // a CloudSync counter API if one exists, else hide the line gracefully.
+    // TODO(orchestrator): wire the live "days shown up in Memento" counter here.
+    let community = '';
+    try {
+      const n = (window.CloudSync && typeof window.CloudSync.communityDays === 'function')
+        ? window.CloudSync.communityDays() : null;
+      if (typeof n === 'number' && n > 0) {
+        community = '<span class="hubcc__community">' + n.toLocaleString() + ' days shown up in Memento</span>';
+      }
+    } catch (e) {}
+    el.innerHTML =
+      '<div class="hubcc">' +
+        '<span class="hubcc__shown">Shown up <b>' + thisWeek + '</b> of 7 this week</span>' +
+        '<span class="hubcc__chain">' + dots + '</span>' +
+        '<span class="hubcc__total"><b>' + total + '</b> day' + (total === 1 ? '' : 's') + '</span>' +
+      '</div>' + community;
   } catch (e) {}
 }
 
@@ -4008,6 +4078,7 @@ function renderAll() {
   try { const _cc = document.getElementById('commandCenter'); if (_cc) { _cc.innerHTML = renderCommandCenter(); bindCommandCenter(_cc); } } catch (e) {}
   try { updateCaptureFab(); } catch (e) {}
   try { renderDailyMemento(); } catch (e) {}
+  try { renderHubConsistency(); } catch (e) {}
   CreatorTools.render();
   state.widgetOrder.forEach(({ key }) => {
     const el = document.querySelector(`.widget[data-widget="${key}"]`);
