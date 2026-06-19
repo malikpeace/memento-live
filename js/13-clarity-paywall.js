@@ -118,6 +118,7 @@ const ClarityPaywall = {
       ov.setAttribute('role', 'dialog');
       ov.setAttribute('aria-label', 'Unlock Memento');
       ov.innerHTML =
+        '<button type="button" class="cpw__close" id="cpwClose" aria-label="Close">&times;</button>' +
         '<div class="cpw__scroll">' +
           '<div class="cpw__hero">' +
             '<div class="cpw__eyebrow">You found it</div>' +
@@ -198,6 +199,8 @@ const ClarityPaywall = {
       if (buy) buy.addEventListener('click', () => this._unlock());
       const skip = ov.querySelector('#cpwSkip');
       if (skip) skip.addEventListener('click', () => this.hide());
+      const closeX = ov.querySelector('#cpwClose');
+      if (closeX) closeX.addEventListener('click', () => this.hide());
 
       document.body.style.overflow = 'hidden';
       void ov.offsetWidth;
