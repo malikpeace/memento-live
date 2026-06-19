@@ -118,6 +118,15 @@ body.ns-bloom .ambient__ns-bloom { opacity: 1; }
 body.ns-bloom .ambient__rays {
   opacity: 0.8;
 }
+/* Movement look: the "alive" signal. Blur + tilt are killed on the lowfx mobile
+   path, so Movement vs Dark must read from something that survives, the ambient
+   itself. Push the god rays brighter + more saturated (and fully opaque) so the
+   choice always changes the app, even with no backdrop-filter. Dark keeps the
+   calm 0.8 baseline above; Minimal flattens the ambient entirely (bg-flat). */
+body.look-movement.ns-bloom .ambient__rays {
+  opacity: 1;
+  filter: saturate(1.55) brightness(1.28);
+}
 .ambient__rays-source {
   position: absolute;
   top: -28%; left: -28%;

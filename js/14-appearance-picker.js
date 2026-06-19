@@ -89,6 +89,10 @@ const AppearancePicker = {
     try {
       if (!state.prefs) state.prefs = {};
       Object.assign(state.prefs, look.prefs);
+      // Store the look identity (not just its prefs) so the choice is durable and
+      // a first-class, visible state: a body.look-<id> hook that CSS can key off
+      // even on the lowfx mobile path where blur/glass deltas are flattened.
+      state.prefs.look = id;
       if (typeof applyPrefs === 'function') applyPrefs();
     } catch (e) {}
   },

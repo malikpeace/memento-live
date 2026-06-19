@@ -192,18 +192,9 @@ const WelcomeIntro = {
       display: (v) => String(v).trim()
     });
     beats.push({ lines: (n) => ['Welcome to Memento, ' + (n || 'you') + '.'], pause: 700 });
-    // Pick the look right after the welcome, so the rest of onboarding and the
-    // first blank Memento already wear the style they chose. Once only (the picker
-    // sets prefs.appearanceChosen); a no-op for anyone who already picked.
-    beats.push({
-      action: () => new Promise((resolve) => {
-        try {
-          if (typeof AppearancePicker !== 'undefined' && AppearancePicker.open && !(state.prefs && state.prefs.appearanceChosen)) {
-            AppearancePicker.open(resolve);
-          } else { resolve(); }
-        } catch (e) { resolve(); }
-      })
-    });
+    // The look is chosen at the very END of onboarding (in _finishWithName), right
+    // before the blank Memento is revealed, so the first card they ever see already
+    // wears their style. (Moved here from a post-welcome beat.)
     // Birthday is the FIRST question (an easy, factual warm-up that also powers
     // Memento Mori), then a transition line escalates into the deeper diagnostic.
     const birthdayBeat = {
@@ -1923,6 +1914,18 @@ const WelcomeIntro = {
   },
 
   _finishWithName(name) {
+    // The look is picked here, as the final step of onboarding, right before the
+    // blank Memento is revealed, so the very first card they see already wears it.
+    // Apply runs live + persists inside the picker (applyPrefs), so when the reveal
+    // mounts the dashboard it is already styled. Once only (prefs.appearanceChosen).
+    if (typeof AppearancePicker !== 'undefined' && AppearancePicker.open && !(state.prefs && state.prefs.appearanceChosen)) {
+      AppearancePicker.open(() => this._revealAfterOnboarding(name));
+      return;
+    }
+    this._revealAfterOnboarding(name);
+  },
+
+  _revealAfterOnboarding(name) {
     // tear down the celebration / help themes + fireworks if still up
     if (this.el) { this.el.classList.remove('welcome-intro--blackout', 'welcome-intro--help'); this._setStage([]); }
     this._confettiVer = (this._confettiVer || 0) + 1;
