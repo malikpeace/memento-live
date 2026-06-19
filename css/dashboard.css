@@ -3112,7 +3112,20 @@ html.lowfx .daycard-ns {
 .mf-stat__sub-key { color: var(--text-3); font-weight: 650; }
 .mf-stat__track { height: 6px; border-radius: 999px; background: var(--kfill-06); overflow: hidden; }
 .mf-stat__fill { height: 100%; border-radius: 999px; }
-.mf__hint { font-size: 0.74rem; color: var(--text-faint); margin-top: 18px; }
+.mf__share {
+  margin-top: 18px;
+  font: inherit; font-weight: 650; font-size: 0.9rem;
+  color: var(--text-hi); cursor: pointer; border: none;
+  background: var(--glass-bg);
+  box-shadow: var(--glass-highlight), var(--shadow-card);
+  border-radius: var(--card-r, 16px);
+  padding: 13px 26px;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.18s ease, transform 0.12s ease;
+}
+.mf__share:hover { background: var(--glass-bg-hover); }
+.mf__share:active { transform: scale(0.97); }
+.mf__hint { font-size: 0.74rem; color: var(--text-faint); margin-top: 14px; }
 @media (prefers-reduced-motion: reduce) {
   #mementoFull, .mf__scroll { transition: none; }
 }
