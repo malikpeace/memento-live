@@ -2855,6 +2855,7 @@ function renderCommandCenter() {
     const how = pa.howToStart || pa.recommendedWhy || '';
     const todayStr = getTodayISO();
     const doneToday = actionDoneToday();
+    const ch = (state.action && state.action.completionHistory) || [];
     const streak = (state.streak && state.streak.count) || 0;
 
     // ---- Home hero. v27 retires the old swappable centerpiece: the card-centered

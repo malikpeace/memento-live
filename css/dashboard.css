@@ -923,10 +923,10 @@ body.ns-bloom .app.dash-v2 #commandCenter .cc-live { display: none; }
      (Vivere is the strip below); the command center is always the mission focus. */
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-hero-toggle { display: none !important; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-live { display: none; }
-  /* Quiet consistency line (the focused home shows this; the full year heatmap
-     #dashConsistency moves one layer deeper, reachable in the Consistency module). */
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashConsistency { display: none; }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #hubConsistency { grid-column: 1 / -1; grid-row: 5; }
+  /* Full year heatmap as a full-width strip under the card (Malik prefers the
+     heatmap over the quiet dots line, which conveys the same thing). */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashConsistency { display: block; grid-column: 1 / -1; grid-row: 5; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #hubConsistency { display: none; }
   /* Mori + Clarity row */
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="mori"]    { grid-column: 1 / 7;  grid-row: 6; aspect-ratio: auto; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="clarity"] { grid-column: 7 / 13; grid-row: 6; aspect-ratio: auto; }
