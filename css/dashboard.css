@@ -3047,12 +3047,21 @@ body.lite .daycard-motion-cta, html.lowfx .daycard-motion-cta { backdrop-filter:
    barely above the card's own film; the deboss reads from the light edge
    under it and the shadow above it, like CNC'd metal under raking light. */
 .daycard-ns__emblem {
-  width: 116px; height: 116px;
-  fill: rgba(255, 255, 255, 0.08);
+  width: 124px; height: 124px;
+  fill: rgba(255, 255, 255, 0.20);
   filter:
-    drop-shadow(0 1px 0 rgba(255, 255, 255, 0.20))
-    drop-shadow(0 -1px 1px rgba(0, 0, 0, 0.32))
-    drop-shadow(0 0 16px rgba(200, 215, 255, 0.18));
+    drop-shadow(0 1.5px 0 rgba(255, 255, 255, 0.32))
+    drop-shadow(0 -1px 1px rgba(0, 0, 0, 0.42))
+    drop-shadow(0 0 22px rgba(205, 218, 255, 0.30));
+}
+/* Light-mode card: the white fill would vanish on near-white glass, so the
+   mark is pressed in dark instead (same machined deboss logic, inverted). */
+html.theme-light .daycard-ns__emblem {
+  fill: rgba(28, 30, 52, 0.22);
+  filter:
+    drop-shadow(0 1.5px 0 rgba(255, 255, 255, 0.50))
+    drop-shadow(0 -1px 1px rgba(0, 0, 0, 0.18))
+    drop-shadow(0 0 18px rgba(74, 108, 255, 0.16));
 }
 .daycard-ns__foot {
   position: relative;
