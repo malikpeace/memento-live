@@ -48,7 +48,11 @@ html.theme-light #topFade {
    band, so hide it there (Malik). */
 body:has(.welcome-intro.open) #topFade,
 body:has(.clarity-exp.open) #topFade,
-body:has(.action-exp.open) #topFade { display: none; }
+body:has(.action-exp.open) #topFade,
+/* The splash is a centered brand screen, nothing scrolls under the status bar,
+   so it needs no top-fade. Hidden while the splash is up so the (light-mode)
+   fade never paints a band over the dark splash. */
+body:has(#splash:not(.dismissed)) #topFade { display: none; }
 
 /* ============================================
    TAB BAR
