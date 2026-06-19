@@ -4450,7 +4450,11 @@ const MementoShareCard = {
     // when none is currently open, so a re-open does not capture our own 'hidden'.
     // The card can open OVER the Clarity ceremony, which holds its own scroll-lock;
     // close() must restore exactly this, not blindly clear it.
-    if (!this._overlay) this._prevOverflow = document.body.style.overflow;
+    if (!this._overlay) {
+      this._prevOverflow = document.body.style.overflow;
+      // Remember the trigger so focus returns to it on close (a11y).
+      this._prevFocus = (document.activeElement && typeof document.activeElement.focus === 'function') ? document.activeElement : null;
+    }
     this._removeOverlay(); // remove a stale overlay's DOM only (does not touch overflow)
     const ov = document.createElement('div');
     ov.className = 'msc-overlay';
@@ -4489,6 +4493,14 @@ const MementoShareCard = {
     ov.querySelector('#mscCopy').addEventListener('click', function () { self._copyText(flash); });
     ov.querySelector('#mscLater').addEventListener('click', function () { self.close(); });
     ov.querySelector('.msc-scrim').addEventListener('click', function () { self.close(); });
+
+    // a11y: Escape closes (matching the fullscreen Memento view), and focus moves
+    // to the primary action on open. Capturing + stopImmediatePropagation so one
+    // Escape closes ONLY this top overlay, never the ceremony / fullscreen beneath.
+    if (self._escHandler) { try { document.removeEventListener('keydown', self._escHandler, true); } catch (e) {} }
+    self._escHandler = function (e) { if (e.key !== 'Escape') return; e.preventDefault(); e.stopImmediatePropagation(); self.close(); };
+    document.addEventListener('keydown', self._escHandler, true);
+    try { const sb = ov.querySelector('#mscShare'); if (sb) requestAnimationFrame(function () { try { sb.focus(); } catch (e) {} }); } catch (e) {}
   },
 
   // Remove the overlay DOM only. Does NOT restore overflow (open() reuses this).
@@ -4500,9 +4512,13 @@ const MementoShareCard = {
 
   close() {
     this._removeOverlay();
+    try { if (this._escHandler) { document.removeEventListener('keydown', this._escHandler, true); this._escHandler = null; } } catch (e) {}
     // Restore the captured value (keeps the ceremony's scroll-lock if it set one).
     try { document.body.style.overflow = this._prevOverflow || ''; } catch (e) {}
     this._prevOverflow = undefined;
+    // Return focus to whatever opened the card (a11y).
+    try { if (this._prevFocus && typeof this._prevFocus.focus === 'function') this._prevFocus.focus(); } catch (e) {}
+    this._prevFocus = undefined;
   },
 
   _text() {
