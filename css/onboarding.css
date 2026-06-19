@@ -3284,7 +3284,7 @@ html.lowfx .auth-screen__card, body.lite .auth-screen__card { background: rgba(1
    the newest line sits low and bright, history stacks upward and dims. */
 .welcome-intro__page-wrap:has(.welcome-convo) {
   /* Bottom-anchor the conversation with margin-top:auto on the column (below),
-     NOT justify-content:flex-end — flex-end CLIPS overflow above the container
+     NOT justify-content:flex-end, flex-end CLIPS overflow above the container
      and makes the history un-scrollable. */
   align-items: stretch; justify-content: flex-start;
   padding: 0; text-align: left;
@@ -3305,7 +3305,7 @@ html.lowfx .auth-screen__card, body.lite .auth-screen__card { background: rgba(1
 .welcome-intro__page-wrap.wc-reading .wc-line { opacity: 1 !important; filter: none !important; }
 .welcome-intro__page-wrap.wc-reading .wc-line.wc-hist { color: rgba(var(--ink),0.86); }
 .welcome-intro__page-wrap.wc-reading .wc-line.user { color: #fff !important; }
-/* hide the scrollbar — clean */
+/* hide the scrollbar, clean */
 .welcome-intro__page-wrap:has(.welcome-convo)::-webkit-scrollbar { width: 0; height: 0; }
 .welcome-convo {
   width: 100%; max-width: 560px;
@@ -3461,7 +3461,7 @@ html.lowfx .auth-screen__card, body.lite .auth-screen__card { background: rgba(1
   /* NOTHING-MOVES keyboard: rest the conversation + composer just ABOVE where the
      keyboard will appear, with the keyboard's space pre-reserved below (the
      padding-bottom ~ keyboard height). The composer auto-focuses, so the keyboard
-     just slides up to meet the input — no scroll, no jump, nothing shifts. The
+     just slides up to meet the input, no scroll, no jump, nothing shifts. The
      document scroll is also locked in JS while focused as a hard guarantee. */
   .welcome-intro:has(.welcome-convo):not(:has(.wc-chips)) { justify-content: flex-end; }
   .welcome-intro:has(.welcome-convo):not(:has(.wc-chips)) .welcome-intro__page-wrap:has(.welcome-convo) {
@@ -3486,3 +3486,53 @@ html.lowfx .auth-screen__card, body.lite .auth-screen__card { background: rgba(1
    focusing the input doesn't jolt the whole screen upward. The JS below cancels
    the scroll/pan iOS applies on focus. At rest the composer already sits just
    above where the keyboard appears, so "don't move" reads cleanest. */
+
+/* ============================================================================
+   ---- LIGHT MODE ----  (additive overrides for html.theme-light)
+   ----------------------------------------------------------------------------
+   Memento is dark-first; light mode is the html.theme-light class on <html>.
+   Most onboarding surfaces in this file need NO override and are intentionally
+   left untouched:
+
+   1. The full-screen onboarding scenes (.welcome-intro, .splash) and the auth
+      screen (.auth-screen, which draws its own #050507 backdrop) stay DARK in
+      light mode by design. base.css re-pins --ink to white inside
+      .welcome-intro / .splash, so their headlines, typewriter lines (.wc-line),
+      chips (.wc-chip / .welcome-intro__chip), composer (.wc-composer), buttons,
+      summary / first-win / solution (help) / paywall pages all read white-on-
+      dark exactly as intended. Inverting them here would BREAK that scene.
+   2. The in-sheet quiz surfaces (.wiz__*, .ai-chat__*, .clarity-summary,
+      .module-intro, .chip, etc.) already use --ink-derived tokens
+      (var(--text-1), var(--kfill-04), rgba(var(--ink),a), var(--hairline)),
+      which flip to near-black on the off-white canvas on their own.
+   3. .clarity-drift--panel keeps its rgba(15,8,40,a) near-black text because it
+      sits on the always-bright Neutron Star summary card in both themes.
+
+   What DOES break: a few FLOATING glass surfaces that paint their OWN hardcoded
+   dark background but pull their TEXT from --ink-derived tokens. In light mode
+   the text inverts to near-black while the surface stays dark, so it goes dark-
+   on-dark and unreadable. Below we relight just those surfaces to light glass
+   (matching the misc.css toast/sheet pattern) so the inverted text reads again.
+============================================================================ */
+
+/* Earned-stillness status toast: dark glass -> light glass so the (now near-
+   black) --text-1 label reads. Border/blur already token-driven. */
+html.theme-light .earned-status {
+  background: rgba(248, 248, 250, 0.88);
+  box-shadow: var(--glass-shadow-soft);
+}
+html.theme-light body.lite .earned-status,
+html.theme-light.lowfx .earned-status {
+  background: rgb(248, 248, 250);
+}
+
+/* Milestone banner (streak 7/30/100): same relight. Its title/sub/buttons all
+   pull from --text-* / --kfill-* tokens, which invert to near-black on their
+   own; only the card's own dark fill + heavy black shadow need flipping. */
+html.theme-light .milestone-banner {
+  background: rgba(248, 248, 250, 0.9);
+  box-shadow: var(--shadow-pop);
+}
+html.theme-light body.lite .milestone-banner {
+  background: rgb(248, 248, 250);
+}

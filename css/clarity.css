@@ -2967,3 +2967,74 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
   .nsv2-star__spike--primary { width: 380px; }
   .nsv2-star__spike--strut { width: 230px; }
 }
+
+/* ============================================================
+   ---- LIGHT MODE ----
+   Toggled by html.theme-light (NOT prefers-color-scheme). ADDITIVE
+   overrides only; every dark rule above is left untouched so dark
+   (the primary theme) cannot break.
+
+   What is ALREADY handled elsewhere and is deliberately NOT re-done here:
+   - base.css re-points .clarity-exp to a light surface and gives
+     .clarity-exp__bg a light gradient, so the WIZARD sits on off-white.
+     All wizard text/borders that ride rgba(var(--ink),a), --kfill-*,
+     --text-hi/mid/lo, --hairline, --solid-bg/fg flip automatically and
+     read correctly. They are not repeated below.
+   - base.css re-pins --ink:255,255,255 on .ns-star-scene, so the deep-
+     space Neutron Star REVEAL stays dark by design (the star, starfield,
+     glow, label, hint). Its zoomed-in detail/summary panels already use a
+     hardcoded light-cream palette with dark text, correct on the bright
+     star interior in either theme. Left as-is.
+   - .nsv2 (Ignition v2) and .ns-ignite are self-contained full-bleed dark
+     ceremony scenes with their own solid dark backgrounds; their white text
+     stays legible on them. Left dark on purpose.
+
+   What this block fixes: the few wizard-chrome surfaces with LITERAL white
+   (#fff / rgba(255,255,255,a)) or hardcoded dark text that assume a dark
+   page and therefore go invisible / wrong on the now-light wizard surface,
+   plus toning the god-ray so it does not wash out on off-white.
+   ============================================================ */
+
+/* Primary "Begin / Find my answer" CTA: was a literal white fill with black
+   text (invisible on the light page). Flip to the dark solid button tokens
+   so it reads as the one primary action on the screen. */
+html.theme-light .clarity-exp__nav-btn--find {
+  background: var(--solid-bg);
+  color: var(--solid-fg);
+  box-shadow: 0 4px 20px rgba(var(--ink), 0.10);
+}
+html.theme-light .clarity-exp__nav-btn--find:hover {
+  box-shadow: 0 6px 28px rgba(var(--ink), 0.16);
+}
+/* Next button pressed-state used a hardcoded white fill / black text. */
+html.theme-light .clarity-exp__nav-btn--next:active {
+  background: var(--solid-bg);
+  color: var(--solid-fg);
+}
+
+/* "Continue building" CTA in the blurry-core fallback (.ns-summary--fallback
+   renders directly on the light wizard surface, NOT inside the dark star
+   scene). Its fill flips to dark via --kfill-96, but its text was hardcoded
+   near-black (#0a0612) -> dark-on-dark. Repoint the text to light. Scoped to
+   the fallback so the zoomed-star override (dark text on the bright star) is
+   never touched. */
+html.theme-light .ns-summary--fallback .ns-card__cta {
+  color: var(--solid-fg);
+}
+
+/* The god-ray layer (.crays) is near-white light arriving over the wizard.
+   On off-white it has little to push against, so lower its overall presence
+   and re-tint the bright source from white to a soft clarity-purple so it
+   stays a felt glow instead of a flat white smear. Decorative + lower
+   priority than text, kept gentle. */
+html.theme-light .crays {
+  opacity: calc(var(--clarity-light, 0.08) * 0.62);
+  mix-blend-mode: multiply;
+}
+html.theme-light .crays__source {
+  background: radial-gradient(circle at 22% 22%,
+    rgba(123, 97, 255, 0.20) 0%,
+    rgba(123, 97, 255, 0.12) 16%,
+    rgba(140, 120, 255, 0.06) 34%,
+    transparent 64%);
+}
