@@ -3215,6 +3215,17 @@ body.pre-clarity .capture-fab { display: none !important; }
 .hubcc--msg .hubcc__shown { white-space: normal; line-height: 1.4; }
 /* Close-your-day: the earned line once today is done, quiet green, not loud. */
 .hubcc__closed { color: var(--color-consistency); font-weight: 600; }
+/* weakestPillar nudge: a quiet way back to the goal when clarity is the gap.
+   Secondary, no CTA styling, just a low-key line under the consistency row. */
+.hubcc__revisit {
+  display: block; margin: 8px 2px 0;
+  font: inherit; font-size: 0.78rem; font-weight: 500;
+  color: var(--text-lo); background: none; border: none; padding: 2px 0;
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transition: color 0.18s ease;
+}
+.hubcc__revisit::after { content: '  \2192'; opacity: 0.7; }
+.hubcc__revisit:hover { color: var(--text-mid); }
 .hubcc__shown b,
 .hubcc__total b {
   font-weight: 700;

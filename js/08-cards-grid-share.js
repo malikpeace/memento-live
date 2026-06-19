@@ -3291,6 +3291,23 @@ function renderHubConsistency() {
     // Pre-Clarity the home stays bare (card + Start CTA only). The consistency
     // line is part of the post-Clarity hub, same gate renderDailyMemento uses.
     if (!(state.clarity && state.clarity.completed)) { el.innerHTML = ''; return; }
+    // weakestPillar biasing: when the user's weakest pillar is clarity, surface a
+    // quiet way back to the goal (the diagnostic steering the hub). The card tint
+    // already biases purple for clarity; this is the brief's secondary nudge.
+    let revisitHtml = '';
+    try {
+      if (String((state.profile && state.profile.weakestPillar) || '').toLowerCase() === 'clarity') {
+        revisitHtml = '<button class="hubcc__revisit" type="button">Revisit your Neutron Star</button>';
+      }
+    } catch (e) {}
+    // One-time delegated click; survives the innerHTML re-renders below.
+    if (!el._revisitBound) {
+      el._revisitBound = true;
+      el.addEventListener('click', function (e) {
+        const t = e.target && e.target.closest && e.target.closest('.hubcc__revisit');
+        if (t) { try { if (typeof ClarityExperience !== 'undefined' && ClarityExperience.openSummary) ClarityExperience.openSummary(); } catch (_) {} }
+      });
+    }
     let cs = { thisWeek: 0, totalActiveDays: 0, counts: {} };
     try { cs = consistencyStats(); } catch (e) {}
     const thisWeek = Math.min(7, cs.thisWeek || 0);
@@ -3340,7 +3357,7 @@ function renderHubConsistency() {
         '<div class="hubcc hubcc--done">' +
           '<span class="hubcc__shown hubcc__closed">Today is closed. You showed up.</span>' +
           '<span class="hubcc__chain">' + dots + '</span>' +
-        '</div>' + community;
+        '</div>' + community + revisitHtml;
       return;
     }
     el.innerHTML =
@@ -3348,7 +3365,7 @@ function renderHubConsistency() {
         '<span class="hubcc__shown">Shown up <b>' + thisWeek + '</b> of 7 this week</span>' +
         '<span class="hubcc__chain">' + dots + '</span>' +
         '<span class="hubcc__total"><b>' + total + '</b> day' + (total === 1 ? '' : 's') + '</span>' +
-      '</div>' + community;
+      '</div>' + community + revisitHtml;
   } catch (e) {}
 }
 
