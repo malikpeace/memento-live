@@ -321,6 +321,10 @@ const ClarityExperience = {
 
           const restartBtn = document.getElementById('nsConfirmRestart');
           if (restartBtn) restartBtn.addEventListener('click', () => {
+            // Detach the capturing ESC handler before leaving the confirm prompt;
+            // restoreSummary is skipped on this path, so without this it would leak
+            // and keep swallowing Escape globally (one more per Continue->Restart).
+            if (confirmEscHandler) { document.removeEventListener('keydown', confirmEscHandler, true); confirmEscHandler = null; }
             state.clarity.completed = false;
             state.clarity.tutorialSeen = false;
             delete state.clarity.draft;

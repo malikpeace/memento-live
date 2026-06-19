@@ -984,7 +984,9 @@ const VivereCanvas = {
       const x = ox + ci * (colW + gutter), y = oy + colH[ci];
       colH[ci] += h + gutter;
       const extra = it.imageId ? { imageId: it.imageId } : { dataURL: it.dataURL };
-      c.cards.push(Object.assign({ id: _vivGenId('image'), type: 'image', x: x, y: y, w: w, h: h, z: c.nextZ++, text: '', title: '', url: '', dataURL: '' }, extra));
+      // Stamp createdAt at import time (like addCard) so patina / anniversary /
+      // On-This-Day read the real moment, not the board's birthday backfilled later.
+      c.cards.push(Object.assign({ id: _vivGenId('image'), type: 'image', x: x, y: y, w: w, h: h, z: c.nextZ++, text: '', title: '', url: '', dataURL: '', createdAt: Date.now() }, extra));
     });
     this._persist();
     this._rerender();

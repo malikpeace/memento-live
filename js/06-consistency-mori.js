@@ -35,6 +35,12 @@ function buildConsistencyData() {
     const s = state || {};
     (s.streak && Array.isArray(s.streak.history) ? s.streak.history : []).forEach(d => add(d, 1));
     (s.action && Array.isArray(s.action.completionHistory) ? s.action.completionHistory : []).forEach(h => add(h && h.date, 1));
+    // A daily check-in is showing up too (its proof event is written as type
+    // 'proof' for the memory feed, so it falls outside PROOF_ACTIVE below; read
+    // the check-in array directly here so a check-in-only day still counts toward
+    // the streak / heatmap and never triggers a false "comeback" nudge). iso is a
+    // local getTodayISO() day key, timezone-stable like every other source.
+    (s.checkins && Array.isArray(s.checkins) ? s.checkins : []).forEach(c => { if (c && c.iso) add(c.iso, 1); });
     // Key off iso (timezone-stable, matches every other source) and only count
     // entries with real text so an empty new note never inflates the streak.
     (s.reflection && Array.isArray(s.reflection.entries) ? s.reflection.entries : []).forEach(e => { if (e && (e.text || '').trim()) add(e.iso || e.date, 1); });

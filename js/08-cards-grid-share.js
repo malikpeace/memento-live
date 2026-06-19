@@ -380,7 +380,9 @@ function _ladderEligible(key) {
     const comps = (state.action && Array.isArray(state.action.completionHistory)) ? state.action.completionHistory : [];
     const compDays = (() => {
       const set = {};
-      comps.forEach(c => { const d = c && c.date && String(c.date).slice(0, 10); if (d) set[d] = true; });
+      // Bucket by LOCAL day (completionHistory stores full ISO timestamps; a raw
+      // .slice(0,10) is the UTC day and mis-times this unlock for evening US users).
+      comps.forEach(c => { const d = c && c.date && ((typeof isoToLocalDay === 'function') ? isoToLocalDay(c.date) : String(c.date).slice(0, 10)); if (d) set[d] = true; });
       return Object.keys(set).map(d => Math.floor(Date.parse(d + 'T00:00:00Z') / 86400000)).filter(n => !isNaN(n)).sort((a, b) => a - b);
     })();
     switch (key) {

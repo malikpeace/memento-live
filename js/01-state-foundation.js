@@ -1238,7 +1238,10 @@ function comebackGapDays() {
     let mostRecent = null; // most recent activity day number
     const consider = (iso) => {
       if (!iso || typeof iso !== 'string') return;
-      const key = iso.slice(0, 10);
+      // Local day (completionHistory.date is a full ISO timestamp; a raw slice
+      // would be the UTC day and under-report the gap for evening US users).
+      const key = isoToLocalDay(iso);
+      if (!key) return;
       const n = Math.floor(new Date(key + 'T00:00:00Z').getTime() / 86400000);
       if (isNaN(n)) return;
       if (mostRecent === null || n > mostRecent) mostRecent = n;

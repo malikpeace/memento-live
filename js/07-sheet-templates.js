@@ -1756,7 +1756,9 @@ const SHEET_TEMPLATES = {
     _weekKey() { const d = new Date(); const oneJan = new Date(d.getFullYear(), 0, 1); const day = Math.floor((d - oneJan) / 86400000); return d.getFullYear() + '-W' + String(Math.ceil((day + oneJan.getDay() + 1) / 7)).padStart(2, '0'); },
     _stats() {
       const todayN = Math.floor(Date.parse(this._todayISO() + 'T00:00:00Z') / 86400000);
-      const inWk = (iso) => { const t = Date.parse(String(iso || '').slice(0, 10) + 'T00:00:00Z'); if (isNaN(t)) return false; const n = Math.floor(t / 86400000); return (todayN - n >= 0 && todayN - n < 7); };
+      // Bucket by LOCAL day (completionHistory.date is a full ISO timestamp; a raw
+      // slice is the UTC day and would drop an evening US action from the window).
+      const inWk = (iso) => { const day = (typeof isoToLocalDay === 'function') ? isoToLocalDay(iso) : String(iso || '').slice(0, 10); if (!day) return false; const t = Date.parse(day + 'T00:00:00Z'); if (isNaN(t)) return false; const n = Math.floor(t / 86400000); return (todayN - n >= 0 && todayN - n < 7); };
       const actions = ((state.action && state.action.completionHistory) || []).filter(h => h && inWk(h.date)).length;
       const deep = ((state.deepwork && state.deepwork.sessions) || []).filter(s => s && inWk(s.iso || s.date)).length;
       const refl = ((state.reflection && state.reflection.entries) || []).filter(e => e && inWk(e.iso || e.date)).length;
@@ -2328,7 +2330,9 @@ const SHEET_TEMPLATES = {
         const death = new Date(Date.now() + Math.max(0, yearsLeft) * MS_YEAR);
         const dateStr = death.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
         const yrs = Math.max(0, Math.floor(yearsLeft));
-        const days = Math.max(0, Math.round(yearsLeft * 365.25));
+        // Remainder days after the whole years (not the full span again, which
+        // read as if the years and days were additive).
+        const days = Math.max(0, Math.round((yearsLeft - yrs) * 365.25));
         return `<div class="mori-deathclock">
           <div class="mori-deathclock__eyebrow">If the averages hold, your last day is</div>
           <div class="mori-deathclock__date">${dateStr}</div>
