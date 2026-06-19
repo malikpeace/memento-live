@@ -295,6 +295,9 @@ function buildDemoState(personaKey) {
     profile: { name: p.name, onboarded: true, onboardedAt: new Date().toISOString() },
     dev: { previewAll: true }, // unlock every module so the demo dashboard looks full
     prefs: { unlockAll: true }, // demos always bypass the unlock ladder
+    // Demos simulate someone who already bought: mark them paid so the post-Clarity
+    // paywall never appears (a persona is supposed to be a full, owned account).
+    entitlements: { isPaid: true, paidAt: new Date().toISOString(), plan: 'demo' },
     checkins: demoCheckins,
     clarity: { completed: true, completedAt: new Date().toISOString(), answers: { neutronStar: p.neutronStar, coreWhy: p.coreWhy, whyItMatters: p.coreWhy, antiVision: p.antiVision, futureVision: p.futureVision, identityLine: p.identityLine, tensionLine: p.tensionLine || '', timeHorizon: '12 months', dailyTime: 90, intensity: 'heavy' } },
     action: { viewMode: 'vine', introSeen: true, intake: { completed: true }, planGenerated: true, planSourceNeutronStar: p.neutronStar, selectedTier: 'moderate', lastGeneratedAt: new Date().toISOString(), primaryAction: { title: p.action.title, why: p.action.why, howToStart: p.action.howToStart, recommendedTier: 'moderate', recommendedWhy: p.action.recommendedWhy, tiers: p.action.tiers, path: p.action.path, linkedProjectId: p.action.linkedProjectId || '', linkedMilestoneId: p.action.linkedMilestoneId || '' }, projects: p.action.projects || [], completionHistory: completionHistory },

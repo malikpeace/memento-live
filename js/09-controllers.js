@@ -191,7 +191,19 @@ const WelcomeIntro = {
       commit: (v) => { state.profile.name = String(v).trim(); persistNow(); return true; },
       display: (v) => String(v).trim()
     });
-    beats.push({ lines: (n) => ['Welcome to Memento, ' + (n || 'you') + '.'] });
+    beats.push({ lines: (n) => ['Welcome to Memento, ' + (n || 'you') + '.'], pause: 700 });
+    // Pick the look right after the welcome, so the rest of onboarding and the
+    // first blank Memento already wear the style they chose. Once only (the picker
+    // sets prefs.appearanceChosen); a no-op for anyone who already picked.
+    beats.push({
+      action: () => new Promise((resolve) => {
+        try {
+          if (typeof AppearancePicker !== 'undefined' && AppearancePicker.open && !(state.prefs && state.prefs.appearanceChosen)) {
+            AppearancePicker.open(resolve);
+          } else { resolve(); }
+        } catch (e) { resolve(); }
+      })
+    });
     // Birthday is the FIRST question (an easy, factual warm-up that also powers
     // Memento Mori), then a transition line escalates into the deeper diagnostic.
     const birthdayBeat = {
@@ -361,6 +373,10 @@ const WelcomeIntro = {
       // Optional extra hold after a beat's lines (e.g. let "Welcome to Memento"
       // sit before the conversation begins). Skipped on instant rebuild / reduced motion.
       if (beat.pause && !instant && !this._wcReduced) { await new Promise(r => setTimeout(r, beat.pause)); if (gen !== this._wcGen) return; }
+      // An action beat pauses the walk for an async side-flow (e.g. the appearance
+      // picker after the welcome) and resumes when it resolves. Skipped on instant
+      // rebuild (back/rewind) so it never re-fires.
+      if (beat.action && !instant) { try { await beat.action(); } catch (e) {} if (gen !== this._wcGen) return; }
       if (beat.input) {
         instant = false;
         const ans = await this._wcAsk(beat);
@@ -4190,17 +4206,12 @@ const Splash = {
     const treatAsReturning = isReturning || hasRestorable;
 
     if (!treatAsReturning) {
-      // First time: slow fade out, then the "choose your look" picker (once),
-      // then the welcome intro. New users pick the feel of their Memento before
-      // they build it; returning users never see it.
+      // First time: slow fade out, then the welcome intro. The "choose your look"
+      // picker now lives INSIDE the welcome, right after "Welcome to Memento", so
+      // the rest of onboarding + the first blank Memento wear the chosen style.
       this.el.classList.add('splash--exiting');
       setTimeout(() => {
-        const startWelcome = () => WelcomeIntro.open();
-        if (typeof AppearancePicker !== 'undefined' && !(state.prefs && state.prefs.appearanceChosen)) {
-          AppearancePicker.open(startWelcome);
-        } else {
-          startWelcome();
-        }
+        WelcomeIntro.open();
       }, 1300);
       setTimeout(() => {
         this.el.classList.add('dismissed');
