@@ -988,14 +988,16 @@ const WelcomeIntro = {
   // (weakestPillar) tailors the "Solution" page and seeds Clarity (Build 2).
   identitySteps: [
     // ── CLARITY gap: do they even know what they want? ──────────────────────
-    { key: 'runningToward', type: 'choices', multi: true,
-      headline: 'So, what do you want to make progress in?',
-      sub: 'Tap whatever fits. You can pick more than one.',
-      options: ['Work & money', 'Health & fitness', 'Discipline & focus', 'A skill or craft', 'Creative work', 'Relationships', 'Confidence & mindset', 'Purpose & direction', "I'm honestly not sure yet"] },
+    // Clarity leads (the real clarity-gap signal); the area question follows as
+    // "what's it about", so the two no longer feel like the same question.
     { key: 'clarityLevel', type: 'choices', multi: false,
       headline: 'Do you actually know what you want?',
       sub: 'Be honest. Naming it is the whole first step.',
       options: ['Yes, I know exactly', 'I have a rough idea', "Not really, I'm figuring it out", 'No, I feel lost'] },
+    { key: 'runningToward', type: 'choices', multi: true,
+      headline: 'What part of your life is this about?',
+      sub: 'Tap whatever fits. You can pick more than one.',
+      options: ['Work & money', 'Health & fitness', 'Discipline & focus', 'A skill or craft', 'Creative work', 'Relationships', 'Confidence & mindset', 'Purpose & direction', "I'm honestly not sure yet"] },
     // (birthday is inserted here, after the clarity gap)
     // ── ACTION gap: do they know the steps, and where are they? ─────────────
     { key: 'actionKnow', type: 'choices', multi: false,
