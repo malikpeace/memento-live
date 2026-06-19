@@ -59,18 +59,21 @@
   border-radius: calc(13px * var(--rx, 1));
 }
 
+/* This overlay is a self-contained dark world (the scrim is always dark because
+   the card is dark art), so its text + primary button are ALWAYS light, never the
+   theme tokens, which flip to dark in light mode and go dark-on-dark here. */
 .msc-title {
   margin-top: 26px;
   font-size: 1.35rem;
   font-weight: 700;
   letter-spacing: -0.01em;
-  color: var(--text-hi, rgba(255, 255, 255, 0.95));
+  color: rgba(255, 255, 255, 0.95);
 }
 .msc-sub {
   margin-top: 6px;
   font-size: 0.92rem;
   line-height: 1.45;
-  color: var(--text-2, rgba(255, 255, 255, 0.6));
+  color: rgba(255, 255, 255, 0.6);
 }
 
 /* Share is the single hero: full-width primary. Copy text + Not now are quiet
@@ -90,8 +93,8 @@
 .msc-btn:active { transform: scale(0.97); }
 .msc-btn--primary {
   margin-top: 22px;
-  background: var(--solid-bg, #fff);
-  color: var(--solid-fg, #000);
+  background: #ffffff;
+  color: #14141a;
 }
 
 .msc-subactions {
@@ -107,7 +110,7 @@
   cursor: pointer;
   background: none;
   border: none;
-  color: var(--text-lo, rgba(255, 255, 255, 0.45));
+  color: rgba(255, 255, 255, 0.5);
   padding: 8px 4px;
   -webkit-tap-highlight-color: transparent;
   transition: opacity 0.18s ease;
@@ -122,8 +125,9 @@
 }
 
 /* Light mode: the scrim stays dark (the card is dark art and reads best on a
-   dark backdrop), but the title/sub use the theme tokens which already flip. */
-html.theme-light .msc-scrim { background: rgba(8, 8, 14, 0.66); }
+   dark backdrop). All overlay text/buttons above are already fixed light, so they
+   stay legible on this dark scrim regardless of app theme. */
+html.theme-light .msc-scrim { background: rgba(8, 8, 14, 0.7); }
 
 @media (prefers-reduced-motion: reduce) {
   .msc-overlay, .msc-panel { transition: none; }
