@@ -661,7 +661,7 @@ html.theme-light .widget--action .widget__icon { color: var(--text-hi) !importan
 }
 .greeting-time { font-size: var(--fs-sm); font-weight: 400; color: var(--text-2); letter-spacing: 0.02em; }
 .greeting-name { font-size: 1.625rem; font-weight: 700; letter-spacing: -0.03em; margin-top: 2px; }
-.header-date { font-size: 0.75rem; color: var(--text-3); font-weight: 500; text-align: right; margin-top: 4px; letter-spacing: 0.02em; }
+.header-date { font-size: 0.75rem; color: var(--text-3); font-weight: 500; text-align: right; margin-top: 4px; letter-spacing: 0.02em; white-space: nowrap; font-variant-numeric: tabular-nums; }
 
 /* --- Widget Grid (Dashboard V2 layout) ---
    The grid is now driven by data-area attributes set in renderGrid().
@@ -1502,6 +1502,8 @@ html.lowfx .cc-hero-body .ctraj { animation: none !important; }
   font-size: var(--fs-xs);
   color: var(--text-3);
   margin-bottom: 4px; /* date now sits above the time */
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap; /* keep "date · ~X weeks left" on one line */
 }
 .dash-header__greeting .greeting-time { font-size: var(--fs-sm); }
 .dash-header__greeting .greeting-name { font-size: var(--fs-lg); margin-top: 0; font-weight: 600; }
@@ -3152,7 +3154,7 @@ html.lowfx .daycard-ns {
   /* !important matches the older mobile rule that force-showed this block. */
   .dash-header__right { display: none !important; }
   #dashGreetingMobile .mgreet__search { display: none !important; }
-  .wbar__date { font-size: 0.8rem; font-weight: 500; color: var(--text-lo); letter-spacing: 0.01em; }
+  .wbar__date { font-size: 0.8rem; font-weight: 500; color: var(--text-lo); letter-spacing: 0.01em; font-variant-numeric: tabular-nums; }
   .wbar__weeks {
     font: inherit; font-size: 0.8rem; font-weight: 500;
     font-variant-numeric: tabular-nums; letter-spacing: 0.01em;

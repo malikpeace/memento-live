@@ -2745,11 +2745,14 @@ function creditTodayAction() {
     const actionText = (pa.tiers && pa.tiers[tier]) || pa.howToStart || pa.title || '';
     if (!state.action) state.action = {};
     if (!Array.isArray(state.action.completionHistory)) state.action.completionHistory = [];
-    state.action.completionHistory.push({ date: new Date().toISOString(), tier, actionText, planTitle: pa.title || '' });
+    // Stamp a stable id so the inline undo can remove THIS exact entry, never a
+    // later completion logged in the undo window (which a blind pop would delete).
+    const id = 'act_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    state.action.completionHistory.push({ id: id, date: new Date().toISOString(), tier, actionText, planTitle: pa.title || '' });
     try { writeProofEvent('action-complete', { title: actionText || pa.title || 'Action completed', module: 'action', metadata: { tier } }); } catch (_) {}
     if (typeof recalculateStreak === 'function') { try { recalculateStreak(); } catch (_) {} }
     try { persistNow(); } catch (_) {}
-    return true;
+    return id;
   } catch (e) { return false; }
 }
 
@@ -2901,7 +2904,7 @@ function renderCommandCenter() {
       row += '<div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--hairline);">';
       row += '<div style="display:flex;gap:8px;flex-wrap:wrap;">';
       if (doneToday) {
-        row += '<div style="flex:1;min-width:150px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;color:rgba(120,230,170,0.95);border:1px solid rgba(120,230,170,0.35);border-radius:calc(8px * var(--rx, 1));padding:12px;">&#10003; Done today</div>';
+        row += '<div style="flex:1;min-width:150px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;color:var(--color-consistency);background:color-mix(in srgb, var(--color-consistency) 12%, transparent);box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);border-radius:calc(8px * var(--rx, 1));padding:12px;">&#10003; Done today</div>';
       } else {
         // Inline confirm: close the day right here. "Open" still routes into the
         // Action module for the focus timer / full detail (secondary, quiet).
@@ -3196,11 +3199,13 @@ function bindCommandCenter(cc) {
       else if (a === 'didit') {
         // Mark today's action done in place, then re-render so the card tint
         // evolves greener and the consistency line flips to "Today is closed".
-        const credited = creditTodayAction();
+        const creditedId = creditTodayAction();
         try { if (typeof renderAll === 'function') renderAll(); } catch (e) {}
-        if (credited && typeof showUndoToast === 'function') {
+        if (creditedId && typeof showUndoToast === 'function') {
           try { showUndoToast('Today is closed. You showed up.', function () {
-            try { var h = state.action && state.action.completionHistory; if (Array.isArray(h) && h.length) { h.pop(); if (typeof recalculateStreak === 'function') recalculateStreak(); persistNow(); if (typeof renderAll === 'function') renderAll(); } } catch (e) {}
+            // Remove THIS exact entry by id, never a later completion logged in
+            // the undo window (a blind pop would delete the wrong one).
+            try { var h = state.action && state.action.completionHistory; if (Array.isArray(h)) { var idx = h.findIndex(function (x) { return x && x.id === creditedId; }); if (idx !== -1) { h.splice(idx, 1); if (typeof recalculateStreak === 'function') recalculateStreak(); persistNow(); if (typeof renderAll === 'function') renderAll(); } } } catch (e) {}
           }); } catch (e) {}
         }
       }
@@ -3377,14 +3382,16 @@ function renderHubConsistency() {
     const todayISO = getTodayISO();
     const doneToday = (cs.counts || {})[todayISO] !== undefined;
     let comeback = false;
-    try { comeback = (typeof isComebackGap === 'function') && isComebackGap(); } catch (e) {}
+    // doneToday wins over a comeback gap: if they just closed the day in place
+    // (even right after a gap), show "Today is closed", not a stale "Today makes N+1".
+    try { comeback = !doneToday && (typeof isComebackGap === 'function') && isComebackGap(); } catch (e) {}
     const lateAndNotDone = !doneToday && !comeback && new Date().getHours() >= 14;
     if (comeback) {
-      el.innerHTML = '<div class="hubcc hubcc--msg"><span class="hubcc__shown">Welcome back. You have shown up <b>' + total + '</b> day' + (total === 1 ? '' : 's') + '. Today makes <b>' + (total + 1) + '</b>.</span></div>' + community;
+      el.innerHTML = '<div class="hubcc hubcc--msg"><span class="hubcc__shown">Welcome back. You have shown up <b>' + total + '</b> day' + (total === 1 ? '' : 's') + '. Today makes <b>' + (total + 1) + '</b>.</span></div>' + community + revisitHtml;
       return;
     }
     if (lateAndNotDone) {
-      el.innerHTML = '<div class="hubcc hubcc--msg"><span class="hubcc__shown">Still time to show up today. The next move is right here.</span></div>' + community;
+      el.innerHTML = '<div class="hubcc hubcc--msg"><span class="hubcc__shown">Still time to show up today. The next move is right here.</span></div>' + community + revisitHtml;
       return;
     }
     if (doneToday) {
