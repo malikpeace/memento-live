@@ -235,7 +235,7 @@ function voiceLint(text) {
   return hits;
 }
 
-const AI_DISCOVERY_SYSTEM_PROMPT = `You are the voice behind Memento. You help people find their Neutron Star, a purpose so heavy no distraction can pull them away.
+const AI_DISCOVERY_SYSTEM_PROMPT = `You are the voice behind Memento. You help people find their Neutron Star, a purpose so heavy no distraction can take them off course.
 
 ${MALIK_VOICE_SPEC}
 
@@ -549,7 +549,7 @@ Generate ONLY a JSON object (no markdown fences, no commentary):
   "coreWhy": "1-2 sentences naming the raw, concrete reason this matters. Use NO pronouns. Do NOT start with 'I', 'You', 'My', 'Your', 'We'. Do NOT start with 'Because'. Drop 'proof that', 'bigger than', 'wake people up', 'stronger than', 'helps people' and other inspirational framing. State the actual thing they kept circling back to as a declarative phrase. Examples of the right tone: 'Watching the people who matter most scroll their lives away.' 'Tired of building things that fade into noise within a month.' 'A piece of work that does not disappear after the launch hype.'",
   "antiVision": "1 short declarative sentence naming what would happen if this stays neglected. NO pronouns (no 'You', 'I', 'Your'). Start with a noun or '-ing' verb. Example tones: 'Another half-built idea that fades into noise.' 'A second decade spent helping other people execute their vision instead.'",
   "futureVision": "1-2 short declarative sentences painting the specific real-world result. NO pronouns. Start with a noun or concrete image. Example tones: 'A real product the right people are actually using because it changes their day.' 'A version of this work that doesn't have to be explained because the impact speaks for itself.'",
-  "identityLine": "A short declarative identity statement. NO pronouns. Do NOT start with 'I am someone who'. Start with a noun or role. Example tones: 'Builder of things that pull people back toward what matters.' 'The kind of operator who finishes what they start.'",
+  "identityLine": "A short declarative identity statement. NO pronouns. Do NOT start with 'I am someone who'. Start with a noun or role. Example tones: 'Builder of things that draw people back toward what matters.' 'The kind of operator who finishes what they start.'",
   "tensionLine": "OPTIONAL. One sentence (max 22 words) naming the contradiction or fear underneath their goal that they circled but never said outright, the subtext. NO pronouns to open. Make them feel understood, not judged. Example tones: 'This was never about more output. It is about no longer feeling behind.' 'The real fear is not failing, it is looking back and finding nothing that lasted.' If nothing clear surfaced, return ''."
 }`;
 
@@ -2317,7 +2317,7 @@ function buildContextMessage() {
 
   ctx += 'IMPORTANT: You are not trying to get them to pick a goal from a list. You are trying to help them arrive at something that feels genuinely theirs through self-reflection. By the end, they should feel like they figured it out themselves, not like they filled out a form. That is the whole point.\n\n';
 
-  ctx += 'Follow whatever thread feels most alive. If they mention something in passing that sounds real, pull on that thread. If they give surface-level answers, go wider and more philosophical. If they light up about something, go deeper on exactly that thing.\n\n';
+  ctx += 'Follow whatever thread feels most alive. If they mention something in passing that sounds real, tug on that thread. If they give surface-level answers, go wider and more philosophical. If they light up about something, go deeper on exactly that thing.\n\n';
 
   ctx += 'This will be the LONGEST path. 20-30+ questions is normal here. Do NOT rush. This person genuinely does not know what they want, so you need to spend real time helping them explore. Be patient. It is okay if they do not land on the exact micro-specific thing. The goal is to get them DIRECTIONALLY CORRECT - at least to the area and rough shape of what they care about. That alone is a huge win.\n\n';
   ctx += 'Once you help them find something that resonates, THEN go deep on the why. Ask for their anti-vision and vision. Find the emotional core.\n\n';
@@ -2426,7 +2426,7 @@ function renderWizardStep(key) {
       );
     case 'discoverDomain':
       return `<div class="wiz__question">No worries! Very few humans ever know exactly what they want to do.</div>
-        <div class="wiz__hint" style="margin-bottom:24px; line-height:1.6;">Most people spend their entire lives avoiding this question. Yet you're here. Which already puts you ahead of 90% of people. Let's figure this out.<br><br>Pick one or two areas that pull at you. Not what you think you should pick. What actually keeps you up at night or gets you out of bed.</div>
+        <div class="wiz__hint" style="margin-bottom:24px; line-height:1.6;">Most people spend their entire lives avoiding this question. Yet you're here. Which already puts you ahead of 90% of people. Let's figure this out.<br><br>Pick one or two areas that draw you in. Not what you think you should pick. What actually keeps you up at night or gets you out of bed.</div>
         <div class="wiz__hint" style="font-size:0.75rem; opacity:0.7; margin-bottom:16px;">Pick up to 2. You can't make progress across all areas of life at once.</div>` +
         wizMultiSelectInner(
           DISCOVERY_DOMAINS.map(d => ({ value: d.value, label: d.label, desc: d.desc }))
