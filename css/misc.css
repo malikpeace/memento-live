@@ -59,8 +59,8 @@ body:has(.action-exp.open) #topFade { display: none; }
   display: flex; align-items: stretch; justify-content: center;
   gap: 4px;
   background: var(--glass-bg-heavy);
-  backdrop-filter: blur(calc(48px * var(--bx, 1))) saturate(150%);
-  -webkit-backdrop-filter: blur(calc(48px * var(--bx, 1))) saturate(150%);
+  backdrop-filter: blur(calc(80px * var(--bx, 1))) saturate(160%);
+  -webkit-backdrop-filter: blur(calc(80px * var(--bx, 1))) saturate(160%);
   border: 0;
   box-shadow: var(--glass-shadow), var(--glass-highlight);
   border-radius: var(--r-card);
@@ -719,10 +719,12 @@ html.theme-light body.lite .more-space__sheet, html.theme-light.lowfx .more-spac
    small element) and drop the deep glass shadow so it reads flat, not lifted. */
 body.lite .tab-bar, html.lowfx .tab-bar {
   background: rgba(12, 13, 17, 0.42);
-  /* Heavier blur so content scrolling behind the bar is well obscured (same
-     transparency, just blurrier for readability). */
-  backdrop-filter: blur(40px) saturate(140%);
-  -webkit-backdrop-filter: blur(40px) saturate(140%);
+  /* Very heavy frost so content scrolling behind the bar is smeared unrecognizable
+     (same transparency, just far blurrier, Malik wants glass you can't see through).
+     !important so it SURVIVES the global `body.lite *{backdrop-filter:none}` perf
+     kill (js/11) which was silently leaving this bar with zero blur, see-through. */
+  backdrop-filter: blur(90px) saturate(150%) !important;
+  -webkit-backdrop-filter: blur(90px) saturate(150%) !important;
   box-shadow: var(--glass-highlight);
 }
 html.theme-light body.lite .tab-bar, html.theme-light.lowfx .tab-bar {

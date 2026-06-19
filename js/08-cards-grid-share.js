@@ -3768,44 +3768,6 @@ function renderDayCard() {
 // the three pillars - Clarity (your goal), Action (your daily follow-through),
 // Consistency (your streak). The card is the hero; the stats sit under it. A
 // snapshot clone of the live card carries its current theme + colour.
-// The energy conduits: three colored streams (clarity purple / action white /
-// consistency green, matching the living card's own blooms) flowing UP from the
-// pillar tiles into the bottom of the card, so the breakdown reads as "the pillars
-// feed your Memento". Each stream's brightness = that pillar's REAL level
-// (livingCardLevels), so an empty pillar's stream goes dark (honest, not decor).
-// On open the streams draw in sequence (Clarity, then Action, then Consistency =
-// the flow). Pure SVG (no backdrop-filter/canvas) so it survives lowfx; the
-// particles + draw-on are gated off when motion is off.
-function buildConduitsSvg(L, motionOff) {
-  const cl = Math.max(0, Math.min(1, (L && L.clar || 0) / 100));
-  const ac = Math.max(0, Math.min(1, (L && L.act || 0) / 100));
-  const co = Math.max(0, Math.min(1, (L && L.cons || 0) / 100));
-  const pillars = [
-    { id: 'clar', d: 'M70,60 C70,32 162,26 224,4',  col: '150,116,255', lvl: cl, dur: '2.4s' },
-    { id: 'act',  d: 'M230,60 C230,40 230,26 232,4', col: '236,239,255', lvl: ac, dur: '2.0s' },
-    { id: 'cons', d: 'M390,60 C390,32 300,26 240,4', col: '56,236,150',  lvl: co, dur: '2.6s' }
-  ];
-  let defs = '<defs><filter id="mfSoft" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="2.4"/></filter>';
-  pillars.forEach((p) => {
-    defs += '<linearGradient id="mfGrad-' + p.id + '" x1="0" y1="60" x2="0" y2="4" gradientUnits="userSpaceOnUse">' +
-      '<stop offset="0" stop-color="rgba(' + p.col + ',0)"/>' +
-      '<stop offset="0.55" stop-color="rgba(' + p.col + ',' + (0.5 * p.lvl).toFixed(3) + ')"/>' +
-      '<stop offset="1" stop-color="rgba(' + p.col + ',' + (0.92 * p.lvl).toFixed(3) + ')"/>' +
-    '</linearGradient>';
-  });
-  defs += '</defs>';
-  const sum = ((cl + ac + co) / 3);
-  let body = '<ellipse class="mf-cond-glow" cx="232" cy="6" rx="34" ry="11" fill="#eef0ff" style="--g:' + (0.08 + 0.22 * sum).toFixed(3) + ';"/>';
-  pillars.forEach((p, i) => {
-    body += '<path class="mf-cond mf-cond--halo" d="' + p.d + '" pathLength="100" stroke="rgba(' + p.col + ',' + (0.22 * p.lvl).toFixed(3) + ')" stroke-width="6" fill="none" filter="url(#mfSoft)" style="--ci:' + i + ';"/>';
-    body += '<path class="mf-cond mf-cond--core" id="mfPath-' + p.id + '" d="' + p.d + '" pathLength="100" stroke="url(#mfGrad-' + p.id + ')" stroke-width="2" stroke-linecap="round" fill="none" style="--ci:' + i + ';"/>';
-    if (!motionOff && p.lvl > 0.04) {
-      body += '<circle r="2.4" fill="rgba(' + p.col + ',0.95)"><animateMotion dur="' + p.dur + '" repeatCount="indefinite"><mpath href="#mfPath-' + p.id + '" xlink:href="#mfPath-' + p.id + '"/></animateMotion></circle>';
-    }
-  });
-  return '<svg class="mf__conduits' + (motionOff ? ' is-static' : '') + '" viewBox="0 0 460 64" width="100%" height="64" preserveAspectRatio="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="--clar:' + cl.toFixed(3) + ';--act:' + ac.toFixed(3) + ';--cons:' + co.toFixed(3) + ';">' + defs + body + '</svg>';
-}
-
 function openMementoFull() {
   try {
     if (document.getElementById('mementoFull')) return;
@@ -3851,7 +3813,6 @@ function openMementoFull() {
       '<button class="mf__close" aria-label="Close">&times;</button>' +
       '<div class="mf__scroll">' +
         '<div class="mf__card" aria-hidden="true"></div>' +
-        buildConduitsSvg(L, _ccMotionOff()) +
         '<div class="mf__eyebrow">Where you stand</div>' +
         '<div class="mf__stats">' + clarityBlock + actionBlock + consBlock + '</div>' +
         // Re-share the evolving card any day (the win-moment share is one-time; this
