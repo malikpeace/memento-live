@@ -236,7 +236,11 @@ const WelcomeIntro = {
       // conversation feels custom, not one canned line everyone gets.
       if (step.key === 'runningToward') beats.push({ lines: () => { const t = this._wcReflect('runningToward'); return t ? [t] : []; } });
       if (step.key === 'clarityLevel') beats.push({ lines: () => { const t = this._wcReflect('clarityLevel'); return t ? [t] : []; } });
+      if (step.key === 'actionKnow') beats.push({ lines: () => { const t = this._wcReflect('actionKnow'); return t ? [t] : []; } });
+      if (step.key === 'actionProgress') beats.push({ lines: () => { const t = this._wcReflect('actionProgress'); return t ? [t] : []; } });
       if (step.key === 'runningFrom') beats.push({ lines: () => { const t = this._wcReflect('runningFrom'); return t ? [t] : []; } });
+      if (step.key === 'distraction') beats.push({ lines: () => { const t = this._wcReflect('distraction'); return t ? [t] : []; } });
+      if (step.key === 'letterToFutureSelf') beats.push({ lines: () => { const t = this._wcReflect('letterToFutureSelf'); return t ? [t] : []; } });
       if (step.key === 'costOfInaction') beats.push({ lines: () => { const t = this._wcReflect('costOfInaction'); return t ? [t] : []; } });
     });
     return beats;
@@ -278,7 +282,39 @@ const WelcomeIntro = {
       'No, I feel lost': "Being lost is okay. Honestly it's where almost everyone starts. We find it together.",
       _fallback: "We'll get this clear. That's the first thing Memento does."
     },
+    actionKnow: {
+      "Yes, but I don't follow through": "Knowing the steps is half of it. The follow-through is exactly what we fix here.",
+      "Sort of, not sure it's right": "Not being sure is fine. We'll sharpen the steps so they actually feel right.",
+      "No, I don't know the steps": "Not knowing the steps is normal. Finding them is exactly what we're here to do.",
+      _fallback: "Either way, we'll get the steps clear so doing becomes the easy part."
+    },
+    actionProgress: {
+      "Haven't really started": "Not starting yet is okay. The first small move is the hardest, and we make it tiny.",
+      'Started, then stalled': "Stalling happens to everyone. It usually means the next step got too big, not that you failed.",
+      'Slow but moving': "Slow but moving still counts. Slow and consistent beats fast and gone every time.",
+      'Actually on a roll': "On a roll, love that. Now we just protect that momentum so it doesn't slip.",
+      _fallback: "Wherever you're at is fine. We build from here, one small step at a time."
+    },
+    distraction: {
+      'TikTok': "TikTok is built to keep you there. It's not weak of you, it's just very good at its job.",
+      'Instagram / Reels': "Instagram and Reels are engineered to be endless. Almost everyone loses time to it.",
+      'YouTube': "YouTube can eat a whole evening. The trick is using it on purpose, not by default.",
+      'Porn': "That's a common one, no shame here. It's a habit like any other, and habits can shift.",
+      'Gaming': "Gaming's fun, nothing wrong with it. We just want it to be your choice, not your autopilot.",
+      'Friends / going out': "Friends matter, that's real. We just make sure they add to the life you want, not replace it.",
+      'Something else': "Whatever it is, naming it is the win. You can't change a habit you won't look at.",
+      _fallback: "Whatever's got a hold on you, it's beatable. We just have to see it clearly first."
+    },
+    letterToFutureSelf: {
+      _fallback: "Thanks for sharing that. It helps Memento actually understand where you're coming from."
+    },
     costOfInaction: {
+      'Wasted potential': "Wasted potential stings the most because you know it was there. That's worth moving on.",
+      'Regret': "Regret is heavy, and it's the one thing you can still avoid from right here.",
+      'Watching everyone pass me': "Watching everyone pass you is rough. But you're not running their race, you're running yours.",
+      'Letting people down': "Not wanting to let people down says a lot about you. That's a good reason to start now.",
+      'Running out of time': "The time thing is real, and feeling it now is exactly why you start now.",
+      'Stuck in the same place': "Staying stuck is its own kind of pain. One small move is how that starts to break.",
       _multi: "That's the weight worth using. Not to scare you, to move you.",
       _fallback: "Hold onto that feeling. That's the fuel when motivation runs out."
     }

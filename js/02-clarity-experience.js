@@ -113,26 +113,84 @@ const ClarityExperience = {
     this._cinematicOpen();
   },
 
-  // Map the onboarding "what do you want to make progress in?" answer to the
-  // Clarity discovery domains, pre-selecting it so the wizard is not blank.
+  // Seed the Clarity wizard from the onboarding diagnostic so the user does not
+  // re-define things they already told us. Every seed is reversible (it pre-fills
+  // a default the user can change) and is applied ONLY where the matching wizard
+  // field is still empty, so a real pick is never overridden. We map onboarding
+  // answers to the CLOSEST existing wizardAnswers field and skip anything without
+  // a clean match (e.g. costOfInaction has no fear/cost field in this wizard, so
+  // it is left for the AI which already receives it via buildProfileContext).
   _seedFromOnboarding() {
-    if (wizardAnswers.discoverDomain) return; // do not override a real pick
     const prof = (state && state.profile) || {};
-    const toward = String(prof.runningToward || '').toLowerCase();
-    if (!toward || toward.indexOf('not sure') !== -1) return;
-    const map = [
-      ['health', 'fitness'], ['fitness', 'fitness'],
-      ['work', 'money'], ['money', 'money'],
-      ['creative', 'creative'],
-      ['skill', 'education'], ['craft', 'education'],
-      ['relationship', 'relationships'],
-      ['confidence', 'mental'], ['mindset', 'mental'],
-      ['purpose', 'spiritual'], ['direction', 'spiritual'],
-      ['discipline', 'mental'], ['focus', 'mental']
-    ];
-    const picked = [];
-    map.forEach(([needle, val]) => { if (toward.indexOf(needle) !== -1 && picked.indexOf(val) === -1) picked.push(val); });
-    if (picked.length) wizardAnswers.discoverDomain = picked.slice(0, 2);
+
+    // runningToward -> discoverDomain (which areas to focus on).
+    if (!wizardAnswers.discoverDomain) {
+      const toward = String(prof.runningToward || '').toLowerCase();
+      if (toward && toward.indexOf('not sure') === -1) {
+        const map = [
+          ['health', 'fitness'], ['fitness', 'fitness'],
+          ['work', 'money'], ['money', 'money'],
+          ['creative', 'creative'],
+          ['skill', 'education'], ['craft', 'education'],
+          ['relationship', 'relationships'],
+          ['confidence', 'mental'], ['mindset', 'mental'],
+          ['purpose', 'spiritual'], ['direction', 'spiritual'],
+          ['discipline', 'mental'], ['focus', 'mental']
+        ];
+        const picked = [];
+        map.forEach(([needle, val]) => { if (toward.indexOf(needle) !== -1 && picked.indexOf(val) === -1) picked.push(val); });
+        if (picked.length) wizardAnswers.discoverDomain = picked.slice(0, 2);
+      }
+    }
+
+    // clarityLevel -> knowDomain (how clear they are on what they want). This is
+    // the first wizard step and gates the branch, so seeding it continues the
+    // flow instead of re-asking. Onboarding: 'Yes, I know exactly' / 'I have a
+    // rough idea' / "Not really, I'm figuring it out" / 'No, I feel lost'.
+    if (!wizardAnswers.knowDomain) {
+      const lvl = String(prof.clarityLevel || '').toLowerCase();
+      if (lvl) {
+        if (lvl.indexOf('know exactly') !== -1) wizardAnswers.knowDomain = 'yes';
+        else if (lvl.indexOf('rough idea') !== -1) wizardAnswers.knowDomain = 'kinda';
+        else if (lvl.indexOf('figuring') !== -1 || lvl.indexOf('lost') !== -1) wizardAnswers.knowDomain = 'not_sure';
+      }
+    }
+
+    // runningFrom -> blocker (their biggest obstacle). Onboarding runningFrom is
+    // a ' · '-joined multi pick; we take the first that maps cleanly to a BLOCKERS
+    // option. This carries through to state.clarity.answers.biggestBlocker (used
+    // by the Ignition anti-vision + cue), so it is worth pre-filling.
+    if (!wizardAnswers.blocker) {
+      const from = String(prof.runningFrom || '').toLowerCase();
+      if (from) {
+        const blockerMap = [
+          ['procrastination', 'Procrastination & avoidance'],
+          ['phone', 'Phone & social media addiction'],
+          ['social media', 'Phone & social media addiction'],
+          ["don't know what to do", 'No clear plan or direction'],
+          ['low motivation', 'Energy & motivation crashes']
+        ];
+        const hit = blockerMap.find(([needle]) => from.indexOf(needle) !== -1);
+        if (hit) wizardAnswers.blocker = hit[1];
+      }
+    }
+
+    // distraction -> apps (which apps steal their time). Onboarding distraction is
+    // a single pick; only the entries that match a TRIGGER_APPS option are seeded
+    // (Porn / Gaming / Friends / Something else have no app equivalent, so skip).
+    if (!(wizardAnswers.apps && wizardAnswers.apps.length)) {
+      const dist = String(prof.distraction || '').toLowerCase();
+      if (dist) {
+        const appMap = [
+          ['tiktok', 'TikTok'],
+          ['instagram', 'Instagram'],
+          ['reels', 'Instagram'],
+          ['youtube', 'YouTube']
+        ];
+        const hit = appMap.find(([needle]) => dist.indexOf(needle) !== -1);
+        if (hit) wizardAnswers.apps = [hit[1]];
+      }
+    }
   },
 
   // Tutorial-only mode: just the intro pages, no wizard
