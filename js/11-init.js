@@ -2037,6 +2037,14 @@ window.addEventListener('keydown', (e) => {
       }
       return;
     }
+    // Minimal home (v161): a leftward (right->left) swipe on the dashboard opens
+    // the Modules sheet. The card is the home; the modules live one swipe away.
+    // Only fires with nothing open, over non-blocked content, as a clean
+    // horizontal left swipe.
+    if (!overlayAtStart && !document.body.classList.contains('menu-peek')
+        && dt < 700 && dx < -70 && Math.abs(dy) < Math.abs(dx) * 0.55 && !blocked(startEl)) {
+      try { if (typeof MoreSpace !== 'undefined' && MoreSpace.open) { MoreSpace.open({ mode: 'switcher' }); return; } } catch (x) {}
+    }
     // Require a quick, clearly-horizontal, rightward swipe.
     if (dt > 700 || dx < 70 || Math.abs(dy) > Math.abs(dx) * 0.55) return;
     if (blocked(startEl)) return;
@@ -2053,6 +2061,18 @@ window.addEventListener('keydown', (e) => {
       if (mb) { try { mb.click(); } catch (x) {} }
     }
   }, { passive: true });
+})();
+
+// Minimal home (v161): wire the Modules pill (a tap-target twin of the swipe)
+// and log one app_open per day for the Activation Point readout (local-only).
+(function () {
+  try { if (window.Analytics) Analytics.track('app_open'); } catch (e) {}
+  try {
+    var hint = document.getElementById('homeModulesHint');
+    if (hint) hint.addEventListener('click', function () {
+      try { if (typeof MoreSpace !== 'undefined' && MoreSpace.open) MoreSpace.open({ mode: 'switcher' }); } catch (e) {}
+    });
+  } catch (e) {}
 })();
 
 // Diagnostic HUD (debug only): open the app with ?perf=1 in the URL to show a

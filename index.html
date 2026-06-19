@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <script>
 /* Single source of truth for the app version. Surfaced in Settings > About. */
-window.MEMENTO_VERSION = 'v160';
+window.MEMENTO_VERSION = 'v161';
 /* LOWFX: touch / mobile devices get a lighter render path (no backdrop blur,
    no will-change layers, no background canvas animations) so iOS does not kill
    the tab from graphics-memory pressure. Desktop (fine pointer) is untouched.
@@ -40,19 +40,19 @@ window.MEMENTO_VERSION = 'v160';
      paint never waits on a third-party CDN. font-display: swap throughout. -->
 <link rel="preload" href="fonts/dmsans-1.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="fonts/fonts.css">
-<link rel="stylesheet" href="css/base.css?v=v160">
-<link rel="stylesheet" href="css/sidebar.css?v=v160">
-<link rel="stylesheet" href="css/dashboard.css?v=v160">
-<link rel="stylesheet" href="css/misc.css?v=v160">
-<link rel="stylesheet" href="css/vivere.css?v=v160">
-<link rel="stylesheet" href="css/notes.css?v=v160">
-<link rel="stylesheet" href="css/onboarding.css?v=v160">
-<link rel="stylesheet" href="css/clarity.css?v=v160">
-<link rel="stylesheet" href="css/action.css?v=v160">
-<link rel="stylesheet" href="css/daycard-living.css?v=v160">
-<link rel="stylesheet" href="css/share-card.css?v=v160">
-<link rel="stylesheet" href="css/clarity-paywall.css?v=v160">
-<link rel="stylesheet" href="css/appearance-picker.css?v=v160">
+<link rel="stylesheet" href="css/base.css?v=v161">
+<link rel="stylesheet" href="css/sidebar.css?v=v161">
+<link rel="stylesheet" href="css/dashboard.css?v=v161">
+<link rel="stylesheet" href="css/misc.css?v=v161">
+<link rel="stylesheet" href="css/vivere.css?v=v161">
+<link rel="stylesheet" href="css/notes.css?v=v161">
+<link rel="stylesheet" href="css/onboarding.css?v=v161">
+<link rel="stylesheet" href="css/clarity.css?v=v161">
+<link rel="stylesheet" href="css/action.css?v=v161">
+<link rel="stylesheet" href="css/daycard-living.css?v=v161">
+<link rel="stylesheet" href="css/share-card.css?v=v161">
+<link rel="stylesheet" href="css/clarity-paywall.css?v=v161">
+<link rel="stylesheet" href="css/appearance-picker.css?v=v161">
 </head>
 <body>
 
@@ -488,6 +488,13 @@ window.MEMENTO_VERSION = 'v160';
          hero on the bento Home (tap to open the Consistency module). -->
     <section id="dashConsistency" aria-label="Your consistency over time"></section>
     <main class="widget-grid" id="widgetGrid"></main>
+    <!-- Minimal home (v161): the card is the home. Everything else lives one
+         swipe away. This quiet pill teaches the gesture and is itself a tap
+         target into the Modules sheet. Mobile + post-Clarity only (CSS). -->
+    <button type="button" id="homeModulesHint" class="home-modules-hint" aria-label="Open your modules">
+      <span class="home-modules-hint__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="home-modules-hint__label">Modules</span>
+    </button>
   </div>
   <!-- footer removed in v5  - replaced by tab bar -->
 </div>
@@ -716,19 +723,19 @@ window.MEMENTO_VERSION = 'v160';
 <!-- Supabase client for OPTIONAL cloud accounts + sync (js/12-cloud-sync.js).
      If this CDN tag fails to load, the app runs fully local, unchanged. -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
-<script src="js/01-state-foundation.js?v=v160"></script>
-<script src="js/02-clarity-experience.js?v=v160"></script>
-<script src="js/03-ai-integration.js?v=v160"></script>
-<script src="js/04-templates-proof.js?v=v160"></script>
-<script src="js/05-vivere.js?v=v160"></script>
-<script src="js/06-consistency-mori.js?v=v160"></script>
-<script src="js/07-sheet-templates.js?v=v160"></script>
-<script src="js/08-cards-grid-share.js?v=v160"></script>
-<script src="js/09-controllers.js?v=v160"></script>
-<script src="js/10-demo-backend.js?v=v160"></script>
-<script src="js/11-init.js?v=v160"></script>
-<script src="js/12-cloud-sync.js?v=v160"></script>
-<script src="js/13-clarity-paywall.js?v=v160"></script>
-<script src="js/14-appearance-picker.js?v=v160"></script>
+<script src="js/01-state-foundation.js?v=v161"></script>
+<script src="js/02-clarity-experience.js?v=v161"></script>
+<script src="js/03-ai-integration.js?v=v161"></script>
+<script src="js/04-templates-proof.js?v=v161"></script>
+<script src="js/05-vivere.js?v=v161"></script>
+<script src="js/06-consistency-mori.js?v=v161"></script>
+<script src="js/07-sheet-templates.js?v=v161"></script>
+<script src="js/08-cards-grid-share.js?v=v161"></script>
+<script src="js/09-controllers.js?v=v161"></script>
+<script src="js/10-demo-backend.js?v=v161"></script>
+<script src="js/11-init.js?v=v161"></script>
+<script src="js/12-cloud-sync.js?v=v161"></script>
+<script src="js/13-clarity-paywall.js?v=v161"></script>
+<script src="js/14-appearance-picker.js?v=v161"></script>
 </body>
 </html>

@@ -161,7 +161,11 @@ const DEFAULT_STATE = {
   // Derived once from the legacy history arrays in migrateState (guarded by
   // meta.proofEventsDerivedV1). Never the sole source of truth for streaks; it
   // is an additional, deduped source alongside the existing per-module arrays.
-  proofEvents: []
+  proofEvents: [],
+  // Activation analytics (local-only): day-bucketed event log so we can compute
+  // the Activation Point (Clarity done + N active action-days in week one).
+  // Written by Analytics.track(); never networked. See Analytics in this file.
+  analytics: { events: [], onceFlags: {}, firstOpenDay: null }
 };
 
 let state = {};
@@ -449,6 +453,56 @@ function persistNow() {
   try { Backend.pushState(); } catch (_) {} // debounced cloud-sync when logged in
   try { if (window.CloudSync) CloudSync.schedulePush(); } catch (_) {} // optional Supabase mirror
 }
+
+/* ── Activation analytics (local-only, no network, no PII) ───────────────────
+   The Retention Playbook's highest-leverage move: find the Activation Point,
+   the behavior in week one that predicts whether someone stays. Hypothesis:
+   finished Clarity (ceremony_done) + the daily action on 3+ days = they stick.
+   We log just enough, day-bucketed, to compute that later. Read it any time in
+   the console with Analytics.activation(). Costs nothing, ships invisibly. */
+const Analytics = {
+  _day() {
+    try { if (typeof isoToLocalDay === 'function') return isoToLocalDay(new Date().toISOString()); } catch (e) {}
+    try { return new Date().toISOString().slice(0, 10); } catch (e) { return ''; }
+  },
+  track(event, meta) {
+    try {
+      if (DEMO_MODE) return; // never pollute the activation log with demo personas
+      if (!state.analytics || typeof state.analytics !== 'object') state.analytics = { events: [], onceFlags: {}, firstOpenDay: null };
+      if (!Array.isArray(state.analytics.events)) state.analytics.events = [];
+      if (!state.analytics.onceFlags || typeof state.analytics.onceFlags !== 'object') state.analytics.onceFlags = {};
+      const day = this._day();
+      // ceremony_done fires once in a lifetime; app_open / action_done at most
+      // once per day (we count distinct active days, not raw taps).
+      let key = null;
+      if (event === 'ceremony_done') key = 'ceremony_done';
+      else if (event === 'app_open' || event === 'action_done') key = event + ':' + day;
+      if (key) { if (state.analytics.onceFlags[key]) return; state.analytics.onceFlags[key] = true; }
+      if (!state.analytics.firstOpenDay) state.analytics.firstOpenDay = day;
+      state.analytics.events.push({ e: event, day: day, ts: Date.now(), m: meta || null });
+      if (state.analytics.events.length > 1000) state.analytics.events = state.analytics.events.slice(-1000);
+      try { persistState(); } catch (e) {}
+    } catch (e) {}
+  },
+  // Console readout: did this user hit the Activation Point?
+  activation() {
+    try {
+      const a = state.analytics || {};
+      const ev = Array.isArray(a.events) ? a.events : [];
+      const actionDays = new Set(ev.filter(x => x && x.e === 'action_done').map(x => x.day));
+      const openDays = new Set(ev.filter(x => x && x.e === 'app_open').map(x => x.day));
+      const ceremony = !!(a.onceFlags && a.onceFlags.ceremony_done);
+      return {
+        firstOpenDay: a.firstOpenDay || null,
+        ceremonyDone: ceremony,
+        activeActionDays: actionDays.size,
+        openDays: openDays.size,
+        activated: ceremony && actionDays.size >= 3
+      };
+    } catch (e) { return null; }
+  }
+};
+try { window.Analytics = Analytics; } catch (e) {}
 
 // The exact default command-center accent literal (kept verbatim so users with
 // no custom accent render byte-identically to today). When a custom accent is

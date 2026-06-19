@@ -3575,6 +3575,7 @@ async function triggerSynthesis() {
       if (!state.clarity.completedAt) state.clarity.completedAt = Date.now();
       if (state.dev) state.dev.relocked = false;
       persistNow();
+      try { Analytics.track('ceremony_done'); } catch (e) {} // Activation Point
     } catch (e) {}
     refreshAiChatUI();
   } catch (err) {
@@ -3589,6 +3590,7 @@ function completeWizard() {
   state.clarity.completed = true;
   if (!state.clarity.completedAt) state.clarity.completedAt = Date.now();
   if (state.dev) state.dev.relocked = false;
+  try { Analytics.track('ceremony_done'); } catch (e) {} // Activation Point
   delete state.clarity.draft; // Clear saved progress
 
   // Map domains (now an array of 1-2)

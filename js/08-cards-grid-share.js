@@ -913,6 +913,8 @@ function bentoMobileReorder(sourceKey, targetKey) {
 const MoreSpace = {
   MODULES: ['streak', 'mori', 'vivere', 'checkin', 'reflection', 'lifestats', 'deepwork', 'distraction'],
   DESC: {
+    clarity: 'Your north star. Revisit or recalibrate.',
+    action: 'The one thing that moves you today.',
     streak: 'Your days, kept visible.',
     mori: 'The clock that makes today matter.',
     vivere: 'A board for the life worth building.',
@@ -930,6 +932,11 @@ const MoreSpace = {
       // so it lists EVERY unlocked module, including ones already on the
       // dashboard, plus the usual single locked teaser.
       if (this._mode === 'switcher') {
+        // The swipe-to-modules hub. Lead with the spine: Clarity (your north
+        // star) -> Action (today's one thing) -> Consistency/Mori -> then the
+        // add-ons (Vivere, Check-in, Notes) below. Clarity is always open;
+        // Action shows so the path is always visible (a gate rises if locked).
+        ['clarity', 'action'].forEach(key => out.push({ key, locked: false }));
         this.MODULES.forEach(key => {
           if (isModuleUnlocked(key)) { out.push({ key, locked: false }); return; }
           if (key === teaser && key !== 'action') out.push({ key, locked: true });
@@ -2744,6 +2751,7 @@ function creditTodayAction() {
     const id = 'act_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
     state.action.completionHistory.push({ id: id, date: new Date().toISOString(), tier, actionText, planTitle: pa.title || '' });
     try { writeProofEvent('action-complete', { title: actionText || pa.title || 'Action completed', module: 'action', metadata: { tier } }); } catch (_) {}
+    try { Analytics.track('action_done', { tier }); } catch (_) {} // Activation Point
     if (typeof recalculateStreak === 'function') { try { recalculateStreak(); } catch (_) {} }
     try { persistNow(); } catch (_) {}
     return id;

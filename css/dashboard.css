@@ -957,7 +957,67 @@ body.ns-bloom .app.dash-v2 #commandCenter .cc-live { display: none; }
      platinum. Pin it to fill the stage so both themes are the same size. */
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-theme-living .daycard-living-stage > .daycard-ns { width: 100%; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-ns { min-height: 340px; }
+
+  /* ── v161 MINIMAL HOME: the Memento card IS the home ───────────────────────
+     Hormozi value-equation move: drop the bottom of the equation (effort) to
+     near zero. The home is the card + today's one action, nothing else. Every
+     module tile, the heatmap, and the quote move off the home; they live one
+     swipe away (swipe left, or tap the Modules pill) and in the menu.
+     Fully reversible: delete this block to restore the full bento. */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashConsistency,
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dailyMemento,
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #hubConsistency,
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="mori"],
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="clarity"],
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="streak"],
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="checkin"],
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="action"],
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="reflection"],
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="vivere"] { display: none !important; }
+
+  /* the card stands alone now, give it the room and the centre of the screen */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard {
+    grid-column: 2 / 12; grid-row: 3; margin-top: 0;
+  }
+  /* slightly trim the hero so the card + today's action + the done affordance
+     all clear the tab bar on shorter phones (still the dominant object). */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-ns { min-height: 312px; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter {
+    grid-row: 4; margin-top: 4px;
+  }
+  /* Today's action stays to one clean idea on the minimal home: the action +
+     why + the done affordance. The "Minimum" / "If resistance hits" coaching
+     lives one tap deeper, in the Action module, so the home stays calm. */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-od-sub { display: none; }
+
+  /* the Modules pill: a quiet glass affordance below the action, full-width,
+     teaching "your modules live one swipe away". No border (fill + blur). */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .home-modules-hint {
+    display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+    grid-column: 1 / -1; grid-row: 5; justify-self: center;
+    margin: 14px auto 4px; padding: 9px 16px;
+    border: 0; border-radius: 999px; cursor: pointer;
+    background: rgba(255,255,255,0.05);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4); backdrop-filter: blur(20px) saturate(1.4);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.07);
+    color: var(--text-lo, rgba(255,255,255,0.5));
+    font: 500 0.78rem/1 var(--font-ui, inherit); letter-spacing: 0.02em;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 180ms ease, background 180ms ease, transform 180ms ease;
+  }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .home-modules-hint:active {
+    transform: scale(0.96); color: var(--text-mid, rgba(255,255,255,0.7));
+  }
+  .home-modules-hint__dots { display: inline-flex; gap: 4px; }
+  .home-modules-hint__dots i {
+    width: 4px; height: 4px; border-radius: 50%;
+    background: currentColor; opacity: 0.85; display: block;
+  }
 }
+
+/* the pill is a minimal-home affordance only: hidden everywhere except the
+   post-Clarity mobile home (the media query above turns it on). */
+.home-modules-hint { display: none; }
 
 /* Mobile (< 768px) - dense 6-column subgrid so more info fits per screen.
    - Mission stays full width (hero)
