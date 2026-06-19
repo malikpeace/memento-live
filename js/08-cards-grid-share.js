@@ -2730,6 +2730,29 @@ function ccActionWhyLine() {
   } catch (e) { return ''; }
 }
 
+// Inline "I did it": mark today's action done from the Home without opening the
+// Action module. Mirrors the bookend's _creditAction exactly (same completion
+// record, proof event, streak recalc, persist) so it can never double-count or
+// diverge. Returns true if it credited, false if already done today / no-op.
+function creditTodayAction() {
+  try {
+    const today = getTodayISO();
+    const h = state.action && state.action.completionHistory;
+    const doneNow = Array.isArray(h) && h.length && h[h.length - 1].date && isoToLocalDay(h[h.length - 1].date) === today;
+    if (doneNow) return false;
+    const pa = (state.action && state.action.primaryAction) || {};
+    const tier = pa.recommendedTier || 'moderate';
+    const actionText = (pa.tiers && pa.tiers[tier]) || pa.howToStart || pa.title || '';
+    if (!state.action) state.action = {};
+    if (!Array.isArray(state.action.completionHistory)) state.action.completionHistory = [];
+    state.action.completionHistory.push({ date: new Date().toISOString(), tier, actionText, planTitle: pa.title || '' });
+    try { writeProofEvent('action-complete', { title: actionText || pa.title || 'Action completed', module: 'action', metadata: { tier } }); } catch (_) {}
+    if (typeof recalculateStreak === 'function') { try { recalculateStreak(); } catch (_) {} }
+    try { persistNow(); } catch (_) {}
+    return true;
+  } catch (e) { return false; }
+}
+
 function renderCommandCenter() {
   try {
     const hasClarity = !!(state.clarity && state.clarity.completed && state.clarity.answers && state.clarity.answers.neutronStar);
@@ -2880,7 +2903,10 @@ function renderCommandCenter() {
       if (doneToday) {
         row += '<div style="flex:1;min-width:150px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;color:rgba(120,230,170,0.95);border:1px solid rgba(120,230,170,0.35);border-radius:calc(8px * var(--rx, 1));padding:12px;">&#10003; Done today</div>';
       } else {
-        row += '<button class="cc-primary" data-cc-action="action" style="flex:1;min-width:150px;font:inherit;font-weight:700;font-size:0.92rem;cursor:pointer;border:none;border-radius:calc(8px * var(--rx, 1));padding:12px 16px;background:var(--solid-bg);color:var(--solid-fg);">Start today\'s action</button>';
+        // Inline confirm: close the day right here. "Open" still routes into the
+        // Action module for the focus timer / full detail (secondary, quiet).
+        row += '<button class="cc-primary" data-cc-action="didit" style="flex:1;min-width:150px;font:inherit;font-weight:700;font-size:0.92rem;cursor:pointer;border:none;border-radius:calc(8px * var(--rx, 1));padding:12px 16px;background:var(--solid-bg);color:var(--solid-fg);">I did it</button>';
+        row += '<button class="cc-open-action" data-cc-action="action" style="flex:0 0 auto;font:inherit;font-weight:600;font-size:0.85rem;cursor:pointer;border:none;background:none;color:var(--text-lo);border-radius:calc(8px * var(--rx, 1));padding:12px 10px;">Open</button>';
       }
       row += '</div>';
       // Live social proof from the optional backend (real data; hidden at 0 / offline).
@@ -3167,6 +3193,17 @@ function bindCommandCenter(cc) {
     cc.querySelectorAll('[data-cc-action]').forEach(b => b.addEventListener('click', () => {
       const a = b.getAttribute('data-cc-action');
       if (a === 'clarity' && typeof ClarityExperience !== 'undefined') ClarityExperience.open();
+      else if (a === 'didit') {
+        // Mark today's action done in place, then re-render so the card tint
+        // evolves greener and the consistency line flips to "Today is closed".
+        const credited = creditTodayAction();
+        try { if (typeof renderAll === 'function') renderAll(); } catch (e) {}
+        if (credited && typeof showUndoToast === 'function') {
+          try { showUndoToast('Today is closed. You showed up.', function () {
+            try { var h = state.action && state.action.completionHistory; if (Array.isArray(h) && h.length) { h.pop(); if (typeof recalculateStreak === 'function') recalculateStreak(); persistNow(); if (typeof renderAll === 'function') renderAll(); } } catch (e) {}
+          }); } catch (e) {}
+        }
+      }
       else if (typeof ActionExperience !== 'undefined') ActionExperience.open();
     }));
     // Comeback Mode: three ways back. Pre-select the chosen tier (the same
