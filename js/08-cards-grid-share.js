@@ -1145,17 +1145,18 @@ function renderGreeting() {
   // Whisper bar (replaces the greeting): date left, "~X weeks left" right, both
   // ambient + low-weight. The card is the first real thing the eye lands on.
   // Tapping the weeks reveals one quiet gold line (Memento Mori, woven in).
+  // Memento Mori, woven into BOTH the mobile whisper bar and the desktop header.
+  let weeksLeft = null;
+  try {
+    const by = state.mori && state.mori.birthYear;
+    if (by && typeof moriWeeksLived === 'function' && typeof moriTotalWeeks === 'function') {
+      const le = (state.mori && state.mori.lifeExpectancy) || 80;
+      weeksLeft = Math.max(0, moriTotalWeeks(le) - moriWeeksLived(by));
+    }
+  } catch (e) {}
   const mg = document.getElementById('dashGreetingMobile');
   if (mg) {
     const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
-    let weeksLeft = null;
-    try {
-      const by = state.mori && state.mori.birthYear;
-      if (by && typeof moriWeeksLived === 'function' && typeof moriTotalWeeks === 'function') {
-        const le = (state.mori && state.mori.lifeExpectancy) || 80;
-        weeksLeft = Math.max(0, moriTotalWeeks(le) - moriWeeksLived(by));
-      }
-    } catch (e) {}
     const weeksBtn = (weeksLeft != null)
       ? '<button class="wbar__weeks" id="wbarWeeks" type="button" aria-label="Weeks of life remaining">~' + weeksLeft.toLocaleString() + ' weeks left</button>'
       : '';
@@ -1171,7 +1172,10 @@ function renderGreeting() {
       else { s.setAttribute('hidden', ''); }
     });
   }
-  setText('headerDate', now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }));
+  // Desktop header: date, plus the same quiet "~X weeks left" Mori line the
+  // mobile whisper bar carries, so mortality is woven in on both layouts.
+  const _hdDate = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+  setText('headerDate', weeksLeft != null ? (_hdDate + '  ·  ~' + weeksLeft.toLocaleString() + ' weeks left') : _hdDate);
 
   // Hub headline: a calm welcoming prompt, matching the render. Shifts to a
   // quiet acknowledgement once today's action is already done.
