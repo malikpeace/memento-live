@@ -39,6 +39,7 @@ const CloudSync = (function () {
   let pulledThisLoad = false;
   let lastCloudStamp = '';  // updated_at of the cloud row this device last wrote or adopted
   let lastSyncMs = 0;       // Date.now() of the last successful push or pull (for the UI)
+  let _communityDays = null; // cached "days shown up across Memento" (null = unknown/RPC absent)
 
   // Reload-loop circuit breaker. Every adopt path ends in location.reload(),
   // so a non-idempotent merge could blink the UI forever. We count adopt-reloads
@@ -485,6 +486,25 @@ const CloudSync = (function () {
     refreshAccountCard();
   }
 
+  // Community counter: fetch the public aggregate "days shown up across Memento"
+  // once, cache it, and re-render the Home line. Reads the community_days RPC
+  // (tools/community-counter.sql). If the RPC is not deployed, _communityDays
+  // stays null and the Home line stays hidden, the app is unaffected.
+  async function fetchCommunityDays() {
+    if (!client) return;
+    try {
+      const r = await client.rpc('community_days');
+      if (r && !r.error && r.data != null) {
+        const n = (typeof r.data === 'number') ? r.data : parseInt(r.data, 10);
+        if (isFinite(n) && n >= 0) {
+          _communityDays = n;
+          try { if (typeof renderHubConsistency === 'function') renderHubConsistency(); } catch (e) {}
+        }
+      }
+    } catch (e) {}
+  }
+  function communityDays() { return _communityDays; }
+
   function lastSyncedText() {
     if (!lastSyncMs) return '';
     const mins = Math.floor((Date.now() - lastSyncMs) / 60000);
@@ -792,6 +812,7 @@ const CloudSync = (function () {
     } catch (e) { client = null; }
     try { bindSplashSignin(); } catch (e) {}
     if (!client) return; // CDN never loaded: stay fully local, all entry points no-op
+    try { fetchCommunityDays(); } catch (e) {} // public counter, runs logged in or out
     try {
       client.auth.getSession().then((r) => {
         session = (r && r.data && r.data.session) || null;
@@ -828,7 +849,7 @@ const CloudSync = (function () {
     init, available, isLoggedIn, email,
     schedulePush, pushNow, syncNow,
     sendCode, verifyCode, signOut, mergeDecision, buildMergedState, createShare, lastSyncedText,
-    openDialog, closeDialog
+    communityDays, openDialog, closeDialog
   };
 })();
 
