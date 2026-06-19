@@ -3329,6 +3329,16 @@ function renderHubConsistency() {
       el.innerHTML = '<div class="hubcc hubcc--msg"><span class="hubcc__shown">Still time to show up today. The next move is right here.</span></div>' + community;
       return;
     }
+    if (doneToday) {
+      // Close-your-day: the quiet, earned reward once today is closed. The chain
+      // shows today's dot filled. No confetti; the point is calm, not loud.
+      el.innerHTML =
+        '<div class="hubcc hubcc--done">' +
+          '<span class="hubcc__shown hubcc__closed">Today is closed. You showed up.</span>' +
+          '<span class="hubcc__chain">' + dots + '</span>' +
+        '</div>' + community;
+      return;
+    }
     el.innerHTML =
       '<div class="hubcc">' +
         '<span class="hubcc__shown">Shown up <b>' + thisWeek + '</b> of 7 this week</span>' +
