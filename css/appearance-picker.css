@@ -133,19 +133,11 @@
 .apk-prev--minimal .apk-prev__mark { background: rgba(255,255,255,0.42); }
 .apk-prev--minimal .apk-prev__row { background: rgba(255,255,255,0.12); }
 
-/* Movement (alive, purple glow + shimmer) */
+/* Movement (alive, purple glow) */
 .apk-prev--movement .apk-prev__sky { background: radial-gradient(70% 60% at 50% 45%, rgba(123,97,255,0.5), #0a0812 70%); }
 .apk-prev--movement .apk-prev__card { background: linear-gradient(165deg, rgba(180,150,255,0.32), rgba(123,97,255,0.12)); box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 0 24px rgba(123,97,255,0.6); }
 .apk-prev--movement .apk-prev__mark { background: rgba(255,255,255,0.85); }
 .apk-prev--movement .apk-prev__row { background: rgba(180,160,255,0.4); }
-.apk-prev--movement .apk-prev__screen::after {
-  content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none;
-  background: linear-gradient(115deg, transparent 38%, rgba(255,255,255,0.16) 50%, transparent 62%);
-  transform: translateX(-100%);
-  animation: apkShimmer 3.2s ease-in-out infinite;
-}
-@keyframes apkShimmer { 0%, 60% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
-@media (prefers-reduced-motion: reduce) { .apk-prev--movement .apk-prev__screen::after { animation: none; opacity: 0; } }
 
 /* ── Card meta + check ─────────────────────────────────────────────────────── */
 .apk-card__meta { display: flex; flex-direction: column; gap: 1px; padding: 10px 13px 12px; }
@@ -171,10 +163,10 @@
   border-radius: 14px;
   padding: 16px 20px;
   font-size: 1rem; font-weight: 700; letter-spacing: -0.01em;
-  color: #0b0b12;
+  color: #0a0a0e;
   cursor: pointer;
-  background: linear-gradient(100deg, #b6a4ff, #9b7eff 55%, #6cc6ff);
-  box-shadow: 0 16px 40px -20px rgba(123, 97, 255, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  background: #ffffff;
+  box-shadow: 0 14px 36px -18px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.6);
   -webkit-tap-highlight-color: transparent;
   transition: transform 0.16s ease;
 }
