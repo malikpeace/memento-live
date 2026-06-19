@@ -224,7 +224,7 @@ const WelcomeIntro = {
           return step.sub ? [h, step.sub] : [h];
         },
         input: step.type === 'choices'
-          ? { kind: 'chips', options: step.options, multi: !!step.multi }
+          ? { kind: 'chips', options: step.options, multi: !!step.multi, exclusive: step.exclusive || [] }
           : { kind: 'text', placeholder: step.placeholder || '', optional: true },
         commit: (v) => {
           if (step.type === 'choices') state.profile[step.key] = Array.isArray(v) ? v.join(SEP) : String(v);
@@ -255,14 +255,14 @@ const WelcomeIntro = {
   // when more than one option is selected; `_fallback` covers anything custom.
   _wcReflections: {
     runningToward: {
-      'Work & money': "Money's a solid one to chase. It quietly touches almost everything else too.",
-      'Health & fitness': "Health first is smart. Everything else gets easier when your body is handled.",
-      'Discipline & focus': "Discipline and focus. That's the part most people are actually missing.",
-      'A skill or craft': "Building a real skill, love that. It compounds for the rest of your life.",
+      'Work & money': "Money. Makes sense, it's the thing everyone chases.",
+      'Health & fitness': "Health is the foundation of everything, without health nothing matters.",
+      'Discipline & focus': "Discipline and focus are always good skills to learn.",
+      'A skill or craft': "Building a real skill unlocks parts of your brain you didn't know were there.",
       'Creative work': "Creative work is one of the most fulfilling things to actually go after.",
-      'Relationships': "Relationships. Honestly that's what most of this is for anyway.",
-      'Confidence & mindset': "Confidence and mindset. Get that right and a lot of the rest follows.",
-      'Purpose & direction': "Purpose and direction is the big one. Most people never stop to figure it out.",
+      'Relationships': "If we're being honest, that's what most of this is for anyway.",
+      'Mindset & Mental': "Mindset and the mental side. Get that right and a lot of the rest follows.",
+      "I'm honestly not sure yet": "No worries! That's what we're here for.",
       _multi: "Good picks. We'll find the one that matters most as we go.",
       _fallback: "Good one. We'll build everything around that."
     },
@@ -590,8 +590,16 @@ const WelcomeIntro = {
         const c = document.createElement('button'); c.type = 'button'; c.className = 'wc-chip'; c.textContent = opt;
         c.addEventListener('click', () => {
           if (spec.multi) {
+            const excl = spec.exclusive || [];
+            const deselect = (val) => { selected.delete(val); wrap.querySelectorAll('.wc-chip').forEach(b => { if (b.textContent === val) b.classList.remove('is-selected'); }); };
             if (selected.has(opt)) { selected.delete(opt); c.classList.remove('is-selected'); }
-            else { selected.add(opt); c.classList.add('is-selected'); }
+            else {
+              // Exclusive options stand alone: selecting one clears all others;
+              // selecting a normal option clears any exclusive one.
+              if (excl.indexOf(opt) !== -1) { [...selected].forEach(deselect); }
+              else { excl.forEach(ex => { if (selected.has(ex)) deselect(ex); }); }
+              selected.add(opt); c.classList.add('is-selected');
+            }
           } else {
             selected.clear();
             wrap.querySelectorAll('.wc-chip').forEach(b => b.classList.remove('is-selected'));
@@ -1068,9 +1076,12 @@ const WelcomeIntro = {
       headline: 'Do you have a goal or mission you want to achieve above everything else?',
       options: ['Yes, I do and know exactly what it is', 'I have a rough idea', "Not really... but I'm trying to figure it out", 'No, I feel lost'] },
     { key: 'runningToward', type: 'choices', multi: true,
+      // "I'm honestly not sure yet" is exclusive: picking it clears the rest, and
+      // picking anything else clears it (you can't be sure AND not sure).
+      exclusive: ["I'm honestly not sure yet"],
       headline: 'What part of your life is this about?',
       sub: 'Tap whatever fits. You can pick more than one.',
-      options: ['Work & money', 'Health & fitness', 'Discipline & focus', 'A skill or craft', 'Creative work', 'Relationships', 'Confidence & mindset', 'Purpose & direction', "I'm honestly not sure yet"] },
+      options: ['Work & money', 'Health & fitness', 'Discipline & focus', 'A skill or craft', 'Creative work', 'Relationships', 'Mindset & Mental', "I'm honestly not sure yet"] },
     // (birthday is inserted here, after the clarity gap)
     // ── ACTION gap: do they know the steps, and where are they? ─────────────
     { key: 'actionKnow', type: 'choices', multi: false,
