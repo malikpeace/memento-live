@@ -192,7 +192,7 @@ const WelcomeIntro = {
     beats.push({ lines: (n) => ['Welcome to Memento, ' + (n || 'you') + '.'] });
     // Opal-style framing: tell them what's about to happen before the questions
     // start, so the diagnostic feels intentional, not like a form.
-    beats.push({ lines: () => ['First, I want to understand where you actually are.', "A few honest questions, then I'll build your Memento around them."], pause: 900 });
+    beats.push({ lines: () => ["First, a couple questions, then we'll start to build your Memento."], pause: 900 });
     // Birthday is the FIRST question (an easy, factual warm-up that also powers
     // Memento Mori), then a transition line escalates into the deeper diagnostic.
     const birthdayBeat = {
