@@ -20,21 +20,12 @@ const RENDERERS = {
         <div class="dash-mission__body">${esc(fullText)}</div>
         <button class="dash-mission__cta" type="button">View full mission <span aria-hidden="true">→</span></button>
         <span class="dash-mission__sparkle" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.7 6.3L20 10l-6.3 1.7L12 18l-1.7-6.3L4 10l6.3-1.7z"/></svg></span>
-        <div class="dash-mission__neutron" aria-hidden="true">
-          <div class="dash-mission__neutron-halo"></div>
-          <div class="dash-mission__neutron-ring"></div>
-          <div class="dash-mission__neutron-ring"></div>
-          <div class="dash-mission__neutron-ring"></div>
-          <canvas class="dash-mission__neutron-star" id="dashMissionStar" width="200" height="200"></canvas>
-        </div>
       `);
       const ctaBtn = c.querySelector('.dash-mission__cta');
       if (ctaBtn) ctaBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         if (typeof ClarityExperience !== 'undefined') ClarityExperience.openSummary();
       });
-      const starCanvas = c.querySelector('#dashMissionStar');
-      if (starCanvas && typeof initStarBlob === 'function') initStarBlob(starCanvas, 200);
       // (no inline tint: the .widget glass rule is !important, so the modules stay
       // flat per the design; the old purple inline gradient never showed.)
     } else {
