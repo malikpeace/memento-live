@@ -480,12 +480,14 @@ const WelcomeIntro = {
   },
 
   // After the input dock mounts (chips / date / composer) it grows, which shrinks
-  // the conversation scroller above it and can clip the newest question line at
-  // the dock boundary. Re-seat the convo at the bottom once layout settles (two
-  // frames: one for the dock layout, one for the FLIP) so the question always
-  // sits fully above the answers.
+  // the conversation scroller above it and would clip the newest question line.
+  // Pin the convo to the bottom SYNCHRONOUSLY (same frame the dock mounted) so the
+  // history settles in one motion. The old version deferred this to two rAFs,
+  // which let the content shift up first and then visibly scroll back down (the
+  // "moves up then comes back down" bounce). One late rAF stays as a safety net.
   _wcReseat() {
-    requestAnimationFrame(() => { this._wcScrollBottom(); requestAnimationFrame(() => this._wcScrollBottom()); });
+    this._wcScrollBottom();
+    requestAnimationFrame(() => this._wcScrollBottom());
   },
 
   // While the AI is typing, the conversation is "busy": pin it to the newest
@@ -627,7 +629,10 @@ const WelcomeIntro = {
         this._wcCommitAnswer(beat, val, false);
       });
       actions.appendChild(cont);
-      this._wcWithFlip(() => { dock.appendChild(wrap); dock.appendChild(actions); });
+      // Append directly (no convo FLIP): the dock growing only needs the history
+      // to settle to the bottom, not glide. The FLIP fought the re-seat scroll and
+      // produced the up-then-down bounce.
+      dock.appendChild(wrap); dock.appendChild(actions);
       this._wcReseat();
       return;
     }
@@ -667,7 +672,7 @@ const WelcomeIntro = {
       });
       actions.appendChild(cont);
       host.appendChild(selWrap); host.appendChild(err); host.appendChild(actions);
-      this._wcWithFlip(() => { dock.appendChild(host); });
+      dock.appendChild(host);
       this._wcReseat();
       return;
     }
@@ -684,7 +689,7 @@ const WelcomeIntro = {
     ta.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit(); } });
     send.addEventListener('click', submit);
     wrap.appendChild(ta); wrap.appendChild(send);
-    this._wcWithFlip(() => { dock.appendChild(wrap); });
+    dock.appendChild(wrap);
     this._wcReseat();
     // preventScroll stops iOS's scroll-into-view jank (the screen briefly scrolling
     // down to a black top strip then snapping back) when the field auto-focuses.
