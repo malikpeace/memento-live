@@ -1979,8 +1979,11 @@ const WelcomeIntro = {
     // The look is picked here, as the final step of onboarding, right before the
     // blank Memento is revealed, so the very first card they see already wears it.
     // Apply runs live + persists inside the picker (applyPrefs), so when the reveal
-    // mounts the dashboard it is already styled. Once only (prefs.appearanceChosen).
-    if (typeof AppearancePicker !== 'undefined' && AppearancePicker.open && !(state.prefs && state.prefs.appearanceChosen)) {
+    // mounts the dashboard it is already styled. NOT gated on appearanceChosen:
+    // _finishWithName only runs when someone completes onboarding, so the style
+    // page should show every time they finish (incl. re-onboarding), not just the
+    // very first time. (The settings "change look" trigger is separate.)
+    if (typeof AppearancePicker !== 'undefined' && AppearancePicker.open) {
       AppearancePicker.open(() => this._revealAfterOnboarding(name));
       return;
     }
