@@ -842,11 +842,13 @@ body.ns-bloom .app.dash-v2 #commandCenter .cc-live { display: none; }
   /* CONSISTENCY band: the year heatmap, full-width below the hero. */
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashConsistency { grid-column: 1 / -1; grid-row: 4; }
 
-  /* BELOW the band: Mori, Clarity, Action, Notes - one even four-up row. */
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="mori"]       { grid-column: 1 / span 3;  grid-row: 5; }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="clarity"]    { grid-column: 4 / span 3;  grid-row: 5; }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="action"]     { grid-column: 7 / span 3;  grid-row: 5; }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="reflection"] { grid-column: 10 / span 3; grid-row: 5; }
+  /* BELOW the band: Mori, Clarity, Notes - one even THREE-up row. The Action
+     tile is suppressed in the default bento (the command center already IS
+     today's action), so its old fourth slot sat empty and left a big gap. Spread
+     the three real tiles across all 12 columns instead. */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="mori"]       { grid-column: 1 / span 4;  grid-row: 5; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="clarity"]    { grid-column: 5 / span 4;  grid-row: 5; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="reflection"] { grid-column: 9 / span 4;  grid-row: 5; }
   /* cap the content-heavy tiles so the four-up row stays an even band */
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="clarity"],
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="reflection"] { max-height: 260px; overflow: hidden; }
