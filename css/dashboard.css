@@ -3141,19 +3141,17 @@ html.lowfx .daycard-ns {
      shadow on mobile (invisible over the near-black dashboard anyway). */
   clip-path: inset(0 round var(--r-card, 14px));
 }
-/* iOS clip fix, LIVING card specifically: the parent .daycard-ns clip-path does
-   not reliably clip separately-composited children (the blurred liquid color
-   layer, the masked burn ring) under the card's 3D tilt, so the colored layer
-   pokes a sharp square corner past the rounded edge. Clip those layers directly.
-   The liquid sits at inset:-28% of the card, so 28/156 = 17.95% brings its clip
-   back to the exact card edge; the burn is card-sized so a 0 inset matches.
-   Lite/lowfx only (the iOS path); desktop's real overflow clip already works. */
-body.lite .daycard-theme-living .daycard-ns__liquid,
-html.lowfx .daycard-theme-living .daycard-ns__liquid {
+/* Clip fix, LIVING card: neither the parent .daycard-ns overflow:hidden (desktop)
+   nor its clip-path (mobile) reliably clips the separately-composited children
+   (the blurred liquid color layer, the masked burn ring) under the card's 3D
+   tilt, so the colored layer pokes a sharp square corner past the rounded edge,
+   on desktop AND iOS. Clip those layers directly, on ALL devices. The liquid
+   sits at inset:-28% of the card, so 28/156 = 17.95% brings its clip back to the
+   exact card edge; the burn is card-sized so a 0 inset matches. */
+.daycard-theme-living .daycard-ns__liquid {
   clip-path: inset(17.95% round var(--r-card, 14px));
 }
-body.lite .daycard-theme-living .daycard-ns__burn,
-html.lowfx .daycard-theme-living .daycard-ns__burn {
+.daycard-theme-living .daycard-ns__burn {
   clip-path: inset(0 round var(--r-card, 14px));
 }
 
