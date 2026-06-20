@@ -50,6 +50,11 @@ body:not(.ns-bloom) .daycard-theme-living .daycard-wrap__aura {
   position: relative;
   width: min(76%, 270px);
   margin: 14px auto 26px;
+  /* The card's outer glow + drop shadow live on the STAGE (the card's unclipped
+     parent), so the card itself can clip-path its corners cleanly without the
+     clip eating its lift. */
+  border-radius: var(--r-card);
+  box-shadow: 0 0 44px rgba(200, 210, 255, 0.10), 0 12px 38px rgba(0, 0, 0, 0.28);
 }
 @media (max-width: 767.98px) {
   .daycard-theme-living .daycard-living-stage { width: min(86%, 330px); }
@@ -67,11 +72,13 @@ body:not(.ns-bloom) .daycard-theme-living .daycard-wrap__aura {
      already drops it via the lite path.) */
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
-  /* softer drop shadow so the reflection bleeds off the bottom with no dark seam */
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.22),
-    0 0 44px rgba(200, 210, 255, 0.10),
-    0 12px 38px rgba(0, 0, 0, 0.28);
+  /* Clip the WHOLE card to the rounded corners on ALL devices (same single clean
+     cut mobile's lite path already uses). The per-layer clips were approximations
+     that left a sub-pixel corner sliver on desktop; this removes it. The outer
+     glow + drop shadow moved to the stage above so this clip doesn't flatten the
+     card; the inset rim stays (it's inside the clip). */
+  clip-path: inset(0 round var(--r-card, 14px));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
 /* ── Liquid color layer (inside the card) ─────────────────────────────────── */
