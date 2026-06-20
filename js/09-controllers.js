@@ -290,7 +290,7 @@ const WelcomeIntro = {
       _fallback: "We'll get this clear. That's the first thing Memento does."
     },
     actionKnow: {
-      "Yes, but I don't follow through": "Knowing the steps is half of it. The follow-through is exactly what we fix here.",
+      "Yes, I know the actions to get there": "Knowing the actions is half of it. Doing them day after day is what we build here.",
       "Sort of, not sure it's right": "Not being sure is fine. We'll sharpen the steps so they actually feel right.",
       "No, I don't know the steps": "Not knowing the steps is normal. Finding them is exactly what we're here to do.",
       _fallback: "Either way, we'll get the steps clear so doing becomes the easy part."
@@ -1096,7 +1096,7 @@ const WelcomeIntro = {
     { key: 'actionKnow', type: 'choices', multi: false,
       headline: 'Do you know what to do to get there?',
       sub: 'The actual steps, not the dream.',
-      options: ["Yes, but I don't follow through", "Sort of, not sure it's right", "No, I don't know the steps"] },
+      options: ["Yes, I know the actions to get there", "Sort of, not sure it's right", "No, I don't know the steps"] },
     { key: 'actionProgress', type: 'choices', multi: false,
       headline: "How's it going so far?",
       sub: 'No judgment. Just where you actually are.',
@@ -1626,7 +1626,7 @@ const WelcomeIntro = {
     // 4) action  (S1 stands alone, operator momentum, tie to actionKnow + progress)
     // ====================================================================
     var action;
-    var followThrough = has(actionKnow, 'follow through') || has(actionKnow, 'follow-through') || has(actionKnow, "don't follow");
+    var followThrough = has(actionKnow, 'follow through') || has(actionKnow, 'follow-through') || has(actionKnow, "don't follow") || has(actionKnow, 'know the action');
     var actionUnsure = has(actionKnow, 'sort of') || has(actionKnow, 'not sure it');
     var noSteps = has(actionKnow, 'know the steps') || has(actionKnow, 'do not know the steps');
     var stalled = has(actionProgress, 'stalled') || has(actionProgress, 'started, then') || has(actionProgress, 'started then');
