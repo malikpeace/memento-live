@@ -58,6 +58,15 @@ body:not(.ns-bloom) .daycard-theme-living .daycard-wrap__aura {
   width: 100%;
   margin: 0;
   z-index: 1;
+  /* No backdrop-filter on the living card. The base .daycard-ns keeps a 5px
+     backdrop blur on desktop, but a backdrop-filter + border-radius renders a
+     square under the card's 3D tilt and pokes a sharp corner past the rounded
+     edge (desktop Chrome AND iOS). The living card's glass is its color blobs +
+     gradient + rim, so dropping the blur is visually identical and lets the
+     corners clip cleanly, without clip-path eating the drop shadow. (Mobile
+     already drops it via the lite path.) */
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
   /* softer drop shadow so the reflection bleeds off the bottom with no dark seam */
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.22),
