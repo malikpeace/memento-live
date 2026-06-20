@@ -316,12 +316,12 @@ const WelcomeIntro = {
       _fallback: "Thanks for sharing that. It helps Memento actually understand where you're coming from."
     },
     costOfInaction: {
-      'Wasted potential': "Wasted potential stings the most because you know it was there. That's worth moving on.",
       'Regret': "Regret is heavy, and it's the one thing you can still avoid from right here.",
+      'Wasted potential': "Wasted potential stings the most because you know it was there. That's worth moving on.",
       'Watching everyone pass me': "Watching everyone pass you is rough. But you're not running their race, you're running yours.",
       'Letting people down': "Not wanting to let people down says a lot about you. That's a good reason to start now.",
       'Running out of time': "The time thing is real, and feeling it now is exactly why you start now.",
-      'Stuck in the same place': "Staying stuck is its own kind of pain. One small move is how that starts to break.",
+      "Becoming someone I don't want to be": "That's a real fear, and a good one. It means you still know who you'd rather be.",
       _multi: "That's the weight worth using. Not to scare you, to move you.",
       _fallback: "Hold onto that feeling. That's the fuel when motivation runs out."
     }
@@ -359,9 +359,15 @@ const WelcomeIntro = {
     while (this._wcIndex < beats.length) {
       if (gen !== this._wcGen) return;
       const beat = beats[this._wcIndex];
-      // Conditional beats (e.g. the distraction follow-up) check the live answers
-      // at walk time; skip silently, marking the slot handled so progress is right.
-      if (beat.skipIf && beat.skipIf(state.profile)) { this._wcAns[this._wcIndex] = null; this._wcIndex++; continue; }
+      // Conditional beats (e.g. the holding-you-back / distraction follow-ups)
+      // check the live answers at walk time; skip silently, marking the slot
+      // handled so progress is right. CLEAR the skipped question's stored answer
+      // too, so a stale value from an earlier path can't leak into its reflection
+      // beat (the "on a roll" user was seeing the old runningFrom reflection).
+      if (beat.skipIf && beat.skipIf(state.profile)) {
+        if (beat.key && state.profile && state.profile[beat.key]) { state.profile[beat.key] = ''; try { persistNow(); } catch (e) {} }
+        this._wcAns[this._wcIndex] = null; this._wcIndex++; continue;
+      }
       const n = (state.profile && state.profile.name) ? state.profile.name : 'you';
       const lines = beat.lines ? beat.lines(n) : [];
       // Focused (Opal-style): when a new question begins, fade everything before
@@ -1124,8 +1130,7 @@ const WelcomeIntro = {
     // ── WHY / weight: the cost of staying where they are (memento mori) ─────
     { key: 'costOfInaction', type: 'choices', multi: true,
       headline: 'If a year goes by and nothing changes, what does that feel like?',
-      sub: 'Sit with it for a second.',
-      options: ['Wasted potential', 'Regret', 'Watching everyone pass me', 'Letting people down', 'Running out of time', 'Stuck in the same place'] },
+      options: ['Regret', 'Wasted potential', 'Watching everyone pass me', 'Letting people down', 'Running out of time', "Becoming someone I don't want to be"] },
     { key: 'letterToFutureSelf', type: 'text',
       headline: 'Anything else Memento should know?',
       sub: 'Totally optional. A line about you, your situation, or what you want. Or just skip it.',
