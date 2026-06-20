@@ -263,6 +263,10 @@ const WelcomeIntro = {
       'Relationships': "If we're being honest, that's what most of this is for anyway.",
       'Mindset & Mental': "Mindset and the mental side. Get that right and a lot of the rest follows.",
       "I'm honestly not sure yet": "No worries! That's what we're here for.",
+      // Count-tiered multi replies: 2 picks reads as focused, 3+ as ambitious.
+      // _multi is the fallback if neither tier is defined.
+      _multi2: "Nice! Let's help you narrow it down to the one that matters most.",
+      _multi3: "Ambitious! We'll help you get to them all, one at a time.",
       _multi: "Good picks. We'll find the one that matters most as we go.",
       _fallback: "Good one. We'll build everything around that."
     },
@@ -332,7 +336,12 @@ const WelcomeIntro = {
       if (!String(raw).trim()) return '';
       const picks = String(raw).split(SEP).map(s => s.trim()).filter(Boolean);
       const m = (this._wcReflections && this._wcReflections[key]) || {};
-      if (picks.length > 1 && m._multi) return m._multi;
+      if (picks.length > 1) {
+        // Count tiers: 3+ picks -> _multi3, exactly 2 -> _multi2, else _multi.
+        if (picks.length >= 3 && m._multi3) return m._multi3;
+        if (picks.length === 2 && m._multi2) return m._multi2;
+        if (m._multi) return m._multi;
+      }
       const first = picks[0] || '';
       return m[first] || m._fallback || '';
     } catch (e) { return ''; }
@@ -1092,11 +1101,15 @@ const WelcomeIntro = {
       headline: "How's it going so far?",
       sub: 'No judgment. Just where you actually are.',
       options: ["Haven't really started", 'Started, then stalled', 'Slow but moving', 'Actually on a roll'] },
-    // ── CONSISTENCY gap: what pulls them back, and what's the pull? ─────────
+    // ── CONSISTENCY gap: what's holding them back, and what's the pull? ──────
+    // Only asked of people who said they are NOT making progress (Haven't
+    // started / Started then stalled). If they're already moving, nothing is
+    // holding them back, so this and the distraction follow-up are skipped.
     { key: 'runningFrom', type: 'choices', multi: true,
-      headline: 'What keeps pulling you back?',
+      headline: 'What do you think is holding you back?',
       sub: 'Be honest, this is just for you.',
-      options: ['Procrastination', 'Phone & social media', "I don't know what to do", "Can't stay consistent", 'Fear of failing', 'Not enough time', 'Low motivation', 'Self-doubt'] },
+      options: ['Procrastination', 'Phone & social media', "I don't know what to do", "Can't stay consistent", 'Fear of failing', 'Not enough time', 'Low motivation', 'Self-doubt'],
+      skipIf: (p) => { const ap = String((p && p.actionProgress) || ''); return ap === 'Slow but moving' || ap === 'Actually on a roll'; } },
     { key: 'distraction', type: 'choices', multi: false,
       headline: 'What pulls your attention the most?',
       sub: 'The honest answer, not the polite one.',
