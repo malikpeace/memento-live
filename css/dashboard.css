@@ -3156,6 +3156,17 @@ html.lowfx .daycard-ns {
 .daycard-theme-living .daycard-ns__burn {
   clip-path: inset(0 round var(--r-card, 14px));
 }
+/* The iridescent sheen (__iri) is the same kind of escapee: a blurred,
+   screen-blend layer at inset:-30%, so 30/160 = 18.75% clips it to the card
+   edge. The __sheen is card-sized (inset 0). Both blended/composited, both need
+   their own clip so no faint corner leaks past the radius (the subtle desktop
+   poke that survived the backdrop-filter fix). */
+.daycard-theme-living .daycard-ns__iri {
+  clip-path: inset(18.75% round var(--r-card, 14px));
+}
+.daycard-theme-living .daycard-ns__sheen {
+  clip-path: inset(0 round var(--r-card, 14px));
+}
 
 /* === Fullscreen Memento (tap the card) ===================================== */
 #mementoFull {
