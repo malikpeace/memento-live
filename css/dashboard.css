@@ -835,9 +835,16 @@ body.ns-bloom .app.dash-v2 #commandCenter .cc-live { display: none; }
     justify-content: center;
   }
 
-  /* RIGHT rail: Consistency + Check-in, each filling half the hero band. */
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="streak"]  { grid-column: 10 / span 3; grid-row: 2; }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="checkin"] { grid-column: 10 / span 3; grid-row: 3; }
+  /* RIGHT rail: Check-in fills the whole hero band (right column), balancing the
+     card. The old Consistency/streak tile is dropped here: it was a smaller copy
+     of the heatmap's own header sitting right above it (the heatmap already shows
+     the streak + active days + the full year), so it was pure redundancy. */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="streak"]  { display: none; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="checkin"] { grid-column: 10 / span 3; grid-row: 2 / span 2; }
+  /* Check-in fills the tall right column, so don't let its content stretch and
+     spread top-to-bottom (empty middle). Keep it a natural-height block centered
+     in the tile. */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="checkin"] .widget__content { flex: 0 0 auto; }
 
   /* CONSISTENCY band: the year heatmap, full-width below the hero. */
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashConsistency { grid-column: 1 / -1; grid-row: 4; }
@@ -2925,7 +2932,10 @@ body:not(.ns-bloom) .app.dash-v2 #dashGreetingMobile { display: none; }
   color: var(--color-consistency); font-weight: 700;
 }
 .dash-cgram__meta { font-size: 0.85rem; color: var(--text-2); }
-.dash-cgram__meta b { color: var(--text-hi); font-weight: 700; font-variant-numeric: tabular-nums; }
+/* The streak number is the loud, glanceable figure now that the redundant
+   Consistency tile is gone (the heatmap header carries the streak). Big number,
+   small label. */
+.dash-cgram__meta b { color: var(--text-hi); font-weight: 750; font-variant-numeric: tabular-nums; font-size: 1.55rem; letter-spacing: -0.01em; margin-right: 1px; }
 .dash-cgram__meta span { color: var(--text-3); }
 .dash-cgram__open { margin-left: auto; font-size: 0.82rem; font-weight: 600; color: var(--text-3); }
 #dashConsistency:hover .dash-cgram__open { color: var(--text-2); }
