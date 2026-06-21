@@ -3824,7 +3824,6 @@ function openMementoFull() {
       '<button class="mf__close" aria-label="Close">&times;</button>' +
       '<div class="mf__scroll">' +
         '<div class="mf__card" aria-hidden="true"></div>' +
-        '<div class="mf__eyebrow">Where you stand</div>' +
         '<div class="mf__stats">' + clarityBlock + actionBlock + consBlock + '</div>' +
         // Re-share the evolving card any day (the win-moment share is one-time; this
         // is the durable path as the pillars fill in). Only when there is a goal to
