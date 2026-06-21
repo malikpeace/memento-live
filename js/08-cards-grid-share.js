@@ -3821,9 +3821,10 @@ function openMementoFull() {
     ov.setAttribute('role', 'dialog');
     ov.setAttribute('aria-label', 'Your Memento');
     ov.innerHTML =
+      '<div class="mf__bg" aria-hidden="true"></div>' +
       '<button class="mf__close" aria-label="Close">&times;</button>' +
       '<div class="mf__scroll">' +
-        '<div class="mf__card" aria-hidden="true"></div>' +
+        '<div class="mf__card"></div>' +
         '<div class="mf__stats">' + clarityBlock + actionBlock + consBlock + '</div>' +
         // Re-share the evolving card any day (the win-moment share is one-time; this
         // is the durable path as the pillars fill in). Only when there is a goal to
@@ -3833,73 +3834,89 @@ function openMementoFull() {
       '</div>';
     document.body.appendChild(ov);
 
-    // Static snapshot of the live card as the hero (strip ids to avoid dupes).
-    const liveWrap = document.querySelector('#dayCard .daycard-wrap');
-    if (liveWrap) {
-      const clone = liveWrap.cloneNode(true);
-      clone.querySelectorAll('[id]').forEach((n) => n.removeAttribute('id'));
-      clone.style.setProperty('--dc-rx', '0deg');
-      clone.style.setProperty('--dc-ry', '0deg');
-      const host = ov.querySelector('.mf__card');
-      if (host) host.appendChild(clone);
-      // Pin the opened card to the EXACT size it has on the home so opening it
-      // never reshapes it. The home card is ~square; the overlay used to force a
-      // tall 300x420, which read as the card "getting longer" on tap. Measure the
-      // live home card and copy its width + height onto the clone (living theme
-      // sizes via its stage, with the inner card filling it; platinum sizes the
-      // card directly). The CSS rule below is only a fallback if this can't run.
-      try {
-        const homeNs = document.querySelector('#dayCard .daycard-ns');
-        if (homeNs) {
-          const w = homeNs.offsetWidth, h = homeNs.offsetHeight;
-          const cStage = clone.querySelector('.daycard-living-stage');
-          const cNs = clone.querySelector('.daycard-ns');
-          if (cStage) { cStage.style.width = w + 'px'; cStage.style.margin = '0 auto'; if (cNs) cNs.style.width = '100%'; }
-          else if (cNs) { cNs.style.width = w + 'px'; }
-          if (cNs) cNs.style.minHeight = h + 'px';
+    // LITERALLY do not touch the Memento. Instead of cloning it, MOVE the real
+    // living card element into this view and animate only the background + stats
+    // around it. It is the same DOM node, still running its own light loop, so it
+    // never cross-fades, jumps, or freezes. We hold the home card's grid cell open
+    // (min-height) so the page behind does not reflow while the card is borrowed,
+    // pin its size inline (the home's size CSS does not reach it out here), and land
+    // it on its exact on-home position so it does not move a pixel. close() puts it
+    // back. All wrapped so the card is always restorable.
+    const dayCardEl = document.getElementById('dayCard');
+    const liveWrap = dayCardEl ? dayCardEl.querySelector('.daycard-wrap') : null;
+    const cardHost = ov.querySelector('.mf__card');
+    let homeParent = null, homeNext = null;
+    const sizedEls = [];
+    if (liveWrap && cardHost) {
+      const liveNs0 = liveWrap.querySelector('.daycard-ns');
+      // LAYOUT size (offsetW/H ignore any transient entrance scale) for the pin;
+      // RECT (H) for the on-screen position to land on.
+      const sw = liveNs0 ? liveNs0.offsetWidth : 0;
+      const sh = liveNs0 ? liveNs0.offsetHeight : 0;
+      const H = liveNs0 ? liveNs0.getBoundingClientRect() : null;
+      if (dayCardEl) dayCardEl.style.minHeight = dayCardEl.offsetHeight + 'px';
+      homeParent = liveWrap.parentNode; homeNext = liveWrap.nextSibling;
+      cardHost.appendChild(liveWrap);            // borrow the REAL card (no clone)
+      // Drop the one-time entrance classes so the borrowed card sits at its stable
+      // scale (the daily materialize animates scale 0.9 -> 1; we don't want a 0.9
+      // snapshot in here). Also flatten any tilt.
+      liveWrap.classList.remove('daycard-materialize', 'daycard-reveal');
+      liveWrap.style.setProperty('--dc-rx', '0deg');
+      liveWrap.style.setProperty('--dc-ry', '0deg');
+      if (H) {
+        const stage = liveWrap.querySelector('.daycard-living-stage');
+        const ns = liveWrap.querySelector('.daycard-ns');
+        if (stage) { stage.style.width = sw + 'px'; stage.style.margin = '0 auto'; if (ns) ns.style.width = '100%'; sizedEls.push(stage); }
+        else if (ns) { ns.style.width = sw + 'px'; }
+        if (ns) { ns.style.minHeight = sh + 'px'; sizedEls.push(ns); }
+        // Land it on its exact home spot -> zero visible movement. Vertical via
+        // padding (keeps the view scrollable, no transform to fight the swipe);
+        // horizontal only if the home card is off-centre.
+        const C = ns ? ns.getBoundingClientRect() : null;
+        if (C) {
+          const dy = Math.round(H.top - C.top);
+          const dx = Math.round(H.left - C.left);
+          if (dy) ov.style.paddingTop = 'calc(36px + var(--safe-t, 0px) + ' + dy + 'px)';
+          if (Math.abs(dx) > 1) {
+            const scroll = ov.querySelector('.mf__scroll');
+            if (scroll) scroll.style.marginLeft = ((parseFloat(getComputedStyle(scroll).marginLeft) || 0) + dx) + 'px';
+          }
         }
-      } catch (e) {}
-      // Let the big card lean with the phone here too, smoothly. This repoints
-      // the single motion loop at the clone; close() restores the dashboard card.
-      try { bindDayCardMotion(clone, clone.querySelector('.daycard-ns')); } catch (e) {}
+      }
     }
 
     document.body.style.overflow = 'hidden';
-    // Opal-style continuity: open the card EXACTLY over the live home card so it
-    // does not appear to move a single pixel. Offset the whole scroll by the
-    // home↔overlay delta with NO transition, so the opened card lands pixel-for-
-    // pixel on the home card (size already matches) while only the breakdown around
-    // it animates in. The home card sits behind at the same spot, so the overlay's
-    // fade-in reads as the background arriving, not the card moving. Extend the
-    // bottom padding by the downward shift so the lower content still scrolls in.
-    try {
-      const homeNs = document.querySelector('#dayCard .daycard-ns');
-      const ovNs = ov.querySelector('.daycard-ns');
-      const scroll = ov.querySelector('.mf__scroll');
-      if (homeNs && ovNs && scroll) {
-        const H = homeNs.getBoundingClientRect();
-        const C = ovNs.getBoundingClientRect();
-        const dx = Math.round(H.left - C.left);
-        const dy = Math.round(H.top - C.top);
-        if (dx || dy) {
-          scroll.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
-          if (dy > 0) ov.style.paddingBottom = 'calc(56px + var(--safe-b, 0px) + ' + dy + 'px)';
-        }
-      }
-    } catch (e) {}
-    // Commit the initial opacity:0 state with a forced reflow, then flip to open so
-    // the transition still plays. rAF gets throttled when the tab is backgrounded,
-    // which can leave the overlay stuck invisible; a sync reflow never stalls.
+    // Commit the initial state with a forced reflow, then flip to open so the bg +
+    // stats transitions play. rAF gets throttled when the tab is backgrounded, which
+    // can leave the overlay stuck; a sync reflow never stalls.
     void ov.offsetWidth;
     ov.classList.add('mf--open');
 
     const close = () => {
-      ov.classList.remove('mf--open');
+      ov.classList.remove('mf--open');   // bg + stats fade out; the card stays put at H
       document.body.style.overflow = '';
       document.removeEventListener('keydown', onKey);
-      // Hand the motion loop back to the live dashboard card.
-      try { bindDayCardMotion(document.querySelector('#dayCard .daycard-wrap'), document.getElementById('dayCardNs')); } catch (e) {}
-      setTimeout(() => { try { ov.remove(); } catch (e) {} }, 340);
+      // Restore the REAL Memento to the home AFTER the background has faded out, then
+      // remove the overlay in the same tick so there's no gap. Putting it back early
+      // would drop it behind the still-opaque bg and make it flash. Let the home size
+      // CSS take over again. Guard against a re-render having rebuilt the card.
+      setTimeout(() => {
+        try {
+          if (liveWrap) {
+            sizedEls.forEach((el) => { el.style.width = ''; el.style.minHeight = ''; el.style.margin = ''; });
+            liveWrap.style.removeProperty('--dc-rx');
+            liveWrap.style.removeProperty('--dc-ry');
+            if (dayCardEl && !dayCardEl.querySelector('.daycard-wrap')) {
+              if (homeNext && homeNext.parentNode === homeParent) homeParent.insertBefore(liveWrap, homeNext);
+              else (homeParent || dayCardEl).appendChild(liveWrap);
+            } else {
+              liveWrap.remove();   // a fresh card already exists; drop the borrowed one
+            }
+          }
+          if (dayCardEl) dayCardEl.style.minHeight = '';
+        } catch (e) {}
+        try { ov.remove(); } catch (e) {}
+      }, 430);
     };
     const onKey = (e) => { if (e.key === 'Escape') close(); };
     ov.querySelector('.mf__close').addEventListener('click', close);

@@ -3237,37 +3237,44 @@ html.lowfx .daycard-ns {
 }
 
 /* === Fullscreen Memento (tap the card) ===================================== */
+/* The Memento itself is NOT a clone and is NOT faded here: openMementoFull() moves
+   the REAL living card element into this view, untouched, at its exact home spot.
+   So the overlay container stays fully opaque + transparent-backgrounded, and only
+   the .mf__bg layer (the reactive aura) + the stats fade/slide in AROUND the card.
+   That's why nothing here animates opacity on the whole overlay. */
 #mementoFull {
   position: fixed; inset: 0; z-index: 1000;
   display: flex; flex-direction: column; align-items: center;
   overflow-y: auto; -webkit-overflow-scrolling: touch;
   padding: calc(36px + var(--safe-t)) 20px calc(56px + var(--safe-b));
-  /* Inside the Memento, the background REFLECTS the card: its pillar light (clarity
-     purple, action gold, consistency green) blooms behind it, keyed off the same
-     :root --aura-* vars and scaled by --aura-energy so it tracks the user's real
-     state (drift cools + dims it). The card sits near the top, so the blooms are
-     anchored around 50% 24%. Layered over the solid base so the stats stay legible. */
+  background: transparent;
+}
+/* The background that REFLECTS the card: its pillar light (clarity purple, action
+   gold, consistency green) blooms behind it, keyed off the :root --aura-* vars and
+   scaled by --aura-energy so it tracks the user's real state (drift cools + dims).
+   This is the ONLY thing that fades in on open, so the card never changes. */
+.mf__bg {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  opacity: 0; transition: opacity 0.42s ease;
   background:
-    radial-gradient(1500px 1200px at 50% 22%,
+    radial-gradient(1500px 1200px at 50% 26%,
       rgba(56, 236, 150, calc(0.34 * var(--aura-cons, 0) * var(--aura-energy, 0.45))) 0%,
       rgba(56, 236, 150, calc(0.16 * var(--aura-cons, 0) * var(--aura-energy, 0.45))) 30%,
       transparent 60%),
-    radial-gradient(1400px 1100px at 52% 34%,
+    radial-gradient(1400px 1100px at 52% 40%,
       rgba(255, 206, 122, calc(0.24 * var(--aura-warmth, 0) * var(--aura-energy, 0.45))) 0%,
       transparent 58%),
-    radial-gradient(1600px 1300px at 50% 26%,
+    radial-gradient(1600px 1300px at 50% 30%,
       rgba(150, 116, 255, calc(0.34 * var(--aura-clar, 0) * var(--aura-energy, 0.45))) 0%,
       rgba(140, 104, 246, calc(0.16 * var(--aura-clar, 0) * var(--aura-energy, 0.45))) 34%,
       transparent 64%),
-    radial-gradient(1700px 1400px at 50% 30%,
+    radial-gradient(1700px 1400px at 50% 34%,
       rgba(70, 92, 140, calc(0.18 * var(--aura-cool, 0) * var(--aura-energy, 0.45))) 0%,
       transparent 66%),
     radial-gradient(120% 70% at 50% 18%, rgba(255, 255, 255, 0.04), transparent 60%),
     var(--surface-0);
-  opacity: 0;
-  transition: opacity 0.32s ease;
 }
-#mementoFull.mf--open { opacity: 1; }
+#mementoFull.mf--open .mf__bg { opacity: 1; }
 .mf__close {
   position: fixed; top: calc(16px + var(--safe-t)); right: 18px; z-index: 3;
   width: 40px; height: 40px; border-radius: 999px; border: none; cursor: pointer;
@@ -3280,12 +3287,14 @@ html.lowfx .daycard-ns {
 .mf__close:hover { background: var(--glass-bg-hover); }
 .mf__scroll {
   width: 100%; max-width: 460px; margin: auto;
+  position: relative; z-index: 1;
   display: flex; flex-direction: column; align-items: center;
 }
-/* The Memento itself does NOT animate on open: no zoom, no scale, no independent
-   move. It sits perfectly still (already pinned to its home size) while only the
-   breakdown AROUND it rises in. The whole overlay just fades in softly. */
+/* The Memento host. The REAL living card is moved in here, untouched and fully
+   opaque (z-index above the .mf__bg, never faded), so it sits perfectly still at
+   its home spot while only the breakdown AROUND it rises in. */
 .mf__card {
+  position: relative; z-index: 1;
   margin: 8px 0 4px;
 }
 .mf__eyebrow, .mf__stats, .mf__share, .mf__hint {
