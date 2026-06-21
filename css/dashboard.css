@@ -903,16 +903,9 @@ body.ns-bloom .app.dash-v2 #commandCenter .cc-live { display: none; }
     justify-content: center;
   }
 
-  /* RIGHT rail: Check-in fills the whole hero band (right column), balancing the
-     card. The old Consistency/streak tile is dropped here: it was a smaller copy
-     of the heatmap's own header sitting right above it (the heatmap already shows
-     the streak + active days + the full year), so it was pure redundancy. */
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="streak"]  { display: none; }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="checkin"] { grid-column: 10 / span 3; grid-row: 2 / span 2; }
-  /* Check-in fills the tall right column, so don't let its content stretch and
-     spread top-to-bottom (empty middle). Keep it a natural-height block centered
-     in the tile. */
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="checkin"] .widget__content { flex: 0 0 auto; }
+  /* The old Consistency/streak tile is dropped (the heatmap already shows the
+     streak + active days + the full year). Check-in is dropped from the home too
+     (it lives in its own module); both are in the hide-list below. */
 
   /* CONSISTENCY band: the year heatmap, full-width below the hero. */
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashConsistency { grid-column: 1 / -1; grid-row: 4; }
@@ -923,6 +916,8 @@ body.ns-bloom .app.dash-v2 #commandCenter .cc-live { display: none; }
      aura. Every module tile lives one click away in the sidebar nav (js/09 routes
      each data-nav to its launcher), so the home stays the calm, powerful
      centerpiece the mockup calls for instead of a wall of tiles. */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="streak"],
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="checkin"],
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="mori"],
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="clarity"],
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="reflection"],
@@ -953,11 +948,6 @@ body.ns-bloom .app.dash-v2 #commandCenter .cc-live { display: none; }
     -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent);
     mask-image: linear-gradient(to bottom, #000 72%, transparent);
   }
-
-  /* the right-rail cards stretch to fill the hero band; center their content so a
-     taller-than-content card reads as intentional space, not a top-stuck label */
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="streak"],
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="checkin"] { justify-content: center; }
 
   /* the card is the bigger centerpiece (overrides the 860px sizing) */
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-theme-platinum .daycard-ns { width: min(100%, 440px); }
