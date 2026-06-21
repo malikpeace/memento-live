@@ -3840,6 +3840,23 @@ function openMementoFull() {
       clone.style.setProperty('--dc-ry', '0deg');
       const host = ov.querySelector('.mf__card');
       if (host) host.appendChild(clone);
+      // Pin the opened card to the EXACT size it has on the home so opening it
+      // never reshapes it. The home card is ~square; the overlay used to force a
+      // tall 300x420, which read as the card "getting longer" on tap. Measure the
+      // live home card and copy its width + height onto the clone (living theme
+      // sizes via its stage, with the inner card filling it; platinum sizes the
+      // card directly). The CSS rule below is only a fallback if this can't run.
+      try {
+        const homeNs = document.querySelector('#dayCard .daycard-ns');
+        if (homeNs) {
+          const w = homeNs.offsetWidth, h = homeNs.offsetHeight;
+          const cStage = clone.querySelector('.daycard-living-stage');
+          const cNs = clone.querySelector('.daycard-ns');
+          if (cStage) { cStage.style.width = w + 'px'; cStage.style.margin = '0 auto'; if (cNs) cNs.style.width = '100%'; }
+          else if (cNs) { cNs.style.width = w + 'px'; }
+          if (cNs) cNs.style.minHeight = h + 'px';
+        }
+      } catch (e) {}
       // Let the big card lean with the phone here too, smoothly. This repoints
       // the single motion loop at the clone; close() restores the dashboard card.
       try { bindDayCardMotion(clone, clone.querySelector('.daycard-ns')); } catch (e) {}
