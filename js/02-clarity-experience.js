@@ -146,7 +146,7 @@ const ClarityExperience = {
     // clarityLevel -> knowDomain (how clear they are on what they want). This is
     // the first wizard step and gates the branch, so seeding it continues the
     // flow instead of re-asking. Onboarding: 'Yes, I know exactly' / 'I have a
-    // rough idea' / "Not really, I'm figuring it out" / 'No, I feel lost'.
+    // rough idea' / "Not really, I'm figuring it out" / 'No, I feel completely lost'.
     if (!wizardAnswers.knowDomain) {
       const lvl = String(prof.clarityLevel || '').toLowerCase();
       if (lvl) {

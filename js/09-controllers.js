@@ -286,7 +286,7 @@ const WelcomeIntro = {
       'Yes, I do and know exactly what it is': "Good! Knowing exactly what you want is the part most people never even reach.",
       'I have a rough idea': "A rough idea is a real start. Memento's whole first job is making it sharp.",
       "Not really... but I'm trying to figure it out": "That's honest, and normal. Finding the answer is literally step one here.",
-      'No, I feel lost': "Being lost is okay. Honestly it's where almost everyone starts. We find it together.",
+      'No, I feel completely lost': "Being lost is okay. Honestly it's where almost everyone starts. We find it together.",
       _fallback: "We'll get this clear. That's the first thing Memento does."
     },
     actionKnow: {
@@ -1094,7 +1094,7 @@ const WelcomeIntro = {
     // "what's it about", so the two no longer feel like the same question.
     { key: 'clarityLevel', type: 'choices', multi: false,
       headline: 'Do you have a goal or mission you want to achieve above everything else?',
-      options: ['Yes, I do and know exactly what it is', 'I have a rough idea', "Not really... but I'm trying to figure it out", 'No, I feel lost'] },
+      options: ['Yes, I do and know exactly what it is', 'I have a rough idea', "Not really... but I'm trying to figure it out", 'No, I feel completely lost'] },
     { key: 'runningToward', type: 'choices', multi: true,
       // "I'm honestly not sure yet" is exclusive: picking it clears the rest, and
       // picking anything else clears it (you can't be sure AND not sure).
