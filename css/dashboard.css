@@ -100,6 +100,69 @@ body:has(.action-exp.open) .action-plan__rays .ambient__rays-beam-shaft {
 }
 body.ns-bloom .ambient__ns-bloom { opacity: 1; }
 
+/* ── Reactive atmosphere: the living card's light, promoted to the whole page ──
+   The card's three pillar colors (clarity purple, action gold, consistency green)
+   bleed out as a page-wide aurora whose VIBRANCY tracks how the user is showing up:
+   richer + warmer as consistency / recent action climb, cooler + dimmer as they
+   drift. Sits ON TOP of the ns-bloom floor (the always-safe baseline) and is gated
+   by body.ns-bloom. Pure layered ALPHA radials (NO mix-blend:screen, which is what
+   turns near-black into a neon wash); no @keyframes / backdrop-filter, so it
+   survives the lowfx mobile path as a static glow. The :root vars are set by
+   setAtmosphereVars() (js/08); the var fallbacks keep it gorgeous before JS runs. */
+.ambient__aura {
+  position: absolute; inset: 0;
+  opacity: 0; pointer-events: none;
+  transition: opacity 2.4s cubic-bezier(0.4, 0, 0.2, 1);
+  /* All blooms are anchored around the card (≈50% wide, upper-middle) so the
+     light reads as RADIATING FROM the Memento itself, then filling the viewport.
+     Large radii so it reaches the screen edges; alphas tuned to be present but
+     never a neon wash. */
+  background:
+    /* consistency green — the "alive" hue. Brightest in a RING around the card
+       (the card occludes dead-center), so the mid-stops carry real weight and the
+       halo reads past the card edges out to the screen. */
+    radial-gradient(2100px 1700px at 50% 32%,
+      rgba(56, 236, 150, calc(0.40 * var(--aura-cons, 0))) 0%,
+      rgba(56, 236, 150, calc(0.24 * var(--aura-cons, 0))) 28%,
+      rgba(56, 236, 150, calc(0.08 * var(--aura-cons, 0))) 50%,
+      transparent 68%),
+    /* action gold warmth, pooling just below the card where the action sits */
+    radial-gradient(1800px 1450px at 56% 70%,
+      rgba(255, 208, 126, calc(0.30 * var(--aura-warmth, 0))) 0%,
+      rgba(255, 190, 100, calc(0.16 * var(--aura-warmth, 0))) 32%,
+      transparent 64%),
+    /* clarity purple base, radiating straight out of the card */
+    radial-gradient(2000px 1600px at 50% 42%,
+      rgba(150, 116, 255, calc(0.38 * var(--aura-clar, 0))) 0%,
+      rgba(140, 104, 246, calc(0.20 * var(--aura-clar, 0))) 34%,
+      rgba(126, 96, 232, calc(0.07 * var(--aura-clar, 0))) 56%,
+      transparent 72%),
+    /* drift steel: a cool desaturating veil that rises as you fall off */
+    radial-gradient(2100px 1700px at 50% 48%,
+      rgba(70, 92, 140, calc(0.20 * var(--aura-cool, 0))) 0%,
+      rgba(54, 70, 112, calc(0.11 * var(--aura-cool, 0))) 44%,
+      transparent 76%);
+}
+body.ns-bloom .ambient__aura { opacity: var(--aura-energy, 0.16); }
+/* Vignette scrim: keep the luminous center, sink the corners, and band the top +
+   bottom so the greeting and tab bar copy never float on raw color. The "powerful
+   but controlled" guarantee; stops here are the readability tuning knob. */
+.ambient__aura::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(135% 110% at 50% 46%,
+      transparent 0%, transparent 54%, rgba(4, 5, 9, 0.38) 100%),
+    linear-gradient(180deg,
+      rgba(4, 5, 9, 0.34) 0%, transparent 22%, transparent 76%, rgba(4, 5, 9, 0.42) 100%);
+}
+body.lite .ambient__aura, html.lowfx .ambient__aura { transition: none; }
+@media (prefers-reduced-motion: reduce) { .ambient__aura { transition: none; } }
+/* Light mode: drop the dark vignette scrim (matches html.theme-light .ambient::after)
+   and ease the aura back so the pillar colors read as a soft tint over the off-white
+   wash, never heavy bands. */
+html.theme-light .ambient__aura::after { background: transparent; }
+html.theme-light body.ns-bloom .ambient__aura { opacity: calc(var(--aura-energy, 0.16) * 0.7); }
+
 /* Volumetric "god rays" coming in from the top-left corner. Behind widgets,
    in front of the pitch-black base, gives the dashboard an ambient cinematic
    feel without competing with content. Pure CSS, GPU-friendly. */
@@ -817,14 +880,19 @@ body.ns-bloom .app.dash-v2 #commandCenter .cc-live { display: none; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #hubConsistency,
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashGreetingMobile { display: none; }
 
-  /* LEFT rail: mission / focus + quote of the day */
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter { grid-column: 1 / span 3; grid-row: 2; }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dailyMemento  { grid-column: 1 / span 3; grid-row: 3; overflow: hidden; }
+  /* CENTER hero, caption: today's action fused DIRECTLY under the card, reading
+     as its caption (the card is the goal made visible; the action is how you move
+     it today). Same center columns so they stack as one object. */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter { grid-column: 4 / span 6; grid-row: 3; }
+  /* LEFT flank: the quote of the day, a quiet supporting element centered beside
+     the hero (the card + its caption define the band height it sits within). */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dailyMemento  { grid-column: 1 / span 3; grid-row: 2 / span 2; overflow: hidden; align-self: center; }
 
-  /* CENTER: the Memento card, the centerpiece, spanning the hero band (rows
-     2-3). Its min-height sets the band height that the side rails fill to. */
+  /* CENTER: the Memento card, the glowing centerpiece. Sits in row 2; today's
+     action (above) fuses under it in row 3. Its min-height sets the hero height
+     the side flanks center within. */
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard {
-    grid-column: 4 / span 6; grid-row: 2 / span 2; margin: 0;
+    grid-column: 4 / span 6; grid-row: 2; margin: 0;
     align-items: stretch;
     justify-content: center;
   }
@@ -849,21 +917,16 @@ body.ns-bloom .app.dash-v2 #commandCenter .cc-live { display: none; }
   /* CONSISTENCY band: the year heatmap, full-width below the hero. */
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashConsistency { grid-column: 1 / -1; grid-row: 4; }
 
-  /* BELOW the band: Mori, Clarity, Notes - one even THREE-up row. The Action
-     tile is suppressed in the default bento (the command center already IS
-     today's action), so its old fourth slot sat empty and left a big gap. Spread
-     the three real tiles across all 12 columns instead. */
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="mori"]       { grid-column: 1 / span 4;  grid-row: 5; }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="clarity"]    { grid-column: 5 / span 4;  grid-row: 5; }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="reflection"] { grid-column: 9 / span 4;  grid-row: 5; }
-  /* cap the content-heavy tiles so the four-up row stays an even band */
+  /* ── Atmospheric home: modules OFF the home ─────────────────────────────────
+     The home is the card (hero) + today's action (its caption) + the quote and
+     check-in flanking it + the year heatmap band, all bathed in the reactive
+     aura. Every module tile lives one click away in the sidebar nav (js/09 routes
+     each data-nav to its launcher), so the home stays the calm, powerful
+     centerpiece the mockup calls for instead of a wall of tiles. */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="mori"],
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="clarity"],
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="reflection"] { max-height: 260px; overflow: hidden; }
-
-  /* BOTTOM: Memento Vivere, full-width strip */
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="vivere"] { grid-column: 1 / -1; grid-row: 6; }
-
-  /* hidden from Home */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="reflection"],
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="vivere"],
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="lifestats"],
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="deepwork"],
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="flow"],
@@ -897,9 +960,9 @@ body.ns-bloom .app.dash-v2 #commandCenter .cc-live { display: none; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="checkin"] { justify-content: center; }
 
   /* the card is the bigger centerpiece (overrides the 860px sizing) */
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-theme-platinum .daycard-ns { width: min(100%, 460px); }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-theme-living .daycard-living-stage { width: min(100%, 460px); }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-ns { min-height: 480px; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-theme-platinum .daycard-ns { width: min(100%, 440px); }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-theme-living .daycard-living-stage { width: min(100%, 440px); }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-ns { min-height: 430px; }
 }
 
 /* ── v27 BENTO HOME, mobile (<768px, after the Neutron Star) ─────────────────

@@ -3948,6 +3948,70 @@ function setLivingCardVars(wrap) {
   wrap.style.setProperty('--lit', (Math.max(L.clar, L.act, L.cons) / 100).toFixed(3));
 }
 
+// Days since the most recent logged action (local-day resolution). null when
+// there's no action history at all -> a brand-new locked-in user has NOT drifted,
+// they just haven't started, so the atmosphere stays the gorgeous purple floor
+// instead of going cold steel. Mirrors actionLocalDaysInWindow's day math.
+function daysSinceLastAction() {
+  try {
+    const h = (state.action && Array.isArray(state.action.completionHistory)) ? state.action.completionHistory : [];
+    if (!h.length) return null;
+    const todayNum = Math.floor(Date.parse(getTodayISO() + 'T00:00:00Z') / 86400000);
+    let latest = -Infinity;
+    h.forEach((e) => {
+      if (!e || !e.date) return;
+      const day = (typeof isoToLocalDay === 'function') ? isoToLocalDay(e.date) : String(e.date).slice(0, 10);
+      if (!day) return;
+      const dNum = Math.floor(Date.parse(day + 'T00:00:00Z') / 86400000);
+      if (dNum > latest) latest = dNum;
+    });
+    if (latest === -Infinity) return null;
+    return Math.max(0, todayNum - latest);
+  } catch (e) { return null; }
+}
+
+// THE ATMOSPHERE ENGINE: promote the living card's pillar light to the WHOLE page.
+// The card's three colors (clarity purple, action gold, consistency green) bleed
+// out as a page-wide aurora (`.ambient__aura`, gated by body.ns-bloom) whose
+// vibrancy tracks how the user is actually showing up: richer + warmer with
+// consistency + recent action, cooler + dimmer as they drift. Sets :root vars the
+// CSS reads. CRITICAL: energy is NEVER keyed off --lit (clarity pins that to ~1,
+// so it carries no signal); it's built from consistency + action minus drift, and
+// floored so the baseline is always gorgeous. Called from renderAll for both card
+// themes. Wrapped in try/catch so a render never dies on the atmosphere.
+function setAtmosphereVars() {
+  try {
+    const root = document.documentElement;
+    const L = livingCardLevels();                 // clar / act / cons, 0..100
+    const clarN = Math.max(0, Math.min(1, L.clar / 100));
+    const actN  = Math.max(0, Math.min(1, L.act  / 100));
+    const consN = Math.max(0, Math.min(1, L.cons / 100));
+
+    // Drift decay: 0 while fresh (acted within a day), ramps to 1 over ~6 days
+    // away. Only someone WITH action history can drift (null -> 0, not started).
+    const drift = daysSinceLastAction();
+    const driftDecay = (drift == null) ? 0 : Math.max(0, Math.min(1, (drift - 1) / 5));
+
+    // Energy = gorgeous floor + consistency vibrancy + recent-action lift, dimmed
+    // as you drift. Floored at 0.16 so a blank-but-locked-in card still glows.
+    let energy = 0.16 + 0.55 * consN + 0.30 * actN;
+    energy = energy * (1 - 0.45 * driftDecay);
+    energy = Math.max(0.16, Math.min(1, energy));
+
+    // Warmth = action gold, fades fast as you fall off. Cool = the steel/violet
+    // "you've drifted" veil rising in its place.
+    const warmth = Math.max(0, Math.min(1, actN * (1 - driftDecay)));
+    const cool = driftDecay;
+
+    root.style.setProperty('--aura-clar', clarN.toFixed(3));
+    root.style.setProperty('--aura-cons', consN.toFixed(3));
+    root.style.setProperty('--aura-act', actN.toFixed(3));
+    root.style.setProperty('--aura-energy', energy.toFixed(3));
+    root.style.setProperty('--aura-warmth', warmth.toFixed(3));
+    root.style.setProperty('--aura-cool', cool.toFixed(3));
+  } catch (e) {}
+}
+
 // Continuous random wander: each blob eases toward a fresh random target and
 // the bloom + reflection mirror blobs ride the same transform, so the color
 // drifts calmly and the reflection tracks it. One loop; restarted per render
@@ -4200,6 +4264,7 @@ function renderDashConsistency() {
 function renderAll() {
   renderGreeting();
   try { renderDayCard(); } catch (e) {}
+  try { setAtmosphereVars(); } catch (e) {}
   try { renderDashConsistency(); } catch (e) {}
   try { const _cc = document.getElementById('commandCenter'); if (_cc) { _cc.innerHTML = renderCommandCenter(); bindCommandCenter(_cc); } } catch (e) {}
   try { updateCaptureFab(); } catch (e) {}
