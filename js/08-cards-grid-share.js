@@ -3865,6 +3865,28 @@ function openMementoFull() {
     }
 
     document.body.style.overflow = 'hidden';
+    // Opal-style continuity: open the card EXACTLY over the live home card so it
+    // does not appear to move a single pixel. Offset the whole scroll by the
+    // home↔overlay delta with NO transition, so the opened card lands pixel-for-
+    // pixel on the home card (size already matches) while only the breakdown around
+    // it animates in. The home card sits behind at the same spot, so the overlay's
+    // fade-in reads as the background arriving, not the card moving. Extend the
+    // bottom padding by the downward shift so the lower content still scrolls in.
+    try {
+      const homeNs = document.querySelector('#dayCard .daycard-ns');
+      const ovNs = ov.querySelector('.daycard-ns');
+      const scroll = ov.querySelector('.mf__scroll');
+      if (homeNs && ovNs && scroll) {
+        const H = homeNs.getBoundingClientRect();
+        const C = ovNs.getBoundingClientRect();
+        const dx = Math.round(H.left - C.left);
+        const dy = Math.round(H.top - C.top);
+        if (dx || dy) {
+          scroll.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+          if (dy > 0) ov.style.paddingBottom = 'calc(56px + var(--safe-b, 0px) + ' + dy + 'px)';
+        }
+      }
+    } catch (e) {}
     // Commit the initial opacity:0 state with a forced reflow, then flip to open so
     // the transition still plays. rAF gets throttled when the tab is backgrounded,
     // which can leave the overlay stuck invisible; a sync reflow never stalls.
