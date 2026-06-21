@@ -3684,9 +3684,14 @@ function renderDayCard() {
     // onboarded users staring at an empty home).
     if (typeof isBrandNewUser === 'function' && isBrandNewUser()) { stopLivingWander(); el.innerHTML = ''; return; }
 
-    // Theme: 'platinum' (classic glass) or 'living' (color-morph + reflection).
-    const theme = (state.dayCard && state.dayCard.theme === 'living') ? 'living' : 'platinum';
-    const living = theme === 'living';
+    // The Day Card is always the LIVING (colorful) card now. The tap-the-emblem
+    // toggle to the blank platinum card was removed (Malik). Color is still EARNED:
+    // the living layers stay blank until the Neutron Star is locked in
+    // (body.ns-bloom), then bloom in. Keep any stale saved theme consistent for
+    // other readers (the share card) with a one-time flip.
+    const theme = 'living';
+    const living = true;
+    try { if (state.dayCard && state.dayCard.theme !== 'living') { state.dayCard.theme = 'living'; persistState(); } } catch (_) {}
     const blobs = '<i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i><i class="blob b4"></i><i class="blob b5"></i><i class="blob b6"></i>';
     // The brand mark machined INTO the glass: filled at 5% so it reads as a
     // relief, light catching its lower edge, shadow on the upper (a deboss).
@@ -3754,9 +3759,8 @@ function renderDayCard() {
     const nsEl = el.querySelector('#dayCardNs');
     bindDayCardTilt(nsEl);
     bindDayCardMotion(el.querySelector('.daycard-wrap'), nsEl);
-    bindDayCardThemeToggle(nsEl);
-    // Tap the card (anywhere but the emblem, which toggles the theme) -> the
-    // fullscreen Memento with your Clarity / Action / Consistency stats.
+    // Tap the card (emblem included) -> the fullscreen Memento with your Clarity /
+    // Action / Consistency stats. The emblem no longer toggles the theme.
     if (nsEl && !nsEl._mfBound) {
       nsEl._mfBound = true;
       nsEl.style.cursor = 'pointer';
@@ -4128,22 +4132,8 @@ function stopLivingWander() {
   if (_dcLivingRaf) { cancelAnimationFrame(_dcLivingRaf); _dcLivingRaf = 0; }
 }
 
-// Tap the emblem (the M mark) to switch the Day Card between platinum and living.
-function bindDayCardThemeToggle(nsEl) {
-  try {
-    if (!nsEl) return;
-    const emblem = nsEl.querySelector('.daycard-ns__emblem');
-    if (!emblem) return;
-    emblem.style.cursor = 'pointer';
-    emblem.addEventListener('click', (e) => {
-      e.stopPropagation();
-      if (!state.dayCard) state.dayCard = { theme: 'platinum' };
-      state.dayCard.theme = (state.dayCard.theme === 'living') ? 'platinum' : 'living';
-      try { persistState(); } catch (_) {}
-      try { renderDayCard(); } catch (_) {}
-    });
-  } catch (e) {}
-}
+// (The tap-the-emblem theme toggle was removed: the Day Card is always the living
+// card now. renderDayCard() forces the living theme; see the note there.)
 
 // Subtle parallax on the Day Card: it tilts a few degrees toward the
 // pointer/finger only, so the glass reads as a physical object you can play
