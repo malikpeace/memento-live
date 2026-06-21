@@ -245,6 +245,7 @@ const WelcomeIntro = {
       if (step.key === 'distraction') beats.push({ lines: () => { const t = this._wcReflect('distraction'); return t ? [t] : []; } });
       if (step.key === 'letterToFutureSelf') beats.push({ lines: () => { const t = this._wcReflect('letterToFutureSelf'); return t ? [t] : []; } });
       if (step.key === 'costOfInaction') beats.push({ lines: () => { const t = this._wcReflect('costOfInaction'); return t ? [t] : []; } });
+      if (step.key === 'momentumWin') beats.push({ lines: () => { const t = this._wcReflect('momentumWin'); return t ? [t] : []; } });
     });
     return beats;
   },
@@ -324,6 +325,18 @@ const WelcomeIntro = {
       "Becoming someone I don't want to be": "That's a real fear, and a good one. It means you still know who you'd rather be.",
       _multi: "That's the weight worth using. Not to scare you, to move you.",
       _fallback: "Hold onto that feeling. That's the fuel when motivation runs out."
+    },
+    momentumWin: {
+      'The goal, actually reached': "That's the whole game. Memento keeps the goal in front of you so a year of small days adds up to it.",
+      'Proof I can count on myself': "That proof is worth more than the goal itself. Every day you show up builds it.",
+      "A life I'm proud of": "A life you're proud of gets built one ordinary day at a time. This is how you stack them.",
+      'Becoming who I want to be': "You already know who that is. Memento just keeps you pointed at them, every day.",
+      'Momentum that compounds': "Compounding is the cheat code. Stay consistent and a year from now it's barely recognizable.",
+      'Real freedom and options': "Freedom is earned in reps. Keep stacking them and the options open up.",
+      _multi3: "That's a lot to build toward. Keep showing up and a year from now it's not a wish, it's your life.",
+      _multi2: "Both of those are on the table. Keep the momentum and a year from now they're just real.",
+      _multi: "All of that is within reach. Momentum is how you get there.",
+      _fallback: "Hold onto that. That's the pull that keeps you going when motivation dips."
     }
   },
 
@@ -1127,10 +1140,20 @@ const WelcomeIntro = {
       options: ['TikTok', 'Instagram / Reels', 'YouTube', 'Porn', 'Gaming', 'Friends / going out', 'Something else'],
       // Only ask if the phone is what's pulling them back.
       skipIf: (p) => String((p && p.runningFrom) || '').indexOf('Phone & social media') === -1 },
-    // ── WHY / weight: the cost of staying where they are (memento mori) ─────
+    // ── WHY / weight: the fuel that carries them. Two framings of the same job,
+    // chosen by where they actually are. People who are NOT moving yet get the
+    // mori weight (the cost of staying still). People who ARE moving (slow but
+    // moving / on a roll) get the upside instead, because an all-negative "if
+    // nothing changes" question contradicts someone who just said they're on a
+    // roll. Exactly one of these two runs (mirrors the runningFrom skip). ─────
     { key: 'costOfInaction', type: 'choices', multi: true,
       headline: 'If a year goes by and nothing changes, what does that feel like?',
-      options: ['Regret', 'Wasted potential', 'Watching everyone pass me', 'Letting people down', 'Running out of time', "Becoming someone I don't want to be"] },
+      options: ['Regret', 'Wasted potential', 'Watching everyone pass me', 'Letting people down', 'Running out of time', "Becoming someone I don't want to be"],
+      skipIf: (p) => { const ap = String((p && p.actionProgress) || ''); return ap === 'Slow but moving' || ap === 'Actually on a roll'; } },
+    { key: 'momentumWin', type: 'choices', multi: true,
+      headline: 'Keep this up for a year. What does that get you?',
+      options: ['The goal, actually reached', 'Proof I can count on myself', "A life I'm proud of", 'Becoming who I want to be', 'Momentum that compounds', 'Real freedom and options'],
+      skipIf: (p) => { const ap = String((p && p.actionProgress) || ''); return !(ap === 'Slow but moving' || ap === 'Actually on a roll'); } },
     { key: 'letterToFutureSelf', type: 'text',
       headline: 'Anything else Memento should know?',
       sub: 'Totally optional. A line about you, your situation, or what you want. Or just skip it.',
@@ -1561,6 +1584,15 @@ const WelcomeIntro = {
     var costStuck = anyHas(p.costOfInaction, 'same place') || anyHas(p.costOfInaction, 'stuck');
     var hasCost = costRegret || costTime || costPotential || costPass || costLetting || costStuck;
 
+    // ---------- momentumWin (the upside "why" for people already moving) ----------
+    var winGoal = anyHas(p.momentumWin, 'goal') || anyHas(p.momentumWin, 'reached');
+    var winSelf = anyHas(p.momentumWin, 'count on') || anyHas(p.momentumWin, 'myself');
+    var winProud = anyHas(p.momentumWin, 'proud');
+    var winBecome = anyHas(p.momentumWin, 'who i want');
+    var winCompound = anyHas(p.momentumWin, 'compound') || anyHas(p.momentumWin, 'momentum');
+    var winFreedom = anyHas(p.momentumWin, 'freedom') || anyHas(p.momentumWin, 'options');
+    var hasWin = winGoal || winSelf || winProud || winBecome || winCompound || winFreedom;
+
     // ---------- runningFrom / distraction ----------
     var phone = anyHas(p.runningFrom, 'phone');
     var procrast = anyHas(p.runningFrom, 'procrast');
@@ -1628,6 +1660,16 @@ const WelcomeIntro = {
         ? 'The clock is the one thing you do not get back. Not to scare you, to move you while it still counts.'
         : 'Not to scare you, to keep you moving when motivation runs out.';
       why = 'When it gets hard, you remember what staying here costs you, ' + costLine + '. ' + tail;
+    } else if (hasWin) {
+      var winBits = [];
+      if (winGoal) winBits.push('the goal actually reached');
+      if (winSelf) winBits.push('proof you can count on yourself');
+      if (winProud) winBits.push('a life you are proud of');
+      if (winBecome) winBits.push('becoming who you want to be');
+      if (winCompound) winBits.push('momentum that compounds');
+      if (winFreedom) winBits.push('the freedom it buys you');
+      var winLine = joinAnd(winBits);
+      why = 'You are already moving, so the why is the upside, ' + winLine + '. When it gets hard, that is the pull that keeps the momentum going.';
     } else {
       why = 'Memento keeps your reason in front of you, so on the hard days you remember why you started. The cost of staying the same is what carries you when motivation is gone.';
     }
@@ -1919,7 +1961,9 @@ const WelcomeIntro = {
 
     const whyFall = p.costOfInaction
       ? `When it gets hard, you remember the cost of staying here: ${phrase(p.costOfInaction)}. That is the fuel that keeps you going.`
-      : 'Memento keeps your reason in front of you, so you are not leaning on motivation that comes and goes.';
+      : p.momentumWin
+        ? `You are already moving, so the why is the upside: ${phrase(p.momentumWin)}. That is the pull that keeps the momentum going.`
+        : 'Memento keeps your reason in front of you, so you are not leaning on motivation that comes and goes.';
     const whatFall = p.runningToward
       ? `You said you want to improve ${phrase(p.runningToward)}.${p.runningFrom ? ' And that ' + phrase(p.runningFrom) + ' keeps getting in the way.' : ''} That is enough to start.`
       : 'You showed up. That is already more than most people manage.';
