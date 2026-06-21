@@ -143,7 +143,12 @@ body.ns-bloom .ambient__ns-bloom { opacity: 1; }
       rgba(54, 70, 112, calc(0.11 * var(--aura-cool, 0))) 44%,
       transparent 76%);
 }
-body.ns-bloom .ambient__aura { opacity: var(--aura-energy, 0.16); }
+/* The reactive aura no longer washes the HOME. The main page is just the top-left
+   beam of light (god rays) now; the card's light reflects on the background only
+   INSIDE the Memento full view (#mementoFull, far below). The #ambientAura element
+   stays in the DOM but hidden (base opacity 0); setAtmosphereVars() still sets the
+   :root --aura-* vars that the full-view aura reads. */
+.ambient__aura { display: none; }
 /* Vignette scrim: keep the luminous center, sink the corners, and band the top +
    bottom so the greeting and tab bar copy never float on raw color. The "powerful
    but controlled" guarantee; stops here are the readability tuning knob. */
@@ -3237,9 +3242,26 @@ html.lowfx .daycard-ns {
   display: flex; flex-direction: column; align-items: center;
   overflow-y: auto; -webkit-overflow-scrolling: touch;
   padding: calc(36px + var(--safe-t)) 20px calc(56px + var(--safe-b));
-  /* A fully opaque page of its own: nothing behind it shows through. A faint
-     radial keeps a touch of depth, layered over the solid base. */
+  /* Inside the Memento, the background REFLECTS the card: its pillar light (clarity
+     purple, action gold, consistency green) blooms behind it, keyed off the same
+     :root --aura-* vars and scaled by --aura-energy so it tracks the user's real
+     state (drift cools + dims it). The card sits near the top, so the blooms are
+     anchored around 50% 24%. Layered over the solid base so the stats stay legible. */
   background:
+    radial-gradient(1500px 1200px at 50% 22%,
+      rgba(56, 236, 150, calc(0.34 * var(--aura-cons, 0) * var(--aura-energy, 0.45))) 0%,
+      rgba(56, 236, 150, calc(0.16 * var(--aura-cons, 0) * var(--aura-energy, 0.45))) 30%,
+      transparent 60%),
+    radial-gradient(1400px 1100px at 52% 34%,
+      rgba(255, 206, 122, calc(0.24 * var(--aura-warmth, 0) * var(--aura-energy, 0.45))) 0%,
+      transparent 58%),
+    radial-gradient(1600px 1300px at 50% 26%,
+      rgba(150, 116, 255, calc(0.34 * var(--aura-clar, 0) * var(--aura-energy, 0.45))) 0%,
+      rgba(140, 104, 246, calc(0.16 * var(--aura-clar, 0) * var(--aura-energy, 0.45))) 34%,
+      transparent 64%),
+    radial-gradient(1700px 1400px at 50% 30%,
+      rgba(70, 92, 140, calc(0.18 * var(--aura-cool, 0) * var(--aura-energy, 0.45))) 0%,
+      transparent 66%),
     radial-gradient(120% 70% at 50% 18%, rgba(255, 255, 255, 0.04), transparent 60%),
     var(--surface-0);
   opacity: 0;
@@ -3259,19 +3281,13 @@ html.lowfx .daycard-ns {
 .mf__scroll {
   width: 100%; max-width: 460px; margin: auto;
   display: flex; flex-direction: column; align-items: center;
-  transform: translateY(14px) scale(0.985);
-  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
-#mementoFull.mf--open .mf__scroll { transform: none; }
-/* The card zooms open (it grows into the screen) rather than popping in, and the
-   breakdown below settles up just behind it for a layered, intentional entrance. */
+/* The Memento itself does NOT animate on open: no zoom, no scale, no independent
+   move. It sits perfectly still (already pinned to its home size) while only the
+   breakdown AROUND it rises in. The whole overlay just fades in softly. */
 .mf__card {
   margin: 8px 0 4px;
-  transform: scale(0.74);
-  opacity: 0;
-  transition: transform 0.52s cubic-bezier(0.34, 1.32, 0.5, 1), opacity 0.4s ease;
 }
-#mementoFull.mf--open .mf__card { transform: scale(1); opacity: 1; }
 .mf__eyebrow, .mf__stats, .mf__share, .mf__hint {
   opacity: 0;
   transform: translateY(10px);

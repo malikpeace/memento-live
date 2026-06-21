@@ -3779,6 +3779,9 @@ function renderDayCard() {
 function openMementoFull() {
   try {
     if (document.getElementById('mementoFull')) return;
+    // Refresh the :root --aura-* vars so the full view's background reflects the
+    // user's latest state the instant it opens (the home no longer shows them).
+    try { setAtmosphereVars(); } catch (e) {}
     const L = (typeof livingCardLevels === 'function') ? livingCardLevels() : { clar: 0, act: 0, cons: 0 };
     let cs = { current: 0, longest: 0, totalActiveDays: 0 };
     try { cs = consistencyStats(); } catch (e) {}
@@ -3987,15 +3990,16 @@ function daysSinceLastAction() {
   } catch (e) { return null; }
 }
 
-// THE ATMOSPHERE ENGINE: promote the living card's pillar light to the WHOLE page.
-// The card's three colors (clarity purple, action gold, consistency green) bleed
-// out as a page-wide aurora (`.ambient__aura`, gated by body.ns-bloom) whose
-// vibrancy tracks how the user is actually showing up: richer + warmer with
-// consistency + recent action, cooler + dimmer as they drift. Sets :root vars the
-// CSS reads. CRITICAL: energy is NEVER keyed off --lit (clarity pins that to ~1,
-// so it carries no signal); it's built from consistency + action minus drift, and
-// floored so the baseline is always gorgeous. Called from renderAll for both card
-// themes. Wrapped in try/catch so a render never dies on the atmosphere.
+// THE ATMOSPHERE ENGINE: turn the living card's pillar light into a reactive
+// background. The card's three colors (clarity purple, action gold, consistency
+// green) reflect on the background INSIDE the Memento full view (#mementoFull),
+// keyed off the :root --aura-* vars this sets. The HOME no longer uses them (it's
+// just the top-left beam now). Vibrancy tracks how the user is actually showing up:
+// richer + warmer with consistency + recent action, cooler + dimmer as they drift.
+// CRITICAL: energy is NEVER keyed off --lit (clarity pins that to ~1, so it carries
+// no signal); it's built from consistency + action minus drift, and floored so the
+// baseline always glows. Called from renderAll for both card themes. Wrapped in
+// try/catch so a render never dies on the atmosphere.
 function setAtmosphereVars() {
   try {
     const root = document.documentElement;
