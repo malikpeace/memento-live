@@ -303,6 +303,20 @@ const WelcomeIntro = {
       'Actually on a roll': "On a roll, love that. Now we just protect that momentum so it doesn't slip.",
       _fallback: "Wherever you're at is fine. We build from here, one small step at a time."
     },
+    clarityBlock: {
+      "Too many directions, I can't pick one": "Too many paths is its own kind of stuck. We narrow it to the one that matters most.",
+      "Scared I'll pick the wrong thing": "There is no permanent wrong pick. You can always adjust, but you cannot steer a parked car.",
+      "I've lost touch with what I care about": "That happens to a lot of people. We find the thread again, gently.",
+      "I've never really stopped to figure it out": "Most people never do. Stopping to ask is already the first real step.",
+      _fallback: "Whatever is blurring it, naming it is how we start to clear it."
+    },
+    clarityHistory: {
+      'No, this is the first time': "Then you are in the right place to start. One honest step at a time.",
+      'Tried, but it faded': "It faded because nothing held it in place. That is exactly what Memento is for.",
+      'I keep starting over': "Starting over is not failing, it is missing the system that makes it stick. We build that.",
+      "I think I'm close, just not there": "Close is good. We close the last gap so it finally lands.",
+      _fallback: "Wherever you have gotten before, we build from here."
+    },
     distraction: {
       'TikTok': "TikTok is built to keep you there. It's not weak of you, it's just very good at its job.",
       'Instagram / Reels': "Instagram and Reels are engineered to be endless. Almost everyone loses time to it.",
@@ -1117,14 +1131,32 @@ const WelcomeIntro = {
       options: ['Work & money', 'Health & fitness', 'Discipline & focus', 'A skill or craft', 'Creative work', 'Relationships', 'Mindset & Mental', "I'm honestly not sure yet"] },
     // (birthday is inserted here, after the clarity gap)
     // ── ACTION gap: do they know the steps, and where are they? ─────────────
+    // Action gap, only for people who actually have a direction (a goal or a rough
+    // idea). Asking someone who just said they feel lost "do you know what to do to
+    // get there?" makes no sense, so for them we branch to the clarity questions below.
     { key: 'actionKnow', type: 'choices', multi: false,
       headline: 'Do you know what to do to get there?',
       sub: 'The actual steps, not the dream.',
-      options: ["Yes, I know the actions to get there", "Sort of, not sure it's right", "No, I don't know the steps"] },
+      options: ["Yes, I know the actions to get there", "Sort of, not sure it's right", "No, I don't know the steps"],
+      skipIf: (p) => { const c = String((p && p.clarityLevel) || '').toLowerCase(); return c.indexOf('lost') !== -1 || c.indexOf('not really') !== -1; } },
     { key: 'actionProgress', type: 'choices', multi: false,
       headline: "How's it going so far?",
       sub: 'No judgment. Just where you actually are.',
-      options: ["Haven't really started", 'Started, then stalled', 'Slow but moving', 'Actually on a roll'] },
+      options: ["Haven't really started", 'Started, then stalled', 'Slow but moving', 'Actually on a roll'],
+      skipIf: (p) => { const c = String((p && p.clarityLevel) || '').toLowerCase(); return c.indexOf('lost') !== -1 || c.indexOf('not really') !== -1; } },
+    // Clarity branch: shown INSTEAD of the two action questions above when they have
+    // no goal yet (lost / still figuring it out). There is no "there" for them, so we
+    // ask what is in the way of naming it, and whether they have tried before.
+    { key: 'clarityBlock', type: 'choices', multi: false,
+      headline: "What's making it hard to know what you want?",
+      sub: 'Be honest, this is just for you.',
+      options: ["Too many directions, I can't pick one", "Scared I'll pick the wrong thing", "I've lost touch with what I care about", "I've never really stopped to figure it out"],
+      skipIf: (p) => { const c = String((p && p.clarityLevel) || '').toLowerCase(); return !(c.indexOf('lost') !== -1 || c.indexOf('not really') !== -1); } },
+    { key: 'clarityHistory', type: 'choices', multi: false,
+      headline: 'Have you tried to figure this out before?',
+      sub: 'No judgment. Just where you actually are.',
+      options: ['No, this is the first time', 'Tried, but it faded', 'I keep starting over', "I think I'm close, just not there"],
+      skipIf: (p) => { const c = String((p && p.clarityLevel) || '').toLowerCase(); return !(c.indexOf('lost') !== -1 || c.indexOf('not really') !== -1); } },
     // ── CONSISTENCY gap: what's holding them back, and what's the pull? ──────
     // Only asked of people who said they are NOT making progress (Haven't
     // started / Started then stalled). If they're already moving, nothing is
