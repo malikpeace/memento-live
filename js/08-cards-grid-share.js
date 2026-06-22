@@ -4152,6 +4152,9 @@ function stopLivingWander() {
 function bindDayCardTilt(card) {
   if (!card) return;
   try {
+    // Off by default; opt-in via Settings > Preferences ("Memento tilt"). The card
+    // leaning toward the cursor read as movement some people don't want.
+    if (!(state.prefs && state.prefs.cardTilt)) return;
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     if (document.documentElement.classList.contains('lowfx')) return;
     // Tilt only. The surface itself stays still: updating --dc-mx/--dc-my

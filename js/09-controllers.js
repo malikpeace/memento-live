@@ -2747,8 +2747,13 @@ const Sidebar = {
       const hit = e.target.closest('.sidebar__nav-item, .sidebar__section--clickable, #sidebarProfile, #sidebarBrand');
       if (hit) {
         const wasPeek = document.body.classList.contains('menu-peek');
+        // Opening Settings (the profile chip) leaves the desktop sidebar open
+        // (Malik): Settings opens behind it, the sidebar stays. The mobile drawer
+        // still closes (it is a full-screen overlay, so keeping it would hide
+        // Settings) -> closeMenu always runs, closePeek is skipped for Settings.
+        const isSettings = hit.matches('#sidebarProfile');
         closeMenu();
-        closePeek();
+        if (!isSettings) closePeek();
         // From a peek over a full-screen view, plain tab destinations (Dashboard,
         // Memento, Settings) and the brand must dismiss the overlay underneath.
         const isTabDest = hit.matches('#sidebarBrand') || (hit.dataset && hit.dataset.tab && !hit.dataset.nav);
@@ -3393,6 +3398,7 @@ const TabBar = {
         '<input type="color" id="prefAccentCustomInput" value="' + customHex + '" aria-label="Pick a custom accent color" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;" />' +
         '<div style="font-size: 0.6875rem; color: var(--text-3); margin: 8px 0 16px;">Retints shared highlights and focus rings. Each module keeps its own color. Pick Custom for any color you like.</div>' +
         toggleRow('prefReduceMotion', 'Reduce motion', 'Calms the orbiting ring, drifting glow, and ambient motion.', reduceMotion) +
+        toggleRow('prefCardTilt', 'Memento tilt', 'The Memento leans toward your cursor as you move the mouse.', !!prefs.cardTilt) +
         toggleRow('prefCompact', 'Compact density', 'Tightens spacing so more fits on screen.', compact) +
         toggleRow('prefWeekMonday', 'Weeks start Monday', 'Aligns the heatmap and calendars to Monday columns.', (state.prefs && state.prefs.weekStart === 'mon')) +
         toggleRow('prefMorningRitual', 'Morning ritual', 'A 20-second start on the first open of each morning.', (state.prefs && state.prefs.morningRitual === 'on')) +
@@ -3564,6 +3570,7 @@ const TabBar = {
       });
     };
     wireToggle('prefReduceMotion', (on) => { state.prefs.reduceMotion = on; });
+    wireToggle('prefCardTilt', (on) => { state.prefs.cardTilt = on; try { if (typeof renderDayCard === 'function') renderDayCard(); } catch (e) {} });
     wireToggle('prefCompact', (on) => { state.prefs.density = on ? 'compact' : 'comfortable'; });
     wireToggle('prefWeekMonday', (on) => {
       state.prefs.weekStart = on ? 'mon' : 'sun';
