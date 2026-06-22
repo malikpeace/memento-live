@@ -446,7 +446,7 @@ html.theme-light .widget--action .widget__icon { color: var(--text-hi) !importan
 .cc-primary {
   transition: transform var(--t-fast) var(--ease-out, ease), box-shadow var(--t-base) ease, background var(--t-base) ease;
 }
-.cc-primary:hover { background: #f4f4f8 !important; box-shadow: 0 4px 16px rgba(0,0,0,0.28); }
+.cc-primary:hover { background: var(--solid-bg-hover, #f4f4f8) !important; box-shadow: 0 4px 16px rgba(0,0,0,0.28); }
 .cc-primary:active { transform: scale(0.98); }
 .cc-primary:focus-visible {
   outline: none;

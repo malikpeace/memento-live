@@ -259,6 +259,10 @@
      --solid-bg for the fill and --solid-fg for its label. */
   --solid-bg: #ffffff;
   --solid-fg: #0b0b12;
+  /* Hover fill for the solid CTA. Must stay on the SAME side as --solid-bg so the
+     --solid-fg label never loses contrast: a near-white nudge under the white dark
+     mode button, a lighter-dark nudge under the dark light-mode button. */
+  --solid-bg-hover: #f0f0f5;
   color-scheme: dark;
 }
 
@@ -323,6 +327,9 @@ html.theme-light {
      visible CTA on the white canvas instead of white-on-white). */
   --solid-bg: #1a1c22;
   --solid-fg: #ffffff;
+  /* Lighter-dark hover so the white label stays visible (the old hardcoded
+     near-white hover turned this button white-on-white when pressed). */
+  --solid-bg-hover: #33363f;
 }
 /* Canvas background + base text live on <body> (theme class is on <html>). */
 html.theme-light body {
