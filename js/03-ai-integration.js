@@ -2361,7 +2361,7 @@ function renderWizard() {
   const steps = getWizardSteps();
   const totalSteps = steps.length;
   const stepKey = steps[wizardStep];
-  const inFullscreen = ClarityExperience.isOpen;
+  const inFullscreen = (typeof ClarityExperience !== 'undefined') && ClarityExperience.isOpen;
 
   let html = '<div class="wiz">';
 
@@ -3292,7 +3292,7 @@ function bindAiChat(container) {
   if (input) {
     input.addEventListener('input', () => {
       aiUserAnswer = input.value;
-      if (ClarityExperience.isOpen) ClarityExperience.updateNav();
+      if (typeof ClarityExperience !== 'undefined' && ClarityExperience.isOpen) ClarityExperience.updateNav();
     });
     // Enter = submit, Shift+Enter = newline
     input.addEventListener('keydown', (e) => {
@@ -3338,7 +3338,7 @@ function bindAiChat(container) {
     } else {
       aiUserAnswer = selectedChoices.join(' | ');
     }
-    if (ClarityExperience.isOpen) ClarityExperience.updateNav();
+    if (typeof ClarityExperience !== 'undefined' && ClarityExperience.isOpen) ClarityExperience.updateNav();
   }
 
   container.querySelectorAll('[data-ai-choice]').forEach(opt => {
@@ -3418,7 +3418,7 @@ function bindAiChat(container) {
       aiUserAnswer = rangeInput.value;
       syncRangeFill(rangeInput);
       syncRangeNumWidth(rangeNumber);
-      if (ClarityExperience.isOpen) ClarityExperience.updateNav();
+      if (typeof ClarityExperience !== 'undefined' && ClarityExperience.isOpen) ClarityExperience.updateNav();
     });
     // Number input → sync slider + fill
     rangeNumber.addEventListener('input', () => {
@@ -3432,7 +3432,7 @@ function bindAiChat(container) {
       } else {
         aiUserAnswer = '';
       }
-      if (ClarityExperience.isOpen) ClarityExperience.updateNav();
+      if (typeof ClarityExperience !== 'undefined' && ClarityExperience.isOpen) ClarityExperience.updateNav();
     });
     // Enter in number input = submit
     rangeNumber.addEventListener('keydown', (e) => {
@@ -3443,16 +3443,16 @@ function bindAiChat(container) {
       aiUserAnswer = rangeNumber.value;
       syncRangeFill(rangeInput);
     }
-    if (ClarityExperience.isOpen) ClarityExperience.updateNav();
+    if (typeof ClarityExperience !== 'undefined' && ClarityExperience.isOpen) ClarityExperience.updateNav();
   } else if (rangeInput) {
     syncRangeFill(rangeInput);
     rangeInput.addEventListener('input', () => {
       aiUserAnswer = rangeInput.value;
       syncRangeFill(rangeInput);
-      if (ClarityExperience.isOpen) ClarityExperience.updateNav();
+      if (typeof ClarityExperience !== 'undefined' && ClarityExperience.isOpen) ClarityExperience.updateNav();
     });
     aiUserAnswer = rangeInput.value;
-    if (ClarityExperience.isOpen) ClarityExperience.updateNav();
+    if (typeof ClarityExperience !== 'undefined' && ClarityExperience.isOpen) ClarityExperience.updateNav();
   }
 
   // Rephrase button
@@ -3516,7 +3516,7 @@ async function autoStartAiChat() {
 }
 
 function refreshAiChatUI() {
-  if (ClarityExperience.isOpen) {
+  if (typeof ClarityExperience !== 'undefined' && ClarityExperience.isOpen) {
     ClarityExperience.renderPage(ClarityExperience.currentPage);
     ClarityExperience.bindWizardInFullscreen();
     ClarityExperience.updateNav();
@@ -3670,7 +3670,7 @@ function completeWizard() {
 
   persistNow();
   renderAll();
-  if (ClarityExperience.isOpen) {
+  if (typeof ClarityExperience !== 'undefined' && ClarityExperience.isOpen) {
     ClarityExperience.close();
   } else {
     Sheet.close();
