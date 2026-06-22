@@ -340,7 +340,7 @@ const WelcomeIntro = {
       'Letting people down': "Not wanting to let people down says a lot about you. That's a good reason to start now.",
       'Running out of time': "The time thing is real, and feeling it now is exactly why you start now.",
       "Becoming someone I don't want to be": "That's a real fear, and a good one. It means you still know who you'd rather be.",
-      _multi: "That's the weight worth using. Not to scare you, to move you.",
+      _multi: "Let's use that as fuel to get the feedback loop started.",
       _fallback: "Hold onto that feeling. That's the fuel when motivation runs out."
     },
     momentumWin: {
@@ -1175,7 +1175,6 @@ const WelcomeIntro = {
       skipIf: (p) => { const ap = String((p && p.actionProgress) || ''); return ap === 'Slow but moving' || ap === 'Actually on a roll'; } },
     { key: 'distraction', type: 'choices', multi: false,
       headline: 'What pulls your attention the most?',
-      sub: 'The honest answer, not the polite one.',
       options: ['TikTok', 'Instagram / Reels', 'YouTube', 'Porn', 'Gaming', 'Friends / going out', 'Something else'],
       // Only ask if the phone is what's pulling them back.
       skipIf: (p) => String((p && p.runningFrom) || '').indexOf('Phone & social media') === -1 },
