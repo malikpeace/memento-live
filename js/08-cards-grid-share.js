@@ -3883,7 +3883,11 @@ function openMementoFull() {
         if (ns) { ns.style.minHeight = sh + 'px'; sizedEls.push(ns); }
         // Land it on its exact home spot -> zero visible movement. Vertical via
         // padding (keeps the view scrollable, no transform to fight the swipe);
-        // horizontal only if the home card is off-centre.
+        // horizontal only if the home card is off-centre. Force the flex layout to
+        // SETTLE after the size-pin before measuring, so C is the card's true
+        // resting position (not a half-resolved first pass) and the padding-top
+        // lands it exactly once, with no second-pass correction the eye can catch.
+        void ov.offsetWidth;
         const C = ns ? ns.getBoundingClientRect() : null;
         if (C) {
           const dy = Math.round(H.top - C.top);

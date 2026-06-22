@@ -3288,7 +3288,13 @@ html.lowfx .daycard-ns {
 }
 .mf__close:hover { background: var(--glass-bg-hover); }
 .mf__scroll {
-  width: 100%; max-width: 460px; margin: auto;
+  /* Top-anchored, NOT margin:auto. margin:auto would vertically centre this
+     block in the flex column, which fights the JS padding-top that pins the card
+     to its on-home spot: the browser resolves that tug-of-war over two layout
+     passes, so the card lands centred (lower) for one frame then settles up =
+     the "shift down for a second" on open. 0 auto keeps horizontal centring only
+     and lets padding-top hold the card perfectly still. */
+  width: 100%; max-width: 460px; margin: 0 auto;
   position: relative; z-index: 1;
   display: flex; flex-direction: column; align-items: center;
 }
