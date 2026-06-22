@@ -2786,6 +2786,19 @@ function actionLocalDaysInWindow(win) {
   } catch (e) { return 0; }
 }
 
+// Comeback coaching: turns the captured "what knocked you off" reason into a
+// deterministic, voice-matched re-entry. Each reason suggests the gentlest honest
+// tier and one line of reframe. No AI, no new state beyond what already exists.
+const COMEBACK_COACHING = {
+  'Too big':    { tier: 'tiny',  line: 'Then today is not the big version. Just open it and do the smallest piece. That counts.' },
+  'Unclear':    { tier: 'tiny',  line: 'Fuzzy is normal. Pick the one obvious next move and do only that. Clarity comes from moving.' },
+  'Tired':      { tier: 'tiny',  line: 'Low energy is allowed. Do the two minute version and stop. Showing up beats catching up.' },
+  'Distracted': { tier: 'light', line: 'Happens to everyone. One small block, phone in the other room. Ten minutes is plenty.' },
+  'Scared':     { tier: 'tiny',  line: 'Scared usually means it matters. You do not have to feel ready. Start small and let the fear shrink.' },
+  'Forgot':     { tier: 'tiny',  line: 'No guilt. You are here now. Do the smallest version so today is not a zero.' },
+  'Other':      { tier: 'tiny',  line: 'Whatever it was, it is behind you. Pick the smallest way back in and go.' }
+};
+
 function renderCommandCenter() {
   try {
     const hasClarity = !!(state.clarity && state.clarity.completed && state.clarity.answers && state.clarity.answers.neutronStar);
@@ -3255,10 +3268,25 @@ function bindCommandCenter(cc) {
     }));
     // Comeback Mode: "what knocked you off" chips. Saves to state.comeback only.
     cc.querySelectorAll('.cc-comeback-reason').forEach(b => b.addEventListener('click', () => {
-      try { if (typeof recordComebackReason === 'function') recordComebackReason(b.getAttribute('data-cc-reason')); } catch (e) {}
+      const reason = b.getAttribute('data-cc-reason');
+      try { if (typeof recordComebackReason === 'function') recordComebackReason(reason); } catch (e) {}
       cc.querySelectorAll('.cc-comeback-reason').forEach(x => { x.style.opacity = (x === b) ? '1' : '0.4'; x.disabled = (x !== b); });
+      const coach = (typeof COMEBACK_COACHING !== 'undefined' && COMEBACK_COACHING[reason]) ? COMEBACK_COACHING[reason] : null;
       const thanks = cc.querySelector('#ccComebackThanks');
-      if (thanks) thanks.style.display = 'block';
+      if (thanks) { if (coach && coach.line) thanks.textContent = coach.line; thanks.style.display = 'block'; }
+      // Suggest the gentlest honest tier for this reason, and lift the matching
+      // way-back button with depth (no border) so the path forward is obvious.
+      if (coach) {
+        try { if (['tiny','light','moderate','heavy','extreme'].indexOf(coach.tier) >= 0) { state.action.selectedTier = coach.tier; persistNow(); } } catch (e) {}
+        try {
+          cc.querySelectorAll('.cc-comeback-way').forEach(w => {
+            const on = w.getAttribute('data-cc-comeback') === coach.tier;
+            w.style.transition = 'box-shadow .2s ease, transform .2s ease';
+            w.style.boxShadow = on ? '0 10px 28px rgba(0,0,0,0.40)' : '';
+            w.style.transform = on ? 'translateY(-1px)' : '';
+          });
+        } catch (e) {}
+      }
     }));
     // v25 prune: Review is a direct Proof trail link.
     const rv = cc.querySelector('#ccReview');
