@@ -289,7 +289,7 @@ const WelcomeIntro = {
       'Yes, I do and know exactly what it is': "Good! Knowing exactly what you want is the part most people never even reach.",
       'I have a rough idea': "A rough idea is a real start. Memento's whole first job is making it sharp.",
       "Not really... but I'm trying to figure it out": "That's honest, and normal. Finding the answer is literally step one here.",
-      'No, I feel completely lost': "Being lost is okay. Honestly it's where almost everyone starts. We find it together.",
+      'No, I feel completely lost': "No worries, this is where everyone has to start. We'll help you find your one thing.",
       _fallback: "We'll get this clear. That's the first thing Memento does."
     },
     actionKnow: {
@@ -1155,8 +1155,7 @@ const WelcomeIntro = {
     // no goal yet (lost / still figuring it out). There is no "there" for them, so we
     // ask what is in the way of naming it, and whether they have tried before.
     { key: 'clarityBlock', type: 'choices', multi: false,
-      headline: "What's making it hard to know what you want?",
-      sub: 'Be honest, this is just for you.',
+      headline: "What do you think is making it hard to know what you want?",
       options: ["Too many directions, I can't pick one", "Scared I'll pick the wrong thing", "I've lost touch with what I care about", "I've never really stopped to figure it out"],
       skipIf: (p) => { const c = String((p && p.clarityLevel) || '').toLowerCase(); return !(c.indexOf('lost') !== -1 || c.indexOf('not really') !== -1); } },
     { key: 'clarityHistory', type: 'choices', multi: false,
