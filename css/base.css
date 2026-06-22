@@ -371,6 +371,16 @@ html.bg-flat .ambient > *,
 html.bg-flat .ambient__orb,
 html.bg-flat .ambient__bloom { display: none !important; }
 
+/* Flat surfaces (prefs.flatUi): remove every glass blur across the whole app for a
+   true flat, matte look. Pairs with uiBlur:0 (which zeroes the --bx blurs at the
+   source) and bg-flat. A user choice in both themes, not just the mobile lite path. */
+html.flat-ui *,
+html.flat-ui *::before,
+html.flat-ui *::after {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
 /* === Custom background (Settings > Preferences > Background) ===
    #customBg sits right after #ambientBg (same fixed plane, later in DOM so it
    paints above it, still behind the app). A media div holds a curated gradient

@@ -14,22 +14,25 @@ const AppearancePicker = {
 
   // Each look maps to the existing prefs that applyPrefs() already consumes, so
   // this rides the same pipeline as Settings (no new theming code).
+  // A 2x2: theme (light / dark) x surface (flat / glass). Flat sets flatUi (strip
+  // all glass blur app-wide) + flatBg + uiBlur:0; glass keeps the blur. dark-glass
+  // is the signature default.
   LOOKS: [
     {
-      id: 'light', name: 'Light', tag: 'Clean and bright',
-      prefs: { theme: 'light', flatBg: true, reduceMotion: false, uiGlass: 0, uiBlur: 1 }
+      id: 'light-flat', name: 'Light flat', tag: 'Clean and minimal',
+      prefs: { theme: 'light', flatBg: true, flatUi: true, reduceMotion: false, uiGlass: 0, uiBlur: 0 }
     },
     {
-      id: 'dark', name: 'Dark', tag: 'The signature',
-      prefs: { theme: 'dark', flatBg: false, reduceMotion: false, uiGlass: 0, uiBlur: 1 }
+      id: 'light-glass', name: 'Light glass', tag: 'Bright and glassy',
+      prefs: { theme: 'light', flatBg: false, flatUi: false, reduceMotion: false, uiGlass: 0, uiBlur: 1 }
     },
     {
-      id: 'minimal', name: 'Minimal', tag: 'Flat and calm',
-      prefs: { theme: 'dark', flatBg: true, reduceMotion: true, uiGlass: 0.5, uiBlur: 0 }
+      id: 'dark-flat', name: 'Dark flat', tag: 'Quiet and minimal',
+      prefs: { theme: 'dark', flatBg: true, flatUi: true, reduceMotion: false, uiGlass: 0, uiBlur: 0 }
     },
     {
-      id: 'movement', name: 'Movement', tag: 'Alive and glassy',
-      prefs: { theme: 'dark', flatBg: false, reduceMotion: false, uiGlass: 0, uiBlur: 1.35 }
+      id: 'dark-glass', name: 'Dark glass', tag: 'The signature',
+      prefs: { theme: 'dark', flatBg: false, flatUi: false, reduceMotion: false, uiGlass: 0, uiBlur: 1 }
     }
   ],
 
@@ -45,13 +48,19 @@ const AppearancePicker = {
       if (this._open || document.getElementById('appearancePicker')) return;
       this._open = true;
       this._onDone = (typeof onDone === 'function') ? onDone : null;
-      this._picked = (state.prefs && state.prefs.theme === 'light') ? 'light' : 'dark';
+      this._picked = (function () {
+        var p = state.prefs || {};
+        var ids = ['light-flat', 'light-glass', 'dark-flat', 'dark-glass'];
+        if (p.look && ids.indexOf(p.look) >= 0) return p.look;
+        var t = (p.theme === 'light') ? 'light' : 'dark';
+        var f = p.flatUi ? 'flat' : 'glass';
+        return t + '-' + f; // default for a fresh user: dark-glass
+      })();
 
       const cards = this.LOOKS.map((lk) =>
         '<button type="button" class="apk-card apk-prev apk-prev--' + lk.id + (lk.id === this._picked ? ' is-picked' : '') + '" data-look="' + lk.id + '" role="radio" aria-checked="' + (lk.id === this._picked) + '">' +
           '<div class="apk-prev__screen">' + this._previewHTML() + '</div>' +
           '<div class="apk-card__meta"><span class="apk-card__name">' + lk.name + '</span><span class="apk-card__tag">' + lk.tag + '</span></div>' +
-          '<span class="apk-card__check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>' +
         '</button>'
       ).join('');
 
@@ -68,7 +77,7 @@ const AppearancePicker = {
             '<div class="apk__sub">Pick a starting look. You can change it anytime in Settings.</div>' +
           '</div>' +
           '<div class="apk__grid" role="radiogroup" aria-label="Looks">' + cards + '</div>' +
-          '<button type="button" class="apk__go" id="apkContinue">Continue</button>' +
+          '<button type="button" class="apk__go" id="apkContinue">Enter</button>' +
         '</div>';
       document.body.appendChild(ov);
 

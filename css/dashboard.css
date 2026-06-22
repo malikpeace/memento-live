@@ -191,7 +191,7 @@ body.ns-bloom .ambient__rays {
    itself. Push the god rays brighter + more saturated (and fully opaque) so the
    choice always changes the app, even with no backdrop-filter. Dark keeps the
    calm 0.8 baseline above; Minimal flattens the ambient entirely (bg-flat). */
-body.look-movement.ns-bloom .ambient__rays {
+body.look-dark-glass.ns-bloom .ambient__rays {
   opacity: 1;
   filter: saturate(1.55) brightness(1.28);
 }

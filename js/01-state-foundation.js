@@ -648,7 +648,7 @@ function applyPrefs() {
     // each pick is a first-class visible state, even on the lowfx mobile path
     // where blur/glass deltas flatten. Re-applied here on every boot from prefs.
     try {
-      const _looks = ['light', 'dark', 'minimal', 'movement'];
+      const _looks = ['light-flat', 'light-glass', 'dark-flat', 'dark-glass'];
       const _lk = (p && typeof p.look === 'string') ? p.look : '';
       _looks.forEach(function (id) { b.classList.toggle('look-' + id, _lk === id); });
     } catch (eLook) {}
@@ -657,6 +657,10 @@ function applyPrefs() {
     // Minimal swatch (prefs.background.type === 'minimal').
     const bgMin = !!(p.background && typeof p.background === 'object' && p.background.type === 'minimal');
     if (document.documentElement) document.documentElement.classList.toggle('bg-flat', !!p.flatBg || bgMin);
+    // Flat surfaces: strip ALL glass/blur app-wide (cards, sheets, bars) for a true
+    // flat, matte look in either theme. Distinct from bg-flat (which only drops the
+    // ambient orbs). Driven by prefs.flatUi; paired with uiBlur:0 by the flat looks.
+    if (document.documentElement) document.documentElement.classList.toggle('flat-ui', !!p.flatUi);
     // Custom background layer (color / gradient / image behind the app).
     try { applyCustomBackground(p); } catch (eBg) {}
     // Reduce motion (calm): add a class the CSS gate keys off of.

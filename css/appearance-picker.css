@@ -115,29 +115,26 @@
 .apk-prev__row--a { width: 52%; bottom: 24px; }
 .apk-prev__row--b { width: 36%; bottom: 13px; }
 
-/* Light */
-.apk-prev--light .apk-prev__sky { background: linear-gradient(160deg, #f6f7fb, #e7e9f1); }
-.apk-prev--light .apk-prev__card { background: #1a1c22; box-shadow: 0 6px 16px rgba(20, 22, 30, 0.22); }
-.apk-prev--light .apk-prev__mark { background: #f6f7fb; }
-.apk-prev--light .apk-prev__row { background: rgba(20, 22, 30, 0.16); }
+/* Light flat: matte WHITE card (the Memento is white/clear on white, not black),
+   the mark reads as a soft tonal shape. No glow. */
+.apk-prev--light-flat .apk-prev__sky { background: #eef0f5; }
+.apk-prev--light-flat .apk-prev__card { background: #ffffff; box-shadow: inset 0 0 0 1px rgba(20,22,30,0.06); }
+.apk-prev--light-flat .apk-prev__mark { background: rgba(20,22,30,0.20); }
 
-/* Dark (signature glass) */
-.apk-prev--dark .apk-prev__sky { background: radial-gradient(120% 90% at 50% -10%, #1b1b2b, #0a0a10 65%); }
-.apk-prev--dark .apk-prev__card { background: linear-gradient(165deg, rgba(255,255,255,0.16), rgba(255,255,255,0.03)); box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 6px 18px rgba(0,0,0,0.4); }
-.apk-prev--dark .apk-prev__mark { background: rgba(255,255,255,0.6); }
-.apk-prev--dark .apk-prev__row { background: rgba(255,255,255,0.16); }
+/* Light glass: glossy white card with a sheen + soft lift on a bright sky. */
+.apk-prev--light-glass .apk-prev__sky { background: linear-gradient(160deg, #f7f8fc, #e6e8f2); }
+.apk-prev--light-glass .apk-prev__card { background: linear-gradient(165deg, rgba(255,255,255,0.96), rgba(255,255,255,0.66)); box-shadow: inset 0 1px 0 rgba(255,255,255,0.95), 0 8px 20px rgba(20,22,30,0.15); }
+.apk-prev--light-glass .apk-prev__mark { background: rgba(20,22,30,0.26); }
 
-/* Minimal (flat, calm, solid) */
-.apk-prev--minimal .apk-prev__sky { background: #16171c; }
-.apk-prev--minimal .apk-prev__card { background: #23252d; box-shadow: none; }
-.apk-prev--minimal .apk-prev__mark { background: rgba(255,255,255,0.42); }
-.apk-prev--minimal .apk-prev__row { background: rgba(255,255,255,0.12); }
+/* Dark flat: matte dark card, solid, no glow. */
+.apk-prev--dark-flat .apk-prev__sky { background: #101117; }
+.apk-prev--dark-flat .apk-prev__card { background: #1e2027; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05); }
+.apk-prev--dark-flat .apk-prev__mark { background: rgba(255,255,255,0.38); }
 
-/* Movement (alive, purple glow) */
-.apk-prev--movement .apk-prev__sky { background: radial-gradient(70% 60% at 50% 45%, rgba(123,97,255,0.5), #0a0812 70%); }
-.apk-prev--movement .apk-prev__card { background: linear-gradient(165deg, rgba(180,150,255,0.32), rgba(123,97,255,0.12)); box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 0 24px rgba(123,97,255,0.6); }
-.apk-prev--movement .apk-prev__mark { background: rgba(255,255,255,0.85); }
-.apk-prev--movement .apk-prev__row { background: rgba(180,160,255,0.4); }
+/* Dark glass (the signature): glassy card with sheen + a purple bloom behind it. */
+.apk-prev--dark-glass .apk-prev__sky { background: radial-gradient(85% 70% at 50% 28%, rgba(123,97,255,0.38), #0a0a12 70%); }
+.apk-prev--dark-glass .apk-prev__card { background: linear-gradient(165deg, rgba(255,255,255,0.17), rgba(255,255,255,0.03)); box-shadow: inset 0 1px 0 rgba(255,255,255,0.34), 0 8px 22px rgba(0,0,0,0.45), 0 0 22px rgba(123,97,255,0.34); }
+.apk-prev--dark-glass .apk-prev__mark { background: rgba(255,255,255,0.7); }
 
 /* ── Card meta + check ─────────────────────────────────────────────────────── */
 .apk-card__meta { display: flex; flex-direction: column; gap: 1px; padding: 10px 13px 12px; }
