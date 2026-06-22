@@ -1541,6 +1541,7 @@ function migrateState() {
   if (state.dev.savedClarity === undefined) state.dev.savedClarity = null;
   if (state.meta.welcomeSeen === undefined) state.meta.welcomeSeen = false;
   if (state.meta.backupNudged === undefined) state.meta.backupNudged = false;
+  if (state.meta.firstWinShown === undefined) state.meta.firstWinShown = false;
   // Consistency: personal-record tracking. Seed from the historical longest run so
   // existing users start with an accurate "best ever" and never see a retroactive
   // record celebration; bestEverShown gates the calm "new record" moment to fire

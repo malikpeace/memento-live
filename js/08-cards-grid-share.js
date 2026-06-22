@@ -1206,7 +1206,10 @@ function renderGreeting() {
   const streakWrap = document.getElementById('hubStreak');
   const streakNum = document.getElementById('hubStreakCount');
   if (streakWrap && streakNum) {
-    const count = (state.streak && state.streak.count) || 0;
+    // Same source as the heatmap so the hub streak appears the moment day-1 is logged.
+    let count = 0;
+    try { count = (typeof consistencyStats === 'function') ? (consistencyStats().current || 0) : ((state.streak && state.streak.count) || 0); }
+    catch (e) { count = (state.streak && state.streak.count) || 0; }
     if (count > 0) { streakNum.textContent = count; streakWrap.style.display = ''; }
     else { streakWrap.style.display = 'none'; }
   }
@@ -2855,7 +2858,12 @@ function renderCommandCenter() {
     const todayStr = getTodayISO();
     const doneToday = actionDoneToday();
     const ch = (state.action && state.action.completionHistory) || [];
-    const streak = (state.streak && state.streak.count) || 0;
+    // Read the streak from the SAME source as the heatmap (consistencyStats counts
+    // today the moment an action is logged) so day-1 reads "1" the instant they
+    // finish, instead of the legacy state.streak.count which can lag behind a render.
+    let streak = 0;
+    try { streak = (typeof consistencyStats === 'function') ? (consistencyStats().current || 0) : ((state.streak && state.streak.count) || 0); }
+    catch (e) { streak = (state.streak && state.streak.count) || 0; }
 
     // ---- Home hero. v27 retires the old swappable centerpiece: the card-centered
     // Home gives Consistency its own tile and the goal lives in Clarity, so the
@@ -4359,6 +4367,29 @@ function renderAll() {
    their goal engraved and mortality woven in. Strictly READ-ONLY.
    Canvas (no glass) so the export is verifiable + reliable.
    ============================================================ */
+// First-win celebration: the very first time a user completes an action (post
+// onboarding), reuse the share overlay to mark the moment. Fires once, ever,
+// gated by state.meta.firstWinShown; never in demo; needs a Neutron Star so the
+// card has something to render, otherwise the flag is left unset to try again.
+function maybeShowFirstWin() {
+  try {
+    if (typeof DEMO_MODE !== 'undefined' && DEMO_MODE) return;
+    if (!state.meta || state.meta.firstWinShown) return;
+    const a = (state.clarity && state.clarity.answers) || {};
+    const goal = (a.neutronStar || a.keystone || '').trim();
+    if (!goal) return; // the card needs a star; do not burn the flag yet
+    state.meta.firstWinShown = true;
+    if (typeof persistNow === 'function') persistNow();
+    setTimeout(function () {
+      try {
+        if (typeof MementoShareCard !== 'undefined' && MementoShareCard.open) {
+          MementoShareCard.open({ title: 'Day one. You actually did the thing.', sub: 'Most people never start. Save this or share it.' });
+        }
+      } catch (e) {}
+    }, 420);
+  } catch (e) {}
+}
+
 const MementoShareCard = {
   _overlay: null,
 
@@ -4567,8 +4598,13 @@ const MementoShareCard = {
   },
 
   // ---- open the share moment (dedicated premium overlay) ----
-  open() {
+  open(opts) {
     if (!this._goal()) return; // nothing to share without a star
+    // Optional {title, sub} override so the same overlay can frame a different
+    // moment (e.g. the first-win celebration) without a second renderer.
+    opts = opts || {};
+    const _title = (opts.title || 'Your star, sealed.');
+    const _sub = (opts.sub || 'Yours to keep, or to share.');
     // Capture the underlying overflow BEFORE removing any stale overlay, and only
     // when none is currently open, so a re-open does not capture our own 'hidden'.
     // The card can open OVER the Clarity ceremony, which holds its own scroll-lock;
@@ -4587,8 +4623,8 @@ const MementoShareCard = {
       '<div class="msc-scrim"></div>' +
       '<div class="msc-panel">' +
         '<div class="msc-frame"><canvas class="msc-canvas" id="mscCanvas" width="1080" height="1350"></canvas></div>' +
-        '<div class="msc-title">Your star, sealed.</div>' +
-        '<div class="msc-sub">Yours to keep, or to share.</div>' +
+        '<div class="msc-title">' + esc(_title) + '</div>' +
+        '<div class="msc-sub">' + esc(_sub) + '</div>' +
         '<button type="button" class="msc-btn msc-btn--primary" id="mscShare">Share</button>' +
         '<div class="msc-subactions">' +
           '<button type="button" class="msc-link" id="mscCopy">Copy text</button>' +
