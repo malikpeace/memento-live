@@ -341,6 +341,9 @@ const ClarityExperience = {
         actionBtn.addEventListener('click', () => {
           this.close();
           ActionExperience.open();
+          // Additive, dismissible: one-time prompt to save their work to an account,
+          // deferred so it never runs inside the ceremony close.
+          try { setTimeout(function () { if (typeof maybeShowSaveWorkNudge === 'function') maybeShowSaveWorkNudge(); }, 600); } catch (e) {}
         });
       }
 

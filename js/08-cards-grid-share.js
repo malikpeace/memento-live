@@ -1496,6 +1496,47 @@ function maybeShowBackupNudge() {
   } catch (_) { /* never let the nudge break the dashboard */ }
 }
 
+// One-time "save your work" nudge after the Neutron Star is born. Points at the
+// existing CloudSync account dialog so a user can sync before they risk losing the
+// thing they just made. Shown once ever (state.meta.saveWorkNudged), never in demo,
+// skipped when sync is unavailable or the user is already signed in. Reuses the
+// .backup-nudge glass toast skin unchanged.
+let _saveWorkNudgeEl = null;
+function maybeShowSaveWorkNudge() {
+  try {
+    if (DEMO_MODE) return;
+    if (!state.meta || state.meta.saveWorkNudged) return;
+    if (typeof CloudSync === 'undefined' || !CloudSync.available || !CloudSync.available()) return;
+    if (CloudSync.isLoggedIn && CloudSync.isLoggedIn()) return;
+    if (_saveWorkNudgeEl || document.querySelector('.backup-nudge')) return;
+    const el = document.createElement('div');
+    _saveWorkNudgeEl = el;
+    el.className = 'backup-nudge';
+    el.setAttribute('role', 'status');
+    el.innerHTML =
+      '<div class="backup-nudge__text">Save your work so you never lose it.' +
+        '<span>Make a free account and your Memento syncs across devices. No password.</span>' +
+      '</div>' +
+      '<button class="backup-nudge__save" type="button">Make one</button>' +
+      '<button class="backup-nudge__close" type="button" aria-label="Dismiss">&times;</button>';
+    document.body.appendChild(el);
+    // Mark shown immediately so a re-render mid-session can't double-fire.
+    state.meta.saveWorkNudged = true;
+    try { persistNow(); } catch (_) {}
+    const dismiss = () => {
+      el.classList.remove('is-visible');
+      setTimeout(() => { try { el.remove(); } catch (_) {} if (_saveWorkNudgeEl === el) _saveWorkNudgeEl = null; }, 300);
+    };
+    el.querySelector('.backup-nudge__save').addEventListener('click', () => {
+      try { if (CloudSync.openDialog) CloudSync.openDialog(); } catch (_) {}
+      dismiss();
+    });
+    el.querySelector('.backup-nudge__close').addEventListener('click', dismiss);
+    void el.offsetWidth;
+    el.classList.add('is-visible');
+  } catch (_) {}
+}
+
 // === Plan tomorrow tonight =========================================
 // The moment today's action is completed is the one moment the user is
 // winning, so ask ONE optional question: "Tomorrow's one action?" Saved to

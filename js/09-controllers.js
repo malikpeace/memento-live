@@ -3992,6 +3992,16 @@ const TabBar = {
         </div>
         <input type="file" id="importFile" accept="application/json,.json" style="display:none;">
         <div id="dataMsg" style="font-size:0.6875rem; color: var(--text-3); margin-top:8px; text-align:center;"></div>
+        ${(function(){
+          var b = (typeof getPreSyncBackup === 'function') ? getPreSyncBackup() : null;
+          if (!b) return '';
+          var when = '';
+          try { when = new Date(b.savedAt || b.ts || Date.now()).toLocaleDateString(); } catch (e) {}
+          return '<div style="margin-top:12px; background: var(--kfill-04); border-radius: calc(12px * var(--rx,1)); padding: 12px 14px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);">' +
+            '<div style="font-size:0.8rem; color: var(--text-1); line-height:1.45; margin-bottom:10px;">Auto-saved copy from ' + when + '. If something looks off, you can roll back to it.</div>' +
+            '<button class="sheet-btn" id="restoreAutoBackup" style="background: var(--kfill-04); color: var(--text-1);">Restore this</button>' +
+          '</div>';
+        })()}
         <div class="privacy-note" style="margin-top:14px;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2L4 5v6c0 5 3.4 8.3 8 10 4.6-1.7 8-5 8-10V5l-8-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
           <span>Your data lives on this device. No account, no tracking. The only thing that ever leaves is what you choose to send to the optional AI. Vision-board and journal images stay on this device only, never synced. Use the backup above to move it yourself.</span>
@@ -4137,6 +4147,19 @@ const TabBar = {
         if (ok) setTimeout(() => location.reload(), 800);
       });
     });
+    // Auto-backup (the pre-sync copy CloudSync keeps) one-tap restore.
+    const restoreAuto = document.getElementById('restoreAutoBackup');
+    if (restoreAuto) restoreAuto.addEventListener('click', () => {
+      if (typeof DEMO_MODE !== 'undefined' && DEMO_MODE) return;
+      const b = (typeof getPreSyncBackup === 'function') ? getPreSyncBackup() : null;
+      if (!b || !b.state) { if (dataMsg) dataMsg.textContent = 'No saved copy found.'; return; }
+      if (!confirm('Restore the auto-saved copy? This replaces what is on this device now.')) return;
+      if (dataMsg) dataMsg.textContent = 'Restoring...';
+      restoreStateObject(b.state, (ok) => {
+        if (dataMsg) dataMsg.textContent = ok ? 'Restored. Reloading...' : 'That copy could not be read.';
+        if (ok) setTimeout(() => location.reload(), 800);
+      });
+    });
     // Reset binding
     document.getElementById('profileReset').addEventListener('click', () => {
       if (confirm('Reset everything? This cannot be undone.')) {
@@ -4241,22 +4264,39 @@ function importMementoData(file, onDone) {
     try {
       const parsed = JSON.parse(reader.result);
       const incoming = (parsed && parsed.state && typeof parsed.state === 'object') ? parsed.state : parsed;
-      if (!incoming || typeof incoming !== 'object' || Array.isArray(incoming)) throw new Error('bad file');
-      // Guard against importing a non-Memento JSON file and wiping everything:
-      // require at least one known top-level key before we replace state.
-      const KNOWN = ['clarity', 'action', 'streak', 'meta', 'profile'];
-      if (!KNOWN.some(k => k in incoming)) throw new Error('not a Memento backup');
-      state = deepMerge(DEFAULT_STATE, incoming);
-      try { migrateClarityHistory(); } catch (e) {}
-      // Run the full migration chain so an older backup is self-consistent and
-      // does not rely on the post-import reload to fix its shape.
-      try { migrateState(); } catch (e) {}
-      persistNow();
-      onDone && onDone(true);
+      restoreStateObject(incoming, onDone);
     } catch (e) { onDone && onDone(false); }
   };
   reader.onerror = () => onDone && onDone(false);
   reader.readAsText(file);
+}
+
+// Shared restore core for both the file import and the auto-backup row. Tolerates an
+// older schema (deepMerges onto DEFAULT_STATE then runs the migration chain) and
+// guards against a non-Memento object wiping everything.
+function restoreStateObject(incoming, onDone) {
+  try {
+    if (!incoming || typeof incoming !== 'object' || Array.isArray(incoming)) throw new Error('bad state');
+    const KNOWN = ['clarity', 'action', 'streak', 'meta', 'profile'];
+    if (!KNOWN.some(k => k in incoming)) throw new Error('not a Memento backup');
+    state = deepMerge(DEFAULT_STATE, incoming);
+    try { migrateClarityHistory(); } catch (e) {}
+    try { migrateState(); } catch (e) {}
+    persistNow();
+    onDone && onDone(true);
+  } catch (e) { onDone && onDone(false); }
+}
+
+// The auto-backup CloudSync writes before adopting a cloud copy (js/12 BACKUP_KEY).
+// Surfaced in Settings so a user can roll back without opening the console.
+function getPreSyncBackup() {
+  try {
+    const raw = localStorage.getItem('memento_pre_sync_backup');
+    if (!raw) return null;
+    const obj = JSON.parse(raw);
+    if (!obj || !obj.state || typeof obj.state !== 'object') return null;
+    return obj;
+  } catch (e) { return null; }
 }
 
 /* ============================================
