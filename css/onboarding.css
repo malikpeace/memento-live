@@ -1566,6 +1566,20 @@ body.lite .welcome-intro__sumstar { animation: none; }
 .welcome-intro__help2-text { font-size: var(--fs-base); line-height: 1.38; color: rgba(var(--ink),0.58); }
 .welcome-intro__help2-foot { font-size: var(--fs-sm); line-height: 1.45; color: rgba(var(--ink),0.42); margin: 18px auto 0; max-width: 32ch; }
 body.lite .welcome-intro__help2-step { animation: none; opacity: 1; }
+/* Swipeable benefit stepper on the "What we're going to build" page. Native
+   scroll-snap does the gesture; the dots reflect position. Onboarding is
+   dark-fixed, so explicit light-on-dark colors (the accent is set inline per step). */
+.welcome-intro__help2 .wi-stepper { width: 100%; margin-top: 4px; }
+.wi-stepper__track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.wi-stepper__track::-webkit-scrollbar { display: none; }
+.wi-stepper__slide { flex: 0 0 100%; scroll-snap-align: center; box-sizing: border-box; padding: 2px; }
+.wi-stepper__card { background: rgba(255,255,255,0.05); border-radius: 16px; padding: 24px 20px 26px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.07); min-height: 178px; text-align: left; }
+.wi-stepper__num { font-size: 0.74rem; font-weight: 800; letter-spacing: 0.16em; font-variant-numeric: tabular-nums; margin-bottom: 12px; }
+.wi-stepper__name { font-size: 1.34rem; font-weight: 750; letter-spacing: -0.01em; margin-bottom: 10px; }
+.wi-stepper__text { font-size: 0.97rem; line-height: 1.5; color: rgba(255,255,255,0.72); }
+.wi-stepper__dots { display: flex; justify-content: center; gap: 7px; margin-top: 18px; }
+.wi-stepper__dot { width: 7px; height: 7px; border-radius: 999px; padding: 0; border: none; cursor: pointer; background: rgba(255,255,255,0.22); transition: width 0.22s ease, background 0.22s ease; }
+.wi-stepper__dot.is-active { width: 22px; background: rgba(255,255,255,0.9); }
 /* Enter Memento: white button, black text. The energy ring comes from the
    standard welcome-intro__btn--orbit class (added on the button). */
 .welcome-intro__btn--enter { background: #fff !important; color: #0b0b12 !important; font-weight: 700; border: none !important; box-shadow: 0 8px 30px rgba(0,0,0,0.4); }

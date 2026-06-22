@@ -1855,28 +1855,31 @@ const WelcomeIntro = {
       return parts.slice(0, max).join(' ').trim();
     };
     const introText = trimSentences([this._solutionWantLine(p), this._solutionNeedLine(p)].filter(Boolean).join(' '), 2);
-    const plus = trimSentences(s.plus || 'Plus reflections, deep-work sessions, and streaks. Quiet tools that make showing up easier.', 1);
-    const steps = [
-      { name: 'Clarity', sub: 'The what', text: trimSentences(s.clarity || 'Get clear on the one thing that actually matters.', 1) },
-      { name: 'Action', sub: 'The how', text: trimSentences(s.action || 'Get the next move so you stop guessing.', 1) },
-      { name: 'Consistency', sub: 'The follow-through', text: trimSentences(s.consistency || 'Keep showing up long enough for it to compound.', 1) },
-      { name: 'Together', sub: 'Where it clicks', text: trimSentences(s.together || 'Clear direction, daily action, and consistency working together.', 1) }
+    // The four benefits as a swipeable stepper (clearer than a long list). Each
+    // carries its own pillar accent; Clarity leads purple. Drive is the new fourth:
+    // the Vivere + Mori engines (something to build toward + your finite time).
+    const STEPS = [
+      { name: 'Clarity', accent: 'rgba(150,116,255,1)', text: 'The one goal that matters most to you, above everything else. Memento keeps every day pointed at it.' },
+      { name: 'Action', accent: 'rgba(232,194,74,1)', text: 'Your goal turned into the single highest-leverage move for today. Memento helps you focus on it and log it, so knowing turns into doing.' },
+      { name: 'Consistency', accent: 'rgba(52,211,153,1)', text: 'A visible record of the days you showed up. Real evidence you can trust on the days you doubt yourself.' },
+      { name: 'Drive', accent: 'rgba(244,138,120,1)', text: 'Two engines for your energy: something real to build toward, and the weight of your finite time. Remember to live, and remember it ends.' }
     ];
-    const stepsHtml = steps.map((st, idx) =>
-      `<div class="welcome-intro__help2-step" style="animation-delay:${(0.2 + idx * 0.16).toFixed(2)}s">
-        <div class="welcome-intro__help2-num">0${idx + 1}</div>
-        <div class="welcome-intro__help2-stepbody">
-          <div class="welcome-intro__help2-name">${esc(st.name)}<span>${esc(st.sub)}</span></div>
-          <div class="welcome-intro__help2-text">${esc(st.text)}</div>
-        </div>
-      </div>`).join('');
+    const slidesHtml = STEPS.map((st, idx) =>
+      `<div class="wi-stepper__slide"><div class="wi-stepper__card">
+        <div class="wi-stepper__num" style="color:${st.accent}">0${idx + 1}</div>
+        <div class="wi-stepper__name" style="color:${st.accent}">${esc(st.name)}</div>
+        <div class="wi-stepper__text">${esc(st.text)}</div>
+      </div></div>`).join('');
+    const dotsHtml = STEPS.map((st, idx) =>
+      `<button type="button" class="wi-stepper__dot${idx === 0 ? ' is-active' : ''}" data-step="${idx}" aria-label="${esc(st.name)}"></button>`).join('');
 
     this.pageWrap.innerHTML = `<div class="welcome-intro__page-inner welcome-intro__help2">
-      <h2 class="welcome-intro__help2-title">The Solution</h2>
+      <h2 class="welcome-intro__help2-title">What we're going to build</h2>
       <p class="welcome-intro__help2-intro">${esc(introText)}</p>
-      <p class="welcome-intro__help2-lead">Memento helps you find:</p>
-      <div class="welcome-intro__help2-steps">${stepsHtml}</div>
-      <p class="welcome-intro__help2-foot">${esc(plus)}</p>
+      <div class="wi-stepper">
+        <div class="wi-stepper__track" id="wiStepperTrack">${slidesHtml}</div>
+        <div class="wi-stepper__dots">${dotsHtml}</div>
+      </div>
     </div>`;
     this.navEl.innerHTML = `<button class="welcome-intro__back-btn" id="solutionBack">←</button><button class="welcome-intro__btn welcome-intro__btn--step" id="identityNext" style="flex:1;width:auto;">Continue</button>`;
     document.getElementById('solutionBack').addEventListener('click', () => {
@@ -1896,6 +1899,22 @@ const WelcomeIntro = {
       this.el.classList.remove('welcome-intro--help');
       this._showIdentityStep(stepIndex + 1);
     });
+    // Swipeable stepper: native scroll-snap does the gesture; keep the dots in
+    // sync with the swipe, and let a dot tap scroll to its step.
+    try {
+      const _track = document.getElementById('wiStepperTrack');
+      const _dots = [].slice.call(this.pageWrap.querySelectorAll('.wi-stepper__dot'));
+      if (_track && _dots.length) {
+        const _sync = () => {
+          const i = Math.round(_track.scrollLeft / Math.max(1, _track.clientWidth));
+          _dots.forEach((d, di) => d.classList.toggle('is-active', di === i));
+        };
+        _track.addEventListener('scroll', () => { window.requestAnimationFrame(_sync); }, { passive: true });
+        _dots.forEach((d, di) => d.addEventListener('click', () => {
+          _track.scrollTo({ left: di * _track.clientWidth, behavior: 'smooth' });
+        }));
+      }
+    } catch (e) {}
   },
 
   // Lightweight confetti / fireworks burst on a canvas. Self-terminates.
