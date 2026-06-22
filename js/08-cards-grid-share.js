@@ -2840,6 +2840,12 @@ const COMEBACK_COACHING = {
   'Other':      { tier: 'tiny',  line: 'Whatever it was, it is behind you. Pick the smallest way back in and go.' }
 };
 
+// A fresh, unread weekly review (the Monday letter from maybeGenerateWeeklyCard)
+// exists. Used to surface it on Home instead of leaving it buried in Updates.
+function hasFreshWeeklyCard() {
+  try { return (state.updates || []).some(u => u && u.type === 'weekly' && !u.read); } catch (e) { return false; }
+}
+
 function renderCommandCenter() {
   try {
     const hasClarity = !!(state.clarity && state.clarity.completed && state.clarity.answers && state.clarity.answers.neutronStar);
@@ -2931,6 +2937,19 @@ function renderCommandCenter() {
     // above the hero, and overlapped the Check-in widget). The weekly review is
     // still reachable from the dashboard "Review" link. Reversible in git history.
     let _beBanner = '';
+    // A fresh weekly review gets ONE quiet affordance above the hero (this code is
+    // past the brand-new and comeback returns, so it only shows on the normal path).
+    // Opening Updates marks it read, so it self-clears on the next render.
+    try {
+      if (typeof hasFreshWeeklyCard === 'function' && hasFreshWeeklyCard()) {
+        const _wk = (state.updates || []).filter(u => u && u.type === 'weekly' && !u.read).pop();
+        const _wkTitle = (_wk && _wk.title) ? _wk.title : 'Your week is ready';
+        _beBanner = '<button type="button" data-weekly-open aria-label="Open your weekly review" style="display:block;width:100%;text-align:left;font:inherit;cursor:pointer;border:none;border-radius:calc(12px * var(--rx, 1));padding:11px 14px;margin-bottom:16px;background:var(--kfill-04);box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);">' +
+          '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;font-weight:700;color:var(--text-3);margin-bottom:3px;">Your week, counted</div>' +
+          '<div style="font-size:0.9rem;font-weight:600;color:var(--text-hi);line-height:1.35;">' + esc(_wkTitle) + '</div>' +
+        '</button>';
+      }
+    } catch (e) {}
     let row = _beBanner + '<div class="cc-hero-toggle" style="position:relative;display:inline-flex;gap:2px;padding:3px;border-radius:calc(8px * var(--rx, 1));background:var(--kfill-04);border:1px solid var(--hairline);margin-bottom:18px;"><span class="cc-hero-pill" aria-hidden="true"></span>' +
       seg('consistency', 'Consistency') + seg('oneThing', 'Today') + seg('neutron', 'Goal') + '</div>';
     row += '<div class="cc-hero-body">';
@@ -3334,6 +3353,8 @@ function bindCommandCenter(cc) {
     if (rv) rv.addEventListener('click', () => { try { ProofTrail.open(); } catch (e) {} });
     const vivOpen = cc.querySelector('#ccVivereOpen');
     if (vivOpen) vivOpen.addEventListener('click', () => { try { if (typeof Sheet !== 'undefined' && Sheet.open) Sheet.open('vivere'); } catch (e) {} });
+    const wkOpen = cc.querySelector('[data-weekly-open]');
+    if (wkOpen) wkOpen.addEventListener('click', () => { try { if (typeof Sheet !== 'undefined' && Sheet.open) Sheet.open('inbox'); } catch (e) {} });
   } catch (e) {}
 }
 // Daily Memento: a calm, day-stable line at the foot of the dashboard. Mirrors
