@@ -3240,7 +3240,8 @@ html.lowfx .daycard-ns {
 /* The Memento itself is NOT a clone and is NOT faded here: openMementoFull() moves
    the REAL living card element into this view, untouched, at its exact home spot.
    So the overlay container stays fully opaque + transparent-backgrounded, and only
-   the .mf__bg layer (the reactive aura) + the stats fade/slide in AROUND the card.
+   the .mf__bg layer (the reactive aura) + the stats fade in (OPACITY only, nothing
+   slides or moves) AROUND the perfectly still card.
    That's why nothing here animates opacity on the whole overlay. */
 #mementoFull {
   position: fixed; inset: 0; z-index: 1000;
@@ -3297,15 +3298,17 @@ html.lowfx .daycard-ns {
   position: relative; z-index: 1;
   margin: 8px 0 4px;
 }
+/* The breakdown fades in with OPACITY ONLY: nothing slides or translates, so the
+   open reads as content quietly appearing around a perfectly still card, never as
+   motion. (Earlier the stats slid up 10px, which was the movement Malik could see.) */
 .mf__eyebrow, .mf__stats, .mf__share, .mf__hint {
   opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 0.4s ease 0.14s, transform 0.46s cubic-bezier(0.22, 1, 0.36, 1) 0.14s;
+  transition: opacity 0.34s ease 0.08s;
 }
 #mementoFull.mf--open .mf__eyebrow,
 #mementoFull.mf--open .mf__stats,
 #mementoFull.mf--open .mf__share,
-#mementoFull.mf--open .mf__hint { opacity: 1; transform: none; }
+#mementoFull.mf--open .mf__hint { opacity: 1; }
 @media (prefers-reduced-motion: reduce) {
   .mf__card, .mf__eyebrow, .mf__stats, .mf__share, .mf__hint { transition: none; transform: none; opacity: 1; }
 }

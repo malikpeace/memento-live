@@ -3861,15 +3861,23 @@ function openMementoFull() {
       if (dayCardEl) dayCardEl.style.minHeight = dayCardEl.offsetHeight + 'px';
       homeParent = liveWrap.parentNode; homeNext = liveWrap.nextSibling;
       cardHost.appendChild(liveWrap);            // borrow the REAL card (no clone)
-      // Drop the one-time entrance classes so the borrowed card sits at its stable
-      // scale (the daily materialize animates scale 0.9 -> 1; we don't want a 0.9
-      // snapshot in here). Also flatten any tilt.
+      const stage = liveWrap.querySelector('.daycard-living-stage');
+      const ns = liveWrap.querySelector('.daycard-ns');
+      // Drop the one-time entrance classes (the daily materialize animates a 0.9
+      // scale we don't want a snapshot of), and FREEZE the card's transform: snap
+      // any tilt flat with the 0.18s transform transition turned OFF, so the card
+      // cannot rotate or animate a hair as the view opens. The tilt vars live on
+      // the .daycard-ns itself (where bindDayCardTilt sets them), not the wrap, so
+      // setting them on the wrap (as before) did nothing.
       liveWrap.classList.remove('daycard-materialize', 'daycard-reveal');
-      liveWrap.style.setProperty('--dc-rx', '0deg');
-      liveWrap.style.setProperty('--dc-ry', '0deg');
+      if (ns) {
+        ns.style.transition = 'none';
+        ns.style.setProperty('--dc-rx', '0deg');
+        ns.style.setProperty('--dc-ry', '0deg');
+        void ns.offsetWidth;        // commit the flat state with no animation
+        ns.style.transition = '';   // restore (in-view tilt, if any, still works)
+      }
       if (H) {
-        const stage = liveWrap.querySelector('.daycard-living-stage');
-        const ns = liveWrap.querySelector('.daycard-ns');
         if (stage) { stage.style.width = sw + 'px'; stage.style.margin = '0 auto'; if (ns) ns.style.width = '100%'; sizedEls.push(stage); }
         else if (ns) { ns.style.width = sw + 'px'; }
         if (ns) { ns.style.minHeight = sh + 'px'; sizedEls.push(ns); }
