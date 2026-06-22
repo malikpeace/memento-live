@@ -1193,7 +1193,10 @@ function renderGreeting() {
   const cueEl = document.getElementById('hubReturnCue');
   if (cueEl) {
     const cue = (state.profile && state.profile.returnCue || '').trim();
-    if (_returnCueDue && cue) {
+    // Keep the cue up until they actually act today, then let it go. It already
+    // persists across the session; this just stops nagging someone who showed up.
+    const _actedToday = (typeof actionDoneToday === 'function') ? actionDoneToday() : false;
+    if (_returnCueDue && cue && !_actedToday) {
       cueEl.textContent = 'When ' + cue + ', it is here.';
       cueEl.style.display = '';
     } else {
