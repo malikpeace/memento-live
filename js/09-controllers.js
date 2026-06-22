@@ -1923,15 +1923,13 @@ const WelcomeIntro = {
     document.getElementById('solutionBack').addEventListener('click', () => {
       const inner = this.pageWrap.querySelector('.welcome-intro__page-inner');
       if (inner) inner.classList.add('exit');
-      setTimeout(() => {
-        this.el.classList.add('welcome-intro--blackout');
-        this.el.classList.remove('welcome-intro--help');
-        this.pageWrap.style.alignItems = 'center';
-        this.pageWrap.style.justifyContent = 'center';
-        this.pageWrap.style.textAlign = 'center';
-        this.currentPage = this.totalPages - 1;
-        this.renderPage(this.currentPage);
-      }, 250);
+      // Back returns to the Congrats celebration, NOT the legacy renderPage tutorial.
+      // The forward flow deliberately skips renderPage, and this.totalPages is undefined
+      // here, so the old code ran renderPage(NaN) and broke everything after it. Clean
+      // up the help-page-only artifacts; _showFirstWin re-establishes the celebration.
+      this.el.classList.remove('welcome-intro--help');
+      const _bc = document.getElementById('welcomeBeacon'); if (_bc) _bc.remove();
+      setTimeout(() => { this._showFirstWin(stepIndex); }, 250);
     });
     document.getElementById('identityNext').addEventListener('click', () => {
       this.el.classList.remove('welcome-intro--help');
