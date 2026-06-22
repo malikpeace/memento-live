@@ -2747,11 +2747,13 @@ const Sidebar = {
       const hit = e.target.closest('.sidebar__nav-item, .sidebar__section--clickable, #sidebarProfile, #sidebarBrand');
       if (hit) {
         const wasPeek = document.body.classList.contains('menu-peek');
-        // Opening Settings (the profile chip) leaves the desktop sidebar open
-        // (Malik): Settings opens behind it, the sidebar stays. The mobile drawer
-        // still closes (it is a full-screen overlay, so keeping it would hide
-        // Settings) -> closeMenu always runs, closePeek is skipped for Settings.
-        const isSettings = hit.matches('#sidebarProfile');
+        // Opening Settings leaves the desktop sidebar open (Malik): Settings opens
+        // behind it, the sidebar stays. There are TWO ways in - the "Settings" nav
+        // item (data-tab="profile") and the profile chip (#sidebarProfile) - so both
+        // are exempted. The mobile drawer still closes (it is a full-screen overlay,
+        // so keeping it would hide Settings) -> closeMenu always runs, closePeek is
+        // skipped for Settings.
+        const isSettings = hit.matches('#sidebarProfile') || (hit.dataset && hit.dataset.tab === 'profile');
         closeMenu();
         if (!isSettings) closePeek();
         // From a peek over a full-screen view, plain tab destinations (Dashboard,
