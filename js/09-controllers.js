@@ -310,6 +310,7 @@ const WelcomeIntro = {
       "Scared I'll pick the wrong thing": "There is no permanent wrong pick. You can always adjust, but you cannot steer a parked car.",
       "I've lost touch with what I care about": "That happens to a lot of people. We find the thread again, gently.",
       "I've never really stopped to figure it out": "Most people never do. Stopping to ask is already the first real step.",
+      _multi: "That mix is what keeps it blurry. We pull it apart and find the one thing underneath.",
       _fallback: "Whatever is blurring it, naming it is how we start to clear it."
     },
     clarityHistory: {
@@ -1154,7 +1155,7 @@ const WelcomeIntro = {
     // Clarity branch: shown INSTEAD of the two action questions above when they have
     // no goal yet (lost / still figuring it out). There is no "there" for them, so we
     // ask what is in the way of naming it, and whether they have tried before.
-    { key: 'clarityBlock', type: 'choices', multi: false,
+    { key: 'clarityBlock', type: 'choices', multi: true,
       headline: "What do you think is making it hard to know what you want?",
       options: ["Too many directions, I can't pick one", "Scared I'll pick the wrong thing", "I've lost touch with what I care about", "I've never really stopped to figure it out"],
       skipIf: (p) => { const c = String((p && p.clarityLevel) || '').toLowerCase(); return !(c.indexOf('lost') !== -1 || c.indexOf('not really') !== -1); } },
