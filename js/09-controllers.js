@@ -219,7 +219,7 @@ const WelcomeIntro = {
         key: step.key,
         skipIf: step.skipIf,   // conditional steps (e.g. distraction) check live answers at walk time
         lines: (n) => {
-          let h = step.headline || '';
+          let h = (typeof step.headline === 'function') ? (step.headline(state.profile) || '') : (step.headline || '');
           if (h.indexOf('{name}') !== -1) h = n ? h.replace('{name}', n) : h.replace('Okay, {name}. ', '');
           return step.sub ? [h, step.sub] : [h];
         },
@@ -1134,7 +1134,11 @@ const WelcomeIntro = {
       // "I'm honestly not sure yet" is exclusive: picking it clears the rest, and
       // picking anything else clears it (you can't be sure AND not sure).
       exclusive: ["I'm honestly not sure yet"],
-      headline: 'What part of your life is this about?',
+      // Softer phrasing for someone still figuring it out (not 100% sure of the area);
+      // a clear goal or a rough idea gets the direct version.
+      headline: (p) => (String((p && p.clarityLevel) || '').toLowerCase().indexOf('not really') !== -1)
+        ? 'What part of your life do you think this is about?'
+        : 'What part of your life is this about?',
       sub: 'Tap whatever fits. You can pick more than one.',
       options: ['Work & money', 'Health & fitness', 'Discipline & focus', 'A skill or craft', 'Creative work', 'Relationships', 'Mindset & Mental', "I'm honestly not sure yet"] },
     // (birthday is inserted here, after the clarity gap)
@@ -1271,7 +1275,7 @@ const WelcomeIntro = {
     const inner = this.pageWrap.querySelector('.welcome-intro__page-inner');
     if (inner) inner.classList.add('exit');
     const name = (state.profile && state.profile.name) ? state.profile.name : '';
-    let headline = step.headline || '';
+    let headline = (typeof step.headline === 'function') ? (step.headline(state.profile) || '') : (step.headline || '');
     if (headline.indexOf('{name}') !== -1) {
       headline = name ? headline.replace('{name}', esc(name)) : headline.replace('Okay, {name}. ', '');
     }
