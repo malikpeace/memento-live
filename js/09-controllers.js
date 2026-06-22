@@ -241,6 +241,8 @@ const WelcomeIntro = {
       if (step.key === 'clarityLevel') beats.push({ lines: () => { const t = this._wcReflect('clarityLevel'); return t ? [t] : []; } });
       if (step.key === 'actionKnow') beats.push({ lines: () => { const t = this._wcReflect('actionKnow'); return t ? [t] : []; } });
       if (step.key === 'actionProgress') beats.push({ lines: () => { const t = this._wcReflect('actionProgress'); return t ? [t] : []; } });
+      if (step.key === 'clarityBlock') beats.push({ lines: () => { const t = this._wcReflect('clarityBlock'); return t ? [t] : []; } });
+      if (step.key === 'clarityHistory') beats.push({ lines: () => { const t = this._wcReflect('clarityHistory'); return t ? [t] : []; } });
       if (step.key === 'runningFrom') beats.push({ lines: () => { const t = this._wcReflect('runningFrom'); return t ? [t] : []; } });
       if (step.key === 'distraction') beats.push({ lines: () => { const t = this._wcReflect('distraction'); return t ? [t] : []; } });
       if (step.key === 'letterToFutureSelf') beats.push({ lines: () => { const t = this._wcReflect('letterToFutureSelf'); return t ? [t] : []; } });
@@ -1123,6 +1125,11 @@ const WelcomeIntro = {
       headline: 'Do you have a goal or mission you want to achieve above everything else?',
       options: ['Yes, I do and know exactly what it is', 'I have a rough idea', "Not really... but I'm trying to figure it out", 'No, I feel completely lost'] },
     { key: 'runningToward', type: 'choices', multi: true,
+      // Skip the "what part of your life" narrowing for someone who just said they
+      // feel completely lost: asking them to pick an area presumes a direction they
+      // do not have yet. They go straight to the clarity questions below. People who
+      // have a goal, a rough idea, or are figuring it out still get this (it helps).
+      skipIf: (p) => String((p && p.clarityLevel) || '').toLowerCase().indexOf('lost') !== -1,
       // "I'm honestly not sure yet" is exclusive: picking it clears the rest, and
       // picking anything else clears it (you can't be sure AND not sure).
       exclusive: ["I'm honestly not sure yet"],
