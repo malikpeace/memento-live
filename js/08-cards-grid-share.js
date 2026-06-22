@@ -3864,7 +3864,9 @@ function renderDayCard() {
     // Action / Consistency stats. The emblem no longer toggles the theme.
     if (nsEl && !nsEl._mfBound) {
       nsEl._mfBound = true;
-      nsEl.style.cursor = 'pointer';
+      // No pointer cursor: the card is the Memento (a hero object), not a button.
+      // It still opens the full view on click, just without the click-hand spanning
+      // the whole large card (which read as "everything is a button" on desktop).
       nsEl.addEventListener('click', () => { try { openMementoFull(); } catch (e) {} });
     }
     if (living) {
