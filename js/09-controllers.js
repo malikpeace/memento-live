@@ -3405,6 +3405,7 @@ const TabBar = {
         '<div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); margin-bottom: 10px;">Appearance</div>' +
         toggleRow('prefLightMode', 'Light mode', 'Switch the whole app to a bright, premium off-white theme.', prefs.theme === 'light') +
         toggleRow('prefFlatBg', 'Minimal background', 'Hide the ambient orbs and glow for a flat, paper-like surface.', !!prefs.flatBg) +
+        toggleRow('prefFlatUi', 'Flat surfaces', 'Remove the glass blur from cards, sheets, and bars for a flat, matte look.', !!prefs.flatUi) +
         '<div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); margin: 18px 0 10px;">Themes</div>' +
         '<div class="pref-swatches" id="prefThemes">' + themesHtml + '</div>' +
         '<div style="font-size: 0.6875rem; color: var(--text-3); margin: 8px 0 0;">One tap sets the whole look. Everything below stays adjustable.</div>' +
@@ -3653,6 +3654,7 @@ const TabBar = {
       persistNow();
     });
     wireToggle('prefFlatBg', (on) => { state.prefs.flatBg = on; });
+    wireToggle('prefFlatUi', (on) => { state.prefs.flatUi = on; });
     // Re-render the command center after accent-affecting changes (its inline
     // accent text is baked at render time), rebinding so buttons keep working.
     const refreshCommandCenter = () => {
