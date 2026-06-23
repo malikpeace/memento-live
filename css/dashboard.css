@@ -1057,7 +1057,7 @@ body.ns-bloom .app.dash-v2 #commandCenter .cc-live { display: none; }
   }
   /* slightly trim the hero so the card + today's action + the done affordance
      all clear the tab bar on shorter phones (still the dominant object). */
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-ns { min-height: 312px; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-ns { min-height: 384px; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter {
     grid-row: 4; margin-top: 4px;
   }
@@ -3388,15 +3388,17 @@ html.lowfx .daycard-ns {
   /* The greeting block (and its headline) hands the header to the brand. */
   .dash-header__greeting { display: none; }
   #dashGreetingMobile {
-    /* Whisper bar near the top of the dashboard: just the date, aligned right.
-       Ambient + lowest weight, it orients without competing with the card. */
+    /* The date is pulled up onto the brand's line (top-right), aligned with the
+       MEMENTO lockup on the left, instead of sitting in its own row below it. The
+       freed vertical space goes to a taller Memento card. */
     display: flex;
-    align-items: baseline;
+    align-items: center;
     justify-content: flex-end;
     flex-wrap: wrap;
     gap: 6px 12px;
-    margin: 0 2px 18px;
-    padding-top: 24px;
+    min-height: 34px;
+    margin: -50px 2px 14px;
+    padding-top: 0;
   }
   /* !important matches the older mobile rule that force-showed this block. */
   .dash-header__right { display: none !important; }
