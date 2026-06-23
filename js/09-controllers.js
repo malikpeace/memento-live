@@ -4037,6 +4037,7 @@ const TabBar = {
           <label style="font-size:0.75rem; color:var(--text-2);">to<input type="time" id="prefQuietEnd" value="${esc(rem.quietEnd || '07:00')}" style="${FIELDS}"></label>
         </div>
         <button class="sheet-btn" id="prefNotifyEnable" style="margin-top:14px; background: rgba(123,97,255,0.12); color: var(--color-clarity); border: 1px solid rgba(123,97,255,0.25);">Enable browser notifications</button>
+        <button class="sheet-btn" id="prefNotifyTest" style="margin-top:8px; background: var(--kfill-04); color: var(--text-1);">Send a test notification now</button>
         <div id="prefReminderMsg" style="font-size:0.6875rem; color: var(--text-3); margin-top:8px;"></div>
       </div>
       <div class="sheet-divider"></div>
@@ -4188,6 +4189,26 @@ const TabBar = {
         if (remMsg) remMsg.textContent = p === 'granted' ? 'Notifications enabled.' : p === 'denied' ? 'Notifications are blocked in your browser settings.' : 'Permission dismissed.';
         if (p === 'granted' && typeof scheduleReminder === 'function') scheduleReminder();
       }).catch(() => {});
+    });
+    // Send a real test notification right now, so you can see what it looks like.
+    // Uses the service worker's showNotification (the path that works in an installed
+    // iOS PWA; the plain Notification() constructor does not on iOS).
+    const notifyTestBtn = document.getElementById('prefNotifyTest');
+    if (notifyTestBtn) notifyTestBtn.addEventListener('click', async () => {
+      try {
+        if (!('Notification' in window)) { if (remMsg) remMsg.textContent = 'This device does not support notifications.'; return; }
+        let perm = Notification.permission;
+        if (perm !== 'granted') perm = await Notification.requestPermission();
+        if (perm !== 'granted') { if (remMsg) remMsg.textContent = perm === 'denied' ? 'Notifications are blocked. Turn them on for Memento in your phone Settings.' : 'Permission dismissed, tap again to allow.'; return; }
+        const opts = { body: "Today's move is waiting. Open Memento and keep your streak alive.", icon: 'icons/icon-192.png', badge: 'icons/icon-192.png', tag: 'memento-test', renotify: true };
+        if ('serviceWorker' in navigator && navigator.serviceWorker.ready) {
+          const reg = await navigator.serviceWorker.ready;
+          await reg.showNotification('Memento', opts);
+        } else if ('Notification' in window) {
+          new Notification('Memento', opts);
+        }
+        if (remMsg) remMsg.textContent = 'Sent. Look for the banner (and check Notification Center).';
+      } catch (e) { if (remMsg) remMsg.textContent = 'Could not send: ' + (e && e.message ? e.message : 'error'); }
     });
     // Data export / import bindings
     const exportBtn = document.getElementById('exportData');
