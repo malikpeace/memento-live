@@ -4011,7 +4011,13 @@ function openMementoFull() {
     void ov.offsetWidth;
     ov.classList.add('mf--open');
 
+    let mfClosed = false;
     const close = () => {
+      if (mfClosed) return;   // idempotent: a 2nd trigger (a swipe + a stray tap, a
+      mfClosed = true;        // double-tap, Escape while tapping) must NOT run the
+                              // restore twice, or the second pass removes the card it
+                              // just put back (the else branch below) and the home
+                              // ends up with no Memento at all.
       ov.classList.remove('mf--open');   // bg + stats fade out; the card stays put at H
       document.body.style.overflow = '';
       document.removeEventListener('keydown', onKey);
@@ -4025,11 +4031,12 @@ function openMementoFull() {
             sizedEls.forEach((el) => { el.style.width = ''; el.style.minHeight = ''; el.style.margin = ''; });
             liveWrap.style.removeProperty('--dc-rx');
             liveWrap.style.removeProperty('--dc-ry');
-            if (dayCardEl && !dayCardEl.querySelector('.daycard-wrap')) {
+            const existing = dayCardEl ? dayCardEl.querySelector('.daycard-wrap') : null;
+            if (dayCardEl && (!existing || existing === liveWrap)) {
               if (homeNext && homeNext.parentNode === homeParent) homeParent.insertBefore(liveWrap, homeNext);
               else (homeParent || dayCardEl).appendChild(liveWrap);
             } else {
-              liveWrap.remove();   // a fresh card already exists; drop the borrowed one
+              liveWrap.remove();   // a DIFFERENT fresh card was rebuilt; drop the borrowed one
             }
           }
           if (dayCardEl) dayCardEl.style.minHeight = '';
