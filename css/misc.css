@@ -628,15 +628,15 @@ html.theme-light body.lite .more-space__sheet, html.theme-light.lowfx .more-spac
 .more-space__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .more-card {
   position: relative;
-  background: var(--kfill-03);
-  border: 1px solid var(--hairline);
+  background: var(--kfill-04);
+  border: 0;
   border-radius: var(--r-card);
-  padding: 16px 16px 15px;
+  padding: 18px 16px 16px;
   cursor: pointer;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  transition: border-color var(--t-base) ease, background var(--t-base) ease, transform var(--t-fast) ease;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: background var(--t-base) ease, transform var(--t-fast) ease;
 }
-.more-card:hover { border-color: var(--hairline-strong); background: var(--kfill-05); }
+.more-card:hover { background: var(--kfill-06); }
 .more-card:active { transform: scale(0.985); }
 .more-card__icon {
   width: 34px; height: 34px;
@@ -672,6 +672,42 @@ html.theme-light body.lite .more-space__sheet, html.theme-light.lowfx .more-spac
 .more-space__confirm button { font: inherit; font-size: var(--fs-sm); font-weight: 600; cursor: pointer; border-radius: var(--r-sm); padding: 8px 12px; }
 #moreUnlockYes { border: none; background: var(--solid-bg); color: var(--solid-fg); }
 #moreUnlockNo { border: 1px solid var(--hairline-strong); background: transparent; color: var(--text-hi); }
+
+/* ── Switcher = a full-screen Modules PAGE on mobile (not a half-height drawer) ──
+   The swipe / the home chevron open this. It fills the display like a real screen:
+   a proper screen title + a close, the modules grid filling it, opaque background
+   (the home does not peek behind). Swipe down from the top, or tap X, to return. */
+@media (max-width: 859.98px) {
+  .more-space--full .more-space__sheet {
+    top: 0; height: 100dvh; max-height: none; max-width: none;
+    margin: 0; border-radius: 0;
+    padding: calc(var(--safe-t, 0px) + 14px) 16px calc(var(--safe-b, 0px) + 20px);
+    background: rgb(9, 10, 14);
+    box-shadow: none;
+  }
+  html.theme-light .more-space--full .more-space__sheet { background: rgb(245, 246, 249); }
+  .more-space--full .more-space__topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin: 2px 2px 20px;
+  }
+  .more-space--full .more-space__screentitle {
+    font-size: 1.55rem; font-weight: 700; letter-spacing: -0.02em; color: var(--text-hi);
+  }
+  .more-space--full .more-space__close {
+    width: 36px; height: 36px; flex: 0 0 auto;
+    border: 0; border-radius: 999px; cursor: pointer;
+    background: var(--kfill-06); color: var(--text-hi);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+    -webkit-tap-highlight-color: transparent;
+    transition: background var(--t-base) ease, transform var(--t-fast) ease;
+  }
+  .more-space--full .more-space__close:active { transform: scale(0.92); background: var(--kfill-10); }
+  .more-space--full .more-space__close svg { width: 17px; height: 17px; display: block; }
+  .more-space--full .more-space__grid { gap: 12px; }
+  .more-space--full .more-card { padding: 20px 18px 18px; }
+  .more-space--full .more-space__foot { margin-top: 24px; padding-bottom: 8px; }
+}
 
 /* ============================================
    v23: CHECK-IN SHEET (one calm glass card)

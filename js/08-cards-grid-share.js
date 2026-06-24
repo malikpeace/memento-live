@@ -950,18 +950,31 @@ const MoreSpace = {
   open(opts) {
     this.close(true);
     this._mode = (opts && opts.mode === 'switcher') ? 'switcher' : 'more';
+    const isFull = (this._mode === 'switcher');
     const wrap = document.createElement('div');
     wrap.id = 'moreSpace';
-    wrap.className = 'more-space';
+    // Switcher mode is a full-screen Modules PAGE on mobile (more-space--full), not
+    // a half-height drawer: a real screen title + close, the modules filling it.
+    wrap.className = 'more-space' + (isFull ? ' more-space--full' : '');
+    const header = isFull
+      ? '<div class="more-space__topbar">' +
+          '<span class="more-space__screentitle">Modules</span>' +
+          '<button class="more-space__close" id="moreClose" type="button" aria-label="Close modules">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>' +
+          '</button>' +
+        '</div>'
+      : '<div class="more-space__handle" aria-hidden="true"></div>' +
+        '<div class="more-space__title">More</div>';
     wrap.innerHTML = '<div class="more-space__backdrop"></div>' +
-      '<div class="more-space__sheet" role="dialog" aria-modal="true" aria-label="' + (this._mode === 'switcher' ? 'Modules' : 'More modules') + '">' +
-        '<div class="more-space__handle" aria-hidden="true"></div>' +
-        '<div class="more-space__title">' + (this._mode === 'switcher' ? 'Modules' : 'More') + '</div>' +
+      '<div class="more-space__sheet" role="dialog" aria-modal="true" aria-label="' + (isFull ? 'Modules' : 'More modules') + '">' +
+        header +
         '<div class="more-space__grid"></div>' +
         '<div class="more-space__foot"></div>' +
       '</div>';
     document.body.appendChild(wrap);
     wrap.querySelector('.more-space__backdrop').addEventListener('click', () => this.close());
+    const _mClose = wrap.querySelector('#moreClose');
+    if (_mClose) _mClose.addEventListener('click', () => this.close());
     this._esc = (e) => { if (e.key === 'Escape') this.close(); };
     document.addEventListener('keydown', this._esc);
 
@@ -975,7 +988,7 @@ const MoreSpace = {
       if (!sheet) return;
       let startY = 0, dy = 0, t0 = 0, h = 1;
       let active = false, decided = false, engaged = false, fromHeader = false;
-      const inHeader = (t) => !!(t && t.closest && t.closest('.more-space__handle, .more-space__title'));
+      const inHeader = (t) => !!(t && t.closest && t.closest('.more-space__handle, .more-space__title, .more-space__topbar'));
       sheet.addEventListener('touchstart', (e) => {
         if (!e.touches || e.touches.length !== 1) return;
         startY = e.touches[0].clientY; dy = 0; t0 = e.timeStamp || 0;
