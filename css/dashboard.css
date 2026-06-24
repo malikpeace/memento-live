@@ -3504,3 +3504,73 @@ body.pre-clarity .capture-fab { display: none !important; }
   letter-spacing: 0.01em;
   font-variant-numeric: tabular-nums;
 }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   v230: SCROLL-SNAP HOME (mobile). v25's two-page feel restored: PAGE 1 = the
+   Memento card + Today; a swipe up CATCHES on PAGE 2 = the modules dashboard.
+   Native CSS scroll-snap (the settle runs in the OS compositor and tracks flick
+   velocity; the JS snapper felt janky on iOS). svh units stay stable under
+   Safari's collapsing URL bar. Overrides the v161 single-screen minimal home.
+   Mobile + post-Clarity only.
+   ════════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 767.98px) {
+  html { scroll-snap-type: y mandatory; }
+  html, body { overflow-x: clip; max-width: 100vw; }
+  body { touch-action: pan-y; overscroll-behavior-x: none; }
+
+  /* flow (not the centered grid) so the two pages stack and snap */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 {
+    display: block !important;
+    align-content: normal !important;
+    padding-bottom: 0 !important;
+  }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .dash-header { margin-bottom: 6px !important; }
+
+  /* PAGE 1 — the card fills the screen above the Today box; both snap as one page */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard {
+    display: flex !important; flex-direction: column; justify-content: center;
+    scroll-snap-align: start; scroll-snap-stop: always;
+    min-height: calc(100svh - var(--safe-t, 0px) - 400px) !important;
+    margin: 0 !important; grid-column: auto !important; grid-row: auto !important;
+  }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-ns { min-height: 320px !important; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter {
+    margin: 10px 0 0 !important; grid-column: auto !important; grid-row: auto !important;
+  }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-od-sub { display: none; }
+
+  /* PAGE 2 — the modules dashboard. #dashBelow becomes a real block that holds the
+     dashboard, snaps as one page, with dead space above so the flip reads as
+     crossing into a separate place. */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashBelow {
+    display: block !important;
+    scroll-snap-align: start; scroll-snap-stop: always;
+    min-height: 100svh;
+    margin-top: 42svh !important;
+    padding: 0 0 calc(110px + var(--safe-b, 0px)) !important;
+  }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashBelow #dashGreetingMobile { display: none !important; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashBelow #dailyMemento,
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashBelow #dashConsistency {
+    display: block !important; margin: 0 0 14px !important; grid-column: auto !important; grid-row: auto !important;
+  }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashBelow [data-area] {
+    display: block !important; aspect-ratio: auto !important;
+  }
+
+  /* page-2 module grid: a clean 2-col flow, full-width heroes, no bento wrapper */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashBelow #widgetGrid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    grid-auto-rows: minmax(0, auto) !important;
+    gap: 12px !important;
+    margin: 0 !important; padding: 0 !important; max-width: none !important;
+    background: none !important; box-shadow: none !important; border: 0 !important;
+    -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+  }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashBelow #widgetGrid > .widget {
+    grid-column: auto !important; grid-row: auto !important; margin: 0 !important; min-width: 0 !important;
+  }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashBelow #widgetGrid > .widget--full { grid-column: 1 / -1 !important; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashBelow #widgetGrid > .dash-more { display: none !important; }
+}

@@ -2040,14 +2040,10 @@ window.addEventListener('keydown', (e) => {
       }
       return;
     }
-    // Minimal home (v161): a leftward (right->left) swipe on the dashboard opens
-    // the Modules sheet. The card is the home; the modules live one swipe away.
-    // Only fires with nothing open, over non-blocked content, as a clean
-    // horizontal left swipe.
-    if (!overlayAtStart && !document.body.classList.contains('menu-peek')
-        && dt < 700 && dx < -70 && Math.abs(dy) < Math.abs(dx) * 0.55 && !blocked(startEl)) {
-      try { if (typeof MoreSpace !== 'undefined' && MoreSpace.open) { MoreSpace.open({ mode: 'switcher' }); return; } } catch (x) {}
-    }
+    // (v230) The modules now live on PAGE 2 of the native scroll-snap home, so the
+    // old left-swipe-opens-the-Modules-sheet shortcut is retired (opening the sheet
+    // would steal the live widget grid off page 2). Swipe down on page 1 stays a
+    // native scroll to the modules.
     // Require a quick, clearly-horizontal, rightward swipe.
     if (dt > 700 || dx < 70 || Math.abs(dy) > Math.abs(dx) * 0.55) return;
     if (blocked(startEl)) return;
@@ -2078,12 +2074,13 @@ window.addEventListener('keydown', (e) => {
   } catch (e) {}
 })();
 
-// Minimal home (v221): swipe UP on the home to pull the Modules sheet up with the
-// thumb, 1:1, past a threshold to commit (else it springs back down). The Memento
-// card and the Today box stay put; the modules ride up from below. Mobile + touch
-// only, and only over the lower (below-the-card) area so the card's tap/tilt and
-// the Today buttons are never hijacked.
+// DISABLED in v230: the home is now a native scroll-snap pager (card+Today = page
+// 1, the modules dashboard = page 2). The old swipe-up-to-open-a-sheet would
+// preventDefault the touchmove and block the native scroll, and would steal the
+// widget grid off page 2 into a sheet. Kept for reference; returns immediately.
 (function () {
+  return;
+  /* eslint-disable no-unreachable */
   var TOUCH = false;
   try {
     TOUCH = (window.matchMedia && window.matchMedia('(pointer: coarse)').matches)
