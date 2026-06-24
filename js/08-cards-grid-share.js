@@ -1015,7 +1015,47 @@ const MoreSpace = {
     })();
 
     this._renderInto();
-    requestAnimationFrame(() => wrap.classList.add('open'));
+    if (opts && opts.startDragged) {
+      // Opened by an upward finger-drag from the home: keep the sheet hidden at the
+      // bottom with NO transition and let the home drag handler drive its transform
+      // 1:1 (dragMove / dragEnd below). The thumb pulls the modules up.
+      var dsheet = wrap.querySelector('.more-space__sheet');
+      this._dragSheet = dsheet;
+      this._dragBackdrop = wrap.querySelector('.more-space__backdrop');
+      this._dragH = (dsheet && dsheet.getBoundingClientRect().height) || Math.round(window.innerHeight * 0.6);
+      if (dsheet) { dsheet.classList.add('dragging'); dsheet.style.transform = 'translateY(' + this._dragH + 'px)'; }
+    } else {
+      requestAnimationFrame(() => wrap.classList.add('open'));
+    }
+  },
+  // ── Finger-tracked open from the home (the swipe-up-for-modules gesture) ──────
+  // pull = px the thumb has travelled UP since it engaged (>= 0). The sheet rides
+  // up from fully hidden so it tracks the finger 1:1.
+  dragMove(pull) {
+    var s = this._dragSheet; if (!s) return;
+    var h = this._dragH || 1;
+    var p = Math.max(0, Math.min(pull, h));
+    s.style.transform = 'translateY(' + (h - p) + 'px)';
+    if (this._dragBackdrop) this._dragBackdrop.style.opacity = String(Math.max(0, Math.min(1, p / h)) * 0.92);
+  },
+  // Commit past ~22% of the sheet height or a clear upward flick; else spring back
+  // down and dismiss. velUp = upward px/ms.
+  dragEnd(pull, velUp) {
+    var s = this._dragSheet, b = this._dragBackdrop, h = this._dragH || 1;
+    this._dragSheet = null; this._dragBackdrop = null;
+    if (!s) return;
+    var commit = pull > h * 0.22 || velUp > 0.5;
+    s.classList.remove('dragging');   // re-enable the CSS transition for the snap
+    if (commit) {
+      var w = document.getElementById('moreSpace');
+      if (w) w.classList.add('open'); // settle fully open (transform -> 0)
+      s.style.transform = '';
+      if (b) b.style.opacity = '';
+    } else {
+      s.style.transform = '';         // -> resting translateY(100%): animate back down
+      if (b) b.style.opacity = '';
+      this.close();
+    }
   },
   close(instant) {
     if (this._esc) { document.removeEventListener('keydown', this._esc); this._esc = null; }

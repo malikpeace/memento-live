@@ -1057,7 +1057,7 @@ body.ns-bloom .app.dash-v2 #commandCenter .cc-live { display: none; }
   }
   /* slightly trim the hero so the card + today's action + the done affordance
      all clear the tab bar on shorter phones (still the dominant object). */
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-ns { min-height: 384px; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-ns { min-height: 304px; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter {
     grid-row: 4; margin-top: 4px;
   }
@@ -1066,28 +1066,26 @@ body.ns-bloom .app.dash-v2 #commandCenter .cc-live { display: none; }
      lives one tap deeper, in the Action module, so the home stays calm. */
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-od-sub { display: none; }
 
-  /* the Modules pill: a quiet glass affordance below the action, full-width,
-     teaching "your modules live one swipe away". No border (fill + blur). */
+  /* the Modules affordance: a quiet up-chevron + label below the Today box that
+     teaches "swipe up for your modules" (the chevron is also a tap target, and the
+     whole lower home is the swipe surface). Sits in the last grid row, clear of
+     the floating tab bar. No pill, no border. */
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .home-modules-hint {
-    display: inline-flex; align-items: center; justify-content: center; gap: 9px;
-    grid-column: 1 / -1; grid-row: 5; justify-self: center;
-    margin: 14px auto 4px; padding: 9px 16px;
-    border: 0; border-radius: 999px; cursor: pointer;
-    background: rgba(255,255,255,0.05);
-    -webkit-backdrop-filter: blur(20px) saturate(1.4); backdrop-filter: blur(20px) saturate(1.4);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.07);
-    color: var(--text-lo, rgba(255,255,255,0.5));
-    font: 500 0.78rem/1 var(--font-ui, inherit); letter-spacing: 0.02em;
+    display: inline-flex; flex-direction: column; align-items: center; gap: 2px;
+    grid-column: 1 / -1; grid-row: 5; justify-self: center; align-self: end;
+    margin: 4px auto 0; padding: 4px 22px;
+    border: 0; background: none; cursor: pointer;
+    color: var(--text-lo, rgba(255,255,255,0.34));
     -webkit-tap-highlight-color: transparent;
-    transition: color 180ms ease, background 180ms ease, transform 180ms ease;
+    transition: color 180ms ease, transform 160ms ease;
   }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .home-modules-hint:active {
-    transform: scale(0.96); color: var(--text-mid, rgba(255,255,255,0.7));
+    transform: translateY(-1px) scale(0.98); color: var(--text-mid, rgba(255,255,255,0.62));
   }
-  .home-modules-hint__dots { display: inline-flex; gap: 4px; }
-  .home-modules-hint__dots i {
-    width: 4px; height: 4px; border-radius: 50%;
-    background: currentColor; opacity: 0.85; display: block;
+  .home-modules-hint__chev { display: block; width: 20px; height: 10px; opacity: 0.85; }
+  .home-modules-hint__chev svg { width: 100%; height: 100%; display: block; }
+  .home-modules-hint__label {
+    font: 600 0.58rem/1 var(--font-ui, inherit); letter-spacing: 0.16em; text-transform: uppercase;
   }
 }
 

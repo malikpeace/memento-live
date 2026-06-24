@@ -2066,8 +2066,8 @@ window.addEventListener('keydown', (e) => {
   }, { passive: true });
 })();
 
-// Minimal home (v161): wire the Modules pill (a tap-target twin of the swipe)
-// and log one app_open per day for the Activation Point readout (local-only).
+// Minimal home (v161): wire the Modules affordance (a tap-target twin of the
+// swipe) and log one app_open per day for the Activation Point readout (local).
 (function () {
   try { if (window.Analytics) Analytics.track('app_open'); } catch (e) {}
   try {
@@ -2076,6 +2076,101 @@ window.addEventListener('keydown', (e) => {
       try { if (typeof MoreSpace !== 'undefined' && MoreSpace.open) MoreSpace.open({ mode: 'switcher' }); } catch (e) {}
     });
   } catch (e) {}
+})();
+
+// Minimal home (v221): swipe UP on the home to pull the Modules sheet up with the
+// thumb, 1:1, past a threshold to commit (else it springs back down). The Memento
+// card and the Today box stay put; the modules ride up from below. Mobile + touch
+// only, and only over the lower (below-the-card) area so the card's tap/tilt and
+// the Today buttons are never hijacked.
+(function () {
+  var TOUCH = false;
+  try {
+    TOUCH = (window.matchMedia && window.matchMedia('(pointer: coarse)').matches)
+      || ('ontouchstart' in window) || ((navigator.maxTouchPoints || 0) > 0)
+      || /[?&]gest=1/.test(location.search);
+  } catch (e) {}
+  if (!TOUCH) return;
+
+  function homeReady() {
+    try {
+      if (window.innerWidth > 859) return false;                 // mobile home only
+      if (!document.body.classList.contains('ns-bloom')) return false; // post-Clarity
+      if (document.body.classList.contains('menu-peek')) return false;
+      if (document.getElementById('moreSpace')) return false;     // already open
+      if (document.querySelector('.sheet.open, .action-exp.open, .clarity-exp.open, .welcome-intro.open, #mementoFull, #appearancePicker')) return false;
+      var dash = document.querySelector('.app.dash-v2');
+      return !!(dash && dash.offsetParent !== null);
+    } catch (e) { return false; }
+  }
+  function blocked(el) {
+    return !!(el && el.closest && el.closest(
+      '#dayCard, .daycard-ns, button, a, input, textarea, select, [role="button"], ' +
+      '.tab-bar, .sidebar, .vcanvas__viewport, canvas, [data-no-swipe]'));
+  }
+  // An up-drag should scroll the page first if there is more below; only steal it
+  // for the modules once the home is scrolled to (or near) its bottom.
+  function atScrollBottom(el) {
+    try {
+      var n = el;
+      while (n && n.nodeType === 1 && n !== document.body && n !== document.documentElement) {
+        var cs = getComputedStyle(n);
+        if (/(auto|scroll)/.test(cs.overflowY) && n.scrollHeight > n.clientHeight + 4) {
+          return n.scrollTop + n.clientHeight >= n.scrollHeight - 6;
+        }
+        n = n.parentNode;
+      }
+      var doc = document.scrollingElement || document.documentElement;
+      return (doc.scrollTop + window.innerHeight) >= doc.scrollHeight - 6;
+    } catch (e) { return true; }
+  }
+
+  var sx = 0, sy = 0, armed = false, engaged = false, pull = 0, lastY = 0, lastT = 0, vel = 0;
+
+  document.addEventListener('touchstart', function (e) {
+    armed = false; engaged = false; pull = 0; vel = 0;
+    if (!e.touches || e.touches.length !== 1) return;
+    if (!homeReady()) return;
+    var t = e.touches[0];
+    if (blocked(e.target)) return;
+    if (t.clientY < window.innerHeight * 0.46) return;   // lower area only (below the card)
+    // The minimal home is a single page that may overflow the viewport by a little
+    // (the taller card). Treat a small overflow as non-scrolling so the gesture is
+    // always live; only genuinely long content must be scrolled to its bottom first.
+    var doc = document.scrollingElement || document.documentElement;
+    var docOver = doc ? (doc.scrollHeight - window.innerHeight) : 0;
+    if (!atScrollBottom(e.target) && docOver > 150) return;
+    sx = t.clientX; sy = t.clientY; lastY = sy; lastT = (e.timeStamp || 0);
+    armed = true;
+  }, { passive: true });
+
+  document.addEventListener('touchmove', function (e) {
+    if (!armed || !e.touches || e.touches.length !== 1) return;
+    var t = e.touches[0];
+    var dy = t.clientY - sy, dx = t.clientX - sx;
+    if (!engaged) {
+      if (dy > 4) { armed = false; return; }                       // went down -> let it scroll
+      if (Math.abs(dy) < 10) return;                               // wait for a clear move
+      if (Math.abs(dx) > Math.abs(dy) * 0.7) { armed = false; return; } // too horizontal
+      engaged = true;
+      try { MoreSpace.open({ mode: 'switcher', startDragged: true }); }
+      catch (x) { engaged = false; armed = false; return; }
+    }
+    pull = Math.max(0, sy - t.clientY);
+    var now = (e.timeStamp || 0);
+    if (now > lastT) { vel = (lastY - t.clientY) / (now - lastT); lastY = t.clientY; lastT = now; }
+    try { MoreSpace.dragMove(pull); } catch (x) {}
+    if (e.cancelable) e.preventDefault();
+  }, { passive: false });
+
+  function endDrag() {
+    if (!engaged) { armed = false; return; }
+    engaged = false; armed = false;
+    try { MoreSpace.dragEnd(pull, vel); } catch (x) {}
+    pull = 0; vel = 0;
+  }
+  document.addEventListener('touchend', endDrag, { passive: true });
+  document.addEventListener('touchcancel', endDrag, { passive: true });
 })();
 
 // Diagnostic HUD (debug only): open the app with ?perf=1 in the URL to show a
