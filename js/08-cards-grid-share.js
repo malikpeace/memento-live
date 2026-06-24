@@ -1027,7 +1027,7 @@ const MoreSpace = {
       sheet.addEventListener('touchcancel', end, { passive: true });
     })();
 
-    this._renderInto();
+    if (isFull) this._hostWidgetGrid(wrap); else this._renderInto();
     if (opts && opts.startDragged) {
       // Opened by an upward finger-drag from the home: keep the sheet hidden at the
       // bottom with NO transition and let the home drag handler drive its transform
@@ -1070,13 +1070,43 @@ const MoreSpace = {
       this.close();
     }
   },
+  // Full-screen Modules page: host the LIVE module widgets (the rich bento cards
+  // with real data, the v25 "Apple-like" feel) instead of generic launcher tiles.
+  // The widget grid is hidden on the minimal home, so borrowing it costs the home
+  // nothing; _restoreWidgetGrid() puts it back on close.
+  _hostWidgetGrid(wrap) {
+    try {
+      var grid = document.getElementById('widgetGrid');
+      var sheet = wrap.querySelector('.more-space__sheet');
+      var slot = wrap.querySelector('.more-space__grid');
+      if (!grid || !sheet) { this._renderInto(); return; }
+      this._wgHome = grid.parentNode;
+      this._wgNext = grid.nextSibling;
+      if (slot && slot.parentNode === sheet) sheet.insertBefore(grid, slot);
+      else sheet.appendChild(grid);
+      if (slot) slot.style.display = 'none';
+      var foot = wrap.querySelector('.more-space__foot');
+      if (foot) foot.style.display = 'none';
+      wrap.classList.add('more-space--widgets');
+    } catch (e) { try { this._renderInto(); } catch (x) {} }
+  },
+  _restoreWidgetGrid() {
+    try {
+      var grid = document.getElementById('widgetGrid');
+      if (grid && this._wgHome) {
+        if (this._wgNext && this._wgNext.parentNode === this._wgHome) this._wgHome.insertBefore(grid, this._wgNext);
+        else this._wgHome.appendChild(grid);
+      }
+    } catch (e) {}
+    this._wgHome = null; this._wgNext = null;
+  },
   close(instant) {
     if (this._esc) { document.removeEventListener('keydown', this._esc); this._esc = null; }
     const w = document.getElementById('moreSpace');
-    if (!w) return;
-    if (instant) { try { w.remove(); } catch (e) {} return; }
+    if (!w) { this._restoreWidgetGrid(); return; }
+    if (instant) { this._restoreWidgetGrid(); try { w.remove(); } catch (e) {} return; }
     w.classList.remove('open');
-    setTimeout(() => { try { w.remove(); } catch (e) {} }, 300);
+    setTimeout(() => { this._restoreWidgetGrid(); try { w.remove(); } catch (e) {} }, 300);
   },
   _openModule(key) {
     this.close();

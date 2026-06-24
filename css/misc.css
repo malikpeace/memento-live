@@ -707,6 +707,26 @@ html.theme-light body.lite .more-space__sheet, html.theme-light.lowfx .more-spac
   .more-space--full .more-space__grid { gap: 12px; }
   .more-space--full .more-card { padding: 20px 18px 18px; }
   .more-space--full .more-space__foot { margin-top: 24px; padding-bottom: 8px; }
+
+  /* Full-screen Modules page hosting the LIVE module widgets (v25 rich cards):
+     a clean 2-col flow, full-width heroes span both, no bento wrapper / glass. */
+  .more-space--full .widget-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    grid-auto-rows: minmax(0, auto) !important;
+    gap: 12px !important;
+    margin: 0 !important; padding: 0 !important; max-width: none !important;
+    background: none !important; box-shadow: none !important; border: 0 !important;
+    -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+  }
+  .more-space--full .widget-grid > .widget {
+    grid-column: auto !important; grid-row: auto !important; margin: 0 !important;
+    min-width: 0 !important;
+  }
+  .more-space--full .widget-grid > .widget--full { grid-column: 1 / -1 !important; }
+  /* the old "More" launcher button rides along inside the grid: hide it here, the
+     full page already IS the modules view. */
+  .more-space--full .widget-grid .dash-more { display: none !important; }
 }
 
 /* ============================================
