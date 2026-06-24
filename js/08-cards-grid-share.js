@@ -2946,7 +2946,7 @@ function renderCommandCenter() {
     if (!hasClarity) {
       return wrap(eyebrow('Start here') +
         '<div style="font-size:1.15rem;font-weight:700;color:var(--text-hi);margin-bottom:6px;">Find your Neutron Star</div>' +
-        '<div style="font-size:0.9rem;line-height:1.5;color:var(--text-2);margin-bottom:14px;">Get clear on the one goal that actually matters. This will be the foundation of Memento.</div>' +
+        '<div style="font-size:0.9rem;line-height:1.5;color:var(--text-2);margin-bottom:14px;">Get clear on the one goal that actually matters to you above all else. This will be the foundation of your Memento.</div>' +
         '<div style="display:flex;">' + primaryBtn('Start', 'clarity') + '</div>');
     }
     if (!hasPlan) {
