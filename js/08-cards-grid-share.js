@@ -2848,7 +2848,7 @@ function ccActionWhyLine() {
     if (Array.isArray(coi)) coi = coi.filter(Boolean).join(', ');
     coi = String(coi || '').trim();
     if (coi) return 'So a year from now is not just ' + coi.toLowerCase().replace(/\.+$/, '') + '.';
-    return 'This moves you toward your goal.';
+    return '';
   } catch (e) { return ''; }
 }
 
