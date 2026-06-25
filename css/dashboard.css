@@ -3518,9 +3518,13 @@ body.pre-clarity .capture-fab { display: none !important; }
   html, body { overflow-x: clip; max-width: 100vw; }
   body { touch-action: pan-y; overscroll-behavior-x: none; }
 
-  /* flow (not the centered grid) so the two pages stack and snap */
+  /* flow (not the centered grid) so the two pages stack and snap. NOTE: display is
+     intentionally NOT !important so the JS that hides the home behind a tab/overlay
+     (app.style.display='none') still wins; this rule beats the bento grid by source
+     order alone. The !important on display here used to leave the home rendered
+     under the (transparent) Profile/Memento panels, bleeding through. */
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 {
-    display: block !important;
+    display: block;
     align-content: normal !important;
     padding-bottom: 0 !important;
   }
