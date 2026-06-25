@@ -308,7 +308,7 @@ const WelcomeIntro = {
       "Haven't really started": "Not starting yet is okay. The first small move is the hardest, and we make it tiny.",
       'Started, then stalled': "Stalling happens to everyone. It usually means the next step got too big, not that you failed.",
       'Slow but moving': "Slow but moving still counts. Slow and consistent beats fast and gone every time.",
-      'Actually on a roll': "On a roll, love that. Now we just protect that momentum so it doesn't slip.",
+      'Actually on a roll': "Good! Consistency is the most important ingredient. Now we just protect that momentum so it doesn't slip.",
       _fallback: "Wherever you're at is fine. We build from here, one small step at a time."
     },
     clarityBlock: {
