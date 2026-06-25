@@ -187,9 +187,15 @@ const WelcomeIntro = {
     beats.push({
       key: 'name',
       lines: () => ['What should I call you?'],
-      input: { kind: 'text', placeholder: 'Your name', max: 30 },
-      commit: (v) => { state.profile.name = String(v).trim(); persistNow(); return true; },
-      display: (v) => String(v).trim()
+      input: { kind: 'name2', max: 30 },
+      commit: (v) => {
+        const first = String((v && v.first) || '').trim();
+        const last = String((v && v.last) || '').trim();
+        if (first) state.profile.name = first;     // greet by FIRST name only
+        state.profile.lastName = last;             // optional, stored for later
+        persistNow(); return true;
+      },
+      display: (v) => [String((v && v.first) || '').trim(), String((v && v.last) || '').trim()].filter(Boolean).join(' ')
     });
     beats.push({ lines: (n) => ['Welcome to Memento, ' + (n || 'you') + '.'], pause: 700 });
     // The look is chosen at the very END of onboarding (in _finishWithName), right
@@ -710,6 +716,40 @@ const WelcomeIntro = {
       host.appendChild(selWrap); host.appendChild(err); host.appendChild(actions);
       dock.appendChild(host);
       this._wcReseat();
+      return;
+    }
+
+    // Two-field name input: first name (required) + last name (optional). The app
+    // greets people by their FIRST name only (nobody wants "Good afternoon Malik
+    // Peace" every day), so commit stores name=first, lastName=last.
+    if (spec.kind === 'name2') {
+      const host = document.createElement('div'); host.className = 'wc-name2';
+      const fields = document.createElement('div'); fields.className = 'wc-name2-fields';
+      const mk = (ph, auto, label) => {
+        const i = document.createElement('input');
+        i.type = 'text'; i.className = 'wc-name2-input'; i.placeholder = ph;
+        i.autocomplete = auto; i.setAttribute('aria-label', label);
+        i.maxLength = spec.max || 30; i.autocapitalize = 'words'; i.spellcheck = false;
+        return i;
+      };
+      const firstI = mk('First name', 'given-name', 'First name');
+      const lastI = mk('Last name (optional)', 'family-name', 'Last name, optional');
+      lastI.enterKeyHint = 'go';
+      fields.appendChild(firstI); fields.appendChild(lastI);
+      const actions = document.createElement('div'); actions.className = 'wc-actions';
+      if (canBack) actions.appendChild(mkBack());
+      const cont = document.createElement('button'); cont.type = 'button'; cont.className = 'wc-continue'; cont.textContent = 'Continue'; cont.disabled = true;
+      const sync = () => { cont.disabled = firstI.value.trim().length === 0; };
+      firstI.addEventListener('input', sync);
+      const submit = () => { const f = firstI.value.trim(); if (!f) return; this._wcCommitAnswer(beat, { first: f, last: lastI.value.trim() }, false); };
+      firstI.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); if (firstI.value.trim()) lastI.focus(); } });
+      lastI.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); submit(); } });
+      cont.addEventListener('click', submit);
+      actions.appendChild(cont);
+      host.appendChild(fields); host.appendChild(actions);
+      dock.appendChild(host);
+      this._wcReseat();
+      setTimeout(() => { try { firstI.focus({ preventScroll: true }); } catch (e) {} }, 250);
       return;
     }
 

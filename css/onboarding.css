@@ -3407,6 +3407,17 @@ html.lowfx .auth-screen__card, body.lite .auth-screen__card { background: rgba(1
   border-radius: var(--r-ctrl); padding: 13px 16px; min-height: 52px; max-height: 120px; outline: none;
 }
 .wc-composer textarea::placeholder { color: rgba(var(--ink),0.32); }
+/* Two-field name input (first + optional last), stacked, matching the composer. */
+.wc-name2 { display: flex; flex-direction: column; gap: 12px; width: 100%; opacity: 0; animation: wcRise 0.5s cubic-bezier(0.16,1,0.3,1) forwards; }
+.wc-name2-fields { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+.wc-name2-input {
+  width: 100%; font: inherit; font-size: 1.1rem; font-weight: 500; line-height: 1.4;
+  color: rgba(var(--ink),0.97); background: rgba(var(--ink),0.025); border: none;
+  border-radius: var(--r-ctrl); padding: 13px 16px; min-height: 52px; outline: none;
+  transition: background var(--t-base) ease;
+}
+.wc-name2-input::placeholder { color: rgba(var(--ink),0.32); }
+.wc-name2-input:focus { background: rgba(var(--ink),0.05); }
 .wc-dateinput {
   flex: 1; font: inherit; font-size: 1.1rem; font-weight: 500; color: rgba(var(--ink),0.97);
   background: rgba(var(--ink),0.025); border: none; border-radius: var(--r-ctrl);
