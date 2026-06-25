@@ -3542,24 +3542,26 @@ body.pre-clarity .capture-fab { display: none !important; }
      flow (absolute) so it does not pull the card up. This makes the worked-on home
      land at the exact same card/Today positions as the blank pre-Clarity home, which
      has no date. */
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashGreetingMobile {
+  /* The date floats top-right on BOTH the blank (pre-Clarity) and the worked-on
+     home, aligned with the MEMENTO lockup, out of the flow (absolute) so it never
+     pulls the card up. Same on both states so the two screens are identical. */
+  body:not(.has-custom-layout) .app.dash-v2 #dashGreetingMobile {
     position: absolute !important; top: calc(var(--safe-t, 0px) + 17px); right: 14px;
-    margin: 0 !important; z-index: 2; justify-content: flex-end;
+    margin: 0 !important; z-index: 2; display: flex !important; justify-content: flex-end;
   }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard {
     display: flex !important; flex-direction: column; justify-content: center;
     min-height: 0 !important;
     margin: 0 !important; grid-column: auto !important; grid-row: auto !important;
   }
-  /* Match the blank (pre-Clarity) home layout exactly: a tall PORTRAIT card
-     (~308 x 452) so the card + the Today box fill the screen down to the tab bar
-     with even breathing room and no empty gap (the worked-on home used to read flat
-     and squat with the card too short). */
-  /* Card height adapts to the real usable height (viewport minus the notch + home
-     indicator + tab bar), capped at 460 so it stays a tall portrait. Fixed px here
-     overflowed the Today box under the tab bar on notched iPhones. */
+  /* LOCKED to the blank (pre-Clarity) card, byte for byte: same width and the same
+     FIXED 452px height as the base mobile rule (#dayCard .daycard-ns above). The
+     worked-on home is the identical screen, just recolored + with Today's text, so
+     the card must NOT resize per device. No responsive calc here on purpose: the
+     blank uses a fixed height and fits on notched iPhones, so this does too. */
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-ns {
-    min-height: min(460px, calc(100svh - var(--safe-t, 0px) - var(--safe-b, 0px) - 372px)) !important;
+    width: min(82vw, 320px) !important;
+    min-height: 452px !important;
   }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-theme-living .daycard-living-stage { width: min(82vw, 320px) !important; margin-bottom: 0 !important; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter {
