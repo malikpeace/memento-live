@@ -3582,3 +3582,33 @@ body.pre-clarity .capture-fab { display: none !important; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashBelow #widgetGrid > .widget--full { grid-column: 1 / -1 !important; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashBelow #widgetGrid > .dash-more { display: none !important; }
 }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   v235: DESKTOP modules back on the dashboard. The atmospheric home hid every
+   module tile and pushed them into the sidebar; now mobile shows the rich module
+   cards (page 2), so desktop matches: the card hero + today + quote + the year
+   heatmap up top, then the live module cards in a grid below it. Sidebar stays as
+   quick nav. Desktop only (>=1024px).
+   ════════════════════════════════════════════════════════════════════════════ */
+@media (min-width: 1024px) {
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #widgetGrid {
+    display: grid !important;
+    grid-column: 1 / -1; grid-row: 5;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 10px;
+    background: none !important; box-shadow: none !important; border: 0 !important;
+    padding: 0 !important; max-width: none !important;
+    -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+  }
+  /* un-hide the rendered module cards (overrides the atmospheric hide list) and let
+     them flow in the 3-col grid; full-width heroes span all three. */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #widgetGrid > .widget[data-area] {
+    display: block !important;
+    grid-column: auto !important; grid-row: auto !important;
+    aspect-ratio: auto !important; min-height: 168px;
+    margin: 0 !important;
+  }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #widgetGrid > .widget--full { grid-column: 1 / -1 !important; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #widgetGrid > .dash-more { display: none !important; }
+}
