@@ -3535,14 +3535,16 @@ body.pre-clarity .capture-fab { display: none !important; }
   /* PAGE 1 snaps at the TOP (the brand row), so the MEMENTO lockup stays visible
      and you can rest at the very top. The card + Today flow below it. */
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .dash-header {
-    margin-bottom: 6px !important;
+    margin-bottom: 10px !important;
     scroll-snap-align: start; scroll-snap-stop: always;
   }
-  /* the date rides up onto the brand row (top-right), aligned with the MEMENTO
-     lockup; it does not take flow space (negative bottom margin) so the card
-     below is not pushed down. */
+  /* The date sits top-right, aligned with the MEMENTO lockup, taken OUT of the
+     flow (absolute) so it does not pull the card up. This makes the worked-on home
+     land at the exact same card/Today positions as the blank pre-Clarity home, which
+     has no date. */
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashGreetingMobile {
-    margin: -34px 2px -22px !important;
+    position: absolute !important; top: calc(var(--safe-t, 0px) + 17px); right: 14px;
+    margin: 0 !important; z-index: 2; justify-content: flex-end;
   }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard {
     display: flex !important; flex-direction: column; justify-content: center;
