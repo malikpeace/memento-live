@@ -3546,12 +3546,22 @@ body.pre-clarity .capture-fab { display: none !important; }
   }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard {
     display: flex !important; flex-direction: column; justify-content: center;
-    min-height: calc(100svh - var(--safe-t, 0px) - 430px) !important;
+    min-height: 0 !important;
     margin: 0 !important; grid-column: auto !important; grid-row: auto !important;
   }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-ns { min-height: 320px !important; }
+  /* Match the blank (pre-Clarity) home layout exactly: a tall PORTRAIT card
+     (~308 x 452) so the card + the Today box fill the screen down to the tab bar
+     with even breathing room and no empty gap (the worked-on home used to read flat
+     and squat with the card too short). */
+  /* Card height adapts to the real usable height (viewport minus the notch + home
+     indicator + tab bar), capped at 460 so it stays a tall portrait. Fixed px here
+     overflowed the Today box under the tab bar on notched iPhones. */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-ns {
+    min-height: min(460px, calc(100svh - var(--safe-t, 0px) - var(--safe-b, 0px) - 372px)) !important;
+  }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-theme-living .daycard-living-stage { width: min(82vw, 320px) !important; margin-bottom: 0 !important; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter {
-    margin: 10px 0 0 !important; grid-column: auto !important; grid-row: auto !important;
+    margin: 22px 0 0 !important; grid-column: auto !important; grid-row: auto !important;
   }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-od-sub { display: none; }
 
