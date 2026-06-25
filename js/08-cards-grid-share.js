@@ -3095,7 +3095,7 @@ function renderCommandCenter() {
       if (tiny) row += '<div class="cc-od-sub" style="font-size:0.85rem;line-height:1.45;color:var(--text-mid);margin-bottom:6px;"><span style="color:var(--text-lo);">Minimum: </span>' + esc(tiny) + '</div>';
       if (how) row += '<div class="cc-od-sub" style="font-size:0.85rem;line-height:1.45;color:var(--text-mid);"><span style="color:var(--text-lo);">If resistance hits: </span>' + esc(how) + '</div>';
       // ---- the daily loop (lives only in Today) --------------------------------
-      row += '<div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--hairline);">';
+      row += '<div style="margin-top:8px;padding-top:6px;border-top:1px solid var(--hairline);">';
       row += '<div style="display:flex;gap:8px;flex-wrap:wrap;">';
       if (doneToday) {
         row += '<div style="flex:1;min-width:150px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;color:var(--color-consistency);background:color-mix(in srgb, var(--color-consistency) 12%, transparent);box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);border-radius:calc(8px * var(--rx, 1));padding:12px;">&#10003; Done today</div>';
