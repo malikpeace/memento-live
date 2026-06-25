@@ -172,7 +172,12 @@ const WelcomeIntro = {
     this._wcQTotal = this._wcBeatsArr.filter(b => b.input).length;
     this._wcIndex = 0;
     this._wcGen = (this._wcGen || 0) + 1;
-    setTimeout(() => this._wcWalk(this._wcGen, false), 220);
+    // Resume-on-refresh: if they left off mid-questions, replay the chat so far and
+    // drop them back on the question they were on. Falls back to a clean start if
+    // nothing is saved, nothing was answered yet, or the question set changed since.
+    if (!this._wcTryResume()) {
+      setTimeout(() => this._wcWalk(this._wcGen, false), 220);
+    }
   },
 
   // Build the ordered beats: opening line, name, birthday, then the existing
@@ -433,13 +438,50 @@ const WelcomeIntro = {
         this._setProgress(0.04 + 0.9 * (answered / Math.max(1, this._wcQTotal)));
       }
       this._wcIndex++;
+      this._wcSaveProgress();
     }
     if (gen !== this._wcGen) return;
+    this._wcClearProgress();   // question phase done; resume no longer applies
     this._wcHandoff();
   },
 
   _wcAsk(beat) {
     return new Promise((resolve) => { this._wcResolve = resolve; this._wcRenderInput(beat, resolve); });
+  },
+
+  // ---- Resume-on-refresh for the question phase --------------------------------
+  // Position + answers are saved to state after every beat, so a reload (or the
+  // PWA being killed in the background) drops the user back where they left off
+  // instead of restarting. Keyed by a signature of the question set, so changing
+  // the questions safely invalidates an old in-progress run rather than landing
+  // someone on the wrong step. Never persists/resumes in demo mode.
+  _wcSig() {
+    try { return (this._wcBeatsArr || []).map(b => (b && b.key) || '_').join('|'); }
+    catch (e) { return ''; }
+  },
+  _wcSaveProgress() {
+    try {
+      if (typeof DEMO_MODE !== 'undefined' && DEMO_MODE) return;
+      if (!state.meta) state.meta = {};
+      state.meta.onbProgress = { ans: Object.assign({}, this._wcAns), index: this._wcIndex, sig: this._wcSig() };
+      persistNow();
+    } catch (e) {}
+  },
+  _wcClearProgress() {
+    try { if (state.meta && state.meta.onbProgress) { state.meta.onbProgress = null; persistNow(); } } catch (e) {}
+  },
+  _wcTryResume() {
+    try {
+      if (typeof DEMO_MODE !== 'undefined' && DEMO_MODE) return false;
+      const p = state.meta && state.meta.onbProgress;
+      if (!p || !p.ans || typeof p.index !== 'number') return false;
+      if (p.sig !== this._wcSig()) return false;                       // questions changed since
+      if (p.index <= 0 || p.index > this._wcBeatsArr.length) return false;
+      if (!Object.keys(p.ans).length) return false;                    // nothing answered yet
+      this._wcAns = Object.assign({}, p.ans);
+      setTimeout(() => this._wcRebuild(p.index), 220);                 // replay prior chat, resume live
+      return true;
+    } catch (e) { return false; }
   },
 
   _wcActiveInput(beat) { return beat && beat.input && !(beat.skipIf && beat.skipIf(state.profile)); },
@@ -482,6 +524,7 @@ const WelcomeIntro = {
     };
     for (let i = 0; i < target; i++) {
       const beat = beats[i];
+      if (beat.skipIf && beat.skipIf(state.profile)) continue;   // don't replay skipped questions
       const lines = beat.lines ? beat.lines(n) : [];
       lines.forEach((t) => addLine(t));
       if (beat.input && this._wcAns[i] != null) addLine(this._wcAns[i], 'user');
