@@ -1174,11 +1174,15 @@ const WelcomeIntro = {
       // "I'm honestly not sure yet" is exclusive: picking it clears the rest, and
       // picking anything else clears it (you can't be sure AND not sure).
       exclusive: ["I'm honestly not sure yet"],
-      // Softer phrasing for someone still figuring it out (not 100% sure of the area);
-      // a clear goal or a rough idea gets the direct version.
-      headline: (p) => (String((p && p.clarityLevel) || '').toLowerCase().indexOf('not really') !== -1)
-        ? 'What part of your life do you think this is about?'
-        : 'What part of your life is this about?',
+      // Phrasing scales with how sure they are: still figuring it out gets the most
+      // tentative version; a rough idea gets a "pick the one you'd most want to
+      // improve" framing (they don't know 100% yet); a clear goal gets the direct one.
+      headline: (p) => {
+        const c = String((p && p.clarityLevel) || '').toLowerCase();
+        if (c.indexOf('not really') !== -1) return 'What part of your life do you think this is about?';
+        if (c.indexOf('rough') !== -1) return 'What part of your life would you most want to improve?';
+        return 'What part of your life is this about?';
+      },
       sub: 'Tap whatever fits. You can pick more than one.',
       options: ['Work & money', 'Health & fitness', 'Discipline & focus', 'A skill or craft', 'Creative work', 'Relationships', 'Mindset & Mental', "I'm honestly not sure yet"] },
     // (birthday is inserted here, after the clarity gap)
