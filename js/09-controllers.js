@@ -288,12 +288,12 @@ const WelcomeIntro = {
       'Not enough time': "Time is tight for everyone. We'll keep it to one small thing a day.",
       'Low motivation': "Motivation comes and goes. We build it so you don't have to rely on it.",
       'Self-doubt': "Self-doubt hits everyone. It gets quieter once you start stacking small wins.",
-      _multi: "That's a lot to carry. None of those are permanent though.",
+      _multi: "That's a lot... but nothing that can't be fixed!",
       _fallback: "Whatever it is, it's not permanent."
     },
     clarityLevel: {
       'Yes, I do and know exactly what it is': "Good! Knowing exactly what you want is the part most people never even reach.",
-      'I have a rough idea': "A rough idea is a real start. Memento's whole first job is making it sharp.",
+      'I have a rough idea': "A rough idea is a real start. Memento's whole first job is making it clearer.",
       "Not really... but I'm trying to figure it out": "That's honest, and normal. Finding the answer is literally step one here.",
       'No, I feel completely lost': "No worries, this is where everyone has to start. We'll help you find your one thing.",
       _fallback: "We'll get this clear. That's the first thing Memento does."
@@ -313,26 +313,26 @@ const WelcomeIntro = {
     },
     clarityBlock: {
       "Too many directions, I can't pick one": "Too many paths is its own kind of stuck. We narrow it to the one that matters most.",
-      "Scared I'll pick the wrong thing": "There is no permanent wrong pick. You can always adjust, but you cannot steer a parked car.",
-      "I've lost touch with what I care about": "That happens to a lot of people. We find the thread again, gently.",
+      "Scared I'll pick the wrong thing": "Don't worry, there is no permanent wrong pick. You can always adjust, and figure out your own path as you walk.",
+      "I've lost touch with what I care about": "Yeah, that happens to a lot of people. You're here so some part of you wants more. We'll find that spark again.",
       "I've never really stopped to figure it out": "Most people never do. Stopping to ask is already the first real step.",
       _multi: "That mix is what keeps it blurry. We pull it apart and find the one thing underneath.",
       _fallback: "Whatever is blurring it, naming it is how we start to clear it."
     },
     clarityHistory: {
-      'No, this is the first time': "Then you are in the right place to start. One honest step at a time.",
+      'No, this is the first time': "Then you are in the right place! The first step is the most important.",
       'Tried, but it faded': "It faded because nothing held it in place. That is exactly what Memento is for.",
       'I keep starting over': "Starting over is not failing, it is missing the system that makes it stick. We build that.",
       "I think I'm close, just not there": "Close is good. We close the last gap so it finally lands.",
       _fallback: "Wherever you have gotten before, we build from here."
     },
     distraction: {
-      'TikTok': "TikTok is built to keep you there. It's not weak of you, it's just very good at its job.",
-      'Instagram / Reels': "Instagram and Reels are engineered to be endless. Almost everyone loses time to it.",
+      'Short form content': "The antidote to boredom. Designed from the ground up to get you to waste as much of your life as possible.",
       'YouTube': "YouTube can eat a whole evening. The trick is using it on purpose, not by default.",
       'Porn': "That's a common one, no shame here. It's a habit like any other, and habits can shift.",
-      'Gaming': "Gaming's fun, nothing wrong with it. We just want it to be your choice, not your autopilot.",
-      'Friends / going out': "Friends matter, that's real. We just make sure they add to the life you want, not replace it.",
+      'Gaming': "Gaming is fun but we don't want it to come ahead of the things you know you should be doing.",
+      'Streaming/TV': "A whole season can vanish in a weekend. We just make sure it's not eating the time you wanted for your goal.",
+      'Unhealthy relationship(s)': "That's a heavy one, and an honest one. The right people pull you toward the life you want, not away from it.",
       'Something else': "Whatever it is, naming it is the win. You can't change a habit you won't look at.",
       _fallback: "Whatever's got a hold on you, it's beatable. We just have to see it clearly first."
     },
@@ -340,12 +340,15 @@ const WelcomeIntro = {
       _fallback: "Thanks for sharing that. It helps Memento actually understand where you're coming from."
     },
     costOfInaction: {
-      'Regret': "Regret is heavy, and it's the one thing you can still avoid from right here.",
+      'Regret': "Regret is one of the worst pains you can experience. You don't feel it now but you will later. Taking steps today can change that.",
       'Wasted potential': "Wasted potential stings the most because you know it was there. That's worth moving on.",
       'Watching everyone pass me': "Watching everyone pass you is rough. But you're not running their race, you're running yours.",
       'Letting people down': "Not wanting to let people down says a lot about you. That's a good reason to start now.",
       'Running out of time': "The time thing is real, and feeling it now is exactly why you start now.",
       "Becoming someone I don't want to be": "That's a real fear, and a good one. It means you still know who you'd rather be.",
+      "Okay, but not perfect": "Okay but not perfect is still worth closing the gap on. That's exactly what we build toward.",
+      "Alright, but I know I can get better": "If you know you can get better, that's the part worth chasing. Let's go get it.",
+      "Honestly, I'd be proud of myself": "Love that. Then this is about making a good thing even better, not fixing something broken.",
       _multi: "Let's use that as fuel to get the feedback loop started.",
       _fallback: "Hold onto that feeling. That's the fuel when motivation runs out."
     },
@@ -1223,7 +1226,7 @@ const WelcomeIntro = {
       skipIf: (p) => { const ap = String((p && p.actionProgress) || ''); return ap === 'Slow but moving' || ap === 'Actually on a roll'; } },
     { key: 'distraction', type: 'choices', multi: false,
       headline: 'What pulls your attention the most?',
-      options: ['TikTok', 'Instagram / Reels', 'YouTube', 'Porn', 'Gaming', 'Friends / going out', 'Something else'],
+      options: ['Short form content', 'YouTube', 'Porn', 'Gaming', 'Streaming/TV', 'Unhealthy relationship(s)', 'Something else'],
       // Only ask if the phone is what's pulling them back.
       skipIf: (p) => String((p && p.runningFrom) || '').indexOf('Phone & social media') === -1 },
     // ── WHY / weight: the fuel that carries them. Two framings of the same job,
@@ -1234,7 +1237,7 @@ const WelcomeIntro = {
     // roll. Exactly one of these two runs (mirrors the runningFrom skip). ─────
     { key: 'costOfInaction', type: 'choices', multi: true,
       headline: 'If a year goes by and nothing changes, what does that feel like?',
-      options: ['Regret', 'Wasted potential', 'Watching everyone pass me', 'Letting people down', 'Running out of time', "Becoming someone I don't want to be"],
+      options: ['Regret', 'Wasted potential', 'Watching everyone pass me', 'Letting people down', 'Running out of time', "Becoming someone I don't want to be", 'Okay, but not perfect', 'Alright, but I know I can get better', "Honestly, I'd be proud of myself"],
       skipIf: (p) => { const ap = String((p && p.actionProgress) || ''); return ap === 'Slow but moving' || ap === 'Actually on a roll'; } },
     { key: 'momentumWin', type: 'choices', multi: true,
       headline: 'Keep this up for a year. What does that get you?',
@@ -1691,12 +1694,12 @@ const WelcomeIntro = {
 
     var distrName = '';
     if (phone) {
-      if (has(distraction, 'tiktok')) distrName = 'TikTok';
-      else if (has(distraction, 'instagram') || has(distraction, 'reel')) distrName = 'Instagram';
+      if (has(distraction, 'short form') || has(distraction, 'shortform')) distrName = 'short form content';
       else if (has(distraction, 'youtube')) distrName = 'YouTube';
       else if (has(distraction, 'porn')) distrName = 'porn';
       else if (has(distraction, 'gaming')) distrName = 'gaming';
-      else if (has(distraction, 'friend') || has(distraction, 'going out')) distrName = 'going out';
+      else if (has(distraction, 'streaming') || has(distraction, 'tv')) distrName = 'streaming';
+      else if (has(distraction, 'relationship')) distrName = 'the wrong people';
     }
 
     // ====================================================================
