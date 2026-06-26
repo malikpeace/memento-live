@@ -183,3 +183,30 @@ body:not(.ns-bloom) .daycard-theme-living .daycard-wrap__aura {
 @media (prefers-reduced-motion: reduce) {
   .daycard-theme-living .daycard-ns__burn { animation: none; opacity: calc(var(--ring, 0) * 0.6); }
 }
+
+/* ── Mobile: keep the card from UNLOADING when it scrolls off the snap page ────
+   On the scroll-snap home, swiping to the modules page scrolls the card out of
+   view. iOS evicts heavy blur + mix-blend-mode layers off-screen to save graphics
+   memory, then re-rasterizes them on the way back, so the card blanks then pops
+   (it reads as "reloading"). The JS wander is already off on mobile (lowfx), but
+   the corner glimmer keeps animating, so the whole card is perpetually dirty and
+   can never be cached as a still bitmap. Fix: hold the glimmer static AND flatten
+   the stage onto one retained compositor layer. Now iOS rasterizes the card once
+   and composites that cached layer during the scroll instead of unloading and
+   re-blurring it. Desktop is untouched; the look is unchanged (the glimmer holds
+   at its bright phase, the glow + blur are kept in full). */
+@media (max-width: 767.98px) {
+  .daycard-theme-living .daycard-ns__burn { animation: none; opacity: calc(var(--ring, 0) * 0.72); }
+  .daycard-theme-living .daycard-living-stage {
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  /* The wander is off on mobile, so the blobs never transform; release their
+     per-layer promotion so they rasterize INTO the one retained stage layer
+     (one cacheable bitmap) instead of each demanding a layer iOS can evict. */
+  .daycard-theme-living .daycard-ns__liquid .blob,
+  .daycard-theme-living .daycard-bloom .blob,
+  .daycard-theme-living .daycard-floor .blob { will-change: auto; }
+}
