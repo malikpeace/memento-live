@@ -174,6 +174,11 @@ Final check before you send: does it sound like a real person who knows this hum
         var arr = JSON.parse(m[1].trim());
         if (Array.isArray(arr)) actions = arr.filter(function (a) { return a && a.type && a.label; }).slice(0, 2);
       } catch (e) {}
+    } else {
+      // truncated reply (hit max_tokens mid-block): the opening marker is present
+      // but <<END>> never arrived, so strip the plumbing and emit no actions
+      var open = visible.indexOf('<<MEMENTO_ACTIONS>>');
+      if (open !== -1) visible = visible.slice(0, open).trim();
     }
     return { text: visible, actions: actions };
   }
@@ -181,6 +186,9 @@ Final check before you send: does it sound like a real person who knows this hum
   async function coachTurn() {
     var c = cstate();
     var recent = c.messages.slice(-12).map(function (m) { return { role: m.role === 'coach' ? 'assistant' : 'user', content: String(m.text || '') }; });
+    // the Anthropic API requires messages[0] to be a user turn; the seeded opener
+    // is a synthetic local greeting, so drop any leading assistant turns
+    while (recent.length && recent[0].role === 'assistant') recent.shift();
     if (!recent.length) recent = [{ role: 'user', content: '(They just opened you. Open the conversation in one or two lines, in context. Do not greet generically.)' }];
     var sys = COACH_SYSTEM.replace('{{CONTEXT}}', 'WHAT IS TRUE FOR THEM RIGHT NOW:\n' + buildCoachContext());
     var reply = await callClaude(recent, sys, { model: (typeof ANTHROPIC_MODEL !== 'undefined' ? ANTHROPIC_MODEL : 'claude-haiku-4-5'), maxTokens: 600, cache: true });
@@ -191,19 +199,19 @@ Final check before you send: does it sound like a real person who knows this hum
   function applyAction(a) {
     try {
       if (a.type === 'shrink') {
-        if (state.action) { state.action.selectedTier = 'tiny'; persistNow(); }
-        _rerenderHome();
-        return 'Done. Today is the tiny version now. Just that, nothing more.';
+        var paS = (state.action && state.action.primaryAction) || {};
+        if (paS.tiers && paS.tiers.tiny) {
+          state.action.selectedTier = 'tiny'; persistNow(); _rerenderHome();
+          return 'Okay, today is just the tiny version now. That still counts.';
+        }
+        return 'Today is already about as small as it gets. Just start that part.';
       }
       if (a.type === 'mark_done') {
-        var alreadyDone = false; try { alreadyDone = (typeof actionDoneToday === 'function') ? !!actionDoneToday() : false; } catch (e) {}
-        if (!alreadyDone && typeof writeProofEvent === 'function') {
-          var pa = (state.action && state.action.primaryAction) || {};
-          var tier = (state.action && state.action.selectedTier) || pa.recommendedTier || 'moderate';
-          writeProofEvent('action-complete', { title: pa.title || 'Action completed', module: 'action', metadata: { tier: tier } });
-        }
+        // canonical idempotent credit: pushes completionHistory, writes the proof
+        // event, recalcs the streak, self-guards if already done today
+        try { if (typeof creditTodayAction === 'function') creditTodayAction(); } catch (e) {}
         _rerenderHome();
-        return 'Logged. That is one more day on the board.';
+        return 'That is one more day on the board. Nice.';
       }
       if (a.type === 'set_tomorrow') {
         var txt = String(a.value || '').trim();
@@ -213,17 +221,19 @@ Final check before you send: does it sound like a real person who knows this hum
           state.action.tomorrowPlan = { date: iso, text: txt };
           persistNow(); _rerenderHome();
         }
-        return 'Set for tomorrow. It will be waiting on your card.';
+        return 'Okay, that is queued for tomorrow. It will be waiting on your card.';
       }
       if (a.type === 'reflect') {
         var rtxt = String(a.value || '').trim();
         if (rtxt) {
           var c = cstate(); if (!Array.isArray(c.reflections)) c.reflections = [];
-          c.reflections.push({ text: rtxt, day: todayISO() });
-          if (c.reflections.length > 40) c.reflections = c.reflections.slice(-40);
-          persistNow();
+          if (!c.reflections.some(function (r) { return r && r.text === rtxt; })) {
+            c.reflections.push({ text: rtxt, day: todayISO() });
+            if (c.reflections.length > 40) c.reflections = c.reflections.slice(-40);
+            persistNow();
+          }
         }
-        return 'Saved. I will hold onto that one.';
+        return 'Good one to keep. It is saved with the rest.';
       }
       if (a.type === 'open_action') {
         close();
@@ -245,7 +255,23 @@ Final check before you send: does it sound like a real person who knows this hum
   // =========================================================================
   // UI: a full-screen glassy chat overlay
   // =========================================================================
-  var el = null, listEl = null, inputEl = null, sending = false;
+  var el = null, listEl = null, inputEl = null, sending = false, _vvHandler = null;
+
+  // iOS keyboard pin: a position:fixed sheet does NOT shrink when the soft
+  // keyboard opens, so the dock would slide up under it. Track visualViewport
+  // and shrink/translate the sheet to sit above the keyboard. Same pattern used
+  // by Clarity (js/02) and the reflection editor (js/07).
+  function _pinViewport() {
+    try {
+      var vv = window.visualViewport;
+      if (!vv || !el || !el.classList.contains('open')) return;
+      var sheet = el.querySelector('.coach-sheet'); if (!sheet) return;
+      var kbUp = (window.innerHeight - vv.height) > 90;
+      if (kbUp) { sheet.style.height = vv.height + 'px'; sheet.style.transform = 'translateY(' + (vv.offsetTop || 0) + 'px)'; }
+      else { sheet.style.height = ''; sheet.style.transform = ''; }
+      if (listEl) listEl.scrollTop = listEl.scrollHeight;
+    } catch (e) {}
+  }
 
   function ensureEl() {
     if (el) return;
@@ -289,11 +315,15 @@ Final check before you send: does it sound like a real person who knows this hum
         var btn = document.createElement('button');
         btn.className = 'coach-act';
         btn.textContent = a.label;
+        // persisted applied-state survives re-render, so an action can't be
+        // applied twice (no duplicate reflections / re-set tomorrows)
+        if (a.applied) { btn.disabled = true; btn.classList.add('is-applied'); }
         btn.addEventListener('click', function () {
-          if (btn.disabled) return;
+          if (btn.disabled || a.applied) return;
           btn.disabled = true; btn.classList.add('is-applied');
+          a.applied = true;
           var ack = applyAction(a);
-          [].slice.call(acts.querySelectorAll('.coach-act')).forEach(function (x) { x.disabled = true; });
+          try { persistNow(); } catch (e) {}
           if (ack) { pushMsg('coach', ack); render(); }
         });
         acts.appendChild(btn);
@@ -339,7 +369,7 @@ Final check before you send: does it sound like a real person who knows this hum
       maybeSummarize();
     } catch (e) {
       sending = false;
-      pushMsg('coach', 'I could not reach my head just now. Check your connection and try me again in a sec.');
+      pushMsg('coach', 'Hmm, I could not connect just now. Check your signal and try me again in a sec.');
       render();
     }
   }
@@ -349,7 +379,7 @@ Final check before you send: does it sound like a real person who knows this hum
     ensureEl();
     var c = cstate();
     if (!c.messages.length) {
-      var line = seedLine || (opener() && opener().line) || 'You showed up. That is the whole thing. What is on your mind?';
+      var line = seedLine || (opener() && opener().line) || 'Hey. What is on your mind today?';
       pushMsg('coach', line);
     }
     render();
@@ -358,6 +388,7 @@ Final check before you send: does it sound like a real person who knows this hum
     document.body.style.overflow = 'hidden';
     // mark today's opener as seen so the home nudge stands down
     try { c.openerSeenKey = openerKey(); persistNow(); } catch (e) {}
+    try { if (window.visualViewport && !_vvHandler) { _vvHandler = _pinViewport; window.visualViewport.addEventListener('resize', _vvHandler); window.visualViewport.addEventListener('scroll', _vvHandler); } } catch (e) {}
     setTimeout(function () { try { inputEl.focus(); } catch (e) {} }, 250);
   }
   function close() {
@@ -365,6 +396,7 @@ Final check before you send: does it sound like a real person who knows this hum
     el.classList.remove('open');
     el.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
+    try { if (_vvHandler && window.visualViewport) { window.visualViewport.removeEventListener('resize', _vvHandler); window.visualViewport.removeEventListener('scroll', _vvHandler); } _vvHandler = null; var sh = el.querySelector('.coach-sheet'); if (sh) { sh.style.height = ''; sh.style.transform = ''; } } catch (e) {}
     _rerenderHome();
     try { syncFab(); } catch (e) {}
   }

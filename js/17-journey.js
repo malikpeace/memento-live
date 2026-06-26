@@ -49,11 +49,12 @@
     h = String(h || '').toLowerCase();
     var mm = h.match(/\d+/); var n = mm ? parseInt(mm[0], 10) : 1;
     if (h.indexOf('today') !== -1 || h.indexOf('now') !== -1) return 0;
+    if (h.indexOf('lifelong') !== -1 || h.indexOf('forever') !== -1 || h.indexOf('someday') !== -1 || h.indexOf('eventually') !== -1 || h.indexOf('life') !== -1) return 1000;
     if (h.indexOf('week') !== -1) return 1 + n * 0.1;
     if (h.indexOf('month') !== -1) return 10 + n;
     if (h.indexOf('quarter') !== -1) return 30 + n;
     if (h.indexOf('year') !== -1) return 100 + n;
-    return 50;
+    return 90;
   }
 
   function goalText() {
@@ -74,7 +75,7 @@
       var pa = (state.action && state.action.primaryAction) || {};
       var path = Array.isArray(pa.path) ? pa.path : [];
       var goal = goalText();
-      var cs = (typeof consistencyStats === 'function') ? consistencyStats() : { current: 0, total: 0 };
+      var cs = (typeof consistencyStats === 'function') ? consistencyStats() : { current: 0, totalActiveDays: 0 };
 
       var html = '<div class="path-intro">The climb from today, up to the one thing you are actually after. Every day you show up is one step.</div>';
       html += '<div class="path-summit"><div class="path-summit__eyebrow">The summit</div><div class="path-summit__goal">' + esc2(goal || 'Your one goal') + '</div></div>';
@@ -96,7 +97,7 @@
       html += '<div class="path-node path-node--now"><span class="path-node__dot"></span><div class="path-node__c">' +
         '<div class="path-node__horizon">You are here, today</div>' +
         '<div class="path-node__title">' + esc2(pa.title || 'Your daily move') + '</div>' +
-        '<div class="path-node__bridge">' + (cs.total || 0) + ' day' + ((cs.total || 0) === 1 ? '' : 's') + ' in. This is where the climb actually happens, one move at a time.</div>' +
+        '<div class="path-node__bridge">' + (cs.totalActiveDays || 0) + ' day' + ((cs.totalActiveDays || 0) === 1 ? '' : 's') + ' in. This is where the climb actually happens, one move at a time.</div>' +
         '</div></div>';
       html += '</div>';
       body.innerHTML = html;
@@ -133,13 +134,13 @@
       var el = buildOverlay('storyOverlay', 'Your story');
       var body = document.getElementById('storyOverlayBody');
       var evs = (Array.isArray(state.proofEvents) ? state.proofEvents.slice() : []);
-      // skip purely-internal record writes from the visible story
-      evs = evs.filter(function (e) { return e && e.type !== 'new-record'; });
+      // skip internal record writes + distraction logs (this is a wins reel, not a ledger)
+      evs = evs.filter(function (e) { return e && e.type !== 'new-record' && e.type !== 'distraction-log' && e.module !== 'distraction'; });
       evs.sort(function (a, b) { return (b.ts || 0) - (a.ts || 0); });
-      var cs = (typeof consistencyStats === 'function') ? consistencyStats() : { current: 0, total: 0, longest: 0 };
+      var cs = (typeof consistencyStats === 'function') ? consistencyStats() : { current: 0, totalActiveDays: 0, longest: 0 };
 
       var html = '<div class="story-stats">' +
-        '<div class="story-stat"><div class="story-stat__n">' + (cs.total || 0) + '</div><div class="story-stat__l">days shown up</div></div>' +
+        '<div class="story-stat"><div class="story-stat__n">' + (cs.totalActiveDays || 0) + '</div><div class="story-stat__l">days shown up</div></div>' +
         '<div class="story-stat"><div class="story-stat__n">' + evs.length + '</div><div class="story-stat__l">moments logged</div></div>' +
         '<div class="story-stat"><div class="story-stat__n">' + (cs.longest || cs.current || 0) + '</div><div class="story-stat__l">best streak</div></div>' +
         '</div>';

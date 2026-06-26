@@ -1,5 +1,5 @@
 /* ===========================================================================
-   coach.css  —  The Memento Coach chat overlay. Dark, glassy, full-screen.
+   coach.css  -  The Memento Coach chat overlay. Dark, glassy, full-screen.
    =========================================================================== */
 .coach-overlay { position: fixed; inset: 0; z-index: 1200; display: none; }
 .coach-overlay.open { display: block; animation: coachFade 0.22s ease both; }
@@ -75,7 +75,7 @@
   padding: 10px 14px calc(12px + var(--safe-b, 0px));
 }
 .coach-input {
-  flex: 1 1 auto; resize: none; font: inherit; font-size: 0.96rem; line-height: 1.4;
+  flex: 1 1 auto; resize: none; font: inherit; font-size: 16px; line-height: 1.4;
   padding: 12px 15px; border-radius: 15px; border: none; outline: none;
   background: rgba(255,255,255,0.07); color: #fff; max-height: 120px;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.07);
@@ -129,3 +129,16 @@
 @keyframes coachFabPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.18); } }
 html.lowfx .coach-fab { animation: none; }
 html.lowfx .coach-fab.has-dot::after { animation: none; }
+
+/* Light mode: a faithful bright surface (same sharpness + glass logic). */
+html.theme-light .coach-overlay::before { background: linear-gradient(180deg, #f4f3f7 0%, #eceaf2 100%); }
+html.theme-light .coach-overlay::after { background: radial-gradient(120% 70% at 15% 0%, rgba(120,86,228,0.08), transparent 60%); }
+html.theme-light .coach-head__name { color: #1a1722; }
+html.theme-light .coach-head__close { background: rgba(20,16,32,0.05); color: rgba(26,23,34,0.6); }
+html.theme-light .coach-msg--coach .coach-bubble { background: rgba(20,16,40,0.05); color: #1f1b2b; box-shadow: inset 0 1px 0 rgba(255,255,255,0.5); }
+html.theme-light .coach-msg--user .coach-bubble { color: #fff; }
+html.theme-light .coach-act { background: rgba(120,86,228,0.12); color: #5a3fc0; }
+html.theme-light .coach-typing span { background: rgba(26,23,34,0.45); }
+html.theme-light .coach-input { background: rgba(20,16,40,0.05); color: #1a1722; box-shadow: inset 0 1px 0 rgba(255,255,255,0.5); }
+html.theme-light .coach-input::placeholder { color: rgba(26,23,34,0.4); }
+html.theme-light .coach-send { background: #1a1722; color: #fff; }
