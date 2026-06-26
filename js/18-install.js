@@ -88,7 +88,7 @@
       '<div class="pwa-install__sheet" role="dialog" aria-label="Add Memento to your home screen">' +
         '<span class="pwa-install__mark">' + markSvg() + '</span>' +
         '<div class="pwa-install__title">Add Memento to your Home Screen</div>' +
-        '<div class="pwa-install__sub">Memento is built to live on your home screen. I highly recommend adding it for a significantly better experience. Follow the instructions below to turn it into a real app.</div>' +
+        '<div class="pwa-install__sub">Memento is built to live on your home screen. I <b>highly recommend</b> adding it for a significantly better experience. Follow the instructions below to turn it into a real app.</div>' +
         body +
         '<button class="pwa-install__skip" data-close="1" type="button">Continue in browser for now</button>' +
       '</div>';

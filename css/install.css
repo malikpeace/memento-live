@@ -35,6 +35,7 @@
 
 .pwa-install__title { font-size: 1.16rem; font-weight: 700; color: #fff; letter-spacing: -0.01em; margin-bottom: 8px; }
 .pwa-install__sub { font-size: 0.9rem; line-height: 1.5; color: rgba(232, 234, 248, 0.62); margin: 0 auto 20px; max-width: 25ch; }
+.pwa-install__sub b { font-weight: 700; color: rgba(255, 255, 255, 0.94); }
 
 /* iOS: two compact steps with the Share + Add glyphs */
 .pwa-install__steps { display: flex; flex-direction: column; gap: 9px; }
@@ -83,6 +84,7 @@ html.theme-light .pwa-install__sheet { background: linear-gradient(180deg, #fbfa
 html.theme-light .pwa-install__close { background: rgba(20, 16, 40, 0.05); color: rgba(26, 23, 34, 0.5); }
 html.theme-light .pwa-install__title { color: #1a1722; }
 html.theme-light .pwa-install__sub { color: rgba(34, 30, 48, 0.6); }
+html.theme-light .pwa-install__sub b { color: #1a1722; }
 html.theme-light .pwa-install__step { background: rgba(20, 16, 40, 0.045); color: #25212f; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6); }
 html.theme-light .pwa-install__step b { color: #1a1722; }
 html.theme-light .pwa-install__num { color: #5a3fc0; background: rgba(120, 86, 228, 0.13); }
