@@ -304,7 +304,7 @@ const WelcomeIntro = {
       _fallback: "We'll get this clear. That's the first thing Memento does."
     },
     actionKnow: {
-      "Yes, I know the actions to get there": "Knowing the actions is half of it. Doing them day after day is what we build here.",
+      "Yes, I know the actions to get there": "Great! We'll confirm them and make sure they're completed day after day.",
       "Sort of, not sure it's right": "Not being sure is fine. We'll sharpen the steps so they actually feel right.",
       "No, I don't know the steps": "Not knowing the steps is normal. Finding them is exactly what we're here to do.",
       _fallback: "Either way, we'll get the steps clear so doing becomes the easy part."
@@ -313,7 +313,7 @@ const WelcomeIntro = {
       "Haven't really started": "Not starting yet is okay. The first small move is the hardest, and we make it tiny.",
       'Started, then stalled': "Stalling happens to everyone. It usually means the next step got too big, not that you failed.",
       'Slow but moving': "Slow but moving still counts. Slow and consistent beats fast and gone every time.",
-      'Actually on a roll': "Good! Consistency is the most important ingredient. Now we just protect that momentum so it doesn't slip.",
+      'Actually on a roll': "Good! Consistency is the most important ingredient. Now we just need to keep that momentum.",
       _fallback: "Wherever you're at is fine. We build from here, one small step at a time."
     },
     clarityBlock: {
@@ -365,7 +365,7 @@ const WelcomeIntro = {
       'Fulfillment and Peace': "Peace comes from knowing you're actually moving, not from standing still. This is how you earn it.",
       "Memories I'll look back at": "A year from now you'll have the receipts. The days you showed up become the story you get to tell.",
       'Other': "Whatever it is for you, it gets built one ordinary day at a time. This is how you stack them.",
-      _multi3: "That's a lot to build toward. Keep showing up and a year from now it's not a wish, it's your life.",
+      _multi3: "Keep that in mind as you continue. Remembering why you started is great fuel. We'll make sure you get there.",
       _multi2: "Both of those are on the table. Keep the momentum and a year from now they're just real.",
       _multi: "All of that is within reach. Momentum is how you get there.",
       _fallback: "Hold onto that. That's the pull that keeps you going when motivation dips."
