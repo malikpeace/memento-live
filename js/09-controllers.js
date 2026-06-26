@@ -333,7 +333,7 @@ const WelcomeIntro = {
     },
     distraction: {
       'Short form content': "The antidote to boredom. Designed from the ground up to get you to waste as much of your life as possible.",
-      'YouTube': "YouTube can eat a whole evening. The trick is using it on purpose, not by default.",
+      'YouTube': "Yeah, YouTube can be tricky. It's extremely useful but can kill your day if you're not careful.",
       'Porn': "That's a common one, no shame here. It's a habit like any other, and habits can shift.",
       'Gaming': "Gaming is fun but we don't want it to come ahead of the things you know you should be doing.",
       'Streaming/TV': "A whole season can vanish in a weekend. We just make sure it's not eating the time you wanted for your goal.",
