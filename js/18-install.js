@@ -18,7 +18,7 @@
 
   // Capture the Android/Chrome install opportunity as early as possible.
   window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferredPrompt = e; });
-  window.addEventListener('appinstalled', function () { try { localStorage.setItem(DISMISS_KEY, '1'); } catch (e) {} hide(false); });
+  window.addEventListener('appinstalled', function () { hide(); });
 
   function isStandalone() {
     try { return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true; } catch (e) { return false; }
@@ -84,60 +84,64 @@
         '</div>'
       : '<button class="pwa-install__btn" id="pwaInstallBtn">Install Memento</button>';
     el.innerHTML =
-      '<div class="pwa-install__scrim" data-close="1"></div>' +
+      '<div class="pwa-install__scrim"></div>' +
       '<div class="pwa-install__sheet" role="dialog" aria-label="Add Memento to your home screen">' +
-        '<button class="pwa-install__close" data-close="1" aria-label="Close">&#10005;</button>' +
         '<span class="pwa-install__mark">' + markSvg() + '</span>' +
         '<div class="pwa-install__title">Add Memento to your Home Screen</div>' +
-        '<div class="pwa-install__sub">For the full app: full screen, and daily reminders.</div>' +
+        '<div class="pwa-install__sub">Memento is built to live on your home screen, full screen, instant, with reminders. Add it to get the real app.</div>' +
         body +
+        '<button class="pwa-install__skip" data-close="1" type="button">Continue in browser for now</button>' +
       '</div>';
     document.body.appendChild(el);
     el.addEventListener('click', function (e) {
       var t = e.target;
-      while (t && t !== el) { if (t.getAttribute && t.getAttribute('data-close')) { hide(true); return; } t = t.parentNode; }
+      while (t && t !== el) { if (t.getAttribute && t.getAttribute('data-close')) { hide(); return; } t = t.parentNode; }
     });
     var ib = el.querySelector('#pwaInstallBtn');
     if (ib) ib.addEventListener('click', androidInstall);
   }
 
   function androidInstall() {
-    if (!deferredPrompt) { hide(true); return; }
+    if (!deferredPrompt) { hide(); return; }
     try {
       deferredPrompt.prompt();
-      deferredPrompt.userChoice.then(function (c) {
-        try { if (c && c.outcome === 'accepted') localStorage.setItem(DISMISS_KEY, '1'); } catch (e) {}
-        deferredPrompt = null; hide(false);
-      }).catch(function () { hide(false); });
-    } catch (e) { hide(false); }
+      deferredPrompt.userChoice.then(function () { deferredPrompt = null; hide(); }).catch(function () { hide(); });
+    } catch (e) { hide(); }
   }
 
   function show() {
     build(); shown = true;
     requestAnimationFrame(function () { el.classList.add('is-open'); el.setAttribute('aria-hidden', 'false'); });
   }
-  function hide(remember) {
-    if (remember) { try { localStorage.setItem(DISMISS_KEY, '1'); } catch (e) {} }
+  function hide() {
+    // intentionally does NOT remember: the prompt returns on every refresh until
+    // they actually install (then isStandalone() gates it off for good).
     if (el) { el.classList.remove('is-open'); el.setAttribute('aria-hidden', 'true'); }
   }
 
-  // Fired by the splash "Get started" / Enter button (the front-page entry),
-  // BEFORE onboarding, so a new user is told how to get the best experience up
-  // front. Skips the welcomeSeen + overlay gates on purpose (the splash is up and
-  // they have not onboarded yet) but still respects installed / mobile / dismissed
-  // / demo. The sheet's z-index (1300) sits above the splash (250) + onboarding (210).
+  // Show the wall: every load / refresh, until installed. Skips overlay + welcomeSeen
+  // on purpose (the splash is up, they may not have onboarded), and does NOT respect a
+  // prior dismissal (it is a requirement, not a one-time suggestion). Still off for the
+  // installed app, desktop, and demo. z-index 1300 sits above splash (250) + onboarding (210).
   function promptOnEntry() {
     try {
       if (shown) return;
       if (isStandalone()) return;
       if (!isMobile()) return;
-      if (dismissed()) return;
       if (typeof DEMO_MODE !== 'undefined' && DEMO_MODE) return;
       show();
     } catch (e) {}
   }
-  // full-gated show (used by the Profile button via show() directly)
   function maybeShowNow() { try { if (shouldShow()) show(); } catch (e) {} }
+
+  // Fire on EVERY page load (every refresh), a beat after boot so the splash paints first.
+  function boot() {
+    try {
+      if (typeof state === 'undefined') { setTimeout(boot, 300); return; }
+      setTimeout(promptOnEntry, 650);
+    } catch (e) {}
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 
   window.MementoInstall = { show: show, hide: hide, shouldShow: shouldShow, maybeShowNow: maybeShowNow, promptOnEntry: promptOnEntry, _isStandalone: isStandalone, _isIOS: isIOS };
 })();

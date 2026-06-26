@@ -65,6 +65,14 @@
 }
 .pwa-install__btn:active { transform: scale(0.98); }
 
+/* The one small, de-emphasized escape (returns next refresh). */
+.pwa-install__skip {
+  display: block; margin: 14px auto 0; padding: 6px 10px;
+  background: none; border: none; cursor: pointer;
+  font: inherit; font-size: 0.8rem; color: rgba(232, 234, 248, 0.34);
+}
+.pwa-install__skip:active { color: rgba(232, 234, 248, 0.6); }
+
 @media (prefers-reduced-motion: reduce) {
   .pwa-install__sheet { transition: opacity 0.2s ease; transform: none; }
 }
