@@ -1595,11 +1595,10 @@ const WelcomeIntro = {
         document.getElementById('identityNext').addEventListener('click', () => this._finishWithName());
         const maybe = document.getElementById('identityMaybe');
         if (maybe) maybe.addEventListener('click', () => this._finishWithName());
-        // Back from the paywall goes to the immediately-preceding "Solution" page,
-        // not all the way back into the congrats celebration replay (summaryStepper
-        // is step i-1, whose final screen is _showHelpPage(i-1)).
+        // Back from the paywall returns to the LAST demo page (the demo sits
+        // between the Solution page and the offer; summaryStepper is step i-1).
         const pwBack = document.getElementById('identityBack');
-        if (pwBack) pwBack.addEventListener('click', () => this._showHelpPage(i - 1));
+        if (pwBack) pwBack.addEventListener('click', () => this._showMementoDemo(i - 1, 5));
         return;
       }
     }, 250);
@@ -1982,70 +1981,226 @@ const WelcomeIntro = {
     this._onSummaryReady = null;
 
     const p = state.profile || {};
-    const s = this._summary || {};
-    const trimSentences = (text, max) => {
-      const parts = String(text || '').match(/[^.!?]+[.!?]+/g) || [String(text || '')];
-      return parts.slice(0, max).join(' ').trim();
-    };
-    const introText = trimSentences([this._solutionWantLine(p), this._solutionNeedLine(p)].filter(Boolean).join(' '), 2);
-    // The four benefits as a swipeable stepper (clearer than a long list). Each
-    // carries its own pillar accent; Clarity leads purple. Drive is the new fourth:
-    // the Vivere + Mori engines (something to build toward + your finite time).
-    const STEPS = [
-      { name: 'Clarity', accent: 'rgba(150,116,255,1)', text: 'The one goal that matters most to you, above everything else. Memento keeps every day pointed at it.' },
-      { name: 'Action', accent: 'rgba(232,194,74,1)', text: 'Your goal turned into the single highest-leverage move for today. Memento helps you focus on it and log it, so knowing turns into doing.' },
-      { name: 'Consistency', accent: 'rgba(52,211,153,1)', text: 'A visible record of the days you showed up. Real evidence you can trust on the days you doubt yourself.' },
-      { name: 'Drive', accent: 'rgba(244,138,120,1)', text: 'Two engines for your energy: something real to build toward, and the weight of your finite time. Remember to live, and remember it ends.' }
-    ];
-    const slidesHtml = STEPS.map((st, idx) =>
-      `<div class="wi-stepper__slide"><div class="wi-stepper__card">
-        <div class="wi-stepper__num" style="color:${st.accent}">0${idx + 1}</div>
-        <div class="wi-stepper__name" style="color:${st.accent}">${esc(st.name)}</div>
-        <div class="wi-stepper__text">${esc(st.text)}</div>
-      </div></div>`).join('');
-    const dotsHtml = STEPS.map((st, idx) =>
-      `<button type="button" class="wi-stepper__dot${idx === 0 ? ' is-active' : ''}" data-step="${idx}" aria-label="${esc(st.name)}"></button>`).join('');
+    // ---- personalized copy (template, built from their own answers) ----------
+    const goals = this._solGoals(p);
+    const wantIntro = goals
+      ? ('You want real movement in ' + goals + '. Not someday. This year.')
+      : 'You want your life to feel sharper than it does right now. Not someday. This year.';
+    const hook = this._solHook(p);
+    const reward = 'Picture a year from now. Same you, but you actually kept the promise. The goal moved, the days stacked up, and you have the receipts. That is not a fantasy, it is just what showing up day after day turns into.';
+    const helps = this._solHelps(p);
+    const helpsHtml = helps.map((h) =>
+      `<li class="wi-sol__help"><span class="wi-sol__help-dot" style="background:${h.accent}"></span><span class="wi-sol__help-txt">${esc(h.line)}</span></li>`).join('');
 
-    this.pageWrap.innerHTML = `<div class="welcome-intro__page-inner welcome-intro__help2">
-      <h2 class="welcome-intro__help2-title">What we're going to build</h2>
-      <p class="welcome-intro__help2-intro">${esc(introText)}</p>
-      <div class="wi-stepper">
-        <div class="wi-stepper__track" id="wiStepperTrack">${slidesHtml}</div>
-        <div class="wi-stepper__dots">${dotsHtml}</div>
-      </div>
+    this.pageWrap.innerHTML = `<div class="welcome-intro__page-inner wi-sol">
+      <div class="wi-sol__eyebrow">Here is the plan</div>
+      <h2 class="wi-sol__title">What we are going to build</h2>
+      <p class="wi-sol__want">${esc(wantIntro)}</p>
+      <p class="wi-sol__hook">${esc(hook)}</p>
+      <div class="wi-sol__reward">${esc(reward)}</div>
+      <div class="wi-sol__help-head">How Memento helps you, directly</div>
+      <ul class="wi-sol__helps">${helpsHtml}</ul>
     </div>`;
-    this.navEl.innerHTML = `<button class="welcome-intro__back-btn" id="solutionBack">←</button><button class="welcome-intro__btn welcome-intro__btn--step" id="identityNext" style="flex:1;width:auto;">Continue</button>`;
+    this.navEl.innerHTML = `<button class="welcome-intro__back-btn" id="solutionBack">←</button><button class="welcome-intro__btn welcome-intro__btn--step" id="identityNext" style="flex:1;width:auto;">See how it works</button>`;
+    // The conversation can leave the page-wrap pinned/scrolled; always open the
+    // Solution page from the top so the headline + want line land first.
+    try { this.pageWrap.classList.remove('wc-busy', 'wc-reading'); this.pageWrap.scrollTop = 0; requestAnimationFrame(() => { try { this.pageWrap.scrollTop = 0; } catch (e) {} }); } catch (e) {}
     document.getElementById('solutionBack').addEventListener('click', () => {
       const inner = this.pageWrap.querySelector('.welcome-intro__page-inner');
       if (inner) inner.classList.add('exit');
-      // Back returns to the Congrats celebration, NOT the legacy renderPage tutorial.
-      // The forward flow deliberately skips renderPage, and this.totalPages is undefined
-      // here, so the old code ran renderPage(NaN) and broke everything after it. Clean
-      // up the help-page-only artifacts; _showFirstWin re-establishes the celebration.
       this.el.classList.remove('welcome-intro--help');
       const _bc = document.getElementById('welcomeBeacon'); if (_bc) _bc.remove();
       setTimeout(() => { this._showFirstWin(stepIndex); }, 250);
     });
     document.getElementById('identityNext').addEventListener('click', () => {
-      this.el.classList.remove('welcome-intro--help');
-      this._showIdentityStep(stepIndex + 1);
+      this._showMementoDemo(stepIndex, 0);
     });
-    // Swipeable stepper: native scroll-snap does the gesture; keep the dots in
-    // sync with the swipe, and let a dot tap scroll to its step.
+  },
+
+  // ---- catered-copy helpers for the Solution page (template, no AI) ----------
+  _solGoals(p) {
     try {
-      const _track = document.getElementById('wiStepperTrack');
-      const _dots = [].slice.call(this.pageWrap.querySelectorAll('.wi-stepper__dot'));
-      if (_track && _dots.length) {
-        const _sync = () => {
-          const i = Math.round(_track.scrollLeft / Math.max(1, _track.clientWidth));
-          _dots.forEach((d, di) => d.classList.toggle('is-active', di === i));
-        };
-        _track.addEventListener('scroll', () => { window.requestAnimationFrame(_sync); }, { passive: true });
-        _dots.forEach((d, di) => d.addEventListener('click', () => {
-          _track.scrollTo({ left: di * _track.clientWidth, behavior: 'smooth' });
-        }));
-      }
+      const toward = this._phraseList(p && p.runningToward);
+      if (toward && toward.indexOf('not sure') === -1 && toward.indexOf('honestly') === -1) return toward;
     } catch (e) {}
+    return '';
+  },
+  _solHook(p) {
+    const ap = String((p && p.actionProgress) || '');
+    if (ap === 'Actually on a roll') return 'You are moving right now, and that is the rarest thing you have. Momentum does not break loud, it slips out one quiet skipped day at a time. Starting is not the job anymore. Not losing this is.';
+    if (ap === 'Slow but moving') return 'Slow but moving still counts, and it puts you ahead of almost everyone standing still. The risk is not speed. It is that slow with nothing in front of you fades, and one bad week becomes the week you quietly stopped.';
+    if (ap === 'Started, then stalled') return 'You started, so the wanting was real. Then it stalled, the way it almost always does, not because you failed but because nothing was holding it in place. Every day it stays parked, it costs a little more to come back.';
+    if (ap === "Haven't really started") return 'You have not really started yet, and that is the heaviest place to sit, because the goal just keeps following you around. Another year of meaning to ends exactly where this one did. So we make the first move small enough that you cannot talk yourself out of it.';
+    return 'Wherever you are right now is fine. We build from here, one small move at a time, until the goal stops being a wish and starts being real.';
+  },
+  _solMomentumPhrase(p) {
+    const mw = String((p && p.momentumWin) || '').toLowerCase();
+    if (mw.indexOf('younger self') !== -1) return 'making your younger self proud';
+    if (mw.indexOf('mastery') !== -1) return 'real self-mastery';
+    if (mw.indexOf('freedom') !== -1) return 'the freedom you described';
+    if (mw.indexOf('fulfillment') !== -1 || mw.indexOf('peace') !== -1) return 'fulfillment and peace';
+    if (mw.indexOf('memories') !== -1) return 'the memories you will look back on';
+    if (mw.indexOf('goals') !== -1) return 'the goals you came in for';
+    return 'a life you are proud of';
+  },
+  _solHelps(p) {
+    const CL = { clarity: 'rgba(150,116,255,1)', action: 'rgba(232,194,74,1)', consistency: 'rgba(52,211,153,1)', drive: 'rgba(244,138,120,1)' };
+    const low = (v) => String(v || '').toLowerCase();
+    const cl = low(p && p.clarityLevel), ak = low(p && p.actionKnow), ap = String((p && p.actionProgress) || ''), rf = low(p && p.runningFrom);
+    const out = [];
+    const clarityFuzzy = cl.indexOf('exactly') === -1;
+    out.push({ accent: CL.clarity, line: clarityFuzzy
+      ? 'You said the goal is still a rough idea. Clarity is the first thing we do. We pull the blur apart and get you down to the one thing that actually matters, so you are not spread thin across five.'
+      : 'Clarity comes first. One goal, named clearly enough that the next move is obvious, so you are not spread thin across five.' });
+    const actionUnsure = ak.indexOf('yes') === -1;
+    out.push({ accent: CL.action, line: actionUnsure
+      ? 'You said you do not fully know the steps. We turn the goal into one daily move, so every day you know the single thing to do. Knowing finally becomes doing, and doing is where it changes.'
+      : 'We turn the goal into one daily move, so every day you know the single highest-leverage thing to do. Knowing becomes doing.' });
+    const consGap = rf.indexOf('consist') !== -1 || rf.indexOf('procrast') !== -1 || rf.indexOf('phone') !== -1 || rf.indexOf('motivation') !== -1 || ap === 'Started, then stalled' || ap === "Haven't really started";
+    out.push({ accent: CL.consistency, line: consGap
+      ? 'You said consistency is the part that breaks down. Memento keeps the days you showed up right in front of you, with a clear way back in on the days you slip. No starting over.'
+      : 'Memento keeps the days you showed up visible, with a clear way back in on the days you slip, so it compounds instead of resetting.' });
+    out.push({ accent: CL.drive, line: 'What you are really after is ' + this._solMomentumPhrase(p) + '. So Memento gives you something to build toward, and keeps the clock honest. Your time is finite, which is exactly why today counts.' });
+    return out;
+  },
+
+  // =========================================================================
+  // THE MEMENTO DEMO: a paced, full-screen walk through the product (6 beats),
+  // each with a stylized mini-mockup of the real screen + one line. Big bottom
+  // button, swipe both ways, dots. Sits between the Solution page and the offer.
+  // =========================================================================
+  _showMementoDemo(stepIndex, beatIdx) {
+    beatIdx = beatIdx || 0;
+    this.el.classList.remove('welcome-intro--blackout');
+    this.el.classList.add('welcome-intro--help');
+    this._setStage(['purple', 'green', 'cyan'], 'help');
+    this._confettiVer = (this._confettiVer || 0) + 1;
+    const _cf = document.getElementById('welcomeConfetti'); if (_cf) _cf.remove();
+    this._hideProgressBar();
+    this.pageWrap.style.alignItems = 'center';
+    this.pageWrap.style.justifyContent = 'center';
+    this.pageWrap.style.textAlign = 'center';
+    this.navEl.style.justifyContent = 'center';
+    this.navEl.style.gap = '10px';
+
+    const BEATS = [
+      { key: 'clarity', accent: 'rgba(150,116,255,1)', headline: 'Get clear on the one goal', line: 'First we find the one goal underneath all the noise, sharp enough to act on. You stop spreading yourself thin and finally know what you are aiming at.' },
+      { key: 'action', accent: 'rgba(232,194,74,1)', headline: 'Turn it into one daily move', line: 'A big goal is paralyzing. One small move is not. Memento turns what you want into the single thing to do today, so knowing finally becomes doing.' },
+      { key: 'consistency', accent: 'rgba(52,211,153,1)', headline: 'Stack the proof', line: 'Every day you show up gets logged where you can see it. On the days you doubt yourself, the evidence is right there. You have done this before, you can do it again.' },
+      { key: 'vivere', accent: 'rgba(244,138,120,1)', headline: 'Something to build toward', line: 'Vivere holds your why where you can see it. The life you are building lives on your screen, so on the flat days you remember exactly what this is for.' },
+      { key: 'mori', accent: 'rgba(206,192,255,1)', headline: 'Your time is finite', line: 'Mori shows you the weeks you have, plainly. Not to scare you, but so today lands as one of them. Finite time is the reason showing up now matters, and the reason the promises you make to yourself are worth keeping.' },
+      { key: 'evolve', accent: 'rgba(125,200,255,1)', headline: 'It grows with you', line: 'As you change, Memento changes with you. The goal sharpens, the moves get bigger, the proof keeps stacking. It fits the person you are becoming, not just who you are today.' }
+    ];
+    const n = BEATS.length;
+    if (beatIdx >= n) { this._showIdentityStep(stepIndex + 1); return; }
+    const b = BEATS[beatIdx];
+    const isLast = beatIdx === n - 1;
+    const dots = BEATS.map((x, i) => `<span class="wi-demo__dot${i === beatIdx ? ' is-active' : ''}" data-beat="${i}" style="${i === beatIdx ? 'background:' + b.accent : ''}"></span>`).join('');
+
+    this.pageWrap.innerHTML = `<div class="welcome-intro__page-inner wi-demo" data-beat="${beatIdx}">
+      <div class="wi-demo__stage" style="--beat:${b.accent}">${this._demoMock(b.key, b.accent)}</div>
+      <div class="wi-demo__eyebrow" style="color:${b.accent}">0${beatIdx + 1} <span>of 0${n}</span></div>
+      <h2 class="wi-demo__headline">${esc(b.headline)}</h2>
+      <p class="wi-demo__line">${esc(b.line)}</p>
+      <div class="wi-demo__dots">${dots}</div>
+    </div>`;
+    this.navEl.innerHTML = `<button class="welcome-intro__back-btn" id="demoBack">←</button><button class="welcome-intro__btn welcome-intro__btn--step" id="demoNext" style="flex:1;width:auto;">${isLast ? 'This is your Memento' : 'Next'}</button>`;
+    try { this.pageWrap.classList.remove('wc-busy', 'wc-reading'); this.pageWrap.scrollTop = 0; } catch (e) {}
+
+    const go = (idx) => {
+      if (idx < 0) { this.el.classList.remove('welcome-intro--help'); this._showHelpPage(stepIndex); return; }
+      this._showMementoDemo(stepIndex, idx);
+    };
+    document.getElementById('demoNext').addEventListener('click', () => go(beatIdx + 1));
+    document.getElementById('demoBack').addEventListener('click', () => go(beatIdx - 1));
+    this.pageWrap.querySelectorAll('.wi-demo__dot').forEach((d) => d.addEventListener('click', () => {
+      const i = parseInt(d.getAttribute('data-beat'), 10); if (!isNaN(i)) go(i);
+    }));
+    // touch swipe: left advances, right goes back
+    try {
+      const stage = this.pageWrap.querySelector('.wi-demo');
+      let sx = 0, sy = 0, t0 = 0;
+      stage.addEventListener('touchstart', (e) => { const t = e.changedTouches[0]; sx = t.clientX; sy = t.clientY; t0 = Date.now(); }, { passive: true });
+      stage.addEventListener('touchend', (e) => {
+        const t = e.changedTouches[0]; const dx = t.clientX - sx; const dy = t.clientY - sy;
+        if (Date.now() - t0 < 650 && Math.abs(dx) > 46 && Math.abs(dx) > Math.abs(dy) * 1.3) {
+          if (dx < 0) go(beatIdx + 1); else go(beatIdx - 1);
+        }
+      }, { passive: true });
+    } catch (e) {}
+  },
+
+  // Stylized mini-mockups of the real Memento screens for the demo. Pure SVG so
+  // they scale and theme. Illustration, not live UI. accent = the beat color.
+  _demoMock(key, accent) {
+    const A = accent || 'rgba(150,116,255,1)';
+    if (key === 'clarity') {
+      return `<svg class="wi-mock" viewBox="0 0 240 210" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs><radialGradient id="mkClar" cx="50%" cy="40%" r="62%"><stop offset="0%" stop-color="${A}" stop-opacity="0.85"/><stop offset="52%" stop-color="${A}" stop-opacity="0.16"/><stop offset="100%" stop-color="${A}" stop-opacity="0"/></radialGradient></defs>
+        <rect x="80" y="26" width="80" height="158" rx="15" fill="rgba(255,255,255,0.055)"/>
+        <rect x="80" y="26" width="80" height="158" rx="15" fill="url(#mkClar)"/>
+        <rect x="80" y="26" width="80" height="2.2" rx="1.1" fill="rgba(255,255,255,0.16)"/>
+        <path d="M104 92 L120 108 L136 92 L136 128 L104 128 Z" fill="rgba(255,255,255,0.92)"/>
+      </svg>`;
+    }
+    if (key === 'action') {
+      return `<svg class="wi-mock" viewBox="0 0 240 210" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="44" y="44" width="152" height="122" rx="16" fill="rgba(255,255,255,0.05)"/>
+        <rect x="44" y="44" width="152" height="2.2" rx="1.1" fill="rgba(255,255,255,0.14)"/>
+        <rect x="62" y="64" width="34" height="7" rx="3.5" fill="${A}" opacity="0.85"/>
+        <rect x="62" y="82" width="116" height="9" rx="4.5" fill="rgba(255,255,255,0.82)"/>
+        <rect x="62" y="98" width="86" height="9" rx="4.5" fill="rgba(255,255,255,0.34)"/>
+        <rect x="62" y="126" width="116" height="24" rx="9" fill="${A}" opacity="0.9"/>
+        <path d="M104 138 l5 5 l10 -11" fill="none" stroke="rgba(20,16,10,0.9)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>`;
+    }
+    if (key === 'consistency') {
+      let cells = '';
+      const lit = { '1-1': .9, '2-1': .55, '0-2': .35, '1-2': .85, '2-2': .95, '3-2': .6, '1-3': .5, '2-3': .9, '3-3': .8, '4-3': .4, '2-4': .7, '3-4': .95, '4-4': .85, '5-4': .55, '3-0': .4, '4-1': .3 };
+      for (let r = 0; r < 5; r++) for (let c = 0; c < 7; c++) {
+        const k = c + '-' + r; const v = lit[k];
+        const fill = v ? `${A}` : 'rgba(255,255,255,0.10)';
+        const op = v ? v : 1;
+        cells += `<rect x="${30 + c * 26}" y="${44 + r * 26}" width="18" height="18" rx="5" fill="${fill}" opacity="${op}"/>`;
+      }
+      return `<svg class="wi-mock" viewBox="0 0 240 210" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${cells}</svg>`;
+    }
+    if (key === 'vivere') {
+      return `<svg class="wi-mock" viewBox="0 0 240 210" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+          <linearGradient id="mkV1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${A}" stop-opacity="0.75"/><stop offset="1" stop-color="rgba(150,116,255,0.55)"/></linearGradient>
+          <linearGradient id="mkV2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="rgba(52,211,153,0.6)"/><stop offset="1" stop-color="rgba(125,200,255,0.5)"/></linearGradient>
+          <linearGradient id="mkV3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="rgba(232,194,74,0.6)"/><stop offset="1" stop-color="${A}" stop-opacity="0.5"/></linearGradient>
+        </defs>
+        <rect x="46" y="40" width="84" height="86" rx="12" fill="url(#mkV1)"/>
+        <rect x="138" y="40" width="56" height="56" rx="12" fill="url(#mkV2)"/>
+        <rect x="138" y="104" width="56" height="64" rx="12" fill="url(#mkV3)"/>
+        <rect x="46" y="134" width="84" height="34" rx="12" fill="rgba(255,255,255,0.08)"/>
+        <rect x="56" y="146" width="46" height="6" rx="3" fill="rgba(255,255,255,0.5)"/>
+        <rect x="56" y="156" width="30" height="6" rx="3" fill="rgba(255,255,255,0.28)"/>
+      </svg>`;
+    }
+    if (key === 'mori') {
+      let dots = '';
+      const cols = 16, rows = 9, lived = Math.round(cols * rows * 0.34);
+      let i = 0;
+      for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+        const isNow = i === lived;
+        const fill = i < lived ? 'rgba(255,255,255,0.4)' : (isNow ? A : 'rgba(255,255,255,0.12)');
+        const rad = isNow ? 3.4 : 2.4;
+        dots += `<circle cx="${24 + c * 12.6}" cy="${40 + r * 14}" r="${rad}" fill="${fill}"${isNow ? ` opacity="1"` : ''}/>`;
+        i++;
+      }
+      return `<svg class="wi-mock" viewBox="0 0 240 210" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${dots}</svg>`;
+    }
+    // evolve: concentric rings growing out of the M mark
+    return `<svg class="wi-mock" viewBox="0 0 240 210" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle cx="120" cy="105" r="78" fill="none" stroke="${A}" stroke-width="1.5" opacity="0.14"/>
+      <circle cx="120" cy="105" r="58" fill="none" stroke="${A}" stroke-width="1.5" opacity="0.26"/>
+      <circle cx="120" cy="105" r="38" fill="none" stroke="${A}" stroke-width="1.5" opacity="0.5"/>
+      <circle cx="120" cy="105" r="20" fill="${A}" opacity="0.16"/>
+      <path d="M106 96 L120 110 L134 96 L134 122 L106 122 Z" fill="rgba(255,255,255,0.92)"/>
+    </svg>`;
   },
 
   // Lightweight confetti / fireworks burst on a canvas. Self-terminates.
