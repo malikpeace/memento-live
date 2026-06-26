@@ -1519,7 +1519,17 @@ body.lite .welcome-intro__sumstar { animation: none; }
 .welcome-intro__firstwin-eyebrow { font-size: var(--fs-xs); letter-spacing: 0.2em; font-weight: 700;
   color: #c9b8ff; margin-bottom: 14px; }
 .welcome-intro__firstwin-title { font-size: 1.95rem; font-weight: 800; color: #fff; line-height: 1.1; margin-bottom: 16px; }
-.welcome-intro__firstwin-body { font-size: 1.02rem; line-height: 1.6; color: rgba(var(--ink),0.8); }
+.welcome-intro__firstwin-body { font-size: 1.02rem; line-height: 1.55; color: rgba(var(--ink),0.8); }
+.welcome-intro__firstwin-body p { margin: 0 0 0.72em; }
+.welcome-intro__firstwin-body p:last-child { margin-bottom: 0; }
+/* Shorter phones: tighten so the longer celebration copy never clips (the screen
+   does not scroll, a tap advances it). */
+@media (max-height: 720px) {
+  .welcome-intro__firstwin-title { font-size: 1.6rem; margin-bottom: 12px; }
+  .welcome-intro__firstwin-body { font-size: 0.95rem; line-height: 1.5; }
+  .welcome-intro__firstwin-body p { margin-bottom: 0.6em; }
+  .welcome-intro__firstwin-tap { margin-top: 16px; }
+}
 /* Gentle CTA prompting the tap-to-fire-fireworks easter egg below the celebration copy. */
 .welcome-intro__firstwin-tap {
   margin-top: 22px; font-size: var(--fs-sm); letter-spacing: 0.04em;
