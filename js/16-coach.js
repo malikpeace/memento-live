@@ -208,10 +208,11 @@ Final check before you send: does it sound like a real person who knows this hum
       }
       if (a.type === 'mark_done') {
         // canonical idempotent credit: pushes completionHistory, writes the proof
-        // event, recalcs the streak, self-guards if already done today
-        try { if (typeof creditTodayAction === 'function') creditTodayAction(); } catch (e) {}
+        // event, recalcs the streak. Returns false if today was already credited.
+        var credited = false;
+        try { if (typeof creditTodayAction === 'function') credited = creditTodayAction(); } catch (e) {}
         _rerenderHome();
-        return 'That is one more day on the board. Nice.';
+        return credited ? 'That is one more day on the board. Nice.' : 'Looks like today is already marked done. You are good.';
       }
       if (a.type === 'set_tomorrow') {
         var txt = String(a.value || '').trim();

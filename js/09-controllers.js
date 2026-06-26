@@ -1239,7 +1239,7 @@ const WelcomeIntro = {
     // get there?" makes no sense, so for them we branch to the clarity questions below.
     { key: 'actionKnow', type: 'choices', multi: false,
       headline: 'Do you know what to do to get there?',
-      sub: 'The actual steps, not the dream.',
+      sub: 'The actual tangible steps, not just a rough idea.',
       options: ["Yes, I know the actions to get there", "Sort of, not sure it's right", "No, I don't know the steps"],
       skipIf: (p) => { const c = String((p && p.clarityLevel) || '').toLowerCase(); return c.indexOf('lost') !== -1 || c.indexOf('not really') !== -1; } },
     { key: 'actionProgress', type: 'choices', multi: false,
@@ -1948,73 +1948,157 @@ const WelcomeIntro = {
       // modern conversation it read as "the old onboarding loading up again"
       // (Malik). Go straight from the Congrats celebration to the personalized
       // "how Memento helps you" page.
-      this._showHelpPage(stepIndex);
+      this._showSolution(stepIndex, 0);
     });
   },
 
   // Single "How Memento helps you" page: dark, glassy, blurred (no fireworks),
   // with an animated path stepper. Replaces the old multi-card click-through.
-  _showHelpPage(stepIndex) {
-    // swap the celebration theme for the dark glass theme; kill the fireworks
-    this.el.classList.remove('welcome-intro--blackout');
-    this.el.classList.add('welcome-intro--help');
-    this._setStage(['purple', 'green', 'cyan'], 'help');   // dark cinematic mix, readable
-    this._confettiVer = (this._confettiVer || 0) + 1;
-    const oldcf = document.getElementById('welcomeConfetti'); if (oldcf) oldcf.remove();
-    this._hideProgressBar();
-    this.pageWrap.style.alignItems = 'center';
-    this.pageWrap.style.justifyContent = 'flex-start';
-    this.pageWrap.style.textAlign = 'left';
-    this.navEl.style.justifyContent = 'center';
-    this.navEl.style.gap = '10px';
-
-    // top-left beacon glare that fades in like light descending onto the page
-    if (!document.getElementById('welcomeBeacon')) {
-      const beacon = document.createElement('div');
-      beacon.id = 'welcomeBeacon'; beacon.className = 'welcome-intro__beacon'; beacon.setAttribute('aria-hidden', 'true');
-      this.el.insertBefore(beacon, this.pageWrap);
-    }
-
-    // Summary is built locally and synchronously (no AI), so it is always ready
-    // here. If _buildSummary ever threw, the templated fallbacks below cover it.
-    if (!this._summary && !this._summaryFailed) this.generateSummary();
-    this._onSummaryReady = null;
-
-    const p = state.profile || {};
-    // ---- personalized copy (template, built from their own answers) ----------
-    const goals = this._solGoals(p);
-    const wantIntro = goals
-      ? ('You want real movement in ' + goals + '. Not someday. This year.')
-      : 'You want your life to feel sharper than it does right now. Not someday. This year.';
-    const hook = this._solHook(p);
-    const reward = 'Picture a year from now. Same you, but you actually kept the promise. The goal moved, the days stacked up, and you have the receipts. That is not a fantasy, it is just what showing up day after day turns into.';
-    const helps = this._solHelps(p);
-    const helpsHtml = helps.map((h) =>
-      `<li class="wi-sol__help"><span class="wi-sol__help-dot" style="background:${h.accent}"></span><span class="wi-sol__help-txt">${esc(h.line)}</span></li>`).join('');
-
-    this.pageWrap.innerHTML = `<div class="welcome-intro__page-inner wi-sol">
-      <div class="wi-sol__eyebrow">Here is the plan</div>
-      <h2 class="wi-sol__title">What we are going to build</h2>
-      <p class="wi-sol__want">${esc(wantIntro)}</p>
-      <p class="wi-sol__hook">${esc(hook)}</p>
-      <div class="wi-sol__reward">${esc(reward)}</div>
-      <div class="wi-sol__help-head">How Memento helps you, directly</div>
-      <ul class="wi-sol__helps">${helpsHtml}</ul>
-    </div>`;
-    this.navEl.innerHTML = `<button class="welcome-intro__back-btn" id="solutionBack">←</button><button class="welcome-intro__btn welcome-intro__btn--step" id="identityNext" style="flex:1;width:auto;">See how it works</button>`;
-    // The conversation can leave the page-wrap pinned/scrolled; always open the
-    // Solution page from the top so the headline + want line land first.
-    try { this.pageWrap.classList.remove('wc-busy', 'wc-reading'); this.pageWrap.scrollTop = 0; requestAnimationFrame(() => { try { this.pageWrap.scrollTop = 0; } catch (e) {} }); } catch (e) {}
-    document.getElementById('solutionBack').addEventListener('click', () => {
+  // The Solution: the emotional WHY, as 3 paced, vertically CENTERED full-screen
+  // beats (want -> stakes -> payoff), the bridge between the first-win and the
+  // 6-beat demo. Mirrors their own answers back. No top-pin, no long paragraph.
+  _showSolution(stepIndex, beatIdx) {
+    beatIdx = (beatIdx == null) ? 0 : beatIdx;
+    // backing off the first beat returns to the first-win celebration
+    if (beatIdx < 0) {
       const inner = this.pageWrap.querySelector('.welcome-intro__page-inner');
       if (inner) inner.classList.add('exit');
       this.el.classList.remove('welcome-intro--help');
       const _bc = document.getElementById('welcomeBeacon'); if (_bc) _bc.remove();
       setTimeout(() => { this._showFirstWin(stepIndex); }, 250);
-    });
-    document.getElementById('identityNext').addEventListener('click', () => {
-      this._showMementoDemo(stepIndex, 0);
-    });
+      return;
+    }
+
+    // dark glass theme, kill the fireworks
+    this.el.classList.remove('welcome-intro--blackout');
+    this.el.classList.add('welcome-intro--help');
+    this._setStage(['purple', 'green', 'cyan'], 'help');
+    this._confettiVer = (this._confettiVer || 0) + 1;
+    const oldcf = document.getElementById('welcomeConfetti'); if (oldcf) oldcf.remove();
+    this._hideProgressBar();
+    // CENTERED, never top-pinned: equal space above AND below, never a dead void
+    this.pageWrap.style.alignItems = 'center';
+    this.pageWrap.style.justifyContent = 'center';
+    this.pageWrap.style.textAlign = 'center';
+    this.navEl.style.justifyContent = 'center';
+    this.navEl.style.gap = '10px';
+
+    if (!document.getElementById('welcomeBeacon')) {
+      const beacon = document.createElement('div');
+      beacon.id = 'welcomeBeacon'; beacon.className = 'welcome-intro__beacon'; beacon.setAttribute('aria-hidden', 'true');
+      this.el.insertBefore(beacon, this.pageWrap);
+    }
+    if (!this._summary && !this._summaryFailed) this.generateSummary();
+    this._onSummaryReady = null;
+
+    const p = state.profile || {};
+    const beats = this._solBeats(p);
+    const n = beats.length;
+    if (beatIdx >= n) { this._showMementoDemo(stepIndex, 0); return; }
+    const b = beats[beatIdx];
+    const isLast = beatIdx === n - 1;
+    const dots = beats.map((x, i) => `<span class="wi-demo__dot${i === beatIdx ? ' is-active' : ''}" data-beat="${i}" style="${i === beatIdx ? 'background:' + b.accent : ''}"></span>`).join('');
+
+    this.pageWrap.innerHTML = `<div class="welcome-intro__page-inner wi-cine" data-beat="${beatIdx}">
+      <div class="wi-cine__beam" style="--beam:${b.beam}"></div>
+      <div class="wi-demo__stage">${this._cineMock(b.key, p)}</div>
+      <div class="wi-demo__eyebrow" style="color:${b.accent}">0${beatIdx + 1} <span>of 0${n}</span></div>
+      <h2 class="wi-demo__headline">${esc(b.headline)}</h2>
+      <p class="wi-demo__line">${esc(b.line)}</p>
+      ${b.trap ? `<p class="wi-cine__trap">${esc(b.trap)}</p>` : ''}
+      <div class="wi-demo__dots">${dots}</div>
+    </div>`;
+    this.navEl.innerHTML = `<button class="welcome-intro__back-btn" id="solBack">←</button><button class="welcome-intro__btn welcome-intro__btn--step" id="solNext" style="flex:1;width:auto;">${isLast ? 'Show me how' : 'Next'}</button>`;
+    try { this.pageWrap.classList.remove('wc-busy', 'wc-reading'); this.pageWrap.scrollTop = 0; } catch (e) {}
+
+    const go = (idx) => { this._showSolution(stepIndex, idx); };
+    document.getElementById('solNext').addEventListener('click', () => go(beatIdx + 1));
+    document.getElementById('solBack').addEventListener('click', () => go(beatIdx - 1));
+    this.pageWrap.querySelectorAll('.wi-demo__dot').forEach((d) => d.addEventListener('click', () => {
+      const i = parseInt(d.getAttribute('data-beat'), 10); if (!isNaN(i)) go(i);
+    }));
+    // touch swipe: left advances, right goes back
+    try {
+      const stage = this.pageWrap.querySelector('.wi-cine');
+      let sx = 0, sy = 0, t0 = 0;
+      stage.addEventListener('touchstart', (e) => { const t = e.changedTouches[0]; sx = t.clientX; sy = t.clientY; t0 = Date.now(); }, { passive: true });
+      stage.addEventListener('touchend', (e) => {
+        const t = e.changedTouches[0]; const dx = t.clientX - sx; const dy = t.clientY - sy;
+        if (Date.now() - t0 < 650 && Math.abs(dx) > 46 && Math.abs(dx) > Math.abs(dy) * 1.3) {
+          if (dx < 0) go(beatIdx + 1); else go(beatIdx - 1);
+        }
+      }, { passive: true });
+    } catch (e) {}
+  },
+
+  // the 3 "why" beats, every line templated from their own answers (no AI)
+  _solBeats(p) {
+    const ap = String((p && p.actionProgress) || '');
+    const goals = this._solGoals(p);
+    const wantHead = goals ? 'Here is what you came for.' : 'You came here to stop drifting.';
+    const wantLine = goals ? 'Real movement, not someday. This year.' : 'A life sharper than it feels right now. This year, not someday.';
+    let stHead, stLine;
+    if (ap === 'Actually on a roll') { stHead = 'You are moving right now.'; stLine = 'Momentum never breaks loud. It slips out one quiet skipped day at a time.'; }
+    else if (ap === 'Slow but moving') { stHead = 'Slow still counts.'; stLine = 'But slow with nothing in front of it fades, and one bad week becomes the week you quietly stopped.'; }
+    else if (ap === 'Started, then stalled') { stHead = 'It stalled. It always does.'; stLine = 'Not because you failed, because nothing was holding it in place. Every parked day costs more to come back.'; }
+    else if (ap === "Haven't really started") { stHead = 'Another year of meaning to.'; stLine = 'Ends exactly where this one did. The goal just keeps following you around.'; }
+    else { stHead = 'Wherever you are is fine.'; stLine = 'We build from here, one small move at a time.'; }
+    const first = (p && p.name) ? String(p.name).trim().split(/\s+/)[0] : '';
+    const payHead = first ? (first + ', a year of showing up becomes this.') : 'A year of showing up becomes this.';
+    const payLine = 'Same you, but you kept the promise, and you have the receipts for ' + this._solMomentumPhrase(p) + '.';
+    return [
+      { key: 'want', accent: 'rgba(150,116,255,1)', beam: 0.55, headline: wantHead, line: wantLine },
+      { key: 'stakes', accent: 'rgba(244,138,120,1)', beam: 0.34, headline: stHead, line: stLine, trap: this._solTrap(p) },
+      { key: 'payoff', accent: 'rgba(206,192,255,1)', beam: 0.72, headline: payHead, line: payLine }
+    ];
+  },
+  // optional one-line trap, from what they said they run from / the cost they named
+  _solTrap(p) {
+    const s = (String((p && p.runningFrom) || '') + ' ' + String((p && p.costOfInaction) || '')).toLowerCase();
+    if (s.indexOf('phone') !== -1 || s.indexOf('social') !== -1 || s.indexOf('scroll') !== -1) return 'And the phone wins by default. We make one move win first.';
+    if (s.indexOf('procrast') !== -1 || s.indexOf('later') !== -1 || s.indexOf('put off') !== -1) return 'And later keeps winning. We make today the move.';
+    if (s.indexOf('consist') !== -1 || s.indexOf('quit') !== -1 || s.indexOf('give up') !== -1) return 'And you start, then it breaks. We keep the days in front of you.';
+    if (s.indexOf('regret') !== -1 || s.indexOf('time') !== -1 || s.indexOf('stuck') !== -1 || s.indexOf('waste') !== -1) return 'One year from now should not look like this one.';
+    return '';
+  },
+  // their own "running toward" areas as compact chips (up to 4), never a run-on
+  _solChips(p) {
+    try {
+      const parts = String((p && p.runningToward) || '').split(' · ').map((s) => s.trim())
+        .filter((s) => s && s.toLowerCase().indexOf('not sure') === -1).slice(0, 4);
+      if (!parts.length) return '';
+      return '<div class="wi-cine__chips">' + parts.map((x) => `<span class="wi-cine__chip">${esc(x)}</span>`).join('') + '</div>';
+    } catch (e) { return ''; }
+  },
+  // the centered reflected motif per beat (inline SVG, demo convention)
+  _cineMock(key, p) {
+    if (key === 'want') {
+      const rings = '<svg class="wi-mock" viewBox="0 0 240 190" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+        + '<circle cx="120" cy="92" r="72" fill="none" stroke="rgba(150,116,255,0.13)" stroke-width="1.5"/>'
+        + '<circle cx="120" cy="92" r="50" fill="none" stroke="rgba(150,116,255,0.24)" stroke-width="1.5"/>'
+        + '<circle cx="120" cy="92" r="28" fill="none" stroke="rgba(150,116,255,0.42)" stroke-width="1.5"/>'
+        + '<circle cx="120" cy="92" r="14" fill="none" stroke="rgba(184,156,255,0.7)" stroke-width="1"/>'
+        + '<circle cx="120" cy="92" r="7" fill="rgba(190,164,255,1)"/></svg>';
+      return '<div class="wi-cine__wantwrap">' + rings + this._solChips(p) + '</div>';
+    }
+    if (key === 'stakes') {
+      const ap = String((p && p.actionProgress) || '');
+      const pct = ap === 'Actually on a roll' ? 82 : ap === 'Slow but moving' ? 46 : ap === 'Started, then stalled' ? 30 : ap === "Haven't really started" ? 8 : 24;
+      return `<div class="wi-cine__gaugewrap"><div class="wi-cine__gauge"><div class="wi-cine__gauge-fill" style="width:${pct}%"></div><div class="wi-cine__gauge-dot" style="left:${pct}%"></div></div></div>`;
+    }
+    // payoff: a 12-month green streak row + a single gold "now" dot (only gold used)
+    let dots = '';
+    for (let i = 0; i < 12; i++) {
+      const x = (30 + i * (180 / 11)).toFixed(1);
+      const op = (0.4 + (i / 11) * 0.55).toFixed(2);
+      dots += `<circle cx="${x}" cy="130" r="5" fill="rgba(52,211,153,${op})"/>`;
+    }
+    return '<svg class="wi-mock" viewBox="0 0 240 190" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+      + '<line x1="30" y1="130" x2="210" y2="130" stroke="rgba(255,255,255,0.10)" stroke-width="1"/>'
+      + dots
+      + '<line x1="120" y1="84" x2="120" y2="124" stroke="rgba(232,194,74,0.28)" stroke-width="1"/>'
+      + '<circle cx="120" cy="78" r="6.5" fill="rgba(232,194,74,1)"/>'
+      + '<circle cx="120" cy="78" r="12" fill="none" stroke="rgba(232,194,74,0.4)" stroke-width="1"/></svg>';
   },
 
   // ---- catered-copy helpers for the Solution page (template, no AI) ----------
@@ -2108,7 +2192,7 @@ const WelcomeIntro = {
     try { this.pageWrap.classList.remove('wc-busy', 'wc-reading'); this.pageWrap.scrollTop = 0; } catch (e) {}
 
     const go = (idx) => {
-      if (idx < 0) { this.el.classList.remove('welcome-intro--help'); this._showHelpPage(stepIndex); return; }
+      if (idx < 0) { this._showSolution(stepIndex, 2); return; }
       this._showMementoDemo(stepIndex, idx);
     };
     document.getElementById('demoNext').addEventListener('click', () => go(beatIdx + 1));

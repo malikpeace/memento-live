@@ -1608,6 +1608,25 @@ body.lite .welcome-intro__help2-step { animation: none; opacity: 1; }
 .wi-demo__dot { width: 7px; height: 7px; border-radius: 999px; background: rgba(255,255,255,0.22); cursor: pointer; transition: width 0.22s ease, background 0.22s ease; }
 .wi-demo__dot.is-active { width: 22px; background: rgba(255,255,255,0.9); }
 body.lite .wi-demo { animation: none; }
+
+/* The Solution "why" beats: paced, centered (margin:auto 0 inside the centered
+   page-wrap = balanced space top AND bottom, never top-pinned), reuses the demo
+   shell + type. A signature beam carries meaning per beat (want, drift, payoff). */
+.wi-cine { align-items: center !important; text-align: center; width: 100%; max-width: 400px; padding: 0 8px; margin: auto 0; position: relative; z-index: 1; animation: wiDemoIn 0.42s cubic-bezier(0.22,1,0.36,1) both; }
+body.lite .wi-cine { animation: none; }
+.wi-cine__beam { position: absolute; left: 50%; top: 50%; width: 46vmin; height: 82vmin; transform: translate(-50%,-52%); z-index: -1; pointer-events: none; mix-blend-mode: screen; filter: blur(26px); opacity: var(--beam, 0.55); transition: opacity 0.3s ease; background: radial-gradient(40% 60% at 50% 38%, rgba(244,236,255,0.5) 0%, rgba(198,178,255,0.26) 22%, rgba(160,164,255,0.10) 46%, transparent 72%); }
+body.lite .wi-cine__beam { filter: blur(18px); }
+.wi-cine__wantwrap { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.wi-cine__chips { display: flex; flex-wrap: wrap; gap: 7px; justify-content: center; margin-top: 16px; max-width: 300px; }
+.wi-cine__chip { font-size: 0.8rem; line-height: 1; padding: 8px 12px; border-radius: 9px; color: rgba(255,255,255,0.88); background: rgba(255,255,255,0.05); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06); }
+.wi-cine__trap { font-size: 0.83rem; line-height: 1.4; color: rgba(232,234,248,0.44); margin: -10px auto 0; max-width: 30ch; }
+.wi-cine__gaugewrap { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 184px; }
+.wi-cine__gauge { width: min(72vw,260px); height: 12px; border-radius: 999px; background: rgba(255,255,255,0.10); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06); position: relative; overflow: hidden; margin: 0 auto; }
+.wi-cine__gauge-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 999px; background: rgba(244,138,120,0.9); box-shadow: 0 0 14px rgba(244,138,120,0.5); transition: width 0.6s cubic-bezier(0.22,1,0.36,1); }
+.wi-cine__gauge-dot { position: absolute; top: 50%; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 999px; background: #fff; box-shadow: 0 0 12px rgba(244,138,120,0.85); animation: wiSolPulse 0.7s ease-out 1; }
+@keyframes wiSolPulse { 0% { transform: scale(0.4); opacity: 0; } 60% { transform: scale(1.15); opacity: 1; } 100% { transform: scale(1); } }
+body.lite .wi-cine__gauge-dot { animation: none; }
+@media (prefers-reduced-motion: reduce) { .wi-cine, .wi-cine__beam, .wi-cine__gauge-fill { animation: none; transition: none; } }
 /* Enter Memento: white button, black text. The energy ring comes from the
    standard welcome-intro__btn--orbit class (added on the button). */
 .welcome-intro__btn--enter { background: #fff !important; color: #0b0b12 !important; font-weight: 700; border: none !important; box-shadow: 0 8px 30px rgba(0,0,0,0.4); }
