@@ -4813,14 +4813,12 @@ const Splash = {
       // First time: slow fade out, then the welcome intro. The "choose your look"
       // picker now lives INSIDE the welcome, right after "Welcome to Memento", so
       // the rest of onboarding + the first blank Memento wear the chosen style.
+      // (Install + account are NOT asked here, they come after Clarity, at the
+      // Neutron Star, once the user has felt the value. See SaveMemento.)
       this.el.classList.add('splash--exiting');
-      const startOnboarding = () => { try { WelcomeIntro.open(); } catch (e) {} };
-      // Pop the install wall on this Get started tap, and HOLD onboarding (the
-      // "hello") until they tap Continue or install. If the wall does not show
-      // (already installed / desktop / demo), start onboarding on the normal timer.
-      let walled = false;
-      try { walled = !!(window.MementoInstall && window.MementoInstall.promptOnEntry && window.MementoInstall.promptOnEntry(startOnboarding)); } catch (e) {}
-      if (!walled) { setTimeout(startOnboarding, 1300); }
+      setTimeout(() => {
+        WelcomeIntro.open();
+      }, 1300);
       setTimeout(() => {
         this.el.classList.add('dismissed');
         this.stopBeams();
@@ -4830,8 +4828,7 @@ const Splash = {
         }
       }, 1800);
     } else {
-      // Returning user: pop the install wall over the dashboard (no onboarding to hold).
-      try { if (window.MementoInstall && window.MementoInstall.promptOnEntry) window.MementoInstall.promptOnEntry(); } catch (e) {}
+      // Returning user: standard exit
       this.el.classList.add('splash--exiting');
       setTimeout(() => {
         this.el.classList.add('dismissed');

@@ -1587,6 +1587,12 @@ function maybeShowBackupNudge() {
 // thing they just made. Shown once ever (state.meta.saveWorkNudged), never in demo,
 // skipped when sync is unavailable or the user is already signed in. Reuses the
 // .backup-nudge glass toast skin unchanged.
+// The "Save your Memento" moment, shown ONCE right after the Neutron Star is born
+// (the value moment). Now that they have built something, this is where we ask for
+// the free account (so nothing is ever lost + it follows them to any device, the
+// fix for the Safari -> installed-app storage gap) and offer Add to Home Screen.
+// Account-primary. Once only (state.meta.saveWorkNudged), never in demo, skipped if
+// already signed in or the account system is unavailable.
 let _saveWorkNudgeEl = null;
 function maybeShowSaveWorkNudge() {
   try {
@@ -1594,32 +1600,40 @@ function maybeShowSaveWorkNudge() {
     if (!state.meta || state.meta.saveWorkNudged) return;
     if (typeof CloudSync === 'undefined' || !CloudSync.available || !CloudSync.available()) return;
     if (CloudSync.isLoggedIn && CloudSync.isLoggedIn()) return;
-    if (_saveWorkNudgeEl || document.querySelector('.backup-nudge')) return;
+    if (_saveWorkNudgeEl || document.getElementById('saveMemento')) return;
+
+    let installed = false; try { installed = !!(window.MementoInstall && window.MementoInstall._isStandalone()); } catch (_) {}
+    const mark = '<svg viewBox="0 0 512 512" width="42" height="42" aria-hidden="true"><rect width="512" height="512" rx="118" fill="#0c0c12"/><rect x="6" y="6" width="500" height="500" rx="114" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="3"/><path d="M150 152 L256 258 L362 152 L362 360 L150 360 Z" fill="none" stroke="#f5f5f7" stroke-width="26" stroke-linejoin="round"/></svg>';
     const el = document.createElement('div');
     _saveWorkNudgeEl = el;
-    el.className = 'backup-nudge';
-    el.setAttribute('role', 'status');
+    el.id = 'saveMemento'; el.className = 'save-memento'; el.setAttribute('aria-hidden', 'true');
     el.innerHTML =
-      '<div class="backup-nudge__text">Save your work so you never lose it.' +
-        '<span>Make a free account and your Memento syncs across devices. No password.</span>' +
-      '</div>' +
-      '<button class="backup-nudge__save" type="button">Make one</button>' +
-      '<button class="backup-nudge__close" type="button" aria-label="Dismiss">&times;</button>';
+      '<div class="save-memento__scrim" data-smclose="1"></div>' +
+      '<div class="save-memento__card" role="dialog" aria-label="Save your Memento">' +
+        '<span class="save-memento__mark">' + mark + '</span>' +
+        '<div class="save-memento__title">Save your Memento</div>' +
+        '<div class="save-memento__sub">You just built something real. Make a free account so it is saved forever and follows you to any device. No password.</div>' +
+        '<button class="save-memento__account" type="button">Create your free account</button>' +
+        (installed ? '' : '<button class="save-memento__install" type="button">Add to Home Screen</button>') +
+        '<button class="save-memento__later" data-smclose="1" type="button">Maybe later</button>' +
+      '</div>';
     document.body.appendChild(el);
     // Mark shown immediately so a re-render mid-session can't double-fire.
     state.meta.saveWorkNudged = true;
     try { persistNow(); } catch (_) {}
-    const dismiss = () => {
-      el.classList.remove('is-visible');
-      setTimeout(() => { try { el.remove(); } catch (_) {} if (_saveWorkNudgeEl === el) _saveWorkNudgeEl = null; }, 300);
+    const close = () => {
+      el.classList.remove('is-open'); el.setAttribute('aria-hidden', 'true');
+      setTimeout(() => { try { el.remove(); } catch (_) {} if (_saveWorkNudgeEl === el) _saveWorkNudgeEl = null; }, 320);
     };
-    el.querySelector('.backup-nudge__save').addEventListener('click', () => {
-      try { if (CloudSync.openDialog) CloudSync.openDialog(); } catch (_) {}
-      dismiss();
+    el.addEventListener('click', (e) => {
+      let t = e.target;
+      while (t && t !== el) { if (t.getAttribute && t.getAttribute('data-smclose')) { close(); return; } t = t.parentNode; }
     });
-    el.querySelector('.backup-nudge__close').addEventListener('click', dismiss);
-    void el.offsetWidth;
-    el.classList.add('is-visible');
+    const acc = el.querySelector('.save-memento__account');
+    if (acc) acc.addEventListener('click', () => { close(); setTimeout(() => { try { if (CloudSync.openDialog) CloudSync.openDialog(); } catch (_) {} }, 280); });
+    const inst = el.querySelector('.save-memento__install');
+    if (inst) inst.addEventListener('click', () => { close(); setTimeout(() => { try { if (window.MementoInstall) window.MementoInstall.show(); } catch (_) {} }, 280); });
+    requestAnimationFrame(() => { el.classList.add('is-open'); el.setAttribute('aria-hidden', 'false'); });
   } catch (_) {}
 }
 

@@ -89,3 +89,48 @@ html.theme-light .pwa-install__step { background: rgba(20, 16, 40, 0.045); color
 html.theme-light .pwa-install__step b { color: #1a1722; }
 html.theme-light .pwa-install__num { color: #5a3fc0; background: rgba(120, 86, 228, 0.13); }
 html.theme-light .pwa-install__glyph { color: #3a6bff; background: rgba(58, 107, 255, 0.12); }
+
+/* ===========================================================================
+   "Save your Memento": the account + add-to-home-screen moment at the Neutron
+   Star reveal. Same centered glass card + materialize entrance as the install.
+   =========================================================================== */
+.save-memento { position: fixed; inset: 0; z-index: 1280; display: none; }
+.save-memento.is-open { display: flex; align-items: center; justify-content: center; padding: 24px; }
+.save-memento__scrim { position: absolute; inset: 0; background: rgba(5, 6, 10, 0.62); opacity: 0; transition: opacity 0.32s ease; }
+.save-memento.is-open .save-memento__scrim { opacity: 1; }
+.save-memento__card {
+  position: relative; width: 100%; max-width: 332px;
+  padding: 30px 26px 22px; border-radius: 22px; text-align: center;
+  background: linear-gradient(180deg, rgba(24, 24, 33, 0.98), rgba(13, 13, 19, 0.99));
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  opacity: 0; transform: translateY(10px) scale(0.94);
+  transition: opacity 0.34s ease, transform 0.46s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.save-memento.is-open .save-memento__card { opacity: 1; transform: translateY(0) scale(1); }
+.save-memento__mark { display: inline-flex; margin-bottom: 16px; filter: drop-shadow(0 8px 22px rgba(0, 0, 0, 0.5)); }
+.save-memento__mark svg { border-radius: 13px; display: block; }
+.save-memento__title { font-size: 1.22rem; font-weight: 700; color: #fff; letter-spacing: -0.01em; margin-bottom: 9px; }
+.save-memento__sub { font-size: 0.9rem; line-height: 1.5; color: rgba(232, 234, 248, 0.64); margin: 0 auto 22px; max-width: 28ch; }
+.save-memento__account {
+  width: 100%; font: inherit; font-size: 1rem; font-weight: 700; color: #fff;
+  border: none; border-radius: 14px; padding: 15px; cursor: pointer; margin-bottom: 9px;
+  background: linear-gradient(160deg, rgba(140, 108, 250, 0.97), rgba(116, 86, 228, 0.95));
+  box-shadow: 0 8px 26px rgba(70, 42, 170, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+.save-memento__account:active { transform: scale(0.98); }
+.save-memento__install {
+  width: 100%; font: inherit; font-size: 0.95rem; font-weight: 650; color: #d8d9e8;
+  border: none; border-radius: 13px; padding: 13px; cursor: pointer; margin-bottom: 2px;
+  background: rgba(255, 255, 255, 0.05); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+.save-memento__install:active { transform: scale(0.98); }
+.save-memento__later { display: block; margin: 10px auto 0; padding: 6px 10px; background: none; border: none; cursor: pointer; font: inherit; font-size: 0.82rem; color: rgba(232, 234, 248, 0.4); }
+.save-memento__later:active { color: rgba(232, 234, 248, 0.65); }
+@media (prefers-reduced-motion: reduce) { .save-memento__card { transition: opacity 0.2s ease; transform: none; } }
+
+html.theme-light .save-memento__scrim { background: rgba(20, 18, 30, 0.34); }
+html.theme-light .save-memento__card { background: linear-gradient(180deg, #fbfaff, #f1eff6); box-shadow: 0 30px 80px rgba(40, 30, 80, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.7); }
+html.theme-light .save-memento__title { color: #1a1722; }
+html.theme-light .save-memento__sub { color: rgba(34, 30, 48, 0.62); }
+html.theme-light .save-memento__install { color: #25212f; background: rgba(20, 16, 40, 0.05); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6); }
+html.theme-light .save-memento__later { color: rgba(34, 30, 48, 0.45); }
