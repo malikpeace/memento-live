@@ -4801,11 +4801,6 @@ const Splash = {
     if (!this.el || this._dismissing || this.el.classList.contains('dismissed')) return;
     this._dismissing = true;
 
-    // Front-page entry: the instant they tap Get started, nudge a non-installed
-    // mobile user to add Memento to their home screen for the best experience,
-    // before onboarding. Self-gated (installed / mobile / dismissed / demo).
-    try { if (window.MementoInstall && window.MementoInstall.promptOnEntry) window.MementoInstall.promptOnEntry(); } catch (e) {}
-
     const isReturning = state.meta.welcomeSeen;
 
     // If the user has a Neutron Star summary or Action view persisted, skip
@@ -4819,9 +4814,13 @@ const Splash = {
       // picker now lives INSIDE the welcome, right after "Welcome to Memento", so
       // the rest of onboarding + the first blank Memento wear the chosen style.
       this.el.classList.add('splash--exiting');
-      setTimeout(() => {
-        WelcomeIntro.open();
-      }, 1300);
+      const startOnboarding = () => { try { WelcomeIntro.open(); } catch (e) {} };
+      // Pop the install wall on this Get started tap, and HOLD onboarding (the
+      // "hello") until they tap Continue or install. If the wall does not show
+      // (already installed / desktop / demo), start onboarding on the normal timer.
+      let walled = false;
+      try { walled = !!(window.MementoInstall && window.MementoInstall.promptOnEntry && window.MementoInstall.promptOnEntry(startOnboarding)); } catch (e) {}
+      if (!walled) { setTimeout(startOnboarding, 1300); }
       setTimeout(() => {
         this.el.classList.add('dismissed');
         this.stopBeams();
@@ -4831,7 +4830,8 @@ const Splash = {
         }
       }, 1800);
     } else {
-      // Returning user: standard exit
+      // Returning user: pop the install wall over the dashboard (no onboarding to hold).
+      try { if (window.MementoInstall && window.MementoInstall.promptOnEntry) window.MementoInstall.promptOnEntry(); } catch (e) {}
       this.el.classList.add('splash--exiting');
       setTimeout(() => {
         this.el.classList.add('dismissed');

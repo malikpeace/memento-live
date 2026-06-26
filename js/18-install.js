@@ -113,35 +113,35 @@
     build(); shown = true;
     requestAnimationFrame(function () { el.classList.add('is-open'); el.setAttribute('aria-hidden', 'false'); });
   }
+  var _onClose = null;
   function hide() {
     // intentionally does NOT remember: the prompt returns on every refresh until
     // they actually install (then isStandalone() gates it off for good).
     if (el) { el.classList.remove('is-open'); el.setAttribute('aria-hidden', 'true'); }
+    // fire the deferred callback (e.g. start onboarding) once they continue/install
+    var cb = _onClose; _onClose = null;
+    if (cb) { try { cb(); } catch (e) {} }
   }
 
   // Show the wall: every load / refresh, until installed. Skips overlay + welcomeSeen
   // on purpose (the splash is up, they may not have onboarded), and does NOT respect a
   // prior dismissal (it is a requirement, not a one-time suggestion). Still off for the
   // installed app, desktop, and demo. z-index 1300 sits above splash (250) + onboarding (210).
-  function promptOnEntry() {
+  // Shown on the splash "Get started" tap (the front-page entry). Optional onDone
+  // is fired when the user continues or installs (used to HOLD onboarding until the
+  // wall is resolved). Returns true if the wall was shown (so the caller can defer).
+  function promptOnEntry(onDone) {
     try {
-      if (shown) return;
-      if (isStandalone()) return;
-      if (!isMobile()) return;
-      if (typeof DEMO_MODE !== 'undefined' && DEMO_MODE) return;
+      if (shown) return false;
+      if (isStandalone()) return false;
+      if (!isMobile()) return false;
+      if (typeof DEMO_MODE !== 'undefined' && DEMO_MODE) return false;
+      _onClose = (typeof onDone === 'function') ? onDone : null;
       show();
-    } catch (e) {}
+      return true;
+    } catch (e) { return false; }
   }
   function maybeShowNow() { try { if (shouldShow()) show(); } catch (e) {} }
-
-  // Fire on EVERY page load (every refresh), a beat after boot so the splash paints first.
-  function boot() {
-    try {
-      if (typeof state === 'undefined') { setTimeout(boot, 300); return; }
-      setTimeout(promptOnEntry, 650);
-    } catch (e) {}
-  }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 
   window.MementoInstall = { show: show, hide: hide, shouldShow: shouldShow, maybeShowNow: maybeShowNow, promptOnEntry: promptOnEntry, _isStandalone: isStandalone, _isIOS: isIOS };
 })();
