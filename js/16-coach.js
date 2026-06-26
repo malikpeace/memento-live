@@ -366,6 +366,7 @@ Final check before you send: does it sound like a real person who knows this hum
     el.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
     _rerenderHome();
+    try { syncFab(); } catch (e) {}
   }
 
   // ---- summarize old turns so memory stays smart but context stays cheap ----
@@ -413,5 +414,54 @@ Final check before you send: does it sound like a real person who knows this hum
     } catch (e) { return true; }
   }
 
-  window.MementoCoach = { open: open, close: close, opener: opener, openerDue: openerDue, _ctx: buildCoachContext, _setSystem: function (s) { if (s) COACH_SYSTEM = s; } };
+  // ---- a subtle floating coach button on the home (post-clarity) -----------
+  //      Fixed position, never touches the locked home layout. Hidden behind
+  //      full-screen overlays by z-index. A dot signals a proactive moment.
+  var fab = null;
+  function appBlockedLite() {
+    try {
+      var sp = document.getElementById('splash'); if (sp && !sp.classList.contains('dismissed')) return true;
+      var lg = document.getElementById('loginScreen'); if (lg && !lg.classList.contains('hidden')) return true;
+      if (document.querySelector('.welcome-intro.open')) return true;
+    } catch (e) {}
+    return false;
+  }
+  function ensureFab() {
+    if (fab) return;
+    fab = document.createElement('button');
+    fab.id = 'coachFab'; fab.className = 'coach-fab'; fab.type = 'button';
+    fab.setAttribute('aria-label', 'Talk to Memento');
+    fab.innerHTML = '<svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><path d="M6 7.5 L12 13.5 L18 7.5 L18 17.5 L6 17.5 Z" fill="#fff"/></svg>';
+    fab.addEventListener('click', function () { open(); });
+    document.body.appendChild(fab);
+  }
+  function fabShouldShow() {
+    try {
+      if (typeof state === 'undefined' || !state.meta || state.meta.welcomeSeen !== true) return false;
+      if (appBlockedLite()) return false;
+      if (el && el.classList.contains('open')) return false;
+      // home only, so it never overlaps Profile/Modules scroll content
+      if (typeof TabBar !== 'undefined' && TabBar.activeTab && TabBar.activeTab !== 'home') return false;
+      return !!(state.action && state.action.primaryAction && state.action.primaryAction.title) ||
+             !!(state.clarity && state.clarity.answers && state.clarity.answers.neutronStar);
+    } catch (e) { return false; }
+  }
+  function syncFab() {
+    try {
+      ensureFab();
+      var show = fabShouldShow();
+      fab.classList.toggle('is-on', show);
+      var o = show ? opener() : null;
+      var proactive = !!(o && (o.when === 'drift' || o.when === 'streak' || o.when === 'pending'));
+      fab.classList.toggle('has-dot', proactive);
+    } catch (e) {}
+  }
+
+  window.MementoCoach = { open: open, close: close, opener: opener, openerDue: openerDue, syncFab: syncFab, _ctx: buildCoachContext, _setSystem: function (s) { if (s) COACH_SYSTEM = s; } };
+
+  // self-init: create the FAB and keep it in sync with the current view
+  try {
+    function _coachBoot() { try { if (typeof state === 'undefined') { setTimeout(_coachBoot, 200); return; } syncFab(); setInterval(syncFab, 2500); } catch (e) {} }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', _coachBoot); else _coachBoot();
+  } catch (e) {}
 })();

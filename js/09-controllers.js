@@ -4244,6 +4244,18 @@ const TabBar = {
           <span style="display:block;font-size:0.8rem;color:var(--text-2);line-height:1.35;margin-top:2px;">Your coach. Stuck, drifting, or just need to think it through.</span>
         </span>
       </button>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+        <button type="button" id="profPathOpen" aria-label="Your path" style="display:flex;flex-direction:column;gap:8px;text-align:left;font:inherit;cursor:pointer;border:none;border-radius:calc(14px*var(--rx,1));padding:15px 15px;background:var(--kfill-04);box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);">
+          <span aria-hidden="true" style="width:30px;height:30px;border-radius:9px;background:linear-gradient(160deg,rgba(150,116,255,0.9),rgba(110,80,225,0.8));box-shadow:0 0 12px rgba(150,116,255,0.35);"></span>
+          <span style="display:block;font-size:0.92rem;font-weight:700;color:var(--text-hi);">Your path</span>
+          <span style="display:block;font-size:0.76rem;color:var(--text-2);line-height:1.3;">From today up to your goal.</span>
+        </button>
+        <button type="button" id="profStoryOpen" aria-label="Your story" style="display:flex;flex-direction:column;gap:8px;text-align:left;font:inherit;cursor:pointer;border:none;border-radius:calc(14px*var(--rx,1));padding:15px 15px;background:var(--kfill-04);box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);">
+          <span aria-hidden="true" style="width:30px;height:30px;border-radius:9px;background:linear-gradient(160deg,rgba(52,211,153,0.9),rgba(40,170,120,0.8));box-shadow:0 0 12px rgba(52,211,153,0.35);"></span>
+          <span style="display:block;font-size:0.92rem;font-weight:700;color:var(--text-hi);">Your story</span>
+          <span style="display:block;font-size:0.76rem;color:var(--text-2);line-height:1.3;">Every proof you have stacked.</span>
+        </button>
+      </div>
       <div id="prefsSection" class="prefs-card">${this.renderPreferencesSection()}</div>
       <div class="prefs-card" style="padding-top: 20px; padding-bottom: 22px;">
         <div style="${SECLABEL}">Identity</div>
@@ -4349,6 +4361,8 @@ const TabBar = {
     bindProfileField('profName', 'name');
     bindProfileField('profFullName', 'fullName');
     try { const _coachBtn = document.getElementById('profCoachOpen'); if (_coachBtn) _coachBtn.addEventListener('click', () => { try { if (typeof MementoCoach !== 'undefined') MementoCoach.open(); } catch (e) {} }); } catch (e) {}
+    try { const _pathBtn = document.getElementById('profPathOpen'); if (_pathBtn) _pathBtn.addEventListener('click', () => { try { if (typeof MementoPath !== 'undefined') MementoPath.open(); } catch (e) {} }); } catch (e) {}
+    try { const _storyBtn = document.getElementById('profStoryOpen'); if (_storyBtn) _storyBtn.addEventListener('click', () => { try { if (typeof MementoStory !== 'undefined') MementoStory.open(); } catch (e) {} }); } catch (e) {}
     // Birthday: save on change, keep Mori's birthYear in sync, refresh the
     // panel so the age label updates live.
     (function () {
