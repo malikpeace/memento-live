@@ -138,7 +138,7 @@ Final check before you send: does it sound like a real person who knows this hum
         L.push('They have not generated their action plan yet.');
       }
       var cs = (typeof consistencyStats === 'function') ? consistencyStats() : null;
-      if (cs) L.push('Consistency: ' + (cs.current || 0) + ' day streak, ' + (cs.total || 0) + ' total days shown up, personal best ' + (cs.longest || 0) + ' days.');
+      if (cs) L.push('Consistency: ' + (cs.current || 0) + ' day streak, ' + (cs.totalActiveDays || 0) + ' total days shown up, personal best ' + (cs.longest || 0) + ' days.');
       var done = false; try { done = (typeof actionDoneToday === 'function') ? !!actionDoneToday() : false; } catch (e) {}
       L.push("Today's action is " + (done ? 'already DONE.' : 'NOT done yet.'));
       var gap = coachDriftDays();
@@ -407,11 +407,14 @@ Final check before you send: does it sound like a real person who knows this hum
       var c = cstate();
       if (c.messages.length < 24) return;
       var head = c.messages.slice(0, c.messages.length - 12);
+      var summarizedCount = head.length;
       var convo = head.map(function (m) { return (m.role === 'user' ? 'Them: ' : 'You: ') + m.text; }).join('\n');
       var sys = 'Summarize this coaching conversation into 4 to 6 tight sentences a coach would keep as memory: what they are working on, what they struggle with, what has happened, any promises or decisions. Plain, no em dashes. Merge it with the existing summary if given, do not just append.';
       var msgs = [{ role: 'user', content: (c.summary ? 'EXISTING SUMMARY:\n' + c.summary + '\n\n' : '') + 'NEW CONVERSATION:\n' + convo }];
       var s = await callClaude(msgs, sys, { model: (typeof ANTHROPIC_MODEL !== 'undefined' ? ANTHROPIC_MODEL : 'claude-haiku-4-5'), maxTokens: 320, noProfile: true });
-      if (s && s.length > 20) { c.summary = s.trim(); c.messages = c.messages.slice(-12); persistNow(); }
+      // trim exactly what was summarized, not a blind tail: turns the user sent
+      // during the await must survive (they are not in the summary)
+      if (s && s.length > 20) { c.summary = s.trim(); c.messages = c.messages.slice(summarizedCount); persistNow(); }
     } catch (e) {}
   }
 

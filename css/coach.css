@@ -30,10 +30,13 @@
 }
 .coach-head__name { font-weight: 700; font-size: 1.02rem; letter-spacing: 0.01em; color: #fff; }
 .coach-head__close {
+  position: relative;
   width: 34px; height: 34px; border: none; border-radius: 10px; cursor: pointer;
   background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.7); font-size: 0.92rem;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
 }
+/* extend the tap target to 44px without growing the 34px visual */
+.coach-head__close::after { content: ''; position: absolute; inset: -5px; }
 .coach-head__close:active { transform: scale(0.94); }
 
 .coach-list {
