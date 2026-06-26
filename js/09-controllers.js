@@ -2483,6 +2483,8 @@ const WelcomeIntro = {
         overlay.remove();
         app.style.transition = '';
         app.style.filter = '';
+        // the instant the home is fully revealed, offer to install (new users).
+        try { if (window.MementoInstall && window.MementoInstall.maybeShowNow) window.MementoInstall.maybeShowNow(); } catch (e) {}
       }, 1200);
     }, 2500);
   }

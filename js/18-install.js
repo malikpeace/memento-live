@@ -39,6 +39,7 @@
       // journey, a sheet, an experience, onboarding) is open. The safest generic gate.
       if (document.body && document.body.style.overflow === 'hidden') return true;
       if (document.querySelector('.welcome-intro.open')) return true;
+      if (document.getElementById('welcomeOverlay')) return true;   // the post-Enter "Welcome to Memento" cinematic
       var sp = document.getElementById('splash'); if (sp && !sp.classList.contains('dismissed')) return true;
       var lg = document.getElementById('loginScreen'); if (lg && !lg.classList.contains('hidden')) return true;
     } catch (e) {}
@@ -136,5 +137,9 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 
   // exposed for a manual "Add to home screen" entry later + for testing
-  window.MementoInstall = { show: show, hide: hide, shouldShow: shouldShow, _isStandalone: isStandalone, _isIOS: isIOS };
+  // gated immediate show (no settle delay) - fired the instant the home reveals
+  // after a new user hits "Enter Memento"
+  function maybeShowNow() { try { if (shouldShow()) show(); } catch (e) {} }
+
+  window.MementoInstall = { show: show, hide: hide, shouldShow: shouldShow, maybeShowNow: maybeShowNow, _isStandalone: isStandalone, _isIOS: isIOS };
 })();
