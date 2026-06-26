@@ -313,7 +313,7 @@ const WelcomeIntro = {
       "Haven't really started": "Not starting yet is okay. The first small move is the hardest, and we make it tiny.",
       'Started, then stalled': "Stalling happens to everyone. It usually means the next step got too big, not that you failed.",
       'Slow but moving': "Slow but moving still counts. Slow and consistent beats fast and gone every time.",
-      'Actually on a roll': "Good! Consistency is the most important ingredient. Now we just need to keep that momentum.",
+      'Actually doing really good': "Good! Consistency is the most important ingredient. Now we just need to keep that momentum.",
       _fallback: "Wherever you're at is fine. We build from here, one small step at a time."
     },
     clarityBlock: {
@@ -1245,7 +1245,7 @@ const WelcomeIntro = {
     { key: 'actionProgress', type: 'choices', multi: false,
       headline: "How's it going so far?",
       sub: 'No judgment. Just where you actually are.',
-      options: ["Haven't really started", 'Started, then stalled', 'Slow but moving', 'Actually on a roll'],
+      options: ["Haven't really started", 'Started, then stalled', 'Slow but moving', 'Actually doing really good'],
       skipIf: (p) => { const c = String((p && p.clarityLevel) || '').toLowerCase(); return c.indexOf('lost') !== -1 || c.indexOf('not really') !== -1; } },
     // Clarity branch: shown INSTEAD of the two action questions above when they have
     // no goal yet (lost / still figuring it out). There is no "there" for them, so we
@@ -1267,7 +1267,7 @@ const WelcomeIntro = {
       headline: 'What do you think is holding you back?',
       sub: 'Be honest, this is just for you.',
       options: ['Procrastination', 'Phone & social media', "I don't know what to do", "Can't stay consistent", 'Fear of failing', 'Not enough time', 'Low motivation', 'Self-doubt'],
-      skipIf: (p) => { const ap = String((p && p.actionProgress) || ''); return ap === 'Slow but moving' || ap === 'Actually on a roll'; } },
+      skipIf: (p) => { const ap = String((p && p.actionProgress) || ''); return ap === 'Slow but moving' || ap === 'Actually doing really good'; } },
     { key: 'distraction', type: 'choices', multi: false,
       headline: 'What pulls your attention the most?',
       options: ['Short form content', 'YouTube', 'Porn', 'Gaming', 'Streaming/TV', 'Unhealthy relationship(s)', 'Something else'],
@@ -1282,13 +1282,13 @@ const WelcomeIntro = {
     { key: 'costOfInaction', type: 'choices', multi: true,
       headline: 'If a year goes by and nothing changes, what does that feel like?',
       options: ['Regret', 'Wasted potential', 'Watching everyone pass me', 'Letting people down', 'Running out of time', "Becoming someone I don't want to be", 'Okay, but not perfect', 'Alright, but I know I can get better', "Honestly, I'd be proud of myself"],
-      skipIf: (p) => { const ap = String((p && p.actionProgress) || ''); return ap === 'Slow but moving' || ap === 'Actually on a roll'; } },
+      skipIf: (p) => { const ap = String((p && p.actionProgress) || ''); return ap === 'Slow but moving' || ap === 'Actually doing really good'; } },
     { key: 'momentumWin', type: 'choices', multi: true,
       headline: 'Keep this up for a year. What does that get you?',
       options: ['Closer to my goals (eg. money, abs, relationships, etc)', 'I make my younger self proud', 'Closer to self-mastery', "I'll have true freedom", 'Fulfillment and Peace', "Memories I'll look back at", 'Other'],
-      skipIf: (p) => { const ap = String((p && p.actionProgress) || ''); return !(ap === 'Slow but moving' || ap === 'Actually on a roll'); } },
+      skipIf: (p) => { const ap = String((p && p.actionProgress) || ''); return !(ap === 'Slow but moving' || ap === 'Actually doing really good'); } },
     { key: 'letterToFutureSelf', type: 'text',
-      headline: 'Anything else Memento should know?',
+      headline: 'Anything else Memento should know about you and your goals?',
       sub: 'Totally optional. A line about you, your situation, or what you want. Or just skip it.',
       placeholder: 'Type anything, or skip' },
     { type: 'summaryStepper' }
@@ -1441,7 +1441,7 @@ const WelcomeIntro = {
         } else {
           const labelFor = (hasText) => hasText ? 'Continue' : 'Skip';
           this.pageWrap.innerHTML = `<div class="welcome-intro__page-inner welcome-intro__identity">${stepHead}
-            <textarea class="welcome-intro__identity-input" id="identityInput" aria-label="Anything else Memento should know" placeholder="${esc(step.placeholder || '')}" rows="4">${esc(existing)}</textarea></div>`;
+            <textarea class="welcome-intro__identity-input" id="identityInput" aria-label="Anything else Memento should know about you and your goals" placeholder="${esc(step.placeholder || '')}" rows="4">${esc(existing)}</textarea></div>`;
           this.navEl.innerHTML = navBack + `<button class="welcome-intro__btn welcome-intro__btn--step" id="identityNext" style="flex:1;width:auto;">${labelFor(!!String(existing).trim())}</button>`;
           const ta = document.getElementById('identityInput');
           const nextBtn = document.getElementById('identityNext');
@@ -2038,7 +2038,7 @@ const WelcomeIntro = {
     const wantHead = goals ? 'Here is what you came for.' : 'You came here to stop drifting.';
     const wantLine = goals ? 'Real movement, not someday. This year.' : 'A life sharper than it feels right now. This year, not someday.';
     let stHead, stLine;
-    if (ap === 'Actually on a roll') { stHead = 'You are moving right now.'; stLine = 'Momentum never breaks loud. It slips out one quiet skipped day at a time.'; }
+    if (ap === 'Actually doing really good') { stHead = 'You are moving right now.'; stLine = 'Momentum never breaks loud. It slips out one quiet skipped day at a time.'; }
     else if (ap === 'Slow but moving') { stHead = 'Slow still counts.'; stLine = 'But slow with nothing in front of it fades, and one bad week becomes the week you quietly stopped.'; }
     else if (ap === 'Started, then stalled') { stHead = 'It stalled. It always does.'; stLine = 'Not because you failed, because nothing was holding it in place. Every parked day costs more to come back.'; }
     else if (ap === "Haven't really started") { stHead = 'Another year of meaning to.'; stLine = 'Ends exactly where this one did. The goal just keeps following you around.'; }
@@ -2083,7 +2083,7 @@ const WelcomeIntro = {
     }
     if (key === 'stakes') {
       const ap = String((p && p.actionProgress) || '');
-      const pct = ap === 'Actually on a roll' ? 82 : ap === 'Slow but moving' ? 46 : ap === 'Started, then stalled' ? 30 : ap === "Haven't really started" ? 8 : 24;
+      const pct = ap === 'Actually doing really good' ? 82 : ap === 'Slow but moving' ? 46 : ap === 'Started, then stalled' ? 30 : ap === "Haven't really started" ? 8 : 24;
       return `<div class="wi-cine__gaugewrap"><div class="wi-cine__gauge"><div class="wi-cine__gauge-fill" style="width:${pct}%"></div><div class="wi-cine__gauge-dot" style="left:${pct}%"></div></div></div>`;
     }
     // payoff: a 12-month green streak row + a single gold "now" dot (only gold used)
@@ -2111,7 +2111,7 @@ const WelcomeIntro = {
   },
   _solHook(p) {
     const ap = String((p && p.actionProgress) || '');
-    if (ap === 'Actually on a roll') return 'You are moving right now, and that is the rarest thing you have. Momentum does not break loud, it slips out one quiet skipped day at a time. Starting is not the job anymore. Not losing this is.';
+    if (ap === 'Actually doing really good') return 'You are moving right now, and that is the rarest thing you have. Momentum does not break loud, it slips out one quiet skipped day at a time. Starting is not the job anymore. Not losing this is.';
     if (ap === 'Slow but moving') return 'Slow but moving still counts, and it puts you ahead of almost everyone standing still. The risk is not speed. It is that slow with nothing in front of you fades, and one bad week becomes the week you quietly stopped.';
     if (ap === 'Started, then stalled') return 'You started, so the wanting was real. Then it stalled, the way it almost always does, not because you failed but because nothing was holding it in place. Every day it stays parked, it costs a little more to come back.';
     if (ap === "Haven't really started") return 'You have not really started yet, and that is the heaviest place to sit, because the goal just keeps following you around. Another year of meaning to ends exactly where this one did. So we make the first move small enough that you cannot talk yourself out of it.';
