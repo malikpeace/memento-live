@@ -4342,6 +4342,14 @@ const TabBar = {
           <span style="display:block;font-size:0.76rem;color:var(--text-2);line-height:1.3;">Every proof you have stacked.</span>
         </button>
       </div>
+      ${(typeof window !== 'undefined' && window.MementoInstall && !window.MementoInstall._isStandalone()) ? `
+      <button type="button" id="profInstallApp" aria-label="Add Memento to your home screen" style="display:flex;align-items:center;gap:13px;width:100%;text-align:left;font:inherit;cursor:pointer;border:none;border-radius:calc(14px * var(--rx,1));padding:15px 16px;margin-bottom:14px;background:var(--kfill-04);box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);">
+        <span aria-hidden="true" style="width:38px;height:38px;flex:0 0 auto;border-radius:11px;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,rgba(96,132,255,0.92),rgba(70,100,220,0.86));box-shadow:0 0 16px rgba(96,132,255,0.4),inset 0 1px 0 rgba(255,255,255,0.22);"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8.5v7M8.5 12h7"/></svg></span>
+        <span style="min-width:0;">
+          <span style="display:block;font-size:0.95rem;font-weight:700;color:var(--text-hi);">Add to Home Screen</span>
+          <span style="display:block;font-size:0.8rem;color:var(--text-2);line-height:1.35;margin-top:2px;">Install Memento as a real app: full screen, instant, with reminders.</span>
+        </span>
+      </button>` : ''}
       <div id="prefsSection" class="prefs-card">${this.renderPreferencesSection()}</div>
       <div class="prefs-card" style="padding-top: 20px; padding-bottom: 22px;">
         <div style="${SECLABEL}">Identity</div>
@@ -4449,6 +4457,7 @@ const TabBar = {
     try { const _coachBtn = document.getElementById('profCoachOpen'); if (_coachBtn) _coachBtn.addEventListener('click', () => { try { if (typeof MementoCoach !== 'undefined') MementoCoach.open(); } catch (e) {} }); } catch (e) {}
     try { const _pathBtn = document.getElementById('profPathOpen'); if (_pathBtn) _pathBtn.addEventListener('click', () => { try { if (typeof MementoPath !== 'undefined') MementoPath.open(); } catch (e) {} }); } catch (e) {}
     try { const _storyBtn = document.getElementById('profStoryOpen'); if (_storyBtn) _storyBtn.addEventListener('click', () => { try { if (typeof MementoStory !== 'undefined') MementoStory.open(); } catch (e) {} }); } catch (e) {}
+    try { const _instBtn = document.getElementById('profInstallApp'); if (_instBtn) _instBtn.addEventListener('click', () => { try { if (window.MementoInstall) window.MementoInstall.show(); } catch (e) {} }); } catch (e) {}
     // Birthday: save on change, keep Mori's birthYear in sync, refresh the
     // panel so the age label updates live.
     (function () {
