@@ -1,0 +1,106 @@
+/* ===========================================================================
+   coach.css  —  The Memento Coach chat overlay. Dark, glassy, full-screen.
+   =========================================================================== */
+.coach-overlay { position: fixed; inset: 0; z-index: 1200; display: none; }
+.coach-overlay.open { display: block; animation: coachFade 0.22s ease both; }
+@keyframes coachFade { from { opacity: 0; } to { opacity: 1; } }
+.coach-overlay::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(180deg, #0c0d14 0%, #08090e 100%);
+}
+.coach-overlay::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(120% 70% at 15% 0%, rgba(150,116,255,0.10), transparent 60%);
+}
+
+.coach-sheet {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  width: 100%; max-width: 700px; margin: 0 auto;
+  padding-top: var(--safe-t, 0px);
+}
+.coach-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px 10px; flex: 0 0 auto;
+}
+.coach-head__id { display: flex; align-items: center; gap: 10px; }
+.coach-head__mark {
+  width: 24px; height: 24px; border-radius: 7px; flex: 0 0 auto;
+  background: linear-gradient(160deg, rgba(165,140,255,0.9), rgba(120,90,230,0.85));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 0 14px rgba(150,116,255,0.4);
+}
+.coach-head__name { font-weight: 700; font-size: 1.02rem; letter-spacing: 0.01em; color: #fff; }
+.coach-head__close {
+  width: 34px; height: 34px; border: none; border-radius: 10px; cursor: pointer;
+  background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.7); font-size: 0.92rem;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+}
+.coach-head__close:active { transform: scale(0.94); }
+
+.coach-list {
+  flex: 1 1 auto; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding: 10px 16px 14px; display: flex; flex-direction: column; gap: 13px;
+}
+.coach-msg { display: flex; flex-direction: column; max-width: 86%; animation: coachMsgIn 0.26s ease both; }
+@keyframes coachMsgIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.coach-msg--coach { align-self: flex-start; align-items: flex-start; }
+.coach-msg--user { align-self: flex-end; align-items: flex-end; }
+.coach-bubble { padding: 11px 15px; border-radius: 17px; font-size: 0.96rem; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word; }
+.coach-msg--coach .coach-bubble {
+  background: rgba(255,255,255,0.065); color: #f1f1f6; border-bottom-left-radius: 6px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.07);
+}
+.coach-msg--user .coach-bubble {
+  background: linear-gradient(160deg, rgba(140,108,250,0.95), rgba(116,86,228,0.92)); color: #fff;
+  border-bottom-right-radius: 6px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.14);
+}
+.coach-acts { display: flex; flex-direction: column; gap: 7px; margin-top: 9px; align-items: flex-start; width: 100%; }
+.coach-act {
+  font: inherit; font-size: 0.87rem; font-weight: 650; text-align: left;
+  padding: 10px 15px; border-radius: 12px; border: none; cursor: pointer;
+  background: rgba(150,116,255,0.16); color: #cbbcff;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.07);
+  transition: transform 0.12s ease, opacity 0.2s ease;
+}
+.coach-act:active { transform: scale(0.98); }
+.coach-act.is-applied, .coach-act:disabled { opacity: 0.45; cursor: default; }
+
+.coach-typing { display: inline-flex; gap: 4px; align-items: center; }
+.coach-typing span { width: 6px; height: 6px; border-radius: 999px; background: rgba(255,255,255,0.5); animation: coachDot 1.2s infinite ease-in-out; }
+.coach-typing span:nth-child(2) { animation-delay: 0.18s; }
+.coach-typing span:nth-child(3) { animation-delay: 0.36s; }
+@keyframes coachDot { 0%, 60%, 100% { opacity: 0.3; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-3px); } }
+
+.coach-dock {
+  display: flex; gap: 8px; align-items: flex-end; flex: 0 0 auto;
+  padding: 10px 14px calc(12px + var(--safe-b, 0px));
+}
+.coach-input {
+  flex: 1 1 auto; resize: none; font: inherit; font-size: 0.96rem; line-height: 1.4;
+  padding: 12px 15px; border-radius: 15px; border: none; outline: none;
+  background: rgba(255,255,255,0.07); color: #fff; max-height: 120px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.07);
+}
+.coach-input::placeholder { color: rgba(255,255,255,0.4); }
+.coach-send {
+  width: 46px; height: 46px; flex: 0 0 auto; border: none; border-radius: 14px; cursor: pointer;
+  background: #fff; color: #0a0a0e; font-size: 1.25rem; font-weight: 700; line-height: 1;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+.coach-send:active { transform: scale(0.95); }
+
+/* The proactive coach line on the home (taps open the chat) */
+.coach-nudge {
+  display: flex; align-items: center; gap: 11px; width: 100%; text-align: left;
+  font: inherit; cursor: pointer; border: none; margin: 0 0 14px;
+  padding: 13px 15px; border-radius: calc(14px * var(--rx, 1));
+  background: var(--kfill-04, rgba(255,255,255,0.045));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+}
+.coach-nudge__dot {
+  width: 26px; height: 26px; flex: 0 0 auto; border-radius: 8px;
+  background: linear-gradient(160deg, rgba(165,140,255,0.9), rgba(120,90,230,0.85));
+  box-shadow: 0 0 14px rgba(150,116,255,0.45);
+}
+.coach-nudge__txt { font-size: 0.9rem; line-height: 1.4; color: var(--text-hi, rgba(255,255,255,0.86)); }
+.coach-nudge__arrow { margin-left: auto; flex: 0 0 auto; color: var(--text-lo, rgba(255,255,255,0.4)); font-size: 0.9rem; }
+.coach-nudge:active { transform: scale(0.992); }

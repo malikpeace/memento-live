@@ -3441,6 +3441,8 @@ function bindCommandCenter(cc) {
     if (vivOpen) vivOpen.addEventListener('click', () => { try { if (typeof Sheet !== 'undefined' && Sheet.open) Sheet.open('vivere'); } catch (e) {} });
     const wkOpen = cc.querySelector('[data-weekly-open]');
     if (wkOpen) wkOpen.addEventListener('click', () => { try { if (typeof Sheet !== 'undefined' && Sheet.open) Sheet.open('inbox'); } catch (e) {} });
+    const coachOpen = cc.querySelector('[data-coach-open]');
+    if (coachOpen) coachOpen.addEventListener('click', () => { try { if (typeof MementoCoach !== 'undefined') MementoCoach.open(); } catch (e) {} });
   } catch (e) {}
 }
 // Daily Memento: a calm, day-stable line at the foot of the dashboard. Mirrors

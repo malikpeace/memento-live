@@ -4237,6 +4237,13 @@ const TabBar = {
         <div style="font-size: 1.25rem; font-weight: 700;">${esc(state.profile.name || 'User')}</div>
         <div style="font-size: 0.875rem; color: var(--text-2); margin-top: 4px;">${esc(state.profile.email || '')}</div>
       </div>
+      <button type="button" id="profCoachOpen" aria-label="Talk to Memento" style="display:flex;align-items:center;gap:13px;width:100%;text-align:left;font:inherit;cursor:pointer;border:none;border-radius:calc(14px * var(--rx,1));padding:15px 16px;margin-bottom:14px;background:var(--kfill-04);box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);">
+        <span aria-hidden="true" style="width:38px;height:38px;flex:0 0 auto;border-radius:11px;background:linear-gradient(160deg,rgba(165,140,255,0.92),rgba(120,90,230,0.88));box-shadow:0 0 16px rgba(150,116,255,0.42),inset 0 1px 0 rgba(255,255,255,0.25);"></span>
+        <span style="min-width:0;">
+          <span style="display:block;font-size:0.95rem;font-weight:700;color:var(--text-hi);">Talk to Memento</span>
+          <span style="display:block;font-size:0.8rem;color:var(--text-2);line-height:1.35;margin-top:2px;">Your coach. Stuck, drifting, or just need to think it through.</span>
+        </span>
+      </button>
       <div id="prefsSection" class="prefs-card">${this.renderPreferencesSection()}</div>
       <div class="prefs-card" style="padding-top: 20px; padding-bottom: 22px;">
         <div style="${SECLABEL}">Identity</div>
@@ -4341,6 +4348,7 @@ const TabBar = {
     };
     bindProfileField('profName', 'name');
     bindProfileField('profFullName', 'fullName');
+    try { const _coachBtn = document.getElementById('profCoachOpen'); if (_coachBtn) _coachBtn.addEventListener('click', () => { try { if (typeof MementoCoach !== 'undefined') MementoCoach.open(); } catch (e) {} }); } catch (e) {}
     // Birthday: save on change, keep Mori's birthYear in sync, refresh the
     // panel so the age label updates live.
     (function () {
