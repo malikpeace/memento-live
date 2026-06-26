@@ -1210,7 +1210,7 @@ const WelcomeIntro = {
     // Clarity leads (the real clarity-gap signal); the area question follows as
     // "what's it about", so the two no longer feel like the same question.
     { key: 'clarityLevel', type: 'choices', multi: false,
-      headline: 'Do you have a goal or mission you want to achieve above everything else?',
+      headline: 'Do you have a mission or goal you want to achieve above everything else?',
       options: ['Yes, I do and know exactly what it is', 'I have a rough idea', "Not really... but I'm trying to figure it out", 'No, I feel completely lost'] },
     { key: 'runningToward', type: 'choices', multi: true,
       // Skip the "what part of your life" narrowing for someone who just said they
