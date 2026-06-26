@@ -2863,7 +2863,11 @@ function creditTodayAction() {
     const doneNow = Array.isArray(h) && h.length && h[h.length - 1].date && isoToLocalDay(h[h.length - 1].date) === today;
     if (doneNow) return false;
     const pa = (state.action && state.action.primaryAction) || {};
-    const tier = pa.recommendedTier || 'moderate';
+    // log the tier the user actually committed to (a coach shrink or the Action
+    // picker sets selectedTier), not always the original recommendation
+    const _TK = ['tiny', 'light', 'moderate', 'heavy', 'extreme'];
+    const _sel = state.action && state.action.selectedTier;
+    const tier = _TK.indexOf(_sel) >= 0 ? _sel : (pa.recommendedTier || 'moderate');
     const actionText = (pa.tiers && pa.tiers[tier]) || pa.howToStart || pa.title || '';
     if (!state.action) state.action = {};
     if (!Array.isArray(state.action.completionHistory)) state.action.completionHistory = [];
@@ -2998,7 +3002,12 @@ function renderCommandCenter() {
       return wrap(cb);
     }
 
-    const oneThing = (tiers[pa.recommendedTier] || pa.title || '').trim() || 'Take one step toward your goal today';
+    // honor the user's chosen intensity (Action picker or a coach shrink), the
+    // same way the Action module does, so the home never contradicts it
+    const _TK = ['tiny', 'light', 'moderate', 'heavy', 'extreme'];
+    const _selT = state.action && state.action.selectedTier;
+    const _activeTier = _TK.indexOf(_selT) >= 0 ? _selT : pa.recommendedTier;
+    const oneThing = (tiers[_activeTier] || tiers[pa.recommendedTier] || pa.title || '').trim() || 'Take one step toward your goal today';
     const tiny = tiers.tiny || '';
     const how = pa.howToStart || pa.recommendedWhy || '';
     const todayStr = getTodayISO();

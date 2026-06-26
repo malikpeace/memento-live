@@ -65,19 +65,19 @@ html.theme-light .jrny-head__title { color: #1a1722; }
 html.theme-light .jrny-close { background: rgba(20,16,32,0.05); color: rgba(26,23,34,0.6); }
 html.theme-light .path-intro { color: rgba(34,30,48,0.66); }
 html.theme-light .path-summit { background: rgba(120,86,228,0.08); }
-html.theme-light .path-summit__eyebrow { color: rgba(110,80,200,0.9); }
+html.theme-light .path-summit__eyebrow { color: rgba(88,62,160,1); }
 html.theme-light .path-summit__goal { color: #1a1722; }
 html.theme-light .path-node__title { color: #1f1b2b; }
-html.theme-light .path-node__horizon { color: rgba(110,80,200,0.8); }
+html.theme-light .path-node__horizon { color: rgba(88,62,160,1); }
 html.theme-light .path-node__bridge { color: rgba(34,30,48,0.6); }
 html.theme-light .path-node__dot { box-shadow: 0 0 0 4px #f1eff5; }
 html.theme-light .path-node--now { background: rgba(20,16,40,0.04); }
 html.theme-light .path-node--now .path-node__dot { box-shadow: 0 0 0 4px #f1eff5, 0 0 16px rgba(120,86,228,0.6); }
 html.theme-light .story-stat { background: rgba(20,16,40,0.05); }
 html.theme-light .story-stat__n { color: #1a1722; }
-html.theme-light .story-stat__l { color: rgba(34,30,48,0.6); }
+html.theme-light .story-stat__l { color: rgba(34,30,48,0.78); }
 html.theme-light .story-empty { color: rgba(34,30,48,0.62); }
-html.theme-light .story-month { color: rgba(26,23,34,0.5); }
+html.theme-light .story-month { color: rgba(26,23,34,0.72); }
 html.theme-light .story-item__rail::before { background: rgba(26,23,34,0.12); }
 html.theme-light .story-item__dot { box-shadow: 0 0 0 4px #f1eff5, 0 0 8px currentColor; }
 html.theme-light .story-item__date { color: #1a1722; }
