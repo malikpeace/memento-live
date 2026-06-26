@@ -2483,8 +2483,6 @@ const WelcomeIntro = {
         overlay.remove();
         app.style.transition = '';
         app.style.filter = '';
-        // the instant the home is fully revealed, offer to install (new users).
-        try { if (window.MementoInstall && window.MementoInstall.maybeShowNow) window.MementoInstall.maybeShowNow(); } catch (e) {}
       }, 1200);
     }, 2500);
   }
@@ -4802,6 +4800,11 @@ const Splash = {
   dismiss() {
     if (!this.el || this._dismissing || this.el.classList.contains('dismissed')) return;
     this._dismissing = true;
+
+    // Front-page entry: the instant they tap Get started, nudge a non-installed
+    // mobile user to add Memento to their home screen for the best experience,
+    // before onboarding. Self-gated (installed / mobile / dismissed / demo).
+    try { if (window.MementoInstall && window.MementoInstall.promptOnEntry) window.MementoInstall.promptOnEntry(); } catch (e) {}
 
     const isReturning = state.meta.welcomeSeen;
 

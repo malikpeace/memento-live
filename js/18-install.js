@@ -122,24 +122,23 @@
     if (el) { el.classList.remove('is-open'); el.setAttribute('aria-hidden', 'true'); }
   }
 
-  function boot() {
+  // Fired by the splash "Get started" / Enter button (the front-page entry),
+  // BEFORE onboarding, so a new user is told how to get the best experience up
+  // front. Skips the welcomeSeen + overlay gates on purpose (the splash is up and
+  // they have not onboarded yet) but still respects installed / mobile / dismissed
+  // / demo. The sheet's z-index (1300) sits above the splash (250) + onboarding (210).
+  function promptOnEntry() {
     try {
-      if (typeof state === 'undefined') { setTimeout(boot, 400); return; }
-      timer = setInterval(function () {
-        if (shouldShow()) {
-          clearInterval(timer); timer = null;
-          // a short beat so it never slams in on first paint or mid-transition
-          setTimeout(function () { if (shouldShow()) show(); }, 1400);
-        }
-      }, 1800);
+      if (shown) return;
+      if (isStandalone()) return;
+      if (!isMobile()) return;
+      if (dismissed()) return;
+      if (typeof DEMO_MODE !== 'undefined' && DEMO_MODE) return;
+      show();
     } catch (e) {}
   }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
-
-  // exposed for a manual "Add to home screen" entry later + for testing
-  // gated immediate show (no settle delay) - fired the instant the home reveals
-  // after a new user hits "Enter Memento"
+  // full-gated show (used by the Profile button via show() directly)
   function maybeShowNow() { try { if (shouldShow()) show(); } catch (e) {} }
 
-  window.MementoInstall = { show: show, hide: hide, shouldShow: shouldShow, maybeShowNow: maybeShowNow, _isStandalone: isStandalone, _isIOS: isIOS };
+  window.MementoInstall = { show: show, hide: hide, shouldShow: shouldShow, maybeShowNow: maybeShowNow, promptOnEntry: promptOnEntry, _isStandalone: isStandalone, _isIOS: isIOS };
 })();
