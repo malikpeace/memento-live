@@ -79,8 +79,8 @@
     var ios = isIOS();
     var body = ios
       ? '<div class="pwa-install__steps">' +
-          '<div class="pwa-install__step"><span class="pwa-install__num">1</span>Tap <span class="pwa-install__glyph">' + shareGlyph() + '</span> in your browser bar</div>' +
-          '<div class="pwa-install__step"><span class="pwa-install__num">2</span>Pick <span class="pwa-install__glyph">' + plusGlyph() + '</span> <b>Add to Home Screen</b></div>' +
+          '<div class="pwa-install__step"><span class="pwa-install__num">1</span>Tap Share<span class="pwa-install__glyph">' + shareGlyph() + '</span></div>' +
+          '<div class="pwa-install__step"><span class="pwa-install__num">2</span><b>Add to Home Screen</b><span class="pwa-install__glyph">' + plusGlyph() + '</span></div>' +
         '</div>'
       : '<button class="pwa-install__btn" id="pwaInstallBtn">Install Memento</button>';
     el.innerHTML =
@@ -88,10 +88,9 @@
       '<div class="pwa-install__sheet" role="dialog" aria-label="Add Memento to your home screen">' +
         '<button class="pwa-install__close" data-close="1" aria-label="Close">&#10005;</button>' +
         '<span class="pwa-install__mark">' + markSvg() + '</span>' +
-        '<div class="pwa-install__title">Make Memento a real app</div>' +
-        '<div class="pwa-install__sub">Add it to your home screen for the full thing: full screen, instant to open, and able to send you daily reminders.</div>' +
+        '<div class="pwa-install__title">Add Memento to your Home Screen</div>' +
+        '<div class="pwa-install__sub">For the full app: full screen, and daily reminders.</div>' +
         body +
-        '<button class="pwa-install__later" data-close="1">Maybe later</button>' +
       '</div>';
     document.body.appendChild(el);
     el.addEventListener('click', function (e) {
