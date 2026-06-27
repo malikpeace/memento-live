@@ -2480,3 +2480,58 @@ document.addEventListener('keydown', (e) => {
     setInterval(upd, 150); upd();
   } catch (e) {}
 })();
+
+// ---------------------------------------------------------------------------
+// Pull-down-to-search (Spotlight-style). The Search tab was removed in favour of
+// this: at the very top of the home, dragging down opens the command palette.
+// overscroll-behavior is already 'none', so this never fights a browser
+// pull-to-refresh. A one-time, fixed, transient hint teaches it without touching
+// the (locked) home layout.
+// ---------------------------------------------------------------------------
+(function pullToSearch() {
+  try {
+    var startY = 0, tracking = false, fired = false;
+    function topY() { return window.scrollY || document.documentElement.scrollTop || 0; }
+    function blocked() {
+      try {
+        if (typeof state !== 'undefined' && state.meta && state.meta.welcomeSeen !== true) return true; // still onboarding
+        if (typeof TabBar !== 'undefined' && TabBar.activeTab && TabBar.activeTab !== 'home') return true;
+        if (document.querySelector('.sheet.open, .coach-sheet, #spotInput, .clarity-exp.open, .pwa-install, .save-memento')) return true;
+        var sp = document.querySelector('.splash'); if (sp && getComputedStyle(sp).display !== 'none' && !sp.classList.contains('dismissed')) return true;
+        return false;
+      } catch (e) { return false; }
+    }
+    document.addEventListener('touchstart', function (e) {
+      if (!e.touches || !e.touches.length) { tracking = false; return; }
+      if (topY() > 6 || blocked()) { tracking = false; return; }
+      startY = e.touches[0].clientY; tracking = true; fired = false;
+    }, { passive: true });
+    document.addEventListener('touchmove', function (e) {
+      if (!tracking || fired || !e.touches || !e.touches.length) return;
+      if (topY() > 6) { tracking = false; return; }
+      if (e.touches[0].clientY - startY > 86) {
+        fired = true; tracking = false;
+        try { if (window.Spotlight && window.Spotlight.open) window.Spotlight.open(); } catch (_) {}
+        try { localStorage.setItem('memento_pullsearch_seen', '1'); } catch (_) {}
+      }
+    }, { passive: true });
+    document.addEventListener('touchend', function () { tracking = false; }, { passive: true });
+
+    function maybeHint() {
+      try {
+        if (localStorage.getItem('memento_pullsearch_seen')) return;
+        if (!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches)) return; // touch devices only
+        if (topY() > 6 || blocked()) return;
+        if (document.getElementById('pullSearchHint')) return;
+        var h = document.createElement('div');
+        h.id = 'pullSearchHint'; h.className = 'pull-search-hint';
+        h.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>Pull down to search';
+        document.body.appendChild(h);
+        requestAnimationFrame(function () { h.classList.add('is-on'); });
+        setTimeout(function () { try { h.classList.remove('is-on'); setTimeout(function () { try { h.remove(); } catch (_) {} }, 450); } catch (_) {} }, 4200);
+        try { localStorage.setItem('memento_pullsearch_seen', '1'); } catch (_) {}
+      } catch (e) {}
+    }
+    setTimeout(maybeHint, 2800);
+  } catch (e) {}
+})();
