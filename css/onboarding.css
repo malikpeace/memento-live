@@ -3436,6 +3436,17 @@ html.lowfx .auth-screen__card, body.lite .auth-screen__card { background: rgba(1
   display: block; padding: 8px 30px calc(var(--safe-b) + 20px);
   background: linear-gradient(to top, #030208 55%, transparent);
 }
+/* Browser tabs (Safari with its bottom toolbar, etc.) have a bottom bar that
+   env(safe-area-inset-bottom) does NOT cover, so the Continue button can clip under
+   it. (100lvh - 100svh) is exactly that collapsible-bar height, and 0 in a standalone
+   / home-screen-installed app, so this adds just enough clearance, and only in a
+   browser tab. The installed app is completely untouched. */
+@supports (height: 100svh) {
+  @media (display-mode: browser) {
+    .welcome-intro__nav { padding-bottom: calc(var(--safe-b, 0px) + 24px + 100lvh - 100svh); }
+    .welcome-intro__nav:has(.wc-dock) { padding-bottom: calc(var(--safe-b, 0px) + 20px + 100lvh - 100svh); }
+  }
+}
 .wc-dock { width: 100%; max-width: 560px; margin: 0 auto; }
 .wc-chips { display: flex; flex-direction: column; gap: 9px; }
 .wc-chip {
