@@ -2578,6 +2578,7 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
   z-index: 20;
   touch-action: manipulation;
 }
+.clarity-exp__close::after { content: ''; position: absolute; inset: -4px; } /* 36px visual -> 44px tap target */
 .clarity-exp__close:active { background: var(--kfill-14); }
 
 /* Progress bar - hidden */

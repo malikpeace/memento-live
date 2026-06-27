@@ -390,7 +390,12 @@ body:has(#splash:not(.dismissed)) #topFade { display: none; }
   display: flex; align-items: center; justify-content: center;
   cursor: pointer; font-size: var(--fs-lg); transition: background var(--t-fast);
   font-family: var(--font);
+  position: relative; /* anchor the invisible tap-area expander below */
 }
+/* Grow the tap target to ~44px without changing the visual 32px circle or the
+   layout (the pseudo-element is positioned, so it adds no box). Apple/Material
+   minimum tap size. */
+.sheet__close::after { content: ''; position: absolute; inset: -6px; }
 .sheet__close:active { background: var(--kfill-14); }
 
 .sheet__body {
