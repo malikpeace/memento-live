@@ -2455,8 +2455,8 @@ body:has(.clarity-exp.open-content) .fullscreen-close-global {
 /* Thin-outline M-crown, sized to the cap height of "emento" so the logo reads as
    the capital M without overpowering the light wordmark. currentColor inherits. */
 .splash__title-mark {
-  height: 0.74em; width: auto; flex: none;
-  margin-right: 0.05em; transform: translateY(-0.09em);
+  height: 0.82em; width: auto; flex: none;
+  margin-right: 0.1em; transform: translateY(0.04em);
 }
 .splash__title-word { display: inline-block; }
 
