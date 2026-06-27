@@ -337,7 +337,7 @@ const WelcomeIntro = {
       'Porn': "That's a common one, no shame here. It's a habit like any other, and habits can shift.",
       'Gaming': "Gaming is fun but we don't want it to come ahead of the things you know you should be doing.",
       'Streaming/TV': "A whole season can vanish in a weekend. We just make sure it's not eating the time you wanted for your goal.",
-      'Unhealthy relationship(s)': "That's a heavy one, and an honest one. The right people pull you toward the life you want, not away from it.",
+      'Unhealthy relationship(s)': "That's a heavy one, and an honest one. The right people get you moving toward the life you want, not away from it.",
       'Something else': "Whatever it is, naming it is the win. You can't change a habit you won't look at.",
       _fallback: "Whatever's got a hold on you, it's beatable. We just have to see it clearly first."
     },
@@ -345,7 +345,7 @@ const WelcomeIntro = {
       'Scrolling and social media': "The phone is the biggest thief of time there is. The good news is that's the easiest leak to plug.",
       'Work or school eats it all': "Fair. But there's almost always a small pocket in the day. We just need to find one and protect it.",
       'No real routine, it just slips': "That's the most common one. Time without a shape disappears. We give the important thing a fixed spot.",
-      'Other people and obligations': "Saying yes to everyone is saying no to your own goal. We carve out one piece that stays yours.",
+      'Other people and obligations': "Saying yes to everyone is saying no to your own goal. We carve out one part that stays yours.",
       'Entertainment and games': "Nothing wrong with it, as long as it's not eating the time you wanted for the thing that matters.",
       'Honestly, I waste a lot of it': "That honesty is the whole turnaround. You can't get the time back, but you can decide where the next hour goes.",
       _fallback: "Wherever it goes, the fix is the same. One small block a day, defended, pointed at your goal."
@@ -377,7 +377,7 @@ const WelcomeIntro = {
       _multi3: "Keep that in mind as you continue. Remembering why you started is great fuel. We'll make sure you get there.",
       _multi2: "Both of those are on the table. Keep the momentum and a year from now they're just real.",
       _multi: "All of that is within reach. Momentum is how you get there.",
-      _fallback: "Hold onto that. That's the pull that keeps you going when motivation dips."
+      _fallback: "Hold onto that. That's what keeps you going when motivation dips."
     }
   },
 
@@ -1484,7 +1484,7 @@ const WelcomeIntro = {
         if (p.runningToward) rows.push(['You want to grow in', phrase(p.runningToward)]);
         if (p.story)         rows.push(['Right now, it feels like', phrase(p.story)]);
         if (p.whoFor)        rows.push(["You're doing this for", phrase(p.whoFor)]);
-        if (p.runningFrom)   rows.push(['What keeps pulling you back is', phrase(p.runningFrom)]);
+        if (p.runningFrom)   rows.push(['What keeps getting in your way is', phrase(p.runningFrom)]);
         if (p.commitment)    rows.push(["And you said you are", phrase(p.commitment)]);
         const STEP = 360;
         let d = 0;
@@ -1815,7 +1815,7 @@ const WelcomeIntro = {
       if (winCompound) winBits.push('momentum that compounds');
       if (winFreedom) winBits.push('the freedom it buys you');
       var winLine = joinAnd(winBits);
-      why = 'You are already moving, so the why is the upside, ' + winLine + '. When it gets hard, that is the pull that keeps the momentum going.';
+      why = 'You are already moving, so the why is the upside, ' + winLine + '. When it gets hard, that is what keeps the momentum going.';
     } else {
       why = 'Memento keeps your reason in front of you, so on the hard days you remember why you started. The cost of staying the same is what carries you when motivation is gone.';
     }
@@ -2478,7 +2478,7 @@ const WelcomeIntro = {
     const whyFall = p.costOfInaction
       ? `When it gets hard, you remember the cost of staying here: ${phrase(p.costOfInaction)}. That is the fuel that keeps you going.`
       : p.momentumWin
-        ? `You are already moving, so the why is the upside: ${phrase(p.momentumWin)}. That is the pull that keeps the momentum going.`
+        ? `You are already moving, so the why is the upside: ${phrase(p.momentumWin)}. That is what keeps the momentum going.`
         : 'Memento keeps your reason in front of you, so you are not leaning on motivation that comes and goes.';
     const whatFall = p.runningToward
       ? `You said you want to improve ${phrase(p.runningToward)}.${p.runningFrom ? ' And that ' + phrase(p.runningFrom) + ' keeps getting in the way.' : ''} That is enough to start.`
@@ -3954,7 +3954,7 @@ const TabBar = {
         '<div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); margin: 18px 0 8px;">Modules</div>' +
         toggleRow('prefUnlockAll', 'Unlock everything', 'Skip the gradual module unlocks and show every module now.', !!prefs.unlockAll) +
         '<div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); margin: 18px 0 8px;">Your anchor quote</div>' +
-        '<input type="text" id="prefAnchorQuote" maxlength="160" placeholder="One line that pulls you forward..." value="' + esc(prefs.anchorQuote || '') + '" style="width:100%;box-sizing:border-box;font:inherit;font-size:0.9rem;color:var(--text-hi);background:var(--surface-1);border:1px solid transparent;border-radius:calc(8px * var(--rx, 1));padding:11px 13px;outline:none;" />' +
+        '<input type="text" id="prefAnchorQuote" maxlength="160" placeholder="One line that gets you moving..." value="' + esc(prefs.anchorQuote || '') + '" style="width:100%;box-sizing:border-box;font:inherit;font-size:0.9rem;color:var(--text-hi);background:var(--surface-1);border:1px solid transparent;border-radius:calc(8px * var(--rx, 1));padding:11px 13px;outline:none;" />' +
         '<div style="font-size: 0.6875rem; color: var(--text-3); margin-top: 8px;">Takes over the daily line on your dashboard. Leave blank to rotate the defaults.</div>' +
       '</div>';
   },
