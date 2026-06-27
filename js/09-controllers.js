@@ -325,11 +325,11 @@ const WelcomeIntro = {
       _fallback: "Whatever is blurring it, naming it is how we start to clear it."
     },
     clarityHistory: {
-      'No, this is the first time': "Then you are in the right place! The first step is the most important.",
-      'Tried, but it faded': "It faded because nothing held it in place. That is exactly what Memento is for.",
-      'I keep starting over': "Starting over is not failing, it is missing the system that makes it stick. We build that.",
-      "I think I'm close, just not there": "Close is good. We close the last gap so it finally lands.",
-      _fallback: "Wherever you have gotten before, we build from here."
+      'Honestly, just recently': "Then you are catching it early, before it hardens into a rut. Good place to start.",
+      'On and off for a while': "On and off means the wanting is real, it just never had anything holding it in place. That is what Memento is for.",
+      'A long time, I keep circling back': "Circling back is not failing, it is missing the system that makes it stick. We build that.",
+      "I feel close, just not there yet": "Close is further than most people get. We close the last gap so it finally lands.",
+      _fallback: "Wherever you have gotten so far, we build from here."
     },
     distraction: {
       'Short form content': "The antidote to boredom. Designed from the ground up to get you to waste as much of your life as possible.",
@@ -1255,9 +1255,9 @@ const WelcomeIntro = {
       options: ["Too many directions, I can't pick one", "Scared I'll pick the wrong thing", "I've lost touch with what I care about", "I've never really stopped to figure it out"],
       skipIf: (p) => { const c = String((p && p.clarityLevel) || '').toLowerCase(); return !(c.indexOf('lost') !== -1 || c.indexOf('not really') !== -1); } },
     { key: 'clarityHistory', type: 'choices', multi: false,
-      headline: 'Have you tried to figure this out before?',
+      headline: 'How long has this been on your mind?',
       sub: 'No judgment. Just where you actually are.',
-      options: ['No, this is the first time', 'Tried, but it faded', 'I keep starting over', "I think I'm close, just not there"],
+      options: ['Honestly, just recently', 'On and off for a while', 'A long time, I keep circling back', "I feel close, just not there yet"],
       skipIf: (p) => { const c = String((p && p.clarityLevel) || '').toLowerCase(); return !(c.indexOf('lost') !== -1 || c.indexOf('not really') !== -1); } },
     // ── CONSISTENCY gap: what's holding them back, and what's the pull? ──────
     // Only asked of people who said they are NOT making progress (Haven't
