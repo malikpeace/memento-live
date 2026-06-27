@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <script>
 /* Single source of truth for the app version. Surfaced in Settings > About. */
-window.MEMENTO_VERSION = 'v290';
+window.MEMENTO_VERSION = 'v291';
 /* LOWFX: touch / mobile devices get a lighter render path (no backdrop blur,
    no will-change layers, no background canvas animations) so iOS does not kill
    the tab from graphics-memory pressure. Desktop (fine pointer) is untouched.
@@ -40,22 +40,22 @@ window.MEMENTO_VERSION = 'v290';
      paint never waits on a third-party CDN. font-display: swap throughout. -->
 <link rel="preload" href="fonts/dmsans-1.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="fonts/fonts.css">
-<link rel="stylesheet" href="css/base.css?v=v290">
-<link rel="stylesheet" href="css/sidebar.css?v=v290">
-<link rel="stylesheet" href="css/dashboard.css?v=v290">
-<link rel="stylesheet" href="css/misc.css?v=v290">
-<link rel="stylesheet" href="css/vivere.css?v=v290">
-<link rel="stylesheet" href="css/notes.css?v=v290">
-<link rel="stylesheet" href="css/onboarding.css?v=v290">
-<link rel="stylesheet" href="css/clarity.css?v=v290">
-<link rel="stylesheet" href="css/action.css?v=v290">
-<link rel="stylesheet" href="css/daycard-living.css?v=v290">
-<link rel="stylesheet" href="css/share-card.css?v=v290">
-<link rel="stylesheet" href="css/clarity-paywall.css?v=v290">
-<link rel="stylesheet" href="css/appearance-picker.css?v=v290">
-<link rel="stylesheet" href="css/coach.css?v=v290">
-<link rel="stylesheet" href="css/journey.css?v=v290">
-<link rel="stylesheet" href="css/install.css?v=v290">
+<link rel="stylesheet" href="css/base.css?v=v291">
+<link rel="stylesheet" href="css/sidebar.css?v=v291">
+<link rel="stylesheet" href="css/dashboard.css?v=v291">
+<link rel="stylesheet" href="css/misc.css?v=v291">
+<link rel="stylesheet" href="css/vivere.css?v=v291">
+<link rel="stylesheet" href="css/notes.css?v=v291">
+<link rel="stylesheet" href="css/onboarding.css?v=v291">
+<link rel="stylesheet" href="css/clarity.css?v=v291">
+<link rel="stylesheet" href="css/action.css?v=v291">
+<link rel="stylesheet" href="css/daycard-living.css?v=v291">
+<link rel="stylesheet" href="css/share-card.css?v=v291">
+<link rel="stylesheet" href="css/clarity-paywall.css?v=v291">
+<link rel="stylesheet" href="css/appearance-picker.css?v=v291">
+<link rel="stylesheet" href="css/coach.css?v=v291">
+<link rel="stylesheet" href="css/journey.css?v=v291">
+<link rel="stylesheet" href="css/install.css?v=v291">
 </head>
 <body>
 
@@ -239,7 +239,7 @@ window.MEMENTO_VERSION = 'v290';
       </g>
     </svg>
     <div class="splash-wrap">
-      <div class="splash__title" role="img" aria-label="Memento"><svg class="splash__title-mark" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><rect width="512" height="512" rx="44" fill="#f5f5f7"/><path d="M44 36 L256 248 L468 36 L468 476 L44 476 Z" fill="#0a0a0e"/></svg><span class="splash__title-word" aria-hidden="true">emento</span></div>
+      <div class="splash__title" role="img" aria-label="Memento"><svg class="splash__title-mark" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><rect width="512" height="512" rx="44" fill="#f5f5f7"/><path d="M50 43 L256 248 L462 43 L462 469 L50 469 Z" fill="#0a0a0e"/></svg><span class="splash__title-word" aria-hidden="true">emento</span></div>
     </div>
     <div id="splashCard" style="display:none"></div>
   </div>
@@ -726,27 +726,27 @@ window.MEMENTO_VERSION = 'v290';
 <!-- Supabase client for OPTIONAL cloud accounts + sync (js/12-cloud-sync.js).
      If this CDN tag fails to load, the app runs fully local, unchanged. -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
-<script src="js/01-state-foundation.js?v=v290"></script>
-<script src="js/02-clarity-experience.js?v=v290"></script>
-<script src="js/03-ai-integration.js?v=v290"></script>
-<script src="js/04-templates-proof.js?v=v290"></script>
-<script src="js/05-vivere.js?v=v290"></script>
-<script src="js/06-consistency-mori.js?v=v290"></script>
-<script src="js/07-sheet-templates.js?v=v290"></script>
-<script src="js/08-cards-grid-share.js?v=v290"></script>
-<script src="js/09-controllers.js?v=v290"></script>
-<script src="js/10-demo-backend.js?v=v290"></script>
+<script src="js/01-state-foundation.js?v=v291"></script>
+<script src="js/02-clarity-experience.js?v=v291"></script>
+<script src="js/03-ai-integration.js?v=v291"></script>
+<script src="js/04-templates-proof.js?v=v291"></script>
+<script src="js/05-vivere.js?v=v291"></script>
+<script src="js/06-consistency-mori.js?v=v291"></script>
+<script src="js/07-sheet-templates.js?v=v291"></script>
+<script src="js/08-cards-grid-share.js?v=v291"></script>
+<script src="js/09-controllers.js?v=v291"></script>
+<script src="js/10-demo-backend.js?v=v291"></script>
 <!-- The Memento Coach: ongoing adaptive AI companion (uses the existing ai-proxy).
      Loads before 11-init so MementoCoach exists when the home first renders. -->
-<script src="js/16-coach.js?v=v290"></script>
+<script src="js/16-coach.js?v=v291"></script>
 <!-- The Path + Your Story: the journey views. Client-side, read existing state. -->
-<script src="js/17-journey.js?v=v290"></script>
+<script src="js/17-journey.js?v=v291"></script>
 <!-- Add to Home Screen prompt: detects browser-tab vs installed PWA. -->
-<script src="js/18-install.js?v=v290"></script>
-<script src="js/11-init.js?v=v290"></script>
-<script src="js/12-cloud-sync.js?v=v290"></script>
-<script src="js/13-clarity-paywall.js?v=v290"></script>
-<script src="js/14-appearance-picker.js?v=v290"></script>
+<script src="js/18-install.js?v=v291"></script>
+<script src="js/11-init.js?v=v291"></script>
+<script src="js/12-cloud-sync.js?v=v291"></script>
+<script src="js/13-clarity-paywall.js?v=v291"></script>
+<script src="js/14-appearance-picker.js?v=v291"></script>
 <!-- Back/forward + hash-URL routing. Loads LAST so every open/close fn it wraps
      already exists. Inert until onboarding is done; touches only location.hash. -->
 </body>
