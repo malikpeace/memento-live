@@ -2444,12 +2444,21 @@ body:has(.clarity-exp.open-content) .fullscreen-close-global {
   font-weight: 200;
   letter-spacing: -0.015em;
   color: rgba(var(--ink), 0.96);
-  text-align: center;
   padding: 0 24px;
+  /* The M-crown brand glyph stands in for the capital M; "emento" follows in the
+     wordmark weight. Baseline-align so the mark sits on the text baseline. */
+  display: flex; align-items: baseline; justify-content: center; line-height: 1;
   /* Flat official wordmark: no glow. (The old 50px purple halo read as an
      effect, not a brand.) */
   transition: opacity 0.34s ease, filter 0.34s ease, transform 0.34s ease;
 }
+/* Thin-outline M-crown, sized to the cap height of "emento" so the logo reads as
+   the capital M without overpowering the light wordmark. currentColor inherits. */
+.splash__title-mark {
+  height: 0.74em; width: auto; flex: none;
+  margin-right: 0.05em; transform: translateY(-0.09em);
+}
+.splash__title-word { display: inline-block; }
 
 .hyperblob {
   transition: opacity 0.58s ease var(--t-base), transform 0.72s cubic-bezier(0.16, 1, 0.3, 1) var(--t-base), filter 0.72s ease var(--t-base);
@@ -3144,9 +3153,12 @@ body.calm-motion .milestone-banner.is-on, body.lite .milestone-banner.is-on { tr
 /* Glass pill pinned top right of the splash, always visible immediately.
    Hidden automatically once a session exists. */
 .splash-signin {
-  position: absolute;
-  top: max(18px, env(safe-area-inset-top, 0px)); right: 18px;
-  z-index: 3;
+  /* Stacked right under Enter inside .splash__swipe: a faint glass pill matching
+     Enter's width, clearly the secondary action (Enter stays solid-white primary). */
+  margin-top: 12px;
+  width: min(216px, calc(100vw - 96px));
+  height: 46px;
+  display: flex; align-items: center; justify-content: center;
   appearance: none; -webkit-appearance: none;
   cursor: pointer;
   background: rgba(255,255,255,0.05);
@@ -3158,17 +3170,13 @@ body.calm-motion .milestone-banner.is-on, body.lite .milestone-banner.is-on { tr
   font-family: var(--font);
   font-size: var(--fs-sm);
   font-weight: 600;
-  letter-spacing: 0.04em;
-  color: rgba(var(--ink), 0.85);
-  padding: 8px 18px; /* generous tap target on mobile */
-  /* No entrance delay: returning users must see the door immediately. */
-  animation: splashSwipeIn 0.4s ease 0.1s both;
-  transition: background var(--t-base) ease, border-color var(--t-base) ease, color var(--t-base) ease;
+  letter-spacing: 0.01em;
+  color: rgba(var(--ink), 0.82);
+  transition: background var(--t-base) ease, color var(--t-base) ease;
 }
 .splash-signin span { color: inherit; }
 .splash-signin:hover {
   background: rgba(255,255,255,0.09);
-  border-color: rgba(255,255,255,0.18);
   color: rgba(var(--ink), 1);
 }
 .splash-signin:focus-visible { outline: none; box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 0 0 2px rgba(var(--ink), 0.25); }
