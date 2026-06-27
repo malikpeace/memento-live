@@ -3688,6 +3688,12 @@ const TabBar = {
   switchTo(tabId) {
     // Search is an ACTION, not a destination: open Spotlight and leave the
     // active tab where it was (the pill never moves to search).
+    // Coach is the middle ACTION tab: opens the coach overlay and leaves the
+    // active tab where it was (Home stays underneath; the pill never moves here).
+    if (tabId === 'coach') {
+      try { if (typeof MementoCoach !== 'undefined' && MementoCoach.open) MementoCoach.open(); } catch (e) {}
+      return;
+    }
     if (tabId === 'search') {
       try { if (window.Spotlight && window.Spotlight.open) window.Spotlight.open(); } catch (e) {}
       return;

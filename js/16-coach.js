@@ -473,6 +473,9 @@ Final check before you send: does it sound like a real person who knows this hum
   }
   function fabShouldShow() {
     try {
+      // The Coach is now a bottom-bar tab on mobile, so the floating button is
+      // redundant whenever that bar is showing. It stays only on desktop (no bar).
+      try { var tb = document.querySelector('.tab-bar'); if (tb && tb.getClientRects().length && getComputedStyle(tb).display !== 'none') return false; } catch (e) {}
       if (typeof state === 'undefined' || !state.meta || state.meta.welcomeSeen !== true) return false;
       if (appBlockedLite()) return false;
       if (el && el.classList.contains('open')) return false;
