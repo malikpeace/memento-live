@@ -186,7 +186,7 @@ const WelcomeIntro = {
   _wcBuild() {
     const SEP = ' · ';
     const beats = [];
-    beats.push({ lines: () => ['Hello 👋.'], pause: 1100 });
+    beats.push({ lines: () => ['Hello 👋'], pause: 1100 });
     // Opal-style framing right up front: set the expectation before any question.
     beats.push({ lines: () => ["First, a couple questions, then we'll start to build your Memento."], pause: 900 });
     beats.push({
