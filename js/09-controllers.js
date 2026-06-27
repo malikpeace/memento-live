@@ -1264,7 +1264,7 @@ const WelcomeIntro = {
     // holding them back, so this and the distraction follow-up are skipped.
     { key: 'runningFrom', type: 'choices', multi: true,
       headline: 'What do you think is holding you back?',
-      sub: 'Be honest, this is just for you.',
+      sub: 'Again, try to be as honest as possible.',
       options: ['Procrastination', 'Phone & social media', "I don't know what to do", "Can't stay consistent", 'Fear of failing', 'Not enough time', 'Low motivation', 'Self-doubt'],
       skipIf: (p) => { const ap = String((p && p.actionProgress) || ''); return ap === 'Slow but moving' || ap === 'Actually doing really good'; } },
     { key: 'distraction', type: 'choices', multi: false,
