@@ -271,8 +271,10 @@ const WelcomeIntro = {
   _wcReflections: {
     runningToward: {
       'Work & money': "Money. Makes sense, it's the thing everyone chases.",
+      'Business': "Business is a hard game, but it pays in skill, freedom, and proof you can build something real.",
       'Health & fitness': "Health is the foundation of everything, without health nothing matters.",
       'Discipline & focus': "Discipline and focus are always good skills to learn.",
+      'Self mastery': "Self-mastery is the quiet one. Get that and almost everything else follows.",
       'A skill or craft': "Building a real skill unlocks parts of your brain you didn't know were there.",
       'Creative work': "Creative work is one of the most fulfilling things to actually go after.",
       'Relationships': "If we're being honest, that's what most of this is for anyway.",
@@ -1240,7 +1242,7 @@ const WelcomeIntro = {
         return 'What part of your life is this about?';
       },
       sub: 'Tap whatever fits. You can pick more than one.',
-      options: ['Work & money', 'Health & fitness', 'Discipline & focus', 'A skill or craft', 'Creative work', 'Relationships', 'Mindset & Mental', "I'm honestly not sure yet"] },
+      options: ['Work & money', 'Business', 'Health & fitness', 'Discipline & focus', 'Self mastery', 'A skill or craft', 'Creative work', 'Relationships', 'Mindset & Mental', "I'm honestly not sure yet"] },
     // (birthday is inserted here, after the clarity gap)
     // ── ACTION gap: do they know the steps, and where are they? ─────────────
     // Action gap, only for people who actually have a direction (a goal or a rough
@@ -1706,6 +1708,8 @@ const WelcomeIntro = {
     var towardClean = [];
     var towardMap = {
       'work & money': 'work and money',
+      'business': 'your business',
+      'self mastery': 'self-mastery',
       'health & fitness': 'your health',
       'discipline & focus': 'discipline and focus',
       'a skill or craft': 'a skill you care about',
