@@ -2316,8 +2316,8 @@ body:has(.clarity-exp.open-content) .fullscreen-close-global {
   position: absolute;
   left: 0; right: 0;
   /* Raised toward the title so it does not sit alone at the bottom. Desktop
-     lifts it a touch more (below). */
-  bottom: calc(env(safe-area-inset-bottom, 0px) + clamp(96px, 15vh, 140px));
+     lifts it a touch more (below). Mobile sits a little higher than it used to. */
+  bottom: calc(env(safe-area-inset-bottom, 0px) + clamp(122px, 19vh, 176px));
   display: flex; flex-direction: column; align-items: center;
   opacity: 0;
   z-index: 3;
@@ -2397,6 +2397,11 @@ body:has(.clarity-exp.open-content) .fullscreen-close-global {
   flex-direction: column;
   align-items: center;
   gap: 0;
+}
+/* Mobile: lift the wordmark off dead-center so the composition is not bottom-
+   weighted with a big empty band up top. Desktop keeps it centered. */
+@media (max-width: 899px) {
+  .splash__scene { transform: translateY(-6vh); }
 }
 
 /* ── Comet border animation ── */
