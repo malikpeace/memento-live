@@ -256,6 +256,7 @@ const WelcomeIntro = {
       if (step.key === 'clarityHistory') beats.push({ lines: () => { const t = this._wcReflect('clarityHistory'); return t ? [t] : []; } });
       if (step.key === 'runningFrom') beats.push({ lines: () => { const t = this._wcReflect('runningFrom'); return t ? [t] : []; } });
       if (step.key === 'distraction') beats.push({ lines: () => { const t = this._wcReflect('distraction'); return t ? [t] : []; } });
+      if (step.key === 'timeDrain') beats.push({ lines: () => { const t = this._wcReflect('timeDrain'); return t ? [t] : []; } });
       if (step.key === 'letterToFutureSelf') beats.push({ lines: () => { const t = this._wcReflect('letterToFutureSelf'); return t ? [t] : []; } });
       if (step.key === 'costOfInaction') beats.push({ lines: () => { const t = this._wcReflect('costOfInaction'); return t ? [t] : []; } });
       if (step.key === 'momentumWin') beats.push({ lines: () => { const t = this._wcReflect('momentumWin'); return t ? [t] : []; } });
@@ -339,6 +340,15 @@ const WelcomeIntro = {
       'Unhealthy relationship(s)': "That's a heavy one, and an honest one. The right people pull you toward the life you want, not away from it.",
       'Something else': "Whatever it is, naming it is the win. You can't change a habit you won't look at.",
       _fallback: "Whatever's got a hold on you, it's beatable. We just have to see it clearly first."
+    },
+    timeDrain: {
+      'Scrolling and social media': "The phone is the biggest thief of time there is. The good news is that's the easiest leak to plug.",
+      'Work or school eats it all': "Fair. But there's almost always a small pocket in the day. We just need to find one and protect it.",
+      'No real routine, it just slips': "That's the most common one. Time without a shape disappears. We give the important thing a fixed spot.",
+      'Other people and obligations': "Saying yes to everyone is saying no to your own goal. We carve out one piece that stays yours.",
+      'Entertainment and games': "Nothing wrong with it, as long as it's not eating the time you wanted for the thing that matters.",
+      'Honestly, I waste a lot of it': "That honesty is the whole turnaround. You can't get the time back, but you can decide where the next hour goes.",
+      _fallback: "Wherever it goes, the fix is the same. One small block a day, defended, pointed at your goal."
     },
     letterToFutureSelf: {
       _fallback: "Thanks for sharing that. It helps Memento actually understand where you're coming from."
@@ -1272,6 +1282,11 @@ const WelcomeIntro = {
       options: ['Short form content', 'YouTube', 'Porn', 'Gaming', 'Streaming/TV', 'Unhealthy relationship(s)', 'Something else'],
       // Only ask if the phone is what's pulling them back.
       skipIf: (p) => String((p && p.runningFrom) || '').indexOf('Phone & social media') === -1 },
+    { key: 'timeDrain', type: 'choices', multi: false,
+      headline: 'Where does your time actually go?',
+      options: ['Scrolling and social media', 'Work or school eats it all', 'No real routine, it just slips', 'Other people and obligations', 'Entertainment and games', 'Honestly, I waste a lot of it'],
+      // Only ask if they said not enough time is what holds them back.
+      skipIf: (p) => String((p && p.runningFrom) || '').indexOf('Not enough time') === -1 },
     // ── WHY / weight: the fuel that carries them. Two framings of the same job,
     // chosen by where they actually are. People who are NOT moving yet get the
     // mori weight (the cost of staying still). People who ARE moving (slow but
@@ -1993,7 +2008,7 @@ const WelcomeIntro = {
     const p = state.profile || {};
     const beats = this._solBeats(p);
     const n = beats.length;
-    if (beatIdx >= n) { this._showMementoDemo(stepIndex, 0); return; }
+    if (beatIdx >= n) { this._showIdentityStep(stepIndex + 1); return; }
     const b = beats[beatIdx];
     const isLast = beatIdx === n - 1;
     const dots = beats.map((x, i) => `<span class="wi-demo__dot${i === beatIdx ? ' is-active' : ''}" data-beat="${i}" style="${i === beatIdx ? 'background:' + b.accent : ''}"></span>`).join('');
@@ -2001,13 +2016,13 @@ const WelcomeIntro = {
     this.pageWrap.innerHTML = `<div class="welcome-intro__page-inner wi-cine" data-beat="${beatIdx}">
       <div class="wi-cine__beam" style="--beam:${b.beam}"></div>
       <div class="wi-demo__stage">${this._cineMock(b.key, p)}</div>
-      <div class="wi-demo__eyebrow" style="color:${b.accent}">0${beatIdx + 1} <span>of 0${n}</span></div>
+      <div class="wi-demo__eyebrow" style="color:${b.accent}">${b.label ? esc(b.label) : ('0' + (beatIdx + 1) + ' <span>of 0' + n + '</span>')}</div>
       <h2 class="wi-demo__headline">${esc(b.headline)}</h2>
       <p class="wi-demo__line">${esc(b.line)}</p>
       ${b.trap ? `<p class="wi-cine__trap">${esc(b.trap)}</p>` : ''}
       <div class="wi-demo__dots">${dots}</div>
     </div>`;
-    this.navEl.innerHTML = `<button class="welcome-intro__back-btn" id="solBack">←</button><button class="welcome-intro__btn welcome-intro__btn--step" id="solNext" style="flex:1;width:auto;">${isLast ? 'Show me how' : 'Next'}</button>`;
+    this.navEl.innerHTML = `<button class="welcome-intro__back-btn" id="solBack">←</button><button class="welcome-intro__btn welcome-intro__btn--step" id="solNext" style="flex:1;width:auto;">${isLast ? 'Build it' : 'Next'}</button>`;
     try { this.pageWrap.classList.remove('wc-busy', 'wc-reading'); this.pageWrap.scrollTop = 0; } catch (e) {}
 
     const go = (idx) => { this._showSolution(stepIndex, idx); };
@@ -2030,26 +2045,114 @@ const WelcomeIntro = {
     } catch (e) {}
   },
 
-  // the 3 "why" beats, every line templated from their own answers (no AI)
+  // The post-first-win sequence, every line templated from their own answers (no AI):
+  // 1 the mirror (exactly what they want + where they are), 2 the cost or the upside
+  // tied to their finite time, 3-5 clarity / action / consistency framed to what they
+  // already told us, 6 the close. Replaces the old want/stakes/payoff + the module demo.
   _solBeats(p) {
-    const ap = String((p && p.actionProgress) || '');
+    const PUR = 'rgba(150,116,255,1)', GOLD = 'rgba(232,194,74,1)', WHT = 'rgba(226,232,255,1)', GRN = 'rgba(52,211,153,1)';
+    const low = (v) => String(v || '').toLowerCase();
+    const cl = low(p && p.clarityLevel), ak = low(p && p.actionKnow), ap = String((p && p.actionProgress) || '');
     const goals = this._solGoals(p);
-    const wantHead = goals ? 'Here is what you came for.' : 'You came here to stop drifting.';
-    const wantLine = goals ? 'Real movement, not someday. This year.' : 'A life sharper than it feels right now. This year, not someday.';
-    let stHead, stLine;
-    if (ap === 'Actually doing really good') { stHead = 'You are moving right now.'; stLine = 'Momentum never breaks loud. It slips out one quiet skipped day at a time.'; }
-    else if (ap === 'Slow but moving') { stHead = 'Slow still counts.'; stLine = 'But slow with nothing in front of it fades, and one bad week becomes the week you quietly stopped.'; }
-    else if (ap === 'Started, then stalled') { stHead = 'It stalled. It always does.'; stLine = 'Not because you failed, because nothing was holding it in place. Every parked day costs more to come back.'; }
-    else if (ap === "Haven't really started") { stHead = 'Another year of meaning to.'; stLine = 'Ends exactly where this one did. The goal just keeps following you around.'; }
-    else { stHead = 'Wherever you are is fine.'; stLine = 'We build from here, one small move at a time.'; }
     const first = (p && p.name) ? String(p.name).trim().split(/\s+/)[0] : '';
-    const payHead = first ? (first + ', a year of showing up becomes this.') : 'A year of showing up becomes this.';
-    const payLine = 'Same you, but you kept the promise, and you have the receipts for ' + this._solMomentumPhrase(p) + '.';
+    const moving = (ap === 'Slow but moving' || ap === 'Actually doing really good');
+    const weeks = this._solWeeksLeft();
+
+    // 1. the mirror: exactly what they want + where they actually are
+    const sumHead = goals ? ('You came here for ' + goals + '.') : 'You came here to stop drifting.';
+    const sumLine = this._solSituation(p);
+
+    // 2. the cost (stuck) or the upside (already moving), tied to their finite time
+    const twHead = weeks ? ('About ' + weeks.toLocaleString() + ' weeks left.') : 'Your time is not unlimited.';
+    const twLine = moving
+      ? ('You are actually moving, and that is rare. Keep this up and ' + this._solMomentumPhrase(p) + ' stops being someday. But momentum leaks out one quiet skipped day at a time.')
+      : ('Let another year go like the last one and ' + this._solCostPhrase(p) + '. Nothing changes on its own. The goal just keeps following you around.');
+    const bridge = 'Memento was built for exactly this. Here is how.';
+
+    // 3-5. clarity / action / consistency, framed to what they already told us
+    const clarityKnows = cl.indexOf('exactly') !== -1;
+    const clarityLost = cl.indexOf('lost') !== -1 || cl.indexOf('not really') !== -1 || cl.indexOf('trying') !== -1;
+    const clLine = clarityKnows
+      ? 'One goal you care about more than anything else. You already know yours, so we pressure-test it until it is ironclad.'
+      : (clarityLost
+        ? 'One goal you care about more than anything else. You are not sure what yours is yet, so finding it is the very first thing we do, together.'
+        : 'One goal you care about more than anything else. You have a rough idea already, so we sharpen it until it is unmistakable.');
+
+    const actionKnows = ak.indexOf('yes') !== -1;
+    const acLine = clarityLost
+      ? 'Once the goal is clear, Memento turns it into the exact move to make today. Knowing finally becomes doing.'
+      : (actionKnows
+        ? 'You already know the moves. Memento keeps you on the single highest-leverage one each day, not the busywork.'
+        : 'You know the goal, you are just not sure how to get there. Memento maps it into the exact tasks that move it.');
+
+    const coLine = moving
+      ? 'You are already moving. Memento protects it, the streak, the proof, the way back, so one bad week never becomes the week you quietly stopped.'
+      : 'First we lock the goal and the moves. Then Memento keeps you showing up, with a way back in on the days you slip, so it actually compounds.';
+
+    // 6. the close
+    const clsHead = first ? (first + ', this is your Memento.') : 'This is your Memento.';
+    const clsLine = 'One goal. One move a day. The proof stacking up behind you. Built around the one life you actually have.';
+
     return [
-      { key: 'want', accent: 'rgba(150,116,255,1)', beam: 0.55, headline: wantHead, line: wantLine },
-      { key: 'stakes', accent: 'rgba(244,138,120,1)', beam: 0.34, headline: stHead, line: stLine, trap: this._solTrap(p) },
-      { key: 'payoff', accent: 'rgba(206,192,255,1)', beam: 0.72, headline: payHead, line: payLine }
+      { key: 'summary', accent: PUR, beam: 0.5, headline: sumHead, line: sumLine, trap: this._solBlockerLine(p) },
+      { key: 'twist', accent: GOLD, beam: 0.34, headline: twHead, line: twLine, trap: bridge },
+      { key: 'clarity', accent: PUR, beam: 0.6, label: 'CLARITY', headline: 'It starts with clarity.', line: clLine },
+      { key: 'action', accent: WHT, beam: 0.62, label: 'ACTION', headline: 'Then it becomes action.', line: acLine },
+      { key: 'consistency', accent: GRN, beam: 0.66, label: 'CONSISTENCY', headline: 'Then you stay consistent.', line: coLine },
+      { key: 'close', accent: GRN, beam: 0.74, headline: clsHead, line: clsLine }
     ];
+  },
+  // where they actually are, reflected back from their clarity + progress answers
+  _solSituation(p) {
+    const low = (v) => String(v || '').toLowerCase();
+    const cl = low(p && p.clarityLevel), ap = String((p && p.actionProgress) || '');
+    const moving = (ap === 'Slow but moving' || ap === 'Actually doing really good');
+    if (cl.indexOf('lost') !== -1) return 'You are not sure which of these is the one yet. That uncertainty is the whole reason you are here, and it is fixable.';
+    if (cl.indexOf('not really') !== -1 || cl.indexOf('trying') !== -1) return 'You have been trying to figure out which one is the one. You are close, you just have not landed it yet.';
+    if (cl.indexOf('exactly') !== -1) return moving
+      ? 'You know exactly what you want and you are already moving. Now you want to make sure it actually sticks.'
+      : 'You know exactly what you want. You just have not turned it into motion yet.';
+    return moving
+      ? 'You have a sense of it and you have started. Now you want it to hold.'
+      : 'You have a rough sense of it. You just have not made it concrete, or made it move.';
+  },
+  // name the thing in the way, from what they said holds them back
+  _solBlockerLine(p) {
+    const rf = String((p && p.runningFrom) || '').toLowerCase();
+    if (!rf) return '';
+    if (rf.indexOf('phone') !== -1 || rf.indexOf('social') !== -1 || rf.indexOf('scroll') !== -1) return 'And the phone keeps winning the moment you sit down.';
+    if (rf.indexOf('procrast') !== -1 || rf.indexOf('later') !== -1 || rf.indexOf('put off') !== -1) return 'And it keeps sliding to later, and later never quite comes.';
+    if (rf.indexOf('consist') !== -1 || rf.indexOf('discipl') !== -1) return 'And you start, then it quietly falls off.';
+    if (rf.indexOf('motiv') !== -1 || rf.indexOf('energy') !== -1 || rf.indexOf('tired') !== -1) return 'And on the low days, it is the first thing to go.';
+    if (rf.indexOf('fear') !== -1 || rf.indexOf('scared') !== -1 || rf.indexOf('doubt') !== -1 || rf.indexOf('fail') !== -1) return 'And part of you is afraid it will not work out.';
+    if (rf.indexOf('time') !== -1 || rf.indexOf('busy') !== -1) return 'And there is never quite enough time for it.';
+    return 'And that is the thing that keeps getting in the way.';
+  },
+  // the cost of another year, from what they named they would lose
+  _solCostPhrase(p) {
+    const c = String((p && p.costOfInaction) || '').toLowerCase();
+    if (c.indexOf('regret') !== -1) return 'the regret only compounds';
+    if (c.indexOf('potential') !== -1 || c.indexOf('waste') !== -1) return 'the gap between who you are and who you could be only widens';
+    if (c.indexOf('behind') !== -1) return 'you fall further behind the people who started';
+    if (c.indexOf('stuck') !== -1 || c.indexOf('same') !== -1) return 'you end up exactly here, one year older';
+    if (c.indexOf('time') !== -1) return 'that is a year you do not get back';
+    return 'you end up exactly here, one year older';
+  },
+  // weeks left from their birth year (Mori math), null if we never collected it
+  _solWeeksLeft() {
+    try {
+      let by = (state.mori && state.mori.birthYear) || null;
+      if (!by) {
+        const b = state.profile && state.profile.birthday;
+        if (b) { const m = String(b).match(/(19|20)\d\d/); if (m) by = parseInt(m[0], 10); }
+      }
+      if (by && typeof moriYearsRemaining === 'function') {
+        const exp = (state.mori && state.mori.lifeExpectancy) || 80;
+        const w = Math.round(moriYearsRemaining(by, exp) * 52);
+        if (w > 0 && w < 6000) return w;
+      }
+    } catch (e) {}
+    return null;
   },
   // optional one-line trap, from what they said they run from / the cost they named
   _solTrap(p) {
@@ -2071,7 +2174,7 @@ const WelcomeIntro = {
   },
   // the centered reflected motif per beat (inline SVG, demo convention)
   _cineMock(key, p) {
-    if (key === 'want') {
+    if (key === 'summary') {
       const rings = '<svg class="wi-mock" viewBox="0 0 240 190" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
         + '<circle cx="120" cy="92" r="72" fill="none" stroke="rgba(150,116,255,0.13)" stroke-width="1.5"/>'
         + '<circle cx="120" cy="92" r="50" fill="none" stroke="rgba(150,116,255,0.24)" stroke-width="1.5"/>'
@@ -2080,12 +2183,13 @@ const WelcomeIntro = {
         + '<circle cx="120" cy="92" r="7" fill="rgba(190,164,255,1)"/></svg>';
       return '<div class="wi-cine__wantwrap">' + rings + this._solChips(p) + '</div>';
     }
-    if (key === 'stakes') {
-      const ap = String((p && p.actionProgress) || '');
-      const pct = ap === 'Actually doing really good' ? 82 : ap === 'Slow but moving' ? 46 : ap === 'Started, then stalled' ? 30 : ap === "Haven't really started" ? 8 : 24;
-      return `<div class="wi-cine__gaugewrap"><div class="wi-cine__gauge"><div class="wi-cine__gauge-fill" style="width:${pct}%"></div><div class="wi-cine__gauge-dot" style="left:${pct}%"></div></div></div>`;
+    if (key === 'twist') return this._twistGrid();
+    if (key === 'clarity' || key === 'action' || key === 'consistency') {
+      const ic = (typeof ICONS !== 'undefined') ? { clarity: ICONS.clarity, action: ICONS.action, consistency: ICONS.streak } : {};
+      const col = { clarity: 'rgba(150,116,255,1)', action: 'rgba(226,232,255,1)', consistency: 'rgba(52,211,153,1)' };
+      return '<div class="wi-cine__pillicon" style="color:' + col[key] + '">' + (ic[key] || '') + '</div>';
     }
-    // payoff: a 12-month green streak row + a single gold "now" dot (only gold used)
+    // close: a 12-month green streak row + a single gold "now" dot (only gold used)
     let dots = '';
     for (let i = 0; i < 12; i++) {
       const x = (30 + i * (180 / 11)).toFixed(1);
@@ -2098,6 +2202,30 @@ const WelcomeIntro = {
       + '<line x1="120" y1="84" x2="120" y2="124" stroke="rgba(232,194,74,0.28)" stroke-width="1"/>'
       + '<circle cx="120" cy="78" r="6.5" fill="rgba(232,194,74,1)"/>'
       + '<circle cx="120" cy="78" r="12" fill="none" stroke="rgba(232,194,74,0.4)" stroke-width="1"/></svg>';
+  },
+  // the twist motif: a life in years (the Mori grid). Spent years dim, the current
+  // year bright gold, the years still ahead a faint gold, so "weeks left" is visible.
+  _twistGrid() {
+    let by = (state.mori && state.mori.birthYear) || null;
+    if (!by) { try { const b = state.profile && state.profile.birthday; if (b) { const m = String(b).match(/(19|20)\d\d/); if (m) by = parseInt(m[0], 10); } } catch (e) {} }
+    let age = null;
+    try { if (by && typeof moriAgeYears === 'function') age = moriAgeYears(by); } catch (e) {}
+    if (age != null) age = Math.max(0, Math.floor(age));
+    const cols = 10, rows = 8, total = cols * rows;
+    const x0 = 44, x1 = 196, y0 = 30, y1 = 150;
+    let cells = '';
+    for (let i = 0; i < total; i++) {
+      const c = i % cols, r = (i / cols) | 0;
+      const x = (x0 + c * ((x1 - x0) / (cols - 1))).toFixed(1);
+      const y = (y0 + r * ((y1 - y0) / (rows - 1))).toFixed(1);
+      let fill;
+      if (age == null) fill = 'rgba(232,194,74,0.18)';
+      else if (i < age) fill = 'rgba(255,255,255,0.10)';
+      else if (i === age) fill = 'rgba(232,194,74,0.95)';
+      else fill = 'rgba(232,194,74,0.34)';
+      cells += '<circle cx="' + x + '" cy="' + y + '" r="3" fill="' + fill + '"/>';
+    }
+    return '<svg class="wi-mock" viewBox="0 0 240 190" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' + cells + '</svg>';
   },
 
   // ---- catered-copy helpers for the Solution page (template, no AI) ----------

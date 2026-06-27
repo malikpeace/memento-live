@@ -1627,6 +1627,11 @@ body.lite .wi-cine { animation: none; }
 .wi-cine__beam { position: absolute; left: 50%; top: 50%; width: 46vmin; height: 82vmin; transform: translate(-50%,-52%); z-index: -1; pointer-events: none; mix-blend-mode: screen; filter: blur(26px); opacity: var(--beam, 0.55); transition: opacity 0.3s ease; background: radial-gradient(40% 60% at 50% 38%, rgba(244,236,255,0.5) 0%, rgba(198,178,255,0.26) 22%, rgba(160,164,255,0.10) 46%, transparent 72%); }
 body.lite .wi-cine__beam { filter: blur(18px); }
 .wi-cine__wantwrap { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+/* the reused module icons (clarity circles, action footsteps, consistency flame) on
+   the three "how Memento helps" beats; color is set inline per pillar, soft halo only */
+.wi-cine__pillicon { width: 92px; height: 92px; margin: 0 auto; display: grid; place-items: center; }
+.wi-cine__pillicon svg { width: 100%; height: 100%; display: block; filter: drop-shadow(0 0 13px currentColor); }
+body.lite .wi-cine__pillicon svg { filter: none; }
 .wi-cine__chips { display: flex; flex-wrap: wrap; gap: 7px; justify-content: center; margin-top: 16px; max-width: 300px; }
 .wi-cine__chip { font-size: 0.8rem; line-height: 1; padding: 8px 12px; border-radius: 9px; color: rgba(255,255,255,0.88); background: rgba(255,255,255,0.05); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06); }
 .wi-cine__trap { font-size: 0.83rem; line-height: 1.4; color: rgba(232,234,248,0.44); margin: -10px auto 0; max-width: 30ch; }
