@@ -340,10 +340,17 @@ const ClarityExperience = {
       if (actionBtn) {
         actionBtn.addEventListener('click', () => {
           this.close();
-          ActionExperience.open();
-          // Additive, dismissible: one-time prompt to save their work to an account,
-          // deferred so it never runs inside the ceremony close.
-          try { setTimeout(function () { if (typeof maybeShowSaveWorkNudge === 'function') maybeShowSaveWorkNudge(); }, 600); } catch (e) {}
+          // "Save your Memento" (account + Add to Home Screen) comes FIRST, at the
+          // value moment, then Action + the paywall wait until it resolves. This keeps
+          // the order Clarity -> save -> paywall and stops them stacking. If the sheet
+          // does not show (already signed in / demo / no account system), go straight
+          // to Action. Deferred so it never runs inside the ceremony close.
+          const proceed = () => { try { ActionExperience.open(); } catch (e) {} };
+          setTimeout(() => {
+            let shown = false;
+            try { shown = (typeof maybeShowSaveWorkNudge === 'function') && maybeShowSaveWorkNudge(proceed); } catch (e) {}
+            if (!shown) proceed();
+          }, 420);
         });
       }
 

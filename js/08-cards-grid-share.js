@@ -1594,13 +1594,16 @@ function maybeShowBackupNudge() {
 // Account-primary. Once only (state.meta.saveWorkNudged), never in demo, skipped if
 // already signed in or the account system is unavailable.
 let _saveWorkNudgeEl = null;
-function maybeShowSaveWorkNudge() {
+// Returns true if the sheet was shown (so the caller can defer what comes next,
+// e.g. Action + the paywall, until it resolves); false if skipped. onDone fires
+// once when the sheet closes (any path: account, install, or maybe later).
+function maybeShowSaveWorkNudge(onDone) {
   try {
-    if (DEMO_MODE) return;
-    if (!state.meta || state.meta.saveWorkNudged) return;
-    if (typeof CloudSync === 'undefined' || !CloudSync.available || !CloudSync.available()) return;
-    if (CloudSync.isLoggedIn && CloudSync.isLoggedIn()) return;
-    if (_saveWorkNudgeEl || document.getElementById('saveMemento')) return;
+    if (DEMO_MODE) return false;
+    if (!state.meta || state.meta.saveWorkNudged) return false;
+    if (typeof CloudSync === 'undefined' || !CloudSync.available || !CloudSync.available()) return false;
+    if (CloudSync.isLoggedIn && CloudSync.isLoggedIn()) return false;
+    if (_saveWorkNudgeEl || document.getElementById('saveMemento')) return false;
 
     let installed = false; try { installed = !!(window.MementoInstall && window.MementoInstall._isStandalone()); } catch (_) {}
     const mark = '<svg viewBox="0 0 512 512" width="42" height="42" aria-hidden="true"><rect width="512" height="512" rx="118" fill="#0c0c12"/><rect x="6" y="6" width="500" height="500" rx="114" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="3"/><path d="M150 152 L256 258 L362 152 L362 360 L150 360 Z" fill="none" stroke="#f5f5f7" stroke-width="26" stroke-linejoin="round"/></svg>';
@@ -1624,6 +1627,7 @@ function maybeShowSaveWorkNudge() {
     const close = () => {
       el.classList.remove('is-open'); el.setAttribute('aria-hidden', 'true');
       setTimeout(() => { try { el.remove(); } catch (_) {} if (_saveWorkNudgeEl === el) _saveWorkNudgeEl = null; }, 320);
+      if (typeof onDone === 'function') { const cb = onDone; onDone = null; setTimeout(cb, 140); }
     };
     el.addEventListener('click', (e) => {
       let t = e.target;
@@ -1634,7 +1638,8 @@ function maybeShowSaveWorkNudge() {
     const inst = el.querySelector('.save-memento__install');
     if (inst) inst.addEventListener('click', () => { close(); setTimeout(() => { try { if (window.MementoInstall) window.MementoInstall.show(); } catch (_) {} }, 280); });
     requestAnimationFrame(() => { el.classList.add('is-open'); el.setAttribute('aria-hidden', 'false'); });
-  } catch (_) {}
+    return true;
+  } catch (_) { return false; }
 }
 
 // === Plan tomorrow tonight =========================================

@@ -328,7 +328,6 @@ const WelcomeIntro = {
       'Honestly, just recently': "Then you are catching it early, before it hardens into a rut. Good place to start.",
       'On and off for a while': "On and off means the wanting is real, it just never had anything holding it in place. That is what Memento is for.",
       'A long time, I keep circling back': "Circling back is not failing, it is missing the system that makes it stick. We build that.",
-      "I feel close, just not there yet": "Close is further than most people get. We close the last gap so it finally lands.",
       _fallback: "Wherever you have gotten so far, we build from here."
     },
     distraction: {
@@ -1257,7 +1256,7 @@ const WelcomeIntro = {
     { key: 'clarityHistory', type: 'choices', multi: false,
       headline: 'How long has this been on your mind?',
       sub: 'No judgment. Just where you actually are.',
-      options: ['Honestly, just recently', 'On and off for a while', 'A long time, I keep circling back', "I feel close, just not there yet"],
+      options: ['Honestly, just recently', 'On and off for a while', 'A long time, I keep circling back'],
       skipIf: (p) => { const c = String((p && p.clarityLevel) || '').toLowerCase(); return !(c.indexOf('lost') !== -1 || c.indexOf('not really') !== -1); } },
     // ── CONSISTENCY gap: what's holding them back, and what's the pull? ──────
     // Only asked of people who said they are NOT making progress (Haven't
