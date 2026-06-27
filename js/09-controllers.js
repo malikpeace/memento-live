@@ -567,10 +567,12 @@ const WelcomeIntro = {
     lines.forEach((l, i) => {
       l.classList.add('wc-hist');
       l.style.filter = '';
-      // The most recent history line is a faint hint; older lines fade out fully
-      // so the stack never grows, however long the conversation gets.
+      // Graduated thread: the lines just above the current question stay clearly
+      // visible (so it is obvious there IS a past conversation to swipe up into),
+      // older ones settle to a faint floor instead of vanishing, and the top mask
+      // dissolves the oldest at the edge. Scroll up (.wc-reading) restores full.
       const fromNewest = (n - 1) - i;
-      l.style.opacity = Math.max(0, 0.18 - fromNewest * 0.06).toFixed(3);
+      l.style.opacity = Math.max(0.1, 0.32 - fromNewest * 0.06).toFixed(3);
     });
   },
 

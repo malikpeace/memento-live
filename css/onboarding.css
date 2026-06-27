@@ -3431,7 +3431,7 @@ html.lowfx .auth-screen__card, body.lite .auth-screen__card { background: rgba(1
 /* Focused mode: once a question is answered and the next begins, its lines become
    faint "history" (one soft level, no blur) so the CURRENT question owns the
    screen. Swipe up (.wc-reading) restores them to full. */
-.wc-line.wc-hist { opacity: 0.14; }
+.wc-line.wc-hist { opacity: 0.22; }
 .wc-line.user { color: #fff; font-weight: 700; }
 
 /* Bottom dock = the existing nav rail, reused. Holds chips or the composer. */
