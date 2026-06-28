@@ -143,8 +143,8 @@
 
     addRow('name', 'text');
     addRow('birthday', 'date');
-    addMultiRow('runningToward');
     addRow('clarityLevel', 'select');
+    addMultiRow('runningToward');
     addRow('actionKnow', 'select');
     addRow('actionProgress', 'select');
     addMultiRow('runningFrom');
