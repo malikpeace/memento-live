@@ -314,7 +314,7 @@ const WelcomeIntro = {
     },
     actionProgress: {
       "Haven't really started": "Not starting yet is okay. The first small move is the hardest, and we make it tiny.",
-      'Started, then stalled': "Stalling happens to everyone. It usually means the next step got too big, not that you failed.",
+      'Started, then stopped': "Stopping happens to everyone. It usually means the next step got too big, not that you failed.",
       'Slow but moving.. just a bit inconsistent': "Slow but moving still counts. We'll help crack that consistency part.",
       'Actually doing really good': "Good! Consistency is the most important ingredient. Now we just need to keep that momentum.",
       _fallback: "Wherever you're at is fine. We build from here, one small step at a time."
@@ -1258,7 +1258,7 @@ const WelcomeIntro = {
     { key: 'actionProgress', type: 'choices', multi: false,
       headline: "How's it going so far?",
       sub: 'No judgment. Just where you actually are.',
-      options: ["Haven't really started", 'Started, then stalled', 'Slow but moving.. just a bit inconsistent', 'Actually doing really good'],
+      options: ["Haven't really started", 'Started, then stopped', 'Slow but moving.. just a bit inconsistent', 'Actually doing really good'],
       skipIf: (p) => { const c = String((p && p.clarityLevel) || '').toLowerCase(); return c.indexOf('lost') !== -1 || c.indexOf('not really') !== -1; } },
     // Clarity branch: shown INSTEAD of the two action questions above when they have
     // no goal yet (lost / still figuring it out). There is no "there" for them, so we
@@ -1842,7 +1842,7 @@ const WelcomeIntro = {
     var followThrough = has(actionKnow, 'follow through') || has(actionKnow, 'follow-through') || has(actionKnow, "don't follow") || has(actionKnow, 'know the action');
     var actionUnsure = has(actionKnow, 'sort of') || has(actionKnow, 'not sure it');
     var noSteps = has(actionKnow, 'know the steps') || has(actionKnow, 'do not know the steps');
-    var stalled = has(actionProgress, 'stalled') || has(actionProgress, 'started, then') || has(actionProgress, 'started then');
+    var stalled = has(actionProgress, 'stopped') || has(actionProgress, 'started, then') || has(actionProgress, 'started then');
     var notStarted = has(actionProgress, 'haven') || has(actionProgress, 'not really started');
     var slow = has(actionProgress, 'slow');
     var roll = has(actionProgress, 'roll');
@@ -1857,7 +1857,7 @@ const WelcomeIntro = {
       action = 'Every day Memento gives you the single move that matters most, so you stop staring at a list guessing where to begin. One clear next step, every day.';
     }
     if (stalled) {
-      action += ' You started and stalled once, and the next move is how you start again.';
+      action += ' You started and stopped once, and the next move is how you start again.';
     } else if (notStarted) {
       action += ' You have not really started yet, so the first move is small enough to actually take.';
     } else if (slow) {
@@ -2304,7 +2304,7 @@ const WelcomeIntro = {
     const ap = String((p && p.actionProgress) || '');
     if (ap === 'Actually doing really good') return 'You are moving right now, and that is the rarest thing you have. Momentum does not break loud, it slips out one quiet skipped day at a time. Starting is not the job anymore. Not losing this is.';
     if (ap === 'Slow but moving.. just a bit inconsistent') return 'Slow but moving still counts, and it puts you ahead of almost everyone standing still. The risk is not speed. It is that slow with nothing in front of you fades, and one bad week becomes the week you quietly stopped.';
-    if (ap === 'Started, then stalled') return 'You started, so the wanting was real. Then it stalled, the way it almost always does, not because you failed but because nothing was holding it in place. Every day it stays parked, it costs a little more to come back.';
+    if (ap === 'Started, then stopped') return 'You started, so the wanting was real. Then it stopped, the way it almost always does, not because you failed but because nothing was holding it in place. Every day it stays parked, it costs a little more to come back.';
     if (ap === "Haven't really started") return 'You have not really started yet, and that is the heaviest place to sit, because the goal just keeps following you around. Another year of meaning to ends exactly where this one did. So we make the first move small enough that you cannot talk yourself out of it.';
     return 'Wherever you are right now is fine. We build from here, one small move at a time, until the goal stops being a wish and starts being real.';
   },
@@ -2331,7 +2331,7 @@ const WelcomeIntro = {
     out.push({ accent: CL.action, line: actionUnsure
       ? 'You said you do not fully know the steps. We turn the goal into one daily move, so every day you know the single thing to do. Knowing finally becomes doing, and doing is where it changes.'
       : 'We turn the goal into one daily move, so every day you know the single highest-leverage thing to do. Knowing becomes doing.' });
-    const consGap = rf.indexOf('consist') !== -1 || rf.indexOf('procrast') !== -1 || rf.indexOf('phone') !== -1 || rf.indexOf('motivation') !== -1 || ap === 'Started, then stalled' || ap === "Haven't really started";
+    const consGap = rf.indexOf('consist') !== -1 || rf.indexOf('procrast') !== -1 || rf.indexOf('phone') !== -1 || rf.indexOf('motivation') !== -1 || ap === 'Started, then stopped' || ap === "Haven't really started";
     out.push({ accent: CL.consistency, line: consGap
       ? 'You said consistency is the part that breaks down. Memento keeps the days you showed up right in front of you, with a clear way back in on the days you slip. No starting over.'
       : 'Memento keeps the days you showed up visible, with a clear way back in on the days you slip, so it compounds instead of resetting.' });
