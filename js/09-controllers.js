@@ -2019,10 +2019,11 @@ const WelcomeIntro = {
     const isLast = beatIdx === n - 1;
     const dots = beats.map((x, i) => `<span class="wi-demo__dot${i === beatIdx ? ' is-active' : ''}" data-beat="${i}" style="${i === beatIdx ? 'background:' + b.accent : ''}"></span>`).join('');
 
-    this.pageWrap.innerHTML = `<div class="welcome-intro__page-inner wi-cine" data-beat="${beatIdx}">
+    const isReflect = b.key === 'summary';
+    this.pageWrap.innerHTML = `<div class="welcome-intro__page-inner wi-cine${isReflect ? ' wi-cine--reflect' : ''}" data-beat="${beatIdx}">
       <div class="wi-cine__beam" style="--beam:${b.beam}"></div>
-      <div class="wi-demo__stage">${this._cineMock(b.key, p)}</div>
-      <div class="wi-demo__eyebrow" style="color:${b.accent}">${b.label ? esc(b.label) : ('0' + (beatIdx + 1) + ' <span>of 0' + n + '</span>')}</div>
+      ${isReflect ? '' : `<div class="wi-demo__stage">${this._cineMock(b.key, p)}</div>`}
+      <div class="wi-demo__eyebrow${isReflect ? ' wi-demo__eyebrow--soft' : ''}" style="color:${b.accent}">${b.label ? esc(b.label) : ('0' + (beatIdx + 1) + ' <span>of 0' + n + '</span>')}</div>
       <h2 class="wi-demo__headline">${esc(b.headline)}</h2>
       <p class="wi-demo__line">${esc(b.line)}</p>
       ${b.trap ? `<p class="wi-cine__trap">${esc(b.trap)}</p>` : ''}
@@ -2098,7 +2099,7 @@ const WelcomeIntro = {
     // and the orb's state change (key === the orb state the CSS evolves).
     const B = 0.5;
     return [
-      { key: 'summary', accent: PUR, beam: B, label: 'WHAT YOU WANT', headline: sumHead, line: sumLine },
+      { key: 'summary', accent: PUR, beam: B, label: 'your position:', headline: sumHead, line: sumLine },
       { key: 'problem', accent: PUR, beam: B, label: 'THE PROBLEM', headline: probHead, line: probLine },
       { key: 'solution', accent: PUR, beam: B, label: 'THE SOLUTION', headline: solHead, line: solLine },
       { key: 'philosophy', accent: PUR, beam: B, label: 'THE PHILOSOPHY', headline: phiHead, line: phiLine },
