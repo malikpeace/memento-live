@@ -2234,7 +2234,7 @@ const WelcomeIntro = {
       // No goal picked (the 'completely lost' path). Reflect WHY it is hard, from
       // their clarityBlock answer, so the end page personalizes to what they said.
       const cb = low(p && p.clarityBlock);
-      let why = 'You are not even sure which direction is the one yet.';
+      let why = 'You are not sure which direction is the one yet.';
       if (cb.indexOf('too many') !== -1 || cb.indexOf('directions') !== -1) why = 'You are not short on directions, you just cannot lock onto the one.';
       else if (cb.indexOf('wrong') !== -1) why = 'The fear of picking wrong has kept you from picking at all.';
       else if (cb.indexOf('lost touch') !== -1) why = 'You have lost the thread of what you actually care about.';
