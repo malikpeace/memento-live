@@ -1640,6 +1640,17 @@ body.lite .wi-cine__beam { filter: blur(18px); }
 /* Smooth crossfade out between chapters (overrides the slide-out for this flow). */
 .wi-cine.exit { animation: wiCineOut 0.18s ease forwards; }
 @keyframes wiCineOut { to { opacity: 0; transform: translateY(-6px); } }
+/* Staggered reveal for the bare chapters (summary / problem / solution): the page
+   lands blank, then the headline fades up, then the line a beat later. The block
+   itself does not animate; each paragraph reveals on its own delay. */
+.wi-cine--stagger { animation: none !important; }
+.wi-cine--stagger .wi-demo__headline,
+.wi-cine--stagger .wi-demo__line { opacity: 0; animation: wiLineIn 0.7s cubic-bezier(0.22,1,0.36,1) forwards; }
+.wi-cine--stagger .wi-demo__headline { animation-delay: 0.22s; }
+.wi-cine--stagger .wi-demo__line { animation-delay: 0.82s; }
+@keyframes wiLineIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.wi-cine--stagger.exit .wi-demo__headline, .wi-cine--stagger.exit .wi-demo__line { animation: none; }
+@media (prefers-reduced-motion: reduce) { .wi-cine--stagger .wi-demo__headline, .wi-cine--stagger .wi-demo__line { animation: none; opacity: 1; } }
 .wi-cine__wantwrap { display: flex; flex-direction: column; align-items: center; justify-content: center; }
 /* the reused module icons (clarity circles, action footsteps, consistency flame) on
    the three "how Memento helps" beats; color is set inline per pillar, soft halo only */

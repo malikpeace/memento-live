@@ -2020,10 +2020,12 @@ const WelcomeIntro = {
     const b = beats[beatIdx];
     const isLast = beatIdx === n - 1;
 
-    const isReflect = b.key === 'summary';
-    this.pageWrap.innerHTML = `<div class="welcome-intro__page-inner wi-cine${isReflect ? ' wi-cine--reflect' : ''}" data-beat="${beatIdx}">
-      ${isReflect ? '' : `<div class="wi-demo__stage">${this._cineMock(b.key, p)}</div>`}
-      ${isReflect ? '' : `<div class="wi-demo__eyebrow" style="color:${b.accent}">${b.label ? esc(b.label) : ('0' + (beatIdx + 1) + ' <span>of 0' + n + '</span>')}</div>`}
+    // Bare chapters (summary / problem / solution): no orb, no label, just words that
+    // fade in one by one. The rest keep their orb + label.
+    const bare = (b.key === 'summary' || b.key === 'problem' || b.key === 'solution');
+    this.pageWrap.innerHTML = `<div class="welcome-intro__page-inner wi-cine${bare ? ' wi-cine--reflect wi-cine--stagger' : ''}" data-beat="${beatIdx}">
+      ${bare ? '' : `<div class="wi-demo__stage">${this._cineMock(b.key, p)}</div>`}
+      ${bare ? '' : `<div class="wi-demo__eyebrow" style="color:${b.accent}">${b.label ? esc(b.label) : ('0' + (beatIdx + 1) + ' <span>of 0' + n + '</span>')}</div>`}
       <h2 class="wi-demo__headline">${esc(b.headline)}</h2>
       <p class="wi-demo__line">${esc(b.line)}</p>
       ${b.trap ? `<p class="wi-cine__trap">${esc(b.trap)}</p>` : ''}
