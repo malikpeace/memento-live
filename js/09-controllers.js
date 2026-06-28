@@ -2189,8 +2189,9 @@ const WelcomeIntro = {
       + '<circle cx="120" cy="92" r="14" fill="none" stroke="rgba(184,156,255,0.7)" stroke-width="1"/>'
       + '<circle cx="120" cy="92" r="7" fill="rgba(190,164,255,1)"/></svg>';
     const ic = (typeof ICONS !== 'undefined') ? ICONS : {};
-    // consistency reads as a calendar (showing up day after day), not the flame
-    const cal = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
+    // consistency = the calendar with X marks for the days you showed up (ported
+    // from the demo consistency mark; strokes bumped so it reads at mark size).
+    const cal = '<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-linecap="round"><rect x="14" y="18" width="52" height="48" rx="7" stroke-width="2.2" opacity="0.55"/><line x1="14" y1="30" x2="66" y2="30" stroke-width="1.6" opacity="0.4"/><line x1="28" y1="13" x2="28" y2="22" stroke-width="2.6" opacity="0.7"/><line x1="52" y1="13" x2="52" y2="22" stroke-width="2.6" opacity="0.7"/><path d="M22 36L28 42M28 36L22 42" stroke-width="2.4"/><path d="M34 36L40 42M40 36L34 42" stroke-width="2.4"/><path d="M46 36L52 42M52 36L46 42" stroke-width="2.4"/><path d="M22 48L28 54M28 48L22 54" stroke-width="2.4"/><path d="M34 48L40 54M40 48L34 54" stroke-width="2.4"/></svg>';
     const marks = '<div class="wi-orb__marks">'
       + '<span class="wi-orb__mark" style="color:rgba(150,116,255,1)">' + (ic.clarity || '') + '</span>'
       + '<span class="wi-orb__mark" style="color:rgba(226,232,255,1)">' + (ic.action || '') + '</span>'
