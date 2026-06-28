@@ -2178,6 +2178,9 @@ const WelcomeIntro = {
     const low = (v) => String(v || '').toLowerCase();
     const cl = low(p && p.clarityLevel), ap = String((p && p.actionProgress) || '');
     const moving = (ap === 'Slow but moving.. just a bit inconsistent' || ap === 'Actually doing really good');
+    // "Started, then stopped" is NOT the same as never starting: they moved, it just
+    // did not stick. That is a consistency problem, so it gets its own line.
+    const stalled = ap === 'Started, then stopped';
     // Goal-aware: the "not sure which" framing only makes sense when NO goal was
     // picked (the 'completely lost' path skips the goal question). If a goal IS
     // present, never say they are unsure which one, that would contradict the
@@ -2198,15 +2201,17 @@ const WelcomeIntro = {
       else if (cb.indexOf('ready') !== -1 || cb.indexOf('waiting') !== -1) why = 'You are waiting to feel ready, and ready keeps not showing up.';
       return why + ' That uncertainty is the whole reason you are here, and it is fixable.';
     }
-    if (cl.indexOf('exactly') !== -1) return moving
-      ? 'You know exactly what you want and you are already moving. Now you want to make sure it actually sticks.'
-      : 'You know exactly what you want. You just have not turned it into motion yet.';
+    if (cl.indexOf('exactly') !== -1) {
+      if (moving) return 'You know exactly what you want and you are already moving. Now you want to make sure it actually sticks.';
+      if (stalled) return 'You know exactly what you want. You have started before, it just keeps falling off.';
+      return 'You know exactly what you want. You just have not turned it into motion yet.';
+    }
     if (cl.indexOf('not really') !== -1 || cl.indexOf('trying') !== -1 || cl.indexOf('lost') !== -1) {
       return 'You have a sense it is about this. You just have not locked it in, or made it move yet.';
     }
-    return moving
-      ? 'You have a sense of it and you have started. Now you want it to hold.'
-      : 'You have the area. You just have not pinned it to one concrete thing, or made it move yet.';
+    if (moving) return 'You have a sense of it and you have started. Now you want it to hold.';
+    if (stalled) return 'You have the area, and you have started on it before. You just have not made any serious moves stick yet.';
+    return 'You have the area. You just have not pinned it to one concrete thing, or made any serious moves yet.';
   },
   // name the thing in the way, from what they said holds them back
   _solBlockerLine(p) {
