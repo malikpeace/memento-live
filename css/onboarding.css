@@ -1439,6 +1439,17 @@ body.calm-motion .welcome-intro__pillar-ground {
     animation-delay: var(--del, 0s);
     will-change: opacity, transform;
   }
+  /* The onboarding chapter beams keep FULL motion on phones too (transient screen,
+     like the splash): the per-beam angular sweep + a brighter opacity glimmer,
+     overriding the blanket freeze above. This is why they were dead on mobile. */
+  .welcome-intro__rays .ambient__rays-beam {
+    animation: wiBeamSweep calc(var(--d, 12s) * 1.7) ease-in-out var(--del, 0s) infinite !important;
+  }
+  .welcome-intro__rays .ambient__rays-beam-shaft {
+    animation: ambientBeamGlimmer calc(var(--d, 10s) * 1.5) ease-in-out infinite !important;
+    animation-delay: var(--del, 0s);
+    will-change: opacity;
+  }
 }
 
 /* Clickable elements should feel alive on pointer hover, even in the mobile
@@ -1638,13 +1649,20 @@ body.lite .wi-cine__beam { filter: blur(18px); }
 /* The signature top-left light: real god-ray shafts (not an orb). The base
    .ambient__rays-* child styles are global; this wrapper just makes them visible
    and sits them behind the text. Created once = constant across chapters. */
-.welcome-intro__rays { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; opacity: 0.95; animation: ambientRaysFadeIn 1.5s ease both; }
-body.lite .welcome-intro__rays { opacity: 0.6; }
+.welcome-intro__rays { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; opacity: 0.95; transform-origin: 6% 4%; filter: brightness(1.18); animation: ambientRaysFadeIn 1.5s ease both, wiRaysDrift 22s ease-in-out infinite; }
+body.lite .welcome-intro__rays { opacity: 0.6; filter: none; }
 /* Crisper, brighter shafts than the dashboard default so they read as distinct
    beams of light from the top-left, not a soft orb. */
 .welcome-intro__rays .ambient__rays-beam-shaft { filter: blur(8px); }
 .welcome-intro__rays .ambient__rays-source { filter: blur(22px); opacity: 0.7; }
-@media (prefers-reduced-motion: reduce) { .welcome-intro__rays { animation: none; } }
+/* The beams MOVE: each one slowly sweeps a few degrees around its own base angle
+   (varied duration + phase per beam so they never sync), the way the action
+   mountain rays drift. Plus the whole cluster gently rocks. This is what makes
+   them read as living light instead of a frozen gradient. */
+.welcome-intro__rays .ambient__rays-beam { animation: wiBeamSweep calc(var(--d, 12s) * 1.7) ease-in-out var(--del, 0s) infinite; }
+@keyframes wiBeamSweep { 0%, 100% { transform: rotate(calc(var(--a) - 3.5deg)); } 50% { transform: rotate(calc(var(--a) + 3.5deg)); } }
+@keyframes wiRaysDrift { 0%, 100% { transform: rotate(-1.3deg); } 50% { transform: rotate(1.3deg); } }
+@media (prefers-reduced-motion: reduce) { .welcome-intro__rays, .welcome-intro__rays .ambient__rays-beam { animation: none; } }
 /* Text + nav sit above the beacon. */
 .welcome-intro--help .welcome-intro__page-wrap { position: relative; z-index: 1; }
 /* Smooth crossfade out between chapters (overrides the slide-out for this flow). */
