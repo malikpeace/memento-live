@@ -1983,17 +1983,18 @@ const WelcomeIntro = {
     if (beatIdx < 0) {
       const inner = this.pageWrap.querySelector('.welcome-intro__page-inner');
       if (inner) inner.classList.add('exit');
-      this.el.classList.remove('welcome-intro--help');
+      this.el.classList.remove('welcome-intro--help', 'welcome-intro--cine');
       const _bc = document.getElementById('welcomeBeacon'); if (_bc) _bc.remove();
-      const _fb = this.el.querySelector('.wi-cine__beam--fixed'); if (_fb) _fb.remove();
       setTimeout(() => { this._showFirstWin(stepIndex); }, 250);
       return;
     }
 
-    // dark glass theme, kill the fireworks
+    // dark glass theme, kill the fireworks. The chapter flow is lit by ONE thing:
+    // the top-left beacon beam (Memento's signature light), over a clean dark canvas.
+    // No colored stage glows, no competing aurora blobs (the --cine class hides them).
     this.el.classList.remove('welcome-intro--blackout');
-    this.el.classList.add('welcome-intro--help');
-    this._setStage(['purple', 'green', 'cyan'], 'help');
+    this.el.classList.add('welcome-intro--help', 'welcome-intro--cine');
+    this._setStage([], 'help');
     this._confettiVer = (this._confettiVer || 0) + 1;
     const oldcf = document.getElementById('welcomeConfetti'); if (oldcf) oldcf.remove();
     this._hideProgressBar();
@@ -2009,21 +2010,13 @@ const WelcomeIntro = {
       beacon.id = 'welcomeBeacon'; beacon.className = 'welcome-intro__beacon'; beacon.setAttribute('aria-hidden', 'true');
       this.el.insertBefore(beacon, this.pageWrap);
     }
-    // ONE constant background: a single fixed glow that lives outside the per-beat
-    // re-render, so it never flickers or jumps between chapters. The text crossfades
-    // over it; the light stays put.
-    if (!this.el.querySelector('.wi-cine__beam--fixed')) {
-      const beam = document.createElement('div');
-      beam.className = 'wi-cine__beam--fixed'; beam.setAttribute('aria-hidden', 'true');
-      this.el.insertBefore(beam, this.pageWrap);
-    }
     if (!this._summary && !this._summaryFailed) this.generateSummary();
     this._onSummaryReady = null;
 
     const p = state.profile || {};
     const beats = this._solBeats(p);
     const n = beats.length;
-    if (beatIdx >= n) { const _fb = this.el.querySelector('.wi-cine__beam--fixed'); if (_fb) _fb.remove(); this._showIdentityStep(stepIndex + 1); return; }
+    if (beatIdx >= n) { this.el.classList.remove('welcome-intro--cine'); this._showIdentityStep(stepIndex + 1); return; }
     const b = beats[beatIdx];
     const isLast = beatIdx === n - 1;
 
@@ -2591,11 +2584,10 @@ const WelcomeIntro = {
 
   _revealAfterOnboarding(name) {
     // tear down the celebration / help themes + fireworks if still up
-    if (this.el) { this.el.classList.remove('welcome-intro--blackout', 'welcome-intro--help'); this._setStage([]); }
+    if (this.el) { this.el.classList.remove('welcome-intro--blackout', 'welcome-intro--help', 'welcome-intro--cine'); this._setStage([]); }
     this._confettiVer = (this._confettiVer || 0) + 1;
     const _cf = document.getElementById('welcomeConfetti'); if (_cf) _cf.remove();
     const _bc = document.getElementById('welcomeBeacon'); if (_bc) _bc.remove();
-    const _fb = this.el && this.el.querySelector('.wi-cine__beam--fixed'); if (_fb) _fb.remove();
     if (this._fwClick) { document.removeEventListener('click', this._fwClick, true); this._fwClick = null; }
     if (name) state.profile.name = name;
     state.meta.welcomeSeen = true;
