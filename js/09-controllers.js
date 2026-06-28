@@ -315,7 +315,7 @@ const WelcomeIntro = {
     actionProgress: {
       "Haven't really started": "Not starting yet is okay. The first small move is the hardest, and we make it tiny.",
       'Started, then stalled': "Stalling happens to everyone. It usually means the next step got too big, not that you failed.",
-      'Slow but moving.. just a bit inconsistent': "Slow but moving still counts. Being slow and consistent is better than being extreme but inconsistent.",
+      'Slow but moving.. just a bit inconsistent': "Slow but moving still counts. We'll help crack that consistency part.",
       'Actually doing really good': "Good! Consistency is the most important ingredient. Now we just need to keep that momentum.",
       _fallback: "Wherever you're at is fine. We build from here, one small step at a time."
     },
@@ -1298,13 +1298,22 @@ const WelcomeIntro = {
     // nothing changes" question contradicts someone who just said they're on a
     // roll. Exactly one of these two runs (mirrors the runningFrom skip). ─────
     { key: 'costOfInaction', type: 'choices', multi: true,
-      headline: 'If a year goes by and nothing changes, what does that feel like?',
+      // Not-started AND slow-but-moving-inconsistent both get the negative "what a
+      // wasted year feels like" question (a mix leaning negative), because someone
+      // who is inconsistent is NOT on a roll, the negative framing fits them. Only
+      // the genuinely-on-a-roll branch ("Actually doing really good") gets the
+      // all-upside momentumWin below. Exactly one of the two runs.
+      headline: (p) => {
+        const ap = String((p && p.actionProgress) || '');
+        if (ap === 'Slow but moving.. just a bit inconsistent') return 'Stay this on-and-off for a year. Where does that leave you?';
+        return 'If a year goes by and nothing changes, what does that feel like?';
+      },
       options: ['Regret', 'Wasted potential', 'Watching everyone pass me', 'Letting people down', 'Running out of time', "Becoming someone I don't want to be", 'Okay, but not perfect', 'Alright, but I know I can get better', "Honestly, I'd be proud of myself"],
-      skipIf: (p) => { const ap = String((p && p.actionProgress) || ''); return ap === 'Slow but moving.. just a bit inconsistent' || ap === 'Actually doing really good'; } },
+      skipIf: (p) => { const ap = String((p && p.actionProgress) || ''); return ap === 'Actually doing really good'; } },
     { key: 'momentumWin', type: 'choices', multi: true,
       headline: 'Keep this up for a year. What does that get you?',
       options: ['Closer to my goals (eg. money, abs, relationships, etc)', 'I make my younger self proud', 'Closer to self-mastery', "I'll have true freedom", 'Fulfillment and Peace', "Memories I'll look back at", 'Other'],
-      skipIf: (p) => { const ap = String((p && p.actionProgress) || ''); return !(ap === 'Slow but moving.. just a bit inconsistent' || ap === 'Actually doing really good'); } },
+      skipIf: (p) => { const ap = String((p && p.actionProgress) || ''); return ap !== 'Actually doing really good'; } },
     { key: 'letterToFutureSelf', type: 'text',
       headline: 'Anything else Memento should know about you and your goals?',
       sub: 'Totally optional. A line about you, your situation, or what you want. Or just skip it.',
