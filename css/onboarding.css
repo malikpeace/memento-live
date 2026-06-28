@@ -1633,8 +1633,18 @@ body.lite .wi-cine__beam { filter: blur(18px); }
    (Memento's signature light). Kill the competing colored aurora blobs; keep a faint
    top-left wash so the beam has somewhere to land. The beacon itself stays constant
    across chapters (created once), so the background never jumps. */
-.welcome-intro--cine { background: radial-gradient(115% 82% at 5% 0%, rgba(124,104,232,0.17), transparent 55%), #07060d !important; }
+.welcome-intro--cine { background: radial-gradient(115% 82% at 5% 0%, rgba(124,104,232,0.14), transparent 55%), #07060d !important; }
 .welcome-intro--cine::before, .welcome-intro--cine::after { display: none !important; }
+/* The signature top-left light: real god-ray shafts (not an orb). The base
+   .ambient__rays-* child styles are global; this wrapper just makes them visible
+   and sits them behind the text. Created once = constant across chapters. */
+.welcome-intro__rays { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; opacity: 0.95; animation: ambientRaysFadeIn 1.5s ease both; }
+body.lite .welcome-intro__rays { opacity: 0.6; }
+/* Crisper, brighter shafts than the dashboard default so they read as distinct
+   beams of light from the top-left, not a soft orb. */
+.welcome-intro__rays .ambient__rays-beam-shaft { filter: blur(8px); }
+.welcome-intro__rays .ambient__rays-source { filter: blur(22px); opacity: 0.7; }
+@media (prefers-reduced-motion: reduce) { .welcome-intro__rays { animation: none; } }
 /* Text + nav sit above the beacon. */
 .welcome-intro--help .welcome-intro__page-wrap { position: relative; z-index: 1; }
 /* Smooth crossfade out between chapters (overrides the slide-out for this flow). */

@@ -1542,7 +1542,7 @@ const WelcomeIntro = {
         this._setStage(['purple', 'green', 'cyan']);
         this._confettiVer = (this._confettiVer || 0) + 1;
         const _cf = document.getElementById('welcomeConfetti'); if (_cf) _cf.remove();
-        const _bc = document.getElementById('welcomeBeacon'); if (_bc) _bc.remove();
+        const _bc = document.getElementById('welcomeRays'); if (_bc) _bc.remove();
         if (this._fwClick) { document.removeEventListener('click', this._fwClick, true); this._fwClick = null; }
         // Paywall: bold Gen-Z look (Malik's pick). Real offer from SELL_IT_PACK.
         // Prices are placeholders: 99 / 199 / 3x39. Buy is non-functional (proceeds via _finishWithName).
@@ -1977,6 +1977,23 @@ const WelcomeIntro = {
   // The Solution: the emotional WHY, as 3 paced, vertically CENTERED full-screen
   // beats (want -> stakes -> payoff), the bridge between the first-win and the
   // 6-beat demo. Mirrors their own answers back. No top-pin, no long paragraph.
+  // The top-left god-ray cluster for the chapter flow: one soft source + angled
+  // light shafts, the same signature beam used on the splash and dashboard.
+  _cineRays() {
+    return '<div class="ambient__rays-source"></div>'
+      + '<div class="ambient__rays-beam" style="--a:3deg;  --h:35px;  --d:9.4s;  --del:-0.0s; --omin:0.04; --omax:0.32; --smin:0.85; --smax:1.05; --c:165 130 255;"><div class="ambient__rays-beam-shaft"></div></div>'
+      + '<div class="ambient__rays-beam" style="--a:9deg;  --h:90px;  --d:11.6s; --del:-1.8s; --omin:0.07; --omax:0.50; --smin:0.55; --smax:1.35; --c:150 130 255;"><div class="ambient__rays-beam-shaft"></div></div>'
+      + '<div class="ambient__rays-beam" style="--a:16deg; --h:24px;  --d:7.1s;  --del:-3.4s; --omin:0.05; --omax:0.30; --smin:0.7;  --smax:1.2;  --c:200 180 255;"><div class="ambient__rays-beam-shaft"></div></div>'
+      + '<div class="ambient__rays-beam" style="--a:22deg; --h:75px;  --d:13.2s; --del:-2.1s; --omin:0.09; --omax:0.65; --smin:0.6;  --smax:1.3;  --c:175 140 255;"><div class="ambient__rays-beam-shaft"></div></div>'
+      + '<div class="ambient__rays-beam" style="--a:29deg; --h:40px;  --d:10.5s; --del:-5.6s; --omin:0.05; --omax:0.34; --smin:0.5;  --smax:1.4;  --c:255 255 255;"><div class="ambient__rays-beam-shaft"></div></div>'
+      + '<div class="ambient__rays-beam" style="--a:36deg; --h:110px; --d:8.3s;  --del:-0.7s; --omin:0.11; --omax:0.72; --smin:0.65; --smax:1.25; --c:150 120 255;"><div class="ambient__rays-beam-shaft"></div></div>'
+      + '<div class="ambient__rays-beam" style="--a:43deg; --h:28px;  --d:14.8s; --del:-4.2s; --omin:0.04; --omax:0.28; --smin:0.8;  --smax:1.15; --c:190 165 255;"><div class="ambient__rays-beam-shaft"></div></div>'
+      + '<div class="ambient__rays-beam" style="--a:50deg; --h:95px;  --d:9.0s;  --del:-3.0s; --omin:0.10; --omax:0.68; --smin:0.55; --smax:1.4;  --c:185 145 255;"><div class="ambient__rays-beam-shaft"></div></div>'
+      + '<div class="ambient__rays-beam" style="--a:64deg; --h:65px;  --d:10.9s; --del:-1.2s; --omin:0.08; --omax:0.54; --smin:0.6;  --smax:1.3;  --c:160 140 255;"><div class="ambient__rays-beam-shaft"></div></div>'
+      + '<div class="ambient__rays-beam" style="--a:72deg; --h:32px;  --d:8.6s;  --del:-4.9s; --omin:0.05; --omax:0.32; --smin:0.7;  --smax:1.2;  --c:255 255 255;"><div class="ambient__rays-beam-shaft"></div></div>'
+      + '<div class="ambient__rays-beam" style="--a:80deg; --h:80px;  --d:11.4s; --del:-2.6s; --omin:0.09; --omax:0.58; --smin:0.55; --smax:1.35; --c:170 135 255;"><div class="ambient__rays-beam-shaft"></div></div>';
+  },
+
   _showSolution(stepIndex, beatIdx) {
     beatIdx = (beatIdx == null) ? 0 : beatIdx;
     // backing off the first beat returns to the first-win celebration
@@ -1984,7 +2001,7 @@ const WelcomeIntro = {
       const inner = this.pageWrap.querySelector('.welcome-intro__page-inner');
       if (inner) inner.classList.add('exit');
       this.el.classList.remove('welcome-intro--help', 'welcome-intro--cine');
-      const _bc = document.getElementById('welcomeBeacon'); if (_bc) _bc.remove();
+      const _bc = document.getElementById('welcomeRays'); if (_bc) _bc.remove();
       setTimeout(() => { this._showFirstWin(stepIndex); }, 250);
       return;
     }
@@ -2005,10 +2022,14 @@ const WelcomeIntro = {
     this.navEl.style.justifyContent = 'center';
     this.navEl.style.gap = '10px';
 
-    if (!document.getElementById('welcomeBeacon')) {
-      const beacon = document.createElement('div');
-      beacon.id = 'welcomeBeacon'; beacon.className = 'welcome-intro__beacon'; beacon.setAttribute('aria-hidden', 'true');
-      this.el.insertBefore(beacon, this.pageWrap);
+    // The signature top-left light: the real god-ray shafts (the same beam cluster
+    // the splash + dashboard use), not a soft orb. Created once, constant across
+    // chapters, sits behind the text.
+    if (!document.getElementById('welcomeRays')) {
+      const rays = document.createElement('div');
+      rays.id = 'welcomeRays'; rays.className = 'welcome-intro__rays'; rays.setAttribute('aria-hidden', 'true');
+      rays.innerHTML = this._cineRays();
+      this.el.insertBefore(rays, this.pageWrap);
     }
     if (!this._summary && !this._summaryFailed) this.generateSummary();
     this._onSummaryReady = null;
@@ -2589,7 +2610,7 @@ const WelcomeIntro = {
     if (this.el) { this.el.classList.remove('welcome-intro--blackout', 'welcome-intro--help', 'welcome-intro--cine'); this._setStage([]); }
     this._confettiVer = (this._confettiVer || 0) + 1;
     const _cf = document.getElementById('welcomeConfetti'); if (_cf) _cf.remove();
-    const _bc = document.getElementById('welcomeBeacon'); if (_bc) _bc.remove();
+    const _bc = document.getElementById('welcomeRays'); if (_bc) _bc.remove();
     if (this._fwClick) { document.removeEventListener('click', this._fwClick, true); this._fwClick = null; }
     if (name) state.profile.name = name;
     state.meta.welcomeSeen = true;
