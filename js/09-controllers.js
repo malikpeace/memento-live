@@ -2113,7 +2113,7 @@ const WelcomeIntro = {
     const probHead = 'But knowing has never been the hard part.';
     const probLine = moving
       ? 'You have started, but momentum is fragile. One quiet week off and it slips, and you are staring at the start again.'
-      : ((blocker ? (blocker.charAt(0).toUpperCase() + blocker.slice(1)) : 'It keeps sliding to later, and later never quite comes.') + ' Another year of that ends exactly where this one did, ' + this._solCostPhrase(p) + '.');
+      : ((blocker ? (blocker.charAt(0).toUpperCase() + blocker.slice(1)) : 'It keeps sliding to later, and later never quite comes.') + ' Another year of this, and ' + this._solCostPhrase(p) + '.');
 
     // 3. THE SOLUTION.
     const solHead = 'That is the whole reason Memento exists.';
@@ -2170,7 +2170,7 @@ const WelcomeIntro = {
     if (rf.indexOf('motiv') !== -1 || rf.indexOf('energy') !== -1 || rf.indexOf('tired') !== -1) return 'And on the low days, it is the first thing to go.';
     if (rf.indexOf('fear') !== -1 || rf.indexOf('scared') !== -1 || rf.indexOf('doubt') !== -1 || rf.indexOf('fail') !== -1) return 'And part of you is afraid it will not work out.';
     if (rf.indexOf('time') !== -1 || rf.indexOf('busy') !== -1) return 'And there is never quite enough time for it.';
-    return 'And that is the thing that keeps getting in the way.';
+    return 'And actually doing it is where it slips.';
   },
   // the cost of another year, from what they named they would lose
   _solCostPhrase(p) {
@@ -2179,7 +2179,7 @@ const WelcomeIntro = {
     if (c.indexOf('potential') !== -1 || c.indexOf('waste') !== -1) return 'the gap between who you are and who you could be only widens';
     if (c.indexOf('behind') !== -1) return 'you fall further behind the people who started';
     if (c.indexOf('stuck') !== -1 || c.indexOf('same') !== -1) return 'you end up exactly here, one year older';
-    if (c.indexOf('time') !== -1) return 'that is a year you do not get back';
+    if (c.indexOf('time') !== -1) return 'you do not get that year back';
     return 'you end up exactly here, one year older';
   },
   // weeks left from their birth year (Mori math), null if we never collected it
