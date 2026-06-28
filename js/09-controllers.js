@@ -2124,11 +2124,11 @@ const WelcomeIntro = {
     const goalsNat = this._solGoalsNatural(p);
     const days = this._solDaysLeft();
 
-    // 1. WHERE YOU ARE + STAKES: their goals + where they are (with hope), then a
-    //    future-paced stakes line that leans pain (stuck) or pleasure (moving).
-    const stageHead = goalsNat ? ('You want to make progress in ' + goalsNat + '.') : 'You want to stop drifting.';
-    const stageLine = this._solSituation(p);
-    const stageStakes = this._solStakes(p, moving);
+    // 1. WHERE YOU ARE: the whole first page adapts to how clear they are. Someone
+    //    who KNOWS what they want leads with the goal; someone with only a rough or
+    //    lost sense leads with where they actually are, then gets reassured about
+    //    their direction. The doom "another year gone" line is no longer the default.
+    const stage = this._solStage(p);
 
     // 3. PHILOSOPHY: the three pillars, shown as an equation (visual built in render).
     const phiHead = 'Anything that gets done comes down to three things.';
@@ -2142,7 +2142,7 @@ const WelcomeIntro = {
     const prevLine = 'It starts empty. Every day you show up it fills with light, clarity, action, and consistency. The more you stack, the more alive it gets.';
 
     return [
-      { key: 'stage', kind: 'stage', accent: PUR, headline: stageHead, line: stageLine, stakes: stageStakes },
+      { key: 'stage', kind: 'stage', accent: PUR, headline: stage.headline, line: stage.line, stakes: stage.stakes },
       { key: 'enter', kind: 'enter', accent: PUR, title: 'Enter Memento' },
       { key: 'philosophy', kind: 'philosophy', accent: PUR, headline: phiHead },
       { key: 'mori', kind: 'mori', accent: PUR, headline: moriHead, line: moriLine, days: days },
@@ -2172,6 +2172,50 @@ const WelcomeIntro = {
       }
     } catch (e) {}
     return null;
+  },
+  // The opening page, adapted to how clear they are. Returns { headline, line, stakes }.
+  _solStage(p) {
+    const low = (v) => String(v || '').toLowerCase();
+    const cl = low(p && p.clarityLevel);
+    const ap = String((p && p.actionProgress) || '');
+    const moving = (ap === 'Slow but moving.. just a bit inconsistent' || ap === 'Actually doing really good');
+    const stalled = ap === 'Started, then stopped';
+    const goalsNat = this._solGoalsNatural(p);
+
+    // LOST: no goal yet. Name the drift, why it is hard, and the one place "getting
+    // clear" genuinely fits (because they are not clear). Still ends on possibility.
+    if (!goalsNat) {
+      return {
+        headline: 'You want to stop drifting.',
+        line: this._solSituation(p),
+        stakes: 'A year from now this is either still a blur, or the thing you finally got clear on. Memento is built to make it the second one.'
+      };
+    }
+
+    // EXACTLY: they know the what. Lead with the goal, it is about doing now, not
+    // figuring out, so no "get clear" framing.
+    if (cl.indexOf('exactly') !== -1) {
+      return {
+        headline: 'You want to make progress in ' + goalsNat + '.',
+        line: this._solSituation(p),
+        stakes: moving
+          ? 'Keep this going and ' + this._solMomentumPhrase(p) + ' stops being someday. The only real risk now is letting it slip.'
+          : 'You are clear on the what. The whole game now is doing it, and doing it again tomorrow. That is exactly what Memento holds you to.'
+      };
+    }
+
+    // ROUGH IDEA / FIGURING IT OUT: lead with where they actually are, then reflect
+    // their stated direction with reassurance, not a warning.
+    const detail = moving
+      ? "You have started, you just want it to actually add up now."
+      : stalled
+        ? "You have started on it before, you just have not made any serious moves stick yet."
+        : "You just have not pinned it down to one thing, or made any serious moves yet.";
+    return {
+      headline: 'You have a pretty general direction you want to move in.',
+      line: detail,
+      stakes: 'You said you want to make progress in ' + goalsNat + '. That is all doable. We just get you clearer on the one that matters most, and help you stay consistent with it.'
+    };
   },
   // where they actually are, reflected back from their clarity + progress answers
   _solSituation(p) {
