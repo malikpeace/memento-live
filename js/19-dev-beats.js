@@ -99,58 +99,76 @@
 
     var body = document.createElement('div'); body.className = 'db-body';
 
+    function stepFor(key) { try { return WelcomeIntro.identitySteps.filter(function (s) { return s.key === key; })[0]; } catch (e) { return null; } }
+    function isMulti(key) { var st = stepFor(key); return !!(st && st.multi); }
+    // Mirror the real flow: a question is only offered if its own skipIf says it
+    // would actually be asked for the current profile. So you can never build an
+    // impossible persona (e.g. 'completely lost' AND a goal), the goal control just
+    // disappears, exactly like the real onboarding skips that question.
+    function isAsked(key) { var st = stepFor(key); if (!st) return true; if (typeof st.skipIf === 'function') { try { return !st.skipIf(P); } catch (e) { return true; } } return true; }
+
+    // Gated onboarding questions, in flow order (upstream gating keys first).
+    var GATED = ['clarityLevel', 'clarityBlock', 'clarityHistory', 'runningToward', 'actionKnow', 'actionProgress', 'runningFrom', 'costOfInaction', 'momentumWin'];
+
     function addRow(key, kind) {
       var row = document.createElement('label'); row.className = 'db-row';
-      var name = document.createElement('span'); name.textContent = key; row.appendChild(name);
+      var nm = document.createElement('span'); nm.textContent = key; row.appendChild(nm);
       var input;
       if (kind === 'text' || kind === 'date') {
         input = document.createElement('input'); input.type = (kind === 'date') ? 'date' : 'text';
         input.value = P[key] || DEFAULTS[key] || '';
       } else {
         input = document.createElement('select');
-        var opts = (kind === 'toward') ? TOWARD_PRESETS.concat(optionsFor('runningToward')) : optionsFor(key);
+        var opts = optionsFor(key);
         opts.forEach(function (o) { var op = document.createElement('option'); op.value = o; op.textContent = o; input.appendChild(op); });
-        var cur = P[key] || DEFAULTS[key];
+        var cur = P[key] || '';
         if (cur && opts.indexOf(cur) === -1) { var op = document.createElement('option'); op.value = cur; op.textContent = cur + ' (current)'; input.appendChild(op); }
-        if (cur) input.value = cur;
+        input.value = cur || (opts[0] || '');
       }
-      function apply() { P[key] = input.value; persistSafe(); render(currentBeat()); }
-      input.addEventListener('change', apply);
-      input.addEventListener('input', apply);
+      function apply() { P[key] = input.value; persistSafe(); refresh(); }
+      input.addEventListener('change', apply); input.addEventListener('input', apply);
       row.appendChild(input); body.appendChild(row);
     }
 
-    // A multi-select toggle-chip row, for the onboarding questions that allow more
-    // than one answer (stored as a ' · '-joined string, exactly like the real flow).
+    // A multi-select toggle-chip row (questions that allow more than one answer,
+    // stored ' · '-joined exactly like the real flow).
     function addMultiRow(key) {
       var row = document.createElement('div'); row.className = 'db-row db-row--multi';
-      var name = document.createElement('span'); name.textContent = key; row.appendChild(name);
+      var nm = document.createElement('span'); nm.textContent = key; row.appendChild(nm);
       var chips = document.createElement('div'); chips.className = 'db-chips';
       var sel = String(P[key] || '').split(' · ').map(function (s) { return s.trim(); }).filter(Boolean);
       optionsFor(key).forEach(function (o) {
         var chip = document.createElement('button'); chip.type = 'button'; chip.textContent = o;
         chip.className = 'db-chip' + (sel.indexOf(o) !== -1 ? ' on' : '');
         chip.addEventListener('click', function () {
-          var i = sel.indexOf(o);
-          if (i === -1) sel.push(o); else sel.splice(i, 1);
+          var i = sel.indexOf(o); if (i === -1) sel.push(o); else sel.splice(i, 1);
           chip.className = 'db-chip' + (sel.indexOf(o) !== -1 ? ' on' : '');
-          P[key] = sel.join(' · '); persistSafe(); render(currentBeat());
+          P[key] = sel.join(' · '); persistSafe(); refresh();
         });
         chips.appendChild(chip);
       });
       row.appendChild(chips); body.appendChild(row);
     }
 
-    addRow('name', 'text');
-    addRow('birthday', 'date');
-    addRow('clarityLevel', 'select');
-    addMultiRow('clarityBlock');
-    addMultiRow('runningToward');
-    addRow('actionKnow', 'select');
-    addRow('actionProgress', 'select');
-    addMultiRow('runningFrom');
-    addMultiRow('costOfInaction');
-    addMultiRow('momentumWin');
+    function buildRows() {
+      body.innerHTML = '';
+      addRow('name', 'text');
+      addRow('birthday', 'date');
+      GATED.forEach(function (key) { if (!isAsked(key)) return; if (isMulti(key)) addMultiRow(key); else addRow(key, 'select'); });
+    }
+    function askedSig() { return GATED.filter(isAsked).join('|'); }
+    var lastSig = null;
+    // On any change: drop answers to questions the profile would no longer reach,
+    // rebuild the control list only when the asked set changed, re-render the chapter.
+    function refresh() {
+      GATED.forEach(function (key) { if (!isAsked(key)) P[key] = ''; });
+      var sig = askedSig();
+      if (sig !== lastSig) { lastSig = sig; buildRows(); }
+      render(currentBeat());
+    }
+    GATED.forEach(function (key) { if (!isAsked(key)) P[key] = ''; });
+    lastSig = askedSig();
+    buildRows();
 
     var collapsed = false;
     toggle.addEventListener('click', function () {
