@@ -1439,6 +1439,16 @@ body.calm-motion .welcome-intro__pillar-ground {
     animation-delay: var(--del, 0s);
     will-change: opacity, transform;
   }
+  /* Splash WOW on phones: brighter glimmer + the gentle sweep, overriding the
+     freeze (and the flicker above) so the get-started screen reads powerful. */
+  .splash__rays .ambient__rays-beam {
+    animation: splashBeamSweep calc(var(--d, 12s) * 1.8) ease-in-out var(--del, 0s) infinite !important;
+  }
+  .splash__rays .ambient__rays-beam-shaft {
+    animation: ambientBeamGlimmer calc(var(--d, 10s) * 1.5) ease-in-out infinite !important;
+    animation-delay: var(--del, 0s);
+    will-change: opacity;
+  }
   /* The onboarding chapter beams keep FULL motion on phones too (transient screen,
      like the splash): the per-beam angular sweep + a brighter opacity glimmer,
      overriding the blanket freeze above. This is why they were dead on mobile. */
@@ -2290,8 +2300,14 @@ body:has(.clarity-exp.open-content) .fullscreen-close-global {
   pointer-events: none;
   overflow: hidden;
   z-index: 1; /* above .splash__bg-gradient blobs, below .splash__scene (z:2) */
+  filter: brightness(1.3) saturate(1.06); /* WOW pass: brighter, more intense beams */
   animation: ambientRaysFadeIn 1.6s ease both;
 }
+/* The beams MOVE: a gentle angular sweep per beam (deliberately less than the
+   onboarding chapters, ~1.8deg) so the splash feels alive and powerful without
+   being busy. Varied duration + phase per beam so they never sync. */
+.splash__rays .ambient__rays-beam { animation: splashBeamSweep calc(var(--d, 12s) * 1.8) ease-in-out var(--del, 0s) infinite; }
+@keyframes splashBeamSweep { 0%, 100% { transform: rotate(calc(var(--a) - 1.8deg)); } 50% { transform: rotate(calc(var(--a) + 1.8deg)); } }
 /* Desktop tuning: keep the source size and beam length identical to mobile so
    the energy near the top-left stays strong. The only thing we change is the
    shaft's radial-gradient ellipse: we compress it so the beam tapers to
