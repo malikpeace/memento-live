@@ -120,19 +120,21 @@
       row.appendChild(input); body.appendChild(row);
     }
 
-    function addTowardRow() {
+    // A multi-select toggle-chip row, for the onboarding questions that allow more
+    // than one answer (stored as a ' · '-joined string, exactly like the real flow).
+    function addMultiRow(key) {
       var row = document.createElement('div'); row.className = 'db-row db-row--multi';
-      var name = document.createElement('span'); name.textContent = 'runningToward'; row.appendChild(name);
+      var name = document.createElement('span'); name.textContent = key; row.appendChild(name);
       var chips = document.createElement('div'); chips.className = 'db-chips';
-      var sel = String(P.runningToward || '').split(' · ').map(function (s) { return s.trim(); }).filter(Boolean);
-      optionsFor('runningToward').forEach(function (o) {
+      var sel = String(P[key] || '').split(' · ').map(function (s) { return s.trim(); }).filter(Boolean);
+      optionsFor(key).forEach(function (o) {
         var chip = document.createElement('button'); chip.type = 'button'; chip.textContent = o;
         chip.className = 'db-chip' + (sel.indexOf(o) !== -1 ? ' on' : '');
         chip.addEventListener('click', function () {
           var i = sel.indexOf(o);
           if (i === -1) sel.push(o); else sel.splice(i, 1);
           chip.className = 'db-chip' + (sel.indexOf(o) !== -1 ? ' on' : '');
-          P.runningToward = sel.join(' · '); persistSafe(); render(currentBeat());
+          P[key] = sel.join(' · '); persistSafe(); render(currentBeat());
         });
         chips.appendChild(chip);
       });
@@ -141,13 +143,13 @@
 
     addRow('name', 'text');
     addRow('birthday', 'date');
-    addTowardRow();
+    addMultiRow('runningToward');
     addRow('clarityLevel', 'select');
     addRow('actionKnow', 'select');
     addRow('actionProgress', 'select');
-    addRow('runningFrom', 'select');
-    addRow('costOfInaction', 'select');
-    addRow('momentumWin', 'select');
+    addMultiRow('runningFrom');
+    addMultiRow('costOfInaction');
+    addMultiRow('momentumWin');
 
     var collapsed = false;
     toggle.addEventListener('click', function () {
