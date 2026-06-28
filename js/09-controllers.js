@@ -1955,7 +1955,7 @@ const WelcomeIntro = {
       <div class="welcome-intro__firstwin-content">
         <div class="welcome-intro__firstwin-eyebrow">Congrats!</div>
         <div class="welcome-intro__firstwin-title">You actually started and took the first step 👏</div>
-        <div class="welcome-intro__firstwin-body"><p>Seriously.</p><p>Most people are constantly uncomfortable with their lives and still do nothing to fix it. They spend their entire existence never even thinking about it.</p><p>But you just sat down and answered honestly about your life. You actually care.</p><p>Some part of you wants to do more, have more, be more.</p><p>Please, hold onto that flame and use it.</p><p>Most people lose it way too soon.</p></div>
+        <div class="welcome-intro__firstwin-body"><p><b>Seriously.</b></p><p>Most people are constantly uncomfortable with their lives and still do nothing to fix it. They spend their entire existence never even thinking about it.</p><p>But you just sat down and answered honestly about your life. You actually care.</p><p>Some part of you wants to do more, have more, be more.</p><p>Please, hold onto that flame and use it.</p><p>Most people lose it way too soon.</p></div>
         <div class="welcome-intro__firstwin-tap">(tap the screen)</div>
       </div>
     </div>`;
