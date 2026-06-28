@@ -2189,10 +2189,12 @@ const WelcomeIntro = {
       + '<circle cx="120" cy="92" r="14" fill="none" stroke="rgba(184,156,255,0.7)" stroke-width="1"/>'
       + '<circle cx="120" cy="92" r="7" fill="rgba(190,164,255,1)"/></svg>';
     const ic = (typeof ICONS !== 'undefined') ? ICONS : {};
+    // consistency reads as a calendar (showing up day after day), not the flame
+    const cal = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
     const marks = '<div class="wi-orb__marks">'
       + '<span class="wi-orb__mark" style="color:rgba(150,116,255,1)">' + (ic.clarity || '') + '</span>'
       + '<span class="wi-orb__mark" style="color:rgba(226,232,255,1)">' + (ic.action || '') + '</span>'
-      + '<span class="wi-orb__mark" style="color:rgba(52,211,153,1)">' + (ic.streak || '') + '</span></div>';
+      + '<span class="wi-orb__mark" style="color:rgba(52,211,153,1)">' + cal + '</span></div>';
     const grid = '<div class="wi-orb__grid">' + this._twistGrid() + '</div>';
     return '<div class="wi-orb" data-orb="' + key + '"><div class="wi-orb__core">' + rings + grid + marks + '</div>' + this._solChips(p) + '</div>';
   },

@@ -1654,7 +1654,7 @@ body.lite .wi-orb__mark svg { filter: none; }
 .wi-orb[data-orb="summary"] .wi-cine__chips { opacity: 1; max-height: 170px; margin-top: 16px; }
 .wi-orb[data-orb="problem"] .wi-orb__rings { opacity: 0.45; filter: grayscale(0.55) brightness(0.85); }
 .wi-orb[data-orb="solution"] .wi-orb__rings { filter: brightness(1.12) saturate(1.1); }
-.wi-orb[data-orb="philosophy"] .wi-orb__rings { opacity: 0.3; }
+.wi-orb[data-orb="philosophy"] .wi-orb__rings { opacity: 0; }
 .wi-orb[data-orb="philosophy"] .wi-orb__marks { opacity: 1; }
 .wi-orb[data-orb="fuel"] .wi-orb__rings { opacity: 0.22; }
 .wi-orb[data-orb="fuel"] .wi-orb__grid { opacity: 0.92; }
