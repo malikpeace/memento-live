@@ -2174,14 +2174,21 @@ const WelcomeIntro = {
     const low = (v) => String(v || '').toLowerCase();
     const cl = low(p && p.clarityLevel), ap = String((p && p.actionProgress) || '');
     const moving = (ap === 'Slow but moving.. just a bit inconsistent' || ap === 'Actually doing really good');
-    if (cl.indexOf('lost') !== -1) return 'You are not sure which of these is the one yet. That uncertainty is the whole reason you are here, and it is fixable.';
-    if (cl.indexOf('not really') !== -1 || cl.indexOf('trying') !== -1) return 'You have been trying to figure out which one is the one. You are close, you just have not landed it yet.';
+    // Goal-aware: the "not sure which" framing only makes sense when NO goal was
+    // picked (the 'completely lost' path skips the goal question). If a goal IS
+    // present, never say they are unsure which one, that would contradict the
+    // headline naming it.
+    const hasGoals = !!this._solGoalsNatural(p);
+    if (!hasGoals) return 'You are not even sure which direction is the one yet. That uncertainty is the whole reason you are here, and it is fixable.';
     if (cl.indexOf('exactly') !== -1) return moving
       ? 'You know exactly what you want and you are already moving. Now you want to make sure it actually sticks.'
       : 'You know exactly what you want. You just have not turned it into motion yet.';
+    if (cl.indexOf('not really') !== -1 || cl.indexOf('trying') !== -1 || cl.indexOf('lost') !== -1) {
+      return 'You have a sense it is about this. You just have not locked it in, or made it move yet.';
+    }
     return moving
       ? 'You have a sense of it and you have started. Now you want it to hold.'
-      : 'You have a rough sense of it. You just have not made it concrete, or made it move.';
+      : 'You have the area. You just have not pinned it to one concrete thing, or made it move yet.';
   },
   // name the thing in the way, from what they said holds them back
   _solBlockerLine(p) {
