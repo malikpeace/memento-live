@@ -290,7 +290,7 @@ const WelcomeIntro = {
     runningFrom: {
       'Procrastination': "Procrastination's beatable. Usually it's the task being unclear, not you being lazy.",
       'Phone & social media': "The phone thing is real for almost everyone right now. You're not weird for it.",
-      "I don't know what to do": "Not knowing what to do is normal. That's kind of the whole point of this.",
+      "I don't know what to do": "Not knowing what to do is normal. We'll help you get clarity on that.",
       "Can't stay consistent": "Consistency is hard for everyone, even the greats. Usually it's just not long enough yet.",
       'Fear of failing': "Fear of failing is fair. But what does life look like if you do nothing instead?",
       'Not enough time': "Time is tight for everyone. We'll keep it to one small thing a day.",
