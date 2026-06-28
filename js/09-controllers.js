@@ -2126,7 +2126,7 @@ const WelcomeIntro = {
 
     // 1. WHERE YOU ARE + STAKES: their goals + where they are (with hope), then a
     //    future-paced stakes line that leans pain (stuck) or pleasure (moving).
-    const stageHead = goalsNat ? ('You came here to work on ' + goalsNat + '.') : 'You came here to stop drifting.';
+    const stageHead = goalsNat ? ('You want to make progress in ' + goalsNat + '.') : 'You want to stop drifting.';
     const stageLine = this._solSituation(p);
     const stageStakes = this._solStakes(p, moving);
 
