@@ -2210,8 +2210,8 @@ const WelcomeIntro = {
       return 'You have a sense it is about this. You just have not locked it in, or made it move yet.';
     }
     if (moving) return 'You have a sense of it and you have started. Now you want it to hold.';
-    if (stalled) return 'You have the area, and you have started on it before. You just have not made any serious moves stick yet.';
-    return 'You have the area. You just have not pinned it to one concrete thing, or made any serious moves yet.';
+    if (stalled) return 'You have a pretty general direction you want to move in, and you have started on it before. You just have not made any serious moves stick yet.';
+    return 'You have a pretty general direction you want to move in. You just have not pinned it to one concrete thing, or made any serious moves yet.';
   },
   // name the thing in the way, from what they said holds them back
   _solBlockerLine(p) {
