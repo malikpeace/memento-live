@@ -70,7 +70,11 @@
       '#devBeats .db-row{display:flex;align-items:center;gap:8px;margin:5px 0;}' +
       '#devBeats .db-row span{flex:0 0 92px;color:#9a93c8;font-size:11px;}' +
       '#devBeats .db-row select,#devBeats .db-row input{flex:1;min-width:0;background:#15131f;color:#fff;' +
-      'border:0;border-radius:7px;padding:6px 8px;font-size:12px;}';
+      'border:0;border-radius:7px;padding:6px 8px;font-size:12px;}' +
+      '#devBeats .db-row--multi{align-items:flex-start;}' +
+      '#devBeats .db-chips{flex:1;display:flex;flex-wrap:wrap;gap:5px;min-width:0;}' +
+      '#devBeats .db-chip{background:#15131f;color:#cfc8f5;border:0;border-radius:999px;padding:5px 10px;font-size:11px;}' +
+      '#devBeats .db-chip.on{background:#5b4ad8;color:#fff;}';
     document.head.appendChild(s);
   }
 
@@ -116,9 +120,28 @@
       row.appendChild(input); body.appendChild(row);
     }
 
+    function addTowardRow() {
+      var row = document.createElement('div'); row.className = 'db-row db-row--multi';
+      var name = document.createElement('span'); name.textContent = 'runningToward'; row.appendChild(name);
+      var chips = document.createElement('div'); chips.className = 'db-chips';
+      var sel = String(P.runningToward || '').split(' · ').map(function (s) { return s.trim(); }).filter(Boolean);
+      optionsFor('runningToward').forEach(function (o) {
+        var chip = document.createElement('button'); chip.type = 'button'; chip.textContent = o;
+        chip.className = 'db-chip' + (sel.indexOf(o) !== -1 ? ' on' : '');
+        chip.addEventListener('click', function () {
+          var i = sel.indexOf(o);
+          if (i === -1) sel.push(o); else sel.splice(i, 1);
+          chip.className = 'db-chip' + (sel.indexOf(o) !== -1 ? ' on' : '');
+          P.runningToward = sel.join(' · '); persistSafe(); render(currentBeat());
+        });
+        chips.appendChild(chip);
+      });
+      row.appendChild(chips); body.appendChild(row);
+    }
+
     addRow('name', 'text');
     addRow('birthday', 'date');
-    addRow('runningToward', 'toward');
+    addTowardRow();
     addRow('clarityLevel', 'select');
     addRow('actionKnow', 'select');
     addRow('actionProgress', 'select');
