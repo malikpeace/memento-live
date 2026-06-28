@@ -2095,7 +2095,7 @@ const WelcomeIntro = {
       if (idx >= 0 && idx < n && idx !== beatIdx) {
         const innerEl = this.pageWrap.querySelector('.welcome-intro__page-inner');
         if (innerEl) innerEl.classList.add('exit');
-        setTimeout(() => this._showSolution(stepIndex, idx), 165);
+        setTimeout(() => this._showSolution(stepIndex, idx), 300);
       } else {
         this._showSolution(stepIndex, idx);
       }
@@ -2105,7 +2105,7 @@ const WelcomeIntro = {
 
     // "Enter Memento" lingers ~3s then dissolves into the next page; a tap skips it.
     if (kind === 'enter') {
-      this._enterTimer = setTimeout(() => { this._enterTimer = null; go(beatIdx + 1); }, 3000);
+      this._enterTimer = setTimeout(() => { this._enterTimer = null; go(beatIdx + 1); }, 5000);
       const ent = this.pageWrap.querySelector('.wi-enter');
       if (ent) ent.addEventListener('click', () => { if (this._enterTimer) { clearTimeout(this._enterTimer); this._enterTimer = null; } go(beatIdx + 1); });
     }
