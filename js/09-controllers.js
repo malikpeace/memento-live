@@ -2152,7 +2152,7 @@ const WelcomeIntro = {
     if (moving) {
       return 'Keep this going and ' + this._solMomentumPhrase(p) + ' stops being someday and starts being real. Let it slip, and a year from now you are starting over. You get to choose which.';
     }
-    return 'Let another year run like this one and ' + this._solCostPhrase(p) + '. Or this is the year it finally moves. Both are still on the table, and what you do next is what decides it.';
+    return "Don't let another year pass without getting clear on what you want. If you let another year pass like this one it'll be another year gone you can NEVER get back.";
   },
   // Days of life left, from their birthday + an 80-year default. Null if unknown.
   _solDaysLeft() {
