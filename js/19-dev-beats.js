@@ -144,6 +144,7 @@
     addRow('name', 'text');
     addRow('birthday', 'date');
     addRow('clarityLevel', 'select');
+    addMultiRow('clarityBlock');
     addMultiRow('runningToward');
     addRow('actionKnow', 'select');
     addRow('actionProgress', 'select');
