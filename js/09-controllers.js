@@ -326,7 +326,7 @@ const WelcomeIntro = {
       "I've never really stopped to figure it out": "Most people never do. Stopping to ask is already the first real step.",
       "Other people's expectations get in the way": "It's hard to hear your own answer under everyone else's. We get you back to what you actually want.",
       "I keep changing my mind": "Changing your mind a lot usually means none of them were ever the real one. We find the one that holds.",
-      "Part of me thinks I can't have it anyway": "That doubt is the quiet thing keeping you stuck. We start small enough to prove it wrong.",
+      "I keep getting in my own way": "Getting in your own way is the most fixable kind of stuck. We make the next move small enough to not trip over.",
       "I'm waiting until I feel ready": "Ready rarely shows up first. Clarity comes from starting, not before it.",
       _multi: "That mix is what keeps it blurry. We pull it apart and find the one thing underneath.",
       _fallback: "Whatever is blurring it, naming it is how we start to clear it."
@@ -1269,7 +1269,7 @@ const WelcomeIntro = {
     // ask what is in the way of naming it, and whether they have tried before.
     { key: 'clarityBlock', type: 'choices', multi: true,
       headline: "What do you think is making it hard to know what you want?",
-      options: ["Too many directions, I can't pick one", "Scared I'll pick the wrong thing", "I've lost touch with what I care about", "I've never really stopped to figure it out", "Other people's expectations get in the way", "I keep changing my mind", "Part of me thinks I can't have it anyway", "I'm waiting until I feel ready"],
+      options: ["Too many directions, I can't pick one", "Scared I'll pick the wrong thing", "I've lost touch with what I care about", "I've never really stopped to figure it out", "Other people's expectations get in the way", "I keep changing my mind", "I keep getting in my own way", "I'm waiting until I feel ready"],
       skipIf: (p) => { const c = String((p && p.clarityLevel) || '').toLowerCase(); return !(c.indexOf('lost') !== -1 || c.indexOf('not really') !== -1); } },
     { key: 'clarityHistory', type: 'choices', multi: false,
       headline: 'How long has this been on your mind?',
@@ -2194,7 +2194,7 @@ const WelcomeIntro = {
       else if (cb.indexOf('never') !== -1 || cb.indexOf('stopped') !== -1) why = 'You have never really stopped long enough to figure it out.';
       else if (cb.indexOf('expectations') !== -1 || cb.indexOf('other people') !== -1) why = 'It is hard to hear your own answer under everyone else\'s.';
       else if (cb.indexOf('changing my mind') !== -1) why = 'Your answer keeps changing, so none of it ever sticks.';
-      else if (cb.indexOf("can't have it") !== -1 || cb.indexOf('anyway') !== -1) why = 'Part of you does not believe you can have it, so you stopped asking.';
+      else if (cb.indexOf('own way') !== -1) why = 'You keep getting in your own way, and you know it.';
       else if (cb.indexOf('ready') !== -1 || cb.indexOf('waiting') !== -1) why = 'You are waiting to feel ready, and ready keeps not showing up.';
       return why + ' That uncertainty is the whole reason you are here, and it is fixable.';
     }
