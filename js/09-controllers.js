@@ -2049,33 +2049,50 @@ const WelcomeIntro = {
     if (beatIdx >= n) { this.el.classList.remove('welcome-intro--cine'); this._showIdentityStep(stepIndex + 1); return; }
     const b = beats[beatIdx];
     const isLast = beatIdx === n - 1;
+    const kind = b.kind || 'stage';
+    // any pending auto-advance from a prior "Enter Memento" beat is cancelled the
+    // moment we render anything else (incl. navigating back to it).
+    if (this._enterTimer) { clearTimeout(this._enterTimer); this._enterTimer = null; }
 
-    // Bare chapters (summary / problem / solution): no orb, no label, just words that
-    // fade in one by one. The rest keep their orb + label.
-    const bare = (b.key === 'summary' || b.key === 'problem' || b.key === 'solution');
-    this.pageWrap.innerHTML = `<div class="welcome-intro__page-inner wi-cine${bare ? ' wi-cine--reflect wi-cine--stagger' : ''}" data-beat="${beatIdx}">
-      ${bare ? '' : `<div class="wi-demo__stage">${this._cineMock(b.key, p)}</div>`}
-      ${bare ? '' : `<div class="wi-demo__eyebrow" style="color:${b.accent}">${b.label ? esc(b.label) : ('0' + (beatIdx + 1) + ' <span>of 0' + n + '</span>')}</div>`}
-      <h2 class="wi-demo__headline">${esc(b.headline)}</h2>
-      <p class="wi-demo__line">${esc(b.line)}</p>
-      ${b.trap ? `<p class="wi-cine__trap">${esc(b.trap)}</p>` : ''}
-    </div>`;
-    this.navEl.innerHTML = `<button class="welcome-intro__back-btn" id="solBack">←</button><button class="welcome-intro__btn welcome-intro__btn--step" id="solNext" style="flex:1;width:auto;">${isLast ? 'Build it' : 'Next'}</button>`;
+    let inner;
+    if (kind === 'enter') {
+      inner = `<div class="welcome-intro__page-inner wi-cine wi-enter" data-beat="${beatIdx}"><div class="wi-enter__title">${esc(b.title)}</div></div>`;
+    } else if (kind === 'philosophy') {
+      inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-phi" data-beat="${beatIdx}"><h2 class="wi-demo__headline">${esc(b.headline)}</h2>${this._cinePhilosophy()}</div>`;
+    } else if (kind === 'mori') {
+      inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-moriview" data-beat="${beatIdx}"><h2 class="wi-demo__headline">${esc(b.headline)}</h2>${this._cineMori()}<p class="wi-demo__line">${esc(b.line)}</p>${b.days ? `<p class="wi-mori__days">btw, you have about <b>${b.days.toLocaleString()}</b> days left.</p>` : ''}</div>`;
+    } else if (kind === 'preview') {
+      inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-prev" data-beat="${beatIdx}"><h2 class="wi-demo__headline">${esc(b.headline)}</h2>${this._cineCardPreview(p)}<p class="wi-demo__line">${esc(b.line)}</p></div>`;
+    } else {
+      inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-cine--stagger" data-beat="${beatIdx}"><h2 class="wi-demo__headline">${esc(b.headline)}</h2><p class="wi-demo__line">${esc(b.line)}</p>${b.stakes ? `<p class="wi-demo__line wi-demo__stakes">${esc(b.stakes)}</p>` : ''}</div>`;
+    }
+    this.pageWrap.innerHTML = inner;
+    // The interstitial has no buttons (auto-advances / tap to skip); every other page
+    // keeps Back + Next (Next becomes "Build it" on the last page).
+    this.navEl.innerHTML = (kind === 'enter') ? '' : `<button class="welcome-intro__back-btn" id="solBack">←</button><button class="welcome-intro__btn welcome-intro__btn--step" id="solNext" style="flex:1;width:auto;">${isLast ? 'Build it' : 'Next'}</button>`;
     try { this.pageWrap.classList.remove('wc-busy', 'wc-reading'); this.pageWrap.scrollTop = 0; } catch (e) {}
 
     // Crossfade between chapters: fade the current text out, then swap. The fixed
     // beam underneath never moves, so it reads as one continuous moment.
     const go = (idx) => {
       if (idx >= 0 && idx < n && idx !== beatIdx) {
-        const inner = this.pageWrap.querySelector('.welcome-intro__page-inner');
-        if (inner) inner.classList.add('exit');
+        const innerEl = this.pageWrap.querySelector('.welcome-intro__page-inner');
+        if (innerEl) innerEl.classList.add('exit');
         setTimeout(() => this._showSolution(stepIndex, idx), 165);
       } else {
         this._showSolution(stepIndex, idx);
       }
     };
-    document.getElementById('solNext').addEventListener('click', () => go(beatIdx + 1));
-    document.getElementById('solBack').addEventListener('click', () => go(beatIdx - 1));
+    const nextBtn = document.getElementById('solNext'); if (nextBtn) nextBtn.addEventListener('click', () => go(beatIdx + 1));
+    const backBtn = document.getElementById('solBack'); if (backBtn) backBtn.addEventListener('click', () => go(beatIdx - 1));
+
+    // "Enter Memento" lingers ~3s then dissolves into the next page; a tap skips it.
+    if (kind === 'enter') {
+      this._enterTimer = setTimeout(() => { this._enterTimer = null; go(beatIdx + 1); }, 3000);
+      const ent = this.pageWrap.querySelector('.wi-enter');
+      if (ent) ent.addEventListener('click', () => { if (this._enterTimer) { clearTimeout(this._enterTimer); this._enterTimer = null; } go(beatIdx + 1); });
+    }
+
     // touch swipe: left advances, right goes back
     try {
       const stage = this.pageWrap.querySelector('.wi-cine');
@@ -2098,53 +2115,59 @@ const WelcomeIntro = {
     const PUR = 'rgba(150,116,255,1)';
     const low = (v) => String(v || '').toLowerCase();
     const ap = String((p && p.actionProgress) || '');
-    const goals = this._solGoals(p);
     const first = (p && p.name) ? String(p.name).trim().split(/\s+/)[0] : '';
     const moving = (ap === 'Slow but moving.. just a bit inconsistent' || ap === 'Actually doing really good');
-    const weeks = this._solWeeksLeft();
-
-    // 1. SUMMARY: exactly what they want + where they actually are.
     const goalsNat = this._solGoalsNatural(p);
-    const sumHead = goalsNat ? ('You came here to work on ' + goalsNat + '.') : 'You came here to stop drifting.';
-    const sumLine = this._solSituation(p);
+    const days = this._solDaysLeft();
 
-    // 2. THE PROBLEM: their own blocker + the cost, relayed back. The quiet "damn".
-    const blocker = String(this._solBlockerLine(p) || '').replace(/^And\s+/, '');
-    const probHead = 'But knowing has never been the hard part.';
-    const probLine = moving
-      ? 'You have started, but momentum is fragile. One quiet week off and it slips, and you are staring at the start again.'
-      : ((blocker ? (blocker.charAt(0).toUpperCase() + blocker.slice(1)) : 'It keeps sliding to later, and later never quite comes.') + ' Another year of this, and ' + this._solCostPhrase(p) + '.');
+    // 1. WHERE YOU ARE + STAKES: their goals + where they are (with hope), then a
+    //    future-paced stakes line that leans pain (stuck) or pleasure (moving).
+    const stageHead = goalsNat ? ('You came here to work on ' + goalsNat + '.') : 'You came here to stop drifting.';
+    const stageLine = this._solSituation(p);
+    const stageStakes = this._solStakes(p, moving);
 
-    // 3. THE SOLUTION.
-    const solHead = 'That is the whole reason Memento exists.';
-    const solLine = 'It takes the one thing you actually want and turns it into the one thing you do today. Then it makes sure you do it again tomorrow, and the day after that.';
-
-    // 4. THE PHILOSOPHY: the three pillars of getting anything done.
+    // 3. PHILOSOPHY: the three pillars, shown as an equation (visual built in render).
     const phiHead = 'Anything that gets done comes down to three things.';
-    const phiLine = 'Clarity, the one goal that matters most. Action, the single move that pushes it. Consistency, doing it on the days you do not feel like it. Memento runs all three for you.';
 
-    // 5. THE FUEL: finite time + the reason underneath it all.
-    const fuelWhy = moving ? this._solMomentumPhrase(p) : 'the life you actually want';
-    const fuelHead = 'But none of it holds without fuel.';
-    const fuelLine = (weeks ? ('You have about ' + weeks.toLocaleString() + ' weeks left. ') : 'Your time is not unlimited. ')
-      + 'So Memento keeps your reason right in front of you, ' + fuelWhy + ', and the day you started, for the times you would rather not.';
+    // 4. MORI: the meaning of the name + finite time (life grid + days in render).
+    const moriHead = 'Memento means reminder.';
+    const moriLine = 'It is Latin. Memento keeps the one thing in front of you, and keeps you honest that your time runs out, so you spend it on what actually matters.';
 
-    // 6. THE CLOSE.
-    const clsHead = first ? (first + ', this is your Memento.') : 'This is your Memento.';
-    const clsLine = 'Clarity, action, consistency, and the reason underneath all of it. Built around the one life you actually have.';
+    // 5. PREVIEW: a blank card that comes alive as you show up (card built in render).
+    const prevHead = first ? (first + ', meet your Memento.') : 'Meet your Memento.';
+    const prevLine = 'It starts empty. Every day you show up it fills with light, clarity, action, and consistency. The more you stack, the more alive it gets.';
 
-    // ONE constant world: same purple accent + steady beam on every chapter, so it
-    // reads as a single continuous moment, not six separate screens. Only the words
-    // and the orb's state change (key === the orb state the CSS evolves).
-    const B = 0.5;
     return [
-      { key: 'summary', accent: PUR, beam: B, label: 'your position:', headline: sumHead, line: sumLine },
-      { key: 'problem', accent: PUR, beam: B, label: 'THE PROBLEM', headline: probHead, line: probLine },
-      { key: 'solution', accent: PUR, beam: B, label: 'THE SOLUTION', headline: solHead, line: solLine },
-      { key: 'philosophy', accent: PUR, beam: B, label: 'THE PHILOSOPHY', headline: phiHead, line: phiLine },
-      { key: 'fuel', accent: PUR, beam: B, label: 'THE FUEL', headline: fuelHead, line: fuelLine },
-      { key: 'close', accent: PUR, beam: B, label: '', headline: clsHead, line: clsLine }
+      { key: 'stage', kind: 'stage', accent: PUR, headline: stageHead, line: stageLine, stakes: stageStakes },
+      { key: 'enter', kind: 'enter', accent: PUR, title: 'Enter Memento' },
+      { key: 'philosophy', kind: 'philosophy', accent: PUR, headline: phiHead },
+      { key: 'mori', kind: 'mori', accent: PUR, headline: moriHead, line: moriLine, days: days },
+      { key: 'preview', kind: 'preview', accent: PUR, headline: prevHead, line: prevLine }
     ];
+  },
+  // Future-paced stakes for the opening page. Momentum -> lean pleasure (what keeping
+  // going earns). Stuck -> lean pain (what another year like this costs). Both land on
+  // it being a choice, so the page never leaves them in despair.
+  _solStakes(p, moving) {
+    if (moving) {
+      return 'Keep this going and ' + this._solMomentumPhrase(p) + ' stops being someday and starts being real. Let it slip, and a year from now you are starting over. You get to choose which.';
+    }
+    return 'Let another year run like this one and ' + this._solCostPhrase(p) + '. Or this is the year it finally moves. Both are still on the table, and what you do next is what decides it.';
+  },
+  // Days of life left, from their birthday + an 80-year default. Null if unknown.
+  _solDaysLeft() {
+    try {
+      const p = state.profile || {};
+      let by = (state.mori && state.mori.birthYear) || null;
+      if (!by && p.birthday) { const m = String(p.birthday).match(/(19|20)\d\d/); if (m) by = parseInt(m[0], 10); }
+      if (!by) return null;
+      const le = (state.mori && state.mori.lifeExpectancy) || 80;
+      if (typeof moriYearsRemaining === 'function') {
+        const yrs = moriYearsRemaining(by, le);
+        if (yrs != null) { const d = Math.round(yrs * 365.25); if (d > 0 && d < 60000) return d; }
+      }
+    } catch (e) {}
+    return null;
   },
   // where they actually are, reflected back from their clarity + progress answers
   _solSituation(p) {
@@ -2238,6 +2261,44 @@ const WelcomeIntro = {
       + '<span class="wi-orb__mark" style="color:rgba(52,211,153,1)">' + cal + '</span></div>';
     const grid = '<div class="wi-orb__grid">' + this._twistGrid() + '</div>';
     return '<div class="wi-orb" data-orb="' + key + '"><div class="wi-orb__core">' + rings + grid + marks + '</div>' + this._solChips(p) + '</div>';
+  },
+  // Philosophy page: the three pillars as a vertical equation that resolves to results.
+  _cinePhilosophy() {
+    const ic = (typeof ICONS !== 'undefined') ? ICONS : {};
+    const cal = '<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-linecap="round"><rect x="14" y="18" width="52" height="48" rx="7" stroke-width="2.2" opacity="0.55"/><line x1="14" y1="30" x2="66" y2="30" stroke-width="1.6" opacity="0.4"/><line x1="28" y1="13" x2="28" y2="22" stroke-width="2.6" opacity="0.7"/><line x1="52" y1="13" x2="52" y2="22" stroke-width="2.6" opacity="0.7"/><path d="M22 36L28 42M28 36L22 42" stroke-width="2.4"/><path d="M34 36L40 42M40 36L34 42" stroke-width="2.4"/><path d="M46 36L52 42M52 36L46 42" stroke-width="2.4"/><path d="M22 48L28 54M28 48L22 54" stroke-width="2.4"/><path d="M34 48L40 54M40 48L34 54" stroke-width="2.4"/></svg>';
+    const item = (color, icon, name, desc) => '<div class="wi-eq__item"><span class="wi-eq__mark" style="color:' + color + '">' + (icon || '') + '</span><span class="wi-eq__txt"><b>' + name + '</b><i>' + desc + '</i></span></div>';
+    return '<div class="wi-eq">'
+      + item('rgba(150,116,255,1)', ic.clarity, 'Clarity', 'the one goal that matters')
+      + '<span class="wi-eq__op">+</span>'
+      + item('rgba(232,194,74,1)', ic.action, 'Action', 'the one move that pushes it')
+      + '<span class="wi-eq__op">+</span>'
+      + item('rgba(52,211,153,1)', cal, 'Consistency', 'the days you do not feel like it')
+      + '<span class="wi-eq__op wi-eq__eq">=</span>'
+      + '<div class="wi-eq__result">Results.</div>'
+      + '</div>';
+  },
+  // Mori page: their life in dots (reuses the life-in-years grid).
+  _cineMori() {
+    return '<div class="wi-mori__grid">' + this._twistGrid() + '</div>';
+  },
+  // Preview page: a blank Memento card whose three pillar lights fill in, staggered,
+  // to show how it comes alive as you show up. Plus the color key.
+  _cineCardPreview(p) {
+    const nm = esc(((p && p.name) || '').trim());
+    return '<div class="wi-prev__wrap">'
+      + '<div class="wi-pcard" aria-hidden="true">'
+      +   '<span class="wi-pcard__glow wi-pcard__glow--c"></span>'
+      +   '<span class="wi-pcard__glow wi-pcard__glow--a"></span>'
+      +   '<span class="wi-pcard__glow wi-pcard__glow--k"></span>'
+      +   '<svg class="wi-pcard__emblem" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>'
+      +   (nm ? '<span class="wi-pcard__name">' + nm + '</span>' : '')
+      + '</div>'
+      + '<div class="wi-key">'
+      +   '<span class="wi-key__i"><i style="background:rgba(150,116,255,1)"></i>Clarity</span>'
+      +   '<span class="wi-key__i"><i style="background:rgba(232,194,74,1)"></i>Action</span>'
+      +   '<span class="wi-key__i"><i style="background:rgba(52,211,153,1)"></i>Consistency</span>'
+      + '</div>'
+      + '</div>';
   },
   // the twist motif: a life in years (the Mori grid). Spent years dim, the current
   // year bright gold, the years still ahead a faint gold, so "weeks left" is visible.
