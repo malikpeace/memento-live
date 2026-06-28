@@ -301,7 +301,7 @@ const WelcomeIntro = {
     },
     clarityLevel: {
       'Yes, I do and know exactly what it is': "Good! Knowing exactly what you want is the part most people never even reach.",
-      'I have a rough idea': "A rough idea is a real start. Memento's whole first job is making it clearer.",
+      'I have a rough idea': "A rough idea is a start. Memento will make sure you're crystal clear on what you want.",
       "Not really... but I'm trying to figure it out": "That's honest, and normal. Finding the answer is literally step one here.",
       'No, I feel completely lost': "No worries, this is where everyone has to start. We'll help you find your one thing.",
       _fallback: "We'll get this clear. That's the first thing Memento does."
@@ -315,7 +315,7 @@ const WelcomeIntro = {
     actionProgress: {
       "Haven't really started": "Not starting yet is okay. The first small move is the hardest, and we make it tiny.",
       'Started, then stalled': "Stalling happens to everyone. It usually means the next step got too big, not that you failed.",
-      'Slow but moving.. just a bit inconsistent': "Slow but moving still counts. Slow and consistent beats fast and gone every time.",
+      'Slow but moving.. just a bit inconsistent': "Slow but moving still counts. Being slow and consistent is better than being extreme but inconsistent.",
       'Actually doing really good': "Good! Consistency is the most important ingredient. Now we just need to keep that momentum.",
       _fallback: "Wherever you're at is fine. We build from here, one small step at a time."
     },
