@@ -374,7 +374,7 @@ const WelcomeIntro = {
     },
     momentumWin: {
       'Closer to my goals (eg. money, abs, relationships, etc)': "Money, your body, your relationships, this is how they actually move. A year of small days adds up to all of it.",
-      'I make my younger self proud': "The kid who wanted more is still in there. Every day you show up is you keeping that promise to him.",
+      'I make my younger self proud': "The kid who wanted more is still in there. Every day you show up is you keeping that promise to them.",
       'Closer to self-mastery': "Self-mastery is just reps. Stack enough days and you stop needing motivation at all.",
       "I'll have true freedom": "Freedom is earned in reps. Keep stacking them and the options open up.",
       'Fulfillment and Peace': "Peace comes from knowing you're actually moving, not from standing still. This is how you earn it.",
@@ -2013,7 +2013,7 @@ const WelcomeIntro = {
     if (beatIdx < 0) {
       const inner = this.pageWrap.querySelector('.welcome-intro__page-inner');
       if (inner) inner.classList.add('exit');
-      this.el.classList.remove('welcome-intro--help', 'welcome-intro--cine');
+      this.el.classList.remove('welcome-intro--help', 'welcome-intro--cine', 'welcome-intro--preenter');
       const _bc = document.getElementById('welcomeRays'); if (_bc) _bc.remove();
       setTimeout(() => { this._showFirstWin(stepIndex); }, 250);
       return;
@@ -2050,10 +2050,14 @@ const WelcomeIntro = {
     const p = state.profile || {};
     const beats = this._solBeats(p);
     const n = beats.length;
-    if (beatIdx >= n) { this.el.classList.remove('welcome-intro--cine'); this._showIdentityStep(stepIndex + 1); return; }
+    if (beatIdx >= n) { this.el.classList.remove('welcome-intro--cine', 'welcome-intro--preenter'); this._showIdentityStep(stepIndex + 1); return; }
     const b = beats[beatIdx];
     const isLast = beatIdx === n - 1;
     const kind = b.kind || 'stage';
+    // The opening page sits on plain black (pre-Memento). The top-left beam arrives
+    // on the "Enter Memento" beat onward, so the light literally comes in as they
+    // enter Memento. --preenter hides the rays + the background wash on the stage page.
+    this.el.classList.toggle('welcome-intro--preenter', kind === 'stage');
     // any pending auto-advance from a prior "Enter Memento" beat is cancelled the
     // moment we render anything else (incl. navigating back to it).
     if (this._enterTimer) { clearTimeout(this._enterTimer); this._enterTimer = null; }
@@ -2178,7 +2182,10 @@ const WelcomeIntro = {
     const low = (v) => String(v || '').toLowerCase();
     const cl = low(p && p.clarityLevel);
     const ap = String((p && p.actionProgress) || '');
-    const moving = (ap === 'Slow but moving.. just a bit inconsistent' || ap === 'Actually doing really good');
+    // Two different "moving" states: doing-really-good (pure momentum) vs slow-but-
+    // moving (their stated problem is consistency). They get different copy.
+    const consistent = ap === 'Actually doing really good';
+    const inconsistent = ap === 'Slow but moving.. just a bit inconsistent';
     const stalled = ap === 'Started, then stopped';
     const goalsNat = this._solGoalsNatural(p);
 
@@ -2192,25 +2199,29 @@ const WelcomeIntro = {
       };
     }
 
-    // EXACTLY: they know the what. Lead with the goal, it is about doing now, not
-    // figuring out, so no "get clear" framing.
+    // EXACTLY: they know the what. Lead with the goal, it is about doing now.
     if (cl.indexOf('exactly') !== -1) {
-      return {
-        headline: 'You want to make progress in ' + goalsNat + '.',
-        line: this._solSituation(p),
-        stakes: moving
-          ? 'Keep this going and ' + this._solMomentumPhrase(p) + ' stops being someday. The only real risk now is letting it slip.'
-          : 'You are clear on the what. The whole game now is doing it, and doing it again tomorrow. That is exactly what Memento holds you to.'
-      };
+      let line, stakes;
+      if (consistent) {
+        line = 'You know exactly what you want and you are already moving. Now you want to make sure it actually sticks.';
+        stakes = 'Continuing to move forward is the only way you reach your goals. The only real risk now is letting it slip.';
+      } else if (inconsistent) {
+        line = 'You know exactly what you want and you have started. The gap now is staying consistent.';
+        stakes = 'Continuing to move forward is the only way you reach your goals, and the piece you are missing is doing it on the days you do not feel like it. That is exactly what Memento holds you to.';
+      } else {
+        line = this._solSituation(p);
+        stakes = 'You are clear on the what. The whole game now is doing it, and doing it again tomorrow. That is exactly what Memento holds you to.';
+      }
+      return { headline: 'You want to make progress in ' + goalsNat + '.', line: line, stakes: stakes };
     }
 
     // ROUGH IDEA / FIGURING IT OUT: lead with where they actually are, then reflect
     // their stated direction with reassurance, not a warning.
-    const detail = moving
-      ? "You have started, you just want it to actually add up now."
-      : stalled
-        ? "You have started on it before, you just have not made any serious moves stick yet."
-        : "You just have not pinned it down to one thing, or made any serious moves yet.";
+    let detail;
+    if (consistent) detail = 'You have started, and it is starting to add up. Now you just keep it going.';
+    else if (inconsistent) detail = 'You have started, you just have not been consistent with it yet.';
+    else if (stalled) detail = 'You have started on it before, you just have not made any serious moves stick yet.';
+    else detail = 'You just have not pinned it down to one thing, or made any serious moves yet.';
     return {
       headline: 'You have a pretty general direction you want to move in.',
       line: detail,
@@ -2751,7 +2762,7 @@ const WelcomeIntro = {
 
   _revealAfterOnboarding(name) {
     // tear down the celebration / help themes + fireworks if still up
-    if (this.el) { this.el.classList.remove('welcome-intro--blackout', 'welcome-intro--help', 'welcome-intro--cine'); this._setStage([]); }
+    if (this.el) { this.el.classList.remove('welcome-intro--blackout', 'welcome-intro--help', 'welcome-intro--cine', 'welcome-intro--preenter'); this._setStage([]); }
     this._confettiVer = (this._confettiVer || 0) + 1;
     const _cf = document.getElementById('welcomeConfetti'); if (_cf) _cf.remove();
     const _bc = document.getElementById('welcomeRays'); if (_bc) _bc.remove();
