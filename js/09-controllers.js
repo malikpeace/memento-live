@@ -2064,7 +2064,16 @@ const WelcomeIntro = {
 
     let inner;
     if (kind === 'enter') {
-      inner = `<div class="welcome-intro__page-inner wi-cine wi-enter" data-beat="${beatIdx}"><div class="wi-enter__title">${esc(b.title)}</div></div>`;
+      // The brand wordmark reveals: "Enter" eyebrow fades up, the purple glow blooms,
+      // the M materializes (scale + de-blur), then "emento" rises in. (Reuses the
+      // splash wordmark glyph so it is the real Memento logo, not plain text.)
+      inner = `<div class="welcome-intro__page-inner wi-cine wi-enter" data-beat="${beatIdx}">
+        <div class="wi-enter__eyebrow">Enter</div>
+        <div class="wi-enter__logo" role="img" aria-label="Memento">
+          <span class="wi-enter__glow" aria-hidden="true"></span>
+          <svg class="wi-enter__mark" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="44" fill="#f5f5f7"/><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z" fill="#0a0a0e"/></svg><span class="wi-enter__word" aria-hidden="true">emento</span>
+        </div>
+      </div>`;
     } else if (kind === 'philosophy') {
       inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-phi" data-beat="${beatIdx}"><h2 class="wi-demo__headline">${esc(b.headline)}</h2>${this._cinePhilosophy()}</div>`;
     } else if (kind === 'mori') {
