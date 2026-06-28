@@ -1985,6 +1985,7 @@ const WelcomeIntro = {
       if (inner) inner.classList.add('exit');
       this.el.classList.remove('welcome-intro--help');
       const _bc = document.getElementById('welcomeBeacon'); if (_bc) _bc.remove();
+      const _fb = this.el.querySelector('.wi-cine__beam--fixed'); if (_fb) _fb.remove();
       setTimeout(() => { this._showFirstWin(stepIndex); }, 250);
       return;
     }
@@ -2008,36 +2009,48 @@ const WelcomeIntro = {
       beacon.id = 'welcomeBeacon'; beacon.className = 'welcome-intro__beacon'; beacon.setAttribute('aria-hidden', 'true');
       this.el.insertBefore(beacon, this.pageWrap);
     }
+    // ONE constant background: a single fixed glow that lives outside the per-beat
+    // re-render, so it never flickers or jumps between chapters. The text crossfades
+    // over it; the light stays put.
+    if (!this.el.querySelector('.wi-cine__beam--fixed')) {
+      const beam = document.createElement('div');
+      beam.className = 'wi-cine__beam--fixed'; beam.setAttribute('aria-hidden', 'true');
+      this.el.insertBefore(beam, this.pageWrap);
+    }
     if (!this._summary && !this._summaryFailed) this.generateSummary();
     this._onSummaryReady = null;
 
     const p = state.profile || {};
     const beats = this._solBeats(p);
     const n = beats.length;
-    if (beatIdx >= n) { this._showIdentityStep(stepIndex + 1); return; }
+    if (beatIdx >= n) { const _fb = this.el.querySelector('.wi-cine__beam--fixed'); if (_fb) _fb.remove(); this._showIdentityStep(stepIndex + 1); return; }
     const b = beats[beatIdx];
     const isLast = beatIdx === n - 1;
-    const dots = beats.map((x, i) => `<span class="wi-demo__dot${i === beatIdx ? ' is-active' : ''}" data-beat="${i}" style="${i === beatIdx ? 'background:' + b.accent : ''}"></span>`).join('');
 
     const isReflect = b.key === 'summary';
     this.pageWrap.innerHTML = `<div class="welcome-intro__page-inner wi-cine${isReflect ? ' wi-cine--reflect' : ''}" data-beat="${beatIdx}">
-      <div class="wi-cine__beam" style="--beam:${b.beam}"></div>
       ${isReflect ? '' : `<div class="wi-demo__stage">${this._cineMock(b.key, p)}</div>`}
-      <div class="wi-demo__eyebrow${isReflect ? ' wi-demo__eyebrow--soft' : ''}" style="color:${b.accent}">${b.label ? esc(b.label) : ('0' + (beatIdx + 1) + ' <span>of 0' + n + '</span>')}</div>
+      ${isReflect ? '' : `<div class="wi-demo__eyebrow" style="color:${b.accent}">${b.label ? esc(b.label) : ('0' + (beatIdx + 1) + ' <span>of 0' + n + '</span>')}</div>`}
       <h2 class="wi-demo__headline">${esc(b.headline)}</h2>
       <p class="wi-demo__line">${esc(b.line)}</p>
       ${b.trap ? `<p class="wi-cine__trap">${esc(b.trap)}</p>` : ''}
-      <div class="wi-demo__dots">${dots}</div>
     </div>`;
     this.navEl.innerHTML = `<button class="welcome-intro__back-btn" id="solBack">←</button><button class="welcome-intro__btn welcome-intro__btn--step" id="solNext" style="flex:1;width:auto;">${isLast ? 'Build it' : 'Next'}</button>`;
     try { this.pageWrap.classList.remove('wc-busy', 'wc-reading'); this.pageWrap.scrollTop = 0; } catch (e) {}
 
-    const go = (idx) => { this._showSolution(stepIndex, idx); };
+    // Crossfade between chapters: fade the current text out, then swap. The fixed
+    // beam underneath never moves, so it reads as one continuous moment.
+    const go = (idx) => {
+      if (idx >= 0 && idx < n && idx !== beatIdx) {
+        const inner = this.pageWrap.querySelector('.welcome-intro__page-inner');
+        if (inner) inner.classList.add('exit');
+        setTimeout(() => this._showSolution(stepIndex, idx), 165);
+      } else {
+        this._showSolution(stepIndex, idx);
+      }
+    };
     document.getElementById('solNext').addEventListener('click', () => go(beatIdx + 1));
     document.getElementById('solBack').addEventListener('click', () => go(beatIdx - 1));
-    this.pageWrap.querySelectorAll('.wi-demo__dot').forEach((d) => d.addEventListener('click', () => {
-      const i = parseInt(d.getAttribute('data-beat'), 10); if (!isNaN(i)) go(i);
-    }));
     // touch swipe: left advances, right goes back
     try {
       const stage = this.pageWrap.querySelector('.wi-cine');
@@ -2066,7 +2079,8 @@ const WelcomeIntro = {
     const weeks = this._solWeeksLeft();
 
     // 1. SUMMARY: exactly what they want + where they actually are.
-    const sumHead = goals ? ('You came here for ' + goals + '.') : 'You came here to stop drifting.';
+    const goalsNat = this._solGoalsNatural(p);
+    const sumHead = goalsNat ? ('You came here to work on ' + goalsNat + '.') : 'You came here to stop drifting.';
     const sumLine = this._solSituation(p);
 
     // 2. THE PROBLEM: their own blocker + the cost, relayed back. The quiet "damn".
@@ -2232,6 +2246,34 @@ const WelcomeIntro = {
       if (toward && toward.indexOf('not sure') === -1 && toward.indexOf('honestly') === -1) return toward;
     } catch (e) {}
     return '';
+  },
+  // The summary headline phrase. Maps the raw goal chips to clean prose and caps the
+  // list at two + "and more" so it reads like a natural sentence, not a comma dump.
+  _solGoalsNatural(p) {
+    try {
+      const MAP = {
+        'work & money': 'your finances',
+        'business': 'your business',
+        'health & fitness': 'your health',
+        'discipline & focus': 'your discipline',
+        'self mastery': 'self-mastery',
+        'a skill or craft': 'your craft',
+        'creative work': 'your creative work',
+        'relationships': 'your relationships',
+        'mindset & mental': 'your mindset'
+      };
+      const raw = String((p && p.runningToward) || '').split(' · ').map((s) => s.trim()).filter(Boolean);
+      const clean = [];
+      for (let i = 0; i < raw.length; i++) {
+        const k = raw[i].toLowerCase();
+        if (k.indexOf('not sure') !== -1 || k.indexOf('honestly') !== -1) continue;
+        clean.push(MAP[k] || (raw[i].charAt(0).toLowerCase() + raw[i].slice(1)));
+      }
+      if (!clean.length) return '';
+      if (clean.length === 1) return clean[0];
+      if (clean.length === 2) return clean[0] + ' and ' + clean[1];
+      return clean[0] + ', ' + clean[1] + ', and more';
+    } catch (e) { return ''; }
   },
   _solHook(p) {
     const ap = String((p && p.actionProgress) || '');
@@ -2553,6 +2595,7 @@ const WelcomeIntro = {
     this._confettiVer = (this._confettiVer || 0) + 1;
     const _cf = document.getElementById('welcomeConfetti'); if (_cf) _cf.remove();
     const _bc = document.getElementById('welcomeBeacon'); if (_bc) _bc.remove();
+    const _fb = this.el && this.el.querySelector('.wi-cine__beam--fixed'); if (_fb) _fb.remove();
     if (this._fwClick) { document.removeEventListener('click', this._fwClick, true); this._fwClick = null; }
     if (name) state.profile.name = name;
     state.meta.welcomeSeen = true;
