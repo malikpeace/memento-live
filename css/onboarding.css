@@ -1634,6 +1634,31 @@ body.lite .wi-cine__beam { filter: blur(18px); }
 body.lite .wi-cine__pillicon svg { filter: none; }
 .wi-cine__chips { display: flex; flex-wrap: wrap; gap: 7px; justify-content: center; margin-top: 16px; max-width: 300px; }
 .wi-cine__chip { font-size: 0.8rem; line-height: 1; padding: 8px 12px; border-radius: 9px; color: rgba(255,255,255,0.88); background: rgba(255,255,255,0.05); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06); }
+
+/* ── THE STORY ORB ───────────────────────────────────────────────────────────
+   One persistent visual for the whole post-first-win story. The rings are the
+   constant core; per chapter, a data-orb state reveals one extra layer (the goal
+   chips, the three pillar marks, or the life-in-years grid) and re-tones the rings,
+   so it reads as one evolving thing in a single constant world, not six screens. */
+.wi-orb { position: relative; width: 240px; max-width: 72vw; margin: 0 auto; display: flex; flex-direction: column; align-items: center; }
+.wi-orb__core { position: relative; width: 100%; }
+.wi-orb__rings { width: 100%; height: auto; display: block; transition: opacity 0.55s ease, filter 0.55s ease; }
+.wi-orb__grid, .wi-orb__marks { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.55s ease; }
+.wi-orb__grid .wi-mock { width: 88%; height: auto; }
+.wi-orb__marks { gap: 24px; }
+.wi-orb__mark { width: 42px; height: 42px; display: grid; place-items: center; }
+.wi-orb__mark svg { width: 100%; height: 100%; display: block; filter: drop-shadow(0 0 11px currentColor); }
+body.lite .wi-orb__mark svg { filter: none; }
+.wi-orb .wi-cine__chips { opacity: 0; max-height: 0; overflow: hidden; margin-top: 0; transition: opacity 0.55s ease, max-height 0.55s ease, margin-top 0.55s ease; }
+/* per-chapter states */
+.wi-orb[data-orb="summary"] .wi-cine__chips { opacity: 1; max-height: 170px; margin-top: 16px; }
+.wi-orb[data-orb="problem"] .wi-orb__rings { opacity: 0.45; filter: grayscale(0.55) brightness(0.85); }
+.wi-orb[data-orb="solution"] .wi-orb__rings { filter: brightness(1.12) saturate(1.1); }
+.wi-orb[data-orb="philosophy"] .wi-orb__rings { opacity: 0.3; }
+.wi-orb[data-orb="philosophy"] .wi-orb__marks { opacity: 1; }
+.wi-orb[data-orb="fuel"] .wi-orb__rings { opacity: 0.22; }
+.wi-orb[data-orb="fuel"] .wi-orb__grid { opacity: 0.92; }
+.wi-orb[data-orb="close"] .wi-orb__rings { filter: brightness(1.18) saturate(1.1); }
 .wi-cine__trap { font-size: 0.83rem; line-height: 1.4; color: rgba(232,234,248,0.44); margin: -10px auto 0; max-width: 30ch; }
 .wi-cine__gaugewrap { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 184px; }
 .wi-cine__gauge { width: min(72vw,260px); height: 12px; border-radius: 999px; background: rgba(255,255,255,0.10); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06); position: relative; overflow: hidden; margin: 0 auto; }

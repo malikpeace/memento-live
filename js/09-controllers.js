@@ -2056,56 +2056,54 @@ const WelcomeIntro = {
   // tied to their finite time, 3-5 clarity / action / consistency framed to what they
   // already told us, 6 the close. Replaces the old want/stakes/payoff + the module demo.
   _solBeats(p) {
-    const PUR = 'rgba(150,116,255,1)', GOLD = 'rgba(232,194,74,1)', WHT = 'rgba(226,232,255,1)', GRN = 'rgba(52,211,153,1)';
+    const PUR = 'rgba(150,116,255,1)';
     const low = (v) => String(v || '').toLowerCase();
-    const cl = low(p && p.clarityLevel), ak = low(p && p.actionKnow), ap = String((p && p.actionProgress) || '');
+    const ap = String((p && p.actionProgress) || '');
     const goals = this._solGoals(p);
     const first = (p && p.name) ? String(p.name).trim().split(/\s+/)[0] : '';
     const moving = (ap === 'Slow but moving' || ap === 'Actually doing really good');
     const weeks = this._solWeeksLeft();
 
-    // 1. the mirror: exactly what they want + where they actually are
+    // 1. SUMMARY: exactly what they want + where they actually are.
     const sumHead = goals ? ('You came here for ' + goals + '.') : 'You came here to stop drifting.';
     const sumLine = this._solSituation(p);
 
-    // 2. the cost (stuck) or the upside (already moving), tied to their finite time
-    const twHead = weeks ? ('About ' + weeks.toLocaleString() + ' weeks left.') : 'Your time is not unlimited.';
-    const twLine = moving
-      ? ('You are actually moving, and that is rare. Keep this up and ' + this._solMomentumPhrase(p) + ' stops being someday. But momentum leaks out one quiet skipped day at a time.')
-      : ('Let another year go like the last one and ' + this._solCostPhrase(p) + '. Nothing changes on its own. The goal just keeps following you around.');
-    const bridge = 'Memento was built for exactly this. Here is how.';
+    // 2. THE PROBLEM: their own blocker + the cost, relayed back. The quiet "damn".
+    const blocker = String(this._solBlockerLine(p) || '').replace(/^And\s+/, '');
+    const probHead = 'But knowing has never been the hard part.';
+    const probLine = moving
+      ? 'You have started, but momentum is fragile. One quiet week off and it slips, and you are staring at the start again.'
+      : ((blocker ? (blocker.charAt(0).toUpperCase() + blocker.slice(1)) : 'It keeps sliding to later, and later never quite comes.') + ' Another year of that ends exactly where this one did, ' + this._solCostPhrase(p) + '.');
 
-    // 3-5. clarity / action / consistency, framed to what they already told us
-    const clarityKnows = cl.indexOf('exactly') !== -1;
-    const clarityLost = cl.indexOf('lost') !== -1 || cl.indexOf('not really') !== -1 || cl.indexOf('trying') !== -1;
-    const clLine = clarityKnows
-      ? 'One goal you care about more than anything else. You already know yours, so we pressure-test it until it is ironclad.'
-      : (clarityLost
-        ? 'One goal you care about more than anything else. You are not sure what yours is yet, so finding it is the very first thing we do, together.'
-        : 'One goal you care about more than anything else. You have a rough idea already, so we sharpen it until it is unmistakable.');
+    // 3. THE SOLUTION.
+    const solHead = 'That is the whole reason Memento exists.';
+    const solLine = 'It takes the one thing you actually want and turns it into the one thing you do today. Then it makes sure you do it again tomorrow, and the day after that.';
 
-    const actionKnows = ak.indexOf('yes') !== -1;
-    const acLine = clarityLost
-      ? 'Once the goal is clear, Memento turns it into the exact move to make today. Knowing finally becomes doing.'
-      : (actionKnows
-        ? 'You already know the moves. Memento keeps you on the single highest-leverage one each day, not the busywork.'
-        : 'You know the goal, you are just not sure how to get there. Memento maps it into the exact tasks that move it.');
+    // 4. THE PHILOSOPHY: the three pillars of getting anything done.
+    const phiHead = 'Anything that gets done comes down to three things.';
+    const phiLine = 'Clarity, the one goal that matters most. Action, the single move that pushes it. Consistency, doing it on the days you do not feel like it. Memento runs all three for you.';
 
-    const coLine = moving
-      ? 'You are already moving. Memento protects it, the streak, the proof, the way back, so one bad week never becomes the week you quietly stopped.'
-      : 'First we lock the goal and the moves. Then Memento keeps you showing up, with a way back in on the days you slip, so it actually compounds.';
+    // 5. THE FUEL: finite time + the reason underneath it all.
+    const fuelWhy = moving ? this._solMomentumPhrase(p) : 'the life you actually want';
+    const fuelHead = 'But none of it holds without fuel.';
+    const fuelLine = (weeks ? ('You have about ' + weeks.toLocaleString() + ' weeks left. ') : 'Your time is not unlimited. ')
+      + 'So Memento keeps your reason right in front of you, ' + fuelWhy + ', and the day you started, for the times you would rather not.';
 
-    // 6. the close
+    // 6. THE CLOSE.
     const clsHead = first ? (first + ', this is your Memento.') : 'This is your Memento.';
-    const clsLine = 'One goal. One move a day. The proof stacking up behind you. Built around the one life you actually have.';
+    const clsLine = 'Clarity, action, consistency, and the reason underneath all of it. Built around the one life you actually have.';
 
+    // ONE constant world: same purple accent + steady beam on every chapter, so it
+    // reads as a single continuous moment, not six separate screens. Only the words
+    // and the orb's state change (key === the orb state the CSS evolves).
+    const B = 0.5;
     return [
-      { key: 'summary', accent: PUR, beam: 0.5, headline: sumHead, line: sumLine, trap: this._solBlockerLine(p) },
-      { key: 'twist', accent: GOLD, beam: 0.34, headline: twHead, line: twLine, trap: bridge },
-      { key: 'clarity', accent: PUR, beam: 0.6, label: 'CLARITY', headline: 'It starts with clarity.', line: clLine },
-      { key: 'action', accent: WHT, beam: 0.62, label: 'ACTION', headline: 'Then it becomes action.', line: acLine },
-      { key: 'consistency', accent: GRN, beam: 0.66, label: 'CONSISTENCY', headline: 'Then you stay consistent.', line: coLine },
-      { key: 'close', accent: GRN, beam: 0.74, headline: clsHead, line: clsLine }
+      { key: 'summary', accent: PUR, beam: B, label: 'WHAT YOU WANT', headline: sumHead, line: sumLine },
+      { key: 'problem', accent: PUR, beam: B, label: 'THE PROBLEM', headline: probHead, line: probLine },
+      { key: 'solution', accent: PUR, beam: B, label: 'THE SOLUTION', headline: solHead, line: solLine },
+      { key: 'philosophy', accent: PUR, beam: B, label: 'THE PHILOSOPHY', headline: phiHead, line: phiLine },
+      { key: 'fuel', accent: PUR, beam: B, label: 'THE FUEL', headline: fuelHead, line: fuelLine },
+      { key: 'close', accent: PUR, beam: B, label: '', headline: clsHead, line: clsLine }
     ];
   },
   // where they actually are, reflected back from their clarity + progress answers
@@ -2180,34 +2178,23 @@ const WelcomeIntro = {
   },
   // the centered reflected motif per beat (inline SVG, demo convention)
   _cineMock(key, p) {
-    if (key === 'summary') {
-      const rings = '<svg class="wi-mock" viewBox="0 0 240 190" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
-        + '<circle cx="120" cy="92" r="72" fill="none" stroke="rgba(150,116,255,0.13)" stroke-width="1.5"/>'
-        + '<circle cx="120" cy="92" r="50" fill="none" stroke="rgba(150,116,255,0.24)" stroke-width="1.5"/>'
-        + '<circle cx="120" cy="92" r="28" fill="none" stroke="rgba(150,116,255,0.42)" stroke-width="1.5"/>'
-        + '<circle cx="120" cy="92" r="14" fill="none" stroke="rgba(184,156,255,0.7)" stroke-width="1"/>'
-        + '<circle cx="120" cy="92" r="7" fill="rgba(190,164,255,1)"/></svg>';
-      return '<div class="wi-cine__wantwrap">' + rings + this._solChips(p) + '</div>';
-    }
-    if (key === 'twist') return this._twistGrid();
-    if (key === 'clarity' || key === 'action' || key === 'consistency') {
-      const ic = (typeof ICONS !== 'undefined') ? { clarity: ICONS.clarity, action: ICONS.action, consistency: ICONS.streak } : {};
-      const col = { clarity: 'rgba(150,116,255,1)', action: 'rgba(226,232,255,1)', consistency: 'rgba(52,211,153,1)' };
-      return '<div class="wi-cine__pillicon" style="color:' + col[key] + '">' + (ic[key] || '') + '</div>';
-    }
-    // close: a 12-month green streak row + a single gold "now" dot (only gold used)
-    let dots = '';
-    for (let i = 0; i < 12; i++) {
-      const x = (30 + i * (180 / 11)).toFixed(1);
-      const op = (0.4 + (i / 11) * 0.55).toFixed(2);
-      dots += `<circle cx="${x}" cy="130" r="5" fill="rgba(52,211,153,${op})"/>`;
-    }
-    return '<svg class="wi-mock" viewBox="0 0 240 190" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
-      + '<line x1="30" y1="130" x2="210" y2="130" stroke="rgba(255,255,255,0.10)" stroke-width="1"/>'
-      + dots
-      + '<line x1="120" y1="84" x2="120" y2="124" stroke="rgba(232,194,74,0.28)" stroke-width="1"/>'
-      + '<circle cx="120" cy="78" r="6.5" fill="rgba(232,194,74,1)"/>'
-      + '<circle cx="120" cy="78" r="12" fill="none" stroke="rgba(232,194,74,0.4)" stroke-width="1"/></svg>';
+    // ONE persistent orb for the whole story. Only the data-orb state changes per
+    // chapter; the CSS reveals the right layer (their goal chips on the summary, the
+    // three pillar marks on the philosophy, the life-in-years grid on the fuel) so it
+    // reads as a single evolving visual instead of six different ones.
+    const rings = '<svg class="wi-orb__rings" viewBox="0 0 240 190" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+      + '<circle cx="120" cy="92" r="72" fill="none" stroke="rgba(150,116,255,0.13)" stroke-width="1.5"/>'
+      + '<circle cx="120" cy="92" r="50" fill="none" stroke="rgba(150,116,255,0.24)" stroke-width="1.5"/>'
+      + '<circle cx="120" cy="92" r="28" fill="none" stroke="rgba(150,116,255,0.42)" stroke-width="1.5"/>'
+      + '<circle cx="120" cy="92" r="14" fill="none" stroke="rgba(184,156,255,0.7)" stroke-width="1"/>'
+      + '<circle cx="120" cy="92" r="7" fill="rgba(190,164,255,1)"/></svg>';
+    const ic = (typeof ICONS !== 'undefined') ? ICONS : {};
+    const marks = '<div class="wi-orb__marks">'
+      + '<span class="wi-orb__mark" style="color:rgba(150,116,255,1)">' + (ic.clarity || '') + '</span>'
+      + '<span class="wi-orb__mark" style="color:rgba(226,232,255,1)">' + (ic.action || '') + '</span>'
+      + '<span class="wi-orb__mark" style="color:rgba(52,211,153,1)">' + (ic.streak || '') + '</span></div>';
+    const grid = '<div class="wi-orb__grid">' + this._twistGrid() + '</div>';
+    return '<div class="wi-orb" data-orb="' + key + '"><div class="wi-orb__core">' + rings + grid + marks + '</div>' + this._solChips(p) + '</div>';
   },
   // the twist motif: a life in years (the Mori grid). Spent years dim, the current
   // year bright gold, the years still ahead a faint gold, so "weeks left" is visible.
