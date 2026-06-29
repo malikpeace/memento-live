@@ -345,6 +345,7 @@ const WelcomeIntro = {
       'Streaming/TV': "A whole season can vanish in a weekend. We just make sure it's not eating the time you wanted for your goal.",
       'Unhealthy relationship(s)': "That's a heavy one, and an honest one. The right people get you moving toward the life you want, not away from it.",
       'Something else': "Whatever it is, naming it is the win. You can't change a habit you won't look at.",
+      _multi: "That's a few things pulling at you at once. We just make sure none of them come ahead of what you actually want.",
       _fallback: "Whatever's got a hold on you, it's beatable. We just have to see it clearly first."
     },
     timeDrain: {
@@ -1285,8 +1286,8 @@ const WelcomeIntro = {
       sub: 'Again, try to be as honest as possible.',
       options: ['Procrastination', 'Phone & social media', "I don't know what to do", "Can't stay consistent", 'Fear of failing', 'Not enough time', 'Low motivation', 'Self-doubt'],
       skipIf: (p) => { const ap = String((p && p.actionProgress) || ''); return ap === 'Slow but moving.. just a bit inconsistent' || ap === 'Actually doing really good'; } },
-    { key: 'distraction', type: 'choices', multi: false,
-      headline: 'What pulls your attention the most?',
+    { key: 'distraction', type: 'choices', multi: true,
+      headline: 'What pulls your attention and takes away focus from your goals?',
       options: ['Short form content', 'YouTube', 'Porn', 'Gaming', 'Streaming/TV', 'Unhealthy relationship(s)', 'Something else'],
       // Only ask if the phone is what's pulling them back.
       skipIf: (p) => String((p && p.runningFrom) || '').indexOf('Phone & social media') === -1 },
