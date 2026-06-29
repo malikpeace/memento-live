@@ -2553,6 +2553,9 @@ const WelcomeIntro = {
     if (this._prevStep >= STEPS.length) return;
     const s = STEPS[this._prevStep];
     this._prevStep++;
+    // The card grows a touch each tap, as if it's coming closer the more you build it.
+    const card = wrap.querySelector('.wi-pcard');
+    if (card) card.style.transform = 'scale(' + (1 + Math.min(this._prevStep, 5) * 0.04).toFixed(3) + ')';
     if (s.glow) { const g = wrap.querySelector('.wi-pcard__glow--' + s.glow); if (g) g.classList.add('on'); }
     if (s.evolve) { const stage = wrap.querySelector('.wi-pcard-stage'); if (stage) stage.classList.add('evolved'); }
     const title = wrap.querySelector('.wi-prev__title');
