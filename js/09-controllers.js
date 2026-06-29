@@ -2063,6 +2063,8 @@ const WelcomeIntro = {
     // on the "Enter Memento" beat onward, so the light literally comes in as they
     // enter Memento. --preenter hides the rays + the background wash on the stage page.
     this.el.classList.toggle('welcome-intro--preenter', kind === 'stage');
+    // Philosophy uses a wider content column (less page padding) so the 3 boxes are not skinny.
+    this.el.classList.toggle('welcome-intro--phi', kind === 'philosophy');
     // any pending auto-advance from a prior "Enter Memento" beat is cancelled the
     // moment we render anything else (incl. navigating back to it).
     if (this._enterTimer) { clearTimeout(this._enterTimer); this._enterTimer = null; }

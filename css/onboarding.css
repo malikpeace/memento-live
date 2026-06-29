@@ -1737,7 +1737,11 @@ body.lite .welcome-intro__rays { opacity: 0.6; filter: none; }
 .wi-phi__goal { margin: 16px auto 0; max-width: 30ch; }
 .wi-phi__goal-eyebrow { display: block; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #fff; margin-bottom: 7px; }
 .wi-phi__goal-text { display: block; font-size: 1rem; font-weight: 600; color: #fff; line-height: 1.35; }
-.wi-phi__cards { display: flex; align-items: stretch; gap: 6px; margin: 20px auto 0; width: 100%; max-width: 380px; }
+/* Philosophy gets a wider content column than other chapters so the 3 boxes are not skinny:
+   trim the big page-wrap side padding and the page-inner padding for this page only. */
+.welcome-intro--phi .welcome-intro__page-wrap { padding-left: 12px; padding-right: 12px; }
+.wi-cine.wi-phi { max-width: 520px; padding-left: 0; padding-right: 0; }
+.wi-phi__cards { display: flex; align-items: stretch; gap: 7px; margin: 20px auto 0; width: 100%; max-width: 500px; }
 .wi-pc-plus { flex: 0 0 auto; align-self: center; color: rgba(255,255,255,0.3); font-size: 1.05rem; font-weight: 300; line-height: 1; }
 .wi-pc { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 9px; background: rgba(255,255,255,0.035); border-radius: 16px; padding: 18px 9px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
 .wi-pc__ic { width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; color: var(--pcc); }
@@ -1755,7 +1759,7 @@ body.lite .welcome-intro__rays { opacity: 0.6; filter: none; }
 /* The philosophy body is a two-view crossfade: pillars (page 1) and fuel (page 2).
    The M + headline above it stay put; min-height holds the height so the M does not
    shift when the shorter fuel view swaps in. */
-.wi-phi__body { position: relative; min-height: 492px; }
+.wi-phi__body { position: relative; min-height: 462px; }
 .wi-phi__bodyinner { transition: opacity 0.22s ease; }
 /* Fuel page: two wider cards (Memento Mori + Memento Vivere). */
 .wi-phi__cards--two { max-width: 344px; }
