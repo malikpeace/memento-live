@@ -2075,8 +2075,8 @@ const WelcomeIntro = {
         </div>
       </div>`;
     } else if (kind === 'philosophy') {
-      this._phiView = 'pillars';
-      inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-phi" data-beat="${beatIdx}"><svg class="wi-phi__mark" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="44" fill="#f5f5f7"/><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z" fill="#0a0a0e"/></svg><h2 class="wi-demo__headline wi-phi__head">${esc(b.headline)}</h2><span class="wi-phi__rule"></span><div class="wi-phi__body">${this._phiBody('pillars')}</div></div>`;
+      this._phiView = 'pillars'; this._phiP = p;
+      inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-phi" data-beat="${beatIdx}"><svg class="wi-phi__mark" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="44" fill="#f5f5f7"/><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z" fill="#0a0a0e"/></svg><h2 class="wi-demo__headline wi-phi__head">${esc(b.headline)}</h2><span class="wi-phi__rule"></span><div class="wi-phi__body">${this._phiBody('pillars', p)}</div></div>`;
     } else if (kind === 'mori') {
       inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-moriview" data-beat="${beatIdx}"><h2 class="wi-demo__headline">${esc(b.headline)}</h2>${this._cineMori()}<p class="wi-demo__line">${esc(b.line)}</p>${b.days ? `<p class="wi-mori__days">btw, you have about <b>${b.days.toLocaleString()}</b> days left.</p>` : ''}</div>`;
     } else if (kind === 'preview') {
@@ -2106,8 +2106,8 @@ const WelcomeIntro = {
     };
     // Philosophy is a two-view chapter: pillars, then the fuel (Mori + Vivere). Next on
     // the pillars crossfades to the fuel within the page before advancing the beat.
-    const goFwd = () => { if (kind === 'philosophy' && this._phiView !== 'fuel') { this._phiSwap('fuel'); return; } go(beatIdx + 1); };
-    const goBack = () => { if (kind === 'philosophy' && this._phiView === 'fuel') { this._phiSwap('pillars'); return; } go(beatIdx - 1); };
+    const goFwd = () => { if (kind === 'philosophy' && this._phiView !== 'help') { this._phiSwap('help'); return; } go(beatIdx + 1); };
+    const goBack = () => { if (kind === 'philosophy' && this._phiView === 'help') { this._phiSwap('pillars'); return; } go(beatIdx - 1); };
     const nextBtn = document.getElementById('solNext'); if (nextBtn) nextBtn.addEventListener('click', goFwd);
     const backBtn = document.getElementById('solBack'); if (backBtn) backBtn.addEventListener('click', goBack);
 
@@ -2416,38 +2416,53 @@ const WelcomeIntro = {
       consistency: { c: 'rgba(52,211,153,1)', label: 'Consistency', icon: cal, text: 'Keep showing up, especially on the days you do not feel like it.' }
     };
   },
-  // The M (hub) is rendered separately above; this builds the three explainer cards.
-  _cinePhilosophy() {
+  // The three pillar cards (Clarity + Action + Consistency), joined by a +. descs is an
+  // optional { clarity, action, consistency } map overriding the default copy, used by
+  // the personalized page 2.
+  _phiCards(descs) {
     const d = this._phiData();
+    descs = descs || {};
     const card = (key) => '<div class="wi-pc" style="--pcc:' + d[key].c + '">'
       + '<span class="wi-pc__ic">' + d[key].icon + '</span>'
       + '<span class="wi-pc__name">' + d[key].label + '</span>'
-      + '<span class="wi-pc__rule"></span>'
-      + '<span class="wi-pc__desc">' + d[key].text + '</span>'
+      + '<span class="wi-pc__desc">' + (descs[key] || d[key].text) + '</span>'
       + '</div>';
-    return '<div class="wi-phi__cards">' + card('clarity') + card('action') + card('consistency') + '</div>';
+    const plus = '<span class="wi-pc-plus" aria-hidden="true">+</span>';
+    return '<div class="wi-phi__cards">' + card('clarity') + plus + card('action') + plus + card('consistency') + '</div>';
   },
-  // Page 2 of the philosophy: the fuel. Two cards, Memento Mori (the push: finite time)
-  // and Memento Vivere (the pull: the life you want), that keep you on the three pillars.
-  _cinePhilosophyFuel() {
-    const ic = (typeof ICONS !== 'undefined') ? ICONS : {};
-    const card = (color, icon, name, desc) => '<div class="wi-pc" style="--pcc:' + color + '">'
-      + '<span class="wi-pc__ic">' + (icon || '') + '</span>'
-      + '<span class="wi-pc__name">' + name + '</span>'
-      + '<span class="wi-pc__rule"></span>'
-      + '<span class="wi-pc__desc">' + desc + '</span>'
-      + '</div>';
-    return '<div class="wi-phi__cards wi-phi__cards--two">'
-      + card('rgba(170,170,178,1)', ic.mori || '', 'Memento Mori', 'Your time is finite. The push that stops the days from slipping by.')
-      + card('rgba(201,162,75,1)', ic.vivere || '', 'Memento Vivere', 'The life you actually want. The pull that keeps you moving toward it.')
-      + '</div>';
+  // Page 2: the same three pillars, now spoken to THIS person's answers, what Memento
+  // will actually do for them (templated from clarityLevel / actionKnow / progress).
+  _phiPersonal(p) {
+    const low = (v) => String(v || '').toLowerCase();
+    const cl = low(p && p.clarityLevel);
+    const ak = low(p && p.actionKnow);
+    const ap = String((p && p.actionProgress) || '');
+    const goal = this._solGoalsNatural(p);
+    const lost = cl.indexOf('lost') !== -1 || cl.indexOf('not really') !== -1;
+    const exactly = cl.indexOf('exactly') !== -1;
+    let clarity;
+    if (lost || !goal) clarity = 'Get laser clear on what you actually want.';
+    else if (exactly) clarity = 'Sharpen the goal you already have in ' + goal + '.';
+    else clarity = 'Pin down the one goal that matters most in ' + goal + '.';
+    let action;
+    if (lost || !ak) action = 'Get laser clear on the exact moves to make, not just a vague idea.';
+    else if (ak.indexOf('yes') !== -1) action = 'Cut to the single highest leverage move and do it.';
+    else if (ak.indexOf('sort of') !== -1) action = 'Turn your rough plan into the moves that actually work.';
+    else action = 'Get laser clear on the exact moves to make, not just a vague idea.';
+    let consistency;
+    if (ap === 'Actually doing really good') consistency = 'Keep the momentum and make it impossible to drop.';
+    else if (ap === 'Slow but moving.. just a bit inconsistent') consistency = 'Tighten it so the slow days stop turning into off days.';
+    else if (ap === 'Started, then stopped') consistency = 'Get you going again, and keep you going this time.';
+    else consistency = 'Build the consistency to actually keep showing up.';
+    return { clarity: clarity, action: action, consistency: consistency };
   },
-  // The body under the static M + headline: pillars (page 1) or fuel (page 2).
-  _phiBody(view) {
-    if (view === 'fuel') {
-      return '<p class="wi-phi__sub">And here is what keeps you on it:</p>' + this._cinePhilosophyFuel();
+  // The body under the static M + headline: page 1 (the pillars in general) or page 2
+  // (how those same pillars apply to this person). The M + headline stay; body swaps.
+  _phiBody(view, p) {
+    if (view === 'help') {
+      return '<p class="wi-phi__sub">Memento will help you:</p>' + this._phiCards(this._phiPersonal(p || {}));
     }
-    return '<p class="wi-phi__sub">Memento comes down to three main pillars:</p>' + this._cinePhilosophy();
+    return '<p class="wi-phi__sub">Memento comes down to three main pillars:</p>' + this._phiCards();
   },
   // Crossfade the body between the two views while the M + headline stay put.
   _phiSwap(view) {
@@ -2456,7 +2471,7 @@ const WelcomeIntro = {
     this._phiView = view;
     body.classList.add('wi-phi__body--out');
     setTimeout(() => {
-      body.innerHTML = this._phiBody(view);
+      body.innerHTML = this._phiBody(view, this._phiP);
       requestAnimationFrame(() => body.classList.remove('wi-phi__body--out'));
     }, 240);
   },
