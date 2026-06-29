@@ -2113,9 +2113,13 @@ const WelcomeIntro = {
 
     // "Enter Memento" lingers ~3s then dissolves into the next page; a tap skips it.
     if (kind === 'enter') {
-      this._enterTimer = setTimeout(() => { this._enterTimer = null; go(beatIdx + 1); }, 5000);
+      // Advance exactly once. Rapid taps / a swipe + the auto-timer must not each fire
+      // the flip, which used to spawn a second floating M clone (the dual-icon glitch).
+      this._enterAdvanced = false; this._flipping = false;
+      const advance = () => { if (this._enterAdvanced) return; this._enterAdvanced = true; if (this._enterTimer) { clearTimeout(this._enterTimer); this._enterTimer = null; } go(beatIdx + 1); };
+      this._enterTimer = setTimeout(advance, 5000);
       const ent = this.pageWrap.querySelector('.wi-enter');
-      if (ent) ent.addEventListener('click', () => { if (this._enterTimer) { clearTimeout(this._enterTimer); this._enterTimer = null; } go(beatIdx + 1); });
+      if (ent) ent.addEventListener('click', advance);
     }
 
     // touch swipe: left advances, right goes back
@@ -2137,6 +2141,8 @@ const WelcomeIntro = {
   // philosophy content fades in beneath it. A floating clone of the M is animated
   // between the two measured positions (FLIP), so it works across the innerHTML swap.
   _flipEnterToPhilosophy(stepIndex, idx) {
+    if (this._flipping) return; // backstop: never run twice (no duplicate clones)
+    this._flipping = true;
     let mark = null;
     try { mark = this.pageWrap.querySelector('.wi-enter__mark'); } catch (e) {}
     if (!mark) { this._showSolution(stepIndex, idx); return; }
@@ -2191,7 +2197,7 @@ const WelcomeIntro = {
     const stage = this._solStage(p);
 
     // 3. PHILOSOPHY: the three pillars, shown as an equation (visual built in render).
-    const phiHead = 'The Philosophy Behind Memento:';
+    const phiHead = 'The Philosophy Behind Memento';
 
     // 4. MORI: the meaning of the name + finite time (life grid + days in render).
     const moriHead = 'Memento means reminder.';
