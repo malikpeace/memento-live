@@ -1245,6 +1245,11 @@ body.calm-motion .welcome-intro__pillar-ground {
   box-shadow: var(--glass-shadow), var(--glass-highlight-strong);
 }
 .welcome-intro__btn:active { transform: scale(0.97); }
+/* Primary step button: solid white with black text for max contrast and standout
+   (Next / Continue / Build it across onboarding). The orbit "Enter Memento" button
+   keeps its own white style via --enter. */
+.welcome-intro__btn--step { background: #fff; color: #0b0b12; font-weight: 700; border-color: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; box-shadow: 0 8px 30px rgba(0,0,0,0.38); }
+.welcome-intro__btn--step:hover { background: #fff; box-shadow: 0 10px 34px rgba(0,0,0,0.44); }
 .welcome-intro__btn--orbit {
   position: relative;
   overflow: visible;
