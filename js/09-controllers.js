@@ -2458,18 +2458,18 @@ const WelcomeIntro = {
     const moving = (ap === 'Actually doing really good' || ap === 'Slow but moving.. just a bit inconsistent');
     // CLARITY: lost -> make it clear. Has a goal -> pressure-test that they truly want it.
     let clarity;
-    if (lost) clarity = "Not clear yet? Memento gets you dead clear on the one thing that matters.";
-    else clarity = "Think you know it? Memento pressure-tests it, so you know you actually care.";
+    if (lost) clarity = "Memento gets you dead clear on the one thing that actually matters.";
+    else clarity = "Memento pressure-tests your goals, so you know you actually care, and gets you crystal clear on what it is.";
     // ACTION: no steps -> find them. Rough idea -> refine. Knows -> sharpen further.
     let action;
-    if (lost || !ak) action = "Not sure what to do? Memento hands you the exact actions to take.";
-    else if (ak.indexOf('yes') !== -1) action = "Know the moves? Memento sharpens them to the highest-leverage few.";
-    else if (ak.indexOf('sort of') !== -1) action = "Got a rough plan? Memento refines it into the moves that actually work.";
-    else action = "Not sure what to do? Memento hands you the exact actions to take.";
-    // CONSISTENCY: already moving -> get you to the reward. Else -> stay aligned until you arrive.
+    if (lost || !ak) action = "Memento hands you the exact actions to take, no more guessing.";
+    else if (ak.indexOf('yes') !== -1) action = "Memento sharpens what you are already doing down to the highest-leverage few.";
+    else if (ak.indexOf('sort of') !== -1) action = "Memento refines your goals into the highest-leverage daily actions you can take today, that actually work and move you forward.";
+    else action = "Memento hands you the exact actions to take, no more guessing.";
+    // CONSISTENCY: already moving -> the reward + the why + finite time. Else -> stay aligned.
     let consistency;
-    if (moving) consistency = "Already moving? Memento gets you all the way to the reward you are after.";
-    else consistency = "Then Memento keeps you aligned to it, day by day, until you get there.";
+    if (moving) consistency = "Keeps you consistent through a living card you build over time, reminding you of your why and that your time is finite.";
+    else consistency = "Memento keeps you aligned to it, day by day, until you actually get there.";
     return { clarity: clarity, action: action, consistency: consistency };
   },
   // The body under the static M + headline: page 1 (the pillars in general) or page 2
