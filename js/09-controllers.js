@@ -2080,8 +2080,8 @@ const WelcomeIntro = {
         </div>
       </div>`;
     } else if (kind === 'philosophy') {
-      this._phiView = 'pillars'; this._phiP = p;
-      inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-phi" data-beat="${beatIdx}"><svg class="wi-phi__mark" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="44" fill="#f5f5f7"/><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z" fill="#0a0a0e"/></svg><h2 class="wi-demo__headline wi-phi__head">${esc(b.headline)}</h2><span class="wi-phi__rule"></span><div class="wi-phi__body">${this._phiBody('pillars', p)}</div></div>`;
+      this._phiView = 'pillars'; this._phiP = p; this._phiSwapping = false;
+      inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-phi" data-beat="${beatIdx}"><svg class="wi-phi__mark" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="44" fill="#f5f5f7"/><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z" fill="#0a0a0e"/></svg><h2 class="wi-demo__headline wi-phi__head">${esc(b.headline)}</h2><span class="wi-phi__rule"></span><div class="wi-phi__body"><div class="wi-phi__bodyinner">${this._phiBody('pillars', p)}</div></div></div>`;
     } else if (kind === 'mori') {
       inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-moriview" data-beat="${beatIdx}"><h2 class="wi-demo__headline">${esc(b.headline)}</h2>${this._cineMori()}<p class="wi-demo__line">${esc(b.line)}</p>${b.days ? `<p class="wi-mori__days">btw, you have about <b>${b.days.toLocaleString()}</b> days left.</p>` : ''}</div>`;
     } else if (kind === 'preview') {
@@ -2475,16 +2475,26 @@ const WelcomeIntro = {
     }
     return '<p class="wi-phi__sub">Memento comes down to three main pillars:</p>' + this._phiCards();
   },
-  // Crossfade the body between the two views while the M + headline stay put.
+  // Crossfade the body between the two views while the M + headline stay put. A frozen
+  // ghost of the OLD content is layered over the body and faded out while the real layer
+  // (now holding the NEW content) fades in. Two real DOM layers avoids the iOS ghosting
+  // that came from swapping innerHTML on a single element mid-opacity-transition.
   _phiSwap(view) {
     const body = this.pageWrap && this.pageWrap.querySelector('.wi-phi__body');
-    if (!body) return;
+    const inner = body && body.querySelector('.wi-phi__bodyinner');
+    if (!body || !inner || this._phiSwapping) return;
+    this._phiSwapping = true;
     this._phiView = view;
-    body.classList.add('wi-phi__body--out');
-    setTimeout(() => {
-      body.innerHTML = this._phiBody(view, this._phiP);
-      requestAnimationFrame(() => body.classList.remove('wi-phi__body--out'));
-    }, 240);
+    const ghost = inner.cloneNode(true);
+    ghost.classList.add('wi-phi__bodyinner--ghost');
+    body.appendChild(ghost);
+    inner.innerHTML = this._phiBody(view, this._phiP);
+    inner.style.opacity = '0';
+    requestAnimationFrame(() => { requestAnimationFrame(() => {
+      inner.style.opacity = '1';
+      ghost.style.opacity = '0';
+    }); });
+    setTimeout(() => { try { ghost.remove(); } catch (e) {} inner.style.opacity = ''; this._phiSwapping = false; }, 420);
   },
   // Mori page: their life in dots (reuses the life-in-years grid).
   _cineMori() {
