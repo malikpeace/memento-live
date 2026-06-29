@@ -2525,30 +2525,38 @@ const WelcomeIntro = {
       +   '<svg class="wi-pcard__emblem" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>'
       + '</div>'
       + '<p class="wi-prev__caption">First, it starts empty.</p>'
+      + '<span class="wi-prev__hint">tap the card</span>'
       + '</div>';
   },
   // The captioned auto-play reveal: blank, then each pillar light fades in (.on) with its
   // caption, ending fully alive. Guarded so leaving the page mid-reveal is harmless.
   _runPreviewReveal() {
     const wrap = this.pageWrap;
-    if (!wrap || !wrap.querySelector('.wi-prev__caption')) return;
-    if (this._prevTimers) this._prevTimers.forEach((t) => clearTimeout(t));
-    this._prevTimers = [];
-    const steps = [
-      { t: 2200, glow: 'c', cap: 'Find clarity, and your Memento glows.' },
-      { t: 4800, glow: 'a', cap: 'Take focused action, and evolve further.' },
-      { t: 7400, glow: 'k', cap: 'Stay consistent, and it comes alive.' },
-      { t: 10000, glow: null, evolve: true, cap: 'The more you show up, the more alive it gets.' }
+    const card = wrap && wrap.querySelector('.wi-pcard');
+    if (!card) return;
+    this._prevStep = 0;
+    card.style.cursor = 'pointer';
+    card.addEventListener('click', () => this._prevAdvance());
+  },
+  // Each tap reveals the next pillar light (+ caption), the last tap evolves the card.
+  _prevAdvance() {
+    const wrap = this.pageWrap; if (!wrap) return;
+    const STEPS = [
+      { glow: 'c', cap: 'Find clarity, and your Memento glows.' },
+      { glow: 'a', cap: 'Take focused action, and evolve further.' },
+      { glow: 'k', cap: 'Stay consistent, and it comes alive.' },
+      { glow: null, evolve: true, cap: 'The more you evolve, the more it evolves.' }
     ];
-    steps.forEach((s) => {
-      this._prevTimers.push(setTimeout(() => {
-        const cap = wrap.querySelector('.wi-prev__caption'); if (!cap) return;
-        if (s.glow) { const g = wrap.querySelector('.wi-pcard__glow--' + s.glow); if (g) g.classList.add('on'); }
-        if (s.evolve) { const card = wrap.querySelector('.wi-pcard'); if (card) card.classList.add('evolved'); }
-        cap.style.opacity = '0';
-        setTimeout(() => { const c = wrap.querySelector('.wi-prev__caption'); if (c) { c.textContent = s.cap; c.style.opacity = '1'; } }, 340);
-      }, s.t));
-    });
+    if (this._prevStep == null) this._prevStep = 0;
+    if (this._prevStep >= STEPS.length) return;
+    const s = STEPS[this._prevStep];
+    this._prevStep++;
+    if (s.glow) { const g = wrap.querySelector('.wi-pcard__glow--' + s.glow); if (g) g.classList.add('on'); }
+    if (s.evolve) { const card = wrap.querySelector('.wi-pcard'); if (card) card.classList.add('evolved'); }
+    const cap = wrap.querySelector('.wi-prev__caption');
+    if (cap) { cap.style.opacity = '0'; setTimeout(() => { const c = wrap.querySelector('.wi-prev__caption'); if (c) { c.textContent = s.cap; c.style.opacity = '1'; } }, 320); }
+    const hint = wrap.querySelector('.wi-prev__hint');
+    if (hint) hint.textContent = (this._prevStep >= STEPS.length) ? '' : 'tap to evolve';
   },
   // the twist motif: a life in years (the Mori grid). Spent years dim, the current
   // year bright gold, the years still ahead a faint gold, so "weeks left" is visible.

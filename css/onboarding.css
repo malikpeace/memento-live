@@ -1797,9 +1797,11 @@ body.lite .welcome-intro__rays { opacity: 0.6; filter: none; }
 .wi-pcard__sheen { position: absolute; inset: -12%; opacity: 0; z-index: 1; mix-blend-mode: screen; background: linear-gradient(122deg, transparent 16%, rgba(255,232,182,0.30) 46%, rgba(255,255,255,0.20) 54%, transparent 78%); transition: opacity 2.6s ease; }
 .wi-pcard.evolved .wi-pcard__sheen { opacity: 1; animation: wiSheenDrift 17s ease-in-out infinite; }
 @keyframes wiSheenDrift { 0%,100% { transform: translate(-5%,-4%); } 50% { transform: translate(6%,5%); } }
-.wi-pcard.evolved { box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 44px 90px rgba(0,0,0,0.62), 0 0 70px -6px rgba(255,206,128,0.5); transition: box-shadow 2.6s ease; }
+.wi-pcard.evolved { animation: wiEvolveGlow 4.5s ease-in-out infinite; }
 .wi-pcard.evolved .wi-pcard__glow.on { opacity: 0.9; }
-@media (prefers-reduced-motion: reduce) { .wi-pcard.evolved .wi-pcard__sheen { animation: none !important; } }
+@keyframes wiEvolveGlow { 0%,100% { box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 44px 90px rgba(0,0,0,0.62), 0 0 52px -8px rgba(255,206,128,0.45); } 50% { box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), 0 44px 90px rgba(0,0,0,0.62), 0 0 96px 2px rgba(255,206,128,0.82); } }
+.wi-prev__hint { display: block; margin-top: -8px; font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(236,238,250,0.38); transition: opacity 0.4s ease; }
+@media (prefers-reduced-motion: reduce) { .wi-pcard.evolved { animation: none !important; box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 44px 90px rgba(0,0,0,0.62), 0 0 70px -6px rgba(255,206,128,0.5); } .wi-pcard.evolved .wi-pcard__sheen { animation: none !important; } }
 .wi-prev__caption { min-height: 2.7em; max-width: 26ch; margin: 0 auto; text-align: center; font-size: 1rem; line-height: 1.45; color: rgba(236,238,250,0.82); transition: opacity 0.34s ease; }
 .wi-cine__wantwrap { display: flex; flex-direction: column; align-items: center; justify-content: center; }
 /* the reused module icons (clarity circles, action footsteps, consistency flame) on
