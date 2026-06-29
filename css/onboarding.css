@@ -1814,6 +1814,17 @@ body.lite .welcome-intro__rays { opacity: 0.6; filter: none; }
 .wi-pcard-stage.evolved .wi-pcard__glow.on { opacity: 0.96; }
 .wi-pcard-stage.evolved .wi-pcard__glow--a.on { opacity: 0.92; }
 .wi-prev__hint { display: block; margin-top: -8px; font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(236,238,250,0.38); transition: opacity 0.4s ease; }
+/* Cinematic arrival: the card rises out of a soft blur and settles into focus, the title
+   lifts in just behind it. Not a pop, a reveal. (Only opacity/blur/scale, GPU-cheap.) */
+.wi-prev .wi-pcard-stage { animation: wiStageArrive 1.7s cubic-bezier(0.16,1,0.3,1) 0.15s both; }
+@keyframes wiStageArrive {
+  0%   { opacity: 0; transform: scale(0.82) translateY(20px); filter: blur(18px); }
+  55%  { opacity: 1; }
+  100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+}
+.wi-prev .wi-prev__title { animation: wiPrevTitleRise 0.9s cubic-bezier(0.16,1,0.3,1) 0.6s backwards; }
+@keyframes wiPrevTitleRise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .wi-prev .wi-pcard-stage, .wi-prev .wi-prev__title { animation: none !important; } }
 @media (prefers-reduced-motion: reduce) { .wi-pcard-stage.evolved .wi-pcard, .wi-pcard-stage.evolved .wi-pcard__spill { animation: none !important; } }
 .wi-prev__caption { min-height: 2.7em; max-width: 26ch; margin: 0 auto; text-align: center; font-size: 1rem; line-height: 1.45; color: #fff; transition: opacity 0.34s ease; }
 .wi-cine__wantwrap { display: flex; flex-direction: column; align-items: center; justify-content: center; }

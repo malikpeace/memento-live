@@ -2099,7 +2099,9 @@ const WelcomeIntro = {
     let solNextLabel = isLast ? 'Build it' : 'Next';
     if (kind === 'philosophy') solNextLabel = 'For you';
     else if (kind === 'stage') solNextLabel = (String((p && p.actionProgress) || '') === 'Actually doing really good') ? "Let's Refine" : "Let's Fix This";
-    this.navEl.innerHTML = (kind === 'enter') ? '' : `<button class="welcome-intro__back-btn" id="solBack">←</button><button class="welcome-intro__btn welcome-intro__btn--step" id="solNext" style="flex:1;width:auto;">${solNextLabel}</button>`;
+    // "Meet Your Memento" is a full-screen, tap-driven moment, no Back/Build chrome.
+    // The reveal advances on tap and the final tap proceeds (see _prevAdvance).
+    this.navEl.innerHTML = (kind === 'enter' || kind === 'preview') ? '' : `<button class="welcome-intro__back-btn" id="solBack">←</button><button class="welcome-intro__btn welcome-intro__btn--step" id="solNext" style="flex:1;width:auto;">${solNextLabel}</button>`;
     try { this.pageWrap.classList.remove('wc-busy', 'wc-reading'); this.pageWrap.scrollTop = 0; } catch (e) {}
 
     // Crossfade between chapters: fade the current text out, then swap. The fixed
@@ -2133,8 +2135,9 @@ const WelcomeIntro = {
       const ent = this.pageWrap.querySelector('.wi-enter');
       if (ent) ent.addEventListener('click', advance);
     }
-    // "Meet Your Memento": kick off the captioned card-comes-alive reveal.
-    if (kind === 'preview') this._runPreviewReveal();
+    // "Meet Your Memento": kick off the captioned card-comes-alive reveal. The last
+    // tap (once the reveal is done) advances forward, since there is no Build button.
+    if (kind === 'preview') { this._prevForward = () => go(beatIdx + 1); this._runPreviewReveal(); }
 
     // touch swipe: left advances, right goes back
     try {
@@ -2538,6 +2541,9 @@ const WelcomeIntro = {
     this._prevStep = 0;
     card.style.cursor = 'pointer';
     card.addEventListener('click', () => this._prevAdvance());
+    // Hold the "tap the card" prompt until the cinematic arrival has played.
+    const hint = wrap.querySelector('.wi-prev__hint');
+    if (hint) { hint.style.opacity = '0'; setTimeout(() => { const h = (this.pageWrap || wrap).querySelector('.wi-prev__hint'); if (h && this._prevStep === 0) h.style.opacity = '1'; }, 1950); }
   },
   // Each tap reveals the next pillar light (+ caption), the last tap evolves the card.
   _prevAdvance() {
@@ -2550,7 +2556,8 @@ const WelcomeIntro = {
       { glow: null, evolve: true, text: 'The more you evolve, the more it evolves.' }
     ];
     if (this._prevStep == null) this._prevStep = 0;
-    if (this._prevStep >= STEPS.length) return;
+    // Reveal already finished: this tap proceeds out of the page (no Build button).
+    if (this._prevStep >= STEPS.length) { if (this._prevForward) this._prevForward(); return; }
     const s = STEPS[this._prevStep];
     this._prevStep++;
     // The card grows a touch each tap, as if it's coming closer the more you build it.
@@ -2560,9 +2567,14 @@ const WelcomeIntro = {
     if (s.evolve) { const stage = wrap.querySelector('.wi-pcard-stage'); if (stage) stage.classList.add('evolved'); }
     const title = wrap.querySelector('.wi-prev__title');
     if (title) { title.style.opacity = '0'; setTimeout(() => { const t = wrap.querySelector('.wi-prev__title'); if (t) { t.textContent = s.text; t.style.opacity = '1'; } }, 320); }
-    // Once they've tapped once they know the gesture, fade the prompt away for good.
     const hint = wrap.querySelector('.wi-prev__hint');
-    if (hint) hint.style.opacity = '0';
+    if (this._prevStep >= STEPS.length) {
+      // Reveal complete: after a beat, invite them to begin (the next tap proceeds).
+      if (hint) { hint.textContent = 'tap to begin'; hint.style.opacity = '0'; setTimeout(() => { const h = (this.pageWrap || wrap).querySelector('.wi-prev__hint'); if (h && this._prevStep >= STEPS.length) h.style.opacity = '1'; }, 1500); }
+    } else if (hint) {
+      // Once they've tapped once they know the gesture, fade the prompt away.
+      hint.style.opacity = '0';
+    }
   },
   // the twist motif: a life in years (the Mori grid). Spent years dim, the current
   // year bright gold, the years still ahead a faint gold, so "weeks left" is visible.
