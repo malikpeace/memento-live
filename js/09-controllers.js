@@ -2517,12 +2517,14 @@ const WelcomeIntro = {
   // (driven by _runPreviewReveal), then drift + breathe as a living aurora behind the M.
   _cineCardPreview(p) {
     return '<div class="wi-prev__wrap">'
-      + '<div class="wi-pcard wi-pcard--big" aria-hidden="true">'
-      +   '<span class="wi-pcard__glow wi-pcard__glow--c"></span>'
-      +   '<span class="wi-pcard__glow wi-pcard__glow--a"></span>'
-      +   '<span class="wi-pcard__glow wi-pcard__glow--k"></span>'
-      +   '<span class="wi-pcard__sheen"></span>'
-      +   '<svg class="wi-pcard__emblem" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>'
+      + '<div class="wi-pcard-stage">'
+      +   '<span class="wi-pcard__spill"></span>'
+      +   '<div class="wi-pcard wi-pcard--big" aria-hidden="true">'
+      +     '<span class="wi-pcard__glow wi-pcard__glow--c"></span>'
+      +     '<span class="wi-pcard__glow wi-pcard__glow--a"></span>'
+      +     '<span class="wi-pcard__glow wi-pcard__glow--k"></span>'
+      +     '<svg class="wi-pcard__emblem" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>'
+      +   '</div>'
       + '</div>'
       + '<span class="wi-prev__hint">tap the card</span>'
       + '</div>';
@@ -2552,7 +2554,7 @@ const WelcomeIntro = {
     const s = STEPS[this._prevStep];
     this._prevStep++;
     if (s.glow) { const g = wrap.querySelector('.wi-pcard__glow--' + s.glow); if (g) g.classList.add('on'); }
-    if (s.evolve) { const card = wrap.querySelector('.wi-pcard'); if (card) card.classList.add('evolved'); }
+    if (s.evolve) { const stage = wrap.querySelector('.wi-pcard-stage'); if (stage) stage.classList.add('evolved'); }
     const title = wrap.querySelector('.wi-prev__title');
     if (title) { title.style.opacity = '0'; setTimeout(() => { const t = wrap.querySelector('.wi-prev__title'); if (t) { t.textContent = s.text; t.style.opacity = '1'; } }, 320); }
     const hint = wrap.querySelector('.wi-prev__hint');
