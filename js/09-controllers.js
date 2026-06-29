@@ -2186,7 +2186,7 @@ const WelcomeIntro = {
     const stage = this._solStage(p);
 
     // 3. PHILOSOPHY: the three pillars, shown as an equation (visual built in render).
-    const phiHead = 'Anything that gets done comes down to three things.';
+    const phiHead = 'The philosophy behind Memento:';
 
     // 4. MORI: the meaning of the name + finite time (life grid + days in render).
     const moriHead = 'Memento means reminder.';
