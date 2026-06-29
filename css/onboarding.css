@@ -1786,12 +1786,12 @@ body.lite .welcome-intro__rays { opacity: 0.6; filter: none; }
    Soft radial gradients that feather to transparent (like the real living card's blobs), not
    solid ellipses, so they read as smooth edgeless light instead of blocky color patches. Low
    opacity, and each blob's bright core sits off-centre so the emblem stays crisp in the middle. */
-.wi-pcard__glow { position: absolute; border-radius: 50%; filter: blur(30px); opacity: 0; mix-blend-mode: screen; transition: opacity 1.8s ease; will-change: transform; }
-.wi-pcard__glow.on { opacity: 0.46; }
-.wi-pcard__glow--c { width: 92%; height: 66%; left: -16%; top: -16%; background: radial-gradient(circle, rgba(150,116,255,0.92), transparent 64%); animation: wiAuroraC 19s ease-in-out infinite; }
-.wi-pcard__glow--a { width: 86%; height: 60%; right: -18%; top: 22%; background: radial-gradient(circle, rgba(236,239,255,0.8), transparent 66%); animation: wiAuroraA 22s ease-in-out infinite; }
-.wi-pcard__glow--a.on { opacity: 0.3; }
-.wi-pcard__glow--k { width: 96%; height: 66%; left: -12%; bottom: -18%; background: radial-gradient(circle, rgba(56,236,150,0.9), transparent 64%); animation: wiAuroraK 20s ease-in-out infinite; }
+.wi-pcard__glow { position: absolute; border-radius: 50%; filter: blur(26px) saturate(1.5); opacity: 0; mix-blend-mode: screen; transition: opacity 1.8s ease; will-change: transform; }
+.wi-pcard__glow.on { opacity: 0.82; }
+.wi-pcard__glow--c { width: 100%; height: 72%; left: -18%; top: -18%; background: radial-gradient(circle, rgba(150,116,255,1), transparent 66%); animation: wiAuroraC 19s ease-in-out infinite; }
+.wi-pcard__glow--a { width: 90%; height: 62%; right: -18%; top: 22%; background: radial-gradient(circle, rgba(236,239,255,0.85), transparent 66%); animation: wiAuroraA 22s ease-in-out infinite; }
+.wi-pcard__glow--a.on { opacity: 0.42; }
+.wi-pcard__glow--k { width: 104%; height: 72%; left: -14%; bottom: -20%; background: radial-gradient(circle, rgba(56,236,150,1), transparent 66%); animation: wiAuroraK 20s ease-in-out infinite; }
 @keyframes wiAuroraC { 0%,100% { transform: translate(-3%,-2%) scale(1); } 33% { transform: translate(4%,2%) scale(1.1); } 66% { transform: translate(-1%,5%) scale(1.04); } }
 @keyframes wiAuroraA { 0%,100% { transform: translate(4%,2%) scale(1.04); } 50% { transform: translate(-4%,-4%) scale(1.12); } }
 @keyframes wiAuroraK { 0%,100% { transform: translate(-3%,4%) scale(1); } 50% { transform: translate(5%,-2%) scale(1.1); } }
@@ -1808,11 +1808,11 @@ body.lite .welcome-intro__rays { opacity: 0.6; filter: none; }
 /* The spill is a soft echo of the two pillar colours (purple TL, green BR) bleeding out past
    the card edges, same hues as inside, feathered to transparent. No rainbow hue-cycle, that
    averaged into mud. Subtle, so it reads as the card quietly emitting light. */
-.wi-pcard__spill { position: absolute; inset: -20%; z-index: 0; opacity: 0; pointer-events: none; filter: blur(50px); background: radial-gradient(58% 58% at 26% 22%, rgba(150,116,255,0.7), transparent 70%), radial-gradient(58% 58% at 76% 80%, rgba(56,236,150,0.62), transparent 70%); transition: opacity 2.4s ease; }
-.wi-pcard-stage.evolved .wi-pcard__spill { opacity: 0.5; }
-.wi-pcard-stage.evolved .wi-pcard { -webkit-box-reflect: below 1px linear-gradient(rgba(0,0,0,0.4), transparent 52%); }
-.wi-pcard-stage.evolved .wi-pcard__glow.on { opacity: 0.6; }
-.wi-pcard-stage.evolved .wi-pcard__glow--a.on { opacity: 0.36; }
+.wi-pcard__spill { position: absolute; inset: -22%; z-index: 0; opacity: 0; pointer-events: none; filter: blur(48px) saturate(1.5); background: radial-gradient(58% 58% at 26% 22%, rgba(150,116,255,0.92), transparent 70%), radial-gradient(58% 58% at 76% 80%, rgba(56,236,150,0.85), transparent 70%); transition: opacity 2.4s ease; }
+.wi-pcard-stage.evolved .wi-pcard__spill { opacity: 0.78; }
+.wi-pcard-stage.evolved .wi-pcard { -webkit-box-reflect: below 1px linear-gradient(rgba(0,0,0,0.42), transparent 52%); }
+.wi-pcard-stage.evolved .wi-pcard__glow.on { opacity: 0.96; }
+.wi-pcard-stage.evolved .wi-pcard__glow--a.on { opacity: 0.5; }
 .wi-prev__hint { display: block; margin-top: -8px; font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(236,238,250,0.38); transition: opacity 0.4s ease; }
 @media (prefers-reduced-motion: reduce) { .wi-pcard-stage.evolved .wi-pcard, .wi-pcard-stage.evolved .wi-pcard__spill { animation: none !important; } }
 .wi-prev__caption { min-height: 2.7em; max-width: 26ch; margin: 0 auto; text-align: center; font-size: 1rem; line-height: 1.45; color: #fff; transition: opacity 0.34s ease; }
