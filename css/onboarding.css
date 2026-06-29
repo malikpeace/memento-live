@@ -1646,8 +1646,13 @@ body.lite .wi-demo { animation: none; }
 /* The Solution "why" beats: paced, centered (margin:auto 0 inside the centered
    page-wrap = balanced space top AND bottom, never top-pinned), reuses the demo
    shell + type. A signature beam carries meaning per beat (want, drift, payoff). */
-.wi-cine { align-items: center !important; text-align: center; width: 100%; max-width: 400px; padding: 0 8px; margin: auto 0; position: relative; z-index: 1; animation: wiDemoIn 0.42s cubic-bezier(0.22,1,0.36,1) both; }
-body.lite .wi-cine { animation: none; }
+/* Every non-stagger chapter page fades in with a pure opacity crossfade (no slide,
+   so it reads as a clean fade, not a pop). Opacity-only = compositor-cheap, so it
+   runs on mobile too (the old wiDemoIn was killed under body.lite, which is why the
+   philosophy page popped in on phones). */
+.wi-cine { align-items: center !important; text-align: center; width: 100%; max-width: 400px; padding: 0 8px; margin: auto 0; position: relative; z-index: 1; animation: wiCineFadeIn 0.55s ease both; }
+body.lite .wi-cine { animation: wiCineFadeIn 0.55s ease both; }
+@keyframes wiCineFadeIn { from { opacity: 0; } to { opacity: 1; } }
 .wi-cine__beam { position: absolute; left: 50%; top: 50%; width: 46vmin; height: 82vmin; transform: translate(-50%,-52%); z-index: -1; pointer-events: none; mix-blend-mode: screen; filter: blur(26px); opacity: var(--beam, 0.55); transition: opacity 0.3s ease; background: radial-gradient(40% 60% at 50% 38%, rgba(244,236,255,0.5) 0%, rgba(198,178,255,0.26) 22%, rgba(160,164,255,0.10) 46%, transparent 72%); }
 body.lite .wi-cine__beam { filter: blur(18px); }
 /* The chapter flow is ONE clean dark canvas lit only by the top-left beacon beam
@@ -1681,8 +1686,8 @@ body.lite .welcome-intro__rays { opacity: 0.6; filter: none; }
 /* Text + nav sit above the beacon. */
 .welcome-intro--help .welcome-intro__page-wrap { position: relative; z-index: 1; }
 /* Smooth crossfade out between chapters (overrides the slide-out for this flow). */
-.wi-cine.exit { animation: wiCineOut 0.32s ease forwards; }
-@keyframes wiCineOut { to { opacity: 0; transform: translateY(-8px); } }
+.wi-cine.exit { animation: wiCineOut 0.34s ease forwards !important; }
+@keyframes wiCineOut { to { opacity: 0; } }
 /* Staggered reveal for the bare chapters (summary / problem / solution): the page
    lands blank, then the headline fades up, then the line a beat later. The block
    itself does not animate; each paragraph reveals on its own delay. */

@@ -2095,7 +2095,7 @@ const WelcomeIntro = {
       if (idx >= 0 && idx < n && idx !== beatIdx) {
         const innerEl = this.pageWrap.querySelector('.welcome-intro__page-inner');
         if (innerEl) innerEl.classList.add('exit');
-        setTimeout(() => this._showSolution(stepIndex, idx), 300);
+        setTimeout(() => this._showSolution(stepIndex, idx), 360);
       } else {
         this._showSolution(stepIndex, idx);
       }
