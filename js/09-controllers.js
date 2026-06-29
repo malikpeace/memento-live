@@ -2092,7 +2092,7 @@ const WelcomeIntro = {
     this.pageWrap.innerHTML = inner;
     // The interstitial has no buttons (auto-advances / tap to skip); every other page
     // keeps Back + Next (Next becomes "Build it" on the last page).
-    this.navEl.innerHTML = (kind === 'enter') ? '' : `<button class="welcome-intro__back-btn" id="solBack">←</button><button class="welcome-intro__btn welcome-intro__btn--step" id="solNext" style="flex:1;width:auto;">${isLast ? 'Build it' : 'Next'}</button>`;
+    this.navEl.innerHTML = (kind === 'enter') ? '' : `<button class="welcome-intro__back-btn" id="solBack">←</button><button class="welcome-intro__btn welcome-intro__btn--step" id="solNext" style="flex:1;width:auto;">${kind === 'philosophy' ? 'For you' : (isLast ? 'Build it' : 'Next')}</button>`;
     try { this.pageWrap.classList.remove('wc-busy', 'wc-reading'); this.pageWrap.scrollTop = 0; } catch (e) {}
 
     // Crossfade between chapters: fade the current text out, then swap. The fixed
@@ -2433,7 +2433,7 @@ const WelcomeIntro = {
   _phiCards(descs) {
     const d = this._phiData();
     descs = descs || {};
-    const card = (key) => '<div class="wi-pc" style="--pcc:' + d[key].c + '">'
+    const card = (key) => '<div class="wi-pc" data-k="' + key + '" style="--pcc:' + d[key].c + '">'
       + '<span class="wi-pc__ic">' + d[key].icon + '</span>'
       + '<span class="wi-pc__name">' + d[key].label + '</span>'
       + '<span class="wi-pc__desc">' + (descs[key] || d[key].text) + '</span>'
@@ -2487,6 +2487,7 @@ const WelcomeIntro = {
     if (!body || !inner || this._phiSwapping) return;
     this._phiSwapping = true;
     this._phiView = view;
+    const nb = document.getElementById('solNext'); if (nb) nb.textContent = (view === 'help') ? 'Next' : 'For you';
     inner.style.opacity = '0';
     setTimeout(() => {
       inner.innerHTML = this._phiBody(view, this._phiP);

@@ -1735,7 +1735,7 @@ body.lite .welcome-intro__rays { opacity: 0.6; filter: none; }
 .wi-phi__sub { margin: 14px auto 0; max-width: 28ch; font-size: 0.95rem; line-height: 1.5; color: rgba(232,234,248,0.6); }
 /* The "Ultimate goal" callout above the foundation line (page 1 only). */
 .wi-phi__goal { margin: 16px auto 0; max-width: 30ch; }
-.wi-phi__goal-eyebrow { display: block; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(150,116,255,0.9); margin-bottom: 6px; }
+.wi-phi__goal-eyebrow { display: block; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #fff; margin-bottom: 7px; }
 .wi-phi__goal-text { display: block; font-size: 1rem; font-weight: 600; color: #fff; line-height: 1.35; }
 .wi-phi__cards { display: flex; align-items: stretch; gap: 6px; margin: 20px auto 0; width: 100%; max-width: 380px; }
 .wi-pc-plus { flex: 0 0 auto; align-self: center; color: rgba(255,255,255,0.3); font-size: 1.05rem; font-weight: 300; line-height: 1; }
@@ -1745,6 +1745,13 @@ body.lite .welcome-intro__rays { opacity: 0.6; filter: none; }
 .wi-pc__name { font-size: 0.9rem; font-weight: 700; color: #fff; letter-spacing: -0.01em; }
 .wi-pc__rule { width: 16px; height: 2px; border-radius: 2px; background: var(--pcc); opacity: 0.5; }
 .wi-pc__desc { font-size: 0.72rem; line-height: 1.45; color: rgba(232,234,248,0.58); }
+/* Colour-coded boxes: Clarity purple, Action white (black text), Consistency green. */
+.wi-pc[data-k="clarity"] { background: rgba(150,116,255,0.16); }
+.wi-pc[data-k="consistency"] { background: rgba(52,211,153,0.15); }
+.wi-pc[data-k="action"] { background: #f5f5f7; box-shadow: none; }
+.wi-pc[data-k="action"] .wi-pc__ic { color: #0a0a0e; }
+.wi-pc[data-k="action"] .wi-pc__name { color: #0a0a0e; }
+.wi-pc[data-k="action"] .wi-pc__desc { color: rgba(10,10,14,0.66); }
 /* The philosophy body is a two-view crossfade: pillars (page 1) and fuel (page 2).
    The M + headline above it stay put; min-height holds the height so the M does not
    shift when the shorter fuel view swaps in. */
