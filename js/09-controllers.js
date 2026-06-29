@@ -2473,7 +2473,9 @@ const WelcomeIntro = {
     if (view === 'help') {
       return '<p class="wi-phi__sub">Memento will help you:</p>' + this._phiCards(this._phiPersonal(p || {}));
     }
-    return '<p class="wi-phi__sub">Memento comes down to three main pillars:</p>' + this._phiCards();
+    return '<div class="wi-phi__goal"><span class="wi-phi__goal-eyebrow">Ultimate goal</span><span class="wi-phi__goal-text">Achievement, in whatever realm of life you choose.</span></div>'
+      + '<p class="wi-phi__sub">The foundation of achievement comes down to three pillars, the foundation of Memento:</p>'
+      + this._phiCards();
   },
   // Sequential fade while the M + headline stay put: the current boxes fade out, then
   // (once fully invisible and the fade has settled) the content swaps and the new boxes
