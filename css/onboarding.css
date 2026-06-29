@@ -1699,13 +1699,13 @@ body.lite .welcome-intro__rays { opacity: 0.6; filter: none; }
 .wi-cine--stagger { animation: none !important; }
 .wi-cine--stagger .wi-demo__headline,
 .wi-cine--stagger .wi-demo__line { opacity: 0; animation: wiLineIn 0.7s cubic-bezier(0.22,1,0.36,1) forwards; }
-.wi-cine--stagger .wi-demo__headline { animation-delay: 0.22s; }
-.wi-cine--stagger .wi-demo__line { animation-delay: 0.82s; }
+.wi-cine--stagger .wi-demo__headline { animation-delay: 0.3s; }
+.wi-cine--stagger .wi-demo__line { animation-delay: 1.15s; }
 @keyframes wiLineIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 .wi-cine--stagger.exit .wi-demo__headline, .wi-cine--stagger.exit .wi-demo__line { animation: none; }
 @media (prefers-reduced-motion: reduce) { .wi-cine--stagger .wi-demo__headline, .wi-cine--stagger .wi-demo__line { animation: none; opacity: 1; } }
 /* The stakes paragraph (3rd) lands after the situation line. */
-.wi-cine--stagger .wi-demo__stakes { animation-delay: 1.3s; color: rgba(232,234,248,0.62); }
+.wi-cine--stagger .wi-demo__stakes { animation-delay: 2.0s; color: rgba(232,234,248,0.62); }
 
 /* ===== Chapter flow v2: enter / philosophy / mori / preview ===== */
 /* "Enter Memento" beat: the brand wordmark reveals like a logo intro, the M
