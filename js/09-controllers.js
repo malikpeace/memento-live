@@ -2075,7 +2075,7 @@ const WelcomeIntro = {
         </div>
       </div>`;
     } else if (kind === 'philosophy') {
-      inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-phi" data-beat="${beatIdx}"><svg class="wi-phi__mark" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="44" fill="#f5f5f7"/><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z" fill="#0a0a0e"/></svg><h2 class="wi-demo__headline">${esc(b.headline)}</h2>${this._cinePhilosophy()}</div>`;
+      inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-phi" data-beat="${beatIdx}"><h2 class="wi-demo__headline">${esc(b.headline)}</h2><svg class="wi-phi__mark" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="44" fill="#f5f5f7"/><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z" fill="#0a0a0e"/></svg>${this._cinePhilosophy()}</div>`;
     } else if (kind === 'mori') {
       inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-moriview" data-beat="${beatIdx}"><h2 class="wi-demo__headline">${esc(b.headline)}</h2>${this._cineMori()}<p class="wi-demo__line">${esc(b.line)}</p>${b.days ? `<p class="wi-mori__days">btw, you have about <b>${b.days.toLocaleString()}</b> days left.</p>` : ''}</div>`;
     } else if (kind === 'preview') {
@@ -2084,6 +2084,24 @@ const WelcomeIntro = {
       inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-cine--stagger" data-beat="${beatIdx}"><h2 class="wi-demo__headline">${esc(b.headline)}</h2><p class="wi-demo__line">${esc(b.line)}</p>${b.stakes ? `<p class="wi-demo__line wi-demo__stakes">${esc(b.stakes)}</p>` : ''}</div>`;
     }
     this.pageWrap.innerHTML = inner;
+    // Philosophy: tap a pillar to glow the M + show its line (Opal-style). Default Clarity.
+    if (kind === 'philosophy') {
+      const data = this._phiData();
+      const phi = this.pageWrap.querySelector('.wi-phi');
+      const exp = this.pageWrap.querySelector('.wi-phi__exp');
+      const diagram = this.pageWrap.querySelector('.wi-phi__diagram');
+      const selectPillar = (key) => {
+        const dd = data[key]; if (!dd) return;
+        if (diagram) diagram.setAttribute('data-sel', key);
+        if (phi) phi.style.setProperty('--phc', dd.c);
+        this.pageWrap.querySelectorAll('.wi-pl').forEach((bn) => bn.classList.toggle('on', bn.getAttribute('data-pillar') === key));
+        if (exp) { exp.style.opacity = '0'; setTimeout(() => { exp.textContent = dd.text; exp.style.opacity = '1'; }, 130); }
+      };
+      this.pageWrap.querySelectorAll('.wi-pl').forEach((bn) => bn.addEventListener('click', () => selectPillar(bn.getAttribute('data-pillar'))));
+      // initial state without the text fade (default line is already in the markup)
+      if (phi) phi.style.setProperty('--phc', data.clarity.c);
+      const c0 = this.pageWrap.querySelector('.wi-pl[data-pillar="clarity"]'); if (c0) c0.classList.add('on');
+    }
     // The interstitial has no buttons (auto-advances / tap to skip); every other page
     // keeps Back + Next (Next becomes "Build it" on the last page).
     this.navEl.innerHTML = (kind === 'enter') ? '' : `<button class="welcome-intro__back-btn" id="solBack">←</button><button class="welcome-intro__btn welcome-intro__btn--step" id="solNext" style="flex:1;width:auto;">${isLast ? 'Build it' : 'Next'}</button>`;
@@ -2399,18 +2417,28 @@ const WelcomeIntro = {
     return '<div class="wi-orb" data-orb="' + key + '"><div class="wi-orb__core">' + rings + grid + marks + '</div>' + this._solChips(p) + '</div>';
   },
   // Philosophy page: the three pillars as a vertical equation that resolves to results.
-  _cinePhilosophy() {
+  // The three pillars feeding the M: color, icon, label, and the "what it is + what
+  // Memento does" line shown when each is tapped. Shared by the render + tap wiring.
+  _phiData() {
     const ic = (typeof ICONS !== 'undefined') ? ICONS : {};
     const cal = '<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-linecap="round"><rect x="14" y="18" width="52" height="48" rx="7" stroke-width="2.2" opacity="0.55"/><line x1="14" y1="30" x2="66" y2="30" stroke-width="1.6" opacity="0.4"/><line x1="28" y1="13" x2="28" y2="22" stroke-width="2.6" opacity="0.7"/><line x1="52" y1="13" x2="52" y2="22" stroke-width="2.6" opacity="0.7"/><path d="M22 36L28 42M28 36L22 42" stroke-width="2.4"/><path d="M34 36L40 42M40 36L34 42" stroke-width="2.4"/><path d="M46 36L52 42M52 36L46 42" stroke-width="2.4"/><path d="M22 48L28 54M28 48L22 54" stroke-width="2.4"/><path d="M34 48L40 54M40 48L34 54" stroke-width="2.4"/></svg>';
-    const item = (color, icon, name, desc) => '<div class="wi-eq__item"><span class="wi-eq__mark" style="color:' + color + '">' + (icon || '') + '</span><span class="wi-eq__txt"><b>' + name + '</b><i>' + desc + '</i></span></div>';
-    return '<div class="wi-eq">'
-      + item('rgba(150,116,255,1)', ic.clarity, 'Clarity', 'the one goal that matters')
-      + '<span class="wi-eq__op">+</span>'
-      + item('rgba(232,194,74,1)', ic.action, 'Action', 'the one move that pushes it')
-      + '<span class="wi-eq__op">+</span>'
-      + item('rgba(52,211,153,1)', cal, 'Consistency', 'the days you do not feel like it')
-      + '<span class="wi-eq__op wi-eq__eq">=</span>'
-      + '<div class="wi-eq__result">Results.</div>'
+    return {
+      order: ['clarity', 'action', 'consistency'],
+      clarity: { c: 'rgba(150,116,255,1)', label: 'Clarity', icon: ic.clarity || '', text: 'The one goal that actually matters. Memento helps you find it.' },
+      action: { c: 'rgba(232,194,74,1)', label: 'Action', icon: ic.action || '', text: 'The single move that pushes it. Memento hands it to you each day.' },
+      consistency: { c: 'rgba(52,211,153,1)', label: 'Consistency', icon: cal, text: 'Showing up on the days you do not feel like it. Memento keeps the streak going.' }
+    };
+  },
+  // The M (hub) is rendered separately above; this builds the bracket + the three
+  // tappable pillar pills + the explainer line that swaps per tap.
+  _cinePhilosophy() {
+    const d = this._phiData();
+    const pill = (key) => '<button class="wi-pl" type="button" data-pillar="' + key + '" style="--plc:' + d[key].c + '"><span class="wi-pl__ic">' + d[key].icon + '</span><span class="wi-pl__lb">' + d[key].label + '</span></button>';
+    const bracket = '<svg class="wi-phi__bracket" viewBox="0 0 300 34" preserveAspectRatio="none" aria-hidden="true"><path d="M150 0 L150 15 M40 15 L260 15 M40 15 L40 34 M150 15 L150 34 M260 15 L260 34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+    return '<div class="wi-phi__diagram" data-sel="clarity">'
+      + bracket
+      + '<div class="wi-phi__pills">' + pill('clarity') + pill('action') + pill('consistency') + '</div>'
+      + '<p class="wi-phi__exp">' + d.clarity.text + '</p>'
       + '</div>';
   },
   // Mori page: their life in dots (reuses the life-in-years grid).
