@@ -2092,7 +2092,12 @@ const WelcomeIntro = {
     this.pageWrap.innerHTML = inner;
     // The interstitial has no buttons (auto-advances / tap to skip); every other page
     // keeps Back + Next (Next becomes "Build it" on the last page).
-    this.navEl.innerHTML = (kind === 'enter') ? '' : `<button class="welcome-intro__back-btn" id="solBack">←</button><button class="welcome-intro__btn welcome-intro__btn--step" id="solNext" style="flex:1;width:auto;">${kind === 'philosophy' ? 'For you' : (isLast ? 'Build it' : 'Next')}</button>`;
+    // Summary (stage) page button adapts: "Let's refine" for someone already doing
+    // really well, "Let's fix this" for everyone else.
+    let solNextLabel = isLast ? 'Build it' : 'Next';
+    if (kind === 'philosophy') solNextLabel = 'For you';
+    else if (kind === 'stage') solNextLabel = (String((p && p.actionProgress) || '') === 'Actually doing really good') ? "Let's refine" : "Let's fix this";
+    this.navEl.innerHTML = (kind === 'enter') ? '' : `<button class="welcome-intro__back-btn" id="solBack">←</button><button class="welcome-intro__btn welcome-intro__btn--step" id="solNext" style="flex:1;width:auto;">${solNextLabel}</button>`;
     try { this.pageWrap.classList.remove('wc-busy', 'wc-reading'); this.pageWrap.scrollTop = 0; } catch (e) {}
 
     // Crossfade between chapters: fade the current text out, then swap. The fixed
