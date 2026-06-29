@@ -2204,7 +2204,7 @@ const WelcomeIntro = {
     const stage = this._solStage(p);
 
     // 3. PHILOSOPHY: the three pillars, shown as an equation (visual built in render).
-    const phiHead = 'The philosophy behind Memento:';
+    const phiHead = 'The Philosophy Behind Memento:';
 
     // 4. MORI: the meaning of the name + finite time (life grid + days in render).
     const moriHead = 'Memento means reminder.';
@@ -2425,7 +2425,7 @@ const WelcomeIntro = {
     return {
       order: ['clarity', 'action', 'consistency'],
       clarity: { c: 'rgba(150,116,255,1)', label: 'Clarity', icon: ic.clarity || '', text: 'The one goal that actually matters. Memento helps you find it.' },
-      action: { c: 'rgba(232,194,74,1)', label: 'Action', icon: ic.action || '', text: 'The single move that pushes it. Memento hands it to you each day.' },
+      action: { c: 'rgba(245,245,247,1)', label: 'Action', icon: ic.action || '', text: 'The single move that pushes it. Memento hands it to you each day.' },
       consistency: { c: 'rgba(52,211,153,1)', label: 'Consistency', icon: cal, text: 'Showing up on the days you do not feel like it. Memento keeps the streak going.' }
     };
   },
@@ -2459,7 +2459,7 @@ const WelcomeIntro = {
       + '</div>'
       + '<div class="wi-key">'
       +   '<span class="wi-key__i"><i style="background:rgba(150,116,255,1)"></i>Clarity</span>'
-      +   '<span class="wi-key__i"><i style="background:rgba(232,194,74,1)"></i>Action</span>'
+      +   '<span class="wi-key__i"><i style="background:rgba(245,245,247,1)"></i>Action</span>'
       +   '<span class="wi-key__i"><i style="background:rgba(52,211,153,1)"></i>Consistency</span>'
       + '</div>'
       + '</div>';
@@ -2544,7 +2544,7 @@ const WelcomeIntro = {
     return 'a life you are proud of';
   },
   _solHelps(p) {
-    const CL = { clarity: 'rgba(150,116,255,1)', action: 'rgba(232,194,74,1)', consistency: 'rgba(52,211,153,1)', drive: 'rgba(244,138,120,1)' };
+    const CL = { clarity: 'rgba(150,116,255,1)', action: 'rgba(245,245,247,1)', consistency: 'rgba(52,211,153,1)', drive: 'rgba(244,138,120,1)' };
     const low = (v) => String(v || '').toLowerCase();
     const cl = low(p && p.clarityLevel), ak = low(p && p.actionKnow), ap = String((p && p.actionProgress) || ''), rf = low(p && p.runningFrom);
     const out = [];
@@ -2585,7 +2585,7 @@ const WelcomeIntro = {
 
     const BEATS = [
       { key: 'clarity', accent: 'rgba(150,116,255,1)', headline: 'Get clear on the one goal', line: 'First we find the one goal underneath all the noise, sharp enough to act on. You stop spreading yourself thin and finally know what you are aiming at.' },
-      { key: 'action', accent: 'rgba(232,194,74,1)', headline: 'Turn it into one daily move', line: 'A big goal is paralyzing. One small move is not. Memento turns what you want into the single thing to do today, so knowing finally becomes doing.' },
+      { key: 'action', accent: 'rgba(245,245,247,1)', headline: 'Turn it into one daily move', line: 'A big goal is paralyzing. One small move is not. Memento turns what you want into the single thing to do today, so knowing finally becomes doing.' },
       { key: 'consistency', accent: 'rgba(52,211,153,1)', headline: 'Stack the proof', line: 'Every day you show up gets logged where you can see it. On the days you doubt yourself, the evidence is right there. You have done this before, you can do it again.' },
       { key: 'vivere', accent: 'rgba(244,138,120,1)', headline: 'Something to build toward', line: 'Vivere holds your why where you can see it. The life you are building lives on your screen, so on the flat days you remember exactly what this is for.' },
       { key: 'mori', accent: 'rgba(206,192,255,1)', headline: 'Your time is finite', line: 'Mori shows you the weeks you have, plainly. Not to scare you, but so today lands as one of them. Finite time is the reason showing up now matters, and the reason the promises you make to yourself are worth keeping.' },
