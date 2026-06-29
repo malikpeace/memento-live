@@ -2534,17 +2534,17 @@ const WelcomeIntro = {
     if (this._prevTimers) this._prevTimers.forEach((t) => clearTimeout(t));
     this._prevTimers = [];
     const steps = [
-      { t: 1500, glow: 'c', cap: 'Get clear, and it lights up.' },
-      { t: 3100, glow: 'a', cap: 'Take action, and it grows.' },
-      { t: 4700, glow: 'k', cap: 'Stay consistent, and it comes alive.' },
-      { t: 6500, glow: null, cap: 'The more you show up, the more alive it gets.' }
+      { t: 2200, glow: 'c', cap: 'Get clear, and it lights up.' },
+      { t: 4800, glow: 'a', cap: 'Take action, and it grows.' },
+      { t: 7400, glow: 'k', cap: 'Stay consistent, and it comes alive.' },
+      { t: 10000, glow: null, cap: 'The more you show up, the more alive it gets.' }
     ];
     steps.forEach((s) => {
       this._prevTimers.push(setTimeout(() => {
         const cap = wrap.querySelector('.wi-prev__caption'); if (!cap) return;
         if (s.glow) { const g = wrap.querySelector('.wi-pcard__glow--' + s.glow); if (g) g.classList.add('on'); }
         cap.style.opacity = '0';
-        setTimeout(() => { const c = wrap.querySelector('.wi-prev__caption'); if (c) { c.textContent = s.cap; c.style.opacity = '1'; } }, 260);
+        setTimeout(() => { const c = wrap.querySelector('.wi-prev__caption'); if (c) { c.textContent = s.cap; c.style.opacity = '1'; } }, 340);
       }, s.t));
     });
   },
