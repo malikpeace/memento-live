@@ -2521,9 +2521,10 @@ const WelcomeIntro = {
       +   '<span class="wi-pcard__glow wi-pcard__glow--c"></span>'
       +   '<span class="wi-pcard__glow wi-pcard__glow--a"></span>'
       +   '<span class="wi-pcard__glow wi-pcard__glow--k"></span>'
+      +   '<span class="wi-pcard__sheen"></span>'
       +   '<svg class="wi-pcard__emblem" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>'
       + '</div>'
-      + '<p class="wi-prev__caption">It starts empty.</p>'
+      + '<p class="wi-prev__caption">First, it starts empty.</p>'
       + '</div>';
   },
   // The captioned auto-play reveal: blank, then each pillar light fades in (.on) with its
@@ -2534,15 +2535,16 @@ const WelcomeIntro = {
     if (this._prevTimers) this._prevTimers.forEach((t) => clearTimeout(t));
     this._prevTimers = [];
     const steps = [
-      { t: 2200, glow: 'c', cap: 'Get clear, and it lights up.' },
-      { t: 4800, glow: 'a', cap: 'Take action, and it grows.' },
+      { t: 2200, glow: 'c', cap: 'Find clarity, and your Memento glows.' },
+      { t: 4800, glow: 'a', cap: 'Take focused action, and evolve further.' },
       { t: 7400, glow: 'k', cap: 'Stay consistent, and it comes alive.' },
-      { t: 10000, glow: null, cap: 'The more you show up, the more alive it gets.' }
+      { t: 10000, glow: null, evolve: true, cap: 'The more you show up, the more alive it gets.' }
     ];
     steps.forEach((s) => {
       this._prevTimers.push(setTimeout(() => {
         const cap = wrap.querySelector('.wi-prev__caption'); if (!cap) return;
         if (s.glow) { const g = wrap.querySelector('.wi-pcard__glow--' + s.glow); if (g) g.classList.add('on'); }
+        if (s.evolve) { const card = wrap.querySelector('.wi-pcard'); if (card) card.classList.add('evolved'); }
         cap.style.opacity = '0';
         setTimeout(() => { const c = wrap.querySelector('.wi-prev__caption'); if (c) { c.textContent = s.cap; c.style.opacity = '1'; } }, 340);
       }, s.t));
