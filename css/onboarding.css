@@ -1676,8 +1676,9 @@ body.lite .wi-cine__beam { filter: blur(18px); }
 /* Pre-Memento: the opening (stage) page is plain black, no beam, no wash. The
    top-left beam arrives on the "Enter Memento" beat, so the light literally comes
    in as they enter Memento. */
-.welcome-intro--cine.welcome-intro--preenter { background: #07060d !important; }
+.welcome-intro--cine.welcome-intro--preenter { background: #000 !important; }
 .welcome-intro--preenter .welcome-intro__rays { opacity: 0 !important; }
+.welcome-intro--preenter .welcome-intro__bg { opacity: 0; }
 body.lite .welcome-intro__rays { opacity: 0.6; filter: none; }
 /* Crisper, brighter shafts than the dashboard default so they read as distinct
    beams of light from the top-left, not a soft orb. */
