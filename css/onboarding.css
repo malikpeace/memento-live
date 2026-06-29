@@ -1750,13 +1750,14 @@ body.lite .welcome-intro__rays { opacity: 0.6; filter: none; }
 .wi-pc__rule { width: 16px; height: 2px; border-radius: 2px; background: var(--pcc); opacity: 0.5; }
 .wi-pc__desc { font-size: 0.72rem; line-height: 1.45; color: rgba(236,238,250,0.82); }
 /* Colour-coded boxes: Clarity purple, Action white (black text), Consistency green. */
-.wi-pc[data-k="clarity"] { background: rgba(150,116,255,1); box-shadow: none; }
+/* Dark subtle tints for Clarity (purple) + Consistency (green), white text + colored
+   icons. Action is the one inverted card: white fill, black text + icon. */
+.wi-pc[data-k="clarity"] { background: rgba(150,116,255,0.16); }
+.wi-pc[data-k="consistency"] { background: rgba(52,211,153,0.15); }
 .wi-pc[data-k="action"] { background: #f5f5f7; box-shadow: none; }
-.wi-pc[data-k="consistency"] { background: rgba(52,211,153,1); box-shadow: none; }
-/* Full-colour boxes use dark icons + text so everything stays readable on the bright fills. */
-.wi-pc[data-k="clarity"] .wi-pc__ic, .wi-pc[data-k="action"] .wi-pc__ic, .wi-pc[data-k="consistency"] .wi-pc__ic { color: #0a0a0e; }
-.wi-pc[data-k="clarity"] .wi-pc__name, .wi-pc[data-k="action"] .wi-pc__name, .wi-pc[data-k="consistency"] .wi-pc__name { color: #0a0a0e; }
-.wi-pc[data-k="clarity"] .wi-pc__desc, .wi-pc[data-k="action"] .wi-pc__desc, .wi-pc[data-k="consistency"] .wi-pc__desc { color: rgba(10,10,14,0.78); }
+.wi-pc[data-k="action"] .wi-pc__ic { color: #0a0a0e; }
+.wi-pc[data-k="action"] .wi-pc__name { color: #0a0a0e; }
+.wi-pc[data-k="action"] .wi-pc__desc { color: rgba(10,10,14,0.82); }
 /* The philosophy body is a two-view crossfade: pillars (page 1) and fuel (page 2).
    The M + headline above it stay put; min-height holds the height so the M does not
    shift when the shorter fuel view swaps in. */
