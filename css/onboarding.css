@@ -1755,7 +1755,7 @@ body.lite .welcome-intro__rays { opacity: 0.6; filter: none; }
 /* The philosophy body is a two-view crossfade: pillars (page 1) and fuel (page 2).
    The M + headline above it stay put; min-height holds the height so the M does not
    shift when the shorter fuel view swaps in. */
-.wi-phi__body { position: relative; min-height: 400px; }
+.wi-phi__body { position: relative; min-height: 492px; }
 .wi-phi__bodyinner { transition: opacity 0.22s ease; }
 /* Fuel page: two wider cards (Memento Mori + Memento Vivere). */
 .wi-phi__cards--two { max-width: 344px; }

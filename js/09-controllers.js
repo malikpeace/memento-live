@@ -2081,7 +2081,7 @@ const WelcomeIntro = {
       </div>`;
     } else if (kind === 'philosophy') {
       this._phiView = 'pillars'; this._phiP = p; this._phiSwapping = false;
-      inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-phi" data-beat="${beatIdx}"><svg class="wi-phi__mark" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="44" fill="#f5f5f7"/><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z" fill="#0a0a0e"/></svg><h2 class="wi-demo__headline wi-phi__head">${esc(b.headline)}</h2><span class="wi-phi__rule"></span><div class="wi-phi__body"><div class="wi-phi__bodyinner">${this._phiBody('pillars', p)}</div></div></div>`;
+      inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-phi" data-beat="${beatIdx}"><svg class="wi-phi__mark" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="44" fill="#f5f5f7"/><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z" fill="#0a0a0e"/></svg><div class="wi-phi__body"><div class="wi-phi__bodyinner">${this._phiBody('pillars', p)}</div></div></div>`;
     } else if (kind === 'mori') {
       inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-moriview" data-beat="${beatIdx}"><h2 class="wi-demo__headline">${esc(b.headline)}</h2>${this._cineMori()}<p class="wi-demo__line">${esc(b.line)}</p>${b.days ? `<p class="wi-mori__days">btw, you have about <b>${b.days.toLocaleString()}</b> days left.</p>` : ''}</div>`;
     } else if (kind === 'preview') {
@@ -2450,30 +2450,34 @@ const WelcomeIntro = {
     const ap = String((p && p.actionProgress) || '');
     const goal = this._solGoalsNatural(p);
     const lost = cl.indexOf('lost') !== -1 || cl.indexOf('not really') !== -1;
-    const exactly = cl.indexOf('exactly') !== -1;
+    const moving = (ap === 'Actually doing really good' || ap === 'Slow but moving.. just a bit inconsistent');
+    // CLARITY: lost -> make it clear. Has a goal -> pressure-test that they truly want it.
     let clarity;
-    if (lost || !goal) clarity = 'Get laser clear on what you actually want.';
-    else if (exactly) clarity = 'Sharpen the goal you already have in ' + goal + '.';
-    else clarity = 'Pin down the one goal that matters most in ' + goal + '.';
+    if (lost) clarity = "Not clear yet? Memento gets you dead clear on the one thing that matters.";
+    else clarity = "Think you know it? Memento pressure-tests it, so you know you actually care.";
+    // ACTION: no steps -> find them. Rough idea -> refine. Knows -> sharpen further.
     let action;
-    if (lost || !ak) action = 'Get laser clear on the exact moves to make, not just a vague idea.';
-    else if (ak.indexOf('yes') !== -1) action = 'Cut to the single highest leverage move and do it.';
-    else if (ak.indexOf('sort of') !== -1) action = 'Turn your rough plan into the moves that actually work.';
-    else action = 'Get laser clear on the exact moves to make, not just a vague idea.';
+    if (lost || !ak) action = "Not sure what to do? Memento hands you the exact actions to take.";
+    else if (ak.indexOf('yes') !== -1) action = "Know the moves? Memento sharpens them to the highest-leverage few.";
+    else if (ak.indexOf('sort of') !== -1) action = "Got a rough plan? Memento refines it into the moves that actually work.";
+    else action = "Not sure what to do? Memento hands you the exact actions to take.";
+    // CONSISTENCY: already moving -> get you to the reward. Else -> stay aligned until you arrive.
     let consistency;
-    if (ap === 'Actually doing really good') consistency = 'Keep the momentum and make it impossible to drop.';
-    else if (ap === 'Slow but moving.. just a bit inconsistent') consistency = 'Tighten it so the slow days stop turning into off days.';
-    else if (ap === 'Started, then stopped') consistency = 'Get you going again, and keep you going this time.';
-    else consistency = 'Build the consistency to actually keep showing up.';
+    if (moving) consistency = "Already moving? Memento gets you all the way to the reward you are after.";
+    else consistency = "Then Memento keeps you aligned to it, day by day, until you get there.";
     return { clarity: clarity, action: action, consistency: consistency };
   },
   // The body under the static M + headline: page 1 (the pillars in general) or page 2
   // (how those same pillars apply to this person). The M + headline stay; body swaps.
   _phiBody(view, p) {
+    const rule = '<span class="wi-phi__rule"></span>';
     if (view === 'help') {
-      return '<p class="wi-phi__sub">Memento will help you:</p>' + this._phiCards(this._phiPersonal(p || {}));
+      return '<h2 class="wi-demo__headline wi-phi__head">How Memento Will Help You</h2>' + rule
+        + '<p class="wi-phi__sub">Based on what you told us:</p>'
+        + this._phiCards(this._phiPersonal(p || {}));
     }
-    return '<div class="wi-phi__goal"><span class="wi-phi__goal-eyebrow">Ultimate goal</span><span class="wi-phi__goal-text">Achievement, in whatever realm of life you choose.</span></div>'
+    return '<h2 class="wi-demo__headline wi-phi__head">The Philosophy Behind Memento</h2>' + rule
+      + '<div class="wi-phi__goal"><span class="wi-phi__goal-eyebrow">Ultimate goal</span><span class="wi-phi__goal-text">Achievement, in whatever realm of life you choose.</span></div>'
       + '<p class="wi-phi__sub">The foundation of achievement comes down to three pillars, the foundation of Memento:</p>'
       + this._phiCards();
   },
