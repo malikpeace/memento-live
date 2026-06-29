@@ -2475,26 +2475,22 @@ const WelcomeIntro = {
     }
     return '<p class="wi-phi__sub">Memento comes down to three main pillars:</p>' + this._phiCards();
   },
-  // Crossfade the body between the two views while the M + headline stay put. A frozen
-  // ghost of the OLD content is layered over the body and faded out while the real layer
-  // (now holding the NEW content) fades in. Two real DOM layers avoids the iOS ghosting
-  // that came from swapping innerHTML on a single element mid-opacity-transition.
+  // Sequential fade while the M + headline stay put: the current boxes fade out, then
+  // (once fully invisible and the fade has settled) the content swaps and the new boxes
+  // fade in, in the same place. Swapping only when settled at opacity 0 avoids the iOS
+  // mid-transition ghosting (which double-painted old + new together).
   _phiSwap(view) {
     const body = this.pageWrap && this.pageWrap.querySelector('.wi-phi__body');
     const inner = body && body.querySelector('.wi-phi__bodyinner');
     if (!body || !inner || this._phiSwapping) return;
     this._phiSwapping = true;
     this._phiView = view;
-    const ghost = inner.cloneNode(true);
-    ghost.classList.add('wi-phi__bodyinner--ghost');
-    body.appendChild(ghost);
-    inner.innerHTML = this._phiBody(view, this._phiP);
     inner.style.opacity = '0';
-    requestAnimationFrame(() => { requestAnimationFrame(() => {
-      inner.style.opacity = '1';
-      ghost.style.opacity = '0';
-    }); });
-    setTimeout(() => { try { ghost.remove(); } catch (e) {} inner.style.opacity = ''; this._phiSwapping = false; }, 420);
+    setTimeout(() => {
+      inner.innerHTML = this._phiBody(view, this._phiP);
+      void inner.offsetHeight; // commit the new content at opacity 0 before fading it in
+      requestAnimationFrame(() => { inner.style.opacity = '1'; this._phiSwapping = false; });
+    }, 270);
   },
   // Mori page: their life in dots (reuses the life-in-years grid).
   _cineMori() {

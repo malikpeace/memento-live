@@ -1745,8 +1745,7 @@ body.lite .welcome-intro__rays { opacity: 0.6; filter: none; }
    The M + headline above it stay put; min-height holds the height so the M does not
    shift when the shorter fuel view swaps in. */
 .wi-phi__body { position: relative; min-height: 320px; }
-.wi-phi__bodyinner { transition: opacity 0.3s ease; }
-.wi-phi__bodyinner--ghost { position: absolute; top: 0; left: 0; right: 0; pointer-events: none; transition: opacity 0.3s ease; }
+.wi-phi__bodyinner { transition: opacity 0.22s ease; }
 /* Fuel page: two wider cards (Memento Mori + Memento Vivere). */
 .wi-phi__cards--two { max-width: 344px; }
 
