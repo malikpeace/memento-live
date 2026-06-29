@@ -1775,20 +1775,23 @@ body.lite .welcome-intro__rays { opacity: 0.6; filter: none; }
 .wi-mori__days b { color: #fff; font-weight: 800; font-variant-numeric: tabular-nums; }
 
 /* Preview: the blank card whose three pillar lights fill in, + the color key. */
-.wi-prev__wrap { display: flex; flex-direction: column; align-items: center; gap: 17px; margin: 8px 0 20px; }
+.wi-prev__wrap { display: flex; flex-direction: column; align-items: center; gap: 24px; margin: 6px 0 0; }
 .wi-pcard { position: relative; width: clamp(146px, 44vw, 176px); aspect-ratio: 0.66; border-radius: 18px; background: rgba(255,255,255,0.045); box-shadow: inset 0 1px 0 rgba(255,255,255,0.09), 0 26px 50px rgba(0,0,0,0.52); overflow: hidden; display: flex; align-items: center; justify-content: center; }
-.wi-pcard__glow { position: absolute; border-radius: 50%; filter: blur(24px); opacity: 0; mix-blend-mode: screen; }
-.wi-pcard__glow--c { width: 78%; height: 56%; left: -14%; top: -12%; background: rgba(150,116,255,0.95); animation: wiCardFill 2.2s ease-out 0.5s forwards; }
-.wi-pcard__glow--a { width: 72%; height: 52%; right: -16%; top: 26%; background: rgba(245,245,247,0.85); animation: wiCardFill 2.2s ease-out 1.15s forwards; }
-.wi-pcard__glow--k { width: 82%; height: 56%; left: -10%; bottom: -14%; background: rgba(52,211,153,0.85); animation: wiCardFill 2.2s ease-out 1.8s forwards; }
-@keyframes wiCardFill { from { opacity: 0; } to { opacity: 0.72; } }
-@media (prefers-reduced-motion: reduce) { .wi-pcard__glow { animation: none !important; opacity: 0.6; } }
-.wi-pcard__emblem { width: 33%; position: relative; z-index: 2; }
-.wi-pcard__emblem path { fill: #fff; opacity: 0.9; }
-.wi-pcard__name { position: absolute; bottom: 12px; left: 0; right: 0; text-align: center; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.55); z-index: 2; }
-.wi-key { display: flex; flex-wrap: wrap; justify-content: center; gap: 13px; }
-.wi-key__i { display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; color: rgba(232,234,248,0.72); }
-.wi-key__i i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+/* The grand hero card. */
+.wi-pcard--big { width: clamp(216px, 60vw, 296px); border-radius: 24px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 44px 90px rgba(0,0,0,0.62); }
+/* Pillar lights: invisible until their step fades them in (.on), then they drift + breathe. */
+.wi-pcard__glow { position: absolute; border-radius: 50%; filter: blur(34px); opacity: 0; mix-blend-mode: screen; transition: opacity 1.3s ease; will-change: transform; }
+.wi-pcard__glow.on { opacity: 0.72; }
+.wi-pcard__glow--c { width: 86%; height: 60%; left: -14%; top: -12%; background: rgba(150,116,255,0.95); animation: wiAuroraC 11s ease-in-out infinite; }
+.wi-pcard__glow--a { width: 80%; height: 56%; right: -16%; top: 24%; background: rgba(245,245,247,0.85); animation: wiAuroraA 13s ease-in-out infinite; }
+.wi-pcard__glow--k { width: 90%; height: 60%; left: -10%; bottom: -16%; background: rgba(52,211,153,0.85); animation: wiAuroraK 12s ease-in-out infinite; }
+@keyframes wiAuroraC { 0%,100% { transform: translate(-4%,-2%) scale(1); } 33% { transform: translate(6%,3%) scale(1.16); } 66% { transform: translate(-2%,7%) scale(1.06); } }
+@keyframes wiAuroraA { 0%,100% { transform: translate(5%,2%) scale(1.05); } 50% { transform: translate(-5%,-6%) scale(1.2); } }
+@keyframes wiAuroraK { 0%,100% { transform: translate(-4%,5%) scale(1); } 50% { transform: translate(7%,-3%) scale(1.14); } }
+@media (prefers-reduced-motion: reduce) { .wi-pcard__glow { animation: none !important; transform: none !important; } .wi-pcard__glow.on { opacity: 0.6; } }
+.wi-pcard__emblem { width: 30%; position: relative; z-index: 2; }
+.wi-pcard__emblem path { fill: #fff; opacity: 0.92; }
+.wi-prev__caption { min-height: 2.7em; max-width: 26ch; margin: 0 auto; text-align: center; font-size: 1rem; line-height: 1.45; color: rgba(236,238,250,0.82); transition: opacity 0.26s ease; }
 .wi-cine__wantwrap { display: flex; flex-direction: column; align-items: center; justify-content: center; }
 /* the reused module icons (clarity circles, action footsteps, consistency flame) on
    the three "how Memento helps" beats; color is set inline per pillar, soft halo only */

@@ -2087,7 +2087,7 @@ const WelcomeIntro = {
     } else if (kind === 'mori') {
       inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-moriview" data-beat="${beatIdx}"><h2 class="wi-demo__headline">${esc(b.headline)}</h2>${this._cineMori()}<p class="wi-demo__line">${esc(b.line)}</p>${b.days ? `<p class="wi-mori__days">btw, you have about <b>${b.days.toLocaleString()}</b> days left.</p>` : ''}</div>`;
     } else if (kind === 'preview') {
-      inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-prev" data-beat="${beatIdx}"><h2 class="wi-demo__headline">${esc(b.headline)}</h2>${this._cineCardPreview(p)}<p class="wi-demo__line">${esc(b.line)}</p></div>`;
+      inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-prev" data-beat="${beatIdx}"><h2 class="wi-demo__headline">${esc(b.headline)}</h2>${this._cineCardPreview(p)}</div>`;
     } else {
       inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-cine--stagger" data-beat="${beatIdx}"><h2 class="wi-demo__headline">${esc(b.headline)}</h2><p class="wi-demo__line">${esc(b.line)}</p>${b.stakes ? `<p class="wi-demo__line wi-demo__stakes">${esc(b.stakes)}</p>` : ''}</div>`;
     }
@@ -2133,6 +2133,8 @@ const WelcomeIntro = {
       const ent = this.pageWrap.querySelector('.wi-enter');
       if (ent) ent.addEventListener('click', advance);
     }
+    // "Meet Your Memento": kick off the captioned card-comes-alive reveal.
+    if (kind === 'preview') this._runPreviewReveal();
 
     // touch swipe: left advances, right goes back
     try {
@@ -2215,16 +2217,15 @@ const WelcomeIntro = {
     const moriHead = 'Memento means reminder.';
     const moriLine = 'It is Latin. Memento keeps the one thing in front of you, and keeps you honest that your time runs out, so you spend it on what actually matters.';
 
-    // 5. PREVIEW: a blank card that comes alive as you show up (card built in render).
-    const prevHead = first ? (first + ', meet your Memento.') : 'Meet your Memento.';
-    const prevLine = 'It starts empty. Every day you show up it fills with light, clarity, action, and consistency. The more you stack, the more alive it gets.';
+    // 5. PREVIEW: a blank card that comes alive, light by light, as the captioned reveal
+    //    plays (card + sequence built in render). The mori page was removed before this.
+    const prevHead = 'Meet Your Memento';
 
     return [
       { key: 'stage', kind: 'stage', accent: PUR, headline: stage.headline, line: stage.line, stakes: stage.stakes },
       { key: 'enter', kind: 'enter', accent: PUR, title: 'Enter Memento' },
       { key: 'philosophy', kind: 'philosophy', accent: PUR, headline: phiHead },
-      { key: 'mori', kind: 'mori', accent: PUR, headline: moriHead, line: moriLine, days: days },
-      { key: 'preview', kind: 'preview', accent: PUR, headline: prevHead, line: prevLine }
+      { key: 'preview', kind: 'preview', accent: PUR, headline: prevHead, line: '' }
     ];
   },
   // Future-paced stakes for the opening page. Momentum -> lean pleasure (what keeping
@@ -2512,22 +2513,40 @@ const WelcomeIntro = {
   },
   // Preview page: a blank Memento card whose three pillar lights fill in, staggered,
   // to show how it comes alive as you show up. Plus the color key.
+  // The grand "Meet Your Memento" card: starts blank, the three pillar lights bloom in
+  // (driven by _runPreviewReveal), then drift + breathe as a living aurora behind the M.
   _cineCardPreview(p) {
-    const nm = esc(((p && p.name) || '').trim());
     return '<div class="wi-prev__wrap">'
-      + '<div class="wi-pcard" aria-hidden="true">'
+      + '<div class="wi-pcard wi-pcard--big" aria-hidden="true">'
       +   '<span class="wi-pcard__glow wi-pcard__glow--c"></span>'
       +   '<span class="wi-pcard__glow wi-pcard__glow--a"></span>'
       +   '<span class="wi-pcard__glow wi-pcard__glow--k"></span>'
       +   '<svg class="wi-pcard__emblem" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>'
-      +   (nm ? '<span class="wi-pcard__name">' + nm + '</span>' : '')
       + '</div>'
-      + '<div class="wi-key">'
-      +   '<span class="wi-key__i"><i style="background:rgba(150,116,255,1)"></i>Clarity</span>'
-      +   '<span class="wi-key__i"><i style="background:rgba(245,245,247,1)"></i>Action</span>'
-      +   '<span class="wi-key__i"><i style="background:rgba(52,211,153,1)"></i>Consistency</span>'
-      + '</div>'
+      + '<p class="wi-prev__caption">It starts empty.</p>'
       + '</div>';
+  },
+  // The captioned auto-play reveal: blank, then each pillar light fades in (.on) with its
+  // caption, ending fully alive. Guarded so leaving the page mid-reveal is harmless.
+  _runPreviewReveal() {
+    const wrap = this.pageWrap;
+    if (!wrap || !wrap.querySelector('.wi-prev__caption')) return;
+    if (this._prevTimers) this._prevTimers.forEach((t) => clearTimeout(t));
+    this._prevTimers = [];
+    const steps = [
+      { t: 1500, glow: 'c', cap: 'Get clear, and it lights up.' },
+      { t: 3100, glow: 'a', cap: 'Take action, and it grows.' },
+      { t: 4700, glow: 'k', cap: 'Stay consistent, and it comes alive.' },
+      { t: 6500, glow: null, cap: 'The more you show up, the more alive it gets.' }
+    ];
+    steps.forEach((s) => {
+      this._prevTimers.push(setTimeout(() => {
+        const cap = wrap.querySelector('.wi-prev__caption'); if (!cap) return;
+        if (s.glow) { const g = wrap.querySelector('.wi-pcard__glow--' + s.glow); if (g) g.classList.add('on'); }
+        cap.style.opacity = '0';
+        setTimeout(() => { const c = wrap.querySelector('.wi-prev__caption'); if (c) { c.textContent = s.cap; c.style.opacity = '1'; } }, 260);
+      }, s.t));
+    });
   },
   // the twist motif: a life in years (the Mori grid). Spent years dim, the current
   // year bright gold, the years still ahead a faint gold, so "weeks left" is visible.

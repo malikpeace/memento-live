@@ -88,7 +88,7 @@
     head.appendChild(title); head.appendChild(toggle);
 
     var nav = document.createElement('div'); nav.className = 'db-nav';
-    var labels = ['stage', 'enter', 'philosophy', 'mori', 'preview'];
+    var labels = ['stage', 'enter', 'philosophy', 'preview'];
     var navBtns = [];
     labels.forEach(function (label, i) {
       var btn = document.createElement('button'); btn.textContent = (i + 1) + ' ' + label;
