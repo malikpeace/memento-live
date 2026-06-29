@@ -2096,7 +2096,7 @@ const WelcomeIntro = {
     // really well, "Let's fix this" for everyone else.
     let solNextLabel = isLast ? 'Build it' : 'Next';
     if (kind === 'philosophy') solNextLabel = 'For you';
-    else if (kind === 'stage') solNextLabel = (String((p && p.actionProgress) || '') === 'Actually doing really good') ? "Let's refine" : "Let's fix this";
+    else if (kind === 'stage') solNextLabel = (String((p && p.actionProgress) || '') === 'Actually doing really good') ? "Let's Refine" : "Let's Fix This";
     this.navEl.innerHTML = (kind === 'enter') ? '' : `<button class="welcome-intro__back-btn" id="solBack">←</button><button class="welcome-intro__btn welcome-intro__btn--step" id="solNext" style="flex:1;width:auto;">${solNextLabel}</button>`;
     try { this.pageWrap.classList.remove('wc-busy', 'wc-reading'); this.pageWrap.scrollTop = 0; } catch (e) {}
 
