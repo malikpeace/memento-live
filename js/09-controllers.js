@@ -2555,13 +2555,14 @@ const WelcomeIntro = {
     this._prevStep++;
     // The card grows a touch each tap, as if it's coming closer the more you build it.
     const card = wrap.querySelector('.wi-pcard');
-    if (card) card.style.transform = 'scale(' + (1 + Math.min(this._prevStep, 5) * 0.04).toFixed(3) + ')';
+    if (card) card.style.transform = 'scale(' + (1 + Math.min(this._prevStep, 5) * 0.03).toFixed(3) + ')';
     if (s.glow) { const g = wrap.querySelector('.wi-pcard__glow--' + s.glow); if (g) g.classList.add('on'); }
     if (s.evolve) { const stage = wrap.querySelector('.wi-pcard-stage'); if (stage) stage.classList.add('evolved'); }
     const title = wrap.querySelector('.wi-prev__title');
     if (title) { title.style.opacity = '0'; setTimeout(() => { const t = wrap.querySelector('.wi-prev__title'); if (t) { t.textContent = s.text; t.style.opacity = '1'; } }, 320); }
+    // Once they've tapped once they know the gesture, fade the prompt away for good.
     const hint = wrap.querySelector('.wi-prev__hint');
-    if (hint) hint.textContent = (this._prevStep >= STEPS.length) ? '' : 'tap to continue';
+    if (hint) hint.style.opacity = '0';
   },
   // the twist motif: a life in years (the Mori grid). Spent years dim, the current
   // year bright gold, the years still ahead a faint gold, so "weeks left" is visible.
