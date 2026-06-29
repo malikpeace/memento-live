@@ -1714,7 +1714,7 @@ body.lite .welcome-intro__rays { opacity: 0.6; filter: none; }
 .wi-enter { justify-content: center; animation: none; }
 .wi-enter__eyebrow { font-size: 0.9rem; letter-spacing: 0.42em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 30px; opacity: 0; animation: mlogoFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.1s both; }
 .wi-enter__logo { position: relative; display: inline-flex; align-items: baseline; justify-content: center; font-family: var(--font); font-size: clamp(3.5rem, 17vw, 5.8rem); font-weight: 200; letter-spacing: -0.015em; color: #fff; line-height: 1; }
-.wi-enter__glow { position: absolute; left: 50%; top: 50%; width: 150%; aspect-ratio: 1 / 1; border-radius: 50%; transform: translate(-50%,-50%) scale(0.2); background: radial-gradient(circle, rgba(155,126,255,0.5) 0%, rgba(155,126,255,0.16) 38%, transparent 68%); filter: blur(16px); opacity: 0; z-index: -1; animation: mlogoBloom 1.25s cubic-bezier(0.22,1,0.36,1) 0.18s forwards; }
+.wi-enter__glow { display: none; }
 .wi-enter__mark { height: 0.82em; width: auto; flex: none; margin-right: 0.1em; transform-origin: center; opacity: 0; animation: mlogoMaterialize 1.0s cubic-bezier(0.22,1,0.36,1) 0.32s both; }
 .wi-enter__word { display: inline-block; opacity: 0; animation: mlogoFadeUp 0.65s cubic-bezier(0.22,1,0.36,1) 0.88s both; }
 @keyframes mlogoBloom { 0% { opacity: 0; transform: translate(-50%,-50%) scale(0.2); } 40% { opacity: 0.95; } 100% { opacity: 0.7; transform: translate(-50%,-50%) scale(1); } }
