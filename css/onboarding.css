@@ -1667,7 +1667,7 @@ body.lite .wi-cine__beam { filter: blur(18px); }
    (Memento's signature light). Kill the competing colored aurora blobs; keep a faint
    top-left wash so the beam has somewhere to land. The beacon itself stays constant
    across chapters (created once), so the background never jumps. */
-.welcome-intro--cine { background: radial-gradient(115% 82% at 5% 0%, rgba(124,104,232,0.14), transparent 55%), #07060d !important; }
+.welcome-intro--cine { background: #000 !important; }
 .welcome-intro--cine::before, .welcome-intro--cine::after { display: none !important; }
 /* The signature top-left light: real god-ray shafts (not an orb). The base
    .ambient__rays-* child styles are global; this wrapper just makes them visible
@@ -1818,6 +1818,9 @@ body.lite .wi-cine__gauge-dot { animation: none; }
 .welcome-intro--help::before, .welcome-intro--help::after {
   content: ''; position: absolute; border-radius: 50%; pointer-events: none; z-index: 0;
   filter: blur(72px); will-change: transform;
+  /* aurora blobs removed: the chapter canvas is pure black, lit only by the top-left
+     beams. Kept the rule shell so the keyframes/markup do not error. */
+  display: none !important;
 }
 .welcome-intro--help::before {
   width: 72vmin; height: 72vmin; left: -16vmin; top: -14vmin;
