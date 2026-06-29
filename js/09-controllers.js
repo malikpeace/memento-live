@@ -2075,7 +2075,7 @@ const WelcomeIntro = {
         </div>
       </div>`;
     } else if (kind === 'philosophy') {
-      inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-phi" data-beat="${beatIdx}"><h2 class="wi-demo__headline">${esc(b.headline)}</h2>${this._cinePhilosophy()}</div>`;
+      inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-phi" data-beat="${beatIdx}"><svg class="wi-phi__mark" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="44" fill="#f5f5f7"/><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z" fill="#0a0a0e"/></svg><h2 class="wi-demo__headline">${esc(b.headline)}</h2>${this._cinePhilosophy()}</div>`;
     } else if (kind === 'mori') {
       inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-moriview" data-beat="${beatIdx}"><h2 class="wi-demo__headline">${esc(b.headline)}</h2>${this._cineMori()}<p class="wi-demo__line">${esc(b.line)}</p>${b.days ? `<p class="wi-mori__days">btw, you have about <b>${b.days.toLocaleString()}</b> days left.</p>` : ''}</div>`;
     } else if (kind === 'preview') {
@@ -2092,6 +2092,9 @@ const WelcomeIntro = {
     // Crossfade between chapters: fade the current text out, then swap. The fixed
     // beam underneath never moves, so it reads as one continuous moment.
     const go = (idx) => {
+      // Leaving "Enter Memento" forward: the M flies up to become the philosophy
+      // header while "Enter" + "emento" fade away (shared-element transition).
+      if (kind === 'enter' && idx === beatIdx + 1) { this._flipEnterToPhilosophy(stepIndex, idx); return; }
       if (idx >= 0 && idx < n && idx !== beatIdx) {
         const innerEl = this.pageWrap.querySelector('.welcome-intro__page-inner');
         if (innerEl) innerEl.classList.add('exit');
@@ -2122,6 +2125,45 @@ const WelcomeIntro = {
         }
       }, { passive: true });
     } catch (e) {}
+  },
+
+  // Shared-element transition out of "Enter Memento": "Enter" + "emento" fade away
+  // while the M flies up and shrinks into the philosophy page's header mark, then the
+  // philosophy content fades in beneath it. A floating clone of the M is animated
+  // between the two measured positions (FLIP), so it works across the innerHTML swap.
+  _flipEnterToPhilosophy(stepIndex, idx) {
+    let mark = null;
+    try { mark = this.pageWrap.querySelector('.wi-enter__mark'); } catch (e) {}
+    if (!mark) { this._showSolution(stepIndex, idx); return; }
+    const r1 = mark.getBoundingClientRect();
+    const M = '<svg viewBox="0 0 512 512" aria-hidden="true" style="width:100%;height:100%;display:block;"><rect width="512" height="512" rx="44" fill="#f5f5f7"/><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z" fill="#0a0a0e"/></svg>';
+    const clone = document.createElement('div');
+    clone.setAttribute('aria-hidden', 'true');
+    clone.style.cssText = 'position:fixed;left:0;top:0;width:' + r1.width + 'px;height:' + r1.height + 'px;transform:translate(' + r1.left + 'px,' + r1.top + 'px);transform-origin:top left;z-index:99990;pointer-events:none;';
+    clone.innerHTML = M;
+    document.body.appendChild(clone);
+    // fade the enter content (eyebrow + emento + original M) out; the clone stays.
+    const inner = this.pageWrap.querySelector('.welcome-intro__page-inner');
+    if (inner) inner.classList.add('exit');
+    setTimeout(() => {
+      this._showSolution(stepIndex, idx);
+      const inner2 = this.pageWrap.querySelector('.welcome-intro__page-inner');
+      let target = null; try { target = this.pageWrap.querySelector('.wi-phi__mark'); } catch (e) {}
+      if (inner2) { inner2.style.animation = 'none'; inner2.style.opacity = '0'; }
+      if (target) {
+        const r2 = target.getBoundingClientRect();
+        const sc = r1.width ? (r2.width / r1.width) : 1;
+        clone.style.transition = 'transform 0.62s cubic-bezier(0.22,1,0.36,1)';
+        requestAnimationFrame(() => { clone.style.transform = 'translate(' + r2.left + 'px,' + r2.top + 'px) scale(' + sc + ')'; });
+        setTimeout(() => {
+          if (inner2) { inner2.style.transition = 'opacity 0.5s ease'; inner2.style.opacity = '1'; }
+          setTimeout(() => { try { clone.remove(); } catch (e) {} }, 200);
+        }, 600);
+      } else {
+        if (inner2) { inner2.style.transition = 'opacity 0.5s ease'; inner2.style.opacity = '1'; }
+        try { clone.remove(); } catch (e) {}
+      }
+    }, 320);
   },
 
   // The post-first-win sequence, every line templated from their own answers (no AI):
