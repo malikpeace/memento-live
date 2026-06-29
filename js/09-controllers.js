@@ -2075,7 +2075,8 @@ const WelcomeIntro = {
         </div>
       </div>`;
     } else if (kind === 'philosophy') {
-      inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-phi" data-beat="${beatIdx}"><svg class="wi-phi__mark" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="44" fill="#f5f5f7"/><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z" fill="#0a0a0e"/></svg><h2 class="wi-demo__headline wi-phi__head">${esc(b.headline)}</h2><span class="wi-phi__rule"></span><p class="wi-phi__sub">Memento comes down to three main pillars:</p>${this._cinePhilosophy()}<div class="wi-phi__fuel"><span class="wi-phi__fuel-eyebrow">The fuel behind it</span><p class="wi-phi__fuel-desc"><b>Memento Mori</b> keeps your time in view, so the days do not slip. <b>Memento Vivere</b> keeps the life you actually want in front of you.</p></div></div>`;
+      this._phiView = 'pillars';
+      inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-phi" data-beat="${beatIdx}"><svg class="wi-phi__mark" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="44" fill="#f5f5f7"/><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z" fill="#0a0a0e"/></svg><h2 class="wi-demo__headline wi-phi__head">${esc(b.headline)}</h2><span class="wi-phi__rule"></span><div class="wi-phi__body">${this._phiBody('pillars')}</div></div>`;
     } else if (kind === 'mori') {
       inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-moriview" data-beat="${beatIdx}"><h2 class="wi-demo__headline">${esc(b.headline)}</h2>${this._cineMori()}<p class="wi-demo__line">${esc(b.line)}</p>${b.days ? `<p class="wi-mori__days">btw, you have about <b>${b.days.toLocaleString()}</b> days left.</p>` : ''}</div>`;
     } else if (kind === 'preview') {
@@ -2103,8 +2104,12 @@ const WelcomeIntro = {
         this._showSolution(stepIndex, idx);
       }
     };
-    const nextBtn = document.getElementById('solNext'); if (nextBtn) nextBtn.addEventListener('click', () => go(beatIdx + 1));
-    const backBtn = document.getElementById('solBack'); if (backBtn) backBtn.addEventListener('click', () => go(beatIdx - 1));
+    // Philosophy is a two-view chapter: pillars, then the fuel (Mori + Vivere). Next on
+    // the pillars crossfades to the fuel within the page before advancing the beat.
+    const goFwd = () => { if (kind === 'philosophy' && this._phiView !== 'fuel') { this._phiSwap('fuel'); return; } go(beatIdx + 1); };
+    const goBack = () => { if (kind === 'philosophy' && this._phiView === 'fuel') { this._phiSwap('pillars'); return; } go(beatIdx - 1); };
+    const nextBtn = document.getElementById('solNext'); if (nextBtn) nextBtn.addEventListener('click', goFwd);
+    const backBtn = document.getElementById('solBack'); if (backBtn) backBtn.addEventListener('click', goBack);
 
     // "Enter Memento" lingers ~3s then dissolves into the next page; a tap skips it.
     if (kind === 'enter') {
@@ -2121,7 +2126,7 @@ const WelcomeIntro = {
       stage.addEventListener('touchend', (e) => {
         const t = e.changedTouches[0]; const dx = t.clientX - sx; const dy = t.clientY - sy;
         if (Date.now() - t0 < 650 && Math.abs(dx) > 46 && Math.abs(dx) > Math.abs(dy) * 1.3) {
-          if (dx < 0) go(beatIdx + 1); else go(beatIdx - 1);
+          if (dx < 0) goFwd(); else goBack();
         }
       }, { passive: true });
     } catch (e) {}
@@ -2406,9 +2411,9 @@ const WelcomeIntro = {
     const cal = '<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-linecap="round"><rect x="14" y="18" width="52" height="48" rx="7" stroke-width="2.2" opacity="0.55"/><line x1="14" y1="30" x2="66" y2="30" stroke-width="1.6" opacity="0.4"/><line x1="28" y1="13" x2="28" y2="22" stroke-width="2.6" opacity="0.7"/><line x1="52" y1="13" x2="52" y2="22" stroke-width="2.6" opacity="0.7"/><path d="M22 36L28 42M28 36L22 42" stroke-width="2.4"/><path d="M34 36L40 42M40 36L34 42" stroke-width="2.4"/><path d="M46 36L52 42M52 36L46 42" stroke-width="2.4"/><path d="M22 48L28 54M28 48L22 54" stroke-width="2.4"/><path d="M34 48L40 54M40 48L34 54" stroke-width="2.4"/></svg>';
     return {
       order: ['clarity', 'action', 'consistency'],
-      clarity: { c: 'rgba(150,116,255,1)', label: 'Clarity', icon: ic.clarity || '', text: 'Get clear on the one goal that actually matters.' },
-      action: { c: 'rgba(245,245,247,1)', label: 'Action', icon: ic.action || '', text: 'The single daily move that pushes it forward.' },
-      consistency: { c: 'rgba(52,211,153,1)', label: 'Consistency', icon: cal, text: 'Showing up even when you do not feel like it.' }
+      clarity: { c: 'rgba(150,116,255,1)', label: 'Clarity', icon: ic.clarity || '', text: 'Get clear on the one goal that actually matters most.' },
+      action: { c: 'rgba(245,245,247,1)', label: 'Action', icon: ic.action || '', text: 'Find the single highest leverage action that actually moves you forward.' },
+      consistency: { c: 'rgba(52,211,153,1)', label: 'Consistency', icon: cal, text: 'Keep showing up, especially on the days you do not feel like it.' }
     };
   },
   // The M (hub) is rendered separately above; this builds the three explainer cards.
@@ -2421,6 +2426,39 @@ const WelcomeIntro = {
       + '<span class="wi-pc__desc">' + d[key].text + '</span>'
       + '</div>';
     return '<div class="wi-phi__cards">' + card('clarity') + card('action') + card('consistency') + '</div>';
+  },
+  // Page 2 of the philosophy: the fuel. Two cards, Memento Mori (the push: finite time)
+  // and Memento Vivere (the pull: the life you want), that keep you on the three pillars.
+  _cinePhilosophyFuel() {
+    const ic = (typeof ICONS !== 'undefined') ? ICONS : {};
+    const card = (color, icon, name, desc) => '<div class="wi-pc" style="--pcc:' + color + '">'
+      + '<span class="wi-pc__ic">' + (icon || '') + '</span>'
+      + '<span class="wi-pc__name">' + name + '</span>'
+      + '<span class="wi-pc__rule"></span>'
+      + '<span class="wi-pc__desc">' + desc + '</span>'
+      + '</div>';
+    return '<div class="wi-phi__cards wi-phi__cards--two">'
+      + card('rgba(170,170,178,1)', ic.mori || '', 'Memento Mori', 'Your time is finite. The push that stops the days from slipping by.')
+      + card('rgba(201,162,75,1)', ic.vivere || '', 'Memento Vivere', 'The life you actually want. The pull that keeps you moving toward it.')
+      + '</div>';
+  },
+  // The body under the static M + headline: pillars (page 1) or fuel (page 2).
+  _phiBody(view) {
+    if (view === 'fuel') {
+      return '<p class="wi-phi__sub">And here is what keeps you on it:</p>' + this._cinePhilosophyFuel();
+    }
+    return '<p class="wi-phi__sub">Memento comes down to three main pillars:</p>' + this._cinePhilosophy();
+  },
+  // Crossfade the body between the two views while the M + headline stay put.
+  _phiSwap(view) {
+    const body = this.pageWrap && this.pageWrap.querySelector('.wi-phi__body');
+    if (!body) return;
+    this._phiView = view;
+    body.classList.add('wi-phi__body--out');
+    setTimeout(() => {
+      body.innerHTML = this._phiBody(view);
+      requestAnimationFrame(() => body.classList.remove('wi-phi__body--out'));
+    }, 240);
   },
   // Mori page: their life in dots (reuses the life-in-years grid).
   _cineMori() {
