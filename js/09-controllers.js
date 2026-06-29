@@ -2087,7 +2087,7 @@ const WelcomeIntro = {
     } else if (kind === 'mori') {
       inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-moriview" data-beat="${beatIdx}"><h2 class="wi-demo__headline">${esc(b.headline)}</h2>${this._cineMori()}<p class="wi-demo__line">${esc(b.line)}</p>${b.days ? `<p class="wi-mori__days">btw, you have about <b>${b.days.toLocaleString()}</b> days left.</p>` : ''}</div>`;
     } else if (kind === 'preview') {
-      inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-prev" data-beat="${beatIdx}"><h2 class="wi-demo__headline">${esc(b.headline)}</h2>${this._cineCardPreview(p)}</div>`;
+      inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-prev" data-beat="${beatIdx}"><h2 class="wi-demo__headline wi-prev__title">${esc(b.headline)}</h2>${this._cineCardPreview(p)}</div>`;
     } else {
       inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-cine--stagger" data-beat="${beatIdx}"><h2 class="wi-demo__headline">${esc(b.headline)}</h2><p class="wi-demo__line">${esc(b.line)}</p>${b.stakes ? `<p class="wi-demo__line wi-demo__stakes">${esc(b.stakes)}</p>` : ''}</div>`;
     }
@@ -2524,7 +2524,6 @@ const WelcomeIntro = {
       +   '<span class="wi-pcard__sheen"></span>'
       +   '<svg class="wi-pcard__emblem" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>'
       + '</div>'
-      + '<p class="wi-prev__caption">First, it starts empty.</p>'
       + '<span class="wi-prev__hint">tap the card</span>'
       + '</div>';
   },
@@ -2542,10 +2541,11 @@ const WelcomeIntro = {
   _prevAdvance() {
     const wrap = this.pageWrap; if (!wrap) return;
     const STEPS = [
-      { glow: 'c', cap: 'Find clarity, and your Memento glows.' },
-      { glow: 'a', cap: 'Take focused action, and evolve further.' },
-      { glow: 'k', cap: 'Stay consistent, and it comes alive.' },
-      { glow: null, evolve: true, cap: 'The more you evolve, the more it evolves.' }
+      { glow: null, text: 'First, it starts empty.' },
+      { glow: 'c', text: 'Find clarity, and your Memento glows.' },
+      { glow: 'a', text: 'Take focused action, and evolve further.' },
+      { glow: 'k', text: 'Stay consistent, and it comes alive.' },
+      { glow: null, evolve: true, text: 'The more you evolve, the more it evolves.' }
     ];
     if (this._prevStep == null) this._prevStep = 0;
     if (this._prevStep >= STEPS.length) return;
@@ -2553,10 +2553,10 @@ const WelcomeIntro = {
     this._prevStep++;
     if (s.glow) { const g = wrap.querySelector('.wi-pcard__glow--' + s.glow); if (g) g.classList.add('on'); }
     if (s.evolve) { const card = wrap.querySelector('.wi-pcard'); if (card) card.classList.add('evolved'); }
-    const cap = wrap.querySelector('.wi-prev__caption');
-    if (cap) { cap.style.opacity = '0'; setTimeout(() => { const c = wrap.querySelector('.wi-prev__caption'); if (c) { c.textContent = s.cap; c.style.opacity = '1'; } }, 320); }
+    const title = wrap.querySelector('.wi-prev__title');
+    if (title) { title.style.opacity = '0'; setTimeout(() => { const t = wrap.querySelector('.wi-prev__title'); if (t) { t.textContent = s.text; t.style.opacity = '1'; } }, 320); }
     const hint = wrap.querySelector('.wi-prev__hint');
-    if (hint) hint.textContent = (this._prevStep >= STEPS.length) ? '' : 'tap to evolve';
+    if (hint) hint.textContent = (this._prevStep >= STEPS.length) ? '' : 'tap to continue';
   },
   // the twist motif: a life in years (the Mori grid). Spent years dim, the current
   // year bright gold, the years still ahead a faint gold, so "weeks left" is visible.
