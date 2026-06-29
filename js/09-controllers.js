@@ -2013,7 +2013,11 @@ const WelcomeIntro = {
     if (beatIdx < 0) {
       const inner = this.pageWrap.querySelector('.welcome-intro__page-inner');
       if (inner) inner.classList.add('exit');
+      // Add blackout in the SAME frame we drop the dark-canvas classes, otherwise there
+      // is a ~250ms gap (before _showFirstWin runs) where the bg falls back to its purple
+      // base and flashes. Blackout keeps it pure black through the whole back transition.
       this.el.classList.remove('welcome-intro--help', 'welcome-intro--cine', 'welcome-intro--preenter');
+      this.el.classList.add('welcome-intro--blackout');
       const _bc = document.getElementById('welcomeRays'); if (_bc) _bc.remove();
       setTimeout(() => { this._showFirstWin(stepIndex); }, 250);
       return;
