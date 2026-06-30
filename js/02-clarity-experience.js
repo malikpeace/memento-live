@@ -604,26 +604,32 @@ const ClarityExperience = {
     title.style.filter = 'blur(16px)';
     title.style.transform = `translate(${dx}px, ${dy}px) scale(1.16)`;
     void title.offsetWidth;
-    // Phase 1: fade in + come into focus while growing (stays centred).
+    // Phase 1a: fade in but HOLD the blur for ~1s (it stays soft and out of focus).
     this._setTimeout(() => {
       if (done) return;
-      title.style.transition = 'opacity 0.7s ease, filter 0.9s ease, transform 1s cubic-bezier(0.16,1,0.3,1)';
+      title.style.transition = 'opacity 0.7s ease, transform 1.6s cubic-bezier(0.16,1,0.3,1)';
       title.style.opacity = '1';
+      title.style.transform = `translate(${dx}px, ${dy}px) scale(1.28)`;
+    }, 60);
+    // Phase 1b: now come into focus while growing a little more.
+    this._setTimeout(() => {
+      if (done) return;
+      title.style.transition = 'filter 1s ease, transform 1s cubic-bezier(0.16,1,0.3,1)';
       title.style.filter = 'blur(0px)';
       title.style.transform = `translate(${dx}px, ${dy}px) scale(1.5)`;
-    }, 60);
-    // Phase 2: after a beat, fly up to the top-left spot.
+    }, 1150);
+    // Phase 2: after it has settled in focus, fly up to the top-left spot.
     this._setTimeout(() => {
       if (done) return;
-      title.style.transition = 'transform 0.85s cubic-bezier(0.16,1,0.3,1), filter 0.85s ease';
+      title.style.transition = 'transform 0.85s cubic-bezier(0.16,1,0.3,1)';
       title.style.transform = 'translate(0px, 0px) scale(1)';
-    }, 1500);
+    }, 2350);
     // Phase 3: it has landed, clean up and start the text.
     this._setTimeout(() => {
       if (done) return;
       title.style.transition = ''; title.style.transform = ''; title.style.filter = ''; title.style.transformOrigin = ''; title.style.willChange = '';
       typeAll();
-    }, 2450);
+    }, 3300);
   },
 
   _cinematicOpen() {
