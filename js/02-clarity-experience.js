@@ -992,7 +992,7 @@ const ClarityExperience = {
             <div class="gs__weight gs__weight--purple" style="position:absolute;bottom:6px;right:-2px;"></div>
           </div>
         </div>`,
-        headline: 'Think of Your Focus like a Scale',
+        headline: 'Think About Your Focus like a Scale',
         sub: "At all times, there's an invisible scale guiding your attention.<br><br>Your brain will always default to the heavier side automatically, unless actively fought (more on that in a second).<br><br>For most people, the heaviest side is distractions, typically instant gratification activities. They're the heaviest and easiest weights to reach for, which throws the scale off balance, automatically draws your attention toward them, and makes it difficult for your brain to focus on the other side. We need to fix this."
       },
       // Page 2  - Willpower doesn't work long term
