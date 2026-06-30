@@ -723,11 +723,14 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
   letter-spacing: -0.03em;
   line-height: 1.1;
   color: rgba(var(--ink),0.95);
-  opacity: 0;
-  animation: clarityIntroFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+  position: relative;
+  z-index: 2;
   margin-bottom: 32px;
   text-align: left;
 }
+/* The word is its own inline element so the centre->top-left fly-in (driven by JS in
+   _runClarityIntro) moves the TEXT, not the full-width title box. */
+.clarity-intro__title-in { display: inline-block; opacity: 0; }
 
 /* Button pill with comet border. Continue/Begin only appears AFTER the last
    line (line 5) finishes its entrance animation at ~10.5s. Was 1s, which

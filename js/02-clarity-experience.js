@@ -506,7 +506,7 @@ const ClarityExperience = {
     this._setLight(0.06); // a whisper of light before the journey starts
     this.pageWrap.innerHTML = `<div class="clarity-intro" id="clarityIntro">
       <div class="clarity-intro__body">
-        <div class="clarity-intro__title">Clarity</div>
+        <div class="clarity-intro__title"><span class="clarity-intro__title-in">Clarity</span></div>
         <div class="clarity-intro__lines">
           <div class="clarity-intro__line clarity-intro__line--1">The first step to accomplishing anything is to first get clear on what it is you want and why. Most people never do this.</div>
           <div class="clarity-intro__line clarity-intro__line--2">They drift. They guess. They settle for wherever life moves them and accept a mediocre existence.</div>
@@ -548,39 +548,82 @@ const ClarityExperience = {
       this._setTimeout(() => { if (this.isOpen) this._openContent(); }, 400);
     });
 
-    this._typeClarityIntro();
+    this._runClarityIntro();
   },
 
-  // Types the Clarity intro lines char-by-char (onboarding-style), then reveals the
-  // bottom Begin button. _claritySkipType fills everything instantly on a tap.
-  _typeClarityIntro() {
+  // The Clarity intro sequence: the word "Clarity" pops in centered + blurry, comes into
+  // focus while growing, then flies up to its top-left spot, and only then do the lines
+  // type in char-by-char (onboarding-style) and the bottom Begin button reveals. A tap
+  // anywhere snaps everything to the finished state.
+  _runClarityIntro() {
     const intro = document.getElementById('clarityIntro');
     if (!intro) return;
     const lines = [...intro.querySelectorAll('.clarity-intro__line')];
     const foot = document.getElementById('clarityIntroFoot');
+    const title = intro.querySelector('.clarity-intro__title-in'); // the word itself, so it centres
     const reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-    // Reserve each line's final wrapped height up front so the stack never jumps as it types.
+    // Reserve each line's final wrapped height up front so the stack never jumps, then clear
+    // them so they are empty (invisible) during the title intro.
     lines.forEach((l) => { l.dataset.full = l.textContent; l.style.minHeight = l.offsetHeight + 'px'; l.textContent = ''; });
+
     let done = false;
     this._claritySkipType = () => {
       if (done) return; done = true;
+      if (title) { title.style.transition = 'none'; title.style.transform = ''; title.style.filter = ''; title.style.opacity = '1'; }
       lines.forEach((l) => { l.textContent = l.dataset.full || ''; });
       if (foot) foot.classList.add('show');
     };
-    if (reduced) { this._claritySkipType(); return; }
-    const typeLine = (idx) => {
+    if (reduced) { if (title) title.style.opacity = '1'; this._claritySkipType(); return; }
+
+    const typeAll = () => {
       if (done) return;
-      if (idx >= lines.length) { done = true; if (foot) foot.classList.add('show'); return; }
-      const el = lines[idx]; const full = el.dataset.full || ''; let i = 0;
-      const tick = () => {
+      const typeLine = (idx) => {
         if (done) return;
-        el.textContent = full.slice(0, i); i++;
-        if (i <= full.length) this._setTimeout(tick, 11 + Math.random() * 9);
-        else this._setTimeout(() => typeLine(idx + 1), 400);
+        if (idx >= lines.length) { done = true; if (foot) foot.classList.add('show'); return; }
+        const el = lines[idx]; const full = el.dataset.full || ''; let i = 0;
+        const tick = () => {
+          if (done) return;
+          el.textContent = full.slice(0, i); i++;
+          if (i <= full.length) this._setTimeout(tick, 11 + Math.random() * 9);
+          else this._setTimeout(() => typeLine(idx + 1), 400);
+        };
+        tick();
       };
-      tick();
+      typeLine(0);
     };
-    this._setTimeout(() => typeLine(0), 650);
+
+    if (!title) { typeAll(); return; }
+    // Measure the title's final (top-left) position, then offset it to screen centre + blur it.
+    const r = title.getBoundingClientRect();
+    const dx = (window.innerWidth / 2) - (r.left + r.width / 2);
+    const dy = (window.innerHeight / 2) - (r.top + r.height / 2);
+    title.style.willChange = 'transform, filter, opacity';
+    title.style.transformOrigin = 'center center';
+    title.style.transition = 'none';
+    title.style.opacity = '0';
+    title.style.filter = 'blur(16px)';
+    title.style.transform = `translate(${dx}px, ${dy}px) scale(1.16)`;
+    void title.offsetWidth;
+    // Phase 1: fade in + come into focus while growing (stays centred).
+    this._setTimeout(() => {
+      if (done) return;
+      title.style.transition = 'opacity 0.7s ease, filter 0.9s ease, transform 1s cubic-bezier(0.16,1,0.3,1)';
+      title.style.opacity = '1';
+      title.style.filter = 'blur(0px)';
+      title.style.transform = `translate(${dx}px, ${dy}px) scale(1.5)`;
+    }, 60);
+    // Phase 2: after a beat, fly up to the top-left spot.
+    this._setTimeout(() => {
+      if (done) return;
+      title.style.transition = 'transform 0.85s cubic-bezier(0.16,1,0.3,1), filter 0.85s ease';
+      title.style.transform = 'translate(0px, 0px) scale(1)';
+    }, 1500);
+    // Phase 3: it has landed, clean up and start the text.
+    this._setTimeout(() => {
+      if (done) return;
+      title.style.transition = ''; title.style.transform = ''; title.style.filter = ''; title.style.transformOrigin = ''; title.style.willChange = '';
+      typeAll();
+    }, 2450);
   },
 
   _cinematicOpen() {
