@@ -93,6 +93,7 @@ PRONOUNS:
 
 HARD BANS (output is rejected if you break these):
 - NEVER use em dashes ( - ) or en dashes (-). Use periods or commas. Rewrite if needed.
+- NEVER use the "It's not X, it's Y" redefinition cliche, or any variant ("It's not just X, it's Y", "This isn't X, it's Y", "not just X, but Y"). This rhetorical substitution is banned outright. State the thing plainly. (An honest concession like "31 isn't old, but you have more experience" is fine; the banned form is restating with "it's Y / this is Y".)
 - NEVER use these AI tics: "Morning arrives", "the purpose behind", "genuinely changing", "the right people are actually using", "deeply meaningful", "authentic", "intentional living", "what truly matters", "the work that matters", "fades into noise", "proof that", "this is bigger than", "wake people up", "stronger than distraction", "essentially", "fundamentally", "at the end of the day", "operator over dreamer", "quiet proof"
 - NEVER use these (flagged by Malik from real outputs): "pulling you", "pulls you", "pulls at you", "pull at you", "what's pulling", any phrase using "pull" for attraction or motivation, "actually landed", "let you breathe", "never go back", "closest to true", "which is honest", "is the line where", "that's the whole game", "the whole game". For attraction/excitement always say "gets you excited" / "what part actually gets you excited".
 - NEVER write LinkedIn-caption, TED Talk, or hustle-bro cadence.
@@ -227,7 +228,13 @@ const VOICE_BANNED = [
   [/what truly matters|deeply meaningful|intentional living|fades into noise|quiet proof|at the end of the day|morning arrives|operator over dreamer/i, 'AI-tic phrase'],
   [/\bfuck\w*/i, 'profanity (only "hell yeah/no" is allowed)'],
   [/\bgets? you going\b/i, '"gets you going" (say "gets you excited")'],
-  [/the whole game/i, '"the whole game"']
+  [/the whole game/i, '"the whole game"'],
+  // The "It's not X, it's Y" redefinition cliche (and "not just X, it's Y"). Malik never wants
+  // this rhetorical substitution. Only the redefinition form is banned (second clause restating
+  // with "it's/this is"); an honest concession like "31 isn't old, but you have experience" is fine.
+  [/\b(it'?s|it is|that'?s|this is)\s+not\b[^.!?]{2,45}?[,.;:]\s*(it'?s|it is|this is|they'?re)\b/i, 'X/Y redefinition ("it\'s not X, it\'s Y")'],
+  [/\b(isn'?t|aren'?t)\b[^.!?]{2,45}?[,.;:]\s*(it'?s|it is|this is|they'?re)\b/i, 'X/Y redefinition ("isn\'t X, it\'s Y")'],
+  [/\bnot just\b[^.!?]{1,45}?[,.;:]\s*(it'?s|it is|this is|they'?re|but)\b/i, 'X/Y phrasing ("not just X, ... Y")']
 ];
 function voiceLint(text) {
   const hits = [];
