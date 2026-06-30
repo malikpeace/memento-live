@@ -2087,7 +2087,7 @@ const WelcomeIntro = {
     } else if (kind === 'mori') {
       inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-moriview" data-beat="${beatIdx}"><h2 class="wi-demo__headline">${esc(b.headline)}</h2>${this._cineMori()}<p class="wi-demo__line">${esc(b.line)}</p>${b.days ? `<p class="wi-mori__days">btw, you have about <b>${b.days.toLocaleString()}</b> days left.</p>` : ''}</div>`;
     } else if (kind === 'preview') {
-      inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-prev" data-beat="${beatIdx}"><h2 class="wi-demo__headline wi-prev__title">${esc(b.headline)}</h2>${this._cineCardPreview(p)}</div>`;
+      inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-prev" data-beat="${beatIdx}"><div class="wi-prev__aura"></div><h2 class="wi-demo__headline wi-prev__title">${esc(b.headline)}</h2>${this._cineCardPreview(p)}</div>`;
     } else {
       inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-cine--stagger" data-beat="${beatIdx}"><h2 class="wi-demo__headline">${esc(b.headline)}</h2><p class="wi-demo__line">${esc(b.line)}</p>${b.stakes ? `<p class="wi-demo__line wi-demo__stakes">${esc(b.stakes)}</p>` : ''}</div>`;
     }
@@ -2568,15 +2568,19 @@ const WelcomeIntro = {
     const s = STEPS[this._prevStep];
     this._prevStep++;
     if (s.glow) { const g = wrap.querySelector('.wi-pcard__glow--' + s.glow); if (g) g.classList.add('on'); }
-    if (s.evolve) { const stage = wrap.querySelector('.wi-pcard-stage'); if (stage) stage.classList.add('evolved'); }
+    if (s.evolve) { const stage = wrap.querySelector('.wi-pcard-stage'); if (stage) stage.classList.add('evolved'); const pv = wrap.querySelector('.wi-prev'); if (pv) pv.classList.add('is-evolved'); }
     // The opal level: rarer sparks of blue / orange / red bloom in over the pillars.
     if (s.opal) { const stage = wrap.querySelector('.wi-pcard-stage'); if (stage) stage.classList.add('opal'); }
     const title = wrap.querySelector('.wi-prev__title');
     if (title) { title.style.opacity = '0'; setTimeout(() => { const t = wrap.querySelector('.wi-prev__title'); if (t) { t.textContent = s.text; t.style.opacity = '1'; } }, 320); }
     const hint = wrap.querySelector('.wi-prev__hint');
     if (this._prevStep >= STEPS.length) {
-      // Reveal complete: after a beat, invite them to begin (the next tap proceeds).
-      if (hint) { hint.textContent = 'tap to begin'; hint.style.opacity = '0'; setTimeout(() => { const h = (this.pageWrap || wrap).querySelector('.wi-prev__hint'); if (h && this._prevStep >= STEPS.length) h.style.opacity = '1'; }, 1500); }
+      // Reveal complete: fade the tap prompt and reveal an "Enter Memento" button.
+      if (hint) hint.style.opacity = '0';
+      if (this.navEl && !document.getElementById('solEnter')) {
+        this.navEl.innerHTML = '<button class="welcome-intro__btn welcome-intro__btn--step welcome-intro__btn--enter" id="solEnter" style="flex:1;width:auto;">Enter Memento</button>';
+        const b = document.getElementById('solEnter'); if (b) b.addEventListener('click', () => { if (this._prevForward) this._prevForward(); });
+      }
     } else if (hint) {
       // Once they've tapped once they know the gesture, fade the prompt away.
       hint.style.opacity = '0';

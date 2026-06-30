@@ -1811,6 +1811,12 @@ body.lite .welcome-intro__rays { opacity: 0.6; filter: none; }
 .wi-pcard__spill { position: absolute; inset: -22%; z-index: 0; opacity: 0; pointer-events: none; filter: blur(48px) saturate(1.5); background: radial-gradient(58% 58% at 26% 22%, rgba(150,116,255,0.92), transparent 70%), radial-gradient(58% 58% at 76% 80%, rgba(56,236,150,0.85), transparent 70%); transition: opacity 2.4s ease; }
 .wi-pcard-stage.evolved .wi-pcard__spill { opacity: 0.78; }
 .wi-pcard-stage.evolved .wi-pcard__glow.on { opacity: 0.96; }
+/* Evolved finale: the whole card (and its spill) slowly cycles through hues, so the colour
+   shifts like a rainbow to show how powerful it gets. White/black stay put; only the colour rotates. */
+.wi-pcard-stage.evolved .wi-pcard { animation: wiHueCard 13s linear infinite; }
+.wi-pcard-stage.evolved .wi-pcard__spill { animation: wiHueSpill 13s linear infinite; }
+@keyframes wiHueCard { to { filter: hue-rotate(360deg); } }
+@keyframes wiHueSpill { from { filter: blur(48px) saturate(1.5) hue-rotate(0deg); } to { filter: blur(48px) saturate(1.5) hue-rotate(360deg); } }
 /* The opal level: the final tap blooms rare sparks of new colour (blue, orange, red, teal)
    over the three pillars, so the card shimmers like a rare opal. Subtle, feathered, drifting. */
 .wi-pcard__opal { position: absolute; inset: 0; z-index: 1; opacity: 0; pointer-events: none; mix-blend-mode: screen; filter: blur(15px) saturate(1.45); transition: opacity 2.4s ease; will-change: transform;
@@ -1835,7 +1841,18 @@ body.lite .welcome-intro__rays { opacity: 0.6; filter: none; }
 }
 .wi-prev .wi-prev__title { animation: wiPrevTitleRise 0.9s cubic-bezier(0.16,1,0.3,1) 0.6s backwards; }
 @keyframes wiPrevTitleRise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-@media (prefers-reduced-motion: reduce) { .wi-prev .wi-pcard-stage, .wi-prev .wi-prev__title { animation: none !important; } }
+/* Background aura: a soft glow behind the whole page that fades in on the evolved step and
+   cycles hues in sync with the card, so the room itself lights up with it. */
+.wi-prev { position: relative; }
+.wi-prev .wi-prev__title, .wi-prev .wi-prev__wrap { position: relative; z-index: 1; }
+.wi-prev__aura { position: absolute; inset: -10% -20%; z-index: 0; pointer-events: none; opacity: 0; filter: blur(72px) saturate(1.4); transition: opacity 2.6s ease;
+  background: radial-gradient(40% 36% at 30% 40%, rgba(150,116,255,0.5), transparent 70%), radial-gradient(42% 38% at 72% 64%, rgba(56,236,150,0.46), transparent 70%); }
+.wi-prev.is-evolved .wi-prev__aura { opacity: 0.7; animation: wiHueAura 13s linear infinite; }
+@keyframes wiHueAura { from { filter: blur(72px) saturate(1.4) hue-rotate(0deg); } to { filter: blur(72px) saturate(1.4) hue-rotate(360deg); } }
+/* the Enter Memento button that appears once the reveal completes */
+.welcome-intro__btn--enter { animation: wiEnterBtnIn 0.5s ease both; }
+@keyframes wiEnterBtnIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .wi-prev .wi-pcard-stage, .wi-prev .wi-prev__title, .wi-pcard-stage.evolved .wi-pcard, .wi-pcard-stage.evolved .wi-pcard__spill, .wi-prev.is-evolved .wi-prev__aura { animation: none !important; } }
 @media (prefers-reduced-motion: reduce) { .wi-pcard-stage.evolved .wi-pcard, .wi-pcard-stage.evolved .wi-pcard__spill { animation: none !important; } }
 .wi-prev__caption { min-height: 2.7em; max-width: 26ch; margin: 0 auto; text-align: center; font-size: 1rem; line-height: 1.45; color: #fff; transition: opacity 0.34s ease; }
 .wi-cine__wantwrap { display: flex; flex-direction: column; align-items: center; justify-content: center; }
