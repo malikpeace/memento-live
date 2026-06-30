@@ -1784,7 +1784,7 @@ body.lite .welcome-intro__rays { opacity: calc(0.6 + var(--wi-beam-boost, 0) * 0
 /* clip-path (not just overflow:hidden) so the blurred / mix-blend glow layers can't escape
    the rounded corners on iOS, which made sharp square corners poke past the radius. The outer
    drop shadow moves to .wi-pcard-stage so the clip doesn't eat it (only the inset rim stays). */
-.wi-pcard { position: relative; width: clamp(146px, 44vw, 176px); aspect-ratio: 0.66; border-radius: 18px; background: rgba(255,255,255,0.045); box-shadow: inset 0 1px 0 rgba(255,255,255,0.09); overflow: hidden; clip-path: inset(0 round 18px); display: flex; align-items: center; justify-content: center; }
+.wi-pcard { position: relative; width: clamp(146px, 44vw, 176px); aspect-ratio: 0.66; border-radius: 18px; background: rgba(255,255,255,0.045); box-shadow: inset 0 1px 0 rgba(255,255,255,0.09); overflow: hidden; clip-path: inset(0 round 18px); isolation: isolate; display: flex; align-items: center; justify-content: center; }
 /* The grand hero card. */
 .wi-pcard--big { width: clamp(216px, 60vw, 296px); border-radius: 24px; clip-path: inset(0 round 24px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.12); }
 /* Pillar lights: invisible until their step fades them in (.on), then they drift + breathe.
@@ -1824,10 +1824,11 @@ body.lite .welcome-intro__rays { opacity: calc(0.6 + var(--wi-beam-boost, 0) * 0
 .wi-pcard-stage.evolved .wi-pcard__glow.on { opacity: 0.96; }
 /* Evolved finale: the whole card (and its spill) slowly cycles through hues, so the colour
    shifts like a rainbow to show how powerful it gets. White/black stay put; only the colour rotates. */
-.wi-pcard-stage.evolved .wi-pcard { animation: wiHueCard 13s linear infinite; }
-.wi-pcard-stage.evolved .wi-pcard__spill { animation: wiHueSpill 13s linear infinite; }
-@keyframes wiHueCard { to { filter: hue-rotate(360deg); } }
-@keyframes wiHueSpill { from { filter: blur(42px) saturate(1.35) hue-rotate(0deg); } to { filter: blur(42px) saturate(1.35) hue-rotate(360deg); } }
+/* Hue-cycle the whole STAGE (card + spill together), NOT the card itself. A filter on the
+   clip-path'd card breaks the rounded clip on iOS, so the glow leaked out the corners. The
+   stage has no clip-path, so filtering it is safe; the card stays a clean, filter-free clip. */
+.wi-prev .wi-pcard-stage.evolved { animation: wiHueStage 13s linear infinite; }
+@keyframes wiHueStage { to { filter: hue-rotate(360deg); } }
 /* The opal level: the final tap blooms rare sparks of new colour (blue, orange, red, teal)
    over the three pillars, so the card shimmers like a rare opal. Subtle, feathered, drifting. */
 .wi-pcard__opal { position: absolute; inset: 0; z-index: 1; opacity: 0; pointer-events: none; mix-blend-mode: screen; filter: blur(15px) saturate(1.45); transition: opacity 2.4s ease; will-change: transform;
@@ -1863,8 +1864,7 @@ body.lite .welcome-intro__rays { opacity: calc(0.6 + var(--wi-beam-boost, 0) * 0
 /* the Enter Memento button that appears once the reveal completes */
 .welcome-intro__btn--enter { animation: wiEnterBtnIn 0.5s ease both; }
 @keyframes wiEnterBtnIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-@media (prefers-reduced-motion: reduce) { .wi-prev .wi-pcard-stage, .wi-prev .wi-prev__title, .wi-pcard-stage.evolved .wi-pcard, .wi-pcard-stage.evolved .wi-pcard__spill, .wi-prev.is-evolved .wi-prev__aura { animation: none !important; } }
-@media (prefers-reduced-motion: reduce) { .wi-pcard-stage.evolved .wi-pcard, .wi-pcard-stage.evolved .wi-pcard__spill { animation: none !important; } }
+@media (prefers-reduced-motion: reduce) { .wi-prev .wi-pcard-stage, .wi-prev .wi-prev__title, .wi-prev .wi-pcard-stage.evolved, .wi-prev.is-evolved .wi-prev__aura { animation: none !important; } }
 .wi-prev__caption { min-height: 2.7em; max-width: 26ch; margin: 0 auto; text-align: center; font-size: 1rem; line-height: 1.45; color: #fff; transition: opacity 0.34s ease; }
 .wi-cine__wantwrap { display: flex; flex-direction: column; align-items: center; justify-content: center; }
 /* the reused module icons (clarity circles, action footsteps, consistency flame) on
