@@ -804,13 +804,14 @@ const ClarityExperience = {
     renderAll();
   },
 
-  // The "How to achieve anything" hero: the headline just APPEARS (no centre-blur-fly-in, that
-  // cinematic is a Clarity-title-only signature). The body lines still type in char-by-char.
-  // A tap fills everything instantly.
+  // The "How to achieve anything" hero: the headline POPS IN sharp + fully visible, centred on
+  // screen, holds, then rises to its top-left spot, and only then do the body lines type in.
+  // No fade and no blur (that softer look is reserved for the Clarity title). A tap fills it.
   _runHeroIntro() {
     const hero = this.pageWrap && this.pageWrap.querySelector('.clarity-tut-hero');
     if (!hero || hero.dataset.introRan) return;
     hero.dataset.introRan = '1';
+    const title = hero.querySelector('.clarity-tut-hero__title-in');
     const lines = [...hero.querySelectorAll('.clarity-tut-hero__line')];
     const reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
     // Reserve each line's height, stash its HTML + plain text, then clear it for the typewriter.
@@ -818,10 +819,11 @@ const ClarityExperience = {
     let done = false;
     this._heroSkip = () => {
       if (done) return; done = true;
+      if (title) { title.style.transition = 'none'; title.style.transform = ''; title.style.opacity = '1'; }
       lines.forEach((l) => { l.innerHTML = l.dataset.full || ''; });
     };
     hero.addEventListener('click', () => { if (this._heroSkip) this._heroSkip(); });
-    if (reduced) { this._heroSkip(); return; }
+    if (reduced) { if (title) title.style.opacity = '1'; this._heroSkip(); return; }
     const typeLine = (idx) => {
       if (done) return;
       if (idx >= lines.length) { done = true; return; }
@@ -834,7 +836,20 @@ const ClarityExperience = {
       };
       tick();
     };
-    this._setTimeout(() => typeLine(0), 450);
+    if (!title) { this._setTimeout(() => typeLine(0), 300); return; }
+    // Measure the title's resting spot, then pop it in (sharp, full opacity) at screen centre.
+    const r = title.getBoundingClientRect();
+    const dx = (window.innerWidth / 2) - (r.left + r.width / 2);
+    const dy = (window.innerHeight / 2) - (r.top + r.height / 2);
+    title.style.willChange = 'transform';
+    title.style.transformOrigin = 'center center';
+    title.style.transition = 'none';
+    title.style.transform = `translate(${dx}px, ${dy}px) scale(1.06)`;
+    title.style.opacity = '1';
+    void title.offsetWidth;
+    // hold centred, then rise to the top-left resting spot, then type.
+    this._setTimeout(() => { if (done) return; title.style.transition = 'transform 0.9s cubic-bezier(0.16,1,0.3,1)'; title.style.transform = 'translate(0px, 0px) scale(1)'; }, 750);
+    this._setTimeout(() => { if (done) return; title.style.transition = ''; title.style.transform = ''; title.style.transformOrigin = ''; title.style.willChange = ''; typeLine(0); }, 1800);
   },
 
   renderPage(index) {
