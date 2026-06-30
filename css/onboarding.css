@@ -1784,7 +1784,11 @@ body.lite .welcome-intro__rays { opacity: calc(0.6 + var(--wi-beam-boost, 0) * 0
 /* clip-path (not just overflow:hidden) so the blurred / mix-blend glow layers can't escape
    the rounded corners on iOS, which made sharp square corners poke past the radius. The outer
    drop shadow moves to .wi-pcard-stage so the clip doesn't eat it (only the inset rim stays). */
-.wi-pcard { position: relative; width: clamp(146px, 44vw, 176px); aspect-ratio: 0.66; border-radius: 18px; background: rgba(255,255,255,0.045); box-shadow: inset 0 1px 0 rgba(255,255,255,0.09); overflow: hidden; clip-path: inset(0 round 18px); isolation: isolate; display: flex; align-items: center; justify-content: center; }
+/* transform: translateZ(0) GPU-promotes the card so iOS treats it as the clip boundary for its
+   composited (blur / mix-blend / will-change) glow layers, which otherwise slip past clip-path
+   and overflow:hidden and poke sharp corners. (The day card gets this promotion free from its 3D
+   tilt; this flat card has no transform, so it must be forced.) */
+.wi-pcard { position: relative; width: clamp(146px, 44vw, 176px); aspect-ratio: 0.66; border-radius: 18px; background: rgba(255,255,255,0.045); box-shadow: inset 0 1px 0 rgba(255,255,255,0.09); overflow: hidden; clip-path: inset(0 round 18px); isolation: isolate; transform: translateZ(0); -webkit-transform: translateZ(0); display: flex; align-items: center; justify-content: center; }
 /* The grand hero card. */
 .wi-pcard--big { width: clamp(216px, 60vw, 296px); border-radius: 24px; clip-path: inset(0 round 24px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.12); }
 /* Pillar lights: invisible until their step fades them in (.on), then they drift + breathe.
