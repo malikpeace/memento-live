@@ -2565,8 +2565,10 @@ const WelcomeIntro = {
       { glow: null, evolve: true, text: 'The more you evolve, the more it evolves.' }
     ];
     if (this._prevStep == null) this._prevStep = 0;
-    // Reveal already finished: this tap proceeds out of the page (no Build button).
-    if (this._prevStep >= STEPS.length) { if (this._prevForward) this._prevForward(); return; }
+    // Reveal finished: "the more you evolve, the more it evolves" is the LAST page. Further
+    // card taps do nothing, only the Enter Memento button proceeds. (Tapping the card used to
+    // trigger the finish, which dropped welcome-intro--cine and flashed the background bright.)
+    if (this._prevStep >= STEPS.length) return;
     const s = STEPS[this._prevStep];
     this._prevStep++;
     // The top-left beams brighten + strengthen with every tap, as the Memento evolves.
