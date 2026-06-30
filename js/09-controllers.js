@@ -2063,6 +2063,8 @@ const WelcomeIntro = {
     // on the "Enter Memento" beat onward, so the light literally comes in as they
     // enter Memento. --preenter hides the rays + the background wash on the stage page.
     this.el.classList.toggle('welcome-intro--preenter', kind === 'stage');
+    // The beam-brightness boost only applies during the Meet Your Memento reveal; reset elsewhere.
+    if (kind !== 'preview') { try { this.el.style.setProperty('--wi-beam-boost', '0'); } catch (e) {} }
     // Philosophy uses a wider content column (less page padding) so the 3 boxes are not skinny.
     this.el.classList.toggle('welcome-intro--phi', kind === 'philosophy');
     // any pending auto-advance from a prior "Enter Memento" beat is cancelled the
@@ -2545,6 +2547,7 @@ const WelcomeIntro = {
     const card = wrap && wrap.querySelector('.wi-pcard');
     if (!card) return;
     this._prevStep = 0;
+    try { this.el.style.setProperty('--wi-beam-boost', '0'); } catch (e) {}
     card.style.cursor = 'pointer';
     card.addEventListener('click', () => this._prevAdvance());
     // Hold the "tap the card" prompt until the cinematic arrival has played.
@@ -2566,6 +2569,8 @@ const WelcomeIntro = {
     if (this._prevStep >= STEPS.length) { if (this._prevForward) this._prevForward(); return; }
     const s = STEPS[this._prevStep];
     this._prevStep++;
+    // The top-left beams brighten + strengthen with every tap, as the Memento evolves.
+    try { this.el.style.setProperty('--wi-beam-boost', (Math.min(this._prevStep, STEPS.length) * 0.12).toFixed(3)); } catch (e) {}
     if (s.glow) { const g = wrap.querySelector('.wi-pcard__glow--' + s.glow); if (g) g.classList.add('on'); }
     if (s.evolve) { const stage = wrap.querySelector('.wi-pcard-stage'); if (stage) stage.classList.add('evolved'); const pv = wrap.querySelector('.wi-prev'); if (pv) pv.classList.add('is-evolved'); }
     // The opal level: rarer sparks of blue / orange / red bloom in over the pillars.
