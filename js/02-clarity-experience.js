@@ -816,14 +816,13 @@ const ClarityExperience = {
     const reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
     // Reserve each line's height, stash its HTML + plain text, then clear it for the typewriter.
     lines.forEach((l) => { l.dataset.full = l.innerHTML; l.dataset.plain = l.textContent || ''; l.style.minHeight = l.offsetHeight + 'px'; l.textContent = ''; });
-    let done = false;
-    this._heroSkip = () => {
-      if (done) return; done = true;
-      if (title) { title.style.transition = 'none'; title.style.transform = ''; title.style.opacity = '1'; }
-      lines.forEach((l) => { l.innerHTML = l.dataset.full || ''; });
+    let done = false;     // every line filled
+    let typing = false;   // the typewriter has begun
+    const landTitle = () => {
+      if (!title) return;
+      title.style.transition = 'none'; title.style.transform = ''; title.style.opacity = '1';
+      title.style.transformOrigin = ''; title.style.willChange = '';
     };
-    hero.addEventListener('click', () => { if (this._heroSkip) this._heroSkip(); });
-    if (reduced) { if (title) title.style.opacity = '1'; this._heroSkip(); return; }
     const typeLine = (idx) => {
       if (done) return;
       if (idx >= lines.length) { done = true; return; }
@@ -831,12 +830,22 @@ const ClarityExperience = {
       const tick = () => {
         if (done) return;
         el.textContent = plain.slice(0, i); i++;
-        if (i <= plain.length) this._setTimeout(tick, 9 + Math.random() * 8);
+        if (i <= plain.length) this._setTimeout(tick, 11 + Math.random() * 9);
         else { el.innerHTML = full; this._setTimeout(() => typeLine(idx + 1), 650); }
       };
       tick();
     };
-    if (!title) { this._setTimeout(() => typeLine(0), 300); return; }
+    const startTyping = () => { if (typing || done) return; typing = true; typeLine(0); };
+    // A tap BEFORE typing starts snaps the title home and begins the typewriter immediately
+    // (so an early tap can never make you miss it); a tap DURING typing fills everything.
+    this._heroSkip = () => {
+      if (done) return;
+      if (!typing) { landTitle(); startTyping(); return; }
+      done = true; lines.forEach((l) => { l.innerHTML = l.dataset.full || ''; });
+    };
+    hero.addEventListener('click', () => { if (this._heroSkip) this._heroSkip(); });
+    if (reduced) { if (title) title.style.opacity = '1'; done = true; lines.forEach((l) => { l.innerHTML = l.dataset.full || ''; }); return; }
+    if (!title) { this._setTimeout(startTyping, 250); return; }
     // Measure the title's resting spot, then pop it in (sharp, full opacity) at screen centre.
     const r = title.getBoundingClientRect();
     const dx = (window.innerWidth / 2) - (r.left + r.width / 2);
@@ -848,8 +857,8 @@ const ClarityExperience = {
     title.style.opacity = '1';
     void title.offsetWidth;
     // hold centred, then rise to the top-left resting spot, then type.
-    this._setTimeout(() => { if (done) return; title.style.transition = 'transform 0.9s cubic-bezier(0.16,1,0.3,1)'; title.style.transform = 'translate(0px, 0px) scale(1)'; }, 750);
-    this._setTimeout(() => { if (done) return; title.style.transition = ''; title.style.transform = ''; title.style.transformOrigin = ''; title.style.willChange = ''; typeLine(0); }, 1800);
+    this._setTimeout(() => { if (done || typing) return; title.style.transition = 'transform 0.85s cubic-bezier(0.16,1,0.3,1)'; title.style.transform = 'translate(0px, 0px) scale(1)'; }, 550);
+    this._setTimeout(() => { if (done || typing) return; landTitle(); startTyping(); }, 1450);
   },
 
   renderPage(index) {
