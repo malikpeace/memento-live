@@ -1781,9 +1781,12 @@ body.lite .welcome-intro__rays { opacity: calc(0.6 + var(--wi-beam-boost, 0) * 0
    vertical centering so the card below never shifts as the line length changes. */
 .wi-prev__title { display: flex; align-items: center; justify-content: center; min-height: 3.1em; max-width: 22ch; margin: 0 auto 4px; font-size: clamp(1.45rem, 5.6vw, 1.8rem); line-height: 1.22; transition: opacity 0.32s ease; }
 .wi-prev__wrap { display: flex; flex-direction: column; align-items: center; gap: 22px; margin: 6px 0 0; }
-.wi-pcard { position: relative; width: clamp(146px, 44vw, 176px); aspect-ratio: 0.66; border-radius: 18px; background: rgba(255,255,255,0.045); box-shadow: inset 0 1px 0 rgba(255,255,255,0.09), 0 26px 50px rgba(0,0,0,0.52); overflow: hidden; display: flex; align-items: center; justify-content: center; }
+/* clip-path (not just overflow:hidden) so the blurred / mix-blend glow layers can't escape
+   the rounded corners on iOS, which made sharp square corners poke past the radius. The outer
+   drop shadow moves to .wi-pcard-stage so the clip doesn't eat it (only the inset rim stays). */
+.wi-pcard { position: relative; width: clamp(146px, 44vw, 176px); aspect-ratio: 0.66; border-radius: 18px; background: rgba(255,255,255,0.045); box-shadow: inset 0 1px 0 rgba(255,255,255,0.09); overflow: hidden; clip-path: inset(0 round 18px); display: flex; align-items: center; justify-content: center; }
 /* The grand hero card. */
-.wi-pcard--big { width: clamp(216px, 60vw, 296px); border-radius: 24px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 44px 90px rgba(0,0,0,0.62); }
+.wi-pcard--big { width: clamp(216px, 60vw, 296px); border-radius: 24px; clip-path: inset(0 round 24px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.12); }
 /* Pillar lights: invisible until their step fades them in (.on), then they drift + breathe.
    Soft radial gradients that feather to transparent (like the real living card's blobs), not
    solid ellipses, so they read as smooth edgeless light instead of blocky color patches. Low
@@ -1809,7 +1812,7 @@ body.lite .welcome-intro__rays { opacity: calc(0.6 + var(--wi-beam-boost, 0) * 0
    teaser that the Memento keeps leveling up. */
 /* "Evolved" finale: no gold. The card reflects off the ground, the colours spill out past
    the card edges, get brighter, and slowly cycle through hues. The colour is the reward. */
-.wi-pcard-stage { position: relative; display: flex; }
+.wi-pcard-stage { position: relative; display: flex; border-radius: 24px; box-shadow: 0 44px 90px rgba(0,0,0,0.62); }
 .wi-pcard-stage .wi-pcard { z-index: 1; }
 /* The spill is a soft echo of the two pillar colours (purple TL, green BR) bleeding out past
    the card edges, same hues as inside, feathered to transparent. No rainbow hue-cycle, that
