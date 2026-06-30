@@ -804,11 +804,66 @@ const ClarityExperience = {
     renderAll();
   },
 
+  // The "How to achieve anything" hero animates like the Clarity title: the headline pops in
+  // centered + blurry, comes into focus, then flies up to its top-left spot, and only then do
+  // the lines type in char-by-char. A tap fills everything.
+  _runHeroIntro() {
+    const hero = this.pageWrap && this.pageWrap.querySelector('.clarity-tut-hero');
+    if (!hero || hero.dataset.introRan) return;
+    hero.dataset.introRan = '1';
+    const title = hero.querySelector('.clarity-tut-hero__title-in');
+    const lines = [...hero.querySelectorAll('.clarity-tut-hero__line')];
+    const reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    // Reserve each line's height, stash its HTML + plain text, then clear it for the typewriter.
+    lines.forEach((l) => { l.dataset.full = l.innerHTML; l.dataset.plain = l.textContent || ''; l.style.minHeight = l.offsetHeight + 'px'; l.textContent = ''; });
+    let done = false;
+    this._heroSkip = () => {
+      if (done) return; done = true;
+      if (title) { title.style.transition = 'none'; title.style.transform = ''; title.style.filter = ''; title.style.opacity = '1'; }
+      lines.forEach((l) => { l.innerHTML = l.dataset.full || ''; });
+    };
+    hero.addEventListener('click', () => { if (this._heroSkip) this._heroSkip(); });
+    if (reduced) { if (title) title.style.opacity = '1'; this._heroSkip(); return; }
+    const typeAll = () => {
+      if (done) return;
+      const typeLine = (idx) => {
+        if (done) return;
+        if (idx >= lines.length) { done = true; return; }
+        const el = lines[idx]; const plain = el.dataset.plain || ''; const full = el.dataset.full || ''; let i = 0;
+        const tick = () => {
+          if (done) return;
+          el.textContent = plain.slice(0, i); i++;
+          if (i <= plain.length) this._setTimeout(tick, 9 + Math.random() * 8);
+          else { el.innerHTML = full; this._setTimeout(() => typeLine(idx + 1), 650); }
+        };
+        tick();
+      };
+      typeLine(0);
+    };
+    if (!title) { typeAll(); return; }
+    const r = title.getBoundingClientRect();
+    const dx = (window.innerWidth / 2) - (r.left + r.width / 2);
+    const dy = (window.innerHeight / 2) - (r.top + r.height / 2);
+    title.style.willChange = 'transform, filter, opacity';
+    title.style.transformOrigin = 'center center';
+    title.style.transition = 'none';
+    title.style.opacity = '0';
+    title.style.filter = 'blur(14px)';
+    title.style.transform = `translate(${dx}px, ${dy}px) scale(1.02)`;
+    void title.offsetWidth;
+    // fade in (hold blur), focus, hold, fly to top-left, type.
+    this._setTimeout(() => { if (done) return; title.style.transition = 'opacity 0.6s ease, transform 1.5s cubic-bezier(0.16,1,0.3,1)'; title.style.opacity = '1'; title.style.transform = `translate(${dx}px, ${dy}px) scale(1.05)`; }, 60);
+    this._setTimeout(() => { if (done) return; title.style.transition = 'filter 0.9s ease, transform 0.9s cubic-bezier(0.16,1,0.3,1)'; title.style.filter = 'blur(0px)'; title.style.transform = `translate(${dx}px, ${dy}px) scale(1.08)`; }, 1050);
+    this._setTimeout(() => { if (done) return; title.style.transition = 'transform 0.85s cubic-bezier(0.16,1,0.3,1)'; title.style.transform = 'translate(0px, 0px) scale(1)'; }, 2700);
+    this._setTimeout(() => { if (done) return; title.style.transition = ''; title.style.transform = ''; title.style.filter = ''; title.style.transformOrigin = ''; title.style.willChange = ''; typeAll(); }, 3650);
+  },
+
   renderPage(index) {
     // In tutorial-only mode, always render tutorial pages
     if (this.tutorialOnly) {
       if (index < this.totalTutorialPages) {
         this.pageWrap.innerHTML = this.renderTutorialPage(index);
+        if (this.pageWrap.querySelector('.clarity-tut-hero')) this._setTimeout(() => this._runHeroIntro(), 30);
       }
       return;
     }
@@ -826,6 +881,7 @@ const ClarityExperience = {
     }
 
     this.pageWrap.innerHTML = html;
+    if (this.pageWrap.querySelector('.clarity-tut-hero')) this._setTimeout(() => this._runHeroIntro(), 30);
 
     // Track whether we're on the Neutron Star summary view (last wizard step,
     // synthesis complete). If yes, persist so a refresh restores it.
@@ -975,10 +1031,11 @@ const ClarityExperience = {
     }
 
     if (p._hero) {
+      const heroLines = String(p.heroSub).split('<br><br>').map(s => `<div class="clarity-tut-hero__line">${s}</div>`).join('');
       return `<div class="clarity-exp__page-inner">
         <div class="clarity-exp__tut clarity-tut-hero">
-          <div class="clarity-tut-hero__title">${p.heroTitle}</div>
-          <div class="clarity-tut-hero__sub">${p.heroSub}</div>
+          <div class="clarity-tut-hero__title"><span class="clarity-tut-hero__title-in">${p.heroTitle}</span></div>
+          <div class="clarity-tut-hero__lines">${heroLines}</div>
         </div>
       </div>`;
     }
