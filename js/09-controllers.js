@@ -2559,8 +2559,7 @@ const WelcomeIntro = {
       { glow: 'c', text: 'Find clarity, and your Memento glows.' },
       { glow: 'a', text: 'Take focused action, and evolve further.' },
       { glow: 'k', text: 'Stay consistent, and it comes alive.' },
-      { glow: null, evolve: true, text: 'The more you evolve, the more it evolves.' },
-      { glow: null, opal: true, text: 'Keep going, and it becomes one of a kind.' }
+      { glow: null, evolve: true, text: 'The more you evolve, the more it evolves.' }
     ];
     if (this._prevStep == null) this._prevStep = 0;
     // Reveal already finished: this tap proceeds out of the page (no Build button).
