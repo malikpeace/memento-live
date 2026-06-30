@@ -875,6 +875,8 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
   line-height: 1.65;
   color: rgba(var(--ink), 0.95);
   text-align: left;
+  /* hidden from the first paint so the full text never flashes; JS reveals it for the typewriter */
+  opacity: 0;
 }
 .clarity-intro__btn-pill {
   transition: transform var(--t-base) cubic-bezier(0.16, 1, 0.3, 1);

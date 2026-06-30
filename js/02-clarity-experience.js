@@ -816,6 +816,9 @@ const ClarityExperience = {
     const reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
     // Reserve each line's height, stash its HTML + plain text, then clear it for the typewriter.
     lines.forEach((l) => { l.dataset.full = l.innerHTML; l.dataset.plain = l.textContent || ''; l.style.minHeight = l.offsetHeight + 'px'; l.textContent = ''; });
+    // Lines start hidden (CSS opacity:0) so the full text never flashes. reveal() makes the
+    // (still-empty) lines paintable right as the typewriter begins.
+    const reveal = () => { lines.forEach((l) => { l.style.opacity = '1'; }); };
     let done = false;     // every line filled
     let typing = false;   // the typewriter has begun
     const landTitle = () => {
@@ -835,30 +838,31 @@ const ClarityExperience = {
       };
       tick();
     };
-    const startTyping = () => { if (typing || done) return; typing = true; typeLine(0); };
+    const startTyping = () => { if (typing || done) return; typing = true; reveal(); typeLine(0); };
+    const fillAll = () => { done = true; reveal(); lines.forEach((l) => { l.innerHTML = l.dataset.full || ''; }); };
     // A tap BEFORE typing starts snaps the title home and begins the typewriter immediately
     // (so an early tap can never make you miss it); a tap DURING typing fills everything.
     this._heroSkip = () => {
       if (done) return;
       if (!typing) { landTitle(); startTyping(); return; }
-      done = true; lines.forEach((l) => { l.innerHTML = l.dataset.full || ''; });
+      fillAll();
     };
     hero.addEventListener('click', () => { if (this._heroSkip) this._heroSkip(); });
-    if (reduced) { if (title) title.style.opacity = '1'; done = true; lines.forEach((l) => { l.innerHTML = l.dataset.full || ''; }); return; }
+    if (reduced) { if (title) title.style.opacity = '1'; fillAll(); return; }
     if (!title) { this._setTimeout(startTyping, 250); return; }
-    // Measure the title's resting spot, then pop it in (sharp, full opacity) at screen centre.
+    // Measure the title's resting spot, then pop it in (sharp, full opacity) big at screen centre.
     const r = title.getBoundingClientRect();
     const dx = (window.innerWidth / 2) - (r.left + r.width / 2);
     const dy = (window.innerHeight / 2) - (r.top + r.height / 2);
     title.style.willChange = 'transform';
     title.style.transformOrigin = 'center center';
     title.style.transition = 'none';
-    title.style.transform = `translate(${dx}px, ${dy}px) scale(1.06)`;
+    title.style.transform = `translate(${dx}px, ${dy}px) scale(1.14)`;
     title.style.opacity = '1';
     void title.offsetWidth;
-    // hold centred, then rise to the top-left resting spot, then type.
-    this._setTimeout(() => { if (done || typing) return; title.style.transition = 'transform 0.85s cubic-bezier(0.16,1,0.3,1)'; title.style.transform = 'translate(0px, 0px) scale(1)'; }, 550);
-    this._setTimeout(() => { if (done || typing) return; landTitle(); startTyping(); }, 1450);
+    // hold centred, then glide to the top-left resting spot, then type.
+    this._setTimeout(() => { if (done || typing) return; title.style.transition = 'transform 0.95s cubic-bezier(0.16,1,0.3,1)'; title.style.transform = 'translate(0px, 0px) scale(1)'; }, 650);
+    this._setTimeout(() => { if (done || typing) return; landTitle(); startTyping(); }, 1650);
   },
 
   renderPage(index) {
