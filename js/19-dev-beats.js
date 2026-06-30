@@ -49,7 +49,10 @@
     try {
       WelcomeIntro._showSolution(0, beat);
       var wi = document.querySelector('.welcome-intro');
-      if (wi) { wi.style.display = 'flex'; wi.style.zIndex = '9000'; wi.classList.remove('hidden'); }
+      // Use the welcome-intro's natural z-index (210) so the dev preview layers exactly like
+      // production. Forcing a huge z-index (9000) buried the appearance picker (z 340) that
+      // opens on Enter Memento, making the finish look broken in the dev tool only.
+      if (wi) { wi.style.display = 'flex'; wi.style.zIndex = ''; wi.classList.remove('hidden'); }
       hideClutter();
     } catch (e) {}
   }
