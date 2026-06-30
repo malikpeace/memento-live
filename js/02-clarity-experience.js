@@ -895,7 +895,7 @@ const ClarityExperience = {
       {
         _hero: true,
         heroTitle: 'How to achieve<br>literally anything',
-        heroSub: "You could study the most successful people alive, watch a hundred videos, read a thousand books, and learn from every kind of person across every walk of life, and you'd get a thousand different answers.<br><br>But underneath all of them is the same thing: <strong style=\"color:rgba(var(--ink),1)\">consistent focus, on one direction, over a long period of time.</strong><br><br>It is true in every real story and every fictional one. And it always begins the same way, by getting clear on a single goal and becoming obsessively attached to it."
+        heroSub: "You could study the most successful people alive, watch a hundred videos, read a thousand books, and learn from every kind of person across every walk of life, and you'd get a thousand different answers.<br><br>But the common denominator between all of them is the same thing: <strong style=\"color:rgba(var(--ink),1)\">consistent focus, on one direction, over a long period of time.</strong><br><br>The very very first step, before you even start, is to find a mission you care about above all else, one you're willing to commit to and suffer for. Once you find a mission you can obsess over, where not achieving it would feel like a piece of your life is missing, that's when everything changes. Focus stops being a fight, and moving toward it becomes automatic."
       },
       // Page 1  - Scale intro (tilted left, distractions heavy)
       {
