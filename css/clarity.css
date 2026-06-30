@@ -864,10 +864,10 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
   animation: clarityIntroLine 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
 }
 .clarity-tut-hero__sub {
-  font-size: 1.05rem;
-  line-height: 1.6;
-  color: rgba(var(--ink), 0.7);
-  max-width: 400px;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: rgba(var(--ink), 0.72);
+  max-width: 460px;
   opacity: 0;
   animation: clarityIntroLine 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.7s forwards;
 }

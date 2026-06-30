@@ -894,7 +894,7 @@ const ClarityExperience = {
       {
         _hero: true,
         heroTitle: 'How to achieve<br>literally anything',
-        heroSub: "It's not motivation. It's not discipline. It all comes down to one thing almost everyone gets wrong, and once you see it, you can't unsee it."
+        heroSub: "You could study the most successful people alive, watch a hundred videos, read a thousand books, and learn from every kind of person across every walk of life, and you'd get a thousand different answers.<br><br>But underneath all of them is the same thing: <strong style=\"color:rgba(var(--ink),1)\">consistent focus, on one direction, over a long period of time.</strong><br><br>It is true in every real story and every fictional one. And it always begins the same way, by getting clear on a single goal and becoming obsessively attached to it."
       },
       // Page 1  - Scale intro (tilted left, distractions heavy)
       {
