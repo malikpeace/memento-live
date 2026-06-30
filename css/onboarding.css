@@ -1811,6 +1811,18 @@ body.lite .welcome-intro__rays { opacity: 0.6; filter: none; }
 .wi-pcard__spill { position: absolute; inset: -22%; z-index: 0; opacity: 0; pointer-events: none; filter: blur(48px) saturate(1.5); background: radial-gradient(58% 58% at 26% 22%, rgba(150,116,255,0.92), transparent 70%), radial-gradient(58% 58% at 76% 80%, rgba(56,236,150,0.85), transparent 70%); transition: opacity 2.4s ease; }
 .wi-pcard-stage.evolved .wi-pcard__spill { opacity: 0.78; }
 .wi-pcard-stage.evolved .wi-pcard__glow.on { opacity: 0.96; }
+/* The opal level: the final tap blooms rare sparks of new colour (blue, orange, red, teal)
+   over the three pillars, so the card shimmers like a rare opal. Subtle, feathered, drifting. */
+.wi-pcard__opal { position: absolute; inset: 0; z-index: 1; opacity: 0; pointer-events: none; mix-blend-mode: screen; filter: blur(15px) saturate(1.45); transition: opacity 2.4s ease; will-change: transform;
+  background:
+    radial-gradient(24% 20% at 22% 30%, rgba(96,156,255,0.6), transparent 70%),
+    radial-gradient(22% 19% at 78% 36%, rgba(255,152,64,0.52), transparent 70%),
+    radial-gradient(20% 18% at 66% 76%, rgba(255,86,96,0.48), transparent 70%),
+    radial-gradient(18% 16% at 33% 72%, rgba(122,255,214,0.42), transparent 70%); }
+.wi-pcard-stage.opal .wi-pcard__opal { opacity: 0.66; animation: wiOpalDrift 16s ease-in-out infinite; }
+.wi-pcard-stage.opal .wi-pcard__spill { background: radial-gradient(56% 56% at 24% 22%, rgba(150,116,255,0.85), transparent 70%), radial-gradient(50% 50% at 80% 40%, rgba(255,150,70,0.42), transparent 72%), radial-gradient(56% 56% at 72% 82%, rgba(56,236,150,0.78), transparent 70%), radial-gradient(46% 46% at 30% 80%, rgba(96,156,255,0.45), transparent 72%); }
+@keyframes wiOpalDrift { 0%,100% { transform: translate(-2%,-1%) scale(1); } 50% { transform: translate(3%,2%) scale(1.06); } }
+@media (prefers-reduced-motion: reduce) { .wi-pcard-stage.opal .wi-pcard__opal { animation: none !important; } }
 .wi-pcard-stage.evolved .wi-pcard__glow--a.on { opacity: 1; }
 .wi-prev__hint { display: block; margin-top: -8px; font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(236,238,250,0.38); transition: opacity 0.4s ease; }
 /* Cinematic arrival: the card rises out of a soft blur and settles into focus, the title

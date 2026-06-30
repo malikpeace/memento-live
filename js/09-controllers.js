@@ -2136,8 +2136,13 @@ const WelcomeIntro = {
       if (ent) ent.addEventListener('click', advance);
     }
     // "Meet Your Memento": kick off the captioned card-comes-alive reveal. The last
-    // tap (once the reveal is done) advances forward, since there is no Build button.
-    if (kind === 'preview') { this._prevForward = () => go(beatIdx + 1); this._runPreviewReveal(); }
+    // tap (once the reveal is done) FINISHES onboarding, it must never fall back into
+    // the identity questions. Preview is always the terminal beat (it runs after the
+    // summaryStepper, the last identity step), so finishing here is always correct.
+    if (kind === 'preview') {
+      this._prevForward = () => { try { this.el.classList.remove('welcome-intro--cine', 'welcome-intro--preenter'); } catch (e) {} this._finishWithName(); };
+      this._runPreviewReveal();
+    }
 
     // touch swipe: left advances, right goes back
     try {
@@ -2526,6 +2531,7 @@ const WelcomeIntro = {
       +     '<span class="wi-pcard__glow wi-pcard__glow--c"></span>'
       +     '<span class="wi-pcard__glow wi-pcard__glow--a"></span>'
       +     '<span class="wi-pcard__glow wi-pcard__glow--k"></span>'
+      +     '<span class="wi-pcard__opal"></span>'
       +     '<svg class="wi-pcard__emblem" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>'
       +   '</div>'
       + '</div>'
@@ -2553,7 +2559,8 @@ const WelcomeIntro = {
       { glow: 'c', text: 'Find clarity, and your Memento glows.' },
       { glow: 'a', text: 'Take focused action, and evolve further.' },
       { glow: 'k', text: 'Stay consistent, and it comes alive.' },
-      { glow: null, evolve: true, text: 'The more you evolve, the more it evolves.' }
+      { glow: null, evolve: true, text: 'The more you evolve, the more it evolves.' },
+      { glow: null, opal: true, text: 'Keep going, and it becomes one of a kind.' }
     ];
     if (this._prevStep == null) this._prevStep = 0;
     // Reveal already finished: this tap proceeds out of the page (no Build button).
@@ -2562,9 +2569,11 @@ const WelcomeIntro = {
     this._prevStep++;
     // The card grows a touch each tap, as if it's coming closer the more you build it.
     const card = wrap.querySelector('.wi-pcard');
-    if (card) card.style.transform = 'scale(' + (1 + Math.min(this._prevStep, 5) * 0.03).toFixed(3) + ')';
+    if (card) card.style.transform = 'scale(' + (1 + Math.min(this._prevStep, 6) * 0.03).toFixed(3) + ')';
     if (s.glow) { const g = wrap.querySelector('.wi-pcard__glow--' + s.glow); if (g) g.classList.add('on'); }
     if (s.evolve) { const stage = wrap.querySelector('.wi-pcard-stage'); if (stage) stage.classList.add('evolved'); }
+    // The opal level: rarer sparks of blue / orange / red bloom in over the pillars.
+    if (s.opal) { const stage = wrap.querySelector('.wi-pcard-stage'); if (stage) stage.classList.add('opal'); }
     const title = wrap.querySelector('.wi-prev__title');
     if (title) { title.style.opacity = '0'; setTimeout(() => { const t = wrap.querySelector('.wi-prev__title'); if (t) { t.textContent = s.text; t.style.opacity = '1'; } }, 320); }
     const hint = wrap.querySelector('.wi-prev__hint');
