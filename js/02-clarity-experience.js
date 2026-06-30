@@ -804,14 +804,13 @@ const ClarityExperience = {
     renderAll();
   },
 
-  // The "How to achieve anything" hero animates like the Clarity title: the headline pops in
-  // centered + blurry, comes into focus, then flies up to its top-left spot, and only then do
-  // the lines type in char-by-char. A tap fills everything.
+  // The "How to achieve anything" hero: the headline just APPEARS (no centre-blur-fly-in, that
+  // cinematic is a Clarity-title-only signature). The body lines still type in char-by-char.
+  // A tap fills everything instantly.
   _runHeroIntro() {
     const hero = this.pageWrap && this.pageWrap.querySelector('.clarity-tut-hero');
     if (!hero || hero.dataset.introRan) return;
     hero.dataset.introRan = '1';
-    const title = hero.querySelector('.clarity-tut-hero__title-in');
     const lines = [...hero.querySelectorAll('.clarity-tut-hero__line')];
     const reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
     // Reserve each line's height, stash its HTML + plain text, then clear it for the typewriter.
@@ -819,43 +818,23 @@ const ClarityExperience = {
     let done = false;
     this._heroSkip = () => {
       if (done) return; done = true;
-      if (title) { title.style.transition = 'none'; title.style.transform = ''; title.style.filter = ''; title.style.opacity = '1'; }
       lines.forEach((l) => { l.innerHTML = l.dataset.full || ''; });
     };
     hero.addEventListener('click', () => { if (this._heroSkip) this._heroSkip(); });
-    if (reduced) { if (title) title.style.opacity = '1'; this._heroSkip(); return; }
-    const typeAll = () => {
+    if (reduced) { this._heroSkip(); return; }
+    const typeLine = (idx) => {
       if (done) return;
-      const typeLine = (idx) => {
+      if (idx >= lines.length) { done = true; return; }
+      const el = lines[idx]; const plain = el.dataset.plain || ''; const full = el.dataset.full || ''; let i = 0;
+      const tick = () => {
         if (done) return;
-        if (idx >= lines.length) { done = true; return; }
-        const el = lines[idx]; const plain = el.dataset.plain || ''; const full = el.dataset.full || ''; let i = 0;
-        const tick = () => {
-          if (done) return;
-          el.textContent = plain.slice(0, i); i++;
-          if (i <= plain.length) this._setTimeout(tick, 9 + Math.random() * 8);
-          else { el.innerHTML = full; this._setTimeout(() => typeLine(idx + 1), 650); }
-        };
-        tick();
+        el.textContent = plain.slice(0, i); i++;
+        if (i <= plain.length) this._setTimeout(tick, 9 + Math.random() * 8);
+        else { el.innerHTML = full; this._setTimeout(() => typeLine(idx + 1), 650); }
       };
-      typeLine(0);
+      tick();
     };
-    if (!title) { typeAll(); return; }
-    const r = title.getBoundingClientRect();
-    const dx = (window.innerWidth / 2) - (r.left + r.width / 2);
-    const dy = (window.innerHeight / 2) - (r.top + r.height / 2);
-    title.style.willChange = 'transform, filter, opacity';
-    title.style.transformOrigin = 'center center';
-    title.style.transition = 'none';
-    title.style.opacity = '0';
-    title.style.filter = 'blur(14px)';
-    title.style.transform = `translate(${dx}px, ${dy}px) scale(1.02)`;
-    void title.offsetWidth;
-    // fade in (hold blur), focus, hold, fly to top-left, type.
-    this._setTimeout(() => { if (done) return; title.style.transition = 'opacity 0.6s ease, transform 1.5s cubic-bezier(0.16,1,0.3,1)'; title.style.opacity = '1'; title.style.transform = `translate(${dx}px, ${dy}px) scale(1.05)`; }, 60);
-    this._setTimeout(() => { if (done) return; title.style.transition = 'filter 0.9s ease, transform 0.9s cubic-bezier(0.16,1,0.3,1)'; title.style.filter = 'blur(0px)'; title.style.transform = `translate(${dx}px, ${dy}px) scale(1.08)`; }, 1050);
-    this._setTimeout(() => { if (done) return; title.style.transition = 'transform 0.85s cubic-bezier(0.16,1,0.3,1)'; title.style.transform = 'translate(0px, 0px) scale(1)'; }, 2700);
-    this._setTimeout(() => { if (done) return; title.style.transition = ''; title.style.transform = ''; title.style.filter = ''; title.style.transformOrigin = ''; title.style.willChange = ''; typeAll(); }, 3650);
+    this._setTimeout(() => typeLine(0), 450);
   },
 
   renderPage(index) {
@@ -962,8 +941,8 @@ const ClarityExperience = {
             <div class="gs__weight gs__weight--purple" style="position:absolute;bottom:6px;right:-2px;"></div>
           </div>
         </div>`,
-        headline: 'Think of your focus like a scale',
-        sub: 'Your brain is always going to automatically default and go towards the heaviest side. For most people, it\'s distractions. They are the heaviest and easiest to access weights on the left side. This causes the scale to be off balance and stops your brain from automatically focusing on the other side. We need to fix this.'
+        headline: 'Think of Your Focus like a Scale',
+        sub: "At all times, there's an invisible scale guiding your attention.<br><br>Your brain will always default to the heavier side automatically, unless actively fought (more on that in a second).<br><br>For most people, the heaviest side is distractions, typically instant gratification activities. They're the heaviest and easiest weights to reach for, which throws the scale off balance, automatically draws your attention toward them, and makes it difficult for your brain to focus on the other side. We need to fix this."
       },
       // Page 2  - Willpower doesn't work long term
       {

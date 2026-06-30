@@ -862,8 +862,7 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
   color: rgba(var(--ink), 1);
   text-align: left;
 }
-/* the word is its own inline element so the JS centre->top-left fly-in moves the TEXT */
-.clarity-tut-hero__title-in { display: inline-block; opacity: 0; }
+.clarity-tut-hero__title-in { display: inline-block; }
 .clarity-tut-hero__lines {
   display: flex;
   flex-direction: column;
