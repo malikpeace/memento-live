@@ -2866,10 +2866,20 @@ const WelcomeIntro = {
       // keep one rAF alive so it resumes on return. No-op while visible.
       if (document.hidden) { requestAnimationFrame(tick); return; }
       ctx.clearRect(0, 0, W, H);
+      // The confetti lands + bounces off the Continue button below, so it reads as a solid object.
+      const _btn = document.getElementById('identityNext');
+      const _br = _btn ? _btn.getBoundingClientRect() : null;
       for (const p of parts) {
         if (p.life > p.max) continue;
         p.life++;
         p.vy += p.g; p.x += p.vx; p.y += p.vy; p.vx *= 0.992; p.rot += p.vr;
+        // Bounce off the button's top edge: only when falling, near the top, within its width.
+        if (_br && p.vy > 0) {
+          const half = p.size * 0.5;
+          if (p.y + half >= _br.top && p.y - half <= _br.top + 18 && p.x >= _br.left - half && p.x <= _br.right + half) {
+            p.y = _br.top - half; p.vy = -p.vy * 0.45; p.vx += (Math.random() - 0.5) * 1.4; p.vr += (Math.random() - 0.5) * 0.12;
+          }
+        }
         ctx.globalAlpha = Math.max(0, 1 - p.life / p.max);
         ctx.fillStyle = p.color;
         ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
