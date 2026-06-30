@@ -585,7 +585,7 @@ const ClarityExperience = {
           if (done) return;
           el.textContent = full.slice(0, i); i++;
           if (i <= full.length) this._setTimeout(tick, 11 + Math.random() * 9);
-          else this._setTimeout(() => typeLine(idx + 1), 400);
+          else this._setTimeout(() => typeLine(idx + 1), 900);
         };
         tick();
       };

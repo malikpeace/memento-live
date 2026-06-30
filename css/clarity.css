@@ -817,13 +817,13 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
 .clarity-intro__line {
   font-size: 1rem;
   line-height: 1.65;
-  color: rgba(var(--ink),0.62);
+  color: rgba(var(--ink), 1);
   text-align: left;
 }
-.clarity-intro__line--3 { color: rgba(var(--ink),0.9); font-weight: 600; }
-.clarity-intro__line--4 { font-size: var(--fs-base); color: rgba(var(--ink),0.5); }
-.clarity-intro__line--5 { font-size: var(--fs-base); color: rgba(var(--ink),0.7); }
-.clarity-intro__line--6 { font-size: var(--fs-sm); color: rgba(var(--ink),0.38); font-style: italic; }
+.clarity-intro__line--3 { font-weight: 700; }
+.clarity-intro__line--4 { font-size: var(--fs-base); }
+.clarity-intro__line--5 { font-size: var(--fs-base); }
+.clarity-intro__line--6 { font-size: var(--fs-sm); font-style: italic; }
 .clarity-intro__btn {
   width: 100%;
   max-width: 400px;
