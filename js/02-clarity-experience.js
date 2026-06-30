@@ -883,9 +883,9 @@ const ClarityExperience = {
     title.style.transform = `translate(${dx}px, ${dy}px) scale(1.14)`;
     title.style.opacity = '1';
     void title.offsetWidth;
-    // hold centred, then glide to the top-left resting spot, then type.
-    this._setTimeout(() => { if (done || typing) return; title.style.transition = 'transform 0.95s cubic-bezier(0.16,1,0.3,1)'; title.style.transform = 'translate(0px, 0px) scale(1)'; }, 650);
-    this._setTimeout(() => { if (done || typing) return; landTitle(); startTyping(); }, 1650);
+    // hold centred for ~1s so the headline sits on screen, then glide to the top-left spot, then type.
+    this._setTimeout(() => { if (done || typing) return; title.style.transition = 'transform 0.95s cubic-bezier(0.16,1,0.3,1)'; title.style.transform = 'translate(0px, 0px) scale(1)'; }, 1500);
+    this._setTimeout(() => { if (done || typing) return; landTitle(); startTyping(); }, 2550);
   },
 
   renderPage(index) {
@@ -981,7 +981,7 @@ const ClarityExperience = {
       {
         _hero: true,
         heroTitle: 'How to achieve<br>literally anything',
-        heroSub: "You could study the most successful people alive, watch a hundred videos, read a thousand books, and learn from every kind of person across every walk of life, and you'd get a thousand different answers.<br><br>But the common denominator between all of them is the same thing: <strong style=\"color:rgba(var(--ink),1)\">consistent focus, on one direction, over a long period of time.</strong><br><br>The very very first step, before you even start, is to find a mission you care about above all else, one you're willing to commit to and suffer for. Once you find a mission you can obsess over, where not achieving it would feel like a piece of your life is missing, that's when everything changes. Focus stops being a fight, and moving toward it becomes automatic."
+        heroSub: "If you study the most successful people alive, read hundreds of books, watch thousands of videos, learn from every kind of person across every walk of life, and you'd get a thousand different answers on how to do it.<br><br>But the common denominator between all of them is the same thing: <strong style=\"color:rgba(var(--ink),1)\">consistent focus, on one direction, over a long period of time.</strong><br><br>The very very first step, before you even start, is to find a mission you care about above all else, one you're willing to commit to and suffer for. Once you find a mission you can obsess over, where not achieving it would feel like a piece of your life is missing, that's when everything changes. Focus stops being a fight, and moving toward it becomes automatic."
       },
       // Page 1  - Scale intro (tilted left, distractions heavy)
       {
