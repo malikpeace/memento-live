@@ -887,21 +887,14 @@ const ClarityExperience = {
 
   renderTutorialPage(index) {
     const pages = [
-      // Page 0  - The hook
+      // Page 0  - The hook: a bold promise that frames the whole module as THE method.
+      // (Replaced the old "Step 1: Know what you want and why" page, which just repeated
+      // the intro. That thesis is now the earned payoff at the end, via the Solution +
+      // Neutron Star pages.)
       {
-        illust: `<svg class="tut-path-svg" viewBox="0 0 140 140">
-          <path class="tut-path-line" d="M20 120 C30 100, 50 110, 55 90 C60 70, 40 65, 50 50 C60 35, 80 45, 85 30 C90 15, 110 25, 120 20"/>
-          <g class="tut-path-pin">
-            <circle cx="20" cy="120" r="6" fill="rgba(123,97,255,0.3)"/>
-            <circle cx="20" cy="120" r="3" fill="var(--color-clarity)"/>
-          </g>
-          <g class="tut-path-x">
-            <line x1="112" y1="12" x2="128" y2="28" stroke="rgba(var(--ink),0.7)" stroke-width="2" stroke-linecap="round"/>
-            <line x1="128" y1="12" x2="112" y2="28" stroke="rgba(var(--ink),0.7)" stroke-width="2" stroke-linecap="round"/>
-          </g>
-        </svg>`,
-        headline: 'Step 1: Know WHAT you want and WHY',
-        sub: 'Most people never achieve their goals because they first off, don\'t truly know what they want. And worse <strong style="color:rgba(var(--ink),0.75)">why</strong> they want what they want. Causing a disconnect between their goal and their brain.'
+        _hero: true,
+        heroTitle: 'How to achieve<br>literally anything',
+        heroSub: "It's not motivation. It's not discipline. It all comes down to one thing almost everyone gets wrong, and once you see it, you can't unsee it."
       },
       // Page 1  - Scale intro (tilted left, distractions heavy)
       {
@@ -976,6 +969,15 @@ const ClarityExperience = {
             Most of us spend our younger years gaming, scrolling, distracted, doing things for other people but not for ourselves. Out of our entire lives, we might have genuinely thought about our own direction for maybe five minutes total. Which is really scary if you think about it.<br><br>
             If you never focus inward on yourself, how can you expect to improve yourself? So if you can, seriously take the time to think about it for a minute.
           </div>
+        </div>
+      </div>`;
+    }
+
+    if (p._hero) {
+      return `<div class="clarity-exp__page-inner">
+        <div class="clarity-exp__tut clarity-tut-hero">
+          <div class="clarity-tut-hero__title">${p.heroTitle}</div>
+          <div class="clarity-tut-hero__sub">${p.heroSub}</div>
         </div>
       </div>`;
     }

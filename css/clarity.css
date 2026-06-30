@@ -841,6 +841,36 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
 }
 .clarity-intro__btn:hover { transform: scale(1.02); }
 .clarity-intro__btn:active { transform: scale(0.97); }
+
+/* Tutorial hero page: the big centered "How to achieve anything" promise that opens the
+   teaching slides. Title rises in, then the sub. */
+.clarity-tut-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 56vh;
+  gap: 22px;
+  padding: 0 8px;
+}
+.clarity-tut-hero__title {
+  font-size: clamp(2.1rem, 9vw, 3.3rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.06;
+  color: rgba(var(--ink), 1);
+  opacity: 0;
+  animation: clarityIntroLine 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+}
+.clarity-tut-hero__sub {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: rgba(var(--ink), 0.7);
+  max-width: 400px;
+  opacity: 0;
+  animation: clarityIntroLine 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.7s forwards;
+}
 .clarity-intro__btn-pill {
   transition: transform var(--t-base) cubic-bezier(0.16, 1, 0.3, 1);
 }
