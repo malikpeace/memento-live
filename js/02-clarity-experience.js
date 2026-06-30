@@ -814,8 +814,17 @@ const ClarityExperience = {
     const title = hero.querySelector('.clarity-tut-hero__title-in');
     const lines = [...hero.querySelectorAll('.clarity-tut-hero__line')];
     const reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-    // Reserve each line's height, stash its HTML + plain text, then clear it for the typewriter.
-    lines.forEach((l) => { l.dataset.full = l.innerHTML; l.dataset.plain = l.textContent || ''; l.style.minHeight = l.offsetHeight + 'px'; l.textContent = ''; });
+    // Capture each line's inline structure (text runs + bold spans WITH their attrs) so the
+    // typewriter can reveal characters with their formatting already applied, then reserve the
+    // height and clear it. Stashing segments (not just plain text) is what keeps the bold part
+    // bold AS it types, instead of typing plain then snapping to bold at the end.
+    lines.forEach((l) => {
+      l.__segs = [...l.childNodes].map((node) => ({ el: node.nodeType === 1 ? node.cloneNode(false) : null, text: node.textContent || '' }));
+      l.__len = l.__segs.reduce((a, s) => a + s.text.length, 0);
+      l.dataset.full = l.innerHTML;
+      l.style.minHeight = l.offsetHeight + 'px';
+      l.textContent = '';
+    });
     // Lines start hidden (CSS opacity:0) so the full text never flashes. reveal() makes the
     // (still-empty) lines paintable right as the typewriter begins.
     const reveal = () => { lines.forEach((l) => { l.style.opacity = '1'; }); };
@@ -829,12 +838,26 @@ const ClarityExperience = {
     const typeLine = (idx) => {
       if (done) return;
       if (idx >= lines.length) { done = true; return; }
-      const el = lines[idx]; const plain = el.dataset.plain || ''; const full = el.dataset.full || ''; let i = 0;
+      const el = lines[idx]; const segs = el.__segs || []; const len = el.__len || 0; let i = 0;
+      // Rebuild the line revealing the first n chars, keeping bold runs in their own (cloned)
+      // element so the bold shows up already bold as it types.
+      const renderUpto = (n) => {
+        el.textContent = '';
+        let rem = n;
+        for (const s of segs) {
+          if (rem <= 0) break;
+          const take = Math.min(rem, s.text.length);
+          const slice = s.text.slice(0, take);
+          if (s.el) { const c = s.el.cloneNode(false); c.textContent = slice; el.appendChild(c); }
+          else { el.appendChild(document.createTextNode(slice)); }
+          rem -= take;
+        }
+      };
       const tick = () => {
         if (done) return;
-        el.textContent = plain.slice(0, i); i++;
-        if (i <= plain.length) this._setTimeout(tick, 11 + Math.random() * 9);
-        else { el.innerHTML = full; this._setTimeout(() => typeLine(idx + 1), 650); }
+        renderUpto(i); i++;
+        if (i <= len) this._setTimeout(tick, 11 + Math.random() * 9);
+        else { el.innerHTML = el.dataset.full || ''; this._setTimeout(() => typeLine(idx + 1), 650); }
       };
       tick();
     };
