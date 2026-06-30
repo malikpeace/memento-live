@@ -618,18 +618,18 @@ const ClarityExperience = {
       title.style.filter = 'blur(0px)';
       title.style.transform = `translate(${dx}px, ${dy}px) scale(1.5)`;
     }, 1150);
-    // Phase 2: after it has settled in focus, fly up to the top-left spot.
+    // Phase 2: HOLD on the focused, centered word for ~2s, then fly up to the top-left spot.
     this._setTimeout(() => {
       if (done) return;
       title.style.transition = 'transform 0.85s cubic-bezier(0.16,1,0.3,1)';
       title.style.transform = 'translate(0px, 0px) scale(1)';
-    }, 2350);
+    }, 4150);
     // Phase 3: it has landed, clean up and start the text.
     this._setTimeout(() => {
       if (done) return;
       title.style.transition = ''; title.style.transform = ''; title.style.filter = ''; title.style.transformOrigin = ''; title.style.willChange = '';
       typeAll();
-    }, 3300);
+    }, 5100);
   },
 
   _cinematicOpen() {
