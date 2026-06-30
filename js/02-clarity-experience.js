@@ -505,42 +505,39 @@ const ClarityExperience = {
     }
     this._setLight(0.06); // a whisper of light before the journey starts
     this.pageWrap.innerHTML = `<div class="clarity-intro" id="clarityIntro">
-      <div class="clarity-intro__title">Clarity</div>
-      <div class="clarity-intro__lines">
-        <div class="clarity-intro__line clarity-intro__line--1">The first step to accomplishing anything is to first get clear on what it is you want and why. Most people never do this.</div>
-        <div class="clarity-intro__line clarity-intro__line--2">They drift. They guess. They settle for wherever life moves them and accept a mediocre existence.</div>
-        <div class="clarity-intro__line clarity-intro__line--3">This module exists to make sure that's not you.</div>
-        <div class="clarity-intro__line clarity-intro__line--4">Over the next few minutes, you'll move through a system designed to uncover your real desires so you know what it is you truly want more than anything else.</div>
-        <div class="clarity-intro__line clarity-intro__line--5">Be as honest as possible. I recommend cutting out a part of your day, sitting down alone, maybe with a calm playlist for the best results.</div>      </div>
-      <div class="clarity-intro__btn-pill" id="clarityIntroPill">
+      <div class="clarity-intro__body">
+        <div class="clarity-intro__title">Clarity</div>
+        <div class="clarity-intro__lines">
+          <div class="clarity-intro__line clarity-intro__line--1">The first step to accomplishing anything is to first get clear on what it is you want and why. Most people never do this.</div>
+          <div class="clarity-intro__line clarity-intro__line--2">They drift. They guess. They settle for wherever life moves them and accept a mediocre existence.</div>
+          <div class="clarity-intro__line clarity-intro__line--3">This module exists to make sure that's not you.</div>
+          <div class="clarity-intro__line clarity-intro__line--4">Over the next few minutes, you'll move through a system designed to uncover your real desires so you know what it is you truly want more than anything else.</div>
+          <div class="clarity-intro__line clarity-intro__line--5">Be as honest as possible. I recommend cutting out a part of your day, sitting down alone, maybe with a calm playlist for the best results.</div>
+        </div>
+      </div>
+      <div class="clarity-intro__foot" id="clarityIntroFoot">
         <button class="clarity-intro__btn" id="clarityIntroBtn">Let's Begin</button>
       </div>
     </div>`;
     this.navEl.innerHTML = '';
     this.el.classList.add('open-content');
 
-    // Tap-to-skip: clicking/tapping anywhere on the intro (except the Begin
-    // button) before animations finish snaps all lines + Begin to fully
-    // visible. Listens on BOTH pointerdown and click so mobile Safari fires
-    // immediately on touch (it can swallow click events on plain div
-    // containers without explicit interactive affordances).
+    // The lines type in one by one (typewriter, like onboarding). Tapping anywhere
+    // (except the Begin button) snaps everything to fully typed + reveals the button.
+    // Listen on BOTH pointerdown and click so mobile Safari fires immediately on touch.
     const introEl = document.getElementById('clarityIntro');
     const skipIntro = (e) => {
-      if (introEl.classList.contains('clarity-intro--skipped')) return;
       if (e.target.closest && e.target.closest('#clarityIntroBtn')) return;
-      introEl.classList.add('clarity-intro--skipped');
+      if (this._claritySkipType) this._claritySkipType();
     };
     introEl.addEventListener('pointerdown', skipIntro);
     introEl.addEventListener('click', skipIntro);
-    // Also bind on the scrollable parent so taps inside the padding area count.
     const wrap = document.getElementById('clarityExpPageWrap');
     if (wrap) {
       const skipFromWrap = (e) => {
-        if (introEl.classList.contains('clarity-intro--skipped')) return;
         if (e.target.closest && e.target.closest('#clarityIntroBtn')) return;
-        // Only skip if the tap originated inside the intro experience.
         if (!e.target.closest || !e.target.closest('#clarityIntro')) return;
-        introEl.classList.add('clarity-intro--skipped');
+        if (this._claritySkipType) this._claritySkipType();
       };
       wrap.addEventListener('pointerdown', skipFromWrap);
     }
@@ -550,6 +547,40 @@ const ClarityExperience = {
       intro.classList.add('clarity-intro--exit');
       this._setTimeout(() => { if (this.isOpen) this._openContent(); }, 400);
     });
+
+    this._typeClarityIntro();
+  },
+
+  // Types the Clarity intro lines char-by-char (onboarding-style), then reveals the
+  // bottom Begin button. _claritySkipType fills everything instantly on a tap.
+  _typeClarityIntro() {
+    const intro = document.getElementById('clarityIntro');
+    if (!intro) return;
+    const lines = [...intro.querySelectorAll('.clarity-intro__line')];
+    const foot = document.getElementById('clarityIntroFoot');
+    const reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    // Reserve each line's final wrapped height up front so the stack never jumps as it types.
+    lines.forEach((l) => { l.dataset.full = l.textContent; l.style.minHeight = l.offsetHeight + 'px'; l.textContent = ''; });
+    let done = false;
+    this._claritySkipType = () => {
+      if (done) return; done = true;
+      lines.forEach((l) => { l.textContent = l.dataset.full || ''; });
+      if (foot) foot.classList.add('show');
+    };
+    if (reduced) { this._claritySkipType(); return; }
+    const typeLine = (idx) => {
+      if (done) return;
+      if (idx >= lines.length) { done = true; if (foot) foot.classList.add('show'); return; }
+      const el = lines[idx]; const full = el.dataset.full || ''; let i = 0;
+      const tick = () => {
+        if (done) return;
+        el.textContent = full.slice(0, i); i++;
+        if (i <= full.length) this._setTimeout(tick, 11 + Math.random() * 9);
+        else this._setTimeout(() => typeLine(idx + 1), 400);
+      };
+      tick();
+    };
+    this._setTimeout(() => typeLine(0), 650);
   },
 
   _cinematicOpen() {
