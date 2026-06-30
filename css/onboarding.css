@@ -1788,13 +1788,15 @@ body.lite .welcome-intro__rays { opacity: 0.6; filter: none; }
    opacity, and each blob's bright core sits off-centre so the emblem stays crisp in the middle. */
 .wi-pcard__glow { position: absolute; border-radius: 50%; filter: blur(26px) saturate(1.5); opacity: 0; mix-blend-mode: screen; transition: opacity 1.8s ease; will-change: transform; }
 .wi-pcard__glow.on { opacity: 0.82; }
-.wi-pcard__glow--c { width: 100%; height: 72%; left: -18%; top: -18%; background: radial-gradient(circle, rgba(150,116,255,1), transparent 66%); animation: wiAuroraC 19s ease-in-out infinite; }
-.wi-pcard__glow--a { width: 112%; height: 76%; right: -14%; top: 16%; background: radial-gradient(circle, rgba(250,251,255,1), transparent 66%); animation: wiAuroraA 22s ease-in-out infinite; }
+/* Orbs sit INSIDE the card (cores within the bounds, not pinned outside the corners) and
+   wander on wide, distinct paths so they cross the interior and overlap each other dynamically. */
+.wi-pcard__glow--c { width: 76%; height: 58%; left: 0%; top: 2%; background: radial-gradient(circle, rgba(150,116,255,1), transparent 64%); animation: wiAuroraC 15s ease-in-out infinite; }
+.wi-pcard__glow--a { width: 72%; height: 54%; left: 14%; top: 26%; background: radial-gradient(circle, rgba(250,251,255,1), transparent 62%); animation: wiAuroraA 18s ease-in-out infinite; }
 .wi-pcard__glow--a.on { opacity: 0.95; }
-.wi-pcard__glow--k { width: 104%; height: 72%; left: -14%; bottom: -20%; background: radial-gradient(circle, rgba(56,236,150,1), transparent 66%); animation: wiAuroraK 20s ease-in-out infinite; }
-@keyframes wiAuroraC { 0%,100% { transform: translate(-3%,-2%) scale(1); } 33% { transform: translate(4%,2%) scale(1.1); } 66% { transform: translate(-1%,5%) scale(1.04); } }
-@keyframes wiAuroraA { 0%,100% { transform: translate(4%,2%) scale(1.04); } 50% { transform: translate(-4%,-4%) scale(1.12); } }
-@keyframes wiAuroraK { 0%,100% { transform: translate(-3%,4%) scale(1); } 50% { transform: translate(5%,-2%) scale(1.1); } }
+.wi-pcard__glow--k { width: 78%; height: 60%; left: 0%; top: 40%; background: radial-gradient(circle, rgba(56,236,150,1), transparent 64%); animation: wiAuroraK 16.5s ease-in-out infinite; }
+@keyframes wiAuroraC { 0%,100% { transform: translate(-6%,-4%) scale(1); } 33% { transform: translate(30%,26%) scale(1.1); } 66% { transform: translate(10%,50%) scale(0.98); } }
+@keyframes wiAuroraA { 0%,100% { transform: translate(8%,8%) scale(1.04); } 33% { transform: translate(-24%,-12%) scale(1.14); } 66% { transform: translate(20%,-20%) scale(0.96); } }
+@keyframes wiAuroraK { 0%,100% { transform: translate(-4%,10%) scale(1); } 33% { transform: translate(26%,-26%) scale(1.12); } 66% { transform: translate(-20%,-6%) scale(1.05); } }
 @media (prefers-reduced-motion: reduce) { .wi-pcard__glow { animation: none !important; transform: none !important; } .wi-pcard__glow.on { opacity: 0.4; } .wi-pcard__glow--a.on { opacity: 0.26; } }
 .wi-pcard__emblem { width: 30%; position: relative; z-index: 2; filter: drop-shadow(0 1px 7px rgba(0,0,0,0.5)); }
 .wi-pcard__emblem path { fill: #fff; opacity: 0.96; }
