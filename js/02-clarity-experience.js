@@ -508,7 +508,8 @@ const ClarityExperience = {
       <div class="clarity-intro__body">
         <div class="clarity-intro__title"><span class="clarity-intro__title-in">Clarity</span></div>
         <div class="clarity-intro__lines">
-          <div class="clarity-intro__line clarity-intro__line--1">The first step to accomplishing anything is to first get clear on what it is you want and why. Most people never do this.</div>
+          <div class="clarity-intro__line clarity-intro__line--1">The first step to accomplishing anything is to first get clear on what it is you want and why.</div>
+          <div class="clarity-intro__line">Most people never do this.</div>
           <div class="clarity-intro__line clarity-intro__line--2">They drift. They guess. They settle for wherever life moves them and accept a mediocre existence.</div>
           <div class="clarity-intro__line clarity-intro__line--3">This module exists to make sure that's not you.</div>
           <div class="clarity-intro__line clarity-intro__line--4">Over the next few minutes, you'll move through a system designed to uncover your real desires so you know what it is you truly want more than anything else.</div>
