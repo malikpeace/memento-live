@@ -618,13 +618,13 @@ const ClarityExperience = {
       title.style.filter = 'blur(0px)';
       title.style.transform = `translate(${dx}px, ${dy}px) scale(1.5)`;
     }, 1150);
-    // Mid-hold flair: the word briefly shifts purple, then back, while it sits centered.
+    // Mid-hold flair: a quick ~0.25s purple FLASH while it sits centered, then back to white.
     this._setTimeout(() => {
       if (done) return;
-      title.style.transition = 'color 0.32s ease';
+      title.style.transition = 'color 0.1s ease';
       title.style.color = 'var(--color-clarity)';
-    }, 2800);
-    this._setTimeout(() => { if (done) return; title.style.color = ''; }, 3450);
+    }, 2900);
+    this._setTimeout(() => { if (done) return; title.style.color = ''; }, 3150);
     // Phase 2: HOLD on the focused, centered word for ~2s, then fly up to the top-left spot.
     this._setTimeout(() => {
       if (done) return;
