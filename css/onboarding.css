@@ -1672,7 +1672,7 @@ body.lite .wi-cine__beam { filter: blur(18px); }
 /* The signature top-left light: real god-ray shafts (not an orb). The base
    .ambient__rays-* child styles are global; this wrapper just makes them visible
    and sits them behind the text. Created once = constant across chapters. */
-.welcome-intro__rays { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; opacity: 0.95; transition: opacity 1.7s ease, filter 1.6s ease; transform-origin: 6% 4%; filter: brightness(calc(1.18 + var(--wi-beam-boost, 0))) saturate(calc(1 + var(--wi-beam-boost, 0) * 0.5)); animation: wiRaysDrift 22s ease-in-out infinite; }
+.welcome-intro__rays { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; opacity: 0.95; transition: opacity 2.6s ease-in-out, filter 2.6s ease-in-out; transform-origin: 6% 4%; filter: brightness(calc(1.18 + var(--wi-beam-boost, 0))) saturate(calc(1 + var(--wi-beam-boost, 0) * 0.5)); animation: wiRaysDrift 22s ease-in-out infinite; }
 /* Pre-Memento: the opening (stage) page is plain black, no beam, no wash. The
    top-left beam arrives on the "Enter Memento" beat, so the light literally comes
    in as they enter Memento. */
