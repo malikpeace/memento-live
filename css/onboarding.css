@@ -1810,7 +1810,6 @@ body.lite .welcome-intro__rays { opacity: 0.6; filter: none; }
    averaged into mud. Subtle, so it reads as the card quietly emitting light. */
 .wi-pcard__spill { position: absolute; inset: -22%; z-index: 0; opacity: 0; pointer-events: none; filter: blur(48px) saturate(1.5); background: radial-gradient(58% 58% at 26% 22%, rgba(150,116,255,0.92), transparent 70%), radial-gradient(58% 58% at 76% 80%, rgba(56,236,150,0.85), transparent 70%); transition: opacity 2.4s ease; }
 .wi-pcard-stage.evolved .wi-pcard__spill { opacity: 0.78; }
-.wi-pcard-stage.evolved .wi-pcard { -webkit-box-reflect: below 1px linear-gradient(rgba(0,0,0,0.42), transparent 52%); }
 .wi-pcard-stage.evolved .wi-pcard__glow.on { opacity: 0.96; }
 .wi-pcard-stage.evolved .wi-pcard__glow--a.on { opacity: 0.92; }
 .wi-prev__hint { display: block; margin-top: -8px; font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(236,238,250,0.38); transition: opacity 0.4s ease; }
