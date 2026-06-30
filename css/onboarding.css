@@ -1790,13 +1790,15 @@ body.lite .welcome-intro__rays { opacity: 0.6; filter: none; }
 .wi-pcard__glow.on { opacity: 0.82; }
 /* Orbs sit INSIDE the card (cores within the bounds, not pinned outside the corners) and
    wander on wide, distinct paths so they cross the interior and overlap each other dynamically. */
-.wi-pcard__glow--c { width: 150%; height: 116%; left: -35%; top: -28%; background: radial-gradient(circle, rgba(150,116,255,1), transparent 64%); animation: wiAuroraC 15s ease-in-out infinite; }
-.wi-pcard__glow--a { width: 134%; height: 104%; left: -18%; top: 0%; background: radial-gradient(circle, rgba(250,251,255,1), transparent 62%); animation: wiAuroraA 18s ease-in-out infinite; }
+/* Each orb starts in its own region (purple upper-left, white centre-right, green lower) and
+   wanders on a distinct path, different direction, speed and phase, so they never track together. */
+.wi-pcard__glow--c { width: 150%; height: 116%; left: -43%; top: -32%; background: radial-gradient(circle, rgba(150,116,255,1), transparent 64%); animation: wiAuroraC 14s ease-in-out -3s infinite; }
+.wi-pcard__glow--a { width: 134%; height: 104%; left: -7%; top: -2%; background: radial-gradient(circle, rgba(250,251,255,1), transparent 62%); animation: wiAuroraA 19s ease-in-out -9s infinite; }
 .wi-pcard__glow--a.on { opacity: 0.95; }
-.wi-pcard__glow--k { width: 156%; height: 120%; left: -36%; top: 14%; background: radial-gradient(circle, rgba(56,236,150,1), transparent 64%); animation: wiAuroraK 16.5s ease-in-out infinite; }
-@keyframes wiAuroraC { 0%,100% { transform: translate(-8%,-6%) scale(1); } 33% { transform: translate(16%,15%) scale(1.08); } 66% { transform: translate(4%,26%) scale(0.98); } }
-@keyframes wiAuroraA { 0%,100% { transform: translate(6%,6%) scale(1.04); } 33% { transform: translate(-14%,-8%) scale(1.12); } 66% { transform: translate(12%,-12%) scale(0.97); } }
-@keyframes wiAuroraK { 0%,100% { transform: translate(-4%,8%) scale(1); } 33% { transform: translate(16%,-16%) scale(1.1); } 66% { transform: translate(-12%,-4%) scale(1.05); } }
+.wi-pcard__glow--k { width: 156%; height: 120%; left: -34%; top: 16%; background: radial-gradient(circle, rgba(56,236,150,1), transparent 64%); animation: wiAuroraK 16s ease-in-out -13s infinite; }
+@keyframes wiAuroraC { 0%,100% { transform: translate(0%,0%) scale(1); } 33% { transform: translate(14%,18%) scale(1.06); } 66% { transform: translate(-6%,8%) scale(0.98); } }
+@keyframes wiAuroraA { 0%,100% { transform: translate(0%,0%) scale(1.03); } 33% { transform: translate(-16%,-12%) scale(1.1); } 66% { transform: translate(9%,-5%) scale(0.96); } }
+@keyframes wiAuroraK { 0%,100% { transform: translate(0%,0%) scale(1); } 33% { transform: translate(14%,-16%) scale(1.08); } 66% { transform: translate(-12%,2%) scale(1.04); } }
 @media (prefers-reduced-motion: reduce) { .wi-pcard__glow { animation: none !important; transform: none !important; } .wi-pcard__glow.on { opacity: 0.4; } .wi-pcard__glow--a.on { opacity: 0.26; } }
 .wi-pcard__emblem { width: 30%; position: relative; z-index: 2; filter: drop-shadow(0 1px 7px rgba(0,0,0,0.5)); }
 .wi-pcard__emblem path { fill: #fff; opacity: 0.96; }
@@ -1810,15 +1812,17 @@ body.lite .welcome-intro__rays { opacity: 0.6; filter: none; }
 /* The spill is a soft echo of the two pillar colours (purple TL, green BR) bleeding out past
    the card edges, same hues as inside, feathered to transparent. No rainbow hue-cycle, that
    averaged into mud. Subtle, so it reads as the card quietly emitting light. */
-.wi-pcard__spill { position: absolute; inset: -22%; z-index: 0; opacity: 0; pointer-events: none; filter: blur(48px) saturate(1.5); background: radial-gradient(58% 58% at 26% 22%, rgba(150,116,255,0.92), transparent 70%), radial-gradient(58% 58% at 76% 80%, rgba(56,236,150,0.85), transparent 70%); transition: opacity 2.4s ease; }
-.wi-pcard-stage.evolved .wi-pcard__spill { opacity: 0.78; }
+/* The spill is the card's OWN light bleeding out past its edges, so it mirrors the inside
+   layout (purple top, white middle, green bottom) and hugs the card. Not a separate aura. */
+.wi-pcard__spill { position: absolute; inset: -14%; z-index: 0; opacity: 0; pointer-events: none; filter: blur(42px) saturate(1.35); background: radial-gradient(46% 34% at 42% 12%, rgba(150,116,255,0.82), transparent 72%), radial-gradient(42% 30% at 58% 50%, rgba(245,247,255,0.5), transparent 72%), radial-gradient(48% 36% at 44% 90%, rgba(56,236,150,0.8), transparent 72%); transition: opacity 2.4s ease; }
+.wi-pcard-stage.evolved .wi-pcard__spill { opacity: 0.6; }
 .wi-pcard-stage.evolved .wi-pcard__glow.on { opacity: 0.96; }
 /* Evolved finale: the whole card (and its spill) slowly cycles through hues, so the colour
    shifts like a rainbow to show how powerful it gets. White/black stay put; only the colour rotates. */
 .wi-pcard-stage.evolved .wi-pcard { animation: wiHueCard 13s linear infinite; }
 .wi-pcard-stage.evolved .wi-pcard__spill { animation: wiHueSpill 13s linear infinite; }
 @keyframes wiHueCard { to { filter: hue-rotate(360deg); } }
-@keyframes wiHueSpill { from { filter: blur(48px) saturate(1.5) hue-rotate(0deg); } to { filter: blur(48px) saturate(1.5) hue-rotate(360deg); } }
+@keyframes wiHueSpill { from { filter: blur(42px) saturate(1.35) hue-rotate(0deg); } to { filter: blur(42px) saturate(1.35) hue-rotate(360deg); } }
 /* The opal level: the final tap blooms rare sparks of new colour (blue, orange, red, teal)
    over the three pillars, so the card shimmers like a rare opal. Subtle, feathered, drifting. */
 .wi-pcard__opal { position: absolute; inset: 0; z-index: 1; opacity: 0; pointer-events: none; mix-blend-mode: screen; filter: blur(15px) saturate(1.45); transition: opacity 2.4s ease; will-change: transform;
