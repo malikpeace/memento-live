@@ -2512,10 +2512,13 @@ const WelcomeIntro = {
     const sub = this.pageWrap.querySelector('.wi-phi__sub');
     const revealSub = () => { if (sub) sub.style.opacity = ''; };
     const showButton = () => { if (nav) { nav.style.transition = 'opacity 0.4s ease'; nav.style.opacity = '1'; nav.style.pointerEvents = ''; } };
+    // Simple, clean reveal: the cards sit in their FINAL slots and just fade in (no pop-and-move,
+    // no colour flash). Clarity fades first, then Action + Consistency together.
+    const fadeIn = (el) => { if (!el) return; el.style.transition = 'opacity 0.55s ease'; el.style.opacity = '1'; };
     const finishAll = () => {
       revealSub();
       cards.classList.remove('wi-phi__cards--seq');
-      pcs.forEach((c) => { c.style.transition = 'none'; c.style.transform = ''; c.classList.remove('wi-pc--present', 'wi-pc--flash'); c.classList.add('wi-pc--seated'); });
+      pcs.forEach((c) => { c.style.transition = 'none'; c.style.transform = ''; c.style.opacity = '1'; });
       plus.forEach((p) => { p.style.opacity = '1'; });
       showButton();
     };
@@ -2523,41 +2526,18 @@ const WelcomeIntro = {
     if (reduced || this._phiSeen) { finishAll(); return; }
     this._phiSeen = true;
     if (nav) { nav.style.opacity = '0'; }
-    const rowRect = cards.getBoundingClientRect();
-    const rowCx = rowRect.left + rowRect.width / 2;
-    const offsets = pcs.map((c) => { const r = c.getBoundingClientRect(); return rowCx - (r.left + r.width / 2); });
-    const present = (i) => {
-      if (token !== this._phiSeqToken) return;
-      if (i >= pcs.length) { showButton(); return; }
-      const c = pcs[i];
-      c.style.transformOrigin = 'center center';
-      c.style.transition = 'none';
-      // Present a bit LOWER (translateY down) so the big card clears the sub text above it,
-      // then it rises + shrinks into its slot.
-      c.style.transform = 'translateX(' + offsets[i] + 'px) translateY(64px) scale(1.34)';
-      void c.offsetWidth;
-      c.classList.add('wi-pc--present');
-      // hold big + low, then glide UP into its slot, then flash its colour.
-      setTimeout(() => {
-        if (token !== this._phiSeqToken) return;
-        c.style.transition = 'transform 0.66s cubic-bezier(0.22,1,0.36,1)';
-        c.style.transform = 'translateX(0px) translateY(0px) scale(1)';
-        setTimeout(() => {
-          if (token !== this._phiSeqToken) return;
-          c.classList.remove('wi-pc--present');
-          c.classList.add('wi-pc--seated', 'wi-pc--flash');
-          setTimeout(() => c.classList.remove('wi-pc--flash'), 720);
-          if (i >= 1 && plus[i - 1]) plus[i - 1].style.opacity = '1';
-          // Pause AFTER the colour flash finishes before the next pillar rises, so each pillar
-          // reads as its own separate moment instead of running one on top of the next.
-          setTimeout(() => present(i + 1), 1150);
-        }, 680);
-      }, 1000);
-    };
-    // Give every element its own beat: headline (already landed from the M flip) holds alone,
-    // then the sub fades in, then after another pause the pillars begin.
+    // headline (already landed from the M flip) holds alone, then the sub fades in.
     setTimeout(revealSub, 550);
-    setTimeout(() => present(0), 2200);
+    // Clarity fades in first...
+    setTimeout(() => { if (token !== this._phiSeqToken) return; fadeIn(pcs[0]); }, 2200);
+    // ...then Action + Consistency fade in together, with the + separators.
+    setTimeout(() => {
+      if (token !== this._phiSeqToken) return;
+      fadeIn(pcs[1]); fadeIn(pcs[2]);
+      plus.forEach((p) => fadeIn(p));
+    }, 3000);
+    // then the button.
+    setTimeout(() => { if (token !== this._phiSeqToken) return; showButton(); }, 3800);
   },
   // Page 2: the same three pillars, now spoken to THIS person's answers, what Memento
   // will actually do for them (templated from clarityLevel / actionKnow / progress).
