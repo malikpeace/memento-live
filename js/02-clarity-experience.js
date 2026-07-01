@@ -488,9 +488,12 @@ const ClarityExperience = {
         aiCurrentOptions = [];
         aiCurrentRange = null;
         if (aiAbortController) { aiAbortController.abort(); aiAbortController = null; }
-        // Show intro if not seen, otherwise go to first question
+        // Hero first (then the "Clarity" intro), matching the fresh open flow; or
+        // straight to the wizard if the tutorial was already seen.
         if (!state.clarity.tutorialSeen) {
-          this._showClarityIntro();
+          this._introPending = true;
+          this._setLight(0.06);
+          this._openContent();
         } else {
           this._openContent();
         }
