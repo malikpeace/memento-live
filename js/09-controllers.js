@@ -2078,7 +2078,7 @@ const WelcomeIntro = {
     if (kind !== 'preview') { try { this.el.style.setProperty('--wi-beam-boost', '0'); } catch (e) {} }
     // Philosophy + the "how Memento helps" page use a wider content column (less page padding)
     // so the 3 boxes / cards are not skinny.
-    this.el.classList.toggle('welcome-intro--phi', kind === 'philosophy' || kind === 'help');
+    this.el.classList.toggle('welcome-intro--phi', kind === 'help');
     // any pending auto-advance from a prior "Enter Memento" beat is cancelled the
     // moment we render anything else (incl. navigating back to it).
     if (this._enterTimer) { clearTimeout(this._enterTimer); this._enterTimer = null; }
@@ -2095,9 +2095,9 @@ const WelcomeIntro = {
           <svg class="wi-enter__mark" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="44" fill="#f5f5f7"/><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z" fill="#0a0a0e"/></svg><span class="wi-enter__word" aria-hidden="true">emento</span>
         </div>
       </div>`;
-    } else if (kind === 'philosophy') {
-      this._phiView = 'pillars'; this._phiP = p; this._phiSwapping = false;
-      inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-phi" data-beat="${beatIdx}"><svg class="wi-phi__mark" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="44" fill="#f5f5f7"/><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z" fill="#0a0a0e"/></svg><div class="wi-phi__body"><div class="wi-phi__bodyinner">${this._phiBody('pillars', p)}</div></div></div>`;
+    } else if (kind === 'help') {
+      this._phiP = p;
+      inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-phi wi-helppage" data-beat="${beatIdx}"><svg class="wi-phi__mark" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="44" fill="#f5f5f7"/><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z" fill="#0a0a0e"/></svg><div class="wi-phi__body"><div class="wi-phi__bodyinner">${this._helpBody(p)}</div></div></div>`;
     } else if (kind === 'mori') {
       inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-moriview" data-beat="${beatIdx}"><h2 class="wi-demo__headline">${esc(b.headline)}</h2>${this._cineMori()}<p class="wi-demo__line">${esc(b.line)}</p>${b.days ? `<p class="wi-mori__days">btw, you have about <b>${b.days.toLocaleString()}</b> days left.</p>` : ''}</div>`;
     } else if (kind === 'preview') {
@@ -2111,37 +2111,33 @@ const WelcomeIntro = {
     // Summary (stage) page button adapts: "Let's refine" for someone already doing
     // really well, "Let's fix this" for everyone else.
     let solNextLabel = isLast ? 'Build it' : 'Next';
-    if (kind === 'philosophy') solNextLabel = 'For you';
-    else if (kind === 'stage') solNextLabel = (String((p && p.actionProgress) || '') === 'Actually doing really good') ? "Let's Refine" : "Let's Fix This";
+    if (kind === 'recap') solNextLabel = (String((p && p.actionProgress) || '') === 'Actually doing really good') ? "Let's Refine" : "Let's Fix This";
     // "Meet Your Memento" is a full-screen, tap-driven moment, no Back/Build chrome.
     // The reveal advances on tap and the final tap proceeds (see _prevAdvance).
     this.navEl.innerHTML = (kind === 'enter' || kind === 'preview') ? '' : `<button class="welcome-intro__back-btn" id="solBack">←</button><button class="welcome-intro__btn welcome-intro__btn--step" id="solNext" style="flex:1;width:auto;">${solNextLabel}</button>`;
     try { this.pageWrap.classList.remove('wc-busy', 'wc-reading'); this.pageWrap.scrollTop = 0; } catch (e) {}
 
-    // Philosophy pillars, first visit: hide the cards + "For you" button, then run the
-    // sequential big-centre -> shrink-into-slot -> colour-flash reveal. Tapping snaps it done.
-    if (kind === 'philosophy') {
+    // Help page, first visit: hold the three personalized points + the equation + the button
+    // back at opacity 0, then reveal them one at a time (Clarity, pause, Action, pause,
+    // Consistency, then the equation). Tapping the page snaps it to the finished state.
+    if (kind === 'help') {
       const reducedM = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
       if (!reducedM && !this._phiSeen) {
-        const cardsEl = this.pageWrap.querySelector('.wi-phi__cards');
-        if (cardsEl) cardsEl.classList.add('wi-phi__cards--seq');
-        // Hold the sub + equation back so they fade in on their own beats.
-        const subEl = this.pageWrap.querySelector('.wi-phi__sub');
-        if (subEl) subEl.style.opacity = '0';
+        this.pageWrap.querySelectorAll('.wi-help__row').forEach((r) => { r.style.opacity = '0'; });
         const eqEl = this.pageWrap.querySelector('.wi-phi__eq');
         if (eqEl) eqEl.style.opacity = '0';
         this.navEl.style.opacity = '0'; this.navEl.style.pointerEvents = 'none';
         const innerEl2 = this.pageWrap.querySelector('.welcome-intro__page-inner');
         if (innerEl2) innerEl2.addEventListener('click', () => { if (this._phiSkipSeq) this._phiSkipSeq(); });
-        setTimeout(() => this._runPhiPillars(), 1100);
+        setTimeout(() => this._runHelpReveal(), 1200);
       }
     }
 
     // Crossfade between chapters: fade the current text out, then swap. The fixed
     // beam underneath never moves, so it reads as one continuous moment.
     const go = (idx) => {
-      // Leaving "Enter Memento" forward: the M flies up to become the philosophy
-      // header while "Enter" + "emento" fade away (shared-element transition).
+      // Leaving "Enter Memento" forward: the M flies up to become the help page's
+      // header mark while "Enter" + "emento" fade away (shared-element transition).
       if (kind === 'enter' && idx === beatIdx + 1) { this._flipEnterToPhilosophy(stepIndex, idx); return; }
       if (idx >= 0 && idx < n && idx !== beatIdx) {
         const innerEl = this.pageWrap.querySelector('.welcome-intro__page-inner');
@@ -2151,10 +2147,8 @@ const WelcomeIntro = {
         this._showSolution(stepIndex, idx);
       }
     };
-    // Philosophy is a two-view chapter: pillars+equation, then the combined "How Memento Will
-    // Help You" page. "For you" crossfades the body in place (M stays); Back returns to pillars.
-    const goFwd = () => { if (kind === 'philosophy' && this._phiView !== 'help') { this._phiSwap('help'); return; } go(beatIdx + 1); };
-    const goBack = () => { if (kind === 'philosophy' && this._phiView === 'help') { this._phiSwap('pillars'); return; } go(beatIdx - 1); };
+    const goFwd = () => { go(beatIdx + 1); };
+    const goBack = () => { go(beatIdx - 1); };
     const nextBtn = document.getElementById('solNext'); if (nextBtn) nextBtn.addEventListener('click', goFwd);
     const backBtn = document.getElementById('solBack'); if (backBtn) backBtn.addEventListener('click', goBack);
 
@@ -2251,9 +2245,6 @@ const WelcomeIntro = {
     //    their direction. The doom "another year gone" line is no longer the default.
     const stage = this._solStage(p);
 
-    // 3. PHILOSOPHY: the three pillars, shown as an equation (visual built in render).
-    const phiHead = 'The Philosophy Behind Memento';
-
     // 4. MORI: the meaning of the name + finite time (life grid + days in render).
     const moriHead = 'Memento means reminder.';
     const moriLine = 'It is Latin. Memento keeps the one thing in front of you, and keeps you honest that your time runs out, so you spend it on what actually matters.';
@@ -2262,16 +2253,17 @@ const WelcomeIntro = {
     //    plays (card + sequence built in render). The mori page was removed before this.
     const prevHead = 'Meet Your Memento';
 
-    // Order: Enter Memento -> Philosophy (pillars) -> the recap ("this is what you said",
-    // the old 'stage' page, now reached via the philosophy "For you" button) -> How Memento
-    // Helps You (the personalized pillar breakdown, now its own page) -> Meet Your Memento.
-    // Philosophy is a two-view chapter again: pillars + equation, then (via "For you") an
-    // in-place swap to the combined "How Memento Will Help You" page (the M stays, the body
-    // crossfades). That help page folds in the old recap ("where you are") + the personalized
-    // how-it-helps points, so recap and help are one page now.
+    // Order: recap ("here's what you said", the personalized _solStage page, its own beat so
+    // they feel understood first) -> Enter Memento -> the single "Here's how Memento will help
+    // you" page (personalized Find Clarity / Take Action / Stay Consistent points + the equation,
+    // staggered reveal) -> Meet Your Memento. The abstract "Philosophy Behind Memento" pillars
+    // page was removed: clarity/action/consistency is now taught ONLY as the concrete, personal
+    // "how it helps you" page, so nothing reads as an AI sales detour.
+    const helpHead = first ? first + ", here's how Memento will help you" : "Here's how Memento will help you";
     return [
+      { key: 'recap', kind: 'recap', accent: PUR, headline: stage.headline, line: stage.line, stakes: stage.stakes },
       { key: 'enter', kind: 'enter', accent: PUR, title: 'Enter Memento' },
-      { key: 'philosophy', kind: 'philosophy', accent: PUR, headline: phiHead },
+      { key: 'help', kind: 'help', accent: PUR, headline: helpHead },
       { key: 'preview', kind: 'preview', accent: PUR, headline: prevHead, line: '' }
     ];
   },
@@ -2482,45 +2474,22 @@ const WelcomeIntro = {
       consistency: { c: 'rgba(52,211,153,1)', label: 'Stay Consistent.', icon: cal, text: "Showing up, especially when it's hard." }
     };
   },
-  // The three pillar cards (Clarity + Action + Consistency), joined by a +. descs is an
-  // optional { clarity, action, consistency } map overriding the default copy, used by
-  // the personalized page 2.
-  _phiCards(descs) {
-    const d = this._phiData();
-    descs = descs || {};
-    const card = (key) => '<div class="wi-pc" data-k="' + key + '" style="--pcc:' + d[key].c + '">'
-      + '<span class="wi-pc__ic">' + d[key].icon + '</span>'
-      + '<span class="wi-pc__name">' + d[key].label + '</span>'
-      + '<span class="wi-pc__desc">' + (descs[key] || d[key].text) + '</span>'
-      + '</div>';
-    const plus = '<span class="wi-pc-plus" aria-hidden="true">&#215;</span>';
-    return '<div class="wi-phi__cards">' + card('clarity') + plus + card('action') + plus + card('consistency') + '</div>';
-  },
-  // Sequential pillar reveal on the philosophy page: each card (Clarity, then Action, then
-  // Consistency) rises BIG in the centre with its icon -> name -> description staggering in,
-  // holds ~1s, then shrinks into its slot and softly flashes its colour on landing. Runs once
-  // per onboarding (_phiSeen); back-navigation and reduced-motion show the final row instantly.
+  // Sequential reveal on the help page: the three personalized points fade in one at a time
+  // (Find Clarity, pause, Take Action, pause, Stay Consistent), then the equation, then the
+  // button. Runs once per onboarding (_phiSeen); reduced-motion + back-nav show it instantly.
   // Tapping the page snaps it to the finished state.
-  _runPhiPillars() {
-    const cards = this.pageWrap && this.pageWrap.querySelector('.wi-phi__cards');
-    if (!cards) return;
-    const pcs = [...cards.querySelectorAll('.wi-pc')];
-    const plus = [...cards.querySelectorAll('.wi-pc-plus')];
+  _runHelpReveal() {
+    const wrap = this.pageWrap && this.pageWrap.querySelector('.wi-help');
+    if (!wrap) return;
+    const rows = [...wrap.querySelectorAll('.wi-help__row')];
+    const eq = this.pageWrap.querySelector('.wi-phi__eq');
     const nav = this.navEl;
     const reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
     const token = this._phiSeqToken;
-    const sub = this.pageWrap.querySelector('.wi-phi__sub');
-    const eq = this.pageWrap.querySelector('.wi-phi__eq');
-    const revealSub = () => { if (sub) sub.style.opacity = ''; };
-    const showButton = () => { if (nav) { nav.style.transition = 'opacity 0.4s ease'; nav.style.opacity = '1'; nav.style.pointerEvents = ''; } };
-    // Simple, clean reveal: the cards sit in their FINAL slots and just fade in (no pop-and-move,
-    // no colour flash). Clarity, then Action, then Consistency, then the equation, each on its own.
     const fadeIn = (el) => { if (!el) return; el.style.transition = 'opacity 0.9s ease'; el.style.opacity = '1'; };
+    const showButton = () => { if (nav) { nav.style.transition = 'opacity 0.4s ease'; nav.style.opacity = '1'; nav.style.pointerEvents = ''; } };
     const finishAll = () => {
-      revealSub();
-      cards.classList.remove('wi-phi__cards--seq');
-      pcs.forEach((c) => { c.style.transition = 'none'; c.style.transform = ''; c.style.opacity = '1'; });
-      plus.forEach((p) => { p.style.opacity = '1'; });
+      rows.forEach((r) => { r.style.transition = 'none'; r.style.opacity = '1'; });
       if (eq) eq.style.opacity = '1';
       showButton();
     };
@@ -2528,16 +2497,12 @@ const WelcomeIntro = {
     if (reduced || this._phiSeen) { finishAll(); return; }
     this._phiSeen = true;
     if (nav) { nav.style.opacity = '0'; }
-    // Evenly spaced (~1.3s between each), slow graceful fades so nothing pops in. Each element
-    // fades in on its own: headline -> sub -> Clarity -> Action -> Consistency -> equation -> button.
-    setTimeout(revealSub, 1500);
-    // Longer beat after the sub before Clarity, then the rest follow at even ~1.3s intervals.
-    setTimeout(() => { if (token !== this._phiSeqToken) return; fadeIn(pcs[0]); }, 3600);
-    setTimeout(() => { if (token !== this._phiSeqToken) return; fadeIn(pcs[1]); fadeIn(plus[0]); }, 4900);
-    setTimeout(() => { if (token !== this._phiSeqToken) return; fadeIn(pcs[2]); fadeIn(plus[1]); }, 6200);
-    // ...then the equation payoff fades in last, then the button.
-    setTimeout(() => { if (token !== this._phiSeqToken) return; fadeIn(eq); }, 7500);
-    setTimeout(() => { if (token !== this._phiSeqToken) return; showButton(); }, 8800);
+    // Evenly spaced (~1.3s), slow graceful fades: Clarity -> Action -> Consistency -> equation -> button.
+    setTimeout(() => { if (token !== this._phiSeqToken) return; fadeIn(rows[0]); }, 300);
+    setTimeout(() => { if (token !== this._phiSeqToken) return; fadeIn(rows[1]); }, 1600);
+    setTimeout(() => { if (token !== this._phiSeqToken) return; fadeIn(rows[2]); }, 2900);
+    setTimeout(() => { if (token !== this._phiSeqToken) return; fadeIn(eq); }, 4200);
+    setTimeout(() => { if (token !== this._phiSeqToken) return; showButton(); }, 5300);
   },
   // Page 2: the same three pillars, now spoken to THIS person's answers, what Memento
   // will actually do for them (templated from clarityLevel / actionKnow / progress).
@@ -2566,52 +2531,32 @@ const WelcomeIntro = {
     else consistency = "Memento keeps you showing up, day after day, until you actually get there.";
     return { clarity: clarity, action: action, consistency: consistency };
   },
-  // The body under the static M + headline: page 1 (the pillars in general) or page 2
-  // (how those same pillars apply to this person). The M + headline stay; body swaps.
-  _phiBody(view, p) {
+  // The single "Here's how Memento will help you" body under the static M + headline: the three
+  // personalized Find Clarity / Take Action / Stay Consistent points as a clean stacked list
+  // (pillar icon + tinted verb + a direct callback to what THEY said), closed by the equation.
+  _helpBody(p) {
     const rule = '<span class="wi-phi__rule"></span>';
-    if (view === 'help') {
-      // Combined page: the "where you are" recap (from _solStage) + how Memento helps (the
-      // personalized clarity/action/consistency points as a clean stacked list).
-      const st = this._solStage(p || {});
-      const help = this._phiPersonal(p || {});
-      return '<h2 class="wi-demo__headline wi-phi__head">How Memento Will Help You</h2>' + rule
-        + '<div class="wi-help">'
-        +   '<p class="wi-help__lead">' + esc(String(st.headline || '')) + '</p>'
-        +   (st.line ? '<p class="wi-help__body">' + esc(String(st.line)) + '</p>' : '')
-        +   '<div class="wi-help__divider"></div>'
-        +   '<div class="wi-help__how">Here\'s how Memento helps</div>'
-        +   '<div class="wi-help__rows">'
-        +     '<div class="wi-help__row"><span class="wi-help__k wi-help__k--c">Clarity</span><p class="wi-help__k-body">' + esc(String(help.clarity || '')) + '</p></div>'
-        +     '<div class="wi-help__row"><span class="wi-help__k wi-help__k--a">Action</span><p class="wi-help__k-body">' + esc(String(help.action || '')) + '</p></div>'
-        +     '<div class="wi-help__row"><span class="wi-help__k wi-help__k--k">Consistency</span><p class="wi-help__k-body">' + esc(String(help.consistency || '')) + '</p></div>'
-        +   '</div>'
-        + '</div>';
-    }
-    return '<h2 class="wi-demo__headline wi-phi__head">The Philosophy Behind Memento</h2>' + rule
-      + '<p class="wi-phi__sub">Everything worthwhile comes down to three things:</p>'
-      + this._phiCards()
+    const first = (p && p.name) ? esc(String(p.name).trim().split(/\s+/)[0]) : '';
+    const head = first ? first + ", here's how Memento will help you" : "Here's how Memento will help you";
+    const d = this._phiData();
+    const help = this._phiPersonal(p || {});
+    const tint = { clarity: 'c', action: 'a', consistency: 'k' };
+    const row = (key, body) => '<div class="wi-help__row" data-k="' + key + '" style="--pcc:' + d[key].c + '">'
+      + '<span class="wi-help__ic">' + d[key].icon + '</span>'
+      + '<div class="wi-help__txt">'
+      +   '<span class="wi-help__k wi-help__k--' + tint[key] + '">' + d[key].label + '</span>'
+      +   '<p class="wi-help__k-body">' + esc(String(body || '')) + '</p>'
+      + '</div>'
+      + '</div>';
+    return '<h2 class="wi-demo__headline wi-phi__head">' + head + '</h2>' + rule
+      + '<div class="wi-help">'
+      +   row('clarity', help.clarity)
+      +   row('action', help.action)
+      +   row('consistency', help.consistency)
+      + '</div>'
       + '<div class="wi-phi__eq">'
       +   '<p class="wi-phi__eq-formula"><span class="wi-phi__eq-term wi-phi__eq-term--c">Clear goal</span><span class="wi-phi__eq-x">&#215;</span><span class="wi-phi__eq-term wi-phi__eq-term--a">Focused action</span><span class="wi-phi__eq-x">&#215;</span><span class="wi-phi__eq-term wi-phi__eq-term--k">Consistency</span> <span class="wi-phi__eq-res">= Results</span></p>'
       + '</div>';
-  },
-  // Sequential fade while the M + headline stay put: the current boxes fade out, then
-  // (once fully invisible and the fade has settled) the content swaps and the new boxes
-  // fade in, in the same place. Swapping only when settled at opacity 0 avoids the iOS
-  // mid-transition ghosting (which double-painted old + new together).
-  _phiSwap(view) {
-    const body = this.pageWrap && this.pageWrap.querySelector('.wi-phi__body');
-    const inner = body && body.querySelector('.wi-phi__bodyinner');
-    if (!body || !inner || this._phiSwapping) return;
-    this._phiSwapping = true;
-    this._phiView = view;
-    const nb = document.getElementById('solNext'); if (nb) nb.textContent = (view === 'help') ? 'Next' : 'For you';
-    inner.style.opacity = '0';
-    setTimeout(() => {
-      inner.innerHTML = this._phiBody(view, this._phiP);
-      void inner.offsetHeight; // commit the new content at opacity 0 before fading it in
-      requestAnimationFrame(() => { inner.style.opacity = '1'; this._phiSwapping = false; });
-    }, 270);
   },
   // Mori page: their life in dots (reuses the life-in-years grid).
   _cineMori() {
