@@ -2529,10 +2529,11 @@ const WelcomeIntro = {
     // Evenly spaced (~1.3s between each), slow graceful fades so nothing pops in. Each pillar
     // fades in on its own: headline -> sub -> Clarity -> Action -> Consistency -> button.
     setTimeout(revealSub, 1500);
-    setTimeout(() => { if (token !== this._phiSeqToken) return; fadeIn(pcs[0]); }, 2800);
-    setTimeout(() => { if (token !== this._phiSeqToken) return; fadeIn(pcs[1]); fadeIn(plus[0]); }, 4100);
-    setTimeout(() => { if (token !== this._phiSeqToken) return; fadeIn(pcs[2]); fadeIn(plus[1]); }, 5400);
-    setTimeout(() => { if (token !== this._phiSeqToken) return; showButton(); }, 6700);
+    // Longer beat after the sub before Clarity, then the rest follow at even ~1.3s intervals.
+    setTimeout(() => { if (token !== this._phiSeqToken) return; fadeIn(pcs[0]); }, 3600);
+    setTimeout(() => { if (token !== this._phiSeqToken) return; fadeIn(pcs[1]); fadeIn(plus[0]); }, 4900);
+    setTimeout(() => { if (token !== this._phiSeqToken) return; fadeIn(pcs[2]); fadeIn(plus[1]); }, 6200);
+    setTimeout(() => { if (token !== this._phiSeqToken) return; showButton(); }, 7500);
   },
   // Page 2: the same three pillars, now spoken to THIS person's answers, what Memento
   // will actually do for them (templated from clarityLevel / actionKnow / progress).
