@@ -2581,7 +2581,7 @@ const WelcomeIntro = {
       + '<div class="wi-help__tx"><span class="wi-help__k">' + label + '</span>' + bodyHtml + '</div>'
       + '</div>';
     const bdy = (t) => '<p class="wi-help__k-body">' + esc(String(t || '')) + '</p>';
-    const growBody = bdy("As you grow, your Memento will continue to grow with you. Reminding you of why you started and helping you stay on track as your progress compounds.");
+    const growBody = bdy("Memento keeps the reason you started front and center, so on the hard days you remember what this is all for, and your progress keeps compounding.");
     // The final node is an energy-ball orb: three big, heavily-blurred colour blobs (purple, cyan,
     // green) drift + oscillate inside a clipped circle, so the whole circle reads as living energy
     // with no hard hotspots or see-through gaps, with the white Memento M on top. It comes alive
@@ -2592,7 +2592,7 @@ const WelcomeIntro = {
       +   '<span class="wi-orb__b wi-orb__b--1"></span><span class="wi-orb__b wi-orb__b--2"></span><span class="wi-orb__b wi-orb__b--3"></span>'
       +   mMark
       + '</span>'
-      + '<div class="wi-help__tx"><span class="wi-help__k">Your Memento grows with you</span>' + growBody + '</div>'
+      + '<div class="wi-help__tx"><span class="wi-help__k">Remember Your Why</span>' + growBody + '</div>'
       + '</div>';
     return '<h2 class="wi-demo__headline wi-phi__head">' + head + '</h2>'
       + '<div class="wi-help__stp">'
