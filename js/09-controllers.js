@@ -2508,18 +2508,31 @@ const WelcomeIntro = {
     this._phiSeen = true;
     if (nav) { nav.style.opacity = '0'; }
     const c = layout();
-    // Clarity (node 0) is already lit. Draw the line down to each next node in turn, lighting it
-    // and clearing its blur as the line arrives. ~1.25s between steps so each is its own beat.
-    let t = 800;
+    // Clarity (node 0) is already lit; every later row is fully hidden and lights up ONLY when the
+    // line physically reaches it. For each segment: start drawing the line from the previous node
+    // to this one over `dur` ms (constant speed, so it looks organic), then at t+dur, once the line
+    // has actually arrived, light the node + fade its row in. HOLD is the pause before the next
+    // segment starts. Nothing below the drawing line is visible (no track, rows hidden).
+    const SPEED = 0.11; // px per ms
+    const HOLD = 520;   // pause after a node lights, before the line moves on
+    let t = 650;
     for (let i = 1; i < nodes.length; i++) {
       const idx = i;
+      const dur = Math.max(430, (c[idx] - c[idx - 1]) / SPEED);
+      // 1) start the line drawing down to this node. Re-measure at draw time (layout is settled by
+      //    now) so the line always reaches the real node centre.
       setTimeout(() => {
         if (token !== this._phiSeqToken) return;
-        if (fill) fill.style.height = (c[idx] - c[0]) + 'px';
-        rows[idx].classList.remove('is-dim');
-        nodes[idx].classList.add('is-on');
+        const cc = layout();
+        if (fill) { fill.style.transition = 'height ' + Math.round(dur) + 'ms linear'; fill.style.height = (cc[idx] - cc[0]) + 'px'; }
       }, t);
-      t += 1250;
+      // 2) when the line arrives, light the node + reveal its row
+      setTimeout(() => {
+        if (token !== this._phiSeqToken) return;
+        nodes[idx].classList.add('is-on');
+        rows[idx].classList.remove('is-dim');
+      }, t + dur);
+      t += dur + HOLD;
     }
     setTimeout(() => { if (token !== this._phiSeqToken) return; showButton(); }, t);
   },
