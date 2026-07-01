@@ -1899,14 +1899,20 @@ body.lite .welcome-intro__rays { opacity: calc(0.6 + var(--wi-beam-boost, 0) * 0
 @media (prefers-reduced-motion: reduce) { .wi-pcard-stage.opal .wi-pcard__opal { animation: none !important; } }
 .wi-pcard-stage.evolved .wi-pcard__glow--a.on { opacity: 1; }
 .wi-prev__hint { display: block; margin-top: -8px; font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(236,238,250,0.38); transition: opacity 0.4s ease; }
-/* Cinematic arrival: the card rises out of a soft blur and settles into focus, the title
-   lifts in just behind it. Not a pop, a reveal. (Only opacity/blur/scale, GPU-cheap.) */
-.wi-prev .wi-pcard-stage { animation: wiStageArrive 1.7s cubic-bezier(0.16,1,0.3,1) 0.15s both; }
+/* Cinematic arrival: the card turns to face you as it rises out of a soft blur and settles into
+   focus, then a soft band of light sweeps across it once (glass catching the light), the title
+   lifts in just behind it. Not a pop, a reveal. (Only opacity/blur/transform, GPU-cheap.) */
+.wi-prev .wi-pcard-stage { animation: wiStageArrive 1.8s cubic-bezier(0.16,1,0.3,1) 0.15s both; }
 @keyframes wiStageArrive {
-  0%   { opacity: 0; transform: scale(0.82) translateY(20px); filter: blur(18px); }
+  0%   { opacity: 0; transform: perspective(950px) rotateY(-15deg) scale(0.84) translateY(24px); filter: blur(16px); }
   55%  { opacity: 1; }
-  100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+  100% { opacity: 1; transform: perspective(950px) rotateY(0deg) scale(1) translateY(0); filter: blur(0); }
 }
+/* A single soft light-sweep across the card as it settles, like light glancing off glass. Clipped
+   by the card's overflow. Passes over the M too, so the emblem catches the light for a beat. */
+.wi-pcard__shine { position: absolute; top: -30%; left: -75%; width: 48%; height: 160%; z-index: 3; pointer-events: none; background: linear-gradient(100deg, transparent, rgba(255,255,255,0.5), transparent); transform: rotate(15deg); filter: blur(7px); opacity: 0; }
+.wi-prev .wi-pcard__shine { animation: wiCardShine 1.25s cubic-bezier(0.25,1,0.4,1) 1s 1 both; }
+@keyframes wiCardShine { 0% { left: -75%; opacity: 0; } 22% { opacity: 0.9; } 68% { opacity: 0.9; } 100% { left: 135%; opacity: 0; } }
 .wi-prev .wi-prev__title { animation: wiPrevTitleRise 0.9s cubic-bezier(0.16,1,0.3,1) 0.6s backwards; }
 @keyframes wiPrevTitleRise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 /* Background aura: a soft glow behind the whole page that fades in on the evolved step and
@@ -1920,7 +1926,7 @@ body.lite .welcome-intro__rays { opacity: calc(0.6 + var(--wi-beam-boost, 0) * 0
 /* the Enter Memento button that appears once the reveal completes */
 .welcome-intro__btn--enter { animation: wiEnterBtnIn 0.5s ease both; }
 @keyframes wiEnterBtnIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-@media (prefers-reduced-motion: reduce) { .wi-prev .wi-pcard-stage, .wi-prev .wi-prev__title, .wi-prev .wi-pcard-stage.evolved, .wi-prev.is-evolved .wi-prev__aura { animation: none !important; } }
+@media (prefers-reduced-motion: reduce) { .wi-prev .wi-pcard-stage, .wi-prev .wi-prev__title, .wi-prev .wi-pcard-stage.evolved, .wi-prev.is-evolved .wi-prev__aura, .wi-prev .wi-pcard__shine { animation: none !important; } }
 .wi-prev__caption { min-height: 2.7em; max-width: 26ch; margin: 0 auto; text-align: center; font-size: 1rem; line-height: 1.45; color: #fff; transition: opacity 0.34s ease; }
 .wi-cine__wantwrap { display: flex; flex-direction: column; align-items: center; justify-content: center; }
 /* the reused module icons (clarity circles, action footsteps, consistency flame) on

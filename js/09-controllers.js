@@ -2621,6 +2621,7 @@ const WelcomeIntro = {
       +     '<span class="wi-pcard__glow wi-pcard__glow--k"></span>'
       +     '<span class="wi-pcard__opal"></span>'
       +     '<svg class="wi-pcard__emblem" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>'
+      +     '<span class="wi-pcard__shine" aria-hidden="true"></span>'
       +   '</div>'
       + '</div>'
       + '<span class="wi-prev__hint">tap the card</span>'
