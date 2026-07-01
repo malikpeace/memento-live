@@ -2559,24 +2559,24 @@ const WelcomeIntro = {
     const head = first ? first + ", here's how Memento will help you" : "Here's how Memento will help you";
     const d = this._phiData();
     const help = this._phiPersonal(p || {});
-    const DARK = 'rgba(10,10,14,1)', WHITE = '#ffffff';
+    const DARK = 'rgba(10,10,14,1)';
     // Upward-trend icon for the final node: your Memento tracking + growing over time.
     const grow = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17l5-5 3 3 7-7"/><path d="M15 8h5v5"/></svg>';
-    // nic = the icon colour on the lit node (white on the coloured nodes for contrast, dark on the
-    // light ones). dim=true starts the row blurred + its node unlit until the line reaches it.
+    // nic = the icon colour on the lit node (dark reads best on every pillar fill). dim=true starts
+    // the row blurred + its node unlit until the line reaches it.
     const row = (icon, color, nic, label, bodyHtml, dim) =>
       '<div class="wi-help__row' + (dim ? ' is-dim' : '') + '" style="--nc:' + color + ';--nic:' + nic + '">'
       + '<span class="wi-help__node' + (dim ? '' : ' is-on') + '" aria-hidden="true">' + icon + '</span>'
       + '<div class="wi-help__tx"><span class="wi-help__k">' + label + '</span>' + bodyHtml + '</div>'
       + '</div>';
     const bdy = (t) => '<p class="wi-help__k-body">' + esc(String(t || '')) + '</p>';
-    const growBody = bdy("Every goal, every action, every day you show up gets tracked on your Memento, so it all compounds and nothing is ever lost.");
+    const growBody = bdy("As you grow, your Memento will continue to grow with you. Reminding you of why you started and helping you stay on track as your progress compounds.");
     return '<h2 class="wi-demo__headline wi-phi__head">' + head + '</h2>'
       + '<div class="wi-help__stp">'
       +   '<span class="wi-help__rail" aria-hidden="true"></span><span class="wi-help__fill" aria-hidden="true"></span>'
-      +   row(d.clarity.icon, d.clarity.c, WHITE, 'Find Clarity', bdy(help.clarity), false)
+      +   row(d.clarity.icon, d.clarity.c, DARK, 'Find Clarity', bdy(help.clarity), false)
       +   row(d.action.icon, d.action.c, DARK, 'Take Action', bdy(help.action), true)
-      +   row(d.consistency.icon, d.consistency.c, WHITE, 'Stay Consistent', bdy(help.consistency), true)
+      +   row(d.consistency.icon, d.consistency.c, DARK, 'Stay Consistent', bdy(help.consistency), true)
       +   row(grow, 'rgba(245,200,119,1)', DARK, 'Your Memento grows with you', growBody, true)
       + '</div>';
   },
