@@ -546,7 +546,9 @@ const ClarityExperience = {
     document.getElementById('clarityIntroBtn').addEventListener('click', () => {
       const intro = document.getElementById('clarityIntro');
       intro.classList.add('clarity-intro--exit');
-      this._setTimeout(() => { if (this.isOpen) this._openContent(); }, 400);
+      // The hero (page 0) already played before this intro, so Begin drops into the
+      // teaching pages at the scale page (page 1).
+      this._setTimeout(() => { if (this.isOpen) { this.currentPage = 1; this._openContent(); } }, 400);
     });
 
     this._runClarityIntro();
@@ -667,11 +669,13 @@ const ClarityExperience = {
       return;
     }
 
-    // ── Clarity Intro Sequence ──
-    // One mount point: _showClarityIntro owns the markup, tap-to-skip, and
-    // the Begin binding (this used to be a full copy-paste of it; the two
-    // versions had already drifted on copy).
-    this._showClarityIntro();
+    // ── Fresh open ──
+    // The "How to achieve literally anything" hero is the FIRST thing they see. Advancing
+    // from it shows the "Clarity" cinematic intro, then the rest of the teaching pages.
+    // (_showClarityIntro is now reached from next(), see the _introPending branch.)
+    this._introPending = true;
+    this._setLight(0.06);
+    this._openContent();
   },
 
   _openContent() {
@@ -760,6 +764,7 @@ const ClarityExperience = {
     this.tutorialOnly = false;
     this._transitioning = false;
     this._resuming = false;
+    this._introPending = false;
     FullscreenClose.hide();
 
     // Hard hide the clarity overlay - display:none is un-ignorable
@@ -981,7 +986,7 @@ const ClarityExperience = {
       {
         _hero: true,
         heroTitle: 'How to achieve<br>literally anything',
-        heroSub: "If you study the most successful people alive, read hundreds of books, watch thousands of videos, learn from every kind of person across every walk of life, and you'd get a thousand different answers on how to do it.<br><br>But the common denominator between all of them is the same thing: <strong style=\"color:rgba(var(--ink),1)\">consistent focus, on one direction, over a long period of time.</strong><br><br>The very very first step, before you even start, is to find a mission you care about above all else, one you're willing to commit to and suffer for. Once you find a mission you can obsess over, where not achieving it would feel like a piece of your life is missing, that's when everything changes. Focus stops being a fight, and moving toward it becomes automatic."
+        heroSub: "If you study the most successful people alive, read hundreds of books, watch thousands of videos, learn from every kind of person across every walk of life, and you'd get a thousand different answers on how to do it.<br><br>But the common denominator between all of them is the same thing: <strong style=\"color:rgba(var(--ink),1)\">consistent focus, on one direction, over a long period of time.</strong><br><br>The very first step, before you even start, is to find a mission you care about above all else, one you're willing to commit to and suffer for over an extended period of time.<br><br>Once you find a mission you can obsess over, where not achieving it would feel like a piece of your life is missing, that's when progress becomes automatic. Focus stops being a constant war, and moving toward it becomes inevitable.<br><br>This is the first step we're going to accomplish."
       },
       // Page 1  - Scale intro (tilted left, distractions heavy)
       {
@@ -1258,6 +1263,14 @@ const ClarityExperience = {
         return;
       }
       this.transitionTo(this.currentPage + 1, 'forward');
+      return;
+    }
+
+    // Fresh flow: advancing from the hero (page 0) shows the "Clarity" cinematic intro once,
+    // then the intro's Begin drops into the teaching pages (scale onward).
+    if (this._introPending && this.currentPage === 0 && !this.tutorialOnly) {
+      this._introPending = false;
+      this._showClarityIntro();
       return;
     }
 
