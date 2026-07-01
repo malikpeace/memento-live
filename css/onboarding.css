@@ -1764,11 +1764,11 @@ body.lite .welcome-intro__rays { opacity: calc(0.6 + var(--wi-beam-boost, 0) * 0
    no hard hotspots or see-through gaps, with the white Memento M on top. ~18% larger than the
    pillar nodes; transform:scale keeps the layout box at 32px so text + rail stay aligned. */
 .wi-help__node--orb { transform: scale(1.18); overflow: hidden; }
-.wi-help__node--orb.is-on { border-color: transparent; background: #6f6ad6; box-shadow: 0 0 20px -3px rgba(120,150,255,0.9); }
-.wi-help__node--orb .wi-orb__b { position: absolute; width: 26px; height: 26px; border-radius: 50%; filter: blur(6px); opacity: 0.9; }
-.wi-help__node--orb.is-on .wi-orb__b--1 { background: #a07dff; top: -3px; left: -4px; animation: wiOrbB1 7s ease-in-out infinite; }
-.wi-help__node--orb.is-on .wi-orb__b--2 { background: #46c8ff; top: -2px; right: -5px; animation: wiOrbB2 8.5s ease-in-out infinite; }
-.wi-help__node--orb.is-on .wi-orb__b--3 { background: #34d399; bottom: -4px; left: 3px; animation: wiOrbB3 9.5s ease-in-out infinite; }
+.wi-help__node--orb.is-on { border: 0; background: #6f6ad6; box-shadow: 0 0 20px -3px rgba(120,150,255,0.9); }
+.wi-help__node--orb .wi-orb__b { position: absolute; width: 32px; height: 32px; border-radius: 50%; filter: blur(6px); opacity: 0.9; }
+.wi-help__node--orb.is-on .wi-orb__b--1 { background: #a07dff; top: -6px; left: -7px; animation: wiOrbB1 7s ease-in-out infinite; }
+.wi-help__node--orb.is-on .wi-orb__b--2 { background: #46c8ff; top: -5px; right: -8px; animation: wiOrbB2 8.5s ease-in-out infinite; }
+.wi-help__node--orb.is-on .wi-orb__b--3 { background: #34d399; bottom: -7px; left: 2px; animation: wiOrbB3 9.5s ease-in-out infinite; }
 .wi-help__node--orb .wi-orb__m { position: absolute; top: 50%; left: 50%; width: 19px; height: 19px; transform: translate(-50%, -50%); z-index: 2; }
 @keyframes wiOrbB1 { 0%, 100% { transform: translate(0, 0); } 33% { transform: translate(6px, 5px); } 66% { transform: translate(3px, 8px); } }
 @keyframes wiOrbB2 { 0%, 100% { transform: translate(0, 0); } 33% { transform: translate(-6px, 6px); } 66% { transform: translate(-8px, -1px); } }
