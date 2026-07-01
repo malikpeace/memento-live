@@ -2514,7 +2514,7 @@ const WelcomeIntro = {
     const showButton = () => { if (nav) { nav.style.transition = 'opacity 0.4s ease'; nav.style.opacity = '1'; nav.style.pointerEvents = ''; } };
     // Simple, clean reveal: the cards sit in their FINAL slots and just fade in (no pop-and-move,
     // no colour flash). Clarity fades first, then Action + Consistency together.
-    const fadeIn = (el) => { if (!el) return; el.style.transition = 'opacity 0.55s ease'; el.style.opacity = '1'; };
+    const fadeIn = (el) => { if (!el) return; el.style.transition = 'opacity 0.9s ease'; el.style.opacity = '1'; };
     const finishAll = () => {
       revealSub();
       cards.classList.remove('wi-phi__cards--seq');
@@ -2526,18 +2526,19 @@ const WelcomeIntro = {
     if (reduced || this._phiSeen) { finishAll(); return; }
     this._phiSeen = true;
     if (nav) { nav.style.opacity = '0'; }
+    // Evenly spaced (~1.3s between each), slow graceful fades so nothing pops in.
     // headline (already landed from the M flip) holds alone, then the sub fades in.
-    setTimeout(revealSub, 550);
+    setTimeout(revealSub, 700);
     // Clarity fades in first...
-    setTimeout(() => { if (token !== this._phiSeqToken) return; fadeIn(pcs[0]); }, 2200);
+    setTimeout(() => { if (token !== this._phiSeqToken) return; fadeIn(pcs[0]); }, 2000);
     // ...then Action + Consistency fade in together, with the + separators.
     setTimeout(() => {
       if (token !== this._phiSeqToken) return;
       fadeIn(pcs[1]); fadeIn(pcs[2]);
       plus.forEach((p) => fadeIn(p));
-    }, 3000);
+    }, 3300);
     // then the button.
-    setTimeout(() => { if (token !== this._phiSeqToken) return; showButton(); }, 3800);
+    setTimeout(() => { if (token !== this._phiSeqToken) return; showButton(); }, 4700);
   },
   // Page 2: the same three pillars, now spoken to THIS person's answers, what Memento
   // will actually do for them (templated from clarityLevel / actionKnow / progress).
