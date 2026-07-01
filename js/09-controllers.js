@@ -2572,7 +2572,7 @@ const WelcomeIntro = {
     // The final node is the Memento M mark on a slowly-rotating gradient that blends the three
     // pillar colours (purple + blue + green) into one, so it reads as the culmination that grows
     // with them. The gradient starts spinning when the line reaches it (is-on).
-    const mMark = '<svg viewBox="0 0 512 512" aria-hidden="true"><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z" fill="#0a0a0e"/></svg>';
+    const mMark = '<svg viewBox="0 0 512 512" aria-hidden="true"><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z" fill="#ffffff"/></svg>';
     const orbRow = '<div class="wi-help__row is-dim" style="--nc:rgba(150,116,255,1)">'
       + '<span class="wi-help__node wi-help__node--orb">' + mMark + '</span>'
       + '<div class="wi-help__tx"><span class="wi-help__k">Your Memento grows with you</span>' + growBody + '</div>'
