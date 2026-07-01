@@ -2569,12 +2569,11 @@ const WelcomeIntro = {
       + '</div>';
     const bdy = (t) => '<p class="wi-help__k-body">' + esc(String(t || '')) + '</p>';
     const growBody = bdy("As you grow, your Memento will continue to grow with you. Reminding you of why you started and helping you stay on track as your progress compounds.");
-    // The final node is the Memento M mark on a slowly-rotating gradient that blends the three
-    // pillar colours (purple + blue + green) into one, so it reads as the culmination that grows
-    // with them. The gradient starts spinning when the line reaches it (is-on).
-    const mMark = '<svg viewBox="0 0 512 512" aria-hidden="true"><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z" fill="#ffffff"/></svg>';
+    // The final node is a smooth living orb: purple + blue + green + cyan blended into one circle
+    // (no icon, no seams) that slowly rotates so the colour mixture feels alive. It comes on when
+    // the line reaches it (is-on).
     const orbRow = '<div class="wi-help__row is-dim" style="--nc:rgba(150,116,255,1)">'
-      + '<span class="wi-help__node wi-help__node--orb">' + mMark + '</span>'
+      + '<span class="wi-help__node wi-help__node--orb" aria-hidden="true"></span>'
       + '<div class="wi-help__tx"><span class="wi-help__k">Your Memento grows with you</span>' + growBody + '</div>'
       + '</div>';
     return '<h2 class="wi-demo__headline wi-phi__head">' + head + '</h2>'
