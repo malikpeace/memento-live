@@ -2129,10 +2129,13 @@ const WelcomeIntro = {
       if (!reducedM && !this._phiSeen) {
         const cardsEl = this.pageWrap.querySelector('.wi-phi__cards');
         if (cardsEl) cardsEl.classList.add('wi-phi__cards--seq');
+        // Hold the sub back so the headline lands first, then the sub fades in, then the pillars.
+        const subEl = this.pageWrap.querySelector('.wi-phi__sub');
+        if (subEl) subEl.style.opacity = '0';
         this.navEl.style.opacity = '0'; this.navEl.style.pointerEvents = 'none';
         const innerEl2 = this.pageWrap.querySelector('.welcome-intro__page-inner');
         if (innerEl2) innerEl2.addEventListener('click', () => { if (this._phiSkipSeq) this._phiSkipSeq(); });
-        setTimeout(() => this._runPhiPillars(), 1000);
+        setTimeout(() => this._runPhiPillars(), 1100);
       }
     }
 
@@ -2506,8 +2509,11 @@ const WelcomeIntro = {
     const nav = this.navEl;
     const reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
     const token = this._phiSeqToken;
+    const sub = this.pageWrap.querySelector('.wi-phi__sub');
+    const revealSub = () => { if (sub) sub.style.opacity = ''; };
     const showButton = () => { if (nav) { nav.style.transition = 'opacity 0.4s ease'; nav.style.opacity = '1'; nav.style.pointerEvents = ''; } };
     const finishAll = () => {
+      revealSub();
       cards.classList.remove('wi-phi__cards--seq');
       pcs.forEach((c) => { c.style.transition = 'none'; c.style.transform = ''; c.classList.remove('wi-pc--present', 'wi-pc--flash'); c.classList.add('wi-pc--seated'); });
       plus.forEach((p) => { p.style.opacity = '1'; });
@@ -2526,14 +2532,16 @@ const WelcomeIntro = {
       const c = pcs[i];
       c.style.transformOrigin = 'center center';
       c.style.transition = 'none';
-      c.style.transform = 'translateX(' + offsets[i] + 'px) scale(1.5)';
+      // Present a bit LOWER (translateY down) so the big card clears the sub text above it,
+      // then it rises + shrinks into its slot.
+      c.style.transform = 'translateX(' + offsets[i] + 'px) translateY(64px) scale(1.34)';
       void c.offsetWidth;
       c.classList.add('wi-pc--present');
-      // hold big in the centre, then glide + shrink into its slot, then flash its colour.
+      // hold big + low, then glide UP into its slot, then flash its colour.
       setTimeout(() => {
         if (token !== this._phiSeqToken) return;
-        c.style.transition = 'transform 0.62s cubic-bezier(0.22,1,0.36,1)';
-        c.style.transform = 'translateX(0px) scale(1)';
+        c.style.transition = 'transform 0.66s cubic-bezier(0.22,1,0.36,1)';
+        c.style.transform = 'translateX(0px) translateY(0px) scale(1)';
         setTimeout(() => {
           if (token !== this._phiSeqToken) return;
           c.classList.remove('wi-pc--present');
@@ -2541,10 +2549,12 @@ const WelcomeIntro = {
           setTimeout(() => c.classList.remove('wi-pc--flash'), 720);
           if (i >= 1 && plus[i - 1]) plus[i - 1].style.opacity = '1';
           present(i + 1);
-        }, 640);
+        }, 680);
       }, 1000);
     };
-    setTimeout(() => present(0), 240);
+    // Sub fades in first (headline already landed from the M flip), holds, then the pillars start.
+    revealSub();
+    setTimeout(() => present(0), 1400);
   },
   // Page 2: the same three pillars, now spoken to THIS person's answers, what Memento
   // will actually do for them (templated from clarityLevel / actionKnow / progress).

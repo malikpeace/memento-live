@@ -1737,7 +1737,7 @@ body.lite .welcome-intro__rays { opacity: calc(0.6 + var(--wi-beam-boost, 0) * 0
 .wi-phi__mark { height: 54px; width: auto; display: block; margin: 0 auto 14px; }
 .wi-phi__head { margin: 0 auto; }
 .wi-phi__rule { display: block; width: 28px; height: 2px; border-radius: 2px; background: rgba(150,116,255,0.6); margin: 15px auto 0; }
-.wi-phi__sub { margin: 14px auto 0; max-width: 28ch; font-size: 0.95rem; line-height: 1.5; color: rgba(236,238,250,0.95); }
+.wi-phi__sub { margin: 14px auto 0; max-width: 28ch; font-size: 0.95rem; line-height: 1.5; color: rgba(236,238,250,0.95); transition: opacity 0.6s ease; }
 /* The "Ultimate goal" callout above the foundation line (page 1 only). */
 .wi-phi__goal { margin: 16px auto 0; max-width: 30ch; }
 .wi-phi__goal-eyebrow { display: block; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #fff; margin-bottom: 7px; }
@@ -1748,7 +1748,7 @@ body.lite .welcome-intro__rays { opacity: calc(0.6 + var(--wi-beam-boost, 0) * 0
 .wi-cine.wi-phi { max-width: 520px; padding-left: 0; padding-right: 0; }
 .wi-phi__cards { display: flex; align-items: stretch; gap: 7px; margin: 20px auto 0; width: 100%; max-width: 500px; }
 .wi-pc-plus { flex: 0 0 auto; align-self: center; color: rgba(255,255,255,0.3); font-size: 1.05rem; font-weight: 300; line-height: 1; }
-.wi-pc { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 9px; background: rgba(255,255,255,0.035); border-radius: 16px; padding: 18px 9px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
+.wi-pc { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 9px; background: rgba(17,16,27,0.72); border-radius: 16px; padding: 18px 9px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 8px 26px rgba(0,0,0,0.34); backdrop-filter: blur(26px) saturate(1.25); -webkit-backdrop-filter: blur(26px) saturate(1.25); }
 .wi-pc__ic { width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; color: var(--pcc); }
 .wi-pc__ic svg { width: 30px; height: 30px; }
 .wi-pc__name { font-size: 0.9rem; font-weight: 700; color: #fff; letter-spacing: -0.01em; }
