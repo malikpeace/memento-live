@@ -2569,11 +2569,16 @@ const WelcomeIntro = {
       + '</div>';
     const bdy = (t) => '<p class="wi-help__k-body">' + esc(String(t || '')) + '</p>';
     const growBody = bdy("As you grow, your Memento will continue to grow with you. Reminding you of why you started and helping you stay on track as your progress compounds.");
-    // The final node is a smooth living orb: purple + blue + green + cyan blended into one circle
-    // (no icon, no seams) that slowly rotates so the colour mixture feels alive. It comes on when
-    // the line reaches it (is-on).
+    // The final node is an energy-ball orb: three big, heavily-blurred colour blobs (purple, cyan,
+    // green) drift + oscillate inside a clipped circle, so the whole circle reads as living energy
+    // with no hard hotspots or see-through gaps, with the white Memento M on top. It comes alive
+    // when the line reaches it (is-on).
+    const mMark = '<svg class="wi-orb__m" viewBox="0 0 512 512" aria-hidden="true"><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z" fill="#ffffff"/></svg>';
     const orbRow = '<div class="wi-help__row is-dim" style="--nc:rgba(150,116,255,1)">'
-      + '<span class="wi-help__node wi-help__node--orb" aria-hidden="true"></span>'
+      + '<span class="wi-help__node wi-help__node--orb" aria-hidden="true">'
+      +   '<span class="wi-orb__b wi-orb__b--1"></span><span class="wi-orb__b wi-orb__b--2"></span><span class="wi-orb__b wi-orb__b--3"></span>'
+      +   mMark
+      + '</span>'
       + '<div class="wi-help__tx"><span class="wi-help__k">Your Memento grows with you</span>' + growBody + '</div>'
       + '</div>';
     return '<h2 class="wi-demo__headline wi-phi__head">' + head + '</h2>'
