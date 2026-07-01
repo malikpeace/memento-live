@@ -1752,13 +1752,22 @@ body.lite .welcome-intro__rays { opacity: calc(0.6 + var(--wi-beam-boost, 0) * 0
    equation as the final "it all compounds" node (JS-driven reveal in _runHelpReveal). */
 .wi-help__stp { position: relative; margin: 26px auto 0; max-width: 31ch; text-align: left; }
 .wi-help__rail { position: absolute; left: 14px; width: 4px; border-radius: 4px; background: rgba(255,255,255,0.12); }
-.wi-help__fill { position: absolute; left: 14px; width: 4px; height: 0; border-radius: 4px; background: linear-gradient(rgba(150,116,255,1) 0%, rgba(245,245,247,1) 42%, rgba(52,211,153,1) 76%, rgba(245,200,119,1) 100%); transition: height 1s ease; }
+.wi-help__fill { position: absolute; left: 14px; width: 4px; height: 0; border-radius: 4px; background: linear-gradient(rgba(150,116,255,1) 0%, rgba(245,245,247,1) 42%, rgba(52,211,153,1) 74%, rgba(160,184,255,1) 100%); transition: height 1s ease; }
 .wi-help__row { display: flex; gap: 15px; padding-bottom: 24px; transition: opacity 0.7s ease, filter 0.7s ease; }
 .wi-help__row:last-child { padding-bottom: 0; }
 .wi-help__row.is-dim { opacity: 0.28; filter: blur(3.5px); }
 .wi-help__node { position: relative; flex: 0 0 auto; width: 32px; height: 32px; border-radius: 50%; background: #12101a; border: 2px solid rgba(255,255,255,0.14); display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.35); z-index: 1; transition: background 0.5s ease, border-color 0.5s ease, color 0.5s ease, box-shadow 0.5s ease; }
 .wi-help__node svg { width: 16px; height: 16px; }
 .wi-help__node.is-on { background: var(--nc); border-color: var(--nc); color: var(--nic, #0a0a0e); box-shadow: 0 0 16px -2px var(--nc); }
+/* The final node is a living orb that slowly cycles light blue -> purple -> white to show the
+   Memento evolving as you grow. It starts animating only once the line reaches it (is-on). */
+.wi-help__node--orb.is-on { border-color: transparent; animation: wiOrbEvolve 7s ease-in-out infinite; }
+@keyframes wiOrbEvolve {
+  0%, 100% { background-color: #8fb8ff; box-shadow: inset 0 2px 4px rgba(255,255,255,0.5), 0 0 20px -1px rgba(143,184,255,0.95); }
+  33%      { background-color: #9674ff; box-shadow: inset 0 2px 4px rgba(255,255,255,0.5), 0 0 20px -1px rgba(150,116,255,0.95); }
+  66%      { background-color: #e9ecff; box-shadow: inset 0 2px 4px rgba(255,255,255,0.6), 0 0 22px -1px rgba(213,220,255,0.95); }
+}
+@media (prefers-reduced-motion: reduce) { .wi-help__node--orb.is-on { animation: none; background-color: #9674ff; } }
 .wi-help__tx { flex: 1 1 auto; min-width: 0; padding-top: 3px; }
 .wi-help__k { display: block; margin-bottom: 4px; font-size: 0.98rem; font-weight: 700; letter-spacing: -0.01em; color: #fff; }
 .wi-help__k-body { margin: 0; font-size: 0.9rem; line-height: 1.5; color: rgba(236,238,250,0.95); }
