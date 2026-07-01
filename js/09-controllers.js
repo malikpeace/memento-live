@@ -2116,19 +2116,17 @@ const WelcomeIntro = {
     this.navEl.innerHTML = (kind === 'enter' || kind === 'preview') ? '' : `<button class="welcome-intro__back-btn" id="solBack">←</button><button class="welcome-intro__btn welcome-intro__btn--step" id="solNext" style="flex:1;width:auto;">${solNextLabel}</button>`;
     try { this.pageWrap.classList.remove('wc-busy', 'wc-reading'); this.pageWrap.scrollTop = 0; } catch (e) {}
 
-    // Help page, first visit: hold the three personalized points + the equation + the button
-    // back at opacity 0, then reveal them one at a time (Clarity, pause, Action, pause,
-    // Consistency, then the equation). Tapping the page snaps it to the finished state.
+    // Help page: the stepper starts with Find Clarity lit and the rest blurred (HTML is-dim).
+    // First visit runs the line-draw reveal; a revisit / reduced-motion lands fully lit at once.
     if (kind === 'help') {
       const reducedM = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-      if (!reducedM && !this._phiSeen) {
-        this.pageWrap.querySelectorAll('.wi-help__row').forEach((r) => { r.style.opacity = '0'; });
-        const eqEl = this.pageWrap.querySelector('.wi-phi__eq');
-        if (eqEl) eqEl.style.opacity = '0';
+      if (reducedM || this._phiSeen) {
+        this._runHelpReveal();
+      } else {
         this.navEl.style.opacity = '0'; this.navEl.style.pointerEvents = 'none';
         const innerEl2 = this.pageWrap.querySelector('.welcome-intro__page-inner');
         if (innerEl2) innerEl2.addEventListener('click', () => { if (this._phiSkipSeq) this._phiSkipSeq(); });
-        setTimeout(() => this._runHelpReveal(), 1200);
+        setTimeout(() => this._runHelpReveal(), 900);
       }
     }
 
@@ -2473,35 +2471,57 @@ const WelcomeIntro = {
       consistency: { c: 'rgba(52,211,153,1)', label: 'Stay Consistent.', icon: cal, text: "Showing up, especially when it's hard." }
     };
   },
-  // Sequential reveal on the help page: the three personalized points fade in one at a time
-  // (Find Clarity, pause, Take Action, pause, Stay Consistent), then the equation, then the
-  // button. Runs once per onboarding (_phiSeen); reduced-motion + back-nav show it instantly.
-  // Tapping the page snaps it to the finished state.
+  // Vertical-stepper reveal on the help page: Find Clarity is already lit; the connecting line
+  // draws DOWN to each next node in turn, deblurring + lighting it (Take Action, Stay Consistent),
+  // then the final "it all compounds" equation node. Runs once per onboarding (_phiSeen);
+  // reduced-motion + back-nav land on the fully-lit state. Tapping the page snaps it done.
   _runHelpReveal() {
-    const wrap = this.pageWrap && this.pageWrap.querySelector('.wi-help');
-    if (!wrap) return;
-    const rows = [...wrap.querySelectorAll('.wi-help__row')];
-    const eq = this.pageWrap.querySelector('.wi-phi__eq');
+    const stp = this.pageWrap && this.pageWrap.querySelector('.wi-help__stp');
+    if (!stp) return;
+    const nodes = [...stp.querySelectorAll('.wi-help__node')];
+    const rows = [...stp.querySelectorAll('.wi-help__row')];
+    const rail = stp.querySelector('.wi-help__rail');
+    const fill = stp.querySelector('.wi-help__fill');
     const nav = this.navEl;
     const reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
     const token = this._phiSeqToken;
-    const fadeIn = (el) => { if (!el) return; el.style.transition = 'opacity 0.9s ease'; el.style.opacity = '1'; };
+    // getBoundingClientRect, not offsetTop: the blurred (is-dim) rows carry a CSS filter, which
+    // makes each row its own offsetParent and zeroes offsetTop. Rects are filter-proof.
+    const centers = () => { const sr = stp.getBoundingClientRect(); return nodes.map((n) => { const r = n.getBoundingClientRect(); return (r.top - sr.top) + r.height / 2; }); };
+    // Pin the rail + fill to run exactly from the first node's centre to the last node's centre.
+    const layout = () => {
+      const c = centers();
+      if (rail) { rail.style.top = c[0] + 'px'; rail.style.height = (c[c.length - 1] - c[0]) + 'px'; }
+      if (fill) fill.style.top = c[0] + 'px';
+      return c;
+    };
     const showButton = () => { if (nav) { nav.style.transition = 'opacity 0.4s ease'; nav.style.opacity = '1'; nav.style.pointerEvents = ''; } };
     const finishAll = () => {
-      rows.forEach((r) => { r.style.transition = 'none'; r.style.opacity = '1'; });
-      if (eq) eq.style.opacity = '1';
+      const c = layout();
+      rows.forEach((r) => r.classList.remove('is-dim'));
+      nodes.forEach((n) => n.classList.add('is-on'));
+      if (fill) { fill.style.transition = 'none'; fill.style.height = (c[c.length - 1] - c[0]) + 'px'; }
       showButton();
     };
     this._phiSkipSeq = () => { if (token !== this._phiSeqToken) return; this._phiSeqToken++; finishAll(); };
     if (reduced || this._phiSeen) { finishAll(); return; }
     this._phiSeen = true;
     if (nav) { nav.style.opacity = '0'; }
-    // Evenly spaced (~1.3s), slow graceful fades: Clarity -> Action -> Consistency -> equation -> button.
-    setTimeout(() => { if (token !== this._phiSeqToken) return; fadeIn(rows[0]); }, 300);
-    setTimeout(() => { if (token !== this._phiSeqToken) return; fadeIn(rows[1]); }, 1600);
-    setTimeout(() => { if (token !== this._phiSeqToken) return; fadeIn(rows[2]); }, 2900);
-    setTimeout(() => { if (token !== this._phiSeqToken) return; fadeIn(eq); }, 4200);
-    setTimeout(() => { if (token !== this._phiSeqToken) return; showButton(); }, 5300);
+    const c = layout();
+    // Clarity (node 0) is already lit. Draw the line down to each next node in turn, lighting it
+    // and clearing its blur as the line arrives. ~1.25s between steps so each is its own beat.
+    let t = 800;
+    for (let i = 1; i < nodes.length; i++) {
+      const idx = i;
+      setTimeout(() => {
+        if (token !== this._phiSeqToken) return;
+        if (fill) fill.style.height = (c[idx] - c[0]) + 'px';
+        rows[idx].classList.remove('is-dim');
+        nodes[idx].classList.add('is-on');
+      }, t);
+      t += 1250;
+    }
+    setTimeout(() => { if (token !== this._phiSeqToken) return; showButton(); }, t);
   },
   // Page 2: the same three pillars, now spoken to THIS person's answers, what Memento
   // will actually do for them (templated from clarityLevel / actionKnow / progress).
@@ -2530,31 +2550,32 @@ const WelcomeIntro = {
     else consistency = "Memento keeps you showing up, day after day, until you actually get there.";
     return { clarity: clarity, action: action, consistency: consistency };
   },
-  // The single "Here's how Memento will help you" body under the static M + headline: the three
-  // personalized Find Clarity / Take Action / Stay Consistent points as a clean stacked list
-  // (pillar icon + tinted verb + a direct callback to what THEY said), closed by the equation.
+  // The single "Here's how Memento will help you" body: a vertical stepper. Find Clarity starts
+  // lit; the line draws down and each next step (Take Action, Stay Consistent) deblurs + lights
+  // up as it is reached, ending on the equation as the final "it all compounds" node. Each pillar
+  // line is a direct, personalized callback to what THEY said (_phiPersonal).
   _helpBody(p) {
-    const rule = '<span class="wi-phi__rule"></span>';
     const first = (p && p.name) ? esc(String(p.name).trim().split(/\s+/)[0]) : '';
     const head = first ? first + ", here's how Memento will help you" : "Here's how Memento will help you";
     const d = this._phiData();
     const help = this._phiPersonal(p || {});
-    const tint = { clarity: 'c', action: 'a', consistency: 'k' };
-    const row = (key, body) => '<div class="wi-help__row" data-k="' + key + '" style="--pcc:' + d[key].c + '">'
-      + '<span class="wi-help__ic">' + d[key].icon + '</span>'
-      + '<div class="wi-help__txt">'
-      +   '<span class="wi-help__k wi-help__k--' + tint[key] + '">' + d[key].label + '</span>'
-      +   '<p class="wi-help__k-body">' + esc(String(body || '')) + '</p>'
-      + '</div>'
+    // Goal-flag icon for the final "it all compounds" node (the payoff).
+    const flag = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4M6 4h11l-2.2 4L17 12H6"/></svg>';
+    // dim=true starts the row blurred + its node unlit; the reveal removes it as the line arrives.
+    const row = (icon, color, label, bodyHtml, dim, extra) =>
+      '<div class="wi-help__row' + (dim ? ' is-dim' : '') + (extra || '') + '" style="--nc:' + color + '">'
+      + '<span class="wi-help__node' + (dim ? '' : ' is-on') + '" aria-hidden="true">' + icon + '</span>'
+      + '<div class="wi-help__tx"><span class="wi-help__k">' + label + '</span>' + bodyHtml + '</div>'
       + '</div>';
-    return '<h2 class="wi-demo__headline wi-phi__head">' + head + '</h2>' + rule
-      + '<div class="wi-help">'
-      +   row('clarity', help.clarity)
-      +   row('action', help.action)
-      +   row('consistency', help.consistency)
-      + '</div>'
-      + '<div class="wi-phi__eq">'
-      +   '<p class="wi-phi__eq-formula"><span class="wi-phi__eq-term wi-phi__eq-term--c">Clear goal</span><span class="wi-phi__eq-x">&#215;</span><span class="wi-phi__eq-term wi-phi__eq-term--a">Focused action</span><span class="wi-phi__eq-x">&#215;</span><span class="wi-phi__eq-term wi-phi__eq-term--k">Consistency</span> <span class="wi-phi__eq-res">= Results</span></p>'
+    const bdy = (t) => '<p class="wi-help__k-body">' + esc(String(t || '')) + '</p>';
+    const eqHtml = '<p class="wi-phi__eq-formula wi-help__eqline"><span class="wi-phi__eq-term wi-phi__eq-term--c">Clear goal</span><span class="wi-phi__eq-x">&#215;</span><span class="wi-phi__eq-term wi-phi__eq-term--a">Focused action</span><span class="wi-phi__eq-x">&#215;</span><span class="wi-phi__eq-term wi-phi__eq-term--k">Consistency</span> <span class="wi-phi__eq-res">= Results</span></p>';
+    return '<h2 class="wi-demo__headline wi-phi__head">' + head + '</h2>'
+      + '<div class="wi-help__stp">'
+      +   '<span class="wi-help__rail" aria-hidden="true"></span><span class="wi-help__fill" aria-hidden="true"></span>'
+      +   row(d.clarity.icon, d.clarity.c, 'Find Clarity', bdy(help.clarity), false, '')
+      +   row(d.action.icon, d.action.c, 'Take Action', bdy(help.action), true, '')
+      +   row(d.consistency.icon, d.consistency.c, 'Stay Consistent', bdy(help.consistency), true, '')
+      +   row(flag, 'rgba(245,200,119,1)', 'It all compounds', eqHtml, true, ' wi-help__row--eq')
       + '</div>';
   },
   // Mori page: their life in dots (reuses the life-in-years grid).
