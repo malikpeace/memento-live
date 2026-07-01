@@ -2495,7 +2495,7 @@ const WelcomeIntro = {
       + '<span class="wi-pc__name">' + d[key].label + '</span>'
       + '<span class="wi-pc__desc">' + (descs[key] || d[key].text) + '</span>'
       + '</div>';
-    const plus = '<span class="wi-pc-plus" aria-hidden="true">+</span>';
+    const plus = '<span class="wi-pc-plus" aria-hidden="true">&#215;</span>';
     return '<div class="wi-phi__cards">' + card('clarity') + plus + card('action') + plus + card('consistency') + '</div>';
   },
   // Sequential pillar reveal on the philosophy page: each card (Clarity, then Action, then
@@ -2581,7 +2581,7 @@ const WelcomeIntro = {
       + this._phiCards()
       + '<div class="wi-phi__eq">'
       +   '<p class="wi-phi__eq-lead">Combine all three, and progress stops being a maybe. It becomes inevitable.</p>'
-      +   '<p class="wi-phi__eq-formula"><span class="wi-phi__eq-term wi-phi__eq-term--c">Clear goal</span><span class="wi-phi__eq-x">&#215;</span><span class="wi-phi__eq-term wi-phi__eq-term--a">Focused Action</span><span class="wi-phi__eq-x">&#215;</span><span class="wi-phi__eq-term wi-phi__eq-term--k">Consistency</span> <span class="wi-phi__eq-res">= results</span></p>'
+      +   '<p class="wi-phi__eq-formula"><span class="wi-phi__eq-term wi-phi__eq-term--c">Clear goal</span><span class="wi-phi__eq-x">&#215;</span><span class="wi-phi__eq-term wi-phi__eq-term--a">Focused Action</span><span class="wi-phi__eq-x">&#215;</span><span class="wi-phi__eq-term wi-phi__eq-term--k">Consistency</span> <span class="wi-phi__eq-res">= Results</span></p>'
       + '</div>';
   },
   // Sequential fade while the M + headline stay put: the current boxes fade out, then
