@@ -1548,7 +1548,7 @@ body.lite .welcome-intro__sumstar { animation: none; }
 .welcome-intro__firstwin-eyebrow { font-size: var(--fs-xs); letter-spacing: 0.2em; font-weight: 700;
   color: #c9b8ff; margin-bottom: 14px; }
 .welcome-intro__firstwin-title { font-size: 1.95rem; font-weight: 800; color: #fff; line-height: 1.1; margin-bottom: 16px; }
-.welcome-intro__firstwin-body { font-size: 1.02rem; line-height: 1.55; color: rgba(var(--ink),0.8); }
+.welcome-intro__firstwin-body { font-size: 1.02rem; line-height: 1.55; color: rgba(var(--ink),0.95); }
 .welcome-intro__firstwin-body p { margin: 0 0 0.72em; }
 .welcome-intro__firstwin-body p:last-child { margin-bottom: 0; }
 /* Shorter phones: tighten so the longer celebration copy never clips (the screen
@@ -1615,7 +1615,7 @@ body.lite .welcome-intro__help2-step { animation: none; opacity: 1; }
 .wi-stepper__card { background: rgba(255,255,255,0.05); border-radius: 16px; padding: 24px 20px 26px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.07); min-height: 178px; text-align: left; }
 .wi-stepper__num { font-size: 0.74rem; font-weight: 800; letter-spacing: 0.16em; font-variant-numeric: tabular-nums; margin-bottom: 12px; }
 .wi-stepper__name { font-size: 1.34rem; font-weight: 750; letter-spacing: -0.01em; margin-bottom: 10px; }
-.wi-stepper__text { font-size: 0.97rem; line-height: 1.5; color: rgba(255,255,255,0.72); }
+.wi-stepper__text { font-size: 0.97rem; line-height: 1.5; color: rgba(255,255,255,0.95); }
 .wi-stepper__dots { display: flex; justify-content: center; gap: 7px; margin-top: 18px; }
 .wi-stepper__dot { width: 7px; height: 7px; border-radius: 999px; padding: 0; border: none; cursor: pointer; background: rgba(255,255,255,0.22); transition: width 0.22s ease, background 0.22s ease; }
 .wi-stepper__dot.is-active { width: 22px; background: rgba(255,255,255,0.9); }
@@ -1737,7 +1737,7 @@ body.lite .welcome-intro__rays { opacity: calc(0.6 + var(--wi-beam-boost, 0) * 0
 .wi-phi__mark { height: 54px; width: auto; display: block; margin: 0 auto 14px; }
 .wi-phi__head { margin: 0 auto; }
 .wi-phi__rule { display: block; width: 28px; height: 2px; border-radius: 2px; background: rgba(150,116,255,0.6); margin: 15px auto 0; }
-.wi-phi__sub { margin: 14px auto 0; max-width: 28ch; font-size: 0.95rem; line-height: 1.5; color: rgba(236,238,250,0.82); }
+.wi-phi__sub { margin: 14px auto 0; max-width: 28ch; font-size: 0.95rem; line-height: 1.5; color: rgba(236,238,250,0.95); }
 /* The "Ultimate goal" callout above the foundation line (page 1 only). */
 .wi-phi__goal { margin: 16px auto 0; max-width: 30ch; }
 .wi-phi__goal-eyebrow { display: block; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #fff; margin-bottom: 7px; }
@@ -1753,15 +1753,10 @@ body.lite .welcome-intro__rays { opacity: calc(0.6 + var(--wi-beam-boost, 0) * 0
 .wi-pc__ic svg { width: 30px; height: 30px; }
 .wi-pc__name { font-size: 0.9rem; font-weight: 700; color: #fff; letter-spacing: -0.01em; }
 .wi-pc__rule { width: 16px; height: 2px; border-radius: 2px; background: var(--pcc); opacity: 0.5; }
-.wi-pc__desc { font-size: 0.72rem; line-height: 1.45; color: rgba(236,238,250,0.82); }
-/* Colour-coded boxes: Clarity purple, Action white (black text), Consistency green. */
-/* Minimal/colorless cards: Clarity + Consistency use the plain dark glass (the only
-   color is their icon, purple / green). Action is the one inverted card: white fill,
-   black text + icon. */
-.wi-pc[data-k="action"] { background: #f5f5f7; box-shadow: none; }
-.wi-pc[data-k="action"] .wi-pc__ic { color: #0a0a0e; }
-.wi-pc[data-k="action"] .wi-pc__name { color: #0a0a0e; }
-.wi-pc[data-k="action"] .wi-pc__desc { color: rgba(10,10,14,0.82); }
+.wi-pc__desc { font-size: 0.72rem; line-height: 1.45; color: rgba(236,238,250,0.95); }
+/* All three pillar cards use the same dark glass; only the icon carries the pillar
+   colour (Clarity purple, Action white, Consistency green). Action is NOT inverted, it
+   matches the others so it does not read as extra emphasis. */
 /* The philosophy body is a two-view crossfade: pillars (page 1) and fuel (page 2).
    The M + headline above it stay put; min-height holds the height so the M does not
    shift when the shorter fuel view swaps in. */
