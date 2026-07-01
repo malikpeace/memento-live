@@ -1010,7 +1010,7 @@ const WelcomeIntro = {
     const _stageMap = {
       1: { lights: ['purple', 'white', 'green'], scene: 'equation' },
       2: { lights: ['purple'], scene: 'clarity' },
-      3: { lights: ['white'], scene: 'action' },
+      3: { lights: ['cyan'], scene: 'action' },
       4: { lights: ['green'], scene: 'consistency' },
       5: { lights: ['purple', 'white', 'green'], scene: 'equation' }
     };
