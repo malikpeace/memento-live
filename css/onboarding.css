@@ -1904,9 +1904,9 @@ body.lite .welcome-intro__rays { opacity: calc(0.6 + var(--wi-beam-boost, 0) * 0
    lifts in just behind it. Not a pop, a reveal. (Only opacity/blur/transform, GPU-cheap.) */
 .wi-prev .wi-pcard-stage { animation: wiStageArrive 1.9s cubic-bezier(0.16,1,0.3,1) 0.15s both; }
 @keyframes wiStageArrive {
-  0%   { opacity: 0; transform: perspective(750px) rotateY(-52deg) scale(0.82) translateY(26px); filter: blur(16px); }
+  0%   { opacity: 0; transform: perspective(680px) rotateY(-72deg) scale(0.8) translateY(28px); filter: blur(16px); }
   55%  { opacity: 1; }
-  100% { opacity: 1; transform: perspective(750px) rotateY(0deg) scale(1) translateY(0); filter: blur(0); }
+  100% { opacity: 1; transform: perspective(680px) rotateY(0deg) scale(1) translateY(0); filter: blur(0); }
 }
 /* A single soft light-sweep across the card as it settles, like light glancing off glass. Clipped
    by the card's overflow. Passes over the M too, so the emblem catches the light for a beat. */

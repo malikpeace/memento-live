@@ -2597,9 +2597,9 @@ const WelcomeIntro = {
     return '<h2 class="wi-demo__headline wi-phi__head">' + head + '</h2>'
       + '<div class="wi-help__stp">'
       +   '<span class="wi-help__rail" aria-hidden="true"></span><span class="wi-help__fill" aria-hidden="true"></span>'
-      +   row(d.clarity.icon, d.clarity.c, DARK, 'Find Clarity', bdy(help.clarity), false)
-      +   row(d.action.icon, d.action.c, DARK, 'Take Action', bdy(help.action), true)
-      +   row(d.consistency.icon, d.consistency.c, DARK, 'Stay Consistent', bdy(help.consistency), true)
+      +   row('', d.clarity.c, DARK, 'Find Clarity', bdy(help.clarity), false)
+      +   row('', d.action.c, DARK, 'Take Action', bdy(help.action), true)
+      +   row('', d.consistency.c, DARK, 'Stay Consistent', bdy(help.consistency), true)
       +   orbRow
       + '</div>';
   },
