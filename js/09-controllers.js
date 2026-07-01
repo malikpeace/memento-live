@@ -2548,13 +2548,16 @@ const WelcomeIntro = {
           c.classList.add('wi-pc--seated', 'wi-pc--flash');
           setTimeout(() => c.classList.remove('wi-pc--flash'), 720);
           if (i >= 1 && plus[i - 1]) plus[i - 1].style.opacity = '1';
-          present(i + 1);
+          // Pause AFTER the colour flash finishes before the next pillar rises, so each pillar
+          // reads as its own separate moment instead of running one on top of the next.
+          setTimeout(() => present(i + 1), 1150);
         }, 680);
       }, 1000);
     };
-    // Sub fades in first (headline already landed from the M flip), holds, then the pillars start.
-    revealSub();
-    setTimeout(() => present(0), 1400);
+    // Give every element its own beat: headline (already landed from the M flip) holds alone,
+    // then the sub fades in, then after another pause the pillars begin.
+    setTimeout(revealSub, 550);
+    setTimeout(() => present(0), 2200);
   },
   // Page 2: the same three pillars, now spoken to THIS person's answers, what Memento
   // will actually do for them (templated from clarityLevel / actionKnow / progress).
