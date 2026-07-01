@@ -1757,6 +1757,24 @@ body.lite .welcome-intro__rays { opacity: calc(0.6 + var(--wi-beam-boost, 0) * 0
 /* All three pillar cards use the same dark glass; only the icon carries the pillar
    colour (Clarity purple, Action white, Consistency green). Action is NOT inverted, it
    matches the others so it does not read as extra emphasis. */
+/* Sequential pillar reveal: each card presents BIG in the centre (icon -> name -> desc
+   staggered), holds, then shrinks into its slot and softly flashes its pillar colour.
+   --seq hides the cards + plus signs until their turn (JS drives the sequence). */
+.wi-phi__cards--seq { overflow: visible; }
+.wi-phi__cards--seq .wi-pc { opacity: 0; will-change: transform; }
+.wi-phi__cards--seq .wi-pc-plus { opacity: 0; transition: opacity 0.4s ease; }
+.wi-pc.wi-pc--present, .wi-pc.wi-pc--seated { opacity: 1; }
+.wi-pc--present { position: relative; z-index: 3; box-shadow: 0 24px 60px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06); }
+.wi-pc--present .wi-pc__ic { animation: wiPcChild 0.45s ease both; }
+.wi-pc--present .wi-pc__name { animation: wiPcChild 0.45s ease 0.14s both; }
+.wi-pc--present .wi-pc__desc { animation: wiPcChild 0.45s ease 0.28s both; }
+@keyframes wiPcChild { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.wi-pc--flash { animation: wiPcFlash 0.72s ease both; }
+@keyframes wiPcFlash {
+  0%   { box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
+  42%  { box-shadow: 0 0 26px 1px var(--pcc), inset 0 0 16px rgba(255,255,255,0.04); }
+  100% { box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
+}
 /* The philosophy body is a two-view crossfade: pillars (page 1) and fuel (page 2).
    The M + headline above it stay put; min-height holds the height so the M does not
    shift when the shorter fuel view swaps in. */

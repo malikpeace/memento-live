@@ -379,7 +379,7 @@ const WelcomeIntro = {
       'Closer to self-mastery': "Self-mastery is just reps. Stack enough days and you stop needing motivation at all.",
       "I'll have true freedom": "Freedom is earned in reps. Keep stacking them and the options open up.",
       'Fulfillment and Peace': "Peace comes from knowing you're actually moving, not from standing still. This is how you earn it.",
-      "Memories I'll look back at": "A year from now you'll have the receipts. The days you showed up become the story you get to tell.",
+      "Memories I'll look back at": "Keep that in mind whenever you hit resistance. The days you showed up will be what's remembered.",
       'Other': "Whatever it is for you, it gets built one ordinary day at a time. This is how you stack them.",
       _multi3: "Keep that in mind as you continue. Remembering why you started is great fuel. We'll make sure you get there.",
       _multi2: "Both of those are on the table. Keep the momentum and a year from now they're just real.",
@@ -1943,6 +1943,8 @@ const WelcomeIntro = {
   // flows into the personalized summary stepper.
   _showFirstWin(stepIndex) {
     if (!this._summaryStarted) { this._summaryStarted = true; try { this.generateSummary(); } catch (e) { this._summaryFailed = true; } }
+    this._phiSeen = false;   // the pillar reveal plays once per onboarding run
+    this._phiSeqToken = (this._phiSeqToken || 0) + 1;
     this._hideProgressBar();
     const nm = (state.profile && state.profile.name) ? state.profile.name : '';
     this.el.classList.add('welcome-intro--blackout');
@@ -2039,6 +2041,9 @@ const WelcomeIntro = {
     this.pageWrap.style.textAlign = 'center';
     this.navEl.style.justifyContent = 'center';
     this.navEl.style.gap = '10px';
+    this.navEl.style.opacity = ''; this.navEl.style.pointerEvents = '';   // reset (the philosophy pillar reveal hides it, then restores)
+    // Bump the pillar-sequence token so a fresh render cancels any running reveal.
+    this._phiSeqToken = (this._phiSeqToken || 0) + 1;
 
     // The signature top-left light: the real god-ray shafts (the same beam cluster
     // the splash + dashboard use), not a soft orb. Created once, constant across
@@ -2062,11 +2067,14 @@ const WelcomeIntro = {
     // The opening page sits on plain black (pre-Memento). The top-left beam arrives
     // on the "Enter Memento" beat onward, so the light literally comes in as they
     // enter Memento. --preenter hides the rays + the background wash on the stage page.
-    this.el.classList.toggle('welcome-intro--preenter', kind === 'stage');
+    // Enter Memento is now the first beat, so the top-left beam is present throughout (no
+    // pre-enter black page before it anymore).
+    this.el.classList.remove('welcome-intro--preenter');
     // The beam-brightness boost only applies during the Meet Your Memento reveal; reset elsewhere.
     if (kind !== 'preview') { try { this.el.style.setProperty('--wi-beam-boost', '0'); } catch (e) {} }
-    // Philosophy uses a wider content column (less page padding) so the 3 boxes are not skinny.
-    this.el.classList.toggle('welcome-intro--phi', kind === 'philosophy');
+    // Philosophy + the "how Memento helps" page use a wider content column (less page padding)
+    // so the 3 boxes / cards are not skinny.
+    this.el.classList.toggle('welcome-intro--phi', kind === 'philosophy' || kind === 'help');
     // any pending auto-advance from a prior "Enter Memento" beat is cancelled the
     // moment we render anything else (incl. navigating back to it).
     if (this._enterTimer) { clearTimeout(this._enterTimer); this._enterTimer = null; }
@@ -2086,6 +2094,10 @@ const WelcomeIntro = {
     } else if (kind === 'philosophy') {
       this._phiView = 'pillars'; this._phiP = p; this._phiSwapping = false;
       inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-phi" data-beat="${beatIdx}"><svg class="wi-phi__mark" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="44" fill="#f5f5f7"/><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z" fill="#0a0a0e"/></svg><div class="wi-phi__body"><div class="wi-phi__bodyinner">${this._phiBody('pillars', p)}</div></div></div>`;
+    } else if (kind === 'help') {
+      // "How Memento Will Help You" is now its own page (was the philosophy page's second view).
+      this._phiView = 'help'; this._phiP = p; this._phiSwapping = false;
+      inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-phi" data-beat="${beatIdx}"><svg class="wi-phi__mark" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="44" fill="#f5f5f7"/><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z" fill="#0a0a0e"/></svg><div class="wi-phi__body"><div class="wi-phi__bodyinner">${this._phiBody('help', p)}</div></div></div>`;
     } else if (kind === 'mori') {
       inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-moriview" data-beat="${beatIdx}"><h2 class="wi-demo__headline">${esc(b.headline)}</h2>${this._cineMori()}<p class="wi-demo__line">${esc(b.line)}</p>${b.days ? `<p class="wi-mori__days">btw, you have about <b>${b.days.toLocaleString()}</b> days left.</p>` : ''}</div>`;
     } else if (kind === 'preview') {
@@ -2106,6 +2118,20 @@ const WelcomeIntro = {
     this.navEl.innerHTML = (kind === 'enter' || kind === 'preview') ? '' : `<button class="welcome-intro__back-btn" id="solBack">←</button><button class="welcome-intro__btn welcome-intro__btn--step" id="solNext" style="flex:1;width:auto;">${solNextLabel}</button>`;
     try { this.pageWrap.classList.remove('wc-busy', 'wc-reading'); this.pageWrap.scrollTop = 0; } catch (e) {}
 
+    // Philosophy pillars, first visit: hide the cards + "For you" button, then run the
+    // sequential big-centre -> shrink-into-slot -> colour-flash reveal. Tapping snaps it done.
+    if (kind === 'philosophy') {
+      const reducedM = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+      if (!reducedM && !this._phiSeen) {
+        const cardsEl = this.pageWrap.querySelector('.wi-phi__cards');
+        if (cardsEl) cardsEl.classList.add('wi-phi__cards--seq');
+        this.navEl.style.opacity = '0'; this.navEl.style.pointerEvents = 'none';
+        const innerEl2 = this.pageWrap.querySelector('.welcome-intro__page-inner');
+        if (innerEl2) innerEl2.addEventListener('click', () => { if (this._phiSkipSeq) this._phiSkipSeq(); });
+        setTimeout(() => this._runPhiPillars(), 1000);
+      }
+    }
+
     // Crossfade between chapters: fade the current text out, then swap. The fixed
     // beam underneath never moves, so it reads as one continuous moment.
     const go = (idx) => {
@@ -2120,10 +2146,10 @@ const WelcomeIntro = {
         this._showSolution(stepIndex, idx);
       }
     };
-    // Philosophy is a two-view chapter: pillars, then the fuel (Mori + Vivere). Next on
-    // the pillars crossfades to the fuel within the page before advancing the beat.
-    const goFwd = () => { if (kind === 'philosophy' && this._phiView !== 'help') { this._phiSwap('help'); return; } go(beatIdx + 1); };
-    const goBack = () => { if (kind === 'philosophy' && this._phiView === 'help') { this._phiSwap('pillars'); return; } go(beatIdx - 1); };
+    // "How Memento helps" is now its own beat (the 'help' page), so the philosophy "For you"
+    // button simply advances to the next beat (the recap) like every other page.
+    const goFwd = () => { go(beatIdx + 1); };
+    const goBack = () => { go(beatIdx - 1); };
     const nextBtn = document.getElementById('solNext'); if (nextBtn) nextBtn.addEventListener('click', goFwd);
     const backBtn = document.getElementById('solBack'); if (backBtn) backBtn.addEventListener('click', goBack);
 
@@ -2231,10 +2257,14 @@ const WelcomeIntro = {
     //    plays (card + sequence built in render). The mori page was removed before this.
     const prevHead = 'Meet Your Memento';
 
+    // Order: Enter Memento -> Philosophy (pillars) -> the recap ("this is what you said",
+    // the old 'stage' page, now reached via the philosophy "For you" button) -> How Memento
+    // Helps You (the personalized pillar breakdown, now its own page) -> Meet Your Memento.
     return [
-      { key: 'stage', kind: 'stage', accent: PUR, headline: stage.headline, line: stage.line, stakes: stage.stakes },
       { key: 'enter', kind: 'enter', accent: PUR, title: 'Enter Memento' },
       { key: 'philosophy', kind: 'philosophy', accent: PUR, headline: phiHead },
+      { key: 'recap', kind: 'stage', accent: PUR, headline: stage.headline, line: stage.line, stakes: stage.stakes },
+      { key: 'help', kind: 'help', accent: PUR, headline: phiHead },
       { key: 'preview', kind: 'preview', accent: PUR, headline: prevHead, line: '' }
     ];
   },
@@ -2459,6 +2489,59 @@ const WelcomeIntro = {
     const plus = '<span class="wi-pc-plus" aria-hidden="true">+</span>';
     return '<div class="wi-phi__cards">' + card('clarity') + plus + card('action') + plus + card('consistency') + '</div>';
   },
+  // Sequential pillar reveal on the philosophy page: each card (Clarity, then Action, then
+  // Consistency) rises BIG in the centre with its icon -> name -> description staggering in,
+  // holds ~1s, then shrinks into its slot and softly flashes its colour on landing. Runs once
+  // per onboarding (_phiSeen); back-navigation and reduced-motion show the final row instantly.
+  // Tapping the page snaps it to the finished state.
+  _runPhiPillars() {
+    const cards = this.pageWrap && this.pageWrap.querySelector('.wi-phi__cards');
+    if (!cards) return;
+    const pcs = [...cards.querySelectorAll('.wi-pc')];
+    const plus = [...cards.querySelectorAll('.wi-pc-plus')];
+    const nav = this.navEl;
+    const reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    const token = this._phiSeqToken;
+    const showButton = () => { if (nav) { nav.style.transition = 'opacity 0.4s ease'; nav.style.opacity = '1'; nav.style.pointerEvents = ''; } };
+    const finishAll = () => {
+      cards.classList.remove('wi-phi__cards--seq');
+      pcs.forEach((c) => { c.style.transition = 'none'; c.style.transform = ''; c.classList.remove('wi-pc--present', 'wi-pc--flash'); c.classList.add('wi-pc--seated'); });
+      plus.forEach((p) => { p.style.opacity = '1'; });
+      showButton();
+    };
+    this._phiSkipSeq = () => { if (token !== this._phiSeqToken) return; this._phiSeqToken++; finishAll(); };
+    if (reduced || this._phiSeen) { finishAll(); return; }
+    this._phiSeen = true;
+    if (nav) { nav.style.opacity = '0'; }
+    const rowRect = cards.getBoundingClientRect();
+    const rowCx = rowRect.left + rowRect.width / 2;
+    const offsets = pcs.map((c) => { const r = c.getBoundingClientRect(); return rowCx - (r.left + r.width / 2); });
+    const present = (i) => {
+      if (token !== this._phiSeqToken) return;
+      if (i >= pcs.length) { showButton(); return; }
+      const c = pcs[i];
+      c.style.transformOrigin = 'center center';
+      c.style.transition = 'none';
+      c.style.transform = 'translateX(' + offsets[i] + 'px) scale(1.5)';
+      void c.offsetWidth;
+      c.classList.add('wi-pc--present');
+      // hold big in the centre, then glide + shrink into its slot, then flash its colour.
+      setTimeout(() => {
+        if (token !== this._phiSeqToken) return;
+        c.style.transition = 'transform 0.62s cubic-bezier(0.22,1,0.36,1)';
+        c.style.transform = 'translateX(0px) scale(1)';
+        setTimeout(() => {
+          if (token !== this._phiSeqToken) return;
+          c.classList.remove('wi-pc--present');
+          c.classList.add('wi-pc--seated', 'wi-pc--flash');
+          setTimeout(() => c.classList.remove('wi-pc--flash'), 720);
+          if (i >= 1 && plus[i - 1]) plus[i - 1].style.opacity = '1';
+          present(i + 1);
+        }, 640);
+      }, 1000);
+    };
+    setTimeout(() => present(0), 240);
+  },
   // Page 2: the same three pillars, now spoken to THIS person's answers, what Memento
   // will actually do for them (templated from clarityLevel / actionKnow / progress).
   _phiPersonal(p) {
@@ -2495,7 +2578,6 @@ const WelcomeIntro = {
         + this._phiCards(this._phiPersonal(p || {}));
     }
     return '<h2 class="wi-demo__headline wi-phi__head">The Philosophy Behind Memento</h2>' + rule
-      + '<div class="wi-phi__goal"><span class="wi-phi__goal-eyebrow">Ultimate goal</span><span class="wi-phi__goal-text">Achievement, in whatever realm of life you choose.</span></div>'
       + '<p class="wi-phi__sub">The foundation of achievement comes down to three pillars, the foundation of Memento:</p>'
       + this._phiCards();
   },
