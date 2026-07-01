@@ -2528,11 +2528,11 @@ const WelcomeIntro = {
     if (nav) { nav.style.opacity = '0'; }
     // Evenly spaced (~1.3s between each), slow graceful fades so nothing pops in. Each pillar
     // fades in on its own: headline -> sub -> Clarity -> Action -> Consistency -> button.
-    setTimeout(revealSub, 700);
-    setTimeout(() => { if (token !== this._phiSeqToken) return; fadeIn(pcs[0]); }, 2000);
-    setTimeout(() => { if (token !== this._phiSeqToken) return; fadeIn(pcs[1]); fadeIn(plus[0]); }, 3300);
-    setTimeout(() => { if (token !== this._phiSeqToken) return; fadeIn(pcs[2]); fadeIn(plus[1]); }, 4600);
-    setTimeout(() => { if (token !== this._phiSeqToken) return; showButton(); }, 5900);
+    setTimeout(revealSub, 1500);
+    setTimeout(() => { if (token !== this._phiSeqToken) return; fadeIn(pcs[0]); }, 2800);
+    setTimeout(() => { if (token !== this._phiSeqToken) return; fadeIn(pcs[1]); fadeIn(plus[0]); }, 4100);
+    setTimeout(() => { if (token !== this._phiSeqToken) return; fadeIn(pcs[2]); fadeIn(plus[1]); }, 5400);
+    setTimeout(() => { if (token !== this._phiSeqToken) return; showButton(); }, 6700);
   },
   // Page 2: the same three pillars, now spoken to THIS person's answers, what Memento
   // will actually do for them (templated from clarityLevel / actionKnow / progress).
@@ -2570,7 +2570,7 @@ const WelcomeIntro = {
         + this._phiCards(this._phiPersonal(p || {}));
     }
     return '<h2 class="wi-demo__headline wi-phi__head">The Philosophy Behind Memento</h2>' + rule
-      + '<p class="wi-phi__sub">The foundation of achievement comes down to three pillars, the foundation of Memento:</p>'
+      + '<p class="wi-phi__sub">The foundation of achievement comes down to three pillars, which is the foundation of Memento:</p>'
       + this._phiCards();
   },
   // Sequential fade while the M + headline stay put: the current boxes fade out, then
