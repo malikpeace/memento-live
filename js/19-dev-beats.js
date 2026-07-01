@@ -96,8 +96,9 @@
     head.appendChild(title); head.appendChild(toggle);
 
     var nav = document.createElement('div'); nav.className = 'db-nav';
-    // Match the live beat order in _solBeats: enter -> philosophy -> recap -> help -> preview.
-    var labels = ['enter', 'philosophy', 'recap', 'help', 'preview'];
+    // Match the live beat order in _solBeats: enter -> philosophy -> preview. (The "How Memento
+    // Will Help You" page is the philosophy page's second view, reached via its "For you" button.)
+    var labels = ['enter', 'philosophy', 'preview'];
     var navBtns = [];
     labels.forEach(function (label, i) {
       var btn = document.createElement('button'); btn.textContent = (i + 1) + ' ' + label;

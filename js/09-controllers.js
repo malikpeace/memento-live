@@ -2098,10 +2098,6 @@ const WelcomeIntro = {
     } else if (kind === 'philosophy') {
       this._phiView = 'pillars'; this._phiP = p; this._phiSwapping = false;
       inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-phi" data-beat="${beatIdx}"><svg class="wi-phi__mark" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="44" fill="#f5f5f7"/><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z" fill="#0a0a0e"/></svg><div class="wi-phi__body"><div class="wi-phi__bodyinner">${this._phiBody('pillars', p)}</div></div></div>`;
-    } else if (kind === 'help') {
-      // "How Memento Will Help You" is now its own page (was the philosophy page's second view).
-      this._phiView = 'help'; this._phiP = p; this._phiSwapping = false;
-      inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-phi" data-beat="${beatIdx}"><svg class="wi-phi__mark" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="44" fill="#f5f5f7"/><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z" fill="#0a0a0e"/></svg><div class="wi-phi__body"><div class="wi-phi__bodyinner">${this._phiBody('help', p)}</div></div></div>`;
     } else if (kind === 'mori') {
       inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-moriview" data-beat="${beatIdx}"><h2 class="wi-demo__headline">${esc(b.headline)}</h2>${this._cineMori()}<p class="wi-demo__line">${esc(b.line)}</p>${b.days ? `<p class="wi-mori__days">btw, you have about <b>${b.days.toLocaleString()}</b> days left.</p>` : ''}</div>`;
     } else if (kind === 'preview') {
@@ -2155,10 +2151,10 @@ const WelcomeIntro = {
         this._showSolution(stepIndex, idx);
       }
     };
-    // "How Memento helps" is now its own beat (the 'help' page), so the philosophy "For you"
-    // button simply advances to the next beat (the recap) like every other page.
-    const goFwd = () => { go(beatIdx + 1); };
-    const goBack = () => { go(beatIdx - 1); };
+    // Philosophy is a two-view chapter: pillars+equation, then the combined "How Memento Will
+    // Help You" page. "For you" crossfades the body in place (M stays); Back returns to pillars.
+    const goFwd = () => { if (kind === 'philosophy' && this._phiView !== 'help') { this._phiSwap('help'); return; } go(beatIdx + 1); };
+    const goBack = () => { if (kind === 'philosophy' && this._phiView === 'help') { this._phiSwap('pillars'); return; } go(beatIdx - 1); };
     const nextBtn = document.getElementById('solNext'); if (nextBtn) nextBtn.addEventListener('click', goFwd);
     const backBtn = document.getElementById('solBack'); if (backBtn) backBtn.addEventListener('click', goBack);
 
@@ -2269,11 +2265,13 @@ const WelcomeIntro = {
     // Order: Enter Memento -> Philosophy (pillars) -> the recap ("this is what you said",
     // the old 'stage' page, now reached via the philosophy "For you" button) -> How Memento
     // Helps You (the personalized pillar breakdown, now its own page) -> Meet Your Memento.
+    // Philosophy is a two-view chapter again: pillars + equation, then (via "For you") an
+    // in-place swap to the combined "How Memento Will Help You" page (the M stays, the body
+    // crossfades). That help page folds in the old recap ("where you are") + the personalized
+    // how-it-helps points, so recap and help are one page now.
     return [
       { key: 'enter', kind: 'enter', accent: PUR, title: 'Enter Memento' },
       { key: 'philosophy', kind: 'philosophy', accent: PUR, headline: phiHead },
-      { key: 'recap', kind: 'stage', accent: PUR, headline: stage.headline, line: stage.line, stakes: stage.stakes },
-      { key: 'help', kind: 'help', accent: PUR, headline: phiHead },
       { key: 'preview', kind: 'preview', accent: PUR, headline: prevHead, line: '' }
     ];
   },
@@ -2572,9 +2570,23 @@ const WelcomeIntro = {
   _phiBody(view, p) {
     const rule = '<span class="wi-phi__rule"></span>';
     if (view === 'help') {
+      // Combined page: the "where you are" recap (from _solStage) + how Memento helps (the
+      // personalized clarity/action/consistency points as a clean stacked list).
+      const st = this._solStage(p || {});
+      const help = this._phiPersonal(p || {});
       return '<h2 class="wi-demo__headline wi-phi__head">How Memento Will Help You</h2>' + rule
-        + '<p class="wi-phi__sub">Based on what you told us:</p>'
-        + this._phiCards(this._phiPersonal(p || {}));
+        + '<div class="wi-help">'
+        +   '<p class="wi-help__lead">' + esc(String(st.headline || '')) + '</p>'
+        +   (st.line ? '<p class="wi-help__body">' + esc(String(st.line)) + '</p>' : '')
+        +   (st.stakes ? '<p class="wi-help__body">' + esc(String(st.stakes)) + '</p>' : '')
+        +   '<div class="wi-help__divider"></div>'
+        +   '<div class="wi-help__how">Here\'s how Memento helps</div>'
+        +   '<div class="wi-help__rows">'
+        +     '<div class="wi-help__row"><span class="wi-help__k wi-help__k--c">Clarity</span><p class="wi-help__k-body">' + esc(String(help.clarity || '')) + '</p></div>'
+        +     '<div class="wi-help__row"><span class="wi-help__k wi-help__k--a">Action</span><p class="wi-help__k-body">' + esc(String(help.action || '')) + '</p></div>'
+        +     '<div class="wi-help__row"><span class="wi-help__k wi-help__k--k">Consistency</span><p class="wi-help__k-body">' + esc(String(help.consistency || '')) + '</p></div>'
+        +   '</div>'
+        + '</div>';
     }
     return '<h2 class="wi-demo__headline wi-phi__head">The Philosophy Behind Memento</h2>' + rule
       + '<p class="wi-phi__sub">The foundation of achievement comes down to three pillars, which is the foundation of Memento:</p>'
