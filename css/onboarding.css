@@ -1763,8 +1763,11 @@ body.lite .welcome-intro__rays { opacity: calc(0.6 + var(--wi-beam-boost, 0) * 0
    colours (purple + blue + green), so it reads as everything combining into your Memento. It
    only starts spinning once the line reaches it (is-on). */
 @property --wi-orb-a { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
-.wi-help__node--orb.is-on { border-color: transparent; background: conic-gradient(from var(--wi-orb-a), #9674ff, #5fb0ff, #34d399, #5fb0ff, #9674ff); box-shadow: inset 0 2px 4px rgba(255,255,255,0.4), 0 0 20px -2px rgba(120,140,255,0.9); animation: wiOrbSpin 9s linear infinite; }
-.wi-help__node--orb svg { position: relative; z-index: 1; width: 18px; height: 18px; }
+/* Slightly larger than the pillar nodes (~18%) so the final step stands out. transform:scale keeps
+   the layout box 32px, so the text column and the rail centre still line up with the rows above. */
+.wi-help__node--orb { transform: scale(1.18); }
+.wi-help__node--orb.is-on { border-color: transparent; background: conic-gradient(from var(--wi-orb-a), #9674ff, #5fb0ff, #34d399, #5fb0ff, #9674ff); box-shadow: 0 0 22px -2px rgba(120,140,255,0.95); animation: wiOrbSpin 9s linear infinite; }
+.wi-help__node--orb svg { position: relative; z-index: 1; width: 19px; height: 19px; }
 @keyframes wiOrbSpin { to { --wi-orb-a: 360deg; } }
 @media (prefers-reduced-motion: reduce) { .wi-help__node--orb.is-on { animation: none; } }
 .wi-help__tx { flex: 1 1 auto; min-width: 0; padding-top: 3px; }
