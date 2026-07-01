@@ -2129,9 +2129,11 @@ const WelcomeIntro = {
       if (!reducedM && !this._phiSeen) {
         const cardsEl = this.pageWrap.querySelector('.wi-phi__cards');
         if (cardsEl) cardsEl.classList.add('wi-phi__cards--seq');
-        // Hold the sub back so the headline lands first, then the sub fades in, then the pillars.
+        // Hold the sub + equation back so they fade in on their own beats.
         const subEl = this.pageWrap.querySelector('.wi-phi__sub');
         if (subEl) subEl.style.opacity = '0';
+        const eqEl = this.pageWrap.querySelector('.wi-phi__eq');
+        if (eqEl) eqEl.style.opacity = '0';
         this.navEl.style.opacity = '0'; this.navEl.style.pointerEvents = 'none';
         const innerEl2 = this.pageWrap.querySelector('.welcome-intro__page-inner');
         if (innerEl2) innerEl2.addEventListener('click', () => { if (this._phiSkipSeq) this._phiSkipSeq(); });
@@ -2510,30 +2512,34 @@ const WelcomeIntro = {
     const reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
     const token = this._phiSeqToken;
     const sub = this.pageWrap.querySelector('.wi-phi__sub');
+    const eq = this.pageWrap.querySelector('.wi-phi__eq');
     const revealSub = () => { if (sub) sub.style.opacity = ''; };
     const showButton = () => { if (nav) { nav.style.transition = 'opacity 0.4s ease'; nav.style.opacity = '1'; nav.style.pointerEvents = ''; } };
     // Simple, clean reveal: the cards sit in their FINAL slots and just fade in (no pop-and-move,
-    // no colour flash). Clarity fades first, then Action + Consistency together.
+    // no colour flash). Clarity, then Action, then Consistency, then the equation, each on its own.
     const fadeIn = (el) => { if (!el) return; el.style.transition = 'opacity 0.9s ease'; el.style.opacity = '1'; };
     const finishAll = () => {
       revealSub();
       cards.classList.remove('wi-phi__cards--seq');
       pcs.forEach((c) => { c.style.transition = 'none'; c.style.transform = ''; c.style.opacity = '1'; });
       plus.forEach((p) => { p.style.opacity = '1'; });
+      if (eq) eq.style.opacity = '1';
       showButton();
     };
     this._phiSkipSeq = () => { if (token !== this._phiSeqToken) return; this._phiSeqToken++; finishAll(); };
     if (reduced || this._phiSeen) { finishAll(); return; }
     this._phiSeen = true;
     if (nav) { nav.style.opacity = '0'; }
-    // Evenly spaced (~1.3s between each), slow graceful fades so nothing pops in. Each pillar
-    // fades in on its own: headline -> sub -> Clarity -> Action -> Consistency -> button.
+    // Evenly spaced (~1.3s between each), slow graceful fades so nothing pops in. Each element
+    // fades in on its own: headline -> sub -> Clarity -> Action -> Consistency -> equation -> button.
     setTimeout(revealSub, 1500);
     // Longer beat after the sub before Clarity, then the rest follow at even ~1.3s intervals.
     setTimeout(() => { if (token !== this._phiSeqToken) return; fadeIn(pcs[0]); }, 3600);
     setTimeout(() => { if (token !== this._phiSeqToken) return; fadeIn(pcs[1]); fadeIn(plus[0]); }, 4900);
     setTimeout(() => { if (token !== this._phiSeqToken) return; fadeIn(pcs[2]); fadeIn(plus[1]); }, 6200);
-    setTimeout(() => { if (token !== this._phiSeqToken) return; showButton(); }, 7500);
+    // ...then the equation payoff fades in last, then the button.
+    setTimeout(() => { if (token !== this._phiSeqToken) return; fadeIn(eq); }, 7500);
+    setTimeout(() => { if (token !== this._phiSeqToken) return; showButton(); }, 8800);
   },
   // Page 2: the same three pillars, now spoken to THIS person's answers, what Memento
   // will actually do for them (templated from clarityLevel / actionKnow / progress).
@@ -2572,7 +2578,11 @@ const WelcomeIntro = {
     }
     return '<h2 class="wi-demo__headline wi-phi__head">The Philosophy Behind Memento</h2>' + rule
       + '<p class="wi-phi__sub">The foundation of achievement comes down to three pillars, which is the foundation of Memento:</p>'
-      + this._phiCards();
+      + this._phiCards()
+      + '<div class="wi-phi__eq">'
+      +   '<p class="wi-phi__eq-lead">Combine all three, and progress stops being a maybe. It becomes inevitable.</p>'
+      +   '<p class="wi-phi__eq-formula"><span class="wi-phi__eq-term wi-phi__eq-term--c">Clear goal</span><span class="wi-phi__eq-x">&#215;</span><span class="wi-phi__eq-term wi-phi__eq-term--a">Focused Action</span><span class="wi-phi__eq-x">&#215;</span><span class="wi-phi__eq-term wi-phi__eq-term--k">Consistency</span> <span class="wi-phi__eq-res">= results</span></p>'
+      + '</div>';
   },
   // Sequential fade while the M + headline stay put: the current boxes fade out, then
   // (once fully invisible and the fade has settled) the content swaps and the new boxes
