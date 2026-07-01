@@ -2052,12 +2052,12 @@ const WelcomeIntro = {
       const rays = document.createElement('div');
       rays.id = 'welcomeRays'; rays.className = 'welcome-intro__rays'; rays.setAttribute('aria-hidden', 'true');
       rays.innerHTML = this._cineRays();
-      // Fade the top-left beams IN as they enter Memento (they used to pop in instantly after
-      // the reorder). The rays carry a 2.6s opacity transition, so start at 0 then release.
-      rays.style.opacity = '0';
       this.el.insertBefore(rays, this.pageWrap);
-      requestAnimationFrame(() => requestAnimationFrame(() => { const r = document.getElementById('welcomeRays'); if (r) r.style.opacity = ''; }));
     }
+    // The top-left beams fade in via the --preenter class (toggled just below): the recap beat
+    // holds them at opacity 0 over a black page, and leaving recap for "Enter Memento" removes
+    // --preenter so the rays' 2.6s opacity transition runs, and the light slowly arrives as they
+    // enter Memento. (No rAF dance, so it never gets stuck if a frame is dropped.)
     if (!this._summary && !this._summaryFailed) this.generateSummary();
     this._onSummaryReady = null;
 
@@ -2068,12 +2068,11 @@ const WelcomeIntro = {
     const b = beats[beatIdx];
     const isLast = beatIdx === n - 1;
     const kind = b.kind || 'stage';
-    // The opening page sits on plain black (pre-Memento). The top-left beam arrives
-    // on the "Enter Memento" beat onward, so the light literally comes in as they
-    // enter Memento. --preenter hides the rays + the background wash on the stage page.
-    // Enter Memento is now the first beat, so the top-left beam is present throughout (no
-    // pre-enter black page before it anymore).
-    this.el.classList.remove('welcome-intro--preenter');
+    // The recap page ("here's what you said") sits on plain black (pre-Memento): --preenter
+    // hides the top-left rays + the background wash. From the "Enter Memento" beat onward the
+    // rays fade in (their 2.6s opacity transition runs when --preenter is removed), so the
+    // light literally arrives as they enter Memento.
+    this.el.classList.toggle('welcome-intro--preenter', kind === 'recap');
     // The beam-brightness boost only applies during the Meet Your Memento reveal; reset elsewhere.
     if (kind !== 'preview') { try { this.el.style.setProperty('--wi-beam-boost', '0'); } catch (e) {} }
     // Philosophy + the "how Memento helps" page use a wider content column (less page padding)
