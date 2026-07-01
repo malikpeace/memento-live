@@ -1755,10 +1755,8 @@ body.lite .welcome-intro__rays { opacity: calc(0.6 + var(--wi-beam-boost, 0) * 0
 .wi-help__ic { flex: 0 0 auto; width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; color: var(--pcc); margin-top: 1px; }
 .wi-help__ic svg { width: 28px; height: 28px; }
 .wi-help__txt { flex: 1 1 auto; min-width: 0; }
-.wi-help__k { display: block; margin-bottom: 4px; font-size: 0.98rem; font-weight: 700; letter-spacing: -0.01em; }
-.wi-help__k--c { color: #b3a1ff; }
-.wi-help__k--a { color: #ffffff; }
-.wi-help__k--k { color: #62e6a6; }
+/* The verb labels stay plain white; only the icon on the left carries the pillar colour. */
+.wi-help__k { display: block; margin-bottom: 4px; font-size: 0.98rem; font-weight: 700; letter-spacing: -0.01em; color: #fff; }
 .wi-help__k-body { margin: 0; font-size: 0.9rem; line-height: 1.5; color: rgba(236,238,250,0.95); }
 /* The "Ultimate goal" callout above the foundation line (page 1 only). */
 .wi-phi__goal { margin: 16px auto 0; max-width: 30ch; }
