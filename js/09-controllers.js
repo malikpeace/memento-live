@@ -2551,31 +2551,33 @@ const WelcomeIntro = {
     return { clarity: clarity, action: action, consistency: consistency };
   },
   // The single "Here's how Memento will help you" body: a vertical stepper. Find Clarity starts
-  // lit; the line draws down and each next step (Take Action, Stay Consistent) deblurs + lights
-  // up as it is reached, ending on the equation as the final "it all compounds" node. Each pillar
-  // line is a direct, personalized callback to what THEY said (_phiPersonal).
+  // lit; the line draws down and each next step (Take Action, Stay Consistent) deblurs + lights up
+  // as it is reached, ending on a final node about your Memento tracking it all as it grows over
+  // time. Each pillar line is a direct, personalized callback to what THEY said (_phiPersonal).
   _helpBody(p) {
     const first = (p && p.name) ? esc(String(p.name).trim().split(/\s+/)[0]) : '';
     const head = first ? first + ", here's how Memento will help you" : "Here's how Memento will help you";
     const d = this._phiData();
     const help = this._phiPersonal(p || {});
-    // Goal-flag icon for the final "it all compounds" node (the payoff).
-    const flag = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4M6 4h11l-2.2 4L17 12H6"/></svg>';
-    // dim=true starts the row blurred + its node unlit; the reveal removes it as the line arrives.
-    const row = (icon, color, label, bodyHtml, dim, extra) =>
-      '<div class="wi-help__row' + (dim ? ' is-dim' : '') + (extra || '') + '" style="--nc:' + color + '">'
+    const DARK = 'rgba(10,10,14,1)', WHITE = '#ffffff';
+    // Upward-trend icon for the final node: your Memento tracking + growing over time.
+    const grow = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17l5-5 3 3 7-7"/><path d="M15 8h5v5"/></svg>';
+    // nic = the icon colour on the lit node (white on the coloured nodes for contrast, dark on the
+    // light ones). dim=true starts the row blurred + its node unlit until the line reaches it.
+    const row = (icon, color, nic, label, bodyHtml, dim) =>
+      '<div class="wi-help__row' + (dim ? ' is-dim' : '') + '" style="--nc:' + color + ';--nic:' + nic + '">'
       + '<span class="wi-help__node' + (dim ? '' : ' is-on') + '" aria-hidden="true">' + icon + '</span>'
       + '<div class="wi-help__tx"><span class="wi-help__k">' + label + '</span>' + bodyHtml + '</div>'
       + '</div>';
     const bdy = (t) => '<p class="wi-help__k-body">' + esc(String(t || '')) + '</p>';
-    const eqHtml = '<p class="wi-phi__eq-formula wi-help__eqline"><span class="wi-phi__eq-term wi-phi__eq-term--c">Clear goal</span><span class="wi-phi__eq-x">&#215;</span><span class="wi-phi__eq-term wi-phi__eq-term--a">Focused action</span><span class="wi-phi__eq-x">&#215;</span><span class="wi-phi__eq-term wi-phi__eq-term--k">Consistency</span> <span class="wi-phi__eq-res">= Results</span></p>';
+    const growBody = bdy("Every goal, every action, every day you show up gets tracked on your Memento, so it all compounds and nothing is ever lost.");
     return '<h2 class="wi-demo__headline wi-phi__head">' + head + '</h2>'
       + '<div class="wi-help__stp">'
       +   '<span class="wi-help__rail" aria-hidden="true"></span><span class="wi-help__fill" aria-hidden="true"></span>'
-      +   row(d.clarity.icon, d.clarity.c, 'Find Clarity', bdy(help.clarity), false, '')
-      +   row(d.action.icon, d.action.c, 'Take Action', bdy(help.action), true, '')
-      +   row(d.consistency.icon, d.consistency.c, 'Stay Consistent', bdy(help.consistency), true, '')
-      +   row(flag, 'rgba(245,200,119,1)', 'It all compounds', eqHtml, true, ' wi-help__row--eq')
+      +   row(d.clarity.icon, d.clarity.c, WHITE, 'Find Clarity', bdy(help.clarity), false)
+      +   row(d.action.icon, d.action.c, DARK, 'Take Action', bdy(help.action), true)
+      +   row(d.consistency.icon, d.consistency.c, WHITE, 'Stay Consistent', bdy(help.consistency), true)
+      +   row(grow, 'rgba(245,200,119,1)', DARK, 'Your Memento grows with you', growBody, true)
       + '</div>';
   },
   // Mori page: their life in dots (reuses the life-in-years grid).
