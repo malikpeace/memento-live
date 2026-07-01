@@ -47,6 +47,10 @@
   }
   function render(beat) {
     try {
+      // Reset the one-shot flags so the pillar reveal (and beam fade) play EVERY time you
+      // jump to a beat, instead of only the first time (that is what makes this a replay tool).
+      try { WelcomeIntro._phiSeen = false; } catch (e) {}
+      try { var _r = document.getElementById('welcomeRays'); if (_r) _r.remove(); } catch (e) {}
       WelcomeIntro._showSolution(0, beat);
       var wi = document.querySelector('.welcome-intro');
       // Use the welcome-intro's natural z-index (210) so the dev preview layers exactly like
@@ -70,6 +74,7 @@
       '#devBeats .db-nav{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;}' +
       '#devBeats .db-nav button{background:#1a1830;color:#cfc8f5;border:0;border-radius:7px;padding:6px 8px;font-size:11px;}' +
       '#devBeats .db-nav button.on{background:#5b4ad8;color:#fff;}' +
+      '#devBeats .db-nav button.db-replay{background:#1f7a4d;color:#fff;font-weight:600;}' +
       '#devBeats .db-row{display:flex;align-items:center;gap:8px;margin:5px 0;}' +
       '#devBeats .db-row span{flex:0 0 92px;color:#9a93c8;font-size:11px;}' +
       '#devBeats .db-row select,#devBeats .db-row input{flex:1;min-width:0;background:#15131f;color:#fff;' +
@@ -91,13 +96,18 @@
     head.appendChild(title); head.appendChild(toggle);
 
     var nav = document.createElement('div'); nav.className = 'db-nav';
-    var labels = ['stage', 'enter', 'philosophy', 'preview'];
+    // Match the live beat order in _solBeats: enter -> philosophy -> recap -> help -> preview.
+    var labels = ['enter', 'philosophy', 'recap', 'help', 'preview'];
     var navBtns = [];
     labels.forEach(function (label, i) {
       var btn = document.createElement('button'); btn.textContent = (i + 1) + ' ' + label;
       btn.addEventListener('click', function () { render(i); markNav(i); });
       nav.appendChild(btn); navBtns.push(btn);
     });
+    // Replay: re-run the CURRENT beat's animation (pillar reveal, beam fade, etc.) from the top.
+    var replayBtn = document.createElement('button'); replayBtn.textContent = '↻ replay'; replayBtn.className = 'db-replay';
+    replayBtn.addEventListener('click', function () { render(currentBeat()); });
+    nav.appendChild(replayBtn);
     function markNav(i) { navBtns.forEach(function (b, j) { b.className = (j === i) ? 'on' : ''; }); }
 
     var body = document.createElement('div'); body.className = 'db-body';

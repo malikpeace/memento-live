@@ -2052,7 +2052,11 @@ const WelcomeIntro = {
       const rays = document.createElement('div');
       rays.id = 'welcomeRays'; rays.className = 'welcome-intro__rays'; rays.setAttribute('aria-hidden', 'true');
       rays.innerHTML = this._cineRays();
+      // Fade the top-left beams IN as they enter Memento (they used to pop in instantly after
+      // the reorder). The rays carry a 2.6s opacity transition, so start at 0 then release.
+      rays.style.opacity = '0';
       this.el.insertBefore(rays, this.pageWrap);
+      requestAnimationFrame(() => requestAnimationFrame(() => { const r = document.getElementById('welcomeRays'); if (r) r.style.opacity = ''; }));
     }
     if (!this._summary && !this._summaryFailed) this.generateSummary();
     this._onSummaryReady = null;
