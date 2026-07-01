@@ -1902,17 +1902,17 @@ body.lite .welcome-intro__rays { opacity: calc(0.6 + var(--wi-beam-boost, 0) * 0
 /* Cinematic arrival: the card turns to face you as it rises out of a soft blur and settles into
    focus, then a soft band of light sweeps across it once (glass catching the light), the title
    lifts in just behind it. Not a pop, a reveal. (Only opacity/blur/transform, GPU-cheap.) */
-.wi-prev .wi-pcard-stage { animation: wiStageArrive 1.8s cubic-bezier(0.16,1,0.3,1) 0.15s both; }
+.wi-prev .wi-pcard-stage { animation: wiStageArrive 1.9s cubic-bezier(0.16,1,0.3,1) 0.15s both; }
 @keyframes wiStageArrive {
-  0%   { opacity: 0; transform: perspective(950px) rotateY(-15deg) scale(0.84) translateY(24px); filter: blur(16px); }
+  0%   { opacity: 0; transform: perspective(750px) rotateY(-52deg) scale(0.82) translateY(26px); filter: blur(16px); }
   55%  { opacity: 1; }
-  100% { opacity: 1; transform: perspective(950px) rotateY(0deg) scale(1) translateY(0); filter: blur(0); }
+  100% { opacity: 1; transform: perspective(750px) rotateY(0deg) scale(1) translateY(0); filter: blur(0); }
 }
 /* A single soft light-sweep across the card as it settles, like light glancing off glass. Clipped
    by the card's overflow. Passes over the M too, so the emblem catches the light for a beat. */
-.wi-pcard__shine { position: absolute; top: -30%; left: -75%; width: 48%; height: 160%; z-index: 3; pointer-events: none; background: linear-gradient(100deg, transparent, rgba(255,255,255,0.5), transparent); transform: rotate(15deg); filter: blur(7px); opacity: 0; }
+.wi-pcard__shine { position: absolute; top: -30%; left: -75%; width: 48%; height: 160%; z-index: 3; pointer-events: none; background: linear-gradient(100deg, transparent, rgba(255,255,255,0.16), transparent); transform: rotate(15deg); filter: blur(7px); opacity: 0; }
 .wi-prev .wi-pcard__shine { animation: wiCardShine 1.25s cubic-bezier(0.25,1,0.4,1) 1s 1 both; }
-@keyframes wiCardShine { 0% { left: -75%; opacity: 0; } 22% { opacity: 0.9; } 68% { opacity: 0.9; } 100% { left: 135%; opacity: 0; } }
+@keyframes wiCardShine { 0% { left: -75%; opacity: 0; } 22% { opacity: 0.75; } 68% { opacity: 0.75; } 100% { left: 135%; opacity: 0; } }
 .wi-prev .wi-prev__title { animation: wiPrevTitleRise 0.9s cubic-bezier(0.16,1,0.3,1) 0.6s backwards; }
 @keyframes wiPrevTitleRise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 /* Background aura: a soft glow behind the whole page that fades in on the evolved step and

@@ -2581,7 +2581,7 @@ const WelcomeIntro = {
       + '<div class="wi-help__tx"><span class="wi-help__k">' + label + '</span>' + bodyHtml + '</div>'
       + '</div>';
     const bdy = (t) => '<p class="wi-help__k-body">' + esc(String(t || '')) + '</p>';
-    const growBody = bdy("Memento keeps the reason you started front and center, so on the hard days you remember what this is all for, and your progress keeps compounding.");
+    const growBody = bdy("Memento tracks your path and keeps the reason you started front and center, so on the hard days you remember what this is all for, and your progress keeps compounding.");
     // The final node is an energy-ball orb: three big, heavily-blurred colour blobs (purple, cyan,
     // green) drift + oscillate inside a clipped circle, so the whole circle reads as living energy
     // with no hard hotspots or see-through gaps, with the white Memento M on top. It comes alive
