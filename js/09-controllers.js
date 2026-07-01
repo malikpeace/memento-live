@@ -2477,9 +2477,9 @@ const WelcomeIntro = {
     const cal = '<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-linecap="round"><rect x="14" y="18" width="52" height="48" rx="7" stroke-width="2.2" opacity="0.55"/><line x1="14" y1="30" x2="66" y2="30" stroke-width="1.6" opacity="0.4"/><line x1="28" y1="13" x2="28" y2="22" stroke-width="2.6" opacity="0.7"/><line x1="52" y1="13" x2="52" y2="22" stroke-width="2.6" opacity="0.7"/><path d="M22 36L28 42M28 36L22 42" stroke-width="2.4"/><path d="M34 36L40 42M40 36L34 42" stroke-width="2.4"/><path d="M46 36L52 42M52 36L46 42" stroke-width="2.4"/><path d="M22 48L28 54M28 48L22 54" stroke-width="2.4"/><path d="M34 48L40 54M40 48L34 54" stroke-width="2.4"/></svg>';
     return {
       order: ['clarity', 'action', 'consistency'],
-      clarity: { c: 'rgba(150,116,255,1)', label: 'Clarity', icon: ic.clarity || '', text: 'Get clear on the one goal that actually matters most.' },
-      action: { c: 'rgba(245,245,247,1)', label: 'Action', icon: ic.action || '', text: 'Find the single highest leverage action that actually moves you forward.' },
-      consistency: { c: 'rgba(52,211,153,1)', label: 'Consistency', icon: cal, text: 'Keep showing up, especially on the days you do not feel like it.' }
+      clarity: { c: 'rgba(150,116,255,1)', label: 'Clarity', icon: ic.clarity || '', text: 'The one goal that actually matters.' },
+      action: { c: 'rgba(245,245,247,1)', label: 'Action', icon: ic.action || '', text: 'The single highest-leverage move.' },
+      consistency: { c: 'rgba(52,211,153,1)', label: 'Consistency', icon: cal, text: "Showing up, especially when it's hard." }
     };
   },
   // The three pillar cards (Clarity + Action + Consistency), joined by a +. descs is an
@@ -2546,23 +2546,24 @@ const WelcomeIntro = {
     const cl = low(p && p.clarityLevel);
     const ak = low(p && p.actionKnow);
     const ap = String((p && p.actionProgress) || '');
-    const goal = this._solGoalsNatural(p);
     const lost = cl.indexOf('lost') !== -1 || cl.indexOf('not really') !== -1;
-    const moving = (ap === 'Actually doing really good' || ap === 'Slow but moving.. just a bit inconsistent');
-    // CLARITY: lost -> make it clear. Has a goal -> pressure-test that they truly want it.
+    const roughIdea = cl.indexOf('rough') !== -1;
+    const noSteps = (ak.indexOf('no') !== -1 || ak.indexOf("don't") !== -1 || lost);
+    const knowsSteps = (ak.indexOf('yes') !== -1 || ak.indexOf('know the') !== -1);
+    const inconsistent = (ap === 'Slow but moving.. just a bit inconsistent' || ap === 'Started, then stopped');
+    // Each line is a direct callback to what THEY said: their clarity level, whether they know
+    // the steps, and their consistency struggle. Personal, not generic.
     let clarity;
-    if (lost) clarity = "Memento gets you dead clear on the one thing that actually matters.";
-    else clarity = "Memento pressure-tests your goals, so you know you actually care, and gets you crystal clear on what it is.";
-    // ACTION: no steps -> find them. Rough idea -> refine. Knows -> sharpen further.
+    if (lost) clarity = "You said you are still figuring out the direction. Memento walks you through finding the one goal worth chasing.";
+    else if (roughIdea) clarity = "You have a rough idea. Memento sharpens it into the one goal that actually matters, so you stop spreading thin.";
+    else clarity = "You already know what you want. Memento keeps it front and center so it never slips.";
     let action;
-    if (lost || !ak) action = "Memento hands you the exact actions to take, no more guessing.";
-    else if (ak.indexOf('yes') !== -1) action = "Memento sharpens what you are already doing down to the highest-leverage few.";
-    else if (ak.indexOf('sort of') !== -1) action = "Memento refines your goals into the highest-leverage daily actions you can take today, that actually work and move you forward.";
-    else action = "Memento hands you the exact actions to take, no more guessing.";
-    // CONSISTENCY: already moving -> the reward + the why + finite time. Else -> stay aligned.
+    if (noSteps) action = "You are not sure of the moves. Memento hands you the single next move, every day.";
+    else if (knowsSteps) action = "You know the moves. Memento sharpens them down to the few that actually move the needle.";
+    else action = "You have some idea of the steps. Memento refines them into the highest-leverage move you can take today.";
     let consistency;
-    if (moving) consistency = "Keeps you consistent through a living card you build over time, reminding you of your why and that your time is finite.";
-    else consistency = "Memento keeps you aligned to it, day by day, until you actually get there.";
+    if (inconsistent) consistency = "Staying consistent is the part you said breaks down. Memento keeps you showing up, especially on the days you do not feel like it.";
+    else consistency = "Memento keeps you showing up, day after day, until you actually get there.";
     return { clarity: clarity, action: action, consistency: consistency };
   },
   // The body under the static M + headline: page 1 (the pillars in general) or page 2
@@ -2578,7 +2579,6 @@ const WelcomeIntro = {
         + '<div class="wi-help">'
         +   '<p class="wi-help__lead">' + esc(String(st.headline || '')) + '</p>'
         +   (st.line ? '<p class="wi-help__body">' + esc(String(st.line)) + '</p>' : '')
-        +   (st.stakes ? '<p class="wi-help__body">' + esc(String(st.stakes)) + '</p>' : '')
         +   '<div class="wi-help__divider"></div>'
         +   '<div class="wi-help__how">Here\'s how Memento helps</div>'
         +   '<div class="wi-help__rows">'
@@ -2589,11 +2589,10 @@ const WelcomeIntro = {
         + '</div>';
     }
     return '<h2 class="wi-demo__headline wi-phi__head">The Philosophy Behind Memento</h2>' + rule
-      + '<p class="wi-phi__sub">The foundation of achievement comes down to three pillars, which is the foundation of Memento:</p>'
+      + '<p class="wi-phi__sub">Everything worthwhile comes down to three things:</p>'
       + this._phiCards()
       + '<div class="wi-phi__eq">'
-      +   '<p class="wi-phi__eq-lead">Combine all three, and progress stops being a maybe. It becomes inevitable.</p>'
-      +   '<p class="wi-phi__eq-formula"><span class="wi-phi__eq-term wi-phi__eq-term--c">Clear goal</span><span class="wi-phi__eq-x">&#215;</span><span class="wi-phi__eq-term wi-phi__eq-term--a">Focused Action</span><span class="wi-phi__eq-x">&#215;</span><span class="wi-phi__eq-term wi-phi__eq-term--k">Consistency</span> <span class="wi-phi__eq-res">= Results</span></p>'
+      +   '<p class="wi-phi__eq-formula"><span class="wi-phi__eq-term wi-phi__eq-term--c">Clarity</span><span class="wi-phi__eq-x">&#215;</span><span class="wi-phi__eq-term wi-phi__eq-term--a">Action</span><span class="wi-phi__eq-x">&#215;</span><span class="wi-phi__eq-term wi-phi__eq-term--k">Consistency</span> <span class="wi-phi__eq-res">= Results</span></p>'
       + '</div>';
   },
   // Sequential fade while the M + headline stay put: the current boxes fade out, then
