@@ -1283,7 +1283,7 @@ const ClarityExperience = {
       // then glide it home; the body is split into line divs for the one-by-one reveal.
       return `<div class="clarity-exp__page-inner">
         <div class="clarity-exp__tut clarity-reflect">
-          <div class="clarity-reflect__headline"><span class="clarity-reflect__headline-in">Now, before you begin.</span></div>
+          <div class="clarity-reflect__headline"><span class="clarity-reflect__headline-in">One last thing before we begin.</span></div>
           <div class="clarity-reflect__body">
             <div class="clarity-reflect__line">I want you to genuinely sit with one question:</div>
             <div class="clarity-reflect__line clarity-reflect__question">"What's the one mission or goal you want to dedicate yourself to?"</div>
