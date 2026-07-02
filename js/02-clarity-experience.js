@@ -4880,7 +4880,7 @@ Return ONLY the sentence text. No quotes, no labels.`;
     // star canvas + WebGL (reuse the app's initStarBlob; self-terminates on disconnect)
     starCanvas.style.width = cSize + 'px'; starCanvas.style.height = cSize + 'px';
     starCanvas.style.left = SX + 'px'; starCanvas.style.top = SY + 'px';
-    if (typeof initStarBlob === 'function') { try { initStarBlob(starCanvas, 240); } catch (_) {} }
+    if (typeof initStarBlob === 'function') { try { initStarBlob(starCanvas, 240, 'pulsar'); } catch (_) {} }
 
     // today card position
     const todayCard = inst.pageWrap.querySelector('#vpToday');
@@ -5752,7 +5752,7 @@ Return ONLY the sentence text. No quotes, no labels.`;
     // Round 12: initialize the real neutron star canvas at the peak
     const peakStar = this.pageWrap.querySelector('#actionPlanJourneyStar');
     if (peakStar && typeof initStarBlob === 'function') {
-      initStarBlob(peakStar, 320);
+      initStarBlob(peakStar, 320, 'pulsar');
     }
 
     // The SVG uses preserveAspectRatio="xMidYMid slice", which means the
@@ -6895,7 +6895,7 @@ function bindIgnitionSequence(container) {
     if (skipBtn) skipBtn.addEventListener('click', advance);
   } else if (step === 'ignite') {
     const blob = root.querySelector('#nsIgniteBlob');
-    if (blob && typeof initStarBlob === 'function') { setTimeout(() => initStarBlob(blob), 40); }
+    if (blob && typeof initStarBlob === 'function') { setTimeout(() => initStarBlob(blob, 240, 'pulsar'), 40); }
     _bindHoldToIgnite(root);
   } else {
     // replay / contrast: simple continue

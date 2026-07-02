@@ -678,7 +678,7 @@ function initNeutronStarStarView(scope) {
     p = p.parentElement;
   }
 
-  if (canvas) initStarBlob(canvas, 760);
+  if (canvas) initStarBlob(canvas, 760, 'pulsar');
 
   // Hide the empty bottom nav so the scene fully covers the viewport.
   const navEl = document.querySelector('.clarity-exp__nav');

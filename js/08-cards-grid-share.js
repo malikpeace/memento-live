@@ -1493,7 +1493,7 @@ function renderResourcesCard() {
 function bindSyntheticWidget(key, el) {
   if (key === 'claritySphere') {
     const c = el.querySelector('#dashClaritySphere');
-    if (c && typeof initStarBlob === 'function') initStarBlob(c, 120);
+    if (c && typeof initStarBlob === 'function') initStarBlob(c, 120, 'pulsar');
     el.addEventListener('click', () => {
       if (state.clarity.completed) ClarityExperience.openSummary();
       else ClarityExperience.open();
