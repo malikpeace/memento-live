@@ -177,6 +177,10 @@ const WelcomeIntro = {
       this._wcDockPanBound = true;
       let sy = 0, sx = 0, lastY = 0, lastT = 0, vel = 0, panning = false, raf = 0;
       const stopMomentum = () => { if (raf) { cancelAnimationFrame(raf); raf = 0; } };
+      // A finger landing on the MESSAGE area must instantly kill any dock-swipe momentum,
+      // otherwise the momentum loop keeps writing scrollTop and fights the native scroll
+      // (that was the "can't swipe back down through the history" bug).
+      this.pageWrap.addEventListener('touchstart', stopMomentum, { passive: true });
       this.navEl.addEventListener('touchstart', (e) => {
         if (!this._wcConvoEl || !this._wcConvoEl.isConnected) return;
         stopMomentum();
