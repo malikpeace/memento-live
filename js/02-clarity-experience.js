@@ -488,10 +488,10 @@ const ClarityExperience = {
         aiCurrentOptions = [];
         aiCurrentRange = null;
         if (aiAbortController) { aiAbortController.abort(); aiAbortController = null; }
-        // Hero first (then the "Clarity" intro), matching the fresh open flow; or
+        // "Clarity" intro first (then the hero page), matching the fresh open flow; or
         // straight to the wizard if the tutorial was already seen.
         if (!state.clarity.tutorialSeen) {
-          this._introPending = true;
+          this._openWithIntro = true;
           this._setLight(0.06);
           this._openContent();
         } else {
@@ -549,9 +549,9 @@ const ClarityExperience = {
     document.getElementById('clarityIntroBtn').addEventListener('click', () => {
       const intro = document.getElementById('clarityIntro');
       intro.classList.add('clarity-intro--exit');
-      // The hero (page 0) already played before this intro, so Begin drops into the
-      // teaching pages at the scale page (page 1).
-      this._setTimeout(() => { if (this.isOpen) { this.currentPage = 1; this._openContent(); } }, 400);
+      // The intro OPENS the module now (v499), so Begin drops into the teaching pages
+      // from the top: the "How to achieve literally anything" hero (page 0).
+      this._setTimeout(() => { if (this.isOpen) { this.currentPage = 0; this._openContent(); } }, 400);
     });
 
     this._runClarityIntro();
@@ -673,12 +673,11 @@ const ClarityExperience = {
     }
 
     // ── Fresh open ──
-    // The "How to achieve literally anything" hero is the FIRST thing they see. Advancing
-    // from it shows the "Clarity" cinematic intro, then the rest of the teaching pages.
-    // (_showClarityIntro is now reached from next(), see the _introPending branch.)
-    // Hold on plain black for a beat before the hero appears (Malik: never drop them
-    // straight into it).
-    this._introPending = true;
+    // The module OPENS with the "Clarity" cinematic intro (v499, Malik: the hero and the
+    // intro were two centred title moments back to back, which stole from Clarity's).
+    // Begin then drops into the teaching pages starting at the hero (page 0), whose
+    // title now enters quietly in place. Hold on plain black for a beat first.
+    this._openWithIntro = true;
     this._setLight(0.06);
     this._openContent(650);
   },
@@ -690,9 +689,16 @@ const ClarityExperience = {
       requestAnimationFrame(() => this.el.classList.add('open-bg-visible'));
     }
 
-    // Phase 2: Render wizard content (after the optional black hold on a fresh open)
+    // Phase 2: Render wizard content (after the optional black hold on a fresh open).
+    // A fresh first open shows the "Clarity" cinematic intro instead of a page; its
+    // Begin button re-enters _openContent for the real page 0.
     this._setTimeout(() => {
       if (!this.isOpen) return;
+      if (this._openWithIntro) {
+        this._openWithIntro = false;
+        this._showClarityIntro();
+        return;
+      }
       this.renderPage(this.currentPage);
       this.updateProgress();
       this.updateNav();
@@ -769,7 +775,7 @@ const ClarityExperience = {
     this.tutorialOnly = false;
     this._transitioning = false;
     this._resuming = false;
-    this._introPending = false;
+    this._openWithIntro = false;
     FullscreenClose.hide();
 
     // Hard hide the clarity overlay - display:none is un-ignorable
@@ -1058,49 +1064,15 @@ const ClarityExperience = {
     hero.addEventListener('click', () => { if (this._heroSkip) this._heroSkip(); });
     if (reduced) { if (title) title.style.opacity = '1'; fillAll(); return; }
     if (!title) { this._setTimeout(startTyping, 250); return; }
-    // The headline TYPES OUT centred on screen (Malik, v498; it used to pop in whole),
-    // then glides to its top-left spot, and only then does the body typewriter begin.
-    // The full-size box is reserved up front so the centring holds while characters appear.
-    const r = title.getBoundingClientRect();
-    const dx = (window.innerWidth / 2) - (r.left + r.width / 2);
-    const dy = (window.innerHeight / 2) - (r.top + r.height / 2);
-    title.dataset.full = title.innerHTML;
-    const titleLines = title.dataset.full.split(/<br\s*\/?\s*>/i).map((s) => s.replace(/<[^>]*>/g, ''));
-    const totalTitle = titleLines.reduce((a, s) => a + s.length, 0);
-    title.style.minWidth = r.width + 'px';
-    title.style.minHeight = r.height + 'px';
-    title.style.display = 'inline-block';
-    title.style.willChange = 'transform';
-    title.style.transformOrigin = 'center center';
-    title.style.transition = 'none';
-    title.style.transform = `translate(${dx}px, ${dy}px) scale(1.14)`;
-    title.style.opacity = '1';
-    title.textContent = '';
-    void title.offsetWidth;
-    const renderTitleUpto = (n) => {
-      title.textContent = '';
-      let rem = n;
-      titleLines.forEach((ln, li) => {
-        if (li > 0 && rem > 0) title.appendChild(document.createElement('br'));
-        if (rem <= 0) return;
-        const take = Math.min(rem, ln.length);
-        title.appendChild(document.createTextNode(ln.slice(0, take)));
-        rem -= take;
-      });
-    };
-    // Type the title, let it breathe centred for a beat, glide home, then the body types.
-    const glideThenType = () => {
-      this._setTimeout(() => { if (done || typing) return; title.style.transition = 'transform 0.95s cubic-bezier(0.16,1,0.3,1)'; title.style.transform = 'translate(0px, 0px) scale(1)'; }, 550);
-      this._setTimeout(() => { if (done || typing) return; landTitle(); startTyping(); }, 1650);
-    };
-    let ti = 0;
-    const titleTick = () => {
-      if (done || typing) return; // a tap already landed the title and started the body
-      renderTitleUpto(ti); ti++;
-      if (ti <= totalTitle) this._setTimeout(titleTick, 24 + Math.random() * 14);
-      else { title.innerHTML = title.dataset.full; glideThenType(); }
-    };
-    this._setTimeout(titleTick, 350);
+    // The title enters QUIETLY at its own spot (v499): the centred cinematic open now
+    // belongs to the "Clarity" intro that precedes this page (Malik: two centred title
+    // moments back to back stole from Clarity's). Fade + rise, a short breath, then the
+    // body typewriter begins.
+    title.style.opacity = '0';
+    title.style.transform = 'translateY(12px)';
+    title.style.transition = 'opacity 0.7s ease, transform 0.7s cubic-bezier(0.16,1,0.3,1)';
+    this._setTimeout(() => { if (done || typing) return; title.style.opacity = '1'; title.style.transform = ''; }, 250);
+    this._setTimeout(() => { if (done || typing) return; landTitle(); startTyping(); }, 1200);
   },
 
   // Native feel (Malik): if the page's content FITS the screen, kill scrolling entirely so
@@ -1495,13 +1467,8 @@ const ClarityExperience = {
       return;
     }
 
-    // Fresh flow: advancing from the hero (page 0) shows the "Clarity" cinematic intro once,
-    // then the intro's Begin drops into the teaching pages (scale onward).
-    if (this._introPending && this.currentPage === 0 && !this.tutorialOnly) {
-      this._introPending = false;
-      this._showClarityIntro();
-      return;
-    }
+    // (The "Clarity" cinematic intro now runs at OPEN, before page 0, so page 0's
+    // Continue is plain navigation: hero -> scale. No one-time branch here anymore.)
 
     // Validate wizard step if applicable
     if (!this.tutorialOnly && this.currentPage >= offset) {
