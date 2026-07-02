@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <script>
 /* Single source of truth for the app version. Surfaced in Settings > About. */
-window.MEMENTO_VERSION = 'v481';
+window.MEMENTO_VERSION = 'v482';
 /* LOWFX: touch / mobile devices get a lighter render path (no backdrop blur,
    no will-change layers, no background canvas animations) so iOS does not kill
    the tab from graphics-memory pressure. Desktop (fine pointer) is untouched.
@@ -40,22 +40,22 @@ window.MEMENTO_VERSION = 'v481';
      paint never waits on a third-party CDN. font-display: swap throughout. -->
 <link rel="preload" href="fonts/dmsans-1.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="fonts/fonts.css">
-<link rel="stylesheet" href="css/base.css?v=v481">
-<link rel="stylesheet" href="css/sidebar.css?v=v481">
-<link rel="stylesheet" href="css/dashboard.css?v=v481">
-<link rel="stylesheet" href="css/misc.css?v=v481">
-<link rel="stylesheet" href="css/vivere.css?v=v481">
-<link rel="stylesheet" href="css/notes.css?v=v481">
-<link rel="stylesheet" href="css/onboarding.css?v=v481">
-<link rel="stylesheet" href="css/clarity.css?v=v481">
-<link rel="stylesheet" href="css/action.css?v=v481">
-<link rel="stylesheet" href="css/daycard-living.css?v=v481">
-<link rel="stylesheet" href="css/share-card.css?v=v481">
-<link rel="stylesheet" href="css/clarity-paywall.css?v=v481">
-<link rel="stylesheet" href="css/appearance-picker.css?v=v481">
-<link rel="stylesheet" href="css/coach.css?v=v481">
-<link rel="stylesheet" href="css/journey.css?v=v481">
-<link rel="stylesheet" href="css/install.css?v=v481">
+<link rel="stylesheet" href="css/base.css?v=v482">
+<link rel="stylesheet" href="css/sidebar.css?v=v482">
+<link rel="stylesheet" href="css/dashboard.css?v=v482">
+<link rel="stylesheet" href="css/misc.css?v=v482">
+<link rel="stylesheet" href="css/vivere.css?v=v482">
+<link rel="stylesheet" href="css/notes.css?v=v482">
+<link rel="stylesheet" href="css/onboarding.css?v=v482">
+<link rel="stylesheet" href="css/clarity.css?v=v482">
+<link rel="stylesheet" href="css/action.css?v=v482">
+<link rel="stylesheet" href="css/daycard-living.css?v=v482">
+<link rel="stylesheet" href="css/share-card.css?v=v482">
+<link rel="stylesheet" href="css/clarity-paywall.css?v=v482">
+<link rel="stylesheet" href="css/appearance-picker.css?v=v482">
+<link rel="stylesheet" href="css/coach.css?v=v482">
+<link rel="stylesheet" href="css/journey.css?v=v482">
+<link rel="stylesheet" href="css/install.css?v=v482">
 </head>
 <body>
 
@@ -721,31 +721,31 @@ window.MEMENTO_VERSION = 'v481';
 <!-- Supabase client for OPTIONAL cloud accounts + sync (js/12-cloud-sync.js).
      If this CDN tag fails to load, the app runs fully local, unchanged. -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
-<script src="js/01-state-foundation.js?v=v481"></script>
-<script src="js/02-clarity-experience.js?v=v481"></script>
-<script src="js/03-ai-integration.js?v=v481"></script>
-<script src="js/04-templates-proof.js?v=v481"></script>
-<script src="js/05-vivere.js?v=v481"></script>
-<script src="js/06-consistency-mori.js?v=v481"></script>
-<script src="js/07-sheet-templates.js?v=v481"></script>
-<script src="js/08-cards-grid-share.js?v=v481"></script>
-<script src="js/09-controllers.js?v=v481"></script>
-<script src="js/10-demo-backend.js?v=v481"></script>
+<script src="js/01-state-foundation.js?v=v482"></script>
+<script src="js/02-clarity-experience.js?v=v482"></script>
+<script src="js/03-ai-integration.js?v=v482"></script>
+<script src="js/04-templates-proof.js?v=v482"></script>
+<script src="js/05-vivere.js?v=v482"></script>
+<script src="js/06-consistency-mori.js?v=v482"></script>
+<script src="js/07-sheet-templates.js?v=v482"></script>
+<script src="js/08-cards-grid-share.js?v=v482"></script>
+<script src="js/09-controllers.js?v=v482"></script>
+<script src="js/10-demo-backend.js?v=v482"></script>
 <!-- The Memento Coach: ongoing adaptive AI companion (uses the existing ai-proxy).
      Loads before 11-init so MementoCoach exists when the home first renders. -->
-<script src="js/16-coach.js?v=v481"></script>
+<script src="js/16-coach.js?v=v482"></script>
 <!-- The Path + Your Story: the journey views. Client-side, read existing state. -->
-<script src="js/17-journey.js?v=v481"></script>
+<script src="js/17-journey.js?v=v482"></script>
 <!-- Add to Home Screen prompt: detects browser-tab vs installed PWA. -->
-<script src="js/18-install.js?v=v481"></script>
-<script src="js/11-init.js?v=v481"></script>
-<script src="js/12-cloud-sync.js?v=v481"></script>
-<script src="js/13-clarity-paywall.js?v=v481"></script>
-<script src="js/14-appearance-picker.js?v=v481"></script>
+<script src="js/18-install.js?v=v482"></script>
+<script src="js/11-init.js?v=v482"></script>
+<script src="js/12-cloud-sync.js?v=v482"></script>
+<script src="js/13-clarity-paywall.js?v=v482"></script>
+<script src="js/14-appearance-picker.js?v=v482"></script>
 <!-- DEV-ONLY: ?dev=beats live preview for the onboarding chapter pages. Inert without the param. -->
-<script src="js/19-dev-beats.js?v=v481"></script>
+<script src="js/19-dev-beats.js?v=v482"></script>
 <!-- Back/forward + hash-URL routing. Loads LAST so every open/close fn it wraps
      already exists. Inert until onboarding is done; touches only location.hash. -->
-<script src="js/15-router.js?v=v481"></script>
+<script src="js/15-router.js?v=v482"></script>
 </body>
 </html>

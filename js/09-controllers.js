@@ -167,6 +167,54 @@ const WelcomeIntro = {
         el.classList.toggle('wc-reading', !atBottom);
       }, { passive: true });
     }
+    // Swipe over the DOCK also scrolls the conversation (Malik: on mobile the chips
+    // dock covers the lower half where thumbs naturally swipe, and people expect an
+    // upward swipe there to peek the chat history). Taps still work: the pan only
+    // engages after clear vertical intent (~10px, more vertical than horizontal),
+    // and iOS cancels the tap on its own once the finger has moved. Release adds a
+    // simple momentum decay so it feels like one continuous native scroller.
+    if (!this._wcDockPanBound) {
+      this._wcDockPanBound = true;
+      let sy = 0, sx = 0, lastY = 0, lastT = 0, vel = 0, panning = false, raf = 0;
+      const stopMomentum = () => { if (raf) { cancelAnimationFrame(raf); raf = 0; } };
+      this.navEl.addEventListener('touchstart', (e) => {
+        if (!this._wcConvoEl || !this._wcConvoEl.isConnected) return;
+        stopMomentum();
+        const t = e.touches[0];
+        sy = lastY = t.clientY; sx = t.clientX; lastT = e.timeStamp; vel = 0; panning = false;
+      }, { passive: true });
+      this.navEl.addEventListener('touchmove', (e) => {
+        if (!this._wcConvoEl || !this._wcConvoEl.isConnected) return;
+        if (this.pageWrap.classList.contains('wc-busy')) return;
+        const t = e.touches[0];
+        if (!panning) {
+          const totY = t.clientY - sy, totX = t.clientX - sx;
+          if (Math.abs(totY) > 10 && Math.abs(totY) > Math.abs(totX) * 1.2) panning = true;
+          else { lastY = t.clientY; lastT = e.timeStamp; return; }
+        }
+        e.preventDefault(); // we own the gesture now: no rubber-band underneath
+        const dy = t.clientY - lastY;
+        this.pageWrap.scrollTop -= dy;
+        const dt = Math.max(1, e.timeStamp - lastT);
+        vel = dy / dt;
+        lastY = t.clientY; lastT = e.timeStamp;
+      }, { passive: false });
+      this.navEl.addEventListener('touchend', () => {
+        if (!panning) return;
+        panning = false;
+        let v = -vel * 16; // px per frame at ~60fps
+        const el = this.pageWrap;
+        const step = () => {
+          raf = 0;
+          if (Math.abs(v) < 0.4) return;
+          el.scrollTop += v;
+          v *= 0.94;
+          if (el.scrollTop <= 0 || el.scrollTop + el.clientHeight >= el.scrollHeight - 1) return;
+          raf = requestAnimationFrame(step);
+        };
+        raf = requestAnimationFrame(step);
+      }, { passive: true });
+    }
     this.pageWrap.classList.remove('wc-reading');
     this._wcBeatsArr = this._wcBuild();
     this._wcQTotal = this._wcBeatsArr.filter(b => b.input).length;
