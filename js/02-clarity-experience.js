@@ -884,7 +884,7 @@ const ClarityExperience = {
           l.style.transition = 'opacity 0.55s ease, transform 0.55s cubic-bezier(0.16,1,0.3,1)';
           l.style.opacity = '1'; l.style.transform = '';
           if (i === lines.length - 1) { done = true; showNav(); }
-        }, i * 600);
+        }, i * 950);
       });
     };
     let typed = false;
