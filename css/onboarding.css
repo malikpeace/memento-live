@@ -937,13 +937,15 @@ body.calm-motion .empty-state, body.lite .empty-state { animation: none; }
    rail computed against the wrong viewport in the standalone PWA and landed at the TOP of the
    screen). The class is never applied now; rule kept inert for history. */
 .welcome-intro__nav.wc-nav--pinned { position: fixed; left: 0; right: 0; bottom: 0; z-index: 260; }
-/* Cosmetic keyboard shift (welcomeKeyboardShift in js/11, Malik's idea): while the conversation
-   text field is focused, the message column eases DOWN so the iOS keyboard push-up reads composed
-   instead of cramped at the top. The input itself stays put (shifting it only makes iOS pan
-   further). Tune the distance via --wc-kbshift. */
+/* Cosmetic keyboard shift (welcomeKeyboardShift in js/11, Malik's idea, LITERAL version): while
+   the conversation text field is focused, ALL onboarding elements (messages + inputs + button)
+   ease DOWN together so the iOS keyboard push-up nets out lower and reads composed. Releases on
+   blur. Tune the distance via --wc-kbshift. */
 .welcome-intro { --wc-kbshift: 120px; }
-.welcome-intro .welcome-convo { transition: transform 0.3s ease; }
-.welcome-intro.wc-kbshift .welcome-convo { transform: translateY(var(--wc-kbshift)); }
+.welcome-intro .welcome-intro__page-wrap,
+.welcome-intro .welcome-intro__nav { transition: transform 0.3s ease; }
+.welcome-intro.wc-kbshift .welcome-intro__page-wrap,
+.welcome-intro.wc-kbshift .welcome-intro__nav { transform: translateY(var(--wc-kbshift)); }
 .welcome-intro__bg {
   position: absolute; inset: 0; pointer-events: none; overflow: hidden;
   /* The glow gradient now lives on .welcome-intro itself (so it paints instantly
