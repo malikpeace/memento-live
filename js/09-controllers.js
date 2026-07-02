@@ -2164,11 +2164,11 @@ const WelcomeIntro = {
     const b = beats[beatIdx];
     const isLast = beatIdx === n - 1;
     const kind = b.kind || 'stage';
-    // The recap ("here's what you said") and the mori beat (their days left) sit on plain black
-    // (pre-Memento): --preenter hides the top-left rays + the background wash. From the "Enter
-    // Memento" beat onward the rays fade in (their 2.6s opacity transition runs when --preenter
-    // is removed), so the light literally arrives, as the answer, right after the weight.
-    this.el.classList.toggle('welcome-intro--preenter', kind === 'recap' || kind === 'mori');
+    // The recap ("here's what you said") sits on plain black (pre-Memento): --preenter hides
+    // the top-left rays + the background wash. From the "Enter Memento" beat onward the rays
+    // fade in (their 2.6s opacity transition runs when --preenter is removed), so the light
+    // literally arrives as they enter Memento.
+    this.el.classList.toggle('welcome-intro--preenter', kind === 'recap');
     // The beam-brightness boost only applies during the Meet Your Memento reveal; reset elsewhere.
     if (kind !== 'preview') { try { this.el.style.setProperty('--wi-beam-boost', '0'); } catch (e) {} }
     // Philosophy + the "how Memento helps" page use a wider content column (less page padding)
@@ -2352,12 +2352,10 @@ const WelcomeIntro = {
     const prevHead = 'Meet Your Memento';
 
     // Order: recap ("here's what you said", the personalized _solStage page, its own beat so
-    // they feel understood first, with their free-text words quoted back verbatim) -> MORI (the
-    // name explained + their real days left, still on black: the weight) -> Enter Memento (the
-    // beams arrive: the answer) -> the single "Here's how Memento will help you" page
-    // (personalized stepper) -> Meet Your Memento. The abstract "Philosophy Behind Memento"
-    // pillars page was removed: clarity/action/consistency is taught ONLY as the concrete,
-    // personal "how it helps you" page, so nothing reads as an AI sales detour.
+    // they feel understood first) -> Enter Memento (the beams arrive) -> the single "Here's how
+    // Memento will help you" page (personalized stepper) -> Meet Your Memento. The abstract
+    // "Philosophy Behind Memento" pillars page was removed (read as an AI sales detour), and the
+    // MORI days-left beat was tried (v469) and REMOVED (v494, Malik: felt forced, did not fit).
     const helpHead = first ? first + ", here's how Memento will help you" : "Here's how Memento will help you";
     // If they wrote a free-text note, acknowledge it WITHOUT quoting or paraphrasing it. Verbatim
     // quote-back broke on real input (long notes chop mid-sentence, lists mangle, and meta notes
@@ -2368,7 +2366,6 @@ const WelcomeIntro = {
     const note = rawLetter ? 'What you wrote in your own words stays with your Memento. Clarity picks it up from there.' : '';
     return [
       { key: 'recap', kind: 'recap', accent: PUR, headline: stage.headline, line: stage.line, stakes: stage.stakes, note: note },
-      { key: 'mori', kind: 'mori', accent: PUR, headline: moriHead, line: moriLine, days: days },
       { key: 'enter', kind: 'enter', accent: PUR, title: 'Enter Memento' },
       { key: 'help', kind: 'help', accent: PUR, headline: helpHead },
       { key: 'preview', kind: 'preview', accent: PUR, headline: prevHead, line: '' }

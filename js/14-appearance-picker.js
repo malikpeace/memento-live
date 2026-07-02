@@ -60,7 +60,9 @@ const AppearancePicker = {
       const cards = this.LOOKS.map((lk) =>
         '<button type="button" class="apk-card apk-prev apk-prev--' + lk.id + (lk.id === this._picked ? ' is-picked' : '') + '" data-look="' + lk.id + '" role="radio" aria-checked="' + (lk.id === this._picked) + '">' +
           '<div class="apk-prev__screen">' + this._previewHTML() + '</div>' +
-          '<div class="apk-card__meta"><span class="apk-card__name">' + lk.name + '</span><span class="apk-card__tag">' + lk.tag + '</span></div>' +
+          // Name only: the tag sublines ("Clean and minimal" etc.) were cut (Malik: they
+          // added nothing to the pick). The previews carry the difference.
+          '<div class="apk-card__meta"><span class="apk-card__name">' + lk.name + '</span></div>' +
         '</button>'
       ).join('');
 

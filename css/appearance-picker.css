@@ -20,9 +20,9 @@
 
 .apk__scrim {
   position: absolute; inset: 0;
-  background: rgba(4, 5, 9, 0.74);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  /* Fully OPAQUE (Malik): nothing from the onboarding behind may show through while
+     picking; the moment is just the picker on black. */
+  background: #000;
 }
 .apk__sheet {
   position: relative;
