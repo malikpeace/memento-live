@@ -149,6 +149,7 @@ const WelcomeIntro = {
     this._setProgress(0.04);
     // mount the flowing column (page-wrap) + the dock (nav rail)
     this.pageWrap.style.alignItems = ''; this.pageWrap.style.justifyContent = ''; this.pageWrap.style.textAlign = '';
+    this.pageWrap.style.overflowY = ''; // undo any fit-scroll lock from a cine beat: the convo scrolls
     this.navEl.style.justifyContent = ''; this.navEl.style.gap = '';
     this.pageWrap.innerHTML = '<div class="welcome-convo" id="wcConvo"></div>';
     this.navEl.innerHTML = '<div class="wc-dock" id="wcDock"></div>';
@@ -262,7 +263,9 @@ const WelcomeIntro = {
       },
       display: (v) => [String((v && v.first) || '').trim(), String((v && v.last) || '').trim()].filter(Boolean).join(' ')
     });
-    beats.push({ lines: (n) => ['Welcome to Memento, ' + (n || 'you') + '.'], pause: 700 });
+    // grand: the welcome line does not type; it blooms in as one piece (soft zoom + de-blur)
+    // and lingers before the conversation moves on.
+    beats.push({ lines: (n) => ['Welcome to Memento, ' + (n || 'you') + '.'], pause: 1500, grand: true });
     // The look is chosen at the very END of onboarding (in _finishWithName), right
     // before the blank Memento is revealed, so the first card they ever see already
     // wears their style. (Moved here from a post-welcome beat.)
@@ -500,7 +503,7 @@ const WelcomeIntro = {
       // it into faint history, so the screen is dominated by the CURRENT question
       // + input rather than a tall stack. Swipe up brings the history back.
       if (lines.length) this._wcMarkHistory();
-      for (const t of lines) { if (gen !== this._wcGen) return; await this._wcTypeLine(t, instant, gen); }
+      for (const t of lines) { if (gen !== this._wcGen) return; await this._wcTypeLine(t, instant, gen, beat.grand); }
       if (gen !== this._wcGen) return;
       // Optional extra hold after a beat's lines (e.g. let "Welcome to Memento"
       // sit before the conversation begins). Skipped on instant rebuild / reduced motion.
@@ -696,9 +699,23 @@ const WelcomeIntro = {
     this._wcFlipKids(kids, before);
   },
 
-  _wcTypeLine(text, instant, gen) {
+  _wcTypeLine(text, instant, gen, grand) {
     return new Promise(res => {
       this._wcSetBusy(true);
+      // grand lines (e.g. "Welcome to Memento, Malik.") do not type: the whole line blooms
+      // in as one piece (soft zoom + de-blur, .wc-line--grand) and holds a beat.
+      if (grand && !instant && !this._wcReduced) {
+        const kidsG = [...this._wcConvoEl.children];
+        const beforeG = kidsG.map(k => k.getBoundingClientRect().top);
+        const elG = document.createElement('div');
+        elG.className = 'wc-line wc-line--grand';
+        elG.textContent = String(text).split('**').join('');
+        this._wcConvoEl.appendChild(elG);
+        this._wcFlipKids(kidsG, beforeG);
+        this._wcScrollBottom();
+        setTimeout(res, 1150);
+        return;
+      }
       // **bold** support (the ONLY markup the typewriter understands; HTML is stripped
       // upstream and would never render anyway). The line is parsed into plain/bold
       // segments and every frame renders the first n characters of the PLAIN text with
@@ -2213,6 +2230,13 @@ const WelcomeIntro = {
     const solNextCls = (kind === 'recap') ? ' welcome-intro__btn--fix' : '';
     this.navEl.innerHTML = (kind === 'enter' || kind === 'preview') ? '' : `<button class="welcome-intro__back-btn" id="solBack">←</button><button class="welcome-intro__btn welcome-intro__btn--step${solNextCls}" id="solNext" style="flex:1;width:auto;">${solNextLabel}</button>`;
     try { this.pageWrap.classList.remove('wc-busy', 'wc-reading'); this.pageWrap.scrollTop = 0; } catch (e) {}
+    // Native feel (Malik): if this chapter's content FITS the screen, kill scrolling entirely
+    // so idle swipes do nothing (no rubber-band). Pages that genuinely overflow (small phones,
+    // long personalized copy) keep scrolling. Re-measured on every beat render.
+    try {
+      const pwFit = this.pageWrap;
+      setTimeout(() => { try { pwFit.style.overflowY = (pwFit.scrollHeight > pwFit.clientHeight + 2) ? '' : 'hidden'; } catch (e) {} }, 150);
+    } catch (e) {}
 
     // Recap page: paragraphs FADE in on staggered delays (CSS on .wi-recap; the typewriter
     // version was tried in v491 and reverted per Malik).

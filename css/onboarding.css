@@ -3835,6 +3835,11 @@ html.lowfx .auth-screen__card, body.lite .auth-screen__card { background: rgba(1
 .wc-line.user { color: #fff; font-weight: 700; }
 /* **bold** emphasis inside a typed line (_wcTypeLine): heavier than the 600 base so it reads. */
 .wc-line b { font-weight: 800; }
+/* Grand line ("Welcome to Memento, Malik."): blooms in as one piece with a soft zoom + de-blur
+   instead of typing, and reads a touch bigger. Lingers via the beat's pause. */
+.wc-line--grand { font-size: 1.5rem; font-weight: 700; color: #fff; animation: wcGrandIn 1.05s cubic-bezier(0.16,1,0.3,1) both; }
+@keyframes wcGrandIn { from { opacity: 0; transform: scale(0.9); filter: blur(10px); } 55% { opacity: 1; } to { opacity: 1; transform: scale(1); filter: blur(0); } }
+@media (prefers-reduced-motion: reduce) { .wc-line--grand { animation: none; } }
 
 /* Bottom dock = the existing nav rail, reused. Holds chips or the composer. */
 .welcome-intro__nav:has(.wc-dock) {

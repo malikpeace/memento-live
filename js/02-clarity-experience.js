@@ -676,19 +676,21 @@ const ClarityExperience = {
     // The "How to achieve literally anything" hero is the FIRST thing they see. Advancing
     // from it shows the "Clarity" cinematic intro, then the rest of the teaching pages.
     // (_showClarityIntro is now reached from next(), see the _introPending branch.)
+    // Hold on plain black for a beat before the hero appears (Malik: never drop them
+    // straight into it).
     this._introPending = true;
     this._setLight(0.06);
-    this._openContent();
+    this._openContent(650);
   },
 
-  _openContent() {
+  _openContent(holdMs) {
     // Phase 1: Dark background
     if (!this.el.classList.contains('open-bg')) {
       this.el.classList.add('open-bg');
       requestAnimationFrame(() => this.el.classList.add('open-bg-visible'));
     }
 
-    // Phase 2: Render wizard content
+    // Phase 2: Render wizard content (after the optional black hold on a fresh open)
     this._setTimeout(() => {
       if (!this.isOpen) return;
       this.renderPage(this.currentPage);
@@ -701,7 +703,7 @@ const ClarityExperience = {
       if (this._resuming) {
         this._resuming = false;
       }
-    }, this._resuming ? 150 : 50);
+    }, holdMs || (this._resuming ? 150 : 50));
 
     // Phase 3: Settle into stable state
     this._setTimeout(() => {
@@ -822,6 +824,11 @@ const ClarityExperience = {
     const title = hero.querySelector('.clarity-tut-hero__title-in');
     const lines = [...hero.querySelectorAll('.clarity-tut-hero__line')];
     const reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    // The Continue nav stays hidden until EVERY element is on screen (Malik: it used to
+    // pop up over an empty page). Shown the moment the last line lands (or on tap-fill).
+    const nav = this.navEl;
+    if (nav) { nav.style.transition = 'opacity 0.45s ease'; nav.style.opacity = '0'; nav.style.pointerEvents = 'none'; }
+    const showNav = () => { if (nav) { nav.style.opacity = '1'; nav.style.pointerEvents = ''; } };
     // Capture each line's inline structure (text runs + bold spans WITH their attrs) so the
     // typewriter can reveal characters with their formatting already applied, then reserve the
     // height and clear it. Stashing segments (not just plain text) is what keeps the bold part
@@ -845,7 +852,7 @@ const ClarityExperience = {
     };
     const typeLine = (idx) => {
       if (done) return;
-      if (idx >= lines.length) { done = true; return; }
+      if (idx >= lines.length) { done = true; showNav(); return; }
       const el = lines[idx]; const segs = el.__segs || []; const len = el.__len || 0; let i = 0;
       // Rebuild the line revealing the first n chars, keeping bold runs in their own (cloned)
       // element so the bold shows up already bold as it types.
@@ -870,7 +877,7 @@ const ClarityExperience = {
       tick();
     };
     const startTyping = () => { if (typing || done) return; typing = true; reveal(); typeLine(0); };
-    const fillAll = () => { done = true; reveal(); lines.forEach((l) => { l.innerHTML = l.dataset.full || ''; }); };
+    const fillAll = () => { done = true; reveal(); lines.forEach((l) => { l.innerHTML = l.dataset.full || ''; }); showNav(); };
     // A tap BEFORE typing starts snaps the title home and begins the typewriter immediately
     // (so an early tap can never make you miss it); a tap DURING typing fills everything.
     this._heroSkip = () => {
@@ -896,12 +903,23 @@ const ClarityExperience = {
     this._setTimeout(() => { if (done || typing) return; landTitle(); startTyping(); }, 2550);
   },
 
+  // Native feel (Malik): if the page's content FITS the screen, kill scrolling entirely so
+  // idle swipes do nothing (no rubber-band). Pages that genuinely overflow keep scrolling.
+  _fitPageScroll() {
+    try {
+      const pw = this.pageWrap;
+      if (!pw) return;
+      this._setTimeout(() => { try { pw.style.overflowY = (pw.scrollHeight > pw.clientHeight + 2) ? '' : 'hidden'; } catch (e) {} }, 150);
+    } catch (e) {}
+  },
+
   renderPage(index) {
     // In tutorial-only mode, always render tutorial pages
     if (this.tutorialOnly) {
       if (index < this.totalTutorialPages) {
         this.pageWrap.innerHTML = this.renderTutorialPage(index);
         if (this.pageWrap.querySelector('.clarity-tut-hero')) this._setTimeout(() => this._runHeroIntro(), 30);
+        this._fitPageScroll();
       }
       return;
     }
@@ -920,6 +938,7 @@ const ClarityExperience = {
 
     this.pageWrap.innerHTML = html;
     if (this.pageWrap.querySelector('.clarity-tut-hero')) this._setTimeout(() => this._runHeroIntro(), 30);
+    this._fitPageScroll();
 
     // Track whether we're on the Neutron Star summary view (last wizard step,
     // synthesis complete). If yes, persist so a refresh restores it.
