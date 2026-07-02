@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Neutron Star variants</title>
+<style>
+  /* Variations of the EXISTING star asset (initStarBlob's shader, copied verbatim as the
+     base). Each variant only ADDS one layer on top of the same body, so every option
+     still reads as the star we already have. Malik picks, then we tune + port. */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #030308; color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+    padding: max(24px, env(safe-area-inset-top)) 20px 60px;
+  }
+  h1 { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.02em; text-align: center; margin-bottom: 4px; }
+  .sub { text-align: center; font-size: 0.85rem; color: rgba(232,234,248,0.95); margin-bottom: 30px; }
+  .grid { display: flex; flex-direction: column; gap: 44px; max-width: 420px; margin: 0 auto; }
+  .tile { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .tile canvas { width: 230px; height: 230px; display: block; }
+  .tile b { font-size: 1rem; font-weight: 700; }
+  .tile p { font-size: 0.82rem; color: rgba(232,234,248,0.95); text-align: center; max-width: 280px; line-height: 1.45; }
+  .tag { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; color: rgba(159,130,255,0.95); }
+</style>
+</head>
+<body>
+  <h1>Neutron Star, pick one</h1>
+  <div class="sub">Same asset as today; each option adds ONE thing on top.</div>
+  <div class="grid" id="grid"></div>
+
+<script>
+(() => {
+  // ── The EXISTING shader from initStarBlob (js/11), verbatim, with optional
+  //    add-on blocks compiled in via #define flags per variant. ──
+  const NOISE = `
+vec3 mod289(vec3 x){return x-floor(x*(1./289.))*289.;}
+vec2 mod289(vec2 x){return x-floor(x*(1./289.))*289.;}
+vec3 permute(vec3 x){return mod289(((x*34.)+1.)*x);}
+float snoise(vec2 v){
+  const vec4 C=vec4(.211324865405187,.366025403784439,-.577350269189626,.024390243902439);
+  vec2 i=floor(v+dot(v,C.yy));vec2 x0=v-i+dot(i,C.xx);
+  vec2 i1;i1=(x0.x>x0.y)?vec2(1,0):vec2(0,1);
+  vec4 x12=x0.xyxy+C.xxzz;x12.xy-=i1;
+  i=mod289(i);
+  vec3 p=permute(permute(i.y+vec3(0,i1.y,1.))+i.x+vec3(0,i1.x,1.));
+  vec3 m=max(.5-vec3(dot(x0,x0),dot(x12.xy,x12.xy),dot(x12.zw,x12.zw)),0.);
+  m=m*m;m=m*m;
+  vec3 x=2.*fract(p*C.www)-1.;vec3 h=abs(x)-.5;vec3 ox=floor(x+.5);vec3 a0=x-ox;
+  m*=1.79284291400159-.85373472095314*(a0*a0+h*h);
+  vec3 g;g.x=a0.x*x0.x+h.x*x0.y;g.yz=a0.yz*x12.xz+h.yz*x12.yw;
+  return 130.*dot(m,g);
+}`;
+
+  function fsrc(defines) {
+    return `precision highp float;
+${defines}
+uniform float u_time;
+uniform vec2 u_res;
+${NOISE}
+void main(){
+  vec2 uv = (gl_FragCoord.xy / u_res) * 2.0 - 1.0;
+  uv.x *= u_res.x / u_res.y;
+  float t = u_time * 0.15;
+  float d = length(uv) - 0.42;
+  float mask = 1.0 - smoothstep(-0.04, 0.05, d);
+  float border = smoothstep(0.05, 0.0, abs(d + 0.01));
+  vec3 borderCol = 0.55 + 0.35 * cos(t * 2.5 + uv.xyx * 3.0 + vec3(0.5, 1.5, 3.0));
+  float n1 = snoise(uv * 1.8 + vec2(t * 0.7, t * 0.5));
+  float n2 = snoise(uv * 2.5 + vec2(-t * 0.6, t * 0.8));
+  float n3 = snoise(uv * 1.2 + vec2(t * 0.4, -t * 0.3));
+  float n4 = snoise(uv * 3.0 + vec2(t * 0.9, t * 0.2));
+  vec3 c1 = vec3(0.3, 0.5, 0.95);
+  vec3 c2 = vec3(0.45, 0.6, 1.0);
+  vec3 c3 = vec3(0.93, 0.95, 1.0);
+  vec3 c4 = vec3(0.55, 0.78, 1.0);
+  vec3 c5 = vec3(0.88, 0.92, 1.0);
+  vec3 col = mix(c1, c2, smoothstep(-0.5, 0.5, n1));
+  col = mix(col, c3, smoothstep(-0.3, 0.5, n2));
+  col = mix(col, c4, smoothstep(-0.2, 0.6, n3) * 0.5);
+  col = mix(col, c5, smoothstep(0.0, 0.7, n4) * 0.5);
+  float spec = smoothstep(0.25, 0.0, length(uv - vec2(-0.08, 0.12)));
+  col += vec3(1.0) * spec * 0.4;
+  col *= 1.35;
+  float innerShadow = smoothstep(0.0, 0.3, -d);
+  col *= 0.8 + 0.2 * innerShadow;
+
+  float beat = 0.0;
+#ifdef PULSE
+  beat = pow(max(sin(u_time * 1.9), 0.0), 3.0);
+  col *= 1.0 + 0.20 * beat;
+#endif
+#ifdef CRACKLE
+  float n5 = snoise(uv * 4.5 + vec2(t * 1.4, -t * 1.0));
+  float fil = smoothstep(0.40, 0.62, abs(n5));
+  col += vec3(0.85, 0.93, 1.0) * fil * 0.45;
+#endif
+#ifdef HOT
+  float core = smoothstep(0.34, 0.0, length(uv));
+  col += vec3(1.0) * core * (0.7 + 0.3 * beat);
+#endif
+
+  vec3 final = col * mask + borderCol * border * 0.35;
+  float alpha = max(mask, border * 0.35);
+
+#ifdef JETS
+  float tilt = -0.45;
+  vec2 ax = vec2(sin(tilt), cos(tilt));
+  float along = dot(uv, ax);
+  float across = abs(dot(uv, vec2(-ax.y, ax.x)));
+  float aa = abs(along);
+  float jw = 0.030 + 0.055 * aa;
+  float jet = smoothstep(jw, jw * 0.15, across)
+            * smoothstep(1.35, 0.5, aa)
+            * smoothstep(0.30, 0.55, aa);
+  float ji = 0.55 + 0.45 * beat;
+  final += vec3(0.72, 0.85, 1.0) * jet * ji * (1.0 - mask * 0.85);
+  alpha = max(alpha, jet * ji);
+#endif
+
+  gl_FragColor = vec4(final, alpha);
+}`;
+  }
+
+  // Same boilerplate as initStarBlob, minus the dashboard pause logic.
+  function makeStar(canvas, size, defines) {
+    const gl = canvas.getContext('webgl');
+    if (!gl) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = size * dpr; canvas.height = size * dpr;
+    const vsrc = 'attribute vec2 a_pos;void main(){gl_Position=vec4(a_pos,0,1);}';
+    function sh(type, src) {
+      const s = gl.createShader(type);
+      gl.shaderSource(s, src); gl.compileShader(s);
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) console.error('shader:', gl.getShaderInfoLog(s));
+      return s;
+    }
+    const prog = gl.createProgram();
+    gl.attachShader(prog, sh(gl.VERTEX_SHADER, vsrc));
+    gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, fsrc(defines)));
+    gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) console.error('link:', gl.getProgramInfoLog(prog));
+    gl.useProgram(prog);
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,1,1]), gl.STATIC_DRAW);
+    const aPos = gl.getAttribLocation(prog, 'a_pos');
+    gl.enableVertexAttribArray(aPos);
+    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+    const uTime = gl.getUniformLocation(prog, 'u_time');
+    const uRes = gl.getUniformLocation(prog, 'u_res');
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    function draw(t) {
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.clearColor(0, 0, 0, 0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.uniform1f(uTime, t * 0.001);
+      gl.uniform2f(uRes, canvas.width, canvas.height);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+  }
+
+  const VARIANTS = [
+    { tag: 'CURRENT', name: 'The star today', desc: 'Untouched, for comparison.', def: '' },
+    { tag: 'A', name: 'Hot core', desc: 'Same star + a white-hot center, denser and heavier.', def: '#define HOT' },
+    { tag: 'B', name: 'Polar jets', desc: 'Same star + two thin steady beams from the poles, tilted like the render.', def: '#define JETS' },
+    { tag: 'C', name: 'Heartbeat', desc: 'Same star + a slow luminosity pulse, alive, breathing power.', def: '#define PULSE\n#define HOT' },
+    { tag: 'D', name: 'Electric crackle', desc: 'Same star + sharper plasma filaments crackling across the surface.', def: '#define CRACKLE' },
+    { tag: 'E', name: 'Full pulsar', desc: 'Hot core + jets + heartbeat together; the jets flare on each beat.', def: '#define HOT\n#define JETS\n#define PULSE' }
+  ];
+
+  const grid = document.getElementById('grid');
+  VARIANTS.forEach((v) => {
+    const tile = document.createElement('div');
+    tile.className = 'tile';
+    tile.innerHTML = '<span class="tag">' + v.tag + '</span><canvas></canvas><b>' + v.name + '</b><p>' + v.desc + '</p>';
+    grid.appendChild(tile);
+    makeStar(tile.querySelector('canvas'), 230, v.def);
+  });
+})();
+</script>
+</body>
+</html>
