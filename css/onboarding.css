@@ -1716,8 +1716,14 @@ body.lite .welcome-intro__rays { opacity: calc(0.6 + var(--wi-beam-boost, 0) * 0
 .wi-recap .wi-demo__headline { margin-bottom: 26px; }
 .wi-recap .wi-demo__line { color: #fff; margin-bottom: 34px; }
 .wi-recap .wi-demo__stakes { color: #fff; }
-/* The recap CTA ("Let's Fix This" / "Let's Refine"): Memento green, white text. */
-.welcome-intro__btn--fix { background: #1fa168; color: #fff; }
+/* The recap CTA ("Let's Fix This" / "Let's Refine"): vibrant Memento green, white text.
+   Hover STAYS green (the base --step hover flips to white, which made white text vanish);
+   it just deepens a touch so the press still reads. */
+.welcome-intro__btn--fix,
+.welcome-intro__btn--step.welcome-intro__btn--fix { background: #16c784; color: #fff; }
+.welcome-intro__btn--fix:hover,
+.welcome-intro__btn--step.welcome-intro__btn--fix:hover { background: #12b476; color: #fff; box-shadow: 0 10px 34px rgba(0,0,0,0.44); }
+.welcome-intro__btn--fix:active { background: #0fa268; color: #fff; }
 
 /* Staggered reveal for the bare chapters (summary / problem / solution): the page
    lands blank, then the headline fades up, then the line a beat later. The block
