@@ -814,6 +814,30 @@ const ClarityExperience = {
     renderAll();
   },
 
+  // The beat between "Let's Find Yours" and the first question: a quiet pulsing clarity
+  // orb + two short lines while Memento visibly pulls in their onboarding answers.
+  // Personalized from state.profile (name + runningToward), templated, no AI call.
+  _showContextLoad(done) {
+    try {
+      const p = state.profile || {};
+      const first = String(p.name || '').trim().split(/\s+/)[0] || '';
+      const areas = String(p.runningToward || '').split('·').map(s => s.trim()).filter(Boolean)
+        .slice(0, 2).join(' and ').toLowerCase();
+      const line1 = first ? ('One sec ' + esc(first) + ', pulling up what you told me...') : 'One sec, pulling up what you told me...';
+      const line2 = areas ? ('Got it. You want progress in ' + esc(areas) + '. Let\'s use that.') : 'Got it. Let\'s find yours.';
+      this.navEl.innerHTML = '';
+      this.pageWrap.innerHTML = '<div class="clarity-exp__page-inner"><div class="clarity-ctx">' +
+        '<div class="clarity-ctx__orb"></div>' +
+        '<div class="clarity-ctx__line">' + line1 + '</div>' +
+        '<div class="clarity-ctx__line clarity-ctx__line--2" id="ctxLine2">' + line2 + '</div>' +
+        '</div></div>';
+      const reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+      if (reduced) { const l2 = document.getElementById('ctxLine2'); if (l2) l2.classList.add('is-on'); this._setTimeout(done, 600); return; }
+      this._setTimeout(() => { const l2 = document.getElementById('ctxLine2'); if (l2) l2.classList.add('is-on'); }, 1100);
+      this._setTimeout(done, 2250);
+    } catch (e) { done(); }
+  },
+
   // The "How to achieve anything" hero: the headline POPS IN sharp + fully visible, centred on
   // screen, holds, then rises to its top-left spot, and only then do the body lines type in.
   // No fade and no blur (that softer look is reserved for the Clarity title). A tap fills it.
@@ -1045,7 +1069,7 @@ const ClarityExperience = {
           </div>
         </div>`,
         headline: '<span style="font-size:clamp(20px,5vw,26px)">Removing distractions alone isn\'t enough</span>',
-        sub: 'Deleting apps, breaking your phone, and removing other distractions can help, but distractions are going to continue to grow as the world becomes faster and more comfortable (more on this later). Even if you shrink the left side by 90%, if it still outweighs a pebble on the right, it won\'t matter long term. Removal won\'t hurt you, but it\'s not <strong style="color:rgba(var(--ink),0.75)">the solution</strong>.'
+        sub: 'Deleting apps, breaking your phone, and removing other distractions can help, but distractions are going to continue to grow as the world becomes faster and more comfortable (more on this later). Even if you shrink the left side by 90%, if it still outweighs a pebble on the right, it won\'t matter long term. Removal won\'t hurt you, but it\'s not <strong style="color:rgba(var(--ink),1)">the solution</strong>.'
       },
       // Page 4  - The ultimate goal: flip the scale
       {
@@ -1058,7 +1082,7 @@ const ClarityExperience = {
           </div>
         </div>`,
         headline: 'The Solution: Break the Scale',
-        sub: 'The best long-term solution, is to have a weight so overwhelming on the other side, that it makes the other side irrelevant. To have something else so rewarding, your brain automatically defaults towards it.<br><br>That weight should be <strong style="color:rgba(var(--ink),0.75)">progression towards a worthy goal</strong>. Making distractions repulsive. Making progression addictive and automatic.'
+        sub: 'The best long-term solution, is to have a weight so overwhelming on the other side, that it makes the other side irrelevant. To have something else so rewarding, your brain automatically defaults towards it.<br><br>That weight should be <strong style="color:rgba(var(--ink),1)">progression towards a worthy goal</strong>. Making distractions repulsive. Making progression addictive and automatic.'
       },
       // Page 5  - The payoff (neutron star)
       {
@@ -1078,7 +1102,7 @@ const ClarityExperience = {
           <div class="clarity-reflect__headline">Now, before you begin.</div>
           <div class="clarity-reflect__body">
             I want you to genuinely sit with one question:<br><br>
-            <span class="clarity-reflect__question">"What do you want to do with your life?"</span><br><br>
+            <span class="clarity-reflect__question">"What's the one mission or goal you want to dedicate yourself to?"</span><br><br>
             This question is not an attempt to pressure or intimidate you, but instead, an invitation for you to really sit with it and see where it takes you.<br><br>
             Most of us spend our younger years gaming, scrolling, distracted, doing things for other people but not for ourselves. Out of our entire lives, we might have genuinely thought about our own direction for maybe five minutes total. Which is really scary if you think about it.<br><br>
             If you never focus inward on yourself, how can you expect to improve yourself? So if you can, seriously take the time to think about it for a minute.
@@ -1302,12 +1326,15 @@ const ClarityExperience = {
       if (!wizardStepValid(stepKey)) return;
     }
 
-    // Transitioning from last tutorial page to first wizard step
+    // Transitioning from last tutorial page to first wizard step.
+    // "Let's Find Yours" first takes a visible beat to pull in their onboarding answers,
+    // so the handoff feels continuous instead of dropping straight into a question (Malik).
+    // The AI side already receives buildProfileContext(); this makes that loading FELT.
     if (!state.clarity.tutorialSeen && this.currentPage === this.totalTutorialPages - 1) {
       state.clarity.tutorialSeen = true;
       persistState();
       // Reset to page 0 since offset is now 0
-      this.transitionTo(0, 'forward');
+      this._showContextLoad(() => { if (this.isOpen) this.transitionTo(0, 'forward'); });
       return;
     }
 

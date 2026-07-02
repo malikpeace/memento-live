@@ -2431,15 +2431,15 @@ function renderWizardStep(key) {
   switch (key) {
     case 'knowDomain':
       return wizSingleSelect(
-        'Okay let\'s start here... Do you know what you want to do with your life?',
-        'As in a mission, purpose, task, or goal. The thing you want to lock in on, that you want to accomplish either right now or long term. (If you don\'t, no worries, we\'ll figure it out. If so, we\'ll get more specific and narrow.)',
+        'Okay let\'s start here... Do you have a mission or goal you want to lock in on?',
+        'It can be a purpose, a project, or a goal. The ONE thing you want to focus on and accomplish, either right now or long term. (If you don\'t, no worries, we\'ll figure it out. If so, we\'ll get more specific and narrow.)',
         [{ value: 'yes', label: 'Yes' }, { value: 'kinda', label: 'Kinda' }, { value: 'not_sure', label: 'No, not yet' }],
         'knowDomain'
       );
     case 'discoverDomain':
       return `<div class="wiz__question">No worries! Very few humans ever know exactly what they want to do.</div>
         <div class="wiz__hint" style="margin-bottom:24px; line-height:1.6;">Most people spend their entire lives avoiding this question. Yet you're here. Which already puts you ahead of 90% of people. Let's figure this out.<br><br>Pick one or two areas that draw you in. Not what you think you should pick. What actually keeps you up at night or gets you out of bed.</div>
-        <div class="wiz__hint" style="font-size:0.75rem; opacity:0.7; margin-bottom:16px;">Pick up to 2. You can't make progress across all areas of life at once.</div>` +
+        <div class="wiz__hint" style="font-size:0.75rem; opacity:0.85; margin-bottom:16px;">Pick up to 2. You can't make progress across all areas of life at once.</div>` +
         wizMultiSelectInner(
           DISCOVERY_DOMAINS.map(d => ({ value: d.value, label: d.label, desc: d.desc }))
             .concat([{ value: 'other', label: 'Something else', desc: 'I\'ll describe it myself' }])
@@ -2536,9 +2536,13 @@ function renderWizardStep(key) {
       );
     case 'whatSpecifically':
       if (wizardAnswers.knowDomain === 'yes') {
+        // Continuity with onboarding (Malik): if they picked areas during setup, say so
+        // here, so Clarity visibly builds on what they already told their Memento.
+        const _tw = String((typeof state !== 'undefined' && state.profile && state.profile.runningToward) || '')
+          .split('·').map(s => s.trim()).filter(Boolean).slice(0, 2).join(' and ').toLowerCase();
         return wizFreeText(
           'Okay good! Describe exactly what you want to accomplish and/or focus on in your own words.',
-          'Be as brief or as detailed as you would like. But detailed is better.',
+          (_tw ? 'Earlier you said you want progress in ' + _tw + '. ' : '') + 'Be as brief or as detailed as you would like. But detailed is better.',
           'whatSpecifically',
           'e.g., I want to build an app that helps people meditate, I want to run a sub-4-hour marathon...'
         );
