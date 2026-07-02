@@ -1417,9 +1417,9 @@ const WelcomeIntro = {
       // commitment effect), and the answer calibrates AI tone + the comeback coaching hook.
       skipIf: (p) => String((p && p.actionProgress) || '') === 'Actually doing really good' },
     { key: 'timeBudget', type: 'choices', multi: false,
-      headline: 'How much time can you actually give this a day?',
+      headline: 'How much time are you willing to give per day to improve your life?',
       sub: 'Be honest. A real 15 minutes beats a fake hour.',
-      options: ['5 minutes', '15 minutes', '30 minutes', 'An hour or more'] },
+      options: ['5 minutes', '15 minutes', '30 minutes', '1 hour', '2 hours', '4 hours', '8+ hours'] },
     { type: 'summaryStepper' }
   ],
 
@@ -2770,7 +2770,8 @@ const WelcomeIntro = {
     const tb = String((p && p.timeBudget) || '');
     let fit = '';
     if (tb === '5 minutes' || tb === '15 minutes' || tb === '30 minutes') fit = 'a first move that fits the ' + tb + ' you said you have';
-    else if (tb === 'An hour or more') fit = 'a first move that fits the time you said you have';
+    else if (tb === '1 hour') fit = 'a first move that fits the hour you said you have';
+    else if (tb === '2 hours' || tb === '4 hours' || tb === '8+ hours') fit = 'a first move sized to the ' + tb + ' a day you committed';
     else fit = 'your first move today';
     return 'First, we find your Clarity. About 10 minutes, and you walk out with one clear goal, and ' + fit + '.';
   },
