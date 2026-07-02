@@ -667,11 +667,13 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
   background: #8f6fff;
   animation: gsExplode 5s ease-in-out infinite;
 }
+/* As it grows it shifts purple -> light blue (Malik: mark the transformation), then
+   settles back to purple as it shrinks. background color interpolates across the frames. */
 @keyframes gsExplode {
-  0%, 40% { width: 24px; height: 20px; }
-  52% { width: 64px; height: 52px; }
-  60%, 88% { width: 58px; height: 48px; }
-  100% { width: 24px; height: 20px; }
+  0%, 40% { width: 24px; height: 20px; background: #8f6fff; }
+  52% { width: 64px; height: 52px; background: #4db8ff; }
+  60%, 88% { width: 58px; height: 48px; background: #4db8ff; }
+  100% { width: 24px; height: 20px; background: #8f6fff; }
 }
 /* Red weight shrinking */
 .gs__weight--red-shrink {
