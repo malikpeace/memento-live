@@ -324,7 +324,7 @@ function initMiniBlob(canvasId, size) {
 })();
 
 // Star blob initializer (circular version of hyperblob)
-function initStarBlob(canvas, size = 240) {
+function initStarBlob(canvas, size = 240, variant) {
   // Guard against stacking loops: if this canvas was already initialised (e.g.
   // a re-render re-ran this on the same element), tear the old WebGL context +
   // animation loop down first. Otherwise each re-render adds another forever
@@ -347,7 +347,9 @@ function initStarBlob(canvas, size = 240) {
   canvas.height = _size * dpr;
 
   const vsrc = `attribute vec2 a_pos;void main(){gl_Position=vec4(a_pos,0,1);}`;
-  const fsrc = `
+  // CLASSIC = the original noise-marbled blob (UNTOUCHED; Malik's fallback: drop the
+  // 'pulsar' argument at the call site in js/02 to go back to this look).
+  const fsrcClassic = `
 precision highp float;
 uniform float u_time;
 uniform vec2 u_res;
@@ -398,6 +400,64 @@ void main(){
   float alpha = max(mask, border * 0.35);
   gl_FragColor = vec4(final, alpha);
 }`;
+
+  // PULSAR = the calm Magnetar Malik picked from proto-pulsar-styles.html (v505): the
+  // same marbled plasma body language + flowing polar jets on a tilted axis, with a
+  // slow quiet 2.8s breath (no shockwave, no glint, no hard beat). Renders with a
+  // luminance alpha so the CSS halo behind the canvas still shows through.
+  const fsrcPulsar = `
+precision highp float;
+uniform float u_time;
+uniform vec2 u_res;
+vec3 mod289(vec3 x){return x-floor(x*(1./289.))*289.;}
+vec2 mod289(vec2 x){return x-floor(x*(1./289.))*289.;}
+vec3 permute(vec3 x){return mod289(((x*34.)+1.)*x);}
+float snoise(vec2 v){
+  const vec4 C=vec4(.211324865405187,.366025403784439,-.577350269189626,.024390243902439);
+  vec2 i=floor(v+dot(v,C.yy));vec2 x0=v-i+dot(i,C.xx);
+  vec2 i1;i1=(x0.x>x0.y)?vec2(1,0):vec2(0,1);
+  vec4 x12=x0.xyxy+C.xxzz;x12.xy-=i1;
+  i=mod289(i);
+  vec3 p=permute(permute(i.y+vec3(0,i1.y,1.))+i.x+vec3(0,i1.x,1.));
+  vec3 m=max(.5-vec3(dot(x0,x0),dot(x12.xy,x12.xy),dot(x12.zw,x12.zw)),0.);
+  m=m*m;m=m*m;
+  vec3 x=2.*fract(p*C.www)-1.;vec3 h=abs(x)-.5;vec3 ox=floor(x+.5);vec3 a0=x-ox;
+  m*=1.79284291400159-.85373472095314*(a0*a0+h*h);
+  vec3 g;g.x=a0.x*x0.x+h.x*x0.y;g.yz=a0.yz*x12.xz+h.yz*x12.yw;
+  return 130.*dot(m,g);
+}
+void main(){
+  vec2 uv = (gl_FragCoord.xy / u_res) * 2.0 - 1.0;
+  uv.x *= u_res.x / u_res.y;
+  float T = u_time;
+  float phase = fract(T / 2.8);
+  float beat = pow(max(sin(3.14159 * phase), 0.0), 2.2);
+  float r = length(uv);
+  float n1 = snoise(uv * 2.2 + vec2(T * 0.12, T * 0.08));
+  float n2 = snoise(uv * 4.0 - vec2(T * 0.10, T * 0.15));
+  vec3 body = mix(vec3(0.25, 0.45, 0.95), vec3(0.55, 0.75, 1.0), smoothstep(-0.6, 0.6, n1));
+  body = mix(body, vec3(0.95, 0.97, 1.0), smoothstep(-0.1, 0.7, n2) * 0.7);
+  float mask = 1.0 - smoothstep(0.28, 0.32, r);
+  float core = exp(-r * 7.0) * (1.35 + 0.18 * beat);
+  float halo = exp(-r * 2.1) * 0.5 * (1.0 + 0.14 * beat);
+  float tilt = -0.5;
+  vec2 ax = vec2(sin(tilt), cos(tilt));
+  float along = dot(uv, ax);
+  float across = dot(uv, vec2(-ax.y, ax.x));
+  float aa = abs(along);
+  float flow = 0.75 + 0.45 * snoise(vec2(aa * 4.0 - T * 2.2, across * 14.0));
+  float jw = 0.035 + 0.09 * aa;
+  float jet = exp(-pow(across / jw, 2.0) * 2.5) * smoothstep(1.6, 0.35, aa) * smoothstep(0.18, 0.42, aa) * flow;
+  float ji = 0.78 + 0.22 * beat;
+  vec3 col = body * mask * (1.0 + 0.07 * beat);
+  col += vec3(1.0) * core;
+  col += vec3(0.45, 0.65, 1.0) * halo;
+  col += vec3(0.75, 0.88, 1.0) * jet * ji;
+  float alpha = clamp(max(col.r, max(col.g, col.b)), 0.0, 1.0);
+  gl_FragColor = vec4(col, alpha);
+}`;
+
+  const fsrc = (variant === 'pulsar') ? fsrcPulsar : fsrcClassic;
 
   function makeShader(type, src) {
     const s = gl.createShader(type);

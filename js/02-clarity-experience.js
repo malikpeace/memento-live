@@ -1166,10 +1166,12 @@ const ClarityExperience = {
       this.bindWizardInFullscreen();
     }
 
-    // Init hypercolor blob on neutron star tutorial page + its cinematic entrance
+    // Init the star on the neutron star tutorial page + its cinematic entrance.
+    // 'pulsar' = the calm Magnetar Malik picked (flowing polar jets + quiet breath);
+    // to REVERT to the classic marbled blob, just drop the 'pulsar' argument.
     const starBlob = document.getElementById('tutStarBlob');
     if (starBlob) {
-      setTimeout(() => initStarBlob(starBlob), 50);
+      setTimeout(() => initStarBlob(starBlob, 240, 'pulsar'), 50);
       this._runStarIntro();
     }
 
