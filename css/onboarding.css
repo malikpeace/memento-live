@@ -1712,6 +1712,10 @@ body.lite .welcome-intro__rays { opacity: calc(0.6 + var(--wi-beam-boost, 0) * 0
 @media (prefers-reduced-motion: reduce) { .wi-cine--stagger .wi-demo__headline, .wi-cine--stagger .wi-demo__line { animation: none; opacity: 1; } }
 /* The stakes paragraph (3rd) lands after the situation line. */
 .wi-cine--stagger .wi-demo__stakes { animation-delay: 2.0s; color: rgba(232,234,248,0.62); }
+/* Their free-text answer quoted back VERBATIM on the recap (last to land). High opacity: it is
+   their own words, it must read bright, not faded. */
+.wi-demo__quote { font-style: italic; color: rgba(236,238,250,0.95); }
+.wi-cine--stagger .wi-demo__quote { animation-delay: 2.9s; }
 
 /* ===== Chapter flow v2: enter / philosophy / mori / preview ===== */
 /* "Enter Memento" beat: the brand wordmark reveals like a logo intro, the M
@@ -1830,6 +1834,8 @@ body.lite .welcome-intro__rays { opacity: calc(0.6 + var(--wi-beam-boost, 0) * 0
 .wi-mori__grid .wi-mock { width: 100%; }
 .wi-mori__days { font-size: 0.95rem; color: rgba(232,234,248,0.62); margin: 12px auto 0; }
 .wi-mori__days b { color: #fff; font-weight: 800; font-variant-numeric: tabular-nums; }
+/* The gut-punch line under the days count: bright, it is the point of the page. */
+.wi-mori__days--stake { margin-top: 6px; color: rgba(236,238,250,0.95); font-weight: 600; }
 
 /* Preview: the blank card whose three pillar lights fill in, + the color key. */
 /* The title narrates through the reveal (Meet Your Memento -> the steps). Fixed height +
@@ -1902,6 +1908,10 @@ body.lite .welcome-intro__rays { opacity: calc(0.6 + var(--wi-beam-boost, 0) * 0
 @media (prefers-reduced-motion: reduce) { .wi-pcard-stage.opal .wi-pcard__opal { animation: none !important; } }
 .wi-pcard-stage.evolved .wi-pcard__glow--a.on { opacity: 1; }
 .wi-prev__hint { display: block; margin-top: -8px; font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(236,238,250,0.38); transition: opacity 0.4s ease; }
+/* The "what happens next" line that fades in with the Enter button once the reveal completes:
+   sets the expectation (Clarity, ~10 min, first move today) right before they land in the app. */
+.wi-prev__next { margin: -4px auto 0; max-width: 30ch; font-size: 0.95rem; line-height: 1.5; color: rgba(236,238,250,0.95); opacity: 0; transition: opacity 0.7s ease 0.25s; }
+.wi-prev__next.is-on { opacity: 1; }
 /* Cinematic arrival: the card turns to face you as it rises out of a soft blur and settles into
    focus, then a soft band of light sweeps across it once (glass catching the light), the title
    lifts in just behind it. Not a pop, a reveal. (Only opacity/blur/transform, GPU-cheap.) */

@@ -96,8 +96,8 @@
     head.appendChild(title); head.appendChild(toggle);
 
     var nav = document.createElement('div'); nav.className = 'db-nav';
-    // Match the live beat order in _solBeats: recap -> enter -> help -> preview.
-    var labels = ['recap', 'enter', 'help', 'preview'];
+    // Match the live beat order in _solBeats: recap -> mori -> enter -> help -> preview.
+    var labels = ['recap', 'mori', 'enter', 'help', 'preview'];
     var navBtns = [];
     labels.forEach(function (label, i) {
       var btn = document.createElement('button'); btn.textContent = (i + 1) + ' ' + label;

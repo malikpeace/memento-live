@@ -1911,13 +1911,16 @@ function buildProfileContext() {
       p.runningFrom ? 'What keeps pulling them back: ' + trunc(p.runningFrom, 90) : '',
       p.distraction ? 'Their biggest pull on attention: ' + trunc(p.distraction, 30) : '',
       p.costOfInaction ? 'The cost of staying stuck (what they are avoiding): ' + trunc(p.costOfInaction, 90) : '',
+      p.momentumWin ? 'What a year of momentum gets them (their upside): ' + trunc(p.momentumWin, 90) : '',
+      // The free-text note is the most personal signal in the whole diagnostic. It sits high
+      // in the list (not last) so the budget below can never silently drop it.
+      p.letterToFutureSelf ? 'In their own words (their note about themselves and their goals): ' + trunc(p.letterToFutureSelf, 220) : '',
       p.weakestPillar ? 'Where they need Memento most (weakest pillar): ' + trunc(p.weakestPillar, 20) : '',
-      p.letterToFutureSelf ? 'Their note to their future self: ' + trunc(p.letterToFutureSelf, 150) : '',
       // Back-compat with pre-diagnostic onboarding answers (filtered out if empty):
       p.story ? 'Who they are right now: ' + trunc(p.story, 130) : '',
       p.whoFor ? 'Who they are doing this for: ' + trunc(p.whoFor, 70) : ''
     ].filter(Boolean);
-    const MAX = 400;
+    const MAX = 700;
     let block = '';
     for (const line of candidates) {
       const addition = (block ? '\n' : '') + line;

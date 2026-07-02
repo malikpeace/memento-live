@@ -2068,11 +2068,11 @@ const WelcomeIntro = {
     const b = beats[beatIdx];
     const isLast = beatIdx === n - 1;
     const kind = b.kind || 'stage';
-    // The recap page ("here's what you said") sits on plain black (pre-Memento): --preenter
-    // hides the top-left rays + the background wash. From the "Enter Memento" beat onward the
-    // rays fade in (their 2.6s opacity transition runs when --preenter is removed), so the
-    // light literally arrives as they enter Memento.
-    this.el.classList.toggle('welcome-intro--preenter', kind === 'recap');
+    // The recap ("here's what you said") and the mori beat (their days left) sit on plain black
+    // (pre-Memento): --preenter hides the top-left rays + the background wash. From the "Enter
+    // Memento" beat onward the rays fade in (their 2.6s opacity transition runs when --preenter
+    // is removed), so the light literally arrives, as the answer, right after the weight.
+    this.el.classList.toggle('welcome-intro--preenter', kind === 'recap' || kind === 'mori');
     // The beam-brightness boost only applies during the Meet Your Memento reveal; reset elsewhere.
     if (kind !== 'preview') { try { this.el.style.setProperty('--wi-beam-boost', '0'); } catch (e) {} }
     // Philosophy + the "how Memento helps" page use a wider content column (less page padding)
@@ -2098,11 +2098,11 @@ const WelcomeIntro = {
       this._phiP = p;
       inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-phi wi-helppage" data-beat="${beatIdx}"><svg class="wi-phi__mark" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="44" fill="#f5f5f7"/><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z" fill="#0a0a0e"/></svg><div class="wi-phi__body"><div class="wi-phi__bodyinner">${this._helpBody(p)}</div></div></div>`;
     } else if (kind === 'mori') {
-      inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-moriview" data-beat="${beatIdx}"><h2 class="wi-demo__headline">${esc(b.headline)}</h2>${this._cineMori()}<p class="wi-demo__line">${esc(b.line)}</p>${b.days ? `<p class="wi-mori__days">btw, you have about <b>${b.days.toLocaleString()}</b> days left.</p>` : ''}</div>`;
+      inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-moriview" data-beat="${beatIdx}"><h2 class="wi-demo__headline">${esc(b.headline)}</h2>${this._cineMori()}<p class="wi-demo__line">${esc(b.line)}</p>${b.days ? `<p class="wi-mori__days">You have about <b>${b.days.toLocaleString()}</b> days left.</p><p class="wi-mori__days wi-mori__days--stake">A year of drifting is 365 of them.</p>` : ''}</div>`;
     } else if (kind === 'preview') {
       inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-prev" data-beat="${beatIdx}"><div class="wi-prev__aura"></div><h2 class="wi-demo__headline wi-prev__title">${esc(b.headline)}</h2>${this._cineCardPreview(p)}</div>`;
     } else {
-      inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-cine--stagger" data-beat="${beatIdx}"><h2 class="wi-demo__headline">${esc(b.headline)}</h2><p class="wi-demo__line">${esc(b.line)}</p>${b.stakes ? `<p class="wi-demo__line wi-demo__stakes">${esc(b.stakes)}</p>` : ''}</div>`;
+      inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-cine--stagger" data-beat="${beatIdx}"><h2 class="wi-demo__headline">${esc(b.headline)}</h2><p class="wi-demo__line">${esc(b.line)}</p>${b.stakes ? `<p class="wi-demo__line wi-demo__stakes">${esc(b.stakes)}</p>` : ''}${b.quote ? `<p class="wi-demo__line wi-demo__quote">In your own words: &ldquo;${esc(b.quote)}&rdquo;</p>` : ''}</div>`;
     }
     this.pageWrap.innerHTML = inner;
     // The interstitial has no buttons (auto-advances / tap to skip); every other page
@@ -2251,14 +2251,20 @@ const WelcomeIntro = {
     const prevHead = 'Meet Your Memento';
 
     // Order: recap ("here's what you said", the personalized _solStage page, its own beat so
-    // they feel understood first) -> Enter Memento -> the single "Here's how Memento will help
-    // you" page (personalized Find Clarity / Take Action / Stay Consistent points + the equation,
-    // staggered reveal) -> Meet Your Memento. The abstract "Philosophy Behind Memento" pillars
-    // page was removed: clarity/action/consistency is now taught ONLY as the concrete, personal
-    // "how it helps you" page, so nothing reads as an AI sales detour.
+    // they feel understood first, with their free-text words quoted back verbatim) -> MORI (the
+    // name explained + their real days left, still on black: the weight) -> Enter Memento (the
+    // beams arrive: the answer) -> the single "Here's how Memento will help you" page
+    // (personalized stepper) -> Meet Your Memento. The abstract "Philosophy Behind Memento"
+    // pillars page was removed: clarity/action/consistency is taught ONLY as the concrete,
+    // personal "how it helps you" page, so nothing reads as an AI sales detour.
     const helpHead = first ? first + ", here's how Memento will help you" : "Here's how Memento will help you";
+    // Their own words, quoted back VERBATIM (never paraphrased, so it can never be wrong).
+    // Clamped so a long note stays one quiet line; skipped entirely if they wrote nothing.
+    const rawLetter = String((p && p.letterToFutureSelf) || '').replace(/\s+/g, ' ').trim();
+    const quote = rawLetter ? (rawLetter.length > 160 ? rawLetter.slice(0, 160).trim() + '…' : rawLetter) : '';
     return [
-      { key: 'recap', kind: 'recap', accent: PUR, headline: stage.headline, line: stage.line, stakes: stage.stakes },
+      { key: 'recap', kind: 'recap', accent: PUR, headline: stage.headline, line: stage.line, stakes: stage.stakes, quote: quote },
+      { key: 'mori', kind: 'mori', accent: PUR, headline: moriHead, line: moriLine, days: days },
       { key: 'enter', kind: 'enter', accent: PUR, title: 'Enter Memento' },
       { key: 'help', kind: 'help', accent: PUR, headline: helpHead },
       { key: 'preview', kind: 'preview', accent: PUR, headline: prevHead, line: '' }
@@ -2563,6 +2569,32 @@ const WelcomeIntro = {
     else consistency = "Memento keeps you showing up, day after day, until you actually get there.";
     return { clarity: clarity, action: action, consistency: consistency };
   },
+  // The personalized opener for the "Remember Your Why" step: quotes back the cost they chose
+  // (or, for someone on a roll, the upside they chose). Pure template off the fixed chip labels,
+  // no AI. Returns '' when they picked nothing, so the generic line stands alone.
+  _whyCallback(p) {
+    const cost = String((p && p.costOfInaction) || '');
+    const win = String((p && p.momentumWin) || '');
+    const hasC = (frag) => cost.indexOf(frag) !== -1;
+    const hasW = (frag) => win.indexOf(frag) !== -1;
+    // Cost picks, heaviest first (multi-select: the heaviest one they touched wins).
+    if (hasC("Becoming someone I don't want to be")) return "You said the real cost is becoming someone you don't want to be.";
+    if (hasC('Regret')) return 'You said another year like this ends in regret.';
+    if (hasC('Running out of time')) return 'You said it feels like time is running out.';
+    if (hasC('Wasted potential')) return 'You said the cost is wasted potential.';
+    if (hasC('Watching everyone pass me')) return 'You said the cost is watching everyone pass you.';
+    if (hasC('Letting people down')) return 'You said the cost is letting people down.';
+    if (hasC('Okay, but not perfect') || hasC('Alright, but I know I can get better')) return 'You said a year like this would be alright, and you know you can get more out of it.';
+    if (hasC("Honestly, I'd be proud of myself")) return 'You said you would be proud of a year like this. Good. Protect that.';
+    // Upside picks (the on-a-roll branch).
+    if (hasW('younger self proud')) return 'You said keeping this up makes your younger self proud.';
+    if (hasW('true freedom')) return 'You said this path is what true freedom looks like.';
+    if (hasW('Fulfillment and Peace')) return 'You said this path ends in fulfillment and peace.';
+    if (hasW('self-mastery')) return 'You said this path leads to self-mastery.';
+    if (hasW('Closer to my goals')) return 'You said a year of this gets you closer to everything you want.';
+    if (hasW('Memories')) return 'You said these become the memories you look back at.';
+    return '';
+  },
   // The single "Here's how Memento will help you" body: a vertical stepper. Find Clarity starts
   // lit; the line draws down and each next step (Take Action, Stay Consistent) deblurs + lights up
   // as it is reached, ending on a final node about your Memento tracking it all as it grows over
@@ -2581,7 +2613,11 @@ const WelcomeIntro = {
       + '<div class="wi-help__tx"><span class="wi-help__k">' + label + '</span>' + bodyHtml + '</div>'
       + '</div>';
     const bdy = (t) => '<p class="wi-help__k-body">' + esc(String(t || '')) + '</p>';
-    const growBody = bdy("Memento tracks your path and keeps the reason you started front and center, so on the hard days you remember what this is all for, and your progress keeps compounding.");
+    // Lead with THEIR why (the cost or upside they picked), then what Memento does with it.
+    const whyLead = this._whyCallback(p || {});
+    const growBody = bdy(whyLead
+      ? whyLead + " Memento tracks your path and keeps that front and center, so on the hard days you remember what this is all for, and your progress keeps compounding."
+      : "Memento tracks your path and keeps the reason you started front and center, so on the hard days you remember what this is all for, and your progress keeps compounding.");
     // The final node is an energy-ball orb: three big, heavily-blurred colour blobs (purple, cyan,
     // green) drift + oscillate inside a clipped circle, so the whole circle reads as living energy
     // with no hard hotspots or see-through gaps, with the white Memento M on top. It comes alive
@@ -2625,6 +2661,7 @@ const WelcomeIntro = {
       +   '</div>'
       + '</div>'
       + '<span class="wi-prev__hint">tap the card</span>'
+      + '<p class="wi-prev__next">First, we find your Clarity. About 10 minutes, and you walk out with one clear goal, and your first move today.</p>'
       + '</div>';
   },
   // The captioned auto-play reveal: blank, then each pillar light fades in (.on) with its
@@ -2668,8 +2705,11 @@ const WelcomeIntro = {
     if (title) { title.style.opacity = '0'; setTimeout(() => { const t = wrap.querySelector('.wi-prev__title'); if (t) { t.textContent = s.text; t.style.opacity = '1'; } }, 320); }
     const hint = wrap.querySelector('.wi-prev__hint');
     if (this._prevStep >= STEPS.length) {
-      // Reveal complete: fade the tap prompt and reveal an "Enter Memento" button.
+      // Reveal complete: fade the tap prompt, set the expectation for what happens NEXT
+      // (Clarity, time-boxed, with the first move today), and reveal the Enter button.
       if (hint) hint.style.opacity = '0';
+      const nx = wrap.querySelector('.wi-prev__next');
+      if (nx) nx.classList.add('is-on');
       if (this.navEl && !document.getElementById('solEnter')) {
         this.navEl.innerHTML = '<button class="welcome-intro__btn welcome-intro__btn--step welcome-intro__btn--enter" id="solEnter" style="flex:1;width:auto;">Enter Memento</button>';
         const b = document.getElementById('solEnter'); if (b) b.addEventListener('click', () => { if (this._prevForward) this._prevForward(); });
