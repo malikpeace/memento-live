@@ -1323,8 +1323,8 @@ const WelcomeIntro = {
     // free-text question: Clarity extracts far more detail minutes later through conversation,
     // and these two are chip answers every module can actually use (and call back). ──────────
     { key: 'commitLevel', type: 'choices', multi: false,
-      headline: 'How committed are you to actually improving your life?',
-      options: ["I'm all in", "I'll really try", 'Honestly, just looking around'],
+      headline: 'How committed are you <b>actually</b> to improving your life?',
+      options: ["Fully committed. I'm all in", 'I really want this', 'I kinda want this', "I'm not sure yet", "Idk. We'll see as we go"],
       // Someone already doing really good has answered this with their life; asking them how
       // serious they are reads as the app not listening. Everyone else says it out loud (the
       // commitment effect), and the answer calibrates AI tone + the comeback coaching hook.
@@ -1440,7 +1440,7 @@ const WelcomeIntro = {
         this._setProgress(0.18 + 0.72 * ((qNum - 1) / Math.max(1, qTotal - 1)));
         const stepHead =
           `<div class="welcome-intro__identity-headline">${headline}</div>` +
-          `<div class="welcome-intro__identity-sub">${step.sub}</div>`;
+          (step.sub ? `<div class="welcome-intro__identity-sub">${step.sub}</div>` : '');
 
         if (step.type === 'choices') {
           const selected = new Set(String(existing).split(SEP).map(s => s.trim()).filter(Boolean));
