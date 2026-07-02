@@ -1090,9 +1090,12 @@ const ClarityExperience = {
     if (this.tutorialOnly) {
       if (index < this.totalTutorialPages) {
         this.pageWrap.innerHTML = this.renderTutorialPage(index);
-        if (this.pageWrap.querySelector('.clarity-tut-hero')) this._setTimeout(() => this._runHeroIntro(), 30);
-        if (this.pageWrap.querySelector('.gs-focus-target')) this._setTimeout(() => this._runFocusIntro(), 30);
-        if (this.pageWrap.querySelector('.clarity-reflect')) this._setTimeout(() => this._runReflectIntro(), 30);
+        // Intros run SYNCHRONOUSLY (same tick as the render) so they hide their page
+        // content BEFORE the first paint. The old 30ms defer let the finished page
+        // flash for a frame before the intro covered it (Malik saw it on-device).
+        if (this.pageWrap.querySelector('.clarity-tut-hero')) this._runHeroIntro();
+        if (this.pageWrap.querySelector('.gs-focus-target')) this._runFocusIntro();
+        if (this.pageWrap.querySelector('.clarity-reflect')) this._runReflectIntro();
         this._fitPageScroll();
       }
       return;
@@ -1111,9 +1114,11 @@ const ClarityExperience = {
     }
 
     this.pageWrap.innerHTML = html;
-    if (this.pageWrap.querySelector('.clarity-tut-hero')) this._setTimeout(() => this._runHeroIntro(), 30);
-    if (this.pageWrap.querySelector('.gs-focus-target')) this._setTimeout(() => this._runFocusIntro(), 30);
-    if (this.pageWrap.querySelector('.clarity-reflect')) this._setTimeout(() => this._runReflectIntro(), 30);
+    // Synchronous (same tick as the render) so each intro hides its page content BEFORE
+    // the first paint; the old 30ms defer flashed the finished page for a frame (Malik).
+    if (this.pageWrap.querySelector('.clarity-tut-hero')) this._runHeroIntro();
+    if (this.pageWrap.querySelector('.gs-focus-target')) this._runFocusIntro();
+    if (this.pageWrap.querySelector('.clarity-reflect')) this._runReflectIntro();
     this._fitPageScroll();
 
     // Track whether we're on the Neutron Star summary view (last wizard step,
