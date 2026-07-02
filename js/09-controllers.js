@@ -292,7 +292,12 @@ const WelcomeIntro = {
         lines: (n) => {
           let h = (typeof step.headline === 'function') ? (step.headline(state.profile) || '') : (step.headline || '');
           if (h.indexOf('{name}') !== -1) h = n ? h.replace('{name}', n) : h.replace('Okay, {name}. ', '');
-          return step.sub ? [h, step.sub] : [h];
+          // SAFETY NET: the typewriter types PLAIN TEXT, so any markup in a headline/sub
+          // would render literally on the phone (shipped once as a visible "<b>" bug).
+          // Strip tags here so that class of mistake can never reach the screen again.
+          const plain = (s) => String(s || '').replace(/<[^>]*>/g, '');
+          h = plain(h);
+          return step.sub ? [h, plain(step.sub)] : [h];
         },
         input: step.type === 'choices'
           ? { kind: 'chips', options: step.options, multi: !!step.multi, exclusive: step.exclusive || [] }
@@ -1382,8 +1387,10 @@ const WelcomeIntro = {
     // ── CLOSE: commitment (say it out loud) then the real daily time budget. Replaced the old
     // free-text question: Clarity extracts far more detail minutes later through conversation,
     // and these two are chip answers every module can actually use (and call back). ──────────
+    // NOTE: headlines here are typed out by the conversation TYPEWRITER as plain text.
+    // Never put HTML in them (a <b> tag renders literally on the phone).
     { key: 'commitLevel', type: 'choices', multi: false,
-      headline: 'How committed are you <b>actually</b> to improving your life?',
+      headline: 'How committed are you ACTUALLY to improving your life?',
       options: ["Fully committed. I'm all in", 'I really want this', 'I kinda want this', "I'm not sure yet", "Idk. We'll see as we go"],
       // Someone already doing really good has answered this with their life; asking them how
       // serious they are reads as the app not listening. Everyone else says it out loud (the
