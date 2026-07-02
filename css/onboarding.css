@@ -1712,10 +1712,10 @@ body.lite .welcome-intro__rays { opacity: calc(0.6 + var(--wi-beam-boost, 0) * 0
 @media (prefers-reduced-motion: reduce) { .wi-cine--stagger .wi-demo__headline, .wi-cine--stagger .wi-demo__line { animation: none; opacity: 1; } }
 /* The stakes paragraph (3rd) lands after the situation line. */
 .wi-cine--stagger .wi-demo__stakes { animation-delay: 2.0s; color: rgba(232,234,248,0.62); }
-/* Their free-text answer quoted back VERBATIM on the recap (last to land). High opacity: it is
-   their own words, it must read bright, not faded. */
-.wi-demo__quote { font-style: italic; color: rgba(236,238,250,0.95); }
-.wi-cine--stagger .wi-demo__quote { animation-delay: 2.9s; }
+/* The free-text acknowledgment on the recap (last to land, only when they wrote something).
+   Never quotes or paraphrases their words; the note itself goes to the Clarity AI. Bright. */
+.wi-demo__note { color: rgba(236,238,250,0.95); }
+.wi-cine--stagger .wi-demo__note { animation-delay: 2.9s; }
 
 /* ===== Chapter flow v2: enter / philosophy / mori / preview ===== */
 /* "Enter Memento" beat: the brand wordmark reveals like a logo intro, the M

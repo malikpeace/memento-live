@@ -2102,7 +2102,7 @@ const WelcomeIntro = {
     } else if (kind === 'preview') {
       inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-prev" data-beat="${beatIdx}"><div class="wi-prev__aura"></div><h2 class="wi-demo__headline wi-prev__title">${esc(b.headline)}</h2>${this._cineCardPreview(p)}</div>`;
     } else {
-      inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-cine--stagger" data-beat="${beatIdx}"><h2 class="wi-demo__headline">${esc(b.headline)}</h2><p class="wi-demo__line">${esc(b.line)}</p>${b.stakes ? `<p class="wi-demo__line wi-demo__stakes">${esc(b.stakes)}</p>` : ''}${b.quote ? `<p class="wi-demo__line wi-demo__quote">In your own words: &ldquo;${esc(b.quote)}&rdquo;</p>` : ''}</div>`;
+      inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-cine--stagger" data-beat="${beatIdx}"><h2 class="wi-demo__headline">${esc(b.headline)}</h2><p class="wi-demo__line">${esc(b.line)}</p>${b.stakes ? `<p class="wi-demo__line wi-demo__stakes">${esc(b.stakes)}</p>` : ''}${b.note ? `<p class="wi-demo__line wi-demo__note">${esc(b.note)}</p>` : ''}</div>`;
     }
     this.pageWrap.innerHTML = inner;
     // The interstitial has no buttons (auto-advances / tap to skip); every other page
@@ -2258,12 +2258,15 @@ const WelcomeIntro = {
     // pillars page was removed: clarity/action/consistency is taught ONLY as the concrete,
     // personal "how it helps you" page, so nothing reads as an AI sales detour.
     const helpHead = first ? first + ", here's how Memento will help you" : "Here's how Memento will help you";
-    // Their own words, quoted back VERBATIM (never paraphrased, so it can never be wrong).
-    // Clamped so a long note stays one quiet line; skipped entirely if they wrote nothing.
+    // If they wrote a free-text note, acknowledge it WITHOUT quoting or paraphrasing it. Verbatim
+    // quote-back broke on real input (long notes chop mid-sentence, lists mangle, and meta notes
+    // like "i'm shy so be nice" are addressed TO the app, not about their goals). A neutral
+    // acknowledgment works for every shape of input; the note itself reaches the Clarity AI,
+    // which is where it actually gets used.
     const rawLetter = String((p && p.letterToFutureSelf) || '').replace(/\s+/g, ' ').trim();
-    const quote = rawLetter ? (rawLetter.length > 160 ? rawLetter.slice(0, 160).trim() + '…' : rawLetter) : '';
+    const note = rawLetter ? 'What you wrote in your own words stays with your Memento. Clarity picks it up from there.' : '';
     return [
-      { key: 'recap', kind: 'recap', accent: PUR, headline: stage.headline, line: stage.line, stakes: stage.stakes, quote: quote },
+      { key: 'recap', kind: 'recap', accent: PUR, headline: stage.headline, line: stage.line, stakes: stage.stakes, note: note },
       { key: 'mori', kind: 'mori', accent: PUR, headline: moriHead, line: moriLine, days: days },
       { key: 'enter', kind: 'enter', accent: PUR, title: 'Enter Memento' },
       { key: 'help', kind: 'help', accent: PUR, headline: helpHead },
