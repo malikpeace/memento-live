@@ -2373,17 +2373,14 @@ document.addEventListener('keydown', (e) => {
 // resizing it never flashes. preventScroll on the auto-focus handles the rest.
 (function welcomeComposerPin() {
   try {
-    // The CONFIRMED-working pattern (v106, Malik verified smooth; same as the
-    // Clarity/Action chat bar's _setupComposeBarPinning): iOS only skips its
-    // page pan when the focused field lives in a real position:fixed element
-    // pinned to the visible-viewport bottom. So while a text field inside the
-    // conversation dock is focused, the nav rail (which holds the composer /
-    // name fields and already paints its own bottom gradient) becomes a fixed
-    // bar whose bottom tracks the visible viewport, riding up with the keyboard
-    // like Messages while everything else stays put. Its slot is reserved via
-    // padding so the conversation above never shifts. Do NOT shrink/translate
-    // the whole overlay and do NOT lock the body: both are on the documented
-    // do-not-repeat list (they fight iOS's own pan). Kill-switch: ?kbfix=0.
+    // DISABLED (Malik, on-device iOS 26.5 / iPhone 14 Pro Max, 2026-07-01): pinning the
+    // nav rail fixed and tracking bottom = innerHeight - vv.height - vv.offsetTop put the
+    // name fields + Continue at the TOP of the screen over the status bar, clearly worse.
+    // That is now SIX failed keyboard interventions (see the ios-keyboard-viewport-pin
+    // memory for the full list). iOS handles the keyboard natively until someone tests
+    // ON-DEVICE while iterating; do not re-enable from the preview alone.
+    return;
+    // eslint-disable-next-line no-unreachable
     if (/[?&]kbfix=0/.test(location.search)) return;
     const vv = window.visualViewport;
     if (!vv) return;
