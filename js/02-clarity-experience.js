@@ -1714,9 +1714,9 @@ const ClarityExperience = {
   },
   _syncLight() {
     try {
-      // The Neutron Star page gets the full top-left beams (Malik: show its power);
-      // every other tutorial page stays a whisper.
-      if (this.pageWrap && this.pageWrap.querySelector('.tut-star-blob')) { this._setLight(0.9); return; }
+      // The Neutron Star page keeps the top-left beams OFF (Malik: no beams here);
+      // the star itself carries the moment.
+      if (this.pageWrap && this.pageWrap.querySelector('.tut-star-blob')) { this._setLight(0); return; }
       const offset = this.getWizardOffset();
       const total = this.getTotalPages();
       if (this.currentPage < offset) {
