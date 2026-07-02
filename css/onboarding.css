@@ -3958,12 +3958,12 @@ html.lowfx .auth-screen__card, body.lite .auth-screen__card { background: rgba(1
    Chip steps stay bottom-anchored because eight stacked options need the room.
    The chip<->non-chip transition is glided via FLIP in the engine, not snapped. */
 @media (max-width: 899px) {
-  /* NOTHING-MOVES keyboard: rest the conversation + composer just ABOVE where the
-     keyboard will appear, with the keyboard's space pre-reserved below (the
-     padding-bottom ~ keyboard height). The composer auto-focuses, so the keyboard
-     just slides up to meet the input, no scroll, no jump, nothing shifts. The
-     document scroll is also locked in JS while focused as a hard guarantee. */
-  .welcome-intro:has(.welcome-convo):not(:has(.wc-chips)) { justify-content: flex-end; }
+  /* CENTERED at rest (Malik, v481): the old strategy pre-reserved ~43vh under the composer so
+     it rested where the keyboard would appear ("nothing moves"), but at rest that read as
+     everything crammed in the top half with a dead hole below, and iOS panned on focus anyway.
+     Now the conversation + composer sit as one centered group with equal room above and below,
+     like the other onboarding pages. The keyboard behaves natively on focus. */
+  .welcome-intro:has(.welcome-convo):not(:has(.wc-chips)) { justify-content: center; }
   .welcome-intro:has(.welcome-convo):not(:has(.wc-chips)) .welcome-intro__page-wrap:has(.welcome-convo) {
     flex: 0 1 auto;
     max-height: 48vh;
@@ -3975,17 +3975,13 @@ html.lowfx .auth-screen__card, body.lite .auth-screen__card { background: rgba(1
   .welcome-intro:has(.welcome-convo):not(:has(.wc-chips)) .welcome-convo { padding-top: 14px; }
   .welcome-intro:has(.welcome-convo):not(:has(.wc-chips)) .welcome-intro__nav:has(.wc-dock) {
     background: none;
-    /* Reserve the keyboard's height below the composer so it rests right where
-       it will sit once the keyboard is up. ~43vh ≈ the iOS keyboard. */
-    padding-bottom: calc(43vh + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
   }
 }
 
-/* Virtual keyboard: rather than chase the keyboard (which fights iOS and ended
-   up worse), HOLD the conversation + composer STILL at their resting position so
-   focusing the input doesn't jolt the whole screen upward. The JS below cancels
-   the scroll/pan iOS applies on focus. At rest the composer already sits just
-   above where the keyboard appears, so "don't move" reads cleanest. */
+/* Virtual keyboard: fully NATIVE. Every interception (pan-cancel JS, layer shrink, composer
+   pin, focus-shift, and the 43vh pre-reserve above) failed on-device; see the
+   ios-keyboard-viewport-pin memory before touching keyboard behavior again. */
 
 /* ============================================================================
    ---- LIGHT MODE ----  (additive overrides for html.theme-light)
