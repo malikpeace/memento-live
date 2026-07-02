@@ -121,7 +121,7 @@
     function isAsked(key) { var st = stepFor(key); if (!st) return true; if (typeof st.skipIf === 'function') { try { return !st.skipIf(P); } catch (e) { return true; } } return true; }
 
     // Gated onboarding questions, in flow order (upstream gating keys first).
-    var GATED = ['clarityLevel', 'clarityBlock', 'clarityHistory', 'runningToward', 'actionKnow', 'actionProgress', 'runningFrom', 'costOfInaction', 'momentumWin'];
+    var GATED = ['clarityLevel', 'clarityBlock', 'clarityHistory', 'runningToward', 'actionKnow', 'actionProgress', 'runningFrom', 'costOfInaction', 'momentumWin', 'commitLevel', 'timeBudget'];
 
     function addRow(key, kind) {
       var row = document.createElement('label'); row.className = 'db-row';

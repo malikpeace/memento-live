@@ -1319,10 +1319,20 @@ const WelcomeIntro = {
       headline: 'Keep this up for a year. What does that get you?',
       options: ['Closer to my goals (eg. money, abs, relationships, etc)', 'I make my younger self proud', 'Closer to self-mastery', "I'll have true freedom", 'Fulfillment and Peace', "Memories I'll look back at", 'Other'],
       skipIf: (p) => { const ap = String((p && p.actionProgress) || ''); return ap !== 'Actually doing really good'; } },
-    { key: 'letterToFutureSelf', type: 'text',
-      headline: 'Anything else Memento should know about you and your goals?',
-      sub: 'Totally optional. A line about you, your situation, or what you want. Or just skip it.',
-      placeholder: 'Type anything, or skip' },
+    // ── CLOSE: commitment (say it out loud) then the real daily time budget. Replaced the old
+    // free-text question: Clarity extracts far more detail minutes later through conversation,
+    // and these two are chip answers every module can actually use (and call back). ──────────
+    { key: 'commitLevel', type: 'choices', multi: false,
+      headline: (p) => {
+        const ap = String((p && p.actionProgress) || '');
+        if (ap === 'Actually doing really good') return 'How serious are you about taking this all the way?';
+        return 'How serious are you about actually fixing this?';
+      },
+      options: ["I'm all in", "I'll really try", 'Honestly, just looking around'] },
+    { key: 'timeBudget', type: 'choices', multi: false,
+      headline: 'How much time can you actually give this a day?',
+      sub: 'Be honest. A real 15 minutes beats a fake hour.',
+      options: ['5 minutes', '15 minutes', '30 minutes', 'An hour or more'] },
     { type: 'summaryStepper' }
   ],
 
@@ -2664,8 +2674,18 @@ const WelcomeIntro = {
       +   '</div>'
       + '</div>'
       + '<span class="wi-prev__hint">tap the card</span>'
-      + '<p class="wi-prev__next">First, we find your Clarity. About 10 minutes, and you walk out with one clear goal, and your first move today.</p>'
+      + '<p class="wi-prev__next">' + this._prevNextLine(p) + '</p>'
       + '</div>';
+  },
+  // The "what happens next" close, sized to the daily time they said they can give (their
+  // timeBudget answer paying off immediately). Falls back to the generic line if unanswered.
+  _prevNextLine(p) {
+    const tb = String((p && p.timeBudget) || '');
+    let fit = '';
+    if (tb === '5 minutes' || tb === '15 minutes' || tb === '30 minutes') fit = 'a first move that fits the ' + tb + ' you said you have';
+    else if (tb === 'An hour or more') fit = 'a first move that fits the time you said you have';
+    else fit = 'your first move today';
+    return 'First, we find your Clarity. About 10 minutes, and you walk out with one clear goal, and ' + fit + '.';
   },
   // The captioned auto-play reveal: blank, then each pillar light fades in (.on) with its
   // caption, ending fully alive. Guarded so leaving the page mid-reveal is harmless.

@@ -1912,6 +1912,8 @@ function buildProfileContext() {
       p.distraction ? 'Their biggest pull on attention: ' + trunc(p.distraction, 30) : '',
       p.costOfInaction ? 'The cost of staying stuck (what they are avoiding): ' + trunc(p.costOfInaction, 90) : '',
       p.momentumWin ? 'What a year of momentum gets them (their upside): ' + trunc(p.momentumWin, 90) : '',
+      p.commitLevel ? 'How committed they said they are: ' + trunc(p.commitLevel, 40) : '',
+      p.timeBudget ? 'Daily time they said they can realistically give: ' + trunc(p.timeBudget, 30) + ' (size actions to fit this)' : '',
       // The free-text note is the most personal signal in the whole diagnostic. It sits high
       // in the list (not last) so the budget below can never silently drop it.
       p.letterToFutureSelf ? 'In their own words (their note about themselves and their goals): ' + trunc(p.letterToFutureSelf, 220) : '',
