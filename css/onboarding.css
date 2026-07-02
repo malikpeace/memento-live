@@ -933,11 +933,10 @@ body.calm-motion .empty-state, body.lite .empty-state { animation: none; }
   overflow: hidden;
 }
 .welcome-intro.open { opacity: 1; pointer-events: auto; }
-/* Keyboard-follow mode (welcomeKeyboardFollow in js/11): while a text field is focused the
-   layer is inline-sized to the visual viewport (height + translateY). The short transition
-   masks the frame gap between iOS's own keyboard pan and our resize, so the layer settles
-   instead of snapping. Must re-declare the opacity transition or the base fade would be lost. */
-.welcome-intro--kb { transition: opacity 1s ease, height 0.22s ease-out, transform 0.22s ease-out; }
+/* Keyboard composer pin (welcomeComposerPin in js/11): while a text field in the conversation
+   dock is focused, the nav rail becomes a fixed bar riding the visible-viewport bottom (JS sets
+   bottom = the keyboard gap), like the Messages compose bar. It keeps its own gradient bg. */
+.welcome-intro__nav.wc-nav--pinned { position: fixed; left: 0; right: 0; bottom: 0; z-index: 260; }
 .welcome-intro__bg {
   position: absolute; inset: 0; pointer-events: none; overflow: hidden;
   /* The glow gradient now lives on .welcome-intro itself (so it paints instantly

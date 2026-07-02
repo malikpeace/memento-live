@@ -2371,58 +2371,61 @@ document.addEventListener('keydown', (e) => {
 // keyboard slides in — a smooth follow, not a jolt. On blur it reverts to the
 // full 100lvh. The glow is baked into the layer's own background (see CSS), so
 // resizing it never flashes. preventScroll on the auto-focus handles the rest.
-(function welcomeKeyboardFollow() {
+(function welcomeComposerPin() {
   try {
-    // Attempt #5, deliberately DIFFERENT from the four failed ones: no body
-    // position:fixed lock (that caused its own jump), no scroll fighting, no
-    // nav-only lift. ONE intervention: while a text field inside the onboarding
-    // is focused, size the fixed overlay to exactly the visible area
-    // (height = vv.height, translateY(vv.offsetTop)) with a short CSS transition
-    // (.welcome-intro--kb) that masks the lag between iOS's own pan and our
-    // resize. The background then reads stationary and the bottom composer lands
-    // above the keyboard, like Messages. Kill-switch for on-device A/B: ?kbfix=0
-    // restores the untouched native behavior. Everything restores fully on blur.
+    // The CONFIRMED-working pattern (v106, Malik verified smooth; same as the
+    // Clarity/Action chat bar's _setupComposeBarPinning): iOS only skips its
+    // page pan when the focused field lives in a real position:fixed element
+    // pinned to the visible-viewport bottom. So while a text field inside the
+    // conversation dock is focused, the nav rail (which holds the composer /
+    // name fields and already paints its own bottom gradient) becomes a fixed
+    // bar whose bottom tracks the visible viewport, riding up with the keyboard
+    // like Messages while everything else stays put. Its slot is reserved via
+    // padding so the conversation above never shifts. Do NOT shrink/translate
+    // the whole overlay and do NOT lock the body: both are on the documented
+    // do-not-repeat list (they fight iOS's own pan). Kill-switch: ?kbfix=0.
     if (/[?&]kbfix=0/.test(location.search)) return;
     const vv = window.visualViewport;
     if (!vv) return;
-    let raf = 0, armed = false;
-    const el = () => document.querySelector('.welcome-intro.open');
-    const reset = (wi) => {
-      wi = wi || el();
-      if (!wi) return;
-      wi.style.height = '';
-      wi.style.transform = '';
-      // drop the transition class only after the restore transition has settled
-      setTimeout(() => { const w = el(); if (w && !armed) w.classList.remove('welcome-intro--kb'); }, 260);
+    let pinned = null;
+    const gap = () => Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+    const update = () => { if (pinned) pinned.style.bottom = gap() + 'px'; };
+    vv.addEventListener('resize', update);
+    vv.addEventListener('scroll', update);
+    const unpin = () => {
+      if (!pinned) return;
+      const wi = document.querySelector('.welcome-intro');
+      if (wi) wi.style.paddingBottom = '';
+      pinned.classList.remove('wc-nav--pinned');
+      pinned.style.bottom = '';
+      pinned = null;
     };
-    const apply = () => {
-      raf = 0;
-      const wi = el();
-      if (!wi) return;
-      const kb = Math.max(0, window.innerHeight - vv.height);
-      if (armed && kb > 60) {
-        wi.classList.add('welcome-intro--kb');
-        wi.style.height = Math.round(vv.height) + 'px';
-        wi.style.transform = 'translateY(' + Math.round(vv.offsetTop) + 'px)';
-      } else {
-        reset(wi);
-      }
+    const pin = (nav, wi) => {
+      if (pinned === nav) { update(); return; }
+      unpin();
+      pinned = nav;
+      // reserve the rail's slot so the conversation column does not shift down
+      wi.style.paddingBottom = nav.offsetHeight + 'px';
+      nav.classList.add('wc-nav--pinned');
+      update();
     };
-    const schedule = () => { if (!raf) raf = requestAnimationFrame(apply); };
-    vv.addEventListener('resize', schedule);
-    vv.addEventListener('scroll', schedule);
     document.addEventListener('focusin', (e) => {
-      const wi = el();
       const t = e.target;
-      if (wi && t && (t.tagName === 'TEXTAREA' || t.tagName === 'INPUT') && wi.contains(t)) {
-        armed = true;
-        // bursts: iOS fires vv geometry late and unevenly while the keyboard animates
-        [0, 60, 150, 300, 500, 800].forEach((d) => setTimeout(schedule, d));
-      }
+      if (!t || (t.tagName !== 'INPUT' && t.tagName !== 'TEXTAREA')) return;
+      const wi = document.querySelector('.welcome-intro.open');
+      if (!wi || !wi.contains(t)) return;
+      // scope to the conversation dock only (composer / name fields); chip and
+      // date beats keep their normal in-flow rail.
+      const nav = t.closest('.welcome-intro__nav');
+      if (!nav || !nav.querySelector('.wc-dock')) return;
+      pin(nav, wi);
     }, true);
     document.addEventListener('focusout', () => {
-      armed = false;
-      [50, 300].forEach((d) => setTimeout(schedule, d));
+      // small delay so first-name -> last-name refocus keeps the pin (no flicker)
+      setTimeout(() => {
+        const a = document.activeElement;
+        if (!a || (a.tagName !== 'INPUT' && a.tagName !== 'TEXTAREA') || !a.closest('.wc-nav--pinned')) unpin();
+      }, 60);
     }, true);
   } catch (e) {}
 })();
