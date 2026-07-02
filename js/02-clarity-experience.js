@@ -838,6 +838,34 @@ const ClarityExperience = {
     } catch (e) { done(); }
   },
 
+  // The Neutron Star page enters cinematically (Malik): the star fades in FIRST, big and
+  // glowing (halo + tremble live in CSS), sits alone for a beat, then the headline and
+  // body fade in under it. Reduced motion shows everything at once.
+  _runStarIntro() {
+    const tut = this.pageWrap.querySelector('.clarity-exp__tut');
+    const stage = this.pageWrap.querySelector('.tut-star-stage');
+    if (!tut || !stage || stage.dataset.introRan) return;
+    stage.dataset.introRan = '1';
+    const reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    if (reduced) return;
+    const illust = this.pageWrap.querySelector('.clarity-exp__tut-illust');
+    const texts = [tut.querySelector('.clarity-exp__tut-headline'), tut.querySelector('.clarity-exp__tut-sub')].filter(Boolean);
+    texts.forEach((el) => { el.style.opacity = '0'; el.style.transform = 'translateY(10px)'; });
+    if (illust) {
+      illust.style.opacity = '0';
+      illust.style.transform = 'scale(0.82)';
+      illust.style.transition = 'opacity 1.2s ease-out, transform 1.6s cubic-bezier(0.16,1,0.3,1)';
+      requestAnimationFrame(() => { illust.style.opacity = '1'; illust.style.transform = ''; });
+    }
+    // The star lands (~1.2s) and sits alone for a second, then the words arrive.
+    this._setTimeout(() => {
+      texts.forEach((el, i) => {
+        el.style.transition = 'opacity 0.7s ease, transform 0.7s cubic-bezier(0.16,1,0.3,1)';
+        this._setTimeout(() => { el.style.opacity = '1'; el.style.transform = ''; }, i * 240);
+      });
+    }, 2300);
+  },
+
   // The "How to achieve anything" hero: the headline POPS IN sharp + fully visible, centred on
   // screen, holds, then rises to its top-left spot, and only then do the body lines type in.
   // No fade and no blur (that softer look is reserved for the Clarity title). A tap fills it.
@@ -987,10 +1015,11 @@ const ClarityExperience = {
       this.bindWizardInFullscreen();
     }
 
-    // Init hypercolor blob on neutron star tutorial page
+    // Init hypercolor blob on neutron star tutorial page + its cinematic entrance
     const starBlob = document.getElementById('tutStarBlob');
     if (starBlob) {
       setTimeout(() => initStarBlob(starBlob), 50);
+      this._runStarIntro();
     }
 
     // Init reflection page timer
@@ -1086,7 +1115,7 @@ const ClarityExperience = {
       },
       // Page 5  - The payoff (neutron star)
       {
-        illust: `<canvas class="tut-star-blob" id="tutStarBlob" width="320" height="320"></canvas>`,
+        illust: `<div class="tut-star-stage"><div class="tut-star-halo"></div><canvas class="tut-star-blob" id="tutStarBlob" width="320" height="320"></canvas></div>`,
         headline: 'Discover your Neutron Star',
         sub: 'I call this the Neutron Star. One of the densest and heaviest objects in existence. Once you find your Neutron Star, a worthy goal you care about above all else, a new level of focus and energy unlocks in your brain. This is how you stay focused and make achievement automatic.'
       },
@@ -1564,7 +1593,7 @@ const ClarityExperience = {
     // Show back button: always if past page 0, or during AI chat if there's history
     const showBack = this.currentPage > 0 || (isWizard && this.currentPage === 0 && state.clarity.tutorialSeen && !this.tutorialOnly) || (stepKey === 'aiChat' && aiChatMessages.length > 1);
     if (showBack) {
-      html += '<button class="clarity-exp__nav-btn clarity-exp__nav-btn--back" id="cexpBack">Back</button>';
+      html += '<button class="clarity-exp__nav-btn clarity-exp__nav-btn--back" id="cexpBack" aria-label="Back"></button>';
     }
 
     if (stepKey === 'aiChat') {

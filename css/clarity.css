@@ -55,46 +55,50 @@
   cursor: pointer; transition: all var(--t-fast); border: none;
 }
 .clarity-exp__nav-btn:active { transform: scale(0.97); }
+/* v497 (Malik): the Next / Continue / Done CTAs are SOLID (white on dark, via the
+   --solid tokens so light mode inverts correctly) for real contrast; the back button
+   is just the arrow, compact. */
 .clarity-exp__nav-btn--back {
   background: var(--kfill-04);
-  border: 1px solid var(--hairline);
-  color: rgba(var(--ink),0.5);
-  flex: 0.45;
+  border: none;
+  color: rgba(var(--ink),0.7);
+  flex: 0 0 64px;
+  padding: 18px 0;
+  text-align: center;
 }
-.clarity-exp__nav-btn--back::before { content: '\2190 '; }
+.clarity-exp__nav-btn--back::before { content: '\2190'; }
 .clarity-exp__nav-btn--next {
-  background: var(--kfill-04);
-  border: 1px solid var(--hairline);
-  color: rgba(var(--ink),0.5);
-  box-shadow: none;
+  background: var(--solid-bg);
+  border: none;
+  color: var(--solid-fg);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.38);
   transition: all var(--t-base) ease;
 }
 .clarity-exp__nav-btn--next:hover {
   background: var(--solid-bg);
   color: var(--solid-fg);
-  border-color: transparent;
   box-shadow: 0 6px 24px rgba(var(--ink), 0.15);
 }
 .clarity-exp__nav-btn--next:active {
-  background: #fff; color: #000;
-  border-color: transparent;
+  background: var(--solid-bg); color: var(--solid-fg);
   box-shadow: 0 6px 24px rgba(var(--ink), 0.15);
   transform: scale(0.97);
 }
 .clarity-exp__nav-btn--next:disabled {
-  opacity: 0.2; box-shadow: none; cursor: default; border-color: rgba(var(--ink),0.05);
+  background: var(--kfill-04); color: rgba(var(--ink),0.4);
+  box-shadow: none; cursor: default; opacity: 1;
 }
 .clarity-exp__nav-btn--next:disabled:hover {
-  background: var(--kfill-04); color: rgba(var(--ink),0.5);
-  box-shadow: none; border-color: rgba(var(--ink),0.05);
+  background: var(--kfill-04); color: rgba(var(--ink),0.4);
+  box-shadow: none;
 }
 .clarity-exp__nav-btn--next:disabled:active { transform: none; }
 .clarity-exp__nav-btn--cta {
-  background: var(--kfill-04);
-  border: 1px solid var(--hairline);
-  color: rgba(var(--ink),0.5);
+  background: var(--solid-bg);
+  border: none;
+  color: var(--solid-fg);
   font-size: var(--fs-lg); font-weight: 700;
-  box-shadow: none;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.38);
   transition: all var(--t-base) ease;
 }
 .clarity-exp__nav-btn--cta:hover {
@@ -280,6 +284,9 @@ body.clarity-legacy-orbs .clarity-exp__bg-orb4 { display: block; }
   display: flex; align-items: center; justify-content: center;
   position: relative; margin-bottom: 8px;
 }
+/* The star page breaks out of the fixed 200x160 illust box so the star renders at
+   its full size (the box was silently shrinking the canvas). */
+.clarity-exp__tut-illust:has(.tut-star-stage) { width: auto; height: auto; }
 .clarity-exp__tut-headline {
   font-size: clamp(24px, 6.5vw, 32px);
   font-weight: 700; letter-spacing: -0.03em;
@@ -486,11 +493,45 @@ body.clarity-legacy-orbs .clarity-exp__bg-orb4 { display: block; }
   100% { opacity: 0; transform: translateY(30px); }
 }
 
-/* Page 4: Neutron star blob */
+/* Page 4: Neutron star blob. v497 (Malik): BIGGER, with a halo that lights up the
+   screen around it and a constant tiny tremble so it feels powerful. The cinematic
+   entrance (star first, text after) is driven by _runStarIntro in js/02. */
 .tut-star-blob {
-  width: 160px;
-  height: 160px;
+  width: 230px;
+  height: 230px;
   border-radius: 50%;
+}
+.tut-star-stage {
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  animation: starShake 0.9s linear infinite;
+}
+.tut-star-halo {
+  position: absolute; left: 50%; top: 50%;
+  width: 520px; height: 520px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(150,165,255,0.30), rgba(150,165,255,0.10) 42%, transparent 72%);
+  animation: starHalo 3.4s ease-in-out infinite;
+}
+@keyframes starHalo {
+  0%, 100% { opacity: 0.75; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+}
+/* A tiny 1-2px tremble, power not wobble. */
+@keyframes starShake {
+  0%, 100% { transform: translate(0, 0); }
+  12% { transform: translate(1.3px, -0.9px); }
+  24% { transform: translate(-1.1px, 1.1px); }
+  36% { transform: translate(0.9px, 1.3px); }
+  48% { transform: translate(-1.3px, -0.7px); }
+  60% { transform: translate(1.1px, 0.6px); }
+  72% { transform: translate(-0.7px, -1.2px); }
+  86% { transform: translate(1.2px, 0.9px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tut-star-stage, .tut-star-halo { animation: none; }
 }
 .tut-star-wrap { position: relative; width: 140px; height: 140px; }
 .tut-star-core {
@@ -557,24 +598,24 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
 .tut-arrows .tut-qmark { color: var(--color-consistency); font-weight: 800; font-size: 18px; }
 
 /* === The Scale === */
-/* v496 (Malik): the scale reads SOLID and sharp now. The weights were translucent
-   gradient ghosts with hairline borders; you could barely see them. Solid color
-   blocks, no borders, no glass blur, crisp inset top light, so the metaphor lands
-   in one glance: heavy red block vs small purple weight. */
+/* v497 (Malik): FLAT and minimal. Pure white fulcrum + beam, sharp low-radius boxes in
+   single flat colors, NO gradients, NO glows, NO shadows, NO inset light. The metaphor
+   should read like a diagram: heavy red block vs small purple weight. Applies to every
+   scale animation (tilt / push / shrink / flip). */
 .gs { position: relative; width: 240px; height: 150px; }
 .gs__fulcrum {
   position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
   width: 0; height: 0;
   border-left: 16px solid transparent; border-right: 16px solid transparent;
-  border-bottom: 22px solid rgba(var(--ink),0.38);
+  border-bottom: 22px solid #fff;
   filter: none;
 }
 .gs__fulcrum::after { display: none; }
 .gs__beam {
   position: absolute; bottom: 22px; left: 8px; right: 8px;
   height: 3px;
-  background: linear-gradient(90deg, rgba(var(--ink),0.35), rgba(var(--ink),0.92) 50%, rgba(var(--ink),0.35));
-  border-radius: 2px;
+  background: #fff;
+  border-radius: 0;
   transform-origin: center bottom;
   box-shadow: none;
 }
@@ -585,48 +626,34 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
 .gs__weight {
   position: absolute;
   border: none;
-  transition: box-shadow var(--t-slow) ease;
+  box-shadow: none;
 }
 /* Red distraction weight */
 .gs__weight--red {
-  width: 56px; height: 46px; border-radius: var(--r-sm);
-  background: linear-gradient(160deg, #ff6a52, #dd2f1e);
-  box-shadow: 0 0 20px rgba(var(--danger-rgb),0.3), 0 6px 18px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.28);
-  animation: gsRedGlow 3s ease-in-out infinite;
-}
-@keyframes gsRedGlow {
-  0%, 100% { box-shadow: 0 0 20px rgba(var(--danger-rgb),0.3), 0 6px 18px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.28); }
-  50% { box-shadow: 0 0 34px rgba(var(--danger-rgb),0.45), 0 6px 20px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.32); }
+  width: 56px; height: 46px; border-radius: 6px;
+  background: #ff4b33;
 }
 /* Purple purpose weight */
 .gs__weight--purple {
-  width: 24px; height: 20px; border-radius: calc(6px * var(--rx, 1));
-  background: linear-gradient(160deg, #c0aaff, #7c5bf2);
-  box-shadow: 0 0 14px rgba(var(--clarity-rgb),0.3), 0 4px 12px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.3);
-  animation: gsPurpleGlow 3.5s ease-in-out infinite;
-}
-@keyframes gsPurpleGlow {
-  0%, 100% { box-shadow: 0 0 14px rgba(var(--clarity-rgb),0.3), 0 4px 12px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.3); }
-  50% { box-shadow: 0 0 24px rgba(var(--clarity-rgb),0.5), 0 4px 14px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.34); }
+  width: 24px; height: 20px; border-radius: 4px;
+  background: #8f6fff;
 }
 /* Purple weight BIG (for flip page) */
 .gs__weight--purple-big {
-  width: 24px; height: 20px; border-radius: calc(6px * var(--rx, 1));
-  background: linear-gradient(160deg, #cdbaff, #7c5bf2);
-  box-shadow: 0 0 14px rgba(var(--clarity-rgb),0.25), 0 4px 12px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.3);
+  width: 24px; height: 20px; border-radius: 4px;
+  background: #8f6fff;
   animation: gsExplode 5s ease-in-out infinite;
 }
 @keyframes gsExplode {
-  0%, 40% { width: 24px; height: 20px; box-shadow: 0 0 14px rgba(var(--clarity-rgb),0.25), 0 4px 12px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.3); }
-  52% { width: 64px; height: 52px; box-shadow: 0 0 50px rgba(var(--clarity-rgb),0.65), 0 0 100px rgba(var(--clarity-rgb),0.22), 0 4px 20px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.32); }
-  60%, 88% { width: 58px; height: 48px; box-shadow: 0 0 40px rgba(var(--clarity-rgb),0.55), 0 0 80px rgba(var(--clarity-rgb),0.16), 0 4px 20px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.32); }
-  100% { width: 24px; height: 20px; box-shadow: 0 0 14px rgba(var(--clarity-rgb),0.25), 0 4px 12px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.3); }
+  0%, 40% { width: 24px; height: 20px; }
+  52% { width: 64px; height: 52px; }
+  60%, 88% { width: 58px; height: 48px; }
+  100% { width: 24px; height: 20px; }
 }
 /* Red weight shrinking */
 .gs__weight--red-shrink {
-  width: 56px; height: 46px; border-radius: var(--r-sm);
-  background: linear-gradient(160deg, #ff6a52, #dd2f1e);
-  box-shadow: 0 0 16px rgba(var(--danger-rgb),0.22), 0 6px 18px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.24);
+  width: 56px; height: 46px; border-radius: 6px;
+  background: #ff4b33;
   animation: gsShrink 4s ease-in-out infinite;
 }
 .gs__weight--red-shrink { transform-origin: bottom center; }
@@ -636,9 +663,8 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
 }
 /* Red weight dimming (on flip) */
 .gs__weight--red-dim {
-  width: 56px; height: 46px; border-radius: var(--r-sm);
-  background: linear-gradient(160deg, #ff6a52, #dd2f1e);
-  box-shadow: 0 0 10px rgba(var(--danger-rgb),0.12), 0 4px 12px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.2);
+  width: 56px; height: 46px; border-radius: 6px;
+  background: #ff4b33;
   animation: gsDim 5s ease-in-out infinite;
 }
 @keyframes gsDim {
@@ -686,23 +712,23 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
   border-top: 7px solid currentColor;
 }
 @keyframes gsHandPush {
-  0%, 100% { transform: translateY(0); opacity: 0.6; color: rgba(var(--ink),0.7); background: rgba(var(--ink),0.55); }
-  30% { transform: translateY(10px); opacity: 0.95; color: rgba(255,70,50,0.95); background: rgba(255,70,50,0.85); }
-  42% { transform: translateY(12px); opacity: 1; color: rgba(255,60,40,1); background: rgba(255,60,40,0.95); }
-  55% { transform: translateY(-3px); opacity: 0.5; color: rgba(var(--ink),0.5); background: var(--kfill-40); }
+  0%, 100% { transform: translateY(0); opacity: 0.7; color: #fff; background: #fff; }
+  30% { transform: translateY(10px); opacity: 1; color: #ff4b33; background: #ff4b33; }
+  42% { transform: translateY(12px); opacity: 1; color: #ff4b33; background: #ff4b33; }
+  55% { transform: translateY(-3px); opacity: 0.6; color: #fff; background: #fff; }
 }
 
 /* Energy dot (flip page)  - flies into the purple weight */
 .gs__dot {
   position: absolute; top: 5px; left: 50%;
   width: 10px; height: 10px; border-radius: 50%;
-  background: var(--color-clarity);
-  box-shadow: 0 0 12px rgba(var(--clarity-rgb),0.6);
+  background: #8f6fff;
+  box-shadow: none;
   animation: gsDotFly 5s ease-in-out infinite;
 }
 @keyframes gsDotFly {
   0% { transform: translate(-50%, 0) scale(1); opacity: 0.85; }
-  40% { transform: translate(75px, 88px) scale(0.5); opacity: 1; box-shadow: 0 0 20px rgba(var(--clarity-rgb),0.8); }
+  40% { transform: translate(75px, 88px) scale(0.5); opacity: 1; }
   46% { transform: translate(75px, 88px) scale(0); opacity: 0; }
   100% { transform: translate(75px, 88px) scale(0); opacity: 0; }
 }
@@ -2683,7 +2709,7 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
   flex: 1; display: flex; flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  overflow-y: auto; overscroll-behavior: contain;
+  overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
   padding: calc(var(--safe-t, 0px) + 64px) 20px 20px;
 }
