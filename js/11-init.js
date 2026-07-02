@@ -2427,6 +2427,36 @@ document.addEventListener('keydown', (e) => {
   } catch (e) {}
 })();
 
+// Cosmetic keyboard compensation (Malik's idea, 2026-07-01): we do NOT fight the iOS pan
+// (see the six failed attempts above). While a conversation text field is focused, the
+// message column eases DOWN (--wc-kbshift in CSS) so the pushed-up screen reads composed
+// instead of cramped at the top; removed on blur. The INPUT itself is deliberately NOT
+// shifted (moving it down just makes iOS pan further, cancelling the shift). Pure class
+// toggle + CSS transform, no viewport math, so it cannot misplace anything. ?kbfix=0 off.
+(function welcomeKeyboardShift() {
+  try {
+    if (/[?&]kbfix=0/.test(location.search)) return;
+    const isField = (t) => !!(t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA'));
+    document.addEventListener('focusin', (e) => {
+      const t = e.target;
+      if (!isField(t)) return;
+      const wi = document.querySelector('.welcome-intro.open');
+      if (!wi || !wi.contains(t)) return;
+      if (!t.closest('.wc-dock')) return; // conversation composer / name fields only
+      wi.classList.add('wc-kbshift');
+    }, true);
+    document.addEventListener('focusout', () => {
+      // grace so hopping first-name -> last-name keeps the shift (no bounce)
+      setTimeout(() => {
+        const a = document.activeElement;
+        if (isField(a) && a.closest('.wc-dock')) return;
+        const wi = document.querySelector('.welcome-intro');
+        if (wi) wi.classList.remove('wc-kbshift');
+      }, 60);
+    }, true);
+  } catch (e) {}
+})();
+
 // ?kbd=1 — hidden on-screen readout of the live viewport numbers, so the exact
 // iOS keyboard behavior can be SEEN on-device (screenshot) instead of inferred.
 (function welcomeKeyboardDebug() {
