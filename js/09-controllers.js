@@ -200,19 +200,22 @@ const WelcomeIntro = {
         const dy = t.clientY - lastY;
         this.pageWrap.scrollTop -= dy;
         const dt = Math.max(1, e.timeStamp - lastT);
-        vel = dy / dt;
+        // smoothed velocity (blend of instant + history) so one noisy last event
+        // does not decide the whole fling
+        vel = 0.6 * (dy / dt) + 0.4 * vel;
         lastY = t.clientY; lastT = e.timeStamp;
       }, { passive: false });
       this.navEl.addEventListener('touchend', () => {
         if (!panning) return;
         panning = false;
-        let v = -vel * 16; // px per frame at ~60fps
+        // momentum: clamp the launch speed, decay gently (~iOS feel), glide to a stop
+        let v = Math.max(-60, Math.min(60, -vel * 16)); // px per frame at ~60fps
         const el = this.pageWrap;
         const step = () => {
           raf = 0;
-          if (Math.abs(v) < 0.4) return;
+          if (Math.abs(v) < 0.3) return;
           el.scrollTop += v;
-          v *= 0.94;
+          v *= 0.955;
           if (el.scrollTop <= 0 || el.scrollTop + el.clientHeight >= el.scrollHeight - 1) return;
           raf = requestAnimationFrame(step);
         };

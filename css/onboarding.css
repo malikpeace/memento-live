@@ -3812,7 +3812,12 @@ html.lowfx .auth-screen__card, body.lite .auth-screen__card { background: rgba(1
      button line up exactly with the conversation text above. */
   display: block; padding: 8px 30px calc(var(--safe-b) + 20px);
   background: linear-gradient(to top, #030208 55%, transparent);
+  /* The dock pan proxy (js/09) owns vertical swipes here: without this, iOS sometimes
+     claims the gesture natively before the proxy's preventDefault lands, making swipes
+     feel dead/clunky. Taps are unaffected; inputs below re-enable native touch. */
+  touch-action: none;
 }
+.wc-dock textarea, .wc-dock input { touch-action: auto; }
 /* Browser tabs (Safari with its bottom toolbar, etc.) have a bottom bar that
    env(safe-area-inset-bottom) does NOT cover, so the Continue button can clip under
    it. (100lvh - 100svh) is exactly that collapsible-bar height, and 0 in a standalone
@@ -3963,7 +3968,9 @@ html.lowfx .auth-screen__card, body.lite .auth-screen__card { background: rgba(1
      everything crammed in the top half with a dead hole below, and iOS panned on focus anyway.
      Now the conversation + composer sit as one centered group with equal room above and below,
      like the other onboarding pages. The keyboard behaves natively on focus. */
-  .welcome-intro:has(.welcome-convo):not(:has(.wc-chips)) { justify-content: center; }
+  /* Centered, then biased UP a touch (Malik: dead-center sat too low): the bottom padding
+     shrinks the centering box, so the group rides ~higher while keeping balanced air. */
+  .welcome-intro:has(.welcome-convo):not(:has(.wc-chips)) { justify-content: center; padding-bottom: 12vh; }
   .welcome-intro:has(.welcome-convo):not(:has(.wc-chips)) .welcome-intro__page-wrap:has(.welcome-convo) {
     flex: 0 1 auto;
     max-height: 48vh;
