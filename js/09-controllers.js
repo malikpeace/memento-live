@@ -1418,7 +1418,6 @@ const WelcomeIntro = {
       skipIf: (p) => String((p && p.actionProgress) || '') === 'Actually doing really good' },
     { key: 'timeBudget', type: 'choices', multi: false,
       headline: 'How much time are you willing to give per day to improve your life?',
-      sub: 'Be honest. A real 15 minutes beats a fake hour.',
       options: ['5 minutes', '15 minutes', '30 minutes', '1 hour', '2 hours', '4 hours', '8+ hours'] },
     { type: 'summaryStepper' }
   ],
