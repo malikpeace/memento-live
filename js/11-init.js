@@ -2435,6 +2435,12 @@ document.addEventListener('keydown', (e) => {
 // toggle + CSS transform, no viewport math, so it cannot misplace anything. ?kbfix=0 off.
 (function welcomeKeyboardShift() {
   try {
+    // DISABLED (Malik, on-device, 2026-07-01): both variants looked bad with the real
+    // keyboard (content-only shift split the layout; all-elements shift still read wrong
+    // after iOS's own pan). Keyboard behavior stays fully native. Deferred to a live
+    // on-device iteration session; see the ios-keyboard-viewport-pin memory.
+    return;
+    // eslint-disable-next-line no-unreachable
     if (/[?&]kbfix=0/.test(location.search)) return;
     const isField = (t) => !!(t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA'));
     document.addEventListener('focusin', (e) => {
