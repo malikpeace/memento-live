@@ -955,13 +955,20 @@ const ClarityExperience = {
     };
     const flyFocus = () => {
       try {
-        const fr = fly.getBoundingClientRect();
-        const tr = target.getBoundingClientRect();
-        const s = tr.height / Math.max(1, fr.height);
+        // Pin an explicit START transform and COMMIT it (reflow) before setting the target,
+        // otherwise killing the fade-in animation + moving in the same frame snaps with no
+        // 'from' state to interpolate = the jump Malik saw. Establish the origin + a concrete
+        // identity transform first, force layout, THEN transition to the target so it glides.
         fly.style.animation = 'none';
         fly.style.opacity = '1';
         fly.style.transformOrigin = 'left top';
-        fly.style.transition = 'transform 1.05s cubic-bezier(0.16,1,0.3,1)';
+        fly.style.transition = 'none';
+        fly.style.transform = 'translate(0px, 0px) scale(1)';
+        void fly.offsetWidth; // commit the start position
+        const fr = fly.getBoundingClientRect();
+        const tr = target.getBoundingClientRect();
+        const s = tr.height / Math.max(1, fr.height);
+        fly.style.transition = 'transform 1.15s cubic-bezier(0.45, 0, 0.15, 1)';
         fly.style.transform = 'translate(' + (tr.left - fr.left) + 'px, ' + (tr.top - fr.top) + 'px) scale(' + s + ')';
       } catch (e) {}
     };
