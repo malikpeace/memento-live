@@ -1171,7 +1171,7 @@ const ClarityExperience = {
     // to REVERT to the classic marbled blob, just drop the 'pulsar' argument.
     const starBlob = document.getElementById('tutStarBlob');
     if (starBlob) {
-      setTimeout(() => initStarBlob(starBlob, 240, 'pulsar'), 50);
+      setTimeout(() => initStarBlob(starBlob, 480, 'pulsar'), 50);
       this._runStarIntro();
     }
 

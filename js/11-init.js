@@ -429,6 +429,9 @@ float snoise(vec2 v){
 void main(){
   vec2 uv = (gl_FragCoord.xy / u_res) * 2.0 - 1.0;
   uv.x *= u_res.x / u_res.y;
+  // Zoomed OUT (v506): the canvas is much larger than the star so the jets have room to
+  // run long and melt into black INSIDE the frame; the body keeps its visual size.
+  uv *= 1.9;
   float T = u_time;
   float phase = fract(T / 2.8);
   float beat = pow(max(sin(3.14159 * phase), 0.0), 2.2);
@@ -447,7 +450,9 @@ void main(){
   float aa = abs(along);
   float flow = 0.75 + 0.45 * snoise(vec2(aa * 4.0 - T * 2.2, across * 14.0));
   float jw = 0.035 + 0.09 * aa;
-  float jet = exp(-pow(across / jw, 2.0) * 2.5) * smoothstep(1.6, 0.35, aa) * smoothstep(0.18, 0.42, aa) * flow;
+  // The fade completes at aa 2.0, BEFORE the jets reach the canvas edge (they exit at
+  // ~2.16 on the tilted axis), so they dissolve into the distance with no cutoff.
+  float jet = exp(-pow(across / jw, 2.0) * 2.5) * smoothstep(2.0, 0.45, aa) * smoothstep(0.18, 0.42, aa) * flow;
   float ji = 0.78 + 0.22 * beat;
   vec3 col = body * mask * (1.0 + 0.07 * beat);
   col += vec3(1.0) * core;

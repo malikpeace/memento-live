@@ -510,10 +510,13 @@ body.clarity-legacy-orbs .clarity-exp__bg-orb4 { display: block; }
 /* Page 4: Neutron star blob. v497 (Malik): BIGGER, with a halo that lights up the
    screen around it and a constant tiny tremble so it feels powerful. The cinematic
    entrance (star first, text after) is driven by _runStarIntro in js/02. */
+/* v506 (Malik): NO circular clip (the border-radius was cropping the pulsar's jets into
+   a visible circle) and a much larger canvas so the jets run long and melt into the black
+   inside the frame; the star body stays the same visual size (the shader zooms out). */
 .tut-star-blob {
-  width: 230px;
-  height: 230px;
-  border-radius: 50%;
+  width: min(92vw, 430px);
+  height: min(92vw, 430px);
+  border-radius: 0;
 }
 .tut-star-stage {
   position: relative;
