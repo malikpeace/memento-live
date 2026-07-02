@@ -1709,6 +1709,16 @@ body.lite .welcome-intro__rays { opacity: calc(0.6 + var(--wi-beam-boost, 0) * 0
 /* Smooth crossfade out between chapters (overrides the slide-out for this flow). */
 .wi-cine.exit { animation: wiCineOut 0.34s ease forwards !important; }
 @keyframes wiCineOut { to { opacity: 0; } }
+/* Recap page (v491): the paragraphs TYPE onto the screen (JS-driven in _showSolution), so the
+   block itself does not animate in. All text is FULL WHITE (Malik: never dim body copy here),
+   with generous space between paragraphs. */
+.wi-recap { animation: none !important; }
+.wi-recap .wi-demo__headline { margin-bottom: 26px; }
+.wi-recap .wi-demo__line { color: #fff; margin-bottom: 34px; }
+.wi-recap .wi-demo__stakes { color: #fff; }
+/* The recap CTA ("Let's Fix This" / "Let's Refine"): Memento green, white text. */
+.welcome-intro__btn--fix { background: #1fa168; color: #fff; }
+
 /* Staggered reveal for the bare chapters (summary / problem / solution): the page
    lands blank, then the headline fades up, then the line a beat later. The block
    itself does not animate; each paragraph reveals on its own delay. */

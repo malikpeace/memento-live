@@ -2198,7 +2198,7 @@ const WelcomeIntro = {
     } else if (kind === 'preview') {
       inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-prev" data-beat="${beatIdx}"><div class="wi-prev__aura"></div><h2 class="wi-demo__headline wi-prev__title">${esc(b.headline)}</h2>${this._cineCardPreview(p)}</div>`;
     } else {
-      inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-cine--stagger" data-beat="${beatIdx}"><h2 class="wi-demo__headline">${esc(b.headline)}</h2><p class="wi-demo__line">${esc(b.line)}</p>${b.stakes ? `<p class="wi-demo__line wi-demo__stakes">${esc(b.stakes)}</p>` : ''}${b.note ? `<p class="wi-demo__line wi-demo__note">${esc(b.note)}</p>` : ''}</div>`;
+      inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-recap" data-beat="${beatIdx}"><h2 class="wi-demo__headline">${esc(b.headline)}</h2><p class="wi-demo__line">${esc(b.line)}</p>${b.stakes ? `<p class="wi-demo__line wi-demo__stakes">${esc(b.stakes)}</p>` : ''}${b.note ? `<p class="wi-demo__line wi-demo__note">${esc(b.note)}</p>` : ''}</div>`;
     }
     this.pageWrap.innerHTML = inner;
     // The interstitial has no buttons (auto-advances / tap to skip); every other page
@@ -2209,8 +2209,47 @@ const WelcomeIntro = {
     if (kind === 'recap') solNextLabel = (String((p && p.actionProgress) || '') === 'Actually doing really good') ? "Let's Refine" : "Let's Fix This";
     // "Meet Your Memento" is a full-screen, tap-driven moment, no Back/Build chrome.
     // The reveal advances on tap and the final tap proceeds (see _prevAdvance).
-    this.navEl.innerHTML = (kind === 'enter' || kind === 'preview') ? '' : `<button class="welcome-intro__back-btn" id="solBack">←</button><button class="welcome-intro__btn welcome-intro__btn--step" id="solNext" style="flex:1;width:auto;">${solNextLabel}</button>`;
+    // The recap CTA ("Let's Fix This" / "Let's Refine") is green with white text (Malik).
+    const solNextCls = (kind === 'recap') ? ' welcome-intro__btn--fix' : '';
+    this.navEl.innerHTML = (kind === 'enter' || kind === 'preview') ? '' : `<button class="welcome-intro__back-btn" id="solBack">←</button><button class="welcome-intro__btn welcome-intro__btn--step${solNextCls}" id="solNext" style="flex:1;width:auto;">${solNextLabel}</button>`;
     try { this.pageWrap.classList.remove('wc-busy', 'wc-reading'); this.pageWrap.scrollTop = 0; } catch (e) {}
+
+    // Recap page: the paragraphs TYPE onto the screen (same pacing family as the conversation
+    // typewriter), one block at a time with a real pause between them. Tap anywhere to complete
+    // instantly; leaving the beat cancels via the token; reduced-motion shows everything at once.
+    if (kind === 'recap') {
+      const innerEl = this.pageWrap.querySelector('.welcome-intro__page-inner');
+      const blocks = innerEl ? [...innerEl.querySelectorAll('.wi-demo__headline, .wi-demo__line')] : [];
+      const reducedR = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+      this._recapToken = (this._recapToken || 0) + 1;
+      const tok = this._recapToken;
+      if (!reducedR && blocks.length) {
+        const texts = blocks.map((el) => el.textContent);
+        // Reserve each block's final height so nothing shifts while typing.
+        blocks.forEach((el) => { el.style.minHeight = el.offsetHeight + 'px'; el.textContent = ''; });
+        const finishAll = () => { blocks.forEach((el, i) => { el.textContent = texts[i]; }); };
+        const typeInto = (el, text) => new Promise((res) => {
+          let i = 0;
+          const tick = () => {
+            if (tok !== this._recapToken) { res(); return; }
+            el.textContent = text.slice(0, i); i++;
+            if (i <= text.length) setTimeout(tick, 18 + Math.random() * 14);
+            else res();
+          };
+          tick();
+        });
+        (async () => {
+          for (let i = 0; i < blocks.length; i++) {
+            if (tok !== this._recapToken) return;
+            await typeInto(blocks[i], texts[i]);
+            if (tok !== this._recapToken) return;
+            // a real breath between paragraphs
+            await new Promise((r) => setTimeout(r, 950));
+          }
+        })();
+        innerEl.addEventListener('click', () => { if (tok === this._recapToken) { this._recapToken++; finishAll(); } });
+      }
+    }
 
     // Help page: the stepper starts with Find Clarity lit and the rest blurred (HTML is-dim).
     // First visit runs the line-draw reveal; a revisit / reduced-motion lands fully lit at once.
