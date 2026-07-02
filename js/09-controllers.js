@@ -699,25 +699,44 @@ const WelcomeIntro = {
   _wcTypeLine(text, instant, gen) {
     return new Promise(res => {
       this._wcSetBusy(true);
+      // **bold** support (the ONLY markup the typewriter understands; HTML is stripped
+      // upstream and would never render anyway). The line is parsed into plain/bold
+      // segments and every frame renders the first n characters of the PLAIN text with
+      // bold applied per segment, DOM-built (textContent into <b>), never innerHTML.
+      const segs = [];
+      String(text).split('**').forEach((part, idx) => { if (part) segs.push({ t: part, b: idx % 2 === 1 }); });
+      const plain = segs.map(s => s.t).join('');
+      const render = (target, n) => {
+        target.textContent = '';
+        let left = n;
+        for (const s of segs) {
+          if (left <= 0) break;
+          const take = s.t.slice(0, left);
+          left -= take.length;
+          if (!take) continue;
+          if (s.b) { const b = document.createElement('b'); b.textContent = take; target.appendChild(b); }
+          else target.appendChild(document.createTextNode(take));
+        }
+      };
       const kids = [...this._wcConvoEl.children];
       const before = kids.map(k => k.getBoundingClientRect().top);
       const el = document.createElement('div');
       el.className = 'wc-line wc-line--enter';
       // Reserve the line's FINAL height up front so the stack shifts ONCE
       // (smoothly, via FLIP) instead of nudging on every typed character.
-      el.textContent = text;
+      render(el, plain.length);
       this._wcConvoEl.appendChild(el);
       el.style.minHeight = el.offsetHeight + 'px';
       el.textContent = '';
       this._wcFlipKids(kids, before);
       this._wcScrollBottom();
       requestAnimationFrame(() => { this._wcScrollBottom(); el.classList.remove('wc-line--enter'); });
-      if (instant || this._wcReduced) { el.textContent = text; setTimeout(res, instant ? 0 : 90); return; }
+      if (instant || this._wcReduced) { render(el, plain.length); setTimeout(res, instant ? 0 : 90); return; }
       let i = 0;
       const tick = () => {
-        if (gen !== this._wcGen) { el.textContent = text; res(); return; }
-        el.textContent = text.slice(0, i); i++;
-        if (i <= text.length) setTimeout(tick, 20 + Math.random() * 16);
+        if (gen !== this._wcGen) { render(el, plain.length); res(); return; }
+        render(el, i); i++;
+        if (i <= plain.length) setTimeout(tick, 20 + Math.random() * 16);
         else setTimeout(res, 680);
       };
       tick();
@@ -1387,10 +1406,11 @@ const WelcomeIntro = {
     // ── CLOSE: commitment (say it out loud) then the real daily time budget. Replaced the old
     // free-text question: Clarity extracts far more detail minutes later through conversation,
     // and these two are chip answers every module can actually use (and call back). ──────────
-    // NOTE: headlines here are typed out by the conversation TYPEWRITER as plain text.
-    // Never put HTML in them (a <b> tag renders literally on the phone).
+    // NOTE: headlines here are typed out by the conversation TYPEWRITER. Never put HTML
+    // in them (tags render literally on the phone; they are also stripped as a safety
+    // net). The ONLY supported emphasis is the **bold** marker, handled by _wcTypeLine.
     { key: 'commitLevel', type: 'choices', multi: false,
-      headline: 'How committed are you ACTUALLY to improving your life?',
+      headline: 'How committed are you **actually** to improving your life?',
       options: ["Fully committed. I'm all in", 'I really want this', 'I kinda want this', "I'm not sure yet", "Idk. We'll see as we go"],
       // Someone already doing really good has answered this with their life; asking them how
       // serious they are reads as the app not listening. Everyone else says it out loud (the

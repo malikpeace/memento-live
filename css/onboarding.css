@@ -3809,6 +3809,8 @@ html.lowfx .auth-screen__card, body.lite .auth-screen__card { background: rgba(1
    screen. Swipe up (.wc-reading) restores them to full. */
 .wc-line.wc-hist { opacity: 0.22; }
 .wc-line.user { color: #fff; font-weight: 700; }
+/* **bold** emphasis inside a typed line (_wcTypeLine): heavier than the 600 base so it reads. */
+.wc-line b { font-weight: 800; }
 
 /* Bottom dock = the existing nav rail, reused. Holds chips or the composer. */
 .welcome-intro__nav:has(.wc-dock) {
