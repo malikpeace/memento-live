@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Pulsar, four philosophies</title>
+<style>
+  /* Four FULL-PULSAR interpretations, each a different design philosophy, all live
+     WebGL shaders. Exploration only; Malik picks a direction, then we tune + port. */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #030308; color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+    padding: max(24px, env(safe-area-inset-top)) 20px 60px;
+  }
+  h1 { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.02em; text-align: center; margin-bottom: 4px; }
+  .sub { text-align: center; font-size: 0.85rem; color: rgba(232,234,248,0.95); margin-bottom: 34px; }
+  .grid { display: flex; flex-direction: column; gap: 52px; max-width: 420px; margin: 0 auto; }
+  .tile { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .tile canvas { width: 300px; height: 300px; display: block; }
+  .tile b { font-size: 1.05rem; font-weight: 700; }
+  .tile p { font-size: 0.82rem; color: rgba(232,234,248,0.95); text-align: center; max-width: 300px; line-height: 1.45; }
+  .tag { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; color: rgba(159,130,255,0.95); }
+</style>
+</head>
+<body>
+  <h1>The Pulsar, four philosophies</h1>
+  <div class="sub">All live renders, not images. Pick a direction.</div>
+  <div class="grid" id="grid"></div>
+
+<script>
+(() => {
+  const NOISE = `
+vec3 mod289(vec3 x){return x-floor(x*(1./289.))*289.;}
+vec2 mod289(vec2 x){return x-floor(x*(1./289.))*289.;}
+vec3 permute(vec3 x){return mod289(((x*34.)+1.)*x);}
+float snoise(vec2 v){
+  const vec4 C=vec4(.211324865405187,.366025403784439,-.577350269189626,.024390243902439);
+  vec2 i=floor(v+dot(v,C.yy));vec2 x0=v-i+dot(i,C.xx);
+  vec2 i1;i1=(x0.x>x0.y)?vec2(1,0):vec2(0,1);
+  vec4 x12=x0.xyxy+C.xxzz;x12.xy-=i1;
+  i=mod289(i);
+  vec3 p=permute(permute(i.y+vec3(0,i1.y,1.))+i.x+vec3(0,i1.x,1.));
+  vec3 m=max(.5-vec3(dot(x0,x0),dot(x12.xy,x12.xy),dot(x12.zw,x12.zw)),0.);
+  m=m*m;m=m*m;
+  vec3 x=2.*fract(p*C.www)-1.;vec3 h=abs(x)-.5;vec3 ox=floor(x+.5);vec3 a0=x-ox;
+  m*=1.79284291400159-.85373472095314*(a0*a0+h*h);
+  vec3 g;g.x=a0.x*x0.x+h.x*x0.y;g.yz=a0.yz*x12.xz+h.yz*x12.yw;
+  return 130.*dot(m,g);
+}`;
+
+  const HEAD = `precision highp float;
+uniform float u_time;
+uniform vec2 u_res;
+${NOISE}
+void main(){
+  vec2 uv = (gl_FragCoord.xy / u_res) * 2.0 - 1.0;
+  uv.x *= u_res.x / u_res.y;
+  vec3 bg = vec3(0.012, 0.012, 0.031);
+  float T = u_time;`;
+  const FOOT = `
+  gl_FragColor = vec4(col, 1.0);
+}`;
+
+  // ── 1. MAGNETAR: the current language with everything turned UP. Flowing plasma
+  //      jets, a shockwave ring on every beat, hot core, lens glint. Raw power. ──
+  const MAGNETAR = HEAD + `
+  float phase = fract(T / 1.4);
+  float beat = pow(max(sin(3.14159 * phase), 0.0), 2.2);
+  float r = length(uv);
+  float n1 = snoise(uv * 2.2 + vec2(T * 0.12, T * 0.08));
+  float n2 = snoise(uv * 4.0 - vec2(T * 0.10, T * 0.15));
+  vec3 body = mix(vec3(0.25, 0.45, 0.95), vec3(0.55, 0.75, 1.0), smoothstep(-0.6, 0.6, n1));
+  body = mix(body, vec3(0.95, 0.97, 1.0), smoothstep(-0.1, 0.7, n2) * 0.7);
+  float mask = 1.0 - smoothstep(0.28, 0.32, r);
+  float core = exp(-r * 7.0) * (1.3 + 1.1 * beat);
+  float halo = exp(-r * 2.1) * 0.5 * (1.0 + 0.5 * beat);
+  float tilt = -0.5;
+  vec2 ax = vec2(sin(tilt), cos(tilt));
+  float along = dot(uv, ax);
+  float across = dot(uv, vec2(-ax.y, ax.x));
+  float aa = abs(along);
+  float flow = 0.75 + 0.45 * snoise(vec2(aa * 4.0 - T * 2.2, across * 14.0));
+  float jw = 0.035 + 0.09 * aa;
+  float jet = exp(-pow(across / jw, 2.0) * 2.5) * smoothstep(1.6, 0.35, aa) * smoothstep(0.18, 0.42, aa) * flow;
+  float ji = 0.5 + 0.8 * beat;
+  float rr = 0.25 + phase * 1.1;
+  float ring = exp(-pow((r - rr) * 26.0, 2.0)) * (1.0 - phase) * 0.8;
+  float glint = exp(-abs(uv.y) * 60.0) * exp(-abs(uv.x) * 2.6) * (0.35 + 0.75 * beat);
+  vec3 col = bg + body * mask * (1.0 + 0.3 * beat);
+  col += vec3(1.0) * core;
+  col += vec3(0.45, 0.65, 1.0) * halo;
+  col += vec3(0.75, 0.88, 1.0) * jet * ji;
+  col += vec3(0.5, 0.85, 1.0) * ring;
+  col += vec3(0.9, 0.95, 1.0) * glint;` + FOOT;
+
+  // ── 2. OPAL: precious-object philosophy. An iridescent gem: thin-film color bands
+  //      drifting on a pearl surface, glossy highlights, twinkling facets, prism jets
+  //      that split into faint spectral edges. Quiet luxury. ──
+  const OPAL = HEAD + `
+  float r = length(uv);
+  float bodyR = 0.34;
+  float mask = 1.0 - smoothstep(bodyR - 0.008, bodyR + 0.008, r);
+  float ang = atan(uv.y, uv.x);
+  float band = snoise(uv * 1.6 + vec2(T * 0.05, -T * 0.04)) * 0.5 + ang * 0.32 + T * 0.03;
+  vec3 iri = 0.72 + 0.28 * cos(6.2831 * (band + vec3(0.0, 0.33, 0.67)));
+  vec3 pearl = vec3(0.90, 0.93, 1.0);
+  float depth = smoothstep(bodyR, -0.1, r);
+  vec3 body = mix(pearl, iri, 0.45) * (0.72 + 0.45 * depth);
+  float rim = smoothstep(bodyR - 0.055, bodyR, r) * mask;
+  float s1 = exp(-pow(length(uv - vec2(-0.12, 0.15)) * 9.0, 2.0)) * 1.1;
+  float s2 = exp(-pow(length(uv - vec2(0.10, -0.12)) * 16.0, 2.0)) * 0.45;
+  vec2 gc = floor((uv + 1.0) * 16.0);
+  vec2 pf = fract((uv + 1.0) * 16.0) - 0.5;
+  float h = fract(sin(dot(gc, vec2(127.1, 311.7))) * 43758.5);
+  float tw = step(0.90, h) * pow(max(sin(T * 2.0 + h * 40.0), 0.0), 8.0);
+  float sparkle = exp(-dot(pf, pf) * 30.0) * tw * mask;
+  float breathe = 0.5 + 0.5 * sin(T * 1.3);
+  float glow = exp(-r * 3.0) * (0.22 + 0.18 * breathe);
+  float tilt = -0.45;
+  vec2 ax = vec2(sin(tilt), cos(tilt));
+  float along = dot(uv, ax);
+  float across = dot(uv, vec2(-ax.y, ax.x));
+  float aa = abs(along);
+  float jw = 0.012 + 0.022 * aa;
+  float jfade = smoothstep(1.25, 0.45, aa) * smoothstep(0.30, 0.50, aa) * (0.4 + 0.35 * breathe);
+  vec3 prism = vec3(
+    exp(-pow((across + 0.012) / jw, 2.0)),
+    exp(-pow(across / jw, 2.0)),
+    exp(-pow((across - 0.012) / jw, 2.0))
+  ) * jfade;
+  vec3 col = bg + body * mask;
+  col += vec3(0.92, 0.96, 1.0) * rim * 0.75;
+  col += vec3(1.0) * (s1 + s2) * mask;
+  col += vec3(1.0) * sparkle * 0.9;
+  col += vec3(0.75, 0.82, 1.0) * glow;
+  col += prism * 0.55;` + FOOT;
+
+  // ── 3. SIGNAL: flat/graphic philosophy (Memento's own design law applied to a star).
+  //      No gradients, no glow: a crisp white disc, razor-sharp expanding pulse rings,
+  //      pointed flat jets, ONE purple accent ring. A poster, alive. ──
+  const SIGNAL = HEAD + `
+  float phase = fract(T / 1.6);
+  float phase2 = fract(phase + 0.5);
+  float r = length(uv);
+  float px = 2.0 / u_res.y;
+  float disc = 1.0 - smoothstep(0.22, 0.22 + px * 2.0, r);
+  float rr1 = 0.30 + phase * 0.60;
+  float ring1 = (1.0 - smoothstep(0.0, px * 3.0, abs(r - rr1) - 0.004)) * (1.0 - phase);
+  float rr2 = 0.30 + phase2 * 0.60;
+  float ring2 = (1.0 - smoothstep(0.0, px * 3.0, abs(r - rr2) - 0.004)) * (1.0 - phase2);
+  float accent = 1.0 - smoothstep(0.0, px * 2.0, abs(r - 0.29) - 0.002);
+  float tilt = -0.45;
+  vec2 ax = vec2(sin(tilt), cos(tilt));
+  float along = dot(uv, ax);
+  float across = dot(uv, vec2(-ax.y, ax.x));
+  float aa = abs(along);
+  float beat = pow(max(sin(3.14159 * phase), 0.0), 2.0);
+  float jw = mix(0.045, 0.004, clamp((aa - 0.27) / 0.85, 0.0, 1.0));
+  float jet = step(abs(across), jw) * step(0.27, aa) * step(aa, 1.02 + 0.14 * beat);
+  vec3 col = bg;
+  col += vec3(1.0) * disc;
+  col += vec3(1.0) * ring1 * 0.9;
+  col += vec3(1.0) * ring2 * 0.5;
+  col += vec3(0.56, 0.44, 1.0) * accent;
+  col += vec3(1.0) * jet * 0.92;` + FOOT;
+
+  // ── 4. EVENT HORIZON: cinematic realism. A blinding point source with diffraction
+  //      spikes, an edge-on accretion disc with doppler brightening, long faint jets,
+  //      a twinkling starfield. Interstellar. ──
+  const HORIZON = HEAD + `
+  float beat = pow(max(sin(T * 1.2), 0.0), 3.0);
+  float r = length(uv);
+  vec2 gc = floor(uv * 40.0);
+  vec2 pf = fract(uv * 40.0) - 0.5;
+  float h = fract(sin(dot(gc, vec2(127.1, 311.7))) * 43758.5);
+  float star = exp(-dot(pf, pf) * 30.0) * step(0.982, h) * (0.35 + 0.65 * abs(sin(T * (1.0 + h * 3.0) + h * 20.0)));
+  float core = exp(-r * 16.0) * 2.1 * (1.0 + 0.6 * beat) + exp(-r * 5.0) * 0.55;
+  float ca = cos(0.35), sa = sin(0.35);
+  vec2 ruv = vec2(uv.x * ca - uv.y * sa, uv.x * sa + uv.y * ca);
+  float sp1 = exp(-abs(ruv.y) * 90.0) * exp(-abs(ruv.x) * 3.5);
+  float sp2 = exp(-abs(ruv.x) * 90.0) * exp(-abs(ruv.y) * 3.5);
+  vec2 duv = vec2(ruv.x, ruv.y * 3.4);
+  float dr = length(duv);
+  float bandD = exp(-pow((dr - 0.62) * 9.0, 2.0));
+  float doppler = 1.15 - 0.75 * smoothstep(-0.6, 0.6, ruv.x);
+  float swirl = 0.7 + 0.5 * snoise(vec2(atan(duv.y, duv.x) * 2.0 + T * 0.6, dr * 3.0));
+  float front = 0.55 + 0.45 * step(0.0, -ruv.y);
+  float discI = bandD * doppler * swirl * front * 0.85;
+  float jet = exp(-pow(ruv.x / 0.03, 2.0)) * smoothstep(1.3, 0.3, abs(ruv.y)) * smoothstep(0.12, 0.30, abs(ruv.y)) * (0.16 + 0.3 * beat);
+  vec3 col = bg + vec3(1.0) * star * 0.8;
+  col += vec3(1.0, 0.98, 0.93) * core;
+  col += vec3(0.9, 0.95, 1.0) * (sp1 + sp2) * (0.45 + 0.5 * beat);
+  col += vec3(0.65, 0.80, 1.0) * discI;
+  col += vec3(0.60, 0.80, 1.0) * jet;` + FOOT;
+
+  function makeStar(canvas, size, src) {
+    const gl = canvas.getContext('webgl');
+    if (!gl) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = size * dpr; canvas.height = size * dpr;
+    const vsrc = 'attribute vec2 a_pos;void main(){gl_Position=vec4(a_pos,0,1);}';
+    function sh(type, s2) {
+      const s = gl.createShader(type);
+      gl.shaderSource(s, s2); gl.compileShader(s);
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) console.error('shader:', gl.getShaderInfoLog(s));
+      return s;
+    }
+    const prog = gl.createProgram();
+    gl.attachShader(prog, sh(gl.VERTEX_SHADER, vsrc));
+    gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, src));
+    gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) console.error('link:', gl.getProgramInfoLog(prog));
+    gl.useProgram(prog);
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,1,1]), gl.STATIC_DRAW);
+    const aPos = gl.getAttribLocation(prog, 'a_pos');
+    gl.enableVertexAttribArray(aPos);
+    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+    const uTime = gl.getUniformLocation(prog, 'u_time');
+    const uRes = gl.getUniformLocation(prog, 'u_res');
+    function draw(t) {
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.uniform1f(uTime, t * 0.001);
+      gl.uniform2f(uRes, canvas.width, canvas.height);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+  }
+
+  const STYLES = [
+    { tag: '1', name: 'Magnetar', desc: 'The current language, turned all the way up: flowing plasma jets, a shockwave on every beat, lens glint. Raw power.', src: MAGNETAR },
+    { tag: '2', name: 'Opal', desc: 'Precious-object philosophy: an iridescent gem with drifting color bands, glossy light, twinkling facets, prism jets. Quiet luxury.', src: OPAL },
+    { tag: '3', name: 'Signal', desc: "Memento's flat law applied to a star: crisp white disc, razor-sharp expanding pulse rings, pointed jets, one purple accent. A living poster.", src: SIGNAL },
+    { tag: '4', name: 'Event Horizon', desc: 'Cinematic realism: a blinding point source with diffraction spikes, an edge-on accretion disc, faint jets, twinkling starfield.', src: HORIZON }
+  ];
+
+  const grid = document.getElementById('grid');
+  STYLES.forEach((v) => {
+    const tile = document.createElement('div');
+    tile.className = 'tile';
+    tile.innerHTML = '<span class="tag">' + v.tag + '</span><canvas></canvas><b>' + v.name + '</b><p>' + v.desc + '</p>';
+    grid.appendChild(tile);
+    makeStar(tile.querySelector('canvas'), 300, v.src);
+  });
+})();
+</script>
+</body>
+</html>
