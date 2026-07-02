@@ -62,6 +62,34 @@ void main(){
   gl_FragColor = vec4(col, 1.0);
 }`;
 
+  // ── 0. MAGNETAR CALM (the pick, refined per Malik): same body + same flowing jets,
+  //      NO shockwave ring, NO lens glint, and the pulse reduced to a slow quiet
+  //      breath (long period, small amplitude) instead of the hard beat. ──
+  const MAGNETAR_CALM = HEAD + `
+  float phase = fract(T / 2.8);
+  float beat = pow(max(sin(3.14159 * phase), 0.0), 2.2);
+  float r = length(uv);
+  float n1 = snoise(uv * 2.2 + vec2(T * 0.12, T * 0.08));
+  float n2 = snoise(uv * 4.0 - vec2(T * 0.10, T * 0.15));
+  vec3 body = mix(vec3(0.25, 0.45, 0.95), vec3(0.55, 0.75, 1.0), smoothstep(-0.6, 0.6, n1));
+  body = mix(body, vec3(0.95, 0.97, 1.0), smoothstep(-0.1, 0.7, n2) * 0.7);
+  float mask = 1.0 - smoothstep(0.28, 0.32, r);
+  float core = exp(-r * 7.0) * (1.35 + 0.18 * beat);
+  float halo = exp(-r * 2.1) * 0.5 * (1.0 + 0.14 * beat);
+  float tilt = -0.5;
+  vec2 ax = vec2(sin(tilt), cos(tilt));
+  float along = dot(uv, ax);
+  float across = dot(uv, vec2(-ax.y, ax.x));
+  float aa = abs(along);
+  float flow = 0.75 + 0.45 * snoise(vec2(aa * 4.0 - T * 2.2, across * 14.0));
+  float jw = 0.035 + 0.09 * aa;
+  float jet = exp(-pow(across / jw, 2.0) * 2.5) * smoothstep(1.6, 0.35, aa) * smoothstep(0.18, 0.42, aa) * flow;
+  float ji = 0.78 + 0.22 * beat;
+  vec3 col = bg + body * mask * (1.0 + 0.07 * beat);
+  col += vec3(1.0) * core;
+  col += vec3(0.45, 0.65, 1.0) * halo;
+  col += vec3(0.75, 0.88, 1.0) * jet * ji;` + FOOT;
+
   // ── 1. MAGNETAR: the current language with everything turned UP. Flowing plasma
   //      jets, a shockwave ring on every beat, hot core, lens glint. Raw power. ──
   const MAGNETAR = HEAD + `
@@ -231,7 +259,8 @@ void main(){
   }
 
   const STYLES = [
-    { tag: '1', name: 'Magnetar', desc: 'The current language, turned all the way up: flowing plasma jets, a shockwave on every beat, lens glint. Raw power.', src: MAGNETAR },
+    { tag: 'THE PICK', name: 'Magnetar, calm', desc: 'Same body, same jets. No shockwave, no glint, and the pulse is a slow quiet breath instead of a hard beat.', src: MAGNETAR_CALM },
+    { tag: '1', name: 'Magnetar (original)', desc: 'For comparison: the intense version with the shockwave, glint, and hard pulse.', src: MAGNETAR },
     { tag: '2', name: 'Opal', desc: 'Precious-object philosophy: an iridescent gem with drifting color bands, glossy light, twinkling facets, prism jets. Quiet luxury.', src: OPAL },
     { tag: '3', name: 'Signal', desc: "Memento's flat law applied to a star: crisp white disc, razor-sharp expanding pulse rings, pointed jets, one purple accent. A living poster.", src: SIGNAL },
     { tag: '4', name: 'Event Horizon', desc: 'Cinematic realism: a blinding point source with diffraction spikes, an edge-on accretion disc, faint jets, twinkling starfield.', src: HORIZON }
