@@ -2371,86 +2371,57 @@ document.addEventListener('keydown', (e) => {
 // keyboard slides in — a smooth follow, not a jolt. On blur it reverts to the
 // full 100lvh. The glow is baked into the layer's own background (see CSS), so
 // resizing it never flashes. preventScroll on the auto-focus handles the rest.
-(function welcomeKeyboardPin() {
+(function welcomeKeyboardFollow() {
   try {
-    // DISABLED (Malik): every active intervention here (scroll-lock, full-layer
-    // shrink, measured dock lift, body position:fixed) made the on-device jump
-    // worse, not better, because they fight iOS's own scroll-into-view. Let iOS
-    // handle the keyboard natively for now. Re-enable only once we have real
-    // device numbers from ?kbd=1 (innerHeight / vv.height / vv.offsetTop / scrollY)
-    // to base a correct fix on instead of guessing blind.
-    return;
-    // eslint-disable-next-line no-unreachable
+    // Attempt #5, deliberately DIFFERENT from the four failed ones: no body
+    // position:fixed lock (that caused its own jump), no scroll fighting, no
+    // nav-only lift. ONE intervention: while a text field inside the onboarding
+    // is focused, size the fixed overlay to exactly the visible area
+    // (height = vv.height, translateY(vv.offsetTop)) with a short CSS transition
+    // (.welcome-intro--kb) that masks the lag between iOS's own pan and our
+    // resize. The background then reads stationary and the bottom composer lands
+    // above the keyboard, like Messages. Kill-switch for on-device A/B: ?kbfix=0
+    // restores the untouched native behavior. Everything restores fully on blur.
+    if (/[?&]kbfix=0/.test(location.search)) return;
     const vv = window.visualViewport;
     if (!vv) return;
-    let raf = 0, armed = false, locked = false, lockedScrollY = 0;
-    const root = document.documentElement;
-    const body = document.body;
-
-    // The real cause of the "drops down, black strip on top, snaps back" jump:
-    // on iOS, focusing an input makes Safari scroll the page to reveal it, and
-    // `position:fixed` layers (the onboarding) jump along with that scroll
-    // (a long-standing iOS bug). `overflow:hidden` does NOT stop it. The only
-    // reliable lock is making the BODY itself `position:fixed` so the document
-    // genuinely cannot scroll — then iOS has nothing to scroll and nothing jumps.
-    const lockBody = () => {
-      if (locked) return;
-      locked = true;
-      lockedScrollY = window.scrollY || window.pageYOffset || 0;
-      body.style.position = 'fixed';
-      body.style.top = (-lockedScrollY) + 'px';
-      body.style.left = '0';
-      body.style.right = '0';
-      body.style.width = '100%';
-      root.style.overflow = 'hidden';
+    let raf = 0, armed = false;
+    const el = () => document.querySelector('.welcome-intro.open');
+    const reset = (wi) => {
+      wi = wi || el();
+      if (!wi) return;
+      wi.style.height = '';
+      wi.style.transform = '';
+      // drop the transition class only after the restore transition has settled
+      setTimeout(() => { const w = el(); if (w && !armed) w.classList.remove('welcome-intro--kb'); }, 260);
     };
-    const unlockBody = () => {
-      if (!locked) return;
-      locked = false;
-      body.style.position = '';
-      body.style.top = '';
-      body.style.left = '';
-      body.style.right = '';
-      body.style.width = '';
-      root.style.overflow = '';
-      try { window.scrollTo(0, lockedScrollY); } catch (e) {}
-    };
-
-    // Per-frame: lift ONLY the dock, and only by however much the focused field
-    // is actually hidden behind the keyboard (zero if it already sits above it,
-    // so nothing moves). The body lock above is what prevents the jump; this just
-    // keeps the composer reachable, like a pinned chat bar.
     const apply = () => {
       raf = 0;
-      const wi = document.querySelector('.welcome-intro.open');
-      const nav = wi && wi.querySelector('.welcome-intro__nav');
-      if (armed && wi && nav) {
-        nav.style.transform = '';
-        const field = wi.querySelector('textarea:focus, input:focus') ||
-                      wi.querySelector('.wc-composer') || nav;
-        const fieldBottom = field.getBoundingClientRect().bottom;
-        const visibleBottom = vv.offsetTop + vv.height;
-        const lift = Math.max(0, Math.ceil(fieldBottom - visibleBottom + 10));
-        nav.style.transform = lift > 0 ? ('translateY(-' + lift + 'px)') : '';
-      } else if (nav) {
-        nav.style.transform = '';
+      const wi = el();
+      if (!wi) return;
+      const kb = Math.max(0, window.innerHeight - vv.height);
+      if (armed && kb > 60) {
+        wi.classList.add('welcome-intro--kb');
+        wi.style.height = Math.round(vv.height) + 'px';
+        wi.style.transform = 'translateY(' + Math.round(vv.offsetTop) + 'px)';
+      } else {
+        reset(wi);
       }
     };
     const schedule = () => { if (!raf) raf = requestAnimationFrame(apply); };
     vv.addEventListener('resize', schedule);
     vv.addEventListener('scroll', schedule);
     document.addEventListener('focusin', (e) => {
-      const wi = document.querySelector('.welcome-intro.open');
+      const wi = el();
       const t = e.target;
       if (wi && t && (t.tagName === 'TEXTAREA' || t.tagName === 'INPUT') && wi.contains(t)) {
         armed = true;
-        lockBody();
-        [0, 50, 150, 300, 500].forEach((d) => setTimeout(schedule, d));
+        // bursts: iOS fires vv geometry late and unevenly while the keyboard animates
+        [0, 60, 150, 300, 500, 800].forEach((d) => setTimeout(schedule, d));
       }
     }, true);
     document.addEventListener('focusout', () => {
       armed = false;
-      unlockBody();
       [50, 300].forEach((d) => setTimeout(schedule, d));
     }, true);
   } catch (e) {}
