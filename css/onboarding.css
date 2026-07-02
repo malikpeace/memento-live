@@ -3767,10 +3767,14 @@ html.lowfx .auth-screen__card, body.lite .auth-screen__card { background: rgba(1
   align-items: stretch; justify-content: flex-start;
   padding: 0; text-align: left;
   /* Swipe up to read history: scrollable, with a clean fade at the top edge so
-     lines dissolve instead of cutting off, and momentum scrolling on touch. */
+     lines dissolve instead of cutting off. Touch panning is driven ENTIRELY by the
+     JS pan proxy in js/09 (native touch scroll on this fixed-overlay scroller proved
+     unreliable in the iOS PWA); touch-action:none hands it every gesture. Desktop
+     wheel/trackpad scrolling is unaffected. */
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
+  touch-action: none;
   -webkit-mask: linear-gradient(to bottom, transparent 0, #000 10%, #000 100%);
   mask: linear-gradient(to bottom, transparent 0, #000 10%, #000 100%);
 }

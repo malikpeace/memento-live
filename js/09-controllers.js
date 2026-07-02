@@ -167,60 +167,65 @@ const WelcomeIntro = {
         el.classList.toggle('wc-reading', !atBottom);
       }, { passive: true });
     }
-    // Swipe over the DOCK also scrolls the conversation (Malik: on mobile the chips
-    // dock covers the lower half where thumbs naturally swipe, and people expect an
-    // upward swipe there to peek the chat history). Taps still work: the pan only
-    // engages after clear vertical intent (~10px, more vertical than horizontal),
-    // and iOS cancels the tap on its own once the finger has moved. Release adds a
-    // simple momentum decay so it feels like one continuous native scroller.
-    if (!this._wcDockPanBound) {
-      this._wcDockPanBound = true;
-      let sy = 0, sx = 0, lastY = 0, lastT = 0, vel = 0, panning = false, raf = 0;
+    // ONE JS-driven scroller for the whole conversation screen (Malik, on-device):
+    // native touch scrolling on the page-wrap proved unreliable inside the fixed
+    // overlay in the iOS PWA (swipes over the MESSAGE text did nothing, only the
+    // dock proxy worked), so the same pan proxy now drives BOTH surfaces: the
+    // message area and the dock. touch-action:none in CSS hands us every gesture;
+    // taps still work (pan engages only after clear vertical intent, and iOS
+    // cancels the tap once the finger moves). Shared momentum with a soft decay,
+    // killed the instant a new finger lands anywhere.
+    if (!this._wcPanBound) {
+      this._wcPanBound = true;
+      let raf = 0;
       const stopMomentum = () => { if (raf) { cancelAnimationFrame(raf); raf = 0; } };
-      // A finger landing on the MESSAGE area must instantly kill any dock-swipe momentum,
-      // otherwise the momentum loop keeps writing scrollTop and fights the native scroll
-      // (that was the "can't swipe back down through the history" bug).
-      this.pageWrap.addEventListener('touchstart', stopMomentum, { passive: true });
-      this.navEl.addEventListener('touchstart', (e) => {
-        if (!this._wcConvoEl || !this._wcConvoEl.isConnected) return;
-        stopMomentum();
-        const t = e.touches[0];
-        sy = lastY = t.clientY; sx = t.clientX; lastT = e.timeStamp; vel = 0; panning = false;
-      }, { passive: true });
-      this.navEl.addEventListener('touchmove', (e) => {
-        if (!this._wcConvoEl || !this._wcConvoEl.isConnected) return;
-        if (this.pageWrap.classList.contains('wc-busy')) return;
-        const t = e.touches[0];
-        if (!panning) {
-          const totY = t.clientY - sy, totX = t.clientX - sx;
-          if (Math.abs(totY) > 10 && Math.abs(totY) > Math.abs(totX) * 1.2) panning = true;
-          else { lastY = t.clientY; lastT = e.timeStamp; return; }
-        }
-        e.preventDefault(); // we own the gesture now: no rubber-band underneath
-        const dy = t.clientY - lastY;
-        this.pageWrap.scrollTop -= dy;
-        const dt = Math.max(1, e.timeStamp - lastT);
-        // smoothed velocity (blend of instant + history) so one noisy last event
-        // does not decide the whole fling
-        vel = 0.6 * (dy / dt) + 0.4 * vel;
-        lastY = t.clientY; lastT = e.timeStamp;
-      }, { passive: false });
-      this.navEl.addEventListener('touchend', () => {
-        if (!panning) return;
-        panning = false;
-        // momentum: clamp the launch speed, decay gently (~iOS feel), glide to a stop
-        let v = Math.max(-60, Math.min(60, -vel * 16)); // px per frame at ~60fps
-        const el = this.pageWrap;
-        const step = () => {
-          raf = 0;
-          if (Math.abs(v) < 0.3) return;
-          el.scrollTop += v;
-          v *= 0.955;
-          if (el.scrollTop <= 0 || el.scrollTop + el.clientHeight >= el.scrollHeight - 1) return;
+      const bindPan = (surface, threshold) => {
+        let sy = 0, sx = 0, lastY = 0, lastT = 0, vel = 0, panning = false;
+        surface.addEventListener('touchstart', (e) => {
+          if (!this._wcConvoEl || !this._wcConvoEl.isConnected) return;
+          stopMomentum();
+          const t = e.touches[0];
+          sy = lastY = t.clientY; sx = t.clientX; lastT = e.timeStamp; vel = 0; panning = false;
+        }, { passive: true });
+        surface.addEventListener('touchmove', (e) => {
+          if (!this._wcConvoEl || !this._wcConvoEl.isConnected) return;
+          if (this.pageWrap.classList.contains('wc-busy')) return;
+          const t = e.touches[0];
+          if (!panning) {
+            const totY = t.clientY - sy, totX = t.clientX - sx;
+            if (Math.abs(totY) > threshold && Math.abs(totY) > Math.abs(totX) * 1.2) panning = true;
+            else { lastY = t.clientY; lastT = e.timeStamp; return; }
+          }
+          e.preventDefault(); // we own the gesture: no native rubber-band underneath
+          const dy = t.clientY - lastY;
+          this.pageWrap.scrollTop -= dy;
+          const dt = Math.max(1, e.timeStamp - lastT);
+          // smoothed velocity (blend of instant + history) so one noisy last event
+          // does not decide the whole fling
+          vel = 0.6 * (dy / dt) + 0.4 * vel;
+          lastY = t.clientY; lastT = e.timeStamp;
+        }, { passive: false });
+        surface.addEventListener('touchend', () => {
+          if (!panning) return;
+          panning = false;
+          // momentum: clamp the launch speed, decay gently (~iOS feel), glide to a stop
+          let v = Math.max(-60, Math.min(60, -vel * 16)); // px per frame at ~60fps
+          const el = this.pageWrap;
+          const step = () => {
+            raf = 0;
+            if (Math.abs(v) < 0.3) return;
+            el.scrollTop += v;
+            v *= 0.955;
+            if (el.scrollTop <= 0 || el.scrollTop + el.clientHeight >= el.scrollHeight - 1) return;
+            raf = requestAnimationFrame(step);
+          };
           raf = requestAnimationFrame(step);
-        };
-        raf = requestAnimationFrame(step);
-      }, { passive: true });
+        }, { passive: true });
+      };
+      // message area: low threshold (nothing tappable, respond fast);
+      // dock: slightly higher so chip taps never read as pans.
+      bindPan(this.pageWrap, 6);
+      bindPan(this.navEl, 10);
     }
     this.pageWrap.classList.remove('wc-reading');
     this._wcBeatsArr = this._wcBuild();
