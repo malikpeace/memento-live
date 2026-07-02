@@ -298,34 +298,45 @@ body.clarity-legacy-orbs .clarity-exp__bg-orb4 { display: block; }
   line-height: 1.65; max-width: 300px;
 }
 
-/* Context-load beat ("Let's Find Yours" -> first question): quiet pulsing clarity orb +
-   two short lines while the onboarding answers are pulled in. Full-white text. */
+/* The single word-beat between "Let's Find Yours" and the first question (v498):
+   "Let's find Clarity." fades up centred, holds, and the questions begin. */
 .clarity-ctx {
   min-height: 62vh;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 18px; text-align: center; padding: 0 24px;
 }
-.clarity-ctx__orb {
-  width: 14px; height: 14px; border-radius: 50%;
-  background: var(--color-clarity);
-  box-shadow: 0 0 26px rgba(var(--clarity-rgb),0.8);
-  animation: ctxPulse 1.15s ease-in-out infinite;
+.clarity-ctx__word {
+  font-size: clamp(1.7rem, 7vw, 2.2rem); font-weight: 700; letter-spacing: -0.02em;
+  color: #fff;
+  opacity: 0; animation: ctxIn 0.6s cubic-bezier(0.16,1,0.3,1) 0.15s forwards;
 }
-@keyframes ctxPulse {
-  0%, 100% { transform: scale(1); opacity: 0.85; }
-  50% { transform: scale(1.35); opacity: 1; }
-}
-.clarity-ctx__line {
-  font-size: 15.5px; line-height: 1.5; color: rgba(var(--ink),1); max-width: 300px;
-  opacity: 0; animation: ctxIn 0.5s ease-out forwards;
-}
-.clarity-ctx__line--2 { animation: none; }
-.clarity-ctx__line--2.is-on { animation: ctxIn 0.5s ease-out forwards; }
-@keyframes ctxIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes ctxIn { from { opacity: 0; transform: translateY(10px) scale(0.97); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) {
-  .clarity-ctx__orb { animation: none; }
-  .clarity-ctx__line, .clarity-ctx__line--2.is-on { animation: none; opacity: 1; }
+  .clarity-ctx__word { animation: none; opacity: 1; }
 }
+
+/* "How Focus Works" title screen over the scale page (v498, _runFocusIntro): centred
+   title on black; the other words clear, "Focus" flies into the headline, page fades up. */
+.clarity-focus-ov {
+  position: absolute; inset: 0; z-index: 6;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 14px; text-align: center; padding: 0 24px;
+}
+.clarity-focus-ov__title {
+  font-size: clamp(2rem, 8.4vw, 2.9rem); font-weight: 700; letter-spacing: -0.03em;
+  line-height: 1.1; color: #fff;
+}
+.clarity-focus-ov__title .cfw { display: inline-block; opacity: 0; animation: ctxIn 0.6s cubic-bezier(0.16,1,0.3,1) forwards; }
+.clarity-focus-ov__title .cfw:nth-child(2) { animation-delay: 0.12s; }
+.clarity-focus-ov__title .cfw:nth-child(3) { animation-delay: 0.24s; }
+.clarity-focus-ov__sub {
+  font-size: 1rem; font-weight: 500; color: rgba(var(--ink),0.95);
+  opacity: 0; animation: ctxIn 0.6s ease 0.55s forwards;
+}
+.clarity-focus-ov.is-clearing .cfw:not(.cfw--focus),
+.clarity-focus-ov.is-clearing .clarity-focus-ov__sub { transition: opacity 0.5s ease; opacity: 0 !important; animation: none; }
+.clarity-focus-ov.is-clearing .cfw--focus { opacity: 1; animation: none; }
+@media (prefers-reduced-motion: reduce) { .clarity-focus-ov { display: none; } }
 
 /* Reflection page */
 .clarity-reflect {
@@ -347,6 +358,9 @@ body.clarity-legacy-orbs .clarity-exp__bg-orb4 { display: block; }
   color: rgba(var(--ink),0.95);
   max-width: 340px;
 }
+/* The body is line divs (v498) so _runReflectIntro can reveal them one by one. */
+.clarity-reflect__line { margin-bottom: 18px; }
+.clarity-reflect__line:last-child { margin-bottom: 0; }
 .clarity-reflect__question {
   display: block;
   font-size: 16px;
@@ -519,7 +533,8 @@ body.clarity-legacy-orbs .clarity-exp__bg-orb4 { display: block; }
   0%, 100% { opacity: 0.75; transform: translate(-50%, -50%) scale(1); }
   50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
 }
-/* A tiny 1-2px tremble, power not wobble. */
+/* A tiny 1-2px tremble, power not wobble. Full strength while ARRIVING; once the page
+   settles (_runStarIntro adds .is-idle) it calms to a quieter idle tremble. */
 @keyframes starShake {
   0%, 100% { transform: translate(0, 0); }
   12% { transform: translate(1.3px, -0.9px); }
@@ -530,8 +545,16 @@ body.clarity-legacy-orbs .clarity-exp__bg-orb4 { display: block; }
   72% { transform: translate(-0.7px, -1.2px); }
   86% { transform: translate(1.2px, 0.9px); }
 }
+.tut-star-stage.is-idle { animation: starShakeIdle 1.3s linear infinite; }
+@keyframes starShakeIdle {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(0.5px, -0.4px); }
+  45% { transform: translate(-0.5px, 0.4px); }
+  70% { transform: translate(0.4px, 0.5px); }
+  88% { transform: translate(-0.4px, -0.4px); }
+}
 @media (prefers-reduced-motion: reduce) {
-  .tut-star-stage, .tut-star-halo { animation: none; }
+  .tut-star-stage, .tut-star-stage.is-idle, .tut-star-halo { animation: none; }
 }
 .tut-star-wrap { position: relative; width: 140px; height: 140px; }
 .tut-star-core {
@@ -661,10 +684,12 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
   0%, 100% { transform: scale(1); opacity: 0.95; }
   50% { transform: scale(0.6); opacity: 0.55; }
 }
-/* Red weight dimming (on flip) */
+/* Red weight dimming (on flip). transform-origin bottom center so the shrink stays
+   SEATED on the beam (Malik: it used to lift off and float as it scaled down). */
 .gs__weight--red-dim {
   width: 56px; height: 46px; border-radius: 6px;
   background: #ff4b33;
+  transform-origin: bottom center;
   animation: gsDim 5s ease-in-out infinite;
 }
 @keyframes gsDim {

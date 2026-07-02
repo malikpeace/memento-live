@@ -39,31 +39,13 @@
   background: #fff;
   color: #0a0a0f;
 }
-.wiz__option-radio {
-  display: none;
-  order: 1;
-  flex-shrink: 0;
-}
-.wiz__option.selected .wiz__option-radio {
-  display: block;
-  width: 6px; height: 6px; border-radius: 50%;
-  background: #0a0a0f;
-  box-shadow: none;
-  border: none;
-}
-.wiz__option-check {
-  display: none;
-  order: 1;
-  flex-shrink: 0;
-}
+/* The selected-state dot was REMOVED (v498, Malik: did not fit the style); the solid
+   white fill IS the selection feedback, exactly like the onboarding chips. */
+.wiz__option-radio,
+.wiz__option-check,
+.wiz__option.selected .wiz__option-radio,
 .wiz__option.selected .wiz__option-check {
-  display: block;
-  width: 6px; height: 6px; border-radius: 50%;
-  background: #0a0a0f;
-  box-shadow: none;
-  flex-shrink: 0;
-  border: none;
-  font-size: 0; color: transparent;
+  display: none;
 }
 .wiz__option-text { font-size: var(--fs-md); font-weight: 500; line-height: 1.3; flex: 1; }
 .wiz__option-desc { font-size: 0.75rem; color: var(--text-2); margin-top: 2px; }

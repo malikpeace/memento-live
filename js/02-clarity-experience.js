@@ -814,28 +814,142 @@ const ClarityExperience = {
     renderAll();
   },
 
-  // The beat between "Let's Find Yours" and the first question: a quiet pulsing clarity
-  // orb + two short lines while Memento visibly pulls in their onboarding answers.
-  // Personalized from state.profile (name + runningToward), templated, no AI call.
+  // The beat between "Let's Find Yours" and the first question: ONE quiet title,
+  // "Let's find Clarity.", then straight into "Okay let's start here...". The v496
+  // fake-loading page (orb + "pulling up what you told me") was cut (Malik: looked
+  // weird); the onboarding context needs no visible loading, the AI receives it at
+  // request time via buildProfileContext.
   _showContextLoad(done) {
     try {
-      const p = state.profile || {};
-      const first = String(p.name || '').trim().split(/\s+/)[0] || '';
-      const areas = String(p.runningToward || '').split('·').map(s => s.trim()).filter(Boolean)
-        .slice(0, 2).join(' and ').toLowerCase();
-      const line1 = first ? ('One sec ' + esc(first) + ', pulling up what you told me...') : 'One sec, pulling up what you told me...';
-      const line2 = areas ? ('Got it. You want progress in ' + esc(areas) + '. Let\'s use that.') : 'Got it. Let\'s find yours.';
       this.navEl.innerHTML = '';
       this.pageWrap.innerHTML = '<div class="clarity-exp__page-inner"><div class="clarity-ctx">' +
-        '<div class="clarity-ctx__orb"></div>' +
-        '<div class="clarity-ctx__line">' + line1 + '</div>' +
-        '<div class="clarity-ctx__line clarity-ctx__line--2" id="ctxLine2">' + line2 + '</div>' +
+        '<div class="clarity-ctx__word">Let\'s find Clarity.</div>' +
         '</div></div>';
       const reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-      if (reduced) { const l2 = document.getElementById('ctxLine2'); if (l2) l2.classList.add('is-on'); this._setTimeout(done, 600); return; }
-      this._setTimeout(() => { const l2 = document.getElementById('ctxLine2'); if (l2) l2.classList.add('is-on'); }, 1100);
-      this._setTimeout(done, 2250);
+      this._setTimeout(done, reduced ? 450 : 1500);
     } catch (e) { done(); }
+  },
+
+  // "Now, before you begin." (Malik, v498): the headline TYPES centred on screen, glides
+  // up to its resting spot, then the body lines come in one at a time. A tap fast-forwards
+  // the current stage (finish typing -> land -> show everything). Nav hidden until done.
+  _runReflectIntro() {
+    const wrap = this.pageWrap.querySelector('.clarity-reflect');
+    const headIn = wrap && wrap.querySelector('.clarity-reflect__headline-in');
+    const lines = wrap ? [...wrap.querySelectorAll('.clarity-reflect__line')] : [];
+    if (!wrap || !headIn || wrap.dataset.introRan) return;
+    wrap.dataset.introRan = '1';
+    const reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    if (reduced) return;
+    const nav = this.navEl;
+    if (nav) { nav.style.transition = 'opacity 0.45s ease'; nav.style.opacity = '0'; nav.style.pointerEvents = 'none'; }
+    const showNav = () => { if (nav) { nav.style.opacity = '1'; nav.style.pointerEvents = ''; } };
+    const full = headIn.textContent;
+    lines.forEach((l) => { l.style.opacity = '0'; l.style.transform = 'translateY(10px)'; });
+    // Centre the headline (same measure-then-transform trick as the hero).
+    const r = headIn.getBoundingClientRect();
+    const dx = (window.innerWidth / 2) - (r.left + r.width / 2);
+    const dy = (window.innerHeight / 2) - (r.top + r.height / 2);
+    headIn.style.display = 'inline-block';
+    headIn.style.minWidth = r.width + 'px';
+    headIn.style.minHeight = r.height + 'px';
+    headIn.style.willChange = 'transform';
+    headIn.style.transformOrigin = 'center center';
+    headIn.style.transform = `translate(${dx}px, ${dy}px) scale(1.15)`;
+    headIn.textContent = '';
+    let done = false;   // everything revealed
+    let landed = false; // headline back at its spot
+    const land = () => {
+      if (landed) return; landed = true;
+      headIn.textContent = full;
+      headIn.style.transition = 'none'; headIn.style.transform = '';
+      headIn.style.transformOrigin = ''; headIn.style.willChange = '';
+    };
+    const revealAll = () => {
+      if (done) return; done = true;
+      land();
+      lines.forEach((l) => { l.style.transition = 'opacity 0.5s ease, transform 0.5s ease'; l.style.opacity = '1'; l.style.transform = ''; });
+      showNav();
+    };
+    const revealLines = () => {
+      lines.forEach((l, i) => {
+        this._setTimeout(() => {
+          if (done) return;
+          l.style.transition = 'opacity 0.55s ease, transform 0.55s cubic-bezier(0.16,1,0.3,1)';
+          l.style.opacity = '1'; l.style.transform = '';
+          if (i === lines.length - 1) { done = true; showNav(); }
+        }, i * 600);
+      });
+    };
+    let typed = false;
+    const glideThenLines = () => {
+      this._setTimeout(() => { if (done || landed) return; headIn.style.transition = 'transform 0.9s cubic-bezier(0.16,1,0.3,1)'; headIn.style.transform = 'translate(0px, 0px) scale(1)'; }, 500);
+      this._setTimeout(() => { if (done) return; land(); revealLines(); }, 1500);
+    };
+    let hi = 0;
+    const headTick = () => {
+      if (done || landed) return;
+      headIn.textContent = full.slice(0, hi); hi++;
+      if (hi <= full.length) this._setTimeout(headTick, 26 + Math.random() * 14);
+      else { typed = true; glideThenLines(); }
+    };
+    // Tap fast-forwards: mid-typing -> land + start the line reveal; after that -> show all.
+    wrap.addEventListener('click', () => {
+      if (done) return;
+      if (!typed && !landed) { typed = true; land(); revealLines(); return; }
+      revealAll();
+    });
+    this._setTimeout(headTick, 300);
+  },
+
+  // The scale page opens on a title screen (Malik, v498): "How Focus Works /
+  // extremely simplified" centred on black; then every word except "Focus" fades out
+  // and "Focus" FLIES into its spot inside "Think About Your Focus like a Scale",
+  // where the page fades up and reading continues seamlessly. Tap skips to the page.
+  _runFocusIntro() {
+    const inner = this.pageWrap.querySelector('.clarity-exp__page-inner');
+    const tut = inner && inner.querySelector('.clarity-exp__tut');
+    const target = inner && inner.querySelector('.gs-focus-target');
+    if (!inner || !tut || !target || inner.dataset.focusIntroRan) return;
+    inner.dataset.focusIntroRan = '1';
+    const reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    if (reduced) return;
+    tut.style.opacity = '0';
+    const nav = this.navEl;
+    if (nav) { nav.style.transition = 'opacity 0.45s ease'; nav.style.opacity = '0'; nav.style.pointerEvents = 'none'; }
+    const showNav = () => { if (nav) { nav.style.opacity = '1'; nav.style.pointerEvents = ''; } };
+    const ov = document.createElement('div');
+    ov.className = 'clarity-focus-ov';
+    ov.innerHTML = '<div class="clarity-focus-ov__title"><span class="cfw">How</span> <span class="cfw cfw--focus">Focus</span> <span class="cfw">Works</span></div>' +
+      '<div class="clarity-focus-ov__sub">extremely simplified</div>';
+    this.el.appendChild(ov);
+    let finished = false;
+    const finish = (instant) => {
+      if (finished) return; finished = true;
+      tut.style.transition = instant ? 'none' : 'opacity 0.6s ease';
+      tut.style.opacity = '1';
+      ov.style.transition = 'opacity 0.45s ease';
+      ov.style.opacity = '0';
+      this._setTimeout(() => { try { ov.remove(); } catch (e) {} }, 500);
+      showNav();
+    };
+    ov.addEventListener('click', () => finish(true));
+    // Beat 1: the title sits. Beat 2: everything but "Focus" clears. Beat 3: "Focus"
+    // flies into the headline (measured live; the hidden page still has layout).
+    this._setTimeout(() => { if (!finished) ov.classList.add('is-clearing'); }, 1900);
+    this._setTimeout(() => {
+      if (finished) return;
+      try {
+        const fly = ov.querySelector('.cfw--focus');
+        const fr = fly.getBoundingClientRect();
+        const tr = target.getBoundingClientRect();
+        const s = tr.height / Math.max(1, fr.height);
+        fly.style.transformOrigin = 'left top';
+        fly.style.transition = 'transform 0.85s cubic-bezier(0.16,1,0.3,1)';
+        fly.style.transform = 'translate(' + (tr.left - fr.left) + 'px, ' + (tr.top - fr.top) + 'px) scale(' + s + ')';
+      } catch (e) {}
+    }, 2500);
+    this._setTimeout(() => finish(false), 3400);
   },
 
   // The Neutron Star page enters cinematically (Malik): the star fades in FIRST, big and
@@ -864,6 +978,9 @@ const ClarityExperience = {
         this._setTimeout(() => { el.style.opacity = '1'; el.style.transform = ''; }, i * 240);
       });
     }, 2300);
+    // Arrival tremble is full strength; once the page is settled the shake calms to a
+    // quieter idle (Malik: powerful entrance, subtler at rest).
+    this._setTimeout(() => { try { stage.classList.add('is-idle'); } catch (e) {} }, 3200);
   },
 
   // The "How to achieve anything" hero: the headline POPS IN sharp + fully visible, centred on
@@ -899,6 +1016,7 @@ const ClarityExperience = {
     let typing = false;   // the typewriter has begun
     const landTitle = () => {
       if (!title) return;
+      if (title.dataset.full) title.innerHTML = title.dataset.full; // snap any partial typing to full
       title.style.transition = 'none'; title.style.transform = ''; title.style.opacity = '1';
       title.style.transformOrigin = ''; title.style.willChange = '';
     };
@@ -940,19 +1058,49 @@ const ClarityExperience = {
     hero.addEventListener('click', () => { if (this._heroSkip) this._heroSkip(); });
     if (reduced) { if (title) title.style.opacity = '1'; fillAll(); return; }
     if (!title) { this._setTimeout(startTyping, 250); return; }
-    // Measure the title's resting spot, then pop it in (sharp, full opacity) big at screen centre.
+    // The headline TYPES OUT centred on screen (Malik, v498; it used to pop in whole),
+    // then glides to its top-left spot, and only then does the body typewriter begin.
+    // The full-size box is reserved up front so the centring holds while characters appear.
     const r = title.getBoundingClientRect();
     const dx = (window.innerWidth / 2) - (r.left + r.width / 2);
     const dy = (window.innerHeight / 2) - (r.top + r.height / 2);
+    title.dataset.full = title.innerHTML;
+    const titleLines = title.dataset.full.split(/<br\s*\/?\s*>/i).map((s) => s.replace(/<[^>]*>/g, ''));
+    const totalTitle = titleLines.reduce((a, s) => a + s.length, 0);
+    title.style.minWidth = r.width + 'px';
+    title.style.minHeight = r.height + 'px';
+    title.style.display = 'inline-block';
     title.style.willChange = 'transform';
     title.style.transformOrigin = 'center center';
     title.style.transition = 'none';
     title.style.transform = `translate(${dx}px, ${dy}px) scale(1.14)`;
     title.style.opacity = '1';
+    title.textContent = '';
     void title.offsetWidth;
-    // hold centred for ~1s so the headline sits on screen, then glide to the top-left spot, then type.
-    this._setTimeout(() => { if (done || typing) return; title.style.transition = 'transform 0.95s cubic-bezier(0.16,1,0.3,1)'; title.style.transform = 'translate(0px, 0px) scale(1)'; }, 1500);
-    this._setTimeout(() => { if (done || typing) return; landTitle(); startTyping(); }, 2550);
+    const renderTitleUpto = (n) => {
+      title.textContent = '';
+      let rem = n;
+      titleLines.forEach((ln, li) => {
+        if (li > 0 && rem > 0) title.appendChild(document.createElement('br'));
+        if (rem <= 0) return;
+        const take = Math.min(rem, ln.length);
+        title.appendChild(document.createTextNode(ln.slice(0, take)));
+        rem -= take;
+      });
+    };
+    // Type the title, let it breathe centred for a beat, glide home, then the body types.
+    const glideThenType = () => {
+      this._setTimeout(() => { if (done || typing) return; title.style.transition = 'transform 0.95s cubic-bezier(0.16,1,0.3,1)'; title.style.transform = 'translate(0px, 0px) scale(1)'; }, 550);
+      this._setTimeout(() => { if (done || typing) return; landTitle(); startTyping(); }, 1650);
+    };
+    let ti = 0;
+    const titleTick = () => {
+      if (done || typing) return; // a tap already landed the title and started the body
+      renderTitleUpto(ti); ti++;
+      if (ti <= totalTitle) this._setTimeout(titleTick, 24 + Math.random() * 14);
+      else { title.innerHTML = title.dataset.full; glideThenType(); }
+    };
+    this._setTimeout(titleTick, 350);
   },
 
   // Native feel (Malik): if the page's content FITS the screen, kill scrolling entirely so
@@ -971,6 +1119,8 @@ const ClarityExperience = {
       if (index < this.totalTutorialPages) {
         this.pageWrap.innerHTML = this.renderTutorialPage(index);
         if (this.pageWrap.querySelector('.clarity-tut-hero')) this._setTimeout(() => this._runHeroIntro(), 30);
+        if (this.pageWrap.querySelector('.gs-focus-target')) this._setTimeout(() => this._runFocusIntro(), 30);
+        if (this.pageWrap.querySelector('.clarity-reflect')) this._setTimeout(() => this._runReflectIntro(), 30);
         this._fitPageScroll();
       }
       return;
@@ -990,6 +1140,8 @@ const ClarityExperience = {
 
     this.pageWrap.innerHTML = html;
     if (this.pageWrap.querySelector('.clarity-tut-hero')) this._setTimeout(() => this._runHeroIntro(), 30);
+    if (this.pageWrap.querySelector('.gs-focus-target')) this._setTimeout(() => this._runFocusIntro(), 30);
+    if (this.pageWrap.querySelector('.clarity-reflect')) this._setTimeout(() => this._runReflectIntro(), 30);
     this._fitPageScroll();
 
     // Track whether we're on the Neutron Star summary view (last wizard step,
@@ -1072,7 +1224,7 @@ const ClarityExperience = {
             <div class="gs__weight gs__weight--purple" style="position:absolute;bottom:6px;right:-2px;"></div>
           </div>
         </div>`,
-        headline: 'Think About Your Focus like a Scale',
+        headline: 'Think About Your <span class="gs-focus-target">Focus</span> like a Scale',
         sub: "At all times, there's an invisible scale guiding your attention.<br><br>Your brain will always default to the heavier side automatically, unless actively fought (more on that in a second).<br><br>For most people, the heaviest side is distractions, typically instant gratification activities. They're the heaviest and easiest weights to reach for, which throws the scale off balance, automatically draws your attention toward them, and makes it difficult for your brain to focus on the other side. We need to fix this."
       },
       // Page 2  - Willpower doesn't work long term
@@ -1126,15 +1278,17 @@ const ClarityExperience = {
     const p = pages[index];
 
     if (p._reflect) {
+      // The headline is a span (like the hero's) so _runReflectIntro can type it centred
+      // then glide it home; the body is split into line divs for the one-by-one reveal.
       return `<div class="clarity-exp__page-inner">
         <div class="clarity-exp__tut clarity-reflect">
-          <div class="clarity-reflect__headline">Now, before you begin.</div>
+          <div class="clarity-reflect__headline"><span class="clarity-reflect__headline-in">Now, before you begin.</span></div>
           <div class="clarity-reflect__body">
-            I want you to genuinely sit with one question:<br><br>
-            <span class="clarity-reflect__question">"What's the one mission or goal you want to dedicate yourself to?"</span><br><br>
-            This question is not an attempt to pressure or intimidate you, but instead, an invitation for you to really sit with it and see where it takes you.<br><br>
-            Most of us spend our younger years gaming, scrolling, distracted, doing things for other people but not for ourselves. Out of our entire lives, we might have genuinely thought about our own direction for maybe five minutes total. Which is really scary if you think about it.<br><br>
-            If you never focus inward on yourself, how can you expect to improve yourself? So if you can, seriously take the time to think about it for a minute.
+            <div class="clarity-reflect__line">I want you to genuinely sit with one question:</div>
+            <div class="clarity-reflect__line clarity-reflect__question">"What's the one mission or goal you want to dedicate yourself to?"</div>
+            <div class="clarity-reflect__line">This question is not an attempt to pressure or intimidate you, but instead, an invitation for you to really sit with it and see where it takes you.</div>
+            <div class="clarity-reflect__line">Most of us spend our younger years gaming, scrolling, distracted, doing things for other people but not for ourselves. Out of our entire lives, we might have genuinely thought about our own direction for maybe five minutes total. Which is really scary if you think about it.</div>
+            <div class="clarity-reflect__line">If you never focus inward on yourself, how can you expect to improve yourself? So if you can, seriously take the time to think about it for a minute.</div>
           </div>
         </div>
       </div>`;
@@ -1564,6 +1718,9 @@ const ClarityExperience = {
   },
   _syncLight() {
     try {
+      // The Neutron Star page gets the full top-left beams (Malik: show its power);
+      // every other tutorial page stays a whisper.
+      if (this.pageWrap && this.pageWrap.querySelector('.tut-star-blob')) { this._setLight(0.9); return; }
       const offset = this.getWizardOffset();
       const total = this.getTotalPages();
       if (this.currentPage < offset) {

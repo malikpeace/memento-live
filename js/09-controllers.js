@@ -4343,6 +4343,18 @@ const TabBar = {
     if (tab.classList.contains('tab-bar__tab--has-dot') !== show) {
       tab.classList.toggle('tab-bar__tab--has-dot', show);
     }
+    // Coach tab stays HIDDEN until Clarity is completed (Malik: there is nothing to
+    // coach about before then, the icon was a dead end for new users). Same call
+    // sites as the dot keep it in sync, and the pill re-measures on layout change.
+    const coach = this.el.querySelector('.tab-bar__tab[data-tab="coach"]');
+    if (coach) {
+      const usable = !!(typeof state !== 'undefined' && state && state.clarity && state.clarity.completed);
+      const hiddenNow = coach.style.display === 'none';
+      if (usable === hiddenNow) {
+        coach.style.display = usable ? '' : 'none';
+        requestAnimationFrame(() => this.movePill(false));
+      }
+    }
   },
 
   movePill(animate = true) {
