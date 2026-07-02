@@ -1411,7 +1411,7 @@ const WelcomeIntro = {
     // net). The ONLY supported emphasis is the **bold** marker, handled by _wcTypeLine.
     { key: 'commitLevel', type: 'choices', multi: false,
       headline: 'How committed are you **actually** to improving your life?',
-      options: ["Fully committed. I'm all in", 'I really want this', 'I kinda want this', "I'm not sure yet", "Idk. We'll see as we go"],
+      options: ["Fully committed. I'm all in", 'I really want this', 'I kinda want this', "Idk, i'm not sure yet", 'Not serious, just here for fun'],
       // Someone already doing really good has answered this with their life; asking them how
       // serious they are reads as the app not listening. Everyone else says it out loud (the
       // commitment effect), and the answer calibrates AI tone + the comeback coaching hook.
