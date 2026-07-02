@@ -38,3 +38,7 @@ jobs:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          # GitHub's Pages publish queue was jammed on 2026-07-02 (deployments sat in
+          # deployment_queued past the default 10-min timeout). Wait up to 30 min.
+          timeout: 1800000
