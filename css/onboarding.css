@@ -1709,13 +1709,21 @@ body.lite .welcome-intro__rays { opacity: calc(0.6 + var(--wi-beam-boost, 0) * 0
 /* Smooth crossfade out between chapters (overrides the slide-out for this flow). */
 .wi-cine.exit { animation: wiCineOut 0.34s ease forwards !important; }
 @keyframes wiCineOut { to { opacity: 0; } }
-/* Recap page (v491): the paragraphs TYPE onto the screen (JS-driven in _showSolution), so the
-   block itself does not animate in. All text is FULL WHITE (Malik: never dim body copy here),
-   with generous space between paragraphs. */
+/* Recap page: paragraphs FADE in on staggered delays (the v491 typewriter was reverted per
+   Malik). All text is FULL WHITE (never dim body copy here), with generous space between
+   paragraphs. */
 .wi-recap { animation: none !important; }
 .wi-recap .wi-demo__headline { margin-bottom: 26px; }
 .wi-recap .wi-demo__line { color: #fff; margin-bottom: 34px; }
 .wi-recap .wi-demo__stakes { color: #fff; }
+.wi-recap .wi-demo__headline,
+.wi-recap .wi-demo__line { opacity: 0; animation: wiLineIn 0.7s cubic-bezier(0.22,1,0.36,1) forwards; }
+.wi-recap .wi-demo__headline { animation-delay: 0.3s; }
+.wi-recap .wi-demo__line { animation-delay: 1.15s; }
+.wi-recap .wi-demo__stakes { animation-delay: 2.0s; }
+.wi-recap .wi-demo__note { animation-delay: 2.9s; }
+.wi-recap.exit .wi-demo__headline, .wi-recap.exit .wi-demo__line { animation: none; }
+@media (prefers-reduced-motion: reduce) { .wi-recap .wi-demo__headline, .wi-recap .wi-demo__line { animation: none; opacity: 1; } }
 /* The recap CTA ("Let's Fix This" / "Let's Refine"): vibrant Memento green, white text.
    Hover STAYS green (the base --step hover flips to white, which made white text vanish);
    it just deepens a touch so the press still reads. */
