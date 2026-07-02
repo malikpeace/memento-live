@@ -520,7 +520,7 @@ const ClarityExperience = {
         </div>
       </div>
       <div class="clarity-intro__foot" id="clarityIntroFoot">
-        <button class="clarity-intro__btn" id="clarityIntroBtn">Let's Begin</button>
+        <button class="clarity-intro__btn" id="clarityIntroBtn">Continue</button>
       </div>
     </div>`;
     this.navEl.innerHTML = '';
@@ -927,35 +927,50 @@ const ClarityExperience = {
     const ov = document.createElement('div');
     ov.className = 'clarity-focus-ov';
     ov.innerHTML = '<div class="clarity-focus-ov__title"><span class="cfw">How</span> <span class="cfw cfw--focus">Focus</span> <span class="cfw">Works</span></div>' +
-      '<div class="clarity-focus-ov__sub">extremely simplified</div>';
+      '<div class="clarity-focus-ov__sub">(extremely simplified)</div>';
     this.el.appendChild(ov);
+    const fly = ov.querySelector('.cfw--focus');
+    const fade = [...ov.querySelectorAll('.cfw:not(.cfw--focus)'), ov.querySelector('.clarity-focus-ov__sub')].filter(Boolean);
     let finished = false;
     const finish = (instant) => {
       if (finished) return; finished = true;
-      tut.style.transition = instant ? 'none' : 'opacity 0.6s ease';
+      tut.style.transition = instant ? 'none' : 'opacity 0.7s ease';
       tut.style.opacity = '1';
-      ov.style.transition = 'opacity 0.45s ease';
+      ov.style.transition = 'opacity 0.5s ease';
       ov.style.opacity = '0';
-      this._setTimeout(() => { try { ov.remove(); } catch (e) {} }, 500);
+      this._setTimeout(() => { try { ov.remove(); } catch (e) {} }, 550);
       showNav();
     };
-    ov.addEventListener('click', () => finish(true));
-    // Beat 1: the title sits. Beat 2: everything but "Focus" clears. Beat 3: "Focus"
-    // flies into the headline (measured live; the hidden page still has layout).
-    this._setTimeout(() => { if (!finished) ov.classList.add('is-clearing'); }, 1900);
-    this._setTimeout(() => {
-      if (finished) return;
+    // Fade the other words + sub OUT smoothly. Pin each to opacity 1 first (killing the
+    // fade-in animation reverts to base opacity 0), force a reflow, THEN transition to 0,
+    // so it glides off instead of snapping (Malik: they used to just turn off).
+    const clearOthers = () => {
+      fade.forEach((el) => {
+        el.style.animation = 'none';
+        el.style.opacity = '1';
+        void el.offsetWidth;
+        el.style.transition = 'opacity 0.7s ease';
+        el.style.opacity = '0';
+      });
+    };
+    const flyFocus = () => {
       try {
-        const fly = ov.querySelector('.cfw--focus');
         const fr = fly.getBoundingClientRect();
         const tr = target.getBoundingClientRect();
         const s = tr.height / Math.max(1, fr.height);
+        fly.style.animation = 'none';
+        fly.style.opacity = '1';
         fly.style.transformOrigin = 'left top';
-        fly.style.transition = 'transform 0.85s cubic-bezier(0.16,1,0.3,1)';
+        fly.style.transition = 'transform 1.05s cubic-bezier(0.16,1,0.3,1)';
         fly.style.transform = 'translate(' + (tr.left - fr.left) + 'px, ' + (tr.top - fr.top) + 'px) scale(' + s + ')';
       } catch (e) {}
-    }, 2500);
-    this._setTimeout(() => finish(false), 3400);
+    };
+    ov.addEventListener('click', () => finish(true));
+    // Slower, more deliberate beats (Malik: it was rushing). Title holds ~2.5s, the other
+    // words fade out (0.7s), "Focus" glides into the headline (1.05s), then the page fades up.
+    this._setTimeout(() => { if (!finished) clearOthers(); }, 2500);
+    this._setTimeout(() => { if (!finished) flyFocus(); }, 3300);
+    this._setTimeout(() => finish(false), 4450);
   },
 
   // The Neutron Star page enters cinematically (Malik): the star fades in FIRST, big and
