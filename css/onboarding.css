@@ -330,15 +330,23 @@
   0%, 100% { opacity: 0.4; }
   50%      { opacity: 1; }
 }
-/* v19 cohesion/a11y: the AI-chat animations were the one surface that never
-   opted into the app's motion-preference system. Gate them like everything else
-   so calm-motion / lite / reduced-motion users get a still, respectful UI. */
-body.calm-motion .ai-chat__bubble, body.lite .ai-chat__bubble,
-body.calm-motion .ai-chat__dot, body.lite .ai-chat__dot,
-body.calm-motion .ai-synthesis, body.lite .ai-synthesis,
-body.calm-motion .ai-thinking, body.lite .ai-thinking,
-body.calm-motion .aur-band, body.lite .aur-band,
-body.calm-motion .aur-line, body.lite .aur-line {
+/* v19 cohesion/a11y: gate the AI-chat animations into the app's motion system.
+   calm-motion + reduced-motion are genuine "hold still" prefs, so they freeze
+   EVERYTHING including the aurora. body.lite is the MOBILE path (auto-applied to
+   every phone, NOT a motion pref); the aurora loader is transform+opacity on ONE
+   small element, the same GPU-cheap class as the onboarding orbs that drift on
+   mobile, so it KEEPS breathing there. (Freezing it under body.lite is why it
+   looked dead on-device.) */
+body.calm-motion .ai-chat__bubble,
+body.calm-motion .ai-chat__dot,
+body.calm-motion .ai-synthesis,
+body.calm-motion .ai-thinking,
+body.calm-motion .aur-band,
+body.calm-motion .aur-line,
+body.lite .ai-chat__bubble,
+body.lite .ai-chat__dot,
+body.lite .ai-synthesis,
+body.lite .ai-thinking {
   animation: none !important;
 }
 @media (prefers-reduced-motion: reduce) {
