@@ -1328,6 +1328,47 @@ const ClarityExperience = {
     </div>`;
   },
 
+  // v523 (Malik, on-device): iOS still overshoots its keyboard pan even though
+  // the v522 layout leaves the field fully visible above the keyboard. Since
+  // zero-pan is now a legal position (field bottom clears the keyboard top),
+  // gently scroll the viewport back to rest whenever iOS shoves it, for as
+  // long as the answer field holds focus. window.scrollTo(0,0) is the only
+  // call that resets the iOS visual-viewport pan; it is a no-op elsewhere.
+  _bindWizSnapBack(container) {
+    if (this._wizSnapCleanup) { this._wizSnapCleanup(); this._wizSnapCleanup = null; }
+    const field = container.querySelector('.wiz__composer .wiz__textarea');
+    if (!field || !window.visualViewport) return;
+    let timer = 0;
+    const snap = () => {
+      timer = 0;
+      if (document.activeElement !== field) return;
+      if (window.scrollY || document.documentElement.scrollTop || window.visualViewport.offsetTop > 1) {
+        window.scrollTo(0, 0);
+      }
+      const pw = this.pageWrap;
+      if (pw && pw.scrollTop) pw.scrollTop = 0;
+    };
+    const queue = () => { if (!timer) timer = setTimeout(snap, 16); };
+    const onFocus = () => {
+      window.visualViewport.addEventListener('resize', queue);
+      window.visualViewport.addEventListener('scroll', queue);
+      // The keyboard animates in over ~250-500ms; sweep a few times after.
+      [80, 260, 450, 700].forEach(ms => setTimeout(queue, ms));
+    };
+    const onBlur = () => {
+      window.visualViewport.removeEventListener('resize', queue);
+      window.visualViewport.removeEventListener('scroll', queue);
+      if (timer) { clearTimeout(timer); timer = 0; }
+    };
+    field.addEventListener('focus', onFocus);
+    field.addEventListener('blur', onBlur);
+    this._wizSnapCleanup = () => {
+      onBlur();
+      field.removeEventListener('focus', onFocus);
+      field.removeEventListener('blur', onBlur);
+    };
+  },
+
   bindWizardInFullscreen() {
     const container = this.pageWrap;
     const stepKey = getWizardSteps()[wizardStep];
@@ -1448,6 +1489,7 @@ const ClarityExperience = {
     // screen right under the question, and the page made non-scrollable so
     // there is no slack to fling. The root class drives that layout in CSS.
     if (this.el) this.el.classList.toggle('has-wiz-composer', !!container.querySelector('.wiz__composer'));
+    this._bindWizSnapBack(container);
 
     // Bind AI chat if on that step (the AI service is built in; there is no
     // key-entry state anymore).
