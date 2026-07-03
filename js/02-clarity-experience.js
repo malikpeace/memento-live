@@ -1330,9 +1330,9 @@ const ClarityExperience = {
 
   // v523-v527 (Malik, on-device iteration): iOS overshoots its keyboard pan
   // even when the layout leaves the field fully visible above the keyboard,
-  // so once the shove stops moving we settle the view back to rest. Shared
-  // with the Action wizard via bindKeyboardSettle (module scope, below the
-  // ClarityExperience object). Precondition for using it on a new surface:
+  // so once the shove stops moving we settle the view back to rest. Lives in
+  // bindKeyboardSettle (module scope, below the ClarityExperience object).
+  // Precondition for using it on a new surface:
   // the field must sit HIGH (fixed ~30vh anchor) so zero-pan is a position
   // iOS accepts instead of re-panning.
   _bindWizSnapBack(container) {
@@ -2671,7 +2671,7 @@ const ActionExperience = {
     // chat message and don't capture anything. The conversation continues
     // with whatever it said as the next bubble.
     return {
-      message: trimmed.length > 0 ? trimmed : "Tell me more so we can lock this in.",
+      message: trimmed.length > 0 ? trimmed : "Tell me more. What does that actually look like?",
       type: 'text',
       options: [],
       snapshot: { ...currentSnapshot },
@@ -2685,8 +2685,9 @@ const ActionExperience = {
   // decides when each of the four snapshot fields is filled.
   async _aiIntakeFetchNext() {
     const intake = state.action.intake;
-    const ns = (state.clarity.answers && state.clarity.answers.neutronStar) || '';
-    const tfHint = (state.clarity.answers && state.clarity.answers.timeframe) || '';
+    const ca = state.clarity.answers || {};
+    const ns = ca.neutronStar || '';
+    const tfHint = ca.timeframe || ca.timeHorizon || '';
 
     // Show typing indicator while we wait.
     const currentEl = this.pageWrap.querySelector('.action-intake__current');
@@ -2694,6 +2695,8 @@ const ActionExperience = {
 
     const context = `User context for this conversation:
 Their locked Neutron Star: "${ns}"
+${ca.coreWhy ? `Why it matters to them (from Clarity, reference it when it sharpens a question, never recite it): "${ca.coreWhy}"` : ''}
+${ca.antiVision ? `What they fear if they never act (from Clarity, background context only): "${ca.antiVision}"` : ''}
 A timeframe they mentioned in Clarity (use as a starting reference, but confirm): "${tfHint}"
 Current snapshot (what you have captured so far): ${JSON.stringify(intake.aiSnapshot)}
 
@@ -3811,44 +3814,6 @@ Return ONLY the sentence text. No quotes, no labels.`;
     `;
   },
 
-  getWizSteps() {
-    const summary = normalizeClaritySummary(state.clarity.answers);
-    const ns = summary.neutronStar || state.clarity.answers.keystone || 'your goal';
-    return [
-      {
-        type: 'confirm', question: 'Is this still the thing you want to make progress on most?',
-        ns, answerKey: 'goalConfirmation',
-        options: [
-          { value: 'yes', label: 'Yes, this is it' },
-          { value: 'mostly', label: 'Mostly yes, but there\'s something else I want to focus on' },
-          { value: 'refocus', label: 'No, I want to work on something different' }
-        ]
-      },
-      {
-        type: 'freetext', answerKey: 'alreadyTried',
-        question: 'What do you think you need to do first?',
-        hint: "It can be something you've already tried, something obvious, or just a gut feeling. Be specific.",
-        placeholder: "e.g. I need to start posting consistently, or I've tried building a landing page but never finished it..."
-      },
-      {
-        type: 'select', answerKey: 'scaleFeeling',
-        question: 'Does that feel doable, or does it feel too big?',
-        hint: "Be honest. There's no wrong answer.",
-        options: [
-          { value: 'yes', label: 'I can start it this week' },
-          { value: 'big', label: 'It feels a bit too big' },
-          { value: 'overwhelming', label: 'It feels very overwhelming' }
-        ]
-      },
-      {
-        type: 'freetext', answerKey: 'biggestBlocker',
-        question: "What's the biggest thing standing in your way?",
-        hint: "Time, money, knowledge, fear, other people. What's the real blocker?",
-        placeholder: "e.g. I don't have enough time after work, or I'm not sure if the idea is good enough..."
-      }
-    ];
-  },
-
   renderContent() {
     this.progressEl.innerHTML = '';
     this.navEl.innerHTML = '';
@@ -3914,14 +3879,14 @@ Return ONLY the sentence text. No quotes, no labels.`;
     }
 
     // Round 9: draft-first. If we have nothing yet, kick off auto-generation.
-    // The chat path is preserved as the refine fallback (renderActionChat).
     if (!actionAiLoading && state.action.introSeen) {
       generateActionDraft();
       return;
     }
 
-    // If we somehow get here pre-intro, fall back to the chat surface.
-    this.renderActionChat();
+    // If we somehow get here pre-intro, route back to the intro so the
+    // normal intake flow takes over.
+    this._showActionIntro();
   },
 
   // === Round 10 - Timeframe gate (shown when Clarity didn't capture one) ===
@@ -3959,204 +3924,6 @@ Return ONLY the sentence text. No quotes, no labels.`;
     });
     wrap.querySelector('#actionTfCustom')?.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') { e.preventDefault(); commit(e.target.value); }
-    });
-  },
-
-  // === Round 8 - Adaptive chat UI ===
-  renderActionChat() {
-    this.progressEl.innerHTML = '';
-    this.navEl.innerHTML = '';
-
-    // First time entering chat - kick off the first question.
-    if (!actionChatReady && !actionChatSending && !actionChatCurrentQuestion) {
-      // Initialize from saved conversation if present.
-      if (Array.isArray(state.action.aiConversation) && state.action.aiConversation.length) {
-        actionChatMessages = [...state.action.aiConversation];
-      } else {
-        actionChatMessages = [];
-      }
-      sendActionChatTurn();
-    }
-
-    const transcriptHtml = actionChatMessages.map(m => {
-      if (m.role === 'assistant') {
-        return `<div class="action-chat__bubble action-chat__bubble--ai">${esc(m.content)}</div>`;
-      }
-      return `<div class="action-chat__bubble action-chat__bubble--user">${esc(m.content)}</div>`;
-    }).join('');
-
-    let inputHtml = '';
-    if (actionChatSending) {
-      inputHtml = `<div class="action-chat__thinking"><span></span><span></span><span></span></div>`;
-    } else if (actionChatCurrentQuestion) {
-      const q = `<div class="action-chat__bubble action-chat__bubble--ai action-chat__bubble--current">${esc(actionChatCurrentQuestion)}</div>`;
-      if (actionChatCurrentType === 'select' && actionChatCurrentOptions.length) {
-        const opts = actionChatCurrentOptions.map((o, i) =>
-          `<button class="action-chat__opt" type="button" data-value="${esc(o)}">${esc(o)}</button>`
-        ).join('');
-        inputHtml = q + `<div class="action-chat__options">${opts}</div>`;
-      } else {
-        inputHtml = q + `
-          <div class="action-chat__input-row">
-            <div class="action-chat__input-row-inner">
-              <textarea class="action-chat__input" id="actionChatInput" rows="2" placeholder="Type your answer..." autocomplete="off"></textarea>
-              <button class="action-chat__send" id="actionChatSend" type="button" aria-label="Send"></button>
-            </div>
-          </div>
-        `;
-      }
-    }
-
-    const errorHtml = actionChatError
-      ? `<div class="action-chat__error">${esc(actionChatError)}</div>`
-      : '';
-
-    this.pageWrap.innerHTML = `
-      <div class="action-exp__page-inner">
-        <div class="action-exp__inner action-chat">
-          <div class="action-chat__eyebrow">Action</div>
-          <div class="action-chat__transcript">${transcriptHtml}</div>
-          ${inputHtml}
-          ${errorHtml}
-        </div>
-      </div>
-    `;
-
-    // Bind input / send
-    const sendBtn = this.pageWrap.querySelector('#actionChatSend');
-    const inputEl = this.pageWrap.querySelector('#actionChatInput');
-    if (sendBtn && inputEl) {
-      const submit = () => {
-        const val = inputEl.value.trim();
-        if (!val) return;
-        submitActionChatReply(val);
-      };
-      sendBtn.addEventListener('click', submit);
-      inputEl.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-          e.preventDefault();
-          submit();
-        }
-      });
-      // Auto-focus on desktop only - avoid keyboard popping up on mobile.
-      if (window.matchMedia && window.matchMedia('(min-width: 1024px)').matches) {
-        setTimeout(() => inputEl.focus(), 50);
-      }
-    }
-    this.pageWrap.querySelectorAll('.action-chat__opt').forEach(btn => {
-      btn.addEventListener('click', () => submitActionChatReply(btn.dataset.value));
-    });
-
-    // Auto-scroll transcript to bottom so latest is visible.
-    const t = this.pageWrap.querySelector('.action-chat__transcript');
-    if (t) t.scrollTop = t.scrollHeight;
-  },
-
-  renderWizStep(stepIdx) {
-    const steps = this.getWizSteps();
-    const step = steps[stepIdx];
-    if (!step) return;
-    const wa = state.action.wizAnswers || {};
-    const total = steps.length;
-
-    let bodyHtml = '';
-    if (stepIdx === 0) {
-      bodyHtml += `<div class="action-wiz__intro">Quick one. I promise this won't take long.</div>`;
-    }
-    if (step.type === 'confirm') {
-      bodyHtml += `<div class="action-ns-card"><div class="action-ns-label">Your Neutron Star</div><div class="action-ns-text">${esc(step.ns)}</div></div>`;
-    }
-    bodyHtml += `<div class="wiz__question">${step.question}</div>`;
-    if (step.hint) bodyHtml += `<div class="wiz__hint">${step.hint}</div>`;
-
-    if (step.type === 'confirm' || step.type === 'select') {
-      bodyHtml += '<div class="wiz__options">';
-      (step.options || []).forEach(opt => {
-        const sel = wa[step.answerKey] === opt.value ? 'selected' : '';
-        bodyHtml += `<div class="wiz__option ${sel}" data-answer-key="${esc(step.answerKey)}" data-value="${esc(opt.value)}">
-          <div class="wiz__option-radio"></div>
-          <div><div class="wiz__option-text">${esc(opt.label)}</div>${opt.desc ? `<div class="wiz__option-desc">${esc(opt.desc)}</div>` : ''}</div>
-        </div>`;
-      });
-      bodyHtml += '</div>';
-    } else {
-      bodyHtml += `<div class="wiz__text-wrap" style="margin-top:8px;"><textarea class="wiz__text-input wiz__textarea" id="actionWizText" data-answer-key="${esc(step.answerKey)}" placeholder="${esc(step.placeholder || '')}" rows="3" style="min-height:72px;max-height:min(148px,20vh);">${esc(wa[step.answerKey] || '')}</textarea></div>`;
-    }
-
-    if (actionAiError) {
-      bodyHtml += `<div style="font-size:0.82rem;color:var(--color-action);padding:10px 14px;border-radius:calc(10px * var(--rx, 1));background:var(--kfill-06);border:1px solid rgba(var(--ink),0.15);margin-top:14px;">${esc(actionAiError)}</div>`;
-    }
-
-    const hasAnswer = !!(wa[step.answerKey]);
-    const isLast = stepIdx === total - 1;
-    const nextLabel = isLast ? 'Find my action plan' : 'Next';
-    const nextCls = isLast ? 'action-wiz__btn--generate' : 'action-wiz__btn--next';
-
-    this.pageWrap.innerHTML = `
-      <div class="action-exp__page-inner">
-        <div class="action-exp__inner">
-          <div class="wiz__step">${bodyHtml}</div>
-        </div>
-      </div>`;
-
-    this.navEl.innerHTML = `<div class="action-wiz__nav">
-      <button class="action-wiz__btn action-wiz__btn--back" id="actionWizBack">Back</button>
-      <button class="action-wiz__btn ${nextCls}" id="actionWizNext" ${hasAnswer ? '' : 'disabled'}>${nextLabel}</button>
-    </div>`;
-
-    this.pageWrap.querySelectorAll('.wiz__option').forEach(opt => {
-      opt.addEventListener('click', () => {
-        this.pageWrap.querySelectorAll('.wiz__option').forEach(o => o.classList.remove('selected'));
-        opt.classList.add('selected');
-        wa[opt.dataset.answerKey] = opt.dataset.value;
-        persistNow();
-        const nb = this.navEl.querySelector('#actionWizNext');
-        if (nb) nb.disabled = false;
-      });
-    });
-
-    const ta = this.pageWrap.querySelector('#actionWizText');
-    if (ta) {
-      ta.addEventListener('input', () => {
-        wa[ta.dataset.answerKey] = ta.value.trim();
-        persistNow();
-        const nb = this.navEl.querySelector('#actionWizNext');
-        if (nb) nb.disabled = !ta.value.trim();
-      });
-      ta.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-          const nb = this.navEl.querySelector('#actionWizNext');
-          if (nb && !nb.disabled) { e.preventDefault(); nb.click(); }
-        }
-      });
-    }
-    // Same iOS keyboard settle as the Clarity wizard (v527); pairs with the
-    // fixed 30vh question anchor in css/action.css.
-    bindKeyboardSettle(this, ta);
-
-    this.navEl.querySelector('#actionWizBack')?.addEventListener('click', () => {
-      if (stepIdx > 0) {
-        state.action.wizStep = stepIdx - 1;
-        persistNow();
-        this.renderWizStep(state.action.wizStep);
-      } else {
-        state.action.tutorialSeen = false;
-        persistNow();
-        this._showActionIntro();
-      }
-    });
-
-    this.navEl.querySelector('#actionWizNext')?.addEventListener('click', () => {
-      if (ta) wa[ta.dataset.answerKey] = ta.value.trim();
-      if (isLast) {
-        state.action.wizStep = 0;
-        persistNow();
-        generateActionPlan();
-      } else {
-        state.action.wizStep = stepIdx + 1;
-        persistNow();
-        this.renderWizStep(state.action.wizStep);
-      }
     });
   },
 
@@ -6637,7 +6404,7 @@ Return ONLY the sentence text. No quotes, no labels.`;
       actionChatReady = false;
       actionChatError = null;
       persistNow();
-      this.renderActionChat();
+      generateActionDraft();
     });
   },
 

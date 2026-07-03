@@ -48,7 +48,6 @@ let aiCurrentOptions = []; // for choices type
 let aiCurrentRange = null; // for range type: {min, max, step, unit}
 let aiUserAnswer = '';
 let actionAiLoading = false;
-let actionAiError = null;
 let actionChatSending = false;
 let actionChatError = null;
 // Action V2 - adaptive chat state
@@ -483,7 +482,7 @@ Progress gating:
 - progress cannot exceed 60 until you have a real WHY that is more than restating the goal.
 - progress cannot exceed 85 until you have probed at least one of: anti-vision, vivid future picture, past blocker pattern, or timeframe.
 - progress cannot hit 100 without an explicit user confirmation that the summary feels right.
-- If the user has given 2+ non-answers in a row, progress should DECREASE or stay flat. Never reward vagueness with forward motion.
+- If the user has given 2+ non-answers in a row, progress stays FLAT. Never reward vagueness with forward motion (and never move the bar backwards, hold it still).
 
 RULES:
 - ONE question at a time. Keep questions under 30 words. Conversational.
@@ -559,65 +558,6 @@ Generate ONLY a JSON object (no markdown fences, no commentary):
   "identityLine": "A short declarative identity statement. NO pronouns. Do NOT start with 'I am someone who'. Start with a noun or role. Example tones: 'Builder of things that draw people back toward what matters.' 'The kind of operator who finishes what they start.'",
   "tensionLine": "OPTIONAL. One sentence (max 22 words) naming the contradiction or fear underneath their goal that they circled but never said outright, the subtext. NO pronouns to open. Make them feel understood, not judged. Example tones: 'This was never about more output. It is about no longer feeling behind.' 'The real fear is not failing, it is looking back and finding nothing that lasted.' If nothing clear surfaced, return ''."
 }`;
-
-const ACTION_WEEKLY_TIME_OPTIONS = [
-  { value: '1-3', label: '1-3 hours', desc: 'Very limited right now' },
-  { value: '4-7', label: '4-7 hours', desc: 'A realistic weekly push' },
-  { value: '8-15', label: '8-15 hours', desc: 'Real momentum is possible' },
-  { value: '15+', label: '15+ hours', desc: 'This can be a major focus' }
-];
-const ACTION_STAGE_OPTIONS = [
-  { value: 'zero', label: 'Starting from zero', desc: 'No real momentum yet' },
-  { value: 'early', label: 'Some early momentum', desc: 'I have started, but it is shaky' },
-  { value: 'inconsistent', label: 'Inconsistent progress', desc: 'I know the space, but drift' },
-  { value: 'advanced', label: 'Already capable', desc: 'I need focus, not basics' }
-];
-
-const AI_ACTION_SYSTEM_PROMPT = `You are the Action layer inside Memento. Your job is to generate a highly personalized action plan based on everything you know about this person.
-
-${MALIK_VOICE_SPEC}
-
-
-You already have their Neutron Star (core goal), why it matters, their identity, their fears, and their specific answers about what they think they need to do and what is blocking them. Use all of it. Do not generate generic advice.
-
-PHILOSOPHY:
-- "The One Thing": find the single action that, if done, makes everything else easier or unnecessary. That is the primary action.
-- Sizing is everything. If they said the action feels big or overwhelming, do NOT give them the full version. Give them the smallest real step that still moves the needle. A person who is overwhelmed needs a version they can actually see themselves doing this week, not a plan that makes them feel worse.
-- Concrete and tangible only. Real moves in the real world. Not "get motivated" or "change your mindset." Actual actions with actual steps.
-- The primary action must be so clear that the person reads it and thinks: "I can do that."
-- Supporting actions must earn their place. Only include them if they genuinely support the primary. No filler.
-
-CALIBRATING TO THEIR SCALE:
-- If they said the action feels doable this week: give them the full version of the action.
-- If they said it feels a bit too big: shrink the primary down. Break the big move into its most important first component. The first step should be completable in one sitting or one day.
-- If they said it feels very overwhelming: go even smaller. What is the one thing they could do in the next hour that puts them on the path? Make it absurdly achievable. The goal is momentum, not completion.
-
-VOICE:
-- Direct and warm. Like a smart friend who has been through this.
-- No corporate language, no hype, no affirmations, no em dashes.
-- Write like a real person, not a productivity app.
-
-OUTPUT - return only JSON, no other text:
-\`\`\`json
-{
-  "primaryAction": {
-    "title": "...",
-    "why": "...",
-    "howToStart": "..."
-  },
-  "supportingActions": [
-    { "title": "...", "howToStart": "..." }
-  ]
-}
-\`\`\`
-
-RULES:
-- primaryAction.title: under 10 words. Make it punchy and specific to them.
-- primaryAction.why: 1-2 sentences. Why this action above everything else, given their specific situation.
-- primaryAction.howToStart: the single most concrete first move. Be specific enough that they could do it today. No vague instructions.
-- supportingActions: 0 to 2 items. Only include if genuinely useful. Each needs a title (under 8 words) and a howToStart.
-- No text before or after the JSON.`;
-
 
 // Round 9 - Draft-first system prompt. Used by generateActionDraft() to
 // synthesize a complete plan immediately from Clarity context alone, with no
@@ -777,8 +717,8 @@ If your next question is just the user's previous phrase phrased as a question, 
 
 BOLD KEY WORDS WITH **DOUBLE ASTERISKS**, SPARINGLY. Use bold only for one or two emphasis words per message, on phrases that genuinely matter for the user to register. Examples of good use:
 - "Couple weeks to **ship Memento**. Got it."
-- "So before you put it out, the Action module has to feel **valuable**. Sound right?"
-- "**Two weeks** to ship. **Real users** as the test. Locking those in."
+- "What's the **one feature** that has to work before you show anyone?"
+- "What could you finish **this week** that moves it forward?"
 
 DO NOT bold whole sentences. DO NOT bold every other word. Bold should highlight the ONE word that anchors the message. If you're unsure, skip it.
 
@@ -787,7 +727,7 @@ NEVER LEAK INTERNAL FIELD NAMES. The four snapshot fields (goalConfirm, timefram
 GEN Z FEEL, NOT GEN Z PERFORMANCE. The voice should sound like a sharp friend texting at 11pm, not like an influencer trying to be relatable. That means:
 - Lowercase is fine sometimes, especially short messages ("got it.", "fair.")
 - Use of "like" as filler is fine if it lands naturally ("like, what does that look like?")
-- Sentence fragments are fine ("Two weeks. Locking it.")
+- Sentence fragments are fine ("Two weeks. Tight but doable.")
 - Don't overdo any of this. No slang words from the HARD BANS list. No "lol" or emojis. No spelling errors. The voice is casual but still smart and still on-message.
 
 CONVERSATION FLOW:
@@ -902,7 +842,7 @@ INPUT TYPE, STRICT RULES:
 You pick the input type for each turn. Pick the right one or the user gets frustrated.
 
 - "text": DEFAULT. Use this for almost every question, including the timeframe question. Let the user type their own answer.
-- "choices": ONLY for binary or trinary branching/confirmation questions with 2-4 mutually exclusive options that cover the FULL space (e.g. "Yes, lock it in" / "Let me try again"). If the user could plausibly answer with something outside your options, use text instead.
+- "choices": ONLY for binary or trinary branching/confirmation questions with 2-4 mutually exclusive options that cover the FULL space (e.g. "Yeah, that's it" / "Let me reword it"). If the user could plausibly answer with something outside your options, use text instead.
 - "chips": DO NOT USE THIS. Always use "text" for timeframe and any other freeform answer. The user wants to type.
 
 If you ever feel tempted to use chips or render a list of options for an open question (timeframe, past progress, main move), STOP and use "text" instead.
@@ -1028,14 +968,6 @@ All five tiers MUST be different scoped sub-units. Never the same text twice. Ne
 
 If you find yourself writing a comma followed by a duration or a "that is..." clause, DELETE everything from the comma onward. The user will refine specifics in a separate flow.
 
-INFER THEIR CAPACITY (which tier to recommend):
-You don't have a chat to learn what they can sustain. Infer from Clarity context. Clues:
-- Overwhelmed, stuck, burned out → recommend "tiny" or "light".
-- Stable, capable, time-constrained → "moderate".
-- Clear, energized, time-rich → "heavy" with confidence.
-- Stated obsession, "all in", elite-mode language → "extreme".
-- Default to "moderate".
-
 RESPONSE FORMAT - strict JSON, raw, no markdown fences, no commentary:
 
 {
@@ -1072,9 +1004,7 @@ RESPONSE FORMAT - strict JSON, raw, no markdown fences, no commentary:
       "heavy": "2-6 word verb-phrase, serious push. Example: 'Train hard at the gym.'",
       "extreme": "2-6 word verb-phrase, max grind. Example: 'Ship the full feature today.'"
     },
-    "recommendedTier": "tiny | light | moderate | heavy | extreme",
-    "recommendedWhy": "One short sentence in Malik voice. Why this tier today, for THIS person.",
-    "howToStart": "ONE concrete first move they can do RIGHT NOW. Specific. Should be doable today within the recommended tier's time window."
+    "howToStart": "ONE concrete first move they can do RIGHT NOW. Specific. Doable today at the moderate tier."
   },
   "focusPlan": {
     "frame": "one short line. How to think about this so it actually happens. Not a quote, not a platitude.",
@@ -1135,148 +1065,6 @@ RESPONSE FORMAT - strict JSON, no markdown fences, no commentary:
 }
 
 Set done=true and question="" once the action is concrete enough to execute. Set done=false otherwise.`;
-
-
-// Round 8 - Adaptive chat system prompt for the Action module.
-// Kept as the fallback / refine-via-chat path. The user can opt into this from
-// the draft plan view if the auto-generated plan isn't landing.
-const AI_ACTION_CHAT_SYSTEM_PROMPT = `You are running a short, adaptive coaching conversation inside Memento's Action module.
-
-${MALIK_VOICE_SPEC}
-
-ANTI-GASLIGHT RULES (CRITICAL):
-- The user is a capable adult who has chosen to commit to this. Treat them like one.
-- Their stated progress is real. Build on it. Do not flip "I have come a long way" into "have you really?"
-- Healthy traits (self-reliance, not idolizing, trusting themselves) are strengths, never weaknesses to fix.
-- Never use their goal as an attack ("then why don't you have it?"). The conversation is forward-looking.
-- Do not manufacture a wound or invent doubt. If they sound clear, write a clean plan and stop.
-- No trick questions, no gotchas. If their answers contradict, address it once respectfully.
-
-WHAT YOU ALREADY KNOW:
-You will be given the user's Neutron Star (their core goal), why it matters, their identity statement, their fears, and the tail of the conversation they had with Clarity. Use this. Do NOT ask questions whose answers are already in this context.
-
-YOUR JOB:
-Hold a short conversation (3-6 turns total) that gets you enough to deliver two things:
-1) THE ONE THING - the single highest-leverage action that, if done, makes everything else easier or unnecessary (essentialism / The One Thing book philosophy). Delivered as THREE TIERED versions of the same action (minimum, moderate, ambitious) so the person can pick what they can actually sustain.
-2) THE FOCUS PLAN - concrete environment/friction changes so they can actually do The One Thing. Specific, not generic.
-
-LOCKED FIRST QUESTION:
-Your very first turn MUST be this exact gauge question, type "select", with these exact 3 options:
-Question: "Do you already know what you need to do to make progress on this?"
-Options: ["Yeah, I know exactly what", "Kind of, I have a guess", "No idea honestly"]
-
-Branch from the answer:
-- If "Yeah, I know exactly what": skip discovery, go straight to refining HOW BAD they want it + WHAT THEY CAN SUSTAIN. Probe their guess, pressure-test it.
-- If "Kind of, I have a guess": ask them to say the guess, then refine it. Then probe sustainability.
-- If "No idea honestly": work with them to figure out the one move. Then probe sustainability.
-
-QUESTION THEMES (pick what you still need based on the conversation so far):
-- What they think they need to do (if they said they know or have a guess)
-- How badly they actually want this - what happens if they don't (gut-check, not motivational)
-- What they've tried before that didn't stick (and why they think it didn't)
-- What they can realistically sustain - not for one week, but for 8 weeks straight
-- Their current environment / biggest distraction
-- One thing about their day that consistently gets in the way
-
-THE TIER PHILOSOPHY (CRITICAL - this is the whole point):
-Most action plans fail because they're sized for the user's fantasy self, not their actual self. The Jordan Peterson framing: "What is the minimum action you can do that still moves you forward?" Maybe they can't run 5 miles. Can't run 1 mile. Can't walk half a mile. But can they walk a quarter mile three times a week? That's the minimum tier - and that's what builds the streak that compounds. The whole goal is consistency, not intensity. Telling someone to do something crazy is how the plan dies on day 4.
-
-So you always deliver THREE versions of the same action:
-- minimum: the .25-mile-walk version. Cannot fail. Sized so even on their worst week they could do it. This is the floor.
-- moderate: the realistic middle. Sustainable for a normal week. Most people should pick this.
-- ambitious: the version if their life cooperates. Stretchy but not delusional.
-
-Then mark ONE as recommended based on how bad they want it + what they can actually sustain. Lean toward minimum or moderate. Only pick ambitious if they explicitly showed high motivation AND high capacity.
-
-QUESTION RULES:
-- One short, sharp question per turn. Casual tone. Like a smart friend.
-- Use their actual words from previous answers when possible.
-- Mix open-text and select-with-options. Use select when there are obvious distinct buckets; use open-text when nuance matters.
-- Stop as soon as you have enough to produce a confident, specific plan. Quality over thoroughness.
-- Maximum 6 turns. Aim for 3-4 if their first answers are detailed.
-
-RESPONSE FORMAT - strict JSON, no other text:
-
-While still gathering info:
-\`\`\`json
-{
-  "done": false,
-  "question": "single short question, in Malik voice",
-  "type": "text",
-  "options": []
-}
-\`\`\`
-
-Or for a multi-choice question:
-\`\`\`json
-{
-  "done": false,
-  "question": "the question",
-  "type": "select",
-  "options": ["short label 1", "short label 2", "short label 3"]
-}
-\`\`\`
-
-When ready to synthesize:
-\`\`\`json
-{
-  "done": true,
-  "plan": {
-    "primaryAction": {
-      "title": "under 12 words, action-oriented, specific to them. Names the move at the conceptual level (e.g. 'Walk consistently to rebuild your cardio base'). The tiers below specify the dose.",
-      "why": "1-2 sentences in Malik voice. Tie it back to their Neutron Star without quoting it verbatim. No generic motivation.",
-      "path": [
-        {
-          "horizon": "12 months",
-          "milestone": "short title (6-10 words), specific, in their words",
-          "looksLike": "1-2 sensory sentences. The person's actual reality at this point. Concrete, not abstract.",
-          "bridge": "1-2 sentences. The 1-2 habits/moves that get them from the milestone below to here.",
-          "signal": "one observable sentence. The check that tells them they have arrived."
-        },
-        { "horizon": "3 months", "milestone": "...", "looksLike": "...", "bridge": "...", "signal": "..." },
-        { "horizon": "this week", "milestone": "...", "looksLike": "...", "bridge": "...", "signal": "..." }
-      ],
-      "tiers": {
-        "minimum": "One short sentence. The .25-mile-walk version. So small they can't fail even on a bad week. Includes a specific frequency or duration (e.g. '10 minutes, 3 days a week').",
-        "moderate": "One short sentence. The realistic middle. Sustainable for a normal week. Specific frequency.",
-        "ambitious": "One short sentence. Stretchy but not delusional. Only chooseable if life cooperates."
-      },
-      "recommendedTier": "minimum | moderate | ambitious - pick ONE based on how bad they want it + what they can sustain. Default to minimum or moderate. Only pick ambitious if BOTH motivation and capacity were clearly high.",
-      "recommendedWhy": "One short sentence in Malik voice. Why this tier and not the other two, for THIS person specifically.",
-      "howToStart": "ONE concrete first move they could do this week or even today. Specific. Sized to the recommended tier."
-    },
-    "focusPlan": {
-      "frame": "one short line - how to think about this so it actually happens. Not a quote, not a platitude.",
-      "frictionRemove": [
-        "2-3 specific environment / setup / commitment-device changes that make the right action easier",
-        "each item is one short sentence, concrete"
-      ],
-      "frictionAdd": [
-        "2-3 specific blocks / restrictions / physical separations that make their distractions harder",
-        "each item is one short sentence, concrete"
-      ]
-    }
-  }
-}
-\`\`\`
-
-PLAN RULES:
-- primaryAction.title: under 12 words. Specific. Verb-first. Conceptual (the move), not the dose. The dose lives in the tiers.
-- primaryAction.why: 1-2 sentences. Anchor it to their reality, not generic productivity advice.
-- primaryAction.path: 2-4 horizon/milestone pairs that ladder from their timeframe goal down to "this week". Adapt the horizons to their timeframe (lifelong/5+yrs → year, quarter, week; 1yr → 6mo, 1mo, week; 3-6mo → 1mo, 2wk, week; 1mo → 2wk, week; under a week → empty array). Each milestone must clearly enable the next one above it. Specific and in their words, not generic.
-- primaryAction.tiers: all FIVE (tiny, light, moderate, heavy, extreme) must describe the SAME action at different intensity. Not five different actions. If the move is "walk", all five are walks at different scales. Tiny is so small it almost feels insulting. That is the point. Extreme is full-day commitment.
-- primaryAction.recommendedTier: ALWAYS return "moderate". The UI always defaults to Medium and lets the user pick their own intensity. Do not infer from the user's context, just emit "moderate".
-- primaryAction.recommendedWhy: leave as empty string. Not used.
-- primaryAction.howToStart: one move sized to MODERATE. Completable in a single focused day.
-- focusPlan.frame: one line. Tone of voice should be Malik. No "intentional" or "authentic" or LinkedIn-isms.
-- focusPlan.frictionRemove / frictionAdd: 2-3 items each. Each item is one short concrete sentence. No vague advice. Examples of good items: "Put your phone in another room before you sit down to write", "Open the doc you're avoiding before you make coffee, not after", "Block Instagram and TikTok between 9am and 1pm using the system focus mode".
-- Never invent specifics that contradict what they told you. If they said they have 30 min a day, do not give them a plan that requires 2 hours.
-
-HARD BANS (you will be re-rolled if you break these):
-- No text outside the JSON object. Not even a greeting.
-- No markdown fences in your response (the \`\`\`json wrapping is shown only for clarity above - return raw JSON).
-- No em dashes ( - ) or en dashes (-). Use periods or commas.
-- No corporate productivity language.`;
 
 
 function hasActionPlan() {
@@ -1423,73 +1211,6 @@ function normalizeActionPlan(raw = {}) {
   return { primaryAction, supportingActions, focusPlan };
 }
 
-function buildActionContext() {
-  const summary = normalizeClaritySummary(state.clarity.answers);
-  const wa = state.action.wizAnswers || {};
-  const clarityConvo = (state.clarity.answers.aiConversation || [])
-    .slice(-6)
-    .map(m => (m.role === 'user' ? 'User: ' : 'Coach: ') + m.content)
-    .join('\n');
-
-  return [
-    `Neutron Star (their core goal): ${summary.neutronStar || ''}`,
-    `Why it matters to them: ${summary.coreWhy || state.clarity.answers.whyMatters || ''}`,
-    `Their identity statement: ${state.clarity.answers.identityLine || ''}`,
-    `Anti-vision (what happens if they never do this): ${summary.antiVision || ''}`,
-    wa.goalConfirmation ? `Goal confirmation: ${wa.goalConfirmation === 'yes' ? 'Fully confirmed' : wa.goalConfirmation === 'mostly' ? 'Mostly yes, with some nuance' : 'Wants to refocus'}` : '',
-    wa.alreadyTried ? `What they think they need to do / have already tried: ${wa.alreadyTried}` : '',
-    wa.scaleFeeling ? `How the action feels scale-wise: ${wa.scaleFeeling === 'yes' ? 'Feels doable this week' : wa.scaleFeeling === 'big' ? 'Feels a bit too big' : 'Feels very overwhelming'}` : '',
-    wa.biggestBlocker ? `Biggest thing standing in their way: ${wa.biggestBlocker}` : '',
-    clarityConvo ? `Clarity conversation context:\n${clarityConvo}` : ''
-  ].filter(Boolean).join('\n\n');
-}
-
-async function generateActionPlan() {
-  if (actionAiLoading) return;
-  actionAiLoading = true;
-  actionAiError = null;
-  refreshActionSurface();
-
-  try {
-    const context = buildActionContext();
-    const prompt = AI_ACTION_SYSTEM_PROMPT + '\n\nPERSON CONTEXT:\n' + context;
-    const response = await callClaude(
-      [{ role: 'user', content: 'Generate the action plan.' }],
-      prompt,
-      { maxTokens: 1400, model: ANTHROPIC_MODEL_PLANS }
-    );
-
-    let jsonStr = response.trim();
-    const match = jsonStr.match(/```json\s*([\s\S]*?)```/);
-    if (match) jsonStr = match[1];
-    const plan = normalizeActionPlan(JSON.parse(jsonStr));
-    state.action.primaryAction = plan.primaryAction;
-    state.action.supportingActions = plan.supportingActions;
-    state.action.planGenerated = true;
-    state.action.planSourceNeutronStar = state.clarity.answers.neutronStar || '';
-    state.action.lastGeneratedAt = new Date().toISOString();
-    persistNow();
-    actionAiLoading = false;
-    refreshActionSurface();
-    renderAll();
-  } catch (err) {
-    actionAiLoading = false;
-    actionAiError = err.message;
-    persistNow();
-    refreshActionSurface();
-  }
-}
-
-function swapActionPrimary(idx) {
-  const supporting = state.action.supportingActions || [];
-  if (idx < 0 || idx >= supporting.length) return;
-  const old = state.action.primaryAction;
-  state.action.primaryAction = supporting[idx];
-  supporting[idx] = old;
-  state.action.supportingActions = supporting;
-  persistNow();
-  refreshActionSurface();
-}
 
 // === Round 9 - Draft-first Action generation =====================
 // Called when the user taps Begin (or has no plan yet). Builds the full plan
@@ -1507,6 +1228,12 @@ async function generateActionDraft(options = {}) {
   // Round 10: timeframe gate. If Clarity didn't capture a usable timeframe,
   // show a one-shot question screen before generating. Skip the gate in
   // next-step mode, by then we already have a plan with a timeframe.
+  // Seed from the synthesis timeHorizon first (older runs stored only that).
+  if (String(state.clarity.answers.timeframe || '').trim().length < 3 &&
+      String(state.clarity.answers.timeHorizon || '').trim().length >= 3) {
+    state.clarity.answers.timeframe = state.clarity.answers.timeHorizon;
+    persistNow();
+  }
   const tf = String(state.clarity.answers.timeframe || '').trim();
   if (!isNextStep && tf.length < 3) {
     actionNeedsTimeframe = true;
@@ -1542,7 +1269,9 @@ async function generateActionDraft(options = {}) {
       `Neutron Star: ${summary.neutronStar || ''}`,
       `Why it matters: ${summary.coreWhy || ''}`,
       `Identity statement: ${state.clarity.answers.identityLine || ''}`,
-      `Fears: ${(state.clarity.answers.fears || []).join(', ')}`,
+      summary.antiVision ? `Anti-vision (the future they fear if they never act, use it to make the stakes concrete without doom): ${summary.antiVision}` : '',
+      summary.futureVision ? `Future vision (the picture if it works, echo it in the path's looksLike fields): ${summary.futureVision}` : '',
+      summary.tensionLine ? `The tension underneath their goal (subtext they circled but never said): ${summary.tensionLine}` : '',
       `TIMEFRAME (use this to size your path steps): ${state.clarity.answers.timeframe || ''}`,
       intakeLines ? `Action intake answers (use these, do not re-ask them):\n${intakeLines}` : '',
       tail ? `Tail of Clarity conversation (verbatim, use their words):\n${tail}` : '',
@@ -1557,7 +1286,7 @@ async function generateActionDraft(options = {}) {
     const response = await callClaude(
       [{ role: 'user', content: userBody }],
       AI_ACTION_DRAFT_SYSTEM_PROMPT,
-      { maxTokens: 1400, model: ANTHROPIC_MODEL_PLANS }
+      { maxTokens: 1400, model: ANTHROPIC_MODEL_PLANS, timeout: 90000 }
     );
 
     let jsonStr = response.trim();
@@ -1588,7 +1317,7 @@ async function generateActionDraft(options = {}) {
         const retryResponse = await callClaude(
           [{ role: 'user', content: retryBody }],
           AI_ACTION_DRAFT_SYSTEM_PROMPT,
-          { maxTokens: 1400, model: ANTHROPIC_MODEL_PLANS }
+          { maxTokens: 1400, model: ANTHROPIC_MODEL_PLANS, timeout: 90000 }
         );
         let retryJson = retryResponse.trim()
           .replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();
@@ -1636,101 +1365,6 @@ async function generateActionDraft(options = {}) {
 // current action complete.
 async function regenerateActionPlanForNextStep() {
   return generateActionDraft({ nextStep: true });
-}
-
-// === Round 8 - Adaptive Action chat ===============================
-// Sends the conversation so far to the AI and parses its next response,
-// which is either a next question or the final synthesized plan.
-async function sendActionChatTurn() {
-  if (actionChatSending) return;
-  actionChatSending = true;
-  actionChatError = null;
-  refreshActionSurface();
-
-  try {
-    const summary = normalizeClaritySummary(state.clarity.answers);
-    const clarityConvo = (state.clarity.answers.aiConversation || [])
-      .slice(-6)
-      .map(m => (m.role === 'user' ? 'User: ' : 'Coach: ') + m.content)
-      .join('\n');
-    const contextLines = [
-      `Neutron Star: ${summary.neutronStar || ''}`,
-      `Why it matters: ${summary.coreWhy || ''}`,
-      `Identity: ${state.clarity.answers.identityLine || ''}`,
-      `Anti-vision: ${summary.antiVision || ''}`,
-      `Future vision: ${summary.futureVision || ''}`,
-      clarityConvo ? `Tail of their Clarity conversation:\n${clarityConvo}` : ''
-    ].filter(Boolean).join('\n\n');
-
-    // Build the user-facing chat history as a single user message with the
-    // full transcript so the AI sees turn order clearly.
-    const transcript = actionChatMessages.length
-      ? actionChatMessages.map(m => (m.role === 'user' ? 'User: ' : 'Coach: ') + m.content).join('\n\n')
-      : '(No turns yet. This is the first question.)';
-
-    const userBody = `PERSON CONTEXT:\n${contextLines}\n\nCONVERSATION SO FAR:\n${transcript}\n\nReturn the next question, or the final plan if you have enough.`;
-
-    const response = await callClaude(
-      [{ role: 'user', content: userBody }],
-      AI_ACTION_CHAT_SYSTEM_PROMPT,
-      { maxTokens: 1400, model: ANTHROPIC_MODEL_PLANS }
-    );
-
-    let jsonStr = response.trim();
-    const fenced = jsonStr.match(/```(?:json)?\s*([\s\S]*?)```/);
-    if (fenced) jsonStr = fenced[1].trim();
-    const parsed = JSON.parse(jsonStr);
-
-    if (parsed && parsed.done && parsed.plan) {
-      const plan = normalizeActionPlan(parsed.plan);
-      state.action.primaryAction = plan.primaryAction;
-      state.action.supportingActions = plan.supportingActions;
-      state.action.focusPlan = plan.focusPlan;
-      state.action.planGenerated = true;
-      state.action.planSourceNeutronStar = state.clarity.answers.neutronStar || '';
-      state.action.lastGeneratedAt = new Date().toISOString();
-      state.action.aiConversation = [...actionChatMessages];
-      actionChatCurrentQuestion = '';
-      actionChatCurrentType = 'text';
-      actionChatCurrentOptions = [];
-      actionChatSending = false;
-      persistNow();
-      refreshActionSurface();
-      renderAll();
-      return;
-    }
-
-    // Otherwise the AI returned a next question.
-    // Sanitize: strip em/en dashes even when the AI ignores the prompt rule.
-    const sanitize = (s) => String(s || '').replace(/[\u2014\u2013]/g, ',').replace(/\s+,/g, ',').replace(/,,/g, ',').trim();
-    actionChatCurrentQuestion = trimText(sanitize(parsed.question), 240);
-    actionChatCurrentType = parsed.type === 'select' ? 'select' : 'text';
-    actionChatCurrentOptions = Array.isArray(parsed.options)
-      ? parsed.options.slice(0, 6).map(o => trimText(sanitize(o), 80)).filter(Boolean)
-      : [];
-    actionChatReady = true;
-    actionChatSending = false;
-    state.action.aiConversation = [...actionChatMessages];
-    persistNow();
-    refreshActionSurface();
-  } catch (err) {
-    actionChatSending = false;
-    actionChatError = err && err.message ? err.message : 'Could not reach the AI. Try again.';
-    refreshActionSurface();
-  }
-}
-
-// Called when the user replies to the current AI question.
-function submitActionChatReply(value) {
-  const text = String(value || '').trim();
-  if (!text) return;
-  actionChatMessages.push({ role: 'assistant', content: actionChatCurrentQuestion });
-  actionChatMessages.push({ role: 'user', content: text });
-  // Clear the question so the UI shows the thinking state until the next turn arrives.
-  actionChatCurrentQuestion = '';
-  actionChatCurrentOptions = [];
-  refreshActionSurface();
-  sendActionChatTurn();
 }
 
 // Refresh just one section of the rendered plan via a targeted AI call.
@@ -3623,15 +3257,26 @@ async function triggerSynthesis() {
       ans.futureVision = r.futureVision || ans.futureVision || '';
       ans.identityLine = r.identityLine || ans.identityLine || '';
       ans.timeHorizon = r.timeHorizon || ans.timeHorizon || '';
+      // Seed the Action-side timeframe from the Clarity timeHorizon so the
+      // Action intake opens already knowing their timeline (it confirms it
+      // instead of asking cold, and the timeframe gate never fires).
+      if (ans.timeHorizon && String(ans.timeframe || '').trim().length < 3) {
+        ans.timeframe = ans.timeHorizon;
+      }
       ans.anchor = r.anchor || ans.anchor || '';
       ans.intensity = r.intensity || ans.intensity || '';
       ans.whyItMatters = ans.coreWhy;
       ans.aiConversation = [...aiChatMessages];
-      state.clarity.completed = true;
-      if (!state.clarity.completedAt) state.clarity.completedAt = Date.now();
-      if (state.dev) state.dev.relocked = false;
+      // Only mark Clarity COMPLETED when the synthesis produced a real star.
+      // An "insufficient" synthesis (empty neutronStar) shows the fallback
+      // screen and must not unlock downstream surfaces with an empty core.
+      if (ans.neutronStar) {
+        state.clarity.completed = true;
+        if (!state.clarity.completedAt) state.clarity.completedAt = Date.now();
+        if (state.dev) state.dev.relocked = false;
+        try { Analytics.track('ceremony_done'); } catch (e) {} // Activation Point
+      }
       persistNow();
-      try { Analytics.track('ceremony_done'); } catch (e) {} // Activation Point
     } catch (e) {}
     refreshAiChatUI();
   } catch (err) {
@@ -3643,10 +3288,16 @@ async function triggerSynthesis() {
 
 function completeWizard() {
   const a = wizardAnswers;
-  state.clarity.completed = true;
-  if (!state.clarity.completedAt) state.clarity.completedAt = Date.now();
-  if (state.dev) state.dev.relocked = false;
-  try { Analytics.track('ceremony_done'); } catch (e) {} // Activation Point
+  // A real star must exist (fresh synthesis or restored answers) before
+  // Clarity counts as completed. Never revoke a previous completion.
+  const hasStar = !!((aiSynthesisResult && aiSynthesisResult.neutronStar) ||
+    (state.clarity.answers && state.clarity.answers.neutronStar));
+  if (hasStar) {
+    state.clarity.completed = true;
+    if (!state.clarity.completedAt) state.clarity.completedAt = Date.now();
+    if (state.dev) state.dev.relocked = false;
+    try { Analytics.track('ceremony_done'); } catch (e) {} // Activation Point
+  }
   delete state.clarity.draft; // Clear saved progress
 
   // Map domains (now an array of 1-2)
@@ -3665,6 +3316,9 @@ function completeWizard() {
     state.clarity.answers.futureVision = aiSynthesisResult.futureVision || '';
     state.clarity.answers.identityLine = aiSynthesisResult.identityLine || '';
     state.clarity.answers.timeHorizon = aiSynthesisResult.timeHorizon || '';
+    if (state.clarity.answers.timeHorizon && String(state.clarity.answers.timeframe || '').trim().length < 3) {
+      state.clarity.answers.timeframe = state.clarity.answers.timeHorizon;
+    }
     state.clarity.answers.anchor = aiSynthesisResult.anchor || '';
     state.clarity.answers.intensity = aiSynthesisResult.intensity || '';
     state.clarity.answers.keystone = aiSynthesisResult.neutronStar || domainLabel || '';
