@@ -2756,42 +2756,25 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
   min-height: 100%;
 }
 
-/* iOS KEYBOARD FIX v2 (Malik, live on-device iteration 2026-07-03): the
-   free-text answer field is a FIXED BOTTOM COMPOSER, cloned from the chat
-   compose bar (.action-chat__input-row), the one keyboard pattern confirmed
-   smooth on Malik's phone. iOS never pans the page for a field that is
-   position:fixed and pinned to the visible-viewport bottom, so the question
-   holds perfectly still and only the composer rides up with the keyboard
-   (iMessage behavior). v1 (static top-anchoring) failed on-device: iOS panned
-   the page to its own preferred field position regardless. The bar is fixed
-   FULL-TIME from render (an on-focus toggle is the one variant that failed
-   even for the chat pattern); its bottom offset is driven by visualViewport
-   in _setupWizComposerPinning (js/02). Fixed only inside the fullscreen
-   experience; anywhere else the wrap stays in normal flow. */
-/* The composer is re-parented to the fullscreen root (out of the animated
-   page subtree, whose entry transforms would hijack position:fixed), so the
-   step hook is a root class set in js/02, not :has(). Top-anchor the question
-   so it stays fully visible above the open keyboard. */
+/* iOS KEYBOARD FIX v3 (Malik, live on-device iteration 2026-07-03), the
+   Duolingo geometry: iOS pans the page exactly as far as it needs to put the
+   focused field at its preferred spot above the keyboard. A field pinned low
+   gets the maximum shove (v2, failed on-device); a field HIGH on the screen
+   needs a near-zero pan (Duolingo's age field, confirmed calm on Malik's
+   phone as a PWA). So: question + hint + field all top-anchored in the upper
+   half, and the page wrap made NON-scrollable on these pages so iOS has no
+   scroll slack to fling. Root class set in js/02 bindWizardInFullscreen. */
 .clarity-exp.has-wiz-composer .wiz__step {
   justify-content: flex-start;
-  padding-top: 3vh;
-  padding-bottom: 170px; /* keep the hint clear of the composer on short screens */
+  padding-top: 2vh;
 }
-.clarity-exp .wiz__composer {
-  position: fixed;
-  left: 0; right: 0; bottom: 0; /* real bottom set by _setupWizComposerPinning */
-  margin: 0 auto;
-  max-width: 640px;
-  z-index: 6;
-  padding: 10px 16px 12px;
-  background: rgba(10, 10, 14, 0.62);
-  backdrop-filter: blur(calc(22px * var(--bx, 1))) saturate(125%);
-  -webkit-backdrop-filter: blur(calc(22px * var(--bx, 1))) saturate(125%);
+.clarity-exp.has-wiz-composer .clarity-exp__page-wrap {
+  overflow: hidden; /* zero pan slack; content fits the upper half by design */
 }
-html.theme-light .clarity-exp .wiz__composer { background: rgba(248, 248, 250, 0.72); }
+.clarity-exp .wiz__composer { margin-top: 14px; }
 .clarity-exp .wiz__composer .wiz__textarea {
   min-height: 96px;              /* 3 text lines + padding, so placeholders never clip */
-  max-height: min(148px, 22vh);  /* grows upward from the bar, then scrolls inside */
+  max-height: min(148px, 20vh);  /* long answers scroll inside, field bottom stays above the keyboard */
 }
 
 

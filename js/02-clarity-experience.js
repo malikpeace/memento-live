@@ -1429,9 +1429,7 @@ const ClarityExperience = {
           });
           if (micBtn) {
             const wrap = input.closest('.wiz__text-wrap');
-            // The composer is position:fixed (its own positioning context);
-            // forcing relative here would knock it back into normal flow.
-            if (wrap) { if (!wrap.classList.contains('wiz__composer')) wrap.style.position = 'relative'; wrap.appendChild(micBtn); input.style.paddingRight = '48px'; }
+            if (wrap) { wrap.style.position = 'relative'; wrap.appendChild(micBtn); input.style.paddingRight = '48px'; }
           }
         } else {
           input.addEventListener('keydown', (e) => {
@@ -1444,20 +1442,12 @@ const ClarityExperience = {
       }
     });
 
-    // Free-text pages: the answer field is a fixed bottom composer that rides
-    // the keyboard (same proven pattern as the chat compose bar). It must live
-    // OUTSIDE the page/step subtree: their entry animations apply transforms,
-    // and any transformed ancestor hijacks position:fixed away from the
-    // viewport. Re-parent it to the fullscreen root (fixed, inset 0), then pin.
-    document.querySelectorAll('#clarityExp > .wiz__composer').forEach(n => n.remove());
-    const composer = container.querySelector('.wiz__composer');
-    if (composer && this.el) {
-      this.el.appendChild(composer);
-      this.el.classList.add('has-wiz-composer');
-      this._setupWizComposerPinning();
-    } else if (this.el) {
-      this.el.classList.remove('has-wiz-composer');
-    }
+    // Free-text pages (Duolingo geometry, v519): iOS pans exactly as far as
+    // needed to put the focused field at its preferred spot above the
+    // keyboard, so the fix is to give it NOTHING to do: field high on the
+    // screen right under the question, and the page made non-scrollable so
+    // there is no slack to fling. The root class drives that layout in CSS.
+    if (this.el) this.el.classList.toggle('has-wiz-composer', !!container.querySelector('.wiz__composer'));
 
     // Bind AI chat if on that step (the AI service is built in; there is no
     // key-entry state anymore).
@@ -1512,38 +1502,6 @@ const ClarityExperience = {
     }
   },
 
-  // Pin the free-text answer composer (.wiz__composer) to the bottom of the
-  // VISIBLE viewport, exactly like the chat compose bar (_setupComposeBarPinning
-  // in ActionExperience, confirmed smooth on-device). At rest it sits on top of
-  // the Back/Next nav; when the iOS keyboard opens it rides up with it while the
-  // rest of the page holds still. The bar is position:fixed FULL-TIME from
-  // render (never toggled on focus - the on-focus variant failed on-device,
-  // see js/11 welcomeComposerPin notes).
-  _setupWizComposerPinning() {
-    try {
-      if (!window.visualViewport) return;
-      const vv = window.visualViewport;
-      if (!this._wizComposerVVUpdate) {
-        this._wizComposerVVUpdate = () => {
-          const bar = document.querySelector('.clarity-exp .wiz__composer');
-          if (!bar) return;
-          const nav = document.querySelector('.clarity-exp__nav');
-          const rest = nav ? nav.offsetHeight : 0;
-          const gap = window.innerHeight - vv.height - vv.offsetTop;
-          bar.style.bottom = `${Math.max(gap, rest, 0)}px`;
-        };
-        vv.addEventListener('resize', this._wizComposerVVUpdate);
-        vv.addEventListener('scroll', this._wizComposerVVUpdate);
-        window.addEventListener('resize', this._wizComposerVVUpdate);
-      }
-      this._wizComposerVVUpdate();
-      // The nav re-renders right after bind (updateNav), which changes its
-      // height; re-measure once the frame settles and after the page
-      // transition finishes.
-      requestAnimationFrame(this._wizComposerVVUpdate);
-      setTimeout(this._wizComposerVVUpdate, 420);
-    } catch (_) {}
-  },
 
   next() {
     if (this.transitioning) return;
