@@ -2764,14 +2764,17 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
    phone as a PWA). So: question + hint + field all top-anchored in the upper
    half, and the page wrap made NON-scrollable on these pages so iOS has no
    scroll slack to fling. Root class set in js/02 bindWizardInFullscreen. */
+/* Center the free-text page with the SAME rule as the multiple-choice pages
+   (base .wiz__step already uses justify-content:center) so every question sits
+   at the same balanced spot, never shifted up. On a normal-height phone the
+   centered field lands just above the keyboard, so iOS only has to nudge it up
+   a little (the Duolingo effect Malik wants), not shove the whole screen. The
+   overflow:hidden keeps zero scroll slack so iOS cannot fling past that nudge. */
 .clarity-exp.has-wiz-composer .wiz__step {
-  justify-content: flex-start;
-  /* Sit a touch lower than dead-top so it reads centered, but keep the field
-     well above the keyboard line so iOS still has near-zero pan to do. */
-  padding-top: 12vh;
+  justify-content: center;
 }
 .clarity-exp.has-wiz-composer .clarity-exp__page-wrap {
-  overflow: hidden; /* zero pan slack; content fits the upper half by design */
+  overflow: hidden; /* no scroll slack for iOS to fling into */
 }
 .clarity-exp .wiz__composer { margin-top: 14px; }
 .clarity-exp .wiz__composer .wiz__textarea {
