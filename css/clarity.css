@@ -2721,17 +2721,20 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
 .clarity-exp__close::after { content: ''; position: absolute; inset: -4px; } /* 36px visual -> 44px tap target */
 .clarity-exp__close:active { background: var(--kfill-14); }
 
-/* Progress bar - hidden */
+/* Progress bar: ONE thin linear track pinned at the very top of the screen,
+   just under the close button (Malik, 2026-07-03). Overlaid (absolute) so it
+   never shifts the page layout when a page has no bar; content is written by
+   updateProgress in js/02 and reuses the .ai-progress__bar/__fill look. */
 .clarity-exp__progress {
-  display: none !important;
+  position: absolute;
+  top: calc(var(--safe-t, 0px) + 60px);
+  left: 20px; right: 20px;
+  z-index: 9;
+  pointer-events: none;
 }
-.clarity-exp__progress-dot {
-  flex: 1; height: 3px; border-radius: 2px;
-  background: var(--kfill-08);
-  transition: background 0.4s ease;
+.clarity-exp__progress .ai-progress__fill {
+  transition: width 0.5s ease;
 }
-.clarity-exp__progress-dot--done { background: var(--color-clarity); }
-.clarity-exp__progress-dot--current { background: rgba(var(--clarity-rgb),0.5); }
 
 /* Page container */
 .clarity-exp__page-wrap {
@@ -2758,19 +2761,23 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
 
 /* ONE fixed question line for the wizard (Malik, on-device iteration
    2026-07-03): every question headline, chips or free text, starts at the
-   SAME height (30vh), so page to page it reads seamless, all on one line.
-   Content-centering could never do this: a taller page (hint + text box)
-   centers LOWER than a chip page, which is exactly the "text pages sit
-   lower" drift Malik flagged. The fixed anchor also keeps the text field
-   high, so the iOS keyboard needs only a small Duolingo-style nudge instead
-   of the full shove; overflow:hidden leaves iOS no scroll slack to fling.
-   Root class set in js/02 bindWizardInFullscreen. */
+   SAME height (19vh, raised from 30vh per Malik's mockup so the page reads
+   taller and long option lists get the whole screen), page to page it reads
+   seamless, all on one line. Content-centering could never do this: a taller
+   page (hint + text box) centers LOWER than a chip page, which is exactly
+   the "text pages sit lower" drift Malik flagged. The fixed anchor also
+   keeps the text field high, so the iOS keyboard needs only a small
+   Duolingo-style nudge instead of the full shove; overflow:hidden leaves
+   iOS no scroll slack to fling. Root class set in js/02
+   bindWizardInFullscreen. Must clear the top progress bar (safe-t + 60px):
+   page-wrap pads safe-t + 64px, plus the 24px floor here, so it always does. */
 .clarity-exp .wiz__step:has(.wiz__options),
+.clarity-exp .wiz__step:has(.ai-range-wrap),
 .clarity-exp.has-wiz-composer .wiz__step {
   justify-content: flex-start;
   /* page-wrap already pads safe-t + 64px; subtract it so the headline lands
-     at exactly 30vh on every device */
-  padding-top: max(16px, calc(30vh - var(--safe-t, 0px) - 64px));
+     at exactly 19vh on every device */
+  padding-top: max(24px, calc(19vh - var(--safe-t, 0px) - 64px));
 }
 .clarity-exp.has-wiz-composer .clarity-exp__page-wrap {
   overflow: hidden; /* no scroll slack for iOS to fling into */

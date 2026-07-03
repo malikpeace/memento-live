@@ -2610,6 +2610,17 @@ function renderAiKeyPrompt() {
     </div>`;
 }
 
+// Discovery progress percent. Prefer AI-reported progress; fall back to a
+// gentle asymptotic curve so the bar always advances but never hits 100% on
+// its own. Shared by the inline bar and the fullscreen top bar (js/02).
+function aiChatPct() {
+  if (typeof aiChatProgress === 'number' && aiChatProgress >= 0) {
+    return Math.max(4, Math.min(100, Math.round(aiChatProgress)));
+  }
+  const qNum = aiChatMessages.filter(m => m.role === 'assistant').length;
+  return Math.max(4, Math.round(90 * (1 - Math.exp(-qNum / 12))));
+}
+
 function renderAiChat() {
   // Loading state  - thinking animation
   if (aiChatLoading) {
@@ -2634,20 +2645,14 @@ function renderAiChat() {
   // AI question ready  - render based on type
   if (aiCurrentQuestion) {
     const current = aiUserAnswer || '';
-    const _qNum = aiChatMessages.filter(m => m.role === 'assistant').length;
-    // Prefer AI-reported progress; fall back to a gentle asymptotic curve so the bar always advances but never hits 100% on its own.
-    let _pct;
-    if (typeof aiChatProgress === 'number' && aiChatProgress >= 0) {
-      _pct = Math.max(4, Math.min(100, Math.round(aiChatProgress)));
-    } else {
-      // Asymptotic toward 90% - never claims completion until AI confirms ready.
-      _pct = Math.round(90 * (1 - Math.exp(-_qNum / 12)));
-      _pct = Math.max(4, _pct);
-    }
-    let html = `<div class="ai-progress">
-        <div class="ai-progress__bar"><div class="ai-progress__fill" style="width:${_pct}%"></div></div>
-      </div>
-      <div class="ai-question-row">
+    // In the fullscreen experience the bar lives in the fixed top slot
+    // (#clarityExpProgress, driven by ClarityExperience.updateProgress) so it
+    // stays pinned to the very top of the screen; inline only as a fallback.
+    const _fsProgress = (typeof ClarityExperience !== 'undefined') && ClarityExperience.isOpen;
+    let html = _fsProgress ? '' : `<div class="ai-progress">
+        <div class="ai-progress__bar"><div class="ai-progress__fill" style="width:${aiChatPct()}%"></div></div>
+      </div>`;
+    html += `<div class="ai-question-row">
         <div class="wiz__question">${esc(aiCurrentQuestion)}</div>
         <button class="ai-rephrase-btn" id="aiRephraseBtn" title="Rephrase this question">?</button>
       </div>
@@ -3570,6 +3575,7 @@ function refreshAiChatUI() {
     ClarityExperience.renderPage(ClarityExperience.currentPage);
     ClarityExperience.bindWizardInFullscreen();
     ClarityExperience.updateNav();
+    ClarityExperience.updateProgress();
   }
 }
 

@@ -1728,14 +1728,36 @@ const ClarityExperience = {
   },
 
   updateProgress() {
-    const total = this.getTotalPages();
-    let html = '';
-    for (let i = 0; i < total; i++) {
-      const cls = i < this.currentPage ? 'clarity-exp__progress-dot--done'
-        : i === this.currentPage ? 'clarity-exp__progress-dot--current' : '';
-      html += `<div class="clarity-exp__progress-dot ${cls}"></div>`;
+    // ONE thin bar pinned at the very top of the screen, under the close
+    // button (Malik, 2026-07-03). Questionnaire pages only: the manual wizard
+    // steps ramp 0-12%, the AI discovery carries 12-100% (aiChatPct, js/03).
+    // Tutorial and synthesis pages render nothing.
+    let pct = -1;
+    if (!this.tutorialOnly) {
+      const offset = this.getWizardOffset();
+      const steps = getWizardSteps();
+      const wizIdx = this.currentPage - offset;
+      const stepKey = steps[wizIdx];
+      if (wizIdx >= 0 && stepKey && stepKey !== 'aiSynthesis') {
+        if (stepKey === 'aiChat') {
+          pct = 12 + Math.round(0.88 * aiChatPct());
+        } else {
+          const aiIdx = Math.max(1, steps.indexOf('aiChat'));
+          pct = Math.round(((wizIdx + 1) / (aiIdx + 1)) * 12);
+        }
+        pct = Math.max(2, Math.min(100, pct));
+      }
     }
-    this.progressEl.innerHTML = html;
+    if (pct < 0) {
+      this.progressEl.innerHTML = '';
+    } else {
+      const fill = this.progressEl.querySelector('.ai-progress__fill');
+      if (fill) {
+        fill.style.width = pct + '%'; // keep the node so the width TRANSITIONS
+      } else {
+        this.progressEl.innerHTML = '<div class="ai-progress__bar"><div class="ai-progress__fill" style="width:' + pct + '%"></div></div>';
+      }
+    }
     this._syncLight();
   },
 
