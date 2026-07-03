@@ -396,27 +396,30 @@ body.lite .ai-thinking {
 .ai-question-row .wiz__question {
   margin-bottom: 0;
   text-align: left;
+  padding-right: 30px; /* reserve space so text never runs under the corner ? */
 }
+/* Quiet rephrase affordance tucked into the top-right corner, out of the
+   reading path. Flat, no border, aligned to the first line of the question. */
 .ai-rephrase-btn {
-  width: 28px; height: 28px;
+  position: absolute;
+  top: 1px; right: 0;
+  width: 22px; height: 22px;
   border-radius: 50%;
-  border: 1px solid rgba(var(--ink),0.12);
-  background: var(--kfill-04);
-  color: rgba(var(--ink),0.4);
-  font-size: 0.75rem;
+  border: none;
+  background: transparent;
+  color: rgba(var(--ink),0.28);
+  font-size: 0.72rem;
   font-weight: 700;
   font-family: var(--font);
   cursor: pointer;
-  transition: all var(--t-fast) ease;
+  transition: color var(--t-fast) ease, background var(--t-fast) ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 10px;
   flex-shrink: 0;
 }
 .ai-rephrase-btn:hover, .ai-rephrase-btn:active {
-  border-color: rgba(123,97,255,0.4);
-  color: rgba(var(--ink),0.7);
+  color: rgba(123,97,255,0.85);
   background: rgba(123,97,255,0.1);
 }
 @keyframes synthSpin { to { transform: rotate(360deg); } }

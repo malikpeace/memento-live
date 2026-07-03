@@ -1126,8 +1126,8 @@ function initSpeechToText(textarea, onInput) {
   btn.className = 'stt-mic-btn';
   btn.type = 'button';
   btn.title = 'Tap to dictate';
-  btn.style.cssText = 'position:absolute;bottom:8px;right:10px;z-index:2;width:32px;height:32px;border-radius:50%;border:1px solid rgba(var(--ink),0.12);background:var(--kfill-06);color:rgba(var(--ink),0.45);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s ease;padding:0;';
-  btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>';
+  btn.style.cssText = 'position:absolute;bottom:8px;right:8px;z-index:2;width:26px;height:26px;border-radius:50%;border:none;background:transparent;color:rgba(var(--ink),0.34);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color 0.15s ease,background 0.15s ease;padding:0;';
+  btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>';
 
   let listening = false;
   let recognition = null;
@@ -1149,14 +1149,12 @@ function initSpeechToText(textarea, onInput) {
     const needsSpace = startVal.length > 0 && !startVal.endsWith(' ') && !startVal.endsWith('\n');
 
     function setActive() {
-      btn.style.background = 'rgba(220, 50, 50, 0.25)';
-      btn.style.borderColor = 'rgba(220, 50, 50, 0.5)';
+      btn.style.background = 'rgba(220, 50, 50, 0.18)';
       btn.style.color = '#ff6b6b';
     }
     function setInactive() {
-      btn.style.background = 'var(--kfill-06)';
-      btn.style.borderColor = 'rgba(var(--ink),0.12)';
-      btn.style.color = 'rgba(var(--ink),0.45)';
+      btn.style.background = 'transparent';
+      btn.style.color = 'rgba(var(--ink),0.34)';
     }
 
     recognition.onstart = () => {
