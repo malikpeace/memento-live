@@ -1340,6 +1340,14 @@ const ClarityExperience = {
     if (!field || !window.visualViewport) return;
     let timer = 0, animating = false;
     const pan = () => Math.max(window.scrollY || document.documentElement.scrollTop || 0, window.visualViewport.offsetTop || 0);
+    // rAF for real display-locked frames on-device; the 40ms timeout only
+    // rescues environments where rAF never fires (the headless preview).
+    const nextFrame = (cb) => {
+      let done = false;
+      const run = () => { if (!done) { done = true; cb(); } };
+      if (window.requestAnimationFrame) requestAnimationFrame(run);
+      setTimeout(run, 40);
+    };
     const glide = () => {
       if (animating || document.activeElement !== field) return;
       const start = window.scrollY || document.documentElement.scrollTop || 0;
@@ -1354,17 +1362,17 @@ const ClarityExperience = {
         const e = 1 - Math.pow(1 - k, 3);
         window.scrollTo(0, Math.round(start * (1 - e)));
         if (pw && pwStart) pw.scrollTop = Math.round(pwStart * (1 - e));
-        if (k < 1) setTimeout(tick, 16);
+        if (k < 1) nextFrame(tick);
         else { animating = false; if (pan() > 1) queue(); }
       };
       tick();
     };
-    // Wait for iOS's shove to STOP MOVING (~90ms quiet) before gliding back,
-    // so the ease-out reads as one intentional motion, not a fight.
+    // Wait for iOS's shove to STOP MOVING (a beat of quiet) before gliding
+    // back, so the ease-out reads as one intentional motion, not a fight.
     const queue = () => {
       if (animating) return;
       if (timer) clearTimeout(timer);
-      timer = setTimeout(() => { timer = 0; glide(); }, 90);
+      timer = setTimeout(() => { timer = 0; glide(); }, 35);
     };
     const onFocus = () => {
       window.visualViewport.addEventListener('resize', queue);
