@@ -1340,35 +1340,40 @@ const ClarityExperience = {
     if (!field || !window.visualViewport) return;
     let timer = 0, animating = false;
     const pan = () => Math.max(window.scrollY || document.documentElement.scrollTop || 0, window.visualViewport.offsetTop || 0);
-    // rAF for real display-locked frames on-device; the 40ms timeout only
-    // rescues environments where rAF never fires (the headless preview).
-    const nextFrame = (cb) => {
-      let done = false;
-      const run = () => { if (!done) { done = true; cb(); } };
-      if (window.requestAnimationFrame) requestAnimationFrame(run);
-      setTimeout(run, 40);
-    };
+    // FLIP settle (v526): animating scrollTo in JS repaints on the busy main
+    // thread while the keyboard opens, which iOS quantizes into 3-4 visible
+    // steps. Instead: reset the scroll in ONE invisible jump, at the same
+    // instant offset the whole view with a transform so it still appears
+    // where iOS left it, then let the COMPOSITOR ease that transform to 0.
     const glide = () => {
       if (animating || document.activeElement !== field) return;
-      const start = window.scrollY || document.documentElement.scrollTop || 0;
+      const P = pan();
       const pw = this.pageWrap;
-      const pwStart = pw ? pw.scrollTop : 0;
-      if (start < 2 && pwStart < 2) return;
+      const pwPan = pw ? pw.scrollTop : 0;
+      const total = P + pwPan;
+      if (total < 2) return;
+      const root = this.el;
+      window.scrollTo(0, 0);
+      if (pw && pwPan) pw.scrollTop = 0;
+      if (!root || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
       animating = true;
-      const t0 = performance.now(), D = 220;
-      const tick = () => {
-        if (document.activeElement !== field) { animating = false; window.scrollTo(0, 0); if (pw) pw.scrollTop = 0; return; }
-        const k = Math.min(1, (performance.now() - t0) / D);
-        const e = 1 - Math.pow(1 - k, 3);
-        window.scrollTo(0, Math.round(start * (1 - e)));
-        if (pw && pwStart) pw.scrollTop = Math.round(pwStart * (1 - e));
-        if (k < 1) nextFrame(tick);
-        else { animating = false; if (pan() > 1) queue(); }
+      root.style.transition = 'none';
+      root.style.transform = 'translateY(' + (-total) + 'px)';
+      void root.offsetHeight;
+      root.style.transition = 'transform 240ms cubic-bezier(0.22, 1, 0.36, 1)';
+      root.style.transform = 'translateY(0)';
+      const finish = () => {
+        root.removeEventListener('transitionend', finish);
+        root.style.transition = '';
+        root.style.transform = '';
+        animating = false;
+        if (document.activeElement === field && pan() > 1) queue();
       };
-      tick();
+      root.addEventListener('transitionend', finish);
+      setTimeout(finish, 320);
     };
-    // Wait for iOS's shove to STOP MOVING (a beat of quiet) before gliding
-    // back, so the ease-out reads as one intentional motion, not a fight.
+    // Wait for iOS's shove to STOP MOVING (a beat of quiet) before settling,
+    // so the ease-out reads as one intentional motion, not a fight.
     const queue = () => {
       if (animating) return;
       if (timer) clearTimeout(timer);
