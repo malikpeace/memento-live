@@ -2773,13 +2773,15 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
    page-wrap pads safe-t + 64px, plus the 24px floor here, so it always does. */
 .clarity-exp .wiz__step:has(.wiz__options),
 .clarity-exp .wiz__step:has(.ai-range-wrap),
+.clarity-exp .wiz__step:has(#aiAnswerInput),
 .clarity-exp.has-wiz-composer .wiz__step {
   justify-content: flex-start;
   /* page-wrap already pads safe-t + 64px; subtract it so the headline lands
      at exactly 19vh on every device */
   padding-top: max(24px, calc(19vh - var(--safe-t, 0px) - 64px));
 }
-.clarity-exp.has-wiz-composer .clarity-exp__page-wrap {
+.clarity-exp.has-wiz-composer .clarity-exp__page-wrap,
+.clarity-exp .clarity-exp__page-wrap:has(#aiAnswerInput) {
   overflow: hidden; /* no scroll slack for iOS to fling into */
 }
 

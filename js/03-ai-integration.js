@@ -2963,6 +2963,16 @@ function bindAiChat(container) {
     if (nextBtn && !nextBtn.disabled) nextBtn.click();
   }
 
+  // Every AI question shares one keyboard recipe (Malik, on-device iteration):
+  // the field must sit HIGH (19vh anchor in css/clarity.css, keyed off the field
+  // ids so chip, free-text and "My own answer" all match), then bindKeyboardSettle
+  // settles iOS's overshoot. Reset any prior binding on every fresh render first.
+  const cexpEl = (typeof ClarityExperience !== 'undefined' && ClarityExperience.isOpen) ? ClarityExperience.el : null;
+  if (cexpEl) {
+    cexpEl.classList.remove('has-ai-custom');
+    if (typeof ClarityExperience.clearFieldSettle === 'function') ClarityExperience.clearFieldSettle();
+  }
+
   // Free text input
   if (input) {
     input.addEventListener('input', () => {
@@ -2976,6 +2986,9 @@ function bindAiChat(container) {
         submitAnswer();
       }
     });
+    if (cexpEl && typeof ClarityExperience.settleFieldOnFocus === 'function') {
+      ClarityExperience.settleFieldOnFocus(input);
+    }
     setTimeout(() => input.focus(), 300);
   }
 
@@ -2990,7 +3003,6 @@ function bindAiChat(container) {
   // buried under the keyboard when you do. When custom mode is active we collapse
   // the other chips (custom is exclusive anyway) so the field rises high under the
   // question, lock the scroll, and reuse the proven bindKeyboardSettle recipe.
-  const cexpEl = (typeof ClarityExperience !== 'undefined' && ClarityExperience.isOpen) ? ClarityExperience.el : null;
   function applyAiCustomLayout(active) {
     if (!cexpEl) return;
     cexpEl.classList.toggle('has-ai-custom', !!active);
@@ -3001,11 +3013,6 @@ function bindAiChat(container) {
     } else if (typeof ClarityExperience.clearFieldSettle === 'function') {
       ClarityExperience.clearFieldSettle();
     }
-  }
-  // Fresh render always starts clean, then re-applies if resuming in custom mode.
-  if (cexpEl) {
-    cexpEl.classList.remove('has-ai-custom');
-    if (typeof ClarityExperience.clearFieldSettle === 'function') ClarityExperience.clearFieldSettle();
   }
 
   // Parse existing answer on resume
@@ -3143,6 +3150,10 @@ function bindAiChat(container) {
     rangeNumber.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') { e.preventDefault(); submitAnswer(); }
     });
+    // Same keyboard-settle recipe when the number field is tapped to type.
+    if (cexpEl && typeof ClarityExperience.settleFieldOnFocus === 'function') {
+      ClarityExperience.settleFieldOnFocus(rangeNumber);
+    }
     // Set initial answer state
     if (rangeNumber.value) {
       aiUserAnswer = rangeNumber.value;
