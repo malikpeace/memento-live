@@ -2779,7 +2779,7 @@ function wizFreeText(question, hint, key, placeholder) {
   const current = wizardAnswers[key] || '';
   return `<div class="wiz__question">${question}</div>
     <div class="wiz__hint">${hint}</div>
-    <div class="wiz__text-wrap"><textarea class="wiz__text-input wiz__textarea" id="wizFreeText_${key}" data-key="${key}" placeholder="${esc(placeholder)}" rows="2">${esc(current)}</textarea></div>`;
+    <div class="wiz__text-wrap wiz__composer"><textarea class="wiz__text-input wiz__textarea" id="wizFreeText_${key}" data-key="${key}" placeholder="${esc(placeholder)}" rows="2">${esc(current)}</textarea></div>`;
 }
 
 function wizSingleSelectInner(options, key) {
