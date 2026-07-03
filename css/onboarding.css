@@ -290,25 +290,45 @@
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
-.ai-thinking__dots {
-  display: flex; gap: 10px;
+/* Aurora Wave thinking loader (Malik's pick, sharpened 2026-07-03): a soft band
+   of Clarity-purple light breathes side to side, echoing the god-ray beams in the
+   app. Sharper than the mockup (tighter blur + crisper light line) so it reads
+   defined, not hazy. Replaces the old 5-dot wave. */
+.aur {
+  position: relative;
+  width: 220px; height: 120px;
+  overflow: visible; /* let the light feather naturally instead of clipping to a box */
 }
-.ai-thinking__dot {
-  width: 7px; height: 7px;
-  border-radius: 50%;
-  background: var(--color-clarity);
-  opacity: 0.15;
-  animation: aiDotWave 1.8s ease-in-out infinite;
+.aur-band {
+  position: absolute; left: -30%; right: -30%;
+  height: 56px; top: 32px; border-radius: 50%;
+  filter: blur(15px);
+  opacity: 0.7;
+  mix-blend-mode: screen;
 }
-.ai-thinking__dot:nth-child(1) { animation-delay: 0s; }
-.ai-thinking__dot:nth-child(2) { animation-delay: 0.15s; }
-.ai-thinking__dot:nth-child(3) { animation-delay: 0.3s; }
-.ai-thinking__dot:nth-child(4) { animation-delay: 0.45s; }
-.ai-thinking__dot:nth-child(5) { animation-delay: 0.6s; }
-@keyframes aiDotWave {
-  0%, 100% { opacity: 0.15; transform: translateY(0) scale(1); }
-  30% { opacity: 1; transform: translateY(-6px) scale(1.2); box-shadow: 0 0 12px rgba(123,97,255,0.4); }
-  60% { opacity: 0.3; transform: translateY(0) scale(1); }
+.aur-band.b1 {
+  background: radial-gradient(58% 100% at 50% 50%, rgba(140,112,255,0.95), rgba(85,80,204,0) 68%);
+  animation: aurDrift 4.5s ease-in-out infinite;
+}
+.aur-band.b2 {
+  top: 46px; height: 38px;
+  background: radial-gradient(52% 100% at 50% 50%, rgba(226,216,255,0.8), rgba(123,97,255,0) 70%);
+  animation: aurDrift 6s ease-in-out infinite reverse;
+}
+@keyframes aurDrift {
+  0%, 100% { transform: translateX(-16%) scaleY(0.82); opacity: 0.45; }
+  50%      { transform: translateX(16%) scaleY(1.12); opacity: 0.95; }
+}
+.aur-line {
+  position: absolute; top: 60px; left: 14%; right: 14%;
+  height: 2px; border-radius: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.95), transparent);
+  box-shadow: 0 0 9px rgba(140,112,255,0.85);
+  animation: aurPulse 4.5s ease-in-out infinite;
+}
+@keyframes aurPulse {
+  0%, 100% { opacity: 0.4; }
+  50%      { opacity: 1; }
 }
 /* v19 cohesion/a11y: the AI-chat animations were the one surface that never
    opted into the app's motion-preference system. Gate them like everything else
@@ -317,11 +337,12 @@ body.calm-motion .ai-chat__bubble, body.lite .ai-chat__bubble,
 body.calm-motion .ai-chat__dot, body.lite .ai-chat__dot,
 body.calm-motion .ai-synthesis, body.lite .ai-synthesis,
 body.calm-motion .ai-thinking, body.lite .ai-thinking,
-body.calm-motion .ai-thinking__dot, body.lite .ai-thinking__dot {
+body.calm-motion .aur-band, body.lite .aur-band,
+body.calm-motion .aur-line, body.lite .aur-line {
   animation: none !important;
 }
 @media (prefers-reduced-motion: reduce) {
-  .ai-chat__bubble, .ai-chat__dot, .ai-synthesis, .ai-thinking, .ai-thinking__dot { animation: none !important; }
+  .ai-chat__bubble, .ai-chat__dot, .ai-synthesis, .ai-thinking, .aur-band, .aur-line { animation: none !important; }
 }
 
 /* AI discovery progress bar */
