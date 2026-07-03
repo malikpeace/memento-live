@@ -2756,6 +2756,29 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
   min-height: 100%;
 }
 
+/* iOS KEYBOARD FIX (Malik, 2026-07-03): free-text wizard pages are anchored
+   HIGH, not vertically centered. Centering parked the textarea at ~55% of the
+   screen, exactly where the iOS keyboard lands, so focusing it made iOS pan
+   the whole fullscreen overlay up to reveal the field (question crammed under
+   the status bar, content cut off). With the question + field laid out in the
+   top ~45% the field is already fully visible above the keyboard, iOS has
+   nothing to reveal, and the layout holds still while the keyboard slides
+   over the empty lower half. Pure static layout, NO focus-time JS (six JS
+   keyboard interventions have failed on-device, see js/11 welcomeComposerPin
+   notes). Scoped to steps owning a real free-text field; choice/chip pages
+   with a collapsible "own answer" input keep the centered look. */
+.clarity-exp .wiz__step:has(.wiz__text-wrap:not(.wiz__text-wrap--collapsible)) {
+  justify-content: flex-start;
+  padding-top: 3vh;
+}
+/* Cap the auto-grow on those pages so a long answer can never push the
+   field's bottom edge down under the keyboard line (~55vh); past the cap the
+   text scrolls inside the field instead. */
+.clarity-exp .wiz__step:has(.wiz__text-wrap:not(.wiz__text-wrap--collapsible)) .wiz__textarea {
+  min-height: 124px;  /* 4 text lines + padding, whole lines only */
+  max-height: min(148px, 24vh);  /* 5 text lines, no half-clipped line at the cap */
+}
+
 
 /* ============================================================
    IGNITION - the one-time Clarity ending ceremony.
