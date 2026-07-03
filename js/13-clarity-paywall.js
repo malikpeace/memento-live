@@ -220,6 +220,7 @@ const ClarityPaywall = {
       state.entitlements.plan = picked ? (picked.getAttribute('data-plan') || 'lifetime') : 'lifetime';
       if (typeof persistNow === 'function') persistNow();
       try { if (typeof Analytics !== 'undefined') Analytics.track('paywall_unlock', { plan: state.entitlements.plan }); } catch (e) {} // Funnel
+      try { window.MementoPush && MementoPush.sync(); } catch (e) {} // reminder context: now paid
     } catch (e) {}
     this.hide();
     try { if (typeof renderAll === 'function') renderAll(); } catch (e) {}

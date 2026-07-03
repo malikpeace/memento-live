@@ -2902,6 +2902,7 @@ function creditTodayAction() {
     state.action.completionHistory.push({ id: id, date: new Date().toISOString(), tier, actionText, planTitle: pa.title || '' });
     try { writeProofEvent('action-complete', { title: actionText || pa.title || 'Action completed', module: 'action', metadata: { tier } }); } catch (_) {}
     try { Analytics.track('action_done', { tier }); } catch (_) {} // Activation Point
+    try { window.MementoPush && MementoPush.sync(); } catch (_) {} // reminder context: day is done
     if (typeof recalculateStreak === 'function') { try { recalculateStreak(); } catch (_) {} }
     try { persistNow(); } catch (_) {}
     return id;
@@ -4022,6 +4023,8 @@ function renderDayCard() {
           // later re-render can never replay it (adding to a detached wrap is inert)
           setTimeout(() => { try { wrap.classList.add('daycard-firstwhite'); } catch (e) {} }, 520);
           setTimeout(() => { try { wrap.classList.remove('daycard-firstwhite'); } catch (e) {} }, 3600);
+          // The one push-permission ask, right after the win lands (js/20-push).
+          setTimeout(() => { try { window.MementoPush && MementoPush.maybePromptAfterFirstWin(); } catch (e) {} }, 4300);
         }
       } catch (e) {}
     } else {

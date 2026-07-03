@@ -82,3 +82,29 @@ self.addEventListener('fetch', (event) => {
       }))
   );
 });
+
+/* Web Push (js/20-push.js subscribes; push-tick sends). Payload is JSON:
+   { title, body, kind }. One tag per kind so a morning reminder never
+   stacks under an evening one. */
+self.addEventListener('push', (event) => {
+  let data = {};
+  try { data = event.data ? event.data.json() : {}; } catch (e) {}
+  const title = data.title || 'Memento';
+  event.waitUntil(self.registration.showNotification(title, {
+    body: data.body || '',
+    icon: './icons/icon-192.png',
+    badge: './icons/icon-192.png',
+    tag: 'memento-' + (data.kind || 'reminder'),
+    data: { kind: data.kind || '' }
+  }));
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
+      for (const c of list) { if ('focus' in c) return c.focus(); }
+      return clients.openWindow(self.registration.scope);
+    })
+  );
+});
