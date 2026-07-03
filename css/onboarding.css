@@ -367,22 +367,16 @@ body.lite .ai-thinking {
   background: var(--kfill-08);
   overflow: hidden;
 }
-@keyframes ai-shimmer {
-  0%   { background-position: 200% center; }
-  100% { background-position: -200% center; }
-}
 .ai-progress__fill {
   height: 100%;
   border-radius: 2px;
+  /* Static fill, mostly white with a whisper of purple at the tail and pure
+     white at the leading edge (Malik, 2026-07-03): no more constant shimmer. */
   background: linear-gradient(90deg,
-    rgba(123,97,255,0.5) 0%,
-    rgba(180,160,255,0.9) 35%,
-    rgba(220,210,255,1) 50%,
-    rgba(180,160,255,0.9) 65%,
-    rgba(123,97,255,0.5) 100%
+    rgba(196,186,255,0.72) 0%,
+    rgba(232,228,255,0.95) 55%,
+    rgba(255,255,255,1) 100%
   );
-  background-size: 200% 100%;
-  animation: ai-shimmer 12s linear infinite;
   transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
