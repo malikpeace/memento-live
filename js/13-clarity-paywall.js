@@ -178,6 +178,11 @@ const ClarityPaywall = {
               '<p>I built this because I watched years almost slip past me on autopilot. I priced it once so it never becomes another bill you forget about. If it does not move you, take the refund.' +
                 '<span class="cpw__founder-who">Malik, founder of Memento</span></p>' +
             '</div>' +
+            '<div class="cpw__legal">' +
+              '<a href="legal/terms.html" target="_blank" rel="noopener">Terms</a>' +
+              '<span aria-hidden="true">&middot;</span>' +
+              '<a href="legal/privacy.html" target="_blank" rel="noopener">Privacy</a>' +
+            '</div>' +
           '</div>' +
         '</div>';
 

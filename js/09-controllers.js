@@ -5184,6 +5184,7 @@ const TabBar = {
       <button class="sheet-btn" id="profileReset" style="background: var(--kfill-12); color: var(--color-action); border: 1px solid rgba(var(--ink),0.25); margin-top: 24px;">Reset Everything</button>
       <div style="font-size: 0.6875rem; color: var(--text-3); text-align: center; margin-top: 12px;">This will delete all your data and start fresh.</div>
       <div style="font-size: 0.6875rem; color: var(--text-3); text-align: center; margin-top: 28px; letter-spacing: 0.06em;">Memento ${(window.MEMENTO_VERSION || '')}</div>
+      <div style="font-size: 0.6875rem; text-align: center; margin-top: 8px;"><a href="legal/terms.html" target="_blank" rel="noopener" style="color: var(--text-3); text-decoration: none; font-weight: 600;">Terms</a><span style="color: var(--text-3); margin: 0 8px;">&middot;</span><a href="legal/privacy.html" target="_blank" rel="noopener" style="color: var(--text-3); text-decoration: none; font-weight: 600;">Privacy</a></div>
     `;
     // Preferences bindings (accent / reduce motion / density)
     this.bindPreferences();

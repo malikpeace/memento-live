@@ -390,6 +390,20 @@
 }
 .cpw__founder p { font-size: 0.82rem; color: rgba(var(--ink, 235, 238, 248), 0.6); line-height: 1.55; margin: 0; }
 .cpw__founder-who { display: block; margin-top: 6px; font-size: 0.76rem; color: rgba(var(--ink, 235, 238, 248), 0.42); font-weight: 600; }
+.cpw__legal {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 26px;
+  font-size: 0.72rem;
+  color: rgba(var(--ink, 235, 238, 248), 0.3);
+}
+.cpw__legal a {
+  color: rgba(var(--ink, 235, 238, 248), 0.42);
+  text-decoration: none;
+  font-weight: 600;
+}
+.cpw__legal a:hover { color: rgba(var(--ink, 235, 238, 248), 0.7); }
 
 @keyframes cpwRise {
   from { opacity: 0; transform: translateY(14px); }
