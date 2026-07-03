@@ -3986,6 +3986,25 @@ function renderDayCard() {
       const wrap = el.querySelector('.daycard-wrap');
       setLivingCardVars(wrap);
       startLivingWander(wrap);
+      // FIRST WHITE: the one-time ceremony when the card earns its first action
+      // light (FIRST-WIN-PLAN #4/#5: log the first move -> the card gains its
+      // first white, 2-3s, not confetti). The white blob blooms in bright, holds
+      // a beat, then settles to its true earned level (css/daycard-living.css
+      // dcFirstWhite). Fires once ever, only with the card actually on screen,
+      // and never on the same render as the full color reveal above (that bloom
+      // already carries every channel in from clear).
+      try {
+        const hasWhite = !!(state.action && Array.isArray(state.action.completionHistory) && state.action.completionHistory.length);
+        const visibleNow = document.body && document.body.classList.contains('boot-revealed') && el.offsetParent !== null;
+        if (visibleNow && !reveal && hasWhite && state.clarity && state.clarity.completed && state.meta && !state.meta.firstWhiteShown) {
+          state.meta.firstWhiteShown = true;
+          try { if (!DEMO_MODE && typeof persistState === 'function') persistState(); } catch (e) {}
+          // let the card settle first, then run the bloom and drop the class so a
+          // later re-render can never replay it (adding to a detached wrap is inert)
+          setTimeout(() => { try { wrap.classList.add('daycard-firstwhite'); } catch (e) {} }, 520);
+          setTimeout(() => { try { wrap.classList.remove('daycard-firstwhite'); } catch (e) {} }, 3600);
+        }
+      } catch (e) {}
     } else {
       stopLivingWander();
     }
@@ -4027,13 +4046,15 @@ function openMementoFull() {
       '<div class="mf-stat mf-stat--action" data-mf-open="action" role="button" tabindex="0">' +
         '<div class="mf-stat__head"><span class="mf-stat__label">Action</span><span class="mf-stat__val">' + act7 + '<span class="mf-stat__unit">/ 7 days</span></span></div>' +
         (todayAction ? '<div class="mf-stat__sub"><span class="mf-stat__sub-key">Today</span> ' + esc(todayAction) + '</div>' : '<div class="mf-stat__sub">Turn your goal into one daily action.</div>') +
-        bar(L.act, 'rgba(236,239,255,0.9)') +
+        // linear days/7, NOT L.act: the bar sits next to the "N / 7 days" figure,
+        // so it must be the same math (L.* carries the light curve, see livingCardLevels)
+        bar(Math.round(act7 / 7 * 100), 'rgba(236,239,255,0.9)') +
       '</div>';
     const consBlock =
       '<div class="mf-stat mf-stat--cons" data-mf-open="streak" role="button" tabindex="0">' +
         '<div class="mf-stat__head"><span class="mf-stat__label">Consistency</span><span class="mf-stat__val">' + streak + '<span class="mf-stat__unit">day streak</span></span></div>' +
-        '<div class="mf-stat__sub">' + (cs.totalActiveDays || 0) + ' active days &middot; ' + Math.round(L.cons) + '% of the last 30</div>' +
-        bar(L.cons, 'var(--color-consistency)') +
+        '<div class="mf-stat__sub">' + (cs.totalActiveDays || 0) + ' active day' + (cs.totalActiveDays === 1 ? '' : 's') + ' &middot; ' + Math.round(cs.pct30 || 0) + '% of the last 30</div>' +
+        bar(Math.round(cs.pct30 || 0), 'var(--color-consistency)') +
       '</div>';
 
     const ov = document.createElement('div');
@@ -4226,10 +4247,24 @@ function openMementoFull() {
 // clarity is the one permanent foundation (locks in once Clarity is completed).
 function livingCardLevels() {
   let clar = (state.clarity && state.clarity.completed) ? 100 : 0;
+  // These are LIGHT levels, not gauges: the raw ratios pass through a sqrt curve
+  // so earned light is actually visible. Linear, the first logged move is 1/7 =
+  // 14% white (invisible at blob opacity ~0.12) and a full first week of showing
+  // up is 23% green; the buyer's first win would not read on the card at all.
+  // sqrt keeps it honest (0 stays 0, only real behavior fills it, 100 stays 100)
+  // but lifts the early ember: 1 action day = 38 white, 7/30 days = 48 green.
+  // Numeric displays (the Memento full-view bars/percent) stay linear; this
+  // curve is only how data becomes light (card + share card + atmosphere).
   let act = 0;
-  try { act = Math.min(100, Math.round(actionLocalDaysInWindow(7) / 7 * 100)); } catch (e) {}
+  try {
+    const d7 = actionLocalDaysInWindow(7);
+    act = d7 > 0 ? Math.min(100, Math.round(Math.sqrt(d7 / 7) * 100)) : 0;
+  } catch (e) {}
   let cons = 0;
-  try { const cs = consistencyStats(); if (cs && typeof cs.pct30 === 'number') cons = cs.pct30; } catch (e) {}
+  try {
+    const cs = consistencyStats();
+    if (cs && typeof cs.pct30 === 'number' && cs.pct30 > 0) cons = Math.min(100, Math.round(Math.sqrt(cs.pct30 / 100) * 100));
+  } catch (e) {}
   return { clar, act, cons };
 }
 

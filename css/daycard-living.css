@@ -178,10 +178,26 @@ body:not(.ns-bloom) .daycard-theme-living .daycard-wrap__aura {
   transition: opacity 0.6s ease;
 }
 
+/* ── FIRST WHITE ceremony: the one-time moment the card earns its first action
+   light. The white blob (b2, in the liquid AND its bloom/floor echoes: this
+   selector matches all three copies) blooms in bright, holds a breath, then
+   settles to its true earned opacity. ~3s total, quiet, no confetti. The class
+   is added/removed by JS in renderDayCard, once per lifetime. */
+@keyframes dcFirstWhite {
+  0%   { opacity: 0; }
+  38%  { opacity: 0.55; }   /* peak tuned in preview: 0.78 washed the purple out */
+  58%  { opacity: 0.55; }
+  100% { opacity: calc(var(--act, 0) * 0.82); }
+}
+.daycard-theme-living.daycard-firstwhite .blob.b2 {
+  animation: dcFirstWhite 2.9s cubic-bezier(0.33, 1, 0.68, 1) both;
+}
+
 /* Reduced motion: hold the color state, drop the glimmer (the JS wander already
    honors prefers-reduced-motion by not animating). */
 @media (prefers-reduced-motion: reduce) {
   .daycard-theme-living .daycard-ns__burn { animation: none; opacity: calc(var(--ring, 0) * 0.6); }
+  .daycard-theme-living.daycard-firstwhite .blob.b2 { animation: none; }
 }
 
 /* ── Mobile: keep the card from UNLOADING when it scrolls off the snap page ────
