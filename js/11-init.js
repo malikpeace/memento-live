@@ -739,7 +739,8 @@ function initNeutronStarStarView(scope) {
   const detailWrap = scope.querySelector('#nsStarDetail');
   const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const hasMouse = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-  if (card && detailWrap && hasMouse && !reducedMotion) {
+  // The manifesto page (P4) is flat typography, not a floating card: no tilt.
+  if (card && detailWrap && hasMouse && !reducedMotion && !card.classList.contains('ns-manifesto')) {
     detailWrap.style.perspective = '1100px';
     card.style.transformStyle = 'preserve-3d';
     card.style.willChange = 'transform';
@@ -1833,6 +1834,19 @@ window.addEventListener('keydown', (e) => {
   if (ClarityExperience && ClarityExperience.isOpen) {
     e.preventDefault();
     e.stopPropagation();
+    // Pop the zoomed star page first (mirrors the X button in js/02 closeNow):
+    // explain sheet, then zoom, and only then the whole clarity view.
+    const nsExplain = document.getElementById('nsExplainSheet');
+    if (nsExplain && nsExplain.getAttribute('aria-hidden') === 'false') {
+      const x = document.getElementById('nsExplainClose');
+      if (x) x.click(); else nsExplain.setAttribute('aria-hidden', 'true');
+      return;
+    }
+    const nsScene = document.getElementById('nsScene');
+    if (nsScene && nsScene.classList.contains('ns-star-scene--zoomed')) {
+      nsScene.classList.remove('ns-star-scene--zoomed');
+      return;
+    }
     ClarityExperience.close();
     return;
   }
