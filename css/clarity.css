@@ -2782,6 +2782,21 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
 .clarity-exp.has-wiz-composer .clarity-exp__page-wrap {
   overflow: hidden; /* no scroll slack for iOS to fling into */
 }
+
+/* "My own answer" focused typing mode (Malik keyboard fix 2026-07-03): the
+   custom textarea normally sits at the BOTTOM of the options list, so it is cut
+   off before you focus it and buried under the keyboard when you do. Custom mode
+   is exclusive (it clears every other choice), so we collapse the other chips and
+   lift the textarea directly under the question, where the 19vh anchor keeps it
+   high above the keyboard, and lock the scroll so iOS has no slack to fling.
+   bindKeyboardSettle (bound in js/03) then settles the pan the same way the
+   wizard free-text pages do. Root class has-ai-custom toggled in js/03 bindAiChat. */
+.clarity-exp.has-ai-custom .wiz__option:not(#aiCustomOption) {
+  display: none;
+}
+.clarity-exp.has-ai-custom .clarity-exp__page-wrap {
+  overflow: hidden;
+}
 .clarity-exp .wiz__composer { margin-top: 14px; }
 .clarity-exp .wiz__composer .wiz__textarea {
   min-height: 72px;              /* short at rest so the whole field sits above the keyboard */

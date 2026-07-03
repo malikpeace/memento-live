@@ -2999,6 +2999,29 @@ function bindAiChat(container) {
   let customMode = false;
   let selectedChoices = [];
 
+  // "My own answer" keyboard fix (Malik, 2026-07-03): the custom textarea sits
+  // at the BOTTOM of the options list, so it is cut off before you focus it and
+  // buried under the keyboard when you do. When custom mode is active we collapse
+  // the other chips (custom is exclusive anyway) so the field rises high under the
+  // question, lock the scroll, and reuse the proven bindKeyboardSettle recipe.
+  const cexpEl = (typeof ClarityExperience !== 'undefined' && ClarityExperience.isOpen) ? ClarityExperience.el : null;
+  function applyAiCustomLayout(active) {
+    if (!cexpEl) return;
+    cexpEl.classList.toggle('has-ai-custom', !!active);
+    if (active) {
+      if (typeof ClarityExperience.settleFieldOnFocus === 'function' && customInput) {
+        ClarityExperience.settleFieldOnFocus(customInput);
+      }
+    } else if (typeof ClarityExperience.clearFieldSettle === 'function') {
+      ClarityExperience.clearFieldSettle();
+    }
+  }
+  // Fresh render always starts clean, then re-applies if resuming in custom mode.
+  if (cexpEl) {
+    cexpEl.classList.remove('has-ai-custom');
+    if (typeof ClarityExperience.clearFieldSettle === 'function') ClarityExperience.clearFieldSettle();
+  }
+
   // Parse existing answer on resume
   if (aiUserAnswer) {
     const parts = aiUserAnswer.split(' | ').filter(Boolean);
@@ -3038,6 +3061,7 @@ function bindAiChat(container) {
         if (customMode) {
           // Deselect custom
           clearAllSelections();
+          applyAiCustomLayout(false);
         } else {
           // Enter custom mode - deselect everything else
           clearAllSelections();
@@ -3046,6 +3070,7 @@ function bindAiChat(container) {
           opt.querySelector('.wiz__option-check').textContent = '\u2713';
           if (customWrap) {
             customWrap.classList.add('expanded');
+            applyAiCustomLayout(true);
             setTimeout(() => { if (customInput) customInput.focus(); }, 350);
           }
         }
@@ -3054,6 +3079,7 @@ function bindAiChat(container) {
         if (customMode) {
           // Leave custom mode, start fresh with this choice
           clearAllSelections();
+          applyAiCustomLayout(false);
         }
 
         if (selectedChoices.includes(val)) {
@@ -3079,6 +3105,10 @@ function bindAiChat(container) {
       }
     });
   }
+
+  // Resuming a question that was already in custom mode: collapse the chips and
+  // bind the settle, but do NOT force focus (no keyboard should pop unprompted).
+  if (customMode) applyAiCustomLayout(true);
 
   // Range slider + number input (synced)  - premium design
   const rangeNumber = container.querySelector('#aiRangeNumber');

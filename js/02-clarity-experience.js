@@ -1340,6 +1340,16 @@ const ClarityExperience = {
     bindKeyboardSettle(this, field);
   },
 
+  // Public hook so the AI questionnaire (js/03, the "My own answer" and
+  // free-text fields) can reuse the same proven keyboard-settle recipe.
+  // Precondition (same as _bindWizSnapBack): the field must already sit HIGH.
+  settleFieldOnFocus(field) {
+    bindKeyboardSettle(this, field);
+  },
+  clearFieldSettle() {
+    if (this._kbSettleCleanup) { this._kbSettleCleanup(); this._kbSettleCleanup = null; }
+  },
+
   bindWizardInFullscreen() {
     const container = this.pageWrap;
     const stepKey = getWizardSteps()[wizardStep];
