@@ -560,7 +560,7 @@ html.theme-light .sidebar-reveal:hover {
    light-on-dark; this only firms up the always-light clarity/action closes. */
 html.theme-light .clarity-exp__close,
 html.theme-light .action-exp__close {
-  background: rgba(24,26,33,0.06);
+  background: transparent;
   color: rgba(24,26,33,0.72);
 }
 
