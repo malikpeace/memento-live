@@ -1328,75 +1328,16 @@ const ClarityExperience = {
     </div>`;
   },
 
-  // v523 (Malik, on-device): iOS still overshoots its keyboard pan even though
-  // the v522 layout leaves the field fully visible above the keyboard. Since
-  // zero-pan is now a legal position (field bottom clears the keyboard top),
-  // gently scroll the viewport back to rest whenever iOS shoves it, for as
-  // long as the answer field holds focus. window.scrollTo(0,0) is the only
-  // call that resets the iOS visual-viewport pan; it is a no-op elsewhere.
+  // v523-v527 (Malik, on-device iteration): iOS overshoots its keyboard pan
+  // even when the layout leaves the field fully visible above the keyboard,
+  // so once the shove stops moving we settle the view back to rest. Shared
+  // with the Action wizard via bindKeyboardSettle (module scope, below the
+  // ClarityExperience object). Precondition for using it on a new surface:
+  // the field must sit HIGH (fixed ~30vh anchor) so zero-pan is a position
+  // iOS accepts instead of re-panning.
   _bindWizSnapBack(container) {
-    if (this._wizSnapCleanup) { this._wizSnapCleanup(); this._wizSnapCleanup = null; }
     const field = container.querySelector('.wiz__composer .wiz__textarea');
-    if (!field || !window.visualViewport) return;
-    let timer = 0, animating = false;
-    const pan = () => Math.max(window.scrollY || document.documentElement.scrollTop || 0, window.visualViewport.offsetTop || 0);
-    // FLIP settle (v526): animating scrollTo in JS repaints on the busy main
-    // thread while the keyboard opens, which iOS quantizes into 3-4 visible
-    // steps. Instead: reset the scroll in ONE invisible jump, at the same
-    // instant offset the whole view with a transform so it still appears
-    // where iOS left it, then let the COMPOSITOR ease that transform to 0.
-    const glide = () => {
-      if (animating || document.activeElement !== field) return;
-      const P = pan();
-      const pw = this.pageWrap;
-      const pwPan = pw ? pw.scrollTop : 0;
-      const total = P + pwPan;
-      if (total < 2) return;
-      const root = this.el;
-      window.scrollTo(0, 0);
-      if (pw && pwPan) pw.scrollTop = 0;
-      if (!root || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
-      animating = true;
-      root.style.transition = 'none';
-      root.style.transform = 'translateY(' + (-total) + 'px)';
-      void root.offsetHeight;
-      root.style.transition = 'transform 240ms cubic-bezier(0.22, 1, 0.36, 1)';
-      root.style.transform = 'translateY(0)';
-      const finish = () => {
-        root.removeEventListener('transitionend', finish);
-        root.style.transition = '';
-        root.style.transform = '';
-        animating = false;
-        if (document.activeElement === field && pan() > 1) queue();
-      };
-      root.addEventListener('transitionend', finish);
-      setTimeout(finish, 320);
-    };
-    // Wait for iOS's shove to STOP MOVING (a beat of quiet) before settling,
-    // so the ease-out reads as one intentional motion, not a fight.
-    const queue = () => {
-      if (animating) return;
-      if (timer) clearTimeout(timer);
-      timer = setTimeout(() => { timer = 0; glide(); }, 35);
-    };
-    const onFocus = () => {
-      window.visualViewport.addEventListener('resize', queue);
-      window.visualViewport.addEventListener('scroll', queue);
-      // The keyboard animates in over ~250-500ms; sweep a few times after.
-      [80, 260, 450, 700].forEach(ms => setTimeout(queue, ms));
-    };
-    const onBlur = () => {
-      window.visualViewport.removeEventListener('resize', queue);
-      window.visualViewport.removeEventListener('scroll', queue);
-      if (timer) { clearTimeout(timer); timer = 0; }
-    };
-    field.addEventListener('focus', onFocus);
-    field.addEventListener('blur', onBlur);
-    this._wizSnapCleanup = () => {
-      onBlur();
-      field.removeEventListener('focus', onFocus);
-      field.removeEventListener('blur', onBlur);
-    };
+    bindKeyboardSettle(this, field);
   },
 
   bindWizardInFullscreen() {
@@ -1903,6 +1844,74 @@ const ACTION_WHITE_RAYS =
   '<div class="ambient__rays-beam" style="--a:72deg; --h:32px;  --d:8.6s;  --del:-4.9s; --omin:0.05; --omax:0.32; --smin:0.7;  --smax:1.2; "><div class="ambient__rays-beam-shaft"></div></div>' +
   '<div class="ambient__rays-beam" style="--a:80deg; --h:80px;  --d:11.4s; --del:-2.6s; --omin:0.09; --omax:0.58; --smin:0.55; --smax:1.35;"><div class="ambient__rays-beam-shaft"></div></div>' +
   '</div>';
+
+// Keyboard settle, shared by the Clarity and Action wizards (v526/v527).
+// iOS pans the page when a field focuses, computed before any JS can run,
+// and it overshoots even when the field is already visible. Recipe: let it
+// shove, wait a 35ms beat of quiet, then reset the scroll in ONE invisible
+// jump while offsetting host.el with a transform so the view still appears
+// where iOS left it, and let the COMPOSITOR ease that transform to 0
+// (animating scrollTo from JS repaints on the busy main thread and renders
+// as 3-4 chunky steps). Precondition: the field sits high (~30vh anchor) so
+// zero-pan is a position iOS accepts instead of re-panning.
+function bindKeyboardSettle(host, field) {
+  if (host._kbSettleCleanup) { host._kbSettleCleanup(); host._kbSettleCleanup = null; }
+  if (!field || !window.visualViewport) return;
+  let timer = 0, animating = false;
+  const pan = () => Math.max(window.scrollY || document.documentElement.scrollTop || 0, window.visualViewport.offsetTop || 0);
+  const glide = () => {
+    if (animating || document.activeElement !== field) return;
+    const P = pan();
+    const pw = host.pageWrap;
+    const pwPan = pw ? pw.scrollTop : 0;
+    const total = P + pwPan;
+    if (total < 2) return;
+    const root = host.el;
+    window.scrollTo(0, 0);
+    if (pw && pwPan) pw.scrollTop = 0;
+    if (!root || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+    animating = true;
+    root.style.transition = 'none';
+    root.style.transform = 'translateY(' + (-total) + 'px)';
+    void root.offsetHeight;
+    root.style.transition = 'transform 240ms cubic-bezier(0.22, 1, 0.36, 1)';
+    root.style.transform = 'translateY(0)';
+    const finish = () => {
+      root.removeEventListener('transitionend', finish);
+      root.style.transition = '';
+      root.style.transform = '';
+      animating = false;
+      if (document.activeElement === field && pan() > 1) queue();
+    };
+    root.addEventListener('transitionend', finish);
+    setTimeout(finish, 320);
+  };
+  // Wait for iOS's shove to STOP MOVING before settling, so the ease-out
+  // reads as one intentional motion, not a fight.
+  const queue = () => {
+    if (animating) return;
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(() => { timer = 0; glide(); }, 35);
+  };
+  const onFocus = () => {
+    window.visualViewport.addEventListener('resize', queue);
+    window.visualViewport.addEventListener('scroll', queue);
+    // The keyboard animates in over ~250-500ms; sweep a few times after.
+    [80, 260, 450, 700].forEach(ms => setTimeout(queue, ms));
+  };
+  const onBlur = () => {
+    window.visualViewport.removeEventListener('resize', queue);
+    window.visualViewport.removeEventListener('scroll', queue);
+    if (timer) { clearTimeout(timer); timer = 0; }
+  };
+  field.addEventListener('focus', onFocus);
+  field.addEventListener('blur', onBlur);
+  host._kbSettleCleanup = () => {
+    onBlur();
+    field.removeEventListener('focus', onFocus);
+    field.removeEventListener('blur', onBlur);
+  };
+}
 
 const ActionExperience = {
   el: null,
@@ -4049,7 +4058,7 @@ Return ONLY the sentence text. No quotes, no labels.`;
       });
       bodyHtml += '</div>';
     } else {
-      bodyHtml += `<div class="wiz__text-wrap" style="margin-top:8px;"><textarea class="wiz__text-input wiz__textarea" id="actionWizText" data-answer-key="${esc(step.answerKey)}" placeholder="${esc(step.placeholder || '')}" rows="3" style="min-height:90px;">${esc(wa[step.answerKey] || '')}</textarea></div>`;
+      bodyHtml += `<div class="wiz__text-wrap" style="margin-top:8px;"><textarea class="wiz__text-input wiz__textarea" id="actionWizText" data-answer-key="${esc(step.answerKey)}" placeholder="${esc(step.placeholder || '')}" rows="3" style="min-height:72px;max-height:min(148px,20vh);">${esc(wa[step.answerKey] || '')}</textarea></div>`;
     }
 
     if (actionAiError) {
@@ -4099,6 +4108,9 @@ Return ONLY the sentence text. No quotes, no labels.`;
         }
       });
     }
+    // Same iOS keyboard settle as the Clarity wizard (v527); pairs with the
+    // fixed 30vh question anchor in css/action.css.
+    bindKeyboardSettle(this, ta);
 
     this.navEl.querySelector('#actionWizBack')?.addEventListener('click', () => {
       if (stepIdx > 0) {

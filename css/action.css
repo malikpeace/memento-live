@@ -3309,3 +3309,17 @@ html.lowfx #actionExpStars {
 /* Light theme: the chat compose bar was hardcoded near-black. */
 html.theme-light .action-chat__input-row { background: rgba(248, 248, 250, 0.72); }
 html.theme-light .action-chat__input-row::before { background: linear-gradient(to top, rgba(248, 248, 250, 0.6), transparent); }
+
+/* ONE fixed question line for the Action wizard (v527), mirroring the
+   Clarity wizard: every question headline, chips or free text, starts at
+   the same ~30vh height, and the text field sits high so the iOS keyboard
+   needs only a small pan (the settle glide in js/02 handles the rest).
+   The sticky topbar consumes ~60px + safe-t of flow before the step. */
+.action-exp .wiz__step:has(.wiz__options),
+.action-exp .wiz__step:has(.wiz__text-wrap) {
+  justify-content: flex-start;
+  padding-top: max(16px, calc(30vh - var(--safe-t, 0px) - 60px));
+}
+.action-exp:has(#actionWizText) .action-exp__page-wrap {
+  overflow: hidden; /* no scroll slack for iOS to fling into */
+}
