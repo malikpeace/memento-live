@@ -1338,17 +1338,34 @@ const ClarityExperience = {
     if (this._wizSnapCleanup) { this._wizSnapCleanup(); this._wizSnapCleanup = null; }
     const field = container.querySelector('.wiz__composer .wiz__textarea');
     if (!field || !window.visualViewport) return;
-    let timer = 0;
-    const snap = () => {
-      timer = 0;
-      if (document.activeElement !== field) return;
-      if (window.scrollY || document.documentElement.scrollTop || window.visualViewport.offsetTop > 1) {
-        window.scrollTo(0, 0);
-      }
+    let timer = 0, animating = false;
+    const pan = () => Math.max(window.scrollY || document.documentElement.scrollTop || 0, window.visualViewport.offsetTop || 0);
+    const glide = () => {
+      if (animating || document.activeElement !== field) return;
+      const start = window.scrollY || document.documentElement.scrollTop || 0;
       const pw = this.pageWrap;
-      if (pw && pw.scrollTop) pw.scrollTop = 0;
+      const pwStart = pw ? pw.scrollTop : 0;
+      if (start < 2 && pwStart < 2) return;
+      animating = true;
+      const t0 = performance.now(), D = 220;
+      const tick = () => {
+        if (document.activeElement !== field) { animating = false; window.scrollTo(0, 0); if (pw) pw.scrollTop = 0; return; }
+        const k = Math.min(1, (performance.now() - t0) / D);
+        const e = 1 - Math.pow(1 - k, 3);
+        window.scrollTo(0, Math.round(start * (1 - e)));
+        if (pw && pwStart) pw.scrollTop = Math.round(pwStart * (1 - e));
+        if (k < 1) setTimeout(tick, 16);
+        else { animating = false; if (pan() > 1) queue(); }
+      };
+      tick();
     };
-    const queue = () => { if (!timer) timer = setTimeout(snap, 16); };
+    // Wait for iOS's shove to STOP MOVING (~90ms quiet) before gliding back,
+    // so the ease-out reads as one intentional motion, not a fight.
+    const queue = () => {
+      if (animating) return;
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => { timer = 0; glide(); }, 90);
+    };
     const onFocus = () => {
       window.visualViewport.addEventListener('resize', queue);
       window.visualViewport.addEventListener('scroll', queue);
