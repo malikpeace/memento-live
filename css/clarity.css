@@ -2756,29 +2756,28 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
   min-height: 100%;
 }
 
-/* iOS KEYBOARD FIX v3 (Malik, live on-device iteration 2026-07-03), the
-   Duolingo geometry: iOS pans the page exactly as far as it needs to put the
-   focused field at its preferred spot above the keyboard. A field pinned low
-   gets the maximum shove (v2, failed on-device); a field HIGH on the screen
-   needs a near-zero pan (Duolingo's age field, confirmed calm on Malik's
-   phone as a PWA). So: question + hint + field all top-anchored in the upper
-   half, and the page wrap made NON-scrollable on these pages so iOS has no
-   scroll slack to fling. Root class set in js/02 bindWizardInFullscreen. */
-/* Center the free-text page with the SAME rule as the multiple-choice pages
-   (base .wiz__step already uses justify-content:center) so every question sits
-   at the same balanced spot, never shifted up. On a normal-height phone the
-   centered field lands just above the keyboard, so iOS only has to nudge it up
-   a little (the Duolingo effect Malik wants), not shove the whole screen. The
-   overflow:hidden keeps zero scroll slack so iOS cannot fling past that nudge. */
+/* ONE fixed question line for the wizard (Malik, on-device iteration
+   2026-07-03): every question headline, chips or free text, starts at the
+   SAME height (30vh), so page to page it reads seamless, all on one line.
+   Content-centering could never do this: a taller page (hint + text box)
+   centers LOWER than a chip page, which is exactly the "text pages sit
+   lower" drift Malik flagged. The fixed anchor also keeps the text field
+   high, so the iOS keyboard needs only a small Duolingo-style nudge instead
+   of the full shove; overflow:hidden leaves iOS no scroll slack to fling.
+   Root class set in js/02 bindWizardInFullscreen. */
+.clarity-exp .wiz__step:has(.wiz__options),
 .clarity-exp.has-wiz-composer .wiz__step {
-  justify-content: center;
+  justify-content: flex-start;
+  /* page-wrap already pads safe-t + 64px; subtract it so the headline lands
+     at exactly 30vh on every device */
+  padding-top: max(16px, calc(30vh - var(--safe-t, 0px) - 64px));
 }
 .clarity-exp.has-wiz-composer .clarity-exp__page-wrap {
   overflow: hidden; /* no scroll slack for iOS to fling into */
 }
 .clarity-exp .wiz__composer { margin-top: 14px; }
 .clarity-exp .wiz__composer .wiz__textarea {
-  min-height: 96px;              /* 3 text lines + padding, so placeholders never clip */
+  min-height: 72px;              /* short at rest so the whole field sits above the keyboard */
   max-height: min(148px, 20vh);  /* long answers scroll inside, field bottom stays above the keyboard */
 }
 

@@ -2576,9 +2576,9 @@ function renderWizardStep(key) {
           .split('·').map(s => s.trim()).filter(Boolean).slice(0, 2).join(' and ').toLowerCase();
         return wizFreeText(
           'Okay good! Describe exactly what you want to accomplish and/or focus on in your own words.',
-          (_tw ? 'Earlier you said you want progress in ' + _tw + '. ' : '') + 'Be as brief or as detailed as you would like. But detailed is better.',
+          (_tw ? 'Earlier you said you want progress in ' + _tw + '. Detailed is better.' : 'Be as brief or as detailed as you would like. But detailed is better.'),
           'whatSpecifically',
-          'e.g., I want to build an app that helps people meditate, I want to run a sub-4-hour marathon...'
+          'e.g., I want to run a sub-4-hour marathon...'
         );
       }
       return wizFreeText(
