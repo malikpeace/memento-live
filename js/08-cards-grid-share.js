@@ -1652,6 +1652,12 @@ function promptTomorrowPlan() {
   try {
     if (DEMO_MODE) return;
     if (!state.action) return;
+    // The FIRST move ever is sacred: the first-white ceremony (and, later, the
+    // notification permission ask) own that moment, so nothing may stack on it
+    // (FIRST-WIN-PLAN P3). firstWhiteShown is set when the ceremony plays; until
+    // then, hold the question. It returns naturally on the second win. Scoped to
+    // clarity.completed so a pre-star logger keeps the old behavior.
+    if (state.clarity && state.clarity.completed && state.meta && !state.meta.firstWhiteShown) return;
     const today = getTodayISO();
     if (state.action.tomorrowPromptDay === today) return; // once per day
     if (_tmrwPlanEl || document.querySelector('.tmrw-plan')) return;
@@ -3995,7 +4001,20 @@ function renderDayCard() {
       // already carries every channel in from clear).
       try {
         const hasWhite = !!(state.action && Array.isArray(state.action.completionHistory) && state.action.completionHistory.length);
-        const visibleNow = document.body && document.body.classList.contains('boot-revealed') && el.offsetParent !== null;
+        // "On screen" must mean FRONT-MOST, not just rendered: right after "Mark
+        // it done" the card sits behind the Action view + share win overlay, and
+        // offsetParent alone let the ceremony burn its once-ever flag invisibly.
+        // Probe the card's center; if anything else (an overlay) is on top, skip
+        // and let a later render (ActionExperience.close nudges one) play it.
+        const cardFront = (() => {
+          const r = el.getBoundingClientRect();
+          if (!r.width || !r.height || r.bottom < 0 || r.top > window.innerHeight) return false;
+          const px = Math.min(window.innerWidth - 2, Math.max(2, r.left + r.width / 2));
+          const py = Math.min(window.innerHeight - 2, Math.max(2, r.top + r.height / 2));
+          const probe = document.elementFromPoint(px, py);
+          return !!(probe && (el.contains(probe) || probe.contains(el)));
+        })();
+        const visibleNow = document.body && document.body.classList.contains('boot-revealed') && el.offsetParent !== null && cardFront;
         if (visibleNow && !reveal && hasWhite && state.clarity && state.clarity.completed && state.meta && !state.meta.firstWhiteShown) {
           state.meta.firstWhiteShown = true;
           try { if (!DEMO_MODE && typeof persistState === 'function') persistState(); } catch (e) {}
@@ -4928,6 +4947,12 @@ const MementoShareCard = {
     // Return focus to whatever opened the card (a11y).
     try { if (this._prevFocus && typeof this._prevFocus.focus === 'function') this._prevFocus.focus(); } catch (e) {}
     this._prevFocus = undefined;
+    // If this overlay was covering a pending first-white ceremony (done logged
+    // from the home hero, win card shown on top), re-render so it plays now
+    // that the day card is front again. No-op once the flag is set.
+    try {
+      if (state.meta && !state.meta.firstWhiteShown && typeof renderDayCard === 'function') renderDayCard();
+    } catch (e) {}
   },
 
   _text() {

@@ -2042,6 +2042,12 @@ const ActionExperience = {
         if (this.progressEl) this.progressEl.innerHTML = '';
         if (this.navEl) this.navEl.innerHTML = '';
         this.el.className = 'action-exp';
+        // Home is front again: re-render the day card so a pending first-white
+        // ceremony (deferred while this view covered it) plays where the user
+        // can actually see it. No-op after the flag is set.
+        try {
+          if (state.meta && !state.meta.firstWhiteShown && typeof renderDayCard === 'function') renderDayCard();
+        } catch (e) {}
       }
     }, 280);
   },
@@ -4252,7 +4258,11 @@ Return ONLY the sentence text. No quotes, no labels.`;
       extreme:  { name: 'Extreme',  level: 5, effort: 'Half day' }
     };
     const tiers = (pa.tiers && typeof pa.tiers === 'object') ? pa.tiers : {};
-    let selectedTier = TIER_KEYS.indexOf(pa.recommendedTier) >= 0 ? pa.recommendedTier : 'moderate';
+    // Prefer the user's saved pick (state.action.selectedTier) so a tier chosen
+    // elsewhere (coach shrink, home hero) shows here too; fall back to the AI rec.
+    let selectedTier = TIER_KEYS.indexOf(state.action && state.action.selectedTier) >= 0
+      ? state.action.selectedTier
+      : (TIER_KEYS.indexOf(pa.recommendedTier) >= 0 ? pa.recommendedTier : 'moderate');
     const tierText = (k) => (tiers && tiers[k]) || pa.title || '';
     const moveText = tierText(selectedTier);
     const title = pa.title || moveText || 'Your one move today';
@@ -4478,7 +4488,10 @@ Return ONLY the sentence text. No quotes, no labels.`;
     // Done today: record completion + proof event, credit streak, refresh.
     const creditToday = () => {
       const pa3 = state.action.primaryAction || {};
-      const tier = pa3.recommendedTier || 'moderate';
+      // Log the tier the user actually did (selectedTier), matching creditTodayAction in js/08.
+      const tier = TIER_KEYS.indexOf(state.action.selectedTier) >= 0
+        ? state.action.selectedTier
+        : (pa3.recommendedTier || 'moderate');
       const actionText = (pa3.tiers && pa3.tiers[tier]) || pa3.howToStart || pa3.title || '';
       if (!Array.isArray(state.action.completionHistory)) state.action.completionHistory = [];
       state.action.completionHistory.push({ date: new Date().toISOString(), tier, actionText, planTitle: pa3.title || '' });

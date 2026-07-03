@@ -223,6 +223,13 @@ const ClarityPaywall = {
     } catch (e) {}
     this.hide();
     try { if (typeof renderAll === 'function') renderAll(); } catch (e) {}
+    // The buyer's first minute (FIRST-WIN-PLAN P3): never drop a fresh buyer on
+    // the dashboard to figure out "now what?". Go straight into Action, which
+    // routes itself (intro -> intake -> plan) to their ONE move for today. The
+    // beat matches the paywall's 360ms fade so the two never overlap.
+    setTimeout(() => {
+      try { if (typeof ActionExperience !== 'undefined') ActionExperience.open(); } catch (e) {}
+    }, 460);
   },
 
   hide() {
