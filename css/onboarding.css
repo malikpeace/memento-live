@@ -290,10 +290,10 @@
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
-/* Aurora Wave thinking loader (Malik's pick, sharpened 2026-07-03): a soft band
-   of Clarity-purple light breathes side to side, echoing the god-ray beams in the
-   app. Sharper than the mockup (tighter blur + crisper light line) so it reads
-   defined, not hazy. Replaces the old 5-dot wave. */
+/* Aurora Wave thinking loader (Malik's pick, 2026-07-03): two soft bands of
+   Clarity-purple light breathe side to side, echoing the god-ray beams in the
+   app. Just the blurs, no center line (Malik: cleaner without it). Replaces the
+   old 5-dot wave. */
 .aur {
   position: relative;
   width: 220px; height: 120px;
@@ -319,17 +319,6 @@
   0%, 100% { transform: translateX(-16%) scaleY(0.82); opacity: 0.45; }
   50%      { transform: translateX(16%) scaleY(1.12); opacity: 0.95; }
 }
-.aur-line {
-  position: absolute; top: 60px; left: 14%; right: 14%;
-  height: 2px; border-radius: 2px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.95), transparent);
-  box-shadow: 0 0 9px rgba(140,112,255,0.85);
-  animation: aurPulse 4.5s ease-in-out infinite;
-}
-@keyframes aurPulse {
-  0%, 100% { opacity: 0.4; }
-  50%      { opacity: 1; }
-}
 /* v19 cohesion/a11y: gate the AI-chat animations into the app's motion system.
    calm-motion + reduced-motion are genuine "hold still" prefs, so they freeze
    EVERYTHING including the aurora. body.lite is the MOBILE path (auto-applied to
@@ -342,7 +331,6 @@ body.calm-motion .ai-chat__dot,
 body.calm-motion .ai-synthesis,
 body.calm-motion .ai-thinking,
 body.calm-motion .aur-band,
-body.calm-motion .aur-line,
 body.lite .ai-chat__bubble,
 body.lite .ai-chat__dot,
 body.lite .ai-synthesis,
@@ -350,7 +338,7 @@ body.lite .ai-thinking {
   animation: none !important;
 }
 @media (prefers-reduced-motion: reduce) {
-  .ai-chat__bubble, .ai-chat__dot, .ai-synthesis, .ai-thinking, .aur-band, .aur-line { animation: none !important; }
+  .ai-chat__bubble, .ai-chat__dot, .ai-synthesis, .ai-thinking, .aur-band { animation: none !important; }
 }
 
 /* AI discovery progress bar */

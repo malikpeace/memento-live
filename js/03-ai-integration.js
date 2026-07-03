@@ -2271,7 +2271,7 @@ function renderAiChat() {
   // Loading state  - thinking animation
   if (aiChatLoading) {
     return `<div class="ai-thinking">
-        <div class="aur"><span class="aur-band b1"></span><span class="aur-band b2"></span><span class="aur-line"></span></div>
+        <div class="aur"><span class="aur-band b1"></span><span class="aur-band b2"></span></div>
       </div>`;
   }
 
@@ -2373,7 +2373,7 @@ function renderAiChat() {
 
   // Fallback - show thinking state
   return `<div class="ai-thinking">
-      <div class="aur"><span class="aur-band b1"></span><span class="aur-band b2"></span><span class="aur-line"></span></div>
+      <div class="aur"><span class="aur-band b1"></span><span class="aur-band b2"></span></div>
     </div>`;
 }
 
@@ -2384,7 +2384,7 @@ function renderAiSynthesis() {
       setTimeout(() => triggerSynthesis(), 100);
     }
     return '<div class="ai-thinking">' +
-      '<div class="aur"><span class="aur-band b1"></span><span class="aur-band b2"></span><span class="aur-line"></span></div>' +
+      '<div class="aur"><span class="aur-band b1"></span><span class="aur-band b2"></span></div>' +
       '<div style="text-align:center;color:var(--text-3);font-size:0.875rem;margin-top:20px;">Synthesizing your Neutron Star...</div></div>';
   }
 
