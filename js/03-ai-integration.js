@@ -2116,7 +2116,10 @@ async function callClaude(messages, systemPrompt, options = {}) {
           // The anon key is public by design; it only proves "this is our
           // app". The SECRET Anthropic key lives in the function's env.
           'Authorization': 'Bearer ' + supaAnon,
-          'apikey': supaAnon
+          'apikey': supaAnon,
+          // Anonymous device id: the proxy keys its daily rate limits on it
+          // so one scripted device can never drain the shared AI balance.
+          'x-memento-device': (typeof Analytics !== 'undefined' && Analytics.deviceId) ? Analytics.deviceId() : 'unknown'
         }
       : {
           'Content-Type': 'application/json',
@@ -2429,13 +2432,44 @@ function buildDomainGrid() {
 
 function renderWizardStep(key) {
   switch (key) {
-    case 'knowDomain':
+    case 'knowDomain': {
+      // Recall opener (FIRST-WIN-PLAN #6): if onboarding already told us how
+      // clear they are, open by remembering that answer instead of a cold
+      // re-ask. Same values either way, so the branch logic is untouched, and
+      // _seedFromOnboarding has already pre-selected the matching chip.
+      const lvl = String((state.profile && state.profile.clarityLevel) || '').toLowerCase();
+      let recall = null;
+      if (lvl.indexOf('know exactly') !== -1) {
+        recall = {
+          q: 'Earlier, you said you know <b>exactly</b> what you\'re going after. Still true?',
+          hint: 'If it is, we\'ll get specific and narrow until it\'s undeniable. If things have shifted since then, no problem, just pick what\'s true today.'
+        };
+      } else if (lvl.indexOf('rough idea') !== -1) {
+        recall = {
+          q: 'Earlier, you said you have a <b>rough idea</b> of what you want. Still where you\'re at?',
+          hint: 'That\'s a good starting point. We\'ll take the rough idea and sharpen it into ONE clear thing. If it\'s changed, just pick what\'s true today.'
+        };
+      } else if (lvl.indexOf('figur') !== -1 || lvl.indexOf('not really') !== -1 || lvl.indexOf('lost') !== -1) {
+        recall = {
+          q: 'Earlier, you said you\'re still <b>figuring out</b> what you want. Still where you\'re at?',
+          hint: 'Good. Most people never even stop to ask. If that\'s still you, we\'ll figure it out together right now. If something got clearer since then, pick what\'s true today.'
+        };
+      }
+      if (recall) {
+        return wizSingleSelect(
+          recall.q,
+          recall.hint,
+          [{ value: 'yes', label: 'Yes, I know exactly what I want' }, { value: 'kinda', label: 'I have a rough idea' }, { value: 'not_sure', label: 'Not yet, help me find it' }],
+          'knowDomain'
+        );
+      }
       return wizSingleSelect(
         'Okay let\'s start here... Do you have a mission or goal you want to lock in on?',
         'It can be a purpose, a project, or a goal. The ONE thing you want to focus on and accomplish, either right now or long term. (If you don\'t, no worries, we\'ll figure it out. If so, we\'ll get more specific and narrow.)',
         [{ value: 'yes', label: 'Yes' }, { value: 'kinda', label: 'Kinda' }, { value: 'not_sure', label: 'No, not yet' }],
         'knowDomain'
       );
+    }
     case 'discoverDomain':
       return `<div class="wiz__question">No worries! Very few humans ever know exactly what they want to do.</div>
         <div class="wiz__hint" style="margin-bottom:24px; line-height:1.6;">Most people spend their entire lives avoiding this question. Yet you're here. Which already puts you ahead of 90% of people. Let's figure this out.<br><br>Pick one or two areas that draw you in. Not what you think you should pick. What actually keeps you up at night or gets you out of bed.</div>

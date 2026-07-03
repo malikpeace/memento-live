@@ -105,6 +105,7 @@ const ClarityPaywall = {
       if (this._open || document.getElementById('clarityPaywall')) return;
       this._open = true;
       opts = opts || {};
+      try { if (typeof Analytics !== 'undefined') Analytics.track('paywall_shown'); } catch (e) {} // Funnel
 
       const prof = (state && state.profile) || {};
       const ans = (state && state.clarity && state.clarity.answers) || {};
@@ -218,6 +219,7 @@ const ClarityPaywall = {
       const picked = document.querySelector('#clarityPaywall .cpw__plan.is-picked');
       state.entitlements.plan = picked ? (picked.getAttribute('data-plan') || 'lifetime') : 'lifetime';
       if (typeof persistNow === 'function') persistNow();
+      try { if (typeof Analytics !== 'undefined') Analytics.track('paywall_unlock', { plan: state.entitlements.plan }); } catch (e) {} // Funnel
     } catch (e) {}
     this.hide();
     try { if (typeof renderAll === 'function') renderAll(); } catch (e) {}

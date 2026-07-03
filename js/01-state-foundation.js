@@ -465,6 +465,20 @@ const Analytics = {
     try { if (typeof isoToLocalDay === 'function') return isoToLocalDay(new Date().toISOString()); } catch (e) {}
     try { return new Date().toISOString().slice(0, 10); } catch (e) { return ''; }
   },
+  // Anonymous device id: a random UUID minted once per device, kept OUTSIDE
+  // the main state blob so resets/restores never change it. Never tied to an
+  // account, email, or any content. Also sent to the ai-proxy for rate limits.
+  deviceId() {
+    try {
+      let id = localStorage.getItem('memento_device_id');
+      if (!id) {
+        id = (crypto && crypto.randomUUID) ? crypto.randomUUID()
+          : ('d-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10));
+        localStorage.setItem('memento_device_id', id);
+      }
+      return id;
+    } catch (e) { return 'unknown'; }
+  },
   track(event, meta) {
     try {
       if (DEMO_MODE) return; // never pollute the activation log with demo personas
@@ -482,7 +496,58 @@ const Analytics = {
       state.analytics.events.push({ e: event, day: day, ts: Date.now(), m: meta || null });
       if (state.analytics.events.length > 1000) state.analytics.events = state.analytics.events.slice(-1000);
       try { persistState(); } catch (e) {}
+      try { this._ship(event, meta || null); } catch (e) {}
     } catch (e) {}
+  },
+  /* Funnel shipping (FIRST-WIN-PLAN #10): the same events, mirrored to the
+     Supabase `events` table so the funnel is measurable across users. Insert-
+     only via the public anon key (RLS blocks all reads), random device id, no
+     PII, tiny payloads. Fully silent: offline or failed sends sit in a local
+     queue and retry on the next event or tab focus; nothing here can ever
+     surface an error or block the app. */
+  _evqKey: 'memento_evq',
+  _flushing: false,
+  _ship(event, meta) {
+    try {
+      let q = [];
+      try { q = JSON.parse(localStorage.getItem(this._evqKey) || '[]'); } catch (e) { q = []; }
+      if (!Array.isArray(q)) q = [];
+      q.push({ n: String(event).slice(0, 64), p: meta || null, v: (window.MEMENTO_VERSION || '') });
+      if (q.length > 200) q = q.slice(-200);
+      try { localStorage.setItem(this._evqKey, JSON.stringify(q)); } catch (e) {}
+      this._flush();
+    } catch (e) {}
+  },
+  _flush() {
+    try {
+      if (this._flushing) return;
+      const url = (typeof window !== 'undefined' && window.MEMENTO_SUPABASE_URL) || '';
+      const anon = (typeof window !== 'undefined' && window.MEMENTO_SUPABASE_ANON) || '';
+      if (!url || !anon) return;
+      if (typeof navigator !== 'undefined' && navigator.onLine === false) return;
+      // Dev/preview sessions never pollute the real funnel (local log still works).
+      try { if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return; } catch (e) {}
+      let q = [];
+      try { q = JSON.parse(localStorage.getItem(this._evqKey) || '[]'); } catch (e) { q = []; }
+      if (!Array.isArray(q) || q.length === 0) return;
+      this._flushing = true;
+      const batch = q.slice(0, 25);
+      const device = this.deviceId();
+      const rows = batch.map(x => ({ device_id: device, name: x.n, props: x.p, app_version: x.v || null }));
+      fetch(url + '/rest/v1/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'apikey': anon, 'Authorization': 'Bearer ' + anon, 'Prefer': 'return=minimal' },
+        body: JSON.stringify(rows)
+      }).then((r) => {
+        this._flushing = false;
+        if (!r.ok) return; // leave queued; retried on next event/focus
+        let cur = [];
+        try { cur = JSON.parse(localStorage.getItem(this._evqKey) || '[]'); } catch (e) { cur = []; }
+        if (!Array.isArray(cur)) cur = [];
+        try { localStorage.setItem(this._evqKey, JSON.stringify(cur.slice(batch.length))); } catch (e) {}
+        if (cur.length > batch.length) this._flush();
+      }).catch(() => { this._flushing = false; });
+    } catch (e) { this._flushing = false; }
   },
   // Console readout: did this user hit the Activation Point?
   activation() {
@@ -503,6 +568,9 @@ const Analytics = {
   }
 };
 try { window.Analytics = Analytics; } catch (e) {}
+// Retry any queued funnel events when the tab regains focus (js/12 has set the
+// Supabase globals by then; failures just stay queued).
+try { window.addEventListener('focus', () => { try { Analytics._flush(); } catch (e) {} }); } catch (e) {}
 
 // The exact default command-center accent literal (kept verbatim so users with
 // no custom accent render byte-identically to today). When a custom accent is

@@ -1661,91 +1661,9 @@ const WelcomeIntro = {
         return;
       }
 
-      // ===== PAYWALL (placeholder, lifetime-anchored) =====
-      if (step.type === 'paywall') {
-        this._hideProgressBar();
-        // lift the dark themes + stop the fireworks before the offer
-        this.el.classList.remove('welcome-intro--blackout', 'welcome-intro--help');
-        this._setStage(['purple', 'green', 'cyan']);
-        this._confettiVer = (this._confettiVer || 0) + 1;
-        const _cf = document.getElementById('welcomeConfetti'); if (_cf) _cf.remove();
-        const _bc = document.getElementById('welcomeRays'); if (_bc) _bc.remove();
-        if (this._fwClick) { document.removeEventListener('click', this._fwClick, true); this._fwClick = null; }
-        // Paywall: bold Gen-Z look (Malik's pick). Real offer from SELL_IT_PACK.
-        // Prices are placeholders: 99 / 199 / 3x39. Buy is non-functional (proceeds via _finishWithName).
-        this.pageWrap.innerHTML = `<div class="welcome-intro__page-inner welcome-intro__paywall">
-          <h1 class="welcome-intro__pw-h1">
-            <span class="welcome-intro__pw-stk">Build your</span>
-            <span class="welcome-intro__pw-stk welcome-intro__pw-grad">Memento</span>
-          </h1>
-          <p class="welcome-intro__pw-sub">Memento turns what you want into one clear direction and the single next move to get there. <b>Every day you show up, it captures the proof, grows your streak, and keeps your story.</b> It compounds over time, so it becomes a place you come back to for years, not weeks.</p>
-          <ul class="welcome-intro__pw-points">
-            <li><span class="welcome-intro__pw-pnum">01</span><span class="welcome-intro__pw-ptxt">One goal, named. <span>And the version of you who reaches it.</span></span></li>
-            <li><span class="welcome-intro__pw-pnum">02</span><span class="welcome-intro__pw-ptxt">The single highest-leverage move a day. <span>Open it, do it, close it.</span></span></li>
-            <li><span class="welcome-intro__pw-pnum">03</span><span class="welcome-intro__pw-ptxt">Watch the gap close. <span>Streaks and proof you can actually see.</span></span></li>
-            <li><span class="welcome-intro__pw-pnum">04</span><span class="welcome-intro__pw-ptxt">Yours and private. <span>On your device, no subscription, forever.</span></span></li>
-          </ul>
-          <div class="welcome-intro__pw-pricehead">
-            <h2 class="welcome-intro__pw-priceh">Pick your way in</h2>
-            <span class="welcome-intro__pw-pricenote">Own it once</span>
-          </div>
-          <div class="welcome-intro__plans" role="radiogroup" aria-label="Choose your plan">
-            <button type="button" class="welcome-intro__plan welcome-intro__plan--hero is-picked" data-plan="lifetime" role="radio" aria-checked="true">
-              <span class="welcome-intro__plan-flag">Most people pick this</span>
-              <div class="welcome-intro__plan-toprow">
-                <div>
-                  <div class="welcome-intro__plan-label welcome-intro__plan-label--grad">The Lock-In System</div>
-                  <div class="welcome-intro__plan-sub">Everything, yours forever. No subscription.</div>
-                </div>
-              </div>
-              <div class="welcome-intro__plan-heroamt">
-                <span class="welcome-intro__plan-hcur">$</span>
-                <span class="welcome-intro__plan-hbig">99</span>
-                <span class="welcome-intro__plan-hmeta">once</span>
-              </div>
-              <p class="welcome-intro__plan-hsub"><b>Cheaper than a year of any app it replaces.</b> Pay once, keep it for life, never see a renewal.</p>
-            </button>
-            <button type="button" class="welcome-intro__plan welcome-intro__plan--flat" data-plan="founder" role="radio" aria-checked="false">
-              <div><div class="welcome-intro__plan-label">Founder's Edition</div><div class="welcome-intro__plan-sub">Founder access and every future update</div></div>
-              <div class="welcome-intro__plan-amt"><span class="welcome-intro__plan-cur">$</span><span class="welcome-intro__plan-big">199</span><span class="welcome-intro__plan-per">once</span></div>
-            </button>
-            <button type="button" class="welcome-intro__plan welcome-intro__plan--flat" data-plan="plan" role="radio" aria-checked="false">
-              <div><div class="welcome-intro__plan-label">Pay in 3</div><div class="welcome-intro__plan-sub">Same system, interest-free</div></div>
-              <div class="welcome-intro__plan-amt"><span class="welcome-intro__plan-cur">3 x $</span><span class="welcome-intro__plan-big">39</span></div>
-            </button>
-          </div>
-          <div class="welcome-intro__pw-reassure">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2L4 5v6c0 5 3.4 8.3 8 10 4.6-1.7 8-5 8-10V5l-8-3z" stroke="var(--success-soft)" stroke-width="2" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="var(--success-soft)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span><b>The Still-Drifting Guarantee.</b> Do the work for 30 days. If you come out the other side still as lost as you started, email me and I refund every cent. You have 60 days to decide.</span>
-          </div>
-          <div class="welcome-intro__pw-founder">
-            <span class="welcome-intro__pw-av">M</span>
-            <p>I built this because I watched years almost slip past me on autopilot. I priced it once so it never becomes another bill you forget about. If it does not move you, take the refund.<span class="welcome-intro__pw-who">Malik, founder of Memento</span></p>
-          </div>
-          <div class="privacy-note">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2L4 5v6c0 5 3.4 8.3 8 10 4.6-1.7 8-5 8-10V5l-8-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-            <span>Your data lives on your device. No account, no tracking. The only thing that ever leaves is what you choose to send to the optional AI. You can export it any time.</span>
-          </div>
-          <button class="welcome-intro__skip-link" id="identityMaybe" type="button" aria-label="Skip for now and enter Memento">Maybe later</button>
-        </div>`;
-        this.navEl.innerHTML = navBack + `<button class="welcome-intro__btn welcome-intro__btn--step welcome-intro__btn--enter welcome-intro__btn--orbit" id="identityNext" style="flex:1;width:auto;--orbit-color:#9b7eff;">Enter Memento</button>`;
-        // Placeholder: tapping a tier just highlights it. The button / Maybe later both
-        // proceed into the app (no billing backend yet).
-        this.pageWrap.querySelectorAll('.welcome-intro__plan').forEach(pl => {
-          pl.addEventListener('click', () => {
-            this.pageWrap.querySelectorAll('.welcome-intro__plan').forEach(x => { x.classList.remove('is-picked'); x.setAttribute('aria-checked', 'false'); });
-            pl.classList.add('is-picked'); pl.setAttribute('aria-checked', 'true');
-          });
-        });
-        document.getElementById('identityNext').addEventListener('click', () => this._finishWithName());
-        const maybe = document.getElementById('identityMaybe');
-        if (maybe) maybe.addEventListener('click', () => this._finishWithName());
-        // Back from the paywall returns to the LAST demo page (the demo sits
-        // between the Solution page and the offer; summaryStepper is step i-1).
-        const pwBack = document.getElementById('identityBack');
-        if (pwBack) pwBack.addEventListener('click', () => this._showMementoDemo(i - 1, 5));
-        return;
-      }
+      // (The old onboarding paywall step was removed 2026-07-02: it was dead code,
+      // no step of type 'paywall' exists, and the ONE money ask lives in js/13
+      // ClarityPaywall at star ignition per FIRST-WIN-PLAN.md.)
     }, 250);
   },
 
@@ -3226,6 +3144,7 @@ const WelcomeIntro = {
   },
 
   _finishWithName(name) {
+    try { if (typeof Analytics !== 'undefined') Analytics.track('onboarding_done'); } catch (e) {} // Funnel
     // The look is picked here, as the final step of onboarding, right before the
     // blank Memento is revealed, so the very first card they see already wears it.
     // Apply runs live + persists inside the picker (applyPrefs), so when the reveal
@@ -5258,7 +5177,7 @@ const TabBar = {
         })()}
         <div class="privacy-note" style="margin-top:14px;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2L4 5v6c0 5 3.4 8.3 8 10 4.6-1.7 8-5 8-10V5l-8-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-          <span>Your data lives on this device. No account, no tracking. The only thing that ever leaves is what you choose to send to the optional AI. Vision-board and journal images stay on this device only, never synced. Use the backup above to move it yourself.</span>
+          <span>Your data lives on this device. No account required, nothing you write is ever collected. The only things that ever leave are what you choose to send to the optional AI, plus anonymous usage signals (which screens get used, never your words). Vision-board and journal images stay on this device only, never synced. Use the backup above to move it yourself.</span>
         </div>
       </div>
       <div class="sheet-divider"></div>

@@ -110,6 +110,7 @@ const ClarityExperience = {
     // instead of a blank start. Their diagnostic answers also reach the AI via
     // buildProfileContext; this pre-selects the area as a reversible default.
     try { if (!state.clarity.completed) this._seedFromOnboarding(); } catch (e) {}
+    try { if (typeof Analytics !== 'undefined') Analytics.track('clarity_start'); } catch (e) {} // Funnel
     this._cinematicOpen();
   },
 
@@ -321,6 +322,19 @@ const ClarityExperience = {
 
           const restartBtn = document.getElementById('nsConfirmRestart');
           if (restartBtn) restartBtn.addEventListener('click', () => {
+            // One free Clarity run, ever (FIRST-WIN-PLAN #1). A restart is a
+            // brand-new AI discovery, so a free user gets the paywall instead of
+            // a silent second run. Close the scene first (the paywall layers under
+            // clarity-exp), same order as the canonical post-naming flow; the
+            // star itself stays saved and untouched.
+            try {
+              if (typeof ClarityPaywall !== 'undefined' && !ClarityPaywall.isPaid()) {
+                if (confirmEscHandler) { document.removeEventListener('keydown', confirmEscHandler, true); confirmEscHandler = null; }
+                _ce.close();
+                ClarityPaywall.show();
+                return;
+              }
+            } catch (e) {}
             // Detach the capturing ESC handler before leaving the confirm prompt;
             // restoreSummary is skipped on this path, so without this it would leak
             // and keep swallowing Escape globally (one more per Continue->Restart).
