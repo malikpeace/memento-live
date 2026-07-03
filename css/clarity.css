@@ -2766,7 +2766,9 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
    scroll slack to fling. Root class set in js/02 bindWizardInFullscreen. */
 .clarity-exp.has-wiz-composer .wiz__step {
   justify-content: flex-start;
-  padding-top: 2vh;
+  /* Sit a touch lower than dead-top so it reads centered, but keep the field
+     well above the keyboard line so iOS still has near-zero pan to do. */
+  padding-top: 12vh;
 }
 .clarity-exp.has-wiz-composer .clarity-exp__page-wrap {
   overflow: hidden; /* zero pan slack; content fits the upper half by design */
