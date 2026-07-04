@@ -7327,18 +7327,57 @@ function _bindStarPlacard(root) {
 })();
 
 // DEV PREVIEW (demo mode only): open the app with ?ceremony=1 to watch the
-// v2 ending end-to-end with the demo persona's answers, without redoing the
-// wizard. Clears ignitedAt for this session only (demo data is throwaway).
-// A floating scrubber (bottom of screen) lets you jump freely between the five
-// acts (monument, sharpen, want, contract, star) both ways, so the whole flow
-// can be reviewed without performing each hold/tap. Inert without ?ceremony=1.
+// VERY end of the questionnaire with the demo persona's answers, without
+// redoing the wizard: the "Synthesizing your Neutron Star..." curtain, the cut
+// into the ceremony, and the five acts. Clears ignitedAt for this session only
+// (demo data is throwaway). A floating scrubber (bottom of screen) jumps
+// freely between S (synthesis) and acts 1-5 both ways, so the whole ending can
+// be reviewed without performing each hold/tap. Inert without ?ceremony=1.
 (function () {
   try {
     if (!/[?&]ceremony=1/.test(location.search)) return;
 
-    // Free back/forth scrubber over the five ceremony acts.
+    // The reviewable stages. 'synth' replays the REAL end-of-questionnaire
+    // moment: the aurora "Synthesizing your Neutron Star..." curtain that plays
+    // after the last answer, which then cuts into the ceremony exactly like the
+    // live flow (renderAiSynthesis -> renderIgnitionV2 when the result lands).
+    const STAGES = ['synth', 'monument', 'sharpen', 'want', 'contract', 'star'];
+    let devSummary = null;
+    let devSynthTimer = null;
+
+    // bindIgnitionV2 re-mounts #nsv2Root onto <body>, so stage changes must
+    // clear that body-mounted root or the old act stays visible on top.
+    const clearCeremonyRoot = () => {
+      const r = document.getElementById('nsv2Root');
+      if (r) r.remove();
+    };
+
+    const showCeremony = (act) => {
+      if (devSynthTimer) { clearTimeout(devSynthTimer); devSynthTimer = null; }
+      clearCeremonyRoot();
+      _ig2Act = act;
+      ClarityExperience.pageWrap.innerHTML = '<div class="clarity-exp__page-inner clarity-exp__page-inner--summary">' + renderIgnitionV2(devSummary) + '</div>';
+      ClarityExperience.navEl.innerHTML = '';
+      bindIgnitionV2(document);
+    };
+
+    const showSynth = () => {
+      if (devSynthTimer) { clearTimeout(devSynthTimer); devSynthTimer = null; }
+      clearCeremonyRoot();
+      _ig2Act = 'synth';
+      // Same markup the real aiSynthesis step shows while Opus is working.
+      ClarityExperience.pageWrap.innerHTML = '<div class="clarity-exp__page-inner">' +
+        '<div class="ai-thinking">' +
+        '<div class="aur"><span class="aur-band b1"></span><span class="aur-band b2"></span><span class="aur-band b3"></span></div>' +
+        '<div style="text-align:center;color:var(--text-3);font-size:0.875rem;margin-top:20px;">Synthesizing your Neutron Star...</div></div></div>';
+      ClarityExperience.navEl.innerHTML = '';
+      // The real synthesis takes a while; 3s is enough to feel the cut.
+      devSynthTimer = setTimeout(() => { showCeremony('monument'); }, 3000);
+    };
+
+    // Free back/forth scrubber over the synth beat + five ceremony acts.
     const mountCeremonyScrubber = () => {
-      const ACTS = ['monument', 'sharpen', 'want', 'contract', 'star'];
+      const ACTS = STAGES;
       const old = document.getElementById('nsv2DevScrub');
       if (old) old.remove();
       const bar = document.createElement('div');
@@ -7352,21 +7391,22 @@ function _bindStarPlacard(root) {
         return b;
       };
       const go = (idx) => {
-        _ig2Act = ACTS[Math.max(0, Math.min(ACTS.length - 1, idx))];
-        _ig2Rerender();
+        const stage = ACTS[Math.max(0, Math.min(ACTS.length - 1, idx))];
+        if (stage === 'synth') showSynth();
+        else showCeremony(stage);
         paint();
       };
       const prev = mk('◀', () => go(ACTS.indexOf(_ig2Act) - 1), 'font-size:11px;');
       const next = mk('▶', () => go(ACTS.indexOf(_ig2Act) + 1), 'font-size:11px;');
       const chipsWrap = document.createElement('div');
       chipsWrap.style.cssText = 'display:flex;gap:4px;';
-      const chips = ACTS.map((_, i) => mk(String(i + 1), () => go(i), 'padding:7px 9px;min-width:26px;'));
+      const chips = ACTS.map((s, i) => mk(s === 'synth' ? 'S' : String(i), () => go(i), 'padding:7px 9px;min-width:26px;'));
       chips.forEach(c => chipsWrap.appendChild(c));
       const label = document.createElement('span');
       label.style.cssText = 'min-width:88px;text-align:center;opacity:0.82;letter-spacing:0.02em;text-transform:capitalize;';
       function paint() {
         const cur = Math.max(0, ACTS.indexOf(_ig2Act));
-        label.textContent = (cur + 1) + '/' + ACTS.length + '  ' + ACTS[cur];
+        label.textContent = (cur === 0 ? 'S' : cur) + '/' + (ACTS.length - 1) + '  ' + (ACTS[cur] === 'synth' ? 'synthesis' : ACTS[cur]);
         chips.forEach((c, i) => {
           c.style.background = i === cur ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.08)';
           c.style.color = i === cur ? '#000' : '#fff';
@@ -7387,8 +7427,8 @@ function _bindStarPlacard(root) {
         try {
           if (typeof DEMO_MODE === 'undefined' || !DEMO_MODE) return;
           state.clarity.ignitedAt = null;
-          _ig2Act = 'monument'; _ig2 = {};
-          const summary = normalizeClaritySummary(state.clarity.answers);
+          _ig2 = {};
+          devSummary = normalizeClaritySummary(state.clarity.answers);
           ClarityExperience.isOpen = true;
           if (typeof FullscreenClose !== 'undefined' && FullscreenClose.show) FullscreenClose.show('clarity');
           ClarityExperience.el.setAttribute('aria-hidden', 'false');
@@ -7397,9 +7437,9 @@ function _bindStarPlacard(root) {
           ClarityExperience.el.classList.add('open-bg');
           ClarityExperience.el.classList.add('open-bg-visible');
           ClarityExperience.el.classList.add('open-content');
-          ClarityExperience.pageWrap.innerHTML = '<div class="clarity-exp__page-inner clarity-exp__page-inner--summary">' + renderIgnitionV2(summary) + '</div>';
-          ClarityExperience.navEl.innerHTML = '';
-          bindIgnitionV2(document);
+          // Start at the synth beat: the loading curtain the user actually sees
+          // after their last answer, then the cut into the ceremony.
+          showSynth();
           mountCeremonyScrubber();
         } catch (e) {}
       }, 1400);
