@@ -6913,27 +6913,27 @@ function _fireIgnition(root) {
 }
 
 /* ============================================================
-   IGNITION v2 - "Monument -> Contract -> Star"
-   The redesigned Clarity ending. v1 (above) stays intact;
+   IGNITION v2 - "Reveal -> Ignite -> Handoff"
+   The Clarity ending (live default). v1 (above) stays intact;
    routing is decided by clarityEndingVersion() below.
-     Act 1 MONUMENT: the goal typeset huge. "Is this exactly it?"
-       -> Not quite: AI-assisted sharpening loop (user is judge).
-       -> That's it: a one-tap want-to/should check, then on.
-     Act 2 CONTRACT: document scale, dated, if-then clause,
-       "Sign it so you can't unsay it", thumbprint press-and-hold.
-     Act 3 STAR: the ink collapses, the star ignites (quiet
-       majesty: JWST palette, diffraction spikes, halation),
-       registry placard with AI-proposed name + rename, and an
-       optional letter coda sealed into the star.
+     Beat 1 REVEAL: black screen, their distilled sentence appears
+       alone, word by word. A quiet "Not quite" escape opens the
+       AI-assisted sharpen editor. The confirm is a PRESS-AND-HOLD
+       on a ring under the sentence, so nobody ignites by accident.
+     Beat 2 IGNITE: the hold completes, the sentence collapses into
+       a point of light, the star ignites (JWST palette, diffraction
+       spikes) with the registry placard + optional sealed letter.
+     Beat 3 HANDOFF: "A star is not a plan." Primary CTA goes
+       straight into Action; ghost "Done for now" to the summary.
    Every star is unique: deterministic hash of the goal text
    drives temperature, spike angle, and designation.
    ============================================================ */
 
-// 'off' = the original flow (no ceremony, straight to the summary card).
-// The v1/v2 ceremony experiments remain available via ?ending=v1 / ?ending=v2.
-const CLARITY_ENDING_VERSION = 'off';
+// 'v2' = the Reveal/Ignite/Handoff ending (live default).
+// ?ending=v1 / ?ending=off remain for review of the older flows.
+const CLARITY_ENDING_VERSION = 'v2';
 function clarityEndingVersion() {
-  // 'v2' = Monument/Contract/Star ceremony (current), 'v1' = first ceremony,
+  // 'v2' = Reveal/Ignite/Handoff ceremony (live), 'v1' = first ceremony,
   // 'off' = the ORIGINAL flow: no ceremony at all, straight to the summary card.
   try {
     const m = /[?&]ending=(v1|v2|off)/.exec(location.search);
@@ -6942,7 +6942,7 @@ function clarityEndingVersion() {
   return CLARITY_ENDING_VERSION;
 }
 
-let _ig2Act = 'monument';   // monument | sharpen | want | contract | star
+let _ig2Act = 'reveal';     // reveal | sharpen | star
 let _ig2 = {};              // scratch state for the run
 
 // Deterministic star identity from the goal text. Same goal = same star.
@@ -6982,15 +6982,30 @@ function renderIgnitionV2(summary) {
   const seed = starSeedFromGoal(goal);
   let inner = '';
 
-  if (_ig2Act === 'monument') {
+  if (_ig2Act === 'reveal') {
+    // The sentence appears alone, word by word, on black. Each word is a
+    // span with a staggered animation-delay; the hold ring and the quiet
+    // escape fade in only after the last word has landed.
+    const words = String(goal).split(/\s+/).filter(Boolean);
+    const STEP = 240, START = 500;
+    const wordEls = words.map((w, i) =>
+      `<span class="nsv2-reveal__w" style="animation-delay:${START + i * STEP}ms">${esc(w)}</span>`
+    ).join(' ');
+    const afterDelay = START + words.length * STEP + 700;
     inner = `
-      <div class="nsv2-monument">
-        <div class="nsv2-eyebrow">Your Neutron Star</div>
-        <div class="nsv2-monument__goal">${esc(goal)}</div>
-        <div class="nsv2-monument__ask">Read it slowly. Is this exactly it?<br>Would you recognize the day this comes true?</div>
-        <div class="nsv2-monument__btns">
-          <button type="button" class="nsv2-btn nsv2-btn--primary" id="nsv2Yes">That's it</button>
-          <button type="button" class="nsv2-btn nsv2-btn--ghost" id="nsv2No">Not quite</button>
+      <div class="nsv2-reveal">
+        <div class="nsv2-eyebrow nsv2-reveal__eyebrow">Your Neutron Star</div>
+        <div class="nsv2-reveal__goal">${wordEls}</div>
+        <div class="nsv2-reveal__after" style="animation-delay:${afterDelay}ms">
+          <div class="nsv2-hold" id="nsv2Hold" role="button" tabindex="0" aria-label="Press and hold to make it yours">
+            <svg viewBox="0 0 76 76" aria-hidden="true">
+              <circle class="nsv2-hold__track" cx="38" cy="38" r="33"/>
+              <circle class="nsv2-hold__fill" id="nsv2HoldFill" cx="38" cy="38" r="33"/>
+            </svg>
+            <span class="nsv2-hold__core" aria-hidden="true"></span>
+          </div>
+          <div class="nsv2-reveal__hint">Read it once more. If it is true,<br><span>press and hold to make it yours.</span></div>
+          <button type="button" class="nsv2-reveal__no" id="nsv2No">Not quite</button>
         </div>
       </div>`;
   } else if (_ig2Act === 'sharpen') {
@@ -7004,56 +7019,6 @@ function renderIgnitionV2(summary) {
           <span class="nsv2-sharpen__ai-note" id="nsv2AiNote"></span>
         </div>
         <button type="button" class="nsv2-btn nsv2-btn--primary" id="nsv2SharpenDone">This is it now</button>
-      </div>`;
-  } else if (_ig2Act === 'want') {
-    inner = `
-      <div class="nsv2-want">
-        <div class="nsv2-eyebrow">Be honest</div>
-        <div class="nsv2-want__q">Do you want this, or do you feel you should want it?</div>
-        <div class="nsv2-monument__btns">
-          <button type="button" class="nsv2-btn nsv2-btn--primary" data-want="want">I want this</button>
-          <button type="button" class="nsv2-btn nsv2-btn--ghost" data-want="should">I feel I should</button>
-        </div>
-        <div class="nsv2-want__note" id="nsv2WantNote" hidden>
-          "Should" is usually somebody else's voice. Worth noticing whose. We will work with what is true.
-          <button type="button" class="nsv2-btn nsv2-btn--primary" id="nsv2WantGo">Continue</button>
-        </div>
-      </div>`;
-  } else if (_ig2Act === 'contract') {
-    const today = new Date().toLocaleDateString('en-US', { day: '2-digit', month: 'long', year: 'numeric' });
-    const a = (state.clarity && state.clarity.answers) || {};
-    const cueDefault = _ig2.cue !== undefined ? _ig2.cue : (a.doomscrollWhen || a.biggestBlocker || '');
-    inner = `
-      <div class="nsv2-contract">
-        <div class="nsv2-eyebrow">The contract</div>
-        <div class="nsv2-doc">
-          <div class="nsv2-doc__date">${esc(today)}</div>
-          <div class="nsv2-doc__goal">${esc(goal)}</div>
-          <div class="nsv2-doc__rule"></div>
-          <div class="nsv2-doc__clause-label">Contingency clause</div>
-          <div class="nsv2-doc__clause">
-            <label class="nsv2-doc__field"><span>When</span>
-              <input type="text" id="nsv2Cue" maxlength="120" placeholder="the moment it usually goes wrong" value="${esc(cueDefault)}"></label>
-            <label class="nsv2-doc__field"><span>I will</span>
-              <input type="text" id="nsv2Act" maxlength="120" placeholder="one physical action I can always take" value="${esc(_ig2.act || '')}"></label>
-          </div>
-          <div class="nsv2-doc__truth">This was already true. You just had not said it out loud yet.</div>
-          <div class="nsv2-doc__sign-row">
-            <div class="nsv2-thumb" id="nsv2Thumb" role="button" aria-label="Press and hold to sign">
-              <svg viewBox="0 0 64 80" aria-hidden="true">
-                <g class="nsv2-thumb__print" fill="none" stroke-linecap="round">
-                  <ellipse cx="32" cy="40" rx="22" ry="30"/>
-                  <ellipse cx="32" cy="40" rx="16.5" ry="23"/>
-                  <ellipse cx="32" cy="40" rx="11" ry="16"/>
-                  <ellipse cx="32" cy="41" rx="6" ry="9"/>
-                  <path d="M32 18 v-6 M14 30 l-5 -4 M50 30 l5 -4 M14 52 l-5 4 M50 52 l5 4"/>
-                </g>
-                <rect class="nsv2-thumb__ink" x="0" y="80" width="64" height="80"/>
-              </svg>
-            </div>
-            <div class="nsv2-doc__sign-hint" id="nsv2SignHint">Sign it so you can't unsay it.<br><span>Press and hold.</span></div>
-          </div>
-        </div>
       </div>`;
   } else {
     // _ig2Act === 'star'
@@ -7089,9 +7054,11 @@ function renderIgnitionV2(summary) {
             <span><i>Ignited</i>${esc(ignDate)}</span>
             <span><i>Status</i>SIGNED</span>
           </div>
+          <div class="nsv2-placard__handoff">A star is not a plan. It needs a first move.</div>
           <div class="nsv2-placard__actions">
+            <button type="button" class="nsv2-btn nsv2-btn--primary" id="nsv2Action">Take the first step</button>
             <button type="button" class="nsv2-btn nsv2-btn--ghost" id="nsv2Letter">Seal a sentence into the star</button>
-            <button type="button" class="nsv2-btn nsv2-btn--primary" id="nsv2Done">Continue</button>
+            <button type="button" class="nsv2-reveal__no nsv2-placard__done" id="nsv2Done">Done for now</button>
           </div>
           <div class="nsv2-letter" id="nsv2LetterBox" hidden>
             <textarea class="nsv2-letter__input" id="nsv2LetterText" maxlength="240" rows="2" placeholder="To the person orbiting this star in 90 days..."></textarea>
@@ -7128,11 +7095,10 @@ function bindIgnitionV2(container) {
   const act = root.getAttribute('data-act');
   const a = (state.clarity && state.clarity.answers) || {};
 
-  if (act === 'monument') {
-    const yes = root.querySelector('#nsv2Yes');
+  if (act === 'reveal') {
     const no = root.querySelector('#nsv2No');
-    if (yes) yes.addEventListener('click', () => { _ig2Act = 'want'; _ig2Rerender(); });
     if (no) no.addEventListener('click', () => { _ig2Act = 'sharpen'; _ig2Rerender(); });
+    _bindHoldToIgnite(root);
   } else if (act === 'sharpen') {
     const input = root.querySelector('#nsv2GoalEdit');
     const aiBtn = root.querySelector('#nsv2AiSharpen');
@@ -7157,72 +7123,60 @@ function bindIgnitionV2(container) {
         try { persistNow(); } catch (e) {}
       }
       _ig2.draftGoal = undefined;
-      _ig2Act = 'monument';
+      _ig2Act = 'reveal';
       _ig2Rerender();
     });
-  } else if (act === 'want') {
-    root.querySelectorAll('[data-want]').forEach(btn => btn.addEventListener('click', () => {
-      const v = btn.getAttribute('data-want');
-      a.wantTo = v;
-      try { persistNow(); } catch (e) {}
-      if (v === 'should') {
-        const note = root.querySelector('#nsv2WantNote');
-        root.querySelectorAll('[data-want]').forEach(b => b.classList.toggle('is-on', b === btn));
-        if (note) { note.hidden = false; const go = note.querySelector('#nsv2WantGo'); if (go) go.addEventListener('click', () => { _ig2Act = 'contract'; _ig2Rerender(); }); }
-      } else {
-        _ig2Act = 'contract'; _ig2Rerender();
-      }
-    }));
-  } else if (act === 'contract') {
-    const cue = root.querySelector('#nsv2Cue');
-    const actI = root.querySelector('#nsv2Act');
-    if (cue) cue.addEventListener('input', () => { _ig2.cue = cue.value; });
-    if (actI) actI.addEventListener('input', () => { _ig2.act = actI.value; });
-    _bindThumbSign(root);
   } else if (act === 'star') {
     _bindStarPlacard(root);
   }
 }
 
-function _bindThumbSign(root) {
-  const thumb = root.querySelector('#nsv2Thumb');
-  const ink = root.querySelector('.nsv2-thumb__ink');
-  const hint = root.querySelector('#nsv2SignHint');
-  if (!thumb || !ink) return;
-  const HOLD_MS = 2200;
+// Press-and-hold on the ring under the sentence. Filling the ring is the
+// confirmation: release early and it resets, so nobody ignites by accident.
+function _bindHoldToIgnite(root) {
+  const hold = root.querySelector('#nsv2Hold');
+  const fill = root.querySelector('#nsv2HoldFill');
+  if (!hold || !fill) return;
+  const HOLD_MS = 1800;
+  const CIRC = 2 * Math.PI * 33; // r=33 in the 76x76 viewBox
+  fill.style.strokeDasharray = String(CIRC);
+  fill.style.strokeDashoffset = String(CIRC);
   let raf = null, start = 0, done = false;
-  const setP = (p) => { ink.setAttribute('y', String(80 - 80 * p)); };
+  const setP = (p) => { fill.style.strokeDashoffset = String(CIRC * (1 - p)); };
   const tick = (t) => {
     if (done) return;
     const p = Math.min(1, (t - start) / HOLD_MS);
     setP(p);
-    if (p >= 1) { done = true; _ig2Signed(root); return; }
+    if (p >= 1) { done = true; root.classList.remove('is-holding'); _ig2Signed(root); return; }
     raf = requestAnimationFrame(tick);
   };
   const begin = (e) => {
     if (done) return;
     e.preventDefault();
-    root.classList.add('is-signing');
+    root.classList.add('is-holding');
     start = performance.now();
     raf = requestAnimationFrame(tick);
   };
   const cancel = () => {
     if (done) return;
-    root.classList.remove('is-signing');
+    root.classList.remove('is-holding');
     if (raf) cancelAnimationFrame(raf);
     setP(0);
   };
-  thumb.addEventListener('pointerdown', begin);
+  hold.addEventListener('pointerdown', begin);
   document.addEventListener('pointerup', cancel);
   document.addEventListener('pointercancel', cancel);
+  // Keyboard path: holding Space or Enter fills the same ring.
+  hold.addEventListener('keydown', (e) => {
+    if ((e.key === ' ' || e.key === 'Enter') && !e.repeat && !done) { e.preventDefault(); begin(e); }
+  });
+  hold.addEventListener('keyup', (e) => {
+    if (e.key === ' ' || e.key === 'Enter') cancel();
+  });
 }
 
 function _ig2Signed(root) {
-  // Persist the clause + the signature, then collapse into ignition.
-  const a = (state.clarity && state.clarity.answers) || {};
-  const cue = (_ig2.cue || '').trim();
-  const actv = (_ig2.act || '').trim();
-  if (cue && actv) a.ifThen = { cue, action: actv, setAt: Date.now() };
+  // The hold completed: persist the ignition, then collapse into the star.
   state.clarity.ignitedAt = Date.now();
   try { persistNow(); } catch (e) {}
   try { if (typeof writeProofEvent === 'function') writeProofEvent('proof', { title: 'Ignition', text: 'Signed and ignited their Neutron Star', module: 'clarity' }); } catch (e) {}
@@ -7298,9 +7252,18 @@ function _bindStarPlacard(root) {
     if (letterBox) { letterBox.hidden = true; }
     if (letterBtn) { letterBtn.textContent = txt ? 'Sealed. Opens in 90 days.' : letterBtn.textContent; letterBtn.disabled = !!txt; }
   });
+  // Primary handoff: the star leads straight into the first move.
+  const actionBtn = root.querySelector('#nsv2Action');
+  if (actionBtn) actionBtn.addEventListener('click', () => {
+    _ig2Act = 'reveal'; _ig2 = {};
+    try { const r = document.getElementById('nsv2Root'); if (r) r.remove(); } catch (e) {}
+    try { completeWizard(); } catch (e) {}
+    try { if (ClarityExperience && ClarityExperience.isOpen) ClarityExperience.close(); } catch (e) {}
+    try { ActionExperience.open(); } catch (e) {}
+  });
   const doneBtn = root.querySelector('#nsv2Done');
   if (doneBtn) doneBtn.addEventListener('click', () => {
-    _ig2Act = 'monument'; _ig2 = {};
+    _ig2Act = 'reveal'; _ig2 = {};
     try { const r = document.getElementById('nsv2Root'); if (r) r.remove(); } catch (e) {}
     try {
       if (ClarityExperience && ClarityExperience.isOpen) {
@@ -7329,10 +7292,11 @@ function _bindStarPlacard(root) {
 // DEV PREVIEW (demo mode only): open the app with ?ceremony=1 to watch the
 // VERY end of the questionnaire with the demo persona's answers, without
 // redoing the wizard: the "Synthesizing your Neutron Star..." curtain, the cut
-// into the ceremony, and the five acts. Clears ignitedAt for this session only
+// into the reveal, and the star. Clears ignitedAt for this session only
 // (demo data is throwaway). A floating scrubber (bottom of screen) jumps
-// freely between S (synthesis) and acts 1-5 both ways, so the whole ending can
-// be reviewed without performing each hold/tap. Inert without ?ceremony=1.
+// freely between S (synthesis), 1 (reveal) and 2 (star) both ways, so the
+// whole ending can be reviewed. The hold-to-ignite on 1 works live and cuts
+// to the star for real. Inert without ?ceremony=1.
 (function () {
   try {
     if (!/[?&]ceremony=1/.test(location.search)) return;
@@ -7341,7 +7305,7 @@ function _bindStarPlacard(root) {
     // moment: the aurora "Synthesizing your Neutron Star..." curtain that plays
     // after the last answer, which then cuts into the ceremony exactly like the
     // live flow (renderAiSynthesis -> renderIgnitionV2 when the result lands).
-    const STAGES = ['synth', 'monument', 'sharpen', 'want', 'contract', 'star'];
+    const STAGES = ['synth', 'reveal', 'star'];
     let devSummary = null;
     let devSynthTimer = null;
 
@@ -7372,7 +7336,7 @@ function _bindStarPlacard(root) {
         '<div style="text-align:center;color:var(--text-3);font-size:0.875rem;margin-top:20px;">Synthesizing your Neutron Star...</div></div></div>';
       ClarityExperience.navEl.innerHTML = '';
       // The real synthesis takes a while; 3s is enough to feel the cut.
-      devSynthTimer = setTimeout(() => { showCeremony('monument'); }, 3000);
+      devSynthTimer = setTimeout(() => { showCeremony('reveal'); }, 3000);
     };
 
     // Free back/forth scrubber over the synth beat + five ceremony acts.
