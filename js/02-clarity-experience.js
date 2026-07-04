@@ -6921,12 +6921,13 @@ function _fireIgnition(root) {
        AI-assisted sharpen editor. The confirm is a PRESS-AND-HOLD
        on a ring under the sentence, so nobody ignites by accident.
      Beat 2 IGNITE: the hold completes, the sentence collapses into
-       a point of light, the star ignites (JWST palette, diffraction
-       spikes) with the registry placard + optional sealed letter.
-     Beat 3 HANDOFF: "A star is not a plan." Primary CTA goes
-       straight into Action; ghost "Done for now" to the summary.
-   Every star is unique: deterministic hash of the goal text
-   drives temperature, spike angle, and designation.
+       a point of light, the star ignites (white/blue, diffraction
+       spikes) with their sentence under it in Memento's own type.
+     Beat 3 HANDOFF: "A star is not a plan." Primary solid CTA goes
+       straight into Action; quiet "Done for now" to the summary.
+   Style law: NOTHING here that isn't already Memento (no serif,
+   no gold, no fake registry). White/blue star only; deterministic
+   hash of the goal drives temperature + spike angle.
    ============================================================ */
 
 // 'v2' = the Reveal/Ignite/Handoff ending (live default).
@@ -7022,8 +7023,6 @@ function renderIgnitionV2(summary) {
       </div>`;
   } else {
     // _ig2Act === 'star'
-    const name = (state.clarity.answers && state.clarity.answers.starName) || '';
-    const ignDate = new Date(state.clarity.ignitedAt || Date.now()).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
     // JWST anatomy: three long primary spike axes (hex mirror) + one shorter
     // horizontal strut pair, each with a faint chromatic fringe twin.
     const spikeEls = [];
@@ -7044,26 +7043,11 @@ function renderIgnitionV2(summary) {
           ${spikeEls.join('')}
           <div class="nsv2-star__core"></div>
         </div>
-        <div class="nsv2-placard">
-          <button type="button" class="nsv2-placard__name" id="nsv2Name" title="Rename your star">${name ? esc(name) : '<span class="nsv2-placard__name-pending">Naming...</span>'}</button>
-          <div class="nsv2-placard__goal">&ldquo;${esc(goal)}&rdquo;</div>
-          <div class="nsv2-placard__rule"></div>
-          <div class="nsv2-placard__meta">
-            <span><i>Designation</i>${esc(seed.designation)}</span>
-            <span><i>Class</i>${esc(seed.cls)} &middot; ${seed.kelvin.toLocaleString()} K</span>
-            <span><i>Ignited</i>${esc(ignDate)}</span>
-            <span><i>Status</i>SIGNED</span>
-          </div>
-          <div class="nsv2-placard__handoff">A star is not a plan. It needs a first move.</div>
-          <div class="nsv2-placard__actions">
-            <button type="button" class="nsv2-btn nsv2-btn--primary" id="nsv2Action">Take the first step</button>
-            <button type="button" class="nsv2-btn nsv2-btn--ghost" id="nsv2Letter">Seal a sentence into the star</button>
-            <button type="button" class="nsv2-reveal__no nsv2-placard__done" id="nsv2Done">Done for now</button>
-          </div>
-          <div class="nsv2-letter" id="nsv2LetterBox" hidden>
-            <textarea class="nsv2-letter__input" id="nsv2LetterText" maxlength="240" rows="2" placeholder="To the person orbiting this star in 90 days..."></textarea>
-            <button type="button" class="nsv2-btn nsv2-btn--primary" id="nsv2LetterSeal">Seal it for 90 days</button>
-          </div>
+        <div class="nsv2-after">
+          <div class="nsv2-after__goal">${esc(goal)}</div>
+          <div class="nsv2-after__line">A star is not a plan. It needs a first move.</div>
+          <button type="button" class="nsv2-cta" id="nsv2Action">Take the first step</button>
+          <button type="button" class="nsv2-reveal__no" id="nsv2Done">Done for now</button>
         </div>
       </div>`;
   }
@@ -7188,70 +7172,13 @@ function _ig2Signed(root) {
   flare.className = 'nsv2__flare';
   root.appendChild(flare);
 
-  // Ask the AI for a star name in parallel with the flare (placard shows
-  // "Naming..." then fills in; offline it quietly stays designation-led).
-  _ig2.nameRequested = false;
-
   setTimeout(() => {
     _ig2Act = 'star';
     _ig2Rerender();
-    _ig2RequestName();
   }, lite ? 700 : 1700);
 }
 
-function _ig2RequestName() {
-  if (_ig2.nameRequested) return;
-  _ig2.nameRequested = true;
-  const a = (state.clarity && state.clarity.answers) || {};
-  if (a.starName) return;
-  Promise.resolve()
-    .then(() => proposeStarNameAI(a))
-    .then(name => {
-      if (name) { a.starName = name; try { persistNow(); } catch (e) {} }
-      const el = document.getElementById('nsv2Name');
-      if (el) el.innerHTML = name ? esc(name) : '<span class="nsv2-placard__name-pending">Name your star</span>';
-    })
-    .catch(() => {
-      const el = document.getElementById('nsv2Name');
-      if (el) el.innerHTML = '<span class="nsv2-placard__name-pending">Name your star</span>';
-    });
-}
-
 function _bindStarPlacard(root) {
-  const a = (state.clarity && state.clarity.answers) || {};
-  const nameBtn = root.querySelector('#nsv2Name');
-  if (nameBtn) nameBtn.addEventListener('click', () => {
-    const cur = a.starName || '';
-    const input = document.createElement('input');
-    input.type = 'text'; input.maxLength = 40; input.value = cur;
-    input.className = 'nsv2-placard__name-input';
-    nameBtn.replaceWith(input);
-    input.focus(); input.select();
-    const commit = () => {
-      const v = input.value.trim();
-      if (v) { a.starName = v; try { persistNow(); } catch (e) {} }
-      _ig2Rerender();
-    };
-    input.addEventListener('blur', commit);
-    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); input.blur(); } });
-  });
-  const letterBtn = root.querySelector('#nsv2Letter');
-  const letterBox = root.querySelector('#nsv2LetterBox');
-  if (letterBtn && letterBox) letterBtn.addEventListener('click', () => {
-    letterBox.hidden = !letterBox.hidden;
-    if (!letterBox.hidden) { const t = letterBox.querySelector('#nsv2LetterText'); if (t) t.focus(); }
-  });
-  const seal = root.querySelector('#nsv2LetterSeal');
-  if (seal) seal.addEventListener('click', () => {
-    const t = root.querySelector('#nsv2LetterText');
-    const txt = ((t && t.value) || '').trim();
-    if (txt) {
-      state.clarity.letter = { text: txt, sealedAt: Date.now(), opensAt: Date.now() + 90 * 24 * 60 * 60 * 1000 };
-      try { persistNow(); } catch (e) {}
-    }
-    if (letterBox) { letterBox.hidden = true; }
-    if (letterBtn) { letterBtn.textContent = txt ? 'Sealed. Opens in 90 days.' : letterBtn.textContent; letterBtn.disabled = !!txt; }
-  });
   // Primary handoff: the star leads straight into the first move.
   const actionBtn = root.querySelector('#nsv2Action');
   if (actionBtn) actionBtn.addEventListener('click', () => {
