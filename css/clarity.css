@@ -2692,7 +2692,7 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
   right: 0;
   z-index: 10;
   display: flex; align-items: center; justify-content: space-between;
-  padding: calc(var(--safe-t, 0px) + 16px) 20px 12px;
+  padding: calc(var(--safe-t, 0px) + 8px) 20px 12px; /* nudged up 8px (Malik: felt slightly low) */
   /* Inherit parent's pointer-events so when .clarity-exp is closed (which
      sets pointer-events:none on itself), this bar stops capturing clicks.
      Was hardcoded to "auto" which made the top strip of the viewport
@@ -2727,7 +2727,7 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
    updateProgress in js/02 and reuses the .ai-progress__bar/__fill look. */
 .clarity-exp__progress {
   position: absolute;
-  top: calc(var(--safe-t, 0px) + 60px);
+  top: calc(var(--safe-t, 0px) + 50px); /* raised 10px with the X (Malik: felt slightly low) */
   left: 20px; right: 20px;
   z-index: 9;
   pointer-events: none;

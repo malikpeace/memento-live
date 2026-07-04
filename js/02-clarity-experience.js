@@ -1810,8 +1810,14 @@ const ClarityExperience = {
 
     const stepKey = isWizard ? getWizardSteps()[wizardStep] : null;
 
+    // While an AI loading curtain is up (thinking between questions, or synthesizing
+    // the star) there is nothing to go back to yet, so hide Back entirely (Malik,
+    // 2026-07-03) - it was a dead control floating on the loader.
+    const isAiLoading = (stepKey === 'aiChat' && aiChatLoading) ||
+      (stepKey === 'aiSynthesis' && !aiSynthesisResult && !aiChatError);
+
     // Show back button: always if past page 0, or during AI chat if there's history
-    const showBack = this.currentPage > 0 || (isWizard && this.currentPage === 0 && state.clarity.tutorialSeen && !this.tutorialOnly) || (stepKey === 'aiChat' && aiChatMessages.length > 1);
+    const showBack = !isAiLoading && (this.currentPage > 0 || (isWizard && this.currentPage === 0 && state.clarity.tutorialSeen && !this.tutorialOnly) || (stepKey === 'aiChat' && aiChatMessages.length > 1));
     if (showBack) {
       html += '<button class="clarity-exp__nav-btn clarity-exp__nav-btn--back" id="cexpBack" aria-label="Back"></button>';
     }
