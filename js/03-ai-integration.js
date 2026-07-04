@@ -3269,11 +3269,12 @@ async function triggerSynthesis() {
       [{ role: 'user', content: 'Context: ' + context + '\n\nFull conversation:\n' + conversationText + '\n\nPlease synthesize this into the JSON structure.' }],
       AI_SYNTHESIS_SYSTEM_PROMPT,
       // The single most important call: read the whole conversation and distill
-      // the one-sentence Neutron Star. Opus, WITH extended thinking so it reasons
-      // hard and the final result is as close to perfect as possible. maxTokens
-      // covers the thinking budget + the JSON output. (thinking + cache are
-      // applied by the proxy; an older proxy simply ignores them, no breakage.)
-      { maxTokens: 4096, model: ANTHROPIC_MODEL_SYNTHESIS, cache: true, thinking: { budget_tokens: 2000 } }
+      // the one-sentence Neutron Star. Runs on Opus, which already reasons at
+      // high effort by default, so the result stays as close to perfect as
+      // possible. (We used to pass an explicit extended-thinking budget here, but
+      // the old `thinking: {type:'enabled', budget_tokens}` shape was retired on
+      // this model and returned a 400; Opus's default effort covers it.)
+      { maxTokens: 4096, model: ANTHROPIC_MODEL_SYNTHESIS, cache: true }
     );
 
     // Parse JSON robustly: strip code fences anywhere, then slice from the first
