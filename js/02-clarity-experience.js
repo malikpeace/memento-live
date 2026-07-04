@@ -7329,9 +7329,59 @@ function _bindStarPlacard(root) {
 // DEV PREVIEW (demo mode only): open the app with ?ceremony=1 to watch the
 // v2 ending end-to-end with the demo persona's answers, without redoing the
 // wizard. Clears ignitedAt for this session only (demo data is throwaway).
+// A floating scrubber (bottom of screen) lets you jump freely between the five
+// acts (monument, sharpen, want, contract, star) both ways, so the whole flow
+// can be reviewed without performing each hold/tap. Inert without ?ceremony=1.
 (function () {
   try {
     if (!/[?&]ceremony=1/.test(location.search)) return;
+
+    // Free back/forth scrubber over the five ceremony acts.
+    const mountCeremonyScrubber = () => {
+      const ACTS = ['monument', 'sharpen', 'want', 'contract', 'star'];
+      const old = document.getElementById('nsv2DevScrub');
+      if (old) old.remove();
+      const bar = document.createElement('div');
+      bar.id = 'nsv2DevScrub';
+      bar.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 14px);z-index:2147483000;display:flex;align-items:center;gap:6px;padding:8px 10px;border-radius:14px;background:rgba(10,10,14,0.86);-webkit-backdrop-filter:blur(22px) saturate(1.4);backdrop-filter:blur(22px) saturate(1.4);box-shadow:0 12px 34px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.08);font:600 12px -apple-system,system-ui,sans-serif;color:#fff;';
+      const mk = (label, onClick, extra) => {
+        const b = document.createElement('button');
+        b.type = 'button'; b.textContent = label;
+        b.style.cssText = 'appearance:none;border:0;cursor:pointer;font:inherit;color:#fff;background:rgba(255,255,255,0.08);border-radius:9px;padding:7px 10px;transition:background 0.15s ease;' + (extra || '');
+        b.addEventListener('click', (e) => { e.preventDefault(); onClick(); });
+        return b;
+      };
+      const go = (idx) => {
+        _ig2Act = ACTS[Math.max(0, Math.min(ACTS.length - 1, idx))];
+        _ig2Rerender();
+        paint();
+      };
+      const prev = mk('◀', () => go(ACTS.indexOf(_ig2Act) - 1), 'font-size:11px;');
+      const next = mk('▶', () => go(ACTS.indexOf(_ig2Act) + 1), 'font-size:11px;');
+      const chipsWrap = document.createElement('div');
+      chipsWrap.style.cssText = 'display:flex;gap:4px;';
+      const chips = ACTS.map((_, i) => mk(String(i + 1), () => go(i), 'padding:7px 9px;min-width:26px;'));
+      chips.forEach(c => chipsWrap.appendChild(c));
+      const label = document.createElement('span');
+      label.style.cssText = 'min-width:88px;text-align:center;opacity:0.82;letter-spacing:0.02em;text-transform:capitalize;';
+      function paint() {
+        const cur = Math.max(0, ACTS.indexOf(_ig2Act));
+        label.textContent = (cur + 1) + '/' + ACTS.length + '  ' + ACTS[cur];
+        chips.forEach((c, i) => {
+          c.style.background = i === cur ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.08)';
+          c.style.color = i === cur ? '#000' : '#fff';
+        });
+      }
+      bar.appendChild(prev); bar.appendChild(chipsWrap); bar.appendChild(next); bar.appendChild(label);
+      document.body.appendChild(bar);
+      paint();
+      // Keep the readout honest if a real in-ceremony button advances the act.
+      // A change-detecting poll (NOT a MutationObserver): paint() mutates the DOM,
+      // so a subtree observer would fire on its own writes and loop forever.
+      let lastAct = _ig2Act;
+      setInterval(() => { if (_ig2Act !== lastAct) { lastAct = _ig2Act; paint(); } }, 250);
+    };
+
     const boot = () => {
       setTimeout(() => {
         try {
@@ -7350,6 +7400,7 @@ function _bindStarPlacard(root) {
           ClarityExperience.pageWrap.innerHTML = '<div class="clarity-exp__page-inner clarity-exp__page-inner--summary">' + renderIgnitionV2(summary) + '</div>';
           ClarityExperience.navEl.innerHTML = '';
           bindIgnitionV2(document);
+          mountCeremonyScrubber();
         } catch (e) {}
       }, 1400);
     };
