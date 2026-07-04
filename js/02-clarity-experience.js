@@ -1903,15 +1903,26 @@ function bindKeyboardSettle(host, field) {
     if (pw && pwPan) pw.scrollTop = 0;
     if (!root || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
     animating = true;
+    // iOS draws the native text caret at the field's UNTRANSFORMED position and
+    // does not follow a CSS transform mid-animation, so during this settle glide
+    // the caret visibly detaches and floats below the box before snapping back
+    // (Malik, 2026-07-03). Hide it for the ~240ms glide (the field is empty /
+    // placeholder at focus, so this is imperceptible) and restore it once the
+    // transform is cleared and the box has landed.
+    field.style.caretColor = 'transparent';
     root.style.transition = 'none';
     root.style.transform = 'translateY(' + (-total) + 'px)';
     void root.offsetHeight;
     root.style.transition = 'transform 240ms cubic-bezier(0.22, 1, 0.36, 1)';
     root.style.transform = 'translateY(0)';
+    let done = false;
     const finish = () => {
+      if (done) return;
+      done = true;
       root.removeEventListener('transitionend', finish);
       root.style.transition = '';
       root.style.transform = '';
+      field.style.caretColor = '';
       animating = false;
       if (document.activeElement === field && pan() > 1) queue();
     };
