@@ -1278,13 +1278,13 @@ const ClarityExperience = {
           </div>
         </div>`,
         headline: 'The Solution: Break the Scale',
-        sub: 'The best long-term solution, is to have a weight so overwhelming on the other side, that it makes the other side irrelevant. To have something else so rewarding, your brain automatically defaults towards it.<br><br>That weight should be <strong style="color:rgba(var(--ink),1)">progression towards a worthy goal</strong>. Making distractions repulsive. Making progression addictive and automatic.'
+        sub: 'The best long-term solution, is to have a weight so overwhelming on the other side, that it makes the other side irrelevant.<br><br>Here\'s the thing about your brain: it only truly fights for <strong style="color:rgba(var(--ink),1)">needs</strong>. Wants weigh almost nothing. You don\'t NEED to get in shape, you want to. You don\'t NEED to chase that goal, you want to. And your brain knows it, so it defaults to the easy side every time.<br><br>But the moment a goal stops being a want and becomes a <strong style="color:rgba(var(--ink),1)">need</strong>, your brain stops fighting you and starts working for you. That\'s the weight we\'re after.'
       },
       // Page 5  - The payoff (neutron star)
       {
         illust: `<div class="tut-star-stage"><div class="tut-star-halo"></div><canvas class="tut-star-blob" id="tutStarBlob" width="320" height="320"></canvas></div>`,
         headline: 'Discover your Neutron Star',
-        sub: 'I call this the Neutron Star. One of the densest and heaviest objects in existence. Once you find your Neutron Star, a worthy goal you care about above all else, a new level of focus and energy unlocks in your brain. This is how you stay focused and make achievement automatic.'
+        sub: 'I call this weight the Neutron Star. One of the densest and heaviest objects in existence, a single teaspoon of one weighs billions of tons.<br><br>Your Neutron Star is a goal so worthy, connected to a why so strong, that it becomes a need. Something you\'re willing to suffer for. Once you find it, focus stops being a war. Your brain defaults to it automatically, and progression towards it is how you make achievement automatic.'
       },
       // Page 7  - Reflection pause before questions
       { _reflect: true }
@@ -1302,6 +1302,7 @@ const ClarityExperience = {
             <div class="clarity-reflect__line">I want you to genuinely sit with one question:</div>
             <div class="clarity-reflect__line clarity-reflect__question">"What's the one mission or goal you want to dedicate yourself to?"</div>
             <div class="clarity-reflect__line">This question is not an attempt to pressure or intimidate you, but instead, an invitation for you to really sit with it and see where it takes you.</div>
+            <div class="clarity-reflect__line">A good compass: what's the thing you can't stop thinking about? The thing that nags at the back of your mind, that every conversation somehow turns back to?</div>
             <div class="clarity-reflect__line">Most of us spend our younger years gaming, scrolling, distracted, doing things for other people but not for ourselves. Out of our entire lives, we might have genuinely thought about our own direction for maybe five minutes total. Which is really scary if you think about it.</div>
             <div class="clarity-reflect__line">If you never focus inward on yourself, how can you expect to improve yourself? So if you can, seriously take the time to think about it for a minute.</div>
           </div>
