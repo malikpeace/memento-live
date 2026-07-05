@@ -953,7 +953,10 @@ const ClarityExperience = {
       ov.style.transition = 'opacity 0.5s ease';
       ov.style.opacity = '0';
       this._setTimeout(() => { try { ov.remove(); } catch (e) {} }, 550);
-      showNav();
+      // Hand off to the body typewriter if it's armed (v551); it shows the nav
+      // itself once the last line lands.
+      if (this._tutTypeStart) { const s = this._tutTypeStart; this._setTimeout(s, instant ? 0 : 500); }
+      else showNav();
     };
     // Fade the other words + sub OUT smoothly. Pin each to opacity 1 first (killing the
     // fade-in animation reverts to base opacity 0), force a reflow, THEN transition to 0,
@@ -1111,6 +1114,63 @@ const ClarityExperience = {
     this._setTimeout(() => { if (done || typing) return; landTitle(); startTyping(); }, 1200);
   },
 
+  // Typewriter for the standard teaching pages (scale pages), same theme as the hero:
+  // illustration + headline keep their CSS entrance, then the body paragraphs type in
+  // one by one with bold runs already bold as they type. A tap fills everything. On the
+  // "How Focus Works" page the overlay runs first and hands off via this._tutTypeStart.
+  // The star page keeps its own cinematic (the star is the moment there). (Malik, v551)
+  _runTutType() {
+    const tut = this.pageWrap && this.pageWrap.querySelector('.clarity-exp__tut');
+    const lines = tut ? [...tut.querySelectorAll('.tut-sub__line')] : [];
+    if (!tut || !lines.length || tut.dataset.typeRan) return;
+    tut.dataset.typeRan = '1';
+    const reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    const nav = this.navEl;
+    if (nav && !reduced) { nav.style.transition = 'opacity 0.45s ease'; nav.style.opacity = '0'; nav.style.pointerEvents = 'none'; }
+    const showNav = () => { if (nav) { nav.style.opacity = '1'; nav.style.pointerEvents = ''; } };
+    if (reduced) { this._tutTypeStart = null; return; }
+    // Stash each line's inline runs (text + bold spans) and reserve its height, then clear.
+    lines.forEach((l) => {
+      l.__segs = [...l.childNodes].map((node) => ({ el: node.nodeType === 1 ? node.cloneNode(false) : null, text: node.textContent || '' }));
+      l.__len = l.__segs.reduce((a, s) => a + s.text.length, 0);
+      l.dataset.full = l.innerHTML;
+      l.style.minHeight = l.offsetHeight + 'px';
+      l.textContent = '';
+    });
+    let done = false;
+    let typing = false;
+    const typeLine = (idx) => {
+      if (done) return;
+      if (idx >= lines.length) { done = true; showNav(); return; }
+      const el = lines[idx]; const segs = el.__segs || []; const len = el.__len || 0; let i = 0;
+      const renderUpto = (n) => {
+        el.textContent = '';
+        let rem = n;
+        for (const s of segs) {
+          if (rem <= 0) break;
+          const take = Math.min(rem, s.text.length);
+          const slice = s.text.slice(0, take);
+          if (s.el) { const c = s.el.cloneNode(false); c.textContent = slice; el.appendChild(c); }
+          else { el.appendChild(document.createTextNode(slice)); }
+          rem -= take;
+        }
+      };
+      const tick = () => {
+        if (done) return;
+        renderUpto(i); i++;
+        if (i <= len) this._setTimeout(tick, 11 + Math.random() * 9);
+        else { el.innerHTML = el.dataset.full || ''; this._setTimeout(() => typeLine(idx + 1), 650); }
+      };
+      tick();
+    };
+    const fillAll = () => { done = true; lines.forEach((l) => { l.innerHTML = l.dataset.full || ''; }); showNav(); };
+    const startTyping = () => { if (typing || done) return; typing = true; typeLine(0); };
+    this._tutTypeStart = startTyping;
+    tut.addEventListener('click', () => { if (!typing) startTyping(); else fillAll(); });
+    // No focus overlay pending: start once the illustration + headline have landed.
+    if (!this.el.querySelector('.clarity-focus-ov')) this._setTimeout(startTyping, 900);
+  },
+
   // Native feel (Malik): if the page's content FITS the screen, kill scrolling entirely so
   // idle swipes do nothing (no rubber-band). Pages that genuinely overflow keep scrolling.
   _fitPageScroll() {
@@ -1129,9 +1189,11 @@ const ClarityExperience = {
         // Intros run SYNCHRONOUSLY (same tick as the render) so they hide their page
         // content BEFORE the first paint. The old 30ms defer let the finished page
         // flash for a frame before the intro covered it (Malik saw it on-device).
+        this._tutTypeStart = null;
         if (this.pageWrap.querySelector('.clarity-tut-hero')) this._runHeroIntro();
         if (this.pageWrap.querySelector('.gs-focus-target')) this._runFocusIntro();
         if (this.pageWrap.querySelector('.clarity-reflect')) this._runReflectIntro();
+        if (this.pageWrap.querySelector('.tut-sub__line') && !this.pageWrap.querySelector('.tut-star-stage')) this._runTutType();
         this._fitPageScroll();
       }
       return;
@@ -1152,9 +1214,11 @@ const ClarityExperience = {
     this.pageWrap.innerHTML = html;
     // Synchronous (same tick as the render) so each intro hides its page content BEFORE
     // the first paint; the old 30ms defer flashed the finished page for a frame (Malik).
+    this._tutTypeStart = null;
     if (this.pageWrap.querySelector('.clarity-tut-hero')) this._runHeroIntro();
     if (this.pageWrap.querySelector('.gs-focus-target')) this._runFocusIntro();
     if (this.pageWrap.querySelector('.clarity-reflect')) this._runReflectIntro();
+    if (this.pageWrap.querySelector('.tut-sub__line') && !this.pageWrap.querySelector('.tut-star-stage')) this._runTutType();
     this._fitPageScroll();
 
     // Track whether we're on the Neutron Star summary view (last wizard step,
@@ -1320,11 +1384,14 @@ const ClarityExperience = {
       </div>`;
     }
 
+    // The sub splits into paragraph lines so the typewriter (_runTutType) can
+    // type them one by one, same theme as the hero + intro (Malik, v551).
+    const subLines = String(p.sub).split('<br><br>').map(s => `<div class="tut-sub__line">${s}</div>`).join('');
     return `<div class="clarity-exp__page-inner">
       <div class="clarity-exp__tut">
         <div class="clarity-exp__tut-illust">${p.illust}</div>
         <div class="clarity-exp__tut-headline">${p.headline}</div>
-        <div class="clarity-exp__tut-sub">${p.sub}</div>
+        <div class="clarity-exp__tut-sub">${subLines}</div>
       </div>
     </div>`;
   },

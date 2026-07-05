@@ -297,6 +297,9 @@ body.clarity-legacy-orbs .clarity-exp__bg-orb4 { display: block; }
   font-size: 15px; color: rgba(var(--ink),0.95);
   line-height: 1.65; max-width: 300px;
 }
+/* Sub paragraphs are line divs so the typewriter can type them one by one (v551);
+   the margin recreates the old <br><br> gap. */
+.tut-sub__line + .tut-sub__line { margin-top: 1em; }
 
 /* The single word-beat between "Let's Find Yours" and the first question (v498):
    "Let's find Clarity." fades up centred, holds, and the questions begin. */

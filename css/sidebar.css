@@ -220,6 +220,15 @@ body:not(.menu-peek):has(.sheet.open) .sidebar-reveal {
 /* Once the menu is open (peeking), hide the hamburger so it does not overlap
    the sidebar header. The backdrop, a nav tap, or Escape closes the menu. */
 body.menu-peek .sidebar-reveal { display: none !important; }
+/* Mobile: no hamburger at all (Malik, v551). The phone dashboard opens the menu
+   via the header brand, and inside overlays it overlapped titles (e.g. the
+   Clarity hero) for a control nobody needs there. */
+@media (max-width: 859px) {
+  .sidebar-reveal,
+  body:not(.menu-peek):has(.action-exp.open) .sidebar-reveal,
+  body:not(.menu-peek):has(.clarity-exp.open) .sidebar-reveal,
+  body:not(.menu-peek):has(.sheet.open) .sidebar-reveal { display: none !important; }
+}
 /* During onboarding there is nothing to navigate to yet, so the menu button is
    hidden until the user officially enters Memento. */
 body:has(.welcome-intro.open) .sidebar-reveal { display: none !important; }
