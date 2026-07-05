@@ -2762,6 +2762,11 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
   overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
   padding: calc(var(--safe-t, 0px) + 64px) 20px 20px;
+  /* v558 (Malik): scrolling content fades out under the top edge (status bar / X)
+     instead of colliding with them, the standard top-scrim treatment. Resting
+     content is untouched, the padding keeps it below the fade zone. */
+  -webkit-mask-image: linear-gradient(to bottom, transparent var(--safe-t, 0px), #000 calc(var(--safe-t, 0px) + 58px));
+  mask-image: linear-gradient(to bottom, transparent var(--safe-t, 0px), #000 calc(var(--safe-t, 0px) + 58px));
 }
 /* The inner page wrapper for any clarity step, needs to be a flex column
    that fills the wrap, otherwise the wiz__step's flex:1 + center never

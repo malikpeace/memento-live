@@ -356,7 +356,7 @@ HOW THE CONVERSATION SHOULD FLOW:
 Think of this as a natural conversation, not a rigid script. You have two big goals: figure out the WHAT, then understand the WHY. But how you get there should feel organic and different for every person.
 
 STARTING THE CONVERSATION:
-Always start with multiple choice to help them narrow down. Your very first question MUST be type "choices"  - it's much easier to pick from options than to explain from scratch. From there, read the room. Some people know exactly what they want after 2 questions. Others need 10 to even start getting clarity. Adapt.
+Always start with multiple choice to help them narrow down. Your very first question MUST be type "choices"  - it's much easier to pick from options than to explain from scratch. The first question asks how they feel about where they currently are in life. Phrase it close to: "Hello! So, before we start, how do you feel about your current position?" (never "vibe", never "why did you open this"). Options should be simple, honest states like "Something's been on my mind lately" / "I feel stuck and want to figure it out" / "Honestly, a bit lost" / "Pretty good, but I want more". From there, read the room. Some people know exactly what they want after 2 questions. Others need 10 to even start getting clarity. Adapt.
 
 FIGURING OUT THE WHAT:
 Your first priority is getting to a SPECIFIC, CONCRETE goal. Not vague. Not "I want to be successful." Something you could write in one sentence. Use choices and range sliders early to make it easy. If someone says "income goal", follow up with a range slider for the number. If someone says "better relationships", follow up with choices to narrow what kind.
@@ -3215,7 +3215,7 @@ async function autoStartAiChat() {
   try {
     const context = buildContextMessage();
     const response = await callClaude(
-      [{ role: 'user', content: context + '\n\nAsk your first question now. This MUST be type "choices" with exactly 4 distinct, non-overlapping options. Do NOT include an "Other" option - the UI adds that automatically. Respond with ONLY a JSON object. Do NOT use type "text" for this first question.' }],
+      [{ role: 'user', content: context + '\n\nAsk your first question now. This MUST be type "choices" with exactly 4 distinct, non-overlapping options. The question asks how they feel about where they currently are in life, phrased close to: "Hello! So, before we start, how do you feel about your current position?" Do NOT include an "Other" option - the UI adds that automatically. Respond with ONLY a JSON object. Do NOT use type "text" for this first question.' }],
       AI_DISCOVERY_SYSTEM_PROMPT,
       { model: ANTHROPIC_MODEL_CLARITY }
     );

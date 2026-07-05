@@ -17,6 +17,15 @@ const ClarityExperience = {
     this.pageWrap = document.getElementById('clarityExpPageWrap');
     this.navEl = document.getElementById('clarityExpNav');
     this.progressEl = document.getElementById('clarityExpProgress');
+    // v558 (Malik): the progress bar moves WITH the scrolling content instead of
+    // sitting locked over it, sliding up + fading as the page scrolls (the top mask
+    // on the page-wrap fades the content itself).
+    this.pageWrap.addEventListener('scroll', () => {
+      if (!this.progressEl) return;
+      const st = this.pageWrap.scrollTop || 0;
+      this.progressEl.style.transform = 'translateY(' + (-Math.min(st, 90)) + 'px)';
+      this.progressEl.style.opacity = String(Math.max(0, 1 - st / 60));
+    }, { passive: true });
     const closeBtn = document.getElementById('clarityExpClose');
     const closeNow = (e) => {
       if (e) {
@@ -2143,6 +2152,9 @@ const ClarityExperience = {
         this.progressEl.innerHTML = '<div class="ai-progress__bar"><div class="ai-progress__fill" style="width:' + pct + '%"></div></div>';
       }
     }
+    // New page = scroll back at 0: reset the scroll-follow transform (v558).
+    this.progressEl.style.transform = '';
+    this.progressEl.style.opacity = '';
     this._syncLight();
   },
 
