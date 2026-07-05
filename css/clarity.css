@@ -300,6 +300,12 @@ body.clarity-legacy-orbs .clarity-exp__bg-orb4 { display: block; }
 /* Sub paragraphs are line divs so the typewriter can type them one by one (v551);
    the margin recreates the old <br><br> gap. */
 .tut-sub__line + .tut-sub__line { margin-top: 1em; }
+/* Mobile (v552): bias the vertically-centred block upward so it clears the floating
+   Continue nav and sits higher on screen (Malik: it read too low). The pages are
+   chunked (2 paragraphs at a time) so nothing should need to scroll. */
+@media (max-width: 859px) {
+  .clarity-exp__tut { padding-bottom: 80px; }
+}
 
 /* The single word-beat between "Let's Find Yours" and the first question (v498):
    "Let's find Clarity." fades up centred, holds, and the questions begin. */
@@ -520,6 +526,11 @@ body.clarity-legacy-orbs .clarity-exp__bg-orb4 { display: block; }
   width: min(92vw, 430px);
   height: min(92vw, 430px);
   border-radius: 0;
+}
+/* Mobile (v552): cap the tutorial star so the Neutron Star page fits a phone
+   screen without scrolling (the 92vw blob alone ate all the spare height). */
+@media (max-width: 859px) {
+  .tut-star-blob { width: min(64vw, 430px); height: min(64vw, 430px); }
 }
 .tut-star-stage {
   position: relative;

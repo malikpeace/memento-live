@@ -946,13 +946,29 @@ const ClarityExperience = {
     const fly = ov.querySelector('.cfw--focus');
     const fade = [...ov.querySelectorAll('.cfw:not(.cfw--focus)'), ov.querySelector('.clarity-focus-ov__sub')].filter(Boolean);
     let finished = false;
+    // The landing is a same-frame SWAP, not a crossfade (Malik, v552: the old fade-out/
+    // fade-in double-exposed the word slightly off target). The real headline appears
+    // instantly the moment the flying word vanishes; only the illustration + the rest of
+    // the page fade in around it. The headline word stays hidden until the swap.
+    const headline = tut.querySelector('.clarity-exp__tut-headline');
+    const illust = tut.querySelector('.clarity-exp__tut-illust');
+    const sub = tut.querySelector('.clarity-exp__tut-sub');
     const finish = (instant) => {
       if (finished) return; finished = true;
-      tut.style.transition = instant ? 'none' : 'opacity 0.7s ease';
+      // Pre-fade the parts around the headline so the tut container can appear instantly.
+      [illust, sub].forEach((el) => { if (el) { el.style.opacity = '0'; } });
+      tut.style.transition = 'none';
       tut.style.opacity = '1';
-      ov.style.transition = 'opacity 0.5s ease';
+      if (fly) { fly.style.transition = 'none'; fly.style.opacity = '0'; }
+      ov.style.transition = 'opacity 0.4s ease';
       ov.style.opacity = '0';
-      this._setTimeout(() => { try { ov.remove(); } catch (e) {} }, 550);
+      this._setTimeout(() => { try { ov.remove(); } catch (e) {} }, 450);
+      [illust, sub].forEach((el) => {
+        if (!el) return;
+        el.style.transition = instant ? 'none' : 'opacity 0.7s ease';
+        void el.offsetWidth;
+        el.style.opacity = '1';
+      });
       // Hand off to the body typewriter if it's armed (v551); it shows the nav
       // itself once the last line lands.
       if (this._tutTypeStart) { const s = this._tutTypeStart; this._setTimeout(s, instant ? 0 : 500); }
@@ -985,16 +1001,17 @@ const ClarityExperience = {
         const fr = fly.getBoundingClientRect();
         const tr = target.getBoundingClientRect();
         const s = tr.height / Math.max(1, fr.height);
-        fly.style.transition = 'transform 1.15s cubic-bezier(0.45, 0, 0.15, 1)';
+        fly.style.transition = 'transform 1.35s cubic-bezier(0.45, 0, 0.15, 1)';
         fly.style.transform = 'translate(' + (tr.left - fr.left) + 'px, ' + (tr.top - fr.top) + 'px) scale(' + s + ')';
       } catch (e) {}
     };
     ov.addEventListener('click', () => finish(true));
-    // Slower, more deliberate beats (Malik: it was rushing). Title holds ~2.5s, the other
-    // words fade out (0.7s), "Focus" glides into the headline (1.05s), then the page fades up.
-    this._setTimeout(() => { if (!finished) clearOthers(); }, 2500);
-    this._setTimeout(() => { if (!finished) flyFocus(); }, 3300);
-    this._setTimeout(() => finish(false), 4450);
+    // Slower, more deliberate beats (Malik, v552: it still rushed). Title holds ~3.4s, the
+    // other words fade out (0.7s), "Focus" glides into the headline (1.35s), lands, and the
+    // swap in finish() puts the real headline in its place the same frame.
+    this._setTimeout(() => { if (!finished) clearOthers(); }, 3400);
+    this._setTimeout(() => { if (!finished) flyFocus(); }, 4400);
+    this._setTimeout(() => finish(false), 5850);
   },
 
   // The Neutron Star page enters cinematically (Malik): the star fades in FIRST, big and
@@ -1054,10 +1071,17 @@ const ClarityExperience = {
       l.style.minHeight = l.offsetHeight + 'px';
       l.textContent = '';
     });
-    // Lines start hidden (CSS opacity:0) so the full text never flashes. reveal() makes the
-    // (still-empty) lines paintable right as the typewriter begins.
-    const reveal = () => { lines.forEach((l) => { l.style.opacity = '1'; }); };
-    let done = false;     // every line filled
+    // Paragraphs show TWO at a time (Malik, v552: no scrolling on mobile). Continue steps
+    // through the chunks on the spot (title stays, old pair fades out, next pair types in)
+    // via this._chunkNext, which next() consults before page navigation.
+    const CH = 2;
+    const chunks = []; for (let i = 0; i < lines.length; i += CH) chunks.push(lines.slice(i, i + CH));
+    let chunkIdx = 0;
+    const layoutChunk = () => {
+      lines.forEach((l) => { l.style.display = 'none'; });
+      chunks[chunkIdx].forEach((l) => { l.style.display = ''; l.style.transition = ''; l.style.opacity = '1'; });
+    };
+    let done = false;     // current chunk fully shown
     let typing = false;   // the typewriter has begun
     const landTitle = () => {
       if (!title) return;
@@ -1065,10 +1089,8 @@ const ClarityExperience = {
       title.style.transition = 'none'; title.style.transform = ''; title.style.opacity = '1';
       title.style.transformOrigin = ''; title.style.willChange = '';
     };
-    const typeLine = (idx) => {
-      if (done) return;
-      if (idx >= lines.length) { done = true; showNav(); return; }
-      const el = lines[idx]; const segs = el.__segs || []; const len = el.__len || 0; let i = 0;
+    const typeLineEl = (el, onDone) => {
+      const segs = el.__segs || []; const len = el.__len || 0; let i = 0;
       // Rebuild the line revealing the first n chars, keeping bold runs in their own (cloned)
       // element so the bold shows up already bold as it types.
       const renderUpto = (n) => {
@@ -1087,21 +1109,49 @@ const ClarityExperience = {
         if (done) return;
         renderUpto(i); i++;
         if (i <= len) this._setTimeout(tick, 11 + Math.random() * 9);
-        else { el.innerHTML = el.dataset.full || ''; this._setTimeout(() => typeLine(idx + 1), 650); }
+        else { el.innerHTML = el.dataset.full || ''; onDone(); }
       };
       tick();
     };
-    const startTyping = () => { if (typing || done) return; typing = true; reveal(); typeLine(0); };
-    const fillAll = () => { done = true; reveal(); lines.forEach((l) => { l.innerHTML = l.dataset.full || ''; }); showNav(); };
+    const typeChunk = () => {
+      const arr = chunks[chunkIdx]; let i = 0;
+      const step = () => {
+        if (done) return;
+        if (i >= arr.length) { done = true; showNav(); return; }
+        typeLineEl(arr[i], () => { i++; this._setTimeout(step, 650); });
+      };
+      step();
+    };
+    const startTyping = () => { if (typing || done) return; typing = true; layoutChunk(); typeChunk(); };
+    const fillChunk = () => { done = true; layoutChunk(); chunks[chunkIdx].forEach((l) => { l.innerHTML = l.dataset.full || ''; }); showNav(); };
+    // Continue mid-hero: fade the current pair out, type the next pair in. Returns false
+    // once the last chunk is showing so next() falls through to real page navigation.
+    this._chunkNext = () => {
+      if (!done || chunkIdx >= chunks.length - 1) return false;
+      done = false;
+      if (nav) { nav.style.opacity = '0'; nav.style.pointerEvents = 'none'; }
+      const cur = chunks[chunkIdx];
+      cur.forEach((l) => { l.style.transition = 'opacity 0.3s ease'; l.style.opacity = '0'; });
+      this._setTimeout(() => {
+        chunkIdx++;
+        chunks[chunkIdx].forEach((l) => { l.textContent = ''; });
+        layoutChunk();
+        try { this.pageWrap.scrollTop = 0; } catch (e) {}
+        this._fitPageScroll();
+        if (reduced) { fillChunk(); return; }
+        typeChunk();
+      }, 330);
+      return true;
+    };
     // A tap BEFORE typing starts snaps the title home and begins the typewriter immediately
-    // (so an early tap can never make you miss it); a tap DURING typing fills everything.
+    // (so an early tap can never make you miss it); a tap DURING typing fills the chunk.
     this._heroSkip = () => {
       if (done) return;
       if (!typing) { landTitle(); startTyping(); return; }
-      fillAll();
+      fillChunk();
     };
     hero.addEventListener('click', () => { if (this._heroSkip) this._heroSkip(); });
-    if (reduced) { if (title) title.style.opacity = '1'; fillAll(); return; }
+    if (reduced) { if (title) title.style.opacity = '1'; typing = true; fillChunk(); return; }
     if (!title) { this._setTimeout(startTyping, 250); return; }
     // The title enters QUIETLY at its own spot (v499): the centred cinematic open now
     // belongs to the "Clarity" intro that precedes this page (Malik: two centred title
@@ -1128,7 +1178,6 @@ const ClarityExperience = {
     const nav = this.navEl;
     if (nav && !reduced) { nav.style.transition = 'opacity 0.45s ease'; nav.style.opacity = '0'; nav.style.pointerEvents = 'none'; }
     const showNav = () => { if (nav) { nav.style.opacity = '1'; nav.style.pointerEvents = ''; } };
-    if (reduced) { this._tutTypeStart = null; return; }
     // Stash each line's inline runs (text + bold spans) and reserve its height, then clear.
     lines.forEach((l) => {
       l.__segs = [...l.childNodes].map((node) => ({ el: node.nodeType === 1 ? node.cloneNode(false) : null, text: node.textContent || '' }));
@@ -1137,12 +1186,19 @@ const ClarityExperience = {
       l.style.minHeight = l.offsetHeight + 'px';
       l.textContent = '';
     });
+    // Two paragraphs at a time (Malik, v552): illustration + headline persist, Continue
+    // swaps in the next pair via this._chunkNext. Keeps every page scroll-free on mobile.
+    const CH = 2;
+    const chunks = []; for (let i = 0; i < lines.length; i += CH) chunks.push(lines.slice(i, i + CH));
+    let chunkIdx = 0;
+    const layoutChunk = () => {
+      lines.forEach((l) => { l.style.display = 'none'; });
+      chunks[chunkIdx].forEach((l) => { l.style.display = ''; l.style.transition = ''; l.style.opacity = '1'; });
+    };
     let done = false;
     let typing = false;
-    const typeLine = (idx) => {
-      if (done) return;
-      if (idx >= lines.length) { done = true; showNav(); return; }
-      const el = lines[idx]; const segs = el.__segs || []; const len = el.__len || 0; let i = 0;
+    const typeLineEl = (el, onDone) => {
+      const segs = el.__segs || []; const len = el.__len || 0; let i = 0;
       const renderUpto = (n) => {
         el.textContent = '';
         let rem = n;
@@ -1159,16 +1215,70 @@ const ClarityExperience = {
         if (done) return;
         renderUpto(i); i++;
         if (i <= len) this._setTimeout(tick, 11 + Math.random() * 9);
-        else { el.innerHTML = el.dataset.full || ''; this._setTimeout(() => typeLine(idx + 1), 650); }
+        else { el.innerHTML = el.dataset.full || ''; onDone(); }
       };
       tick();
     };
-    const fillAll = () => { done = true; lines.forEach((l) => { l.innerHTML = l.dataset.full || ''; }); showNav(); };
-    const startTyping = () => { if (typing || done) return; typing = true; typeLine(0); };
+    const typeChunk = () => {
+      const arr = chunks[chunkIdx]; let i = 0;
+      const step = () => {
+        if (done) return;
+        if (i >= arr.length) { done = true; showNav(); return; }
+        typeLineEl(arr[i], () => { i++; this._setTimeout(step, 650); });
+      };
+      step();
+    };
+    const fillChunk = () => { done = true; layoutChunk(); chunks[chunkIdx].forEach((l) => { l.innerHTML = l.dataset.full || ''; }); showNav(); };
+    const startTyping = () => { if (typing || done) return; typing = true; layoutChunk(); typeChunk(); };
+    this._chunkNext = () => {
+      if (!done || chunkIdx >= chunks.length - 1) return false;
+      done = false;
+      if (nav) { nav.style.opacity = '0'; nav.style.pointerEvents = 'none'; }
+      const cur = chunks[chunkIdx];
+      cur.forEach((l) => { l.style.transition = 'opacity 0.3s ease'; l.style.opacity = '0'; });
+      this._setTimeout(() => {
+        chunkIdx++;
+        chunks[chunkIdx].forEach((l) => { l.textContent = ''; });
+        layoutChunk();
+        try { this.pageWrap.scrollTop = 0; } catch (e) {}
+        this._fitPageScroll();
+        if (reduced) { fillChunk(); return; }
+        typeChunk();
+      }, 330);
+      return true;
+    };
+    if (reduced) { this._tutTypeStart = null; typing = true; fillChunk(); return; }
     this._tutTypeStart = startTyping;
-    tut.addEventListener('click', () => { if (!typing) startTyping(); else fillAll(); });
+    tut.addEventListener('click', () => { if (!typing) startTyping(); else fillChunk(); });
     // No focus overlay pending: start once the illustration + headline have landed.
     if (!this.el.querySelector('.clarity-focus-ov')) this._setTimeout(startTyping, 900);
+  },
+
+  // The Neutron Star page shows its paragraphs ONE at a time with a fade (no typewriter,
+  // the star owns that page's motion). Continue swaps paragraphs via _chunkNext, keeping
+  // the page scroll-free on phones. (Malik, v552)
+  _runStarChunks() {
+    const tut = this.pageWrap && this.pageWrap.querySelector('.clarity-exp__tut');
+    const lines = tut ? [...tut.querySelectorAll('.tut-sub__line')] : [];
+    if (!tut || lines.length < 2 || tut.dataset.starChunksRan) return;
+    tut.dataset.starChunksRan = '1';
+    let idx = 0;
+    lines.forEach((l, i) => { if (i > 0) l.style.display = 'none'; });
+    this._chunkNext = () => {
+      if (idx >= lines.length - 1) return false;
+      const cur = lines[idx];
+      cur.style.transition = 'opacity 0.3s ease'; cur.style.opacity = '0';
+      this._setTimeout(() => {
+        cur.style.display = 'none';
+        idx++;
+        const nx = lines[idx];
+        nx.style.display = ''; nx.style.opacity = '0'; nx.style.transition = 'opacity 0.5s ease';
+        void nx.offsetWidth; nx.style.opacity = '1';
+        try { this.pageWrap.scrollTop = 0; } catch (e) {}
+        this._fitPageScroll();
+      }, 320);
+      return true;
+    };
   },
 
   // Native feel (Malik): if the page's content FITS the screen, kill scrolling entirely so
@@ -1190,10 +1300,12 @@ const ClarityExperience = {
         // content BEFORE the first paint. The old 30ms defer let the finished page
         // flash for a frame before the intro covered it (Malik saw it on-device).
         this._tutTypeStart = null;
+        this._chunkNext = null;
         if (this.pageWrap.querySelector('.clarity-tut-hero')) this._runHeroIntro();
         if (this.pageWrap.querySelector('.gs-focus-target')) this._runFocusIntro();
         if (this.pageWrap.querySelector('.clarity-reflect')) this._runReflectIntro();
         if (this.pageWrap.querySelector('.tut-sub__line') && !this.pageWrap.querySelector('.tut-star-stage')) this._runTutType();
+        if (this.pageWrap.querySelector('.tut-star-stage')) this._runStarChunks();
         this._fitPageScroll();
       }
       return;
@@ -1215,10 +1327,12 @@ const ClarityExperience = {
     // Synchronous (same tick as the render) so each intro hides its page content BEFORE
     // the first paint; the old 30ms defer flashed the finished page for a frame (Malik).
     this._tutTypeStart = null;
+    this._chunkNext = null;
     if (this.pageWrap.querySelector('.clarity-tut-hero')) this._runHeroIntro();
     if (this.pageWrap.querySelector('.gs-focus-target')) this._runFocusIntro();
     if (this.pageWrap.querySelector('.clarity-reflect')) this._runReflectIntro();
     if (this.pageWrap.querySelector('.tut-sub__line') && !this.pageWrap.querySelector('.tut-star-stage')) this._runTutType();
+    if (this.pageWrap.querySelector('.tut-star-stage')) this._runStarChunks();
     this._fitPageScroll();
 
     // Track whether we're on the Neutron Star summary view (last wizard step,
@@ -1304,7 +1418,7 @@ const ClarityExperience = {
           </div>
         </div>`,
         headline: 'Think About Your <span class="gs-focus-target">Focus</span> like a Scale',
-        sub: "At all times, there's an invisible scale guiding your attention.<br><br>Your brain will always default to the heavier side automatically, unless actively fought (more on that in a second).<br><br>For most people, the heaviest side is distractions, typically instant gratification activities. They're the heaviest and easiest weights to reach for, which throws the scale off balance, automatically draws your attention toward them, and makes it difficult for your brain to focus on the other side. We need to fix this."
+        sub: "At all times, there's an invisible scale guiding your attention.<br><br>Your brain will always default to the heavier side automatically, unless actively fought (more on that in a second).<br><br>For most people, the heaviest side is distractions, typically instant gratification activities.<br><br>They're the heaviest and easiest weights to reach for, which throws the scale off balance, automatically draws your attention toward them, and makes it difficult for your brain to focus on the other side.<br><br>We need to fix this."
       },
       // Page 2  - Willpower doesn't work long term
       {
@@ -1329,7 +1443,7 @@ const ClarityExperience = {
           </div>
         </div>`,
         headline: '<span style="font-size:clamp(20px,5vw,26px)">Removing distractions alone isn\'t enough</span>',
-        sub: 'Deleting apps, breaking your phone, and removing other distractions can help, but distractions are going to continue to grow as the world becomes faster and more comfortable (more on this later). Even if you shrink the left side by 90%, if it still outweighs a pebble on the right, it won\'t matter long term. Removal won\'t hurt you, but it\'s not <strong style="color:rgba(var(--ink),1)">the solution</strong>.'
+        sub: 'Deleting apps, breaking your phone, and removing other distractions can help, but distractions are going to continue to grow as the world becomes faster and more comfortable (more on this later).<br><br>Even if you shrink the left side by 90%, if it still outweighs a pebble on the right, it won\'t matter long term.<br><br>Removal won\'t hurt you, but it\'s not <strong style="color:rgba(var(--ink),1)">the solution</strong>.'
       },
       // Page 4  - The ultimate goal: flip the scale
       {
@@ -1348,7 +1462,7 @@ const ClarityExperience = {
       {
         illust: `<div class="tut-star-stage"><div class="tut-star-halo"></div><canvas class="tut-star-blob" id="tutStarBlob" width="320" height="320"></canvas></div>`,
         headline: 'Discover your Neutron Star',
-        sub: 'I call this weight the Neutron Star. One of the densest and heaviest objects in existence, a single teaspoon of one weighs billions of tons.<br><br>Your Neutron Star is a goal so worthy, connected to a why so strong, that it becomes a need. Something you\'re willing to suffer for. Once you find it, focus stops being a war. Your brain defaults to it automatically, and progression towards it is how you make achievement automatic.'
+        sub: 'I call this weight the Neutron Star. One of the densest and heaviest objects in existence, a single teaspoon of one weighs billions of tons.<br><br>Your Neutron Star is a goal so worthy, connected to a why so strong, that it becomes a need. Something you\'re willing to suffer for.<br><br>Once you find it, focus stops being a war. Your brain defaults to it automatically, and progression towards it is how you make achievement automatic.'
       },
       // Page 7  - Reflection pause before questions
       { _reflect: true }
@@ -1596,6 +1710,9 @@ const ClarityExperience = {
 
   next() {
     if (this.transitioning) return;
+    // Chunked teaching pages (v552): Continue steps through the paragraph pairs on the
+    // current page first; only once the last pair is showing does it navigate.
+    if (this._chunkNext) { try { if (this._chunkNext()) return; } catch (e) {} }
     const offset = this.getWizardOffset();
     const total = this.getTotalPages();
 
