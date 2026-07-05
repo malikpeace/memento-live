@@ -1054,3 +1054,29 @@ body.boot-revealed #bootMask { display: none; }
   border-radius: var(--r-card);
 }
 
+
+/* ============================================================
+   TRUE FLAT (v572, Malik): "flat" means FLAT, not just blur-off.
+   No sheen, no inset highlight, no glow shadows, no 3D illusion.
+   OLED-like in dark. The glass tokens flatten here, so every
+   surface riding them flattens app-wide; hardcoded hero-card
+   layers are flattened in dashboard.css.
+   ============================================================ */
+html.flat-ui {
+  --glass-sheen: none;
+  --glass-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  --glass-highlight: 0 0 0 rgba(0, 0, 0, 0);
+}
+html.flat-ui:not(.theme-light) {
+  --glass-bg: rgba(12, 12, 16, 0.94);
+  --glass-bg-heavy: rgba(10, 10, 13, 0.97);
+}
+html.flat-ui.theme-light {
+  --glass-bg: rgba(255, 255, 255, 0.96);
+  --glass-bg-heavy: rgba(252, 252, 253, 0.98);
+}
+/* OLED ground: the dark flat page is true black. */
+html.flat-ui:not(.theme-light) body,
+html.flat-ui:not(.theme-light) .ambient {
+  background: #000;
+}

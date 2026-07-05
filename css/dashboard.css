@@ -3683,3 +3683,38 @@ html:not(.theme-light) body.pre-clarity .daycard-ns__emblem {
     drop-shadow(0 -1px 1px rgba(0, 0, 0, 0.5))
     drop-shadow(0 0 20px rgba(205, 218, 255, 0.18));
 }
+
+/* ---- TRUE FLAT: the hero card (v572, Malik's render). Solid near-black slab,
+   one quiet hairline ring, matte emblem. No film, no sheen, no iridescence,
+   no glow, no deboss: nothing pretending to be 3D. Both card states. ---- */
+html.flat-ui body .daycard-ns,
+html.flat-ui body.pre-clarity .daycard-ns {
+  background: #0a0a0e;
+  box-shadow: none;
+}
+html.flat-ui body .daycard-ns::before,
+html.flat-ui body.pre-clarity .daycard-ns::before {
+  background: rgba(255, 255, 255, 0.09);
+}
+html.flat-ui body .daycard-ns__sheen,
+html.flat-ui body .daycard-ns__iri,
+html.flat-ui body .daycard-wrap__aura {
+  display: none;
+}
+/* The blank card renders the liquid-glass blob layers even pre-Clarity (that
+   clear film IS the gray); flat hides them so the slab is truly solid. The
+   colored post-Clarity card keeps its liquid color. */
+html.flat-ui body.pre-clarity .daycard-ns__liquid,
+html.flat-ui body.pre-clarity .daycard-ns__burn {
+  display: none;
+}
+html.flat-ui body .daycard-ns__emblem,
+html.flat-ui body.pre-clarity .daycard-ns__emblem {
+  filter: none;
+}
+html.flat-ui.theme-light body .daycard-ns {
+  background: #f5f6f8;
+}
+html.flat-ui.theme-light body .daycard-ns::before {
+  background: rgba(24, 26, 33, 0.10);
+}
