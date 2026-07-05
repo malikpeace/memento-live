@@ -534,6 +534,11 @@ body.clarity-legacy-orbs .clarity-exp__bg-orb4 { display: block; }
    still fits because the sub shows one paragraph at a time. */
 @media (max-width: 859px) {
   .tut-star-blob { width: min(82vw, 430px); height: min(82vw, 430px); }
+  /* v559 (Malik): the star should DOMINATE. Visual scale on the illustration wrapper
+     (not layout size), so the page geometry + no-scroll guarantee are untouched and
+     the glow bleeds past the screen edges. The entrance transition still runs on the
+     inline transform and settles into this. */
+  .clarity-exp__tut-illust:has(.tut-star-stage) { transform: scale(1.85); }
 }
 .tut-star-stage {
   position: relative;
@@ -568,10 +573,10 @@ body.clarity-legacy-orbs .clarity-exp__bg-orb4 { display: block; }
 .tut-star-stage.is-idle { animation: starShakeIdle 1.3s linear infinite; }
 @keyframes starShakeIdle {
   0%, 100% { transform: translate(0, 0); }
-  20% { transform: translate(0.5px, -0.4px); }
-  45% { transform: translate(-0.5px, 0.4px); }
-  70% { transform: translate(0.4px, 0.5px); }
-  88% { transform: translate(-0.4px, -0.4px); }
+  20% { transform: translate(0.7px, -0.5px); }
+  45% { transform: translate(-0.7px, 0.5px); }
+  70% { transform: translate(0.5px, 0.7px); }
+  88% { transform: translate(-0.5px, -0.6px); }
 }
 @media (prefers-reduced-motion: reduce) {
   .tut-star-stage, .tut-star-stage.is-idle, .tut-star-halo { animation: none; }

@@ -1426,6 +1426,11 @@ const ClarityExperience = {
     // Lock the sub to the tallest paragraph so the star never shifts between them (v553).
     const subWrap = tut.querySelector('.clarity-exp__tut-sub');
     if (subWrap) subWrap.style.minHeight = Math.max(...lines.map((l) => l.offsetHeight || 0)) + 'px';
+    // The star page NEVER scrolls (Malik, v559): scrolling shifted the pinned geometry
+    // and iOS pauses the canvas animation mid-scroll. Runs after _fitPageScroll's own
+    // 150ms pass so it can't be re-enabled.
+    const lockScroll = () => this._setTimeout(() => { try { this.pageWrap.style.overflowY = 'hidden'; this.pageWrap.scrollTop = 0; } catch (e) {} }, 200);
+    lockScroll();
     const show = (i, fadeIn) => {
       lines.forEach((l) => { l.style.display = 'none'; });
       const nx = lines[i];
@@ -1435,7 +1440,7 @@ const ClarityExperience = {
         void nx.offsetWidth; nx.style.opacity = '1';
       } else { nx.style.transition = ''; nx.style.opacity = '1'; }
       try { this.pageWrap.scrollTop = 0; } catch (e) {}
-      this._fitPageScroll();
+      lockScroll();
     };
     this._chunkNext = () => {
       if (idx >= lines.length - 1) return false;
