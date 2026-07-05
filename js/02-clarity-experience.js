@@ -865,10 +865,15 @@ const ClarityExperience = {
     if (nav) { nav.style.transition = 'opacity 0.45s ease'; nav.style.opacity = '0'; nav.style.pointerEvents = 'none'; }
     const showNav = () => { if (nav) { nav.style.opacity = '1'; nav.style.pointerEvents = ''; } };
     const full = headIn.textContent;
-    // Chunk the body TWO lines at a time like the other teaching pages (v553): the page
-    // was ~120px taller than a phone screen; chunking keeps it scroll-free and stable.
+    // Chunk the body like the other teaching pages (v553), but the first two lines
+    // (the setup + THE QUESTION) stay PINNED across chunks (v554: fading the question
+    // out made "This question is not an attempt..." read broken, it lost its
+    // antecedent). Only the supporting paragraphs rotate beneath it, in pairs.
     lines.forEach((l) => { l.__h = l.offsetHeight; l.style.opacity = '0'; l.style.transform = 'translateY(10px)'; });
-    const chunks = []; for (let i = 0; i < lines.length; i += 2) chunks.push(lines.slice(i, i + 2));
+    const pinned = lines.slice(0, 2);
+    const rest = lines.slice(2);
+    const chunks = []; for (let i = 0; i < rest.length; i += 2) chunks.push(rest.slice(i, i + 2));
+    if (!chunks.length) chunks.push([]);
     if (chunks.length > 1) {
       const last = chunks[chunks.length - 1];
       if (last.length === 1 && (last[0].textContent || '').length < 60) { chunks.pop(); chunks[chunks.length - 1].push(last[0]); }
@@ -879,10 +884,12 @@ const ClarityExperience = {
     const body = wrap.querySelector('.clarity-reflect__body');
     if (body) {
       const GAP = 18;
-      body.style.minHeight = Math.max(...chunks.map((c) => c.reduce((a, l) => a + (l.__h || 0), 0) + GAP * (c.length - 1))) + 'px';
+      const pinnedH = pinned.reduce((a, l) => a + (l.__h || 0), 0) + GAP * pinned.length;
+      body.style.minHeight = (pinnedH + Math.max(...chunks.map((c) => c.reduce((a, l) => a + (l.__h || 0), 0) + GAP * Math.max(0, c.length - 1)))) + 'px';
     }
     const layoutChunk = () => {
       lines.forEach((l) => { l.style.display = 'none'; });
+      pinned.forEach((l) => { l.style.display = ''; });
       chunks[chunkIdx].forEach((l) => { l.style.display = ''; });
     };
     layoutChunk();
@@ -909,11 +916,12 @@ const ClarityExperience = {
       if (done) return; done = true;
       land();
       layoutChunk();
-      chunks[chunkIdx].forEach((l) => { l.style.transition = 'opacity 0.5s ease, transform 0.5s ease'; l.style.opacity = '1'; l.style.transform = ''; });
+      pinned.concat(chunks[chunkIdx]).forEach((l) => { l.style.transition = 'opacity 0.5s ease, transform 0.5s ease'; l.style.opacity = '1'; l.style.transform = ''; });
       showNav();
     };
     const revealLines = () => {
-      const arr = chunks[chunkIdx];
+      // First pass reveals the pinned setup + question too; later chunks only the pair.
+      const arr = chunkIdx === 0 ? pinned.concat(chunks[0]) : chunks[chunkIdx];
       arr.forEach((l, i) => {
         this._setTimeout(() => {
           if (done) return;
@@ -950,7 +958,7 @@ const ClarityExperience = {
       this._chunkIdx = chunkIdx;
       done = true;
       layoutChunk();
-      chunks[chunkIdx].forEach((l) => { l.style.transition = 'none'; l.style.opacity = '1'; l.style.transform = ''; });
+      pinned.concat(chunks[chunkIdx]).forEach((l) => { l.style.transition = 'none'; l.style.opacity = '1'; l.style.transform = ''; });
       showNav();
       this.updateNav();
       try { this.pageWrap.scrollTop = 0; } catch (e) {}
