@@ -15,12 +15,13 @@ const AppearancePicker = {
   // Each look maps to the existing prefs that applyPrefs() already consumes, so
   // this rides the same pipeline as Settings (no new theming code).
   // A 2x2: theme (light / dark) x surface (flat / glass). Flat sets flatUi (strip
-  // all glass blur app-wide) + flatBg + uiBlur:0; glass keeps the blur. dark-glass
-  // is the signature default.
+  // all glass blur app-wide) + uiBlur:0; glass keeps the blur. dark-glass is the
+  // signature default. flatBg stays FALSE in every look (Malik, v575): the top-left
+  // beams belong to all four; Minimal background remains a manual Settings choice.
   LOOKS: [
     {
       id: 'light-flat', name: 'Light flat', tag: 'Clean and minimal',
-      prefs: { theme: 'light', flatBg: true, flatUi: true, reduceMotion: false, uiGlass: 0, uiBlur: 0 }
+      prefs: { theme: 'light', flatBg: false, flatUi: true, reduceMotion: false, uiGlass: 0, uiBlur: 0 }
     },
     {
       id: 'light-glass', name: 'Light glass', tag: 'Bright and glassy',
@@ -28,7 +29,7 @@ const AppearancePicker = {
     },
     {
       id: 'dark-flat', name: 'Dark flat', tag: 'Quiet and minimal',
-      prefs: { theme: 'dark', flatBg: true, flatUi: true, reduceMotion: false, uiGlass: 0, uiBlur: 0 }
+      prefs: { theme: 'dark', flatBg: false, flatUi: true, reduceMotion: false, uiGlass: 0, uiBlur: 0 }
     },
     {
       id: 'dark-glass', name: 'Dark glass', tag: 'The signature',

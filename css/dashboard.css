@@ -3721,3 +3721,13 @@ html.flat-ui.theme-light body .daycard-ns {
 html.flat-ui.theme-light body .daycard-ns::before {
   background: rgba(24, 26, 33, 0.10);
 }
+
+
+/* v575 (Malik): the card's light spill (wrap aura / living glow) sometimes painted
+   OVER the TODAY panel's text (the panel was unpositioned, so any positioned glow
+   layer legally covered it; desktop even gives #dayCard z-index:3). The panel now
+   stacks above the spill everywhere, so its text is always readable. */
+body.ns-bloom .app.dash-v2 #commandCenter {
+  position: relative;
+  z-index: 4;
+}
