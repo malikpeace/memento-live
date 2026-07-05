@@ -3244,16 +3244,35 @@ html.theme-light .ns-summary--fallback .ns-card__cta {
    and re-tint the bright source from white to a soft clarity-purple so it
    stays a felt glow instead of a flat white smear. Decorative + lower
    priority than text, kept gentle. */
+/* v569 (Malik's dial: rgba(119,95,235) at ~0.55): the beams keep their exact
+   geometry/timing but the INK goes Clarity purple and lays on the light page
+   like pigment (multiply). The old 0.62 damping made them invisible. */
 html.theme-light .crays {
-  opacity: calc(var(--clarity-light, 0.08) * 0.62);
+  --c: 119 95 235;
   mix-blend-mode: multiply;
+  opacity: min(1, calc(var(--clarity-light, 0.08) * 2.4));
 }
 html.theme-light .crays__source {
   background: radial-gradient(circle at 22% 22%,
-    rgba(123, 97, 255, 0.20) 0%,
-    rgba(123, 97, 255, 0.12) 16%,
-    rgba(140, 120, 255, 0.06) 34%,
+    rgba(119, 95, 235, 0.44) 0%,
+    rgba(119, 95, 235, 0.26) 16%,
+    rgba(130, 108, 240, 0.12) 34%,
     transparent 64%);
+}
+/* The star page forces a dark scene in light mode; there the rays go back to
+   their dark-mode white ink (purple multiply would vanish on black). */
+html.theme-light .clarity-exp:has(.tut-star-stage) .crays {
+  --c: 255 255 255;
+  mix-blend-mode: normal;
+  opacity: var(--clarity-light, 0.08);
+}
+html.theme-light .clarity-exp:has(.tut-star-stage) .crays__source {
+  background: radial-gradient(circle at 22% 22%,
+    rgba(240, 230, 255, 0.45) 0%,
+    rgba(195, 175, 255, 0.24) 14%,
+    rgba(160, 160, 255, 0.12) 30%,
+    rgba(180, 140, 200, 0.05) 50%,
+    transparent 72%);
 }
 
 /* ============================================================

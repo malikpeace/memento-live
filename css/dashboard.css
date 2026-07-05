@@ -3634,3 +3634,25 @@ body.pre-clarity .capture-fab { display: none !important; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #widgetGrid > .widget--full { grid-column: 1 / -1 !important; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #widgetGrid > .dash-more { display: none !important; }
 }
+
+/* Light mode (v569, Malik's dial): the top-left rays on the home + Action plan
+   swap their white ink for Clarity purple laid on like pigment. Same beams,
+   same flicker choreography, visible on paper. Scoped to light surfaces only,
+   the dark onboarding/splash scenes keep white rays. The extra `body` in the
+   selector outranks base.css's accent-tinted --c on the shaft. */
+html.theme-light body .ambient .ambient__rays-beam-shaft,
+html.theme-light body .apl-rays .ambient__rays-beam-shaft {
+  --c: 119 95 235;
+}
+html.theme-light .ambient .ambient__rays,
+html.theme-light .apl-rays {
+  mix-blend-mode: multiply;
+}
+html.theme-light .ambient .ambient__rays-source,
+html.theme-light .apl-rays .ambient__rays-source {
+  background: radial-gradient(circle at 22% 22%,
+    rgba(119, 95, 235, 0.40) 0%,
+    rgba(119, 95, 235, 0.22) 16%,
+    rgba(130, 108, 240, 0.10) 34%,
+    transparent 64%);
+}
