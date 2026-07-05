@@ -3474,3 +3474,26 @@ body.lite .ns-star-scene--manifesto.ns-star-scene--zoomed .ns-star-stage {
   box-shadow: inset 0 1px 0 rgba(var(--ink), 0.06);
 }
 .ns-star-scene--manifesto .ns-star-detail__restart:hover { background: rgba(var(--ink), 0.14); }
+
+/* ---- Light mode, teaching pages (v566, Malik's light-mode pass) ---- */
+/* "How Focus Works" overlay + the "Okay, Let's begin." word beat used literal
+   white text: invisible on the light wizard surface. Ride the ink token. */
+html.theme-light .clarity-focus-ov__title,
+html.theme-light .clarity-ctx__word {
+  color: rgba(var(--ink), 1);
+}
+/* The scale's beam + fulcrum were literal white, invisible on off-white. */
+html.theme-light .gs__beam { background: rgba(var(--ink), 0.9); }
+html.theme-light .gs__fulcrum { border-bottom-color: rgba(var(--ink), 0.9); }
+/* The Neutron Star is a SPACE object: the star page goes fully dark even in
+   light mode (same rule as the reveal scene, which stays dark by design). One
+   dramatic cut to space for that beat; --ink re-pins so every text token flips
+   to white automatically. */
+html.theme-light .clarity-exp:has(.tut-star-stage) {
+  --ink: 255, 255, 255;
+  background: #050308;
+}
+html.theme-light .clarity-exp:has(.tut-star-stage) .clarity-exp__bg {
+  /* !important matches the base.css light-surface rule it must beat. */
+  background: radial-gradient(ellipse at 50% 30%, #0d0d18 0%, #050308 72%) !important;
+}

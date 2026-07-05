@@ -4035,3 +4035,18 @@ html.theme-light .milestone-banner {
 html.theme-light body.lite .milestone-banner {
   background: rgb(248, 248, 250);
 }
+
+/* Light mode (v566, Malik): a SELECTED answer flips to solid black with white
+   text, the white-fill selection reads as barely-different on the light page.
+   Covers the clarity/onboarding wizard chips, the discover grid tiles, and the
+   conversation chips (same white-when-selected recipe everywhere). */
+html.theme-light .wiz__option.selected,
+html.theme-light .wiz__domain-tile.selected,
+html.theme-light .wc-chip.is-selected {
+  background: #101015;
+  color: #fff;
+}
+html.theme-light .wiz__option.selected .wiz__option-text { color: #fff; }
+html.theme-light .wiz__option.selected .wiz__option-desc { color: rgba(255,255,255,0.65); }
+html.theme-light .wiz__domain-tile.selected .wiz__domain-tile-label { color: #fff; }
+html.theme-light .wiz__domain-tile.selected .wiz__domain-tile-check { color: #fff; }
