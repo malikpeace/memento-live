@@ -2826,6 +2826,17 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
 .clarity-exp.has-ai-custom .clarity-exp__page-wrap {
   overflow: hidden;
 }
+/* Same recipe for the discover grid's "Something else" field (v561): while it is
+   focused, only the SELECTED tiles stay (context), the long intro hints collapse,
+   and the page locks, so the field sits high above the iOS keyboard and the text
+   being typed is actually visible. */
+.clarity-exp.has-discover-custom .wiz__option[data-key="discoverDomain"]:not(.selected),
+.clarity-exp.has-discover-custom .wiz__hint {
+  display: none;
+}
+.clarity-exp.has-discover-custom .clarity-exp__page-wrap {
+  overflow: hidden;
+}
 .clarity-exp .wiz__composer { margin-top: 14px; }
 .clarity-exp .wiz__composer .wiz__textarea {
   min-height: 72px;              /* short at rest so the whole field sits above the keyboard */

@@ -1805,6 +1805,19 @@ const ClarityExperience = {
           if (inp) {
             const show = (wizardAnswers.discoverDomain || []).includes('other');
             inp.style.display = show ? '' : 'none';
+            // While typing, collapse everything but the selected tiles so the field
+            // sits high above the iOS keyboard (same recipe as "My own answer",
+            // has-ai-custom); the settle hook absorbs the iOS focus shove. (v561)
+            if (!inp._settleBound) {
+              inp._settleBound = true;
+              if (typeof this.settleFieldOnFocus === 'function') this.settleFieldOnFocus(inp);
+              inp.addEventListener('focus', () => {
+                try { this.el.classList.add('has-discover-custom'); this.pageWrap.scrollTop = 0; } catch (e) {}
+              });
+              inp.addEventListener('blur', () => {
+                try { this.el.classList.remove('has-discover-custom'); } catch (e) {}
+              });
+            }
             if (show && val === 'other') { try { inp.focus(); } catch (e) {} }
           }
         }
