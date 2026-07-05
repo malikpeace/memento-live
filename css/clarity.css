@@ -3494,6 +3494,23 @@ html.theme-light .clarity-exp:has(.tut-star-stage) {
   background: #050308;
 }
 html.theme-light .clarity-exp:has(.tut-star-stage) .clarity-exp__bg {
-  /* !important matches the base.css light-surface rule it must beat. */
-  background: radial-gradient(ellipse at 50% 30%, #0d0d18 0%, #050308 72%) !important;
+  /* !important matches the base.css light-surface rule it must beat. The star's
+     blue glow is painted HERE, on the unclipped background, because the halo
+     inside the page-wrap gets cut in a straight line at the wrap's bottom edge
+     (overflow hidden); with the bg carrying the same tone the clip is invisible. */
+  background: radial-gradient(circle at 50% 34%,
+    rgba(150, 165, 255, 0.13) 0%,
+    rgba(120, 135, 230, 0.07) 30%,
+    rgba(5, 3, 8, 1) 66%) !important;
+}
+/* Tame the in-wrap halo so its clipped edge can't read as a line. */
+html.theme-light .clarity-exp:has(.tut-star-stage) .tut-star-halo {
+  /* filter, not opacity: the starHalo keyframes animate opacity and would win */
+  filter: opacity(0.55);
+}
+/* The star page is a dark scene even in light mode, so its primary action uses
+   the dark-scene CTA: solid white, near-black text (Malik, v567). */
+html.theme-light .clarity-exp:has(.tut-star-stage) .clarity-exp__nav-btn--next {
+  background: #fff !important;
+  color: #0b0b12 !important;
 }
