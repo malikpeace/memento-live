@@ -862,7 +862,7 @@ const ClarityExperience = {
     const reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
     if (reduced) return;
     const nav = this.navEl;
-    if (nav) { nav.style.transition = 'opacity 0.45s ease'; nav.style.opacity = '0'; nav.style.pointerEvents = 'none'; }
+    if (nav) { nav.style.transition = 'none'; nav.style.opacity = '0'; nav.style.pointerEvents = 'none'; void nav.offsetWidth; nav.style.transition = 'opacity 0.45s ease'; }
     const showNav = () => { if (nav) { nav.style.opacity = '1'; nav.style.pointerEvents = ''; } };
     const full = headIn.textContent;
     // Chunk the body like the other teaching pages (v553), but the first two lines
@@ -1000,7 +1000,7 @@ const ClarityExperience = {
     if (reduced) return;
     tut.style.opacity = '0';
     const nav = this.navEl;
-    if (nav) { nav.style.transition = 'opacity 0.45s ease'; nav.style.opacity = '0'; nav.style.pointerEvents = 'none'; }
+    if (nav) { nav.style.transition = 'none'; nav.style.opacity = '0'; nav.style.pointerEvents = 'none'; void nav.offsetWidth; nav.style.transition = 'opacity 0.45s ease'; }
     const showNav = () => { if (nav) { nav.style.opacity = '1'; nav.style.pointerEvents = ''; } };
     const ov = document.createElement('div');
     ov.className = 'clarity-focus-ov';
@@ -1127,7 +1127,7 @@ const ClarityExperience = {
     // The Continue nav stays hidden until EVERY element is on screen (Malik: it used to
     // pop up over an empty page). Shown the moment the last line lands (or on tap-fill).
     const nav = this.navEl;
-    if (nav) { nav.style.transition = 'opacity 0.45s ease'; nav.style.opacity = '0'; nav.style.pointerEvents = 'none'; }
+    if (nav) { nav.style.transition = 'none'; nav.style.opacity = '0'; nav.style.pointerEvents = 'none'; void nav.offsetWidth; nav.style.transition = 'opacity 0.45s ease'; }
     const showNav = () => { if (nav) { nav.style.opacity = '1'; nav.style.pointerEvents = ''; } };
     // Capture each line's inline structure (text runs + bold spans WITH their attrs) so the
     // typewriter can reveal characters with their formatting already applied, then reserve the
@@ -1282,7 +1282,7 @@ const ClarityExperience = {
     tut.dataset.typeRan = '1';
     const reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
     const nav = this.navEl;
-    if (nav && !reduced) { nav.style.transition = 'opacity 0.45s ease'; nav.style.opacity = '0'; nav.style.pointerEvents = 'none'; }
+    if (nav && !reduced) { nav.style.transition = 'none'; nav.style.opacity = '0'; nav.style.pointerEvents = 'none'; void nav.offsetWidth; nav.style.transition = 'opacity 0.45s ease'; }
     const showNav = () => { if (nav) { nav.style.opacity = '1'; nav.style.pointerEvents = ''; } };
     // Stash each line's inline runs (text + bold spans) and reserve its height, then clear.
     lines.forEach((l) => {
