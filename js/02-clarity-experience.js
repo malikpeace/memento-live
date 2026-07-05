@@ -843,10 +843,10 @@ const ClarityExperience = {
     try {
       this.navEl.innerHTML = '';
       this.pageWrap.innerHTML = '<div class="clarity-exp__page-inner"><div class="clarity-ctx">' +
-        '<div class="clarity-ctx__word">Let\'s find Clarity.</div>' +
+        '<div class="clarity-ctx__word">Okay, Let\'s begin.</div>' +
         '</div></div>';
       const reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-      this._setTimeout(done, reduced ? 450 : 1500);
+      this._setTimeout(done, reduced ? 450 : 2500);
     } catch (e) { done(); }
   },
 
@@ -1093,25 +1093,34 @@ const ClarityExperience = {
     stage.dataset.introRan = '1';
     const reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
     if (reduced) return;
+    // The nav stays hidden while the star arrives (Malik, v557): the star gets the
+    // screen to itself, buttons only fade in with the words.
+    const nav = this.navEl;
+    if (nav) { nav.style.transition = 'none'; nav.style.opacity = '0'; nav.style.pointerEvents = 'none'; void nav.offsetWidth; nav.style.transition = 'opacity 0.45s ease'; }
+    const showNav = () => { if (nav) { nav.style.opacity = '1'; nav.style.pointerEvents = ''; } };
     const illust = this.pageWrap.querySelector('.clarity-exp__tut-illust');
     const texts = [tut.querySelector('.clarity-exp__tut-headline'), tut.querySelector('.clarity-exp__tut-sub')].filter(Boolean);
     texts.forEach((el) => { el.style.opacity = '0'; el.style.transform = 'translateY(10px)'; });
     if (illust) {
+      illust.style.transition = 'none';
       illust.style.opacity = '0';
-      illust.style.transform = 'scale(0.82)';
-      illust.style.transition = 'opacity 1.2s ease-out, transform 1.6s cubic-bezier(0.16,1,0.3,1)';
+      illust.style.transform = 'scale(0.7)';
+      void illust.offsetWidth; // commit the start state so the transition actually runs
+      // Slower, heavier arrival (Malik, v557: it used to suddenly appear).
+      illust.style.transition = 'opacity 2.4s ease-out, transform 3s cubic-bezier(0.16,1,0.3,1)';
       requestAnimationFrame(() => { illust.style.opacity = '1'; illust.style.transform = ''; });
     }
-    // The star lands (~1.2s) and sits alone for a second, then the words arrive.
+    // The star lands slowly and sits alone for a beat, then the words + nav arrive.
     this._setTimeout(() => {
       texts.forEach((el, i) => {
         el.style.transition = 'opacity 0.7s ease, transform 0.7s cubic-bezier(0.16,1,0.3,1)';
         this._setTimeout(() => { el.style.opacity = '1'; el.style.transform = ''; }, i * 240);
       });
-    }, 2300);
+      this._setTimeout(showNav, 500);
+    }, 3400);
     // Arrival tremble is full strength; once the page is settled the shake calms to a
     // quieter idle (Malik: powerful entrance, subtler at rest).
-    this._setTimeout(() => { try { stage.classList.add('is-idle'); } catch (e) {} }, 3200);
+    this._setTimeout(() => { try { stage.classList.add('is-idle'); } catch (e) {} }, 4400);
   },
 
   // The "How to achieve anything" hero: the headline POPS IN sharp + fully visible, centred on
@@ -1469,6 +1478,12 @@ const ClarityExperience = {
         if (this.pageWrap.querySelector('.clarity-reflect')) this._runReflectIntro();
         if (this.pageWrap.querySelector('.tut-sub__line') && !this.pageWrap.querySelector('.tut-star-stage')) this._runTutType();
         if (this.pageWrap.querySelector('.tut-star-stage')) this._runStarChunks();
+        // Star page: same init + cinematic entrance as the wizard path (v557).
+        const tutStarBlob = document.getElementById('tutStarBlob');
+        if (tutStarBlob) {
+          setTimeout(() => initStarBlob(tutStarBlob, 480, 'pulsar'), 50);
+          this._runStarIntro();
+        }
         this._fitPageScroll();
       }
       return;

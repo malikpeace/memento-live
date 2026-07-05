@@ -529,9 +529,11 @@ body.clarity-legacy-orbs .clarity-exp__bg-orb4 { display: block; }
   border-radius: 0;
 }
 /* Mobile (v552): cap the tutorial star so the Neutron Star page fits a phone
-   screen without scrolling (the 92vw blob alone ate all the spare height). */
+   screen without scrolling (the 92vw blob alone ate all the spare height).
+   v557: pushed back up to 82vw (Malik: it read small, not powerful); the page
+   still fits because the sub shows one paragraph at a time. */
 @media (max-width: 859px) {
-  .tut-star-blob { width: min(64vw, 430px); height: min(64vw, 430px); }
+  .tut-star-blob { width: min(82vw, 430px); height: min(82vw, 430px); }
 }
 .tut-star-stage {
   position: relative;
