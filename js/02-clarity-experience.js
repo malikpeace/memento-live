@@ -1738,7 +1738,18 @@ const ClarityExperience = {
         const val = opt.dataset.value;
         if (!val) return;
         const isMulti = opt.querySelector('.wiz__option-check');
-        if (isMulti) {
+        // "Something else" / "I have no idea" are exclusive AND bypass the 2-pick max
+        // gate (at max their clicks were silently swallowed, Malik v562): tapping one
+        // replaces the whole selection; tapping it again clears it. The resync block
+        // below repaints every tile.
+        const isExclusiveDiscover = isMulti && key === 'discoverDomain' && (val === 'other' || val === 'no_idea');
+        if (isExclusiveDiscover) {
+          const cur = wizardAnswers[key] || [];
+          wizardAnswers[key] = cur.includes(val) ? [] : [val];
+          const clarityEl = document.getElementById('clarityExp');
+          const warn = clarityEl ? clarityEl.querySelector('.wiz__limit-msg--warn') : null;
+          if (warn) warn.remove();
+        } else if (isMulti) {
           const arr = wizardAnswers[key] || [];
           const maxMap = { apps: 3, discoverDomain: 2 };
           const max = maxMap[key] || 99;
@@ -1795,6 +1806,25 @@ const ClarityExperience = {
           }
           container.querySelectorAll('.wiz__option[data-key="' + key + '"]').forEach(o => {
             o.classList.toggle('selected', o.dataset.value === val);
+          });
+        }
+        // "Something else" and "I have no idea" are EXCLUSIVE (Malik, v562): picking
+        // either clears every other selection, and picking a normal area clears them.
+        // Then re-sync every tile's selected/check/locked state from the answer array.
+        if (key === 'discoverDomain') {
+          const arrNow = wizardAnswers[key] || [];
+          if ((val === 'other' || val === 'no_idea') && arrNow.includes(val)) {
+            wizardAnswers[key] = [val];
+          } else if (arrNow.includes(val)) {
+            wizardAnswers[key] = arrNow.filter(v => v !== 'other' && v !== 'no_idea');
+          }
+          const arr = wizardAnswers[key] || [];
+          container.querySelectorAll('[data-key="discoverDomain"]').forEach(o => {
+            const on = arr.includes(o.dataset.value);
+            o.classList.toggle('selected', on);
+            const chk = o.querySelector('.wiz__option-check, .wiz__domain-tile-check');
+            if (chk) chk.textContent = on ? '✓' : '';
+            o.classList.toggle('wiz__option--locked', !on && arr.length >= 2);
           });
         }
         // "Something else" on the discover grid: reveal its always-in-DOM text field
