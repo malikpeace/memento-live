@@ -4050,3 +4050,17 @@ html.theme-light .wiz__option.selected .wiz__option-text { color: #fff; }
 html.theme-light .wiz__option.selected .wiz__option-desc { color: rgba(255,255,255,0.65); }
 html.theme-light .wiz__domain-tile.selected .wiz__domain-tile-label { color: #fff; }
 html.theme-light .wiz__domain-tile.selected .wiz__domain-tile-check { color: #fff; }
+
+/* Light mode (v568, Malik): the progress fill was white-to-lavender, invisible
+   on the light page. Inverse of the dark recipe: purple whisper at the tail,
+   solid near-black at the leading edge. Track bumped a touch for contrast. */
+html.theme-light .ai-progress__bar {
+  background: rgba(var(--ink), 0.10);
+}
+html.theme-light .ai-progress__fill {
+  background: linear-gradient(90deg,
+    rgba(123, 97, 255, 0.65) 0%,
+    rgba(66, 58, 110, 0.92) 55%,
+    rgba(24, 26, 33, 1) 100%
+  );
+}
