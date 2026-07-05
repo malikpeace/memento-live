@@ -502,10 +502,10 @@ const ClarityExperience = {
         aiCurrentOptions = [];
         aiCurrentRange = null;
         if (aiAbortController) { aiAbortController.abort(); aiAbortController = null; }
-        // "Clarity" intro first (then the hero page), matching the fresh open flow; or
-        // straight to the wizard if the tutorial was already seen.
+        // Hero first, then the "Clarity" intro (v556 flipped flow); or straight to
+        // the wizard if the tutorial was already seen.
         if (!state.clarity.tutorialSeen) {
-          this._openWithIntro = true;
+          this._introPending = true;
           this._setLight(0.06);
           this._openContent();
         } else {
@@ -563,9 +563,9 @@ const ClarityExperience = {
     document.getElementById('clarityIntroBtn').addEventListener('click', () => {
       const intro = document.getElementById('clarityIntro');
       intro.classList.add('clarity-intro--exit');
-      // The intro OPENS the module now (v499), so Begin drops into the teaching pages
-      // from the top: the "How to achieve literally anything" hero (page 0).
-      this._setTimeout(() => { if (this.isOpen) { this.currentPage = 0; this._openContent(); } }, 400);
+      // FLIPPED (v556): the intro plays AFTER the hero, so Begin drops into the
+      // scale pages (page 1). The hero (page 0) was already seen.
+      this._setTimeout(() => { if (this.isOpen) { this.currentPage = 1; this._openContent(); } }, 400);
     });
 
     this._runClarityIntro();
@@ -687,11 +687,10 @@ const ClarityExperience = {
     }
 
     // ── Fresh open ──
-    // The module OPENS with the "Clarity" cinematic intro (v499, Malik: the hero and the
-    // intro were two centred title moments back to back, which stole from Clarity's).
-    // Begin then drops into the teaching pages starting at the hero (page 0), whose
-    // title now enters quietly in place. Hold on plain black for a beat first.
-    this._openWithIntro = true;
+    // FLIPPED (v556, Malik): the module now OPENS on the hero ("How to achieve
+    // literally anything", page 0); the "Clarity" cinematic intro plays AFTER it,
+    // between the hero and the scale pages (gated in next() via _introPending).
+    this._introPending = true;
     this._setLight(0.06);
     this._openContent(650);
   },
@@ -790,6 +789,7 @@ const ClarityExperience = {
     this._transitioning = false;
     this._resuming = false;
     this._openWithIntro = false;
+    this._introPending = false;
     FullscreenClose.hide();
 
     // Hard hide the clarity overlay - display:none is un-ignorable
@@ -1879,6 +1879,13 @@ const ClarityExperience = {
     // Chunked teaching pages (v552): Continue steps through the paragraph pairs on the
     // current page first; only once the last pair is showing does it navigate.
     if (this._chunkNext) { try { if (this._chunkNext()) return; } catch (e) {} }
+    // FLIPPED flow (v556): leaving the hero plays the "Clarity" cinematic intro once;
+    // its Begin then drops into the scale pages (page 1).
+    if (this._introPending && this.currentPage === 0) {
+      this._introPending = false;
+      this._showClarityIntro();
+      return;
+    }
     const offset = this.getWizardOffset();
     const total = this.getTotalPages();
 
