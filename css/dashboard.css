@@ -3689,12 +3689,14 @@ html:not(.theme-light) body.pre-clarity .daycard-ns__emblem {
    no glow, no deboss: nothing pretending to be 3D. Both card states. ---- */
 html.flat-ui body .daycard-ns,
 html.flat-ui body.pre-clarity .daycard-ns {
-  background: #0a0a0e;
+  /* AMOLED (v573): the slab sits a hair above the #000 ground, contrast comes
+     from the hairline ring, not fill. */
+  background: #060608;
   box-shadow: none;
 }
 html.flat-ui body .daycard-ns::before,
 html.flat-ui body.pre-clarity .daycard-ns::before {
-  background: rgba(255, 255, 255, 0.09);
+  background: rgba(255, 255, 255, 0.07);
 }
 html.flat-ui body .daycard-ns__sheen,
 html.flat-ui body .daycard-ns__iri,
@@ -3711,6 +3713,7 @@ html.flat-ui body.pre-clarity .daycard-ns__burn {
 html.flat-ui body .daycard-ns__emblem,
 html.flat-ui body.pre-clarity .daycard-ns__emblem {
   filter: none;
+  fill: rgba(255, 255, 255, 0.10);
 }
 html.flat-ui.theme-light body .daycard-ns {
   background: #f5f6f8;
