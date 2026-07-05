@@ -1797,6 +1797,17 @@ const ClarityExperience = {
             o.classList.toggle('selected', o.dataset.value === val);
           });
         }
+        // "Something else" on the discover grid: reveal its always-in-DOM text field
+        // (clicks don't re-render the step, so a conditional render never appeared;
+        // Malik's bug, v560). Focus it when just selected.
+        if (key === 'discoverDomain') {
+          const inp = container.querySelector('#discoverOtherInput');
+          if (inp) {
+            const show = (wizardAnswers.discoverDomain || []).includes('other');
+            inp.style.display = show ? '' : 'none';
+            if (show && val === 'other') { try { inp.focus(); } catch (e) {} }
+          }
+        }
         this.updateNav();
       });
     });

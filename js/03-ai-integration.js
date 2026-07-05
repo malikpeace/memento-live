@@ -1899,10 +1899,13 @@ async function callClaude(messages, systemPrompt, options = {}) {
 
 function buildContextMessage() {
   const domains = Array.isArray(wizardAnswers.discoverDomain) ? wizardAnswers.discoverDomain : (wizardAnswers.discoverDomain ? [wizardAnswers.discoverDomain] : []);
+  // "Something else" resolves to whatever they typed (v560).
+  const discoverOther = (wizardAnswers.discoverDomainCustom || '').trim();
+  const domainName = (v) => (v === 'other' && discoverOther) ? discoverOther : (DISCOVERY_DOMAINS.find(d => d.value === v)?.label || v);
   const primary = domains[0] || '';
-  const primaryLabel = DISCOVERY_DOMAINS.find(d => d.value === primary)?.label || primary;
+  const primaryLabel = primary ? domainName(primary) : '';
   const secondaryDomains = domains.slice(1);
-  const secondaryLabel = secondaryDomains.map(d => DISCOVERY_DOMAINS.find(dd => dd.value === d)?.label || d).join(', ');
+  const secondaryLabel = secondaryDomains.map(domainName).join(', ');
 
   if (wizardAnswers.knowDomain === 'yes') {
     const whatTheyWant = wizardAnswers.whatSpecifically || '';
@@ -2116,7 +2119,12 @@ function renderWizardStep(key) {
         'knowDomain'
       );
     }
-    case 'discoverDomain':
+    case 'discoverDomain': {
+      // The "Something else" field is ALWAYS in the DOM and just hidden, because option
+      // clicks toggle classes in place without re-rendering, so a conditionally rendered
+      // input could never appear (Malik's bug, v560). bindWizardEvents shows/hides it.
+      const ddPicked = wizardAnswers.discoverDomain || [];
+      const ddCustom = wizardAnswers.discoverDomainCustom || '';
       return `<div class="wiz__question">No worries! Very few humans ever know exactly what they want to do.</div>
         <div class="wiz__hint" style="margin-bottom:24px; line-height:1.6;">Most people spend their entire lives avoiding this question. Yet you're here. Which already puts you ahead of 90% of people. Let's figure this out.<br><br>Pick one or two areas that draw you in. Not what you think you should pick. What actually keeps you up at night or gets you out of bed.</div>
         <div class="wiz__hint" style="font-size:0.75rem; opacity:0.85; margin-bottom:16px;">Pick up to 2. You can't make progress across all areas of life at once.</div>` +
@@ -2125,7 +2133,9 @@ function renderWizardStep(key) {
             .concat([{ value: 'other', label: 'Something else', desc: 'I\'ll describe it myself' }])
             .concat([{ value: 'no_idea', label: 'I have no idea', desc: 'Help me figure it out' }]),
           'discoverDomain', 2
-        );
+        ) +
+        `<input class="wiz__text-input" id="discoverOtherInput" data-key="discoverDomainCustom" placeholder="What area? Say it in your own words..." value="${esc(ddCustom)}" style="margin-top:12px; display:${ddPicked.includes('other') ? '' : 'none'}">`;
+    }
     case 'pickPrimary': {
       const picked = wizardAnswers.discoverDomain || [];
       const ppCurrent = wizardAnswers['pickPrimary'] || '';
@@ -2134,7 +2144,8 @@ function renderWizardStep(key) {
       ppHtml += '<div class="wiz__options">';
       picked.forEach(val => {
         const d = DISCOVERY_DOMAINS.find(dd => dd.value === val);
-        const label = d ? d.label : val;
+        const _oc = (wizardAnswers.discoverDomainCustom || '').trim();
+        const label = d ? d.label : (val === 'other' && _oc ? _oc : val);
         const sel = ppCurrent === val ? 'selected' : '';
         ppHtml += `<div class="wiz__option ${sel}" data-key="pickPrimary" data-value="${esc(val)}">
           <div class="wiz__option-radio"></div>
@@ -2182,9 +2193,8 @@ function renderWizardStep(key) {
         <div class="wiz__option-radio"></div>
         <div><div class="wiz__option-text">Something else</div></div>
       </div>`;
-      if (current === 'other_custom') {
-        ddHtml += `<input class="wiz__text-input" id="drilldownCustomInput" data-key="domainDrilldownCustom" placeholder="Tell me what you mean..." value="${esc(customText)}" style="margin-top:8px">`;
-      }
+      // Always in the DOM, hidden unless selected (option clicks don't re-render, v560).
+      ddHtml += `<input class="wiz__text-input" id="drilldownCustomInput" data-key="domainDrilldownCustom" placeholder="Tell me what you mean..." value="${esc(customText)}" style="margin-top:8px; display:${current === 'other_custom' ? '' : 'none'}">`;
       ddHtml += '</div>';
       return ddHtml;
     }
@@ -2514,7 +2524,14 @@ function wizMultiSelect(q, hint, options, key, max) {
 function wizardStepValid(key) {
   switch (key) {
     case 'knowDomain': return !!wizardAnswers.knowDomain;
-    case 'discoverDomain': return (wizardAnswers.discoverDomain || []).length >= 1;
+    case 'discoverDomain': {
+      const sel = wizardAnswers.discoverDomain || [];
+      if (sel.length < 1) return false;
+      // "Something else" needs the description filled in, otherwise Next silently
+      // dropped their answer (Malik's bug, v560).
+      if (sel.includes('other')) return (wizardAnswers.discoverDomainCustom || '').trim().length > 0;
+      return true;
+    }
     case 'whyThisArea': return (wizardAnswers.whyThisArea || '').trim().length > 0;
     case 'currentState': return !!wizardAnswers.currentState;
     case 'pickPrimary': return !!wizardAnswers.pickPrimary;
@@ -2569,6 +2586,24 @@ function bindWizard(container) {
         container.querySelectorAll(`.wiz__option[data-key="${key}"]`).forEach(o => {
           o.classList.toggle('selected', o.dataset.value === value);
         });
+      }
+      // Show/hide the "Something else" custom fields (always in the DOM, since option
+      // clicks don't re-render the step; focus when revealed). (Malik's bug, v560)
+      if (key === 'discoverDomain') {
+        const inp = container.querySelector('#discoverOtherInput');
+        if (inp) {
+          const show = (wizardAnswers.discoverDomain || []).includes('other');
+          inp.style.display = show ? '' : 'none';
+          if (show && value === 'other') try { inp.focus(); } catch (e) {}
+        }
+      }
+      if (key === 'domainDrilldown') {
+        const inp = container.querySelector('#drilldownCustomInput');
+        if (inp) {
+          const show = wizardAnswers.domainDrilldown === 'other_custom';
+          inp.style.display = show ? '' : 'none';
+          if (show) try { inp.focus(); } catch (e) {}
+        }
       }
       updateWizNavState(container);
     });
@@ -3340,9 +3375,10 @@ function completeWizard() {
   }
   delete state.clarity.draft; // Clear saved progress
 
-  // Map domains (now an array of 1-2)
+  // Map domains (now an array of 1-2); "Something else" resolves to what they typed (v560)
   const domains = Array.isArray(a.discoverDomain) ? a.discoverDomain : (a.discoverDomain ? [a.discoverDomain] : []);
-  const domainLabel = domains.map(d => DISCOVERY_DOMAINS.find(dd => dd.value === d)?.label || d).join(' & ');
+  const _dOther = (a.discoverDomainCustom || '').trim();
+  const domainLabel = domains.map(d => (d === 'other' && _dOther) ? _dOther : (DISCOVERY_DOMAINS.find(dd => dd.value === d)?.label || d)).join(' & ');
   state.clarity.answers.domains = domains;
   state.clarity.answers.whyThisArea = a.whyThisArea || '';
   state.clarity.answers.currentState = a.currentState || '';
