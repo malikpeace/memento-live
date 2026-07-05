@@ -296,10 +296,10 @@ body.clarity-legacy-orbs .clarity-exp__bg-orb4 { display: block; }
 .clarity-exp__tut-sub {
   font-size: 15px; color: rgba(var(--ink),0.95);
   line-height: 1.65; max-width: 300px;
+  /* Paragraphs are line divs typed one by one (v551). Flex gap (not margins) spaces
+     them so hidden (display:none) lines can never leave a stray offset (v553). */
+  display: flex; flex-direction: column; gap: 15px;
 }
-/* Sub paragraphs are line divs so the typewriter can type them one by one (v551);
-   the margin recreates the old <br><br> gap. */
-.tut-sub__line + .tut-sub__line { margin-top: 1em; }
 /* Mobile (v552): bias the vertically-centred block upward so it clears the floating
    Continue nav and sits higher on screen (Malik: it read too low). The pages are
    chunked (2 paragraphs at a time) so nothing should need to scroll. */
@@ -367,9 +367,10 @@ body.clarity-legacy-orbs .clarity-exp__bg-orb4 { display: block; }
   color: rgba(var(--ink),0.95);
   max-width: 340px;
 }
-/* The body is line divs (v498) so _runReflectIntro can reveal them one by one. */
-.clarity-reflect__line { margin-bottom: 18px; }
-.clarity-reflect__line:last-child { margin-bottom: 0; }
+/* The body is line divs (v498) so _runReflectIntro can reveal them one by one.
+   Flex gap (not margins) so hidden chunked lines leave no stray offset (v553). */
+.clarity-reflect__body { display: flex; flex-direction: column; gap: 18px; }
+.clarity-reflect__line { margin-bottom: 0; }
 .clarity-reflect__question {
   display: block;
   font-size: 16px;

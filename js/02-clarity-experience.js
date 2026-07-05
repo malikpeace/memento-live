@@ -865,7 +865,27 @@ const ClarityExperience = {
     if (nav) { nav.style.transition = 'opacity 0.45s ease'; nav.style.opacity = '0'; nav.style.pointerEvents = 'none'; }
     const showNav = () => { if (nav) { nav.style.opacity = '1'; nav.style.pointerEvents = ''; } };
     const full = headIn.textContent;
-    lines.forEach((l) => { l.style.opacity = '0'; l.style.transform = 'translateY(10px)'; });
+    // Chunk the body TWO lines at a time like the other teaching pages (v553): the page
+    // was ~120px taller than a phone screen; chunking keeps it scroll-free and stable.
+    lines.forEach((l) => { l.__h = l.offsetHeight; l.style.opacity = '0'; l.style.transform = 'translateY(10px)'; });
+    const chunks = []; for (let i = 0; i < lines.length; i += 2) chunks.push(lines.slice(i, i + 2));
+    if (chunks.length > 1) {
+      const last = chunks[chunks.length - 1];
+      if (last.length === 1 && (last[0].textContent || '').length < 60) { chunks.pop(); chunks[chunks.length - 1].push(last[0]); }
+    }
+    let chunkIdx = 0;
+    this._chunkIdx = 0;
+    this._chunkTotal = chunks.length;
+    const body = wrap.querySelector('.clarity-reflect__body');
+    if (body) {
+      const GAP = 18;
+      body.style.minHeight = Math.max(...chunks.map((c) => c.reduce((a, l) => a + (l.__h || 0), 0) + GAP * (c.length - 1))) + 'px';
+    }
+    const layoutChunk = () => {
+      lines.forEach((l) => { l.style.display = 'none'; });
+      chunks[chunkIdx].forEach((l) => { l.style.display = ''; });
+    };
+    layoutChunk();
     // Centre the headline (same measure-then-transform trick as the hero).
     const r = headIn.getBoundingClientRect();
     const dx = (window.innerWidth / 2) - (r.left + r.width / 2);
@@ -888,18 +908,54 @@ const ClarityExperience = {
     const revealAll = () => {
       if (done) return; done = true;
       land();
-      lines.forEach((l) => { l.style.transition = 'opacity 0.5s ease, transform 0.5s ease'; l.style.opacity = '1'; l.style.transform = ''; });
+      layoutChunk();
+      chunks[chunkIdx].forEach((l) => { l.style.transition = 'opacity 0.5s ease, transform 0.5s ease'; l.style.opacity = '1'; l.style.transform = ''; });
       showNav();
     };
     const revealLines = () => {
-      lines.forEach((l, i) => {
+      const arr = chunks[chunkIdx];
+      arr.forEach((l, i) => {
         this._setTimeout(() => {
           if (done) return;
           l.style.transition = 'opacity 0.55s ease, transform 0.55s cubic-bezier(0.16,1,0.3,1)';
           l.style.opacity = '1'; l.style.transform = '';
-          if (i === lines.length - 1) { done = true; showNav(); }
+          if (i === arr.length - 1) { done = true; showNav(); }
         }, i * 950);
       });
+    };
+    const seen = new Set([0]);
+    this._chunkNext = () => {
+      if (!done || chunkIdx >= chunks.length - 1) return false;
+      done = false;
+      if (nav) { nav.style.opacity = '0'; nav.style.pointerEvents = 'none'; }
+      const cur = chunks[chunkIdx];
+      cur.forEach((l) => { l.style.transition = 'opacity 0.3s ease'; l.style.opacity = '0'; });
+      this._setTimeout(() => {
+        chunkIdx++;
+        this._chunkIdx = chunkIdx;
+        this.updateNav();
+        chunks[chunkIdx].forEach((l) => { l.style.opacity = '0'; l.style.transform = 'translateY(10px)'; });
+        layoutChunk();
+        try { this.pageWrap.scrollTop = 0; } catch (e) {}
+        this._fitPageScroll();
+        if (seen.has(chunkIdx)) { revealAll(); return; }
+        seen.add(chunkIdx);
+        revealLines();
+      }, 330);
+      return true;
+    };
+    this._chunkPrev = () => {
+      if (chunkIdx <= 0) return false;
+      chunkIdx--;
+      this._chunkIdx = chunkIdx;
+      done = true;
+      layoutChunk();
+      chunks[chunkIdx].forEach((l) => { l.style.transition = 'none'; l.style.opacity = '1'; l.style.transform = ''; });
+      showNav();
+      this.updateNav();
+      try { this.pageWrap.scrollTop = 0; } catch (e) {}
+      this._fitPageScroll();
+      return true;
     };
     let typed = false;
     const glideThenLines = () => {
@@ -994,15 +1050,20 @@ const ClarityExperience = {
         // identity transform first, force layout, THEN transition to the target so it glides.
         fly.style.animation = 'none';
         fly.style.opacity = '1';
-        fly.style.transformOrigin = 'left top';
+        // Scale by FONT-SIZE ratio and align the box CENTERS (v553). The old height-ratio
+        // scale compared line boxes with different line-heights (1.1 vs 1.2), so the word
+        // landed ~9% oversized and off by a few px, which read as a snap at the swap.
+        fly.style.transformOrigin = '50% 50%';
         fly.style.transition = 'none';
         fly.style.transform = 'translate(0px, 0px) scale(1)';
         void fly.offsetWidth; // commit the start position
         const fr = fly.getBoundingClientRect();
         const tr = target.getBoundingClientRect();
-        const s = tr.height / Math.max(1, fr.height);
+        const s = (parseFloat(getComputedStyle(target).fontSize) || 1) / (parseFloat(getComputedStyle(fly).fontSize) || 1);
+        const dx = (tr.left + tr.width / 2) - (fr.left + fr.width / 2);
+        const dy = (tr.top + tr.height / 2) - (fr.top + fr.height / 2);
         fly.style.transition = 'transform 1.35s cubic-bezier(0.45, 0, 0.15, 1)';
-        fly.style.transform = 'translate(' + (tr.left - fr.left) + 'px, ' + (tr.top - fr.top) + 'px) scale(' + s + ')';
+        fly.style.transform = 'translate(' + dx + 'px, ' + dy + 'px) scale(' + s + ')';
       } catch (e) {}
     };
     ov.addEventListener('click', () => finish(true));
@@ -1068,7 +1129,8 @@ const ClarityExperience = {
       l.__segs = [...l.childNodes].map((node) => ({ el: node.nodeType === 1 ? node.cloneNode(false) : null, text: node.textContent || '' }));
       l.__len = l.__segs.reduce((a, s) => a + s.text.length, 0);
       l.dataset.full = l.innerHTML;
-      l.style.minHeight = l.offsetHeight + 'px';
+      l.__h = l.offsetHeight;
+      l.style.minHeight = l.__h + 'px';
       l.textContent = '';
     });
     // Paragraphs show TWO at a time (Malik, v552: no scrolling on mobile). Continue steps
@@ -1076,11 +1138,31 @@ const ClarityExperience = {
     // via this._chunkNext, which next() consults before page navigation.
     const CH = 2;
     const chunks = []; for (let i = 0; i < lines.length; i += CH) chunks.push(lines.slice(i, i + CH));
+    // A short orphan sentence never gets its own chunk (Malik, v553: "We need to fix
+    // this." alone on a step felt wrong); it rides with the previous pair.
+    if (chunks.length > 1) {
+      const last = chunks[chunks.length - 1];
+      if (last.length === 1 && (last[0].dataset.full || '').length < 60) { chunks.pop(); chunks[chunks.length - 1].push(last[0]); }
+    }
     let chunkIdx = 0;
+    this._chunkIdx = 0;
+    this._chunkTotal = chunks.length;
+    const seen = new Set([0]);
     const layoutChunk = () => {
       lines.forEach((l) => { l.style.display = 'none'; });
-      chunks[chunkIdx].forEach((l) => { l.style.display = ''; l.style.transition = ''; l.style.opacity = '1'; });
+      chunks[chunkIdx].forEach((l) => { l.style.display = ''; l.style.transition = ''; l.style.opacity = '1'; l.style.marginTop = ''; });
     };
+    // Lock the lines container to the TALLEST chunk so the title/illustration never
+    // shift when a shorter pair swaps in (v553: this was the jump Malik saw).
+    const linesWrap = hero.querySelector('.clarity-tut-hero__lines');
+    if (linesWrap) {
+      const GAP = 18;
+      const maxH = Math.max(...chunks.map((c) => c.reduce((a, l) => a + (l.__h || 0), 0) + GAP * (c.length - 1)));
+      linesWrap.style.minHeight = maxH + 'px';
+    }
+    // Lay the first chunk out NOW, same tick as the render, so the first paint already
+    // has the final geometry (laying it out at typing start made the title drop, v553).
+    layoutChunk();
     let done = false;     // current chunk fully shown
     let typing = false;   // the typewriter has begun
     const landTitle = () => {
@@ -1122,10 +1204,11 @@ const ClarityExperience = {
       };
       step();
     };
-    const startTyping = () => { if (typing || done) return; typing = true; layoutChunk(); typeChunk(); };
+    const startTyping = () => { if (typing || done) return; typing = true; typeChunk(); };
     const fillChunk = () => { done = true; layoutChunk(); chunks[chunkIdx].forEach((l) => { l.innerHTML = l.dataset.full || ''; }); showNav(); };
     // Continue mid-hero: fade the current pair out, type the next pair in. Returns false
     // once the last chunk is showing so next() falls through to real page navigation.
+    // Already-seen chunks re-fill instantly instead of retyping (back-and-forth, v553).
     this._chunkNext = () => {
       if (!done || chunkIdx >= chunks.length - 1) return false;
       done = false;
@@ -1134,13 +1217,28 @@ const ClarityExperience = {
       cur.forEach((l) => { l.style.transition = 'opacity 0.3s ease'; l.style.opacity = '0'; });
       this._setTimeout(() => {
         chunkIdx++;
-        chunks[chunkIdx].forEach((l) => { l.textContent = ''; });
-        layoutChunk();
+        this._chunkIdx = chunkIdx;
+        this.updateNav();
         try { this.pageWrap.scrollTop = 0; } catch (e) {}
         this._fitPageScroll();
-        if (reduced) { fillChunk(); return; }
+        if (reduced || seen.has(chunkIdx)) { fillChunk(); return; }
+        seen.add(chunkIdx);
+        chunks[chunkIdx].forEach((l) => { l.textContent = ''; });
+        layoutChunk();
         typeChunk();
       }, 330);
+      return true;
+    };
+    // Back mid-hero: previous pair returns instantly filled (no retype).
+    this._chunkPrev = () => {
+      if (chunkIdx <= 0) return false;
+      done = true;
+      chunkIdx--;
+      this._chunkIdx = chunkIdx;
+      fillChunk();
+      this.updateNav();
+      try { this.pageWrap.scrollTop = 0; } catch (e) {}
+      this._fitPageScroll();
       return true;
     };
     // A tap BEFORE typing starts snaps the title home and begins the typewriter immediately
@@ -1183,18 +1281,37 @@ const ClarityExperience = {
       l.__segs = [...l.childNodes].map((node) => ({ el: node.nodeType === 1 ? node.cloneNode(false) : null, text: node.textContent || '' }));
       l.__len = l.__segs.reduce((a, s) => a + s.text.length, 0);
       l.dataset.full = l.innerHTML;
-      l.style.minHeight = l.offsetHeight + 'px';
+      l.__h = l.offsetHeight;
+      l.style.minHeight = l.__h + 'px';
       l.textContent = '';
     });
     // Two paragraphs at a time (Malik, v552): illustration + headline persist, Continue
     // swaps in the next pair via this._chunkNext. Keeps every page scroll-free on mobile.
     const CH = 2;
     const chunks = []; for (let i = 0; i < lines.length; i += CH) chunks.push(lines.slice(i, i + CH));
+    // Short orphan sentence rides with the previous pair (v553).
+    if (chunks.length > 1) {
+      const last = chunks[chunks.length - 1];
+      if (last.length === 1 && (last[0].dataset.full || '').length < 60) { chunks.pop(); chunks[chunks.length - 1].push(last[0]); }
+    }
     let chunkIdx = 0;
+    this._chunkIdx = 0;
+    this._chunkTotal = chunks.length;
+    const seen = new Set([0]);
     const layoutChunk = () => {
       lines.forEach((l) => { l.style.display = 'none'; });
       chunks[chunkIdx].forEach((l) => { l.style.display = ''; l.style.transition = ''; l.style.opacity = '1'; });
     };
+    // Lock the sub container to the TALLEST chunk so the illustration + headline never
+    // shift when a shorter pair swaps in (v553).
+    const subWrap = tut.querySelector('.clarity-exp__tut-sub');
+    if (subWrap) {
+      const GAP = 15;
+      const maxH = Math.max(...chunks.map((c) => c.reduce((a, l) => a + (l.__h || 0), 0) + GAP * (c.length - 1)));
+      subWrap.style.minHeight = maxH + 'px';
+    }
+    // First chunk laid out NOW (same tick as render) so the first paint is final geometry.
+    layoutChunk();
     let done = false;
     let typing = false;
     const typeLineEl = (el, onDone) => {
@@ -1229,7 +1346,7 @@ const ClarityExperience = {
       step();
     };
     const fillChunk = () => { done = true; layoutChunk(); chunks[chunkIdx].forEach((l) => { l.innerHTML = l.dataset.full || ''; }); showNav(); };
-    const startTyping = () => { if (typing || done) return; typing = true; layoutChunk(); typeChunk(); };
+    const startTyping = () => { if (typing || done) return; typing = true; typeChunk(); };
     this._chunkNext = () => {
       if (!done || chunkIdx >= chunks.length - 1) return false;
       done = false;
@@ -1238,13 +1355,27 @@ const ClarityExperience = {
       cur.forEach((l) => { l.style.transition = 'opacity 0.3s ease'; l.style.opacity = '0'; });
       this._setTimeout(() => {
         chunkIdx++;
-        chunks[chunkIdx].forEach((l) => { l.textContent = ''; });
-        layoutChunk();
+        this._chunkIdx = chunkIdx;
+        this.updateNav();
         try { this.pageWrap.scrollTop = 0; } catch (e) {}
         this._fitPageScroll();
-        if (reduced) { fillChunk(); return; }
+        if (reduced || seen.has(chunkIdx)) { fillChunk(); return; }
+        seen.add(chunkIdx);
+        chunks[chunkIdx].forEach((l) => { l.textContent = ''; });
+        layoutChunk();
         typeChunk();
       }, 330);
+      return true;
+    };
+    this._chunkPrev = () => {
+      if (chunkIdx <= 0) return false;
+      done = true;
+      chunkIdx--;
+      this._chunkIdx = chunkIdx;
+      fillChunk();
+      this.updateNav();
+      try { this.pageWrap.scrollTop = 0; } catch (e) {}
+      this._fitPageScroll();
       return true;
     };
     if (reduced) { this._tutTypeStart = null; typing = true; fillChunk(); return; }
@@ -1263,20 +1394,41 @@ const ClarityExperience = {
     if (!tut || lines.length < 2 || tut.dataset.starChunksRan) return;
     tut.dataset.starChunksRan = '1';
     let idx = 0;
+    this._chunkIdx = 0;
+    this._chunkTotal = lines.length;
     lines.forEach((l, i) => { if (i > 0) l.style.display = 'none'; });
+    // Lock the sub to the tallest paragraph so the star never shifts between them (v553).
+    const subWrap = tut.querySelector('.clarity-exp__tut-sub');
+    if (subWrap) subWrap.style.minHeight = Math.max(...lines.map((l) => l.offsetHeight || 0)) + 'px';
+    const show = (i, fadeIn) => {
+      lines.forEach((l) => { l.style.display = 'none'; });
+      const nx = lines[i];
+      nx.style.display = '';
+      if (fadeIn) {
+        nx.style.opacity = '0'; nx.style.transition = 'opacity 0.5s ease';
+        void nx.offsetWidth; nx.style.opacity = '1';
+      } else { nx.style.transition = ''; nx.style.opacity = '1'; }
+      try { this.pageWrap.scrollTop = 0; } catch (e) {}
+      this._fitPageScroll();
+    };
     this._chunkNext = () => {
       if (idx >= lines.length - 1) return false;
       const cur = lines[idx];
       cur.style.transition = 'opacity 0.3s ease'; cur.style.opacity = '0';
       this._setTimeout(() => {
-        cur.style.display = 'none';
         idx++;
-        const nx = lines[idx];
-        nx.style.display = ''; nx.style.opacity = '0'; nx.style.transition = 'opacity 0.5s ease';
-        void nx.offsetWidth; nx.style.opacity = '1';
-        try { this.pageWrap.scrollTop = 0; } catch (e) {}
-        this._fitPageScroll();
+        this._chunkIdx = idx;
+        this.updateNav();
+        show(idx, true);
       }, 320);
+      return true;
+    };
+    this._chunkPrev = () => {
+      if (idx <= 0) return false;
+      idx--;
+      this._chunkIdx = idx;
+      this.updateNav();
+      show(idx, false);
       return true;
     };
   },
@@ -1301,6 +1453,9 @@ const ClarityExperience = {
         // flash for a frame before the intro covered it (Malik saw it on-device).
         this._tutTypeStart = null;
         this._chunkNext = null;
+        this._chunkPrev = null;
+        this._chunkIdx = 0;
+        this._chunkTotal = 0;
         if (this.pageWrap.querySelector('.clarity-tut-hero')) this._runHeroIntro();
         if (this.pageWrap.querySelector('.gs-focus-target')) this._runFocusIntro();
         if (this.pageWrap.querySelector('.clarity-reflect')) this._runReflectIntro();
@@ -1328,6 +1483,9 @@ const ClarityExperience = {
     // the first paint; the old 30ms defer flashed the finished page for a frame (Malik).
     this._tutTypeStart = null;
     this._chunkNext = null;
+    this._chunkPrev = null;
+    this._chunkIdx = 0;
+    this._chunkTotal = 0;
     if (this.pageWrap.querySelector('.clarity-tut-hero')) this._runHeroIntro();
     if (this.pageWrap.querySelector('.gs-focus-target')) this._runFocusIntro();
     if (this.pageWrap.querySelector('.clarity-reflect')) this._runReflectIntro();
@@ -1778,6 +1936,8 @@ const ClarityExperience = {
 
   back() {
     if (this.transitioning) return;
+    // Chunked teaching pages (v553): Back steps to the previous paragraph pair first.
+    if (this._chunkPrev) { try { if (this._chunkPrev()) return; } catch (e) {} }
 
     // If in AI chat with history, go back one question
     const offset = this.getWizardOffset();
@@ -2001,13 +2161,20 @@ const ClarityExperience = {
     const isAiLoading = (stepKey === 'aiChat' && aiChatLoading) ||
       (stepKey === 'aiSynthesis' && !aiSynthesisResult && !aiChatError);
 
-    // Show back button: always if past page 0, or during AI chat if there's history
-    const showBack = !isAiLoading && (this.currentPage > 0 || (isWizard && this.currentPage === 0 && state.clarity.tutorialSeen && !this.tutorialOnly) || (stepKey === 'aiChat' && aiChatMessages.length > 1));
+    // Show back button: always if past page 0, mid-chunk on any teaching page (v553),
+    // or during AI chat if there's history
+    const showBack = !isAiLoading && (this.currentPage > 0 || (this._chunkIdx | 0) > 0 || (isWizard && this.currentPage === 0 && state.clarity.tutorialSeen && !this.tutorialOnly) || (stepKey === 'aiChat' && aiChatMessages.length > 1));
     if (showBack) {
       html += '<button class="clarity-exp__nav-btn clarity-exp__nav-btn--back" id="cexpBack" aria-label="Back"></button>';
     }
 
-    if (stepKey === 'aiChat') {
+    // Mid-chunk on a teaching page (v553): always a plain Continue; the page's real
+    // CTA (Done / Let's Find Yours) only appears on the final paragraph chunk.
+    const midChunk = (this._chunkTotal | 0) > 1 && (this._chunkIdx | 0) < this._chunkTotal - 1;
+
+    if (midChunk) {
+      html += '<button class="clarity-exp__nav-btn clarity-exp__nav-btn--next" id="cexpNext">Continue</button>';
+    } else if (stepKey === 'aiChat') {
       if (aiChatReady) {
         // AI is done - auto-advance to synthesis (no Continue button needed)
         setTimeout(() => {
