@@ -1835,19 +1835,17 @@ const ClarityExperience = {
           if (inp) {
             const show = (wizardAnswers.discoverDomain || []).includes('other');
             inp.style.display = show ? '' : 'none';
-            // While typing, collapse everything but the selected tiles so the field
-            // sits high above the iOS keyboard (same recipe as "My own answer",
-            // has-ai-custom); the settle hook absorbs the iOS focus shove. (v561)
+            // While "Something else" is SELECTED (not just while the keyboard is up,
+            // v563: dismissing the keyboard used to snap the full grid back and hide
+            // their answer), collapse everything but the selected tiles so the field
+            // sits high above the iOS keyboard and stays reviewable before Next.
+            // The settle hook absorbs the iOS focus shove. (v561)
             if (!inp._settleBound) {
               inp._settleBound = true;
               if (typeof this.settleFieldOnFocus === 'function') this.settleFieldOnFocus(inp);
-              inp.addEventListener('focus', () => {
-                try { this.el.classList.add('has-discover-custom'); this.pageWrap.scrollTop = 0; } catch (e) {}
-              });
-              inp.addEventListener('blur', () => {
-                try { this.el.classList.remove('has-discover-custom'); } catch (e) {}
-              });
+              inp.addEventListener('focus', () => { try { this.pageWrap.scrollTop = 0; } catch (e) {} });
             }
+            try { this.el.classList.toggle('has-discover-custom', show); if (show) this.pageWrap.scrollTop = 0; } catch (e) {}
             if (show && val === 'other') { try { inp.focus(); } catch (e) {} }
           }
         }
@@ -1901,6 +1899,9 @@ const ClarityExperience = {
     // screen right under the question, and the page made non-scrollable so
     // there is no slack to fling. The root class drives that layout in CSS.
     if (this.el) this.el.classList.toggle('has-wiz-composer', !!container.querySelector('.wiz__composer'));
+    // Keep the discover grid collapsed across re-renders while "Something else" is
+    // selected; clear the class on every other step (v563).
+    if (this.el) this.el.classList.toggle('has-discover-custom', !!(container.querySelector('#discoverOtherInput') && (wizardAnswers.discoverDomain || []).includes('other')));
     this._bindWizSnapBack(container);
 
     // Bind AI chat if on that step (the AI service is built in; there is no
