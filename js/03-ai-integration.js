@@ -1910,7 +1910,7 @@ function buildFirstQuestionInstruction() {
   ).trim();
   const base = 'Ask your first question now. This MUST be type "choices" with exactly 4 distinct, non-overlapping options. Do NOT include an "Other" option - the UI adds that automatically. Respond with ONLY a JSON object. Do NOT use type "text" for this first question.';
   if (described) {
-    return base + ' IMPORTANT: they already told you, in their own words: "' + described + '". Your first question MUST reference their words and take the first real step into that (narrow what kind it is, or where they are with it). Do NOT ask a generic warm-up like how they feel about their current position.';
+    return base + ' IMPORTANT: they already told you, in their own words: "' + described + '". Your first question MUST reference their words and take the first real step into that (narrow what kind it is, or where they are with it). Do NOT ask a generic warm-up like how they feel about their current position. EXCEPTION: if what they wrote fails the REALITY GATE (fictional, impossible, illegal, or an obvious joke like "be Batman and rule the world"), do NOT treat it as a plan and do NOT call it a good starting point. Match the joke with ONE light line, then ask what the real pull underneath it is; the options for this one question can be playful, but they must each point at a real driver.';
   }
   return base + ' The question asks how they feel about where they currently are in life, phrased close to: "Hello! So, before we start, how do you feel about your current position?"';
 }
