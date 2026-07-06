@@ -3794,6 +3794,12 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
   display: flex; flex-direction: column;
   align-items: center; justify-content: flex-end;
   padding: 0 22px calc(var(--safe-b, 0px) + 28px);
+  /* v602 (Malik): near-black room. The purple lives around the STAR, not the
+     whole background; one faint halo at the star position, everything else
+     falls to black. */
+  background:
+    radial-gradient(circle at 50% 26%, rgba(58, 42, 138, 0.20), transparent 40%),
+    #030308;
 }
 .ns-star-scene--min .ns-star-stage {
   position: absolute; top: -2%; left: 50%; transform: translateX(-50%);
