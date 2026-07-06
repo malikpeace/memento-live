@@ -3128,7 +3128,7 @@ html.lowfx .nsv2-reveal__w, html.lowfx .nsv2-reveal__after, html.lowfx .nsv2-rev
 /* The ceremony star is the real pulsar shader canvas (v585); no clip so the
    jets melt into the black, negative margin tightens the gap to the goal text
    since the canvas carries its own dark padding. v586: near full-screen. */
-.nsv2-star__blob { display: block; width: min(100vw, 560px); height: min(150vw, 84lvh); margin: -6vh auto -60px; border-radius: 0; object-fit: cover; }
+.nsv2-star__blob { display: block; width: min(150vw, 84lvh); height: min(150vw, 84lvh); margin: -6vh auto -60px; border-radius: 0; }
 
 /* Synthesis loading (v586): the marbled star (no jets) slowly condensing.
    The wrapper scales down over the whole wait; the shader keeps breathing. */
@@ -3664,10 +3664,15 @@ html.theme-light .gs__fulcrum { border-bottom-color: rgba(var(--ink), 0.9); }
 /* The Neutron Star is a SPACE object: the star page goes fully dark even in
    light mode (same rule as the reveal scene, which stays dark by design). One
    dramatic cut to space for that beat; --ink re-pins so every text token flips
-   to white automatically. */
-html.theme-light .clarity-exp:has(.tut-star-stage) {
+   to white automatically. v599: the summary/manifesto scene (.ns-star-scene)
+   obeys the same law, the light shell was bleeding through the top scrim. */
+html.theme-light .clarity-exp:has(.tut-star-stage),
+html.theme-light .clarity-exp:has(.ns-star-scene) {
   --ink: 255, 255, 255;
-  background: #050308;
+  background: #050308 !important;
+}
+html.theme-light .clarity-exp:has(.ns-star-scene) .clarity-exp__bg {
+  background: #050308 !important;
 }
 html.theme-light .clarity-exp:has(.tut-star-stage) .clarity-exp__bg {
   /* !important matches the base.css light-surface rule it must beat. The star's
