@@ -3128,7 +3128,7 @@ html.lowfx .nsv2-reveal__w, html.lowfx .nsv2-reveal__after, html.lowfx .nsv2-rev
 /* The ceremony star is the real pulsar shader canvas (v585); no clip so the
    jets melt into the black, negative margin tightens the gap to the goal text
    since the canvas carries its own dark padding. v586: near full-screen. */
-.nsv2-star__blob { display: block; width: min(150vw, 84lvh); height: min(150vw, 84lvh); margin: -6vh auto -60px; border-radius: 0; }
+.nsv2-star__blob { display: block; width: min(150vw, 84lvh); height: min(150vw, 84lvh); margin: -6vh calc((100% - min(150vw, 84lvh)) / 2) -60px; border-radius: 0; }
 
 /* Synthesis loading (v586): the marbled star (no jets) slowly condensing.
    The wrapper scales down over the whole wait; the shader keeps breathing. */

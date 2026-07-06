@@ -2107,8 +2107,7 @@ function renderWizardStep(key) {
       const ddPicked = wizardAnswers.discoverDomain || [];
       const ddCustom = wizardAnswers.discoverDomainCustom || '';
       return `<div class="wiz__question">No worries! Very few humans ever know exactly what they want to do.</div>
-        <div class="wiz__hint" style="margin-bottom:24px; line-height:1.6;">Most people spend their entire lives avoiding this question. Yet you're here. Which already puts you ahead of 90% of people. Let's figure this out.<br><br>Pick one or two areas that draw you in. Not what you think you should pick. What actually keeps you up at night or gets you out of bed.</div>
-        <div class="wiz__hint" style="font-size:0.75rem; opacity:0.85; margin-bottom:16px;">Pick up to 2. You can't make progress across all areas of life at once.</div>` +
+        <div class="wiz__hint" style="margin-bottom:24px; line-height:1.6;">Most people spend their entire lives avoiding this question. Yet you're here. Which already puts you ahead of 90% of people. Let's figure this out.<br><br>Pick one or two areas that seem most interesting to you. It doesn't need to be perfect. This is to help get you directionally correct. And pick only up to 2 because you can't make progress across all areas of life at once. (unlikely you're a navy seal)</div>` +
         wizMultiSelectInner(
           DISCOVERY_DOMAINS.map(d => ({ value: d.value, label: d.label, desc: d.desc }))
             .concat([{ value: 'other', label: 'Something else', desc: 'I\'ll describe it myself' }])
