@@ -7513,26 +7513,11 @@ function renderIgnitionV2(summary) {
       </div>`;
   } else {
     // _ig2Act === 'star'
-    // JWST anatomy: three long primary spike axes (hex mirror) + one shorter
-    // horizontal strut pair, each with a faint chromatic fringe twin.
-    const spikeEls = [];
-    const primary = [90, 30, 150].map(b => b + seed.spikeAngle);
-    primary.forEach(ang => {
-      spikeEls.push(`<div class="nsv2-star__spike nsv2-star__spike--primary" style="transform: translate(-50%,-50%) rotate(${ang}deg)"></div>`);
-      spikeEls.push(`<div class="nsv2-star__spike nsv2-star__spike--primary nsv2-star__spike--fringe" style="transform: translate(-50%,-50%) rotate(${ang}deg) translateY(1.4px); background: linear-gradient(90deg, transparent, ${seed.fringe}, transparent);"></div>`);
-    });
-    const strutAng = seed.spikeAngle * 0.4;
-    spikeEls.push(`<div class="nsv2-star__spike nsv2-star__spike--strut" style="transform: translate(-50%,-50%) rotate(${strutAng}deg)"></div>`);
-    spikeEls.push(`<div class="nsv2-star__spike nsv2-star__spike--strut nsv2-star__spike--fringe" style="transform: translate(-50%,-50%) rotate(${strutAng}deg) translateY(1.2px); background: linear-gradient(90deg, transparent, ${seed.fringe}, transparent);"></div>`);
+    // THE Neutron Star: the same pulsar shader the teaching page and manifesto
+    // use (Malik killed the bespoke JWST spike star, v585). One star everywhere.
     inner = `
-      <div class="nsv2-starscene" style="--star-glow: ${seed.glowRgb}; --star-core: ${seed.core};">
-        <div class="nsv2-star" aria-hidden="true">
-          <div class="nsv2-star__halo nsv2-star__halo--far"></div>
-          <div class="nsv2-star__halo nsv2-star__halo--mid"></div>
-          <div class="nsv2-star__halo nsv2-star__halo--near"></div>
-          ${spikeEls.join('')}
-          <div class="nsv2-star__core"></div>
-        </div>
+      <div class="nsv2-starscene">
+        <canvas class="nsv2-star__blob" id="nsv2StarBlob" aria-hidden="true"></canvas>
         <div class="nsv2-after">
           <div class="nsv2-after__goal">${esc(goal)}</div>
           <div class="nsv2-after__line">A star is not a plan. It needs a first move.</div>
@@ -7601,6 +7586,8 @@ function bindIgnitionV2(container) {
       _ig2Rerender();
     });
   } else if (act === 'star') {
+    const blob = root.querySelector('#nsv2StarBlob');
+    if (blob && typeof initStarBlob === 'function') { setTimeout(() => { try { initStarBlob(blob, 480, 'pulsar'); } catch (e) {} }, 40); }
     _bindStarPlacard(root);
   }
 }

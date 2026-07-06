@@ -69,7 +69,7 @@ const DEMO_PERSONAS = {
     antiVision: 'Another year of building in the dark, polishing features nobody asked for, calling it progress.',
     futureVision: 'A product that grows while I sleep and a small team I trust.',
     identityLine: 'I talk to users every day and ship every week.',
-    tensionLine: 'The real fear is not failing. It is building for a year and finding no one would miss it.',
+    tensionLine: 'The real fear: building for a year and finding no one would miss it.',
     action: {
       title: 'Talk to three users about why they signed up',
       why: 'You are guessing until you hear it in their words. Three conversations beat a week of building.',
