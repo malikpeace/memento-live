@@ -431,30 +431,33 @@ void main(){
   uv.x *= u_res.x / u_res.y;
   // Zoomed OUT (v506): the canvas is much larger than the star so the jets have room to
   // run long and melt into black INSIDE the frame; the body keeps its visual size.
-  uv *= 2.05;
+  uv *= 3.0;
   float T = u_time;
   float phase = fract(T / 2.8);
   float beat = pow(max(sin(3.14159 * phase), 0.0), 2.2);
   float r = length(uv);
-  float n1 = snoise(uv * 2.2 + vec2(T * 0.12, T * 0.08));
-  float n2 = snoise(uv * 4.0 - vec2(T * 0.10, T * 0.15));
+  float n1 = snoise(uv * 1.5 + vec2(T * 0.12, T * 0.08));
+  float n2 = snoise(uv * 2.7 - vec2(T * 0.10, T * 0.15));
   vec3 body = mix(vec3(0.42, 0.28, 0.92), vec3(0.68, 0.55, 1.0), smoothstep(-0.6, 0.6, n1));
   body = mix(body, vec3(0.95, 0.97, 1.0), smoothstep(-0.1, 0.7, n2) * 0.7);
-  float mask = 1.0 - smoothstep(0.28, 0.32, r);
-  float core = exp(-r * 7.0) * (1.35 + 0.18 * beat);
-  float halo = exp(-r * 2.1) * 0.5 * (1.0 + 0.14 * beat);
+  float mask = 1.0 - smoothstep(0.41, 0.47, r);
+  float core = exp(-r * 4.8) * (1.35 + 0.18 * beat);
+  float halo = exp(-r * 1.44) * 0.5 * (1.0 + 0.14 * beat);
   float tilt = -0.5;
   vec2 ax = vec2(sin(tilt), cos(tilt));
   float along = dot(uv, ax);
   float across = dot(uv, vec2(-ax.y, ax.x));
   float aa = abs(along);
   float flow = 0.75 + 0.45 * snoise(vec2(aa * 4.0 - T * 2.2, across * 14.0));
-  float jw = 0.045 + 0.11 * aa;
-  // v595: longer, wider, brighter jets (Malik). Fade completes at aa 2.3, still before
-  // the canvas edge (~2.33 on the tilted axis at the 2.05 zoom), so no cutoff.
-  float jet = exp(-pow(across / jw, 2.0) * 2.5) * smoothstep(2.3, 0.5, aa) * smoothstep(0.18, 0.42, aa) * flow;
+  float jw = 0.066 + 0.11 * aa;
+  // v596: STRETCHED jets (Malik: almost full screen). Zoom 3.0 gives them room; every
+  // body radius below is rescaled x1.46 so the star body stays its usual visual size.
+  // Fade completes at aa 3.25, before the tilted-axis edge (~3.4), so no cutoff.
+  float jet = exp(-pow(across / jw, 2.0) * 2.5) * smoothstep(3.25, 0.72, aa) * smoothstep(0.26, 0.61, aa) * flow;
   float ji = 0.92 + 0.26 * beat;
-  vec3 col = body * mask * (1.0 + 0.07 * beat);
+  float backglow = exp(-r * 0.85) * 0.16 * (1.0 + 0.2 * beat);
+  vec3 col = vec3(0.58, 0.45, 1.0) * backglow;
+  col += body * mask * (1.0 + 0.07 * beat);
   col += vec3(1.0) * core;
   col += vec3(0.58, 0.45, 1.0) * halo;
   col += vec3(0.80, 0.70, 1.0) * jet * ji;
