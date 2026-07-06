@@ -7485,7 +7485,6 @@ function renderIgnitionV2(summary) {
     const afterDelay = START + words.length * STEP + 700;
     inner = `
       <div class="nsv2-reveal">
-        <div class="nsv2-eyebrow nsv2-reveal__eyebrow">Your Neutron Star</div>
         <div class="nsv2-reveal__goal">${wordEls}</div>
         <div class="nsv2-reveal__after" style="animation-delay:${afterDelay}ms">
           <div class="nsv2-hold" id="nsv2Hold" role="button" tabindex="0" aria-label="Press and hold to collapse">
@@ -7525,9 +7524,29 @@ function renderIgnitionV2(summary) {
       </div>`;
   }
 
+  // THE signature top-left beams, the exact same asset as the home ambient
+  // (same beam configs as index.html), not a bespoke cluster. Born by --holdp.
+  const RAY_BEAMS = [
+    [3, 35, 9.4, 0.0, 0.04, 0.32, 0.85, 1.05, '165 130 255'],
+    [9, 90, 11.6, 1.8, 0.07, 0.50, 0.55, 1.35, '130 170 255'],
+    [16, 24, 7.1, 3.4, 0.05, 0.30, 0.7, 1.2, '255 110 140'],
+    [22, 75, 13.2, 2.1, 0.09, 0.65, 0.6, 1.3, '175 140 255'],
+    [29, 40, 10.5, 5.6, 0.05, 0.34, 0.5, 1.4, '255 255 255'],
+    [36, 110, 8.3, 0.7, 0.11, 0.72, 0.65, 1.25, '150 120 255'],
+    [43, 28, 14.8, 4.2, 0.04, 0.28, 0.8, 1.15, '140 180 255'],
+    [50, 95, 9.0, 3.0, 0.10, 0.68, 0.55, 1.4, '185 145 255'],
+    [57, 22, 12.3, 6.5, 0.04, 0.24, 0.75, 1.2, '255 130 155'],
+    [64, 65, 10.9, 1.2, 0.08, 0.54, 0.6, 1.3, '120 165 255'],
+    [72, 32, 8.6, 4.9, 0.05, 0.32, 0.7, 1.2, '255 255 255'],
+    [80, 80, 11.4, 2.6, 0.09, 0.58, 0.55, 1.35, '170 135 255']
+  ];
+  const raysHtml = '<div class="nsv2__rays ambient__rays" aria-hidden="true"><div class="ambient__rays-source"></div>' +
+    RAY_BEAMS.map(b => `<div class="ambient__rays-beam" style="--a:${b[0]}deg; --h:${b[1]}px; --d:${b[2]}s; --del:-${b[3]}s; --omin:${b[4]}; --omax:${b[5]}; --smin:${b[6]}; --smax:${b[7]}; --c:${b[8]};"><div class="ambient__rays-beam-shaft"></div></div>`).join('') +
+    '</div>';
+
   return `
     <div class="nsv2" id="nsv2Root" data-act="${esc(_ig2Act)}">
-      <div class="nsv2__rays" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+      ${raysHtml}
       <div class="nsv2__dust" aria-hidden="true"></div>
       <div class="nsv2__vignette" aria-hidden="true"></div>
       <div class="nsv2__inner">${inner}</div>
@@ -7597,7 +7616,7 @@ function _bindHoldToIgnite(root) {
   const hold = root.querySelector('#nsv2Hold');
   const fill = root.querySelector('#nsv2HoldFill');
   if (!hold || !fill) return;
-  const HOLD_MS = 1800;
+  const HOLD_MS = 5000;
   const CIRC = 2 * Math.PI * 33; // r=33 in the 76x76 viewBox
   fill.style.strokeDasharray = String(CIRC);
   fill.style.strokeDashoffset = String(CIRC);
@@ -7648,14 +7667,18 @@ function _ig2Signed(root) {
   const lite = document.documentElement.classList.contains('lowfx')
     || (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   root.classList.add(lite ? 'is-collapsing-lite' : 'is-collapsing');
+  // v587: the flash fills the WHOLE screen solid white, the star act swaps in
+  // behind it, then the white fades and the star slowly zooms out. The flare
+  // lives on <body> so the act re-render cannot kill it mid-fade.
   const flare = document.createElement('div');
-  flare.className = 'nsv2__flare';
-  root.appendChild(flare);
+  flare.className = 'nsv2__flare' + (lite ? '' : ' nsv2__flare--v2');
+  document.body.appendChild(flare);
+  setTimeout(() => { try { flare.remove(); } catch (e) {} }, lite ? 900 : 3000);
 
   setTimeout(() => {
     _ig2Act = 'star';
     _ig2Rerender();
-  }, lite ? 700 : 1700);
+  }, lite ? 700 : 800);
 }
 
 function _bindStarPlacard(root) {
