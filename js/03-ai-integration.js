@@ -231,9 +231,14 @@ const VOICE_BANNED = [
   // The "It's not X, it's Y" redefinition cliche (and "not just X, it's Y"). Malik never wants
   // this rhetorical substitution. Only the redefinition form is banned (second clause restating
   // with "it's/this is"); an honest concession like "31 isn't old, but you have experience" is fine.
-  [/\b(it'?s|it is|that'?s|this is)\s+not\b[^.!?]{2,45}?[,.;:]\s*(it'?s|it is|this is|they'?re)\b/i, 'X/Y redefinition ("it\'s not X, it\'s Y")'],
-  [/\b(isn'?t|aren'?t)\b[^.!?]{2,45}?[,.;:]\s*(it'?s|it is|this is|they'?re)\b/i, 'X/Y redefinition ("isn\'t X, it\'s Y")'],
-  [/\bnot just\b[^.!?]{1,45}?[,.;:]\s*(it'?s|it is|this is|they'?re|but)\b/i, 'X/Y phrasing ("not just X, ... Y")']
+  [/\b(it'?s|it is|that'?s|this is)\s+not\b[^.!?]{2,45}?[,.;:]\s*(it'?s|it is|this is|that is|they'?re|they are|it was|they were)\b/i, 'X/Y redefinition ("it\'s not X, it\'s Y")'],
+  [/\b(isn'?t|aren'?t|wasn'?t|weren'?t)\b[^.!?]{2,45}?[,.;:]\s*(it'?s|it is|this is|that is|they'?re|they are|it was|they were)\b/i, 'X/Y redefinition ("isn\'t X, it\'s Y")'],
+  [/\bnot just\b[^.!?]{1,45}?[,.;:]\s*(it'?s|it is|this is|they'?re|but)\b/i, 'X/Y phrasing ("not just X, ... Y")'],
+  // Stress-test escapes (2026-07-06): the same cliche across a sentence boundary or with a
+  // noun subject. "was never (really) about X. It is Y" / "The fear is not A. The fear is B."
+  [/\b(was|were|is|are)\s+never\s+[^.!?]{2,60}[.!?]\s*(it|they|this|that)\s+(was|were|is|are)\b/i, 'X/Y redefinition ("was never X. It was Y")'],
+  [/\b(is|was|are|were)\s+not\s+(really\s+|actually\s+|just\s+)?the\b[^.!?]{2,60}[.!?]\s*(it|they|this|that)\s+(is|was|are|were)\b/i, 'X/Y redefinition ("is not really the X. It is Y")'],
+  [/\bthe\s+(\w+)\s+(?:is|was)\s+not\b[^.!?]{2,60}[.!?]\s*the\s+\1\s+(?:is|was)\b/i, 'X/Y redefinition ("The fear is not A. The fear is B.")']
 ];
 function voiceLint(text) {
   const hits = [];
@@ -451,8 +456,9 @@ CRITICAL: DO NOT BUILD AN ACTION PLAN. The purpose of this conversation is to fi
 
 WHEN TO FINISH:
 - Do NOT finish early. Do NOT signal "ready" after 5-10 exchanges. This conversation should have at minimum 15 exchanges.
-- Before finishing, you MUST ask the person directly if they feel clear. Something like: "Based on everything we have talked about, I think your core focus is [summarize it]. Does that feel right to you? Do you feel like you actually know what you want to lock in on now?"
-- Use type "choices" for this confirmation with options like: "Yes, that feels exactly right", "Close but not quite", "No, I am still not sure"
+- Before offering the confirmation, you MUST have asked the timeframe question (see timeframe above). A star without a time horizon is incomplete; do not skip it even when the conversation flows past it.
+- Before finishing, you MUST ask the person directly if they feel clear, with the SUMMARY included in the question. No first person. Something like: "Based on everything, here is the core: [summarize it in their words]. Does that feel right?"
+- Use type "choices" for this confirmation. The confirmation is the ONE question allowed 3 options instead of 4: "Yes, that feels exactly right", "Close but not quite", "No, I am still not sure"
 - If they say "close but not quite" or "no", keep going. Ask what feels off. Dig deeper.
 - ONLY add "ready": true AFTER the person has explicitly confirmed that the summary feels right to them.
 - NEVER set ready: true without asking for their confirmation first. This is critical.
@@ -508,6 +514,8 @@ RULES:
 - NEVER use hashtags, asterisks, dashes, or any markdown in your question or hint text.
 - NEVER repeat a question you already asked, even rephrased. Every question must be meaningfully different from all previous questions in the conversation. If you catch yourself about to ask something similar to what you already asked, change direction entirely.
 - Stay locked onto THEIR stated goal. Don't drift.
+- NEVER use internal terms from these instructions with the user: "anti-vision", "reality gate", "the WHAT/WHY", "synthesis", "Neutron Star synthesis". Speak plainly ("the version of life you want to avoid", "your goal").
+- If you reality-check a timeline or number, you OWN the renegotiation: in the same breath or the next question, help them set the realistic version ("6 months is fantasy for this. 24 months with the first sale in 30 days is real. Does that trade work for you?"). Never leave someone mid-air after taking their number away.
 - Use multiple choice often early on to help people narrow down what they mean. It's easier to pick from options than to explain from scratch.
 - For number questions (income, hours, months), use choices with specific ranges like "$2k-4k/month", "5-10 hours/week" etc. Never use type "range".
 - Switch to open text when you need them to go deeper or explain their "why".`;
@@ -573,7 +581,7 @@ Generate ONLY a JSON object (no markdown fences, no commentary):
   "antiVision": "1 short declarative sentence naming what would happen if this stays neglected. NO pronouns (no 'You', 'I', 'Your'). Start with a noun or '-ing' verb. Example tones: 'Another half-built idea that fades into noise.' 'A second decade spent helping other people execute their vision instead.'",
   "futureVision": "1-2 short declarative sentences painting the specific real-world result. NO pronouns. Start with a noun or concrete image. Example tones: 'A real product the right people are actually using because it changes their day.' 'A version of this work that doesn't have to be explained because the impact speaks for itself.'",
   "identityLine": "A short declarative identity statement. NO pronouns. Do NOT start with 'I am someone who'. Start with a noun or role. Example tones: 'Builder of things that draw people back toward what matters.' 'The kind of operator who finishes what they start.'",
-  "tensionLine": "OPTIONAL. One sentence (max 22 words) naming the contradiction or fear underneath their goal that they circled but never said outright, the subtext. NO pronouns to open. Make them feel understood, not judged. Example tones: 'This was never about more output. It is about no longer feeling behind.' 'The real fear is not failing, it is looking back and finding nothing that lasted.' If nothing clear surfaced, return ''."
+  "tensionLine": "OPTIONAL. One sentence (max 22 words) naming the contradiction or fear underneath their goal that they circled but never said outright, the subtext. NO pronouns to open. Make them feel understood, not judged. HARD BAN: never use the redefinition pattern in ANY form or tense: not 'it is not X, it is Y', not 'was never (really) about X. It is Y', not 'The fear is not A. The fear is B.', not 'aren't X. They are Y'. State the tension directly instead. Example tones: 'Behind the output goal sits the dread of still feeling behind.' 'Looking back and finding nothing that lasted scares them more than failing.' If nothing clear surfaced, return ''."
 }`;
 
 // Round 9 - Draft-first system prompt. Used by generateActionDraft() to
@@ -2856,7 +2864,7 @@ async function sendAiAnswer() {
     if (userMsgCount <= 2) {
       const lastMsg = apiMessages[apiMessages.length - 1];
       if (lastMsg && lastMsg.role === 'user') {
-        lastMsg.content += '\n\n[System note: This is question ' + (userMsgCount + 1) + '. Use type "choices" with exactly 4 distinct, substantive options. Do NOT include any "I don\'t know" or "I\'m not sure" option. The UI already adds that automatically. Do NOT include an "Other" option either, the UI adds that too.]';
+        lastMsg.content += '\n\n[System note: Reply with ONLY one JSON object per the RESPONSE FORMAT (question/hint/type/options/progress), no prose outside it, every turn without exception. This is question ' + (userMsgCount + 1) + '. Use type "choices" with exactly 4 distinct, substantive options. Do NOT include any "I don\'t know" or "I\'m not sure" option. The UI already adds that automatically. Do NOT include an "Other" option either, the UI adds that too.]';
       }
     } else if (userMsgCount <= 4) {
       const lastMsg = apiMessages[apiMessages.length - 1];
