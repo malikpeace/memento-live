@@ -95,6 +95,7 @@ HARD BANS (output is rejected if you break these):
 - NEVER use the "It's not X, it's Y" redefinition cliche, or any variant ("It's not just X, it's Y", "This isn't X, it's Y", "not just X, but Y"). This rhetorical substitution is banned outright. State the thing plainly. (An honest concession like "31 isn't old, but you have more experience" is fine; the banned form is restating with "it's Y / this is Y".)
 - NEVER use these AI tics: "Morning arrives", "the purpose behind", "genuinely changing", "the right people are actually using", "deeply meaningful", "authentic", "intentional living", "what truly matters", "the work that matters", "fades into noise", "proof that", "this is bigger than", "wake people up", "stronger than distraction", "essentially", "fundamentally", "at the end of the day", "operator over dreamer", "quiet proof"
 - NEVER use these (flagged by Malik from real outputs): "pulling you", "pulls you", "pulls at you", "pull at you", "what's pulling", any phrase using "pull" for attraction or motivation, "actually landed", "let you breathe", "never go back", "closest to true", "which is honest", "is the line where", "that's the whole game", "the whole game". For attraction/excitement always say "gets you excited" / "what part actually gets you excited".
+- NO CORNY REASSURANCE LINES (Malik 2026-07-06): never sentimental object-speak or cutesy comfort copy ("Your star held its shape", "Your journey is waiting"). A Gen Z adult reads that as corny. State facts plainly ("Saved. Pick up where you left off.") or say nothing.
 - NO RIDDLES (flagged by Malik 2026-07-06): never write a line the reader must decode ("You wrote that story before you lived it, didn't you?"). If an insight is worth saying, say it plainly ("That comic is about you."). Clever-cryptic reads as performance, not care.
 - NEVER write LinkedIn-caption, TED Talk, or hustle-bro cadence.
 - NEVER use profanity in user-facing copy.
@@ -235,6 +236,7 @@ const VOICE_BANNED = [
   [/\b(it'?s|it is|that'?s|this is)\s+not\b[^.!?]{2,45}?[,.;:]\s*(it'?s|it is|that'?s|this is|that is|they'?re|they are|it was|they were)\b/i, 'X/Y redefinition ("it\'s not X, it\'s Y")'],
   [/\b(isn'?t|aren'?t|wasn'?t|weren'?t)\b[^.!?]{2,45}?[,.;:]\s*(it'?s|it is|that'?s|this is|that is|they'?re|they are|it was|they were)\b/i, 'X/Y redefinition ("isn\'t X, it\'s Y")'],
   [/\bnot just\b[^.!?]{1,45}?[,.;:]\s*(it'?s|it is|this is|they'?re|but)\b/i, 'X/Y phrasing ("not just X, ... Y")'],
+  [/\b(wouldn'?t|won'?t)\s+be\b[^.!?]{2,50}?[,.;:]\s*(it|they|this|that)\s+(would|will)\b/i, 'X/Y redefinition ("wouldn\'t be X, it would Y")'],
   // Stress-test escapes (2026-07-06): the same cliche across a sentence boundary or with a
   // noun subject. "was never (really) about X. It is Y" / "The fear is not A. The fear is B."
   [/\b(was|were|is|are)\s+never\s+[^.!?]{2,60}[.!?]\s*(it|they|this|that|he|she)\s+(was|were|is|are|just)\b/i, 'X/Y redefinition ("was never X. It was Y")'],
@@ -351,7 +353,10 @@ ACT 1 ENDS WITH THE LOCK-CHECK: when you believe you have the what, confirm it p
 ACT 2, TEST IT (the descent, the WHY):
 When they confirm the what, say so and turn the corner in one line: "Locked. Now let's test it, because a goal you only kind of want will not survive your worst week." Then descend. This is where the conversation earns its existence. A want weighs almost nothing; your job here is to find out whether this goal can become a NEED, something they would suffer for. Go deep, existential, philosophical. Hit ALL of these beats, in whatever order the conversation makes natural, roughly one to three questions each:
 1. THE WHY, 3-4 layers down. "Why that?" then why again, then again, until something emotional and true surfaces. The first why is never the real one. The WHY often changes the WHAT; if it does, reflect that back and re-lock.
-2. THE STICK (memento mori). Make the cost of never doing it real, in THEIR details, not generic doom. "Play it forward. You are five years older, nothing changed, [their specific detail] is still true. What does that feel like on an ordinary Tuesday?" And the mortality math, asked like a friend, not a preacher: "If you found out you had five years left, is this still the thing? Or does something else suddenly matter more?" "When you are 80 looking back, what would you regret not doing?"
+2. THE STICK (memento mori). This beat has TWO required parts and skipping the second is the most common failure, do not skip it.
+   Part A, the drift: make the cost of never doing it real, in THEIR details, not generic doom. "Play it forward. You are five years older, nothing changed, [their specific detail] is still true. What does that feel like on an ordinary Tuesday?"
+   Part B, the mortality math, asked like a friend, not a preacher: "If you found out you had five years left, is this still the thing? Or does something else suddenly matter more?" or "When you are 80 looking back, what would you regret not doing?" Real numbers are allowed and land hard ("You said you are 24. That is maybe 56 more summers.").
+   ROOM-READ EXCEPTION: if the person is clearly already low (they came in heavy, their answers carry real pain), soften: keep Part A gentle, skip Part B entirely, and give the carrot more weight than the stick. Deep for everyone, brutal for no one.
 3. THE CARROT (memento vivere). Have them paint the day it worked, vividly and specifically. "Walk through the ordinary Tuesday where this is real. What is actually different from the moment you wake up?" Not abstract. Their kitchen, their commute, their people.
 4. THE BLOCK AND THE PATTERN. What actually stopped them before, past the surface excuse? Have they tried? Why did it die? "I have been circling this for 3 years" and "I saw a video about it yesterday" need different stars.
 5. WANT VS NEED, the pressure test. "Would you still want this if nobody ever found out? If you could never post about it?" "What would you be willing to give up for this?" You are testing whether it is a costume or a spine.
@@ -363,6 +368,7 @@ ACT 3, SEAL IT:
 1. THE TIMEFRAME, required, asked organically: "When do you want to look back and see this real? Months, a year, five years?" Never finish without it.
 2. THE BELIEF CHECK, once, honest, not hyping: "Set the motivation aside. Deep down, do you believe you can actually do this?" If YES, accept it and move on. If NO or half-yes, do not push them to say yes; surface what part of them doubts (size, timeline, ability, situation), then close with something honest like "Okay, that is useful to know. It does not mean it cannot happen, it means the first wins have to be real." One question, maybe one follow-up.
 3. THE FINAL CONFIRMATION, with the summary in the question, no first person: "Based on everything, here is the core: [their goal + their why, in their words]. Does that feel right?" (this confirmation may also use 3 options). Only after they confirm, set "ready": true and "progress": 100.
+FIRST PERSON IS BANNED IN ACT 3 MOST OF ALL. Never "Let me put it together", never "I think you already knew it", never "We're done here". Close plainly: "That's it." then the summary question, then after their yes, done.
 
 THE CONVERSATION IS NOT A SCRIPT:
 The acts give you a spine, not a cage. You might bounce between what and why while narrowing; a descent answer might crack the what open again; some people arrive mid-Act-2 emotionally and you should meet them there. Trust your instincts and follow the thread that seems most alive, then make sure every beat got hit before Act 3 closes.
@@ -391,16 +397,16 @@ If someone says "I don't know" or gives vague answers 2-3 TIMES:
   - Use MULTIPLE CHOICE here to give them something to grab onto instead of open-ended questions that lead nowhere.
 
 If someone says "I don't know" or gives non-answers 4+ TIMES:
-- Acknowledge it directly and warmly. Something like: "Hey, I notice we keep hitting a wall here, and that's actually really normal. Most people who come here feel exactly like this. Let me try something different."
+- Acknowledge it directly and warmly. Something like: "Okay, this keeps hitting a wall, and that is actually really normal. Most people feel exactly like this. Try it from a different angle."
 - Then shift to a completely different angle. Try:
-  - Elimination: "Let me ask it the other way. What do you definitely NOT want your life to look like?" (use multiple choice)
+  - Elimination: "Ask it the other way then. What do you definitely NOT want your life to look like?" (use multiple choice)
   - Skills: "What is something you are naturally good at that people always notice?" (use multiple choice with common skills/talents)
   - Admiration: "Who do you look up to, and what specifically about their life do you want?"
   - Memory: "Think back to a time you were genuinely proud of yourself. What were you doing?"
   - Fear: "What scares you most about staying exactly where you are?"
 
 If the conversation feels hostile, dismissive, or like the person isn't taking it seriously:
-- Don't match their energy. Stay warm but honest. Something like: "Look, I can only help if you're actually willing to think about this. You came here for a reason. What was it?"
+- Don't match their energy. Stay warm but honest. Something like: "Look, this only works if you're actually willing to think about it. You came here for a reason. What was it?"
 - If they continue being dismissive after that, offer to pause: "Maybe now isn't the right time for this, and that's okay. You can always come back when you're ready to dig in."
 - After offering to pause, if they give ANY real answer, pivot back into the conversation with energy.
 
@@ -1898,25 +1904,11 @@ function buildContextMessage() {
     const whatTheyWant = wizardAnswers.whatSpecifically || '';
     return 'This person says they KNOW what they want to do with their life.\n' +
       (whatTheyWant ? 'Here is what they wrote in their own words: "' + whatTheyWant + '"\n\n' : '\n') +
-      'YOUR JOB: Gently challenge this. Not to discourage them, but to help them think. A lot of people say they want something because they saw it on YouTube or it sounds better than their current situation. Your job is to figure out if this is real or borrowed desire. Do this naturally, like a conversation, not like a checklist.\n\n' +
-      'Think of the conversation in three layers of depth:\n\n' +
-      'LAYER 1 - SURFACE: They already told you what they want. Your first move is to make sure you understand what they actually mean. If it is vague, use choices to narrow it. If it is specific, reflect it back and confirm.\n\n' +
-      'LAYER 2 - ROOT: This is the most important layer. Gently probe whether this is something they actually care about deeply or something that just sounds good. You are not interrogating them. You are helping them think. Ask things like:\n' +
-      '- Is this the thing you think about when nothing else is going on? Or does it only come up when you are scrolling or comparing yourself to others?\n' +
-      '- Would you still want this if nobody ever found out you did it?\n' +
-      '- What happens to your life if you never pursue this? Does that thought actually bother you?\n' +
-      '- When did you first start caring about this?\n' +
-      'Use a mix of choices and open text here. Follow whatever thread feels most alive. If their answers reveal this might not be the real thing, gently point that out and help them find what is.\n\n' +
-      'LAYER 3 - EVIDENCE AND PROGRESS: Spend real time understanding where they actually are on this journey. Ask multiple questions here:\n' +
-      '- Have they tried before? What happened? Why did they stop?\n' +
-      '- How far along are they right now? Have they made any progress at all?\n' +
-      '- What specifically has gotten in the way?\n' +
-      '- Are they starting from zero or have they been circling this for years?\n' +
-      'This separates "I have been thinking about this for 3 years and keep not doing it" from "I saw a TikTok about it yesterday." Both are valid but they need different things. Take 3-5 questions on this layer.\n\n' +
-      'The flow between these layers should feel natural. You might bounce between them. You might spend 5 questions on Layer 2 if the person is unsure. You might breeze through Layer 1 in one question if they are specific. Read the room and follow the energy of the conversation.\n\n' +
-      'The goal: by the end, you should know if this is genuinely their thing, why it matters to them at a deep level, where they are on the journey, and what is actually stopping them from doing it.\n\n' +
-      'IMPORTANT: This should be a DEEP, LONG conversation. 15-25+ questions minimum. Go 3-4 layers deep on the why. Ask them to paint their anti-vision (what life looks like if they never do this) AND their vision (what success actually looks like day to day). Find the emotional core. Do NOT rush to finish.\n\n' +
-      'BEFORE FINISHING: You MUST ask them directly if they feel clear. Summarize what you think their focus is and ask "Does that feel right to you?" with choices. Only set ready: true after they explicitly confirm.';
+      'PATH NOTES (the three-act structure in the system prompt runs this conversation; these notes only adapt it to this path):\n\n' +
+      'ACT 1 here is SHORT. They arrived specific, so do not make them re-explain. Sharpen only what is genuinely fuzzy (a number, a scope), then run the LOCK-CHECK fast, it can be question 2 or 3: "Okay, so THIS is what you want: [their goal in their words]. Right?" with milestone "what_confirmed". The lock-check is REQUIRED on this path too, even when they typed the goal themselves; confirming it out loud is the moment the testing gets permission.\n\n' +
+      'ACT 2 is where this path earns its existence, because a stated goal can be real or borrowed. A lot of people want something because they saw it on YouTube or it sounds better than their current situation. The descent beats reveal which it is: the why-layers show whether the reasons are theirs, the want-vs-need pressure test ("Would you still want this if nobody ever found out?") separates costume from spine, and the block-and-pattern beat separates "circling this for 3 years" from "saw a TikTok yesterday". Never accuse them of borrowed desire; let the questions reveal it, and if it IS borrowed, help them find what is underneath and re-lock.\n\n' +
+      'Do not rush the descent just because Act 1 was fast. The mortality math and the vivid carrot matter MORE for confident arrivals, they have usually never tested the goal against a deathbed.\n\n' +
+      'ACT 3 runs exactly per the system prompt: timeframe, then ONE belief check (never a second one), then the final summary confirmation, then ready.';
   }
 
   // "Kinda" path - they have a rough idea
@@ -1924,12 +1916,10 @@ function buildContextMessage() {
     const kindaDesc = wizardAnswers.kindaDescribe || '';
     let ctx = 'This person said they KINDA know what they want to do. They have a rough idea but are not fully clear yet.\n';
     if (kindaDesc) ctx += 'Here is how they described it: "' + kindaDesc + '"\n\n';
-    ctx += 'YOUR JOB: They have a starting point but it is probably vague or half-formed. Your job is to help them sharpen it into something specific and real. Start by checking if what they described is actually what they care about, or if it is just the first thing that came to mind.\n\n';
-    ctx += 'Use choices early to help them narrow down what they mean. Then go deeper into WHY this matters and whether this is truly the thing or if there is something underneath it.\n\n';
-    ctx += 'If their description is vague, help them get specific with choices. If it is already somewhat specific, test it the same way you would for someone who said "yes" - is this real or borrowed desire?\n\n';
-    ctx += 'PROGRESS CHECK: At some point, ask how far along they are. Have they started? Made any progress? Tried before and stopped? What got in the way? Spend 3-5 questions understanding where they actually are on this journey.\n\n';
-    ctx += 'This should be a DEEP, LONG conversation. 15-25+ questions minimum. Go 3-4 layers deep on the why. Ask for anti-vision and vision. Find the emotional core.\n\n';
-    ctx += 'BEFORE FINISHING: You MUST ask them directly if they feel clear. Summarize and ask "Does that feel right?" with choices. Only set ready: true after they confirm.';
+    ctx += 'PATH NOTES (the three-act structure in the system prompt runs this conversation; these notes only adapt it to this path):\n\n';
+    ctx += 'ACT 1: their description is a starting point, probably vague or half-formed. Sharpen it with choices until it is one concrete sentence, then run the LOCK-CHECK with milestone "what_confirmed". If the sharpening reveals their description was just the first thing that came to mind, follow what is actually alive instead, then lock that.\n\n';
+    ctx += 'ACT 2: run the full descent per the system prompt. The block-and-pattern beat matters here: have they started? tried and stopped? what got in the way?\n\n';
+    ctx += 'ACT 3 per the system prompt: timeframe, ONE belief check, final summary confirmation, ready.';
     return ctx;
   }
 
@@ -1970,9 +1960,8 @@ function buildContextMessage() {
 
   ctx += 'Follow whatever thread feels most alive. If they mention something in passing that sounds real, tug on that thread. If they give surface-level answers, go wider and more philosophical. If they light up about something, go deeper on exactly that thing.\n\n';
 
-  ctx += 'This will be the LONGEST path. 20-30+ questions is normal here. Do NOT rush. This person genuinely does not know what they want, so you need to spend real time helping them explore. Be patient. It is okay if they do not land on the exact micro-specific thing. The goal is to get them DIRECTIONALLY CORRECT - at least to the area and rough shape of what they care about. That alone is a huge win.\n\n';
-  ctx += 'Once you help them find something that resonates, THEN go deep on the why. Ask for their anti-vision and vision. Find the emotional core.\n\n';
-  ctx += 'BEFORE FINISHING: You MUST ask them directly if they feel clear. Summarize what you think they want and ask "Does that feel right?" with choices. Only set ready: true after they explicitly confirm. NEVER assume they are done. It is totally okay if their answer is broad like "I want to build something creative that helps people." That is directionally correct and good enough to work with.';
+  ctx += 'This is the LONGEST Act 1 of any path. 20-30+ total questions is normal here. Do NOT rush. Be patient. It is okay if they do not land on the exact micro-specific thing; DIRECTIONALLY CORRECT (the area and rough shape of what they care about) is a huge win. When something resonates, sharpen it just enough to say back in one sentence, then run the LOCK-CHECK with milestone "what_confirmed".\n\n';
+  ctx += 'Then run the full Act 2 descent and Act 3 per the system prompt (timeframe, ONE belief check, final summary confirmation, ready). For someone who started from zero, the descent is what turns "a thing I just noticed I care about" into a need; do not skip beats because Act 1 ran long. It is totally okay if their final answer is broad like "build something creative that helps people."';
 
   return ctx;
 }
@@ -2861,7 +2850,7 @@ async function sendAiAnswer() {
       // v578: the JSON-envelope reminder rides EVERY turn. The retest proved the
       // model drops the contract deep into emotional open-text stretches, exactly
       // where the v577 early-turns-only note never reached.
-      lastApiMsg.content += '\n\n[System note: Reply with ONLY one JSON object per the RESPONSE FORMAT (question/hint/type/options/progress), no prose before or after it. This applies to EVERY reply, including reflective or emotional moments and the final confirmation.]';
+      lastApiMsg.content += '\n\n[System note: Reply with ONLY one JSON object per the RESPONSE FORMAT (question/hint/type/options/progress/act), no prose before or after it. This applies to EVERY reply, including reflective or emotional moments and the final confirmation.]';
     }
 
     // Opus heavy-hitter (Malik, v579): exactly ONE escalated call, the descent
@@ -2874,7 +2863,12 @@ async function sendAiAnswer() {
       const lastAssistant = [...aiChatMessages].reverse().find(m => m.role === 'assistant');
       const confirmedWhat = lastAssistant && lastAssistant._milestone === 'what_confirmed' &&
         /^\s*yes\b|that'?s it|exactly/i.test(text || '');
-      if (confirmedWhat) _turnModel = (typeof ANTHROPIC_MODEL_SYNTHESIS === 'string') ? ANTHROPIC_MODEL_SYNTHESIS : _turnModel;
+      if (confirmedWhat) {
+        _turnModel = (typeof ANTHROPIC_MODEL_SYNTHESIS === 'string') ? ANTHROPIC_MODEL_SYNTHESIS : _turnModel;
+        // v580: the forming star fires its first-light pulse when the descent
+        // opener renders (consumed by updateProgress in js/02).
+        try { window._clarityFirstLight = true; } catch (eFL) {}
+      }
     } catch (eEsc) {}
     let response = await callClaude(apiMessages, AI_DISCOVERY_SYSTEM_PROMPT, { model: _turnModel, cache: true });
     let parsed = parseAiQuestion(response);

@@ -3595,3 +3595,15 @@ html.theme-light .fs-neb {
   .forming-star.fs--tremble, .fs--collapse .fs-neb, .fs--collapse .fs-core { animation: none; }
 }
 html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
+
+/* First light (v580): the WHAT is confirmed, the core ignites once. */
+.forming-star.fs--firstlight .fs-core {
+  animation: fsFirstLight 1.4s cubic-bezier(0.22, 1, 0.36, 1) 1;
+}
+@keyframes fsFirstLight {
+  0%   { transform: translate(-50%, -50%) scale(0.8); }
+  22%  { transform: translate(-50%, -50%) scale(1.9);
+         box-shadow: 0 0 34px rgba(220, 232, 255, 0.95), 0 0 8px rgba(255, 255, 255, 1); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) { .forming-star.fs--firstlight .fs-core { animation: none; } }

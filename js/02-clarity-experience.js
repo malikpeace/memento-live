@@ -2223,6 +2223,13 @@ const ClarityExperience = {
       if (star) {
         star.style.setProperty('--sp', sp.toFixed(3));
         star.classList.toggle('fs--tremble', sp > 0.82);
+        // First light (v580): one bright pulse the moment the WHAT is confirmed.
+        if (window._clarityFirstLight) {
+          window._clarityFirstLight = false;
+          star.classList.remove('fs--firstlight');
+          void star.offsetWidth;
+          star.classList.add('fs--firstlight');
+        }
       }
     } else {
       const fill = this.progressEl.querySelector('.ai-progress__fill');
@@ -2260,8 +2267,17 @@ const ClarityExperience = {
       const steps = getWizardSteps();
       const key = steps[wizardStep];
       if (key === 'aiSynthesis') { this._setLight(1); return; }
-      const wfrac = (this.currentPage - offset) / Math.max(1, (total - offset - 1));
-      this._setLight(0.22 + 0.58 * Math.max(0, Math.min(1, wfrac)));
+      // v580 (Malik): the QUESTIONS run in darkness. The beams are BORN the
+      // moment the WHAT is confirmed (the Act 1 lock-check yes), then brighten
+      // through the descent with real progress. Light = clarity, earned.
+      let confirmed = false;
+      let pct = 0;
+      try {
+        confirmed = (typeof aiChatMessages !== 'undefined') && aiChatMessages.some(m => m && m.role === 'assistant' && (m._act || 0) >= 2);
+        pct = (typeof aiChatPct === 'function') ? (aiChatPct() / 100) : 0;
+      } catch (eA) {}
+      if (!confirmed) { this._setLight(0.02); return; }
+      this._setLight(0.3 + 0.6 * Math.max(0, Math.min(1, pct)));
     } catch (e) {}
   },
 
