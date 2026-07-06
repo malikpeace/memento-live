@@ -2259,11 +2259,14 @@ function aiChatPct() {
 }
 
 function renderAiChat() {
-  // Loading state  - thinking animation
+  // While the AI thinks, the forming star (top slot) breathes instead of the old
+  // center aurora blur. The aurora markup + .aur CSS are kept for an easy revert:
+  // `<div class="ai-thinking"><div class="aur"><span class="aur-band b1"></span><span class="aur-band b2"></span><span class="aur-band b3"></span></div></div>`
+  const _prog = document.getElementById('clarityExpProgress');
+  if (_prog) _prog.classList.toggle('is-thinking', !!aiChatLoading);
+  // Loading state - empty stage, the star carries it
   if (aiChatLoading) {
-    return `<div class="ai-thinking">
-        <div class="aur"><span class="aur-band b1"></span><span class="aur-band b2"></span><span class="aur-band b3"></span></div>
-      </div>`;
+    return `<div class="ai-thinking"></div>`;
   }
 
   // Error state
