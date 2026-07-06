@@ -231,12 +231,12 @@ const VOICE_BANNED = [
   // The "It's not X, it's Y" redefinition cliche (and "not just X, it's Y"). Malik never wants
   // this rhetorical substitution. Only the redefinition form is banned (second clause restating
   // with "it's/this is"); an honest concession like "31 isn't old, but you have experience" is fine.
-  [/\b(it'?s|it is|that'?s|this is)\s+not\b[^.!?]{2,45}?[,.;:]\s*(it'?s|it is|this is|that is|they'?re|they are|it was|they were)\b/i, 'X/Y redefinition ("it\'s not X, it\'s Y")'],
-  [/\b(isn'?t|aren'?t|wasn'?t|weren'?t)\b[^.!?]{2,45}?[,.;:]\s*(it'?s|it is|this is|that is|they'?re|they are|it was|they were)\b/i, 'X/Y redefinition ("isn\'t X, it\'s Y")'],
+  [/\b(it'?s|it is|that'?s|this is)\s+not\b[^.!?]{2,45}?[,.;:]\s*(it'?s|it is|that'?s|this is|that is|they'?re|they are|it was|they were)\b/i, 'X/Y redefinition ("it\'s not X, it\'s Y")'],
+  [/\b(isn'?t|aren'?t|wasn'?t|weren'?t)\b[^.!?]{2,45}?[,.;:]\s*(it'?s|it is|that'?s|this is|that is|they'?re|they are|it was|they were)\b/i, 'X/Y redefinition ("isn\'t X, it\'s Y")'],
   [/\bnot just\b[^.!?]{1,45}?[,.;:]\s*(it'?s|it is|this is|they'?re|but)\b/i, 'X/Y phrasing ("not just X, ... Y")'],
   // Stress-test escapes (2026-07-06): the same cliche across a sentence boundary or with a
   // noun subject. "was never (really) about X. It is Y" / "The fear is not A. The fear is B."
-  [/\b(was|were|is|are)\s+never\s+[^.!?]{2,60}[.!?]\s*(it|they|this|that)\s+(was|were|is|are)\b/i, 'X/Y redefinition ("was never X. It was Y")'],
+  [/\b(was|were|is|are)\s+never\s+[^.!?]{2,60}[.!?]\s*(it|they|this|that|he|she)\s+(was|were|is|are|just)\b/i, 'X/Y redefinition ("was never X. It was Y")'],
   [/\b(is|was|are|were)\s+not\s+(really\s+|actually\s+|just\s+)?the\b[^.!?]{2,60}[.!?]\s*(it|they|this|that)\s+(is|was|are|were)\b/i, 'X/Y redefinition ("is not really the X. It is Y")'],
   [/\bthe\s+(\w+)\s+(?:is|was)\s+not\b[^.!?]{2,60}[.!?]\s*the\s+\1\s+(?:is|was)\b/i, 'X/Y redefinition ("The fear is not A. The fear is B.")']
 ];
@@ -2773,10 +2773,11 @@ function parseAiQuestion(response) {
     } catch (e2) {}
   }
 
-  // Last resort: strip any JSON-looking content so raw JSON never shows
+  // Last resort: strip any JSON-looking content so raw JSON never shows.
+  // _fallback marks this path so sendAiAnswer can run ONE corrective retry (v578).
   let cleanText = response.replace(/\{[\s\S]*\}/g, '').replace(/\[READY\]/g, '').trim();
   if (!cleanText) cleanText = 'Let me rephrase that. What are you trying to accomplish?';
-  return { question: cleanText, hint: '', ready: response.includes('[READY]'), type: 'text', options: [], range: null };
+  return { _fallback: true, question: cleanText, hint: '', ready: response.includes('[READY]'), type: 'text', options: [], range: null };
 }
 
 // Track if we went back (set by back() method)
@@ -2864,7 +2865,7 @@ async function sendAiAnswer() {
     if (userMsgCount <= 2) {
       const lastMsg = apiMessages[apiMessages.length - 1];
       if (lastMsg && lastMsg.role === 'user') {
-        lastMsg.content += '\n\n[System note: Reply with ONLY one JSON object per the RESPONSE FORMAT (question/hint/type/options/progress), no prose outside it, every turn without exception. This is question ' + (userMsgCount + 1) + '. Use type "choices" with exactly 4 distinct, substantive options. Do NOT include any "I don\'t know" or "I\'m not sure" option. The UI already adds that automatically. Do NOT include an "Other" option either, the UI adds that too.]';
+        lastMsg.content += '\n\n[System note: This is question ' + (userMsgCount + 1) + '. Use type "choices" with exactly 4 distinct, substantive options. Do NOT include any "I don\'t know" or "I\'m not sure" option. The UI already adds that automatically. Do NOT include an "Other" option either, the UI adds that too.]';
       }
     } else if (userMsgCount <= 4) {
       const lastMsg = apiMessages[apiMessages.length - 1];
@@ -2892,10 +2893,29 @@ async function sendAiAnswer() {
         lastApiMsg.content += '\n\n[System note: The user just said they do not know or are not sure (they have said this ' + idkCount + ' time(s) now). Do NOT ask the same question in different words. CHANGE ANGLES COMPLETELY. Ask about something different, like their daily life, what they are good at, what they spend time on, or who they admire. Do not keep pressing on the same topic they just said they do not know about.]';
       }
       lastApiMsg.content += '\n\n[System note: For the hint field, set it to empty string "" most of the time. Only include a hint if it genuinely adds context the user needs. Most questions do not need hints.]';
+      // v578: the JSON-envelope reminder rides EVERY turn. The retest proved the
+      // model drops the contract deep into emotional open-text stretches, exactly
+      // where the v577 early-turns-only note never reached.
+      lastApiMsg.content += '\n\n[System note: Reply with ONLY one JSON object per the RESPONSE FORMAT (question/hint/type/options/progress), no prose before or after it. This applies to EVERY reply, including reflective or emotional moments and the final confirmation.]';
     }
 
     let response = await callClaude(apiMessages, AI_DISCOVERY_SYSTEM_PROMPT, { model: clarityChatModel(), cache: true });
     let parsed = parseAiQuestion(response);
+
+    // JSON-envelope repair (v578): if the model answered in prose (no JSON found),
+    // ONE corrective retry asking it to resend the same content as JSON. This is
+    // the hard guarantee; the per-turn note above is the soft one.
+    if (parsed && parsed._fallback) {
+      try {
+        const fixMsgs = apiMessages.concat([
+          { role: 'assistant', content: response },
+          { role: 'user', content: '[System: Your previous reply broke the contract, it was prose instead of JSON. Resend the SAME content as a single valid JSON object per the RESPONSE FORMAT (question/hint/type/options/progress). Nothing outside the JSON. If it offered choices in prose, use type "choices" with those options.]' }
+        ]);
+        const fixed = await callClaude(fixMsgs, AI_DISCOVERY_SYSTEM_PROMPT, { model: clarityChatModel(), cache: true });
+        const reparsed = parseAiQuestion(fixed);
+        if (reparsed && !reparsed._fallback) { response = fixed; parsed = reparsed; }
+      } catch (eFix) { /* keep the prose fallback, same as pre-v578 behavior */ }
+    }
 
     // Duplicate detection: if the new question is too similar to a previous one, retry once
     const newQ = (parsed.question || '').toLowerCase().trim();
