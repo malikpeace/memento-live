@@ -3204,15 +3204,20 @@ html.lowfx .nsv2-reveal__w, html.lowfx .nsv2-reveal__after, html.lowfx .nsv2-rev
   position: fixed; top: 0; left: 0;
   width: 100vw; height: 100lvh;
   background: #fff;
-  animation: nsv2FlareV2 3.4s cubic-bezier(0.3, 0, 0.35, 1) forwards;
+  animation: nsv2FlareV2 4.6s linear forwards;
 }
 @media (prefers-reduced-motion: reduce) {
   .nsv2.is-holding .nsv2__white { opacity: clamp(0, (var(--holdp, 0) - 0.55) * 1.1, 0.5); }
 }
+/* v591: long soft tail so the white truly FADES away into the star instead of
+   snapping off; the star never pops in, it emerges from the white. */
 @keyframes nsv2FlareV2 {
-  0%   { opacity: 0; transform: none; }
-  20%  { opacity: 1; }
-  42%  { opacity: 1; }
+  0%   { opacity: 0; }
+  14%  { opacity: 1; }
+  30%  { opacity: 1; }
+  55%  { opacity: 0.62; }
+  75%  { opacity: 0.28; }
+  90%  { opacity: 0.1; }
   100% { opacity: 0; }
 }
 /* v590: when the white fades you are INSIDE the star (scale 6.5, it fills the
@@ -3223,6 +3228,30 @@ html.lowfx .nsv2-reveal__w, html.lowfx .nsv2-reveal__after, html.lowfx .nsv2-rev
 @keyframes nsv2StarZoomOut {
   from { transform: scale(6.5); }
   to   { transform: scale(1); }
+}
+/* v591: the newborn star RAGES, violent shake while it is huge, decaying to
+   dead calm as it settles. On the scene wrapper so it stacks with the zoom. */
+.nsv2[data-act="star"] .nsv2-starscene { animation: nsv2StarRage 3.6s linear both; }
+@keyframes nsv2StarRage {
+  0%   { translate: 0 0; }
+  5%   { translate: 14px -10px; }
+  10%  { translate: -13px 11px; }
+  15%  { translate: 12px 8px; }
+  20%  { translate: -12px -9px; }
+  25%  { translate: 11px -7px; }
+  30%  { translate: -9px 8px; }
+  36%  { translate: 8px 6px; }
+  42%  { translate: -7px -5px; }
+  48%  { translate: 6px -4px; }
+  55%  { translate: -5px 4px; }
+  62%  { translate: 4px 2px; }
+  70%  { translate: -3px -2px; }
+  78%  { translate: 2px 1px; }
+  86%  { translate: -1px 1px; }
+  100% { translate: 0 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nsv2[data-act="star"] .nsv2-starscene { animation: none; }
 }
 .nsv2[data-act="star"] .nsv2-after { animation: nsv2In 0.9s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: 3.4s; }
 @media (prefers-reduced-motion: reduce) {
