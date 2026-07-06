@@ -551,7 +551,7 @@ body.clarity-legacy-orbs .clarity-exp__bg-orb4 { display: block; }
   transform: translate(-50%, -50%);
   border-radius: 50%;
   pointer-events: none;
-  background: radial-gradient(circle, rgba(150,165,255,0.30), rgba(150,165,255,0.10) 42%, transparent 72%);
+  background: radial-gradient(circle, rgba(160,140,255,0.30), rgba(160,140,255,0.10) 42%, transparent 72%);
   animation: starHalo 3.4s ease-in-out infinite;
 }
 @keyframes starHalo {

@@ -382,11 +382,11 @@ void main(){
   float n2 = snoise(uv * 2.5 + vec2(-t * 0.6, t * 0.8));
   float n3 = snoise(uv * 1.2 + vec2(t * 0.4, -t * 0.3));
   float n4 = snoise(uv * 3.0 + vec2(t * 0.9, t * 0.2));
-  vec3 c1 = vec3(0.3, 0.5, 0.95);
-  vec3 c2 = vec3(0.45, 0.6, 1.0);
-  vec3 c3 = vec3(0.93, 0.95, 1.0);
-  vec3 c4 = vec3(0.55, 0.78, 1.0);
-  vec3 c5 = vec3(0.88, 0.92, 1.0);
+  vec3 c1 = vec3(0.42, 0.28, 0.92);
+  vec3 c2 = vec3(0.58, 0.45, 1.0);
+  vec3 c3 = vec3(0.94, 0.92, 1.0);
+  vec3 c4 = vec3(0.68, 0.55, 1.0);
+  vec3 c5 = vec3(0.90, 0.86, 1.0);
   vec3 col = mix(c1, c2, smoothstep(-0.5, 0.5, n1));
   col = mix(col, c3, smoothstep(-0.3, 0.5, n2));
   col = mix(col, c4, smoothstep(-0.2, 0.6, n3) * 0.5);
@@ -438,7 +438,7 @@ void main(){
   float r = length(uv);
   float n1 = snoise(uv * 2.2 + vec2(T * 0.12, T * 0.08));
   float n2 = snoise(uv * 4.0 - vec2(T * 0.10, T * 0.15));
-  vec3 body = mix(vec3(0.25, 0.45, 0.95), vec3(0.55, 0.75, 1.0), smoothstep(-0.6, 0.6, n1));
+  vec3 body = mix(vec3(0.42, 0.28, 0.92), vec3(0.68, 0.55, 1.0), smoothstep(-0.6, 0.6, n1));
   body = mix(body, vec3(0.95, 0.97, 1.0), smoothstep(-0.1, 0.7, n2) * 0.7);
   float mask = 1.0 - smoothstep(0.28, 0.32, r);
   float core = exp(-r * 7.0) * (1.35 + 0.18 * beat);
@@ -456,8 +456,8 @@ void main(){
   float ji = 0.78 + 0.22 * beat;
   vec3 col = body * mask * (1.0 + 0.07 * beat);
   col += vec3(1.0) * core;
-  col += vec3(0.45, 0.65, 1.0) * halo;
-  col += vec3(0.75, 0.88, 1.0) * jet * ji;
+  col += vec3(0.58, 0.45, 1.0) * halo;
+  col += vec3(0.80, 0.70, 1.0) * jet * ji;
   float alpha = clamp(max(col.r, max(col.g, col.b)), 0.0, 1.0);
   gl_FragColor = vec4(col, alpha);
 }`;
