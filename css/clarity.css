@@ -3786,3 +3786,82 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
   100% { transform: translate(-50%, -50%) scale(1); }
 }
 @media (prefers-reduced-motion: reduce) { .forming-star.fs--firstlight .fs-core { animation: none; } }
+
+/* ── v600: THE MINIMAL STAR SUMMARY (Malik's render) ──
+   One glance: giant star owning the top, eyebrow, the sentence (numbers in
+   violet), hairline divider, timeframe, one CTA. Utilities in the dots menu. */
+.ns-star-scene--min {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-end;
+  padding: 0 22px calc(var(--safe-b, 0px) + 28px);
+}
+.ns-star-scene--min .ns-star-stage {
+  position: absolute; top: -2%; left: 50%; transform: translateX(-50%);
+  width: 100%; height: 62%;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: none;
+}
+.ns-star-scene--min .ns-star-blob {
+  width: min(160vw, 76lvh); height: min(160vw, 76lvh);
+  max-width: none; border-radius: 0;
+}
+.ns-star-scene--min .ns-star-glow { display: none; } /* glow is baked into the shader now */
+.ns-min__content {
+  position: relative; z-index: 3;
+  display: flex; flex-direction: column; align-items: center;
+  width: 100%; max-width: 560px;
+}
+.ns-min__eyebrow {
+  font-size: 12px; font-weight: 700;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: 14px;
+}
+.ns-min__goal {
+  margin: 0;
+  font-size: clamp(26px, 7.4vw, 34px);
+  line-height: 1.22; font-weight: 800;
+  color: #fff; text-align: center; text-wrap: balance;
+}
+.ns-min__num { color: #a78bfa; }
+.ns-min__divider { width: 44px; height: 1px; background: rgba(255, 255, 255, 0.22); margin: 22px 0 18px; }
+.ns-min__time { display: flex; align-items: center; gap: 9px; color: rgba(255, 255, 255, 0.75); font-size: 16px; font-weight: 600; }
+.ns-min__time svg { color: #a78bfa; }
+.ns-min__cta {
+  margin-top: 26px;
+  appearance: none; border: 0; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%; max-width: 420px;
+  padding: 17px 22px; border-radius: 999px;
+  background: #fff; color: #0b0b12;
+  font: 700 16px var(--font, -apple-system, system-ui, sans-serif);
+  letter-spacing: 0.01em;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+}
+.ns-min__cta:active { transform: scale(0.985); }
+.ns-min__menu-btn {
+  position: absolute; top: calc(var(--safe-t, 0px) + 14px); left: 18px; z-index: 5;
+  appearance: none; border: 0; cursor: pointer;
+  width: 40px; height: 32px; border-radius: 9px;
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 18px; font-weight: 800; line-height: 0.6; letter-spacing: 1px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+.ns-min__sheet {
+  position: absolute; top: calc(var(--safe-t, 0px) + 52px); left: 18px; z-index: 6;
+  display: none; flex-direction: column; min-width: 216px; padding: 6px;
+  border-radius: 14px;
+  background: rgba(16, 16, 22, 0.92);
+  -webkit-backdrop-filter: blur(28px) saturate(1.4);
+  backdrop-filter: blur(28px) saturate(1.4);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+.ns-min__sheet.is-open { display: flex; }
+.ns-min__sheet-item {
+  appearance: none; border: 0; background: transparent; cursor: pointer;
+  text-align: left; padding: 12px 14px; border-radius: 9px;
+  color: rgba(255, 255, 255, 0.92);
+  font: 600 14.5px var(--font, -apple-system, system-ui, sans-serif);
+}
+.ns-min__sheet-item:active { background: rgba(255, 255, 255, 0.08); }

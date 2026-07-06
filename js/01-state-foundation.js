@@ -1202,67 +1202,37 @@ function renderNeutronStarSummary(summary, { allowContinue = false, showRestart 
     `;
   }
 
-  // Manifesto passages (FIRST-WIN-PLAN P4): the glass tabbed card became ONE
-  // dark typography-first page. Every passage keeps the .ns-summary__panel /
-  // __panel-body / __panel-refresh classes so the existing rephrase wiring
-  // (js/11 initStarScene) keeps working untouched; is-active on all of them
-  // because nothing is tabbed away anymore.
-  const passages = [
-    { key: 'why',      label: 'Why This Matters',     body: summary.coreWhy     || '',  field: 'coreWhy' },
-    { key: 'future',   label: 'Future You',           body: summary.futureVision || '', field: 'futureVision' },
-    { key: 'avoiding', label: "What You're Avoiding", body: summary.antiVision  || '',  field: 'antiVision' },
-  ].filter(t => t.body);
-
-  const refreshIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>`;
-
-  const passagesHtml = passages.map(t => `
-    <section class="ns-summary__panel is-active ns-manifesto__section" data-panel="${t.key}">
-      <div class="ns-manifesto__label">${esc(t.label)}<button type="button" class="ns-summary__panel-refresh" data-field="${t.field}" data-label="${esc(t.label)}" aria-label="Rephrase this section">${refreshIcon}</button></div>
-      <p class="ns-summary__panel-body ns-manifesto__body">${esc(t.body)}</p>
-    </section>
-  `).join('');
-
-  const arrowDown = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg>`;
-
-  // "Journey" drift: only once there are 2+ completed Clarity runs to compare.
-  // Sits quietly at the very bottom of the manifesto.
-  const showJourney = (state.clarity && Array.isArray(state.clarity.history) && state.clarity.history.length >= 2);
-  const journeyHtml = showJourney ? `
-    <section class="ns-summary__panel ns-summary__panel--journey is-active ns-manifesto__journey" data-panel="journey">
-      ${renderClarityDrift('panel')}
-    </section>` : '';
+  // v600 (Malik): the summary is ONE glance, not a manifesto. Giant star owning
+  // most of the screen, the sentence (numbers popped in violet), the timeframe,
+  // one CTA. The deeper material (why/future/avoiding) stays in state and feeds
+  // the AI; it no longer renders here. Utilities live in a quiet dots menu.
+  const arrowRight = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg>`;
+  const calIcon = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`;
+  // Numbers in the goal glow violet (like the render): escape first, then wrap.
+  const goalHtml = esc(summary.neutronStar || '').replace(/(\d[\d,.]*)/g, '<span class="ns-min__num">$1</span>');
+  const timeframe = (summary.timeHorizon || '').trim();
 
   return `
-    <div class="ns-star-scene ns-star-scene--manifesto" id="nsScene">
+    <div class="ns-star-scene ns-star-scene--manifesto ns-star-scene--min" id="nsScene">
       <div class="ns-star-scene__starfield" id="nsStarfield" aria-hidden="true"></div>
-      <div class="ns-star-label">Your Neutron Star</div>
+      <button type="button" class="ns-min__menu-btn" id="nsMenuBtn" aria-label="More options" aria-haspopup="true">&middot;&middot;&middot;</button>
       <div class="ns-star-stage" id="nsStarStage">
         <div class="ns-star-glow"></div>
         <canvas class="ns-star-blob" id="nsStarBlob" width="360" height="360" aria-hidden="true"></canvas>
-        <button type="button" class="ns-star-stage__hit" id="nsStarHit" aria-label="Open neutron star"></button>
       </div>
-      <div class="ns-star-detail" id="nsStarDetail">
-        <div class="ns-star-detail__card ns-manifesto">
-          <header class="ns-summary__panel is-active ns-manifesto__hero" data-panel="mission">
-            <div class="ns-manifesto__eyebrow">Your Neutron Star<button type="button" class="ns-summary__panel-refresh" data-field="neutronStar" data-label="Primary Goal" aria-label="Rephrase your goal">${refreshIcon}</button></div>
-            <h1 class="ns-summary__panel-body ns-manifesto__goal">${esc(summary.neutronStar || '')}</h1>
-          </header>
-          ${passagesHtml}
-          ${summary.tensionLine ? `<div class="ns-summary__tension">${esc(summary.tensionLine)}</div>` : ''}
-          <div class="ns-summary__discovery">This was already true. You just had not said it out loud yet.</div>
-          <div class="ns-manifesto__cta">
-            <button type="button" id="summaryAction" class="ns-summary__explore">
-              <span class="ns-summary__explore-label">Take Action</span>
-              <span class="ns-summary__explore-icon">${arrowDown}</span>
-            </button>
-          </div>
-          <div class="ns-manifesto__quiet">
-            <button type="button" id="summaryContinue" class="ns-summary__refine-link">Refine answers</button>
-            <button type="button" class="ns-summary__refine-link" data-share-star aria-label="Share your Neutron Star">Share</button>
-            <button type="button" id="nsExplainBtn" class="ns-summary__refine-link" aria-label="What is a Neutron Star?">What's this?</button>
-          </div>
-          ${journeyHtml}
-        </div>
+      <div class="ns-min__content">
+        <div class="ns-min__eyebrow">Your Neutron Star</div>
+        <h1 class="ns-min__goal">${goalHtml}</h1>
+        <div class="ns-min__divider" aria-hidden="true"></div>
+        ${timeframe ? `<div class="ns-min__time">${calIcon}<span>${esc(timeframe)}</span></div>` : ''}
+        <button type="button" id="summaryAction" class="ns-min__cta">
+          <span>Take Action</span>${arrowRight}
+        </button>
+      </div>
+      <div class="ns-min__sheet" id="nsMenuSheet" aria-hidden="true" role="menu">
+        <button type="button" id="summaryContinue" class="ns-min__sheet-item" role="menuitem">Refine answers</button>
+        <button type="button" class="ns-min__sheet-item" data-share-star role="menuitem">Share</button>
+        <button type="button" id="nsExplainBtn" class="ns-min__sheet-item" role="menuitem">What's a Neutron Star?</button>
       </div>
 
       <!-- Explanation sheet: opens from the "What's this?" quiet link.

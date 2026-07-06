@@ -735,10 +735,27 @@ function initNeutronStarStarView(scope) {
   stage.addEventListener('click', zoomIn);
   const hit = scope.querySelector('#nsStarHit');
   if (hit) hit.addEventListener('click', (e) => { e.stopPropagation(); zoomIn(); });
-  // v598 (Malik): never strand anyone on the star-only foyer (a bare star with
-  // no info and no visible affordance read as broken). Opening the Neutron
-  // Star lands straight on the manifesto; the star stays the hero up top.
-  setTimeout(zoomIn, 350);
+  // v598 (Malik): never strand anyone on the star-only foyer. Only relevant to
+  // layouts that still HAVE a hidden detail pane; the v600 minimal summary
+  // shows everything at once and must not take the zoom transforms.
+  if (scope.querySelector('#nsStarDetail')) setTimeout(zoomIn, 350);
+
+  // v600: quiet dots menu on the minimal summary (Refine / Share / What's this).
+  const menuBtn = scope.querySelector('#nsMenuBtn');
+  const menuSheet = scope.querySelector('#nsMenuSheet');
+  if (menuBtn && menuSheet) {
+    menuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const open = menuSheet.classList.toggle('is-open');
+      menuSheet.setAttribute('aria-hidden', open ? 'false' : 'true');
+    });
+    scene.addEventListener('click', (ev) => {
+      if (!menuSheet.contains(ev.target) && ev.target !== menuBtn) {
+        menuSheet.classList.remove('is-open');
+        menuSheet.setAttribute('aria-hidden', 'true');
+      }
+    });
+  }
 
   // 3D parallax tilt on the glass card. Desktop only (real mouse + hover).
   // Skipped on touch devices and when prefers-reduced-motion is set.
