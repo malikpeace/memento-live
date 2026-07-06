@@ -7766,8 +7766,12 @@ function _bindStarPlacard(root) {
         '<div style="text-align:center;color:var(--text-1);font-size:0.875rem;margin-top:6px;">Condensing your Neutron Star...</div></div></div>';
       setTimeout(() => { try { const c = document.getElementById('synthCondenseStar'); if (c && typeof initStarBlob === 'function') initStarBlob(c, 480); } catch (e) {} }, 60);
       ClarityExperience.navEl.innerHTML = '';
-      // The real synthesis takes a while; 3s is enough to feel the cut.
-      devSynthTimer = setTimeout(() => { showCeremony('reveal'); }, 3000);
+      // Dev pacing: shrink a moment, then run the same pixel-fall the real
+      // flow uses (finishCondenseThen) so the beat previews true to life.
+      devSynthTimer = setTimeout(() => {
+        const go = () => showCeremony('reveal');
+        if (typeof finishCondenseThen === 'function') finishCondenseThen(go); else go();
+      }, 2600);
     };
 
     // Free back/forth scrubber over the synth beat + five ceremony acts.

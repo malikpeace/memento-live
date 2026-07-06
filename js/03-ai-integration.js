@@ -3321,6 +3321,25 @@ function refreshAiChatUI() {
   }
 }
 
+// The condense loading must END as a literal pixel before the cut (Malik).
+// Freezes the slow shrink where it is, then drives it down to scale 0.003
+// in one accelerating fall, and only then hands off.
+function finishCondenseThen(next) {
+  try {
+    const c = document.getElementById('synthCondenseStar');
+    if (!c) { next(); return; }
+    let cur = 1;
+    const m = getComputedStyle(c).transform;
+    if (m && m.indexOf('matrix(') === 0) cur = parseFloat(m.slice(7)) || 1;
+    c.style.animation = 'none';
+    c.style.transform = 'scale(' + cur + ')';
+    void c.offsetWidth;
+    c.style.transition = 'transform 1.1s cubic-bezier(0.6, 0, 0.9, 0.5)';
+    c.style.transform = 'scale(0.003)';
+    setTimeout(next, 1250);
+  } catch (e) { next(); }
+}
+
 async function triggerSynthesis() {
   if (aiSynthesisLoading) return;
   aiSynthesisLoading = true;
@@ -3387,7 +3406,8 @@ async function triggerSynthesis() {
       }
       persistNow();
     } catch (e) {}
-    refreshAiChatUI();
+    // Do not cut until the star has fallen all the way to a pixel.
+    finishCondenseThen(() => refreshAiChatUI());
   } catch (err) {
     aiSynthesisLoading = false;
     aiChatError = err.message;
