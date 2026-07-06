@@ -1221,7 +1221,6 @@ function renderNeutronStarSummary(summary, { allowContinue = false, showRestart 
         <canvas class="ns-star-blob" id="nsStarBlob" width="360" height="360" aria-hidden="true"></canvas>
       </div>
       <div class="ns-min__content">
-        <div class="ns-min__eyebrow">Your Neutron Star</div>
         <h1 class="ns-min__goal">${goalHtml}</h1>
         <div class="ns-min__divider" aria-hidden="true"></div>
         ${timeframe ? `<div class="ns-min__time">${calIcon}<span>${esc(timeframe)}</span></div>` : ''}
