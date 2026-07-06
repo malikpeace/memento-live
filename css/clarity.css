@@ -3204,6 +3204,10 @@ html.lowfx .nsv2-reveal__w, html.lowfx .nsv2-reveal__after, html.lowfx .nsv2-rev
   position: fixed; top: 0; left: 0;
   width: 100vw; height: 100lvh;
   background: #fff;
+  /* Above the ceremony root (9000): the star act swaps in UNDER the white,
+     which then fades over ~3s. At z 50 the new act painted over the white
+     and read as an instant cut (v593 fix). */
+  z-index: 9990;
   animation: nsv2FlareV2 5.2s linear forwards;
 }
 @media (prefers-reduced-motion: reduce) {
