@@ -3204,20 +3204,23 @@ html.lowfx .nsv2-reveal__w, html.lowfx .nsv2-reveal__after, html.lowfx .nsv2-rev
   position: fixed; top: 0; left: 0;
   width: 100vw; height: 100lvh;
   background: #fff;
-  animation: nsv2FlareV2 4.6s linear forwards;
+  animation: nsv2FlareV2 5.2s linear forwards;
 }
 @media (prefers-reduced-motion: reduce) {
   .nsv2.is-holding .nsv2__white { opacity: clamp(0, (var(--holdp, 0) - 0.55) * 1.1, 0.5); }
 }
 /* v591: long soft tail so the white truly FADES away into the star instead of
    snapping off; the star never pops in, it emerges from the white. */
+/* v592: grow to full white -> STAY solid white for a full second -> long slow
+   fade revealing the huge shaking star. Removal (js/02, 5.4s) strictly after
+   the animation ends, never yanked mid-fade. */
 @keyframes nsv2FlareV2 {
   0%   { opacity: 0; }
-  14%  { opacity: 1; }
-  30%  { opacity: 1; }
-  55%  { opacity: 0.62; }
-  75%  { opacity: 0.28; }
-  90%  { opacity: 0.1; }
+  12%  { opacity: 1; }
+  32%  { opacity: 1; }
+  50%  { opacity: 0.75; }
+  68%  { opacity: 0.45; }
+  84%  { opacity: 0.2; }
   100% { opacity: 0; }
 }
 /* v590: when the white fades you are INSIDE the star (scale 6.5, it fills the
@@ -3253,7 +3256,7 @@ html.lowfx .nsv2-reveal__w, html.lowfx .nsv2-reveal__after, html.lowfx .nsv2-rev
 @media (prefers-reduced-motion: reduce) {
   .nsv2[data-act="star"] .nsv2-starscene { animation: none; }
 }
-.nsv2[data-act="star"] .nsv2-after { animation: nsv2In 0.9s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: 3.4s; }
+.nsv2[data-act="star"] .nsv2-after { animation: nsv2In 0.9s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: 4.3s; }
 @media (prefers-reduced-motion: reduce) {
   .nsv2[data-act="star"] .nsv2-star__blob { animation: none; }
   .nsv2[data-act="star"] .nsv2-after { animation-delay: 0s; }

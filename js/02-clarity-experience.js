@@ -7674,7 +7674,9 @@ function _ig2Signed(root) {
   const flare = document.createElement('div');
   flare.className = 'nsv2__flare' + (lite ? '' : ' nsv2__flare--v2');
   document.body.appendChild(flare);
-  setTimeout(() => { try { flare.remove(); } catch (e) {} }, lite ? 900 : 3500);
+  // Remove strictly AFTER the fade animation ends (v592: it was being yanked
+  // out at 3.5s mid-fade, which read as the white vanishing instantly).
+  setTimeout(() => { try { flare.remove(); } catch (e) {} }, lite ? 900 : 5400);
 
   setTimeout(() => {
     _ig2Act = 'star';
