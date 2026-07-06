@@ -3134,7 +3134,7 @@ body.lite .daycard-motion-cta, html.lowfx .daycard-motion-cta { backdrop-filter:
 /* Light-mode card: the white fill would vanish on near-white glass, so the
    mark is pressed in dark instead (same machined deboss logic, inverted). */
 html.theme-light .daycard-ns__emblem {
-  fill: rgba(28, 30, 52, 0.22);
+  fill: rgba(28, 30, 52, 0.32);
   filter:
     drop-shadow(0 1.5px 0 rgba(255, 255, 255, 0.50))
     drop-shadow(0 -1px 1px rgba(0, 0, 0, 0.18))
@@ -3717,6 +3717,12 @@ html.flat-ui body.pre-clarity .daycard-ns__emblem {
 }
 html.flat-ui.theme-light body .daycard-ns {
   background: #f5f6f8;
+}
+/* Light + flat: the white emblem fill above vanishes on the light slab; press
+   the M in dark instead so it actually reads (v597). */
+html.flat-ui.theme-light body .daycard-ns__emblem,
+html.flat-ui.theme-light body.pre-clarity .daycard-ns__emblem {
+  fill: rgba(28, 30, 52, 0.30);
 }
 html.flat-ui.theme-light body .daycard-ns::before {
   background: rgba(24, 26, 33, 0.10);
