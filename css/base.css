@@ -1081,3 +1081,18 @@ html.flat-ui:not(.theme-light) body,
 html.flat-ui:not(.theme-light) .ambient {
   background: #000;
 }
+
+/* Dynamic accent swatch (v576): the colored-M gradient, slowly turning. */
+.pref-swatch__dot--dynamic {
+  background: conic-gradient(from 0deg, #7b61ff, #6084ff, #f064c8, #7b61ff);
+  box-shadow: 0 0 0 1px rgba(var(--ink), 0.18), 0 0 10px rgba(150, 116, 255, 0.4);
+  animation: prefDynSpin 6s linear infinite;
+}
+@keyframes prefDynSpin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .pref-swatch__dot--dynamic { animation: none; } }
+
+/* Compact density strengthened (v576, Malik: it barely did anything). */
+body.density-compact { --card-pad: 10px; }
+html:has(body.density-compact) { font-size: 14px; }
+body.density-compact .pref-row { padding-top: 8px; padding-bottom: 8px; }
+body.density-compact .sheet__body { line-height: 1.45; }

@@ -683,6 +683,36 @@ function fillAlpha(a, t) {
 // Applies persisted preferences to the document. Guarded by existence checks
 // so missing/partial prefs are a no-op (= today's exact look). Idempotent;
 // safe to call on boot and again after a pref change.
+let _accentDriftTimer = null;
+const _ACCENT_DRIFT_STOPS = [[123, 97, 255], [96, 132, 255], [240, 100, 200]];
+let _accentDriftStart = 0;
+function _accentDriftTick() {
+  const b = document.body; if (!b) return;
+  const PERIOD = 30000; // one full loop through the M palette
+  const t = ((Date.now() - _accentDriftStart) % PERIOD) / PERIOD * _ACCENT_DRIFT_STOPS.length;
+  const i = Math.floor(t) % _ACCENT_DRIFT_STOPS.length;
+  const j = (i + 1) % _ACCENT_DRIFT_STOPS.length;
+  const f = t - Math.floor(t);
+  const mix = (a, c) => Math.round(a + (c - a) * f);
+  const A = _ACCENT_DRIFT_STOPS[i], B = _ACCENT_DRIFT_STOPS[j];
+  const rgb = [mix(A[0], B[0]), mix(A[1], B[1]), mix(A[2], B[2])];
+  b.style.setProperty('--accent', 'rgb(' + rgb.join(',') + ')');
+  b.style.setProperty('--accent-rgb', rgb.join(', '));
+  b.style.setProperty('--accent-strong', 'rgb(' + rgb.map(v => Math.round(v * 0.72)).join(',') + ')');
+}
+function applyAccentDrift(p) {
+  const active = (!p.accent || p.accent === 'default') && !p.reduceMotion;
+  if (!active) {
+    if (_accentDriftTimer) { clearInterval(_accentDriftTimer); _accentDriftTimer = null; }
+    return; // applyPrefs already stripped the inline vars for non-custom accents
+  }
+  if (!_accentDriftTimer) {
+    _accentDriftStart = Date.now();
+    _accentDriftTimer = setInterval(_accentDriftTick, 400);
+  }
+  _accentDriftTick(); // repaint now (applyPrefs just cleared the inline vars)
+}
+
 function applyPrefs() {
   try {
     const p = (state && state.prefs) || {};
@@ -707,6 +737,11 @@ function applyPrefs() {
     } else {
       b.removeAttribute('data-accent');
     }
+    // Dynamic accent (Malik, v576): the default accent slowly drifts through the
+    // colored-M palette (purple -> blue -> pink). Inline body vars only, no
+    // data-accent attr, so module colors and the beams stay stock. Static purple
+    // under reduce-motion.
+    try { applyAccentDrift(p); } catch (eDrift) {}
     // Monochrome: desaturate the whole app (filter lives on <html>).
     if (document.documentElement) document.documentElement.classList.toggle('mono-theme', accent === 'mono');
     // Light theme: the class lives on <html> so the :root ink-derived tokens
@@ -740,8 +775,10 @@ function applyPrefs() {
     // REMOVED so the look comes purely from the CSS token defaults.
     const root = document.documentElement;
     if (root) {
+      // Floor 0.35 (Malik, v576): fully square corners never looked good, so
+      // "Sharp" still keeps a hint of radius. Also rescues older saved 0s.
       const rx = (typeof p.uiRadius === 'number' && isFinite(p.uiRadius))
-        ? Math.min(1.4, Math.max(0, p.uiRadius)) : 1;
+        ? Math.min(1.4, Math.max(0.35, p.uiRadius)) : 1;
       if (rx === 1) root.style.removeProperty('--rx');
       else root.style.setProperty('--rx', String(rx));
       // Backdrop-blur multiplier (--bx). Every backdrop-filter blur in the app

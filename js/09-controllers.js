@@ -4441,25 +4441,26 @@ const TabBar = {
     const customHex = (prefs.accentCustom && /^#?[0-9a-fA-F]{3,6}$/.test(prefs.accentCustom))
       ? (prefs.accentCustom[0] === '#' ? prefs.accentCustom : '#' + prefs.accentCustom)
       : '#7b61ff';
+    // Primary color selector (Malik, v576): one of each, Dynamic first (the
+    // colored-M drift), Custom last. Old keys keep working if already saved.
     const swatches = [
-      ['default', 'Dynamic', '#7b61ff'],
-      ['cyan', 'Cyan', '#2bd4d4'],
-      ['green', 'Green', '#34d97a'],
-      ['amber', 'Amber', '#ffb73d'],
-      ['rose', 'Rose', '#ff6b9d'],
+      ['default', 'Dynamic', ''],
+      ['crimson', 'Red', '#ff4d6d'],
       ['blue', 'Blue', '#4f8cff'],
-      ['teal', 'Teal', '#19c3a6'],
-      ['lime', 'Lime', '#a3e635'],
+      ['rose', 'Pink', '#ff6b9d'],
       ['orange', 'Orange', '#ff8a3d'],
-      ['crimson', 'Crimson', '#ff4d6d'],
-      ['magenta', 'Magenta', '#e84de8'],
-      ['mono', 'Monochrome', '#cfcfcf'],
+      ['amber', 'Yellow', '#ffb73d'],
+      ['green', 'Green', '#34d97a'],
+      ['mono', 'Mono', '#cfcfcf'],
       ['custom', 'Custom', customHex]
     ];
     const swatchHtml = swatches.map(([key, label, col]) => {
       const sel = key === accent;
+      const dot = key === 'default'
+        ? '<span class="pref-swatch__dot pref-swatch__dot--dynamic"></span>'
+        : '<span class="pref-swatch__dot" style="background:' + col + ';box-shadow:0 0 0 1px rgba(var(--ink),0.18), 0 0 10px ' + col + '66;"></span>';
       return '<button type="button" class="pref-swatch' + (sel ? ' pref-swatch--active' : '') + '" data-accent="' + key + '" aria-pressed="' + sel + '" aria-label="' + label + ' accent" title="' + label + '">' +
-        '<span class="pref-swatch__dot" style="background:' + col + ';box-shadow:0 0 0 1px rgba(var(--ink),0.18), 0 0 10px ' + col + '66;"></span>' +
+        dot +
         '<span class="pref-swatch__label">' + label + '</span>' +
       '</button>';
     }).join('');
@@ -4525,45 +4526,15 @@ const TabBar = {
       '</div>';
     return '' +
       '<div style="padding: 20px 0;">' +
-        '<div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-2); margin-bottom: 12px;">Preferences</div>' +
-        '<div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); margin-bottom: 10px;">Appearance</div>' +
+        '<div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-2); margin-bottom: 12px;">Appearance</div>' +
         toggleRow('prefLightMode', 'Light mode', 'Switch the whole app to a bright, premium off-white theme.', prefs.theme === 'light') +
-        toggleRow('prefFlatBg', 'Minimal background', 'Hide the ambient orbs and glow for a flat, paper-like surface.', !!prefs.flatBg) +
         toggleRow('prefFlatUi', 'Glass', 'Glassy, blurred surfaces with depth. Turn off for a flat, high-contrast matte look.', !prefs.flatUi) +
-        '<div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); margin: 18px 0 10px;">Themes</div>' +
-        '<div class="pref-swatches" id="prefThemes">' + themesHtml + '</div>' +
-        '<div style="font-size: 0.6875rem; color: var(--text-3); margin: 8px 0 0;">One tap sets the whole look. Everything below stays adjustable.</div>' +
-        '<div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); margin: 18px 0 10px;">Background</div>' +
-        '<div class="pref-swatches" id="prefBackground">' + bgHtml + '</div>' +
-        '<input type="file" id="prefBgUploadInput" accept="image/*" style="display:none;" />' +
-        bgLinkRow +
-        bgDimRow +
-        '<div style="height:18px;"></div>' +
-        '<div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); margin-bottom: 10px;">Accent</div>' +
+        toggleRow('prefFlatBg', 'Minimal background', 'Hide the ambient orbs and glow for a flat, paper-like surface.', !!prefs.flatBg) +
+        '<div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); margin: 18px 0 10px;">Color</div>' +
         '<div class="pref-swatches" id="prefAccent">' + swatchHtml + '</div>' +
         '<input type="color" id="prefAccentCustomInput" value="' + customHex + '" aria-label="Pick a custom accent color" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;" />' +
-        '<div style="font-size: 0.6875rem; color: var(--text-3); margin: 8px 0 16px;">Retints shared highlights and focus rings. Each module keeps its own color. Pick Custom for any color you like.</div>' +
-        toggleRow('prefReduceMotion', 'Reduce motion', 'Calms the orbiting ring, drifting glow, and ambient motion.', reduceMotion) +
-        toggleRow('prefCardTilt', 'Memento tilt', 'The Memento leans toward your cursor as you move the mouse.', !!prefs.cardTilt) +
-        toggleRow('prefCompact', 'Compact density', 'Tightens spacing so more fits on screen.', compact) +
-        toggleRow('prefWeekMonday', 'Weeks start Monday', 'Aligns the heatmap and calendars to Monday columns.', (state.prefs && state.prefs.weekStart === 'mon')) +
-        toggleRow('prefMorningRitual', 'Morning ritual', 'A 20-second start on the first open of each morning.', (state.prefs && state.prefs.morningRitual === 'on')) +
-        '<div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); margin: 18px 0 8px;">Sidebar</div>' +
-        (function () {
-          const sbp = (state.prefs && state.prefs.sidebarSections) || {};
-          return toggleRow('prefSbNeutron', 'Neutron Star', 'Pin your goal in the menu.', !!sbp.neutron) +
-            toggleRow('prefSbAction', "Today's action", 'Pin the day\u2019s one move.', !!sbp.action) +
-            toggleRow('prefSbTimeleft', 'Time left', 'Days remaining to your goal.', !!sbp.timeleft) +
-            toggleRow('prefSbStreak', 'Consistency', 'Your streak count.', !!sbp.streak) +
-            toggleRow('prefSbDeepwork', 'Deep work today', 'Sessions logged today.', !!sbp.deepwork);
-        })() +
-        '<div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); margin: 18px 0 8px;">Feel</div>' +
-        sliderRow('prefUiRadius', 'Corner radius', 'Sharp', 'Round', 0, 1.4, 'any', uiRadius) +
-        sliderRow('prefUiGlass', 'Surface opacity', 'Glass', 'Solid', -0.25, 1, 'any', uiGlass) +
-        sliderRow('prefUiBlur', 'Blur', 'Crisp', 'Frosted', 0, 1.5, 'any', uiBlur) +
-        // Live demo of the three sliders. Pure tokens (--rx / --bx / --wfill-*)
-        // over its own colorful inner backdrop, so changes read instantly even
-        // on a plain black app background.
+        '<div style="height:14px;"></div>' +
+        sliderRow('prefUiRadius', 'Corner radius', 'Sharp', 'Round', 0.35, 1.4, 'any', Math.max(0.35, uiRadius)) +
         '<div class="feel-preview" aria-hidden="true">' +
           '<div class="feel-preview__bg"></div>' +
           '<div class="feel-preview__card">' +
@@ -4575,14 +4546,20 @@ const TabBar = {
           '</div>' +
         '</div>' +
         '<div class="feel-preview__caption">Live preview</div>' +
-        '<div style="display:flex; justify-content:flex-end; margin: 10px 0 4px;">' +
-          '<button type="button" id="prefFeelReset" class="pref-feel-reset">Reset feel</button>' +
-        '</div>' +
-        '<div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); margin: 18px 0 8px;">Modules</div>' +
-        toggleRow('prefUnlockAll', 'Unlock everything', 'Skip the gradual module unlocks and show every module now.', !!prefs.unlockAll) +
-        '<div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); margin: 18px 0 8px;">Your anchor quote</div>' +
-        '<input type="text" id="prefAnchorQuote" maxlength="160" placeholder="One line that gets you moving..." value="' + esc(prefs.anchorQuote || '') + '" style="width:100%;box-sizing:border-box;font:inherit;font-size:0.9rem;color:var(--text-hi);background:var(--surface-1);border:1px solid transparent;border-radius:calc(8px * var(--rx, 1));padding:11px 13px;outline:none;" />' +
-        '<div style="font-size: 0.6875rem; color: var(--text-3); margin-top: 8px;">Takes over the daily line on your dashboard. Leave blank to rotate the defaults.</div>' +
+        '<div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-2); margin: 22px 0 12px;">Behavior</div>' +
+        toggleRow('prefReduceMotion', 'Reduce motion', 'Calms the orbiting ring, drifting glow, and ambient motion.', reduceMotion) +
+        toggleRow('prefCardTilt', 'Memento tilt', 'The Memento leans toward your cursor as you move the mouse.', !!prefs.cardTilt) +
+        toggleRow('prefCompact', 'Compact density', 'Tightens spacing and type so more fits on screen.', compact) +
+        toggleRow('prefWeekMonday', 'Weeks start Monday', 'Aligns the heatmap and calendars to Monday columns.', (state.prefs && state.prefs.weekStart === 'mon')) +
+        '<div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); margin: 18px 0 8px;">Sidebar</div>' +
+        (function () {
+          const sbp = (state.prefs && state.prefs.sidebarSections) || {};
+          return toggleRow('prefSbNeutron', 'Neutron Star', 'Pin your goal in the menu.', !!sbp.neutron) +
+            toggleRow('prefSbAction', "Today's action", 'Pin the day\u2019s one move.', !!sbp.action) +
+            toggleRow('prefSbTimeleft', 'Time left', 'Days remaining to your goal.', !!sbp.timeleft) +
+            toggleRow('prefSbStreak', 'Consistency', 'Your streak count.', !!sbp.streak) +
+            toggleRow('prefSbDeepwork', 'Deep work today', 'Sessions logged today.', !!sbp.deepwork);
+        })() +
       '</div>';
   },
 
@@ -4892,52 +4869,30 @@ const TabBar = {
   // Support + contact: the closeness moat. One builder you can actually reach.
   renderSupportSection() {
     if (!state.support) state.support = { contacts: { discord: 'https://discord.gg/UNbPAUc3y4', email: 'mpeac3@gmail.com' }, feedbackQueue: [] };
-    const sp = state.support; const c = sp.contacts || {};
+    const c = state.support.contacts || {};
     const discordUrl = c.discord || 'https://discord.gg/UNbPAUc3y4';
     const emailAddr = c.email || 'mpeac3@gmail.com';
-    const SECLABEL = 'font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-2); margin-bottom: 12px;';
-    const variant = (state.prefs && state.prefs.guaranteeVariant === 'b') ? 'b' : 'a';
-    const guarantee = variant === 'b'
-      ? 'The Unmissable Guarantee. If Memento has not helped you stop drifting within 30 days, email me and I will refund you in full. And I read every message myself.'
-      : 'The Unmissable Promise. I read and reply to every message myself. If you are stuck or something is missing, I will personally help you get unstuck.';
-    const changelog = [
-      ['You asked for a way to reach me', 'Added this Support tab with a direct line and a Discord.'],
-      ['You wanted notes that feel lived in', 'Folders, Recently Deleted, and a full notes app in Reflection.'],
-      ['You wanted a real vision board', 'An infinite, zoomable Vivere canvas with multiple boards.'],
-    ];
+    const open = !!this._supportOpen;
     const BTN = 'flex:1; text-decoration:none; text-align:center; display:inline-flex; align-items:center; justify-content:center; gap:7px;';
+    // One tappable row (Malik, v576); everything personal lives inside it.
     return '' +
-      '<div style="' + SECLABEL + '">Support and contact</div>' +
-      '<div style="font-size:0.8125rem; color:var(--text-2); line-height:1.55; margin-bottom:14px;">Memento is built by one person, on purpose. You can reach me directly, and I actually answer.</div>' +
-      '<div class="support-guarantee">' + esc(guarantee) + '</div>' +
-      '<div style="display:flex; gap:8px; margin:14px 0;">' +
-        '<a class="sheet-btn" style="' + BTN + ' background:rgba(88,101,242,0.16); color:#aab4ff; border:1px solid rgba(88,101,242,0.4);" href="' + esc(/^https?:\/\//i.test(discordUrl) ? discordUrl : '#').replace(/"/g, '&quot;') + '" target="_blank" rel="noopener">Join the Discord</a>' +
-        '<a class="sheet-btn" style="' + BTN + ' background:var(--kfill-05); color:var(--text-hi); border:1px solid transparent;" href="mailto:' + esc(emailAddr).replace(/"/g, '&quot;') + '">Email me</a>' +
-      '</div>' +
-      '<div style="' + SECLABEL + ' margin-top:18px;">Send an idea, a bug, or a note</div>' +
-      '<div class="fb-kinds" id="fbKind">' +
-        '<button type="button" class="fb-chip fb-chip--on" data-fb-kind="idea">Idea</button>' +
-        '<button type="button" class="fb-chip" data-fb-kind="bug">Bug</button>' +
-        '<button type="button" class="fb-chip" data-fb-kind="love">Love note</button>' +
-      '</div>' +
-      '<textarea id="fbText" class="wiz__text-input" rows="3" placeholder="What would make Memento better for you?" style="margin:8px 0; resize:vertical; min-height:70px;"></textarea>' +
-      '<button class="sheet-btn" id="fbSend" style="background:rgba(191,90,242,0.14); color:var(--color-reflection); border:1px solid rgba(191,90,242,0.32);">Send to Malik</button>' +
-      '<div id="fbMsg" style="font-size:0.6875rem; color:var(--text-3); margin-top:8px; text-align:center;"></div>' +
-      '<button type="button" class="support-disclose" id="whyBuilt">Why I built this</button>' +
-      '<div id="whyBuiltBody" class="support-story" style="display:none;">' +
-        '<p>I watched years blur past on autopilot. Days I could not tell apart, a life I was not actually choosing. Memento is the tool I needed: something that keeps what I want in front of me and counts the days I actually show up.</p>' +
-        '<p>I cannot outspend the big apps. But I can build the thing I would want, listen to the people who use it, and answer when you reach out. That is the whole bet.</p>' +
-      '</div>' +
-      '<div style="' + SECLABEL + ' margin-top:20px;">You asked, I shipped</div>' +
-      '<ul class="support-changelog">' + changelog.map(function (it) { return '<li><strong>' + esc(it[0]) + '.</strong> ' + esc(it[1]) + '</li>'; }).join('') + '</ul>' +
-      '<details class="support-edit"><summary>Edit contact links</summary>' +
-        '<label>Discord invite<input type="text" id="spDiscord" value="' + esc(discordUrl) + '"></label>' +
-        '<label>Contact email<input type="text" id="spEmail" value="' + esc(emailAddr) + '"></label>' +
-        '<label class="support-edit__row">Guarantee wording' +
-          '<select id="spGuarantee"><option value="a"' + (variant === 'a' ? ' selected' : '') + '>Relationship (no refund)</option><option value="b"' + (variant === 'b' ? ' selected' : '') + '>Money-back</option></select>' +
-        '</label>' +
-      '</details>' +
-      this.renderSpotifySettings();
+      '<button type="button" class="support-disclose" id="supportOpenRow" aria-expanded="' + (open ? 'true' : 'false') + '" style="display:flex;align-items:center;justify-content:space-between;width:100%;margin:0;">Support &amp; contact<span aria-hidden="true" style="color:var(--text-3);font-size:1rem;transform:rotate(' + (open ? '90deg' : '0deg') + ');transition:transform 0.2s ease;">\u203a</span></button>' +
+      '<div id="supportBody" style="display:' + (open ? 'block' : 'none') + '; padding-top:14px;">' +
+        '<div style="font-size:0.85rem; color:var(--text-hi); font-weight:600; line-height:1.55; margin-bottom:6px;">Memento is built by one person, me.</div>' +
+        '<div style="font-size:0.8125rem; color:var(--text-1); line-height:1.6; margin-bottom:14px;">I read and reply to every message myself. If you are stuck or something is missing, reach out and I will personally help you get unstuck.</div>' +
+        '<div class="fb-kinds" id="fbKind">' +
+          '<button type="button" class="fb-chip fb-chip--on" data-fb-kind="idea">Idea</button>' +
+          '<button type="button" class="fb-chip" data-fb-kind="bug">Bug</button>' +
+          '<button type="button" class="fb-chip" data-fb-kind="love">Love note</button>' +
+        '</div>' +
+        '<textarea id="fbText" class="wiz__text-input" rows="3" placeholder="What would make Memento better for you?" style="margin:8px 0; resize:vertical; min-height:70px;"></textarea>' +
+        '<button class="sheet-btn" id="fbSend" style="background:rgba(191,90,242,0.14); color:var(--color-reflection); border:1px solid rgba(191,90,242,0.32);">Send to Malik</button>' +
+        '<div id="fbMsg" style="font-size:0.6875rem; color:var(--text-3); margin-top:8px; text-align:center;"></div>' +
+        '<div style="display:flex; gap:8px; margin-top:12px;">' +
+          '<a class="sheet-btn" style="' + BTN + ' background:rgba(88,101,242,0.16); color:#aab4ff; border:1px solid rgba(88,101,242,0.4);" href="' + esc(/^https?:\/\//i.test(discordUrl) ? discordUrl : '#').replace(/"/g, '&quot;') + '" target="_blank" rel="noopener">Join the Discord</a>' +
+          '<a class="sheet-btn" style="' + BTN + ' background:var(--kfill-05); color:var(--text-hi); border:1px solid transparent;" href="mailto:' + esc(emailAddr).replace(/"/g, '&quot;') + '">Email me</a>' +
+        '</div>' +
+      '</div>';
   },
   renderSpotifySettings() {
     const SECLABEL = 'font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-2); margin: 22px 0 12px;';
@@ -4961,6 +4916,12 @@ const TabBar = {
       '</details>';
   },
   bindSupportSection() {
+    const rowBtn = document.getElementById('supportOpenRow');
+    if (rowBtn) rowBtn.addEventListener('click', () => {
+      this._supportOpen = !this._supportOpen;
+      const ss = document.getElementById('supportSection');
+      if (ss) { ss.innerHTML = this.renderSupportSection(); this.bindSupportSection(); }
+    });
     const root = document.getElementById('supportSection');
     if (!root) return;
     if (!state.support) state.support = { contacts: {}, feedbackQueue: [] };
@@ -5067,33 +5028,15 @@ const TabBar = {
     const rem = (state.prefs && state.prefs.reminder) || {};
     body.innerHTML = `
       <div style="text-align:center; padding: 32px 0 24px;">
-        <div id="profAvatar" style="width: 64px; height: 64px; border-radius: 50%; background-color: rgba(123,97,255,0.15); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-size: 1.5rem; color: var(--color-clarity); border: 1px solid var(--hairline); overflow: hidden;">${esc((state.profile.name || 'U').charAt(0).toUpperCase())}</div>
+        <div id="profAvatar" style="width: 96px; height: 96px; border-radius: 50%; background-color: rgba(123,97,255,0.15); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; font-size: 2.1rem; color: var(--color-clarity); border: 1px solid var(--hairline); overflow: hidden;">${esc((state.profile.name || 'U').charAt(0).toUpperCase())}</div>
         <div style="display:flex; gap:14px; justify-content:center; margin-bottom: 14px;">
           <button type="button" id="profAvatarPick" style="font:500 0.75rem/1 inherit; cursor:pointer; border:none; background:transparent; color:var(--text-2); padding:4px 2px;">${state.profile.avatarId ? 'Change photo' : 'Add photo'}</button>
           <button type="button" id="profAvatarRemove" style="font:500 0.75rem/1 inherit; cursor:pointer; border:none; background:transparent; color:var(--text-3); padding:4px 2px; ${state.profile.avatarId ? '' : 'display:none;'}">Remove</button>
         </div>
         <input type="file" id="profAvatarFile" accept="image/*" hidden>
-        <div style="font-size: 1.25rem; font-weight: 700;">${esc(state.profile.name || 'User')}</div>
+        <div style="font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em;">${esc(state.profile.name || 'User')}</div>
         <div style="font-size: 0.875rem; color: var(--text-2); margin-top: 4px;">${esc(state.profile.email || '')}</div>
-      </div>
-      <button type="button" id="profCoachOpen" aria-label="Talk to Memento" style="display:flex;align-items:center;gap:13px;width:100%;text-align:left;font:inherit;cursor:pointer;border:none;border-radius:calc(14px * var(--rx,1));padding:15px 16px;margin-bottom:14px;background:var(--kfill-04);box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);">
-        <span aria-hidden="true" style="width:38px;height:38px;flex:0 0 auto;border-radius:11px;background:linear-gradient(160deg,rgba(165,140,255,0.92),rgba(120,90,230,0.88));box-shadow:0 0 16px rgba(150,116,255,0.42),inset 0 1px 0 rgba(255,255,255,0.25);"></span>
-        <span style="min-width:0;">
-          <span style="display:block;font-size:0.95rem;font-weight:700;color:var(--text-hi);">Talk to Memento</span>
-          <span style="display:block;font-size:0.8rem;color:var(--text-2);line-height:1.35;margin-top:2px;">Your coach. Stuck, drifting, or just need to think it through.</span>
-        </span>
-      </button>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
-        <button type="button" id="profPathOpen" aria-label="Your path" style="display:flex;flex-direction:column;gap:8px;text-align:left;font:inherit;cursor:pointer;border:none;border-radius:calc(14px*var(--rx,1));padding:15px 15px;background:var(--kfill-04);box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);">
-          <span aria-hidden="true" style="width:30px;height:30px;border-radius:9px;background:linear-gradient(160deg,rgba(150,116,255,0.9),rgba(110,80,225,0.8));box-shadow:0 0 12px rgba(150,116,255,0.35);"></span>
-          <span style="display:block;font-size:0.92rem;font-weight:700;color:var(--text-hi);">Your path</span>
-          <span style="display:block;font-size:0.76rem;color:var(--text-2);line-height:1.3;">From today up to your goal.</span>
-        </button>
-        <button type="button" id="profStoryOpen" aria-label="Your story" style="display:flex;flex-direction:column;gap:8px;text-align:left;font:inherit;cursor:pointer;border:none;border-radius:calc(14px*var(--rx,1));padding:15px 15px;background:var(--kfill-04);box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);">
-          <span aria-hidden="true" style="width:30px;height:30px;border-radius:9px;background:linear-gradient(160deg,rgba(52,211,153,0.9),rgba(40,170,120,0.8));box-shadow:0 0 12px rgba(52,211,153,0.35);"></span>
-          <span style="display:block;font-size:0.92rem;font-weight:700;color:var(--text-hi);">Your story</span>
-          <span style="display:block;font-size:0.76rem;color:var(--text-2);line-height:1.3;">Every proof you have stacked.</span>
-        </button>
+        <input type="text" id="prefAnchorQuote" maxlength="160" placeholder="One line that gets you moving..." value="${esc((state.prefs && state.prefs.anchorQuote) || '')}" style="margin:14px auto 0;display:block;width:100%;max-width:340px;box-sizing:border-box;text-align:center;font:inherit;font-size:0.85rem;color:var(--text-1);background:var(--kfill-04);border:none;border-radius:calc(10px * var(--rx,1));padding:10px 14px;outline:none;box-shadow:inset 0 1px 0 rgba(255,255,255,0.05);" />
       </div>
       ${(typeof window !== 'undefined' && window.MementoInstall && !window.MementoInstall._isStandalone()) ? `
       <button type="button" id="profInstallApp" aria-label="Add Memento to your home screen" style="display:flex;align-items:center;gap:13px;width:100%;text-align:left;font:inherit;cursor:pointer;border:none;border-radius:calc(14px * var(--rx,1));padding:15px 16px;margin-bottom:14px;background:var(--kfill-04);box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);">
@@ -5112,45 +5055,7 @@ const TabBar = {
         <input type="text" id="profFullName" maxlength="60" value="${esc(state.profile.fullName || '')}" placeholder="First and last" style="${FIELD}" />
         <div style="${FLABEL}">Birthday${(function () { const a = (typeof ageFromBirthday === 'function') ? ageFromBirthday(state.profile.birthday) : null; return a != null ? ' <span style="text-transform:none;letter-spacing:0;color:var(--text-lo);">(' + a + ' years old)</span>' : ''; })()}</div>
         <input type="date" id="profBirthday" value="${esc(state.profile.birthday || '')}" style="${FIELD}color-scheme:dark;" />
-        <div style="${FLABEL}">What you are running toward</div>
-        <input type="text" id="profRunningToward" maxlength="120" value="${esc(state.profile.runningToward || '')}" placeholder="The person or life you are building" style="${FIELD}" />
-        <div style="${FLABEL}">Your story</div>
-        <textarea id="profStory" maxlength="600" rows="3" placeholder="A few lines on where you are and where you want to be." style="${FIELDTA}">${esc(state.profile.story || '')}</textarea>
-        <div style="${FLABEL}">Letter to your future self</div>
-        <textarea id="profLetter" maxlength="800" rows="3" placeholder="Write to the you reading this a year from now." style="${FIELDTA}">${esc(state.profile.letterToFutureSelf || '')}</textarea>
         <div style="font-size: 0.6875rem; color: var(--text-3); margin-top: 8px;">Saved on this device. Used across Clarity and Reflection.</div>
-      </div>
-      <div class="sheet-divider"></div>
-      <div style="padding: 20px 0;">
-        <div style="${SECLABEL}">Your return cue</div>
-        <div style="font-size: 0.6875rem; color: var(--text-3); margin: 0 0 10px;">A small habit to hook this to. Memento gives it back to you the first time you open it on a new day.</div>
-        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-          <span style="font-size:0.9rem; color:var(--text-2);">When I</span>
-          <input type="text" id="profReturnCue" maxlength="80" value="${esc(state.profile.returnCue || '')}" placeholder="finish my coffee" style="${FIELD}flex:1; min-width:140px; width:auto;" />
-          <span style="font-size:0.9rem; color:var(--text-2);">, I open Memento.</span>
-        </div>
-      </div>
-      <div class="sheet-divider"></div>
-      <div style="padding: 20px 0;">
-        <div style="${SECLABEL}">Dashboard layout</div>
-        <div style="font-size: 0.6875rem; color: var(--text-3); margin: 0 0 12px;">Reorder your modules, hide what you do not use, resize them, and save named layouts.</div>
-        <button class="sheet-btn" id="prefCustomizeLayout" style="background: var(--kfill-05); color: var(--text-hi); border: 1px solid var(--hairline);">Customize dashboard</button>
-      </div>
-      <div class="sheet-divider"></div>
-      <div style="padding: 20px 0;">
-        <div style="${SECLABEL}">Daily reminder</div>
-        <div class="pref-row">
-          <div class="pref-row__text"><div class="pref-row__title">Daily nudge</div><div class="pref-row__sub">A gentle reminder to show up. Browser notifications fire only while a Memento tab is open.</div></div>
-          <button type="button" id="prefReminderOn" class="pref-toggle${rem.enabled ? ' pref-toggle--on' : ''}" role="switch" aria-checked="${rem.enabled ? 'true' : 'false'}" aria-label="Daily nudge"><span class="pref-toggle__knob"></span></button>
-        </div>
-        <div style="display:flex; gap:14px; align-items:center; margin-top:12px; flex-wrap:wrap;">
-          <label style="font-size:0.75rem; color:var(--text-2);">Time<input type="time" id="prefReminderTime" value="${esc(rem.time || '09:00')}" style="${FIELDS}"></label>
-          <label style="font-size:0.75rem; color:var(--text-2);">Quiet from<input type="time" id="prefQuietStart" value="${esc(rem.quietStart || '22:00')}" style="${FIELDS}"></label>
-          <label style="font-size:0.75rem; color:var(--text-2);">to<input type="time" id="prefQuietEnd" value="${esc(rem.quietEnd || '07:00')}" style="${FIELDS}"></label>
-        </div>
-        <button class="sheet-btn" id="prefNotifyEnable" style="margin-top:14px; background: rgba(123,97,255,0.12); color: var(--color-clarity); border: 1px solid rgba(123,97,255,0.25);">Enable browser notifications</button>
-        <button class="sheet-btn" id="prefNotifyTest" style="margin-top:8px; background: var(--kfill-04); color: var(--text-1);">Send a test notification now</button>
-        <div id="prefReminderMsg" style="font-size:0.6875rem; color: var(--text-3); margin-top:8px;"></div>
       </div>
       <div class="sheet-divider"></div>
       <div style="padding: 20px 0;" id="acctSection">${this.renderAccountSection()}</div>
