@@ -3127,8 +3127,72 @@ html.lowfx .nsv2-reveal__w, html.lowfx .nsv2-reveal__after, html.lowfx .nsv2-rev
 .nsv2-starscene { display: flex; flex-direction: column; align-items: center; }
 /* The ceremony star is the real pulsar shader canvas (v585); no clip so the
    jets melt into the black, negative margin tightens the gap to the goal text
-   since the canvas carries its own dark padding. */
-.nsv2-star__blob { display: block; width: min(82vw, 430px); height: min(82vw, 430px); margin: 0 auto -36px; border-radius: 0; }
+   since the canvas carries its own dark padding. v586: near full-screen. */
+.nsv2-star__blob { display: block; width: min(100vw, 560px); height: min(100vw, 560px); margin: -4vh auto -52px; border-radius: 0; }
+
+/* Synthesis loading (v586): the marbled star (no jets) slowly condensing.
+   The wrapper scales down over the whole wait; the shader keeps breathing. */
+.synth-condense { display: flex; justify-content: center; }
+.synth-condense__star {
+  display: block;
+  width: min(72vw, 340px); height: min(72vw, 340px);
+  border-radius: 0;
+  animation: synthCondense 14s cubic-bezier(0.55, 0, 0.65, 1) forwards;
+}
+@keyframes synthCondense {
+  0%   { transform: scale(1.12); }
+  100% { transform: scale(0.5); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .synth-condense__star { animation: none; transform: scale(0.85); }
+}
+
+/* The signature top-left beams inside the ceremony (v586): born during the
+   press-and-hold, driven by --holdp (0..1), flooding at the collapse. */
+.nsv2__rays {
+  position: absolute; top: -6%; left: -10%;
+  width: 90%; height: 80%;
+  transform: rotate(36deg); transform-origin: 0 0;
+  opacity: 0; pointer-events: none; z-index: 1;
+}
+.nsv2__rays i {
+  position: absolute; left: 0;
+  height: 30px; border-radius: 999px;
+  background: linear-gradient(90deg, rgba(205, 195, 255, 0.9), rgba(160, 145, 255, 0.35) 55%, transparent);
+  filter: blur(8px);
+}
+.nsv2__rays i:nth-child(1) { top: 0;     width: 120%; }
+.nsv2__rays i:nth-child(2) { top: 60px;  width: 95%;  height: 22px; opacity: 0.75; }
+.nsv2__rays i:nth-child(3) { top: 118px; width: 135%; height: 38px; opacity: 0.9; }
+.nsv2__rays i:nth-child(4) { top: 196px; width: 85%;  height: 20px; opacity: 0.6; }
+.nsv2__rays i:nth-child(5) { top: 252px; width: 110%; height: 30px; opacity: 0.8; }
+.nsv2.is-holding .nsv2__rays {
+  opacity: calc(var(--holdp, 0) * var(--holdp, 0));
+  filter: brightness(calc(0.7 + var(--holdp, 0) * 1.8));
+}
+.nsv2.is-collapsing .nsv2__rays,
+.nsv2.is-collapsing-lite .nsv2__rays {
+  opacity: 1;
+  filter: brightness(2.6);
+  transition: opacity 0.25s ease, filter 0.25s ease;
+}
+/* The sentence trembles harder as the hold deepens. */
+.nsv2.is-holding .nsv2-reveal__goal {
+  animation: nsv2HoldShake 0.42s linear infinite;
+  transform: scale(calc(1 + var(--holdp, 0) * 0.02));
+}
+@keyframes nsv2HoldShake {
+  0%   { translate: 0 0; }
+  20%  { translate: calc(var(--holdp, 0) * 2.4px) calc(var(--holdp, 0) * -1.6px); }
+  40%  { translate: calc(var(--holdp, 0) * -2.0px) calc(var(--holdp, 0) * 2.0px); }
+  60%  { translate: calc(var(--holdp, 0) * 1.6px) calc(var(--holdp, 0) * 1.2px); }
+  80%  { translate: calc(var(--holdp, 0) * -2.4px) calc(var(--holdp, 0) * -1.2px); }
+  100% { translate: 0 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nsv2.is-holding .nsv2-reveal__goal { animation: none; transform: none; }
+  .nsv2.is-holding .nsv2__rays { opacity: calc(var(--holdp, 0) * 0.5); }
+}
 .nsv2-star { position: relative; width: 380px; height: 380px; margin: 0 auto 2px; }
 .nsv2-star__halo { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); border-radius: 50%; mix-blend-mode: screen; }
 .nsv2-star__halo--far  { width: 320px; height: 320px; background: radial-gradient(circle, rgba(var(--star-glow), 0.14) 0%, transparent 70%); animation: nsv2Breathe 44s ease-in-out infinite; }

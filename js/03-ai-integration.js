@@ -2377,12 +2377,17 @@ function renderAiSynthesis() {
     if (!aiSynthesisLoading && !aiSynthesisResult) {
       setTimeout(() => triggerSynthesis(), 100);
     }
-    // v579 (Malik): the synthesis loading IS the final collapse. The forming
-    // star from the conversation pulls its last matter in and shakes, then the
-    // ignition ceremony (reveal -> hold -> star) is the explosion.
+    // v586 (Malik): the synthesis loading is the star itself slowly CONDENSING,
+    // the real marbled star (no pulsar jets yet; the jets arrive at ignition).
+    setTimeout(() => {
+      try {
+        const c = document.getElementById('synthCondenseStar');
+        if (c && !c.dataset.init && typeof initStarBlob === 'function') { c.dataset.init = '1'; initStarBlob(c, 480); }
+      } catch (e) {}
+    }, 60);
     return '<div class="ai-thinking">' +
-      '<div class="forming-star fs--collapse" aria-hidden="true"><i class="fs-neb"></i><i class="fs-neb fs-neb2"></i><i class="fs-core"></i></div>' +
-      '<div style="text-align:center;color:var(--text-1);font-size:0.875rem;margin-top:26px;">Collapsing everything you said into your Neutron Star...</div></div>';
+      '<div class="synth-condense" aria-hidden="true"><canvas id="synthCondenseStar" class="synth-condense__star"></canvas></div>' +
+      '<div style="text-align:center;color:var(--text-1);font-size:0.875rem;margin-top:6px;">Condensing your Neutron Star...</div></div>';
   }
 
   if (!aiSynthesisResult && aiChatError) {

@@ -7488,14 +7488,14 @@ function renderIgnitionV2(summary) {
         <div class="nsv2-eyebrow nsv2-reveal__eyebrow">Your Neutron Star</div>
         <div class="nsv2-reveal__goal">${wordEls}</div>
         <div class="nsv2-reveal__after" style="animation-delay:${afterDelay}ms">
-          <div class="nsv2-hold" id="nsv2Hold" role="button" tabindex="0" aria-label="Press and hold to make it yours">
+          <div class="nsv2-hold" id="nsv2Hold" role="button" tabindex="0" aria-label="Press and hold to collapse">
             <svg viewBox="0 0 76 76" aria-hidden="true">
               <circle class="nsv2-hold__track" cx="38" cy="38" r="33"/>
               <circle class="nsv2-hold__fill" id="nsv2HoldFill" cx="38" cy="38" r="33"/>
             </svg>
             <span class="nsv2-hold__core" aria-hidden="true"></span>
           </div>
-          <div class="nsv2-reveal__hint">Read it once more. If it is true,<br><span>press and hold to make it yours.</span></div>
+          <div class="nsv2-reveal__hint"><span>Press and hold to collapse.</span></div>
           <button type="button" class="nsv2-reveal__no" id="nsv2No">Not quite</button>
         </div>
       </div>`;
@@ -7520,15 +7520,14 @@ function renderIgnitionV2(summary) {
         <canvas class="nsv2-star__blob" id="nsv2StarBlob" aria-hidden="true"></canvas>
         <div class="nsv2-after">
           <div class="nsv2-after__goal">${esc(goal)}</div>
-          <div class="nsv2-after__line">A star is not a plan. It needs a first move.</div>
           <button type="button" class="nsv2-cta" id="nsv2Action">Take the first step</button>
-          <button type="button" class="nsv2-reveal__no" id="nsv2Done">Done for now</button>
         </div>
       </div>`;
   }
 
   return `
     <div class="nsv2" id="nsv2Root" data-act="${esc(_ig2Act)}">
+      <div class="nsv2__rays" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
       <div class="nsv2__dust" aria-hidden="true"></div>
       <div class="nsv2__vignette" aria-hidden="true"></div>
       <div class="nsv2__inner">${inner}</div>
@@ -7587,7 +7586,7 @@ function bindIgnitionV2(container) {
     });
   } else if (act === 'star') {
     const blob = root.querySelector('#nsv2StarBlob');
-    if (blob && typeof initStarBlob === 'function') { setTimeout(() => { try { initStarBlob(blob, 480, 'pulsar'); } catch (e) {} }, 40); }
+    if (blob && typeof initStarBlob === 'function') { setTimeout(() => { try { initStarBlob(blob, 720, 'pulsar'); } catch (e) {} }, 40); }
     _bindStarPlacard(root);
   }
 }
@@ -7603,7 +7602,11 @@ function _bindHoldToIgnite(root) {
   fill.style.strokeDasharray = String(CIRC);
   fill.style.strokeDashoffset = String(CIRC);
   let raf = null, start = 0, done = false;
-  const setP = (p) => { fill.style.strokeDashoffset = String(CIRC * (1 - p)); };
+  const setP = (p) => {
+    fill.style.strokeDashoffset = String(CIRC * (1 - p));
+    // Drives the hold buildup: beams brighten, the sentence shakes harder.
+    root.style.setProperty('--holdp', String(p));
+  };
   const tick = (t) => {
     if (done) return;
     const p = Math.min(1, (t - start) / HOLD_MS);
@@ -7736,8 +7739,9 @@ function _bindStarPlacard(root) {
       // Same markup the real aiSynthesis step shows while Opus is working.
       ClarityExperience.pageWrap.innerHTML = '<div class="clarity-exp__page-inner">' +
         '<div class="ai-thinking">' +
-        '<div class="aur"><span class="aur-band b1"></span><span class="aur-band b2"></span><span class="aur-band b3"></span></div>' +
-        '<div style="text-align:center;color:var(--text-3);font-size:0.875rem;margin-top:20px;">Synthesizing your Neutron Star...</div></div></div>';
+        '<div class="synth-condense" aria-hidden="true"><canvas id="synthCondenseStar" class="synth-condense__star"></canvas></div>' +
+        '<div style="text-align:center;color:var(--text-1);font-size:0.875rem;margin-top:6px;">Condensing your Neutron Star...</div></div></div>';
+      setTimeout(() => { try { const c = document.getElementById('synthCondenseStar'); if (c && typeof initStarBlob === 'function') initStarBlob(c, 480); } catch (e) {} }, 60);
       ClarityExperience.navEl.innerHTML = '';
       // The real synthesis takes a while; 3s is enough to feel the cut.
       devSynthTimer = setTimeout(() => { showCeremony('reveal'); }, 3000);
