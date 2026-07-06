@@ -7547,6 +7547,7 @@ function renderIgnitionV2(summary) {
   return `
     <div class="nsv2" id="nsv2Root" data-act="${esc(_ig2Act)}">
       ${raysHtml}
+      <div class="nsv2__white" aria-hidden="true"></div>
       <div class="nsv2__dust" aria-hidden="true"></div>
       <div class="nsv2__vignette" aria-hidden="true"></div>
       <div class="nsv2__inner">${inner}</div>

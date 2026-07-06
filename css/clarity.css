@@ -3183,11 +3183,30 @@ html.lowfx .nsv2-reveal__w, html.lowfx .nsv2-reveal__after, html.lowfx .nsv2-rev
   transition: opacity 0.25s ease, filter 0.25s ease;
 }
 
+/* v589: as the hold gets close, the whole screen fades toward FULL white,
+   driven by the hold progress itself (kicks in past ~55%). 100lvh + fixed so
+   it truly covers every device edge to edge, notch to home indicator. */
+.nsv2__white {
+  position: fixed; top: 0; left: 0;
+  width: 100vw; height: 100lvh;
+  background: #fff; opacity: 0;
+  pointer-events: none; z-index: 60;
+  transition: opacity 0.25s linear;
+}
+.nsv2.is-holding .nsv2__white { opacity: clamp(0, (var(--holdp, 0) - 0.55) * 2.222, 1); }
+.nsv2.is-collapsing .nsv2__white,
+.nsv2.is-collapsing-lite .nsv2__white { opacity: 1; }
+
 /* v587 collapse: solid white flash filling the WHOLE screen, then a slow fade
    revealing the star already swapped in behind it, zooming out. */
 .nsv2__flare--v2 {
+  position: fixed; top: 0; left: 0;
+  width: 100vw; height: 100lvh;
   background: #fff;
   animation: nsv2FlareV2 2.9s cubic-bezier(0.3, 0, 0.35, 1) forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .nsv2.is-holding .nsv2__white { opacity: clamp(0, (var(--holdp, 0) - 0.55) * 1.1, 0.5); }
 }
 @keyframes nsv2FlareV2 {
   0%   { opacity: 0; transform: none; }
