@@ -431,7 +431,7 @@ void main(){
   uv.x *= u_res.x / u_res.y;
   // Zoomed OUT (v506): the canvas is much larger than the star so the jets have room to
   // run long and melt into black INSIDE the frame; the body keeps its visual size.
-  uv *= 1.9;
+  uv *= 2.05;
   float T = u_time;
   float phase = fract(T / 2.8);
   float beat = pow(max(sin(3.14159 * phase), 0.0), 2.2);
@@ -449,11 +449,11 @@ void main(){
   float across = dot(uv, vec2(-ax.y, ax.x));
   float aa = abs(along);
   float flow = 0.75 + 0.45 * snoise(vec2(aa * 4.0 - T * 2.2, across * 14.0));
-  float jw = 0.035 + 0.09 * aa;
-  // The fade completes at aa 2.0, BEFORE the jets reach the canvas edge (they exit at
-  // ~2.16 on the tilted axis), so they dissolve into the distance with no cutoff.
-  float jet = exp(-pow(across / jw, 2.0) * 2.5) * smoothstep(2.0, 0.45, aa) * smoothstep(0.18, 0.42, aa) * flow;
-  float ji = 0.78 + 0.22 * beat;
+  float jw = 0.045 + 0.11 * aa;
+  // v595: longer, wider, brighter jets (Malik). Fade completes at aa 2.3, still before
+  // the canvas edge (~2.33 on the tilted axis at the 2.05 zoom), so no cutoff.
+  float jet = exp(-pow(across / jw, 2.0) * 2.5) * smoothstep(2.3, 0.5, aa) * smoothstep(0.18, 0.42, aa) * flow;
+  float ji = 0.92 + 0.26 * beat;
   vec3 col = body * mask * (1.0 + 0.07 * beat);
   col += vec3(1.0) * core;
   col += vec3(0.58, 0.45, 1.0) * halo;
