@@ -7674,7 +7674,7 @@ function _ig2Signed(root) {
   const flare = document.createElement('div');
   flare.className = 'nsv2__flare' + (lite ? '' : ' nsv2__flare--v2');
   document.body.appendChild(flare);
-  setTimeout(() => { try { flare.remove(); } catch (e) {} }, lite ? 900 : 3000);
+  setTimeout(() => { try { flare.remove(); } catch (e) {} }, lite ? 900 : 3500);
 
   setTimeout(() => {
     _ig2Act = 'star';

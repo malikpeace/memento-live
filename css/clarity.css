@@ -3139,8 +3139,9 @@ html.lowfx .nsv2-reveal__w, html.lowfx .nsv2-reveal__after, html.lowfx .nsv2-rev
   border-radius: 0;
   /* v588: the slow phase shrinks steadily; the moment the synthesis result
      lands, finishCondenseThen (js/03) freezes this and drives the star down
-     to a LITERAL pixel (scale 0.003) before the cut is allowed to happen. */
-  animation: synthCondense 18s cubic-bezier(0.5, 0, 0.75, 0.6) forwards;
+     to a LITERAL pixel (scale 0.003) before the cut is allowed to happen.
+     v590: linear, so it is visibly shrinking from the very first frame. */
+  animation: synthCondense 18s linear forwards;
 }
 @keyframes synthCondense {
   0%   { transform: scale(1.1); }
@@ -3203,7 +3204,7 @@ html.lowfx .nsv2-reveal__w, html.lowfx .nsv2-reveal__after, html.lowfx .nsv2-rev
   position: fixed; top: 0; left: 0;
   width: 100vw; height: 100lvh;
   background: #fff;
-  animation: nsv2FlareV2 2.9s cubic-bezier(0.3, 0, 0.35, 1) forwards;
+  animation: nsv2FlareV2 3.4s cubic-bezier(0.3, 0, 0.35, 1) forwards;
 }
 @media (prefers-reduced-motion: reduce) {
   .nsv2.is-holding .nsv2__white { opacity: clamp(0, (var(--holdp, 0) - 0.55) * 1.1, 0.5); }
@@ -3214,12 +3215,16 @@ html.lowfx .nsv2-reveal__w, html.lowfx .nsv2-reveal__after, html.lowfx .nsv2-rev
   42%  { opacity: 1; }
   100% { opacity: 0; }
 }
-.nsv2[data-act="star"] .nsv2-star__blob { animation: nsv2StarZoomOut 3.2s cubic-bezier(0.22, 1, 0.36, 1) both; }
+/* v590: when the white fades you are INSIDE the star (scale 6.5, it fills the
+   screen), then it slowly pulls back to rest over ~4s. The gentle-start curve
+   keeps it huge while the white is still clearing, so white melts into star
+   surface with no jump cut. */
+.nsv2[data-act="star"] .nsv2-star__blob { animation: nsv2StarZoomOut 4.2s cubic-bezier(0.5, 0, 0.25, 1) both; }
 @keyframes nsv2StarZoomOut {
-  from { transform: scale(2.2); }
+  from { transform: scale(6.5); }
   to   { transform: scale(1); }
 }
-.nsv2[data-act="star"] .nsv2-after { animation: nsv2In 0.8s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: 1.5s; }
+.nsv2[data-act="star"] .nsv2-after { animation: nsv2In 0.9s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: 3.4s; }
 @media (prefers-reduced-motion: reduce) {
   .nsv2[data-act="star"] .nsv2-star__blob { animation: none; }
   .nsv2[data-act="star"] .nsv2-after { animation-delay: 0s; }
