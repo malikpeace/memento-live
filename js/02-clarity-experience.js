@@ -2202,8 +2202,28 @@ const ClarityExperience = {
         pct = Math.max(2, Math.min(100, pct));
       }
     }
+    // Which step are we on? The AI discovery replaces the bar with the FORMING
+    // STAR (v579, Malik): a diffuse cloud that contracts and brightens as the
+    // conversation compresses their answers, trembling near the end. The
+    // psychological read: progress IS star formation, not a loading bar.
+    let onAiChat = false;
+    try {
+      const _steps = getWizardSteps();
+      onAiChat = !this.tutorialOnly && _steps[this.currentPage - this.getWizardOffset()] === 'aiChat';
+    } catch (e) {}
     if (pct < 0) {
       this.progressEl.innerHTML = '';
+    } else if (onAiChat) {
+      const sp = Math.max(0, Math.min(1, (pct - 12) / 88));
+      let star = this.progressEl.querySelector('.forming-star');
+      if (!star) {
+        this.progressEl.innerHTML = '<div class="forming-star" aria-hidden="true"><i class="fs-neb"></i><i class="fs-core"></i></div>';
+        star = this.progressEl.querySelector('.forming-star');
+      }
+      if (star) {
+        star.style.setProperty('--sp', sp.toFixed(3));
+        star.classList.toggle('fs--tremble', sp > 0.82);
+      }
     } else {
       const fill = this.progressEl.querySelector('.ai-progress__fill');
       if (fill) {
