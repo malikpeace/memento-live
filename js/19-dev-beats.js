@@ -233,37 +233,48 @@
           b.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); try { onClick(); } catch (err) {} });
           return b;
         };
-        bar.appendChild(mk('Beginning', () => {
-          // The VERY beginning: the whole pre-clarity home (welcome hero, blank
-          // card, no beams, no modules), rendered for real. Tap again to restore.
-          document.body.classList.remove('card-evolving', 'card-evolve-go');
-          if (!window._evoBeginSnap) {
-            window._evoBeginSnap = JSON.stringify(state.clarity);
-            state.clarity.completed = false;
-            state.clarity.ignitedAt = null;
-            if (state.clarity.answers) state.clarity.answers.neutronStar = '';
-          } else {
-            try { state.clarity = JSON.parse(window._evoBeginSnap); } catch (e) {}
-            window._evoBeginSnap = null;
-          }
-          try { renderGrid(); } catch (e) {}
-          try { const cc = document.getElementById('commandCenter'); if (cc) { cc.innerHTML = renderCommandCenter(); bindCommandCenter(cc); } } catch (e) {}
-          try { renderDailyMemento(); } catch (e) {}
-        }));
-        bar.appendChild(mk('Blank', () => {
-          // Just the card stage: flip the slab to its pre-clarity look in place.
-          document.body.classList.remove('card-evolving', 'card-evolve-go');
-          document.body.classList.toggle('pre-clarity');
-        }));
-        bar.appendChild(mk('Evolution', () => {
-          // Replay the full ignition evolution: blank beat -> purple floods -> beams.
+        // ---- THE STAGE CINEMA ----
+        // Each button plays the LITERAL unlock animation for that stage: the
+        // pillar's light pours into the real card by animating the real
+        // per-pillar vars (--clar purple, --act white, --cons green).
+        const STAGES = {
+          beginning:   { clar: 0, act: 0,    cons: 0 },
+          clarity:     { clar: 1, act: 0,    cons: 0 },
+          action:      { clar: 1, act: 0.62, cons: 0 },
+          consistency: { clar: 1, act: 0.62, cons: 0.7 }
+        };
+        const setVars = (wrap, v) => {
+          wrap.style.setProperty('--clar', String(v.clar));
+          wrap.style.setProperty('--act', String(v.act));
+          wrap.style.setProperty('--cons', String(v.cons));
+          wrap.style.setProperty('--mix', String(Math.min(v.clar, v.cons) * 0.75));
+          wrap.style.setProperty('--lit', String(Math.max(v.clar, v.act, v.cons)));
+        };
+        const ORDER = ['beginning', 'clarity', 'action', 'consistency'];
+        const playStage = (key) => {
           document.body.classList.remove('pre-clarity', 'card-evolving', 'card-evolve-go');
-          state.meta = state.meta || {};
-          state.meta.cardEvolutionSeen = false;
-          if (state.clarity && !state.clarity.ignitedAt) state.clarity.ignitedAt = Date.now();
-          try { _cardEvolutionRunning = false; } catch (e) {}
-          _maybeRunCardEvolution();
-        }));
+          const wrap = document.querySelector('.daycard-wrap');
+          if (!wrap) return;
+          const from = STAGES[ORDER[Math.max(0, ORDER.indexOf(key) - 1)]];
+          const to = STAGES[key];
+          // snap to the previous stage instantly...
+          document.body.classList.remove('stage-cinema');
+          setVars(wrap, key === 'beginning' ? STAGES.beginning : from);
+          document.body.classList.toggle('ns-bloom', key !== 'beginning' && ORDER.indexOf(key) >= 1 && key !== 'clarity');
+          void wrap.offsetWidth;
+          // ...then pour the new pillar's light in, slow and cinematic.
+          setTimeout(() => {
+            document.body.classList.add('stage-cinema');
+            setVars(wrap, to);
+            if (key === 'clarity') setTimeout(() => document.body.classList.add('ns-bloom'), 2000); // beams bloom after the purple
+            if (key === 'beginning') document.body.classList.remove('ns-bloom');
+            setTimeout(() => document.body.classList.remove('stage-cinema'), 3400);
+          }, 650);
+        };
+        bar.appendChild(mk('Beginning', () => playStage('beginning')));
+        bar.appendChild(mk('Clarity', () => playStage('clarity')));
+        bar.appendChild(mk('Action', () => playStage('action')));
+        bar.appendChild(mk('Consistency', () => playStage('consistency')));
         bar.appendChild(mk('Day 1.', () => {
           state.meta = state.meta || {};
           state.meta.firstActionDone = false;

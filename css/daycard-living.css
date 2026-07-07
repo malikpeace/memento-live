@@ -226,3 +226,9 @@ body:not(.ns-bloom) .daycard-theme-living .daycard-wrap__aura {
   .daycard-theme-living .daycard-bloom .blob,
   .daycard-theme-living .daycard-floor .blob { will-change: auto; }
 }
+
+/* dev=evo stage cinema: while a stage unlock is playing, the pillar light
+   pours in slowly instead of the everyday 0.6s tick. */
+body.stage-cinema .daycard-theme-living .daycard-ns__liquid .blob {
+  transition: opacity 3s cubic-bezier(0.22, 1, 0.36, 1);
+}
