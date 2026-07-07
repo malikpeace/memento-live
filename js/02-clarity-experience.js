@@ -3238,7 +3238,7 @@ They arrived HERE seconds after igniting this exact star, so the goal and timefr
       // v621: the intake is the paid first minute; it runs on Sonnet like the
       // Clarity conversation (it was silently falling to the Haiku default,
       // which kept slipping on the voice rules).
-      const raw = await callClaude(apiMessages, AI_ACTION_INTAKE_SYSTEM_PROMPT, { maxTokens: 700, model: (typeof ANTHROPIC_MODEL_CLARITY === 'string' ? ANTHROPIC_MODEL_CLARITY : undefined) });
+      const raw = await callClaude(apiMessages, AI_ACTION_INTAKE_SYSTEM_PROMPT, { maxTokens: 1200, model: (typeof ANTHROPIC_MODEL_CLARITY === 'string' ? ANTHROPIC_MODEL_CLARITY : undefined) });
       const parsed = this._parseAiIntakeResponse(raw, intake.aiSnapshot);
 
       // Update snapshot from the AI's judgment. The AI is the SOLE authority
