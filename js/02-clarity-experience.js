@@ -7442,7 +7442,7 @@ function _fireIgnition(root) {
   // The one sacred moment: plays exactly once per goal.
   state.clarity.ignitedAt = Date.now();
   try { persistNow(); } catch (e) {}
-  try { if (typeof writeProofEvent === 'function') writeProofEvent('proof', { title: 'Ignition', text: 'Ignited their Neutron Star', module: 'clarity' }); } catch (e) {}
+  try { if (typeof writeProofEvent === 'function') writeProofEvent('proof', { title: 'Ignition', text: 'Ignited their Neutron Star', module: 'clarity', silent: true }); } catch (e) {}
 
   const lite = document.documentElement.classList.contains('lowfx')
     || (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -7607,7 +7607,7 @@ function renderIgnitionV2(summary) {
         <canvas class="nsv2-star__blob" id="nsv2StarBlob" aria-hidden="true"></canvas>
         <div class="nsv2-after">
           <div class="nsv2-after__goal">${esc(goal)}</div>
-          <button type="button" class="nsv2-cta" id="nsv2Action">Take the first step</button>
+          <button type="button" class="nsv2-cta" id="nsv2Action">Add to your Memento</button>
         </div>
       </div>`;
   }
@@ -7751,7 +7751,7 @@ function _ig2Signed(root) {
   // The hold completed: persist the ignition, then collapse into the star.
   state.clarity.ignitedAt = Date.now();
   try { persistNow(); } catch (e) {}
-  try { if (typeof writeProofEvent === 'function') writeProofEvent('proof', { title: 'Ignition', text: 'Signed and ignited their Neutron Star', module: 'clarity' }); } catch (e) {}
+  try { if (typeof writeProofEvent === 'function') writeProofEvent('proof', { title: 'Ignition', text: 'Signed and ignited their Neutron Star', module: 'clarity', silent: true }); } catch (e) {}
 
   const lite = document.documentElement.classList.contains('lowfx')
     || (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -7778,9 +7778,12 @@ function _bindStarPlacard(root) {
   if (actionBtn) actionBtn.addEventListener('click', () => {
     _ig2Act = 'reveal'; _ig2 = {};
     try { const r = document.getElementById('nsv2Root'); if (r) r.remove(); } catch (e) {}
-    try { completeWizard(); } catch (e) {}
-    try { if (ClarityExperience && ClarityExperience.isOpen) ClarityExperience.close(); } catch (e) {}
-    try { ActionExperience.open(); } catch (e) {}
+    // "Add to your Memento" (Malik): close the ceremony, land on the home, play
+    // the card unlock cinema (watch the Memento come alive), then the save nudge.
+    _addToMementoThenAction(() => {
+      try { completeWizard(); } catch (e) {}
+      try { if (ClarityExperience && ClarityExperience.isOpen) ClarityExperience.close(); } catch (e) {}
+    });
   });
   const doneBtn = root.querySelector('#nsv2Done');
   if (doneBtn) doneBtn.addEventListener('click', () => {

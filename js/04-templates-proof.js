@@ -328,8 +328,10 @@ function writeProofEvent(type, fields) {
     // Calm feedback, fired ONLY when an event actually persisted (above
     // dedupe returns null and never reaches here). This is the shared
     // chokepoint for action, deep work, reflection, and vivere, so the
-    // settlement is universal without hooking each completion site.
-    try { playEarnedStillness(); } catch (_) {}
+    // settlement is universal without hooking each completion site. `silent`
+    // skips the "Kept." pill for events that have their own big moment (the
+    // star ignition, which owns the whole ceremony screen).
+    if (!fields.silent) { try { playEarnedStillness(); } catch (_) {} }
     // v23 unlock ladder: every real proof event is a potential trigger, so this
     // chokepoint also re-evaluates the ladder (queues at most one unlock/day).
     try { if (typeof evaluateUnlockLadder === 'function') evaluateUnlockLadder(); } catch (_) {}
