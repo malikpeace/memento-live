@@ -3579,13 +3579,19 @@ function streakFlameTier(count) {
 // open it re-checks until the user really lands here. Reduced-motion users
 // skip the show and just get the finished card.
 let _cardEvolutionRunning = false;
-function _maybeRunCardEvolution() {
-  if (_cardEvolutionRunning) return;
-  if (!(state.clarity && state.clarity.completed && state.clarity.ignitedAt)) return;
+let _cardEvolutionThen = null;
+// Optional `then` continuation (Malik's "Add to your Memento" flow): whoever
+// actually plays (or skips) the cinema runs it once at the end, so the save
+// nudge + Action ask land AFTER the card comes alive, not before.
+function _maybeRunCardEvolution(then) {
+  if (then) _cardEvolutionThen = then;
+  const flush = () => { const cb = _cardEvolutionThen; _cardEvolutionThen = null; if (cb) { try { cb(); } catch (e) {} } };
+  if (_cardEvolutionRunning) return;   // a run is in progress; its onDone will flush
+  if (!(state.clarity && state.clarity.completed && state.clarity.ignitedAt)) { flush(); return; }
   state.meta = state.meta || {};
-  if (state.meta.cardEvolutionSeen) return;
+  if (state.meta.cardEvolutionSeen) { flush(); return; }
   const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (reduced) { state.meta.cardEvolutionSeen = true; try { persistNow(); } catch (e) {} return; }
+  if (reduced) { state.meta.cardEvolutionSeen = true; try { persistNow(); } catch (e) {} flush(); return; }
   _cardEvolutionRunning = true;
   const overlayOpen = () => {
     try {
@@ -3597,14 +3603,15 @@ function _maybeRunCardEvolution() {
     return false;
   };
   const attempt = () => {
-    if (state.meta.cardEvolutionSeen) { _cardEvolutionRunning = false; return; }
+    if (state.meta.cardEvolutionSeen) { _cardEvolutionRunning = false; flush(); return; }
     if (overlayOpen()) { setTimeout(attempt, 1200); return; }
     const ok = _runClarityUnlockCinema(() => {
       state.meta.cardEvolutionSeen = true;
       try { persistNow(); } catch (e) {}
       _cardEvolutionRunning = false;
+      flush();
     });
-    if (!ok) { _cardEvolutionRunning = false; }
+    if (!ok) { _cardEvolutionRunning = false; flush(); }
   };
   attempt();
 }

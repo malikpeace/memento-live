@@ -1225,7 +1225,7 @@ function renderNeutronStarSummary(summary, { allowContinue = false, showRestart 
         <div class="ns-min__divider" aria-hidden="true"></div>
         ${timeframe ? `<div class="ns-min__time">${calIcon}<span>${esc(timeframe)}</span></div>` : ''}
         <button type="button" id="summaryAction" class="ns-min__cta">
-          <span>Take Action</span>${arrowRight}
+          <span>Add to your Memento</span>${arrowRight}
         </button>
       </div>
       <div class="ns-min__sheet" id="nsMenuSheet" aria-hidden="true" role="menu">

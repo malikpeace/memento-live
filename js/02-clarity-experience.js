@@ -269,8 +269,7 @@ const ClarityExperience = {
             const reAction = document.getElementById('summaryAction');
             if (reAction) {
               reAction.addEventListener('click', () => {
-                _ce.close();
-                ActionExperience.open();
+                _addToMementoThenAction(() => _ce.close());
               });
             }
             const scope = document.getElementById('nsScene') || document;
@@ -361,19 +360,10 @@ const ClarityExperience = {
 
       const actionBtn = document.getElementById('summaryAction');
       if (actionBtn) {
+        // "Add to your Memento" (Malik): close the summary, land on the home, play
+        // the unlock cinema (watch the Memento come alive), then the save nudge.
         actionBtn.addEventListener('click', () => {
-          this.close();
-          // "Save your Memento" (account + Add to Home Screen) comes FIRST, at the
-          // value moment, then Action + the paywall wait until it resolves. This keeps
-          // the order Clarity -> save -> paywall and stops them stacking. If the sheet
-          // does not show (already signed in / demo / no account system), go straight
-          // to Action. Deferred so it never runs inside the ceremony close.
-          const proceed = () => { try { ActionExperience.open(); } catch (e) {} };
-          setTimeout(() => {
-            let shown = false;
-            try { shown = (typeof maybeShowSaveWorkNudge === 'function') && maybeShowSaveWorkNudge(proceed); } catch (e) {}
-            if (!shown) proceed();
-          }, 420);
+          _addToMementoThenAction(() => _ce.close());
         });
       }
 
@@ -1932,8 +1922,7 @@ const ClarityExperience = {
       const actionBtn = container.querySelector('#summaryAction');
       if (actionBtn) {
         actionBtn.addEventListener('click', () => {
-          completeWizard();
-          ActionExperience.open();
+          _addToMementoThenAction(() => { try { completeWizard(); } catch (e) {} });
         });
       }
       const continueBtn2 = container.querySelector('#summaryContinue');
@@ -7541,6 +7530,28 @@ function starSeedFromGoal(goal) {
     designation: 'MV-' + (1000 + (h % 9000)) + '-' + greek,
     kelvin: Math.round(9000 + t * 21000)        // white ~9,000K .. deep blue ~30,000K
   };
+}
+
+// Malik's "Add to your Memento" flow (v637): the star summary CTA finalizes the
+// summary, lands the user on the home, plays the card unlock cinema (they WATCH
+// their Memento come alive), and only THEN fires the save nudge, leaving them on
+// the home where the next-step card invites them to take their first action.
+// `finalize` is the per-entry close step (close / completeWizard).
+function _addToMementoThenAction(finalize) {
+  const proceedAfter = () => {
+    // Save-your-Memento nudge lands AFTER the cinema (Malik's call). No auto-jump
+    // to Action: they stay on the home and the card guides them from there.
+    try { if (typeof maybeShowSaveWorkNudge === 'function') maybeShowSaveWorkNudge(function () {}); } catch (e) {}
+  };
+  try { if (typeof finalize === 'function') finalize(); } catch (e) {}
+  // Let the summary/ceremony finish closing, then play the cinema on the home and
+  // chain the save nudge to its completion.
+  setTimeout(() => {
+    try {
+      if (typeof _maybeRunCardEvolution === 'function') _maybeRunCardEvolution(proceedAfter);
+      else proceedAfter();
+    } catch (e) { proceedAfter(); }
+  }, 480);
 }
 
 function renderIgnitionV2(summary) {
