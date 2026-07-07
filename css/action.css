@@ -3417,3 +3417,28 @@ html.theme-light .action-chat__input-row::before { background: linear-gradient(t
   .action-cine__thinking i { animation: none; }
   .action-cine__rw { animation: none; opacity: 1; filter: none; transform: none; }
 }
+
+/* v617: light mode. The intake matches Clarity's light questionnaire (light
+   page, dark ink via the wiz tokens); only the CTA + thinking dot need their
+   light-scene variants. The loading beat and the first-move reveal are star
+   moments and stay DARK in light mode, same law as every star scene. */
+html.theme-light .action-cine__continue {
+  background: #101015; color: #fff;
+  box-shadow: 0 14px 30px rgba(20, 22, 40, 0.2);
+}
+html.theme-light .action-cine__thinking i {
+  background: #101015;
+  box-shadow: 0 0 14px rgba(20, 22, 40, 0.25);
+}
+html.theme-light .action-exp:has(.action-draft-loading--cine),
+html.theme-light .action-exp:has(.action-cine-reveal) {
+  --ink: 255, 255, 255;
+  background: #050308 !important;
+}
+html.theme-light .action-exp:has(.action-draft-loading--cine) .action-exp__bg,
+html.theme-light .action-exp:has(.action-cine-reveal) .action-exp__bg {
+  background: #050308 !important;
+}
+html.theme-light .action-exp:has(.action-draft-loading--cine) .action-cine__thinking i {
+  background: #fff; box-shadow: 0 0 18px rgba(255, 255, 255, 0.7);
+}
