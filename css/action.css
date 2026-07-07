@@ -66,7 +66,11 @@ body:has(.clarity-exp.open)::after { display: none; }
 }
 .action-exp__bg {
   position: absolute; inset: 0; overflow: hidden; pointer-events: none;
-  background: #000;
+  /* v628 (Malik): BLUEPRINT. Near-black with an ultra-faint dot matrix and a
+     vignette, replaces the four white glow orbs that read as AI haze. */
+  background-color: #07070a;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.075) 1px, transparent 1px);
+  background-size: 22px 22px;
 }
 .action-exp__stars {
   position: absolute; inset: 0;
@@ -105,17 +109,13 @@ body:has(.clarity-exp.open)::after { display: none; }
    provide all the motion. The orbs are just a soft monochrome wash now.) */
 .action-exp__bg::before {
   content: '';
-  position: absolute;
-  width: max(600px, 55vw); height: max(600px, 55vw);
-  border-radius: 50%;
-  background: radial-gradient(circle,
-    rgba(var(--ink),0.32) 0%,
-    rgba(220,220,225,0.18) 30%,
-    rgba(140,140,148,0.06) 60%,
-    transparent 82%);
-  top: -8%; left: -8%; filter: blur(30px);
+  position: absolute; inset: 0;
+  background: radial-gradient(110% 80% at 50% 30%, transparent 40%, rgba(7, 7, 10, 0.9) 100%);
   pointer-events: none;
 }
+.action-exp__bg::after,
+.action-exp__bg-orb3,
+.action-exp__bg-orb4 { display: none; }
 .action-exp__bg::after {
   content: '';
   position: absolute;
@@ -3454,4 +3454,15 @@ html.theme-light .action-exp:has(.action-cine-reveal) .action-exp__bg {
 }
 html.theme-light .action-exp:has(.action-draft-loading--cine) .action-cine__thinking i {
   background: #fff; box-shadow: 0 0 18px rgba(255, 255, 255, 0.7);
+}
+
+
+/* Blueprint, light mode: ink dots on the light surface. */
+html.theme-light .action-exp__bg {
+  background-color: #eef0f3;
+  background-image: radial-gradient(rgba(24, 26, 33, 0.10) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+html.theme-light .action-exp__bg::before {
+  background: radial-gradient(110% 80% at 50% 30%, transparent 40%, rgba(238, 240, 243, 0.9) 100%);
 }
