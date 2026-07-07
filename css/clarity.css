@@ -3194,8 +3194,19 @@ html.lowfx .nsv2-reveal__w, html.lowfx .nsv2-reveal__after, html.lowfx .nsv2-rev
   background: #fff; opacity: 0;
   pointer-events: none; z-index: 60;
   transition: opacity 0.25s linear;
+  /* Own GPU layer so ramping the full-screen white never repaints the page
+     (mobile flashing fix, v639). */
+  will-change: opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
-.nsv2.is-holding .nsv2__white { opacity: clamp(0, (var(--holdp, 0) - 0.55) * 2.222, 1); }
+/* During the hold, --holdp updates every animation frame, so the white must
+   track it DIRECTLY. The 0.25s transition was chasing the per-frame value and
+   stuttering/flashing on mobile; kill it while holding. */
+.nsv2.is-holding .nsv2__white {
+  opacity: clamp(0, (var(--holdp, 0) - 0.55) * 2.222, 1);
+  transition: none;
+}
 .nsv2.is-collapsing .nsv2__white,
 .nsv2.is-collapsing-lite .nsv2__white { opacity: 1; }
 

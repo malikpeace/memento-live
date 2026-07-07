@@ -338,13 +338,22 @@ function initStarBlob(canvas, size = 240, variant) {
   // while a module is open, so the GPU is free for the thing being opened.
   const _lite = window.matchMedia('(max-width: 820px)').matches
              || window.matchMedia('(pointer: coarse)').matches;
-  const dpr = _lite ? 1 : Math.min(window.devicePixelRatio || 1, 2);
-  const _size = _lite ? Math.min(size, 420) : size;
+  // HERO stars (the big ceremony / summary / tutorial star, size >= 480) must be
+  // crisp no matter how large they render or how far they zoom, so they keep real
+  // retina resolution even on mobile. The tiny always-on ambient blob (size 240)
+  // stays on the cheap lite path to save battery. Backing store is capped so a
+  // huge hero star can never allocate a runaway buffer on a phone (v639, Malik).
+  const _hero = size >= 480;
+  const dpr = (_lite && !_hero)
+    ? 1
+    : Math.min(window.devicePixelRatio || 1, _hero ? 3 : 2);
+  const _size = (_lite && !_hero) ? Math.min(size, 420) : size;
   const _inDash = !!(canvas.closest && canvas.closest('.app'));
-  const _minDelta = _lite ? 33 : 0;   // ~30fps cap on mobile
+  const _minDelta = _lite && !_hero ? 33 : 0;   // ~30fps cap on the tiny ambient blob only
   let _last = 0;
-  canvas.width = _size * dpr;
-  canvas.height = _size * dpr;
+  const _buf = Math.min(Math.round(_size * dpr), 1600);
+  canvas.width = _buf;
+  canvas.height = _buf;
 
   const vsrc = `attribute vec2 a_pos;void main(){gl_Position=vec4(a_pos,0,1);}`;
   // CLASSIC = the original noise-marbled blob (UNTOUCHED; Malik's fallback: drop the
