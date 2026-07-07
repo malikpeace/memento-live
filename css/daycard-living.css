@@ -238,7 +238,10 @@ body.stage-cinema .daycard-theme-living .daycard-ns__liquid .blob {
 body.evo2 #commandCenter { opacity: 0 !important; pointer-events: none; transition: opacity 0.6s ease; }
 body.evo2 #dayCard { position: relative; z-index: 30; }
 body.evo2 .daycard-wrap {
-  transform: scale(1.22) translateY(6vh);
+  /* The unlock cinema grows the card, but 1.22 + 6vh pushed it beyond full
+     screen on shorter phones (Malik). Pulled back so it still swells and
+     dominates but stays on screen. */
+  transform: scale(1.1) translateY(3vh);
   transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 /* slow, deliberate light during the cinema */

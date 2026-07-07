@@ -219,7 +219,14 @@
    ============================================================ */
 (function () {
   try {
-    if (!/[?&]dev=evo/.test(location.search)) return;
+    // Shown when ?dev=evo is in the URL OR when Malik has toggled it on with the
+    // hidden gesture (persisted per-device in localStorage). Customers never see
+    // it: no param + no flag = nothing renders, and the gesture is a deliberate
+    // 5-tap in the top-right corner that no real user would trip.
+    var hasParam = /[?&]dev=evo/.test(location.search);
+    var flagOn = function () { try { return localStorage.getItem('mementoCheat') === '1'; } catch (e) { return false; } };
+    var setFlag = function (v) { try { if (v) localStorage.setItem('mementoCheat', '1'); else localStorage.removeItem('mementoCheat'); } catch (e) {} };
+    var shouldShow = function () { return hasParam || flagOn(); };
     const mount = () => {
       try {
         if (document.getElementById('evoDevBar')) return;
@@ -373,7 +380,28 @@
         document.body.appendChild(bar);
       } catch (e) {}
     };
-    if (document.readyState === 'complete' || document.readyState === 'interactive') setTimeout(mount, 1200);
-    else window.addEventListener('DOMContentLoaded', () => setTimeout(mount, 1200));
+    const unmount = () => { const b = document.getElementById('evoDevBar'); if (b) b.remove(); };
+
+    // Hidden summon: 5 quick taps in the top-right corner (over the date) toggles
+    // the cheat bar on/off and remembers the choice for this device.
+    let taps = [];
+    document.addEventListener('click', (e) => {
+      try {
+        if (e.clientX > window.innerWidth - 60 && e.clientY < 72) {
+          const now = Date.now();
+          taps = taps.filter((t) => now - t < 1600);
+          taps.push(now);
+          if (taps.length >= 5) {
+            taps = [];
+            if (document.getElementById('evoDevBar')) { setFlag(false); unmount(); }
+            else { setFlag(true); mount(); }
+          }
+        }
+      } catch (err) {}
+    }, true);
+
+    const boot = () => { if (shouldShow()) mount(); };
+    if (document.readyState === 'complete' || document.readyState === 'interactive') setTimeout(boot, 1200);
+    else window.addEventListener('DOMContentLoaded', () => setTimeout(boot, 1200));
   } catch (e) {}
 })();
