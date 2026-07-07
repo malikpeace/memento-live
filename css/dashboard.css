@@ -3770,3 +3770,14 @@ body.card-evolving .ambient__rays {
 /* The card glow + aura under it stay drained too so nothing leaks color early. */
 body.card-evolving .daycard-wrap__aura { opacity: 0; }
 body.card-evolving.card-evolve-go .daycard-wrap__aura { opacity: 1; transition: opacity 2.4s ease; }
+
+/* v608: the new-day breath. The Today panel glows up and settles, twice,
+   the first time the home is seen each day with a move still pending. */
+#commandCenter.cc-newday { animation: ccNewDay 2.1s ease-in-out 0.5s 2; }
+@keyframes ccNewDay {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.18); }
+}
+@media (prefers-reduced-motion: reduce) {
+  #commandCenter.cc-newday { animation: none; }
+}

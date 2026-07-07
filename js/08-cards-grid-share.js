@@ -3277,6 +3277,21 @@ function _ccHeroSwap(mutate) {
   setTimeout(() => { try { newBody.style.height = 'auto'; newBody.style.overflow = ''; newBody.style.transition = ''; newBody.style.opacity = ''; } catch (e) {} }, CC_RISE_MS + 40);
 }
 function bindCommandCenter(cc) {
+  // v608 (Malik, overnight item 5): first open of a NEW day with a move still
+  // pending, the Today panel breathes once so the move is the first thing the
+  // eye lands on. Once per day, never when today's action is already done.
+  try {
+    const _dayKey = new Date().toISOString().slice(0, 10);
+    state.meta = state.meta || {};
+    const _hasPlan = !!(state.action && state.action.primaryAction && state.clarity && state.clarity.completed);
+    if (_hasPlan && state.meta.lastNewDayPulse !== _dayKey && !actionDoneToday()
+        && !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) {
+      state.meta.lastNewDayPulse = _dayKey;
+      try { persistNow(); } catch (e) {}
+      cc.classList.add('cc-newday');
+      setTimeout(() => { try { cc.classList.remove('cc-newday'); } catch (e) {} }, 4200);
+    }
+  } catch (e) {}
   try {
     // Slide the pill behind the active hero segment. Returns true once placed.
     const _placeHeroPill = (scope, animate) => {
