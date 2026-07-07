@@ -1723,10 +1723,10 @@ async function generateAccountabilityCheck() {
 // - ANTHROPIC_MODEL (default) covers everything else: insights, accountability
 //   check-ins, goal sharpening, star names. Sonnet too (Malik, 2026-07-07:
 //   no Haiku anywhere, quality shows even in one-liners).
-const ANTHROPIC_MODEL = 'claude-sonnet-4-6';
-const ANTHROPIC_MODEL_CLARITY = 'claude-sonnet-4-6';
+const ANTHROPIC_MODEL = 'claude-sonnet-5';
+const ANTHROPIC_MODEL_CLARITY = 'claude-sonnet-5';
 const ANTHROPIC_MODEL_SYNTHESIS = 'claude-opus-4-8';
-const ANTHROPIC_MODEL_PLANS = 'claude-sonnet-4-6';
+const ANTHROPIC_MODEL_PLANS = 'claude-sonnet-5';
 
 // Dynamic escalation: a Clarity conversation that runs long without converging
 // is a "tough" person. Once that trips, the REST of the discovery turns get Opus
