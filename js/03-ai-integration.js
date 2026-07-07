@@ -2286,9 +2286,11 @@ function renderAiChat() {
   // `<div class="ai-thinking"><div class="aur"><span class="aur-band b1"></span><span class="aur-band b2"></span><span class="aur-band b3"></span></div></div>`
   const _prog = document.getElementById('clarityExpProgress');
   if (_prog) _prog.classList.toggle('is-thinking', !!aiChatLoading);
-  // Loading state - empty stage, the star carries it
+  // Loading state (v629, Malik): the forming star breathes CENTER-SCREEN,
+  // lower and more purple; the top slot keeps the normal thin bar.
   if (aiChatLoading) {
-    return `<div class="ai-thinking"></div>`;
+    const sp = Math.max(0, Math.min(1, aiChatPct() / 100));
+    return `<div class="ai-thinking ai-thinking--star"><div class="forming-star" aria-hidden="true" style="--sp:${sp.toFixed(3)}"><i class="fs-neb"></i><i class="fs-core"></i></div></div>`;
   }
 
   // Error state

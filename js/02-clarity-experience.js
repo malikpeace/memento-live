@@ -2205,35 +2205,11 @@ const ClarityExperience = {
         pct = Math.max(2, Math.min(100, pct));
       }
     }
-    // Which step are we on? The AI discovery replaces the bar with the FORMING
-    // STAR (v579, Malik): a diffuse cloud that contracts and brightens as the
-    // conversation compresses their answers, trembling near the end. The
-    // psychological read: progress IS star formation, not a loading bar.
-    let onAiChat = false;
-    try {
-      const _steps = getWizardSteps();
-      onAiChat = !this.tutorialOnly && _steps[this.currentPage - this.getWizardOffset()] === 'aiChat';
-    } catch (e) {}
+    // v629 (Malik): the AI discovery shows the SAME thin bar as the manual
+    // questions again. The forming star moved off the top slot and now lives
+    // center-screen as the thinking indicator (renderAiChat in js/03).
     if (pct < 0) {
       this.progressEl.innerHTML = '';
-    } else if (onAiChat) {
-      const sp = Math.max(0, Math.min(1, (pct - 12) / 88));
-      let star = this.progressEl.querySelector('.forming-star');
-      if (!star) {
-        this.progressEl.innerHTML = '<div class="forming-star" aria-hidden="true"><i class="fs-neb"></i><i class="fs-core"></i></div>';
-        star = this.progressEl.querySelector('.forming-star');
-      }
-      if (star) {
-        star.style.setProperty('--sp', sp.toFixed(3));
-        star.classList.toggle('fs--tremble', sp > 0.82);
-        // First light (v580): one bright pulse the moment the WHAT is confirmed.
-        if (window._clarityFirstLight) {
-          window._clarityFirstLight = false;
-          star.classList.remove('fs--firstlight');
-          void star.offsetWidth;
-          star.classList.add('fs--firstlight');
-        }
-      }
     } else {
       const fill = this.progressEl.querySelector('.ai-progress__fill');
       if (fill) {

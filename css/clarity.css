@@ -3743,6 +3743,31 @@ html.theme-light .clarity-exp:has(.tut-star-stage) .clarity-exp__nav-btn--next {
   .clarity-exp__progress.is-thinking .fs-neb,
   .clarity-exp__progress.is-thinking .fs-core { animation: none; }
 }
+/* v629 (Malik): while the AI thinks between questions the star sits CENTERED
+   mid-screen (not in the top slot) and reads clearly purple. */
+.ai-thinking--star {
+  min-height: 62vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ai-thinking--star .forming-star { width: 72px; height: 44px; }
+.ai-thinking--star .fs-neb {
+  width: 64px; height: 38px;
+  background: radial-gradient(ellipse at 50% 50%,
+    rgba(150, 118, 255, 0.7), rgba(123, 97, 255, 0.3) 55%, transparent 78%);
+  animation: fsThinkNeb 1.7s ease-in-out infinite;
+}
+.ai-thinking--star .fs-core {
+  box-shadow:
+    0 0 calc(8px + var(--sp, 0) * 18px) rgba(168, 140, 255, calc(0.5 + var(--sp, 0) * 0.45)),
+    0 0 3px rgba(255, 255, 255, 0.9);
+  animation: fsThinkCore 1.7s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ai-thinking--star .fs-neb,
+  .ai-thinking--star .fs-core { animation: none; }
+}
 /* Light mode: the white core needs ink to read on the light page. */
 html.theme-light .fs-core {
   background: #5b48d8;
