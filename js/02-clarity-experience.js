@@ -7871,10 +7871,29 @@ function _bindStarPlacard(root) {
       }, 2600);
     };
 
+    // Filler goal (Malik) so the ceremony/summary previews look real even when
+    // there is no synthesized star yet. Used ONLY for the cheat-bar preview;
+    // never written to state.
+    const FILLER_ANSWERS = {
+      neutronStar: 'Build Memento into the tool that gets a million people locked in on the one thing that actually matters',
+      coreWhy: 'Too many people stay busy for years without ever moving, and most apps feed the distraction instead of cutting it.',
+      antiVision: 'Another well-designed app people download, admire for a day, and forget by the weekend.',
+      futureVision: 'A product people open every morning because it points them straight at the one move that matters that day.',
+      identityLine: 'The builder who made real focus feel inevitable instead of impossible.',
+      timeHorizon: '12 months',
+      anchor: 'Purpose',
+      intensity: 'High'
+    };
     // Shared API for the cheat bar: build a demo summary lazily, open the
     // fullscreen Clarity shell, and jump straight to any ending beat.
     const ensureSummary = () => {
-      if (!devSummary) { try { devSummary = normalizeClaritySummary(state.clarity.answers); } catch (e) {} }
+      if (!devSummary) {
+        try {
+          const ans = state.clarity.answers || {};
+          const hasStar = String(ans.neutronStar || '').trim().length > 0;
+          devSummary = normalizeClaritySummary(hasStar ? ans : FILLER_ANSWERS);
+        } catch (e) {}
+      }
       return devSummary;
     };
     const openShell = () => {

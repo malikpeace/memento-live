@@ -3361,6 +3361,15 @@ function finishCondenseThen(next) {
     void c.offsetWidth;
     c.style.transition = 'transform 1.1s cubic-bezier(0.6, 0, 0.9, 0.5)';
     c.style.transform = 'scale(0.003)';
+    // As the star reaches its pixel, fade the whole synth screen (tiny star +
+    // "Condensing..." text) out into black so the reveal can crossfade in
+    // instead of hard-cutting to it (Malik). The reveal (.nsv2) fades in on its
+    // own entrance animation, so the two meet on black.
+    const wrap = (c.closest && (c.closest('.ai-thinking') || c.closest('.synth-condense'))) || c.parentElement;
+    if (wrap) {
+      wrap.style.transition = 'opacity 0.5s ease 0.55s';
+      wrap.style.opacity = '0';
+    }
     setTimeout(next, 1250);
   } catch (e) { next(); }
 }
