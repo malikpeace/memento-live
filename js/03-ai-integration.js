@@ -3367,10 +3367,13 @@ function finishCondenseThen(next) {
     // own entrance animation, so the two meet on black.
     const wrap = (c.closest && (c.closest('.ai-thinking') || c.closest('.synth-condense'))) || c.parentElement;
     if (wrap) {
-      wrap.style.transition = 'opacity 0.5s ease 0.55s';
+      // Hold the screen at full until the star has actually fallen to a pixel
+      // (the shrink easing keeps it large until ~1.05s), THEN fade. Starting the
+      // fade earlier made it dissolve while the star was still big (Malik).
+      wrap.style.transition = 'opacity 0.35s ease 1.05s';
       wrap.style.opacity = '0';
     }
-    setTimeout(next, 1250);
+    setTimeout(next, 1500);
   } catch (e) { next(); }
 }
 
