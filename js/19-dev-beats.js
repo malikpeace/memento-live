@@ -225,7 +225,7 @@
         if (document.getElementById('evoDevBar')) return;
         const bar = document.createElement('div');
         bar.id = 'evoDevBar';
-        bar.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 78px);z-index:2147483000;display:flex;align-items:center;gap:6px;padding:8px 10px;border-radius:14px;background:rgba(10,10,14,0.88);-webkit-backdrop-filter:blur(22px) saturate(1.4);backdrop-filter:blur(22px) saturate(1.4);box-shadow:0 12px 34px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.08);font:600 12px -apple-system,system-ui,sans-serif;color:#fff;';
+        bar.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 148px);z-index:2147483000;display:flex;align-items:center;gap:6px;padding:8px 10px;border-radius:14px;background:rgba(10,10,14,0.88);-webkit-backdrop-filter:blur(22px) saturate(1.4);backdrop-filter:blur(22px) saturate(1.4);box-shadow:0 12px 34px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.08);font:600 12px -apple-system,system-ui,sans-serif;color:#fff;';
         const mk = (label, onClick) => {
           const b = document.createElement('button');
           b.type = 'button'; b.textContent = label;
@@ -233,6 +233,23 @@
           b.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); try { onClick(); } catch (err) {} });
           return b;
         };
+        bar.appendChild(mk('Beginning', () => {
+          // The VERY beginning: the whole pre-clarity home (welcome hero, blank
+          // card, no beams, no modules), rendered for real. Tap again to restore.
+          document.body.classList.remove('card-evolving', 'card-evolve-go');
+          if (!window._evoBeginSnap) {
+            window._evoBeginSnap = JSON.stringify(state.clarity);
+            state.clarity.completed = false;
+            state.clarity.ignitedAt = null;
+            if (state.clarity.answers) state.clarity.answers.neutronStar = '';
+          } else {
+            try { state.clarity = JSON.parse(window._evoBeginSnap); } catch (e) {}
+            window._evoBeginSnap = null;
+          }
+          try { renderGrid(); } catch (e) {}
+          try { const cc = document.getElementById('commandCenter'); if (cc) { cc.innerHTML = renderCommandCenter(); bindCommandCenter(cc); } } catch (e) {}
+          try { renderDailyMemento(); } catch (e) {}
+        }));
         bar.appendChild(mk('Blank', () => {
           // Just the card stage: flip the slab to its pre-clarity look in place.
           document.body.classList.remove('card-evolving', 'card-evolve-go');
