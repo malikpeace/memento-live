@@ -3166,6 +3166,14 @@ html.lowfx .nsv2-reveal__w, html.lowfx .nsv2-reveal__after, html.lowfx .nsv2-rev
   opacity: calc(var(--holdp, 0) * var(--holdp, 0));
   filter: saturate(1.35) brightness(calc(0.75 + var(--holdp, 0) * 1.1));
 }
+/* MOBILE (lowfx) flashing fix, v640: animating the brightness FILTER on the
+   blurred beam cluster re-rasterizes it every frame, which flickers on iOS as
+   the white ramps up. Pin the filter STATIC on mobile, the per-shaft opacity
+   ramp below still carries the brightening, so nothing needs to recompute the
+   blur each frame. Desktop keeps the animated filter (it handles it fine). */
+html.lowfx .nsv2.is-holding .nsv2__rays.ambient__rays {
+  filter: saturate(1.35) brightness(1.5);
+}
 /* While holding, the ambient flicker would leave most beams at their dim floor;
    pause it and drive every shaft straight from the hold progress instead, so
    the whole cluster ramps toward full power together. */
