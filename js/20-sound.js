@@ -9,8 +9,8 @@
      done       - marking the move done
      newday     - the morning breath on the Today panel
      tick       - the typewriter (B5: a felt sub bump, throttled)
-   OFF by default: state.prefs.soundOn gates everything. iOS audio
-   unlocks on the first user gesture after the toggle is on.
+   ON by default; state.prefs.soundOn === false turns it off (the
+   Appearance toggle). iOS audio unlocks on the first user gesture.
    ============================================================ */
 
 const MementoSound = (() => {
@@ -18,8 +18,10 @@ const MementoSound = (() => {
   let master = null;
   let lastTick = 0;
 
+  // ON by default (Malik): sound plays unless the user explicitly turns the
+  // Appearance toggle off (soundOn === false). Undefined means on.
   const on = () => {
-    try { return !!(state && state.prefs && state.prefs.soundOn); } catch (e) { return false; }
+    try { return !(state && state.prefs && state.prefs.soundOn === false); } catch (e) { return true; }
   };
 
   const ac = () => {

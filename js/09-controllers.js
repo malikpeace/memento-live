@@ -4530,7 +4530,7 @@ const TabBar = {
         '<div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-2); margin-bottom: 12px;">Appearance</div>' +
         toggleRow('prefLightMode', 'Light mode', 'Switch the whole app to a bright, premium off-white theme.', prefs.theme === 'light') +
         toggleRow('prefFlatUi', 'Glass', 'Glassy, blurred surfaces with depth. Turn off for a flat, high-contrast matte look.', !prefs.flatUi) +
-        toggleRow('prefSound', 'Sound', 'Quiet synthesized moments: the typewriter, marking a move done, the card coming alive.', !!prefs.soundOn) +
+        toggleRow('prefSound', 'Sound', 'Quiet synthesized moments: the typewriter, marking a move done, the card coming alive.', prefs.soundOn !== false) +
         toggleRow('prefFlatBg', 'Minimal background', 'Hide the ambient orbs and glow for a flat, paper-like surface.', !!prefs.flatBg) +
         '<div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); margin: 18px 0 10px;">Color</div>' +
         '<div class="pref-swatches" id="prefAccent">' + swatchHtml + '</div>' +
