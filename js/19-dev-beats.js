@@ -225,13 +225,46 @@
         if (document.getElementById('evoDevBar')) return;
         const bar = document.createElement('div');
         bar.id = 'evoDevBar';
-        bar.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 148px);z-index:2147483000;display:flex;align-items:center;gap:6px;padding:8px 10px;border-radius:14px;background:rgba(10,10,14,0.88);-webkit-backdrop-filter:blur(22px) saturate(1.4);backdrop-filter:blur(22px) saturate(1.4);box-shadow:0 12px 34px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.08);font:600 12px -apple-system,system-ui,sans-serif;color:#fff;';
+        bar.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 96px);z-index:2147483000;display:flex;flex-direction:column;gap:6px;width:min(340px,calc(100vw - 20px));padding:9px 10px 10px;border-radius:15px;background:rgba(10,10,14,0.9);-webkit-backdrop-filter:blur(24px) saturate(1.4);backdrop-filter:blur(24px) saturate(1.4);box-shadow:0 14px 40px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08);font:600 12px -apple-system,system-ui,sans-serif;color:#fff;';
         const mk = (label, onClick) => {
           const b = document.createElement('button');
           b.type = 'button'; b.textContent = label;
-          b.style.cssText = 'appearance:none;border:0;cursor:pointer;font:inherit;color:#fff;background:rgba(255,255,255,0.08);border-radius:9px;padding:8px 11px;';
+          b.style.cssText = 'appearance:none;border:0;cursor:pointer;font:inherit;color:#fff;background:rgba(255,255,255,0.08);border-radius:8px;padding:7px 9px;flex:1 1 auto;white-space:nowrap;';
           b.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); try { onClick(); } catch (err) {} });
           return b;
+        };
+        // ---- header: title + collapse toggle ----
+        const head = document.createElement('div');
+        head.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 2px 2px;';
+        const ttl = document.createElement('b');
+        ttl.textContent = 'DEV · fly around';
+        ttl.style.cssText = 'font-size:10.5px;letter-spacing:0.08em;text-transform:uppercase;opacity:0.6;';
+        const collapse = document.createElement('button');
+        collapse.type = 'button'; collapse.textContent = 'hide';
+        collapse.style.cssText = 'appearance:none;border:0;cursor:pointer;font:600 11px -apple-system,system-ui,sans-serif;color:#fff;background:rgba(255,255,255,0.1);border-radius:7px;padding:4px 9px;';
+        const body = document.createElement('div');
+        body.style.cssText = 'display:flex;flex-direction:column;gap:6px;';
+        let hidden = false;
+        collapse.addEventListener('click', (e) => {
+          e.preventDefault(); e.stopPropagation();
+          hidden = !hidden;
+          body.style.display = hidden ? 'none' : 'flex';
+          collapse.textContent = hidden ? 'show' : 'hide';
+        });
+        head.appendChild(ttl); head.appendChild(collapse);
+        // A labeled row of buttons.
+        const row = (labelText, btns) => {
+          const wrap = document.createElement('div');
+          wrap.style.cssText = 'display:flex;align-items:center;gap:5px;';
+          const lb = document.createElement('span');
+          lb.textContent = labelText;
+          lb.style.cssText = 'flex:0 0 42px;font-size:9.5px;letter-spacing:0.05em;text-transform:uppercase;opacity:0.5;';
+          wrap.appendChild(lb);
+          const grp = document.createElement('div');
+          grp.style.cssText = 'display:flex;gap:5px;flex:1 1 auto;';
+          btns.forEach(b => grp.appendChild(b));
+          wrap.appendChild(grp);
+          return wrap;
         };
         // ---- THE STAGE CINEMA ----
         // Each button plays the LITERAL unlock animation for that stage: the
@@ -272,27 +305,71 @@
             setTimeout(() => document.body.classList.remove('stage-cinema'), 3400);
           }, 650);
         };
-        bar.appendChild(mk('Beginning', () => playStage('beginning')));
-        bar.appendChild(mk('Clarity', () => {
-          // the full unlock cinema, exactly what a real user gets
-          document.body.classList.remove('pre-clarity', 'card-evolving', 'card-evolve-go');
-          window._evoStageOverride = STAGES.beginning;
-          apply();
-          _runClarityUnlockCinema(null, { holdOverride: STAGES.clarity });
-        }));
-        bar.appendChild(mk('Action', () => playStage('action')));
-        bar.appendChild(mk('Consistency', () => playStage('consistency')));
-        bar.appendChild(mk('Day 1.', () => {
-          state.meta = state.meta || {};
-          state.meta.firstActionDone = false;
-          _maybeFirstWinMoment();
-        }));
-        bar.appendChild(mk('New day', () => {
-          state.meta = state.meta || {};
-          delete state.meta.lastNewDayPulse;
-          const cc = document.getElementById('commandCenter');
-          if (cc) { cc.innerHTML = renderCommandCenter(); bindCommandCenter(cc); }
-        }));
+        // Close any open Clarity/ceremony overlay before a card-stage button so
+        // the home + real card are visible again.
+        const closeCeremony = () => {
+          try {
+            const r = document.getElementById('nsv2Root'); if (r) r.remove();
+            const cx = document.querySelector('.clarity-exp');
+            if (cx) { cx.classList.remove('open-bg', 'open-bg-visible', 'open-content', 'open'); cx.setAttribute('aria-hidden', 'true'); }
+            if (typeof ClarityExperience !== 'undefined') ClarityExperience.isOpen = false;
+            if (typeof ActionExperience !== 'undefined' && ActionExperience.close) ActionExperience.close();
+            if (typeof FullscreenClose !== 'undefined' && FullscreenClose.hide) FullscreenClose.hide();
+            if (typeof TabBar !== 'undefined' && TabBar.show) TabBar.show();
+            document.body.style.overflow = '';
+          } catch (e) {}
+        };
+
+        // Row 1 - CARD look (snap the real home card to each pillar stage)
+        body.appendChild(row('Card', [
+          mk('Blank', () => { closeCeremony(); playStage('beginning'); }),
+          mk('Clarity', () => { closeCeremony(); playStage('clarity'); }),
+          mk('Action', () => { closeCeremony(); playStage('action'); }),
+          mk('Consist', () => { closeCeremony(); playStage('consistency'); })
+        ]));
+
+        // Row 2 - END OF CLARITY (jump straight to the ending without redoing it)
+        const dc = () => (typeof window.DevCeremony === 'object' && window.DevCeremony) ? window.DevCeremony : null;
+        body.appendChild(row('Clarity', [
+          mk('Synth', () => { const c = dc(); if (c) c.synth(); }),
+          mk('Reveal', () => { const c = dc(); if (c) c.reveal(); }),
+          mk('Star', () => { const c = dc(); if (c) c.star(); }),
+          mk('Summary', () => { const c = dc(); if (c) c.summary(); })
+        ]));
+
+        // Row 3 - MOMENTS (the animations)
+        body.appendChild(row('Play', [
+          mk('Unlock', () => {
+            closeCeremony();
+            document.body.classList.remove('pre-clarity', 'card-evolving', 'card-evolve-go');
+            window._evoStageOverride = STAGES.beginning;
+            apply();
+            _runClarityUnlockCinema(null, { holdOverride: STAGES.clarity });
+          }),
+          mk('Day 1', () => {
+            closeCeremony();
+            state.meta = state.meta || {};
+            state.meta.firstActionDone = false;
+            _maybeFirstWinMoment();
+          }),
+          mk('New day', () => {
+            closeCeremony();
+            state.meta = state.meta || {};
+            delete state.meta.lastNewDayPulse;
+            const cc = document.getElementById('commandCenter');
+            if (cc) { cc.innerHTML = renderCommandCenter(); bindCommandCenter(cc); }
+          })
+        ]));
+
+        // Row 4 - JUMP to a surface
+        body.appendChild(row('Go', [
+          mk('Home', () => { closeCeremony(); try { if (typeof Router !== 'undefined' && Router.go) Router.go('home'); } catch (e) {} }),
+          mk('Action mod', () => { closeCeremony(); try { if (typeof ActionExperience !== 'undefined') { state.action = state.action || {}; state.action.introSeen = true; ActionExperience.open(); } } catch (e) {} }),
+          mk('Clarity', () => { closeCeremony(); try { if (typeof ClarityExperience !== 'undefined') ClarityExperience.open(); } catch (e) {} })
+        ]));
+
+        bar.appendChild(head);
+        bar.appendChild(body);
         document.body.appendChild(bar);
       } catch (e) {}
     };

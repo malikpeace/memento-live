@@ -7809,7 +7809,10 @@ function _bindStarPlacard(root) {
 // to the star for real. Inert without ?ceremony=1.
 (function () {
   try {
-    if (!/[?&]ceremony=1/.test(location.search)) return;
+    // The synth/reveal/star jump functions are ALWAYS defined and exposed on
+    // window.DevCeremony so the ?dev=evo cheat bar can fly to the end of Clarity
+    // too. Only the ?ceremony=1 auto-scrubber boots on its own.
+    const CEREMONY_SCRUB = /[?&]ceremony=1/.test(location.search);
 
     // The reviewable stages. 'synth' replays the REAL end-of-questionnaire
     // moment: the aurora "Synthesizing your Neutron Star..." curtain that plays
@@ -7852,6 +7855,35 @@ function _bindStarPlacard(root) {
         const go = () => showCeremony('reveal');
         if (typeof finishCondenseThen === 'function') finishCondenseThen(go); else go();
       }, 2600);
+    };
+
+    // Shared API for the cheat bar: build a demo summary lazily, open the
+    // fullscreen Clarity shell, and jump straight to any ending beat.
+    const ensureSummary = () => {
+      if (!devSummary) { try { devSummary = normalizeClaritySummary(state.clarity.answers); } catch (e) {} }
+      return devSummary;
+    };
+    const openShell = () => {
+      try {
+        state.clarity.ignitedAt = null;
+        _ig2 = {};
+        ensureSummary();
+        ClarityExperience.isOpen = true;
+        if (typeof FullscreenClose !== 'undefined' && FullscreenClose.show) FullscreenClose.show('clarity');
+        ClarityExperience.el.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        try { TabBar.hide(); } catch (e) {}
+        ClarityExperience.el.classList.add('open-bg');
+        ClarityExperience.el.classList.add('open-bg-visible');
+        ClarityExperience.el.classList.add('open-content');
+      } catch (e) {}
+    };
+    window.DevCeremony = {
+      open: openShell,
+      synth: () => { openShell(); showSynth(); },
+      reveal: () => { openShell(); showCeremony('reveal'); },
+      star: () => { openShell(); showCeremony('star'); },
+      summary: () => { openShell(); try { ClarityExperience.openSummary(); } catch (e) {} }
     };
 
     // Free back/forth scrubber over the synth beat + five ceremony acts.
@@ -7923,7 +7955,9 @@ function _bindStarPlacard(root) {
         } catch (e) {}
       }, 1400);
     };
-    if (document.readyState === 'complete' || document.readyState === 'interactive') boot();
-    else document.addEventListener('DOMContentLoaded', boot);
+    if (CEREMONY_SCRUB) {
+      if (document.readyState === 'complete' || document.readyState === 'interactive') boot();
+      else document.addEventListener('DOMContentLoaded', boot);
+    }
   } catch (e) {}
 })();
