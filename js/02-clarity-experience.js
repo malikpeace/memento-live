@@ -2868,15 +2868,15 @@ const ActionExperience = {
         intake.answers.goalConfirm = _ns;
         const _tf = (state.clarity.answers.timeframe || state.clarity.answers.timeHorizon || '').trim();
         if (_tf) { intake.aiSnapshot.timeframe = _tf; intake.answers.timeframe = _tf; }
-        intake.phase = 'ai';
+        intake.phase = 'aiDriven';
       }
     }
 
     // Skeleton scaffold.
     this.pageWrap.innerHTML = `
-      <div class="action-exp__page-inner action-intake-page">
-        <div class="action-exp__inner action-intake">
-          <div class="action-intake__transcript"></div>
+      <div class="action-exp__page-inner action-intake-page action-intake-page--cine">
+        <div class="action-exp__inner action-intake action-intake--cine">
+          <div class="action-intake__transcript" style="display:none" aria-hidden="true"></div>
           <div class="action-intake__current"></div>
         </div>
       </div>`;
@@ -2894,7 +2894,7 @@ const ActionExperience = {
       // recent AI question as the current section so the user can pick up
       // exactly where they left off.
       this._restoreAiIntakeFromState();
-    } else if (intake.phase === 'ai') {
+    } else if (intake.phase === 'aiDriven' && intake.aiMessages.length === 0) {
       // v606 hot path: goal + timeframe already locked, the AI opens at
       // past progress directly.
       this._aiIntakeFetchNext();
@@ -3236,7 +3236,7 @@ const ActionExperience = {
 
     // Show typing indicator while we wait.
     const currentEl = this.pageWrap.querySelector('.action-intake__current');
-    if (currentEl) currentEl.innerHTML = '<div class="action-chat__typing"><span></span><span></span><span></span></div>';
+    if (currentEl) currentEl.innerHTML = '<div class="action-cine__thinking" aria-label="Thinking"><i></i></div>';
 
     const context = `User context for this conversation:
 Their locked Neutron Star: "${ns}"
@@ -3367,6 +3367,7 @@ They arrived HERE seconds after igniting this exact star, so the goal and timefr
       chips: parsed.options || []
     };
     current.innerHTML = this._buildCurrentSectionHtml(fakeQ);
+    this._cineActivate();
 
     // Back button: only show if at least one exchange has happened.
     const existingBack = intake.querySelector('#intakeBack');
@@ -3652,7 +3653,7 @@ They arrived HERE seconds after igniting this exact star, so the goal and timefr
       oldOptions.style.transform = 'translateY(4px)';
     }
     setTimeout(() => {
-      current.innerHTML = '<div class="action-chat__typing"><span></span><span></span><span></span></div>';
+      current.innerHTML = '<div class="action-cine__thinking" aria-label="Thinking"><i></i></div>';
       if (then) then();
     }, 280);
   },
@@ -3773,7 +3774,7 @@ They arrived HERE seconds after igniting this exact star, so the goal and timefr
 
     // 4. Show typing indicator in current section after a beat, then fetch next.
     setTimeout(() => {
-      current.innerHTML = '<div class="action-chat__typing"><span></span><span></span><span></span></div>';
+      current.innerHTML = '<div class="action-cine__thinking" aria-label="Thinking"><i></i></div>';
       this._aiIntakeFetchNext(answer);
     }, 280);
   },
@@ -3897,11 +3898,14 @@ They arrived HERE seconds after igniting this exact star, so the goal and timefr
   // options/input) for the step the user is currently on. Used by both the
   // initial render and the surgical back-swap so the markup stays in sync.
   _buildCurrentSectionHtml(q) {
-    // AI bubbles use the **bold** convention (see escWithBold helper).
-    let html = `<div class="action-chat__bubble action-chat__bubble--ai action-chat__bubble--current">${escWithBold(q.prompt || '')}</div>`;
+    // v615 (Malik): the intake speaks Clarity's language. One question at a
+    // time, full screen, typed out; the answers fade up once the line lands.
+    // The IDs/classes the submit handlers query are unchanged.
+    let html = `<div class="action-cine__q" data-cine-q>${escWithBold(q.prompt || '')}</div>`;
+    let answers = '';
     if (q.type === 'select' || q.type === 'choices') {
       const opts = (q.options || []).map(o => `<button class="action-chat__opt" type="button" data-value="${esc(o)}">${esc(o)}</button>`).join('');
-      html += `<div class="action-chat__options">${opts}</div>`;
+      answers += `<div class="action-chat__options">${opts}</div>`;
     } else if (q.type === 'chips') {
       const chipsSrc = (q.chips && q.chips.length) ? q.chips : (q.options || []);
       const chips = chipsSrc.map(c => `<button class="action-plan__when-chip" type="button" data-chip="${esc(c)}">${esc(c)}</button>`).join('');
@@ -3912,9 +3916,9 @@ They arrived HERE seconds after igniting this exact star, so the goal and timefr
           <input class="wiz__text-input" id="intakeCustom" type="text" placeholder="${esc(q.customPlaceholder || 'Or type your own...')}" style="flex:1;">
           <button class="action-wiz__btn action-wiz__btn--generate" id="intakeCustomSave" type="button" style="padding:12px 20px;border-radius:calc(8px * var(--rx, 1));">Use this</button>
         </div>`;
-      html += `<div class="action-plan__when-edit" id="intakeChips">${chips}</div>${customRow}`;
+      answers += `<div class="action-plan__when-edit" id="intakeChips">${chips}</div>${customRow}`;
     } else {
-      html += `
+      answers += `
         <div class="action-chat__input-row">
           <div class="action-chat__input-row-inner">
             <textarea class="action-chat__input" id="intakeInput" rows="2" placeholder="${esc(q.placeholder || 'Type your answer...')}" autocomplete="off"></textarea>
@@ -3923,7 +3927,34 @@ They arrived HERE seconds after igniting this exact star, so the goal and timefr
         </div>
         <div class="action-chat__error" id="intakeErr" style="display:none;"></div>`;
     }
+    html += `<div class="action-cine__answers">${answers}</div>`;
     return html;
+  },
+
+  // v615: type the question line out, then fade the answers up. Tap anywhere
+  // on the question to fast-forward. Reduced motion renders instantly.
+  _cineActivate() {
+    const qEl = this.pageWrap.querySelector('[data-cine-q]');
+    const ans = this.pageWrap.querySelector('.action-cine__answers');
+    if (!qEl) { if (ans) ans.classList.add('is-on'); return; }
+    const full = qEl.innerHTML;
+    const plain = qEl.textContent || '';
+    const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const finish = () => {
+      qEl.innerHTML = full;
+      if (ans) ans.classList.add('is-on');
+    };
+    if (reduced || plain.length < 2) { finish(); return; }
+    qEl.textContent = '';
+    let i = 0, done = false;
+    const step = Math.max(1, Math.round(plain.length / 110));   // whole line lands in ~1.6s
+    const iv = setInterval(() => {
+      if (done) return;
+      i += step;
+      if (i >= plain.length) { done = true; clearInterval(iv); finish(); return; }
+      qEl.textContent = plain.slice(0, i);
+    }, 15);
+    qEl.addEventListener('click', () => { if (!done) { done = true; clearInterval(iv); finish(); } }, { once: true });
   },
 
   // Generates a one-line, personalized AI reaction to the user's previous
@@ -4042,6 +4073,7 @@ Give them ONE short, personal reaction that references something specific in the
     const renderNextQuestion = () => {
       if (!nextQ) { this._finishIntake(); return; }
       current.innerHTML = this._buildCurrentSectionHtml(nextQ);
+      this._cineActivate();
       const existingBack = intake.querySelector('#intakeBack');
       if (existingBack) existingBack.remove();
       const backBtn = document.createElement('button');
@@ -4111,6 +4143,7 @@ Give them ONE short, personal reaction that references something specific in the
 
     // Replace the inner HTML of the current section only.
     current.innerHTML = this._buildCurrentSectionHtml(q);
+    this._cineActivate();
 
     // Update / inject the back button at the top of the intake. It only shows
     // when step > 0; rebuild it surgically so the existing button (still in
@@ -4393,14 +4426,10 @@ Return ONLY the sentence text. No quotes, no labels.`;
 
     if (actionAiLoading) {
       this.pageWrap.innerHTML = `
-        <div class="action-exp__page-inner"><div class="action-exp__inner action-draft-loading">
-          <div class="ai-synthesis__thinking action-draft-loading__dots"><span></span><span></span><span></span></div>
-          <div class="action-draft-loading__title">Building your action plan.</div>
-          <div class="action-draft-loading__lines">
-            <div class="action-draft-loading__line action-draft-loading__line--1">Confirming what you want and how to get it.</div>
-            <div class="action-draft-loading__line action-draft-loading__line--2">Finding the highest leverage actions you can take today.</div>
-            <div class="action-draft-loading__line action-draft-loading__line--3" style="font-style: italic; opacity: 0.7;">"The magic you're looking for is in the work you're avoiding."</div>
-          </div>
+        <div class="action-exp__page-inner"><div class="action-exp__inner action-draft-loading action-draft-loading--cine">
+          <div class="action-cine__thinking" aria-hidden="true"><i></i></div>
+          <div class="action-draft-loading__title">Building your path.</div>
+          <div class="action-draft-loading__line action-draft-loading__line--1">Finding the highest leverage move you can make today.</div>
         </div></div>`;
       return;
     }
@@ -4421,6 +4450,32 @@ Return ONLY the sentence text. No quotes, no labels.`;
     }
 
     if (hasActionPlan() && actionPlanMatchesClarity()) {
+      // v615: the FIRST time the plan exists, the ONE move gets its reveal,
+      // big on black, word by word, then the plan settles in underneath.
+      state.meta = state.meta || {};
+      if (!state.meta.planRevealSeen) {
+        state.meta.planRevealSeen = true;
+        try { persistNow(); } catch (e) {}
+        const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (!reduced) {
+          const pa = state.action.primaryAction || {};
+          const tier = (state.action.selectedTier || pa.recommendedTier || 'moderate');
+          const move = (pa.tiers && pa.tiers[tier]) || pa.howToStart || pa.title || '';
+          if (move) {
+            const words = String(move).split(/\s+/).filter(Boolean).map((w, i) =>
+              `<span class="action-cine__rw" style="animation-delay:${380 + i * 170}ms">${esc(w)}</span>`
+            ).join(' ');
+            this.pageWrap.innerHTML = `
+              <div class="action-exp__page-inner"><div class="action-exp__inner action-cine-reveal">
+                <div class="action-cine-reveal__eyebrow">The first move</div>
+                <div class="action-cine-reveal__move">${words}</div>
+              </div></div>`;
+            const holdMs = 380 + String(move).split(/\s+/).length * 170 + 1900;
+            setTimeout(() => { if (this.isOpen) this.renderContent(); }, Math.min(holdMs, 7000));
+            return;
+          }
+        }
+      }
       this._renderPlanByMode();
       return;
     }
