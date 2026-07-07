@@ -1720,9 +1720,10 @@ async function generateAccountabilityCheck() {
 //   one call, so it gets Opus. Conversation cheap, the payoff sharp.
 // - ANTHROPIC_MODEL_PLANS stays pinned to the model the 2000-line action-plan
 //   prompts were tuned against, so plan quality never silently shifts.
-// - ANTHROPIC_MODEL (default) covers the cheap high-volume calls: insights,
-//   accountability check-ins, goal sharpening, star names.
-const ANTHROPIC_MODEL = 'claude-haiku-4-5';
+// - ANTHROPIC_MODEL (default) covers everything else: insights, accountability
+//   check-ins, goal sharpening, star names. Sonnet too (Malik, 2026-07-07:
+//   no Haiku anywhere, quality shows even in one-liners).
+const ANTHROPIC_MODEL = 'claude-sonnet-4-6';
 const ANTHROPIC_MODEL_CLARITY = 'claude-sonnet-4-6';
 const ANTHROPIC_MODEL_SYNTHESIS = 'claude-opus-4-8';
 const ANTHROPIC_MODEL_PLANS = 'claude-sonnet-4-6';
