@@ -1750,7 +1750,15 @@ const CreatorTools = {
     bind('creatorJumpSplash', () => this.jumpSplash());
     bind('creatorJumpOnboarding', () => this.jumpOnboarding());
     bind('creatorJumpStyle', () => this.jumpStyle());
-    bind('creatorJumpDashboard', () => this.jumpDashboard());
+    // Stage & animation jumps (Malik: fly around Memento from the cheat bar)
+    bind('creatorJumpBlankCard', () => this.jumpBlankCard());
+    bind('creatorJumpUnlock', () => this.jumpUnlockCinema());
+    bind('creatorJumpSynth', () => this.jumpSynth());
+    bind('creatorJumpReveal', () => this.jumpReveal());
+    bind('creatorJumpStar', () => this.jumpStar());
+    bind('creatorJumpStarSummary', () => this.jumpStarSummary());
+    bind('creatorJumpDay1', () => this.jumpDay1());
+    bind('creatorJumpNewDay', () => this.jumpNewDay());
 
     // Dropdown toggle
     const toggle = document.getElementById('creatorBoxToggle');
@@ -1995,6 +2003,49 @@ const CreatorTools = {
     if (ActionExperience.isOpen) ActionExperience.renderContent();
     else ActionExperience.open();
     this.render();
+  },
+
+  // Close the cheat dropdown AND the sidebar drawer so a card animation is
+  // actually visible on the home behind them.
+  _closeAll() {
+    try {
+      document.getElementById('creatorBox')?.classList.remove('creator-box--open');
+      document.body.classList.remove('mobile-menu-open', 'menu-peek');
+    } catch (e) {}
+  },
+
+  // --- Stage & animation jumps (Malik: fly around from the cheat bar) ---
+  jumpBlankCard() {
+    this._closeAll();
+    try { if (window.DevStages) window.DevStages.play('beginning'); } catch (e) {}
+  },
+  jumpUnlockCinema() {
+    this._closeAll();
+    try {
+      if (window.DevStages) window.DevStages.close();
+      document.body.classList.remove('pre-clarity', 'card-evolving', 'card-evolve-go');
+      window._evoStageOverride = { clar: 0, act: 0, cons: 0 };
+      const w = document.querySelector('.daycard-wrap');
+      if (w && typeof setLivingCardVars === 'function') setLivingCardVars(w);
+      if (typeof _runClarityUnlockCinema === 'function') _runClarityUnlockCinema(null, { holdOverride: { clar: 100, act: 0, cons: 0 } });
+    } catch (e) {}
+  },
+  jumpSynth() { this._closeAll(); try { if (window.DevCeremony) window.DevCeremony.synth(); } catch (e) {} },
+  jumpReveal() { this._closeAll(); try { if (window.DevCeremony) window.DevCeremony.reveal(); } catch (e) {} },
+  jumpStar() { this._closeAll(); try { if (window.DevCeremony) window.DevCeremony.star(); } catch (e) {} },
+  jumpStarSummary() { this._closeAll(); try { if (window.DevCeremony) window.DevCeremony.summary(); } catch (e) {} },
+  jumpDay1() {
+    this._closeAll();
+    try { state.meta = state.meta || {}; state.meta.firstActionDone = false; if (typeof _maybeFirstWinMoment === 'function') _maybeFirstWinMoment(); } catch (e) {}
+  },
+  jumpNewDay() {
+    this._closeAll();
+    try {
+      state.meta = state.meta || {};
+      delete state.meta.lastNewDayPulse;
+      const cc = document.getElementById('commandCenter');
+      if (cc && typeof renderCommandCenter === 'function') { cc.innerHTML = renderCommandCenter(); if (typeof bindCommandCenter === 'function') bindCommandCenter(cc); }
+    } catch (e) {}
   }
 };
 

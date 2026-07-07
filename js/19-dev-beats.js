@@ -219,14 +219,50 @@
    ============================================================ */
 (function () {
   try {
-    // Shown when ?dev=evo is in the URL OR when Malik has toggled it on with the
-    // hidden gesture (persisted per-device in localStorage). Customers never see
-    // it: no param + no flag = nothing renders, and the gesture is a deliberate
-    // 5-tap in the top-right corner that no real user would trip.
+    // The floating ?dev=evo bar is URL-gated. The card-stage jump helpers below
+    // are ALWAYS exposed on window.DevStages so the in-app Cheat Code Bar
+    // (CreatorTools, in the menu) can drive the real home card too.
     var hasParam = /[?&]dev=evo/.test(location.search);
-    var flagOn = function () { try { return localStorage.getItem('mementoCheat') === '1'; } catch (e) { return false; } };
-    var setFlag = function (v) { try { if (v) localStorage.setItem('mementoCheat', '1'); else localStorage.removeItem('mementoCheat'); } catch (e) {} };
-    var shouldShow = function () { return hasParam || flagOn(); };
+
+    var DSTAGES = {
+      beginning:   { clar: 0,   act: 0,  cons: 0 },
+      clarity:     { clar: 100, act: 0,  cons: 0 },
+      action:      { clar: 100, act: 62, cons: 0 },
+      consistency: { clar: 100, act: 62, cons: 70 }
+    };
+    var DORDER = ['beginning', 'clarity', 'action', 'consistency'];
+    var dApply = function () { var w = document.querySelector('.daycard-wrap'); if (w && typeof setLivingCardVars === 'function') setLivingCardVars(w); return w; };
+    var dClose = function () {
+      try {
+        var r = document.getElementById('nsv2Root'); if (r) r.remove();
+        var cx = document.querySelector('.clarity-exp');
+        if (cx) { cx.classList.remove('open-bg', 'open-bg-visible', 'open-content', 'open'); cx.setAttribute('aria-hidden', 'true'); }
+        if (typeof ClarityExperience !== 'undefined') ClarityExperience.isOpen = false;
+        if (typeof ActionExperience !== 'undefined' && ActionExperience.close) ActionExperience.close();
+        if (typeof FullscreenClose !== 'undefined' && FullscreenClose.hide) FullscreenClose.hide();
+        if (typeof TabBar !== 'undefined' && TabBar.show) TabBar.show();
+        document.body.style.overflow = '';
+      } catch (e) {}
+    };
+    var dPlay = function (key) {
+      dClose();
+      document.body.classList.remove('pre-clarity', 'card-evolving', 'card-evolve-go', 'stage-cinema');
+      var from = DSTAGES[DORDER[Math.max(0, DORDER.indexOf(key) - 1)]];
+      window._evoStageOverride = (key === 'beginning') ? DSTAGES.beginning : from;
+      var w = dApply(); if (!w) return;
+      document.body.classList.toggle('ns-bloom', DORDER.indexOf(key) > 1);
+      void w.offsetWidth;
+      setTimeout(function () {
+        document.body.classList.add('stage-cinema');
+        window._evoStageOverride = DSTAGES[key];
+        dApply();
+        if (key === 'clarity') setTimeout(function () { document.body.classList.add('ns-bloom'); }, 2000);
+        if (key === 'beginning') document.body.classList.remove('ns-bloom');
+        setTimeout(function () { document.body.classList.remove('stage-cinema'); }, 3400);
+      }, 650);
+    };
+    window.DevStages = { play: dPlay, close: dClose, STAGES: DSTAGES };
+
     const mount = () => {
       try {
         if (document.getElementById('evoDevBar')) return;
@@ -380,28 +416,9 @@
         document.body.appendChild(bar);
       } catch (e) {}
     };
-    const unmount = () => { const b = document.getElementById('evoDevBar'); if (b) b.remove(); };
-
-    // Hidden summon: 5 quick taps in the top-right corner (over the date) toggles
-    // the cheat bar on/off and remembers the choice for this device.
-    let taps = [];
-    document.addEventListener('click', (e) => {
-      try {
-        if (e.clientX > window.innerWidth - 60 && e.clientY < 72) {
-          const now = Date.now();
-          taps = taps.filter((t) => now - t < 1600);
-          taps.push(now);
-          if (taps.length >= 5) {
-            taps = [];
-            if (document.getElementById('evoDevBar')) { setFlag(false); unmount(); }
-            else { setFlag(true); mount(); }
-          }
-        }
-      } catch (err) {}
-    }, true);
-
-    const boot = () => { if (shouldShow()) mount(); };
-    if (document.readyState === 'complete' || document.readyState === 'interactive') setTimeout(boot, 1200);
-    else window.addEventListener('DOMContentLoaded', () => setTimeout(boot, 1200));
+    if (hasParam) {
+      if (document.readyState === 'complete' || document.readyState === 'interactive') setTimeout(mount, 1200);
+      else window.addEventListener('DOMContentLoaded', () => setTimeout(mount, 1200));
+    }
   } catch (e) {}
 })();
