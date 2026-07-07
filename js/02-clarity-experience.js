@@ -2621,6 +2621,15 @@ const ActionExperience = {
     // Gate order: intro → intake (5 questions) → plan. The user has to
     // complete the intake before they can see the mountain, even on reload.
     const intakeDone = state.action.intake && state.action.intake.completed;
+    // v606 (Malik): arriving HOT from the ignition ceremony, no intro deck.
+    // "A star is not a plan" was the promise; the next screen is the plan.
+    const _hotIgnition = !!(state.clarity && state.clarity.completed && state.clarity.ignitedAt
+      && (Date.now() - state.clarity.ignitedAt) < 30 * 60 * 1000);
+    if (!state.action.introSeen && _hotIgnition && !intakeDone) {
+      state.action.introSeen = true;
+      state.action.tutorialSeen = true;
+      try { persistNow(); } catch (e) {}
+    }
     if (!state.action.introSeen) {
       this._showActionIntro();
     } else if (!intakeDone) {
@@ -2846,6 +2855,21 @@ const ActionExperience = {
       intake.aiHistory = [];
       intake.pendingNewGoal = '';
       intake.phase = 'goalConfirm';
+      // v606 (Malik): they pressed and held for THIS star minutes ago; asking
+      // "does it still fit?" again kills the momentum. Hot from ignition, the
+      // goal is confirmed by the hold itself and the timeframe came from Act 3,
+      // so the conversation opens at "what have you actually done so far".
+      const _hot = !!(state.clarity && state.clarity.ignitedAt
+        && (Date.now() - state.clarity.ignitedAt) < 30 * 60 * 1000);
+      const _ns = (state.clarity.answers && state.clarity.answers.neutronStar) || '';
+      if (_hot && _ns) {
+        intake.answers = intake.answers || {};
+        intake.aiSnapshot.goalConfirm = _ns;
+        intake.answers.goalConfirm = _ns;
+        const _tf = (state.clarity.answers.timeframe || state.clarity.answers.timeHorizon || '').trim();
+        if (_tf) { intake.aiSnapshot.timeframe = _tf; intake.answers.timeframe = _tf; }
+        intake.phase = 'ai';
+      }
     }
 
     // Skeleton scaffold.
@@ -2870,6 +2894,10 @@ const ActionExperience = {
       // recent AI question as the current section so the user can pick up
       // exactly where they left off.
       this._restoreAiIntakeFromState();
+    } else if (intake.phase === 'ai') {
+      // v606 hot path: goal + timeframe already locked, the AI opens at
+      // past progress directly.
+      this._aiIntakeFetchNext();
     } else {
       // Render the first phase (hardcoded opener).
       this._renderIntakePhase();
@@ -3217,7 +3245,9 @@ ${ca.antiVision ? `What they fear if they never act (from Clarity, background co
 A timeframe they mentioned in Clarity (use as a starting reference, but confirm): "${tfHint}"
 Current snapshot (what you have captured so far): ${JSON.stringify(intake.aiSnapshot)}
 
-Reminder: ONLY put a value in snapshot.X when the user's most recent answer is substantive for field X. If it's vague, garbage, sarcastic, or a platitude, leave the field empty and push back in your message.`;
+Reminder: ONLY put a value in snapshot.X when the user's most recent answer is substantive for field X. If it's vague, garbage, sarcastic, or a platitude, leave the field empty and push back in your message.${(intake.aiMessages.length === 0 && intake.aiSnapshot.goalConfirm) ? `
+
+They arrived HERE seconds after igniting this exact star, so the goal and timeframe are already locked (see snapshot). Do NOT greet them like a returning user (never "welcome back"), do NOT re-confirm the goal, and NO emojis. One short grounded line that carries the momentum, then ask what they have actually done toward it so far.` : ''}`;
 
     // Build API messages: inject context into the FIRST user message of the convo.
     const apiMessages = [];
