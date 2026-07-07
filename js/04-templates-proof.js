@@ -273,10 +273,32 @@ function celebrateDone(el) {
   } catch (_) {}
 }
 
+// v607 (Malik, overnight item 3): the FIRST action ever completed gets one
+// quiet full-screen beat: black, "Day 1." blooming in, gone. Motion and
+// darkness only, no new visual language, once in a lifetime per account.
+function _maybeFirstWinMoment() {
+  state.meta = state.meta || {};
+  if (state.meta.firstActionDone) { return; }
+  state.meta.firstActionDone = true;
+  try { persistNow(); } catch (e) {}
+  const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduced) return;
+  const el = document.createElement('div');
+  el.className = 'first-win';
+  el.innerHTML = '<div class="first-win__label">Day 1.</div>';
+  document.body.appendChild(el);
+  requestAnimationFrame(() => el.classList.add('is-on'));
+  setTimeout(() => { el.classList.remove('is-on'); }, 2200);
+  setTimeout(() => { try { el.remove(); } catch (e) {} }, 2900);
+}
+
 function writeProofEvent(type, fields) {
   try {
     if (!type) return null;
-    if (type === 'action-complete') { try { feel('complete'); } catch (_) {} }
+    if (type === 'action-complete') {
+      try { feel('complete'); } catch (_) {}
+      try { _maybeFirstWinMoment(); } catch (_) {}
+    }
     if (!Array.isArray(state.proofEvents)) state.proofEvents = [];
     fields = fields || {};
     // Callers that may re-fire on re-render pass a dedupeKey to stay idempotent.
