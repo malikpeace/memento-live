@@ -3351,6 +3351,11 @@ html.lowfx .nsv2.is-holding .nsv2__rays.ambient__rays {
 @keyframes nsv2CoreBreathe { 0%,100% { box-shadow: 0 0 18px 6px rgba(var(--star-glow), 0.8), 0 0 50px 18px rgba(var(--star-glow), 0.45), 0 0 110px 40px rgba(var(--star-glow), 0.18); } 50% { box-shadow: 0 0 22px 8px rgba(var(--star-glow), 0.9), 0 0 60px 24px rgba(var(--star-glow), 0.55), 0 0 130px 52px rgba(var(--star-glow), 0.24); } }
 /* After the ignition: their sentence under the star, app type, then the handoff. */
 .nsv2-after { text-align: center; max-width: 480px; margin: 26px auto 0; animation: nsv2In 0.9s 0.25s cubic-bezier(0.22,1,0.36,1) both; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.nsv2-after__eyebrow {
+  font-family: var(--font); font-size: 0.6875rem; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: rgba(255,255,255,0.5); margin-bottom: -4px;
+}
 .nsv2-after__goal {
   font-family: var(--font); font-size: clamp(1.15rem, 3.4vw, 1.5rem); font-weight: 700;
   line-height: 1.35; letter-spacing: -0.015em; color: rgba(255,255,255,0.97);

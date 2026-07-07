@@ -7606,6 +7606,7 @@ function renderIgnitionV2(summary) {
       <div class="nsv2-starscene">
         <canvas class="nsv2-star__blob" id="nsv2StarBlob" aria-hidden="true"></canvas>
         <div class="nsv2-after">
+          <div class="nsv2-after__eyebrow">Your Neutron Star</div>
           <div class="nsv2-after__goal">${esc(goal)}</div>
           <button type="button" class="nsv2-cta" id="nsv2Action">Add to your Memento</button>
         </div>
