@@ -2077,30 +2077,9 @@ window.addEventListener('keydown', (e) => {
   window.addEventListener('orientationchange', apply);
 })();
 
-// Scroll performance: while the user is actively scrolling, pause the heavy
-// continuous effects (WebGL star, gradient borders, dashboard animations). On
-// mobile, re-rasterising those every frame WHILE scrolling is what drops FPS to
-// single digits. Pausing them lets the page scroll at 60fps; they snap back the
-// instant scrolling stops (invisible during a fast scroll).
-(function () {
-  const st = document.createElement('style');
-  st.textContent = 'body.is-scrolling .app *,body.is-scrolling .app *::before,body.is-scrolling .app *::after{animation-play-state:paused!important;}';
-  (document.head || document.documentElement).appendChild(st);
-  let t = 0;
-  const onScroll = () => {
-    if (!window.__scrolling) {
-      window.__scrolling = true;
-      document.body.classList.add('is-scrolling');
-    }
-    clearTimeout(t);
-    t = setTimeout(() => {
-      window.__scrolling = false;
-      document.body.classList.remove('is-scrolling');
-    }, 130);
-  };
-  document.addEventListener('scroll', onScroll, { capture: true, passive: true });
-  document.addEventListener('touchmove', onScroll, { passive: true });
-})();
+// Scroll-pause REMOVED (Malik, v618): animations used to pause while scrolling
+// as a perf guard, but the visible freeze reads worse than the frame cost on
+// modern phones. If old devices ever complain, revive behind ?lowfx=1 only.
 
 // Mobile navigation gestures (touch devices only):
 //  - Swipe left->right to go BACK: if a note is open full-screen it returns to
