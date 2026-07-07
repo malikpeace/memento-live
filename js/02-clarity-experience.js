@@ -3089,19 +3089,9 @@ const ActionExperience = {
   _renderIntakeBackButton() {
     const intake = this.pageWrap.querySelector('.action-intake');
     if (!intake) return;
-    const existingBack = intake.querySelector('#intakeBack');
-    if (existingBack) existingBack.remove();
     const userTurns = (state.action.intake && state.action.intake.aiMessages || [])
       .filter(m => m.role === 'user').length;
-    if (userTurns <= 0) return;
-    const backBtn = document.createElement('button');
-    backBtn.className = 'action-intake__back';
-    backBtn.id = 'intakeBack';
-    backBtn.type = 'button';
-    backBtn.setAttribute('aria-label', 'Previous question');
-    backBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg><span>Back</span>';
-    backBtn.addEventListener('click', () => this._intakeBack());
-    intake.insertBefore(backBtn, intake.firstChild);
+    this._cineRenderChrome(userTurns > 0, () => this._intakeBack());
   },
 
   // Back: pop the last user message + last AI message from the conversation,
@@ -3390,22 +3380,9 @@ They arrived HERE seconds after igniting this exact star, so the goal and timefr
     current.innerHTML = this._buildCurrentSectionHtml(fakeQ);
     this._cineActivate();
 
-    // v625 (Malik): the intake wears CLARITY's skeleton. Thin progress bar up
-    // top (fields captured / 4), and the wizard's bottom nav: back arrow +
-    // big Next that stays disabled until there is an answer.
-    try {
-      const snap = state.action.intake.aiSnapshot || {};
-      const filled = ['goalConfirm', 'timeframe', 'pastProgress', 'mainMove']
-        .filter(k => typeof snap[k] === 'string' && snap[k].trim().length > 0).length;
-      const pct = Math.max(8, Math.round(filled / 4 * 100));
-      this.progressEl.innerHTML = '<div class="ai-progress__bar"><div class="ai-progress__fill" style="width:' + pct + '%"></div></div>';
-    } catch (e) {}
-    const canGoBack = state.action.intake.aiMessages.filter(m => m.role === 'user').length > 0;
-    this.navEl.innerHTML =
-      (canGoBack ? '<button class="clarity-exp__nav-btn clarity-exp__nav-btn--back" id="intakeBack" aria-label="Back"></button>' : '') +
-      '<button class="clarity-exp__nav-btn clarity-exp__nav-btn--next" id="intakeSend" disabled>Next</button>';
-    const backBtn = this.navEl.querySelector('#intakeBack');
-    if (backBtn) backBtn.addEventListener('click', () => this._aiIntakeBack());
+    this._cineRenderChrome(
+      state.action.intake.aiMessages.filter(m => m.role === 'user').length > 0,
+      () => this._aiIntakeBack());
 
     // If the user just hit Back, pre-fill the previous answer into the input
     // so they can edit it. If they leave it unchanged and hit send, we'll
@@ -3450,41 +3427,56 @@ They arrived HERE seconds after igniting this exact star, so the goal and timefr
 
   // Helper used by both the phase machine and the back navigation to wire up
   // chip / textarea / send button handlers consistently.
+  // v627: DELEGATED wiring. Renders kept replacing innerHTML after per-element
+  // listeners attached, orphaning them (dead Next button on device). One set of
+  // listeners lives on the permanent containers (pageWrap + navEl) forever and
+  // reads the CURRENT elements at event time, so no re-render can kill them.
   _wireSubmitHandlers(q, submit) {
-    const nextBtn = (this.navEl && this.navEl.querySelector('#intakeSend')) || this.pageWrap.querySelector('#intakeSend');
-    if (q.type === 'choices' || q.type === 'select') {
-      // Clarity behavior: tap selects, Next confirms.
-      let picked = '';
-      this.pageWrap.querySelectorAll('.action-chat__opt').forEach(btn => {
-        btn.addEventListener('click', () => {
-          picked = btn.dataset.value;
-          this.pageWrap.querySelectorAll('.action-chat__opt').forEach(b => b.classList.toggle('selected', b === btn));
-          if (nextBtn) nextBtn.disabled = false;
-        });
-      });
-      if (nextBtn) nextBtn.addEventListener('click', () => { if (picked) submit(picked); });
-    } else if (q.type === 'chips') {
-      this.pageWrap.querySelectorAll('#intakeChips .action-plan__when-chip').forEach(btn => {
-        btn.addEventListener('click', () => submit(btn.dataset.chip));
-      });
-      const custom = this.pageWrap.querySelector('#intakeCustom');
-      const customBtn = this.pageWrap.querySelector('#intakeCustomSave');
-      if (customBtn) customBtn.addEventListener('click', () => submit(custom && custom.value));
-      if (custom) custom.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') { e.preventDefault(); submit(custom.value); }
-      });
-    } else {
-      const input = this.pageWrap.querySelector('#intakeInput');
-      const doSubmit = () => submit(input && input.value);
-      if (nextBtn) nextBtn.addEventListener('click', doSubmit);
-      if (input) {
-        input.addEventListener('input', () => { if (nextBtn) nextBtn.disabled = !(input.value || '').trim(); });
-        input.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); doSubmit(); }
-        });
-        setTimeout(() => input.focus(), 80);
+    this._cineEnsureDelegation();
+    this._cinePicked = '';
+    this._cineQType = (q.type === 'choices' || q.type === 'select') ? 'choices' : (q.type === 'chips' ? 'chips' : 'text');
+    this._cineSubmit = submit;
+    if (this._cineQType === 'text') setTimeout(() => { const i = this.pageWrap.querySelector('#intakeInput'); if (i) i.focus(); }, 80);
+  },
+
+  _cineGo() {
+    if (!this._cineSubmit) return;
+    if (this._cineQType === 'choices') { if (this._cinePicked) this._cineSubmit(this._cinePicked); return; }
+    const i = this.pageWrap.querySelector('#intakeInput');
+    this._cineSubmit(i && i.value);
+  },
+
+  _cineEnsureDelegation() {
+    if (this._cineDelegated) return;
+    this._cineDelegated = true;
+    this.pageWrap.addEventListener('input', (e) => {
+      if (!e.target || e.target.id !== 'intakeInput') return;
+      const nb = this.navEl.querySelector('#intakeSend');
+      if (nb) nb.disabled = !((e.target.value || '').trim());
+    });
+    this.pageWrap.addEventListener('keydown', (e) => {
+      if (!e.target) return;
+      if (e.target.id === 'intakeInput' && e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this._cineGo(); }
+      if (e.target.id === 'intakeCustom' && e.key === 'Enter') { e.preventDefault(); if (this._cineSubmit) this._cineSubmit(e.target.value); }
+    });
+    this.pageWrap.addEventListener('click', (e) => {
+      const opt = e.target.closest && e.target.closest('.action-chat__opt');
+      if (opt) {
+        this._cinePicked = opt.dataset.value;
+        this.pageWrap.querySelectorAll('.action-chat__opt').forEach(b => b.classList.toggle('selected', b === opt));
+        const nb = this.navEl.querySelector('#intakeSend');
+        if (nb) nb.disabled = false;
+        return;
       }
-    }
+      const chip = e.target.closest && e.target.closest('#intakeChips .action-plan__when-chip');
+      if (chip && this._cineSubmit) { this._cineSubmit(chip.dataset.chip); return; }
+      const saveBtn = e.target.closest && e.target.closest('#intakeCustomSave');
+      if (saveBtn && this._cineSubmit) { const c = this.pageWrap.querySelector('#intakeCustom'); this._cineSubmit(c && c.value); }
+    });
+    this.navEl.addEventListener('click', (e) => {
+      const nb = e.target.closest && e.target.closest('#intakeSend');
+      if (nb && !nb.disabled) this._cineGo();
+    });
   },
 
   // The actual state-machine transitions. Each branch decides what phase
@@ -3760,7 +3752,7 @@ They arrived HERE seconds after igniting this exact star, so the goal and timefr
       const doSubmit = () => submit(input && input.value);
       if (nextBtn) nextBtn.addEventListener('click', doSubmit);
       if (input) {
-        input.addEventListener('input', () => { if (nextBtn) nextBtn.disabled = !(input.value || '').trim(); });
+        input.addEventListener('input', () => { if (nextBtn) nextBtn.disabled = !((input.value || '').trim()); });
         input.addEventListener('keydown', (e) => {
           if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); doSubmit(); }
         });
@@ -3907,12 +3899,8 @@ They arrived HERE seconds after igniting this exact star, so the goal and timefr
         <div class="action-chat__error" id="intakeErr" style="display:none;"></div>`;
     }
 
-    const backHtml = step > 0
-      ? `<button class="action-intake__back" id="intakeBack" type="button" aria-label="Previous question">
-           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-           <span>Back</span>
-         </button>`
-      : '';
+    const backHtml = '';
+    this._cineRenderChrome(step > 0, () => this._intakeBack());
 
     const goingBackCls = goingBack ? ' action-intake--going-back' : '';
     this.pageWrap.innerHTML = `
@@ -3964,6 +3952,18 @@ They arrived HERE seconds after igniting this exact star, so the goal and timefr
     return html;
   },
 
+
+  // v626 (Malik): ONE chrome renderer for every intake render path. Bottom nav
+  // only (back arrow when there is history + big Next), NO progress bar, and
+  // never a floating top back pill.
+  _cineRenderChrome(canGoBack, backFn) {
+    try { this.progressEl.innerHTML = ''; } catch (e) {}
+    this.navEl.innerHTML =
+      (canGoBack ? '<button class="clarity-exp__nav-btn clarity-exp__nav-btn--back" id="intakeBack" aria-label="Back"></button>' : '') +
+      '<button class="clarity-exp__nav-btn clarity-exp__nav-btn--next" id="intakeSend" disabled>Next</button>';
+    const backBtn = this.navEl.querySelector('#intakeBack');
+    if (backBtn && backFn) backBtn.addEventListener('click', backFn);
+  },
   // v615: type the question line out, then fade the answers up. Tap anywhere
   // on the question to fast-forward. Reduced motion renders instantly.
   _cineActivate() {
@@ -4108,15 +4108,7 @@ Give them ONE short, personal reaction that references something specific in the
       if (!nextQ) { this._finishIntake(); return; }
       current.innerHTML = this._buildCurrentSectionHtml(nextQ);
       this._cineActivate();
-      const existingBack = intake.querySelector('#intakeBack');
-      if (existingBack) existingBack.remove();
-      const backBtn = document.createElement('button');
-      backBtn.className = 'action-intake__back';
-      backBtn.id = 'intakeBack';
-      backBtn.type = 'button';
-      backBtn.setAttribute('aria-label', 'Previous question');
-      backBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg><span>Back</span>';
-      intake.insertBefore(backBtn, intake.firstChild);
+      this._cineRenderChrome(true, () => this._intakeBack());
       this._bindIntakeStep(nextQ);
     };
 
@@ -4182,17 +4174,7 @@ Give them ONE short, personal reaction that references something specific in the
     // Update / inject the back button at the top of the intake. It only shows
     // when step > 0; rebuild it surgically so the existing button (still in
     // the DOM from before) doesn't keep its stale click handler.
-    const existingBack = intake.querySelector('#intakeBack');
-    if (existingBack) existingBack.remove();
-    if (step > 0) {
-      const backBtn = document.createElement('button');
-      backBtn.className = 'action-intake__back';
-      backBtn.id = 'intakeBack';
-      backBtn.type = 'button';
-      backBtn.setAttribute('aria-label', 'Previous question');
-      backBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg><span>Back</span>';
-      intake.insertBefore(backBtn, intake.firstChild);
-    }
+    this._cineRenderChrome(step > 0, () => this._intakeBack());
 
     // Re-bind the step (back button click + advance handlers).
     this._bindIntakeStep(q);
