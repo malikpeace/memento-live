@@ -3301,6 +3301,20 @@ They arrived HERE seconds after igniting this exact star, so the goal and timefr
       const snap = intake.aiSnapshot;
       const lengthOk = (s, n) => typeof s === 'string' && s.trim().length >= n;
       const snapComplete = lengthOk(snap.goalConfirm, 8) && lengthOk(snap.timeframe, 2) && lengthOk(snap.pastProgress, 4) && lengthOk(snap.mainMove, 4);
+      // v620 backstop: the reality-check calibration is NON-SKIPPABLE and small
+      // models skip it when the user pre-accepts. If no assistant turn ever ran
+      // the comfortable-or-stretch calibration, refuse ready once and force it.
+      const calibrated = intake.aiMessages.some(m => m.role === 'assistant'
+        && /comfortab|stretch|realistic(ally)? (do|get|fit)|actually (get|fit) (this|it)/i.test(String(m.content)))
+        || /comfortab|stretch/i.test(String(parsed.message || ''));
+      if (parsed.ready === true && snapComplete && !calibrated && !intake._calibrationForced) {
+        intake._calibrationForced = true;
+        intake.aiMessages.push({ role: 'assistant', content: JSON.stringify(parsed) });
+        intake.aiMessages.push({ role: 'user', content: '[System note: you set ready without running the reality-check calibration. Ask ONE question now, in your own words: with their real week and the capacity they described, is this move comfortable or a stretch? Adjust the move if the answer says so, then finish.]' });
+        persistNow();
+        await this._aiIntakeFetchNext();
+        return;
+      }
       if (parsed.ready === true && snapComplete) {
         intake.completed = true;
         persistNow();
