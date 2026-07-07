@@ -221,10 +221,23 @@ body:has(.clarity-exp.open)::after { display: none; }
 .action-exp:has(.action-plan-page) .action-exp__top,
 .action-exp:has(.action-plan-page) .action-exp__progress,
 .action-exp:has(.action-plan-page) .action-exp__nav,
-.action-exp:has(.action-intake-page) .action-exp__top,
-.action-exp:has(.action-intake-page) .action-exp__progress,
-.action-exp:has(.action-intake-page) .action-exp__nav {
+.action-exp:has(.action-intake-page) .action-exp__top {
   display: none;
+}
+/* v625: the cinematic intake wears Clarity's skeleton, progress bar at the
+   top and the back/Next nav at the bottom, so those stay visible for it. */
+.action-exp:has(.action-intake-page:not(.action-intake-page--cine)) .action-exp__progress,
+.action-exp:has(.action-intake-page:not(.action-intake-page--cine)) .action-exp__nav {
+  display: none;
+}
+.action-exp:has(.action-intake-page--cine) .action-exp__progress {
+  position: absolute; top: calc(var(--safe-t, 0px) + 18px);
+  left: 20px; right: 68px; z-index: 5;
+}
+.action-exp:has(.action-intake-page--cine) .action-exp__nav {
+  position: absolute; left: 16px; right: 16px;
+  bottom: calc(var(--safe-b, 0px) + 18px); z-index: 5;
+  display: flex; gap: 10px;
 }
 .action-exp:has(.action-plan-page) .action-exp__page-wrap,
 .action-exp:has(.action-intake-page) .action-exp__page-wrap {

@@ -3240,6 +3240,7 @@ const ActionExperience = {
     // Show typing indicator while we wait.
     const currentEl = this.pageWrap.querySelector('.action-intake__current');
     if (currentEl) currentEl.innerHTML = '<div class="action-cine__thinking" aria-label="Thinking"><i></i></div>';
+    try { this.navEl.innerHTML = ''; } catch (e) {}
 
     const context = `User context for this conversation:
 Their locked Neutron Star: "${ns}"
@@ -3389,19 +3390,22 @@ They arrived HERE seconds after igniting this exact star, so the goal and timefr
     current.innerHTML = this._buildCurrentSectionHtml(fakeQ);
     this._cineActivate();
 
-    // Back button: only show if at least one exchange has happened.
-    const existingBack = intake.querySelector('#intakeBack');
-    if (existingBack) existingBack.remove();
-    if (state.action.intake.aiMessages.filter(m => m.role === 'user').length > 0) {
-      const backBtn = document.createElement('button');
-      backBtn.className = 'action-intake__back';
-      backBtn.id = 'intakeBack';
-      backBtn.type = 'button';
-      backBtn.setAttribute('aria-label', 'Previous question');
-      backBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg><span>Back</span>';
-      intake.insertBefore(backBtn, intake.firstChild);
-      backBtn.addEventListener('click', () => this._aiIntakeBack());
-    }
+    // v625 (Malik): the intake wears CLARITY's skeleton. Thin progress bar up
+    // top (fields captured / 4), and the wizard's bottom nav: back arrow +
+    // big Next that stays disabled until there is an answer.
+    try {
+      const snap = state.action.intake.aiSnapshot || {};
+      const filled = ['goalConfirm', 'timeframe', 'pastProgress', 'mainMove']
+        .filter(k => typeof snap[k] === 'string' && snap[k].trim().length > 0).length;
+      const pct = Math.max(8, Math.round(filled / 4 * 100));
+      this.progressEl.innerHTML = '<div class="ai-progress__bar"><div class="ai-progress__fill" style="width:' + pct + '%"></div></div>';
+    } catch (e) {}
+    const canGoBack = state.action.intake.aiMessages.filter(m => m.role === 'user').length > 0;
+    this.navEl.innerHTML =
+      (canGoBack ? '<button class="clarity-exp__nav-btn clarity-exp__nav-btn--back" id="intakeBack" aria-label="Back"></button>' : '') +
+      '<button class="clarity-exp__nav-btn clarity-exp__nav-btn--next" id="intakeSend" disabled>Next</button>';
+    const backBtn = this.navEl.querySelector('#intakeBack');
+    if (backBtn) backBtn.addEventListener('click', () => this._aiIntakeBack());
 
     // If the user just hit Back, pre-fill the previous answer into the input
     // so they can edit it. If they leave it unchanged and hit send, we'll
@@ -3447,10 +3451,18 @@ They arrived HERE seconds after igniting this exact star, so the goal and timefr
   // Helper used by both the phase machine and the back navigation to wire up
   // chip / textarea / send button handlers consistently.
   _wireSubmitHandlers(q, submit) {
+    const nextBtn = (this.navEl && this.navEl.querySelector('#intakeSend')) || this.pageWrap.querySelector('#intakeSend');
     if (q.type === 'choices' || q.type === 'select') {
+      // Clarity behavior: tap selects, Next confirms.
+      let picked = '';
       this.pageWrap.querySelectorAll('.action-chat__opt').forEach(btn => {
-        btn.addEventListener('click', () => submit(btn.dataset.value));
+        btn.addEventListener('click', () => {
+          picked = btn.dataset.value;
+          this.pageWrap.querySelectorAll('.action-chat__opt').forEach(b => b.classList.toggle('selected', b === btn));
+          if (nextBtn) nextBtn.disabled = false;
+        });
       });
+      if (nextBtn) nextBtn.addEventListener('click', () => { if (picked) submit(picked); });
     } else if (q.type === 'chips') {
       this.pageWrap.querySelectorAll('#intakeChips .action-plan__when-chip').forEach(btn => {
         btn.addEventListener('click', () => submit(btn.dataset.chip));
@@ -3463,13 +3475,15 @@ They arrived HERE seconds after igniting this exact star, so the goal and timefr
       });
     } else {
       const input = this.pageWrap.querySelector('#intakeInput');
-      const send  = this.pageWrap.querySelector('#intakeSend');
       const doSubmit = () => submit(input && input.value);
-      if (send)  send.addEventListener('click', doSubmit);
-      if (input) input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); doSubmit(); }
-      });
-      if (input) setTimeout(() => input.focus(), 80);
+      if (nextBtn) nextBtn.addEventListener('click', doSubmit);
+      if (input) {
+        input.addEventListener('input', () => { if (nextBtn) nextBtn.disabled = !(input.value || '').trim(); });
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); doSubmit(); }
+        });
+        setTimeout(() => input.focus(), 80);
+      }
     }
   },
 
@@ -3674,6 +3688,7 @@ They arrived HERE seconds after igniting this exact star, so the goal and timefr
     }
     setTimeout(() => {
       current.innerHTML = '<div class="action-cine__thinking" aria-label="Thinking"><i></i></div>';
+      try { this.navEl.innerHTML = ''; } catch (e) {}
       if (then) then();
     }, 280);
   },
@@ -3742,13 +3757,15 @@ They arrived HERE seconds after igniting this exact star, so the goal and timefr
       });
     } else {
       const input = this.pageWrap.querySelector('#intakeInput');
-      const send  = this.pageWrap.querySelector('#intakeSend');
       const doSubmit = () => submit(input && input.value);
-      if (send)  send.addEventListener('click', doSubmit);
-      if (input) input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); doSubmit(); }
-      });
-      if (input) setTimeout(() => input.focus(), 80);
+      if (nextBtn) nextBtn.addEventListener('click', doSubmit);
+      if (input) {
+        input.addEventListener('input', () => { if (nextBtn) nextBtn.disabled = !(input.value || '').trim(); });
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); doSubmit(); }
+        });
+        setTimeout(() => input.focus(), 80);
+      }
     }
   },
 
@@ -3795,6 +3812,7 @@ They arrived HERE seconds after igniting this exact star, so the goal and timefr
     // 4. Show typing indicator in current section after a beat, then fetch next.
     setTimeout(() => {
       current.innerHTML = '<div class="action-cine__thinking" aria-label="Thinking"><i></i></div>';
+      try { this.navEl.innerHTML = ''; } catch (e) {}
       this._aiIntakeFetchNext(answer);
     }, 280);
   },
@@ -3940,7 +3958,6 @@ They arrived HERE seconds after igniting this exact star, so the goal and timefr
     } else {
       answers += `
         <textarea class="wiz__text-input action-cine__input" id="intakeInput" rows="3" placeholder="${esc(q.placeholder || 'Type your answer...')}" autocomplete="off"></textarea>
-        <button class="action-cine__continue" id="intakeSend" type="button">Continue</button>
         <div class="action-chat__error" id="intakeErr" style="display:none;"></div>`;
     }
     html += `<div class="action-cine__answers">${answers}</div>`;
