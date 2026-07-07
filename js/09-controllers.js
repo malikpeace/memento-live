@@ -753,6 +753,7 @@ const WelcomeIntro = {
       const tick = () => {
         if (gen !== this._wcGen) { render(el, plain.length); res(); return; }
         render(el, i); i++;
+        try { if (typeof MementoSound !== 'undefined') MementoSound.tick(); } catch (e) {}
         if (i <= plain.length) setTimeout(tick, 20 + Math.random() * 16);
         else setTimeout(res, 680);
       };

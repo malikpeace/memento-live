@@ -613,6 +613,7 @@ const ClarityExperience = {
         const tick = () => {
           if (done) return;
           el.textContent = full.slice(0, i); i++;
+          try { if (typeof MementoSound !== 'undefined') MementoSound.tick(); } catch (e) {}
           if (i <= full.length) this._setTimeout(tick, 11 + Math.random() * 9);
           else this._setTimeout(() => typeLine(idx + 1), 900);
         };
