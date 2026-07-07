@@ -7543,15 +7543,30 @@ function _addToMementoThenAction(finalize) {
     // to Action: they stay on the home and the card guides them from there.
     try { if (typeof maybeShowSaveWorkNudge === 'function') maybeShowSaveWorkNudge(function () {}); } catch (e) {}
   };
-  try { if (typeof finalize === 'function') finalize(); } catch (e) {}
-  // Let the summary/ceremony finish closing, then play the cinema on the home and
-  // chain the save nudge to its completion.
-  setTimeout(() => {
-    try {
-      if (typeof _maybeRunCardEvolution === 'function') _maybeRunCardEvolution(proceedAfter);
-      else proceedAfter();
-    } catch (e) { proceedAfter(); }
-  }, 480);
+  const runClose = () => {
+    try { if (typeof finalize === 'function') finalize(); } catch (e) {}
+    // Clear the inline fade on the persistent clarity-exp so a future open is
+    // never stuck invisible (it is hidden by its own classes now anyway).
+    try { const cx = document.querySelector('.clarity-exp'); if (cx) { cx.style.transition = ''; cx.style.opacity = ''; } } catch (e) {}
+    // A beat after landing on the home, play the cinematic evolution, then the
+    // save nudge chains to its completion.
+    setTimeout(() => {
+      try {
+        if (typeof _maybeRunCardEvolution === 'function') _maybeRunCardEvolution(proceedAfter);
+        else proceedAfter();
+      } catch (e) { proceedAfter(); }
+    }, 240);
+  };
+  // FADE the ceremony + clarity overlay out first, revealing the Home behind it,
+  // THEN close and start the cinematic evolution (Malik). Both the nsv2 ceremony
+  // (body-mounted) and the clarity-exp fade together so the dashboard shows through.
+  const overlays = [document.getElementById('nsv2Root'), document.querySelector('.clarity-exp')].filter(Boolean);
+  if (overlays.length) {
+    overlays.forEach(el => { try { el.style.transition = 'opacity 0.55s ease'; el.style.opacity = '0'; } catch (e) {} });
+    setTimeout(runClose, 580);
+  } else {
+    runClose();
+  }
 }
 
 function renderIgnitionV2(summary) {
@@ -7562,28 +7577,26 @@ function renderIgnitionV2(summary) {
   let inner = '';
 
   if (_ig2Act === 'reveal') {
-    // The sentence appears alone, word by word, on black. Each word is a
-    // span with a staggered animation-delay; the hold ring and the quiet
-    // escape fade in only after the last word has landed.
-    const words = String(goal).split(/\s+/).filter(Boolean);
-    const STEP = 240, START = 500;
+    // The sentence appears alone, word by word, on black, ending with a period
+    // so it reads as a full sentence (Malik). The touch point and the quiet hint
+    // fade in only after the last word has landed. Slower stagger than before so
+    // it arrives with weight. No "Not quite" escape: reaching this beat IS the
+    // confirmation.
+    const goalP = /[.!?]$/.test(String(goal).trim()) ? String(goal).trim() : String(goal).trim() + '.';
+    const words = String(goalP).split(/\s+/).filter(Boolean);
+    const STEP = 380, START = 800;
     const wordEls = words.map((w, i) =>
       `<span class="nsv2-reveal__w" style="animation-delay:${START + i * STEP}ms">${esc(w)}</span>`
     ).join(' ');
-    const afterDelay = START + words.length * STEP + 700;
+    const afterDelay = START + words.length * STEP + 900;
     inner = `
       <div class="nsv2-reveal">
         <div class="nsv2-reveal__goal">${wordEls}</div>
         <div class="nsv2-reveal__after" style="animation-delay:${afterDelay}ms">
           <div class="nsv2-hold" id="nsv2Hold" role="button" tabindex="0" aria-label="Press and hold to collapse">
-            <svg viewBox="0 0 76 76" aria-hidden="true">
-              <circle class="nsv2-hold__track" cx="38" cy="38" r="33"/>
-              <circle class="nsv2-hold__fill" id="nsv2HoldFill" cx="38" cy="38" r="33"/>
-            </svg>
             <span class="nsv2-hold__core" aria-hidden="true"></span>
           </div>
           <div class="nsv2-reveal__hint"><span>Press and hold to collapse.</span></div>
-          <button type="button" class="nsv2-reveal__no" id="nsv2No">Not quite</button>
         </div>
       </div>`;
   } else if (_ig2Act === 'sharpen') {
@@ -7607,7 +7620,7 @@ function renderIgnitionV2(summary) {
         <canvas class="nsv2-star__blob" id="nsv2StarBlob" aria-hidden="true"></canvas>
         <div class="nsv2-after">
           <div class="nsv2-after__eyebrow">Your Neutron Star</div>
-          <div class="nsv2-after__goal">${esc(goal)}</div>
+          <div class="nsv2-after__goal">${esc(/[.!?]$/.test(String(goal).trim()) ? String(goal).trim() : String(goal).trim() + '.')}</div>
           <button type="button" class="nsv2-cta" id="nsv2Action">Add to your Memento</button>
         </div>
       </div>`;
@@ -7704,16 +7717,12 @@ function bindIgnitionV2(container) {
 // confirmation: release early and it resets, so nobody ignites by accident.
 function _bindHoldToIgnite(root) {
   const hold = root.querySelector('#nsv2Hold');
-  const fill = root.querySelector('#nsv2HoldFill');
-  if (!hold || !fill) return;
+  if (!hold) return;
   const HOLD_MS = 5000;
-  const CIRC = 2 * Math.PI * 33; // r=33 in the 76x76 viewBox
-  fill.style.strokeDasharray = String(CIRC);
-  fill.style.strokeDashoffset = String(CIRC);
   let raf = null, start = 0, done = false;
   const setP = (p) => {
-    fill.style.strokeDashoffset = String(CIRC * (1 - p));
-    // Drives the hold buildup: beams brighten, the sentence shakes harder.
+    // No progress ring anymore (Malik): the touch point itself grows + glows
+    // with --holdp, and the beams brighten and the sentence shakes harder.
     root.style.setProperty('--holdp', String(p));
   };
   const tick = (t) => {
@@ -7778,10 +7787,11 @@ function _bindStarPlacard(root) {
   const actionBtn = root.querySelector('#nsv2Action');
   if (actionBtn) actionBtn.addEventListener('click', () => {
     _ig2Act = 'reveal'; _ig2 = {};
-    try { const r = document.getElementById('nsv2Root'); if (r) r.remove(); } catch (e) {}
-    // "Add to your Memento" (Malik): close the ceremony, land on the home, play
-    // the card unlock cinema (watch the Memento come alive), then the save nudge.
+    // "Add to your Memento" (Malik): FADE the ceremony back to the home, then play
+    // the card unlock cinema. _addToMementoThenAction fades the overlay out first;
+    // the nsv2 root is removed inside finalize (after the fade), not before it.
     _addToMementoThenAction(() => {
+      try { const r = document.getElementById('nsv2Root'); if (r) r.remove(); } catch (e) {}
       try { completeWizard(); } catch (e) {}
       try { if (ClarityExperience && ClarityExperience.isOpen) ClarityExperience.close(); } catch (e) {}
     });

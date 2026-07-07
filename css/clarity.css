@@ -3053,15 +3053,22 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
 }
 .nsv2-reveal__w {
   display: inline-block; opacity: 0;
-  animation: nsv2WordIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: nsv2WordIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 @keyframes nsv2WordIn {
   from { opacity: 0; transform: translateY(0.35em); filter: blur(6px); }
   to { opacity: 1; transform: none; filter: none; }
 }
+/* Mobile-cheap word entrance: the same slow fade + rise WITHOUT the per-word
+   blur (blur re-rasterizes each frame on iOS). Malik wants the text to still
+   arrive slowly on the phone, where it was previously disabled entirely. */
+@keyframes nsv2WordInLite {
+  from { opacity: 0; transform: translateY(0.4em); }
+  to { opacity: 1; transform: none; }
+}
 .nsv2-reveal__after {
   display: flex; flex-direction: column; align-items: center; gap: 20px;
-  opacity: 0; animation: nsv2WordIn 0.9s ease forwards;
+  opacity: 0; animation: nsv2WordIn 1.2s ease forwards;
 }
 .nsv2-hold {
   position: relative; width: 76px; height: 76px; cursor: pointer;
@@ -3075,18 +3082,28 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
   fill: none; stroke: #ffffff; stroke-width: 2.5; stroke-linecap: round;
   filter: drop-shadow(0 0 6px rgba(255,255,255,0.5));
 }
+/* The touch point (v644, Malik): no ring anymore, just a clean glowing orb that
+   breathes gently at rest and grows + brightens with the hold (--holdp) as its
+   own progress feedback. */
 .nsv2-hold__core {
-  position: absolute; left: 50%; top: 50%; width: 10px; height: 10px;
+  position: absolute; left: 50%; top: 50%; width: 15px; height: 15px;
   transform: translate(-50%, -50%); border-radius: 50%;
-  background: rgba(255,255,255,0.95);
-  box-shadow: 0 0 14px rgba(255,255,255,0.6);
-  transition: box-shadow 0.25s ease, transform 0.25s ease;
+  background: radial-gradient(circle at 50% 40%, #fff 0%, #fff 42%, rgba(214,226,255,0.92) 72%, rgba(184,204,255,0.55) 100%);
+  box-shadow: 0 0 12px rgba(255,255,255,0.7), 0 0 30px rgba(190,210,255,0.32);
+  transition: box-shadow 0.2s ease;
+  animation: nsv2CorePulse 3.2s ease-in-out infinite;
+}
+@keyframes nsv2CorePulse {
+  0%, 100% { box-shadow: 0 0 11px rgba(255,255,255,0.65), 0 0 26px rgba(190,210,255,0.28); }
+  50% { box-shadow: 0 0 17px rgba(255,255,255,0.85), 0 0 40px rgba(190,210,255,0.46); }
 }
 .nsv2.is-holding .nsv2-hold__core {
-  transform: translate(-50%, -50%) scale(1.5);
-  box-shadow: 0 0 26px rgba(255,255,255,0.95), 0 0 60px rgba(200,218,255,0.5);
+  animation: none;
+  transform: translate(-50%, -50%) scale(calc(1 + var(--holdp, 0) * 1.7));
+  box-shadow:
+    0 0 calc(14px + var(--holdp, 0) * 30px) rgba(255,255,255,0.95),
+    0 0 calc(30px + var(--holdp, 0) * 64px) rgba(200,218,255, calc(0.4 + var(--holdp, 0) * 0.45));
 }
-.nsv2.is-holding .nsv2-reveal__goal { transition: text-shadow 1.6s ease; text-shadow: 0 0 26px rgba(220,232,255,0.35); }
 .nsv2-reveal__hint { font-size: var(--fs-md); color: rgba(255,255,255,0.62); line-height: 1.7; }
 .nsv2-reveal__hint span { color: rgba(255,255,255,0.92); font-weight: 600; }
 .nsv2-reveal__no {
@@ -3098,7 +3115,10 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
 @media (prefers-reduced-motion: reduce) {
   .nsv2-reveal__w, .nsv2-reveal__after, .nsv2-reveal__eyebrow { animation: none; opacity: 1; }
 }
-html.lowfx .nsv2-reveal__w, html.lowfx .nsv2-reveal__after, html.lowfx .nsv2-reveal__eyebrow { animation: none; opacity: 1; }
+/* Mobile: keep the slow entrance (Malik) but on the cheap blur-free keyframe. */
+html.lowfx .nsv2-reveal__w { animation: nsv2WordInLite 1.1s ease forwards; }
+html.lowfx .nsv2-reveal__after { animation: nsv2WordInLite 1.2s ease forwards; }
+html.lowfx .nsv2-reveal__eyebrow { animation: nsv2WordInLite 1.0s ease forwards; }
 /* --- Sharpen --- */
 .nsv2-sharpen__hint { font-size: var(--fs-md); color: rgba(255,255,255,0.55); line-height: 1.6; max-width: 44ch; margin: 0 auto 22px; }
 .nsv2-sharpen__input {
@@ -3258,14 +3278,32 @@ html.lowfx .nsv2.is-holding .nsv2__rays.ambient__rays {
    screen), then it slowly pulls back to rest over ~4s. The gentle-start curve
    keeps it huge while the white is still clearing, so white melts into star
    surface with no jump cut. */
-.nsv2[data-act="star"] .nsv2-star__blob { animation: nsv2StarZoomOut 4.2s cubic-bezier(0.5, 0, 0.25, 1) both; }
+/* Zoom in from huge, then the star keeps BREATHING forever so it feels alive
+   (Malik). Breathe uses the `scale` property so it composes with the zoom's
+   `transform: scale`; it only kicks in after the zoom settles. */
+.nsv2[data-act="star"] .nsv2-star__blob {
+  animation: nsv2StarZoomOut 4.2s cubic-bezier(0.5, 0, 0.25, 1) both,
+             nsv2StarBreathe 6.5s ease-in-out 4.4s infinite;
+}
 @keyframes nsv2StarZoomOut {
   from { transform: scale(6.5); }
   to   { transform: scale(1); }
 }
+@keyframes nsv2StarBreathe { 0%, 100% { scale: 1; } 50% { scale: 1.04; } }
 /* v591: the newborn star RAGES, violent shake while it is huge, decaying to
-   dead calm as it settles. On the scene wrapper so it stacks with the zoom. */
-.nsv2[data-act="star"] .nsv2-starscene { animation: nsv2StarRage 3.6s linear both; }
+   dead calm as it settles, then a permanent gentle idle tremble so it never
+   goes fully dead (Malik). Both use `translate`; the idle hands off after the
+   rage ends. On the scene wrapper so it stacks with the zoom. */
+.nsv2[data-act="star"] .nsv2-starscene {
+  animation: nsv2StarRage 3.6s linear both,
+             nsv2StarIdleShake 3.4s ease-in-out 3.8s infinite;
+}
+@keyframes nsv2StarIdleShake {
+  0%, 100% { translate: 0 0; }
+  25% { translate: 1.4px -1px; }
+  50% { translate: -1.2px 1.2px; }
+  75% { translate: 1px 1.1px; }
+}
 @keyframes nsv2StarRage {
   0%   { translate: 0 0; }
   5%   { translate: 14px -10px; }

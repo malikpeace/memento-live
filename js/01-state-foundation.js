@@ -1209,7 +1209,9 @@ function renderNeutronStarSummary(summary, { allowContinue = false, showRestart 
   const arrowRight = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg>`;
   const calIcon = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`;
   // Numbers in the goal glow violet (like the render): escape first, then wrap.
-  const goalHtml = esc(summary.neutronStar || '').replace(/(\d[\d,.]*)/g, '<span class="ns-min__num">$1</span>');
+  const _nsRaw = String(summary.neutronStar || '').trim();
+  const _nsDot = _nsRaw && !/[.!?]$/.test(_nsRaw) ? _nsRaw + '.' : _nsRaw;
+  const goalHtml = esc(_nsDot).replace(/(\d[\d,.]*)/g, '<span class="ns-min__num">$1</span>');
   const timeframe = (summary.timeHorizon || '').trim();
 
   return `
