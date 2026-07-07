@@ -232,3 +232,42 @@ body:not(.ns-bloom) .daycard-theme-living .daycard-wrap__aura {
 body.stage-cinema .daycard-theme-living .daycard-ns__liquid .blob {
   transition: opacity 3s cubic-bezier(0.22, 1, 0.36, 1);
 }
+
+/* ── v614: the clarity unlock cinema ─────────────────────────────────────── */
+/* The room clears: Today fades away, the blank Memento grows near full screen. */
+body.evo2 #commandCenter { opacity: 0 !important; pointer-events: none; transition: opacity 0.6s ease; }
+body.evo2 #dayCard { position: relative; z-index: 30; }
+body.evo2 .daycard-wrap {
+  transform: scale(1.22) translateY(6vh);
+  transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* slow, deliberate light during the cinema */
+body.evo2 .daycard-theme-living .daycard-ns__liquid .blob {
+  transition: opacity 2.8s cubic-bezier(0.3, 0, 0.35, 1), transform 2.8s cubic-bezier(0.3, 0, 0.35, 1);
+}
+/* THE SURGE: the purple takes the WHOLE card */
+body.evo2.evo2-surge .daycard-theme-living .blob.b1 {
+  opacity: 1 !important;
+  transform: scale(2.7) !important;
+}
+/* THE ORB: the purple settles into a single body of light inside the card */
+body.evo2.evo2-orb .daycard-theme-living .blob.b1 {
+  transform: translate(26%, 32%) scale(0.82);
+}
+/* the shimmer that sweeps across during the surge */
+.evo2-shine {
+  position: absolute; inset: 0; z-index: 4; pointer-events: none;
+  background: linear-gradient(115deg, transparent 32%, rgba(255, 255, 255, 0.30) 50%, transparent 68%);
+  transform: translateX(-130%);
+  mix-blend-mode: screen;
+  animation: evo2Shine 2.8s cubic-bezier(0.4, 0, 0.3, 1) forwards;
+}
+@keyframes evo2Shine { to { transform: translateX(130%); } }
+/* the first light comes in slower than the everyday bloom */
+body.evo2 .ambient__rays { transition: opacity 3.2s ease; }
+@media (prefers-reduced-motion: reduce) {
+  body.evo2 .daycard-wrap { transform: none; }
+  .evo2-shine { animation: none; opacity: 0; }
+}
+body.evo2-snap .daycard-theme-living .daycard-ns__liquid .blob { transition: none !important; }
+body.evo2-snap .ambient__rays { transition: none !important; }

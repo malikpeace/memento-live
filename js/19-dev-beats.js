@@ -273,7 +273,13 @@
           }, 650);
         };
         bar.appendChild(mk('Beginning', () => playStage('beginning')));
-        bar.appendChild(mk('Clarity', () => playStage('clarity')));
+        bar.appendChild(mk('Clarity', () => {
+          // the full unlock cinema, exactly what a real user gets
+          document.body.classList.remove('pre-clarity', 'card-evolving', 'card-evolve-go');
+          window._evoStageOverride = STAGES.beginning;
+          apply();
+          _runClarityUnlockCinema(null, { holdOverride: STAGES.clarity });
+        }));
         bar.appendChild(mk('Action', () => playStage('action')));
         bar.appendChild(mk('Consistency', () => playStage('consistency')));
         bar.appendChild(mk('Day 1.', () => {

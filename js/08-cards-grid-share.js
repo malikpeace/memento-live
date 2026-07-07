@@ -3547,18 +3547,65 @@ function _maybeRunCardEvolution() {
   const attempt = () => {
     if (state.meta.cardEvolutionSeen) { _cardEvolutionRunning = false; return; }
     if (overlayOpen()) { setTimeout(attempt, 1200); return; }
-    document.body.classList.add('card-evolving');
-    setTimeout(() => {
-      document.body.classList.add('card-evolve-go');
-      setTimeout(() => {
-        document.body.classList.remove('card-evolving', 'card-evolve-go');
-        state.meta.cardEvolutionSeen = true;
-        try { persistNow(); } catch (e) {}
-        _cardEvolutionRunning = false;
-      }, 2600);
-    }, 950);
+    const ok = _runClarityUnlockCinema(() => {
+      state.meta.cardEvolutionSeen = true;
+      try { persistNow(); } catch (e) {}
+      _cardEvolutionRunning = false;
+    });
+    if (!ok) { _cardEvolutionRunning = false; }
   };
   attempt();
+}
+
+// v614 (Malik): the clarity unlock CINEMA. The Today panel fades away, the
+// blank Memento grows near full screen and sits empty for a beat, then the
+// whole card SURGES completely purple with a shimmer sweeping across it,
+// then it calms, the purple settling into an orb inside the card, and only
+// then do the top-left beams slowly come in. ~9s, once in a lifetime (or on
+// demand from ?dev=evo). opts.holdOverride keeps a stage pinned afterward
+// (dev use); real runs return to live data at the end.
+function _runClarityUnlockCinema(onDone, opts) {
+  opts = opts || {};
+  const el = document.getElementById('dayCard');
+  const wrap = el && el.querySelector('.daycard-wrap');
+  const ns = wrap && wrap.querySelector('.daycard-ns');
+  if (!wrap || !ns) return false;
+  try { stopLivingWander(); } catch (e) {}
+  // clear any inline drift so the class choreography owns the blobs
+  wrap.querySelectorAll('.daycard-ns__liquid .blob').forEach(b => { b.style.opacity = ''; b.style.transform = ''; });
+  // snap to BLANK instantly (no drain) before the cinema's slow transitions arm
+  document.body.classList.add('evo2-snap');
+  window._evoStageOverride = { clar: 0, act: 0, cons: 0 };
+  setLivingCardVars(wrap);
+  document.body.classList.remove('ns-bloom', 'evo2-surge', 'evo2-orb');
+  void wrap.offsetWidth;
+  document.body.classList.remove('evo2-snap');
+  document.body.classList.add('evo2');
+  const T = [];
+  T.push(setTimeout(() => {                     // THE SURGE: fully purple + shimmer
+    window._evoStageOverride = { clar: 100, act: 0, cons: 0 };
+    setLivingCardVars(wrap);
+    document.body.classList.add('evo2-surge');
+    const shine = document.createElement('span');
+    shine.className = 'evo2-shine';
+    ns.appendChild(shine);
+    T.push(setTimeout(() => { try { shine.remove(); } catch (e) {} }, 3000));
+  }, 1400));
+  T.push(setTimeout(() => {                     // THE CALM: settle into the orb
+    document.body.classList.remove('evo2-surge');
+    document.body.classList.add('evo2-orb');
+  }, 4800));
+  T.push(setTimeout(() => {                     // THE BEAMS: first light, slow
+    document.body.classList.add('ns-bloom');
+  }, 6900));
+  T.push(setTimeout(() => {                     // EXIT: home returns around it
+    document.body.classList.remove('evo2', 'evo2-orb');
+    window._evoStageOverride = opts.holdOverride || null;
+    setLivingCardVars(wrap);
+    try { startLivingWander(wrap); } catch (e) {}
+    if (onDone) onDone();
+  }, 9400));
+  return true;
 }
 
 function renderDailyMemento() {
