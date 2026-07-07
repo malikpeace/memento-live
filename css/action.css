@@ -2276,6 +2276,11 @@ body:has(.clarity-exp.open)::after { display: none; }
      now matches the rest of the module's monochrome palette. */
   background: linear-gradient(to top, rgba(0,0,0,0.95) 40%, transparent);
 }
+/* Light mode: the black fade would bleed a dark strip onto the off-white
+   surface. Fade to the light surface instead. */
+html.theme-light .action-exp__nav {
+  background: linear-gradient(to top, rgba(238,240,243,0.95) 40%, transparent);
+}
 .action-exp__nav-btn {
   padding: 14px 28px;
   border-radius: var(--r-ctrl);
@@ -2289,12 +2294,15 @@ body:has(.clarity-exp.open)::after { display: none; }
 .action-exp__nav-btn:hover { background: var(--kfill-12); }
 .action-exp__nav-btn:active { transform: scale(0.97); }
 .action-exp__nav-btn--cta {
-  background: var(--kfill-92);
-  color: #0a0c14;
+  /* Theme-aware solid CTA (matches Clarity's --next button): white fill + dark
+     text in dark mode, dark fill + light text in light mode. Previously the
+     hardcoded --kfill-92 fill + #0a0c14 text went dark-on-dark in light mode. */
+  background: var(--solid-bg);
+  color: var(--solid-fg);
   border-color: transparent;
   font-weight: 700;
 }
-.action-exp__nav-btn--cta:hover { background: #fff; }
+.action-exp__nav-btn--cta:hover { background: var(--solid-bg-hover); }
 .action-exp__nav-btn--back {
   background: transparent;
   border-color: rgba(var(--ink),0.12);
