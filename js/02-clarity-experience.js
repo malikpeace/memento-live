@@ -3901,11 +3901,11 @@ They arrived HERE seconds after igniting this exact star, so the goal and timefr
     // v615 (Malik): the intake speaks Clarity's language. One question at a
     // time, full screen, typed out; the answers fade up once the line lands.
     // The IDs/classes the submit handlers query are unchanged.
-    let html = `<div class="action-cine__q" data-cine-q>${escWithBold(q.prompt || '')}</div>`;
+    let html = `<div class="wiz__question action-cine__q" data-cine-q>${escWithBold(q.prompt || '')}</div>`;
     let answers = '';
     if (q.type === 'select' || q.type === 'choices') {
-      const opts = (q.options || []).map(o => `<button class="action-chat__opt" type="button" data-value="${esc(o)}">${esc(o)}</button>`).join('');
-      answers += `<div class="action-chat__options">${opts}</div>`;
+      const opts = (q.options || []).map(o => `<button class="wiz__option action-chat__opt" type="button" data-value="${esc(o)}"><span class="wiz__option-label">${esc(o)}</span></button>`).join('');
+      answers += `<div class="wiz__options">${opts}</div>`;
     } else if (q.type === 'chips') {
       const chipsSrc = (q.chips && q.chips.length) ? q.chips : (q.options || []);
       const chips = chipsSrc.map(c => `<button class="action-plan__when-chip" type="button" data-chip="${esc(c)}">${esc(c)}</button>`).join('');
@@ -3919,12 +3919,8 @@ They arrived HERE seconds after igniting this exact star, so the goal and timefr
       answers += `<div class="action-plan__when-edit" id="intakeChips">${chips}</div>${customRow}`;
     } else {
       answers += `
-        <div class="action-chat__input-row">
-          <div class="action-chat__input-row-inner">
-            <textarea class="action-chat__input" id="intakeInput" rows="2" placeholder="${esc(q.placeholder || 'Type your answer...')}" autocomplete="off"></textarea>
-            <button class="action-chat__send" id="intakeSend" type="button" aria-label="Send"></button>
-          </div>
-        </div>
+        <textarea class="wiz__text-input action-cine__input" id="intakeInput" rows="3" placeholder="${esc(q.placeholder || 'Type your answer...')}" autocomplete="off"></textarea>
+        <button class="action-cine__continue" id="intakeSend" type="button">Continue</button>
         <div class="action-chat__error" id="intakeErr" style="display:none;"></div>`;
     }
     html += `<div class="action-cine__answers">${answers}</div>`;

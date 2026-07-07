@@ -3332,18 +3332,17 @@ html.theme-light .action-chat__input-row::before { background: linear-gradient(t
 /* ── v615: THE ACTION CINEMA (Malik: Clarity's language, white accent) ──────
    The intake is one question at a time on black: the line types itself out,
    the answers fade up under it. No bubbles, no compose bar chrome. */
-.action-intake-page--cine { display: flex; align-items: center; }
+.action-intake-page--cine { display: flex; align-items: flex-start; }
 .action-intake--cine {
-  display: flex; flex-direction: column; justify-content: center;
-  min-height: 72vh; width: 100%; max-width: 560px; margin: 0 auto;
-  padding: 0 6px;
+  display: flex; flex-direction: column; justify-content: flex-start;
+  width: 100%; max-width: 560px; margin: 0 auto;
+  /* the question line starts at the same fixed y as Clarity's wizard */
+  padding: calc(var(--safe-t, 0px) + 84px) 20px 24px;
 }
-.action-cine__q {
-  font-size: clamp(22px, 5.9vw, 27px);
-  font-weight: 800; line-height: 1.34;
-  color: rgba(var(--ink, 255, 255, 255), 0.97);
-  min-height: 3.6em;
+.action-cine__q.wiz__question {
+  min-height: 4.6em;
   text-wrap: balance;
+  margin-bottom: 0;
 }
 .action-cine__q b { color: #fff; }
 .action-cine__answers {
@@ -3352,42 +3351,18 @@ html.theme-light .action-chat__input-row::before { background: linear-gradient(t
   margin-top: 26px;
 }
 .action-cine__answers.is-on { opacity: 1; transform: none; }
-/* the option chips: Action's white, no borders, glass fill */
-.action-intake--cine .action-chat__options { display: flex; flex-direction: column; gap: 10px; }
-.action-intake--cine .action-chat__opt {
-  border: 0; text-align: left; cursor: pointer; width: 100%;
-  padding: 15px 17px; border-radius: calc(11px * var(--rx, 1));
-  background: rgba(255, 255, 255, 0.06);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
-  color: rgba(var(--ink, 255, 255, 255), 0.95);
-  font: 600 15px var(--font, -apple-system, system-ui, sans-serif);
-  transition: background 0.15s ease;
+/* answers use CLARITY's own wizard tokens (.wiz__options/.wiz__option/
+   .wiz__text-input come from onboarding.css, light mode included). Only the
+   continue CTA is defined here: the v497 solid-white law. */
+.action-intake--cine .action-cine__input { margin-bottom: 14px; min-height: 96px; resize: none; }
+.action-cine__continue {
+  appearance: none; border: 0; cursor: pointer; width: 100%;
+  padding: 16px 22px; border-radius: calc(12px * var(--rx, 1));
+  background: #fff; color: #0b0b12;
+  font: 700 16px var(--font, -apple-system, system-ui, sans-serif);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.4);
 }
-.action-intake--cine .action-chat__opt:active { background: rgba(255, 255, 255, 0.13); }
-/* free text: quiet glass field + solid white send */
-.action-intake--cine .action-chat__input-row { position: static; padding: 0; background: transparent; box-shadow: none; }
-.action-intake--cine .action-chat__input-row-inner { display: flex; gap: 10px; align-items: flex-end; }
-.action-intake--cine .action-chat__input {
-  flex: 1; border: 0; resize: none;
-  background: rgba(255, 255, 255, 0.06);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  border-radius: calc(12px * var(--rx, 1));
-  color: rgba(var(--ink, 255, 255, 255), 0.97);
-  font: 500 16px var(--font, -apple-system, system-ui, sans-serif);
-  line-height: 1.5; padding: 14px 15px; min-height: 84px;
-  outline: none;
-}
-.action-intake--cine .action-chat__send {
-  width: 46px; height: 46px; flex: none;
-  border: 0; border-radius: 999px; cursor: pointer;
-  background: #fff;
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45);
-  position: relative;
-}
-.action-intake--cine .action-chat__send::after {
-  content: ""; position: absolute; inset: 0;
-  background: no-repeat center / 18px url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%230b0b12" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>');
-}
+.action-cine__continue:active { transform: scale(0.985); }
 /* the thinking beat: one white point, breathing */
 .action-cine__thinking { display: flex; justify-content: flex-start; padding: 8px 2px; min-height: 3.6em; align-items: center; }
 .action-cine__thinking i {
