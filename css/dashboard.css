@@ -3306,16 +3306,27 @@ html.lowfx .daycard-ns {
 /* The breakdown fades in with OPACITY ONLY: nothing slides or translates, so the
    open reads as content quietly appearing around a perfectly still card, never as
    motion. (Earlier the stats slid up 10px, which was the movement Malik could see.) */
-.mf__eyebrow, .mf__stats, .mf__share, .mf__hint {
+.mf__eyebrow, .mf__why, .mf__stats, .mf__share, .mf__hint {
   opacity: 0;
   transition: opacity 0.34s ease 0.08s;
 }
 #mementoFull.mf--open .mf__eyebrow,
+#mementoFull.mf--open .mf__why,
 #mementoFull.mf--open .mf__stats,
 #mementoFull.mf--open .mf__share,
 #mementoFull.mf--open .mf__hint { opacity: 1; }
 @media (prefers-reduced-motion: reduce) {
-  .mf__card, .mf__eyebrow, .mf__stats, .mf__share, .mf__hint { transition: none; transform: none; opacity: 1; }
+  .mf__card, .mf__eyebrow, .mf__why, .mf__stats, .mf__share, .mf__hint { transition: none; transform: none; opacity: 1; }
+}
+/* The carrot + stick why, quietly under the card. Quiet via SIZE and width, not
+   opacity (body copy stays bright, per the reading law). */
+.mf__why {
+  width: 100%; max-width: 340px;
+  margin: 22px auto 0;
+  text-align: center;
+  font-size: 0.88rem; font-weight: 500;
+  color: var(--text-hi); line-height: 1.55;
+  text-wrap: balance;
 }
 /* Fallback sizing only (JS pins the opened card to the live home card's exact
    size). Square to match the home card so a tap never reshapes it. */
@@ -3737,3 +3748,25 @@ body.ns-bloom .app.dash-v2 #commandCenter {
   position: relative;
   z-index: 4;
 }
+
+/* ── v605: THE EVOLUTION (Malik) ──
+   One-time, right after ignition: the card sits drained and still for a beat,
+   then color FLOODS back in, then the beams bloom on for the first time. No
+   layout changes at all, the drain is a filter on the real card, so the end
+   state is pixel-identical to the everyday home. */
+body.card-evolving .daycard-ns {
+  filter: saturate(0) brightness(0.72);
+}
+body.card-evolving.card-evolve-go .daycard-ns {
+  filter: saturate(1) brightness(1);
+  transition: filter 2.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* Beams hold their breath until the flood finishes; removing the classes lets
+   the existing ns-bloom transition (1.8s) carry the first bloom. */
+body.card-evolving .ambient__rays {
+  opacity: 0 !important;
+  transition: none;
+}
+/* The card glow + aura under it stay drained too so nothing leaks color early. */
+body.card-evolving .daycard-wrap__aura { opacity: 0; }
+body.card-evolving.card-evolve-go .daycard-wrap__aura { opacity: 1; transition: opacity 2.4s ease; }

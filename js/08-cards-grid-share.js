@@ -546,6 +546,11 @@ function renderGrid() {
   document.body.classList.toggle('pre-clarity', _preClarity);
   if (_preClarity) return;
 
+  // v605 (Malik): the EVOLUTION. The first time the home is actually seen
+  // after ignition, the user witnesses the card come alive: a still, drained
+  // beat, then color floods the card, then the beams bloom on. Once, ever.
+  try { _maybeRunCardEvolution(); } catch (e) {}
+
   // v19 Custom Layouts: when the user has customized, the grid auto-flows by
   // saved order with per-size spans (.is-custom overrides the designed data-area
   // placement) and hidden widgets are skipped. Otherwise the hand-tuned default
@@ -3502,6 +3507,45 @@ function streakFlameTier(count) {
   return t;
 }
 
+// v605: the one-time card evolution after ignition. Runs only when the home
+// is actually visible (no fullscreen experience covering it); if something is
+// open it re-checks until the user really lands here. Reduced-motion users
+// skip the show and just get the finished card.
+let _cardEvolutionRunning = false;
+function _maybeRunCardEvolution() {
+  if (_cardEvolutionRunning) return;
+  if (!(state.clarity && state.clarity.completed && state.clarity.ignitedAt)) return;
+  state.meta = state.meta || {};
+  if (state.meta.cardEvolutionSeen) return;
+  const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduced) { state.meta.cardEvolutionSeen = true; try { persistNow(); } catch (e) {} return; }
+  _cardEvolutionRunning = true;
+  const overlayOpen = () => {
+    try {
+      if (typeof ClarityExperience !== 'undefined' && ClarityExperience.isOpen) return true;
+      if (typeof ActionExperience !== 'undefined' && ActionExperience.isOpen) return true;
+      if (document.querySelector('.cpw.open, .cpw--open, #nsv2Root')) return true;
+      if (document.hidden) return true;
+    } catch (e) {}
+    return false;
+  };
+  const attempt = () => {
+    if (state.meta.cardEvolutionSeen) { _cardEvolutionRunning = false; return; }
+    if (overlayOpen()) { setTimeout(attempt, 1200); return; }
+    document.body.classList.add('card-evolving');
+    setTimeout(() => {
+      document.body.classList.add('card-evolve-go');
+      setTimeout(() => {
+        document.body.classList.remove('card-evolving', 'card-evolve-go');
+        state.meta.cardEvolutionSeen = true;
+        try { persistNow(); } catch (e) {}
+        _cardEvolutionRunning = false;
+      }, 2600);
+    }, 950);
+  };
+  attempt();
+}
+
 function renderDailyMemento() {
   try {
     const el = document.getElementById('dailyMemento');
@@ -4055,6 +4099,16 @@ function openMementoFull() {
     const todayAction = tiers[pa.recommendedTier] || pa.title || '';
     let act7 = 0;
     try { act7 = actionLocalDaysInWindow(7); } catch (e) {}
+    // Carrot + stick why line (v604): the summary page is now star + goal only, so
+    // the WHY lives here. Two synthesized sentences, stick first then carrot: the
+    // antiVision (what happens if this stays neglected) and the coreWhy (the real
+    // reason it matters). Both are standalone declaratives from the AI synthesis;
+    // shown quietly under the card, only when a goal exists.
+    const whyStick = String(ans.antiVision || ans.fearPain || '').trim();
+    const whyCarrot = String(ans.coreWhy || ans.whyItMatters || '').trim();
+    const whyLine = (goal && (whyStick || whyCarrot))
+      ? '<div class="mf__why">' + esc([whyStick, whyCarrot].filter(Boolean).join(' ')) + '</div>'
+      : '';
 
     const bar = (pct, color) => '<div class="mf-stat__track"><div class="mf-stat__fill" style="width:' + Math.max(2, Math.min(100, pct)) + '%;background:' + color + '"></div></div>';
 
@@ -4088,6 +4142,7 @@ function openMementoFull() {
       '<button class="mf__close" aria-label="Close">&times;</button>' +
       '<div class="mf__scroll">' +
         '<div class="mf__card"></div>' +
+        whyLine +
         '<div class="mf__stats">' + clarityBlock + actionBlock + consBlock + '</div>' +
         // Re-share the evolving card any day (the win-moment share is one-time; this
         // is the durable path as the pillars fill in). Only when there is a goal to
