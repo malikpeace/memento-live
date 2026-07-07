@@ -4338,6 +4338,9 @@ function openMementoFull() {
 // are now": consistency = last 30 days, action = last 7 days (both can fade);
 // clarity is the one permanent foundation (locks in once Clarity is completed).
 function livingCardLevels() {
+  // ?dev=evo stage cinema: while a stage is selected, the override IS the data,
+  // so re-renders cannot repaint real demo levels over the staged look.
+  if (window._evoStageOverride) return window._evoStageOverride;
   let clar = (state.clarity && state.clarity.completed) ? 100 : 0;
   // These are LIGHT levels, not gauges: the raw ratios pass through a sqrt curve
   // so earned light is actually visible. Linear, the first logged move is 1/7 =
@@ -4465,10 +4468,26 @@ function startLivingWander(wrap) {
       kScl: R(0.0025, 0.007),
       kOp:  R(0.0025, 0.009),  // per-blob fade speed (slowed ~50%)
     }));
+    // v613: the data brightness is LIVE, not cached. Each frame the loop reads
+    // the wrap's current pillar vars and chases them smoothly (~2.5s), so a
+    // stage unlock (real or dev cinema) pours in through the drift instead of
+    // being stomped by a stale cached base. Mapping mirrors daycard-living.css.
+    const _pv = (n) => parseFloat(wrap.style.getPropertyValue(n)) || 0;
+    const BASEF = [
+      (v) => v.clar,          // b1 purple
+      (v) => v.act * 0.82,    // b2 white
+      (v) => v.cons,          // b3 green
+      (v) => v.mix,           // b4 blend
+      (v) => v.cons * 0.5,    // b5 green echo
+      () => 0                 // b6 red test, held off
+    ];
     function frame() {
+      const v = { clar: _pv('--clar'), act: _pv('--act'), cons: _pv('--cons'), mix: _pv('--mix') };
       for (let i = 0; i < inside.length; i++) {
         const b = st[i];
-        if (b.base <= 0) continue;   // disabled pillar (e.g. the red test) stays dark
+        const target = BASEF[i] ? BASEF[i](v) : 0;
+        b.base += (target - b.base) * 0.018;
+        if (b.base <= 0.004 && target <= 0) { b.base = 0; inside[i].style.opacity = '0'; if (bloom[i]) bloom[i].style.opacity = '0'; if (mirror[i]) mirror[i].style.opacity = '0'; continue; }
         b.x += (b.tx - b.x) * b.kPos;
         b.y += (b.ty - b.y) * b.kPos;
         b.sc += (b.tsc - b.sc) * b.kScl;

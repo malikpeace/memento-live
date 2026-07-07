@@ -237,35 +237,36 @@
         // Each button plays the LITERAL unlock animation for that stage: the
         // pillar's light pours into the real card by animating the real
         // per-pillar vars (--clar purple, --act white, --cons green).
+        // Levels are 0-100 (the same scale livingCardLevels returns). While a
+        // stage is selected, window._evoStageOverride IS the card's data source,
+        // so no re-render can repaint real demo levels over the staged look.
         const STAGES = {
-          beginning:   { clar: 0, act: 0,    cons: 0 },
-          clarity:     { clar: 1, act: 0,    cons: 0 },
-          action:      { clar: 1, act: 0.62, cons: 0 },
-          consistency: { clar: 1, act: 0.62, cons: 0.7 }
+          beginning:   { clar: 0,   act: 0,  cons: 0 },
+          clarity:     { clar: 100, act: 0,  cons: 0 },
+          action:      { clar: 100, act: 62, cons: 0 },
+          consistency: { clar: 100, act: 62, cons: 70 }
         };
-        const setVars = (wrap, v) => {
-          wrap.style.setProperty('--clar', String(v.clar));
-          wrap.style.setProperty('--act', String(v.act));
-          wrap.style.setProperty('--cons', String(v.cons));
-          wrap.style.setProperty('--mix', String(Math.min(v.clar, v.cons) * 0.75));
-          wrap.style.setProperty('--lit', String(Math.max(v.clar, v.act, v.cons)));
+        const apply = () => {
+          const wrap = document.querySelector('.daycard-wrap');
+          if (wrap && typeof setLivingCardVars === 'function') setLivingCardVars(wrap);
+          return wrap;
         };
         const ORDER = ['beginning', 'clarity', 'action', 'consistency'];
         const playStage = (key) => {
           document.body.classList.remove('pre-clarity', 'card-evolving', 'card-evolve-go');
-          const wrap = document.querySelector('.daycard-wrap');
-          if (!wrap) return;
           const from = STAGES[ORDER[Math.max(0, ORDER.indexOf(key) - 1)]];
-          const to = STAGES[key];
           // snap to the previous stage instantly...
           document.body.classList.remove('stage-cinema');
-          setVars(wrap, key === 'beginning' ? STAGES.beginning : from);
-          document.body.classList.toggle('ns-bloom', key !== 'beginning' && ORDER.indexOf(key) >= 1 && key !== 'clarity');
+          window._evoStageOverride = (key === 'beginning') ? STAGES.beginning : from;
+          const wrap = apply();
+          if (!wrap) return;
+          document.body.classList.toggle('ns-bloom', ORDER.indexOf(key) > 1);
           void wrap.offsetWidth;
           // ...then pour the new pillar's light in, slow and cinematic.
           setTimeout(() => {
             document.body.classList.add('stage-cinema');
-            setVars(wrap, to);
+            window._evoStageOverride = STAGES[key];
+            apply();
             if (key === 'clarity') setTimeout(() => document.body.classList.add('ns-bloom'), 2000); // beams bloom after the purple
             if (key === 'beginning') document.body.classList.remove('ns-bloom');
             setTimeout(() => document.body.classList.remove('stage-cinema'), 3400);
