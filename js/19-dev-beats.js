@@ -211,3 +211,57 @@
   if (document.readyState === 'complete' || document.readyState === 'interactive') setTimeout(start, 350);
   else document.addEventListener('DOMContentLoaded', function () { setTimeout(start, 350); });
 })();
+
+/* ============================================================
+   ?dev=evo (v610, Malik): watch, replay, and critique the card's
+   life stages on the REAL home with the REAL card. A floating
+   scrubber with stage buttons. Completely inert without the param.
+   ============================================================ */
+(function () {
+  try {
+    if (!/[?&]dev=evo/.test(location.search)) return;
+    const mount = () => {
+      try {
+        if (document.getElementById('evoDevBar')) return;
+        const bar = document.createElement('div');
+        bar.id = 'evoDevBar';
+        bar.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 78px);z-index:2147483000;display:flex;align-items:center;gap:6px;padding:8px 10px;border-radius:14px;background:rgba(10,10,14,0.88);-webkit-backdrop-filter:blur(22px) saturate(1.4);backdrop-filter:blur(22px) saturate(1.4);box-shadow:0 12px 34px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.08);font:600 12px -apple-system,system-ui,sans-serif;color:#fff;';
+        const mk = (label, onClick) => {
+          const b = document.createElement('button');
+          b.type = 'button'; b.textContent = label;
+          b.style.cssText = 'appearance:none;border:0;cursor:pointer;font:inherit;color:#fff;background:rgba(255,255,255,0.08);border-radius:9px;padding:8px 11px;';
+          b.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); try { onClick(); } catch (err) {} });
+          return b;
+        };
+        bar.appendChild(mk('Blank', () => {
+          // Just the card stage: flip the slab to its pre-clarity look in place.
+          document.body.classList.remove('card-evolving', 'card-evolve-go');
+          document.body.classList.toggle('pre-clarity');
+        }));
+        bar.appendChild(mk('Evolution', () => {
+          // Replay the full ignition evolution: blank beat -> purple floods -> beams.
+          document.body.classList.remove('pre-clarity', 'card-evolving', 'card-evolve-go');
+          state.meta = state.meta || {};
+          state.meta.cardEvolutionSeen = false;
+          if (state.clarity && !state.clarity.ignitedAt) state.clarity.ignitedAt = Date.now();
+          try { _cardEvolutionRunning = false; } catch (e) {}
+          _maybeRunCardEvolution();
+        }));
+        bar.appendChild(mk('Day 1.', () => {
+          state.meta = state.meta || {};
+          state.meta.firstActionDone = false;
+          _maybeFirstWinMoment();
+        }));
+        bar.appendChild(mk('New day', () => {
+          state.meta = state.meta || {};
+          delete state.meta.lastNewDayPulse;
+          const cc = document.getElementById('commandCenter');
+          if (cc) { cc.innerHTML = renderCommandCenter(); bindCommandCenter(cc); }
+        }));
+        document.body.appendChild(bar);
+      } catch (e) {}
+    };
+    if (document.readyState === 'complete' || document.readyState === 'interactive') setTimeout(mount, 1200);
+    else window.addEventListener('DOMContentLoaded', () => setTimeout(mount, 1200));
+  } catch (e) {}
+})();
