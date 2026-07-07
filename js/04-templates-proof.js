@@ -283,6 +283,7 @@ function _maybeFirstWinMoment() {
   try { persistNow(); } catch (e) {}
   const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (reduced) return;
+  try { if (typeof MementoSound !== 'undefined') MementoSound.play('day1'); } catch (e) {}
   const el = document.createElement('div');
   el.className = 'first-win';
   el.innerHTML = '<div class="first-win__label">Day 1.</div>';
@@ -297,6 +298,7 @@ function writeProofEvent(type, fields) {
     if (!type) return null;
     if (type === 'action-complete') {
       try { feel('complete'); } catch (_) {}
+      try { if (typeof MementoSound !== 'undefined') MementoSound.play('done'); } catch (_) {}
       try { _maybeFirstWinMoment(); } catch (_) {}
     }
     if (!Array.isArray(state.proofEvents)) state.proofEvents = [];

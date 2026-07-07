@@ -1216,6 +1216,7 @@ const ClarityExperience = {
       const tick = () => {
         if (done) return;
         renderUpto(i); i++;
+        try { if (typeof MementoSound !== 'undefined') MementoSound.tick(); } catch (e) {}
         if (i <= len) this._setTimeout(tick, 11 + Math.random() * 9);
         else { el.innerHTML = el.dataset.full || ''; onDone(); }
       };
@@ -1357,6 +1358,7 @@ const ClarityExperience = {
       const tick = () => {
         if (done) return;
         renderUpto(i); i++;
+        try { if (typeof MementoSound !== 'undefined') MementoSound.tick(); } catch (e) {}
         if (i <= len) this._setTimeout(tick, 11 + Math.random() * 9);
         else { el.innerHTML = el.dataset.full || ''; onDone(); }
       };
@@ -3964,6 +3966,7 @@ They arrived HERE seconds after igniting this exact star, so the goal and timefr
     const iv = setInterval(() => {
       if (done) return;
       i += step;
+      try { if (typeof MementoSound !== 'undefined') MementoSound.tick(); } catch (e) {}
       if (i >= plain.length) { done = true; clearInterval(iv); finish(); return; }
       qEl.textContent = plain.slice(0, i);
     }, 15);

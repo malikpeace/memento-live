@@ -3288,6 +3288,7 @@ function bindCommandCenter(cc) {
         && !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) {
       state.meta.lastNewDayPulse = _dayKey;
       try { persistNow(); } catch (e) {}
+      try { if (typeof MementoSound !== 'undefined') MementoSound.play('newday'); } catch (e) {}
       cc.classList.add('cc-newday');
       setTimeout(() => { try { cc.classList.remove('cc-newday'); } catch (e) {} }, 4200);
     }
@@ -3585,6 +3586,7 @@ function _runClarityUnlockCinema(onDone, opts) {
   T.push(setTimeout(() => {                     // THE SURGE: fully purple + shimmer
     window._evoStageOverride = { clar: 100, act: 0, cons: 0 };
     setLivingCardVars(wrap);
+    try { if (typeof MementoSound !== 'undefined') MementoSound.play('evolution'); } catch (e) {}
     document.body.classList.add('evo2-surge');
     const shine = document.createElement('span');
     shine.className = 'evo2-shine';
@@ -3596,6 +3598,7 @@ function _runClarityUnlockCinema(onDone, opts) {
     document.body.classList.add('evo2-orb');
   }, 4800));
   T.push(setTimeout(() => {                     // THE BEAMS: first light, slow
+    try { if (typeof MementoSound !== 'undefined') MementoSound.play('firstlight'); } catch (e) {}
     document.body.classList.add('ns-bloom');
   }, 6900));
   T.push(setTimeout(() => {                     // EXIT: home returns around it
@@ -4144,6 +4147,7 @@ function renderDayCard() {
 // Consistency (your streak). The card is the hero; the stats sit under it. A
 // snapshot clone of the live card carries its current theme + colour.
 function openMementoFull() {
+  try { if (typeof MementoSound !== 'undefined') MementoSound.play('arrival'); } catch (e) {}
   try {
     if (document.getElementById('mementoFull')) return;
     // Refresh the :root --aura-* vars so the full view's background reflects the

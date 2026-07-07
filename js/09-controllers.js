@@ -4529,6 +4529,7 @@ const TabBar = {
         '<div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-2); margin-bottom: 12px;">Appearance</div>' +
         toggleRow('prefLightMode', 'Light mode', 'Switch the whole app to a bright, premium off-white theme.', prefs.theme === 'light') +
         toggleRow('prefFlatUi', 'Glass', 'Glassy, blurred surfaces with depth. Turn off for a flat, high-contrast matte look.', !prefs.flatUi) +
+        toggleRow('prefSound', 'Sound', 'Quiet synthesized moments: the typewriter, marking a move done, the card coming alive.', !!prefs.soundOn) +
         toggleRow('prefFlatBg', 'Minimal background', 'Hide the ambient orbs and glow for a flat, paper-like surface.', !!prefs.flatBg) +
         '<div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); margin: 18px 0 10px;">Color</div>' +
         '<div class="pref-swatches" id="prefAccent">' + swatchHtml + '</div>' +
@@ -4757,6 +4758,7 @@ const TabBar = {
     wireToggle('prefFlatBg', (on) => { state.prefs.flatBg = on; });
     // The toggle reads as GLASS (Malik, v574): ON = glassy (flatUi off), OFF = flat.
     wireToggle('prefFlatUi', (on) => { state.prefs.flatUi = !on; });
+    wireToggle('prefSound', (on) => { state.prefs.soundOn = !!on; try { if (on && typeof MementoSound !== 'undefined') MementoSound.play('done'); } catch (e) {} });
     // Re-render the command center after accent-affecting changes (its inline
     // accent text is baked at render time), rebinding so buttons keep working.
     const refreshCommandCenter = () => {
