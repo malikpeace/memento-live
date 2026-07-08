@@ -10,7 +10,12 @@
 #clarityPaywall {
   position: fixed;
   inset: 0;
-  z-index: 320;
+  /* Above the Clarity experience overlay (z 1000) and the top fade (z 2000).
+     At z 320 the paywall sat UNDER the just-closed Clarity overlay, so its
+     leftover close button covered the paywall X (taps did nothing) and its
+     dark panel showed as a square behind the card (Malik v659). The paywall
+     is a full-screen opaque modal, it owns the top layer. */
+  z-index: 2100;
   background:
     radial-gradient(120% 80% at 50% -10%, rgba(123, 97, 255, 0.16), transparent 60%),
     radial-gradient(120% 90% at 50% 120%, rgba(123, 97, 255, 0.08), transparent 55%),
