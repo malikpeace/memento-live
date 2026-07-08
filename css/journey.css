@@ -83,3 +83,115 @@ html.theme-light .story-item__dot { box-shadow: 0 0 0 4px #f1eff5, 0 0 8px curre
 html.theme-light .story-item__date { color: #1a1722; }
 html.theme-light .story-item__title { color: rgba(31,27,43,0.92); }
 html.theme-light .story-item__text { color: rgba(34,30,48,0.62); }
+
+/* ============================================================
+   THE PATH TAB (BOTTOM-BAR-PLAN.md phase 2): one vertical road, star at the
+   top, "you are here" in the middle, the walked trail (green) below. Gap-only
+   connectors (the same language as the First 7 Days screen), one bright
+   element (the here-marker), tabular numerals. Follows the app theme.
+   ============================================================ */
+.pt { text-align: center; }
+.pt-eyebrow {
+  font-family: var(--font); font-size: 0.65rem; font-weight: 700;
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-3);
+}
+.pt-starwrap { display: flex; flex-direction: column; align-items: center; margin-top: 20px; }
+.pt-star {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: radial-gradient(circle at 46% 40%, #fff 0%, #efe9ff 34%, #c9b8ff 62%, rgba(160,130,255,0.18) 78%, transparent 88%);
+  box-shadow: 0 0 30px rgba(190,160,255,0.5), 0 0 90px rgba(150,120,255,0.24);
+  animation: ptBreathe 6.5s ease-in-out infinite;
+}
+@keyframes ptBreathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.045); } }
+.pt-goal {
+  margin: 18px auto 0; max-width: 26ch; text-wrap: balance;
+  font-family: var(--font); font-size: 1.0625rem; font-weight: 700; line-height: 1.4;
+  color: var(--text-hi);
+}
+.pt-horizon {
+  margin-top: 10px; display: flex; align-items: center; gap: 6px;
+  font-family: var(--font); font-size: 0.71875rem; font-weight: 600; color: var(--text-3);
+}
+.pt-stats {
+  margin-top: 15px; display: flex; gap: 18px;
+  font-family: var(--font); font-size: 0.71875rem; color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+.pt-stats b { color: var(--text-2); font-weight: 700; }
+
+.pt-road { position: relative; margin-top: 44px; }
+.pt-seg { position: relative; padding-bottom: 46px; }
+.pt-link {
+  position: absolute; left: 50%; top: -40px; width: 1.5px; height: 44px;
+  transform: translateX(-50%); background: rgba(var(--ink), 0.10);
+}
+.pt-seg:first-child .pt-link { height: 30px; top: -32px; background: linear-gradient(180deg, rgba(160,130,255,0.35), rgba(var(--ink),0.10)); }
+.pt-dot {
+  display: block; width: 9px; height: 9px; border-radius: 50%; margin: 0 auto 13px;
+  background: rgba(var(--ink), 0.28);
+  box-shadow: 0 0 0 5px var(--bg-deep);
+  position: relative; z-index: 2;
+}
+.pt-lab {
+  font-family: var(--font); font-size: 0.625rem; font-weight: 700;
+  letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+.pt-ttl { margin-top: 5px; font-family: var(--font); font-size: 0.9375rem; font-weight: 600; color: var(--text-2); }
+.pt-seg--next .pt-dot { background: rgba(var(--ink), 0.65); }
+.pt-seg--next .pt-ttl { color: var(--text-hi); }
+
+.pt-today { position: relative; padding: 4px 0 50px; }
+.pt-today .pt-link { top: -42px; height: 42px; }
+.pt-here {
+  display: block; width: 15px; height: 15px; border-radius: 50%; margin: 0 auto 15px;
+  background: var(--solid-bg);
+  box-shadow: 0 0 0 6px var(--bg-deep), 0 0 22px rgba(var(--ink), 0.7);
+  position: relative; z-index: 2;
+  animation: ptPulse 2.6s ease-in-out infinite;
+}
+@keyframes ptPulse {
+  0%, 100% { box-shadow: 0 0 0 6px var(--bg-deep), 0 0 14px rgba(var(--ink), 0.5); }
+  50% { box-shadow: 0 0 0 6px var(--bg-deep), 0 0 28px rgba(var(--ink), 0.85); }
+}
+.pt-today .pt-lab { color: var(--text-2); }
+.pt-big {
+  margin-top: 6px; font-family: var(--font); font-size: 1.1875rem; font-weight: 800;
+  letter-spacing: -0.01em; color: var(--text-hi);
+}
+.pt-move {
+  margin: 9px auto 0; max-width: 30ch; font-family: var(--font);
+  font-size: 0.84375rem; line-height: 1.5; color: var(--text-2); text-wrap: balance;
+}
+.pt-move b { color: var(--text-hi); font-weight: 650; }
+
+.pt-past .pt-link { background: rgba(120, 230, 170, 0.32); }
+.pt-past .pt-dot { background: rgb(120, 230, 170); box-shadow: 0 0 0 5px var(--bg-deep), 0 0 11px rgba(120,230,170,0.45); }
+.pt-past .pt-lab { color: rgba(120, 230, 170, 0.8); }
+.pt-past .pt-ttl { font-size: 0.875rem; font-weight: 600; color: var(--text-2); }
+.pt-weekchip {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 15px; border-radius: 999px;
+  background: var(--kfill-06);
+  box-shadow: inset 0 1px 0 rgba(var(--ink), 0.05);
+  font-family: var(--font); font-size: 0.75rem; font-weight: 650; color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+.pt-weekchip i { width: 6px; height: 6px; border-radius: 50%; background: rgb(120,230,170); }
+.pt-origin .pt-dot { background: rgba(120, 230, 170, 0.55); box-shadow: 0 0 0 5px var(--bg-deep); }
+.pt-origin .pt-ttl { color: var(--text-3); font-size: 0.84375rem; }
+.pt-origin { padding-bottom: 8px; }
+
+/* Light mode: the walked green needs ink-side contrast on the light surface. */
+html.theme-light .pt-past .pt-link { background: rgba(22, 140, 82, 0.3); }
+html.theme-light .pt-past .pt-dot { background: rgb(28, 158, 96); box-shadow: 0 0 0 5px var(--bg-deep), 0 0 10px rgba(28,158,96,0.35); }
+html.theme-light .pt-past .pt-lab { color: rgba(20, 125, 74, 0.9); }
+html.theme-light .pt-weekchip i { background: rgb(28, 158, 96); }
+html.theme-light .pt-origin .pt-dot { background: rgba(28, 158, 96, 0.55); }
+html.theme-light .pt-star {
+  background: radial-gradient(circle at 46% 40%, #fff 0%, #ece5ff 34%, #b9a5f5 62%, rgba(124,94,235,0.22) 78%, transparent 88%);
+  box-shadow: 0 0 26px rgba(124,94,235,0.35), 0 0 70px rgba(124,94,235,0.16);
+}
+@media (prefers-reduced-motion: reduce) {
+  .pt-star, .pt-here { animation: none; }
+}

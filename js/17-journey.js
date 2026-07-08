@@ -183,10 +183,138 @@ function renderPathTab() {
   try {
     const body = document.getElementById('pathBody');
     if (!body) return;
-    body.innerHTML = '<div class="tabstub">' +
-      '<div class="tabstub__eyebrow">The Path</div>' +
-      '<div class="tabstub__line">Your road to the star is being paved.</div>' +
+    const E = (s) => { try { return (typeof esc === 'function') ? esc(s) : String(s == null ? '' : s); } catch (e) { return ''; } };
+
+    // --- data ---
+    const ans = (state.clarity && state.clarity.answers) || {};
+    const goalRaw = String(ans.neutronStar || '').trim();
+    const goal = goalRaw && !/[.!?]$/.test(goalRaw) ? goalRaw + '.' : goalRaw;
+    const horizon = String(ans.timeHorizon || ans.timeframe || '').trim();
+    const ignited = (state.clarity && (state.clarity.ignitedAt || state.clarity.completedAt)) || Date.now();
+    const DAY = 86400000;
+    const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
+    const ignStart = new Date(ignited); ignStart.setHours(0, 0, 0, 0);
+    const dayN = Math.max(1, Math.round((todayStart - ignStart) / DAY) + 1);
+    let cs = { totalActiveDays: 0, counts: {} };
+    try { cs = consistencyStats() || cs; } catch (e) {}
+    const counts = cs.counts || {};
+    const movesDone = (state.proofEvents || []).filter(ev => ev && ev.type === 'action-complete').length;
+    const pa = (state.action && state.action.primaryAction) || {};
+    const move = String(pa.title || '').trim();
+
+    // milestones, farthest first so the road descends toward today
+    const rank = (h2) => {
+      h2 = String(h2 || '').toLowerCase();
+      const mm = h2.match(/\d+/); const n = mm ? parseInt(mm[0], 10) : 1;
+      if (h2.indexOf('today') !== -1 || h2.indexOf('now') !== -1) return 0;
+      if (h2.indexOf('life') !== -1 || h2.indexOf('forever') !== -1 || h2.indexOf('someday') !== -1 || h2.indexOf('eventually') !== -1) return 1000;
+      if (h2.indexOf('week') !== -1) return 1 + n * 0.1;
+      if (h2.indexOf('month') !== -1) return 10 + n;
+      if (h2.indexOf('quarter') !== -1) return 30 + n;
+      if (h2.indexOf('year') !== -1) return 100 + n;
+      return 90;
+    };
+    const miles = (Array.isArray(pa.path) ? pa.path.slice() : [])
+      .filter(m => m && String(m.milestone || '').trim())
+      .sort((a, b) => rank(b.horizon) - rank(a.horizon));
+
+    // the walked trail: last 7 calendar days before today that were shown up,
+    // best title per day (action-complete wins, else the latest proof event)
+    const titleByDay = {};
+    (state.proofEvents || []).forEach(ev => {
+      if (!ev || !ev.iso) return;
+      const cur = titleByDay[ev.iso];
+      if (!cur || (ev.type === 'action-complete' && cur.type !== 'action-complete') ||
+          (ev.type === cur.type && (ev.ts || 0) > (cur.ts || 0))) titleByDay[ev.iso] = ev;
+    });
+    const dayIso = (d) => { const x = new Date(d); x.setHours(12, 0, 0, 0); return x.toISOString().split('T')[0]; };
+    const recent = [];
+    for (let i = 1; i <= 7; i++) {
+      const t = new Date(todayStart.getTime() - i * DAY);
+      if (t < ignStart) break;
+      const iso = dayIso(t);
+      if (counts[iso] === undefined) continue;
+      const ev = titleByDay[iso];
+      recent.push({
+        lab: i === 1 ? 'Yesterday' : ('Day ' + (dayN - i)),
+        ttl: (ev && String(ev.title || '').trim()) || 'Showed up'
+      });
+    }
+    // older weeks (since ignition, before the 7-day window) condense to chips
+    const weeks = [];
+    const windowStart = new Date(todayStart.getTime() - 7 * DAY);
+    let wStart = new Date(ignStart);
+    let wIdx = 1;
+    while (wStart < windowStart && wIdx < 60) {
+      const wEnd = new Date(Math.min(wStart.getTime() + 7 * DAY, windowStart.getTime()));
+      let on = 0, total = 0;
+      for (let t = new Date(wStart); t < wEnd; t = new Date(t.getTime() + DAY)) {
+        total++;
+        if (counts[dayIso(t)] !== undefined) on++;
+      }
+      if (total > 0) weeks.push({ idx: wIdx, on, total });
+      wStart = new Date(wStart.getTime() + 7 * DAY);
+      wIdx++;
+    }
+    weeks.reverse(); // most recent condensed week sits closest to the days
+    const originDate = (() => { try { return ignStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); } catch (e) { return ''; } })();
+
+    // --- html ---
+    let h = '<div class="pt">';
+    h += '<div class="pt-eyebrow">The Path</div>';
+    h += '<div class="pt-starwrap"><div class="pt-star" aria-hidden="true"></div>';
+    if (goal) h += '<div class="pt-goal">' + E(goal) + '</div>';
+    if (horizon) h += '<div class="pt-horizon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16M9 3v4M15 3v4"/></svg><span>' + E(horizon) + '</span></div>';
+    h += '<div class="pt-stats"><span>Day <b>' + dayN + '</b></span>';
+    if (cs.totalActiveDays) h += '<span><b>' + cs.totalActiveDays + '</b> days shown up</span>';
+    if (movesDone) h += '<span><b>' + movesDone + '</b> moves done</span>';
+    h += '</div></div>';
+
+    h += '<div class="pt-road">';
+    if (miles.length) {
+      miles.forEach((m, i) => {
+        const next = i === miles.length - 1;
+        h += '<div class="pt-seg' + (next ? ' pt-seg--next' : '') + '"><span class="pt-link"></span><span class="pt-dot"></span>' +
+          '<div class="pt-lab">' + (next ? 'Next &middot; ' : '') + E(m.horizon || '') + '</div>' +
+          '<div class="pt-ttl">' + E(m.milestone) + '</div></div>';
+      });
+    } else {
+      h += '<div class="pt-seg"><span class="pt-link"></span><span class="pt-dot"></span>' +
+        '<div class="pt-lab">Ahead</div><div class="pt-ttl">Your milestones appear once your plan is built.</div></div>';
+    }
+
+    h += '<div class="pt-today" id="ptToday"><span class="pt-link"></span><span class="pt-here"></span>' +
+      '<div class="pt-lab">Today &middot; Day ' + dayN + '</div>' +
+      '<div class="pt-big">' + (dayN === 1 ? 'The road starts here.' : 'You are here.') + '</div>' +
+      (move ? '<div class="pt-move">' + (dayN === 1 ? 'First move' : "Today's move") + ': <b>' + E(move) + '</b></div>' : '') +
       '</div>';
+
+    recent.forEach(d => {
+      h += '<div class="pt-seg pt-past"><span class="pt-link"></span><span class="pt-dot"></span>' +
+        '<div class="pt-lab">' + d.lab + '</div><div class="pt-ttl">' + E(d.ttl) + '</div></div>';
+    });
+    weeks.forEach(w => {
+      h += '<div class="pt-seg pt-past pt-week"><span class="pt-link"></span>' +
+        '<span class="pt-weekchip"><i></i>Week ' + w.idx + ' &middot; showed up ' + w.on + ' of ' + w.total + ' days</span></div>';
+    });
+    if (dayN > 1) {
+      h += '<div class="pt-seg pt-past pt-origin"><span class="pt-link"></span><span class="pt-dot"></span>' +
+        '<div class="pt-lab">Day 1' + (originDate ? ' &middot; ' + originDate : '') + '</div>' +
+        '<div class="pt-ttl">You ignited your star.</div></div>';
+    }
+    h += '</div></div>';
+    body.innerHTML = h;
+
+    // Land centered on today (the panel is the scroll container). setTimeout,
+    // not rAF: rAF is throttled in background tabs and the scroll silently
+    // never runs there.
+    setTimeout(() => {
+      try {
+        const panel = document.getElementById('panelPath');
+        const today = document.getElementById('ptToday');
+        if (panel && today) panel.scrollTop = Math.max(0, today.offsetTop - panel.clientHeight * 0.40);
+      } catch (e) {}
+    }, 50);
   } catch (e) {}
 }
 function renderReflectTab() {
