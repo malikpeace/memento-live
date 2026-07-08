@@ -7536,11 +7536,91 @@ function starSeedFromGoal(goal) {
 // summary, lands the user on the home, plays the card unlock cinema (they WATCH
 // their Memento come alive), and only THEN fires the save nudge, leaving them on
 // the home where the next-step card invites them to take their first action.
+// ============================================================
+// THE FIRST 7 DAYS (v647, Malik): a future-pacing screen that rides the peak
+// right after the card evolution cinema and leads into the paywall. Honest
+// about the day-3 dip (the retention hook). Personalized to their star.
+// ============================================================
+function _renderNext7Days() {
+  const name = (state.profile && state.profile.name) ? String(state.profile.name).trim() : '';
+  const star = (state.clarity && state.clarity.answers && state.clarity.answers.neutronStar) || '';
+  const greet = name ? (esc(name) + ", here's exactly what's coming.") : "Here's exactly what's coming.";
+  const DAYS = [
+    { n: 'DAY 1', t: 'You start.', d: "One real move toward your goal. You're already past everyone who only talked about it." },
+    { n: 'DAY 2', t: 'It holds.', d: "Day two proves day one wasn't a fluke." },
+    { n: 'DAY 3 &middot; THE DIP', t: 'This is where most quit.', d: "Motivation drops. Nothing feels different yet. Showing up today is the whole game.", cls: 'n7d-day--dip' },
+    { n: 'DAY 4', t: 'It eases.', d: "You stop forcing it. Momentum starts carrying the weight for you." },
+    { n: 'DAY 5', t: 'It shows.', d: "Someone notices something's different before you say a word." },
+    { n: 'DAY 6', t: "It's yours.", d: "The effort fades. It just feels like who you are now." },
+    { n: 'DAY 7', t: 'Proof.', d: "Seven days. The week that ends most people didn't end you.", cls: 'n7d-day--win' }
+  ];
+  const daysHtml = DAYS.map(o =>
+    `<div class="n7d-day ${o.cls || ''}"><div class="n7d-node"></div><div class="n7d-num">${o.n}</div><div class="n7d-title">${esc(o.t)}</div><div class="n7d-desc">${esc(o.d)}</div></div>`
+  ).join('');
+  const starHtml = star ? `<p class="n7d-star">Toward <b>&ldquo;${esc(star)}&rdquo;</b></p>` : '';
+  return `<div class="n7d" id="n7dRoot" role="dialog" aria-label="Your first 7 days">
+    <div class="n7d-scroll" id="n7dScroll">
+      <div class="n7d-inner">
+        <div class="n7d-eyebrow">The first 7 days</div>
+        <h1 class="n7d-h1">${greet}</h1>
+        <p class="n7d-sub">Week one is the one that breaks people. You'll see every step before it hits, especially the day that makes most of them quit.</p>
+        ${starHtml}
+        <div class="n7d-path">${daysHtml}</div>
+        <p class="n7d-close" id="n7dClose">This week is the hardest it ever gets. <b>After it, momentum does the lifting.</b></p>
+      </div>
+    </div>
+    <div class="n7d-bar"><button type="button" class="n7d-cta" id="n7dCta">Start day one</button></div>
+  </div>`;
+}
+function showNext7Days(onProceed) {
+  try {
+    if (document.getElementById('n7dRoot')) return;
+    const host = document.createElement('div');
+    host.innerHTML = _renderNext7Days();
+    const root = host.firstElementChild;
+    document.body.appendChild(root);
+    document.body.style.overflow = 'hidden';
+    const scroll = root.querySelector('#n7dScroll');
+    requestAnimationFrame(() => root.classList.add('n7d--in'));
+    // Reveal each day as it scrolls into view (root = the scroll container).
+    const items = root.querySelectorAll('.n7d-day, #n7dClose');
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((es) => {
+        es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } });
+      }, { root: scroll, threshold: 0.3, rootMargin: '0px 0px -8% 0px' });
+      items.forEach(el => io.observe(el));
+    } else {
+      items.forEach(el => el.classList.add('is-in'));
+    }
+    const cta = root.querySelector('#n7dCta');
+    if (cta) cta.addEventListener('click', () => {
+      root.classList.add('n7d--out');
+      setTimeout(() => {
+        try { root.remove(); } catch (e) {}
+        document.body.style.overflow = '';
+        try { if (typeof onProceed === 'function') onProceed(); } catch (e) {}
+      }, 420);
+    });
+  } catch (e) { try { if (typeof onProceed === 'function') onProceed(); } catch (_) {} }
+}
+
 // `finalize` is the per-entry close step (close / completeWizard).
 function _addToMementoThenAction(finalize) {
   const proceedAfter = () => {
-    // Save-your-Memento nudge lands AFTER the cinema (Malik's call). No auto-jump
-    // to Action: they stay on the home and the card guides them from there.
+    // After the cinema (card evolved): ride the peak into the FIRST 7 DAYS
+    // future-pacing screen, then the paywall (Malik). Once per lifetime.
+    try {
+      state.meta = state.meta || {};
+      if (typeof showNext7Days === 'function' && !state.meta.next7DaysSeen) {
+        state.meta.next7DaysSeen = true;
+        try { persistNow(); } catch (e) {}
+        showNext7Days(() => {
+          try { if (typeof ClarityPaywall !== 'undefined' && ClarityPaywall.show) ClarityPaywall.show(); } catch (e) {}
+        });
+        return;
+      }
+    } catch (e) {}
+    // Returning path (already saw the 7 days): the quiet save-your-Memento nudge.
     try { if (typeof maybeShowSaveWorkNudge === 'function') maybeShowSaveWorkNudge(function () {}); } catch (e) {}
   };
   const runClose = () => {

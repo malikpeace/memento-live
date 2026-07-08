@@ -1757,6 +1757,7 @@ const CreatorTools = {
     bind('creatorJumpReveal', () => this.jumpReveal());
     bind('creatorJumpStar', () => this.jumpStar());
     bind('creatorJumpStarSummary', () => this.jumpStarSummary());
+    bind('creatorJump7Days', () => this.jump7Days());
     bind('creatorJumpDay1', () => this.jumpDay1());
     bind('creatorJumpNewDay', () => this.jumpNewDay());
 
@@ -2031,6 +2032,7 @@ const CreatorTools = {
     } catch (e) {}
   },
   jumpSynth() { this._closeAll(); try { if (window.DevCeremony) window.DevCeremony.synth(); } catch (e) {} },
+  jump7Days() { this._closeAll(); try { if (typeof showNext7Days === 'function') showNext7Days(function () { try { if (typeof ClarityPaywall !== 'undefined' && ClarityPaywall.show) ClarityPaywall.show(); } catch (e) {} }); } catch (e) {} },
   jumpReveal() { this._closeAll(); try { if (window.DevCeremony) window.DevCeremony.reveal(); } catch (e) {} },
   jumpStar() { this._closeAll(); try { if (window.DevCeremony) window.DevCeremony.star(); } catch (e) {} },
   jumpStarSummary() { this._closeAll(); try { if (window.DevCeremony) window.DevCeremony.summary(); } catch (e) {} },
