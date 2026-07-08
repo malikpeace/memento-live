@@ -3974,65 +3974,89 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
 .ns-min__sheet-item:active { background: rgba(255, 255, 255, 0.08); }
 
 /* ============================================================
-   THE FIRST 7 DAYS (v647, Malik) - future-pacing screen after the card
-   evolution cinema, leading into the paywall. Memento's ceremony language:
-   near-black radial ground, centered column, a vertical "path" with a glowing
-   node per day, reveal-on-scroll, one solid CTA. Green (consistency) is used
-   only on the path + the day you cross the line. Honest day-3 dip.
+   THE FIRST 7 DAYS (v648, Malik) - future-pacing screen after the card
+   evolution cinema, into the paywall. ONE scroll, a hero that fills the first
+   view, days revealing on scroll, a top fade under the status bar, and a CTA
+   that appears only at the very bottom. Always a dark ceremony surface.
    ============================================================ */
 .n7d {
-  position: fixed; inset: 0; z-index: 9500;
+  position: fixed; inset: 0; z-index: 9500; overflow: hidden;
   background: radial-gradient(130% 90% at 50% 8%, #0d0d18 0%, #08080e 42%, #030305 100%);
   opacity: 0; transform: translateY(26px);
   transition: opacity 0.6s cubic-bezier(0.22,1,0.36,1), transform 0.6s cubic-bezier(0.22,1,0.36,1);
+  /* Force light text regardless of app theme (dark surface always). */
+  --text-hi: rgba(255,255,255,0.96);
+  --text-mid: rgba(255,255,255,0.72);
+  --text-lo: rgba(255,255,255,0.42);
 }
 .n7d--in { opacity: 1; transform: none; }
 .n7d--out { opacity: 0; transform: translateY(-10px); transition: opacity 0.4s ease, transform 0.4s ease; }
+
+/* the single scroll container */
 .n7d-scroll {
-  position: absolute; inset: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden;
+  -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
 }
 .n7d-inner {
   max-width: 440px; margin: 0 auto;
-  padding: calc(var(--safe-t, 0px) + 64px) 26px calc(var(--safe-b, 0px) + 150px);
+  padding: calc(var(--safe-t, 0px) + 30px) 26px calc(var(--safe-b, 0px) + 150px);
+}
+
+/* top fade under the status bar (dark, correct on both themes) */
+.n7d-topfade {
+  position: absolute; top: 0; left: 0; right: 0; z-index: 4; pointer-events: none;
+  height: calc(var(--safe-t, 0px) + 54px);
+  background: linear-gradient(180deg, #05050a 0%, #05050a 44%, rgba(5,5,10,0) 100%);
+}
+
+/* HERO fills the first screen so the intro breathes; days come on scroll */
+.n7d-hero {
+  min-height: calc(100lvh - var(--safe-t, 0px) - 96px);
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  text-align: center; padding-bottom: 12px;
 }
 .n7d-eyebrow {
   font-family: var(--font); font-size: 11.5px; font-weight: 700;
   letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-lo);
-  text-align: center;
-  opacity: 0; transform: translateY(10px); animation: n7dRise 0.9s cubic-bezier(0.22,1,0.36,1) 0.1s forwards;
+  opacity: 0; transform: translateY(10px); animation: n7dRise 0.9s cubic-bezier(0.22,1,0.36,1) 0.25s forwards;
 }
 .n7d-h1 {
-  margin: 14px 0 0; text-align: center; text-wrap: balance;
-  font-family: var(--font); font-size: 29px; line-height: 1.16; font-weight: 800;
+  margin: 15px 0 0; text-wrap: balance;
+  font-family: var(--font); font-size: 30px; line-height: 1.14; font-weight: 800;
   letter-spacing: -0.02em; color: var(--text-hi);
-  opacity: 0; transform: translateY(12px); animation: n7dRise 1s cubic-bezier(0.22,1,0.36,1) 0.24s forwards;
+  opacity: 0; transform: translateY(12px); animation: n7dRise 1s cubic-bezier(0.22,1,0.36,1) 0.45s forwards;
 }
 .n7d-sub {
-  margin: 16px auto 0; max-width: 34ch; text-align: center; text-wrap: balance;
+  margin: 18px auto 0; max-width: 34ch; text-wrap: balance;
   font-family: var(--font); font-size: 15.5px; line-height: 1.55; color: var(--text-mid);
-  opacity: 0; transform: translateY(12px); animation: n7dRise 1s cubic-bezier(0.22,1,0.36,1) 0.42s forwards;
+  opacity: 0; transform: translateY(12px); animation: n7dRise 1s cubic-bezier(0.22,1,0.36,1) 0.68s forwards;
 }
 .n7d-star {
-  margin: 22px auto 0; max-width: 30ch; text-align: center;
+  margin: 24px auto 0; max-width: 30ch;
   font-family: var(--font); font-size: 13px; line-height: 1.5; color: var(--text-lo);
-  opacity: 0; transform: translateY(12px); animation: n7dRise 1s cubic-bezier(0.22,1,0.36,1) 0.6s forwards;
+  opacity: 0; transform: translateY(12px); animation: n7dRise 1s cubic-bezier(0.22,1,0.36,1) 0.9s forwards;
 }
 .n7d-star b { color: var(--text-mid); font-weight: 600; }
+.n7d-cue {
+  margin-top: 42px; color: rgba(255,255,255,0.32); line-height: 0;
+  opacity: 0; animation: n7dRise 1s ease 1.35s forwards, n7dCue 1.9s ease-in-out 2.3s infinite;
+}
 
-.n7d-path { position: relative; margin-top: 56px; }
+/* the path */
+.n7d-path { position: relative; margin-top: 8px; padding-top: 8px; }
 .n7d-path::before {
-  content: ""; position: absolute; top: 6px; bottom: 64px; left: 50%; width: 1.5px;
+  content: ""; position: absolute; top: 6px; bottom: 60px; left: 50%; width: 1.5px;
   transform: translateX(-50%);
   background: linear-gradient(180deg,
     rgba(255,255,255,0.09) 0%,
-    rgba(255,255,255,0.045) 32%,
+    rgba(255,255,255,0.045) 30%,
     rgba(255,255,255,0.09) 55%,
-    rgba(120,230,170,0.38) 100%);
+    rgba(120,230,170,0.4) 100%);
 }
 .n7d-day {
-  position: relative; text-align: center; padding-bottom: 52px;
-  opacity: 0; transform: translateY(20px);
-  transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1);
+  position: relative; text-align: center; padding-bottom: 58px;
+  opacity: 0; transform: translateY(22px);
+  transition: opacity 0.75s cubic-bezier(0.22,1,0.36,1), transform 0.75s cubic-bezier(0.22,1,0.36,1);
 }
 .n7d-day.is-in { opacity: 1; transform: none; }
 .n7d-node {
@@ -4044,9 +4068,8 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
   font-family: var(--font); font-size: 11px; font-weight: 700; letter-spacing: 0.2em;
   color: var(--text-lo); font-variant-numeric: tabular-nums;
 }
-.n7d-title { margin-top: 7px; font-family: var(--font); font-size: 20px; font-weight: 700; letter-spacing: -0.01em; color: var(--text-hi); }
-.n7d-desc { margin: 8px auto 0; max-width: 27ch; font-family: var(--font); font-size: 14.5px; line-height: 1.5; color: var(--text-mid); text-wrap: balance; }
-
+.n7d-title { margin-top: 7px; font-family: var(--font); font-size: 21px; font-weight: 700; letter-spacing: -0.01em; color: var(--text-hi); }
+.n7d-desc { margin: 9px auto 0; max-width: 27ch; font-family: var(--font); font-size: 14.5px; line-height: 1.5; color: var(--text-mid); text-wrap: balance; }
 .n7d-day--dip .n7d-node {
   background: transparent; box-shadow: 0 0 0 5px #08080e;
   border: 1.5px solid rgba(255,255,255,0.55); width: 13px; height: 13px;
@@ -4056,42 +4079,37 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
 .n7d-day--win .n7d-num { color: rgba(120,230,170,0.92); }
 
 .n7d-close {
-  text-align: center; max-width: 30ch; margin: 6px auto 0;
-  font-family: var(--font); font-size: 15px; line-height: 1.55; color: var(--text-mid); text-wrap: balance;
-  opacity: 0; transform: translateY(20px);
-  transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1);
+  text-align: center; max-width: 30ch; margin: 4px auto 0;
+  font-family: var(--font); font-size: 15.5px; line-height: 1.55; color: var(--text-mid); text-wrap: balance;
+  opacity: 0; transform: translateY(22px);
+  transition: opacity 0.75s cubic-bezier(0.22,1,0.36,1), transform 0.75s cubic-bezier(0.22,1,0.36,1);
 }
 .n7d-close.is-in { opacity: 1; transform: none; }
 .n7d-close b { color: var(--text-hi); font-weight: 650; }
+.n7d-end { height: 8px; }
 
+/* CTA appears only when the bottom is reached */
 .n7d-bar {
-  position: absolute; left: 0; right: 0; bottom: 0; z-index: 3;
-  padding: 20px 26px calc(24px + var(--safe-b, 0px));
-  background: linear-gradient(180deg, rgba(6,6,10,0) 0%, rgba(6,6,10,0.85) 34%, #050508 100%);
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 5;
+  padding: 28px 26px calc(24px + var(--safe-b, 0px));
+  background: linear-gradient(180deg, rgba(6,6,10,0) 0%, rgba(6,6,10,0.9) 44%, #050508 100%);
   display: flex; justify-content: center;
+  opacity: 0; transform: translateY(16px); pointer-events: none;
+  transition: opacity 0.45s ease, transform 0.45s ease;
 }
+.n7d-bar.is-in { opacity: 1; transform: none; pointer-events: auto; }
 .n7d-cta {
   -webkit-appearance: none; appearance: none; border: 0; cursor: pointer;
   width: 100%; max-width: 388px; padding: 17px 20px; border-radius: var(--r-ctrl);
-  background: var(--solid-bg); color: var(--solid-fg);
+  background: #fff; color: #0b0b12;
   font-family: var(--font); font-size: 16.5px; font-weight: 700; letter-spacing: -0.01em;
-  box-shadow: 0 10px 34px rgba(0,0,0,0.5);
+  box-shadow: 0 10px 34px rgba(0,0,0,0.55);
   transition: transform 0.12s ease;
 }
 .n7d-cta:active { transform: scale(0.985); }
 @keyframes n7dRise { to { opacity: 1; transform: none; } }
+@keyframes n7dCue { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
 @media (prefers-reduced-motion: reduce) {
-  .n7d, .n7d-eyebrow, .n7d-h1, .n7d-sub, .n7d-star, .n7d-day, .n7d-close { animation: none; opacity: 1; transform: none; transition: none; }
-}
-/* The 7-days screen is always a dark ceremony surface: force light text + a
-   white CTA regardless of the app theme (light mode would otherwise flip
-   --text-* to ink and go dark-on-dark). */
-.n7d { --ink: 255, 255, 255; }
-.n7d-cta { background: #fff; color: #0b0b12; }
-/* --text-* are eagerly resolved at the theme scope, so overriding --ink alone
-   doesn't relight them. Redefine the text tokens directly on the dark surface. */
-.n7d {
-  --text-hi: rgba(255,255,255,0.96);
-  --text-mid: rgba(255,255,255,0.72);
-  --text-lo: rgba(255,255,255,0.42);
+  .n7d, .n7d-eyebrow, .n7d-h1, .n7d-sub, .n7d-star, .n7d-cue, .n7d-day, .n7d-close { animation: none; opacity: 1; transform: none; transition: none; }
+  .n7d-bar { transition: none; }
 }

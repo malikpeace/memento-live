@@ -7558,18 +7558,24 @@ function _renderNext7Days() {
     `<div class="n7d-day ${o.cls || ''}"><div class="n7d-node"></div><div class="n7d-num">${o.n}</div><div class="n7d-title">${esc(o.t)}</div><div class="n7d-desc">${esc(o.d)}</div></div>`
   ).join('');
   const starHtml = star ? `<p class="n7d-star">Toward <b>&ldquo;${esc(star)}&rdquo;</b></p>` : '';
+  const cue = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   return `<div class="n7d" id="n7dRoot" role="dialog" aria-label="Your first 7 days">
+    <div class="n7d-topfade" aria-hidden="true"></div>
     <div class="n7d-scroll" id="n7dScroll">
       <div class="n7d-inner">
-        <div class="n7d-eyebrow">The first 7 days</div>
-        <h1 class="n7d-h1">${greet}</h1>
-        <p class="n7d-sub">Week one is the one that breaks people. You'll see every step before it hits, especially the day that makes most of them quit.</p>
-        ${starHtml}
+        <div class="n7d-hero">
+          <div class="n7d-eyebrow">The first 7 days</div>
+          <h1 class="n7d-h1">${greet}</h1>
+          <p class="n7d-sub">Week one is the one that breaks people. You'll see every step before it hits, especially the day that makes most of them quit.</p>
+          ${starHtml}
+          <div class="n7d-cue" aria-hidden="true">${cue}</div>
+        </div>
         <div class="n7d-path">${daysHtml}</div>
         <p class="n7d-close" id="n7dClose">This week is the hardest it ever gets. <b>After it, momentum does the lifting.</b></p>
+        <div class="n7d-end" id="n7dEnd" aria-hidden="true"></div>
       </div>
     </div>
-    <div class="n7d-bar"><button type="button" class="n7d-cta" id="n7dCta">Start day one</button></div>
+    <div class="n7d-bar" id="n7dBar"><button type="button" class="n7d-cta" id="n7dCta">Start day one</button></div>
   </div>`;
 }
 function showNext7Days(onProceed) {
@@ -7582,15 +7588,25 @@ function showNext7Days(onProceed) {
     document.body.style.overflow = 'hidden';
     const scroll = root.querySelector('#n7dScroll');
     requestAnimationFrame(() => root.classList.add('n7d--in'));
-    // Reveal each day as it scrolls into view (root = the scroll container).
+    // Reveal each day as it scrolls into view (root = the single scroll container).
     const items = root.querySelectorAll('.n7d-day, #n7dClose');
+    const bar = root.querySelector('#n7dBar');
+    const end = root.querySelector('#n7dEnd');
     if ('IntersectionObserver' in window) {
       const io = new IntersectionObserver((es) => {
         es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } });
-      }, { root: scroll, threshold: 0.3, rootMargin: '0px 0px -8% 0px' });
+      }, { root: scroll, threshold: 0.25, rootMargin: '0px 0px -10% 0px' });
       items.forEach(el => io.observe(el));
+      // The CTA appears only once the very bottom is reached (Malik).
+      if (bar && end) {
+        const io2 = new IntersectionObserver((es) => {
+          es.forEach(e => { bar.classList.toggle('is-in', e.isIntersecting); });
+        }, { root: scroll, threshold: 0.02 });
+        io2.observe(end);
+      }
     } else {
       items.forEach(el => el.classList.add('is-in'));
+      if (bar) bar.classList.add('is-in');
     }
     const cta = root.querySelector('#n7dCta');
     if (cta) cta.addEventListener('click', () => {
