@@ -3642,6 +3642,11 @@ function _runClarityUnlockCinema(onDone, opts) {
   const ns = wrap && wrap.querySelector('.daycard-ns');
   if (!wrap || !ns) return false;
   try { stopLivingWander(); } catch (e) {}
+  // Clear the room for the ceremony: the bottom bar slides away (built after
+  // this cinema, it used to sit on screen through the whole reveal). Driven
+  // here in JS, not just CSS, so it clears even if the compositor throttles
+  // transitions mid-surge. It returns at EXIT when the card settles.
+  try { if (typeof TabBar !== 'undefined' && TabBar.hide) TabBar.hide(); } catch (e) {}
   // clear any inline drift so the class choreography owns the blobs
   wrap.querySelectorAll('.daycard-ns__liquid .blob').forEach(b => { b.style.opacity = ''; b.style.transform = ''; });
   // snap to BLANK instantly (no drain) before the cinema's slow transitions arm
@@ -3676,6 +3681,8 @@ function _runClarityUnlockCinema(onDone, opts) {
     window._evoStageOverride = opts.holdOverride || null;
     setLivingCardVars(wrap);
     try { startLivingWander(wrap); } catch (e) {}
+    // The room returns: the bar slides back up now the card has settled.
+    try { if (typeof TabBar !== 'undefined' && TabBar.show) TabBar.show(); } catch (e) {}
     if (onDone) onDone();
   }, 9400));
   return true;

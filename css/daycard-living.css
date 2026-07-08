@@ -236,6 +236,13 @@ body.stage-cinema .daycard-theme-living .daycard-ns__liquid .blob {
 /* ── v614: the clarity unlock cinema ─────────────────────────────────────── */
 /* The room clears: Today fades away, the blank Memento grows near full screen. */
 body.evo2 #commandCenter { opacity: 0 !important; pointer-events: none; transition: opacity 0.6s ease; }
+/* The bottom bar is part of the room, so it clears too (it was built after this
+   cinema and used to sit on screen through the whole reveal, breaking the sacred
+   first-evolution beat, Malik v658). Driven by TabBar.hide()/show() in the
+   cinema JS, transition-independent, so it clears even if the compositor
+   throttles CSS transitions mid-animation. It slides back when the card settles. */
+/* The top status-bar fade is chrome too; drop it so the reveal is edge to edge. */
+body.evo2 #topFade { opacity: 0 !important; transition: opacity 0.6s ease; }
 body.evo2 #dayCard { position: relative; z-index: 30; }
 body.evo2 .daycard-wrap {
   /* The unlock cinema grows the card, but 1.22 + 6vh pushed it beyond full
