@@ -7909,9 +7909,16 @@ function _bindStarPlacard(root) {
     };
     const openShell = () => {
       try {
-        state.clarity.ignitedAt = null;
         _ig2 = {};
         ensureSummary();
+        // Prime the gates so the cheat bar can REPLAY the full flow, including the
+        // card-evolution cinema on "Add to your Memento" (which is once-per-lifetime
+        // for real users, so it never fires twice without this reset). Dev-only:
+        // DevCeremony is cheat-bar gated. Restart Clarity/Everything to undo.
+        state.meta = state.meta || {};
+        state.meta.cardEvolutionSeen = false;
+        state.clarity.completed = true;
+        state.clarity.ignitedAt = Date.now();
         ClarityExperience.isOpen = true;
         if (typeof FullscreenClose !== 'undefined' && FullscreenClose.show) FullscreenClose.show('clarity');
         ClarityExperience.el.setAttribute('aria-hidden', 'false');
