@@ -4289,9 +4289,12 @@ const TabBar = {
   },
 
   show() {
-    // No bar before the star is ignited: the pre-Clarity home keeps its single
-    // job, and the bar appearing after ignition is part of the reward.
-    const hasStar = !!(typeof state !== 'undefined' && state && state.clarity && state.clarity.completed);
+    // No bar before the star exists: the pre-Clarity home keeps its single
+    // job, and the bar appearing after ignition is part of the reward. Keyed
+    // on a REAL star (completed + neutronStar), the same truth the home hero
+    // uses, so a stale completed flag (dev priming) can never leak the bar.
+    const hasStar = !!(typeof state !== 'undefined' && state && state.clarity && state.clarity.completed &&
+      state.clarity.answers && String(state.clarity.answers.neutronStar || '').trim());
     if (!hasStar) { this.hide(); return; }
     if (this.el) this.el.classList.remove('hidden');
     requestAnimationFrame(() => this.movePill(false));

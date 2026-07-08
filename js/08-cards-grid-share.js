@@ -539,7 +539,9 @@ function renderGrid() {
   // bar cannot linger from a stale state (a cheat-bar reset flips
   // clarity.completed without a reload; the bar must vanish on the very next
   // render, not the next boot). body.home-locked drives the CSS scroll lock.
-  const _lockedHome = isBrandNewUser() || !(state.clarity && state.clarity.completed);
+  const _hasRealStar = !!(state.clarity && state.clarity.completed &&
+    state.clarity.answers && String(state.clarity.answers.neutronStar || '').trim());
+  const _lockedHome = isBrandNewUser() || !_hasRealStar;
   document.body.classList.toggle('home-locked', _lockedHome);
   if (_lockedHome) { try { if (typeof TabBar !== 'undefined' && TabBar.hide) TabBar.hide(); } catch (e) {} }
 
