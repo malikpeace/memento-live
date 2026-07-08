@@ -2443,6 +2443,20 @@ document.addEventListener('keydown', (e) => {
   try {
     if (!('serviceWorker' in navigator)) return;
     if (location.protocol === 'file:') return;
+    // Do NOT register the SW on localhost previews (or with ?nosw): its
+    // network-first fetch handler intercepts CSS/JS, and inside the Claude
+    // preview sandbox those SW-initiated fetches get blocked, so the page loads
+    // as raw unstyled HTML. Prod (github.io) still gets the SW. Also proactively
+    // tear down any SW a previous version left registered on this preview origin.
+    const _isLocal = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+    const _noSw = /[?&]nosw\b/.test(location.search);
+    if (_isLocal || _noSw) {
+      try {
+        navigator.serviceWorker.getRegistrations().then((rs) => rs.forEach((r) => r.unregister())).catch(() => {});
+        if (window.caches && caches.keys) caches.keys().then((ks) => ks.forEach((k) => { if (k.indexOf('memento-') === 0) caches.delete(k); })).catch(() => {});
+      } catch (e) {}
+      return;
+    }
     window.addEventListener('load', () => {
       try {
         const v = (window.MEMENTO_VERSION || 'v24');
