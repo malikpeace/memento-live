@@ -3746,6 +3746,12 @@ function renderHubConsistency() {
   try {
     const el = document.getElementById('hubConsistency');
     if (!el) return;
+    // Removed (Malik, 2026-07-08): the weekly "Shown up X of 7" line + dots +
+    // "Revisit your Neutron Star" is gone from the home. Kept the function as a
+    // no-op so every caller stays safe; the logic below is dead until revived.
+    el.innerHTML = '';
+    return;
+    /* eslint-disable no-unreachable */
     if (isBrandNewUser()) { el.innerHTML = ''; return; }
     // Pre-Clarity the home stays bare (card + Start CTA only). The consistency
     // line is part of the post-Clarity hub, same gate renderDailyMemento uses.

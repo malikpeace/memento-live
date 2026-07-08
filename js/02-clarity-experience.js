@@ -253,7 +253,14 @@ const ClarityExperience = {
       if (continueBtn) {
         const openRefinePrompt = () => {
           const detail = document.getElementById('nsStarDetail');
-          if (!detail) return;
+          if (!detail) {
+            // Fallback (insufficient synthesis: no star card to refine).
+            // "Continue Building" must not dead-end; reopen Clarity so they can
+            // add more and re-synthesize (Malik).
+            try { _ce.close(); } catch (e) {}
+            setTimeout(() => { try { ClarityExperience.open(); } catch (e) {} }, 400);
+            return;
+          }
           // Save the original summary card so we can restore it on cancel/ESC.
           const savedHtml = detail.innerHTML;
           let confirmEscHandler = null;
