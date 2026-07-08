@@ -3716,15 +3716,15 @@ function _runClarityUnlockCinema(onDone, opts) {
     ns.appendChild(shine);
     T.push(setTimeout(() => { try { shine.remove(); } catch (e) {} }, 3000));
   }, 1400));
-  T.push(setTimeout(() => {                     // THE CALM: settle into the orb
+  T.push(setTimeout(() => {                     // THE CALM: settle into the rest
     document.body.classList.remove('evo2-surge');
     document.body.classList.add('evo2-orb');
-  }, 4800));
+  }, 4600));
   T.push(setTimeout(() => {                     // THE BEAMS: first light, slow
     try { if (typeof MementoSound !== 'undefined') MementoSound.play('firstlight'); } catch (e) {}
     document.body.classList.add('ns-bloom');
-  }, 6900));
-  T.push(setTimeout(finish, 9400));             // EXIT: home returns around it
+  }, 6400));
+  T.push(setTimeout(finish, 8600));             // EXIT: home returns around it
   // Safety net: if the tab was suspended and the exit timer fired late (or the
   // chain was throttled), this still lands us on the lit card. Fires late too,
   // but guarantees a finish once the app is foreground again.

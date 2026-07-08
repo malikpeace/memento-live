@@ -281,9 +281,14 @@ body.evo2.evo2-surge .daycard-theme-living .blob.b1 {
 }
 /* The glow settles smoothly (not a snap) when the surge ends into the orb. */
 body.evo2 .daycard-theme-living .daycard-bloom { transition: opacity 1.6s ease; }
-/* THE ORB: the purple settles into a single body of light inside the card */
+/* THE SETTLE: the surge (scale 2.7, fills the whole card) eases down into the
+   card's REAL resting purple, top-weighted and rich, the exact state the card
+   rests in forever. Landing here (not on a dim shrunken center orb) means the
+   exit adds the content + bar around an already-settled card with NO shift or
+   dim-down (Malik v664, the old translate(26%,32%) scale(0.82) read as the
+   card losing its color then jumping). */
 body.evo2.evo2-orb .daycard-theme-living .blob.b1 {
-  transform: translate(26%, 32%) scale(0.82);
+  transform: scale(1);
 }
 /* the shimmer that sweeps across during the surge */
 .evo2-shine {
