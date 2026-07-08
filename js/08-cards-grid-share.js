@@ -3592,12 +3592,52 @@ function streakFlameTier(count) {
 // skip the show and just get the finished card.
 let _cardEvolutionRunning = false;
 let _cardEvolutionThen = null;
+let _evoStartedAt = 0;          // ms timestamp the current run began (staleness math)
+let _evoFinished = true;        // guards _evoFinish against double-running per run
+let _evoVisHandler = null;      // the run's visibilitychange listener, so we can detach it
+const EVO_MAX_MS = 12000;       // a run older than this is wedged -> force-finish
+
+// Idempotent teardown for the unlock cinema. This is the ONE place a run can
+// end, so an interrupted run (iOS suspends JS timers whenever the app is
+// backgrounded / the screen locks mid-cinema) can always be healed back to the
+// lit card + visible bar instead of freezing on the blank frame. Safe to call
+// from the exit timer, the safety timeout, a visibility change, or the
+// render-time watchdog.
+function _evoFinish(wrap, onDone, opts) {
+  if (_evoFinished) { if (onDone) { try { onDone(); } catch (e) {} } return; }
+  _evoFinished = true;
+  opts = opts || {};
+  try { (window._evoTimers || []).forEach(id => clearTimeout(id)); } catch (e) {}
+  window._evoTimers = [];
+  if (_evoVisHandler) { try { document.removeEventListener('visibilitychange', _evoVisHandler); } catch (e) {} _evoVisHandler = null; }
+  try { document.querySelectorAll('.evo2-shine').forEach(s => s.remove()); } catch (e) {}
+  document.body.classList.remove('evo2', 'evo2-orb', 'evo2-surge', 'evo2-snap');
+  // Land on the lit end state: a dev hold keeps its staged look, a real run
+  // returns to live data (and the beams marker ns-bloom for a star user).
+  if (opts.holdOverride) { window._evoStageOverride = opts.holdOverride; window._evoHold = true; }
+  else {
+    window._evoStageOverride = null; window._evoHold = false;
+    try { if (state.clarity && state.clarity.answers && state.clarity.answers.neutronStar) document.body.classList.add('ns-bloom'); } catch (e) {}
+  }
+  wrap = wrap || document.querySelector('.daycard-wrap');
+  try { if (wrap) setLivingCardVars(wrap); } catch (e) {}
+  try { if (wrap && !opts.holdOverride) startLivingWander(wrap); } catch (e) {}
+  try { if (typeof TabBar !== 'undefined' && TabBar.show) TabBar.show(); } catch (e) {}
+  _cardEvolutionRunning = false;
+  if (onDone) { try { onDone(); } catch (e) {} }
+}
+
 // Optional `then` continuation (Malik's "Add to your Memento" flow): whoever
 // actually plays (or skips) the cinema runs it once at the end, so the save
 // nudge + Action ask land AFTER the card comes alive, not before.
 function _maybeRunCardEvolution(then) {
   if (then) _cardEvolutionThen = then;
   const flush = () => { const cb = _cardEvolutionThen; _cardEvolutionThen = null; if (cb) { try { cb(); } catch (e) {} } };
+  // Watchdog: a run that has overstayed its lifetime got its timers suspended
+  // by iOS. Force it to finish so this render recovers (lit card + bar).
+  if (_cardEvolutionRunning && _evoStartedAt && (Date.now() - _evoStartedAt) > EVO_MAX_MS) {
+    _evoFinish(document.querySelector('.daycard-wrap'), null, {});
+  }
   if (_cardEvolutionRunning) return;   // a run is in progress; its onDone will flush
   if (!(state.clarity && state.clarity.completed && state.clarity.ignitedAt)) { flush(); return; }
   state.meta = state.meta || {};
@@ -3615,15 +3655,16 @@ function _maybeRunCardEvolution(then) {
     return false;
   };
   const attempt = () => {
-    if (state.meta.cardEvolutionSeen) { _cardEvolutionRunning = false; flush(); return; }
+    if (state.meta.cardEvolutionSeen && !_cardEvolutionRunning) { flush(); return; }
     if (overlayOpen()) { setTimeout(attempt, 1200); return; }
-    const ok = _runClarityUnlockCinema(() => {
-      state.meta.cardEvolutionSeen = true;
-      try { persistNow(); } catch (e) {}
-      _cardEvolutionRunning = false;
-      flush();
-    });
-    if (!ok) { _cardEvolutionRunning = false; flush(); }
+    // Commit SEEN before the cinema plays: if this run is interrupted (the app
+    // is backgrounded mid-reveal), it must NEVER replay and re-blank the card
+    // on the next load. Worst case the user gets a clean lit card instead of a
+    // permanently bricked one. The moment is once-ever either way.
+    state.meta.cardEvolutionSeen = true;
+    try { persistNow(); } catch (e) {}
+    const ok = _runClarityUnlockCinema(() => { flush(); });
+    if (!ok) { _cardEvolutionRunning = false; window._evoStageOverride = null; try { if (typeof TabBar !== 'undefined' && TabBar.show) TabBar.show(); } catch (e) {} flush(); }
   };
   attempt();
 }
@@ -3634,30 +3675,37 @@ function _maybeRunCardEvolution(then) {
 // then it calms, the purple settling into an orb inside the card, and only
 // then do the top-left beams slowly come in. ~9s, once in a lifetime (or on
 // demand from ?dev=evo). opts.holdOverride keeps a stage pinned afterward
-// (dev use); real runs return to live data at the end.
+// (dev use); real runs return to live data at the end. Every exit path funnels
+// through _evoFinish so a suspended run can never wedge the card blank.
 function _runClarityUnlockCinema(onDone, opts) {
   opts = opts || {};
   const el = document.getElementById('dayCard');
   const wrap = el && el.querySelector('.daycard-wrap');
   const ns = wrap && wrap.querySelector('.daycard-ns');
   if (!wrap || !ns) return false;
+  _cardEvolutionRunning = true;
+  _evoFinished = false;
+  _evoStartedAt = Date.now();
+  const finish = () => _evoFinish(wrap, onDone, opts);
   try { stopLivingWander(); } catch (e) {}
   // Clear the room for the ceremony: the bottom bar slides away (built after
   // this cinema, it used to sit on screen through the whole reveal). Driven
   // here in JS, not just CSS, so it clears even if the compositor throttles
-  // transitions mid-surge. It returns at EXIT when the card settles.
+  // transitions mid-surge. It returns via _evoFinish when the card settles.
   try { if (typeof TabBar !== 'undefined' && TabBar.hide) TabBar.hide(); } catch (e) {}
   // clear any inline drift so the class choreography owns the blobs
   wrap.querySelectorAll('.daycard-ns__liquid .blob').forEach(b => { b.style.opacity = ''; b.style.transform = ''; });
   // snap to BLANK instantly (no drain) before the cinema's slow transitions arm
   document.body.classList.add('evo2-snap');
   window._evoStageOverride = { clar: 0, act: 0, cons: 0 };
+  window._evoHold = false;
   setLivingCardVars(wrap);
   document.body.classList.remove('ns-bloom', 'evo2-surge', 'evo2-orb');
   void wrap.offsetWidth;
   document.body.classList.remove('evo2-snap');
   document.body.classList.add('evo2');
   const T = [];
+  window._evoTimers = T;
   T.push(setTimeout(() => {                     // THE SURGE: fully purple + shimmer
     window._evoStageOverride = { clar: 100, act: 0, cons: 0 };
     setLivingCardVars(wrap);
@@ -3676,15 +3724,15 @@ function _runClarityUnlockCinema(onDone, opts) {
     try { if (typeof MementoSound !== 'undefined') MementoSound.play('firstlight'); } catch (e) {}
     document.body.classList.add('ns-bloom');
   }, 6900));
-  T.push(setTimeout(() => {                     // EXIT: home returns around it
-    document.body.classList.remove('evo2', 'evo2-orb');
-    window._evoStageOverride = opts.holdOverride || null;
-    setLivingCardVars(wrap);
-    try { startLivingWander(wrap); } catch (e) {}
-    // The room returns: the bar slides back up now the card has settled.
-    try { if (typeof TabBar !== 'undefined' && TabBar.show) TabBar.show(); } catch (e) {}
-    if (onDone) onDone();
-  }, 9400));
+  T.push(setTimeout(finish, 9400));             // EXIT: home returns around it
+  // Safety net: if the tab was suspended and the exit timer fired late (or the
+  // chain was throttled), this still lands us on the lit card. Fires late too,
+  // but guarantees a finish once the app is foreground again.
+  T.push(setTimeout(finish, EVO_MAX_MS + 800));
+  // And the instant recovery: if the app is hidden/shown mid-cinema, finish
+  // now rather than risk freezing on the blank frame.
+  _evoVisHandler = () => { if (document.visibilityState === 'visible' && _cardEvolutionRunning) finish(); };
+  try { document.addEventListener('visibilitychange', _evoVisHandler); } catch (e) {}
   return true;
 }
 
@@ -4472,9 +4520,15 @@ function openMementoFull() {
 // are now": consistency = last 30 days, action = last 7 days (both can fade);
 // clarity is the one permanent foundation (locks in once Clarity is completed).
 function livingCardLevels() {
-  // ?dev=evo stage cinema: while a stage is selected, the override IS the data,
-  // so re-renders cannot repaint real demo levels over the staged look.
-  if (window._evoStageOverride) return window._evoStageOverride;
+  // Stage override: honored ONLY during a live, non-wedged run or a pinned dev
+  // hold (?dev=evo). A leftover override from an interrupted cinema (iOS killed
+  // its timers) must never blank a real user's card, so a stale one is ignored
+  // and real levels win. This is the last-resort safety behind _evoFinish.
+  if (window._evoStageOverride) {
+    const fresh = _cardEvolutionRunning && _evoStartedAt && (Date.now() - _evoStartedAt) <= EVO_MAX_MS;
+    if (window._evoHold || fresh) return window._evoStageOverride;
+    window._evoStageOverride = null;   // stale: drop it so the card lights normally
+  }
   let clar = (state.clarity && state.clarity.completed) ? 100 : 0;
   // These are LIGHT levels, not gauges: the raw ratios pass through a sqrt curve
   // so earned light is actually visible. Linear, the first logged move is 1/7 =
