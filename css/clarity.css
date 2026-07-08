@@ -3974,17 +3974,17 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
 .ns-min__sheet-item:active { background: rgba(255, 255, 255, 0.08); }
 
 /* ============================================================
-   THE FIRST 7 DAYS (v648, Malik) - future-pacing screen after the card
-   evolution cinema, into the paywall. ONE scroll, a hero that fills the first
-   view, days revealing on scroll, a top fade under the status bar, and a CTA
-   that appears only at the very bottom. Always a dark ceremony surface.
+   THE FIRST 7 DAYS (v649, Malik) - future-pacing screen after the card
+   evolution cinema, into the paywall. One scroll, a hero that fills the first
+   view and TYPES in, a background that evolves as you scroll, a gap-only path
+   line (never crosses the text), and a CTA that appears only at the very
+   bottom. Always a dark ceremony surface.
    ============================================================ */
 .n7d {
   position: fixed; inset: 0; z-index: 9500; overflow: hidden;
   background: radial-gradient(130% 90% at 50% 8%, #0d0d18 0%, #08080e 42%, #030305 100%);
   opacity: 0; transform: translateY(26px);
   transition: opacity 0.6s cubic-bezier(0.22,1,0.36,1), transform 0.6s cubic-bezier(0.22,1,0.36,1);
-  /* Force light text regardless of app theme (dark surface always). */
   --text-hi: rgba(255,255,255,0.96);
   --text-mid: rgba(255,255,255,0.72);
   --text-lo: rgba(255,255,255,0.42);
@@ -3992,14 +3992,19 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
 .n7d--in { opacity: 1; transform: none; }
 .n7d--out { opacity: 0; transform: translateY(-10px); transition: opacity 0.4s ease, transform 0.4s ease; }
 
-/* the single scroll container */
+/* background EVOLVES with scroll: purple (clarity) at the top fades out, green
+   (consistency) at the bottom fades in, driven by --n7dp (0..1) from JS */
+.n7d-glow { position: absolute; inset: 0; z-index: 0; pointer-events: none; transition: opacity 0.2s linear; }
+.n7d-glow--top { background: radial-gradient(85% 52% at 50% 0%, rgba(139,124,255,0.17), transparent 60%); opacity: calc(1 - var(--n7dp, 0) * 0.85); }
+.n7d-glow--bot { background: radial-gradient(95% 55% at 50% 100%, rgba(120,230,170,0.17), transparent 60%); opacity: var(--n7dp, 0); }
+
 .n7d-scroll {
-  position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden;
+  position: absolute; inset: 0; z-index: 1; overflow-y: auto; overflow-x: hidden;
   -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
 }
 .n7d-inner {
   max-width: 440px; margin: 0 auto;
-  padding: calc(var(--safe-t, 0px) + 30px) 26px calc(var(--safe-b, 0px) + 150px);
+  padding: calc(var(--safe-t, 0px) + 30px) 26px calc(var(--safe-b, 0px) + 120px);
 }
 
 /* top fade under the status bar (dark, correct on both themes) */
@@ -4009,56 +4014,57 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
   background: linear-gradient(180deg, #05050a 0%, #05050a 44%, rgba(5,5,10,0) 100%);
 }
 
-/* HERO fills the first screen so the intro breathes; days come on scroll */
+/* HERO fills the first screen; the intro TYPES in (Malik) */
 .n7d-hero {
   min-height: calc(100lvh - var(--safe-t, 0px) - 96px);
   display: flex; flex-direction: column; justify-content: center; align-items: center;
   text-align: center; padding-bottom: 12px;
 }
+.n7d-eyebrow, .n7d-sub, .n7d-star, .n7d-cue {
+  opacity: 0; transform: translateY(10px);
+  transition: opacity 0.85s cubic-bezier(0.22,1,0.36,1), transform 0.85s cubic-bezier(0.22,1,0.36,1);
+}
+.n7d-eyebrow.on, .n7d-sub.on, .n7d-star.on, .n7d-cue.on { opacity: 1; transform: none; }
 .n7d-eyebrow {
   font-family: var(--font); font-size: 11.5px; font-weight: 700;
   letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-lo);
-  opacity: 0; transform: translateY(10px); animation: n7dRise 0.9s cubic-bezier(0.22,1,0.36,1) 0.25s forwards;
 }
 .n7d-h1 {
-  margin: 15px 0 0; text-wrap: balance;
+  margin: 15px 0 0; min-height: 1.14em; text-wrap: balance;
   font-family: var(--font); font-size: 30px; line-height: 1.14; font-weight: 800;
   letter-spacing: -0.02em; color: var(--text-hi);
-  opacity: 0; transform: translateY(12px); animation: n7dRise 1s cubic-bezier(0.22,1,0.36,1) 0.45s forwards;
 }
+/* typewriter: whole words never break; chars reveal one at a time */
+.n7d-w { white-space: nowrap; display: inline-block; }
+.n7d-ch { opacity: 0; }
+.n7d-ch.on { opacity: 1; transition: opacity 0.09s ease; }
 .n7d-sub {
   margin: 18px auto 0; max-width: 34ch; text-wrap: balance;
   font-family: var(--font); font-size: 15.5px; line-height: 1.55; color: var(--text-mid);
-  opacity: 0; transform: translateY(12px); animation: n7dRise 1s cubic-bezier(0.22,1,0.36,1) 0.68s forwards;
 }
 .n7d-star {
   margin: 24px auto 0; max-width: 30ch;
   font-family: var(--font); font-size: 13px; line-height: 1.5; color: var(--text-lo);
-  opacity: 0; transform: translateY(12px); animation: n7dRise 1s cubic-bezier(0.22,1,0.36,1) 0.9s forwards;
 }
 .n7d-star b { color: var(--text-mid); font-weight: 600; }
-.n7d-cue {
-  margin-top: 42px; color: rgba(255,255,255,0.32); line-height: 0;
-  opacity: 0; animation: n7dRise 1s ease 1.35s forwards, n7dCue 1.9s ease-in-out 2.3s infinite;
-}
+.n7d-cue { margin-top: 42px; color: rgba(255,255,255,0.32); line-height: 0; }
+.n7d-cue.on { animation: n7dCue 1.9s ease-in-out 0.5s infinite; }
 
-/* the path */
+/* the path: a GAP-ONLY connector (never crosses the text) between nodes */
 .n7d-path { position: relative; margin-top: 8px; padding-top: 8px; }
-.n7d-path::before {
-  content: ""; position: absolute; top: 6px; bottom: 60px; left: 50%; width: 1.5px;
-  transform: translateX(-50%);
-  background: linear-gradient(180deg,
-    rgba(255,255,255,0.09) 0%,
-    rgba(255,255,255,0.045) 30%,
-    rgba(255,255,255,0.09) 55%,
-    rgba(120,230,170,0.4) 100%);
-}
 .n7d-day {
   position: relative; text-align: center; padding-bottom: 58px;
   opacity: 0; transform: translateY(22px);
   transition: opacity 0.75s cubic-bezier(0.22,1,0.36,1), transform 0.75s cubic-bezier(0.22,1,0.36,1);
 }
 .n7d-day.is-in { opacity: 1; transform: none; }
+.n7d-day::before {
+  content: ""; position: absolute; left: 50%; top: -56px;
+  width: 1.5px; height: 62px; transform: translateX(-50%);
+  background: rgba(255,255,255,0.10); z-index: 0;
+}
+.n7d-day:first-child::before { display: none; }
+.n7d-day--win::before { background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(120,230,170,0.4)); }
 .n7d-node {
   width: 11px; height: 11px; border-radius: 50%; margin: 0 auto 20px;
   background: #fff; box-shadow: 0 0 0 5px #08080e, 0 0 16px rgba(255,255,255,0.45);
@@ -4086,9 +4092,9 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
 }
 .n7d-close.is-in { opacity: 1; transform: none; }
 .n7d-close b { color: var(--text-hi); font-weight: 650; }
-.n7d-end { height: 8px; }
+.n7d-end { height: 4px; }
 
-/* CTA appears only when the bottom is reached */
+/* CTA appears only when the very bottom is reached */
 .n7d-bar {
   position: absolute; left: 0; right: 0; bottom: 0; z-index: 5;
   padding: 28px 26px calc(24px + var(--safe-b, 0px));
@@ -4107,9 +4113,8 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
   transition: transform 0.12s ease;
 }
 .n7d-cta:active { transform: scale(0.985); }
-@keyframes n7dRise { to { opacity: 1; transform: none; } }
 @keyframes n7dCue { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
 @media (prefers-reduced-motion: reduce) {
-  .n7d, .n7d-eyebrow, .n7d-h1, .n7d-sub, .n7d-star, .n7d-cue, .n7d-day, .n7d-close { animation: none; opacity: 1; transform: none; transition: none; }
+  .n7d, .n7d-eyebrow, .n7d-sub, .n7d-star, .n7d-cue, .n7d-day, .n7d-close, .n7d-ch { animation: none; opacity: 1; transform: none; transition: none; }
   .n7d-bar { transition: none; }
 }

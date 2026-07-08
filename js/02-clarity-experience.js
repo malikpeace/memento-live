@@ -7557,26 +7557,49 @@ function _renderNext7Days() {
   const daysHtml = DAYS.map(o =>
     `<div class="n7d-day ${o.cls || ''}"><div class="n7d-node"></div><div class="n7d-num">${o.n}</div><div class="n7d-title">${esc(o.t)}</div><div class="n7d-desc">${esc(o.d)}</div></div>`
   ).join('');
-  const starHtml = star ? `<p class="n7d-star">Toward <b>&ldquo;${esc(star)}&rdquo;</b></p>` : '';
+  const starHtml = star ? `<p class="n7d-star" id="n7dStar">Toward <b>&ldquo;${esc(star)}&rdquo;</b></p>` : '';
   const cue = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   return `<div class="n7d" id="n7dRoot" role="dialog" aria-label="Your first 7 days">
+    <div class="n7d-glow n7d-glow--top" aria-hidden="true"></div>
+    <div class="n7d-glow n7d-glow--bot" aria-hidden="true"></div>
     <div class="n7d-topfade" aria-hidden="true"></div>
     <div class="n7d-scroll" id="n7dScroll">
       <div class="n7d-inner">
         <div class="n7d-hero">
-          <div class="n7d-eyebrow">The first 7 days</div>
-          <h1 class="n7d-h1">${greet}</h1>
-          <p class="n7d-sub">Week one is the one that breaks people. You'll see every step before it hits, especially the day that makes most of them quit.</p>
+          <div class="n7d-eyebrow" id="n7dEyebrow">The first 7 days</div>
+          <h1 class="n7d-h1" id="n7dTitle" data-n7d-type="${esc(greet)}"></h1>
+          <p class="n7d-sub" id="n7dSub">Week one is the one that breaks people. You'll see every step before it hits, especially the day that makes most of them quit.</p>
           ${starHtml}
-          <div class="n7d-cue" aria-hidden="true">${cue}</div>
+          <div class="n7d-cue" id="n7dCue" aria-hidden="true">${cue}</div>
         </div>
         <div class="n7d-path">${daysHtml}</div>
         <p class="n7d-close" id="n7dClose">This week is the hardest it ever gets. <b>After it, momentum does the lifting.</b></p>
         <div class="n7d-end" id="n7dEnd" aria-hidden="true"></div>
       </div>
     </div>
-    <div class="n7d-bar" id="n7dBar"><button type="button" class="n7d-cta" id="n7dCta">Start day one</button></div>
+    <div class="n7d-bar" id="n7dBar"><button type="button" class="n7d-cta" id="n7dCta">Start Day 1</button></div>
   </div>`;
+}
+// A small typewriter for the hero title: words kept whole (no mid-word wrap),
+// characters revealed one at a time with the app's tick sound.
+function _n7dType(el, text, speed, onDone) {
+  try {
+    const esc1 = (c) => c === '<' ? '&lt;' : c === '>' ? '&gt;' : c === '&' ? '&amp;' : c;
+    const words = String(text).split(' ');
+    el.innerHTML = words.map(w =>
+      '<span class="n7d-w">' + w.split('').map(c => '<span class="n7d-ch">' + esc1(c) + '</span>').join('') + '</span>'
+    ).join(' ');
+    const spans = el.querySelectorAll('.n7d-ch');
+    let i = 0;
+    const step = () => {
+      if (i >= spans.length) { if (onDone) onDone(); return; }
+      spans[i].classList.add('on');
+      try { if (typeof MementoSound !== 'undefined') MementoSound.tick(); } catch (e) {}
+      i++;
+      el._n7dTimer = setTimeout(step, speed);
+    };
+    step();
+  } catch (e) { try { el.textContent = text; } catch (_) {} if (onDone) onDone(); }
 }
 function showNext7Days(onProceed) {
   try {
@@ -7587,27 +7610,62 @@ function showNext7Days(onProceed) {
     document.body.appendChild(root);
     document.body.style.overflow = 'hidden';
     const scroll = root.querySelector('#n7dScroll');
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     requestAnimationFrame(() => root.classList.add('n7d--in'));
+
+    // Hero sequence (Malik: slower, typewriter): eyebrow fades, the title TYPES
+    // with the tick, then the sub / star / scroll cue fade in after it lands.
+    const eyebrow = root.querySelector('#n7dEyebrow');
+    const title = root.querySelector('#n7dTitle');
+    const sub = root.querySelector('#n7dSub');
+    const starEl = root.querySelector('#n7dStar');
+    const cueEl = root.querySelector('#n7dCue');
+    const titleText = title ? (title.getAttribute('data-n7d-type') || '') : '';
+    if (reduce) {
+      if (title) title.textContent = titleText;
+      [eyebrow, title, sub, starEl, cueEl].forEach(el => el && el.classList.add('on'));
+    } else {
+      setTimeout(() => { if (eyebrow) eyebrow.classList.add('on'); }, 500);
+      setTimeout(() => {
+        if (!title) return;
+        title.classList.add('on');
+        _n7dType(title, titleText, 52, () => {
+          setTimeout(() => { if (sub) sub.classList.add('on'); }, 280);
+          setTimeout(() => { if (starEl) starEl.classList.add('on'); }, 720);
+          setTimeout(() => { if (cueEl) cueEl.classList.add('on'); }, 1040);
+        });
+      }, 1350);
+    }
+
     // Reveal each day as it scrolls into view (root = the single scroll container).
     const items = root.querySelectorAll('.n7d-day, #n7dClose');
     const bar = root.querySelector('#n7dBar');
-    const end = root.querySelector('#n7dEnd');
     if ('IntersectionObserver' in window) {
       const io = new IntersectionObserver((es) => {
         es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } });
       }, { root: scroll, threshold: 0.25, rootMargin: '0px 0px -10% 0px' });
       items.forEach(el => io.observe(el));
-      // The CTA appears only once the very bottom is reached (Malik).
-      if (bar && end) {
-        const io2 = new IntersectionObserver((es) => {
-          es.forEach(e => { bar.classList.toggle('is-in', e.isIntersecting); });
-        }, { root: scroll, threshold: 0.02 });
-        io2.observe(end);
-      }
     } else {
       items.forEach(el => el.classList.add('is-in'));
-      if (bar) bar.classList.add('is-in');
     }
+
+    // The background EVOLVES with scroll (purple clarity at the top fades to
+    // green consistency at the bottom), and the CTA appears only at the VERY
+    // bottom (Malik).
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return; ticking = true;
+      requestAnimationFrame(() => {
+        const max = Math.max(1, scroll.scrollHeight - scroll.clientHeight);
+        const p = Math.min(1, Math.max(0, scroll.scrollTop / max));
+        root.style.setProperty('--n7dp', p.toFixed(3));
+        if (bar) bar.classList.toggle('is-in', (scroll.scrollTop + scroll.clientHeight) >= (scroll.scrollHeight - 14));
+        ticking = false;
+      });
+    };
+    scroll.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
     const cta = root.querySelector('#n7dCta');
     if (cta) cta.addEventListener('click', () => {
       root.classList.add('n7d--out');
