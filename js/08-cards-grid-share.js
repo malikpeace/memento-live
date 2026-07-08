@@ -535,6 +535,14 @@ function renderGrid() {
   const _customized = !!(state.ui && state.ui.layoutCustomized);
   document.body.classList.toggle('has-custom-layout', _customized);
 
+  // Pre-star home is LOCKED SOLID (Malik): no scroll, no rubber-band, and the
+  // bar cannot linger from a stale state (a cheat-bar reset flips
+  // clarity.completed without a reload; the bar must vanish on the very next
+  // render, not the next boot). body.home-locked drives the CSS scroll lock.
+  const _lockedHome = isBrandNewUser() || !(state.clarity && state.clarity.completed);
+  document.body.classList.toggle('home-locked', _lockedHome);
+  if (_lockedHome) { try { if (typeof TabBar !== 'undefined' && TabBar.hide) TabBar.hide(); } catch (e) {} }
+
   // Brand-new user: the welcome hero (command center) is the whole dashboard.
   // No module cards, no More strip; everything appears as it unlocks.
   if (isBrandNewUser()) return;

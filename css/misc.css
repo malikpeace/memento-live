@@ -841,3 +841,15 @@ html.theme-light body.lite .tab-bar, html.theme-light.lowfx .tab-bar {
   text-transform: uppercase; color: var(--text-3);
 }
 .tabstub__line { font-size: 0.9375rem; color: var(--text-2); }
+
+/* ============================================
+   PRE-STAR HOME LOCK (Malik): before Clarity is done there is nothing below
+   the hero, so the home must be truly full screen. Kills the slight scroll
+   and the iOS rubber-band bounce (which happens even when content fits).
+   Mobile only; toggled by renderGrid via body.home-locked.
+   ============================================ */
+@media (max-width: 859.98px) {
+  body.home-locked { overflow: hidden !important; height: 100lvh; overscroll-behavior-y: none; }
+  body.home-locked .app { overflow: hidden !important; height: 100lvh; }
+  body.home-locked #dashBelow { display: none !important; }
+}
