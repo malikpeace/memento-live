@@ -253,13 +253,29 @@ body.evo2 .daycard-wrap {
 }
 /* slow, deliberate light during the cinema */
 body.evo2 .daycard-theme-living .daycard-ns__liquid .blob {
-  transition: opacity 2.8s cubic-bezier(0.3, 0, 0.35, 1), transform 2.8s cubic-bezier(0.3, 0, 0.35, 1);
+  transition: transform 2.8s cubic-bezier(0.3, 0, 0.35, 1);
 }
-/* THE SURGE: the purple takes the WHOLE card */
+/* THE SURGE: the purple takes the WHOLE card.
+   The reveal is driven by a keyframe ANIMATION on the color layers, not the
+   var-fed opacity, because iOS Safari does NOT start a CSS transition when only
+   a custom property (--clar) changes, so the old var jump snapped the purple in
+   instantly. Animating a literal opacity 0 -> 1 on the layer runs smoothly on
+   iOS, so the purple rises out of black (Malik v662). */
+@keyframes evo2Reveal { from { opacity: 0; } to { opacity: 1; } }
+body.evo2.evo2-surge .daycard-theme-living .daycard-ns__liquid {
+  animation: evo2Reveal 2.7s cubic-bezier(0.33, 0, 0.2, 1) both;
+  will-change: opacity;
+}
+body.evo2.evo2-surge .daycard-theme-living .daycard-bloom {
+  animation: evo2Reveal 3s cubic-bezier(0.33, 0, 0.2, 1) both;
+  will-change: opacity;
+}
 body.evo2.evo2-surge .daycard-theme-living .blob.b1 {
   opacity: 1 !important;
   transform: scale(2.7) !important;
 }
+/* The glow settles smoothly (not a snap) when the surge ends into the orb. */
+body.evo2 .daycard-theme-living .daycard-bloom { transition: opacity 1.6s ease; }
 /* THE ORB: the purple settles into a single body of light inside the card */
 body.evo2.evo2-orb .daycard-theme-living .blob.b1 {
   transform: translate(26%, 32%) scale(0.82);
