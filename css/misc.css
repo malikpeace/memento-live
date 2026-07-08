@@ -57,74 +57,69 @@ body:has(#splash:not(.dismissed)) #topFade { display: none; }
 /* ============================================
    TAB BAR
    ============================================ */
-/* The 5-slot bar: Today / Path / [Do] / Reflect / You (BOTTOM-BAR-PLAN.md).
-   One glass slab, labels under icons, a raised solid Do button as the single
-   accent. Active tab = brighter, no sliding pill. */
+/* The 5-slot bar: Today / Path / Do / Reflect / You (BOTTOM-BAR-PLAN.md).
+   Icons + labels, no raised button. A soft glass CAPSULE slides behind the
+   active destination (Malik's 1+2+3 blend, v660). Restrained: hierarchy by
+   the capsule + brightness, not a big accent. */
 .tab-bar {
   position: fixed; bottom: calc(10px + var(--safe-b)); left: 50%; transform: translateX(-50%);
   z-index: 90;
-  display: flex; align-items: flex-end; justify-content: space-around;
-  width: min(400px, calc(100vw - 20px));
+  display: flex; align-items: stretch; justify-content: space-around;
+  width: min(392px, calc(100vw - 20px));
   background: var(--glass-bg-heavy);
-  backdrop-filter: blur(calc(28px * var(--bx, 1))) saturate(140%);
-  -webkit-backdrop-filter: blur(calc(28px * var(--bx, 1))) saturate(140%);
+  backdrop-filter: blur(calc(30px * var(--bx, 1))) saturate(150%);
+  -webkit-backdrop-filter: blur(calc(30px * var(--bx, 1))) saturate(150%);
   border: 0;
   box-shadow: var(--glass-shadow), var(--glass-highlight);
-  border-radius: 22px;
-  padding: 6px 6px 8px;
+  border-radius: 20px;
+  padding: 6px;
   transition: transform var(--t-slow) var(--ease-out), opacity var(--t-slow);
 }
 .tab-bar.hidden { transform: translateX(-50%) translateY(calc(100% + 20px + var(--safe-b))); opacity: 0; pointer-events: none; }
+/* The sliding glass capsule: a lit pane the active tab rests in. Sits behind
+   the tabs; JS positions it (left/width) under the active destination. */
+.tab-bar__cap {
+  position: absolute; top: 6px; left: 0; height: calc(100% - 12px);
+  border-radius: 14px;
+  background: var(--kfill-08, rgba(255,255,255,0.07));
+  box-shadow: inset 0 1px 0 rgba(var(--ink), 0.12);
+  pointer-events: none; z-index: 0; opacity: 0;
+  transition: left 0.42s cubic-bezier(0.22,1,0.36,1), width 0.42s cubic-bezier(0.22,1,0.36,1), opacity 0.25s ease;
+}
+.tab-bar__cap.is-on { opacity: 1; }
 .tab-bar__tab {
   position: relative;
   z-index: 1;
   flex: 1;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 3px;
-  padding: 8px 0 5px;
-  min-height: 48px;
+  gap: 4px;
+  padding: 9px 0 7px;
+  min-height: 50px;
   background: none; border: none; color: var(--text-3);
   font-family: var(--font);
   cursor: pointer; transition: color var(--t-base) var(--ease-out);
-  border-radius: var(--r-ctrl);
+  border-radius: 14px;
   -webkit-tap-highlight-color: transparent;
 }
 .tab-bar__tab--active { color: var(--text-hi); }
-.tab-bar__icon { width: 22px; height: 22px; }
+.tab-bar__icon { width: 22px; height: 22px; display: block; }
 .tab-bar__label {
   display: block;
-  font-size: 0.575rem; font-weight: 700;
-  letter-spacing: 0.08em; text-transform: uppercase;
+  font-size: 0.5625rem; font-weight: 700;
+  letter-spacing: 0.09em; text-transform: uppercase;
 }
-/* DO: the raised solid center button, the bar's one accent. Play = pending,
-   check = today's move is done (the spent state doubles as a status light). */
-.tab-bar__do {
-  position: relative; z-index: 2;
-  flex: 0 0 auto;
-  width: 54px; height: 54px; margin: 0 8px;
-  transform: translateY(-14px);
-  border: none; border-radius: 50%;
-  background: var(--solid-bg); color: var(--solid-fg);
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 10px 26px rgba(0,0,0,0.5);
-  transition: transform 0.12s ease, background var(--t-base) ease, color var(--t-base) ease, opacity var(--t-base) ease;
-  -webkit-tap-highlight-color: transparent;
+/* DO stays an equal slot, distinguished only by a FILLED play glyph (subtle
+   primacy, no circle). The check is the spent state (today's move done). */
+.tab-bar__do-glyph { position: relative; width: 22px; height: 22px; }
+.tab-bar__do-play, .tab-bar__do-check {
+  position: absolute; inset: 0; width: 22px; height: 22px;
+  transition: opacity var(--t-base) ease;
 }
-.tab-bar__do:active { transform: translateY(-14px) scale(0.95); }
-.tab-bar__do-play, .tab-bar__do-check { width: 22px; height: 22px; }
-.tab-bar__do-check { display: none; }
-.tab-bar__do.is-spent {
-  background: var(--kfill-10);
-  color: rgba(120, 230, 170, 0.95);
-  box-shadow: inset 0 1px 0 rgba(var(--ink), 0.10), 0 6px 18px rgba(0,0,0,0.35);
-}
-.tab-bar__do.is-spent .tab-bar__do-play { display: none; }
-.tab-bar__do.is-spent .tab-bar__do-check { display: block; }
-html.theme-light .tab-bar__do.is-spent {
-  background: rgba(24, 26, 33, 0.08);
-  color: rgba(22, 140, 82, 0.95);
-}
+.tab-bar__do-check { opacity: 0; color: rgba(120, 230, 170, 0.95); }
+.tab-bar__tab--do:active { transform: scale(0.94); }
+.tab-bar__tab--do.is-spent .tab-bar__do-play { opacity: 0; }
+.tab-bar__tab--do.is-spent .tab-bar__do-check { opacity: 1; }
+html.theme-light .tab-bar__do-check { color: rgba(22, 140, 82, 0.95); }
 
 /* ============================================
    TAB PANELS

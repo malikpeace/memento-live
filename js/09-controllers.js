@@ -4235,17 +4235,22 @@ const TabBar = {
   activeTab: 'home',
 
   pill: null,
+  cap: null,
 
   init() {
     this.el = document.getElementById('tabBar');
     this.pill = document.getElementById('tabBarPill');
+    this.cap = document.getElementById('tabBarCap');
     if (!this.el) return;
     this.tabs = [...this.el.querySelectorAll('.tab-bar__tab')];
     this.tabs.forEach(tab => {
       tab.addEventListener('click', () => this.switchTo(tab.dataset.tab));
     });
-    // Position pill on initial active tab after layout
+    // Position the capsule on the initial active tab after layout. setTimeout,
+    // not only rAF: rAF is throttled in background tabs and would leave the
+    // capsule unplaced until first interaction.
     requestAnimationFrame(() => this.movePill(false));
+    setTimeout(() => this.movePill(false), 60);
     this.updateHomeDot();
   },
 
@@ -4255,7 +4260,7 @@ const TabBar = {
   // (Kept the historical name: every call site already calls updateHomeDot.)
   updateHomeDot() {
     if (!this.el) return;
-    const doBtn = this.el.querySelector('.tab-bar__do');
+    const doBtn = this.el.querySelector('.tab-bar__tab--do');
     if (!doBtn) return;
     const done = (typeof actionDoneToday === 'function') ? actionDoneToday() : false;
     if (doBtn.classList.contains('is-spent') !== done) {
@@ -4274,17 +4279,23 @@ const TabBar = {
     return false;
   },
 
+  // Slide the glass capsule behind the active destination tab. Do is an action
+  // (opens Action, never becomes --active), so the capsule only rests on real
+  // destinations. Kept the historical name so every call site stays valid.
   movePill(animate = true) {
-    const active = this.el.querySelector('.tab-bar__tab--active');
-    if (!active || !this.pill) return;
+    const cap = this.cap;
+    if (!cap || !this.el) return;
+    const active = this.el.querySelector('.tab-bar__tab--active:not(.tab-bar__tab--do)');
+    if (!active) { cap.classList.remove('is-on'); return; }
     const barRect = this.el.getBoundingClientRect();
     const tabRect = active.getBoundingClientRect();
-    if (!animate) this.pill.style.transition = 'none';
-    this.pill.style.left = (tabRect.left - barRect.left) + 'px';
-    this.pill.style.width = tabRect.width + 'px';
+    if (!animate) cap.style.transition = 'none';
+    cap.style.left = (tabRect.left - barRect.left) + 'px';
+    cap.style.width = tabRect.width + 'px';
+    cap.classList.add('is-on');
     if (!animate) {
-      void this.pill.offsetHeight; // force reflow
-      this.pill.style.transition = '';
+      void cap.offsetHeight; // force reflow so the first placement never animates from 0
+      cap.style.transition = '';
     }
   },
 
@@ -4298,6 +4309,7 @@ const TabBar = {
     if (!hasStar) { this.hide(); return; }
     if (this.el) this.el.classList.remove('hidden');
     requestAnimationFrame(() => this.movePill(false));
+    setTimeout(() => this.movePill(false), 60);
     this.updateHomeDot();
   },
 
