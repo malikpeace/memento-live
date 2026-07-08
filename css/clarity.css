@@ -3341,6 +3341,16 @@ html.lowfx .nsv2.is-holding .nsv2__rays.ambient__rays {
   animation: nsv2HoldShake 0.42s linear infinite;
   transform: scale(calc(1 + var(--holdp, 0) * 0.02));
 }
+/* The whole-block goal (v646) gets its VISIBILITY from its entrance
+   animation's end state; the hold shake replacing that animation snapped
+   opacity back to 0 and the statement vanished mid-hold (Malik). Carry a
+   zero-length entrance alongside the shake so the text stays. */
+.nsv2.is-holding .nsv2-reveal__goal--whole {
+  animation: nsv2WordIn 0.001s linear forwards, nsv2HoldShake 0.42s linear infinite;
+}
+html.lowfx .nsv2.is-holding .nsv2-reveal__goal--whole {
+  animation: nsv2WordInLite 0.001s linear forwards, nsv2HoldShake 0.42s linear infinite;
+}
 @keyframes nsv2HoldShake {
   0%   { translate: 0 0; }
   20%  { translate: calc(var(--holdp, 0) * 2.4px) calc(var(--holdp, 0) * -1.6px); }
