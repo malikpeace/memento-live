@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <script>
 /* Single source of truth for the app version. Surfaced in Settings > About. */
-window.MEMENTO_VERSION = 'v651';
+window.MEMENTO_VERSION = 'v652';
 /* LOWFX: touch / mobile devices get a lighter render path (no backdrop blur,
    no will-change layers, no background canvas animations) so iOS does not kill
    the tab from graphics-memory pressure. Desktop (fine pointer) is untouched.
@@ -40,21 +40,21 @@ window.MEMENTO_VERSION = 'v651';
      paint never waits on a third-party CDN. font-display: swap throughout. -->
 <link rel="preload" href="fonts/dmsans-1.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="fonts/fonts.css">
-<link rel="stylesheet" href="css/base.css?v=v651">
-<link rel="stylesheet" href="css/sidebar.css?v=v651">
-<link rel="stylesheet" href="css/dashboard.css?v=v651">
-<link rel="stylesheet" href="css/misc.css?v=v651">
-<link rel="stylesheet" href="css/vivere.css?v=v651">
-<link rel="stylesheet" href="css/notes.css?v=v651">
-<link rel="stylesheet" href="css/onboarding.css?v=v651">
-<link rel="stylesheet" href="css/clarity.css?v=v651">
-<link rel="stylesheet" href="css/action.css?v=v651">
-<link rel="stylesheet" href="css/daycard-living.css?v=v651">
-<link rel="stylesheet" href="css/share-card.css?v=v651">
-<link rel="stylesheet" href="css/clarity-paywall.css?v=v651">
-<link rel="stylesheet" href="css/appearance-picker.css?v=v651">
-<link rel="stylesheet" href="css/journey.css?v=v651">
-<link rel="stylesheet" href="css/install.css?v=v651">
+<link rel="stylesheet" href="css/base.css?v=v652">
+<link rel="stylesheet" href="css/sidebar.css?v=v652">
+<link rel="stylesheet" href="css/dashboard.css?v=v652">
+<link rel="stylesheet" href="css/misc.css?v=v652">
+<link rel="stylesheet" href="css/vivere.css?v=v652">
+<link rel="stylesheet" href="css/notes.css?v=v652">
+<link rel="stylesheet" href="css/onboarding.css?v=v652">
+<link rel="stylesheet" href="css/clarity.css?v=v652">
+<link rel="stylesheet" href="css/action.css?v=v652">
+<link rel="stylesheet" href="css/daycard-living.css?v=v652">
+<link rel="stylesheet" href="css/share-card.css?v=v652">
+<link rel="stylesheet" href="css/clarity-paywall.css?v=v652">
+<link rel="stylesheet" href="css/appearance-picker.css?v=v652">
+<link rel="stylesheet" href="css/journey.css?v=v652">
+<link rel="stylesheet" href="css/install.css?v=v652">
 </head>
 <body>
 
@@ -614,17 +614,29 @@ window.MEMENTO_VERSION = 'v651';
   <div class="welcome-intro__nav" id="welcomeIntroNav"></div>
 </div>
 
-<!-- Tab Bar -->
+<!-- Tab Bar: Today / Path / [Do] / Reflect / You (BOTTOM-BAR-PLAN.md).
+     Appears only after the star is ignited (the bar growing in is part of the
+     reward); free users see it as a preview whose locked tabs open the paywall. -->
 <nav class="tab-bar hidden" id="tabBar" aria-label="Main navigation">
-  <div class="tab-bar__pill" id="tabBarPill"></div>
   <button class="tab-bar__tab tab-bar__tab--active" data-tab="home">
-    <svg class="tab-bar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
-    <span class="tab-bar__label">Home</span>
-    <span class="tab-bar__dot" id="homeTabDot" aria-hidden="true"></span>
+    <svg class="tab-bar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5 12 5l8 6.5"/><path d="M6.5 10.5V19h11v-8.5"/></svg>
+    <span class="tab-bar__label">Today</span>
+  </button>
+  <button class="tab-bar__tab" data-tab="path">
+    <svg class="tab-bar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c6 0 4-7 9-7"/><circle cx="5" cy="19" r="1.6"/><circle cx="14" cy="12" r="1.6"/><path d="M14 12c4 0 3-5 5.5-6"/><circle cx="19.5" cy="5.5" r="1.7"/></svg>
+    <span class="tab-bar__label">Path</span>
+  </button>
+  <button class="tab-bar__do" data-tab="do" aria-label="Do today's move">
+    <svg class="tab-bar__do-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 5.5v13l10-6.5z"/></svg>
+    <svg class="tab-bar__do-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+  </button>
+  <button class="tab-bar__tab" data-tab="reflect">
+    <svg class="tab-bar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5c-4.4 2-6.8 5-6.8 9A6.8 6.8 0 0 0 12 19.3 6.8 6.8 0 0 0 18.8 12.5c0-4-2.4-7-6.8-9z"/><path d="M12 19.3V9.5"/></svg>
+    <span class="tab-bar__label">Reflect</span>
   </button>
   <button class="tab-bar__tab" data-tab="profile">
-    <svg class="tab-bar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-    <span class="tab-bar__label">Profile</span>
+    <svg class="tab-bar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.4"/><path d="M5.5 19.5c1.2-3.4 3.6-5 6.5-5s5.3 1.6 6.5 5"/></svg>
+    <span class="tab-bar__label">You</span>
   </button>
 </nav>
 
@@ -635,9 +647,19 @@ window.MEMENTO_VERSION = 'v651';
     <div class="tab-panel__body" id="mementoBody"></div>
   </div>
 </div>
+<div class="tab-panel hidden" id="panelPath">
+  <div class="tab-panel__inner tab-panel__inner--path">
+    <div class="tab-panel__body" id="pathBody"></div>
+  </div>
+</div>
+<div class="tab-panel hidden" id="panelReflect">
+  <div class="tab-panel__inner">
+    <div class="tab-panel__body" id="reflectBody"></div>
+  </div>
+</div>
 <div class="tab-panel hidden" id="panelProfile">
   <div class="tab-panel__inner">
-    <div class="tab-panel__header">Profile</div>
+    <div class="tab-panel__header">You</div>
     <div class="tab-panel__body" id="profileBody"></div>
   </div>
 </div>
@@ -725,31 +747,31 @@ window.MEMENTO_VERSION = 'v651';
 <!-- Supabase client for OPTIONAL cloud accounts + sync (js/12-cloud-sync.js).
      If this CDN tag fails to load, the app runs fully local, unchanged. -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
-<script src="js/01-state-foundation.js?v=v651"></script>
-<script src="js/02-clarity-experience.js?v=v651"></script>
-<script src="js/03-ai-integration.js?v=v651"></script>
-<script src="js/04-templates-proof.js?v=v651"></script>
-<script src="js/05-vivere.js?v=v651"></script>
-<script src="js/06-consistency-mori.js?v=v651"></script>
-<script src="js/07-sheet-templates.js?v=v651"></script>
-<script src="js/08-cards-grid-share.js?v=v651"></script>
-<script src="js/09-controllers.js?v=v651"></script>
-<script src="js/10-demo-backend.js?v=v651"></script>
+<script src="js/01-state-foundation.js?v=v652"></script>
+<script src="js/02-clarity-experience.js?v=v652"></script>
+<script src="js/03-ai-integration.js?v=v652"></script>
+<script src="js/04-templates-proof.js?v=v652"></script>
+<script src="js/05-vivere.js?v=v652"></script>
+<script src="js/06-consistency-mori.js?v=v652"></script>
+<script src="js/07-sheet-templates.js?v=v652"></script>
+<script src="js/08-cards-grid-share.js?v=v652"></script>
+<script src="js/09-controllers.js?v=v652"></script>
+<script src="js/10-demo-backend.js?v=v652"></script>
 <!-- The Path + Your Story: the journey views. Client-side, read existing state. -->
-<script src="js/17-journey.js?v=v651"></script>
+<script src="js/17-journey.js?v=v652"></script>
 <!-- Add to Home Screen prompt: detects browser-tab vs installed PWA. -->
-<script src="js/18-install.js?v=v651"></script>
-<script src="js/20-push.js?v=v651"></script>
-<script src="js/11-init.js?v=v651"></script>
-<script src="js/12-cloud-sync.js?v=v651"></script>
-<script src="js/13-clarity-paywall.js?v=v651"></script>
-<script src="js/14-appearance-picker.js?v=v651"></script>
+<script src="js/18-install.js?v=v652"></script>
+<script src="js/20-push.js?v=v652"></script>
+<script src="js/11-init.js?v=v652"></script>
+<script src="js/12-cloud-sync.js?v=v652"></script>
+<script src="js/13-clarity-paywall.js?v=v652"></script>
+<script src="js/14-appearance-picker.js?v=v652"></script>
 <!-- DEV-ONLY: ?dev=beats live preview for the onboarding chapter pages. Inert without the param. -->
-<script src="js/19-dev-beats.js?v=v651"></script>
+<script src="js/19-dev-beats.js?v=v652"></script>
 <!-- The sound engine: synthesized moments, off by default (Profile toggle). -->
-<script src="js/20-sound.js?v=v651"></script>
+<script src="js/20-sound.js?v=v652"></script>
 <!-- Back/forward + hash-URL routing. Loads LAST so every open/close fn it wraps
      already exists. Inert until onboarding is done; touches only location.hash. -->
-<script src="js/15-router.js?v=v651"></script>
+<script src="js/15-router.js?v=v652"></script>
 </body>
 </html>

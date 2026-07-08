@@ -172,3 +172,30 @@
   window.MementoPath = MementoPath;
   window.MementoStory = MementoStory;
 })();
+
+/* ============================================================
+   TAB SURFACES (BOTTOM-BAR-PLAN.md, phase 1 stubs).
+   renderPathTab / renderReflectTab are the bottom bar's Path and Reflect
+   panels. Phase 1 ships quiet placeholders so the bar's routing is complete;
+   phases 2 and 3 replace the bodies with the real road and the evening close.
+   ============================================================ */
+function renderPathTab() {
+  try {
+    const body = document.getElementById('pathBody');
+    if (!body) return;
+    body.innerHTML = '<div class="tabstub">' +
+      '<div class="tabstub__eyebrow">The Path</div>' +
+      '<div class="tabstub__line">Your road to the star is being paved.</div>' +
+      '</div>';
+  } catch (e) {}
+}
+function renderReflectTab() {
+  try {
+    const body = document.getElementById('reflectBody');
+    if (!body) return;
+    body.innerHTML = '<div class="tabstub">' +
+      '<div class="tabstub__eyebrow">Reflect</div>' +
+      '<div class="tabstub__line">Close your day here, coming right up.</div>' +
+      '</div>';
+  } catch (e) {}
+}

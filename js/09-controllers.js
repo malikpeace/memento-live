@@ -4249,32 +4249,29 @@ const TabBar = {
     this.updateHomeDot();
   },
 
-  // Quiet Home nudge: a tiny accent dot on the Home tab when a plan exists and
-  // today's action is not yet completed. Read-only of state. No dot when there
-  // is no plan or once today is done. Called wherever the tab bar appears or
-  // the day's completion can change.
+  // The Do button doubles as a status light for the day: play = today's move
+  // is pending, green check = today is closed. Read-only of state. Called
+  // wherever the tab bar appears or the day's completion can change.
+  // (Kept the historical name: every call site already calls updateHomeDot.)
   updateHomeDot() {
     if (!this.el) return;
-    const tab = this.el.querySelector('.tab-bar__tab[data-tab="home"]');
-    if (!tab) return;
-    const show = (typeof actionPendingToday === 'function') ? actionPendingToday() : false;
-    // Idempotent: only touch the class when the value actually changes, since
-    // this can be called several times on one dashboard entry (show + switchTo).
-    if (tab.classList.contains('tab-bar__tab--has-dot') !== show) {
-      tab.classList.toggle('tab-bar__tab--has-dot', show);
+    const doBtn = this.el.querySelector('.tab-bar__do');
+    if (!doBtn) return;
+    const done = (typeof actionDoneToday === 'function') ? actionDoneToday() : false;
+    if (doBtn.classList.contains('is-spent') !== done) {
+      doBtn.classList.toggle('is-spent', done);
     }
-    // Coach tab stays HIDDEN until Clarity is completed (Malik: there is nothing to
-    // coach about before then, the icon was a dead end for new users). Same call
-    // sites as the dot keep it in sync, and the pill re-measures on layout change.
-    const coach = this.el.querySelector('.tab-bar__tab[data-tab="coach"]');
-    if (coach) {
-      const usable = !!(typeof state !== 'undefined' && state && state.clarity && state.clarity.completed);
-      const hiddenNow = coach.style.display === 'none';
-      if (usable === hiddenNow) {
-        coach.style.display = usable ? '' : 'none';
-        requestAnimationFrame(() => this.movePill(false));
-      }
-    }
+  },
+
+  // Paid gate for the locked tabs (Path / Do / Reflect). Free users see the
+  // bar as a preview; locked taps open the paywall (BOTTOM-BAR-PLAN.md).
+  _unlocked() {
+    try {
+      if (state.entitlements && state.entitlements.isPaid) return true;
+      if (state.prefs && state.prefs.unlockAll) return true;
+      if (state.dev && state.dev.previewAll) return true;
+    } catch (e) {}
+    return false;
   },
 
   movePill(animate = true) {
@@ -4292,6 +4289,10 @@ const TabBar = {
   },
 
   show() {
+    // No bar before the star is ignited: the pre-Clarity home keeps its single
+    // job, and the bar appearing after ignition is part of the reward.
+    const hasStar = !!(typeof state !== 'undefined' && state && state.clarity && state.clarity.completed);
+    if (!hasStar) { this.hide(); return; }
     if (this.el) this.el.classList.remove('hidden');
     requestAnimationFrame(() => this.movePill(false));
     this.updateHomeDot();
@@ -4302,6 +4303,24 @@ const TabBar = {
   },
 
   switchTo(tabId) {
+    // DO is the center ACTION button, not a destination: route straight into
+    // the work and leave the active tab where it was.
+    //   free           -> paywall (the bar is a preview)
+    //   paid, any day  -> the Action module at today's move (spent state still
+    //                     opens it for review)
+    if (tabId === 'do') {
+      if (!this._unlocked()) {
+        try { if (typeof ClarityPaywall !== 'undefined' && ClarityPaywall.show) ClarityPaywall.show(); } catch (e) {}
+        return;
+      }
+      try { if (typeof ActionExperience !== 'undefined' && ActionExperience.open) ActionExperience.open(); } catch (e) {}
+      return;
+    }
+    // Path / Reflect are paid surfaces; free taps open the paywall.
+    if ((tabId === 'path' || tabId === 'reflect') && !this._unlocked()) {
+      try { if (typeof ClarityPaywall !== 'undefined' && ClarityPaywall.show) ClarityPaywall.show(); } catch (e) {}
+      return;
+    }
     // Search is an ACTION, not a destination: open Spotlight and leave the
     // active tab where it was (the pill never moves to search).
     // Coach is the middle ACTION tab: opens the coach overlay and leaves the
@@ -4359,16 +4378,17 @@ const TabBar = {
     if (welcomeOverlay) welcomeOverlay.remove();
 
     const app = document.getElementById('app');
-    const panels = ['memento', 'profile'];
+    const panels = ['memento', 'path', 'reflect', 'profile'];
 
     if (tabId === 'home') {
       MementoVisual.destroy();
       app.style.display = '';
-      panels.forEach(p => document.getElementById('panel' + p.charAt(0).toUpperCase() + p.slice(1)).classList.add('hidden'));
+      panels.forEach(p => { const el = document.getElementById('panel' + p.charAt(0).toUpperCase() + p.slice(1)); if (el) el.classList.add('hidden'); });
     } else {
       app.style.display = 'none';
       panels.forEach(p => {
         const panel = document.getElementById('panel' + p.charAt(0).toUpperCase() + p.slice(1));
+        if (!panel) return;
         if (p === tabId) {
           panel.classList.remove('hidden');
           panel.style.display = '';
@@ -4386,6 +4406,8 @@ const TabBar = {
     if (mementoInner) mementoInner.classList.remove('tab-panel__inner--memento');
     switch (panelId) {
       case 'memento': this.renderMemento(); break;
+      case 'path': if (typeof renderPathTab === 'function') renderPathTab(); break;
+      case 'reflect': if (typeof renderReflectTab === 'function') renderReflectTab(); break;
       case 'profile': this.renderProfile(); break;
     }
   },
