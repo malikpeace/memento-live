@@ -7577,21 +7577,16 @@ function renderIgnitionV2(summary) {
   let inner = '';
 
   if (_ig2Act === 'reveal') {
-    // The sentence appears alone, word by word, on black, ending with a period
-    // so it reads as a full sentence (Malik). The touch point and the quiet hint
-    // fade in only after the last word has landed. Slower stagger than before so
-    // it arrives with weight. No "Not quite" escape: reaching this beat IS the
-    // confirmation.
+    // The whole sentence fades in as ONE block (Malik: not word by word), ending
+    // with a period so it reads as a full sentence. The touch point and the quiet
+    // hint fade in only after it has landed. No "Not quite" escape: reaching this
+    // beat IS the confirmation.
     const goalP = /[.!?]$/.test(String(goal).trim()) ? String(goal).trim() : String(goal).trim() + '.';
-    const words = String(goalP).split(/\s+/).filter(Boolean);
-    const STEP = 380, START = 800;
-    const wordEls = words.map((w, i) =>
-      `<span class="nsv2-reveal__w" style="animation-delay:${START + i * STEP}ms">${esc(w)}</span>`
-    ).join(' ');
-    const afterDelay = START + words.length * STEP + 900;
+    const START = 700;
+    const afterDelay = START + 1500;
     inner = `
       <div class="nsv2-reveal">
-        <div class="nsv2-reveal__goal">${wordEls}</div>
+        <div class="nsv2-reveal__goal nsv2-reveal__goal--whole" style="animation-delay:${START}ms">${esc(goalP)}</div>
         <div class="nsv2-reveal__after" style="animation-delay:${afterDelay}ms">
           <div class="nsv2-hold" id="nsv2Hold" role="button" tabindex="0" aria-label="Press and hold to collapse">
             <span class="nsv2-hold__core" aria-hidden="true"></span>

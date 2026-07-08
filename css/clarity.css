@@ -3055,6 +3055,12 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
   display: inline-block; opacity: 0;
   animation: nsv2WordIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
+/* The whole sentence fades in as one block (Malik: not word by word). */
+.nsv2-reveal__goal--whole {
+  opacity: 0;
+  animation: nsv2WordIn 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+html.lowfx .nsv2-reveal__goal--whole { animation: nsv2WordInLite 1.2s ease forwards; }
 @keyframes nsv2WordIn {
   from { opacity: 0; transform: translateY(0.35em); filter: blur(6px); }
   to { opacity: 1; transform: none; filter: none; }
@@ -3113,7 +3119,7 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
 }
 .nsv2-reveal__no:hover { color: rgba(255,255,255,0.85); }
 @media (prefers-reduced-motion: reduce) {
-  .nsv2-reveal__w, .nsv2-reveal__after, .nsv2-reveal__eyebrow { animation: none; opacity: 1; }
+  .nsv2-reveal__w, .nsv2-reveal__after, .nsv2-reveal__eyebrow, .nsv2-reveal__goal--whole { animation: none; opacity: 1; }
 }
 /* Mobile: keep the slow entrance (Malik) but on the cheap blur-free keyframe. */
 html.lowfx .nsv2-reveal__w { animation: nsv2WordInLite 1.1s ease forwards; }
