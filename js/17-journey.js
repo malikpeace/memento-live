@@ -321,9 +321,91 @@ function renderReflectTab() {
   try {
     const body = document.getElementById('reflectBody');
     if (!body) return;
-    body.innerHTML = '<div class="tabstub">' +
-      '<div class="tabstub__eyebrow">Reflect</div>' +
-      '<div class="tabstub__line">Close your day here, coming right up.</div>' +
-      '</div>';
+    const E = (s) => { try { return (typeof esc === 'function') ? esc(s) : String(s == null ? '' : s); } catch (e) { return ''; } };
+
+    const todayISO = getTodayISO();
+    const entries = (state.reflection && Array.isArray(state.reflection.entries)) ? state.reflection.entries : [];
+    const todayEntry = entries.slice().reverse().find(en => en && en.iso === todayISO && en.closedDay);
+    const done = (typeof actionDoneToday === 'function') ? actionDoneToday() : false;
+    const pa = (state.action && state.action.primaryAction) || {};
+    const move = String(pa.title || '').trim();
+    const dateLabel = (() => { try { return new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }); } catch (e) { return ''; } })();
+
+    // Templated prompt (zero AI, decision 4): names their actual day. Variant
+    // rotates by date so it never feels like a stuck sign.
+    const seed = parseInt(todayISO.replace(/-/g, ''), 10) || 0;
+    const DONE_PROMPTS = [
+      "What's worth remembering from today?",
+      'What did today prove?',
+      'What worked today that you should repeat?'
+    ];
+    const MISS_PROMPTS = [
+      'What got in the way today?',
+      'What made today heavy?',
+      'What would make tomorrow easier?'
+    ];
+    const prompt = (done ? DONE_PROMPTS : MISS_PROMPTS)[seed % 3];
+
+    let h = '<div class="rf">';
+    h += '<div class="rf-eyebrow">Reflect</div>';
+    h += '<div class="rf-date">' + E(dateLabel) + '</div>';
+
+    if (todayEntry) {
+      // The day is sealed: quiet done-state, tonight's line shown.
+      h += '<div class="rf-sealed">';
+      h += '<div class="rf-sealed__mark" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>';
+      h += '<div class="rf-sealed__big">Tonight is sealed.</div>';
+      h += '<div class="rf-sealed__text">&ldquo;' + E(todayEntry.text || '') + '&rdquo;</div>';
+      h += '</div>';
+    } else {
+      h += '<div class="rf-close">';
+      h += '<div class="rf-q">' + E(prompt) + '</div>';
+      if (move) h += '<div class="rf-context">' + (done ? 'Today’s move is done: ' : 'Today’s move: ') + '<b>' + E(move) + '</b></div>';
+      h += '<textarea id="rfInput" class="rf-input" rows="3" maxlength="500" placeholder="One honest line is enough."></textarea>';
+      h += '<button type="button" id="rfSave" class="rf-cta" disabled>Close the day</button>';
+      h += '</div>';
+    }
+
+    // Past reflections, behind the ritual. Newest first, capped.
+    const past = entries.slice().reverse().filter(en => en && String(en.text || '').trim() && !(en.iso === todayISO && en.closedDay)).slice(0, 14);
+    if (past.length) {
+      h += '<div class="rf-pastlab">Past reflections</div>';
+      h += '<div class="rf-past">';
+      past.forEach(en => {
+        h += '<div class="rf-item"><div class="rf-item__date">' + E(en.date || en.iso || '') + '</div><div class="rf-item__text">' + E(String(en.text).slice(0, 220)) + '</div></div>';
+      });
+      h += '</div>';
+    }
+    h += '<button type="button" id="rfAllNotes" class="rf-notes-link">All notes</button>';
+    h += '</div>';
+    body.innerHTML = h;
+
+    // --- bind ---
+    const input = document.getElementById('rfInput');
+    const save = document.getElementById('rfSave');
+    if (input && save) {
+      input.addEventListener('input', () => { save.disabled = !input.value.trim(); });
+      save.addEventListener('click', () => {
+        const v = input.value.trim();
+        if (!v) return;
+        try {
+          if (!state.reflection) state.reflection = {};
+          if (!Array.isArray(state.reflection.entries)) state.reflection.entries = [];
+          state.reflection.entries.push({
+            date: new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }),
+            iso: todayISO,
+            text: v,
+            closedDay: true
+          });
+          try { writeProofEvent('reflection-save', { title: 'Closed the day', text: v.slice(0, 140), module: 'reflection', dedupeKey: 'close-' + todayISO }); } catch (e) {}
+          persistNow();
+        } catch (e) {}
+        renderReflectTab();
+      });
+    }
+    const allNotes = document.getElementById('rfAllNotes');
+    if (allNotes) allNotes.addEventListener('click', () => {
+      try { if (typeof Sheet !== 'undefined' && Sheet.open) Sheet.open('reflection'); } catch (e) {}
+    });
   } catch (e) {}
 }
