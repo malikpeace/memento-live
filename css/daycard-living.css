@@ -19,11 +19,16 @@
 /* Before the Neutron Star is locked in (no body.ns-bloom), the card has NO life
    yet: no colour, no bloom, no reflection, no edge-burn. It reads as the blank
    platinum glass until the user has actually started. The colour is earned. */
-body:not(.ns-bloom) .daycard-theme-living .daycard-ns__liquid,
-body:not(.ns-bloom) .daycard-theme-living .daycard-bloom,
-body:not(.ns-bloom) .daycard-theme-living .daycard-floor,
-body:not(.ns-bloom) .daycard-theme-living .daycard-ns__burn,
-body:not(.ns-bloom) .daycard-theme-living .daycard-wrap__aura {
+/* ...EXCEPT during the unlock cinema's lit stages. ns-bloom is off from the
+   blank frame until the beams (6.9s), so without this exception the color
+   layers were force-hidden through the whole SURGE + ORB, blacking the card
+   out for ~2s between the surge and the beams (Malik v663). The surge/orb
+   stages own the card's light, so exempt them here. */
+body:not(.ns-bloom):not(.evo2-surge):not(.evo2-orb) .daycard-theme-living .daycard-ns__liquid,
+body:not(.ns-bloom):not(.evo2-surge):not(.evo2-orb) .daycard-theme-living .daycard-bloom,
+body:not(.ns-bloom):not(.evo2-surge):not(.evo2-orb) .daycard-theme-living .daycard-floor,
+body:not(.ns-bloom):not(.evo2-surge):not(.evo2-orb) .daycard-theme-living .daycard-ns__burn,
+body:not(.ns-bloom):not(.evo2-surge):not(.evo2-orb) .daycard-theme-living .daycard-wrap__aura {
   opacity: 0 !important;
 }
 
