@@ -141,13 +141,20 @@ body:not(.ns-bloom) .daycard-theme-living .daycard-wrap__aura {
   background: radial-gradient(circle, rgba(255,72,86,1.0), transparent 66%);
   opacity: 0; }   /* the "red test" pillar has no real data; held off in-app */
 
-/* ── Color bloom: a blurred echo behind the card that bleeds the hue out ───── */
+/* ── Color bloom: a blurred echo behind the card that bleeds the hue out ─────
+   EDGE-SAFE BY CONSTRUCTION (Malik v682, the recurring "purple box outside the
+   card"): this layer used to be a rounded RECT bigger than the card with
+   overflow:hidden, so its glow blobs were clipped at the rect's edges. A clipped
+   rectangle IS a box; blur only softens it, and on a real phone the boundary
+   showed. RULE: any glow layer OUTSIDE the card must fade to nothing radially
+   (mask), NEVER be clipped by a rectangular container. */
 .daycard-theme-living .daycard-bloom {
-  position: absolute; inset: -5%; z-index: 0;
-  border-radius: calc(var(--r-card) + 12px);
-  pointer-events: none; overflow: hidden;
+  position: absolute; inset: -14%; z-index: 0;
+  pointer-events: none;
   filter: blur(34px) saturate(var(--sat, 1.5));
   opacity: calc(var(--emit, 0.55) * var(--lit, 0));
+  -webkit-mask: radial-gradient(ellipse 68% 66% at 50% 44%, #000 42%, transparent 71%);
+          mask: radial-gradient(ellipse 68% 66% at 50% 44%, #000 42%, transparent 71%);
 }
 .daycard-theme-living .daycard-bloom .blob {
   position: absolute; border-radius: 50%; mix-blend-mode: screen; will-change: transform;
