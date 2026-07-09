@@ -62,7 +62,10 @@ body:has(#splash:not(.dismissed)) #topFade { display: none; }
    active destination (Malik's 1+2+3 blend, v660). Restrained: hierarchy by
    the capsule + brightness, not a big accent. */
 .tab-bar {
-  position: fixed; bottom: calc(10px + var(--safe-b)); left: 50%; transform: translateX(-50%);
+  /* Sits low, close to the home indicator (Malik: match Opal's bar distance).
+     safe-b minus a touch so it hugs the bottom without tucking the labels under
+     the indicator; the max() keeps a floor on devices with no safe inset. */
+  position: fixed; bottom: max(8px, calc(var(--safe-b) - 12px)); left: 50%; transform: translateX(-50%);
   z-index: 90;
   display: flex; align-items: stretch; justify-content: space-around;
   width: min(392px, calc(100vw - 20px));
