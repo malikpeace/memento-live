@@ -1,9 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <!-- Memento brand mark (Malik's M-crown). TWO colours only: white rounded square +
-       the black M filling it. No frame, no extra layers. SINGLE SOURCE: replace this
-       file and re-export the PNG sizes (180/192/512) to update the favicon, home-screen
-       icon, sidebar mark, and Enter screen everywhere.
-       Re-export: qlmanage -t -s 512 -o <dir> icon.svg, then sips -z N N to 180/192. -->
-  <rect x="0" y="0" width="512" height="512" rx="80" fill="#f5f5f7"/>
-  <path d="M58 60 L256 250 L454 60 L454 452 L58 452 Z" fill="#0a0a0e"/>
+  <!-- Memento brand mark, the OFFICIAL icon (Malik, v680): near-black tile, white
+       rounded-square OUTLINE, the M reading as the dark interior with the white
+       notch. TWO colours only. SINGLE SOURCE: this file is the favicon directly;
+       the PNG sizes (180/192/512) share this exact geometry (PIL generator:
+       margin 14%, stroke 5.2%, outer radius 7.3%, notch apex 45%). -->
+  <rect width="512" height="512" fill="#0a0a0e"/>
+  <clipPath id="inner"><rect x="99" y="99" width="314" height="314" rx="10"/></clipPath>
+  <rect x="85.5" y="85.5" width="341" height="341" rx="23.5" fill="none" stroke="#f5f5f7" stroke-width="27"/>
+  <path d="M99 99 H413 L256 230.5 Z" fill="#f5f5f7" clip-path="url(#inner)"/>
 </svg>
