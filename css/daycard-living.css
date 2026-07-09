@@ -299,41 +299,47 @@ body.evo2 .daycard-theme-living .daycard-living-stage {
   box-shadow: 0 26px 64px rgba(0, 0, 0, 0.55);
   transition: box-shadow 0.9s ease;
 }
-/* The internal colour settles slowly and cinematically from the full-purple
-   surge down to the card's resting fill (Malik v676: "slowly unfade"). */
-body.evo2 .daycard-theme-living .daycard-ns__liquid .blob {
-  transition: transform 2.8s cubic-bezier(0.16, 1, 0.3, 1);
-}
-/* THE SURGE: the purple takes the WHOLE card.
-   The reveal is driven by a keyframe ANIMATION on the color layers, not the
-   var-fed opacity, because iOS Safari does NOT start a CSS transition when only
-   a custom property (--clar) changes, so the old var jump snapped the purple in
-   instantly. Animating a literal opacity 0 -> 1 on the layer runs smoothly on
-   iOS, so the purple rises out of black (Malik v662). */
+/* THE REVEAL, rebuilt for smoothness (Malik v677, verified in the motion lab he
+   held on-device). The old reveal SCALED the blurred blobs (scale 2.1 -> 1) to
+   flood then settle the purple. Animating a heavily-blurred layer's transform is
+   the single most expensive thing on mobile Safari (it re-renders the 46px blur
+   every frame), which is what made it janky. The blobs now NEVER move: the liquid
+   simply fades in to its RESTING purple (a single opacity crossfade of a blurred
+   layer is cheap and smooth), and the "full purple -> subtle" beat is carried by
+   a separate FLAT wash (.evo2-wash, below) whose opacity is animated in JS. */
 @keyframes evo2Reveal { from { opacity: 0; } to { opacity: 1; } }
-/* The purple rises slowly out of the blank card (2.6s, was 1.7s), a deliberate
-   cinematic fill instead of a quick swell (Malik v676: "slowly turn full purple").
-   Only the INTERNAL liquid animates now; the external bloom stays hidden through
-   the whole cinema so nothing bleeds into a box around the card. */
+/* The resting liquid fades up over the fill (2.4s, matches the wash). Only the
+   INTERNAL liquid animates; the external bloom stays hidden the whole cinema so
+   nothing bleeds into a box. No blob transform, ever. */
 body.evo2.evo2-surge .daycard-theme-living .daycard-ns__liquid {
-  animation: evo2Reveal 2.6s cubic-bezier(0.33, 0, 0.2, 1) both;
+  animation: evo2Reveal 2.4s cubic-bezier(0.28, 0.85, 0.2, 1) both;
   will-change: opacity;
 }
-/* Surge floods the card, but a smaller overshoot (2.1, was 2.7) sits closer to
-   the resting fill so the settle is a gentle focus, not a big dim-down. */
-body.evo2.evo2-surge .daycard-theme-living .blob.b1 {
-  opacity: 1 !important;
-  transform: scale(2.1) !important;
+/* THE WASH: a single FLAT purple gradient that floods the whole card and then
+   fades away to leave the subtle resting liquid. Flat (no live blur re-render on
+   change), so animating its opacity is pure compositor work = buttery. It sits
+   above the colour but below the pressed emblem (inserted before .daycard-ns__body
+   in JS). Clipped inside the card by the card's contain:paint. */
+.evo2-wash {
+  position: absolute; inset: -12%; pointer-events: none; opacity: 0;
+  background: radial-gradient(58% 52% at 50% 42%,
+    rgba(171, 152, 255, 0.95) 0%,
+    rgba(139, 120, 246, 0.66) 46%,
+    rgba(110, 92, 224, 0.28) 78%,
+    rgba(110, 92, 224, 0) 100%);
+  filter: blur(20px) saturate(1.4);
+  will-change: opacity;
 }
-/* THE SETTLE: the surge (scale 2.7, fills the whole card) eases down into the
-   card's REAL resting purple, top-weighted and rich, the exact state the card
-   rests in forever. Landing here (not on a dim shrunken center orb) means the
-   exit adds the content + bar around an already-settled card with NO shift or
-   dim-down (Malik v664, the old translate(26%,32%) scale(0.82) read as the
-   card losing its color then jumping). */
-body.evo2.evo2-orb .daycard-theme-living .blob.b1 {
-  transform: scale(1);
-}
+/* ns-bloom is turned on at the FILL so the card's INTERNAL liquid lights to its
+   true resting purple (its brightness is gated by ns-bloom, without it the liquid
+   is nearly black and the settle drained to dark). But the beams + external card
+   glow must NOT appear during the reveal, only the card. So while evo2 is on they
+   are force-hidden regardless of ns-bloom; removing evo2 at finish fades them in
+   with everything else (Malik v677: nothing outside the card until the end). */
+body.evo2 .ambient__rays { opacity: 0 !important; }
+body.evo2 .daycard-theme-living .daycard-bloom,
+body.evo2 .daycard-theme-living .daycard-floor,
+body.evo2 .daycard-theme-living .daycard-wrap__aura { opacity: 0 !important; }
 /* the shimmer that sweeps across during the surge */
 .evo2-shine {
   position: absolute; inset: 0; z-index: 4; pointer-events: none;
@@ -348,10 +354,11 @@ body.evo2 .ambient__rays { transition: opacity 3.2s ease; }
 @media (prefers-reduced-motion: reduce) {
   body.evo2 .daycard-wrap { transform: none; }
   .evo2-shine { animation: none; opacity: 0; }
-  /* No surge/settle motion for reduced-motion users: the reveal opacity + blob
-     scale resolve instantly to the lit end state instead of animating. */
+  .evo2-wash { transition: none !important; }
+  /* No surge/settle motion for reduced-motion users: the reveal opacity resolves
+     instantly to the lit end state instead of animating (the wash opacity is set
+     directly in JS for this case). */
   body.evo2.evo2-surge .daycard-theme-living .daycard-ns__liquid { animation: none; opacity: 1; }
-  body.evo2 .daycard-theme-living .daycard-ns__liquid .blob { transition: none !important; }
 }
 body.evo2-snap .daycard-theme-living .daycard-ns__liquid .blob { transition: none !important; }
 body.evo2-snap .ambient__rays { transition: none !important; }

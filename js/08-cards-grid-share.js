@@ -3691,7 +3691,8 @@ function _evoFinish(wrap, onDone, opts) {
   try { (window._evoTimers || []).forEach(id => clearTimeout(id)); } catch (e) {}
   window._evoTimers = [];
   if (_evoVisHandler) { try { document.removeEventListener('visibilitychange', _evoVisHandler); } catch (e) {} _evoVisHandler = null; }
-  try { document.querySelectorAll('.evo2-shine').forEach(s => s.remove()); } catch (e) {}
+  try { (window._evoWashAnims || []).forEach(a => { try { a.cancel(); } catch (e) {} }); window._evoWashAnims = []; } catch (e) {}
+  try { document.querySelectorAll('.evo2-shine, .evo2-wash').forEach(s => s.remove()); } catch (e) {}
   document.body.classList.remove('evo2', 'evo2-orb', 'evo2-surge', 'evo2-snap');
   // Land on the lit end state: a dev hold keeps its staged look, a real run
   // returns to live data (and the beams marker ns-bloom for a star user).
@@ -3785,33 +3786,67 @@ function _runClarityUnlockCinema(onDone, opts) {
   void wrap.offsetWidth;
   document.body.classList.remove('evo2-snap');
   document.body.classList.add('evo2');
+  // Build the flat SURGE WASH: one flat purple gradient that floods the card, its
+  // opacity animated in JS (compositor-only = smooth). We NEVER animate the blurred
+  // liquid's blobs anymore, that transform-under-blur was the jank Malik saw on the
+  // phone (v677, confirmed in the motion lab). It goes below the pressed emblem.
+  let wash = ns.querySelector('.evo2-wash');
+  if (!wash) {
+    wash = document.createElement('span');
+    wash.className = 'evo2-wash';
+    const bodyEl = ns.querySelector('.daycard-ns__body');
+    if (bodyEl) ns.insertBefore(wash, bodyEl); else ns.appendChild(wash);
+  }
+  wash.style.opacity = '0';
+  window._evoWashAnims = [];
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Cinematic timing (the feel Malik picked in the motion lab): a slow fill to
+  // full purple, a beat, then a slow unfade to the subtle resting purple.
+  const FILL = 2400, HOLD = 560, SETTLE = 2200;
+  const EASE_UP = 'cubic-bezier(0.28, 0.85, 0.2, 1)';
+  const EASE_DOWN = 'cubic-bezier(0.45, 0, 0.3, 1)';
   const T = [];
   window._evoTimers = T;
-  // Timeline (v676, slower + cinematic, card holds perfectly still, everything
-  // stays INSIDE the card, beams + chrome return only at the very end):
-  //   0.0s  the room is already cleared; the blank card sits alone for a beat
-  //   0.8s  THE SURGE: the purple rises slowly to fill the whole card (2.6s)
-  //   3.4s  THE SETTLE: it eases back down to the subtle resting purple (2.8s)
-  //   6.2s  FINISH: the card is at rest -> beams, header, bar + next-step card
-  //         all FADE back in together (via _evoFinish: ns-bloom on, evo2 off)
-  T.push(setTimeout(() => {                     // THE SURGE: fully purple + shimmer
+  // Timeline (v677): 0.0s the blank card sits alone for a beat -> 0.8s THE FILL
+  // (liquid fades in + wash floods to full purple, 2.4s) -> 3.76s THE SETTLE (wash
+  // unfades away leaving the subtle liquid, 2.2s) -> 5.96s FINISH (beams, header,
+  // bar + next-step card all fade back in via _evoFinish: ns-bloom on, evo2 off).
+  T.push(setTimeout(() => {                     // THE FILL: rise to full purple
     window._evoStageOverride = { clar: 100, act: 0, cons: 0 };
     setLivingCardVars(wrap);
     try { if (typeof MementoSound !== 'undefined') MementoSound.play('evolution'); } catch (e) {}
-    document.body.classList.add('evo2-surge');
+    // ns-bloom lights the INTERNAL liquid to its true resting purple so the settle
+    // leaves a bright card, not a dark one. The beams + external glow it would also
+    // trigger are held off by the body.evo2 suppression until finish drops evo2.
+    document.body.classList.add('ns-bloom');
+    document.body.classList.add('evo2-surge');   // fades the resting liquid in (opacity only)
+    if (reduce) { wash.style.opacity = '1'; }
+    else {
+      try {
+        const a = wash.animate([{ opacity: 0 }, { opacity: 1 }], { duration: FILL, easing: EASE_UP, fill: 'forwards' });
+        window._evoWashAnims.push(a);
+      } catch (e) { wash.style.opacity = '1'; }
+    }
     const shine = document.createElement('span');
     shine.className = 'evo2-shine';
     ns.appendChild(shine);
-    T.push(setTimeout(() => { try { shine.remove(); } catch (e) {} }, 2600));
+    T.push(setTimeout(() => { try { shine.remove(); } catch (e) {} }, FILL));
   }, 800));
   T.push(setTimeout(() => {                     // THE SETTLE: full purple -> subtle
     document.body.classList.remove('evo2-surge');
     document.body.classList.add('evo2-orb');
-  }, 3400));
+    if (reduce) { wash.style.opacity = '0'; }
+    else {
+      try {
+        const a = wash.animate([{ opacity: 1 }, { opacity: 0 }], { duration: SETTLE, easing: EASE_DOWN, fill: 'forwards' });
+        window._evoWashAnims.push(a);
+      } catch (e) { wash.style.opacity = '0'; }
+    }
+  }, 800 + FILL + HOLD));                        // 3.76s
   T.push(setTimeout(() => {                     // FINISH: first light + room fades in
     try { if (typeof MementoSound !== 'undefined') MementoSound.play('firstlight'); } catch (e) {}
     finish();                                   // _evoFinish adds ns-bloom (beams + glow) and drops evo2 (chrome)
-  }, 6200));
+  }, 800 + FILL + HOLD + SETTLE));               // 5.96s
   // Safety net: if the tab was suspended and the exit timer fired late (or the
   // chain was throttled), this still lands us on the lit card. Fires late too,
   // but guarantees a finish once the app is foreground again.
