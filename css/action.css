@@ -2248,7 +2248,7 @@ body:has(.clarity-exp.open)::after { display: none; }
 
 /* ===== Restored Action Experience inner layout ===== */
 .action-exp__close {
-  position: absolute; top: 12px; right: 16px; z-index: 30;
+  position: absolute; top: calc(env(safe-area-inset-top, 0px) + 12px); right: 16px; z-index: 30;
   width: 44px; height: 44px;
   background: transparent;
   border: none; border-radius: 50%;
@@ -2372,7 +2372,7 @@ html.theme-light .action-exp__nav {
 /* ===== Restored Action Plan page styles ===== */
 .action-plan__topbar {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 4px 96px 12px 16px;
+  padding: calc(var(--safe-t, 0px) + 4px) 96px 12px 16px;
 }
 .action-plan__topbar-right {
   display: flex; align-items: center; gap: 8px;

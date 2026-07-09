@@ -107,7 +107,7 @@ body:has(#splash:not(.dismissed)) #topFade { display: none; }
   min-height: 50px;
   background: none; border: none; color: var(--text-3);
   font-family: var(--font);
-  cursor: pointer; transition: color var(--t-base) var(--ease-out);
+  cursor: pointer; transition: color var(--t-base) var(--ease-out), transform var(--t-fast) var(--ease-out);
   border-radius: 14px;
   -webkit-tap-highlight-color: transparent;
 }

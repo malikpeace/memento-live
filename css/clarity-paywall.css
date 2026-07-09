@@ -25,7 +25,7 @@
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   opacity: 0;
-  transition: opacity 0.5s ease;
+  transition: opacity 0.36s ease;
 }
 #clarityPaywall.cpw--open { opacity: 1; }
 
@@ -262,6 +262,7 @@
 .cpw__plans { display: grid; gap: 11px; }
 .cpw__plan {
   position: relative;
+  overflow: hidden;
   text-align: left;
   width: 100%;
   border: 0;
@@ -339,7 +340,7 @@
 .cpw__buy {
   width: 100%;
   border: 0;
-  border-radius: 15px;
+  border-radius: 16px;
   padding: 17px 20px;
   font-size: 1.02rem;
   font-weight: 700;
