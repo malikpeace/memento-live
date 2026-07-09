@@ -521,8 +521,22 @@ function renderGrid() {
   grid.innerHTML = '';
 
   // Neutron Star bloom: dashboard lights up once the user has locked in their star.
+  // BUT the unlock cinema owns this flag while it runs, and while the once-ever
+  // evolution is still PENDING (just ignited, not yet played) the card must land
+  // BLANK, otherwise the home flashes a colored card for the beat before the
+  // cinema snaps it dark (v679). The cinema itself lights ns-bloom at the fill.
   const hasNeutronStar = !!(state.clarity && state.clarity.answers && state.clarity.answers.neutronStar);
-  document.body.classList.toggle('ns-bloom', hasNeutronStar);
+  let _evoOwnsBloom = false;
+  try {
+    const _reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const _pending = !_reduced && !!(state.clarity && state.clarity.completed && state.clarity.ignitedAt) &&
+      !(state.meta && state.meta.cardEvolutionSeen);
+    _evoOwnsBloom = (typeof _cardEvolutionRunning !== 'undefined' && _cardEvolutionRunning) || _pending;
+    if (_pending && !(typeof _cardEvolutionRunning !== 'undefined' && _cardEvolutionRunning)) {
+      document.body.classList.remove('ns-bloom');
+    }
+  } catch (e) {}
+  if (!_evoOwnsBloom) document.body.classList.toggle('ns-bloom', hasNeutronStar);
 
   // Paywall lock: once Clarity is done but they have not paid, every module but
   // Clarity reads as locked on the dashboard (tapping one rises the paywall).
