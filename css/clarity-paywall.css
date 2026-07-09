@@ -148,7 +148,8 @@
   font-size: 1.02rem;
   line-height: 1.5;
   color: rgba(var(--ink, 235, 238, 248), 0.62);
-  animation: cpwRise 0.8s ease 0.1s both;
+  /* Delay >= the star-wrap above it (0.25s) so the hero cascades downward. */
+  animation: cpwRise 0.8s ease 0.38s both;
 }
 .cpw__bridge b { color: #fff; font-weight: 600; }
 
