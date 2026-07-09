@@ -3693,7 +3693,11 @@ function _evoFinish(wrap, onDone, opts) {
   if (_evoVisHandler) { try { document.removeEventListener('visibilitychange', _evoVisHandler); } catch (e) {} _evoVisHandler = null; }
   try { (window._evoWashAnims || []).forEach(a => { try { a.cancel(); } catch (e) {} }); window._evoWashAnims = []; } catch (e) {}
   try { document.querySelectorAll('.evo2-shine, .evo2-wash').forEach(s => s.remove()); } catch (e) {}
-  document.body.classList.remove('evo2', 'evo2-orb', 'evo2-surge', 'evo2-snap');
+  document.body.classList.remove('evo2', 'evo2-orb', 'evo2-surge', 'evo2-snap', 'evo2-grow');
+  // Always finish on the LIVE card (never a stale detached reference), and clear
+  // the grow vars so the card sits exactly at its resting spot.
+  wrap = document.querySelector('#dayCard .daycard-wrap') || wrap;
+  try { if (wrap) { wrap.style.removeProperty('--evo-sc'); wrap.style.removeProperty('--evo-ty'); } } catch (e) {}
   // Land on the lit end state: a dev hold keeps its staged look, a real run
   // returns to live data (and the beams marker ns-bloom for a star user).
   if (opts.holdOverride) { window._evoStageOverride = opts.holdOverride; window._evoHold = true; }
@@ -3704,8 +3708,10 @@ function _evoFinish(wrap, onDone, opts) {
   wrap = wrap || document.querySelector('.daycard-wrap');
   try { if (wrap) setLivingCardVars(wrap); } catch (e) {}
   try { if (wrap && !opts.holdOverride) startLivingWander(wrap); } catch (e) {}
-  try { if (typeof TabBar !== 'undefined' && TabBar.show) TabBar.show(); } catch (e) {}
+  // running=false BEFORE show(): TabBar.show() refuses while the cinema runs
+  // (the v678 gate), so clearing the flag first is what lets the bar return.
   _cardEvolutionRunning = false;
+  try { if (typeof TabBar !== 'undefined' && TabBar.show) TabBar.show(); } catch (e) {}
   if (onDone) { try { onDone(); } catch (e) {} }
 }
 
@@ -3800,17 +3806,34 @@ function _runClarityUnlockCinema(onDone, opts) {
   wash.style.opacity = '0';
   window._evoWashAnims = [];
   const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  // Cinematic timing (the feel Malik picked in the motion lab): a slow fill to
-  // full purple, a beat, then a slow unfade to the subtle resting purple.
-  const FILL = 2400, HOLD = 560, SETTLE = 2200;
+  // Measure the grow: the card scales up to ALMOST full screen from its own spot
+  // (Malik v678). JS computes the exact scale + vertical centering once, so the
+  // CSS transform is a pure compositor animation with no layout guesswork.
+  try {
+    const r = wrap.getBoundingClientRect();
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const sc = Math.min((vw * 0.94) / Math.max(r.width, 1), (vh * 0.86) / Math.max(r.height, 1), 1.6);
+    const ty = (vh / 2) - (r.top + r.height / 2);
+    wrap.style.setProperty('--evo-sc', sc.toFixed(4));
+    wrap.style.setProperty('--evo-ty', ty.toFixed(1) + 'px');
+  } catch (e) {}
+  // Cinematic pacing (the feel Malik picked in the motion lab), now with his full
+  // v678 choreography: chrome clears -> the card GROWS near full screen -> floods
+  // full purple -> recedes to the subtle resting blur -> shrinks home -> the room
+  // returns. Nothing instant, every beat animated.
+  const CLEAR = 900, GROW = 1150, FILL = 2400, HOLD = 500, SETTLE = 2200, SHRINK = 1150;
   const EASE_UP = 'cubic-bezier(0.28, 0.85, 0.2, 1)';
   const EASE_DOWN = 'cubic-bezier(0.45, 0, 0.3, 1)';
   const T = [];
   window._evoTimers = T;
-  // Timeline (v677): 0.0s the blank card sits alone for a beat -> 0.8s THE FILL
-  // (liquid fades in + wash floods to full purple, 2.4s) -> 3.76s THE SETTLE (wash
-  // unfades away leaving the subtle liquid, 2.2s) -> 5.96s FINISH (beams, header,
-  // bar + next-step card all fade back in via _evoFinish: ns-bloom on, evo2 off).
+  const tGrow = CLEAR;                                  // 0.9s
+  const tFill = tGrow + GROW + 50;                      // ~2.1s
+  const tSettle = tFill + FILL + HOLD;                  // ~5.0s
+  const tShrink = tSettle + SETTLE;                     // ~7.2s
+  const tFinish = tShrink + SHRINK + 100;               // ~8.45s
+  T.push(setTimeout(() => {                     // THE GROW: card rises near full screen
+    document.body.classList.add('evo2-grow');
+  }, tGrow));
   T.push(setTimeout(() => {                     // THE FILL: rise to full purple
     window._evoStageOverride = { clar: 100, act: 0, cons: 0 };
     setLivingCardVars(wrap);
@@ -3831,7 +3854,7 @@ function _runClarityUnlockCinema(onDone, opts) {
     shine.className = 'evo2-shine';
     ns.appendChild(shine);
     T.push(setTimeout(() => { try { shine.remove(); } catch (e) {} }, FILL));
-  }, 800));
+  }, tFill));
   T.push(setTimeout(() => {                     // THE SETTLE: full purple -> subtle
     document.body.classList.remove('evo2-surge');
     document.body.classList.add('evo2-orb');
@@ -3842,11 +3865,14 @@ function _runClarityUnlockCinema(onDone, opts) {
         window._evoWashAnims.push(a);
       } catch (e) { wash.style.opacity = '0'; }
     }
-  }, 800 + FILL + HOLD));                        // 3.76s
+  }, tSettle));
+  T.push(setTimeout(() => {                     // THE RETURN: card shrinks home
+    document.body.classList.remove('evo2-grow');
+  }, tShrink));
   T.push(setTimeout(() => {                     // FINISH: first light + room fades in
     try { if (typeof MementoSound !== 'undefined') MementoSound.play('firstlight'); } catch (e) {}
-    finish();                                   // _evoFinish adds ns-bloom (beams + glow) and drops evo2 (chrome)
-  }, 800 + FILL + HOLD + SETTLE));               // 5.96s
+    finish();                                   // _evoFinish drops evo2 (chrome + beams fade back)
+  }, tFinish));
   // Safety net: if the tab was suspended and the exit timer fired late (or the
   // chain was throttled), this still lands us on the lit card. Fires late too,
   // but guarantees a finish once the app is foreground again.
@@ -4259,6 +4285,11 @@ function renderDayCard() {
   try {
     const el = document.getElementById('dayCard');
     if (!el) return;
+    // The unlock cinema OWNS the card while it runs. Rebuilding innerHTML here
+    // detaches the exact nodes the cinema is animating, so the user stares at a
+    // fresh blank card while the whole show plays on a dead one (Malik's
+    // recording, v678: no purple ever appeared). _evoFinish re-syncs the card.
+    if (typeof _cardEvolutionRunning !== 'undefined' && _cardEvolutionRunning) return;
     try { if (/[?&]daycard=1/.test(location.search)) document.body.classList.add('daycard-force'); } catch (e) {}
     // Show the card for anyone who is past the brand-new state. isBrandNewUser()
     // already returns false once they have data (e.g. a birth year from

@@ -285,11 +285,17 @@ body.evo2 #topFade {
   pointer-events: none;
 }
 body.evo2 #dayCard { position: relative; z-index: 30; }
-/* The card holds PERFECTLY STILL through the whole cinema, only its colour
-   animates. A moving / zooming card was the main thing reading as not-native
-   (Malik v676: "stay perfectly still"). It sits at its normal home size + spot. */
+/* THE GROW (Malik v678): once the room is clear, the card rises to ALMOST full
+   screen from its own spot, holds there through the purple beats, then eases
+   back home before the room returns. The exact scale + vertical centering are
+   measured in JS (--evo-sc / --evo-ty), so this is a pure compositor transform,
+   smooth, with the same travel both ways. */
 body.evo2 .daycard-wrap {
   transform: none;
+  transition: transform 1.15s cubic-bezier(0.33, 0.9, 0.25, 1);
+}
+body.evo2.evo2-grow .daycard-wrap {
+  transform: translateY(var(--evo-ty, 0px)) scale(var(--evo-sc, 1.15));
 }
 /* Absolutely nothing outside the card during the cinema: the stage's resting
    outer GLOW ring (the soft bluish 44px halo) is dropped so the card sits clean
@@ -352,7 +358,8 @@ body.evo2 .daycard-theme-living .daycard-wrap__aura { opacity: 0 !important; }
 /* the first light comes in slower than the everyday bloom */
 body.evo2 .ambient__rays { transition: opacity 3.2s ease; }
 @media (prefers-reduced-motion: reduce) {
-  body.evo2 .daycard-wrap { transform: none; }
+  body.evo2 .daycard-wrap,
+  body.evo2.evo2-grow .daycard-wrap { transform: none !important; transition: none !important; }
   .evo2-shine { animation: none; opacity: 0; }
   .evo2-wash { transition: none !important; }
   /* No surge/settle motion for reduced-motion users: the reveal opacity resolves

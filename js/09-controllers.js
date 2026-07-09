@@ -4373,6 +4373,10 @@ const TabBar = {
   },
 
   show() {
+    // The unlock cinema owns the bar: while it runs, NOTHING may re-show it
+    // (Malik's recording caught _seedStep's post-render show() putting the bar
+    // back over the reveal, v678). _evoFinish calls show() again at the end.
+    try { if (typeof _cardEvolutionRunning !== 'undefined' && _cardEvolutionRunning) return; } catch (e) {}
     // No bar before the star exists: the pre-Clarity home keeps its single
     // job, and the bar appearing after ignition is part of the reward. Keyed
     // on a REAL star (completed + neutronStar), the same truth the home hero
