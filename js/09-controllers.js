@@ -4244,14 +4244,87 @@ const TabBar = {
     if (!this.el) return;
     this.tabs = [...this.el.querySelectorAll('.tab-bar__tab')];
     this.tabs.forEach(tab => {
-      tab.addEventListener('click', () => this.switchTo(tab.dataset.tab));
+      // A real tap switches; a drag is handled by the pointer gesture below and
+      // swallows the click so we don't double-fire.
+      tab.addEventListener('click', () => {
+        if (this._justDragged) { this._justDragged = false; return; }
+        this.switchTo(tab.dataset.tab);
+      });
     });
+    this._bindDrag();
     // Position the capsule on the initial active tab after layout. setTimeout,
     // not only rAF: rAF is throttled in background tabs and would leave the
     // capsule unplaced until first interaction.
     requestAnimationFrame(() => this.movePill(false));
     setTimeout(() => this.movePill(false), 60);
     this.updateHomeDot();
+  },
+
+  // iOS-style drag select: grab the glass capsule behind the icons, slide it
+  // along the bar with a finger, and on release it snaps to (and switches to)
+  // whichever tab it is over (Malik). A plain tap still switches instantly.
+  _bindDrag() {
+    const bar = this.el;
+    let drag = null;
+    const capW = () => { const a = bar.querySelector('.tab-bar__tab'); return a ? a.getBoundingClientRect().width : 60; };
+    const place = (clientX) => {
+      const barRect = bar.getBoundingClientRect();
+      const w = capW();
+      let left = clientX - barRect.left - w / 2;
+      left = Math.max(6, Math.min(left, barRect.width - w - 6));
+      this.cap.style.left = left + 'px';
+      this.cap.style.width = w + 'px';
+      this.cap.classList.add('is-on');
+    };
+    const nearestTab = (clientX) => {
+      let best = null, bestD = Infinity;
+      this.tabs.forEach(t => {
+        const r = t.getBoundingClientRect();
+        const d = Math.abs((r.left + r.width / 2) - clientX);
+        if (d < bestD) { bestD = d; best = t; }
+      });
+      return best;
+    };
+    const onMove = (e) => {
+      if (!drag) return;
+      const x = e.clientX != null ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+      if (!drag.moved && Math.abs(x - drag.startX) > 6) {
+        drag.moved = true;
+        this.cap.style.transition = 'none';       // follow the finger 1:1
+        bar.classList.add('tab-bar--dragging');
+        // Capture only once a real drag begins, so a plain tap's click still
+        // lands on its tab (capturing on pointerdown can retarget the click).
+        try { if (drag.pid != null) bar.setPointerCapture(drag.pid); } catch (err) {}
+      }
+      if (drag.moved) { place(x); if (e.cancelable) e.preventDefault(); }
+    };
+    const onUp = (e) => {
+      if (!drag) return;
+      const x = e.clientX != null ? e.clientX : drag.startX;
+      const wasDrag = drag.moved;
+      try { if (drag.pid != null) bar.releasePointerCapture(drag.pid); } catch (err) {}
+      bar.classList.remove('tab-bar--dragging');
+      this.cap.style.transition = '';            // re-arm the spring for the snap
+      if (wasDrag) {
+        this._justDragged = true;                 // swallow the click that follows
+        const t = nearestTab(x);
+        if (t) this.switchTo(t.dataset.tab);
+        this.movePill(true);                      // snap capsule to the active tab
+        setTimeout(() => { this._justDragged = false; }, 350);
+      }
+      drag = null;
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
+    };
+    bar.addEventListener('pointerdown', (e) => {
+      if (e.button != null && e.button !== 0) return;
+      if (!e.target.closest('.tab-bar__tab')) return;
+      drag = { startX: e.clientX, moved: false, pid: e.pointerId };
+      window.addEventListener('pointermove', onMove);
+      window.addEventListener('pointerup', onUp);
+      window.addEventListener('pointercancel', onUp);
+    });
   },
 
   // The Do button doubles as a status light for the day: play = today's move
