@@ -4467,26 +4467,57 @@ const TabBar = {
 
     const app = document.getElementById('app');
     const panels = ['memento', 'path', 'reflect', 'profile'];
+    const getPanel = (p) => document.getElementById('panel' + p.charAt(0).toUpperCase() + p.slice(1));
 
     if (tabId === 'home') {
-      MementoVisual.destroy();
+      // Home is the base layer under the panels; reveal it, then fade the active
+      // panel out over it (crossfade). Destroy the WebGL glyph AFTER the fade so
+      // the memento panel does not blank mid-transition.
       app.style.display = '';
-      panels.forEach(p => { const el = document.getElementById('panel' + p.charAt(0).toUpperCase() + p.slice(1)); if (el) el.classList.add('hidden'); });
+      panels.forEach(p => this._hidePanel(getPanel(p), p === 'memento' ? () => MementoVisual.destroy() : null));
     } else {
-      app.style.display = 'none';
+      // Keep home painted UNDER the incoming panel during the fade, then stop it
+      // once the (opaque) panel is fully shown.
+      app.style.display = '';
       panels.forEach(p => {
-        const panel = document.getElementById('panel' + p.charAt(0).toUpperCase() + p.slice(1));
+        const panel = getPanel(p);
         if (!panel) return;
         if (p === tabId) {
           panel.classList.remove('hidden');
-          panel.style.display = '';
           this.renderPanel(p);
+          this._showPanel(panel);
         } else {
-          if (p === 'memento') MementoVisual.destroy();
-          panel.classList.add('hidden');
+          this._hidePanel(panel, p === 'memento' ? () => MementoVisual.destroy() : null);
         }
       });
+      clearTimeout(this._appHideT);
+      this._appHideT = setTimeout(() => { if (this.activeTab !== 'home') app.style.display = 'none'; }, 230);
     }
+  },
+
+  // Crossfade helpers: show fades a panel up from opacity 0; hide fades it out
+  // then unmounts (display:none) so nothing lingers painted. Timers are cleared
+  // on re-entry so rapid tab hopping never strands a half-faded panel.
+  _showPanel(panel) {
+    if (!panel) return;
+    clearTimeout(panel._navHideT);
+    // Synchronous: remove the unmount, add the show class. The tabPanelIn
+    // keyframe animates opacity up on its own, no timer/rAF to be throttled.
+    panel.classList.remove('hidden');
+    panel.classList.add('is-shown');
+  },
+  _hidePanel(panel, after) {
+    if (!panel) return;
+    if (!panel.classList.contains('is-shown') && panel.classList.contains('hidden')) {
+      if (after) { try { after(); } catch (e) {} }
+      return;                                // already hidden, nothing to fade
+    }
+    panel.classList.remove('is-shown');
+    clearTimeout(panel._navHideT);
+    panel._navHideT = setTimeout(() => {
+      panel.classList.add('hidden');
+      if (after) { try { after(); } catch (e) {} }
+    }, 210);
   },
 
   renderPanel(panelId) {
