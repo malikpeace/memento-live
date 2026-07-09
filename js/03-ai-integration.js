@@ -2214,7 +2214,7 @@ function renderWizardStep(key) {
         'Where are you right now with this?',
         'No judgment. Just the truth.',
         [
-          { value: 'zero', label: 'Starting from zero  - haven\u2019t really begun' },
+          { value: 'zero', label: 'Starting from zero, haven\u2019t really begun' },
           { value: 'tried', label: 'I\u2019ve tried before but couldn\u2019t stick with it' },
           { value: 'inconsistent', label: 'I\u2019m doing it inconsistently and want to get serious' },
           { value: 'avoiding', label: 'I know what to do but I keep avoiding it' }

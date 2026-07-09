@@ -493,6 +493,7 @@ html.theme-light .sheet--exp[data-module="deepwork"],
 html.theme-light #dwFocusOverlay,
 html.theme-light .ns-star-scene,
 html.theme-light .welcome-intro,
+html.theme-light #clarityPaywall,
 html.theme-light .splash {
   color-scheme: dark;
   --ink: 255, 255, 255;

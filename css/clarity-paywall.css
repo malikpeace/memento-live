@@ -46,6 +46,8 @@
   -webkit-tap-highlight-color: transparent;
   transition: background 0.18s ease, transform 0.12s ease;
 }
+/* Extend the tap target to the 44px iOS minimum without growing the visual. */
+.cpw__close::after { content: ""; position: absolute; inset: -6px; }
 .cpw__close:hover { background: rgba(var(--ink, 235, 238, 248), 0.16); }
 .cpw__close:active { transform: scale(0.92); }
 
@@ -77,7 +79,7 @@
 .cpw__eyebrow {
   font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.34em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: rgba(168, 150, 255, 0.92);
   margin-bottom: 30px;
@@ -124,7 +126,7 @@
 .cpw__star-cap {
   font-size: 0.66rem;
   font-weight: 700;
-  letter-spacing: 0.26em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: rgba(168, 150, 255, 0.78);
   margin-bottom: 12px;
@@ -250,7 +252,7 @@
 }
 .cpw__offer-title {
   font-size: 0.74rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: rgba(var(--ink, 235, 238, 248), 0.7);
@@ -350,8 +352,9 @@
 }
 .cpw__buy:active { transform: translateY(1px) scale(0.995); }
 .cpw__skip {
-  display: block;
-  margin: 14px auto 0;
+  display: flex; align-items: center; justify-content: center;
+  width: fit-content; min-height: 44px;
+  margin: 8px auto 0;
   padding: 8px 12px;
   border: 0;
   background: none;

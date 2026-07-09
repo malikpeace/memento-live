@@ -2422,26 +2422,10 @@ html.theme-light .action-exp__nav {
 .action-plan__quote:active {
   transform: translateY(-50%) translateY(0);
 }
-/* Big decorative curly quotes. Top-left opening, bottom-right closing. */
+/* Decorative curly quotes removed (design law: no serif fonts, no decorative
+   ornament; minimal + intentional wins, v669). */
 .action-plan__quote::before,
-.action-plan__quote::after {
-  position: absolute;
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 3.4rem;
-  line-height: 1;
-  color: rgba(180, 160, 255, 0.32);
-  pointer-events: none;
-}
-.action-plan__quote::before {
-  content: '\201C';
-  top: 6px;
-  left: 12px;
-}
-.action-plan__quote::after {
-  content: '\201D';
-  bottom: -14px;
-  right: 14px;
-}
+.action-plan__quote::after { content: none; }
 .action-plan__quote-text {
   position: relative;
   z-index: 1;

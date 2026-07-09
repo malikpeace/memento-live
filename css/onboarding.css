@@ -1159,9 +1159,9 @@ body.calm-motion .welcome-intro__pillar-ground {
   line-height: 1.6; max-width: 340px; margin: 0;
 }
 .welcome-intro__tagline {
-  font-family: 'Fraunces', 'Times New Roman', Georgia, serif;
-  font-style: italic; font-size: var(--fs-xl);
-  font-weight: 400;
+  /* App font, no serif/italic (design law: no serif fonts ever, v669). */
+  font-family: var(--font); font-size: var(--fs-xl);
+  font-weight: 500;
   letter-spacing: -0.01em;
   color: var(--text-2); line-height: 1.45;
   max-width: 340px; margin: 0;

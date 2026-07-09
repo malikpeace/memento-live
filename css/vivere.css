@@ -157,7 +157,7 @@ body.calm-motion img.img-skeleton, body.calm-motion img.img-loaded { animation: 
 .vcard__video-missing { padding: 24px 10px; text-align: center; font-size: var(--fs-sm); color: var(--text-lo); }
 /* --- Quote cards: typography-led, three fixed templates, hairline premium --- */
 .vcard--quote { padding: 22px 20px 16px; border-color: rgba(var(--ink),0.18); }
-.vcard__quote-text { font-family: Fraunces, Georgia, serif; font-size: 1.18rem; line-height: 1.45; color: var(--text-hi); outline: none; min-height: 1.4em; white-space: pre-wrap; word-break: break-word; }
+.vcard__quote-text { font-family: var(--font); font-size: 1.18rem; line-height: 1.45; color: var(--text-hi); outline: none; min-height: 1.4em; white-space: pre-wrap; word-break: break-word; }
 .vcard__quote-text:empty::before { content: attr(data-ph); color: var(--text-3); }
 .vcard__quote-attr { margin-top: 12px; font-size: var(--fs-xs); font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-hi); opacity: 0.4; outline: none; min-height: 1em; }
 .vcard__quote-attr:empty::before { content: attr(data-ph); color: var(--text-3); text-transform: none; letter-spacing: 0; }
@@ -221,7 +221,7 @@ body.calm-motion .viv-nudge { animation: none; }
 .viv-lane__card { margin-top: 8px; padding: 14px 16px; border-radius: var(--r-ctrl); background: var(--kfill-03); border: 1px solid var(--hairline); }
 .viv-lane__thumb { display: block; width: 100%; max-width: 260px; border-radius: calc(6px * var(--rx, 1)); margin-bottom: 8px; }
 .viv-lane__text { font-size: var(--fs-base); line-height: 1.5; color: var(--text-hi); }
-.viv-lane__text--quote { font-family: Fraunces, Georgia, serif; font-size: 1.02rem; }
+.viv-lane__text--quote { font-family: var(--font); font-size: 1.02rem; }
 .viv-lane__sub { font-size: var(--fs-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; color: var(--text-lo); margin-top: 4px; }
 .viv-lane__meta { margin-top: 8px; font-size: var(--fs-xs); color: var(--text-lo); }
 .viv-lane__go { font: inherit; font-size: var(--fs-xs); font-weight: 600; color: var(--color-vivere); background: transparent; border: 0; padding: 0; cursor: pointer; }

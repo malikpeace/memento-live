@@ -159,7 +159,7 @@ const ClarityPaywall = {
               '</button>' +
               '<button type="button" class="cpw__plan cpw__plan--flat" data-plan="plan" role="radio" aria-checked="false">' +
                 '<div><div class="cpw__plan-label">Pay in 3</div><div class="cpw__plan-sub">Same system, interest-free</div></div>' +
-                '<div class="cpw__plan-right cpw__plan-amt"><span class="cpw__plan-cur">3 x $</span><span class="cpw__plan-big">39</span></div>' +
+                '<div class="cpw__plan-right cpw__plan-amt"><span class="cpw__plan-cur">3 × $</span><span class="cpw__plan-big">39</span></div>' +
               '</button>' +
             '</div>' +
           '</div>' +
@@ -243,6 +243,9 @@ const ClarityPaywall = {
     this._open = false;
     if (!ov) return;
     try { if (typeof stopLivingWander === 'function') stopLivingWander(); } catch (e) {}
+    // The paywall borrowed the single living-card RAF for its own card; hand it
+    // back so the HOME card keeps drifting after dismiss (Malik audit v669).
+    try { const hw = document.querySelector('#dayCard .daycard-wrap.daycard-theme-living'); if (hw && typeof startLivingWander === 'function') startLivingWander(hw); } catch (e) {}
     ov.classList.remove('cpw--open');
     document.body.style.overflow = '';
     setTimeout(() => { try { ov.remove(); } catch (e) {} }, 360);

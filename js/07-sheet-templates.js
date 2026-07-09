@@ -4350,7 +4350,7 @@ const SHEET_TEMPLATES = {
       const moveSel = '<div class="rnote-menu__lbl">Move to</div>' +
         '<select class="rnote-menu__move" data-move aria-label="Move to folder">' +
           '<option value=""' + (!note.folder ? ' selected' : '') + '>No folder</option>' +
-          folders.map(f => '<option value="' + esc(f.id) + '"' + (note.folder === f.id ? ' selected' : '') + '>' + esc(f.parentId ? '\u2014 ' + f.name : f.name) + '</option>').join('') +
+          folders.map(f => '<option value="' + esc(f.id) + '"' + (note.folder === f.id ? ' selected' : '') + '>' + esc(f.parentId ? '\u00a0\u00a0' + f.name : f.name) + '</option>').join('') +
         '</select>';
       m.innerHTML =
         '<button type="button" data-act="open">Open</button>' +

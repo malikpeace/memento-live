@@ -97,7 +97,7 @@ function generateSprint() {
    MODULE INTROS
    ============================================ */
 const MODULE_INTROS = {
-  clarity: { icon: ICONS.clarity, color: 'var(--color-clarity)', quote: "Most people don't even know what they want. Clarity is about discovering exactly what you want and WHY  - your Neutron Star.", cta: "Let's Go" },
+  clarity: { icon: ICONS.clarity, color: 'var(--color-clarity)', quote: "Most people don't even know what they want. Clarity is about discovering exactly what you want and WHY, your Neutron Star.", cta: "Let's Go" },
   action: { icon: ICONS.action, color: 'var(--color-action)', quote: "Now that your Neutron Star is clear, Action finds the highest-leverage moves to actually move toward it.", cta: "Let's Go" },
   streak: { icon: ICONS.streak, color: 'var(--color-consistency)', quote: "Clarity and action mean nothing if you only show up once. Consistency is the whole game. This is where you prove it to yourself, one day at a time.", cta: "Let's Go" },
   flow: { icon: ICONS.flow, color: 'var(--color-flow)', quote: "Life will throw roadblocks. These tools help pave the way.", cta: "Let's Go" },

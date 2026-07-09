@@ -4667,6 +4667,9 @@ function startLivingWander(wrap) {
       () => 0                 // b6 red test, held off
     ];
     function frame() {
+      // Idle cheaply while the app is backgrounded: reschedule without touching
+      // styles so no layout/paint work happens off-screen.
+      if (document.hidden) { _dcLivingRaf = requestAnimationFrame(frame); return; }
       const v = { clar: _pv('--clar'), act: _pv('--act'), cons: _pv('--cons'), mix: _pv('--mix') };
       for (let i = 0; i < inside.length; i++) {
         const b = st[i];

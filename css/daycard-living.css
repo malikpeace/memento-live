@@ -308,6 +308,11 @@ body.evo2 .ambient__rays { transition: opacity 3.2s ease; }
 @media (prefers-reduced-motion: reduce) {
   body.evo2 .daycard-wrap { transform: none; }
   .evo2-shine { animation: none; opacity: 0; }
+  /* No surge/settle motion for reduced-motion users: the reveal opacity + blob
+     scale resolve instantly to the lit end state instead of animating. */
+  body.evo2.evo2-surge .daycard-theme-living .daycard-ns__liquid,
+  body.evo2.evo2-surge .daycard-theme-living .daycard-bloom { animation: none; opacity: 1; }
+  body.evo2 .daycard-theme-living .daycard-ns__liquid .blob { transition: none !important; }
 }
 body.evo2-snap .daycard-theme-living .daycard-ns__liquid .blob { transition: none !important; }
 body.evo2-snap .ambient__rays { transition: none !important; }
