@@ -4373,10 +4373,13 @@ const TabBar = {
   },
 
   show() {
-    // The unlock cinema owns the bar: while it runs, NOTHING may re-show it
-    // (Malik's recording caught _seedStep's post-render show() putting the bar
-    // back over the reveal, v678). _evoFinish calls show() again at the end.
-    try { if (typeof _cardEvolutionRunning !== 'undefined' && _cardEvolutionRunning) return; } catch (e) {}
+    // The unlock cinema owns the bar while it is ACTIVELY PLAYING: nothing may
+    // re-show it over the reveal (Malik's recording caught _seedStep doing so,
+    // v678). Actively playing = running AND the finish guard is armed
+    // (_evoFinished false). A run that is merely ARMED and waiting for an
+    // overlay to close must NOT block the bar, that wedged it hidden forever
+    // when the wait never resolved (v681). _evoFinish re-shows at the end.
+    try { if (typeof _cardEvolutionRunning !== 'undefined' && _cardEvolutionRunning && typeof _evoFinished !== 'undefined' && !_evoFinished) return; } catch (e) {}
     // No bar before the star exists: the pre-Clarity home keeps its single
     // job, and the bar appearing after ignition is part of the reward. Keyed
     // on a REAL star (completed + neutronStar), the same truth the home hero

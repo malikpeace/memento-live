@@ -2054,6 +2054,13 @@ const CreatorTools = {
       const DS = (typeof DEFAULT_STATE !== 'undefined') ? DEFAULT_STATE : {};
       const keepProfile = clone(state.profile || DS.profile || {});
       const keepPrefs = clone(state.prefs || DS.prefs || {});
+      // Mori birth data survives every checkpoint: a REAL post-onboarding user
+      // always has a birth year, and isBrandNewUser() keys on it. Wiping it made
+      // the 'blank' checkpoint read as brand-new -> NO card on the home (Malik
+      // v681: "Blank card" showed the Start hero with no card). Fall back to the
+      // founder demo's birth data when the session has none.
+      const keepMori = clone(state.mori || {});
+      const demoMori = demo ? clone(demo.mori || {}) : {};
       // Deterministic + coherent: every checkpoint is seeded from the founder
       // demo's content (a realistic real user). Base is a fully CLEAN default for
       // the early steps (no leftover activity/history leaking through), or the
@@ -2062,6 +2069,9 @@ const CreatorTools = {
       const base = clone((step === 'ongoing' && demo) ? demo : DS);
       Object.keys(base).forEach(k => { state[k] = base[k]; });
       state.profile = keepProfile; state.prefs = keepPrefs;
+      state.mori = state.mori || {};
+      if (keepMori.birthYear || demoMori.birthYear) state.mori.birthYear = keepMori.birthYear || demoMori.birthYear;
+      if (keepMori.lifeExpectancy || demoMori.lifeExpectancy) state.mori.lifeExpectancy = keepMori.lifeExpectancy || demoMori.lifeExpectancy;
       state.profile.onboarded = true;
       state.meta = state.meta || {}; state.meta.onboarded = true; state.meta.welcomeSeen = true;
       state.entitlements = state.entitlements || {}; state.dev = state.dev || {};
@@ -3747,6 +3757,10 @@ function _maybeRunCardEvolution(then) {
   const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (reduced) { state.meta.cardEvolutionSeen = true; try { persistNow(); } catch (e) {} flush(); return; }
   _cardEvolutionRunning = true;
+  // Stamp the ARMED time too (not just the play start): a run stuck WAITING for
+  // an overlay that never closes must also age out via the >12s watchdog above,
+  // else the running flag wedges renders/bar forever (v681).
+  _evoStartedAt = Date.now();
   const overlayOpen = () => {
     try {
       if (typeof ClarityExperience !== 'undefined' && ClarityExperience.isOpen) return true;
