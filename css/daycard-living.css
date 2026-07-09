@@ -256,9 +256,11 @@ body.evo2 .daycard-wrap {
   transform: scale(1.1) translateY(3vh);
   transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
-/* slow, deliberate light during the cinema */
+/* The light settles like iOS: a quick, decisive ease-OUT to rest, not a long
+   mushy decay (Malik v665: the old 2.8s made the surge slowly drain down for
+   ~4s instead of flowing into the next beat). */
 body.evo2 .daycard-theme-living .daycard-ns__liquid .blob {
-  transition: transform 2.8s cubic-bezier(0.3, 0, 0.35, 1);
+  transition: transform 1.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 /* THE SURGE: the purple takes the WHOLE card.
    The reveal is driven by a keyframe ANIMATION on the color layers, not the
@@ -268,16 +270,18 @@ body.evo2 .daycard-theme-living .daycard-ns__liquid .blob {
    iOS, so the purple rises out of black (Malik v662). */
 @keyframes evo2Reveal { from { opacity: 0; } to { opacity: 1; } }
 body.evo2.evo2-surge .daycard-theme-living .daycard-ns__liquid {
-  animation: evo2Reveal 2.7s cubic-bezier(0.33, 0, 0.2, 1) both;
+  animation: evo2Reveal 1.7s cubic-bezier(0.33, 0, 0.2, 1) both;
   will-change: opacity;
 }
 body.evo2.evo2-surge .daycard-theme-living .daycard-bloom {
-  animation: evo2Reveal 3s cubic-bezier(0.33, 0, 0.2, 1) both;
+  animation: evo2Reveal 1.9s cubic-bezier(0.33, 0, 0.2, 1) both;
   will-change: opacity;
 }
+/* Surge floods the card, but a smaller overshoot (2.1, was 2.7) sits closer to
+   the resting fill so the settle is a gentle focus, not a big dim-down. */
 body.evo2.evo2-surge .daycard-theme-living .blob.b1 {
   opacity: 1 !important;
-  transform: scale(2.7) !important;
+  transform: scale(2.1) !important;
 }
 /* The glow settles smoothly (not a snap) when the surge ends into the orb. */
 body.evo2 .daycard-theme-living .daycard-bloom { transition: opacity 1.6s ease; }
@@ -296,7 +300,7 @@ body.evo2.evo2-orb .daycard-theme-living .blob.b1 {
   background: linear-gradient(115deg, transparent 32%, rgba(255, 255, 255, 0.30) 50%, transparent 68%);
   transform: translateX(-130%);
   mix-blend-mode: screen;
-  animation: evo2Shine 2.8s cubic-bezier(0.4, 0, 0.3, 1) forwards;
+  animation: evo2Shine 1.8s cubic-bezier(0.4, 0, 0.3, 1) forwards;
 }
 @keyframes evo2Shine { to { transform: translateX(130%); } }
 /* the first light comes in slower than the everyday bloom */
