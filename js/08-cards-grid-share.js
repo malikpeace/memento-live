@@ -4220,15 +4220,12 @@ function renderDayCard() {
     const nsEl = el.querySelector('#dayCardNs');
     bindDayCardTilt(nsEl);
     bindDayCardMotion(el.querySelector('.daycard-wrap'), nsEl);
-    // Tap the card (emblem included) -> the fullscreen Memento with your Clarity /
-    // Action / Consistency stats. The emblem no longer toggles the theme.
-    if (nsEl && !nsEl._mfBound) {
-      nsEl._mfBound = true;
-      // No pointer cursor: the card is the Memento (a hero object), not a button.
-      // It still opens the full view on click, just without the click-hand spanning
-      // the whole large card (which read as "everything is a button" on desktop).
-      nsEl.addEventListener('click', () => { try { openMementoFull(); } catch (e) {} });
-    }
+    // The card is a STATIC hero, not a button (memory: home-blank-is-locked-layout,
+    // card static + pinned to home size). Tapping it used to open the fullscreen
+    // Memento (openMementoFull), which borrows the REAL card DOM node into an
+    // overlay and restores it on close, a fragile move that on iOS could leave the
+    // card floating over the home in a broken half-state (Malik v668). The progress
+    // stats now live in the Path tab, so the card tap is removed: it does nothing.
     if (living) {
       const wrap = el.querySelector('.daycard-wrap');
       setLivingCardVars(wrap);
