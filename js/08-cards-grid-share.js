@@ -2026,32 +2026,108 @@ const CreatorTools = {
   },
 
   // --- Stage & animation jumps (Malik: fly around from the cheat bar) ---
-  jumpBlankCard() {
-    this._closeAll();
-    try { if (window.DevStages) window.DevStages.play('beginning'); } catch (e) {}
-  },
-  jumpUnlockCinema() {
-    this._closeAll();
+  // STATE-ACCURATE: each jump commits a REAL, coherent state for that checkpoint
+  // so you land at a genuine step you can continue organically (real paywall,
+  // real action generation, real days), NOT a throwaway preview. Your own star/
+  // plan are kept if you have them; otherwise the founder demo's content is
+  // borrowed so there is always something real to work with. Dev-only, URL-gated.
+  _seedStep(step) {
     try {
-      if (window.DevStages) window.DevStages.close();
-      document.body.classList.remove('pre-clarity', 'card-evolving', 'card-evolve-go');
-      window._evoStageOverride = { clar: 0, act: 0, cons: 0 };
-      const w = document.querySelector('.daycard-wrap');
-      if (w && typeof setLivingCardVars === 'function') setLivingCardVars(w);
-      if (typeof _runClarityUnlockCinema === 'function') _runClarityUnlockCinema(null, { holdOverride: { clar: 100, act: 0, cons: 0 } });
+      const nowISO = new Date().toISOString();
+      const now = Date.now();
+      const clone = (o) => JSON.parse(JSON.stringify(o));
+      const demo = (typeof buildDemoState === 'function') ? buildDemoState('founder') : null;
+      const DS = (typeof DEFAULT_STATE !== 'undefined') ? DEFAULT_STATE : {};
+      const keepProfile = clone(state.profile || DS.profile || {});
+      const keepPrefs = clone(state.prefs || DS.prefs || {});
+      // Deterministic + coherent: every checkpoint is seeded from the founder
+      // demo's content (a realistic real user). Base is a fully CLEAN default for
+      // the early steps (no leftover activity/history leaking through), or the
+      // full lived-in founder demo for 'ongoing'. Copied onto the live state
+      // object IN PLACE so every existing reference stays valid.
+      const base = clone((step === 'ongoing' && demo) ? demo : DS);
+      Object.keys(base).forEach(k => { state[k] = base[k]; });
+      state.profile = keepProfile; state.prefs = keepPrefs;
+      state.profile.onboarded = true;
+      state.meta = state.meta || {}; state.meta.onboarded = true; state.meta.welcomeSeen = true;
+      state.entitlements = state.entitlements || {}; state.dev = state.dev || {};
+      state.clarity = state.clarity || {}; state.action = state.action || {};
+      const starC = () => demo ? clone(demo.clarity) : clone(DS.clarity || {});
+      const planC = () => demo ? clone(demo.action) : clone(DS.action || {});
+      const free = () => { state.entitlements = { isPaid: false, paidAt: null, plan: '' }; state.prefs.unlockAll = false; state.dev.previewAll = false; };
+      const paid = () => { state.entitlements = { isPaid: true, paidAt: nowISO, plan: 'lifetime' }; state.prefs.unlockAll = true; };
+      const setStar = (ignAt) => { state.clarity = starC(); state.clarity.completed = true; if (!state.clarity.completedAt) state.clarity.completedAt = nowISO; state.clarity.ignitedAt = ignAt; };
+      const setPlan = () => { state.action = planC(); state.action.planGenerated = true; state.action.introSeen = true; state.action.intake = { completed: true }; };
+
+      switch (step) {
+        case 'blank':                 // brand-new, pre-Clarity: nothing lit
+          free(); state.meta.cardEvolutionSeen = true;
+          break;
+        case 'star':                  // star found + ignited, FREE, no plan (real post-Clarity beat -> paywall)
+          setStar(now); free(); state.meta.cardEvolutionSeen = true;
+          break;
+        case 'unlock':                // just ignited, card-evolution NOT seen -> the real cinema plays on render
+          setStar(now); free(); state.meta.cardEvolutionSeen = false;
+          break;
+        case 'day1': {                // paid, plan generated, the FIRST action just completed today
+          setStar(now); setPlan(); paid(); state.meta.cardEvolutionSeen = true;
+          delete state.meta.firstActionDone;   // let the first-win moment re-fire
+          const todayISO = (typeof getTodayISO === 'function') ? getTodayISO() : nowISO.slice(0, 10);
+          const pa = state.action.primaryAction || {};
+          state.action.completionHistory = [{ date: nowISO, tier: 'moderate', actionText: pa.title || 'Today’s action', planTitle: pa.title || '' }];
+          state.streak = { history: [todayISO], count: 1, bestEver: 1, bestEverShown: 1 };
+          break;
+        }
+        case 'ongoing':               // full lived-in user (a year of history from the founder demo)
+        default:
+          state.clarity.completed = true; state.clarity.ignitedAt = now - 12 * 86400000; if (!state.clarity.completedAt) state.clarity.completedAt = nowISO;
+          state.action.planGenerated = true;
+          paid(); state.meta.cardEvolutionSeen = true;
+          break;
+      }
+      try { if (typeof persistNow === 'function') persistNow(); } catch (e) {}
+      try { if (typeof renderGrid === 'function') renderGrid(); } catch (e) {}
+      try { if (typeof renderAll === 'function') renderAll(); } catch (e) {}
+      // Reflect the seeded step in the bar: show()/updateHomeDot self-gate on the
+      // real state (bar hidden pre-star, shown + Do status light once ignited).
+      try { if (typeof TabBar !== 'undefined' && TabBar.show) { TabBar.show(); TabBar.updateHomeDot(); } } catch (e) {}
     } catch (e) {}
   },
-  jumpSynth() { this._closeAll(); try { if (window.DevCeremony) window.DevCeremony.synth(); } catch (e) {} },
-  jump7Days() { this._closeAll(); try { if (typeof showNext7Days === 'function') showNext7Days(function () { try { if (typeof ClarityPaywall !== 'undefined' && ClarityPaywall.show) ClarityPaywall.show(); } catch (e) {} }); } catch (e) {} },
-  jumpReveal() { this._closeAll(); try { if (window.DevCeremony) window.DevCeremony.reveal(); } catch (e) {} },
-  jumpStar() { this._closeAll(); try { if (window.DevCeremony) window.DevCeremony.star(); } catch (e) {} },
-  jumpStarSummary() { this._closeAll(); try { if (window.DevCeremony) window.DevCeremony.summary(); } catch (e) {} },
+  // Close any open experience/overlay and land on the real home, so a seeded
+  // step plays on the actual app surface (not under a leftover overlay).
+  _devToHome() {
+    try {
+      const r = document.getElementById('nsv2Root'); if (r) r.remove();
+      if (typeof ClarityExperience !== 'undefined' && ClarityExperience.close && ClarityExperience.isOpen) ClarityExperience.close();
+      if (typeof ActionExperience !== 'undefined' && ActionExperience.close) ActionExperience.close();
+      document.getElementById('clarityPaywall')?.remove();
+      if (typeof ClarityPaywall !== 'undefined') ClarityPaywall._open = false;
+      if (typeof Sheet !== 'undefined' && Sheet.isOpen) Sheet.close();
+      document.body.style.overflow = '';
+      if (typeof TabBar !== 'undefined' && TabBar.switchTo) TabBar.switchTo('home');
+    } catch (e) {}
+  },
+
+  jumpBlankCard() { this._closeAll(); this._devToHome(); this._seedStep('blank'); },
+  jumpUnlockCinema() {
+    this._closeAll(); this._devToHome();
+    // Seed a real just-ignited state with the cinema unseen; renderGrid inside
+    // _seedStep runs the REAL _maybeRunCardEvolution, so the actual cinema plays.
+    this._seedStep('unlock');
+  },
+  jumpSynth() { this._closeAll(); this._seedStep('star'); try { if (window.DevCeremony) window.DevCeremony.synth(); } catch (e) {} },
+  jump7Days() { this._closeAll(); this._seedStep('star'); try { if (typeof showNext7Days === 'function') showNext7Days(function () { try { if (typeof ClarityPaywall !== 'undefined' && ClarityPaywall.show) ClarityPaywall.show(); } catch (e) {} }); } catch (e) {} },
+  jumpReveal() { this._closeAll(); this._seedStep('star'); try { if (window.DevCeremony) window.DevCeremony.reveal(); } catch (e) {} },
+  jumpStar() { this._closeAll(); this._seedStep('star'); try { if (window.DevCeremony) window.DevCeremony.star(); } catch (e) {} },
+  jumpStarSummary() { this._closeAll(); this._seedStep('star'); try { if (window.DevCeremony) window.DevCeremony.summary(); } catch (e) {} },
   jumpDay1() {
-    this._closeAll();
-    try { state.meta = state.meta || {}; state.meta.firstActionDone = false; if (typeof _maybeFirstWinMoment === 'function') _maybeFirstWinMoment(); } catch (e) {}
+    this._closeAll(); this._devToHome();
+    this._seedStep('day1');
+    try { if (typeof _maybeFirstWinMoment === 'function') _maybeFirstWinMoment(); } catch (e) {}
   },
   jumpNewDay() {
-    this._closeAll();
+    this._closeAll(); this._devToHome();
+    this._seedStep('ongoing');
     try {
       state.meta = state.meta || {};
       delete state.meta.lastNewDayPulse;
