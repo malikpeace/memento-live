@@ -2553,10 +2553,20 @@ const ActionExperience = {
 
   open() {
     if (this.isOpen) return;
-    // Paywall gate: Action is paid. If locked, rise the paywall instead.
+    // Paywall gate: Action is paid. If locked, this is the "Build my plan" moment
+    // the evolved card hands off to. The FIRST time, future-pace through the First
+    // 7 Days screen and THEN raise the paywall (build desire, then ask). After that
+    // it goes straight to the paywall (Malik v676: cinema -> tap -> 7 days -> paywall).
     try {
       if (typeof ClarityPaywall !== 'undefined' && ClarityPaywall.isLockedByPaywall('action')) {
-        ClarityPaywall.show();
+        state.meta = state.meta || {};
+        if (typeof showNext7Days === 'function' && !state.meta.next7DaysSeen) {
+          state.meta.next7DaysSeen = true;
+          try { persistNow(); } catch (e) {}
+          showNext7Days(() => { try { if (ClarityPaywall.show) ClarityPaywall.show(); } catch (e) {} });
+        } else {
+          ClarityPaywall.show();
+        }
         return;
       }
     } catch (e) {}
@@ -7688,21 +7698,18 @@ function showNext7Days(onProceed) {
 // `finalize` is the per-entry close step (close / completeWizard).
 function _addToMementoThenAction(finalize) {
   const proceedAfter = () => {
-    // After the cinema (card evolved): ride the peak into the FIRST 7 DAYS
-    // future-pacing screen, then the paywall (Malik). Once per lifetime.
+    // The cinema now LANDS on the live home and waits: the card has evolved, the
+    // header, bar and next-step card fade back in, and the user taps "Build my
+    // plan" when they are ready. That tap (ActionExperience.open on an unpaid
+    // user) is what leads into the First 7 Days screen, then the paywall, so the
+    // moment is theirs to advance, nothing auto-fires over the reveal (Malik v676).
+    // Returning path only: the quiet save-your-Memento nudge.
     try {
       state.meta = state.meta || {};
-      if (typeof showNext7Days === 'function' && !state.meta.next7DaysSeen) {
-        state.meta.next7DaysSeen = true;
-        try { persistNow(); } catch (e) {}
-        showNext7Days(() => {
-          try { if (typeof ClarityPaywall !== 'undefined' && ClarityPaywall.show) ClarityPaywall.show(); } catch (e) {}
-        });
-        return;
+      if (state.meta.next7DaysSeen && typeof maybeShowSaveWorkNudge === 'function') {
+        maybeShowSaveWorkNudge(function () {});
       }
     } catch (e) {}
-    // Returning path (already saw the 7 days): the quiet save-your-Memento nudge.
-    try { if (typeof maybeShowSaveWorkNudge === 'function') maybeShowSaveWorkNudge(function () {}); } catch (e) {}
   };
   const runClose = () => {
     try { if (typeof finalize === 'function') finalize(); } catch (e) {}

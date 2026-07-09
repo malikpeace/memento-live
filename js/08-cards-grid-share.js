@@ -3787,6 +3787,13 @@ function _runClarityUnlockCinema(onDone, opts) {
   document.body.classList.add('evo2');
   const T = [];
   window._evoTimers = T;
+  // Timeline (v676, slower + cinematic, card holds perfectly still, everything
+  // stays INSIDE the card, beams + chrome return only at the very end):
+  //   0.0s  the room is already cleared; the blank card sits alone for a beat
+  //   0.8s  THE SURGE: the purple rises slowly to fill the whole card (2.6s)
+  //   3.4s  THE SETTLE: it eases back down to the subtle resting purple (2.8s)
+  //   6.2s  FINISH: the card is at rest -> beams, header, bar + next-step card
+  //         all FADE back in together (via _evoFinish: ns-bloom on, evo2 off)
   T.push(setTimeout(() => {                     // THE SURGE: fully purple + shimmer
     window._evoStageOverride = { clar: 100, act: 0, cons: 0 };
     setLivingCardVars(wrap);
@@ -3795,17 +3802,16 @@ function _runClarityUnlockCinema(onDone, opts) {
     const shine = document.createElement('span');
     shine.className = 'evo2-shine';
     ns.appendChild(shine);
-    T.push(setTimeout(() => { try { shine.remove(); } catch (e) {} }, 1900));
-  }, 1000));
-  T.push(setTimeout(() => {                     // THE CALM: settle into the rest
+    T.push(setTimeout(() => { try { shine.remove(); } catch (e) {} }, 2600));
+  }, 800));
+  T.push(setTimeout(() => {                     // THE SETTLE: full purple -> subtle
     document.body.classList.remove('evo2-surge');
     document.body.classList.add('evo2-orb');
-  }, 3200));
-  T.push(setTimeout(() => {                     // THE BEAMS: first light, slow
+  }, 3400));
+  T.push(setTimeout(() => {                     // FINISH: first light + room fades in
     try { if (typeof MementoSound !== 'undefined') MementoSound.play('firstlight'); } catch (e) {}
-    document.body.classList.add('ns-bloom');
-  }, 4800));
-  T.push(setTimeout(finish, 6400));             // EXIT: home returns around it
+    finish();                                   // _evoFinish adds ns-bloom (beams + glow) and drops evo2 (chrome)
+  }, 6200));
   // Safety net: if the tab was suspended and the exit timer fired late (or the
   // chain was throttled), this still lands us on the lit card. Fires late too,
   // but guarantees a finish once the app is foreground again.

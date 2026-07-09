@@ -24,12 +24,28 @@
    layers were force-hidden through the whole SURGE + ORB, blacking the card
    out for ~2s between the surge and the beams (Malik v663). The surge/orb
    stages own the card's light, so exempt them here. */
+/* INTERNAL colour (clipped INSIDE .daycard-ns) is what lights up during the
+   cinema's surge/orb, so it is exempt from the pre-star hide. */
 body:not(.ns-bloom):not(.evo2-surge):not(.evo2-orb) .daycard-theme-living .daycard-ns__liquid,
-body:not(.ns-bloom):not(.evo2-surge):not(.evo2-orb) .daycard-theme-living .daycard-bloom,
-body:not(.ns-bloom):not(.evo2-surge):not(.evo2-orb) .daycard-theme-living .daycard-floor,
-body:not(.ns-bloom):not(.evo2-surge):not(.evo2-orb) .daycard-theme-living .daycard-ns__burn,
-body:not(.ns-bloom):not(.evo2-surge):not(.evo2-orb) .daycard-theme-living .daycard-wrap__aura {
+body:not(.ns-bloom):not(.evo2-surge):not(.evo2-orb) .daycard-theme-living .daycard-ns__burn {
   opacity: 0 !important;
+}
+/* EXTERNAL colour (bloom echo, floor reflection, ambient aura) lives OUTSIDE the
+   card and would read as a purple BOX around it. It is hidden until the card is
+   truly at rest (ns-bloom), and is deliberately NOT exempted for surge/orb, so
+   the WHOLE cinema keeps every trace of purple strictly inside the card. These
+   fade in at the very end with the beams + chrome (Malik v676: no box, ever). */
+body:not(.ns-bloom) .daycard-theme-living .daycard-bloom,
+body:not(.ns-bloom) .daycard-theme-living .daycard-floor,
+body:not(.ns-bloom) .daycard-theme-living .daycard-wrap__aura {
+  opacity: 0 !important;
+}
+/* The external layers FADE in (not snap) when the card reaches rest at the end
+   of the cinema, arriving softly with the beams. */
+.daycard-theme-living .daycard-bloom,
+.daycard-theme-living .daycard-floor,
+.daycard-theme-living .daycard-wrap__aura {
+  transition: opacity 0.9s ease;
 }
 
 .daycard-theme-living {
@@ -84,6 +100,13 @@ body:not(.ns-bloom):not(.evo2-surge):not(.evo2-orb) .daycard-theme-living .dayca
      card; the inset rim stays (it's inside the clip). */
   clip-path: inset(0 round var(--r-card, 14px));
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  /* Keep the card's own blurred colour strictly INSIDE its rounded box. clip-path
+     alone lets a blurred / composited descendant (the __liquid layer's 46px blur)
+     escape on some engines (the same layer-escapes-clip issue as the card corners),
+     which haloed the colour outside the card. Paint containment clips it hard. It
+     is on the base rule (not just the cinema) so it is established at first paint
+     and never depends on a mid-animation recompositing (Malik v676: only inside). */
+  contain: paint;
 }
 
 /* ── Liquid color layer (inside the card) ─────────────────────────────────── */
@@ -238,29 +261,48 @@ body.stage-cinema .daycard-theme-living .daycard-ns__liquid .blob {
   transition: opacity 3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* ── v614: the clarity unlock cinema ─────────────────────────────────────── */
-/* The room clears: Today fades away, the blank Memento grows near full screen. */
-body.evo2 #commandCenter { opacity: 0 !important; pointer-events: none; transition: opacity 0.6s ease; }
-/* The bottom bar is part of the room, so it clears too (it was built after this
-   cinema and used to sit on screen through the whole reveal, breaking the sacred
-   first-evolution beat, Malik v658). Driven by TabBar.hide()/show() in the
-   cinema JS, transition-independent, so it clears even if the compositor
-   throttles CSS transitions mid-animation. It slides back when the card settles. */
-/* The top status-bar fade is chrome too; drop it so the reveal is edge to edge. */
-body.evo2 #topFade { opacity: 0 !important; transition: opacity 0.6s ease; }
-body.evo2 #dayCard { position: relative; z-index: 30; }
-body.evo2 .daycard-wrap {
-  /* The unlock cinema grows the card, but 1.22 + 6vh pushed it beyond full
-     screen on shorter phones (Malik). Pulled back so it still swells and
-     dominates but stays on screen. */
-  transform: scale(1.1) translateY(3vh);
-  transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+/* ── v614/v676: the clarity unlock cinema ────────────────────────────────── */
+/* The room clears so ONLY the card is on screen: the next-step card, the header
+   (M wordmark + date), the mobile date, the daily line, and the top fade all go.
+   The transition is declared on the BASE element (not the body.evo2 selector) so
+   it still applies the instant evo2 is removed at the end, letting the whole room
+   FADE back in rather than snap (Malik v676). The bottom bar clears via
+   TabBar.hide() in JS (transition-independent, survives a throttled compositor)
+   and slides back on TabBar.show() when the card settles. */
+#commandCenter,
+.dash-header,
+#dashGreetingMobile,
+#dailyMemento,
+#topFade {
+  transition: opacity 0.7s ease;
 }
-/* The light settles like iOS: a quick, decisive ease-OUT to rest, not a long
-   mushy decay (Malik v665: the old 2.8s made the surge slowly drain down for
-   ~4s instead of flowing into the next beat). */
+body.evo2 #commandCenter,
+body.evo2 .dash-header,
+body.evo2 #dashGreetingMobile,
+body.evo2 #dailyMemento,
+body.evo2 #topFade {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+body.evo2 #dayCard { position: relative; z-index: 30; }
+/* The card holds PERFECTLY STILL through the whole cinema, only its colour
+   animates. A moving / zooming card was the main thing reading as not-native
+   (Malik v676: "stay perfectly still"). It sits at its normal home size + spot. */
+body.evo2 .daycard-wrap {
+  transform: none;
+}
+/* Absolutely nothing outside the card during the cinema: the stage's resting
+   outer GLOW ring (the soft bluish 44px halo) is dropped so the card sits clean
+   on black with no surrounding box or halo, just a black-on-black depth shadow.
+   The resting glow returns with everything else at the end (Malik v676). */
+body.evo2 .daycard-theme-living .daycard-living-stage {
+  box-shadow: 0 26px 64px rgba(0, 0, 0, 0.55);
+  transition: box-shadow 0.9s ease;
+}
+/* The internal colour settles slowly and cinematically from the full-purple
+   surge down to the card's resting fill (Malik v676: "slowly unfade"). */
 body.evo2 .daycard-theme-living .daycard-ns__liquid .blob {
-  transition: transform 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 2.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 /* THE SURGE: the purple takes the WHOLE card.
    The reveal is driven by a keyframe ANIMATION on the color layers, not the
@@ -269,12 +311,12 @@ body.evo2 .daycard-theme-living .daycard-ns__liquid .blob {
    instantly. Animating a literal opacity 0 -> 1 on the layer runs smoothly on
    iOS, so the purple rises out of black (Malik v662). */
 @keyframes evo2Reveal { from { opacity: 0; } to { opacity: 1; } }
+/* The purple rises slowly out of the blank card (2.6s, was 1.7s), a deliberate
+   cinematic fill instead of a quick swell (Malik v676: "slowly turn full purple").
+   Only the INTERNAL liquid animates now; the external bloom stays hidden through
+   the whole cinema so nothing bleeds into a box around the card. */
 body.evo2.evo2-surge .daycard-theme-living .daycard-ns__liquid {
-  animation: evo2Reveal 1.7s cubic-bezier(0.33, 0, 0.2, 1) both;
-  will-change: opacity;
-}
-body.evo2.evo2-surge .daycard-theme-living .daycard-bloom {
-  animation: evo2Reveal 1.9s cubic-bezier(0.33, 0, 0.2, 1) both;
+  animation: evo2Reveal 2.6s cubic-bezier(0.33, 0, 0.2, 1) both;
   will-change: opacity;
 }
 /* Surge floods the card, but a smaller overshoot (2.1, was 2.7) sits closer to
@@ -283,8 +325,6 @@ body.evo2.evo2-surge .daycard-theme-living .blob.b1 {
   opacity: 1 !important;
   transform: scale(2.1) !important;
 }
-/* The glow settles smoothly (not a snap) when the surge ends into the orb. */
-body.evo2 .daycard-theme-living .daycard-bloom { transition: opacity 1.6s ease; }
 /* THE SETTLE: the surge (scale 2.7, fills the whole card) eases down into the
    card's REAL resting purple, top-weighted and rich, the exact state the card
    rests in forever. Landing here (not on a dim shrunken center orb) means the
@@ -310,8 +350,7 @@ body.evo2 .ambient__rays { transition: opacity 3.2s ease; }
   .evo2-shine { animation: none; opacity: 0; }
   /* No surge/settle motion for reduced-motion users: the reveal opacity + blob
      scale resolve instantly to the lit end state instead of animating. */
-  body.evo2.evo2-surge .daycard-theme-living .daycard-ns__liquid,
-  body.evo2.evo2-surge .daycard-theme-living .daycard-bloom { animation: none; opacity: 1; }
+  body.evo2.evo2-surge .daycard-theme-living .daycard-ns__liquid { animation: none; opacity: 1; }
   body.evo2 .daycard-theme-living .daycard-ns__liquid .blob { transition: none !important; }
 }
 body.evo2-snap .daycard-theme-living .daycard-ns__liquid .blob { transition: none !important; }
