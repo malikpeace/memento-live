@@ -577,6 +577,29 @@ try { window.addEventListener('focus', () => { try { Analytics._flush(); } catch
 // active, command-center inline-styled text reads the live --accent variable.
 const ACCENT_DEFAULT_CC = 'rgba(123,97,255,0.92)';
 const ACCENT_CHOICES = ['default', 'cyan', 'green', 'amber', 'rose', 'blue', 'teal', 'lime', 'orange', 'crimson', 'magenta', 'mono', 'custom'];
+// Hexes for the named accents (must stay in sync with body[data-accent] vars in
+// css/base.css). Used to compute the Memento hue-match rotation in JS.
+const ACCENT_HEX = {
+  cyan: '#2bd4d4', green: '#34d97a', amber: '#ffb73d', rose: '#ff6b9d',
+  blue: '#4f8cff', teal: '#19c3a6', lime: '#a3e635', orange: '#ff8a3d',
+  crimson: '#ff4d6d', magenta: '#e84de8'
+};
+// Hue (0-360) of a hex color. Used for the Memento accent-match rotation.
+function hexToHue(hex) {
+  try {
+    let h = hex.replace('#', '');
+    if (h.length === 3) h = h.split('').map(c => c + c).join('');
+    const r = parseInt(h.slice(0, 2), 16) / 255, g = parseInt(h.slice(2, 4), 16) / 255, b = parseInt(h.slice(4, 6), 16) / 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min;
+    if (!d) return 0;
+    let hue;
+    if (max === r) hue = ((g - b) / d) % 6;
+    else if (max === g) hue = (b - r) / d + 2;
+    else hue = (r - g) / d + 4;
+    hue *= 60;
+    return (hue + 360) % 360;
+  } catch (e) { return 0; }
+}
 // Curated one-tap "Looks": each bundles accent + theme + minimal background +
 // density into a named aesthetic so the app feels like the user's own. Applying
 // one only sets state.prefs (additive, never touches their data) then re-applies
@@ -737,6 +760,29 @@ function applyPrefs() {
     } else {
       b.removeAttribute('data-accent');
     }
+    // Match Memento to color theme (Malik v683): when ON (the default), the card's
+    // colour layers hue-rotate toward the chosen accent (pure CSS via --mm-hue, the
+    // filters already on the liquid/bloom/floor pick it up). Dynamic (drifting) and
+    // Mono keep the stock card; the toggle lets accent-only users opt out.
+    try {
+      const mmOn = p.matchMemento !== false;
+      let mmHex = null;
+      if (accent === 'custom') {
+        mmHex = (p.accentCustom && /^#?[0-9a-fA-F]{3,6}$/.test(p.accentCustom))
+          ? (p.accentCustom[0] === '#' ? p.accentCustom : '#' + p.accentCustom) : '#7b61ff';
+      } else if (accent && accent !== 'default' && accent !== 'mono' && ACCENT_HEX[accent]) {
+        mmHex = ACCENT_HEX[accent];
+      }
+      if (mmOn && mmHex) {
+        // The card's native clarity purple sits at hue ~256deg; rotate to the accent.
+        const rot = Math.round(hexToHue(mmHex) - 256);
+        b.classList.add('mm-match');
+        b.style.setProperty('--mm-hue', rot + 'deg');
+      } else {
+        b.classList.remove('mm-match');
+        b.style.removeProperty('--mm-hue');
+      }
+    } catch (eMM) {}
     // Dynamic accent (Malik, v576): the default accent slowly drifts through the
     // colored-M palette (purple -> blue -> pink). Inline body vars only, no
     // data-accent attr, so module colors and the beams stay stock. Static purple

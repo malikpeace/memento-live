@@ -4683,6 +4683,7 @@ const TabBar = {
         '<div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); margin: 18px 0 10px;">Color</div>' +
         '<div class="pref-swatches" id="prefAccent">' + swatchHtml + '</div>' +
         '<input type="color" id="prefAccentCustomInput" value="' + customHex + '" aria-label="Pick a custom accent color" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;" />' +
+        toggleRow('prefMatchMemento', 'Match Memento to color theme', 'Tints your Memento card toward the accent you pick. Off keeps the card its own colors.', prefs.matchMemento !== false) +
         '<div style="height:14px;"></div>' +
         sliderRow('prefUiRadius', 'Corner radius', 'Sharp', 'Round', 0.35, 1.4, 'any', Math.max(0.35, uiRadius)) +
         '<div class="feel-preview" aria-hidden="true">' +
@@ -4842,6 +4843,7 @@ const TabBar = {
         applyPrefs();
       });
     };
+    wireToggle('prefMatchMemento', (on) => { state.prefs.matchMemento = on; });
     wireToggle('prefReduceMotion', (on) => { state.prefs.reduceMotion = on; });
     wireToggle('prefCardTilt', (on) => { state.prefs.cardTilt = on; try { if (typeof renderDayCard === 'function') renderDayCard(); } catch (e) {} });
     wireToggle('prefCompact', (on) => { state.prefs.density = on ? 'compact' : 'comfortable'; });

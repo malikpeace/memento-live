@@ -62,7 +62,7 @@ body:not(.ns-bloom) .daycard-theme-living .daycard-wrap__aura {
 /* Ambient aura: gate by --lit so an empty living card has no surrounding glow,
    and let --glow scale its brightness. */
 .daycard-theme-living .daycard-wrap__aura {
-  filter: blur(28px) brightness(calc((0.7 + 1.7 * var(--glow, 0.4)) * var(--lit, 0)));
+  filter: blur(28px) brightness(calc((0.7 + 1.7 * var(--glow, 0.4)) * var(--lit, 0))) hue-rotate(var(--mm-hue, 0deg));
 }
 
 /* The stage shrink-wraps the card so the bloom + reflection align to the card
@@ -113,7 +113,7 @@ body:not(.ns-bloom) .daycard-theme-living .daycard-wrap__aura {
 .daycard-theme-living .daycard-ns__liquid {
   position: absolute; inset: -28%; pointer-events: none; z-index: 0;
   /* heavier blur so the glows read as smooth, edgeless light (Malik) */
-  filter: blur(46px) saturate(var(--sat, 1.5));
+  filter: blur(46px) saturate(var(--sat, 1.5)) hue-rotate(var(--mm-hue, 0deg));
 }
 .daycard-theme-living .daycard-ns__liquid .blob {
   position: absolute; border-radius: 50%;
@@ -151,7 +151,7 @@ body:not(.ns-bloom) .daycard-theme-living .daycard-wrap__aura {
 .daycard-theme-living .daycard-bloom {
   position: absolute; inset: -14%; z-index: 0;
   pointer-events: none;
-  filter: blur(34px) saturate(var(--sat, 1.5));
+  filter: blur(34px) saturate(var(--sat, 1.5)) hue-rotate(var(--mm-hue, 0deg));
   opacity: calc(var(--emit, 0.55) * var(--lit, 0));
   -webkit-mask: radial-gradient(ellipse 68% 66% at 50% 44%, #000 42%, transparent 71%);
           mask: radial-gradient(ellipse 68% 66% at 50% 44%, #000 42%, transparent 71%);
@@ -194,7 +194,7 @@ body:not(.ns-bloom) .daycard-theme-living .daycard-wrap__aura {
   pointer-events: none; overflow: hidden;
   border-radius: var(--r-card);
   opacity: calc(var(--lit, 0) * var(--rfl-i, 1));
-  filter: blur(22px) saturate(var(--sat, 1.5));
+  filter: blur(22px) saturate(var(--sat, 1.5)) hue-rotate(var(--mm-hue, 0deg));
   transition: opacity 0.6s ease;
   /* vertical fade (flipped: local-bottom = the card edge = brightest, soft top
      fade-in then fade down) intersected with a horizontal fade toward the ends */
@@ -340,7 +340,7 @@ body.evo2.evo2-surge .daycard-theme-living .daycard-ns__liquid {
     rgba(139, 120, 246, 0.66) 46%,
     rgba(110, 92, 224, 0.28) 78%,
     rgba(110, 92, 224, 0) 100%);
-  filter: blur(20px) saturate(1.4);
+  filter: blur(20px) saturate(1.4) hue-rotate(var(--mm-hue, 0deg));
   will-change: opacity;
 }
 /* ns-bloom is turned on at the FILL so the card's INTERNAL liquid lights to its
