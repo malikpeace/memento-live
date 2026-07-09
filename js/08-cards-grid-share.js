@@ -2115,11 +2115,16 @@ const CreatorTools = {
     // _seedStep runs the REAL _maybeRunCardEvolution, so the actual cinema plays.
     this._seedStep('unlock');
   },
-  jumpSynth() { this._closeAll(); this._seedStep('star'); try { if (window.DevCeremony) window.DevCeremony.synth(); } catch (e) {} },
-  jump7Days() { this._closeAll(); this._seedStep('star'); try { if (typeof showNext7Days === 'function') showNext7Days(function () { try { if (typeof ClarityPaywall !== 'undefined' && ClarityPaywall.show) ClarityPaywall.show(); } catch (e) {} }); } catch (e) {} },
-  jumpReveal() { this._closeAll(); this._seedStep('star'); try { if (window.DevCeremony) window.DevCeremony.reveal(); } catch (e) {} },
-  jumpStar() { this._closeAll(); this._seedStep('star'); try { if (window.DevCeremony) window.DevCeremony.star(); } catch (e) {} },
-  jumpStarSummary() { this._closeAll(); this._seedStep('star'); try { if (window.DevCeremony) window.DevCeremony.summary(); } catch (e) {} },
+  // The CEREMONY jumps open the real Clarity ceremony, which is already state-
+  // accurate: the hold ignites for real, then Add-to-Memento plays the real card
+  // cinema -> First 7 Days -> paywall. Seeding state here PRE-SET ignitedAt +
+  // cardEvolutionSeen, which skipped the cinema and fired the paywall early
+  // (Malik v674). So these enter the natural flow untouched, no seeding.
+  jumpSynth() { this._closeAll(); try { if (window.DevCeremony) window.DevCeremony.synth(); } catch (e) {} },
+  jump7Days() { this._closeAll(); try { if (typeof showNext7Days === 'function') showNext7Days(function () { try { if (typeof ClarityPaywall !== 'undefined' && ClarityPaywall.show) ClarityPaywall.show(); } catch (e) {} }); } catch (e) {} },
+  jumpReveal() { this._closeAll(); try { if (window.DevCeremony) window.DevCeremony.reveal(); } catch (e) {} },
+  jumpStar() { this._closeAll(); try { if (window.DevCeremony) window.DevCeremony.star(); } catch (e) {} },
+  jumpStarSummary() { this._closeAll(); try { if (window.DevCeremony) window.DevCeremony.summary(); } catch (e) {} },
   jumpDay1() {
     this._closeAll(); this._devToHome();
     this._seedStep('day1');

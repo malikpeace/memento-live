@@ -105,6 +105,18 @@ const ClarityPaywall = {
       if (this._open || document.getElementById('clarityPaywall')) return;
       this._open = true;
       opts = opts || {};
+      // Clear any leftover card-evolution cinema state so it can't leak into the
+      // paywall's own card (body.evo2 was scaling + boxing the paywall card when the
+      // cinema was interrupted, Malik v674). Finish a live run, then strip the classes.
+      try {
+        if (typeof _cardEvolutionRunning !== 'undefined' && _cardEvolutionRunning && typeof _evoFinish === 'function') {
+          _evoFinish(document.getElementById('dayCard'), null, {});
+        }
+      } catch (e) {}
+      try {
+        document.body.classList.remove('evo2', 'evo2-surge', 'evo2-orb', 'stage-cinema');
+        window._evoStageOverride = null;
+      } catch (e) {}
       try { if (typeof Analytics !== 'undefined') Analytics.track('paywall_shown'); } catch (e) {} // Funnel
 
       const prof = (state && state.profile) || {};
