@@ -369,7 +369,14 @@ function _injectDemoBar(persona) {
       mk('creator', 'Creator') + mk('founder', 'Founder') + mk('student', 'Student') +
       '<button id="demoExit" class="creator-box__btn creator-box__btn--danger" style="flex:0 0 auto;">Exit demo</button>';
     actions.appendChild(row);
-    row.querySelectorAll('[data-demo]').forEach(b => b.addEventListener('click', () => { location.search = '?demo=' + b.getAttribute('data-demo'); }));
+    // Re-tapping the persona you are ALREADY in must still do something visible:
+    // assigning an identical location.search can read as a silent no-op (Malik
+    // v684, stuck re-tapping Founder), so force a clean reload in that case.
+    row.querySelectorAll('[data-demo]').forEach(b => b.addEventListener('click', () => {
+      const k = b.getAttribute('data-demo');
+      if (new RegExp('[?&]demo=' + k + '(&|$)').test(location.search)) location.reload();
+      else location.search = '?demo=' + k;
+    }));
     const ex = document.getElementById('demoExit');
     if (ex) ex.addEventListener('click', () => { location.href = location.pathname; });
     return true;
@@ -385,6 +392,13 @@ function applyDemoModeIfRequested() {
   const raw = (m[1] || '').toLowerCase();
   const persona = DEMO_PERSONAS[raw] ? raw : 'creator';
   try { state = buildDemoState(persona); } catch (e) { DEMO_MODE = false; return; }
+  // A demo boot is a FRESH look at the persona, always land on the Today home.
+  // recallView() prefers localStorage('memento_view'), which SURVIVES the reload
+  // into ?demo=, so a remembered 'tab:profile' (Malik had just been in Settings)
+  // was force-switching every demo boot onto the You panel 50ms after landing
+  // (v684, his recording). Clear the remembered view before init restores it.
+  try { localStorage.setItem('memento_view', ''); } catch (e) {}
+  try { if (state.ui) state.ui.lastView = null; } catch (e) {}
   try { if (typeof recalculateStreak === 'function') recalculateStreak(); } catch (e) {}
   // Demo opens at a settled state: align the record baseline to the seeded best
   // and drop any one-shot record flag, so the calm "new record" moment only ever
