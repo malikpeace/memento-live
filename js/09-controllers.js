@@ -4497,8 +4497,13 @@ const TabBar = {
           this._hidePanel(panel, p === 'memento' ? () => MementoVisual.destroy() : null);
         }
       });
+      // v694 (Malik): hide the home SYNCHRONOUSLY. The 230ms grace timer served
+      // the removed v671 crossfade; with instant switches (v689) it just left
+      // the home painted beneath the deliberately-transparent panels, which
+      // blended both screens into soup (his settings screenshot). The ambient
+      // (a separate layer) still shows through the panel scrim as designed.
       clearTimeout(this._appHideT);
-      this._appHideT = setTimeout(() => { if (this.activeTab !== 'home') app.style.display = 'none'; }, 230);
+      app.style.display = 'none';
     }
   },
 
