@@ -7783,8 +7783,9 @@ function renderIgnitionV2(summary) {
         <canvas class="nsv2-star__blob" id="nsv2StarBlob" aria-hidden="true"></canvas>
         <div class="nsv2-after">
           <div class="nsv2-after__eyebrow">Your Neutron Star</div>
-          <div class="nsv2-after__goal">${esc(/[.!?]$/.test(String(goal).trim()) ? String(goal).trim() : String(goal).trim() + '.')}</div>
-          <button type="button" class="nsv2-cta" id="nsv2Action">Add to your Memento</button>
+          <div class="nsv2-after__goal">${esc(/[.!?]$/.test(String(goal).trim()) ? String(goal).trim() : String(goal).trim() + '.').replace(/(\d[\d,.]*)/g, '<span class="ns-min__num">$1</span>')}</div>
+          <div class="nsv2-after__divider" aria-hidden="true"></div>
+          <button type="button" class="nsv2-cta" id="nsv2Action"><span>Add to your Memento</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></button>
         </div>
       </div>`;
   }
