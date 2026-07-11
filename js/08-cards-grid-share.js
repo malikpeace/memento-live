@@ -139,22 +139,46 @@ const RENDERERS = {
 
   mori(el) {
     const c = el.querySelector('.widget__content');
-    const yearsEl = c.querySelector('.widget__big-num');
-    const daysEl = c.querySelector('#moriDays');
-    const weeksEl = c.querySelector('#moriWeeks');
-    const reminderEl = c.querySelector('#moriReminder');
+    const numEl = c.querySelector('.widget__big-num');
+    const unitEl = c.querySelector('.widget__big-unit');
     if (state.mori.birthYear) {
       const left = moriYearsRemaining(state.mori.birthYear, state.mori.lifeExpectancy);
-      const daysLeft = Math.round(left * 365.25);
-      yearsEl.textContent = Math.floor(left);
-      if (daysEl) daysEl.textContent = daysLeft.toLocaleString() + ' days';
-      if (weeksEl) weeksEl.textContent = 'Week ' + moriWeeksLived(state.mori.birthYear).toLocaleString() + ' of ' + moriTotalWeeks(state.mori.lifeExpectancy).toLocaleString();
+      numEl.textContent = Math.round(left * 365.25).toLocaleString();
+      if (unitEl) unitEl.textContent = 'days left';
     } else {
-      yearsEl.textContent = '--';
-      if (daysEl) daysEl.textContent = 'Set your birth year';
-      if (weeksEl) weeksEl.textContent = '';
+      numEl.textContent = '--';
+      if (unitEl) unitEl.textContent = 'Set your birth year';
     }
-    if (reminderEl) reminderEl.textContent = state.mori.reminderText || 'Make it count.';
+  },
+
+  photo(el) {
+    try {
+      const face = el.querySelector('#photoTileFace');
+      const inp = el.querySelector('#photoTileInput');
+      if (!face) return;
+      const id = state.prefs && state.prefs.photoTile;
+      if (id && /^idb:/.test(id) && typeof idbGetBlobURL === 'function') {
+        idbGetBlobURL(id.slice(4)).then((url) => {
+          if (url) { face.classList.add('widget__photo--set'); face.style.backgroundImage = 'url(' + url + ')'; face.innerHTML = ''; }
+        }).catch(() => {});
+      }
+      if (inp && !inp._photoBound) {
+        inp._photoBound = true;
+        inp.addEventListener('click', (e) => e.stopPropagation());
+        inp.addEventListener('change', () => {
+          const file = inp.files && inp.files[0];
+          if (!file || typeof vivDownscaleImage !== 'function' || typeof idbStore === 'undefined') return;
+          vivDownscaleImage(file, 900).then(({ dataURL, w, h }) => {
+            idbStore(dataURL, w, h).then((newId) => {
+              state.prefs = state.prefs || {};
+              state.prefs.photoTile = 'idb:' + newId;
+              persistNow();
+              RENDERERS.photo(el);
+            });
+          }).catch(() => {});
+        });
+      }
+    } catch (e) {}
   },
 
   vivere(el) {
@@ -622,6 +646,10 @@ function renderGrid() {
       return;
     }
 
+    // v690 (Malik): retired tiles. The heatmap card IS consistency, and logging
+    // the daily move IS the check-in; their little tiles just repeated that.
+    // History still counts; only the tiles are gone.
+    if (key === 'streak' || key === 'checkin') return;
     // Gate (v23 unlock ladder): locked modules do not render on the dashboard
     // at all; the single next teaser lives in the More space instead. Action is
     // the one exception: visible from day 1 as an inert gate card whose text
@@ -651,9 +679,14 @@ function renderGrid() {
     // element, so we can re-enable resizing later by reinserting the div.
     let inner = `<div class="widget__glow"></div><div class="widget__content">`;
 
-    // Standard top-row for every widget. (The only picture-frame widget,
-    // Personality, was removed, so there is no longer a skip case.)
-    inner += `<div class="widget__top-row"><div class="widget__label-group"><div class="widget__icon" style="color:var(--color-${def.color})">${def.icon}</div><div class="widget__label">${def.label}</div></div><div class="widget__arrow">›</div></div>`;
+    // Standard top-row for every widget. The photo tile is the one exception:
+    // pure image, zero words (v690, Malik).
+    if (key !== 'photo') inner += `<div class="widget__top-row"><div class="widget__label-group"><div class="widget__icon" style="color:var(--color-${def.color})">${def.icon}</div><div class="widget__label">${def.label}</div></div><div class="widget__arrow">›</div></div>`;
+
+    if (key === 'photo') {
+      inner += `<div class="widget__photo" id="photoTileFace"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="3.5"/><circle cx="9" cy="9.2" r="1.7"/><path d="M4.5 17.5l4.6-4.6a1.4 1.4 0 0 1 2 0l6.4 6.4M14.5 15.5l1.9-1.9a1.4 1.4 0 0 1 2 0l2.1 2.1"/></svg></div>`;
+      inner += `<input type="file" id="photoTileInput" accept="image/*" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;" aria-label="Choose a photo" />`;
+    }
 
     switch (key) {
       case 'clarity':
@@ -678,15 +711,13 @@ function renderGrid() {
         inner += `<div class="widget__progress-bar"><div class="widget__progress-fill" style="width:0%"></div></div>`;
         break;
       case 'mori':
-        inner += `<div class="widget__big-num" style="font-size:2rem">--</div>`;
-        inner += `<div class="widget__big-unit">years left</div>`;
-        inner += `<div class="widget__secondary" id="moriDays"></div>`;
-        inner += `<div class="widget__secondary" id="moriWeeks"></div>`;
-        inner += `<div class="widget__secondary" id="moriReminder" style="margin-top:2px;font-style:italic"></div>`;
+        // v690 (Malik): ONE number. The weeks line + reminder were word salad.
+        inner += `<div class="widget__big-num" style="font-size:2rem;font-variant-numeric:tabular-nums">--</div>`;
+        inner += `<div class="widget__big-unit">days left</div>`;
         break;
       case 'vivere':
         // Today's life practice at a glance. Filled by RENDERERS.vivere.
-        inner += `<div class="widget__title" id="vivWidgetCat" style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-vivere);font-weight:700;">Today's practice</div>`;
+        inner += `<div class="widget__title" id="vivWidgetCat" style="font-size:0.72rem;color:var(--text-3);font-weight:600;">Today's practice</div>`;
         inner += `<div class="widget__subtitle" id="vivWidgetPrompt" style="color:var(--text-hi);font-weight:600;font-size:0.98rem;line-height:1.3;margin-top:6px;">Remember what makes life worth it</div>`;
         inner += `<div class="widget__secondary" id="vivWidgetStatus" style="margin-top:8px;color:var(--text-lo);"></div>`;
         break;
@@ -698,7 +729,7 @@ function renderGrid() {
         </div>`;
         break;
       case 'deepwork':
-        inner += `<div class="widget__big-num" style="color:var(--color-deepwork);text-shadow:0 0 15px rgba(255,159,10,0.3)" id="dwWidgetCount">0</div>`;
+        inner += `<div class="widget__big-num" id="dwWidgetCount">0</div>`;
         inner += `<div class="widget__big-unit">sessions</div>`;
         inner += `<div class="widget__secondary" id="dwWidgetTimer"></div>`;
         break;
@@ -707,7 +738,7 @@ function renderGrid() {
         inner += `<div class="widget__subtitle" id="refWidgetSub">Tap to journal your thoughts</div>`;
         break;
       case 'distraction':
-        inner += `<div class="widget__big-num" style="color:var(--color-distraction)">0</div>`;
+        inner += `<div class="widget__big-num">0</div>`;
         inner += `<div class="widget__big-unit">today</div>`;
         break;
       case 'checkin':
@@ -3276,7 +3307,7 @@ function renderCommandCenter() {
           row += '</div>' + _link;
         } else {
           row += '<div style="font-size:0.84rem;color:var(--text-mid);line-height:1.5;margin-bottom:12px;">Break this goal into projects and milestones you can check off.</div>';
-          row += '<button class="cc-proj-open" data-cc-proj style="font:inherit;font-weight:650;font-size:0.8rem;cursor:pointer;border:1px solid ' + C + ';background:transparent;color:' + C + ';border-radius:calc(6px * var(--rx, 1));padding:9px 15px;">Add projects &rarr;</button>';
+          row += '<button class="cc-proj-open" data-cc-proj style="font:inherit;font-weight:650;font-size:0.8rem;cursor:pointer;border:none;background:var(--kfill-08);color:var(--text-hi);border-radius:calc(6px * var(--rx, 1));padding:9px 15px;">Add projects &rarr;</button>';
         }
         row += '</div>';
       }
@@ -3916,6 +3947,11 @@ function renderDailyMemento() {
   try {
     const el = document.getElementById('dailyMemento');
     if (!el) return;
+    // v690 (Malik): the daily quote is OFF the home for now (the Hello header
+    // owns the top of page 2). Deliberately paused, not deleted; he may want
+    // it back, everything below stays intact.
+    el.innerHTML = '';
+    if (true) return;
     // Brand-new users get one element on screen: the welcome hero.
     if (isBrandNewUser()) { el.innerHTML = ''; return; }
     // Pre-Clarity the dashboard stays bare: the daily line earns its place
@@ -5063,8 +5099,35 @@ function renderDashConsistency() {
   } catch (e) {}
 }
 
+// v690 (Malik): page 2 opens like an app, not a feed. Big hello, a search
+// button (Spotlight) and a settings button (You tab). Mobile-only via CSS.
+function renderDashHello() {
+  try {
+    const el = document.getElementById('dashHello');
+    if (!el) return;
+    const name = (state.profile && (state.profile.name || '').trim()) || '';
+    el.innerHTML =
+      '<div class="dhello">' +
+        '<div class="dhello__hi">Hello' + (name ? ', ' + esc(name) : '') + '</div>' +
+        '<div class="dhello__btns">' +
+          '<button type="button" class="dhello__btn" id="dhSearch" aria-label="Search Memento">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>' +
+          '</button>' +
+          '<button type="button" class="dhello__btn" id="dhGear" aria-label="Open settings">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>' +
+          '</button>' +
+        '</div>' +
+      '</div>';
+    const sb = el.querySelector('#dhSearch');
+    if (sb) sb.addEventListener('click', () => { try { if (window.Spotlight && window.Spotlight.open) window.Spotlight.open(); } catch (e) {} });
+    const gb = el.querySelector('#dhGear');
+    if (gb) gb.addEventListener('click', () => { try { if (typeof TabBar !== 'undefined' && TabBar.switchTo) TabBar.switchTo('profile'); } catch (e) {} });
+  } catch (e) {}
+}
+
 function renderAll() {
   renderGreeting();
+  try { renderDashHello(); } catch (e) {}
   try { renderDayCard(); } catch (e) {}
   try { setAtmosphereVars(); } catch (e) {}
   try { renderDashConsistency(); } catch (e) {}

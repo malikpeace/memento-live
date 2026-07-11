@@ -124,6 +124,7 @@ const DEFAULT_STATE = {
     { key: 'clarity', size: 'full' },
     { key: 'action', size: 'full' },
     { key: 'streak', size: 'half' },
+    { key: 'photo', size: 'half' },
     { key: 'mori', size: 'half' },
     { key: 'checkin', size: 'half' },
     { key: 'vivere', size: 'half' },
@@ -672,10 +673,10 @@ function darkenHex(hex, amount) {
 // Default => exact original literal. Custom => the CSS variable so it tracks
 // the active accent theme.
 function ccAccentColor() {
-  try {
-    const a = state && state.prefs && state.prefs.accent;
-    return (a && a !== 'default' && ACCENT_CHOICES.indexOf(a) !== -1) ? 'var(--accent)' : ACCENT_DEFAULT_CC;
-  } catch (e) { return ACCENT_DEFAULT_CC; }
+  // v690 (Malik): colored micro-text is gone app-wide. Every command-center
+  // "accent" text paints neutral now; colour lives only in real data and
+  // visuals (heatmap cells, the card, the star, beams).
+  return 'var(--text-2)';
 }
 
 // === Feel sliders (Settings > Preferences > Feel) ===
@@ -1880,6 +1881,12 @@ function migrateState() {
     const mIdx = state.widgetOrder.findIndex(w => w.key === 'mori');
     state.widgetOrder.splice(mIdx === -1 ? state.widgetOrder.length : mIdx + 1, 0, { key: 'vivere', size: 'half' });
   }
+  // v690 (Malik): the photo tile, one personal image on the dashboard. Sits
+  // beside Memento Mori (where the retired check-in tile used to be).
+  if (Array.isArray(state.widgetOrder) && !state.widgetOrder.find(w => w.key === 'photo')) {
+    const mIdx2 = state.widgetOrder.findIndex(w => w.key === 'mori');
+    state.widgetOrder.splice(mIdx2 === -1 ? state.widgetOrder.length : mIdx2, 0, { key: 'photo', size: 'half' });
+  }
   if (state.introsSeen && state.introsSeen.vivere === undefined) state.introsSeen.vivere = false;
   if (state.meta && state.meta.proofEventsDerivedV1 === undefined) state.meta.proofEventsDerivedV1 = false;
 
@@ -2325,6 +2332,7 @@ const WIDGET_DEFS = {
   vivere:    { label: 'Memento Vivere', color: 'vivere', defaultSize: 'half', icon: ICONS.vivere },
   lifestats: { label: 'Energy', color: 'lifestats', defaultSize: 'half', icon: ICONS.lifestats },
   checkin:   { label: 'Check-in', color: 'lifestats', defaultSize: 'half', icon: ICONS.checkin },
+  photo:     { label: '', color: 'action', defaultSize: 'half', icon: '' },
   deepwork:  { label: 'Deep Work', color: 'deepwork', defaultSize: 'half', icon: ICONS.deepwork },
   reflection:{ label: 'Notes', color: 'reflection', defaultSize: 'half', icon: ICONS.reflection },
   distraction:{ label: 'Friction', color: 'distraction', defaultSize: 'half', icon: ICONS.distraction },
@@ -2808,6 +2816,11 @@ const DragDrop = {
     }
     const key = el.dataset.widget;
     if (!key) return;
+    // The photo tile is not a module: tapping it opens the image picker (v690).
+    if (key === 'photo') {
+      try { const inp = el.querySelector('#photoTileInput'); if (inp) inp.click(); } catch (e) {}
+      return;
+    }
     // Consistent crossfade for every module open: fade the dashboard out while
     // the destination experience/sheet fades in simultaneously.
     const app = document.getElementById('app');

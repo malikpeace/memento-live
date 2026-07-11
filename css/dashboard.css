@@ -337,29 +337,8 @@ body.ns-bloom .widget--clarity {
    consistent across screens. */
 .widget__label,
 .widget__icon { color: rgba(var(--ink), 0.65) !important; }
-.widget--clarity .widget__label   { color: var(--text-hi) !important; }
-.widget--clarity .widget__icon    { color: var(--color-clarity) !important; }
-.widget--action .widget__label,
-.widget--action .widget__icon     { color: var(--color-action) !important; }
-/* --color-action is pure white, invisible on the light-mode widget surface, so
-   the Action label/icon need a theme-aware high-contrast color in light mode. */
-html.theme-light .widget--action .widget__label,
-html.theme-light .widget--action .widget__icon { color: var(--text-hi) !important; }
-.widget--consistency .widget__label,
-.widget--consistency .widget__icon { color: var(--color-consistency) !important; }
-.widget--flow .widget__label,
-.widget--flow .widget__icon       { color: var(--color-flow) !important; }
-.widget--mori .widget__label,
-.widget--mori .widget__icon       { color: var(--color-mori) !important; }
-.widget--vivere .widget__icon     { color: var(--color-vivere) !important; }
-.widget--lifestats .widget__label,
-.widget--lifestats .widget__icon  { color: var(--color-lifestats) !important; }
-.widget--deepwork .widget__label,
-.widget--deepwork .widget__icon   { color: var(--color-deepwork) !important; }
-.widget--reflection .widget__label,
-.widget--reflection .widget__icon { color: var(--color-reflection) !important; }
-.widget--distraction .widget__label,
-.widget--distraction .widget__icon { color: var(--color-distraction) !important; }
+/* v690 (Malik): the per-module colored labels/icons are gone, every module
+   header reads neutral. Colour lives in the data (heatmap cells, card, star). */
 .widget__big-num,
 .widget__progress-text { color: rgba(var(--ink), 0.92) !important; text-shadow: none !important; }
 .dash-card__eyebrow { color: rgba(var(--ink), 0.72) !important; }
@@ -378,7 +357,8 @@ html.theme-light .widget--action .widget__icon { color: var(--text-hi) !importan
    ::before adds a soft directional gradient like lit glass. */
 .widget {
   background: var(--glass-bg) !important;
-  border-color: var(--glass-border) !important;
+  /* v690 (Malik): no thin borders on modules, fill + inset highlight only. */
+  border: none !important;
   box-shadow: var(--glass-shadow), var(--glass-highlight) !important;
 }
 .widget::before {
@@ -394,7 +374,7 @@ html.theme-light .widget--action .widget__icon { color: var(--text-hi) !importan
 }
 .widget:hover {
   background: var(--glass-bg-hover) !important;
-  border-color: var(--glass-border-hover) !important;
+  border: none !important;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5) !important;
 }
 /* Keyboard focus ring: the tiles are role="button" tabindex="0" and are the
@@ -2616,10 +2596,10 @@ html.lowfx .cc-hero-body .ctraj { animation: none !important; }
   height: 100%;
 }
 .widget__label {
-  font-size: 0.625rem; font-weight: 700;
-  letter-spacing: 0.12em; text-transform: uppercase;
+  /* v690 (Malik): sentence case, no tracked-caps kicker. Quiet and Apple. */
+  font-size: 0.78rem; font-weight: 600;
+  letter-spacing: 0; text-transform: none;
 }
-.widget--clarity .widget__label { color: var(--text-hi); }
 /* New "Option A" Clarity widget: mini glowing star + anchor word + CTA */
 .widget--clarity__hero {
   display: flex;
@@ -2984,8 +2964,9 @@ body:not(.ns-bloom) .app.dash-v2 #dashGreetingMobile { display: none; }
 #dashConsistency:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .dash-cgram__head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; }
 .dash-cgram__label {
-  font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--color-consistency); font-weight: 700;
+  /* v690 (Malik): neutral, sentence-shaped label; the green lives in the cells. */
+  font-size: 0.78rem; letter-spacing: 0;  text-transform: none;
+  color: var(--text-3); font-weight: 600;
 }
 .dash-cgram__meta { font-size: 0.85rem; color: var(--text-2); }
 /* The streak number is the loud, glanceable figure now that the redundant
@@ -3776,3 +3757,34 @@ body.card-evolving.card-evolve-go .daycard-wrap__aura { opacity: 1; transition: 
 @media (prefers-reduced-motion: reduce) {
   #commandCenter.cc-newday { animation: none; }
 }
+
+
+/* ── v690 (Malik): page-2 Hello header, clean and Apple ────────────────────── */
+#dashHello { display: none; }
+@media (max-width: 859.98px) {
+  #dashHello { display: block; }
+  .dhello { display: flex; align-items: center; justify-content: space-between; padding: 6px 2px 16px; }
+  .dhello__hi { font-size: 1.7rem; font-weight: 800; letter-spacing: -0.02em; color: var(--text-hi); }
+  .dhello__btns { display: flex; gap: 10px; }
+  .dhello__btn {
+    width: 40px; height: 40px; border-radius: 50%;
+    border: none; cursor: pointer; color: var(--text-hi);
+    background: var(--kfill-08);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    display: flex; align-items: center; justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .dhello__btn:active { opacity: 0.6; }
+  .dhello__btn svg { width: 18px; height: 18px; }
+}
+
+/* ── v690 (Malik): the photo tile, one personal image, zero words ──────────── */
+.widget[data-widget="photo"] .widget__content { padding: 0 !important; position: static; }
+.widget[data-widget="photo"] .widget__photo {
+  position: absolute; inset: 0; border-radius: inherit; overflow: hidden;
+  background-size: cover; background-position: center;
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(var(--ink), 0.22);
+}
+.widget[data-widget="photo"] .widget__photo svg { width: 26px; height: 26px; }
+.widget[data-widget="photo"] .widget__photo.widget__photo--set svg { display: none; }
