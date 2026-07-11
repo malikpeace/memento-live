@@ -144,14 +144,14 @@ html.theme-light .tab-bar__do-check { color: rgba(22, 140, 82, 0.95); }
   overflow-y: auto; overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
   opacity: 0; pointer-events: none;
-  transition: opacity 0.18s var(--ease-out);
 }
 /* SHOW = a keyframe animation, not a timer-gated transition: it fires the
    instant .is-shown is added (no start-frame or rAF needed), so a throttled
    timer can never strand a panel invisible. HIDE just removes .is-shown and
    the base transition fades opacity 1 -> 0, then a timer adds .hidden. */
-@keyframes tabPanelIn { from { opacity: 0; } to { opacity: 1; } }
-.tab-panel.is-shown { opacity: 1; pointer-events: auto; animation: tabPanelIn 0.18s var(--ease-out); }
+/* v689 (Malik): tab switches are INSTANT, like a native iOS tab bar. The v671
+   crossfade read as "trying to be pretty instead of functional" on-device. */
+.tab-panel.is-shown { opacity: 1; pointer-events: auto; }
 .tab-panel.hidden { display: none; }
 @media (prefers-reduced-motion: reduce) {
   .tab-panel { transition: none; }

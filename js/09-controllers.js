@@ -4407,7 +4407,12 @@ const TabBar = {
       return;
     }
     // Path / Reflect are paid surfaces; free taps open the paywall.
-    if ((tabId === 'path' || tabId === 'reflect') && !this._unlocked()) {
+    // The Path tab was removed from the bar (v689): with no goal-metric data it
+    // was consistency re-skinned. Any stale reference (old tab:path restore,
+    // deep link) lands Home. The panel + renderer stay dormant for a future
+    // Progress tab built on a real measured goal metric.
+    if (tabId === 'path') tabId = 'home';
+    if (tabId === 'reflect' && !this._unlocked()) {
       try { if (typeof ClarityPaywall !== 'undefined' && ClarityPaywall.show) ClarityPaywall.show(); } catch (e) {}
       return;
     }
