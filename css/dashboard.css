@@ -3811,46 +3811,11 @@ html.theme-light .ambient__rays { display: none !important; }
 }
 
 
-/* ── v696 (Malik): the Banner, the card's pinned identity once it scrolls away ── */
-#cardBanner {
-  display: none;
-  position: fixed;
-  top: calc(var(--safe-t, 0px) + 8px);
-  left: 14px; right: 14px; height: 88px;
-  border-radius: 18px;
-  z-index: 45;
-  opacity: 0; transform: translateY(-10px);
-  pointer-events: none;
-  cursor: pointer;
-  overflow: hidden;
-  background:
-    radial-gradient(120% 160% at 18% 0%, rgba(150, 116, 255, 0.55) 0%, rgba(110, 88, 220, 0.18) 46%, transparent 75%),
-    linear-gradient(165deg, rgba(30, 26, 48, 0.97) 0%, rgba(14, 13, 21, 0.97) 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 14px 40px rgba(0, 0, 0, 0.55);
-  contain: paint;
-}
-html.theme-light #cardBanner {
-  background:
-    radial-gradient(120% 160% at 18% 0%, rgba(150, 116, 255, 0.40) 0%, rgba(150, 130, 235, 0.12) 46%, transparent 75%),
-    linear-gradient(165deg, rgba(248, 247, 252, 0.97) 0%, rgba(230, 230, 240, 0.97) 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 14px 40px rgba(40, 40, 80, 0.22);
-}
-@media (max-width: 767.98px) {
-  body.ns-bloom:not(.has-custom-layout) #cardBanner { display: flex; align-items: center; justify-content: space-between; padding: 0 18px; }
-}
-/* Never over panels, overlays, or the unlock cinema. */
-body:has(.tab-panel.is-shown) #cardBanner,
-body:has(.action-exp.open) #cardBanner,
-body:has(.clarity-exp.open) #cardBanner,
-body:has(.sheet.open) #cardBanner,
-body.evo2 #cardBanner,
-body.home-locked #cardBanner { display: none !important; }
-.cbn__left b { display: block; font-size: 15px; font-weight: 750; color: var(--text-hi); letter-spacing: -0.01em; }
-.cbn__left span { font-size: 11px; color: var(--text-2); font-variant-numeric: tabular-nums; }
-.cbn__right { text-align: right; }
-.cbn__right b { display: block; font-size: 15px; font-weight: 750; color: var(--text-hi); font-variant-numeric: tabular-nums; }
-.cbn__right span { font-size: 11px; color: var(--text-2); }
-/* The card itself condenses slightly as it leaves, compositor-only. */
+/* v697 (Malik): the Hero shrink. The REAL card scales down as you scroll (the
+   container's height hands its space to the content below), then scrolls away
+   like any element. Driven by HeroShrink in js/09; transform-origin here so the
+   card shrinks from its top edge. */
 @media (max-width: 767.98px) {
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-wrap { transform-origin: top center; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard { overflow: visible; }
 }
