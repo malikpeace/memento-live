@@ -5820,6 +5820,9 @@ const HeroShrink = {
   card: null, wrap: null, _raf: 0, _full: 0, _min: 0,
 
   init() {
+    // v698: where CSS scroll-driven animations exist, the shrink runs on the
+    // compositor (css/dashboard.css) and this JS fallback stays out of the way.
+    try { if (CSS.supports('animation-timeline: scroll()')) return; } catch (e) {}
     window.addEventListener('scroll', () => this._queue(), { passive: true });
     window.addEventListener('resize', () => { this._full = 0; this._queue(); });
     this._queue();

@@ -3811,11 +3811,33 @@ html.theme-light .ambient__rays { display: none !important; }
 }
 
 
-/* v697 (Malik): the Hero shrink. The REAL card scales down as you scroll (the
-   container's height hands its space to the content below), then scrolls away
-   like any element. Driven by HeroShrink in js/09; transform-origin here so the
-   card shrinks from its top edge. */
+/* v697/v698 (Malik): the Hero shrink. The REAL card scales down as you scroll
+   (the container's height hands its space to the content below), then scrolls
+   away like any element. v698: driven by CSS scroll-driven animations where
+   supported, the browser samples them in lockstep with the scroll offset, so a
+   fast flick can never outrun the shrink (his complaint with the JS path,
+   which only hears about scroll after the compositor already moved). HeroShrink
+   in js/09 stays as the fallback for older engines. The card's flow height is
+   LOCKED at 452px by design (v245), so the fixed keyframe endpoints hold on
+   every phone. */
 @media (max-width: 767.98px) {
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-wrap { transform-origin: top center; }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard { overflow: visible; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard { overflow: visible; justify-content: flex-start !important; }
+
+  @supports (animation-timeline: scroll()) {
+    /* :not(.evo2): the unlock cinema owns the wrap transform; a scroll-driven
+       animation would override the grow classes, so it detaches entirely. */
+    body.ns-bloom:not(.has-custom-layout):not(.evo2) .app.dash-v2 #dayCard {
+      animation: heroCardHeight linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0px 224px;
+    }
+    body.ns-bloom:not(.has-custom-layout):not(.evo2) .app.dash-v2 #dayCard .daycard-wrap {
+      animation: heroCardScale linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0px 224px;
+    }
+  }
 }
+@keyframes heroCardHeight { from { height: 466px; } to { height: 242px; } }
+@keyframes heroCardScale  { from { transform: scale(1); } to { transform: scale(0.5193); } }
