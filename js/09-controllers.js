@@ -5807,6 +5807,107 @@ function restoreLastView() {
 }
 
 /* ============================================
+   HOME BANNER (v696, Malik) — the Banner home.
+   One continuous scroll: the card starts near full screen; as it scrolls
+   away it condenses slightly (compositor-only transform) and this pinned
+   banner crossfades in, carrying the card's identity (greeting, day count,
+   date). Tapping the banner glides back to the top. Mobile + post-star only;
+   panels/overlays/cinema hide it via CSS.
+   ============================================ */
+const HomeBanner = {
+  el: null, _raf: 0, _range: 320, _wrap: null,
+
+  init() {
+    this.el = document.getElementById('cardBanner');
+    if (!this.el) return;
+    this._measure();
+    window.addEventListener('scroll', () => this._queue(), { passive: true });
+    window.addEventListener('resize', () => { this._measure(); this._queue(); });
+    this.el.addEventListener('click', () => {
+      try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, 0); }
+    });
+    this.el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.el.click(); } });
+    this.refresh();
+    this._queue();
+  },
+
+  _active() {
+    try {
+      return window.matchMedia('(max-width: 767.98px)').matches &&
+        document.body.classList.contains('ns-bloom') &&
+        !document.body.classList.contains('has-custom-layout') &&
+        !document.body.classList.contains('home-locked');
+    } catch (e) { return false; }
+  },
+
+  _measure() {
+    try {
+      const card = document.getElementById('dayCard');
+      if (!card) return;
+      // Collapse completes as the card's bottom clears the top of the screen.
+      this._range = Math.max(240, card.offsetTop + card.offsetHeight - 90);
+      this._wrap = card.querySelector('.daycard-wrap');
+    } catch (e) {}
+  },
+
+  // Fill the banner's identity: time greeting, day of the climb, the date.
+  refresh() {
+    try {
+      if (!this.el) return;
+      const h = new Date().getHours();
+      const greet = h < 12 ? 'Good morning' : (h < 18 ? 'Good afternoon' : 'Good evening');
+      const g = document.getElementById('cbnGreet'); if (g) g.textContent = greet;
+      const dEl = document.getElementById('cbnDay');
+      if (dEl) {
+        let t = '';
+        try {
+          if (state.clarity && state.clarity.ignitedAt) {
+            const d = Math.max(1, Math.floor((Date.now() - state.clarity.ignitedAt) / 86400000) + 1);
+            t = 'Day ' + d;
+          }
+        } catch (e) {}
+        dEl.textContent = t;
+      }
+      const now = new Date();
+      const dt = document.getElementById('cbnDate');
+      if (dt) dt.textContent = now.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+      const dw = document.getElementById('cbnDow');
+      if (dw) dw.textContent = now.toLocaleDateString(undefined, { weekday: 'long' });
+    } catch (e) {}
+  },
+
+  _queue() {
+    if (this._raf) return;
+    this._raf = requestAnimationFrame(() => { this._raf = 0; this._tick(); });
+  },
+
+  _tick() {
+    if (!this.el) return;
+    if (!this._active()) { this.el.style.opacity = '0'; this.el.style.pointerEvents = 'none'; return; }
+    // The card renders after boot AND re-renders replace its DOM: re-measure
+    // whenever the cached wrap is missing or detached (a stale node silently
+    // eats the styles, the same class of bug as the vanishing cheat bar).
+    if (!this._wrap || !this._wrap.isConnected) this._measure();
+    const y = window.scrollY || document.documentElement.scrollTop || 0;
+    const p = Math.max(0, Math.min(1, y / this._range));
+    // The card condenses a touch as it leaves (compositor-only).
+    if (this._wrap && !document.body.classList.contains('evo2')) {
+      this._wrap.style.transform = p > 0 ? ('scale(' + (1 - p * 0.06).toFixed(4) + ')') : '';
+      this._wrap.style.opacity = p > 0 ? String(1 - p * 0.35) : '';
+    }
+    // The banner crossfades in over the last stretch of the collapse.
+    const bp = Math.max(0, Math.min(1, (p - 0.72) / 0.24));
+    this.el.style.opacity = String(bp);
+    this.el.style.transform = 'translateY(' + ((1 - bp) * -10).toFixed(1) + 'px)';
+    this.el.style.pointerEvents = bp > 0.9 ? 'auto' : 'none';
+  }
+};
+try {
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => HomeBanner.init());
+  else HomeBanner.init();
+} catch (e) {}
+
+/* ============================================
    PARALLAX CONTROLLER
    ============================================ */
 const Parallax = {
