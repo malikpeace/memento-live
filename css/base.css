@@ -1100,3 +1100,12 @@ body.density-compact { --card-pad: 10px; }
 html:has(body.density-compact) { font-size: 14px; }
 body.density-compact .pref-row { padding-top: 8px; padding-bottom: 8px; }
 body.density-compact .sheet__body { line-height: 1.45; }
+
+/* ── Mobile native feel (v688, Malik) ─────────────────────────────────────────
+   No rendered scrollbars on the mobile path: a visible bar reads "web page",
+   not app. html.lowfx is stamped at first paint on phones/tablets. */
+html.lowfx * { scrollbar-width: none; }
+html.lowfx *::-webkit-scrollbar { width: 0; height: 0; display: none; }
+/* Settings is a quiet room: the top-left god-ray beams stay on the home and do
+   not shine over the You panel (v688, Malik: distracting behind settings). */
+body:has(#panelProfile.is-shown) .ambient__rays { opacity: 0 !important; }
