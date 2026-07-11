@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <script>
 /* Single source of truth for the app version. Surfaced in Settings > About. */
-window.MEMENTO_VERSION = 'v685';
+window.MEMENTO_VERSION = 'v686';
 /* LOWFX: touch / mobile devices get a lighter render path (no backdrop blur,
    no will-change layers, no background canvas animations) so iOS does not kill
    the tab from graphics-memory pressure. Desktop (fine pointer) is untouched.
@@ -36,25 +36,38 @@ window.MEMENTO_VERSION = 'v685';
 <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="manifest" href="manifest.json">
+<!-- Native iOS launch images (v686): the system shows the official mark the
+     instant the icon is tapped, before ANY code runs; the in-app boot mask then
+     continues the identical visual. Re-add the app to the home screen to bake
+     these in (iOS reads them at add time). -->
+<link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="icons/splash/splash-828x1792.png">
+<link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash/splash-1125x2436.png">
+<link rel="apple-touch-startup-image" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash/splash-1170x2532.png">
+<link rel="apple-touch-startup-image" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash/splash-1179x2556.png">
+<link rel="apple-touch-startup-image" media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash/splash-1206x2622.png">
+<link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash/splash-1242x2688.png">
+<link rel="apple-touch-startup-image" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash/splash-1284x2778.png">
+<link rel="apple-touch-startup-image" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash/splash-1290x2796.png">
+<link rel="apple-touch-startup-image" media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="icons/splash/splash-1320x2868.png">
 <!-- Fonts are self-hosted (fonts/, downloaded from Google Fonts) so first
      paint never waits on a third-party CDN. font-display: swap throughout. -->
 <link rel="preload" href="fonts/dmsans-1.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="fonts/fonts.css">
-<link rel="stylesheet" href="css/base.css?v=v685">
-<link rel="stylesheet" href="css/sidebar.css?v=v685">
-<link rel="stylesheet" href="css/dashboard.css?v=v685">
-<link rel="stylesheet" href="css/misc.css?v=v685">
-<link rel="stylesheet" href="css/vivere.css?v=v685">
-<link rel="stylesheet" href="css/notes.css?v=v685">
-<link rel="stylesheet" href="css/onboarding.css?v=v685">
-<link rel="stylesheet" href="css/clarity.css?v=v685">
-<link rel="stylesheet" href="css/action.css?v=v685">
-<link rel="stylesheet" href="css/daycard-living.css?v=v685">
-<link rel="stylesheet" href="css/share-card.css?v=v685">
-<link rel="stylesheet" href="css/clarity-paywall.css?v=v685">
-<link rel="stylesheet" href="css/appearance-picker.css?v=v685">
-<link rel="stylesheet" href="css/journey.css?v=v685">
-<link rel="stylesheet" href="css/install.css?v=v685">
+<link rel="stylesheet" href="css/base.css?v=v686">
+<link rel="stylesheet" href="css/sidebar.css?v=v686">
+<link rel="stylesheet" href="css/dashboard.css?v=v686">
+<link rel="stylesheet" href="css/misc.css?v=v686">
+<link rel="stylesheet" href="css/vivere.css?v=v686">
+<link rel="stylesheet" href="css/notes.css?v=v686">
+<link rel="stylesheet" href="css/onboarding.css?v=v686">
+<link rel="stylesheet" href="css/clarity.css?v=v686">
+<link rel="stylesheet" href="css/action.css?v=v686">
+<link rel="stylesheet" href="css/daycard-living.css?v=v686">
+<link rel="stylesheet" href="css/share-card.css?v=v686">
+<link rel="stylesheet" href="css/clarity-paywall.css?v=v686">
+<link rel="stylesheet" href="css/appearance-picker.css?v=v686">
+<link rel="stylesheet" href="css/journey.css?v=v686">
+<link rel="stylesheet" href="css/install.css?v=v686">
 </head>
 <body>
 
@@ -69,12 +82,10 @@ window.MEMENTO_VERSION = 'v685';
      dashboard god rays on every refresh when restoring a deeper view. The
      reveal class .boot-revealed is added by JS at the end of the init block. -->
 <div id="bootMask" aria-hidden="true">
-  <!-- The OFFICIAL outline mark (matches icons/icon.svg + the header lockup):
-       white outline square + notch on the black mask, no tile. -->
-  <svg class="bootmask__mark" width="64" height="64" viewBox="64 64 384 384" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect x="85.5" y="85.5" width="341" height="341" rx="23.5" stroke="#f5f5f7" stroke-width="27"/>
-    <path d="M99 99 H413 L256 230.5 Z" fill="#f5f5f7"/>
-  </svg>
+  <!-- The OFFICIAL icon itself (v686): the exact home-screen icon file, so the
+       launch mark can never look hand-stitched. Its near-black tile matches the
+       mask background, so only the mark reads. Precached by the SW. -->
+  <img class="bootmask__mark" src="icons/icon-512.png" width="96" height="96" alt="" aria-hidden="true">
 </div>
 
 <!-- Ambient Background -->
@@ -621,7 +632,7 @@ window.MEMENTO_VERSION = 'v685';
 
 <!-- Tab Bar: Today / Path / Do / Reflect / You (BOTTOM-BAR-PLAN.md).
      Icons + labels with a soft glass capsule that slides behind the active
-     destination (Malik's 1+2+3 blend, v685). No raised button. Appears only
+     destination (Malik's 1+2+3 blend, v686). No raised button. Appears only
      after the star is ignited; free users see it as a preview whose locked
      tabs open the paywall. -->
 <nav class="tab-bar hidden" id="tabBar" aria-label="Main navigation">
@@ -758,31 +769,31 @@ window.MEMENTO_VERSION = 'v685';
 <!-- Supabase client for OPTIONAL cloud accounts + sync (js/12-cloud-sync.js).
      If this CDN tag fails to load, the app runs fully local, unchanged. -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
-<script src="js/01-state-foundation.js?v=v685"></script>
-<script src="js/02-clarity-experience.js?v=v685"></script>
-<script src="js/03-ai-integration.js?v=v685"></script>
-<script src="js/04-templates-proof.js?v=v685"></script>
-<script src="js/05-vivere.js?v=v685"></script>
-<script src="js/06-consistency-mori.js?v=v685"></script>
-<script src="js/07-sheet-templates.js?v=v685"></script>
-<script src="js/08-cards-grid-share.js?v=v685"></script>
-<script src="js/09-controllers.js?v=v685"></script>
-<script src="js/10-demo-backend.js?v=v685"></script>
+<script src="js/01-state-foundation.js?v=v686"></script>
+<script src="js/02-clarity-experience.js?v=v686"></script>
+<script src="js/03-ai-integration.js?v=v686"></script>
+<script src="js/04-templates-proof.js?v=v686"></script>
+<script src="js/05-vivere.js?v=v686"></script>
+<script src="js/06-consistency-mori.js?v=v686"></script>
+<script src="js/07-sheet-templates.js?v=v686"></script>
+<script src="js/08-cards-grid-share.js?v=v686"></script>
+<script src="js/09-controllers.js?v=v686"></script>
+<script src="js/10-demo-backend.js?v=v686"></script>
 <!-- The Path + Your Story: the journey views. Client-side, read existing state. -->
-<script src="js/17-journey.js?v=v685"></script>
+<script src="js/17-journey.js?v=v686"></script>
 <!-- Add to Home Screen prompt: detects browser-tab vs installed PWA. -->
-<script src="js/18-install.js?v=v685"></script>
-<script src="js/20-push.js?v=v685"></script>
-<script src="js/11-init.js?v=v685"></script>
-<script src="js/12-cloud-sync.js?v=v685"></script>
-<script src="js/13-clarity-paywall.js?v=v685"></script>
-<script src="js/14-appearance-picker.js?v=v685"></script>
+<script src="js/18-install.js?v=v686"></script>
+<script src="js/20-push.js?v=v686"></script>
+<script src="js/11-init.js?v=v686"></script>
+<script src="js/12-cloud-sync.js?v=v686"></script>
+<script src="js/13-clarity-paywall.js?v=v686"></script>
+<script src="js/14-appearance-picker.js?v=v686"></script>
 <!-- DEV-ONLY: ?dev=beats live preview for the onboarding chapter pages. Inert without the param. -->
-<script src="js/19-dev-beats.js?v=v685"></script>
+<script src="js/19-dev-beats.js?v=v686"></script>
 <!-- The sound engine: synthesized moments, off by default (Profile toggle). -->
-<script src="js/20-sound.js?v=v685"></script>
+<script src="js/20-sound.js?v=v686"></script>
 <!-- Back/forward + hash-URL routing. Loads LAST so every open/close fn it wraps
      already exists. Inert until onboarding is done; touches only location.hash. -->
-<script src="js/15-router.js?v=v685"></script>
+<script src="js/15-router.js?v=v686"></script>
 </body>
 </html>

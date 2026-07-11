@@ -1038,21 +1038,24 @@ body::after {
   position: fixed;
   top: 0; left: 0; right: 0;
   height: 100vh; height: 100lvh;
-  background: #000;
+  /* Identity near-black, EXACTLY the icon tile + the native startup images
+     (v686): the iOS launch image, this mask, and the icon PNG's square tile
+     all share #0a0a0e, so launch -> boot -> app is one seamless surface. */
+  background: #0a0a0e;
   z-index: 999999;
   pointer-events: none;
   /* Native launch-screen behavior (Malik): the mask is fully there, then it
      is gone, a single-frame cut, exactly like an iOS launch screen handing
      off to the app's first frame. No fade, no scale, no transition. */
 }
-/* The brand mark on the boot mask: a native-style launch moment instead of a
-   blank black frame. Inline SVG paints on the first frame, perfectly still,
-   the way a real launch screen is. */
+/* The brand mark on the boot mask: the OFFICIAL icon file itself (v686), so it
+   is pixel-identical to the home-screen icon + the native startup image, and a
+   launch can never look hand-stitched. Perfectly still, like a real launch. */
 #bootMask { display: flex; align-items: center; justify-content: center; }
 body.boot-revealed #bootMask { display: none; }
 .bootmask__mark {
   display: block;
-  border-radius: var(--r-card);
+  width: 96px; height: 96px;
 }
 
 

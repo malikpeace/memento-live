@@ -111,12 +111,22 @@
 
   // --- reconcile the URL to whatever screen is actually on top ----------------
   //     Called (debounced through the handoff window) after any wrapped action.
+  // Bottom-bar tabs are SIBLINGS, not a stack (Malik v686): switching tabs must
+  // never create a history entry, or the iOS edge swipe "goes back" through old
+  // tabs from the Home page. Tab -> tab is a REPLACE; only genuinely deeper
+  // screens (modules, experiences, paywall) push and get back-to-close.
+  var TAB_SLUGS = { home: 1, path: 1, reflect: 1, profile: 1, memento: 1 };
+
   function reconcile() {
     if (!routerEnabled() || R.navLock) return;
     ensureSeeded();
     var now = currentTopSlug();
     var top = topFrame();
     if (now === top) return;                       // no change / collapse-repeat
+    if (TAB_SLUGS[now] && TAB_SLUGS[top]) {        // lateral tab hop: no history
+      replaceSlug(now);
+      return;
+    }
     var below = R.frames.length >= 2 ? R.frames[R.frames.length - 2] : 'home';
     if (now === below) {
       // screen got shallower and matches the frame beneath -> it's a BACK step
