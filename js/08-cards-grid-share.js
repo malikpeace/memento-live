@@ -5153,6 +5153,9 @@ function renderAll() {
   // Keep the desktop sidebar's live blocks (today's action, streak, greeting)
   // in sync with state. No-op on mobile since Sidebar.el is null there.
   if (typeof Sidebar !== 'undefined' && Sidebar.refresh) Sidebar.refresh();
+  // Renders change page-1's height (next-step vs today's action states), so
+  // the below-the-fold gap re-computes with them (v699).
+  try { if (typeof HeroShrink !== 'undefined' && HeroShrink.layoutGap) HeroShrink.layoutGap(); } catch (e) {}
 }
 
 /* ============================================================

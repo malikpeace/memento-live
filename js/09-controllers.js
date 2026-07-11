@@ -5820,12 +5820,34 @@ const HeroShrink = {
   card: null, wrap: null, _raf: 0, _full: 0, _min: 0,
 
   init() {
+    // v699 (Malik): at rest, NOTHING of the modules section may peek into the
+    // first screen. Page-1 content is shorter than tall viewports (Pro Max),
+    // so the gap is computed per device, always runs, both shrink paths.
+    this.layoutGap();
+    window.addEventListener('resize', () => this.layoutGap());
+    window.addEventListener('pageshow', () => this.layoutGap());
     // v698: where CSS scroll-driven animations exist, the shrink runs on the
     // compositor (css/dashboard.css) and this JS fallback stays out of the way.
     try { if (CSS.supports('animation-timeline: scroll()')) return; } catch (e) {}
     window.addEventListener('scroll', () => this._queue(), { passive: true });
     window.addEventListener('resize', () => { this._full = 0; this._queue(); });
     this._queue();
+  },
+
+  // Push #dashBelow's top just past the fold: Hello + the modules are what you
+  // scroll INTO, never something that leaks into the resting first screen.
+  layoutGap() {
+    try {
+      if (!this._active()) return;
+      const below = document.getElementById('dashBelow');
+      if (!below) return;
+      // The stylesheet's margin-top carries !important, so the override must too.
+      below.style.setProperty('margin-top', '36px', 'important');
+      const wasY = window.scrollY;
+      const top = below.getBoundingClientRect().top + wasY;
+      const need = (window.innerHeight + 28) - top;
+      if (need > 0) below.style.setProperty('margin-top', (36 + Math.ceil(need)) + 'px', 'important');
+    } catch (e) {}
   },
 
   _active() {
