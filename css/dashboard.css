@@ -76,27 +76,27 @@ body:has(.action-exp.open) .action-plan__rays .ambient__rays-beam-shaft {
   position: absolute; inset: 0;
   opacity: 0; pointer-events: none;
   transition: opacity 2.4s cubic-bezier(0.4, 0, 0.2, 1);
+  /* v687 (Malik): the sky is DARK + beams now, not purple + beams. The page
+     stays near-black for contrast; the beams (.ambient__rays, untouched) carry
+     the light. The top-left glare survives, tighter and dimmer, purely as the
+     beams' source halo; the bottom wash + middle bloom are cut to a whisper. */
   background:
-    /* Main light source: bright glare exploding from the top-left corner. */
-    radial-gradient(1750px 1400px at 7% 0%,
-      rgba(180, 205, 255, 0.72) 0%,
-      rgba(135, 165, 255, 0.44) 18%,
-      rgba(90, 122, 225, 0.24) 38%,
-      rgba(55, 80, 180, 0.10) 58%,
-      rgba(35, 50, 120, 0.03) 74%,
-      transparent 86%),
-    /* Ambient purple wash rising from the bottom, so the lower modules have
-       something to reveal behind their transparent black. */
+    /* The beams' source halo: tight, dim, top-left only. */
+    radial-gradient(1300px 1000px at 7% 0%,
+      rgba(180, 205, 255, 0.38) 0%,
+      rgba(135, 165, 255, 0.20) 18%,
+      rgba(90, 122, 225, 0.09) 38%,
+      rgba(55, 80, 180, 0.03) 58%,
+      transparent 76%),
+    /* A whisper of purple at the very bottom so pure black never reads flat. */
     radial-gradient(1300px 900px at 72% 112%,
-      rgba(150, 92, 240, 0.24) 0%,
-      rgba(120, 74, 220, 0.12) 28%,
-      rgba(82, 52, 170, 0.04) 52%,
-      transparent 72%),
-    /* Soft violet bloom through the middle to tie the two together. */
+      rgba(150, 92, 240, 0.08) 0%,
+      rgba(120, 74, 220, 0.035) 28%,
+      transparent 58%),
+    /* The middle stays dark: contrast IS the identity. */
     radial-gradient(1000px 800px at 52% 56%,
-      rgba(124, 88, 220, 0.10) 0%,
-      rgba(96, 72, 190, 0.045) 36%,
-      transparent 70%);
+      rgba(124, 88, 220, 0.03) 0%,
+      transparent 55%);
 }
 body.ns-bloom .ambient__ns-bloom { opacity: 1; }
 
