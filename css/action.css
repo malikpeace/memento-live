@@ -3452,6 +3452,13 @@ html.theme-light .action-exp:has(.action-draft-loading--cine) .action-exp__bg::b
 html.theme-light .action-exp:has(.action-cine-reveal) .action-exp__bg::before {
   background: none !important;
 }
+/* ...and the bottom nav's light fade strip (Malik caught it on-device, v692):
+   in light mode the nav fades to the off-white surface, which painted a light
+   band along the ceremony's bottom edge. Dark ceremony = no light layer, period. */
+html.theme-light .action-exp:has(.action-draft-loading--cine) .action-exp__nav,
+html.theme-light .action-exp:has(.action-cine-reveal) .action-exp__nav {
+  background: none !important;
+}
 html.theme-light .action-exp:has(.action-draft-loading--cine) .action-cine__thinking i {
   background: #fff; box-shadow: 0 0 18px rgba(255, 255, 255, 0.7);
 }
