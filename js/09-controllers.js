@@ -4588,6 +4588,10 @@ const TabBar = {
   // default (today's) selection highlighted.
   renderPreferencesSection() {
     const prefs = (state && state.prefs) || {};
+    // v695 (Malik): color customization is a PAID feature. Free users see the
+    // swatches dimmed; tapping raises the paywall (also listed there).
+    let _colorLocked = false;
+    try { _colorLocked = (typeof ClarityPaywall !== 'undefined') && ClarityPaywall.isLockedByPaywall('action'); } catch (e) {}
     const accent = ACCENT_CHOICES.indexOf(prefs.accent) !== -1 ? prefs.accent : 'default';
     const reduceMotion = !!prefs.reduceMotion;
     const compact = prefs.density === 'compact';
@@ -4685,8 +4689,8 @@ const TabBar = {
         toggleRow('prefFlatUi', 'Glass', 'Glassy, blurred surfaces with depth. Turn off for a flat, high-contrast matte look.', !prefs.flatUi) +
         toggleRow('prefSound', 'Sound', 'Quiet synthesized moments: the typewriter, marking a move done, the card coming alive.', prefs.soundOn !== false) +
         toggleRow('prefFlatBg', 'Minimal background', 'Hide the ambient orbs and glow for a flat, paper-like surface.', !!prefs.flatBg) +
-        '<div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); margin: 18px 0 10px;">Color</div>' +
-        '<div class="pref-swatches" id="prefAccent">' + swatchHtml + '</div>' +
+        '<div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); margin: 18px 0 10px;">Color' + (_colorLocked ? ' <span style="text-transform:none;letter-spacing:0;color:var(--text-lo);font-weight:600;">&middot; unlocks with Memento</span>' : '') + '</div>' +
+        '<div class="pref-swatches' + (_colorLocked ? ' pref-swatches--locked' : '') + '" id="prefAccent">' + swatchHtml + '</div>' +
         '<input type="color" id="prefAccentCustomInput" value="' + customHex + '" aria-label="Pick a custom accent color" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;" />' +
         toggleRow('prefMatchMemento', 'Match Memento to color theme', 'Tints your Memento card toward the accent you pick. Off keeps the card its own colors.', prefs.matchMemento !== false) +
         '<div style="height:14px;"></div>' +
@@ -4776,6 +4780,10 @@ const TabBar = {
     if (accentWrap) {
       accentWrap.querySelectorAll('.pref-swatch').forEach(btn => {
         btn.addEventListener('click', () => {
+          // Paid feature: free users get the paywall, not the palette (v695).
+          try {
+            if (typeof ClarityPaywall !== 'undefined' && ClarityPaywall.isLockedByPaywall('action')) { ClarityPaywall.show(); return; }
+          } catch (e) {}
           const val = btn.getAttribute('data-accent');
           if (ACCENT_CHOICES.indexOf(val) === -1) return;
           state.prefs.accent = val;
@@ -5199,7 +5207,6 @@ const TabBar = {
         <input type="file" id="profAvatarFile" accept="image/*" hidden>
         <div style="font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em;">${esc(state.profile.name || 'User')}</div>
         <div style="font-size: 0.875rem; color: var(--text-2); margin-top: 4px;">${esc(state.profile.email || '')}</div>
-        <input type="text" id="prefAnchorQuote" maxlength="160" placeholder="One line that gets you moving..." value="${esc((state.prefs && state.prefs.anchorQuote) || '')}" style="margin:14px auto 0;display:block;width:100%;max-width:340px;box-sizing:border-box;text-align:center;font:inherit;font-size:0.85rem;color:var(--text-1);background:var(--kfill-04);border:none;border-radius:calc(10px * var(--rx,1));padding:10px 14px;outline:none;box-shadow:inset 0 1px 0 rgba(255,255,255,0.05);" />
       </div>
       ${(typeof window !== 'undefined' && window.MementoInstall && !window.MementoInstall._isStandalone()) ? `
       <button type="button" id="profInstallApp" aria-label="Add Memento to your home screen" style="display:flex;align-items:center;gap:13px;width:100%;text-align:left;font:inherit;cursor:pointer;border:none;border-radius:calc(14px * var(--rx,1));padding:15px 16px;margin-bottom:14px;background:var(--kfill-04);box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);">

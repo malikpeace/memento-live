@@ -3505,7 +3505,11 @@ body.pre-clarity .capture-fab { display: none !important; }
      resting BELOW the iOS status bar / notch. Without it, snap-align:start pulls the
      header to the very top of the viewport, scrolling past the safe-area padding and
      tucking the brand + card under the clock and battery. */
-  html { scroll-snap-type: y mandatory; scroll-padding-top: calc(var(--safe-t, 0px) + 18px); }
+  /* v695 (Malik): PROXIMITY, not mandatory. Page 2 is taller than the screen;
+     mandatory snapping kept yanking the scroll back to the section top so the
+     lower modules were unreachable. Proximity keeps the page-1/page-2 flip but
+     lets you scroll freely once you are inside page 2. */
+  html { scroll-snap-type: y proximity; scroll-padding-top: calc(var(--safe-t, 0px) + 18px); }
   html, body { overflow-x: clip; max-width: 100vw; }
   body { touch-action: pan-y; overscroll-behavior-x: none; }
 
@@ -3533,7 +3537,9 @@ body.pre-clarity .capture-fab { display: none !important; }
      home, aligned with the MEMENTO lockup, out of the flow (absolute) so it never
      pulls the card up. Same on both states so the two screens are identical. */
   body:not(.has-custom-layout) .app.dash-v2 #dashGreetingMobile {
-    position: absolute !important; top: calc(var(--safe-t, 0px) + 17px); right: 14px;
+    /* v695 (Malik): the date's optical center matches the MEMENTO lockup's
+       (it sat 8px low). */
+    position: absolute !important; top: calc(var(--safe-t, 0px) + 9px); right: 14px;
     margin: 0 !important; z-index: 2; display: flex !important; justify-content: flex-end;
   }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard {
@@ -3561,7 +3567,7 @@ body.pre-clarity .capture-fab { display: none !important; }
      crossing into a separate place. */
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashBelow {
     display: block !important;
-    scroll-snap-align: start; scroll-snap-stop: always;
+    scroll-snap-align: start;
     min-height: 100svh;
     margin-top: 42svh !important;
     padding: 0 0 calc(110px + var(--safe-b, 0px)) !important;
@@ -3793,3 +3799,15 @@ body.card-evolving.card-evolve-go .daycard-wrap__aura { opacity: 1; transition: 
 /* v691 (Malik): the god-ray beams are a dark-mode soul feature, light piercing
    darkness. On the light theme they read as smudge, so they are OFF there. */
 html.theme-light .ambient__rays { display: none !important; }
+
+
+/* v695 (Malik): keep the Memento card's compositor layer ALIVE during scroll.
+   With paint containment, iOS could evict the heavy blurred card offscreen and
+   repaint it late on the way back, which read as the card vanishing/reloading
+   mid-scroll. A pinned 3D layer on the card keeps it rasterized. */
+@media (max-width: 767.98px) {
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-ns {
+    transform: translateZ(0);
+    will-change: transform;
+  }
+}

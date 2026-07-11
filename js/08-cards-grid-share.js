@@ -167,15 +167,20 @@ const RENDERERS = {
         inp.addEventListener('click', (e) => e.stopPropagation());
         inp.addEventListener('change', () => {
           const file = inp.files && inp.files[0];
-          if (!file || typeof vivDownscaleImage !== 'function' || typeof idbStore === 'undefined') return;
-          vivDownscaleImage(file, 900).then(({ dataURL, w, h }) => {
+          if (!file || typeof vivDownscaleImage !== 'function' || typeof idbStore !== 'function') return;
+          // vivDownscaleImage is CALLBACK-based (v695 fix: treating it as a
+          // promise made the upload a silent no-op, Malik saw nothing).
+          vivDownscaleImage(file, 900, (dataURL, w, h) => {
+            if (!dataURL) return;
             idbStore(dataURL, w, h).then((newId) => {
+              if (!newId) return;
               state.prefs = state.prefs || {};
               state.prefs.photoTile = 'idb:' + newId;
               persistNow();
-              RENDERERS.photo(el);
+              const live = document.querySelector('.widget[data-widget="photo"]') || el;
+              RENDERERS.photo(live);
             });
-          }).catch(() => {});
+          });
         });
       }
     } catch (e) {}
@@ -5075,12 +5080,11 @@ function renderDashConsistency() {
     const weeks = window.innerWidth < 768 ? 27 : 52;
     let graph = '';
     try { graph = renderConsistencyHeatmap(weeks, 'rolling', true); } catch (e) {}
+    // v695 (Malik): ONE fact in the header, the streak, top-left. No label
+    // ('the green cells say consistency'), no active-days tally, no Open hint.
     el.innerHTML =
       '<div class="dash-cgram__head">' +
-        '<div class="dash-cgram__label">Consistency</div>' +
-        '<div class="dash-cgram__meta"><b>' + streak + '</b> day streak' +
-          (cs.totalActiveDays ? ' <span>&middot; ' + cs.totalActiveDays + ' active days</span>' : '') + '</div>' +
-        '<span class="dash-cgram__open" aria-hidden="true">Open &rsaquo;</span>' +
+        '<div class="dash-cgram__meta"><b>' + streak + '</b> day streak</div>' +
       '</div>' +
       '<div class="dash-cgram__graph">' + graph + '</div>';
     // Read-only on the Home: strip the per-cell tap affordance; the whole band
