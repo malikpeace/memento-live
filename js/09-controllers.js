@@ -5173,6 +5173,11 @@ const TabBar = {
 
   renderProfile() {
     const body = document.getElementById('profileBody');
+    // The cheat bar lives at the foot of this panel on mobile (v685). Capture
+    // the LIVE node BEFORE the innerHTML wipe below destroys it, else the
+    // second visit to You finds nothing to re-append and the bar vanishes
+    // until a full reload (Malik v693: "sometimes I can't see the cheat bar").
+    const _cboxKeep = document.getElementById('creatorBox');
     const FIELD = 'width:100%;box-sizing:border-box;font:inherit;font-size:0.9rem;color:var(--text-hi);background:var(--surface-1);border:1px solid transparent;border-radius:calc(8px * var(--rx, 1));padding:11px 13px;outline:none;';
     const FIELDTA = FIELD + 'resize:vertical;line-height:1.5;';
     const FIELDS = 'font:inherit;font-size:0.85rem;color:var(--text-hi);background:var(--surface-1);border:1px solid transparent;border-radius:calc(6px * var(--rx, 1));padding:6px 8px;outline:none;margin-left:6px;';
@@ -5257,7 +5262,9 @@ const TabBar = {
     // Desktop keeps it in the sidebar (Sidebar._relocateCreatorBox).
     try {
       if (window.matchMedia && window.matchMedia('(max-width: 859.98px)').matches) {
-        const cbox = document.getElementById('creatorBox');
+        // Use the pre-wipe reference: a detached node re-attaches with every
+        // CreatorTools handler intact. getElementById can no longer see it here.
+        const cbox = _cboxKeep || document.getElementById('creatorBox');
         if (cbox) body.appendChild(cbox);
       }
     } catch (e) {}
