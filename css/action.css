@@ -3405,8 +3405,9 @@ html.theme-light .action-chat__input-row::before { background: linear-gradient(t
   min-height: 76vh; text-align: center; padding: 0 10px;
 }
 .action-cine-reveal__eyebrow {
-  font-size: 12px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
-  color: rgba(var(--ink, 255, 255, 255), 0.5); margin-bottom: 18px;
+  /* v691 (Malik): sentence case, no tracked-caps kicker. */
+  font-size: 14px; font-weight: 600; letter-spacing: 0; text-transform: none;
+  color: rgba(var(--ink, 255, 255, 255), 0.55); margin-bottom: 16px;
 }
 .action-cine-reveal__move {
   font-size: clamp(26px, 7vw, 34px); font-weight: 800; line-height: 1.3;
@@ -3443,6 +3444,13 @@ html.theme-light .action-exp:has(.action-cine-reveal) {
 html.theme-light .action-exp:has(.action-draft-loading--cine) .action-exp__bg,
 html.theme-light .action-exp:has(.action-cine-reveal) .action-exp__bg {
   background: #050308 !important;
+}
+/* ...and the bg's ::before vignette (a light haze) must go too, or light mode
+   renders a black oval floating on white (Malik v691). The ceremony is DARK,
+   fully, in both themes. */
+html.theme-light .action-exp:has(.action-draft-loading--cine) .action-exp__bg::before,
+html.theme-light .action-exp:has(.action-cine-reveal) .action-exp__bg::before {
+  background: none !important;
 }
 html.theme-light .action-exp:has(.action-draft-loading--cine) .action-cine__thinking i {
   background: #fff; box-shadow: 0 0 18px rgba(255, 255, 255, 0.7);

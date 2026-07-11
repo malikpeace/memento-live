@@ -3788,3 +3788,8 @@ body.card-evolving.card-evolve-go .daycard-wrap__aura { opacity: 1; transition: 
 }
 .widget[data-widget="photo"] .widget__photo svg { width: 26px; height: 26px; }
 .widget[data-widget="photo"] .widget__photo.widget__photo--set svg { display: none; }
+
+
+/* v691 (Malik): the god-ray beams are a dark-mode soul feature, light piercing
+   darkness. On the light theme they read as smudge, so they are OFF there. */
+html.theme-light .ambient__rays { display: none !important; }
