@@ -3386,17 +3386,9 @@ html.lowfx .daycard-ns {
 }
 #dashGreetingMobile { display: none; }
 @media (max-width: 859.98px) {
-  /* The brand lockup is a tap target on mobile (opens the drawer). Give it a
-     comfortable hit area + a press cue, no tap-flash. */
-  .dash-header__brand {
-    display: inline-flex;
-    cursor: pointer;
-    margin: -6px -8px; padding: 6px 8px;
-    border-radius: 12px;
-    -webkit-tap-highlight-color: transparent;
-    transition: opacity 0.15s ease;
-  }
-  .dash-header__brand:active { opacity: 0.55; }
+  /* The brand lockup is PURE BRANDING on mobile (v685): the drawer is gone on
+     phones (bottom bar is the only nav), so no cursor, no hit area, no press cue. */
+  .dash-header__brand { display: inline-flex; }
   /* The greeting block (and its headline) hands the header to the brand. */
   .dash-header__greeting { display: none; }
   #dashGreetingMobile {

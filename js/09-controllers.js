@@ -3309,6 +3309,9 @@ const Sidebar = {
     let _peekWasCollapsed = false;
     let _peekCloseTimer = null;
     const openPeek  = () => {
+      // NO drawer on phones (Malik v685): the bottom bar is the ONLY mobile nav.
+      // The sidebar/drawer earns its place at desktop + iPad widths only.
+      if (_isDrawer()) return;
       // Cancel any in-flight close so re-opening mid-slide snaps back cleanly.
       if (_peekCloseTimer) { clearTimeout(_peekCloseTimer); _peekCloseTimer = null; }
       document.body.classList.remove('menu-peek-closing');
@@ -3357,18 +3360,10 @@ const Sidebar = {
       });
     }
 
-    // Mobile: tapping the top-left Memento brand lockup also opens the drawer
-    // (it is the obvious thing to tap up there). Make it a real control.
-    const brandLockup = document.querySelector('.dash-header__brand');
-    if (brandLockup) {
-      brandLockup.setAttribute('role', 'button');
-      brandLockup.setAttribute('tabindex', '0');
-      brandLockup.setAttribute('aria-label', 'Open menu');
-      brandLockup.removeAttribute('aria-hidden');
-      const openFromBrand = (e) => { if (!_isDrawer()) return; if (e) e.preventDefault(); openPeek(); };
-      brandLockup.addEventListener('click', openFromBrand);
-      brandLockup.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') openFromBrand(e); });
-    }
+    // The top-left MEMENTO lockup is PURE BRANDING on mobile now (Malik v685):
+    // it used to open the drawer, but the bottom bar is the only phone nav, so
+    // the lockup is a decorative app mark like any shipped iOS app. No role, no
+    // handlers; it stays aria-hidden from the markup.
 
     // --- iOS-like drag-to-close for the mobile drawer ---------------------------
     // Grab the open drawer and slide it left with your finger; release past a
@@ -5250,6 +5245,17 @@ const TabBar = {
     // Optional account / sync card.
     try { this.bindAccountSection(); } catch (e) {}
     try { this.bindSupportSection(); } catch (e) {}
+    // Cheat Code Bar's mobile home (Malik v685): the drawer is gone on phones,
+    // so the dev-only creator box rides at the foot of the You panel instead.
+    // The LIVE element is moved (not cloned) so every CreatorTools handler stays
+    // attached; renderProfile rebuilds innerHTML, so re-append on every render.
+    // Desktop keeps it in the sidebar (Sidebar._relocateCreatorBox).
+    try {
+      if (window.matchMedia && window.matchMedia('(max-width: 859.98px)').matches) {
+        const cbox = document.getElementById('creatorBox');
+        if (cbox) body.appendChild(cbox);
+      }
+    } catch (e) {}
     // Identity field edits (debounced persist). Name also refreshes the
     // sidebar profile + the top hub greeting live.
     const bindProfileField = (id, key) => {

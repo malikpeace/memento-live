@@ -168,7 +168,7 @@
     transition: opacity var(--t-slow) ease;
   }
   body.mobile-menu-open .mobile-menu-backdrop { opacity: 1; pointer-events: auto; }
-  .dash-header__brand { cursor: pointer; }
+  /* v685: the lockup is pure branding on mobile (drawer removed), no cursor. */
 }
 
 /* === Persistent top-left menu button + "menu-peek" overlay ===
