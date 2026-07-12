@@ -2290,8 +2290,15 @@ function renderAiChat() {
   // Loading state (v629, Malik): the forming star breathes CENTER-SCREEN,
   // lower and more purple; the top slot keeps the normal thin bar.
   if (aiChatLoading) {
-    const sp = Math.max(0, Math.min(1, aiChatPct() / 100));
-    return `<div class="ai-thinking ai-thinking--star"><div class="forming-star" aria-hidden="true" style="--sp:${sp.toFixed(3)}"><i class="fs-neb"></i><i class="fs-core"></i></div></div>`;
+    // v719 (Malik): the RAIN ACCRETION loader, dust feeding the forming star.
+    // Deterministic seeding matches the approved lab exactly (16 motes, golden-
+    // angle spread, staggered negative delays so it is mid-fall on first paint).
+    // The old forming-star branch is one line, kept in git for revert.
+    let dust = '';
+    for (let i = 0; i < 16; i++) {
+      dust += `<i style="--a:${(i * 137) % 360}deg;--d:${(3.2 + (i % 5) * 0.55).toFixed(2)}s;--del:${(-(i % 9) * 0.8).toFixed(1)}s;--s:${2 + (i % 3)}px"></i>`;
+    }
+    return `<div class="ai-thinking ai-thinking--rain"><div class="acc-sys" aria-hidden="true"><span class="acc-core"></span>${dust}</div></div>`;
   }
 
   // Error state
