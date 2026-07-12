@@ -2218,8 +2218,11 @@ const CreatorTools = {
           Q('Who benefits when you pull this off, besides you?'), A('My family. And every person the product actually helps.'),
           Q('What are you willing to give up for it?'), A('Comfort. Most of my scrolling. Some weekends.')
         ],
-        aiChatReady: false,
-        aiChatProgress: 92,
+        // ready:true = THIS is the last one: answering advances straight to
+        // synthesis instead of fetching more questions (v722, Malik hit 3-4
+        // extra questions when the seed left the conversation open).
+        aiChatReady: true,
+        aiChatProgress: 100,
         aiCurrentQuestion: 'Last one. A year from now this either happened or it did not. What will have made the difference?',
         aiCurrentHint: 'Say it plainly. This is the spine of your star.',
         aiCurrentType: 'text',

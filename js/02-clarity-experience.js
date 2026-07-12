@@ -2009,7 +2009,15 @@ const ClarityExperience = {
       const currentStepKey = getWizardSteps()[wizardStep];
       if (currentStepKey === 'aiChat') {
         if (aiChatReady) {
-          // AI is done  - advance to synthesis
+          // AI is done - advance to synthesis. If a final answer is sitting in
+          // the composer (the ready beat still shows one), it joins the
+          // transcript so the star is forged from it too (v722).
+          try {
+            if ((aiUserAnswer || '').trim()) {
+              aiChatMessages.push({ role: 'user', content: aiUserAnswer.trim() });
+              aiUserAnswer = '';
+            }
+          } catch (e) {}
           this.transitionTo(this.currentPage + 1, 'forward');
           setTimeout(() => {
             if (!aiSynthesisResult && !aiSynthesisLoading) {
