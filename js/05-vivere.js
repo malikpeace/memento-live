@@ -1018,7 +1018,7 @@ const VivereCanvas = {
     if (existing) { existing.remove(); return; }
     if (!wrap) return;
     const bgs = [['Default', 'var(--surface-0)'], ['Charcoal', '#0e0e12'], ['Ink', '#0a0d14'], ['Warm', '#14100c'], ['Slate', '#101418']];
-    const accents = ['rgba(201,162,75,0.7)', 'rgba(123,151,255,0.7)', 'rgba(120,200,160,0.7)', 'rgba(232,122,170,0.7)', 'rgba(225,225,225,0.6)'];
+    const accents = ['rgba(201,162,75,0.7)', 'rgba(123,151,255,0.7)', 'rgba(120, 200, 127,0.7)', 'rgba(232,122,170,0.7)', 'rgba(225,225,225,0.6)'];
     const styles = [['Dots', 'dot'], ['Lines', 'lines'], ['None', 'none']];
     const pop = document.createElement('div');
     pop.id = 'vcCustomize';

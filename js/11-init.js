@@ -391,11 +391,11 @@ void main(){
   float n2 = snoise(uv * 2.5 + vec2(-t * 0.6, t * 0.8));
   float n3 = snoise(uv * 1.2 + vec2(t * 0.4, -t * 0.3));
   float n4 = snoise(uv * 3.0 + vec2(t * 0.9, t * 0.2));
-  vec3 c1 = vec3(0.42, 0.28, 0.92);
-  vec3 c2 = vec3(0.58, 0.45, 1.0);
-  vec3 c3 = vec3(0.94, 0.92, 1.0);
-  vec3 c4 = vec3(0.68, 0.55, 1.0);
-  vec3 c5 = vec3(0.90, 0.86, 1.0);
+  vec3 c1 = vec3(0.28, 0.82, 0.92);
+  vec3 c2 = vec3(0.45, 0.92, 1.00);
+  vec3 c3 = vec3(0.92, 0.99, 1.00);
+  vec3 c4 = vec3(0.55, 0.93, 1.00);
+  vec3 c5 = vec3(0.86, 0.98, 1.00);
   vec3 col = mix(c1, c2, smoothstep(-0.5, 0.5, n1));
   col = mix(col, c3, smoothstep(-0.3, 0.5, n2));
   col = mix(col, c4, smoothstep(-0.2, 0.6, n3) * 0.5);
@@ -447,7 +447,7 @@ void main(){
   float r = length(uv);
   float n1 = snoise(uv * 1.5 + vec2(T * 0.12, T * 0.08));
   float n2 = snoise(uv * 2.7 - vec2(T * 0.10, T * 0.15));
-  vec3 body = mix(vec3(0.42, 0.28, 0.92), vec3(0.68, 0.55, 1.0), smoothstep(-0.6, 0.6, n1));
+  vec3 body = mix(vec3(0.28, 0.82, 0.92), vec3(0.55, 0.93, 1.00), smoothstep(-0.6, 0.6, n1));
   body = mix(body, vec3(0.95, 0.97, 1.0), smoothstep(-0.1, 0.7, n2) * 0.7);
   float mask = 1.0 - smoothstep(0.41, 0.47, r);
   float core = exp(-r * 4.8) * (1.35 + 0.18 * beat);
@@ -465,11 +465,11 @@ void main(){
   float jet = exp(-pow(across / jw, 2.0) * 2.5) * smoothstep(3.25, 0.72, aa) * smoothstep(0.26, 0.61, aa) * flow;
   float ji = 0.92 + 0.26 * beat;
   float backglow = exp(-r * 0.85) * 0.16 * (1.0 + 0.2 * beat);
-  vec3 col = vec3(0.58, 0.45, 1.0) * backglow;
+  vec3 col = vec3(0.45, 0.92, 1.00) * backglow;
   col += body * mask * (1.0 + 0.07 * beat);
   col += vec3(1.0) * core;
-  col += vec3(0.58, 0.45, 1.0) * halo;
-  col += vec3(0.80, 0.70, 1.0) * jet * ji;
+  col += vec3(0.45, 0.92, 1.00) * halo;
+  col += vec3(0.70, 0.95, 1.00) * jet * ji;
   float alpha = clamp(max(col.r, max(col.g, col.b)), 0.0, 1.0);
   gl_FragColor = vec4(col, alpha);
 }`;
@@ -589,8 +589,8 @@ void main(){
   float n2=snoise(uv*1.8+vec2(-t*0.4,t*0.6));
   float n3=snoise(uv*0.8+vec2(t*0.3,-t*0.2));
   float n4=snoise(uv*2.2+vec2(t*0.7,t*0.15));
-  vec3 c1=vec3(0.05,0.02,0.18);
-  vec3 c2=vec3(0.28,0.08,0.55);
+  vec3 c1=vec3(0.02, 0.16, 0.18);
+  vec3 c2=vec3(0.08, 0.48, 0.55);
   vec3 c3=vec3(0.08,0.18,0.62);
   vec3 c4=vec3(0.55,0.05,0.60);
   vec3 c5=vec3(0.0,0.38,0.55);
@@ -1268,8 +1268,8 @@ void main(){
   float n3 = snoise(uv * 0.8 + vec2(t * 0.3, -t * 0.2));
   float n4 = snoise(uv * 2.2 + vec2(t * 0.7, t * 0.15));
   vec3 c1 = vec3(0.0, 0.0, 0.0);
-  vec3 c2 = vec3(0.18, 0.0, 1.0);
-  vec3 c3 = vec3(0.0, 0.08, 1.0);
+  vec3 c2 = vec3(0.00, 0.85, 1.00);
+  vec3 c3 = vec3(0.00, 0.85, 1.00);
   vec3 c4 = vec3(0.0, 0.9, 0.95);
   vec3 c5 = vec3(1.0, 0.0, 0.72);
   vec3 col = mix(c1, c2, smoothstep(-0.4, 0.4, n1));
@@ -1374,7 +1374,7 @@ void main(){
   const dpr = window.devicePixelRatio || 1;
 
   const colors = [
-    [123, 97, 255],   // purple (clarity)
+    [58, 217, 245],  // cyan (clarity)
     [255, 59, 48],    // red (action)
     [48, 209, 88],    // green (consistency)
     [56, 189, 248],   // blue (flow)
@@ -2026,7 +2026,7 @@ window.addEventListener('keydown', (e) => {
     'body.lite .action-chat__input-row,body.lite .ai-chat__input-row{backdrop-filter:blur(calc(18px * var(--bx, 1))) saturate(125%)!important;-webkit-backdrop-filter:blur(calc(18px * var(--bx, 1))) saturate(125%)!important;background:rgba(10,10,14,0.55)!important;}',
     // Without backdrop-blur, translucent overlays would let the dashboard show
     // through on mobile. Make the full-screen overlays opaque in lite mode.
-    'body.lite .clarity-exp{background:#050308!important;}',
+    'body.lite .clarity-exp{background:#030708!important;}',
     'body.lite .ns-refine-overlay{background:rgba(4,6,12,0.96)!important;}',
     // CRITICAL neutron-star view fixes (was 1fps on mobile). Three things each
     // re-rasterized a blur/shadow EVERY frame:

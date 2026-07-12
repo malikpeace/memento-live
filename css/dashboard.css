@@ -90,12 +90,12 @@ body:has(.action-exp.open) .action-plan__rays .ambient__rays-beam-shaft {
       transparent 76%),
     /* A whisper of purple at the very bottom so pure black never reads flat. */
     radial-gradient(1300px 900px at 72% 112%,
-      rgba(150, 92, 240, 0.08) 0%,
-      rgba(120, 74, 220, 0.035) 28%,
+      rgba(92, 218, 240, 0.08) 0%,
+      rgba(74, 198, 220, 0.035) 28%,
       transparent 58%),
     /* The middle stays dark: contrast IS the identity. */
     radial-gradient(1000px 800px at 52% 56%,
-      rgba(124, 88, 220, 0.03) 0%,
+      rgba(88, 200, 220, 0.03) 0%,
       transparent 55%);
 }
 body.ns-bloom .ambient__ns-bloom { opacity: 1; }
@@ -122,9 +122,9 @@ body.ns-bloom .ambient__ns-bloom { opacity: 1; }
        (the card occludes dead-center), so the mid-stops carry real weight and the
        halo reads past the card edges out to the screen. */
     radial-gradient(2100px 1700px at 50% 32%,
-      rgba(56, 236, 150, calc(0.40 * var(--aura-cons, 0))) 0%,
-      rgba(56, 236, 150, calc(0.24 * var(--aura-cons, 0))) 28%,
-      rgba(56, 236, 150, calc(0.08 * var(--aura-cons, 0))) 50%,
+      rgba(56, 236, 71, calc(0.40 * var(--aura-cons, 0))) 0%,
+      rgba(56, 236, 71, calc(0.24 * var(--aura-cons, 0))) 28%,
+      rgba(56, 236, 71, calc(0.08 * var(--aura-cons, 0))) 50%,
       transparent 68%),
     /* action gold warmth, pooling just below the card where the action sits */
     radial-gradient(1800px 1450px at 56% 70%,
@@ -133,9 +133,9 @@ body.ns-bloom .ambient__ns-bloom { opacity: 1; }
       transparent 64%),
     /* clarity purple base, radiating straight out of the card */
     radial-gradient(2000px 1600px at 50% 42%,
-      rgba(150, 116, 255, calc(0.38 * var(--aura-clar, 0))) 0%,
-      rgba(140, 104, 246, calc(0.20 * var(--aura-clar, 0))) 34%,
-      rgba(126, 96, 232, calc(0.07 * var(--aura-clar, 0))) 56%,
+      rgba(116, 234, 255, calc(0.38 * var(--aura-clar, 0))) 0%,
+      rgba(104, 225, 246, calc(0.20 * var(--aura-clar, 0))) 34%,
+      rgba(96, 212, 232, calc(0.07 * var(--aura-clar, 0))) 56%,
       transparent 72%),
     /* drift steel: a cool desaturating veil that rises as you fall off */
     radial-gradient(2100px 1700px at 50% 48%,
@@ -200,10 +200,10 @@ body.look-dark-glass.ns-bloom .ambient__rays {
   top: -28%; left: -28%;
   width: 70%; height: 70%;
   background: radial-gradient(circle at 22% 22%,
-    rgba(240,230,255,0.45) 0%,
-    rgba(195,175,255,0.24) 14%,
-    rgba(160,160,255,0.12) 30%,
-    rgba(180,140,200,0.05) 50%,
+    rgba(230, 251, 255,0.45) 0%,
+    rgba(175, 243, 255,0.24) 14%,
+    rgba(160, 241, 255,0.12) 30%,
+    rgba(140, 191, 200,0.05) 50%,
     transparent 72%);
   filter: blur(16px);
   animation: ambientRaysSourcePulse 9s ease-in-out infinite;
@@ -426,7 +426,7 @@ body.ns-bloom .widget--clarity {
 .cc-primary {
   transition: transform var(--t-fast) var(--ease-out, ease), box-shadow var(--t-base) ease, background var(--t-base) ease;
 }
-.cc-primary:hover { background: var(--solid-bg-hover, #f4f4f8) !important; box-shadow: 0 4px 16px rgba(0,0,0,0.28); }
+.cc-primary:hover { background: var(--solid-bg-hover, #f4f7f8) !important; box-shadow: 0 4px 16px rgba(0,0,0,0.28); }
 .cc-primary:active { transform: scale(0.98); }
 .cc-primary:focus-visible {
   outline: none;
@@ -1436,7 +1436,7 @@ html.lowfx .hub-hl-pop {
   background: rgba(20, 20, 26, 0.96);
 }
 html.theme-light .hub-hl-pop {
-  background: rgba(252, 252, 253, 0.78);
+  background: rgba(252, 253, 253, 0.78);
   border-color: rgba(0, 0, 0, 0.10);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 18px 48px rgba(0, 0, 0, 0.18);
 }
@@ -1548,14 +1548,14 @@ html.lowfx .cc-hero-body .ctraj { animation: none !important; }
 /* Spotify Now Playing pill */
 .spotify-pill { display: inline-flex; align-items: center; gap: 8px; max-width: 230px; padding: 6px 12px 6px 8px; background: var(--kfill-05); border: 1px solid var(--hairline); border-radius: 999px; cursor: pointer; transition: background var(--t-fast) ease, border-color var(--t-fast) ease; font: inherit; }
 .spotify-pill:hover { background: var(--kfill-09); border-color: var(--hairline-strong, rgba(var(--ink),0.18)); }
-.spotify-pill__art { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: calc(6px * var(--rx, 1)); background: rgba(29,185,84,0.12); overflow: hidden; flex: none; }
+.spotify-pill__art { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: calc(6px * var(--rx, 1)); background: rgba(29, 185, 42,0.12); overflow: hidden; flex: none; }
 .spotify-pill__art img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .spotify-pill__meta { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; text-align: left; }
 .spotify-pill__title { font-size: var(--fs-sm); font-weight: 600; color: var(--text-hi); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
 .spotify-pill__artist { font-size: var(--fs-xs); color: var(--text-lo); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
 .spotify-pill__artist:empty { display: none; }
 .spotify-pill__bars { display: none; align-items: flex-end; gap: 2px; height: 13px; flex: none; }
-.spotify-pill__bars i { width: 2.5px; background: #1DB954; border-radius: 1px; animation: spotbar 0.9s ease-in-out infinite; }
+.spotify-pill__bars i { width: 2.5px; background: #1db92a; border-radius: 1px; animation: spotbar 0.9s ease-in-out infinite; }
 .spotify-pill__bars i:nth-child(1) { height: 50%; animation-delay: 0s; }
 .spotify-pill__bars i:nth-child(2) { height: 100%; animation-delay: 0.25s; }
 .spotify-pill__bars i:nth-child(3) { height: 70%; animation-delay: 0.5s; }
@@ -1717,7 +1717,7 @@ html.lowfx .cc-hero-body .ctraj { animation: none !important; }
   bottom: calc(28px + var(--safe-b));
   left: 50%;
   transform: translateX(-50%) translateY(20px);
-  background: rgba(15, 15, 22, 0.92);
+  background: rgba(15, 21, 22, 0.92);
   border: 1px solid var(--dash-border-strong);
   color: var(--dash-text-1);
   padding: 12px 20px;
@@ -2152,8 +2152,8 @@ html.lowfx .cc-hero-body .ctraj { animation: none !important; }
 }
 .dash-reflection__cta {
   appearance: none;
-  background: rgba(191, 90, 242, 0.18);
-  border: 1px solid rgba(191, 90, 242, 0.4);
+  background: rgba(90, 219, 242, 0.18);
+  border: 1px solid rgba(90, 219, 242, 0.4);
   color: var(--color-reflection);
   padding: 8px 14px;
   border-radius: 999px;
@@ -2167,7 +2167,7 @@ html.lowfx .cc-hero-body .ctraj { animation: none !important; }
   margin-left: auto;
   transition: background var(--t-base) ease, transform var(--t-fast) ease;
 }
-.dash-reflection__cta:hover { background: rgba(191, 90, 242, 0.28); }
+.dash-reflection__cta:hover { background: rgba(90, 219, 242, 0.28); }
 .dash-reflection__cta:active { transform: scale(0.97); }
 .dash-reflection__cta span { transition: transform var(--t-base) ease; }
 .dash-reflection__cta:hover span { transform: translateX(3px); }
@@ -2363,12 +2363,12 @@ html.lowfx .cc-hero-body .ctraj { animation: none !important; }
     from var(--angle, 0deg),
     transparent 0%,
     transparent 60%,
-    rgba(180, 120, 255, 0.15) 70%,
-    rgba(180, 120, 255, 0.5) 80%,
-    rgba(220, 180, 255, 0.85) 88%,
+    rgba(120, 235, 255, 0.15) 70%,
+    rgba(120, 235, 255, 0.5) 80%,
+    rgba(180, 244, 255, 0.85) 88%,
     white 92%,
-    rgba(220, 180, 255, 0.85) 96%,
-    rgba(180, 120, 255, 0.3) 99%,
+    rgba(180, 244, 255, 0.85) 96%,
+    rgba(120, 235, 255, 0.3) 99%,
     transparent 100%
   );
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -2445,11 +2445,11 @@ html.lowfx .cc-hero-body .ctraj { animation: none !important; }
   font-size: var(--fs-2xs);
   font-weight: 600;
   letter-spacing: 0.03em;
-  color: #8af0b6;
-  background: rgba(80, 220, 140, 0.10);
+  color: #8af093;
+  background: rgba(80, 220, 92, 0.10);
   -webkit-backdrop-filter: blur(calc(8px * var(--bx, 1))) saturate(135%);
   backdrop-filter: blur(calc(8px * var(--bx, 1))) saturate(135%);
-  border: 1px solid rgba(130, 240, 175, 0.30);
+  border: 1px solid rgba(130, 240, 139, 0.30);
   border-radius: var(--r-sm);
   box-shadow: 0 1px 8px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.10);
   pointer-events: none;
@@ -2528,9 +2528,9 @@ html.lowfx .cc-hero-body .ctraj { animation: none !important; }
 
 /* Clarity widget pulse glow when locked module is tapped */
 @keyframes clarityPulse {
-  0% { box-shadow: 0 0 0 0 rgba(123, 97, 255, 0.5); }
-  40% { box-shadow: 0 0 20px 4px rgba(123, 97, 255, 0.4), 0 0 40px 8px rgba(123, 97, 255, 0.15); }
-  100% { box-shadow: 0 0 0 0 rgba(123, 97, 255, 0); }
+  0% { box-shadow: 0 0 0 0 rgba(58, 217, 245, 0.5); }
+  40% { box-shadow: 0 0 20px 4px rgba(58, 217, 245, 0.4), 0 0 40px 8px rgba(58, 217, 245, 0.15); }
+  100% { box-shadow: 0 0 0 0 rgba(58, 217, 245, 0); }
 }
 .widget--clarity.clarity-pulse {
   animation: clarityPulse 1s ease-out;
@@ -2645,7 +2645,7 @@ html.lowfx .cc-hero-body .ctraj { animation: none !important; }
   font-size: var(--fs-xs);
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: rgba(180, 170, 255, 0.7);
+  color: rgba(170, 242, 255, 0.7);
   font-weight: 600;
 }
 .widget--clarity__cta {
@@ -2864,10 +2864,10 @@ body.lite .widget__reveal::after { animation: none; opacity: 0; }
   backdrop-filter: blur(calc(24px * var(--bx, 1))); -webkit-backdrop-filter: blur(calc(24px * var(--bx, 1)));
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
 }
-html.theme-light .cc-review-pop { background: rgba(252, 252, 253, 0.94); }
+html.theme-light .cc-review-pop { background: rgba(252, 253, 253, 0.94); }
 /* Lite mode strips backdrop-filter, so the popover must go solid on phones. */
 body.lite .cc-review-pop { background: rgb(14, 15, 20); }
-html.theme-light body.lite .cc-review-pop { background: rgb(252, 252, 253); }
+html.theme-light body.lite .cc-review-pop { background: rgb(252, 253, 253); }
 .cc-review-pop__row {
   display: flex; align-items: center; justify-content: space-between; gap: 14px;
   width: 100%; font: inherit; font-size: var(--fs-base); font-weight: 600; color: var(--text-hi);
@@ -2884,7 +2884,7 @@ body.lite .undo-toast, html.lowfx .undo-toast,
 body.lite .backup-nudge, html.lowfx .backup-nudge { background: rgba(10, 11, 14, 0.985); }
 html.theme-light body.lite .tmrw-plan, html.theme-light.lowfx .tmrw-plan,
 html.theme-light body.lite .undo-toast, html.theme-light.lowfx .undo-toast,
-html.theme-light body.lite .backup-nudge, html.theme-light.lowfx .backup-nudge { background: rgba(250, 250, 252, 0.98); }
+html.theme-light body.lite .backup-nudge, html.theme-light.lowfx .backup-nudge { background: rgba(250, 252, 252, 0.98); }
 
 /* === Day Card: the mobile hero ===
    A compact copy of Clarity's Neutron Star summary card, worn at the top
@@ -3073,8 +3073,8 @@ body.lite .daycard-motion-cta, html.lowfx .daycard-motion-cta { backdrop-filter:
   position: absolute; inset: -30%;
   pointer-events: none;
   background: conic-gradient(from 210deg at var(--dc-mx, 50%) var(--dc-my, 40%),
-    rgba(220, 225, 255, 0.10), rgba(167, 139, 250, 0.07),
-    rgba(94, 162, 247, 0.05), rgba(235, 235, 245, 0.09),
+    rgba(220, 225, 255, 0.10), rgba(139, 233, 250, 0.07),
+    rgba(94, 162, 247, 0.05), rgba(235, 243, 245, 0.09),
     rgba(220, 225, 255, 0.10));
   filter: blur(22px);
   mix-blend-mode: screen;
@@ -3115,7 +3115,7 @@ body.lite .daycard-motion-cta, html.lowfx .daycard-motion-cta { backdrop-filter:
 /* Light-mode card: the white fill would vanish on near-white glass, so the
    mark is pressed in dark instead (same machined deboss logic, inverted). */
 html.theme-light .daycard-ns__emblem {
-  fill: rgba(28, 30, 52, 0.32);
+  fill: rgba(28, 48, 52, 0.32);
   filter:
     drop-shadow(0 1.5px 0 rgba(255, 255, 255, 0.50))
     drop-shadow(0 -1px 1px rgba(0, 0, 0, 0.18))
@@ -3143,7 +3143,7 @@ html.theme-light .daycard-ns__emblem {
 /* Engraving stays legible on the light-mode card (the bluish-white deboss above
    is tuned for the dark card). */
 html.theme-light .daycard-ns__goal {
-  color: rgba(24, 26, 42, 0.60);
+  color: rgba(24, 39, 42, 0.60);
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.45), 0 -0.5px 0 rgba(0, 0, 0, 0.06);
 }
 /* Signature entrance: the card materializes once per day (first Home open),
@@ -3172,7 +3172,7 @@ html.theme-light .daycard-ns__goal {
 /* Light theme: the lavender aura sits on near-white; deepen it slightly. */
 html.theme-light .daycard-wrap__aura {
   background: radial-gradient(closest-side,
-    rgba(98, 74, 178, 0.14), rgba(74, 108, 255, 0.05) 48%, transparent 72%);
+    rgba(74, 162, 178, 0.14), rgba(74, 108, 255, 0.05) 48%, transparent 72%);
 }
 /* The card does NOT keep backdrop-filter on touch devices. It used to (a single
    static card is cheap), but on iOS Safari backdrop-filter + the card's 3D tilt
@@ -3239,15 +3239,15 @@ html.lowfx .daycard-ns {
   opacity: 0; transition: opacity 0.42s ease;
   background:
     radial-gradient(1500px 1200px at 50% 26%,
-      rgba(56, 236, 150, calc(0.34 * var(--aura-cons, 0) * var(--aura-energy, 0.45))) 0%,
-      rgba(56, 236, 150, calc(0.16 * var(--aura-cons, 0) * var(--aura-energy, 0.45))) 30%,
+      rgba(56, 236, 71, calc(0.34 * var(--aura-cons, 0) * var(--aura-energy, 0.45))) 0%,
+      rgba(56, 236, 71, calc(0.16 * var(--aura-cons, 0) * var(--aura-energy, 0.45))) 30%,
       transparent 60%),
     radial-gradient(1400px 1100px at 52% 40%,
       rgba(255, 206, 122, calc(0.24 * var(--aura-warmth, 0) * var(--aura-energy, 0.45))) 0%,
       transparent 58%),
     radial-gradient(1600px 1300px at 50% 30%,
-      rgba(150, 116, 255, calc(0.34 * var(--aura-clar, 0) * var(--aura-energy, 0.45))) 0%,
-      rgba(140, 104, 246, calc(0.16 * var(--aura-clar, 0) * var(--aura-energy, 0.45))) 34%,
+      rgba(116, 234, 255, calc(0.34 * var(--aura-clar, 0) * var(--aura-energy, 0.45))) 0%,
+      rgba(104, 225, 246, calc(0.16 * var(--aura-clar, 0) * var(--aura-energy, 0.45))) 34%,
       transparent 64%),
     radial-gradient(1700px 1400px at 50% 34%,
       rgba(70, 92, 140, calc(0.18 * var(--aura-cool, 0) * var(--aura-energy, 0.45))) 0%,
@@ -3425,13 +3425,13 @@ body.pre-clarity .capture-fab { display: none !important; }
   animation: startNudge 1.5s ease-out 1;
 }
 @keyframes startNudge {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(123, 97, 255, 0); transform: none; }
-  18% { box-shadow: 0 0 0 5px rgba(123, 97, 255, 0.45), 0 0 30px rgba(123, 97, 255, 0.35); transform: scale(1.03); }
-  40% { box-shadow: 0 0 0 2px rgba(123, 97, 255, 0.15); transform: none; }
-  58% { box-shadow: 0 0 0 5px rgba(123, 97, 255, 0.45), 0 0 30px rgba(123, 97, 255, 0.35); transform: scale(1.03); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(58, 217, 245, 0); transform: none; }
+  18% { box-shadow: 0 0 0 5px rgba(58, 217, 245, 0.45), 0 0 30px rgba(58, 217, 245, 0.35); transform: scale(1.03); }
+  40% { box-shadow: 0 0 0 2px rgba(58, 217, 245, 0.15); transform: none; }
+  58% { box-shadow: 0 0 0 5px rgba(58, 217, 245, 0.45), 0 0 30px rgba(58, 217, 245, 0.35); transform: scale(1.03); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .cc-primary.start-nudge { animation: none; box-shadow: 0 0 0 3px rgba(123, 97, 255, 0.45); }
+  .cc-primary.start-nudge { animation: none; box-shadow: 0 0 0 3px rgba(58, 217, 245, 0.45); }
 }
 
 /* Hub consistency line: one quiet row under the quote. No card, no border.
@@ -3538,7 +3538,7 @@ body.pre-clarity .capture-fab { display: none !important; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .dash-header::before {
     content: ''; position: absolute; left: 0; right: 0; z-index: -1;
     top: calc(-12px - var(--safe-t, 0px)); height: calc(var(--safe-t, 0px) + 62px);
-    background: rgba(4, 4, 6, 0.38);
+    background: rgba(4, 6, 6, 0.38);
     backdrop-filter: blur(14px) saturate(1.3);
     -webkit-backdrop-filter: blur(14px) saturate(1.3);
     mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
@@ -3659,7 +3659,7 @@ body.pre-clarity .capture-fab { display: none !important; }
    selector outranks base.css's accent-tinted --c on the shaft. */
 html.theme-light body .ambient .ambient__rays-beam-shaft,
 html.theme-light body .apl-rays .ambient__rays-beam-shaft {
-  --c: 119 95 235;
+  --c: 95 214 235;
 }
 html.theme-light .ambient .ambient__rays,
 html.theme-light .apl-rays {
@@ -3668,9 +3668,9 @@ html.theme-light .apl-rays {
 html.theme-light .ambient .ambient__rays-source,
 html.theme-light .apl-rays .ambient__rays-source {
   background: radial-gradient(circle at 22% 22%,
-    rgba(119, 95, 235, 0.40) 0%,
-    rgba(119, 95, 235, 0.22) 16%,
-    rgba(130, 108, 240, 0.10) 34%,
+    rgba(95, 214, 235, 0.40) 0%,
+    rgba(95, 214, 235, 0.22) 16%,
+    rgba(108, 220, 240, 0.10) 34%,
     transparent 64%);
 }
 
@@ -3683,7 +3683,7 @@ html:not(.theme-light) body.pre-clarity .daycard-ns {
   background:
     linear-gradient(165deg,
       rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.004) 48%, rgba(255, 255, 255, 0.02)),
-    linear-gradient(180deg, rgba(10, 10, 16, 0.60), rgba(5, 5, 9, 0.60));
+    linear-gradient(180deg, rgba(10, 15, 16, 0.60), rgba(5, 8, 9, 0.60));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.16),
     0 0 60px rgba(200, 210, 255, 0.06),
@@ -3739,7 +3739,7 @@ html.flat-ui.theme-light body .daycard-ns {
    the M in dark instead so it actually reads (v597). */
 html.flat-ui.theme-light body .daycard-ns__emblem,
 html.flat-ui.theme-light body.pre-clarity .daycard-ns__emblem {
-  fill: rgba(28, 30, 52, 0.30);
+  fill: rgba(28, 48, 52, 0.30);
 }
 html.flat-ui.theme-light body .daycard-ns::before {
   background: rgba(24, 26, 33, 0.10);

@@ -1685,7 +1685,7 @@ function maybeShowSaveWorkNudge(onDone) {
     if (_saveWorkNudgeEl || document.getElementById('saveMemento')) return false;
 
     let installed = false; try { installed = !!(window.MementoInstall && window.MementoInstall._isStandalone()); } catch (_) {}
-    const mark = '<svg viewBox="0 0 512 512" width="42" height="42" aria-hidden="true"><rect width="512" height="512" rx="118" fill="#0c0c12"/><rect x="6" y="6" width="500" height="500" rx="114" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="3"/><path d="M150 152 L256 258 L362 152 L362 360 L150 360 Z" fill="none" stroke="#f5f5f7" stroke-width="26" stroke-linejoin="round"/></svg>';
+    const mark = '<svg viewBox="0 0 512 512" width="42" height="42" aria-hidden="true"><rect width="512" height="512" rx="118" fill="#0c1112"/><rect x="6" y="6" width="500" height="500" rx="114" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="3"/><path d="M150 152 L256 258 L362 152 L362 360 L150 360 Z" fill="none" stroke="#f5f5f7" stroke-width="26" stroke-linejoin="round"/></svg>';
     const el = document.createElement('div');
     _saveWorkNudgeEl = el;
     el.id = 'saveMemento'; el.className = 'save-memento'; el.setAttribute('aria-hidden', 'true');
@@ -2252,9 +2252,9 @@ const ProofTrail = {
     // Calm, glass-friendly tier badges. Falls back gracefully for unknown tiers.
     const map = {
       tiny: { label: 'Tiny', color: 'rgba(var(--success-rgb),0.95)', bg: 'rgba(var(--success-rgb),0.12)', bd: 'rgba(var(--success-rgb),0.32)' },
-      light: { label: 'Light', color: 'rgba(94,206,160,0.95)', bg: 'rgba(94,206,160,0.12)', bd: 'rgba(94,206,160,0.32)' },
+      light: { label: 'Light', color: 'rgba(94, 206, 103,0.95)', bg: 'rgba(94, 206, 103,0.12)', bd: 'rgba(94, 206, 103,0.32)' },
       moderate: { label: 'Moderate', color: 'rgba(123,160,255,0.95)', bg: 'rgba(123,160,255,0.12)', bd: 'rgba(123,160,255,0.32)' },
-      heavy: { label: 'Heavy', color: 'rgba(123,97,255,0.95)', bg: 'rgba(123,97,255,0.14)', bd: 'rgba(123,97,255,0.34)' },
+      heavy: { label: 'Heavy', color: 'rgba(58, 217, 245,0.95)', bg: 'rgba(58, 217, 245,0.14)', bd: 'rgba(58, 217, 245,0.34)' },
       extreme: { label: 'Extreme', color: 'rgba(255,107,107,0.95)', bg: 'rgba(255,107,107,0.12)', bd: 'rgba(255,107,107,0.34)' }
     };
     if (map[tier]) return map[tier];
@@ -2328,7 +2328,7 @@ const ProofTrail = {
     const m = {
       action: { label: 'Action', color: 'rgba(123,160,255,0.95)', bg: 'rgba(123,160,255,0.12)', bd: 'rgba(123,160,255,0.32)' },
       deepwork: { label: 'Deep work', color: 'rgba(255,159,10,0.95)', bg: 'rgba(255,159,10,0.12)', bd: 'rgba(255,159,10,0.32)' },
-      reflection: { label: 'Notes', color: 'rgba(191,90,242,0.95)', bg: 'rgba(191,90,242,0.12)', bd: 'rgba(191,90,242,0.32)' },
+      reflection: { label: 'Notes', color: 'rgba(90, 219, 242,0.95)', bg: 'rgba(90, 219, 242,0.12)', bd: 'rgba(90, 219, 242,0.32)' },
       vivere: { label: 'Lived', color: 'rgba(201,162,75,0.95)', bg: 'rgba(201,162,75,0.12)', bd: 'rgba(201,162,75,0.34)' },
       proof: { label: 'Proof', color: 'rgba(48,209,88,0.95)', bg: 'rgba(48,209,88,0.12)', bd: 'rgba(48,209,88,0.32)' }
     };
@@ -2337,7 +2337,7 @@ const ProofTrail = {
   render() {
     const ch = (state.action && Array.isArray(state.action.completionHistory)) ? state.action.completionHistory.slice() : [];
     const allEv = this._allEvents();
-    const PUR = 'rgba(123,97,255,0.92)';
+    const PUR = 'rgba(58, 217, 245,0.92)';
 
     // Empty state: motivating, not guilt-trippy.
     if (!allEv.length) {
@@ -2393,7 +2393,7 @@ const ProofTrail = {
       if (typeof Sheet === 'undefined' || !Sheet.body) return;
       // If a regular widget sheet is open, fully reset its widget state first.
       Sheet.currentWidget = null;
-      if (Sheet.titleEl) { Sheet.titleEl.textContent = 'Proof Trail'; Sheet.titleEl.style.color = 'rgba(123,97,255,0.95)'; }
+      if (Sheet.titleEl) { Sheet.titleEl.textContent = 'Proof Trail'; Sheet.titleEl.style.color = 'rgba(58, 217, 245,0.95)'; }
       Sheet.body.innerHTML = this.render();
       if (Sheet.el) { Sheet.el.classList.add('open'); Sheet.el.setAttribute('aria-hidden', 'false'); }
       if (Sheet.backdrop) Sheet.backdrop.classList.add('active');
@@ -2442,7 +2442,7 @@ const WeeklyReview = {
   },
   render() {
     const d = this._data();
-    const PUR = 'rgba(123,97,255,0.92)';
+    const PUR = 'rgba(58, 217, 245,0.92)';
     const goal = (state.clarity && state.clarity.answers && state.clarity.answers.neutronStar) || '';
     const deepLabel = d.deepMin >= 60 ? (Math.round(d.deepMin / 6) / 10) + 'h' : d.deepMin + 'm';
     const stat = (num, label) => `<div style="flex:1;min-width:0;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:calc(14px * var(--rx, 1));padding:12px 8px;text-align:center;box-shadow:var(--glass-highlight);">
@@ -2479,7 +2479,7 @@ const WeeklyReview = {
     try {
       if (typeof Sheet === 'undefined' || !Sheet.body) return;
       Sheet.currentWidget = null;
-      if (Sheet.titleEl) { Sheet.titleEl.textContent = 'Weekly review'; Sheet.titleEl.style.color = 'rgba(123,97,255,0.95)'; }
+      if (Sheet.titleEl) { Sheet.titleEl.textContent = 'Weekly review'; Sheet.titleEl.style.color = 'rgba(58, 217, 245,0.95)'; }
       Sheet.body.innerHTML = this.render();
       this.bind();
       if (Sheet.el) { Sheet.el.classList.add('open'); Sheet.el.setAttribute('aria-hidden', 'false'); }
@@ -2514,7 +2514,7 @@ const ShareStudio = {
   _canvasOk: null,          // null=untested, true/false after first probe
 
   // ---- Accent + brand constants (match clarity purple tokens) ----
-  PURPLE: 'rgba(123,97,255,0.92)',
+  PURPLE: 'rgba(58, 217, 245,0.92)',
 
   // ---- Read-only data gatherers (never mutate) ----
   _ns() {
@@ -2644,16 +2644,16 @@ const ShareStudio = {
 
     // --- Background: rich dark vertical gradient + purple radial bloom ---
     const bg = ctx.createLinearGradient(0, 0, 0, H);
-    bg.addColorStop(0, '#15131f');
-    bg.addColorStop(0.55, '#0d0c14');
-    bg.addColorStop(1, '#08070d');
+    bg.addColorStop(0, '#131d1f');
+    bg.addColorStop(0.55, '#0c1314');
+    bg.addColorStop(1, '#070c0d');
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, W, H);
 
     const bloom = ctx.createRadialGradient(W * 0.78, H * 0.16, 0, W * 0.78, H * 0.16, W * 0.95);
-    bloom.addColorStop(0, 'rgba(123,97,255,0.30)');
-    bloom.addColorStop(0.4, 'rgba(123,97,255,0.10)');
-    bloom.addColorStop(1, 'rgba(123,97,255,0)');
+    bloom.addColorStop(0, 'rgba(58, 217, 245,0.30)');
+    bloom.addColorStop(0.4, 'rgba(58, 217, 245,0.10)');
+    bloom.addColorStop(1, 'rgba(58, 217, 245,0)');
     ctx.fillStyle = bloom;
     ctx.fillRect(0, 0, W, H);
 
@@ -2680,7 +2680,7 @@ const ShareStudio = {
     this._spacedText(ctx, eyebrowMap[type] || 'MEMENTO', M, M + 30, 5);
 
     // Accent dot + small underline beneath eyebrow.
-    ctx.fillStyle = 'rgba(123,97,255,0.55)';
+    ctx.fillStyle = 'rgba(58, 217, 245,0.55)';
     ctx.fillRect(M, M + 50, 64, 4);
 
     // --- Body per card type ---
@@ -2755,7 +2755,7 @@ const ShareStudio = {
 
     // Identity line, sits near the bottom as a quiet anchor.
     if (d.identity) {
-      ctx.fillStyle = 'rgba(123,97,255,0.85)';
+      ctx.fillStyle = 'rgba(58, 217, 245,0.85)';
       ctx.font = 'italic 600 36px ' + FF;
       const idLines = this._wrap(ctx, '“' + d.identity + '”', W - M * 2, 3);
       let iy = H - M - 120 - (idLines.length - 1) * 48;
@@ -2875,7 +2875,7 @@ const ShareStudio = {
       c.width = 40; c.height = 40;
       const ctx = c.getContext('2d');
       if (!ctx) return false;
-      ctx.fillStyle = '#7b61ff';
+      ctx.fillStyle = '#3ad9f5';
       ctx.fillRect(0, 0, 40, 40);
       const url = c.toDataURL('image/png');
       // A 40x40 solid PNG data URL is comfortably > 200 chars; blank/tainted fails.
@@ -2922,7 +2922,7 @@ const ShareStudio = {
       h += '<button class="share-type" data-share-type="' + t + '" role="tab" aria-selected="' + active + '" style="'
         + 'font:inherit;font-weight:650;font-size:0.82rem;cursor:pointer;border-radius:var(--pill-r);padding:8px 15px;'
         + (active
-            ? 'background:rgba(123,97,255,0.18);color:var(--text-hi);border:1px solid rgba(123,97,255,0.45);'
+            ? 'background:rgba(58, 217, 245,0.18);color:var(--text-hi);border:1px solid rgba(58, 217, 245,0.45);'
             : 'background:var(--glass-bg);color:var(--text-2);border:1px solid var(--glass-border);')
         + '">' + esc(label[t]) + '</button>';
     });
@@ -2937,7 +2937,7 @@ const ShareStudio = {
     h += '<button id="sharePrivate" style="display:flex;align-items:center;gap:10px;width:100%;text-align:left;font:inherit;cursor:pointer;'
       + 'background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:calc(14px * var(--rx, 1));padding:12px 14px;margin-bottom:14px;color:var(--text-1);box-shadow:var(--glass-highlight);">'
       + '<span class="share-toggle" aria-hidden="true" style="flex:none;width:42px;height:25px;border-radius:999px;position:relative;transition:background .18s;'
-      + 'background:' + (this.privateMode ? 'rgba(123,97,255,0.85)' : 'rgba(var(--ink),0.16)') + ';">'
+      + 'background:' + (this.privateMode ? 'rgba(58, 217, 245,0.85)' : 'rgba(var(--ink),0.16)') + ';">'
       + '<span style="position:absolute;top:3px;left:' + (this.privateMode ? '20px' : '3px') + ';width:19px;height:19px;border-radius:50%;background:var(--solid-bg);transition:left .18s;box-shadow:0 1px 3px rgba(0,0,0,0.3);"></span></span>'
       + '<span style="display:flex;flex-direction:column;gap:1px;"><span style="font-size:0.9rem;font-weight:650;">Private</span>'
       + '<span style="font-size:0.74rem;color:var(--text-3);">Hide my name on the card</span></span></button>';
@@ -2958,7 +2958,7 @@ const ShareStudio = {
       const body = (typeof Sheet !== 'undefined' && Sheet.body) ? Sheet.body : document;
       const self = this;
       const msg = body.querySelector('#shareMsg');
-      const flash = (t, ok) => { if (!msg) return; msg.textContent = t; msg.style.color = ok ? 'rgba(120,230,170,0.95)' : 'var(--text-3)'; };
+      const flash = (t, ok) => { if (!msg) return; msg.textContent = t; msg.style.color = ok ? 'rgba(120, 230, 129,0.95)' : 'var(--text-3)'; };
 
       // Render the initial preview.
       this._refreshPreview();
@@ -3224,8 +3224,8 @@ function renderCommandCenter() {
         const skin = recommended
           ? 'background:var(--solid-bg);color:var(--solid-fg);border:none;'
           : 'background:var(--glass-bg);border:1px solid var(--glass-border);color:var(--text-hi);';
-        const sub = recommended ? 'color:rgba(11,11,18,0.62);' : 'color:var(--text-2);';
-        const tag = 'color:' + (recommended ? 'rgba(11,11,18,0.55)' : 'var(--text-3)') + ';font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;';
+        const sub = recommended ? 'color:rgba(11, 17, 18,0.62);' : 'color:var(--text-2);';
+        const tag = 'color:' + (recommended ? 'rgba(11, 17, 18,0.55)' : 'var(--text-3)') + ';font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;';
         return '<button class="cc-comeback-way" data-cc-comeback="' + tierKey + '" style="' + base + skin + '">' +
           '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:3px;">' +
             '<span style="font-weight:700;font-size:0.95rem;">' + esc(label) + '</span>' +
@@ -3728,9 +3728,9 @@ function bindCommandCenter(cc) {
 // starting ember; white is the 180-day star.
 function streakFlameTier(count) {
   const T = [
-    { min: 0,   c: '#A78BFA', s: 20, g: 6 },   // ember purple
+    { min: 0,   c: '#8be9fa', s: 20, g: 6 },   // ember purple
     { min: 7,   c: '#5EA2F7', s: 21, g: 6 },   // blue
-    { min: 14,  c: '#34D399', s: 22, g: 7 },   // green
+    { min: 14,  c: '#34d341', s: 22, g: 7 },   // green
     { min: 30,  c: '#E8C24A', s: 23, g: 7 },   // yellow
     { min: 60,  c: '#F59E0B', s: 24, g: 8 },   // orange
     { min: 100, c: '#EF6A5A', s: 25, g: 9 },   // red
@@ -5308,9 +5308,9 @@ const MementoShareCard = {
 
     // base near-black gradient (matches the app's dark soul)
     const bg = ctx.createLinearGradient(0, 0, 0, H);
-    bg.addColorStop(0, '#0c0b13');
-    bg.addColorStop(0.52, '#09080f');
-    bg.addColorStop(1, '#060509');
+    bg.addColorStop(0, '#0b1213');
+    bg.addColorStop(0.52, '#080e0f');
+    bg.addColorStop(1, '#050809');
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, W, H);
 
@@ -5321,10 +5321,10 @@ const MementoShareCard = {
     // anchor and stays dominant; action/consistency are kept subordinate so a
     // fully-lit re-share never crowds the engraved goal with opposed color masses.
     ctx.globalCompositeOperation = 'lighter';
-    this._bloom(ctx, W * 0.66, H * 0.27, W * 0.92, 'rgba(150,116,255,ALPHA)', 0.40 * clarLit);
-    this._bloom(ctx, W * 0.70, H * 0.24, W * 0.42, 'rgba(176,150,255,ALPHA)', 0.30 * clarLit);
+    this._bloom(ctx, W * 0.66, H * 0.27, W * 0.92, 'rgba(116, 234, 255,ALPHA)', 0.40 * clarLit);
+    this._bloom(ctx, W * 0.70, H * 0.24, W * 0.42, 'rgba(150, 239, 255,ALPHA)', 0.30 * clarLit);
     this._bloom(ctx, W * 0.30, H * 0.49, W * 0.50, 'rgba(236,239,255,ALPHA)', 0.17 * act);
-    this._bloom(ctx, W * 0.30, H * 0.74, W * 0.62, 'rgba(56,236,150,ALPHA)', 0.20 * cons);
+    this._bloom(ctx, W * 0.30, H * 0.74, W * 0.62, 'rgba(56, 236, 71,ALPHA)', 0.20 * cons);
     // a cool reflected pool low on the card, like the living card's mirror
     this._bloom(ctx, W * 0.52, H * 1.02, W * 0.85, 'rgba(120,140,220,ALPHA)', 0.14 * clarLit);
     ctx.globalCompositeOperation = 'source-over';
@@ -5335,9 +5335,9 @@ const MementoShareCard = {
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
     const core = ctx.createRadialGradient(sx, sy, 0, sx, sy, 104);
-    core.addColorStop(0, 'rgba(249,247,255,' + (0.62 * clarLit).toFixed(3) + ')');
-    core.addColorStop(0.38, 'rgba(198,182,255,' + (0.22 * clarLit).toFixed(3) + ')');
-    core.addColorStop(1, 'rgba(198,182,255,0)');
+    core.addColorStop(0, 'rgba(247, 254, 255,' + (0.62 * clarLit).toFixed(3) + ')');
+    core.addColorStop(0.38, 'rgba(182, 244, 255,' + (0.22 * clarLit).toFixed(3) + ')');
+    core.addColorStop(1, 'rgba(182, 244, 255,0)');
     ctx.fillStyle = core;
     ctx.fillRect(0, 0, W, H);
     ctx.restore();
@@ -5353,7 +5353,7 @@ const MementoShareCard = {
     ctx.textBaseline = 'alphabetic';
 
     // eyebrow
-    ctx.fillStyle = 'rgba(198,186,255,0.82)';
+    ctx.fillStyle = 'rgba(186, 245, 255,0.82)';
     ctx.font = this._font('600', 27);
     this._tracked(ctx, 'MY NEUTRON STAR', W / 2, 196, 5);
 
@@ -5371,7 +5371,7 @@ const MementoShareCard = {
       if (lines.length * lineH <= 600) break;
     }
     ctx.font = this._font('700', size);
-    ctx.fillStyle = 'rgba(247,247,252,0.98)';
+    ctx.fillStyle = 'rgba(247, 251, 252,0.98)';
     ctx.textAlign = 'center';
     const lineH = size * 1.16;
     const blockH = lines.length * lineH;
@@ -5391,7 +5391,7 @@ const MementoShareCard = {
     // star designation (if named)
     const name = this._starName();
     if (name) {
-      ctx.fillStyle = 'rgba(176,170,206,0.72)';
+      ctx.fillStyle = 'rgba(170, 201, 206,0.72)';
       ctx.font = this._font('600', 24);
       this._tracked(ctx, name.toUpperCase(), W / 2, ruleY + 52, 3);
     }
@@ -5400,7 +5400,7 @@ const MementoShareCard = {
     // matching the in-app whisper bar ("~X weeks left"), not a motivational tail.
     const wl = this._weeksLeft();
     if (wl != null) {
-      ctx.fillStyle = 'rgba(174,168,200,0.62)';
+      ctx.fillStyle = 'rgba(168, 195, 200,0.62)';
       ctx.font = this._font('500', 29);
       ctx.textAlign = 'center';
       ctx.fillText('~' + wl.toLocaleString() + ' weeks left.', W / 2, H - 174);
@@ -5408,7 +5408,7 @@ const MementoShareCard = {
     }
 
     // wordmark
-    ctx.fillStyle = 'rgba(158,152,186,0.78)';
+    ctx.fillStyle = 'rgba(152, 181, 186,0.78)';
     ctx.font = this._font('700', 28);
     this._tracked(ctx, 'MEMENTO', W / 2, H - 92, 7);
   },
@@ -5462,7 +5462,7 @@ const MementoShareCard = {
     requestAnimationFrame(function () { ov.classList.add('is-in'); });
 
     const msg = ov.querySelector('#mscMsg');
-    const flash = function (t, ok) { if (!msg) return; msg.textContent = t; msg.style.color = ok ? 'rgba(120,230,170,0.95)' : 'rgba(180,176,200,0.8)'; };
+    const flash = function (t, ok) { if (!msg) return; msg.textContent = t; msg.style.color = ok ? 'rgba(120, 230, 129,0.95)' : 'rgba(180,176,200,0.8)'; };
 
     ov.querySelector('#mscShare').addEventListener('click', function () { self._shareOrSave(canvas, flash); });
     ov.querySelector('#mscCopy').addEventListener('click', function () { self._copyText(flash); });

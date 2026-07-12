@@ -150,7 +150,7 @@ const DEFAULT_STATE = {
   // unlockAll: the unlock-ladder escape hatch. True bypasses module gating
   // entirely (set by the user in Settings/More, or by migration for users who
   // already completed Clarity).
-  prefs: { accent: 'default', accentCustom: '#7b61ff', theme: 'dark', flatBg: false, background: { type: 'default', value: '' }, bgDim: 0.2, reduceMotion: false, density: 'comfortable', uiRadius: 1, uiGlass: 0, uiBlur: 1, anchorQuote: '', trashWindowDays: 30, guaranteeVariant: 'a', unlockAll: false, appearanceChosen: false, look: '', motionTilt: true, motionGranted: false, cardTilt: false, reminder: { enabled: false, time: '09:00', quietStart: '22:00', quietEnd: '07:00' } },
+  prefs: { accent: 'default', accentCustom: '#3ad9f5', theme: 'dark', flatBg: false, background: { type: 'default', value: '' }, bgDim: 0.2, reduceMotion: false, density: 'comfortable', uiRadius: 1, uiGlass: 0, uiBlur: 1, anchorQuote: '', trashWindowDays: 30, guaranteeVariant: 'a', unlockAll: false, appearanceChosen: false, look: '', motionTilt: true, motionGranted: false, cardTilt: false, reminder: { enabled: false, time: '09:00', quietStart: '22:00', quietEnd: '07:00' } },
   // Optional, additive per-day memo of AI insight/accountability output so the
   // "Surface a pattern" button does not re-bill the API every press on the same
   // day. day is an ISO date; a mismatch (or any error) falls through to a live
@@ -576,12 +576,12 @@ try { window.addEventListener('focus', () => { try { Analytics._flush(); } catch
 // The exact default command-center accent literal (kept verbatim so users with
 // no custom accent render byte-identically to today). When a custom accent is
 // active, command-center inline-styled text reads the live --accent variable.
-const ACCENT_DEFAULT_CC = 'rgba(123,97,255,0.92)';
+const ACCENT_DEFAULT_CC = 'rgba(58, 217, 245,0.92)';
 const ACCENT_CHOICES = ['default', 'cyan', 'green', 'amber', 'rose', 'blue', 'teal', 'lime', 'orange', 'crimson', 'magenta', 'mono', 'custom'];
 // Hexes for the named accents (must stay in sync with body[data-accent] vars in
 // css/base.css). Used to compute the Memento hue-match rotation in JS.
 const ACCENT_HEX = {
-  cyan: '#2bd4d4', green: '#34d97a', amber: '#ffb73d', rose: '#ff6b9d',
+  cyan: '#2bd4d4', green: '#3fd94e', amber: '#ffb73d', rose: '#ff6b9d',
   blue: '#4f8cff', teal: '#19c3a6', lime: '#a3e635', orange: '#ff8a3d',
   crimson: '#ff4d6d', magenta: '#e84de8'
 };
@@ -620,7 +620,7 @@ const MEMENTO_LOOKS = [
 const BG_COLOR_CHOICES = [
   { key: 'black',    name: 'Pure black',  css: 'radial-gradient(ellipse 85% 65% at 50% 38%, #0a0a0c 0%, #000000 100%)' },
   { key: 'ink',      name: 'Deep ink',    css: 'radial-gradient(ellipse 95% 75% at 50% 28%, #0b1426 0%, #050810 58%, #02030a 100%)' },
-  { key: 'forest',   name: 'Dark forest', css: 'radial-gradient(ellipse 95% 75% at 50% 30%, #081b10 0%, #04110a 55%, #020704 100%)' },
+  { key: 'forest',   name: 'Dark forest', css: 'radial-gradient(ellipse 95% 75% at 50% 30%, #081b0a 0%, #041105 55%, #020702 100%)' },
   { key: 'ember',    name: 'Ember',       css: 'radial-gradient(ellipse 95% 75% at 50% 74%, #220b06 0%, #130605 55%, #060203 100%)' },
   { key: 'plum',     name: 'Plum',        css: 'radial-gradient(ellipse 95% 75% at 50% 28%, #180a22 0%, #0d0514 55%, #050208 100%)' },
   { key: 'graphite', name: 'Graphite',    css: 'linear-gradient(180deg, #141417 0%, #0c0c0e 55%, #050506 100%)' }
@@ -656,14 +656,14 @@ function decodeLook(code) {
 function hexToRgbTriplet(hex) {
   let h = String(hex || '').trim().replace('#', '');
   if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
-  if (!/^[0-9a-fA-F]{6}$/.test(h)) return '123, 97, 255';
+  if (!/^[0-9a-fA-F]{6}$/.test(h)) return '58, 217, 245';
   const r = parseInt(h.slice(0, 2), 16), g = parseInt(h.slice(2, 4), 16), b = parseInt(h.slice(4, 6), 16);
   return r + ', ' + g + ', ' + b;
 }
 function darkenHex(hex, amount) {
   let h = String(hex || '').trim().replace('#', '');
   if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
-  if (!/^[0-9a-fA-F]{6}$/.test(h)) return '#5550CC';
+  if (!/^[0-9a-fA-F]{6}$/.test(h)) return '#50b9cc';
   const f = Math.max(0, 1 - (amount == null ? 0.28 : amount));
   const ch = i => { const v = Math.round(parseInt(h.slice(i, i + 2), 16) * f); return ('0' + v.toString(16)).slice(-2); };
   return '#' + ch(0) + ch(2) + ch(4);
@@ -708,7 +708,7 @@ function fillAlpha(a, t) {
 // so missing/partial prefs are a no-op (= today's exact look). Idempotent;
 // safe to call on boot and again after a pref change.
 let _accentDriftTimer = null;
-const _ACCENT_DRIFT_STOPS = [[123, 97, 255], [96, 132, 255], [240, 100, 200]];
+const _ACCENT_DRIFT_STOPS = [[58, 217, 245], [96, 132, 255], [240, 100, 200]];
 let _accentDriftStart = 0;
 function _accentDriftTick() {
   const b = document.body; if (!b) return;
@@ -750,7 +750,7 @@ function applyPrefs() {
     b.style.removeProperty('--accent-rgb');
     b.style.removeProperty('--accent-strong');
     if (accent === 'custom') {
-      const hex = (p.accentCustom && /^#?[0-9a-fA-F]{3,6}$/.test(p.accentCustom)) ? p.accentCustom : '#7b61ff';
+      const hex = (p.accentCustom && /^#?[0-9a-fA-F]{3,6}$/.test(p.accentCustom)) ? p.accentCustom : '#3ad9f5';
       const norm = hex[0] === '#' ? hex : '#' + hex;
       b.setAttribute('data-accent', 'custom');
       b.style.setProperty('--accent', norm);
@@ -770,13 +770,13 @@ function applyPrefs() {
       let mmHex = null;
       if (accent === 'custom') {
         mmHex = (p.accentCustom && /^#?[0-9a-fA-F]{3,6}$/.test(p.accentCustom))
-          ? (p.accentCustom[0] === '#' ? p.accentCustom : '#' + p.accentCustom) : '#7b61ff';
+          ? (p.accentCustom[0] === '#' ? p.accentCustom : '#' + p.accentCustom) : '#3ad9f5';
       } else if (accent && accent !== 'default' && accent !== 'mono' && ACCENT_HEX[accent]) {
         mmHex = ACCENT_HEX[accent];
       }
       if (mmOn && mmHex) {
-        // The card's native clarity purple sits at hue ~256deg; rotate to the accent.
-        const rot = Math.round(hexToHue(mmHex) - 256);
+        // The card's native clarity cyan sits at hue ~189deg (v711); rotate to the accent.
+        const rot = Math.round(hexToHue(mmHex) - 189);
         b.classList.add('mm-match');
         b.style.setProperty('--mm-hue', rot + 'deg');
       } else {
@@ -2122,22 +2122,22 @@ function mementoMemorialSVG(opts) {
   return `<svg${id}${cls}${size} viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <defs>
       <linearGradient id="memLit${s}" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#e6c4ff"/><stop offset="45%" stop-color="#b8a3ff"/><stop offset="100%" stop-color="#7d92ff"/>
+        <stop offset="0%" stop-color="#c4f6ff"/><stop offset="45%" stop-color="#a3f1ff"/><stop offset="100%" stop-color="#7d92ff"/>
       </linearGradient>
       <linearGradient id="memShadow${s}" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#9d7ad6"/><stop offset="45%" stop-color="#6e6bc4"/><stop offset="100%" stop-color="#3a5aa8"/>
+        <stop offset="0%" stop-color="#7ac8d6"/><stop offset="45%" stop-color="#6bb7c4"/><stop offset="100%" stop-color="#3a5aa8"/>
       </linearGradient>
       <linearGradient id="memPedTop${s}" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#ead4ff"/><stop offset="100%" stop-color="#bea4ff"/>
+        <stop offset="0%" stop-color="#d4f9ff"/><stop offset="100%" stop-color="#a4f1ff"/>
       </linearGradient>
       <linearGradient id="memPedFront${s}" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#a08aff"/><stop offset="100%" stop-color="#5a78e0"/>
+        <stop offset="0%" stop-color="#8aedff"/><stop offset="100%" stop-color="#5a78e0"/>
       </linearGradient>
       <linearGradient id="memPedSide${s}" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#6a59b5"/><stop offset="100%" stop-color="#3a4ea0"/>
+        <stop offset="0%" stop-color="#59a7b5"/><stop offset="100%" stop-color="#3a4ea0"/>
       </linearGradient>
       <linearGradient id="memRingGrad${s}" x1="0" y1="0" x2="1" y2="0.6">
-        <stop offset="0%" stop-color="#c084ff"/><stop offset="55%" stop-color="#7d8cff"/><stop offset="100%" stop-color="#5dc7ff"/>
+        <stop offset="0%" stop-color="#84edff"/><stop offset="55%" stop-color="#7debff"/><stop offset="100%" stop-color="#5dc7ff"/>
       </linearGradient>
       <filter id="memRingGlow${s}" x="-60%" y="-60%" width="220%" height="220%">
         <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="b1"/>

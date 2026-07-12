@@ -35,13 +35,13 @@
      before. body.theme-light overrides --ink to a near-black, inverting all of
      them at once while preserving each value's original opacity. */
   --ink: 255, 255, 255;
-  --bg-deep: #040406;
+  --bg-deep: #040606;
   --bg-card: rgba(0, 0, 0, 0.6);
   --bg-card-hover: rgba(10, 10, 12, 0.66);
   --border-card: rgba(var(--ink),0.11);
   --border-card-hover: rgba(var(--ink),0.2);
 
-  --color-clarity: #5550CC;
+  --color-clarity: #50b9cc;
   --color-clarity-blue: #3D6FCC;
   --color-clarity-teal: #14B896;
   --color-action: #FFFFFF;
@@ -55,23 +55,23 @@
   --color-vivere-green: #7BC47F; /* the green half of the warm pairing */
   --color-lifestats: #2DD4BF;
   --color-deepwork: #FF9F0A;
-  --color-reflection: #BF5AF2;
+  --color-reflection: #5adbf2;
   --color-distraction: #FF6B6B;
   /* Consistency / success green, routed through variables so a chosen accent can
      take it over (see the accent-dominance block). Default = the original green. */
   --success: #30D158;
   --success-rgb: 48, 209, 88;
-  --success-soft: #54e39b;
+  --success-soft: #54e360;
 
   /* Shared accent (eyebrows, focus rings, command-center / onboarding / sheet
      accent, primary highlights). Defaults to today's exact purple. A user can
      retint this from Profile > Preferences; per-module identity colors above
      are never affected. --accent is the bright link/highlight shade,
      --accent-rgb feeds rgba() glows/rings, --accent-strong is the deeper fill
-     used by solid accent surfaces (matches the prior #5550CC). */
-  --accent: #7b61ff;
-  --accent-rgb: 123, 97, 255;
-  --accent-strong: #5550CC;
+     used by solid accent surfaces (matches the prior #50b9cc). */
+  --accent: #3ad9f5;
+  --accent-rgb: 58, 217, 245;
+  --accent-strong: #50b9cc;
 
   --font: 'Geist', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
   --text-1: rgba(var(--ink),0.92);
@@ -237,7 +237,7 @@
   --fs-2xl: 1.7rem;    /* screen headings */
   /* Fixed module identity colors (never affected by the user's --accent
      retint; Clarity stays purple even when the accent goes cyan). */
-  --clarity-rgb: 123, 97, 255;
+  --clarity-rgb: 58, 217, 245;
   --danger: #ff3b30;
   --danger-rgb: 255, 59, 48;
   /* Layering tiers: content < raised bits < nav < sheets < modal overlays
@@ -258,11 +258,11 @@
      In light mode it inverts to dark-on-white so it never goes invisible. Use
      --solid-bg for the fill and --solid-fg for its label. */
   --solid-bg: #ffffff;
-  --solid-fg: #0b0b12;
+  --solid-fg: #0b1112;
   /* Hover fill for the solid CTA. Must stay on the SAME side as --solid-bg so the
      --solid-fg label never loses contrast: a near-white nudge under the white dark
      mode button, a lighter-dark nudge under the dark light-mode button. */
-  --solid-bg-hover: #f0f0f5;
+  --solid-bg-hover: #f0f4f5;
   color-scheme: dark;
 }
 
@@ -301,7 +301,7 @@ html.theme-light {
   --glass-bg: rgba(255,255,255,0.82);
   --glass-bg-hover: rgba(255,255,255,0.92);
   --glass-bg-strong: rgba(255,255,255,0.94);
-  --glass-bg-heavy: rgba(250,250,252,0.94);
+  --glass-bg-heavy: rgba(250, 252, 252,0.94);
   --glass-border: rgba(24,26,33,0.10);
   --glass-border-hover: rgba(24,26,33,0.18);
   --glass-highlight: inset 0 1px 0 rgba(255,255,255,0.9);
@@ -434,7 +434,7 @@ body.custom-bg .apl-rays { display: none !important; }
 html:not(.bg-flat) #panelProfile { background: transparent; }
 html:not(.bg-flat) #panelProfile::before {
   content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
-  background: rgba(4, 4, 8, 0.42);
+  background: rgba(4, 7, 8, 0.42);
   animation: settingsDimIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 html.theme-light:not(.bg-flat) #panelProfile::before { background: rgba(238, 240, 243, 0.55); }
@@ -497,7 +497,7 @@ html.theme-light #clarityPaywall,
 html.theme-light .splash {
   color-scheme: dark;
   --ink: 255, 255, 255;
-  --surface-0: #040405; --bg-deep: #040406;
+  --surface-0: #040405; --bg-deep: #040606;
   --surface-1: rgba(var(--ink),0.04); --surface-2: rgba(var(--ink),0.072); --surface-3: rgba(var(--ink),0.10);
   --surface-1-solid: #101117; --surface-2-solid: #171820;
   --bg-card: rgba(0,0,0,0.6); --bg-card-hover: rgba(10,10,12,0.66);
@@ -515,7 +515,7 @@ html.theme-light .splash {
   --text-1: rgba(var(--ink),0.92); --text-2: rgba(var(--ink),0.55); --text-3: rgba(var(--ink),0.30);
   --text-hi: rgba(var(--ink),0.96); --text-mid: rgba(var(--ink),0.62); --text-lo: rgba(var(--ink),0.40); --text-faint: rgba(var(--ink),0.24);
   --hairline: rgba(var(--ink),0.09); --hairline-strong: rgba(var(--ink),0.16);
-  --solid-bg: #ffffff; --solid-fg: #0b0b12;
+  --solid-bg: #ffffff; --solid-fg: #0b1112;
 }
 
 /* --- Content experiences: inner surfaces + scoped tokens for light mode ---
@@ -592,7 +592,7 @@ html.theme-light .action-exp__close {
    focus rings + glows, primary highlight chrome). Per-module identity colors
    (--color-clarity etc.) are never touched. */
 body[data-accent="cyan"]    { --accent: #2bd4d4; --accent-rgb: 43, 212, 212;  --accent-strong: #1796a6; }
-body[data-accent="green"]   { --accent: #34d97a; --accent-rgb: 52, 217, 122;  --accent-strong: #1f9e5a; }
+body[data-accent="green"]   { --accent: #3fd94e; --accent-rgb: 63, 217, 78;  --accent-strong: #1f9e2a; }
 body[data-accent="amber"]   { --accent: #ffb73d; --accent-rgb: 255, 183, 61;  --accent-strong: #cc8a1f; }
 body[data-accent="rose"]    { --accent: #ff6b9d; --accent-rgb: 255, 107, 157; --accent-strong: #cc3f72; }
 body[data-accent="blue"]    { --accent: #4f8cff; --accent-rgb: 79, 140, 255;  --accent-strong: #2f63cc; }
@@ -937,7 +937,7 @@ body.density-compact .sidebar__inner { gap: 8px; }
     radial-gradient(circle at 84% 18%, #e84de8 0%, transparent 50%),
     radial-gradient(circle at 68% 88%, #ffb73d 0%, transparent 54%),
     radial-gradient(circle at 22% 84%, #19c3a6 0%, transparent 50%),
-    #0a0a10;
+    #0a0f10;
 }
 .feel-preview__card {
   position: relative; z-index: 1;
@@ -956,7 +956,7 @@ body.density-compact .sidebar__inner { gap: 8px; }
 .feel-preview__row { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
 .feel-preview__btn {
   font-size: var(--fs-xs); font-weight: 600; line-height: 1;
-  color: #0b0b12; background: #ffffff;
+  color: #0b1112; background: #ffffff;
   padding: 6px 12px; border-radius: var(--r-sm);
 }
 .feel-preview__chip {
@@ -1029,7 +1029,7 @@ body::after {
   background:
     radial-gradient(ellipse 70% 60% at 50% 50%,
       rgba(20, 20, 26, 1) 0%,
-      rgba(8, 8, 12, 1) 50%,
+      rgba(8, 11, 12, 1) 50%,
       rgba(0, 0, 0, 1) 100%);
 }
 /* Boot mask: covers everything in pure black on first paint, fades out via
@@ -1080,7 +1080,7 @@ html.flat-ui:not(.theme-light) {
 }
 html.flat-ui.theme-light {
   --glass-bg: rgba(255, 255, 255, 0.96);
-  --glass-bg-heavy: rgba(252, 252, 253, 0.98);
+  --glass-bg-heavy: rgba(252, 253, 253, 0.98);
 }
 /* OLED ground: the dark flat page is true black. */
 html.flat-ui:not(.theme-light) body,
@@ -1091,8 +1091,8 @@ html.flat-ui:not(.theme-light) .ambient {
 /* Dynamic accent swatch (v576): the colored-M gradient, slowly turning. */
 /* v695 (Malik): one still colour, no spinning gradient. */
 .pref-swatch__dot--dynamic {
-  background: #7b61ff;
-  box-shadow: 0 0 0 1px rgba(var(--ink), 0.18), 0 0 10px rgba(150, 116, 255, 0.4);
+  background: #3ad9f5;
+  box-shadow: 0 0 0 1px rgba(var(--ink), 0.18), 0 0 10px rgba(116, 234, 255, 0.4);
 }
 
 /* Compact density strengthened (v576, Malik: it barely did anything). */

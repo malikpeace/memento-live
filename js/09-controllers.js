@@ -14,17 +14,17 @@ function threePillarsSystemSVG() {
       </filter>
       <linearGradient id="pillarSystemBase" x1="38" y1="122" x2="222" y2="122" gradientUnits="userSpaceOnUse">
         <stop offset="0%" stop-color="rgba(var(--ink),0.18)"/>
-        <stop offset="50%" stop-color="rgba(123,97,255,0.52)"/>
+        <stop offset="50%" stop-color="rgba(58, 217, 245,0.52)"/>
         <stop offset="100%" stop-color="rgba(var(--success-rgb),0.34)"/>
       </linearGradient>
     </defs>
     <path class="pillar-system__orbit" d="M45 95C62 39 98 23 130 28C168 33 197 58 214 98" fill="none" stroke="rgba(var(--ink),0.14)" stroke-width="1.2"/>
     <path class="pillar-system__base" d="M43 122H217" stroke="url(#pillarSystemBase)" stroke-width="3" stroke-linecap="round"/>
     <g class="pillar-system__node pillar-system__node--clarity" filter="url(#pillarSystemGlow)">
-      <circle cx="76" cy="85" r="18" fill="rgba(123,97,255,0.08)" stroke="#7B61FF" stroke-width="1.2"/>
-      <circle cx="76" cy="85" r="8" fill="none" stroke="#7B61FF" stroke-width="1.2" opacity="0.72"/>
-      <circle cx="76" cy="85" r="2.8" fill="#7B61FF"/>
-      <path d="M76 103V122" stroke="#7B61FF" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="76" cy="85" r="18" fill="rgba(58, 217, 245,0.08)" stroke="#3ad9f5" stroke-width="1.2"/>
+      <circle cx="76" cy="85" r="8" fill="none" stroke="#3ad9f5" stroke-width="1.2" opacity="0.72"/>
+      <circle cx="76" cy="85" r="2.8" fill="#3ad9f5"/>
+      <path d="M76 103V122" stroke="#3ad9f5" stroke-width="4" stroke-linecap="round"/>
     </g>
     <g class="pillar-system__node pillar-system__node--action" filter="url(#pillarSystemGlow)">
       <path d="M130 52L151 93H136V122H124V93H109L130 52Z" fill="rgba(var(--ink),0.10)" stroke="rgba(var(--ink),0.94)" stroke-width="1.4" stroke-linejoin="round"/>
@@ -65,7 +65,7 @@ const WelcomeIntro = {
   steps: [
     {
       color: 'var(--color-clarity)',
-      hex: '#7B61FF',
+      hex: '#3ad9f5',
       label: 'Pillar 1',
       headline: 'Clarity',
       body: 'Know exactly what you want. Why you want it. And how you\u2019re going to get there. Everything starts with knowing the what, why, and how.',
@@ -2029,17 +2029,17 @@ const WelcomeIntro = {
   // light shafts, the same signature beam used on the splash and dashboard.
   _cineRays() {
     return '<div class="ambient__rays-source"></div>'
-      + '<div class="ambient__rays-beam" style="--a:3deg;  --h:35px;  --d:9.4s;  --del:-0.0s; --omin:0.04; --omax:0.32; --smin:0.85; --smax:1.05; --c:165 130 255;"><div class="ambient__rays-beam-shaft"></div></div>'
-      + '<div class="ambient__rays-beam" style="--a:9deg;  --h:90px;  --d:11.6s; --del:-1.8s; --omin:0.07; --omax:0.50; --smin:0.55; --smax:1.35; --c:150 130 255;"><div class="ambient__rays-beam-shaft"></div></div>'
-      + '<div class="ambient__rays-beam" style="--a:16deg; --h:24px;  --d:7.1s;  --del:-3.4s; --omin:0.05; --omax:0.30; --smin:0.7;  --smax:1.2;  --c:200 180 255;"><div class="ambient__rays-beam-shaft"></div></div>'
-      + '<div class="ambient__rays-beam" style="--a:22deg; --h:75px;  --d:13.2s; --del:-2.1s; --omin:0.09; --omax:0.65; --smin:0.6;  --smax:1.3;  --c:175 140 255;"><div class="ambient__rays-beam-shaft"></div></div>'
+      + '<div class="ambient__rays-beam" style="--a:3deg;  --h:35px;  --d:9.4s;  --del:-0.0s; --omin:0.04; --omax:0.32; --smin:0.85; --smax:1.05; --c:130 236 255;"><div class="ambient__rays-beam-shaft"></div></div>'
+      + '<div class="ambient__rays-beam" style="--a:9deg;  --h:90px;  --d:11.6s; --del:-1.8s; --omin:0.07; --omax:0.50; --smin:0.55; --smax:1.35; --c:130 236 255;"><div class="ambient__rays-beam-shaft"></div></div>'
+      + '<div class="ambient__rays-beam" style="--a:16deg; --h:24px;  --d:7.1s;  --del:-3.4s; --omin:0.05; --omax:0.30; --smin:0.7;  --smax:1.2;  --c:180 244 255;"><div class="ambient__rays-beam-shaft"></div></div>'
+      + '<div class="ambient__rays-beam" style="--a:22deg; --h:75px;  --d:13.2s; --del:-2.1s; --omin:0.09; --omax:0.65; --smin:0.6;  --smax:1.3;  --c:140 238 255;"><div class="ambient__rays-beam-shaft"></div></div>'
       + '<div class="ambient__rays-beam" style="--a:29deg; --h:40px;  --d:10.5s; --del:-5.6s; --omin:0.05; --omax:0.34; --smin:0.5;  --smax:1.4;  --c:255 255 255;"><div class="ambient__rays-beam-shaft"></div></div>'
-      + '<div class="ambient__rays-beam" style="--a:36deg; --h:110px; --d:8.3s;  --del:-0.7s; --omin:0.11; --omax:0.72; --smin:0.65; --smax:1.25; --c:150 120 255;"><div class="ambient__rays-beam-shaft"></div></div>'
-      + '<div class="ambient__rays-beam" style="--a:43deg; --h:28px;  --d:14.8s; --del:-4.2s; --omin:0.04; --omax:0.28; --smin:0.8;  --smax:1.15; --c:190 165 255;"><div class="ambient__rays-beam-shaft"></div></div>'
-      + '<div class="ambient__rays-beam" style="--a:50deg; --h:95px;  --d:9.0s;  --del:-3.0s; --omin:0.10; --omax:0.68; --smin:0.55; --smax:1.4;  --c:185 145 255;"><div class="ambient__rays-beam-shaft"></div></div>'
-      + '<div class="ambient__rays-beam" style="--a:64deg; --h:65px;  --d:10.9s; --del:-1.2s; --omin:0.08; --omax:0.54; --smin:0.6;  --smax:1.3;  --c:160 140 255;"><div class="ambient__rays-beam-shaft"></div></div>'
+      + '<div class="ambient__rays-beam" style="--a:36deg; --h:110px; --d:8.3s;  --del:-0.7s; --omin:0.11; --omax:0.72; --smin:0.65; --smax:1.25; --c:120 235 255;"><div class="ambient__rays-beam-shaft"></div></div>'
+      + '<div class="ambient__rays-beam" style="--a:43deg; --h:28px;  --d:14.8s; --del:-4.2s; --omin:0.04; --omax:0.28; --smin:0.8;  --smax:1.15; --c:165 241 255;"><div class="ambient__rays-beam-shaft"></div></div>'
+      + '<div class="ambient__rays-beam" style="--a:50deg; --h:95px;  --d:9.0s;  --del:-3.0s; --omin:0.10; --omax:0.68; --smin:0.55; --smax:1.4;  --c:145 238 255;"><div class="ambient__rays-beam-shaft"></div></div>'
+      + '<div class="ambient__rays-beam" style="--a:64deg; --h:65px;  --d:10.9s; --del:-1.2s; --omin:0.08; --omax:0.54; --smin:0.6;  --smax:1.3;  --c:140 238 255;"><div class="ambient__rays-beam-shaft"></div></div>'
       + '<div class="ambient__rays-beam" style="--a:72deg; --h:32px;  --d:8.6s;  --del:-4.9s; --omin:0.05; --omax:0.32; --smin:0.7;  --smax:1.2;  --c:255 255 255;"><div class="ambient__rays-beam-shaft"></div></div>'
-      + '<div class="ambient__rays-beam" style="--a:80deg; --h:80px;  --d:11.4s; --del:-2.6s; --omin:0.09; --omax:0.58; --smin:0.55; --smax:1.35; --c:170 135 255;"><div class="ambient__rays-beam-shaft"></div></div>';
+      + '<div class="ambient__rays-beam" style="--a:80deg; --h:80px;  --d:11.4s; --del:-2.6s; --omin:0.09; --omax:0.58; --smin:0.55; --smax:1.35; --c:135 237 255;"><div class="ambient__rays-beam-shaft"></div></div>';
   },
 
   _showSolution(stepIndex, beatIdx) {
@@ -2272,7 +2272,7 @@ const WelcomeIntro = {
   // tied to their finite time, 3-5 clarity / action / consistency framed to what they
   // already told us, 6 the close. Replaces the old want/stakes/payoff + the module demo.
   _solBeats(p) {
-    const PUR = 'rgba(150,116,255,1)';
+    const PUR = 'rgba(116, 234, 255,1)';
     const low = (v) => String(v || '').toLowerCase();
     const ap = String((p && p.actionProgress) || '');
     const first = (p && p.name) ? String(p.name).trim().split(/\s+/)[0] : '';
@@ -2492,19 +2492,19 @@ const WelcomeIntro = {
     // three pillar marks on the philosophy, the life-in-years grid on the fuel) so it
     // reads as a single evolving visual instead of six different ones.
     const rings = '<svg class="wi-orb__rings" viewBox="0 0 240 190" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
-      + '<circle cx="120" cy="92" r="72" fill="none" stroke="rgba(150,116,255,0.13)" stroke-width="1.5"/>'
-      + '<circle cx="120" cy="92" r="50" fill="none" stroke="rgba(150,116,255,0.24)" stroke-width="1.5"/>'
-      + '<circle cx="120" cy="92" r="28" fill="none" stroke="rgba(150,116,255,0.42)" stroke-width="1.5"/>'
-      + '<circle cx="120" cy="92" r="14" fill="none" stroke="rgba(184,156,255,0.7)" stroke-width="1"/>'
-      + '<circle cx="120" cy="92" r="7" fill="rgba(190,164,255,1)"/></svg>';
+      + '<circle cx="120" cy="92" r="72" fill="none" stroke="rgba(116, 234, 255,0.13)" stroke-width="1.5"/>'
+      + '<circle cx="120" cy="92" r="50" fill="none" stroke="rgba(116, 234, 255,0.24)" stroke-width="1.5"/>'
+      + '<circle cx="120" cy="92" r="28" fill="none" stroke="rgba(116, 234, 255,0.42)" stroke-width="1.5"/>'
+      + '<circle cx="120" cy="92" r="14" fill="none" stroke="rgba(156, 240, 255,0.7)" stroke-width="1"/>'
+      + '<circle cx="120" cy="92" r="7" fill="rgba(164, 241, 255,1)"/></svg>';
     const ic = (typeof ICONS !== 'undefined') ? ICONS : {};
     // consistency = the calendar with X marks for the days you showed up (ported
     // from the demo consistency mark; strokes bumped so it reads at mark size).
     const cal = '<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-linecap="round"><rect x="14" y="18" width="52" height="48" rx="7" stroke-width="2.2" opacity="0.55"/><line x1="14" y1="30" x2="66" y2="30" stroke-width="1.6" opacity="0.4"/><line x1="28" y1="13" x2="28" y2="22" stroke-width="2.6" opacity="0.7"/><line x1="52" y1="13" x2="52" y2="22" stroke-width="2.6" opacity="0.7"/><path d="M22 36L28 42M28 36L22 42" stroke-width="2.4"/><path d="M34 36L40 42M40 36L34 42" stroke-width="2.4"/><path d="M46 36L52 42M52 36L46 42" stroke-width="2.4"/><path d="M22 48L28 54M28 48L22 54" stroke-width="2.4"/><path d="M34 48L40 54M40 48L34 54" stroke-width="2.4"/></svg>';
     const marks = '<div class="wi-orb__marks">'
-      + '<span class="wi-orb__mark" style="color:rgba(150,116,255,1)">' + (ic.clarity || '') + '</span>'
+      + '<span class="wi-orb__mark" style="color:rgba(116, 234, 255,1)">' + (ic.clarity || '') + '</span>'
       + '<span class="wi-orb__mark" style="color:rgba(226,232,255,1)">' + (ic.action || '') + '</span>'
-      + '<span class="wi-orb__mark" style="color:rgba(52,211,153,1)">' + cal + '</span></div>';
+      + '<span class="wi-orb__mark" style="color:rgba(52, 211, 65,1)">' + cal + '</span></div>';
     const grid = '<div class="wi-orb__grid">' + this._twistGrid() + '</div>';
     return '<div class="wi-orb" data-orb="' + key + '"><div class="wi-orb__core">' + rings + grid + marks + '</div>' + this._solChips(p) + '</div>';
   },
@@ -2516,9 +2516,9 @@ const WelcomeIntro = {
     const cal = '<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-linecap="round"><rect x="14" y="18" width="52" height="48" rx="7" stroke-width="2.2" opacity="0.55"/><line x1="14" y1="30" x2="66" y2="30" stroke-width="1.6" opacity="0.4"/><line x1="28" y1="13" x2="28" y2="22" stroke-width="2.6" opacity="0.7"/><line x1="52" y1="13" x2="52" y2="22" stroke-width="2.6" opacity="0.7"/><path d="M22 36L28 42M28 36L22 42" stroke-width="2.4"/><path d="M34 36L40 42M40 36L34 42" stroke-width="2.4"/><path d="M46 36L52 42M52 36L46 42" stroke-width="2.4"/><path d="M22 48L28 54M28 48L22 54" stroke-width="2.4"/><path d="M34 48L40 54M40 48L34 54" stroke-width="2.4"/></svg>';
     return {
       order: ['clarity', 'action', 'consistency'],
-      clarity: { c: 'rgba(150,116,255,1)', label: 'Find Clarity.', icon: ic.clarity || '', text: 'The one goal that actually matters.' },
+      clarity: { c: 'rgba(116, 234, 255,1)', label: 'Find Clarity.', icon: ic.clarity || '', text: 'The one goal that actually matters.' },
       action: { c: 'rgba(245,245,247,1)', label: 'Take Action.', icon: ic.action || '', text: 'The single highest-leverage move.' },
-      consistency: { c: 'rgba(52,211,153,1)', label: 'Stay Consistent.', icon: cal, text: "Showing up, especially when it's hard." }
+      consistency: { c: 'rgba(52, 211, 65,1)', label: 'Stay Consistent.', icon: cal, text: "Showing up, especially when it's hard." }
     };
   },
   // Vertical-stepper reveal on the help page: Find Clarity is already lit; the connecting line
@@ -2667,7 +2667,7 @@ const WelcomeIntro = {
     // with no hard hotspots or see-through gaps, with the white Memento M on top. It comes alive
     // when the line reaches it (is-on).
     const mMark = '<svg class="wi-orb__m" viewBox="0 0 512 512" aria-hidden="true"><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z" fill="#ffffff"/></svg>';
-    const orbRow = '<div class="wi-help__row is-dim" style="--nc:rgba(150,116,255,1)">'
+    const orbRow = '<div class="wi-help__row is-dim" style="--nc:rgba(116, 234, 255,1)">'
       + '<span class="wi-help__node wi-help__node--orb" aria-hidden="true">'
       +   '<span class="wi-orb__b wi-orb__b--1"></span><span class="wi-orb__b wi-orb__b--2"></span><span class="wi-orb__b wi-orb__b--3"></span>'
       +   mMark
@@ -2854,7 +2854,7 @@ const WelcomeIntro = {
     return 'a life you are proud of';
   },
   _solHelps(p) {
-    const CL = { clarity: 'rgba(150,116,255,1)', action: 'rgba(245,245,247,1)', consistency: 'rgba(52,211,153,1)', drive: 'rgba(244,138,120,1)' };
+    const CL = { clarity: 'rgba(116, 234, 255,1)', action: 'rgba(245,245,247,1)', consistency: 'rgba(52, 211, 65,1)', drive: 'rgba(244,138,120,1)' };
     const low = (v) => String(v || '').toLowerCase();
     const cl = low(p && p.clarityLevel), ak = low(p && p.actionKnow), ap = String((p && p.actionProgress) || ''), rf = low(p && p.runningFrom);
     const out = [];
@@ -2894,11 +2894,11 @@ const WelcomeIntro = {
     this.navEl.style.gap = '10px';
 
     const BEATS = [
-      { key: 'clarity', accent: 'rgba(150,116,255,1)', headline: 'Get clear on the one goal', line: 'First we find the one goal underneath all the noise, sharp enough to act on. You stop spreading yourself thin and finally know what you are aiming at.' },
+      { key: 'clarity', accent: 'rgba(116, 234, 255,1)', headline: 'Get clear on the one goal', line: 'First we find the one goal underneath all the noise, sharp enough to act on. You stop spreading yourself thin and finally know what you are aiming at.' },
       { key: 'action', accent: 'rgba(245,245,247,1)', headline: 'Turn it into one daily move', line: 'A big goal is paralyzing. One small move is not. Memento turns what you want into the single thing to do today, so knowing finally becomes doing.' },
-      { key: 'consistency', accent: 'rgba(52,211,153,1)', headline: 'Stack the proof', line: 'Every day you show up gets logged where you can see it. On the days you doubt yourself, the evidence is right there. You have done this before, you can do it again.' },
+      { key: 'consistency', accent: 'rgba(52, 211, 65,1)', headline: 'Stack the proof', line: 'Every day you show up gets logged where you can see it. On the days you doubt yourself, the evidence is right there. You have done this before, you can do it again.' },
       { key: 'vivere', accent: 'rgba(244,138,120,1)', headline: 'Something to build toward', line: 'Vivere holds your why where you can see it. The life you are building lives on your screen, so on the flat days you remember exactly what this is for.' },
-      { key: 'mori', accent: 'rgba(206,192,255,1)', headline: 'Your time is finite', line: 'Mori shows you the weeks you have, plainly. Not to scare you, but so today lands as one of them. Finite time is the reason showing up now matters, and the reason the promises you make to yourself are worth keeping.' },
+      { key: 'mori', accent: 'rgba(192, 246, 255,1)', headline: 'Your time is finite', line: 'Mori shows you the weeks you have, plainly. Not to scare you, but so today lands as one of them. Finite time is the reason showing up now matters, and the reason the promises you make to yourself are worth keeping.' },
       { key: 'evolve', accent: 'rgba(125,200,255,1)', headline: 'It grows with you', line: 'As you change, Memento changes with you. The goal sharpens, the moves get bigger, the proof keeps stacking. It fits the person you are becoming, not just who you are today.' }
     ];
     const n = BEATS.length;
@@ -2943,7 +2943,7 @@ const WelcomeIntro = {
   // Stylized mini-mockups of the real Memento screens for the demo. Pure SVG so
   // they scale and theme. Illustration, not live UI. accent = the beat color.
   _demoMock(key, accent) {
-    const A = accent || 'rgba(150,116,255,1)';
+    const A = accent || 'rgba(116, 234, 255,1)';
     if (key === 'clarity') {
       return `<svg class="wi-mock" viewBox="0 0 240 210" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <defs><radialGradient id="mkClar" cx="50%" cy="40%" r="62%"><stop offset="0%" stop-color="${A}" stop-opacity="0.85"/><stop offset="52%" stop-color="${A}" stop-opacity="0.16"/><stop offset="100%" stop-color="${A}" stop-opacity="0"/></radialGradient></defs>
@@ -2978,8 +2978,8 @@ const WelcomeIntro = {
     if (key === 'vivere') {
       return `<svg class="wi-mock" viewBox="0 0 240 210" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <defs>
-          <linearGradient id="mkV1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${A}" stop-opacity="0.75"/><stop offset="1" stop-color="rgba(150,116,255,0.55)"/></linearGradient>
-          <linearGradient id="mkV2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="rgba(52,211,153,0.6)"/><stop offset="1" stop-color="rgba(125,200,255,0.5)"/></linearGradient>
+          <linearGradient id="mkV1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${A}" stop-opacity="0.75"/><stop offset="1" stop-color="rgba(116, 234, 255,0.55)"/></linearGradient>
+          <linearGradient id="mkV2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="rgba(52, 211, 65,0.6)"/><stop offset="1" stop-color="rgba(125,200,255,0.5)"/></linearGradient>
           <linearGradient id="mkV3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="rgba(232,194,74,0.6)"/><stop offset="1" stop-color="${A}" stop-opacity="0.5"/></linearGradient>
         </defs>
         <rect x="46" y="40" width="84" height="86" rx="12" fill="url(#mkV1)"/>
@@ -3021,7 +3021,7 @@ const WelcomeIntro = {
     const W = window.innerWidth, H = window.innerHeight;
     canvas.width = W * dpr; canvas.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     const lite = document.body.classList.contains('lite') || document.documentElement.classList.contains('lowfx');
-    const colors = ['#9b7eff', '#6d3df0', '#b144ff', '#ffd86b', '#ff5fa2', '#5fd0ff', '#7cffb2'];
+    const colors = ['#7eecff', '#3dd5f0', '#44e3ff', '#ffd86b', '#ff5fa2', '#5fd0ff', '#7cff87'];
     let parts = [];
     const burst = (ox, oy, count, big) => {
       if (parts.length > 260) parts = parts.filter(p => p.life <= p.max);
@@ -3114,7 +3114,7 @@ const WelcomeIntro = {
     this._onSummaryReady = null;
     this._hideProgressBar();
 
-    const sparkle = '<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="vpSumStar" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#efe9ff"/><stop offset="55%" stop-color="#9b7eff"/><stop offset="100%" stop-color="#6d3df0"/></radialGradient></defs><path d="M32 3 C34 22 42 30 61 32 C42 34 34 42 32 61 C30 42 22 34 3 32 C22 30 30 22 32 3 Z" fill="url(#vpSumStar)"/></svg>';
+    const sparkle = '<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="vpSumStar" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#e9fcff"/><stop offset="55%" stop-color="#7eecff"/><stop offset="100%" stop-color="#3dd5f0"/></radialGradient></defs><path d="M32 3 C34 22 42 30 61 32 C42 34 34 42 32 61 C30 42 22 34 3 32 C22 30 30 22 32 3 Z" fill="url(#vpSumStar)"/></svg>';
 
     this.pageWrap.style.alignItems = 'center';
     this.pageWrap.style.textAlign = 'left';
@@ -4217,9 +4217,9 @@ const Sidebar = {
 // individually adjustable afterward. Accent keys must exist in ACCENT_CHOICES;
 // bg is [type, value] for prefs.background.
 const THEME_PRESETS = [
-  { key: 'midnight', name: 'Midnight', theme: 'dark',  accent: 'default', bg: ['default', ''],        uiRadius: 1,   uiGlass: 0,   dot: 'background: radial-gradient(circle at 32% 30%, #2a2440 0%, #0a0a10 70%);' },
+  { key: 'midnight', name: 'Midnight', theme: 'dark',  accent: 'default', bg: ['default', ''],        uiRadius: 1,   uiGlass: 0,   dot: 'background: radial-gradient(circle at 32% 30%, #243c40 0%, #0a0f10 70%);' },
   { key: 'ember',    name: 'Ember',    theme: 'dark',  accent: 'orange',  bg: ['color', 'ember'],     uiRadius: 0.8, uiGlass: 0,   dot: 'background: radial-gradient(circle at 32% 70%, #5a2410 0%, #160605 75%);' },
-  { key: 'forest',   name: 'Forest',   theme: 'dark',  accent: 'green',   bg: ['color', 'forest'],    uiRadius: 1,   uiGlass: 0,   dot: 'background: radial-gradient(circle at 32% 30%, #14402a 0%, #04110a 75%);' },
+  { key: 'forest',   name: 'Forest',   theme: 'dark',  accent: 'green',   bg: ['color', 'forest'],    uiRadius: 1,   uiGlass: 0,   dot: 'background: radial-gradient(circle at 32% 30%, #144018 0%, #041105 75%);' },
   { key: 'mono',     name: 'Mono',     theme: 'dark',  accent: 'mono',    bg: ['color', 'graphite'],  uiRadius: 0.6, uiGlass: 0.3, dot: 'background: linear-gradient(180deg, #2c2c30 0%, #0e0e10 100%);' },
   { key: 'paper',    name: 'Paper',    theme: 'light', accent: 'default', bg: ['minimal', ''],        uiRadius: 1.1, uiGlass: 0,   dot: 'background: linear-gradient(180deg, #f4f4f6 0%, #dadce2 100%);' }
 ];
@@ -4604,7 +4604,7 @@ const TabBar = {
     // [key, label, dot-color]. 'default' (Dynamic) dot shows the shared purple.
     const customHex = (prefs.accentCustom && /^#?[0-9a-fA-F]{3,6}$/.test(prefs.accentCustom))
       ? (prefs.accentCustom[0] === '#' ? prefs.accentCustom : '#' + prefs.accentCustom)
-      : '#7b61ff';
+      : '#3ad9f5';
     // Primary color selector (Malik, v576): one of each, Dynamic first (the
     // colored-M drift), Custom last. Old keys keep working if already saved.
     const swatches = [
@@ -4614,7 +4614,7 @@ const TabBar = {
       ['rose', 'Pink', '#ff6b9d'],
       ['orange', 'Orange', '#ff8a3d'],
       ['amber', 'Yellow', '#ffb73d'],
-      ['green', 'Green', '#34d97a'],
+      ['green', 'Green', '#3fd94e'],
       ['mono', 'Mono', '#cfcfcf'],
       ['custom', 'Custom', customHex]
     ];
@@ -4668,7 +4668,7 @@ const TabBar = {
     const bgIsUpload = bgPref.type === 'image' && /^idb:/.test(bgPref.value || '');
     const bgIsLink = bgPref.type === 'image' && /^https:\/\//i.test(bgPref.value || '');
     const bgHtml =
-      bgSwatch('default', 'Default', dot('background: radial-gradient(circle at 32% 30%, #2a2440 0%, #0a0a10 70%);'), bgPref.type === 'default') +
+      bgSwatch('default', 'Default', dot('background: radial-gradient(circle at 32% 30%, #243c40 0%, #0a0f10 70%);'), bgPref.type === 'default') +
       bgSwatch('minimal', 'Minimal', dot('background: var(--bg-deep); box-shadow: inset 0 0 0 1px rgba(var(--ink),0.2);'), bgPref.type === 'minimal') +
       bgColors.map(c => bgSwatch('color:' + c.key, c.name, thumb('background: ' + c.css + ';'), bgPref.type === 'color' && bgPref.value === c.key)).join('') +
       bgSwatch('img:bg/mountain.jpg', 'Mountain', thumb('background-image: url(bg/mountain.jpg);'), bgPref.type === 'image' && bgPref.value === 'bg/mountain.jpg') +
@@ -5066,10 +5066,10 @@ const TabBar = {
           '<button type="button" class="fb-chip" data-fb-kind="love">Love note</button>' +
         '</div>' +
         '<textarea id="fbText" class="wiz__text-input" rows="3" placeholder="What would make Memento better for you?" style="margin:8px 0; resize:vertical; min-height:70px;"></textarea>' +
-        '<button class="sheet-btn" id="fbSend" style="background:rgba(191,90,242,0.14); color:var(--color-reflection); border:1px solid rgba(191,90,242,0.32);">Send to Malik</button>' +
+        '<button class="sheet-btn" id="fbSend" style="background:rgba(90, 219, 242,0.14); color:var(--color-reflection); border:1px solid rgba(90, 219, 242,0.32);">Send to Malik</button>' +
         '<div id="fbMsg" style="font-size:0.6875rem; color:var(--text-3); margin-top:8px; text-align:center;"></div>' +
         '<div style="display:flex; gap:8px; margin-top:12px;">' +
-          '<a class="sheet-btn" style="' + BTN + ' background:rgba(88,101,242,0.16); color:#aab4ff; border:1px solid rgba(88,101,242,0.4);" href="' + esc(/^https?:\/\//i.test(discordUrl) ? discordUrl : '#').replace(/"/g, '&quot;') + '" target="_blank" rel="noopener">Join the Discord</a>' +
+          '<a class="sheet-btn" style="' + BTN + ' background:rgba(88, 219, 242,0.16); color:#aab4ff; border:1px solid rgba(88, 219, 242,0.4);" href="' + esc(/^https?:\/\//i.test(discordUrl) ? discordUrl : '#').replace(/"/g, '&quot;') + '" target="_blank" rel="noopener">Join the Discord</a>' +
           '<a class="sheet-btn" style="' + BTN + ' background:var(--kfill-05); color:var(--text-hi); border:1px solid transparent;" href="mailto:' + esc(emailAddr).replace(/"/g, '&quot;') + '">Email me</a>' +
         '</div>' +
       '</div>';
@@ -5090,7 +5090,7 @@ const TabBar = {
         '<div style="display:flex; gap:8px; margin-top:10px;">' +
           (connected
             ? '<button type="button" class="sheet-btn" id="spDisconnect" style="flex:1; background:var(--kfill-05); color:var(--text-hi); border:1px solid transparent;">Disconnect</button>'
-            : '<button type="button" class="sheet-btn" id="spConnect" style="flex:1; background:rgba(29,185,84,0.16); color:#1DB954; border:1px solid rgba(29,185,84,0.4);">Connect Spotify</button>') +
+            : '<button type="button" class="sheet-btn" id="spConnect" style="flex:1; background:rgba(29, 185, 42,0.16); color:#1db92a; border:1px solid rgba(29, 185, 42,0.4);">Connect Spotify</button>') +
         '</div>' +
         '<div id="spMsg" style="font-size:0.6875rem; color:var(--text-3); margin-top:8px;">' + (connected ? 'Connected. The pill updates every 20 seconds.' : '') + '</div>' +
       '</details>';
@@ -5172,7 +5172,7 @@ const TabBar = {
     }
     return '<div style="' + SECLABEL + '">Account</div>' +
       '<div style="font-size:0.8125rem;color:var(--text-2);line-height:1.45;margin-bottom:12px;">Keep your data safe across devices.</div>' +
-      '<button class="sheet-btn" id="acctOpenAuth" style="background: rgba(123,97,255,0.12); color: var(--color-clarity); border: 1px solid rgba(123,97,255,0.25);">Sign in</button>' +
+      '<button class="sheet-btn" id="acctOpenAuth" style="background: rgba(58, 217, 245,0.12); color: var(--color-clarity); border: 1px solid rgba(58, 217, 245,0.25);">Sign in</button>' +
       '<div style="font-size:0.6875rem; color: var(--text-3); margin-top:8px;">No password. We email you a link.</div>';
   },
 
@@ -5213,7 +5213,7 @@ const TabBar = {
     const rem = (state.prefs && state.prefs.reminder) || {};
     body.innerHTML = `
       <div style="text-align:center; padding: 32px 0 24px;">
-        <div id="profAvatar" style="width: 96px; height: 96px; border-radius: 50%; background-color: rgba(123,97,255,0.15); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; font-size: 2.1rem; color: var(--color-clarity); border: 1px solid var(--hairline); overflow: hidden;">${esc((state.profile.name || 'U').charAt(0).toUpperCase())}</div>
+        <div id="profAvatar" style="width: 96px; height: 96px; border-radius: 50%; background-color: rgba(58, 217, 245,0.15); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; font-size: 2.1rem; color: var(--color-clarity); border: 1px solid var(--hairline); overflow: hidden;">${esc((state.profile.name || 'U').charAt(0).toUpperCase())}</div>
         <div style="display:flex; gap:14px; justify-content:center; margin-bottom: 14px;">
           <button type="button" id="profAvatarPick" style="font:500 0.75rem/1 inherit; cursor:pointer; border:none; background:transparent; color:var(--text-2); padding:4px 2px;">${state.profile.avatarId ? 'Change photo' : 'Add photo'}</button>
           <button type="button" id="profAvatarRemove" style="font:500 0.75rem/1 inherit; cursor:pointer; border:none; background:transparent; color:var(--text-3); padding:4px 2px; ${state.profile.avatarId ? '' : 'display:none;'}">Remove</button>
@@ -6124,9 +6124,9 @@ const BgBeams = {
     // Convergence glow at top-left
     ctx.globalCompositeOperation = 'source-over';
     const glowGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 120);
-    glowGrad.addColorStop(0, 'rgba(200,180,255,0.15)');
-    glowGrad.addColorStop(0.3, 'rgba(160,140,220,0.06)');
-    glowGrad.addColorStop(0.6, 'rgba(120,100,180,0.02)');
+    glowGrad.addColorStop(0, 'rgba(180, 244, 255,0.15)');
+    glowGrad.addColorStop(0.3, 'rgba(140, 208, 220,0.06)');
+    glowGrad.addColorStop(0.6, 'rgba(100, 168, 180,0.02)');
     glowGrad.addColorStop(1, 'transparent');
     ctx.fillStyle = glowGrad;
     ctx.fillRect(0, 0, 240, 240);
@@ -6178,11 +6178,11 @@ void main(){
   float n2 = snoise(uv * 2.5 + vec2(-t * 0.6, t * 0.8));
   float n3 = snoise(uv * 1.2 + vec2(t * 0.4, -t * 0.3));
   float n4 = snoise(uv * 3.0 + vec2(t * 0.9, t * 0.2));
-  vec3 c1 = vec3(0.25, 0.1, 0.55);
-  vec3 c2 = vec3(0.15, 0.2, 0.7);
-  vec3 c3 = vec3(0.85, 0.85, 0.95);
+  vec3 c1 = vec3(0.10, 0.48, 0.55);
+  vec3 c2 = vec3(0.15, 0.62, 0.70);
+  vec3 c3 = vec3(0.85, 0.93, 0.95);
   vec3 c4 = vec3(0.1, 0.6, 0.65);
-  vec3 c5 = vec3(0.6, 0.35, 0.7);
+  vec3 c5 = vec3(0.35, 0.65, 0.70);
   vec3 col = mix(c1, c2, smoothstep(-0.5, 0.5, n1));
   col = mix(col, c3, smoothstep(-0.3, 0.6, n2));
   col = mix(col, c4, smoothstep(-0.2, 0.7, n3) * 0.6);

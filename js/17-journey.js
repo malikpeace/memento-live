@@ -110,14 +110,14 @@
   // =========================================================================
   var MOD_META = {
     action: { c: 'rgba(232,194,74,1)', label: 'Action' },
-    streak: { c: 'rgba(52,211,153,1)', label: 'Consistency' },
-    consistency: { c: 'rgba(52,211,153,1)', label: 'Consistency' },
+    streak: { c: 'rgba(52, 211, 65,1)', label: 'Consistency' },
+    consistency: { c: 'rgba(52, 211, 65,1)', label: 'Consistency' },
     reflection: { c: 'rgba(125,200,255,1)', label: 'Reflection' },
-    deepwork: { c: 'rgba(150,116,255,1)', label: 'Deep work' },
+    deepwork: { c: 'rgba(116, 234, 255,1)', label: 'Deep work' },
     vivere: { c: 'rgba(244,138,120,1)', label: 'Vivere' },
-    mori: { c: 'rgba(206,192,255,1)', label: 'Mori' },
-    clarity: { c: 'rgba(150,116,255,1)', label: 'Clarity' },
-    '': { c: 'rgba(150,116,255,1)', label: 'Memento' }
+    mori: { c: 'rgba(192, 246, 255,1)', label: 'Mori' },
+    clarity: { c: 'rgba(116, 234, 255,1)', label: 'Clarity' },
+    '': { c: 'rgba(116, 234, 255,1)', label: 'Memento' }
   };
   function modMeta(m) { return MOD_META[m] || MOD_META['']; }
   function fmtDate(iso) {

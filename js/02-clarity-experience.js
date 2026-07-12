@@ -5064,7 +5064,7 @@ Return ONLY the sentence text. No quotes, no labels.`;
     const s = document.createElement('style');
     s.id = 'vpStyles';
     s.textContent =
-      '.vp-stage{position:fixed;inset:0;pointer-events:none;z-index:1;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,sans-serif;background:#04040a;}' +
+      '.vp-stage{position:fixed;inset:0;pointer-events:none;z-index:1;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,sans-serif;background:#04090a;}' +
       '#vpViz{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;}' +
       '#vpStar{position:absolute;transform:translate(-50%,-50%);pointer-events:none;border-radius:50%;}' +
       '.vp-today-ring{fill:none;stroke:rgba(var(--ink),0.28);stroke-width:1.2;transform-box:fill-box;transform-origin:center;animation:vp-ping 3.4s ease-out 0.5s infinite;}' +
@@ -5081,7 +5081,7 @@ Return ONLY the sentence text. No quotes, no labels.`;
       '.vp-shrink{display:block;width:100%;font:inherit;font-size:11.5px;font-weight:600;cursor:pointer;padding:7px;margin-bottom:8px;border-radius:calc(9px * var(--rx, 1));background:transparent;color:rgba(150,175,255,0.85);border:1px dashed rgba(120,160,255,0.35);transition:all 0.15s ease;}' +
       '.vp-shrink:hover{background:rgba(90,130,255,0.12);color:#cfe0ff;}' +
       '.vp-done{width:100%;font:inherit;font-size:13px;font-weight:650;cursor:pointer;padding:11px;border-radius:calc(11px * var(--rx, 1));color:#07101f;background:linear-gradient(180deg,#9fc0ff,#6f9bff);border:none;letter-spacing:0.2px;transition:all 0.2s ease;}' +
-      '.vp-done--done{background:var(--glass-bg);color:rgba(180,220,190,0.95);box-shadow:var(--glass-highlight),inset 0 0 0 1px rgba(140,220,170,0.4);}' +
+      '.vp-done--done{background:var(--glass-bg);color:rgba(180,220,190,0.95);box-shadow:var(--glass-highlight),inset 0 0 0 1px rgba(140, 220, 147,0.4);}' +
       '.vp-mile{position:absolute;transform:translate(-50%,-50%);}' +
       '.vp-mile-node{position:absolute;left:-4px;top:-4px;width:8px;height:8px;border-radius:50%;background:#cfe0ff;box-shadow:0 0 7px rgba(140,170,255,0.7);}' +
       '.vp-mile-conn{position:absolute;left:0;top:-58px;width:0;height:50px;border-left:1px dashed rgba(150,175,255,0.5);opacity:0;transition:opacity 0.25s ease;}' +
@@ -5259,7 +5259,7 @@ Return ONLY the sentence text. No quotes, no labels.`;
     svgEl('stop', { offset: '0.6', 'stop-color': '#fff', 'stop-opacity': '0.7' }, childFade);
     svgEl('stop', { offset: '1', 'stop-color': '#fff', 'stop-opacity': '0.32' }, childFade);
 
-    svgEl('rect', { width: W, height: H, fill: '#04040a' }, svg);
+    svgEl('rect', { width: W, height: H, fill: '#04090a' }, svg);
     const pathsG = svgEl('g', { opacity: '0.5' }, svg);
 
     function smooth(pts) {
@@ -5901,18 +5901,18 @@ Return ONLY the sentence text. No quotes, no labels.`;
                more identically across Safari and Chromium-based browsers.
                Heights bumped (avg ~150px), --omax bumped (avg ~0.85) so
                beams read as a powerful explosion of light. -->
-          <div class="ambient__rays-beam" style="--a:-160deg; --h:100px; --d:9.4s;  --del:-0.0s; --omin:0.20; --omax:0.85; --smin:0.85; --smax:1.10; --c:145 100 255;"><div class="ambient__rays-beam-shaft"></div></div>
+          <div class="ambient__rays-beam" style="--a:-160deg; --h:100px; --d:9.4s;  --del:-0.0s; --omin:0.20; --omax:0.85; --smin:0.85; --smax:1.10; --c:100 232 255;"><div class="ambient__rays-beam-shaft"></div></div>
           <div class="ambient__rays-beam" style="--a:-147deg; --h:180px; --d:11.6s; --del:-1.8s; --omin:0.28; --omax:0.95; --smin:0.55; --smax:1.40; --c:110 150 255;"><div class="ambient__rays-beam-shaft"></div></div>
           <div class="ambient__rays-beam" style="--a:-134deg; --h:80px;  --d:7.1s;  --del:-3.4s; --omin:0.22; --omax:0.85; --smin:0.7;  --smax:1.25; --c:255 95 130;"><div class="ambient__rays-beam-shaft"></div></div>
-          <div class="ambient__rays-beam" style="--a:-121deg; --h:160px; --d:13.2s; --del:-2.1s; --omin:0.30; --omax:0.98; --smin:0.6;  --smax:1.35; --c:160 120 255;"><div class="ambient__rays-beam-shaft"></div></div>
+          <div class="ambient__rays-beam" style="--a:-121deg; --h:160px; --d:13.2s; --del:-2.1s; --omin:0.30; --omax:0.98; --smin:0.6;  --smax:1.35; --c:120 235 255;"><div class="ambient__rays-beam-shaft"></div></div>
           <div class="ambient__rays-beam" style="--a:-108deg; --h:120px; --d:10.5s; --del:-5.6s; --omin:0.25; --omax:0.92; --smin:0.5;  --smax:1.45; --c:255 255 255;"><div class="ambient__rays-beam-shaft"></div></div>
-          <div class="ambient__rays-beam" style="--a:-95deg;  --h:220px; --d:8.3s;  --del:-0.7s; --omin:0.35; --omax:1.00; --smin:0.65; --smax:1.30; --c:200 180 255;"><div class="ambient__rays-beam-shaft"></div></div>
+          <div class="ambient__rays-beam" style="--a:-95deg;  --h:220px; --d:8.3s;  --del:-0.7s; --omin:0.35; --omax:1.00; --smin:0.65; --smax:1.30; --c:180 244 255;"><div class="ambient__rays-beam-shaft"></div></div>
           <div class="ambient__rays-beam" style="--a:-82deg;  --h:90px;  --d:14.8s; --del:-4.2s; --omin:0.20; --omax:0.80; --smin:0.8;  --smax:1.20; --c:120 165 255;"><div class="ambient__rays-beam-shaft"></div></div>
-          <div class="ambient__rays-beam" style="--a:-69deg;  --h:200px; --d:9.0s;  --del:-3.0s; --omin:0.32; --omax:0.98; --smin:0.55; --smax:1.45; --c:170 125 255;"><div class="ambient__rays-beam-shaft"></div></div>
+          <div class="ambient__rays-beam" style="--a:-69deg;  --h:200px; --d:9.0s;  --del:-3.0s; --omin:0.32; --omax:0.98; --smin:0.55; --smax:1.45; --c:125 235 255;"><div class="ambient__rays-beam-shaft"></div></div>
           <div class="ambient__rays-beam" style="--a:-56deg;  --h:75px;  --d:12.3s; --del:-6.5s; --omin:0.20; --omax:0.78; --smin:0.75; --smax:1.25; --c:255 115 145;"><div class="ambient__rays-beam-shaft"></div></div>
           <div class="ambient__rays-beam" style="--a:-43deg;  --h:150px; --d:10.9s; --del:-1.2s; --omin:0.27; --omax:0.92; --smin:0.6;  --smax:1.35; --c:100 150 255;"><div class="ambient__rays-beam-shaft"></div></div>
           <div class="ambient__rays-beam" style="--a:-30deg;  --h:100px; --d:8.6s;  --del:-4.9s; --omin:0.22; --omax:0.85; --smin:0.7;  --smax:1.25; --c:255 255 255;"><div class="ambient__rays-beam-shaft"></div></div>
-          <div class="ambient__rays-beam" style="--a:-17deg;  --h:170px; --d:11.4s; --del:-2.6s; --omin:0.28; --omax:0.95; --smin:0.55; --smax:1.40; --c:155 115 255;"><div class="ambient__rays-beam-shaft"></div></div>
+          <div class="ambient__rays-beam" style="--a:-17deg;  --h:170px; --d:11.4s; --del:-2.6s; --omin:0.28; --omax:0.95; --smin:0.55; --smax:1.40; --c:115 234 255;"><div class="ambient__rays-beam-shaft"></div></div>
         </div>
         <!-- Background mountain ridges. Same image as the main mountain,
              scaled down and offset to either side, blurred, low-opacity.
@@ -5930,7 +5930,7 @@ Return ONLY the sentence text. No quotes, no labels.`;
              the base, looking up." Pure SVG silhouette, repeats edge-to-edge. -->
         <svg class="action-plan__treeline" viewBox="0 0 1200 100" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
           <!-- A row of varying pine triangles + a solid ground band underneath. -->
-          <path fill="rgba(6, 4, 14, 0.95)" d="
+          <path fill="rgba(4, 12, 14, 0.95)" d="
             M0 100
             L0 70 L18 40 L36 70 L46 50 L60 70 L74 30 L92 70 L106 55 L122 70 L138 35 L156 70 L168 60 L182 70 L196 25 L216 70 L228 55 L246 70 L260 45 L278 70 L292 65 L308 70 L324 30 L344 70 L358 55 L378 70 L390 50 L408 70 L424 28 L444 70 L460 60 L476 70 L494 38 L514 70 L526 55 L546 70 L562 32 L582 70 L598 60 L616 70 L630 48 L650 70 L668 55 L686 70 L700 28 L720 70 L734 55 L754 70 L770 42 L790 70 L804 58 L824 70 L840 30 L860 70 L876 55 L894 70 L908 48 L928 70 L944 32 L964 70 L978 55 L996 70 L1012 38 L1030 70 L1046 60 L1064 70 L1080 28 L1100 70 L1116 50 L1136 70 L1152 55 L1172 70 L1186 42 L1200 70
             L1200 100 Z" />

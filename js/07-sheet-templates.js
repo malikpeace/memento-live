@@ -5275,7 +5275,7 @@ const SHEET_TEMPLATES = {
         // background via hiliteColor (which handles multi-block selections
         // correctly), then convert the spans it created into <mark data-hl>.
         const HL_COLORS = ['green', 'red', 'blue', 'yellow', 'purple'];
-        const HL_SENTINEL = { green: 'rgb(1, 255, 2)', red: 'rgb(255, 1, 2)', blue: 'rgb(1, 2, 255)', yellow: 'rgb(255, 255, 2)', purple: 'rgb(128, 1, 129)' };
+        const HL_SENTINEL = { green: 'rgb(1, 255, 2)', red: 'rgb(255, 1, 2)', blue: 'rgb(1, 217, 255)', yellow: 'rgb(255, 255, 2)', purple: 'rgb(128, 1, 129)' };
         const unwrapEl = (el) => { const p = el.parentNode; if (!p) return; while (el.firstChild) p.insertBefore(el.firstChild, el); p.removeChild(el); };
         const convertHlSpans = (color) => {
           const want = HL_SENTINEL[color];

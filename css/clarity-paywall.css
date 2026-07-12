@@ -17,9 +17,9 @@
      is a full-screen opaque modal, it owns the top layer. */
   z-index: 2100;
   background:
-    radial-gradient(120% 80% at 50% -10%, rgba(123, 97, 255, 0.16), transparent 60%),
-    radial-gradient(120% 90% at 50% 120%, rgba(123, 97, 255, 0.08), transparent 55%),
-    #07070b;
+    radial-gradient(120% 80% at 50% -10%, rgba(58, 217, 245, 0.16), transparent 60%),
+    radial-gradient(120% 90% at 50% 120%, rgba(58, 217, 245, 0.08), transparent 55%),
+    #070a0b;
   color: rgba(var(--ink, 235, 238, 248), 0.92);
   overflow-y: auto;
   overflow-x: hidden;
@@ -81,7 +81,7 @@
   font-weight: 700;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(168, 150, 255, 0.92);
+  color: rgba(150, 239, 255, 0.92);
   margin-bottom: 30px;
   animation: cpwRise 0.7s ease both;
 }
@@ -105,8 +105,8 @@
   height: 132%;
   transform: translate(-50%, -50%);
   background:
-    radial-gradient(46% 42% at 50% 50%, rgba(139, 110, 255, 0.62), rgba(123, 97, 255, 0.26) 42%, transparent 70%),
-    radial-gradient(70% 60% at 50% 56%, rgba(108, 92, 220, 0.3), transparent 72%);
+    radial-gradient(46% 42% at 50% 50%, rgba(110, 233, 255, 0.62), rgba(58, 217, 245, 0.26) 42%, transparent 70%),
+    radial-gradient(70% 60% at 50% 56%, rgba(92, 201, 220, 0.3), transparent 72%);
   filter: blur(14px);
   pointer-events: none;
   z-index: 0;
@@ -128,7 +128,7 @@
   font-weight: 700;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(168, 150, 255, 0.78);
+  color: rgba(150, 239, 255, 0.78);
   margin-bottom: 12px;
 }
 .cpw__star {
@@ -238,7 +238,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(123, 97, 255, 0.05), transparent 70%);
+  background: linear-gradient(180deg, rgba(58, 217, 245, 0.05), transparent 70%);
   pointer-events: none;
 }
 
@@ -283,18 +283,18 @@
   padding: 15px 17px;
 }
 .cpw__plan.is-picked {
-  background: rgba(123, 97, 255, 0.12);
-  box-shadow: inset 0 0 0 1.5px rgba(155, 126, 255, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  background: rgba(58, 217, 245, 0.12);
+  box-shadow: inset 0 0 0 1.5px rgba(126, 236, 255, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 .cpw__plan--hero {
   padding: 22px 19px 20px;
   background:
-    linear-gradient(180deg, rgba(123, 97, 255, 0.14), rgba(123, 97, 255, 0.04)),
+    linear-gradient(180deg, rgba(58, 217, 245, 0.14), rgba(58, 217, 245, 0.04)),
     rgba(255, 255, 255, 0.04);
   box-shadow:
-    inset 0 0 0 1.5px rgba(155, 126, 255, 0.55),
+    inset 0 0 0 1.5px rgba(126, 236, 255, 0.55),
     inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    0 22px 60px -30px rgba(123, 97, 255, 0.7);
+    0 22px 60px -30px rgba(58, 217, 245, 0.7);
 }
 .cpw__plan-flag {
   position: absolute;
@@ -303,8 +303,8 @@
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #0b0b12;
-  background: linear-gradient(100deg, #9b7eff, #6cc6ff);
+  color: #0b1112;
+  background: linear-gradient(100deg, #7eecff, #6cc6ff);
   padding: 6px 12px;
   border-bottom-left-radius: 12px;
 }
@@ -345,10 +345,10 @@
   font-size: 1.02rem;
   font-weight: 700;
   letter-spacing: -0.01em;
-  color: #0b0b12;
+  color: #0b1112;
   cursor: pointer;
-  background: linear-gradient(100deg, #b6a4ff, #9b7eff 55%, #6cc6ff);
-  box-shadow: 0 18px 46px -20px rgba(123, 97, 255, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  background: linear-gradient(100deg, #a4f1ff, #7eecff 55%, #6cc6ff);
+  box-shadow: 0 18px 46px -20px rgba(58, 217, 245, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.4);
   -webkit-tap-highlight-color: transparent;
   transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
@@ -395,8 +395,8 @@
   align-items: center;
   justify-content: center;
   font-weight: 800;
-  color: #0b0b12;
-  background: linear-gradient(135deg, #9b7eff, #6cc6ff);
+  color: #0b1112;
+  background: linear-gradient(135deg, #7eecff, #6cc6ff);
 }
 .cpw__founder p { font-size: 0.82rem; color: rgba(var(--ink, 235, 238, 248), 0.6); line-height: 1.55; margin: 0; }
 .cpw__founder-who { display: block; margin-top: 6px; font-size: 0.76rem; color: rgba(var(--ink, 235, 238, 248), 0.42); font-weight: 600; }
@@ -444,7 +444,7 @@ body.cpw-locked .widget[data-widget]:not([data-widget="clarity"])::after {
   width: 26px;
   height: 26px;
   border-radius: 999px;
-  background-color: rgba(12, 12, 18, 0.72);
+  background-color: rgba(12, 17, 18, 0.72);
   background-repeat: no-repeat;
   background-position: center;
   background-size: 13px 13px;

@@ -132,8 +132,8 @@
 .apk-prev--dark-flat .apk-prev__mark { background: rgba(255,255,255,0.38); }
 
 /* Dark glass (the signature): glassy card with sheen + a purple bloom behind it. */
-.apk-prev--dark-glass .apk-prev__sky { background: radial-gradient(85% 70% at 50% 28%, rgba(123,97,255,0.38), #0a0a12 70%); }
-.apk-prev--dark-glass .apk-prev__card { background: linear-gradient(165deg, rgba(255,255,255,0.17), rgba(255,255,255,0.03)); box-shadow: inset 0 1px 0 rgba(255,255,255,0.34), 0 8px 22px rgba(0,0,0,0.45), 0 0 22px rgba(123,97,255,0.34); }
+.apk-prev--dark-glass .apk-prev__sky { background: radial-gradient(85% 70% at 50% 28%, rgba(58, 217, 245,0.38), #0a1112 70%); }
+.apk-prev--dark-glass .apk-prev__card { background: linear-gradient(165deg, rgba(255,255,255,0.17), rgba(255,255,255,0.03)); box-shadow: inset 0 1px 0 rgba(255,255,255,0.34), 0 8px 22px rgba(0,0,0,0.45), 0 0 22px rgba(58, 217, 245,0.34); }
 .apk-prev--dark-glass .apk-prev__mark { background: rgba(255,255,255,0.7); }
 
 /* ── Card meta + check ─────────────────────────────────────────────────────── */
@@ -144,8 +144,8 @@
   position: absolute; top: 9px; right: 9px;
   width: 22px; height: 22px; border-radius: 999px;
   display: flex; align-items: center; justify-content: center;
-  background: linear-gradient(135deg, #9b7eff, #6cc6ff);
-  color: #0b0b12;
+  background: linear-gradient(135deg, #7eecff, #6cc6ff);
+  color: #0b1112;
   opacity: 0; transform: scale(0.6);
   transition: opacity 0.18s ease, transform 0.18s cubic-bezier(0.16, 1.4, 0.4, 1);
 }

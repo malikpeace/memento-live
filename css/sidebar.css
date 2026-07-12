@@ -368,7 +368,7 @@ body.menu-peek-closing .menu-peek-backdrop { opacity: 0; pointer-events: none; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-clarity, #8e72ff);
+  color: var(--color-clarity, #72eaff);
 }
 .sidebar__collapse {
   width: 28px; height: 28px;
@@ -411,7 +411,7 @@ body.sidebar-collapsed .sidebar__collapse svg { transform: rotate(180deg); }
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(140, 120, 255, 0.45), rgba(80, 60, 180, 0.65));
+  background: linear-gradient(135deg, rgba(120, 235, 255, 0.45), rgba(60, 162, 180, 0.65));
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -581,9 +581,9 @@ body.sidebar-collapsed .sidebar__collapse svg { transform: rotate(180deg); }
   margin-top: 4px;
   padding: 4px 8px;
   border-radius: 999px;
-  background: rgba(140, 120, 255, 0.10);
-  border: 1px solid rgba(180, 160, 255, 0.22);
-  color: rgba(220, 210, 255, 0.95);
+  background: rgba(120, 235, 255, 0.10);
+  border: 1px solid rgba(160, 241, 255, 0.22);
+  color: rgba(210, 248, 255, 0.95);
   font-size: var(--fs-xs);
   font-weight: 700;
   letter-spacing: 0.10em;
@@ -708,7 +708,7 @@ body.sidebar-collapsed .sidebar__inner {
 /* (sidebar-reveal is a ghost button on ink tokens now; it themes itself.) */
 @media (max-width: 859.98px) {
   html.theme-light .sidebar {
-    background: rgba(250, 250, 252, 0.98);
+    background: rgba(250, 252, 252, 0.98);
   }
 }
 

@@ -808,7 +808,7 @@ function moriTotalWeeks(lifeExpectancy) {
 }
 // Memento Mori color map for the life-spend grid (doomscroll dropped). Free time
 // is gold, the precious part. Lived time is faint, future-unallocated is ghosted.
-const MORI_COLORS = { gone: 'rgba(var(--ink),0.16)', sleep: '#3b4a63', work: '#2f6fb0', human: '#2f8f5e', screen: '#6b54c9', free: '#c9a24b', ghost: 'rgba(var(--ink),0.05)' };
+const MORI_COLORS = { gone: 'rgba(var(--ink),0.16)', sleep: '#3b4a63', work: '#2f6fb0', human: '#2f8f37', screen: '#54b7c9', free: '#c9a24b', ghost: 'rgba(var(--ink),0.05)' };
 const MORI_LEGEND = [ ['gone', 'Lived'], ['sleep', 'Sleep'], ['work', 'Work'], ['human', 'Upkeep'], ['screen', 'Screens'], ['free', 'Free'] ];
 // Build the life-spend units: lived years first, then the REMAINING years grouped
 // by how they will be spent (sleep, work, upkeep, screens), then free time, then
