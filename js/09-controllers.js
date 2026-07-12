@@ -4695,6 +4695,7 @@ const TabBar = {
         toggleRow('prefFlatUi', 'Glass', 'Glassy, blurred surfaces with depth. Turn off for a flat, high-contrast matte look.', !prefs.flatUi) +
         toggleRow('prefSound', 'Sound', 'Quiet synthesized moments: the typewriter, marking a move done, the card coming alive.', prefs.soundOn !== false) +
         toggleRow('prefFlatBg', 'Minimal background', 'Hide the ambient orbs and glow for a flat, paper-like surface.', !!prefs.flatBg) +
+        toggleRow('prefCompact', 'Compact density', 'Tightens spacing and type so more fits on screen.', compact) +
         // Color is paid (v695). v705 (Malik): free users don't see it AT ALL,
         // the paywall's "Make it yours" line is the only tease.
         (_colorLocked ? '' :
@@ -4720,7 +4721,6 @@ const TabBar = {
         // Tilt follows the mouse cursor, so it does nothing on the phone (v706).
         ((window.matchMedia && window.matchMedia('(max-width: 859.98px)').matches) ? '' :
           toggleRow('prefCardTilt', 'Memento tilt', 'The Memento leans toward your cursor as you move the mouse.', !!prefs.cardTilt)) +
-        toggleRow('prefCompact', 'Compact density', 'Tightens spacing and type so more fits on screen.', compact) +
         toggleRow('prefWeekMonday', 'Weeks start Monday', 'Aligns the heatmap and calendars to Monday columns.', (state.prefs && state.prefs.weekStart === 'mon')) +
         // The sidebar only exists on desktop (>=860px); on the phone these pin
         // toggles control nothing, so they don't render there (v705, Malik).
