@@ -3178,10 +3178,17 @@ html.lowfx .nsv2-reveal__goal--whole { animation: nsv2WordInLite 1.2s ease forwa
 /* Orbit fall (v726): the mote ARCS in, sweeping ~300deg of spiral on the way
    down instead of falling straight. */
 .nsv2-collapse-field i.orb { animation-name: nsv2FieldSpiral; }
+/* The 50% waypoint splits the path into two eased SEGMENTS; without matched
+   easings every orbiter raced to the waypoint then dead-stopped (the per-
+   segment curve restarts slow). The per-keyframe beziers below are velocity-
+   matched at the join (seg1 exit slope = seg2 entry slope = ~1.7), so the arc
+   reads as one continuous accelerating fall (v728). */
 @keyframes nsv2FieldSpiral {
-  0% { transform: rotate(var(--a)) translateX(var(--r, 60vmax)) scale(1); opacity: 0; }
+  0% { transform: rotate(var(--a)) translateX(var(--r, 60vmax)) scale(1); opacity: 0;
+       animation-timing-function: cubic-bezier(0.4, 0, 0.7, 0.5); }
   10% { opacity: 0.95; }
-  50% { transform: rotate(calc(var(--a) + 140deg)) translateX(calc(var(--r, 60vmax) * 0.42)) scale(0.85); opacity: 0.9; }
+  50% { transform: rotate(calc(var(--a) + 140deg)) translateX(calc(var(--r, 60vmax) * 0.42)) scale(0.85); opacity: 0.9;
+        animation-timing-function: cubic-bezier(0.3, 0.5, 0.75, 0.5); }
   93% { opacity: 0.85; }
   100% { transform: rotate(calc(var(--a) + 300deg)) translateX(3px) scale(0.2); opacity: 0; }
 }
