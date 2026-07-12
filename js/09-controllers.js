@@ -5913,21 +5913,37 @@ const HeroShrink = {
     const p = Math.max(0, Math.min(1, y / range));
     if (p <= 0) { this._clear(); return; }
     const h = Math.round(this._full - range * p);
-    const sc = h / this._full;
     this.card.style.height = h + 'px';
     this.card.style.justifyContent = 'flex-start';
-    // Drift into the top-left corner in lockstep with the shrink (v707): the
-    // card's center moves so its scaled left edge ends at 16px. Same center
-    // math as the heroCardScale keyframe (origin is top center).
+    // Dock (v707/v708): the card shrinks to a 0.19-scale mini and its center
+    // moves so the scaled left edge ends at 16px, where the sticky container
+    // then holds it. Same math as the heroCardScale keyframe (origin top
+    // center). Visual scale is DECOUPLED from the container height, the
+    // layout handoff (466 -> 242) stays 1:1 with the finger.
+    const SC_END = 0.19;
+    const sc = 1 - (1 - SC_END) * p;
     const cardW = Math.min(0.82 * window.innerWidth, 320);
-    const scEnd = this._min / this._full;
-    const dxEnd = 16 + (cardW * scEnd) / 2 - window.innerWidth / 2;
+    const dxEnd = 16 + (cardW * SC_END) / 2 - window.innerWidth / 2;
     this.wrap.style.transform = 'translateX(' + (dxEnd * p).toFixed(1) + 'px) scale(' + sc.toFixed(4) + ')';
   }
 };
 try {
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => HeroShrink.init());
   else HeroShrink.init();
+} catch (e) {}
+// v708: tapping the DOCKED mini card returns you to the top of the home.
+// Capture phase: while docked, the tap means "go back up", never "open the
+// card", so the card's own handlers are suppressed for that tap.
+try {
+  document.addEventListener('click', (e) => {
+    if (!e.target || !e.target.closest || !e.target.closest('#dayCard')) return;
+    if (!window.matchMedia || !window.matchMedia('(max-width: 767.98px)').matches) return;
+    if (!document.body.classList.contains('ns-bloom')) return;
+    if ((window.scrollY || 0) < 200) return;   // not docked yet
+    e.preventDefault();
+    e.stopPropagation();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, true);
 } catch (e) {}
 
 /* ============================================
