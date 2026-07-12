@@ -7788,22 +7788,27 @@ function renderIgnitionV2(summary) {
     // language as the thinking loader, turned up and made interactive.
     // Motes spawn OFF-SCREEN (vmax radii) and ride in; the surge layer fades
     // in over ~1.1s on press instead of popping (organic, v724).
+    // v726 (Malik): variety in the paths. Half the idle motes SPIRAL in (orbit
+    // fall) instead of falling straight; a dedicated orbit layer joins the
+    // press; the flood grows to 28. Peak: ~80 motes converging.
     let idleM = '';
     for (let i = 0; i < 12; i++) {
-      idleM += `<i style="--a:${(i * 137) % 360}deg;--d:${(5.2 + (i % 5) * 0.7).toFixed(2)}s;--del:${(-(i % 9) * 1.1).toFixed(1)}s;--s:${2 + (i % 3)}px;--r:${52 + (i % 4) * 6}vmax"></i>`;
+      idleM += `<i${i % 2 ? ' class="orb"' : ''} style="--a:${(i * 137) % 360}deg;--d:${(5.2 + (i % 5) * 0.7).toFixed(2)}s;--del:${(-(i % 9) * 1.1).toFixed(1)}s;--s:${2 + (i % 3)}px;--r:${52 + (i % 4) * 6}vmax"></i>`;
     }
     let surgeM = '';
     for (let i = 0; i < 20; i++) {
       surgeM += `<i style="--a:${(i * 53 + 20) % 360}deg;--d:${(1.4 + (i % 5) * 0.22).toFixed(2)}s;--del:${(-(i % 8) * 0.35).toFixed(2)}s;--s:${2 + (i % 3)}px;--r:${58 + (i % 5) * 7}vmax"></i>`;
     }
-    // The FLOOD (v725): a third layer that pours in progressively with the
-    // hold itself (opacity driven by --holdp), so the longer you press, the
-    // more of the sky is falling. Peak: ~56 motes converging.
+    // Orbit layer: 20 motes arcing in on spiral paths, wakes with the press.
+    let orbitM = '';
+    for (let i = 0; i < 20; i++) {
+      orbitM += `<i class="orb" style="--a:${(i * 71 + 33) % 360}deg;--d:${(1.8 + (i % 5) * 0.28).toFixed(2)}s;--del:${(-(i % 7) * 0.4).toFixed(2)}s;--s:${1.5 + (i % 3)}px;--r:${56 + (i % 5) * 8}vmax"></i>`;
+    }
     let floodM = '';
-    for (let i = 0; i < 24; i++) {
+    for (let i = 0; i < 28; i++) {
       floodM += `<i style="--a:${(i * 91 + 7) % 360}deg;--d:${(1.1 + (i % 6) * 0.14).toFixed(2)}s;--del:${(-(i % 9) * 0.21).toFixed(2)}s;--s:${1.5 + (i % 3)}px;--r:${62 + (i % 6) * 6}vmax"></i>`;
     }
-    const fieldMotes = `<span class="fld fld--idle">${idleM}</span><span class="fld fld--surge">${surgeM}</span><span class="fld fld--flood">${floodM}</span>`;
+    const fieldMotes = `<span class="fld fld--idle">${idleM}</span><span class="fld fld--surge">${surgeM}</span><span class="fld fld--orbit">${orbitM}</span><span class="fld fld--flood">${floodM}</span>`;
     inner = `
       <div class="nsv2-reveal">
         <div class="nsv2-reveal__after" style="animation-delay:${START}ms">
