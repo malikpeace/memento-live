@@ -1311,10 +1311,22 @@ function renderGreeting() {
   } catch (e) {}
   const mg = document.getElementById('dashGreetingMobile');
   if (mg) {
-    // Whisper bar: just the date, aligned right. (Mori "weeks left" lives in the
-    // Memento Mori tile now; the home stays calm.)
-    const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
-    mg.innerHTML = '<span class="wbar__date">' + esc(dateStr) + '</span>';
+    // Whisper bar (v709, Malik): "July 12, 2026", pinned top-right. Tapping it
+    // swaps the date for the weeks you have left to live for a few seconds,
+    // the home's quiet mortality tap.
+    const dateStr = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    mg.innerHTML = '<span class="wbar__date" id="wbarDate" role="button" tabindex="0" aria-label="Show weeks left to live">' + esc(dateStr) + '</span>';
+    const wd = document.getElementById('wbarDate');
+    if (wd && weeksLeft != null) {
+      const revert = () => { wd.textContent = dateStr; wd._wbOn = false; };
+      wd.addEventListener('click', () => {
+        clearTimeout(wd._wbT);
+        if (wd._wbOn) { revert(); return; }
+        wd._wbOn = true;
+        wd.textContent = '~' + weeksLeft.toLocaleString() + ' weeks left';
+        wd._wbT = setTimeout(revert, 4000);
+      });
+    }
   }
   // Desktop header: date, plus the same quiet "~X weeks left" Mori line the
   // mobile whisper bar carries, so mortality is woven in on both layouts.

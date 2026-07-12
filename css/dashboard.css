@@ -3522,11 +3522,33 @@ body.pre-clarity .capture-fab { display: none !important; }
     align-content: normal !important;
     padding-bottom: 0 !important;
   }
-  /* PAGE 1 snaps at the TOP (the brand row), so the MEMENTO lockup stays visible
-     and you can rest at the very top. The card + Today flow below it. */
+  /* v709 (Malik): the header is PINNED. The M-lockup and the date never move;
+     the page scrolls under them and the shrinking card lands IN the M's slot.
+     Fixed header leaves the flow, so #dayCard compensates with margin-top to
+     keep the rest layout pixel-identical (v245 law). pointer-events: none so
+     the strip never blocks content; the date re-enables its own. */
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .dash-header {
-    margin-bottom: 10px !important;
+    position: fixed; top: calc(var(--safe-t, 0px) + 12px); left: 0; right: 0;
+    z-index: 50; margin-bottom: 0 !important;
+    padding: 4px 14px 0 14px;
+    pointer-events: none;
   }
+  /* Progressive glass under the pinned header so content scrolling beneath
+     stays legible: blurred tint MASKED to fade out (never a hard band). */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .dash-header::before {
+    content: ''; position: absolute; left: 0; right: 0; z-index: -1;
+    top: calc(-12px - var(--safe-t, 0px)); height: calc(var(--safe-t, 0px) + 62px);
+    background: rgba(4, 4, 6, 0.38);
+    backdrop-filter: blur(14px) saturate(1.3);
+    -webkit-backdrop-filter: blur(14px) saturate(1.3);
+    mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+    pointer-events: none;
+  }
+  html.theme-light body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .dash-header::before {
+    background: rgba(230, 232, 236, 0.45);
+  }
+
   /* The date sits top-right, aligned with the MEMENTO lockup, taken OUT of the
      flow (absolute) so it does not pull the card up. This makes the worked-on home
      land at the exact same card/Today positions as the blank pre-Clarity home, which
@@ -3536,14 +3558,18 @@ body.pre-clarity .capture-fab { display: none !important; }
      pulls the card up. Same on both states so the two screens are identical. */
   body:not(.has-custom-layout) .app.dash-v2 #dashGreetingMobile {
     /* v695 (Malik): the date's optical center matches the MEMENTO lockup's
-       (it sat 8px low). */
-    position: absolute !important; top: calc(var(--safe-t, 0px) + 9px); right: 14px;
-    margin: 0 !important; z-index: 2; display: flex !important; justify-content: flex-end;
+       (it sat 8px low). v709: FIXED so it never scrolls, and tappable (tap
+       swaps the date for the weeks you have left, js/08). */
+    position: fixed !important; top: calc(var(--safe-t, 0px) + 9px); right: 14px;
+    margin: 0 !important; z-index: 51; display: flex !important; justify-content: flex-end;
+    pointer-events: auto; cursor: pointer;
   }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard {
     display: flex !important; flex-direction: column; justify-content: center;
     min-height: 0 !important;
-    margin: 0 !important; grid-column: auto !important; grid-row: auto !important;
+    /* top 29px = the pinned header's vacated flow space (v709), so the card
+       rests at the exact pre-v709 position, top 45px (v245 law). */
+    margin: 29px 0 0 0 !important; grid-column: auto !important; grid-row: auto !important;
   }
   /* LOCKED to the blank (pre-Clarity) card, byte for byte: same width and the same
      FIXED 452px height as the base mobile rule (#dayCard .daycard-ns above). The
@@ -3834,8 +3860,8 @@ html.theme-light .ambient__rays { display: none !important; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-wrap { transform-origin: top center; pointer-events: auto; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard {
     overflow: visible; justify-content: flex-start !important;
-    position: sticky; top: calc(var(--safe-t, 0px) + 8px);
-    z-index: 40; pointer-events: none;
+    position: sticky; top: calc(var(--safe-t, 0px) + 16px);
+    z-index: 60; pointer-events: none;
   }
 
   @supports (animation-timeline: scroll()) {
@@ -3844,16 +3870,23 @@ html.theme-light .ambient__rays { display: none !important; }
     body.ns-bloom:not(.has-custom-layout):not(.evo2) .app.dash-v2 #dayCard {
       animation: heroCardHeight linear both;
       animation-timeline: scroll(root block);
-      animation-range: 0px 224px;
+      animation-range: 0px 438px;
     }
     body.ns-bloom:not(.has-custom-layout):not(.evo2) .app.dash-v2 #dayCard .daycard-wrap {
       animation: heroCardScale linear both;
       animation-timeline: scroll(root block);
-      animation-range: 0px 224px;
+      animation-range: 0px 438px;
+    }
+    body.ns-bloom:not(.has-custom-layout):not(.evo2) .app.dash-v2 .dash-header .dash-header__brand-mark {
+      animation: heroMarkFade linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0px 438px;
     }
   }
 }
-@keyframes heroCardHeight { from { height: 466px; } to { height: 242px; } }
-@keyframes heroCardScale  { from { transform: translateX(0) scale(1); } to { transform: translateX(calc(16px + (min(82vw, 320px) * 0.19) / 2 - 50vw)) scale(0.19); } }
+@keyframes heroCardHeight { from { height: 466px; } to { height: 28px; } }
+@keyframes heroCardScale  { from { transform: translateX(0) scale(1, 1); } to { transform: translateX(calc(14px + (min(82vw, 320px) * 0.0618) / 2 - 50vw)) scale(0.0618, 0.042); } }
+/* The header's own M fades late, as the arriving card replaces it. */
+@keyframes heroMarkFade { 0% { opacity: 1; } 55% { opacity: 1; } 100% { opacity: 0; } }
 
 

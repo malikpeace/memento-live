@@ -5885,7 +5885,7 @@ const HeroShrink = {
         this._full = this.card.offsetHeight || 0;
         if (hadH) this.card.style.height = hadH;
       }
-      this._min = Math.max(230, Math.round(this._full * 0.52));
+      this._min = 28;   // v709: mirrors heroCardHeight's 28px end
     } catch (e) {}
   },
 
@@ -5893,6 +5893,8 @@ const HeroShrink = {
     try {
       if (this.card) { this.card.style.height = ''; this.card.style.justifyContent = ''; }
       if (this.wrap) { this.wrap.style.transform = ''; }
+      const mark = document.querySelector('.dash-header .dash-header__brand-mark');
+      if (mark) mark.style.opacity = '';
     } catch (e) {}
   },
 
@@ -5915,16 +5917,19 @@ const HeroShrink = {
     const h = Math.round(this._full - range * p);
     this.card.style.height = h + 'px';
     this.card.style.justifyContent = 'flex-start';
-    // Dock (v707/v708): the card shrinks to a 0.19-scale mini and its center
-    // moves so the scaled left edge ends at 16px, where the sticky container
-    // then holds it. Same math as the heroCardScale keyframe (origin top
-    // center). Visual scale is DECOUPLED from the container height, the
-    // layout handoff (466 -> 242) stays 1:1 with the finger.
-    const SC_END = 0.19;
-    const sc = 1 - (1 - SC_END) * p;
+    // Dock v2 (v709): the card SQUASHES into the header's 19px M slot at 14px
+    // left, becoming the icon (1:1). The header's own M fades over the last
+    // 45% as the card replaces it. Same math as the heroCardScale /
+    // heroMarkFade keyframes (origin top center). Visual scale is DECOUPLED
+    // from the container height; the layout handoff stays 1:1 with the finger.
+    const SX_END = 0.0618, SY_END = 0.042;
+    const sx = 1 - (1 - SX_END) * p;
+    const sy = 1 - (1 - SY_END) * p;
     const cardW = Math.min(0.82 * window.innerWidth, 320);
-    const dxEnd = 16 + (cardW * SC_END) / 2 - window.innerWidth / 2;
-    this.wrap.style.transform = 'translateX(' + (dxEnd * p).toFixed(1) + 'px) scale(' + sc.toFixed(4) + ')';
+    const dxEnd = 14 + (cardW * SX_END) / 2 - window.innerWidth / 2;
+    this.wrap.style.transform = 'translateX(' + (dxEnd * p).toFixed(1) + 'px) scale(' + sx.toFixed(4) + ', ' + sy.toFixed(4) + ')';
+    const mark = document.querySelector('.dash-header .dash-header__brand-mark');
+    if (mark) mark.style.opacity = p <= 0.55 ? '' : String(Math.max(0, 1 - (p - 0.55) / 0.45));
   }
 };
 try {
