@@ -937,6 +937,16 @@ body.calm-motion .empty-state, body.lite .empty-state { animation: none; }
 @media (prefers-reduced-motion: reduce) {
   .welcome-intro__orb { animation: none !important; }
 }
+/* The card-reveal / chapter cinematics own the screen AND the GPU: the aurora
+   pauses and dims under the cine themes so the reveal never drops frames
+   (v718, Malik: "the cinematic evolved animation is a bit chopped"). */
+.welcome-intro--cine .welcome-intro__orb,
+.welcome-intro--preenter .welcome-intro__orb,
+.welcome-intro--blackout .welcome-intro__orb,
+.welcome-intro--help .welcome-intro__orb {
+  animation-play-state: paused;
+  opacity: 0.4;
+}
 .welcome-intro__page-wrap {
   position: relative; z-index: 1;
   flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column;

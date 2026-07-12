@@ -7749,13 +7749,12 @@ function renderIgnitionV2(summary) {
     // with a period so it reads as a full sentence. The touch point and the quiet
     // hint fade in only after it has landed. No "Not quite" escape: reaching this
     // beat IS the confirmation.
-    const goalP = /[.!?]$/.test(String(goal).trim()) ? String(goal).trim() : String(goal).trim() + '.';
+    // v718 (Malik): no goal text on this beat, the star page says it again a
+    // second later. Just the touch point + hint, centered on the dark.
     const START = 700;
-    const afterDelay = START + 1500;
     inner = `
       <div class="nsv2-reveal">
-        <div class="nsv2-reveal__goal nsv2-reveal__goal--whole" style="animation-delay:${START}ms">${esc(goalP)}</div>
-        <div class="nsv2-reveal__after" style="animation-delay:${afterDelay}ms">
+        <div class="nsv2-reveal__after" style="animation-delay:${START}ms">
           <div class="nsv2-hold" id="nsv2Hold" role="button" tabindex="0" aria-label="Press and hold to collapse">
             <span class="nsv2-hold__core" aria-hidden="true"></span>
           </div>

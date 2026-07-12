@@ -428,7 +428,7 @@ const WelcomeIntro = {
       _fallback: "Whatever's got a hold on you, it's beatable. We just have to see it clearly first."
     },
     timeDrain: {
-      'Scrolling and social media': "The phone is the biggest thief of time there is. The good news is that's the easiest leak to plug.",
+      'Scrolling and social media': "Yeah, our phones are designed from the ground up to waste as much of our time as possible. But we'll help fix this.",
       'Work or school eats it all': "Fair. But there's almost always a small pocket in the day. We just need to find one and protect it.",
       'No real routine, it just slips': "That's the most common one. Time without a shape disappears. We give the important thing a fixed spot.",
       'Other people and obligations': "Saying yes to everyone is saying no to your own goal. We carve out one part that stays yours.",
@@ -2219,7 +2219,10 @@ const WelcomeIntro = {
     // the identity questions. Preview is always the terminal beat (it runs after the
     // summaryStepper, the last identity step), so finishing here is always correct.
     if (kind === 'preview') {
-      this._prevForward = () => { try { this.el.classList.remove('welcome-intro--cine', 'welcome-intro--preenter'); } catch (e) {} this._finishWithName(); };
+      // v718 (Malik): do NOT strip the cine theme here, the page is still fully
+      // visible and de-theming it repaints the same beat bright (the "popped up
+      // again" flash). _revealAfterOnboarding strips it after the fade-out.
+      this._prevForward = () => { this._finishWithName(); };
       this._runPreviewReveal();
     }
 
@@ -3172,8 +3175,12 @@ const WelcomeIntro = {
   },
 
   _revealAfterOnboarding(name) {
-    // tear down the celebration / help themes + fireworks if still up
-    if (this.el) { this.el.classList.remove('welcome-intro--blackout', 'welcome-intro--help', 'welcome-intro--cine', 'welcome-intro--preenter'); this._setStage([]); }
+    // Theme classes are stripped AFTER the fade-out below (v718): removing them
+    // while the intro is still visible repaints the last beat bright (Malik's
+    // "evolved page popped up again" flash on Enter Memento).
+    setTimeout(() => {
+      try { if (this.el) { this.el.classList.remove('welcome-intro--blackout', 'welcome-intro--help', 'welcome-intro--cine', 'welcome-intro--preenter'); this._setStage([]); } } catch (e) {}
+    }, 1100);
     this._confettiVer = (this._confettiVer || 0) + 1;
     const _cf = document.getElementById('welcomeConfetti'); if (_cf) _cf.remove();
     const _bc = document.getElementById('welcomeRays'); if (_bc) _bc.remove();
@@ -3231,6 +3238,9 @@ const WelcomeIntro = {
         overlay.remove();
         app.style.transition = '';
         app.style.filter = '';
+        // The transform is gone now: redo the fold measurement that was
+        // deferred while the app was scaled (v718).
+        try { if (typeof HeroShrink !== 'undefined' && HeroShrink.layoutGap) HeroShrink.layoutGap(); } catch (e) {}
       }, 1200);
     }, 2500);
   }
@@ -5862,6 +5872,18 @@ const HeroShrink = {
   // Push #dashBelow's top just past the fold: Hello + the modules are what you
   // scroll INTO, never something that leaks into the resting first screen.
   layoutGap() {
+    // Never measure while the app is scaled/filtered (the post-onboarding
+    // reveal holds scale(1.05) for ~2.5s): every rect reads ~5% inflated and
+    // the fold margin lands short, page 2 bleeding onto the home (v718,
+    // Malik's broken-layout screenshots). Retry once the transform clears.
+    try {
+      const appEl = document.getElementById('app');
+      if (appEl && getComputedStyle(appEl).transform !== 'none') {
+        clearTimeout(this._gapRetryT);
+        this._gapRetryT = setTimeout(() => this.layoutGap(), 600);
+        return;
+      }
+    } catch (e) {}
     try {
       if (!this._active()) return;
       const below = document.getElementById('dashBelow');
