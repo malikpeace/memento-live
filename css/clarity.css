@@ -10,6 +10,26 @@
   opacity: 0; pointer-events: none;
   overflow: hidden;
 }
+/* v720 (Malik): the NEBULA background, lab values verbatim. Two cloud layers
+   drifting in opposite phases (30s / 38s), transform-only so they run a full
+   10-minute session compositor-cheap. No stars, his call: deep thinking, not
+   distraction. Hidden in light mode (dark clouds have nothing to sit on). */
+.clarity-exp__neb1, .clarity-exp__neb2 { position: absolute; pointer-events: none; }
+.clarity-exp__neb1 { right: -45%; top: -20%; width: 135%; height: 64%;
+  background: radial-gradient(55% 55% at 60% 42%, rgba(34, 84, 96, 0.36), transparent 68%),
+              radial-gradient(40% 42% at 40% 60%, rgba(24, 60, 72, 0.24), transparent 70%);
+  animation: clarityNeb1Drift 30s ease-in-out infinite alternate; }
+.clarity-exp__neb2 { left: -50%; bottom: -24%; width: 120%; height: 52%;
+  background: radial-gradient(50% 50% at 45% 55%, rgba(26, 66, 78, 0.2), transparent 70%);
+  animation: clarityNeb2Drift 38s ease-in-out infinite alternate; }
+@keyframes clarityNeb1Drift { from { transform: translate(0, 0) scale(1); } to { transform: translate(-4.5%, 3%) scale(1.07); } }
+@keyframes clarityNeb2Drift { from { transform: translate(0, 0) scale(1.05); } to { transform: translate(4%, -2.5%) scale(1); } }
+@media (prefers-reduced-motion: reduce) {
+  .clarity-exp__neb1, .clarity-exp__neb2 { animation: none; }
+}
+html.theme-light .clarity-exp__neb1,
+html.theme-light .clarity-exp__neb2 { display: none; }
+
 /* Pure fade entrance - no scale/zoom. Consistent with the dashboard crossfade. */
 .clarity-exp.open-bg {
   opacity: 1; pointer-events: auto;
