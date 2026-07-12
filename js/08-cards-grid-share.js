@@ -586,7 +586,9 @@ function renderGrid() {
     state.clarity.answers && String(state.clarity.answers.neutronStar || '').trim());
   const _lockedHome = isBrandNewUser() || !_hasRealStar;
   document.body.classList.toggle('home-locked', _lockedHome);
-  if (_lockedHome) { try { if (typeof TabBar !== 'undefined' && TabBar.hide) TabBar.hide(); } catch (e) {} }
+  // v703: the locked pre-star home keeps the bar too (Today + You only, the
+  // prestar mode inside TabBar.show), so Settings is reachable from day one.
+  try { if (typeof TabBar !== 'undefined' && TabBar.show) TabBar.show(); } catch (e) {}
 
   // Brand-new user: the welcome hero (command center) is the whole dashboard.
   // No module cards, no More strip; everything appears as it unlocks.
@@ -5156,24 +5158,8 @@ function renderAll() {
   // Renders change page-1's height (next-step vs today's action states), so
   // the below-the-fold gap re-computes with them (v699).
   try { if (typeof HeroShrink !== 'undefined' && HeroShrink.layoutGap) HeroShrink.layoutGap(); } catch (e) {}
-  // v702 (Malik): the cheat bar must be reachable EVERYWHERE. On the pre-star
-  // locked home there is no bottom bar (so no You panel), so the box floats
-  // collapsed at the foot of the screen instead. Post-star the float clears and
-  // renderProfile re-homes it at the You panel's foot as usual. Dev-only UI.
-  try {
-    const _cb = document.getElementById('creatorBox');
-    if (_cb) {
-      const _mob = window.matchMedia && window.matchMedia('(max-width: 859.98px)').matches;
-      if (_mob && document.body.classList.contains('home-locked')) {
-        if (!_cb.classList.contains('creator-box--float')) {
-          _cb.classList.add('creator-box--float');
-          document.body.appendChild(_cb);
-        }
-      } else {
-        _cb.classList.remove('creator-box--float');
-      }
-    }
-  } catch (e) {}
+  // v703: the v702 floating cheat bar is retired, the bar (Today + You) exists
+  // pre-star now, so the You panel and its cheat bar are always reachable.
 }
 
 /* ============================================================

@@ -873,3 +873,9 @@ html.theme-light body.lite .tab-bar, html.theme-light.lowfx .tab-bar {
   body.home-locked .app { overflow: hidden !important; height: 100lvh; }
   body.home-locked #dashBelow { display: none !important; }
 }
+
+
+/* v703 (Malik): the bar exists from day one so Settings is always reachable;
+   pre-star it is just Today + You. Do and Reflect are earned with the star. */
+.tab-bar--prestar .tab-bar__tab--do,
+.tab-bar--prestar [data-tab="reflect"] { display: none; }

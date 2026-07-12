@@ -4375,13 +4375,13 @@ const TabBar = {
     // overlay to close must NOT block the bar, that wedged it hidden forever
     // when the wait never resolved (v681). _evoFinish re-shows at the end.
     try { if (typeof _cardEvolutionRunning !== 'undefined' && _cardEvolutionRunning && typeof _evoFinished !== 'undefined' && !_evoFinished) return; } catch (e) {}
-    // No bar before the star exists: the pre-Clarity home keeps its single
-    // job, and the bar appearing after ignition is part of the reward. Keyed
-    // on a REAL star (completed + neutronStar), the same truth the home hero
-    // uses, so a stale completed flag (dev priming) can never leak the bar.
+    // v703 (Malik): the bar exists from the very beginning, so Settings (You)
+    // is always reachable. Pre-star it shows ONLY Today + You; Do and Reflect
+    // appear once a REAL star exists (completed + neutronStar, the same truth
+    // the home hero uses, so a stale completed flag can never leak them).
     const hasStar = !!(typeof state !== 'undefined' && state && state.clarity && state.clarity.completed &&
       state.clarity.answers && String(state.clarity.answers.neutronStar || '').trim());
-    if (!hasStar) { this.hide(); return; }
+    if (this.el) this.el.classList.toggle('tab-bar--prestar', !hasStar);
     if (this.el) this.el.classList.remove('hidden');
     requestAnimationFrame(() => this.movePill(false));
     setTimeout(() => this.movePill(false), 60);
