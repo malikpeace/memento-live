@@ -5156,6 +5156,24 @@ function renderAll() {
   // Renders change page-1's height (next-step vs today's action states), so
   // the below-the-fold gap re-computes with them (v699).
   try { if (typeof HeroShrink !== 'undefined' && HeroShrink.layoutGap) HeroShrink.layoutGap(); } catch (e) {}
+  // v702 (Malik): the cheat bar must be reachable EVERYWHERE. On the pre-star
+  // locked home there is no bottom bar (so no You panel), so the box floats
+  // collapsed at the foot of the screen instead. Post-star the float clears and
+  // renderProfile re-homes it at the You panel's foot as usual. Dev-only UI.
+  try {
+    const _cb = document.getElementById('creatorBox');
+    if (_cb) {
+      const _mob = window.matchMedia && window.matchMedia('(max-width: 859.98px)').matches;
+      if (_mob && document.body.classList.contains('home-locked')) {
+        if (!_cb.classList.contains('creator-box--float')) {
+          _cb.classList.add('creator-box--float');
+          document.body.appendChild(_cb);
+        }
+      } else {
+        _cb.classList.remove('creator-box--float');
+      }
+    }
+  } catch (e) {}
 }
 
 /* ============================================================
