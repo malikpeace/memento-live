@@ -7793,10 +7793,17 @@ function renderIgnitionV2(summary) {
       idleM += `<i style="--a:${(i * 137) % 360}deg;--d:${(5.2 + (i % 5) * 0.7).toFixed(2)}s;--del:${(-(i % 9) * 1.1).toFixed(1)}s;--s:${2 + (i % 3)}px;--r:${52 + (i % 4) * 6}vmax"></i>`;
     }
     let surgeM = '';
-    for (let i = 0; i < 16; i++) {
+    for (let i = 0; i < 20; i++) {
       surgeM += `<i style="--a:${(i * 53 + 20) % 360}deg;--d:${(1.4 + (i % 5) * 0.22).toFixed(2)}s;--del:${(-(i % 8) * 0.35).toFixed(2)}s;--s:${2 + (i % 3)}px;--r:${58 + (i % 5) * 7}vmax"></i>`;
     }
-    const fieldMotes = `<span class="fld fld--idle">${idleM}</span><span class="fld fld--surge">${surgeM}</span>`;
+    // The FLOOD (v725): a third layer that pours in progressively with the
+    // hold itself (opacity driven by --holdp), so the longer you press, the
+    // more of the sky is falling. Peak: ~56 motes converging.
+    let floodM = '';
+    for (let i = 0; i < 24; i++) {
+      floodM += `<i style="--a:${(i * 91 + 7) % 360}deg;--d:${(1.1 + (i % 6) * 0.14).toFixed(2)}s;--del:${(-(i % 9) * 0.21).toFixed(2)}s;--s:${1.5 + (i % 3)}px;--r:${62 + (i % 6) * 6}vmax"></i>`;
+    }
+    const fieldMotes = `<span class="fld fld--idle">${idleM}</span><span class="fld fld--surge">${surgeM}</span><span class="fld fld--flood">${floodM}</span>`;
     inner = `
       <div class="nsv2-reveal">
         <div class="nsv2-reveal__after" style="animation-delay:${START}ms">

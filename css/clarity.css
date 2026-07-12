@@ -3138,12 +3138,13 @@ html.lowfx .nsv2-reveal__goal--whole { animation: nsv2WordInLite 1.2s ease forwa
 }
 .nsv2.is-holding .nsv2-hold__core {
   animation: none;
-  /* v724 (Malik): a collapse COMPRESSES. The core shrinks toward a point while
-     the glow intensifies, density made visible. */
-  transform: translate(-50%, -50%) scale(calc(1 - var(--holdp, 0) * 0.45));
+  /* v724/v725 (Malik): a collapse COMPRESSES, unmistakably. The core crushes
+     to a quarter of its size; the near halo stays TIGHT so the shrink reads
+     (a fat halo was masking it), while the far bloom still swells. */
+  transform: translate(-50%, -50%) scale(calc(1 - var(--holdp, 0) * 0.75));
   box-shadow:
-    0 0 calc(14px + var(--holdp, 0) * 38px) rgba(255,255,255,0.98),
-    0 0 calc(30px + var(--holdp, 0) * 80px) rgba(200,218,255, calc(0.4 + var(--holdp, 0) * 0.5));
+    0 0 calc(12px + var(--holdp, 0) * 16px) rgba(255,255,255,1),
+    0 0 calc(30px + var(--holdp, 0) * 90px) rgba(200,218,255, calc(0.4 + var(--holdp, 0) * 0.55));
 }
 /* v723/v724 (Malik): the collapse accretion field. Motes spawn OFF-SCREEN and
    ride the loader's gravity curve into the touch point. The surge layer fades
@@ -3177,6 +3178,12 @@ html.lowfx .nsv2-reveal__goal--whole { animation: nsv2WordInLite 1.2s ease forwa
 .fld--surge i { animation-play-state: paused; }
 .nsv2.is-holding .fld--surge { opacity: 1; }
 .nsv2.is-holding .fld--surge i { animation-play-state: running; }
+/* The FLOOD pours in progressively with the hold itself: opacity rides --holdp
+   directly, so density keeps climbing the whole 5 seconds (v725). */
+.fld--flood { opacity: 0; }
+.fld--flood i { animation-play-state: paused; }
+.nsv2.is-holding .fld--flood { opacity: calc(var(--holdp, 0) * 1.5 - 0.12); }
+.nsv2.is-holding .fld--flood i { animation-play-state: running; }
 /* Pressure shake: builds from nothing with --holdp (core + field together). */
 .nsv2.is-holding .nsv2-hold { animation: nsv2CollapseShake 0.3s linear infinite; }
 @keyframes nsv2CollapseShake {
