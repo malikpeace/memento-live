@@ -1827,6 +1827,7 @@ const CreatorTools = {
     // Stage & animation jumps (Malik: fly around Memento from the cheat bar)
     bind('creatorJumpBlankCard', () => this.jumpBlankCard());
     bind('creatorJumpUnlock', () => this.jumpUnlockCinema());
+    bind('creatorJumpFinalQ', () => this.jumpFinalQuestion());
     bind('creatorJumpSynth', () => this.jumpSynth());
     bind('creatorJumpReveal', () => this.jumpReveal());
     bind('creatorJumpStar', () => this.jumpStar());
@@ -2194,6 +2195,41 @@ const CreatorTools = {
   // cinema -> First 7 Days -> paywall. Seeding state here PRE-SET ignitedAt +
   // cardEvolutionSeen, which skipped the cinema and fired the paywall early
   // (Malik v674). So these enter the natural flow untouched, no seeding.
+  // v721 (Malik): land on the FINAL clarity question. Writes a crafted
+  // near-complete discovery draft, then opens Clarity so the REAL resume
+  // restore (tap Continue) mounts the last question through production code.
+  jumpFinalQuestion() {
+    this._closeAll(); this._devToHome();
+    try {
+      state.clarity = state.clarity || {};
+      state.clarity.completed = false;
+      state.clarity.tutorialSeen = true;
+      const Q = (t) => ({ role: 'assistant', _act: 3, content: t });
+      const A = (t) => ({ role: 'user', content: t });
+      state.clarity.draft = {
+        wizardAnswers: { knowDomain: 'yes', whatSpecifically: 'Get my product to 100 paying users' },
+        wizardStep: 1 + 1,   // knowDomain -> whatSpecifically -> aiChat
+        aiChatMessages: [
+          { role: 'assistant', _act: 1, content: "Okay, let's start here. What's the one goal that matters above everything else right now?" }, A('Get my product to 100 paying users.'),
+          { role: 'assistant', _act: 2, content: 'Locked: 100 paying users who would genuinely miss it. Why that, above everything else?' }, A('It would prove I can build something people actually need.'),
+          Q('And why does proving that matter to you?'), A('Because I refuse to stay average. I want a life I chose.'),
+          Q('What has stopped you before when you chased something like this?'), A('I scatter. I start five things and finish none.'),
+          Q('What would it cost you if this never happened?'), A('Years. And always wondering if I could have.'),
+          Q('Who benefits when you pull this off, besides you?'), A('My family. And every person the product actually helps.'),
+          Q('What are you willing to give up for it?'), A('Comfort. Most of my scrolling. Some weekends.')
+        ],
+        aiChatReady: false,
+        aiChatProgress: 92,
+        aiCurrentQuestion: 'Last one. A year from now this either happened or it did not. What will have made the difference?',
+        aiCurrentHint: 'Say it plainly. This is the spine of your star.',
+        aiCurrentType: 'text',
+        aiCurrentOptions: [],
+        aiCurrentRange: null
+      };
+      persistNow();
+      ClarityExperience.open();
+    } catch (e) {}
+  },
   jumpSynth() { this._closeAll(); try { if (window.DevCeremony) window.DevCeremony.synth(); } catch (e) {} },
   jump7Days() { this._closeAll(); try { if (typeof showNext7Days === 'function') showNext7Days(function () { try { if (typeof ClarityPaywall !== 'undefined' && ClarityPaywall.show) ClarityPaywall.show(); } catch (e) {} }); } catch (e) {} },
   jumpReveal() { this._closeAll(); try { if (window.DevCeremony) window.DevCeremony.reveal(); } catch (e) {} },

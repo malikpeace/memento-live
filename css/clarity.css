@@ -29,6 +29,11 @@
 }
 html.theme-light .clarity-exp__neb1,
 html.theme-light .clarity-exp__neb2 { display: none; }
+/* The nebula yields to the star pages + the quiet pre-question pause (v721):
+   _syncNebula in js/02 toggles this; a slow fade either way. */
+.clarity-exp__neb1, .clarity-exp__neb2 { transition: opacity 1.6s ease; }
+.clarity-exp--noneb .clarity-exp__neb1,
+.clarity-exp--noneb .clarity-exp__neb2 { opacity: 0; }
 
 /* Pure fade entrance - no scale/zoom. Consistent with the dashboard crossfade. */
 .clarity-exp.open-bg {

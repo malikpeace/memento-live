@@ -852,6 +852,7 @@ const ClarityExperience = {
       this.pageWrap.innerHTML = '<div class="clarity-exp__page-inner"><div class="clarity-ctx">' +
         '<div class="clarity-ctx__word">Okay, Let\'s begin.</div>' +
         '</div></div>';
+      this._syncNebula();
       const reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
       this._setTimeout(done, reduced ? 450 : 2500);
     } catch (e) { done(); }
@@ -2232,16 +2233,17 @@ const ClarityExperience = {
     try {
       // The Neutron Star page keeps the top-left beams OFF (Malik: no beams here);
       // the star itself carries the moment.
-      if (this.pageWrap && this.pageWrap.querySelector('.tut-star-blob')) { this._setLight(0); return; }
+      if (this.pageWrap && this.pageWrap.querySelector('.tut-star-blob')) { this._setLight(0); this._syncNebula(); return; }
       const offset = this.getWizardOffset();
       const total = this.getTotalPages();
       if (this.currentPage < offset) {
         this._setLight(0.06 + 0.10 * (this.currentPage / Math.max(1, offset)));
+        this._syncNebula();
         return;
       }
       const steps = getWizardSteps();
       const key = steps[wizardStep];
-      if (key === 'aiSynthesis') { this._setLight(1); return; }
+      if (key === 'aiSynthesis') { this._setLight(1); this._syncNebula(); return; }
       // v580 (Malik): the QUESTIONS run in darkness. The beams are BORN the
       // moment the WHAT is confirmed (the Act 1 lock-check yes), then brighten
       // through the descent with real progress. Light = clarity, earned.
@@ -2251,8 +2253,28 @@ const ClarityExperience = {
         confirmed = (typeof aiChatMessages !== 'undefined') && aiChatMessages.some(m => m && m.role === 'assistant' && (m._act || 0) >= 2);
         pct = (typeof aiChatPct === 'function') ? (aiChatPct() / 100) : 0;
       } catch (eA) {}
-      if (!confirmed) { this._setLight(0.02); return; }
+      if (!confirmed) { this._setLight(0.02); this._syncNebula(); return; }
       this._setLight(0.3 + 0.6 * Math.max(0, Math.min(1, pct)));
+    } catch (e) {}
+    this._syncNebula();
+  },
+
+  // v721 (Malik): the nebula yields wherever a star owns the screen, and stays
+  // dark through the pre-question pause. OFF on the Neutron Star tutorial page,
+  // the reflect page ("One last thing"), the "Okay, Let's begin." beat, and the
+  // synthesis; fades back in (1.6s, css) when the questionnaire starts.
+  _syncNebula() {
+    try {
+      let off = false;
+      if (this.pageWrap && (
+        this.pageWrap.querySelector('.tut-star-blob') ||
+        this.pageWrap.querySelector('.clarity-reflect') ||
+        this.pageWrap.querySelector('.clarity-ctx'))) off = true;
+      if (!this.tutorialOnly && this.currentPage >= this.getWizardOffset()) {
+        const key = getWizardSteps()[wizardStep];
+        if (key === 'aiSynthesis') off = true;
+      }
+      this.el.classList.toggle('clarity-exp--noneb', off);
     } catch (e) {}
   },
 
