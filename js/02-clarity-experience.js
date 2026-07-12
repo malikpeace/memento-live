@@ -7791,22 +7791,31 @@ function renderIgnitionV2(summary) {
     // v726 (Malik): variety in the paths. Half the idle motes SPIRAL in (orbit
     // fall) instead of falling straight; a dedicated orbit layer joins the
     // press; the flood grows to 28. Peak: ~80 motes converging.
+    // v727 (Malik): real size variety with MASS. Boulders (bigger, brighter,
+    // ~18% slower) down to fine dust (1px, quick). Sizes carry their own glow
+    // (css scales the shadow off --s).
+    const SZ = [1, 1.6, 2.2, 3, 4, 5.2];
+    const mass = (px, base) => (base * (0.85 + (px / 5.2) * 0.33));
     let idleM = '';
     for (let i = 0; i < 12; i++) {
-      idleM += `<i${i % 2 ? ' class="orb"' : ''} style="--a:${(i * 137) % 360}deg;--d:${(5.2 + (i % 5) * 0.7).toFixed(2)}s;--del:${(-(i % 9) * 1.1).toFixed(1)}s;--s:${2 + (i % 3)}px;--r:${52 + (i % 4) * 6}vmax"></i>`;
+      const px = SZ[(i * 5) % 6];
+      idleM += `<i${i % 2 ? ' class="orb"' : ''} style="--a:${(i * 137) % 360}deg;--d:${mass(px, 5.2 + (i % 5) * 0.7).toFixed(2)}s;--del:${(-(i % 9) * 1.1).toFixed(1)}s;--s:${px}px;--r:${52 + (i % 4) * 6}vmax"></i>`;
     }
     let surgeM = '';
     for (let i = 0; i < 20; i++) {
-      surgeM += `<i style="--a:${(i * 53 + 20) % 360}deg;--d:${(1.4 + (i % 5) * 0.22).toFixed(2)}s;--del:${(-(i % 8) * 0.35).toFixed(2)}s;--s:${2 + (i % 3)}px;--r:${58 + (i % 5) * 7}vmax"></i>`;
+      const px = SZ[(i * 7 + 1) % 6];
+      surgeM += `<i style="--a:${(i * 53 + 20) % 360}deg;--d:${mass(px, 1.4 + (i % 5) * 0.22).toFixed(2)}s;--del:${(-(i % 8) * 0.35).toFixed(2)}s;--s:${px}px;--r:${58 + (i % 5) * 7}vmax"></i>`;
     }
     // Orbit layer: 20 motes arcing in on spiral paths, wakes with the press.
     let orbitM = '';
     for (let i = 0; i < 20; i++) {
-      orbitM += `<i class="orb" style="--a:${(i * 71 + 33) % 360}deg;--d:${(1.8 + (i % 5) * 0.28).toFixed(2)}s;--del:${(-(i % 7) * 0.4).toFixed(2)}s;--s:${1.5 + (i % 3)}px;--r:${56 + (i % 5) * 8}vmax"></i>`;
+      const px = SZ[(i * 5 + 2) % 6];
+      orbitM += `<i class="orb" style="--a:${(i * 71 + 33) % 360}deg;--d:${mass(px, 1.8 + (i % 5) * 0.28).toFixed(2)}s;--del:${(-(i % 7) * 0.4).toFixed(2)}s;--s:${px}px;--r:${56 + (i % 5) * 8}vmax"></i>`;
     }
     let floodM = '';
     for (let i = 0; i < 28; i++) {
-      floodM += `<i style="--a:${(i * 91 + 7) % 360}deg;--d:${(1.1 + (i % 6) * 0.14).toFixed(2)}s;--del:${(-(i % 9) * 0.21).toFixed(2)}s;--s:${1.5 + (i % 3)}px;--r:${62 + (i % 6) * 6}vmax"></i>`;
+      const px = SZ[(i * 7 + 4) % 6];
+      floodM += `<i style="--a:${(i * 91 + 7) % 360}deg;--d:${mass(px, 1.1 + (i % 6) * 0.14).toFixed(2)}s;--del:${(-(i % 9) * 0.21).toFixed(2)}s;--s:${px}px;--r:${62 + (i % 6) * 6}vmax"></i>`;
     }
     const fieldMotes = `<span class="fld fld--idle">${idleM}</span><span class="fld fld--surge">${surgeM}</span><span class="fld fld--orbit">${orbitM}</span><span class="fld fld--flood">${floodM}</span>`;
     inner = `
