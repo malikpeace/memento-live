@@ -879,3 +879,6 @@ html.theme-light body.lite .tab-bar, html.theme-light.lowfx .tab-bar {
    pre-star it is just Today + You. Do and Reflect are earned with the star. */
 .tab-bar--prestar .tab-bar__tab--do,
 .tab-bar--prestar [data-tab="reflect"] { display: none; }
+/* Two tabs get a bar sized for two: each slot keeps the 4-tab slot width
+   instead of stretching across the full 392px. */
+.tab-bar--prestar { width: min(224px, calc(100vw - 20px)); }

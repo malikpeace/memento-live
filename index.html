@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <script>
 /* Single source of truth for the app version. Surfaced in Settings > About. */
-window.MEMENTO_VERSION = 'v703';
+window.MEMENTO_VERSION = 'v704';
 /* LOWFX: touch / mobile devices get a lighter render path (no backdrop blur,
    no will-change layers, no background canvas animations) so iOS does not kill
    the tab from graphics-memory pressure. Desktop (fine pointer) is untouched.
@@ -36,7 +36,7 @@ window.MEMENTO_VERSION = 'v703';
 <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="manifest" href="manifest.json">
-<!-- Native iOS launch images (v703): the system shows the official mark the
+<!-- Native iOS launch images (v704): the system shows the official mark the
      instant the icon is tapped, before ANY code runs; the in-app boot mask then
      continues the identical visual. Re-add the app to the home screen to bake
      these in (iOS reads them at add time). -->
@@ -53,21 +53,21 @@ window.MEMENTO_VERSION = 'v703';
      paint never waits on a third-party CDN. font-display: swap throughout. -->
 <link rel="preload" href="fonts/dmsans-1.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="fonts/fonts.css">
-<link rel="stylesheet" href="css/base.css?v=v703">
-<link rel="stylesheet" href="css/sidebar.css?v=v703">
-<link rel="stylesheet" href="css/dashboard.css?v=v703">
-<link rel="stylesheet" href="css/misc.css?v=v703">
-<link rel="stylesheet" href="css/vivere.css?v=v703">
-<link rel="stylesheet" href="css/notes.css?v=v703">
-<link rel="stylesheet" href="css/onboarding.css?v=v703">
-<link rel="stylesheet" href="css/clarity.css?v=v703">
-<link rel="stylesheet" href="css/action.css?v=v703">
-<link rel="stylesheet" href="css/daycard-living.css?v=v703">
-<link rel="stylesheet" href="css/share-card.css?v=v703">
-<link rel="stylesheet" href="css/clarity-paywall.css?v=v703">
-<link rel="stylesheet" href="css/appearance-picker.css?v=v703">
-<link rel="stylesheet" href="css/journey.css?v=v703">
-<link rel="stylesheet" href="css/install.css?v=v703">
+<link rel="stylesheet" href="css/base.css?v=v704">
+<link rel="stylesheet" href="css/sidebar.css?v=v704">
+<link rel="stylesheet" href="css/dashboard.css?v=v704">
+<link rel="stylesheet" href="css/misc.css?v=v704">
+<link rel="stylesheet" href="css/vivere.css?v=v704">
+<link rel="stylesheet" href="css/notes.css?v=v704">
+<link rel="stylesheet" href="css/onboarding.css?v=v704">
+<link rel="stylesheet" href="css/clarity.css?v=v704">
+<link rel="stylesheet" href="css/action.css?v=v704">
+<link rel="stylesheet" href="css/daycard-living.css?v=v704">
+<link rel="stylesheet" href="css/share-card.css?v=v704">
+<link rel="stylesheet" href="css/clarity-paywall.css?v=v704">
+<link rel="stylesheet" href="css/appearance-picker.css?v=v704">
+<link rel="stylesheet" href="css/journey.css?v=v704">
+<link rel="stylesheet" href="css/install.css?v=v704">
 </head>
 <body>
 
@@ -82,7 +82,7 @@ window.MEMENTO_VERSION = 'v703';
      dashboard god rays on every refresh when restoring a deeper view. The
      reveal class .boot-revealed is added by JS at the end of the init block. -->
 <div id="bootMask" aria-hidden="true">
-  <!-- The OFFICIAL icon itself (v703): the exact home-screen icon file, so the
+  <!-- The OFFICIAL icon itself (v704): the exact home-screen icon file, so the
        launch mark can never look hand-stitched. Its near-black tile matches the
        mask background, so only the mark reads. Precached by the SW. -->
   <img class="bootmask__mark" src="icons/icon-512.png" width="96" height="96" alt="" aria-hidden="true">
@@ -513,7 +513,7 @@ window.MEMENTO_VERSION = 'v703';
   <div id="dashBelow">
     <!-- One quiet line: On this day (your own words from 30/90/365 days ago) or
          the rotating Daily Memento. -->
-    <!-- v703 (Malik): page 2 opens like an app. Hello + search + settings. -->
+    <!-- v704 (Malik): page 2 opens like an app. Hello + search + settings. -->
     <div id="dashHello"></div>
     <div id="dailyMemento"></div>
     <!-- One quiet consistency line: shown-up-this-week, cumulative days, a 7-dot
@@ -634,7 +634,7 @@ window.MEMENTO_VERSION = 'v703';
 
 <!-- Tab Bar: Today / Path / Do / Reflect / You (BOTTOM-BAR-PLAN.md).
      Icons + labels with a soft glass capsule that slides behind the active
-     destination (Malik's 1+2+3 blend, v703). No raised button. Appears only
+     destination (Malik's 1+2+3 blend, v704). No raised button. Appears only
      after the star is ignited; free users see it as a preview whose locked
      tabs open the paywall. -->
 <nav class="tab-bar hidden" id="tabBar" aria-label="Main navigation">
@@ -643,7 +643,7 @@ window.MEMENTO_VERSION = 'v703';
     <svg class="tab-bar__icon tab-bar__icon--m" viewBox="120 116 272 280" fill="currentColor" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
     <span class="tab-bar__label">Today</span>
   </button>
-  <!-- Path tab removed (Malik v703): with no goal-metric data of its own it was
+  <!-- Path tab removed (Malik v704): with no goal-metric data of its own it was
        consistency in a third costume. Four honest tabs; the panel + renderer stay
        dormant in js/09 so a real Progress tab can return once a measurable goal
        metric exists. -->
@@ -773,31 +773,31 @@ window.MEMENTO_VERSION = 'v703';
 <!-- Supabase client for OPTIONAL cloud accounts + sync (js/12-cloud-sync.js).
      If this CDN tag fails to load, the app runs fully local, unchanged. -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
-<script src="js/01-state-foundation.js?v=v703"></script>
-<script src="js/02-clarity-experience.js?v=v703"></script>
-<script src="js/03-ai-integration.js?v=v703"></script>
-<script src="js/04-templates-proof.js?v=v703"></script>
-<script src="js/05-vivere.js?v=v703"></script>
-<script src="js/06-consistency-mori.js?v=v703"></script>
-<script src="js/07-sheet-templates.js?v=v703"></script>
-<script src="js/08-cards-grid-share.js?v=v703"></script>
-<script src="js/09-controllers.js?v=v703"></script>
-<script src="js/10-demo-backend.js?v=v703"></script>
+<script src="js/01-state-foundation.js?v=v704"></script>
+<script src="js/02-clarity-experience.js?v=v704"></script>
+<script src="js/03-ai-integration.js?v=v704"></script>
+<script src="js/04-templates-proof.js?v=v704"></script>
+<script src="js/05-vivere.js?v=v704"></script>
+<script src="js/06-consistency-mori.js?v=v704"></script>
+<script src="js/07-sheet-templates.js?v=v704"></script>
+<script src="js/08-cards-grid-share.js?v=v704"></script>
+<script src="js/09-controllers.js?v=v704"></script>
+<script src="js/10-demo-backend.js?v=v704"></script>
 <!-- The Path + Your Story: the journey views. Client-side, read existing state. -->
-<script src="js/17-journey.js?v=v703"></script>
+<script src="js/17-journey.js?v=v704"></script>
 <!-- Add to Home Screen prompt: detects browser-tab vs installed PWA. -->
-<script src="js/18-install.js?v=v703"></script>
-<script src="js/20-push.js?v=v703"></script>
-<script src="js/11-init.js?v=v703"></script>
-<script src="js/12-cloud-sync.js?v=v703"></script>
-<script src="js/13-clarity-paywall.js?v=v703"></script>
-<script src="js/14-appearance-picker.js?v=v703"></script>
+<script src="js/18-install.js?v=v704"></script>
+<script src="js/20-push.js?v=v704"></script>
+<script src="js/11-init.js?v=v704"></script>
+<script src="js/12-cloud-sync.js?v=v704"></script>
+<script src="js/13-clarity-paywall.js?v=v704"></script>
+<script src="js/14-appearance-picker.js?v=v704"></script>
 <!-- DEV-ONLY: ?dev=beats live preview for the onboarding chapter pages. Inert without the param. -->
-<script src="js/19-dev-beats.js?v=v703"></script>
+<script src="js/19-dev-beats.js?v=v704"></script>
 <!-- The sound engine: synthesized moments, off by default (Profile toggle). -->
-<script src="js/20-sound.js?v=v703"></script>
+<script src="js/20-sound.js?v=v704"></script>
 <!-- Back/forward + hash-URL routing. Loads LAST so every open/close fn it wraps
      already exists. Inert until onboarding is done; touches only location.hash. -->
-<script src="js/15-router.js?v=v703"></script>
+<script src="js/15-router.js?v=v704"></script>
 </body>
 </html>

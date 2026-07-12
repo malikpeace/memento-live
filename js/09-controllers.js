@@ -4381,8 +4381,14 @@ const TabBar = {
     // the home hero uses, so a stale completed flag can never leak them).
     const hasStar = !!(typeof state !== 'undefined' && state && state.clarity && state.clarity.completed &&
       state.clarity.answers && String(state.clarity.answers.neutronStar || '').trim());
-    if (this.el) this.el.classList.toggle('tab-bar--prestar', !hasStar);
-    if (this.el) this.el.classList.remove('hidden');
+    if (this.el) {
+      // Prestar also narrows the bar (two slots, not a stretched 392px), so a
+      // mode change moves every tab: re-seat the capsule after layout.
+      const was = this.el.classList.contains('tab-bar--prestar');
+      this.el.classList.toggle('tab-bar--prestar', !hasStar);
+      this.el.classList.remove('hidden');
+      if (was !== !hasStar) requestAnimationFrame(() => this.movePill(false));
+    }
     requestAnimationFrame(() => this.movePill(false));
     setTimeout(() => this.movePill(false), 60);
     this.updateHomeDot();
