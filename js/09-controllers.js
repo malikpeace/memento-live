@@ -5911,12 +5911,9 @@ const HeroShrink = {
     if (!this.wrap || !this.wrap.isConnected) { this._full = 0; this._measure(); }
     if (!this.card || !this.wrap || !this._full) return;
     const y = window.scrollY || document.documentElement.scrollTop || 0;
-    const range = this._full - this._min;               // 1:1 with the finger
+    const range = 438;                       // mirrors the keyframes' range
     const p = Math.max(0, Math.min(1, y / range));
     if (p <= 0) { this._clear(); return; }
-    const h = Math.round(this._full - range * p);
-    this.card.style.height = h + 'px';
-    this.card.style.justifyContent = 'flex-start';
     // Dock v2 (v709): the card SQUASHES into the header's 19px M slot at 14px
     // left, becoming the icon (1:1). The header's own M fades over the last
     // 45% as the card replaces it. Same math as the heroCardScale /

@@ -3847,16 +3847,17 @@ html.theme-light .ambient__rays { display: none !important; }
    LOCKED at 452px by design (v245), so the fixed keyframe endpoints hold on
    every phone. */
 @media (max-width: 767.98px) {
-  /* v707/v708 (Malik): the DOCK. The collapse steers INTO the top-left corner,
-     and the mini card then STAYS there while the rest of the page scrolls
-     (position: sticky, #dayCard is a direct child of #app which spans the
-     whole scroll). Origin stays top center (scale keeps the card's center),
-     the translateX moves that center so the scaled card's LEFT edge lands at
-     16px (the header lockup's inset). Center math only needs the card's own
-     width (min(82vw,320) by the v245 law), never the wrap's. The container is
-     tap-transparent so the empty strip around the docked mini card never
-     swallows touches meant for content scrolling beneath it; the wrap (whose
-     hit area shrinks with the transform) stays tappable. */
+  /* v707-v710 (Malik): the DOCK. The card squashes INTO the header's M slot
+     and STAYS there (position: sticky, #dayCard is a direct child of #app
+     which spans the whole scroll). v710 physics: the container's flow box
+     keeps its FULL height (no height animation), so content below rises at
+     exactly 1x finger speed and geometrically can never catch the shrinking
+     card's bottom edge (the v709 sticky + height-collapse combo made content
+     travel at 2x and slide THROUGH the glass mid-morph, Malik's jank video).
+     Origin top center; the translateX moves the card's center so its scaled
+     left edge lands at 14px. The container is tap-transparent so the strip
+     around the docked chip never swallows touches; the wrap (whose hit area
+     shrinks with the transform) stays tappable. */
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-wrap { transform-origin: top center; pointer-events: auto; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard {
     overflow: visible; justify-content: flex-start !important;
@@ -3867,11 +3868,6 @@ html.theme-light .ambient__rays { display: none !important; }
   @supports (animation-timeline: scroll()) {
     /* :not(.evo2): the unlock cinema owns the wrap transform; a scroll-driven
        animation would override the grow classes, so it detaches entirely. */
-    body.ns-bloom:not(.has-custom-layout):not(.evo2) .app.dash-v2 #dayCard {
-      animation: heroCardHeight linear both;
-      animation-timeline: scroll(root block);
-      animation-range: 0px 438px;
-    }
     body.ns-bloom:not(.has-custom-layout):not(.evo2) .app.dash-v2 #dayCard .daycard-wrap {
       animation: heroCardScale linear both;
       animation-timeline: scroll(root block);
@@ -3884,7 +3880,6 @@ html.theme-light .ambient__rays { display: none !important; }
     }
   }
 }
-@keyframes heroCardHeight { from { height: 466px; } to { height: 28px; } }
 @keyframes heroCardScale  { from { transform: translateX(0) scale(1, 1); } to { transform: translateX(calc(14px + (min(82vw, 320px) * 0.0618) / 2 - 50vw)) scale(0.0618, 0.042); } }
 /* The header's own M fades late, as the arriving card replaces it. */
 @keyframes heroMarkFade { 0% { opacity: 1; } 55% { opacity: 1; } 100% { opacity: 0; } }
