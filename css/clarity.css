@@ -3143,6 +3143,37 @@ html.lowfx .nsv2-reveal__goal--whole { animation: nsv2WordInLite 1.2s ease forwa
     0 0 calc(14px + var(--holdp, 0) * 30px) rgba(255,255,255,0.95),
     0 0 calc(30px + var(--holdp, 0) * 64px) rgba(200,218,255, calc(0.4 + var(--holdp, 0) * 0.45));
 }
+/* v723 (Malik): the collapse accretion field. Motes fall toward the touch
+   point on the loader's gravity curve; the surge set only exists while
+   holding, and the whole field contracts with --holdp so squeezing visibly
+   pulls the sky in. Transform+opacity only. */
+.nsv2-collapse-field {
+  position: absolute; left: 50%; top: 50%; width: 0; height: 0;
+  pointer-events: none;
+}
+.nsv2.is-holding .nsv2-collapse-field {
+  transform: scale(calc(1 - var(--holdp, 0) * 0.35));
+}
+.nsv2-collapse-field i {
+  position: absolute; left: 0; top: 0; border-radius: 50%;
+  width: var(--s, 2.5px); height: var(--s, 2.5px);
+  background: rgba(214, 236, 252, 0.95);
+  box-shadow: 0 0 6px rgba(150, 220, 245, 0.6);
+  opacity: 0;
+  animation: nsv2FieldFall var(--d, 4s) cubic-bezier(0.5, 0, 0.85, 0.4) var(--del, 0s) infinite;
+}
+@keyframes nsv2FieldFall {
+  0% { transform: rotate(var(--a)) translateX(var(--r, 150px)) scale(1); opacity: 0; }
+  10% { opacity: 0.9; }
+  82% { opacity: 0.75; }
+  100% { transform: rotate(var(--a)) translateX(4px) scale(0.3); opacity: 0; }
+}
+/* The surge set sleeps until the hold begins. */
+.nsv2-collapse-field i.surge { visibility: hidden; animation-play-state: paused; }
+.nsv2.is-holding .nsv2-collapse-field i.surge { visibility: visible; animation-play-state: running; }
+@media (prefers-reduced-motion: reduce) {
+  .nsv2-collapse-field { display: none; }
+}
 .nsv2-reveal__hint { font-size: var(--fs-md); color: rgba(255,255,255,0.62); line-height: 1.7; }
 .nsv2-reveal__hint span { color: rgba(255,255,255,0.92); font-weight: 600; }
 .nsv2-reveal__no {

@@ -7782,10 +7782,22 @@ function renderIgnitionV2(summary) {
     // v718 (Malik): no goal text on this beat, the star page says it again a
     // second later. Just the touch point + hint, centered on the dark.
     const START = 700;
+    // v723 (Malik): an accretion field around the touch point. Calm rain at
+    // rest (matter drifting toward the core), and a SURGE while holding: more
+    // motes, much faster, the whole field contracting with --holdp. Same
+    // language as the thinking loader, turned up and made interactive.
+    let fieldMotes = '';
+    for (let i = 0; i < 12; i++) {
+      fieldMotes += `<i style="--a:${(i * 137) % 360}deg;--d:${(3.4 + (i % 5) * 0.6).toFixed(2)}s;--del:${(-(i % 9) * 0.9).toFixed(1)}s;--s:${2 + (i % 3)}px;--r:${140 + (i % 4) * 14}px"></i>`;
+    }
+    for (let i = 0; i < 16; i++) {
+      fieldMotes += `<i class="surge" style="--a:${(i * 53 + 20) % 360}deg;--d:${(0.9 + (i % 5) * 0.18).toFixed(2)}s;--del:${(-(i % 8) * 0.25).toFixed(2)}s;--s:${2 + (i % 3)}px;--r:${(150 + (i % 5) * 16)}px"></i>`;
+    }
     inner = `
       <div class="nsv2-reveal">
         <div class="nsv2-reveal__after" style="animation-delay:${START}ms">
           <div class="nsv2-hold" id="nsv2Hold" role="button" tabindex="0" aria-label="Press and hold to collapse">
+            <span class="nsv2-collapse-field" aria-hidden="true">${fieldMotes}</span>
             <span class="nsv2-hold__core" aria-hidden="true"></span>
           </div>
           <div class="nsv2-reveal__hint"><span>Press and hold to collapse.</span></div>
