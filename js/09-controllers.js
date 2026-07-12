@@ -5891,7 +5891,7 @@ const HeroShrink = {
 
   _clear() {
     try {
-      if (this.card) { this.card.style.height = ''; this.card.style.justifyContent = ''; }
+      if (this.card) { this.card.style.height = ''; this.card.style.justifyContent = ''; this.card.style.zIndex = ''; }
       if (this.wrap) { this.wrap.style.transform = ''; }
       const mark = document.querySelector('.dash-header .dash-header__brand-mark');
       if (mark) mark.style.opacity = '';
@@ -5927,6 +5927,8 @@ const HeroShrink = {
     this.wrap.style.transform = 'translateX(' + (dxEnd * p).toFixed(1) + 'px) scale(' + sx.toFixed(4) + ', ' + sy.toFixed(4) + ')';
     const mark = document.querySelector('.dash-header .dash-header__brand-mark');
     if (mark) mark.style.opacity = p <= 0.55 ? '' : String(Math.max(0, 1 - (p - 0.55) / 0.45));
+    // Layer flip (mirrors heroCardLayer): above the header only for the dock.
+    this.card.style.zIndex = p > 0.5 ? '60' : '';
   }
 };
 try {

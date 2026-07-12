@@ -3533,20 +3533,25 @@ body.pre-clarity .capture-fab { display: none !important; }
     padding: 4px 14px 0 14px;
     pointer-events: none;
   }
-  /* Progressive glass under the pinned header so content scrolling beneath
-     stays legible: blurred tint MASKED to fade out (never a hard band). */
+  /* Gradient tint under the pinned header so content scrolling beneath stays
+     legible. GRADIENT ONLY, no backdrop-filter, no mask: the v709 masked-blur
+     scrim melted iOS WebKit (compositor jank then the black crash screen,
+     Malik's phone, 2026-07-12). A gradient fading to transparent is crash-proof
+     and is the same fallback the topFade uses where blur cannot render. */
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .dash-header::before {
     content: ''; position: absolute; left: 0; right: 0; z-index: -1;
-    top: calc(-12px - var(--safe-t, 0px)); height: calc(var(--safe-t, 0px) + 62px);
-    background: rgba(4, 6, 6, 0.38);
-    backdrop-filter: blur(14px) saturate(1.3);
-    -webkit-backdrop-filter: blur(14px) saturate(1.3);
-    mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+    top: calc(-12px - var(--safe-t, 0px)); height: calc(var(--safe-t, 0px) + 66px);
+    background: linear-gradient(to bottom,
+      rgba(4, 6, 6, 0.88) 0%,
+      rgba(4, 6, 6, 0.55) 55%,
+      rgba(4, 6, 6, 0) 100%);
     pointer-events: none;
   }
   html.theme-light body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .dash-header::before {
-    background: rgba(230, 232, 236, 0.45);
+    background: linear-gradient(to bottom,
+      rgba(230, 232, 236, 0.9) 0%,
+      rgba(230, 232, 236, 0.55) 55%,
+      rgba(230, 232, 236, 0) 100%);
   }
 
   /* The date sits top-right, aligned with the MEMENTO lockup, taken OUT of the
@@ -3563,6 +3568,9 @@ body.pre-clarity .capture-fab { display: none !important; }
     position: fixed !important; top: calc(var(--safe-t, 0px) + 9px); right: 14px;
     margin: 0 !important; z-index: 51; display: flex !important; justify-content: flex-end;
     pointer-events: auto; cursor: pointer;
+  }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter {
+    position: relative; z-index: 30;
   }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard {
     display: flex !important; flex-direction: column; justify-content: center;
@@ -3862,7 +3870,10 @@ html.theme-light .ambient__rays { display: none !important; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard {
     overflow: visible; justify-content: flex-start !important;
     position: sticky; top: calc(var(--safe-t, 0px) + 16px);
-    z-index: 60; pointer-events: none;
+    /* z 20 at rest: the Today box (z 30) always reads above the card's bloom
+       bleed (Malik, repeated ask). heroCardLayer lifts the container to 60
+       past mid-morph so the docked chip rides above the z-50 header. */
+    z-index: 20; pointer-events: none;
   }
 
   @supports (animation-timeline: scroll()) {
@@ -3878,10 +3889,18 @@ html.theme-light .ambient__rays { display: none !important; }
       animation-timeline: scroll(root block);
       animation-range: 0px 438px;
     }
+    body.ns-bloom:not(.has-custom-layout):not(.evo2) .app.dash-v2 #dayCard {
+      animation: heroCardLayer linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0px 438px;
+    }
   }
 }
 @keyframes heroCardScale  { from { transform: translateX(0) scale(1, 1); } to { transform: translateX(calc(14px + (min(82vw, 320px) * 0.0618) / 2 - 50vw)) scale(0.0618, 0.042); } }
 /* The header's own M fades late, as the arriving card replaces it. */
 @keyframes heroMarkFade { 0% { opacity: 1; } 55% { opacity: 1; } 100% { opacity: 0; } }
+/* Discrete z flip at mid-morph: under the Today box at rest, above the header
+   for the dock. */
+@keyframes heroCardLayer { 0% { z-index: 20; } 100% { z-index: 60; } }
 
 
