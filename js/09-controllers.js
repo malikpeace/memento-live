@@ -5916,7 +5916,13 @@ const HeroShrink = {
     const sc = h / this._full;
     this.card.style.height = h + 'px';
     this.card.style.justifyContent = 'flex-start';
-    this.wrap.style.transform = 'scale(' + sc.toFixed(4) + ')';
+    // Drift into the top-left corner in lockstep with the shrink (v707): the
+    // card's center moves so its scaled left edge ends at 16px. Same center
+    // math as the heroCardScale keyframe (origin is top center).
+    const cardW = Math.min(0.82 * window.innerWidth, 320);
+    const scEnd = this._min / this._full;
+    const dxEnd = 16 + (cardW * scEnd) / 2 - window.innerWidth / 2;
+    this.wrap.style.transform = 'translateX(' + (dxEnd * p).toFixed(1) + 'px) scale(' + sc.toFixed(4) + ')';
   }
 };
 try {

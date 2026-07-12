@@ -3821,6 +3821,11 @@ html.theme-light .ambient__rays { display: none !important; }
    LOCKED at 452px by design (v245), so the fixed keyframe endpoints hold on
    every phone. */
 @media (max-width: 767.98px) {
+  /* v707 (Malik): the collapse steers INTO the top-left corner, not straight
+     back into the distance. Origin stays top center (scale keeps the card's
+     center), the translateX moves that center so the scaled card's LEFT edge
+     lands at 16px (the header lockup's inset). Center math only needs the
+     card's own width (min(82vw,320) by the v245 law), never the wrap's. */
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-wrap { transform-origin: top center; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard { overflow: visible; justify-content: flex-start !important; }
 
@@ -3840,6 +3845,6 @@ html.theme-light .ambient__rays { display: none !important; }
   }
 }
 @keyframes heroCardHeight { from { height: 466px; } to { height: 242px; } }
-@keyframes heroCardScale  { from { transform: scale(1); } to { transform: scale(0.5193); } }
+@keyframes heroCardScale  { from { transform: translateX(0) scale(1); } to { transform: translateX(calc(16px + (min(82vw, 320px) * 0.5193) / 2 - 50vw)) scale(0.5193); } }
 
 
