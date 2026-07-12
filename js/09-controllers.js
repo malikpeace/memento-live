@@ -4717,7 +4717,9 @@ const TabBar = {
         '<div class="feel-preview__caption">Live preview</div>' +
         '<div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-2); margin: 22px 0 12px;">Behavior</div>' +
         toggleRow('prefReduceMotion', 'Reduce motion', 'Calms the orbiting ring, drifting glow, and ambient motion.', reduceMotion) +
-        toggleRow('prefCardTilt', 'Memento tilt', 'The Memento leans toward your cursor as you move the mouse.', !!prefs.cardTilt) +
+        // Tilt follows the mouse cursor, so it does nothing on the phone (v706).
+        ((window.matchMedia && window.matchMedia('(max-width: 859.98px)').matches) ? '' :
+          toggleRow('prefCardTilt', 'Memento tilt', 'The Memento leans toward your cursor as you move the mouse.', !!prefs.cardTilt)) +
         toggleRow('prefCompact', 'Compact density', 'Tightens spacing and type so more fits on screen.', compact) +
         toggleRow('prefWeekMonday', 'Weeks start Monday', 'Aligns the heatmap and calendars to Monday columns.', (state.prefs && state.prefs.weekStart === 'mon')) +
         // The sidebar only exists on desktop (>=860px); on the phone these pin
