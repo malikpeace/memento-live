@@ -163,9 +163,20 @@ const WelcomeIntro = {
       this._wcScrollBound = true;
       this.pageWrap.addEventListener('scroll', () => {
         if (this._wcBusy) return; // pinned to bottom while the AI is typing
-        const el = this.pageWrap;
-        const atBottom = (el.scrollHeight - el.scrollTop - el.clientHeight) < 28;
-        el.classList.toggle('wc-reading', !atBottom);
+        if (this._wcReadRaf) return;
+        this._wcReadRaf = requestAnimationFrame(() => {
+          this._wcReadRaf = 0;
+          const el = this.pageWrap;
+          const dist = el.scrollHeight - el.scrollTop - el.clientHeight;
+          // Hysteresis (v717, Malik's video): a single 28px threshold flipped
+          // the class repeatedly when the scroll hovered around it, and each
+          // flip restarted the 0.55s fade mid-flight, reading as a SNAP. Enter
+          // reading past 64px away, exit only under 16px, so one clean fade
+          // plays per direction, every time.
+          const reading = el.classList.contains('wc-reading');
+          if (!reading && dist > 64) el.classList.add('wc-reading');
+          else if (reading && dist < 16) el.classList.remove('wc-reading');
+        });
       }, { passive: true });
     }
     // ONE JS-driven scroller for the whole conversation screen (Malik, on-device):
