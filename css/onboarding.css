@@ -885,7 +885,14 @@ body.calm-motion .empty-state, body.lite .empty-state { animation: none; }
      so the color is always there, no dark flash. */
   /* ~50% darker onboarding bg (Malik): the center glow was too bright. Halved
      the glow alpha and deepened the mid-stop so the copy sits on near-black. */
-  background: radial-gradient(125% 75% at 50% 40%, rgba(88, 202, 222,0.13), rgba(14, 33, 36,0.82) 46%, #04090a 84%), #020708;
+  /* v714 (Malik): AURORA. A night sky base (sparse static stars baked into a
+     tiny SVG tile, zero runtime cost) under five slow aurora ribbons in
+     Memento's own colors (cyan lead, spring, violet, blue, white). The copy
+     sits on the near-black lower half. */
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cg fill='%23ffffff'%3E%3Ccircle cx='23' cy='41' r='1' opacity='.5'/%3E%3Ccircle cx='131' cy='23' r='1.4' opacity='.7'/%3E%3Ccircle cx='217' cy='77' r='1' opacity='.4'/%3E%3Ccircle cx='279' cy='31' r='1.2' opacity='.6'/%3E%3Ccircle cx='73' cy='127' r='1' opacity='.35'/%3E%3Ccircle cx='181' cy='163' r='1.3' opacity='.55'/%3E%3Ccircle cx='257' cy='197' r='1' opacity='.4'/%3E%3Ccircle cx='41' cy='229' r='1.2' opacity='.5'/%3E%3Ccircle cx='149' cy='271' r='1' opacity='.45'/%3E%3Ccircle cx='283' cy='257' r='1.4' opacity='.6'/%3E%3C/g%3E%3C/svg%3E") repeat,
+    radial-gradient(140% 90% at 50% -20%, rgba(24, 52, 60, 0.55), transparent 60%),
+    linear-gradient(180deg, #041014 0%, #020609 42%, #010204 100%);
   display: flex; flex-direction: column;
   opacity: 0; pointer-events: none;
   transition: opacity 1s ease;
@@ -908,56 +915,75 @@ body.calm-motion .empty-state, body.lite .empty-state { animation: none; }
 }
 .welcome-intro__orb {
   position: absolute; border-radius: 50%;
-  /* more blur + more fade than the splash, so it sits quietly behind the copy */
-  filter: blur(66px); opacity: 0.4; will-change: transform;
+  /* Aurora ribbons (v714): elongated ellipses, radially feathered so a clipped
+     edge can never show (glow edge-safe law). Transform-only motion, so the
+     mobile whitelist keeps them drifting cheaply; blur drops to 18px on phones
+     via the crash-fix rule. */
+  filter: blur(40px); will-change: transform;
   mix-blend-mode: screen;
 }
-.welcome-intro__orb--purple {
-  width: 82vmin; height: 82vmin;
-  background: radial-gradient(circle at center, #3dd5f0 0%, rgba(61, 213, 240,0.30) 50%, transparent 70%);
-  top: 4%; left: 28%;
-  animation: welcOrbFloat1 30s ease-in-out infinite;
+/* Cyan lead curtain, the brightest band. */
+.welcome-intro__orb--aur1 {
+  width: 150vmax; height: 30vmin; top: 6%; left: -40%;
+  background: radial-gradient(ellipse at center, rgba(58, 217, 245, 0.85) 0%, rgba(58, 217, 245, 0.22) 48%, transparent 72%);
+  opacity: 0.38;
+  animation: aurFlow1 26s ease-in-out infinite;
 }
-.welcome-intro__orb--red {
-  width: 76vmin; height: 76vmin;
-  background: radial-gradient(circle at center, #ff3e8f 0%, rgba(255,62,143,0.24) 50%, transparent 70%);
-  bottom: -16%; right: -8%;
-  animation: welcOrbFloat2 29s ease-in-out infinite;
+/* Spring green underglow. */
+.welcome-intro__orb--aur2 {
+  width: 130vmax; height: 24vmin; top: 18%; left: -30%;
+  background: radial-gradient(ellipse at center, rgba(63, 217, 78, 0.6) 0%, rgba(63, 217, 78, 0.16) 46%, transparent 72%);
+  opacity: 0.26;
+  animation: aurFlow2 31s ease-in-out infinite;
 }
-.welcome-intro__orb--green {
-  width: 70vmin; height: 70vmin;
-  background: radial-gradient(circle at center, #1ea7ff 0%, rgba(30,167,255,0.26) 50%, transparent 70%);
-  top: -10%; left: -10%;
-  animation: welcOrbFloat3 32s ease-in-out infinite;
+/* Violet high band, auroras get to keep purple. */
+.welcome-intro__orb--aur3 {
+  width: 130vmax; height: 24vmin; top: 29%; left: -20%;
+  background: radial-gradient(ellipse at center, rgba(123, 97, 255, 0.55) 0%, rgba(123, 97, 255, 0.15) 46%, transparent 72%);
+  opacity: 0.22;
+  animation: aurFlow3 36s ease-in-out infinite;
 }
-.welcome-intro__orb--blue {
-  width: 62vmin; height: 62vmin;
-  background: radial-gradient(circle at center, #44e3ff 0%, rgba(68, 227, 255,0.24) 50%, transparent 72%);
-  bottom: 4%; left: 14%;
-  animation: welcOrbFloat4 33s ease-in-out infinite;
+/* Blue upper wash. */
+.welcome-intro__orb--aur4 {
+  width: 120vmax; height: 20vmin; top: -3%; left: -28%;
+  background: radial-gradient(ellipse at center, rgba(79, 140, 255, 0.55) 0%, rgba(79, 140, 255, 0.15) 46%, transparent 72%);
+  opacity: 0.26;
+  animation: aurFlow4 29s ease-in-out infinite;
 }
-/* Onboarding-only orb drift: ~75% more travel than the splash's splashFloat
-   (and a shorter period, so it reads as livelier). Kept separate so the splash
-   orbs are untouched. Opacities match the originals so only the motion changed. */
-@keyframes welcOrbFloat1 {
-  0%, 100% { transform: translate(0, 0) scale(0.85); opacity: 0.12; }
-  33% { transform: translate(24.5vmax, 15.75vmax) scale(1); opacity: 0.2; }
-  66% { transform: translate(10.5vmax, 28vmax) scale(1.05); opacity: 0.22; }
+/* Thin white shimmer riding the cyan. */
+.welcome-intro__orb--aur5 {
+  width: 110vmax; height: 9vmin; top: 11%; left: -22%;
+  background: radial-gradient(ellipse at center, rgba(240, 250, 255, 0.7) 0%, rgba(240, 250, 255, 0.16) 44%, transparent 70%);
+  opacity: 0.18;
+  animation: aurFlow5 23s ease-in-out infinite;
 }
-@keyframes welcOrbFloat2 {
-  0%, 100% { transform: translate(0, 0) scale(0.85); opacity: 0.1; }
-  40% { transform: translate(-21vmax, 17.5vmax) scale(1); opacity: 0.2; }
-  75% { transform: translate(-8.75vmax, 24.5vmax) scale(0.95); opacity: 0.18; }
+/* Aurora flow: each band keeps its own slant while sliding along it and
+   breathing in height + brightness. Transform + opacity only (compositor). */
+@keyframes aurFlow1 {
+  0%, 100% { transform: rotate(-14deg) translateX(0) scaleY(1); opacity: 0.3; }
+  45% { transform: rotate(-14deg) translateX(7vmax) scaleY(1.35); opacity: 0.5; }
+  75% { transform: rotate(-14deg) translateX(3vmax) scaleY(1.1); opacity: 0.38; }
 }
-@keyframes welcOrbFloat3 {
-  0%, 100% { transform: translate(0, 0) scale(0.85); opacity: 0.12; }
-  35% { transform: translate(22.75vmax, -14vmax) scale(1.05); opacity: 0.22; }
-  70% { transform: translate(7vmax, -26.25vmax) scale(0.95); opacity: 0.18; }
+@keyframes aurFlow2 {
+  0%, 100% { transform: rotate(-11deg) translateX(0) scaleY(1); opacity: 0.14; }
+  40% { transform: rotate(-11deg) translateX(-6vmax) scaleY(1.5); opacity: 0.34; }
+  70% { transform: rotate(-11deg) translateX(-2vmax) scaleY(1.15); opacity: 0.18; }
 }
-@keyframes welcOrbFloat4 {
-  0%, 100% { transform: translate(0, 0) scale(0.85); opacity: 0.1; }
-  40% { transform: translate(-24.5vmax, -17.5vmax) scale(1); opacity: 0.2; }
-  72% { transform: translate(-8.75vmax, -28vmax) scale(1.05); opacity: 0.22; }
+@keyframes aurFlow3 {
+  0%, 100% { transform: rotate(-18deg) translateX(0) scaleY(1); opacity: 0.12; }
+  50% { transform: rotate(-18deg) translateX(8vmax) scaleY(1.4); opacity: 0.3; }
+}
+@keyframes aurFlow4 {
+  0%, 100% { transform: rotate(-9deg) translateX(0) scaleY(1); opacity: 0.14; }
+  38% { transform: rotate(-9deg) translateX(-7vmax) scaleY(1.3); opacity: 0.33; }
+  72% { transform: rotate(-9deg) translateX(-3vmax) scaleY(1.05); opacity: 0.17; }
+}
+@keyframes aurFlow5 {
+  0%, 100% { transform: rotate(-13deg) translateX(0) scaleY(1); opacity: 0.08; }
+  55% { transform: rotate(-13deg) translateX(9vmax) scaleY(1.6); opacity: 0.26; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .welcome-intro__orb { animation: none !important; }
 }
 .welcome-intro__page-wrap {
   position: relative; z-index: 1;
