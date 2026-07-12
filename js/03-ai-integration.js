@@ -3555,14 +3555,11 @@ function completeWizard() {
   // Unlock all modules with staggered animation
   setTimeout(() => unlockModules(), 500);
 
-  // The payment moment: Clarity is the free first win. The first time they name
-  // their Neutron Star, the dashboard blooms, then the paywall rises (purple
-  // card + their star + the rest of Memento, locked). Skipped if already paid.
-  try {
-    if (typeof ClarityPaywall !== 'undefined' && !ClarityPaywall.isPaid()) {
-      setTimeout(() => { try { ClarityPaywall.show(); } catch (e) {} }, 1100);
-    }
-  } catch (e) {}
+  // v701 (Malik): the old auto-paywall timer is GONE. It predated the v637/v676
+  // Add-to-Memento flow and fired 1100ms after Clarity completed, which landed
+  // the paywall ON TOP of the card-evolution cinema. The paywall's only entry
+  // after ignition is the user's own tap: Build my plan -> First 7 Days ->
+  // paywall (js/02 ActionExperience.open gate).
 }
 
 
