@@ -4695,10 +4695,13 @@ const TabBar = {
         toggleRow('prefFlatUi', 'Glass', 'Glassy, blurred surfaces with depth. Turn off for a flat, high-contrast matte look.', !prefs.flatUi) +
         toggleRow('prefSound', 'Sound', 'Quiet synthesized moments: the typewriter, marking a move done, the card coming alive.', prefs.soundOn !== false) +
         toggleRow('prefFlatBg', 'Minimal background', 'Hide the ambient orbs and glow for a flat, paper-like surface.', !!prefs.flatBg) +
-        '<div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); margin: 18px 0 10px;">Color' + (_colorLocked ? ' <span style="text-transform:none;letter-spacing:0;color:var(--text-lo);font-weight:600;">&middot; unlocks with Memento</span>' : '') + '</div>' +
-        '<div class="pref-swatches' + (_colorLocked ? ' pref-swatches--locked' : '') + '" id="prefAccent">' + swatchHtml + '</div>' +
-        '<input type="color" id="prefAccentCustomInput" value="' + customHex + '" aria-label="Pick a custom accent color" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;" />' +
-        toggleRow('prefMatchMemento', 'Match Memento to color theme', 'Tints your Memento card toward the accent you pick. Off keeps the card its own colors.', prefs.matchMemento !== false) +
+        // Color is paid (v695). v705 (Malik): free users don't see it AT ALL,
+        // the paywall's "Make it yours" line is the only tease.
+        (_colorLocked ? '' :
+          '<div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); margin: 18px 0 10px;">Color</div>' +
+          '<div class="pref-swatches" id="prefAccent">' + swatchHtml + '</div>' +
+          '<input type="color" id="prefAccentCustomInput" value="' + customHex + '" aria-label="Pick a custom accent color" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;" />' +
+          toggleRow('prefMatchMemento', 'Match Memento to color theme', 'Tints your Memento card toward the accent you pick. Off keeps the card its own colors.', prefs.matchMemento !== false)) +
         '<div style="height:14px;"></div>' +
         sliderRow('prefUiRadius', 'Corner radius', 'Sharp', 'Round', 0.35, 1.4, 'any', Math.max(0.35, uiRadius)) +
         '<div class="feel-preview" aria-hidden="true">' +
@@ -4717,10 +4720,13 @@ const TabBar = {
         toggleRow('prefCardTilt', 'Memento tilt', 'The Memento leans toward your cursor as you move the mouse.', !!prefs.cardTilt) +
         toggleRow('prefCompact', 'Compact density', 'Tightens spacing and type so more fits on screen.', compact) +
         toggleRow('prefWeekMonday', 'Weeks start Monday', 'Aligns the heatmap and calendars to Monday columns.', (state.prefs && state.prefs.weekStart === 'mon')) +
-        '<div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); margin: 18px 0 8px;">Sidebar</div>' +
+        // The sidebar only exists on desktop (>=860px); on the phone these pin
+        // toggles control nothing, so they don't render there (v705, Malik).
         (function () {
+          if (window.matchMedia && window.matchMedia('(max-width: 859.98px)').matches) return '';
           const sbp = (state.prefs && state.prefs.sidebarSections) || {};
-          return toggleRow('prefSbNeutron', 'Neutron Star', 'Pin your goal in the menu.', !!sbp.neutron) +
+          return '<div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); margin: 18px 0 8px;">Sidebar</div>' +
+            toggleRow('prefSbNeutron', 'Neutron Star', 'Pin your goal in the menu.', !!sbp.neutron) +
             toggleRow('prefSbAction', "Today's action", 'Pin the day\u2019s one move.', !!sbp.action) +
             toggleRow('prefSbTimeleft', 'Time left', 'Days remaining to your goal.', !!sbp.timeleft) +
             toggleRow('prefSbStreak', 'Consistency', 'Your streak count.', !!sbp.streak) +
