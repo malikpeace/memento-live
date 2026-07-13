@@ -869,8 +869,18 @@ html.theme-light body.lite .tab-bar, html.theme-light.lowfx .tab-bar {
    Mobile only; toggled by renderGrid via body.home-locked.
    ============================================ */
 @media (max-width: 859.98px) {
-  body.home-locked { overflow: hidden !important; height: 100lvh; overscroll-behavior-y: none; }
-  body.home-locked .app { overflow: hidden !important; height: 100lvh; }
+  /* v747 (Malik): size to the DYNAMIC viewport (dvh tracks Safari's toolbar
+     showing/hiding; == lvh in the installed app) and allow vertical scroll
+     when the content genuinely cannot fit above the toolbar + tab bar, so the
+     Start button is always reachable in-browser. */
+  body.home-locked { overscroll-behavior-y: none; height: 100lvh; height: 100dvh; overflow: hidden !important; }
+  body.home-locked .app {
+    height: 100lvh; height: 100dvh;
+    overflow: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: calc(92px + var(--safe-b, 0px)) !important;
+  }
   body.home-locked #dashBelow { display: none !important; }
 }
 
