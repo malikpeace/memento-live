@@ -1691,10 +1691,10 @@ function maybeShowSaveWorkNudge(onDone) {
     el.id = 'saveMemento'; el.className = 'save-memento'; el.setAttribute('aria-hidden', 'true');
     el.innerHTML =
       '<div class="save-memento__scrim" data-smclose="1"></div>' +
-      '<div class="save-memento__card" role="dialog" aria-label="Save your Memento">' +
+      '<div class="save-memento__card" role="dialog" aria-label="Hold onto your Memento">' +
         '<span class="save-memento__mark">' + mark + '</span>' +
-        '<div class="save-memento__title">Save your Memento</div>' +
-        '<div class="save-memento__sub">You just built something real. Make a free account so it is saved forever and follows you to any device. No password.</div>' +
+        '<div class="save-memento__title">Hold onto your Memento</div>' +
+        '<div class="save-memento__sub">You just laid the foundation for your Memento. I highly recommend making a free account so that it\'s saved and synced across any devices forever. It takes 30 seconds and doesn\'t require a password.</div>' +
         '<button class="save-memento__account" type="button">Create your free account</button>' +
         (installed ? '' : '<button class="save-memento__install" type="button">Add to Home Screen</button>') +
         '<button class="save-memento__later" data-smclose="1" type="button">Maybe later</button>' +

@@ -7985,10 +7985,17 @@ function _bindHoldToIgnite(root) {
       fieldAnims.forEach((a) => { a.playbackRate = rate; });
     } catch (e) {}
   };
+  let lastQ = -1;
   const setP = (p) => {
     // No progress ring anymore (Malik): the touch point itself grows + glows
     // with --holdp, and the beams brighten and the sentence shakes harder.
-    root.style.setProperty('--holdp', String(p));
+    // v765 (Malik: hold got laggy): --holdp drives var()-based box-shadows,
+    // shake keyframes and the beams' brightness FILTER, each write re-rasters
+    // them. Quantize to 2% steps: ~50 restyles over the 5s hold instead of
+    // ~300 per-frame ones. The motes' own animations + the playbackRate ramp
+    // are independent, so the visible motion stays perfectly continuous.
+    const q = p <= 0 ? 0 : Math.round(p * 50) / 50;
+    if (q !== lastQ) { lastQ = q; root.style.setProperty('--holdp', String(q)); }
     setRate(p <= 0 ? 1 : 1 + p * 2.8);
   };
   const tick = (t) => {
