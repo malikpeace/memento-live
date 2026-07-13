@@ -78,6 +78,13 @@
   .pwa-install__sheet { transition: opacity 0.2s ease; transform: none; }
 }
 
+/* v737 (Malik): the exits must be VISIBLE in light mode. The skip's near-white
+   ink was invisible on the light card (he could not leave the sheet), and the
+   close button's CSS existed with no markup. */
+html.theme-light .pwa-install__skip { color: rgba(24, 30, 36, 0.55); }
+html.theme-light .pwa-install__skip:active { color: rgba(24, 30, 36, 0.8); }
+html.theme-light .pwa-install__close { background: rgba(10, 14, 18, 0.07); color: rgba(24, 30, 36, 0.6); }
+
 /* Light mode: faithful bright card. */
 html.theme-light .pwa-install__scrim { background: rgba(18, 28, 30, 0.34); }
 html.theme-light .pwa-install__sheet { background: linear-gradient(180deg, #fafeff, #eff5f6); box-shadow: 0 30px 80px rgba(30, 72, 80, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.7); }
