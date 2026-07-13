@@ -3357,7 +3357,19 @@ function refreshAiChatUI() {
 function finishCondenseThen(next) {
   try {
     const c = document.getElementById('synthCondenseStar');
-    if (!c) { next(); return; }
+    if (!c) {
+      // v762 (Malik): the synth wait is the quiet "One moment." line now (the
+      // condensing star died in v733), which left this finisher bailing straight
+      // to next() and HARD-CUTTING into the press-and-hold page. Fade the quiet
+      // line out to the dark first so the reveal can crossfade in.
+      const quiet = document.querySelector('.clarity-exp .ai-thinking');
+      if (quiet) {
+        quiet.style.transition = 'opacity 0.5s ease';
+        quiet.style.opacity = '0';
+        setTimeout(next, 560);
+      } else { next(); }
+      return;
+    }
     let cur = 1;
     const m = getComputedStyle(c).transform;
     if (m && m.indexOf('matrix(') === 0) cur = parseFloat(m.slice(7)) || 1;

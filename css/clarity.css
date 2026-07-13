@@ -3006,7 +3006,7 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
      as the star hits its pixel, then the reveal fades in here instead of popping.
      Plays once on mount; act changes (collapse/star) mutate the same element so
      it never replays. */
-  animation: nsv2RootIn 0.6s ease both;
+  animation: nsv2RootIn 1s ease-out both;
 }
 @keyframes nsv2RootIn { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .nsv2 { animation: none; } }
