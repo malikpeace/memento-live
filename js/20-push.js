@@ -225,9 +225,16 @@
     try { if (typeof Analytics !== 'undefined') Analytics.track('push_prompt_shown', {}); } catch (e) {}
   }
 
+  function isStandalone() {
+    try { return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true; } catch (e) { return false; }
+  }
   function eligible() {
     if (isDemo()) return false;
     if (!supported()) return false;
+    // v760 (Malik): the ask only ever happens inside the INSTALLED app. Asking
+    // in a browser tab makes no sense (on iOS it cannot even deliver), and it
+    // would burn the once-ever card in the wrong storage anyway.
+    if (!isStandalone()) return false;
     try { if (Notification.permission !== 'default') return false; } catch (e) { return false; }
     try { if (localStorage.getItem(ASK_KEY) === '1') return false; } catch (e) {}
     try { if (!(state.clarity && state.clarity.completed)) return false; } catch (e) { return false; }
