@@ -3360,11 +3360,12 @@ html.lowfx .daycard-ns {
 /* The outline mark is transparent + currentColor: same ink as the wordmark so the
    lockup reads as ONE unit in both themes (the old white tile sat oddly sized on
    dark, Malik v680). */
-/* The glyph rides the TEXT BASELINE inside the word (v741): height matches the
-   cap height (~0.72em of the 0.74rem caps), margin matches the 0.24em track. */
+/* The glyph rides the TEXT BASELINE inside the word (v741). v742 (Malik): it
+   is deliberately ~20% TALLER than the caps (Opal-style lead letter), growing
+   upward from the shared baseline so it stands out without sitting low. */
 .dash-header__brand-mark {
   display: inline-block; vertical-align: baseline;
-  height: 0.72em; width: auto; margin-right: 0.24em;
+  height: 0.88em; width: auto; margin-right: 0.24em;
   color: var(--text-hi);
 }
 .dash-header__brand-name {
