@@ -3971,7 +3971,11 @@ html.theme-light .clarity-exp:has(.tut-star-stage) .clarity-exp__nav-btn--next {
   min-height: 62vh;
   display: flex; align-items: center; justify-content: center;
 }
+.acc-wrap { display: flex; flex-direction: column; align-items: center; }
 .acc-sys { position: relative; width: 230px; height: 230px; pointer-events: none; }
+/* Caption pinned a fixed 70px under the core (the sys is 230px, core centered),
+   no viewport math (v729). */
+.acc-caption { margin-top: -46px; text-align: center; color: var(--text-1); font-size: 0.875rem; }
 .acc-core { position: absolute; left: 50%; top: 50%; width: 10px; height: 10px; margin: -5px;
   border-radius: 50%;
   background: radial-gradient(circle at 42% 40%, #ffffff, #cdeffb 55%, rgba(140, 215, 235, 0.9));

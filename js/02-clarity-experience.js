@@ -7794,26 +7794,26 @@ function renderIgnitionV2(summary) {
     // v727 (Malik): real size variety with MASS. Boulders (bigger, brighter,
     // ~18% slower) down to fine dust (1px, quick). Sizes carry their own glow
     // (css scales the shadow off --s).
-    const SZ = [1, 1.6, 2.2, 3, 4, 5.2];
-    const mass = (px, base) => (base * (0.85 + (px / 5.2) * 0.33));
+    const SZ = [2, 3, 4, 5.5, 7, 9];
+    const mass = (px, base) => (base * (0.85 + (px / 9) * 0.33));
     let idleM = '';
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < 16; i++) {
       const px = SZ[(i * 5) % 6];
       idleM += `<i${i % 2 ? ' class="orb"' : ''} style="--a:${(i * 137) % 360}deg;--d:${mass(px, 5.2 + (i % 5) * 0.7).toFixed(2)}s;--del:${(-(i % 9) * 1.1).toFixed(1)}s;--s:${px}px;--r:${52 + (i % 4) * 6}vmax"></i>`;
     }
     let surgeM = '';
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 28; i++) {
       const px = SZ[(i * 7 + 1) % 6];
       surgeM += `<i style="--a:${(i * 53 + 20) % 360}deg;--d:${mass(px, 1.4 + (i % 5) * 0.22).toFixed(2)}s;--del:${(-(i % 8) * 0.35).toFixed(2)}s;--s:${px}px;--r:${58 + (i % 5) * 7}vmax"></i>`;
     }
     // Orbit layer: 20 motes arcing in on spiral paths, wakes with the press.
     let orbitM = '';
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 28; i++) {
       const px = SZ[(i * 5 + 2) % 6];
       orbitM += `<i class="orb" style="--a:${(i * 71 + 33) % 360}deg;--d:${mass(px, 1.8 + (i % 5) * 0.28).toFixed(2)}s;--del:${(-(i % 7) * 0.4).toFixed(2)}s;--s:${px}px;--r:${56 + (i % 5) * 8}vmax"></i>`;
     }
     let floodM = '';
-    for (let i = 0; i < 28; i++) {
+    for (let i = 0; i < 36; i++) {
       const px = SZ[(i * 7 + 4) % 6];
       floodM += `<i style="--a:${(i * 91 + 7) % 360}deg;--d:${mass(px, 1.1 + (i % 6) * 0.14).toFixed(2)}s;--del:${(-(i % 9) * 0.21).toFixed(2)}s;--s:${px}px;--r:${62 + (i % 6) * 6}vmax"></i>`;
     }
@@ -8099,10 +8099,7 @@ function _bindStarPlacard(root) {
       _ig2Act = 'synth';
       // Same markup the real aiSynthesis step shows while Opus is working.
       ClarityExperience.pageWrap.innerHTML = '<div class="clarity-exp__page-inner">' +
-        '<div class="ai-thinking">' +
-        '<div class="synth-condense" aria-hidden="true"><canvas id="synthCondenseStar" class="synth-condense__star"></canvas></div>' +
-        '<div style="text-align:center;color:var(--text-1);font-size:0.875rem;margin-top:6px;">Condensing your Neutron Star...</div></div></div>';
-      setTimeout(() => { try { const c = document.getElementById('synthCondenseStar'); if (c && typeof initStarBlob === 'function') initStarBlob(c, 480); } catch (e) {} }, 60);
+        rainLoaderHtml('One moment.') + '</div>';
       ClarityExperience.navEl.innerHTML = '';
       // Dev pacing: shrink a moment, then run the same pixel-fall the real
       // flow uses (finishCondenseThen) so the beat previews true to life.

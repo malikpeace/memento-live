@@ -2281,6 +2281,17 @@ function aiChatPct() {
   return Math.max(4, Math.round(90 * (1 - Math.exp(-qNum / 12))));
 }
 
+// The rain-accretion loader (v719), shared by the thinking beat and the
+// synthesis wait (v729). Deterministic seeding, mid-fall on first paint.
+function rainLoaderHtml(caption) {
+  let dust = '';
+  for (let i = 0; i < 16; i++) {
+    dust += `<i style="--a:${(i * 137) % 360}deg;--d:${(3.2 + (i % 5) * 0.55).toFixed(2)}s;--del:${(-(i % 9) * 0.8).toFixed(1)}s;--s:${2 + (i % 3)}px"></i>`;
+  }
+  const cap = caption ? `<div class="acc-caption">${caption}</div>` : '';
+  return `<div class="ai-thinking ai-thinking--rain"><div class="acc-wrap"><div class="acc-sys" aria-hidden="true"><span class="acc-core"></span>${dust}</div>${cap}</div></div>`;
+}
+
 function renderAiChat() {
   // While the AI thinks, the forming star (top slot) breathes instead of the old
   // center aurora blur. The aurora markup + .aur CSS are kept for an easy revert:
@@ -2290,15 +2301,8 @@ function renderAiChat() {
   // Loading state (v629, Malik): the forming star breathes CENTER-SCREEN,
   // lower and more purple; the top slot keeps the normal thin bar.
   if (aiChatLoading) {
-    // v719 (Malik): the RAIN ACCRETION loader, dust feeding the forming star.
-    // Deterministic seeding matches the approved lab exactly (16 motes, golden-
-    // angle spread, staggered negative delays so it is mid-fall on first paint).
-    // The old forming-star branch is one line, kept in git for revert.
-    let dust = '';
-    for (let i = 0; i < 16; i++) {
-      dust += `<i style="--a:${(i * 137) % 360}deg;--d:${(3.2 + (i % 5) * 0.55).toFixed(2)}s;--del:${(-(i % 9) * 0.8).toFixed(1)}s;--s:${2 + (i % 3)}px"></i>`;
-    }
-    return `<div class="ai-thinking ai-thinking--rain"><div class="acc-sys" aria-hidden="true"><span class="acc-core"></span>${dust}</div></div>`;
+    // v719 (Malik): the RAIN ACCRETION loader (rainLoaderHtml above).
+    return rainLoaderHtml();
   }
 
   // Error state
@@ -2409,17 +2413,11 @@ function renderAiSynthesis() {
     if (!aiSynthesisLoading && !aiSynthesisResult) {
       setTimeout(() => triggerSynthesis(), 100);
     }
-    // v586 (Malik): the synthesis loading is the star itself slowly CONDENSING,
-    // the real marbled star (no pulsar jets yet; the jets arrive at ignition).
-    setTimeout(() => {
-      try {
-        const c = document.getElementById('synthCondenseStar');
-        if (c && !c.dataset.init && typeof initStarBlob === 'function') { c.dataset.init = '1'; initStarBlob(c, 480); }
-      } catch (e) {}
-    }, 60);
-    return '<div class="ai-thinking">' +
-      '<div class="synth-condense" aria-hidden="true"><canvas id="synthCondenseStar" class="synth-condense__star"></canvas></div>' +
-      '<div style="text-align:center;color:var(--text-1);font-size:0.875rem;margin-top:6px;">Condensing your Neutron Star...</div></div>';
+    // v729 (Malik): the condensing visual moved to the USER's press-and-hold
+    // collapse, so this wait no longer condenses anything (it was condensing
+    // the star twice). Quiet rain + one line. (The old synth-condense canvas
+    // block is in git for revert.)
+    return rainLoaderHtml('One moment.');
   }
 
   if (!aiSynthesisResult && aiChatError) {
