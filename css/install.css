@@ -135,7 +135,7 @@ html.theme-light .pwa-install__glyph { color: #3a6bff; background: rgba(58, 107,
   padding: 13px 14px; border-radius: 13px;
   background: rgba(255, 255, 255, 0.05); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
   /* The walking spotlight (v755, Malik): each step lights up in turn, on a loop,
-     to show the progression. One shared cycle (--n steps x 1.1s), each row offset
+     to show the progression. One shared cycle (--n steps x 1.8s), each row offset
      by its slot; only the ::after overlay's opacity animates. */
   position: relative;
 }
@@ -143,8 +143,8 @@ html.theme-light .pwa-install__glyph { color: #3a6bff; background: rgba(58, 107,
   content: ''; position: absolute; inset: 0; border-radius: 13px; pointer-events: none;
   background: rgba(255, 255, 255, 0.07); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
   opacity: 0;
-  animation: pwaGuideSpot calc(var(--n, 5) * 1.1s) linear infinite;
-  animation-delay: calc(var(--i, 0) * 1.1s + 0.6s);
+  animation: pwaGuideSpot calc(var(--n, 5) * 1.8s) linear infinite;
+  animation-delay: calc(var(--i, 0) * 1.8s + 0.6s);
 }
 @keyframes pwaGuideSpot {
   0% { opacity: 0; }
