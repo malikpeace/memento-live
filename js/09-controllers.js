@@ -4618,7 +4618,10 @@ const TabBar = {
     // v695 (Malik): color customization is a PAID feature. Free users see the
     // swatches dimmed; tapping raises the paywall (also listed there).
     let _colorLocked = false;
-    try { _colorLocked = (typeof ClarityPaywall !== 'undefined') && ClarityPaywall.isLockedByPaywall('action'); } catch (e) {}
+    // v743 (Malik): color is premium from DAY ONE. isLockedByPaywall only
+    // engages after the star exists, which left the color picker open to
+    // brand-new users; the gate is simply paid-or-nothing.
+    try { _colorLocked = (typeof ClarityPaywall !== 'undefined') && !ClarityPaywall.isPaid(); } catch (e) {}
     const accent = ACCENT_CHOICES.indexOf(prefs.accent) !== -1 ? prefs.accent : 'default';
     const reduceMotion = !!prefs.reduceMotion;
     const compact = prefs.density === 'compact';
@@ -4815,9 +4818,10 @@ const TabBar = {
     if (accentWrap) {
       accentWrap.querySelectorAll('.pref-swatch').forEach(btn => {
         btn.addEventListener('click', () => {
-          // Paid feature: free users get the paywall, not the palette (v695).
+          // Paid feature: free users get the paywall, not the palette (v695;
+          // v743: gate is paid-or-nothing so it holds from day one).
           try {
-            if (typeof ClarityPaywall !== 'undefined' && ClarityPaywall.isLockedByPaywall('action')) { ClarityPaywall.show(); return; }
+            if (typeof ClarityPaywall !== 'undefined' && !ClarityPaywall.isPaid()) { ClarityPaywall.show(); return; }
           } catch (e) {}
           const val = btn.getAttribute('data-accent');
           if (ACCENT_CHOICES.indexOf(val) === -1) return;
