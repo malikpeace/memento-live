@@ -3534,18 +3534,26 @@ body.pre-clarity .capture-fab { display: none !important; }
      Fixed header leaves the flow, so #dayCard compensates with margin-top to
      keep the rest layout pixel-identical (v245 law). pointer-events: none so
      the strip never blocks content; the date re-enables its own. */
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .dash-header {
+  /* v746 (Malik): pinned in EVERY home state, same scope as the date. It was
+     gated on ns-bloom, so states without the bloom class scrolled the lockup
+     away while the date stayed (his Safari report). */
+  body:not(.has-custom-layout) .app.dash-v2 .dash-header {
     position: fixed; top: calc(var(--safe-t, 0px) + 12px); left: 0; right: 0;
     z-index: 50; margin-bottom: 0 !important;
     padding: 4px 14px 0 14px;
     pointer-events: none;
+  }
+  /* Non-bloom states need the same 29px flow compensation the bloom home has
+     (the fixed header vacates its flow space; v245 card-top law). */
+  body:not(.has-custom-layout):not(.ns-bloom) .app.dash-v2 #dayCard {
+    margin-top: 29px !important;
   }
   /* Gradient tint under the pinned header so content scrolling beneath stays
      legible. GRADIENT ONLY, no backdrop-filter, no mask: the v709 masked-blur
      scrim melted iOS WebKit (compositor jank then the black crash screen,
      Malik's phone, 2026-07-12). A gradient fading to transparent is crash-proof
      and is the same fallback the topFade uses where blur cannot render. */
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .dash-header::before {
+  body:not(.has-custom-layout) .app.dash-v2 .dash-header::before {
     content: ''; position: absolute; left: 0; right: 0; z-index: -1;
     top: calc(-12px - var(--safe-t, 0px)); height: calc(var(--safe-t, 0px) + 66px);
     background: linear-gradient(to bottom,
@@ -3554,7 +3562,7 @@ body.pre-clarity .capture-fab { display: none !important; }
       rgba(4, 6, 6, 0) 100%);
     pointer-events: none;
   }
-  html.theme-light body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .dash-header::before {
+  html.theme-light body:not(.has-custom-layout) .app.dash-v2 .dash-header::before {
     background: linear-gradient(to bottom,
       rgba(230, 232, 236, 0.9) 0%,
       rgba(230, 232, 236, 0.55) 55%,
