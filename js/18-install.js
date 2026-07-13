@@ -90,7 +90,7 @@
         '<div class="pwa-install__title">Add Memento to your Home Screen</div>' +
         '<div class="pwa-install__sub">Memento is built to live on your home screen. I <b>highly recommend</b> adding it for a significantly better experience. Follow the instructions below to turn it into a real app.</div>' +
         body +
-        '<button class="pwa-install__skip" data-close="1" type="button">Continue in browser for now</button>' +
+        '<button class="pwa-install__skip" data-close="1" type="button">Nah, I want a worse experience for now</button>' +
       '</div>';
     document.body.appendChild(el);
     el.addEventListener('click', function (e) {
