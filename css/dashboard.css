@@ -3356,7 +3356,8 @@ html.lowfx .daycard-ns {
 
 /* === Mobile header swap: brand lockup up top, greeting under the card ===
    Desktop is untouched (brand + mobile greeting slot stay display:none). */
-.dash-header__brand { display: none; align-items: center; gap: 8px; }
+/* Tight gap: the mark is the word's first LETTER (v740), matching the 0.24em track. */
+.dash-header__brand { display: none; align-items: center; gap: 2.6px; }
 /* The outline mark is transparent + currentColor: same ink as the wordmark so the
    lockup reads as ONE unit in both themes (the old white tile sat oddly sized on
    dark, Malik v680). */
