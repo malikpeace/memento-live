@@ -3277,7 +3277,7 @@ function renderCommandCenter() {
     const primaryBtn = (label, action) => '<button class="cc-primary" data-cc-action="' + action + '" style="flex:0 1 auto;min-width:180px;font:inherit;font-weight:700;font-size:0.92rem;cursor:pointer;border:none;border-radius:calc(8px * var(--rx, 1));padding:12px 40px;background:var(--solid-bg);color:var(--solid-fg);">' + esc(label) + '</button>';
 
     if (!hasClarity) {
-      return wrap(eyebrow('Start here') +
+      return wrap(eyebrow('First step') +
         '<div style="font-size:1.15rem;font-weight:700;color:var(--text-hi);margin-bottom:6px;">Find your Neutron Star</div>' +
         '<div style="font-size:0.9rem;line-height:1.5;color:var(--text-2);margin-bottom:14px;">Get clear on the one goal that actually matters to you above all else. This will be the foundation of your Memento.</div>' +
         '<div style="display:flex;">' + primaryBtn('Start', 'clarity') + '</div>');

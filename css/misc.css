@@ -881,6 +881,20 @@ html.theme-light body.lite .tab-bar, html.theme-light.lowfx .tab-bar {
     -webkit-overflow-scrolling: touch;
     padding-bottom: calc(92px + var(--safe-b, 0px)) !important;
   }
+  /* v748 (Malik): NOTHING may touch. On short viewports (in-browser Safari,
+     its toolbar eats ~110px) the card is the only flexible element: it scales
+     down proportionally so header + card + first-step box + tab bar all fit
+     with air. At the installed app's full height this resolves to the stock
+     452px, so the locked-layout law is untouched where it was defined.
+     Budget: 100dvh - (45 header + 14 gap + ~205 hero + 8 gap + 92 bar zone). */
+  body.home-locked #dayCard .daycard-ns,
+  body.home-locked #dayCard .daycard-theme-living .daycard-living-stage {
+    height: clamp(260px, calc(100dvh - 414px - var(--safe-b, 0px)), 452px) !important;
+    min-height: 0 !important;
+    width: auto !important;
+    aspect-ratio: 320 / 452;
+    max-width: min(82vw, 320px);
+  }
   body.home-locked #dashBelow { display: none !important; }
 }
 
