@@ -1836,6 +1836,19 @@ const CreatorTools = {
     bind('creatorJumpDay1', () => this.jumpDay1());
     bind('creatorJumpNewDay', () => this.jumpNewDay());
 
+    // Every cheat button press toasts its own label (v735): universal
+    // feedback, delegated so future buttons get it for free.
+    try {
+      const box = document.getElementById('creatorBox');
+      if (box && !box.dataset.toastBound) {
+        box.dataset.toastBound = '1';
+        box.addEventListener('click', (e) => {
+          const b = e.target && e.target.closest && e.target.closest('.creator-box__btn');
+          if (b && b.textContent) this._devToast('\u2192 ' + b.textContent.trim());
+        });
+      }
+    } catch (e) {}
+
     // Dropdown toggle
     const toggle = document.getElementById('creatorBoxToggle');
     if (toggle) toggle.addEventListener('click', () => this.toggleDropdown());
@@ -2090,6 +2103,23 @@ const CreatorTools = {
     } catch (e) {}
   },
 
+  // v735 (Malik): every cheat press answers back. A small pill names what
+  // fired, so a jump that lands on a similar-looking screen (or seeds state
+  // with no visible change) never reads as a dead tap. Dev-only surface.
+  _devToast(label) {
+    try {
+      const old = document.getElementById('devJumpToast');
+      if (old) old.remove();
+      const t = document.createElement('div');
+      t.id = 'devJumpToast';
+      t.textContent = label;
+      t.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 96px);z-index:2147483200;padding:8px 14px;border-radius:999px;background:rgba(10,10,14,0.92);color:#fff;font:600 12px -apple-system,system-ui,sans-serif;box-shadow:0 10px 28px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);pointer-events:none;opacity:0;transition:opacity 0.18s ease;';
+      document.body.appendChild(t);
+      requestAnimationFrame(() => { t.style.opacity = '1'; });
+      setTimeout(() => { try { t.style.opacity = '0'; setTimeout(() => t.remove(), 220); } catch (e) {} }, 1500);
+    } catch (e) {}
+  },
+
   // --- Stage & animation jumps (Malik: fly around from the cheat bar) ---
   // STATE-ACCURATE: each jump commits a REAL, coherent state for that checkpoint
   // so you land at a genuine step you can continue organically (real paywall,
@@ -2201,9 +2231,11 @@ const CreatorTools = {
   jumpFinalQuestion() {
     this._closeAll(); this._devToHome();
     try {
-      state.clarity = state.clarity || {};
-      state.clarity.completed = false;
-      state.clarity.tutorialSeen = true;
+      // FULL clarity reset (v735): star residue from a prior jump (ignitedAt,
+      // summary, answers) routed the resume straight to the summary card.
+      // This must look like a genuine mid-questionnaire run.
+      state.clarity = { completed: false, tutorialSeen: true, answers: {} };
+      try { aiSynthesisResult = null; aiSynthesisLoading = false; } catch (e) {}
       const Q = (t) => ({ role: 'assistant', _act: 3, content: t });
       const A = (t) => ({ role: 'user', content: t });
       state.clarity.draft = {
@@ -2231,6 +2263,15 @@ const CreatorTools = {
       };
       persistNow();
       ClarityExperience.open();
+      // Auto-tap Continue on the resume prompt (v735): the dev jump should
+      // land ON the final question in one press, not two.
+      let tries = 0;
+      const auto = setInterval(() => {
+        tries++;
+        const b = document.getElementById('resumeContinue');
+        if (b) { clearInterval(auto); b.click(); }
+        else if (tries > 30) clearInterval(auto);
+      }, 120);
     } catch (e) {}
   },
   jumpSynth() { this._closeAll(); try { if (window.DevCeremony) window.DevCeremony.synth(); } catch (e) {} },
