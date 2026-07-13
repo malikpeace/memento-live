@@ -122,13 +122,6 @@ html.theme-light .pwa-install__glyph { color: #3a6bff; background: rgba(58, 107,
   animation: pwaGuideRise 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 @keyframes pwaGuideRise { to { transform: translateY(0); } }
-.pwa-guide__close {
-  position: fixed; top: calc(16px + var(--safe-t, 0px)); right: 16px; width: 34px; height: 34px;
-  border: none; border-radius: 10px; cursor: pointer;
-  background: rgba(255, 255, 255, 0.06); color: rgba(255, 255, 255, 0.55); font-size: 0.8rem;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
-}
-.pwa-guide__close:active { transform: scale(0.9); }
 .pwa-guide__mark { display: inline-flex; margin-bottom: 18px; filter: drop-shadow(0 10px 26px rgba(0, 0, 0, 0.55)); }
 .pwa-guide__mark svg { border-radius: 13px; display: block; }
 .pwa-guide__title {
@@ -141,6 +134,24 @@ html.theme-light .pwa-install__glyph { color: #3a6bff; background: rgba(58, 107,
   color: rgba(245, 249, 250, 0.94); text-align: left;
   padding: 13px 14px; border-radius: 13px;
   background: rgba(255, 255, 255, 0.05); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  /* The walking spotlight (v755, Malik): each step lights up in turn, on a loop,
+     to show the progression. One shared cycle (--n steps x 1.1s), each row offset
+     by its slot; only the ::after overlay's opacity animates. */
+  position: relative;
+}
+.pwa-guide__step::after {
+  content: ''; position: absolute; inset: 0; border-radius: 13px; pointer-events: none;
+  background: rgba(255, 255, 255, 0.07); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  opacity: 0;
+  animation: pwaGuideSpot calc(var(--n, 5) * 1.1s) linear infinite;
+  animation-delay: calc(var(--i, 0) * 1.1s + 0.6s);
+}
+@keyframes pwaGuideSpot {
+  0% { opacity: 0; }
+  4% { opacity: 1; }
+  16% { opacity: 1; }
+  22% { opacity: 0; }
+  100% { opacity: 0; }
 }
 .pwa-guide__step b { font-weight: 700; color: #fff; }
 .pwa-guide__txt { flex: 1 1 auto; }
@@ -163,15 +174,24 @@ html.theme-light .pwa-install__glyph { color: #3a6bff; background: rgba(58, 107,
 }
 .pwa-guide__install:active { transform: scale(0.98); }
 .pwa-guide__or { font-size: 0.8rem; color: rgba(232, 234, 248, 0.42); margin-bottom: 12px; }
+.pwa-guide__actions { display: flex; gap: 10px; width: 100%; margin-top: 22px; }
+.pwa-guide__back {
+  flex: 0 0 auto; width: 52px; border: none; border-radius: 14px; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: rgba(255, 255, 255, 0.07); color: rgba(255, 255, 255, 0.85);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.pwa-guide__back:active { transform: scale(0.94); }
 .pwa-guide__done {
-  width: 100%; font: inherit; font-size: 1rem; font-weight: 700; color: #0b0f10;
-  border: none; border-radius: 14px; padding: 15px; cursor: pointer; margin-top: 22px;
+  flex: 1 1 auto; font: inherit; font-size: 1rem; font-weight: 700; color: #0b0f10;
+  border: none; border-radius: 14px; padding: 15px; cursor: pointer;
   background: linear-gradient(180deg, #ffffff, #e9f1f2);
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 .pwa-guide__done:active { transform: scale(0.98); }
 @media (prefers-reduced-motion: reduce) {
   .pwa-guide.is-open, .pwa-guide__inner { animation: none; opacity: 1; transform: none; }
+  .pwa-guide__step::after { animation: none; }
 }
 
 /* ===========================================================================

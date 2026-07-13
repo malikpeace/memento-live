@@ -161,21 +161,33 @@
       '<path d="M5 12.5 10 17.5 19 7"/></svg>';
   }
 
+  function mGlyph() {
+    return '<svg viewBox="113 108 286 297" width="15" height="15" fill="currentColor" aria-hidden="true">' +
+      '<path d="M113 108 L256 251 L399 108 L399 405 L113 405 Z"/></svg>';
+  }
+
   function guideStepsHtml() {
-    var mk = function (n, html, glyph) {
-      return '<div class="pwa-guide__step"><span class="pwa-guide__num">' + n + '</span><span class="pwa-guide__txt">' + html + '</span>' +
-        (glyph ? '<span class="pwa-guide__glyph">' + glyph + '</span>' : '') + '</div>';
+    // Each step carries its slot index so the CSS can spotlight them one after
+    // another on a loop (the --n on the wrapper sets the cycle length).
+    var rows = [];
+    var mk = function (html, glyph) {
+      var i = rows.length;
+      rows.push('<div class="pwa-guide__step" style="--i:' + i + '"><span class="pwa-guide__num">' + (i + 1) + '</span><span class="pwa-guide__txt">' + html + '</span>' +
+        (glyph ? '<span class="pwa-guide__glyph">' + glyph + '</span>' : '') + '</div>');
     };
     if (isIOS()) {
       var ipad = Math.min(screen.width || 0, screen.height || 0) >= 744;
-      return mk(1, 'Tap the <b>three dots</b> ' + (ipad ? 'at the top right of Safari.' : 'at the bottom of Safari.'), dotsGlyph()) +
-        mk(2, 'Tap <b>Share</b>.', shareGlyph()) +
-        mk(3, 'Scroll down and tap <b>Add to Home Screen</b>.', plusGlyph()) +
-        mk(4, 'Tap <b>Add</b> at the top, keeping <b>Open as Web App</b> on.', addGlyph());
+      mk('Tap the <b>three dots</b> ' + (ipad ? 'at the top right of Safari.' : 'at the bottom of Safari.'), dotsGlyph());
+      mk('Tap <b>Share</b>.', shareGlyph());
+      mk('Scroll down and tap <b>Add to Home Screen</b>.', plusGlyph());
+      mk('Tap <b>Add</b> at the top, keeping <b>Open as Web App</b> on.', addGlyph());
+    } else {
+      mk('Tap the <b>three dots</b> at the top of your browser.', dotsGlyph());
+      mk('Tap <b>Add to Home screen</b>.', plusGlyph());
+      mk('Tap <b>Install</b>.', addGlyph());
     }
-    return mk(1, 'Tap the <b>three dots</b> at the top of your browser.', dotsGlyph()) +
-      mk(2, 'Tap <b>Add to Home screen</b>.', plusGlyph()) +
-      mk(3, 'Tap <b>Install</b>.', addGlyph());
+    mk('Open it and <b>build your Memento</b>.', mGlyph());
+    return '<div class="pwa-guide__steps" style="--n:' + rows.length + '">' + rows.join('') + '</div>';
   }
 
   function buildGuide() {
@@ -190,12 +202,16 @@
       : '';
     guideEl.innerHTML =
       '<div class="pwa-guide__inner" role="dialog" aria-label="How to add Memento to your Home Screen">' +
-        '<button class="pwa-guide__close" data-close="1" type="button" aria-label="Close">\u2715</button>' +
         '<span class="pwa-guide__mark">' + markSvg() + '</span>' +
         '<div class="pwa-guide__title">How to add Memento to your Home&nbsp;Screen</div>' +
         installBtn +
-        '<div class="pwa-guide__steps">' + guideStepsHtml() + '</div>' +
-        '<button class="pwa-guide__done" data-close="1" type="button">Done</button>' +
+        guideStepsHtml() +
+        '<div class="pwa-guide__actions">' +
+          '<button class="pwa-guide__back" data-close="1" type="button" aria-label="Back">' +
+            '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+          '</button>' +
+          '<button class="pwa-guide__done" data-close="1" type="button">See you there</button>' +
+        '</div>' +
       '</div>';
     document.body.appendChild(guideEl);
     guideEl.addEventListener('click', function (e) {
