@@ -43,13 +43,22 @@ function threePillarsSystemSVG() {
 }
 
 const WelcomeIntro = {
-  // True when the install nudge beat should appear: a touch device (phone or
-  // iPad) running in the BROWSER, not the installed app. Desktop skips.
+  // True when the install nudge beat should appear: anyone running in the
+  // BROWSER, not the installed app. Phones/iPads are the priority, but desktop
+  // gets it too (v758, Malik) so Mac users learn the Add to Dock path; the
+  // guide's steps and the nudge wording adapt per device.
   _wcNeedsInstallNudge() {
     try {
       if (window.MementoInstall && MementoInstall._isStandalone && MementoInstall._isStandalone()) return false;
-      return !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+      return true;
     } catch (e) { return false; }
+  },
+  _wcInstallHome() {
+    try {
+      if (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) return 'home screen';
+      if (/Macintosh|Mac OS X/.test(navigator.userAgent || '')) return 'Dock';
+    } catch (e) {}
+    return 'desktop';
   },
 
   el: null, pageWrap: null, navEl: null,
@@ -296,7 +305,7 @@ const WelcomeIntro = {
       skipIf: () => !this._wcNeedsInstallNudge(),
       lines: (n) => [
         (n ? n + ', one' : 'One') + ' quick thing before we go deeper.',
-        "You're using Memento inside your browser right now. It's built to live on your home screen, and it's A LOT better there, trust me.",
+        "You're using Memento inside your browser right now. It's built to live on your " + this._wcInstallHome() + ", and it's A LOT better there, trust me.",
         "Doing it now also means you won't lose your progress later.",
         'It takes about ten seconds.'
       ],

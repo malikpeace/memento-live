@@ -166,6 +166,18 @@
       '<path d="M113 108 L256 251 L399 108 L399 405 L113 405 Z"/></svg>';
   }
 
+  function isMacSafari() {
+    var ua = navigator.userAgent || '';
+    return /Macintosh/.test(ua) && /Safari/.test(ua) && !/Chrome|Chromium|CriOS|Edg|OPR/.test(ua) && !(navigator.maxTouchPoints > 1);
+  }
+  function isMac() { return /Macintosh|Mac OS X/.test(navigator.userAgent || '') && !(navigator.maxTouchPoints > 1); }
+
+  function guideTitle() {
+    if (!isMobile() && isMac()) return 'How to add Memento to your Dock';
+    if (!isMobile()) return 'How to install Memento as an app';
+    return 'How to add Memento to your Home&nbsp;Screen';
+  }
+
   function guideStepsHtml() {
     // Each step carries its slot index so the CSS can spotlight them one after
     // another on a loop (the --n on the wrapper sets the cycle length).
@@ -181,6 +193,15 @@
       mk('Tap <b>Share</b>.', shareGlyph());
       mk('Scroll down and tap <b>Add to Home Screen</b>.', plusGlyph());
       mk('Tap <b>Add</b> at the top, keeping <b>Open as Web App</b> on.', addGlyph());
+    } else if (!isMobile() && isMacSafari()) {
+      // macOS Safari: a real native web app since Sonoma, straight into the Dock.
+      mk('Click <b>File</b> in the menu bar.', dotsGlyph());
+      mk('Click <b>Add to Dock</b>.', plusGlyph());
+      mk('Click <b>Add</b>.', addGlyph());
+    } else if (!isMobile()) {
+      // Desktop Chrome / Edge / Brave: the install icon lives in the address bar.
+      mk('Click the <b>install icon</b> at the right end of the address bar.', plusGlyph());
+      mk('Click <b>Install</b>.', addGlyph());
     } else {
       mk('Tap the <b>three dots</b> at the top of your browser.', dotsGlyph());
       mk('Tap <b>Add to Home screen</b>.', plusGlyph());
@@ -203,7 +224,7 @@
     guideEl.innerHTML =
       '<div class="pwa-guide__inner" role="dialog" aria-label="How to add Memento to your Home Screen">' +
         '<span class="pwa-guide__mark">' + markSvg() + '</span>' +
-        '<div class="pwa-guide__title">How to add Memento to your Home&nbsp;Screen</div>' +
+        '<div class="pwa-guide__title">' + guideTitle() + '</div>' +
         installBtn +
         guideStepsHtml() +
         '<div class="pwa-guide__actions">' +
