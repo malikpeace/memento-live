@@ -217,6 +217,30 @@ const ClarityExperience = {
 
   openSummary() {
     if (this.isOpen) return;
+    // v764 (Malik's resume law: never land AHEAD of where they were): synthesis
+    // marks clarity.completed before the hold-to-collapse, so an app kill on the
+    // ceremony left completed=true with no ignitedAt, and every summary entry
+    // (boot restore, sidebar, star card) skipped the hold. Owed ceremony first.
+    try {
+      const ev = (typeof clarityEndingVersion === 'function') ? clarityEndingVersion() : 'v2';
+      if (ev !== 'off' && state.clarity && state.clarity.completed && !state.clarity.ignitedAt
+          && String((state.clarity.answers || {}).neutronStar || '').trim()) {
+        this.isOpen = true;
+        FullscreenClose.show('clarity');
+        this.el.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        TabBar.hide();
+        _ig2Act = 'reveal'; _ig2 = {};
+        const sum = normalizeClaritySummary(state.clarity.answers);
+        this.pageWrap.innerHTML = `<div class="clarity-exp__page-inner clarity-exp__page-inner--summary">${(typeof renderIgnitionV2 === 'function') ? renderIgnitionV2(sum) : renderNeutronStarSummary(sum)}</div>`;
+        this.navEl.innerHTML = '';
+        if (typeof bindIgnitionV2 === 'function') bindIgnitionV2(document);
+        this.el.classList.add('open-bg');
+        requestAnimationFrame(() => { this.el.classList.add('open-bg-visible'); this.el.classList.add('open-content'); });
+        this._setTimeout(() => { if (this.isOpen) { this.el.classList.add('open'); this.el.classList.remove('open-bg', 'open-bg-visible', 'open-content'); } }, 700);
+        return;
+      }
+    } catch (e) {}
     this.isOpen = true;
     // Persist this view so a refresh lands the user back here instead of the dashboard.
     rememberView('claritySummary');
@@ -1537,7 +1561,12 @@ const ClarityExperience = {
       const steps = getWizardSteps();
       const wizIdx = index - offset;
       const stepKey = steps[wizIdx];
-      const isSummary = stepKey === 'aiSynthesis' && !!aiSynthesisResult;
+      // v764 (Malik's resume law: land them where they were or BEHIND, never
+      // ahead): the summary checkpoint only exists once the hold-to-collapse is
+      // DONE (ignitedAt). Before that, renderAiSynthesis shows the ceremony, and
+      // remembering 'claritySummary' here made an app kill + relaunch skip the
+      // hold entirely.
+      const isSummary = stepKey === 'aiSynthesis' && !!aiSynthesisResult && !!(state.clarity && state.clarity.ignitedAt);
       if (state.ui) {
         const desired = isSummary ? 'claritySummary' : null;
         // Don't clobber other view types (e.g., 'action').
