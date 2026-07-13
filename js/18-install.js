@@ -143,5 +143,85 @@
   }
   function maybeShowNow() { try { if (shouldShow()) show(); } catch (e) {} }
 
-  window.MementoInstall = { show: show, hide: hide, shouldShow: shouldShow, maybeShowNow: maybeShowNow, promptOnEntry: promptOnEntry, _isStandalone: isStandalone, _isIOS: isIOS };
+  /* ---- The onboarding HOW-TO page (v754, Malik) --------------------------------
+     "Show me how" during onboarding opens THIS: a full floating page with the
+     REAL step-by-step. The old 2-step sheet undersold the actual iOS flow
+     (three dots -> Share -> scroll -> Add to Home Screen -> Add), and the
+     conversation kept autoplaying underneath it, which read as cheap. This one
+     returns a Promise so the caller can HOLD until the user dismisses it. The
+     sheet above stays for deeper in the app. */
+  var guideEl = null, guideResolve = null;
+
+  function dotsGlyph() {
+    return '<svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor" aria-hidden="true">' +
+      '<circle cx="5" cy="12" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="19" cy="12" r="1.9"/></svg>';
+  }
+  function addGlyph() {
+    return '<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<path d="M5 12.5 10 17.5 19 7"/></svg>';
+  }
+
+  function guideStepsHtml() {
+    var mk = function (n, html, glyph) {
+      return '<div class="pwa-guide__step"><span class="pwa-guide__num">' + n + '</span><span class="pwa-guide__txt">' + html + '</span>' +
+        (glyph ? '<span class="pwa-guide__glyph">' + glyph + '</span>' : '') + '</div>';
+    };
+    if (isIOS()) {
+      var ipad = Math.min(screen.width || 0, screen.height || 0) >= 744;
+      return mk(1, 'Tap the <b>three dots</b> ' + (ipad ? 'at the top right of Safari.' : 'at the bottom of Safari.'), dotsGlyph()) +
+        mk(2, 'Tap <b>Share</b>.', shareGlyph()) +
+        mk(3, 'Scroll down and tap <b>Add to Home Screen</b>.', plusGlyph()) +
+        mk(4, 'Tap <b>Add</b> at the top, keeping <b>Open as Web App</b> on.', addGlyph());
+    }
+    return mk(1, 'Tap the <b>three dots</b> at the top of your browser.', dotsGlyph()) +
+      mk(2, 'Tap <b>Add to Home screen</b>.', plusGlyph()) +
+      mk(3, 'Tap <b>Install</b>.', addGlyph());
+  }
+
+  function buildGuide() {
+    if (guideEl) { guideEl.remove(); }
+    guideEl = document.createElement('div');
+    guideEl.id = 'pwaGuide'; guideEl.className = 'pwa-guide'; guideEl.setAttribute('aria-hidden', 'true');
+    // Android with a captured install prompt gets the one-tap button on top of
+    // the manual steps; everyone else gets the steps alone.
+    var installBtn = (!isIOS() && deferredPrompt)
+      ? '<button class="pwa-guide__install" id="pwaGuideInstall" type="button">Install Memento</button>' +
+        '<div class="pwa-guide__or">or do it manually</div>'
+      : '';
+    guideEl.innerHTML =
+      '<div class="pwa-guide__inner" role="dialog" aria-label="How to add Memento to your Home Screen">' +
+        '<button class="pwa-guide__close" data-close="1" type="button" aria-label="Close">\u2715</button>' +
+        '<span class="pwa-guide__mark">' + markSvg() + '</span>' +
+        '<div class="pwa-guide__title">How to add Memento to your Home&nbsp;Screen</div>' +
+        installBtn +
+        '<div class="pwa-guide__steps">' + guideStepsHtml() + '</div>' +
+        '<button class="pwa-guide__done" data-close="1" type="button">Done</button>' +
+      '</div>';
+    document.body.appendChild(guideEl);
+    guideEl.addEventListener('click', function (e) {
+      var t = e.target;
+      while (t && t !== guideEl) { if (t.getAttribute && t.getAttribute('data-close')) { hideGuide(); return; } t = t.parentNode; }
+    });
+    var ib = guideEl.querySelector('#pwaGuideInstall');
+    if (ib) ib.addEventListener('click', function () {
+      if (!deferredPrompt) return;
+      try {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(function () { deferredPrompt = null; hideGuide(); }).catch(function () {});
+      } catch (e) {}
+    });
+  }
+
+  function showGuide() {
+    buildGuide();
+    requestAnimationFrame(function () { guideEl.classList.add('is-open'); guideEl.setAttribute('aria-hidden', 'false'); });
+    return new Promise(function (res) { guideResolve = res; });
+  }
+  function hideGuide() {
+    if (guideEl) { guideEl.classList.remove('is-open'); guideEl.setAttribute('aria-hidden', 'true'); }
+    var r = guideResolve; guideResolve = null;
+    if (r) { try { r(); } catch (e) {} }
+  }
+
+  window.MementoInstall = { show: show, hide: hide, showGuide: showGuide, shouldShow: shouldShow, maybeShowNow: maybeShowNow, promptOnEntry: promptOnEntry, _isStandalone: isStandalone, _isIOS: isIOS };
 })();

@@ -301,13 +301,19 @@ const WelcomeIntro = {
         'It takes about ten seconds.'
       ],
       input: { kind: 'chips', options: ['Show me how', "I'll stay in the browser for now"] },
-      commit: (v) => {
-        if (v === 'Show me how') {
-          try { if (window.MementoInstall && MementoInstall.show) MementoInstall.show(); } catch (e) {}
-        }
-        return true;
-      },
+      commit: (v) => { this._wcShowInstallGuide = (v === 'Show me how'); return true; },
       display: (v) => (v === 'Show me how' ? 'Adding it now.' : 'Maybe later.')
+    });
+    // v754 (Malik): "Show me how" opens the dedicated floating HOW-TO page with
+    // the real step-by-step, and this action beat HOLDS the conversation until
+    // it is dismissed (the next message autoplaying under the old sheet was cheap).
+    beats.push({
+      key: 'installGuide',
+      skipIf: () => !this._wcShowInstallGuide,
+      action: () => {
+        this._wcShowInstallGuide = false;
+        try { return MementoInstall.showGuide(); } catch (e) { return Promise.resolve(); }
+      }
     });
     // The look is chosen at the very END of onboarding (in _finishWithName), right
     // before the blank Memento is revealed, so the first card they ever see already
