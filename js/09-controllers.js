@@ -296,7 +296,8 @@ const WelcomeIntro = {
       skipIf: () => !this._wcNeedsInstallNudge(),
       lines: (n) => [
         (n ? n + ', one' : 'One') + ' quick thing before we go deeper.',
-        "You're using Memento inside your browser right now. It's built to live on your home screen, and it's A LOT better there, trust me. Doing it now also means you won't lose your progress later.",
+        "You're using Memento inside your browser right now. It's built to live on your home screen, and it's A LOT better there, trust me.",
+        "Doing it now also means you won't lose your progress later.",
         'It takes about ten seconds.'
       ],
       input: { kind: 'chips', options: ['Show me how', "I'll stay in the browser for now"] },
