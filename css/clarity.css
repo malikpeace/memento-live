@@ -3192,17 +3192,17 @@ html.lowfx .nsv2-reveal__goal--whole { animation: nsv2WordInLite 1.2s ease forwa
   93% { opacity: 0.85; }
   100% { transform: rotate(calc(var(--a) + 300deg)) translateX(3px) scale(0.2); opacity: 0; }
 }
-/* The surge + orbit layers sleep until the hold begins, then FADE in (no pop). */
-.fld--surge, .fld--orbit { opacity: 0; transition: opacity 1.1s ease; }
-.fld--surge i, .fld--orbit i { animation-play-state: paused; }
-.nsv2.is-holding .fld--surge, .nsv2.is-holding .fld--orbit { opacity: 1; }
-.nsv2.is-holding .fld--surge i, .nsv2.is-holding .fld--orbit i { animation-play-state: running; }
-/* The FLOOD pours in progressively with the hold itself: opacity rides --holdp
-   directly, so density keeps climbing the whole 5 seconds (v725). */
-.fld--flood { opacity: 0; }
-.fld--flood i { animation-play-state: paused; }
-.nsv2.is-holding .fld--flood { opacity: calc(var(--holdp, 0) * 1.5 - 0.12); }
-.nsv2.is-holding .fld--flood i { animation-play-state: running; }
+/* Exponential waves (v730): each wave's opacity rides --holdp through its own
+   threshold window, so density doubles as the hold deepens: 4 motes at rest,
+   ~220 converging near the end. Waves sleep (paused) until the hold. */
+.fld--wave { opacity: 0; }
+.fld--wave i { animation-play-state: paused; }
+.nsv2.is-holding .fld--wave i { animation-play-state: running; }
+.nsv2.is-holding .fld--w1 { opacity: max(0, min(1, calc((var(--holdp, 0) - 0.02) * 6))); }
+.nsv2.is-holding .fld--w2 { opacity: max(0, min(1, calc((var(--holdp, 0) - 0.18) * 6))); }
+.nsv2.is-holding .fld--w3 { opacity: max(0, min(1, calc((var(--holdp, 0) - 0.36) * 6))); }
+.nsv2.is-holding .fld--w4 { opacity: max(0, min(1, calc((var(--holdp, 0) - 0.54) * 6))); }
+.nsv2.is-holding .fld--w5 { opacity: max(0, min(1, calc((var(--holdp, 0) - 0.72) * 6))); }
 /* Pressure shake: builds from nothing with --holdp (core + field together). */
 .nsv2.is-holding .nsv2-hold { animation: nsv2CollapseShake 0.3s linear infinite; }
 @keyframes nsv2CollapseShake {

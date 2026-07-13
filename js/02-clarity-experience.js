@@ -7788,36 +7788,27 @@ function renderIgnitionV2(summary) {
     // language as the thinking loader, turned up and made interactive.
     // Motes spawn OFF-SCREEN (vmax radii) and ride in; the surge layer fades
     // in over ~1.1s on press instead of popping (organic, v724).
-    // v726 (Malik): variety in the paths. Half the idle motes SPIRAL in (orbit
-    // fall) instead of falling straight; a dedicated orbit layer joins the
-    // press; the flood grows to 28. Peak: ~80 motes converging.
-    // v727 (Malik): real size variety with MASS. Boulders (bigger, brighter,
-    // ~18% slower) down to fine dust (1px, quick). Sizes carry their own glow
-    // (css scales the shadow off --s).
+    // v730 (Malik): EXPONENTIAL escalation. 3-4 motes at rest, then five
+    // doubling waves (8/16/32/64/96 = ~220 motes) gated by --holdp thresholds,
+    // while the hold's rAF ramps every animation's playbackRate. Sizes carry
+    // their own glow; every 3rd mote orbit-falls.
     const SZ = [2, 3, 4, 5.5, 7, 9];
     const mass = (px, base) => (base * (0.85 + (px / 9) * 0.33));
+    const mkMote = (i, base, seedA, seedStep) => {
+      const px = SZ[(i * seedStep + seedA) % 6];
+      const orb = i % 3 === 2 ? ' class="orb"' : '';
+      return `<i${orb} style="--a:${(i * 137 + seedA * 41) % 360}deg;--d:${mass(px, base + (i % 5) * 0.22).toFixed(2)}s;--del:${(-(i % 9) * 0.31).toFixed(2)}s;--s:${px}px;--r:${52 + (i % 6) * 7}vmax"></i>`;
+    };
     let idleM = '';
-    for (let i = 0; i < 16; i++) {
-      const px = SZ[(i * 5) % 6];
-      idleM += `<i${i % 2 ? ' class="orb"' : ''} style="--a:${(i * 137) % 360}deg;--d:${mass(px, 5.2 + (i % 5) * 0.7).toFixed(2)}s;--del:${(-(i % 9) * 1.1).toFixed(1)}s;--s:${px}px;--r:${52 + (i % 4) * 6}vmax"></i>`;
-    }
-    let surgeM = '';
-    for (let i = 0; i < 28; i++) {
-      const px = SZ[(i * 7 + 1) % 6];
-      surgeM += `<i style="--a:${(i * 53 + 20) % 360}deg;--d:${mass(px, 1.4 + (i % 5) * 0.22).toFixed(2)}s;--del:${(-(i % 8) * 0.35).toFixed(2)}s;--s:${px}px;--r:${58 + (i % 5) * 7}vmax"></i>`;
-    }
-    // Orbit layer: 20 motes arcing in on spiral paths, wakes with the press.
-    let orbitM = '';
-    for (let i = 0; i < 28; i++) {
-      const px = SZ[(i * 5 + 2) % 6];
-      orbitM += `<i class="orb" style="--a:${(i * 71 + 33) % 360}deg;--d:${mass(px, 1.8 + (i % 5) * 0.28).toFixed(2)}s;--del:${(-(i % 7) * 0.4).toFixed(2)}s;--s:${px}px;--r:${56 + (i % 5) * 8}vmax"></i>`;
-    }
-    let floodM = '';
-    for (let i = 0; i < 36; i++) {
-      const px = SZ[(i * 7 + 4) % 6];
-      floodM += `<i style="--a:${(i * 91 + 7) % 360}deg;--d:${mass(px, 1.1 + (i % 6) * 0.14).toFixed(2)}s;--del:${(-(i % 9) * 0.21).toFixed(2)}s;--s:${px}px;--r:${62 + (i % 6) * 6}vmax"></i>`;
-    }
-    const fieldMotes = `<span class="fld fld--idle">${idleM}</span><span class="fld fld--surge">${surgeM}</span><span class="fld fld--orbit">${orbitM}</span><span class="fld fld--flood">${floodM}</span>`;
+    for (let i = 0; i < 4; i++) idleM += mkMote(i, 5.4, 0, 5);
+    const waves = [[8, 2.4], [16, 2.0], [32, 1.7], [64, 1.4], [96, 1.15]];
+    let waveHtml = '';
+    waves.forEach(([n, base], w) => {
+      let m = '';
+      for (let i = 0; i < n; i++) m += mkMote(i, base, w + 1, 7);
+      waveHtml += `<span class="fld fld--wave fld--w${w + 1}">${m}</span>`;
+    });
+    const fieldMotes = `<span class="fld fld--idle">${idleM}</span>${waveHtml}`;
     inner = `
       <div class="nsv2-reveal">
         <div class="nsv2-reveal__after" style="animation-delay:${START}ms">
@@ -7950,10 +7941,26 @@ function _bindHoldToIgnite(root) {
   if (!hold) return;
   const HOLD_MS = 5000;
   let raf = null, start = 0, done = false;
+  // v730 (Malik): the fall SPEED ramps with the hold, 1x -> ~3.8x. playbackRate
+  // changes speed without position jumps (Web Animations API); applied in
+  // steps so ~220 animations are not touched every frame.
+  let fieldAnims = null, lastRate = 1;
+  const setRate = (rate) => {
+    try {
+      if (!fieldAnims) {
+        const f = root.querySelector('.nsv2-collapse-field');
+        fieldAnims = f ? f.getAnimations({ subtree: true }) : [];
+      }
+      if (Math.abs(rate - lastRate) < 0.06) return;
+      lastRate = rate;
+      fieldAnims.forEach((a) => { a.playbackRate = rate; });
+    } catch (e) {}
+  };
   const setP = (p) => {
     // No progress ring anymore (Malik): the touch point itself grows + glows
     // with --holdp, and the beams brighten and the sentence shakes harder.
     root.style.setProperty('--holdp', String(p));
+    setRate(p <= 0 ? 1 : 1 + p * 2.8);
   };
   const tick = (t) => {
     if (done) return;
