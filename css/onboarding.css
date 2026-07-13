@@ -928,11 +928,20 @@ body.calm-motion .empty-state, body.lite .empty-state { animation: none; }
               radial-gradient(40% 30% at 45% 30%, rgba(240, 250, 255, 0.14), transparent 68%);
   filter: blur(26px);
   opacity: 1;
-  animation: welcAuroraDrift 14s ease-in-out infinite alternate;
+  /* v761 (Malik: "alive, not crazy"): the old +/-6% drift moved slower than its
+     own blur radius and read as a still image. Wider wander + a slow brightness
+     breathe on a DIFFERENT period (14s vs 9s) so the combined rhythm never
+     reads as a loop. Both compositor-only (transform + opacity). */
+  animation: welcAuroraDrift 14s ease-in-out infinite alternate,
+             welcAuroraBreathe 9s ease-in-out infinite alternate;
 }
 @keyframes welcAuroraDrift {
-  from { transform: translateX(-6%) skewY(-2deg); }
-  to   { transform: translateX(6%) skewY(2deg); }
+  from { transform: translateX(-16%) skewY(-2.4deg); }
+  to   { transform: translateX(16%) skewY(2.4deg); }
+}
+@keyframes welcAuroraBreathe {
+  from { opacity: 1; }
+  to   { opacity: 0.68; }
 }
 @media (prefers-reduced-motion: reduce) {
   .welcome-intro__orb { animation: none !important; }
@@ -945,7 +954,9 @@ body.calm-motion .empty-state, body.lite .empty-state { animation: none; }
 .welcome-intro--blackout .welcome-intro__orb,
 .welcome-intro--help .welcome-intro__orb {
   animation-play-state: paused;
-  opacity: 0.4;
+  /* !important so the dim beats the paused breathe animation's held opacity
+     (author !important outranks animations in the cascade). */
+  opacity: 0.4 !important;
 }
 .welcome-intro__page-wrap {
   position: relative; z-index: 1;
