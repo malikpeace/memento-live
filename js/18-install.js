@@ -231,7 +231,7 @@
           '<button class="pwa-guide__back" data-close="1" type="button" aria-label="Back">' +
             '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
           '</button>' +
-          '<button class="pwa-guide__done" id="pwaGuideDone" type="button">See you there \ud83d\udc4b</button>' +
+          '<div class="pwa-guide__done" aria-hidden="true">See you there \ud83d\udc4b</div>' +
         '</div>' +
       '</div>';
     document.body.appendChild(guideEl);
@@ -247,11 +247,9 @@
         deferredPrompt.userChoice.then(function () { deferredPrompt = null; hideGuide(); }).catch(function () {});
       } catch (e) {}
     });
-    // "See you there" just closes (v766, Malik): the v759 share-sheet shortcut
-    // is DEAD, on-device the sheet navigator.share opens has no Add to Home
-    // Screen row, so it only confused the flow.
-    var db = guideEl.querySelector('#pwaGuideDone');
-    if (db) db.addEventListener('click', function () { hideGuide(); });
+    // "See you there" is a DEAD send-off, not a control (v767, Malik): tapping
+    // it must not advance anything. They leave via the installed app; the back
+    // square is the only way back into the conversation.
   }
 
   function showGuide() {

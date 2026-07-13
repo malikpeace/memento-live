@@ -184,11 +184,10 @@ html.theme-light .pwa-install__glyph { color: #3a6bff; background: rgba(58, 107,
 .pwa-guide__back:active { transform: scale(0.94); }
 .pwa-guide__done {
   flex: 1 1 auto; font: inherit; font-size: 1rem; font-weight: 700; color: #0b0f10;
-  border: none; border-radius: 14px; padding: 15px; cursor: pointer;
+  border: none; border-radius: 14px; padding: 15px; text-align: center;
   background: linear-gradient(180deg, #ffffff, #e9f1f2);
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
-.pwa-guide__done:active { transform: scale(0.98); }
 @media (prefers-reduced-motion: reduce) {
   .pwa-guide.is-open, .pwa-guide__inner { animation: none; opacity: 1; transform: none; }
   .pwa-guide__step::after { animation: none; }
