@@ -574,7 +574,7 @@ const CloudSync = (function () {
         '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
       '</button>' +
       '<div class="auth-screen__col">' +
-        '<div class="auth-screen__glyph" aria-hidden="true"><img src="icons/icon.svg" alt=""></div>' +
+        '<div class="auth-screen__glyph" aria-hidden="true"><svg viewBox="0 0 512 512" width="100%" height="100%"><rect width="512" height="512" rx="115" fill="#0a0a0e"/><path d="M113 108 L256 251 L399 108 L399 405 L113 405 Z" fill="#f5f5f7"/></svg></div>' +
         '<div class="auth-screen__card">' +
           '<div id="authStepEmail">' +
             '<div class="auth-screen__title">Welcome to Memento</div>' +
