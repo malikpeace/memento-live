@@ -2085,7 +2085,16 @@ function submitFeedback(kind, text) {
   try {
     if (!state.support) state.support = { contacts: {}, feedbackQueue: [] };
     if (!Array.isArray(state.support.feedbackQueue)) state.support.feedbackQueue = [];
-    state.support.feedbackQueue.push({ id: 'fb_' + Date.now() + '_' + Math.floor(Math.random() * 1e4), ts: Date.now(), kind: kind || 'idea', text: String(text || '').slice(0, 4000), status: 'queued' });
+    // v734: triage context rides along (version, device, screen, ua), so a
+    // launch-week bug report is actionable without a back-and-forth.
+    let ctx = '';
+    try {
+      ctx = ' [v:' + (window.MEMENTO_VERSION || '?') + ' d:' + Analytics.deviceId().slice(0, 8) +
+        ' s:' + window.innerWidth + 'x' + window.innerHeight +
+        ' t:' + (document.documentElement.classList.contains('theme-light') ? 'light' : 'dark') +
+        ' ua:' + navigator.userAgent.slice(0, 80) + ']';
+    } catch (e) {}
+    state.support.feedbackQueue.push({ id: 'fb_' + Date.now() + '_' + Math.floor(Math.random() * 1e4), ts: Date.now(), kind: kind || 'idea', text: (String(text || '') + ctx).slice(0, 4000), status: 'queued' });
     try { persistNow(); } catch (e) {}
     try { if (typeof Backend !== 'undefined' && Backend.sendFeedbackQueue) Backend.sendFeedbackQueue(); } catch (e) {}
   } catch (e) {}
