@@ -43,6 +43,15 @@ function threePillarsSystemSVG() {
 }
 
 const WelcomeIntro = {
+  // True when the install nudge beat should appear: a touch device (phone or
+  // iPad) running in the BROWSER, not the installed app. Desktop skips.
+  _wcNeedsInstallNudge() {
+    try {
+      if (window.MementoInstall && MementoInstall._isStandalone && MementoInstall._isStandalone()) return false;
+      return !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+    } catch (e) { return false; }
+  },
+
   el: null, pageWrap: null, navEl: null,
   currentPage: 0,
   totalPages: 6,
@@ -277,6 +286,28 @@ const WelcomeIntro = {
     // grand: the welcome line does not type; it blooms in as one piece (soft zoom + de-blur)
     // and lingers before the conversation moves on.
     beats.push({ lines: (n) => ['Welcome to Memento, ' + (n || 'you') + '.'], pause: 1500, grand: true });
+    // v749 (Malik): get them onto the HOME SCREEN as early as possible. Right
+    // after the name (so switching costs ~20 seconds of progress, not a whole
+    // onboarding: iOS gives the installed app SEPARATE storage from Safari),
+    // a personal nudge with honest framing. Phones + iPads only; skipped when
+    // already installed, and skipped silently on desktop.
+    beats.push({
+      key: 'installNudge',
+      skipIf: () => !this._wcNeedsInstallNudge(),
+      lines: (n) => [
+        (n ? n + ', one' : 'One') + ' quick thing before we go deeper.',
+        "You're using Memento inside your browser right now. It's built to live on your home screen, and it's A LOT better there, trust me. Doing it now also means you won't lose your progress later.",
+        'It takes about ten seconds.'
+      ],
+      input: { kind: 'chips', options: ['Show me how', "I'll stay in the browser for now"] },
+      commit: (v) => {
+        if (v === 'Show me how') {
+          try { if (window.MementoInstall && MementoInstall.show) MementoInstall.show(); } catch (e) {}
+        }
+        return true;
+      },
+      display: (v) => (v === 'Show me how' ? 'Adding it now.' : 'Maybe later.')
+    });
     // The look is chosen at the very END of onboarding (in _finishWithName), right
     // before the blank Memento is revealed, so the first card they ever see already
     // wears their style. (Moved here from a post-welcome beat.)
