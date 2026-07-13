@@ -87,7 +87,7 @@
       '<div class="pwa-install__scrim" data-close="1"></div>' +
       '<div class="pwa-install__sheet" role="dialog" aria-label="Add Memento to your home screen">' +
         '<button class="pwa-install__close" data-close="1" type="button" aria-label="Close">\u2715</button>' +
-        '<span class="pwa-install__mark">' + markSvg() + '</span>' +
+        '<span class="pwa-install__mark"><img src="icons/icon-180.png" alt="" width="42" height="42" style="display:block;border-radius:13px;"></span>' +
         '<div class="pwa-install__title">Add Memento to your Home Screen</div>' +
         '<div class="pwa-install__sub">Memento is built to live on your home screen. I <b>highly recommend</b> adding it for a significantly better experience. Follow the instructions below to turn it into a real app.</div>' +
         body +
