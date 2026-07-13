@@ -247,17 +247,11 @@
         deferredPrompt.userChoice.then(function () { deferredPrompt = null; hideGuide(); }).catch(function () {});
       } catch (e) {}
     });
-    // "See you there" doubles as the shortcut (v759, Malik): on iOS it opens the
-    // native share sheet directly, so "Add to Home Screen" is one tap away and
-    // steps 1-2 are skipped. Must be called synchronously in the tap (gesture
-    // requirement). Everywhere else, or if the sheet refuses, it just closes.
+    // "See you there" just closes (v766, Malik): the v759 share-sheet shortcut
+    // is DEAD, on-device the sheet navigator.share opens has no Add to Home
+    // Screen row, so it only confused the flow.
     var db = guideEl.querySelector('#pwaGuideDone');
-    if (db) db.addEventListener('click', function () {
-      try {
-        if (isIOS() && navigator.share) navigator.share({ title: 'Memento', url: location.href }).catch(function () {});
-      } catch (e) {}
-      hideGuide();
-    });
+    if (db) db.addEventListener('click', function () { hideGuide(); });
   }
 
   function showGuide() {
