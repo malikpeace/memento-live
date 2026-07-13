@@ -570,9 +570,8 @@ const CloudSync = (function () {
         '<div class="ambient__rays-beam" style="--a:50deg; --h:95px;  --d:9.0s;  --del:-3.0s; --omin:0.10; --omax:0.68; --smin:0.55; --smax:1.4;  --c:145 238 255;"><div class="ambient__rays-beam-shaft"></div></div>' +
         '<div class="ambient__rays-beam" style="--a:64deg; --h:65px;  --d:10.9s; --del:-1.2s; --omin:0.08; --omax:0.54; --smin:0.6;  --smax:1.3;  --c:120 165 255;"><div class="ambient__rays-beam-shaft"></div></div>' +
       '</div>' +
-      '<button type="button" class="auth-screen__back" data-close>' +
-        '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
-        '<span>Back</span>' +
+      '<button type="button" class="auth-screen__back" data-close aria-label="Back">' +
+        '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
       '</button>' +
       '<div class="auth-screen__col">' +
         '<div class="auth-screen__glyph" aria-hidden="true"><img src="icons/icon.svg" alt=""></div>' +
