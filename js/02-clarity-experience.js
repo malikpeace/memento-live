@@ -7792,8 +7792,8 @@ function renderIgnitionV2(summary) {
     // doubling waves (8/16/32/64/96 = ~220 motes) gated by --holdp thresholds,
     // while the hold's rAF ramps every animation's playbackRate. Sizes carry
     // their own glow; every 3rd mote orbit-falls.
-    const SZ = [2, 3, 4, 5.5, 7, 9];
-    const mass = (px, base) => (base * (0.85 + (px / 9) * 0.33));
+    const SZ = [4, 5, 6.5, 8, 10, 12];
+    const mass = (px, base) => (base * (0.85 + (px / 12) * 0.33));
     const mkMote = (i, base, seedA, seedStep) => {
       const px = SZ[(i * seedStep + seedA) % 6];
       const orb = i % 3 === 2 ? ' class="orb"' : '';
