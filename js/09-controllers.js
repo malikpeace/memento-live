@@ -2134,12 +2134,12 @@ const WelcomeIntro = {
         <div class="wi-enter__eyebrow">Enter</div>
         <div class="wi-enter__logo" role="img" aria-label="Memento">
           <span class="wi-enter__glow" aria-hidden="true"></span>
-          <svg class="wi-enter__mark" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="44" fill="#f5f5f7"/><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z" fill="#0a0a0e"/></svg><span class="wi-enter__word" aria-hidden="true">emento</span>
+          <svg class="wi-enter__mark" viewBox="42 40 428 432" aria-hidden="true"><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z" fill="#f5f5f7"/></svg><span class="wi-enter__word" aria-hidden="true">emento</span>
         </div>
       </div>`;
     } else if (kind === 'help') {
       this._phiP = p;
-      inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-phi wi-helppage" data-beat="${beatIdx}"><svg class="wi-phi__mark" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="44" fill="#f5f5f7"/><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z" fill="#0a0a0e"/></svg><div class="wi-phi__body"><div class="wi-phi__bodyinner">${this._helpBody(p)}</div></div></div>`;
+      inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-phi wi-helppage" data-beat="${beatIdx}"><svg class="wi-phi__mark" viewBox="42 40 428 432" aria-hidden="true"><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z" fill="#f5f5f7"/></svg><div class="wi-phi__body"><div class="wi-phi__bodyinner">${this._helpBody(p)}</div></div></div>`;
     } else if (kind === 'mori') {
       inner = `<div class="welcome-intro__page-inner wi-cine wi-cine--reflect wi-moriview" data-beat="${beatIdx}"><h2 class="wi-demo__headline">${esc(b.headline)}</h2>${this._cineMori()}<p class="wi-demo__line">${esc(b.line)}</p>${b.days ? `<p class="wi-mori__days">You have about <b>${b.days.toLocaleString()}</b> days left.</p><p class="wi-mori__days wi-mori__days--stake">A year of drifting is 365 of them.</p>` : ''}</div>`;
     } else if (kind === 'preview') {
@@ -2251,7 +2251,7 @@ const WelcomeIntro = {
     try { mark = this.pageWrap.querySelector('.wi-enter__mark'); } catch (e) {}
     if (!mark) { this._showSolution(stepIndex, idx); return; }
     const r1 = mark.getBoundingClientRect();
-    const M = '<svg viewBox="0 0 512 512" aria-hidden="true" style="width:100%;height:100%;display:block;"><rect width="512" height="512" rx="44" fill="#f5f5f7"/><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z" fill="#0a0a0e"/></svg>';
+    const M = '<svg viewBox="42 40 428 432" aria-hidden="true" style="width:100%;height:100%;display:block;"><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z" fill="#f5f5f7"/></svg>';
     const clone = document.createElement('div');
     clone.setAttribute('aria-hidden', 'true');
     clone.style.cssText = 'position:fixed;left:0;top:0;width:' + r1.width + 'px;height:' + r1.height + 'px;transform:translate(' + r1.left + 'px,' + r1.top + 'px);transform-origin:top left;z-index:99990;pointer-events:none;';

@@ -1685,7 +1685,7 @@ function maybeShowSaveWorkNudge(onDone) {
     if (_saveWorkNudgeEl || document.getElementById('saveMemento')) return false;
 
     let installed = false; try { installed = !!(window.MementoInstall && window.MementoInstall._isStandalone()); } catch (_) {}
-    const mark = '<svg viewBox="0 0 512 512" width="42" height="42" aria-hidden="true"><rect width="512" height="512" rx="118" fill="#0c1112"/><rect x="6" y="6" width="500" height="500" rx="114" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="3"/><path d="M150 152 L256 258 L362 152 L362 360 L150 360 Z" fill="none" stroke="#f5f5f7" stroke-width="26" stroke-linejoin="round"/></svg>';
+    const mark = '<svg viewBox="0 0 512 512" width="42" height="42" aria-hidden="true"><rect width="512" height="512" rx="118" fill="#0c1112"/><path d="M113 108 L256 251 L399 108 L399 405 L113 405 Z" fill="#f5f5f7"/></svg>';
     const el = document.createElement('div');
     _saveWorkNudgeEl = el;
     el.id = 'saveMemento'; el.className = 'save-memento'; el.setAttribute('aria-hidden', 'true');
