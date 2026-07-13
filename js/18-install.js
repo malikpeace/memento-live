@@ -231,7 +231,7 @@
           '<button class="pwa-guide__back" data-close="1" type="button" aria-label="Back">' +
             '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
           '</button>' +
-          '<button class="pwa-guide__done" data-close="1" type="button">See you there \ud83d\udc4b</button>' +
+          '<button class="pwa-guide__done" id="pwaGuideDone" type="button">See you there \ud83d\udc4b</button>' +
         '</div>' +
       '</div>';
     document.body.appendChild(guideEl);
@@ -246,6 +246,17 @@
         deferredPrompt.prompt();
         deferredPrompt.userChoice.then(function () { deferredPrompt = null; hideGuide(); }).catch(function () {});
       } catch (e) {}
+    });
+    // "See you there" doubles as the shortcut (v759, Malik): on iOS it opens the
+    // native share sheet directly, so "Add to Home Screen" is one tap away and
+    // steps 1-2 are skipped. Must be called synchronously in the tap (gesture
+    // requirement). Everywhere else, or if the sheet refuses, it just closes.
+    var db = guideEl.querySelector('#pwaGuideDone');
+    if (db) db.addEventListener('click', function () {
+      try {
+        if (isIOS() && navigator.share) navigator.share({ title: 'Memento', url: location.href }).catch(function () {});
+      } catch (e) {}
+      hideGuide();
     });
   }
 
