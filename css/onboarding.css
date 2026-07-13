@@ -3789,7 +3789,11 @@ html.lowfx .auth-screen__card, body.lite .auth-screen__card { background: rgba(1
 .wc-line b { font-weight: 800; }
 /* Grand line ("Welcome to Memento, Malik."): blooms in as one piece with a soft zoom + de-blur
    instead of typing, and reads a touch bigger. Lingers via the beat's pause. */
-.wc-line--grand { font-size: 1.5rem; font-weight: 700; color: #fff; animation: wcGrandIn 1.05s cubic-bezier(0.16,1,0.3,1) both; }
+/* fill BACKWARDS, not both (v757): 'both' retained filter: blur(0) on the line
+   forever, keeping it composited and taxing every later typewriter frame (the
+   post-welcome lag Malik felt). The end keyframe matches the base styles, so
+   releasing the fill is invisible and the layer is freed the moment it lands. */
+.wc-line--grand { font-size: 1.5rem; font-weight: 700; color: #fff; animation: wcGrandIn 1.05s cubic-bezier(0.16,1,0.3,1) backwards; }
 @keyframes wcGrandIn { from { opacity: 0; transform: scale(0.9); filter: blur(10px); } 55% { opacity: 1; } to { opacity: 1; transform: scale(1); filter: blur(0); } }
 @media (prefers-reduced-motion: reduce) { .wc-line--grand { animation: none; } }
 
