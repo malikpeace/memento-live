@@ -8106,7 +8106,7 @@ function _bindStarPlacard(root) {
       _ig2Act = 'synth';
       // Same markup the real aiSynthesis step shows while Opus is working.
       ClarityExperience.pageWrap.innerHTML = '<div class="clarity-exp__page-inner">' +
-        rainLoaderHtml('One moment.') + '</div>';
+        '<div class="ai-thinking ai-thinking--quiet"><span class="quiet-line">One moment.</span></div></div>';
       ClarityExperience.navEl.innerHTML = '';
       // Dev pacing: shrink a moment, then run the same pixel-fall the real
       // flow uses (finishCondenseThen) so the beat previews true to life.

@@ -3976,6 +3976,17 @@ html.theme-light .clarity-exp:has(.tut-star-stage) .clarity-exp__nav-btn--next {
 /* Caption pinned a fixed 70px under the core (the sys is 230px, core centered),
    no viewport math (v729). */
 .acc-caption { margin-top: -46px; text-align: center; color: var(--text-1); font-size: 0.875rem; }
+/* The synthesis wait (v733): no loader object at all, the collapse right after
+   is a similar animation. One quiet line, breathing so it never looks frozen. */
+.ai-thinking--quiet {
+  min-height: 62vh; display: flex; align-items: center; justify-content: center;
+  color: var(--text-1); font-size: 0.9rem;
+}
+/* The breathe lives on a CHILD span: body.lite kills animation on .ai-thinking
+   itself (phones are lite), and this must keep breathing there. */
+.ai-thinking--quiet .quiet-line { animation: quietBreathe 3.4s ease-in-out infinite; }
+@keyframes quietBreathe { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .ai-thinking--quiet .quiet-line { animation: none; } }
 .acc-core { position: absolute; left: 50%; top: 50%; width: 10px; height: 10px; margin: -5px;
   border-radius: 50%;
   background: radial-gradient(circle at 42% 40%, #ffffff, #cdeffb 55%, rgba(140, 215, 235, 0.9));

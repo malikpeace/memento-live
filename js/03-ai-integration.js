@@ -2413,11 +2413,11 @@ function renderAiSynthesis() {
     if (!aiSynthesisLoading && !aiSynthesisResult) {
       setTimeout(() => triggerSynthesis(), 100);
     }
-    // v729 (Malik): the condensing visual moved to the USER's press-and-hold
-    // collapse, so this wait no longer condenses anything (it was condensing
-    // the star twice). Quiet rain + one line. (The old synth-condense canvas
-    // block is in git for revert.)
-    return rainLoaderHtml('One moment.');
+    // v729/v733 (Malik): the condensing visual moved to the USER's press-and-
+    // hold collapse, and the rain loader came off this page too (the collapse
+    // right after is a similar animation, it read as a duplicate). Just the
+    // line, breathing softly on the dark.
+    return '<div class="ai-thinking ai-thinking--quiet"><span class="quiet-line">One moment.</span></div>';
   }
 
   if (!aiSynthesisResult && aiChatError) {
