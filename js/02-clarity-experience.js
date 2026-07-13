@@ -7972,6 +7972,10 @@ function _bindHoldToIgnite(root) {
   const begin = (e) => {
     if (done) return;
     e.preventDefault();
+    // Belt-and-braces (v763): make sure the mount entrance animation is fully
+    // released before the surge starts, so nothing holds the full-screen root
+    // as a composited opacity group while ~220 motes are flying.
+    try { root.style.animation = 'none'; } catch (err) {}
     root.classList.add('is-holding');
     start = performance.now();
     raf = requestAnimationFrame(tick);
