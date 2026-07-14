@@ -5914,11 +5914,6 @@ const HeroShrink = {
     window.addEventListener('pageshow', () => this.layoutGap());
     // v698: where CSS scroll-driven animations exist, the shrink runs on the
     // compositor (css/dashboard.css) and this JS fallback stays out of the way.
-    // The z-flip runs as a JS one-shot on EVERY browser (v769): it was a
-    // scroll-driven z-index animation, but z-index is main-thread-only and
-    // fast up-down flicks thrashed the layer tree around the flip point.
-    // Hysteresis (240 up / 200 down) so oscillation cannot re-trigger it.
-    window.addEventListener('scroll', () => this._zFlip(), { passive: true });
     try { if (CSS.supports('animation-timeline: scroll()')) return; } catch (e) {}
     window.addEventListener('scroll', () => this._queue(), { passive: true });
     window.addEventListener('resize', () => { this._full = 0; this._queue(); });
@@ -5964,18 +5959,6 @@ const HeroShrink = {
     } catch (e) {}
   },
 
-  _zFlip() {
-    try {
-      if (!this._active()) return;
-      const card = document.getElementById('dayCard');
-      if (!card) return;
-      const y = window.scrollY || document.documentElement.scrollTop || 0;
-      const hi = card.style.zIndex === '60';
-      if (!hi && y > 240) card.style.zIndex = '60';
-      else if (hi && y < 200) card.style.zIndex = '';
-    } catch (e) {}
-  },
-
   _active() {
     try {
       return window.matchMedia('(max-width: 767.98px)').matches &&
@@ -6004,7 +5987,9 @@ const HeroShrink = {
   _clear() {
     try {
       if (this.card) { this.card.style.height = ''; this.card.style.justifyContent = ''; this.card.style.zIndex = ''; }
-      if (this.wrap) { this.wrap.style.transform = ''; }
+      if (this.wrap) { this.wrap.style.transform = ''; this.wrap.style.opacity = ''; this.wrap.style.pointerEvents = ''; }
+      const glow = document.getElementById('mmScrollGlow');
+      if (glow && glow.style.opacity !== '') glow.style.opacity = '';
       const hello = document.getElementById('dashHello');
       if (hello && hello.style.opacity !== '') hello.style.opacity = '';
       const mark = document.querySelector('.dash-header .dash-header__brand-mark');
@@ -6021,27 +6006,18 @@ const HeroShrink = {
     // The unlock cinema owns the wrap's transform; never fight it.
     if (document.body.classList.contains('evo2')) { this._clear(); return; }
     if (!this._active()) { this._clear(); return; }
-    // Re-renders replace the card's DOM: re-measure on missing OR detached refs.
     if (!this.wrap || !this.wrap.isConnected) { this._full = 0; this._measure(); }
-    if (!this.card || !this.wrap || !this._full) return;
+    if (!this.card || !this.wrap) return;
     const y = window.scrollY || document.documentElement.scrollTop || 0;
-    const range = 438;                       // mirrors the keyframes' range
-    const p = Math.max(0, Math.min(1, y / range));
+    const p = Math.max(0, Math.min(1, y / 300));   // mirrors heroCardDissolve's range
     if (p <= 0) { this._clear(); return; }
-    // Dock v2 (v709): the card SQUASHES into the header's 19px M slot at 14px
-    // left, becoming the icon (1:1). The header's own M fades over the last
-    // 45% as the card replaces it. Same math as the heroCardScale /
-    // heroMarkFade keyframes (origin top center). Visual scale is DECOUPLED
-    // from the container height; the layout handoff stays 1:1 with the finger.
-    const SX_END = 0.0618, SY_END = 0.042;
-    const sx = 1 - (1 - SX_END) * p;
-    const sy = 1 - (1 - SY_END) * p;
-    const cardW = Math.min(0.82 * window.innerWidth, 320);
-    const dxEnd = 14 + (cardW * SX_END) / 2 - window.innerWidth / 2;
-    this.wrap.style.transform = 'translateX(' + (dxEnd * p).toFixed(1) + 'px) scale(' + sx.toFixed(4) + ', ' + sy.toFixed(4) + ')';
-    const mark = document.querySelector('.dash-header .dash-header__brand-mark');
-    if (mark) mark.style.opacity = p <= 0.55 ? '' : String(Math.max(0, 1 - (p - 0.55) / 0.45));
-    // (z flip moved to _zFlip, v769: hysteresis'd, runs on all browsers.)
+    // v770 (Malik's lab pick): dissolve into glow. The card lags at 0.3x,
+    // shrinks to 0.94 and fades out; the ambient glow fades in with it.
+    this.wrap.style.transform = 'translateY(' + (Math.min(y, 300) * 0.3).toFixed(1) + 'px) scale(' + (1 - p * 0.06).toFixed(4) + ')';
+    this.wrap.style.opacity = String(1 - p);
+    this.wrap.style.pointerEvents = p > 0.5 ? 'none' : '';
+    const glow = document.getElementById('mmScrollGlow');
+    if (glow) glow.style.opacity = String(p);
     // Hub greeting fade-in (mirrors hubFadeIn): rides in on scroll.
     const hello = document.getElementById('dashHello');
     if (hello) hello.style.opacity = String(Math.max(0, Math.min(1, (y - 40) / 340)));
@@ -6051,20 +6027,8 @@ try {
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => HeroShrink.init());
   else HeroShrink.init();
 } catch (e) {}
-// v708: tapping the DOCKED mini card returns you to the top of the home.
-// Capture phase: while docked, the tap means "go back up", never "open the
-// card", so the card's own handlers are suppressed for that tap.
-try {
-  document.addEventListener('click', (e) => {
-    if (!e.target || !e.target.closest || !e.target.closest('#dayCard')) return;
-    if (!window.matchMedia || !window.matchMedia('(max-width: 767.98px)').matches) return;
-    if (!document.body.classList.contains('ns-bloom')) return;
-    if ((window.scrollY || 0) < 200) return;   // not docked yet
-    e.preventDefault();
-    e.stopPropagation();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, true);
-} catch (e) {}
+// (v708's docked-chip tap-to-top removed in v770: the corner dock is dead;
+// the card now dissolves into the ambient glow as you scroll.)
 
 /* ============================================
    PARALLAX CONTROLLER

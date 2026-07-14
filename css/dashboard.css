@@ -291,6 +291,19 @@ body.look-dark-glass.ns-bloom .ambient__rays {
    pitch black before the user locks in their star, blue/white wash after. */
 .ambient__orb { display: none !important; }
 .ambient { background: #000; }
+/* v770: the dissolve-into-glow layer. Authored in the card's cyan and rotated
+   to the user's accent by the same --mm-hue the card layers use. Radial,
+   fading OUT before its own bounds (glow edge-safety law). display:none unless
+   the mobile bloom home can actually use it (hidden-animations law). */
+.ambient__mmglow {
+  position: absolute; top: -12%; left: -15%; right: -15%; height: 46%;
+  background: radial-gradient(62% 58% at 50% 26%, rgba(58, 217, 245, 0.30), transparent 68%);
+  filter: hue-rotate(var(--mm-hue, 0deg));
+  opacity: 0; display: none; pointer-events: none;
+}
+@media (max-width: 767.98px) {
+  body.ns-bloom:not(.has-custom-layout) .ambient__mmglow { display: block; }
+}
 
 /* Post-NS: widgets pick up the cool wash with a clear top rim-light and a
    soft blue outer glow. The Clarity widget glows brightest as the source. */
@@ -3884,31 +3897,32 @@ html.theme-light .ambient__rays { display: none !important; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-wrap { transform-origin: top center; pointer-events: auto; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard {
     overflow: visible; justify-content: flex-start !important;
-    position: sticky; top: calc(var(--safe-t, 0px) + 16px);
-    /* z 20 at rest: the Today box (z 30) always reads above the card's bloom
-       bleed (Malik, repeated ask). heroCardLayer lifts the container to 60
-       past mid-morph so the docked chip rides above the z-50 header. */
+    /* v770 (Malik killed the corner dock, picked the lab's "dissolve into
+       glow"): no sticky pin anymore, the card rides normal flow, lags the
+       scroll at 0.3x and fades out while the ambient glow fades in.
+       z 20 at rest: the Today box (z 30) always reads above the card's bloom
+       bleed (Malik, repeated ask). */
     z-index: 20; pointer-events: none;
   }
 
   @supports (animation-timeline: scroll()) {
     /* :not(.evo2): the unlock cinema owns the wrap transform; a scroll-driven
        animation would override the grow classes, so it detaches entirely. */
+    /* v770, Malik's lab pick "dissolve into glow" (verbatim values): the card
+       lags the scroll at 0.3x, gently shrinks and fades to nothing over the
+       first 300px while its color survives as the ambient glow below.
+       pointer-events flips off at the discrete midpoint so the fading glass
+       can never swallow taps meant for the Today box. */
     body.ns-bloom:not(.has-custom-layout):not(.evo2) .app.dash-v2 #dayCard .daycard-wrap {
-      animation: heroCardScale linear both;
+      animation: heroCardDissolve linear both;
       animation-timeline: scroll(root block);
-      animation-range: 0px 438px;
+      animation-range: 0px 300px;
     }
-    body.ns-bloom:not(.has-custom-layout):not(.evo2) .app.dash-v2 .dash-header .dash-header__brand-mark {
-      animation: heroMarkFade linear both;
+    body.ns-bloom:not(.has-custom-layout) .ambient__mmglow {
+      animation: mmGlowIn linear both;
       animation-timeline: scroll(root block);
-      animation-range: 0px 438px;
+      animation-range: 0px 300px;
     }
-    /* heroCardLayer (the z-index flip) is NO LONGER a scroll animation (v769):
-       z-index cannot run on the compositor, so fast up-down flicks re-sorted
-       and re-allocated the page's GPU layers at 120Hz around the flip point,
-       part of the on-device crash loop. The flip is now a hysteresis'd
-       one-shot style write in HeroShrink._zFlip (js/09). */
     /* v768/v769 (Malik): the hub greeting must not peek into the resting first
        screen; it fades in as you scroll down. Scoped to the small #dashHello
        row ONLY: animating the whole #dashBelow held the entire screen-tall
@@ -3921,11 +3935,10 @@ html.theme-light .ambient__rays { display: none !important; }
   }
 }
 @keyframes hubFadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes heroCardScale  { from { transform: translateX(0) scale(1, 1); } to { transform: translateX(calc(14px + (min(82vw, 320px) * 0.0618) / 2 - 50vw)) scale(0.0618, 0.042); } }
-/* The header's own M fades late, as the arriving card replaces it. */
-@keyframes heroMarkFade { 0% { opacity: 1; } 55% { opacity: 1; } 100% { opacity: 0; } }
-/* Discrete z flip at mid-morph: under the Today box at rest, above the header
-   for the dock. */
-@keyframes heroCardLayer { 0% { z-index: 20; } 100% { z-index: 60; } }
+@keyframes heroCardDissolve {
+  from { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+  to   { opacity: 0; transform: translateY(90px) scale(0.94); pointer-events: none; }
+}
+@keyframes mmGlowIn { from { opacity: 0; } to { opacity: 1; } }
 
 
