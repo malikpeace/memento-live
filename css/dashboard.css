@@ -3904,14 +3904,16 @@ html.theme-light .ambient__rays { display: none !important; }
       animation-timeline: scroll(root block);
       animation-range: 0px 438px;
     }
-    body.ns-bloom:not(.has-custom-layout):not(.evo2) .app.dash-v2 #dayCard {
-      animation: heroCardLayer linear both;
-      animation-timeline: scroll(root block);
-      animation-range: 0px 438px;
-    }
-    /* v768 (Malik): the hub (Hello + search/settings) must not peek into the
-       resting first screen; it fades in as you scroll down to it. */
-    body.ns-bloom:not(.has-custom-layout):not(.evo2) .app.dash-v2 #dashBelow {
+    /* heroCardLayer (the z-index flip) is NO LONGER a scroll animation (v769):
+       z-index cannot run on the compositor, so fast up-down flicks re-sorted
+       and re-allocated the page's GPU layers at 120Hz around the flip point,
+       part of the on-device crash loop. The flip is now a hysteresis'd
+       one-shot style write in HeroShrink._zFlip (js/09). */
+    /* v768/v769 (Malik): the hub greeting must not peek into the resting first
+       screen; it fades in as you scroll down. Scoped to the small #dashHello
+       row ONLY: animating the whole #dashBelow held the entire screen-tall
+       hub as one giant composited texture (GPU pressure on phones). */
+    body.ns-bloom:not(.has-custom-layout):not(.evo2) .app.dash-v2 #dashHello {
       animation: hubFadeIn linear both;
       animation-timeline: scroll(root block);
       animation-range: 40px 380px;

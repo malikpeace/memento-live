@@ -5914,6 +5914,11 @@ const HeroShrink = {
     window.addEventListener('pageshow', () => this.layoutGap());
     // v698: where CSS scroll-driven animations exist, the shrink runs on the
     // compositor (css/dashboard.css) and this JS fallback stays out of the way.
+    // The z-flip runs as a JS one-shot on EVERY browser (v769): it was a
+    // scroll-driven z-index animation, but z-index is main-thread-only and
+    // fast up-down flicks thrashed the layer tree around the flip point.
+    // Hysteresis (240 up / 200 down) so oscillation cannot re-trigger it.
+    window.addEventListener('scroll', () => this._zFlip(), { passive: true });
     try { if (CSS.supports('animation-timeline: scroll()')) return; } catch (e) {}
     window.addEventListener('scroll', () => this._queue(), { passive: true });
     window.addEventListener('resize', () => { this._full = 0; this._queue(); });
@@ -5959,6 +5964,18 @@ const HeroShrink = {
     } catch (e) {}
   },
 
+  _zFlip() {
+    try {
+      if (!this._active()) return;
+      const card = document.getElementById('dayCard');
+      if (!card) return;
+      const y = window.scrollY || document.documentElement.scrollTop || 0;
+      const hi = card.style.zIndex === '60';
+      if (!hi && y > 240) card.style.zIndex = '60';
+      else if (hi && y < 200) card.style.zIndex = '';
+    } catch (e) {}
+  },
+
   _active() {
     try {
       return window.matchMedia('(max-width: 767.98px)').matches &&
@@ -5988,8 +6005,8 @@ const HeroShrink = {
     try {
       if (this.card) { this.card.style.height = ''; this.card.style.justifyContent = ''; this.card.style.zIndex = ''; }
       if (this.wrap) { this.wrap.style.transform = ''; }
-      const below = document.getElementById('dashBelow');
-      if (below && below.style.opacity !== '') below.style.opacity = '';
+      const hello = document.getElementById('dashHello');
+      if (hello && hello.style.opacity !== '') hello.style.opacity = '';
       const mark = document.querySelector('.dash-header .dash-header__brand-mark');
       if (mark) mark.style.opacity = '';
     } catch (e) {}
@@ -6024,11 +6041,10 @@ const HeroShrink = {
     this.wrap.style.transform = 'translateX(' + (dxEnd * p).toFixed(1) + 'px) scale(' + sx.toFixed(4) + ', ' + sy.toFixed(4) + ')';
     const mark = document.querySelector('.dash-header .dash-header__brand-mark');
     if (mark) mark.style.opacity = p <= 0.55 ? '' : String(Math.max(0, 1 - (p - 0.55) / 0.45));
-    // Layer flip (mirrors heroCardLayer): above the header only for the dock.
-    this.card.style.zIndex = p > 0.5 ? '60' : '';
-    // Hub fade-in (mirrors hubFadeIn, v768): Hello + modules ride in on scroll.
-    const below = document.getElementById('dashBelow');
-    if (below) below.style.opacity = String(Math.max(0, Math.min(1, (y - 40) / 340)));
+    // (z flip moved to _zFlip, v769: hysteresis'd, runs on all browsers.)
+    // Hub greeting fade-in (mirrors hubFadeIn): rides in on scroll.
+    const hello = document.getElementById('dashHello');
+    if (hello) hello.style.opacity = String(Math.max(0, Math.min(1, (y - 40) / 340)));
   }
 };
 try {
