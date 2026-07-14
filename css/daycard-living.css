@@ -280,6 +280,7 @@ body.stage-cinema .daycard-theme-living .daycard-ns__liquid .blob {
 .dash-header,
 #dashGreetingMobile,
 #dailyMemento,
+#dashBelow,
 #topFade {
   transition: opacity 0.9s ease; /* matches the approved lab's chrome fade */
 }
@@ -287,11 +288,17 @@ body.evo2 #commandCenter,
 body.evo2 .dash-header,
 body.evo2 #dashGreetingMobile,
 body.evo2 #dailyMemento,
+body.evo2 #dashBelow,
 body.evo2 #topFade {
   opacity: 0 !important;
   pointer-events: none;
 }
 body.evo2 #dayCard { position: relative; z-index: 30; }
+/* The cinema's snap strips ns-bloom for its blank beat, which reverts
+   #dashBelow to display:contents, and opacity does NOTHING on a contents
+   element (the hub stayed visible under the blank card, Malik's video).
+   Force it to a real box for the cinema so the opacity hide always bites. */
+body.evo2 #dashBelow { display: block !important; }
 /* THE GROW (Malik v678): once the room is clear, the card rises to ALMOST full
    screen from its own spot, holds there through the purple beats, then eases
    back home before the room returns. The exact scale + vertical centering are
@@ -353,21 +360,15 @@ body.evo2 .ambient__rays { opacity: 0 !important; }
 body.evo2 .daycard-theme-living .daycard-bloom,
 body.evo2 .daycard-theme-living .daycard-floor,
 body.evo2 .daycard-theme-living .daycard-wrap__aura { opacity: 0 !important; }
-/* the shimmer that sweeps across during the surge */
-.evo2-shine {
-  position: absolute; inset: 0; z-index: 4; pointer-events: none;
-  background: linear-gradient(115deg, transparent 32%, rgba(255, 255, 255, 0.30) 50%, transparent 68%);
-  transform: translateX(-130%);
-  mix-blend-mode: screen;
-  animation: evo2Shine 1.8s cubic-bezier(0.4, 0, 0.3, 1) forwards;
-}
-@keyframes evo2Shine { to { transform: translateX(130%); } }
-/* the first light comes in slower than the everyday bloom */
-body.evo2 .ambient__rays { transition: opacity 3.2s ease; }
+/* (the .evo2-shine shimmer sweep was removed in v771, Malik: "I don't like it") */
+/* The first light (the top-left beams) waits for the room (v771, Malik): at
+   finish the chrome fades back FIRST while evo2-afterglow keeps the beams
+   dark; then evo2-beamsin releases them on a slow 3.2s fade. */
+body.evo2-afterglow .ambient__rays { opacity: 0 !important; transition: none !important; }
+body.evo2-beamsin .ambient__rays { transition: opacity 3.2s ease !important; }
 @media (prefers-reduced-motion: reduce) {
   body.evo2 .daycard-wrap,
   body.evo2.evo2-grow .daycard-wrap { transform: none !important; transition: none !important; }
-  .evo2-shine { animation: none; opacity: 0; }
   .evo2-wash { transition: none !important; }
   /* No surge/settle motion for reduced-motion users: the reveal opacity resolves
      instantly to the lit end state instead of animating (the wash opacity is set

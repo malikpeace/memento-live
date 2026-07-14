@@ -3848,6 +3848,20 @@ function _evoFinish(wrap, onDone, opts) {
   try { (window._evoWashAnims || []).forEach(a => { try { a.cancel(); } catch (e) {} }); window._evoWashAnims = []; } catch (e) {}
   try { document.querySelectorAll('.evo2-shine, .evo2-wash').forEach(s => s.remove()); } catch (e) {}
   document.body.classList.remove('evo2', 'evo2-orb', 'evo2-surge', 'evo2-snap', 'evo2-grow');
+  // v771 (Malik): the room returns FIRST, then the top-left beams fade in
+  // slowly on their own. evo2-afterglow keeps the beams dark while the chrome
+  // fades back (~0.9s); evo2-beamsin then releases them on a 3.2s ease.
+  try {
+    const reduceFx = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!reduceFx) {
+      document.body.classList.add('evo2-afterglow');
+      setTimeout(() => {
+        document.body.classList.remove('evo2-afterglow');
+        document.body.classList.add('evo2-beamsin');
+        setTimeout(() => { try { document.body.classList.remove('evo2-beamsin'); } catch (e) {} }, 3600);
+      }, 1300);
+    }
+  } catch (e) {}
   // Always finish on the LIVE card (never a stale detached reference), and clear
   // the grow vars so the card sits exactly at its resting spot.
   wrap = document.querySelector('#dayCard .daycard-wrap') || wrap;
@@ -3999,8 +4013,28 @@ function _runClarityUnlockCinema(onDone, opts) {
     // ns-bloom lights the INTERNAL liquid to its true resting purple so the settle
     // leaves a bright card, not a dark one. The beams + external glow it would also
     // trigger are held off by the body.evo2 suppression until finish drops evo2.
+    // v771 (Malik: "the card drops when it gains color"): adding ns-bloom flips
+    // the home LAYOUT under the card, moving its flow box, and the grown card
+    // rode the shift down-screen. Measure the on-screen top across the flip and
+    // fold the delta back into --evo-ty in the same frame (transition off), so
+    // the card visually stays pinned at center.
+    const _beforeTop = (() => { try { return wrap.getBoundingClientRect().top; } catch (e) { return null; } })();
     document.body.classList.add('ns-bloom');
     document.body.classList.add('evo2-surge');   // fades the resting liquid in (opacity only)
+    try {
+      if (_beforeTop !== null) {
+        void document.body.offsetWidth;
+        const delta = wrap.getBoundingClientRect().top - _beforeTop;
+        if (Math.abs(delta) > 1) {
+          const prevTrans = wrap.style.transition;
+          wrap.style.transition = 'none';
+          const curTy = parseFloat(wrap.style.getPropertyValue('--evo-ty')) || 0;
+          wrap.style.setProperty('--evo-ty', (curTy - delta).toFixed(1) + 'px');
+          void wrap.offsetWidth;
+          wrap.style.transition = prevTrans;
+        }
+      }
+    } catch (e) {}
     if (reduce) { wash.style.opacity = '1'; }
     else {
       try {
@@ -4008,10 +4042,7 @@ function _runClarityUnlockCinema(onDone, opts) {
         window._evoWashAnims.push(a);
       } catch (e) { wash.style.opacity = '1'; }
     }
-    const shine = document.createElement('span');
-    shine.className = 'evo2-shine';
-    ns.appendChild(shine);
-    T.push(setTimeout(() => { try { shine.remove(); } catch (e) {} }, FILL));
+    // (the shimmer sweep was removed in v771, Malik)
   }, tFill));
   T.push(setTimeout(() => {                     // THE SETTLE: full purple -> subtle
     document.body.classList.remove('evo2-surge');
