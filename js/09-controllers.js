@@ -5943,7 +5943,18 @@ const HeroShrink = {
       below.style.setProperty('margin-top', '36px', 'important');
       const wasY = window.scrollY;
       const top = below.getBoundingClientRect().top + wasY;
-      const need = (window.innerHeight + 28) - top;
+      // Measure against the LARGE viewport (100lvh probe), not innerHeight:
+      // in-browser Safari's collapsing toolbar grows the viewport after the
+      // measure, which let the hub peek into the resting screen (v768, Malik).
+      let vh = window.innerHeight;
+      try {
+        const probe = document.createElement('div');
+        probe.style.cssText = 'position:fixed;top:0;left:0;width:0;height:100lvh;visibility:hidden;pointer-events:none;';
+        document.body.appendChild(probe);
+        vh = probe.offsetHeight || vh;
+        probe.remove();
+      } catch (e) {}
+      const need = (vh + 28) - top;
       if (need > 0) below.style.setProperty('margin-top', (36 + Math.ceil(need)) + 'px', 'important');
     } catch (e) {}
   },
@@ -5977,6 +5988,8 @@ const HeroShrink = {
     try {
       if (this.card) { this.card.style.height = ''; this.card.style.justifyContent = ''; this.card.style.zIndex = ''; }
       if (this.wrap) { this.wrap.style.transform = ''; }
+      const below = document.getElementById('dashBelow');
+      if (below && below.style.opacity !== '') below.style.opacity = '';
       const mark = document.querySelector('.dash-header .dash-header__brand-mark');
       if (mark) mark.style.opacity = '';
     } catch (e) {}
@@ -6013,6 +6026,9 @@ const HeroShrink = {
     if (mark) mark.style.opacity = p <= 0.55 ? '' : String(Math.max(0, 1 - (p - 0.55) / 0.45));
     // Layer flip (mirrors heroCardLayer): above the header only for the dock.
     this.card.style.zIndex = p > 0.5 ? '60' : '';
+    // Hub fade-in (mirrors hubFadeIn, v768): Hello + modules ride in on scroll.
+    const below = document.getElementById('dashBelow');
+    if (below) below.style.opacity = String(Math.max(0, Math.min(1, (y - 40) / 340)));
   }
 };
 try {

@@ -895,6 +895,18 @@ body.calm-motion .empty-state, body.lite .empty-state { animation: none; }
   overflow: hidden;
 }
 .welcome-intro.open { opacity: 1; pointer-events: auto; }
+/* CRASH LAW (v768): the intro is STATIC markup, mounted for every user on
+   every load, and "closed" only means opacity 0, which does NOT stop child
+   animations. The aurora's two infinite animations on a huge blurred layer
+   were running behind the whole app forever, and after v761 made them
+   stronger, phones hit GPU exhaustion and WebKit crash-looped on scroll
+   (Malik's "A problem repeatedly occurred" video). When the intro is not
+   open, its animated layers must not RENDER at all. 'open' is only removed
+   under the covering reveal overlay, so the pop-off is never visible. */
+.welcome-intro:not(.open) .welcome-intro__bg,
+.welcome-intro:not(.open) .welcome-intro__stage {
+  display: none;
+}
 /* Keyboard composer pin (welcomeComposerPin in js/11): DISABLED after failing on-device (the
    rail computed against the wrong viewport in the standalone PWA and landed at the TOP of the
    screen). The class is never applied now; rule kept inert for history. */

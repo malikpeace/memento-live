@@ -3909,8 +3909,16 @@ html.theme-light .ambient__rays { display: none !important; }
       animation-timeline: scroll(root block);
       animation-range: 0px 438px;
     }
+    /* v768 (Malik): the hub (Hello + search/settings) must not peek into the
+       resting first screen; it fades in as you scroll down to it. */
+    body.ns-bloom:not(.has-custom-layout):not(.evo2) .app.dash-v2 #dashBelow {
+      animation: hubFadeIn linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 40px 380px;
+    }
   }
 }
+@keyframes hubFadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes heroCardScale  { from { transform: translateX(0) scale(1, 1); } to { transform: translateX(calc(14px + (min(82vw, 320px) * 0.0618) / 2 - 50vw)) scale(0.0618, 0.042); } }
 /* The header's own M fades late, as the arriving card replaces it. */
 @keyframes heroMarkFade { 0% { opacity: 1; } 55% { opacity: 1; } 100% { opacity: 0; } }
