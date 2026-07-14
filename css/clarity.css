@@ -2998,6 +2998,10 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
 .nsv2 {
   /* Above the clarity experience layer, below the global close X (10001). */
   position: fixed; inset: 0; z-index: 9000;
+  /* v773: the long-press must never trigger iOS text selection / callout
+     (Malik's video caught selection handles on the hint mid-hold, a
+     main-thread hitch right as the surge starts). */
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
   background:
     radial-gradient(120% 90% at 50% 38%, #0a1214 0%, #050808 55%, #000 100%);
   display: flex; align-items: center; justify-content: center;
@@ -3112,7 +3116,11 @@ html.lowfx .nsv2-reveal__goal--whole { animation: nsv2WordInLite 1.2s ease forwa
 .nsv2-reveal__after {
   display: flex; flex-direction: column; align-items: center; gap: 20px;
   opacity: 0; animation: nsv2WordIn 1.2s ease forwards;
+  position: relative; z-index: 1;
 }
+/* v773: the whole mote field on ONE composited layer. */
+.nsv2-collapse-canvas { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+@media (prefers-reduced-motion: reduce) { .nsv2-collapse-canvas { display: none; } }
 .nsv2-hold {
   position: relative; width: 76px; height: 76px; cursor: pointer;
   touch-action: none; -webkit-user-select: none; user-select: none;
@@ -3219,7 +3227,13 @@ html.lowfx .nsv2-reveal__goal--whole { animation: nsv2WordInLite 1.2s ease forwa
   .nsv2-collapse-field { display: none; }
   .nsv2.is-holding .nsv2-hold { animation: none; }
 }
-.nsv2-reveal__hint { font-size: var(--fs-md); color: rgba(255,255,255,0.62); line-height: 1.7; }
+.nsv2-reveal__hint {
+  font-size: var(--fs-md); color: rgba(255,255,255,0.62); line-height: 1.7;
+  /* v773 (Malik): the hint dissolves as the hold deepens (gone by ~half),
+     smoothed across the quantized --holdp steps. */
+  opacity: calc(1 - min(1, var(--holdp, 0) * 2.2));
+  transition: opacity 0.25s linear;
+}
 .nsv2-reveal__hint span { color: rgba(255,255,255,0.92); font-weight: 600; }
 .nsv2-reveal__no {
   font: inherit; font-size: var(--fs-sm); font-weight: 500; cursor: pointer;

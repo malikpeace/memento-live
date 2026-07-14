@@ -2316,6 +2316,11 @@ const ClarityExperience = {
   },
 
   updateNav() {
+    // v773 (Malik's video): a stray "Continue" nav flashed under the whiteout
+    // as the star act swapped in, a re-render refilled the wizard nav while
+    // the nsv2 ceremony owned the screen. The nav stays EMPTY whenever the
+    // ceremony root exists, no matter who triggers a render.
+    try { if (document.getElementById('nsv2Root')) { if (this.navEl) this.navEl.innerHTML = ''; return; } } catch (e) {}
     const offset = this.getWizardOffset();
     const total = this.getTotalPages();
     const isLastTut = !this.tutorialOnly && !state.clarity.tutorialSeen && this.currentPage === this.totalTutorialPages - 1;
@@ -7821,28 +7826,16 @@ function renderIgnitionV2(summary) {
     // doubling waves (8/16/32/64/96 = ~220 motes) gated by --holdp thresholds,
     // while the hold's rAF ramps every animation's playbackRate. Sizes carry
     // their own glow; every 3rd mote orbit-falls.
-    const SZ = [4, 5, 6.5, 8, 10, 12];
-    const mass = (px, base) => (base * (0.85 + (px / 12) * 0.33));
-    const mkMote = (i, base, seedA, seedStep) => {
-      const px = SZ[(i * seedStep + seedA) % 6];
-      const orb = i % 3 === 2 ? ' class="orb"' : '';
-      return `<i${orb} style="--a:${(i * 137 + seedA * 41) % 360}deg;--d:${mass(px, base + (i % 5) * 0.22).toFixed(2)}s;--del:${(-(i % 9) * 0.31).toFixed(2)}s;--s:${px}px;--r:${52 + (i % 6) * 7}vmax"></i>`;
-    };
-    let idleM = '';
-    for (let i = 0; i < 4; i++) idleM += mkMote(i, 5.4, 0, 5);
-    const waves = [[8, 2.4], [16, 2.0], [32, 1.7], [64, 1.4], [96, 1.15]];
-    let waveHtml = '';
-    waves.forEach(([n, base], w) => {
-      let m = '';
-      for (let i = 0; i < n; i++) m += mkMote(i, base, w + 1, 7);
-      waveHtml += `<span class="fld fld--wave fld--w${w + 1}">${m}</span>`;
-    });
-    const fieldMotes = `<span class="fld fld--idle">${idleM}</span>${waveHtml}`;
+    // v773 (Malik: the hold MUST be perfectly smooth): the ~220 DOM motes were
+    // ~220 individually composited GPU layers, which is why the hold kept
+    // reading as laggy on-device no matter how the bookkeeping was tuned. The
+    // whole field now renders on ONE canvas (see _nsv2FieldEngine below) with
+    // the exact same parameters, trajectories, sizes, glows, waves and ramp.
     inner = `
       <div class="nsv2-reveal">
+        <canvas class="nsv2-collapse-canvas" id="nsv2FieldCv" aria-hidden="true"></canvas>
         <div class="nsv2-reveal__after" style="animation-delay:${START}ms">
           <div class="nsv2-hold" id="nsv2Hold" role="button" tabindex="0" aria-label="Press and hold to collapse">
-            <span class="nsv2-collapse-field" aria-hidden="true">${fieldMotes}</span>
             <span class="nsv2-hold__core" aria-hidden="true"></span>
           </div>
           <div class="nsv2-reveal__hint"><span>Press and hold to collapse.</span></div>
@@ -7963,6 +7956,163 @@ function bindIgnitionV2(container) {
   }
 }
 
+// ── The collapse field, on ONE canvas (v773) ────────────────────────────────
+// Exact port of the DOM field's parameters (v730-732): 4 idle motes + five
+// doubling waves (8/16/32/64/96) gated by hold-progress thresholds, straight
+// falls eased by cubic-bezier(0.45,0,0.75,0.4), every 3rd mote orbit-falling
+// through the v728 velocity-matched two-segment spiral, sizes 4-12px with
+// mass-scaled durations and s*2.2 glows, the whole field contracting with the
+// hold and the speed ramping 1x -> 3.8x. One composited layer instead of ~220.
+function _nsv2FieldEngine(root) {
+  const cv = root.querySelector('#nsv2FieldCv');
+  const holdEl = root.querySelector('#nsv2Hold');
+  if (!cv || !holdEl) return null;
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return null;
+  const ctx = cv.getContext('2d');
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  let W = 0, H = 0, cx = 0, cy = 0, vmax = 0;
+  const size = () => {
+    W = window.innerWidth; H = window.innerHeight;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    vmax = Math.max(W, H) / 100;
+    try { const r = holdEl.getBoundingClientRect(); cx = r.left + r.width / 2; cy = r.top + r.height / 2; } catch (e) { cx = W / 2; cy = H / 2; }
+  };
+  size();
+  window.addEventListener('resize', size);
+  // cubic-bezier evaluator (x -> t -> y), Newton + bisection fallback
+  const bez = (x1, y1, x2, y2) => {
+    const cxb = 3 * x1, bxb = 3 * (x2 - x1) - cxb, axb = 1 - cxb - bxb;
+    const cyb = 3 * y1, byb = 3 * (y2 - y1) - cyb, ayb = 1 - cyb - byb;
+    const sx = (t) => ((axb * t + bxb) * t + cxb) * t;
+    const dx = (t) => (3 * axb * t + 2 * bxb) * t + cxb;
+    return (x) => {
+      if (x <= 0) return 0; if (x >= 1) return 1;
+      let t = x;
+      for (let i = 0; i < 5; i++) { const e = sx(t) - x; const d = dx(t); if (Math.abs(e) < 1e-4 || d < 1e-6) break; t -= e / d; }
+      if (t < 0) t = 0; if (t > 1) t = 1;
+      return ((ayb * t + byb) * t + cyb) * t;
+    };
+  };
+  const easeFall = bez(0.45, 0, 0.75, 0.4);
+  const easeS1 = bez(0.4, 0, 0.7, 0.5);
+  const easeS2 = bez(0.3, 0.5, 0.75, 0.5);
+  // motes: same generator math as the DOM mkMote
+  const SZ = [4, 5, 6.5, 8, 10, 12];
+  const mass = (px, base) => (base * (0.85 + (px / 12) * 0.33));
+  const motes = [];
+  const mk = (i, base, seedA, seedStep, wave) => {
+    const px = SZ[(i * seedStep + seedA) % 6];
+    const d = mass(px, base + (i % 5) * 0.22);
+    const del = (i % 9) * 0.31;
+    motes.push({
+      a: ((i * 137 + seedA * 41) % 360) * Math.PI / 180,
+      d: d, s: px, r: 52 + (i % 6) * 7,
+      orb: i % 3 === 2, wave: wave,
+      phase: (del / d) % 1
+    });
+  };
+  for (let i = 0; i < 4; i++) mk(i, 5.4, 0, 5, -1);
+  [[8, 2.4], [16, 2.0], [32, 1.7], [64, 1.4], [96, 1.15]].forEach((wv, w) => {
+    for (let i = 0; i < wv[0]; i++) mk(i, wv[1], w + 1, 7, w);
+  });
+  const WAVE_T = [0.02, 0.18, 0.36, 0.54, 0.72];
+  // pre-rendered sprites (core + glow) per size, at 2x headroom for the glow
+  const sprites = {};
+  const sprite = (px) => {
+    let sp = sprites[px];
+    if (sp) return sp;
+    const glow = px * 2.2;
+    const rad = px / 2 + glow;
+    const c = document.createElement('canvas');
+    c.width = c.height = Math.ceil(rad * 2 * dpr);
+    const g = c.getContext('2d');
+    g.scale(dpr, dpr);
+    // the box-shadow glow: a soft radial halo
+    let gr = g.createRadialGradient(rad, rad, px * 0.2, rad, rad, rad);
+    gr.addColorStop(0, 'rgba(150,220,245,0.65)');
+    gr.addColorStop(0.45, 'rgba(150,220,245,0.28)');
+    gr.addColorStop(1, 'rgba(150,220,245,0)');
+    g.fillStyle = gr; g.fillRect(0, 0, rad * 2, rad * 2);
+    // the mote body
+    gr = g.createRadialGradient(rad - px * 0.08, rad - px * 0.1, px * 0.08, rad, rad, px / 2);
+    gr.addColorStop(0, '#ffffff');
+    gr.addColorStop(0.55, 'rgba(214,236,252,0.95)');
+    gr.addColorStop(1, 'rgba(170,225,248,0.85)');
+    g.fillStyle = gr;
+    g.beginPath(); g.arc(rad, rad, px / 2, 0, Math.PI * 2); g.fill();
+    sp = { c: c, rad: rad };
+    sprites[px] = sp;
+    return sp;
+  };
+  const eng = { p: 0, holding: false, stopped: false, fade: 1 };
+  let last = performance.now(), raf = 0;
+  const SHAKE = [[0, 0], [2.6, -1.8], [-2.2, 1.4], [1.8, 2.2]];
+  const frame = (now) => {
+    if (eng.stopped && eng.fade <= 0) { try { ctx.clearRect(0, 0, cv.width, cv.height); } catch (e) {} return; }
+    if (!cv.isConnected) return;
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    if (eng.stopped) eng.fade = Math.max(0, eng.fade - dt * 4);
+    const p = eng.p;
+    const rate = 1 + p * 2.8;
+    const fieldScale = 1 - p * 0.5;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    // pressure shake (mirrors nsv2CollapseShake, 0.3s cycle, amplitude * p)
+    let ox = 0, oy = 0;
+    if (eng.holding && p > 0) {
+      const sh = SHAKE[Math.floor((now / 75) % 4)];
+      ox = sh[0] * p; oy = sh[1] * p;
+    }
+    for (let i = 0; i < motes.length; i++) {
+      const m = motes[i];
+      let wa = 1;
+      if (m.wave >= 0) {
+        if (!eng.holding && p <= 0) continue;              // waves sleep until the hold
+        wa = Math.max(0, Math.min(1, (p - WAVE_T[m.wave]) * 6));
+        if (wa <= 0) continue;
+      }
+      m.phase += (dt / m.d) * rate;
+      if (m.phase >= 1) m.phase -= 1;
+      const ph = m.phase;
+      let ang, rr, sc, op;
+      if (m.orb) {
+        if (ph < 0.5) {
+          const t = easeS1(ph / 0.5);
+          ang = m.a + (140 * Math.PI / 180) * t;
+          rr = m.r * (1 - 0.58 * t);
+          sc = 1 - 0.15 * t;
+        } else {
+          const t = easeS2((ph - 0.5) / 0.5);
+          ang = m.a + (140 + 160 * t) * Math.PI / 180;
+          rr = m.r * 0.42 * (1 - t) + (3 / vmax) * t;
+          sc = 0.85 - 0.65 * t;
+        }
+        op = ph < 0.1 ? ph / 0.1 * 0.95 : ph < 0.5 ? 0.95 - (ph - 0.1) / 0.4 * 0.05 : ph < 0.93 ? 0.9 - (ph - 0.5) / 0.43 * 0.05 : 0.85 * (1 - (ph - 0.93) / 0.07);
+      } else {
+        const e = easeFall(ph);
+        ang = m.a;
+        rr = m.r * (1 - e) + (3 / vmax) * e;
+        sc = 1 - 0.8 * e;
+        op = ph < 0.12 ? ph / 0.12 * 0.95 : ph < 0.93 ? 0.95 - (ph - 0.12) / 0.81 * 0.05 : 0.9 * (1 - (ph - 0.93) / 0.07);
+      }
+      const dist = rr * vmax * fieldScale;
+      const x = cx + Math.cos(ang) * dist + ox;
+      const y = cy + Math.sin(ang) * dist + oy;
+      const sp = sprite(m.s);
+      const half = sp.rad * sc * fieldScale;
+      if (x + half < 0 || x - half > W || y + half < 0 || y - half > H) continue;
+      ctx.globalAlpha = Math.max(0, Math.min(1, op * wa)) * eng.fade;
+      ctx.drawImage(sp.c, x - half, y - half, half * 2, half * 2);
+    }
+    ctx.globalAlpha = 1;
+    raf = requestAnimationFrame(frame);
+  };
+  raf = requestAnimationFrame(frame);
+  eng.stop = () => { eng.stopped = true; };
+  eng.destroy = () => { eng.stopped = true; eng.fade = 0; try { cancelAnimationFrame(raf); } catch (e) {} try { window.removeEventListener('resize', size); } catch (e) {} };
+  return eng;
+}
+
 // Press-and-hold on the ring under the sentence. Filling the ring is the
 // confirmation: release early and it resets, so nobody ignites by accident.
 function _bindHoldToIgnite(root) {
@@ -7970,21 +8120,9 @@ function _bindHoldToIgnite(root) {
   if (!hold) return;
   const HOLD_MS = 5000;
   let raf = null, start = 0, done = false;
-  // v730 (Malik): the fall SPEED ramps with the hold, 1x -> ~3.8x. playbackRate
-  // changes speed without position jumps (Web Animations API); applied in
-  // steps so ~220 animations are not touched every frame.
-  let fieldAnims = null, lastRate = 1;
-  const setRate = (rate) => {
-    try {
-      if (!fieldAnims) {
-        const f = root.querySelector('.nsv2-collapse-field');
-        fieldAnims = f ? f.getAnimations({ subtree: true }) : [];
-      }
-      if (Math.abs(rate - lastRate) < 0.06) return;
-      lastRate = rate;
-      fieldAnims.forEach((a) => { a.playbackRate = rate; });
-    } catch (e) {}
-  };
+  // v773: the mote field lives on one canvas; the engine reads p directly
+  // (its speed ramp 1x -> 3.8x and wave gates run inside its own rAF).
+  const eng = _nsv2FieldEngine(root);
   let lastQ = -1;
   const setP = (p) => {
     // No progress ring anymore (Malik): the touch point itself grows + glows
@@ -7992,17 +8130,16 @@ function _bindHoldToIgnite(root) {
     // v765 (Malik: hold got laggy): --holdp drives var()-based box-shadows,
     // shake keyframes and the beams' brightness FILTER, each write re-rasters
     // them. Quantize to 2% steps: ~50 restyles over the 5s hold instead of
-    // ~300 per-frame ones. The motes' own animations + the playbackRate ramp
-    // are independent, so the visible motion stays perfectly continuous.
+    // ~300 per-frame ones. The canvas field is independent and continuous.
     const q = p <= 0 ? 0 : Math.round(p * 50) / 50;
     if (q !== lastQ) { lastQ = q; root.style.setProperty('--holdp', String(q)); }
-    setRate(p <= 0 ? 1 : 1 + p * 2.8);
+    if (eng) { eng.p = p; eng.holding = p > 0; }
   };
   const tick = (t) => {
     if (done) return;
     const p = Math.min(1, (t - start) / HOLD_MS);
     setP(p);
-    if (p >= 1) { done = true; root.classList.remove('is-holding'); _ig2Signed(root); return; }
+    if (p >= 1) { done = true; root.classList.remove('is-holding'); if (eng) eng.stop(); _ig2Signed(root); return; }
     raf = requestAnimationFrame(tick);
   };
   const begin = (e) => {
