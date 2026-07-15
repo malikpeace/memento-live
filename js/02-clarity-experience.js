@@ -7624,41 +7624,39 @@ function starSeedFromGoal(goal) {
 // ============================================================
 function _renderNext7Days() {
   const name = (state.profile && state.profile.name) ? String(state.profile.name).trim() : '';
-  const star = (state.clarity && state.clarity.answers && state.clarity.answers.neutronStar) || '';
   const greet = name ? (esc(name) + ", here's exactly what's coming.") : "Here's exactly what's coming.";
+  // v778 (Malik's Ascent, grilled + locked): numeral lives IN the node, title +
+  // one line beside it, no labels, no eyebrow, no goal echo. Day 3 is the dip
+  // (white node, darker stretch), day 7 the green summit.
   const DAYS = [
-    { n: 'DAY 1', t: 'You start.', d: "One real move toward your goal. You're already past everyone who only talked about it." },
-    { n: 'DAY 2', t: 'It holds.', d: "Day two proves day one wasn't a fluke." },
-    { n: 'DAY 3 &middot; THE DIP', t: 'This is where most quit.', d: "Motivation drops. Nothing feels different yet. Showing up today is the whole game.", cls: 'n7d-day--dip' },
-    { n: 'DAY 4', t: 'It eases.', d: "You stop forcing it. Momentum starts carrying the weight for you." },
-    { n: 'DAY 5', t: 'It shows.', d: "Someone notices something's different before you say a word." },
-    { n: 'DAY 6', t: "It's yours.", d: "The effort fades. It just feels like who you are now." },
-    { n: 'DAY 7', t: 'Proof.', d: "Seven days. The week that ends most people didn't end you.", cls: 'n7d-day--win' }
+    { t: 'You start.', d: "One real move toward your goal. You're already past everyone who only talked about it." },
+    { t: 'It holds.', d: "Day two proves day one wasn't a fluke." },
+    { t: 'This is where most quit.', d: "Motivation drops. Nothing feels different yet. Showing up today is the whole game.", cls: 'n7d-day--dip' },
+    { t: 'It eases.', d: "You stop forcing it. Momentum starts carrying the weight for you." },
+    { t: 'It shows.', d: "Someone notices something's different before you say a word." },
+    { t: "It's yours.", d: "The effort fades. It just feels like who you are now." },
+    { t: 'Proof.', d: "Seven days. The week that ends most people didn't end you.", cls: 'n7d-day--win' }
   ];
-  const daysHtml = DAYS.map(o =>
-    `<div class="n7d-day ${o.cls || ''}"><div class="n7d-node"></div><div class="n7d-num">${o.n}</div><div class="n7d-title">${esc(o.t)}</div><div class="n7d-desc">${esc(o.d)}</div></div>`
-  ).join('');
-  const starHtml = star ? `<p class="n7d-star" id="n7dStar">Toward <b>&ldquo;${esc(star)}&rdquo;</b></p>` : '';
-  const cue = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  // The document is the mountain: day 7 nearest the top, day 1 at the base,
+  // the hero below it all. The view STARTS at the bottom; pulling the content
+  // down climbs upward.
+  const daysHtml = DAYS.map((o, i) =>
+    `<div class="n7d-day ${o.cls || ''}" data-n7day="${i + 1}"><div class="n7d-node">${i + 1}</div><div class="n7d-title">${esc(o.t)}</div><div class="n7d-desc">${esc(o.d)}</div></div>`
+  ).reverse().join('');
   return `<div class="n7d" id="n7dRoot" role="dialog" aria-label="Your first 7 days">
-    <div class="n7d-glow n7d-glow--top" aria-hidden="true"></div>
-    <div class="n7d-glow n7d-glow--bot" aria-hidden="true"></div>
+    <div class="n7d-summit" aria-hidden="true"></div>
     <div class="n7d-topfade" aria-hidden="true"></div>
     <div class="n7d-scroll" id="n7dScroll">
       <div class="n7d-inner">
+        <p class="n7d-close" id="n7dClose">This week is the hardest it ever gets. <b>After it, momentum does the lifting.</b></p>
+        <div class="n7d-endcta"><button type="button" class="n7d-cta" id="n7dCta">Start Day 1</button></div>
+        <div class="n7d-path"><div class="n7d-line" aria-hidden="true"></div>${daysHtml}</div>
         <div class="n7d-hero">
-          <div class="n7d-eyebrow" id="n7dEyebrow">The first 7 days</div>
           <h1 class="n7d-h1" id="n7dTitle" data-n7d-type="${esc(greet)}"></h1>
           <p class="n7d-sub" id="n7dSub">Week one is the one that breaks people. You'll see every step before it hits, especially the day that makes most of them quit.</p>
-          ${starHtml}
-          <div class="n7d-cue" id="n7dCue" aria-hidden="true">${cue}</div>
         </div>
-        <div class="n7d-path">${daysHtml}</div>
-        <p class="n7d-close" id="n7dClose">This week is the hardest it ever gets. <b>After it, momentum does the lifting.</b></p>
-        <div class="n7d-end" id="n7dEnd" aria-hidden="true"></div>
       </div>
     </div>
-    <div class="n7d-bar" id="n7dBar"><button type="button" class="n7d-cta" id="n7dCta">Start Day 1</button></div>
   </div>`;
 }
 // A small typewriter for the hero title: words kept whole (no mid-word wrap),
@@ -7692,63 +7690,101 @@ function showNext7Days(onProceed) {
     document.body.style.overflow = 'hidden';
     const scroll = root.querySelector('#n7dScroll');
     const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    requestAnimationFrame(() => root.classList.add('n7d--in'));
+    // Start at the BASE of the mountain (the hero, bottom of the document).
+    scroll.scrollTop = scroll.scrollHeight;
+    requestAnimationFrame(() => { scroll.scrollTop = scroll.scrollHeight; root.classList.add('n7d--in'); });
 
-    // Hero sequence (Malik: slower, typewriter): eyebrow fades, the title TYPES
-    // with the tick, then the sub / star / scroll cue fade in after it lands.
-    const eyebrow = root.querySelector('#n7dEyebrow');
     const title = root.querySelector('#n7dTitle');
     const sub = root.querySelector('#n7dSub');
-    const starEl = root.querySelector('#n7dStar');
-    const cueEl = root.querySelector('#n7dCue');
     const titleText = title ? (title.getAttribute('data-n7d-type') || '') : '';
+    // Days in CLIMB order (1..7); the DOM lists them 7..1.
+    const days = Array.from(root.querySelectorAll('.n7d-day')).reverse();
+
+    // Ignite on approach, whoever is driving. Day 7 lights the summit (aurora
+    // + closing line + CTA ride the n7d--lit class with their own delays).
+    const ignite = (el) => {
+      if (!el || el.classList.contains('is-in')) return;
+      el.classList.add('is-in');
+      try { if (typeof MementoSound !== 'undefined') MementoSound.tick(); } catch (e) {}
+      if (el.classList.contains('n7d-day--win')) root.classList.add('n7d--lit');
+    };
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((es) => {
+        es.forEach(e => { if (e.isIntersecting) { ignite(e.target); io.unobserve(e.target); } });
+      }, { root: scroll, threshold: 0.6 });
+      days.forEach(el => io.observe(el));
+    } else {
+      days.forEach(ignite);
+    }
+
+    // The camera: scrollTop tweens (rAF) up the mountain, ~2.5s a day. The
+    // FIRST touch/wheel kills auto for good; taps advance one day in either mode.
+    let autoOn = !reduce, tweenRaf = 0, seqTimer = 0, dayIdx = -1;
+    const centerOf = (el) => {
+      const target = el.offsetTop - (scroll.clientHeight / 2) + (el.offsetHeight / 2);
+      return Math.max(0, Math.min(target, scroll.scrollHeight - scroll.clientHeight));
+    };
+    const tweenTo = (to, ms) => {
+      cancelAnimationFrame(tweenRaf);
+      const from = scroll.scrollTop, d = to - from, t0 = performance.now();
+      const ease = (x) => 1 - Math.pow(1 - x, 3);
+      const step = (now) => {
+        const p = Math.min(1, (now - t0) / ms);
+        scroll.scrollTop = from + d * ease(p);
+        if (p < 1) tweenRaf = requestAnimationFrame(step);
+      };
+      tweenRaf = requestAnimationFrame(step);
+    };
+    const goTo = (idx, ms) => {
+      dayIdx = Math.max(0, Math.min(days.length - 1, idx));
+      tweenTo(centerOf(days[dayIdx]), ms || 950);
+    };
+    const stopAuto = () => {
+      if (!autoOn && !seqTimer && !tweenRaf) return;
+      autoOn = false;
+      clearTimeout(seqTimer); seqTimer = 0;
+      cancelAnimationFrame(tweenRaf); tweenRaf = 0;
+    };
+    const seq = () => {
+      if (!autoOn) return;
+      if (dayIdx >= days.length - 1) {
+        // past the summit: settle on the closing + CTA, then rest.
+        seqTimer = setTimeout(() => { if (autoOn) tweenTo(0, 1100); }, 1400);
+        return;
+      }
+      goTo(dayIdx + 1, 950);
+      seqTimer = setTimeout(seq, 2500);
+    };
+    // Manual takeover: real gestures only (never the programmatic tween).
+    ['touchstart', 'wheel', 'keydown'].forEach(ev =>
+      scroll.addEventListener(ev, stopAuto, { passive: true }));
+    // Tap = one day up (works in both modes; the CTA handles itself).
+    scroll.addEventListener('click', (e) => {
+      if (e.target && e.target.closest && e.target.closest('#n7dCta')) return;
+      clearTimeout(seqTimer); seqTimer = 0;
+      goTo(dayIdx + 1, 700);
+      if (autoOn) seqTimer = setTimeout(seq, 2400);
+    });
+
+    // Hero: the title TYPES with the tick, the sub lands, then the climb begins.
     if (reduce) {
       if (title) title.textContent = titleText;
-      [eyebrow, title, sub, starEl, cueEl].forEach(el => el && el.classList.add('on'));
+      if (sub) sub.classList.add('on');
+      days.forEach(ignite);
     } else {
-      setTimeout(() => { if (eyebrow) eyebrow.classList.add('on'); }, 500);
       setTimeout(() => {
         if (!title) return;
         title.classList.add('on');
         _n7dType(title, titleText, 52, () => {
           setTimeout(() => { if (sub) sub.classList.add('on'); }, 280);
-          setTimeout(() => { if (starEl) starEl.classList.add('on'); }, 720);
-          setTimeout(() => { if (cueEl) cueEl.classList.add('on'); }, 1040);
+          seqTimer = setTimeout(seq, 2100);
         });
-      }, 1350);
+      }, 900);
     }
-
-    // Reveal each day as it scrolls into view (root = the single scroll container).
-    const items = root.querySelectorAll('.n7d-day, #n7dClose');
-    const bar = root.querySelector('#n7dBar');
-    if ('IntersectionObserver' in window) {
-      const io = new IntersectionObserver((es) => {
-        es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } });
-      }, { root: scroll, threshold: 0.25, rootMargin: '0px 0px -10% 0px' });
-      items.forEach(el => io.observe(el));
-    } else {
-      items.forEach(el => el.classList.add('is-in'));
-    }
-
-    // The background EVOLVES with scroll (purple clarity at the top fades to
-    // green consistency at the bottom), and the CTA appears only at the VERY
-    // bottom (Malik).
-    let ticking = false;
-    const onScroll = () => {
-      if (ticking) return; ticking = true;
-      requestAnimationFrame(() => {
-        const max = Math.max(1, scroll.scrollHeight - scroll.clientHeight);
-        const p = Math.min(1, Math.max(0, scroll.scrollTop / max));
-        root.style.setProperty('--n7dp', p.toFixed(3));
-        if (bar) bar.classList.toggle('is-in', (scroll.scrollTop + scroll.clientHeight) >= (scroll.scrollHeight - 14));
-        ticking = false;
-      });
-    };
-    scroll.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
 
     const cta = root.querySelector('#n7dCta');
     if (cta) cta.addEventListener('click', () => {
+      stopAuto();
       root.classList.add('n7d--out');
       setTimeout(() => {
         try { root.remove(); } catch (e) {}
@@ -7758,6 +7794,7 @@ function showNext7Days(onProceed) {
     });
   } catch (e) { try { if (typeof onProceed === 'function') onProceed(); } catch (_) {} }
 }
+
 
 // `finalize` is the per-entry close step (close / completeWizard).
 function _addToMementoThenAction(finalize) {

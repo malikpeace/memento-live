@@ -4170,21 +4170,28 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
    ============================================================ */
 .n7d {
   position: fixed; inset: 0; z-index: 9500; overflow: hidden;
-  background: radial-gradient(130% 90% at 50% 8%, #0d1618 0%, #080d0e 42%, #030505 100%);
+  /* v778 (Malik's Ascent, near-black + summit glow): the path is the only
+     light source; the green summit aurora is EARNED when day 7 ignites. */
+  background: radial-gradient(130% 90% at 50% 8%, #0a0f11 0%, #070b0c 42%, #030505 100%);
   opacity: 0; transform: translateY(26px);
   transition: opacity 0.6s cubic-bezier(0.22,1,0.36,1), transform 0.6s cubic-bezier(0.22,1,0.36,1);
   --text-hi: rgba(255,255,255,0.96);
-  --text-mid: rgba(255,255,255,0.72);
+  --text-mid: rgba(255,255,255,0.75);
   --text-lo: rgba(255,255,255,0.42);
+  --n7-cyan: 58, 217, 245;
+  --n7-green: 63, 217, 78;
 }
 .n7d--in { opacity: 1; transform: none; }
 .n7d--out { opacity: 0; transform: translateY(-10px); transition: opacity 0.4s ease, transform 0.4s ease; }
 
-/* background EVOLVES with scroll: purple (clarity) at the top fades out, green
-   (consistency) at the bottom fades in, driven by --n7dp (0..1) from JS */
-.n7d-glow { position: absolute; inset: 0; z-index: 0; pointer-events: none; transition: opacity 0.2s linear; }
-.n7d-glow--top { background: radial-gradient(85% 52% at 50% 0%, rgba(124, 235, 255,0.17), transparent 60%); opacity: calc(1 - var(--n7dp, 0) * 0.85); }
-.n7d-glow--bot { background: radial-gradient(95% 55% at 50% 100%, rgba(120, 230, 129,0.17), transparent 60%); opacity: var(--n7dp, 0); }
+/* The summit aurora: fixed at the top, radial (edge-safe by construction),
+   lit only when day 7 ignites. */
+.n7d-summit {
+  position: absolute; top: -12%; left: -20%; right: -20%; height: 46%;
+  z-index: 0; pointer-events: none; opacity: 0; transition: opacity 2.4s ease;
+  background: radial-gradient(60% 58% at 50% 22%, rgba(var(--n7-green), 0.26), transparent 68%);
+}
+.n7d--lit .n7d-summit { opacity: 1; }
 
 .n7d-scroll {
   position: absolute; inset: 0; z-index: 1; overflow-y: auto; overflow-x: hidden;
@@ -4192,37 +4199,31 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
 }
 .n7d-inner {
   max-width: 440px; margin: 0 auto;
-  padding: calc(var(--safe-t, 0px) + 30px) 26px calc(var(--safe-b, 0px) + 120px);
+  padding: calc(var(--safe-t, 0px) + 90px) 26px calc(var(--safe-b, 0px) + 40px);
 }
-
-/* top fade under the status bar (dark, correct on both themes) */
 .n7d-topfade {
   position: absolute; top: 0; left: 0; right: 0; z-index: 4; pointer-events: none;
   height: calc(var(--safe-t, 0px) + 54px);
   background: linear-gradient(180deg, #05090a 0%, #05090a 44%, rgba(5, 9, 10,0) 100%);
 }
 
-/* HERO fills the first screen; the intro TYPES in (Malik) */
+/* HERO sits at the BASE of the climb (the bottom of the document): title types,
+   one sub line, nothing else (Malik: no eyebrow, no goal echo). */
 .n7d-hero {
-  min-height: calc(100lvh - var(--safe-t, 0px) - 96px);
+  min-height: calc(100lvh - var(--safe-t, 0px) - 150px);
   display: flex; flex-direction: column; justify-content: center; align-items: center;
-  text-align: center; padding-bottom: 12px;
+  text-align: center;
 }
-.n7d-eyebrow, .n7d-sub, .n7d-star, .n7d-cue {
+.n7d-sub {
   opacity: 0; transform: translateY(10px);
   transition: opacity 0.85s cubic-bezier(0.22,1,0.36,1), transform 0.85s cubic-bezier(0.22,1,0.36,1);
 }
-.n7d-eyebrow.on, .n7d-sub.on, .n7d-star.on, .n7d-cue.on { opacity: 1; transform: none; }
-.n7d-eyebrow {
-  font-family: var(--font); font-size: 11.5px; font-weight: 700;
-  letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-lo);
-}
+.n7d-sub.on { opacity: 1; transform: none; }
 .n7d-h1 {
-  margin: 15px 0 0; min-height: 1.14em; text-wrap: balance;
+  margin: 0; min-height: 1.14em; text-wrap: balance;
   font-family: var(--font); font-size: 30px; line-height: 1.14; font-weight: 800;
   letter-spacing: -0.02em; color: var(--text-hi);
 }
-/* typewriter: whole words never break; chars reveal one at a time */
 .n7d-w { white-space: nowrap; display: inline-block; }
 .n7d-ch { opacity: 0; }
 .n7d-ch.on { opacity: 1; transition: opacity 0.09s ease; }
@@ -4230,68 +4231,74 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
   margin: 18px auto 0; max-width: 34ch; text-wrap: balance;
   font-family: var(--font); font-size: 15.5px; line-height: 1.55; color: var(--text-mid);
 }
-.n7d-star {
-  margin: 24px auto 0; max-width: 30ch;
-  font-family: var(--font); font-size: 13px; line-height: 1.5; color: var(--text-lo);
-}
-.n7d-star b { color: var(--text-mid); font-weight: 600; }
-.n7d-cue { margin-top: 42px; color: rgba(255,255,255,0.32); line-height: 0; }
-.n7d-cue.on { animation: n7dCue 1.9s ease-in-out 0.5s infinite; }
 
-/* the path: a GAP-ONLY connector (never crosses the text) between nodes */
-.n7d-path { position: relative; margin-top: 8px; padding-top: 8px; }
+/* THE ASCENT: day 7 sits nearest the top of the document, day 1 at the base
+   above the hero; scrolling the content down (the natural pull) climbs UP. */
+.n7d-path { position: relative; padding: 10px 0 26px; }
+.n7d-line {
+  position: absolute; left: 15px; top: 24px; bottom: 6px; width: 2px; z-index: 0;
+  background: linear-gradient(180deg,
+    rgba(var(--n7-green), 0.75) 0%,
+    rgba(var(--n7-cyan), 0.55) 26%,
+    rgba(var(--n7-cyan), 0.30) 70%,
+    rgba(var(--n7-cyan), 0.10) 100%);
+}
 .n7d-day {
-  position: relative; text-align: center; padding-bottom: 58px;
-  opacity: 0; transform: translateY(22px);
-  transition: opacity 0.75s cubic-bezier(0.22,1,0.36,1), transform 0.75s cubic-bezier(0.22,1,0.36,1);
+  position: relative; padding: 0 0 64px 58px; text-align: left;
+  opacity: 0.14; transform: translateY(10px);
+  transition: opacity 0.9s cubic-bezier(0.22,1,0.36,1), transform 0.9s cubic-bezier(0.22,1,0.36,1);
 }
 .n7d-day.is-in { opacity: 1; transform: none; }
-.n7d-day::before {
-  content: ""; position: absolute; left: 50%; top: -56px;
-  width: 1.5px; height: 62px; transform: translateX(-50%);
-  background: rgba(255,255,255,0.10); z-index: 0;
-}
-.n7d-day:first-child::before { display: none; }
-.n7d-day--win::before { background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(120, 230, 129,0.4)); }
 .n7d-node {
-  width: 11px; height: 11px; border-radius: 50%; margin: 0 auto 20px;
-  background: #fff; box-shadow: 0 0 0 5px #080d0e, 0 0 16px rgba(255,255,255,0.45);
-  position: relative; z-index: 2;
+  position: absolute; left: 0; top: -1px; width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; z-index: 1;
+  font-family: var(--font); font-size: 13.5px; font-weight: 700; font-variant-numeric: tabular-nums;
+  color: rgba(255,255,255,0.55);
+  background: #070c0d; box-shadow: inset 0 0 0 1.5px rgba(var(--n7-cyan), 0.35);
+  transition: color 0.7s ease, box-shadow 0.7s ease, background 0.7s ease;
 }
-.n7d-num {
-  font-family: var(--font); font-size: 11px; font-weight: 700; letter-spacing: 0.2em;
-  color: var(--text-lo); font-variant-numeric: tabular-nums;
+.n7d-day.is-in .n7d-node {
+  color: #06181c; background: rgb(122, 226, 246);
+  box-shadow: 0 0 0 5px #050808, 0 0 22px rgba(var(--n7-cyan), 0.65);
 }
-.n7d-title { margin-top: 7px; font-family: var(--font); font-size: 21px; font-weight: 700; letter-spacing: -0.01em; color: var(--text-hi); }
-.n7d-desc { margin: 9px auto 0; max-width: 27ch; font-family: var(--font); font-size: 14.5px; line-height: 1.5; color: var(--text-mid); text-wrap: balance; }
-.n7d-day--dip .n7d-node {
-  background: transparent; box-shadow: 0 0 0 5px #080d0e;
-  border: 1.5px solid rgba(255,255,255,0.55); width: 13px; height: 13px;
-}
-.n7d-day--dip .n7d-num { color: rgba(120, 230, 129,0.92); }
-.n7d-day--win .n7d-node { background: rgb(120, 230, 129); box-shadow: 0 0 0 5px #080d0e, 0 0 20px rgba(120, 230, 129,0.6); }
-.n7d-day--win .n7d-num { color: rgba(120, 230, 129,0.92); }
+.n7d-title { font-family: var(--font); font-size: 21px; font-weight: 800; letter-spacing: -0.015em; color: var(--text-hi); }
+.n7d-desc { margin: 8px 0 0; max-width: 28ch; font-family: var(--font); font-size: 14.5px; line-height: 1.55; color: var(--text-mid); }
 
+/* Day 3, the dip: a darker stretch; its node ignites plain white. */
+.n7d-day--dip::before {
+  content: ""; position: absolute; inset: -34px -40px -30px -30px; z-index: -1; pointer-events: none;
+  background: radial-gradient(85% 80% at 40% 50%, rgba(0,0,0,0.55), transparent 75%);
+}
+.n7d-day--dip .n7d-node { box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.35); }
+.n7d-day--dip.is-in .n7d-node {
+  color: #0b0d0e; background: #f2f6f7;
+  box-shadow: 0 0 0 5px #050808, 0 0 20px rgba(255,255,255,0.5);
+}
+
+/* Day 7, the summit: spring green, the consistency color being born. */
+.n7d-day--win .n7d-node { box-shadow: inset 0 0 0 1.5px rgba(var(--n7-green), 0.45); }
+.n7d-day--win.is-in .n7d-node {
+  color: #06180a; background: rgb(88, 226, 104);
+  box-shadow: 0 0 0 5px #050808, 0 0 26px rgba(var(--n7-green), 0.8);
+}
+.n7d-day--win.is-in .n7d-title { text-shadow: 0 0 30px rgba(var(--n7-green), 0.35); }
+
+/* Closing line + CTA live ABOVE day 7 (the top of the climb); both are gated
+   on day 7 igniting (n7d--lit), never on their own scroll position. */
 .n7d-close {
-  text-align: center; max-width: 30ch; margin: 4px auto 0;
+  text-align: left; max-width: 30ch; margin: 0 0 26px 58px;
   font-family: var(--font); font-size: 15.5px; line-height: 1.55; color: var(--text-mid); text-wrap: balance;
-  opacity: 0; transform: translateY(22px);
-  transition: opacity 0.75s cubic-bezier(0.22,1,0.36,1), transform 0.75s cubic-bezier(0.22,1,0.36,1);
+  opacity: 0; transform: translateY(14px);
+  transition: opacity 0.8s cubic-bezier(0.22,1,0.36,1) 0.9s, transform 0.8s cubic-bezier(0.22,1,0.36,1) 0.9s;
 }
-.n7d-close.is-in { opacity: 1; transform: none; }
+.n7d--lit .n7d-close { opacity: 1; transform: none; }
 .n7d-close b { color: var(--text-hi); font-weight: 650; }
-.n7d-end { height: 4px; }
-
-/* CTA appears only when the very bottom is reached */
-.n7d-bar {
-  position: absolute; left: 0; right: 0; bottom: 0; z-index: 5;
-  padding: 28px 26px calc(24px + var(--safe-b, 0px));
-  background: linear-gradient(180deg, rgba(6, 9, 10,0) 0%, rgba(6, 9, 10,0.9) 44%, #050808 100%);
-  display: flex; justify-content: center;
-  opacity: 0; transform: translateY(16px); pointer-events: none;
-  transition: opacity 0.45s ease, transform 0.45s ease;
+.n7d-endcta {
+  margin: 0 0 64px; display: flex; justify-content: center;
+  opacity: 0; transform: translateY(14px); pointer-events: none;
+  transition: opacity 0.8s ease 1.7s, transform 0.8s ease 1.7s;
 }
-.n7d-bar.is-in { opacity: 1; transform: none; pointer-events: auto; }
+.n7d--lit .n7d-endcta { opacity: 1; transform: none; pointer-events: auto; }
 .n7d-cta {
   -webkit-appearance: none; appearance: none; border: 0; cursor: pointer;
   width: 100%; max-width: 388px; padding: 17px 20px; border-radius: var(--r-ctrl);
@@ -4301,8 +4308,7 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
   transition: transform 0.12s ease;
 }
 .n7d-cta:active { transform: scale(0.985); }
-@keyframes n7dCue { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
 @media (prefers-reduced-motion: reduce) {
-  .n7d, .n7d-eyebrow, .n7d-sub, .n7d-star, .n7d-cue, .n7d-day, .n7d-close, .n7d-ch { animation: none; opacity: 1; transform: none; transition: none; }
-  .n7d-bar { transition: none; }
+  .n7d, .n7d-sub, .n7d-day, .n7d-close, .n7d-endcta, .n7d-ch { animation: none; opacity: 1; transform: none; transition: none; }
+  .n7d-summit { transition: none; }
 }
