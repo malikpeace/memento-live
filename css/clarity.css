@@ -4211,11 +4211,14 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
 @keyframes n7dTwinkle { from { opacity: 0.3; } to { opacity: 0.75; } }
 .n7d-breath {
   position: absolute; inset: -8%; z-index: 0; pointer-events: none; opacity: 0;
-  background: radial-gradient(58% 42% at 50% 46%, rgba(var(--n7bc, var(--n7-cyan)), 0.11), transparent 70%);
-  transition: opacity 2s ease;
+  /* v782: stronger, and two layers crossfade so the color FADES between days
+     instead of snapping. Radial, fades before its bounds (glow law). */
+  background: radial-gradient(64% 48% at 50% 46%, rgba(var(--n7bc, var(--n7-cyan)), 0.17), transparent 70%);
+  transition: opacity 1.8s ease;
 }
-.n7d--climb .n7d-breath { opacity: 1; animation: n7dBreath 7s ease-in-out infinite alternate; }
-@keyframes n7dBreath { from { transform: scale(1); } to { transform: scale(1.08); } }
+.n7d--climb .n7d-breath.on { opacity: 1; }
+.n7d--climb .n7d-breath { animation: n7dBreath 7s ease-in-out infinite alternate; }
+@keyframes n7dBreath { from { transform: scale(1); } to { transform: scale(1.07); } }
 
 .n7d-scroll {
   position: absolute; inset: 0; z-index: 1; overflow-y: auto; overflow-x: hidden;
@@ -4285,6 +4288,11 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
   transition: opacity 1.3s cubic-bezier(0.22,1,0.36,1), transform 1.3s cubic-bezier(0.22,1,0.36,1);
 }
 .n7d-day.is-in { opacity: 1; transform: none; }
+/* v782 (Malik): only the CURRENT day is in focus; the rest of the lit trail
+   blurs back until you return to it. */
+.n7d-day.is-in { transition: opacity 1.1s cubic-bezier(0.22,1,0.36,1), transform 1.3s cubic-bezier(0.22,1,0.36,1), filter 1.1s ease; }
+.n7d-day.is-in:not(.is-cur) { opacity: 0.28; filter: blur(3.5px); }
+.n7d-day.is-cur { opacity: 1; filter: none; }
 /* small dot node (the lab look), blooming into the day's own color */
 .n7d-node {
   position: absolute; left: 9px; top: 14px; width: 14px; height: 14px; border-radius: 50%;
@@ -4357,4 +4365,5 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
   .n7d, .n7d-sub, .n7d-day, .n7d-dlab, .n7d-title, .n7d-desc, .n7d-close, .n7d-endcta, .n7d-ch { animation: none; opacity: 1; transform: none; transition: none; }
   .n7d-summit { transition: none; }
   .n7d-dust--tw, .n7d--climb .n7d-breath { animation: none; }
+  .n7d-day.is-in:not(.is-cur) { opacity: 1; filter: none; }
 }

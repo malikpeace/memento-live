@@ -7655,7 +7655,8 @@ function _renderNext7Days() {
   return `<div class="n7d" id="n7dRoot" role="dialog" aria-label="Your first 7 days">
     <div class="n7d-dust" aria-hidden="true"></div>
     <div class="n7d-dust n7d-dust--tw" aria-hidden="true" style="transform: scale(-1, 1)"></div>
-    <div class="n7d-breath" aria-hidden="true"></div>
+    <div class="n7d-breath" id="n7dBreathA" aria-hidden="true"></div>
+    <div class="n7d-breath" id="n7dBreathB" aria-hidden="true"></div>
     <div class="n7d-summit" aria-hidden="true"></div>
     <div class="n7d-topfade" aria-hidden="true"></div>
     <div class="n7d-scroll" id="n7dScroll">
@@ -7714,14 +7715,55 @@ function showNext7Days(onProceed) {
 
     // Ignite on approach, whoever is driving. Day 7 lights the summit (aurora
     // + closing line + CTA ride the n7d--lit class with their own delays).
-    const ignite = (el) => {
-      if (!el || el.classList.contains('is-in')) return;
-      el.classList.add('is-in');
-      try { if (typeof MementoSound !== 'undefined') MementoSound.tick(); } catch (e) {}
-      // The background breathes in the color of the day being lived (v781).
-      try { root.classList.add('n7d--climb'); root.style.setProperty('--n7bc', el.style.getPropertyValue('--dc') || ''); } catch (e) {}
-      if (el.classList.contains('n7d-day--win')) root.classList.add('n7d--lit');
+    // v782 (Malik): ONE day in focus. The current day is sharp; every other
+    // ignited day blurs back, and the background CROSSFADES to the current
+    // day's color (two stacked breath layers trading opacity, 1.8s).
+    const breathA = root.querySelector('#n7dBreathA');
+    const breathB = root.querySelector('#n7dBreathB');
+    let breathFront = null, curDay = null;
+    const setBreath = (color) => {
+      if (!color || !breathA || !breathB) return;
+      const back = (breathFront === breathA) ? breathB : breathA;
+      back.style.setProperty('--n7bc', color);
+      back.classList.add('on');
+      if (breathFront) breathFront.classList.remove('on');
+      breathFront = back;
     };
+    const setCurrent = (el) => {
+      if (!el || el === curDay) return;
+      if (curDay) curDay.classList.remove('is-cur');
+      curDay = el;
+      el.classList.add('is-cur');
+      root.classList.add('n7d--climb');
+      setBreath(el.style.getPropertyValue('--dc') || '');
+    };
+    const ignite = (el) => {
+      if (!el) return;
+      if (!el.classList.contains('is-in')) {
+        el.classList.add('is-in');
+        try { if (typeof MementoSound !== 'undefined') MementoSound.tick(); } catch (e) {}
+        if (el.classList.contains('n7d-day--win')) root.classList.add('n7d--lit');
+      }
+      setCurrent(el);
+    };
+    // Manual scrolling re-focuses whichever ignited day is nearest the center
+    // (so scrolling back down the mountain refocuses + recolors correctly).
+    let focusTick = false;
+    scroll.addEventListener('scroll', () => {
+      if (focusTick) return; focusTick = true;
+      setTimeout(() => {
+        focusTick = false;
+        const mid = scroll.scrollTop + scroll.clientHeight / 2;
+        let best = null, bd = Infinity;
+        for (const d of days) {
+          if (!d.classList.contains('is-in')) continue;
+          const c = d.offsetTop + d.offsetHeight / 2;
+          const dist = Math.abs(c - mid);
+          if (dist < bd) { bd = dist; best = d; }
+        }
+        if (best && bd < scroll.clientHeight * 0.35) setCurrent(best);
+      }, 120);
+    }, { passive: true });
     if ('IntersectionObserver' in window) {
       const io = new IntersectionObserver((es) => {
         es.forEach(e => { if (e.isIntersecting) { ignite(e.target); io.unobserve(e.target); } });
