@@ -4241,12 +4241,16 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
     rgba(var(--n7-green), 0.8) 0%,
     rgba(96, 217, 160, 0.55) 33%,
     rgba(var(--n7-cyan), 0.42) 66%,
-    rgba(var(--n7-cyan), 0.14) 100%);
+    rgba(var(--n7-cyan), 0.12) 86%,
+    rgba(var(--n7-cyan), 0) 100%);
 }
 .n7d-day {
-  position: relative; padding: 0 0 92px 58px; text-align: left;
+  /* v780 (Malik): each day owns its moment. Stops sit nearly a half-screen
+     apart, and a day is INVISIBLE until its ignition, no previewing the
+     climb ahead. */
+  position: relative; padding: 0 0 min(38vh, 340px) 58px; text-align: left;
   --dc: var(--n7-cyan);
-  opacity: 0.15; transform: translateY(12px);
+  opacity: 0; transform: translateY(12px);
   transition: opacity 1.3s cubic-bezier(0.22,1,0.36,1), transform 1.3s cubic-bezier(0.22,1,0.36,1);
 }
 .n7d-day.is-in { opacity: 1; transform: none; }

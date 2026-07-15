@@ -7785,9 +7785,10 @@ function showNext7Days(onProceed) {
         if (!title) return;
         title.classList.add('on');
         _n7dType(title, titleText, 52, () => {
-          setTimeout(() => { if (sub) sub.classList.add('on'); }, 280);
-          // A real beat to READ the promise before the ground starts moving.
-          seqTimer = setTimeout(seq, 3200);
+          // v780 (Malik): a real BREAK after the typed headline lands, THEN the
+          // sub line arrives, then another full beat before the ground moves.
+          setTimeout(() => { if (sub) sub.classList.add('on'); }, 1200);
+          seqTimer = setTimeout(seq, 4600);
         });
       }, 900);
     }
