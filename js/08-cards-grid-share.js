@@ -1811,16 +1811,9 @@ const CreatorTools = {
       const el = document.getElementById(id);
       if (el) el.addEventListener('click', fn);
     };
-    bind('creatorUnlockAll', () => this.setPreviewAll(true));
-    bind('creatorNormal', () => this.lockAll());
-    bind('creatorOpenSummary', () => this.openSummary());
-    bind('creatorRestoreClarity', () => this.restoreClarity());
-    bind('creatorRestartClarity', () => this.restartClarity());
-    bind('creatorRestartAction', () => this.restartAction());
-    bind('creatorRestartEverything', () => this.restartEverything());
-    bind('creatorSkipAction', () => this.skipActionIntake());
-    // Fast navigation (non-destructive): replay the first-run moments without
-    // wiping any data, so jumping between parts of the app is quick during dev.
+    // (v774: Unlock/Lock All, Open Neutron Star, Skip to Action Plan and the
+    // Restore/Restart rows are gone from the bar; their methods remain for
+    // console use until the pre-ship dead-code sweep.)
     bind('creatorJumpSplash', () => this.jumpSplash());
     bind('creatorJumpOnboarding', () => this.jumpOnboarding());
     bind('creatorJumpStyle', () => this.jumpStyle());
@@ -1829,12 +1822,8 @@ const CreatorTools = {
     bind('creatorJumpUnlock', () => this.jumpUnlockCinema());
     bind('creatorJumpFinalQ', () => this.jumpFinalQuestion());
     bind('creatorJumpSynth', () => this.jumpSynth());
-    bind('creatorJumpReveal', () => this.jumpReveal());
-    bind('creatorJumpStar', () => this.jumpStar());
-    bind('creatorJumpStarSummary', () => this.jumpStarSummary());
     bind('creatorJump7Days', () => this.jump7Days());
     bind('creatorJumpDay1', () => this.jumpDay1());
-    bind('creatorJumpNewDay', () => this.jumpNewDay());
 
     // Every cheat button press toasts its own label (v735): universal
     // feedback, delegated so future buttons get it for free.
@@ -2250,11 +2239,13 @@ const CreatorTools = {
           Q('Who benefits when you pull this off, besides you?'), A('My family. And every person the product actually helps.'),
           Q('What are you willing to give up for it?'), A('Comfort. Most of my scrolling. Some weekends.')
         ],
-        // ready:true = THIS is the last one: answering advances straight to
-        // synthesis instead of fetching more questions (v722, Malik hit 3-4
-        // extra questions when the seed left the conversation open).
-        aiChatReady: true,
-        aiChatProgress: 100,
+        // ready:false (v774, Malik): the jump must STOP on the final question
+        // and let him actually answer it in the composer; his answer goes to
+        // the real AI, which wraps the conversation (the transcript above is
+        // complete enough that act 3 closes after one answer) and only then
+        // moves to synthesis. ready:true skipped the answering beat entirely.
+        aiChatReady: false,
+        aiChatProgress: 96,
         aiCurrentQuestion: 'Last one. A year from now this either happened or it did not. What will have made the difference?',
         aiCurrentHint: 'Say it plainly. This is the spine of your star.',
         aiCurrentType: 'text',
