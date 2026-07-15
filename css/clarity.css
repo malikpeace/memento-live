@@ -4230,6 +4230,21 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
 .n7d--auto .n7d-scroll { scroll-snap-type: none; }
 .n7d-day { scroll-snap-align: center; }
 .n7d-hero { scroll-snap-align: center; }
+/* Beyond the summit (v784, Malik: show it does not stop after one week): the
+   path continues upward past day 7, fading into the distance, with three
+   unlit ghost stops ahead. Revealed with the summit (n7d--lit). */
+.n7d-beyond {
+  position: absolute; left: 15px; top: -190px; width: 2px; height: 190px;
+  background: linear-gradient(0deg, rgba(var(--n7-green), 0.75), rgba(var(--n7-green), 0.18) 55%, rgba(var(--n7-green), 0) 100%);
+  opacity: 0; transition: opacity 1.6s ease 1.4s;
+}
+.n7d--lit .n7d-beyond { opacity: 1; }
+.n7d-bdot { position: absolute; left: 50%; width: 8px; height: 8px; border-radius: 50%;
+  transform: translateX(-50%); background: rgba(var(--n7-green), 0.35); }
+.n7d-bdot--1 { top: 108px; }
+.n7d-bdot--2 { top: 54px; background: rgba(var(--n7-green), 0.22); width: 7px; height: 7px; }
+.n7d-bdot--3 { top: 8px; background: rgba(var(--n7-green), 0.12); width: 6px; height: 6px; }
+
 /* v783: the ending is ONE summit screen with a single snap point, so day 7
    and the finale each get a clean, centered stop. */
 .n7d-summitstop {
@@ -4245,6 +4260,17 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
   height: calc(var(--safe-t, 0px) + 54px);
   background: linear-gradient(180deg, #05090a 0%, #05090a 44%, rgba(5, 9, 10,0) 100%);
 }
+
+/* The connector (v784): a short line between the hero and the path's tail,
+   drawing UPWARD (origin bottom) during the pause before the climb, the
+   quiet invitation that a path exists above. */
+.n7d-heroline {
+  width: 2px; height: 120px; margin: 0 0 26px 15px;
+  background: linear-gradient(180deg, rgba(var(--n7-cyan), 0.34), rgba(var(--n7-cyan), 0));
+  transform: scaleY(0); transform-origin: bottom center;
+  transition: transform 1.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.n7d-heroline.on { transform: scaleY(1); }
 
 /* HERO sits at the BASE of the climb (the bottom of the document): title types,
    one sub line, nothing else (Malik: no eyebrow, no goal echo). */
@@ -4332,10 +4358,21 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
 }
 .n7d-day.is-in .n7d-desc { opacity: 1; transform: none; }
 
-/* Day 3, the dip: a darker stretch of the mountain. */
+/* Day 3, the dip (v784, Malik: it should FEEL disconnected): the whole stop
+   jogs off the path, and the line itself BREAKS across its stretch (the
+   cover strip paints the flat base color over the line). */
+.n7d-day--dip {
+  transform: translateX(18px);
+}
+.n7d-day--dip.is-in { transform: translateX(18px); }
+.n7d-day--dip.is-in:not(.is-cur) { transform: translateX(18px); }
 .n7d-day--dip::before {
-  content: ""; position: absolute; inset: -40px -40px -36px -30px; z-index: -1; pointer-events: none;
+  content: ""; position: absolute; inset: -40px -40px -36px -48px; z-index: -1; pointer-events: none;
   background: radial-gradient(85% 80% at 40% 50%, rgba(0,0,0,0.6), transparent 75%);
+}
+.n7d-day--dip::after {
+  content: ""; position: absolute; left: -5px; top: -46px; width: 6px; height: calc(100% + 6px);
+  background: #040607; z-index: 0; pointer-events: none;
 }
 /* Day 7, the summit: its green node glows wider and the title catches it. */
 .n7d-day--win.is-in .n7d-node { box-shadow: 0 0 0 5px #050808, 0 0 30px rgba(var(--dc), 0.9); }
@@ -4371,4 +4408,6 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
   .n7d-summit { transition: none; }
   .n7d-dust--tw, .n7d--climb .n7d-breath { animation: none; }
   .n7d-day.is-in:not(.is-cur) { opacity: 1; filter: none; }
+  .n7d-heroline { transition: none; transform: none; }
+  .n7d-beyond { transition: none; }
 }
