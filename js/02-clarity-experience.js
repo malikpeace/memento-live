@@ -7640,8 +7640,17 @@ function _renderNext7Days() {
   // The document is the mountain: day 7 nearest the top, day 1 at the base,
   // the hero below it all. The view STARTS at the bottom; pulling the content
   // down climbs upward.
+  // v779 (Malik): lab-faithful stops (small dot node + "DAY X" label + title +
+  // line) and a TRUE color progression: each day's accent is interpolated from
+  // Clarity cyan (day 1) to spring green (day 7); the dip stays white.
+  const lerp = (a, b, k) => Math.round(a + (b - a) * k);
+  const dayColor = (i) => {
+    if (i === 2) return '242, 246, 247';                       // the dip: white
+    const k = i / 6;
+    return lerp(58, 63, k) + ', 217, ' + lerp(245, 78, k);      // cyan -> green
+  };
   const daysHtml = DAYS.map((o, i) =>
-    `<div class="n7d-day ${o.cls || ''}" data-n7day="${i + 1}"><div class="n7d-node">${i + 1}</div><div class="n7d-title">${esc(o.t)}</div><div class="n7d-desc">${esc(o.d)}</div></div>`
+    `<div class="n7d-day ${o.cls || ''}" data-n7day="${i + 1}" style="--dc:${dayColor(i)}"><div class="n7d-node"></div><div class="n7d-dlab">Day ${i + 1}${i === 2 ? ' · the dip' : ''}</div><div class="n7d-title">${esc(o.t)}</div><div class="n7d-desc">${esc(o.d)}</div></div>`
   ).reverse().join('');
   return `<div class="n7d" id="n7dRoot" role="dialog" aria-label="Your first 7 days">
     <div class="n7d-summit" aria-hidden="true"></div>
@@ -7727,7 +7736,7 @@ function showNext7Days(onProceed) {
     const tweenTo = (to, ms) => {
       cancelAnimationFrame(tweenRaf);
       const from = scroll.scrollTop, d = to - from, t0 = performance.now();
-      const ease = (x) => 1 - Math.pow(1 - x, 3);
+      const ease = (x) => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; // easeInOutCubic: gentle leave, gentle land
       const step = (now) => {
         const p = Math.min(1, (now - t0) / ms);
         scroll.scrollTop = from + d * ease(p);
@@ -7749,11 +7758,11 @@ function showNext7Days(onProceed) {
       if (!autoOn) return;
       if (dayIdx >= days.length - 1) {
         // past the summit: settle on the closing + CTA, then rest.
-        seqTimer = setTimeout(() => { if (autoOn) tweenTo(0, 1100); }, 1400);
+        seqTimer = setTimeout(() => { if (autoOn) tweenTo(0, 1600); }, 2200);
         return;
       }
-      goTo(dayIdx + 1, 950);
-      seqTimer = setTimeout(seq, 2500);
+      goTo(dayIdx + 1, 1350);
+      seqTimer = setTimeout(seq, 3600);
     };
     // Manual takeover: real gestures only (never the programmatic tween).
     ['touchstart', 'wheel', 'keydown'].forEach(ev =>
@@ -7762,8 +7771,8 @@ function showNext7Days(onProceed) {
     scroll.addEventListener('click', (e) => {
       if (e.target && e.target.closest && e.target.closest('#n7dCta')) return;
       clearTimeout(seqTimer); seqTimer = 0;
-      goTo(dayIdx + 1, 700);
-      if (autoOn) seqTimer = setTimeout(seq, 2400);
+      goTo(dayIdx + 1, 900);
+      if (autoOn) seqTimer = setTimeout(seq, 3400);
     });
 
     // Hero: the title TYPES with the tick, the sub lands, then the climb begins.
@@ -7777,7 +7786,8 @@ function showNext7Days(onProceed) {
         title.classList.add('on');
         _n7dType(title, titleText, 52, () => {
           setTimeout(() => { if (sub) sub.classList.add('on'); }, 280);
-          seqTimer = setTimeout(seq, 2100);
+          // A real beat to READ the promise before the ground starts moving.
+          seqTimer = setTimeout(seq, 3200);
         });
       }, 900);
     }

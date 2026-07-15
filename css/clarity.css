@@ -4238,49 +4238,59 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
 .n7d-line {
   position: absolute; left: 15px; top: 24px; bottom: 6px; width: 2px; z-index: 0;
   background: linear-gradient(180deg,
-    rgba(var(--n7-green), 0.75) 0%,
-    rgba(var(--n7-cyan), 0.55) 26%,
-    rgba(var(--n7-cyan), 0.30) 70%,
-    rgba(var(--n7-cyan), 0.10) 100%);
+    rgba(var(--n7-green), 0.8) 0%,
+    rgba(96, 217, 160, 0.55) 33%,
+    rgba(var(--n7-cyan), 0.42) 66%,
+    rgba(var(--n7-cyan), 0.14) 100%);
 }
 .n7d-day {
-  position: relative; padding: 0 0 64px 58px; text-align: left;
-  opacity: 0.14; transform: translateY(10px);
-  transition: opacity 0.9s cubic-bezier(0.22,1,0.36,1), transform 0.9s cubic-bezier(0.22,1,0.36,1);
+  position: relative; padding: 0 0 92px 58px; text-align: left;
+  --dc: var(--n7-cyan);
+  opacity: 0.15; transform: translateY(12px);
+  transition: opacity 1.3s cubic-bezier(0.22,1,0.36,1), transform 1.3s cubic-bezier(0.22,1,0.36,1);
 }
 .n7d-day.is-in { opacity: 1; transform: none; }
+/* small dot node (the lab look), blooming into the day's own color */
 .n7d-node {
-  position: absolute; left: 0; top: -1px; width: 32px; height: 32px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center; z-index: 1;
-  font-family: var(--font); font-size: 13.5px; font-weight: 700; font-variant-numeric: tabular-nums;
-  color: rgba(255,255,255,0.55);
-  background: #070c0d; box-shadow: inset 0 0 0 1.5px rgba(var(--n7-cyan), 0.35);
-  transition: color 0.7s ease, box-shadow 0.7s ease, background 0.7s ease;
+  position: absolute; left: 9px; top: 14px; width: 14px; height: 14px; border-radius: 50%;
+  z-index: 1; background: #070c0d;
+  box-shadow: inset 0 0 0 1.5px rgba(var(--dc), 0.4);
+  transform: scale(0.8);
+  transition: background 1.1s cubic-bezier(0.34, 1.4, 0.44, 1), box-shadow 1.1s ease, transform 1.1s cubic-bezier(0.34, 1.4, 0.44, 1);
 }
 .n7d-day.is-in .n7d-node {
-  color: #06181c; background: rgb(122, 226, 246);
-  box-shadow: 0 0 0 5px #050808, 0 0 22px rgba(var(--n7-cyan), 0.65);
+  background: rgb(var(--dc)); transform: scale(1);
+  box-shadow: 0 0 0 5px #050808, 0 0 20px rgba(var(--dc), 0.75);
 }
-.n7d-title { font-family: var(--font); font-size: 21px; font-weight: 800; letter-spacing: -0.015em; color: var(--text-hi); }
-.n7d-desc { margin: 8px 0 0; max-width: 28ch; font-family: var(--font); font-size: 14.5px; line-height: 1.55; color: var(--text-mid); }
+/* the lab's DAY X label, in the day's own progression color (Malik asked for
+   these back; the color carries the cyan -> green climb) */
+.n7d-dlab {
+  font-family: var(--font); font-size: 10px; font-weight: 700;
+  letter-spacing: 0.24em; text-transform: uppercase;
+  color: rgba(var(--dc), 0.85); margin-bottom: 6px;
+  opacity: 0; transition: opacity 1s ease 0.15s;
+}
+.n7d-day.is-in .n7d-dlab { opacity: 1; }
+.n7d-title {
+  font-family: var(--font); font-size: 22px; font-weight: 800; letter-spacing: -0.015em; color: var(--text-hi);
+  opacity: 0; transform: translateY(6px);
+  transition: opacity 1s cubic-bezier(0.22,1,0.36,1) 0.3s, transform 1s cubic-bezier(0.22,1,0.36,1) 0.3s;
+}
+.n7d-day.is-in .n7d-title { opacity: 1; transform: none; }
+.n7d-desc {
+  margin: 8px 0 0; max-width: 28ch; font-family: var(--font); font-size: 14.5px; line-height: 1.55; color: var(--text-mid);
+  opacity: 0; transform: translateY(6px);
+  transition: opacity 1s cubic-bezier(0.22,1,0.36,1) 0.55s, transform 1s cubic-bezier(0.22,1,0.36,1) 0.55s;
+}
+.n7d-day.is-in .n7d-desc { opacity: 1; transform: none; }
 
-/* Day 3, the dip: a darker stretch; its node ignites plain white. */
+/* Day 3, the dip: a darker stretch of the mountain. */
 .n7d-day--dip::before {
-  content: ""; position: absolute; inset: -34px -40px -30px -30px; z-index: -1; pointer-events: none;
-  background: radial-gradient(85% 80% at 40% 50%, rgba(0,0,0,0.55), transparent 75%);
+  content: ""; position: absolute; inset: -40px -40px -36px -30px; z-index: -1; pointer-events: none;
+  background: radial-gradient(85% 80% at 40% 50%, rgba(0,0,0,0.6), transparent 75%);
 }
-.n7d-day--dip .n7d-node { box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.35); }
-.n7d-day--dip.is-in .n7d-node {
-  color: #0b0d0e; background: #f2f6f7;
-  box-shadow: 0 0 0 5px #050808, 0 0 20px rgba(255,255,255,0.5);
-}
-
-/* Day 7, the summit: spring green, the consistency color being born. */
-.n7d-day--win .n7d-node { box-shadow: inset 0 0 0 1.5px rgba(var(--n7-green), 0.45); }
-.n7d-day--win.is-in .n7d-node {
-  color: #06180a; background: rgb(88, 226, 104);
-  box-shadow: 0 0 0 5px #050808, 0 0 26px rgba(var(--n7-green), 0.8);
-}
+/* Day 7, the summit: its green node glows wider and the title catches it. */
+.n7d-day--win.is-in .n7d-node { box-shadow: 0 0 0 5px #050808, 0 0 30px rgba(var(--dc), 0.9); }
 .n7d-day--win.is-in .n7d-title { text-shadow: 0 0 30px rgba(var(--n7-green), 0.35); }
 
 /* Closing line + CTA live ABOVE day 7 (the top of the climb); both are gated
@@ -4309,6 +4319,6 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
 }
 .n7d-cta:active { transform: scale(0.985); }
 @media (prefers-reduced-motion: reduce) {
-  .n7d, .n7d-sub, .n7d-day, .n7d-close, .n7d-endcta, .n7d-ch { animation: none; opacity: 1; transform: none; transition: none; }
+  .n7d, .n7d-sub, .n7d-day, .n7d-dlab, .n7d-title, .n7d-desc, .n7d-close, .n7d-endcta, .n7d-ch { animation: none; opacity: 1; transform: none; transition: none; }
   .n7d-summit { transition: none; }
 }
