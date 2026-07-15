@@ -7661,8 +7661,8 @@ function _renderNext7Days() {
     <div class="n7d-topfade" aria-hidden="true"></div>
     <div class="n7d-scroll" id="n7dScroll">
       <div class="n7d-inner">
-        <p class="n7d-close" id="n7dClose">This week is the hardest it ever gets. <b>After it, momentum does the lifting.</b></p>
-        <div class="n7d-endcta"><button type="button" class="n7d-cta" id="n7dCta">Start Day 1</button></div>
+        <div class="n7d-summitstop"><p class="n7d-close" id="n7dClose">This week is the hardest it ever gets. <b>After it, momentum does the lifting.</b></p>
+        <div class="n7d-endcta"><button type="button" class="n7d-cta" id="n7dCta">Start Day 1</button></div></div>
         <div class="n7d-path"><div class="n7d-line" aria-hidden="true"></div>${daysHtml}</div>
         <div class="n7d-hero">
           <h1 class="n7d-h1" id="n7dTitle" data-n7d-type="${esc(greet)}"></h1>
@@ -7757,11 +7757,13 @@ function showNext7Days(onProceed) {
         let best = null, bd = Infinity;
         for (const d of days) {
           if (!d.classList.contains('is-in')) continue;
-          const c = d.offsetTop + d.offsetHeight / 2;
+          const c = absTop(d) + d.offsetHeight / 2;
           const dist = Math.abs(c - mid);
           if (dist < bd) { bd = dist; best = d; }
         }
-        if (best && bd < scroll.clientHeight * 0.35) setCurrent(best);
+        // v783: nearest ignited day WINS outright (the old radius gate stranded
+        // focus on the wrong day near the summit, day 7 was unreachable).
+        if (best) setCurrent(best);
       }, 120);
     }, { passive: true });
     if ('IntersectionObserver' in window) {
@@ -7777,8 +7779,11 @@ function showNext7Days(onProceed) {
     // FIRST touch/wheel kills auto for good; taps advance one day in either mode.
     let autoOn = !reduce, tweenRaf = 0, seqTimer = 0, dayIdx = -1;
     if (autoOn) root.classList.add('n7d--auto');   // snap sleeps while the camera drives (v781)
+    // Absolute position within the scroll DOCUMENT (offsetTop alone resolves
+    // against .n7d-path, which skewed every centering computation, v783).
+    const absTop = (el) => el.getBoundingClientRect().top - scroll.getBoundingClientRect().top + scroll.scrollTop;
     const centerOf = (el) => {
-      const target = el.offsetTop - (scroll.clientHeight / 2) + (el.offsetHeight / 2);
+      const target = absTop(el) - (scroll.clientHeight / 2) + (el.offsetHeight / 2);
       return Math.max(0, Math.min(target, scroll.scrollHeight - scroll.clientHeight));
     };
     const tweenTo = (to, ms) => {

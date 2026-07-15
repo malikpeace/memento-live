@@ -4230,7 +4230,12 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
 .n7d--auto .n7d-scroll { scroll-snap-type: none; }
 .n7d-day { scroll-snap-align: center; }
 .n7d-hero { scroll-snap-align: center; }
-.n7d-close { scroll-snap-align: start; }
+/* v783: the ending is ONE summit screen with a single snap point, so day 7
+   and the finale each get a clean, centered stop. */
+.n7d-summitstop {
+  min-height: 58vh; display: flex; flex-direction: column;
+  justify-content: center; scroll-snap-align: center;
+}
 .n7d-inner {
   max-width: 440px; margin: 0 auto;
   padding: calc(var(--safe-t, 0px) + 90px) 26px calc(var(--safe-b, 0px) + 40px);
@@ -4339,7 +4344,7 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
 /* Closing line + CTA live ABOVE day 7 (the top of the climb); both are gated
    on day 7 igniting (n7d--lit), never on their own scroll position. */
 .n7d-close {
-  text-align: left; max-width: 30ch; margin: 0 0 26px 58px;
+  text-align: left; max-width: 30ch; margin: 0 0 30px 58px;
   font-family: var(--font); font-size: 15.5px; line-height: 1.55; color: var(--text-mid); text-wrap: balance;
   opacity: 0; transform: translateY(14px);
   transition: opacity 0.8s cubic-bezier(0.22,1,0.36,1) 0.9s, transform 0.8s cubic-bezier(0.22,1,0.36,1) 0.9s;
@@ -4347,7 +4352,7 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
 .n7d--lit .n7d-close { opacity: 1; transform: none; }
 .n7d-close b { color: var(--text-hi); font-weight: 650; }
 .n7d-endcta {
-  margin: 0 0 64px; display: flex; justify-content: center;
+  margin: 0; display: flex; justify-content: center;
   opacity: 0; transform: translateY(14px); pointer-events: none;
   transition: opacity 0.8s ease 1.7s, transform 0.8s ease 1.7s;
 }
