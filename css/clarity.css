@@ -4170,9 +4170,9 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
    ============================================================ */
 .n7d {
   position: fixed; inset: 0; z-index: 9500; overflow: hidden;
-  /* v778 (Malik's Ascent, near-black + summit glow): the path is the only
-     light source; the green summit aurora is EARNED when day 7 ignites. */
-  background: radial-gradient(130% 90% at 50% 8%, #0a0f11 0%, #070b0c 42%, #030505 100%);
+  /* v781 (Malik): FLAT near-black, the faint radial sheen read as a smudge.
+     Life comes from the dust, the day-breath and the earned summit aurora. */
+  background: #040607;
   opacity: 0; transform: translateY(26px);
   transition: opacity 0.6s cubic-bezier(0.22,1,0.36,1), transform 0.6s cubic-bezier(0.22,1,0.36,1);
   --text-hi: rgba(255,255,255,0.96);
@@ -4193,10 +4193,41 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
 }
 .n7d--lit .n7d-summit { opacity: 1; }
 
+/* Life (v781): a sparse two-layer star dust, one layer twinkling slowly
+   (opacity only, transient page), plus a soft breathing glow TINTED by the
+   day currently igniting (--n7bc set from JS; radial, edge-safe). */
+.n7d-dust {
+  position: absolute; inset: -2%; z-index: 0; pointer-events: none; opacity: 0.55;
+  background-image:
+    radial-gradient(1.2px 1.2px at 12% 22%, rgba(255,255,255,0.5), transparent 100%),
+    radial-gradient(1px 1px at 78% 14%, rgba(200,235,255,0.42), transparent 100%),
+    radial-gradient(1.4px 1.4px at 62% 46%, rgba(255,255,255,0.34), transparent 100%),
+    radial-gradient(1px 1px at 30% 64%, rgba(200,235,255,0.4), transparent 100%),
+    radial-gradient(1.2px 1.2px at 88% 72%, rgba(255,255,255,0.3), transparent 100%),
+    radial-gradient(1px 1px at 44% 88%, rgba(200,235,255,0.36), transparent 100%),
+    radial-gradient(1px 1px at 8% 92%, rgba(255,255,255,0.28), transparent 100%);
+}
+.n7d-dust--tw { animation: n7dTwinkle 6.5s ease-in-out infinite alternate; }
+@keyframes n7dTwinkle { from { opacity: 0.3; } to { opacity: 0.75; } }
+.n7d-breath {
+  position: absolute; inset: -8%; z-index: 0; pointer-events: none; opacity: 0;
+  background: radial-gradient(58% 42% at 50% 46%, rgba(var(--n7bc, var(--n7-cyan)), 0.11), transparent 70%);
+  transition: opacity 2s ease;
+}
+.n7d--climb .n7d-breath { opacity: 1; animation: n7dBreath 7s ease-in-out infinite alternate; }
+@keyframes n7dBreath { from { transform: scale(1); } to { transform: scale(1.08); } }
+
 .n7d-scroll {
   position: absolute; inset: 0; z-index: 1; overflow-y: auto; overflow-x: hidden;
   -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
+  /* v781 (Malik): finger scrolling snaps each day to center. Disabled while
+     the auto camera drives (n7d--auto) so the tween and the snap never fight. */
+  scroll-snap-type: y mandatory;
 }
+.n7d--auto .n7d-scroll { scroll-snap-type: none; }
+.n7d-day { scroll-snap-align: center; }
+.n7d-hero { scroll-snap-align: center; }
+.n7d-close { scroll-snap-align: start; }
 .n7d-inner {
   max-width: 440px; margin: 0 auto;
   padding: calc(var(--safe-t, 0px) + 90px) 26px calc(var(--safe-b, 0px) + 40px);
@@ -4325,4 +4356,5 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
 @media (prefers-reduced-motion: reduce) {
   .n7d, .n7d-sub, .n7d-day, .n7d-dlab, .n7d-title, .n7d-desc, .n7d-close, .n7d-endcta, .n7d-ch { animation: none; opacity: 1; transform: none; transition: none; }
   .n7d-summit { transition: none; }
+  .n7d-dust--tw, .n7d--climb .n7d-breath { animation: none; }
 }

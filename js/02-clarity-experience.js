@@ -7653,6 +7653,9 @@ function _renderNext7Days() {
     `<div class="n7d-day ${o.cls || ''}" data-n7day="${i + 1}" style="--dc:${dayColor(i)}"><div class="n7d-node"></div><div class="n7d-dlab">Day ${i + 1}${i === 2 ? ' · the dip' : ''}</div><div class="n7d-title">${esc(o.t)}</div><div class="n7d-desc">${esc(o.d)}</div></div>`
   ).reverse().join('');
   return `<div class="n7d" id="n7dRoot" role="dialog" aria-label="Your first 7 days">
+    <div class="n7d-dust" aria-hidden="true"></div>
+    <div class="n7d-dust n7d-dust--tw" aria-hidden="true" style="transform: scale(-1, 1)"></div>
+    <div class="n7d-breath" aria-hidden="true"></div>
     <div class="n7d-summit" aria-hidden="true"></div>
     <div class="n7d-topfade" aria-hidden="true"></div>
     <div class="n7d-scroll" id="n7dScroll">
@@ -7715,6 +7718,8 @@ function showNext7Days(onProceed) {
       if (!el || el.classList.contains('is-in')) return;
       el.classList.add('is-in');
       try { if (typeof MementoSound !== 'undefined') MementoSound.tick(); } catch (e) {}
+      // The background breathes in the color of the day being lived (v781).
+      try { root.classList.add('n7d--climb'); root.style.setProperty('--n7bc', el.style.getPropertyValue('--dc') || ''); } catch (e) {}
       if (el.classList.contains('n7d-day--win')) root.classList.add('n7d--lit');
     };
     if ('IntersectionObserver' in window) {
@@ -7729,6 +7734,7 @@ function showNext7Days(onProceed) {
     // The camera: scrollTop tweens (rAF) up the mountain, ~2.5s a day. The
     // FIRST touch/wheel kills auto for good; taps advance one day in either mode.
     let autoOn = !reduce, tweenRaf = 0, seqTimer = 0, dayIdx = -1;
+    if (autoOn) root.classList.add('n7d--auto');   // snap sleeps while the camera drives (v781)
     const centerOf = (el) => {
       const target = el.offsetTop - (scroll.clientHeight / 2) + (el.offsetHeight / 2);
       return Math.max(0, Math.min(target, scroll.scrollHeight - scroll.clientHeight));
@@ -7753,6 +7759,7 @@ function showNext7Days(onProceed) {
       autoOn = false;
       clearTimeout(seqTimer); seqTimer = 0;
       cancelAnimationFrame(tweenRaf); tweenRaf = 0;
+      root.classList.remove('n7d--auto');   // hand the wheel to the finger: snap wakes up
     };
     const seq = () => {
       if (!autoOn) return;
@@ -7771,6 +7778,7 @@ function showNext7Days(onProceed) {
     scroll.addEventListener('click', (e) => {
       if (e.target && e.target.closest && e.target.closest('#n7dCta')) return;
       clearTimeout(seqTimer); seqTimer = 0;
+      if (!autoOn) { root.classList.add('n7d--auto'); setTimeout(() => { if (!autoOn) root.classList.remove('n7d--auto'); }, 950); }
       goTo(dayIdx + 1, 900);
       if (autoOn) seqTimer = setTimeout(seq, 3400);
     });
