@@ -3232,10 +3232,10 @@ function renderCommandCenter() {
         '<div style="display:flex;">' + primaryBtn('Start', 'clarity') + '</div>');
     }
     if (!hasPlan) {
+      // v777 (Malik): ONE eyebrow, one line, one button. The goal text is gone,
+      // they literally just forged it; repeating it here read as AI over-explaining.
       return wrap(eyebrow('Next step') +
-        '<div style="font-size:1.15rem;font-weight:700;color:var(--text-hi);margin-bottom:6px;">Turn your goal into today\'s action</div>' +
-        '<div style="font-size:0.64rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-3);margin-bottom:4px;">Your goal</div>' +
-        '<div style="font-size:0.9rem;line-height:1.5;color:var(--text-2);margin-bottom:14px;">' + esc(state.clarity.answers.neutronStar) + '</div>' +
+        '<div style="font-size:1.15rem;font-weight:700;color:var(--text-hi);margin-bottom:14px;">Turn your neutron star into a tangible daily action</div>' +
         '<div style="display:flex;">' + primaryBtn('Build my plan', 'action') + '</div>');
     }
 
