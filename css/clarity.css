@@ -4187,9 +4187,11 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
 /* The summit aurora: fixed at the top, radial (edge-safe by construction),
    lit only when day 7 ignites. */
 .n7d-summit {
-  position: absolute; top: -12%; left: -20%; right: -20%; height: 46%;
+  /* v786: the week descends now; the earned green glow rises from the BOTTOM
+     where day 7 and the finale live. */
+  position: absolute; bottom: -12%; left: -20%; right: -20%; height: 46%; top: auto;
   z-index: 0; pointer-events: none; opacity: 0; transition: opacity 2.4s ease;
-  background: radial-gradient(60% 58% at 50% 22%, rgba(var(--n7-green), 0.26), transparent 68%);
+  background: radial-gradient(60% 58% at 50% 78%, rgba(var(--n7-green), 0.26), transparent 68%);
 }
 .n7d--lit .n7d-summit { opacity: 1; }
 
@@ -4234,16 +4236,16 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
    path continues upward past day 7, fading into the distance, with three
    unlit ghost stops ahead. Revealed with the summit (n7d--lit). */
 .n7d-beyond {
-  position: absolute; left: 15px; top: -190px; width: 2px; height: 190px;
-  background: linear-gradient(0deg, rgba(var(--n7-green), 0.75), rgba(var(--n7-green), 0.18) 55%, rgba(var(--n7-green), 0) 100%);
+  position: absolute; left: 15px; bottom: -190px; width: 2px; height: 190px;
+  background: linear-gradient(180deg, rgba(var(--n7-green), 0.75), rgba(var(--n7-green), 0.18) 55%, rgba(var(--n7-green), 0) 100%);
   opacity: 0; transition: opacity 1.6s ease 1.4s;
 }
 .n7d--lit .n7d-beyond { opacity: 1; }
 .n7d-bdot { position: absolute; left: 50%; width: 8px; height: 8px; border-radius: 50%;
   transform: translateX(-50%); background: rgba(var(--n7-green), 0.35); }
-.n7d-bdot--1 { top: 108px; }
-.n7d-bdot--2 { top: 54px; background: rgba(var(--n7-green), 0.22); width: 7px; height: 7px; }
-.n7d-bdot--3 { top: 8px; background: rgba(var(--n7-green), 0.12); width: 6px; height: 6px; }
+.n7d-bdot--1 { top: 66px; }
+.n7d-bdot--2 { top: 122px; background: rgba(var(--n7-green), 0.22); width: 7px; height: 7px; }
+.n7d-bdot--3 { top: 172px; background: rgba(var(--n7-green), 0.12); width: 6px; height: 6px; }
 
 /* v783: the ending is ONE summit screen with a single snap point, so day 7
    and the finale each get a clean, centered stop. */
@@ -4306,10 +4308,10 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
   content: ""; position: absolute; left: 15px; top: 24px; bottom: -12px; width: 2px;
   background: linear-gradient(180deg, rgba(var(--dc), 0.55), rgba(var(--dc), 0.16));
 }
-/* the base of the trail: day 1's segment dissolves toward the hero */
-.n7d-day:last-child::before {
-  bottom: -70px;
-  background: linear-gradient(180deg, rgba(var(--dc), 0.55), rgba(var(--dc), 0) 88%);
+/* day 7 (last stop) hands its segment into the beyond-trail below */
+.n7d-day:last-of-type::before {
+  bottom: -12px;
+  background: linear-gradient(180deg, rgba(var(--dc), 0.55), rgba(var(--dc), 0.3));
 }
 /* v782 (Malik): only the CURRENT day is in focus; the rest of the lit trail
    blurs back until you return to it. */
@@ -4359,11 +4361,10 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
 }
 .n7d-day--dip.is-in { transform: translateX(18px); }
 .n7d-day--dip.is-in:not(.is-cur) { transform: translateX(18px); }
-/* the segment arriving from day 4 (the day above the dip) ends early */
-.n7d-day--win ~ .n7d-day:has(+ .n7d-day--dip)::before,
-.n7d-day[data-n7day="4"]::before { bottom: 96px; background: linear-gradient(180deg, rgba(var(--dc), 0.55), rgba(var(--dc), 0) 92%); }
+/* the segment arriving from day 2 (the day above the dip now) ends early */
+.n7d-day[data-n7day="2"]::before { bottom: 96px; background: linear-gradient(180deg, rgba(var(--dc), 0.55), rgba(var(--dc), 0) 92%); }
 /* the dip's own segment: back on the path axis (undo the jog) and detached
-   from its node, it resumes below, fading in from nothing */
+   from its node, it resumes below (toward day 4), fading in from nothing */
 .n7d-day--dip::before {
   left: -3px; top: 110px;
   background: linear-gradient(180deg, rgba(var(--dc), 0) 0%, rgba(var(--dc), 0.28) 40%, rgba(var(--dc), 0.16) 100%);

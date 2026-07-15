@@ -7637,9 +7637,8 @@ function _renderNext7Days() {
     { t: "It's yours.", d: "The effort fades. It just feels like who you are now." },
     { t: 'Proof.', d: "Seven days. The week that ends most people didn't end you.", cls: 'n7d-day--win' }
   ];
-  // The document is the mountain: day 7 nearest the top, day 1 at the base,
-  // the hero below it all. The view STARTS at the bottom; pulling the content
-  // down climbs upward.
+  // v786 (Malik): REVERSED. The week now descends: hero at the top, day 1
+  // first, day 7 at the bottom where the finale waits. Natural scroll.
   // v779 (Malik): lab-faithful stops (small dot node + "DAY X" label + title +
   // line) and a TRUE color progression: each day's accent is interpolated from
   // Clarity cyan (day 1) to spring green (day 7); the dip stays white.
@@ -7651,7 +7650,7 @@ function _renderNext7Days() {
   };
   const daysHtml = DAYS.map((o, i) =>
     `<div class="n7d-day ${o.cls || ''}" data-n7day="${i + 1}" style="--dc:${dayColor(i)}"><div class="n7d-node"></div><div class="n7d-dlab">Day ${i + 1}${i === 2 ? ' · the dip' : ''}</div><div class="n7d-title">${esc(o.t)}</div><div class="n7d-desc">${esc(o.d)}</div></div>`
-  ).reverse().join('');
+  ).join('');
   return `<div class="n7d" id="n7dRoot" role="dialog" aria-label="Your first 7 days">
     <div class="n7d-dust" aria-hidden="true"></div>
     <div class="n7d-dust n7d-dust--tw" aria-hidden="true" style="transform: scale(-1, 1)"></div>
@@ -7661,13 +7660,13 @@ function _renderNext7Days() {
     <div class="n7d-topfade" aria-hidden="true"></div>
     <div class="n7d-scroll" id="n7dScroll">
       <div class="n7d-inner">
-        <div class="n7d-summitstop"><p class="n7d-close" id="n7dClose">This week is the hardest it ever gets. <b>After it, momentum does the lifting.</b></p>
-        <div class="n7d-endcta"><button type="button" class="n7d-cta" id="n7dCta">Start Day 1</button></div></div>
-        <div class="n7d-path"><div class="n7d-beyond" aria-hidden="true"><span class="n7d-bdot n7d-bdot--1"></span><span class="n7d-bdot n7d-bdot--2"></span><span class="n7d-bdot n7d-bdot--3"></span></div>${daysHtml}</div>
         <div class="n7d-hero">
           <h1 class="n7d-h1" id="n7dTitle" data-n7d-type="${esc(greet)}"></h1>
           <p class="n7d-sub" id="n7dSub">Week one is the one that breaks people. You'll see every step before it hits, especially the day that makes most of them quit.</p>
         </div>
+        <div class="n7d-path">${daysHtml}<div class="n7d-beyond" aria-hidden="true"><span class="n7d-bdot n7d-bdot--1"></span><span class="n7d-bdot n7d-bdot--2"></span><span class="n7d-bdot n7d-bdot--3"></span></div></div>
+        <div class="n7d-summitstop"><p class="n7d-close" id="n7dClose">This week is the hardest it ever gets. <b>After it, momentum does the lifting.</b></p>
+        <div class="n7d-endcta"><button type="button" class="n7d-cta" id="n7dCta">Start Day 1</button></div></div>
       </div>
     </div>
   </div>`;
@@ -7703,15 +7702,12 @@ function showNext7Days(onProceed) {
     document.body.style.overflow = 'hidden';
     const scroll = root.querySelector('#n7dScroll');
     const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    // Start at the BASE of the mountain (the hero, bottom of the document).
-    scroll.scrollTop = scroll.scrollHeight;
-    requestAnimationFrame(() => { scroll.scrollTop = scroll.scrollHeight; root.classList.add('n7d--in'); });
+    requestAnimationFrame(() => root.classList.add('n7d--in'));
 
     const title = root.querySelector('#n7dTitle');
     const sub = root.querySelector('#n7dSub');
     const titleText = title ? (title.getAttribute('data-n7d-type') || '') : '';
-    // Days in CLIMB order (1..7); the DOM lists them 7..1.
-    const days = Array.from(root.querySelectorAll('.n7d-day')).reverse();
+    const days = Array.from(root.querySelectorAll('.n7d-day'));
 
     // Ignite on approach, whoever is driving. Day 7 lights the summit (aurora
     // + closing line + CTA ride the n7d--lit class with their own delays).
@@ -7811,8 +7807,8 @@ function showNext7Days(onProceed) {
     const seq = () => {
       if (!autoOn) return;
       if (dayIdx >= days.length - 1) {
-        // past the summit: settle on the closing + CTA, then rest.
-        seqTimer = setTimeout(() => { if (autoOn) tweenTo(0, 1600); }, 2200);
+        // past day 7: settle down onto the closing + CTA, then rest.
+        seqTimer = setTimeout(() => { if (autoOn) tweenTo(scroll.scrollHeight - scroll.clientHeight, 1600); }, 2200);
         return;
       }
       goTo(dayIdx + 1, 1350);
