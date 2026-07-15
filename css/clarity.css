@@ -4183,6 +4183,9 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
 }
 .n7d--in { opacity: 1; transform: none; }
 .n7d--out { opacity: 0; transform: translateY(-10px); transition: opacity 0.4s ease, transform 0.4s ease; }
+/* The 7-days scene stays DARK in light mode by design (same law as the
+   onboarding + auth scenes); everything inside uses its own pinned tokens. */
+html.theme-light .n7d { background: #040607; }
 
 /* The summit aurora: fixed at the top, radial (edge-safe by construction),
    lit only when day 7 ignites. */
@@ -4191,7 +4194,11 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
      where day 7 and the finale live. */
   position: absolute; bottom: -12%; left: -20%; right: -20%; height: 46%; top: auto;
   z-index: 0; pointer-events: none; opacity: 0; transition: opacity 2.4s ease;
-  background: radial-gradient(60% 58% at 50% 78%, rgba(var(--n7-green), 0.26), transparent 68%);
+  background: radial-gradient(60% 58% at 50% 78%,
+    rgba(var(--n7-green), 0.22) 0%,
+    rgba(var(--n7-green), 0.11) 38%,
+    rgba(var(--n7-green), 0.04) 58%,
+    rgba(var(--n7-green), 0) 78%);
 }
 .n7d--lit .n7d-summit { opacity: 1; }
 
@@ -4215,7 +4222,11 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
   position: absolute; inset: -8%; z-index: 0; pointer-events: none; opacity: 0;
   /* v782: stronger, and two layers crossfade so the color FADES between days
      instead of snapping. Radial, fades before its bounds (glow law). */
-  background: radial-gradient(64% 48% at 50% 46%, rgba(var(--n7bc, var(--n7-cyan)), 0.17), transparent 70%);
+  background: radial-gradient(64% 48% at 50% 46%,
+    rgba(var(--n7bc, var(--n7-cyan)), calc(0.16 * var(--n7ba, 1))) 0%,
+    rgba(var(--n7bc, var(--n7-cyan)), calc(0.09 * var(--n7ba, 1))) 40%,
+    rgba(var(--n7bc, var(--n7-cyan)), calc(0.035 * var(--n7ba, 1))) 60%,
+    rgba(var(--n7bc, var(--n7-cyan)), 0) 78%);
   transition: opacity 1.8s ease;
 }
 .n7d--climb .n7d-breath.on { opacity: 1; }
@@ -4236,16 +4247,16 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
    path continues upward past day 7, fading into the distance, with three
    unlit ghost stops ahead. Revealed with the summit (n7d--lit). */
 .n7d-beyond {
-  position: absolute; left: 15px; bottom: -190px; width: 2px; height: 190px;
-  background: linear-gradient(180deg, rgba(var(--n7-green), 0.75), rgba(var(--n7-green), 0.18) 55%, rgba(var(--n7-green), 0) 100%);
+  /* dots only (the line is day 7's own segment); same axis, no second line */
+  position: absolute; left: 15px; bottom: -230px; width: 2px; height: 230px;
   opacity: 0; transition: opacity 1.6s ease 1.4s;
 }
 .n7d--lit .n7d-beyond { opacity: 1; }
 .n7d-bdot { position: absolute; left: 50%; width: 8px; height: 8px; border-radius: 50%;
   transform: translateX(-50%); background: rgba(var(--n7-green), 0.35); }
-.n7d-bdot--1 { top: 66px; }
-.n7d-bdot--2 { top: 122px; background: rgba(var(--n7-green), 0.22); width: 7px; height: 7px; }
-.n7d-bdot--3 { top: 172px; background: rgba(var(--n7-green), 0.12); width: 6px; height: 6px; }
+.n7d-bdot--1 { top: 74px; }
+.n7d-bdot--2 { top: 138px; background: rgba(var(--n7-green), 0.2); width: 7px; height: 7px; }
+.n7d-bdot--3 { top: 196px; background: rgba(var(--n7-green), 0.1); width: 6px; height: 6px; }
 
 /* v783: the ending is ONE summit screen with a single snap point, so day 7
    and the finale each get a clean, centered stop. */
@@ -4308,10 +4319,15 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
   content: ""; position: absolute; left: 15px; top: 24px; bottom: -12px; width: 2px;
   background: linear-gradient(180deg, rgba(var(--dc), 0.55), rgba(var(--dc), 0.16));
 }
-/* day 7 (last stop) hands its segment into the beyond-trail below */
-.n7d-day:last-of-type::before {
-  bottom: -12px;
-  background: linear-gradient(180deg, rgba(var(--dc), 0.55), rgba(var(--dc), 0.3));
+/* day 7 (last stop): its own segment IS the beyond, one unbroken line
+   extending past the node and dissolving to nothing (v787, no seams). */
+.n7d-day[data-n7day="7"]::before {
+  bottom: -230px;
+  background: linear-gradient(180deg,
+    rgba(var(--dc), 0.55) 0%,
+    rgba(var(--dc), 0.34) 35%,
+    rgba(var(--dc), 0.14) 70%,
+    rgba(var(--dc), 0) 96%);
 }
 /* v782 (Malik): only the CURRENT day is in focus; the rest of the lit trail
    blurs back until you return to it. */
@@ -4369,10 +4385,9 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
   left: -3px; top: 110px;
   background: linear-gradient(180deg, rgba(var(--dc), 0) 0%, rgba(var(--dc), 0.28) 40%, rgba(var(--dc), 0.16) 100%);
 }
-.n7d-day--dip::after {
-  content: ""; position: absolute; inset: -40px -40px -36px -48px; z-index: -1; pointer-events: none;
-  background: radial-gradient(85% 80% at 40% 50%, rgba(0,0,0,0.6), transparent 75%);
-}
+/* (v787: the dip's dark radial is DELETED, its bounds were visible as a box,
+   the exact glow-edge law failure. The dip reads through the white node, the
+   jog, the severed line and the paled breath.) */
 /* Day 7, the summit: its green node glows wider and the title catches it. */
 .n7d-day--win.is-in .n7d-node { box-shadow: 0 0 0 5px #050808, 0 0 30px rgba(var(--dc), 0.9); }
 .n7d-day--win.is-in .n7d-title { text-shadow: 0 0 30px rgba(var(--n7-green), 0.35); }

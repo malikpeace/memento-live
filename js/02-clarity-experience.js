@@ -7717,10 +7717,11 @@ function showNext7Days(onProceed) {
     const breathA = root.querySelector('#n7dBreathA');
     const breathB = root.querySelector('#n7dBreathB');
     let breathFront = null, curDay = null;
-    const setBreath = (color) => {
+    const setBreath = (color, alpha) => {
       if (!color || !breathA || !breathB) return;
       const back = (breathFront === breathA) ? breathB : breathA;
       back.style.setProperty('--n7bc', color);
+      back.style.setProperty('--n7ba', alpha || '1');
       back.classList.add('on');
       if (breathFront) breathFront.classList.remove('on');
       breathFront = back;
@@ -7731,7 +7732,9 @@ function showNext7Days(onProceed) {
       curDay = el;
       el.classList.add('is-cur');
       root.classList.add('n7d--climb');
-      setBreath(el.style.getPropertyValue('--dc') || '');
+      // the dip's white breath runs PALE (v787): full-strength white read as a
+      // giant gray ellipse with visible banding on OLED.
+      setBreath(el.style.getPropertyValue('--dc') || '', el.classList.contains('n7d-day--dip') ? '0.4' : '1');
     };
     const ignite = (el) => {
       if (!el) return;
