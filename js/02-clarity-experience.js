@@ -7663,8 +7663,7 @@ function _renderNext7Days() {
       <div class="n7d-inner">
         <div class="n7d-summitstop"><p class="n7d-close" id="n7dClose">This week is the hardest it ever gets. <b>After it, momentum does the lifting.</b></p>
         <div class="n7d-endcta"><button type="button" class="n7d-cta" id="n7dCta">Start Day 1</button></div></div>
-        <div class="n7d-path"><div class="n7d-line" aria-hidden="true"></div><div class="n7d-beyond" aria-hidden="true"><span class="n7d-bdot n7d-bdot--1"></span><span class="n7d-bdot n7d-bdot--2"></span><span class="n7d-bdot n7d-bdot--3"></span></div>${daysHtml}</div>
-        <div class="n7d-heroline" id="n7dHeroline" aria-hidden="true"></div>
+        <div class="n7d-path"><div class="n7d-beyond" aria-hidden="true"><span class="n7d-bdot n7d-bdot--1"></span><span class="n7d-bdot n7d-bdot--2"></span><span class="n7d-bdot n7d-bdot--3"></span></div>${daysHtml}</div>
         <div class="n7d-hero">
           <h1 class="n7d-h1" id="n7dTitle" data-n7d-type="${esc(greet)}"></h1>
           <p class="n7d-sub" id="n7dSub">Week one is the one that breaks people. You'll see every step before it hits, especially the day that makes most of them quit.</p>
@@ -7844,10 +7843,7 @@ function showNext7Days(onProceed) {
         _n7dType(title, titleText, 52, () => {
           // v780 (Malik): a real BREAK after the typed headline lands, THEN the
           // sub line arrives, then another full beat before the ground moves.
-          // v784: during that beat the connector line DRAWS upward from the
-          // hero, the quiet invitation that a path exists above.
           setTimeout(() => { if (sub) sub.classList.add('on'); }, 1200);
-          setTimeout(() => { const hl = root.querySelector('#n7dHeroline'); if (hl) hl.classList.add('on'); }, 2300);
           seqTimer = setTimeout(seq, 4600);
         });
       }, 900);
