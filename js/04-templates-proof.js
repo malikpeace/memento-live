@@ -190,17 +190,8 @@ function recalculateStreak() {
     state.streak.bestEverShown = cur;
     try { writeProofEvent('new-record', { title: cur + ' day record', module: 'streak', dedupeKey: 'record-' + cur, metadata: { count: cur } }); } catch (_) {}
   }
-  // Once the count just crossed into "worth not losing" territory (>= 7),
-  // surface the one-time backup nudge. Self-guards demo / already-shown, and
-  // defers to a microtask so it never reenters a render in progress.
-  try {
-    if (!DEMO_MODE && state.meta && !state.meta.backupNudged && state.streak.count >= 7) {
-      if (typeof maybeShowBackupNudge === 'function') {
-        if (typeof queueMicrotask === 'function') queueMicrotask(maybeShowBackupNudge);
-        else setTimeout(maybeShowBackupNudge, 0);
-      }
-    }
-  } catch (_) {}
+  // (the day-7 backup-download nudge was removed in v775, Malik: accounts +
+  // cloud sync are the real answer; Settings keeps the manual backup.)
 }
 
 /* ============================================

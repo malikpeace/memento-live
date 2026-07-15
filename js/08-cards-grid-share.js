@@ -1620,53 +1620,11 @@ function showComingSoonToast(message) {
   }, 1800);
 }
 
-// One-time backup nudge. Shown once the streak first reaches 7 (data is now
-// worth not losing). Points at the existing export. Dismiss OR save sets
-// state.meta.backupNudged so it never shows again. Never appears or persists
-// in DEMO_MODE (persistNow already no-ops, but we also skip the UI so demo
-// sessions stay clean). Additive: reuses exportMementoData() unchanged.
-let _backupNudgeEl = null;
-function maybeShowBackupNudge() {
-  try {
-    if (DEMO_MODE) return;
-    if (!state.meta || state.meta.backupNudged) return;
-    const count = (state.streak && state.streak.count) || 0;
-    if (count < 7) return;
-    if (_backupNudgeEl || document.querySelector('.backup-nudge')) return;
-    const el = document.createElement('div');
-    _backupNudgeEl = el;
-    el.className = 'backup-nudge';
-    el.setAttribute('role', 'status');
-    el.innerHTML =
-      '<div class="backup-nudge__text">Save a backup of your progress.' +
-        '<span>One week in. Download a copy so you never lose it.</span>' +
-      '</div>' +
-      '<button class="backup-nudge__save" type="button">Download</button>' +
-      '<button class="backup-nudge__close" type="button" aria-label="Dismiss">&times;</button>';
-    document.body.appendChild(el);
-    // Mark as shown immediately so a re-render mid-session can't double-fire.
-    state.meta.backupNudged = true;
-    try { persistNow(); } catch (_) {}
-    const dismiss = () => {
-      el.classList.remove('is-visible');
-      setTimeout(() => { try { el.remove(); } catch (_) {} if (_backupNudgeEl === el) _backupNudgeEl = null; }, 300);
-    };
-    el.querySelector('.backup-nudge__save').addEventListener('click', () => {
-      try { exportMementoData(); } catch (_) {}
-      dismiss();
-    });
-    el.querySelector('.backup-nudge__close').addEventListener('click', dismiss);
-    void el.offsetWidth; // reflow so the transition runs
-    el.classList.add('is-visible');
-  } catch (_) { /* never let the nudge break the dashboard */ }
-}
+// (The one-time day-7 backup-download nudge was removed in v775, Malik:
+// obsolete now that accounts + cloud sync exist; Settings keeps the manual
+// Download backup.)
 
-// One-time "save your work" nudge after the Neutron Star is born. Points at the
-// existing CloudSync account dialog so a user can sync before they risk losing the
-// thing they just made. Shown once ever (state.meta.saveWorkNudged), never in demo,
-// skipped when sync is unavailable or the user is already signed in. Reuses the
-// .backup-nudge glass toast skin unchanged.
-// The "Save your Memento" moment, shown ONCE right after the Neutron Star is born
+// The "Hold onto your Memento" moment, shown ONCE right after the Neutron Star is born
 // (the value moment). Now that they have built something, this is where we ask for
 // the free account (so nothing is ever lost + it follows them to any device, the
 // fix for the Safari -> installed-app storage gap) and offer Add to Home Screen.

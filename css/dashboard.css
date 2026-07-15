@@ -1787,31 +1787,6 @@ html.lowfx .cc-hero-body .ctraj { animation: none !important; }
   color: var(--solid-fg);
 }
 
-.backup-nudge {
-  position: fixed;
-  left: 50%;
-  bottom: calc(96px + var(--safe-b));
-  transform: translateX(-50%) translateY(16px);
-  z-index: 10001;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  max-width: min(440px, calc(100vw - 32px));
-  padding: 12px 12px 12px 18px;
-  background: var(--glass-bg-strong);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--r-card);
-  box-shadow: var(--glass-shadow), var(--glass-highlight);
-  -webkit-backdrop-filter: blur(calc(20px * var(--bx, 1)));
-  backdrop-filter: blur(calc(20px * var(--bx, 1)));
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity var(--t-slow) ease, transform var(--t-slow) ease;
-}
-.backup-nudge.is-visible { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
-.backup-nudge__text { font-size: var(--fs-base); line-height: 1.4; color: var(--text-1); flex: 1; }
-.backup-nudge__text span { display: block; color: var(--text-2); font-size: var(--fs-sm); margin-top: 2px; }
-/* Plan-tomorrow prompt: same glass family as the backup nudge, but a column
    with a single input. One primary action, quiet skip. */
 .tmrw-plan {
   position: fixed;
@@ -1869,31 +1844,6 @@ html.lowfx .cc-hero-body .ctraj { animation: none !important; }
   border-radius: var(--pill-r);
 }
 .tmrw-plan__skip:hover { color: var(--text-2); }
-
-.backup-nudge__save {
-  flex-shrink: 0;
-  font: 600 0.82rem/1 inherit;
-  cursor: pointer;
-  border: none;
-  border-radius: var(--pill-r);
-  padding: 8px 14px;
-  background: var(--solid-bg);
-  color: var(--solid-fg);
-  white-space: nowrap;
-}
-.backup-nudge__save:active { transform: scale(0.97); }
-.backup-nudge__close {
-  flex-shrink: 0;
-  width: 26px; height: 26px;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer;
-  border: 1px solid var(--glass-border);
-  border-radius: var(--pill-r);
-  background: transparent;
-  color: var(--text-2);
-  font-size: var(--fs-lg); line-height: 1;
-}
-.backup-nudge__close:hover { color: var(--text-1); border-color: var(--glass-border-hover); }
 
 /* "Your one thing today" footer for reachable detail sheets. Glass-token
    styled so it reads as part of the sheet, sitting at the bottom as a quiet
@@ -2894,11 +2844,7 @@ html.theme-light body.lite .cc-review-pop { background: rgb(252, 253, 253); }
    offer, undo toast, backup nudge) go near-solid where blur is stripped. */
 body.lite .tmrw-plan, html.lowfx .tmrw-plan,
 body.lite .undo-toast, html.lowfx .undo-toast,
-body.lite .backup-nudge, html.lowfx .backup-nudge { background: rgba(10, 11, 14, 0.985); }
-html.theme-light body.lite .tmrw-plan, html.theme-light.lowfx .tmrw-plan,
 html.theme-light body.lite .undo-toast, html.theme-light.lowfx .undo-toast,
-html.theme-light body.lite .backup-nudge, html.theme-light.lowfx .backup-nudge { background: rgba(250, 252, 252, 0.98); }
-
 /* === Day Card: the mobile hero ===
    A compact copy of Clarity's Neutron Star summary card, worn at the top
    of the dashboard the way the Apple Card sits at the top of Wallet.
