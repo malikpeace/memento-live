@@ -7826,7 +7826,14 @@ function showNext7Days(onProceed) {
       if (e.target && e.target.closest && e.target.closest('#n7dCta')) return;
       clearTimeout(seqTimer); seqTimer = 0;
       if (!autoOn) { root.classList.add('n7d--auto'); setTimeout(() => { if (!autoOn) root.classList.remove('n7d--auto'); }, 950); }
-      goTo(dayIdx + 1, 900);
+      // past day 7 the next stop is the FINALE; a tap there never yanks the
+      // camera back up (v788).
+      if (dayIdx >= days.length - 1) {
+        const max = scroll.scrollHeight - scroll.clientHeight;
+        if (scroll.scrollTop < max - 8) tweenTo(max, 900);
+      } else {
+        goTo(dayIdx + 1, 900);
+      }
       if (autoOn) seqTimer = setTimeout(seq, 3400);
     });
 
