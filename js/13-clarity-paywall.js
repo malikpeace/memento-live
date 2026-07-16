@@ -132,61 +132,57 @@ const ClarityPaywall = {
       ov.id = 'clarityPaywall';
       ov.setAttribute('role', 'dialog');
       ov.setAttribute('aria-label', 'Unlock Memento');
+      const feat = (icon, label) => '<div class="cpw__feat">' + icon + '<span>' + label + '</span></div>';
+      const I = {
+        act: '<svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        cons: '<svg viewBox="0 0 24 24" fill="none"><path d="M12 3c2 3 5 4 5 8a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-2-1-4-1-7z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>',
+        mori: '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        coach: '<svg viewBox="0 0 24 24" fill="none"><path d="M21 12a8 8 0 1 1-3.1-6.3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M12 8v4l3 2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" opacity="0"/><path d="M8 10h8M8 14h5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>',
+        colors: '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><circle cx="9" cy="10" r="1.3" fill="currentColor"/><circle cx="14.5" cy="9" r="1.3" fill="currentColor"/><circle cx="15" cy="14.5" r="1.3" fill="currentColor"/></svg>'
+      };
       ov.innerHTML =
-        '<button type="button" class="cpw__close" id="cpwClose" aria-label="Close">&times;</button>' +
         '<div class="cpw__scroll">' +
-          '<div class="cpw__hero">' +
-            '<div class="cpw__eyebrow">You found it</div>' +
-            '<div class="cpw__card">' + this._cardHTML(name) + '</div>' +
-            '<div class="cpw__star-wrap">' +
-              '<div class="cpw__star-cap">Your Neutron Star</div>' +
-              '<div class="cpw__star">' + this._esc(star) + '</div>' +
-            '</div>' +
+          '<div class="cpw__hero cpw__hero--v2">' +
+            '<div class="cpw__card cpw__card--mini">' + this._cardHTML(name) + '</div>' +
+            '<h1 class="cpw__h1">Build your Memento.</h1>' +
+            '<p class="cpw__sub2">Everything, yours forever. No subscription.</p>' +
           '</div>' +
 
-          '<p class="cpw__bridge">Clarity is yours, and it is the foundation. <b>Everything else in Memento is built to turn it into a life you actually live.</b></p>' +
-
-          '<div class="cpw__locked">' +
-            '<div class="cpw__locked-head">' +
-              '<span class="cpw__locked-title">Locked until you unlock</span>' +
-              '<span class="cpw__locked-note">Built on your clarity</span>' +
-            '</div>' +
-            '<div class="cpw__grid">' + this._modulesHTML() + '</div>' +
+          '<div class="cpw__feats">' +
+            feat(I.act, 'Your one move a day') +
+            feat(I.cons, 'Streaks and your year in light') +
+            feat(I.mori, 'Memento Mori, your time made visible') +
+            feat(I.coach, 'An AI coach in your corner') +
+            feat(I.colors, 'Colors and themes, make it yours') +
           '</div>' +
 
-          '<div class="cpw__offer">' +
-            '<div class="cpw__offer-head">' +
-              '<span class="cpw__offer-title">Unlock everything</span>' +
-              '<span class="cpw__offer-note">Own it once</span>' +
-            '</div>' +
-            '<div class="cpw__plans" role="radiogroup" aria-label="Choose your plan">' +
-              '<button type="button" class="cpw__plan cpw__plan--hero is-picked" data-plan="lifetime" role="radio" aria-checked="true">' +
-                '<span class="cpw__plan-flag">Most people pick this</span>' +
-                '<div class="cpw__plan-label">The Lock-In System</div>' +
-                '<div class="cpw__plan-sub">Everything, yours forever. No subscription.</div>' +
-                '<div class="cpw__plan-amt"><span class="cpw__plan-cur">$</span><span class="cpw__plan-big">99</span><span class="cpw__plan-meta">once</span></div>' +
-                '<p class="cpw__plan-hsub"><b>Cheaper than a year of any app it replaces.</b> Pay once, keep it for life, never see a renewal.</p>' +
-              '</button>' +
-              '<button type="button" class="cpw__plan cpw__plan--flat" data-plan="founder" role="radio" aria-checked="false">' +
-                '<div><div class="cpw__plan-label">Founder\'s Edition</div><div class="cpw__plan-sub">Founder access and every future update</div></div>' +
-                '<div class="cpw__plan-right cpw__plan-amt"><span class="cpw__plan-cur">$</span><span class="cpw__plan-big">199</span></div>' +
-              '</button>' +
-              '<button type="button" class="cpw__plan cpw__plan--flat" data-plan="plan" role="radio" aria-checked="false">' +
-                '<div><div class="cpw__plan-label">Pay in 3</div><div class="cpw__plan-sub">Same system, interest-free</div></div>' +
-                '<div class="cpw__plan-right cpw__plan-amt"><span class="cpw__plan-cur">3 × $</span><span class="cpw__plan-big">39</span></div>' +
-              '</button>' +
-            '</div>' +
+          '<div class="cpw__plans cpw__plans--v2" role="radiogroup" aria-label="Choose your plan">' +
+            '<button type="button" class="cpw__plan cpw__plan--row is-picked" data-plan="lifetime" role="radio" aria-checked="true">' +
+              '<span class="cpw__radio" aria-hidden="true"></span>' +
+              '<div class="cpw__plan-main"><div class="cpw__plan-label">The Lock-In System <span class="cpw__plan-flag2">Most pick this</span></div><div class="cpw__plan-sub">Pay once, own it for life</div></div>' +
+              '<div class="cpw__plan-amt"><span class="cpw__plan-cur">$</span><span class="cpw__plan-big">99</span><span class="cpw__plan-meta">once</span></div>' +
+            '</button>' +
+            '<button type="button" class="cpw__plan cpw__plan--row" data-plan="founder" role="radio" aria-checked="false">' +
+              '<span class="cpw__radio" aria-hidden="true"></span>' +
+              '<div class="cpw__plan-main"><div class="cpw__plan-label">Founder\'s Edition</div><div class="cpw__plan-sub">Founder access, every future update</div></div>' +
+              '<div class="cpw__plan-amt"><span class="cpw__plan-cur">$</span><span class="cpw__plan-big">199</span></div>' +
+            '</button>' +
+            '<button type="button" class="cpw__plan cpw__plan--row" data-plan="plan" role="radio" aria-checked="false">' +
+              '<span class="cpw__radio" aria-hidden="true"></span>' +
+              '<div class="cpw__plan-main"><div class="cpw__plan-label">Pay in 3</div><div class="cpw__plan-sub">Same system, interest-free</div></div>' +
+              '<div class="cpw__plan-amt"><span class="cpw__plan-cur">3 × $</span><span class="cpw__plan-big">39</span></div>' +
+            '</button>' +
           '</div>' +
 
           '<div class="cpw__cta">' +
             '<button type="button" class="cpw__buy" id="cpwBuy">Unlock Memento</button>' +
-            '<button type="button" class="cpw__skip" id="cpwSkip">Maybe later</button>' +
           '</div>' +
+          '<div class="cpw__guarantee cpw__guarantee--v2">' + shieldSvg +
+            '<span><b>The Locked-In Guarantee.</b> Show up for 30 days. If your life isn\'t measurably moving, email me and I refund every cent, and you keep the app. Drifting stays free.</span>' +
+          '</div>' +
+          '<button type="button" class="cpw__skip" id="cpwSkip">Maybe later</button>' +
 
-          '<div class="cpw__trust">' +
-            '<div class="cpw__guarantee">' + shieldSvg +
-              '<span><b>The Still-Drifting Guarantee.</b> Do the work for 30 days. If you come out the other side as lost as you started, email me and I refund every cent. You have 60 days to decide.</span>' +
-            '</div>' +
+          '<div class="cpw__trust cpw__trust--v2">' +
             '<div class="cpw__founder">' +
               '<span class="cpw__founder-av">M</span>' +
               '<p>I built this because I watched years almost slip past me on autopilot. I priced it once so it never becomes another bill you forget about. If it does not move you, take the refund.' +
