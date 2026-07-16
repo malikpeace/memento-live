@@ -4248,15 +4248,16 @@ html.theme-light .n7d { background: #040607; }
    unlit ghost stops ahead. Revealed with the summit (n7d--lit). */
 .n7d-beyond {
   /* dots only (the line is day 7's own segment); same axis, no second line */
-  position: absolute; left: 15px; bottom: -160px; width: 2px; height: 160px;
+  position: absolute; left: 15px; bottom: -250px; width: 2px; height: 250px;
   opacity: 0; transition: opacity 1.6s ease 1.4s;
 }
 .n7d--lit .n7d-beyond { opacity: 1; }
 .n7d-bdot { position: absolute; left: 50%; width: 8px; height: 8px; border-radius: 50%;
   transform: translateX(-50%); background: rgba(var(--n7-green), 0.35); }
-.n7d-bdot--1 { top: 52px; }
-.n7d-bdot--2 { top: 96px; background: rgba(var(--n7-green), 0.2); width: 7px; height: 7px; }
-.n7d-bdot--3 { top: 134px; background: rgba(var(--n7-green), 0.1); width: 6px; height: 6px; }
+.n7d-bdot--1 { top: 54px; }
+.n7d-bdot--2 { top: 110px; background: rgba(var(--n7-green), 0.24); width: 7px; height: 7px; }
+.n7d-bdot--3 { top: 162px; background: rgba(var(--n7-green), 0.14); width: 6px; height: 6px; }
+.n7d-bdot--4 { top: 210px; background: rgba(var(--n7-green), 0.07); width: 5px; height: 5px; }
 
 /* v783: the ending is ONE summit screen with a single snap point, so day 7
    and the finale each get a clean, centered stop. */
@@ -4322,12 +4323,14 @@ html.theme-light .n7d { background: #040607; }
 /* day 7 (last stop): its own segment IS the beyond, one unbroken line
    extending past the node and dissolving to nothing (v787, no seams). */
 .n7d-day[data-n7day="7"]::before {
-  bottom: -160px;
+  bottom: -250px;
   background: linear-gradient(180deg,
     rgba(var(--dc), 0.55) 0%,
-    rgba(var(--dc), 0.34) 35%,
-    rgba(var(--dc), 0.14) 70%,
-    rgba(var(--dc), 0) 96%);
+    rgba(var(--dc), 0.36) 30%,
+    rgba(var(--dc), 0.22) 52%,
+    rgba(var(--dc), 0.12) 72%,
+    rgba(var(--dc), 0.05) 88%,
+    rgba(var(--dc), 0) 100%);
 }
 /* v782 (Malik): only the CURRENT day is in focus; the rest of the lit trail
    blurs back until you return to it. */

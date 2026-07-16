@@ -7664,7 +7664,7 @@ function _renderNext7Days() {
           <h1 class="n7d-h1" id="n7dTitle" data-n7d-type="${esc(greet)}"></h1>
           <p class="n7d-sub" id="n7dSub">Week one is the one that breaks people. You'll see every step before it hits, especially the day that makes most of them quit.</p>
         </div>
-        <div class="n7d-path">${daysHtml}<div class="n7d-beyond" aria-hidden="true"><span class="n7d-bdot n7d-bdot--1"></span><span class="n7d-bdot n7d-bdot--2"></span><span class="n7d-bdot n7d-bdot--3"></span></div></div>
+        <div class="n7d-path">${daysHtml}<div class="n7d-beyond" aria-hidden="true"><span class="n7d-bdot n7d-bdot--1"></span><span class="n7d-bdot n7d-bdot--2"></span><span class="n7d-bdot n7d-bdot--3"></span><span class="n7d-bdot n7d-bdot--4"></span></div></div>
         <div class="n7d-summitstop"><p class="n7d-close" id="n7dClose">This week is the hardest it ever gets. <b>After it, momentum does the lifting.</b></p>
         <div class="n7d-endcta"><button type="button" class="n7d-cta" id="n7dCta">Start Day 1</button></div></div>
       </div>
