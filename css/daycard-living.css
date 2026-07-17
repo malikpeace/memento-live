@@ -281,10 +281,12 @@ body.stage-cinema .daycard-theme-living .daycard-ns__liquid .blob {
 #dashGreetingMobile,
 #dailyMemento,
 #dashBelow,
+#deskMission,
 #topFade {
   transition: opacity 0.9s ease; /* matches the approved lab's chrome fade */
 }
 body.evo2 #commandCenter,
+body.evo2 #deskMission,
 body.evo2 .dash-header,
 body.evo2 #dashGreetingMobile,
 body.evo2 #dailyMemento,

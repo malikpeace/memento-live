@@ -3584,7 +3584,67 @@ function _ccHeroSwap(mutate) {
   newBody.style.opacity = '1';
   setTimeout(() => { try { newBody.style.height = 'auto'; newBody.style.overflow = ''; newBody.style.transition = ''; newBody.style.opacity = ''; } catch (e) {} }, CC_RISE_MS + 40);
 }
+// v812 Desktop Editorial home (Malik's pick, prototypes/home-desktop-lab-v4,
+// Editorial tab, ported verbatim): the mission set as a 42px headline beside
+// the card, with the Done button + streak/proofs stats inline beneath it.
+// Desktop-only twin of the command center (CSS hides it <1024 and hides the
+// command center's box at >=1024 under ns-bloom). The INFORMATION LAW: every
+// fact appears exactly once on the desktop home; mission = this headline,
+// done = the button, streak + proofs = the stat pair, the year = the heatmap,
+// time/death = the clock. Reuses the same data-cc-action wiring.
+function renderDeskMission() {
+  try {
+    const el = document.getElementById('deskMission');
+    if (!el) return;
+    const hasClarity = !!(state.clarity && state.clarity.completed && state.clarity.answers && state.clarity.answers.neutronStar);
+    const pa = (state.action && state.action.primaryAction) || {};
+    const tiers = pa.tiers || {};
+    const hasPlan = !!(state.action && state.action.planGenerated && pa.title);
+    const label = (t) => '<div class="dkm__label">' + t + '</div>';
+    const head = (t) => '<div class="dkm__headline">' + esc(t) + '</div>';
+    const solid = (t, action) => '<button class="dkm__btn dkm__btn--solid" data-cc-action="' + action + '">' + esc(t) + '</button>';
+
+    if (!hasClarity) {
+      el.innerHTML = label('First step') + head('Find your Neutron Star.') +
+        '<div class="dkm__row">' + solid('Start', 'clarity') + '</div>';
+    } else if (!hasPlan) {
+      el.innerHTML = label('Next step') + head('Turn your neutron star into a tangible daily action.') +
+        '<div class="dkm__row">' + solid('Build my plan', 'action') + '</div>';
+    } else if (typeof isComebackGap === 'function' && isComebackGap()) {
+      // Comeback: the full shame-free chooser lives in the command center /
+      // Action module; the desktop hero keeps the calm one-liner + one door.
+      el.innerHTML = label('Welcome back') + head('Pick the smallest way back in.') +
+        '<div class="dkm__row">' + solid('Choose', 'action') + '</div>';
+    } else {
+      const _TK = ['tiny', 'light', 'moderate', 'heavy', 'extreme'];
+      const _selT = state.action && state.action.selectedTier;
+      const _activeTier = _TK.indexOf(_selT) >= 0 ? _selT : pa.recommendedTier;
+      let mission = (tiers[_activeTier] || tiers[pa.recommendedTier] || pa.title || '').trim() || 'Take one step toward your goal today';
+      if (!/[.!?]$/.test(mission)) mission += '.';
+      let streak = 0;
+      try { streak = (typeof consistencyStats === 'function') ? (consistencyStats().current || 0) : ((state.streak && state.streak.count) || 0); }
+      catch (e) { streak = (state.streak && state.streak.count) || 0; }
+      const proofs = ((state.action && state.action.completionHistory) || []).length;
+      const done = actionDoneToday();
+      const doneBtn = done
+        ? '<div class="dkm__btn dkm__btn--done">&#10003; Done today</div>'
+        : '<button class="dkm__btn dkm__btn--solid" data-cc-action="didit">I did it</button>';
+      const stat = (n, l) => '<div class="dkm__stat"><div class="dkm__stat-n">' + n.toLocaleString() + '</div><div class="dkm__stat-l">' + l + '</div></div>';
+      el.innerHTML =
+        label('Today&rsquo;s mission') +
+        head(mission) +
+        '<div class="dkm__row">' + doneBtn +
+          '<div class="dkm__stats">' + stat(streak, 'day streak') + stat(proofs, 'proofs') + '</div>' +
+        '</div>';
+    }
+    bindCommandCenter(el);
+  } catch (e) {}
+}
+
 function bindCommandCenter(cc) {
+  // v812: the desktop editorial hero mirrors every command-center re-render
+  // through this single chokepoint (guarded against self-recursion).
+  try { if (cc && cc.id === 'commandCenter') renderDeskMission(); } catch (e) {}
   // v608 (Malik, overnight item 5): first open of a NEW day with a move still
   // pending, the Today panel breathes once so the move is the first thing the
   // eye lands on. Once per day, never when today's action is already done.
@@ -5215,10 +5275,22 @@ function renderDashConsistency() {
     try { graph = renderConsistencyHeatmap(weeks, 'rolling', true); } catch (e) {}
     // v695 (Malik): ONE fact in the header, the streak, top-left. No label
     // ('the green cells say consistency'), no active-days tally, no Open hint.
+    // v812 information law: on the DESKTOP editorial home the streak lives in
+    // the hero's stat pair, so the head hides there (CSS) and the band carries
+    // only a quiet right-aligned date range instead.
+    const _rangeLbl = (function () {
+      try {
+        const end = new Date();
+        const start = new Date(end.getTime() - 52 * 7 * 86400000);
+        const f = (d) => d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+        return f(start) + ' &rarr; ' + f(end);
+      } catch (e) { return ''; }
+    })();
     el.innerHTML =
       '<div class="dash-cgram__head">' +
         '<div class="dash-cgram__meta"><b>' + streak + '</b> day streak</div>' +
       '</div>' +
+      (_rangeLbl ? '<div class="dash-cgram__range">' + _rangeLbl + '</div>' : '') +
       '<div class="dash-cgram__graph">' + graph + '</div>';
     // Read-only on the Home: strip the per-cell tap affordance; the whole band
     // opens the full Consistency module instead.

@@ -3914,3 +3914,102 @@ body.card-square { --card-w: 360px; --card-h: 360px; }
   body.card-square .app.dash-v2 #dayCard .daycard-theme-living .daycard-living-stage,
   body.card-square.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-theme-living .daycard-living-stage { height: auto !important; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   v812 DESKTOP EDITORIAL HOME (Malik's pick after 4 mockup rounds; source of
+   truth prototypes/home-desktop-lab-v4.html, Editorial tab, ported verbatim).
+   Two-part page in the sidebar frame: hero row (card LEFT, mission as a 42px
+   headline RIGHT with Done + streak/proofs stats inline) and the year
+   heatmap as a full-width band below. THE INFORMATION LAW: every fact
+   appears exactly once (mission=headline, done=button, streak+proofs=stats,
+   year=heatmap, time/death=clock), so the module tiles, quote, proof-trail
+   line and the heatmap's streak header are all OFF this layout.
+   Desktop only (>=1024 + ns-bloom); the mobile home is hard-locked. */
+#deskMission { display: none; }
+.dash-cgram__range { display: none; }
+@media (min-width: 1024px) {
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 {
+    display: grid !important;
+    grid-template-columns: 1fr 1.25fr;
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas:
+      "dhead dhead"
+      "dcard dmission"
+      "dheat dheat";
+    column-gap: 60px;
+    align-items: center;
+    width: 100%;
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 56px 28px;
+    box-sizing: border-box;
+    min-height: 100vh;
+  }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashBelow { display: contents; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .dash-header { grid-area: dhead; align-self: start; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard {
+    grid-area: dcard; display: flex; justify-content: center; margin: 0;
+    --card-w: 206px; --card-h: 277px;
+  }
+  body.card-square.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard { --card-w: 240px; --card-h: 240px; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #deskMission { display: block; grid-area: dmission; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashConsistency {
+    grid-area: dheat; display: block; align-self: end; margin: 48px 0 0; padding: 0;
+    background: none; box-shadow: none; border: none;
+  }
+  /* everything else leaves the desktop home (info law + sidebar duplicates) */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter,
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dailyMemento,
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashHello,
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #hubConsistency,
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #widgetGrid,
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .dash-more,
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .dash-header .hub-headline,
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .dash-header .hub-returncue {
+    display: none !important;
+  }
+  /* the heatmap band: no streak header (the stat pair owns it), one quiet
+     right-aligned range label, cells that breathe across the full width */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashConsistency .dash-cgram__head { display: none; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashConsistency .dash-cgram__range {
+    display: flex; justify-content: flex-end;
+    font-size: 11px; color: var(--text-lo); margin-bottom: 9px;
+    font-variant-numeric: tabular-nums;
+  }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashConsistency .cgraph__months { display: none; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashConsistency .cgraph__legend { display: none; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashConsistency .cgraph__cols { gap: 3px; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashConsistency .cgraph__col { gap: 3px; flex: 1 1 0; max-width: 20px; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashConsistency .cgraph__col .cgraph__cell {
+    width: 100%; height: auto; aspect-ratio: 1 / 1; border-radius: 3px;
+  }
+}
+/* the mission-as-headline (dkm) pieces, tokens only, no borders */
+.dkm__label { font-size: 13px; font-weight: 600; color: var(--text-mid, var(--text-2)); margin-bottom: 14px; }
+.dkm__headline {
+  font-size: 42px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.08;
+  color: var(--text-hi); margin-bottom: 28px; text-wrap: balance; max-width: 18ch;
+}
+.dkm__row { display: flex; align-items: center; gap: 26px; flex-wrap: wrap; }
+.dkm__btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 200px; height: 44px; box-sizing: border-box;
+  font: inherit; font-weight: 700; font-size: 0.92rem;
+  border: none; border-radius: calc(10px * var(--rx, 1));
+}
+.dkm__btn--solid { cursor: pointer; background: var(--solid-bg); color: var(--solid-fg); }
+.dkm__btn--solid:active { transform: scale(0.98); }
+.dkm__btn--done {
+  font-weight: 600; font-size: 14px; color: var(--color-consistency);
+  background: linear-gradient(180deg, rgba(var(--success-rgb), 0.16), rgba(var(--success-rgb), 0.08));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  cursor: default; user-select: none;
+}
+.dkm__stats { display: flex; gap: 26px; }
+.dkm__stat-n { font-size: 19px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text-hi); }
+.dkm__stat-l { font-size: 11.5px; color: var(--text-mid, var(--text-2)); }
+/* editorial breathes, never stretches silly: below 1150 the gap tightens */
+@media (min-width: 1024px) and (max-width: 1149.98px) {
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 { column-gap: 40px; padding: 0 40px 24px; }
+  .dkm__headline { font-size: 36px; }
+}
