@@ -4084,3 +4084,49 @@ html.theme-light .ai-progress__fill {
     rgba(24, 26, 33, 1) 100%
   );
 }
+
+/* ── v809: the LEFT LEDGER (Malik picked it in the mirror-page lab) ─────────
+   Rule of the system: LEFT when Memento talks to you, CENTER when it shows
+   you something sacred. The post-celebration talking stretch (the mirror
+   'recap' + the Mori days beat) now reads left-aligned and anchored low,
+   continuing the left-aligned conversation it just came from. The monuments
+   (celebration, Meet-your-Memento preview, ceremony star) stay centered.
+   The staggered wiLineIn beats above are untouched and keep playing. */
+.wi-cine.wi-recap, .wi-cine.wi-moriview {
+  align-items: flex-start !important;
+  text-align: left;
+  margin: auto 0 26px;              /* anchored low, a breath above the nav */
+  max-width: 430px;
+  padding: 0 10px;
+}
+.wi-cine.wi-recap .wi-demo__headline, .wi-cine.wi-moriview .wi-demo__headline {
+  font-size: clamp(1.75rem, 7.4vw, 2.15rem);
+  line-height: 1.13;
+  letter-spacing: -0.022em;
+  margin-bottom: 16px;
+  text-wrap: balance;
+}
+/* the "where you are" line becomes a bold subhead, not a floating sentence */
+.wi-cine.wi-recap .wi-demo__line,
+.wi-cine.wi-moriview .wi-demo__line {
+  margin-left: 0; margin-right: 0;
+  max-width: 30ch;
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.5;
+  color: #fff;
+}
+.wi-cine.wi-recap .wi-demo__line { margin-bottom: 26px; }
+/* the plan paragraph: readable-bright, narrower, left */
+.wi-cine.wi-recap .wi-demo__stakes {
+  font-weight: 400;
+  font-size: 0.97rem;
+  line-height: 1.62;
+  color: rgba(255, 255, 255, 0.88);
+  max-width: 31ch;
+  margin-bottom: 0;
+}
+/* Mori beat: the grid hangs left with the text (a full left ledger), and the
+   day lines brighten to reading contrast (the no-dim-body-text law). */
+.wi-cine.wi-moriview .wi-mori__grid { margin-left: 0; margin-right: auto; }
+.wi-cine.wi-moriview .wi-mori__days { text-align: left; margin-left: 0; margin-right: 0; color: rgba(255, 255, 255, 0.88); }
