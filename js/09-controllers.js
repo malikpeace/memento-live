@@ -5365,14 +5365,25 @@ const TabBar = {
     // micro-labels anywhere. All control ids are unchanged, every binding below
     // still lands.
     const _syncLine = (function () {
+      // v801 (Malik): paid users see their PLAN here, not the storage detail.
+      let plan = '';
+      try {
+        if (state.entitlements && state.entitlements.isPaid) {
+          const p = state.entitlements.plan || '';
+          plan = (p === 'monthly') ? 'Pro &middot; monthly'
+            : (p === 'yearly') ? 'Pro &middot; yearly'
+            : 'Founder plan';
+        }
+      } catch (e) {}
+      let sync = 'On this device';
       try {
         const cs = window.CloudSync;
         if (cs && cs.isLoggedIn && cs.isLoggedIn()) {
           const when = (cs.lastSyncedText && cs.lastSyncedText()) || '';
-          return 'Synced' + (when ? ' &middot; ' + esc(when) : '');
+          sync = 'Synced' + (when ? ' &middot; ' + esc(when) : '');
         }
       } catch (e) {}
-      return 'On this device';
+      return plan ? (plan + ' &middot; ' + sync) : sync;
     })();
     const _showInstall = (typeof window !== 'undefined' && window.MementoInstall && !window.MementoInstall._isStandalone());
     const _showUnlock = (typeof ClarityPaywall !== 'undefined' && !ClarityPaywall.isPaid());

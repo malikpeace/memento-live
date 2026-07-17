@@ -1788,6 +1788,8 @@ const CreatorTools = {
     bind('creatorJumpSynth', () => this.jumpSynth());
     bind('creatorJump7Days', () => this.jump7Days());
     bind('creatorJumpPaywall', () => this.jumpPaywall());
+    bind('creatorTogglePaid', () => this.togglePaid());
+    try { this._paidLabel(); } catch (e) {}
     bind('creatorJumpDay1', () => this.jumpDay1());
 
     // Every cheat button press toasts its own label (v735): universal
@@ -2239,6 +2241,42 @@ const CreatorTools = {
 
   // Straight to the paywall itself (force so it opens even on a paid dev state).
   jumpPaywall() { this._closeAll(); try { if (typeof ClarityPaywall !== 'undefined' && ClarityPaywall.show) ClarityPaywall.show({ force: true }); } catch (e) {} },
+
+  // Paid/Free switch (Malik v801): flips entitlements app-wide so both sides
+  // of the paywall can be walked without buying. The label states the CURRENT
+  // mode so the bar always tells the truth.
+  _paidLabel() {
+    const b = document.getElementById('creatorTogglePaid');
+    if (!b) return;
+    let paid = false;
+    try { paid = !!(state.entitlements && state.entitlements.isPaid); } catch (e) {}
+    b.textContent = paid ? 'Paid mode (tap for free)' : 'Free mode (tap for paid)';
+  },
+  togglePaid() {
+    try {
+      const paid = !(state.entitlements && state.entitlements.isPaid);
+      if (paid) {
+        state.entitlements = { isPaid: true, paidAt: new Date().toISOString(), plan: 'founder' };
+        if (!state.prefs) state.prefs = {};
+        state.prefs.unlockAll = true;
+      } else {
+        state.entitlements = { isPaid: false, paidAt: null, plan: '' };
+        if (state.prefs) state.prefs.unlockAll = false;
+        if (state.dev) state.dev.previewAll = false;
+      }
+      try { const pw = document.getElementById('clarityPaywall'); if (pw) pw.remove(); if (typeof ClarityPaywall !== 'undefined') ClarityPaywall._open = false; document.body.style.overflow = ''; } catch (e) {}
+      try { persistNow(); } catch (e) {}
+      try { renderGrid(); renderAll(); } catch (e) {}
+      try {
+        if (typeof TabBar !== 'undefined') {
+          TabBar.show(); TabBar.updateHomeDot();
+          const pp = document.getElementById('panelProfile');
+          if (pp && !pp.classList.contains('hidden')) TabBar.renderPanel('profile');
+        }
+      } catch (e) {}
+      this._paidLabel();
+    } catch (e) {}
+  },
   jumpReveal() { this._closeAll(); try { if (window.DevCeremony) window.DevCeremony.reveal(); } catch (e) {} },
   jumpStar() { this._closeAll(); try { if (window.DevCeremony) window.DevCeremony.star(); } catch (e) {} },
   jumpStarSummary() { this._closeAll(); try { if (window.DevCeremony) window.DevCeremony.summary(); } catch (e) {} },
