@@ -4721,9 +4721,12 @@ const TabBar = {
     const themeNow = prefs.theme === 'light' ? 'light' : 'dark';
     const presets = (typeof THEME_PRESETS !== 'undefined') ? THEME_PRESETS : [];
     const themesHtml = presets.map(t => {
+      // v802 (Malik): corner radius / glass are FEEL, not identity. Matching
+      // them here made picking Sharp flip the theme to "Custom" and deselect
+      // the tile, which read as the theme changing. A preset stays "on" as
+      // long as its theme + accent + background hold.
       const on = themeNow === t.theme && accent === t.accent &&
-        bgPref.type === t.bg[0] && (bgPref.value || '') === (t.bg[1] || '') &&
-        uiRadius === t.uiRadius && uiGlass === t.uiGlass;
+        bgPref.type === t.bg[0] && (bgPref.value || '') === (t.bg[1] || '');
       return '<button type="button" class="pref-swatch' + (on ? ' pref-swatch--active' : '') + '" data-theme-preset="' + t.key + '" aria-pressed="' + on + '" title="' + t.name + '">' +
         '<span class="pref-swatch__dot" style="' + t.dot + '"></span>' +
         '<span class="pref-swatch__label">' + t.name + '</span>' +
@@ -4778,11 +4781,11 @@ const TabBar = {
       '</button>';
     const drawer = (id, isOpen, inner) =>
       '<div class="you-drawer" id="' + id + '"' + (isOpen ? '' : ' hidden') + '>' + inner + '</div>';
-    // Current theme preset name (Custom when nothing matches exactly).
+    // Current theme preset name (Custom when nothing matches). Radius/glass
+    // deliberately NOT compared (v802): they are feel, not identity.
     const _matchingPreset = presets.filter(t =>
       themeNow === t.theme && accent === t.accent &&
-      bgPref.type === t.bg[0] && (bgPref.value || '') === (t.bg[1] || '') &&
-      uiRadius === t.uiRadius && uiGlass === t.uiGlass)[0];
+      bgPref.type === t.bg[0] && (bgPref.value || '') === (t.bg[1] || ''))[0];
     const themeName = _matchingPreset ? _matchingPreset.name : 'Custom';
     // Accent value: the active color dot ringed, two quiet companions (mock).
     const _accCol = (swatches.filter(s => s[0] === accent)[0] || [])[2] || '';

@@ -7630,7 +7630,7 @@ function starSeedFromGoal(goal) {
 // ============================================================
 function _renderNext7Days() {
   const name = (state.profile && state.profile.name) ? String(state.profile.name).trim() : '';
-  const greet = name ? (esc(name) + ", here's exactly what's coming.") : "Here's exactly what's coming.";
+  const greet = name ? (esc(name) + ", here's exactly what the next week looks like.") : "Here's exactly what the next week looks like.";
   // v778 (Malik's Ascent, grilled + locked): numeral lives IN the node, title +
   // one line beside it, no labels, no eyebrow, no goal echo. Day 3 is the dip
   // (white node, darker stretch), day 7 the green summit.
@@ -7668,7 +7668,7 @@ function _renderNext7Days() {
       <div class="n7d-inner">
         <div class="n7d-hero">
           <h1 class="n7d-h1" id="n7dTitle" data-n7d-type="${esc(greet)}"></h1>
-          <p class="n7d-sub" id="n7dSub">Week one is the one that breaks people. You'll see every step before it hits, especially the day that makes most of them quit.</p>
+          <p class="n7d-sub" id="n7dSub">The first week is typically the hardest. We'll run through every step so you know what's coming, to make sure above all else: <b>you keep going.</b></p>
         </div>
         <div class="n7d-path">${daysHtml}<div class="n7d-beyond" aria-hidden="true"><span class="n7d-bdot n7d-bdot--1"></span><span class="n7d-bdot n7d-bdot--2"></span><span class="n7d-bdot n7d-bdot--3"></span><span class="n7d-bdot n7d-bdot--4"></span></div></div>
         <div class="n7d-summitstop"><p class="n7d-close" id="n7dClose">This week is the hardest it ever gets. <b>After it, momentum does the lifting.</b></p>
