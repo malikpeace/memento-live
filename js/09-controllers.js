@@ -4754,9 +4754,11 @@ const TabBar = {
         '<div style="font-size:0.6875rem; color:var(--text-3); margin-top:6px;">Paste an image address from a free site like Unsplash or Pexels.</div>' +
         '<div id="prefBgLinkMsg" style="font-size:0.6875rem; color:var(--text-3); margin-top:4px;"></div>' +
       '</div>';
+    // v794 Glass Ledger: two big sentence-case section words, each with ONE
+    // glass card of rows beneath it. No uppercase micro-labels.
     return '' +
-      '<div style="padding: 20px 0;">' +
-        '<div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-2); margin-bottom: 12px;">Appearance</div>' +
+      '<div class="you-h">Appearance</div>' +
+      '<div class="you-card">' +
         toggleRow('prefLightMode', 'Light mode', 'Switch the whole app to a bright, premium off-white theme.', prefs.theme === 'light') +
         toggleRow('prefFlatUi', 'Glass', 'Glassy, blurred surfaces with depth. Turn off for a flat, high-contrast matte look.', !prefs.flatUi) +
         toggleRow('prefSound', 'Sound', 'Quiet synthesized moments: the typewriter, marking a move done, the card coming alive.', prefs.soundOn !== false) +
@@ -4765,11 +4767,11 @@ const TabBar = {
         // Color is paid (v695). v705 (Malik): free users don't see it AT ALL,
         // the paywall's "Make it yours" line is the only tease.
         (_colorLocked ? '' :
-          '<div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); margin: 18px 0 10px;">Color</div>' +
+          '<div class="you-sub">Color</div>' +
           '<div class="pref-swatches" id="prefAccent">' + swatchHtml + '</div>' +
           '<input type="color" id="prefAccentCustomInput" value="' + customHex + '" aria-label="Pick a custom accent color" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;" />' +
           toggleRow('prefMatchMemento', 'Match Memento to color theme', 'Tints your Memento card toward the accent you pick. Off keeps the card its own colors.', prefs.matchMemento !== false)) +
-        '<div style="height:14px;"></div>' +
+        '<div style="height:10px;"></div>' +
         sliderRow('prefUiRadius', 'Corner radius', 'Sharp', 'Round', 0.35, 1.4, 'any', Math.max(0.35, uiRadius)) +
         '<div class="feel-preview" aria-hidden="true">' +
           '<div class="feel-preview__bg"></div>' +
@@ -4782,7 +4784,9 @@ const TabBar = {
           '</div>' +
         '</div>' +
         '<div class="feel-preview__caption">Live preview</div>' +
-        '<div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-2); margin: 22px 0 12px;">Behavior</div>' +
+      '</div>' +
+      '<div class="you-h">Behavior</div>' +
+      '<div class="you-card">' +
         toggleRow('prefReduceMotion', 'Reduce motion', 'Calms the orbiting ring, drifting glow, and ambient motion.', reduceMotion) +
         // Tilt follows the mouse cursor, so it does nothing on the phone (v706).
         ((window.matchMedia && window.matchMedia('(max-width: 859.98px)').matches) ? '' :
@@ -4793,7 +4797,7 @@ const TabBar = {
         (function () {
           if (window.matchMedia && window.matchMedia('(max-width: 859.98px)').matches) return '';
           const sbp = (state.prefs && state.prefs.sidebarSections) || {};
-          return '<div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); margin: 18px 0 8px;">Sidebar</div>' +
+          return '<div class="you-sub">Sidebar</div>' +
             toggleRow('prefSbNeutron', 'Neutron Star', 'Pin your goal in the menu.', !!sbp.neutron) +
             toggleRow('prefSbAction', "Today's action", 'Pin the day\u2019s one move.', !!sbp.action) +
             toggleRow('prefSbTimeleft', 'Time left', 'Days remaining to your goal.', !!sbp.timeleft) +
@@ -5218,7 +5222,9 @@ const TabBar = {
   // Account card: optional cloud sync via CloudSync (js/12, Supabase magic
   // link, no passwords). Offline-safe; the app works fully without it.
   renderAccountSection() {
-    const SECLABEL = 'font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-2); margin-bottom: 12px;';
+    // v794 Glass Ledger: this renders INSIDE the Data card, so "Account" is a
+    // sentence-case sub-head, not an uppercase micro-label.
+    const SECLABEL = 'font-size: 0.8rem; font-weight: 700; color: var(--text-2); margin: 2px 0 10px;';
     const cs = window.CloudSync;
     if (!cs || !cs.available()) {
       return '<div style="' + SECLABEL + '">Account</div>' +
@@ -5273,57 +5279,68 @@ const TabBar = {
     // until a full reload (Malik v693: "sometimes I can't see the cheat bar").
     const _cboxKeep = document.getElementById('creatorBox');
     const FIELD = 'width:100%;box-sizing:border-box;font:inherit;font-size:0.9rem;color:var(--text-hi);background:var(--surface-1);border:1px solid transparent;border-radius:calc(8px * var(--rx, 1));padding:11px 13px;outline:none;';
-    const FIELDTA = FIELD + 'resize:vertical;line-height:1.5;';
-    const FIELDS = 'font:inherit;font-size:0.85rem;color:var(--text-hi);background:var(--surface-1);border:1px solid transparent;border-radius:calc(6px * var(--rx, 1));padding:6px 8px;outline:none;margin-left:6px;';
-    const SECLABEL = 'font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-2); margin-bottom: 12px;';
-    const FLABEL = 'font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); margin: 16px 0 6px;';
-    const rem = (state.prefs && state.prefs.reminder) || {};
+    // v794: the Glass Ledger (Malik's pick from the settings lab). Big
+    // sentence-case section words OUTSIDE the cards carry the hierarchy; the
+    // controls live in glass cards so every row reads tappable. No uppercase
+    // micro-labels anywhere. All control ids are unchanged, every binding below
+    // still lands.
+    const _syncLine = (function () {
+      try {
+        const cs = window.CloudSync;
+        if (cs && cs.isLoggedIn && cs.isLoggedIn()) {
+          const when = (cs.lastSyncedText && cs.lastSyncedText()) || '';
+          return 'Synced' + (when ? ' &middot; ' + esc(when) : '');
+        }
+      } catch (e) {}
+      return 'On this device';
+    })();
+    const _showInstall = (typeof window !== 'undefined' && window.MementoInstall && !window.MementoInstall._isStandalone());
+    const _showUnlock = (typeof ClarityPaywall !== 'undefined' && !ClarityPaywall.isPaid());
+    const _unlockPrice = (function () { try { return '$' + ClarityPaywall._PRICING.founder + ' once'; } catch (e) { return ''; } })();
     body.innerHTML = `
-      <div style="text-align:center; padding: 32px 0 24px;">
-        <div id="profAvatar" style="width: 96px; height: 96px; border-radius: 50%; background-color: rgba(58, 217, 245,0.15); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; font-size: 2.1rem; color: var(--color-clarity); border: 1px solid var(--hairline); overflow: hidden;">${esc((state.profile.name || 'U').charAt(0).toUpperCase())}</div>
-        <div style="display:flex; gap:14px; justify-content:center; margin-bottom: 14px;">
-          <button type="button" id="profAvatarPick" style="font:500 0.75rem/1 inherit; cursor:pointer; border:none; background:transparent; color:var(--text-2); padding:4px 2px;">${state.profile.avatarId ? 'Change photo' : 'Add photo'}</button>
-          <button type="button" id="profAvatarRemove" style="font:500 0.75rem/1 inherit; cursor:pointer; border:none; background:transparent; color:var(--text-3); padding:4px 2px; ${state.profile.avatarId ? '' : 'display:none;'}">Remove</button>
+      <div class="you-head">
+        <div id="profAvatar" class="you-avatar">${esc((state.profile.name || 'U').charAt(0).toUpperCase())}</div>
+        <div style="flex:1; min-width:0;">
+          <div style="font-size:1.2rem; font-weight:800; letter-spacing:-0.01em;">${esc(state.profile.name || 'User')}</div>
+          <div style="font-size:0.78rem; color:var(--text-2); margin-top:2px;">${_syncLine}</div>
+          <div style="display:flex; gap:14px; margin-top:5px;">
+            <button type="button" id="profAvatarPick" style="font:600 0.74rem/1 inherit; cursor:pointer; border:none; background:transparent; color:var(--text-2); padding:2px 0;">${state.profile.avatarId ? 'Change photo' : 'Add photo'}</button>
+            <button type="button" id="profAvatarRemove" style="font:600 0.74rem/1 inherit; cursor:pointer; border:none; background:transparent; color:var(--text-3); padding:2px 0; ${state.profile.avatarId ? '' : 'display:none;'}">Remove</button>
+          </div>
         </div>
-        <input type="file" id="profAvatarFile" accept="image/*" hidden>
-        <div style="font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em;">${esc(state.profile.name || 'User')}</div>
-        <div style="font-size: 0.875rem; color: var(--text-2); margin-top: 4px;">${esc(state.profile.email || '')}</div>
       </div>
-      ${(typeof window !== 'undefined' && window.MementoInstall && !window.MementoInstall._isStandalone()) ? `
-      <button type="button" id="profInstallApp" aria-label="Add Memento to your home screen" style="display:flex;align-items:center;gap:13px;width:100%;text-align:left;font:inherit;cursor:pointer;border:none;border-radius:calc(14px * var(--rx,1));padding:15px 16px;margin-bottom:14px;background:var(--kfill-04);box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);">
-        <span aria-hidden="true" style="width:38px;height:38px;flex:0 0 auto;border-radius:11px;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,rgba(96,132,255,0.92),rgba(70,100,220,0.86));box-shadow:0 0 16px rgba(96,132,255,0.4),inset 0 1px 0 rgba(255,255,255,0.22);"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8.5v7M8.5 12h7"/></svg></span>
-        <span style="min-width:0;">
-          <span style="display:block;font-size:0.95rem;font-weight:700;color:var(--text-hi);">Add to Home Screen</span>
-          <span style="display:block;font-size:0.8rem;color:var(--text-2);line-height:1.35;margin-top:2px;">Install Memento as a real app: full screen, instant, with reminders.</span>
-        </span>
-      </button>` : ''}
-      ${(typeof ClarityPaywall !== 'undefined' && !ClarityPaywall.isPaid()) ? `
-      <button type="button" id="profUnlock" aria-label="Unlock Memento" style="display:flex;align-items:center;gap:13px;width:100%;text-align:left;font:inherit;cursor:pointer;border:none;border-radius:calc(14px * var(--rx,1));padding:15px 16px;margin-bottom:14px;background:var(--kfill-04);box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);">
-        <span aria-hidden="true" style="width:38px;height:38px;flex:0 0 auto;border-radius:11px;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,rgba(58,217,245,0.92),rgba(44,150,190,0.86));box-shadow:0 0 16px rgba(58,217,245,0.4),inset 0 1px 0 rgba(255,255,255,0.22);"><svg viewBox="0 0 512 512" width="17" height="17" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z" fill="#0b1112"/></svg></span>
-        <span style="min-width:0;">
-          <span style="display:block;font-size:0.95rem;font-weight:700;color:var(--text-hi);">Unlock Memento</span>
-          <span style="display:block;font-size:0.8rem;color:var(--text-2);line-height:1.35;margin-top:2px;">Own it once, yours for life. Everything opens the moment you do.</span>
-        </span>
-      </button>` : ''}
-      <div id="prefsSection" class="prefs-card">${this.renderPreferencesSection()}</div>
-      <div class="prefs-card" style="padding-top: 20px; padding-bottom: 22px;">
-        <div style="${SECLABEL}">Identity</div>
-        <div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); margin: 0 0 6px;">What to call you</div>
+      <input type="file" id="profAvatarFile" accept="image/*" hidden>
+      ${(_showInstall || _showUnlock) ? `
+      <div class="you-h">Memento</div>
+      <div class="you-card">
+        ${_showInstall ? `
+        <button type="button" id="profInstallApp" class="you-row" aria-label="Add Memento to your home screen">
+          <span class="you-row__text"><span class="you-row__title">Add to Home Screen</span><span class="you-row__sub">A real app: full screen, instant, with reminders.</span></span>
+          <span class="you-chev" aria-hidden="true">&rsaquo;</span>
+        </button>` : ''}
+        ${_showUnlock ? `
+        <button type="button" id="profUnlock" class="you-row" aria-label="Unlock Memento">
+          <span class="you-row__text"><span class="you-row__title">Unlock Memento</span><span class="you-row__sub">Own it once, yours for life.</span></span>
+          <span class="you-row__val" style="color:var(--color-clarity);">${_unlockPrice}</span>
+          <span class="you-chev" aria-hidden="true">&rsaquo;</span>
+        </button>` : ''}
+      </div>` : ''}
+      <div id="prefsSection">${this.renderPreferencesSection()}</div>
+      <div class="you-h">Identity</div>
+      <div class="you-card you-card--pad">
+        <div class="you-sub" style="margin-top:2px;">What to call you</div>
         <input type="text" id="profName" maxlength="40" value="${esc(state.profile.name || '')}" placeholder="Nickname" style="${FIELD}" />
-        <div style="${FLABEL}">Full name</div>
+        <div class="you-sub">Full name</div>
         <input type="text" id="profFullName" maxlength="60" value="${esc(state.profile.fullName || '')}" placeholder="First and last" style="${FIELD}" />
-        <div style="${FLABEL}">Birthday${(function () { const a = (typeof ageFromBirthday === 'function') ? ageFromBirthday(state.profile.birthday) : null; return a != null ? ' <span style="text-transform:none;letter-spacing:0;color:var(--text-lo);">(' + a + ' years old)</span>' : ''; })()}</div>
+        <div class="you-sub">Birthday${(function () { const a = (typeof ageFromBirthday === 'function') ? ageFromBirthday(state.profile.birthday) : null; return a != null ? ' <span style="font-weight:500;color:var(--text-lo);">(' + a + ' years old)</span>' : ''; })()}</div>
         <input type="date" id="profBirthday" value="${esc(state.profile.birthday || '')}" style="${FIELD}color-scheme:dark;" />
-        <div style="font-size: 0.6875rem; color: var(--text-3); margin-top: 8px;">Saved on this device. Used across Clarity and Reflection.</div>
+        <div style="font-size: 0.72rem; color: var(--text-3); margin-top: 10px;">Saved on this device. Used across Clarity and Reflection.</div>
       </div>
-      <div class="sheet-divider"></div>
-      <div style="padding: 20px 0;" id="acctSection">${this.renderAccountSection()}</div>
-      <div class="sheet-divider"></div>
-      <div style="padding: 20px 0;" id="supportSection">${this.renderSupportSection()}</div>
-      <div class="sheet-divider"></div>
-      <div style="padding: 20px 0;">
-        <div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-2); margin-bottom: 12px;">Your Data</div>
-        <div style="font-size: 0.8125rem; color: var(--text-2); margin-bottom: 12px; line-height: 1.4;">Your Memento lives on this device only. Download a backup so a cleared browser or a new device never erases your history.</div>
+      <div class="you-h">Data</div>
+      <div class="you-card you-card--pad">
+        <div id="acctSection">${this.renderAccountSection()}</div>
+        <div class="you-sub" style="margin-top:20px;">Backup</div>
+        <div style="font-size: 0.8125rem; color: var(--text-2); margin-bottom: 12px; line-height: 1.45;">Download a backup so a cleared browser or a new device never erases your history.</div>
         <div style="display:flex; gap:8px;">
           <button class="sheet-btn" id="exportData" style="flex:1; background: rgba(var(--success-rgb),0.12); color: var(--color-consistency); border: 1px solid rgba(var(--success-rgb),0.25);">Download backup</button>
           <button class="sheet-btn" id="importData" style="flex:1; background: var(--kfill-04); color: var(--text-1); border: 1px solid rgba(var(--ink),0.08);">Restore</button>
@@ -5345,8 +5362,11 @@ const TabBar = {
           <span>Your data lives on this device. No account required, nothing you write is ever collected. The only things that ever leave are what you choose to send to the optional AI, plus anonymous usage signals (which screens get used, never your words). Vision-board and journal images stay on this device only, never synced. Use the backup above to move it yourself.</span>
         </div>
       </div>
-      <div class="sheet-divider"></div>
-      <button class="sheet-btn" id="profileReset" style="background: var(--kfill-12); color: var(--color-action); border: 1px solid rgba(var(--ink),0.25); margin-top: 24px;">Reset Everything</button>
+      <div class="you-h">Support</div>
+      <div class="you-card you-card--pad">
+        <div id="supportSection">${this.renderSupportSection()}</div>
+      </div>
+      <button class="sheet-btn" id="profileReset" style="background: var(--kfill-12); color: var(--color-action); border: 1px solid rgba(var(--ink),0.25); margin-top: 34px;">Reset Everything</button>
       <div style="font-size: 0.6875rem; color: var(--text-3); text-align: center; margin-top: 12px;">This will delete all your data and start fresh.</div>
       <div style="font-size: 0.6875rem; color: var(--text-3); text-align: center; margin-top: 28px; letter-spacing: 0.06em;">Memento ${(window.MEMENTO_VERSION || '')}</div>
       <div style="font-size: 0.6875rem; text-align: center; margin-top: 8px;"><a href="legal/terms.html" target="_blank" rel="noopener" style="color: var(--text-3); text-decoration: none; font-weight: 600;">Terms</a><span style="color: var(--text-3); margin: 0 8px;">&middot;</span><a href="legal/privacy.html" target="_blank" rel="noopener" style="color: var(--text-3); text-decoration: none; font-weight: 600;">Privacy</a></div>

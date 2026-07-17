@@ -57,8 +57,8 @@
 .fb-chip--on { color: var(--color-reflection); background: rgba(90, 219, 242,0.16); border-color: rgba(90, 219, 242,0.34); }
 .support-disclose { display: block; width: 100%; text-align: left; font: inherit; font-size: var(--fs-sm); font-weight: 600; color: var(--text-mid); background: transparent; border: 0; padding: 14px 0 4px; cursor: pointer; }
 .support-disclose:hover { color: var(--text-hi); }
-.support-disclose::after { content: ' \203A'; opacity: 0.6; }
-.support-disclose.is-open::after { content: ' \2304'; }
+/* v794: the chevron is the inline rotating span in renderSupportSection; the
+   CSS ::after copy doubled it up on the Glass Ledger card. */
 .support-story { font-size: var(--fs-sm); line-height: 1.6; color: var(--text-mid); padding: 4px 0; }
 .support-story p { margin: 0 0 10px; }
 .support-changelog { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
