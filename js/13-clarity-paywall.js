@@ -1,8 +1,12 @@
 /* ───────────────────────────────────────────────────────────────────────────
    ClarityPaywall — the payment moment, shown the first time someone finishes
-   Clarity and names their Neutron Star. The living Memento card blooms purple
-   (clarity is the one pillar lit), their goal sits beneath it, and every other
-   module is shown locked until they unlock Memento.
+   Clarity, names their Neutron Star, and walks the First 7 Days page.
+
+   v792 layout (the Relic, Malik's pick from the paywall labs):
+   big pure glass card with a cyan under-glow, "Build your Memento.", the
+   features as glass chips, ONE visible plan (Founder's Lifetime, first 250
+   only) with the other plans collapsed behind a disclosure, the CTA carrying
+   its own fine print, the guarantee, and Maybe later as the ONLY exit.
 
    This is the only hard paywall: Clarity is the free first win, Action +
    Consistency + everything else are paid. The "Unlock" button is a placeholder
@@ -11,6 +15,22 @@
 
 const ClarityPaywall = {
   _open: false,
+
+  // ONE place to change money (prices can move over time; the founder tier is
+  // genuinely capped, after the first N buyers the price becomes the anchor).
+  _PRICING: {
+    anchor: 400,      // lifetime price after the founder window
+    founder: 250,     // founder's lifetime, pay once
+    founderCap: 250,  // "first 250 people only"
+    yearly: 200,
+    monthly: 25
+  },
+
+  // Social proof ships HIDDEN until the numbers are real. The layout below is
+  // ready; flip this once real users + real quotes exist. Fake proof NEVER
+  // renders in production.
+  _SHOW_PROOF: false,
+  _PROOF: { count: 0, quote: '', who: '' },
 
   // Has the user paid / been granted everything?
   isPaid() {
@@ -33,83 +53,25 @@ const ClarityPaywall = {
     });
   },
 
-  // The living Memento card markup, identical to renderDayCard's living theme,
-  // built standalone so it does not depend on #dayCard being on screen.
-  _cardHTML(name) {
-    const blobs = '<i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i><i class="blob b4"></i><i class="blob b5"></i><i class="blob b6"></i>';
-    const emblem = '<svg class="daycard-ns__emblem" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
-    const nm = this._esc((name || '').trim());
-    const ns =
-      '<div class="daycard-ns">' +
-        '<span class="daycard-ns__liquid" aria-hidden="true">' + blobs + '</span>' +
-        '<span class="daycard-ns__iri" aria-hidden="true"></span>' +
-        '<span class="daycard-ns__sheen" aria-hidden="true"></span>' +
-        '<span class="daycard-ns__burn" aria-hidden="true"></span>' +
-        '<div class="daycard-ns__body">' + emblem + '</div>' +
-        '<div class="daycard-ns__foot"><span class="daycard-ns__name">' + nm + '</span></div>' +
-      '</div>';
-    return '<div class="daycard-wrap daycard-theme-living">' +
-        '<span class="daycard-wrap__aura" aria-hidden="true"></span>' +
-        '<div class="daycard-living-stage">' +
-          '<span class="daycard-bloom" aria-hidden="true">' + blobs + '</span>' +
-          '<span class="daycard-floor" aria-hidden="true">' + blobs + '</span>' +
-          ns +
-        '</div>' +
-      '</div>';
-  },
-
-  // Force the card to pure clarity (purple), regardless of action/consistency,
-  // and push the glow harder than the dashboard default so this moment really
-  // blooms (the dashboard tuning is deliberately restrained; this is the climax).
-  _setPureClarity(wrap) {
-    if (!wrap) return;
-    wrap.style.setProperty('--clar', '1.000');
-    wrap.style.setProperty('--act', '0.000');
-    wrap.style.setProperty('--cons', '0.000');
-    wrap.style.setProperty('--mix', '0.000');
-    wrap.style.setProperty('--lit', '1.000');
-    wrap.style.setProperty('--glow', '0.85');
-    wrap.style.setProperty('--ring', '0.55');
-    wrap.style.setProperty('--emit', '1.15');
-    wrap.style.setProperty('--sat', '1.75');
-  },
-
-  _lockSvg: '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 11V8a4 4 0 1 1 8 0v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
-
-  _modules: [
-    { name: 'Action', sub: 'Your one move a day', wide: true,
-      ico: '<svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' },
-    { name: 'Consistency', sub: 'Your streak',
-      ico: '<svg viewBox="0 0 24 24" fill="none"><path d="M12 3c2 3 5 4 5 8a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-2-1-4-1-7z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>' },
-    { name: 'Memento Mori', sub: 'Your time, visualized',
-      ico: '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>' },
-    { name: 'Memento Vivere', sub: 'Your vision board',
-      ico: '<svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M4 15l4-4 3 3 3-4 6 6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>' },
-    { name: 'Make it yours', sub: 'Colors & themes',
-      ico: '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><circle cx="9" cy="10" r="1.3" fill="currentColor"/><circle cx="14.5" cy="9" r="1.3" fill="currentColor"/><circle cx="15" cy="14.5" r="1.3" fill="currentColor"/></svg>' },
-    { name: 'Notes', sub: 'Reflections & proof',
-      ico: '<svg viewBox="0 0 24 24" fill="none"><path d="M7 4h10a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.7"/><path d="M9 9h6M9 13h6M9 17h3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>' }
-  ],
-
-  _modulesHTML() {
-    return this._modules.map((m) =>
-      '<div class="cpw__mod' + (m.wide ? ' cpw__mod--wide' : '') + '">' +
-        '<span class="cpw__mod-ico">' + m.ico + '</span>' +
-        '<span class="cpw__mod-txt"><span class="cpw__mod-name">' + this._esc(m.name) + '</span>' +
-          '<span class="cpw__mod-sub">' + this._esc(m.sub) + '</span></span>' +
-        '<span class="cpw__mod-lock">' + this._lockSvg + '</span>' +
-      '</div>'
-    ).join('');
+  // The CTA's fine print per plan (lives inside the button, Opal-style).
+  _fineFor(plan) {
+    const P = this._PRICING;
+    if (plan === 'yearly') return '$' + P.yearly + ' a year &middot; $' + (P.yearly / 365).toFixed(2) + ' a day';
+    if (plan === 'monthly') return '$' + P.monthly + ' a month &middot; cancel anytime';
+    return '$' + P.founder + ' once &middot; yours forever';
   },
 
   show(opts) {
     try {
+      opts = opts || {};
+      // Already unlocked (early buyer, restored purchase, second device): the
+      // paywall never shows again. Dev previews pass { force: true }.
+      if (this.isPaid() && !opts.force) return;
       if (this._open || document.getElementById('clarityPaywall')) return;
       this._open = true;
-      opts = opts || {};
       // Clear any leftover card-evolution cinema state so it can't leak into the
-      // paywall's own card (body.evo2 was scaling + boxing the paywall card when the
-      // cinema was interrupted, Malik v674). Finish a live run, then strip the classes.
+      // paywall (body.evo2 scaled + boxed the screen when the cinema was
+      // interrupted, Malik v674). Finish a live run, then strip the classes.
       try {
         if (typeof _cardEvolutionRunning !== 'undefined' && _cardEvolutionRunning && typeof _evoFinish === 'function') {
           _evoFinish(document.getElementById('dayCard'), null, {});
@@ -121,61 +83,79 @@ const ClarityPaywall = {
       } catch (e) {}
       try { if (typeof Analytics !== 'undefined') Analytics.track('paywall_shown'); } catch (e) {} // Funnel
 
-      const prof = (state && state.profile) || {};
-      const ans = (state && state.clarity && state.clarity.answers) || {};
-      const star = opts.star || ans.neutronStar || 'The one thing that actually matters to you.';
-      const name = prof.name || '';
-
+      const P = this._PRICING;
       const shieldSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2L4 5v6c0 5 3.4 8.3 8 10 4.6-1.7 8-5 8-10V5l-8-3z" stroke="rgba(108,198,255,0.9)" stroke-width="2" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="rgba(108,198,255,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      const chip = (label) => '<span class="cpw__chip">' + label + '</span>';
+
+      // Social proof slot: layout ready, hidden until the numbers are real.
+      let proofHtml = '';
+      if (this._SHOW_PROOF && this._PROOF.count > 0) {
+        proofHtml =
+          '<div class="cpw__proof">' +
+            '<span class="cpw__proof-avs" aria-hidden="true"><i></i><i></i><i></i></span>' +
+            '<span class="cpw__proof-count">' + this._PROOF.count + ' people building theirs</span>' +
+            (this._PROOF.quote ? '<p class="cpw__proof-quote">&ldquo;' + this._esc(this._PROOF.quote) + '&rdquo;<span class="cpw__proof-who">' + this._esc(this._PROOF.who) + '</span></p>' : '') +
+          '</div>';
+      }
 
       const ov = document.createElement('div');
       ov.id = 'clarityPaywall';
       ov.setAttribute('role', 'dialog');
       ov.setAttribute('aria-label', 'Unlock Memento');
-      const feat = (icon, label) => '<div class="cpw__feat">' + icon + '<span>' + label + '</span></div>';
-      const I = {
-        act: '<svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-        cons: '<svg viewBox="0 0 24 24" fill="none"><path d="M12 3c2 3 5 4 5 8a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-2-1-4-1-7z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>',
-        mori: '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-        coach: '<svg viewBox="0 0 24 24" fill="none"><path d="M21 12a8 8 0 1 1-3.1-6.3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M12 8v4l3 2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" opacity="0"/><path d="M8 10h8M8 14h5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>',
-        colors: '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><circle cx="9" cy="10" r="1.3" fill="currentColor"/><circle cx="14.5" cy="9" r="1.3" fill="currentColor"/><circle cx="15" cy="14.5" r="1.3" fill="currentColor"/></svg>'
-      };
       ov.innerHTML =
         '<div class="cpw__scroll">' +
-          '<div class="cpw__hero cpw__hero--v2">' +
-            '<div class="cpw__card cpw__card--mini">' + this._cardHTML(name) + '</div>' +
+          '<div class="cpw__hero cpw__hero--v3">' +
+            '<div class="cpw__relic" aria-hidden="true">' +
+              '<span class="cpw__relic-glow"></span>' +
+              '<div class="cpw__relic-card">' +
+                '<svg class="cpw__relic-m" viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>' +
+              '</div>' +
+            '</div>' +
             '<h1 class="cpw__h1">Build your Memento.</h1>' +
-            '<p class="cpw__sub2">Everything, yours forever. No subscription.</p>' +
+            '<div class="cpw__chips">' +
+              chip('Refined clarity') +
+              chip('One move a day') +
+              chip('Streaks') +
+              chip('Memento Mori') +
+              chip('Themes') +
+              '<span class="cpw__chip cpw__chip--more">+ everything after</span>' +
+            '</div>' +
+            proofHtml +
           '</div>' +
 
-          '<div class="cpw__feats">' +
-            feat(I.act, 'Your one move a day') +
-            feat(I.cons, 'Streaks and your year in light') +
-            feat(I.mori, 'Memento Mori, your time made visible') +
-            feat(I.coach, 'An AI coach in your corner') +
-            feat(I.colors, 'Colors and themes, make it yours') +
-          '</div>' +
-
-          '<div class="cpw__plans cpw__plans--v2" role="radiogroup" aria-label="Choose your plan">' +
-            '<button type="button" class="cpw__plan cpw__plan--row is-picked" data-plan="lifetime" role="radio" aria-checked="true">' +
-              '<span class="cpw__radio" aria-hidden="true"></span>' +
-              '<div class="cpw__plan-main"><div class="cpw__plan-label">The Lock-In System <span class="cpw__plan-flag2">Most pick this</span></div><div class="cpw__plan-sub">Pay once, own it for life</div></div>' +
-              '<div class="cpw__plan-amt"><span class="cpw__plan-cur">$</span><span class="cpw__plan-big">99</span><span class="cpw__plan-meta">once</span></div>' +
+          '<div class="cpw__offer3" role="radiogroup" aria-label="Choose your plan">' +
+            '<button type="button" class="cpw__plan3 is-picked" data-plan="founder" role="radio" aria-checked="true">' +
+              '<div class="cpw__plan3-top">' +
+                '<span class="cpw__plan3-name">Founder&rsquo;s Lifetime</span>' +
+                '<span class="cpw__plan-flag2">First ' + P.founderCap + ' only</span>' +
+              '</div>' +
+              '<div class="cpw__plan3-price">' +
+                '<span class="cpw__plan3-was">$' + P.anchor + '</span>' +
+                '<span class="cpw__plan3-now">$' + P.founder + '</span>' +
+                '<span class="cpw__plan3-per">once, yours for life</span>' +
+              '</div>' +
             '</button>' +
-            '<button type="button" class="cpw__plan cpw__plan--row" data-plan="founder" role="radio" aria-checked="false">' +
-              '<span class="cpw__radio" aria-hidden="true"></span>' +
-              '<div class="cpw__plan-main"><div class="cpw__plan-label">Founder\'s Edition</div><div class="cpw__plan-sub">Founder access, every future update</div></div>' +
-              '<div class="cpw__plan-amt"><span class="cpw__plan-cur">$</span><span class="cpw__plan-big">199</span></div>' +
-            '</button>' +
-            '<button type="button" class="cpw__plan cpw__plan--row" data-plan="plan" role="radio" aria-checked="false">' +
-              '<span class="cpw__radio" aria-hidden="true"></span>' +
-              '<div class="cpw__plan-main"><div class="cpw__plan-label">Pay in 3</div><div class="cpw__plan-sub">Same system, interest-free</div></div>' +
-              '<div class="cpw__plan-amt"><span class="cpw__plan-cur">3 × $</span><span class="cpw__plan-big">39</span></div>' +
-            '</button>' +
+            '<button type="button" class="cpw__more" id="cpwMore" aria-expanded="false" aria-controls="cpwMorePlans">Other plans <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' +
+            '<div class="cpw__moreplans" id="cpwMorePlans" hidden>' +
+              '<button type="button" class="cpw__plan cpw__plan--row" data-plan="yearly" role="radio" aria-checked="false">' +
+                '<span class="cpw__radio" aria-hidden="true"></span>' +
+                '<div class="cpw__plan-main"><div class="cpw__plan-label">Yearly</div><div class="cpw__plan-sub">$' + (P.yearly / 365).toFixed(2) + ' a day</div></div>' +
+                '<div class="cpw__plan-amt"><span class="cpw__plan-cur">$</span><span class="cpw__plan-big">' + P.yearly + '</span><span class="cpw__plan-meta">/yr</span></div>' +
+              '</button>' +
+              '<button type="button" class="cpw__plan cpw__plan--row" data-plan="monthly" role="radio" aria-checked="false">' +
+                '<span class="cpw__radio" aria-hidden="true"></span>' +
+                '<div class="cpw__plan-main"><div class="cpw__plan-label">Monthly</div><div class="cpw__plan-sub">Cancel anytime</div></div>' +
+                '<div class="cpw__plan-amt"><span class="cpw__plan-cur">$</span><span class="cpw__plan-big">' + P.monthly + '</span><span class="cpw__plan-meta">/mo</span></div>' +
+              '</button>' +
+            '</div>' +
           '</div>' +
 
           '<div class="cpw__cta">' +
-            '<button type="button" class="cpw__buy" id="cpwBuy">Unlock Memento</button>' +
+            '<button type="button" class="cpw__buy cpw__buy--fine" id="cpwBuy">' +
+              '<span class="cpw__buy-main">Unlock Memento</span>' +
+              '<span class="cpw__buy-sub" id="cpwBuyFine">' + this._fineFor('founder') + '</span>' +
+            '</button>' +
+            '<div class="cpw__speed">Your first move is five minutes away.</div>' +
           '</div>' +
           '<div class="cpw__guarantee cpw__guarantee--v2">' + shieldSvg +
             '<span><b>The Locked-In Guarantee.</b> Show up for 30 days. If your life isn\'t measurably moving, email me and I refund every cent, and you keep the app. Drifting stays free.</span>' +
@@ -198,25 +178,38 @@ const ClarityPaywall = {
 
       document.body.appendChild(ov);
 
-      // pure-purple living card + calm drift
-      const wrap = ov.querySelector('.daycard-wrap');
-      this._setPureClarity(wrap);
-      try { if (typeof startLivingWander === 'function') startLivingWander(wrap); } catch (e) {}
-
-      // tier picker (visual only, no charge)
-      ov.querySelectorAll('.cpw__plan').forEach((pl) => {
+      // Plan picker (visual only, no charge). Picking a plan re-writes the
+      // fine print inside the CTA so the button always states the real deal.
+      const fine = ov.querySelector('#cpwBuyFine');
+      ov.querySelectorAll('[data-plan]').forEach((pl) => {
         pl.addEventListener('click', () => {
-          ov.querySelectorAll('.cpw__plan').forEach((x) => { x.classList.remove('is-picked'); x.setAttribute('aria-checked', 'false'); });
+          ov.querySelectorAll('[data-plan]').forEach((x) => { x.classList.remove('is-picked'); x.setAttribute('aria-checked', 'false'); });
           pl.classList.add('is-picked'); pl.setAttribute('aria-checked', 'true');
+          if (fine) fine.innerHTML = this._fineFor(pl.getAttribute('data-plan'));
         });
+      });
+
+      // "Other plans" disclosure (Opal-style): one price on screen, the rest
+      // one tap away for the people who need a smaller yes.
+      const more = ov.querySelector('#cpwMore');
+      const morePlans = ov.querySelector('#cpwMorePlans');
+      if (more && morePlans) more.addEventListener('click', () => {
+        const open = morePlans.hasAttribute('hidden');
+        if (open) morePlans.removeAttribute('hidden'); else morePlans.setAttribute('hidden', '');
+        more.setAttribute('aria-expanded', open ? 'true' : 'false');
+        more.classList.toggle('is-open', open);
+        if (!open) {
+          // Collapsing returns the pick to the founder plan so the CTA never
+          // quotes a price the screen no longer shows.
+          const f = ov.querySelector('.cpw__plan3');
+          if (f && !f.classList.contains('is-picked')) f.click();
+        }
       });
 
       const buy = ov.querySelector('#cpwBuy');
       if (buy) buy.addEventListener('click', () => this._unlock());
       const skip = ov.querySelector('#cpwSkip');
       if (skip) skip.addEventListener('click', () => this.hide());
-      const closeX = ov.querySelector('#cpwClose');
-      if (closeX) closeX.addEventListener('click', () => this.hide());
 
       document.body.style.overflow = 'hidden';
       void ov.offsetWidth;
@@ -231,19 +224,29 @@ const ClarityPaywall = {
       if (!state.entitlements) state.entitlements = { isPaid: false, paidAt: null, plan: '' };
       state.entitlements.isPaid = true;
       state.entitlements.paidAt = Date.now();
-      const picked = document.querySelector('#clarityPaywall .cpw__plan.is-picked');
-      state.entitlements.plan = picked ? (picked.getAttribute('data-plan') || 'lifetime') : 'lifetime';
+      const picked = document.querySelector('#clarityPaywall [data-plan].is-picked');
+      state.entitlements.plan = picked ? (picked.getAttribute('data-plan') || 'founder') : 'founder';
       if (typeof persistNow === 'function') persistNow();
       try { if (typeof Analytics !== 'undefined') Analytics.track('paywall_unlock', { plan: state.entitlements.plan }); } catch (e) {} // Funnel
       try { window.MementoPush && MementoPush.sync(); } catch (e) {} // reminder context: now paid
     } catch (e) {}
     this.hide();
     try { if (typeof renderAll === 'function') renderAll(); } catch (e) {}
+    // If they unlocked from the You panel (early buy), re-render it so the
+    // "Unlock Memento" row disappears immediately.
+    try {
+      const pp = document.getElementById('panelProfile');
+      if (pp && !pp.classList.contains('hidden') && typeof TabBar !== 'undefined') TabBar.renderPanel('profile');
+    } catch (e) {}
     // The buyer's first minute (FIRST-WIN-PLAN P3): never drop a fresh buyer on
     // the dashboard to figure out "now what?". Go straight into Action, which
     // routes itself (intro -> intake -> plan) to their ONE move for today. The
     // beat matches the paywall's 360ms fade so the two never overlap.
-    setTimeout(() => {
+    // Early buyers who unlock BEFORE running Clarity stay where they are: the
+    // pre-star home already points them at Clarity, and Action needs a star.
+    let clarityDone = false;
+    try { clarityDone = !!(state.clarity && state.clarity.completed); } catch (e) {}
+    if (clarityDone) setTimeout(() => {
       try { if (typeof ActionExperience !== 'undefined') ActionExperience.open(); } catch (e) {}
     }, 460);
   },
@@ -252,10 +255,6 @@ const ClarityPaywall = {
     const ov = document.getElementById('clarityPaywall');
     this._open = false;
     if (!ov) return;
-    try { if (typeof stopLivingWander === 'function') stopLivingWander(); } catch (e) {}
-    // The paywall borrowed the single living-card RAF for its own card; hand it
-    // back so the HOME card keeps drifting after dismiss (Malik audit v669).
-    try { const hw = document.querySelector('#dayCard .daycard-wrap.daycard-theme-living'); if (hw && typeof startLivingWander === 'function') startLivingWander(hw); } catch (e) {}
     ov.classList.remove('cpw--open');
     document.body.style.overflow = '';
     setTimeout(() => { try { ov.remove(); } catch (e) {} }, 360);
@@ -263,11 +262,10 @@ const ClarityPaywall = {
 };
 
 // Dev / preview helper: open the paywall on demand with ?paywall=1 (and an
-// optional demo star), without walking all of Clarity.
+// optional demo star), without walking all of Clarity. force so it shows even
+// on a paid dev state.
 try {
   if (/[?&]paywall=1/.test(location.search)) {
-    const m = location.search.match(/[?&]star=([^&]+)/);
-    const star = m ? decodeURIComponent(m[1]) : '';
-    window.addEventListener('load', () => { setTimeout(() => ClarityPaywall.show(star ? { star } : {}), 400); });
+    window.addEventListener('load', () => { setTimeout(() => ClarityPaywall.show({ force: true }), 400); });
   }
 } catch (e) {}

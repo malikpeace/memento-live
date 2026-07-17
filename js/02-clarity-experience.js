@@ -2617,21 +2617,27 @@ const ActionExperience = {
 
   open() {
     if (this.isOpen) return;
-    // Paywall gate: Action is paid. If locked, this is the "Build my plan" moment
-    // the evolved card hands off to. The FIRST time, future-pace through the First
-    // 7 Days screen and THEN raise the paywall (build desire, then ask). After that
-    // it goes straight to the paywall (Malik v676: cinema -> tap -> 7 days -> paywall).
+    // Paywall gate: Action is paid. This is the "Build my plan" moment the
+    // evolved card hands off to. The FIRST time, future-pace through the First
+    // 7 Days screen for EVERYONE (it is the trust timeline, not the sell), then
+    // branch: already paid (early buyer) goes straight into Action with no
+    // paywall ever shown; unpaid gets the ask (Malik v676 + v792 prepaid path).
     try {
-      if (typeof ClarityPaywall !== 'undefined' && ClarityPaywall.isLockedByPaywall('action')) {
+      if (typeof ClarityPaywall !== 'undefined') {
         state.meta = state.meta || {};
-        if (typeof showNext7Days === 'function' && !state.meta.next7DaysSeen) {
+        const clarityDone = !!(state.clarity && state.clarity.completed);
+        if (clarityDone && typeof showNext7Days === 'function' && !state.meta.next7DaysSeen) {
           state.meta.next7DaysSeen = true;
           try { persistNow(); } catch (e) {}
-          showNext7Days(() => { try { if (ClarityPaywall.show) ClarityPaywall.show(); } catch (e) {} });
-        } else {
-          ClarityPaywall.show();
+          showNext7Days(() => {
+            try {
+              if (ClarityPaywall.isPaid()) ActionExperience.open();
+              else if (ClarityPaywall.show) ClarityPaywall.show();
+            } catch (e) {}
+          });
+          return;
         }
-        return;
+        if (ClarityPaywall.isLockedByPaywall('action')) { ClarityPaywall.show(); return; }
       }
     } catch (e) {}
     this.isOpen = true;

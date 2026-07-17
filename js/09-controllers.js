@@ -5297,6 +5297,14 @@ const TabBar = {
           <span style="display:block;font-size:0.8rem;color:var(--text-2);line-height:1.35;margin-top:2px;">Install Memento as a real app: full screen, instant, with reminders.</span>
         </span>
       </button>` : ''}
+      ${(typeof ClarityPaywall !== 'undefined' && !ClarityPaywall.isPaid()) ? `
+      <button type="button" id="profUnlock" aria-label="Unlock Memento" style="display:flex;align-items:center;gap:13px;width:100%;text-align:left;font:inherit;cursor:pointer;border:none;border-radius:calc(14px * var(--rx,1));padding:15px 16px;margin-bottom:14px;background:var(--kfill-04);box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);">
+        <span aria-hidden="true" style="width:38px;height:38px;flex:0 0 auto;border-radius:11px;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,rgba(58,217,245,0.92),rgba(44,150,190,0.86));box-shadow:0 0 16px rgba(58,217,245,0.4),inset 0 1px 0 rgba(255,255,255,0.22);"><svg viewBox="0 0 512 512" width="17" height="17" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z" fill="#0b1112"/></svg></span>
+        <span style="min-width:0;">
+          <span style="display:block;font-size:0.95rem;font-weight:700;color:var(--text-hi);">Unlock Memento</span>
+          <span style="display:block;font-size:0.8rem;color:var(--text-2);line-height:1.35;margin-top:2px;">Own it once, yours for life. Everything opens the moment you do.</span>
+        </span>
+      </button>` : ''}
       <div id="prefsSection" class="prefs-card">${this.renderPreferencesSection()}</div>
       <div class="prefs-card" style="padding-top: 20px; padding-bottom: 22px;">
         <div style="${SECLABEL}">Identity</div>
@@ -5380,6 +5388,8 @@ const TabBar = {
     try { const _pathBtn = document.getElementById('profPathOpen'); if (_pathBtn) _pathBtn.addEventListener('click', () => { try { if (typeof MementoPath !== 'undefined') MementoPath.open(); } catch (e) {} }); } catch (e) {}
     try { const _storyBtn = document.getElementById('profStoryOpen'); if (_storyBtn) _storyBtn.addEventListener('click', () => { try { if (typeof MementoStory !== 'undefined') MementoStory.open(); } catch (e) {} }); } catch (e) {}
     try { const _instBtn = document.getElementById('profInstallApp'); if (_instBtn) _instBtn.addEventListener('click', () => { try { if (window.MementoInstall) window.MementoInstall.show(); } catch (e) {} }); } catch (e) {}
+    // Early buy: anyone can pay before the paywall would ever find them (v792).
+    try { const _unlBtn = document.getElementById('profUnlock'); if (_unlBtn) _unlBtn.addEventListener('click', () => { try { if (typeof ClarityPaywall !== 'undefined' && ClarityPaywall.show) ClarityPaywall.show(); } catch (e) {} }); } catch (e) {}
     // Birthday: save on change, keep Mori's birthYear in sync, refresh the
     // panel so the age label updates live.
     (function () {

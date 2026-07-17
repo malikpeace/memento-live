@@ -2224,7 +2224,7 @@ const CreatorTools = {
     } catch (e) {}
   },
   jumpSynth() { this._closeAll(); try { if (window.DevCeremony) window.DevCeremony.synth(); } catch (e) {} },
-  jump7Days() { this._closeAll(); try { if (typeof showNext7Days === 'function') showNext7Days(function () { try { if (typeof ClarityPaywall !== 'undefined' && ClarityPaywall.show) ClarityPaywall.show(); } catch (e) {} }); } catch (e) {} },
+  jump7Days() { this._closeAll(); try { state.meta = state.meta || {}; state.meta.next7DaysSeen = true; } catch (e) {} try { if (typeof showNext7Days === 'function') showNext7Days(function () { try { if (typeof ClarityPaywall !== 'undefined') { if (ClarityPaywall.isPaid()) { if (typeof ActionExperience !== 'undefined') ActionExperience.open(); } else if (ClarityPaywall.show) ClarityPaywall.show(); } } catch (e) {} }); } catch (e) {} },
   jumpReveal() { this._closeAll(); try { if (window.DevCeremony) window.DevCeremony.reveal(); } catch (e) {} },
   jumpStar() { this._closeAll(); try { if (window.DevCeremony) window.DevCeremony.star(); } catch (e) {} },
   jumpStarSummary() { this._closeAll(); try { if (window.DevCeremony) window.DevCeremony.summary(); } catch (e) {} },

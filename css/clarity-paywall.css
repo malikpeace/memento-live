@@ -398,7 +398,7 @@
   color: #0b1112;
   background: linear-gradient(135deg, #7eecff, #6cc6ff);
 }
-.cpw__founder p { font-size: 0.82rem; color: rgba(var(--ink, 235, 238, 248), 0.6); line-height: 1.55; margin: 0; }
+.cpw__founder p { font-size: 0.82rem; color: rgba(var(--ink, 235, 238, 248), 0.85); line-height: 1.55; margin: 0; }
 .cpw__founder-who { display: block; margin-top: 6px; font-size: 0.76rem; color: rgba(var(--ink, 235, 238, 248), 0.42); font-weight: 600; }
 .cpw__legal {
   display: flex;
@@ -537,3 +537,133 @@ body.cpw-locked .widget[data-widget]:not([data-widget="clarity"])::after {
 
 .cpw__hero--v2 { padding-top: calc(var(--safe-t, 0px) + 12px); }
 .cpw__sub2 { margin-top: 6px; }
+
+/* ═══ v792: the Relic (Malik's final pick from the paywall labs) ═══
+   Big pure glass card (nothing written on it) over a cyan under-glow,
+   "Build your Memento.", features as glass chips, ONE visible plan
+   (Founder's Lifetime, first 250 only) with the rest behind a disclosure,
+   the CTA carrying its own fine print, and Maybe later as the only exit. */
+.cpw__hero--v3 { padding-top: calc(var(--safe-t, 0px) + 18px); width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; }
+
+/* The relic: pure glass, no text, lit from beneath. The glow is a radial that
+   dies BEFORE its bounds (edge-safe by construction, the glow-edge law). */
+.cpw__relic { position: relative; width: 172px; height: 228px; margin-top: 0; }
+.cpw__relic-glow {
+  position: absolute; left: 50%; top: 74%; width: 380px; height: 360px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(closest-side,
+    rgba(58, 217, 245, 0.5),
+    rgba(58, 217, 245, 0.26) 38%,
+    rgba(58, 217, 245, 0.10) 60%,
+    rgba(58, 217, 245, 0.025) 78%,
+    transparent 92%);
+  pointer-events: none;
+  animation: cpwGlow 5.5s ease-in-out infinite;
+}
+.cpw__relic-card {
+  position: absolute; inset: 0;
+  border-radius: 22px;
+  background: linear-gradient(165deg, rgba(255,255,255,0.11), rgba(255,255,255,0.035) 55%, rgba(122,222,245,0.075));
+  backdrop-filter: blur(28px) saturate(1.4);
+  -webkit-backdrop-filter: blur(28px) saturate(1.4);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.16),
+    inset 0 -1px 0 rgba(255,255,255,0.05),
+    0 30px 60px -30px rgba(0,0,0,0.7);
+  display: flex; align-items: center; justify-content: center;
+}
+.cpw__relic-m { width: 64px; height: 64px; }
+.cpw__relic-m path { fill: rgba(255,255,255,0.92); }
+
+.cpw__hero--v3 .cpw__h1 { margin-top: 17px; }
+
+/* Feature chips: glass pills, the accent chip promises the future. */
+.cpw__chips {
+  margin: 14px auto 0; max-width: 340px;
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 7px;
+}
+.cpw__chip {
+  display: inline-flex; align-items: center;
+  padding: 7px 13px; border-radius: 999px;
+  background: rgba(255,255,255,0.06);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+  font-family: var(--font); font-size: 12.5px; font-weight: 600;
+  color: rgba(255,255,255,0.92); white-space: nowrap;
+}
+.cpw__chip--more {
+  background: rgba(58, 217, 245, 0.12);
+  box-shadow: inset 0 1px 0 rgba(122,222,245,0.14);
+  color: #aeeaf8;
+}
+
+/* Social proof slot: ships hidden until the numbers are real. */
+.cpw__proof { margin: 16px auto 0; max-width: 320px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.cpw__proof-avs { display: flex; }
+.cpw__proof-avs i {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: linear-gradient(140deg, rgba(122,222,245,0.6), rgba(63,120,160,0.5));
+  box-shadow: 0 0 0 2px #070a0b;
+}
+.cpw__proof-avs i + i { margin-left: -7px; }
+.cpw__proof-count { font-family: var(--font); font-size: 12.5px; font-weight: 600; color: rgba(255,255,255,0.8); }
+.cpw__proof-quote { margin: 0; font-family: var(--font); font-size: 13px; line-height: 1.5; color: rgba(255,255,255,0.92); }
+.cpw__proof-who { display: block; margin-top: 4px; font-size: 11.5px; font-weight: 600; color: rgba(255,255,255,0.55); }
+
+/* One visible plan: the founder card. */
+.cpw__offer3 { margin: 16px auto 0; width: 100%; max-width: 360px; display: flex; flex-direction: column; }
+.cpw__plan3 {
+  -webkit-appearance: none; appearance: none; cursor: pointer; text-align: left;
+  width: 100%; padding: 14px 16px; border: none; border-radius: 16px;
+  background: rgba(255,255,255,0.05);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+  font-family: var(--font); color: rgba(255,255,255,0.95);
+  transition: background 0.25s ease, box-shadow 0.25s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.cpw__plan3.is-picked {
+  background: rgba(58, 217, 245, 0.10);
+  box-shadow: inset 0 0 0 1.5px rgba(58, 217, 245, 0.55), inset 0 1px 0 rgba(255,255,255,0.08);
+}
+.cpw__plan3-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.cpw__plan3-name { font-size: 15px; font-weight: 700; letter-spacing: -0.01em; }
+.cpw__plan3-price { display: flex; align-items: baseline; gap: 8px; margin-top: 7px; font-variant-numeric: tabular-nums; }
+.cpw__plan3-was { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.45); text-decoration: line-through; }
+.cpw__plan3-now { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; color: rgba(255,255,255,0.97); }
+.cpw__plan3-per { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.6); }
+
+/* The disclosure: the smaller yes, one tap away. */
+.cpw__more {
+  align-self: center; display: flex; align-items: center; gap: 5px;
+  min-height: 40px; margin-top: 4px; padding: 6px 12px;
+  border: none; background: none; cursor: pointer;
+  font-family: var(--font); font-size: 12.5px; font-weight: 600;
+  color: rgba(255,255,255,0.55);
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.2s ease;
+}
+.cpw__more:hover { color: rgba(255,255,255,0.8); }
+.cpw__more svg { transition: transform 0.25s ease; }
+.cpw__more.is-open svg { transform: rotate(180deg); }
+.cpw__moreplans { display: flex; flex-direction: column; gap: 8px; padding-top: 2px; }
+.cpw__moreplans[hidden] { display: none; }
+
+/* CTA with its own fine print (the button states the real deal). */
+.cpw__buy--fine { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 12px 20px 11px; }
+.cpw__buy-main { font-size: 1.02rem; font-weight: 700; letter-spacing: -0.01em; }
+.cpw__buy-sub { font-size: 11.5px; font-weight: 600; color: rgba(11, 17, 18, 0.62); font-variant-numeric: tabular-nums; }
+.cpw__speed {
+  margin-top: 10px; text-align: center;
+  font-family: var(--font); font-size: 12.5px; font-weight: 600;
+  color: rgba(255,255,255,0.88);
+}
+.cpw__offer3 ~ .cpw__cta { margin-top: 14px; }
+.cpw__cta + .cpw__guarantee--v2 { margin-top: 15px; }
+
+/* The collapsed rows reuse the v790 row anatomy but live in .cpw__moreplans,
+   so mirror the type scale here (the founder price stays the loudest number). */
+.cpw__moreplans .cpw__plan-label { font-size: 14.5px; font-weight: 700; }
+.cpw__moreplans .cpw__plan-sub { font-size: 11.5px; color: rgba(255,255,255,0.55); margin-top: 2px; }
+.cpw__moreplans .cpw__plan-amt { flex: 0 0 auto; display: flex; align-items: baseline; gap: 2px; font-variant-numeric: tabular-nums; }
+.cpw__moreplans .cpw__plan-cur { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.7); }
+.cpw__moreplans .cpw__plan-big { font-size: 19px; font-weight: 800; letter-spacing: -0.01em; }
+.cpw__moreplans .cpw__plan-meta { font-size: 11px; color: rgba(255,255,255,0.55); margin-left: 3px; }
