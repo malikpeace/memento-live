@@ -4382,11 +4382,16 @@ html.theme-light .n7d { background: #040607; }
 .n7d-day--dip.is-in:not(.is-cur) { transform: translateX(18px); }
 /* the segment arriving from day 2 (the day above the dip now) ends early */
 .n7d-day[data-n7day="2"]::before { bottom: 96px; background: linear-gradient(180deg, rgba(var(--dc), 0.55), rgba(var(--dc), 0) 92%); }
-/* the dip's own segment: back on the path axis (undo the jog) and detached
-   from its node, it resumes below (toward day 4), fading in from nothing */
+/* the dip's own segment (v803, Malik: the old detached axis line "just looks
+   weird"): it now starts in the air BELOW the jogged node and drifts
+   diagonally back toward the path, rejoining the axis as it reaches day 4.
+   The path visibly sags away and returns, which IS the dip. Fades in from
+   nothing at the top so the disconnection above the node stays honest. */
 .n7d-day--dip::before {
-  left: -3px; top: 110px;
-  background: linear-gradient(180deg, rgba(var(--dc), 0) 0%, rgba(var(--dc), 0.28) 40%, rgba(var(--dc), 0.16) 100%);
+  left: 15px; top: 104px;
+  transform: rotate(3deg);
+  transform-origin: top center;
+  background: linear-gradient(180deg, rgba(var(--dc), 0) 0%, rgba(var(--dc), 0.30) 38%, rgba(var(--dc), 0.34) 100%);
 }
 /* (v787: the dip's dark radial is DELETED, its bounds were visible as a box,
    the exact glow-edge law failure. The dip reads through the white node, the
