@@ -4130,3 +4130,10 @@ html.theme-light .ai-progress__fill {
    day lines brighten to reading contrast (the no-dim-body-text law). */
 .wi-cine.wi-moriview .wi-mori__grid { margin-left: 0; margin-right: auto; }
 .wi-cine.wi-moriview .wi-mori__days { text-align: left; margin-left: 0; margin-right: 0; color: rgba(255, 255, 255, 0.88); }
+
+/* v811 (Malik: 'not THAT low on desktop'): the ledger anchors a fixed 26px
+   above the nav, which reads right on a phone but hugs the floor of a tall
+   desktop window. On bigger screens it rises to the lower third. */
+@media (min-width: 641px) {
+  .wi-cine.wi-recap, .wi-cine.wi-moriview { margin-bottom: min(22vh, 220px); }
+}
