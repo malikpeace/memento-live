@@ -3297,7 +3297,14 @@ html.lowfx .nsv2-reveal__eyebrow { animation: nsv2WordInLite 1.0s ease forwards;
   .nsv2-star__blob {
     width: min(58lvh, 62vw);
     height: min(58lvh, 62vw);
-    margin: 0 auto -28px;
+    /* v807 (Malik: star off-center on desktop synthesis): in TALL windows the
+       58lvh star grows wider than the 624px inner column, and CSS auto margins
+       stop centering an overflowing block (it pins left and overflows right,
+       pushing the star right of the centered text). No auto margins; the
+       starscene's flex align-items:center centers even when the canvas
+       overflows, symmetrically. */
+    margin: 0 0 -28px;
+    align-self: center;
   }
   .nsv2-starscene { justify-content: center; }
   .nsv2[data-act="star"] .nsv2-after { margin-top: 8px; }

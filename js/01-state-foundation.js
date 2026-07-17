@@ -817,6 +817,9 @@ function applyPrefs() {
     b.classList.toggle('calm-motion', !!p.reduceMotion);
     // Density: compact tightens dashboard gap + card padding via :root vars.
     b.classList.toggle('density-compact', p.density === 'compact');
+    // v807 (Malik): the Memento card's shape. 'tall' (default, the locked
+    // 320x440 card) or 'square'. Pure CSS via body.card-square.
+    b.classList.toggle('card-square', p.cardShape === 'square');
     // Feel sliders: corner radius multiplier (--rx) + surface-opacity buckets.
     // At the exact defaults (radius 1, glass 0) the inline overrides are
     // REMOVED so the look comes purely from the CSS token defaults.
