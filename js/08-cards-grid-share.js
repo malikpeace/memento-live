@@ -1778,6 +1778,7 @@ const CreatorTools = {
     // Stage & animation jumps (Malik: fly around Memento from the cheat bar)
     bind('creatorJumpBlankCard', () => this.jumpBlankCard());
     bind('creatorJumpUnlock', () => this.jumpUnlockCinema());
+    bind('creatorJumpAfterCinema', () => this.jumpAfterCinema());
     bind('creatorJumpFinalQ', () => this.jumpFinalQuestion());
     bind('creatorJumpSynth', () => this.jumpSynth());
     bind('creatorJump7Days', () => this.jump7Days());
@@ -2162,6 +2163,10 @@ const CreatorTools = {
   },
 
   jumpBlankCard() { this._closeAll(); this._devToHome(); this._seedStep('blank'); },
+  // Right AFTER the cinema + clarity (Malik v799): the freshly colored card on
+  // the home, star ignited, FREE, First 7 Days unseen. From here the real flow
+  // walks: Build my plan -> First 7 Days -> paywall.
+  jumpAfterCinema() { this._closeAll(); this._devToHome(); this._seedStep('star'); },
   jumpUnlockCinema() {
     this._closeAll(); this._devToHome();
     // Seed a real just-ignited state with the cinema unseen; renderGrid inside
