@@ -1784,6 +1784,7 @@ const CreatorTools = {
     bind('creatorJumpBlankCard', () => this.jumpBlankCard());
     bind('creatorJumpUnlock', () => this.jumpUnlockCinema());
     bind('creatorJumpAfterCinema', () => this.jumpAfterCinema());
+    bind('creatorJumpCelebration', () => this.jumpCelebration());
     bind('creatorJumpFinalQ', () => this.jumpFinalQuestion());
     bind('creatorJumpSynth', () => this.jumpSynth());
     bind('creatorJump7Days', () => this.jump7Days());
@@ -2174,6 +2175,24 @@ const CreatorTools = {
   // the home, star ignited, FREE, First 7 Days unseen. From here the real flow
   // walks: Build my plan -> First 7 Days -> paywall.
   jumpAfterCinema() { this._closeAll(); this._devToHome(); this._seedStep('star'); },
+
+  // The onboarding CELEBRATION (confetti) page (Malik v810), from which the
+  // real flow continues: Continue -> the mirror recap -> the rest. Opens the
+  // welcome intro straight at the first-win beat.
+  jumpCelebration() {
+    this._closeAll(); this._devToHome();
+    try {
+      const wi = (typeof WelcomeIntro !== 'undefined') ? WelcomeIntro : null;
+      if (!wi) return;
+      if (!wi.el) wi.el = document.getElementById('welcomeIntro');
+      if (!wi.el) return;
+      if (!wi.pageWrap) wi.pageWrap = wi.el.querySelector('.welcome-intro__page-wrap');
+      if (!wi.navEl) wi.navEl = wi.el.querySelector('.welcome-intro__nav');
+      wi.el.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      wi._showFirstWin(0);
+    } catch (e) {}
+  },
   jumpUnlockCinema() {
     this._closeAll(); this._devToHome();
     // Seed a real just-ignited state with the cinema unseen; renderGrid inside
