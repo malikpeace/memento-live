@@ -4694,10 +4694,13 @@ const TabBar = {
         '<span class="pref-swatch__label">' + label + '</span>' +
       '</button>';
     }).join('');
+    // v796 Glass Ledger, mock-exact: rows are ONE line (label + control). The
+    // explanation strings still feed aria-labels but never render, the mock's
+    // calm comes from labels standing alone.
     const toggleRow = (id, title, sub, on) =>
       '<div class="pref-row">' +
-        '<div class="pref-row__text"><div class="pref-row__title">' + title + '</div><div class="pref-row__sub">' + sub + '</div></div>' +
-        '<button type="button" id="' + id + '" class="pref-toggle' + (on ? ' pref-toggle--on' : '') + '" role="switch" aria-checked="' + (on ? 'true' : 'false') + '" aria-label="' + title + '"><span class="pref-toggle__knob"></span></button>' +
+        '<div class="pref-row__text"><div class="pref-row__title">' + title + '</div></div>' +
+        '<button type="button" id="' + id + '" class="pref-toggle' + (on ? ' pref-toggle--on' : '') + '" role="switch" aria-checked="' + (on ? 'true' : 'false') + '" aria-label="' + title + (sub ? '. ' + sub : '') + '"><span class="pref-toggle__knob"></span></button>' +
       '</div>';
     // Feel sliders: corner radius + surface opacity (live-applied via applyPrefs).
     const uiRadius = (typeof prefs.uiRadius === 'number' && isFinite(prefs.uiRadius)) ? prefs.uiRadius : 1;
@@ -4754,36 +4757,76 @@ const TabBar = {
         '<div style="font-size:0.6875rem; color:var(--text-3); margin-top:6px;">Paste an image address from a free site like Unsplash or Pexels.</div>' +
         '<div id="prefBgLinkMsg" style="font-size:0.6875rem; color:var(--text-3); margin-top:4px;"></div>' +
       '</div>';
-    // v794 Glass Ledger: two big sentence-case section words, each with ONE
-    // glass card of rows beneath it. No uppercase micro-labels.
+    // v796 Glass Ledger, mock-exact: the heavy controls (theme presets +
+    // background, accent swatches, radius slider + preview) collapse behind
+    // one-line VALUE rows ("Theme &middot; Midnight &rsaquo;") that expand in
+    // place. Drawer state lives on TabBar._youDrawers so refreshPrefsSection
+    // re-renders don't slam them shut. The theme + background pickers were
+    // computed-but-never-rendered dead code until now; their binds
+    // (#prefThemes / #prefBackground) have been waiting in bindPreferences.
+    const openD = TabBar._youDrawers || (TabBar._youDrawers = {});
+    const vrow = (id, label, valueHtml, isOpen) =>
+      '<button type="button" class="you-vrow" id="' + id + '" aria-expanded="' + (isOpen ? 'true' : 'false') + '">' +
+        '<span class="you-vrow__label">' + label + '</span>' +
+        '<span class="you-vrow__val">' + valueHtml + '</span>' +
+        '<span class="you-chev you-chev--turn' + (isOpen ? ' is-open' : '') + '" aria-hidden="true">&rsaquo;</span>' +
+      '</button>';
+    const drawer = (id, isOpen, inner) =>
+      '<div class="you-drawer" id="' + id + '"' + (isOpen ? '' : ' hidden') + '>' + inner + '</div>';
+    // Current theme preset name (Custom when nothing matches exactly).
+    const _matchingPreset = presets.filter(t =>
+      themeNow === t.theme && accent === t.accent &&
+      bgPref.type === t.bg[0] && (bgPref.value || '') === (t.bg[1] || '') &&
+      uiRadius === t.uiRadius && uiGlass === t.uiGlass)[0];
+    const themeName = _matchingPreset ? _matchingPreset.name : 'Custom';
+    // Accent value: the active color dot ringed, two quiet companions (mock).
+    const _accCol = (swatches.filter(s => s[0] === accent)[0] || [])[2] || '';
+    const accentDots =
+      '<span class="you-dots">' +
+        (accent === 'default'
+          ? '<span class="you-dot you-dot--on pref-swatch__dot--dynamic"></span>'
+          : '<span class="you-dot you-dot--on" style="background:' + _accCol + ';"></span>') +
+        '<span class="you-dot" style="background:#3fd94e;"></span>' +
+        '<span class="you-dot" style="background:#a06b45;"></span>' +
+      '</span>';
+    const radiusLabel = uiRadius <= 0.7 ? 'Sharp' : (uiRadius < 1.15 ? 'Balanced' : 'Round');
     return '' +
       '<div class="you-h">Appearance</div>' +
       '<div class="you-card">' +
+        vrow('prefThemeRow', 'Theme', esc(themeName), !!openD.theme) +
+        drawer('prefThemeDrawer', !!openD.theme,
+          '<div class="pref-swatches" id="prefThemes">' + themesHtml + '</div>' +
+          '<div class="you-sub">Background</div>' +
+          '<div class="pref-swatches" id="prefBackground">' + bgHtml + '</div>' +
+          '<input type="file" id="prefBgUploadInput" accept="image/*" style="display:none;">' +
+          bgLinkRow + bgDimRow) +
+        // Color is paid (v695). v705 (Malik): free users don't see it AT ALL,
+        // the paywall's "Make it yours" line is the only tease.
+        (_colorLocked ? '' :
+          vrow('prefAccentRow', 'Accent', accentDots, !!openD.accent) +
+          drawer('prefAccentDrawer', !!openD.accent,
+            '<div class="pref-swatches" id="prefAccent">' + swatchHtml + '</div>' +
+            '<input type="color" id="prefAccentCustomInput" value="' + customHex + '" aria-label="Pick a custom accent color" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;" />' +
+            toggleRow('prefMatchMemento', 'Match Memento to color', 'Tints your Memento card toward the accent you pick.', prefs.matchMemento !== false))) +
         toggleRow('prefLightMode', 'Light mode', 'Switch the whole app to a bright, premium off-white theme.', prefs.theme === 'light') +
         toggleRow('prefFlatUi', 'Glass', 'Glassy, blurred surfaces with depth. Turn off for a flat, high-contrast matte look.', !prefs.flatUi) +
         toggleRow('prefSound', 'Sound', 'Quiet synthesized moments: the typewriter, marking a move done, the card coming alive.', prefs.soundOn !== false) +
         toggleRow('prefFlatBg', 'Minimal background', 'Hide the ambient orbs and glow for a flat, paper-like surface.', !!prefs.flatBg) +
         toggleRow('prefCompact', 'Compact density', 'Tightens spacing and type so more fits on screen.', compact) +
-        // Color is paid (v695). v705 (Malik): free users don't see it AT ALL,
-        // the paywall's "Make it yours" line is the only tease.
-        (_colorLocked ? '' :
-          '<div class="you-sub">Color</div>' +
-          '<div class="pref-swatches" id="prefAccent">' + swatchHtml + '</div>' +
-          '<input type="color" id="prefAccentCustomInput" value="' + customHex + '" aria-label="Pick a custom accent color" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;" />' +
-          toggleRow('prefMatchMemento', 'Match Memento to color theme', 'Tints your Memento card toward the accent you pick. Off keeps the card its own colors.', prefs.matchMemento !== false)) +
-        '<div style="height:10px;"></div>' +
-        sliderRow('prefUiRadius', 'Corner radius', 'Sharp', 'Round', 0.35, 1.4, 'any', Math.max(0.35, uiRadius)) +
-        '<div class="feel-preview" aria-hidden="true">' +
-          '<div class="feel-preview__bg"></div>' +
-          '<div class="feel-preview__card">' +
-            '<div class="feel-preview__text">The glass you are shaping.</div>' +
-            '<div class="feel-preview__row">' +
-              '<span class="feel-preview__btn">Continue</span>' +
-              '<span class="feel-preview__chip">Today</span>' +
+        vrow('prefRadiusRow', 'Corner radius', radiusLabel, !!openD.radius) +
+        drawer('prefRadiusDrawer', !!openD.radius,
+          sliderRow('prefUiRadius', 'Corner radius', 'Sharp', 'Round', 0.35, 1.4, 'any', Math.max(0.35, uiRadius)) +
+          '<div class="feel-preview" aria-hidden="true">' +
+            '<div class="feel-preview__bg"></div>' +
+            '<div class="feel-preview__card">' +
+              '<div class="feel-preview__text">The glass you are shaping.</div>' +
+              '<div class="feel-preview__row">' +
+                '<span class="feel-preview__btn">Continue</span>' +
+                '<span class="feel-preview__chip">Today</span>' +
+              '</div>' +
             '</div>' +
           '</div>' +
-        '</div>' +
-        '<div class="feel-preview__caption">Live preview</div>' +
+          '<div class="feel-preview__caption">Live preview</div>') +
       '</div>' +
       '<div class="you-h">Behavior</div>' +
       '<div class="you-card">' +
@@ -4860,6 +4903,21 @@ const TabBar = {
   // and re-applies live via applyPrefs() so the user sees it instantly.
   bindPreferences() {
     if (!state.prefs) state.prefs = { accent: 'default', reduceMotion: false, density: 'comfortable' };
+    // v796: the Theme / Accent / Corner radius value rows disclose their heavy
+    // controls in place. State rides TabBar._youDrawers so re-renders keep
+    // open drawers open.
+    const _wireDrawer = (rowId, key) => {
+      const row = document.getElementById(rowId);
+      if (!row) return;
+      row.addEventListener('click', () => {
+        const o = TabBar._youDrawers || (TabBar._youDrawers = {});
+        o[key] = !o[key];
+        this.refreshPrefsSection();
+      });
+    };
+    _wireDrawer('prefThemeRow', 'theme');
+    _wireDrawer('prefAccentRow', 'accent');
+    _wireDrawer('prefRadiusRow', 'radius');
     const accentWrap = document.getElementById('prefAccent');
     if (accentWrap) {
       accentWrap.querySelectorAll('.pref-swatch').forEach(btn => {
