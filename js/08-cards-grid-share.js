@@ -1228,7 +1228,12 @@ const MoreSpace = {
     });
     if (!entries.length) html = '<div class="more-space__empty">Everything lives on your dashboard right now.</div>';
     gridEl.innerHTML = html;
-    const anyLocked = !!nextLockedModule();
+    // v800 sweep: the ladder's "Unlock everything" is a PAID-user affordance
+    // (it skips the module-noise reveal pacing). Free users never see it; the
+    // flag it flips must never stand in for payment.
+    let _paidHere = false;
+    try { _paidHere = (typeof ClarityPaywall !== 'undefined') && ClarityPaywall.isPaid(); } catch (e) {}
+    const anyLocked = !!nextLockedModule() && _paidHere;
     foot.innerHTML = anyLocked ? '<button type="button" class="more-space__unlock" id="moreUnlockAll">I know what I&rsquo;m doing. Unlock everything.</button>' : '';
     const self = this;
     gridEl.querySelectorAll('[data-more-key]').forEach(card => {

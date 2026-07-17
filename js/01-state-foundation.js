@@ -1814,6 +1814,17 @@ function migrateState() {
   if (typeof state.ui.lastUnlockISO !== 'string') state.ui.lastUnlockISO = '';
   if (typeof state.ui.pendingReveal !== 'string') state.ui.pendingReveal = '';
   if (state.prefs && state.prefs.unlockAll === undefined) state.prefs.unlockAll = false;
+  // v800 sweep: unlockAll is the module-noise ladder hatch, never a payment.
+  // A stale flag (old grandfather migration, imported backup, hand-edited
+  // storage) must not ride into a free account looking paid-adjacent. Demo
+  // personas keep it (their state is rebuilt each load with ?demo=).
+  try {
+    if (state.prefs && state.prefs.unlockAll &&
+        !(state.entitlements && state.entitlements.isPaid) &&
+        !/[?&]demo=/.test(location.search)) {
+      state.prefs.unlockAll = false;
+    }
+  } catch (e) {}
   if (state.introsSeen && state.introsSeen.checkin === undefined) state.introsSeen.checkin = false;
   if (state.lifestats) {
     if (state.lifestats.mood === undefined) state.lifestats.mood = 0;

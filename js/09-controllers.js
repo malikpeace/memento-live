@@ -4406,10 +4406,13 @@ const TabBar = {
 
   // Paid gate for the locked tabs (Path / Do / Reflect). Free users see the
   // bar as a preview; locked taps open the paywall (BOTTOM-BAR-PLAN.md).
+  // v800 sweep: prefs.unlockAll NO LONGER counts as paid here. It is the
+  // module-noise ladder escape hatch, and the More-sheet "Unlock everything"
+  // button let a FREE user flip it and walk straight into Do/Reflect. Paid
+  // status comes only from entitlements (or the console-only dev preview).
   _unlocked() {
     try {
       if (state.entitlements && state.entitlements.isPaid) return true;
-      if (state.prefs && state.prefs.unlockAll) return true;
       if (state.dev && state.dev.previewAll) return true;
     } catch (e) {}
     return false;
@@ -4794,13 +4797,18 @@ const TabBar = {
     return '' +
       '<div class="you-h">Appearance</div>' +
       '<div class="you-card">' +
-        vrow('prefThemeRow', 'Theme', esc(themeName), !!openD.theme) +
-        drawer('prefThemeDrawer', !!openD.theme,
-          '<div class="you-tiles you-tiles--themes" id="prefThemes">' + themesHtml + '</div>' +
-          '<div class="you-sub">Background</div>' +
-          '<div class="you-tiles" id="prefBackground">' + bgHtml + '</div>' +
-          '<input type="file" id="prefBgUploadInput" accept="image/*" style="display:none;">' +
-          bgLinkRow + bgDimRow) +
+        // Themes + backgrounds are PAID like color (v705/v743: free users
+        // don't see them at all; the paywall's "Themes" chip is the only
+        // tease). v798 revived these pickers and briefly leaked them free,
+        // caught in the v800 paywall sweep.
+        (_colorLocked ? '' :
+          vrow('prefThemeRow', 'Theme', esc(themeName), !!openD.theme) +
+          drawer('prefThemeDrawer', !!openD.theme,
+            '<div class="you-tiles you-tiles--themes" id="prefThemes">' + themesHtml + '</div>' +
+            '<div class="you-sub">Background</div>' +
+            '<div class="you-tiles" id="prefBackground">' + bgHtml + '</div>' +
+            '<input type="file" id="prefBgUploadInput" accept="image/*" style="display:none;">' +
+            bgLinkRow + bgDimRow)) +
         // Color is paid (v695). v705 (Malik): free users don't see it AT ALL,
         // the paywall's "Make it yours" line is the only tease.
         (_colorLocked ? '' :
