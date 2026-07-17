@@ -667,3 +667,42 @@ body.cpw-locked .widget[data-widget]:not([data-widget="clarity"])::after {
 .cpw__moreplans .cpw__plan-cur { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.7); }
 .cpw__moreplans .cpw__plan-big { font-size: 19px; font-weight: 800; letter-spacing: -0.01em; }
 .cpw__moreplans .cpw__plan-meta { font-size: 11px; color: rgba(255,255,255,0.55); margin-left: 3px; }
+
+/* ═══ v805: DESKTOP / iPad paywall (Malik: "make sure it looks good on
+   desktop... centered and the spacing is good no matter the screen").
+   On phones the ask fills the first screen and the founder note lives below
+   the fold by design. On tall wide screens everything fits at once, so the
+   fold concept is meaningless: center the whole column vertically, scale the
+   relic up a touch, and pull the trust section up so there is no dead void
+   under Terms/Privacy. ═══ */
+@media (min-width: 861px) {
+  .cpw__scroll {
+    justify-content: center;
+    min-height: 100vh;
+    padding-top: 48px;
+    padding-bottom: 48px;
+  }
+  .cpw__hero--v3 { padding-top: 0; }
+  .cpw__relic { width: 190px; height: 252px; }
+  .cpw__relic-glow { width: 400px; height: 400px; }
+  .cpw__trust--v2 { margin-top: 34px; }
+  .cpw__founder { margin-top: 0; padding-top: 22px; }
+  .cpw__legal { margin-top: 18px; }
+}
+/* Typical laptop heights: compress so the ENTIRE column (founder note and
+   legal included) fits one screen with no scroll. */
+@media (min-width: 861px) and (max-height: 1000px) {
+  .cpw__scroll { padding-top: 28px; padding-bottom: 28px; }
+  .cpw__relic { width: 160px; height: 210px; }
+  .cpw__relic-glow { width: 360px; height: 360px; }
+  .cpw__hero--v3 .cpw__h1 { margin-top: 13px; }
+  .cpw__chips { margin-top: 11px; }
+  .cpw__offer3 { margin-top: 13px; }
+  .cpw__offer3 ~ .cpw__cta { margin-top: 12px; }
+  .cpw__speed { margin-top: 8px; }
+  .cpw__cta + .cpw__guarantee--v2 { margin-top: 11px; }
+  .cpw__guarantee--v2 + .cpw__skip { margin-top: 3px; }
+  .cpw__trust--v2 { margin-top: 13px; }
+  .cpw__founder { padding-top: 14px; }
+  .cpw__legal { margin-top: 12px; }
+}

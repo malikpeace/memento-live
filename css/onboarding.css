@@ -1521,7 +1521,9 @@ body.lite .welcome-intro__sumstar { animation: none; }
 /* The reward / first-win screen is pure black. Hide the god-ray beams too, so going
    BACK to it from the stage page does not leak the purple beams behind it. */
 .welcome-intro--blackout .welcome-intro__rays { opacity: 0 !important; }
-.welcome-intro__confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.welcome-intro__confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+/* v805 (Malik): the shower always passes BEHIND the words. */
+.welcome-intro__firstwin-content { position: relative; z-index: 1; }
 .welcome-intro__firstwin { align-items: center !important; text-align: center; position: relative; z-index: 4; }
 .welcome-intro__firstwin-content { max-width: 440px; animation: fwFade 0.7s ease 0.3s both; }
 @keyframes fwFade { from { opacity: 0; transform: translateY(12px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }

@@ -3096,26 +3096,47 @@ const WelcomeIntro = {
     this._confettiBurst = (x, y) => burst(x, y, lite ? 16 : 30, true);
     const ver = (this._confettiVer = (this._confettiVer || 0) + 1);
     burst(W * 0.5, H * 0.42, lite ? 36 : 70, true);   // opening celebration burst
-    // ambient fireworks that keep coming in slowly behind the summary
-    const schedule = () => {
-      if (this._confettiVer !== ver || !canvas.isConnected) return;
-      burst(W * (0.18 + Math.random() * 0.64), H * (0.16 + Math.random() * 0.32), lite ? 10 : 20, false);
-      setTimeout(schedule, 1500 + Math.random() * 1800);
+    // v805 (Malik picked "Refined current" from the celebration lab): the
+    // ambient layer is a CONSTANT gentle shower falling from the top, not
+    // periodic mid-air bursts. Deliberately sparse ("not TOO much"): a couple
+    // of pieces per second, slow fall, soft sway.
+    let _frame = 0;
+    const RAIN_EVERY = lite ? 22 : 13;   // frames between drops (~2-4/s at 60fps)
+    const rainDrop = () => {
+      if (parts.length > 200) return;
+      parts.push({
+        x: Math.random() * W, y: -12,
+        vx: (Math.random() - 0.5) * 0.5,
+        vy: 0.7 + Math.random() * 0.9,
+        g: 0.004 + Math.random() * 0.006,   // barely accelerates: a drift, not a drop
+        size: 4 + Math.random() * 5,
+        rot: Math.random() * 6.28, vr: (Math.random() - 0.5) * 0.14,
+        color: colors[(Math.random() * colors.length) | 0],
+        life: 0, max: 900,                   // lives until it leaves the screen
+        sway: 0.2 + Math.random() * 0.5, sp: Math.random() * 6.28,
+        shape: Math.random() < 0.5 ? 'r' : 'c'
+      });
     };
-    setTimeout(schedule, lite ? 2200 : 1400);
     const tick = () => {
       if (this._confettiVer !== ver || !canvas.isConnected) { ctx.clearRect(0, 0, W, H); return; }
       // Perf: freeze the celebration while the tab is backgrounded (invisible),
       // keep one rAF alive so it resumes on return. No-op while visible.
       if (document.hidden) { requestAnimationFrame(tick); return; }
       ctx.clearRect(0, 0, W, H);
+      // The constant gentle shower (v805): a drop every RAIN_EVERY frames.
+      _frame++;
+      if (_frame % RAIN_EVERY === 0) rainDrop();
+      if (_frame % 400 === 0) parts = parts.filter(p => p.life <= p.max && p.y < H + 30);
       // The confetti lands + bounces off the Continue button below, so it reads as a solid object.
       const _btn = document.getElementById('identityNext');
       const _br = _btn ? _btn.getBoundingClientRect() : null;
       for (const p of parts) {
         if (p.life > p.max) continue;
+        if (p.y > H + 24) { p.life = p.max + 1; continue; }
         p.life++;
         p.vy += p.g; p.x += p.vx; p.y += p.vy; p.vx *= 0.992; p.rot += p.vr;
+        // shower pieces sway side to side as they fall (burst pieces have no sway)
+        if (p.sway) p.x += Math.sin(p.life * 0.03 + p.sp) * p.sway;
         // Bounce off the button's top edge: only when falling, near the top, within its width.
         if (_br && p.vy > 0) {
           const half = p.size * 0.5;
