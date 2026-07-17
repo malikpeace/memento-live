@@ -4732,6 +4732,8 @@ const TabBar = {
         visual + '<span class="pref-swatch__label">' + label + '</span>' +
       '</button>';
     const dot = (style) => '<span class="pref-swatch__dot" style="' + style + '"></span>';
+    // v798: upload / from-a-link tiles carry an icon instead of a blank fill.
+    const icoTile = (svg) => '<span class="pref-swatch__dot" style="display:flex;align-items:center;justify-content:center;background:var(--kfill-05);color:var(--text-2);">' + svg + '</span>';
     const thumb = (style) => '<span class="pref-swatch__thumb" style="' + style + '"></span>';
     const bgColors = (typeof BG_COLOR_CHOICES !== 'undefined') ? BG_COLOR_CHOICES : [];
     const bgIsUpload = bgPref.type === 'image' && /^idb:/.test(bgPref.value || '');
@@ -4742,8 +4744,8 @@ const TabBar = {
       bgColors.map(c => bgSwatch('color:' + c.key, c.name, thumb('background: ' + c.css + ';'), bgPref.type === 'color' && bgPref.value === c.key)).join('') +
       bgSwatch('img:bg/mountain.jpg', 'Mountain', thumb('background-image: url(bg/mountain.jpg);'), bgPref.type === 'image' && bgPref.value === 'bg/mountain.jpg') +
       bgSwatch('img:bg/streaks.jpg', 'Streaks', thumb('background-image: url(bg/streaks.jpg);'), bgPref.type === 'image' && bgPref.value === 'bg/streaks.jpg') +
-      bgSwatch('upload', bgIsUpload ? 'Your photo' : 'Upload', dot('background: var(--kfill-08); box-shadow: inset 0 0 0 1px rgba(var(--ink),0.2);'), bgIsUpload) +
-      bgSwatch('link', 'From a link', dot('background: var(--kfill-08); box-shadow: inset 0 0 0 1px rgba(var(--ink),0.2);'), bgIsLink);
+      bgSwatch('upload', bgIsUpload ? 'Your photo' : 'Upload', icoTile('<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>'), bgIsUpload) +
+      bgSwatch('link', 'From a link', icoTile('<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 14a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1 1"/><path d="M14 10a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1-1"/></svg>'), bgIsLink);
     const bgDimRow = (bgPref.type === 'color' || bgPref.type === 'image')
       ? sliderRow('prefBgDim', 'Background dim', 'Clear', 'Dark', 0, 0.6, 'any', bgDim)
       : '';
@@ -4794,9 +4796,9 @@ const TabBar = {
       '<div class="you-card">' +
         vrow('prefThemeRow', 'Theme', esc(themeName), !!openD.theme) +
         drawer('prefThemeDrawer', !!openD.theme,
-          '<div class="pref-swatches" id="prefThemes">' + themesHtml + '</div>' +
+          '<div class="you-tiles you-tiles--themes" id="prefThemes">' + themesHtml + '</div>' +
           '<div class="you-sub">Background</div>' +
-          '<div class="pref-swatches" id="prefBackground">' + bgHtml + '</div>' +
+          '<div class="you-tiles" id="prefBackground">' + bgHtml + '</div>' +
           '<input type="file" id="prefBgUploadInput" accept="image/*" style="display:none;">' +
           bgLinkRow + bgDimRow) +
         // Color is paid (v695). v705 (Malik): free users don't see it AT ALL,
@@ -4804,7 +4806,7 @@ const TabBar = {
         (_colorLocked ? '' :
           vrow('prefAccentRow', 'Accent', accentDots, !!openD.accent) +
           drawer('prefAccentDrawer', !!openD.accent,
-            '<div class="pref-swatches" id="prefAccent">' + swatchHtml + '</div>' +
+            '<div class="you-swatches" id="prefAccent">' + swatchHtml + '</div>' +
             '<input type="color" id="prefAccentCustomInput" value="' + customHex + '" aria-label="Pick a custom accent color" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;" />' +
             toggleRow('prefMatchMemento', 'Match Memento to color', 'Tints your Memento card toward the accent you pick.', prefs.matchMemento !== false))) +
         toggleRow('prefLightMode', 'Light mode', 'Switch the whole app to a bright, premium off-white theme.', prefs.theme === 'light') +
