@@ -1192,3 +1192,25 @@ body:has(#panelProfile.is-shown) .ambient__rays { opacity: 0 !important; }
 .you-card .you-drawer + .you-vrow { border-top: 1px solid rgba(var(--ink), 0.07); }
 /* The one-line rows sit a touch taller than the old two-line ones. */
 .you-card .pref-row { padding: 15px 0; }
+
+/* v797: settings gone native. Segmented corner-radius control + row cleanup. */
+.you-seg {
+  flex: 0 0 auto; display: flex; gap: 2px;
+  background: var(--kfill-05); border-radius: calc(9px * var(--rx, 1)); padding: 2.5px;
+}
+.you-seg button {
+  -webkit-appearance: none; appearance: none; border: none; cursor: pointer;
+  font: inherit; font-size: 0.74rem; font-weight: 600; color: var(--text-2);
+  background: none; padding: 6px 10px; border-radius: calc(7px * var(--rx, 1));
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+.you-seg button.is-on {
+  background: var(--kfill-12); color: var(--text-hi);
+  box-shadow: inset 0 1px 0 rgba(var(--ink), 0.08);
+}
+/* Anchors styled as rows keep the row rhythm too. */
+.you-card a.you-vrow { color: var(--text-hi); }
+.you-card .you-vrow + a.you-vrow,
+.you-card a.you-vrow + a.you-vrow,
+.you-card .you-drawer + a.you-vrow { border-top: 1px solid rgba(var(--ink), 0.07); }

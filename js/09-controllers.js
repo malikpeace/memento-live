@@ -4789,7 +4789,6 @@ const TabBar = {
         '<span class="you-dot" style="background:#3fd94e;"></span>' +
         '<span class="you-dot" style="background:#a06b45;"></span>' +
       '</span>';
-    const radiusLabel = uiRadius <= 0.7 ? 'Sharp' : (uiRadius < 1.15 ? 'Balanced' : 'Round');
     return '' +
       '<div class="you-h">Appearance</div>' +
       '<div class="you-card">' +
@@ -4813,20 +4812,20 @@ const TabBar = {
         toggleRow('prefSound', 'Sound', 'Quiet synthesized moments: the typewriter, marking a move done, the card coming alive.', prefs.soundOn !== false) +
         toggleRow('prefFlatBg', 'Minimal background', 'Hide the ambient orbs and glow for a flat, paper-like surface.', !!prefs.flatBg) +
         toggleRow('prefCompact', 'Compact density', 'Tightens spacing and type so more fits on screen.', compact) +
-        vrow('prefRadiusRow', 'Corner radius', radiusLabel, !!openD.radius) +
-        drawer('prefRadiusDrawer', !!openD.radius,
-          sliderRow('prefUiRadius', 'Corner radius', 'Sharp', 'Round', 0.35, 1.4, 'any', Math.max(0.35, uiRadius)) +
-          '<div class="feel-preview" aria-hidden="true">' +
-            '<div class="feel-preview__bg"></div>' +
-            '<div class="feel-preview__card">' +
-              '<div class="feel-preview__text">The glass you are shaping.</div>' +
-              '<div class="feel-preview__row">' +
-                '<span class="feel-preview__btn">Continue</span>' +
-                '<span class="feel-preview__chip">Today</span>' +
-              '</div>' +
+        // Corner radius: three named options, no slider (Malik v797). Values
+        // land on the same prefs.uiRadius scale the old slider drove.
+        (function () {
+          const opts = [['Sharp', 0.6], ['Balanced', 1], ['Round', 1.3]];
+          const cur = opts.reduce((a, b) => Math.abs(b[1] - uiRadius) < Math.abs(a[1] - uiRadius) ? b : a);
+          return '<div class="pref-row">' +
+            '<div class="pref-row__text"><div class="pref-row__title">Corner radius</div></div>' +
+            '<div class="you-seg" id="prefRadiusSeg" role="radiogroup" aria-label="Corner radius">' +
+              opts.map(o =>
+                '<button type="button" data-radius="' + o[1] + '" role="radio" aria-checked="' + (o === cur) + '"' +
+                (o === cur ? ' class="is-on"' : '') + '>' + o[0] + '</button>').join('') +
             '</div>' +
-          '</div>' +
-          '<div class="feel-preview__caption">Live preview</div>') +
+          '</div>';
+        })() +
       '</div>' +
       '<div class="you-h">Behavior</div>' +
       '<div class="you-card">' +
@@ -5032,6 +5031,17 @@ const TabBar = {
     wireSlider('prefUiRadius', 'uiRadius', 1);
     wireSlider('prefUiGlass', 'uiGlass', 0);
     wireSlider('prefUiBlur', 'uiBlur', 1);
+    // v797: corner radius is three named options now, same uiRadius scale.
+    const radiusSeg = document.getElementById('prefRadiusSeg');
+    if (radiusSeg) radiusSeg.querySelectorAll('[data-radius]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const v = parseFloat(btn.getAttribute('data-radius'));
+        state.prefs.uiRadius = isFinite(v) ? v : 1;
+        persistNow();
+        applyPrefs();
+        this.refreshPrefsSection();
+      });
+    });
     const feelReset = document.getElementById('prefFeelReset');
     if (feelReset) feelReset.addEventListener('click', () => {
       state.prefs.uiRadius = 1;
@@ -5182,13 +5192,15 @@ const TabBar = {
     const discordUrl = c.discord || 'https://discord.gg/UNbPAUc3y4';
     const emailAddr = c.email || 'mpeac3@gmail.com';
     const open = !!this._supportOpen;
-    const BTN = 'flex:1; text-decoration:none; text-align:center; display:inline-flex; align-items:center; justify-content:center; gap:7px;';
-    // One tappable row (Malik, v576); everything personal lives inside it.
+    // v797: native rows. "Message Malik" discloses the feedback form in place;
+    // Discord and email are plain rows of their own.
     return '' +
-      '<button type="button" class="support-disclose" id="supportOpenRow" aria-expanded="' + (open ? 'true' : 'false') + '" style="display:flex;align-items:center;justify-content:space-between;width:100%;margin:0;">Support &amp; contact<span aria-hidden="true" style="color:var(--text-3);font-size:1rem;transform:rotate(' + (open ? '90deg' : '0deg') + ');transition:transform 0.2s ease;">\u203a</span></button>' +
-      '<div id="supportBody" style="display:' + (open ? 'block' : 'none') + '; padding-top:14px;">' +
-        '<div style="font-size:0.85rem; color:var(--text-hi); font-weight:600; line-height:1.55; margin-bottom:6px;">Memento is built by one person, me.</div>' +
-        '<div style="font-size:0.8125rem; color:var(--text-1); line-height:1.6; margin-bottom:14px;">I read and reply to every message myself. If you are stuck or something is missing, reach out and I will personally help you get unstuck.</div>' +
+      '<button type="button" class="you-vrow" id="supportOpenRow" aria-expanded="' + (open ? 'true' : 'false') + '">' +
+        '<span class="you-vrow__label">Message Malik</span>' +
+        '<span class="you-chev you-chev--turn' + (open ? ' is-open' : '') + '" aria-hidden="true">\u203a</span>' +
+      '</button>' +
+      '<div class="you-drawer" id="supportBody"' + (open ? '' : ' hidden') + '>' +
+        '<div style="font-size:0.8125rem; color:var(--text-1); line-height:1.6; margin-bottom:12px;">Memento is built by one person, me. I read and reply to every message myself.</div>' +
         '<div class="fb-kinds" id="fbKind">' +
           '<button type="button" class="fb-chip fb-chip--on" data-fb-kind="idea">Idea</button>' +
           '<button type="button" class="fb-chip" data-fb-kind="bug">Bug</button>' +
@@ -5197,11 +5209,15 @@ const TabBar = {
         '<textarea id="fbText" class="wiz__text-input" rows="3" placeholder="What would make Memento better for you?" style="margin:8px 0; resize:vertical; min-height:70px;"></textarea>' +
         '<button class="sheet-btn" id="fbSend" style="background:rgba(90, 219, 242,0.14); color:var(--color-reflection); border:1px solid rgba(90, 219, 242,0.32);">Send to Malik</button>' +
         '<div id="fbMsg" style="font-size:0.6875rem; color:var(--text-3); margin-top:8px; text-align:center;"></div>' +
-        '<div style="display:flex; gap:8px; margin-top:12px;">' +
-          '<a class="sheet-btn" style="' + BTN + ' background:rgba(88, 219, 242,0.16); color:#aab4ff; border:1px solid rgba(88, 219, 242,0.4);" href="' + esc(/^https?:\/\//i.test(discordUrl) ? discordUrl : '#').replace(/"/g, '&quot;') + '" target="_blank" rel="noopener">Join the Discord</a>' +
-          '<a class="sheet-btn" style="' + BTN + ' background:var(--kfill-05); color:var(--text-hi); border:1px solid transparent;" href="mailto:' + esc(emailAddr).replace(/"/g, '&quot;') + '">Email me</a>' +
-        '</div>' +
-      '</div>';
+      '</div>' +
+      '<a class="you-vrow" style="text-decoration:none;" href="' + esc(/^https?:\/\//i.test(discordUrl) ? discordUrl : '#').replace(/"/g, '&quot;') + '" target="_blank" rel="noopener">' +
+        '<span class="you-vrow__label">Join the Discord</span>' +
+        '<span class="you-chev" aria-hidden="true">\u203a</span>' +
+      '</a>' +
+      '<a class="you-vrow" style="text-decoration:none;" href="mailto:' + esc(emailAddr).replace(/"/g, '&quot;') + '">' +
+        '<span class="you-vrow__label">Email me</span>' +
+        '<span class="you-chev" aria-hidden="true">\u203a</span>' +
+      '</a>';
   },
   renderSpotifySettings() {
     const SECLABEL = 'font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-2); margin: 22px 0 12px;';
@@ -5280,19 +5296,16 @@ const TabBar = {
   // Account card: optional cloud sync via CloudSync (js/12, Supabase magic
   // link, no passwords). Offline-safe; the app works fully without it.
   renderAccountSection() {
-    // v794 Glass Ledger: this renders INSIDE the Data card, so "Account" is a
-    // sentence-case sub-head, not an uppercase micro-label.
-    const SECLABEL = 'font-size: 0.8rem; font-weight: 700; color: var(--text-2); margin: 2px 0 10px;';
+    // v797: this renders inside the Data card's "Account" drawer row, so no
+    // heading of its own at all.
     const cs = window.CloudSync;
     if (!cs || !cs.available()) {
-      return '<div style="' + SECLABEL + '">Account</div>' +
-        '<div style="font-size:0.8125rem;color:var(--text-2);line-height:1.45;">Sync is offline right now. Your data is safe on this device.</div>';
+      return '<div style="font-size:0.8125rem;color:var(--text-2);line-height:1.45;">Sync is offline right now. Your data is safe on this device.</div>';
     }
     if (cs.isLoggedIn()) {
       const em = esc(cs.email() || 'your account');
       const when = cs.lastSyncedText();
-      return '<div style="' + SECLABEL + '">Account</div>' +
-        '<div style="font-size:0.8125rem;color:var(--text-2);line-height:1.45;margin-bottom:12px;">Signed in as <b style="color:var(--text-hi);">' + em + '</b>. Your Memento syncs across devices as you use it.</div>' +
+      return '<div style="font-size:0.8125rem;color:var(--text-2);line-height:1.45;margin-bottom:12px;">Signed in as <b style="color:var(--text-hi);">' + em + '</b>. Your Memento syncs across devices as you use it.</div>' +
         '<div style="display:flex;align-items:center;gap:7px;font-size:0.78rem;color:var(--text-3);margin-bottom:14px;"><span style="width:6px;height:6px;border-radius:50%;background:var(--color-consistency);flex:none;"></span>Synced' + (when ? ('&nbsp;&nbsp;&middot;&nbsp;&nbsp;' + esc(when)) : '') + '</div>' +
         '<div style="display:flex; gap:8px;">' +
           '<button class="sheet-btn" id="acctSyncNow" style="flex:1; background: var(--kfill-04); color: var(--text-1); border: 1px solid rgba(var(--ink),0.08);">Sync now</button>' +
@@ -5301,8 +5314,7 @@ const TabBar = {
         '<div style="font-size:0.6875rem; color: var(--text-3); margin-top:8px;">Signing out keeps everything on this device.</div>' +
         '<div id="acctMsg" style="font-size:0.6875rem; color: var(--text-3); margin-top:4px;"></div>';
     }
-    return '<div style="' + SECLABEL + '">Account</div>' +
-      '<div style="font-size:0.8125rem;color:var(--text-2);line-height:1.45;margin-bottom:12px;">Keep your data safe across devices.</div>' +
+    return '<div style="font-size:0.8125rem;color:var(--text-2);line-height:1.45;margin-bottom:12px;">Keep your data safe across devices.</div>' +
       '<button class="sheet-btn" id="acctOpenAuth" style="background: rgba(58, 217, 245,0.12); color: var(--color-clarity); border: 1px solid rgba(58, 217, 245,0.25);">Sign in</button>' +
       '<div style="font-size:0.6875rem; color: var(--text-3); margin-top:8px;">No password. We email you a link.</div>';
   },
@@ -5355,6 +5367,9 @@ const TabBar = {
     const _showInstall = (typeof window !== 'undefined' && window.MementoInstall && !window.MementoInstall._isStandalone());
     const _showUnlock = (typeof ClarityPaywall !== 'undefined' && !ClarityPaywall.isPaid());
     const _unlockPrice = (function () { try { return '$' + ClarityPaywall._PRICING.founder + ' once'; } catch (e) { return ''; } })();
+    // Row drawers (v797): open-state survives re-renders, same store the
+    // preferences drawers use.
+    const _od = TabBar._youDrawers || (TabBar._youDrawers = {});
     body.innerHTML = `
       <div class="you-head">
         <div id="profAvatar" class="you-avatar">${esc((state.profile.name || 'U').charAt(0).toUpperCase())}</div>
@@ -5372,62 +5387,110 @@ const TabBar = {
       <div class="you-h">Memento</div>
       <div class="you-card">
         ${_showInstall ? `
-        <button type="button" id="profInstallApp" class="you-row" aria-label="Add Memento to your home screen">
-          <span class="you-row__text"><span class="you-row__title">Add to Home Screen</span><span class="you-row__sub">A real app: full screen, instant, with reminders.</span></span>
+        <button type="button" id="profInstallApp" class="you-vrow" aria-label="Add Memento to your home screen. A real app: full screen, instant, with reminders.">
+          <span class="you-vrow__label">Add to Home Screen</span>
           <span class="you-chev" aria-hidden="true">&rsaquo;</span>
         </button>` : ''}
         ${_showUnlock ? `
-        <button type="button" id="profUnlock" class="you-row" aria-label="Unlock Memento">
-          <span class="you-row__text"><span class="you-row__title">Unlock Memento</span><span class="you-row__sub">Own it once, yours for life.</span></span>
-          <span class="you-row__val" style="color:var(--color-clarity);">${_unlockPrice}</span>
+        <button type="button" id="profUnlock" class="you-vrow" aria-label="Unlock Memento. Own it once, yours for life.">
+          <span class="you-vrow__label">Unlock Memento</span>
+          <span class="you-vrow__val" style="color:var(--color-clarity);">${_unlockPrice}</span>
           <span class="you-chev" aria-hidden="true">&rsaquo;</span>
         </button>` : ''}
       </div>` : ''}
       <div id="prefsSection">${this.renderPreferencesSection()}</div>
       <div class="you-h">Identity</div>
-      <div class="you-card you-card--pad">
-        <div class="you-sub" style="margin-top:2px;">What to call you</div>
-        <input type="text" id="profName" maxlength="40" value="${esc(state.profile.name || '')}" placeholder="Nickname" style="${FIELD}" />
-        <div class="you-sub">Full name</div>
-        <input type="text" id="profFullName" maxlength="60" value="${esc(state.profile.fullName || '')}" placeholder="First and last" style="${FIELD}" />
-        <div class="you-sub">Birthday${(function () { const a = (typeof ageFromBirthday === 'function') ? ageFromBirthday(state.profile.birthday) : null; return a != null ? ' <span style="font-weight:500;color:var(--text-lo);">(' + a + ' years old)</span>' : ''; })()}</div>
-        <input type="date" id="profBirthday" value="${esc(state.profile.birthday || '')}" style="${FIELD}color-scheme:dark;" />
-        <div style="font-size: 0.72rem; color: var(--text-3); margin-top: 10px;">Saved on this device. Used across Clarity and Reflection.</div>
+      <div class="you-card">
+        <button type="button" class="you-vrow" id="profNameRow" aria-expanded="${_od.name ? 'true' : 'false'}">
+          <span class="you-vrow__label">Name</span>
+          <span class="you-vrow__val" id="profNameVal">${esc(state.profile.name || 'Add')}</span>
+          <span class="you-chev you-chev--turn${_od.name ? ' is-open' : ''}" aria-hidden="true">&rsaquo;</span>
+        </button>
+        <div class="you-drawer" id="profNameDrawer"${_od.name ? '' : ' hidden'}>
+          <input type="text" id="profName" maxlength="40" value="${esc(state.profile.name || '')}" placeholder="Nickname" style="${FIELD}" />
+        </div>
+        <button type="button" class="you-vrow" id="profFullNameRow" aria-expanded="${_od.fullname ? 'true' : 'false'}">
+          <span class="you-vrow__label">Full name</span>
+          <span class="you-vrow__val" id="profFullNameVal">${esc(state.profile.fullName || 'Add')}</span>
+          <span class="you-chev you-chev--turn${_od.fullname ? ' is-open' : ''}" aria-hidden="true">&rsaquo;</span>
+        </button>
+        <div class="you-drawer" id="profFullNameDrawer"${_od.fullname ? '' : ' hidden'}>
+          <input type="text" id="profFullName" maxlength="60" value="${esc(state.profile.fullName || '')}" placeholder="First and last" style="${FIELD}" />
+        </div>
+        <button type="button" class="you-vrow" id="profBirthdayRow" aria-expanded="${_od.birthday ? 'true' : 'false'}">
+          <span class="you-vrow__label">Birthday</span>
+          <span class="you-vrow__val">${(function () {
+            if (!state.profile.birthday) return 'Add';
+            var t = state.profile.birthday;
+            try { var d = new Date(t + 'T12:00:00'); if (!isNaN(d)) t = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }); } catch (e) {}
+            var a = (typeof ageFromBirthday === 'function') ? ageFromBirthday(state.profile.birthday) : null;
+            return esc(t) + (a != null ? ' &middot; ' + a : '');
+          })()}</span>
+          <span class="you-chev you-chev--turn${_od.birthday ? ' is-open' : ''}" aria-hidden="true">&rsaquo;</span>
+        </button>
+        <div class="you-drawer" id="profBirthdayDrawer"${_od.birthday ? '' : ' hidden'}>
+          <input type="date" id="profBirthday" value="${esc(state.profile.birthday || '')}" style="${FIELD}color-scheme:dark;" />
+          <div style="font-size: 0.72rem; color: var(--text-3); margin-top: 8px;">Saved on this device. Used across Clarity and Reflection.</div>
+        </div>
       </div>
       <div class="you-h">Data</div>
-      <div class="you-card you-card--pad">
-        <div id="acctSection">${this.renderAccountSection()}</div>
-        <div class="you-sub" style="margin-top:20px;">Backup</div>
-        <div style="font-size: 0.8125rem; color: var(--text-2); margin-bottom: 12px; line-height: 1.45;">Download a backup so a cleared browser or a new device never erases your history.</div>
-        <div style="display:flex; gap:8px;">
-          <button class="sheet-btn" id="exportData" style="flex:1; background: rgba(var(--success-rgb),0.12); color: var(--color-consistency); border: 1px solid rgba(var(--success-rgb),0.25);">Download backup</button>
-          <button class="sheet-btn" id="importData" style="flex:1; background: var(--kfill-04); color: var(--text-1); border: 1px solid rgba(var(--ink),0.08);">Restore</button>
+      <div class="you-card">
+        <button type="button" class="you-vrow" id="acctRow" aria-expanded="${_od.account ? 'true' : 'false'}">
+          <span class="you-vrow__label">Account</span>
+          <span class="you-vrow__val">${_syncLine}</span>
+          <span class="you-chev you-chev--turn${_od.account ? ' is-open' : ''}" aria-hidden="true">&rsaquo;</span>
+        </button>
+        <div class="you-drawer" id="acctDrawer"${_od.account ? '' : ' hidden'}>
+          <div id="acctSection">${this.renderAccountSection()}</div>
         </div>
+        <button type="button" class="you-vrow" id="exportData">
+          <span class="you-vrow__label">Download backup</span>
+        </button>
+        <button type="button" class="you-vrow" id="importData">
+          <span class="you-vrow__label">Restore from backup</span>
+        </button>
         <input type="file" id="importFile" accept="application/json,.json" style="display:none;">
-        <div id="dataMsg" style="font-size:0.6875rem; color: var(--text-3); margin-top:8px; text-align:center;"></div>
+        <div id="dataMsg" style="font-size:0.6875rem; color: var(--text-3); text-align:center;"></div>
         ${(function(){
           var b = (typeof getPreSyncBackup === 'function') ? getPreSyncBackup() : null;
           if (!b) return '';
           var when = '';
           try { when = new Date(b.savedAt || b.ts || Date.now()).toLocaleDateString(); } catch (e) {}
-          return '<div style="margin-top:12px; background: var(--kfill-04); border-radius: calc(12px * var(--rx,1)); padding: 12px 14px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);">' +
-            '<div style="font-size:0.8rem; color: var(--text-1); line-height:1.45; margin-bottom:10px;">Auto-saved copy from ' + when + '. If something looks off, you can roll back to it.</div>' +
-            '<button class="sheet-btn" id="restoreAutoBackup" style="background: var(--kfill-04); color: var(--text-1);">Restore this</button>' +
-          '</div>';
+          return '<button type="button" class="you-vrow" id="restoreAutoBackup">' +
+            '<span class="you-vrow__label">Roll back to auto-saved copy</span>' +
+            '<span class="you-vrow__val">' + when + '</span>' +
+          '</button>';
         })()}
-        <div class="privacy-note" style="margin-top:14px;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2L4 5v6c0 5 3.4 8.3 8 10 4.6-1.7 8-5 8-10V5l-8-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-          <span>Your data lives on this device. No account required, nothing you write is ever collected. The only things that ever leave are what you choose to send to the optional AI, plus anonymous usage signals (which screens get used, never your words). Vision-board and journal images stay on this device only, never synced. Use the backup above to move it yourself.</span>
+        <button type="button" class="you-vrow" id="privacyRow" aria-expanded="${_od.privacy ? 'true' : 'false'}">
+          <span class="you-vrow__label">Privacy</span>
+          <span class="you-vrow__val">On this device</span>
+          <span class="you-chev you-chev--turn${_od.privacy ? ' is-open' : ''}" aria-hidden="true">&rsaquo;</span>
+        </button>
+        <div class="you-drawer" id="privacyDrawer"${_od.privacy ? '' : ' hidden'}>
+          <div class="privacy-note">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2L4 5v6c0 5 3.4 8.3 8 10 4.6-1.7 8-5 8-10V5l-8-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+            <span>Your data lives on this device. No account required, nothing you write is ever collected. The only things that ever leave are what you choose to send to the optional AI, plus anonymous usage signals (which screens get used, never your words). Vision-board and journal images stay on this device only, never synced. Use the backup above to move it yourself.</span>
+          </div>
         </div>
       </div>
       <div class="you-h">Support</div>
-      <div class="you-card you-card--pad">
+      <div class="you-card">
         <div id="supportSection">${this.renderSupportSection()}</div>
+        <a class="you-vrow" href="legal/terms.html" target="_blank" rel="noopener" style="text-decoration:none;">
+          <span class="you-vrow__label">Terms</span>
+          <span class="you-chev" aria-hidden="true">&rsaquo;</span>
+        </a>
+        <a class="you-vrow" href="legal/privacy.html" target="_blank" rel="noopener" style="text-decoration:none;">
+          <span class="you-vrow__label">Privacy Policy</span>
+          <span class="you-chev" aria-hidden="true">&rsaquo;</span>
+        </a>
       </div>
-      <button class="sheet-btn" id="profileReset" style="background: var(--kfill-12); color: var(--color-action); border: 1px solid rgba(var(--ink),0.25); margin-top: 34px;">Reset Everything</button>
-      <div style="font-size: 0.6875rem; color: var(--text-3); text-align: center; margin-top: 12px;">This will delete all your data and start fresh.</div>
-      <div style="font-size: 0.6875rem; color: var(--text-3); text-align: center; margin-top: 28px; letter-spacing: 0.06em;">Memento ${(window.MEMENTO_VERSION || '')}</div>
-      <div style="font-size: 0.6875rem; text-align: center; margin-top: 8px;"><a href="legal/terms.html" target="_blank" rel="noopener" style="color: var(--text-3); text-decoration: none; font-weight: 600;">Terms</a><span style="color: var(--text-3); margin: 0 8px;">&middot;</span><a href="legal/privacy.html" target="_blank" rel="noopener" style="color: var(--text-3); text-decoration: none; font-weight: 600;">Privacy</a></div>
+      <div class="you-card" style="margin-top: 30px;">
+        <button type="button" class="you-vrow" id="profileReset">
+          <span class="you-vrow__label" style="color: var(--color-action);">Reset everything</span>
+        </button>
+      </div>
+      <div style="font-size: 0.6875rem; color: var(--text-3); text-align: center; margin-top: 26px; letter-spacing: 0.06em;">Memento ${(window.MEMENTO_VERSION || '')}</div>
     `;
     // Preferences bindings (accent / reduce motion / density)
     this.bindPreferences();
@@ -5447,22 +5510,46 @@ const TabBar = {
         if (cbox) body.appendChild(cbox);
       }
     } catch (e) {}
+    // v797: expandable rows (Name / Full name / Birthday / Account / Privacy).
+    // Pure DOM toggles, no re-render, so open inputs never lose focus; the
+    // flag store keeps them open across full re-renders.
+    const _wireRowDrawer = (rowId, drawerId, key) => {
+      const row = document.getElementById(rowId);
+      const d = document.getElementById(drawerId);
+      if (!row || !d) return;
+      row.addEventListener('click', () => {
+        const o = TabBar._youDrawers || (TabBar._youDrawers = {});
+        o[key] = !o[key];
+        if (o[key]) d.removeAttribute('hidden'); else d.setAttribute('hidden', '');
+        row.setAttribute('aria-expanded', o[key] ? 'true' : 'false');
+        const ch = row.querySelector('.you-chev--turn');
+        if (ch) ch.classList.toggle('is-open', !!o[key]);
+        // Opening an edit drawer drops the caret straight into its input.
+        if (o[key]) { const inp = d.querySelector('input'); if (inp && inp.type !== 'date') { try { inp.focus(); } catch (e) {} } }
+      });
+    };
+    _wireRowDrawer('profNameRow', 'profNameDrawer', 'name');
+    _wireRowDrawer('profFullNameRow', 'profFullNameDrawer', 'fullname');
+    _wireRowDrawer('profBirthdayRow', 'profBirthdayDrawer', 'birthday');
+    _wireRowDrawer('acctRow', 'acctDrawer', 'account');
+    _wireRowDrawer('privacyRow', 'privacyDrawer', 'privacy');
     // Identity field edits (debounced persist). Name also refreshes the
-    // sidebar profile + the top hub greeting live.
-    const bindProfileField = (id, key) => {
+    // sidebar profile + the top hub greeting live. Row values track edits.
+    const bindProfileField = (id, key, valId) => {
       const el = document.getElementById(id);
       if (!el) return;
       let t = null;
       const commit = () => {
         state.profile[key] = el.value;
         persistNow();
+        if (valId) { const v = document.getElementById(valId); if (v) v.textContent = el.value || 'Add'; }
         if (key === 'name') { try { if (typeof Sidebar !== 'undefined' && Sidebar.refresh) Sidebar.refresh(); if (typeof renderGreeting === 'function') renderGreeting(); } catch (e) {} }
       };
       el.addEventListener('input', () => { state.profile[key] = el.value; clearTimeout(t); t = setTimeout(commit, 300); });
       el.addEventListener('blur', commit);
     };
-    bindProfileField('profName', 'name');
-    bindProfileField('profFullName', 'fullName');
+    bindProfileField('profName', 'name', 'profNameVal');
+    bindProfileField('profFullName', 'fullName', 'profFullNameVal');
     try { const _pathBtn = document.getElementById('profPathOpen'); if (_pathBtn) _pathBtn.addEventListener('click', () => { try { if (typeof MementoPath !== 'undefined') MementoPath.open(); } catch (e) {} }); } catch (e) {}
     try { const _storyBtn = document.getElementById('profStoryOpen'); if (_storyBtn) _storyBtn.addEventListener('click', () => { try { if (typeof MementoStory !== 'undefined') MementoStory.open(); } catch (e) {} }); } catch (e) {}
     try { const _instBtn = document.getElementById('profInstallApp'); if (_instBtn) _instBtn.addEventListener('click', () => { try { if (window.MementoInstall) window.MementoInstall.show(); } catch (e) {} }); } catch (e) {}
@@ -5494,6 +5581,9 @@ const TabBar = {
       if (!circle || !pick || !fileIn) return;
       applyProfileAvatar(circle, (state.profile.name || 'U').charAt(0).toUpperCase());
       pick.addEventListener('click', () => fileIn.click());
+      // Native touch (v797): the avatar itself is the photo button.
+      circle.style.cursor = 'pointer';
+      circle.addEventListener('click', () => fileIn.click());
       fileIn.addEventListener('change', () => {
         const f = fileIn.files && fileIn.files[0];
         fileIn.value = '';
