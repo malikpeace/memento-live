@@ -3286,6 +3286,26 @@ html.lowfx .nsv2-reveal__eyebrow { animation: nsv2WordInLite 1.0s ease forwards;
    jets melt into the black, negative margin tightens the gap to the goal text
    since the canvas carries its own dark padding. v586: near full-screen. */
 .nsv2-star__blob { display: block; width: min(150vw, 84lvh); height: min(150vw, 84lvh); margin: -6vh calc((100% - min(150vw, 84lvh)) / 2) -60px; border-radius: 0; }
+/* v804 (Malik: "the final neutron star page doesn't fully fit on desktop"):
+   the mobile star is deliberately near-fullscreen (84lvh) with the goal text
+   overlapping its fading jets, which works on a tall phone. On a wide/short
+   desktop or iPad-landscape the scene is centered, so an 84lvh star plus the
+   ~260px sentence + CTA block overflowed the fixed viewport and clipped the
+   CTA. On wide screens, size the star off the SHORTER axis and reserve room so
+   the whole ceremony (star, sentence, divider, CTA) always fits and centers. */
+@media (min-width: 641px) {
+  .nsv2-star__blob {
+    width: min(58lvh, 62vw);
+    height: min(58lvh, 62vw);
+    margin: 0 auto -28px;
+  }
+  .nsv2-starscene { justify-content: center; }
+  .nsv2[data-act="star"] .nsv2-after { margin-top: 8px; }
+}
+/* Short landscape (laptops, iPad landscape): shorter still so nothing clips. */
+@media (min-width: 641px) and (max-height: 780px) {
+  .nsv2-star__blob { width: min(50lvh, 56vw); height: min(50lvh, 56vw); }
+}
 
 /* Synthesis loading (v586): the marbled star (no jets) slowly condensing.
    The wrapper scales down over the whole wait; the shader keeps breathing. */

@@ -947,10 +947,16 @@ body.ns-bloom .app.dash-v2 #commandCenter .cc-live { display: none; }
     mask-image: linear-gradient(to bottom, #000 72%, transparent);
   }
 
-  /* the card is the bigger centerpiece (overrides the 860px sizing) */
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-theme-platinum .daycard-ns { width: min(100%, 440px); }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-theme-living .daycard-living-stage { width: min(100%, 440px); }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-ns { min-height: 430px; }
+  /* v804 (Malik: "sometimes the star is fat/square, sometimes a card"): this
+     ns-bloom override used to WIDEN the colored card to 440 while holding the
+     height at 430, so post-Clarity it rendered SQUARE (440x430) while the blank
+     pre-Clarity card stayed the tall 320x440 card. That broke the locked rule
+     that blank and colored are pixel-identical, and read as the card changing
+     shape. Pin the colored card to the exact same tall shape as the blank/base
+     (one shape, always), driven by the shared --card-w / --card-h tokens. */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-theme-platinum .daycard-ns { width: var(--card-w, 320px); }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-theme-living .daycard-living-stage { width: var(--card-w, 320px); }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-ns { min-height: var(--card-h, 440px); }
 }
 
 /* ── v27 BENTO HOME, mobile (<768px, after the Neutron Star) ─────────────────
@@ -2896,10 +2902,12 @@ body.daycard-force #dayCard { display: block; max-width: 430px; }
     flex: 0 0 auto;
     margin: 0 auto 40px;
   }
-  /* platinum card sizes itself; living sizes via its stage (card fills it) */
-  #dayCard .daycard-theme-platinum .daycard-ns { width: 320px; margin: 0; }
-  #dayCard .daycard-theme-living .daycard-living-stage { width: 320px; margin: 0 0 26px; }
-  #dayCard .daycard-ns { min-height: 440px; }
+  /* platinum card sizes itself; living sizes via its stage (card fills it).
+     v804: shape driven by --card-w / --card-h so the card is ONE locked shape
+     everywhere (and a square variant is a single-token swap). */
+  #dayCard .daycard-theme-platinum .daycard-ns { width: var(--card-w, 320px); margin: 0; }
+  #dayCard .daycard-theme-living .daycard-living-stage { width: var(--card-w, 320px); margin: 0 0 26px; }
+  #dayCard .daycard-ns { min-height: var(--card-h, 440px); }
 }
 /* Before the Neutron Star, Home is just the (blank) card + the one "Start your
    Neutron Star" CTA on black, at EVERY width. The module grid, daily line and
