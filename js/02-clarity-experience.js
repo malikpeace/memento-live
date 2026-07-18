@@ -2886,22 +2886,30 @@ const ActionExperience = {
   // above the conversation as quiet editable facts instead of gate questions.
   // Tapping one drops a plain request into the conversation; the AI handles
   // the change in one turn and the snapshot mirror updates this strip.
-  _renderIntakeGiven() {
-    const host = this.pageWrap && this.pageWrap.querySelector('#intakeGiven');
+  // v843 (Malik): the intake opens as a BRIEF, not a bare strip. Their star
+  // restated with its timeframe and committed time (all from Clarity, tappable
+  // to change), then the leverage framing: most action is busywork, we are
+  // hunting the one move that makes the rest easier or unnecessary.
+  _renderIntakeBrief() {
+    const host = this.pageWrap && this.pageWrap.querySelector('#intakeBrief');
     if (!host) return;
     const ca = (state.clarity && state.clarity.answers) || {};
     const goal = (ca.neutronStar || '').trim();
     const tf = (ca.timeframe || ca.timeHorizon || '').trim();
+    const mins = parseInt(ca.dailyTime, 10) || 0;
+    const minsLabel = mins >= 60 ? ((mins % 60 === 0 ? (mins / 60) : (mins / 60).toFixed(1)) + (mins === 60 ? ' hour' : ' hours')) : (mins + ' min');
     if (!goal) { host.innerHTML = ''; return; }
+    const metaBits = [];
+    if (tf) metaBits.push(esc(tf));
+    if (mins) metaBits.push(esc(minsLabel) + ' a day');
     host.innerHTML =
-      '<button type="button" class="intake-given__row" id="intakeEditGoal" aria-label="Edit the goal">' +
-        '<span class="intake-given__val">' + esc(goal) + '</span>' +
-        '<span class="intake-given__edit">edit</span>' +
-      '</button>' +
-      (tf ? ('<button type="button" class="intake-given__row intake-given__row--tf" id="intakeEditTf" aria-label="Edit the timeframe">' +
-        '<span class="intake-given__val">' + esc(tf) + '</span>' +
-        '<span class="intake-given__edit">edit</span>' +
-      '</button>') : '');
+      '<div class="intake-brief__lead">The goal you locked in:</div>' +
+      '<button type="button" class="intake-brief__goal" id="intakeEditGoal" aria-label="Edit the goal">' + esc(goal) + '</button>' +
+      (metaBits.length ? '<button type="button" class="intake-brief__meta" id="intakeEditTf" aria-label="Edit the timeframe">' + metaBits.join(' &middot; ') + '<span class="intake-brief__edit">edit</span></button>' : '') +
+      '<div class="intake-brief__lev">' +
+        '<p>Not every action counts the same. Most of what people do is low-leverage busywork, it feels productive and moves nothing.</p>' +
+        '<p>Somewhere in your goal there is <b>one move</b> that makes everything else easier or unnecessary. Finding it is what we do next.</p>' +
+      '</div>';
     const send = (msg) => {
       try {
         const intake = state.action.intake;
@@ -2914,7 +2922,7 @@ const ActionExperience = {
     const g = host.querySelector('#intakeEditGoal');
     if (g) g.addEventListener('click', () => send('I want to change the wording of the goal.'));
     const t = host.querySelector('#intakeEditTf');
-    if (t) t.addEventListener('click', () => send('I want a different timeframe.'));
+    if (t) t.addEventListener('click', () => send('I want to change the timeframe.'));
   },
 
   _intakeQuestions() {
@@ -3011,12 +3019,12 @@ const ActionExperience = {
     this.pageWrap.innerHTML = `
       <div class="action-exp__page-inner action-intake-page action-intake-page--cine">
         <div class="action-exp__inner action-intake action-intake--cine">
-          <div class="action-intake__given" id="intakeGiven"></div>
+          <div class="action-intake__brief" id="intakeBrief"></div>
           <div class="action-intake__transcript" style="display:none" aria-hidden="true"></div>
           <div class="action-intake__current"></div>
         </div>
       </div>`;
-    this._renderIntakeGiven();
+    this._renderIntakeBrief();
 
     // Auto-scroll to bottom whenever the intake DOM changes (new bubble,
     // new question, typing indicator, etc.) so the latest message is always
@@ -3032,9 +3040,13 @@ const ActionExperience = {
       // exactly where they left off.
       this._restoreAiIntakeFromState();
     } else if (intake.phase === 'aiDriven' && intake.aiMessages.length === 0) {
-      // v606 hot path: goal + timeframe already locked, the AI opens at
-      // past progress directly.
-      this._aiIntakeFetchNext();
+      // v843: the opener is CLIENT-ASKED (no round trip): do you know the
+      // move? Two doors; the AI takes over from whichever they pick.
+      const opener = 'Do you already know what you have to do to make progress toward this goal?';
+      intake.aiMessages.push({ role: 'assistant', content: opener });
+      intake.aiHistory.push({ message: opener, type: 'choices', options: ['I know the move', 'Find it for me'] });
+      persistNow();
+      this._aiIntakeRenderQuestion({ question: opener, type: 'choices', options: ['I know the move', 'Find it for me'] });
     } else {
       // Render the first phase (hardcoded opener).
       this._renderIntakePhase();
@@ -3432,12 +3444,12 @@ The goal and timeframe are already locked from Clarity (see snapshot); they are 
       // real substance (so a hallucinated ready: true cannot end the convo early).
       const snap = intake.aiSnapshot;
       const lengthOk = (s, n) => typeof s === 'string' && s.trim().length >= n;
-      // v830 (the intake flip): pastProgress is the ONLY question. Goal and
-      // timeframe are prefilled from Clarity (editable on screen), and the
-      // plan prompt already treats mainMove/oneThing as optional garnish. The
-      // AI keeps its lazy-answer authority: a vague answer leaves the field
-      // empty and gets pushback, so this still cannot be garbage-completed.
-      if (lengthOk(snap.pastProgress, 4)) {
+      // v843 (the two doors): the client asked "do you know the move". If
+      // they knew it, the AI captures mainMove and we are done; if not, the
+      // AI asks the one locator question and pastProgress completes it. The
+      // AI keeps its lazy-answer authority either way: a vague answer leaves
+      // the field empty and gets pushback, so this cannot be garbage-completed.
+      if (lengthOk(snap.mainMove, 8) || lengthOk(snap.pastProgress, 4)) {
         intake.completed = true;
         persistNow();
         this._aiIntakeRenderClosing();
