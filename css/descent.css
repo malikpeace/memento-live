@@ -1,0 +1,64 @@
+/* ===========================================================================
+   descent.css — THE DEEPER ROOM (Mori day 3 / Vivere day 5), v836.
+   Dark cinema in both themes, same register as the 7-days screen: near-black,
+   typography-first, one quiet escape, no chrome. The warm light appears ONLY
+   inside the Vivere quote + closer (a color, not a coat of paint).
+   =========================================================================== */
+.dr {
+  position: fixed; inset: 0; z-index: 9600;
+  display: flex; align-items: center; justify-content: center;
+  background: #050607;
+  opacity: 0; transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  font-family: var(--font);
+  -webkit-tap-highlight-color: transparent;
+}
+.dr--in { opacity: 1; }
+
+.dr__skip {
+  position: absolute; top: calc(var(--safe-t) + 18px); right: 20px; z-index: 2;
+  border: none; background: transparent; cursor: pointer; padding: 8px 12px;
+  font-family: var(--font); font-size: 0.75rem; color: rgba(255,255,255,0.4);
+}
+.dr__skip:active, .dr__skip:hover { color: rgba(255,255,255,0.8); }
+
+.dr__stage {
+  width: min(88vw, 420px); text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  opacity: 0; transform: translateY(10px);
+  transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1), transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.dr__stage--shown { opacity: 1; transform: none; }
+
+.dr__hint {
+  position: absolute; bottom: calc(var(--safe-b) + 26px); left: 0; right: 0;
+  text-align: center; font-size: 0.6875rem; color: rgba(255,255,255,0.28);
+  pointer-events: none;
+}
+
+.dr__big {
+  font-size: clamp(1.9rem, 8vw, 2.4rem); font-weight: 700;
+  letter-spacing: -0.03em; line-height: 1.12; color: rgba(255,255,255,0.96);
+  text-wrap: balance;
+}
+.dr__num { font-variant-numeric: tabular-nums; font-size: clamp(2.6rem, 12vw, 3.6rem); }
+.dr__sub { font-size: 0.96875rem; color: rgba(255,255,255,0.72); line-height: 1.5; }
+.dr__lead { font-size: 1.0625rem; font-weight: 600; color: rgba(255,255,255,0.92); line-height: 1.45; text-wrap: balance; }
+.dr__lead b { font-weight: 700; color: #fff; font-variant-numeric: tabular-nums; }
+.dr__quiet { font-size: 0.78125rem; color: rgba(255,255,255,0.5); }
+.dr__quote {
+  font-size: 1.25rem; font-weight: 650; line-height: 1.42;
+  color: rgba(255,255,255,0.94); letter-spacing: -0.015em; text-wrap: balance;
+}
+.dr__grid { display: block; margin: 6px auto; }
+
+/* Vivere's warm light: the ONE place it appears as type. */
+.dr__quote--warm .dr__w { opacity: 0.16; transition: opacity 0.8s ease, color 0.8s ease, text-shadow 0.8s ease; }
+.dr__quote--warm .dr__w.is-lit {
+  opacity: 1; color: rgb(255, 226, 188);
+  text-shadow: 0 0 26px rgba(255, 196, 130, 0.35);
+}
+.dr__big--warm { color: rgb(255, 232, 202); text-shadow: 0 0 34px rgba(255, 196, 130, 0.28); }
+
+@media (prefers-reduced-motion: reduce) {
+  .dr, .dr__stage { transition: none; }
+}

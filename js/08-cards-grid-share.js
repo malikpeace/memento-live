@@ -1810,6 +1810,8 @@ const CreatorTools = {
     try { this._paidLabel(); } catch (e) {}
     bind('creatorJumpDay1', () => this.jumpDay1());
     bind('creatorJumpAction', () => this.jumpAction());
+    bind('creatorJumpMori', () => this.jumpMori());
+    bind('creatorJumpVivere', () => this.jumpVivere());
 
     // Every cheat button press toasts its own label (v735): universal
     // feedback, delegated so future buttons get it for free.
@@ -2278,6 +2280,9 @@ const CreatorTools = {
 
   // Straight to the paywall itself (force so it opens even on a paid dev state).
   jumpPaywall() { this._closeAll(); try { if (typeof ClarityPaywall !== 'undefined' && ClarityPaywall.show) ClarityPaywall.show({ force: true }); } catch (e) {} },
+  // The Deeper Room moments, straight in (gates bypassed for preview).
+  jumpMori() { this._closeAll(); try { DeeperRoom.openMori({ force: true }); } catch (e) {} },
+  jumpVivere() { this._closeAll(); try { DeeperRoom.openVivere({ force: true }); } catch (e) {} },
   // Straight to the Action module screen (A5/A9): clears the gates so the
   // intro/tutorial/intake never intercept, then opens the experience.
   jumpAction() {
@@ -4640,6 +4645,8 @@ function renderDayCard() {
         (living ? '<span class="daycard-ns__liquid" aria-hidden="true">' + blobs + '</span>' : '') +
         '<span class="daycard-ns__iri" aria-hidden="true"></span>' +
         '<span class="daycard-ns__sheen" aria-hidden="true"></span>' +
+        ((state.meta && state.meta.moriMomentAt) ? '<span class="daycard-ns__mori" aria-hidden="true"></span>' : '') +
+        ((state.meta && state.meta.vivereMomentAt) ? '<span class="daycard-ns__vivere" aria-hidden="true"></span>' : '') +
         (living ? '<span class="daycard-ns__burn" aria-hidden="true"></span>' : '') +
         '<div class="daycard-ns__body">' + emblemSvg + '</div>' +
         '<div class="daycard-ns__foot">' + goalSpan + nameSpan + '</div>' +
