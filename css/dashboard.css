@@ -3997,6 +3997,9 @@ body.card-square { --card-w: 360px; --card-h: 360px; }
   }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashConsistency .cgraph__months { display: none; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashConsistency .cgraph__legend { display: none; }
+  /* v817 (Malik: 'NO PROOF YET can go'): the editorial home's heatmap speaks
+     for itself; the coaching empty-state stays inside the Consistency module. */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashConsistency .empty-state { display: none; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashConsistency .cgraph__cols { gap: 3px; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashConsistency .cgraph__col { gap: 3px; flex: 1 1 0; max-width: 20px; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashConsistency .cgraph__col .cgraph__cell {
