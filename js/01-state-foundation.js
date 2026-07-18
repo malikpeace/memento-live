@@ -1277,9 +1277,22 @@ function renderNeutronStarSummary(summary, { allowContinue = false, showRestart 
         <h1 class="ns-min__goal">${goalHtml}</h1>
         <div class="ns-min__divider" aria-hidden="true"></div>
         ${timeframe ? `<div class="ns-min__time">${calIcon}<span>${esc(timeframe)}</span></div>` : ''}
-        <button type="button" id="summaryAction" class="ns-min__cta">
-          <span>Add to your Memento</span>${arrowRight}
-        </button>
+        ${(function () {
+          // v815 (Malik): once the star has already been added (the card
+          // evolution has played), the CTA turns into a quiet ghost receipt,
+          // "Added to Memento", instead of re-selling the add. Same tap
+          // (closes back to the home), it just stops shouting.
+          const added = !!(state && state.meta && state.meta.cardEvolutionSeen);
+          if (added) {
+            return `<button type="button" id="summaryAction" class="ns-min__cta ns-min__cta--added">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="4 12.5 10 18.5 20 6.5"/></svg>
+              <span>Added to Memento</span>
+            </button>`;
+          }
+          return `<button type="button" id="summaryAction" class="ns-min__cta">
+            <span>Add to your Memento</span>${arrowRight}
+          </button>`;
+        })()}
       </div>
       <div class="ns-min__sheet" id="nsMenuSheet" aria-hidden="true" role="menu">
         <button type="button" id="summaryContinue" class="ns-min__sheet-item" role="menuitem">Refine answers</button>
