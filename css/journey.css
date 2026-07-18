@@ -277,7 +277,9 @@ html.theme-light .rf-sealed__mark { color: rgb(28, 158, 39); }
   text-align: left;
 }
 .rf-item__date { font-family: var(--font); font-size: 0.6875rem; font-weight: 650; color: var(--text-3); font-variant-numeric: tabular-nums; }
-.rf-item__text { margin-top: 4px; font-family: var(--font); font-size: 0.875rem; line-height: 1.5; color: var(--text-2); }
+/* Reading content, not a label: --text-2 read as washed-out gray in both
+   themes (the no-dim-body-text law). The date above stays quiet. */
+.rf-item__text { margin-top: 4px; font-family: var(--font); font-size: 0.875rem; line-height: 1.5; color: var(--text-1); }
 .rf-notes-link {
   display: flex; align-items: center; justify-content: center;
   width: fit-content; min-height: 44px; margin: 14px auto 0; padding: 8px 16px;
