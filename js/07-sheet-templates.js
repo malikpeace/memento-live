@@ -3977,7 +3977,15 @@ const SHEET_TEMPLATES = {
       // and the running timer. The interval updates both the sheet display and
       // (if open) the focus overlay. Exiting focus keeps the session running.
       let focusTimerEl = null;
-      const _updateTimer = (text) => { if (timerEl) timerEl.textContent = text; if (focusTimerEl) focusTimerEl.textContent = text; };
+      const _updateTimer = (text) => {
+        if (timerEl) timerEl.textContent = text;
+        if (focusTimerEl) focusTimerEl.textContent = text;
+        // A3 thin progress line: fills toward the target; hidden-by-empty on open-ended runs.
+        try {
+          const bar = document.getElementById('dwFocusBar');
+          if (bar && self._targetSec > 0) bar.style.width = Math.min(100, (self._elapsed / self._targetSec) * 100) + '%';
+        } catch (_) {}
+      };
       const _exitFocus = () => { const o = document.getElementById('dwFocusOverlay'); if (o) o.remove(); focusTimerEl = null; };
       const finish = () => {
         const logged = self._commit();
@@ -4014,17 +4022,19 @@ const SHEET_TEMPLATES = {
         o.id = 'dwFocusOverlay';
         o.setAttribute('role', 'dialog');
         o.setAttribute('aria-label', 'Deep work focus mode');
-        o.style.cssText = 'position:fixed;inset:0;z-index:100000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;background:radial-gradient(120% 80% at 50% 30%, #15110a, #07070a 70%);padding:40px;text-align:center;';
+        // v827: the A3 running state (Malik's locked finals). Flat near-black in
+        // BOTH themes, huge tabular time, dimmed task, no amber, no borders.
+        o.style.cssText = 'position:fixed;inset:0;z-index:100000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;background:#060608;padding:40px;text-align:center;';
         o.innerHTML =
-          '<div style="font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,159,10,0.7);font-weight:700;">Deep Work</div>' +
-          '<div style="font-size:1.2rem;font-weight:600;color:rgba(var(--ink),0.86);max-width:520px;line-height:1.4;">' + esc(intention) + '</div>' +
-          '<div id="dwFocusTimer" style="font-size:clamp(4rem,18vw,9rem);font-weight:800;letter-spacing:-0.04em;color:#fff;font-variant-numeric:tabular-nums;line-height:0.9;">' + fmt(cur) + '</div>' +
-          '<div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">' +
-            '<button id="dwFocusEnd" style="font:inherit;font-weight:700;font-size:0.9rem;cursor:pointer;border:none;border-radius:calc(8px * var(--rx, 1));padding:13px 22px;background:var(--color-deepwork);color:#fff;">End and log</button>' +
-            '<button id="dwFocusExit" style="font:inherit;font-weight:600;font-size:0.9rem;cursor:pointer;border:1px solid rgba(var(--ink),0.18);border-radius:calc(8px * var(--rx, 1));padding:13px 22px;background:transparent;color:rgba(var(--ink),0.8);">Exit focus</button>' +
+          '<div id="dwFocusTimer" style="font-size:clamp(3.6rem,16vw,8rem);font-weight:700;letter-spacing:-0.03em;color:rgba(255,255,255,0.96);font-variant-numeric:tabular-nums;line-height:0.9;">' + fmt(cur) + '</div>' +
+          '<div style="width:120px;height:3px;border-radius:2px;background:rgba(255,255,255,0.1);overflow:hidden;"><div id="dwFocusBar" style="width:0%;height:100%;border-radius:2px;background:var(--success);"></div></div>' +
+          '<div style="font-size:0.84375rem;font-weight:500;color:rgba(255,255,255,0.5);max-width:480px;line-height:1.45;">' + esc(intention) + '</div>' +
+          '<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:10px;">' +
+            '<button id="dwFocusEnd" style="font:inherit;font-weight:700;font-size:0.875rem;cursor:pointer;border:none;border-radius:calc(10px * var(--rx, 1));padding:13px 24px;background:#fff;color:#0a0c0e;">End and log</button>' +
+            '<button id="dwFocusExit" style="font:inherit;font-weight:600;font-size:0.875rem;cursor:pointer;border:none;border-radius:calc(10px * var(--rx, 1));padding:13px 24px;background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.9);box-shadow:inset 0 1px 0 rgba(255,255,255,0.07);">Exit focus</button>' +
           '</div>' +
-          '<input id="dwPark" type="text" autocomplete="off" placeholder="Park a distraction, then stay. Enter to save." aria-label="Park a distraction to your inbox" style="margin-top:4px;max-width:440px;width:100%;box-sizing:border-box;font:inherit;font-size:0.85rem;color:rgba(var(--ink),0.85);background:var(--kfill-05);border:1px solid rgba(var(--ink),0.16);border-radius:calc(8px * var(--rx, 1));padding:11px 14px;outline:none;text-align:center;">' +
-          '<div id="dwParkMsg" aria-live="polite" style="font-size:0.7rem;color:rgba(255,159,10,0.85);min-height:14px;margin-top:-16px;">&nbsp;</div>';
+          '<input id="dwPark" type="text" autocomplete="off" placeholder="Park a distraction, then stay. Enter to save." aria-label="Park a distraction to your inbox" style="margin-top:4px;max-width:440px;width:100%;box-sizing:border-box;font:inherit;font-size:0.85rem;color:rgba(255,255,255,0.85);background:rgba(255,255,255,0.05);border:none;box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);border-radius:calc(8px * var(--rx, 1));padding:11px 14px;outline:none;text-align:center;">' +
+          '<div id="dwParkMsg" aria-live="polite" style="font-size:0.7rem;color:rgba(255,255,255,0.6);min-height:14px;margin-top:-16px;">&nbsp;</div>';
         document.body.appendChild(o);
         focusTimerEl = o.querySelector('#dwFocusTimer');
         o.querySelector('#dwFocusExit').addEventListener('click', _exitFocus);

@@ -4784,7 +4784,47 @@ Return ONLY the sentence text. No quotes, no labels.`;
       '}',
       // reduced motion / lite
       'body.calm-motion .apl-step__panel,body.lite .apl-step__panel,body.calm-motion .apl-chev,body.lite .apl-chev{transition:none;}',
-      '@media (prefers-reduced-motion:reduce){.apl-step__panel,.apl-chev,.apl-btn,.apl-seg__btn{transition-duration:0.01ms;}}'
+      '@media (prefers-reduced-motion:reduce){.apl-step__panel,.apl-chev,.apl-btn,.apl-seg__btn{transition-duration:0.01ms;}}',
+      // ===== A5 / A9 (v825, Malik's locked finals): one task, five bars, one
+      // CTA. Dark cinema in both themes (like the 7-days surface). =====
+      '.a5-screen{background:#060608;--a5-hi:rgba(255,255,255,0.96);--a5-mid:rgba(255,255,255,0.72);--a5-lo:rgba(255,255,255,0.5);}',
+      '.a5-wrap{position:relative;z-index:1;max-width:560px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;align-items:center;text-align:center;padding:calc(var(--safe-t) + 22px) 24px calc(var(--safe-b) + 26px);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;box-sizing:border-box;}',
+      '.a5-top{width:100%;display:flex;justify-content:center;min-height:28px;align-items:center;}',
+      '@media (max-width:859.98px){.a5-top{padding-right:44px;justify-content:flex-start;}}',
+      '.a5-date{font-size:0.75rem;color:var(--a5-lo);}',
+      '.a5-mid{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;}',
+      '.a5-mid .a5-task{margin-bottom:24px;}',
+      '.a5-mid .a5-bars{margin-bottom:36px;}',
+      '.a5-mid .a5-cta{margin-bottom:6px;}',
+      '.a5-task{font-size:clamp(1.5rem,5.8vw,1.75rem);font-weight:700;letter-spacing:-0.025em;line-height:1.2;color:var(--a5-hi);margin:0;text-wrap:balance;max-width:22ch;}',
+      '.a5-bars{display:flex;align-items:flex-end;gap:5px;height:22px;}',
+      '.a5-bar{position:relative;display:flex;align-items:flex-end;border:none;background:transparent;padding:0 2px;cursor:pointer;height:22px;}',
+      '.a5-bar::after{content:"";position:absolute;inset:-12px -4px;}',
+      '.a5-bar i{display:block;width:6px;border-radius:2px;background:rgba(255,255,255,0.14);transition:background 0.15s ease;}',
+      '.a5-bar i.on{background:var(--success);}',
+      '.a5-foot{width:100%;display:flex;flex-direction:column;gap:14px;align-items:center;}',
+      '.a5-cta{width:100%;height:48px;border:none;border-radius:calc(10px * var(--rx,1));background:#fff;color:#0a0c0e;font-family:inherit;font-size:0.90625rem;font-weight:700;cursor:pointer;box-shadow:0 6px 22px rgba(0,0,0,0.4);transition:transform 0.15s ease;}',
+      '.a5-cta:active{transform:scale(0.985);}',
+      '.a5-focus{border:none;background:transparent;padding:6px 12px;font-family:inherit;font-size:0.8125rem;color:var(--a5-mid);cursor:pointer;}',
+      '.a5-focus:active,.a5-focus:hover{color:var(--a5-hi);}',
+      '.a5-stats{font-size:0.71875rem;color:var(--a5-lo);}',
+      // ----- A9 done receipt (left-aligned, per the mock) -----
+      '.a5-mid--left{align-items:flex-start;text-align:left;justify-content:center;}',
+      '.a5-done-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;}',
+      '.a5-done-dot{width:8px;height:8px;border-radius:50%;background:var(--success);}',
+      '.a5-done-label{font-size:0.84375rem;font-weight:700;color:var(--success);}',
+      '.a5-task--left{max-width:none;text-wrap:balance;font-size:clamp(1.4rem,5.4vw,1.5625rem);margin-bottom:26px;}',
+      '.a5-bars-row{display:flex;align-items:center;gap:12px;margin-bottom:30px;}',
+      '.a5-banked{font-size:0.71875rem;color:var(--success);}',
+      '.a5-receipt{width:100%;display:flex;flex-direction:column;gap:10px;}',
+      '.a5-rrow{display:flex;justify-content:space-between;align-items:baseline;gap:16px;font-size:0.8125rem;}',
+      '.a5-rlabel{color:var(--a5-lo);}',
+      '.a5-rval{font-weight:700;color:var(--a5-hi);text-align:right;}',
+      '.a5-ghost{width:100%;height:44px;border:none;border-radius:calc(10px * var(--rx,1));background:rgba(255,255,255,0.07);color:var(--a5-hi);font-family:inherit;font-size:0.84375rem;font-weight:600;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,0.07);}',
+      '@media (prefers-reduced-motion:reduce){.a5-cta,.a5-bar i{transition-duration:0.01ms;}}',
+      // Dark cinema in BOTH themes (locked spec, like the 7-days surface):
+      // opt out of the base.css light-ify that re-points .apl-screen to white.
+      'html.theme-light .apl-screen.a5-screen{background:#060608;}'
     ].join('');
     document.head.appendChild(s);
   },
@@ -4872,142 +4912,69 @@ Return ONLY the sentence text. No quotes, no labels.`;
 
     const dateStr = new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' });
 
-    // ----- build markup -----
+    // ----- build markup: A5 centered landing / A9 done receipt (v825) -----
+    // Malik's locked finals (artifact 4b250d1e): one task, five difficulty
+    // bars, one CTA, focus optional. No eyebrows, no why/path/notes cards.
     const esc2 = esc;
-    const CHEV = '<svg class="apl-chev" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-
-    // ===== 1. TODAY'S ACTION split card =====
-    // Intensity selector: small segmented control. Selecting calls the existing
-    // tier-set logic (recommendedTier + persistNow + re-render) wired below.
-    const segHtml =
-      '<div class="apl-seg" id="aplSeg" role="radiogroup" aria-label="Intensity">' +
-        TIER_KEYS.map(k => {
-          const m = TIER_META[k];
-          const on = (k === selectedTier);
-          return '<button class="apl-seg__btn' + (on ? ' is-on' : '') + '" type="button" role="radio" aria-checked="' + (on ? 'true' : 'false') + '" data-tier="' + k + '">' + esc2(m.name) + '</button>';
-        }).join('') +
+    const BAR_HEIGHTS = [8, 11, 14, 17, 20];
+    const tierIdx = Math.max(0, TIER_KEYS.indexOf(selectedTier));
+    const barsHtml = (fillAll) =>
+      '<div class="a5-bars' + (fillAll ? ' a5-bars--banked' : '') + '" id="a5Bars" role="radiogroup" aria-label="Difficulty">' +
+        TIER_KEYS.map((k, i) =>
+          '<button type="button" class="a5-bar" role="radio" aria-checked="' + ((fillAll ? true : i <= tierIdx) ? 'true' : 'false') + '" aria-label="' + esc2(TIER_META[k].name) + '" data-tier="' + k + '">' +
+            '<i style="height:' + BAR_HEIGHTS[i] + 'px"' + ((fillAll || i <= tierIdx) ? ' class="on"' : '') + '></i>' +
+          '</button>'
+        ).join('') +
       '</div>';
 
-    const todayHtml =
-      '<section class="apl-today apl-card" aria-labelledby="aplTodayTitle">' +
-        '<div class="apl-today__main">' +
-          '<div class="apl-label">Today\'s action</div>' +
-          '<h1 class="apl-today__title" id="aplTodayTitle">' + esc2(moveText || title) + '</h1>' +
-          segHtml +
-          '<div class="apl-seg-hint" id="aplSegHint">' + (function () { var tm = TIER_META[selectedTier] || {}; var isRec = selectedTier === pa.recommendedTier; var eff = tm.effort ? ' (' + esc2(tm.effort) + ')' : ''; return '<b>' + esc2(tm.name || '') + '</b>' + eff + (isRec ? (pa.recommendedWhy ? '. ' + esc2(pa.recommendedWhy) : ', your recommended dose today.') : ' dose selected.'); })() + '</div>' +
-          '<div class="apl-today__actions">' +
-            '<button class="apl-btn apl-btn--done' + (completedToday ? ' is-done' : '') + '" type="button" id="aplMarkDone"' + (completedToday ? ' aria-pressed="true"' : '') + '><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5"/></svg>' + (completedToday ? 'Done today' : 'Mark it done') + '</button>' +
-            '<button class="apl-btn apl-btn--ghost" type="button" id="aplFocus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>Focus on this</button>' +
-            '<button class="apl-btn apl-btn--ghost" type="button" id="aplRefine"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v5l3-3M12 21a7 7 0 1 0-7-7"/></svg>Refine</button>' +
+    // Next milestone = the nearest horizon on the plan path (path runs small
+    // to big; the ladder reverses it for display).
+    const nextMilestone = (rawPath.length ? (rawPath[0].milestone || '') : '') || goalText;
+
+    let screenHtml;
+    if (completedToday) {
+      // A9: the receipt. The green Done mark carries the tense; the move text
+      // stays verbatim (no fabricated past-tense rewriting of user words).
+      const lastDone = (state.action.completionHistory || [])[ (state.action.completionHistory || []).length - 1 ] || {};
+      const doneText = lastDone.actionText || moveText || title;
+      screenHtml =
+        '<div class="a5-wrap a5-wrap--done">' +
+          '<header class="a5-top"><span class="a5-date apl-num">' + esc2(dateStr) + '</span></header>' +
+          '<div class="a5-mid a5-mid--left">' +
+            '<div class="a5-done-row"><span class="a5-done-dot" aria-hidden="true"></span><span class="a5-done-label">Done</span></div>' +
+            '<h1 class="a5-task a5-task--left">' + esc2(doneText) + '</h1>' +
+            '<div class="a5-bars-row">' + barsHtml(true) + '<span class="a5-banked">banked</span></div>' +
+            '<div class="a5-receipt">' +
+              '<div class="a5-rrow"><span class="a5-rlabel">Streak</span><span class="a5-rval apl-num">' + streakCount + (streakCount === 1 ? ' day' : ' days') + '</span></div>' +
+              '<div class="a5-rrow"><span class="a5-rlabel">Proof</span><span class="a5-rval apl-num">#' + doneCount + '</span></div>' +
+              '<div class="a5-rrow"><span class="a5-rlabel">Toward</span><span class="a5-rval">' + esc2(String(nextMilestone).slice(0, 60)) + '</span></div>' +
+            '</div>' +
           '</div>' +
-        '</div>' +
-        (whyText ? '<div class="apl-today__why"><div class="apl-label">Why this matters</div><p class="apl-today__whytext">' + esc2(whyText) + '</p></div>' : '') +
-      '</section>';
-
-    // ===== 3. YOUR PATH stepper (centerpiece) =====
-    // Collapsed rows top->bottom: GOAL -> milestones (big->small) -> TODAY.
-    // Tags derived by position. Rows expand to looksLike / bridge / signal.
-    const fieldsFor = (p) => {
-      const rows = [];
-      if (p.looksLike) rows.push('<div class="apl-field"><div class="apl-field__label">Looks like</div><div class="apl-field__val">' + esc2(p.looksLike) + '</div></div>');
-      if (p.bridge) rows.push('<div class="apl-field"><div class="apl-field__label">Bridge</div><div class="apl-field__val">' + esc2(p.bridge) + '</div></div>');
-      if (p.signal) rows.push('<div class="apl-field"><div class="apl-field__label">Signal</div><div class="apl-field__val">' + esc2(p.signal) + '</div></div>');
-      return rows.length ? '<div class="apl-fields">' + rows.join('') + '</div>' : '';
-    };
-
-    const goalStep =
-      '<div class="apl-step apl-step--goal" data-step>' +
-        '<button class="apl-step__head" type="button" aria-expanded="false" aria-controls="aplS0">' +
-          '<span class="apl-step__node" aria-hidden="true"><span class="apl-step__dot"></span></span>' +
-          '<span class="apl-step__body"><span class="apl-step__eyebrow">Goal</span><span class="apl-step__text">' + esc2(goalText) + '</span></span>' +
-          '<span class="apl-step__aside">' + CHEV + '</span>' +
-        '</button>' +
-        '<div class="apl-step__panel" id="aplS0" role="region"><div class="apl-step__panel-inner"></div></div>' +
-      '</div>';
-
-    const milestoneSteps = ladderPath.map((p, idx) => {
-      const sid = 'aplS' + (idx + 1);
-      const fields = fieldsFor(p);
-      return '<div class="apl-step" data-step>' +
-        '<button class="apl-step__head" type="button" aria-expanded="false" aria-controls="' + sid + '">' +
-          '<span class="apl-step__node" aria-hidden="true"><span class="apl-step__dot"></span></span>' +
-          '<span class="apl-step__body"><span class="apl-step__eyebrow">Milestone &middot; ' + esc2(p.horizon || 'Milestone') + '</span><span class="apl-step__text">' + esc2(p.milestone) + '</span></span>' +
-          '<span class="apl-step__aside">' + CHEV + '</span>' +
-        '</button>' +
-        '<div class="apl-step__panel" id="' + sid + '" role="region"><div class="apl-step__panel-inner">' + fields + '</div></div>' +
-      '</div>';
-    }).join('');
-
-    const todayFields = (function () {
-      const rows = [];
-      if (howToStart) rows.push('<div class="apl-field"><div class="apl-field__label">How to start</div><div class="apl-field__val">' + esc2(howToStart) + '</div></div>');
-      return rows.length ? '<div class="apl-fields">' + rows.join('') + '</div>' : '';
-    })();
-    const todayStep =
-      '<div class="apl-step apl-step--today is-open" data-step>' +
-        '<button class="apl-step__head" type="button" aria-expanded="true" aria-controls="aplStoday">' +
-          '<span class="apl-step__node" aria-hidden="true"><span class="apl-step__dot"></span></span>' +
-          '<span class="apl-step__body"><span class="apl-step__eyebrow">Today</span><span class="apl-step__text">' + esc2(moveText) + '</span></span>' +
-          '<span class="apl-step__aside">' + CHEV + '</span>' +
-        '</button>' +
-        '<div class="apl-step__panel" id="aplStoday" role="region"><div class="apl-step__panel-inner">' + todayFields + '</div></div>' +
-      '</div>';
-
-    const pathHtml =
-      '<section class="apl-card apl-path-wrap" aria-labelledby="aplPathLabel"><div class="apl-path">' +
-        '<div class="apl-path__head"><span class="apl-label" id="aplPathLabel">Your path</span><span class="apl-path__sub">From today to your goal</span></div>' +
-        '<div class="apl-stepper" id="aplStepper">' + goalStep + milestoneSteps + todayStep + '</div>' +
-      '</div></section>';
-
-    // ===== 4. footer links =====
-    const footHtml =
-      '<div class="apl-foot">' +
-        '<button class="apl-foot__link" type="button" id="aplProof">Proof trail <b>' + doneCount + ' done</b></button>' +
-      '</div>';
-
-    // ===== 5. RIGHT RAIL (real data only) =====
-    const FOCUS_DOTS = 6;
-    const focusDots = Array.from({ length: FOCUS_DOTS }, (_, i) => '<span class="apl-dot' + (i < focusToday ? ' is-on' : '') + '"></span>').join('');
-    const focusCard =
-      '<section class="apl-rcard apl-card" aria-label="Focus today">' +
-        '<div class="apl-rcard__head"><span class="apl-label">Focus today</span></div>' +
-        (sessions.length
-          ? ('<div class="apl-rcard__big apl-num">' + focusToday + '<small>' + (focusToday === 1 ? 'session' : 'sessions') + '</small></div>' +
-             '<div class="apl-dots" aria-hidden="true">' + focusDots + '</div>' +
-             '<div class="apl-rcard__sub">All time <b>' + esc2(focusTotalLabel) + '</b> of deep work</div>')
-          : '<div class="apl-rempty">No focus sessions yet. Start one and it shows up here.</div>') +
-      '</section>';
-
-    const progressCard =
-      '<section class="apl-rcard apl-card" aria-label="Progress">' +
-        '<div class="apl-rcard__head"><span class="apl-label">' + (daysLeft != null ? 'Time left' : 'Consistency') + '</span></div>' +
-        (daysLeft != null
-          ? ('<div class="apl-rcard__big apl-num">' + daysLeft + '<small>' + (daysLeft === 1 ? 'day to your goal' : 'days to your goal') + '</small></div>' +
-             '<div class="apl-rcard__sub">Streak <b>' + streakCount + (streakCount === 1 ? ' day' : ' days') + '</b></div>')
-          : (streakCount > 0
-              ? ('<div class="apl-rcard__big apl-num">' + streakCount + '<small>' + (streakCount === 1 ? 'day streak' : 'day streak') + '</small></div>' +
-                 '<div class="apl-rcard__sub">Days you have shown up in a row.</div>')
-              : '<div class="apl-rempty">Show up today and your streak starts here.</div>')) +
-      '</section>';
-
-    const reflCard =
-      '<section class="apl-rcard apl-card" aria-label="Notes">' +
-        '<div class="apl-rcard__head"><span class="apl-label">Notes</span></div>' +
-        (lastRefl && lastRefl.text
-          ? ('<div class="apl-refl__date">' + esc2(lastRefl.date || '') + '</div><p class="apl-refl__text">' + esc2(lastRefl.text) + '</p>')
-          : '<div class="apl-rempty">No reflections yet. A line a day adds up.</div>') +
-        '<button class="apl-rlink" type="button" id="aplNewRefl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>New entry</button>' +
-      '</section>';
+          '<div class="a5-foot">' +
+            '<button type="button" class="a5-ghost" id="a5CloseDay">Close the day &rarr;</button>' +
+          '</div>' +
+        '</div>';
+    } else {
+      screenHtml =
+        '<div class="a5-wrap">' +
+          '<header class="a5-top"><span class="a5-date apl-num">' + esc2(dateStr) + '</span></header>' +
+          '<div class="a5-mid">' +
+            '<h1 class="a5-task">' + esc2(moveText || title) + '</h1>' +
+            barsHtml(false) +
+            '<button type="button" class="a5-cta" id="aplMarkDone">I did it</button>' +
+            '<button type="button" class="a5-focus" id="aplFocus">Focus for 25 min</button>' +
+          '</div>' +
+          '<div class="a5-foot">' +
+            '<div class="a5-stats apl-num">day ' + streakCount + ' &middot; ' + doneCount + ' proofs</div>' +
+          '</div>' +
+        '</div>';
+    }
 
     inst.pageWrap.innerHTML =
-      '<div class="action-plan-page apl-screen">' + ACTION_WHITE_RAYS + '<div class="apl-wrap">' +
-        '<header class="apl-head"><div class="apl-head__title"><span class="apl-head__dot"></span>Action</div><div class="apl-head__date apl-num">' + esc2(dateStr) + '</div></header>' +
-        '<div class="apl-main">' + todayHtml + pathHtml + footHtml + '</div>' +
-        '<div class="apl-rail">' + focusCard + progressCard + reflCard + '</div>' +
-      '</div></div>';
+      '<div class="action-plan-page apl-screen a5-screen">' + screenHtml + '</div>';
 
     // ===== wiring =====
-    // Intensity selector: set recommendedTier + persist, then re-render.
+    // Difficulty bars: tap sets the tier (existing tier-set logic + persist).
     const selectTier = (k) => {
       if (TIER_KEYS.indexOf(k) < 0) return;
       if (!state.action.primaryAction) state.action.primaryAction = {};
@@ -5019,22 +4986,9 @@ Return ONLY the sentence text. No quotes, no labels.`;
       }
       inst.renderActionPlan();
     };
-    inst.pageWrap.querySelectorAll('#aplSeg .apl-seg__btn').forEach(b => {
-      b.addEventListener('click', (e) => { e.stopPropagation(); selectTier(b.getAttribute('data-tier')); });
+    inst.pageWrap.querySelectorAll('#a5Bars .a5-bar').forEach(b => {
+      b.addEventListener('click', (e) => { e.stopPropagation(); if (!completedToday) selectTier(b.getAttribute('data-tier')); });
     });
-
-    // Path stepper accordion (independent toggles).
-    const stepper = inst.pageWrap.querySelector('#aplStepper');
-    if (stepper) {
-      stepper.addEventListener('click', (e) => {
-        const head = e.target.closest('.apl-step__head');
-        if (!head) return;
-        const step = head.closest('[data-step]');
-        if (!step) return;
-        const open = step.classList.toggle('is-open');
-        head.setAttribute('aria-expanded', open ? 'true' : 'false');
-      });
-    }
 
     // Done today: record completion + proof event, credit streak, refresh.
     const creditToday = () => {
@@ -5070,17 +5024,16 @@ Return ONLY the sentence text. No quotes, no labels.`;
     const doneBtn = inst.pageWrap.querySelector('#aplMarkDone');
     if (doneBtn) doneBtn.addEventListener('click', onMarkDone);
 
-    // Refine / evening check-in: open the existing refine flow.
-    const refineBtn = inst.pageWrap.querySelector('#aplRefine');
-    if (refineBtn) refineBtn.addEventListener('click', (e) => {
+    // A9 "Close the day": leave the module, land on Reflect.
+    const closeDay = inst.pageWrap.querySelector('#a5CloseDay');
+    if (closeDay) closeDay.addEventListener('click', (e) => {
       e.stopPropagation();
-      inst._openRefineFromLadder();
+      try { exitToModules('action'); } catch (_) {}
+      setTimeout(() => { try { if (typeof TabBar !== 'undefined' && TabBar.switchTo) TabBar.switchTo('reflect'); } catch (_) {} }, 80);
     });
 
-    // v23 "Focus on this": Deep Work folded into Action. Opens the existing
-    // deep-work sheet (z-index above this experience), prefills the intention
-    // with today's move, and enters the full-screen focus overlay. Sessions
-    // log to state.deepwork.sessions exactly as before.
+    // Focus (optional, never the centerpiece): the existing Deep Work flow.
+    // Prefills the intention with today's move and enters the focus overlay.
     const focusBtn = inst.pageWrap.querySelector('#aplFocus');
     if (focusBtn) focusBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -5095,17 +5048,16 @@ Return ONLY the sentence text. No quotes, no labels.`;
             if (!body) return;
             const inp = body.querySelector('#dwIntention');
             if (inp && (moveText || title)) inp.value = moveText || title;
+            // "Focus for 25 min" means 25: pick the preset so the overlay
+            // counts DOWN with the progress line instead of running open-ended.
+            const preset = body.querySelector('.dw-preset[data-min="25"]');
+            if (preset) preset.click();
             const fb = body.querySelector('#dwFocus');
             if (fb) fb.click();
           } catch (_) {}
         }, 60);
       } catch (_) {}
     });
-
-    // Footer + rail links -> existing sheets (real, no fabrication).
-    const onTap = (sel, fn) => { const el = inst.pageWrap.querySelector(sel); if (el) el.addEventListener('click', (e) => { e.stopPropagation(); try { fn(); } catch (_) {} }); };
-    onTap('#aplProof', () => { if (typeof ProofTrail !== 'undefined' && ProofTrail.open) ProofTrail.open(); });
-    onTap('#aplNewRefl', () => { if (typeof Sheet !== 'undefined' && Sheet.open) Sheet.open('reflection'); });
   },
 
   // Open the legacy refine sheet without leaving the ladder screen. We build a
