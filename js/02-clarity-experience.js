@@ -2747,35 +2747,118 @@ const ActionExperience = {
   _showActionIntro() {
     this.progressEl.innerHTML = '';
     this.navEl.innerHTML = '';
+    // v842 (Malik): the Action intro speaks Clarity's exact language: same
+    // classes (same stylesheet), the title pops in centered + blurry, focuses,
+    // flies to its top-left spot, THEN the lines typewrite in char-by-char and
+    // the Begin button reveals PINNED at the bottom. Tap anywhere skips.
     this.pageWrap.innerHTML = `
       <div class="action-exp__page-inner">
-        <div class="action-intro" id="actionIntro">
-          <div class="action-intro__title">Action</div>
-          <div class="action-intro__lines">
-            <div class="action-intro__line action-intro__line--1">Without focused action, literally nothing else matters.</div>
-            <div class="action-intro__line action-intro__line--2">You can have the best plan in the world. You can think, wish, and manifest for years. But if you never turn it into actual action, you will go nowhere.</div>
-            <div class="action-intro__line action-intro__line--3">This module exists to change that.</div>
-            <div class="action-intro__line action-intro__line--4">The goal is to find the highest leverage actions for your goal. The ones that, if done, make it unreasonable for you not to achieve it. Then a focused plan you can actually act on today.</div>
+        <div class="clarity-intro" id="actionIntro">
+          <div class="clarity-intro__body">
+            <div class="clarity-intro__title"><span class="clarity-intro__title-in" id="actionIntroTitle">Action</span></div>
+            <div class="clarity-intro__lines">
+              <div class="clarity-intro__line">Without focused action, literally nothing else matters.</div>
+              <div class="clarity-intro__line">You can have the best plan in the world. You can think, wish, and manifest for years. But if you never turn it into actual action, you will go nowhere.</div>
+              <div class="clarity-intro__line">This module exists to change that.</div>
+              <div class="clarity-intro__line">The goal is to find the highest leverage actions for your goal. The ones that, if done, make it unreasonable for you not to achieve it. Then a focused plan you can actually act on today.</div>
+            </div>
           </div>
-          <div class="action-intro__btn-pill" id="actionIntroPill">
-            <button class="action-intro__btn" id="actionIntroBtn">Begin</button>
+          <div class="clarity-intro__foot" id="actionIntroFoot">
+            <button class="clarity-intro__btn" id="actionIntroBtn">Begin</button>
           </div>
         </div>
       </div>`;
-    // Tap-to-skip on the intro: clicking anywhere except the Begin button
-    // before animations finish snaps all lines + Begin to fully visible so
-    // the user can proceed without waiting through the staggered fades.
-    const introEl = document.getElementById('actionIntro');
-    introEl.addEventListener('click', (e) => {
-      if (introEl.classList.contains('action-intro--skipped')) return;
-      // If user actually clicked the Begin button, let its own handler run.
-      if (e.target.closest('#actionIntroBtn')) return;
-      introEl.classList.add('action-intro--skipped');
-    });
+
+    const intro = document.getElementById('actionIntro');
+    const lines = [...intro.querySelectorAll('.clarity-intro__line')];
+    const foot = document.getElementById('actionIntroFoot');
+    const title = document.getElementById('actionIntroTitle');
+    const reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    const timers = [];
+    const later = (fn, ms) => { const t = setTimeout(fn, ms); timers.push(t); return t; };
+
+    // Reserve each line's wrapped height so the stack never jumps, then empty them.
+    lines.forEach((l) => { l.dataset.full = l.textContent; l.style.minHeight = l.offsetHeight + 'px'; l.textContent = ''; });
+
+    let done = false;
+    const skipAll = () => {
+      if (done) return; done = true;
+      timers.forEach(clearTimeout);
+      if (title) { title.style.transition = 'none'; title.style.transform = ''; title.style.filter = ''; title.style.opacity = '1'; }
+      lines.forEach((l) => { l.textContent = l.dataset.full || ''; });
+      if (foot) foot.classList.add('show');
+    };
+
+    const typeAll = () => {
+      if (done) return;
+      const typeLine = (idx) => {
+        if (done) return;
+        if (idx >= lines.length) { done = true; if (foot) foot.classList.add('show'); return; }
+        const el = lines[idx]; const full = el.dataset.full || ''; let i = 0;
+        const tick = () => {
+          if (done) return;
+          el.textContent = full.slice(0, i); i++;
+          try { if (typeof MementoSound !== 'undefined') MementoSound.tick(); } catch (e) {}
+          if (i <= full.length) later(tick, 11 + Math.random() * 9);
+          else later(() => typeLine(idx + 1), 900);
+        };
+        tick();
+      };
+      typeLine(0);
+    };
+
+    // Tap anywhere (except Begin) skips to the finished state, both events so
+    // mobile Safari fires immediately on touch.
+    const skipTap = (e) => {
+      if (e.target.closest && e.target.closest('#actionIntroBtn')) return;
+      skipAll();
+    };
+    intro.addEventListener('pointerdown', skipTap);
+    intro.addEventListener('click', skipTap);
+
+    if (reduced || !title) {
+      if (title) title.style.opacity = '1';
+      if (reduced) skipAll(); else typeAll();
+    } else {
+      // The Clarity title choreography, verbatim timings: centered + blurred,
+      // fade in holding the blur, focus while growing, hold, fly to the spot.
+      const r = title.getBoundingClientRect();
+      const dx = (window.innerWidth / 2) - (r.left + r.width / 2);
+      const dy = (window.innerHeight / 2) - (r.top + r.height / 2);
+      title.style.willChange = 'transform, filter, opacity';
+      title.style.transformOrigin = 'center center';
+      title.style.transition = 'none';
+      title.style.opacity = '0';
+      title.style.filter = 'blur(16px)';
+      title.style.transform = `translate(${dx}px, ${dy}px) scale(1.16)`;
+      void title.offsetWidth;
+      later(() => {
+        if (done) return;
+        title.style.transition = 'opacity 0.7s ease, transform 1.6s cubic-bezier(0.16,1,0.3,1)';
+        title.style.opacity = '1';
+        title.style.transform = `translate(${dx}px, ${dy}px) scale(1.28)`;
+      }, 60);
+      later(() => {
+        if (done) return;
+        title.style.transition = 'filter 1s ease, transform 1s cubic-bezier(0.16,1,0.3,1)';
+        title.style.filter = 'blur(0px)';
+        title.style.transform = `translate(${dx}px, ${dy}px) scale(1.5)`;
+      }, 1150);
+      later(() => {
+        if (done) return;
+        title.style.transition = 'transform 0.85s cubic-bezier(0.16,1,0.3,1)';
+        title.style.transform = 'translate(0px, 0px) scale(1)';
+      }, 4150);
+      later(() => {
+        if (done) return;
+        title.style.transition = ''; title.style.transform = ''; title.style.filter = ''; title.style.transformOrigin = ''; title.style.willChange = '';
+        typeAll();
+      }, 5100);
+    }
 
     document.getElementById('actionIntroBtn').addEventListener('click', () => {
-      const intro = document.getElementById('actionIntro');
-      intro.classList.add('action-intro--exit');
+      skipAll();
+      intro.classList.add('clarity-intro--exit');
       setTimeout(() => {
         if (!this.isOpen) return;
         state.action.introSeen = true;
