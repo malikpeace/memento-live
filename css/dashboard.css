@@ -3931,11 +3931,17 @@ body.card-square { --card-w: 360px; --card-h: 360px; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 {
     display: grid !important;
     grid-template-columns: 1fr 1.25fr;
-    grid-template-rows: auto 1fr auto;
+    /* v813b (Malik's screenshot): hero + heatmap center TOGETHER as one
+       composed block (like the mock), instead of the hero floating mid-void
+       with the heatmap pinned to the window floor. Flexible spacer rows above
+       and below the cluster (bottom slightly larger, optical center). */
+    grid-template-rows: auto minmax(24px, 1fr) auto auto minmax(40px, 1.25fr);
     grid-template-areas:
       "dhead dhead"
+      ". ."
       "dcard dmission"
-      "dheat dheat";
+      "dheat dheat"
+      ". .";
     column-gap: 60px;
     align-items: center;
     width: 100%;
@@ -3945,6 +3951,19 @@ body.card-square { --card-w: 360px; --card-h: 360px; }
     box-sizing: border-box;
     min-height: 100vh;
   }
+  /* the mock's topbar: greeting hard-LEFT, clock hard-right (the header was
+     centering the greeting inside the new grid, Malik's screenshot) */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .dash-header {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+    padding: 26px 0 0;
+    margin: 0;
+  }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .dash-header__brand { display: none !important; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .dash-header__greeting { margin: 0; text-align: left; flex: 1 1 auto; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .dash-header__right { flex: 0 0 auto; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashBelow { display: contents; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .dash-header { grid-area: dhead; align-self: start; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard {
@@ -3954,7 +3973,7 @@ body.card-square { --card-w: 360px; --card-h: 360px; }
   body.card-square.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard { --card-w: 240px; --card-h: 240px; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #deskMission { display: block; grid-area: dmission; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashConsistency {
-    grid-area: dheat; display: block; align-self: end; margin: 48px 0 0; padding: 0;
+    grid-area: dheat; display: block; align-self: start; margin: 48px 0 0; padding: 0;
     background: none; box-shadow: none; border: none;
   }
   /* everything else leaves the desktop home (info law + sidebar duplicates) */
@@ -4008,6 +4027,14 @@ body.card-square { --card-w: 360px; --card-h: 360px; }
 .dkm__stats { display: flex; gap: 26px; }
 .dkm__stat-n { font-size: 19px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text-hi); }
 .dkm__stat-l { font-size: 11.5px; color: var(--text-mid, var(--text-2)); }
+/* very wide screens: the composition scales up a touch so it never reads
+   lost on a big monitor (still capped, still the same proportions) */
+@media (min-width: 1760px) {
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 { max-width: 1400px; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard { --card-w: 232px; --card-h: 312px; }
+  body.card-square.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard { --card-w: 268px; --card-h: 268px; }
+  .dkm__headline { font-size: 47px; }
+}
 /* editorial breathes, never stretches silly: below 1150 the gap tightens */
 @media (min-width: 1024px) and (max-width: 1149.98px) {
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 { column-gap: 40px; padding: 0 40px 24px; }
