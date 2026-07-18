@@ -1812,6 +1812,7 @@ const CreatorTools = {
     bind('creatorJumpAction', () => this.jumpAction());
     bind('creatorJumpMori', () => this.jumpMori());
     bind('creatorJumpVivere', () => this.jumpVivere());
+    bind('creatorJumpWoven', () => this.jumpWoven());
 
     // Every cheat button press toasts its own label (v735): universal
     // feedback, delegated so future buttons get it for free.
@@ -2283,6 +2284,20 @@ const CreatorTools = {
   // The Deeper Room moments, straight in (gates bypassed for preview).
   jumpMori() { this._closeAll(); try { DeeperRoom.openMori({ force: true }); } catch (e) {} },
   jumpVivere() { this._closeAll(); try { DeeperRoom.openVivere({ force: true }); } catch (e) {} },
+  // The end-state card with BOTH weaves already in it, no cinema: stamps the
+  // flags, rebuilds the card, lands on home. Toggles OFF on second press.
+  jumpWoven() {
+    this._closeAll();
+    try {
+      state.meta = state.meta || {};
+      const on = !(state.meta.moriMomentAt && state.meta.vivereMomentAt);
+      state.meta.moriMomentAt = on ? Date.now() : null;
+      state.meta.vivereMomentAt = on ? Date.now() : null;
+      persistNow();
+      if (typeof renderDayCard === 'function') renderDayCard();
+      if (typeof TabBar !== 'undefined' && TabBar.switchTo) TabBar.switchTo('home');
+    } catch (e) {}
+  },
   // Straight to the Action module screen (A5/A9): clears the gates so the
   // intro/tutorial/intake never intercept, then opens the experience.
   jumpAction() {
