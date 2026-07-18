@@ -6570,3 +6570,96 @@ void main(){
   float alpha = mask;
   gl_FragColor = vec4(final, alpha);
 }`;
+
+// ============================================================================
+// GRABBER TRIAL (v839): native sheet dismissal on the Action surface, opt-in.
+// prefs.exitStyle === 'grabber' -> body.exit-grabber (grabber shows, ✕ hides)
+// + real pull-down physics: the surface tracks the finger 1:1, corners round
+// off with progress, release past 28% of the screen (or a fast flick)
+// dismisses, anything less springs back. Cheat-bar "Exit" button toggles it
+// live. Reversible by design: toggle off and none of this runs.
+// ============================================================================
+const GrabberTrial = {
+  init() {
+    this._applyBodyClass();
+    const btn = document.getElementById('creatorExitStyle');
+    if (btn) {
+      const label = () => { btn.textContent = 'Exit: ' + (this._on() ? 'grabber' : '✕'); };
+      label();
+      btn.addEventListener('click', () => {
+        state.prefs.exitStyle = this._on() ? 'x' : 'grabber';
+        try { persistNow(); } catch (e) {}
+        this._applyBodyClass();
+        label();
+      });
+    }
+    this._wireDrag();
+  },
+
+  _on() { return !!(state.prefs && state.prefs.exitStyle === 'grabber'); },
+  _applyBodyClass() { document.body.classList.toggle('exit-grabber', this._on()); },
+
+  _wireDrag() {
+    const grab = document.getElementById('actionExpGrabber');
+    const exp = document.getElementById('actionExp');
+    if (!grab || !exp) return;
+    let startY = 0, dy = 0, lastY = 0, lastT = 0, vel = 0, dragging = false;
+
+    const setDrag = (y) => {
+      dy = Math.max(0, y - startY);
+      const p = Math.min(1, dy / (window.innerHeight || 800));
+      exp.style.transform = 'translateY(' + dy + 'px)';
+      exp.style.borderRadius = Math.round(26 * Math.min(1, p * 6)) + 'px ' + Math.round(26 * Math.min(1, p * 6)) + 'px 0 0';
+      exp.style.overflow = 'hidden';
+    };
+    const clear = () => {
+      exp.classList.remove('is-dragging', 'is-dismissing', 'is-springing');
+      exp.style.transform = '';
+      exp.style.borderRadius = '';
+      exp.style.overflow = '';
+    };
+
+    grab.addEventListener('pointerdown', (e) => {
+      if (!this._on()) return;
+      dragging = true;
+      startY = lastY = e.clientY; lastT = performance.now(); vel = 0;
+      exp.classList.add('is-dragging');
+      try { grab.setPointerCapture(e.pointerId); } catch (err) {}
+      e.preventDefault();
+    });
+    grab.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      const t = performance.now();
+      if (t > lastT) vel = (e.clientY - lastY) / (t - lastT);
+      lastY = e.clientY; lastT = t;
+      setDrag(e.clientY);
+    });
+    const release = (e) => {
+      if (!dragging) return;
+      dragging = false;
+      exp.classList.remove('is-dragging');
+      const goodDistance = dy > (window.innerHeight || 800) * 0.28;
+      const goodFlick = vel > 0.7 && dy > 60;
+      if (goodDistance || goodFlick) {
+        exp.classList.add('is-dismissing');
+        exp.style.transform = 'translateY(102%)';
+        setTimeout(() => {
+          try { exitToModules('action'); } catch (err) {}
+          setTimeout(clear, 60);
+        }, 300);
+      } else if (dy > 2) {
+        exp.classList.add('is-springing');
+        exp.style.transform = 'translateY(0px)';
+        exp.style.borderRadius = '0px';
+        setTimeout(clear, 460);
+      } else {
+        // A plain tap on the grabber closes, like tapping a sheet's pill.
+        clear();
+        try { exitToModules('action'); } catch (err) {}
+      }
+      dy = 0;
+    };
+    grab.addEventListener('pointerup', release);
+    grab.addEventListener('pointercancel', () => { dragging = false; dy = 0; exp.classList.add('is-springing'); exp.style.transform = ''; setTimeout(clear, 460); });
+  }
+};

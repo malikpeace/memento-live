@@ -68,6 +68,7 @@ CreatorTools.init();
 WelcomeIntro.init();
 TabBar.init();
 try { if (typeof DeeperRoom !== 'undefined') DeeperRoom.init(); } catch (e) {}
+try { if (typeof GrabberTrial !== 'undefined') GrabberTrial.init(); } catch (e) {}
 Sidebar.init();
 DragDrop.init();
 Splash.init();
