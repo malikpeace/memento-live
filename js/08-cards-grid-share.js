@@ -1809,6 +1809,7 @@ const CreatorTools = {
     bind('creatorTogglePaid', () => this.togglePaid());
     try { this._paidLabel(); } catch (e) {}
     bind('creatorJumpDay1', () => this.jumpDay1());
+    bind('creatorJumpAction', () => this.jumpAction());
 
     // Every cheat button press toasts its own label (v735): universal
     // feedback, delegated so future buttons get it for free.
@@ -2277,6 +2278,20 @@ const CreatorTools = {
 
   // Straight to the paywall itself (force so it opens even on a paid dev state).
   jumpPaywall() { this._closeAll(); try { if (typeof ClarityPaywall !== 'undefined' && ClarityPaywall.show) ClarityPaywall.show({ force: true }); } catch (e) {} },
+  // Straight to the Action module screen (A5/A9): clears the gates so the
+  // intro/tutorial/intake never intercept, then opens the experience.
+  jumpAction() {
+    this._closeAll();
+    try {
+      state.meta.next7DaysSeen = true;
+      state.action.introSeen = true;
+      state.action.tutorialSeen = true;
+      if (!state.action.intake) state.action.intake = { answers: {}, completed: true };
+      else state.action.intake.completed = true;
+      persistNow();
+    } catch (e) {}
+    try { ActionExperience.open(); } catch (e) {}
+  },
 
   // Paid/Free switch (Malik v801): flips entitlements app-wide so both sides
   // of the paywall can be walked without buying. The label states the CURRENT

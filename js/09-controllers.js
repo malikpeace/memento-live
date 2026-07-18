@@ -4347,6 +4347,30 @@ const TabBar = {
     requestAnimationFrame(() => this.movePill(false));
     setTimeout(() => this.movePill(false), 60);
     this.updateHomeDot();
+
+    // v834 (Malik): reopening the app must land on the HOME, never settings.
+    // iOS resumes the PWA exactly where it was left, so a session parked on
+    // the You tab greeted him with settings. On resume after a real gap
+    // (>5 min away), if the surface is the You tab and nothing deeper is
+    // open (no sheet, no module experience), snap back to home. Modules and
+    // mid-flows are left exactly where they were (the resume law).
+    this._hiddenAt = 0;
+    document.addEventListener('visibilitychange', () => {
+      try {
+        if (document.visibilityState === 'hidden') { this._hiddenAt = Date.now(); return; }
+        const away = this._hiddenAt ? (Date.now() - this._hiddenAt) : 0;
+        if (away < 5 * 60 * 1000) return;
+        if (this.activeTab !== 'profile') return;
+        const deeper =
+          (typeof Sheet !== 'undefined' && Sheet.isOpen) ||
+          (typeof ActionExperience !== 'undefined' && ActionExperience.isOpen) ||
+          (typeof ClarityExperience !== 'undefined' && ClarityExperience.isOpen) ||
+          document.getElementById('n7dRoot') ||
+          document.getElementById('clarityPaywall');
+        if (deeper) return;
+        this.switchTo('home');
+      } catch (e) {}
+    });
   },
 
   // iOS-style drag select: grab the glass capsule behind the icons, slide it
@@ -4489,6 +4513,30 @@ const TabBar = {
     requestAnimationFrame(() => this.movePill(false));
     setTimeout(() => this.movePill(false), 60);
     this.updateHomeDot();
+
+    // v834 (Malik): reopening the app must land on the HOME, never settings.
+    // iOS resumes the PWA exactly where it was left, so a session parked on
+    // the You tab greeted him with settings. On resume after a real gap
+    // (>5 min away), if the surface is the You tab and nothing deeper is
+    // open (no sheet, no module experience), snap back to home. Modules and
+    // mid-flows are left exactly where they were (the resume law).
+    this._hiddenAt = 0;
+    document.addEventListener('visibilitychange', () => {
+      try {
+        if (document.visibilityState === 'hidden') { this._hiddenAt = Date.now(); return; }
+        const away = this._hiddenAt ? (Date.now() - this._hiddenAt) : 0;
+        if (away < 5 * 60 * 1000) return;
+        if (this.activeTab !== 'profile') return;
+        const deeper =
+          (typeof Sheet !== 'undefined' && Sheet.isOpen) ||
+          (typeof ActionExperience !== 'undefined' && ActionExperience.isOpen) ||
+          (typeof ClarityExperience !== 'undefined' && ClarityExperience.isOpen) ||
+          document.getElementById('n7dRoot') ||
+          document.getElementById('clarityPaywall');
+        if (deeper) return;
+        this.switchTo('home');
+      } catch (e) {}
+    });
   },
 
   hide() {
