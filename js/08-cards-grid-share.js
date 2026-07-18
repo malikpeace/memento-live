@@ -1810,6 +1810,7 @@ const CreatorTools = {
     try { this._paidLabel(); } catch (e) {}
     bind('creatorJumpDay1', () => this.jumpDay1());
     bind('creatorJumpAction', () => this.jumpAction());
+    bind('creatorRestartAction', () => this.restartAction());
     bind('creatorJumpMori', () => this.jumpMori());
     bind('creatorJumpVivere', () => this.jumpVivere());
     bind('creatorJumpWoven', () => this.jumpWoven());
@@ -2281,6 +2282,28 @@ const CreatorTools = {
 
   // Straight to the paywall itself (force so it opens even on a paid dev state).
   jumpPaywall() { this._closeAll(); try { if (typeof ClarityPaywall !== 'undefined' && ClarityPaywall.show) ClarityPaywall.show({ force: true }); } catch (e) {} },
+  // Fresh-buyer Action: wipes the module's flags + plan (NOT the completion
+  // history, that feeds the home's streak/proofs) so opening Do replays the
+  // exact first-open-after-paying flow: intro cinema -> the one question ->
+  // plan generation -> reveal -> A5.
+  restartAction() {
+    this._closeAll();
+    try {
+      state.meta.next7DaysSeen = false;
+      state.action.introSeen = false;
+      state.action.tutorialSeen = false;
+      state.action.intake = { answers: {}, completed: false };
+      state.action.planGenerated = false;
+      state.action.primaryAction = null;
+      state.action.supportingActions = [];
+      state.action.focusPlan = null;
+      state.action.aiConversation = [];
+      state.meta.planRevealSeen = false;
+      persistNow();
+    } catch (e) {}
+    try { ActionExperience.open(); } catch (e) {}
+  },
+
   // The Deeper Room moments, straight in (gates bypassed for preview).
   jumpMori() { this._closeAll(); try { DeeperRoom.openMori({ force: true }); } catch (e) {} },
   jumpVivere() { this._closeAll(); try { DeeperRoom.openVivere({ force: true }); } catch (e) {} },
