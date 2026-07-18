@@ -4250,7 +4250,12 @@ const Sidebar = {
           weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'
         });
         const reflectedToday = entries.some(e => e && e.date === todayLong);
-        const showReflect = !!(state.clarity && state.clarity.completed) && !reflectedToday;
+        // v816 (overnight sweep): Reflection is paid; nudging a declined free
+        // user to write one just bounces them off the paywall dressed as an
+        // invitation. The nudge earns its place only for paying users.
+        let _rfPaid = true;
+        try { _rfPaid = (typeof ClarityPaywall === 'undefined') || ClarityPaywall.isPaid() || !ClarityPaywall.isLockedByPaywall('reflection'); } catch (e) {}
+        const showReflect = !!(state.clarity && state.clarity.completed) && !reflectedToday && _rfPaid;
         reflectBtn.style.display = showReflect ? '' : 'none';
       }
 

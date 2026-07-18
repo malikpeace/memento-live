@@ -429,6 +429,13 @@ function _ladderEligible(key) {
 // unlock ladder takes over from there.
 function isBrandNewUser() {
   try {
+    // v816 (overnight flow walk): anyone who FINISHED onboarding is not brand
+    // new, full stop. The old birth-year key meant a user who skipped the
+    // birthday question landed on an empty home with NO card, seconds after
+    // "Meet Your Memento" literally introduced the card. Onboarded = the
+    // blank card + Start box, always.
+    if (state.profile && state.profile.onboarded) return false;
+    if (state.meta && state.meta.onboarded) return false;
     if ((state.prefs && state.prefs.unlockAll) || (state.dev && state.dev.previewAll)) return false;
     if (state.clarity && state.clarity.completed) return false;
     if (state.clarity && state.clarity.answers && state.clarity.answers.neutronStar) return false;
