@@ -2799,57 +2799,56 @@ const ActionExperience = {
   // before the AI builds anything. The answers get baked into the draft
   // prompt so the plan is grounded in what the user actually said, not just
   // their Clarity output.
+  // v830: the prefilled confirmations (goal + timeframe from Clarity), shown
+  // above the conversation as quiet editable facts instead of gate questions.
+  // Tapping one drops a plain request into the conversation; the AI handles
+  // the change in one turn and the snapshot mirror updates this strip.
+  _renderIntakeGiven() {
+    const host = this.pageWrap && this.pageWrap.querySelector('#intakeGiven');
+    if (!host) return;
+    const ca = (state.clarity && state.clarity.answers) || {};
+    const goal = (ca.neutronStar || '').trim();
+    const tf = (ca.timeframe || ca.timeHorizon || '').trim();
+    if (!goal) { host.innerHTML = ''; return; }
+    host.innerHTML =
+      '<button type="button" class="intake-given__row" id="intakeEditGoal" aria-label="Edit the goal">' +
+        '<span class="intake-given__val">' + esc(goal) + '</span>' +
+        '<span class="intake-given__edit">edit</span>' +
+      '</button>' +
+      (tf ? ('<button type="button" class="intake-given__row intake-given__row--tf" id="intakeEditTf" aria-label="Edit the timeframe">' +
+        '<span class="intake-given__val">' + esc(tf) + '</span>' +
+        '<span class="intake-given__edit">edit</span>' +
+      '</button>') : '');
+    const send = (msg) => {
+      try {
+        const intake = state.action.intake;
+        if (!intake || intake.completed) return;
+        intake.aiMessages.push({ role: 'user', content: msg });
+        persistNow();
+        this._aiIntakeFetchNext();
+      } catch (_) {}
+    };
+    const g = host.querySelector('#intakeEditGoal');
+    if (g) g.addEventListener('click', () => send('I want to change the wording of the goal.'));
+    const t = host.querySelector('#intakeEditTf');
+    if (t) t.addEventListener('click', () => send('I want a different timeframe.'));
+  },
+
   _intakeQuestions() {
     const ns = state.clarity.answers.neutronStar || 'your goal';
     const ans = (state.action.intake && state.action.intake.answers) || {};
     const wantsReword = /word|change/i.test(ans.goalConfirm || '');
 
+    // v830 (the intake flip): ONE question. Goal + timeframe come from
+    // Clarity and are shown as editable confirmations, never asked.
     const base = [
-      {
-        id: 'goalConfirm',
-        type: 'select',
-        prompt: `Before we build anything, let's make sure this is still right.\n\nYour Neutron Star: "${ns}"\n\nIs that still the goal we're working toward?`,
-        options: ["Yeah, that's it", "Close, but I'd word it differently", "No, I want to change it"]
-      },
-      // Conditional reword step appears only if the user picked one of the
-      // edit options on goalConfirm. Lets them actually rewrite the goal
-      // before the rest of the intake builds on it.
-      ...(wantsReword ? [{
-        id: 'rewordedGoal',
-        type: 'text',
-        prompt: 'Okay, give it to me in your words. What is the goal you actually want to chase?',
-        placeholder: 'Be specific. The version that actually fits.',
-        minLen: 15
-      }] : []),
-      {
-        id: 'timeframe',
-        type: 'chips',
-        prompt: "What's the timeline on this? As in, how long do you actually think this takes realistically? A one-month plan and a five-year plan are completely different.",
-        chips: ['1 month', '3 months', '6 months', '1 year', '2 years', '5 years', 'Lifelong'],
-        allowCustom: true,
-        customPlaceholder: 'Or type your own (e.g. 18 months)'
-      },
       {
         id: 'pastProgress',
         type: 'text',
-        prompt: "And have you already started moving on this? What have you actually done so far, even if it feels small? Or are you starting from zero. I just want to know the progress you've made so far.",
+        prompt: "Have you already started moving on this? What have you actually done so far, even if it feels small? Or are you starting from zero.",
         placeholder: 'Be honest. "Nothing yet" is a real answer if it\'s true.',
         minLen: 12,
         allowNothing: true
-      },
-      {
-        id: 'mainMove',
-        type: 'text',
-        prompt: "So if you had to guess, what is the main move you need to make to get from where you are to where you want to be?",
-        placeholder: 'Your real guess. Not a textbook answer.',
-        minLen: 20
-      },
-      {
-        id: 'oneThing',
-        type: 'text',
-        prompt: "And if you had to pick just ONE thing, the move that, if you actually did it, would make everything else easier or unnecessary, what is it?",
-        placeholder: 'Trust your gut here.',
-        minLen: 15
       }
     ];
     return base;
@@ -2910,14 +2909,12 @@ const ActionExperience = {
       intake.aiHistory = [];
       intake.pendingNewGoal = '';
       intake.phase = 'goalConfirm';
-      // v606 (Malik): they pressed and held for THIS star minutes ago; asking
-      // "does it still fit?" again kills the momentum. Hot from ignition, the
-      // goal is confirmed by the hold itself and the timeframe came from Act 3,
-      // so the conversation opens at "what have you actually done so far".
-      const _hot = !!(state.clarity && state.clarity.ignitedAt
-        && (Date.now() - state.clarity.ignitedAt) < 30 * 60 * 1000);
+      // v830 (Malik's approved intake flip): the goal and timeframe come from
+      // Clarity, ALWAYS. They are shown as editable confirmations at the top
+      // of the screen, never asked as gate questions. The conversation opens
+      // at the one real question: what have you actually done so far.
       const _ns = (state.clarity.answers && state.clarity.answers.neutronStar) || '';
-      if (_hot && _ns) {
+      if (_ns) {
         intake.answers = intake.answers || {};
         intake.aiSnapshot.goalConfirm = _ns;
         intake.answers.goalConfirm = _ns;
@@ -2931,10 +2928,12 @@ const ActionExperience = {
     this.pageWrap.innerHTML = `
       <div class="action-exp__page-inner action-intake-page action-intake-page--cine">
         <div class="action-exp__inner action-intake action-intake--cine">
+          <div class="action-intake__given" id="intakeGiven"></div>
           <div class="action-intake__transcript" style="display:none" aria-hidden="true"></div>
           <div class="action-intake__current"></div>
         </div>
       </div>`;
+    this._renderIntakeGiven();
 
     // Auto-scroll to bottom whenever the intake DOM changes (new bubble,
     // new question, typing indicator, etc.) so the latest message is always
@@ -3293,7 +3292,7 @@ Current snapshot (what you have captured so far): ${JSON.stringify(intake.aiSnap
 
 Reminder: ONLY put a value in snapshot.X when the user's most recent answer is substantive for field X. If it's vague, garbage, sarcastic, or a platitude, leave the field empty and push back in your message.${(intake.aiMessages.length === 0 && intake.aiSnapshot.goalConfirm) ? `
 
-They arrived HERE seconds after igniting this exact star, so the goal and timeframe are already locked (see snapshot). Do NOT greet them like a returning user (never "welcome back"), do NOT re-confirm the goal, and NO emojis. One short grounded line that carries the momentum, then ask what they have actually done toward it so far.` : ''}`;
+The goal and timeframe are already locked from Clarity (see snapshot); they are shown on screen as editable confirmations. Do NOT greet them like a returning user (never "welcome back"), do NOT re-confirm the goal or the timeframe, and NO emojis. One short grounded line that carries the momentum, then ask what they have actually done toward it so far. This is the ONLY question in this conversation; the moment their answer is substantive, the plan builds. If they say they want to change the goal wording or the timeframe, handle that in one turn (capture the new value), then return to the one question.` : ''}`;
 
     // Build API messages: inject context into the FIRST user message of the convo.
     const apiMessages = [];
@@ -3335,6 +3334,7 @@ They arrived HERE seconds after igniting this exact star, so the goal and timefr
 
       // Mirror captures to clarity state where used downstream.
       if (intake.aiSnapshot.timeframe) state.clarity.answers.timeframe = intake.aiSnapshot.timeframe;
+      try { this._renderIntakeGiven(); } catch (_) {}
       if (intake.aiSnapshot.goalConfirm && intake.aiSnapshot.goalConfirm.length >= 8) {
         // Only overwrite Neutron Star if the captured goalConfirm looks like a real goal.
         const chipLabels = ["yeah, that's still it", "close, but i'd word it differently", "no, i want to change it"];
@@ -3349,6 +3349,17 @@ They arrived HERE seconds after igniting this exact star, so the goal and timefr
       // real substance (so a hallucinated ready: true cannot end the convo early).
       const snap = intake.aiSnapshot;
       const lengthOk = (s, n) => typeof s === 'string' && s.trim().length >= n;
+      // v830 (the intake flip): pastProgress is the ONLY question. Goal and
+      // timeframe are prefilled from Clarity (editable on screen), and the
+      // plan prompt already treats mainMove/oneThing as optional garnish. The
+      // AI keeps its lazy-answer authority: a vague answer leaves the field
+      // empty and gets pushback, so this still cannot be garbage-completed.
+      if (lengthOk(snap.pastProgress, 4)) {
+        intake.completed = true;
+        persistNow();
+        this._aiIntakeRenderClosing();
+        return;
+      }
       const snapComplete = lengthOk(snap.goalConfirm, 8) && lengthOk(snap.timeframe, 2) && lengthOk(snap.pastProgress, 4) && lengthOk(snap.mainMove, 4);
       // v620 backstop: the reality-check calibration is NON-SKIPPABLE and small
       // models skip it when the user pre-accepts. If no assistant turn ever ran
