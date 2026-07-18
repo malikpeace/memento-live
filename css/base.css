@@ -330,6 +330,12 @@ html.theme-light {
   /* Lighter-dark hover so the white label stays visible (the old hardcoded
      near-white hover turned this button white-on-white when pressed). */
   --solid-bg-hover: #33363f;
+
+  /* Confirmation-state text ("Done today"): the raw consistency green reads
+     ~2.3:1 on white. Mix it toward a deep green-black so it stays the same hue
+     (accent-matched personas keep their color) but earns real contrast. Dark
+     theme has no --done-ink, so usages fall back to the raw color. */
+  --done-ink: color-mix(in srgb, var(--color-consistency) 58%, #122417);
 }
 /* Canvas background + base text live on <body> (theme class is on <html>). */
 html.theme-light body {
@@ -861,7 +867,9 @@ body.density-compact .sidebar__inner { gap: 8px; }
 }
 .pref-toggle__knob {
   position: absolute; top: 2px; left: 2px; width: 22px; height: 22px; border-radius: 50%;
-  background: var(--solid-bg); transition: transform var(--t-base) var(--ease-out, ease);
+  /* Always white, like the iOS switch knob in BOTH themes. var(--solid-bg)
+     flipped it near-black in light mode, which read broken, not native. */
+  background: #fff; transition: transform var(--t-base) var(--ease-out, ease);
   box-shadow: 0 1px 3px rgba(0,0,0,0.4);
 }
 /* v695 (Malik): toggles read iOS-native, GREEN when on, neutral when off,

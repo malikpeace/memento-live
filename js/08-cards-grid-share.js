@@ -3463,7 +3463,7 @@ function renderCommandCenter() {
       row += '<div style="margin-top:8px;padding-top:6px;border-top:1px solid var(--hairline);">';
       row += '<div style="display:flex;gap:8px;flex-wrap:wrap;">';
       if (doneToday) {
-        row += '<div style="flex:1;min-width:150px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;color:var(--color-consistency);background:color-mix(in srgb, var(--color-consistency) 12%, transparent);box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);border-radius:calc(8px * var(--rx, 1));padding:12px;">&#10003; Done today</div>';
+        row += '<div style="flex:1;min-width:150px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;color:var(--done-ink, var(--color-consistency));background:color-mix(in srgb, var(--color-consistency) 12%, transparent);box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);border-radius:calc(8px * var(--rx, 1));padding:12px;">&#10003; Done today</div>';
       } else {
         // Inline confirm: close the day right here. "Open" still routes into the
         // Action module for the focus timer / full detail (secondary, quiet).

@@ -3929,7 +3929,11 @@ body.card-square { --card-w: 360px; --card-h: 360px; }
 .dash-cgram__range { display: none; }
 @media (min-width: 1024px) {
   body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 {
-    display: grid !important;
+    /* display is intentionally NOT !important: TabBar hides the home behind
+       tab panels via app.style.display='none' (inline), and an !important here
+       overrode that, bleeding the home through the transparent Do/Reflect/You
+       panels on desktop. Source order already beats the bento rule above. */
+    display: grid;
     grid-template-columns: 1fr 1.25fr;
     /* v813b (Malik's screenshot): hero + heatmap center TOGETHER as one
        composed block (like the mock), instead of the hero floating mid-void
@@ -4022,7 +4026,7 @@ body.card-square { --card-w: 360px; --card-h: 360px; }
 .dkm__btn--solid { cursor: pointer; background: var(--solid-bg); color: var(--solid-fg); }
 .dkm__btn--solid:active { transform: scale(0.98); }
 .dkm__btn--done {
-  font-weight: 600; font-size: 14px; color: var(--color-consistency);
+  font-weight: 600; font-size: 14px; color: var(--done-ink, var(--color-consistency));
   background: linear-gradient(180deg, rgba(var(--success-rgb), 0.16), rgba(var(--success-rgb), 0.08));
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
   cursor: default; user-select: none;

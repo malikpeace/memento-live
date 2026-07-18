@@ -5560,7 +5560,7 @@ const TabBar = {
       </div>
       <div class="you-card" style="margin-top: 30px;">
         <button type="button" class="you-vrow" id="profileReset">
-          <span class="you-vrow__label" style="color: var(--color-action);">Reset everything</span>
+          <span class="you-vrow__label" style="color: var(--text-1);">Reset everything</span>
         </button>
       </div>
       <div style="font-size: 0.6875rem; color: var(--text-3); text-align: center; margin-top: 26px; letter-spacing: 0.06em;">Memento ${(window.MEMENTO_VERSION || '')}</div>
