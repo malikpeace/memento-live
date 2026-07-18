@@ -3928,7 +3928,7 @@ body.card-square { --card-w: 360px; --card-h: 360px; }
 #deskMission { display: none; }
 .dash-cgram__range { display: none; }
 @media (min-width: 1024px) {
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 {
+  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 {
     display: grid !important;
     grid-template-columns: 1fr 1.25fr;
     /* v813b (Malik's screenshot): hero + heatmap center TOGETHER as one
@@ -3953,7 +3953,7 @@ body.card-square { --card-w: 360px; --card-h: 360px; }
   }
   /* the mock's topbar: greeting hard-LEFT, clock hard-right (the header was
      centering the greeting inside the new grid, Malik's screenshot) */
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .dash-header {
+  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 .dash-header {
     display: flex !important;
     justify-content: space-between;
     align-items: flex-start;
@@ -3961,48 +3961,48 @@ body.card-square { --card-w: 360px; --card-h: 360px; }
     padding: 26px 0 0;
     margin: 0;
   }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .dash-header__brand { display: none !important; }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .dash-header__greeting { margin: 0; text-align: left; flex: 1 1 auto; }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .dash-header__right { flex: 0 0 auto; }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashBelow { display: contents; }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .dash-header { grid-area: dhead; align-self: start; }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard {
+  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 .dash-header__brand { display: none !important; }
+  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 .dash-header__greeting { margin: 0; text-align: left; flex: 1 1 auto; }
+  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 .dash-header__right { flex: 0 0 auto; }
+  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #dashBelow { display: contents; }
+  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 .dash-header { grid-area: dhead; align-self: start; }
+  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #dayCard {
     grid-area: dcard; display: flex; justify-content: center; margin: 0;
     --card-w: 206px; --card-h: 277px;
   }
-  body.card-square.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard { --card-w: 240px; --card-h: 240px; }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #deskMission { display: block; grid-area: dmission; }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashConsistency {
+  body.card-square:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #dayCard { --card-w: 240px; --card-h: 240px; }
+  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #deskMission { display: block; grid-area: dmission; }
+  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #dashConsistency {
     grid-area: dheat; display: block; align-self: start; margin: 48px 0 0; padding: 0;
     background: none; box-shadow: none; border: none;
   }
   /* everything else leaves the desktop home (info law + sidebar duplicates) */
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter,
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dailyMemento,
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashHello,
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #hubConsistency,
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #widgetGrid,
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .dash-more,
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .dash-header .hub-headline,
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 .dash-header .hub-returncue {
+  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #commandCenter,
+  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #dailyMemento,
+  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #dashHello,
+  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #hubConsistency,
+  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #widgetGrid,
+  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 .dash-more,
+  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 .dash-header .hub-headline,
+  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 .dash-header .hub-returncue {
     display: none !important;
   }
   /* the heatmap band: no streak header (the stat pair owns it), one quiet
      right-aligned range label, cells that breathe across the full width */
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashConsistency .dash-cgram__head { display: none; }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashConsistency .dash-cgram__range {
+  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #dashConsistency .dash-cgram__head { display: none; }
+  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #dashConsistency .dash-cgram__range {
     display: flex; justify-content: flex-end;
     font-size: 11px; color: var(--text-lo); margin-bottom: 9px;
     font-variant-numeric: tabular-nums;
   }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashConsistency .cgraph__months { display: none; }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashConsistency .cgraph__legend { display: none; }
+  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #dashConsistency .cgraph__months { display: none; }
+  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #dashConsistency .cgraph__legend { display: none; }
   /* v817 (Malik: 'NO PROOF YET can go'): the editorial home's heatmap speaks
      for itself; the coaching empty-state stays inside the Consistency module. */
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashConsistency .empty-state { display: none; }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashConsistency .cgraph__cols { gap: 3px; }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashConsistency .cgraph__col { gap: 3px; flex: 1 1 0; max-width: 20px; }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashConsistency .cgraph__col .cgraph__cell {
+  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #dashConsistency .empty-state { display: none; }
+  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #dashConsistency .cgraph__cols { gap: 3px; }
+  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #dashConsistency .cgraph__col { gap: 3px; flex: 1 1 0; max-width: 20px; }
+  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #dashConsistency .cgraph__col .cgraph__cell {
     width: 100%; height: auto; aspect-ratio: 1 / 1; border-radius: 3px;
   }
 }
@@ -4033,13 +4033,13 @@ body.card-square { --card-w: 360px; --card-h: 360px; }
 /* very wide screens: the composition scales up a touch so it never reads
    lost on a big monitor (still capped, still the same proportions) */
 @media (min-width: 1760px) {
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 { max-width: 1400px; }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard { --card-w: 232px; --card-h: 312px; }
-  body.card-square.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard { --card-w: 268px; --card-h: 268px; }
+  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 { max-width: 1400px; }
+  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #dayCard { --card-w: 232px; --card-h: 312px; }
+  body.card-square:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #dayCard { --card-w: 268px; --card-h: 268px; }
   .dkm__headline { font-size: 47px; }
 }
 /* editorial breathes, never stretches silly: below 1150 the gap tightens */
 @media (min-width: 1024px) and (max-width: 1149.98px) {
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 { column-gap: 40px; padding: 0 40px 24px; }
+  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 { column-gap: 40px; padding: 0 40px 24px; }
   .dkm__headline { font-size: 36px; }
 }

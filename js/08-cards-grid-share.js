@@ -570,9 +570,19 @@ function renderGrid() {
     _evoOwnsBloom = (typeof _cardEvolutionRunning !== 'undefined' && _cardEvolutionRunning) || _pending;
     if (_pending && !(typeof _cardEvolutionRunning !== 'undefined' && _cardEvolutionRunning)) {
       document.body.classList.remove('ns-bloom');
+      // v818 (Malik: "the cinematic doesn't move to the 100% same spot" on
+      // desktop, confirmed by measurement): stripping ns-bloom here dropped
+      // the whole DESKTOP EDITORIAL layout (gated on ns-bloom), so the card
+      // popped to the pre-clarity 320x440 geometry mid-flow, then snapped
+      // back at the fill. evo-pending keeps the editorial grid + card tokens
+      // holding through the blank beat; color still stays off (ns-bloom).
+      document.body.classList.add('evo-pending');
     }
   } catch (e) {}
-  if (!_evoOwnsBloom) document.body.classList.toggle('ns-bloom', hasNeutronStar);
+  if (!_evoOwnsBloom) {
+    document.body.classList.toggle('ns-bloom', hasNeutronStar);
+    document.body.classList.remove('evo-pending');
+  }
 
   // Paywall lock: once Clarity is done but they have not paid, every module but
   // Clarity reads as locked on the dashboard (tapping one rises the paywall).
