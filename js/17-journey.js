@@ -327,8 +327,6 @@ function renderReflectTab() {
     const entries = (state.reflection && Array.isArray(state.reflection.entries)) ? state.reflection.entries : [];
     const todayEntry = entries.slice().reverse().find(en => en && en.iso === todayISO && en.closedDay);
     const done = (typeof actionDoneToday === 'function') ? actionDoneToday() : false;
-    const pa = (state.action && state.action.primaryAction) || {};
-    const move = String(pa.title || '').trim();
     const dateLabel = (() => { try { return new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }); } catch (e) { return ''; } })();
 
     // Templated prompt (zero AI, decision 4): names their actual day. Variant
@@ -346,45 +344,76 @@ function renderReflectTab() {
     ];
     const prompt = (done ? DONE_PROMPTS : MISS_PROMPTS)[seed % 3];
 
-    let h = '<div class="rf">';
-    h += '<div class="rf-eyebrow">Reflect</div>';
-    h += '<div class="rf-date">' + E(dateLabel) + '</div>';
+    // The story: every written day, newest first. Tonight (if sealed) leads.
+    const past = entries.slice()
+      .filter(en => en && String(en.text || '').trim() && !(en.iso === todayISO && en.closedDay))
+      .sort((a, b) => String(b.iso || '').localeCompare(String(a.iso || '')));
+    const dayCount = past.length + (todayEntry ? 1 : 0);
+    const sealed = !!todayEntry;
 
-    if (todayEntry) {
-      // The day is sealed: quiet done-state, tonight's line shown.
-      h += '<div class="rf-sealed">';
-      h += '<div class="rf-sealed__mark" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>';
-      h += '<div class="rf-sealed__big">Tonight is sealed.</div>';
-      h += '<div class="rf-sealed__text">&ldquo;' + E(todayEntry.text || '') + '&rdquo;</div>';
-      h += '</div>';
+    // Two faces, one natural scroll: the writing face fills the viewport, the
+    // rail-timeline story lives one swipe below it (Malik: the timeline must be
+    // BEHIND a swipe, not already on screen). Native scrolling IS the gesture.
+    let h = '<div class="rf2' + (sealed ? ' rf2--sealed' : '') + '" id="rf2">';
+
+    // ---- face 1: tonight (whisper writing) --------------------------------
+    h += '<section class="rf2-write" id="rf2Write">';
+    h += '<div class="rf2-date">' + E(dateLabel) + '</div>';
+    if (sealed) {
+      h += '<div class="rf2-q">' + E(prompt) + '</div>';
+      h += '<div class="rf2-bigread">&ldquo;' + E(todayEntry.text || '') + '&rdquo;</div>';
+      h += '<div class="rf2-floor"><span class="rf2-count">day closed</span><span class="rf2-sealedmark" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></div>';
     } else {
-      h += '<div class="rf-close">';
-      h += '<div class="rf-q">' + E(prompt) + '</div>';
-      if (move) h += '<div class="rf-context">' + (done ? 'Today’s move is done: ' : 'Today’s move: ') + '<b>' + E(move) + '</b></div>';
-      h += '<textarea id="rfInput" class="rf-input" rows="3" maxlength="500" placeholder="One honest line is enough."></textarea>';
-      h += '<button type="button" id="rfSave" class="rf-cta" disabled>Close the day</button>';
-      h += '</div>';
+      h += '<div class="rf2-q">' + E(prompt) + '</div>';
+      h += '<textarea id="rfInput" class="rf2-input" rows="1" maxlength="500" placeholder="Write it here." aria-label="' + E(prompt) + '"></textarea>';
+      h += '<div class="rf2-floor"><span class="rf2-count tabnum" id="rfCount">0 words</span><button type="button" id="rfSave" class="rf2-cta" disabled>Close the day</button></div>';
     }
+    h += '<button type="button" class="rf2-hint" id="rfStoryOpen" aria-label="See your story">';
+    h += '<span class="rf2-hint__bar" aria-hidden="true"></span>';
+    h += '<span class="rf2-hint__label tabnum">your story' + (dayCount ? ' &middot; ' + dayCount + (dayCount === 1 ? ' day' : ' days') : '') + '</span>';
+    h += '</button>';
+    h += '</section>';
 
-    // Past reflections, behind the ritual. Newest first, capped.
-    const past = entries.slice().reverse().filter(en => en && String(en.text || '').trim() && !(en.iso === todayISO && en.closedDay)).slice(0, 14);
-    if (past.length) {
-      h += '<div class="rf-pastlab">Past reflections</div>';
-      h += '<div class="rf-past">';
-      past.forEach(en => {
-        h += '<div class="rf-item"><div class="rf-item__date">' + E(en.date || en.iso || '') + '</div><div class="rf-item__text">' + E(String(en.text).slice(0, 220)) + '</div></div>';
+    // ---- face 2: the story (rail timeline) --------------------------------
+    h += '<section class="rf2-story" id="rf2Story">';
+    h += '<div class="rf2-story__head"><span class="rf2-story__title">Your story</span><span class="rf2-story__n tabnum">' + dayCount + (dayCount === 1 ? ' day' : ' days') + '</span></div>';
+    if (dayCount) {
+      h += '<div class="rf2-rail">';
+      h += '<div class="rf2-rail__line" aria-hidden="true"></div>';
+      h += '<div class="rf2-rail__col">';
+      if (todayEntry) {
+        h += '<div class="rf2-en rf2-en--tonight"><div class="rf2-en__date tabnum">Tonight</div><div class="rf2-en__text">' + E(String(todayEntry.text || '').slice(0, 220)) + '</div></div>';
+      }
+      past.slice(0, 30).forEach(en => {
+        h += '<div class="rf2-en"><div class="rf2-en__date tabnum">' + E(en.date || en.iso || '') + '</div><div class="rf2-en__text">' + E(String(en.text).slice(0, 220)) + '</div></div>';
       });
-      h += '</div>';
+      h += '</div></div>';
+    } else {
+      h += '<div class="rf2-empty">Your first line tonight starts it.</div>';
     }
-    h += '<button type="button" id="rfAllNotes" class="rf-notes-link">All notes</button>';
+    h += '<button type="button" id="rfWriteBack" class="rf2-back">' + (sealed ? 'tonight is sealed' : 'swipe down to write') + '</button>';
+    h += '<button type="button" id="rfAllNotes" class="rf2-notes-link">All notes</button>';
+    h += '</section>';
     h += '</div>';
     body.innerHTML = h;
 
-    // --- bind ---
+    const panel = body.closest('.tab-panel');
+
+    // --- bind: writing ---
     const input = document.getElementById('rfInput');
     const save = document.getElementById('rfSave');
+    const count = document.getElementById('rfCount');
     if (input && save) {
-      input.addEventListener('input', () => { save.disabled = !input.value.trim(); });
+      const grow = () => { input.style.height = 'auto'; input.style.height = input.scrollHeight + 'px'; };
+      input.addEventListener('input', () => {
+        save.disabled = !input.value.trim();
+        if (count) {
+          const n = input.value.trim() ? input.value.trim().split(/\s+/).length : 0;
+          count.textContent = n + (n === 1 ? ' word' : ' words');
+        }
+        grow();
+      });
+      grow();
       save.addEventListener('click', () => {
         const v = input.value.trim();
         if (!v) return;
@@ -403,6 +432,16 @@ function renderReflectTab() {
         renderReflectTab();
       });
     }
+
+    // --- bind: faces (tap complements the natural swipe/scroll) ---
+    const story = document.getElementById('rf2Story');
+    const hint = document.getElementById('rfStoryOpen');
+    if (hint && story && panel) hint.addEventListener('click', () => {
+      const top = story.getBoundingClientRect().top - panel.getBoundingClientRect().top + panel.scrollTop;
+      panel.scrollTo({ top: top, behavior: 'smooth' });
+    });
+    const back = document.getElementById('rfWriteBack');
+    if (back && panel) back.addEventListener('click', () => { panel.scrollTo({ top: 0, behavior: 'smooth' }); });
     const allNotes = document.getElementById('rfAllNotes');
     if (allNotes) allNotes.addEventListener('click', () => {
       try { if (typeof Sheet !== 'undefined' && Sheet.open) Sheet.open('reflection'); } catch (e) {}

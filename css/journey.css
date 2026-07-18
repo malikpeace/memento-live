@@ -200,91 +200,91 @@ html.theme-light .pt-star {
    REFLECT TAB (BOTTOM-BAR-PLAN.md phase 3): the evening close. One prompt,
    one line, "Close the day"; sealed state after; past reflections behind it.
    ============================================================ */
-.rf { max-width: 480px; margin: 0 auto; }
-.rf-eyebrow {
-  font-family: var(--font); font-size: 0.65rem; font-weight: 700;
-  letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-3);
-  text-align: center;
+/* v821: the R design (Malik's pick, finals artifact). Paper-dark journal, no
+   cards. Face 1 = whisper writing (your words are the biggest thing on
+   screen, live word count). Face 2 = the rail-timeline story, deliberately
+   BEHIND a swipe: it lives one natural scroll below the writing face. */
+.rf2 { max-width: 520px; margin: 0 auto; }
+.rf2 .tabnum { font-variant-numeric: tabular-nums; }
+
+/* face 1: tonight. Fills the panel viewport so the story stays off-screen
+   until the user swipes. 100dvh minus the panel's own padding + tab bar. */
+.rf2-write {
+  /* Fill the viewport exactly: the story face must start AT the fold, never
+     peeking (Malik: the timeline is behind a swipe). Inner top pad = safe-t+20. */
+  min-height: calc(100dvh - var(--safe-t) - 20px);
+  display: flex; flex-direction: column;
+  /* keep the pull-hint visible above the floating tab bar */
+  padding-bottom: calc(96px + var(--safe-b));
 }
-.rf-date {
-  margin-top: 8px; text-align: center;
-  font-family: var(--font); font-size: 1.375rem; font-weight: 700;
-  letter-spacing: -0.02em; color: var(--text-hi);
-  font-variant-numeric: tabular-nums;
+.rf2-date { font-size: 0.75rem; color: var(--text-3); font-variant-numeric: tabular-nums; margin-top: 4px; }
+.rf2-q { font-size: 0.75rem; color: var(--text-3); margin: auto 0 14px; padding-top: 34px; }
+.rf2-input {
+  width: 100%; border: none; background: transparent; resize: none; padding: 0; margin: 0;
+  font-family: var(--font); font-size: 1.8125rem; font-weight: 700; letter-spacing: -0.025em;
+  line-height: 1.22; color: var(--text-hi); caret-color: var(--text-hi);
+  min-height: 2.6em; overflow: hidden; outline: none;
 }
-.rf-close { margin-top: 30px; }
-.rf-q {
-  font-family: var(--font); font-size: 1.0625rem; font-weight: 700;
-  line-height: 1.4; color: var(--text-hi); text-align: center; text-wrap: balance;
+.rf2-input::placeholder { color: var(--text-3); font-weight: 700; }
+.rf2-bigread {
+  font-size: 1.8125rem; font-weight: 700; letter-spacing: -0.025em; line-height: 1.22;
+  color: var(--text-hi); overflow-wrap: break-word;
 }
-.rf-context {
-  margin: 10px auto 0; max-width: 34ch; text-align: center;
-  font-family: var(--font); font-size: 0.8125rem; line-height: 1.5; color: var(--text-2);
-  text-wrap: balance;
-}
-.rf-context b { color: var(--text-hi); font-weight: 650; }
-.rf-input {
-  display: block; width: 100%; margin-top: 18px;
-  padding: 14px 16px; border: 0; border-radius: var(--r-ctrl);
-  background: var(--kfill-06);
-  box-shadow: inset 0 1px 0 rgba(var(--ink), 0.06);
-  color: var(--text-hi); font-family: var(--font); font-size: 0.9375rem; line-height: 1.55;
-  resize: none; outline: none;
-  transition: background var(--t-base) ease;
-}
-.rf-input::placeholder { color: var(--text-3); }
-.rf-input:focus { background: var(--kfill-08, var(--kfill-06)); }
-.rf-cta {
-  display: block; width: 100%; margin-top: 12px;
-  padding: 15px 20px; border: 0; border-radius: var(--r-ctrl);
+.rf2-floor { display: flex; align-items: center; justify-content: space-between; margin: 26px 0 auto; }
+.rf2-count { font-size: 0.71875rem; color: var(--text-3); }
+.rf2-cta {
+  font-family: var(--font); font-size: 0.84375rem; font-weight: 700; cursor: pointer;
+  padding: 12px 22px; border: none; border-radius: calc(10px * var(--rx, 1));
   background: var(--solid-bg); color: var(--solid-fg);
-  font-family: var(--font); font-size: 0.9375rem; font-weight: 700; letter-spacing: -0.01em;
-  cursor: pointer; box-shadow: var(--shadow-card);
-  transition: opacity var(--t-base) ease, transform 0.12s ease;
+  box-shadow: 0 6px 22px rgba(0,0,0,0.35);
+  transition: transform var(--t-fast, 0.15s) ease, background var(--t-fast, 0.15s) ease;
 }
-.rf-cta:active { transform: scale(0.985); }
-.rf-cta:disabled { background: var(--kfill-06); color: var(--text-3); box-shadow: none; cursor: default; }
+.rf2-cta:active { transform: scale(0.985); }
+.rf2-cta:disabled { background: var(--kfill-06); color: var(--text-3); box-shadow: none; cursor: default; }
+.rf2-sealedmark { color: var(--color-consistency); display: inline-flex; }
+html.theme-light .rf2-sealedmark { color: rgb(28, 158, 39); }
 
-@keyframes rfSealIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-.rf-sealed { margin-top: 34px; text-align: center; animation: rfSealIn 0.4s var(--ease-out, ease) both; }
-@media (prefers-reduced-motion: reduce) { .rf-sealed { animation: none; } }
-.rf-sealed__mark {
-  width: 40px; height: 40px; margin: 0 auto; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  background: var(--kfill-06); color: rgb(120, 230, 129);
-  box-shadow: inset 0 1px 0 rgba(var(--ink), 0.06);
+/* the pull hint: the only trace of the story on the writing face */
+.rf2-hint {
+  margin: 34px auto 0; padding: 10px 18px; border: none; background: transparent; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 7px;
+  font-family: var(--font);
 }
-html.theme-light .rf-sealed__mark { color: rgb(28, 158, 39); }
-.rf-sealed__big {
-  margin-top: 14px; font-family: var(--font); font-size: 1.1875rem; font-weight: 800;
-  letter-spacing: -0.01em; color: var(--text-hi);
-}
-.rf-sealed__text {
-  margin: 10px auto 0; max-width: 36ch;
-  font-family: var(--font); font-size: 0.9375rem; line-height: 1.55; color: var(--text-2);
-  text-wrap: balance;
-}
+.rf2-hint__bar { width: 34px; height: 4px; border-radius: 2px; background: rgba(var(--ink), 0.18); }
+.rf2-hint__label { font-size: 0.71875rem; color: var(--text-3); }
+.rf2-hint:active .rf2-hint__label, .rf2-hint:hover .rf2-hint__label { color: var(--text-1); }
 
-.rf-pastlab {
-  margin: 40px 0 10px; font-family: var(--font); font-size: 0.65rem; font-weight: 700;
-  letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-3);
+/* face 2: the story (revealed by the swipe) */
+.rf2-story { padding-top: 34px; }
+.rf2-story__head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 20px; }
+.rf2-story__title { font-size: 1.0625rem; font-weight: 700; letter-spacing: -0.02em; color: var(--text-hi); }
+.rf2-story__n { font-size: 0.71875rem; color: var(--text-3); }
+.rf2-rail { display: flex; gap: 14px; }
+.rf2-rail__line {
+  flex: 0 0 2px; border-radius: 2px;
+  background: linear-gradient(180deg, var(--color-consistency), rgba(var(--ink), 0.08) 34%);
 }
-.rf-past { display: flex; flex-direction: column; gap: 8px; }
-.rf-item {
-  padding: 13px 15px; border-radius: var(--r-card);
-  background: var(--kfill-04, var(--kfill-06));
-  box-shadow: inset 0 1px 0 rgba(var(--ink), 0.04);
-  text-align: left;
+.rf2--sealed .rf2-rail__line { background: linear-gradient(180deg, var(--color-consistency), rgba(var(--ink), 0.08) 34%); }
+.rf2:not(.rf2--sealed) .rf2-rail__line { background: rgba(var(--ink), 0.09); }
+.rf2-rail__col { flex: 1; display: flex; flex-direction: column; gap: 17px; min-width: 0; }
+.rf2-en__date { font-size: 0.6875rem; font-weight: 650; color: var(--text-3); margin-bottom: 3px; }
+.rf2-en--tonight .rf2-en__date { color: var(--color-consistency); }
+html.theme-light .rf2-en--tonight .rf2-en__date { color: rgb(28, 158, 39); }
+.rf2-en__text { font-family: var(--font); font-size: 0.84375rem; line-height: 1.55; color: var(--text-1); overflow-wrap: break-word; }
+.rf2-en--tonight .rf2-en__text { color: var(--text-hi); }
+.rf2-empty { font-size: 0.84375rem; color: var(--text-2); }
+.rf2-back {
+  display: block; margin: 30px auto 0; padding: 8px 14px; border: none; background: transparent;
+  font-family: var(--font); font-size: 0.71875rem; color: var(--text-3); cursor: pointer;
 }
-.rf-item__date { font-family: var(--font); font-size: 0.6875rem; font-weight: 650; color: var(--text-3); font-variant-numeric: tabular-nums; }
-/* Reading content, not a label: --text-2 read as washed-out gray in both
-   themes (the no-dim-body-text law). The date above stays quiet. */
-.rf-item__text { margin-top: 4px; font-family: var(--font); font-size: 0.875rem; line-height: 1.5; color: var(--text-1); }
-.rf-notes-link {
-  display: flex; align-items: center; justify-content: center;
-  width: fit-content; min-height: 44px; margin: 14px auto 0; padding: 8px 16px;
-  background: transparent; border: 0; cursor: pointer;
-  font-family: var(--font); font-size: 0.8125rem; font-weight: 600; color: var(--text-3);
-  transition: color var(--t-base) ease;
+.rf2-back:active, .rf2-back:hover { color: var(--text-1); }
+.rf2-notes-link {
+  display: block; margin: 4px auto 0; padding: 8px 14px; border: none; background: transparent;
+  font-family: var(--font); font-size: 0.71875rem; color: var(--text-3); cursor: pointer;
 }
-.rf-notes-link:active, .rf-notes-link:hover { color: var(--text-hi); }
+.rf2-notes-link:active, .rf2-notes-link:hover { color: var(--text-hi); }
+
+/* desktop: same column, composed (desktop law): capped width, real air */
+@media (min-width: 861px) {
+  .rf2 { max-width: 560px; }
+}
