@@ -2289,7 +2289,9 @@ const CreatorTools = {
   restartAction() {
     this._closeAll();
     try {
-      state.meta.next7DaysSeen = false;
+      // v869 (Malik): the 7-days page has its own cheat (jump7Days); restart
+      // goes straight into the module's first-time flow, no detour.
+      state.meta.next7DaysSeen = true;
       state.action.introSeen = false;
       state.action.tutorialSeen = false;
       state.action.intake = { answers: {}, completed: false };
