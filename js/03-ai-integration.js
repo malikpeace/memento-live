@@ -916,6 +916,9 @@ Each path step has FOUR text fields. Write each one tight and in their voice:
 - bridge: 1-2 sentences. The 1-2 habits or moves that compound between the milestone BELOW this one and this one. Specific. Like "five days of CPAT-style training per week, alternating cardio and weighted carries." Not "stay consistent and trust the process."
 - signal: ONE sentence. The observable check that proves they have arrived. Something they could verify in the real world. Like "you have completed the full CPAT sequence under target time three times in a row." Not "you feel ready."
 
+MECHANICAL SPECIFICITY DOCTRINE (applies to title, tiers, howToStart, bridges):
+Write like Alex Hormozi explains things: literal, mechanical, stupid-simple. The reader should never have to interpret. If the move involves a tool, NAME the tool (Eventbrite, GarageBand, the barbell, the Word doc). If it involves a place, NAME the place. If a smart stranger could ask "okay but what do I physically do first?", it is too abstract, rewrite. And NEVER the contrast pattern anywhere in this plan: no "Stop X, start Y", no "not X, but Y", no "less X, more Y". Just name the do.
+
 THE TIER PHILOSOPHY (CRITICAL, SHORT, SPECIFIC, SELF-CONTAINED):
 
 Each tier is a short verb-phrase naming the move. 3-7 words. Verb-first. Must be readable in isolation, someone seeing it cold should understand exactly what to do.
@@ -984,7 +987,7 @@ RESPONSE FORMAT - strict JSON, raw, no markdown fences, no commentary:
 
 {
   "primaryAction": {
-    "title": "under 12 words, action-oriented, specific to them. Names the move at the conceptual level. The tiers below specify the dose.",
+    "title": "under 9 words. The MOVE named mechanically, like you are talking to someone who needs zero interpretation: name the literal thing they do (and the tool/place when it disambiguates). NEVER a diagnosis, never a contrast, never meta-language. BANNED SHAPES: anything starting with Stop, any Stop-X-start-Y or not-X-but-Y contrast, anything about their patterns or habits (that goes in why). GOOD: 'Do one timed practice question set' / 'Search Eventbrite and book one event' / 'Walk outside for ten minutes'. BAD: 'Stop outlining, start doing practice questions' / 'Pick one recurring meetup and stop bailing on it' / 'Turn your posts into bookings'.",
     "why": "1-2 sentences in Malik voice. Tie it back to their Neutron Star without quoting it verbatim. No generic motivation.",
     "path": [
       {
@@ -1016,7 +1019,14 @@ RESPONSE FORMAT - strict JSON, raw, no markdown fences, no commentary:
       "heavy": "2-6 word verb-phrase, serious push. Example: 'Train hard at the gym.'",
       "extreme": "2-6 word verb-phrase, max grind. Example: 'Ship the full feature today.'"
     },
-    "howToStart": "ONE concrete first move they can do RIGHT NOW. Specific. Doable today at the moderate tier."
+    "tierTime": {
+      "tiny": "rough honest time cost as a short string, unit scaled to the move: '5 min'",
+      "light": "'15 min'",
+      "moderate": "'45 min' (or '2 hrs', 'one evening', whatever is TRUE for this goal)",
+      "heavy": "'2 hrs'",
+      "extreme": "'half a day' (bigger scales allowed: 'a full Saturday')"
+    },
+    "howToStart": "The literal FIRST PHYSICAL MOTION, so specific it feels autistic: name the device, the app or place, and the exact search phrase / first sentence / first rep when applicable. 'Open your laptop, go to Eventbrite, type run clubs NYC, book the first one under $20.' Not 'start looking into events.'"
   },
   "focusPlan": {
     "frame": "one short line. How to think about this so it actually happens. Not a quote, not a platitude.",
@@ -1187,11 +1197,20 @@ function normalizeActionPlan(raw = {}) {
     }
     seen[(tiersRaw[key] || '').toLowerCase()] = true;
   });
+  // v850: per-tier honest time cost (short strings like '45 min', 'half a
+  // day'), unit scaled to the goal by the AI. Optional; capped + cleaned.
+  const rawTierTime = raw.primaryAction?.tierTime || {};
+  const tierTime = {};
+  validTiers.forEach(k => {
+    const t = trimText(clean(rawTierTime[k]), 16);
+    if (t) tierTime[k] = t;
+  });
   const primaryAction = {
     title: cleanTitle,
     why: trimText(clean(raw.primaryAction?.why), 240),
     path: path,
     tiers: tiersRaw,
+    tierTime: tierTime,
     // Hard-force moderate. Per product spec the UI always defaults to
     // Medium and the user picks their own intensity, the AI no longer
     // recommends a tier.

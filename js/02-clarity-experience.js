@@ -4928,7 +4928,8 @@ Return ONLY the sentence text. No quotes, no labels.`;
       '.a5-date{font-size:0.75rem;color:var(--a5-lo);}',
       '.a5-mid{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;}',
       '.a5-mid .a5-task{margin-bottom:24px;}',
-      '.a5-mid .a5-bars{margin-bottom:36px;}',
+      '.a5-mid .a5-bars{margin-bottom:14px;}',
+      '.a5-time{font-size:0.75rem;color:var(--a5-lo);margin-bottom:26px;}',
       '.a5-mid .a5-cta{margin-bottom:6px;}',
       '.a5-task{font-size:clamp(1.5rem,5.8vw,1.75rem);font-weight:700;letter-spacing:-0.025em;line-height:1.2;color:var(--a5-hi);margin:0;text-wrap:balance;max-width:22ch;}',
       '.a5-bars{display:flex;align-items:flex-end;gap:5px;height:22px;}',
@@ -5095,6 +5096,7 @@ Return ONLY the sentence text. No quotes, no labels.`;
           '<div class="a5-mid">' +
             '<h1 class="a5-task">' + esc2(moveText || title) + '</h1>' +
             barsHtml(false) +
+            ((pa.tierTime && pa.tierTime[selectedTier]) ? '<div class="a5-time apl-num">~' + esc2(pa.tierTime[selectedTier]) + '</div>' : '') +
             '<button type="button" class="a5-cta" id="aplMarkDone">I did it</button>' +
             '<button type="button" class="a5-focus" id="aplFocus">Focus for 25 min</button>' +
           '</div>' +
