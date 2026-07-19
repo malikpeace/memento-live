@@ -2944,37 +2944,127 @@ const ActionExperience = {
   // (his I5 pick): do you already know the move, know it / find it for me.
   _renderIntakeBrief() { /* replaced by the beat sequence (v845) */ },
 
-  _renderMissionConfirm() {
-    this._settleOpenState();
-    const host = this.pageWrap && this.pageWrap.querySelector('.action-intake__current');
-    if (!host) return;
-    try { this.navEl.innerHTML = ''; } catch (e) {}
+  // ============================================================
+  // v871: THE DETERMINISTIC INTAKE RENDERER (Malik's full-flush sweep).
+  // The intake previously had three rendering systems fighting (hidden
+  // transcript restore, incremental stack clones, direct beat renders),
+  // which produced mis-ordered/duplicated screens on resume. Now ONE view
+  // model is derived purely from persisted state and ONE renderer paints
+  // it; open, resume, settle, back, and question-landed all route here.
+  // ============================================================
+
+  // Pure derivation: what should be on screen, from state alone.
+  _deriveIntakeView() {
+    const intake = state.action.intake || {};
     const ca = (state.clarity && state.clarity.answers) || {};
     const goal = (ca.neutronStar || '').trim();
-    if (!goal) { this._renderDoors(); return; }
-    // v860 (Malik): no "I want to change it" escape here. They locked the star
-    // in Clarity five minutes ago; this beat is a summary of everything they
-    // just said, then straight into finding the move.
+    const msgs = (intake.aiMessages || []).filter(m => m && !/^User picked "/.test(m.content || ''));
+    // Fold messages into question/answer exchanges.
+    const pairs = [];
+    msgs.forEach((m) => {
+      if (m.role === 'assistant') {
+        let t = m.content;
+        try { const o = JSON.parse(t); if (o && o.question) t = o.question; } catch (e) {}
+        pairs.push({ q: t, a: '' });
+      } else if (pairs.length) {
+        pairs[pairs.length - 1].a = m.content;
+      }
+    });
+    const last = msgs[msgs.length - 1];
+    let mode;
+    if (!msgs.length) mode = (this._doorsLive || !goal) ? 'doors' : 'summary';
+    else if (last.role === 'user') mode = 'thinking';
+    else mode = 'question';
+    // Past items: the summary always leads once the flow moved beyond it,
+    // then every completed exchange. The live exchange stays out of the past.
+    const past = [];
+    if (goal && (msgs.length || this._doorsLive)) past.push({ kind: 'summary' });
+    const pastPairs = (mode === 'question') ? pairs.slice(0, -1) : pairs;
+    pastPairs.forEach(p => past.push({ kind: 'qa', q: p.q, a: p.a }));
+    // Current question metadata (aiHistory tail wins, matching the live path).
+    let current = null;
+    if (mode === 'question') {
+      let q = pairs[pairs.length - 1].q, type = 'text', options = [];
+      const h = (intake.aiHistory || [])[(intake.aiHistory || []).length - 1];
+      if (h && h.message) { q = h.message; type = h.type || 'text'; options = h.options || []; }
+      if (type === 'chips') type = 'text';
+      current = { question: q, type, options };
+    }
+    return { mode, past, current, goal };
+  },
+
+  // The summary beat's inner HTML, shared by the live beat and the past stack.
+  _summaryBeatHtml(withCta) {
+    const ca = (state.clarity && state.clarity.answers) || {};
+    const goal = (ca.neutronStar || '').trim();
     const tf = ((ca.timeHorizon || ca.timeframe || '') + '').trim();
     const why = ((ca.coreWhy || ca.whyItMatters || '') + '').trim();
-    // Mid-sentence embed: drop the goal's leading capital unless it looks
-    // like a proper noun (second letter also uppercase, e.g. "NYC").
     const goalEmbed = (goal.length > 1 && /^[A-Z][a-z]/.test(goal))
       ? goal.charAt(0).toLowerCase() + goal.slice(1) : goal;
-    host.innerHTML =
-      '<div class="intake-beat" data-beat="summary">' +
-        '<div class="intake-beat__body">' +
-          '<div class="intake-beat__quiet">Quick recap</div>' +
-          '<div class="intake-beat__sum">You want to <b>' + esc(goalEmbed) + '</b>' +
-            (tf ? ', within <b>' + esc(tf) + '</b>' : '') + '.</div>' +
-          (why ? '<div class="intake-beat__sum intake-beat__sum--why">In your own words: &ldquo;' + esc(why) + '&rdquo;</div>' : '') +
-          '<div class="intake-beat__sum">Let\'s find out <b>exactly</b> how to get you there.</div>' +
-        '</div>' +
-        '<button type="button" class="intake-beat__cta" id="missionConfirmBtn">Continue</button>' +
-      '</div>';
-    this._cineActivate();
-    host.querySelector('#missionConfirmBtn').addEventListener('click', () => this._renderDoors());
-    this._typeRecapBeat(host);
+    return '<div class="intake-beat" data-beat="summary">' +
+      '<div class="intake-beat__body">' +
+        '<div class="intake-beat__quiet">Quick recap</div>' +
+        '<div class="intake-beat__sum">You want to <b>' + esc(goalEmbed) + '</b>' +
+          (tf ? ', within <b>' + esc(tf) + '</b>' : '') + '.</div>' +
+        (why ? '<div class="intake-beat__sum intake-beat__sum--why">In your own words: &ldquo;' + esc(why) + '&rdquo;</div>' : '') +
+        '<div class="intake-beat__sum">Let\'s find out <b>exactly</b> how to get you there.</div>' +
+      '</div>' +
+      (withCta ? '<button type="button" class="intake-beat__cta" id="missionConfirmBtn">Continue</button>' : '') +
+    '</div>';
+  },
+
+  // Paint the derived view. Idempotent: calling twice yields identical DOM.
+  _renderIntakeFromState(opts) {
+    opts = opts || {};
+    const intakeEl = this.pageWrap && this.pageWrap.querySelector('.action-intake');
+    const host = intakeEl && intakeEl.querySelector('.action-intake__current');
+    if (!intakeEl || !host) return;
+    const v = this._deriveIntakeView();
+
+    // The past stack, rebuilt declaratively (no cloning, no incremental drift).
+    let past = intakeEl.querySelector('.action-intake__past');
+    if (!past) {
+      past = document.createElement('div');
+      past.className = 'action-intake__past';
+      past.setAttribute('aria-hidden', 'true');
+      intakeEl.insertBefore(past, host);
+    }
+    past.innerHTML = v.past.map((item) => {
+      if (item.kind === 'summary') return this._summaryBeatHtml(false);
+      return '<div class="intake-beat intake-beat--past-q"><div class="intake-beat__body">' +
+        '<div class="intake-beat__ask">' + escWithBold(item.q) + '</div></div></div>' +
+        (item.a ? '<div class="intake-past__ans">' + esc(item.a) + '</div>' : '');
+    }).join('');
+    past.style.display = v.past.length ? '' : 'none';
+
+    try { this.navEl.innerHTML = ''; } catch (e) {}
+    if (v.mode === 'summary') {
+      host.innerHTML = this._summaryBeatHtml(true);
+      this._cineActivate();
+      const btn = host.querySelector('#missionConfirmBtn');
+      if (btn) btn.addEventListener('click', () => {
+        this._doorsLive = true;
+        this._renderIntakeFromState();
+      });
+      this._typeRecapBeat(host);
+    } else if (v.mode === 'doors') {
+      this._renderDoorsBeat(host);
+    } else if (v.mode === 'thinking') {
+      host.innerHTML = '<div class="action-cine__thinking" aria-label="Thinking"><i></i></div>';
+      this._aiIntakeFetchNext();
+    } else {
+      // Current question: the existing question machinery (input building,
+      // pendingEdit prefill, submit wiring, chrome) paints into the host.
+      this._aiIntakeRenderQuestion(v.current);
+      this._renderIntakeBackButton();
+    }
+    try { const sc = intakeEl.closest('.action-exp__page-wrap') || this.pageWrap; if (sc) sc.scrollTop = sc.scrollHeight; } catch (e) {}
+  },
+
+  // Back-compat entry: everything that used to call the mission beat directly.
+  _renderMissionConfirm() {
+    this._settleOpenState();
+    this._renderIntakeFromState();
   },
 
   // v864 (Malik): the recap types in like Clarity, no instant pop. Lines type
@@ -3035,46 +3125,9 @@ const ActionExperience = {
     } catch (e) {}
   },
 
-  // v860: past beats stay visible above the current one, blurred and inert,
-  // like the onboarding conversation. Clone (strips listeners), stamp the
-  // user's answer if one was just given, wipe the live host.
-  _stackPast(host, answerText, incomingId) {
-    try {
-      if (!host || !host.children.length) return;
-      // Re-render of the SAME beat (resume settle, back): don't duplicate it
-      // into the past stack, just clear the live host.
-      const first = host.firstElementChild;
-      if (incomingId && first && first.getAttribute('data-beat') === incomingId) {
-        host.innerHTML = '';
-        return;
-      }
-      let past = host.parentNode.querySelector('.action-intake__past');
-      if (!past) {
-        past = document.createElement('div');
-        past.className = 'action-intake__past';
-        past.setAttribute('aria-hidden', 'true');
-        host.parentNode.insertBefore(past, host);
-      }
-      Array.from(host.children).forEach((ch) => past.appendChild(ch.cloneNode(true)));
-      if (answerText) {
-        const a = document.createElement('div');
-        a.className = 'intake-past__ans';
-        a.textContent = answerText;
-        past.appendChild(a);
-      }
-      host.innerHTML = '';
-    } catch (_) {}
-  },
-
-  _renderDoors() {
-    this._settleOpenState();
-    const host = this.pageWrap && this.pageWrap.querySelector('.action-intake__current');
-    if (!host) return;
-    try { this.navEl.innerHTML = ''; } catch (e) {}
+  // The doors beat, painted only by _renderIntakeFromState.
+  _renderDoorsBeat(host) {
     const intake = state.action.intake;
-    // v860: the summary beat above (stacked, blurred) already carries the
-    // goal, so this beat asks the question clean, no repeated star line.
-    this._stackPast(host, '', 'doors');
     host.innerHTML =
       '<div class="intake-beat" data-beat="doors">' +
         '<div class="intake-beat__body">' +
@@ -3087,16 +3140,26 @@ const ActionExperience = {
     this._cineActivate();
     const pick = (label) => {
       try {
+        if (!Array.isArray(intake.aiMessages)) intake.aiMessages = [];
+        if (!Array.isArray(intake.aiHistory)) intake.aiHistory = [];
         const opener = 'Do you already know what you have to do to make progress toward this goal?';
         intake.aiMessages.push({ role: 'assistant', content: opener });
         intake.aiHistory.push({ message: opener, type: 'choices', options: ['I know the move', 'Find it for me'] });
         intake.aiMessages.push({ role: 'user', content: label });
         persistNow();
-        this._aiIntakeFetchNext();
+        // Trailing user message = thinking mode = the fetch fires from there.
+        this._renderIntakeFromState();
       } catch (_) {}
     };
-    host.querySelector('#doorKnow').addEventListener('click', () => pick('I know the move'));
-    host.querySelector('#doorFind').addEventListener('click', () => pick('Find it for me'));
+    const k = host.querySelector('#doorKnow'), f = host.querySelector('#doorFind');
+    if (k) k.addEventListener('click', () => pick('I know the move'));
+    if (f) f.addEventListener('click', () => pick('Find it for me'));
+  },
+
+  // Back-compat entry (older call sites).
+  _renderDoors() {
+    this._doorsLive = true;
+    this._renderIntakeFromState();
   },
 
   _intakeQuestions() {
@@ -3208,18 +3271,11 @@ const ActionExperience = {
     // when the iOS keyboard is up and the user scrolls.
     this._setupComposeBarPinning();
 
-    if (hasProgress) {
-      // Replay every previous message into the transcript and re-show the most
-      // recent AI question as the current section so the user can pick up
-      // exactly where they left off.
-      this._restoreAiIntakeFromState();
-    } else if (intake.phase === 'aiDriven' && intake.aiMessages.length === 0) {
-      // v845 (Malik's flow): intro -> mission confirm -> the doors -> AI.
-      this._renderMissionConfirm();
-    } else {
-      // Render the first phase (hardcoded opener).
-      this._renderIntakePhase();
-    }
+    // v871: ONE routing path. The deterministic renderer derives summary /
+    // doors / current-question / thinking straight from persisted state, so
+    // fresh opens and resumes are the same code.
+    this._doorsLive = false;
+    this._renderIntakeFromState();
   },
 
   // Pin the compose bar to the bottom of the actual VISIBLE viewport (not
@@ -3290,109 +3346,20 @@ const ActionExperience = {
     } catch (_) {}
   },
 
-  // Rebuilds the transcript + current section from persisted state, so a page
-  // refresh in the middle of the conversation lands the user exactly where they
-  // were. Every prior user/assistant pair becomes a transcript bubble; the most
-  // recent assistant turn becomes the active question.
+  // v871: resume mid-conversation. The deterministic renderer derives the
+  // whole screen from state: past exchanges stacked blurred, the CURRENT
+  // question live, and a trailing user message (in-flight when they left)
+  // auto-continues via thinking mode. Same spot or one step behind, never
+  // ahead, never mis-ordered.
   _restoreAiIntakeFromState() {
-    const intake = state.action.intake;
-    const transcript = this.pageWrap.querySelector('.action-intake__transcript');
-    const current    = this.pageWrap.querySelector('.action-intake__current');
-    if (!transcript || !current || !intake.aiMessages || !intake.aiMessages.length) {
-      this._renderIntakePhase();
-      return;
-    }
-
-    // Find the index of the LAST assistant message - that becomes the current
-    // question. Everything before it goes into the transcript. Anything after
-    // it (a trailing user message with no AI reply) was likely an in-flight
-    // request that didn't finish; re-fetch the next turn.
-    let lastAssistantIdx = -1;
-    for (let i = intake.aiMessages.length - 1; i >= 0; i--) {
-      if (intake.aiMessages[i].role === 'assistant') { lastAssistantIdx = i; break; }
-    }
-
-    // If there's no assistant turn at all, the conversation hasn't started in
-    // earnest yet; render the hardcoded opener.
-    if (lastAssistantIdx === -1) {
-      this._renderIntakePhase();
-      return;
-    }
-
-    // Append every message before the last assistant turn to the transcript.
-    for (let i = 0; i < lastAssistantIdx; i++) {
-      const m = intake.aiMessages[i];
-      if (m.role === 'assistant') {
-        // The very first assistant message could be a JSON-encoded hardcoded
-        // opener (see _renderIntakePhase). Extract the question text out of it.
-        let text = m.content;
-        try {
-          const obj = JSON.parse(text);
-          if (obj && obj.question) text = obj.question;
-        } catch (e) { /* not JSON, use as-is */ }
-        const bubble = document.createElement('div');
-        bubble.className = 'action-chat__bubble action-chat__bubble--ai';
-        bubble.innerHTML = escWithBold(text);
-        transcript.appendChild(bubble);
-      } else if (m.role === 'user') {
-        // Skip seed messages we use to brief the AI internally about chip clicks.
-        if (/^User picked "/.test(m.content)) continue;
-        const bubble = document.createElement('div');
-        bubble.className = 'action-chat__bubble action-chat__bubble--user';
-        bubble.textContent = m.content;
-        transcript.appendChild(bubble);
-      }
-    }
-
-    // The last assistant message becomes the current question. Try to recover
-    // its rendering metadata (type / options) from aiHistory if available.
-    const lastAssistant = intake.aiMessages[lastAssistantIdx];
-    let lastMessage = lastAssistant.content;
-    let lastType = 'text';
-    let lastOptions = [];
-    try {
-      const obj = JSON.parse(lastAssistant.content);
-      if (obj && obj.question) lastMessage = obj.question;
-      if (obj && obj.type) lastType = obj.type;
-      if (obj && obj.options) lastOptions = obj.options;
-    } catch (e) { /* not JSON */ }
-    // Prefer aiHistory metadata if it matches.
-    if (intake.aiHistory && intake.aiHistory.length > 0) {
-      const last = intake.aiHistory[intake.aiHistory.length - 1];
-      if (last && last.message) {
-        lastMessage = last.message;
-        lastType = last.type || lastType;
-        lastOptions = last.options || lastOptions;
-      }
-    }
-
-    // Force chips back to text just like the AI fetch path does.
-    if (lastType === 'chips') lastType = 'text';
-
-    this._aiIntakeRenderQuestion({ question: lastMessage, type: lastType, options: lastOptions });
-    this._renderIntakeBackButton();
-
-    // If the very last message in the log is a user message (in-flight when
-    // they refreshed), kick off the next AI turn so we don't strand them.
-    if (intake.aiMessages[intake.aiMessages.length - 1].role === 'user') {
-      this._aiIntakeFetchNext();
-    }
+    this._renderIntakeFromState();
   },
 
   // Renders the hardcoded goalConfirm opener. Every subsequent turn is driven
   // by the AI through _aiIntakeFetchNext.
   _renderIntakePhase() {
-    const intake = state.action.intake;
-    if (intake.phase !== 'goalConfirm') {
-      // Anything other than the opener should not be coming through here.
-      // Trigger an AI fetch as a recovery.
-      this._aiIntakeFetchNext();
-      return;
-    }
-    // v857: the legacy goalConfirm chip screen is DEAD (the mission-confirm
-    // beat owns goal confirmation since v845). Any path that lands here
-    // (e.g. the back button's old fallback) re-enters the beats instead.
-    this._renderMissionConfirm();
+    // v871: legacy entry; the deterministic renderer decides everything.
+    this._renderIntakeFromState();
   },
 
   // Renders / refreshes the back button in the intake header. Visible whenever
@@ -3402,7 +3369,9 @@ const ActionExperience = {
     if (!intake) return;
     const userTurns = (state.action.intake && state.action.intake.aiMessages || [])
       .filter(m => m.role === 'user').length;
-    this._cineRenderChrome(userTurns > 0, () => this._intakeBack());
+    // v871: ONE back path (_aiIntakeBack); the legacy _intakeBack (transcript
+    // bubble surgery) is dead for the beat flow.
+    this._cineRenderChrome(userTurns > 0, () => this._aiIntakeBack());
   },
 
   // Back: pop the last user message + last AI message from the conversation,
@@ -3534,6 +3503,14 @@ const ActionExperience = {
   // decides when each of the four snapshot fields is filled.
   async _aiIntakeFetchNext() {
     const intake = state.action.intake;
+    // v871: single-flight. Restore, settle, doors, and retry can all decide a
+    // fetch is needed; only one runs, the rest are no-ops.
+    if (this._intakeFetching) return;
+    this._intakeFetching = true;
+    try { await this._aiIntakeFetchNextInner(intake); } finally { this._intakeFetching = false; }
+  },
+
+  async _aiIntakeFetchNextInner(intake) {
     // v867: a restored/seeded intake can carry messages without the snapshot
     // scaffolding (the logged "reading 'goalConfirm' of undefined" promise
     // crash). Heal the shape before any read.
@@ -3671,8 +3648,9 @@ The goal and timeframe are already locked from Clarity (see snapshot); they are 
           mainMove:    { msg: "If you had to guess, what's the one move that would actually move the needle?", type: 'text' }
         }[missing];
         intake.aiMessages.push({ role: 'assistant', content: fallback.msg });
+        intake.aiHistory.push({ message: fallback.msg, type: fallback.type, options: fallback.opts || [] });
         persistNow();
-        this._aiIntakeRenderQuestion({ question: fallback.msg, type: fallback.type, options: fallback.opts || [] });
+        this._renderIntakeFromState();
         return;
       }
 
@@ -3680,8 +3658,7 @@ The goal and timeframe are already locked from Clarity (see snapshot); they are 
       // Save the rendering metadata so back nav can restore the same input type.
       intake.aiHistory.push({ message, type, options });
       persistNow();
-      this._aiIntakeRenderQuestion({ question: message, type, options });
-      this._renderIntakeBackButton();
+      this._renderIntakeFromState();
     } catch (e) {
       console.warn('AI intake error', e);
       // v870 (Malik): one SILENT retry first, a single radio blip should never
@@ -3726,16 +3703,9 @@ The goal and timeframe are already locked from Clarity (see snapshot); they are 
       options: parsed.options || [],
       chips: parsed.options || []
     };
-    // v860: the outgoing beat (doors, or the previous AI question) rises into
-    // the blurred past stack, carrying the answer the user just gave.
-    const _msgs = state.action.intake.aiMessages || [];
-    const _lastUser = (_msgs.length && _msgs[_msgs.length - 1].role === 'user') ? _msgs[_msgs.length - 1].content : '';
-    this._stackPast(current, _lastUser, 'q:' + (fakeQ.prompt || '').slice(0, 40));
+    // v871: the past stack is built declaratively by _renderIntakeFromState;
+    // this function only paints the CURRENT question.
     current.innerHTML = this._buildCurrentSectionHtml(fakeQ);
-    try {
-      const cb = current.firstElementChild;
-      if (cb) cb.setAttribute('data-beat', 'q:' + (fakeQ.prompt || '').slice(0, 40));
-    } catch (_) {}
     this._cineActivate();
 
     this._cineRenderChrome(
@@ -4167,44 +4137,43 @@ The goal and timeframe are already locked from Clarity (see snapshot); they are 
     }, 280);
   },
 
+  // v871: THE one back path. Pop the current question AND its aiHistory
+  // metadata (the old version left history unpopped, so later restores got
+  // the wrong input type), stash the full pendingEdit shape (the unchanged-
+  // answer short-circuit depends on cachedAssistant/cachedHistory/
+  // cachedSnapshot), clear the snapshot so the AI re-decides on re-answer,
+  // then re-derive the whole screen.
   _aiIntakeBack() {
     const intake = state.action.intake;
     if (!intake.aiMessages || intake.aiMessages.length < 2) return;
-    // Pop the last assistant + last user from the conversation.
-    while (intake.aiMessages.length > 0) {
-      const last = intake.aiMessages[intake.aiMessages.length - 1];
-      intake.aiMessages.pop();
-      if (last.role === 'user') break;
+    let poppedAssistant = null, poppedHistory = null, poppedUser = null;
+    while (intake.aiMessages.length && intake.aiMessages[intake.aiMessages.length - 1].role === 'assistant') {
+      poppedAssistant = intake.aiMessages.pop();
+      if (Array.isArray(intake.aiHistory) && intake.aiHistory.length) poppedHistory = intake.aiHistory.pop();
     }
-    // Also pop the prior assistant to re-show it.
-    let lastAssistantIdx = -1;
-    for (let i = intake.aiMessages.length - 1; i >= 0; i--) {
-      if (intake.aiMessages[i].role === 'assistant') { lastAssistantIdx = i; break; }
+    if (intake.aiMessages.length && intake.aiMessages[intake.aiMessages.length - 1].role === 'user') {
+      poppedUser = intake.aiMessages.pop();
     }
-    if (lastAssistantIdx < 0) {
-      // No prior question to return to: just refetch the opener.
+    // Back past the first AI turn = land on the doors beat cleanly.
+    const hasUserLeft = intake.aiMessages.some(m => m.role === 'user');
+    if (!hasUserLeft) {
       intake.aiMessages = [];
-      this._startAiIntake();
+      intake.aiHistory = [];
+      intake._pendingEdit = null;
+      persistNow();
+      this._doorsLive = true;
+      this._renderIntakeFromState();
       return;
     }
-    // Remove the assistant we just popped to re-show from history (we'll re-add it via render).
-    const restoreAssistant = intake.aiMessages.splice(lastAssistantIdx, 1)[0];
+    intake._pendingEdit = {
+      prevAnswer: (poppedUser && poppedUser.content) || '',
+      cachedAssistant: poppedAssistant ? poppedAssistant.content : '',
+      cachedHistory: poppedHistory,
+      cachedSnapshot: JSON.parse(JSON.stringify(intake.aiSnapshot || {}))
+    };
+    intake.aiSnapshot = { goalConfirm: '', timeframe: '', pastProgress: '', mainMove: '' };
     persistNow();
-
-    // Remove the last two transcript bubbles (the AI question that was current
-    // before back, plus the user's previous answer that we're discarding).
-    const transcriptEl = this.pageWrap.querySelector('.action-intake__transcript');
-    if (transcriptEl) {
-      const bubbles = Array.from(transcriptEl.querySelectorAll('.action-chat__bubble'));
-      [bubbles[bubbles.length - 1], bubbles[bubbles.length - 2]].forEach(b => { if (b && b.parentNode) b.parentNode.removeChild(b); });
-    }
-
-    // Render the prior assistant question in the current section.
-    let parsed = parseModelJson(restoreAssistant.content);
-    if (!parsed) parsed = { question: restoreAssistant.content, type: 'text' };
-    intake.aiMessages.push(restoreAssistant);
-    persistNow();
-    this._aiIntakeRenderQuestion(parsed);
+    this._renderIntakeFromState();
   },
 
   // After ready:true, briefly show a "Building your plan..." state, then kick off
