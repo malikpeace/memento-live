@@ -3534,6 +3534,12 @@ const ActionExperience = {
   // decides when each of the four snapshot fields is filled.
   async _aiIntakeFetchNext() {
     const intake = state.action.intake;
+    // v867: a restored/seeded intake can carry messages without the snapshot
+    // scaffolding (the logged "reading 'goalConfirm' of undefined" promise
+    // crash). Heal the shape before any read.
+    if (!intake.aiSnapshot) intake.aiSnapshot = { goalConfirm: '', timeframe: '', pastProgress: '', mainMove: '' };
+    if (!Array.isArray(intake.aiHistory)) intake.aiHistory = [];
+    if (!intake.answers) intake.answers = {};
     const ca = state.clarity.answers || {};
     const ns = ca.neutronStar || '';
     const tfHint = ca.timeframe || ca.timeHorizon || '';

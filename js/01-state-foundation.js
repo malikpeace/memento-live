@@ -222,6 +222,17 @@ function loadState() {
       const parsed = JSON.parse(raw);
       if (!looksLikeState(parsed)) throw new Error('state schema mismatch');
       loaded = parsed;
+    } else {
+      // v867 (Malik's relaunch-to-onboarding glitch): a MISSING primary key
+      // must fall to the backup exactly like a corrupt one. iOS can relaunch
+      // a killed PWA with the primary write torn or evicted; before this,
+      // that booted a real user straight into onboarding without ever
+      // looking at the backup sitting next to it.
+      const braw = localStorage.getItem(APP_KEY + '_backup');
+      if (braw) {
+        const b = JSON.parse(braw);
+        if (looksLikeState(b)) { loaded = b; recovered = true; }
+      }
     }
   } catch (e) {
     hadCorrupt = true;

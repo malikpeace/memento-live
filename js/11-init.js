@@ -147,7 +147,14 @@ document.addEventListener('keydown', (e) => {
             if (typeof TabBar !== 'undefined' && TabBar.switchTo) TabBar.switchTo(v.slice(4));
             const app2 = document.getElementById('app'); if (app2) app2.style.opacity = '1';
           }
-        } catch (_) {}
+        } catch (_) {
+          // v867: a crashed restore must NEVER strand the user on the
+          // invisible app (opacity 0 behind the dismissed splash). Drop the
+          // bad saved view and land on the visible home.
+          try { rememberView(null); } catch (_2) {}
+          try { const app3 = document.getElementById('app'); if (app3) app3.style.opacity = '1'; } catch (_2) {}
+          try { if (typeof TabBar !== 'undefined' && TabBar.switchTo) TabBar.switchTo('home'); } catch (_2) {}
+        }
       }, 50);
     }
   } catch (_) { /* never block the page if state is malformed */ }
