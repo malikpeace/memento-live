@@ -3056,6 +3056,14 @@ body:has(.clarity-exp.open)::after { display: none; }
   min-height: calc(100dvh - var(--safe-t, 0px) - 108px);
   justify-content: flex-start;
 }
+/* v883 (Malik: Continue floats mid-screen): the beats fill the viewport
+   below the top anchor so their CTAs land near the bottom like Clarity and
+   onboarding (the beat composition law). Direct height, no flex-grow. */
+.action-intake--cine .action-intake__current .intake-beat,
+.action-intake__past ~ .action-intake__current .intake-beat {
+  min-height: calc(100dvh - var(--safe-t, 0px) - 132px);
+  padding-bottom: calc(var(--safe-b, 0px) + 8px);
+}
 /* Flat iMessage-style bubbles: solid fills, no gradients, no borders,
    no glassy blur. Tight corner radius with one squared-off corner facing
    the speaker. */
@@ -3676,15 +3684,15 @@ html.theme-light .action-exp:has(.action-intake-page--cine) .action-exp__nav {
 .action-intake__past .action-cine__composer,
 .action-intake__past .action-cine__send,
 .action-intake__past .intake-beat__spacer { display: none; }
-/* When a past stack exists, the live beat gives up a little height so the
-   blurred tail of the previous beat peeks above the fold after auto-scroll. */
-.action-intake__past ~ .action-intake__current .intake-beat,
-.action-intake__past + .action-intake__current .intake-beat {
-  min-height: calc(100dvh - var(--safe-t) - 320px);
-}
-/* The page scrolls once a past stack exists, so the live section needs real
-   clearance under it or the fixed bottom nav overlaps the last chip. */
-.action-intake__past ~ .action-intake__current {
+/* (v883: the -320px stacked-beat cap is DEAD. It matched even when the past
+   stack was EMPTY (the sibling exists display:none), silently shortening
+   every recap/doors beat, THE floating-Continue bug Malik screenshotted.
+   The unified beat height near .action-intake__current now governs.) */
+/* The page scrolls once a past stack HAS ITEMS (v883: the bare sibling
+   selector matched the empty display:none stack too, inflating every fresh
+   beat by 140px and scrolling the recap's top off screen), so the live
+   section needs real clearance under it or the nav overlaps the last chip. */
+.action-intake__past.has-items ~ .action-intake__current {
   padding-bottom: calc(140px + var(--safe-b, 0px));
 }
 .intake-past__ans {

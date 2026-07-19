@@ -3056,6 +3056,7 @@ const ActionExperience = {
         (item.a ? '<div class="intake-past__ans">' + esc(item.a) + '</div>' : '');
     }).join('');
     past.style.display = v.past.length ? '' : 'none';
+    past.classList.toggle('has-items', v.past.length > 0);
 
     try { this.navEl.innerHTML = ''; } catch (e) {}
     if (v.mode === 'summary') {
