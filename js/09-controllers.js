@@ -4894,7 +4894,16 @@ const TabBar = {
             '<div class="you-swatches" id="prefAccent">' + swatchHtml + '</div>' +
             '<input type="color" id="prefAccentCustomInput" value="' + customHex + '" aria-label="Pick a custom accent color" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;" />' +
             toggleRow('prefMatchMemento', 'Match Memento to color', 'Tints your Memento card toward the accent you pick.', prefs.matchMemento !== false))) +
-        toggleRow('prefLightMode', 'Light mode', 'Switch the whole app to a bright, premium off-white theme.', prefs.theme === 'light') +
+        (function () {
+          const cur = prefs.theme === 'light' ? 'light' : (prefs.theme === 'dark' ? 'dark' : 'auto');
+          const seg = [['auto', 'Auto'], ['light', 'Light'], ['dark', 'Dark']].map(function (o) {
+            return '<button type="button" class="pref-seg__opt' + (cur === o[0] ? ' is-on' : '') + '" data-theme-mode="' + o[0] + '" aria-pressed="' + (cur === o[0] ? 'true' : 'false') + '">' + o[1] + '</button>';
+          }).join('');
+          return '<div class="pref-row">' +
+            '<div class="pref-row__text"><div class="pref-row__title">Appearance</div></div>' +
+            '<div class="pref-seg" id="prefThemeMode" role="group" aria-label="Appearance. Auto follows your device.">' + seg + '</div>' +
+          '</div>';
+        })() +
         toggleRow('prefFlatUi', 'Glass', 'Glassy, blurred surfaces with depth. Turn off for a flat, high-contrast matte look.', !prefs.flatUi) +
         toggleRow('prefSound', 'Sound', 'Quiet synthesized moments: the typewriter, marking a move done, the card coming alive.', prefs.soundOn !== false) +
         toggleRow('prefFlatBg', 'Minimal background', 'Hide the ambient orbs and glow for a flat, paper-like surface.', !!prefs.flatBg) +
@@ -5172,15 +5181,20 @@ const TabBar = {
       if (on && state.ui) { state.ui.unlockQueue = []; state.ui.pendingReveal = ''; }
       try { if (typeof renderGrid === 'function') renderGrid(); if (typeof renderAll === 'function') renderAll(); } catch (e) {}
     });
-    // Light mode: wired manually so the switch runs through applyThemeChange()
-    // for the buttery cross-fade instead of a hard snap.
-    const lmEl = document.getElementById('prefLightMode');
-    if (lmEl) lmEl.addEventListener('click', () => {
-      const on = !lmEl.classList.contains('pref-toggle--on');
-      lmEl.classList.toggle('pref-toggle--on', on);
-      lmEl.setAttribute('aria-checked', on ? 'true' : 'false');
-      applyThemeChange(() => { state.prefs.theme = on ? 'light' : 'dark'; });
-      persistNow();
+    // Appearance: Auto / Light / Dark. Runs through applyThemeChange() for
+    // the cross-fade; Auto resolves against the device (themeIsLight).
+    const themeSeg = document.getElementById('prefThemeMode');
+    if (themeSeg) themeSeg.querySelectorAll('[data-theme-mode]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const mode = btn.getAttribute('data-theme-mode');
+        themeSeg.querySelectorAll('[data-theme-mode]').forEach(b => {
+          const on = b === btn;
+          b.classList.toggle('is-on', on);
+          b.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+        applyThemeChange(() => { state.prefs.theme = mode; });
+        persistNow();
+      });
     });
     wireToggle('prefFlatBg', (on) => { state.prefs.flatBg = on; });
     // The toggle reads as GLASS (Malik, v574): ON = glassy (flatUi off), OFF = flat.

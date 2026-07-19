@@ -858,6 +858,25 @@ body.density-compact .sidebar__inner { gap: 8px; }
 .pref-row__text { flex: 1; min-width: 0; }
 .pref-row__title { font-size: var(--fs-base); font-weight: 600; color: var(--text-1); }
 .pref-row__sub { font-size: 0.75rem; color: var(--text-3); line-height: 1.4; margin-top: 2px; }
+/* v863: Auto/Light/Dark appearance segment. Fill + inset highlight, no
+   borders, tight radius per the design law. */
+.pref-seg {
+  flex: 0 0 auto; display: inline-flex; gap: 2px; padding: 2px;
+  border-radius: calc(9px * var(--rx, 1));
+  background: rgba(var(--ink), 0.06);
+  box-shadow: inset 0 1px 0 rgba(var(--ink), 0.04);
+}
+.pref-seg__opt {
+  border: 0; cursor: pointer; padding: 6px 12px;
+  border-radius: calc(7px * var(--rx, 1));
+  background: transparent; color: rgba(var(--ink), 0.55);
+  font-family: var(--font); font-size: 0.8125rem; font-weight: 600;
+  transition: background var(--t-base) ease, color var(--t-base) ease;
+}
+.pref-seg__opt.is-on {
+  background: var(--solid-bg); color: var(--solid-fg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+}
 .pref-toggle {
   flex: 0 0 auto; width: 46px; height: 28px; border-radius: 999px; cursor: pointer;
   background: var(--kfill-10); border: 1px solid rgba(var(--ink),0.14);

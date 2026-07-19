@@ -150,7 +150,7 @@ const DEFAULT_STATE = {
   // unlockAll: the unlock-ladder escape hatch. True bypasses module gating
   // entirely (set by the user in Settings/More, or by migration for users who
   // already completed Clarity).
-  prefs: { accent: 'default', accentCustom: '#3ad9f5', theme: 'dark', flatBg: false, background: { type: 'default', value: '' }, bgDim: 0.2, reduceMotion: false, density: 'comfortable', uiRadius: 1, uiGlass: 0, uiBlur: 1, anchorQuote: '', trashWindowDays: 30, guaranteeVariant: 'a', unlockAll: false, appearanceChosen: false, look: '', motionTilt: true, motionGranted: false, cardTilt: false, reminder: { enabled: false, time: '09:00', quietStart: '22:00', quietEnd: '07:00' } },
+  prefs: { accent: 'default', accentCustom: '#3ad9f5', theme: 'auto', flatBg: false, background: { type: 'default', value: '' }, bgDim: 0.2, reduceMotion: false, density: 'comfortable', uiRadius: 1, uiGlass: 0, uiBlur: 1, anchorQuote: '', trashWindowDays: 30, guaranteeVariant: 'a', unlockAll: false, appearanceChosen: false, look: '', motionTilt: true, motionGranted: false, cardTilt: false, reminder: { enabled: false, time: '09:00', quietStart: '22:00', quietEnd: '07:00' } },
   // Optional, additive per-day memo of AI insight/accountability output so the
   // "Surface a pattern" button does not re-bill the API every press on the same
   // day. day is an ISO date; a mismatch (or any error) falls through to a live
@@ -792,8 +792,15 @@ function applyPrefs() {
     // Monochrome: desaturate the whole app (filter lives on <html>).
     if (document.documentElement) document.documentElement.classList.toggle('mono-theme', accent === 'mono');
     // Light theme: the class lives on <html> so the :root ink-derived tokens
-    // re-resolve. Default is dark (only flip when explicitly 'light').
-    if (document.documentElement) document.documentElement.classList.toggle('theme-light', p.theme === 'light');
+    // re-resolve. v863: 'auto' (the default) follows the device via
+    // prefers-color-scheme; 'light'/'dark' are manual overrides.
+    const _isLight = themeIsLight(p);
+    if (document.documentElement) document.documentElement.classList.toggle('theme-light', _isLight);
+    // Keep the iOS chrome (status bar / PWA title bar) matching the surface.
+    try {
+      const tc = document.querySelector('meta[name="theme-color"]');
+      if (tc) tc.setAttribute('content', _isLight ? '#eef0f3' : '#000000');
+    } catch (eTc) {}
     // Chosen starting look (AppearancePicker): a durable body.look-<id> hook so
     // each pick is a first-class visible state, even on the lowfx mobile path
     // where blur/glass deltas flatten. Re-applied here on every boot from prefs.
@@ -947,6 +954,28 @@ function applyCustomBackground(p) {
 // run the mutation (which flips the theme class), then drop the transition so
 // it never affects normal interactions. Respects reduced motion (instant).
 let _themeAnimTimer = null;
+// v863: resolve the effective theme. 'auto' (default) follows the device's
+// prefers-color-scheme, live; 'light'/'dark' are manual picks.
+function themeIsLight(p) {
+  const t = (p && p.theme) || 'auto';
+  if (t === 'light') return true;
+  if (t === 'dark') return false;
+  try { return !window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) { return false; }
+}
+
+// While in Auto, re-apply (with the cross-fade) the moment the device flips
+// its appearance, even mid-session. addListener fallback covers older iOS.
+try {
+  const _sysThemeMq = window.matchMedia('(prefers-color-scheme: dark)');
+  const _onSysTheme = () => {
+    try {
+      if (((state && state.prefs && state.prefs.theme) || 'auto') === 'auto') applyThemeChange(function () {});
+    } catch (e) {}
+  };
+  if (_sysThemeMq.addEventListener) _sysThemeMq.addEventListener('change', _onSysTheme);
+  else if (_sysThemeMq.addListener) _sysThemeMq.addListener(_onSysTheme);
+} catch (e) {}
+
 function applyThemeChange(mutate) {
   try {
     const el = document.documentElement;
