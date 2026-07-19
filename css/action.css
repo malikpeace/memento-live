@@ -2271,7 +2271,12 @@ body:has(.clarity-exp.open)::after { display: none; }
 .action-plan__mark-complete:active { transform: scale(0.97); }
 
 /* ===== Restored Action Experience inner layout ===== */
-.action-exp__close {
+/* v880 (Malik's double-X screenshot): the module's own plain X stacked with
+   the global frosted-circle close (FullscreenClose), offset ~4px, reading as
+   two X's. The global one is the approved look and handles the close; this
+   duplicate is DEAD. */
+.action-exp__close { display: none !important; }
+.action-exp__close-dead {
   position: absolute; top: calc(env(safe-area-inset-top, 0px) + 12px); right: 16px; z-index: 30;
   width: 44px; height: 44px;
   background: transparent;
