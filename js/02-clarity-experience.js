@@ -2509,6 +2509,19 @@ const ActionExperience = {
   // between states at partial opacity. This settles it: whenever we are open
   // but not fully 'open', snap to the stable end state. Called on every
   // resume and at the start of every content render.
+  // v864: tracked timers (mirrors ClarityExperience), cleared on close so the
+  // recap typewriter can't keep ticking into a closed module.
+  _clearTimers() {
+    if (this._timers) this._timers.forEach(t => clearTimeout(t));
+    this._timers = [];
+  },
+  _setTimeout(fn, ms) {
+    const t = setTimeout(fn, ms);
+    if (!this._timers) this._timers = [];
+    this._timers.push(t);
+    return t;
+  },
+
   _settleOpenState() {
     try {
       if (!this.isOpen || !this.el) return;
@@ -2668,6 +2681,7 @@ const ActionExperience = {
     } catch (e) {}
     this.isOpen = true;
     this._openedAt = Date.now();
+    this._recapTyped = false;
     rememberView('action');
     FullscreenClose.show('action');
     if (this._settleTimer) {
@@ -2737,6 +2751,7 @@ const ActionExperience = {
   close() {
     if (!this.isOpen) return;
     this.isOpen = false;
+    this._clearTimers();
     if (recallView() === 'action') rememberView(null);
     FullscreenClose.hide();
     if (this._settleTimer) {
@@ -2959,6 +2974,65 @@ const ActionExperience = {
       '</div>';
     this._cineActivate();
     host.querySelector('#missionConfirmBtn').addEventListener('click', () => this._renderDoors());
+    this._typeRecapBeat(host);
+  },
+
+  // v864 (Malik): the recap types in like Clarity, no instant pop. Lines type
+  // sequentially with formatting preserved; layout is reserved up front so
+  // nothing shifts; the CTA fades in when typing ends; any tap skips. Types
+  // once per open (resume re-renders show instantly).
+  _typeRecapBeat(host) {
+    try {
+      const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduce || this._recapTyped) return;
+      this._recapTyped = true;
+      const beat = host.querySelector('.intake-beat');
+      const body = beat && beat.querySelector('.intake-beat__body');
+      const cta = beat && beat.querySelector('.intake-beat__cta');
+      if (!beat || !body || !cta) return;
+      body.style.minHeight = body.offsetHeight + 'px';
+      cta.style.opacity = '0'; cta.style.pointerEvents = 'none';
+      cta.style.transition = 'opacity 0.5s ease';
+      const stash = Array.from(body.children).map((el) => {
+        const segs = Array.from(el.childNodes).map((n) =>
+          n.nodeType === 3 ? { text: n.textContent, el: null } : { text: n.textContent, el: n.cloneNode(false) });
+        return { el, html: el.innerHTML, segs, len: segs.reduce((a, s) => a + s.text.length, 0) };
+      });
+      stash.forEach((s) => { s.el.innerHTML = ''; });
+      let done = false;
+      const showCta = () => { cta.style.opacity = '1'; cta.style.pointerEvents = 'auto'; };
+      const finish = () => {
+        if (done) return; done = true;
+        stash.forEach((s) => { s.el.innerHTML = s.html; });
+        showCta();
+      };
+      beat.addEventListener('click', () => finish());
+      const typeLine = (li) => {
+        if (done) return;
+        if (li >= stash.length) { done = true; showCta(); return; }
+        const s = stash[li]; let i = 0;
+        const renderUpto = (n) => {
+          s.el.textContent = '';
+          let rem = n;
+          for (const seg of s.segs) {
+            if (rem <= 0) break;
+            const take = Math.min(rem, seg.text.length);
+            if (seg.el) { const c = seg.el.cloneNode(false); c.textContent = seg.text.slice(0, take); s.el.appendChild(c); }
+            else s.el.appendChild(document.createTextNode(seg.text.slice(0, take)));
+            rem -= take;
+          }
+        };
+        const tick = () => {
+          if (done) return;
+          renderUpto(i); i++;
+          try { if (typeof MementoSound !== 'undefined') MementoSound.tick(); } catch (e) {}
+          if (i <= s.len) this._setTimeout(tick, 10 + Math.random() * 8);
+          else { s.el.innerHTML = s.html; this._setTimeout(() => typeLine(li + 1), 420); }
+        };
+        tick();
+      };
+      typeLine(0);
+    } catch (e) {}
   },
 
   // v860: past beats stay visible above the current one, blurred and inert,
