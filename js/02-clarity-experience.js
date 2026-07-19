@@ -2528,6 +2528,64 @@ const ActionExperience = {
     return t;
   },
 
+  // v874: keep the intake input visible above the iOS keyboard by scrolling
+  // the CONVERSATION (the inner scroller), not by fighting the window pan.
+  // The settle-glide recipe needs a high-anchored field; this one sits low,
+  // so gliding hid the typed text under the keyboard (Malik's screenshot).
+  _bindIntakeKeyboardKeep(field) {
+    if (this._kbKeepCleanup) { this._kbKeepCleanup(); this._kbKeepCleanup = null; }
+    const vv = window.visualViewport;
+    if (!field || !vv) return;
+    // The v102 onboarding mechanism, ported: the conversation auto-scrolls to
+    // its bottom, so there is NO inner headroom to absorb the keyboard (proved
+    // in-pane: scroller already at max). The overlay itself must SHRINK to the
+    // visual viewport so the layout reflows above the keyboard.
+    const restore = () => {
+      try {
+        this.el.style.height = ''; this.el.style.maxHeight = '';
+        this.el.style.top = ''; this.el.style.bottom = '';
+      } catch (e) {}
+    };
+    const keep = () => {
+      try {
+        if (document.activeElement !== field) { restore(); return; }
+        const kbUp = vv.height < window.innerHeight - 40;
+        if (kbUp) {
+          this.el.style.top = vv.offsetTop + 'px';
+          this.el.style.bottom = 'auto';
+          this.el.style.height = vv.height + 'px';
+          this.el.style.maxHeight = vv.height + 'px';
+        } else {
+          restore();
+        }
+        const sc = this.pageWrap && this.pageWrap.querySelector('.action-exp__page-inner');
+        if (sc) sc.scrollTop = sc.scrollHeight;
+      } catch (e) {}
+    };
+    let sweeps = [];
+    const onFocus = () => {
+      vv.addEventListener('resize', keep);
+      vv.addEventListener('scroll', keep);
+      // The keyboard animates in over ~250-500ms; sweep a few times after.
+      sweeps = [80, 260, 450, 700].map(ms => setTimeout(keep, ms));
+    };
+    const onBlur = () => {
+      vv.removeEventListener('resize', keep);
+      vv.removeEventListener('scroll', keep);
+      sweeps.forEach(t => clearTimeout(t)); sweeps = [];
+      restore();
+    };
+    field.addEventListener('focus', onFocus);
+    field.addEventListener('blur', onBlur);
+    field.addEventListener('input', keep);
+    this._kbKeepCleanup = () => {
+      onBlur();
+      field.removeEventListener('focus', onFocus);
+      field.removeEventListener('blur', onBlur);
+      field.removeEventListener('input', keep);
+    };
+  },
+
   _settleOpenState() {
     try {
       if (!this.isOpen || !this.el) return;
@@ -2758,6 +2816,7 @@ const ActionExperience = {
     if (!this.isOpen) return;
     this.isOpen = false;
     this._clearTimers();
+    if (this._kbKeepCleanup) { this._kbKeepCleanup(); this._kbKeepCleanup = null; }
     if (recallView() === 'action') rememberView(null);
     FullscreenClose.hide();
     if (this._settleTimer) {
@@ -3064,7 +3123,7 @@ const ActionExperience = {
       this._aiIntakeRenderQuestion(v.current);
       this._renderIntakeBackButton();
     }
-    try { const sc = intakeEl.closest('.action-exp__page-wrap') || this.pageWrap; if (sc) sc.scrollTop = sc.scrollHeight; } catch (e) {}
+    try { const sc = this.pageWrap && this.pageWrap.querySelector('.action-exp__page-inner'); if (sc) sc.scrollTop = sc.scrollHeight; } catch (e) {}
   },
 
   // Back-compat entry: everything that used to call the mission beat directly.
@@ -3746,12 +3805,14 @@ The goal and timeframe are already locked from Clarity (see snapshot); they are 
     // this function only paints the CURRENT question.
     current.innerHTML = this._buildCurrentSectionHtml(fakeQ);
     this._cineActivate();
-    // v873 (Malik: "the text box moves too much"): the Action input gets the
-    // same keyboard-settle recipe as Clarity/onboarding, with the intake's
-    // scrolled position as the rest point instead of zero.
+    // v874 (Malik: typed text invisible under the keyboard): the settle-glide
+    // recipe is WRONG for this surface, its precondition is a HIGH field and
+    // this one sits low, so the glide scrolled the input back under the
+    // keyboard while typing. Instead: keep the input visible by scrolling the
+    // conversation (the inner scroller) whenever the keyboard overlaps it.
     try {
       const kbField = current.querySelector('#intakeInput');
-      if (kbField && typeof bindKeyboardSettle === 'function') bindKeyboardSettle(this, kbField);
+      if (kbField) this._bindIntakeKeyboardKeep(kbField);
     } catch (eKb) {}
 
     this._cineRenderChrome(
