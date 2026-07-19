@@ -3365,7 +3365,8 @@ html.lowfx #actionExpStars {
 }
 .action-cine__q.wiz__question {
   min-height: 4.6em;
-  text-wrap: balance;
+  /* NO text-wrap: balance: this question TYPES in (v865 law, css/action.css
+     .intake-beat__sum comment): balance re-wraps every line per character. */
   margin-bottom: 0;
 }
 .action-cine__q b { color: #fff; }
