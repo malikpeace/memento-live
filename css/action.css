@@ -3572,3 +3572,11 @@ html.theme-light .action-exp .action-exp__nav {
 }
 html.theme-light .action-exp .action-chat__input-row { background: rgba(6, 6, 8, 0.72); }
 html.theme-light .action-exp .action-chat__input-row::before { background: linear-gradient(to top, rgba(6, 6, 8, 0.6), transparent); }
+
+/* v856: the change-goal / cine question page, contrast made EXPLICIT (Malik's
+   unreadable screenshot; the dimming itself was the v855 stranded state, but
+   this page now states its colors instead of inheriting them). */
+.action-intake--cine .action-cine__q { color: rgba(255, 255, 255, 0.96); }
+.action-intake--cine .wiz__text-input,
+.action-intake--cine .action-cine__input { color: #fff; background: rgba(255, 255, 255, 0.06); }
+.action-intake--cine .wiz__text-input::placeholder { color: rgba(255, 255, 255, 0.48); }
