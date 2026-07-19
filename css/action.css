@@ -3594,6 +3594,19 @@ body.exit-grabber .action-exp__close { display: none !important; }
   .action-intake__current .intake-beat { animation: none; }
 }
 
+/* v870: the intake retry state. One quiet tappable block, no error jargon. */
+.intake-retry {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 6px;
+  width: 100%; text-align: left; border: none; cursor: pointer;
+  background: rgba(var(--ink), 0.05); box-shadow: var(--glass-highlight);
+  border-radius: calc(14px * var(--rx, 1)); padding: 18px 20px;
+  font-family: var(--font); margin-top: 8px;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.intake-retry:active { transform: scale(0.985); }
+.intake-retry__line { font-size: 0.9375rem; color: rgba(var(--ink), 0.92); line-height: 1.4; }
+.intake-retry__cta { font-size: 0.875rem; font-weight: 700; color: var(--text-hi); }
+
 /* v860 (Malik): the clarity summary beat. Sentence-sized, their own words. */
 .intake-beat__sum {
   font-size: 1.375rem; font-weight: 600; letter-spacing: -0.02em; line-height: 1.3;

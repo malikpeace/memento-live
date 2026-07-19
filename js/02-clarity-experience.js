@@ -3683,13 +3683,27 @@ The goal and timeframe are already locked from Clarity (see snapshot); they are 
       this._aiIntakeRenderQuestion({ question: message, type, options });
       this._renderIntakeBackButton();
     } catch (e) {
-      // Network or parse failure: show error inline rather than silently advancing.
       console.warn('AI intake error', e);
+      // v870 (Malik): one SILENT retry first, a single radio blip should never
+      // surface. Only a second failure shows the human line + tap-to-retry.
+      if (!this._intakeRetried) {
+        this._intakeRetried = true;
+        this._setTimeout(() => { if (this.isOpen) this._aiIntakeFetchNext(); }, 1600);
+        return;
+      }
+      this._intakeRetried = false;
       const currentEl2 = this.pageWrap.querySelector('.action-intake__current');
       if (currentEl2) {
         currentEl2.innerHTML = `
-          <div class="action-chat__bubble action-chat__bubble--ai action-chat__bubble--current">Something went wrong on my end. Try sending that again, or refresh if it sticks.</div>
-          <div class="action-chat__error">${esc(e.message || 'Connection error')}</div>`;
+          <button type="button" class="intake-retry" id="intakeRetryBtn">
+            <span class="intake-retry__line">Oops, something went wrong with Memento.</span>
+            <span class="intake-retry__cta">Tap to retry</span>
+          </button>`;
+        const btn = currentEl2.querySelector('#intakeRetryBtn');
+        if (btn) btn.addEventListener('click', () => {
+          currentEl2.innerHTML = '<div class="action-cine__thinking" aria-label="Thinking"><i></i></div>';
+          this._aiIntakeFetchNext();
+        });
       }
     }
   },
@@ -3697,6 +3711,7 @@ The goal and timeframe are already locked from Clarity (see snapshot); they are 
   // Renders the AI's current question into the current section, with a smooth
   // swap that doesn't unmount the transcript.
   _aiIntakeRenderQuestion(parsed) {
+    this._intakeRetried = false; // a question landed = the line is healthy again
     this._settleOpenState();
     const intake = this.pageWrap.querySelector('.action-intake');
     const transcript = intake && intake.querySelector('.action-intake__transcript');
