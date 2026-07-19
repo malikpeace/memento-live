@@ -2278,9 +2278,6 @@ body:has(.clarity-exp.open)::after { display: none; }
 }
 /* Light mode: the black fade would bleed a dark strip onto the off-white
    surface. Fade to the light surface instead. */
-html.theme-light .action-exp__nav {
-  background: linear-gradient(to top, rgba(238,240,243,0.95) 40%, transparent);
-}
 .action-exp__nav-btn {
   padding: 14px 28px;
   border-radius: var(--r-ctrl);
@@ -3312,8 +3309,6 @@ html.lowfx #actionExpStars {
 
 
 /* Light theme: the chat compose bar was hardcoded near-black. */
-html.theme-light .action-chat__input-row { background: rgba(248, 248, 250, 0.72); }
-html.theme-light .action-chat__input-row::before { background: linear-gradient(to top, rgba(248, 248, 250, 0.6), transparent); }
 
 /* ONE fixed question line for the Action wizard (v527), mirroring the
    Clarity wizard: every question headline, chips or free text, starts at
@@ -3428,14 +3423,6 @@ html.theme-light .action-chat__input-row::before { background: linear-gradient(t
    page, dark ink via the wiz tokens); only the CTA + thinking dot need their
    light-scene variants. The loading beat and the first-move reveal are star
    moments and stay DARK in light mode, same law as every star scene. */
-html.theme-light .action-cine__continue {
-  background: #101015; color: #fff;
-  box-shadow: 0 14px 30px rgba(20, 37, 40, 0.2);
-}
-html.theme-light .action-cine__thinking i {
-  background: #101015;
-  box-shadow: 0 0 14px rgba(20, 37, 40, 0.25);
-}
 html.theme-light .action-exp:has(.action-draft-loading--cine),
 html.theme-light .action-exp:has(.action-cine-reveal) {
   --ink: 255, 255, 255;
@@ -3464,15 +3451,9 @@ html.theme-light .action-exp:has(.action-draft-loading--cine) .action-cine__thin
 }
 
 
-/* Blueprint, light mode: ink dots on the light surface. */
-html.theme-light .action-exp__bg {
-  background-color: #eef0f3;
-  background-image: radial-gradient(rgba(24, 26, 33, 0.10) 1px, transparent 1px);
-  background-size: 22px 22px;
-}
-html.theme-light .action-exp__bg::before {
-  background: radial-gradient(110% 80% at 50% 30%, transparent 40%, rgba(238, 240, 243, 0.9) 100%);
-}
+/* (v852: the light-mode blueprint surface is DEAD. The module is dark cinema
+   in both themes, root rule at the end of this file. The dot grid stays via
+   the dark blueprint styles; nothing in .action-exp may ever paint light.) */
 
 /* v843: the intake BRIEF (Malik). Their star restated with timeframe +
    committed time (tappable to change), then the leverage framing, then the
@@ -3570,3 +3551,24 @@ body.exit-grabber .action-exp__close { display: none !important; }
   color: rgba(255,255,255,0.55); margin-bottom: 18px; text-wrap: balance;
 }
 .intake-beat { min-height: calc(100dvh - var(--safe-t) - 230px); }
+
+
+/* ============================================================
+   THE ACTION MODULE IS DARK CINEMA IN BOTH THEMES. ROOT RULE.
+   (v852, after the third light-mode break of this class: v691 black oval,
+   v692 light band, v851 white-on-white intake beats.) Every inner page
+   (intro, mission confirm, doors, chat, loading, reveal, A5/A9) inherits
+   this. NEVER add a per-page :has() theme opt-out inside .action-exp again;
+   if a new page looks wrong in light mode, the bug is a light-colored layer
+   INSIDE it, not a missing opt-out.
+   ============================================================ */
+html.theme-light .action-exp {
+  --ink: 255, 255, 255;
+  background: #000 !important;
+}
+html.theme-light .action-exp .action-exp__bg { background: #000; }
+html.theme-light .action-exp .action-exp__nav {
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 40%, transparent);
+}
+html.theme-light .action-exp .action-chat__input-row { background: rgba(6, 6, 8, 0.72); }
+html.theme-light .action-exp .action-chat__input-row::before { background: linear-gradient(to top, rgba(6, 6, 8, 0.6), transparent); }

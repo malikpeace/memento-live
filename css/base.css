@@ -471,7 +471,6 @@ html.bg-flat .apl-rays { display: none !important; }
    literal) renders correctly light-on-dark.
    ============================================================ */
 /* --- Light-ify the content experiences --- */
-html.theme-light .action-exp,
 html.theme-light .sheet--exp[data-module="vivere"],
 html.theme-light .sheet--exp[data-module="yearbook"],
 html.theme-light .sheet--exp[data-module="reflection"],
@@ -479,8 +478,6 @@ html.theme-light .sheet--exp[data-module="lifestats"],
 html.theme-light .sheet--exp[data-module="distraction"],
 html.theme-light .sheet--exp[data-module="flow"],
 html.theme-light .sheet--exp[data-module="streak"] { background: var(--surface-0); }
-html.theme-light .action-exp__bg,
-html.theme-light .action-exp:has(.action-plan-page) .action-exp__bg,
 html.theme-light .clarity-exp__bg,
 html.theme-light .sheet--exp[data-module="vivere"] .sheet__exp-bg,
 html.theme-light .sheet--exp[data-module="yearbook"] .sheet__exp-bg,
