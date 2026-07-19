@@ -36,17 +36,41 @@ body:has(.clarity-exp.open)::after { display: none; }
 }
 .action-exp.open-bg .action-exp__bg { opacity: 1; }
 .action-exp.open-bg.open-bg-visible .action-exp__bg { opacity: 1; }
+/* v861 (Malik: "instant pop looks cheap"): staged entrance. The dark/light
+   surface fades up first (0.6s above), then the content layers rise 14px and
+   fade in on a stagger: chrome, then the page, then the nav. Ease-out
+   entering, settled by ~0.8s. */
 .action-exp.open-bg .action-exp__top,
 .action-exp.open-bg .action-exp__progress,
 .action-exp.open-bg .action-exp__page-wrap,
 .action-exp.open-bg .action-exp__nav {
-  opacity: 0; transform: none;
-  transition: opacity 0.5s ease;
+  /* SNAP hidden, no transition: children sit at opacity 1 pre-open (only the
+     root is hidden), so transitioning here just runs 1->0 and gets reversed
+     by open-content 30ms later = zero visible motion. */
+  opacity: 0; transform: translateY(14px);
+  transition: none;
 }
 .action-exp.open-content .action-exp__top,
 .action-exp.open-content .action-exp__progress,
 .action-exp.open-content .action-exp__page-wrap,
-.action-exp.open-content .action-exp__nav { opacity: 1; transform: none; }
+.action-exp.open-content .action-exp__nav {
+  opacity: 1; transform: none;
+  transition: opacity 0.45s ease, transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.action-exp.open-content .action-exp__top,
+.action-exp.open-content .action-exp__progress { transition-delay: 0.14s; }
+.action-exp.open-content .action-exp__page-wrap { transition-delay: 0.22s; }
+.action-exp.open-content .action-exp__nav { transition-delay: 0.32s; }
+@media (prefers-reduced-motion: reduce) {
+  .action-exp.open-bg .action-exp__top,
+  .action-exp.open-bg .action-exp__progress,
+  .action-exp.open-bg .action-exp__page-wrap,
+  .action-exp.open-bg .action-exp__nav { transform: none; }
+  .action-exp.open-content .action-exp__top,
+  .action-exp.open-content .action-exp__progress,
+  .action-exp.open-content .action-exp__page-wrap,
+  .action-exp.open-content .action-exp__nav { transition: opacity 0.3s ease; }
+}
 .action-exp.open {
   opacity: 1; pointer-events: auto;
 }
@@ -3556,6 +3580,18 @@ body.exit-grabber .action-exp__close { display: none !important; }
   color: rgba(var(--ink),0.55); margin-bottom: 18px; text-wrap: balance;
 }
 .intake-beat { min-height: calc(100dvh - var(--safe-t) - 230px); }
+
+/* v861: each newly rendered live beat rises in instead of swapping instantly.
+   backwards fill only (no forwards hold, see the hidden-animations law). */
+@keyframes intakeBeatIn {
+  from { opacity: 0; transform: translateY(12px); }
+}
+.action-intake__current .intake-beat {
+  animation: intakeBeatIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .action-intake__current .intake-beat { animation: none; }
+}
 
 /* v860 (Malik): the clarity summary beat. Sentence-sized, their own words. */
 .intake-beat__sum {

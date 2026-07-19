@@ -2512,6 +2512,11 @@ const ActionExperience = {
   _settleOpenState() {
     try {
       if (!this.isOpen || !this.el) return;
+      // v861: an open choreography is legitimately in flight for the first
+      // ~2s (settle timer pending). Force-settling then killed every open
+      // animation (the "instant pop"). Past that window, a pending timer
+      // means iOS froze mid-open, so settle as before.
+      if (Date.now() - (this._openedAt || 0) < 2000) return;
       if (!this.el.classList.contains('open')) {
         this.el.classList.add('open');
         this.el.classList.remove('open-bg', 'open-bg-visible', 'open-content');
@@ -2662,6 +2667,7 @@ const ActionExperience = {
       }
     } catch (e) {}
     this.isOpen = true;
+    this._openedAt = Date.now();
     rememberView('action');
     FullscreenClose.show('action');
     if (this._settleTimer) {
@@ -2713,13 +2719,19 @@ const ActionExperience = {
     } else {
       this.renderContent();
     }
-    this.el.classList.add('open-content');
+    // v861: open-content must land AFTER a painted frame of the hidden
+    // open-bg state, or the content transitions never run and the module
+    // pops in instantly (the "cheap" open Malik flagged). Double rAF
+    // guarantees one real paint in between.
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      if (this.isOpen) this.el.classList.add('open-content');
+    }));
     this._settleTimer = setTimeout(() => {
       if (!this.isOpen) return;
       this.el.classList.add('open');
       this.el.classList.remove('open-bg', 'open-bg-visible', 'open-content');
       this._settleTimer = null;
-    }, 700);
+    }, 950);
   },
 
   close() {
@@ -2937,7 +2949,7 @@ const ActionExperience = {
     host.innerHTML =
       '<div class="intake-beat" data-beat="summary">' +
         '<div class="intake-beat__body">' +
-          '<div class="intake-beat__quiet">So here\'s where you stand.</div>' +
+          '<div class="intake-beat__quiet">Quick recap</div>' +
           '<div class="intake-beat__sum">You want to <b>' + esc(goalEmbed) + '</b>' +
             (tf ? ', within <b>' + esc(tf) + '</b>' : '') + '.</div>' +
           (why ? '<div class="intake-beat__sum intake-beat__sum--why">In your own words: &ldquo;' + esc(why) + '&rdquo;</div>' : '') +
