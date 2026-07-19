@@ -2757,10 +2757,10 @@ const ActionExperience = {
           <div class="clarity-intro__body">
             <div class="clarity-intro__title"><span class="clarity-intro__title-in" id="actionIntroTitle">Action</span></div>
             <div class="clarity-intro__lines">
-              <div class="clarity-intro__line">Without focused action, literally nothing else matters.</div>
-              <div class="clarity-intro__line">You can have the best plan in the world. You can think, wish, and manifest for years. But if you never turn it into actual action, you will go nowhere.</div>
-              <div class="clarity-intro__line">This module exists to change that.</div>
-              <div class="clarity-intro__line">The goal is to find the highest leverage actions for your goal. The ones that, if done, make it unreasonable for you not to achieve it. Then a focused plan you can actually act on today.</div>
+              <div class="clarity-intro__line">Clarity gave you the what. This is the how.</div>
+              <div class="clarity-intro__line">There are two kinds of action. Cheap action: busy, comfortable, feels productive, moves nothing. Most people live there.</div>
+              <div class="clarity-intro__line">And high-leverage action: the few moves that actually change your position. Usually there is one that makes everything else easier or unnecessary.</div>
+              <div class="clarity-intro__line">This module finds the highest-leverage action you can actually do. So there is zero excuse left: you will know exactly what to do, and it will be doable.</div>
             </div>
           </div>
           <div class="clarity-intro__foot" id="actionIntroFoot">
@@ -2890,39 +2890,64 @@ const ActionExperience = {
   // restated with its timeframe and committed time (all from Clarity, tappable
   // to change), then the leverage framing: most action is busywork, we are
   // hunting the one move that makes the rest easier or unnecessary.
-  _renderIntakeBrief() {
-    const host = this.pageWrap && this.pageWrap.querySelector('#intakeBrief');
+  // v845 (Malik's flow, his words): after the intro, remind them of the
+  // mission and CONFIRM it, then the doors. Beat 1: "You said your mission
+  // is... right?" with one confirm button. Beat 2: the question-first doors
+  // (his I5 pick): do you already know the move, know it / find it for me.
+  _renderIntakeBrief() { /* replaced by the beat sequence (v845) */ },
+
+  _renderMissionConfirm() {
+    const host = this.pageWrap && this.pageWrap.querySelector('.action-intake__current');
     if (!host) return;
     const ca = (state.clarity && state.clarity.answers) || {};
     const goal = (ca.neutronStar || '').trim();
-    const tf = (ca.timeframe || ca.timeHorizon || '').trim();
-    const mins = parseInt(ca.dailyTime, 10) || 0;
-    const minsLabel = mins >= 60 ? ((mins % 60 === 0 ? (mins / 60) : (mins / 60).toFixed(1)) + (mins === 60 ? ' hour' : ' hours')) : (mins + ' min');
-    if (!goal) { host.innerHTML = ''; return; }
-    const metaBits = [];
-    if (tf) metaBits.push(esc(tf));
-    if (mins) metaBits.push(esc(minsLabel) + ' a day');
+    if (!goal) { this._renderDoors(); return; }
     host.innerHTML =
-      '<div class="intake-brief__lead">The goal you locked in:</div>' +
-      '<button type="button" class="intake-brief__goal" id="intakeEditGoal" aria-label="Edit the goal">' + esc(goal) + '</button>' +
-      (metaBits.length ? '<button type="button" class="intake-brief__meta" id="intakeEditTf" aria-label="Edit the timeframe">' + metaBits.join(' &middot; ') + '<span class="intake-brief__edit">edit</span></button>' : '') +
-      '<div class="intake-brief__lev">' +
-        '<p>Not every action counts the same. Most of what people do is low-leverage busywork, it feels productive and moves nothing.</p>' +
-        '<p>Somewhere in your goal there is <b>one move</b> that makes everything else easier or unnecessary. Finding it is what we do next.</p>' +
+      '<div class="intake-beat">' +
+        '<div class="intake-beat__quiet">You said your mission is:</div>' +
+        '<div class="intake-beat__goal">' + esc(goal) + '</div>' +
+        '<div class="intake-beat__spacer"></div>' +
+        '<button type="button" class="intake-beat__cta" id="missionConfirmBtn">That\'s it</button>' +
+        '<button type="button" class="intake-beat__ghostline" id="missionChangeBtn">I want to change it</button>' +
       '</div>';
+    this._cineActivate();
     const send = (msg) => {
       try {
         const intake = state.action.intake;
-        if (!intake || intake.completed) return;
         intake.aiMessages.push({ role: 'user', content: msg });
         persistNow();
         this._aiIntakeFetchNext();
       } catch (_) {}
     };
-    const g = host.querySelector('#intakeEditGoal');
-    if (g) g.addEventListener('click', () => send('I want to change the wording of the goal.'));
-    const t = host.querySelector('#intakeEditTf');
-    if (t) t.addEventListener('click', () => send('I want to change the timeframe.'));
+    host.querySelector('#missionConfirmBtn').addEventListener('click', () => this._renderDoors());
+    host.querySelector('#missionChangeBtn').addEventListener('click', () => send('I want to change the wording of the goal.'));
+  },
+
+  _renderDoors() {
+    const host = this.pageWrap && this.pageWrap.querySelector('.action-intake__current');
+    if (!host) return;
+    const intake = state.action.intake;
+    host.innerHTML =
+      '<div class="intake-beat">' +
+        '<div class="intake-beat__ask">Do you already know what you have to do to get there?</div>' +
+        '<div class="intake-beat__sub">Not the busywork. The one move that makes everything else easier or unnecessary.</div>' +
+        '<div class="intake-beat__spacer"></div>' +
+        '<button type="button" class="intake-beat__cta" id="doorKnow">I know the move</button>' +
+        '<button type="button" class="intake-beat__cta intake-beat__cta--ghost" id="doorFind">Find it for me</button>' +
+      '</div>';
+    this._cineActivate();
+    const pick = (label) => {
+      try {
+        const opener = 'Do you already know what you have to do to make progress toward this goal?';
+        intake.aiMessages.push({ role: 'assistant', content: opener });
+        intake.aiHistory.push({ message: opener, type: 'choices', options: ['I know the move', 'Find it for me'] });
+        intake.aiMessages.push({ role: 'user', content: label });
+        persistNow();
+        this._aiIntakeFetchNext();
+      } catch (_) {}
+    };
+    host.querySelector('#doorKnow').addEventListener('click', () => pick('I know the move'));
+    host.querySelector('#doorFind').addEventListener('click', () => pick('Find it for me'));
   },
 
   _intakeQuestions() {
@@ -3040,13 +3065,8 @@ const ActionExperience = {
       // exactly where they left off.
       this._restoreAiIntakeFromState();
     } else if (intake.phase === 'aiDriven' && intake.aiMessages.length === 0) {
-      // v843: the opener is CLIENT-ASKED (no round trip): do you know the
-      // move? Two doors; the AI takes over from whichever they pick.
-      const opener = 'Do you already know what you have to do to make progress toward this goal?';
-      intake.aiMessages.push({ role: 'assistant', content: opener });
-      intake.aiHistory.push({ message: opener, type: 'choices', options: ['I know the move', 'Find it for me'] });
-      persistNow();
-      this._aiIntakeRenderQuestion({ question: opener, type: 'choices', options: ['I know the move', 'Find it for me'] });
+      // v845 (Malik's flow): intro -> mission confirm -> the doors -> AI.
+      this._renderMissionConfirm();
     } else {
       // Render the first phase (hardcoded opener).
       this._renderIntakePhase();
@@ -3383,6 +3403,7 @@ Their locked Neutron Star: "${ns}"
 ${ca.coreWhy ? `Why it matters to them (from Clarity, reference it when it sharpens a question, never recite it): "${ca.coreWhy}"` : ''}
 ${ca.antiVision ? `What they fear if they never act (from Clarity, background context only): "${ca.antiVision}"` : ''}
 A timeframe they mentioned in Clarity (use as a starting reference, but confirm): "${tfHint}"
+${ca.dailyTime ? `Their committed daily time from Clarity (door 2 reconfirms this in your own words): ${ca.dailyTime} minutes a day${ca.intensity ? ', self-rated intensity: ' + ca.intensity : ''}` : ''}
 Current snapshot (what you have captured so far): ${JSON.stringify(intake.aiSnapshot)}
 
 Reminder: ONLY put a value in snapshot.X when the user's most recent answer is substantive for field X. If it's vague, garbage, sarcastic, or a platitude, leave the field empty and push back in your message.${(intake.aiMessages.length === 0 && intake.aiSnapshot.goalConfirm) ? `
@@ -3444,12 +3465,15 @@ The goal and timeframe are already locked from Clarity (see snapshot); they are 
       // real substance (so a hallucinated ready: true cannot end the convo early).
       const snap = intake.aiSnapshot;
       const lengthOk = (s, n) => typeof s === 'string' && s.trim().length >= n;
-      // v843 (the two doors): the client asked "do you know the move". If
-      // they knew it, the AI captures mainMove and we are done; if not, the
-      // AI asks the one locator question and pastProgress completes it. The
-      // AI keeps its lazy-answer authority either way: a vague answer leaves
-      // the field empty and gets pushback, so this cannot be garbage-completed.
-      if (lengthOk(snap.mainMove, 8) || lengthOk(snap.pastProgress, 4)) {
+      // v845 (Malik's branches): door 1 ("I know the move") needs the move AND
+      // the is-it-working answer; door 2 ("Find it for me") needs the
+      // commitment check + locator, which both land in pastProgress. The AI
+      // keeps its lazy-answer authority: vague answers stay uncaptured.
+      const door1 = (intake.aiMessages.find(m => m.role === 'user') || {}).content === 'I know the move';
+      const doneNow = door1
+        ? (lengthOk(snap.mainMove, 8) && lengthOk(snap.pastProgress, 4))
+        : lengthOk(snap.pastProgress, 4);
+      if (doneNow) {
         intake.completed = true;
         persistNow();
         this._aiIntakeRenderClosing();
