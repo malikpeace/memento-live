@@ -4210,9 +4210,31 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
 }
 .n7d--in { opacity: 1; transform: none; }
 .n7d--out { opacity: 0; transform: translateY(-10px); transition: opacity 0.4s ease, transform 0.4s ease; }
-/* The 7-days scene stays DARK in light mode by design (same law as the
-   onboarding + auth scenes); everything inside uses its own pinned tokens. */
-html.theme-light .n7d { background: #040607; }
+/* v862 (Malik): the 7-days scene FOLLOWS THE THEME. In light mode it becomes
+   a faithful light surface: ink text, light node rings, no star dust (specks
+   don't read on daylight), dark solid CTA. The green/cyan day accents stay. */
+html.theme-light .n7d {
+  background: #eef0f3;
+  --text-hi: rgba(24, 26, 33, 0.96);
+  --text-mid: rgba(24, 26, 33, 0.75);
+  --text-lo: rgba(24, 26, 33, 0.45);
+}
+html.theme-light .n7d-dust { display: none; }
+html.theme-light .n7d-topfade {
+  background: linear-gradient(180deg, #eef0f3 0%, #eef0f3 44%, rgba(238, 240, 243, 0) 100%);
+}
+html.theme-light .n7d-node { background: #d7dade; }
+html.theme-light .n7d-day.is-in .n7d-node {
+  box-shadow: 0 0 0 5px #eef0f3, 0 0 20px rgba(var(--dc), 0.45);
+}
+html.theme-light .n7d-day--win.is-in .n7d-node {
+  box-shadow: 0 0 0 5px #eef0f3, 0 0 30px rgba(var(--dc), 0.6);
+}
+html.theme-light .n7d-close { color: rgba(24, 26, 33, 0.92); }
+html.theme-light .n7d-cta {
+  background: #1a1c22; color: #fff;
+  box-shadow: 0 10px 30px rgba(15, 18, 24, 0.25);
+}
 
 /* The summit aurora: fixed at the top, radial (edge-safe by construction),
    lit only when day 7 ignites. */
