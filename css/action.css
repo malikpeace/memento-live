@@ -3523,7 +3523,13 @@ body.exit-grabber .action-exp__close { display: none !important; }
 .action-exp.is-springing { transition: transform 0.42s cubic-bezier(0.22, 1.6, 0.36, 1), border-radius 0.42s ease !important; }
 
 /* v845: the intake beats (mission confirm + the doors), question-first (I5). */
-.intake-beat { display: flex; flex-direction: column; min-height: 56vh; text-align: left; }
+.intake-beat { display: flex; flex-direction: column; text-align: left; }
+/* THE BEAT COMPOSITION LAW (v851, after Malik caught inconsistent spacing
+   between beats): every intake beat shares ONE vertical rhythm. The content
+   block floats optically centered (slightly high) in the space above the
+   CTAs; the CTAs anchor near the bottom. Same skeleton for every beat, no
+   per-screen spacing decisions ever again. */
+.intake-beat__body { margin: auto 0; padding-bottom: 8vh; }
 .intake-beat__quiet { font-size: 0.8125rem; color: rgba(255,255,255,0.55); margin-bottom: 12px; }
 .intake-beat__goal {
   font-size: 1.5rem; font-weight: 700; letter-spacing: -0.025em; line-height: 1.25;
@@ -3535,7 +3541,7 @@ body.exit-grabber .action-exp__close { display: none !important; }
 }
 .intake-beat__sub { font-size: 0.875rem; color: rgba(255,255,255,0.72); line-height: 1.5; }
 .intake-beat__sub b { color: rgba(255,255,255,0.96); }
-.intake-beat__spacer { flex: 1; min-height: 34px; }
+.intake-beat__spacer { flex: 1; min-height: 34px; } /* legacy, beats now use __body */
 .intake-beat__cta {
   width: 100%; height: 48px; border: none; border-radius: calc(10px * var(--rx,1));
   background: #fff; color: #0a0c0e; font-family: var(--font); font-size: 0.90625rem;
@@ -3563,4 +3569,4 @@ body.exit-grabber .action-exp__close { display: none !important; }
   font-size: 0.8125rem; font-weight: 600; line-height: 1.45;
   color: rgba(255,255,255,0.55); margin-bottom: 18px; text-wrap: balance;
 }
-.intake-beat { min-height: 64vh; }
+.intake-beat { min-height: calc(100dvh - var(--safe-t) - 230px); }

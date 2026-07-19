@@ -2905,9 +2905,10 @@ const ActionExperience = {
     if (!goal) { this._renderDoors(); return; }
     host.innerHTML =
       '<div class="intake-beat">' +
-        '<div class="intake-beat__quiet">You said your mission is:</div>' +
-        '<div class="intake-beat__goal">' + esc(goal) + '</div>' +
-        '<div class="intake-beat__spacer"></div>' +
+        '<div class="intake-beat__body">' +
+          '<div class="intake-beat__quiet">You said your mission is:</div>' +
+          '<div class="intake-beat__goal">' + esc(goal) + '</div>' +
+        '</div>' +
         '<button type="button" class="intake-beat__cta" id="missionConfirmBtn">That\'s it</button>' +
         '<button type="button" class="intake-beat__ghostline" id="missionChangeBtn">I want to change it</button>' +
       '</div>';
@@ -2932,10 +2933,11 @@ const ActionExperience = {
     const goalLine = ((state.clarity && state.clarity.answers && state.clarity.answers.neutronStar) || '').trim();
     host.innerHTML =
       '<div class="intake-beat">' +
-        (goalLine ? '<div class="intake-beat__star">' + esc(goalLine) + '</div>' : '') +
-        '<div class="intake-beat__ask">Do you already know what you have to do to get there?</div>' +
-        '<div class="intake-beat__sub">Not the busywork. The one move that makes everything else easier or unnecessary.</div>' +
-        '<div class="intake-beat__spacer"></div>' +
+        '<div class="intake-beat__body">' +
+          (goalLine ? '<div class="intake-beat__star">' + esc(goalLine) + '</div>' : '') +
+          '<div class="intake-beat__ask">Do you already know what you have to do to get there?</div>' +
+          '<div class="intake-beat__sub">Not the busywork. The one move that makes everything else easier or unnecessary.</div>' +
+        '</div>' +
         '<button type="button" class="intake-beat__cta" id="doorKnow">I know the move</button>' +
         '<button type="button" class="intake-beat__cta intake-beat__cta--ghost" id="doorFind">Find it for me</button>' +
       '</div>';
