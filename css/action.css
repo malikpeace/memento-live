@@ -104,23 +104,27 @@ body:has(.clarity-exp.open)::after { display: none; }
 .action-exp__bg .action-exp__bg-orb3 {
   display: block; position: absolute; inset: 0; width: auto; height: auto;
   border-radius: 0; filter: none; transform: none;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.09) 1px, transparent 1px);
-  background-size: 22px 22px; background-position: 11px 11px;
+  /* v885 (Malik: no NEW dots): a 66px tile = every third dot of the SAME
+     22px lattice (66 = 3 x 22, position 0 0 is on-grid), so this layer only
+     brightens existing dots and fades them back. */
+  background-image: radial-gradient(rgba(255, 255, 255, 0.085) 1px, transparent 1px);
+  background-size: 66px 66px; background-position: 0 0;
   animation: actionDotsBreathe 9s ease-in-out infinite alternate;
 }
 .action-exp__bg::after {
   content: ''; display: block; position: absolute; inset: 0;
   width: auto; height: auto; border-radius: 0; filter: none; transform: none;
-  background: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
-  background-size: 22px 22px; background-position: 5px 17px;
+  /* A disjoint on-grid subset (offsets are multiples of 22px). */
+  background: radial-gradient(rgba(255, 255, 255, 0.075) 1px, transparent 1px);
+  background-size: 66px 66px; background-position: 22px 44px;
   animation: actionDotsBreathe 13s ease-in-out -6s infinite alternate;
 }
 html.theme-light .action-exp__bg .action-exp__bg-orb3 {
-  background-image: radial-gradient(rgba(24, 26, 33, 0.10) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(24, 26, 33, 0.09) 1px, transparent 1px);
 }
 html.theme-light .action-exp__bg::after {
-  background: radial-gradient(rgba(24, 26, 33, 0.085) 1px, transparent 1px);
-  background-size: 22px 22px; background-position: 5px 17px;
+  background: radial-gradient(rgba(24, 26, 33, 0.08) 1px, transparent 1px);
+  background-size: 66px 66px; background-position: 22px 44px;
 }
 @keyframes actionDotsBreathe {
   0% { opacity: 0; }
