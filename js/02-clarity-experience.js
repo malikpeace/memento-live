@@ -2425,17 +2425,22 @@ function bindKeyboardSettle(host, field) {
   if (host._kbSettleCleanup) { host._kbSettleCleanup(); host._kbSettleCleanup = null; }
   if (!field || !window.visualViewport) return;
   let timer = 0, animating = false;
+  // v873: the resting pageWrap scroll is CAPTURED at focus, not assumed 0.
+  // Clarity's fields live in unscrolled wraps (baseline 0, unchanged); the
+  // Action intake scrolls (past stack above the input), so zeroing would
+  // jump the user to the top of their history.
+  let restPw = 0;
   const pan = () => Math.max(window.scrollY || document.documentElement.scrollTop || 0, window.visualViewport.offsetTop || 0);
   const glide = () => {
     if (animating || document.activeElement !== field) return;
     const P = pan();
     const pw = host.pageWrap;
-    const pwPan = pw ? pw.scrollTop : 0;
+    const pwPan = pw ? (pw.scrollTop - restPw) : 0;
     const total = P + pwPan;
     if (total < 2) return;
     const root = host.el;
     window.scrollTo(0, 0);
-    if (pw && pwPan) pw.scrollTop = 0;
+    if (pw && pwPan) pw.scrollTop = restPw;
     if (!root || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
     animating = true;
     // iOS draws the native text caret at the field's UNTRANSFORMED position and
@@ -2472,6 +2477,7 @@ function bindKeyboardSettle(host, field) {
     timer = setTimeout(() => { timer = 0; glide(); }, 35);
   };
   const onFocus = () => {
+    restPw = host.pageWrap ? host.pageWrap.scrollTop : 0;
     window.visualViewport.addEventListener('resize', queue);
     window.visualViewport.addEventListener('scroll', queue);
     // The keyboard animates in over ~250-500ms; sweep a few times after.
@@ -3146,8 +3152,16 @@ const ActionExperience = {
         intake.aiMessages.push({ role: 'assistant', content: opener });
         intake.aiHistory.push({ message: opener, type: 'choices', options: ['I know the move', 'Find it for me'] });
         intake.aiMessages.push({ role: 'user', content: label });
+        // v873 (Malik): "I know the move" needs no thinking, the next question
+        // is fixed. Push it locally and render instantly; the AI takes over
+        // from their answer. "Find it for me" stays AI (the capacity line is
+        // personalized), so that path derives thinking mode and fetches.
+        if (label === 'I know the move') {
+          const q = "That's great! What do you think you have to do? The most literal, tangible actions.";
+          intake.aiMessages.push({ role: 'assistant', content: q });
+          intake.aiHistory.push({ message: q, type: 'text', options: [] });
+        }
         persistNow();
-        // Trailing user message = thinking mode = the fetch fires from there.
         this._renderIntakeFromState();
       } catch (_) {}
     };
@@ -3732,6 +3746,13 @@ The goal and timeframe are already locked from Clarity (see snapshot); they are 
     // this function only paints the CURRENT question.
     current.innerHTML = this._buildCurrentSectionHtml(fakeQ);
     this._cineActivate();
+    // v873 (Malik: "the text box moves too much"): the Action input gets the
+    // same keyboard-settle recipe as Clarity/onboarding, with the intake's
+    // scrolled position as the rest point instead of zero.
+    try {
+      const kbField = current.querySelector('#intakeInput');
+      if (kbField && typeof bindKeyboardSettle === 'function') bindKeyboardSettle(this, kbField);
+    } catch (eKb) {}
 
     this._cineRenderChrome(
       state.action.intake.aiMessages.filter(m => m.role === 'user').length > 0,

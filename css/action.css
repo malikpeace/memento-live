@@ -3630,7 +3630,8 @@ body.exit-grabber .action-exp__close { display: none !important; }
   pointer-events: none; user-select: none;
 }
 .action-intake__past .intake-beat {
-  min-height: 0; filter: blur(2.5px); opacity: 0.34;
+  /* v873 (Malik): history stays READABLE, dimmed, not blurred. */
+  min-height: 0; opacity: 0.5;
   transform-origin: top left; transform: scale(0.99);
 }
 .action-intake__past .intake-beat__body { margin: 0; padding-bottom: 0; }
@@ -3654,7 +3655,7 @@ body.exit-grabber .action-exp__close { display: none !important; }
 .intake-past__ans {
   align-self: flex-end; max-width: 78%; text-align: right;
   font-size: 0.9375rem; font-weight: 600; line-height: 1.4;
-  color: rgba(var(--ink),0.5); filter: blur(1.5px);
+  color: rgba(var(--ink),0.55);
 }
 
 /* v856: the change-goal / cine question page, contrast made EXPLICIT (Malik's
