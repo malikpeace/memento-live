@@ -4943,7 +4943,8 @@ Return ONLY the sentence text. No quotes, no labels.`;
       '@media (prefers-reduced-motion:reduce){.apl-step__panel,.apl-chev,.apl-btn,.apl-seg__btn{transition-duration:0.01ms;}}',
       // ===== A5 / A9 (v825, Malik's locked finals): one task, five bars, one
       // CTA. Dark cinema in both themes (like the 7-days surface). =====
-      '.a5-screen{background:#060608;--a5-hi:rgba(255,255,255,0.96);--a5-mid:rgba(255,255,255,0.72);--a5-lo:rgba(255,255,255,0.5);}',
+      '.a5-screen{background:#060608;--a5-hi:rgba(var(--ink),0.96);--a5-mid:rgba(var(--ink),0.72);--a5-lo:rgba(var(--ink),0.5);}',
+      'html.theme-light .a5-screen{background:#eef0f3;}',
       '.a5-wrap{position:relative;z-index:1;max-width:560px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;align-items:center;text-align:center;padding:calc(var(--safe-t) + 22px) 24px calc(var(--safe-b) + 26px);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;box-sizing:border-box;}',
       '.a5-top{width:100%;display:flex;justify-content:center;min-height:28px;align-items:center;}',
       '@media (max-width:859.98px){.a5-top{padding-right:44px;justify-content:flex-start;}}',
@@ -4957,10 +4958,10 @@ Return ONLY the sentence text. No quotes, no labels.`;
       '.a5-bars{display:flex;align-items:flex-end;gap:5px;height:22px;}',
       '.a5-bar{position:relative;display:flex;align-items:flex-end;border:none;background:transparent;padding:0 2px;cursor:pointer;height:22px;}',
       '.a5-bar::after{content:"";position:absolute;inset:-12px -4px;}',
-      '.a5-bar i{display:block;width:6px;border-radius:2px;background:rgba(255,255,255,0.14);transition:background 0.15s ease;}',
+      '.a5-bar i{display:block;width:6px;border-radius:2px;background:rgba(var(--ink),0.14);transition:background 0.15s ease;}',
       '.a5-bar i.on{background:var(--success);}',
       '.a5-foot{width:100%;display:flex;flex-direction:column;gap:14px;align-items:center;}',
-      '.a5-cta{width:100%;height:48px;border:none;border-radius:calc(10px * var(--rx,1));background:#fff;color:#0a0c0e;font-family:inherit;font-size:0.90625rem;font-weight:700;cursor:pointer;box-shadow:0 6px 22px rgba(0,0,0,0.4);transition:transform 0.15s ease;}',
+      '.a5-cta{width:100%;height:48px;border:none;border-radius:calc(10px * var(--rx,1));background:var(--solid-bg);color:var(--solid-fg);font-family:inherit;font-size:0.90625rem;font-weight:700;cursor:pointer;box-shadow:0 6px 22px rgba(0,0,0,0.4);transition:transform 0.15s ease;}',
       '.a5-cta:active{transform:scale(0.985);}',
       '.a5-focus{border:none;background:transparent;padding:6px 12px;font-family:inherit;font-size:0.8125rem;color:var(--a5-mid);cursor:pointer;}',
       '.a5-focus:active,.a5-focus:hover{color:var(--a5-hi);}',
@@ -4977,11 +4978,9 @@ Return ONLY the sentence text. No quotes, no labels.`;
       '.a5-rrow{display:flex;justify-content:space-between;align-items:baseline;gap:16px;font-size:0.8125rem;}',
       '.a5-rlabel{color:var(--a5-lo);}',
       '.a5-rval{font-weight:700;color:var(--a5-hi);text-align:right;}',
-      '.a5-ghost{width:100%;height:44px;border:none;border-radius:calc(10px * var(--rx,1));background:rgba(255,255,255,0.07);color:var(--a5-hi);font-family:inherit;font-size:0.84375rem;font-weight:600;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,0.07);}',
+      '.a5-ghost{width:100%;height:44px;border:none;border-radius:calc(10px * var(--rx,1));background:rgba(var(--ink),0.07);color:var(--a5-hi);font-family:inherit;font-size:0.84375rem;font-weight:600;cursor:pointer;box-shadow:var(--glass-highlight);}',
       '@media (prefers-reduced-motion:reduce){.a5-cta,.a5-bar i{transition-duration:0.01ms;}}',
-      // Dark cinema in BOTH themes (locked spec, like the 7-days surface):
-      // opt out of the base.css light-ify that re-points .apl-screen to white.
-      'html.theme-light .apl-screen.a5-screen{background:#060608;}'
+      // v858: A5 follows the theme (Malik's call); the light bg is set above.
     ].join('');
     document.head.appendChild(s);
   },

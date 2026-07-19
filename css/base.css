@@ -471,6 +471,7 @@ html.bg-flat .apl-rays { display: none !important; }
    literal) renders correctly light-on-dark.
    ============================================================ */
 /* --- Light-ify the content experiences --- */
+html.theme-light .action-exp,
 html.theme-light .sheet--exp[data-module="vivere"],
 html.theme-light .sheet--exp[data-module="yearbook"],
 html.theme-light .sheet--exp[data-module="reflection"],
