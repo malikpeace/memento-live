@@ -403,6 +403,13 @@ function renderReflectTab() {
     const input = document.getElementById('rfInput');
     const save = document.getElementById('rfSave');
     const count = document.getElementById('rfCount');
+    // v877: the write box gets the KeyboardPin pan-preventer (same as the
+    // Action intake) so tapping it never jumps the screen.
+    try {
+      if (typeof KeyboardPin !== 'undefined' && panel && getComputedStyle(panel).position === 'fixed') {
+        KeyboardPin.auto(panel);
+      }
+    } catch (e) {}
     if (input && save) {
       const grow = () => { input.style.height = 'auto'; input.style.height = input.scrollHeight + 'px'; };
       input.addEventListener('input', () => {

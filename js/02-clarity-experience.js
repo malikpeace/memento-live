@@ -2528,62 +2528,22 @@ const ActionExperience = {
     return t;
   },
 
-  // v874: keep the intake input visible above the iOS keyboard by scrolling
-  // the CONVERSATION (the inner scroller), not by fighting the window pan.
-  // The settle-glide recipe needs a high-anchored field; this one sits low,
-  // so gliding hid the typed text under the keyboard (Malik's screenshot).
-  _bindIntakeKeyboardKeep(field) {
-    if (this._kbKeepCleanup) { this._kbKeepCleanup(); this._kbKeepCleanup = null; }
-    const vv = window.visualViewport;
-    if (!field || !vv) return;
-    // The v102 onboarding mechanism, ported: the conversation auto-scrolls to
-    // its bottom, so there is NO inner headroom to absorb the keyboard (proved
-    // in-pane: scroller already at max). The overlay itself must SHRINK to the
-    // visual viewport so the layout reflows above the keyboard.
-    const restore = () => {
-      try {
-        this.el.style.height = ''; this.el.style.maxHeight = '';
-        this.el.style.top = ''; this.el.style.bottom = '';
-      } catch (e) {}
-    };
-    const keep = () => {
-      try {
-        if (document.activeElement !== field) { restore(); return; }
-        const kbUp = vv.height < window.innerHeight - 40;
-        if (kbUp) {
-          this.el.style.top = vv.offsetTop + 'px';
-          this.el.style.bottom = 'auto';
-          this.el.style.height = vv.height + 'px';
-          this.el.style.maxHeight = vv.height + 'px';
-        } else {
-          restore();
+  // v877: the intake's keyboard handling is KeyboardPin (js/01), the
+  // pan-preventer: pre-shrinks the overlay on pointerup (before focus) using
+  // the learned keyboard height, so iOS never pans and the keyboard slides
+  // over a stable layout. Replaces the v874 reactive-only pin.
+  _bindIntakeKeyboardKeep() {
+    try {
+      if (typeof KeyboardPin === 'undefined') return;
+      KeyboardPin.auto(this.el, {
+        afterPin: () => {
+          try {
+            const sc = this.pageWrap && this.pageWrap.querySelector('.action-exp__page-inner');
+            if (sc) sc.scrollTop = sc.scrollHeight;
+          } catch (e) {}
         }
-        const sc = this.pageWrap && this.pageWrap.querySelector('.action-exp__page-inner');
-        if (sc) sc.scrollTop = sc.scrollHeight;
-      } catch (e) {}
-    };
-    let sweeps = [];
-    const onFocus = () => {
-      vv.addEventListener('resize', keep);
-      vv.addEventListener('scroll', keep);
-      // The keyboard animates in over ~250-500ms; sweep a few times after.
-      sweeps = [80, 260, 450, 700].map(ms => setTimeout(keep, ms));
-    };
-    const onBlur = () => {
-      vv.removeEventListener('resize', keep);
-      vv.removeEventListener('scroll', keep);
-      sweeps.forEach(t => clearTimeout(t)); sweeps = [];
-      restore();
-    };
-    field.addEventListener('focus', onFocus);
-    field.addEventListener('blur', onBlur);
-    field.addEventListener('input', keep);
-    this._kbKeepCleanup = () => {
-      onBlur();
-      field.removeEventListener('focus', onFocus);
-      field.removeEventListener('blur', onBlur);
-      field.removeEventListener('input', keep);
-    };
+      });
+    } catch (e) {}
   },
 
   _settleOpenState() {
@@ -2816,7 +2776,7 @@ const ActionExperience = {
     if (!this.isOpen) return;
     this.isOpen = false;
     this._clearTimers();
-    if (this._kbKeepCleanup) { this._kbKeepCleanup(); this._kbKeepCleanup = null; }
+    try { if (typeof KeyboardPin !== 'undefined') KeyboardPin.release(this.el); } catch (e) {}
     if (recallView() === 'action') rememberView(null);
     FullscreenClose.hide();
     if (this._settleTimer) {

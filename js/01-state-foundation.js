@@ -965,6 +965,120 @@ function applyCustomBackground(p) {
 // run the mutation (which flips the theme class), then drop the transition so
 // it never affects normal interactions. Respects reduced motion (instant).
 let _themeAnimTimer = null;
+// ============================================================
+// v877: KeyboardPin, the iOS keyboard pan-preventer (research in
+// overnight/KEYBOARD_RESEARCH.md). iOS pans the whole page when a focused
+// field would sit under the keyboard, dragging even fixed overlays with it
+// (Malik's "screen jumps and I see the background"). Prevention: LEARN the
+// device's keyboard height once, then on pointerup (which fires BEFORE
+// focus) shrink the surface so the field is already visible above the
+// keyboard; iOS skips the pan and the keyboard slides over a stable layout.
+// A visualViewport resize listener truth-corrects the few-px prediction
+// error; the first-ever open (nothing learned yet) falls back to reactive
+// correction and learns for every open after.
+// ============================================================
+const KeyboardPin = {
+  _KEY: 'memento_kb_h',
+  kbH() {
+    try {
+      const v = parseInt(localStorage.getItem(this._KEY) || '', 10);
+      return (v > 150 && v < window.innerHeight * 0.7) ? v : 0;
+    } catch (e) { return 0; }
+  },
+  _isEditable(t) {
+    return !!(t && (t.tagName === 'TEXTAREA' || t.isContentEditable ||
+      (t.tagName === 'INPUT' && !/^(button|checkbox|radio|range|color|submit|file)$/.test(t.type || 'text'))));
+  },
+  // Touch devices only: a desktop window resized mid-typing would otherwise
+  // false-learn a "keyboard height" and shrink overlays on click.
+  _touch() {
+    try { return window.matchMedia('(pointer: coarse)').matches; } catch (e) { return false; }
+  },
+  _learn() {
+    try {
+      if (!this._touch()) return;
+      const vv = window.visualViewport; if (!vv) return;
+      if (!this._isEditable(document.activeElement)) return;
+      const d = Math.round(window.innerHeight - vv.height);
+      if (d > 150 && d < window.innerHeight * 0.7) localStorage.setItem(this._KEY, String(d));
+    } catch (e) {}
+  },
+  init() {
+    try {
+      const vv = window.visualViewport;
+      if (vv) vv.addEventListener('resize', () => this._learn());
+    } catch (e) {}
+  },
+  // Shrink a fixed full-screen panel to the (predicted or real) space above
+  // the keyboard. Returns true when a pin was applied.
+  _apply(panel) {
+    try {
+      if (!panel || !this._touch()) return false;
+      const vv = window.visualViewport;
+      const real = vv ? Math.round(window.innerHeight - vv.height) : 0;
+      const kb = (real > 150) ? real : this.kbH();
+      if (!kb) return false;
+      const top = (real > 150 && vv) ? Math.round(vv.offsetTop) : 0;
+      panel.style.top = top + 'px';
+      panel.style.bottom = 'auto';
+      panel.style.height = (window.innerHeight - kb) + 'px';
+      panel.style.maxHeight = (window.innerHeight - kb) + 'px';
+      panel.dataset.kbPinned = '1';
+      return true;
+    } catch (e) { return false; }
+  },
+  release(panel) {
+    try {
+      if (!panel || !panel.dataset.kbPinned) return;
+      delete panel.dataset.kbPinned;
+      panel.style.top = ''; panel.style.bottom = '';
+      panel.style.height = ''; panel.style.maxHeight = '';
+    } catch (e) {}
+  },
+  // Delegated wiring: any editable inside the panel pins it. Idempotent.
+  auto(panel, opts) {
+    if (!panel || panel._kbAuto) return;
+    panel._kbAuto = true;
+    opts = opts || {};
+    const after = () => { if (opts.afterPin) { try { opts.afterPin(); } catch (e) {} } };
+    let unhook = null;
+    const correct = () => {
+      const ae = document.activeElement;
+      if (this._isEditable(ae) && panel.contains(ae)) {
+        this._learn();
+        if (this._apply(panel)) after();
+      } else {
+        this.release(panel);
+      }
+    };
+    // THE core move: pre-pin on pointerup, before focus fires, so iOS never
+    // needs to pan. Capture phase so no inner handler can eat it.
+    panel.addEventListener('pointerup', (e) => {
+      const t = e.target && e.target.closest ? e.target.closest('textarea, input, [contenteditable]') : null;
+      if (!this._isEditable(t)) return;
+      if (this._apply(panel)) after();
+    }, true);
+    panel.addEventListener('focusin', (e) => {
+      if (!this._isEditable(e.target)) return;
+      if (this._apply(panel)) after();
+      if (!unhook) {
+        const vv = window.visualViewport;
+        if (vv) { vv.addEventListener('resize', correct); unhook = () => vv.removeEventListener('resize', correct); }
+      }
+    });
+    panel.addEventListener('focusout', () => {
+      setTimeout(() => {
+        const ae = document.activeElement;
+        if (!(this._isEditable(ae) && panel.contains(ae))) {
+          this.release(panel);
+          if (unhook) { unhook(); unhook = null; }
+        }
+      }, 60);
+    });
+  }
+};
+try { KeyboardPin.init(); } catch (e) {}
+
 // v863: resolve the effective theme. 'auto' (default) follows the device's
 // prefers-color-scheme, live; 'light'/'dark' are manual picks.
 function themeIsLight(p) {
