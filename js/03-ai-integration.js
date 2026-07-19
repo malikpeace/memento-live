@@ -1299,7 +1299,7 @@ async function generateActionDraft(options = {}) {
     const response = await callClaude(
       [{ role: 'user', content: userBody }],
       AI_ACTION_DRAFT_SYSTEM_PROMPT,
-      { maxTokens: 5000, model: ANTHROPIC_MODEL_PLANS, timeout: 90000 }
+      { maxTokens: 8000, model: ANTHROPIC_MODEL_PLANS, timeout: 120000 }
     );
 
     let jsonStr = response.trim();
@@ -1312,7 +1312,26 @@ async function generateActionDraft(options = {}) {
     if (firstBrace > 0 || (firstBrace !== -1 && lastBrace !== -1)) {
       jsonStr = jsonStr.slice(firstBrace, lastBrace + 1);
     }
-    const parsed = JSON.parse(jsonStr);
+    try { window.__lastPlanRaw = jsonStr; } catch (e) {}
+    // v848: Sonnet 5 spends a VARIABLE amount of the token budget on thinking
+    // (emotional goals think longest), so the JSON occasionally arrives
+    // truncated even with a high cap. One fresh retry recovers nearly all of
+    // these; only a double failure surfaces the error to the user.
+    let parsed;
+    try { parsed = JSON.parse(jsonStr); }
+    catch (parseErr) {
+      const retryRaw = await callClaude(
+        [{ role: 'user', content: userBody }],
+        AI_ACTION_DRAFT_SYSTEM_PROMPT,
+        { maxTokens: 8000, model: ANTHROPIC_MODEL_PLANS, timeout: 120000 }
+      );
+      let rj = retryRaw.trim().replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();
+      const fb2 = rj.indexOf('{');
+      const lb2 = rj.lastIndexOf('}');
+      if (fb2 > 0 || (fb2 !== -1 && lb2 !== -1)) rj = rj.slice(fb2, lb2 + 1);
+      try { window.__lastPlanRaw = rj; } catch (e) {}
+      parsed = JSON.parse(rj);
+    }
 
     let plan = normalizeActionPlan(parsed);
     let stats = _lastPlanSanitizationStats;
@@ -1330,7 +1349,7 @@ async function generateActionDraft(options = {}) {
         const retryResponse = await callClaude(
           [{ role: 'user', content: retryBody }],
           AI_ACTION_DRAFT_SYSTEM_PROMPT,
-          { maxTokens: 5000, model: ANTHROPIC_MODEL_PLANS, timeout: 90000 }
+          { maxTokens: 8000, model: ANTHROPIC_MODEL_PLANS, timeout: 120000 }
         );
         let retryJson = retryResponse.trim()
           .replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();
