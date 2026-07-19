@@ -2899,6 +2899,7 @@ const ActionExperience = {
   _renderMissionConfirm() {
     const host = this.pageWrap && this.pageWrap.querySelector('.action-intake__current');
     if (!host) return;
+    try { this.navEl.innerHTML = ''; } catch (e) {}
     const ca = (state.clarity && state.clarity.answers) || {};
     const goal = (ca.neutronStar || '').trim();
     if (!goal) { this._renderDoors(); return; }
@@ -2926,9 +2927,12 @@ const ActionExperience = {
   _renderDoors() {
     const host = this.pageWrap && this.pageWrap.querySelector('.action-intake__current');
     if (!host) return;
+    try { this.navEl.innerHTML = ''; } catch (e) {}
     const intake = state.action.intake;
+    const goalLine = ((state.clarity && state.clarity.answers && state.clarity.answers.neutronStar) || '').trim();
     host.innerHTML =
       '<div class="intake-beat">' +
+        (goalLine ? '<div class="intake-beat__star">' + esc(goalLine) + '</div>' : '') +
         '<div class="intake-beat__ask">Do you already know what you have to do to get there?</div>' +
         '<div class="intake-beat__sub">Not the busywork. The one move that makes everything else easier or unnecessary.</div>' +
         '<div class="intake-beat__spacer"></div>' +

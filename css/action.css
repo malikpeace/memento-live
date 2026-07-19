@@ -3552,3 +3552,15 @@ body.exit-grabber .action-exp__close { display: none !important; }
   font-family: var(--font); font-size: 0.78125rem; color: rgba(255,255,255,0.45);
 }
 .intake-beat__ghostline:active { color: rgba(255,255,255,0.8); }
+
+/* v846: the nav's bottom scrim only exists when the nav has content; an empty
+   nav painted a washed band over pure black (visible on OLED, Malik's report).
+   The doors beat also carries the star so the goal stays in sight. */
+/* must out-specify .action-exp:has(.action-intake-page--cine) .action-exp__nav */
+.action-exp .action-exp__nav:empty,
+.action-exp:has(.action-intake-page--cine) .action-exp__nav:empty { display: none; }
+.intake-beat__star {
+  font-size: 0.8125rem; font-weight: 600; line-height: 1.45;
+  color: rgba(255,255,255,0.55); margin-bottom: 18px; text-wrap: balance;
+}
+.intake-beat { min-height: 64vh; }
