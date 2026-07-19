@@ -2925,26 +2925,59 @@ const ActionExperience = {
     const ca = (state.clarity && state.clarity.answers) || {};
     const goal = (ca.neutronStar || '').trim();
     if (!goal) { this._renderDoors(); return; }
+    // v860 (Malik): no "I want to change it" escape here. They locked the star
+    // in Clarity five minutes ago; this beat is a summary of everything they
+    // just said, then straight into finding the move.
+    const tf = ((ca.timeHorizon || ca.timeframe || '') + '').trim();
+    const why = ((ca.coreWhy || ca.whyItMatters || '') + '').trim();
+    // Mid-sentence embed: drop the goal's leading capital unless it looks
+    // like a proper noun (second letter also uppercase, e.g. "NYC").
+    const goalEmbed = (goal.length > 1 && /^[A-Z][a-z]/.test(goal))
+      ? goal.charAt(0).toLowerCase() + goal.slice(1) : goal;
     host.innerHTML =
-      '<div class="intake-beat">' +
+      '<div class="intake-beat" data-beat="summary">' +
         '<div class="intake-beat__body">' +
-          '<div class="intake-beat__quiet">You said your mission is:</div>' +
-          '<div class="intake-beat__goal">' + esc(goal) + '</div>' +
+          '<div class="intake-beat__quiet">So here\'s where you stand.</div>' +
+          '<div class="intake-beat__sum">You want to <b>' + esc(goalEmbed) + '</b>' +
+            (tf ? ', within <b>' + esc(tf) + '</b>' : '') + '.</div>' +
+          (why ? '<div class="intake-beat__sum intake-beat__sum--why">In your own words: &ldquo;' + esc(why) + '&rdquo;</div>' : '') +
+          '<div class="intake-beat__sum">Let\'s find out <b>exactly</b> how to get you there.</div>' +
         '</div>' +
-        '<button type="button" class="intake-beat__cta" id="missionConfirmBtn">That\'s it</button>' +
-        '<button type="button" class="intake-beat__ghostline" id="missionChangeBtn">I want to change it</button>' +
+        '<button type="button" class="intake-beat__cta" id="missionConfirmBtn">Continue</button>' +
       '</div>';
     this._cineActivate();
-    const send = (msg) => {
-      try {
-        const intake = state.action.intake;
-        intake.aiMessages.push({ role: 'user', content: msg });
-        persistNow();
-        this._aiIntakeFetchNext();
-      } catch (_) {}
-    };
     host.querySelector('#missionConfirmBtn').addEventListener('click', () => this._renderDoors());
-    host.querySelector('#missionChangeBtn').addEventListener('click', () => send('I want to change the wording of the goal.'));
+  },
+
+  // v860: past beats stay visible above the current one, blurred and inert,
+  // like the onboarding conversation. Clone (strips listeners), stamp the
+  // user's answer if one was just given, wipe the live host.
+  _stackPast(host, answerText, incomingId) {
+    try {
+      if (!host || !host.children.length) return;
+      // Re-render of the SAME beat (resume settle, back): don't duplicate it
+      // into the past stack, just clear the live host.
+      const first = host.firstElementChild;
+      if (incomingId && first && first.getAttribute('data-beat') === incomingId) {
+        host.innerHTML = '';
+        return;
+      }
+      let past = host.parentNode.querySelector('.action-intake__past');
+      if (!past) {
+        past = document.createElement('div');
+        past.className = 'action-intake__past';
+        past.setAttribute('aria-hidden', 'true');
+        host.parentNode.insertBefore(past, host);
+      }
+      Array.from(host.children).forEach((ch) => past.appendChild(ch.cloneNode(true)));
+      if (answerText) {
+        const a = document.createElement('div');
+        a.className = 'intake-past__ans';
+        a.textContent = answerText;
+        past.appendChild(a);
+      }
+      host.innerHTML = '';
+    } catch (_) {}
   },
 
   _renderDoors() {
@@ -2953,11 +2986,12 @@ const ActionExperience = {
     if (!host) return;
     try { this.navEl.innerHTML = ''; } catch (e) {}
     const intake = state.action.intake;
-    const goalLine = ((state.clarity && state.clarity.answers && state.clarity.answers.neutronStar) || '').trim();
+    // v860: the summary beat above (stacked, blurred) already carries the
+    // goal, so this beat asks the question clean, no repeated star line.
+    this._stackPast(host, '', 'doors');
     host.innerHTML =
-      '<div class="intake-beat">' +
+      '<div class="intake-beat" data-beat="doors">' +
         '<div class="intake-beat__body">' +
-          (goalLine ? '<div class="intake-beat__star">' + esc(goalLine) + '</div>' : '') +
           '<div class="intake-beat__ask">Do you already know what you have to do to get there?</div>' +
           '<div class="intake-beat__sub">Not the busywork. The one move that makes everything else easier or unnecessary.</div>' +
         '</div>' +
@@ -3585,7 +3619,16 @@ The goal and timeframe are already locked from Clarity (see snapshot); they are 
       options: parsed.options || [],
       chips: parsed.options || []
     };
+    // v860: the outgoing beat (doors, or the previous AI question) rises into
+    // the blurred past stack, carrying the answer the user just gave.
+    const _msgs = state.action.intake.aiMessages || [];
+    const _lastUser = (_msgs.length && _msgs[_msgs.length - 1].role === 'user') ? _msgs[_msgs.length - 1].content : '';
+    this._stackPast(current, _lastUser, 'q:' + (fakeQ.prompt || '').slice(0, 40));
     current.innerHTML = this._buildCurrentSectionHtml(fakeQ);
+    try {
+      const cb = current.firstElementChild;
+      if (cb) cb.setAttribute('data-beat', 'q:' + (fakeQ.prompt || '').slice(0, 40));
+    } catch (_) {}
     this._cineActivate();
 
     this._cineRenderChrome(

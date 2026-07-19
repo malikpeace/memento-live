@@ -3557,7 +3557,52 @@ body.exit-grabber .action-exp__close { display: none !important; }
 }
 .intake-beat { min-height: calc(100dvh - var(--safe-t) - 230px); }
 
+/* v860 (Malik): the clarity summary beat. Sentence-sized, their own words. */
+.intake-beat__sum {
+  font-size: 1.375rem; font-weight: 600; letter-spacing: -0.02em; line-height: 1.3;
+  color: rgba(var(--ink),0.94); text-wrap: balance; margin-bottom: 16px;
+}
+.intake-beat__sum b { font-weight: 700; color: var(--text-hi); }
+.intake-beat__sum--why {
+  font-size: 1rem; font-weight: 500; line-height: 1.45; color: rgba(var(--ink),0.72);
+}
+.intake-beat__sum--why b, .intake-beat__sum:last-child { margin-bottom: 0; }
+.intake-beat__body .intake-beat__sum + .intake-beat__sum { margin-top: 0; }
 
+/* v860: the past stack. Answered beats rise above the live one, blurred and
+   inert, like the onboarding conversation. Radius-free, no boxes: the beats
+   themselves just sit dimmer and softer up the page. */
+.action-intake__past {
+  display: flex; flex-direction: column; gap: 26px; margin-bottom: 34px;
+  pointer-events: none; user-select: none;
+}
+.action-intake__past .intake-beat {
+  min-height: 0; filter: blur(2.5px); opacity: 0.34;
+  transform-origin: top left; transform: scale(0.99);
+}
+.action-intake__past .intake-beat__body { margin: 0; padding-bottom: 0; }
+.action-intake__past .intake-beat__cta,
+.action-intake__past .intake-beat__ghostline,
+.action-intake__past .wiz__text-input,
+.action-intake__past .action-cine__composer,
+.action-intake__past .action-cine__send,
+.action-intake__past .intake-beat__spacer { display: none; }
+/* When a past stack exists, the live beat gives up a little height so the
+   blurred tail of the previous beat peeks above the fold after auto-scroll. */
+.action-intake__past ~ .action-intake__current .intake-beat,
+.action-intake__past + .action-intake__current .intake-beat {
+  min-height: calc(100dvh - var(--safe-t) - 320px);
+}
+/* The page scrolls once a past stack exists, so the live section needs real
+   clearance under it or the fixed bottom nav overlaps the last chip. */
+.action-intake__past ~ .action-intake__current {
+  padding-bottom: calc(140px + var(--safe-b, 0px));
+}
+.intake-past__ans {
+  align-self: flex-end; max-width: 78%; text-align: right;
+  font-size: 0.9375rem; font-weight: 600; line-height: 1.4;
+  color: rgba(var(--ink),0.5); filter: blur(1.5px);
+}
 
 /* v856: the change-goal / cine question page, contrast made EXPLICIT (Malik's
    unreadable screenshot; the dimming itself was the v855 stranded state, but
