@@ -3986,7 +3986,16 @@ const SHEET_TEMPLATES = {
           if (bar && self._targetSec > 0) bar.style.width = Math.min(100, (self._elapsed / self._targetSec) * 100) + '%';
         } catch (_) {}
       };
-      const _exitFocus = () => { const o = document.getElementById('dwFocusOverlay'); if (o) o.remove(); focusTimerEl = null; };
+      const _exitFocus = () => {
+        const o = document.getElementById('dwFocusOverlay'); if (o) o.remove(); focusTimerEl = null;
+        // v872 (Action sweep): focus launched FROM the Action plan (aplFocus)
+        // opens this sheet as plumbing; exiting focus must land back on A5,
+        // not strand the user on the Deep Work sheet.
+        if (window.__dwFromAction) {
+          window.__dwFromAction = false;
+          try { if (typeof Sheet !== 'undefined' && Sheet.close) Sheet.close(); } catch (e) {}
+        }
+      };
       const finish = () => {
         const logged = self._commit();
         if (logged) { persistNow(); renderWidget('streak'); }

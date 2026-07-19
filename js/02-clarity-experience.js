@@ -3598,6 +3598,31 @@ The goal and timeframe are already locked from Clarity (see snapshot); they are 
       // commitment check + locator, which both land in pastProgress. The AI
       // keeps its lazy-answer authority: vague answers stay uncaptured.
       const door1 = (intake.aiMessages.find(m => m.role === 'user') || {}).content === 'I know the move';
+      // v871 CAPTURE NET (the sweep's "Good to go?" stall): the model
+      // sometimes fails to capture a clearly substantive answer and then
+      // recaps forever. The field mapping is deterministic by contract, so
+      // stamp it ourselves when the model slips: door 1's first substantive
+      // answer IS mainMove and its second IS pastProgress; door 2's second
+      // IS pastProgress (the first is the capacity reconfirm). Lazy answers
+      // stay uncaptured (BS check + length bar keep the AI's push-back
+      // authority intact).
+      try {
+        const doorIdx = intake.aiMessages.findIndex(m => m.role === 'user');
+        const afterDoor = intake.aiMessages.slice(doorIdx + 1)
+          .filter(m => m.role === 'user').map(m => String(m.content || ''));
+        const substantive = (s) => {
+          if (typeof s !== 'string' || s.trim().length < 16) return false;
+          try { if (typeof detectBSAnswer === 'function' && detectBSAnswer(s)) return false; } catch (e2) {}
+          return true;
+        };
+        const stamp = (k, v) => { snap[k] = v; intake.answers[k] = v; };
+        if (door1) {
+          if (!lengthOk(snap.mainMove, 8) && substantive(afterDoor[0])) stamp('mainMove', afterDoor[0]);
+          if (!lengthOk(snap.pastProgress, 4) && substantive(afterDoor[1])) stamp('pastProgress', afterDoor[1]);
+        } else {
+          if (!lengthOk(snap.pastProgress, 4) && substantive(afterDoor[1])) stamp('pastProgress', afterDoor[1]);
+        }
+      } catch (eNet) {}
       const doneNow = door1
         ? (lengthOk(snap.mainMove, 8) && lengthOk(snap.pastProgress, 4))
         : lengthOk(snap.pastProgress, 4);
@@ -5317,7 +5342,11 @@ Return ONLY the sentence text. No quotes, no labels.`;
         // Skip the one-time module intro flash; the focus session IS the intro.
         if (state.introsSeen && !state.introsSeen.deepwork) { state.introsSeen.deepwork = true; try { persistNow(); } catch (_) {} }
         if (typeof Sheet === 'undefined' || !Sheet.open) return;
+        window.__dwFromAction = true; // exit-focus returns to A5, not the sheet
         Sheet.open('deepwork');
+        // The sheet is PLUMBING here; a relaunch mid-focus must resume into
+        // Action, not the Deep Work sheet (the wrong-spot resume Malik hit).
+        try { rememberView('action'); } catch (eRv) {}
         setTimeout(() => {
           try {
             const body = Sheet.body;
