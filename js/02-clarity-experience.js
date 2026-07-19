@@ -3269,14 +3269,10 @@ const ActionExperience = {
       this._aiIntakeFetchNext();
       return;
     }
-    const ns = (state.clarity.answers && state.clarity.answers.neutronStar) || 'your goal';
-    const q = {
-      question: `Okay so, before we continue... does that Neutron Star still feel right?\n\n**${ns}**\n\nIs that still it, or would you word it differently?`,
-      type: 'choices',
-      options: ["Yeah, that's still it", "Close, but I'd word it differently", "No, I want to change it"]
-    };
-    this._aiIntakeRenderQuestion(q);
-    this._renderIntakeBackButton();
+    // v857: the legacy goalConfirm chip screen is DEAD (the mission-confirm
+    // beat owns goal confirmation since v845). Any path that lands here
+    // (e.g. the back button's old fallback) re-enters the beats instead.
+    this._renderMissionConfirm();
   },
 
   // Renders / refreshes the back button in the intake header. Visible whenever
