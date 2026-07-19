@@ -1265,12 +1265,9 @@ async function generateActionDraft(options = {}) {
     state.clarity.answers.timeframe = state.clarity.answers.timeHorizon;
     persistNow();
   }
-  const tf = String(state.clarity.answers.timeframe || '').trim();
-  if (!isNextStep && tf.length < 3) {
-    actionNeedsTimeframe = true;
-    refreshActionSurface();
-    return;
-  }
+  // v875 (Malik): the timeframe-picker gate is DEAD. Timeframe is Clarity's
+  // question; when it's missing the plan generates without it rather than
+  // ambushing the user with a bare chip screen.
   actionAiLoading = true;
   actionChatError = null;
   refreshActionSurface();

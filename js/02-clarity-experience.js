@@ -4867,13 +4867,8 @@ Return ONLY the sentence text. No quotes, no labels.`;
       return;
     }
 
-    // Round 10: timeframe gate before generation
-    if (actionNeedsTimeframe && !hasActionPlan()) {
-      this.pageWrap.innerHTML = this.renderTimeframeGate();
-      this.bindTimeframeGate();
-      return;
-    }
-
+    // (v875: the Round 10 timeframe gate is DEAD, Malik killed it. Timeframe
+    // is Clarity's question; a missing one never blocks the module.)
     if (actionAiLoading) {
       this.pageWrap.innerHTML = `
         <div class="action-exp__page-inner"><div class="action-exp__inner action-draft-loading action-draft-loading--cine">
@@ -4941,43 +4936,8 @@ Return ONLY the sentence text. No quotes, no labels.`;
     this._showActionIntro();
   },
 
-  // === Round 10 - Timeframe gate (shown when Clarity didn't capture one) ===
-  renderTimeframeGate() {
-    const chips = ['1 month', '3 months', '6 months', '1 year', '2 years', '5 years', 'Lifelong'];
-    const chipsHtml = chips.map(c => `<button class="action-plan__when-chip" data-tf="${esc(c)}" type="button">${esc(c)}</button>`).join('');
-    return `
-      <div class="action-exp__page-inner"><div class="action-exp__inner action-tf-gate">
-        <div class="action-tf-gate__title">First, when do you want this?</div>
-        <div class="action-tf-gate__sub">A plan for a month from now and a plan for five years from now look completely different. Pick the one that's true.</div>
-        <div class="action-plan__when-edit" id="actionTfChips">${chipsHtml}</div>
-        <div style="display:flex;gap:8px;align-items:center;margin-top:14px;width:100%;max-width:420px;">
-          <input class="wiz__text-input" id="actionTfCustom" type="text" placeholder="Or type your own (e.g. 18 months)" style="flex:1;">
-          <button class="action-wiz__btn action-wiz__btn--generate" id="actionTfSave" style="padding:12px 20px;border-radius:calc(8px * var(--rx, 1));">Use this</button>
-        </div>
-      </div></div>
-    `;
-  },
-  bindTimeframeGate() {
-    const wrap = this.pageWrap;
-    const commit = (val) => {
-      const v = String(val || '').trim();
-      if (v.length < 1) return;
-      state.clarity.answers.timeframe = v;
-      persistNow();
-      actionNeedsTimeframe = false;
-      generateActionDraft();
-    };
-    wrap.querySelectorAll('#actionTfChips .action-plan__when-chip').forEach(btn => {
-      btn.addEventListener('click', () => commit(btn.dataset.tf));
-    });
-    wrap.querySelector('#actionTfSave')?.addEventListener('click', () => {
-      const v = wrap.querySelector('#actionTfCustom')?.value || '';
-      commit(v);
-    });
-    wrap.querySelector('#actionTfCustom')?.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') { e.preventDefault(); commit(e.target.value); }
-    });
-  },
+  // (v875: renderTimeframeGate / bindTimeframeGate DELETED, Malik killed the
+  // screen. Timeframe belongs to Clarity; the plan generates without one.)
 
   // Route the plan page to the active view mode. Vine is the default; the
   // mountain stays available behind the toggle.
