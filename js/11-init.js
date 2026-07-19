@@ -5,6 +5,23 @@
 /* ============================================
    INIT
    ============================================ */
+/* v882: build-stamp guard. If the shell (index.html's MEMENTO_VERSION) and
+   the scripts (js/01's MEMENTO_JS_BUILD) disagree, the phone is running a
+   stale cached mix (the SW's offline fallback on a bad connection). ONE
+   forced reload repairs it; the sessionStorage flag prevents a loop when
+   the network genuinely can't deliver the new files yet. */
+try {
+  if (window.MEMENTO_VERSION && window.MEMENTO_JS_BUILD) {
+    if (window.MEMENTO_VERSION !== window.MEMENTO_JS_BUILD) {
+      if (!sessionStorage.getItem('memento_ver_reloaded')) {
+        sessionStorage.setItem('memento_ver_reloaded', '1');
+        location.reload();
+      }
+    } else {
+      sessionStorage.removeItem('memento_ver_reloaded');
+    }
+  }
+} catch (e) {}
 loadState();
 migrateState();
 applyPrefs(); // additive: stamp accent/motion/density prefs (no-op if unset)
