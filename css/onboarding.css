@@ -4056,13 +4056,15 @@ html.theme-light body.lite .milestone-banner {
   background: rgb(248, 248, 250);
 }
 
-/* Light mode (v566, Malik): a SELECTED answer flips to solid black with white
-   text, the white-fill selection reads as barely-different on the light page.
-   Covers the clarity/onboarding wizard chips, the discover grid tiles, and the
-   conversation chips (same white-when-selected recipe everywhere). */
+/* Light mode (v566, Malik): on LIGHT-rendered pages (the clarity wizard, the
+   Action intake) a SELECTED answer flips to solid black with white text, the
+   white fill reads as barely-different there. v868 (Malik's invisible-selection
+   report): the flip must NOT touch the welcome onboarding conversation
+   (.wc-chip), that surface is ALWAYS DARK, so the black flip made selected
+   answers dark-on-dark = invisible in light mode. Welcome chips stay solid
+   white with black text in BOTH themes; that is the selection feedback. */
 html.theme-light .wiz__option.selected,
-html.theme-light .wiz__domain-tile.selected,
-html.theme-light .wc-chip.is-selected {
+html.theme-light .wiz__domain-tile.selected {
   background: #101015;
   color: #fff;
 }
@@ -4070,6 +4072,11 @@ html.theme-light .wiz__option.selected .wiz__option-text { color: #fff; }
 html.theme-light .wiz__option.selected .wiz__option-desc { color: rgba(255,255,255,0.65); }
 html.theme-light .wiz__domain-tile.selected .wiz__domain-tile-label { color: #fff; }
 html.theme-light .wiz__domain-tile.selected .wiz__domain-tile-check { color: #fff; }
+html.theme-light .welcome-intro .wc-chip.is-selected,
+.welcome-intro .wc-chip.is-selected {
+  background: #fff;
+  color: #0a0e0f;
+}
 
 /* Light mode (v568, Malik): the progress fill was white-to-lavender, invisible
    on the light page. Inverse of the dark recipe: purple whisper at the tail,
