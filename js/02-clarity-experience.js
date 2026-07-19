@@ -3040,10 +3040,10 @@ const ActionExperience = {
     if (!msgs.length) mode = (this._doorsLive || !goal) ? 'doors' : 'summary';
     else if (last.role === 'user') mode = 'thinking';
     else mode = 'question';
-    // Past items: the summary always leads once the flow moved beyond it,
-    // then every completed exchange. The live exchange stays out of the past.
+    // Past items: v876 (Malik): the recap NEVER enters the history, the
+    // conversation's history starts at the doors question. The live exchange
+    // stays out of the past.
     const past = [];
-    if (goal && (msgs.length || this._doorsLive)) past.push({ kind: 'summary' });
     const pastPairs = (mode === 'question') ? pairs.slice(0, -1) : pairs;
     pastPairs.forEach(p => past.push({ kind: 'qa', q: p.q, a: p.a }));
     // Current question metadata (aiHistory tail wins, matching the live path).
@@ -3139,15 +3139,19 @@ const ActionExperience = {
   _typeRecapBeat(host) {
     try {
       const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (reduce || this._recapTyped) return;
-      this._recapTyped = true;
+      if (reduce) return;
       const beat = host.querySelector('.intake-beat');
+      // The recap types once per open; the doors beat types on every arrival
+      // (it is only reachable via Continue in-session).
+      const isRecap = beat && beat.getAttribute('data-beat') === 'summary';
+      if (isRecap && this._recapTyped) return;
+      if (isRecap) this._recapTyped = true;
       const body = beat && beat.querySelector('.intake-beat__body');
-      const cta = beat && beat.querySelector('.intake-beat__cta');
+      const ctas = beat ? Array.from(beat.querySelectorAll('.intake-beat__cta, .intake-beat__ghostline')) : [];
+      const cta = ctas[0];
       if (!beat || !body || !cta) return;
       body.style.minHeight = body.offsetHeight + 'px';
-      cta.style.opacity = '0'; cta.style.pointerEvents = 'none';
-      cta.style.transition = 'opacity 0.5s ease';
+      ctas.forEach(c => { c.style.opacity = '0'; c.style.pointerEvents = 'none'; c.style.transition = 'opacity 0.5s ease'; });
       const stash = Array.from(body.children).map((el) => {
         const segs = Array.from(el.childNodes).map((n) =>
           n.nodeType === 3 ? { text: n.textContent, el: null } : { text: n.textContent, el: n.cloneNode(false) });
@@ -3155,7 +3159,7 @@ const ActionExperience = {
       });
       stash.forEach((s) => { s.el.innerHTML = ''; });
       let done = false;
-      const showCta = () => { cta.style.opacity = '1'; cta.style.pointerEvents = 'auto'; };
+      const showCta = () => { ctas.forEach(c => { c.style.opacity = '1'; c.style.pointerEvents = 'auto'; }); };
       const finish = () => {
         if (done) return; done = true;
         stash.forEach((s) => { s.el.innerHTML = s.html; });
@@ -3196,18 +3200,21 @@ const ActionExperience = {
     host.innerHTML =
       '<div class="intake-beat" data-beat="doors">' +
         '<div class="intake-beat__body">' +
-          '<div class="intake-beat__ask">Do you already know what you have to do to get there?</div>' +
+          '<div class="intake-beat__ask">Do you know what you have to do to get there?</div>' +
           '<div class="intake-beat__sub">Not the busywork. The one move that makes everything else easier or unnecessary.</div>' +
         '</div>' +
         '<button type="button" class="intake-beat__cta" id="doorKnow">I know the move</button>' +
         '<button type="button" class="intake-beat__cta intake-beat__cta--ghost" id="doorFind">Find it for me</button>' +
       '</div>';
     this._cineActivate();
+    // v876 (Malik): the doors open on a BLANK page and the question TYPES in
+    // like onboarding; the CTAs fade in when the typing lands.
+    this._typeRecapBeat(host);
     const pick = (label) => {
       try {
         if (!Array.isArray(intake.aiMessages)) intake.aiMessages = [];
         if (!Array.isArray(intake.aiHistory)) intake.aiHistory = [];
-        const opener = 'Do you already know what you have to do to make progress toward this goal?';
+        const opener = 'Do you know what you have to do to get there?';
         intake.aiMessages.push({ role: 'assistant', content: opener });
         intake.aiHistory.push({ message: opener, type: 'choices', options: ['I know the move', 'Find it for me'] });
         intake.aiMessages.push({ role: 'user', content: label });

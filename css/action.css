@@ -3607,6 +3607,26 @@ body.exit-grabber .action-exp__close { display: none !important; }
 .intake-retry__line { font-size: 0.9375rem; color: rgba(var(--ink), 0.92); line-height: 1.4; }
 .intake-retry__cta { font-size: 0.875rem; font-weight: 700; color: var(--text-hi); }
 
+/* v876 (Malik): the conversation fades at its scroll edges (a mask, so it
+   works in both themes) and the nav paints NO box of its own on this page,
+   the gradient scrim read as a black rectangle behind the buttons on OLED. */
+.action-exp:has(.action-intake-page--cine) .action-exp__page-inner {
+  -webkit-mask-image: linear-gradient(180deg,
+    transparent 0,
+    #000 calc(var(--safe-t, 0px) + 84px),
+    #000 calc(100% - 130px),
+    transparent 100%);
+  mask-image: linear-gradient(180deg,
+    transparent 0,
+    #000 calc(var(--safe-t, 0px) + 84px),
+    #000 calc(100% - 130px),
+    transparent 100%);
+}
+.action-exp:has(.action-intake-page--cine) .action-exp__nav,
+html.theme-light .action-exp:has(.action-intake-page--cine) .action-exp__nav {
+  background: none;
+}
+
 /* v860 (Malik): the clarity summary beat. Sentence-sized, their own words. */
 .intake-beat__sum {
   font-size: 1.375rem; font-weight: 600; letter-spacing: -0.02em; line-height: 1.3;
