@@ -8690,7 +8690,11 @@ function _bindStarPlacard(root) {
         try {
           const ans = state.clarity.answers || {};
           const hasStar = String(ans.neutronStar || '').trim().length > 0;
-          devSummary = normalizeClaritySummary(hasStar ? ans : FILLER_ANSWERS);
+          // v881 (Malik): cheat jumps must leave REAL-flow state behind. With
+          // no real star, the filler becomes the state's star, exactly as if
+          // the user had synthesized it, so the home/gates read post-Clarity.
+          if (!hasStar) state.clarity.answers = Object.assign({}, ans, FILLER_ANSWERS);
+          devSummary = normalizeClaritySummary(state.clarity.answers);
         } catch (e) {}
       }
       return devSummary;
@@ -8706,7 +8710,9 @@ function _bindStarPlacard(root) {
         state.meta = state.meta || {};
         state.meta.cardEvolutionSeen = false;
         state.clarity.completed = true;
+        state.clarity.completedAt = state.clarity.completedAt || Date.now();
         state.clarity.ignitedAt = Date.now();
+        try { persistNow(); } catch (ePersist) {}
         ClarityExperience.isOpen = true;
         if (typeof FullscreenClose !== 'undefined' && FullscreenClose.show) FullscreenClose.show('clarity');
         ClarityExperience.el.setAttribute('aria-hidden', 'false');

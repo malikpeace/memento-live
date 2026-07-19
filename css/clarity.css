@@ -3438,8 +3438,14 @@ html.lowfx .nsv2.is-holding .nsv2__rays.ambient__rays {
    (Malik). Breathe uses the `scale` property so it composes with the zoom's
    `transform: scale`; it only kicks in after the zoom settles. */
 .nsv2[data-act="star"] .nsv2-star__blob {
+  /* v881 (Malik): the rage + idle tremble live on the STAR ONLY; they used
+     to sit on the scene wrapper, which shook the sentence and the CTA too.
+     zoom = transform, breathe = scale, shake = translate: independent
+     properties, all three compose here. */
   animation: nsv2StarZoomOut 4.2s cubic-bezier(0.5, 0, 0.25, 1) both,
-             nsv2StarBreathe 6.5s ease-in-out 4.4s infinite;
+             nsv2StarBreathe 6.5s ease-in-out 4.4s infinite,
+             nsv2StarRage 3.6s linear both,
+             nsv2StarIdleShake 3.4s ease-in-out 3.8s infinite;
 }
 @keyframes nsv2StarZoomOut {
   from { transform: scale(6.5); }
@@ -3450,10 +3456,8 @@ html.lowfx .nsv2.is-holding .nsv2__rays.ambient__rays {
    dead calm as it settles, then a permanent gentle idle tremble so it never
    goes fully dead (Malik). Both use `translate`; the idle hands off after the
    rage ends. On the scene wrapper so it stacks with the zoom. */
-.nsv2[data-act="star"] .nsv2-starscene {
-  animation: nsv2StarRage 3.6s linear both,
-             nsv2StarIdleShake 3.4s ease-in-out 3.8s infinite;
-}
+/* (v881: the scene wrapper no longer shakes; the star canvas carries the
+   rage + idle tremble so the sentence and CTA stay perfectly still.) */
 @keyframes nsv2StarIdleShake {
   0%, 100% { translate: 0 0; }
   25% { translate: 1.4px -1px; }
