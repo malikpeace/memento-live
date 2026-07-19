@@ -3041,22 +3041,13 @@ const ActionExperience = {
     if (!intakeEl || !host) return;
     const v = this._deriveIntakeView();
 
-    // The past stack, rebuilt declaratively (no cloning, no incremental drift).
-    let past = intakeEl.querySelector('.action-intake__past');
-    if (!past) {
-      past = document.createElement('div');
-      past.className = 'action-intake__past';
-      past.setAttribute('aria-hidden', 'true');
-      intakeEl.insertBefore(past, host);
-    }
-    past.innerHTML = v.past.map((item) => {
-      if (item.kind === 'summary') return this._summaryBeatHtml(false);
-      return '<div class="intake-beat intake-beat--past-q"><div class="intake-beat__body">' +
-        '<div class="intake-beat__ask">' + escWithBold(item.q) + '</div></div></div>' +
-        (item.a ? '<div class="intake-past__ans">' + esc(item.a) + '</div>' : '');
-    }).join('');
-    past.style.display = v.past.length ? '' : 'none';
-    past.classList.toggle('has-items', v.past.length > 0);
+    // v884 (Malik): NO visible history. Each beat/question stands alone on a
+    // clean page, exactly like Clarity; the stack read as a failed imitation
+    // of onboarding and made the module feel disjointed. The derivation keeps
+    // computing the conversation (state machine unchanged), it just never
+    // paints the past.
+    const past = intakeEl.querySelector('.action-intake__past');
+    if (past) { past.innerHTML = ''; past.style.display = 'none'; past.classList.remove('has-items'); }
 
     try { this.navEl.innerHTML = ''; } catch (e) {}
     if (v.mode === 'summary') {

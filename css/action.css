@@ -96,6 +96,43 @@ body:has(.clarity-exp.open)::after { display: none; }
   background-image: radial-gradient(rgba(255, 255, 255, 0.075) 1px, transparent 1px);
   background-size: 22px 22px;
 }
+/* v884 (Malik: "the background feels kinda dead"): the blueprint BREATHES.
+   Two extra dot lattices at offset tile positions fade in and out on
+   different slow clocks; the interference reads as dots randomly appearing
+   and disappearing. Opacity-only (compositor cheap), no loops visible as
+   rhythm, and both die inside the dark ceremonies. */
+.action-exp__bg .action-exp__bg-orb3 {
+  display: block; position: absolute; inset: 0; width: auto; height: auto;
+  border-radius: 0; filter: none; transform: none;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.09) 1px, transparent 1px);
+  background-size: 22px 22px; background-position: 11px 11px;
+  animation: actionDotsBreathe 9s ease-in-out infinite alternate;
+}
+.action-exp__bg::after {
+  content: ''; display: block; position: absolute; inset: 0;
+  width: auto; height: auto; border-radius: 0; filter: none; transform: none;
+  background: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: 22px 22px; background-position: 5px 17px;
+  animation: actionDotsBreathe 13s ease-in-out -6s infinite alternate;
+}
+html.theme-light .action-exp__bg .action-exp__bg-orb3 {
+  background-image: radial-gradient(rgba(24, 26, 33, 0.10) 1px, transparent 1px);
+}
+html.theme-light .action-exp__bg::after {
+  background: radial-gradient(rgba(24, 26, 33, 0.085) 1px, transparent 1px);
+  background-size: 22px 22px; background-position: 5px 17px;
+}
+@keyframes actionDotsBreathe {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+.action-exp:has(.action-draft-loading--cine) .action-exp__bg-orb3,
+.action-exp:has(.action-cine-reveal) .action-exp__bg-orb3,
+.action-exp:has(.action-draft-loading--cine) .action-exp__bg::after,
+.action-exp:has(.action-cine-reveal) .action-exp__bg::after { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .action-exp__bg .action-exp__bg-orb3, .action-exp__bg::after { animation: none; opacity: 0.35; }
+}
 .action-exp__stars {
   position: absolute; inset: 0;
   width: 100%; height: 100%;
@@ -137,34 +174,11 @@ body:has(.clarity-exp.open)::after { display: none; }
   background: radial-gradient(110% 80% at 50% 30%, transparent 40%, rgba(7, 7, 10, 0.9) 100%);
   pointer-events: none;
 }
-.action-exp__bg::after,
-.action-exp__bg-orb3,
+/* (v884: the old monochrome orb ::after/orb3 styles are DEAD; both hooks now
+   carry the breathing dot lattices defined with the blueprint above. orb4
+   stays hidden.) */
 .action-exp__bg-orb4 { display: none; }
-.action-exp__bg::after {
-  content: '';
-  position: absolute;
-  width: max(520px, 48vw); height: max(520px, 48vw);
-  border-radius: 50%;
-  background: radial-gradient(circle,
-    rgba(240, 244, 245,0.28) 0%,
-    rgba(200,200,210,0.16) 30%,
-    rgba(120,120,128,0.05) 60%,
-    transparent 82%);
-  bottom: -6%; right: -6%; filter: blur(30px);
-  pointer-events: none;
-}
-.action-exp__bg-orb3 {
-  position: absolute;
-  width: max(440px, 42vw); height: max(440px, 42vw);
-  border-radius: 50%;
-  background: radial-gradient(circle,
-    rgba(230,230,236,0.22) 0%,
-    rgba(180,180,188,0.13) 30%,
-    rgba(100,100,108,0.04) 60%,
-    transparent 82%);
-  top: 28%; right: -6%; filter: blur(30px);
-  pointer-events: none;
-}
+/* (v884: old orb3 glow deleted; orb3 is a breathing dot lattice now.) */
 .action-exp__bg-orb4 {
   position: absolute;
   width: max(360px, 34vw); height: max(360px, 34vw);
