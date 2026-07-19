@@ -2503,11 +2503,32 @@ const ActionExperience = {
   _zoomTy: 0,
   _settleTimer: null,
 
+  // v855 (Malik's dim screen): the open choreography (open-bg -> rAF ->
+  // open-content -> timer -> open) uses rAF and timers that iOS SUSPENDS when
+  // the app backgrounds; returning mid-choreography stranded the surface
+  // between states at partial opacity. This settles it: whenever we are open
+  // but not fully 'open', snap to the stable end state. Called on every
+  // resume and at the start of every content render.
+  _settleOpenState() {
+    try {
+      if (!this.isOpen || !this.el) return;
+      if (!this.el.classList.contains('open')) {
+        this.el.classList.add('open');
+        this.el.classList.remove('open-bg', 'open-bg-visible', 'open-content');
+        const app = document.getElementById('app');
+        if (app) { app.style.transition = ''; }
+      }
+    } catch (e) {}
+  },
+
   init() {
     this.el = document.getElementById('actionExp');
     this.pageWrap = document.getElementById('actionExpPageWrap');
     this.progressEl = document.getElementById('actionExpProgress');
     this.navEl = document.getElementById('actionExpNav');
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') setTimeout(() => this._settleOpenState(), 250);
+    });
     const closeBtn = document.getElementById('actionExpClose');
     if (closeBtn) {
       const closeNow = (e) => {
@@ -2897,6 +2918,7 @@ const ActionExperience = {
   _renderIntakeBrief() { /* replaced by the beat sequence (v845) */ },
 
   _renderMissionConfirm() {
+    this._settleOpenState();
     const host = this.pageWrap && this.pageWrap.querySelector('.action-intake__current');
     if (!host) return;
     try { this.navEl.innerHTML = ''; } catch (e) {}
@@ -2926,6 +2948,7 @@ const ActionExperience = {
   },
 
   _renderDoors() {
+    this._settleOpenState();
     const host = this.pageWrap && this.pageWrap.querySelector('.action-intake__current');
     if (!host) return;
     try { this.navEl.innerHTML = ''; } catch (e) {}
@@ -3552,6 +3575,7 @@ The goal and timeframe are already locked from Clarity (see snapshot); they are 
   // Renders the AI's current question into the current section, with a smooth
   // swap that doesn't unmount the transcript.
   _aiIntakeRenderQuestion(parsed) {
+    this._settleOpenState();
     const intake = this.pageWrap.querySelector('.action-intake');
     const transcript = intake && intake.querySelector('.action-intake__transcript');
     const current = intake && intake.querySelector('.action-intake__current');
