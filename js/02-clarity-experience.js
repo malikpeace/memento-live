@@ -2528,21 +2528,15 @@ const ActionExperience = {
     return t;
   },
 
-  // v877: the intake's keyboard handling is KeyboardPin (js/01), the
-  // pan-preventer: pre-shrinks the overlay on pointerup (before focus) using
-  // the learned keyboard height, so iOS never pans and the keyboard slides
-  // over a stable layout. Replaces the v874 reactive-only pin.
-  _bindIntakeKeyboardKeep() {
+  // v879 (Malik: "whatever Clarity does, do THAT"): the intake input uses
+  // the EXACT keyboard recipe Clarity/onboarding use, bindKeyboardSettle,
+  // the v523-v527 on-device-tuned settle (let iOS shove, wait for quiet,
+  // glide back in one compositor motion, caret hidden during the glide).
+  // Its precondition, a HIGH field, holds since v878 (input bottom ~37%).
+  // No KeyboardPin here; Clarity doesn't shrink its overlay and neither do we.
+  _bindIntakeKeyboardKeep(field) {
     try {
-      if (typeof KeyboardPin === 'undefined') return;
-      KeyboardPin.auto(this.el, {
-        afterPin: () => {
-          try {
-            const sc = this.pageWrap && this.pageWrap.querySelector('.action-exp__page-inner');
-            if (sc) sc.scrollTop = sc.scrollHeight;
-          } catch (e) {}
-        }
-      });
+      if (field && typeof bindKeyboardSettle === 'function') bindKeyboardSettle(this, field);
     } catch (e) {}
   },
 
@@ -2777,6 +2771,7 @@ const ActionExperience = {
     this.isOpen = false;
     this._clearTimers();
     try { if (typeof KeyboardPin !== 'undefined') KeyboardPin.release(this.el); } catch (e) {}
+    if (this._kbSettleCleanup) { try { this._kbSettleCleanup(); } catch (e) {} this._kbSettleCleanup = null; }
     if (recallView() === 'action') rememberView(null);
     FullscreenClose.hide();
     if (this._settleTimer) {
