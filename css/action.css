@@ -3041,6 +3041,16 @@ body:has(.clarity-exp.open)::after { display: none; }
   display: flex; flex-direction: column;
   gap: 14px;
 }
+/* v878 (Malik: a HIGH field is what stops the iOS keyboard pan, same reason
+   Clarity/onboarding feel native): the LIVE question section fills the
+   viewport below the top anchor, so the auto-scroll lands the question at
+   Clarity's fixed y with the input directly under it, in the top half of
+   the screen. justify-content stays flex-start: question + input at the
+   section's top, empty space below them. */
+.action-intake--cine .action-intake__current {
+  min-height: calc(100dvh - var(--safe-t, 0px) - 108px);
+  justify-content: flex-start;
+}
 /* Flat iMessage-style bubbles: solid fills, no gradients, no borders,
    no glassy blur. Tight corner radius with one squared-off corner facing
    the speaker. */

@@ -1011,12 +1011,12 @@ const KeyboardPin = {
   },
   // Shrink a fixed full-screen panel to the (predicted or real) space above
   // the keyboard. Returns true when a pin was applied.
-  _apply(panel) {
+  _apply(panel, allowPredicted) {
     try {
       if (!panel || !this._touch()) return false;
       const vv = window.visualViewport;
       const real = vv ? Math.round(window.innerHeight - vv.height) : 0;
-      const kb = (real > 150) ? real : this.kbH();
+      const kb = (real > 150) ? real : (allowPredicted ? this.kbH() : 0);
       if (!kb) return false;
       const top = (real > 150 && vv) ? Math.round(vv.offsetTop) : 0;
       panel.style.top = top + 'px';
@@ -1051,16 +1051,21 @@ const KeyboardPin = {
         this.release(panel);
       }
     };
-    // THE core move: pre-pin on pointerup, before focus fires, so iOS never
-    // needs to pan. Capture phase so no inner handler can eat it.
-    panel.addEventListener('pointerup', (e) => {
-      const t = e.target && e.target.closest ? e.target.closest('textarea, input, [contenteditable]') : null;
-      if (!this._isEditable(t)) return;
-      if (this._apply(panel)) after();
-    }, true);
+    // Pre-pin on pointerup (before focus) using the LEARNED height. v878:
+    // OFF by default, Malik's device showed the prediction losing to iOS's
+    // varying keyboard heights (dead gap above the keyboard). The real fix
+    // is anchoring fields HIGH so iOS has no reason to pan; the reactive
+    // correction below then uses only REAL measured values.
+    if (opts.predict) {
+      panel.addEventListener('pointerup', (e) => {
+        const t = e.target && e.target.closest ? e.target.closest('textarea, input, [contenteditable]') : null;
+        if (!this._isEditable(t)) return;
+        if (this._apply(panel, true)) after();
+      }, true);
+    }
     panel.addEventListener('focusin', (e) => {
       if (!this._isEditable(e.target)) return;
-      if (this._apply(panel)) after();
+      if (this._apply(panel, !!opts.predict)) after();
       if (!unhook) {
         const vv = window.visualViewport;
         if (vv) { vv.addEventListener('resize', correct); unhook = () => vv.removeEventListener('resize', correct); }
