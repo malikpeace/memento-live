@@ -4109,47 +4109,6 @@ The goal and timeframe are already locked from Clarity (see snapshot); they are 
     return this._bindIntakePhaseHandlers(q);
   },
 
-  // Stub for legacy callers that used to invoke a closure-style submit.
-  // Kept here for safety; not used by the new state machine.
-  _stub_oldSubmit(q) {
-    const submit = (raw) => {
-      const value = String(raw || '').trim();
-      const bsReason = (typeof detectBSAnswer === 'function') ? detectBSAnswer(value) : null;
-      if (bsReason) {
-        this._intakeShowError(bsReason);
-        return;
-      }
-      this._aiIntakeStashAndAnswer(value);
-    };
-
-    if (q.type === 'choices' || q.type === 'select') {
-      this.pageWrap.querySelectorAll('.action-chat__opt').forEach(btn => {
-        btn.addEventListener('click', () => submit(btn.dataset.value));
-      });
-    } else if (q.type === 'chips') {
-      this.pageWrap.querySelectorAll('#intakeChips .action-plan__when-chip').forEach(btn => {
-        btn.addEventListener('click', () => submit(btn.dataset.chip));
-      });
-      const custom = this.pageWrap.querySelector('#intakeCustom');
-      const customBtn = this.pageWrap.querySelector('#intakeCustomSave');
-      if (customBtn) customBtn.addEventListener('click', () => submit(custom && custom.value));
-      if (custom) custom.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') { e.preventDefault(); submit(custom.value); }
-      });
-    } else {
-      const input = this.pageWrap.querySelector('#intakeInput');
-      const doSubmit = () => submit(input && input.value);
-      if (nextBtn) nextBtn.addEventListener('click', doSubmit);
-      if (input) {
-        input.addEventListener('input', () => { if (nextBtn) nextBtn.disabled = !((input.value || '').trim()); });
-        input.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); doSubmit(); }
-        });
-        setTimeout(() => input.focus(), 80);
-      }
-    }
-  },
-
   // Move the just-asked AI question down into transcript, append the user's
   // answer, show typing indicator, then fetch the next question.
   _aiIntakeStashAndAnswer(answer) {

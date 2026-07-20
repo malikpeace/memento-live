@@ -84,7 +84,7 @@ ActionExperience.init();
 CreatorTools.init();
 WelcomeIntro.init();
 TabBar.init();
-try { if (typeof DeeperRoom !== 'undefined') DeeperRoom.init(); } catch (e) {}
+setTimeout(function(){ try { if (typeof DeeperRoom !== 'undefined') DeeperRoom.init(); } catch (e) {} }, 0);
 try { if (typeof GrabberTrial !== 'undefined') GrabberTrial.init(); } catch (e) {}
 Sidebar.init();
 DragDrop.init();
@@ -2283,62 +2283,6 @@ window.addEventListener('keydown', (e) => {
   }
   document.addEventListener('touchend', endDrag, { passive: true });
   document.addEventListener('touchcancel', endDrag, { passive: true });
-})();
-
-// Diagnostic HUD (debug only): open the app with ?perf=1 in the URL to show a
-// live metrics readout in the top-right corner. Tells us whether a slowdown is
-// a leak (a number climbs), the GPU/phone (FPS drops, others flat), or neither.
-(function () {
-  // Legacy perf HUD, superseded by the ?perf=1 diagnostic overlay at the top of
-  // the script. Kept dormant to avoid a duplicate readout.
-  return;
-  // eslint-disable-next-line no-unreachable
-  try {
-    var glMade = 0;
-    var origGet = HTMLCanvasElement.prototype.getContext;
-    HTMLCanvasElement.prototype.getContext = function (type) {
-      if (type === 'webgl' || type === 'webgl2' || type === 'experimental-webgl') glMade++;
-      return origGet.apply(this, arguments);
-    };
-    var rafCalls = 0;
-    var origRaf = (window.requestAnimationFrame || function (cb) { return setTimeout(cb, 16); }).bind(window);
-    window.requestAnimationFrame = function (cb) { rafCalls++; return origRaf(cb); };
-    var hud = document.createElement('div');
-    hud.id = '__perfHud';
-    hud.style.cssText =
-      'position:fixed;top:90px;left:8px;z-index:2147483647;' +
-      'background:#000;color:#3f6;font:13px/1.5 ui-monospace,monospace;padding:10px 12px;' +
-      'border-radius:calc(10px * var(--rx, 1));pointer-events:none;white-space:pre;border:2px solid #3f6;box-shadow:0 6px 24px rgba(0,0,0,0.6);';
-    hud.textContent = 'PERF\nstarting...';
-    var pin = function () { var root = document.documentElement; if (root && hud.parentNode !== root) root.appendChild(hud); };
-    pin();
-    var lastSec = performance.now(), lastNodes = 0, peakNodes = 0;
-    setInterval(function () {
-      pin();
-      var now = performance.now();
-      var dt = (now - lastSec) / 1000; lastSec = now;
-      var fps = dt > 0 ? Math.round(rafCalls / dt) : 0;
-      var nodes = document.getElementsByTagName('*').length;
-      if (nodes > peakNodes) peakNodes = nodes;
-      var delta = nodes - lastNodes; lastNodes = nodes;
-      hud.textContent =
-        'PERF (crash hunt)\n' +
-        'anim loops/s: ' + fps + '\n' +
-        'canvases: ' + document.querySelectorAll('canvas').length + '\n' +
-        'GL ctx made: ' + glMade + '\n' +
-        'DOM nodes: ' + nodes + ' (' + (delta >= 0 ? '+' : '') + delta + '/s)\n' +
-        'DOM peak: ' + peakNodes + '\n' +
-        'heap MB: ' + (performance.memory ? Math.round(performance.memory.usedJSHeapSize / 1048576) : 'n/a');
-      rafCalls = 0;
-    }, 1000);
-  } catch (e) {
-    try {
-      var err = document.createElement('div');
-      err.style.cssText = 'position:fixed;top:90px;left:8px;z-index:2147483647;background:#900;color:#fff;font:12px ui-monospace,monospace;padding:8px;border-radius:calc(8px * var(--rx, 1));white-space:pre;max-width:90vw;';
-      err.textContent = 'PERF HUD error:\n' + (e && e.message ? e.message : e);
-      (document.documentElement || document.body).appendChild(err);
-    } catch (e2) {}
-  }
 })();
 
 // Freeze the page whenever a full-screen module / dialog is open, so the open

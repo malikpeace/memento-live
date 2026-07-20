@@ -40,7 +40,8 @@ const DeeperRoom = {
       if (typeof ClarityExperience !== 'undefined' && ClarityExperience.isOpen) return false;
       if (document.getElementById('n7dRoot')) return false;
       if (document.getElementById('clarityPaywall')) return false;
-      if (document.getElementById('welcomeIntro')) return false;
+      const _wi = document.getElementById('welcomeIntro');
+      if (_wi && _wi.classList.contains('open')) return false;
       if (document.body.classList.contains('evo2') || document.body.classList.contains('evo-pending')) return false;
       if (this._el) return false;
     } catch (e) {}
