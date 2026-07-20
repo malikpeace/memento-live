@@ -2,12 +2,12 @@
    Extracted from app.js lines 2-2125. Loaded as a classic <script> so
    all modules share one global lexical scope (no window pollution). Order matters:
    this file must load before js/11-init.js, which runs the bootstrap immediately. */
-/* v892: the JS build stamp. The release sed bump rewrites the version in BOTH
+/* v893: the JS build stamp. The release sed bump rewrites the version in BOTH
    index.html AND this line; js/11 compares them at boot and force-refreshes
    ONCE on mismatch. Kills the "phone silently runs old cached js under a new
    index" class (the SW's offline fallback can serve stale files on a bad
    connection; Malik hit this three times in one day). */
-window.MEMENTO_JS_BUILD = 'v892';
+window.MEMENTO_JS_BUILD = 'v893';
 /* ============================================
    STATE MANAGEMENT
    ============================================ */
@@ -440,7 +440,7 @@ function stripCadenceAndTime(text) {
   // "daily/weekly/monthly/nightly"
   s = s.replace(/\s*\b(daily|weekly|monthly|nightly)\b/gi, '');
   // "X days/weeks/months a week" patterns, digits AND word numbers
-  // (v892: "three times a week" in a title left a garbled 7-word fallback
+  // (v893: "three times a week" in a title left a garbled 7-word fallback
   // "Go to the gym three times a" because only \d+ was matched).
   s = s.replace(/\s*\b(\d+|one|two|three|four|five|six|seven|eight|nine|ten|twice)\s+(days?|nights?|mornings?|evenings?|weeks?|months?|times?|sessions?)\s+(a|per)\s+(day|week|month|year)\b/gi, '');
   s = s.replace(/\s*\b(once|twice)\s+(a|per)\s+(day|week|month|year)\b/gi, '');
@@ -1915,7 +1915,7 @@ function migrateState() {
   // already-clean text.
   if (state.action.primaryAction && typeof stripCadenceAndTime === 'function') {
     const pa = state.action.primaryAction;
-    // v892: title and howToStart are NO LONGER stripped. The strip garbled
+    // v893: title and howToStart are NO LONGER stripped. The strip garbled
     // durations mid-sentence ("for [60 seconds] before" -> "for before") and
     // erased the cadence the doctrine now wants visible in lever titles.
     // Tiers still get re-validated below with a cadence-free fallback.

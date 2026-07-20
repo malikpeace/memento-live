@@ -1459,7 +1459,11 @@ async function generateActionDraft(options = {}) {
         // API rejects the disabled flag (400), fall back to the same
         // nudged call without it.
         const lastTry = emptyTries === softNudges.length;
-        const callOpts = { maxTokens: 8000, model: ANTHROPIC_MODEL_PLANS, timeout: 120000 };
+        // v893: cache the ~15k-token system prompt. It's identical on every
+        // plan generation, so the proxy wraps it in an ephemeral cache block
+        // and repeat calls (bursts, or many users close together) read it at
+        // ~10% the input cost. Output and behavior are unchanged.
+        const callOpts = { maxTokens: 8000, model: ANTHROPIC_MODEL_PLANS, timeout: 120000, cache: true };
         if (lastTry) callOpts.thinking = 'off';
         const body = userBody + (emptyTries ? softNudges[emptyTries - 1] : '');
         try {
@@ -1499,7 +1503,7 @@ async function generateActionDraft(options = {}) {
       const retryRaw = await callClaude(
         [{ role: 'user', content: userBody }],
         AI_ACTION_DRAFT_SYSTEM_PROMPT,
-        { maxTokens: 8000, model: ANTHROPIC_MODEL_PLANS, timeout: 120000 }
+        { maxTokens: 8000, model: ANTHROPIC_MODEL_PLANS, timeout: 120000, cache: true }
       );
       let rj = retryRaw.trim().replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();
       const fb2 = rj.indexOf('{');
@@ -1574,7 +1578,7 @@ async function generateActionDraft(options = {}) {
         const retryResponse = await callClaude(
           [{ role: 'user', content: retryBody }],
           AI_ACTION_DRAFT_SYSTEM_PROMPT,
-          { maxTokens: 8000, model: ANTHROPIC_MODEL_PLANS, timeout: 120000 }
+          { maxTokens: 8000, model: ANTHROPIC_MODEL_PLANS, timeout: 120000, cache: true }
         );
         let retryJson = retryResponse.trim()
           .replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();
@@ -3572,7 +3576,7 @@ async function autoStartAiChat() {
     const response = await callClaude(
       [{ role: 'user', content: context + '\n\n' + buildFirstQuestionInstruction() }],
       AI_DISCOVERY_SYSTEM_PROMPT,
-      { model: ANTHROPIC_MODEL_CLARITY }
+      { model: ANTHROPIC_MODEL_CLARITY, cache: true }
     );
 
     const parsed = parseAiQuestion(response);
