@@ -2,12 +2,12 @@
    Extracted from app.js lines 2-2125. Loaded as a classic <script> so
    all modules share one global lexical scope (no window pollution). Order matters:
    this file must load before js/11-init.js, which runs the bootstrap immediately. */
-/* v886: the JS build stamp. The release sed bump rewrites the version in BOTH
+/* v887: the JS build stamp. The release sed bump rewrites the version in BOTH
    index.html AND this line; js/11 compares them at boot and force-refreshes
    ONCE on mismatch. Kills the "phone silently runs old cached js under a new
    index" class (the SW's offline fallback can serve stale files on a bad
    connection; Malik hit this three times in one day). */
-window.MEMENTO_JS_BUILD = 'v886';
+window.MEMENTO_JS_BUILD = 'v887';
 /* ============================================
    STATE MANAGEMENT
    ============================================ */
@@ -439,8 +439,11 @@ function stripCadenceAndTime(text) {
   s = s.replace(/\s*\b(today|tonight|tomorrow)\b/gi, '');
   // "daily/weekly/monthly/nightly"
   s = s.replace(/\s*\b(daily|weekly|monthly|nightly)\b/gi, '');
-  // "X days/weeks/months a week" patterns
-  s = s.replace(/\s*\b\d+\s+(days?|weeks?|months?|times?)\s+(a|per)\s+(day|week|month|year)\b/gi, '');
+  // "X days/weeks/months a week" patterns, digits AND word numbers
+  // (v887: "three times a week" in a title left a garbled 7-word fallback
+  // "Go to the gym three times a" because only \d+ was matched).
+  s = s.replace(/\s*\b(\d+|one|two|three|four|five|six|seven|eight|nine|ten|twice)\s+(days?|weeks?|months?|times?)\s+(a|per)\s+(day|week|month|year)\b/gi, '');
+  s = s.replace(/\s*\b(once|twice)\s+(a|per)\s+(day|week|month|year)\b/gi, '');
   // "full-day", "all-day", "half-day", "whole-day" blocks/sessions
   s = s.replace(/\s*\b(full[\s\-]day|all[\s\-]day|half[\s\-]day|whole[\s\-]day)\s*(blocks?|sessions?|sprints?|stints?)?\b/gi, '');
   // "by Friday/Monday/etc." or "by tomorrow"
@@ -1912,10 +1915,12 @@ function migrateState() {
   // already-clean text.
   if (state.action.primaryAction && typeof stripCadenceAndTime === 'function') {
     const pa = state.action.primaryAction;
-    if (pa.title) pa.title = stripCadenceAndTime(pa.title);
-    if (pa.howToStart) pa.howToStart = stripCadenceAndTime(pa.howToStart);
+    // v887: title and howToStart are NO LONGER stripped. The strip garbled
+    // durations mid-sentence ("for [60 seconds] before" -> "for before") and
+    // erased the cadence the doctrine now wants visible in lever titles.
+    // Tiers still get re-validated below with a cadence-free fallback.
     if (pa.tiers && typeof pa.tiers === 'object') {
-      const titleFb = pa.title || '';
+      const titleFb = stripCadenceAndTime(pa.title || '');
       const tierKeys = ['tiny','light','moderate','heavy','extreme'];
       tierKeys.forEach(k => {
         if (pa.tiers[k]) {

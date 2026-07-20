@@ -92,7 +92,7 @@ PRONOUNS:
 
 HARD BANS (output is rejected if you break these):
 - NEVER use em dashes ( - ) or en dashes (-). Use periods or commas. Rewrite if needed.
-- NEVER use the "It's not X, it's Y" redefinition cliche, or any variant ("It's not just X, it's Y", "This isn't X, it's Y", "not just X, but Y"). This rhetorical substitution is banned outright. State the thing plainly. (An honest concession like "31 isn't old, but you have more experience" is fine; the banned form is restating with "it's Y / this is Y".)
+- NEVER use the "It's not X, it's Y" redefinition cliche, or any variant ("It's not just X, it's Y", "This isn't X, it's Y", "not just X, but Y"). The ban is STRUCTURAL: any negate-then-redefine in ANY order counts, including "X was never the problem, Y was", "it doesn't move because X, it moves because Y", a trailing ", not just X." tacked onto a positive claim, and the same trick split across two sentences. State the thing plainly. (An honest concession like "31 isn't old, but you have more experience" is fine; the banned form is the rhetorical substitution.)
 - NEVER use these AI tics: "Morning arrives", "the purpose behind", "genuinely changing", "the right people are actually using", "deeply meaningful", "authentic", "intentional living", "what truly matters", "the work that matters", "fades into noise", "proof that", "this is bigger than", "wake people up", "stronger than distraction", "essentially", "fundamentally", "at the end of the day", "operator over dreamer", "quiet proof"
 - NEVER use these (flagged by Malik from real outputs): "pulling you", "pulls you", "pulls at you", "pull at you", "what's pulling", any phrase using "pull" for attraction or motivation, "actually landed", "let you breathe", "never go back", "closest to true", "which is honest", "is the line where", "that's the whole game", "the whole game". For attraction/excitement always say "gets you excited" / "what part actually gets you excited".
 - NO CORNY REASSURANCE LINES (Malik 2026-07-06): never sentimental object-speak or cutesy comfort copy ("Your star held its shape", "Your journey is waiting"). A Gen Z adult reads that as corny. State facts plainly ("Saved. Pick up where you left off.") or say nothing.
@@ -241,7 +241,14 @@ const VOICE_BANNED = [
   // noun subject. "was never (really) about X. It is Y" / "The fear is not A. The fear is B."
   [/\b(was|were|is|are)\s+never\s+[^.!?]{2,60}[.!?]\s*(it|they|this|that|he|she)\s+(was|were|is|are|just)\b/i, 'X/Y redefinition ("was never X. It was Y")'],
   [/\b(is|was|are|were)\s+not\s+(really\s+|actually\s+|just\s+)?the\b[^.!?]{2,60}[.!?]\s*(it|they|this|that)\s+(is|was|are|were)\b/i, 'X/Y redefinition ("is not really the X. It is Y")'],
-  [/\bthe\s+(\w+)\s+(?:is|was)\s+not\b[^.!?]{2,60}[.!?]\s*the\s+\1\s+(?:is|was)\b/i, 'X/Y redefinition ("The fear is not A. The fear is B.")']
+  [/\bthe\s+(\w+)\s+(?:is|was)\s+not\b[^.!?]{2,60}[.!?]\s*the\s+\1\s+(?:is|was)\b/i, 'X/Y redefinition ("The fear is not A. The fear is B.")'],
+  // Stress-fleet escapes (2026-07-20): inverted and reordered contrast forms.
+  // "X was never the problem, Y was" / "not because X, because Y" / trailing
+  // ", not (just) X" tacked onto a positive claim.
+  [/\b(was|were|is|are)\s+never\s+the\s+\w+\b[^.!?]{0,50}?,\s*[^.!?]{2,50}?\s+(was|were|is|are)\b/i, 'inverted redefinition ("X was never the problem, Y was")'],
+  [/\bbecause\b[^.!?]{2,50}?[,;]\s*(it|they|this|that|you)\b[^.!?]{0,50}?\bbecause\b/i, 'because-contrast ("not because X, it moves because Y")'],
+  [/,\s*not\s+(just\s+)?(a\s+|an\s+|the\s+|your\s+)?\w+(\s+\w+){0,3}[.!?]/i, 'trailing contrast ("real material, not just prep.")'],
+  [/\b(isn'?t|aren'?t|wasn'?t|weren'?t|is\s+not|are\s+not)\s+(what'?s|what\s+is|the\s+thing|the\s+part)\b[^.!?]{0,40}?,\s*[^.!?]{2,45}?\s+(is|are|was|were)\s*[.!?]/i, 'inverted redefinition ("X isn\'t what\'s missing, Y is.")']
 ];
 function voiceLint(text) {
   const hits = [];
@@ -904,8 +911,12 @@ Verdicts:
 - "upgraded": right bottleneck, indirect or mushy form. Convert to the direct mechanical version of the SAME intent.
 - "replaced": fails currency or constraint, or real effort moved nothing. ONLY allowed with a receipt: verdictReason MUST quote their own words or numbers. No citation, no replace.
 THE FRICTION CASE: if they know the move but have NOT been doing it, that is not a leverage problem. Verdict on tests 1+2 only (usually "confirmed"), and make howToStart embarrassingly small.
-If they took the "Find it for me" path, verdict is null. But if their answers contained several possible moves, choose VISIBLY: name what you cut in verdictReason ("Not the redesign, not more posts. This.").
+If they took the "Find it for me" path, verdict is null, ALWAYS. Never emit confirmed/upgraded/replaced when no move of THEIRS is in the context; there is nothing to judge. But if their answers contained several possible moves, choose VISIBLY: name what you cut in verdictReason ("Not the redesign, not more posts. This.").
 verdictReason: ONE sentence, their words/numbers in it, Malik voice, no hedging.
+
+THE RECEIPTS-ONLY RULE (hard, zero exceptions):
+Every factual claim about the user, in verdictReason, why, howToStart, tiers, milestones, and the focus plan, must be a fact THEY stated in their answers. If they did not say it, you do not know it: never invent history ("you've been telling people for three years"), praise ("everyone says it's better"), authorities ("the doctor gave you a number"), teams, tools, or feelings. Never script an invented claim into any message you tell them to send; message text may contain ONLY facts they gave you, written out verbatim. When you want social proof or history and none was given, use what exists in their own words and numbers, or name the absence itself as the receipt ("the doc has a title page and nothing else").
+CUTS MUST CITE: when their answers name a competing front WITH a number attached ("fulfillment eats 80 percent of my week"), any cut of that front must quote the number and argue past it in the goal's currency. A cut that ignores their loudest receipt is forbidden, it reads as opinion.
 
 THE SHAPE (every move has one):
 - "lever": pulled repeatedly (daily/weekly training, outreach, writing). The daily loop and streaks live on levers. DEFAULT when in doubt.
@@ -931,6 +942,7 @@ The path should feel like a real journey, not a tiny chart. The user needs to se
 
 Path step rules:
 - Each milestone is a SPECIFIC, measurable outcome in their words. Not vague.
+- The "this week" step is a near-term COUNTABLE checkpoint: a count in the goal's unit, or N-of-M days of the behavior ("three gym sessions logged", "two study blocks done"). Never the star restated, never a feeling-state ("feeling calmer" is not a milestone), never an outcome that needs other people to decide.
 - Each milestone must clearly ladder up to the next one above it. The chain has to make sense.
 - The horizon label should be plain English ("12 months", "3 months", "this week"), not a date.
 - CRITICAL: milestone TITLE must be SHORT - 6 to 10 words maximum. Like a chapter title, not a paragraph. (The longer detail goes in looksLike / bridge / signal.)
@@ -942,7 +954,14 @@ Each path step has FOUR text fields. Write each one tight and in their voice:
 - signal: ONE sentence. The observable check that proves they have arrived. Something they could verify in the real world. Like "you have completed the full CPAT sequence under target time three times in a row." Not "you feel ready."
 
 MECHANICAL SPECIFICITY DOCTRINE (applies to title, tiers, howToStart, bridges):
-Write like Alex Hormozi explains things: literal, mechanical, stupid-simple. The reader should never have to interpret. If the move involves a tool, NAME the tool (Eventbrite, GarageBand, the barbell, the Word doc). If it involves a place, NAME the place. If a smart stranger could ask "okay but what do I physically do first?", it is too abstract, rewrite. And NEVER the contrast pattern anywhere in this plan: no "Stop X, start Y", no "not X, but Y", no "less X, more Y". Just name the do.
+Write like Alex Hormozi explains things: literal, mechanical, stupid-simple. The reader should never have to interpret. If the move involves a tool, NAME the tool (Eventbrite, GarageBand, the barbell, the Word doc). If it involves a place, NAME the place. If a smart stranger could ask "okay but what do I physically do first?", it is too abstract, rewrite.
+
+THE CONTRAST BAN (structure, not just phrasing): never negate-then-redefine, in ANY order or spelling, anywhere in the plan. Banned shapes: "it's not X, it's Y", "X, not Y", "Y, not just X", "X was never the problem, Y was", "X isn't what's missing, Y is", "it doesn't move because X, it moves because Y", and the same trick split across two sentences. Say the straight version instead. "The plan was never the problem, showing up was" becomes "Three months of saved routines, two gym visits. Showing up is the gap." "The split isn't what's missing, three visits a week is" becomes "Three visits a week is what's missing." "Real material, not just prep" becomes "Real material." Just name the do.
+
+THE WHEN (cadence rules):
+- The move's cadence is part of the exact plan. When the move is a lever and frequency is the diagnosis or the user's own stated rhythm, put the cadence IN THE TITLE: "Go to the gym three times a week", "Finish one rough demo a week". A replaced-for-attendance move with no cadence anywhere is an incomplete answer.
+- Cadence stays BANNED inside tiers (tiers are today's dose only).
+- Never reference a time that was never established ("your gym time" when none exists). Pin one instead: "set a 6pm alarm for Monday".
 
 THE TIER PHILOSOPHY (CRITICAL, SHORT, SPECIFIC, SELF-CONTAINED):
 
@@ -1006,13 +1025,21 @@ You will produce FIVE tiers, five DIFFERENT scoped sub-units of the same core mo
 
 All five tiers MUST be different scoped sub-units. Never the same text twice. Never even close, if "tiny" and "light" boil down to the same action ("Open the project" / "Sit down with the project"), the model has failed. Each tier must point at a CONCRETELY DIFFERENT-SIZED output.
 
+THE LADDER CONTRACT (all five tiers, hard):
+- SAME physical motion at five strictly increasing sizes, and the size must be legible from the words alone (one X / two X / the full X). Never a category switch (a leg day is not a bigger "full workout"; a different sport is not a bigger gym session) and never a downstream task that only exists after another tier is done ("Mix the demo" is not a bigger "Finish the demo").
+- Every tier uses the verb that transacts in the goal's currency. Scoreboard is subscribers or readers? The verb is Post/Publish/Send, never Write. Scoreboard is a drink drunk? The verb is Drink, never Prep, Measure, or Batch.
+- If the verdict's upgrade adds a mechanic (the link on every post, a specific form), that mechanic appears in EVERY tier or is carried by the title. Never in just one tier, that implies the others skip it.
+- Every noun in a tier must already exist in the plan or in their answers. No "the circuit" if no circuit was defined, no "the menu" if none exists.
+- Only motions under THEIR control. "Get three replies" is other people's decisions, not a tier.
+- tierTime must be honest for THIS user (door-to-door for gym moves, not just the workout) and arithmetically consistent with the tier text.
+
 If you find yourself writing a comma followed by a duration or a "that is..." clause, DELETE everything from the comma onward. The user will refine specifics in a separate flow.
 
 RESPONSE FORMAT - strict JSON, raw, no markdown fences, no commentary:
 
 {
   "primaryAction": {
-    "title": "under 9 words. The MOVE named mechanically, like you are talking to someone who needs zero interpretation: name the literal thing they do (and the tool/place when it disambiguates). NEVER a diagnosis, never a contrast, never meta-language. BANNED SHAPES: anything starting with Stop, any Stop-X-start-Y or not-X-but-Y contrast, anything about their patterns or habits (that goes in why). GOOD: 'Do one timed practice question set' / 'Search Eventbrite and book one event' / 'Walk outside for ten minutes'. BAD: 'Stop outlining, start doing practice questions' / 'Pick one recurring meetup and stop bailing on it' / 'Turn your posts into bookings'.",
+    "title": "under 9 words. The MOVE named mechanically, like you are talking to someone who needs zero interpretation: name the literal thing they do (and the tool/place when it disambiguates). NEVER a diagnosis, never a contrast, never meta-language. BANNED SHAPES: anything starting with Stop, any Stop-X-start-Y or not-X-but-Y contrast, anything about their patterns or habits (that goes in why). GOOD: 'Do one timed practice question set' / 'Search Eventbrite and book one event' / 'Go to the gym three times a week'. BAD: 'Stop outlining, start doing practice questions' / 'Pick one recurring meetup and stop bailing on it' / 'Turn your posts into bookings'. When frequency is the diagnosis or their stated rhythm, the cadence BELONGS in the title (see THE WHEN).",
     "why": "1-2 sentences in Malik voice. Tie it back to their Neutron Star without quoting it verbatim. No generic motivation.",
     "path": [
       {
@@ -1051,7 +1078,7 @@ RESPONSE FORMAT - strict JSON, raw, no markdown fences, no commentary:
       "heavy": "'2 hrs'",
       "extreme": "'half a day' (bigger scales allowed: 'a full Saturday')"
     },
-    "howToStart": "The literal FIRST PHYSICAL MOTION, so specific it feels autistic: name the device, the app or place, and the exact search phrase / first sentence / first rep when applicable. 'Open your laptop, go to Eventbrite, type run clubs NYC, book the first one under $20.' Not 'start looking into events.'",
+    "howToStart": "ONE ignition motion, executable in minutes, never a chained multi-hour plan (the workout/session/batch itself belongs to the tiers). So specific it feels autistic: name the device, the app or place, the exact search phrase / first sentence / first rep, and exact durations when they matter ('hum a melody into the mic for 60 seconds'). Any message you tell them to send is written out verbatim and contains only facts THEY stated. 'Open your laptop, go to Eventbrite, type run clubs NYC, book the first one under $20.' Not 'start looking into events', not a full day compressed into a sentence.",
     "verdict": "'confirmed' | 'upgraded' | 'replaced' when the user named their own move; null on the find-it-for-me path.",
     "verdictReason": "ONE sentence. For replaced/upgraded: their own words or numbers as the receipt. For confirmed: why their instinct passes the tests. For a visible cut on the find path: what was cut. Empty string when nothing to say.",
     "shape": "'lever' (repeated move, the default) or 'door' (genuine one-shot finishable today)."
@@ -1072,7 +1099,9 @@ HARD BANS:
 - No markdown fences. Return raw JSON.
 - No em dashes ( - ) or en dashes (-). Use periods or commas.
 - No corporate productivity language. No "intentional", "authentic", "what truly matters".
-- All three tiers must describe the SAME move at different doses. Not three different actions.`;
+- All five tiers must describe the SAME move at different doses. Not five different actions.
+
+FINAL CHECK before returning: reread title, howToStart, and verdictReason word by word. Complete grammatical sentences, no dropped words ("for before you judge it"), no doubled words. These three lines are the flagship of the whole plan; a glitch here reads as the app breaking.`;
 
 
 const AI_ACTION_REFINE_SYSTEM_PROMPT = `You help the user refine TODAY'S ACTION inside Memento from a vague verb-object phrase into a more specific version they can actually do today.
@@ -1171,6 +1200,18 @@ function actionPlanMatchesClarity() {
   return hasActionPlan() && state.action.planSourceNeutronStar === (state.clarity.answers.neutronStar || '');
 }
 
+// v887 (stress fleet): cheap garble detector for the flagship plan lines.
+// Catches dropped-word artifacts ("for before you judge it") and doubled
+// words so a glitched sentence triggers the existing retry instead of
+// shipping to the user.
+function planTextGarbled(s) {
+  if (!s) return false;
+  const t = String(s);
+  if (/\bfor\s+(before|after|when|until|while)\b/i.test(t)) return true;
+  if (/\b(a|an|the|to|of|in|on|for|with|and)\s+\1\b/i.test(t)) return true;
+  return false;
+}
+
 function normalizeActionPlan(raw = {}) {
   // Strip em/en dashes the AI may sneak in despite the prompt ban.
   const clean = (s) => String(s || '').replace(/[\u2014\u2013]/g, ',').replace(/\s+,/g, ',').replace(/,,/g, ',').trim();
@@ -1191,21 +1232,27 @@ function normalizeActionPlan(raw = {}) {
     bridge: trimText(clean(s?.bridge), 280),
     signal: trimText(clean(s?.signal), 220)
   })).filter(p => p.horizon && p.milestone);
-  // Clean the title FIRST so it's a clean grammatical fallback for any
-  // tier that fails validation. Without this, the title's own cadence
-  // words ("Ship X this week", "by Friday") polluted every fallback.
-  const cleanTitle = stripCadenceAndTime(trimText(clean(raw.primaryAction?.title), 90));
-  const cleanHowToStart = stripCadenceAndTime(trimText(clean(raw.primaryAction?.howToStart), 240));
+  // v887 (stress fleet): the title and howToStart KEEP their cadence and
+  // durations. Stripping them here was the source of the garbled flagship
+  // lines ("hum into the mic for [60 seconds] before you judge it" lost its
+  // duration mid-sentence) and erased the WHEN the doctrine now requires
+  // in lever titles. Only the tier FALLBACK below is cadence-stripped so
+  // title cadence never leaks into tiers.
+  const cleanTitle = trimText(clean(raw.primaryAction?.title), 90);
+  const cleanHowToStart = trimText(clean(raw.primaryAction?.howToStart), 280);
   // Reset and re-collect sanitization stats for this generation. Each
   // sanitizeTierText call records its rejection (if any) into tierOpts.
   _lastPlanSanitizationStats = { rejections: 0, reasons: {} };
   const tierKeys = ['tiny','light','moderate','heavy','extreme'];
   const tiersRaw = {};
+  // Cadence-free version of the title, used ONLY as tier fallback text so a
+  // "three times a week" title never plants cadence inside a tier.
+  const tierFallbackTitle = stripCadenceAndTime(cleanTitle);
   const tierFallbackKey = { tiny: 'minimum', light: 'minimum', heavy: 'ambitious', extreme: 'ambitious' };
   tierKeys.forEach(key => {
     const rawText = clean(rawTiers[key] || rawTiers[tierFallbackKey[key]]);
     const tierOpts = {};
-    tiersRaw[key] = sanitizeTierText(rawText, cleanTitle, tierOpts);
+    tiersRaw[key] = sanitizeTierText(rawText, tierFallbackTitle, tierOpts);
     if (tierOpts.rejected) {
       _lastPlanSanitizationStats.rejections++;
       _lastPlanSanitizationStats.reasons[key] = tierOpts.reason;
@@ -1214,7 +1261,7 @@ function normalizeActionPlan(raw = {}) {
   // Dedup pass: if two tiers come back with the same text, replace the
   // duplicate with the cleaned title. Counts as a soft rejection too so
   // the retry path can react to it.
-  const titleFallbackTxt = cleanTitle.split(/\s+/).slice(0, 7).join(' ');
+  const titleFallbackTxt = tierFallbackTitle.split(/\s+/).slice(0, 7).join(' ');
   const seen = {};
   tierKeys.forEach(key => {
     const text = (tiersRaw[key] || '').toLowerCase();
@@ -1345,11 +1392,30 @@ async function generateActionDraft(options = {}) {
       : '';
     const userBody = `PERSON CONTEXT:\n${contextLines}\n\nReturn the full plan JSON now. No conversation. If their "ONE THING" guess is close to a real high-leverage move, USE IT as the primaryAction title (lightly rewritten in your voice). Their guess at the main move is data, not a constraint - but anchor to it when it lines up.${nextStepInstruction}`;
 
-    const response = await callClaude(
-      [{ role: 'user', content: userBody }],
-      AI_ACTION_DRAFT_SYSTEM_PROMPT,
-      { maxTokens: 8000, model: ANTHROPIC_MODEL_PLANS, timeout: 120000 }
-    );
+    // v887: soft/emotional goals (no scoreboard) make Sonnet think for its
+    // ENTIRE output budget and return a thinking-only block with no text,
+    // which callClaude surfaces as "empty response". The proxy caps output
+    // at ~8192 so a bigger maxTokens can't rescue it. One quiet retry with
+    // a lower-thinking nudge recovers most of these before the user ever
+    // sees an error. (A permanent fix needs the proxy's output ceiling
+    // raised; flagged for Malik.)
+    const softNudge = '\n\nIMPORTANT: keep your internal reasoning brief. Spend your budget on the JSON output, not on deliberation. Decide the move quickly and write the plan.';
+    let response;
+    try {
+      response = await callClaude(
+        [{ role: 'user', content: userBody }],
+        AI_ACTION_DRAFT_SYSTEM_PROMPT,
+        { maxTokens: 8000, model: ANTHROPIC_MODEL_PLANS, timeout: 120000 }
+      );
+    } catch (emptyErr) {
+      if (/empty response/i.test(String(emptyErr && emptyErr.message))) {
+        response = await callClaude(
+          [{ role: 'user', content: userBody + softNudge }],
+          AI_ACTION_DRAFT_SYSTEM_PROMPT,
+          { maxTokens: 8000, model: ANTHROPIC_MODEL_PLANS, timeout: 120000 }
+        );
+      } else { throw emptyErr; }
+    }
 
     let jsonStr = response.trim();
     // Strip markdown code fences (with or without "json" tag, and even if
@@ -1385,6 +1451,24 @@ async function generateActionDraft(options = {}) {
     let plan = normalizeActionPlan(parsed);
     let stats = _lastPlanSanitizationStats;
 
+    // v887: a garbled flagship line (dropped/doubled words in howToStart or
+    // verdictReason) counts as two rejections so the retry below fires.
+    if (planTextGarbled(plan.primaryAction.howToStart) || planTextGarbled(plan.primaryAction.verdictReason)) {
+      stats = {
+        rejections: Math.max(stats.rejections, 2),
+        reasons: Object.assign({}, stats.reasons, { howToStart: 'garbled sentence (dropped or doubled word), rewrite it complete and grammatical' })
+      };
+    }
+    // v887: the banned contrast/redefinition pattern in the flagship lines
+    // also triggers the retry. voiceLint carries the structural regexes.
+    const voiceHits = voiceLint([plan.primaryAction.title, plan.primaryAction.why, plan.primaryAction.verdictReason].filter(Boolean).join(' '));
+    if (voiceHits.length) {
+      stats = {
+        rejections: Math.max(stats.rejections, 2),
+        reasons: Object.assign({}, stats.reasons, { voice: 'banned negate-then-redefine contrast (' + voiceHits[0] + ') in title/why/verdictReason, state it straight instead' })
+      };
+    }
+
     // RETRY: if 2+ tiers had to be replaced by the sanitizer, the AI
     // broke the rules badly enough that the plan is mostly fallbacks.
     // Call the AI once more with explicit feedback about what went wrong,
@@ -1394,7 +1478,7 @@ async function generateActionDraft(options = {}) {
         const failedTiers = Object.entries(stats.reasons)
           .map(([k, why]) => `- ${k}: ${why}`)
           .join('\n');
-        const retryBody = userBody + `\n\nRETRY: Your previous output failed validation on these tiers:\n${failedTiers}\n\nRule reminders you broke:\n- "cadence-anywhere" = you put "this week", "every day", "daily", etc. anywhere in the text. Tier text is for TODAY only.\n- "time-duration" = you put "20 minutes", "two hours", etc. No timed sessions.\n- "hard-deadline" = you put "by Friday", "by tomorrow". No dates.\n- "duplicate" = two tiers had the same text. All 5 must be different scoped sub-units.\n- "setup-verb" = you used "sit down", "work on", "focus on". Use OUTPUT verbs that produce a thing.\n- "bare-pronoun" = you used "it"/"this"/"that" as the object. Name the actual sub-unit.\n- "gutted" = the cleaned text was too short. Be specific from the start.\n\nReturn the full plan JSON again, but this time make all 5 tiers obey the rules. The title and howToStart must also avoid cadence and hard deadlines.`;
+        const retryBody = userBody + `\n\nRETRY: Your previous output failed validation on these tiers:\n${failedTiers}\n\nRule reminders you broke:\n- "cadence-anywhere" = you put "this week", "every day", "daily", etc. anywhere in the text. Tier text is for TODAY only.\n- "time-duration" = you put "20 minutes", "two hours", etc. No timed sessions.\n- "hard-deadline" = you put "by Friday", "by tomorrow". No dates.\n- "duplicate" = two tiers had the same text. All 5 must be different scoped sub-units.\n- "setup-verb" = you used "sit down", "work on", "focus on". Use OUTPUT verbs that produce a thing.\n- "bare-pronoun" = you used "it"/"this"/"that" as the object. Name the actual sub-unit.\n- "gutted" = the cleaned text was too short. Be specific from the start.\n\nReturn the full plan JSON again, but this time make all 5 tiers obey the rules. Cadence may live in the TITLE (when frequency is the diagnosis) and exact durations in howToStart, never in tiers. No hard deadlines anywhere.`;
         const retryResponse = await callClaude(
           [{ role: 'user', content: retryBody }],
           AI_ACTION_DRAFT_SYSTEM_PROMPT,
@@ -1417,6 +1501,14 @@ async function generateActionDraft(options = {}) {
         // If retry fails, keep the original. Better something than nothing.
         console.warn('plan retry failed', retryErr);
       }
+    }
+
+    // v887 (doctrine): the find-it-for-me path has NO verdict, there is no
+    // move of theirs to judge. Enforce it here so a model slip ("upgraded"
+    // on door 2) can never reach the reveal. verdictReason survives, it
+    // carries the visible cut on the find path.
+    if (!String(intake.mainMove || '').trim() && plan.primaryAction) {
+      plan.primaryAction.verdict = null;
     }
 
     state.action.primaryAction = plan.primaryAction;

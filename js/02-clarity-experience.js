@@ -4872,7 +4872,10 @@ Return ONLY the sentence text. No quotes, no labels.`;
               : verdict === 'upgraded' ? 'Your move, sharpened'
               : verdict === 'replaced' ? 'The real lever'
               : 'The first move';
-            const reason = (verdict === 'replaced' || verdict === 'upgraded') && pa.verdictReason
+            // v887 (doctrine): the receipt line also shows on the find path
+            // when the model chose visibly between several of their moves,
+            // the cut is named on screen. Confirmed stays eyebrow-only.
+            const reason = (verdict === 'replaced' || verdict === 'upgraded' || verdict === null) && pa.verdictReason
               ? `<div class="action-cine-reveal__reason">${esc(pa.verdictReason)}</div>` : '';
             this.pageWrap.innerHTML = `
               <div class="action-exp__page-inner"><div class="action-exp__inner action-cine-reveal">
