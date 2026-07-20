@@ -3470,6 +3470,14 @@ html.lowfx #actionExpStars {
   font-size: 14px; font-weight: 600; letter-spacing: 0; text-transform: none;
   color: rgba(var(--ink, 255, 255, 255), 0.55); margin-bottom: 16px;
 }
+/* v886: the verdict's receipt line under the revealed move (replaced /
+   upgraded only). Bright per the no-dim-body-text law, arrives late. */
+.action-cine-reveal__reason {
+  margin-top: 18px; max-width: 460px;
+  font-size: 0.9375rem; line-height: 1.5; font-weight: 500;
+  color: rgba(255, 255, 255, 0.92);
+  opacity: 0; animation: nsv2In 0.8s cubic-bezier(0.22, 1, 0.36, 1) 2.2s forwards;
+}
 .action-cine-reveal__move {
   font-size: clamp(26px, 7vw, 34px); font-weight: 800; line-height: 1.3;
   color: #fff; max-width: 540px; text-wrap: balance;

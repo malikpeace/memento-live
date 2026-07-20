@@ -4864,13 +4864,24 @@ Return ONLY the sentence text. No quotes, no labels.`;
             const words = String(move).split(/\s+/).filter(Boolean).map((w, i) =>
               `<span class="action-cine__rw" style="animation-delay:${380 + i * 170}ms">${esc(w)}</span>`
             ).join(' ');
+            // v886 (ACTION-PHILOSOPHY.md): the reveal frames the VERDICT.
+            // Their instinct confirmed, sharpened, or replaced with their own
+            // receipt on screen. Find-path keeps the classic line.
+            const verdict = pa.verdict || null;
+            const eyebrow = verdict === 'confirmed' ? 'Your instinct was right'
+              : verdict === 'upgraded' ? 'Your move, sharpened'
+              : verdict === 'replaced' ? 'The real lever'
+              : 'The first move';
+            const reason = (verdict === 'replaced' || verdict === 'upgraded') && pa.verdictReason
+              ? `<div class="action-cine-reveal__reason">${esc(pa.verdictReason)}</div>` : '';
             this.pageWrap.innerHTML = `
               <div class="action-exp__page-inner"><div class="action-exp__inner action-cine-reveal">
-                <div class="action-cine-reveal__eyebrow">The first move</div>
+                <div class="action-cine-reveal__eyebrow">${esc(eyebrow)}</div>
                 <div class="action-cine-reveal__move">${words}</div>
+                ${reason}
               </div></div>`;
-            const holdMs = 380 + String(move).split(/\s+/).length * 170 + 1900;
-            setTimeout(() => { if (this.isOpen) this.renderContent(); }, Math.min(holdMs, 7000));
+            const holdMs = 380 + String(move).split(/\s+/).length * 170 + (reason ? 3400 : 1900);
+            setTimeout(() => { if (this.isOpen) this.renderContent(); }, Math.min(holdMs, 9000));
             return;
           }
         }
@@ -5316,6 +5327,16 @@ Return ONLY the sentence text. No quotes, no labels.`;
       if (doneNow) return;
       try { celebrateDone(inst.pageWrap.querySelector('#aplMarkDone')); } catch (_) {}
       creditToday();
+      // v886 (ACTION-PHILOSOPHY.md, move shapes): a completed DOOR rolls into
+      // the next move THE SAME DAY, never coasting on a checkbox. Levers keep
+      // the daily loop untouched. The next-step generation reads completion
+      // history and replaces the plan; the A5 done-state shows until it lands.
+      try {
+        const pa = state.action.primaryAction || {};
+        if (pa.shape === 'door' && typeof regenerateActionPlanForNextStep === 'function') {
+          setTimeout(() => { try { regenerateActionPlanForNextStep(); } catch (e2) {} }, 2600);
+        }
+      } catch (eShape) {}
       inst.renderActionPlan();
     };
     const doneBtn = inst.pageWrap.querySelector('#aplMarkDone');
