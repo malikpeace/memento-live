@@ -3254,17 +3254,16 @@ html.lowfx .daycard-ns {
 /* The breakdown fades in with OPACITY ONLY: nothing slides or translates, so the
    open reads as content quietly appearing around a perfectly still card, never as
    motion. (Earlier the stats slid up 10px, which was the movement Malik could see.) */
-.mf__eyebrow, .mf__why, .mf__stats, .mf__share, .mf__hint {
+.mf__eyebrow, .mf__why, .mf__stats, .mf__hint {
   opacity: 0;
   transition: opacity 0.34s ease 0.08s;
 }
 #mementoFull.mf--open .mf__eyebrow,
 #mementoFull.mf--open .mf__why,
 #mementoFull.mf--open .mf__stats,
-#mementoFull.mf--open .mf__share,
 #mementoFull.mf--open .mf__hint { opacity: 1; }
 @media (prefers-reduced-motion: reduce) {
-  .mf__card, .mf__eyebrow, .mf__why, .mf__stats, .mf__share, .mf__hint { transition: none; transform: none; opacity: 1; }
+  .mf__card, .mf__eyebrow, .mf__why, .mf__stats, .mf__hint { transition: none; transform: none; opacity: 1; }
 }
 /* The carrot + stick why, quietly under the card. Quiet via SIZE and width, not
    opacity (body copy stays bright, per the reading law). */
@@ -3303,19 +3302,6 @@ html.lowfx .daycard-ns {
 .mf-stat__sub-key { color: var(--text-3); font-weight: 650; }
 .mf-stat__track { height: 6px; border-radius: 999px; background: var(--kfill-06); overflow: hidden; }
 .mf-stat__fill { height: 100%; border-radius: 999px; }
-.mf__share {
-  margin-top: 18px;
-  font: inherit; font-weight: 650; font-size: 0.9rem;
-  color: var(--text-hi); cursor: pointer; border: none;
-  background: var(--glass-bg);
-  box-shadow: var(--glass-highlight), var(--shadow-card);
-  border-radius: var(--card-r, 16px);
-  padding: 13px 26px;
-  -webkit-tap-highlight-color: transparent;
-  transition: background 0.18s ease, transform 0.12s ease;
-}
-.mf__share:hover { background: var(--glass-bg-hover); }
-.mf__share:active { transform: scale(0.97); }
 .mf__hint { font-size: 0.74rem; color: var(--text-faint); margin-top: 14px; }
 @media (prefers-reduced-motion: reduce) {
   #mementoFull, .mf__scroll { transition: none; }

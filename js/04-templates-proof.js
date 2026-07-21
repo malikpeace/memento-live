@@ -332,8 +332,6 @@ function writeProofEvent(type, fields) {
       try { pulseNeutronStar(); } catch (_) {}
       try { maybeShowMilestoneBanner(); } catch (_) {}
       try { Backend.complete(ev.iso); } catch (_) {} // count toward today's public total
-      // First-ever action completion: a one-time win moment (fires once, ever).
-      try { if (typeof maybeShowFirstWin === 'function') maybeShowFirstWin(); } catch (_) {}
     }
     return ev;
   } catch (e) { return null; }

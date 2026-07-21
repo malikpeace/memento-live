@@ -2,12 +2,12 @@
    Extracted from app.js lines 2-2125. Loaded as a classic <script> so
    all modules share one global lexical scope (no window pollution). Order matters:
    this file must load before js/11-init.js, which runs the bootstrap immediately. */
-/* v898: the JS build stamp. The release sed bump rewrites the version in BOTH
+/* v899: the JS build stamp. The release sed bump rewrites the version in BOTH
    index.html AND this line; js/11 compares them at boot and force-refreshes
    ONCE on mismatch. Kills the "phone silently runs old cached js under a new
    index" class (the SW's offline fallback can serve stale files on a bad
    connection; Malik hit this three times in one day). */
-window.MEMENTO_JS_BUILD = 'v898';
+window.MEMENTO_JS_BUILD = 'v899';
 /* ============================================
    STATE MANAGEMENT
    ============================================ */
@@ -440,7 +440,7 @@ function stripCadenceAndTime(text) {
   // "daily/weekly/monthly/nightly"
   s = s.replace(/\s*\b(daily|weekly|monthly|nightly)\b/gi, '');
   // "X days/weeks/months a week" patterns, digits AND word numbers
-  // (v898: "three times a week" in a title left a garbled 7-word fallback
+  // (v899: "three times a week" in a title left a garbled 7-word fallback
   // "Go to the gym three times a" because only \d+ was matched).
   s = s.replace(/\s*\b(\d+|one|two|three|four|five|six|seven|eight|nine|ten|twice)\s+(days?|nights?|mornings?|evenings?|weeks?|months?|times?|sessions?)\s+(a|per)\s+(day|week|month|year)\b/gi, '');
   s = s.replace(/\s*\b(once|twice)\s+(a|per)\s+(day|week|month|year)\b/gi, '');
@@ -1274,7 +1274,7 @@ function sanitizeTierText(str, titleFallback, opts) {
   const setupPhrase = /^(sit\s+down|get\s+started|set\s+up|gear\s+up|prep|prepare)\b/i.test(original)
     || /\b(work\s+on|focus\s+on|spend\s+time\s+on|look\s+at|check\s+on|think\s+about|plan\s+to)\b/i.test(original);
   if (setupPhrase) return fallback('setup-verb');
-  // v898: durations are ALLOWED in tier text. They are the one honest scaling
+  // v899: durations are ALLOWED in tier text. They are the one honest scaling
   // axis for time/presence moves (be with her, meditate, phone-free time,
   // deep work), and stripping them was collapsing those ladders into five
   // identical rungs (the confirmed behavioral-ladder blocker). Output moves
@@ -1292,7 +1292,7 @@ function sanitizeTierText(str, titleFallback, opts) {
   // First clause only (cut at period/semicolon/em-dash separator/comma+space).
   const cutAt = s.search(/[.!?;]|\s-\s|,\s/);
   if (cutAt > 2) s = s.slice(0, cutAt);
-  // 9-word ceiling (up from 7, v898). Durations and scope qualifiers are
+  // 9-word ceiling (up from 7, v899). Durations and scope qualifiers are
   // allowed in tiers now ("Delay every craving to the end of the day",
   // "10 phone-free minutes with her in the evening"), and a 7-word cap was
   // chopping the top rung's qualifier off, leaving it reading smaller than
@@ -1469,7 +1469,6 @@ function renderNeutronStarSummary(summary, { allowContinue = false, showRestart 
       </div>
       <div class="ns-min__sheet" id="nsMenuSheet" aria-hidden="true" role="menu">
         <button type="button" id="summaryContinue" class="ns-min__sheet-item" role="menuitem">Refine answers</button>
-        <button type="button" class="ns-min__sheet-item" data-share-star role="menuitem">Share</button>
         <button type="button" id="nsExplainBtn" class="ns-min__sheet-item" role="menuitem">What's a Neutron Star?</button>
       </div>
 
@@ -1835,7 +1834,6 @@ function migrateState() {
   if (state.dev.savedClarity === undefined) state.dev.savedClarity = null;
   if (state.meta.welcomeSeen === undefined) state.meta.welcomeSeen = false;
   if (state.meta.backupNudged === undefined) state.meta.backupNudged = false;
-  if (state.meta.firstWinShown === undefined) state.meta.firstWinShown = false;
   if (state.meta.saveWorkNudged === undefined) state.meta.saveWorkNudged = false;
   // Consistency: personal-record tracking. Seed from the historical longest run so
   // existing users start with an accurate "best ever" and never see a retroactive
@@ -1920,7 +1918,7 @@ function migrateState() {
   // already-clean text.
   if (state.action.primaryAction && typeof stripCadenceAndTime === 'function') {
     const pa = state.action.primaryAction;
-    // v898: title and howToStart are NO LONGER stripped. The strip garbled
+    // v899: title and howToStart are NO LONGER stripped. The strip garbled
     // durations mid-sentence ("for [60 seconds] before" -> "for before") and
     // erased the cadence the doctrine now wants visible in lever titles.
     // Tiers still get re-validated below with a cadence-free fallback.
