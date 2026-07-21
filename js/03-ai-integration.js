@@ -1109,7 +1109,9 @@ RESPONSE FORMAT - strict JSON, raw, no markdown fences, no commentary:
     "howToStart": "ONE ignition motion, executable TODAY (never gated on a future day), in minutes, never a chained multi-hour plan (the workout/session/batch itself belongs to the tiers). Under 45 words, complete sentences. So specific it feels autistic: name the place or the category (never an unstated brand), the exact search phrase / first sentence / first rep, and exact durations when they matter ('hum a melody into the mic for 60 seconds'). Every time anchor must be named in the same sentence ('set a 7pm alarm'), never a dangling referent like 'that same time'. Any message you tell them to send is written out verbatim and contains only facts THEY stated. Not 'start looking into events', not a full day compressed into a sentence.",
     "verdict": "'confirmed' | 'upgraded' | 'replaced' when the user named their own move; null on the find-it-for-me path.",
     "verdictReason": "ONE sentence. For replaced/upgraded: their own words or numbers as the receipt. For confirmed: why their instinct passes the tests. For a visible cut on the find path: what was cut. Empty string when nothing to say.",
-    "shape": "'lever' (repeated move, the default) or 'door' (genuine one-shot finishable today)."
+    "shape": "'lever' (repeated move, the default) or 'door' (genuine one-shot finishable today).",
+    "targetCompletions": "INTEGER. How many times they complete this exact move to satisfy the commitment, sized to THEIR goal and timeframe. A 'door' (one-shot) is always 1. A daily 'lever' over two weeks is 14; three-times-a-week over two weeks is 6; a steady open-ended habit defaults to 7. Must be >= 1 and <= windowDays.",
+    "windowDays": "INTEGER. The number of days they have to hit targetCompletions. A 'door' is 1. 'Run two miles daily for two weeks' = 14. 'Train three times weekly for two weeks' = 14 (window is 14 days even though target is 6). Must be >= targetCompletions and <= 90."
   },
   "focusPlan": {
     "frame": "one short line. How to think about this so it actually happens. Not a quote, not a platitude.",
@@ -1354,6 +1356,31 @@ function normalizeActionPlan(raw = {}) {
     verdictReason: trimText(clean(raw.primaryAction?.verdictReason), 300),
     shape: raw.primaryAction?.shape === 'door' ? 'door' : 'lever'
   };
+  // v900 commitment contract (Codex builds the `N of M` progress line against
+  // these two fields): targetCompletions = how many times to do the exact move,
+  // windowDays = days allowed. Clamp to 1 <= target <= window <= 90. A 'door'
+  // (one-shot) is always 1 of 1. Missing/invalid data falls back defensively so
+  // the UI never renders NaN: door -> 1/1, lever -> 7/7.
+  (function () {
+    const isDoor = primaryAction.shape === 'door';
+    const toInt = (v) => {
+      const n = Math.floor(Number(v));
+      return Number.isFinite(n) ? n : 0;
+    };
+    let target = toInt(raw.primaryAction?.targetCompletions);
+    let windowDays = toInt(raw.primaryAction?.windowDays);
+    if (isDoor) {
+      target = 1;
+      windowDays = 1;
+    } else {
+      if (target < 1) target = 7;           // repeating fallback
+      if (windowDays < 1) windowDays = target; // no window given -> tightest honest window
+      windowDays = Math.min(90, windowDays);
+      target = Math.min(target, windowDays); // target can never exceed the window
+    }
+    primaryAction.targetCompletions = target;
+    primaryAction.windowDays = windowDays;
+  })();
 
   const supportingActions = Array.isArray(raw.supportingActions)
     ? raw.supportingActions.slice(0, 2).map(item => ({
@@ -1377,6 +1404,73 @@ function normalizeActionPlan(raw = {}) {
 
   return { primaryAction, supportingActions, focusPlan };
 }
+
+// === v900 - Commitment review (the AI-owned prerequisite for Codex's review
+// screen) ==========================================================
+// Called when a commitment COMPLETES (hit targetCompletions) or its window
+// EXPIRES. The three questions are FIXED and asked by the UI, not the model:
+//   1. What tangible result did this create?      -> answers.result
+//   2. What worked or what needs changing?         -> answers.changed
+//   3. Continue, adjust, or move on?               -> answers.decision
+// This call turns those answers into ONE short Malik-voice reflection and
+// echoes the decision. It does NOT build the next plan itself: when decision is
+// 'adjust' or 'move_on', the caller regenerates via generateActionDraft (adjust
+// = same move resized, move_on = a fresh highest-leverage move). Contract:
+//   input:  { move, goal, outcome:'completed'|'expired',
+//             answers:{ result, changed, decision:'continue'|'adjust'|'move_on' } }
+//   output: { reflection: string, decision: 'continue'|'adjust'|'move_on' }
+// On any AI failure it returns a safe non-empty reflection so the review screen
+// never blocks on the model (the user's progress is already saved).
+async function generateCommitmentReview(opts = {}) {
+  const move = String(opts.move || '').trim();
+  const goal = String(opts.goal || '').trim();
+  const outcome = opts.outcome === 'expired' ? 'expired' : 'completed';
+  const a = opts.answers || {};
+  const decisionRaw = String(a.decision || '').toLowerCase();
+  const decision = ['continue', 'adjust', 'move_on'].includes(decisionRaw) ? decisionRaw : 'continue';
+  const result = String(a.result || '').trim();
+  const changed = String(a.changed || '').trim();
+
+  const safeFallback = outcome === 'completed'
+    ? 'You committed to it and you closed it out. That is the whole game, one move at a time.'
+    : 'The window closed, but you showed up and learned what the move actually costs. That is data, not a loss.';
+
+  if (!hasAnthropicKey()) return { reflection: safeFallback, decision };
+
+  const sys = `You are the voice behind Memento reflecting back on a finished commitment. The user just ${outcome === 'completed' ? 'completed' : 'ran out the clock on'} a commitment and answered three questions about it. Write ONE reflection, 1-2 sentences, in Malik's voice: plain, honest, a sharp friend. Mirror something concrete THEY said (their result or what they changed), never generic praise. No new advice, no next-step instructions, no questions. Speak only to what happened.\n\n${MALIK_VOICE_SPEC}\n\nReturn ONLY the reflection sentence(s), no JSON, no quotes, no label.`;
+  const userBody = [
+    goal ? `Their goal: ${goal}` : '',
+    move ? `The move they committed to: ${move}` : '',
+    `Outcome: ${outcome === 'completed' ? 'they hit the target' : 'the window expired before they finished'}`,
+    result ? `What it created (their words): ${result}` : '',
+    changed ? `What worked / needs changing (their words): ${changed}` : '',
+    `Their call going forward: ${decision === 'continue' ? 'continue the same move' : decision === 'adjust' ? 'adjust / resize it' : 'move on to a new move'}`
+  ].filter(Boolean).join('\n');
+
+  try {
+    const raw = await callClaude(
+      [{ role: 'user', content: userBody }],
+      sys,
+      // thinking OFF: a one-line reflection needs zero deliberation, and adaptive
+      // thinking on a tiny budget was eating the whole allowance and returning
+      // empty text (forcing the fallback). Off = fast + reliably non-empty.
+      { maxTokens: 320, model: ANTHROPIC_MODEL_PLANS, timeout: 60000, thinking: 'off' }
+    );
+    let reflection = String(raw || '').trim().replace(/^["']|["']$/g, '').trim();
+    // Strip em/en dashes AND spaced-hyphen em-dash substitutes (" - ") the model
+    // sometimes uses, per the no-dashes voice law.
+    reflection = reflection.replace(/[—–]/g, ',').replace(/\s+-\s+/g, ', ').replace(/,\s*,/g, ',').trim();
+    // Voice guard: if the model slipped a banned contrast, fall back to the
+    // safe line rather than ship the tell.
+    if (!reflection || (typeof voiceLint === 'function' && voiceLint(reflection).length)) {
+      reflection = safeFallback;
+    }
+    return { reflection: trimText(reflection, 320), decision };
+  } catch (e) {
+    return { reflection: safeFallback, decision };
+  }
+}
+try { if (typeof window !== 'undefined') window.generateCommitmentReview = generateCommitmentReview; } catch (e) {}
 
 
 // === Round 9 - Draft-first Action generation =====================
@@ -1472,7 +1566,7 @@ async function generateActionDraft(options = {}) {
         // plan generation, so the proxy wraps it in an ephemeral cache block
         // and repeat calls (bursts, or many users close together) read it at
         // ~10% the input cost. Output and behavior are unchanged.
-        const callOpts = { maxTokens: 8000, model: ANTHROPIC_MODEL_PLANS, timeout: 120000, cache: true };
+        const callOpts = { maxTokens: 16000, model: ANTHROPIC_MODEL_PLANS, timeout: 120000, cache: true };
         if (lastTry) callOpts.thinking = 'off';
         const body = userBody + (emptyTries ? softNudges[emptyTries - 1] : '');
         try {
@@ -1512,7 +1606,7 @@ async function generateActionDraft(options = {}) {
       const retryRaw = await callClaude(
         [{ role: 'user', content: userBody }],
         AI_ACTION_DRAFT_SYSTEM_PROMPT,
-        { maxTokens: 8000, model: ANTHROPIC_MODEL_PLANS, timeout: 120000, cache: true }
+        { maxTokens: 16000, model: ANTHROPIC_MODEL_PLANS, timeout: 120000, cache: true }
       );
       let rj = retryRaw.trim().replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();
       const fb2 = rj.indexOf('{');
@@ -1610,7 +1704,7 @@ async function generateActionDraft(options = {}) {
         const retryResponse = await callClaude(
           [{ role: 'user', content: retryBody }],
           AI_ACTION_DRAFT_SYSTEM_PROMPT,
-          { maxTokens: 8000, model: ANTHROPIC_MODEL_PLANS, timeout: 120000, cache: true }
+          { maxTokens: 16000, model: ANTHROPIC_MODEL_PLANS, timeout: 120000, cache: true }
         );
         let retryJson = retryResponse.trim()
           .replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();
