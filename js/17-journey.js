@@ -233,7 +233,7 @@ function renderPathTab() {
       const t = new Date(todayStart.getTime() - i * DAY);
       if (t < ignStart) break;
       const iso = dayIso(t);
-      if (counts[iso] === undefined) continue;
+      if (!consistencyDayHasMainAction(counts[iso])) continue;
       const ev = titleByDay[iso];
       recent.push({
         lab: i === 1 ? 'Yesterday' : ('Day ' + (dayN - i)),
@@ -250,7 +250,7 @@ function renderPathTab() {
       let on = 0, total = 0;
       for (let t = new Date(wStart); t < wEnd; t = new Date(t.getTime() + DAY)) {
         total++;
-        if (counts[dayIso(t)] !== undefined) on++;
+        if (consistencyDayHasMainAction(counts[dayIso(t)])) on++;
       }
       if (total > 0) weeks.push({ idx: wIdx, on, total });
       wStart = new Date(wStart.getTime() + 7 * DAY);

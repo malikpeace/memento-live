@@ -113,10 +113,9 @@ const MODULE_INTROS = {
    STREAK RECALCULATION
    ============================================ */
 function recalculateStreak() {
-  // Streak = consecutive active days over the unified activity set (check-ins,
-  // action completions, reflections, deep work), so the dashboard count matches
-  // the heatmap and the longest-streak stat. minutesReclaimed is cumulative so it
-  // only ever grows, instead of collapsing to zero the moment a streak breaks.
+  // Streak = consecutive days where the main Action was completed (or manually
+  // backfilled as complete). Supporting app activity can shade the heatmap, but
+  // it cannot preserve the streak by itself.
   const counts = buildConsistencyData();
   // === Grace days ===================================================
   // Every 7 consecutive active days banks one grace day (max 2 held). When a
@@ -126,7 +125,7 @@ function recalculateStreak() {
   const g = state.streak.grace = state.streak.grace || { bank: 0, lastEarnMilestone: 0, used: {} };
   if (!g.used) g.used = {};
   try {
-    const activeSet = new Set(Object.keys(counts).map(_dayNum));
+    const activeSet = new Set(Object.keys(counts).filter(k => consistencyDayHasMainAction(counts[k])).map(_dayNum));
     Object.keys(g.used).forEach(k => activeSet.add(_dayNum(k)));
     const today = _dayNum(getTodayISO());
     let walk = activeSet.has(today) ? today : today - 1;
@@ -171,12 +170,12 @@ function recalculateStreak() {
     }
     g.lastEarnMilestone = m;
   } catch (_) {}
-  // Any activity in the unified set counts (action completions, notes, deep
-  // work), not just a manual streak tap. lastCheckDate feeds comeback-gap
-  // detection; reading only streak.history left it stale for users who log
-  // actions without ever tapping the heatmap, falsely triggering comeback UI.
-  state.streak.lastCheckDate = (counts[getTodayISO()] !== undefined || state.streak.history.includes(getTodayISO())) ? getTodayISO() : state.streak.lastCheckDate;
-  state.streak.minutesReclaimed = Object.keys(counts).length * (state.clarity.answers.dailyTime || 30);
+  // A completed main Action counts whether it came from a receipt or a manual
+  // backfill. lastCheckDate feeds comeback-gap detection; reading only the
+  // manual history would leave it stale for users who use the Action screen.
+  state.streak.lastCheckDate = (consistencyDayHasMainAction(counts[getTodayISO()]) || state.streak.history.includes(getTodayISO())) ? getTodayISO() : state.streak.lastCheckDate;
+  const completedDays = Object.keys(counts).filter(k => consistencyDayHasMainAction(counts[k])).length;
+  state.streak.minutesReclaimed = completedDays * (state.clarity.answers.dailyTime || 30);
   // Personal record: bestEver only ever grows. A calm "new record" moment fires
   // once per genuinely new high, the moment the CURRENT run first beats the prior
   // best (>= 2 days, and at least as long as any past run so old history catching
@@ -429,8 +428,8 @@ function maybeGenerateWeeklyCard() {
     let counts = {}; try { counts = buildConsistencyData(); } catch (e) {}
     // No letter before there is any history at all; the first one should
     // describe a week that was actually lived with Memento.
-    if (!Object.keys(counts).length) { state.meta.lastWeeklyCardFor = mondayISO; persistState(); return; }
-    const kept = days.filter(k => counts[k] !== undefined).length;
+    if (!Object.keys(counts).some(k => consistencyDayHasMainAction(counts[k]))) { state.meta.lastWeeklyCardFor = mondayISO; persistState(); return; }
+    const kept = days.filter(k => consistencyDayHasMainAction(counts[k])).length;
     const used = (state.streak && state.streak.grace && state.streak.grace.used) || {};
     const graceUsed = days.filter(k => used[k]).length;
     let excerpt = '';
@@ -524,4 +523,3 @@ function showMilestoneBanner(days) {
     });
   } catch (_) {}
 }
-

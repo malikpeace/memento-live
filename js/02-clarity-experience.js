@@ -5,6 +5,67 @@
 /* ============================================
    CLARITY FULL-SCREEN EXPERIENCE
    ============================================ */
+// The Action spine: one generated mission owns its own receipts. Plans are
+// replaced when Doors advance, so a lazily-stamped id naturally stays with the
+// old plan while the new plan receives a fresh id. Legacy receipts without an
+// id still match when their saved plan title and action text belong to the
+// current plan.
+function ensureActionMissionId(primaryAction) {
+  const pa = primaryAction || (state.action && state.action.primaryAction);
+  if (!pa || typeof pa !== 'object') return '';
+  const hasMission = !!(pa.title || pa.howToStart || (pa.tiers && Object.keys(pa.tiers).length));
+  if (!hasMission) return '';
+  if (!pa.missionId) {
+    pa.missionId = 'mission_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  }
+  return pa.missionId;
+}
+
+function actionMissionTexts(primaryAction) {
+  const pa = primaryAction || {};
+  const texts = [];
+  if (pa.title) texts.push(String(pa.title).trim());
+  if (pa.howToStart) texts.push(String(pa.howToStart).trim());
+  if (pa.tiers && typeof pa.tiers === 'object') {
+    Object.keys(pa.tiers).forEach(k => { if (pa.tiers[k]) texts.push(String(pa.tiers[k]).trim()); });
+  }
+  return texts.filter(Boolean);
+}
+
+function actionCompletionMatchesMission(entry, primaryAction) {
+  if (!entry) return false;
+  const pa = primaryAction || (state.action && state.action.primaryAction) || {};
+  const missionId = ensureActionMissionId(pa);
+  if (!missionId) return false;
+  if (entry.missionId) return entry.missionId === missionId;
+  // Backward compatibility for receipts saved before mission ids existed.
+  const samePlan = !!(entry.planTitle && pa.title && String(entry.planTitle).trim() === String(pa.title).trim());
+  const savedText = String(entry.actionText || '').trim();
+  return samePlan && !!savedText && actionMissionTexts(pa).indexOf(savedText) >= 0;
+}
+
+function actionCompletionForDay(day, primaryAction) {
+  const history = (state.action && Array.isArray(state.action.completionHistory)) ? state.action.completionHistory : [];
+  for (let i = history.length - 1; i >= 0; i--) {
+    const entry = history[i];
+    if (entry && entry.date && isoToLocalDay(entry.date) === day && actionCompletionMatchesMission(entry, primaryAction)) return entry;
+  }
+  return null;
+}
+
+function createActionCompletionRecord(primaryAction, tier, actionText) {
+  const pa = primaryAction || (state.action && state.action.primaryAction) || {};
+  return {
+    id: 'act_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    missionId: ensureActionMissionId(pa),
+    clarityGoal: (state.action && state.action.planSourceNeutronStar) || (state.clarity && state.clarity.answers && state.clarity.answers.neutronStar) || '',
+    date: new Date().toISOString(),
+    tier: tier || 'moderate',
+    actionText: actionText || '',
+    planTitle: pa.title || ''
+  };
+}
+
 const ClarityExperience = {
   el: null, pageWrap: null, navEl: null, progressEl: null,
   isOpen: false,
@@ -5144,14 +5205,12 @@ Return ONLY the sentence text. No quotes, no labels.`;
     const rawPath = Array.isArray(pa.path) ? pa.path.filter(p => p && p.milestone) : [];
     const ladderPath = rawPath.slice().reverse(); // big horizon first, smallest last
 
-    // completion state for today
+    // Completion belongs to this exact mission, not merely to the calendar day.
+    // A Door can generate a second move on the same day; the old receipt must not
+    // make that new move look complete.
     const todayStr = getTodayISO();
-    const completedToday = (function () {
-      const h = state.action.completionHistory;
-      if (!Array.isArray(h) || !h.length) return false;
-      const last = h[h.length - 1];
-      return !!(last && last.date && isoToLocalDay(last.date) === todayStr);
-    })();
+    const todayCompletion = actionCompletionForDay(todayStr, pa);
+    const completedToday = !!todayCompletion;
 
     // "Why this matters": prefer an explicit leverage line, else `why`.
     const whyText = (levRows.length ? String(levRows[0].val) : why) || '';
@@ -5204,7 +5263,7 @@ Return ONLY the sentence text. No quotes, no labels.`;
     if (completedToday) {
       // A9: the receipt. The green Done mark carries the tense; the move text
       // stays verbatim (no fabricated past-tense rewriting of user words).
-      const lastDone = (state.action.completionHistory || [])[ (state.action.completionHistory || []).length - 1 ] || {};
+      const lastDone = todayCompletion || {};
       const doneText = lastDone.actionText || moveText || title;
       screenHtml =
         '<div class="a5-wrap a5-wrap--done">' +
@@ -5269,8 +5328,9 @@ Return ONLY the sentence text. No quotes, no labels.`;
         : (pa3.recommendedTier || 'moderate');
       const actionText = (pa3.tiers && pa3.tiers[tier]) || pa3.howToStart || pa3.title || '';
       if (!Array.isArray(state.action.completionHistory)) state.action.completionHistory = [];
-      state.action.completionHistory.push({ date: new Date().toISOString(), tier, actionText, planTitle: pa3.title || '' });
-      try { writeProofEvent('action-complete', { title: actionText || pa3.title || 'Action completed', module: 'action', metadata: { tier } }); } catch (_) {}
+      const completion = createActionCompletionRecord(pa3, tier, actionText);
+      state.action.completionHistory.push(completion);
+      try { writeProofEvent('action-complete', { title: actionText || pa3.title || 'Action completed', module: 'action', metadata: { tier, missionId: completion.missionId } }); } catch (_) {}
       if (typeof recalculateStreak === 'function') { try { recalculateStreak(); } catch (_) {} }
       try { persistNow(); } catch (_) {}
       if (typeof refreshActionSurface === 'function') { try { refreshActionSurface(); } catch (_) {} }
@@ -5280,12 +5340,7 @@ Return ONLY the sentence text. No quotes, no labels.`;
     };
     const onMarkDone = (e) => {
       if (e) e.stopPropagation();
-      const doneNow = (function () {
-        const h = state.action.completionHistory;
-        if (!Array.isArray(h) || !h.length) return false;
-        const last = h[h.length - 1];
-        return !!(last && last.date && isoToLocalDay(last.date) === todayStr);
-      })();
+      const doneNow = !!actionCompletionForDay(todayStr, state.action.primaryAction);
       if (doneNow) return;
       try { celebrateDone(inst.pageWrap.querySelector('#aplMarkDone')); } catch (_) {}
       creditToday();
@@ -5440,7 +5495,7 @@ Return ONLY the sentence text. No quotes, no labels.`;
     const deadline = ans.timeHorizon || ans.timeframe || '';
     const vinePath = (Array.isArray(pa.path) ? pa.path.slice() : []).reverse().filter(p => p && p.milestone).slice(0, 4);
     const todayStr = getTodayISO();
-    const completedToday = (function () { const h = state.action.completionHistory; if (!Array.isArray(h) || !h.length) return false; const last = h[h.length - 1]; return !!(last && last.date && isoToLocalDay(last.date) === todayStr); })();
+    const completedToday = !!actionCompletionForDay(todayStr, pa);
 
     // ----- scaffold -----
     const TIER_HINTS = { tiny: 'The smallest possible version', light: 'Small but meaningful', moderate: 'A realistic day of work', heavy: 'A serious push', extreme: 'All-in for the day' };
@@ -5497,8 +5552,9 @@ Return ONLY the sentence text. No quotes, no labels.`;
     const vpCreditToday = () => {
       const actionText = tierText(curTier);
       if (!Array.isArray(state.action.completionHistory)) state.action.completionHistory = [];
-      state.action.completionHistory.push({ date: new Date().toISOString(), tier: curTier, actionText, planTitle: pa.title || '' });
-      try { writeProofEvent('action-complete', { title: actionText || pa.title || 'Action completed', module: 'action', metadata: { tier: curTier } }); } catch (_) {}
+      const completion = createActionCompletionRecord(pa, curTier, actionText);
+      state.action.completionHistory.push(completion);
+      try { writeProofEvent('action-complete', { title: actionText || pa.title || 'Action completed', module: 'action', metadata: { tier: curTier, missionId: completion.missionId } }); } catch (_) {}
       if (typeof recalculateStreak === 'function') recalculateStreak();
       try { persistNow(); } catch (_) {}
       if (typeof refreshActionSurface === 'function') { try { refreshActionSurface(); } catch (_) {} }
@@ -6812,13 +6868,9 @@ Return ONLY the sentence text. No quotes, no labels.`;
         ? refine.refinedText
         : ((pa.tiers && pa.tiers[tier]) || pa.howToStart || pa.title || '');
       if (!Array.isArray(state.action.completionHistory)) state.action.completionHistory = [];
-      state.action.completionHistory.push({
-        date: new Date().toISOString(),
-        tier,
-        actionText,
-        planTitle: pa.title || ''
-      });
-      try { writeProofEvent('action-complete', { title: actionText || pa.title || 'Action completed', module: 'action', metadata: { tier: tier } }); } catch (_) {}
+      const completion = createActionCompletionRecord(pa, tier, actionText);
+      state.action.completionHistory.push(completion);
+      try { writeProofEvent('action-complete', { title: actionText || pa.title || 'Action completed', module: 'action', metadata: { tier: tier, missionId: completion.missionId } }); } catch (_) {}
       persistNow();
       if (typeof TabBar !== 'undefined' && TabBar.updateHomeDot) { try { TabBar.updateHomeDot(); } catch (_) {} }
       // Reveal the "Get next step" CTA.
@@ -6836,11 +6888,8 @@ Return ONLY the sentence text. No quotes, no labels.`;
     // completionHistory signal as the vine; applies only the VISUAL side
     // effects markComplete produces (never re-pushes to history).
     (() => {
-      const h = state.action.completionHistory;
-      if (!Array.isArray(h) || !h.length) return;
-      const last = h[h.length - 1];
       const todayStr = getTodayISO();
-      const completedToday = !!(last && last.date && isoToLocalDay(last.date) === todayStr);
+      const completedToday = !!actionCompletionForDay(todayStr, state.action.primaryAction);
       if (!completedToday) return;
       if (todayCard) todayCard.classList.add('is-completed');
       this.pageWrap.querySelectorAll('.action-plan__mark-complete').forEach(btn => {

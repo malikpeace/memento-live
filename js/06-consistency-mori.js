@@ -25,41 +25,75 @@ function _dayNum(isoKey) { return Math.floor(Date.parse(isoKey + 'T00:00:00Z') /
 function _weekStartOffset() { try { return (state.prefs && state.prefs.weekStart === 'mon') ? 1 : 0; } catch (e) { return 0; } }
 function _keyFromDayNum(n) { return new Date(n * 86400000).toISOString().split('T')[0]; }
 
-// Aggregates activity across modules into a { isoDate: score } map. This is the
-// single source of truth for "how consistent have you been". Each event adds to
-// that day's score; the heatmap buckets the score into intensity levels.
-function buildConsistencyData() {
-  const counts = {};
-  const add = (d, w) => { const k = _isoDayKey(d); if (k) counts[k] = (counts[k] || 0) + (w || 1); };
+// The main Action is the product's outcome signal. Completing it (or manually
+// backfilling a day the user completed outside Memento) earns a full day. The
+// supporting modules remain visible as faint context, but they cannot extend a
+// streak by themselves. One support category counts once per day, preventing a
+// long note or several focus sessions from gaming the score.
+const CONSISTENCY_MAIN_WEIGHT = 5;
+const CONSISTENCY_SUPPORT_WEIGHT = 0.25;
+
+function buildConsistencyModel() {
+  const mainDays = {};
+  const supportByDay = {};
+  const markMain = (d) => { const k = _isoDayKey(d); if (k) mainDays[k] = true; };
+  const markSupport = (d, kind) => {
+    const k = _isoDayKey(d);
+    if (!k || !kind) return;
+    if (!supportByDay[k]) supportByDay[k] = {};
+    supportByDay[k][kind] = true;
+  };
   try {
     const s = state || {};
-    (s.streak && Array.isArray(s.streak.history) ? s.streak.history : []).forEach(d => add(d, 1));
-    (s.action && Array.isArray(s.action.completionHistory) ? s.action.completionHistory : []).forEach(h => add(h && h.date, 1));
-    // A daily check-in is showing up too (its proof event is written as type
-    // 'proof' for the memory feed, so it falls outside PROOF_ACTIVE below; read
-    // the check-in array directly here so a check-in-only day still counts toward
-    // the streak / heatmap and never triggers a false "comeback" nudge). iso is a
-    // local getTodayISO() day key, timezone-stable like every other source.
-    (s.checkins && Array.isArray(s.checkins) ? s.checkins : []).forEach(c => { if (c && c.iso) add(c.iso, 1); });
-    // Key off iso (timezone-stable, matches every other source) and only count
-    // entries with real text so an empty new note never inflates the streak.
-    (s.reflection && Array.isArray(s.reflection.entries) ? s.reflection.entries : []).forEach(e => { if (e && (e.text || '').trim()) add(e.iso || e.date, 1); });
-    // Deep work: prefer an ISO field if present (added in the P4 deepwork upgrade),
-    // fall back to the legacy short-date string.
-    (s.deepwork && Array.isArray(s.deepwork.sessions) ? s.deepwork.sessions : []).forEach(x => add(x && (x.iso || x.dateISO || x.date), 1));
-    // proofEvents as an ADDITIONAL source, gap-fill only: it can mark a day
-    // active that the legacy arrays miss (future proofEvents-only activity),
-    // but it never adds weight to a day already counted above, so the streak
-    // and heatmap intensity stay byte-identical for all existing data. Only the
-    // event types that already count toward consistency are eligible.
-    const PROOF_ACTIVE = { 'action-complete': 1, 'deepwork-commit': 1, 'reflection-save': 1, 'checkin': 1, 'vivere': 1 };
+    (s.streak && Array.isArray(s.streak.history) ? s.streak.history : []).forEach(markMain);
+    (s.action && Array.isArray(s.action.completionHistory) ? s.action.completionHistory : []).forEach(h => markMain(h && h.date));
+    (s.checkins && Array.isArray(s.checkins) ? s.checkins : []).forEach(c => { if (c && c.iso) markSupport(c.iso, 'checkin'); });
+    (s.reflection && Array.isArray(s.reflection.entries) ? s.reflection.entries : []).forEach(e => {
+      if (e && (e.text || '').trim()) markSupport(e.iso || e.date, 'reflection');
+    });
+    (s.deepwork && Array.isArray(s.deepwork.sessions) ? s.deepwork.sessions : []).forEach(x => {
+      markSupport(x && (x.iso || x.dateISO || x.date), 'deepwork');
+    });
+    const PROOF_KIND = {
+      'action-complete': 'main',
+      'deepwork-commit': 'deepwork',
+      'reflection-save': 'reflection',
+      'checkin': 'checkin',
+      'vivere': 'vivere'
+    };
     (s.proofEvents && Array.isArray(s.proofEvents) ? s.proofEvents : []).forEach(ev => {
-      if (!ev || !PROOF_ACTIVE[ev.type]) return;
-      const k = _isoDayKey(ev.iso);
-      if (k && counts[k] === undefined) counts[k] = 1;
+      if (!ev || !PROOF_KIND[ev.type]) return;
+      if (PROOF_KIND[ev.type] === 'main') markMain(ev.iso);
+      else markSupport(ev.iso, PROOF_KIND[ev.type]);
     });
   } catch (e) {}
-  return counts;
+
+  const counts = {};
+  const allDays = {};
+  Object.keys(mainDays).forEach(k => { allDays[k] = true; });
+  Object.keys(supportByDay).forEach(k => { allDays[k] = true; });
+  Object.keys(allDays).forEach(k => {
+    const supportCount = supportByDay[k] ? Object.keys(supportByDay[k]).length : 0;
+    counts[k] = mainDays[k]
+      ? CONSISTENCY_MAIN_WEIGHT
+      : Math.min(1, supportCount * CONSISTENCY_SUPPORT_WEIGHT);
+  });
+  return { counts, mainDays, supportByDay };
+}
+
+function buildConsistencyData() { return buildConsistencyModel().counts; }
+function consistencyDayHasMainAction(score) { return Number(score || 0) >= CONSISTENCY_MAIN_WEIGHT; }
+function consistencyHeatmapLevel(score) {
+  if (consistencyDayHasMainAction(score)) return 5;
+  if (Number(score || 0) >= 0.75) return 2;
+  return Number(score || 0) > 0 ? 1 : 0;
+}
+function consistencyDaySummary(key, score) {
+  if (consistencyDayHasMainAction(score)) return `${key}: main action complete`;
+  const supportCount = Math.max(1, Math.round(Number(score || 0) / CONSISTENCY_SUPPORT_WEIGHT));
+  return Number(score || 0) > 0
+    ? `${key}: ${supportCount} support ${supportCount === 1 ? 'activity' : 'activities'} logged`
+    : `${key}: main action not complete`;
 }
 
 // Current streak = consecutive active days walking back from today over the
@@ -71,7 +105,7 @@ function _currentStreakFrom(counts, strict) {
   // one counted day (so missing today AND yesterday still breaks the run) and
   // only when the day before the gap is active (a 2+ day gap never bridges).
   // Pass strict=true for the raw chain (used where a true break must be detected).
-  const active = new Set(Object.keys(counts).map(_dayNum));
+  const active = new Set(Object.keys(counts).filter(k => consistencyDayHasMainAction(counts[k])).map(_dayNum));
   // Grace days already spent are covered days forever: they keep the chain
   // intact in both modes (a covered day is not a break, even for the raw chain).
   try {
@@ -90,7 +124,7 @@ function _currentStreakFrom(counts, strict) {
 }
 function consistencyStats() {
   const counts = buildConsistencyData();
-  const keys = Object.keys(counts).sort();
+  const keys = Object.keys(counts).filter(k => consistencyDayHasMainAction(counts[k])).sort();
   const totalActiveDays = keys.length;
   let longest = 0, cur = 0, prev = null;
   keys.forEach(k => {
@@ -108,10 +142,9 @@ function consistencyStats() {
     if (diff >= 0 && diff <= 29) last30 += 1;
   });
   const pct30 = Math.round((last30 / 30) * 100);
-  // Compounding consistency: a "100% day" is 5 logged actions, so each meaningful
-  // action is 20%. dayFill(iso) returns 0..1. yearConsistency is the average fill
-  // over the trailing 365 days x100; it climbs slowly and is never 100, which is
-  // the point: a long-range number you watch rise.
+  // A completed main Action fills the day. Supporting activities can contribute
+  // at most 20% together, keeping them useful without letting app activity stand
+  // in for the move the user actually chose.
   let yearFillSum = 0;
   for (let d = 0; d < 365; d++) {
     const v = counts[_keyFromDayNum(todayNum - d)] || 0;
@@ -127,9 +160,8 @@ function consistencyStats() {
   return { counts, totalActiveDays, longest, current, thisWeek, lastWeek, last30, pct30, yearConsistency };
 }
 
-// dayFill: 0..1 share of a "full" day (5 logged actions = 100%). Shared by the
-// heatmap shading and the trajectory graph so both read the same compounding model.
-function consistencyDayFill(count) { return Math.min(5, count || 0) / 5; }
+// dayFill: 0..1 share of a full day. Shared by the heatmap and trajectory graph.
+function consistencyDayFill(count) { return Math.min(CONSISTENCY_MAIN_WEIGHT, count || 0) / CONSISTENCY_MAIN_WEIGHT; }
 
 // Counts proof events in the trailing 7 days by type, for the "Week of Proof"
 // summary on Home and in Momentum. Reads the proofEvents spine.
@@ -185,9 +217,8 @@ function renderConsistencyHeatmap(weeks, mode, fit, scale) {
   weeks = weeks || 26;
   mode = mode === 'year' ? 'year' : 'rolling';
   const { counts } = consistencyStats();
-  // Compounding model: 5 logged actions = a full (100%) day, each action = 20%.
-  // So a day grades across 5 green steps (l1 faintest at 1 action, l5 full at 5+).
-  const level = (v) => v <= 0 ? 0 : Math.min(5, v);
+  // Supporting activity stays faint; the main Action earns the full cell.
+  const level = consistencyHeatmapLevel;
   // Days covered by a spent grace day render muted (never red, never empty).
   const _graceUsed = (state.streak && state.streak.grace && state.streak.grace.used) || {};
   // Week scale: a single row of the last 7 days with weekday letters, larger
@@ -204,14 +235,14 @@ function renderConsistencyHeatmap(weeks, mode, fit, scale) {
       const isToday = dn === todayNum;
       const isGrace = v === 0 && _graceUsed[key];
       const dow = new Date(dn * 86400000).getUTCDay();
-      const base = isGrace ? `${key}: covered by a grace day` : (v === 0 ? `${key}: nothing logged` : `${key}: ${v} ${v === 1 ? 'action logged' : 'actions logged'}`);
-      const label = (isToday ? 'Today, ' : '') + (v === 0 && !isGrace ? `${base}. Tap to mark this day done.` : isGrace ? `${base}.` : `${base}. Tap to undo.`);
+      const base = isGrace ? `${key}: covered by a grace day` : consistencyDaySummary(key, v);
+      const label = (isToday ? 'Today, ' : '') + (isGrace ? `${base}.` : consistencyDayHasMainAction(v) ? `${base}.` : `${base}. Tap to mark the main action complete.`);
       row7 += `<div class="cgweek__day">` +
         `<div class="cgraph__cell cgraph__cell--l${lvl}${isGrace ? ' cgraph__cell--grace' : ''} cgraph__cell--tap${isToday ? ' cgraph__cell--today' : ''}" data-date="${key}" role="button" tabindex="0" aria-label="${label}" title="${label}"></div>` +
         `<span class="cgweek__dow${isToday ? ' cgweek__dow--today' : ''}">${DOWL[dow]}</span>` +
       `</div>`;
     }
-    return `<div class="cgraph cgraph--week${fit ? ' cgraph--fit' : ''}" role="group" aria-label="The last seven days. Each square is a day; greener squares mean more done. Tap a day to mark it done or undo it.">` +
+    return `<div class="cgraph cgraph--week${fit ? ' cgraph--fit' : ''}" role="group" aria-label="The last seven days. A full green square means the main action was completed; faint squares show supporting activity.">` +
       `<div class="cgweek">${row7}</div>` +
       (Object.keys(counts).length === 0 ? '<div class="empty-state"><div class="empty-state__label">No proof yet</div><div class="empty-state__hint">Every square here becomes a win the moment you act, starting today.</div><hr class="empty-state__rule" aria-hidden="true"></div>' : '') +
     `</div>`;
@@ -274,9 +305,9 @@ function renderConsistencyHeatmap(weeks, mode, fit, scale) {
       const lvl = level(v);
       const isToday = dn === todayNum;
       const isGrace = v === 0 && _graceUsed[key];
-      const base = isGrace ? `${key}: covered by a grace day` : (v === 0 ? `${key}: nothing logged` : `${key}: ${v} ${v === 1 ? 'action logged' : 'actions logged'}`);
+      const base = isGrace ? `${key}: covered by a grace day` : consistencyDaySummary(key, v);
       // Non-future cells are tappable: same backfill toggle the calendar uses.
-      const label = (isToday ? 'Today, ' : '') + (v === 0 && !isGrace ? `${base}. Tap to mark this day done.` : isGrace ? `${base}.` : `${base}. Tap to undo.`);
+      const label = (isToday ? 'Today, ' : '') + (isGrace ? `${base}.` : consistencyDayHasMainAction(v) ? `${base}.` : `${base}. Tap to mark the main action complete.`);
       // Thermal: hue by recency (old=red -> now=blue); intensity sets vividness.
       let styleAttr = '';
       if (hmPalette === 'thermal' && lvl > 0) {
@@ -306,7 +337,7 @@ function renderConsistencyHeatmap(weeks, mode, fit, scale) {
     <div class="cgraph__cell cgraph__cell--l5"></div>
     <span>More</span></div>`;
 
-  return `<div class="cgraph${fit ? ' cgraph--fit' : ''}${hmMod}" role="group" aria-label="Daily consistency, oldest days on the left. Each square is a day; greener squares mean more done, and empty squares are days with nothing logged. Tap a day to mark it done or undo it.">
+  return `<div class="cgraph${fit ? ' cgraph--fit' : ''}${hmMod}" role="group" aria-label="Daily consistency, oldest days on the left. A full green square means the main action was completed; faint squares show supporting activity.">
     <div class="cgraph__scroll">
       <div class="cgraph__inner">${monthRow}${cols}</div>
     </div>
@@ -556,7 +587,7 @@ function renderChainCalendar() {
       const dn = startSunday + c * 7 + r;
       if (dn > todayNum) { cols += '<div class="chain__cell chain__cell--future"></div>'; continue; }
       const key = _keyFromDayNum(dn);
-      const on = (counts[key] || 0) > 0;
+      const on = consistencyDayHasMainAction(counts[key]);
       const isToday = dn === todayNum;
       const x = on ? '<svg viewBox="0 0 24 24" class="chain__x" aria-hidden="true"><path d="M5 5 L19 19"/><path d="M19 5 L5 19"/></svg>' : '';
       cols += '<div class="chain__cell chain__cell--tap' + (on ? ' chain__cell--x' : '') + (isToday ? ' chain__cell--today' : '') + '" data-date="' + key + '" role="button" tabindex="0" aria-label="' + key + (on ? ', done. Tap to undo.' : ', empty. Tap to mark done.') + '">' + x + '</div>';
@@ -565,7 +596,7 @@ function renderChainCalendar() {
   }
   const st = consistencyStats();
   const cur = st.current || 0;
-  const done = (counts[getTodayISO()] || 0) > 0;
+  const done = consistencyDayHasMainAction(counts[getTodayISO()]);
   let line;
   if (cur >= 2 && !done) line = cur + " X's in a row. One mark keeps it alive.";
   else if (cur >= 2) line = cur + " X's in a row. Each one harder to give up.";
@@ -583,7 +614,7 @@ function renderConsistencyBreakdowns() {
   const scale = (state.ui && state.ui.consistencyScale) || 'week';
   const { counts } = consistencyStats();
   const todayNum = _dayNum(getTodayISO());
-  const on = (key) => (counts[key] || 0) > 0;
+  const on = (key) => consistencyDayHasMainAction(counts[key]);
   const seg = (s, label) => '<button type="button" class="cscale__btn' + (s === scale ? ' cscale__btn--on' : '') + '" data-cscale="' + s + '">' + label + '</button>';
   const control = '<div class="cscale">' + seg('week', 'Week') + seg('month', 'Month') + seg('year', 'Year') + '</div>';
   const FULLM = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -613,7 +644,7 @@ function renderConsistencyBreakdowns() {
   } else {
     const d = new Date(getTodayISO() + 'T00:00:00Z'); const y = d.getUTCFullYear(); const curM = d.getUTCMonth();
     const per = new Array(12).fill(0); let total = 0;
-    Object.keys(counts).forEach(k => { if (k.slice(0, 4) === String(y)) { const mi = parseInt(k.slice(5, 7), 10) - 1; if (mi >= 0 && mi < 12) { per[mi]++; total++; } } });
+    Object.keys(counts).forEach(k => { if (consistencyDayHasMainAction(counts[k]) && k.slice(0, 4) === String(y)) { const mi = parseInt(k.slice(5, 7), 10) - 1; if (mi >= 0 && mi < 12) { per[mi]++; total++; } } });
     const max = Math.max(1, ...per);
     const MN = ['J','F','M','A','M','J','J','A','S','O','N','D'];
     let bars = '', best = 0, bestM = 0;
@@ -845,4 +876,3 @@ function moriScreenYears(yearsLeft, hoursPerDay) {
     waking: yearsLeft * (hoursPerDay / 16),
   };
 }
-

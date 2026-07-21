@@ -62,7 +62,8 @@ const RENDERERS = {
   streak(el) {
     const c = el.querySelector('.widget__content');
     const isFullWidth = el.classList.contains('widget--full');
-    // Unified activity set so the widget dots match Month/Heatmap/Chain and the count.
+    // The streak tracks completed main Actions; support activity remains a faint
+    // heatmap signal but cannot light a streak dot.
     const counts = (typeof buildConsistencyData === 'function') ? buildConsistencyData() : {};
     if (isFullWidth) {
       const today = new Date();
@@ -77,7 +78,7 @@ const RENDERERS = {
         d.setDate(d.getDate() + offset);
         const dateStr = localISO(d);
         const isToday = offset === 0;
-        const isDone = (counts[dateStr] || 0) > 0;
+        const isDone = (typeof consistencyDayHasMainAction === 'function') && consistencyDayHasMainAction(counts[dateStr]);
         html += `<div class="week-day ${isToday ? 'week-day--today' : ''} ${isDone ? 'week-day--done' : ''}">
           <div class="week-day__name">${dayNamesAll[d.getDay()]}</div>
           <div class="week-day__dot"></div>
@@ -95,7 +96,7 @@ const RENDERERS = {
         const d = new Date();
         d.setDate(d.getDate() - i);
         const dateStr = localISO(d);
-        const active = ((counts[dateStr] || 0) > 0) ? 'widget__streak-dot--active' : '';
+        const active = consistencyDayHasMainAction(counts[dateStr]) ? 'widget__streak-dot--active' : '';
         html += `<div class="widget__streak-dot ${active}"></div>`;
       }
       html += '</div>';
@@ -2158,7 +2159,9 @@ const CreatorTools = {
           delete state.meta.firstActionDone;   // let the first-win moment re-fire
           const todayISO = (typeof getTodayISO === 'function') ? getTodayISO() : nowISO.slice(0, 10);
           const pa = state.action.primaryAction || {};
-          state.action.completionHistory = [{ date: nowISO, tier: 'moderate', actionText: pa.title || 'Today’s action', planTitle: pa.title || '' }];
+          const seededCompletion = createActionCompletionRecord(pa, 'moderate', pa.title || 'Today’s action');
+          seededCompletion.date = nowISO;
+          state.action.completionHistory = [seededCompletion];
           state.streak = { history: [todayISO], count: 1, bestEver: 1, bestEverShown: 1 };
           break;
         }
@@ -3257,8 +3260,8 @@ function renderOnThisDay() {
 // hero render and the in-place update after a heatmap square is tapped.
 function ccScoreLineInner(cs) {
   const sc = (label, val, title) => '<span title="' + title + '">' + label + ' <b style="color:var(--text-hi);font-weight:800;font-variant-numeric:tabular-nums;">' + val + '</b><span style="color:var(--text-faint);font-weight:600;">/100</span></span>';
-  let h = sc('Consistency score', cs.pct30, 'Your consistency over the last 30 days, out of 100.');
-  if (typeof cs.yearConsistency === 'number') h += sc('Year score', cs.yearConsistency, 'Your consistency across the last 365 days, out of 100. A full day is 5 logged actions.');
+  let h = sc('Consistency score', cs.pct30, 'Days with the main Action completed in the last 30 days, out of 100.');
+  if (typeof cs.yearConsistency === 'number') h += sc('Year score', cs.yearConsistency, 'Your trailing 365-day consistency. The main Action fills a day; supporting activity can add only a faint partial signal.');
   return h;
 }
 // One short, derived "why" under today's action. Ties the action back to the
@@ -3283,11 +3286,8 @@ function ccActionWhyLine() {
 // diverge. Returns true if it credited, false if already done today / no-op.
 function creditTodayAction() {
   try {
-    const today = getTodayISO();
-    const h = state.action && state.action.completionHistory;
-    const doneNow = Array.isArray(h) && h.length && h[h.length - 1].date && isoToLocalDay(h[h.length - 1].date) === today;
-    if (doneNow) return false;
     const pa = (state.action && state.action.primaryAction) || {};
+    if (actionCompletionForDay(getTodayISO(), pa)) return false;
     // log the tier the user actually committed to (a coach shrink or the Action
     // picker sets selectedTier), not always the original recommendation
     const _TK = ['tiny', 'light', 'moderate', 'heavy', 'extreme'];
@@ -3296,29 +3296,25 @@ function creditTodayAction() {
     const actionText = (pa.tiers && pa.tiers[tier]) || pa.howToStart || pa.title || '';
     if (!state.action) state.action = {};
     if (!Array.isArray(state.action.completionHistory)) state.action.completionHistory = [];
-    // Stamp a stable id so the inline undo can remove THIS exact entry, never a
-    // later completion logged in the undo window (which a blind pop would delete).
-    const id = 'act_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-    state.action.completionHistory.push({ id: id, date: new Date().toISOString(), tier, actionText, planTitle: pa.title || '' });
-    try { writeProofEvent('action-complete', { title: actionText || pa.title || 'Action completed', module: 'action', metadata: { tier } }); } catch (_) {}
+    // The receipt owns both a stable record id (for undo) and the mission id
+    // (for truth). A later same-day Door cannot inherit this completion.
+    const completion = createActionCompletionRecord(pa, tier, actionText);
+    state.action.completionHistory.push(completion);
+    try { writeProofEvent('action-complete', { title: actionText || pa.title || 'Action completed', module: 'action', metadata: { tier, missionId: completion.missionId } }); } catch (_) {}
     try { Analytics.track('action_done', { tier }); } catch (_) {} // Activation Point
     try { window.MementoPush && MementoPush.sync(); } catch (_) {} // reminder context: day is done
     if (typeof recalculateStreak === 'function') { try { recalculateStreak(); } catch (_) {} }
     try { persistNow(); } catch (_) {}
-    return id;
+    return completion.id;
   } catch (e) { return false; }
 }
 
-// Single source of truth: was today's daily ACTION completed (compared on the
-// LOCAL day)? completionHistory stores full ISO timestamps, so a raw UTC slice
-// would mis-read after the UTC rollover in negative-UTC zones; always go through
-// isoToLocalDay. Used by the hub headline, the command center, and the hub
-// consistency line so they never contradict each other on the same screen.
+// Single source of truth: was the CURRENT mission completed today? A user may
+// finish a Door and receive a second mission on the same local day, so date-only
+// completion would put the first receipt's checkmark on the second mission.
 function actionDoneToday() {
   try {
-    const today = getTodayISO();
-    const h = state.action && state.action.completionHistory;
-    return Array.isArray(h) && h.some(e => e && e.date && isoToLocalDay(e.date) === today);
+    return !!actionCompletionForDay(getTodayISO(), state.action && state.action.primaryAction);
   } catch (e) { return false; }
 }
 
@@ -3578,7 +3574,7 @@ function renderCommandCenter() {
           const dnum = todayNum - i;
           const iso = new Date(dnum * 86400000).toISOString().split('T')[0];
           const dow = new Date(dnum * 86400000).getUTCDay();
-          const on = counts[iso] !== undefined;
+          const on = consistencyDayHasMainAction(counts[iso]);
           dots += '<div style="display:flex;flex-direction:column;align-items:center;gap:7px;">' +
             '<div style="width:11px;height:11px;border-radius:50%;background:' + (on ? C : 'rgba(var(--ink),0.10)') + ';box-shadow:' + (on ? '0 0 8px ' + C : 'none') + ';"></div>' +
             '<span style="font-size:0.58rem;color:var(--text-faint);font-weight:600;">' + dl[dow] + '</span></div>';
@@ -3599,9 +3595,9 @@ function renderCommandCenter() {
       }
       // Anti-fragile primary metric: a rolling 30-day percentage that only ever
       // nudges, so one missed day can never read as catastrophic.
-      // Consistency expressed as 0-100 SCORES (not percentages): a 30-day score
-      // and a long-range year score (a "100% day" is 5 logged actions). Updated
-      // in place on a square tap (id ccScoreLine).
+      // Consistency expressed as 0-100 SCORES (not percentages): the 30-day
+      // score counts main-Action days; the year score can show a small partial
+      // signal for support work. Updated in place on a square tap.
       if (cs.totalActiveDays > 0) {
         row += '<div id="ccScoreLine" style="display:flex;gap:18px;margin-bottom:14px;font-size:0.85rem;color:var(--text-lo);">' + ccScoreLineInner(cs) + '</div>';
       }
@@ -3785,7 +3781,7 @@ function bindCommandCenter(cc) {
           // (which flashed and jumped the scroll).
           try {
             const counts = (typeof buildConsistencyData === 'function') ? buildConsistencyData() : {};
-            const lvl = Math.min(5, counts[date] || 0);
+            const lvl = (typeof consistencyHeatmapLevel === 'function') ? consistencyHeatmapLevel(counts[date]) : Math.min(5, counts[date] || 0);
             cell.className = cell.className.replace(/cgraph__cell--l\d/, 'cgraph__cell--l' + lvl);
             cell.style.background = '';
             cell.classList.remove('cgraph__cell--justfilled');
@@ -4336,7 +4332,7 @@ function renderHubConsistency() {
       const todayNum = Math.floor(Date.parse(getTodayISO() + 'T00:00:00Z') / 86400000);
       for (let i = 6; i >= 0; i--) {
         const iso = new Date((todayNum - i) * 86400000).toISOString().split('T')[0];
-        const on = counts[iso] !== undefined;
+        const on = consistencyDayHasMainAction(counts[iso]);
         dots += '<span class="hubcc__dot' + (on ? ' is-on' : '') + '"></span>';
       }
     } catch (e) {}

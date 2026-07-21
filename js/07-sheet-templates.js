@@ -631,16 +631,14 @@ const SHEET_TEMPLATES = {
       try { persistNow(); } catch (_) {}
     },
     _creditAction() {
-      const today = this._todayISO();
-      const h = state.action.completionHistory;
-      const doneNow = Array.isArray(h) && h.length && h[h.length - 1].date && isoToLocalDay(h[h.length - 1].date) === today;
-      if (doneNow) return false;
       const pa = state.action.primaryAction || {};
+      if (actionCompletionForDay(this._todayISO(), pa)) return false;
       const tier = pa.recommendedTier || 'moderate';
       const actionText = (pa.tiers && pa.tiers[tier]) || pa.howToStart || pa.title || '';
       if (!Array.isArray(state.action.completionHistory)) state.action.completionHistory = [];
-      state.action.completionHistory.push({ date: new Date().toISOString(), tier, actionText, planTitle: pa.title || '' });
-      try { writeProofEvent('action-complete', { title: actionText || pa.title || 'Action completed', module: 'action', metadata: { tier } }); } catch (_) {}
+      const completion = createActionCompletionRecord(pa, tier, actionText);
+      state.action.completionHistory.push(completion);
+      try { writeProofEvent('action-complete', { title: actionText || pa.title || 'Action completed', module: 'action', metadata: { tier, missionId: completion.missionId } }); } catch (_) {}
       if (typeof recalculateStreak === 'function') { try { recalculateStreak(); } catch (_) {} }
       try { persistNow(); } catch (_) {}
       return true;
@@ -693,7 +691,7 @@ const SHEET_TEMPLATES = {
           const yk = localISO(y);
           let counts = {}; try { counts = buildConsistencyData(); } catch (_) {}
           const used = (state.streak && state.streak.grace && state.streak.grace.used) || {};
-          const line = (counts[yk] > 0) ? 'Yesterday counted.' : (used[yk] ? 'A grace day held the chain.' : 'Yesterday was quiet.');
+          const line = consistencyDayHasMainAction(counts[yk]) ? 'Yesterday counted.' : (used[yk] ? 'A grace day held the chain.' : 'Yesterday was quiet.');
           const streak = (state.streak && state.streak.count) || 0;
           h += '<div class="be-ico">&#9728;&#65039;</div><div class="be-step">Morning &middot; step 1 of 3</div>';
           h += '<div class="be-q">' + line + '</div>';
@@ -1993,7 +1991,7 @@ const SHEET_TEMPLATES = {
   streak: {
     render() {
       const today = getTodayISO();
-      const done = state.streak.lastCheckDate === today || ((consistencyStats().counts[today] || 0) > 0);
+      const done = consistencyDayHasMainAction(consistencyStats().counts[today]);
       const st = consistencyStats();
       // Conditionally add the staggered reveal cascade only on a fresh open
       // (Sheet._expReveal), never on internal re-renders (day toggles, view swaps).
@@ -6244,8 +6242,7 @@ function renderCalendar(year, month) {
   const startDow = (firstDay.getDay() + 6) % 7; // Monday = 0
   const daysInMonth = lastDay.getDate();
   const today = getTodayISO();
-  // Use the unified activity set so Month matches Heatmap and Chain (a day made
-  // active by an action/deep-work/reflection counts as done here too).
+  // Month matches Heatmap and Chain: only the main Action earns a completed day.
   const _counts = buildConsistencyData();
 
   let html = '<div class="cal">';
@@ -6265,7 +6262,7 @@ function renderCalendar(year, month) {
   for (let d = 1; d <= daysInMonth; d++) {
     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
     const isToday = dateStr === today;
-    const isDone = (_counts[dateStr] || 0) > 0;
+    const isDone = consistencyDayHasMainAction(_counts[dateStr]);
     let cls = 'cal__day';
     if (isToday) cls += ' cal__day--today';
     if (isDone) cls += ' cal__day--done';
@@ -6328,4 +6325,3 @@ function refreshCalendar(container) {
   container.innerHTML = SHEET_TEMPLATES.streak.render();
   SHEET_TEMPLATES.streak.bind(container);
 }
-

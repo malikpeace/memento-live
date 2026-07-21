@@ -772,10 +772,14 @@ body.calm-motion .empty-state, body.lite .empty-state { animation: none; }
   position: fixed; inset: 0; z-index: 200;
   display: flex; align-items: center; justify-content: center;
   background: #050808;
-  transition: opacity 0.6s var(--ease-out); padding: 20px;
+  visibility: visible;
+  transition: opacity 0.6s var(--ease-out), visibility 0s linear 0s; padding: 20px;
   overflow: hidden;
 }
-.login.hidden { opacity: 0; pointer-events: none; }
+.login.hidden {
+  opacity: 0; pointer-events: none; visibility: hidden;
+  transition: opacity 0.6s var(--ease-out), visibility 0s linear 0.6s;
+}
 .login__orbs { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
 .login__orb {
   position: absolute; border-radius: 50%;
@@ -2441,11 +2445,15 @@ body:has(.clarity-exp.open-content) .fullscreen-close-global {
   height: 100vh; height: 100lvh;
   display: flex; align-items: center; justify-content: center;
   background: #000;
-  transition: opacity 0.6s var(--ease-out);
+  visibility: visible;
+  transition: opacity 0.6s var(--ease-out), visibility 0s linear 0s;
   touch-action: none;
   overflow: hidden;
 }
-.splash.dismissed { opacity: 0; pointer-events: none; }
+.splash.dismissed {
+  opacity: 0; pointer-events: none; visibility: hidden;
+  transition: opacity 0.6s var(--ease-out), visibility 0s linear 0.6s;
+}
 /* Splash V2 - vibrant gradient background, no logo */
 .splash--v2 {
   /* Static glow so the splash is never pure black, even before the animated
