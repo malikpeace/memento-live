@@ -6182,7 +6182,7 @@ Return ONLY the sentence text. No quotes, no labels.`;
         </div>
         <div class="js-peak-tooltip" aria-hidden="true">
           <div class="js-peak-tooltip__label">YOUR DESTINATION</div>
-          <div class="js-peak-tooltip__text">${esc(neutronStar) || 'Set your neutron star'}</div>
+          <div class="js-peak-tooltip__text">${esc(neutronStar) || 'Set your Neutron Star'}</div>
         </div>
       </div>
     `;

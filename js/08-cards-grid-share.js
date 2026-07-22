@@ -3492,7 +3492,7 @@ function renderCommandCenter() {
       // v777 (Malik): ONE eyebrow, one line, one button. The goal text is gone,
       // they literally just forged it; repeating it here read as AI over-explaining.
       return wrap(eyebrow('Next step') +
-        '<div style="font-size:1.15rem;font-weight:700;color:var(--text-hi);margin-bottom:14px;">Turn your neutron star into a tangible daily action</div>' +
+        '<div style="font-size:1.15rem;font-weight:700;color:var(--text-hi);margin-bottom:14px;">Turn your Neutron Star into a tangible daily action</div>' +
         '<div style="display:flex;">' + primaryBtn('Build my plan', 'action') + '</div>');
     }
 
@@ -3781,7 +3781,7 @@ function renderDeskMission() {
       el.innerHTML = label('First step') + head('Find your Neutron Star.') +
         '<div class="dkm__row">' + solid('Start', 'clarity') + '</div>';
     } else if (!hasPlan) {
-      el.innerHTML = label('Next step') + head('Turn your neutron star into a tangible daily action.') +
+      el.innerHTML = label('Next step') + head('Turn your Neutron Star into a tangible daily action.') +
         '<div class="dkm__row">' + solid('Build my plan', 'action') + '</div>';
     } else if (typeof isComebackGap === 'function' && isComebackGap()) {
       // Comeback: the full shame-free chooser lives in the command center /
