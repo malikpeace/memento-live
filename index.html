@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <script>
 /* Single source of truth for the app version. Surfaced in Settings > About. */
-window.MEMENTO_VERSION = 'v915';
+window.MEMENTO_VERSION = 'v916';
 /* LOWFX: touch / mobile devices get a lighter render path (no backdrop blur,
    no will-change layers, no background canvas animations) so iOS does not kill
    the tab from graphics-memory pressure. Desktop (fine pointer) is untouched.
@@ -53,21 +53,21 @@ window.MEMENTO_VERSION = 'v915';
      paint never waits on a third-party CDN. font-display: swap throughout. -->
 <link rel="preload" href="fonts/dmsans-1.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="fonts/fonts.css">
-<link rel="stylesheet" href="css/base.css?v=v915">
-<link rel="stylesheet" href="css/sidebar.css?v=v915">
-<link rel="stylesheet" href="css/dashboard.css?v=v915">
-<link rel="stylesheet" href="css/misc.css?v=v915">
-<link rel="stylesheet" href="css/vivere.css?v=v915">
-<link rel="stylesheet" href="css/notes.css?v=v915">
-<link rel="stylesheet" href="css/onboarding.css?v=v915">
-<link rel="stylesheet" href="css/clarity.css?v=v915">
-<link rel="stylesheet" href="css/action.css?v=v915">
-<link rel="stylesheet" href="css/daycard-living.css?v=v915">
-<link rel="stylesheet" href="css/clarity-paywall.css?v=v915">
-<link rel="stylesheet" href="css/appearance-picker.css?v=v915">
-<link rel="stylesheet" href="css/journey.css?v=v915">
-<link rel="stylesheet" href="css/descent.css?v=v915">
-<link rel="stylesheet" href="css/install.css?v=v915">
+<link rel="stylesheet" href="css/base.css?v=v916">
+<link rel="stylesheet" href="css/sidebar.css?v=v916">
+<link rel="stylesheet" href="css/dashboard.css?v=v916">
+<link rel="stylesheet" href="css/misc.css?v=v916">
+<link rel="stylesheet" href="css/vivere.css?v=v916">
+<link rel="stylesheet" href="css/notes.css?v=v916">
+<link rel="stylesheet" href="css/onboarding.css?v=v916">
+<link rel="stylesheet" href="css/clarity.css?v=v916">
+<link rel="stylesheet" href="css/action.css?v=v916">
+<link rel="stylesheet" href="css/daycard-living.css?v=v916">
+<link rel="stylesheet" href="css/clarity-paywall.css?v=v916">
+<link rel="stylesheet" href="css/appearance-picker.css?v=v916">
+<link rel="stylesheet" href="css/journey.css?v=v916">
+<link rel="stylesheet" href="css/descent.css?v=v916">
+<link rel="stylesheet" href="css/install.css?v=v916">
 </head>
 <body>
 
@@ -479,7 +479,9 @@ window.MEMENTO_VERSION = 'v915';
       <button class="creator-box__btn" id="creatorJumpCelebration">Celebration</button>
       <div class="creator-box__divider">Stages &amp; animations</div>
       <button class="creator-box__btn" id="creatorJumpBlankCard">Blank card</button>
-      <button class="creator-box__btn" id="creatorJumpUnlock">Unlock cinema</button>
+      <button class="creator-box__btn" id="creatorJumpUnlock">Evolution 1 · cyan (Clarity)</button>
+      <button class="creator-box__btn" id="creatorJumpEvoPlat">Evolution 2 · platinum (Action)</button>
+      <button class="creator-box__btn" id="creatorJumpEvoGreen">Evolution 3 · green (Consistency)</button>
       <button class="creator-box__btn" id="creatorJumpAfterCinema">After cinematic</button>
       <button class="creator-box__btn" id="creatorJumpFinalQ">Final question</button>
       <button class="creator-box__btn" id="creatorJumpSynth">Synthesis</button>
@@ -782,32 +784,32 @@ window.MEMENTO_VERSION = 'v915';
 <!-- Supabase client for OPTIONAL cloud accounts + sync (js/12-cloud-sync.js).
      If this CDN tag fails to load, the app runs fully local, unchanged. -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
-<script src="js/01-state-foundation.js?v=v915"></script>
-<script src="js/02-clarity-experience.js?v=v915"></script>
-<script src="js/03-ai-integration.js?v=v915"></script>
-<script src="js/04-templates-proof.js?v=v915"></script>
-<script src="js/05-vivere.js?v=v915"></script>
-<script src="js/06-consistency-mori.js?v=v915"></script>
-<script src="js/07-sheet-templates.js?v=v915"></script>
-<script src="js/08-cards-grid-share.js?v=v915"></script>
-<script src="js/09-controllers.js?v=v915"></script>
-<script src="js/10-demo-backend.js?v=v915"></script>
+<script src="js/01-state-foundation.js?v=v916"></script>
+<script src="js/02-clarity-experience.js?v=v916"></script>
+<script src="js/03-ai-integration.js?v=v916"></script>
+<script src="js/04-templates-proof.js?v=v916"></script>
+<script src="js/05-vivere.js?v=v916"></script>
+<script src="js/06-consistency-mori.js?v=v916"></script>
+<script src="js/07-sheet-templates.js?v=v916"></script>
+<script src="js/08-cards-grid-share.js?v=v916"></script>
+<script src="js/09-controllers.js?v=v916"></script>
+<script src="js/10-demo-backend.js?v=v916"></script>
 <!-- The Path + Your Story: the journey views. Client-side, read existing state. -->
-<script src="js/17-journey.js?v=v915"></script>
+<script src="js/17-journey.js?v=v916"></script>
 <!-- Add to Home Screen prompt: detects browser-tab vs installed PWA. -->
-<script src="js/18-install.js?v=v915"></script>
-<script src="js/20-push.js?v=v915"></script>
-<script src="js/11-init.js?v=v915"></script>
-<script src="js/12-cloud-sync.js?v=v915"></script>
-<script src="js/13-clarity-paywall.js?v=v915"></script>
-<script src="js/14-appearance-picker.js?v=v915"></script>
+<script src="js/18-install.js?v=v916"></script>
+<script src="js/20-push.js?v=v916"></script>
+<script src="js/11-init.js?v=v916"></script>
+<script src="js/12-cloud-sync.js?v=v916"></script>
+<script src="js/13-clarity-paywall.js?v=v916"></script>
+<script src="js/14-appearance-picker.js?v=v916"></script>
 <!-- DEV-ONLY: ?dev=beats live preview for the onboarding chapter pages. Inert without the param. -->
-<script src="js/19-dev-beats.js?v=v915"></script>
+<script src="js/19-dev-beats.js?v=v916"></script>
 <!-- The sound engine: synthesized moments, off by default (Profile toggle). -->
-<script src="js/20-sound.js?v=v915"></script>
-<script src="js/21-descent.js?v=v915"></script>
+<script src="js/20-sound.js?v=v916"></script>
+<script src="js/21-descent.js?v=v916"></script>
 <!-- Back/forward + hash-URL routing. Loads LAST so every open/close fn it wraps
      already exists. Inert until onboarding is done; touches only location.hash. -->
-<script src="js/15-router.js?v=v915"></script>
+<script src="js/15-router.js?v=v916"></script>
 </body>
 </html>

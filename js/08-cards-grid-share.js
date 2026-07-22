@@ -1803,6 +1803,8 @@ const CreatorTools = {
     // Stage & animation jumps (Malik: fly around Memento from the cheat bar)
     bind('creatorJumpBlankCard', () => this.jumpBlankCard());
     bind('creatorJumpUnlock', () => this.jumpUnlockCinema());
+    bind('creatorJumpEvoPlat', () => this.jumpEvoColour('evo2-plat'));
+    bind('creatorJumpEvoGreen', () => this.jumpEvoColour('evo2-green'));
     bind('creatorJumpAfterCinema', () => this.jumpAfterCinema());
     bind('creatorJumpCelebration', () => this.jumpCelebration());
     bind('creatorJumpFinalQ', () => this.jumpFinalQuestion());
@@ -2248,6 +2250,26 @@ const CreatorTools = {
     // Seed a real just-ignited state with the cinema unseen; renderGrid inside
     // _seedStep runs the REAL _maybeRunCardEvolution, so the actual cinema plays.
     this._seedStep('unlock');
+  },
+  // v916 (Malik): watch the other two evolutions on demand. The card earns its
+  // layers one moment at a time (cyan at Clarity, platinum when the Action plan
+  // is revealed, green on the first completed action) and it is the SAME cinema
+  // every time, only the wash colour changes. So this replays the real unlock
+  // cinema with the colour class applied, rather than faking a second animation.
+  // The class is cleared after the run so it can never leak into the next one.
+  jumpEvoColour(cls) {
+    this._closeAll(); this._devToHome();
+    try {
+      document.body.classList.remove('evo2-plat', 'evo2-green');
+      if (cls) document.body.classList.add(cls);
+    } catch (e) {}
+    this._seedStep('unlock');
+    // The cinema is ~10.5s end to end (grow -> surge -> orb -> settle -> beams).
+    // Clear a little past that; _evoFinish does not know about the colour class.
+    clearTimeout(this._evoColourTimer);
+    this._evoColourTimer = setTimeout(() => {
+      try { document.body.classList.remove('evo2-plat', 'evo2-green'); } catch (e) {}
+    }, 13000);
   },
   // The CEREMONY jumps open the real Clarity ceremony, which is already state-
   // accurate: the hold ignites for real, then Add-to-Memento plays the real card
