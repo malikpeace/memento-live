@@ -443,3 +443,119 @@ body.evo2-snap .ambient__rays { transition: none !important; }
 .daycard-ns__vivere.is-weaving { transition: opacity 2.6s cubic-bezier(0.22, 1, 0.36, 1); }
 .daycard-ns__mori.is-weaving:not(.is-woven),
 .daycard-ns__vivere.is-weaving:not(.is-woven) { opacity: 0; }
+
+/* ============================================================================
+   v930 · THE ACTION REWARD (Malik's card-playground picks, prototypes/card-playground.html)
+   Three layers that arrive ONLY as Action is earned. Every one of them keys off
+   --act, which is 0 until the user has actually done the work, so an unearned
+   card is byte-identical to what it is today. His call, explicitly: "I do not
+   want the rim to be there by default. only for action. I want it to be a
+   reward." So none of this is a material property of the card.
+
+   The strengths are the values he settled on in the playground, and they differ
+   per theme on purpose (he checked both and picked separately): light wants a
+   restrained wash because a pale card fills up fast, dark can take the full one.
+       dark   wash 0.85 · rim 1.00 · pop 0.30
+       light  wash 0.30 · rim 0.90 · pop 0
+   ========================================================================== */
+.daycard-theme-living { --plat-k: 0.85; --rim-k: 1; --pop-k: 0.30; }
+html.theme-light .daycard-theme-living { --plat-k: 0.30; --rim-k: 0.90; --pop-k: 0; }
+
+/* A · the silvery wash. This is what makes the centre read as platinum rather
+   than just brighter colour; A/B'd in the playground against --act alone, and
+   it is doing real work, it is not redundant with the act blob. */
+.daycard-theme-living .daycard-ns__plat {
+  position: absolute; inset: -12%;
+  z-index: 4; pointer-events: none;
+  opacity: calc(var(--act, 0) * var(--plat-k));
+  transition: opacity 0.6s ease;
+  background: radial-gradient(58% 52% at 50% 42%,
+    rgba(255, 255, 255, 0.92) 0%, rgba(226, 236, 248, 0.62) 46%,
+    rgba(190, 208, 228, 0.26) 78%, rgba(190, 208, 228, 0) 100%);
+  filter: blur(20px) saturate(1.04);
+}
+html.theme-light .daycard-theme-living .daycard-ns__plat {
+  background: radial-gradient(58% 52% at 50% 42%,
+    rgba(255, 255, 255, 0.97) 0%, rgba(238, 244, 250, 0.70) 46%,
+    rgba(208, 220, 232, 0.30) 78%, rgba(208, 220, 232, 0) 100%);
+}
+
+/* B · colour reassert. The earned hues live UNDER the wash, so a strong wash
+   drowns them. This re-states them ON TOP, at the same positions as the card's
+   own blobs so it reads as the same colour resurfacing, never a second glow.
+   Strength is tied to how much white is actually covering them (the wash,
+   squared), so it is self-limiting and contributes nothing at low wash. */
+.daycard-theme-living .daycard-ns__tint {
+  position: absolute; inset: 0; border-radius: inherit;
+  z-index: 5; pointer-events: none;
+  opacity: calc(var(--act, 0) * var(--plat-k) * var(--act, 0) * var(--plat-k) * var(--pop-k));
+  transition: opacity 0.6s ease;
+  background:
+    radial-gradient(58% 50% at 26% 16%, rgba(58, 217, 245, calc(0.85 * var(--clar, 0))) 0%, rgba(58, 217, 245, 0) 70%),
+    radial-gradient(58% 50% at 76% 84%, rgba(63, 217, 78, calc(0.85 * var(--cons, 0))) 0%, rgba(63, 217, 78, 0) 70%);
+}
+
+/* C · THE RIM. Action moves out to the perimeter as a burning edge. Built from
+   INSET shadows on a layer that inherits the card's radius, so the burn follows
+   the rounded corners exactly and can never render as a box (the edge-safety
+   law). Every layer is blurred: a 0 blur radius would draw a literal line, i.e.
+   a border, which is exactly what it must not look like. */
+.daycard-theme-living .daycard-ns__rim {
+  position: absolute; inset: 0; border-radius: inherit;
+  z-index: 6; pointer-events: none;
+  opacity: calc(var(--act, 0) * var(--rim-k));
+  transition: opacity 0.6s ease;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.92),
+    inset 0 0 14px rgba(255, 255, 255, 0.50),
+    inset 0 0 38px rgba(206, 230, 255, 0.34),
+    inset 0 0 82px rgba(170, 205, 255, 0.18);
+}
+/* Light mode: a bright edge cannot out-shine a near-white card (measured about
+   1.26:1 against the 3:1 a graphic needs), but the card's interior is cyan and
+   green, not white, so a white rim still separates where there is colour and
+   quietly vanishes where there is not. The falloff is MONOTONIC (bright at the
+   edge, fading inward, nothing else): an inboard bloom under a darker band
+   reads as an inset frame, which is the failure he caught on the prototype. */
+html.theme-light .daycard-theme-living .daycard-ns__rim {
+  box-shadow:
+    inset 0 0 7px rgba(255, 255, 255, 0.98),
+    inset 0 0 20px rgba(255, 255, 255, 0.86),
+    inset 0 0 46px rgba(255, 255, 255, 0.52),
+    inset 0 0 92px rgba(226, 240, 255, 0.26);
+}
+
+/* The rim's escaping light. It CANNOT live on the card: .daycard-ns is
+   clip-path + contain:paint, which would clip an outer shadow away entirely.
+   It goes on the stage, where the card's existing glow and drop shadow already
+   live, and it is APPENDED to them rather than replacing them, so the lift and
+   the ground shadow Malik likes are untouched. */
+.daycard-theme-living .daycard-living-stage {
+  box-shadow:
+    0 0 44px rgba(200, 210, 255, 0.10),
+    0 12px 38px rgba(0, 0, 0, 0.28),
+    0 0 calc(34px * var(--act, 0)) rgba(186, 218, 255, calc(0.30 * var(--act, 0)));
+}
+html.theme-light .daycard-theme-living .daycard-living-stage {
+  box-shadow:
+    0 0 44px rgba(200, 210, 255, 0.10),
+    0 12px 38px rgba(0, 0, 0, 0.28),
+    0 8px calc(26px * var(--act, 0)) rgba(64, 92, 134, calc(0.20 * var(--act, 0)));
+}
+
+/* The reward in the GROUND REFLECTION (Malik asked for this explicitly). The
+   floor is already flipped, blurred 22px and masked, so a rim placed inside it
+   inherits all of that for free and reads as the reflected edge. No extra
+   machinery, and it fades with the reflection because the floor's own opacity
+   still gates it. */
+.daycard-theme-living .daycard-floor .daycard-ns__rim { z-index: 1; }
+
+/* GATE: the reward is internal colour, so it obeys the same pre-star rule as
+   the liquid and the burn. Deliberately NOT exempted for the clarity cinema's
+   surge/orb stages, unlike those two: this is Action's reward and has no
+   business appearing during Clarity's ignition. */
+body:not(.ns-bloom) .daycard-theme-living .daycard-ns__plat,
+body:not(.ns-bloom) .daycard-theme-living .daycard-ns__tint,
+body:not(.ns-bloom) .daycard-theme-living .daycard-ns__rim {
+  opacity: 0 !important;
+}

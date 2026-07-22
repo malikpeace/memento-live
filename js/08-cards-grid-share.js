@@ -4841,6 +4841,14 @@ function renderDayCard() {
         ((state.meta && state.meta.moriMomentAt) ? '<span class="daycard-ns__mori" aria-hidden="true"></span>' : '') +
         ((state.meta && state.meta.vivereMomentAt) ? '<span class="daycard-ns__vivere" aria-hidden="true"></span>' : '') +
         (living ? '<span class="daycard-ns__burn" aria-hidden="true"></span>' : '') +
+        /* v930 (Malik's playground picks): the Action REWARD. __plat is the
+           silvery wash, __tint re-states the earned hues on top of it so they
+           are not drowned, __rim is the burning perimeter. All three are
+           driven by --act alone, so an unearned card never shows them: the
+           rim in particular is a reward, never the card's default edge. */
+        (living ? '<span class="daycard-ns__plat" aria-hidden="true"></span>' : '') +
+        (living ? '<span class="daycard-ns__tint" aria-hidden="true"></span>' : '') +
+        (living ? '<span class="daycard-ns__rim" aria-hidden="true"></span>' : '') +
         '<div class="daycard-ns__body">' + emblemSvg + '</div>' +
         '<div class="daycard-ns__foot">' + goalSpan + nameSpan + '</div>' +
       '</div>';
@@ -4850,7 +4858,13 @@ function renderDayCard() {
     const inner = living
       ? '<div class="daycard-living-stage">' +
           '<span class="daycard-bloom" aria-hidden="true">' + blobs + '</span>' +
-          '<span class="daycard-floor" aria-hidden="true">' + blobs + '</span>' +
+          /* v930: the floor carries the rim too (Malik: he wants the reward to
+             show in the ground reflection). It needs no machinery of its own,
+             the floor is already flipped, blurred and masked, so a rim placed
+             inside it inherits all of that and reads as the reflected edge. */
+          '<span class="daycard-floor" aria-hidden="true">' + blobs +
+            '<span class="daycard-ns__rim" aria-hidden="true"></span>' +
+          '</span>' +
           ns +
         '</div>'
       : ns;
