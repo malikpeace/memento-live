@@ -17,6 +17,7 @@ const MementoSound = (() => {
   let ctx = null;
   let master = null;
   let lastTick = 0;
+  let resumePromise = null;
 
   // ON by default (Malik): sound plays unless the user explicitly turns the
   // Appearance toggle off (soundOn === false). Undefined means on.
@@ -28,13 +29,25 @@ const MementoSound = (() => {
     if (!ctx) {
       const AC = window.AudioContext || window.webkitAudioContext;
       if (!AC) return null;
-      ctx = new AC();
+      // Favor immediate response for UI sounds. Older Safari builds do not
+      // accept constructor options, so retain the no-options fallback.
+      try { ctx = new AC({ latencyHint: 'interactive' }); }
+      catch (e) { ctx = new AC(); }
       master = ctx.createGain();
       master.gain.value = 0.8;
       const comp = ctx.createDynamicsCompressor();
       master.connect(comp).connect(ctx.destination);
     }
-    if (ctx.state === 'suspended') { try { ctx.resume(); } catch (e) {} }
+    // Do not repeatedly ask the browser to resume on every typed character.
+    // More importantly, play() will skip ticks until this finishes so Web
+    // Audio cannot queue a group of stale ticks and release them late.
+    if (ctx.state === 'suspended' && !resumePromise) {
+      try {
+        resumePromise = ctx.resume()
+          .catch(() => {})
+          .finally(() => { resumePromise = null; });
+      } catch (e) { resumePromise = null; }
+    }
     return ctx;
   };
 
@@ -160,19 +173,22 @@ const MementoSound = (() => {
   return {
     play(name) {
       try {
-        if (!on() || !S[name]) return;
-        const c = ac(); if (!c || !master) return;
+        if (!on() || !S[name]) return false;
+        const c = ac();
+        if (!c || !master || c.state !== 'running') return false;
         S[name](c, master);
-      } catch (e) {}
+        return true;
+      } catch (e) { return false; }
     },
-    // the typewriter tick, self-throttled to a typing rhythm
+    // The visual typewriter runs much faster than the audible rhythm. Keep a
+    // stable cadence instead of drawing a new random threshold on every frame,
+    // which made desktop ticks feel detached from the letters they belonged to.
     tick() {
       try {
         if (!on()) return;
         const now = performance.now();
-        if (now - lastTick < 75 + Math.random() * 50) return;
-        lastTick = now;
-        this.play('tick');
+        if (now - lastTick < 64) return;
+        if (this.play('tick')) lastTick = now;
       } catch (e) {}
     }
   };
