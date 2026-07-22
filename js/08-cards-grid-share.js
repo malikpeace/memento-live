@@ -1317,13 +1317,12 @@ function renderGreeting() {
   // Search rides along: the dashboard page gets its own search button on
   // the greeting row (the header one is hidden on mobile); it just proxies
   // the real #hubSearch so all Spotlight wiring stays in one place.
-  // Whisper bar (replaces the greeting): date left, "~X weeks left" right, both
-  // ambient + low-weight. The card is the first real thing the eye lands on.
-  // Tapping the weeks reveals one quiet gold line (Memento Mori, woven in).
-  // Memento Mori, woven into BOTH the mobile whisper bar and the desktop header.
+  // Memento Mori belongs to the paid experience. Before payment, both headers
+  // show the date only and expose no hidden weeks-left interaction.
   let weeksLeft = null;
   try {
-    const by = state.mori && state.mori.birthYear;
+    const paid = !!(state.entitlements && state.entitlements.isPaid);
+    const by = paid && state.mori && state.mori.birthYear;
     if (by && typeof moriWeeksLived === 'function' && typeof moriTotalWeeks === 'function') {
       const lived = moriWeeksLived(by);
       // A future/typo birthYear yields negative weeks-lived and would print an
@@ -1340,7 +1339,9 @@ function renderGreeting() {
     // swaps the date for the weeks you have left to live for a few seconds,
     // the home's quiet mortality tap.
     const dateStr = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-    mg.innerHTML = '<span class="wbar__date" id="wbarDate" role="button" tabindex="0" aria-label="Show weeks left to live">' + esc(dateStr) + '</span>';
+    mg.innerHTML = weeksLeft != null
+      ? '<span class="wbar__date" id="wbarDate" role="button" tabindex="0" aria-label="Show weeks left to live">' + esc(dateStr) + '</span>'
+      : '<span class="wbar__date" id="wbarDate">' + esc(dateStr) + '</span>';
     const wd = document.getElementById('wbarDate');
     if (wd && weeksLeft != null) {
       const revert = () => { wd.textContent = dateStr; wd._wbOn = false; };
@@ -1353,8 +1354,7 @@ function renderGreeting() {
       });
     }
   }
-  // Desktop header: date, plus the same quiet "~X weeks left" Mori line the
-  // mobile whisper bar carries, so mortality is woven in on both layouts.
+  // Desktop header adds Mori only after paid access.
   const _hdDate = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
   setText('headerDate', weeksLeft != null ? (_hdDate + '  ·  ~' + weeksLeft.toLocaleString() + ' weeks left') : _hdDate);
 
@@ -5201,8 +5201,7 @@ function stopLivingWander() {
 function bindDayCardTilt(card) {
   if (!card) return;
   try {
-    // Off by default; opt-in via Settings > Preferences ("Memento tilt"). The card
-    // leaning toward the cursor read as movement some people don't want.
+    // On by default for new profiles; Settings still lets anyone turn it off.
     if (!(state.prefs && state.prefs.cardTilt)) return;
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     if (document.documentElement.classList.contains('lowfx')) return;

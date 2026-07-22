@@ -4134,11 +4134,15 @@ const Sidebar = {
 
       // Gate the secondary modules in the nav until Clarity is complete. A
       // brand-new user with nothing unlocked should only see Dashboard, Search,
-      // Goal, and Settings; the rest (Schedule, Plan, Focus, Journal, Progress,
+      // and Settings; Goal appears only after a real Neutron Star exists. The
+      // rest (Schedule, Plan, Focus, Journal, Progress,
       // Memento, Vivere) appear once they set their Neutron Star. The dashboard
       // cards for these are already locked pre-clarity, so showing them in the
       // nav just led to empty/glitchy destinations.
       const clarityDone = !!(state.clarity && state.clarity.completed);
+      const hasNeutronStar = !!(state.clarity && state.clarity.answers && String(state.clarity.answers.neutronStar || '').trim());
+      const clarityNav = this.el.querySelector('.sidebar__nav-item[data-nav="clarity"]');
+      if (clarityNav) clarityNav.style.display = hasNeutronStar ? '' : 'none';
       ['timeblocks', 'action', 'deepwork', 'reflection', 'streak', 'vivere'].forEach(nav => {
         const el = this.el.querySelector('.sidebar__nav-item[data-nav="' + nav + '"]');
         if (el) el.style.display = clarityDone ? '' : 'none';
