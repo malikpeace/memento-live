@@ -550,6 +550,48 @@ function _injectDemoBar(persona) {
   let tries = 0;
   const iv = setInterval(() => { if (mount() || ++tries > 20) clearInterval(iv); }, 100);
 }
+
+// Shift every source the real Comeback detector reads. This is demo-only and
+// runs after buildDemoState(), so testing an absence never touches saved data.
+function _shiftDemoActivity(days) {
+  const gap = Math.max(0, Number(days) || 0);
+  if (!gap) return;
+  const ms = gap * 86400000;
+  const shiftISO = (value) => {
+    if (!value || typeof value !== 'string') return value;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return _keyFromDayNum(_dayNum(value) - gap);
+    const time = new Date(value).getTime();
+    return isNaN(time) ? value : new Date(time - ms).toISOString();
+  };
+  const shiftTimestamp = (value) => Number.isFinite(Number(value)) ? Number(value) - ms : value;
+
+  const history = state.action && Array.isArray(state.action.completionHistory) ? state.action.completionHistory : [];
+  history.forEach((entry) => { if (entry && entry.date) entry.date = shiftISO(entry.date); });
+  if (state.streak) {
+    if (state.streak.lastCheckDate) state.streak.lastCheckDate = shiftISO(state.streak.lastCheckDate).slice(0, 10);
+    if (Array.isArray(state.streak.history)) state.streak.history = state.streak.history.map(shiftISO);
+  }
+  (Array.isArray(state.checkins) ? state.checkins : []).forEach((entry) => {
+    if (!entry) return;
+    if (entry.iso) entry.iso = shiftISO(entry.iso).slice(0, 10);
+    if (entry.ts) entry.ts = shiftTimestamp(entry.ts);
+  });
+  const reflections = state.reflection && Array.isArray(state.reflection.entries) ? state.reflection.entries : [];
+  reflections.forEach((entry) => { if (entry && entry.iso) entry.iso = shiftISO(entry.iso).slice(0, 10); });
+  const sessions = state.deepwork && Array.isArray(state.deepwork.sessions) ? state.deepwork.sessions : [];
+  sessions.forEach((entry) => {
+    if (!entry) return;
+    if (entry.iso) entry.iso = shiftISO(entry.iso).slice(0, 10);
+    if (entry.dateISO) entry.dateISO = shiftISO(entry.dateISO).slice(0, 10);
+  });
+  (Array.isArray(state.proofEvents) ? state.proofEvents : []).forEach((entry) => {
+    if (!entry) return;
+    if (entry.iso) entry.iso = shiftISO(entry.iso);
+    if (entry.ts) entry.ts = shiftTimestamp(entry.ts);
+  });
+  if (state.meta && state.meta.lastVisit) state.meta.lastVisit = shiftISO(state.meta.lastVisit).slice(0, 10);
+}
+
 function applyDemoModeIfRequested() {
   const m = /[?&]demo=([a-z0-9]+)/i.exec(location.search);
   if (!m) return;
@@ -557,6 +599,14 @@ function applyDemoModeIfRequested() {
   const raw = (m[1] || '').toLowerCase();
   const persona = DEMO_PERSONAS[raw] ? raw : 'creator';
   try { state = buildDemoState(persona); } catch (e) { DEMO_MODE = false; return; }
+  const comebackRaw = new URLSearchParams(location.search).get('comeback');
+  const comebackDays = comebackRaw === null ? null : Number(comebackRaw);
+  if ([0, 1, 3, 7, 14].indexOf(comebackDays) >= 0) {
+    // "Missed 1 day" means yesterday was fully blank, so the most recent
+    // activity belongs two date cells back. Active today remains an exact 0.
+    _shiftDemoActivity(comebackDays === 0 ? 0 : comebackDays + 1);
+    state.dev.comebackMissedDays = comebackDays;
+  }
   // A demo boot is a FRESH look at the persona, always land on the Today home.
   // recallView() prefers localStorage('memento_view'), which SURVIVES the reload
   // into ?demo=, so a remembered 'tab:profile' (Malik had just been in Settings)
@@ -577,15 +627,7 @@ function applyDemoModeIfRequested() {
   try {
     window.__comebackDebug = {
       simulateGap: function (days) {
-        const d = (days == null ? 3 : days) * 86400000;
-        const shift = (iso) => { if (!iso || typeof iso !== 'string') return iso; const t = new Date(iso).getTime(); return isNaN(t) ? iso : new Date(t - d).toISOString(); };
-        const ch = (state.action && Array.isArray(state.action.completionHistory)) ? state.action.completionHistory : [];
-        ch.forEach(e => { if (e && e.date) e.date = shift(e.date); });
-        if (state.streak) {
-          if (state.streak.lastCheckDate) state.streak.lastCheckDate = (shift(state.streak.lastCheckDate) || '').slice(0, 10);
-          if (Array.isArray(state.streak.history)) state.streak.history = state.streak.history.map(h => (shift(h + 'T00:00:00Z') || '').slice(0, 10));
-        }
-        if (state.meta) state.meta.lastVisit = (shift(state.meta.lastVisit + 'T00:00:00Z') || '').slice(0, 10);
+        _shiftDemoActivity(days == null ? 3 : days);
         renderAll();
         return { gapDays: comebackGapDays(), isGap: isComebackGap(), historyLen: (state.streak && state.streak.history || []).length };
       },

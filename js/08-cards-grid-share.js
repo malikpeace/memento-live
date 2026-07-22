@@ -1817,6 +1817,9 @@ const CreatorTools = {
     bind('creatorJumpMori', () => this.jumpMori());
     bind('creatorJumpVivere', () => this.jumpVivere());
     bind('creatorJumpWoven', () => this.jumpWoven());
+    document.querySelectorAll('[data-comeback-gap]').forEach((button) => {
+      button.addEventListener('click', () => this.jumpComebackScenario(Number(button.dataset.comebackGap)));
+    });
 
     // Every cheat button press toasts its own label (v735): universal
     // feedback, delegated so future buttons get it for free.
@@ -1849,7 +1852,27 @@ const CreatorTools = {
     const bits = [];
     bits.push(state.dev.previewAll ? 'All unlocked' : (state.clarity.completed ? 'Clarity done' : 'Locked'));
     if (state.dev.savedClarity) bits.push('Restore available');
+    const comebackDays = Number(state.dev && state.dev.comebackMissedDays);
+    if (Number.isInteger(comebackDays) && comebackDays >= 0) {
+      bits.push(comebackDays === 0 ? 'Active today' : 'Missed ' + comebackDays + (comebackDays === 1 ? ' day' : ' days'));
+    }
     stateEl.textContent = bits.join(' · ');
+    const activeGap = Number.isInteger(comebackDays) && comebackDays >= 0 ? String(comebackDays) : '';
+    document.querySelectorAll('[data-comeback-gap]').forEach((button) => {
+      const active = !!activeGap && button.dataset.comebackGap === activeGap;
+      button.classList.toggle('creator-box__btn--primary', active);
+      button.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+  },
+
+  jumpComebackScenario(days) {
+    const allowed = [0, 1, 3, 7, 14];
+    const gap = allowed.indexOf(days) >= 0 ? days : 3;
+    const params = new URLSearchParams(location.search);
+    const persona = /^[a-z0-9]+$/i.test(params.get('demo') || '') ? params.get('demo') : 'creator';
+    params.set('demo', persona);
+    params.set('comeback', String(gap));
+    location.search = '?' + params.toString();
   },
 
   setPreviewAll(on) {
