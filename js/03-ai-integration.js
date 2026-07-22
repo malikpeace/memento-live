@@ -1798,17 +1798,28 @@ async function refreshActionSection(field) {
       { "horizon": "this week", "milestone": "..." }
     ],
     "tiers": {
-      "minimum": "tiny .25-mile-walk version with a specific frequency. Cannot fail.",
-      "moderate": "realistic middle. Sustainable for a normal week.",
-      "ambitious": "stretchy but not delusional."
+      "tiny": "2-6 word verb phrase, the bare-minimum dose. Cannot fail.",
+      "light": "2-6 word verb phrase, easy dose.",
+      "moderate": "2-6 word verb phrase, the realistic dose.",
+      "heavy": "2-6 word verb phrase, a serious push.",
+      "extreme": "2-6 word verb phrase, max grind."
     },
-    "recommendedTier": "minimum | moderate | ambitious",
-    "recommendedWhy": "one short sentence in Malik voice, why this tier for this person",
-    "howToStart": "one concrete first move, sized to the recommended tier"
+    "tierTime": {
+      "tiny": "duration ONLY, 1-3 words: '5 min'",
+      "light": "'15 min'",
+      "moderate": "'45 min'",
+      "heavy": "'2 hrs'",
+      "extreme": "'half a day'"
+    },
+    "howToStart": "one concrete first move, sized to the moderate tier",
+    "shape": "'lever' (repeated move, the default) or 'door' (genuine one-shot finishable today)",
+    "targetCompletions": "INTEGER. How many times they complete this exact move to satisfy the commitment. A 'door' is always 1. Daily for two weeks = 14; three times a week for two weeks = 6; a steady habit defaults to 7. Must be >= 1 and <= windowDays.",
+    "windowDays": "INTEGER. Days allowed to hit targetCompletions. A 'door' is 1. 'Daily for two weeks' = 14. 'Three times weekly for two weeks' = 14. Must be >= targetCompletions and <= 90."
   }
 }
 Path rules: 2-4 horizon/milestone pairs ending with "this week". Adapt step granularity to their timeframe. Each milestone must clearly ladder into the next one above it. If timeframe is under a week, return path as an empty array.
-Same overall meaning as the current One Thing, just rewritten in a different way using their voice. All three tiers must describe the SAME move at different doses. Do not contradict the Focus Plan above.`
+TIER LADDER (hard): all FIVE tiers are the SAME physical motion at strictly increasing sizes, scaling ONE axis, and the size must be legible from the words alone. Output moves scale the UNIT ("write one paragraph / 500 words / 1000 words"); time and presence moves scale the DURATION ("10 phone-free minutes with her / 30 minutes / a full hour"); resist and delay moves scale the resistance. NEVER reuse the title verbatim as a tier, never two tiers that mean the same thing, and never put cadence ("every day", "3x a week") inside a tier, that belongs in the title.
+Same overall meaning as the current One Thing, just rewritten in a different way using their voice. Do not contradict the Focus Plan above.`
     : `Return JSON with the new focusPlan. Same shape as before:
 {
   "focusPlan": {
@@ -1845,7 +1856,9 @@ ADDITIONAL RULES:
     const response = await callClaude(
       [{ role: 'user', content: userBody }],
       sys,
-      { maxTokens: 900, model: ANTHROPIC_MODEL_PLANS }
+      // v905: was 900, which could not fit a full primaryAction (5 tiers +
+      // tierTime + path) even before the schema grew, so refines truncated.
+      { maxTokens: 6000, model: ANTHROPIC_MODEL_PLANS }
     );
     let jsonStr = response.trim();
     const fenced = jsonStr.match(/```(?:json)?\s*([\s\S]*?)```/);
