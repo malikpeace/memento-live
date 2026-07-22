@@ -3452,6 +3452,22 @@ html.lowfx #actionExpStars {
 /* _renderIntakeBrief has been a no-op since v845, but the empty node still
    carried a 26px bottom margin that shoved the question off Clarity's line. */
 .action-intake--cine .action-intake__brief { display: none; }
+/* v927 (Malik): against the blueprint dot matrix a 0.04 fill reads as fully
+   see-through, the lattice marches straight through the field and the bottom
+   buttons. A modest backdrop blur smears the dots behind them into an even
+   wash so they read as real glass sitting ON the page. Clarity's identical
+   controls are deliberately left alone: its backdrop is a smooth nebula with
+   no pattern to show through, so this would buy nothing there, and that
+   nebula ANIMATES, which is the expensive case for backdrop-filter on iOS.
+   !important so it SURVIVES the global `body.lite *{backdrop-filter:none}`
+   perf kill in js/11. body.lite is the MOBILE path, so without it this would
+   have shown on desktop only and never on the phone (same trap the tab bar
+   documents in css/misc.css). Three small static elements, the cheap case. */
+.action-exp:has(.action-intake-page--cine) .action-cine__input,
+.action-exp:has(.action-intake-page--cine) .clarity-exp__nav-btn {
+  -webkit-backdrop-filter: blur(calc(20px * var(--bx, 1))) saturate(1.3) !important;
+  backdrop-filter: blur(calc(20px * var(--bx, 1))) saturate(1.3) !important;
+}
 .action-cine__q.wiz__question {
   /* v920: NO reserved 4.6em. It left a fat void between a short question and
      the field (Malik's screenshot: ~68px of nothing) that Clarity never has,
