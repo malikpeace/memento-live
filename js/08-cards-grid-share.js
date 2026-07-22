@@ -1800,6 +1800,7 @@ const CreatorTools = {
     bind('creatorJumpSplash', () => this.jumpSplash());
     bind('creatorJumpOnboarding', () => this.jumpOnboarding());
     bind('creatorJumpStyle', () => this.jumpStyle());
+    bind('creatorGiveNeutronStar', () => this.giveNeutronStar());
     // Stage & animation jumps (Malik: fly around Memento from the cheat bar)
     bind('creatorJumpBlankCard', () => this.jumpBlankCard());
     bind('creatorJumpUnlock', () => this.jumpUnlockCinema());
@@ -2042,6 +2043,52 @@ const CreatorTools = {
       const sp = document.getElementById('splash'); if (sp) sp.classList.add('dismissed');
       if (typeof TabBar !== 'undefined' && TabBar.show) TabBar.show();
       renderAll();
+    } catch (e) {}
+  },
+
+  // Malik's clean handoff into the real post-Clarity flow. This gives the
+  // tester a finished Neutron Star, removes any old Action plan or receipts,
+  // and lands on Home. Everything after that remains production behavior:
+  // Build my plan -> First 7 Days -> paywall -> fresh Action intake.
+  giveNeutronStar() {
+    this._closeAll();
+    this._devToHome();
+    this._seedStep('star');
+    try {
+      state.clarity.answers = Object.assign(JSON.parse(JSON.stringify(DEFAULT_STATE.clarity.answers)), {
+        neutronStar: 'Grow Memento into a tool that can be used by several people.',
+        coreWhy: 'I want Memento to become a real tool that helps people find what matters and act on it.',
+        whyMatters: 'I want Memento to become a real tool that helps people find what matters and act on it.',
+        whyMoreThanAnything: 'I want to prove Memento can improve someone else\'s real day, not stay an idea I use alone.',
+        antiVision: 'Memento stays a promising idea that never becomes useful to people beyond me.',
+        futureVision: 'Several people use Memento to find the one thing that matters and act on it every day.',
+        identityLine: 'The builder who turned Memento into a tool people genuinely use.',
+        whatSpecifically: 'Grow Memento into a tool that can be used by several people.',
+        timeHorizon: '12 months',
+        timeframe: '12 months',
+        anchor: 'Build',
+        intensity: 'High'
+      });
+      state.clarity.history = [];
+      state.clarity.letter = null;
+      state.clarity.driftChecks = [];
+      delete state.clarity.draft;
+      state.clarity.completed = true;
+      state.clarity.completedAt = new Date().toISOString();
+      state.clarity.ignitedAt = Date.now();
+      state.action = JSON.parse(JSON.stringify(DEFAULT_STATE.action));
+      state.meta = state.meta || {};
+      state.meta.cardEvolutionSeen = true;
+      state.meta.next7DaysSeen = false;
+      state.meta.planRevealSeen = false;
+      if (typeof persistNow === 'function') persistNow();
+      if (typeof renderGrid === 'function') renderGrid();
+      if (typeof renderAll === 'function') renderAll();
+      if (typeof TabBar !== 'undefined' && TabBar.show) {
+        TabBar.show();
+        TabBar.updateHomeDot();
+      }
+      this.render();
     } catch (e) {}
   },
 
