@@ -597,6 +597,29 @@ function _shiftDemoActivity(days) {
   if (state.meta && state.meta.lastVisit) state.meta.lastVisit = shiftISO(state.meta.lastVisit).slice(0, 10);
 }
 
+// Every avatar must open before today's main Action has been confirmed, even if
+// another demo path or a previous in-memory persona introduced a same-day
+// receipt. Keep all older history and supporting activity intact.
+function _resetDemoTodayAction() {
+  try {
+    const today = (typeof getTodayISO === 'function') ? getTodayISO() : new Date().toISOString().slice(0, 10);
+    const dayOf = (value) => {
+      try { return (typeof isoToLocalDay === 'function') ? isoToLocalDay(value) : String(value || '').slice(0, 10); }
+      catch (e) { return String(value || '').slice(0, 10); }
+    };
+    if (state.action && Array.isArray(state.action.completionHistory)) {
+      state.action.completionHistory = state.action.completionHistory.filter((entry) => !entry || dayOf(entry.date) !== today);
+    }
+    if (state.streak && Array.isArray(state.streak.history)) {
+      state.streak.history = state.streak.history.filter((day) => dayOf(day) !== today);
+      if (dayOf(state.streak.lastCheckDate) === today) state.streak.lastCheckDate = '';
+    }
+    if (Array.isArray(state.proofEvents)) {
+      state.proofEvents = state.proofEvents.filter((entry) => !entry || entry.type !== 'action-complete' || dayOf(entry.iso || entry.ts) !== today);
+    }
+  } catch (e) {}
+}
+
 function applyDemoModeIfRequested() {
   const m = /[?&]demo=([a-z0-9]+)/i.exec(location.search);
   if (!m) return;
@@ -612,6 +635,7 @@ function applyDemoModeIfRequested() {
     _shiftDemoActivity(comebackDays === 0 ? 0 : comebackDays + 1);
     state.dev.comebackMissedDays = comebackDays;
   }
+  _resetDemoTodayAction();
   // A demo boot is a FRESH look at the persona, always land on the Today home.
   // recallView() prefers localStorage('memento_view'), which SURVIVES the reload
   // into ?demo=, so a remembered 'tab:profile' (Malik had just been in Settings)
