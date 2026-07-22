@@ -3337,7 +3337,20 @@ function creditTodayAction() {
 // Complete the Home mission through one shared path after the deliberate hold.
 // Keeping the receipt + undo logic here prevents mobile and desktop from
 // drifting into different completion behavior.
+function showHomeCompletionWash() {
+  try {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    document.querySelectorAll('.cc-completion-wash').forEach((element) => element.remove());
+    const wash = document.createElement('div');
+    wash.className = 'cc-completion-wash';
+    wash.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(wash);
+    setTimeout(() => { try { wash.remove(); } catch (e) {} }, 1050);
+  } catch (e) {}
+}
+
 function completeTodayActionFromHome() {
+  showHomeCompletionWash();
   const creditedId = creditTodayAction();
   try { if (typeof renderAll === 'function') renderAll(); } catch (e) {}
   if (creditedId && typeof showUndoToast === 'function') {
@@ -3372,7 +3385,7 @@ function bindHomeActionHold(button) {
     if (!holding || finished) return;
     holding = false;
     button.classList.remove('is-holding');
-    if (label) label.textContent = 'Hold to complete';
+    if (label) label.textContent = 'Log';
   };
   const finish = () => {
     if (!holding || finished) return;
@@ -3381,7 +3394,6 @@ function bindHomeActionHold(button) {
     timer = null;
     button.classList.remove('is-holding');
     button.classList.add('is-finishing');
-    if (label) label.textContent = 'Completing';
     completeTodayActionFromHome();
   };
   const begin = (event) => {
@@ -3390,7 +3402,6 @@ function bindHomeActionHold(button) {
     if (event) event.preventDefault();
     holding = true;
     button.classList.add('is-holding');
-    if (label) label.textContent = 'Keep holding';
     try {
       if (event && event.pointerId != null && button.setPointerCapture) button.setPointerCapture(event.pointerId);
     } catch (e) {}
@@ -3618,14 +3629,13 @@ function renderCommandCenter() {
       if (how) row += '<div class="cc-od-sub" style="font-size:0.85rem;line-height:1.45;color:var(--text-mid);"><span style="color:var(--text-lo);">If resistance hits: </span>' + esc(how) + '</div>';
       // ---- the daily loop (lives only in Today) --------------------------------
       row += '<div style="margin-top:8px;padding-top:6px;border-top:1px solid var(--hairline);">';
-      row += '<div style="display:flex;gap:8px;flex-wrap:wrap;">';
+      row += '<div style="display:flex;">';
       if (doneToday) {
-        row += '<div style="flex:1;min-width:150px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;color:var(--done-ink, var(--color-consistency));background:color-mix(in srgb, var(--color-consistency) 12%, transparent);box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);border-radius:calc(8px * var(--rx, 1));padding:12px;">Completed</div>';
+        row += '<div class="cc-completed-action" role="status">Completed</div>';
       } else {
-        // Deliberate confirmation: the progress fill must complete before the
-        // receipt is earned. Open remains the quiet route to full Action detail.
-        row += '<button class="cc-primary cc-hold-complete" data-cc-action="didit" aria-label="Hold for three seconds to complete"><span class="cc-hold-complete__fill" aria-hidden="true"></span><span class="cc-hold-complete__label">Hold to complete</span></button>';
-        row += '<button class="cc-open-action" data-cc-action="action" style="flex:0 0 auto;font:inherit;font-weight:600;font-size:0.85rem;cursor:pointer;border:none;background:none;color:var(--text-lo);border-radius:calc(8px * var(--rx, 1));padding:12px 10px;">Open</button>';
+        // One deliberate confirmation. The button fills for the entire hold;
+        // the Action module remains available from the primary Do navigation.
+        row += '<button class="cc-primary cc-hold-complete" data-cc-action="didit" aria-label="Hold Log for three seconds to complete"><span class="cc-hold-complete__fill" aria-hidden="true"></span><span class="cc-hold-complete__label">Log</span></button>';
       }
       row += '</div>';
       // Live social proof from the optional backend (real data; hidden at 0 / offline).
@@ -3790,7 +3800,7 @@ function renderDeskMission() {
       const done = actionDoneToday();
       const doneBtn = done
         ? '<div class="dkm__btn dkm__btn--done">Completed</div>'
-        : '<button class="dkm__btn dkm__btn--solid cc-hold-complete" data-cc-action="didit" aria-label="Hold for three seconds to complete"><span class="cc-hold-complete__fill" aria-hidden="true"></span><span class="cc-hold-complete__label">Hold to complete</span></button>';
+        : '<button class="dkm__btn dkm__btn--solid cc-hold-complete" data-cc-action="didit" aria-label="Hold Log for three seconds to complete"><span class="cc-hold-complete__fill" aria-hidden="true"></span><span class="cc-hold-complete__label">Log</span></button>';
       const stat = (n, l) => '<div class="dkm__stat"><div class="dkm__stat-n">' + n.toLocaleString() + '</div><div class="dkm__stat-l">' + l + '</div></div>';
       el.innerHTML =
         label('Today&rsquo;s mission') +

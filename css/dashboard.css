@@ -449,6 +449,8 @@ body.ns-bloom .widget--clarity {
   position: relative;
   isolation: isolate;
   overflow: hidden;
+  flex: 1 1 100%;
+  width: 100%;
   min-width: 150px;
   min-height: 44px;
   padding: 12px 16px;
@@ -468,7 +470,7 @@ body.ns-bloom .widget--clarity {
   position: absolute;
   z-index: -1;
   inset: 0;
-  background: color-mix(in srgb, var(--color-consistency) 72%, #07120a);
+  background: var(--color-consistency);
   transform: scaleX(0);
   transform-origin: left center;
   transition: transform 180ms ease-out;
@@ -480,6 +482,38 @@ body.ns-bloom .widget--clarity {
   transition-timing-function: linear;
 }
 .cc-hold-complete.is-finishing .cc-hold-complete__fill { transform: scaleX(1); }
+.cc-completed-action {
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border-radius: calc(8px * var(--rx, 1));
+  background: var(--color-consistency);
+  color: #04130a;
+  font-weight: 750;
+  font-size: 0.92rem;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.24), 0 0 22px rgba(var(--success-rgb),0.14);
+}
+.cc-completion-wash {
+  position: fixed;
+  z-index: 13000;
+  inset: 0;
+  pointer-events: none;
+  background: var(--color-consistency);
+  opacity: 0;
+  animation: ccCompletionWash 1000ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes ccCompletionWash {
+  0% { opacity: 0; }
+  42% { opacity: 0.94; }
+  56% { opacity: 0.94; }
+  100% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cc-completion-wash { display: none; animation: none; }
+}
 .cc-card #ccCheckinBtn,
 .cc-card .cc-ans {
   transition: border-color var(--t-base) ease, background var(--t-base) ease, color var(--t-base) ease, transform var(--t-fast) var(--ease-out, ease);
@@ -4052,12 +4086,13 @@ body.card-square { --card-w: 360px; --card-h: 360px; }
   font: inherit; font-weight: 700; font-size: 0.92rem;
   border: none; border-radius: calc(10px * var(--rx, 1));
 }
+.dkm__btn.cc-hold-complete { flex: 0 0 200px; width: 200px; }
 .dkm__btn--solid { cursor: pointer; background: var(--solid-bg); color: var(--solid-fg); }
 .dkm__btn--solid:active { transform: scale(0.98); }
 .dkm__btn--done {
-  font-weight: 600; font-size: 14px; color: var(--done-ink, var(--color-consistency));
-  background: linear-gradient(180deg, rgba(var(--success-rgb), 0.16), rgba(var(--success-rgb), 0.08));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  font-weight: 700; font-size: 14px; color: #04130a;
+  background: var(--color-consistency);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24), 0 0 22px rgba(var(--success-rgb),0.14);
   cursor: default; user-select: none;
 }
 .dkm__stats { display: flex; gap: 26px; }

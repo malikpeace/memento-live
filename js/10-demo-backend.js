@@ -511,7 +511,7 @@ function buildDemoState(personaKey) {
       }
     },
     lifestats: { sleep: 4, diet: 3, exercise: 4, mood: 4, stress: 3, focus: 4, history: [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0].map((d, i) => { const dt = new Date(Date.now() - d * 86400000); const w = [3, 4, 2, 4, 5, 3, 4, 5, 4, 3, 4]; return { date: localISO(dt), sleep: w[i], exercise: ((i * 3) % 5) + 1, diet: ((i * 2) % 4) + 1, mood: ((i + 2) % 5) + 1, stress: ((i * 2 + 1) % 5) + 1, focus: ((i + 1) % 5) + 1 }; }) },
-    meta: { onboarded: true, welcomeSeen: true, lastVisit: _demoISO(0) },
+    meta: { onboarded: true, welcomeSeen: true, firstActionDone: completionHistory.length > 0, lastVisit: _demoISO(0) },
     ui: { lastView: null },
     // Seed Vivere proof events so the Proof Trail and Momentum reflect lived
     // moments (the demo path does not run the derive migration, so set directly).
