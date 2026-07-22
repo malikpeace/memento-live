@@ -2401,7 +2401,12 @@ body:has(.action-milestone-sheet[aria-hidden="false"]) .fullscreen-close-global,
 body:has(.action-cave-sheet[aria-hidden="false"]) .fullscreen-close-global,
 body:has(.clarity-exp.open) .fullscreen-close-global,
 body:has(.clarity-exp.open-bg) .fullscreen-close-global,
-body:has(.clarity-exp.open-content) .fullscreen-close-global {
+body:has(.clarity-exp.open-content) .fullscreen-close-global,
+/* v920: the cine intake now carries Clarity's own bare X too, so the global
+   chip has to step aside here for the same reason. This filled 40px chip WAS
+   the X on Malik's Action screenshot, and it is why that screen read as a
+   different app than Clarity's bare X. */
+body:has(.action-intake-page--cine) .fullscreen-close-global {
   display: none !important;
 }
 .fullscreen-close-global:hover { background: var(--kfill-16); color: rgba(var(--ink),1); }

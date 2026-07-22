@@ -3131,7 +3131,12 @@ const ActionExperience = {
       this._aiIntakeRenderQuestion(v.current);
       this._renderIntakeBackButton();
     }
-    try { const sc = this.pageWrap && this.pageWrap.querySelector('.action-exp__page-inner'); if (sc) sc.scrollTop = sc.scrollHeight; } catch (e) {}
+    // v920: do NOT scroll to the bottom. That was here for the old transcript
+    // stack, but v884 stopped painting the past, so every beat is now a single
+    // short page and the scroll only dragged the question ABOVE its anchor
+    // (measured -46px off Clarity's line). Each beat starts at the top, the
+    // way every Clarity page does.
+    try { const sc = this.pageWrap && this.pageWrap.querySelector('.action-exp__page-inner'); if (sc) sc.scrollTop = 0; } catch (e) {}
   },
 
   // Back-compat entry: everything that used to call the mission beat directly.
@@ -3404,6 +3409,20 @@ const ActionExperience = {
       const scroller = this.pageWrap && this.pageWrap.querySelector('.action-exp__page-inner');
       const intake = this.pageWrap && this.pageWrap.querySelector('.action-intake');
       if (!scroller || !intake) return;
+      // v920: the cine intake has NO transcript to follow (v884 stopped
+      // painting the past), so following the bottom only does harm here: it
+      // fires on the typewriter's own characterData mutations and smooth-
+      // scrolls the page while the question is still typing, which dragged
+      // the question ~96px above Clarity's line. Each beat is one short page
+      // that must simply rest at the top.
+      if (this.pageWrap.querySelector('.action-intake-page--cine')) {
+        if (this._intakeAutoScrollObserver) {
+          try { this._intakeAutoScrollObserver.disconnect(); } catch (_) {}
+          this._intakeAutoScrollObserver = null;
+        }
+        scroller.scrollTop = 0;
+        return;
+      }
       // Disconnect any previous observer before installing a new one.
       if (this._intakeAutoScrollObserver) {
         try { this._intakeAutoScrollObserver.disconnect(); } catch (_) {}
@@ -3828,6 +3847,18 @@ The goal and timeframe are already locked from Clarity (see snapshot); they are 
     try {
       const kbField = current.querySelector('#intakeInput');
       if (kbField) this._bindIntakeKeyboardKeep(kbField);
+      // v920: the field rests at Clarity's height and grows with the answer up
+      // to Clarity's cap, so long answers are never clipped. Reading the cap
+      // off the computed style keeps CSS the single source of truth.
+      if (kbField) {
+        const cap = parseFloat(getComputedStyle(kbField).maxHeight) || 148;
+        const grow = () => {
+          kbField.style.height = 'auto';
+          kbField.style.height = Math.min(kbField.scrollHeight, cap) + 'px';
+        };
+        kbField.addEventListener('input', grow);
+        grow();
+      }
     } catch (eKb) {}
 
     this._cineRenderChrome(
@@ -4353,7 +4384,7 @@ The goal and timeframe are already locked from Clarity (see snapshot); they are 
       answers += `<div class="action-plan__when-edit" id="intakeChips">${chips}</div>${customRow}`;
     } else {
       answers += `
-        <textarea class="wiz__text-input action-cine__input" id="intakeInput" rows="3" placeholder="${esc(q.placeholder || 'Type your answer...')}" autocomplete="off"></textarea>
+        <textarea class="wiz__text-input action-cine__input" id="intakeInput" rows="2" placeholder="${esc(q.placeholder || 'Type your answer...')}" autocomplete="off"></textarea>
         <div class="action-chat__error" id="intakeErr" style="display:none;"></div>`;
     }
     html += `<div class="action-cine__answers">${answers}</div>`;
