@@ -117,6 +117,11 @@ body:has(#splash:not(.dismissed)) #topFade { display: none; }
   display: block;
   font-size: 0.5625rem; font-weight: 700;
   letter-spacing: 0.09em; text-transform: uppercase;
+  /* letter-spacing is added after the LAST letter too, so the glyph run is
+     0.09em narrower than its box and centring the box shoves the text left
+     (which reads as the icon sitting right of it). Cancel the trailing space
+     so the letters themselves centre under the icon. */
+  margin-right: -0.09em;
 }
 /* DO stays an equal slot, distinguished only by a FILLED play glyph (subtle
    primacy, no circle). The check is the spent state (today's move done). */
