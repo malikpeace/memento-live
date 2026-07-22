@@ -5197,6 +5197,19 @@ function livingCardLevels() {
     const d7 = actionLocalDaysInWindow(7);
     act = d7 > 0 ? Math.min(100, Math.round(Math.sqrt(d7 / 7) * 100)) : 0;
   } catch (e) {}
+  // v934 (Malik): the platinum is earned when the move is DISCOVERED, not when
+  // it is logged, and it does not change once earned. Logging is Consistency's
+  // job (green): if the platinum also waited for a logged day, both rewards
+  // would land on the same day and neither would read as its own thing. So a
+  // discovered plan takes Action straight to full and holds it there.
+  // "Discovered" is planGenerated + a real primaryAction, verified against the
+  // live state shape rather than assumed: state.action.plan exists as a key but
+  // is NOT the flag (it reads false on a fully-planned card), which is exactly
+  // the trap that made a first attempt at this silently do nothing.
+  try {
+    const A = state.action;
+    if (A && A.planGenerated && A.primaryAction && A.primaryAction.title) act = 100;
+  } catch (e) {}
   let cons = 0;
   try {
     const cs = consistencyStats();
@@ -5211,8 +5224,17 @@ function setLivingCardVars(wrap) {
   wrap.style.setProperty('--clar', (L.clar / 100).toFixed(3));
   wrap.style.setProperty('--act', (L.act / 100).toFixed(3));
   wrap.style.setProperty('--cons', (L.cons / 100).toFixed(3));
-  // blend blob appears only when clarity AND consistency are both present
-  wrap.style.setProperty('--mix', (Math.min(L.clar, L.cons) / 100 * 0.75).toFixed(3));
+  // The blend blob (b4, the periwinkle) used to appear ONLY when clarity and
+  // consistency were both present. v934 (Malik): Clarity now carries a touch of
+  // it alongside the cyan, because the card-playground prototype showed that and
+  // he liked it. That purple was an artifact of the prototype's simplified --mix
+  // (it lit the blob whenever ANY pillar was on); this makes the real card do it
+  // deliberately, at a deliberately small amount. The paired clarity+consistency
+  // blend still rises above it, so the blob keeps its original meaning and just
+  // no longer starts from nothing.
+  const mixPair = Math.min(L.clar, L.cons) / 100 * 0.75;
+  const mixSolo = (L.clar / 100) * 0.34;
+  wrap.style.setProperty('--mix', Math.max(mixPair, mixSolo).toFixed(3));
   // lit gates everything outside the card (aura, bloom, reflection) by fill
   wrap.style.setProperty('--lit', (Math.max(L.clar, L.act, L.cons) / 100).toFixed(3));
   // v931: the Action reward's platinum wash drives the card's CENTRE bright and
