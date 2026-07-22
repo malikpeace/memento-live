@@ -3385,7 +3385,7 @@ function bindHomeActionHold(button) {
     if (!holding || finished) return;
     holding = false;
     button.classList.remove('is-holding');
-    if (label) label.textContent = 'Log';
+    if (label) label.textContent = 'Mark Complete';
   };
   const finish = () => {
     if (!holding || finished) return;
@@ -3635,7 +3635,7 @@ function renderCommandCenter() {
       } else {
         // One deliberate confirmation. The button fills for the entire hold;
         // the Action module remains available from the primary Do navigation.
-        row += '<button class="cc-primary cc-hold-complete" data-cc-action="didit" aria-label="Hold Log for three seconds to complete"><span class="cc-hold-complete__fill" aria-hidden="true"></span><span class="cc-hold-complete__label">Log</span></button>';
+        row += '<button class="cc-primary cc-hold-complete" data-cc-action="didit" aria-label="Hold for three seconds to mark complete"><span class="cc-hold-complete__fill" aria-hidden="true"></span><span class="cc-hold-complete__label">Mark Complete</span></button>';
       }
       row += '</div>';
       // Live social proof from the optional backend (real data; hidden at 0 / offline).
@@ -3800,7 +3800,7 @@ function renderDeskMission() {
       const done = actionDoneToday();
       const doneBtn = done
         ? '<div class="dkm__btn dkm__btn--done">Completed</div>'
-        : '<button class="dkm__btn dkm__btn--solid cc-hold-complete" data-cc-action="didit" aria-label="Hold Log for three seconds to complete"><span class="cc-hold-complete__fill" aria-hidden="true"></span><span class="cc-hold-complete__label">Log</span></button>';
+        : '<button class="dkm__btn dkm__btn--solid cc-hold-complete" data-cc-action="didit" aria-label="Hold for three seconds to mark complete"><span class="cc-hold-complete__fill" aria-hidden="true"></span><span class="cc-hold-complete__label">Mark Complete</span></button>';
       const stat = (n, l) => '<div class="dkm__stat"><div class="dkm__stat-n">' + n.toLocaleString() + '</div><div class="dkm__stat-l">' + l + '</div></div>';
       el.innerHTML =
         label('Today&rsquo;s mission') +
