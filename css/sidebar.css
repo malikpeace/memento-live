@@ -619,35 +619,6 @@ body.sidebar-collapsed .sidebar__collapse svg { transform: rotate(180deg); }
   font-weight: 700;
 }
 
-/* Reflection nudge: full-width CTA-styled button inside the sidebar. */
-.sidebar__reflect-cta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  width: 100%;
-  padding: 12px 14px;
-  border-radius: var(--r-sm);
-  background: rgba(120, 160, 255, 0.08);
-  border: 1px solid rgba(160, 190, 255, 0.18);
-  color: rgba(220, 230, 255, 0.95);
-  font-family: var(--font);
-  font-size: var(--fs-sm);
-  font-weight: 600;
-  cursor: pointer;
-  transition: background var(--t-base) ease, border-color var(--t-base) ease, transform var(--t-base) ease;
-}
-.sidebar__reflect-cta:hover {
-  background: rgba(120, 160, 255, 0.14);
-  border-color: rgba(180, 200, 255, 0.32);
-}
-.sidebar__reflect-cta:active { transform: scale(0.985); }
-.sidebar__reflect-cta::after {
-  content: '\203A';
-  font-size: var(--fs-lg);
-  opacity: 0.7;
-}
-
 /* Spacer pushes footer to the bottom. */
 .sidebar__spacer { flex: 1; }
 .sidebar__footer {

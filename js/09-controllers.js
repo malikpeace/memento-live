@@ -4042,15 +4042,6 @@ const Sidebar = {
       dwBlock.addEventListener('click', dwOpen);
       _kbd(dwBlock, dwOpen);
     }
-    // Reflection nudge: same pattern, opens the reflection sheet.
-    const reflectBtn = document.getElementById('sidebarReflectionCta');
-    if (reflectBtn) {
-      reflectBtn.addEventListener('click', () => {
-        if (typeof TabBar !== 'undefined') TabBar.switchTo('home');
-        if (typeof Sheet !== 'undefined' && Sheet.open) Sheet.open('reflection');
-      });
-    }
-
     // Nav items: data-tab items switch the top-level view; data-nav items stay
     // on the dashboard and open the matching full-screen flow or sheet, so the
     // 8-item nav maps entirely onto existing launchers (no new pages).
@@ -4241,23 +4232,6 @@ const Sidebar = {
         dwSection.style.display = showDw ? '' : 'none';
       }
 
-      // Reflection nudge: only show if no reflection logged today.
-      // Reflection entries use the full "Tue, Mar 5, 2026" date format.
-      const reflectBtn = document.getElementById('sidebarReflectionCta');
-      if (reflectBtn) {
-        const entries = (state.reflection && state.reflection.entries) || [];
-        const todayLong = new Date().toLocaleDateString('en-US', {
-          weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'
-        });
-        const reflectedToday = entries.some(e => e && e.date === todayLong);
-        // v816 (overnight sweep): Reflection is paid; nudging a declined free
-        // user to write one just bounces them off the paywall dressed as an
-        // invitation. The nudge earns its place only for paying users.
-        let _rfPaid = true;
-        try { _rfPaid = (typeof ClarityPaywall === 'undefined') || ClarityPaywall.isPaid() || !ClarityPaywall.isLockedByPaywall('reflection'); } catch (e) {}
-        const showReflect = !!(state.clarity && state.clarity.completed) && !reflectedToday && _rfPaid;
-        reflectBtn.style.display = showReflect ? '' : 'none';
-      }
 
       // Quiet Home nudge (mirrors the mobile tab bar): tiny accent dot on the
       // Home nav item when a plan exists and today's action is not yet done.

@@ -690,7 +690,6 @@ body[data-accent="amber"], body[data-accent="rose"] {
    Mouse users are unaffected (:focus-visible only). */
 .sidebar__nav-item:focus-visible,
 .sidebar__section--clickable:focus-visible,
-.sidebar__reflect-cta:focus-visible,
 .cc-hero-seg:focus-visible,
 .dw-preset:focus-visible,
 .reflect-chip:focus-visible {
