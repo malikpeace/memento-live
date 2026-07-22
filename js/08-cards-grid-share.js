@@ -3334,6 +3334,83 @@ function creditTodayAction() {
   } catch (e) { return false; }
 }
 
+// Complete the Home mission through one shared path after the deliberate hold.
+// Keeping the receipt + undo logic here prevents mobile and desktop from
+// drifting into different completion behavior.
+function completeTodayActionFromHome() {
+  const creditedId = creditTodayAction();
+  try { if (typeof renderAll === 'function') renderAll(); } catch (e) {}
+  if (creditedId && typeof showUndoToast === 'function') {
+    try { showUndoToast('Today is closed. You showed up.', function () {
+      try {
+        const history = state.action && state.action.completionHistory;
+        if (!Array.isArray(history)) return;
+        const index = history.findIndex((entry) => entry && entry.id === creditedId);
+        if (index === -1) return;
+        history.splice(index, 1);
+        if (typeof recalculateStreak === 'function') recalculateStreak();
+        persistNow();
+        if (typeof renderAll === 'function') renderAll();
+      } catch (e) {}
+    }); } catch (e) {}
+  }
+  return creditedId;
+}
+
+function bindHomeActionHold(button) {
+  if (!button || button.dataset.holdBound) return;
+  button.dataset.holdBound = '1';
+  const HOLD_MS = 3000;
+  const label = button.querySelector('.cc-hold-complete__label');
+  let timer = null;
+  let holding = false;
+  let finished = false;
+
+  const reset = () => {
+    if (timer) clearTimeout(timer);
+    timer = null;
+    if (!holding || finished) return;
+    holding = false;
+    button.classList.remove('is-holding');
+    if (label) label.textContent = 'Hold to complete';
+  };
+  const finish = () => {
+    if (!holding || finished) return;
+    finished = true;
+    holding = false;
+    timer = null;
+    button.classList.remove('is-holding');
+    button.classList.add('is-finishing');
+    if (label) label.textContent = 'Completing';
+    completeTodayActionFromHome();
+  };
+  const begin = (event) => {
+    if (finished || holding || actionDoneToday()) return;
+    if (event && event.type === 'pointerdown' && event.button != null && event.button !== 0) return;
+    if (event) event.preventDefault();
+    holding = true;
+    button.classList.add('is-holding');
+    if (label) label.textContent = 'Keep holding';
+    try {
+      if (event && event.pointerId != null && button.setPointerCapture) button.setPointerCapture(event.pointerId);
+    } catch (e) {}
+    timer = setTimeout(finish, HOLD_MS);
+  };
+
+  button.addEventListener('pointerdown', begin);
+  button.addEventListener('pointerup', reset);
+  button.addEventListener('pointercancel', reset);
+  button.addEventListener('lostpointercapture', reset);
+  button.addEventListener('contextmenu', (event) => event.preventDefault());
+  button.addEventListener('keydown', (event) => {
+    if ((event.key === ' ' || event.key === 'Enter') && !event.repeat) begin(event);
+  });
+  button.addEventListener('keyup', (event) => {
+    if (event.key === ' ' || event.key === 'Enter') reset();
+  });
+  button.addEventListener('blur', reset);
+}
+
 // Single source of truth: was the CURRENT mission completed today? A user may
 // finish a Door and receive a second mission on the same local day, so date-only
 // completion would put the first receipt's checkmark on the second mission.
@@ -3459,7 +3536,6 @@ function renderCommandCenter() {
     const how = pa.howToStart || pa.recommendedWhy || '';
     const todayStr = getTodayISO();
     const doneToday = actionDoneToday();
-    const ch = (state.action && state.action.completionHistory) || [];
     // Read the streak from the SAME source as the heatmap (consistencyStats counts
     // today the moment an action is logged) so day-1 reads "1" the instant they
     // finish, instead of the legacy state.streak.count which can lag behind a render.
@@ -3544,11 +3620,11 @@ function renderCommandCenter() {
       row += '<div style="margin-top:8px;padding-top:6px;border-top:1px solid var(--hairline);">';
       row += '<div style="display:flex;gap:8px;flex-wrap:wrap;">';
       if (doneToday) {
-        row += '<div style="flex:1;min-width:150px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;color:var(--done-ink, var(--color-consistency));background:color-mix(in srgb, var(--color-consistency) 12%, transparent);box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);border-radius:calc(8px * var(--rx, 1));padding:12px;">&#10003; Done today</div>';
+        row += '<div style="flex:1;min-width:150px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;color:var(--done-ink, var(--color-consistency));background:color-mix(in srgb, var(--color-consistency) 12%, transparent);box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);border-radius:calc(8px * var(--rx, 1));padding:12px;">Completed</div>';
       } else {
-        // Inline confirm: close the day right here. "Open" still routes into the
-        // Action module for the focus timer / full detail (secondary, quiet).
-        row += '<button class="cc-primary" data-cc-action="didit" style="flex:1;min-width:150px;font:inherit;font-weight:700;font-size:0.92rem;cursor:pointer;border:none;border-radius:calc(8px * var(--rx, 1));padding:12px 16px;background:var(--solid-bg);color:var(--solid-fg);">I did it</button>';
+        // Deliberate confirmation: the progress fill must complete before the
+        // receipt is earned. Open remains the quiet route to full Action detail.
+        row += '<button class="cc-primary cc-hold-complete" data-cc-action="didit" aria-label="Hold for three seconds to complete"><span class="cc-hold-complete__fill" aria-hidden="true"></span><span class="cc-hold-complete__label">Hold to complete</span></button>';
         row += '<button class="cc-open-action" data-cc-action="action" style="flex:0 0 auto;font:inherit;font-weight:600;font-size:0.85rem;cursor:pointer;border:none;background:none;color:var(--text-lo);border-radius:calc(8px * var(--rx, 1));padding:12px 10px;">Open</button>';
       }
       row += '</div>';
@@ -3560,17 +3636,6 @@ function renderCommandCenter() {
             '<span style="width:6px;height:6px;border-radius:50%;background:' + C + ';box-shadow:0 0 8px ' + C + ';flex:none;"></span>' +
             '<span><b style="color:var(--text-hi);font-weight:700;">' + _tc + '</b> ' + (_tc === 1 ? 'person' : 'people') + ' showed up today</span></div>';
         }
-      }
-      {
-        // v25 prune (Malik): share cards and the weekly review module are gone
-        // (the Monday letter in Updates is the weekly look-back now), so Review
-        // is one quiet link straight to the Proof trail.
-        const chArr = Array.isArray(ch) ? ch : [];
-        const doneCount = chArr.length;
-        row += '<div style="margin-top:12px;">';
-        row += '<button id="ccReview" style="display:inline-flex;align-items:center;gap:7px;font:inherit;font-weight:600;font-size:0.82rem;cursor:pointer;border:none;background:transparent;color:' + C + ';padding:0;">' +
-          '<span>Proof trail</span>' + (doneCount > 0 ? '<b style="font-weight:700;">' + doneCount + ' done</b>' : '') + '</button>';
-        row += '</div>';
       }
       // ---- "One thing to live" (Vivere). The calm counterweight to the build
       // loop above: today's life practice, one quiet line, tap to open Vivere.
@@ -3722,17 +3787,16 @@ function renderDeskMission() {
       let streak = 0;
       try { streak = (typeof consistencyStats === 'function') ? (consistencyStats().current || 0) : ((state.streak && state.streak.count) || 0); }
       catch (e) { streak = (state.streak && state.streak.count) || 0; }
-      const proofs = ((state.action && state.action.completionHistory) || []).length;
       const done = actionDoneToday();
       const doneBtn = done
-        ? '<div class="dkm__btn dkm__btn--done">&#10003; Done today</div>'
-        : '<button class="dkm__btn dkm__btn--solid" data-cc-action="didit">I did it</button>';
+        ? '<div class="dkm__btn dkm__btn--done">Completed</div>'
+        : '<button class="dkm__btn dkm__btn--solid cc-hold-complete" data-cc-action="didit" aria-label="Hold for three seconds to complete"><span class="cc-hold-complete__fill" aria-hidden="true"></span><span class="cc-hold-complete__label">Hold to complete</span></button>';
       const stat = (n, l) => '<div class="dkm__stat"><div class="dkm__stat-n">' + n.toLocaleString() + '</div><div class="dkm__stat-l">' + l + '</div></div>';
       el.innerHTML =
         label('Today&rsquo;s mission') +
         head(mission) +
         '<div class="dkm__row">' + doneBtn +
-          '<div class="dkm__stats">' + stat(streak, 'day streak') + stat(proofs, 'proofs') + '</div>' +
+          '<div class="dkm__stats">' + stat(streak, 'day streak') + '</div>' +
         '</div>';
     }
     bindCommandCenter(el);
@@ -3909,22 +3973,11 @@ function bindCommandCenter(cc) {
         setTimeout(() => { try { newBody.style.height = 'auto'; newBody.style.overflow = ''; newBody.style.transition = ''; newBody.style.opacity = ''; } catch (e) {} }, CC_RISE_MS + 40);
       }
     }));
+    cc.querySelectorAll('[data-cc-action="didit"]').forEach(bindHomeActionHold);
     cc.querySelectorAll('[data-cc-action]').forEach(b => b.addEventListener('click', () => {
       const a = b.getAttribute('data-cc-action');
       if (a === 'clarity' && typeof ClarityExperience !== 'undefined') ClarityExperience.open();
-      else if (a === 'didit') {
-        // Mark today's action done in place, then re-render so the card tint
-        // evolves greener and the consistency line flips to "Today is closed".
-        const creditedId = creditTodayAction();
-        try { if (typeof renderAll === 'function') renderAll(); } catch (e) {}
-        if (creditedId && typeof showUndoToast === 'function') {
-          try { showUndoToast('Today is closed. You showed up.', function () {
-            // Remove THIS exact entry by id, never a later completion logged in
-            // the undo window (a blind pop would delete the wrong one).
-            try { var h = state.action && state.action.completionHistory; if (Array.isArray(h)) { var idx = h.findIndex(function (x) { return x && x.id === creditedId; }); if (idx !== -1) { h.splice(idx, 1); if (typeof recalculateStreak === 'function') recalculateStreak(); persistNow(); if (typeof renderAll === 'function') renderAll(); } } } catch (e) {}
-          }); } catch (e) {}
-        }
-      }
+      else if (a === 'didit') return;
       else if (typeof ActionExperience !== 'undefined') ActionExperience.open();
     }));
     // Comeback Mode: three ways back. Pre-select the chosen tier (the same

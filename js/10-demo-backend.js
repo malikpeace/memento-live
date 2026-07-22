@@ -322,18 +322,22 @@ function buildDemoState(personaKey) {
     fresh: [0, 1, 2]
   };
   const activeDays = PATTERNS[p.pattern] || PATTERNS.steady;
-  let streakHistory = activeDays.map(_demoISO).sort();
+  // A demo opens before today's Action has been confirmed. Historical proof is
+  // still rich, but the current day is deliberately blank so Malik can test the
+  // same hold-to-complete interaction a real user receives.
+  const completedDays = activeDays.filter((daysAgo) => daysAgo > 0);
+  let streakHistory = completedDays.map(_demoISO).sort();
   // Seed the personal-record fields from the longest run already in the demo
   // history, so opening the demo does not fire a spurious "new record" moment
   // (a genuine record still fires when the user backfills a gap to beat it).
   let _demoBest = (function () {
-    const nums = activeDays.map(d => Math.floor(Date.parse(_demoISO(d) + 'T00:00:00Z') / 86400000)).sort((a, b) => a - b);
+    const nums = completedDays.map(d => Math.floor(Date.parse(_demoISO(d) + 'T00:00:00Z') / 86400000)).sort((a, b) => a - b);
     let lo = 0, run = 0, prev = null;
     nums.forEach(n => { if (prev !== null && n - prev === 1) run += 1; else run = 1; if (run > lo) lo = run; prev = n; });
     return lo;
   })();
   const tierCycle = ['moderate', 'light', 'moderate', 'heavy', 'tiny', 'moderate', 'light', 'moderate', 'heavy', 'moderate', 'light', 'moderate'];
-  let completionHistory = activeDays.slice(0, 12).map((d, i) => {
+  let completionHistory = completedDays.slice(0, 12).map((d, i) => {
     const tier = tierCycle[i % tierCycle.length];
     return { date: new Date(Date.now() - d * 86400000).toISOString(), tier, actionText: p.action.tiers[tier] || p.action.title, planTitle: p.action.title };
   }).reverse();
@@ -378,6 +382,7 @@ function buildDemoState(personaKey) {
       if (d >= 96 && d <= 104) activeProb -= 0.5;   // a short trip
       if (d <= 5) activeProb = 1.5;        // guarantee a strong current streak
       if (rnd(d + 1) > activeProb) continue; // rest day
+      if (d === 0) continue;                 // today's Action awaits the real hold
       yStreak.push(iso);
       const r2 = rnd(d * 7 + 3);
       let lvl = r2 < 0.18 ? 1 : r2 < 0.55 ? 2 : r2 < 0.85 ? 3 : 4;

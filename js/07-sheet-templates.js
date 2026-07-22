@@ -2000,15 +2000,19 @@ const SHEET_TEMPLATES = {
       const markBtn = done
         ? '<button class="sheet-btn sheet-btn--green" disabled>Done for today</button>'
         : '<button class="sheet-btn sheet-btn--green" id="streakMark">Mark today complete</button>';
+      let proofCount = 0;
+      try { proofCount = (typeof ProofTrail !== 'undefined' && ProofTrail._allEvents) ? ProofTrail._allEvents().length : 0; } catch (e) {}
+      const proofLink = '<button class="sheet-btn" id="streakProofTrail" style="display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--surface-1);color:var(--text-hi);border:1px solid var(--hairline);"><span>Proof trail</span><span style="color:var(--text-3);font-size:0.78rem;font-weight:600;">' + proofCount + ' entries</span></button>';
 
       let html = '<div class="exp-shell exp-shell--top">';
       html += renderRecordMoment();
       html += sec(0, renderConsistencyHero(st, done));
       html += sec(1, markBtn);
       html += sec(2, renderConsistencyStats());
-      html += sec(3, renderConsistencyViews());
-      html += sec(4, renderConsistencyBreakdowns());
-      html += sec(5, renderMilestoneLadder());
+      html += sec(3, proofLink);
+      html += sec(4, renderConsistencyViews());
+      html += sec(5, renderConsistencyBreakdowns());
+      html += sec(6, renderMilestoneLadder());
       html += oneThingFooterHtml();
       html += '</div>';
       return html;
@@ -2028,6 +2032,10 @@ const SHEET_TEMPLATES = {
         renderAll();
         try { maybeShowMilestoneBanner(); } catch (_) {}
         reRender();
+      });
+      const proofBtn = container.querySelector('#streakProofTrail');
+      if (proofBtn) proofBtn.addEventListener('click', () => {
+        try { if (typeof ProofTrail !== 'undefined') ProofTrail.open(); } catch (e) {}
       });
 
       // View toggle (Heatmap/Chain/Month) and breakdown scale (Week/Month/Year).
