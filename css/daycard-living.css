@@ -352,6 +352,37 @@ body.evo2.evo2-surge .daycard-theme-living .daycard-ns__liquid {
   filter: blur(20px) saturate(1.4) hue-rotate(var(--mm-hue, 0deg));
   will-change: opacity;
 }
+/* ── The other two evolutions (v910, Malik) ──────────────────────────────────
+   The card earns its layers one moment at a time: CYAN when Clarity lands (the
+   wash above, the default), PLATINUM when the Action plan is revealed, GREEN
+   when the first action is actually completed. Malik's call: it is the SAME
+   cinema every time, only the colour changes. So these are pure wash overrides,
+   nothing about the choreography (grow -> surge -> orb -> settle) is touched.
+   Trigger contract for the state owner: add `evo2-plat` or `evo2-green` to
+   <body> alongside the existing evolution classes. No class = cyan, so the
+   Clarity moment keeps working exactly as it does today. */
+/* PLATINUM: the Action reveal. Neutral white metal, deliberately NOT hue-rotated
+   (the user's accent must never tint it, or it stops reading as platinum) and
+   barely saturated, so it reads as light rather than a colour. */
+body.evo2-plat .evo2-wash {
+  background: radial-gradient(58% 52% at 50% 42%,
+    rgba(255, 255, 255, 0.97) 0%,
+    rgba(238, 244, 250, 0.70) 46%,
+    rgba(208, 220, 232, 0.30) 78%,
+    rgba(208, 220, 232, 0) 100%);
+  filter: blur(20px) saturate(1.04);
+}
+/* GREEN: the first completed action. Spring green (#3fd94e), the existing
+   consistency accent, brightened toward the centre so the flood has the same
+   luminous core the cyan one has. */
+body.evo2-green .evo2-wash {
+  background: radial-gradient(58% 52% at 50% 42%,
+    rgba(138, 247, 149, 0.95) 0%,
+    rgba(92, 230, 108, 0.66) 46%,
+    rgba(63, 217, 78, 0.28) 78%,
+    rgba(63, 217, 78, 0) 100%);
+  filter: blur(20px) saturate(1.35);
+}
 /* ns-bloom is turned on at the FILL so the card's INTERNAL liquid lights to its
    true resting purple (its brightness is gated by ns-bloom, without it the liquid
    is nearly black and the settle drained to dark). But the beams + external card
