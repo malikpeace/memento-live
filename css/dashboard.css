@@ -3159,6 +3159,61 @@ html.theme-light .daycard-ns__emblem {
     drop-shadow(0 -1px 1px rgba(0, 0, 0, 0.18))
     drop-shadow(0 0 18px rgba(74, 108, 255, 0.16));
 }
+/* ── v917 THE ADAPTIVE M (Malik) ──────────────────────────────────────────
+   The two rules above key off the APP THEME, not the card. So the mark was a
+   fixed dark M in light mode however dark the card got, and a fixed white M in
+   dark mode however bright it got. Both ends failed: during the evolution flood
+   the card goes near-white, and a white mark on a white flood is invisible.
+
+   Now the mark follows the CARD via one knob, --card-lum (0 = card is dark,
+   1 = card is light), and cross-fades between a dark and a light treatment.
+   Values ported verbatim from the approved lab (prototypes/light-mode-card-lab).
+   The fill carries the two extremes; the deboss edges are strong enough that
+   mid-tones read from edge lighting rather than fill contrast, which is how a
+   real pressed emblem stays visible on any material.
+
+   Pure CSS, keyed off classes that already exist, so nothing in js/08 changes.
+   The rules above remain the fallback for engines without color-mix. */
+   Implemented as two discrete treatments with a TRANSITION between them rather
+   than a continuously interpolated colour: `fill` and `filter` both animate, so
+   switching is a smooth half-second fade, which is the seamless feel we want,
+   and there is no dependence on color-mix resolving a var() percentage (that
+   silently fell back to the light mark on every card, caught in testing). */
+
+/* The mark when the card is DARK: light, pressed, shadow above the edge. */
+.daycard-theme-living .daycard-ns__emblem,
+html.theme-light .daycard-theme-living .daycard-ns__emblem {
+  transition: fill 0.5s ease, filter 0.5s ease;
+}
+.daycard-theme-living .daycard-ns__emblem {
+  fill: rgba(255, 255, 255, 0.55);
+  filter:
+    drop-shadow(0 1.5px 0 rgba(255, 255, 255, 0.30))
+    drop-shadow(0 -1.5px 1.5px rgba(0, 0, 0, 0.60));
+}
+/* The mark when the card is LIGHT: dark, same deboss logic inverted. */
+html.theme-light .daycard-theme-living .daycard-ns__emblem {
+  fill: rgba(20, 29, 40, 0.62);
+  filter:
+    drop-shadow(0 1.5px 0 rgba(255, 255, 255, 0.75))
+    drop-shadow(0 -1.5px 1.5px rgba(0, 0, 0, 0.30));
+}
+/* THE POINT: any evolution flood (cyan, platinum, green) drives the card bright
+   in EITHER theme, so the mark flips to its dark treatment for the duration and
+   eases back on its own afterwards. This is the case that was broken: a white
+   mark on a near-white platinum flood was invisible. */
+body.evo2-surge .daycard-theme-living .daycard-ns__emblem,
+body.evo2-orb .daycard-theme-living .daycard-ns__emblem,
+html.theme-light body.evo2-surge .daycard-theme-living .daycard-ns__emblem,
+html.theme-light body.evo2-orb .daycard-theme-living .daycard-ns__emblem {
+  fill: rgba(20, 29, 40, 0.62);
+  filter:
+    drop-shadow(0 1.5px 0 rgba(255, 255, 255, 0.75))
+    drop-shadow(0 -1.5px 1.5px rgba(0, 0, 0, 0.30));
+}
+@media (prefers-reduced-motion: reduce) {
+  .daycard-theme-living .daycard-ns__emblem { transition: none; }
+}
 .daycard-ns__foot {
   position: relative;
   display: flex; align-items: flex-end; justify-content: flex-start; gap: 10px;
