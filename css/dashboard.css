@@ -3202,17 +3202,26 @@ html.theme-light .daycard-theme-living .daycard-ns__emblem {
    in EITHER theme, so the mark flips to its dark treatment for the duration and
    eases back on its own afterwards. This is the case that was broken: a white
    mark on a near-white platinum flood was invisible. */
-/* v931: the same case, but PERMANENT. The v930 Action reward floods the card's
-   centre with the platinum wash and it stays flooded, so the mark has to flip
-   for good rather than only for the duration of the cinema above. .daycard--bright
-   is set in js/08 setLivingCardVars once --act clears the threshold where a
-   white mark stops reading against the wash. */
-.daycard-wrap.daycard--bright .daycard-ns__emblem,
-html.theme-light .daycard-wrap.daycard--bright .daycard-ns__emblem,
 body.evo2-surge .daycard-theme-living .daycard-ns__emblem,
 body.evo2-orb .daycard-theme-living .daycard-ns__emblem,
 html.theme-light body.evo2-surge .daycard-theme-living .daycard-ns__emblem,
 html.theme-light body.evo2-orb .daycard-theme-living .daycard-ns__emblem {
+  fill: rgba(20, 29, 40, 0.62);
+  filter:
+    drop-shadow(0 1.5px 0 rgba(255, 255, 255, 0.75))
+    drop-shadow(0 -1.5px 1.5px rgba(0, 0, 0, 0.30));
+}
+/* v931: the same case, but PERMANENT. The v930 Action reward floods the centre
+   and KEEPS it flooded, so the mark flips for good rather than for the length
+   of an animation. Set by .daycard--bright from js/08 setLivingCardVars.
+   The values are the prototype's verbatim. Malik reported the mark reading grey
+   here and the instinct was to darken the fill, but that was the wrong lever:
+   the mark was painting at exactly this colour and then being covered by the
+   reward layers, which sit above .daycard-ns__body's default stacking. The fix
+   is the z-order in daycard-living.css; darkening the ink would only have been
+   compensating for a layer that should not have been on top of it. */
+.daycard-wrap.daycard--bright .daycard-ns__emblem,
+html.theme-light .daycard-wrap.daycard--bright .daycard-ns__emblem {
   fill: rgba(20, 29, 40, 0.62);
   filter:
     drop-shadow(0 1.5px 0 rgba(255, 255, 255, 0.75))

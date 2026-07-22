@@ -550,6 +550,16 @@ html.theme-light .daycard-theme-living .daycard-living-stage {
    still gates it. */
 .daycard-theme-living .daycard-floor .daycard-ns__rim { z-index: 1; }
 
+/* v932 FIX: the mark and the foot must ride ABOVE the reward. .daycard-ns__body
+   and __foot sit at z-index auto, so the wash (4), the tint (5) and the rim (6)
+   were all painting straight over them: the M was rendering at its correct dark
+   fill and then being washed back to grey by a 0.72-opacity white layer on top
+   of it, which is why it read light no matter what the fill said. The goal and
+   name in the foot were being washed the same way. Lifting both above the new
+   layers is the actual fix; the fill was never the problem. */
+.daycard-theme-living .daycard-ns__body,
+.daycard-theme-living .daycard-ns__foot { position: relative; z-index: 7; }
+
 /* GATE: the reward is internal colour, so it obeys the same pre-star rule as
    the liquid and the burn. Deliberately NOT exempted for the clarity cinema's
    surge/orb stages, unlike those two: this is Action's reward and has no
