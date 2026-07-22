@@ -3202,6 +3202,13 @@ html.theme-light .daycard-theme-living .daycard-ns__emblem {
    in EITHER theme, so the mark flips to its dark treatment for the duration and
    eases back on its own afterwards. This is the case that was broken: a white
    mark on a near-white platinum flood was invisible. */
+/* v931: the same case, but PERMANENT. The v930 Action reward floods the card's
+   centre with the platinum wash and it stays flooded, so the mark has to flip
+   for good rather than only for the duration of the cinema above. .daycard--bright
+   is set in js/08 setLivingCardVars once --act clears the threshold where a
+   white mark stops reading against the wash. */
+.daycard-wrap.daycard--bright .daycard-ns__emblem,
+html.theme-light .daycard-wrap.daycard--bright .daycard-ns__emblem,
 body.evo2-surge .daycard-theme-living .daycard-ns__emblem,
 body.evo2-orb .daycard-theme-living .daycard-ns__emblem,
 html.theme-light body.evo2-surge .daycard-theme-living .daycard-ns__emblem,

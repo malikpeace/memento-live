@@ -5215,6 +5215,16 @@ function setLivingCardVars(wrap) {
   wrap.style.setProperty('--mix', (Math.min(L.clar, L.cons) / 100 * 0.75).toFixed(3));
   // lit gates everything outside the card (aura, bloom, reflection) by fill
   wrap.style.setProperty('--lit', (Math.max(L.clar, L.act, L.cons) / 100).toFixed(3));
+  // v931: the Action reward's platinum wash drives the card's CENTRE bright and
+  // it STAYS bright, so the adaptive M has to flip for good, not just during the
+  // evolution cinema the way v917 handled. A discrete class, not a computed
+  // colour: a var-driven color-mix silently resolved to 0% last time and left
+  // the mark white on every card while looking correct in code.
+  // The threshold is on --act alone, deliberately theme-independent: 0.41 x the
+  // dark wash constant (0.85) is the ~0.35 centre brightness where a white mark
+  // stops reading. Light mode already presses the mark dark at every value, so
+  // one rule covers both and there is no stale state to re-sync on a theme flip.
+  wrap.classList.toggle('daycard--bright', (L.act / 100) > 0.41);
 }
 
 // Days since the most recent logged action (local-day resolution). null when
