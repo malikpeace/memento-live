@@ -2909,13 +2909,15 @@ body.daycard-force #dayCard { display: block; max-width: 430px; }
   #dayCard .daycard-theme-living .daycard-living-stage { width: var(--card-w, 320px); margin: 0 0 26px; }
   #dayCard .daycard-ns { min-height: var(--card-h, 440px); }
 }
-/* Before the Neutron Star, Home is just the (blank) card + the one "Start your
-   Neutron Star" CTA on black, at EVERY width. The module grid, daily line and
-   mobile greeting are hidden until the star is locked in (body.ns-bloom). */
+/* Before the Neutron Star, mobile/tablet stays focused on the blank card and
+   one next step. Desktop keeps its mature editorial skeleton from day one. */
 body:not(.ns-bloom) .app.dash-v2 #widgetGrid,
 body:not(.ns-bloom) .app.dash-v2 #dailyMemento,
 body:not(.ns-bloom) .app.dash-v2 #dashConsistency,
 body:not(.ns-bloom) .app.dash-v2 #dashGreetingMobile { display: none; }
+
+/* Action + Consistency begin after payment, so the year heatmap does too. */
+body:not(.memento-paid) .app.dash-v2 #dashConsistency { display: none !important; }
 
 /* ── Consistency band (the year heatmap) on the Home ───────────────────────── */
 #dashConsistency {
@@ -3910,11 +3912,11 @@ body.card-square { --card-w: 360px; --card-h: 360px; }
    appears exactly once (mission=headline, done=button, streak+proofs=stats,
    year=heatmap, time/death=clock), so the module tiles, quote, proof-trail
    line and the heatmap's streak header are all OFF this layout.
-   Desktop only (>=1024 + ns-bloom); the mobile home is hard-locked. */
+   Desktop only (>=1024); the skeleton is stable from first visit onward. */
 #deskMission { display: none; }
 .dash-cgram__range { display: none; }
 @media (min-width: 1024px) {
-  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 {
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 {
     /* display is intentionally NOT !important: TabBar hides the home behind
        tab panels via app.style.display='none' (inline), and an !important here
        overrode that, bleeding the home through the transparent Do/Reflect/You
@@ -3941,9 +3943,15 @@ body.card-square { --card-w: 360px; --card-h: 360px; }
     box-sizing: border-box;
     min-height: 100vh;
   }
+  /* At tighter desktop widths, the floating sidebar must own real space. */
+  body.sidebar-active:not(.sidebar-collapsed):not(.has-custom-layout) .app.dash-v2 {
+    width: calc(100% - var(--sidebar-w));
+    margin-left: max(var(--sidebar-w), calc((100vw - 1240px) / 2));
+    margin-right: auto;
+  }
   /* the mock's topbar: greeting hard-LEFT, clock hard-right (the header was
      centering the greeting inside the new grid, Malik's screenshot) */
-  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 .dash-header {
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 .dash-header {
     display: flex !important;
     justify-content: space-between;
     align-items: flex-start;
@@ -3951,48 +3959,48 @@ body.card-square { --card-w: 360px; --card-h: 360px; }
     padding: 26px 0 0;
     margin: 0;
   }
-  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 .dash-header__brand { display: none !important; }
-  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 .dash-header__greeting { margin: 0; text-align: left; flex: 1 1 auto; }
-  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 .dash-header__right { flex: 0 0 auto; }
-  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #dashBelow { display: contents; }
-  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 .dash-header { grid-area: dhead; align-self: start; }
-  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #dayCard {
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 .dash-header__brand { display: none !important; }
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 .dash-header__greeting { margin: 0; text-align: left; flex: 1 1 auto; }
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 .dash-header__right { flex: 0 0 auto; }
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #dashBelow { display: contents; }
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 .dash-header { grid-area: dhead; align-self: start; }
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #dayCard {
     grid-area: dcard; display: flex; justify-content: center; margin: 0;
     --card-w: 206px; --card-h: 277px;
   }
-  body.card-square:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #dayCard { --card-w: 240px; --card-h: 240px; }
-  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #deskMission { display: block; grid-area: dmission; }
-  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #dashConsistency {
+  body.card-square:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #dayCard { --card-w: 240px; --card-h: 240px; }
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #deskMission { display: block; grid-area: dmission; }
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #dashConsistency {
     grid-area: dheat; display: block; align-self: start; margin: 48px 0 0; padding: 0;
     background: none; box-shadow: none; border: none;
   }
   /* everything else leaves the desktop home (info law + sidebar duplicates) */
-  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #commandCenter,
-  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #dailyMemento,
-  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #dashHello,
-  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #hubConsistency,
-  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #widgetGrid,
-  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 .dash-more,
-  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 .dash-header .hub-headline,
-  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 .dash-header .hub-returncue {
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #commandCenter,
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #dailyMemento,
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #dashHello,
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #hubConsistency,
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #widgetGrid,
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 .dash-more,
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 .dash-header .hub-headline,
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 .dash-header .hub-returncue {
     display: none !important;
   }
   /* the heatmap band: no streak header (the stat pair owns it), one quiet
      right-aligned range label, cells that breathe across the full width */
-  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #dashConsistency .dash-cgram__head { display: none; }
-  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #dashConsistency .dash-cgram__range {
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #dashConsistency .dash-cgram__head { display: none; }
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #dashConsistency .dash-cgram__range {
     display: flex; justify-content: flex-end;
     font-size: 11px; color: var(--text-lo); margin-bottom: 9px;
     font-variant-numeric: tabular-nums;
   }
-  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #dashConsistency .cgraph__months { display: none; }
-  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #dashConsistency .cgraph__legend { display: none; }
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #dashConsistency .cgraph__months { display: none; }
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #dashConsistency .cgraph__legend { display: none; }
   /* v817 (Malik: 'NO PROOF YET can go'): the editorial home's heatmap speaks
      for itself; the coaching empty-state stays inside the Consistency module. */
-  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #dashConsistency .empty-state { display: none; }
-  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #dashConsistency .cgraph__cols { gap: 3px; }
-  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #dashConsistency .cgraph__col { gap: 3px; flex: 1 1 0; max-width: 20px; }
-  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #dashConsistency .cgraph__col .cgraph__cell {
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #dashConsistency .empty-state { display: none; }
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #dashConsistency .cgraph__cols { gap: 3px; }
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #dashConsistency .cgraph__col { gap: 3px; flex: 1 1 0; max-width: 20px; }
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #dashConsistency .cgraph__col .cgraph__cell {
     width: 100%; height: auto; aspect-ratio: 1 / 1; border-radius: 3px;
   }
 }
@@ -4023,13 +4031,16 @@ body.card-square { --card-w: 360px; --card-h: 360px; }
 /* very wide screens: the composition scales up a touch so it never reads
    lost on a big monitor (still capped, still the same proportions) */
 @media (min-width: 1760px) {
-  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 { max-width: 1400px; }
-  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #dayCard { --card-w: 232px; --card-h: 312px; }
-  body.card-square:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 #dayCard { --card-w: 268px; --card-h: 268px; }
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 { max-width: 1400px; }
+  body.sidebar-active:not(.sidebar-collapsed):not(.has-custom-layout) .app.dash-v2 {
+    margin-left: max(var(--sidebar-w), calc((100vw - 1400px) / 2));
+  }
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #dayCard { --card-w: 232px; --card-h: 312px; }
+  body.card-square:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #dayCard { --card-w: 268px; --card-h: 268px; }
   .dkm__headline { font-size: 47px; }
 }
 /* editorial breathes, never stretches silly: below 1150 the gap tightens */
 @media (min-width: 1024px) and (max-width: 1149.98px) {
-  body:is(.ns-bloom, .evo2, .evo-pending):not(.has-custom-layout) .app.dash-v2 { column-gap: 40px; padding: 0 40px 24px; }
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 { column-gap: 40px; padding: 0 40px 24px; }
   .dkm__headline { font-size: 36px; }
 }

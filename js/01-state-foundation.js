@@ -2,12 +2,12 @@
    Extracted from app.js lines 2-2125. Loaded as a classic <script> so
    all modules share one global lexical scope (no window pollution). Order matters:
    this file must load before js/11-init.js, which runs the bootstrap immediately. */
-/* v904: the JS build stamp. The release sed bump rewrites the version in BOTH
+/* v905: the JS build stamp. The release sed bump rewrites the version in BOTH
    index.html AND this line; js/11 compares them at boot and force-refreshes
    ONCE on mismatch. Kills the "phone silently runs old cached js under a new
    index" class (the SW's offline fallback can serve stale files on a bad
    connection; Malik hit this three times in one day). */
-window.MEMENTO_JS_BUILD = 'v904';
+window.MEMENTO_JS_BUILD = 'v905';
 /* ============================================
    STATE MANAGEMENT
    ============================================ */
@@ -440,7 +440,7 @@ function stripCadenceAndTime(text) {
   // "daily/weekly/monthly/nightly"
   s = s.replace(/\s*\b(daily|weekly|monthly|nightly)\b/gi, '');
   // "X days/weeks/months a week" patterns, digits AND word numbers
-  // (v904: "three times a week" in a title left a garbled 7-word fallback
+  // (v905: "three times a week" in a title left a garbled 7-word fallback
   // "Go to the gym three times a" because only \d+ was matched).
   s = s.replace(/\s*\b(\d+|one|two|three|four|five|six|seven|eight|nine|ten|twice)\s+(days?|nights?|mornings?|evenings?|weeks?|months?|times?|sessions?)\s+(a|per)\s+(day|week|month|year)\b/gi, '');
   s = s.replace(/\s*\b(once|twice)\s+(a|per)\s+(day|week|month|year)\b/gi, '');
@@ -1274,7 +1274,7 @@ function sanitizeTierText(str, titleFallback, opts) {
   const setupPhrase = /^(sit\s+down|get\s+started|set\s+up|gear\s+up|prep|prepare)\b/i.test(original)
     || /\b(work\s+on|focus\s+on|spend\s+time\s+on|look\s+at|check\s+on|think\s+about|plan\s+to)\b/i.test(original);
   if (setupPhrase) return fallback('setup-verb');
-  // v904: durations are ALLOWED in tier text. They are the one honest scaling
+  // v905: durations are ALLOWED in tier text. They are the one honest scaling
   // axis for time/presence moves (be with her, meditate, phone-free time,
   // deep work), and stripping them was collapsing those ladders into five
   // identical rungs (the confirmed behavioral-ladder blocker). Output moves
@@ -1292,7 +1292,7 @@ function sanitizeTierText(str, titleFallback, opts) {
   // First clause only (cut at period/semicolon/em-dash separator/comma+space).
   const cutAt = s.search(/[.!?;]|\s-\s|,\s/);
   if (cutAt > 2) s = s.slice(0, cutAt);
-  // 9-word ceiling (up from 7, v904). Durations and scope qualifiers are
+  // 9-word ceiling (up from 7, v905). Durations and scope qualifiers are
   // allowed in tiers now ("Delay every craving to the end of the day",
   // "10 phone-free minutes with her in the evening"), and a 7-word cap was
   // chopping the top rung's qualifier off, leaving it reading smaller than
@@ -1918,7 +1918,7 @@ function migrateState() {
   // already-clean text.
   if (state.action.primaryAction && typeof stripCadenceAndTime === 'function') {
     const pa = state.action.primaryAction;
-    // v904: title and howToStart are NO LONGER stripped. The strip garbled
+    // v905: title and howToStart are NO LONGER stripped. The strip garbled
     // durations mid-sentence ("for [60 seconds] before" -> "for before") and
     // erased the cadence the doctrine now wants visible in lever titles.
     // Tiers still get re-validated below with a cadence-free fallback.

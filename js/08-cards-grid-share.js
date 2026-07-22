@@ -590,6 +590,8 @@ function renderGrid() {
   let _cpwLocked = false;
   try { _cpwLocked = (typeof ClarityPaywall !== 'undefined') && ClarityPaywall.isLockedByPaywall('action'); } catch (e) {}
   document.body.classList.toggle('cpw-locked', _cpwLocked);
+  const _hasPaidAccess = !!(state.entitlements && state.entitlements.isPaid);
+  document.body.classList.toggle('memento-paid', _hasPaidAccess);
 
   // v27 bento opt-out flag (kept current above the early returns so a stale
   // has-custom-layout can never linger on brand-new / pre-clarity renders).
@@ -5435,4 +5437,3 @@ function renderAll() {
   // v703: the v702 floating cheat bar is retired, the bar (Today + You) exists
   // pre-star now, so the You panel and its cheat bar are always reachable.
 }
-
