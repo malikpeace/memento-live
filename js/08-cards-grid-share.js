@@ -1445,7 +1445,7 @@ function computeHeroHeadline() {
   // Local-day comparison (not a raw UTC slice) so the headline agrees with the
   // command center and consistency line after the UTC rollover in US zones.
   const done = (typeof actionDoneToday === 'function') ? actionDoneToday() : false;
-  return done ? 'Today’s mission, done.' : 'What’s the mission today?';
+  return done ? 'Today’s Action, done.' : 'What’s today’s Action?';
 }
 function bindHeroHeadlinePicker(headlineEl) {
   const hub = headlineEl.closest('.dash-header__hub') || headlineEl.parentElement;
@@ -1484,7 +1484,7 @@ function bindHeroHeadlinePicker(headlineEl) {
     let html = '<div class="hub-hl-pop__group">';
     html += '<button type="button" class="hub-hl-pop__opt' + (autoOn ? ' is-on' : '') + '" role="menuitemradio" aria-checked="' + (autoOn ? 'true' : 'false') + '" data-hl-auto>' +
       '<span class="hub-hl-pop__check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' +
-      '<span class="hub-hl-pop__label">Auto <span class="hub-hl-pop__hint">mission status</span></span></button>';
+      '<span class="hub-hl-pop__label">Auto <span class="hub-hl-pop__hint">Action status</span></span></button>';
     html += '</div><div class="hub-hl-pop__sep" aria-hidden="true"></div><div class="hub-hl-pop__group">';
     HERO_HEADLINE_PRESETS.forEach(p => {
       const on = hh.mode === 'preset' && (hh.value || '').trim() === p;
@@ -3959,7 +3959,7 @@ function renderDeskMission() {
             : '') +
         '</div>';
       el.innerHTML =
-        label('Today&rsquo;s mission') +
+        label('Today&rsquo;s Action') +
         head(mission) +
         '<div class="dkm__row">' + doneBtn + streakChip + '</div>';
     }
