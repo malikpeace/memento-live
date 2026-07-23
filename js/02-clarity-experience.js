@@ -7988,6 +7988,7 @@ function _renderNext7Days() {
     <div class="n7d-breath" id="n7dBreathA" aria-hidden="true"></div>
     <div class="n7d-breath" id="n7dBreathB" aria-hidden="true"></div>
     <div class="n7d-summit" aria-hidden="true"></div>
+    <div class="n7d-atmo" id="n7dAtmo" aria-hidden="true"><i></i><i></i><i></i></div>
     <div class="n7d-topfade" aria-hidden="true"></div>
     <div class="n7d-scroll" id="n7dScroll">
       <div class="n7d-inner">
@@ -8048,6 +8049,8 @@ function showNext7Days(onProceed) {
     let breathFront = null, curDay = null;
     const setBreath = (color, alpha) => {
       if (!color || !breathA || !breathB) return;
+      root.style.setProperty('--n7bc', color);   // v956: expose the current day hue to the atmo lab layer
+
       const back = (breathFront === breathA) ? breathB : breathA;
       back.style.setProperty('--n7bc', color);
       back.style.setProperty('--n7ba', alpha || '1');
@@ -8260,6 +8263,35 @@ function showNext7Days(onProceed) {
         });
       }, 900);
     }
+
+    // v956 (dev, ?n7bg): a background-options switcher. 0 = the current look,
+    // 1-8 = the candidate atmospheres. Inert and unrendered without the param.
+    try {
+      const bgParam = new URLSearchParams(location.search).get('n7bg');
+      if (bgParam !== null) {
+        const opts = ['Current', 'Aurora ribbon', 'Grounded wash', 'Film grain', 'Corner glows', 'Drifting mesh', 'Deep starfield', 'Contours', 'Spotlight'];
+        const bar = document.createElement('div');
+        bar.className = 'n7bg-bar';
+        const name = document.createElement('span');
+        name.className = 'n7bg-name';
+        const apply = (n) => {
+          for (let k = 1; k <= 8; k++) root.classList.remove('n7bg' + k);
+          if (n >= 1 && n <= 8) root.classList.add('n7bg' + n);
+          name.textContent = n + ' · ' + opts[n];
+          bar.querySelectorAll('button').forEach((b, k) => b.classList.toggle('on', k === n));
+        };
+        for (let n = 0; n <= 8; n++) {
+          const b = document.createElement('button');
+          b.type = 'button'; b.textContent = String(n);
+          b.addEventListener('click', () => apply(n));
+          bar.appendChild(b);
+        }
+        bar.appendChild(name);
+        root.appendChild(bar);
+        const start = Math.max(0, Math.min(8, parseInt(bgParam, 10) || 0));
+        apply(start);
+      }
+    } catch (e) {}
 
     const cta = root.querySelector('#n7dCta');
     if (cta) cta.addEventListener('click', () => {
