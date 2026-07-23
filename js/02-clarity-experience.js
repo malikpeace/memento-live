@@ -8192,23 +8192,31 @@ function showNext7Days(onProceed) {
     // v960: the hero intro must be SEEN before a tap can advance. Until it's
     // fully revealed, the first tap finishes the intro (types the rest of the
     // headline + lands the sub) instead of shooting the reader to day 1.
-    let introDone = reduce, introStartTimer = 0, introSubTimer = 0;
+    // Two staged reveals so a tapper reads both lines before leaving: tap 1 fills
+    // the headline, tap 2 lands the sub, then taps advance. Untapped, each auto-
+    // arrives on a timer so a patient reader sees them too.
+    let titleShown = reduce, introDone = reduce, introStartTimer = 0, introSubTimer = 0;
     const beginClimb = (delay) => { clearTimeout(seqTimer); if (autoOn) seqTimer = setTimeout(seq, delay); };
-    const onTitleDone = () => {
+    const showSub = () => {
       if (introDone) return;
       introDone = true;
       clearTimeout(introSubTimer);
-      introSubTimer = setTimeout(() => { if (sub) sub.classList.add('on'); }, 700);
-      beginClimb(4200);
+      if (sub) sub.classList.add('on');
+      beginClimb(3600);
     };
-    const finishIntro = () => {
-      if (introDone) return;
+    const onTitleShown = () => {
+      if (titleShown) return;
+      titleShown = true;
+      clearTimeout(introSubTimer);
+      introSubTimer = setTimeout(showSub, 1000);   // sub auto-lands a beat later if untapped
+    };
+    const revealTitle = () => {
       clearTimeout(introStartTimer);
       if (title) {
         title.classList.add('on');
-        if (title._n7dFinish) title._n7dFinish();   // reveals the rest, then onTitleDone
-        else { title.textContent = titleText; onTitleDone(); }
-      } else { onTitleDone(); }
+        if (title._n7dFinish) title._n7dFinish();   // reveals the rest, then onTitleShown
+        else { title.textContent = titleText; onTitleShown(); }
+      } else { onTitleShown(); }
     };
     // Manual takeover: real gestures only (never the programmatic tween).
     ['touchstart', 'wheel', 'keydown'].forEach(ev =>
@@ -8245,7 +8253,7 @@ function showNext7Days(onProceed) {
     }, { passive: true });
     scroll.addEventListener('touchend', () => {
       if (tMoved < 10) return;                   // a tap, not a swipe: let click run
-      if (!introDone) { swiped = true; clearTimeout(swipeGuard); swipeGuard = setTimeout(() => { swiped = false; }, 360); finishIntro(); return; }
+      if (!introDone) { swiped = true; clearTimeout(swipeGuard); swipeGuard = setTimeout(() => { swiped = false; }, 360); if (!titleShown) revealTitle(); else showSub(); return; }
       swiped = true;
       clearTimeout(swipeGuard);
       swipeGuard = setTimeout(() => { swiped = false; }, 360);
@@ -8262,7 +8270,9 @@ function showNext7Days(onProceed) {
     scroll.addEventListener('click', (e) => {
       if (e.target && e.target.closest && e.target.closest('#n7dCta')) return;
       if (swiped) return;
-      if (!introDone) { finishIntro(); return; }   // first tap reveals the intro, doesn't advance
+      // staged: tap 1 fills the headline, tap 2 lands the sub, then taps advance
+      if (!titleShown) { revealTitle(); return; }
+      if (!introDone) { showSub(); return; }
       clearTimeout(seqTimer); seqTimer = 0;
       const touch = root.classList.contains('n7d--touch');
       // Desktop CSS snap fights the tween; briefly mute it. Touch has snap off already.
@@ -8282,8 +8292,8 @@ function showNext7Days(onProceed) {
     });
 
     // Hero: the title TYPES with the tick, the sub lands, then the climb begins.
-    // onTitleDone (v960) lands the sub + starts the climb, whether the headline
-    // finished typing on its own or an early tap fast-forwarded it (finishIntro).
+    // onTitleShown (v961) marks the headline seen + schedules the sub; a tap can
+    // fast-forward each stage (revealTitle, then showSub) without advancing.
     if (reduce) {
       if (title) title.textContent = titleText;
       if (sub) sub.classList.add('on');
@@ -8292,7 +8302,7 @@ function showNext7Days(onProceed) {
       introStartTimer = setTimeout(() => {
         if (!title) return;
         title.classList.add('on');
-        _n7dType(title, titleText, 52, onTitleDone);
+        _n7dType(title, titleText, 52, onTitleShown);
       }, 900);
     }
 
