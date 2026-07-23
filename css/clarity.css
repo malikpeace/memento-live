@@ -4293,24 +4293,40 @@ html.theme-light .n7d-cta {
 .n7d-finale {
   position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: 0;
   transition: opacity 1.8s ease;
-  /* Malik: pool ALL the Memento colours into a rich blended band at the FLOOR
-     (like every day's grounded hue), so the finale glows cyan + periwinkle +
-     platinum + green together and fades up to pure black at the top. */
+  /* Malik: WIDE, short aurora ribbons pooled at the floor (not round blurs) that
+     slowly drift, so the whole Memento palette blends across the bottom and moves.
+     Two layers cross-drift so the overlaps keep shifting. Fades up to pure black. */
   background:
-    radial-gradient(92% 54% at 25% 102%, rgba(58, 217, 245, 0.44), transparent 60%),   /* cyan, lower-left */
-    radial-gradient(92% 54% at 75% 102%, rgba(128, 150, 255, 0.42), transparent 60%),  /* periwinkle, lower-right */
-    radial-gradient(76% 44% at 50% 97%, rgba(255, 255, 255, 0.22), transparent 54%),   /* platinum core, low centre */
-    radial-gradient(110% 58% at 50% 107%, rgba(63, 217, 78, 0.38), transparent 60%);   /* green, floor centre */
+    radial-gradient(140% 42% at 26% 103%, rgba(58, 217, 245, 0.42), transparent 62%),   /* cyan ribbon, left */
+    radial-gradient(155% 46% at 50% 107%, rgba(63, 217, 78, 0.34), transparent 60%);     /* green ribbon, deepest floor */
 }
-.n7d--fin .n7d-finale { opacity: 1; animation: n7dFinBreathe 9s ease-in-out infinite alternate; }
-@keyframes n7dFinBreathe { from { transform: scale(1); } to { transform: scale(1.04); } }
+.n7d-finale::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(140% 42% at 74% 103%, rgba(128, 150, 255, 0.42), transparent 62%),  /* periwinkle ribbon, right */
+    radial-gradient(112% 32% at 50% 99%, rgba(255, 255, 255, 0.20), transparent 56%);    /* platinum core, low centre */
+}
+.n7d--fin .n7d-finale { opacity: 1; animation: n7dFinDriftA 17s ease-in-out infinite alternate; }
+.n7d--fin .n7d-finale::before { animation: n7dFinDriftB 21s ease-in-out infinite alternate; }
+@keyframes n7dFinDriftA { from { transform: translate(-5%, 1.5%); } to { transform: translate(6%, -1.5%); } }
+@keyframes n7dFinDriftB { from { transform: translate(5.5%, -1.5%); } to { transform: translate(-6%, 1.5%); } }
 /* the multi-hue floor leads: the lone green summit + single-hue wash step back so
    the cyan and periwinkle read in the blend instead of stacking three greens. */
 .n7d--fin .n7d-summit { opacity: 0.2; }
 .n7d--fin .n7d-breath.on { opacity: 0.22; }
 
+/* the final node is a small Memento-spectrum bead, not a lone green dot. Scoped
+   under .n7d--fin so it out-specifies the base + win node rules that follow it. */
+.n7d--fin .n7d-day--final.is-in .n7d-node {
+  background: conic-gradient(from 150deg, #3ad9f5, #8096ff, #ffffff, #3fd94e, #3ad9f5);
+  box-shadow: 0 0 0 5px #050808,
+    0 0 16px rgba(58, 217, 245, 0.6),
+    0 0 26px rgba(128, 150, 255, 0.42),
+    0 0 34px rgba(63, 217, 78, 0.32);
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .n7d--fin .n7d-finale { animation: none !important; }
+  .n7d--fin .n7d-finale, .n7d--fin .n7d-finale::before { animation: none !important; }
 }
 
 .n7d-scroll {
