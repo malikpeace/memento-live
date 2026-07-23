@@ -7991,9 +7991,7 @@ function _renderNext7Days() {
           <h1 class="n7d-h1" id="n7dTitle" data-n7d-type="${esc(greet)}"></h1>
           <p class="n7d-sub" id="n7dSub">The first week is typically the hardest. We'll run through every step so you know what's coming, to make sure above all else: <b>you keep going.</b></p>
         </div>
-        <div class="n7d-path">${daysHtml}<div class="n7d-beyond" aria-hidden="true"><span class="n7d-bdot n7d-bdot--1"></span><span class="n7d-bdot n7d-bdot--2"></span><span class="n7d-bdot n7d-bdot--3"></span><span class="n7d-bdot n7d-bdot--4"></span></div></div>
-        <div class="n7d-summitstop"><p class="n7d-close" id="n7dClose">This week is the hardest it ever gets. <b>After it, momentum does the lifting.</b></p>
-        <div class="n7d-endcta"><button type="button" class="n7d-cta" id="n7dCta">Start Day 1</button></div></div>
+        <div class="n7d-path">${daysHtml}<div class="n7d-day n7d-day--win n7d-day--final" data-n7day="final" style="--dc:63, 217, 78"><div class="n7d-node"></div><div class="n7d-title">Start Now.</div><div class="n7d-desc"><p>The journey of 1000 miles begins with a single step. You just took the first step, now you just need to keep going.</p><p>Are you ready?</p></div><div class="n7d-endcta"><button type="button" class="n7d-cta" id="n7dCta">I&rsquo;m ready</button></div></div></div>
       </div>
     </div>
   </div>`;
