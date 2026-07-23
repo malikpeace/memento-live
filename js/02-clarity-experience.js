@@ -7975,8 +7975,12 @@ function _renderNext7Days() {
   // becomes separate <p>s. esc() first, so the copy is still fully escaped and
   // only the paragraph split adds markup.
   const descHtml = (d) => String(d).split(/\n\s*\n/).map(p => `<p>${esc(p.trim())}</p>`).join('');
+  // v953: content lives in .n7d-dc, and THAT is the snap + camera target (not the
+  // whole .n7d-day, whose huge bottom padding pushed the content ~half a padding
+  // above centre). The node/line stay on .n7d-day so they still sit beside the
+  // title and the trail still spans the gap.
   const daysHtml = DAYS.map((o, i) =>
-    `<div class="n7d-day ${o.cls || ''}" data-n7day="${i + 1}" style="--dc:${dayColor(i)}"><div class="n7d-node"></div><div class="n7d-dlab">Day ${i + 1}${i === 2 ? ' · The Dip' : ''}</div><div class="n7d-title">${esc(o.t)}</div><div class="n7d-desc">${descHtml(o.d)}</div></div>`
+    `<div class="n7d-day ${o.cls || ''}" data-n7day="${i + 1}" style="--dc:${dayColor(i)}"><div class="n7d-node"></div><div class="n7d-dc"><div class="n7d-dlab">Day ${i + 1}${i === 2 ? ' · The Dip' : ''}</div><div class="n7d-title">${esc(o.t)}</div><div class="n7d-desc">${descHtml(o.d)}</div></div></div>`
   ).join('');
   return `<div class="n7d" id="n7dRoot" role="dialog" aria-label="Your first 7 days">
     <div class="n7d-dust" aria-hidden="true"></div>
@@ -7991,7 +7995,7 @@ function _renderNext7Days() {
           <h1 class="n7d-h1" id="n7dTitle" data-n7d-type="${esc(greet)}"></h1>
           <p class="n7d-sub" id="n7dSub">The first week is typically the hardest. We'll run through every step so you know what's coming, to make sure above all else: <b>you keep going.</b></p>
         </div>
-        <div class="n7d-path">${daysHtml}<div class="n7d-day n7d-day--win n7d-day--final" data-n7day="final" style="--dc:63, 217, 78"><div class="n7d-node"></div><div class="n7d-title">Start Now.</div><div class="n7d-desc"><p><em class="n7d-quote">The journey of 1000 miles begins with a single step. - Lao Tzu</em></p><p>You just took the first step; now you just need to keep going.</p><p>Are you ready?</p></div><div class="n7d-endcta"><button type="button" class="n7d-cta" id="n7dCta">I&rsquo;m ready</button></div></div><div class="n7d-tail" aria-hidden="true"></div></div>
+        <div class="n7d-path">${daysHtml}<div class="n7d-day n7d-day--win n7d-day--final" data-n7day="final" style="--dc:63, 217, 78"><div class="n7d-node"></div><div class="n7d-dc"><div class="n7d-title">Start Now.</div><div class="n7d-desc"><p><em class="n7d-quote">The journey of 1000 miles begins with a single step. - Lao Tzu</em></p><p>You just took the first step; now you just need to keep going.</p><p>Are you ready?</p></div><div class="n7d-endcta"><button type="button" class="n7d-cta" id="n7dCta">I&rsquo;m ready</button></div></div><div class="n7d-tail" aria-hidden="true"></div></div></div>
       </div>
     </div>
   </div>`;
@@ -8106,8 +8110,13 @@ function showNext7Days(onProceed) {
     // Absolute position within the scroll DOCUMENT (offsetTop alone resolves
     // against .n7d-path, which skewed every centering computation, v783).
     const absTop = (el) => el.getBoundingClientRect().top - scroll.getBoundingClientRect().top + scroll.scrollTop;
+    // v953: center the CONTENT wrapper, not the padded day box, so the camera
+    // rests with the text in the middle (matching the manual snap). Falls back
+    // to the element itself for the hero, which has no wrapper.
+    const dcOf = (el) => (el && el.querySelector) ? (el.querySelector('.n7d-dc') || el) : el;
     const centerOf = (el) => {
-      const target = absTop(el) - (scroll.clientHeight / 2) + (el.offsetHeight / 2);
+      const c = dcOf(el);
+      const target = absTop(c) - (scroll.clientHeight / 2) + (c.offsetHeight / 2);
       return Math.max(0, Math.min(target, scroll.scrollHeight - scroll.clientHeight));
     };
     const tweenTo = (to, ms) => {

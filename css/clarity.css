@@ -4302,7 +4302,11 @@ html.theme-light .n7d-cta {
   scroll-snap-type: y mandatory;
 }
 .n7d--auto .n7d-scroll { scroll-snap-type: none; }
-.n7d-day { scroll-snap-align: center; }
+/* v953: snap the CONTENT wrapper, not the padded day box. The box carries ~320px
+   of bottom padding for spacing, so centring the box left the text sitting half
+   a padding above centre (Malik: 'some days are WAY too high'). .n7d-dc is
+   content-sized, so centring it centres the actual text. */
+.n7d-dc { scroll-snap-align: center; }
 .n7d-hero { scroll-snap-align: center; }
 /* Beyond the summit (v784, Malik: show it does not stop after one week): the
    path continues upward past day 7, fading into the distance, with three
