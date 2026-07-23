@@ -8076,23 +8076,26 @@ function showNext7Days(onProceed) {
     };
     // Manual scrolling re-focuses whichever ignited day is nearest the center
     // (so scrolling back down the mountain refocuses + recolors correctly).
+    // v955: track the focus on the next frame (was a 120ms setTimeout, which lagged
+    // the colour/blur behind the finger and read as clunky). rAF keeps it glued.
     let focusTick = false;
+    const refocus = () => {
+      focusTick = false;
+      const mid = scroll.scrollTop + scroll.clientHeight / 2;
+      let best = null, bd = Infinity;
+      for (const d of days) {
+        if (!d.classList.contains('is-in')) continue;
+        const c = absTop(dcOf(d)) + dcOf(d).offsetHeight / 2;
+        const dist = Math.abs(c - mid);
+        if (dist < bd) { bd = dist; best = d; }
+      }
+      // v783: nearest ignited day WINS outright (the old radius gate stranded
+      // focus on the wrong day near the summit, day 7 was unreachable).
+      if (best) setCurrent(best);
+    };
     scroll.addEventListener('scroll', () => {
       if (focusTick) return; focusTick = true;
-      setTimeout(() => {
-        focusTick = false;
-        const mid = scroll.scrollTop + scroll.clientHeight / 2;
-        let best = null, bd = Infinity;
-        for (const d of days) {
-          if (!d.classList.contains('is-in')) continue;
-          const c = absTop(d) + d.offsetHeight / 2;
-          const dist = Math.abs(c - mid);
-          if (dist < bd) { bd = dist; best = d; }
-        }
-        // v783: nearest ignited day WINS outright (the old radius gate stranded
-        // focus on the wrong day near the summit, day 7 was unreachable).
-        if (best) setCurrent(best);
-      }, 120);
+      requestAnimationFrame(refocus);
     }, { passive: true });
     if ('IntersectionObserver' in window) {
       const io = new IntersectionObserver((es) => {
@@ -8119,13 +8122,15 @@ function showNext7Days(onProceed) {
       const target = absTop(c) - (scroll.clientHeight / 2) + (c.offsetHeight / 2);
       return Math.max(0, Math.min(target, scroll.scrollHeight - scroll.clientHeight));
     };
-    const tweenTo = (to, ms) => {
+    const easeInOutCubic = (x) => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; // gentle leave + land (cinematic camera)
+    const easeOutCubic = (x) => 1 - Math.pow(1 - x, 3); // moves at once, glides into place (snap / tap)
+    const tweenTo = (to, ms, ease) => {
       cancelAnimationFrame(tweenRaf);
       const from = scroll.scrollTop, d = to - from, t0 = performance.now();
-      const ease = (x) => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; // easeInOutCubic: gentle leave, gentle land
+      const fn = ease || easeInOutCubic;
       const step = (now) => {
         const p = Math.min(1, (now - t0) / ms);
-        scroll.scrollTop = from + d * ease(p);
+        scroll.scrollTop = from + d * fn(p);
         if (p < 1) tweenRaf = requestAnimationFrame(step);
       };
       tweenRaf = requestAnimationFrame(step);
@@ -8172,18 +8177,68 @@ function showNext7Days(onProceed) {
     // Manual takeover: real gestures only (never the programmatic tween).
     ['touchstart', 'wheel', 'keydown'].forEach(ev =>
       scroll.addEventListener(ev, stopAuto, { passive: true }));
-    // Tap = one day up (works in both modes; the CTA handles itself).
+
+    // v955 (Malik): the swipe should snap the INSTANT the finger lifts, with the
+    // snap itself still gliding. iOS's CSS mandatory snap waits for all momentum
+    // to bleed off before it even begins, which reads as a lag. So on touch we
+    // turn CSS snap OFF (.n7d--touch) and snap ourselves on touchend: project the
+    // flick a little, pick the nearest stop, and tween to it with an ease-out so
+    // it leaves at once and settles. Writing scrollTop also kills iOS momentum,
+    // so there's no drift-then-snap. Desktop keeps CSS snap (right with a wheel).
+    const snapEls = [root.querySelector('.n7d-hero'), ...days].filter(Boolean);
+    const nearestTo = (pos) => {
+      const mid = pos + scroll.clientHeight / 2;
+      let best = null, bd = Infinity;
+      for (const el of snapEls) {
+        const c = absTop(dcOf(el)) + dcOf(el).offsetHeight / 2;
+        const dist = Math.abs(c - mid);
+        if (dist < bd) { bd = dist; best = el; }
+      }
+      return best;
+    };
+    let tY = 0, tT = 0, vY = 0, tMoved = 0, swiped = false, swipeGuard = 0;
+    scroll.addEventListener('touchstart', (e) => {
+      root.classList.add('n7d--touch');   // CSS snap sleeps; JS owns the snap
+      const t = e.touches[0]; tY = t.clientY; tT = performance.now(); vY = 0; tMoved = 0;
+    }, { passive: true });
+    scroll.addEventListener('touchmove', (e) => {
+      const t = e.touches[0], now = performance.now(), dt = now - tT;
+      if (dt > 0) vY = (tY - t.clientY) / dt;   // px/ms, + = content scrolling up
+      tMoved += Math.abs(t.clientY - tY);
+      tY = t.clientY; tT = now;
+    }, { passive: true });
+    scroll.addEventListener('touchend', () => {
+      if (tMoved < 10) return;                   // a tap, not a swipe: let click run
+      swiped = true;
+      clearTimeout(swipeGuard);
+      swipeGuard = setTimeout(() => { swiped = false; }, 360);
+      const projected = scroll.scrollTop + vY * 200;   // honour the flick a touch
+      const el = nearestTo(projected);
+      if (el) {
+        const idx = days.indexOf(el);
+        if (idx >= 0) { dayIdx = idx; ignite(el); }
+        tweenTo(centerOf(el), 400, easeOutCubic);       // begins on release, glides in
+      }
+    }, { passive: true });
+
+    // Tap = one day up. A swipe already snapped itself, so ignore its trailing click.
     scroll.addEventListener('click', (e) => {
       if (e.target && e.target.closest && e.target.closest('#n7dCta')) return;
+      if (swiped) return;
       clearTimeout(seqTimer); seqTimer = 0;
-      if (!autoOn) { root.classList.add('n7d--auto'); setTimeout(() => { if (!autoOn) root.classList.remove('n7d--auto'); }, 950); }
+      const touch = root.classList.contains('n7d--touch');
+      // Desktop CSS snap fights the tween; briefly mute it. Touch has snap off already.
+      if (!autoOn && !touch) { root.classList.add('n7d--auto'); setTimeout(() => { if (!autoOn) root.classList.remove('n7d--auto'); }, 620); }
       // past day 7 the next stop is the FINALE; a tap there never yanks the
       // camera back up (v788).
       if (dayIdx >= days.length - 1) {
         const max = scroll.scrollHeight - scroll.clientHeight;
-        if (scroll.scrollTop < max - 8) tweenTo(max, 900);
+        if (scroll.scrollTop < max - 8) tweenTo(max, 560, easeOutCubic);
       } else {
-        goTo(dayIdx + 1, 900);
+        const nx = Math.min(days.length - 1, dayIdx + 1);
+        dayIdx = nx;
+        ignite(days[nx]);                        // text instantly sharp on tap
+        tweenTo(centerOf(days[nx]), 520, easeOutCubic);
       }
       if (autoOn) seqTimer = setTimeout(seq, 3400);
     });

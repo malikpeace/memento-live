@@ -4302,6 +4302,9 @@ html.theme-light .n7d-cta {
   scroll-snap-type: y mandatory;
 }
 .n7d--auto .n7d-scroll { scroll-snap-type: none; }
+/* v955: on touch the JS snaps on finger-release (immediate, no iOS momentum
+   lag), so native CSS snap must step aside or the two fight. Desktop keeps it. */
+.n7d--touch .n7d-scroll { scroll-snap-type: none; }
 /* v953: snap the CONTENT wrapper, not the padded day box. The box carries ~320px
    of bottom padding for spacing, so centring the box left the text sitting half
    a padding above centre (Malik: 'some days are WAY too high'). .n7d-dc is
