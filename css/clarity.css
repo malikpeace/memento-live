@@ -4289,12 +4289,20 @@ html.theme-light .n7d-cta {
 .n7d-scroll {
   position: absolute; inset: 0; z-index: 1; overflow-y: auto; overflow-x: hidden;
   -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
-  /* v781 (Malik): finger scrolling snaps each day to center. Disabled while
-     the auto camera drives (n7d--auto) so the tween and the snap never fight. */
-  scroll-snap-type: y mandatory;
+  /* v781: finger scrolling snaps each day to center. Disabled while the auto
+     camera drives (n7d--auto) so the tween and the snap never fight.
+     v949 (Malik: "on desktop I can't even scroll down to the final section"):
+     PROXIMITY, not mandatory. Mandatory + snap-align:center makes the terminal
+     'Start Now.' stop UNREACHABLE, since it can never reach viewport center
+     (nothing below it to scroll into), so the browser snapped the wheel back to
+     Day 7 every time. Proximity keeps the gentle centering near each stop but
+     lets the scroll actually reach the bottom. The final also aligns to END so
+     it lands cleanly against the bottom instead of fighting to center. */
+  scroll-snap-type: y proximity;
 }
 .n7d--auto .n7d-scroll { scroll-snap-type: none; }
 .n7d-day { scroll-snap-align: center; }
+.n7d-day--final { scroll-snap-align: end; }
 .n7d-hero { scroll-snap-align: center; }
 /* Beyond the summit (v784, Malik: show it does not stop after one week): the
    path continues upward past day 7, fading into the distance, with three
