@@ -560,15 +560,26 @@ html.theme-light .daycard-theme-living .daycard-living-stage {
 .daycard-theme-living .daycard-ns__body,
 .daycard-theme-living .daycard-ns__foot { position: relative; z-index: 7; }
 
-/* v941: the mark takes NO transform of its own. It is a child of .daycard-ns,
-   so it already tilts with the card's rotateX/rotateY, which is exactly what it
-   should do: tilt, not travel.
-   v939 tried to add parallax here because the mark sits on the rotation axis
-   and therefore barely moves. That was the wrong read of the problem: a
-   translate makes the mark SLIDE independently of the glass, which looks like
-   it is chasing the cursor (Malik: "it's supposed to TILT not move"). If the
-   tilt ever needs to read more strongly on the mark, the answer is a rotation
-   that amplifies the card's own, never a translation. */
+/* v942: the mark LEANS with the card, visibly.
+   It inherits the card's rotateX/rotateY already, but it sits on the rotation
+   AXIS, where a rotation moves almost nothing (measured: 1.72px of card travel
+   against 0.27px of emblem), so the inherited tilt alone is imperceptible.
+   This adds its OWN rotation on the SAME axes, driven by the same
+   --dc-rx/--dc-ry, which deepens the lean without displacing the mark: a
+   rotation about an element's own centre cannot translate it. That is the
+   whole difference from v939, which used a translate and made the mark slide
+   around like it was chasing the cursor (Malik: "supposed to TILT not move").
+   The tighter perspective than the card's 900px gives the small mark enough
+   foreshortening to actually read at these angles. */
+.daycard-theme-living .daycard-ns__body {
+  transform:
+    perspective(520px)
+    rotateX(calc(var(--dc-rx, 0deg) * 2.4))
+    rotateY(calc(var(--dc-ry, 0deg) * 2.4));
+  transform-origin: 50% 50%;
+  transition: transform 0.18s ease-out;
+  will-change: transform;
+}
 
 /* GATE: the reward is internal colour, so it obeys the same pre-star rule as
    the liquid and the burn. Deliberately NOT exempted for the clarity cinema's
