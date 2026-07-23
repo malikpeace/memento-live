@@ -1797,6 +1797,7 @@ const CreatorTools = {
     // (v774: Unlock/Lock All, Open Neutron Star, Skip to Action Plan and the
     // Restore/Restart rows are gone from the bar; their methods remain for
     // console use until the pre-ship dead-code sweep.)
+    bind('creatorFreshStart', () => this.freshStart());
     bind('creatorJumpSplash', () => this.jumpSplash());
     bind('creatorJumpOnboarding', () => this.jumpOnboarding());
     bind('creatorJumpStyle', () => this.jumpStyle());
@@ -2003,6 +2004,26 @@ const CreatorTools = {
   // so closing it leaves the real state exactly as it was.
   _closeCheat() { try { document.getElementById('creatorBox')?.classList.remove('creator-box--open'); } catch (e) {} },
 
+  // v938 (Malik: "I want to see what it would ACTUALLY be like for a real
+  // user"). Every jump below is a teleport: it fabricates a state and opens a
+  // real screen, so the SURFACE is real but the history behind it is invented.
+  // That is why a jump can show behaviour a real user could never hit (the
+  // Action evolution playing over a state with no discovered plan). This is the
+  // opposite: a true clean slate, then the actual journey from the splash.
+  // Same wipe the Settings > Reset everything path uses, minus the exit survey:
+  // IS_RESETTING blocks the pagehide flush from re-persisting the in-memory
+  // state after the wipe, and landing on pathname (not a plain reload) drops
+  // ?demo=... so a persona cannot silently re-seed and undo the reset.
+  freshStart() {
+    if (!confirm('Start as a new user?\n\nThis wipes everything on this device and begins the real journey from the splash. Cannot be undone.')) return;
+    try { this._closeAll(); } catch (e) {}
+    try { if (typeof IS_RESETTING !== 'undefined') IS_RESETTING = true; } catch (e) {}
+    try { localStorage.clear(); } catch (_) {
+      try { localStorage.removeItem(APP_KEY); } catch (_) {}
+    }
+    try { sessionStorage.clear(); } catch (e) {}
+    location.href = location.pathname;
+  },
   jumpSplash() {
     this._closeCheat();
     // Splash has no open(); init() re-shows it (clears the 'dismissed' class and
@@ -2235,6 +2256,28 @@ const CreatorTools = {
           // back to cyan. It also puts the real move in the Today box.
           setStar(now); setPlan(); paid(); state.meta.cardEvolutionSeen = false;
           break;
+        case 'consistent': {          // v938: star + plan + paid + REAL logged history.
+          // Evolution 3's precondition. Consistency is computed from logged
+          // days, so seeding 'unlock' (no history) gave the green cinema
+          // nothing to settle onto and it drained exactly like the platinum
+          // did. Five of the last seven days is enough to read as green.
+          setStar(now); setPlan(); paid(); state.meta.cardEvolutionSeen = false;
+          const iso = (d) => new Date(Date.now() - d * 864e5).toISOString();
+          const day = (d) => iso(d).slice(0, 10);
+          const pa2 = state.action.primaryAction || {};
+          const hist = [];
+          const streakDays = [];
+          for (let d = 0; d < 7; d++) {
+            if (d === 2 || d === 5) continue;          // two honest misses
+            const rec = createActionCompletionRecord(pa2, 'moderate', pa2.title || 'Today’s action');
+            rec.date = iso(d);
+            hist.push(rec);
+            streakDays.push(day(d));
+          }
+          state.action.completionHistory = hist;
+          state.streak = { history: streakDays, count: 2, bestEver: 3, bestEverShown: 3 };
+          break;
+        }
         case 'day1': {                // paid, plan generated, the FIRST action just completed today
           setStar(now); setPlan(); paid(); state.meta.cardEvolutionSeen = true;
           delete state.meta.firstActionDone;   // let the first-win moment re-fire
@@ -2327,7 +2370,9 @@ const CreatorTools = {
     // precondition is a DISCOVERED plan (planGenerated + primaryAction), which
     // is what lights Action since v936; without it the reward correctly drains
     // the moment the wash fades, which is the bug Malik filmed.
-    this._seedStep(stage === 'action' ? 'discovered' : 'unlock');
+    this._seedStep(stage === 'action' ? 'discovered'
+                 : stage === 'consistency' ? 'consistent'
+                 : 'unlock');
     // The cinema is ~10.5s end to end (grow -> surge -> orb -> settle -> beams).
     // Clear a little past that; _evoFinish does not know about the colour class.
     clearTimeout(this._evoColourTimer);
