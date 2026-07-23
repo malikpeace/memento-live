@@ -8134,6 +8134,21 @@ function showNext7Days(onProceed) {
       cancelAnimationFrame(tweenRaf); tweenRaf = 0;
       root.classList.remove('n7d--auto');   // hand the wheel to the finger: snap wakes up
     };
+    // v947 (Malik: "there's a lot more text now and people CAN NOT read that
+    // fast"). The dwell used to be a flat 3600ms (4800 for the dip), tuned when
+    // every day was a one-liner. The days now run 30-95 words, so the camera
+    // was pulling away mid-sentence. Dwell now scales with the day's own word
+    // count (~200 wpm, so ~300ms/word), so it self-adjusts if the copy changes
+    // again. Floors keep short days from feeling rushed, the cap keeps the
+    // longest from feeling frozen, and the camera-travel time is added on top
+    // so the reading window starts only once the day has landed centered. A
+    // real touch/scroll still hands the wheel to the finger (stopAuto).
+    const dwellFor = (dayEl) => {
+      const words = ((dayEl && dayEl.textContent) || '').trim().split(/\s+/).filter(Boolean).length;
+      const dip = dayEl && dayEl.classList.contains('n7d-day--dip');
+      const read = Math.max(dip ? 5200 : 3400, Math.min(words * 300, 12000));
+      return 1350 + read;   // + the tween travel, so reading time starts on landing
+    };
     const seq = () => {
       if (!autoOn) return;
       if (dayIdx >= days.length - 1) {
@@ -8142,8 +8157,7 @@ function showNext7Days(onProceed) {
         return;
       }
       goTo(dayIdx + 1, 1350);
-      const dwellDip = days[dayIdx] && days[dayIdx].classList.contains('n7d-day--dip');
-      seqTimer = setTimeout(seq, dwellDip ? 4800 : 3600);
+      seqTimer = setTimeout(seq, dwellFor(days[dayIdx]));
     };
     // Manual takeover: real gestures only (never the programmatic tween).
     ['touchstart', 'wheel', 'keydown'].forEach(ev =>
