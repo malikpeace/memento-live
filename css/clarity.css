@@ -4272,130 +4272,42 @@ html.theme-light .n7d-cta {
 .n7d-dust--tw { animation: n7dTwinkle 6.5s ease-in-out infinite alternate; }
 @keyframes n7dTwinkle { from { opacity: 0.3; } to { opacity: 0.75; } }
 .n7d-breath {
-  position: absolute; inset: -8%; z-index: 0; pointer-events: none; opacity: 0;
-  /* v782: stronger, and two layers crossfade so the color FADES between days
-     instead of snapping. Radial, fades before its bounds (glow law). */
-  background: radial-gradient(64% 48% at 50% 46%,
-    rgba(var(--n7bc, var(--n7-cyan)), calc(0.16 * var(--n7ba, 1))) 0%,
-    rgba(var(--n7bc, var(--n7-cyan)), calc(0.09 * var(--n7ba, 1))) 40%,
-    rgba(var(--n7bc, var(--n7-cyan)), calc(0.035 * var(--n7ba, 1))) 60%,
-    rgba(var(--n7bc, var(--n7-cyan)), 0) 78%);
+  position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: 0;
+  /* v957 (Malik picked "grounded wash"): the day hue pools softly at the FLOOR
+     where the trail descends, instead of a centred blob. Two layers still
+     crossfade (setBreath) so the colour fades smoothly between days. */
+  background: linear-gradient(180deg,
+    transparent 26%,
+    rgba(var(--n7bc, var(--n7-cyan)), calc(0.055 * var(--n7ba, 1))) 64%,
+    rgba(var(--n7bc, var(--n7-cyan)), calc(0.16 * var(--n7ba, 1))) 100%);
   transition: opacity 1.8s ease;
 }
 .n7d--climb .n7d-breath.on { opacity: 1; }
-.n7d--climb .n7d-breath { animation: n7dBreath 7s ease-in-out infinite alternate; }
-@keyframes n7dBreath { from { transform: scale(1); } to { transform: scale(1.07); } }
 
 /* ============================================================================
-   v956 — 7-day BACKGROUND OPTIONS lab (dev, ?n7bg=). The .n7d-atmo layer is
-   inert until an .n7bgN class lands on the root; each option is a self-contained
-   dark-first, edge-safe atmosphere that still tints with the current day hue
-   (--n7bc, set on root by setBreath). Options 1-8 suppress the default breath so
-   they read cleanly. Light theme hides the lab layer (tuned per-pick later). */
-.n7d-atmo { position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: 0; }
-.n7d-atmo i { display: none; }
-.n7d[class*="n7bg"] .n7d-breath { opacity: 0 !important; }
-html.theme-light .n7d-atmo { display: none; }
-
-/* 1 — Aurora ribbon: a soft diagonal band low in the frame, slowly drifting. */
-.n7d.n7bg1 .n7d-atmo { opacity: 1; }
-.n7d.n7bg1 .n7d-atmo::before {
-  content: ''; position: absolute; left: -30%; right: -30%; bottom: 6%; height: 54%;
+   v957 — the FINALE bloom (Malik). Day 7's lone green summit opens into the full
+   Memento spectrum as the climb becomes "Start Now.": cyan (Clarity), periwinkle
+   (the accent), green (Consistency) and a soft platinum-white core, all radial +
+   edge-safe. Revealed when the final stop becomes current (.n7d--fin), fading up
+   over ~1.8s so the single green blooms into the whole palette. */
+.n7d-finale {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: 0;
+  transition: opacity 1.8s ease;
   background:
-    radial-gradient(58% 60% at 32% 50%, rgba(var(--n7bc, var(--n7-cyan)), 0.24), transparent 70%),
-    radial-gradient(52% 52% at 72% 54%, rgba(var(--n7bc, var(--n7-cyan)), 0.15), transparent 72%);
-  filter: blur(34px); will-change: transform;
-  animation: n7bgAurora 15s ease-in-out infinite alternate;
+    radial-gradient(56% 56% at 16% 38%, rgba(58, 217, 245, 0.26), transparent 70%),   /* cyan, left */
+    radial-gradient(54% 56% at 84% 44%, rgba(128, 150, 255, 0.24), transparent 70%),  /* periwinkle, right */
+    radial-gradient(66% 52% at 50% 94%, rgba(63, 217, 78, 0.20), transparent 72%),    /* green, floor (the summit continued) */
+    radial-gradient(46% 38% at 50% 56%, rgba(255, 255, 255, 0.13), transparent 66%);  /* platinum core */
 }
-@keyframes n7bgAurora { from { transform: rotate(-10deg) translateX(-5%); } to { transform: rotate(-3deg) translateX(6%); } }
-
-/* 2 — Grounded wash: the day hue pools at the FLOOR where the trail descends. */
-.n7d.n7bg2 .n7d-atmo { opacity: 1;
-  background: linear-gradient(180deg,
-    transparent 28%,
-    rgba(var(--n7bc, var(--n7-cyan)), 0.05) 66%,
-    rgba(var(--n7bc, var(--n7-cyan)), 0.15) 100%);
-}
-
-/* 3 — Film grain + vignette: cinematic, tactile, almost no colour. The grain is
-   a WHISPER (low opacity, soft-light) so it textures the black, never greys it. */
-.n7d.n7bg3 .n7d-atmo { opacity: 1;
-  background:
-    radial-gradient(60% 44% at 50% 46%, rgba(var(--n7bc, var(--n7-cyan)), 0.06), transparent 66%),
-    radial-gradient(126% 96% at 50% 44%, transparent 58%, rgba(0,0,0,0.5) 100%);
-}
-.n7d.n7bg3 .n7d-atmo::after {
-  content: ''; position: absolute; inset: -60%; opacity: 0.09; mix-blend-mode: soft-light;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
-  animation: n7bgGrain 0.7s steps(3) infinite;
-}
-@keyframes n7bgGrain { 0%{transform:translate(0,0);} 33%{transform:translate(-2%,1.5%);} 66%{transform:translate(1.5%,-1.5%);} 100%{transform:translate(0,0);} }
-
-/* 4 — Twin corner glows: asymmetric depth, day hue top-left, cool fill low-right. */
-.n7d.n7bg4 .n7d-atmo { opacity: 1;
-  background:
-    radial-gradient(46% 40% at 12% 8%, rgba(var(--n7bc, var(--n7-cyan)), 0.22), transparent 70%),
-    radial-gradient(50% 46% at 88% 96%, rgba(255,255,255,0.055), transparent 72%);
-}
-
-/* 5 — Drifting mesh: three blurred day-hue orbs slowly orbiting (living gradient). */
-.n7d.n7bg5 .n7d-atmo { opacity: 1; }
-.n7d.n7bg5 .n7d-atmo i { display: block; position: absolute; border-radius: 50%; filter: blur(64px); will-change: transform; }
-.n7d.n7bg5 .n7d-atmo i:nth-child(1) { width: 62%; height: 42%; left: 4%; top: 16%;
-  background: radial-gradient(closest-side, rgba(var(--n7bc, var(--n7-cyan)), 0.22), transparent);
-  animation: n7bgMeshA 19s ease-in-out infinite alternate; }
-.n7d.n7bg5 .n7d-atmo i:nth-child(2) { width: 56%; height: 40%; right: -4%; top: 44%;
-  background: radial-gradient(closest-side, rgba(var(--n7bc, var(--n7-cyan)), 0.15), transparent);
-  animation: n7bgMeshB 23s ease-in-out infinite alternate; }
-.n7d.n7bg5 .n7d-atmo i:nth-child(3) { width: 52%; height: 38%; left: 18%; bottom: 4%;
-  background: radial-gradient(closest-side, rgba(255,255,255,0.045), transparent);
-  animation: n7bgMeshA 27s ease-in-out infinite alternate-reverse; }
-@keyframes n7bgMeshA { from { transform: translate(0,0); } to { transform: translate(8%,-6%); } }
-@keyframes n7bgMeshB { from { transform: translate(0,0); } to { transform: translate(-7%,5%); } }
-
-/* 6 — Deep starfield: the dust runs richer and drifts, over a faint floor tint. */
-.n7d.n7bg6 .n7d-atmo { opacity: 1;
-  background: radial-gradient(90% 70% at 50% 100%, rgba(var(--n7bc, var(--n7-cyan)), 0.10), transparent 68%);
-}
-.n7d.n7bg6 .n7d-dust { opacity: 0.9; animation: n7bgDrift 40s linear infinite; }
-@keyframes n7bgDrift { from { transform: translateY(0); } to { transform: translateY(-3%); } }
-
-/* 7 — Topographic contours: faint map rings rising to a peak below (the climb). */
-.n7d.n7bg7 .n7d-atmo { opacity: 1;
-  background:
-    radial-gradient(80% 60% at 50% 120%, rgba(var(--n7bc, var(--n7-cyan)), 0.08), transparent 60%),
-    repeating-radial-gradient(circle at 50% 122%, transparent 0 37px, rgba(255,255,255,0.03) 37px 39px);
-  -webkit-mask: radial-gradient(122% 104% at 50% 62%, #000 38%, transparent 92%);
-          mask: radial-gradient(122% 104% at 50% 62%, #000 38%, transparent 92%);
-}
-
-/* 8 — Reading spotlight: the centre reads bright, the edges fall to black. */
-.n7d.n7bg8 .n7d-atmo { opacity: 1;
-  background:
-    radial-gradient(46% 34% at 50% 50%, rgba(var(--n7bc, var(--n7-cyan)), 0.13), transparent 62%),
-    radial-gradient(120% 100% at 50% 50%, transparent 38%, rgba(0,0,0,0.52) 100%);
-}
-
-/* The dev switcher chip bar (only rendered when ?n7bg is present). */
-.n7bg-bar {
-  position: fixed; left: 50%; transform: translateX(-50%);
-  top: calc(var(--safe-t, 0px) + 10px); z-index: 9600;
-  display: flex; gap: 6px; align-items: center; padding: 7px 9px;
-  background: rgba(10,12,15,0.72); backdrop-filter: blur(20px) saturate(1.3);
-  border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06);
-  max-width: 94vw; flex-wrap: wrap; justify-content: center;
-}
-.n7bg-bar button {
-  min-width: 26px; height: 26px; padding: 0 6px; border: 0; cursor: pointer;
-  border-radius: 7px; background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7);
-  font: 600 12px/1 var(--font, system-ui); font-variant-numeric: tabular-nums;
-}
-.n7bg-bar button.on { background: rgba(255,255,255,0.92); color: #0b0d10; }
-.n7bg-bar .n7bg-name { color: rgba(255,255,255,0.9); font: 600 12px/1 var(--font, system-ui); padding: 0 6px 0 2px; letter-spacing: 0.01em; }
+.n7d--fin .n7d-finale { opacity: 1; animation: n7dFinBreathe 9s ease-in-out infinite alternate; }
+@keyframes n7dFinBreathe { from { transform: scale(1); } to { transform: scale(1.045); } }
+/* the multi-hue bloom leads: the single green summit + floor wash step back so the
+   cyan and periwinkle read, instead of the floor stacking three greens. */
+.n7d--fin .n7d-summit { opacity: 0.28; }
+.n7d--fin .n7d-breath.on { opacity: 0.28; }
 
 @media (prefers-reduced-motion: reduce) {
-  .n7d-atmo::before, .n7d-atmo i, .n7d.n7bg6 .n7d-dust { animation: none !important; }
-  .n7d.n7bg3 .n7d-atmo::after { animation: none !important; }
+  .n7d--fin .n7d-finale { animation: none !important; }
 }
 
 .n7d-scroll {
