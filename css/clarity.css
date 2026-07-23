@@ -4315,14 +4315,24 @@ html.theme-light .n7d-cta {
 .n7d--fin .n7d-summit { opacity: 0.2; }
 .n7d--fin .n7d-breath.on { opacity: 0.22; }
 
-/* the final node is a small Memento-spectrum bead, not a lone green dot. Scoped
-   under .n7d--fin so it out-specifies the base + win node rules that follow it. */
+/* the final node is a soft, glowing Memento-spectrum orb, bigger than the day
+   dots so it stands out. Scoped under .n7d--fin so it out-specifies the base +
+   win node rules that follow it. A blurred colour twin sits behind a crisp,
+   white-cored bead, with a wide multi-hue bloom. */
 .n7d--fin .n7d-day--final.is-in .n7d-node {
+  transform: scale(1.7);
+  background:
+    radial-gradient(circle at 50% 44%, rgba(255,255,255,0.92), rgba(255,255,255,0) 54%),
+    conic-gradient(from 150deg, #3ad9f5, #8096ff, #ffffff, #3fd94e, #3ad9f5);
+  box-shadow:
+    0 0 13px 3px rgba(58, 217, 245, 0.55),
+    0 0 30px 7px rgba(128, 150, 255, 0.42),
+    0 0 52px 13px rgba(63, 217, 78, 0.26);
+}
+.n7d--fin .n7d-day--final.is-in .n7d-node::after {
+  content: ''; position: absolute; inset: -55%; border-radius: 50%; z-index: -1;
   background: conic-gradient(from 150deg, #3ad9f5, #8096ff, #ffffff, #3fd94e, #3ad9f5);
-  box-shadow: 0 0 0 5px #050808,
-    0 0 16px rgba(58, 217, 245, 0.6),
-    0 0 26px rgba(128, 150, 255, 0.42),
-    0 0 34px rgba(63, 217, 78, 0.32);
+  filter: blur(7px); opacity: 0.6;
 }
 
 @media (prefers-reduced-motion: reduce) {
