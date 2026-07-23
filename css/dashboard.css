@@ -4144,6 +4144,28 @@ body.card-square { --card-w: 360px; --card-h: 360px; }
     width: 100%; height: auto; aspect-ratio: 1 / 1; border-radius: 3px;
   }
 }
+/* v940 (Malik): on desktop the mission was bare text floating on the room, so
+   it read as part of the background rather than as today's one thing. It is a
+   real panel now, which gives it separation from the beams behind it. Glass by
+   the house recipe: translucent fill + blur + a 1px inset highlight, NO border
+   (his standing rule), 16px radius per the cards/sheets tier. */
+#deskMission {
+  padding: 28px 30px 30px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.045);
+  -webkit-backdrop-filter: blur(calc(28px * var(--bx, 1))) saturate(1.35);
+  backdrop-filter: blur(calc(28px * var(--bx, 1))) saturate(1.35);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 20px 54px rgba(0, 0, 0, 0.34);
+}
+html.theme-light #deskMission {
+  background: rgba(255, 255, 255, 0.62);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 18px 46px rgba(64, 92, 134, 0.14);
+}
+
 /* the mission-as-headline (dkm) pieces, tokens only, no borders */
 .dkm__label { font-size: 13px; font-weight: 600; color: var(--text-mid, var(--text-2)); margin-bottom: 14px; }
 .dkm__headline {
@@ -4166,6 +4188,20 @@ body.card-square { --card-w: 360px; --card-h: 360px; }
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24), 0 0 22px rgba(var(--success-rgb),0.14);
   cursor: default; user-select: none;
 }
+/* v940: the streak reads as one unit, NUMBER + FLAME + label on a line, with
+   the record underneath. The flame's colour/size/glow come from streakFlameTier
+   in js/08, so a longer run visibly burns hotter rather than only counting up. */
+.dkm__streak { display: flex; flex-direction: column; gap: 2px; }
+.dkm__streak-top { display: flex; align-items: center; gap: 7px; }
+.dkm__streak-n {
+  font-size: 30px; font-weight: 700; line-height: 1;
+  font-variant-numeric: tabular-nums; letter-spacing: -0.02em;
+  color: var(--text-hi);
+}
+.dkm__flame { flex: none; display: block; }
+.dkm__streak-l { font-size: 13px; font-weight: 600; color: var(--text-hi); }
+.dkm__streak-sub { font-size: 11.5px; color: var(--text-mid, var(--text-2)); font-variant-numeric: tabular-nums; }
+
 .dkm__stats { display: flex; gap: 26px; }
 .dkm__stat-n { font-size: 19px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text-hi); }
 .dkm__stat-l { font-size: 11.5px; color: var(--text-mid, var(--text-2)); }

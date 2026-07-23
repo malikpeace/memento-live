@@ -3932,13 +3932,36 @@ function renderDeskMission() {
       const doneBtn = done
         ? '<div class="dkm__btn dkm__btn--done">Completed</div>'
         : '<button class="dkm__btn dkm__btn--solid cc-hold-complete" data-cc-action="didit" aria-label="Hold for three seconds to mark complete"><span class="cc-hold-complete__fill" aria-hidden="true"></span><span class="cc-hold-complete__label">Mark Complete</span></button>';
-      const stat = (n, l) => '<div class="dkm__stat"><div class="dkm__stat-n">' + n.toLocaleString() + '</div><div class="dkm__stat-l">' + l + '</div></div>';
+      // v940 (Malik): the streak reads as a NUMBER + FLAME, the treatment he
+      // liked, not a bare stat column. The flame is the existing tiered one
+      // (streakFlameTier: colour, size and glow all escalate with the streak),
+      // so a long run visibly burns hotter instead of just counting higher.
+      let _cs = null;
+      try { _cs = (typeof consistencyStats === 'function') ? consistencyStats() : null; } catch (e) {}
+      const _best = _cs ? (_cs.longest || 0) : 0;
+      const _active = _cs ? (_cs.totalActiveDays || 0) : 0;
+      const flameSvg = (n) => {
+        const fl = streakFlameTier(n);
+        return '<svg class="dkm__flame" width="' + fl.s + '" height="' + fl.s + '" viewBox="0 0 24 24" fill="' + fl.c +
+          '" style="filter:drop-shadow(0 0 ' + fl.g + 'px ' + fl.c + ') brightness(1.15) saturate(1.2);" aria-hidden="true">' +
+          '<path fill-rule="evenodd" clip-rule="evenodd" d="M12.963 2.286a.75.75 0 0 0-1.071-.136 9.742 9.742 0 0 0-3.539 6.177A7.547 7.547 0 0 1 6.648 6.61a.75.75 0 0 0-1.152-.082A9 9 0 1 0 15.68 4.534a7.46 7.46 0 0 1-2.717-2.248ZM15.75 14.25a3.75 3.75 0 1 1-7.313-1.172c.628.465 1.35.81 2.133 1a5.989 5.989 0 0 1 1.925-3.547 3.75 3.75 0 0 1 3.255 3.719Z"/></svg>';
+      };
+      const streakChip =
+        '<div class="dkm__streak">' +
+          '<div class="dkm__streak-top">' +
+            '<span class="dkm__streak-n">' + streak.toLocaleString() + '</span>' +
+            (streak > 0 ? flameSvg(streak) : '') +
+            '<span class="dkm__streak-l">day streak</span>' +
+          '</div>' +
+          (_best || _active
+            ? '<div class="dkm__streak-sub">Best ' + _best.toLocaleString() +
+              ' &middot; ' + _active.toLocaleString() + ' active days</div>'
+            : '') +
+        '</div>';
       el.innerHTML =
         label('Today&rsquo;s mission') +
         head(mission) +
-        '<div class="dkm__row">' + doneBtn +
-          '<div class="dkm__stats">' + stat(streak, 'day streak') + '</div>' +
-        '</div>';
+        '<div class="dkm__row">' + doneBtn + streakChip + '</div>';
     }
     bindCommandCenter(el);
   } catch (e) {}
@@ -5126,8 +5149,6 @@ function openMementoFull() {
         ns.style.transition = 'none';
         ns.style.setProperty('--dc-rx', '0deg');
         ns.style.setProperty('--dc-ry', '0deg');
-        ns.style.setProperty('--dc-px', '0px');   // v939: flatten the mark's parallax too
-        ns.style.setProperty('--dc-py', '0px');
         void ns.offsetWidth;        // commit the flat state with no animation
         ns.style.transition = '';   // restore (in-view tilt, if any, still works)
       }
@@ -5511,12 +5532,9 @@ function bindDayCardTilt(card) {
     const set = (c, nx, ny, amp) => {
       c.style.setProperty('--dc-rx', (ny * -3.2 * amp).toFixed(2) + 'deg');
       c.style.setProperty('--dc-ry', (nx * 4 * amp).toFixed(2) + 'deg');
-      c.style.setProperty('--dc-px', (nx * 5 * amp).toFixed(2) + 'px');
-      c.style.setProperty('--dc-py', (ny * 4 * amp).toFixed(2) + 'px');
     };
     const reset = () => {
       card.style.setProperty('--dc-rx', '0deg'); card.style.setProperty('--dc-ry', '0deg');
-      card.style.setProperty('--dc-px', '0px'); card.style.setProperty('--dc-py', '0px');
     };
     card.addEventListener('pointermove', (e) => {
       const r = card.getBoundingClientRect();
@@ -5566,11 +5584,6 @@ function bindDayCardMotion(wrap, card) {
       curRy += (tgtRy - curRy) * 0.16;
       card.style.setProperty('--dc-rx', curRx.toFixed(2) + 'deg');
       card.style.setProperty('--dc-ry', curRy.toFixed(2) + 'deg');
-      // v939: the mark's parallax rides the gyro too, or it would only lift off
-      // the pivot on desktop. Derived from the same smoothed lean, scaled to the
-      // gyro's wider amplitude so the travel matches the pointer version.
-      card.style.setProperty('--dc-px', (curRy / AMP_Y * 5).toFixed(2) + 'px');
-      card.style.setProperty('--dc-py', (-curRx / AMP_X * 4).toFixed(2) + 'px');
       _dcMotionRaf = requestAnimationFrame(loop);
     };
     const onOrient = (e) => {
