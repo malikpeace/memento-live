@@ -560,6 +560,20 @@ html.theme-light .daycard-theme-living .daycard-living-stage {
 .daycard-theme-living .daycard-ns__body,
 .daycard-theme-living .daycard-ns__foot { position: relative; z-index: 7; }
 
+/* v939: the mark rides the tilt. It sits on the rotation AXIS, so rotateX/Y
+   barely moves it (measured: 1.72px of card travel against 0.27px of emblem)
+   and it read as floating stationary while the card leaned around it. This
+   gives it parallax in the tilt's direction so it reads as raised above the
+   glass. Set on the body (not the svg) so the mark and its deboss shadows move
+   as one piece. Matches the card's own 0.18s ease-out so they move together,
+   and inherits the tilt's existing reduced-motion / lowfx gating for free,
+   since --dc-px/--dc-py are only ever written by those code paths. */
+.daycard-theme-living .daycard-ns__body {
+  transform: translate3d(var(--dc-px, 0px), var(--dc-py, 0px), 0);
+  transition: transform 0.18s ease-out;
+  will-change: transform;
+}
+
 /* GATE: the reward is internal colour, so it obeys the same pre-star rule as
    the liquid and the burn. Deliberately NOT exempted for the clarity cinema's
    surge/orb stages, unlike those two: this is Action's reward and has no

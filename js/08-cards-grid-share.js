@@ -5126,6 +5126,8 @@ function openMementoFull() {
         ns.style.transition = 'none';
         ns.style.setProperty('--dc-rx', '0deg');
         ns.style.setProperty('--dc-ry', '0deg');
+        ns.style.setProperty('--dc-px', '0px');   // v939: flatten the mark's parallax too
+        ns.style.setProperty('--dc-py', '0px');
         void ns.offsetWidth;        // commit the flat state with no animation
         ns.style.transition = '';   // restore (in-view tilt, if any, still works)
       }
@@ -5496,11 +5498,26 @@ function bindDayCardTilt(card) {
     // Tilt only. The surface itself stays still: updating --dc-mx/--dc-my
     // here made the iridescent wash chase the pointer, which read as a
     // cheap hover effect (Malik). The wash now sits at its resting point.
+    // v939 (Malik: "the M just floats there stationary when the card moves").
+    // The mark sits dead centre, which is the rotation AXIS, so a rotateX/Y
+    // moves the card's edges a lot and its centre almost not at all (measured:
+    // 1.72px of card travel against 0.27px of emblem). It was never detached,
+    // it was just standing on the pivot. Parallax is what sells it: a small
+    // offset in the tilt's direction so the mark reads as raised ABOVE the
+    // glass rather than printed flat on it.
+    // Done with its own px vars, not translateZ + preserve-3d, because the card
+    // carries clip-path + contain:paint (the corner-poke law) and both force
+    // 3D flattening, so a translateZ child would do nothing.
     const set = (c, nx, ny, amp) => {
       c.style.setProperty('--dc-rx', (ny * -3.2 * amp).toFixed(2) + 'deg');
       c.style.setProperty('--dc-ry', (nx * 4 * amp).toFixed(2) + 'deg');
+      c.style.setProperty('--dc-px', (nx * 5 * amp).toFixed(2) + 'px');
+      c.style.setProperty('--dc-py', (ny * 4 * amp).toFixed(2) + 'px');
     };
-    const reset = () => { card.style.setProperty('--dc-rx', '0deg'); card.style.setProperty('--dc-ry', '0deg'); };
+    const reset = () => {
+      card.style.setProperty('--dc-rx', '0deg'); card.style.setProperty('--dc-ry', '0deg');
+      card.style.setProperty('--dc-px', '0px'); card.style.setProperty('--dc-py', '0px');
+    };
     card.addEventListener('pointermove', (e) => {
       const r = card.getBoundingClientRect();
       if (!r.width || !r.height) return;
@@ -5549,6 +5566,11 @@ function bindDayCardMotion(wrap, card) {
       curRy += (tgtRy - curRy) * 0.16;
       card.style.setProperty('--dc-rx', curRx.toFixed(2) + 'deg');
       card.style.setProperty('--dc-ry', curRy.toFixed(2) + 'deg');
+      // v939: the mark's parallax rides the gyro too, or it would only lift off
+      // the pivot on desktop. Derived from the same smoothed lean, scaled to the
+      // gyro's wider amplitude so the travel matches the pointer version.
+      card.style.setProperty('--dc-px', (curRy / AMP_Y * 5).toFixed(2) + 'px');
+      card.style.setProperty('--dc-py', (-curRx / AMP_X * 4).toFixed(2) + 'px');
       _dcMotionRaf = requestAnimationFrame(loop);
     };
     const onOrient = (e) => {
