@@ -7951,9 +7951,9 @@ function _renderNext7Days() {
   // one line beside it, no labels, no eyebrow, no goal echo. Day 3 is the dip
   // (white node, darker stretch), day 7 the green summit.
   const DAYS = [
-    { t: 'You start.', d: "One real move toward your goal. You're already past everyone who only talked about it." },
-    { t: 'It holds.', d: "Day two proves day one wasn't a fluke." },
-    { t: 'This is where most quit.', d: "Motivation drops. Nothing feels different yet. Showing up today is the whole game.", cls: 'n7d-day--dip' },
+    { t: 'You find out the HOW and start.', d: "Next we find the one real move that ACTUALLY moves you toward your goal. By ACTUALLY taking action, you're ahead of 95% of people since most people don't even start and only talk. We will document this as evidence and proof you can make progress." },
+    { t: 'Another Step Forward.', d: "You take more actions that continue to compound. You feel good because you're highly motivated and you are learning and documenting and taking the right actions, proving to yourself that day one wasn't a fluke." },
+    { t: 'This is where most quit.', d: "The initial burst of motivation drops. This is when, to your brain, quitting and getting distracted by your phone looks more interesting than continuing to make progress.\n\nThis is when Memento will unlock your sense of urgency with both positive and negative reward. By reminding you the cost of inaction and the reminder of your limited time to existence and achieve your goals. As well as reminding you of your progress you've already made and the dreams and promises you made to yourself.\n\nPersonal note: This is the hardest part. But push past this and progression becomes easier. Not easy. But easier.", cls: 'n7d-day--dip' },
     { t: 'It eases.', d: "You stop forcing it. Momentum starts carrying the weight for you." },
     { t: 'It shows.', d: "Someone notices something's different before you say a word." },
     { t: "It's yours.", d: "The effort fades. It just feels like who you are now." },
@@ -7970,8 +7970,13 @@ function _renderNext7Days() {
     const k = i / 6;
     return lerp(58, 63, k) + ', 217, ' + lerp(245, 78, k);      // cyan -> green
   };
+  // v944 (Malik): descriptions can now run to multiple paragraphs (Day 3 grew a
+  // real explanation + a personal note), so a blank-line-separated string
+  // becomes separate <p>s. esc() first, so the copy is still fully escaped and
+  // only the paragraph split adds markup.
+  const descHtml = (d) => String(d).split(/\n\s*\n/).map(p => `<p>${esc(p.trim())}</p>`).join('');
   const daysHtml = DAYS.map((o, i) =>
-    `<div class="n7d-day ${o.cls || ''}" data-n7day="${i + 1}" style="--dc:${dayColor(i)}"><div class="n7d-node"></div><div class="n7d-dlab">Day ${i + 1}${i === 2 ? ' · the dip' : ''}</div><div class="n7d-title">${esc(o.t)}</div><div class="n7d-desc">${esc(o.d)}</div></div>`
+    `<div class="n7d-day ${o.cls || ''}" data-n7day="${i + 1}" style="--dc:${dayColor(i)}"><div class="n7d-node"></div><div class="n7d-dlab">Day ${i + 1}${i === 2 ? ' · The Dip' : ''}</div><div class="n7d-title">${esc(o.t)}</div><div class="n7d-desc">${descHtml(o.d)}</div></div>`
   ).join('');
   return `<div class="n7d" id="n7dRoot" role="dialog" aria-label="Your first 7 days">
     <div class="n7d-dust" aria-hidden="true"></div>

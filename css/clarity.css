@@ -4422,6 +4422,11 @@ html.theme-light .n7d-cta {
   opacity: 0; transform: translateY(6px);
   transition: opacity 1s cubic-bezier(0.22,1,0.36,1) 0.55s, transform 1s cubic-bezier(0.22,1,0.36,1) 0.55s;
 }
+/* v944: the desc is now paragraphs (Day 3 runs long). Kill the browser's default
+   <p> margins and set our own gap so multi-paragraph days breathe without the
+   single-paragraph days changing at all. */
+.n7d-desc p { margin: 0; }
+.n7d-desc p + p { margin-top: 11px; }
 .n7d-day.is-in .n7d-desc { opacity: 1; transform: none; }
 
 /* Day 3, the dip (v785, real disconnection): the stop jogs off the path and
