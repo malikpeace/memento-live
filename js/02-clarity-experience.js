@@ -8011,9 +8011,19 @@ function _n7dType(el, text, speed, onDone) {
       '<span class="n7d-w">' + w.split('').map(c => '<span class="n7d-ch">' + esc1(c) + '</span>').join('') + '</span>'
     ).join(' ');
     const spans = el.querySelectorAll('.n7d-ch');
-    let i = 0;
+    let i = 0, done = false;
+    // v960: expose a finisher so an early tap can reveal the whole line at once
+    // (a fast tapper should still SEE the first message, not get shot past it).
+    const finish = () => {
+      if (done) return; done = true;
+      clearTimeout(el._n7dTimer);
+      spans.forEach(s => s.classList.add('on'));
+      i = spans.length;
+      if (onDone) onDone();
+    };
+    el._n7dFinish = finish;
     const step = () => {
-      if (i >= spans.length) { if (onDone) onDone(); return; }
+      if (i >= spans.length) { finish(); return; }
       spans[i].classList.add('on');
       try { if (typeof MementoSound !== 'undefined') MementoSound.tick(); } catch (e) {}
       i++;
@@ -8179,6 +8189,27 @@ function showNext7Days(onProceed) {
       goTo(dayIdx + 1, 1350);
       seqTimer = setTimeout(seq, dwellFor(days[dayIdx]));
     };
+    // v960: the hero intro must be SEEN before a tap can advance. Until it's
+    // fully revealed, the first tap finishes the intro (types the rest of the
+    // headline + lands the sub) instead of shooting the reader to day 1.
+    let introDone = reduce, introStartTimer = 0, introSubTimer = 0;
+    const beginClimb = (delay) => { clearTimeout(seqTimer); if (autoOn) seqTimer = setTimeout(seq, delay); };
+    const onTitleDone = () => {
+      if (introDone) return;
+      introDone = true;
+      clearTimeout(introSubTimer);
+      introSubTimer = setTimeout(() => { if (sub) sub.classList.add('on'); }, 700);
+      beginClimb(4200);
+    };
+    const finishIntro = () => {
+      if (introDone) return;
+      clearTimeout(introStartTimer);
+      if (title) {
+        title.classList.add('on');
+        if (title._n7dFinish) title._n7dFinish();   // reveals the rest, then onTitleDone
+        else { title.textContent = titleText; onTitleDone(); }
+      } else { onTitleDone(); }
+    };
     // Manual takeover: real gestures only (never the programmatic tween).
     ['touchstart', 'wheel', 'keydown'].forEach(ev =>
       scroll.addEventListener(ev, stopAuto, { passive: true }));
@@ -8214,6 +8245,7 @@ function showNext7Days(onProceed) {
     }, { passive: true });
     scroll.addEventListener('touchend', () => {
       if (tMoved < 10) return;                   // a tap, not a swipe: let click run
+      if (!introDone) { swiped = true; clearTimeout(swipeGuard); swipeGuard = setTimeout(() => { swiped = false; }, 360); finishIntro(); return; }
       swiped = true;
       clearTimeout(swipeGuard);
       swipeGuard = setTimeout(() => { swiped = false; }, 360);
@@ -8230,6 +8262,7 @@ function showNext7Days(onProceed) {
     scroll.addEventListener('click', (e) => {
       if (e.target && e.target.closest && e.target.closest('#n7dCta')) return;
       if (swiped) return;
+      if (!introDone) { finishIntro(); return; }   // first tap reveals the intro, doesn't advance
       clearTimeout(seqTimer); seqTimer = 0;
       const touch = root.classList.contains('n7d--touch');
       // Desktop CSS snap fights the tween; briefly mute it. Touch has snap off already.
@@ -8249,20 +8282,17 @@ function showNext7Days(onProceed) {
     });
 
     // Hero: the title TYPES with the tick, the sub lands, then the climb begins.
+    // onTitleDone (v960) lands the sub + starts the climb, whether the headline
+    // finished typing on its own or an early tap fast-forwarded it (finishIntro).
     if (reduce) {
       if (title) title.textContent = titleText;
       if (sub) sub.classList.add('on');
       days.forEach(ignite);
     } else {
-      setTimeout(() => {
+      introStartTimer = setTimeout(() => {
         if (!title) return;
         title.classList.add('on');
-        _n7dType(title, titleText, 52, () => {
-          // v780 (Malik): a real BREAK after the typed headline lands, THEN the
-          // sub line arrives, then another full beat before the ground moves.
-          setTimeout(() => { if (sub) sub.classList.add('on'); }, 1200);
-          seqTimer = setTimeout(seq, 4600);
-        });
+        _n7dType(title, titleText, 52, onTitleDone);
       }, 900);
     }
 
