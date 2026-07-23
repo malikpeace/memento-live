@@ -4444,6 +4444,9 @@ html.theme-light .n7d-cta {
    single-paragraph days changing at all. */
 .n7d-desc p { margin: 0; }
 .n7d-desc p + p { margin-top: 11px; }
+/* v951 (Malik): the Lao Tzu line is italic. App font (never a serif), full
+   brightness (his no-dim-body law), just slanted. */
+.n7d-quote { font-family: var(--font); font-style: italic; color: inherit; }
 .n7d-day.is-in .n7d-desc { opacity: 1; transform: none; }
 
 /* Day 3, the dip (v785, real disconnection): the stop jogs off the path and
