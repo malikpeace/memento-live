@@ -29,6 +29,22 @@
 }
 #clarityPaywall.cpw--open { opacity: 1; }
 
+/* v964 (Malik): a subtle living aura that shines across the whole page, the same
+   Memento hues as the evolved relic, slowly breathing. Edge-safe radials, sits
+   behind the content (.cpw__scroll is lifted to z-index 1). */
+#clarityPaywall::before {
+  content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(58% 42% at 26% 12%, rgba(58, 217, 245, 0.13), transparent 60%),
+    radial-gradient(54% 42% at 80% 20%, rgba(128, 150, 255, 0.11), transparent 62%),
+    radial-gradient(90% 52% at 50% 104%, rgba(63, 217, 78, 0.12), transparent 64%);
+  animation: cpwAura 16s ease-in-out infinite alternate;
+}
+@keyframes cpwAura {
+  from { opacity: 0.8; transform: translateY(0) scale(1); }
+  to   { opacity: 1; transform: translateY(-1.5%) scale(1.03); }
+}
+
 /* Close X: an easy way out (kept above the top fade so it stays crisp/tappable). */
 .cpw__close {
   position: fixed;
@@ -56,6 +72,7 @@
 }
 
 .cpw__scroll {
+  position: relative; z-index: 1;   /* above the page aura (#clarityPaywall::before) */
   min-height: 100%;
   width: 100%;
   max-width: 480px;
@@ -458,6 +475,7 @@ body.cpw-locked .widget[data-widget]:not([data-widget="clarity"])::after {
 @media (prefers-reduced-motion: reduce) {
   .cpw__eyebrow, .cpw__card, .cpw__star-wrap, .cpw__bridge { animation: none; }
   .cpw__card::before { animation: none; opacity: 0.9; }
+  #clarityPaywall::before, .cpw__relic-glow, .cpw__relic-card::before { animation: none; }
 }
 
 /* ═══ v790: the ONE-SCREEN paywall (Malik's grill, Sunlitt-style) ═══
@@ -545,35 +563,60 @@ body.cpw-locked .widget[data-widget]:not([data-widget="clarity"])::after {
    the CTA carrying its own fine print, and Maybe later as the only exit. */
 .cpw__hero--v3 { padding-top: calc(var(--safe-t, 0px) + 18px); width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; }
 
-/* The relic: pure glass, no text, lit from beneath. The glow is a radial that
-   dies BEFORE its bounds (edge-safe by construction, the glow-edge law). */
+/* The relic: the fully EVOLVED Memento, not a blank card, showing what the user's
+   own card becomes. A living iridescent glass of cyan (Clarity) + periwinkle
+   (accent) + green (Consistency) + platinum white, hues slowly drifting, sitting
+   in its own multi-hue aura. (Malik v964: 'show what it could be', make it
+   special.) Radials die before their bounds (edge-safe glow law). */
 .cpw__relic { position: relative; width: 172px; height: 228px; margin-top: 0; }
 .cpw__relic-glow {
-  position: absolute; left: 50%; top: 74%; width: 380px; height: 360px;
+  position: absolute; left: 50%; top: 72%; width: 410px; height: 390px;
   transform: translate(-50%, -50%);
-  background: radial-gradient(closest-side,
-    rgba(58, 217, 245, 0.5),
-    rgba(58, 217, 245, 0.26) 38%,
-    rgba(58, 217, 245, 0.10) 60%,
-    rgba(58, 217, 245, 0.025) 78%,
-    transparent 92%);
+  background:
+    radial-gradient(closest-side, rgba(58, 217, 245, 0.40), transparent 66%),
+    radial-gradient(closest-side, rgba(128, 150, 255, 0.30), transparent 70%),
+    radial-gradient(closest-side, rgba(63, 217, 78, 0.30), transparent 72%);
   pointer-events: none;
-  animation: cpwGlow 5.5s ease-in-out infinite;
+  animation: cpwRelicAura 12s ease-in-out infinite alternate;
+}
+@keyframes cpwRelicAura {
+  from { transform: translate(-52%, -50%) scale(1); opacity: 0.82; }
+  to   { transform: translate(-48%, -50%) scale(1.09); opacity: 1; }
 }
 .cpw__relic-card {
   position: absolute; inset: 0;
-  border-radius: 22px;
-  background: linear-gradient(165deg, rgba(255,255,255,0.11), rgba(255,255,255,0.035) 55%, rgba(122,222,245,0.075));
-  backdrop-filter: blur(28px) saturate(1.4);
-  -webkit-backdrop-filter: blur(28px) saturate(1.4);
+  border-radius: 22px; overflow: hidden; isolation: isolate;
+  background: linear-gradient(158deg, rgba(255,255,255,0.20), rgba(255,255,255,0.05) 54%, rgba(255,255,255,0.12));
+  backdrop-filter: blur(24px) saturate(1.5);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.16),
-    inset 0 -1px 0 rgba(255,255,255,0.05),
-    0 30px 60px -30px rgba(0,0,0,0.7);
+    inset 0 1px 0 rgba(255,255,255,0.32),
+    inset 0 -1px 0 rgba(255,255,255,0.06),
+    0 30px 60px -26px rgba(0,0,0,0.72);
   display: flex; align-items: center; justify-content: center;
 }
-.cpw__relic-m { width: 64px; height: 64px; }
-.cpw__relic-m path { fill: rgba(255,255,255,0.92); }
+/* the living colour, drifting + shifting hue so it never looks static */
+.cpw__relic-card::before {
+  content: ''; position: absolute; inset: -14%;
+  background:
+    radial-gradient(46% 42% at 24% 22%, rgba(58, 217, 245, 0.85), transparent 70%),
+    radial-gradient(46% 44% at 80% 28%, rgba(128, 150, 255, 0.78), transparent 70%),
+    radial-gradient(62% 54% at 50% 98%, rgba(63, 217, 78, 0.80), transparent 72%),
+    radial-gradient(42% 38% at 50% 50%, rgba(255, 255, 255, 0.60), transparent 62%);
+  filter: blur(6px) saturate(1.25);
+  animation: cpwRelicHue 15s ease-in-out infinite alternate;
+}
+@keyframes cpwRelicHue {
+  0%   { transform: translate(-2%, 1%) rotate(-4deg); filter: blur(6px) saturate(1.2) hue-rotate(-10deg); }
+  100% { transform: translate(3%, -2%) rotate(5deg); filter: blur(9px) saturate(1.45) hue-rotate(14deg); }
+}
+/* glass gloss on top of the colour */
+.cpw__relic-card::after {
+  content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: linear-gradient(150deg, rgba(255,255,255,0.30), rgba(255,255,255,0) 44%);
+}
+.cpw__relic-m { width: 64px; height: 64px; position: relative; z-index: 3; }
+.cpw__relic-m path { fill: rgba(16, 22, 28, 0.78); }   /* dark M on the bright evolved card */
 
 .cpw__hero--v3 .cpw__h1 { margin-top: 17px; }
 
