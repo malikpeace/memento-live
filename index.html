@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <script>
 /* Single source of truth for the app version. Surfaced in Settings > About. */
-window.MEMENTO_VERSION = 'v949';
+window.MEMENTO_VERSION = 'v950';
 /* LOWFX: touch / mobile devices get a lighter render path (no backdrop blur,
    no will-change layers, no background canvas animations) so iOS does not kill
    the tab from graphics-memory pressure. Desktop (fine pointer) is untouched.
@@ -53,21 +53,21 @@ window.MEMENTO_VERSION = 'v949';
      paint never waits on a third-party CDN. font-display: swap throughout. -->
 <link rel="preload" href="fonts/dmsans-1.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="fonts/fonts.css">
-<link rel="stylesheet" href="css/base.css?v=v949">
-<link rel="stylesheet" href="css/sidebar.css?v=v949">
-<link rel="stylesheet" href="css/dashboard.css?v=v949">
-<link rel="stylesheet" href="css/misc.css?v=v949">
-<link rel="stylesheet" href="css/vivere.css?v=v949">
-<link rel="stylesheet" href="css/notes.css?v=v949">
-<link rel="stylesheet" href="css/onboarding.css?v=v949">
-<link rel="stylesheet" href="css/clarity.css?v=v949">
-<link rel="stylesheet" href="css/action.css?v=v949">
-<link rel="stylesheet" href="css/daycard-living.css?v=v949">
-<link rel="stylesheet" href="css/clarity-paywall.css?v=v949">
-<link rel="stylesheet" href="css/appearance-picker.css?v=v949">
-<link rel="stylesheet" href="css/journey.css?v=v949">
-<link rel="stylesheet" href="css/descent.css?v=v949">
-<link rel="stylesheet" href="css/install.css?v=v949">
+<link rel="stylesheet" href="css/base.css?v=v950">
+<link rel="stylesheet" href="css/sidebar.css?v=v950">
+<link rel="stylesheet" href="css/dashboard.css?v=v950">
+<link rel="stylesheet" href="css/misc.css?v=v950">
+<link rel="stylesheet" href="css/vivere.css?v=v950">
+<link rel="stylesheet" href="css/notes.css?v=v950">
+<link rel="stylesheet" href="css/onboarding.css?v=v950">
+<link rel="stylesheet" href="css/clarity.css?v=v950">
+<link rel="stylesheet" href="css/action.css?v=v950">
+<link rel="stylesheet" href="css/daycard-living.css?v=v950">
+<link rel="stylesheet" href="css/clarity-paywall.css?v=v950">
+<link rel="stylesheet" href="css/appearance-picker.css?v=v950">
+<link rel="stylesheet" href="css/journey.css?v=v950">
+<link rel="stylesheet" href="css/descent.css?v=v950">
+<link rel="stylesheet" href="css/install.css?v=v950">
 </head>
 <body>
 
@@ -472,7 +472,7 @@ window.MEMENTO_VERSION = 'v949';
            lock/unlock/restart rows and the redundant ceremony jumps
            (Reveal/Star/Star summary duplicate Synthesis; New day unused)
            are gone. -->
-      <!-- v949 (Malik): the only button here that is NOT a teleport. Every jump
+      <!-- v950 (Malik): the only button here that is NOT a teleport. Every jump
            below fabricates a state and opens a real screen, so you see real UI
            on invented history. This wipes everything and starts the actual
            journey from the splash, which is the only way to experience Memento
@@ -793,32 +793,32 @@ window.MEMENTO_VERSION = 'v949';
 <!-- Supabase client for OPTIONAL cloud accounts + sync (js/12-cloud-sync.js).
      If this CDN tag fails to load, the app runs fully local, unchanged. -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
-<script src="js/01-state-foundation.js?v=v949"></script>
-<script src="js/02-clarity-experience.js?v=v949"></script>
-<script src="js/03-ai-integration.js?v=v949"></script>
-<script src="js/04-templates-proof.js?v=v949"></script>
-<script src="js/05-vivere.js?v=v949"></script>
-<script src="js/06-consistency-mori.js?v=v949"></script>
-<script src="js/07-sheet-templates.js?v=v949"></script>
-<script src="js/08-cards-grid-share.js?v=v949"></script>
-<script src="js/09-controllers.js?v=v949"></script>
-<script src="js/10-demo-backend.js?v=v949"></script>
+<script src="js/01-state-foundation.js?v=v950"></script>
+<script src="js/02-clarity-experience.js?v=v950"></script>
+<script src="js/03-ai-integration.js?v=v950"></script>
+<script src="js/04-templates-proof.js?v=v950"></script>
+<script src="js/05-vivere.js?v=v950"></script>
+<script src="js/06-consistency-mori.js?v=v950"></script>
+<script src="js/07-sheet-templates.js?v=v950"></script>
+<script src="js/08-cards-grid-share.js?v=v950"></script>
+<script src="js/09-controllers.js?v=v950"></script>
+<script src="js/10-demo-backend.js?v=v950"></script>
 <!-- The Path + Your Story: the journey views. Client-side, read existing state. -->
-<script src="js/17-journey.js?v=v949"></script>
+<script src="js/17-journey.js?v=v950"></script>
 <!-- Add to Home Screen prompt: detects browser-tab vs installed PWA. -->
-<script src="js/18-install.js?v=v949"></script>
-<script src="js/20-push.js?v=v949"></script>
-<script src="js/11-init.js?v=v949"></script>
-<script src="js/12-cloud-sync.js?v=v949"></script>
-<script src="js/13-clarity-paywall.js?v=v949"></script>
-<script src="js/14-appearance-picker.js?v=v949"></script>
+<script src="js/18-install.js?v=v950"></script>
+<script src="js/20-push.js?v=v950"></script>
+<script src="js/11-init.js?v=v950"></script>
+<script src="js/12-cloud-sync.js?v=v950"></script>
+<script src="js/13-clarity-paywall.js?v=v950"></script>
+<script src="js/14-appearance-picker.js?v=v950"></script>
 <!-- DEV-ONLY: ?dev=beats live preview for the onboarding chapter pages. Inert without the param. -->
-<script src="js/19-dev-beats.js?v=v949"></script>
+<script src="js/19-dev-beats.js?v=v950"></script>
 <!-- The sound engine: synthesized moments, off by default (Profile toggle). -->
-<script src="js/20-sound.js?v=v949"></script>
-<script src="js/21-descent.js?v=v949"></script>
+<script src="js/20-sound.js?v=v950"></script>
+<script src="js/21-descent.js?v=v950"></script>
 <!-- Back/forward + hash-URL routing. Loads LAST so every open/close fn it wraps
      already exists. Inert until onboarding is done; touches only location.hash. -->
-<script src="js/15-router.js?v=v949"></script>
+<script src="js/15-router.js?v=v950"></script>
 </body>
 </html>

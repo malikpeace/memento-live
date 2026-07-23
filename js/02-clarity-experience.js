@@ -7991,7 +7991,7 @@ function _renderNext7Days() {
           <h1 class="n7d-h1" id="n7dTitle" data-n7d-type="${esc(greet)}"></h1>
           <p class="n7d-sub" id="n7dSub">The first week is typically the hardest. We'll run through every step so you know what's coming, to make sure above all else: <b>you keep going.</b></p>
         </div>
-        <div class="n7d-path">${daysHtml}<div class="n7d-day n7d-day--win n7d-day--final" data-n7day="final" style="--dc:63, 217, 78"><div class="n7d-node"></div><div class="n7d-title">Start Now.</div><div class="n7d-desc"><p>The journey of 1000 miles begins with a single step. You just took the first step, now you just need to keep going.</p><p>Are you ready?</p></div><div class="n7d-endcta"><button type="button" class="n7d-cta" id="n7dCta">I&rsquo;m ready</button></div></div></div>
+        <div class="n7d-path">${daysHtml}<div class="n7d-day n7d-day--win n7d-day--final" data-n7day="final" style="--dc:63, 217, 78"><div class="n7d-node"></div><div class="n7d-title">Start Now.</div><div class="n7d-desc"><p>The journey of 1000 miles begins with a single step. You just took the first step, now you just need to keep going.</p><p>Are you ready?</p></div><div class="n7d-endcta"><button type="button" class="n7d-cta" id="n7dCta">I&rsquo;m ready</button></div></div><div class="n7d-tail" aria-hidden="true"></div></div>
       </div>
     </div>
   </div>`;
@@ -8150,8 +8150,11 @@ function showNext7Days(onProceed) {
     const seq = () => {
       if (!autoOn) return;
       if (dayIdx >= days.length - 1) {
-        // past day 7: settle down onto the closing + CTA, then rest.
-        seqTimer = setTimeout(() => { if (autoOn) tweenTo(scroll.scrollHeight - scroll.clientHeight, 1600); }, 2200);
+        // v950: the final stop IS the last day now (the terminal 'Start Now.'
+        // node), and it has a 60vh spacer below it, so the bottom of the scroll
+        // is empty room, NOT the resting place. goTo already centered the final
+        // when we arrived; just rest here. (The old code tweened to the very
+        // bottom, which now lands on the void below the CTA.)
         return;
       }
       goTo(dayIdx + 1, 1350);

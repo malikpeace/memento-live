@@ -4302,7 +4302,6 @@ html.theme-light .n7d-cta {
 }
 .n7d--auto .n7d-scroll { scroll-snap-type: none; }
 .n7d-day { scroll-snap-align: center; }
-.n7d-day--final { scroll-snap-align: end; }
 .n7d-hero { scroll-snap-align: center; }
 /* Beyond the summit (v784, Malik: show it does not stop after one week): the
    path continues upward past day 7, fading into the distance, with three
@@ -4392,9 +4391,17 @@ html.theme-light .n7d-cta {
 /* v948: THE FINAL STOP. It is a real node on the path (its own dot + the line
    arriving at it), styled like a day but terminal: no line extends past it, and
    the copy + CTA live inside so the trail ends ON the button, not next to it. */
-.n7d-day--final { padding-bottom: calc(var(--safe-b, 0px) + 56px); }
+.n7d-day--final { padding-bottom: calc(var(--safe-b, 0px) + 40px); }
 .n7d-day--final::before { display: none; }              /* terminal: the line stops here */
 .n7d-day--final .n7d-endcta { justify-content: flex-start; margin-top: 24px; }
+/* v950 (Malik: 'the final should reach the MIDDLE of the screen'): a trailing
+   spacer BELOW the final stop. Every other day has ~340px under it that lets the
+   NEXT day rise to center; the final has no next, so without this its node can
+   only reach the screen bottom, never the middle. The spacer is empty scroll
+   room, not a snap target, so the compact final centers cleanly on any viewport
+   and the camera can rest on it centered. Kept off the very top of the doc so it
+   never adds space above the hero. */
+.n7d-tail { height: 60vh; pointer-events: none; }
 /* v782 (Malik): only the CURRENT day is in focus; the rest of the lit trail
    blurs back until you return to it. */
 .n7d-day.is-in { transition: opacity 1.1s cubic-bezier(0.22,1,0.36,1), transform 1.3s cubic-bezier(0.22,1,0.36,1), filter 1.1s ease; }
