@@ -7996,7 +7996,7 @@ function _renderNext7Days() {
           <h1 class="n7d-h1" id="n7dTitle" data-n7d-type="${esc(greet)}"></h1>
           <p class="n7d-sub" id="n7dSub">The first week is typically the hardest. We'll run through every step so you know what's coming, to make sure above all else: <b>you keep going.</b></p>
         </div>
-        <div class="n7d-path">${daysHtml}<div class="n7d-day n7d-day--win n7d-day--final" data-n7day="final" style="--dc:63, 217, 78"><div class="n7d-node"></div><div class="n7d-dc"><div class="n7d-title">Start Now.</div><div class="n7d-desc"><p><em class="n7d-quote">The journey of 1000 miles begins with a single step. - Lao Tzu</em></p><p>You just took the first step; now you just need to keep going.</p><p>Are you ready?</p></div><div class="n7d-endcta"><button type="button" class="n7d-cta" id="n7dCta">I&rsquo;m ready</button></div></div><div class="n7d-tail" aria-hidden="true"></div></div></div>
+        <div class="n7d-path">${daysHtml}<div class="n7d-day n7d-day--win n7d-day--final" data-n7day="final" style="--dc:63, 217, 78"><div class="n7d-node"></div><div class="n7d-dc"><div class="n7d-title">Start Now.</div><div class="n7d-desc"><p><em class="n7d-quote">The journey of 1000 miles begins with a single step. - Lao Tzu</em></p><p>You just took the first step; now you just need to keep going.</p><p>Are you ready?</p></div><div class="n7d-endcta"><button type="button" class="n7d-cta" id="n7dCta">I&rsquo;m Ready</button></div></div><div class="n7d-tail" aria-hidden="true"></div></div></div>
       </div>
     </div>
   </div>`;
