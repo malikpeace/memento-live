@@ -1804,8 +1804,8 @@ const CreatorTools = {
     // Stage & animation jumps (Malik: fly around Memento from the cheat bar)
     bind('creatorJumpBlankCard', () => this.jumpBlankCard());
     bind('creatorJumpUnlock', () => this.jumpUnlockCinema());
-    bind('creatorJumpEvoPlat', () => this.jumpEvoColour('evo2-plat'));
-    bind('creatorJumpEvoGreen', () => this.jumpEvoColour('evo2-green'));
+    bind('creatorJumpEvoPlat', () => this.jumpEvoColour('evo2-plat', 'action'));
+    bind('creatorJumpEvoGreen', () => this.jumpEvoColour('evo2-green', 'consistency'));
     bind('creatorJumpAfterCinema', () => this.jumpAfterCinema());
     bind('creatorJumpCelebration', () => this.jumpCelebration());
     bind('creatorJumpFinalQ', () => this.jumpFinalQuestion());
@@ -2228,6 +2228,13 @@ const CreatorTools = {
         case 'unlock':                // just ignited, card-evolution NOT seen -> the real cinema plays on render
           setStar(now); free(); state.meta.cardEvolutionSeen = false;
           break;
+        case 'discovered':            // v937: star + a DISCOVERED plan, paid, cinema not seen.
+          // The Action evolution's real precondition. setPlan() gives exactly
+          // the shape that lights Action (planGenerated + primaryAction), so
+          // the cinema has an earned state to settle ONTO instead of draining
+          // back to cyan. It also puts the real move in the Today box.
+          setStar(now); setPlan(); paid(); state.meta.cardEvolutionSeen = false;
+          break;
         case 'day1': {                // paid, plan generated, the FIRST action just completed today
           setStar(now); setPlan(); paid(); state.meta.cardEvolutionSeen = true;
           delete state.meta.firstActionDone;   // let the first-win moment re-fire
@@ -2304,13 +2311,23 @@ const CreatorTools = {
   // every time, only the wash colour changes. So this replays the real unlock
   // cinema with the colour class applied, rather than faking a second animation.
   // The class is cleared after the run so it can never leak into the next one.
-  jumpEvoColour(cls) {
+  jumpEvoColour(cls, stage) {
+    // v937: set the stage BEFORE anything that can render. _devToHome() paints
+    // the home, and painting home is what kicks off the cinema, so setting this
+    // afterwards meant the cinema had already read a null stage and run
+    // Clarity's blank-to-cyan script. That ordering is why the first attempt at
+    // this silently did nothing.
+    window._evoStageKind = stage || null;
     this._closeAll(); this._devToHome();
     try {
       document.body.classList.remove('evo2-plat', 'evo2-green');
       if (cls) document.body.classList.add(cls);
     } catch (e) {}
-    this._seedStep('unlock');
+    // Seed what the evolution is actually celebrating. The platinum's
+    // precondition is a DISCOVERED plan (planGenerated + primaryAction), which
+    // is what lights Action since v936; without it the reward correctly drains
+    // the moment the wash fades, which is the bug Malik filmed.
+    this._seedStep(stage === 'action' ? 'discovered' : 'unlock');
     // The cinema is ~10.5s end to end (grow -> surge -> orb -> settle -> beams).
     // Clear a little past that; _evoFinish does not know about the colour class.
     clearTimeout(this._evoColourTimer);
@@ -4140,6 +4157,9 @@ function _evoFinish(wrap, onDone, opts) {
   if (_evoFinished) { if (onDone) { try { onDone(); } catch (e) {} } return; }
   _evoFinished = true;
   opts = opts || {};
+  // v937: this run's stage is spent. Leaving it set would make the NEXT
+  // evolution inherit it and start from the wrong earned state.
+  try { window._evoStageKind = null; } catch (e) {}
   try { (window._evoTimers || []).forEach(id => clearTimeout(id)); } catch (e) {}
   window._evoTimers = [];
   if (_evoVisHandler) { try { document.removeEventListener('visibilitychange', _evoVisHandler); } catch (e) {} _evoVisHandler = null; }
@@ -4253,12 +4273,30 @@ function _runClarityUnlockCinema(onDone, opts) {
   try { if (typeof TabBar !== 'undefined' && TabBar.hide) TabBar.hide(); } catch (e) {}
   // clear any inline drift so the class choreography owns the blobs
   wrap.querySelectorAll('.daycard-ns__liquid .blob').forEach(b => { b.style.opacity = ''; b.style.transform = ''; });
-  // snap to BLANK instantly (no drain) before the cinema's slow transitions arm
+  // v937: WHICH evolution is this. Every evolution used to run Clarity's script
+  // (snap to blank, fill to cyan), which is right only for the first one. Action
+  // opened on a blank card even though cyan was already earned, and it ended at
+  // act:0, so the platinum flood had nothing under it and drained the moment the
+  // wash faded (Malik: "it just kinda fades away"). Each evolution now starts
+  // from what is ALREADY earned and ends holding what it just earned.
+  const _stage = opts.stage || window._evoStageKind || null;
+  const _evoTo = livingCardLevels();          // the settled state being unlocked
+  const _isFirst = _stage !== 'action' && _stage !== 'consistency';
+  const _evoFrom = _isFirst
+    ? { clar: 0, act: 0, cons: 0 }            // Clarity: from truly nothing
+    : (_stage === 'action'
+        ? { clar: _evoTo.clar, act: 0, cons: _evoTo.cons }
+        : { clar: _evoTo.clar, act: _evoTo.act, cons: 0 });
+
+  // snap to the STARTING state instantly (no drain) before the slow transitions arm
   document.body.classList.add('evo2-snap');
-  window._evoStageOverride = { clar: 0, act: 0, cons: 0 };
+  window._evoStageOverride = _evoFrom;
   window._evoHold = false;
   setLivingCardVars(wrap);
-  document.body.classList.remove('ns-bloom', 'evo2-surge', 'evo2-orb');
+  // Only the FIRST evolution strips ns-bloom. The later ones are already lit,
+  // and removing it is what blanked the card before the platinum arrived.
+  document.body.classList.remove('evo2-surge', 'evo2-orb');
+  if (_isFirst) document.body.classList.remove('ns-bloom');
   void wrap.offsetWidth;
   document.body.classList.remove('evo2-snap');
   document.body.classList.add('evo2');
@@ -4304,8 +4342,12 @@ function _runClarityUnlockCinema(onDone, opts) {
   T.push(setTimeout(() => {                     // THE GROW: card rises near full screen
     document.body.classList.add('evo2-grow');
   }, tGrow));
-  T.push(setTimeout(() => {                     // THE FILL: rise to full purple
-    window._evoStageOverride = { clar: 100, act: 0, cons: 0 };
+  T.push(setTimeout(() => {                     // THE FILL: rise to the earned state
+    // v937: the END state is what was just earned, not a hardcoded cyan. This
+    // is the line that made the platinum drain: it ended EVERY evolution at
+    // act:0, so the wash faded onto a card that had never been handed the
+    // Action light at all.
+    window._evoStageOverride = _evoTo;
     setLivingCardVars(wrap);
     try { if (typeof MementoSound !== 'undefined') MementoSound.play('evolution'); } catch (e) {}
     // ns-bloom lights the INTERNAL liquid to its true resting purple so the settle
