@@ -8309,11 +8309,23 @@ function showNext7Days(onProceed) {
     const cta = root.querySelector('#n7dCta');
     if (cta) cta.addEventListener('click', () => {
       stopAuto();
+      // v963: open the destination FIRST, underneath the still-opaque 7-day (the
+      // paywall lives at z 2100, this overlay at 9500), so the home is never
+      // uncovered between screens. Then fade THIS overlay out to reveal it.
+      try { if (typeof onProceed === 'function') onProceed(); } catch (e) {}
+      // Force the paywall fully opaque at once so the crossfade reveals it, not a
+      // half-faded panel with the home showing through. Its own fade would still
+      // be running behind the opaque 7-day and finish mid-reveal otherwise.
+      let pw = null;
+      try {
+        pw = document.getElementById('clarityPaywall');
+        if (pw) { pw.classList.add('cpw--open'); pw.style.transition = 'none'; pw.style.opacity = '1'; }
+      } catch (e) {}
       root.classList.add('n7d--out');
       setTimeout(() => {
         try { root.remove(); } catch (e) {}
-        document.body.style.overflow = '';
-        try { if (typeof onProceed === 'function') onProceed(); } catch (e) {}
+        document.body.style.overflow = 'hidden';   // the paywall owns the scroll lock now
+        try { if (pw) { pw.style.transition = ''; pw.style.opacity = ''; } } catch (e) {}   // restore its own fade for close
       }, 420);
     });
   } catch (e) { try { if (typeof onProceed === 'function') onProceed(); } catch (_) {} }
