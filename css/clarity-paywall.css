@@ -475,7 +475,7 @@ body.cpw-locked .widget[data-widget]:not([data-widget="clarity"])::after {
 @media (prefers-reduced-motion: reduce) {
   .cpw__eyebrow, .cpw__card, .cpw__star-wrap, .cpw__bridge { animation: none; }
   .cpw__card::before { animation: none; opacity: 0.9; }
-  #clarityPaywall::before, .cpw__relic-glow, .cpw__relic-card::before { animation: none; }
+  #clarityPaywall::before, .cpw__relic { animation: none; }
 }
 
 /* ═══ v790: the ONE-SCREEN paywall (Malik's grill, Sunlitt-style) ═══
@@ -563,60 +563,50 @@ body.cpw-locked .widget[data-widget]:not([data-widget="clarity"])::after {
    the CTA carrying its own fine print, and Maybe later as the only exit. */
 .cpw__hero--v3 { padding-top: calc(var(--safe-t, 0px) + 18px); width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; }
 
-/* The relic: the fully EVOLVED Memento, not a blank card, showing what the user's
-   own card becomes. A living iridescent glass of cyan (Clarity) + periwinkle
-   (accent) + green (Consistency) + platinum white, hues slowly drifting, sitting
-   in its own multi-hue aura. (Malik v964: 'show what it could be', make it
-   special.) Radials die before their bounds (edge-safe glow law). */
-.cpw__relic { position: relative; width: 172px; height: 228px; margin-top: 0; }
-.cpw__relic-glow {
-  position: absolute; left: 50%; top: 72%; width: 410px; height: 390px;
-  transform: translate(-50%, -50%);
-  background:
-    radial-gradient(closest-side, rgba(58, 217, 245, 0.40), transparent 66%),
-    radial-gradient(closest-side, rgba(128, 150, 255, 0.30), transparent 70%),
-    radial-gradient(closest-side, rgba(63, 217, 78, 0.30), transparent 72%);
-  pointer-events: none;
-  animation: cpwRelicAura 12s ease-in-out infinite alternate;
+/* The relic: the REAL evolved Memento, the same living card the user earns, the
+   exact cyan (Clarity) + white + green (Consistency) + periwinkle (accent) blob
+   recipe from renderDayCard, screen-blended over a dark glass base and blurred so
+   it reads as smooth, edgeless light. The whole thing hue-cycles like a rainbow,
+   matching the onboarding evolved finale (Malik v965: 'use the REAL card'). */
+.cpw__relic {
+  position: relative; width: 172px; height: 228px; margin-top: 0;
+  /* rainbow hue-cycle on the WRAPPER (card + spill), never the clipped card,
+     a filter on the clip breaks the rounded corners on iOS. Same as the
+     onboarding wiHueStage. White/black stay put; only the colour rotates. */
+  animation: cpwRelicRainbow 15s linear infinite;
 }
-@keyframes cpwRelicAura {
-  from { transform: translate(-52%, -50%) scale(1); opacity: 0.82; }
-  to   { transform: translate(-48%, -50%) scale(1.09); opacity: 1; }
+@keyframes cpwRelicRainbow { to { filter: hue-rotate(360deg); } }
+/* the card's own light bleeding out past its edges (cyan top, white mid, green
+   bottom), feathered to transparent, edge-safe. Mirrors the onboarding spill. */
+.cpw__relic-spill {
+  position: absolute; inset: -18%; z-index: 0; pointer-events: none;
+  filter: blur(34px) saturate(1.4);
+  background:
+    radial-gradient(46% 34% at 42% 12%, rgba(116, 234, 255, 0.78), transparent 72%),
+    radial-gradient(42% 30% at 58% 50%, rgba(245, 247, 255, 0.42), transparent 72%),
+    radial-gradient(48% 36% at 46% 92%, rgba(56, 236, 71, 0.72), transparent 72%);
 }
 .cpw__relic-card {
-  position: absolute; inset: 0;
+  position: absolute; inset: 0; z-index: 1;
   border-radius: 22px; overflow: hidden; isolation: isolate;
-  background: linear-gradient(158deg, rgba(255,255,255,0.20), rgba(255,255,255,0.05) 54%, rgba(255,255,255,0.12));
-  backdrop-filter: blur(24px) saturate(1.5);
-  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  background: #0a0e10;
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.32),
-    inset 0 -1px 0 rgba(255,255,255,0.06),
+    inset 0 1px 0 rgba(255,255,255,0.26),
+    inset 0 -1px 0 rgba(255,255,255,0.05),
     0 30px 60px -26px rgba(0,0,0,0.72);
   display: flex; align-items: center; justify-content: center;
 }
-/* the living colour, drifting + shifting hue so it never looks static */
-.cpw__relic-card::before {
-  content: ''; position: absolute; inset: -14%;
-  background:
-    radial-gradient(46% 42% at 24% 22%, rgba(58, 217, 245, 0.85), transparent 70%),
-    radial-gradient(46% 44% at 80% 28%, rgba(128, 150, 255, 0.78), transparent 70%),
-    radial-gradient(62% 54% at 50% 98%, rgba(63, 217, 78, 0.80), transparent 72%),
-    radial-gradient(42% 38% at 50% 50%, rgba(255, 255, 255, 0.60), transparent 62%);
-  filter: blur(6px) saturate(1.25);
-  animation: cpwRelicHue 15s ease-in-out infinite alternate;
-}
-@keyframes cpwRelicHue {
-  0%   { transform: translate(-2%, 1%) rotate(-4deg); filter: blur(6px) saturate(1.2) hue-rotate(-10deg); }
-  100% { transform: translate(3%, -2%) rotate(5deg); filter: blur(9px) saturate(1.45) hue-rotate(14deg); }
-}
-/* glass gloss on top of the colour */
-.cpw__relic-card::after {
-  content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none;
-  background: linear-gradient(150deg, rgba(255,255,255,0.30), rgba(255,255,255,0) 44%);
-}
-.cpw__relic-m { width: 64px; height: 64px; position: relative; z-index: 3; }
-.cpw__relic-m path { fill: rgba(16, 22, 28, 0.78); }   /* dark M on the bright evolved card */
+/* the liquid colour layer: real-card blobs, screen-blended, heavily blurred to
+   smooth, edgeless light. Clipped inside the card by its overflow. */
+.cpw__relic-liquid { position: absolute; inset: -28%; z-index: 0; pointer-events: none; filter: blur(30px) saturate(1.5); }
+.cpw__relic-blob { position: absolute; border-radius: 50%; mix-blend-mode: screen; }
+.cpw__relic-blob.b1 { width: 94%; height: 72%; left: -12%; top: -14%; background: radial-gradient(circle, rgba(116,234,255,1), transparent 66%); opacity: 1; }        /* cyan, Clarity */
+.cpw__relic-blob.b2 { width: 150%; height: 120%; left: -25%; top: -8%; background: radial-gradient(circle, rgba(236,239,255,0.98), transparent 66%); opacity: 0.82; }   /* platinum white core */
+.cpw__relic-blob.b3 { width: 98%; height: 76%; right: -14%; bottom: -16%; background: radial-gradient(circle, rgba(56,236,71,1), transparent 64%); opacity: 1; }         /* green, Consistency */
+.cpw__relic-blob.b4 { width: 72%; height: 58%; left: 0%; bottom: 4%; background: radial-gradient(circle, rgba(128,150,255,0.85), transparent 66%); opacity: 0.5; }       /* periwinkle, accent (a touch) */
+.cpw__relic-blob.b5 { width: 66%; height: 54%; right: 4%; top: 28%; background: radial-gradient(circle, rgba(120,255,131,0.7), transparent 68%); opacity: 0.5; }         /* light green */
+.cpw__relic-m { width: 64px; height: 64px; position: relative; z-index: 2; }
+.cpw__relic-m path { fill: rgba(52, 60, 70, 0.92); }   /* dark slate M on the bright evolved card, like the real one */
 
 .cpw__hero--v3 .cpw__h1 { margin-top: 17px; }
 

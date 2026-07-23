@@ -106,8 +106,15 @@ const ClarityPaywall = {
         '<div class="cpw__scroll">' +
           '<div class="cpw__hero cpw__hero--v3">' +
             '<div class="cpw__relic" aria-hidden="true">' +
-              '<span class="cpw__relic-glow"></span>' +
+              '<span class="cpw__relic-spill"></span>' +
               '<div class="cpw__relic-card">' +
+                '<span class="cpw__relic-liquid">' +
+                  '<span class="cpw__relic-blob b1"></span>' +
+                  '<span class="cpw__relic-blob b2"></span>' +
+                  '<span class="cpw__relic-blob b3"></span>' +
+                  '<span class="cpw__relic-blob b4"></span>' +
+                  '<span class="cpw__relic-blob b5"></span>' +
+                '</span>' +
                 '<svg class="cpw__relic-m" viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>' +
               '</div>' +
             '</div>' +
