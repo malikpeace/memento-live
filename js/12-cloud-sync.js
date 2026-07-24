@@ -36,7 +36,13 @@ const CloudSync = (function () {
   let pushQueued = false;   // a push failed or arrived mid-flight; retry on next change/focus
   let sessionRetryNeeded = false; // boot-time getSession failed (offline); retry on focus
   let adopting = false;     // a cloud copy is being adopted (reload imminent); freeze all sync
-  let pulledThisLoad = false;
+  const FIRST_SYNC_WAITING = 'waiting';
+  const FIRST_SYNC_RESTORING = 'restoring';
+  const FIRST_SYNC_READY = 'ready';
+  const FIRST_SYNC_FAILED = 'failed';
+  let firstSyncState = FIRST_SYNC_WAITING;
+  let firstSyncPromise = null;
+  let lastCloudRevision = 0;
   let lastCloudStamp = '';  // updated_at of the cloud row this device last wrote or adopted
   let lastSyncMs = 0;       // Date.now() of the last successful push or pull (for the UI)
   let _communityDays = null; // cached "days shown up across Memento" (null = unknown/RPC absent)
@@ -47,6 +53,44 @@ const CloudSync = (function () {
   // legitimate adopts, then refuse to reload again and fall back to pushing the
   // local copy up. A clean load with no adopt clears the counter.
   const ADOPT_GUARD_KEY = 'memento_sync_adopt_guard';
+  const RESTORE_MARKER_KEY = 'memento_sync_restoring';
+  let restoreEl = null;
+
+  function showRestoreScreen() {
+    try {
+      if (!restoreEl) {
+        restoreEl = document.createElement('div');
+        restoreEl.id = 'cloudRestoreScreen';
+        restoreEl.setAttribute('role', 'status');
+        restoreEl.setAttribute('aria-live', 'polite');
+        restoreEl.setAttribute('data-cloud-keep', '');
+        restoreEl.style.cssText = 'position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;background:#050608;color:#f5f5f7;font-family:inherit;opacity:0;transition:opacity .2s ease;';
+        restoreEl.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center;padding:28px"><svg viewBox="0 0 64 64" width="48" height="48" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#0a0a0e"/><path d="M14 14L32 32 50 14v37H14z" fill="#f5f5f7"/></svg><div style="font-size:17px;font-weight:650">Restoring your Memento...</div><div style="width:120px;height:2px;overflow:hidden;background:rgba(255,255,255,.12)"><span style="display:block;width:45%;height:100%;background:#5bdaf3;animation:mementoRestoreSlide 1.1s ease-in-out infinite alternate"></span></div></div>';
+        if (!document.getElementById('cloudRestoreStyle')) {
+          const style = document.createElement('style');
+          style.id = 'cloudRestoreStyle';
+          style.textContent = '@keyframes mementoRestoreSlide{from{transform:translateX(-15%)}to{transform:translateX(135%)}}@media(prefers-reduced-motion:reduce){#cloudRestoreScreen span{animation:none!important;transform:none!important;width:100%!important}}';
+          document.body.appendChild(style);
+        }
+        document.body.appendChild(restoreEl);
+      }
+      restoreEl.style.display = 'flex';
+      const raf = (window && window.requestAnimationFrame) ? window.requestAnimationFrame.bind(window) : function (fn) { setTimeout(fn, 0); };
+      raf(function () { if (restoreEl) restoreEl.style.opacity = '1'; });
+    } catch (e) {}
+  }
+
+  function hideRestoreScreen() {
+    try {
+      if (!restoreEl) return;
+      restoreEl.style.opacity = '0';
+      setTimeout(function () { if (restoreEl && restoreEl.style.opacity === '0') restoreEl.style.display = 'none'; }, 220);
+    } catch (e) {}
+  }
+
+  function markRestoreReload() { try { sessionStorage.setItem(RESTORE_MARKER_KEY, '1'); } catch (e) {} }
+  function clearRestoreReload() { try { sessionStorage.removeItem(RESTORE_MARKER_KEY); } catch (e) {} }
+  function restoreReloadPending() { try { return sessionStorage.getItem(RESTORE_MARKER_KEY) === '1'; } catch (e) { return false; } }
   function adoptWouldLoop() {
     try {
       const now = Date.now();
@@ -94,8 +138,9 @@ const CloudSync = (function () {
 
   /* ---------- merge logic (pure, testable) ---------- */
 
-  // Latest activity in a state snapshot, as epoch ms. Reads proofEvents
-  // (numeric ts or iso strings) plus meta.lastVisit. 0 = no signal.
+  // Latest meaningful edit in a state snapshot, as epoch ms. lastVisit is
+  // deliberately excluded: opening a fresh device must never make its blank
+  // state look newer than real work already stored in the cloud.
   function activityStamp(s) {
     let max = 0;
     const seen = (v) => {
@@ -108,19 +153,24 @@ const CloudSync = (function () {
     try {
       const evs = (s && Array.isArray(s.proofEvents)) ? s.proofEvents : [];
       for (let i = 0; i < evs.length; i++) { const ev = evs[i]; if (ev) { seen(ev.ts); seen(ev.iso); } }
-      if (s && s.meta) { seen(s.meta.lastVisit); seen(s.meta.lastEditAt); }
+      if (s && s.meta) seen(s.meta.lastEditAt);
     } catch (e) {}
     return max;
   }
 
-  // "Real" = the user has actually lived in this copy (onboarded, named
-  // themselves, or logged anything). A fresh default state is not real.
+  // "Real" = the user has created durable content. Merely opening onboarding
+  // or visiting today is not real work and may never beat a cloud copy.
   function isRealState(s) {
     try {
       if (!s || typeof s !== 'object') return false;
       if (Array.isArray(s.proofEvents) && s.proofEvents.length) return true;
-      if (s.meta && s.meta.welcomeSeen) return true;
       if (s.profile && (s.profile.onboarded || String(s.profile.name || '').trim())) return true;
+      if (s.clarity && (s.clarity.completed || String((((s.clarity || {}).answers || {}).neutronStar) || '').trim())) return true;
+      if (s.action && (s.action.planGenerated || String((((s.action || {}).primaryAction || {}).title) || '').trim())) return true;
+      if (s.reflection && Array.isArray(s.reflection.entries) && s.reflection.entries.length) return true;
+      if (Array.isArray(s.checkins) && s.checkins.length) return true;
+      if (s.deepwork && Array.isArray(s.deepwork.sessions) && s.deepwork.sessions.length) return true;
+      if (s.vivere && (Array.isArray(s.vivere.memories) && s.vivere.memories.length)) return true;
       return false;
     } catch (e) { return false; }
   }
@@ -275,11 +325,10 @@ const CloudSync = (function () {
   // reload. The post-reload boot pull sees "local already contains everything"
   // and pushes the merged copy up, completing the cycle.
   function adoptMerged(merged, why) {
-    if (adopting) return;
+    if (adopting) return true;
     if (adoptWouldLoop()) {
-      try { console.warn('CloudSync: merge reload loop detected, keeping the local copy and syncing it up instead.'); } catch (e) {}
-      try { pushNow(); } catch (e) {}
-      return;
+      try { console.warn('CloudSync: merge reload loop detected. Sync is paused so neither copy can be overwritten.'); } catch (e) {}
+      return false;
     }
     try {
       adopting = true;
@@ -288,8 +337,11 @@ const CloudSync = (function () {
       } catch (e) {}
       console.info('CloudSync: merged with the cloud copy per module (' + (why || '') + '). The previous local copy was backed up to localStorage "' + BACKUP_KEY + '".');
       localStorage.setItem(APP_KEY, JSON.stringify(merged));
+      markRestoreReload();
+      showRestoreScreen();
       location.reload();
-    } catch (e) { adopting = false; }
+      return true;
+    } catch (e) { adopting = false; return false; }
   }
 
   /* ---------- sync engine ---------- */
@@ -298,28 +350,49 @@ const CloudSync = (function () {
   // via one guarded line, so every local save mirrors to the cloud ~4s later.
   function schedulePush() {
     if (!client || !isLoggedIn() || demo() || adopting) return;
+    if (firstSyncState !== FIRST_SYNC_READY) { pushQueued = true; return; }
     clearTimeout(pushTimer);
     pushTimer = setTimeout(() => { pushNow(); }, PUSH_DEBOUNCE_MS);
   }
 
-  async function pushNow() {
+  async function pushNow(retryOnConflict) {
     if (!client || !isLoggedIn() || demo() || adopting) return false;
+    if (firstSyncState !== FIRST_SYNC_READY) { pushQueued = true; return false; }
     if (pushing) { pushQueued = true; return false; }
     pushing = true;
     clearTimeout(pushTimer);
     try {
       const snap = (typeof stripInlineMediaForSync === 'function') ? stripInlineMediaForSync(state) : state;
-      const stamp = new Date().toISOString();
-      const r = await client.from('user_state').upsert({
-        user_id: session.user.id, state: snap, updated_at: stamp, device: deviceLabel()
+      const r = await client.rpc('sync_user_state', {
+        p_state: snap,
+        p_device: deviceLabel(),
+        p_expected_revision: lastCloudRevision || 0
       });
       pushing = false;
-      if (r && !r.error) {
+      const result = r && !r.error ? (Array.isArray(r.data) ? r.data[0] : r.data) : null;
+      if (result && result.accepted) {
         pushQueued = false;
-        lastCloudStamp = stamp;
+        lastCloudRevision = Number(result.revision) || lastCloudRevision || 0;
+        lastCloudStamp = result.updated_at || new Date().toISOString();
         lastSyncMs = Date.now();
         refreshAccountCard();
         return true;
+      }
+      if (result && result.conflict && result.state) {
+        const remoteRow = {
+          state: result.state,
+          updated_at: result.updated_at || '',
+          revision: Number(result.revision) || 0
+        };
+        lastCloudRevision = remoteRow.revision;
+        if (remoteRow.updated_at) lastCloudStamp = remoteRow.updated_at;
+        const d = mergeDecision(state, remoteRow);
+        if (d.action === 'adoptCloud') return !!adoptCloud(remoteRow, result.reason || d.reason);
+        if (d.action === 'adoptMerged') return !!adoptMerged(d.merged, result.reason || d.reason);
+        pushQueued = true;
+        // One revision-aware retry is safe when local already contains every
+        // remote module. A second conflict waits for focus/manual sync.
+        if (retryOnConflict !== false) return pushNow(false);
       }
       pushQueued = true;
       return false;
@@ -330,11 +403,10 @@ const CloudSync = (function () {
   // cloud state to localStorage and reload (the simplest correct path; every
   // module re-reads state on boot). Never logs state contents.
   function adoptCloud(row, why) {
-    if (adopting) return;
+    if (adopting) return true;
     if (adoptWouldLoop()) {
-      try { console.warn('CloudSync: adopt reload loop detected, keeping the local copy and syncing it up instead.'); } catch (e) {}
-      try { pushNow(); } catch (e) {}
-      return;
+      try { console.warn('CloudSync: adopt reload loop detected. Sync is paused so neither copy can be overwritten.'); } catch (e) {}
+      return false;
     }
     try {
       adopting = true;
@@ -343,45 +415,83 @@ const CloudSync = (function () {
       } catch (e) {}
       console.info('CloudSync: adopting the cloud copy (' + (why || 'newer') + '). The previous local copy was backed up to localStorage "' + BACKUP_KEY + '".');
       localStorage.setItem(APP_KEY, JSON.stringify(row.state));
+      markRestoreReload();
+      showRestoreScreen();
       location.reload();
-    } catch (e) { adopting = false; }
+      return true;
+    } catch (e) { adopting = false; return false; }
   }
 
   async function fetchRow(columns) {
     try {
-      const r = await client.from('user_state').select(columns || 'state, updated_at, device').eq('user_id', session.user.id).maybeSingle();
+      const r = await client.from('user_state').select(columns || 'state, updated_at, device, revision').eq('user_id', session.user.id).maybeSingle();
       if (!r || r.error) return { ok: false, row: null };
       return { ok: true, row: r.data || null };
     } catch (e) { return { ok: false, row: null }; }
   }
 
-  // Login/boot pull: fetch the row, decide, act. Failures queue a retry.
+  // Login/boot pull: fetch the row and decide. It never pushes by itself;
+  // beginFirstSync marks the pull complete before allowing any write.
   async function pullAndMerge() {
-    if (!client || !isLoggedIn() || demo() || adopting) return;
+    if (!client || !isLoggedIn() || demo() || adopting) return { ok: false };
     try {
       const f = await fetchRow();
-      if (!f.ok) { pushQueued = true; return; }
+      if (!f.ok) return { ok: false };
       const d = mergeDecision(state, f.row);
-      if (d.action === 'adoptCloud') { adoptCloud(f.row, d.reason); return; }
-      if (d.action === 'adoptMerged') { adoptMerged(d.merged, d.reason); return; }
-      // Clean load, no reload needed: this device already holds everything.
-      // Reset the reload-loop guard so a future legitimate adopt isn't blocked.
-      clearAdoptGuard();
+      if (d.action === 'adoptCloud') {
+        const didAdopt = adoptCloud(f.row, d.reason);
+        return { ok: didAdopt, adopting: didAdopt };
+      }
+      if (d.action === 'adoptMerged') {
+        const didAdopt = adoptMerged(d.merged, d.reason);
+        return { ok: didAdopt, adopting: didAdopt };
+      }
+      lastCloudRevision = (f.row && Number(f.row.revision)) || 0;
       if (f.row && f.row.updated_at) lastCloudStamp = f.row.updated_at;
-      await pushNow();
-    } catch (e) { pushQueued = true; }
+      return { ok: true, shouldPush: true };
+    } catch (e) { return { ok: false }; }
+  }
+
+  async function beginFirstSync() {
+    if (!client || !isLoggedIn() || demo() || adopting) return false;
+    if (firstSyncState === FIRST_SYNC_READY) return true;
+    if (firstSyncState === FIRST_SYNC_RESTORING && firstSyncPromise) return firstSyncPromise;
+    firstSyncState = FIRST_SYNC_RESTORING;
+    showRestoreScreen();
+    firstSyncPromise = (async function () {
+      const result = await pullAndMerge();
+      if (result && result.adopting) return !!result.ok;
+      if (!result || !result.ok) {
+        firstSyncState = FIRST_SYNC_FAILED;
+        pushQueued = true;
+        hideRestoreScreen();
+        refreshAccountCard();
+        return false;
+      }
+      firstSyncState = FIRST_SYNC_READY;
+      clearAdoptGuard();
+      clearRestoreReload();
+      hideRestoreScreen();
+      const shouldPush = !!result.shouldPush || pushQueued;
+      if (shouldPush) await pushNow();
+      refreshAccountCard();
+      return true;
+    })();
+    try { return await firstSyncPromise; }
+    finally { if (firstSyncState !== FIRST_SYNC_RESTORING) firstSyncPromise = null; }
   }
 
   // Focus pull: cheap updated_at probe; if another device wrote a newer row,
   // adopt it (with the same backup guard). 1.5s slack absorbs clock jitter.
   async function checkRemote() {
-    if (!client || !isLoggedIn() || demo() || adopting || !lastCloudStamp) return;
+    if (!client || !isLoggedIn() || demo() || adopting || firstSyncState !== FIRST_SYNC_READY || !lastCloudStamp) return;
     try {
-      const p = await fetchRow('updated_at');
+      const p = await fetchRow('updated_at, revision');
       if (!p.ok || !p.row || !p.row.updated_at) return;
-      if (Date.parse(p.row.updated_at) > Date.parse(lastCloudStamp) + 1500) {
+      if ((Number(p.row.revision) || 0) > lastCloudRevision || Date.parse(p.row.updated_at) > Date.parse(lastCloudStamp) + 1500) {
         const f = await fetchRow();
         if (f.ok && f.row && isRealState(f.row.state)) {
+          lastCloudRevision = Number(f.row.revision) || 0;
           const d = mergeDecision(state, f.row);
           if (d.action === 'adoptMerged') adoptMerged(d.merged, 'another device synced more recently');
           else if (d.action === 'adoptCloud') adoptCloud(f.row, 'another device synced more recently');
@@ -421,14 +531,14 @@ const CloudSync = (function () {
           session = (r && r.data && r.data.session) || null;
           if (session) {
             hideSplashLink();
-            if (!pulledThisLoad) { pulledThisLoad = true; pullAndMerge(); }
+            beginFirstSync();
             refreshAccountCard();
           }
         }).catch(() => { sessionRetryNeeded = true; });
       }
       return;
     }
-    if (!pulledThisLoad) { pulledThisLoad = true; pullAndMerge(); return; }
+    if (firstSyncState !== FIRST_SYNC_READY) { beginFirstSync(); return; }
     if (pushQueued) { pushNow(); return; }
     checkRemote();
   }
@@ -437,6 +547,7 @@ const CloudSync = (function () {
   // (may adopt + reload), otherwise push this device up.
   async function syncNow() {
     if (!client || !isLoggedIn() || demo()) return false;
+    if (!(await beginFirstSync())) return false;
     await checkRemote();
     if (adopting) return true;
     return pushNow();
@@ -482,7 +593,12 @@ const CloudSync = (function () {
     if (hadPending) { try { await pushNow(); } catch (e) {} }
     try { await client.auth.signOut(); } catch (e) {}
     session = null;
+    firstSyncState = FIRST_SYNC_WAITING;
+    firstSyncPromise = null;
     lastCloudStamp = '';
+    lastCloudRevision = 0;
+    clearRestoreReload();
+    hideRestoreScreen();
     refreshAccountCard();
   }
 
@@ -811,13 +927,18 @@ const CloudSync = (function () {
     } catch (e) { client = null; }
     try { bindSplashSignin(); } catch (e) {}
     if (!client) return; // CDN never loaded: stay fully local, all entry points no-op
+    if (restoreReloadPending()) showRestoreScreen();
     try { fetchCommunityDays(); } catch (e) {} // public counter, runs logged in or out
     try {
       client.auth.getSession().then((r) => {
         session = (r && r.data && r.data.session) || null;
         if (session) {
           hideSplashLink();
-          if (!pulledThisLoad) { pulledThisLoad = true; pullAndMerge(); }
+          beginFirstSync();
+        } else {
+          firstSyncState = FIRST_SYNC_WAITING;
+          clearRestoreReload();
+          hideRestoreScreen();
         }
         refreshAccountCard();
       }).catch((e) => {
@@ -833,7 +954,14 @@ const CloudSync = (function () {
         if (session) {
           hideSplashLink();
           closeDialog();
-          if (!pulledThisLoad) { pulledThisLoad = true; pullAndMerge(); }
+          beginFirstSync();
+        } else {
+          firstSyncState = FIRST_SYNC_WAITING;
+          firstSyncPromise = null;
+          lastCloudStamp = '';
+          lastCloudRevision = 0;
+          clearRestoreReload();
+          hideRestoreScreen();
         }
         if (had !== isLoggedIn()) refreshAccountCard();
       });
