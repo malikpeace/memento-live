@@ -1616,8 +1616,6 @@ function bindSyntheticWidget(key, el) {
           if (typeof Sheet !== 'undefined' && Sheet.open) Sheet.open('reflection');
         } else if (action === 'deep') {
           if (typeof Sheet !== 'undefined' && Sheet.open) Sheet.open('deepwork');
-        } else {
-          showComingSoonToast();
         }
       });
     });
@@ -1625,7 +1623,6 @@ function bindSyntheticWidget(key, el) {
     el.querySelectorAll('[data-resource]').forEach(row => {
       row.addEventListener('click', (e) => {
         e.stopPropagation();
-        showComingSoonToast();
       });
     });
   }
@@ -1757,7 +1754,6 @@ function promptTomorrowPlan() {
         const d = new Date(); d.setDate(d.getDate() + 1);
         state.action.tomorrowPlan = { date: localISO(d), text };
         persistState();
-        try { showComingSoonToast('Saved. It will be waiting in the morning.'); } catch (_) {}
       }
       dismiss();
     };
@@ -4902,8 +4898,7 @@ function showQuickCapture() {
       setTimeout(() => { try { el.remove(); } catch (_) {} if (_qcEl === el) _qcEl = null; }, 300);
     };
     const save = () => {
-      const ok = captureToNotes(input.value);
-      if (ok) { try { showComingSoonToast('Captured to Notes.'); } catch (_) {} }
+      captureToNotes(input.value);
       dismiss();
     };
     el.querySelector('.tmrw-plan__save').addEventListener('click', save);

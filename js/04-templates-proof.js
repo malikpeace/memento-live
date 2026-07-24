@@ -144,7 +144,6 @@ function recalculateStreak() {
           try {
             let dayName = iso;
             try { dayName = new Date(iso + 'T12:00:00').toLocaleDateString(undefined, { weekday: 'long' }); } catch (_) {}
-            if (typeof showComingSoonToast === 'function') showComingSoonToast('A banked grace day covered ' + dayName + '. Streak intact.');
             if (typeof pushUpdate === 'function') pushUpdate('grace', 'A grace day covered ' + dayName, 'Life happened. The chain holds.');
           } catch (_) {}
         }
@@ -164,7 +163,6 @@ function recalculateStreak() {
       const before = g.bank || 0;
       g.bank = Math.min(2, before + (m - (g.lastEarnMilestone || 0)));
       if (g.bank > before && !DEMO_MODE) {
-        try { if (typeof showComingSoonToast === 'function') showComingSoonToast('Grace day banked. One missed day will be covered for you.'); } catch (_) {}
         try { if (typeof pushUpdate === 'function') pushUpdate('grace', 'Grace day banked', 'Seven days kept. One missed day will be covered for you, automatically.'); } catch (_) {}
       }
     }
@@ -350,30 +348,16 @@ function playEarnedStillness() {
     const reduce = body.classList.contains('calm-motion') || body.classList.contains('lite') ||
       (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
     if (!reduce) body.classList.add('earned-stillness');
-    // Quiet status line. Reused element so a burst never stacks nodes.
-    let el = document.getElementById('earnedStatus');
-    if (!el) {
-      el = document.createElement('div');
-      el.id = 'earnedStatus';
-      el.className = 'earned-status record-moment';
-      el.setAttribute('role', 'status');
-      el.setAttribute('aria-live', 'polite');
-      // record-moment is added only for the role/status family naming; strip its
-      // box styling so this stays the minimal pill defined by .earned-status.
-      el.classList.remove('record-moment');
-      body.appendChild(el);
-    }
-    el.textContent = 'Kept.';
-    // Fade in shortly after paint so the opacity transition runs. A short timer
-    // (not rAF alone) so the reveal still fires reliably if the tab was hidden
-    // when the event landed (rAF is throttled in background tabs).
-    setTimeout(() => { try { el.classList.add('is-on'); } catch (e) {} }, 30);
+    // v975 (Malik: scalp the toasts): the visible "Kept." pill is gone. The
+    // brief ambient calm (a dim of the orbs) stays, it's a motion beat, not a
+    // notification. Remove any pill left in the DOM by an older cached build so
+    // it can never flash again.
+    try { const _old = document.getElementById('earnedStatus'); if (_old) _old.remove(); } catch (e) {}
     clearTimeout(playEarnedStillness._t1);
     clearTimeout(playEarnedStillness._t2);
     playEarnedStillness._t1 = setTimeout(() => {
       // Always remove the class so ambient motion can never get stuck paused.
       body.classList.remove('earned-stillness');
-      if (el) el.classList.remove('is-on');
     }, 2500);
     playEarnedStillness._t2 = setTimeout(() => {
       playEarnedStillness._busy = false;

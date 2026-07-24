@@ -891,7 +891,6 @@ const VivereCanvas = {
       a.href = cv.toDataURL('image/png');
       a.download = (c.name || 'board').replace(/[^\w\- ]+/g, '').trim().replace(/\s+/g, '-').toLowerCase() + '.png';
       document.body.appendChild(a); a.click(); a.remove();
-      try { showComingSoonToast('Board exported.'); } catch (e) {}
     } catch (e) {}
   },
 

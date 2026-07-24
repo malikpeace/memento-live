@@ -1266,7 +1266,7 @@ const SHEET_TEMPLATES = {
             name: name.trim().slice(0, 40),
             blocks: state.timeblocks.filter(b => b && b.day === day0).map(b => ({ start: b.start, durMin: b.durMin, type: b.type, label: b.label }))
           });
-          try { persistNow(); showComingSoonToast('Template saved.'); } catch (_) {}
+          try { persistNow(); } catch (_) {}
           rerender(); return;
         }
         if (t.hasAttribute('data-tb-tpl-open')) { self._tplOpen = true; self._adding = false; self._importing = false; rerender(); return; }
@@ -1294,7 +1294,7 @@ const SHEET_TEMPLATES = {
           const tpl = id2 === '__starter' ? { blocks: starter } : (state.timeblockTemplates || []).find(x => x.id === id2);
           if (tpl) {
             tpl.blocks.forEach(b => state.timeblocks.push({ id: self._id(), day: day0, start: b.start, durMin: b.durMin, type: b.type, label: b.label }));
-            try { persistNow(); showComingSoonToast('Day planned.'); } catch (_) {}
+            try { persistNow(); } catch (_) {}
           }
           rerender(); return;
         }
@@ -1312,7 +1312,7 @@ const SHEET_TEMPLATES = {
           if (!tpl) return;
           tpl.blocks.forEach(b => state.timeblocks.push({ id: self._id(), day: day0, start: b.start, durMin: b.durMin, type: b.type, label: b.label }));
           self._tplOpen = false;
-          try { persistNow(); showComingSoonToast('Template applied.'); } catch (_) {}
+          try { persistNow(); } catch (_) {}
           rerender(); return;
         }
         if (t.hasAttribute('data-tb-add')) { self._addStart = '09:00'; self._adding = true; self._importing = false; rerender('tbLabel'); return; }
@@ -1327,7 +1327,7 @@ const SHEET_TEMPLATES = {
           state.timeblocks.filter(b => b && b.day === day).forEach(b => {
             state.timeblocks.push({ id: self._id(), day: tm, start: b.start, durMin: b.durMin, type: b.type, label: b.label });
           });
-          try { persistNow(); showComingSoonToast('Copied to tomorrow.'); } catch (_) {}
+          try { persistNow(); } catch (_) {}
           self._day = tm; rerender(); return;
         }
         if (t.hasAttribute('data-tb-ics-open')) { self._importing = true; self._adding = false; rerender('tbIcsPaste'); return; }
@@ -3429,7 +3429,6 @@ const SHEET_TEMPLATES = {
             a.href = cv.toDataURL('image/png');
             a.download = 'memento-moment.png';
             document.body.appendChild(a); a.click(); a.remove();
-            try { showComingSoonToast('Saved as image.'); } catch (e) {}
           };
           cv.width = W;
           if (m.media && m.media[0]) {
@@ -5796,7 +5795,6 @@ const SHEET_TEMPLATES = {
           a.download = 'memento-notes.md';
           document.body.appendChild(a); a.click(); a.remove();
           setTimeout(() => { try { URL.revokeObjectURL(a.href); } catch (e2) {} }, 4000);
-          if (typeof showComingSoonToast === 'function') showComingSoonToast('All notes exported.');
         } catch (e2) {}
         if (opts) opts.hidden = true;
       });
