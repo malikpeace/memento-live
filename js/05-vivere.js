@@ -290,6 +290,11 @@ function hydrateImageEls(root) {
 // browser storage budget. Calls cb(dataURL, w, h) or cb(null) on failure.
 function vivDownscaleImage(file, maxDim, cb) {
   try {
+    if (!file || file.size > 20 * 1024 * 1024 || /^image\/svg/i.test(file.type || '') ||
+        (window.MementoBackup && !window.MementoBackup.acceptImageFile(file))) {
+      cb(null);
+      return;
+    }
     const reader = new FileReader();
     reader.onload = (e) => {
       const img = new Image();
@@ -1935,7 +1940,13 @@ function vivMarkResurfaced(id) {
 // and quality; resolves to '' on any failure (text-first, photo optional).
 function vivCompressImage(file, cb) {
   try {
-    if (!file || !/^image\//.test(file.type)) { cb(''); return; }
+    if (!file
+        || file.size > 20 * 1024 * 1024
+        || /^image\/svg/i.test(file.type || '')
+        || (window.MementoBackup && !window.MementoBackup.acceptImageFile(file))) {
+      cb('');
+      return;
+    }
     const reader = new FileReader();
     reader.onerror = () => cb('');
     reader.onload = () => {
@@ -1963,4 +1974,3 @@ function vivCompressImage(file, cb) {
     reader.readAsDataURL(file);
   } catch (e) { cb(''); }
 }
-

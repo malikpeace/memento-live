@@ -5799,8 +5799,9 @@ const TabBar = {
     const importBtn = document.getElementById('importData');
     const importFile = document.getElementById('importFile');
     const dataMsg = document.getElementById('dataMsg');
-    if (exportBtn) exportBtn.addEventListener('click', () => {
-      const ok = exportMementoData();
+    if (exportBtn) exportBtn.addEventListener('click', async () => {
+      if (dataMsg) dataMsg.textContent = 'Preparing backup...';
+      const ok = await exportMementoData();
       if (dataMsg) dataMsg.textContent = ok ? 'Backup downloaded.' : 'Could not export.';
     });
     if (importBtn && importFile) importBtn.addEventListener('click', () => importFile.click());
@@ -5906,8 +5907,11 @@ function initLogin() {
    ============================================ */
 // Downloads the full state wrapped with a schema version + timestamp so a
 // cleared browser or new device does not erase the user's history.
-function exportMementoData() {
+async function exportMementoData() {
   if (DEMO_MODE) return false;
+  if (window.MementoBackup && typeof window.MementoBackup.export === 'function') {
+    return window.MementoBackup.export(state, SCHEMA_VERSION);
+  }
   try {
     const payload = { schemaVersion: SCHEMA_VERSION, exportedAt: new Date().toISOString(), state };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -5925,6 +5929,13 @@ function exportMementoData() {
 // state object. Always deepMerges onto DEFAULT_STATE so a backup from an older
 // schema restores gracefully instead of breaking on missing fields.
 function importMementoData(file, onDone) {
+  if (window.MementoBackup && typeof window.MementoBackup.import === 'function') {
+    window.MementoBackup.import(file, restoreStateObject)
+      .then((ok) => { if (onDone) onDone(ok); })
+      .catch(() => { if (onDone) onDone(false); });
+    return;
+  }
+  if (!file || file.size > 10 * 1024 * 1024) { if (onDone) onDone(false); return; }
   const reader = new FileReader();
   reader.onload = () => {
     try {

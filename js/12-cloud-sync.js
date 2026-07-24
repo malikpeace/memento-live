@@ -124,6 +124,7 @@ const CloudSync = (function () {
   function available() { return !!client; }
   function isLoggedIn() { return !!(session && session.user); }
   function email() { return (session && session.user && session.user.email) || ''; }
+  function accessToken() { return (session && session.access_token) || ''; }
 
   // Short human label stored next to each push so "which device wrote this"
   // is answerable from the table. Never anything identifying beyond OS+browser.
@@ -501,21 +502,29 @@ const CloudSync = (function () {
     } catch (e) {}
   }
 
-  // Public share links: insert one rendered card into the shares table under
-  // an unguessable id. Read side is the get_share RPC (share.html); setup SQL
-  // lives in overnight/SHARE_LINKS_SETUP.md. Explicit pull-only export.
+  // Public share links: send one rendered card through the authenticated,
+  // rate-limited share boundary under an unguessable id. Explicit pull-only
+  // export; nothing is public unless the person presses the share button.
   async function createShare(rec) {
     try {
-      if (!client) return { ok: false, reason: 'unavailable' };
+      if (!client || !session || !session.access_token) return { ok: false, reason: 'unavailable' };
       if (!isLoggedIn()) return { ok: false, reason: 'auth' };
-      const r = await client.from('shares').insert({
-        id: rec.id, owner: session.user.id, kind: rec.kind || 'card', payload: rec.payload || {}
+      const r = await fetch(SUPABASE_URL + '/functions/v1/share-card', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': 'Bearer ' + session.access_token,
+          'x-memento-device': deletionDeviceId(),
+        },
+        body: JSON.stringify({
+          id: rec.id,
+          kind: rec.kind,
+          payload: rec.payload || {},
+        }),
       });
-      if (r && r.error) {
-        const msg = String(r.error.message || '');
-        if (r.error.code === '42P01' || msg.indexOf('relation') !== -1) return { ok: false, reason: 'no-table' };
-        return { ok: false, reason: 'error' };
-      }
+      if (r.status === 401) return { ok: false, reason: 'auth' };
+      if (!r.ok) return { ok: false, reason: 'error' };
       return { ok: true };
     } catch (e) { return { ok: false, reason: 'error' }; }
   }
@@ -591,6 +600,11 @@ const CloudSync = (function () {
     clearTimeout(pushTimer);
     pushQueued = false;
     if (hadPending) { try { await pushNow(); } catch (e) {} }
+    try {
+      if (window.MementoPush && MementoPush.disableForSignOut) {
+        await settleWithin(MementoPush.disableForSignOut(), 3500);
+      }
+    } catch (e) {}
     try { await client.auth.signOut(); } catch (e) {}
     session = null;
     firstSyncState = FIRST_SYNC_WAITING;
@@ -600,6 +614,321 @@ const CloudSync = (function () {
     clearRestoreReload();
     hideRestoreScreen();
     refreshAccountCard();
+  }
+
+  /* ---------- account deletion ---------- */
+
+  let deleteEl = null;
+  let deleteWorking = false;
+  let deleteOperationId = '';
+
+  function newDeletionOperationId() {
+    try {
+      if (crypto && crypto.randomUUID) return crypto.randomUUID();
+    } catch (e) {}
+    const bytes = new Uint8Array(16);
+    try { crypto.getRandomValues(bytes); } catch (e) {
+      for (let i = 0; i < bytes.length; i++) bytes[i] = Math.floor(Math.random() * 256);
+    }
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+    const hex = [].map.call(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+    return hex.slice(0, 8) + '-' + hex.slice(8, 12) + '-' + hex.slice(12, 16) + '-' +
+      hex.slice(16, 20) + '-' + hex.slice(20);
+  }
+
+  function deletionDeviceId() {
+    try {
+      if (typeof Analytics !== 'undefined' && Analytics.deviceId) return Analytics.deviceId();
+    } catch (e) {}
+    try { return localStorage.getItem('memento_device_id') || ''; } catch (e) { return ''; }
+  }
+
+  function setDeletionStatus(text, isError) {
+    if (!deleteEl) return;
+    ['#accountDeleteStatus', '#accountDeleteIntroStatus'].forEach((selector) => {
+      const el = deleteEl.querySelector(selector);
+      if (!el) return;
+      el.textContent = text || '';
+      el.style.color = isError ? '#ff8d8d' : 'var(--text-2)';
+    });
+  }
+
+  function buildDeletionDialog() {
+    if (deleteEl) return deleteEl;
+    deleteEl = document.createElement('div');
+    deleteEl.id = 'accountDeleteDialog';
+    deleteEl.setAttribute('role', 'dialog');
+    deleteEl.setAttribute('aria-modal', 'true');
+    deleteEl.setAttribute('aria-hidden', 'true');
+    deleteEl.setAttribute('aria-labelledby', 'accountDeleteTitle');
+    deleteEl.setAttribute('data-cloud-keep', '');
+    deleteEl.style.cssText = 'position:fixed;inset:0;z-index:2147483100;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.78);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);';
+    deleteEl.innerHTML =
+      '<div style="width:min(100%,430px);box-sizing:border-box;padding:28px 24px;border:1px solid rgba(255,255,255,.1);background:#0c0d10;color:#f5f5f7;border-radius:8px;box-shadow:0 24px 80px rgba(0,0,0,.55);">' +
+        '<div id="accountDeleteIntro">' +
+          '<h2 id="accountDeleteTitle" style="margin:0 0 10px;font-size:1.45rem;letter-spacing:0;">Delete your account</h2>' +
+          '<p style="margin:0 0 18px;color:#a7a7af;line-height:1.55;font-size:.92rem;">This permanently deletes your cloud account, synced Memento data, reminders, and the Memento data on this device.</p>' +
+          '<button type="button" id="accountDeleteBackup" class="sheet-btn" style="width:100%;margin-bottom:10px;background:#f5f5f7;color:#090a0c;border:0;">Download a backup first</button>' +
+          '<button type="button" id="accountDeleteSend" class="sheet-btn" style="width:100%;margin-bottom:10px;background:rgba(255,76,76,.12);color:#ff9a9a;border:1px solid rgba(255,76,76,.3);">Continue to deletion</button>' +
+          '<button type="button" data-delete-close class="sheet-btn" style="width:100%;background:transparent;color:#a7a7af;border:0;">Cancel</button>' +
+          '<div id="accountDeleteIntroStatus" role="status" aria-live="polite" style="min-height:20px;margin-top:8px;color:#a7a7af;font-size:.78rem;text-align:center;"></div>' +
+        '</div>' +
+        '<div id="accountDeleteCodeStep" hidden>' +
+          '<h2 style="margin:0 0 10px;font-size:1.45rem;letter-spacing:0;">Check your email</h2>' +
+          '<p style="margin:0 0 18px;color:#a7a7af;line-height:1.55;font-size:.92rem;">Enter the fresh six-digit code sent to <b id="accountDeleteEmail" style="color:#f5f5f7;"></b>. This proves it is really you.</p>' +
+          '<input id="accountDeleteCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" aria-label="Six-digit deletion code" placeholder="000000" style="width:100%;box-sizing:border-box;margin-bottom:12px;padding:14px 16px;border:1px solid rgba(255,255,255,.12);border-radius:6px;background:rgba(255,255,255,.06);color:#f5f5f7;font:inherit;font-size:1.2rem;text-align:center;letter-spacing:.35em;outline:none;">' +
+          '<button type="button" id="accountDeleteConfirm" class="sheet-btn" style="width:100%;margin-bottom:10px;background:#d92d35;color:white;border:0;">Delete account permanently</button>' +
+          '<button type="button" id="accountDeleteResend" class="sheet-btn" style="width:100%;margin-bottom:4px;background:transparent;color:#a7a7af;border:0;">Send a new code</button>' +
+          '<button type="button" data-delete-close class="sheet-btn" style="width:100%;background:transparent;color:#a7a7af;border:0;">Cancel</button>' +
+          '<div id="accountDeleteStatus" role="status" aria-live="polite" style="min-height:20px;margin-top:8px;color:#a7a7af;font-size:.78rem;text-align:center;"></div>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(deleteEl);
+
+    deleteEl.querySelectorAll('[data-delete-close]').forEach((button) => {
+      button.addEventListener('click', closeDeletionDialog);
+    });
+    const backup = deleteEl.querySelector('#accountDeleteBackup');
+    if (backup) backup.addEventListener('click', async () => {
+      let ok = false;
+      setDeletionStatus('Preparing your backup...', false);
+      try { if (typeof exportMementoData === 'function') ok = await exportMementoData(); } catch (e) {}
+      if (ok) setDeletionStatus('Backup downloaded. Keep it somewhere safe.', false);
+      if (!ok) setDeletionStatus('The backup could not be downloaded. Your account has not been changed.', true);
+    });
+    const send = deleteEl.querySelector('#accountDeleteSend');
+    if (send) send.addEventListener('click', () => sendDeletionCode(false));
+    const resend = deleteEl.querySelector('#accountDeleteResend');
+    if (resend) resend.addEventListener('click', () => sendDeletionCode(true));
+    const confirm = deleteEl.querySelector('#accountDeleteConfirm');
+    if (confirm) confirm.addEventListener('click', confirmAccountDeletion);
+    const code = deleteEl.querySelector('#accountDeleteCode');
+    if (code) {
+      code.addEventListener('input', () => { code.value = String(code.value || '').replace(/\D/g, '').slice(0, CODE_LEN); });
+      code.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') { event.preventDefault(); confirmAccountDeletion(); }
+      });
+    }
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && deleteEl.style.display === 'flex' && !deleteWorking) {
+        event.preventDefault();
+        event.stopPropagation();
+        closeDeletionDialog();
+      }
+    }, true);
+    return deleteEl;
+  }
+
+  function openDeletionDialog() {
+    if (!isLoggedIn() || deleteWorking) return;
+    const dialog = buildDeletionDialog();
+    const intro = dialog.querySelector('#accountDeleteIntro');
+    const codeStep = dialog.querySelector('#accountDeleteCodeStep');
+    const code = dialog.querySelector('#accountDeleteCode');
+    if (intro) intro.hidden = false;
+    if (codeStep) codeStep.hidden = true;
+    if (code) code.value = '';
+    deleteOperationId = '';
+    setDeletionStatus('', false);
+    dialog.style.display = 'flex';
+    dialog.setAttribute('aria-hidden', 'false');
+    try { const first = dialog.querySelector('#accountDeleteBackup'); if (first) first.focus(); } catch (e) {}
+  }
+
+  function closeDeletionDialog() {
+    if (!deleteEl || deleteWorking) return;
+    deleteEl.style.display = 'none';
+    deleteEl.setAttribute('aria-hidden', 'true');
+    deleteOperationId = '';
+  }
+
+  async function sendDeletionCode(isResend) {
+    if (!client || !isLoggedIn() || deleteWorking) return;
+    const address = email();
+    const send = deleteEl && deleteEl.querySelector(isResend ? '#accountDeleteResend' : '#accountDeleteSend');
+    if (send) { send.disabled = true; send.textContent = 'Sending...'; }
+    try {
+      const result = await client.auth.signInWithOtp({
+        email: address,
+        options: { shouldCreateUser: false },
+      });
+      if (result && result.error) throw result.error;
+      deleteOperationId = newDeletionOperationId();
+      const intro = deleteEl.querySelector('#accountDeleteIntro');
+      const codeStep = deleteEl.querySelector('#accountDeleteCodeStep');
+      const addressEl = deleteEl.querySelector('#accountDeleteEmail');
+      if (addressEl) addressEl.textContent = address;
+      if (intro) intro.hidden = true;
+      if (codeStep) codeStep.hidden = false;
+      setDeletionStatus(isResend ? 'A new code was sent.' : '', false);
+      try { const code = deleteEl.querySelector('#accountDeleteCode'); if (code) { code.value = ''; code.focus(); } } catch (e) {}
+    } catch (e) {
+      setDeletionStatus('The code could not be sent. Nothing was deleted. Try again.', true);
+      try { if (window.MementoErrors) MementoErrors.reportBackend({ endpoint: 'auth', status: 0, phase: 'reauth' }); } catch (_) {}
+    } finally {
+      if (send) {
+        send.disabled = false;
+        send.textContent = isResend ? 'Send a new code' : 'Continue to deletion';
+      }
+    }
+  }
+
+  async function invokeAccountDeletion(accessToken) {
+    const response = await fetch(SUPABASE_URL + '/functions/v1/delete-account', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + accessToken,
+        'x-memento-device': deletionDeviceId(),
+      },
+      body: JSON.stringify({ operation_id: deleteOperationId }),
+      signal: AbortSignal.timeout(20000),
+    });
+    let result = null;
+    try { result = await response.json(); } catch (e) {}
+    return { ok: response.ok && result && result.deleted === true, status: response.status };
+  }
+
+  function settleWithin(promise, timeoutMs) {
+    return Promise.race([
+      Promise.resolve(promise).catch(() => null),
+      new Promise((resolve) => setTimeout(() => resolve(null), timeoutMs)),
+    ]);
+  }
+
+  async function eraseCurrentDeviceAfterDeletion() {
+    try { if (typeof IS_RESETTING !== 'undefined') IS_RESETTING = true; } catch (e) {}
+    try {
+      if ('serviceWorker' in navigator) {
+        await settleWithin(
+          navigator.serviceWorker.ready.then((registration) => (
+            registration.pushManager
+              ? registration.pushManager.getSubscription()
+              : null
+          )).then((subscription) => subscription ? subscription.unsubscribe() : null),
+          2500,
+        );
+      }
+    } catch (e) {}
+    try { if (client) await settleWithin(client.auth.signOut({ scope: 'local' }), 2000); } catch (e) {}
+    try {
+      if (typeof _idbUrlCache !== 'undefined' && _idbUrlCache && _idbUrlCache.forEach) {
+        _idbUrlCache.forEach((value) => { try { URL.revokeObjectURL(value); } catch (e) {} });
+        _idbUrlCache.clear();
+      }
+      if (typeof _idbDB !== 'undefined' && _idbDB) { try { _idbDB.close(); } catch (e) {} _idbDB = null; }
+      if (window.indexedDB) {
+        await settleWithin(new Promise((resolve) => {
+          try {
+            const request = indexedDB.deleteDatabase('memento_media');
+            request.onsuccess = request.onerror = request.onblocked = () => resolve(null);
+          } catch (e) { resolve(null); }
+        }), 2500);
+      }
+    } catch (e) {}
+    try {
+      const keys = [];
+      for (let i = 0; i < localStorage.length; i++) keys.push(localStorage.key(i));
+      keys.forEach((key) => {
+        if (key && (key.indexOf('memento_') === 0 || key.indexOf('sb-lipuxymlsowdrbummqxw-') === 0)) {
+          try { localStorage.removeItem(key); } catch (e) {}
+        }
+      });
+    } catch (e) {}
+    try {
+      const keys = [];
+      for (let i = 0; i < sessionStorage.length; i++) keys.push(sessionStorage.key(i));
+      keys.forEach((key) => {
+        if (key && (key.indexOf('memento_') === 0 || key.indexOf('sb-lipuxymlsowdrbummqxw-') === 0)) {
+          try { sessionStorage.removeItem(key); } catch (e) {}
+        }
+      });
+    } catch (e) {}
+    session = null;
+    try { location.replace(location.origin + location.pathname); } catch (e) { location.reload(); }
+  }
+
+  async function confirmAccountDeletion() {
+    if (!client || !isLoggedIn() || deleteWorking) return;
+    const codeInput = deleteEl && deleteEl.querySelector('#accountDeleteCode');
+    const code = String(codeInput && codeInput.value || '').replace(/\D/g, '');
+    if (code.length !== CODE_LEN) {
+      setDeletionStatus('Enter the six-digit code from your email.', true);
+      return;
+    }
+    if (!deleteOperationId) deleteOperationId = newDeletionOperationId();
+
+    const button = deleteEl.querySelector('#accountDeleteConfirm');
+    const originalUserId = session && session.user && session.user.id;
+    deleteWorking = true;
+    if (button) { button.disabled = true; button.textContent = 'Deleting...'; }
+    setDeletionStatus('Verifying your identity...', false);
+    try {
+      const verified = await client.auth.verifyOtp({
+        email: email(),
+        token: code,
+        type: 'email',
+      });
+      if (verified && verified.error) throw new Error('verification_failed');
+      const freshSession = verified && verified.data && verified.data.session;
+      const freshUserId = freshSession && freshSession.user && freshSession.user.id;
+      if (!freshSession || !freshSession.access_token || !freshUserId || freshUserId !== originalUserId) {
+        throw new Error('verification_failed');
+      }
+
+      session = freshSession;
+      setDeletionStatus('Deleting your account and synced data...', false);
+      const result = await invokeAccountDeletion(freshSession.access_token);
+      if (!result.ok) {
+        try { if (window.MementoErrors) MementoErrors.reportBackend({ endpoint: 'account_delete', status: result.status, phase: 'delete' }); } catch (_) {}
+        throw new Error('deletion_failed');
+      }
+
+      setDeletionStatus('Account deleted. Clearing this device...', false);
+      await eraseCurrentDeviceAfterDeletion();
+    } catch (e) {
+      const verificationFailed = String(e && e.message || '') === 'verification_failed';
+      setDeletionStatus(
+        verificationFailed
+          ? 'That code did not work. Nothing was deleted. Request a new code and try again.'
+          : 'Deletion could not finish. Your device has not been erased. Try again.',
+        true,
+      );
+      try {
+        if (window.MementoErrors) MementoErrors.reportBackend({
+          endpoint: verificationFailed ? 'auth' : 'account_delete',
+          status: 0,
+          phase: verificationFailed ? 'reauth' : 'delete',
+        });
+      } catch (_) {}
+      deleteWorking = false;
+      if (button) { button.disabled = false; button.textContent = 'Delete account permanently'; }
+    }
+  }
+
+  function installAccountDeletionUi() {
+    try {
+      if (typeof TabBar === 'undefined' || TabBar._mementoDeletionWired) return;
+      const render = TabBar.renderAccountSection;
+      const bind = TabBar.bindAccountSection;
+      TabBar.renderAccountSection = function () {
+        const base = render.call(this);
+        if (!isLoggedIn()) return base;
+        return base +
+          '<div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(var(--ink),0.08);">' +
+            '<button class="sheet-btn" id="acctDeleteAccount" style="width:100%;background:transparent;color:#d95b61;border:1px solid rgba(217,91,97,.22);">Delete account</button>' +
+            '<div style="font-size:0.6875rem;color:var(--text-3);margin-top:8px;">Requires a fresh code sent to your email.</div>' +
+          '</div>';
+      };
+      TabBar.bindAccountSection = function () {
+        bind.call(this);
+        const button = document.getElementById('acctDeleteAccount');
+        if (button) button.addEventListener('click', openDeletionDialog);
+      };
+      TabBar._mementoDeletionWired = true;
+    } catch (e) {}
   }
 
   // Community counter: fetch the public aggregate "days shown up across Memento"
@@ -920,6 +1249,7 @@ const CloudSync = (function () {
   /* ---------- boot ---------- */
 
   function init() {
+    try { installAccountDeletionUi(); } catch (e) {}
     try {
       if (window.supabase && window.supabase.createClient) {
         client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -973,10 +1303,10 @@ const CloudSync = (function () {
   }
 
   return {
-    init, available, isLoggedIn, email,
+    init, available, isLoggedIn, email, accessToken,
     schedulePush, pushNow, syncNow,
     sendCode, verifyCode, signOut, mergeDecision, buildMergedState, createShare, lastSyncedText,
-    communityDays, openDialog, closeDialog
+    communityDays, openDialog, closeDialog, openDeletionDialog
   };
 })();
 

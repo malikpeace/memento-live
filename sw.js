@@ -23,9 +23,10 @@ const PRECACHE = [
   './bg/mountain.jpg', './bg/streaks.jpg',
   './css/base.css', './css/sidebar.css', './css/dashboard.css', './css/misc.css',
   './css/vivere.css', './css/notes.css', './css/onboarding.css', './css/clarity.css',
-  './css/action.css', './css/daycard-living.css', './css/share-card.css',
+  './css/action.css', './css/daycard-living.css',
   './css/clarity-paywall.css', './css/appearance-picker.css', './css/journey.css',
   './css/descent.css', './css/install.css',
+  './js/00-error-reporting.js', './js/00-backup-security.js',
   './js/01-state-foundation.js', './js/02-clarity-experience.js', './js/03-ai-integration.js',
   './js/04-templates-proof.js', './js/05-vivere.js', './js/06-consistency-mori.js',
   './js/07-sheet-templates.js', './js/08-cards-grid-share.js', './js/09-controllers.js',
@@ -48,8 +49,10 @@ const PRECACHE = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE)
-      .then((c) => c.addAll(PRECACHE))
-      .catch(() => {}) // a failed precache must never block install; runtime caching fills gaps
+      // One unavailable optional asset must not cancel every other offline
+      // asset. The deployment test verifies the manifest before release; this
+      // per-file fallback protects installs from a transient network failure.
+      .then((c) => Promise.all(PRECACHE.map((url) => c.add(url).catch(() => null))))
       .then(() => self.skipWaiting())
   );
 });
@@ -68,6 +71,13 @@ self.addEventListener('fetch', (event) => {
   let url;
   try { url = new URL(req.url); } catch (e) { return; }
   if (url.origin !== self.location.origin) return; // Supabase, AI, CDNs: untouched
+  // Static app files never need their query string to identify the cached
+  // response. Canonicalizing the key prevents OAuth codes, share ids, and
+  // other query values from being retained in Cache Storage.
+  const cacheKey = new Request(url.origin + url.pathname, {
+    method: 'GET',
+    credentials: 'same-origin'
+  });
   // cache:'no-cache' forces revalidation against the server (304s are cheap),
   // so the browser's heuristic HTTP cache can never serve a stale file from
   // under us on servers without cache headers. Navigations cannot be passed
@@ -80,16 +90,19 @@ self.addEventListener('fetch', (event) => {
       .then((res) => {
         // Cache every good same-origin response so offline keeps working even
         // for files that were not in the precache list.
-        if (res && res.ok && res.type === 'basic') {
+        const cacheControl = res && res.headers
+          ? String(res.headers.get('cache-control') || '').toLowerCase()
+          : '';
+        if (res && res.ok && res.type === 'basic' && cacheControl.indexOf('no-store') === -1) {
           const copy = res.clone();
-          caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {});
+          caches.open(CACHE).then((c) => c.put(cacheKey, copy)).catch(() => {});
         }
         return res;
       })
       // ignoreSearch so the ?v= cache-busting query on css/js requests still
       // matches the UNVERSIONED precache keys (./css/base.css etc.) on a cold
       // offline start, before runtime caching has stored the versioned URLs.
-      .catch(() => caches.match(req, { ignoreSearch: true }).then((hit) => {
+      .catch(() => caches.match(cacheKey).then((hit) => {
         if (hit) return hit;
         // Navigations fall back to the cached shell.
         if (req.mode === 'navigate') return caches.match('./index.html');

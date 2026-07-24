@@ -1201,7 +1201,7 @@ const SHEET_TEMPLATES = {
       return events;
     },
     _importIcsText(text) {
-      const found = this._parseICS(text);
+      const found = this._parseICS(String(text || '').slice(0, 2 * 1024 * 1024)).slice(0, 5000);
       if (!found.length) return 0;
       if (!state.calendar || typeof state.calendar !== 'object') state.calendar = { events: [] };
       if (!Array.isArray(state.calendar.events)) state.calendar.events = [];
@@ -1407,6 +1407,11 @@ const SHEET_TEMPLATES = {
       }, true);
       body.addEventListener('change', (e) => {
         if (e.target && e.target.id === 'tbIcsFile' && e.target.files && e.target.files[0]) {
+          if (e.target.files[0].size > 2 * 1024 * 1024) {
+            try { if (typeof showComingSoonToast === 'function') showComingSoonToast('That calendar file is too large.'); } catch (_) {}
+            e.target.value = '';
+            return;
+          }
           const fr = new FileReader();
           fr.onload = () => {
             const n = self._importIcsText(String(fr.result || ''));
@@ -5891,10 +5896,11 @@ const SHEET_TEMPLATES = {
       if (impBtn && impFile) {
         impBtn.addEventListener('click', () => impFile.click());
         impFile.addEventListener('change', async () => {
-          const files = Array.from(impFile.files || []);
+          const files = Array.from(impFile.files || []).slice(0, 50);
           let n = 0;
           for (const f of files) {
             try {
+              if (!f || f.size > 2 * 1024 * 1024) continue;
               const text = await f.text();
               const htmlBody = self._mdToHtml(text);
               const folder = (self._view && self._view !== 'all' && self._view !== 'trash') ? self._view : null;

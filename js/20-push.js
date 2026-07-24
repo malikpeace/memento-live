@@ -80,6 +80,16 @@
     return c;
   }
 
+  function remoteToken() {
+    try {
+      if (window.CloudSync && CloudSync.accessToken) {
+        var token = CloudSync.accessToken();
+        if (token) return token;
+      }
+    } catch (e) {}
+    return window.MEMENTO_SUPABASE_ANON || '';
+  }
+
   function rpcSync(sub) {
     try {
       var url = window.MEMENTO_SUPABASE_URL, anon = window.MEMENTO_SUPABASE_ANON;
@@ -91,24 +101,55 @@
       if (!device) return Promise.resolve();
       var ctx = buildContext();
       var today = (typeof getTodayISO === 'function') ? getTodayISO() : null;
-      return fetch(url + '/rest/v1/rpc/upsert_push_subscription', {
-        method: 'POST',
-        headers: { apikey: anon, Authorization: 'Bearer ' + anon, 'Content-Type': 'application/json' },
+      return fetch(fnUrl(), {
+        method: 'PUT',
+        headers: {
+          apikey: anon,
+          Authorization: 'Bearer ' + remoteToken(),
+          'Content-Type': 'application/json',
+          'x-memento-device': device
+        },
         body: JSON.stringify({
-          p_device: device,
-          p_endpoint: j.endpoint || '',
-          p_p256dh: keys.p256dh || '',
-          p_auth: keys.auth || '',
-          p_tz_offset_min: ctx.tz,
-          p_move_name: ctx.move,
-          p_day_done_date: ctx.dayDone,
-          p_last_open_date: today,
-          p_paid: ctx.paid,
-          p_clarity_done: ctx.clarity,
-          p_enabled: true
+          endpoint: j.endpoint || '',
+          p256dh: keys.p256dh || '',
+          auth: keys.auth || '',
+          tz_offset_min: ctx.tz,
+          move_name: ctx.move,
+          day_done_date: ctx.dayDone,
+          last_open_date: today,
+          paid: ctx.paid,
+          clarity_done: ctx.clarity,
+          enabled: true
         })
       }).catch(function () {});
     } catch (e) { return Promise.resolve(); }
+  }
+
+  function disableForSignOut() {
+    var url = window.MEMENTO_SUPABASE_URL, anon = window.MEMENTO_SUPABASE_ANON;
+    var token = remoteToken();
+    var device = '';
+    try { device = (typeof deviceId === 'function') ? deviceId() : ''; } catch (e) {}
+    var remove = Promise.resolve();
+    if (url && anon && token && token !== anon && device) {
+      remove = fetch(fnUrl(), {
+        method: 'DELETE',
+        headers: {
+          apikey: anon,
+          Authorization: 'Bearer ' + token,
+          'x-memento-device': device
+        }
+      }).catch(function () {});
+    }
+    return remove.then(function () {
+      if (!supported()) return null;
+      return navigator.serviceWorker.ready
+        .then(function (registration) { return registration.pushManager.getSubscription(); })
+        .then(function (subscription) { return subscription ? subscription.unsubscribe() : null; })
+        .catch(function () {});
+    }).then(function () {
+      try { localStorage.removeItem(ON_KEY); } catch (e) {}
+    });
   }
 
   // Refresh the server's picture of this device (open date, move, day done).
@@ -285,6 +326,7 @@
 
   window.MementoPush = {
     sync: sync,
+    disableForSignOut: disableForSignOut,
     maybePromptAfterFirstWin: maybePromptAfterFirstWin,
     supported: supported
   };

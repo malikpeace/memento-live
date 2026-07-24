@@ -7,7 +7,7 @@
    ONCE on mismatch. Kills the "phone silently runs old cached js under a new
    index" class (the SW's offline fallback can serve stale files on a bad
    connection; Malik hit this three times in one day). */
-window.MEMENTO_JS_BUILD = 'v980';
+window.MEMENTO_JS_BUILD = 'v981';
 /* ============================================
    STATE MANAGEMENT
    ============================================ */
@@ -178,13 +178,16 @@ const DEFAULT_STATE = {
 let state = {};
 let saveTimer = null;
 
-function deepMerge(target, source) {
+function deepMerge(target, source, depth) {
+  depth = Number(depth) || 0;
   // Deep clone the target first. A shallow { ...target } aliases default nested
   // objects by reference for any key missing from source, so later state
   // mutations would corrupt DEFAULT_STATE itself and poison future clones.
   const out = JSON.parse(JSON.stringify(target));
   if (!source || typeof source !== 'object') return out;
+  if (depth > 40) return out;
   for (const key of Object.keys(source)) {
+    if (key === '__proto__' || key === 'prototype' || key === 'constructor') continue;
     const sv = source[key];
     // A corrupted or hand-edited backup can carry null/undefined for a key that
     // the defaults define as a structured object (e.g. {clarity:null}). Letting
@@ -194,7 +197,7 @@ function deepMerge(target, source) {
     if (Array.isArray(sv) && out[key] && !Array.isArray(out[key])) continue;
     if (typeof sv === 'object' && !Array.isArray(sv) &&
         out[key] && typeof out[key] === 'object' && !Array.isArray(out[key])) {
-      out[key] = deepMerge(target[key], sv);
+      out[key] = deepMerge(target[key], sv, depth + 1);
     } else if (Array.isArray(sv)) {
       // Deep-clone arrays so the merged state can never alias the source blob.
       out[key] = JSON.parse(JSON.stringify(sv));
@@ -520,12 +523,12 @@ const Analytics = {
       try { this._ship(event, meta || null); } catch (e) {}
     } catch (e) {}
   },
-  /* Funnel shipping (FIRST-WIN-PLAN #10): the same events, mirrored to the
-     Supabase `events` table so the funnel is measurable across users. Insert-
-     only via the public anon key (RLS blocks all reads), random device id, no
-     PII, tiny payloads. Fully silent: offline or failed sends sit in a local
-     queue and retry on the next event or tab focus; nothing here can ever
-     surface an error or block the app. */
+  /* Funnel shipping (FIRST-WIN-PLAN #10): the same events, mirrored through
+     the rate-limited report-event boundary so browsers cannot write arbitrary
+     rows to the database. The server allowlists event names and metadata,
+     hashes the random device id, and discards everything else. Fully silent:
+     offline or failed sends sit in a local queue and retry on the next event
+     or tab focus; nothing here can surface an error or block the app. */
   _evqKey: 'memento_evq',
   _flushing: false,
   _ship(event, meta) {
@@ -554,11 +557,15 @@ const Analytics = {
       this._flushing = true;
       const batch = q.slice(0, 25);
       const device = this.deviceId();
-      const rows = batch.map(x => ({ device_id: device, name: x.n, props: x.p, app_version: x.v || null }));
-      fetch(url + '/rest/v1/events', {
+      fetch(url + '/functions/v1/report-event', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'apikey': anon, 'Authorization': 'Bearer ' + anon, 'Prefer': 'return=minimal' },
-        body: JSON.stringify(rows)
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': anon,
+          'Authorization': 'Bearer ' + anon,
+          'x-memento-device': device
+        },
+        body: JSON.stringify({ events: batch })
       }).then((r) => {
         this._flushing = false;
         if (!r.ok) return; // leave queued; retried on next event/focus
