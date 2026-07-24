@@ -1344,9 +1344,14 @@ function renderGreeting() {
     // swaps the date for the weeks you have left to live for a few seconds,
     // the home's quiet mortality tap.
     const dateStr = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-    mg.innerHTML = weeksLeft != null
+    // v976: the mobile Settings/You corner icon sits beside the date (the retired
+    // bottom bar's You tab). Opens the profile panel via the TabBar machinery.
+    const gearHTML = '<button class="wbar__settings" id="wbarSettings" type="button" aria-label="You and settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.5" r="3.4"/><path d="M5.5 19.5c1.2-3.4 3.6-5 6.5-5s5.3 1.6 6.5 5"/></svg></button>';
+    mg.innerHTML = gearHTML + (weeksLeft != null
       ? '<span class="wbar__date" id="wbarDate" role="button" tabindex="0" aria-label="Show weeks left to live">' + esc(dateStr) + '</span>'
-      : '<span class="wbar__date" id="wbarDate">' + esc(dateStr) + '</span>';
+      : '<span class="wbar__date" id="wbarDate">' + esc(dateStr) + '</span>');
+    const _ws = document.getElementById('wbarSettings');
+    if (_ws) _ws.addEventListener('click', function () { try { if (typeof TabBar !== 'undefined' && TabBar.switchTo) TabBar.switchTo('profile'); } catch (e) {} });
     const wd = document.getElementById('wbarDate');
     if (wd && weeksLeft != null) {
       const revert = () => { wd.textContent = dateStr; wd._wbOn = false; };
