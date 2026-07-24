@@ -4299,12 +4299,19 @@ html.theme-light .n7d-cta {
   background:
     radial-gradient(140% 42% at 26% 103%, rgba(58, 217, 245, 0.42), transparent 62%),   /* cyan ribbon, left */
     radial-gradient(155% 46% at 50% 107%, rgba(63, 217, 78, 0.34), transparent 60%);     /* green ribbon, deepest floor */
+  /* v971 (Malik: harsh line in the bottom-right): the ribbons stay opaque at the
+     viewport edge, so the fixed overlay clipped them into a hard vertical line as
+     they drift. Feather the left/right edges to transparent so no clip can show. */
+  -webkit-mask: linear-gradient(90deg, transparent 0, #000 17%, #000 83%, transparent 100%);
+          mask: linear-gradient(90deg, transparent 0, #000 17%, #000 83%, transparent 100%);
 }
 .n7d-finale::before {
   content: ''; position: absolute; inset: 0; pointer-events: none;
   background:
     radial-gradient(140% 42% at 74% 103%, rgba(128, 150, 255, 0.42), transparent 62%),  /* periwinkle ribbon, right */
     radial-gradient(112% 32% at 50% 99%, rgba(255, 255, 255, 0.20), transparent 56%);    /* platinum core, low centre */
+  -webkit-mask: linear-gradient(90deg, transparent 0, #000 17%, #000 83%, transparent 100%);
+          mask: linear-gradient(90deg, transparent 0, #000 17%, #000 83%, transparent 100%);
 }
 .n7d--fin .n7d-finale { opacity: 1; animation: n7dFinDriftA 17s ease-in-out infinite alternate; }
 .n7d--fin .n7d-finale::before { animation: n7dFinDriftB 21s ease-in-out infinite alternate; }
