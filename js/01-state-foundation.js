@@ -2,12 +2,12 @@
    Extracted from app.js lines 2-2125. Loaded as a classic <script> so
    all modules share one global lexical scope (no window pollution). Order matters:
    this file must load before js/11-init.js, which runs the bootstrap immediately. */
-/* v974: the JS build stamp. The release sed bump rewrites the version in BOTH
+/* v977: the JS build stamp. The release sed bump rewrites the version in BOTH
    index.html AND this line; js/11 compares them at boot and force-refreshes
    ONCE on mismatch. Kills the "phone silently runs old cached js under a new
    index" class (the SW's offline fallback can serve stale files on a bad
    connection; Malik hit this three times in one day). */
-window.MEMENTO_JS_BUILD = 'v974';
+window.MEMENTO_JS_BUILD = 'v977';
 /* ============================================
    STATE MANAGEMENT
    ============================================ */
