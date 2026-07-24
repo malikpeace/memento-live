@@ -4318,6 +4318,14 @@ const TabBar = {
         this.switchTo(tab.dataset.tab);
       });
     });
+    // v977: every tab panel's top-left X returns to Home. With the mobile bottom
+    // bar retired (v976) this is the only way out of a panel on a phone, so it is
+    // bound here alongside the tabs themselves rather than in a feature module.
+    try {
+      document.querySelectorAll('[data-panel-close]').forEach((btn) => {
+        btn.addEventListener('click', (e) => { e.preventDefault(); this.switchTo('home'); });
+      });
+    } catch (e) {}
     this._bindDrag();
     // Position the capsule on the initial active tab after layout. setTimeout,
     // not only rAF: rAF is throttled in background tabs and would leave the
