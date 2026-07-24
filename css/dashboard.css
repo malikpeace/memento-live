@@ -2952,11 +2952,13 @@ html.theme-light body.lite .undo-toast, html.theme-light.lowfx .undo-toast,
   /* vw, not %: #dayCard is a shrink-to-fit column, so a % width on the card
      resolves against the card's own collapsed width and degenerates to a thin
      bar. vw is viewport-relative, so the card keeps a proper card proportion. */
+  /* v979: same --p1-card-* vars the colored home uses, so the blank pre-Clarity
+     card and the worked-on card stay pixel-identical (the v245 law). */
   #dayCard .daycard-ns {
-    width: min(82vw, 320px);
-    min-height: 452px;
+    width: var(--p1-card-w, min(82vw, 320px));
+    min-height: var(--p1-card-h, 452px);
   }
-  #dayCard .daycard-theme-living .daycard-living-stage { width: min(82vw, 320px); }
+  #dayCard .daycard-theme-living .daycard-living-stage { width: var(--p1-card-w, min(82vw, 320px)); }
 }
 body.daycard-force #dayCard { display: block; max-width: 430px; }
 /* Desktop / tablet: show the card too, as a clean centered artifact at the top
@@ -3610,7 +3612,23 @@ body.pre-clarity .capture-fab { display: none !important; }
   /* v696 (Malik): ONE continuous scroll, the Banner home. No snap at all: the
      card starts near full screen, condenses as you scroll, and a pinned banner
      takes over its identity while Hello + the modules flow beneath. */
-  html { scroll-snap-type: none; scroll-padding-top: calc(var(--safe-t, 0px) + 18px); }
+  /* v979 (Malik): snap is BACK. Page 1 = the Memento + Today (one screen), a swipe
+     up past the threshold catches page 2 (Hello + modules). Native CSS snap, not
+     the JS snapper: the settle runs in the OS compositor and tracks flick velocity
+     (the v696 note recorded the JS version as janky on the home). */
+  html { scroll-snap-type: y mandatory; scroll-padding-top: calc(var(--safe-t, 0px) + 18px); }
+  /* ONE source of truth for page-1 sizing, so the blank and the colored home can
+     never drift apart (the v245 pixel-parity law). The height reserve is: the
+     card's own top offset (45) + the gap to the Today box (26) + the box (205) +
+     the breathing room under it (40). The clamp keeps a small phone from
+     overflowing and a huge one from going silly. */
+  :root {
+    --p1-card-w: min(88vw, 352px);
+    --p1-card-h: clamp(330px, calc(100svh - var(--safe-t, 0px) - 316px), 560px);
+  }
+  /* The two snap stops: page 1 starts at the card, page 2 starts at the modules. */
+  body:not(.has-custom-layout) .app.dash-v2 #dayCard { scroll-snap-align: start; }
+  body:not(.has-custom-layout) .app.dash-v2 #dashBelow { scroll-snap-align: start; }
   html, body { overflow-x: clip; max-width: 100vw; }
   body { touch-action: pan-y; overscroll-behavior-x: none; }
 
@@ -3689,18 +3707,24 @@ body.pre-clarity .capture-fab { display: none !important; }
        rests at the exact pre-v709 position, top 45px (v245 law). */
     margin: 29px 0 0 0 !important; grid-column: auto !important; grid-row: auto !important;
   }
-  /* LOCKED to the blank (pre-Clarity) card, byte for byte: same width and the same
-     FIXED 452px height as the base mobile rule (#dayCard .daycard-ns above). The
-     worked-on home is the identical screen, just recolored + with Today's text, so
-     the card must NOT resize per device. No responsive calc here on purpose: the
-     blank uses a fixed height and fits on notched iPhones, so this does too. */
+  /* v979 (Malik): the card is BIGGER now that the bottom bar is gone, and page 1
+     is one screen. Still LOCKED to the blank card byte for byte (v245 law): both
+     read the same --p1-card-* vars, so blank and colored stay identical. The height
+     is a clamp instead of a flat 452 so page 1 fills a tall phone without
+     overflowing a small one; it is NOT edge-to-edge, it leaves real breathing room
+     above the Today box and below it (Malik: "not literally to the exact edges"). */
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-ns {
-    width: min(82vw, 320px) !important;
-    min-height: 452px !important;
+    width: var(--p1-card-w) !important;
+    min-height: var(--p1-card-h) !important;
   }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-theme-living .daycard-living-stage { width: min(82vw, 320px) !important; margin-bottom: 0 !important; }
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-theme-living .daycard-living-stage { width: var(--p1-card-w) !important; margin-bottom: 0 !important; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter {
-    margin: 22px 0 0 !important; grid-column: auto !important; grid-row: auto !important;
+    margin: 26px 0 0 !important; grid-column: auto !important; grid-row: auto !important;
+  }
+  /* v979: the Today box is taller and sits lower, taking back the room the
+     retired bottom bar left empty (22/20 -> 32/30 padding, ~186px -> ~205px). */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-card {
+    padding-top: 32px !important; padding-bottom: 30px !important;
   }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-od-sub { display: none; }
 
