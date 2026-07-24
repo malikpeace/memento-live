@@ -588,7 +588,13 @@ body.cpw-locked .widget[data-widget]:not([data-widget="clarity"])::after {
 }
 .cpw__relic-card {
   position: absolute; inset: 0; z-index: 1;
-  border-radius: 22px; overflow: hidden; isolation: isolate;
+  border-radius: 22px; isolation: isolate;
+  /* clip-path + contain:paint clips the blurred/screen-blended liquid cleanly on
+     iOS. overflow:hidden + border-radius does NOT, a blurred/composited child
+     escapes the round clip and pokes SHARP SQUARE corners (the corner-poke bug).
+     This is exactly how the real daycard clips its liquid. */
+  clip-path: inset(0 round 22px);
+  contain: paint;
   background: #0a0e10;
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,0.26),
