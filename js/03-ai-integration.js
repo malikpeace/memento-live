@@ -1736,12 +1736,18 @@ async function generateActionDraft(options = {}) {
       plan.primaryAction.verdict = null;
     }
 
+    // v973: arm the one-time platinum card evolution ONLY on a genuine first
+    // discovery (planGenerated flipping false->true), never on a regenerate and
+    // never for users who already had a plan before this shipped. The home
+    // render (_maybeRunActionEvolution) consumes the flag when they land there.
+    const _firstDiscovery = !(state.action && state.action.planGenerated);
     state.action.primaryAction = plan.primaryAction;
     state.action.supportingActions = plan.supportingActions;
     state.action.focusPlan = plan.focusPlan;
     state.action.planGenerated = true;
     state.action.planSourceNeutronStar = state.clarity.answers.neutronStar || '';
     state.action.lastGeneratedAt = new Date().toISOString();
+    try { state.meta = state.meta || {}; if (_firstDiscovery && !state.meta.actionEvolutionSeen) state.meta.actionRevealPending = true; } catch (e) {}
     // Clear any chat state from prior versions so it doesn't render stale.
     state.action.aiConversation = [];
     actionChatMessages = [];

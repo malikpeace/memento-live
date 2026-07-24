@@ -625,6 +625,11 @@ function renderGrid() {
   // after ignition, the user witnesses the card come alive: a still, drained
   // beat, then color floods the card, then the beams bloom on. Once, ever.
   try { _maybeRunCardEvolution(); } catch (e) {}
+  // v973: and, once the colour reveal is behind them, a PAID user who has just
+  // discovered their first move earns the platinum reward reveal. Self-gates on
+  // paid + planGenerated + not-yet-seen, and stands down while the Clarity cinema
+  // (or an overlay) is up, so the two never collide.
+  try { _maybeRunActionEvolution(); } catch (e) {}
 
   // v19 Custom Layouts: when the user has customized, the grid auto-flows by
   // saved order with per-size spans (.is-custom overrides the designed data-area
@@ -4313,6 +4318,63 @@ function _maybeRunCardEvolution(then) {
     if (!ok) { _cardEvolutionRunning = false; window._evoStageOverride = null; try { if (typeof TabBar !== 'undefined' && TabBar.show) TabBar.show(); } catch (e) {} flush(); }
   };
   attempt();
+}
+
+// v973 (Malik): the ACTION evolution. Once a PAID user DISCOVERS their first move
+// (planGenerated + a real primaryAction), the home card earns its platinum reward
+// with the same cinematic reveal the Clarity colour got, then STAYS platinum, the
+// resting look comes from the card's live --act level (not the evo2-plat class),
+// so it never drains back. Its own once-ever flag (meta.actionEvolutionSeen), kept
+// separate from the Clarity flag so BOTH play, in order (colour first, then rim).
+// Mirrors _maybeRunCardEvolution's guards: overlay-wait, aged-out watchdog, and
+// commit-SEEN-before-play so an interrupted run can never replay + re-blank.
+function _maybeRunActionEvolution() {
+  try {
+    if (_cardEvolutionRunning) return;                 // a run (Clarity or this) is already playing
+    state.meta = state.meta || {};
+    if (!state.meta.cardEvolutionSeen) return;          // the Clarity colour reveal must land first
+    if (state.meta.actionEvolutionSeen) return;         // once, ever
+    // Fires ONLY on a genuine first discovery (armed at plan generation in js/03),
+    // so existing paid users never replay it out of context.
+    if (!state.meta.actionRevealPending) return;
+    const paid = !!(state.entitlements && state.entitlements.isPaid);
+    const pa = state.action && state.action.primaryAction;
+    const discovered = !!(state.action && state.action.planGenerated && pa && String(pa.title || '').trim());
+    if (!paid || !discovered) return;
+    if (!(state.clarity && state.clarity.completed && state.clarity.ignitedAt)) return;
+    const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) { state.meta.actionEvolutionSeen = true; state.meta.actionRevealPending = false; try { persistNow(); } catch (e) {} return; }
+    _cardEvolutionRunning = true;
+    _evoStartedAt = Date.now();
+    const cleanupClass = () => { try { document.body.classList.remove('evo2-plat'); } catch (e) {} };
+    const overlayOpen = () => {
+      try {
+        if (typeof ClarityExperience !== 'undefined' && ClarityExperience.isOpen) return true;
+        if (typeof ActionExperience !== 'undefined' && ActionExperience.isOpen) return true;
+        if (document.querySelector('.cpw.open, .cpw--open, #nsv2Root, #clarityPaywall')) return true;
+        if (document.hidden) return true;
+      } catch (e) {}
+      return false;
+    };
+    const attempt = () => {
+      // aged-out watchdog: iOS suspended the wait timers; heal to the lit card.
+      if (_evoStartedAt && (Date.now() - _evoStartedAt) > EVO_MAX_MS) {
+        state.meta.actionEvolutionSeen = true; state.meta.actionRevealPending = false; try { persistNow(); } catch (e) {}
+        _cardEvolutionRunning = false; cleanupClass();
+        try { const w = document.querySelector('#dayCard .daycard-wrap'); if (w) setLivingCardVars(w); } catch (e) {}
+        try { if (typeof TabBar !== 'undefined' && TabBar.show) TabBar.show(); } catch (e) {}
+        return;
+      }
+      if (overlayOpen()) { setTimeout(attempt, 1200); return; }
+      // commit SEEN before the reveal: an interrupted run must never replay.
+      state.meta.actionEvolutionSeen = true; state.meta.actionRevealPending = false; try { persistNow(); } catch (e) {}
+      window._evoStageKind = 'action';
+      try { document.body.classList.add('evo2-plat'); } catch (e) {}
+      const ok = _runClarityUnlockCinema(() => { cleanupClass(); });
+      if (!ok) { _cardEvolutionRunning = false; window._evoStageKind = null; cleanupClass(); try { if (typeof TabBar !== 'undefined' && TabBar.show) TabBar.show(); } catch (e) {} }
+    };
+    attempt();
+  } catch (e) { _cardEvolutionRunning = false; }
 }
 
 // v614 (Malik): the clarity unlock CINEMA. The Today panel fades away, the
