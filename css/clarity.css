@@ -4517,13 +4517,13 @@ html.theme-light .n7d-cta {
 .n7d-day--dip, .n7d-day--dip.is-in, .n7d-day--dip.is-in:not(.is-cur) { transform: none; }
 .n7d-day[data-n7day="2"]::before { bottom: -12px; background: linear-gradient(180deg, rgba(var(--dc), 0.55), rgba(var(--dc), 0.16)); }
 .n7d-day--dip::before { left: 15px; top: 24px; background: linear-gradient(180deg, rgba(var(--dc), 0.55), rgba(var(--dc), 0.16)); }
-/* the shattered dip node: a dim grey cracked-glass disc, no colour glow. */
+/* the dip node is just DIMMER than the others: a muted fill and a faint glow, so
+   it reads as quiet/low-energy (the place people trip up), no crack. */
 .n7d-day--dip.is-in .n7d-node {
-  width: 16px; height: 16px; left: 8px; top: 13px; opacity: 0.82;
-  background: center / 16px 16px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='11.5' fill='%23a6acb7'/%3E%3Cg stroke='%23080b0f' stroke-width='1.1' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 12 L13 0.5'/%3E%3Cpath d='M12 12 L23.5 10'/%3E%3Cpath d='M12 12 L15 23.5'/%3E%3Cpath d='M12 12 L0.5 14'/%3E%3Cpath d='M12 12 L6 2'/%3E%3Cpath d='M13 0.5 L10.5 5 L16 8'/%3E%3Cpath d='M23.5 10 L18 13 L20 18'/%3E%3Cpath d='M0.5 14 L7 15'/%3E%3C/g%3E%3C/svg%3E");
-  box-shadow: 0 0 0 5px #050808, 0 0 9px rgba(160, 172, 188, 0.30);
+  background: rgba(var(--dc), 0.45);
+  box-shadow: 0 0 0 5px #050808, 0 0 8px rgba(var(--dc), 0.26);
 }
-html.theme-light .n7d-day--dip.is-in .n7d-node { box-shadow: 0 0 0 5px #eef0f3, 0 0 9px rgba(120, 132, 150, 0.32); }
+html.theme-light .n7d-day--dip.is-in .n7d-node { box-shadow: 0 0 0 5px #eef0f3, 0 0 8px rgba(var(--dc), 0.3); }
 /* Day 7, the summit: its green node glows wider and the title catches it. */
 .n7d-day--win.is-in .n7d-node { box-shadow: 0 0 0 5px #050808, 0 0 30px rgba(var(--dc), 0.9); }
 .n7d-day--win.is-in .n7d-title { text-shadow: 0 0 30px rgba(var(--n7-green), 0.35); }
