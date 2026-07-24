@@ -3624,7 +3624,7 @@ body.pre-clarity .capture-fab { display: none !important; }
      overflowing and a huge one from going silly. */
   :root {
     --p1-card-w: min(88vw, 352px);
-    --p1-card-h: clamp(330px, calc(100svh - var(--safe-t, 0px) - 347px), 560px);
+    --p1-card-h: clamp(330px, calc(100svh - var(--safe-t, 0px) - 332px), 560px);
   }
   /* The two snap stops: page 1 starts at the card, page 2 starts at the modules. */
   body:not(.has-custom-layout) .app.dash-v2 #dayCard { scroll-snap-align: start; }
@@ -3709,7 +3709,7 @@ body.pre-clarity .capture-fab { display: none !important; }
        of nearly touching it. PADDING, not more margin: #dayCard's top margin
        collapses against its neighbours, so raising it barely moved the card.
        The height reserve grows to match, so page 1 stays exactly one screen. */
-    margin: 29px 0 0 0 !important; padding-top: 40px !important;
+    margin: 29px 0 0 0 !important; padding-top: 34px !important;
     grid-column: auto !important; grid-row: auto !important;
   }
   /* v979 (Malik): the card is BIGGER now that the bottom bar is gone, and page 1
@@ -3724,12 +3724,19 @@ body.pre-clarity .capture-fab { display: none !important; }
   }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-theme-living .daycard-living-stage { width: var(--p1-card-w) !important; margin-bottom: 0 !important; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter {
-    margin: 26px 0 0 !important; grid-column: auto !important; grid-row: auto !important;
+    margin: 16px 0 0 !important; grid-column: auto !important; grid-row: auto !important;
   }
   /* v979: the Today box is taller and sits lower, taking back the room the
-     retired bottom bar left empty (22/20 -> 32/30 padding, ~186px -> ~205px). */
+     retired bottom bar left empty (22/20 -> 32/30 padding, ~186px -> ~205px).
+     v981: min-height pins EVERY page-1 state to the same box height. "Next step"
+     rendered ~191px and "Today" ~206px, and because the card height is a fixed
+     calc that 15px difference fell out as dead space at the bottom of whichever
+     state was shorter. One height means the card can be packed tight and both
+     states fill the screen identically. */
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-card {
     padding-top: 32px !important; padding-bottom: 30px !important;
+    min-height: 206px !important;
+    display: flex !important; flex-direction: column !important; justify-content: center !important;
   }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-od-sub { display: none; }
 
