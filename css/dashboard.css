@@ -3624,7 +3624,7 @@ body.pre-clarity .capture-fab { display: none !important; }
      overflowing and a huge one from going silly. */
   :root {
     --p1-card-w: min(88vw, 352px);
-    --p1-card-h: clamp(330px, calc(100svh - var(--safe-t, 0px) - 316px), 560px);
+    --p1-card-h: clamp(330px, calc(100svh - var(--safe-t, 0px) - 347px), 560px);
   }
   /* The two snap stops: page 1 starts at the card, page 2 starts at the modules. */
   body:not(.has-custom-layout) .app.dash-v2 #dayCard { scroll-snap-align: start; }
@@ -3705,7 +3705,12 @@ body.pre-clarity .capture-fab { display: none !important; }
     min-height: 0 !important;
     /* top 29px = the pinned header's vacated flow space (v709), so the card
        rests at the exact pre-v709 position, top 45px (v245 law). */
-    margin: 29px 0 0 0 !important; grid-column: auto !important; grid-row: auto !important;
+    /* v980 (Malik): the card sits clear of the MEMENTO lockup + date row instead
+       of nearly touching it. PADDING, not more margin: #dayCard's top margin
+       collapses against its neighbours, so raising it barely moved the card.
+       The height reserve grows to match, so page 1 stays exactly one screen. */
+    margin: 29px 0 0 0 !important; padding-top: 40px !important;
+    grid-column: auto !important; grid-row: auto !important;
   }
   /* v979 (Malik): the card is BIGGER now that the bottom bar is gone, and page 1
      is one screen. Still LOCKED to the blank card byte for byte (v245 law): both
@@ -3736,7 +3741,9 @@ body.pre-clarity .capture-fab { display: none !important; }
     /* v696: the modules follow the card in ONE scroll, a breath apart, not a
        42svh chasm with a snap page break. */
     margin-top: 30px !important;
-    padding: 0 0 calc(110px + var(--safe-b, 0px)) !important;
+    /* v980 (Malik): page 2 starts lower too, so Hello + the modules clear the
+       pinned lockup row the same way the card now does on page 1. */
+    padding: 32px 0 calc(110px + var(--safe-b, 0px)) !important;
   }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashBelow #dashGreetingMobile { display: none !important; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashBelow #dailyMemento,
