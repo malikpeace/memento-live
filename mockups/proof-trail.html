@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Proof trail, 10 ways</title>
+<link rel="stylesheet" href="_shared.css">
+<style>
+/* 1 spine */
+.v1-row { position: relative; padding: 0 0 26px 46px; }
+.v1-d { font-size: 12.5px; color: var(--text-lo); }
+.v1-t { font-size: 15.5px; font-weight: 650; margin: 2px 0 0; line-height: 1.35; }
+/* 2 chapters */
+.v2-ch { margin-bottom: 26px; }
+.v2-hd { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 10px; }
+.v2-name { font-size: 17px; font-weight: 750; letter-spacing: -0.01em; }
+.v2-n { font-size: 12.5px; color: var(--text-lo); }
+.v2-bars { display: flex; gap: 3px; }
+.v2-bar { height: 26px; flex: 1; border-radius: 3px; background: rgba(var(--ink),0.08); }
+.v2-bar.on { background: var(--green); }
+.v2-bar.cy { background: var(--cyan); }
+.v2-line { font-size: 13.5px; color: var(--text-mid); margin: 9px 0 0; line-height: 1.5; }
+/* 3 ribbon */
+.v3-rail { display: flex; gap: 10px; overflow-x: auto; padding: 0 20px 6px; scroll-snap-type: x mandatory; }
+.v3-rail::-webkit-scrollbar { height: 0; }
+.v3-c { flex: none; width: 210px; scroll-snap-align: center; background: rgba(var(--ink),0.045); border-radius: var(--r-card); padding: 16px; box-shadow: var(--glass-hi); }
+.v3-day { font-size: 34px; font-weight: 800; letter-spacing: -0.03em; }
+/* 4 constellation */
+.v4-sky { position: relative; height: 300px; margin: 0 20px; }
+.v4-s { position: absolute; width: 7px; height: 7px; border-radius: 50%; background: #fff; }
+.v4-s.big { width: 11px; height: 11px; box-shadow: 0 0 14px rgba(58,217,245,0.9); background: var(--cyan); }
+.v4-l { position: absolute; height: 1px; background: rgba(var(--ink),0.18); transform-origin: 0 0; }
+/* 5 ledger */
+.v5-r { display: grid; grid-template-columns: 58px 1fr auto; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--hairline); font-size: 13px; }
+.v5-r span:first-child { color: var(--text-lo); }
+.v5-k { color: var(--green); font-weight: 700; }
+/* 6 strata */
+.v6-stack { display: flex; flex-direction: column-reverse; gap: 4px; }
+.v6-l { border-radius: 6px; padding: 10px 13px; display: flex; justify-content: space-between; align-items: center; font-size: 13.5px; }
+/* 7 then/now */
+.v7-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.v7-col { background: rgba(var(--ink),0.04); border-radius: var(--r-card); padding: 16px; box-shadow: var(--glass-hi); }
+.v7-big { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; }
+/* 8 ladder */
+.v8-r { display: flex; align-items: center; gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--hairline); }
+.v8-tick { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; flex: none; }
+.v8-tick svg { width: 12px; height: 12px; }
+/* 9 heat */
+.v9-grid { display: grid; grid-template-columns: repeat(19, 1fr); gap: 3px; }
+.v9-c { aspect-ratio: 1; border-radius: 2px; background: rgba(var(--ink),0.07); }
+/* 10 words */
+.v10-q { border-left: 2px solid rgba(var(--ink),0.2); padding: 2px 0 2px 14px; margin-bottom: 22px; }
+.v10-w { font-size: 15.5px; line-height: 1.5; color: var(--text-hi); }
+</style>
+</head><body>
+<div class="gal">
+<a class="gal__back" href="index.html">&larr; all mockups</a>
+<h1>Proof trail, 10 ways</h1>
+<p class="gal__sub">Ten different answers to "show me the path I've been on." Same data every time: 11 day streak, 31 moves done, goal set in March. They differ in what they make you feel, not in styling.</p>
+<div class="grid">
+
+<!-- 1 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">01</span><span class="item__name">The spine</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:6px">
+      <h2 class="h-sec">Your path</h2>
+      <p class="t-body" style="margin-top:4px">31 moves since March 14.</p>
+    </div>
+    <div class="pad" style="position:relative;margin-top:26px">
+      <div class="spine" style="left:35px"></div>
+      <div class="v1-row"><span class="node node--g" style="top:2px;left:29px"></span>
+        <div class="v1-d">Today</div><p class="v1-t">Talked to three users about why they signed up</p></div>
+      <div class="v1-row"><span class="node node--g" style="top:2px;left:29px"></span>
+        <div class="v1-d">Yesterday</div><p class="v1-t">Shipped the account deletion flow</p></div>
+      <div class="v1-row"><span class="node" style="top:2px;left:29px"></span>
+        <div class="v1-d">Jul 21</div><p class="v1-t">Rewrote the paywall in one sitting</p></div>
+      <div class="v1-row"><span class="node node--dim" style="top:2px;left:29px"></span>
+        <div class="v1-d">Jul 19</div><p class="v1-t" style="color:var(--text-mid)">Missed. Came back the next morning.</p></div>
+      <div class="v1-row"><span class="node" style="top:2px;left:29px"></span>
+        <div class="v1-d">Jul 18</div><p class="v1-t">First paying user</p></div>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note">Closest to the 7-day page, so it already feels like Memento. Reads as a diary. Risk: long lists get boring fast.</p>
+</div>
+
+<!-- 2 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">02</span><span class="item__name">Chapters</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:6px">
+      <h2 class="h-sec">Four chapters in</h2>
+      <p class="t-body" style="margin-top:4px">March to today.</p>
+      <div style="height:24px"></div>
+      <div class="v2-ch"><div class="v2-hd"><span class="v2-name">Starting cold</span><span class="v2-n">Mar 14 &ndash; Apr 2</span></div>
+        <div class="v2-bars"><i class="v2-bar cy"></i><i class="v2-bar cy"></i><i class="v2-bar"></i><i class="v2-bar cy"></i><i class="v2-bar"></i><i class="v2-bar cy"></i><i class="v2-bar cy"></i></div>
+        <p class="v2-line">You shipped on 5 of 7 days and quit twice.</p></div>
+      <div class="v2-ch"><div class="v2-hd"><span class="v2-name">The dip</span><span class="v2-n">Apr &ndash; May</span></div>
+        <div class="v2-bars"><i class="v2-bar"></i><i class="v2-bar cy"></i><i class="v2-bar"></i><i class="v2-bar"></i><i class="v2-bar cy"></i><i class="v2-bar"></i><i class="v2-bar"></i></div>
+        <p class="v2-line">Six weeks of almost nothing. You came back anyway.</p></div>
+      <div class="v2-ch"><div class="v2-hd"><span class="v2-name">It clicked</span><span class="v2-n">June</span></div>
+        <div class="v2-bars"><i class="v2-bar on"></i><i class="v2-bar on"></i><i class="v2-bar on"></i><i class="v2-bar"></i><i class="v2-bar on"></i><i class="v2-bar on"></i><i class="v2-bar on"></i></div>
+        <p class="v2-line">Your first paying user landed on June 11.</p></div>
+      <div class="v2-ch"><div class="v2-hd"><span class="v2-name">Now</span><span class="v2-n">July</span></div>
+        <div class="v2-bars"><i class="v2-bar on"></i><i class="v2-bar on"></i><i class="v2-bar on"></i><i class="v2-bar on"></i><i class="v2-bar on"></i><i class="v2-bar on"></i><i class="v2-bar on"></i></div>
+        <p class="v2-line">11 straight. Your longest run yet.</p></div>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note">The story version. Groups time into eras with a plain sentence each. This is the one that makes a year feel like a journey instead of a log.</p>
+</div>
+
+<!-- 3 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">03</span><span class="item__name">Ribbon</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:6px"><h2 class="h-sec">Swipe back through it</h2></div>
+    <div style="height:22px"></div>
+    <div class="v3-rail">
+      <div class="v3-c"><div class="v3-day num" style="color:var(--green)">31</div><p class="t-cap">moves done</p>
+        <hr class="rule"><p class="t-body" style="font-size:13.5px">Talked to three users today.</p></div>
+      <div class="v3-c"><div class="v3-day num">11</div><p class="t-cap">day streak</p>
+        <hr class="rule"><p class="t-body" style="font-size:13.5px">Longest run since you started.</p></div>
+      <div class="v3-c"><div class="v3-day num" style="color:var(--cyan)">1st</div><p class="t-cap">paying user</p>
+        <hr class="rule"><p class="t-body" style="font-size:13.5px">June 11. You emailed him back in nine minutes.</p></div>
+      <div class="v3-c"><div class="v3-day num" style="color:#565e69">6</div><p class="t-cap">weeks lost</p>
+        <hr class="rule"><p class="t-body" style="font-size:13.5px">April to May. You returned on a Tuesday.</p></div>
+    </div>
+    <div class="pad" style="margin-top:26px"><p class="t-cap">Four cards. Swipe.</p></div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note">Horizontal, one fact per card. Fast and low-commitment, good on a phone. Weakness: harder to feel total distance.</p>
+</div>
+
+<!-- 4 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">04</span><span class="item__name">Constellation</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:6px"><h2 class="h-sec">31 points of light</h2>
+      <p class="t-body" style="margin-top:4px">Every move you kept.</p></div>
+    <div class="v4-sky" style="margin-top:20px">
+      <i class="v4-l" style="left:40px;top:250px;width:78px;transform:rotate(-38deg)"></i>
+      <i class="v4-l" style="left:110px;top:205px;width:72px;transform:rotate(-22deg)"></i>
+      <i class="v4-l" style="left:178px;top:178px;width:66px;transform:rotate(-30deg)"></i>
+      <i class="v4-l" style="left:238px;top:145px;width:74px;transform:rotate(-40deg)"></i>
+      <i class="v4-s" style="left:38px;top:248px"></i><i class="v4-s" style="left:72px;top:222px"></i>
+      <i class="v4-s" style="left:108px;top:203px"></i><i class="v4-s" style="left:142px;top:192px"></i>
+      <i class="v4-s" style="left:176px;top:176px"></i><i class="v4-s" style="left:210px;top:160px"></i>
+      <i class="v4-s" style="left:236px;top:143px"></i><i class="v4-s" style="left:268px;top:118px"></i>
+      <i class="v4-s big" style="left:300px;top:92px"></i>
+      <i class="v4-s" style="left:64px;top:120px;opacity:.3"></i><i class="v4-s" style="left:250px;top:52px;opacity:.3"></i>
+      <i class="v4-s" style="left:150px;top:70px;opacity:.25"></i>
+    </div>
+    <div class="pad"><p class="t-body">The bright one is the day someone first paid you.</p></div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note">Ties directly to the Neutron Star language. Beautiful and ownable, and it gets denser the longer you stay. Weakest at conveying specifics.</p>
+</div>
+
+<!-- 5 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">05</span><span class="item__name">Ledger</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:6px">
+      <h2 class="h-sec">31 kept</h2>
+      <p class="t-body" style="margin-top:4px">4 missed. 133 days.</p>
+      <div style="height:22px"></div>
+      <div class="v5-r"><span class="num">Jul 24</span><span>Talked to three users</span><span class="v5-k">&check;</span></div>
+      <div class="v5-r"><span class="num">Jul 23</span><span>Shipped deletion flow</span><span class="v5-k">&check;</span></div>
+      <div class="v5-r"><span class="num">Jul 22</span><span>Fixed the paywall copy</span><span class="v5-k">&check;</span></div>
+      <div class="v5-r"><span class="num">Jul 21</span><span>Rewrote onboarding</span><span class="v5-k">&check;</span></div>
+      <div class="v5-r"><span class="num">Jul 20</span><span>Cold emailed 12 people</span><span class="v5-k">&check;</span></div>
+      <div class="v5-r"><span class="num" style="color:rgba(235,238,248,.25)">Jul 19</span><span style="color:var(--text-lo)">&mdash;</span><span style="color:var(--text-lo)">&times;</span></div>
+      <div class="v5-r"><span class="num">Jul 18</span><span>First paying user</span><span class="v5-k">&check;</span></div>
+      <div class="v5-r"><span class="num">Jul 17</span><span>Shipped the card evolution</span><span class="v5-k">&check;</span></div>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note">Deliberately unglamorous. Utilitarian, scannable, honest about misses. Fastest to build. No emotion, which may be exactly right or exactly wrong.</p>
+</div>
+
+<!-- 6 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">06</span><span class="item__name">Strata</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:6px">
+      <h2 class="h-sec">What you've stacked</h2>
+      <p class="t-body" style="margin-top:4px">Every layer is a week you showed up.</p>
+      <div style="height:24px"></div>
+      <div class="v6-stack">
+        <div class="v6-l" style="background:rgba(58,217,245,.13)"><span>Week 1</span><span class="t-cap num">3 moves</span></div>
+        <div class="v6-l" style="background:rgba(58,217,245,.17)"><span>Week 2</span><span class="t-cap num">4</span></div>
+        <div class="v6-l" style="background:rgba(58,217,245,.1)"><span>Week 3</span><span class="t-cap num">1</span></div>
+        <div class="v6-l" style="background:rgba(99,150,180,.13)"><span>April</span><span class="t-cap num">2</span></div>
+        <div class="v6-l" style="background:rgba(99,180,150,.18)"><span>May</span><span class="t-cap num">5</span></div>
+        <div class="v6-l" style="background:rgba(63,217,78,.22)"><span>June</span><span class="t-cap num">9</span></div>
+        <div class="v6-l" style="background:rgba(63,217,78,.32)"><span>July</span><span class="t-cap num">11</span></div>
+      </div>
+      <p class="t-body" style="margin-top:20px">You are building upward. Thin months are still layers.</p>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note">Sediment metaphor: it literally grows taller. Cyan at the bottom shifting green as consistency arrives, so the app's own colour story does the talking.</p>
+</div>
+
+<!-- 7 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">07</span><span class="item__name">Then and now</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:6px">
+      <h2 class="h-sec">Since you started</h2>
+      <div style="height:20px"></div>
+      <div class="v7-2">
+        <div class="v7-col"><p class="t-cap">March 14</p><div class="v7-big num" style="margin-top:8px">0</div>
+          <p class="t-body" style="font-size:13px;margin-top:6px">paying users</p></div>
+        <div class="v7-col" style="background:rgba(63,217,78,.08)"><p class="t-cap">Today</p><div class="v7-big num" style="margin-top:8px;color:var(--green)">1</div>
+          <p class="t-body" style="font-size:13px;margin-top:6px">paying users</p></div>
+      </div>
+      <div style="height:12px"></div>
+      <div class="v7-2">
+        <div class="v7-col"><p class="t-cap">Longest run then</p><div class="v7-big num" style="margin-top:8px">2</div></div>
+        <div class="v7-col" style="background:rgba(63,217,78,.08)"><p class="t-cap">Longest run now</p><div class="v7-big num" style="margin-top:8px;color:var(--green)">11</div></div>
+      </div>
+      <hr class="rule" style="margin:22px 0">
+      <p class="t-body">In March you wrote: "I keep starting things and quitting when it gets boring."</p>
+      <p class="t-body" style="margin-top:12px;color:var(--text-hi)">You have not quit in 11 days.</p>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note">The comparison does the emotional work, and it sets up the evidence wall perfectly. Needs a captured "before", which is exactly what you proposed.</p>
+</div>
+
+<!-- 8 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">08</span><span class="item__name">Ladder</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:6px">
+      <h2 class="h-sec">100 paying users</h2>
+      <p class="t-body" style="margin-top:4px">You are on rung three.</p>
+      <div style="height:20px"></div>
+      <div class="v8-r"><span class="v8-tick" style="background:var(--green)"><svg viewBox="0 0 24 24" fill="none" stroke="#04140a" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><div><div style="font-weight:650">Something built</div><p class="t-cap">Mar 14</p></div></div>
+      <div class="v8-r"><span class="v8-tick" style="background:var(--green)"><svg viewBox="0 0 24 24" fill="none" stroke="#04140a" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><div><div style="font-weight:650">Someone used it</div><p class="t-cap">May 2</p></div></div>
+      <div class="v8-r"><span class="v8-tick" style="background:var(--green)"><svg viewBox="0 0 24 24" fill="none" stroke="#04140a" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><div><div style="font-weight:650">Someone paid</div><p class="t-cap">Jun 11</p></div></div>
+      <div class="v8-r"><span class="v8-tick" style="box-shadow:inset 0 0 0 2px var(--cyan)"></span><div><div style="font-weight:650;color:var(--cyan)">Ten paying</div><p class="t-cap">next</p></div></div>
+      <div class="v8-r" style="opacity:.45"><span class="v8-tick" style="box-shadow:inset 0 0 0 2px rgba(235,238,248,.3)"></span><div><div style="font-weight:650">Fifty paying</div></div></div>
+      <div class="v8-r" style="opacity:.3"><span class="v8-tick" style="box-shadow:inset 0 0 0 2px rgba(235,238,248,.3)"></span><div><div style="font-weight:650">One hundred</div></div></div>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note">Goal-shaped rather than time-shaped. The only variant that shows what is still ahead, which is motivating but needs milestones the AI can derive.</p>
+</div>
+
+<!-- 9 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">09</span><span class="item__name">Heat, then story</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:6px">
+      <h2 class="h-sec">133 days</h2>
+      <div style="height:18px"></div>
+      <div class="v9-grid" id="heat9"></div>
+      <hr class="rule" style="margin:20px 0">
+      <p class="t-body" style="color:var(--text-hi)">Your best stretch was 11 days, and it is the one you are in.</p>
+      <p class="t-body" style="margin-top:12px">Tap any square to read what you did that day.</p>
+      <div style="height:18px"></div>
+      <div class="panel"><p class="t-cap">Jun 11</p><p class="t-body" style="color:var(--text-hi);margin-top:6px">First paying user. You emailed him back in nine minutes.</p></div>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note">Keeps the heatmap you already have, but makes it a door into the story instead of a decoration. Least new work of any variant here.</p>
+</div>
+
+<!-- 10 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">10</span><span class="item__name">Your own words</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:6px">
+      <h2 class="h-sec">What you said</h2>
+      <p class="t-body" style="margin-top:4px">Only your words, oldest first.</p>
+      <div style="height:24px"></div>
+      <div class="v10-q"><p class="t-cap">March 14</p><p class="v10-w">"I keep starting things and quitting at the part where it gets boring."</p></div>
+      <div class="v10-q"><p class="t-cap">April 30</p><p class="v10-w">"Nobody is using it and I do not want to look at it."</p></div>
+      <div class="v10-q" style="border-color:var(--cyan)"><p class="t-cap">June 11</p><p class="v10-w">"Someone paid. A stranger paid for the thing I made."</p></div>
+      <div class="v10-q" style="border-color:var(--green)"><p class="t-cap">July 24</p><p class="v10-w">"Eleven days straight. This is the longest I have stuck with anything."</p></div>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note">No metrics at all. The whole screen is the user quoting themselves over time. Hardest to leave, because deleting the app deletes this. Requires the deposit habit to exist.</p>
+</div>
+
+</div></div>
+<script>
+var h = document.getElementById('heat9');
+if (h) { var seed = 7; for (var i=0;i<133;i++){ seed=(seed*1103515245+12345)%2147483648; var r=seed/2147483648;
+  var d=document.createElement('i'); d.className='v9-c';
+  var on = i>110 ? r<0.86 : (i>60 ? r<0.5 : r<0.32);
+  if (on) d.style.background = i>100 ? 'rgba(63,217,78,'+(0.45+r*0.5)+')' : 'rgba(63,217,78,'+(0.22+r*0.4)+')';
+  h.appendChild(d); } }
+</script>
+</body></html>

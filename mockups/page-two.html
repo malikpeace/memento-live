@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Page two, 5 ways</title>
+<link rel="stylesheet" href="_shared.css">
+<style>
+.row { display:flex; align-items:center; justify-content:space-between; padding:16px 0; border-bottom:1px solid var(--hairline); }
+.row__l { display:flex; align-items:center; gap:13px; }
+.ic { width:32px; height:32px; border-radius:9px; background:rgba(var(--ink),.06); display:grid; place-items:center; flex:none; }
+.ic svg { width:16px; height:16px; stroke:var(--text-mid); fill:none; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
+.chev { width:14px; height:14px; stroke:rgba(235,238,248,.3); fill:none; stroke-width:2.2; stroke-linecap:round; }
+.tiles { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.tile { border-radius:var(--r-card); background:rgba(var(--ink),.045); box-shadow:var(--glass-hi); padding:16px; min-height:112px; display:flex; flex-direction:column; justify-content:space-between; }
+.tile__n { font-size:26px; font-weight:750; letter-spacing:-0.02em; }
+.hm { display:grid; grid-template-columns:repeat(21,1fr); gap:3px; }
+.hm i { aspect-ratio:1; border-radius:2px; background:rgba(var(--ink),.07); }
+.feed { padding:15px 0; border-bottom:1px solid var(--hairline); }
+.big { font-size:52px; font-weight:200; letter-spacing:-0.04em; line-height:1; }
+</style>
+</head><body>
+<div class="gal">
+<a class="gal__back" href="index.html">&larr; all mockups</a>
+<h1>Page two, 5 ways</h1>
+<p class="gal__sub">What sits below the Memento when you swipe up. Right now it is a modules page. These are five other jobs it could do instead.</p>
+<div class="grid">
+
+<!-- P1 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">01</span><span class="item__name">The record</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:16px">
+      <div style="display:flex;align-items:baseline;gap:10px">
+        <span class="big num" style="color:var(--green)">11</span>
+        <span class="t-body">day streak</span>
+      </div>
+      <div style="height:22px"></div>
+      <div class="hm" id="hm1"></div>
+      <div style="height:26px"></div>
+      <div class="tiles">
+        <div class="tile"><span class="t-cap">Moves done</span><span class="tile__n num">31</span></div>
+        <div class="tile"><span class="t-cap">Best run</span><span class="tile__n num">11</span></div>
+        <div class="tile"><span class="t-cap">Days in</span><span class="tile__n num">133</span></div>
+        <div class="tile"><span class="t-cap">Evidence</span><span class="tile__n num">14</span></div>
+      </div>
+      <div style="height:22px"></div>
+      <hr class="rule">
+      <div class="row" style="border:0"><div class="row__l">
+        <span class="ic"><svg viewBox="0 0 24 24"><path d="M4 19V5m0 14h16M8 15l3.5-4.5 3 3L20 7"/></svg></span>
+        <span style="font-size:15px;font-weight:600">Your full path</span></div>
+        <svg class="chev" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note">Page two becomes the scoreboard, not a menu. Everything is a number you earned. Modules move into the row at the bottom and the sidebar.</p>
+</div>
+
+<!-- P2 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">02</span><span class="item__name">The feed</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:16px">
+      <h2 class="h-sec">Recent</h2>
+      <div style="height:12px"></div>
+      <div class="feed"><p class="t-cap">Today</p>
+        <p style="font-size:15.5px;font-weight:600;margin:5px 0 0">Talk to three users about why they signed up</p>
+        <p class="t-body" style="font-size:13.5px;margin-top:5px">Not done yet.</p></div>
+      <div class="feed"><p class="t-cap">Yesterday</p>
+        <p style="font-size:15.5px;font-weight:600;margin:5px 0 0">Shipped the account deletion flow</p>
+        <p class="t-body" style="font-size:13.5px;margin-top:5px;color:var(--green)">Done, 41 minutes</p></div>
+      <div class="feed"><p class="t-cap">Jul 22</p>
+        <p style="font-size:15.5px;font-weight:600;margin:5px 0 0">Reflection</p>
+        <p class="t-body" style="font-size:13.5px;margin-top:5px">"I keep building instead of talking to people."</p></div>
+      <div class="feed"><p class="t-cap">Jul 18</p>
+        <p style="font-size:15.5px;font-weight:600;margin:5px 0 0">First paying user</p>
+        <p class="t-body" style="font-size:13.5px;margin-top:5px;color:var(--cyan)">Evidence added</p></div>
+      <div class="feed" style="border:0"><p class="t-cap">Jul 17</p>
+        <p style="font-size:15.5px;font-weight:600;margin:5px 0 0">Cold emailed 12 people</p>
+        <p class="t-body" style="font-size:13.5px;margin-top:5px;color:var(--green)">Done</p></div>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note">One reverse-chronological stream of everything you did, wrote, and photographed. No modules, no navigation. The app's memory as the second page.</p>
+</div>
+
+<!-- P3 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">03</span><span class="item__name">Clean list</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:18px">
+      <div class="row"><div class="row__l">
+        <span class="ic" style="background:rgba(58,217,245,.12)"><svg viewBox="0 0 24 24" style="stroke:var(--cyan)"><circle cx="12" cy="12" r="3.2"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg></span>
+        <div><div style="font-size:15.5px;font-weight:600">Clarity</div><p class="t-cap">100 paying users</p></div></div>
+        <svg class="chev" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div>
+      <div class="row"><div class="row__l">
+        <span class="ic" style="background:rgba(63,217,78,.12)"><svg viewBox="0 0 24 24" style="stroke:var(--green)"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+        <div><div style="font-size:15.5px;font-weight:600">Action</div><p class="t-cap">Today's move is waiting</p></div></div>
+        <svg class="chev" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div>
+      <div class="row"><div class="row__l">
+        <span class="ic"><svg viewBox="0 0 24 24"><path d="M4 19V5m0 14h16M8 15v-4M12 15V9M16 15v-6"/></svg></span>
+        <div><div style="font-size:15.5px;font-weight:600">Consistency</div><p class="t-cap">11 days</p></div></div>
+        <svg class="chev" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div>
+      <div class="row"><div class="row__l">
+        <span class="ic"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M8 10h8M8 14h5"/></svg></span>
+        <div><div style="font-size:15.5px;font-weight:600">Reflect</div><p class="t-cap">Last wrote Tuesday</p></div></div>
+        <svg class="chev" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div>
+      <div class="row"><div class="row__l">
+        <span class="ic"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M5 17l4.5-4.5L14 17"/></svg></span>
+        <div><div style="font-size:15.5px;font-weight:600">Evidence</div><p class="t-cap">14 photos</p></div></div>
+        <svg class="chev" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div>
+      <div class="row" style="border:0"><div class="row__l">
+        <span class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4.5l3 1.8"/></svg></span>
+        <div><div style="font-size:15.5px;font-weight:600">Memento Mori</div><p class="t-cap">4,038 weeks left</p></div></div>
+        <svg class="chev" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note">What you have now, done properly: every row carries live state so the page tells you something instead of being a menu. Lowest risk, lowest ceiling.</p>
+</div>
+
+<!-- P4 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">04</span><span class="item__name">One thing next</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:24px">
+      <p class="t-cap">Next</p>
+      <p style="font-size:22px;font-weight:750;letter-spacing:-0.015em;line-height:1.3;margin:8px 0 0">Talk to three users about why they signed up</p>
+      <div style="height:14px"></div>
+      <button class="btn">Open</button>
+      <hr class="rule" style="margin:28px 0">
+      <p class="t-cap">Also worth doing</p>
+      <div class="row" style="padding:14px 0"><div class="row__l">
+        <span class="ic"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M8 10h8M8 14h5"/></svg></span>
+        <span style="font-size:15px;font-weight:600">You have not reflected in 4 days</span></div></div>
+      <div class="row" style="padding:14px 0;border:0"><div class="row__l">
+        <span class="ic"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M5 17l4.5-4.5L14 17"/></svg></span>
+        <span style="font-size:15px;font-weight:600">Add proof from yesterday</span></div></div>
+      <hr class="rule" style="margin:28px 0">
+      <p class="t-cap">Everything else</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:11px">
+        <span class="chip">Clarity</span><span class="chip">Path</span><span class="chip">Evidence</span>
+        <span class="chip">Mori</span><span class="chip">Settings</span>
+      </div>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note">Page two answers "what should I do next" instead of listing rooms. The app decides; modules shrink to chips at the bottom.</p>
+</div>
+
+<!-- P5 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">05</span><span class="item__name">The wall</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:16px;display:flex;justify-content:space-between;align-items:baseline">
+      <h2 class="h-sec">14 pieces of proof</h2></div>
+    <div class="pad" style="margin-top:14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px">
+        <div style="aspect-ratio:1;border-radius:7px;background:linear-gradient(150deg,rgba(63,217,78,.28),rgba(18,44,24,.6))"></div>
+        <div style="aspect-ratio:1;border-radius:7px;background:linear-gradient(150deg,rgba(90,110,130,.4),rgba(30,40,50,.55))"></div>
+        <div style="aspect-ratio:1;border-radius:7px;background:linear-gradient(150deg,rgba(58,217,245,.3),rgba(20,40,52,.6))"></div>
+        <div style="aspect-ratio:1;border-radius:7px;background:linear-gradient(150deg,rgba(128,150,255,.28),rgba(24,26,50,.6))"></div>
+        <div style="aspect-ratio:1;border-radius:7px;background:linear-gradient(150deg,rgba(90,110,130,.35),rgba(30,40,50,.55))"></div>
+        <div style="aspect-ratio:1;border-radius:7px;background:linear-gradient(150deg,rgba(63,217,78,.2),rgba(18,44,24,.6))"></div>
+        <div style="aspect-ratio:1;border-radius:7px;background:linear-gradient(150deg,rgba(58,217,245,.2),rgba(20,40,52,.6))"></div>
+        <div style="aspect-ratio:1;border-radius:7px;background:linear-gradient(150deg,rgba(90,110,130,.3),rgba(30,40,50,.55))"></div>
+        <div style="aspect-ratio:1;border-radius:7px;background:rgba(235,238,248,.035);display:grid;place-items:center">
+          <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:rgba(235,238,248,.22);fill:none;stroke-width:1.8;stroke-linecap:round"><path d="M12 6v12M6 12h12"/></svg></div>
+      </div>
+      <hr class="rule" style="margin:22px 0">
+      <div style="display:flex;justify-content:space-between">
+        <div><div class="tile__n num" style="color:var(--green)">11</div><p class="t-cap" style="margin-top:3px">day streak</p></div>
+        <div><div class="tile__n num">31</div><p class="t-cap" style="margin-top:3px">moves</p></div>
+        <div><div class="tile__n num">133</div><p class="t-cap" style="margin-top:3px">days in</p></div>
+      </div>
+      <hr class="rule" style="margin:22px 0">
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <span class="chip">Clarity</span><span class="chip">Action</span><span class="chip">Reflect</span>
+        <span class="chip">Mori</span><span class="chip">Settings</span>
+      </div>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note">Swipe up from the Memento and land on your own proof. The most emotional of the five and the one that makes leaving hardest, if the photo habit takes.</p>
+</div>
+
+</div></div>
+<script>
+var h = document.getElementById('hm1');
+if (h) { var s = 19; for (var i=0;i<126;i++){ s=(s*1103515245+12345)%2147483648; var r=s/2147483648;
+  var d=document.createElement('i');
+  var on = i>104 ? true : (i>60 ? r<0.55 : r<0.3);
+  if (on) d.style.background='rgba(63,217,78,'+(0.28+r*0.55)+')';
+  h.appendChild(d); } }
+</script>
+</body></html>

@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Action, 10 ways</title>
+<link rel="stylesheet" href="_shared.css">
+<style>
+.stack { display: flex; flex-direction: column; min-height: 100%; }
+.grow { flex: 1; }
+.bot { padding: 0 20px; }
+/* focus button */
+.focus-btn { display:flex; align-items:center; justify-content:center; gap:9px; width:100%; padding:14px; border:0; border-radius:var(--r-ctrl); background:rgba(var(--ink),0.07); color:var(--text-hi); font-family:var(--font); font-size:14.5px; font-weight:650; }
+.focus-btn svg { width:16px; height:16px; stroke:var(--cyan); fill:none; stroke-width:2; }
+/* dial */
+.dial { width:214px; height:214px; margin:0 auto; position:relative; display:grid; place-items:center; }
+.dial svg { position:absolute; inset:0; transform:rotate(-90deg); }
+.dial__t { font-size:44px; font-weight:300; letter-spacing:-0.02em; font-variant-numeric:tabular-nums; }
+/* sub steps */
+.sub { display:flex; gap:11px; align-items:flex-start; padding:11px 0; }
+.box { width:17px; height:17px; border-radius:5px; box-shadow:inset 0 0 0 1.5px rgba(235,238,248,.28); flex:none; margin-top:2px; }
+.box--on { background:var(--green); box-shadow:none; display:grid; place-items:center; }
+.box--on svg { width:11px; height:11px; }
+/* progress bar */
+.bar { height:4px; border-radius:2px; background:rgba(var(--ink),0.09); overflow:hidden; }
+.bar i { display:block; height:100%; background:var(--green); }
+/* two tier */
+.tier { border-radius:var(--r-card); padding:15px; background:rgba(var(--ink),0.04); box-shadow:var(--glass-hi); }
+/* chat */
+.said { font-size:15px; line-height:1.55; color:var(--text-mid); }
+</style>
+</head><body>
+<div class="gal">
+<a class="gal__back" href="index.html">&larr; all mockups</a>
+<h1>Action, 10 ways</h1>
+<p class="gal__sub">What you see the second Action opens. Same move every time: "Talk to three users about why they signed up." Every one has a focus option, placed differently on purpose.</p>
+<div class="grid">
+
+<!-- A1 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">01</span><span class="item__name">One move, nothing else</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack" style="min-height:844px">
+    <div class="safe-t"></div>
+    <div class="pad"><p class="t-cap">Friday</p></div>
+    <div class="grow" style="display:grid;place-items:center;padding:0 26px">
+      <div><h1 class="h-move" style="font-size:30px;text-align:center">Talk to three users about why they signed up</h1></div>
+    </div>
+    <div class="bot" style="padding-bottom:14px">
+      <button class="btn">Done</button>
+      <div style="height:9px"></div>
+      <button class="focus-btn"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9.5V13l2.2 1.6M9 2.5h6"/></svg>Focus</button>
+    </div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note">Maximum restraint. The move is the whole screen. Nothing to read, nothing to decide. Closest to the design law, but gives you no sense of context.</p>
+</div>
+
+<!-- A2 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">02</span><span class="item__name">Timer is the screen</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack" style="min-height:844px">
+    <div class="safe-t"></div>
+    <div class="pad" style="padding-top:8px"><p class="t-body" style="font-size:16px;color:var(--text-hi);text-align:center;line-height:1.4">Talk to three users about why they signed up</p></div>
+    <div class="grow" style="display:grid;place-items:center">
+      <div>
+        <div class="dial">
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="none" stroke="rgba(235,238,248,.08)" stroke-width="2"/>
+          <circle cx="50" cy="50" r="45" fill="none" stroke="#3ad9f5" stroke-width="2" stroke-linecap="round" stroke-dasharray="283" stroke-dashoffset="96"/></svg>
+          <div class="dial__t">18:42</div>
+        </div>
+        <p class="t-cap" style="text-align:center;margin-top:16px">25 minutes. Phone face down.</p>
+      </div>
+    </div>
+    <div class="bot" style="padding-bottom:14px">
+      <button class="btn">Done</button>
+      <div style="height:9px"></div>
+      <button class="focus-btn" style="background:transparent">Pause</button>
+    </div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note">Focus is not a button, it is the default state. Opening Action means you are starting now. Strongest anti-procrastination design; wrong if most moves are not timed work.</p>
+</div>
+
+<!-- A3 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">03</span><span class="item__name">On the card</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack" style="min-height:844px">
+    <div class="safe-t"></div>
+    <div class="grow" style="display:grid;place-items:center">
+      <div>
+        <div class="card" style="height:330px;place-items:end start">
+          <div class="card__liquid"><i class="card__b c1"></i><i class="card__b c2"></i><i class="card__b c3"></i><i class="card__b c4"></i></div>
+          <div class="card__rim"></div>
+          <div style="position:relative;z-index:2;padding:22px">
+            <p style="font-size:12px;color:rgba(10,16,18,.6);font-weight:650">Today</p>
+            <p style="font-size:20px;font-weight:750;color:#0a1012;line-height:1.28;margin:6px 0 0">Talk to three users about why they signed up</p>
+          </div>
+        </div>
+        <p class="t-cap" style="text-align:center;margin-top:18px">Day 11</p>
+      </div>
+    </div>
+    <div class="bot" style="padding-bottom:14px">
+      <button class="btn">Done</button>
+      <div style="height:9px"></div>
+      <button class="focus-btn"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9.5V13l2.2 1.6M9 2.5h6"/></svg>Focus</button>
+    </div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note">The move lives on the Memento itself, so doing it visibly feeds the object. Ties Action to the thing you are building. Risk: text on a bright card is a contrast fight.</p>
+</div>
+
+<!-- A4 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">04</span><span class="item__name">One big, one small</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack" style="min-height:844px">
+    <div class="safe-t"></div>
+    <div class="pad" style="padding-top:10px"><p class="t-cap">Day 11</p></div>
+    <div class="grow" style="display:flex;flex-direction:column;justify-content:center;padding:0 20px;gap:22px">
+      <div>
+        <h1 class="h-move" style="font-size:27px">Talk to three users about why they signed up</h1>
+        <p class="t-body" style="margin-top:10px">About 40 minutes.</p>
+      </div>
+      <div class="tier">
+        <p class="t-cap">If today falls apart</p>
+        <p style="font-size:15px;font-weight:600;margin:6px 0 0;line-height:1.4">Send one of them a single message.</p>
+      </div>
+    </div>
+    <div class="bot" style="padding-bottom:14px">
+      <button class="btn">Done</button>
+      <div style="height:9px"></div>
+      <button class="focus-btn"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9.5V13l2.2 1.6M9 2.5h6"/></svg>Focus</button>
+    </div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note">A built-in floor. On bad days the streak survives without lying. This is the single highest-leverage retention idea on this page.</p>
+</div>
+
+<!-- A5 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">05</span><span class="item__name">Move and reason</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack" style="min-height:844px">
+    <div class="safe-t"></div>
+    <div class="grow" style="display:flex;flex-direction:column;justify-content:center;padding:0 22px">
+      <h1 class="h-move" style="font-size:28px">Talk to three users about why they signed up</h1>
+      <hr class="rule" style="margin:22px 0">
+      <p class="t-body" style="color:var(--text-hi)">You have 8 users and no idea which part they actually needed. You cannot get to 100 guessing.</p>
+    </div>
+    <div class="bot" style="padding-bottom:14px">
+      <button class="btn">Done</button>
+      <div style="height:9px"></div>
+      <button class="focus-btn"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9.5V13l2.2 1.6M9 2.5h6"/></svg>Focus</button>
+    </div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note">Two lines total: what, and why it is the move today. The why is where the AI earns its cost. Kills the "why am I doing this" drop-off.</p>
+</div>
+
+<!-- A6 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">06</span><span class="item__name">Broken into three</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack" style="min-height:844px">
+    <div class="safe-t"></div>
+    <div class="pad" style="padding-top:12px"><h1 class="h-move" style="font-size:24px">Talk to three users</h1>
+      <p class="t-body" style="margin-top:8px">Ask why they signed up.</p></div>
+    <div class="grow" style="padding:26px 20px 0">
+      <div class="sub"><span class="box box--on"><svg viewBox="0 0 24 24" fill="none" stroke="#04140a" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+        <span style="font-size:15px;color:var(--text-lo);text-decoration:line-through">Marcus</span></div>
+      <div class="sub"><span class="box"></span><span style="font-size:15px">Priya</span></div>
+      <div class="sub"><span class="box"></span><span style="font-size:15px">The one who signed up Tuesday</span></div>
+      <hr class="rule" style="margin:16px 0">
+      <div class="bar"><i style="width:33%"></i></div>
+      <p class="t-cap" style="margin-top:9px">1 of 3</p>
+    </div>
+    <div class="bot" style="padding-bottom:14px">
+      <button class="focus-btn"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9.5V13l2.2 1.6M9 2.5h6"/></svg>Focus</button>
+    </div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note">Only for moves that genuinely have parts. Partial credit feels good and reduces all-or-nothing failure. Danger: turns Memento into a to-do app if it is the default.</p>
+</div>
+
+<!-- A7 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">07</span><span class="item__name">Under the goal</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack" style="min-height:844px">
+    <div class="safe-t"></div>
+    <div class="pad" style="padding-top:10px">
+      <p class="t-body" style="font-size:13.5px">100 paying users</p>
+      <div class="bar" style="margin-top:10px"><i style="width:8%"></i></div>
+      <div style="display:flex;justify-content:space-between;margin-top:7px">
+        <span class="t-cap num">8</span><span class="t-cap num">100</span></div>
+    </div>
+    <div class="grow" style="display:grid;place-items:center;padding:0 22px">
+      <h1 class="h-move" style="font-size:29px;text-align:center">Talk to three users about why they signed up</h1>
+    </div>
+    <div class="bot" style="padding-bottom:14px">
+      <button class="btn">Done</button>
+      <div style="height:9px"></div>
+      <button class="focus-btn"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9.5V13l2.2 1.6M9 2.5h6"/></svg>Focus</button>
+    </div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note">Anchors every day to the number that matters. Works only when the goal is countable, and an 8% bar can be demoralizing early.</p>
+</div>
+
+<!-- A8 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">08</span><span class="item__name">Pick your window</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack" style="min-height:844px">
+    <div class="safe-t"></div>
+    <div class="grow" style="display:flex;flex-direction:column;justify-content:center;padding:0 22px">
+      <h1 class="h-move" style="font-size:26px">Talk to three users about why they signed up</h1>
+      <div style="height:26px"></div>
+      <p class="t-cap">How long do you have?</p>
+      <div style="display:flex;gap:8px;margin-top:11px">
+        <span class="chip">10 min</span><span class="chip chip--on">25 min</span><span class="chip">50 min</span>
+      </div>
+    </div>
+    <div class="bot" style="padding-bottom:14px">
+      <button class="btn">Start</button>
+      <div style="height:9px"></div>
+      <button class="focus-btn" style="background:transparent">Mark done instead</button>
+    </div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note">Commitment first, work second. The single tap on a time chip is a decision, which is what actually starts people. Focus becomes the primary path, "done" the escape.</p>
+</div>
+
+<!-- A9 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">09</span><span class="item__name">It talks first</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack" style="min-height:844px">
+    <div class="safe-t"></div>
+    <div class="grow" style="display:flex;flex-direction:column;justify-content:center;padding:0 22px">
+      <p class="said">You have shipped for eleven days and talked to nobody. That is the gap.</p>
+      <div style="height:20px"></div>
+      <h1 class="h-move" style="font-size:27px">Talk to three users about why they signed up</h1>
+      <div style="height:20px"></div>
+      <p class="t-cap">Not it? Say what changed.</p>
+    </div>
+    <div class="bot" style="padding-bottom:14px">
+      <button class="btn">Done</button>
+      <div style="height:9px"></div>
+      <button class="focus-btn"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9.5V13l2.2 1.6M9 2.5h6"/></svg>Focus</button>
+    </div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note">One line of read on you before the move, in your voice spec. Feels alive and adaptive. Every line has to actually be true or it collapses instantly.</p>
+</div>
+
+<!-- A10 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">10</span><span class="item__name">The workbench</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack" style="min-height:844px">
+    <div class="safe-t"></div>
+    <div class="pad" style="padding-top:10px;display:flex;justify-content:space-between;align-items:center">
+      <p class="t-cap">Day 11</p><p class="t-cap num">31 done</p></div>
+    <div class="pad" style="margin-top:18px">
+      <h1 class="h-move" style="font-size:25px">Talk to three users about why they signed up</h1>
+      <div style="height:16px"></div>
+      <button class="focus-btn" style="background:rgba(58,217,245,.1)"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9.5V13l2.2 1.6M9 2.5h6"/></svg>Start 25 minutes</button>
+      <hr class="rule" style="margin:20px 0">
+      <p class="t-cap">Notes</p>
+      <div class="panel panel--flat" style="margin-top:9px;min-height:110px;padding:14px">
+        <p class="t-body" style="font-size:14px;color:var(--text-lo)">Marcus said he came for the card, stayed for the streak. Ask Priya if&hellip;</p>
+      </div>
+      <hr class="rule" style="margin:20px 0">
+      <p class="t-cap">Yesterday</p>
+      <p class="t-body" style="margin-top:6px;font-size:14px">Shipped the account deletion flow.</p>
+    </div>
+    <div class="grow"></div>
+    <div class="bot" style="padding-bottom:14px"><button class="btn">Done</button></div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note">The dense one. Notes are the investment loop: type here and the app holds something only you have. Least Memento-like in restraint, most likely to create switching cost.</p>
+</div>
+
+</div></div>
+</body></html>

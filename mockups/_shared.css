@@ -1,0 +1,124 @@
+/* Memento mockup kit. Real app tokens so every mockup is judged in Memento's
+   own language, never a generic dark theme.
+   Laws honoured here: no eyebrow labels, no gold/serif, no emoji icons, tight
+   radii, hairlines, body copy stays BRIGHT (low alpha only on tiny captions). */
+@font-face { font-family: 'Geist'; src: url('fonts/geist-400.otf') format('opentype'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Geist'; src: url('fonts/geist-500.otf') format('opentype'); font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Geist'; src: url('fonts/geist-700.otf') format('opentype'); font-weight: 700; font-display: swap; }
+
+:root {
+  --ink: 235, 238, 248;
+  --bg-deep: #040606;
+  --surface-0: #040405;
+  --text-hi: rgba(var(--ink), 0.96);
+  --text-mid: rgba(var(--ink), 0.78);
+  --text-lo: rgba(var(--ink), 0.42);
+  --hairline: rgba(var(--ink), 0.09);
+  --hairline-strong: rgba(var(--ink), 0.16);
+  --cyan: #3ad9f5;
+  --green: #3fd94e;
+  --peri: #8096ff;
+  --r-ctrl: 10px;
+  --r-card: 14px;
+  --font: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+  --glass: rgba(var(--ink), 0.05);
+  --glass-hi: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: #0a0b0d; color: var(--text-hi);
+  font-family: var(--font); -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- gallery chrome (not part of the mockups themselves) ---------- */
+.gal { padding: 28px 20px 80px; max-width: 1600px; margin: 0 auto; }
+.gal__back { display: inline-block; color: var(--text-lo); text-decoration: none; font-size: 13px; margin-bottom: 14px; }
+.gal__back:hover { color: var(--text-hi); }
+.gal h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 6px; }
+.gal__sub { color: var(--text-mid); font-size: 14px; margin: 0 0 26px; max-width: 62ch; line-height: 1.5; }
+.grid { display: flex; flex-wrap: wrap; gap: 30px; align-items: flex-start; }
+.item { width: 390px; }
+.item__label { display: flex; align-items: baseline; gap: 8px; margin: 0 0 8px; }
+.item__n { font-size: 12px; color: var(--text-lo); font-variant-numeric: tabular-nums; }
+.item__name { font-size: 14px; font-weight: 650; }
+.item__note { font-size: 12.5px; color: var(--text-mid); line-height: 1.45; margin: 8px 2px 0; }
+
+/* on a real phone: shrink the frames so one fits the screen, still 390x844 inside */
+@media (max-width: 440px) {
+  .gal { padding: 22px 12px 60px; }
+  .gal h1 { font-size: 23px; }
+  .grid { gap: 34px; }
+  .item { zoom: 0.88; }
+}
+@media (max-width: 375px) {
+  .item { zoom: 0.84; }
+}
+
+/* ---------- the phone ---------- */
+.phone {
+  width: 390px; height: 844px; border-radius: 34px; overflow: hidden;
+  background: var(--bg-deep); position: relative;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.07);
+}
+.phone__scroll { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; }
+.phone__scroll::-webkit-scrollbar { width: 0; }
+/* simulated safe areas */
+.safe-t { height: 47px; flex: none; }
+.safe-b { height: 34px; flex: none; }
+.pad { padding-left: 20px; padding-right: 20px; }
+
+/* ---------- shared Memento pieces ---------- */
+.mhead { display: flex; align-items: center; justify-content: space-between; padding: 10px 20px 0; }
+.mhead__brand { display: flex; align-items: center; gap: 1px; font-size: 12.5px; font-weight: 700; letter-spacing: 0.22em; color: rgba(var(--ink),0.9); }
+.mhead__brand svg { width: 13px; height: 13px; margin-right: 2px; }
+.mhead__date { font-size: 13.5px; color: var(--text-mid); }
+.mhead__icon { width: 30px; height: 30px; border-radius: 999px; background: rgba(var(--ink),0.07); display: grid; place-items: center; }
+.mhead__icon svg { width: 17px; height: 17px; stroke: var(--text-mid); fill: none; stroke-width: 1.9; }
+
+/* the Memento card */
+.card {
+  width: min(88vw, 341px); height: 300px; border-radius: 22px; margin: 0 auto;
+  position: relative; overflow: hidden; isolation: isolate; background: #0a0e10;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.26), 0 26px 50px -26px rgba(0,0,0,0.75);
+  display: grid; place-items: center;
+}
+.card--sm { height: 190px; width: 232px; }
+.card__liquid { position: absolute; inset: -28%; filter: blur(30px) saturate(1.5); }
+.card__b { position: absolute; border-radius: 50%; mix-blend-mode: screen; }
+.card__b.c1 { width: 104%; height: 82%; left: -16%; top: -18%; background: radial-gradient(circle, rgba(116,234,255,1), transparent 64%); }
+.card__b.c2 { width: 104%; height: 84%; left: 2%; top: 6%; background: radial-gradient(circle, rgba(240,243,255,1), transparent 62%); opacity: 0.5; }
+.card__b.c3 { width: 108%; height: 86%; right: -18%; bottom: -20%; background: radial-gradient(circle, rgba(56,236,71,1), transparent 62%); }
+.card__b.c4 { width: 84%; height: 66%; left: -6%; bottom: 2%; background: radial-gradient(circle, rgba(128,150,255,0.95), transparent 64%); opacity: 0.62; }
+.card__m { position: relative; z-index: 2; width: 52px; height: 52px; }
+.card__m path { fill: rgba(52,60,70,0.92); }
+.card__rim { position: absolute; inset: 0; border-radius: inherit; z-index: 1; pointer-events: none;
+  box-shadow: inset 0 0 0 1.3px rgba(255,255,255,0.94), inset 0 0 14px rgba(255,255,255,0.5), inset 0 0 36px rgba(206,230,255,0.3); }
+
+/* generic surfaces */
+.panel { background: rgba(var(--ink),0.045); border-radius: var(--r-card); box-shadow: var(--glass-hi); padding: 18px; }
+.panel--flat { background: rgba(var(--ink),0.03); }
+.rule { height: 1px; background: var(--hairline); border: 0; margin: 14px 0; }
+.btn {
+  display: block; width: 100%; padding: 15px; border: 0; border-radius: var(--r-ctrl);
+  background: #fff; color: #0b1112; font-family: var(--font); font-size: 15.5px; font-weight: 700;
+  text-align: center; cursor: pointer;
+}
+.btn--ghost { background: rgba(var(--ink),0.07); color: var(--text-hi); }
+.btn--wide { border-radius: 12px; }
+.chip {
+  display: inline-flex; align-items: center; padding: 7px 12px; border-radius: 999px;
+  background: rgba(var(--ink),0.06); font-size: 12.5px; font-weight: 600; color: var(--text-mid);
+}
+.chip--on { background: rgba(255,255,255,0.92); color: #0b1112; }
+.h-move { font-size: 23px; font-weight: 800; letter-spacing: -0.015em; line-height: 1.22; margin: 0; }
+.h-sec { font-size: 19px; font-weight: 750; letter-spacing: -0.01em; margin: 0; }
+.t-body { font-size: 14.5px; line-height: 1.55; color: var(--text-mid); margin: 0; }
+.t-cap { font-size: 12px; color: var(--text-lo); }
+.num { font-variant-numeric: tabular-nums; }
+
+/* dot + spine, reused by several proof-trail variants */
+.spine { position: absolute; left: 15px; top: 0; bottom: 0; width: 2px; background: linear-gradient(180deg, rgba(58,217,245,0.5), rgba(63,217,78,0.5)); }
+.node { position: absolute; left: 9px; width: 14px; height: 14px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 0 5px var(--bg-deep); }
+.node--g { background: var(--green); }
+.node--dim { background: #565e69; }

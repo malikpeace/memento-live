@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Evidence wall, 5 ways</title>
+<link rel="stylesheet" href="_shared.css">
+<style>
+.ph { background: linear-gradient(150deg, rgba(90,110,130,.4), rgba(30,40,50,.55)); position: relative; overflow: hidden; }
+.ph::after { content:''; position:absolute; inset:0; background: radial-gradient(70% 60% at 30% 25%, rgba(255,255,255,.14), transparent 70%); }
+.ph--a { background: linear-gradient(160deg, rgba(58,217,245,.3), rgba(20,40,52,.6)); }
+.ph--b { background: linear-gradient(140deg, rgba(63,217,78,.26), rgba(18,44,24,.6)); }
+.ph--c { background: linear-gradient(200deg, rgba(128,150,255,.28), rgba(24,26,50,.6)); }
+/* 1 mosaic */
+.mos { display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; }
+.mos > * { border-radius:8px; aspect-ratio:1; }
+.mos .tall { grid-row: span 2; aspect-ratio: 1/2.045; }
+.mos .wide { grid-column: span 2; aspect-ratio: 2.045/1; }
+/* 2 stack */
+.ev { border-radius:var(--r-card); overflow:hidden; margin-bottom:14px; background:rgba(var(--ink),.04); box-shadow:var(--glass-hi); }
+.ev__img { height:190px; }
+.ev__b { padding:14px 16px 16px; }
+/* 3 shelf */
+.shelf { display:flex; gap:9px; overflow-x:auto; padding:0 20px; }
+.shelf::-webkit-scrollbar { height:0; }
+.shelf > div { flex:none; width:118px; }
+.shelf .ph { height:148px; border-radius:9px; }
+/* 4 pair */
+.pair { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.pair .ph { aspect-ratio:3/4; border-radius:10px; }
+/* 5 single */
+.hero .ph { height:420px; border-radius:16px; }
+.empty { border-radius:8px; aspect-ratio:1; background:rgba(var(--ink),.035); display:grid; place-items:center; }
+.empty svg { width:18px; height:18px; stroke:rgba(235,238,248,.22); fill:none; stroke-width:1.8; }
+</style>
+</head><body>
+<div class="gal">
+<a class="gal__back" href="index.html">&larr; all mockups</a>
+<h1>Evidence wall, 5 ways</h1>
+<p class="gal__sub">Vivere rebuilt as proof of what happened instead of a board of what you want. Prompted after a completed action, never on a schedule. The grey blocks are user photos.</p>
+<div class="grid">
+
+<!-- E1 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">01</span><span class="item__name">Mosaic</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:6px;display:flex;justify-content:space-between;align-items:baseline">
+      <h2 class="h-sec">Evidence</h2><span class="t-cap num">14</span></div>
+    <div class="pad" style="margin-top:16px">
+      <div class="mos">
+        <div class="ph ph--b tall"></div>
+        <div class="ph wide"></div>
+        <div class="ph ph--a"></div>
+        <div class="ph ph--c"></div>
+        <div class="ph"></div>
+        <div class="ph tall"></div>
+        <div class="ph ph--b"></div>
+        <div class="ph ph--a"></div>
+        <div class="ph ph--c"></div>
+        <div class="ph"></div>
+        <div class="ph ph--b"></div>
+        <div class="empty"><svg viewBox="0 0 24 24"><path d="M12 6v12M6 12h12" stroke-linecap="round"/></svg></div>
+      </div>
+      <p class="t-body" style="margin-top:18px">Every one of these came after a day you finished.</p>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note">Densest, most satisfying to scroll, zero words. It only works once there are 10+ photos, so the first month looks bare.</p>
+</div>
+
+<!-- E2 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">02</span><span class="item__name">Dated stack</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:6px"><h2 class="h-sec">Evidence</h2>
+      <p class="t-body" style="margin-top:4px">14 days you have something to show for.</p></div>
+    <div class="pad" style="margin-top:18px">
+      <div class="ev"><div class="ph ph--b ev__img"></div>
+        <div class="ev__b"><p class="t-cap">Jul 24</p>
+          <p style="font-size:15px;font-weight:600;margin:5px 0 0;line-height:1.4">Three calls done. Marcus said he stayed for the streak.</p></div></div>
+      <div class="ev"><div class="ph ph--a ev__img"></div>
+        <div class="ev__b"><p class="t-cap">Jul 18</p>
+          <p style="font-size:15px;font-weight:600;margin:5px 0 0;line-height:1.4">First payment. A stranger paid for the thing I made.</p></div></div>
+      <div class="ev"><div class="ph ev__img"></div>
+        <div class="ev__b"><p class="t-cap">Jul 12</p>
+          <p style="font-size:15px;font-weight:600;margin:5px 0 0;line-height:1.4">Shipped the card evolution at 2am.</p></div></div>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note">Photo plus one line in your own words. Works from day one with a single entry, and doubles as the proof trail. Safest pick.</p>
+</div>
+
+<!-- E3 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">03</span><span class="item__name">Shelf under the card</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div style="padding-top:14px">
+      <div class="card card--sm" style="height:230px;width:270px">
+        <div class="card__liquid"><i class="card__b c1"></i><i class="card__b c2"></i><i class="card__b c3"></i><i class="card__b c4"></i></div>
+        <div class="card__rim"></div>
+      </div>
+    </div>
+    <div class="pad" style="margin-top:26px;display:flex;justify-content:space-between;align-items:baseline">
+      <h2 class="h-sec" style="font-size:17px">Evidence</h2><span class="t-cap num">14</span></div>
+    <div class="shelf" style="margin-top:12px">
+      <div><div class="ph ph--b"></div><p class="t-cap" style="margin-top:6px">Jul 24</p></div>
+      <div><div class="ph ph--a"></div><p class="t-cap" style="margin-top:6px">Jul 18</p></div>
+      <div><div class="ph"></div><p class="t-cap" style="margin-top:6px">Jul 12</p></div>
+      <div><div class="ph ph--c"></div><p class="t-cap" style="margin-top:6px">Jul 4</p></div>
+    </div>
+    <div class="pad" style="margin-top:26px">
+      <hr class="rule">
+      <p class="t-body" style="margin-top:14px">Today: talk to three users about why they signed up.</p>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note">Not its own page. The wall is a strip that lives under the Memento, so proof is always half-visible instead of somewhere you must go.</p>
+</div>
+
+<!-- E4 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">04</span><span class="item__name">Then and now</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:6px"><h2 class="h-sec">How far</h2></div>
+    <div class="pad" style="margin-top:18px">
+      <div class="pair">
+        <div><div class="ph"></div><p class="t-cap" style="margin-top:7px">Mar 14</p></div>
+        <div><div class="ph ph--b"></div><p class="t-cap" style="margin-top:7px">Jul 24</p></div>
+      </div>
+      <p class="t-body" style="margin-top:16px;color:var(--text-hi)">The desk on day one, and the desk today.</p>
+      <hr class="rule" style="margin:26px 0">
+      <div class="pair">
+        <div><div class="ph ph--c"></div><p class="t-cap" style="margin-top:7px">Apr 2</p></div>
+        <div><div class="ph ph--a"></div><p class="t-cap" style="margin-top:7px">Jul 18</p></div>
+      </div>
+      <p class="t-body" style="margin-top:16px;color:var(--text-hi)">Zero users, then the first payment screen.</p>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note">Pairs an old photo with a recent one. The most emotionally powerful of the five, and the only one that needs the app to pick pairs intelligently.</p>
+</div>
+
+<!-- E5 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">05</span><span class="item__name">One at a time</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad hero" style="padding-top:20px">
+      <div class="ph ph--a"></div>
+      <p class="t-cap" style="margin-top:16px">Jul 18, day 5</p>
+      <p style="font-size:19px;font-weight:650;line-height:1.4;margin:8px 0 0">First payment. A stranger paid for the thing I made.</p>
+      <div style="display:flex;gap:6px;margin-top:26px;justify-content:center">
+        <i style="width:6px;height:6px;border-radius:50%;background:rgba(235,238,248,.25)"></i>
+        <i style="width:6px;height:6px;border-radius:50%;background:rgba(235,238,248,.25)"></i>
+        <i style="width:6px;height:6px;border-radius:50%;background:#fff"></i>
+        <i style="width:6px;height:6px;border-radius:50%;background:rgba(235,238,248,.25)"></i>
+        <i style="width:6px;height:6px;border-radius:50%;background:rgba(235,238,248,.25)"></i>
+      </div>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note">Full-bleed, swipe one by one. Treats each piece of proof as worth its own screen. Slow to browse, but it is the version people screenshot and send to someone.</p>
+</div>
+
+</div></div>
+</body></html>
