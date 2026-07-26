@@ -14,7 +14,8 @@
     { id: 'mori',     t: 'Mori',         f: 'mori.html',        r: 2 },
     { id: 'ambient',  t: 'Lock screen',  f: 'ambient.html',     r: 2 },
     { id: 'page2b',   t: 'Page two, more', f: 'page-two-2.html',r: 2 },
-    { id: 'desk',     t: 'Desktop home', f: 'desktop-home.html', r: 3 }
+    { id: 'desk',     t: 'Desktop home', f: 'desktop-home.html', r: 3 },
+    { id: 'object',   t: 'The object',   f: 'object.html',       r: 4 }
   ];
   var KEY = 'memento-mockup-picks';
   var here = (location.pathname.split('/').pop() || 'index.html');
