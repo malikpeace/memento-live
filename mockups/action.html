@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Action, 10 ways</title>
+<title>Action, 15 ways</title>
 <link rel="stylesheet" href="_shared.css">
 <style>
 .stack { display: flex; flex-direction: column; min-height: 100%; }
@@ -26,11 +26,32 @@
 .tier { border-radius:var(--r-card); padding:15px; background:rgba(var(--ink),0.04); box-shadow:var(--glass-hi); }
 /* chat */
 .said { font-size:15px; line-height:1.55; color:var(--text-mid); }
+/* ---- round two ---- */
+.door { border-radius:var(--r-card); padding:18px; background:rgba(var(--ink),.045); box-shadow:var(--glass-hi); }
+.door__k { font-size:11.5px; color:var(--text-lo); }
+.door__t { font-size:18px; font-weight:700; line-height:1.32; margin:7px 0 0; letter-spacing:-.01em; }
+.door__w { font-size:13px; color:var(--text-mid); margin-top:9px; line-height:1.45; }
+.brief { display:grid; grid-template-columns:78px 1fr; gap:12px; padding:13px 0; border-bottom:1px solid var(--hairline); }
+.brief__k { font-size:12px; color:var(--text-lo); padding-top:1px; }
+.brief__v { font-size:15px; line-height:1.45; }
+.sched { position:relative; padding-left:52px; }
+.hr { position:relative; height:56px; border-top:1px solid var(--hairline); }
+.hr__t { position:absolute; left:-52px; top:-8px; font-size:11.5px; color:var(--text-lo);
+  font-variant-numeric:tabular-nums; }
+.blk { position:absolute; left:0; right:0; border-radius:9px; padding:11px 13px;
+  background:rgba(58,217,245,.13); box-shadow:inset 0 0 0 1px rgba(58,217,245,.28); }
+.blk--g { background:rgba(var(--ink),.05); box-shadow:var(--glass-hi); }
+.swipe { position:relative; height:330px; }
+.swipe > div { position:absolute; left:50%; transform:translateX(-50%); width:290px;
+  border-radius:16px; padding:22px; background:rgba(24,27,31,.97);
+  box-shadow:0 18px 40px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.08); }
+.swipe__hint { display:flex; justify-content:space-between; margin-top:16px; }
+.carry { border-left:2px solid rgba(63,217,78,.5); padding-left:14px; }
 </style>
 </head><body>
 <div class="gal">
 <a class="gal__back" href="index.html">&larr; all mockups</a>
-<h1>Action, 10 ways</h1>
+<h1>Action, 15 ways</h1>
 <p class="gal__sub">What you see the second Action opens. Same move every time: "Talk to three users about why they signed up." Every one has a focus option, placed differently on purpose.</p>
 <div class="grid">
 
@@ -50,7 +71,7 @@
     </div>
     <div class="safe-b"></div>
   </div></div></div>
-  <p class="item__note">Maximum restraint. The move is the whole screen. Nothing to read, nothing to decide. Closest to the design law, but gives you no sense of context.</p>
+  <p class="item__note"><b>What it is.</b> The move alone on the screen. No stats, no context.<br><b class="g">Good.</b> Maximum restraint and closest to Memento's design law. Nothing to decide, so nothing to procrastinate on.<br><b class="b">Bad.</b> No sense of why this is today's move, which is exactly the gap people use to justify skipping.<br><span class="sn">Seen in Things' Today view, Opal's session screen, Apple's Focus mode.</span></p>
 </div>
 
 <!-- A2 -->
@@ -76,7 +97,7 @@
     </div>
     <div class="safe-b"></div>
   </div></div></div>
-  <p class="item__note">Focus is not a button, it is the default state. Opening Action means you are starting now. Strongest anti-procrastination design; wrong if most moves are not timed work.</p>
+  <p class="item__note"><b>What it is.</b> Opening Action starts a timer. Focus is the default state, not a button.<br><b class="g">Good.</b> Removes the gap between deciding and starting, which is where procrastination actually lives.<br><b class="b">Bad.</b> Wrong for moves that are conversations, errands or waiting on other people. Forces every task into a work-block shape.<br><span class="sn">Seen in Forest, Session, Pomofocus, Bear Focus Timer.</span></p>
 </div>
 
 <!-- A3 -->
@@ -104,7 +125,7 @@
     </div>
     <div class="safe-b"></div>
   </div></div></div>
-  <p class="item__note">The move lives on the Memento itself, so doing it visibly feeds the object. Ties Action to the thing you are building. Risk: text on a bright card is a contrast fight.</p>
+  <p class="item__note"><b>What it is.</b> The move printed on the Memento card itself.<br><b class="g">Good.</b> Doing the work visibly feeds the object you are building, which is the premise of the whole app.<br><b class="b">Bad.</b> Dark text on a bright, moving card is a real contrast fight, and long moves will not fit.<br><span class="sn">Seen in Apple Watch complications, Duolingo's mascot states, Finch's pet screen.</span></p>
 </div>
 
 <!-- A4 -->
@@ -130,7 +151,7 @@
     </div>
     <div class="safe-b"></div>
   </div></div></div>
-  <p class="item__note">A built-in floor. On bad days the streak survives without lying. This is the single highest-leverage retention idea on this page.</p>
+  <p class="item__note"><b>What it is.</b> Today's full move plus a much smaller fallback for bad days.<br><b class="g">Good.</b> The highest-leverage retention idea in the set. It gives the streak a floor, so a bad day is not a choice between lying and quitting.<br><b class="b">Bad.</b> Some people will take the small option every day. Without a limit it quietly becomes the real bar.<br><span class="sn">Seen in Duolingo's streak freeze, Streaks' flexible goals, Habitica's rest day.</span></p>
 </div>
 
 <!-- A5 -->
@@ -150,7 +171,7 @@
     </div>
     <div class="safe-b"></div>
   </div></div></div>
-  <p class="item__note">Two lines total: what, and why it is the move today. The why is where the AI earns its cost. Kills the "why am I doing this" drop-off.</p>
+  <p class="item__note"><b>What it is.</b> The move, a rule, then one line explaining why it is today's move.<br><b class="g">Good.</b> The why is where the AI earns its cost, and it kills the most common skip reason: not seeing the point.<br><b class="b">Bad.</b> One wrong or generic reason and the whole feature reads as filler. Costs a real AI call every day.<br><span class="sn">Seen in Sunsama's planning prompts, Motion's reasoning, Superhuman's suggestions.</span></p>
 </div>
 
 <!-- A6 -->
@@ -174,7 +195,7 @@
     </div>
     <div class="safe-b"></div>
   </div></div></div>
-  <p class="item__note">Only for moves that genuinely have parts. Partial credit feels good and reduces all-or-nothing failure. Danger: turns Memento into a to-do app if it is the default.</p>
+  <p class="item__note"><b>What it is.</b> The move split into its actual parts, with a progress bar.<br><b class="g">Good.</b> Partial credit, so a half-finished day still counts. Good for moves that genuinely have three pieces.<br><b class="b">Bad.</b> If it is the default, Memento quietly becomes a to-do app, which is the thing it is trying not to be.<br><span class="sn">Seen in Todoist subtasks, Things' checklists, Apple Reminders.</span></p>
 </div>
 
 <!-- A7 -->
@@ -198,7 +219,7 @@
     </div>
     <div class="safe-b"></div>
   </div></div></div>
-  <p class="item__note">Anchors every day to the number that matters. Works only when the goal is countable, and an 8% bar can be demoralizing early.</p>
+  <p class="item__note"><b>What it is.</b> Today's move under a progress bar toward the goal number.<br><b class="g">Good.</b> Anchors every day to the number that matters, so daily work never feels disconnected from the outcome.<br><b class="b">Bad.</b> An 8% bar early on is discouraging, and it only works when the goal is countable at all.<br><span class="sn">Seen in Kickstarter progress bars, Strava goals, Apple Fitness move goals.</span></p>
 </div>
 
 <!-- A8 -->
@@ -221,7 +242,7 @@
     </div>
     <div class="safe-b"></div>
   </div></div></div>
-  <p class="item__note">Commitment first, work second. The single tap on a time chip is a decision, which is what actually starts people. Focus becomes the primary path, "done" the escape.</p>
+  <p class="item__note"><b>What it is.</b> You pick how long you have before you start. The tap is the commitment.<br><b class="g">Good.</b> A single small decision is what actually starts people, and choosing 10 minutes beats skipping entirely.<br><b class="b">Bad.</b> Adds a step before the work. Some days you just want to press done and go.<br><span class="sn">Seen in Headspace's session lengths, Forest's timer, Freedom's session picker.</span></p>
 </div>
 
 <!-- A9 -->
@@ -243,7 +264,7 @@
     </div>
     <div class="safe-b"></div>
   </div></div></div>
-  <p class="item__note">One line of read on you before the move, in your voice spec. Feels alive and adaptive. Every line has to actually be true or it collapses instantly.</p>
+  <p class="item__note"><b>What it is.</b> One line of read on you, then the move.<br><b class="g">Good.</b> Makes the app feel like it has been paying attention rather than assigning chores.<br><b class="b">Bad.</b> Every line has to be true. One wrong observation and people stop believing all of them.<br><span class="sn">Seen in Duolingo's personalised nudges, Spotify's DJ, Whoop's daily coach.</span></p>
 </div>
 
 <!-- A10 -->
@@ -270,7 +291,153 @@
     <div class="bot" style="padding-bottom:14px"><button class="btn">Done</button></div>
     <div class="safe-b"></div>
   </div></div></div>
-  <p class="item__note">The dense one. Notes are the investment loop: type here and the app holds something only you have. Least Memento-like in restraint, most likely to create switching cost.</p>
+  <p class="item__note"><b>What it is.</b> The dense one: move, timer, notes and yesterday on one screen.<br><b class="g">Good.</b> Notes are the investment loop. Typing here creates something only you have, which makes leaving expensive.<br><b class="b">Bad.</b> Least restrained option in the set. It looks like a productivity tool, not like Memento.<br><span class="sn">Seen in Linear's issue view, Notion task pages, Sunsama's daily notes.</span></p>
+</div>
+
+<!-- A11 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">11</span><span class="item__name">Two doors</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack" style="min-height:844px">
+    <div class="safe-t"></div>
+    <div class="pad" style="padding-top:16px"><p class="t-cap">Day 11. Pick one.</p></div>
+    <div class="grow" style="display:flex;flex-direction:column;justify-content:center;padding:0 20px;gap:14px">
+      <div class="door">
+        <p class="door__k">The safe one</p>
+        <p class="door__t">Ship the pricing change you already wrote</p>
+        <p class="door__w">Forty minutes. You know it works. Moves you a little.</p>
+      </div>
+      <div class="door" style="background:rgba(58,217,245,.09);box-shadow:inset 0 0 0 1px rgba(58,217,245,.24)">
+        <p class="door__k" style="color:var(--cyan)">The uncomfortable one</p>
+        <p class="door__t">Call the three users who never replied</p>
+        <p class="door__w">You have avoided this for six days. It is the one that changes the plan.</p>
+      </div>
+    </div>
+    <div class="bot" style="padding-bottom:14px">
+      <button class="btn">Take the uncomfortable one</button>
+      <div style="height:9px"></div>
+      <button class="focus-btn" style="background:transparent">Take the safe one</button>
+    </div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note"><b>What it is.</b> Two moves offered: the safe one and the one you have been avoiding.<br><b class="g">Good.</b> Names the avoidance out loud, which nothing else here does. Choosing feels like an act rather than compliance.<br><b class="b">Bad.</b> Offering an easy out means people take it. The AI also has to correctly identify what you are avoiding, which is hard.<br><span class="sn">Seen in Duolingo's lesson choice, Headspace's session picker, choice architecture in coaching apps.</span></p>
+</div>
+
+<!-- A12 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">12</span><span class="item__name">The brief</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack" style="min-height:844px">
+    <div class="safe-t"></div>
+    <div class="pad" style="padding-top:18px">
+      <h1 class="h-move" style="font-size:23px">Talk to three users about why they signed up</h1>
+      <div style="height:18px"></div>
+      <div class="brief"><span class="brief__k">First step</span><span class="brief__v">Open the signup list and pick three names.</span></div>
+      <div class="brief"><span class="brief__k">Done when</span><span class="brief__v">You have three answers written down.</span></div>
+      <div class="brief"><span class="brief__k">Roughly</span><span class="brief__v">40 minutes</span></div>
+      <div class="brief" style="border:0"><span class="brief__k">If stuck</span><span class="brief__v">Send a voice note instead of asking for a call.</span></div>
+    </div>
+    <div class="grow"></div>
+    <div class="bot" style="padding-bottom:14px">
+      <button class="btn">Done</button>
+      <div style="height:9px"></div>
+      <button class="focus-btn"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9.5V13l2.2 1.6M9 2.5h6"/></svg>Focus</button>
+    </div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note"><b>What it is.</b> The move as a short brief: first step, done when, roughly how long, what to do if stuck.<br><b class="g">Good.</b> Kills the two real blockers at once, not knowing where to start and not knowing when to stop.<br><b class="b">Bad.</b> Four extra lines to read every single day. It is the most words of any Action screen here.<br><span class="sn">Seen in Linear issue templates, Amazon's one-pagers, Asana task briefs.</span></p>
+</div>
+
+<!-- A13 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">13</span><span class="item__name">Carried from yesterday</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack" style="min-height:844px">
+    <div class="safe-t"></div>
+    <div class="grow" style="display:flex;flex-direction:column;justify-content:center;padding:0 22px">
+      <div class="carry">
+        <p class="t-cap">Yesterday you shipped the deletion flow and wrote:</p>
+        <p style="font-size:15.5px;line-height:1.5;margin:8px 0 0;color:var(--text-hi)">"I keep building instead of talking to people."</p>
+      </div>
+      <div style="height:32px"></div>
+      <p class="t-cap">So today</p>
+      <h1 class="h-move" style="font-size:27px;margin-top:9px">Talk to three users about why they signed up</h1>
+    </div>
+    <div class="bot" style="padding-bottom:14px">
+      <button class="btn">Done</button>
+      <div style="height:9px"></div>
+      <button class="focus-btn"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9.5V13l2.2 1.6M9 2.5h6"/></svg>Focus</button>
+    </div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note"><b>What it is.</b> Yesterday's result and your own words, then today's move underneath.<br><b class="g">Good.</b> Free continuity. Today's move visibly comes from yesterday, which makes the whole thing feel like one thread.<br><b class="b">Bad.</b> Depends entirely on the daily one-line capture existing. Awkward on the first day and after a break.<br><span class="sn">Seen in Sunsama's carry-over, Day One's on-this-day, standup formats.</span></p>
+</div>
+
+<!-- A14 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">14</span><span class="item__name">Put it in the day</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack" style="min-height:844px">
+    <div class="safe-t"></div>
+    <div class="pad" style="padding-top:16px">
+      <h2 class="h-sec" style="font-size:17px">Friday</h2>
+      <p class="t-body" style="margin-top:4px;font-size:13.5px">Your move has a slot. Drag it if it is wrong.</p>
+    </div>
+    <div class="pad" style="margin-top:22px">
+      <div class="sched">
+        <div class="hr"><span class="hr__t">9:00</span></div>
+        <div class="hr"><span class="hr__t">10:00</span>
+          <div class="blk--g blk" style="top:6px;height:44px"><span style="font-size:13.5px;color:var(--text-mid)">Standup</span></div></div>
+        <div class="hr"><span class="hr__t">11:00</span></div>
+        <div class="hr"><span class="hr__t">12:00</span></div>
+        <div class="hr"><span class="hr__t">1:00</span></div>
+        <div class="hr"><span class="hr__t">2:00</span>
+          <div class="blk" style="top:6px;height:100px">
+            <span class="t-cap" style="color:var(--cyan)">Today's move &middot; 40 min</span>
+            <p style="font-size:15px;font-weight:650;line-height:1.35;margin:5px 0 0">Talk to three users about why they signed up</p></div></div>
+        <div class="hr"><span class="hr__t">3:00</span></div>
+        <div class="hr" style="height:0"><span class="hr__t">4:00</span></div>
+      </div>
+    </div>
+    <div class="grow"></div>
+    <div class="bot" style="padding-bottom:14px">
+      <button class="btn">Start at 2:00</button>
+      <div style="height:9px"></div>
+      <button class="focus-btn" style="background:transparent">Start now instead</button>
+    </div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note"><b>What it is.</b> The move placed at a specific hour of today, calendar style.<br><b class="g">Good.</b> Scheduling beats intending. A move with a time attached is dramatically more likely to happen.<br><b class="b">Bad.</b> Requires calendar access to be useful, and a wrongly placed block is worse than no block.<br><span class="sn">Seen in Sunsama, Motion, Google Calendar's tasks, Structured.</span></p>
+</div>
+
+<!-- A15 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">15</span><span class="item__name">Accept or swap</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack" style="min-height:844px">
+    <div class="safe-t"></div>
+    <div class="pad" style="padding-top:16px"><p class="t-cap">Three left today</p></div>
+    <div class="grow" style="display:grid;place-items:center">
+      <div style="width:100%">
+        <div class="swipe">
+          <div style="top:22px;transform:translateX(-50%) scale(.9);opacity:.3">
+            <p class="t-cap">Option 3</p>
+            <p style="font-size:18px;font-weight:700;margin-top:8px;line-height:1.3">Rewrite the pricing page</p></div>
+          <div style="top:11px;transform:translateX(-50%) scale(.95);opacity:.55">
+            <p class="t-cap">Option 2</p>
+            <p style="font-size:18px;font-weight:700;margin-top:8px;line-height:1.3">Ship the payment fix</p></div>
+          <div style="top:0">
+            <p class="t-cap">Today's move</p>
+            <p style="font-size:22px;font-weight:750;margin-top:9px;line-height:1.28;letter-spacing:-.015em">Talk to three users about why they signed up</p>
+            <p class="t-body" style="font-size:13.5px;margin-top:12px">You cannot get to 100 guessing.</p>
+            <div class="swipe__hint">
+              <span class="t-cap">&larr; swap</span>
+              <span class="t-cap" style="color:var(--green)">accept &rarr;</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bot" style="padding-bottom:14px">
+      <button class="focus-btn"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9.5V13l2.2 1.6M9 2.5h6"/></svg>Focus</button>
+    </div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note"><b>What it is.</b> The move as a card. Swipe right to accept, left to swap for another.<br><b class="g">Good.</b> Accepting is a physical act, which creates commitment. Swapping is honest about the days when the AI guessed wrong.<br><b class="b">Bad.</b> Makes skipping frictionless. Some people will swipe through everything and start nothing.<br><span class="sn">Seen in Tinder's card stack, Duolingo's lesson skip, Superhuman's triage.</span></p>
 </div>
 
 </div></div>

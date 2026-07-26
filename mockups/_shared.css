@@ -49,7 +49,11 @@ body {
 .item__label { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; }
 .item__n { font-size: 12px; color: var(--text-lo); font-variant-numeric: tabular-nums; }
 .item__name { font-size: 14px; font-weight: 650; }
-.item__note { font-size: 12.5px; color: var(--text-mid); line-height: 1.45; margin: 8px 2px 0; }
+.item__note { font-size: 12.5px; color: var(--text-mid); line-height: 1.55; margin: 10px 2px 0; }
+.item__note b { color: var(--text-hi); font-weight: 650; }
+.item__note b.g { color: #3fd94e; }
+.item__note b.b { color: #ff8f6b; }
+.item__note .sn { color: var(--text-lo); font-size: 11.5px; }
 .item__pick { margin-left: auto; width: 26px; height: 26px; flex: none; border: 0; padding: 0;
   border-radius: 7px; background: rgba(var(--ink),0.06); color: rgba(235,238,248,0.3);
   display: grid; place-items: center; cursor: pointer; }
