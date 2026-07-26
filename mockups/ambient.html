@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lock screen, 5 ways</title>
+<link rel="stylesheet" href="_shared.css">
+<style>
+.lock { position:absolute; inset:0; padding:60px 16px 40px; display:flex; flex-direction:column;
+  background:radial-gradient(120% 70% at 50% 0%, #10161c, #050708 62%); }
+.lock__date { text-align:center; font-size:15px; color:rgba(255,255,255,.62); font-weight:500; }
+.lock__t { text-align:center; font-size:80px; font-weight:250; letter-spacing:-0.03em; line-height:1;
+  margin-top:2px; font-variant-numeric:tabular-nums; }
+.grow { flex:1; }
+.notif { border-radius:18px; padding:13px 15px; background:rgba(38,42,48,0.72);
+  backdrop-filter:blur(24px) saturate(1.4); -webkit-backdrop-filter:blur(24px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08); margin-bottom:8px; }
+.notif__h { display:flex; align-items:center; gap:7px; margin-bottom:5px; }
+.notif__ic { width:17px; height:17px; border-radius:5px; background:#0a0e10; display:grid; place-items:center; }
+.notif__ic svg { width:11px; height:11px; }
+.notif__ic path { fill:#eef2f8; }
+.notif__app { font-size:11.5px; font-weight:650; letter-spacing:.05em; color:rgba(255,255,255,.55); }
+.notif__when { margin-left:auto; font-size:11.5px; color:rgba(255,255,255,.42); }
+.notif__t { font-size:14.5px; font-weight:700; }
+.notif__b { font-size:14px; line-height:1.4; color:rgba(255,255,255,.8); margin-top:2px; }
+.wdg { border-radius:20px; background:rgba(22,25,29,0.72); backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px); box-shadow:inset 0 1px 0 rgba(255,255,255,.08); padding:14px; }
+.wdg--sq { aspect-ratio:1; display:flex; flex-direction:column; justify-content:space-between; }
+.wdgrow { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.lsw { display:flex; gap:9px; justify-content:center; margin-top:12px; }
+.lsw__c { width:154px; border-radius:12px; padding:9px 11px; background:rgba(255,255,255,.14);
+  backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); }
+.dock { display:flex; justify-content:space-between; padding:0 26px; margin-top:14px; }
+.dock i { width:42px; height:42px; border-radius:12px; background:rgba(255,255,255,.11); display:block; }
+.bars { display:flex; gap:2px; align-items:flex-end; height:26px; }
+.bars i { flex:1; border-radius:1.5px; background:rgba(63,217,78,.7); }
+</style>
+</head><body>
+<div class="gal">
+<h1>Lock screen, 5 ways</h1>
+<p class="gal__sub">What Memento is when you are not in it. Push is already wired, so this is mostly a copy and layout decision. It is also the only surface that can bring someone back who has stopped opening the app.</p>
+<div class="grid">
+
+<!-- N1 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">01</span><span class="item__name">Morning, the move</span></div>
+  <div class="phone"><div class="lock">
+    <div class="lock__date">Friday, July 24</div>
+    <div class="lock__t">7:12</div>
+    <div class="grow"></div>
+    <div class="notif">
+      <div class="notif__h"><span class="notif__ic"><svg viewBox="0 0 24 24"><path d="M3 20V4h3l6 9 6-9h3v16h-3.4V9.6L12.6 18h-1.2L6.4 9.6V20z"/></svg></span>
+        <span class="notif__app">MEMENTO</span><span class="notif__when">now</span></div>
+      <div class="notif__t">Talk to three users about why they signed up</div>
+      <div class="notif__b">Day 11. About 40 minutes.</div>
+    </div>
+  </div></div>
+  <p class="item__note">The move itself is the notification, so you know the day's work before unlocking. No "open the app to see", no teaser. This one is worth building first.</p>
+</div>
+
+<!-- N2 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">02</span><span class="item__name">The card on the lock screen</span></div>
+  <div class="phone"><div class="lock">
+    <div class="lock__date">Friday, July 24</div>
+    <div class="lock__t">7:12</div>
+    <div class="lsw">
+      <div class="lsw__c"><div style="font-size:11px;color:rgba(255,255,255,.6);font-weight:600">Day 11</div>
+        <div style="font-size:13.5px;font-weight:700;line-height:1.3;margin-top:3px">Talk to three users</div></div>
+      <div class="lsw__c" style="display:flex;align-items:center;gap:10px">
+        <div style="width:30px;height:40px;border-radius:6px;overflow:hidden;position:relative;background:#0a0e10;flex:none">
+          <div class="card__liquid" style="filter:blur(9px) saturate(1.5)"><i class="card__b c1"></i><i class="card__b c2"></i><i class="card__b c3"></i><i class="card__b c4"></i></div></div>
+        <div><div style="font-size:19px;font-weight:750;line-height:1;font-variant-numeric:tabular-nums">11</div>
+          <div style="font-size:10.5px;color:rgba(255,255,255,.6);margin-top:2px">day run</div></div>
+      </div>
+    </div>
+    <div class="grow"></div>
+  </div></div>
+  <p class="item__note">Your Memento sits on the lock screen permanently, next to a small streak count. Seen forty times a day without a single notification, and a grey card is a quiet nudge.</p>
+</div>
+
+<!-- N3 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">03</span><span class="item__name">Home screen widgets</span></div>
+  <div class="phone"><div class="lock" style="padding-top:70px;background:radial-gradient(120% 70% at 50% 0%, #131a20, #060809 62%)">
+    <div class="wdgrow">
+      <div class="wdg wdg--sq" style="padding:0;overflow:hidden;position:relative;background:#0a0e10">
+        <div class="card__liquid" style="filter:blur(26px) saturate(1.5)"><i class="card__b c1"></i><i class="card__b c2"></i><i class="card__b c3"></i><i class="card__b c4"></i></div>
+        <div style="position:relative;z-index:2;margin-top:auto;padding:13px">
+          <div style="font-size:11.5px;font-weight:700;color:rgba(10,16,18,.6)">DAY 11</div></div>
+      </div>
+      <div class="wdg wdg--sq">
+        <div style="font-size:11.5px;color:rgba(255,255,255,.55);font-weight:600">Streak</div>
+        <div><div style="font-size:38px;font-weight:750;letter-spacing:-0.03em;line-height:1;color:var(--green);font-variant-numeric:tabular-nums">11</div>
+          <div class="bars" style="margin-top:10px"><i style="height:9px"></i><i style="height:14px"></i><i style="height:11px"></i><i style="height:19px"></i><i style="height:16px"></i><i style="height:23px"></i><i style="height:26px"></i></div></div>
+      </div>
+    </div>
+    <div style="height:14px"></div>
+    <div class="wdg">
+      <div style="font-size:11.5px;color:rgba(255,255,255,.55);font-weight:600">Today</div>
+      <div style="font-size:16px;font-weight:700;line-height:1.32;margin-top:5px">Talk to three users about why they signed up</div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <span style="flex:1;text-align:center;padding:8px;border-radius:8px;background:rgba(255,255,255,.9);color:#0b1112;font-size:12.5px;font-weight:700">Done</span>
+        <span style="flex:1;text-align:center;padding:8px;border-radius:8px;background:rgba(255,255,255,.12);font-size:12.5px;font-weight:650">Focus</span>
+      </div>
+    </div>
+    <div class="grow"></div>
+    <div class="dock"><i></i><i></i><i></i><i></i></div>
+  </div></div>
+  <p class="item__note">Three widgets: the card, the streak, and the move with Done built in. Marking a day complete without opening the app is the lowest-friction version of the whole loop.</p>
+</div>
+
+<!-- N4 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">04</span><span class="item__name">Night, the close</span></div>
+  <div class="phone"><div class="lock">
+    <div class="lock__date">Friday, July 24</div>
+    <div class="lock__t">9:40</div>
+    <div class="grow"></div>
+    <div class="notif">
+      <div class="notif__h"><span class="notif__ic"><svg viewBox="0 0 24 24"><path d="M3 20V4h3l6 9 6-9h3v16h-3.4V9.6L12.6 18h-1.2L6.4 9.6V20z"/></svg></span>
+        <span class="notif__app">MEMENTO</span><span class="notif__when">now</span></div>
+      <div class="notif__t">Did you talk to three users?</div>
+      <div class="notif__b">Answer here and the day is closed.</div>
+      <div style="display:flex;gap:8px;margin-top:11px">
+        <span style="flex:1;text-align:center;padding:9px;border-radius:10px;background:rgba(255,255,255,.9);color:#0b1112;font-size:13px;font-weight:700">Yes</span>
+        <span style="flex:1;text-align:center;padding:9px;border-radius:10px;background:rgba(255,255,255,.12);font-size:13px;font-weight:650">Not today</span>
+      </div>
+    </div>
+  </div></div>
+  <p class="item__note">The evening ritual finished from the lock screen in one tap. Whether the streak survives should never depend on remembering to open an app at 11pm.</p>
+</div>
+
+<!-- N5 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">05</span><span class="item__name">After the silence</span></div>
+  <div class="phone"><div class="lock">
+    <div class="lock__date">Thursday, July 30</div>
+    <div class="lock__t">8:05</div>
+    <div class="grow"></div>
+    <div class="notif" style="opacity:.55">
+      <div class="notif__h"><span class="notif__ic"><svg viewBox="0 0 24 24"><path d="M3 20V4h3l6 9 6-9h3v16h-3.4V9.6L12.6 18h-1.2L6.4 9.6V20z"/></svg></span>
+        <span class="notif__app">MEMENTO</span><span class="notif__when">3d ago</span></div>
+      <div class="notif__t">Still here when you are.</div>
+    </div>
+    <div class="notif">
+      <div class="notif__h"><span class="notif__ic"><svg viewBox="0 0 24 24"><path d="M3 20V4h3l6 9 6-9h3v16h-3.4V9.6L12.6 18h-1.2L6.4 9.6V20z"/></svg></span>
+        <span class="notif__app">MEMENTO</span><span class="notif__when">now</span></div>
+      <div class="notif__t">Six days. Your 31 moves did not go anywhere.</div>
+      <div class="notif__b">Today's is small on purpose: send Marcus one message.</div>
+    </div>
+  </div></div>
+  <p class="item__note">Two messages across a week of silence, and neither one is a guilt trip. The second names what survived and shrinks the ask, which is the whole comeback strategy in one banner.</p>
+</div>
+
+</div></div>
+<script src="_kit.js"></script>
+</body></html>
