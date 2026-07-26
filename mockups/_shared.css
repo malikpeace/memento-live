@@ -54,6 +54,11 @@ body {
 .item__note b.g { color: #3fd94e; }
 .item__note b.b { color: #ff8f6b; }
 .item__note .sn { color: var(--text-lo); font-size: 11.5px; }
+/* full-width break between the safe batch and the experimental batch */
+.split { width: 100%; margin: 18px 0 4px; padding-top: 26px; border-top: 1px solid var(--hairline-strong); }
+.split__t { display: block; font-size: 17px; font-weight: 700; letter-spacing: -0.015em; }
+.split__d { display: block; font-size: 13.5px; color: var(--text-mid); line-height: 1.5; margin-top: 6px; max-width: 74ch; }
+
 .item__pick { margin-left: auto; width: 26px; height: 26px; flex: none; border: 0; padding: 0;
   border-radius: 7px; background: rgba(var(--ink),0.06); color: rgba(235,238,248,0.3);
   display: grid; place-items: center; cursor: pointer; }
