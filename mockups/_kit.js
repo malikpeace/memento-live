@@ -3,6 +3,7 @@
    the list in one go. Nothing here is part of the mockups themselves. */
 (function () {
   var SEC = [
+    { id: 'picks',    t: 'Your picks',   f: 'picks.html',       r: 0, noPick: true },
     { id: 'proof',    t: 'Proof trail',  f: 'proof-trail.html', r: 1 },
     { id: 'action',   t: 'Action',       f: 'action.html',      r: 1 },
     { id: 'evidence', t: 'Evidence',     f: 'evidence.html',    r: 1 },
@@ -49,7 +50,7 @@
   var bar = document.createElement('div');
   bar.className = 'gpick';
   bar.innerHTML = '<span class="gpick__n"></span><button class="gpick__b" type="button">Copy list</button><button class="gpick__b gpick__b--q" type="button">Clear</button>';
-  document.body.appendChild(bar);
+  if (!(sec && sec.noPick)) document.body.appendChild(bar);
   var nEl = bar.querySelector('.gpick__n');
 
   function label(id) {
@@ -64,7 +65,7 @@
     });
   }
 
-  if (sec) {
+  if (sec && !sec.noPick) {
     document.querySelectorAll('.item').forEach(function (it) {
       var n = (it.querySelector('.item__n') || {}).textContent || '';
       it.dataset.pid = sec.id + ':' + n.trim();
