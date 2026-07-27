@@ -8,7 +8,7 @@
 .grow { flex:1; }
 .bot { padding:0 20px 14px; }
 
-/* the action card (15's stack + 12's brief) */
+/* the action card */
 .deckwrap { position:relative; padding:0 20px; }
 .acard { position:relative; border-radius:18px; padding:22px;
   background:rgba(24,27,31,.97);
@@ -22,7 +22,8 @@
 .brief:last-of-type { border-bottom:0; }
 .brief__k { font-size:12px; color:var(--text-lo); padding-top:1px; }
 .brief__v { font-size:14.5px; line-height:1.45; }
-.swaphint { display:flex; justify-content:space-between; margin-top:14px; }
+.swaphint { display:flex; justify-content:space-between; margin-top:14px; align-items:center; }
+.notthis { text-align:center; margin-top:16px; font-size:12px; color:var(--text-lo); }
 .holdbtn { display:block; width:100%; padding:16px; border:0; border-radius:var(--r-ctrl);
   background:#fff; color:#0b1112; font-family:var(--font); font-size:15.5px; font-weight:700; text-align:center; }
 .holdbtn small { display:block; font-size:11px; font-weight:600; color:rgba(11,17,18,.55); margin-top:2px; }
@@ -30,12 +31,12 @@
   border:0; border-radius:var(--r-ctrl); background:rgba(var(--ink),.07); color:var(--text-hi);
   font-family:var(--font); font-size:14.5px; font-weight:650; }
 .focusbtn svg { width:16px; height:16px; stroke:var(--cyan); fill:none; stroke-width:2; }
-
-/* mid-swap */
-.tilt { position:relative; z-index:2; transform:rotate(-10deg) translateX(-352px) translateY(-26px);
-  box-shadow:22px 18px 44px rgba(0,0,0,.65), inset 0 1px 0 rgba(255,255,255,.08); }
-.door2 { position:absolute; left:20px; right:20px; top:16px; z-index:1; border-radius:18px; padding:22px;
-  background:rgba(15,29,33,.99); box-shadow:inset 0 0 0 1px rgba(58,217,245,.26), 0 14px 34px rgba(0,0,0,.5); }
+.dots { display:flex; gap:7px; }
+.dots i { width:6px; height:6px; border-radius:50%; background:rgba(var(--ink),.18); }
+.dots i.on { background:#fff; box-shadow:0 0 8px rgba(255,255,255,.6); }
+/* intensity: an edge-safe radial that grows with tier size */
+.tierglow { position:absolute; left:50%; top:42%; width:560px; height:560px; transform:translate(-50%,-50%);
+  pointer-events:none; background:radial-gradient(circle, rgba(58,217,245,.26), rgba(58,217,245,.08) 44%, transparent 66%); }
 
 /* green flood */
 .flood { position:absolute; inset:0;
@@ -44,64 +45,58 @@
   color:rgba(235,238,248,.6); text-decoration:line-through; text-decoration-color:rgba(63,217,78,.9);
   text-decoration-thickness:2.5px; }
 
-/* record rows */
+/* rows */
 .rrow { display:flex; gap:11px; padding:11px 0; border-bottom:1px solid var(--hairline); align-items:baseline; }
 .rrow:last-child { border-bottom:0; }
 .rrow__tick { color:var(--green); font-weight:700; flex:none; }
 .rrow__t { font-size:15px; }
 .rrow__m { margin-left:auto; font-size:12px; color:var(--text-lo); font-variant-numeric:tabular-nums; flex:none; }
-.nextcard { border-radius:var(--r-card); padding:17px; background:rgba(var(--ink),.05); box-shadow:var(--glass-hi); }
+.openbox { width:15px; height:15px; border-radius:5px; box-shadow:inset 0 0 0 1.5px rgba(235,238,248,.28); flex:none; align-self:center; }
+.nextcard { border-radius:var(--r-card); padding:19px; background:rgba(var(--ink),.05); box-shadow:var(--glass-hi); }
 .pillrow { display:flex; gap:9px; margin-top:14px; }
 .pill { flex:1; padding:12px; border-radius:10px; text-align:center; font-size:13.5px; font-weight:700; }
 .pill--on { background:#fff; color:#0b1112; }
 .pill--off { background:rgba(var(--ink),.07); color:var(--text-hi); }
 
 /* morning open */
-.dayflip { display:flex; align-items:baseline; gap:16px; }
-.dayflip .old { font-size:40px; font-weight:250; letter-spacing:-.03em; color:var(--text-lo);
-  text-decoration:line-through; font-variant-numeric:tabular-nums; }
-.dayflip .new { font-size:88px; font-weight:750; letter-spacing:-.045em; line-height:1;
-  font-variant-numeric:tabular-nums; }
-
-/* scale dots */
-.dots { display:flex; gap:7px; justify-content:center; margin-top:18px; }
-.dots i { width:6px; height:6px; border-radius:50%; background:rgba(var(--ink),.18); }
-.dots i.on { background:#fff; box-shadow:0 0 8px rgba(255,255,255,.6); }
-/* giant morning number */
 .giant { font-size:196px; font-weight:750; letter-spacing:-.06em; line-height:.86; font-variant-numeric:tabular-nums; }
-.giant-old { font-size:32px; font-weight:300; color:var(--text-lo); text-decoration:line-through; font-variant-numeric:tabular-nums; }
-/* evidence: mixed mosaic + tape totals */
-.mx { display:grid; grid-template-columns:repeat(3,1fr); gap:5px; }
-.mx > * { border-radius:8px; aspect-ratio:1; min-width:0; }
-.mx .tall { grid-row:span 2; aspect-ratio:1/2.045; }
-.mph { position:relative; overflow:hidden; }
+.gsm { position:relative; display:inline-block; align-self:flex-start; font-size:34px; font-weight:300; color:var(--text-lo);
+  font-variant-numeric:tabular-nums; }
+.gsm .slash { position:absolute; left:-16%; right:-16%; top:48%; height:3.5px; border-radius:2px;
+  transform:rotate(-22deg);
+  background:linear-gradient(90deg, transparent, rgba(255,96,74,.95) 14%, rgba(255,96,74,.95) 86%, transparent); }
+
+/* evidence variants */
+.eh { display:flex; justify-content:space-between; align-items:baseline; }
+.mph { position:relative; overflow:hidden; border-radius:10px; }
 .mph::after { content:''; position:absolute; inset:0; background:radial-gradient(70% 60% at 30% 25%, rgba(255,255,255,.13), transparent 70%); }
-.tq { background:rgba(var(--ink),.05); box-shadow:var(--glass-hi); padding:10px 11px; display:flex; flex-direction:column; justify-content:space-between; }
-.tq p { font-size:11.5px; line-height:1.4; margin:0; color:var(--text-hi); }
-.tq .d { font-size:9.5px; color:var(--text-lo); font-variant-numeric:tabular-nums; }
-.tq--r p b { font-size:15px; font-weight:750; font-variant-numeric:tabular-nums; display:block; margin-bottom:3px; }
+.mph .cap { position:absolute; left:13px; bottom:11px; z-index:2; font-size:12px; color:rgba(255,255,255,.9);
+  text-shadow:0 1px 10px rgba(0,0,0,.85); }
+.g2 { display:grid; grid-template-columns:1fr 1fr; gap:7px; }
+.tq { background:rgba(var(--ink),.05); box-shadow:var(--glass-hi); border-radius:10px; padding:13px;
+  display:flex; flex-direction:column; justify-content:space-between; min-width:0; }
+.tq p { font-size:12.5px; line-height:1.45; margin:0; color:var(--text-hi); }
+.tq .d { font-size:10px; color:var(--text-lo); font-variant-numeric:tabular-nums; margin-top:8px; }
+.tq--r p b { font-size:17px; font-weight:750; font-variant-numeric:tabular-nums; display:block; margin-bottom:3px; }
+.statrow { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+.stat { border-radius:var(--r-card); background:rgba(var(--ink),.045); box-shadow:var(--glass-hi); padding:12px 13px; }
+.stat b { display:block; font-size:20px; font-weight:750; letter-spacing:-.02em; font-variant-numeric:tabular-nums; }
+.stat span { font-size:10.5px; color:var(--text-lo); }
+.qbig { border-left:2px solid rgba(63,217,78,.55); padding:3px 0 3px 15px; }
+.qbig p { font-size:18px; font-weight:600; line-height:1.45; margin:0; }
 .tape2 { background:rgba(var(--ink),.045); border-radius:4px; padding:13px 16px 15px; position:relative; box-shadow:var(--glass-hi); }
 .tape2::after { content:''; position:absolute; left:0; right:0; bottom:-7px; height:8px;
   background:repeating-linear-gradient(90deg, rgba(var(--ink),.045) 0 8px, transparent 8px 16px); }
 .trw { display:flex; justify-content:space-between; padding:6px 0; font-size:13px; font-variant-numeric:tabular-nums; color:var(--text-mid); }
 .trw b { color:var(--text-hi); font-weight:650; }
-/* the record, day-grained */
-.rday { padding:14px 0; border-bottom:1px solid var(--hairline); }
-.rday__h { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px; }
-.rday__d { font-size:12.5px; color:var(--text-lo); font-variant-numeric:tabular-nums; }
-.rday__n { font-size:11.5px; color:var(--text-lo); font-variant-numeric:tabular-nums; }
-.rmv { display:flex; gap:9px; padding:5px 0; font-size:14.5px; align-items:baseline; }
-.rmv i { font-style:normal; color:var(--green); font-weight:700; flex:none; }
-.rmv.dim { color:var(--text-mid); }
-.rmv.dim i { color:#565e69; }
 </style>
 </head><body>
 <div class="gal">
 <h1>The loop, in sequence</h1>
-<p class="gal__sub">Your spec, drawn. Not alternatives this time, one flow in six beats: the merged Action page (11 + 12 + 15), the swap, completion, the chain, the morning open, and what the Record becomes. Same founder goal as every other render.</p>
+<p class="gal__sub">One flow, nine frames. The Action page, the size scale, completion, the day so far, the morning open in its two beats, then three different Evidence layouts to react to, since the last one was not it.</p>
 <div class="grid">
 
-<!-- L1 -->
+<!-- 01 -->
 <div class="item">
   <div class="item__label"><span class="item__n">01</span><span class="item__name">The Action page, merged</span></div>
   <div class="phone"><div class="phone__scroll"><div class="stack">
@@ -121,11 +116,12 @@
           <div class="brief"><span class="brief__k">Roughly</span><span class="brief__v">40 minutes</span></div>
           <div class="brief"><span class="brief__k">If stuck</span><span class="brief__v">Send a voice note instead of asking for a call.</span></div>
           <div class="swaphint">
-            <span class="t-cap">&larr; swap</span>
-            <span class="t-cap num">2 of 3</span>
+            <div class="dots"><i></i><i></i><i class="on"></i><i></i><i></i></div>
+            <span class="t-cap num">3 of 5</span>
           </div>
         </div>
       </div>
+      <p class="notthis">Not this move</p>
     </div>
     <div class="bot">
       <button class="holdbtn">Hold to complete<small>press and hold</small></button>
@@ -134,42 +130,48 @@
     </div>
     <div class="safe-b"></div>
   </div></div></div>
-  <p class="item__note">What you land on when you tap the Today box. The move as a card (15), carrying the full brief (12). The edge of the next card peeks behind it, so swapping is discoverable without a single word of UI.</p>
+  <p class="item__note">The move as a card carrying the full brief, dots showing where it sits on the five sizes. Under the card, the quiet line for the rare case where the move itself is wrong: "Not this move" asks for a different one. That is its home.</p>
 </div>
 
-<!-- L2 -->
+<!-- 02 -->
 <div class="item">
-  <div class="item__label"><span class="item__n">02</span><span class="item__name">The scale, mid-swipe</span></div>
-  <div class="phone"><div class="phone__scroll"><div class="stack">
+  <div class="item__label"><span class="item__n">02</span><span class="item__name">The scale, same layout</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack" style="position:relative">
+    <div class="tierglow"></div>
     <div class="safe-t"></div>
-    <div class="pad" style="padding-top:12px;display:flex;justify-content:space-between">
+    <div class="pad" style="padding-top:12px;display:flex;justify-content:space-between;position:relative">
       <span class="t-cap">Day 11</span><span class="t-cap">Friday</span></div>
-    <div class="grow" style="display:flex;flex-direction:column;justify-content:center">
+    <div class="grow" style="display:flex;flex-direction:column;justify-content:center;position:relative">
       <div class="deckwrap">
-        <div class="door2" style="box-shadow:inset 0 0 0 1px rgba(255,255,255,.14), 0 14px 34px rgba(0,0,0,.5);background:rgba(24,27,31,.99)">
-          <p class="t-cap">The same move, bigger</p>
-          <p class="amove" style="font-size:20px">Call five users and ask what nearly stopped them signing up</p>
-          <p class="awhy">Calls beat messages. Five answers is a pattern, not a coincidence.</p>
-          <div class="dots"><i></i><i></i><i></i><i class="on"></i><i></i></div>
-          <div style="height:16px"></div>
-        </div>
-        <div class="acard tilt">
+        <div class="acard--behind"></div>
+        <div class="acard">
           <p class="t-cap">Today's move</p>
-          <p class="amove">Talk to three users about why they signed up</p>
-          <p class="awhy">You have 8 users and no idea which part they actually needed.</p>
-          <div style="height:26px"></div>
+          <p class="amove">Call five users and ask what nearly stopped them signing up</p>
+          <p class="awhy">Calls beat messages. Five answers is a pattern, not a coincidence.</p>
+          <hr class="rule" style="margin:16px 0 4px">
+          <div class="brief"><span class="brief__k">First step</span><span class="brief__v">Open your users list and call the first name. No script.</span></div>
+          <div class="brief"><span class="brief__k">Done when</span><span class="brief__v">Five answers written down.</span></div>
+          <div class="brief"><span class="brief__k">Roughly</span><span class="brief__v">90 minutes</span></div>
+          <div class="brief"><span class="brief__k">If stuck</span><span class="brief__v">Leave a voicemail and move to the next name.</span></div>
+          <div class="swaphint">
+            <div class="dots"><i></i><i></i><i></i><i class="on"></i><i></i></div>
+            <span class="t-cap num">4 of 5</span>
+          </div>
         </div>
       </div>
+      <p class="notthis">Not this move</p>
     </div>
     <div class="bot">
-      <p class="t-cap" style="text-align:center;padding-bottom:10px">Bigger versions to the right. Lighter to the left.</p>
+      <button class="holdbtn">Hold to complete<small>press and hold</small></button>
+      <div style="height:9px"></div>
+      <button class="focusbtn"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9.5V13l2.2 1.6M9 2.5h6"/></svg>Focus 25 min</button>
     </div>
     <div class="safe-b"></div>
   </div></div></div>
-  <p class="item__note">The swipe is a size scale of the same move, not a different move. Right goes bigger and more direct, left goes smaller and more approachable, the dots show where you stand on the five sizes. The plan already generates this ladder for every move, so the gesture is the interface to something that exists. "Not this move" lives as a quiet line elsewhere for the rare full swap.</p>
+  <p class="item__note">One swipe right from frame 01. The screen does not change, only the card: every field rewritten for the bigger size, the dots move to 4, and the room gets more intense the further right you go. Swiping left does the reverse, softer field text, dimmer room.</p>
 </div>
 
-<!-- L3 -->
+<!-- 03 -->
 <div class="item">
   <div class="item__label"><span class="item__n">03</span><span class="item__name">Held. Green.</span></div>
   <div class="phone">
@@ -183,88 +185,154 @@
     </div>
     <div class="safe-b"></div>
   </div></div></div>
-  <p class="item__note">The hold finishes, the whole screen floods green from the bottom, the move gets struck through. Two seconds, no confetti, no message telling you good job. Then it settles into the next frame.</p>
+  <p class="item__note">The hold finishes, the screen floods green from the bottom, the move gets struck. Two seconds, nothing congratulates you, then it settles into the next frame.</p>
 </div>
 
-<!-- L4 -->
+<!-- 04 -->
 <div class="item">
-  <div class="item__label"><span class="item__n">04</span><span class="item__name">Today so far, and the chain</span></div>
+  <div class="item__label"><span class="item__n">04</span><span class="item__name">Today so far</span></div>
   <div class="phone"><div class="phone__scroll"><div class="stack">
     <div class="safe-t"></div>
     <div class="pad" style="padding-top:20px">
       <h2 style="font-size:36px;font-weight:750;letter-spacing:-.025em;margin:0">Friday</h2>
-      <div style="height:18px"></div>
-      <div class="rrow"><span class="rrow__tick">&check;</span><span class="rrow__t">Talked to three users about why they signed up</span><span class="rrow__m">52m</span></div>
-      <div class="rrow"><span class="rrow__tick">&check;</span><span class="rrow__t">Four hours of deep work on onboarding</span><span class="rrow__m">4h</span></div>
-      <hr class="rule" style="margin:20px 0">
-      <p class="t-cap">Next move</p>
-      <div class="nextcard" style="margin-top:10px">
-        <p style="font-size:16.5px;font-weight:700;line-height:1.35">Write down the one sentence all three of them said</p>
-        <p class="t-body" style="font-size:13px;margin-top:7px">Because Marcus and the Tuesday signup used almost the same words.</p>
+    </div>
+    <div class="grow" style="display:flex;flex-direction:column;justify-content:center;padding:0 20px">
+      <div class="nextcard">
+        <div class="rrow"><span class="rrow__tick">&check;</span><span class="rrow__t">Talked to three users about why they signed up</span><span class="rrow__m">52m</span></div>
+        <div class="rrow"><span class="rrow__tick">&check;</span><span class="rrow__t">Four hours of deep work on onboarding</span><span class="rrow__m">4h</span></div>
+        <hr class="rule" style="margin:14px 0">
+        <p class="t-cap">Your next move</p>
+        <p style="font-size:17px;font-weight:700;line-height:1.35;margin:8px 0 0">Write down the one sentence all three of them said</p>
         <div class="pillrow">
           <span class="pill pill--off">Do it now</span>
           <span class="pill pill--on">Tomorrow</span>
         </div>
       </div>
     </div>
-    <div class="grow"></div>
-    <div class="bot"><button class="focusbtn" style="background:transparent">Done for today</button></div>
+    <div class="bot"><button class="focusbtn" style="background:transparent">Finish today</button></div>
     <div class="safe-b"></div>
   </div></div></div>
-  <p class="item__note">Big Friday, the list, the next move, nothing narrating. Do it now chains another move into today, Tomorrow locks it and stays the highlighted default. A cadence move like daily deep work re-arms itself here instead of proposing something new.</p>
+  <p class="item__note">One box in the middle holding the whole day: what got done, then your next move with the choice. No reason line under the move, no list stretching down the page. Most days this box holds one row and the choice, and it looks just as full.</p>
 </div>
 
-<!-- L5 -->
+<!-- 05 -->
 <div class="item">
-  <div class="item__label"><span class="item__n">05</span><span class="item__name">The morning open</span></div>
+  <div class="item__label"><span class="item__n">05</span><span class="item__name">The morning open, first beat</span></div>
   <div class="phone"><div class="phone__scroll"><div class="stack">
     <div class="safe-t"></div>
     <div class="grow" style="display:flex;flex-direction:column;justify-content:center;padding:0 24px">
-      <span class="giant-old">11</span>
-      <div class="giant">12</div>
-      <div style="height:30px"></div>
       <p class="t-cap">Yesterday</p>
-      <div style="height:4px"></div>
+      <div style="height:6px"></div>
+      <div class="giant">11</div>
+      <div style="height:26px"></div>
       <div class="rrow"><span class="rrow__tick">&check;</span><span class="rrow__t">Talked to three users</span></div>
       <div class="rrow"><span class="rrow__tick">&check;</span><span class="rrow__t">Four hours of deep work</span></div>
       <div class="rrow"><span class="rrow__tick">&check;</span><span class="rrow__t">Wrote down the sentence they all said</span></div>
+    </div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note">First open of a new day starts on yesterday: the day you finished, enormous, with what it held. It sits for a beat, then the eleven slides up and takes the slash. Tap skips the wait.</p>
+</div>
+
+<!-- 06 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">06</span><span class="item__name">The morning open, second beat</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack">
+    <div class="safe-t"></div>
+    <div class="grow" style="display:flex;flex-direction:column;justify-content:center;padding:0 24px">
+      <span class="gsm">11<span class="slash"></span></span>
+      <div class="giant">12</div>
+      <div style="height:26px"></div>
+      <p class="t-cap">Today</p>
+      <div style="height:4px"></div>
+      <div class="rrow"><span class="openbox"></span><span class="rrow__t">Write down the one sentence all three of them said</span></div>
+      <div class="rrow"><span class="openbox"></span><span class="rrow__t">Four hours of deep work</span></div>
     </div>
     <div class="bot">
       <button class="holdbtn" style="padding:16px">Start today</button>
     </div>
     <div class="safe-b"></div>
   </div></div></div>
-  <p class="item__note">First open of a new day. Eleven struck small, twelve enormous, yesterday listed with no commentary, and one button that drops you straight into today's move. If yesterday held nothing the number simply does not advance.</p>
+  <p class="item__note">The eleven shrinks to the top and takes a diagonal red strike, twelve arrives huge, and the list flips from what happened to what is next: the move locked last night plus the cadence move, re-armed. Start today drops you onto the Action page.</p>
 </div>
 
-<!-- L6 -->
+<!-- 07 -->
 <div class="item">
-  <div class="item__label"><span class="item__n">06</span><span class="item__name">Evidence</span></div>
+  <div class="item__label"><span class="item__n">07</span><span class="item__name">Evidence, the latest large</span></div>
   <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
-    <div class="pad" style="padding-top:14px;display:flex;justify-content:space-between;align-items:baseline">
+    <div class="pad eh" style="padding-top:14px">
       <h2 class="h-sec" style="font-size:24px">Evidence</h2><span class="t-cap num">14</span></div>
     <div class="pad" style="margin-top:14px">
-      <div class="mx">
-        <div class="mph tall" style="background:linear-gradient(150deg,rgba(63,217,78,.28),rgba(18,44,24,.6))"></div>
-        <div class="tq"><p>"A stranger paid for the thing I made."</p><span class="d">Jul 18</span></div>
-        <div class="mph" style="background:linear-gradient(150deg,rgba(90,110,130,.4),rgba(30,40,50,.55))"></div>
-        <div class="tq tq--r"><p><b>$29.00</b>First payment</p><span class="d">Jul 18</span></div>
-        <div class="mph" style="background:linear-gradient(160deg,rgba(58,217,245,.3),rgba(20,40,52,.6))"></div>
-        <div class="mph" style="background:linear-gradient(200deg,rgba(128,150,255,.28),rgba(24,26,50,.6))"></div>
-        <div class="tq"><p>"Marcus stayed for the streak, not the card."</p><span class="d">Jul 24</span></div>
-        <div class="mph" style="background:linear-gradient(150deg,rgba(90,110,130,.3),rgba(30,40,50,.55))"></div>
+      <div class="mph" style="height:296px;border-radius:14px;background:linear-gradient(150deg,rgba(63,217,78,.28),rgba(18,44,24,.62))">
+        <span class="cap">Jul 24 &middot; Three calls done</span>
       </div>
-      <div style="height:24px"></div>
-      <div class="tape2">
-        <div class="trw"><span>Moves kept</span><b>31</b></div>
-        <div class="trw"><span>Hours in</span><b>19:04</b></div>
-        <div class="trw"><span>Pieces of evidence</span><b>14</b></div>
-        <hr class="rule" style="margin:7px 0">
-        <div class="trw"><span>Paying users</span><b>1 of 100</b></div>
+      <p class="t-cap" style="text-align:center;margin:14px 0 18px">31 moves &middot; 19 hours &middot; 1 of 100 paying</p>
+      <div class="g2">
+        <div class="tq"><p>"A stranger paid for the thing I made."</p><span class="d">Jul 18</span></div>
+        <div class="mph" style="aspect-ratio:1;background:linear-gradient(160deg,rgba(58,217,245,.3),rgba(20,40,52,.6))"></div>
+        <div class="mph" style="aspect-ratio:1;background:linear-gradient(200deg,rgba(128,150,255,.28),rgba(24,26,50,.6))"></div>
+        <div class="tq tq--r"><p><b>$29.00</b>First payment</p><span class="d">Jul 18</span></div>
       </div>
     </div>
   <div class="safe-b"></div></div></div>
-  <p class="item__note">The merged surface, renamed to what it is. The mosaic from Evidence 01 holding mixed pieces, photos, their own lines, receipts, all one wall. Under it the receipt-roll totals from Proof trail 11: everything counted together and pointed at the goal number. One page doing what evidence and the proof trail were both trying to do.</p>
+  <p class="item__note">The newest piece gets the whole top, everything before it waits in a two-column wall underneath, and the totals shrink to one quiet line between them. The page leads with the most recent proof instead of treating all fourteen equally.</p>
+</div>
+
+<!-- 08 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">08</span><span class="item__name">Evidence, counted first</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad eh" style="padding-top:14px">
+      <h2 class="h-sec" style="font-size:24px">Evidence</h2><span class="t-cap num">14</span></div>
+    <div class="pad" style="margin-top:14px">
+      <div class="statrow">
+        <div class="stat"><b>31</b><span>moves</span></div>
+        <div class="stat"><b>19:04</b><span>hours</span></div>
+        <div class="stat"><b class="num" style="color:var(--cyan)">1<span style="font-size:12px;color:var(--text-lo);font-weight:600"> / 100</span></b><span>paying</span></div>
+      </div>
+      <div style="height:8px"></div>
+      <div class="g2">
+        <div class="mph" style="grid-row:span 2;background:linear-gradient(150deg,rgba(63,217,78,.28),rgba(18,44,24,.62))"></div>
+        <div class="tq"><p>"Marcus stayed for the streak, not the card."</p><span class="d">Jul 24</span></div>
+        <div class="mph" style="aspect-ratio:1.4;background:linear-gradient(160deg,rgba(58,217,245,.3),rgba(20,40,52,.6))"></div>
+      </div>
+      <div style="height:7px"></div>
+      <div class="tq tq--r" style="flex-direction:row;align-items:baseline;justify-content:space-between">
+        <p><b style="display:inline;margin-right:9px">$29.00</b>First payment</p><span class="d">Jul 18</span></div>
+      <div style="height:7px"></div>
+      <div class="g2">
+        <div class="mph" style="aspect-ratio:1;background:linear-gradient(200deg,rgba(128,150,255,.28),rgba(24,26,50,.6))"></div>
+        <div class="mph" style="aspect-ratio:1;background:linear-gradient(150deg,rgba(90,110,130,.35),rgba(30,40,50,.55))"></div>
+      </div>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note">The count leads: three earned numbers across the top, then the wall in mixed sizes with the receipt as a full-width band cutting through it. Closest to the receipt-roll feeling without being a receipt.</p>
+</div>
+
+<!-- 09 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">09</span><span class="item__name">Evidence, one piece at a time</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad eh" style="padding-top:14px">
+      <h2 class="h-sec" style="font-size:24px">Evidence</h2><span class="t-cap num">14</span></div>
+    <div class="pad" style="margin-top:18px">
+      <div class="mph" style="height:212px;background:linear-gradient(150deg,rgba(63,217,78,.28),rgba(18,44,24,.62))">
+        <span class="cap">Jul 24 &middot; Three calls done</span></div>
+      <div style="height:22px"></div>
+      <div class="qbig"><p>"A stranger paid for the thing I made."</p>
+        <p class="t-cap" style="margin-top:7px">Jul 18</p></div>
+      <div style="height:22px"></div>
+      <div class="tape2">
+        <div class="trw"><span>Jul 18 &middot; payment</span><b>$29.00</b></div>
+      </div>
+      <div style="height:26px"></div>
+      <div class="mph" style="height:212px;background:linear-gradient(160deg,rgba(58,217,245,.3),rgba(20,40,52,.6))">
+        <span class="cap">Jul 12 &middot; Card evolution shipped</span></div>
+      <div style="height:22px"></div>
+      <p class="t-cap" style="text-align:center">31 moves &middot; 19 hours &middot; 1 of 100 paying</p>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note">No grid at all. Every piece full width in its own shape, photos as photos, quotes as pulled lines, receipts as tape, generous air between them. The slowest to scan and the most like flipping through something that matters.</p>
 </div>
 
 </div></div>
