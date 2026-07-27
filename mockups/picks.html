@@ -526,7 +526,39 @@
   border-radius:3px; background:linear-gradient(180deg,#9aa3b0,#5a636f); z-index:4; }
 .s-obj .lant-handle{ position:absolute; left:50%; top:-38px; width:56px; height:34px; transform:translateX(-50%);
   border:2px solid #78818e; border-bottom:0; border-radius:28px 28px 0 0; z-index:3; }
+
+/* ---- light mode (gallery chrome only; the frames keep the dark app inside) ---- */
+html.lm body { background:#eef0f3; color:#171b21; }
+html.lm { --text-hi:#171b21; --text-mid:#464d59; --text-lo:#878e9c;
+  --hairline:rgba(18,24,32,.12); --hairline-strong:rgba(18,24,32,.22); }
+html.lm .gnav { background:rgba(238,240,243,.88); }
+html.lm .gnav__a { color:#878e9c; }
+html.lm .gnav__a:hover { color:#171b21; }
+html.lm .gnav__a.is-on { background:rgba(18,24,32,.08); color:#171b21; }
+html.lm .gal__sub a { color:#171b21 !important; }
+html.lm .f { background:rgba(18,24,32,.05); box-shadow:none; }
+html.lm .f--warn { background:rgba(214,86,40,.09); }
+html.lm .f--warn h3 { color:#bb4d1e; }
+html.lm .item__note b.g { color:#1e9c3c; }
+html.lm .item__note b.b { color:#cf5527; }
+/* re-pin the dark tokens inside every mockup frame so the renders stay untouched */
+html.lm .phone, html.lm .hero, html.lm .dsk {
+  --ink:235,238,248;
+  --text-hi:rgba(var(--ink),0.96); --text-mid:rgba(var(--ink),0.78); --text-lo:rgba(var(--ink),0.42);
+  --hairline:rgba(var(--ink),0.09); --hairline-strong:rgba(var(--ink),0.16);
+  color:var(--text-hi);
+  box-shadow:0 18px 50px rgba(15,20,30,.28), 0 0 0 1px rgba(15,20,30,.14);
+}
+.lmbtn { position:fixed; right:14px; bottom:16px; z-index:60; border:0; padding:10px 16px;
+  border-radius:999px; font-family:var(--font); font-size:13px; font-weight:700; cursor:pointer;
+  background:rgba(235,238,248,.92); color:#0b1112; box-shadow:0 10px 30px rgba(0,0,0,.45); }
+html.lm .lmbtn { background:#15181d; color:#eef0f3; box-shadow:0 10px 30px rgba(15,20,30,.3); }
 </style>
+<script>
+/* apply saved theme before paint; default light since this page is for reading */
+(function(){ var m; try{ m = localStorage.getItem('mockup-theme'); }catch(e){}
+  if ((m || 'light') === 'light') document.documentElement.classList.add('lm'); })();
+</script>
 </head><body>
 <div class="gal">
 <h1>Your picks</h1>
@@ -1679,4 +1711,17 @@ here. The full set of 125 is still at <a href="index.html" style="color:var(--te
 })();
 </script>
 <script src="_kit.js"></script>
+<button class="lmbtn" id="lmToggle" type="button">Theme</button>
+<script>
+(function(){
+  var h = document.documentElement, b = document.getElementById('lmToggle');
+  function paint(){ b.textContent = h.classList.contains('lm') ? 'Dark mode' : 'Light mode'; }
+  b.addEventListener('click', function(){
+    h.classList.toggle('lm');
+    try{ localStorage.setItem('mockup-theme', h.classList.contains('lm') ? 'light' : 'dark'); }catch(e){}
+    paint();
+  });
+  paint();
+})();
+</script>
 </body></html>
