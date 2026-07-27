@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The loop, in sequence</title>
+<link rel="stylesheet" href="_shared.css">
+<style>
+.stack { display:flex; flex-direction:column; min-height:844px; }
+.grow { flex:1; }
+.bot { padding:0 20px 14px; }
+
+/* the action card (15's stack + 12's brief) */
+.deckwrap { position:relative; padding:0 20px; }
+.acard { position:relative; border-radius:18px; padding:22px;
+  background:rgba(24,27,31,.97);
+  box-shadow:0 18px 40px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.08); }
+.acard--behind { position:absolute; left:28px; right:28px; top:-9px; height:60px;
+  border-radius:18px; background:rgba(18,21,24,.9);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05); }
+.amove { font-size:23px; font-weight:750; letter-spacing:-.018em; line-height:1.28; margin:8px 0 0; }
+.awhy { font-size:13.5px; line-height:1.5; color:var(--text-mid); margin-top:10px; }
+.brief { display:grid; grid-template-columns:76px 1fr; gap:12px; padding:12px 0; border-bottom:1px solid var(--hairline); }
+.brief:last-of-type { border-bottom:0; }
+.brief__k { font-size:12px; color:var(--text-lo); padding-top:1px; }
+.brief__v { font-size:14.5px; line-height:1.45; }
+.swaphint { display:flex; justify-content:space-between; margin-top:14px; }
+.holdbtn { display:block; width:100%; padding:16px; border:0; border-radius:var(--r-ctrl);
+  background:#fff; color:#0b1112; font-family:var(--font); font-size:15.5px; font-weight:700; text-align:center; }
+.holdbtn small { display:block; font-size:11px; font-weight:600; color:rgba(11,17,18,.55); margin-top:2px; }
+.focusbtn { display:flex; align-items:center; justify-content:center; gap:9px; width:100%; padding:14px;
+  border:0; border-radius:var(--r-ctrl); background:rgba(var(--ink),.07); color:var(--text-hi);
+  font-family:var(--font); font-size:14.5px; font-weight:650; }
+.focusbtn svg { width:16px; height:16px; stroke:var(--cyan); fill:none; stroke-width:2; }
+
+/* mid-swap */
+.tilt { position:relative; z-index:2; transform:rotate(-10deg) translateX(-322px) translateY(-26px);
+  box-shadow:22px 18px 44px rgba(0,0,0,.65), inset 0 1px 0 rgba(255,255,255,.08); }
+.door2 { position:absolute; left:20px; right:20px; top:16px; z-index:1; border-radius:18px; padding:22px;
+  background:rgba(15,29,33,.99); box-shadow:inset 0 0 0 1px rgba(58,217,245,.26), 0 14px 34px rgba(0,0,0,.5); }
+
+/* green flood */
+.flood { position:absolute; inset:0;
+  background:radial-gradient(130% 90% at 50% 100%, rgba(63,217,78,.55), rgba(24,80,36,.35) 45%, rgba(5,10,7,1) 100%); }
+.struck { font-size:24px; font-weight:750; letter-spacing:-.018em; line-height:1.3;
+  color:rgba(235,238,248,.6); text-decoration:line-through; text-decoration-color:rgba(63,217,78,.9);
+  text-decoration-thickness:2.5px; }
+
+/* record rows */
+.rrow { display:flex; gap:11px; padding:11px 0; border-bottom:1px solid var(--hairline); align-items:baseline; }
+.rrow:last-child { border-bottom:0; }
+.rrow__tick { color:var(--green); font-weight:700; flex:none; }
+.rrow__t { font-size:15px; }
+.rrow__m { margin-left:auto; font-size:12px; color:var(--text-lo); font-variant-numeric:tabular-nums; flex:none; }
+.nextcard { border-radius:var(--r-card); padding:17px; background:rgba(var(--ink),.05); box-shadow:var(--glass-hi); }
+.pillrow { display:flex; gap:9px; margin-top:14px; }
+.pill { flex:1; padding:12px; border-radius:10px; text-align:center; font-size:13.5px; font-weight:700; }
+.pill--on { background:#fff; color:#0b1112; }
+.pill--off { background:rgba(var(--ink),.07); color:var(--text-hi); }
+
+/* morning open */
+.dayflip { display:flex; align-items:baseline; gap:16px; }
+.dayflip .old { font-size:40px; font-weight:250; letter-spacing:-.03em; color:var(--text-lo);
+  text-decoration:line-through; font-variant-numeric:tabular-nums; }
+.dayflip .new { font-size:88px; font-weight:750; letter-spacing:-.045em; line-height:1;
+  font-variant-numeric:tabular-nums; }
+
+/* the record, day-grained */
+.rday { padding:14px 0; border-bottom:1px solid var(--hairline); }
+.rday__h { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px; }
+.rday__d { font-size:12.5px; color:var(--text-lo); font-variant-numeric:tabular-nums; }
+.rday__n { font-size:11.5px; color:var(--text-lo); font-variant-numeric:tabular-nums; }
+.rmv { display:flex; gap:9px; padding:5px 0; font-size:14.5px; align-items:baseline; }
+.rmv i { font-style:normal; color:var(--green); font-weight:700; flex:none; }
+.rmv.dim { color:var(--text-mid); }
+.rmv.dim i { color:#565e69; }
+</style>
+</head><body>
+<div class="gal">
+<h1>The loop, in sequence</h1>
+<p class="gal__sub">Your spec, drawn. Not alternatives this time, one flow in six beats: the merged Action page (11 + 12 + 15), the swap, completion, the chain, the morning open, and what the Record becomes. Same founder goal as every other render.</p>
+<div class="grid">
+
+<!-- L1 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">01</span><span class="item__name">The Action page, merged</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack">
+    <div class="safe-t"></div>
+    <div class="pad" style="padding-top:12px;display:flex;justify-content:space-between">
+      <span class="t-cap">Day 11</span><span class="t-cap">Friday</span></div>
+    <div class="grow" style="display:flex;flex-direction:column;justify-content:center">
+      <div class="deckwrap">
+        <div class="acard--behind"></div>
+        <div class="acard">
+          <p class="t-cap">Today's move</p>
+          <p class="amove">Talk to three users about why they signed up</p>
+          <p class="awhy">You have 8 users and no idea which part they actually needed. You cannot get to 100 guessing.</p>
+          <hr class="rule" style="margin:16px 0 4px">
+          <div class="brief"><span class="brief__k">First step</span><span class="brief__v">Open the signup list and pick three names.</span></div>
+          <div class="brief"><span class="brief__k">Done when</span><span class="brief__v">You have three answers written down.</span></div>
+          <div class="brief"><span class="brief__k">Roughly</span><span class="brief__v">40 minutes</span></div>
+          <div class="brief"><span class="brief__k">If stuck</span><span class="brief__v">Send a voice note instead of asking for a call.</span></div>
+          <div class="swaphint">
+            <span class="t-cap">&larr; swap</span>
+            <span class="t-cap num">2 of 3</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bot">
+      <button class="holdbtn">Hold to complete<small>press and hold</small></button>
+      <div style="height:9px"></div>
+      <button class="focusbtn"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9.5V13l2.2 1.6M9 2.5h6"/></svg>Focus 25 min</button>
+    </div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note">What you land on when you tap the Today box. The move as a card (15), carrying the full brief (12). The edge of the next card peeks behind it, so swapping is discoverable without a single word of UI.</p>
+</div>
+
+<!-- L2 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">02</span><span class="item__name">The swap, mid-swipe</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack">
+    <div class="safe-t"></div>
+    <div class="pad" style="padding-top:12px;display:flex;justify-content:space-between">
+      <span class="t-cap">Day 11</span><span class="t-cap">Friday</span></div>
+    <div class="grow" style="display:flex;flex-direction:column;justify-content:center">
+      <div class="deckwrap">
+        <div class="door2">
+          <p class="t-cap" style="color:var(--cyan)">The one you have been avoiding</p>
+          <p class="amove" style="font-size:20px">Call the three users who never replied</p>
+          <p class="awhy">Six days of avoiding this. It is the one that changes the plan.</p>
+          <div style="height:52px"></div>
+        </div>
+        <div class="acard tilt">
+          <p class="t-cap">Today's move</p>
+          <p class="amove">Talk to three users about why they signed up</p>
+          <p class="awhy">You have 8 users and no idea which part they actually needed.</p>
+          <div style="height:26px"></div>
+        </div>
+      </div>
+    </div>
+    <div class="bot">
+      <p class="t-cap" style="text-align:center;padding-bottom:10px">Release to see the next move. Tap to keep this one.</p>
+    </div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note">The swap is where 11 lives. The alternative behind the card is not a random reshuffle, it is framed: the safe one, the uncomfortable one. Two doors as a gesture instead of a screen.</p>
+</div>
+
+<!-- L3 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">03</span><span class="item__name">Held. Green.</span></div>
+  <div class="phone">
+    <div class="flood"></div>
+    <div class="phone__scroll" style="position:relative"><div class="stack">
+    <div class="safe-t"></div>
+    <div class="grow" style="display:flex;flex-direction:column;justify-content:center;padding:0 26px">
+      <p class="struck">Talk to three users about why they signed up</p>
+      <div style="height:18px"></div>
+      <p style="font-size:15px;color:rgba(235,238,248,.92)">That is one.</p>
+    </div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note">The hold finishes, the whole screen floods green from the bottom, the move gets struck through. Two seconds, no confetti, no message telling you good job. Then it settles into the next frame.</p>
+</div>
+
+<!-- L4 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">04</span><span class="item__name">Today so far, and the chain</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack">
+    <div class="safe-t"></div>
+    <div class="pad" style="padding-top:16px">
+      <h2 class="h-sec">Friday</h2>
+      <p class="t-body" style="margin-top:4px">Day 11 is kept. Anything more is stacking.</p>
+      <div style="height:14px"></div>
+      <div class="rrow"><span class="rrow__tick">&check;</span><span class="rrow__t">Talked to three users about why they signed up</span><span class="rrow__m">52m</span></div>
+      <div class="rrow"><span class="rrow__tick">&check;</span><span class="rrow__t">Four hours of deep work on onboarding</span><span class="rrow__m">4h</span></div>
+      <hr class="rule" style="margin:20px 0">
+      <p class="t-cap">Next move</p>
+      <div class="nextcard" style="margin-top:10px">
+        <p style="font-size:16.5px;font-weight:700;line-height:1.35">Write down the one sentence all three of them said</p>
+        <p class="t-body" style="font-size:13px;margin-top:7px">Because Marcus and the Tuesday signup used almost the same words.</p>
+        <div class="pillrow">
+          <span class="pill pill--off">Do it now</span>
+          <span class="pill pill--on">Tomorrow</span>
+        </div>
+      </div>
+    </div>
+    <div class="grow"></div>
+    <div class="bot"><button class="focusbtn" style="background:transparent">Done for today</button></div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note">After the green: today's list so far, and the next move already proposed. Do it now chains a second move into the same day. Tomorrow locks it in and the day ends decided, your Close 05 pick. For a cadence move like daily deep work, this card reads "Same move, re-armed for tomorrow" instead of proposing something new.</p>
+</div>
+
+<!-- L5 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">05</span><span class="item__name">The morning open</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack">
+    <div class="safe-t"></div>
+    <div class="grow" style="display:flex;flex-direction:column;justify-content:center;padding:0 24px">
+      <div class="dayflip">
+        <span class="old">11</span>
+        <span class="new">12</span>
+      </div>
+      <p class="t-body" style="margin-top:10px;color:var(--text-hi)">Yesterday held three.</p>
+      <div style="height:22px"></div>
+      <div class="rrow"><span class="rrow__tick">&check;</span><span class="rrow__t">Talked to three users</span></div>
+      <div class="rrow"><span class="rrow__tick">&check;</span><span class="rrow__t">Four hours of deep work</span></div>
+      <div class="rrow"><span class="rrow__tick">&check;</span><span class="rrow__t">Wrote down the sentence they all said</span></div>
+    </div>
+    <div class="bot">
+      <button class="holdbtn" style="padding:15px">Today's move<small>locked in last night</small></button>
+    </div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note">First open of a new day. Eleven strikes and slides, twelve lands, yesterday's moves listed under it. This replaces closing the day entirely: the boundary is when you show up, not when you sleep. If yesterday held nothing, this screen stays honest and quiet, the number just does not move.</p>
+</div>
+
+<!-- L6 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">06</span><span class="item__name">What the Record becomes</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:16px">
+      <h2 class="h-sec">The record</h2>
+      <p class="t-body" style="margin-top:4px">Days, holding whatever they held.</p>
+      <div style="height:10px"></div>
+      <div class="rday">
+        <div class="rday__h"><span class="rday__d">Fri, Jul 24 &middot; day 11</span><span class="rday__n">3 moves</span></div>
+        <div class="rmv"><i>&check;</i>Talked to three users</div>
+        <div class="rmv"><i>&check;</i>Four hours of deep work</div>
+        <div class="rmv"><i>&check;</i>Wrote down the sentence they all said</div>
+      </div>
+      <div class="rday">
+        <div class="rday__h"><span class="rday__d">Thu, Jul 23 &middot; day 10</span><span class="rday__n">1 move</span></div>
+        <div class="rmv"><i>&check;</i>Shipped the account deletion flow</div>
+      </div>
+      <div class="rday">
+        <div class="rday__h"><span class="rday__d">Wed, Jul 22</span><span class="rday__n"></span></div>
+        <div class="rmv dim"><i>&middot;</i>Missed. Came back Thursday.</div>
+      </div>
+      <div class="rday" style="border:0">
+        <div class="rday__h"><span class="rday__d">Tue, Jul 21 &middot; day 9</span><span class="rday__n">2 moves</span></div>
+        <div class="rmv"><i>&check;</i>Rewrote the paywall in one sitting</div>
+        <div class="rmv"><i>&check;</i>Four hours of deep work</div>
+      </div>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note">The Record's unit is the day, and a day holds one move or four. A one-move day is a full row, never a thin one, so extra moves read as stacking rather than the new minimum. Photos, notes and receipts attach to their day, same stream.</p>
+</div>
+
+</div></div>
+<script src="_kit.js"></script>
+</body></html>
