@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reflect, 5 ways</title>
+<link rel="stylesheet" href="_shared.css">
+<style>
+.stack { display:flex; flex-direction:column; min-height:844px; }
+.grow { flex:1; }
+.bot { padding:0 20px 14px; }
+.caret { display:inline-block; width:2px; height:19px; background:var(--cyan); vertical-align:-3px; margin-left:2px; }
+.field { font-size:17px; line-height:1.6; color:var(--text-hi); }
+.q { font-size:15px; color:var(--text-lo); }
+.slot { padding:16px 0; border-bottom:1px solid var(--hairline); }
+.slot__q { font-size:13px; color:var(--text-lo); }
+.slot__a { font-size:16px; line-height:1.5; margin-top:6px; color:var(--text-hi); }
+.wave { display:flex; align-items:center; gap:3px; height:64px; justify-content:center; }
+.wave i { width:3px; border-radius:2px; background:var(--cyan); }
+.mic { width:78px; height:78px; border-radius:50%; margin:0 auto; display:grid; place-items:center;
+  background:rgba(58,217,245,.13); box-shadow:0 0 0 12px rgba(58,217,245,.05); }
+.mic svg { width:26px; height:26px; stroke:var(--cyan); fill:none; stroke-width:1.9; stroke-linecap:round; }
+.sealed { border-radius:var(--r-card); background:rgba(var(--ink),.04); box-shadow:var(--glass-hi); padding:20px; text-align:center; }
+.sealed svg { width:22px; height:22px; stroke:var(--text-lo); fill:none; stroke-width:1.8; }
+</style>
+</head><body>
+<div class="gal">
+<h1>Reflect, 5 ways</h1>
+<p class="gal__sub">The writing surface. What matters here is how little friction there is between opening it and having written something, because almost nobody journals on purpose.</p>
+<div class="grid">
+
+<!-- F1 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">01</span><span class="item__name">Blank page</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack">
+    <div class="safe-t"></div>
+    <div class="pad" style="padding-top:24px">
+      <p class="q">Friday night. What is on your mind?</p>
+      <div style="height:20px"></div>
+      <p class="field">Marcus stayed for the streak, not the card. That changes what I should be building<span class="caret"></span></p>
+    </div>
+    <div class="grow"></div>
+    <div class="bot"><button class="btn">Save</button></div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note"><b>What it is.</b> A quiet prompt, then a blank page.<br><b class="g">Good.</b> No formatting, no title, no mood picker. The least standing between you and the first word.<br><b class="b">Bad.</b> A blank page is exactly what stops most people writing. There is no help if you do not know what to say.<br><span class="sn">Seen in Bear, iA Writer, Apple Notes.</span></p>
+</div>
+
+<!-- F2 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">02</span><span class="item__name">Asked about today</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack">
+    <div class="safe-t"></div>
+    <div class="pad" style="padding-top:24px">
+      <h1 class="h-move" style="font-size:24px">You said Priya never replied. Does that change the plan?</h1>
+      <div style="height:20px"></div>
+      <p class="field" style="color:var(--text-mid)">Type anything.</p>
+    </div>
+    <div class="grow"></div>
+    <div class="bot"><button class="btn">Save</button>
+      <div style="height:9px"></div>
+      <button class="btn btn--ghost">Ask me something else</button></div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note"><b>What it is.</b> The question comes from what you actually did today.<br><b class="g">Good.</b> Much harder to ignore than a generic prompt, and the clearest place the AI justifies its cost.<br><b class="b">Bad.</b> One AI call per day that has to be specific and correct, or the question feels worse than no question.<br><span class="sn">Seen in Sunsama's prompts, Reflectly's adaptive questions, Stoic.</span></p>
+</div>
+
+<!-- F3 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">03</span><span class="item__name">Three slots</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack">
+    <div class="safe-t"></div>
+    <div class="pad" style="padding-top:20px">
+      <p class="t-cap">Friday</p>
+      <div style="height:8px"></div>
+      <div class="slot"><p class="slot__q">Worked</p>
+        <p class="slot__a">Calling instead of emailing. Two answered in an hour.</p></div>
+      <div class="slot"><p class="slot__q">Did not</p>
+        <p class="slot__a">Trying to do it at 4pm when I am fried.</p></div>
+      <div class="slot" style="border:0"><p class="slot__q">Tomorrow</p>
+        <p class="slot__a" style="color:var(--text-lo)">&mdash;</p></div>
+    </div>
+    <div class="grow"></div>
+    <div class="bot"><button class="btn">Save</button></div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note"><b>What it is.</b> Three short answers: worked, did not, tomorrow.<br><b class="g">Good.</b> Finishable in under a minute, which is the whole game, and it produces structured text the AI can actually use.<br><b class="b">Bad.</b> The same three questions every night gets boring fast, and it can produce answers on autopilot.<br><span class="sn">Seen in Sunsama's shutdown, agile retros, the Five Minute Journal.</span></p>
+</div>
+
+<!-- F4 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">04</span><span class="item__name">Say it out loud</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack">
+    <div class="safe-t"></div>
+    <div class="pad" style="padding-top:24px"><p class="q">Hold and talk. It writes it down.</p></div>
+    <div class="grow" style="display:grid;place-items:center">
+      <div style="width:100%">
+        <div class="wave" id="wave"></div>
+        <div style="height:34px"></div>
+        <div class="mic"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 12a6.5 6.5 0 0 0 13 0M12 18.5V21"/></svg></div>
+        <p class="t-cap" style="text-align:center;margin-top:18px;font-variant-numeric:tabular-nums">0:24</p>
+      </div>
+    </div>
+    <div class="bot"><button class="btn btn--ghost">Type instead</button></div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note"><b>What it is.</b> Hold and talk. It writes it down for you.<br><b class="g">Good.</b> Removes typing, which is the actual reason journaling dies on a phone. People say things they would never type.<br><b class="b">Bad.</b> Needs transcription, which costs money and gets names wrong. Also useless in public.<br><span class="sn">Seen in Day One's audio entries, Otter, Voice Memos transcription.</span></p>
+</div>
+
+<!-- F5 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">05</span><span class="item__name">Letter to yourself</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack">
+    <div class="safe-t"></div>
+    <div class="pad" style="padding-top:22px">
+      <p class="q">Opens in 30 days. You will have forgotten you wrote it.</p>
+      <div style="height:18px"></div>
+      <p class="field">If you are reading this and you stopped, it was because you started building again instead of talking to people. Go call someone<span class="caret"></span></p>
+    </div>
+    <div class="grow"></div>
+    <div class="pad" style="padding-bottom:16px">
+      <div class="sealed">
+        <svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+        <p class="t-body" style="margin-top:10px;font-size:13.5px">Sealed until Aug 23</p>
+      </div>
+    </div>
+    <div class="bot"><button class="btn">Seal it</button></div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note"><b>What it is.</b> A message to yourself that unseals in 30 days.<br><b class="g">Good.</b> Gives Memento a reason to notify you that has nothing to do with nagging, and the arrival moment is the most shareable thing here.<br><b class="b">Bad.</b> The payoff is a month away, so it is unprovable at launch, and a letter arriving after someone quit could sting.<br><span class="sn">Seen in FutureMe, Apple Journal's reflections, time-capsule features.</span></p>
+</div>
+
+</div></div>
+<script>
+var w = document.getElementById('wave');
+if (w) { var s=11; for (var i=0;i<44;i++){ s=(s*1103515245+12345)%2147483648; var r=s/2147483648;
+  var b=document.createElement('i'); var mid=1-Math.abs(i-22)/26;
+  b.style.height=Math.max(4, Math.round(4+r*54*mid))+'px';
+  b.style.opacity = (0.35+mid*0.6).toFixed(2);
+  w.appendChild(b); } }
+</script>
+<script src="_kit.js"></script>
+</body></html>

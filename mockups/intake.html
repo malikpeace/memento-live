@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Action, the first two minutes</title>
+<link rel="stylesheet" href="_shared.css">
+<style>
+.stack { display:flex; flex-direction:column; min-height:844px; }
+.grow { flex:1; }
+.bot { padding:0 20px 14px; }
+.cta { display:block; width:100%; padding:16px; border:0; border-radius:var(--r-ctrl);
+  background:#fff; color:#0b1112; font-family:var(--font); font-size:15.5px; font-weight:700; text-align:center; }
+.ghost { display:block; width:100%; padding:14px; border:0; border-radius:var(--r-ctrl);
+  background:rgba(var(--ink),.07); color:var(--text-hi); font-family:var(--font); font-size:14.5px; font-weight:650; text-align:center; }
+
+/* intro */
+.star { font-size:30px; font-weight:750; letter-spacing:-.022em; line-height:1.22; }
+.introline { font-size:16.5px; line-height:1.6; color:var(--text-hi); }
+
+/* the fork */
+.q { font-size:29px; font-weight:750; letter-spacing:-.02em; line-height:1.25; }
+.doorb { display:block; width:100%; text-align:left; border:0; border-radius:16px; padding:22px;
+  font-family:var(--font); background:rgba(var(--ink),.05); box-shadow:var(--glass-hi); }
+.doorb--hi { background:rgba(255,255,255,.92); }
+.doorb__t { font-size:19px; font-weight:750; letter-spacing:-.015em; color:var(--text-hi); }
+.doorb--hi .doorb__t { color:#0b1112; }
+.doorb__s { display:block; font-size:13.5px; line-height:1.5; color:var(--text-mid); margin-top:7px; }
+.doorb--hi .doorb__s { color:rgba(11,17,18,.6); }
+
+/* questions */
+.field { border-radius:var(--r-card); background:rgba(var(--ink),.05); box-shadow:var(--glass-hi);
+  padding:17px; font-size:16.5px; line-height:1.55; color:var(--text-hi); min-height:112px; }
+.caret { display:inline-block; width:2px; height:19px; background:var(--cyan); vertical-align:-3px; margin-left:1px; }
+.chip2 { display:block; width:100%; text-align:left; border:0; border-radius:12px; padding:16px 17px;
+  font-family:var(--font); font-size:15.5px; font-weight:650; color:var(--text-hi);
+  background:rgba(var(--ink),.05); box-shadow:var(--glass-hi); }
+.chip2--on { background:rgba(255,255,255,.92); color:#0b1112; }
+
+/* verdict */
+.theirs { font-size:17px; line-height:1.5; color:var(--text-lo); text-decoration:line-through;
+  text-decoration-color:rgba(235,238,248,.35); }
+.receipt { font-size:15.5px; line-height:1.6; color:var(--text-hi); }
+.newact { font-size:27px; font-weight:750; letter-spacing:-.02em; line-height:1.25; }
+
+/* the cut (door 2) */
+.cutrow { font-size:16px; line-height:1.5; color:var(--text-lo); text-decoration:line-through;
+  text-decoration-color:rgba(235,238,248,.3); padding:9px 0; }
+</style>
+</head><body>
+<div class="gal">
+<h1>Action, the first two minutes</h1>
+<p class="gal__sub">The intake done properly, from the paywall to the Action page you already approved. Same person as every other render: their star is 100 paying users, and the action the whole loop shows was born here as a Replace verdict. One screen per beat, one thing per screen.</p>
+<div class="grid">
+
+<!-- I1 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">01</span><span class="item__name">What Action is</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack">
+    <div class="safe-t"></div>
+    <div class="grow" style="display:flex;flex-direction:column;justify-content:center;padding:0 24px">
+      <p class="t-cap">Clarity found the target</p>
+      <div style="height:10px"></div>
+      <p class="star">100 paying users for Memento</p>
+      <div style="height:30px"></div>
+      <p class="introline">Action is the other half. One thing to do about it, chosen for where you actually are, sized to the day you are actually having.</p>
+      <div style="height:14px"></div>
+      <p class="introline" style="color:var(--text-mid)">Not a list. Never a list.</p>
+    </div>
+    <div class="bot"><button class="cta">Begin</button></div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note">First screen after the paywall. Their star said back, then two sentences on what Action is and one on what it is not. No tour, no feature list, one button.</p>
+</div>
+
+<!-- I2 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">02</span><span class="item__name">The fork</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack">
+    <div class="safe-t"></div>
+    <div class="grow" style="display:flex;flex-direction:column;justify-content:center;padding:0 22px">
+      <p class="q">Do you already know what you have to do?</p>
+      <div style="height:30px"></div>
+      <button class="doorb doorb--hi">
+        <span class="doorb__t">I know what to do</span>
+        <span class="doorb__s">Tell Action your move. It gets tested against your own numbers, not obeyed.</span>
+      </button>
+      <div style="height:11px"></div>
+      <button class="doorb">
+        <span class="doorb__t">Find it for me</span>
+        <span class="doorb__s">Two questions and Action chooses. You will see exactly why.</span>
+      </button>
+    </div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note">The two doors as real doors instead of buttons in a chat. Each one says what happens behind it in one line, so choosing is informed. Answering "I don't know" inside door 1 slides quietly into door 2, never an error.</p>
+</div>
+
+<!-- I3 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">03</span><span class="item__name">Door 1, question one</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack">
+    <div class="safe-t"></div>
+    <div class="pad" style="padding-top:14px"><span class="t-cap num">1 of 2</span></div>
+    <div class="grow" style="display:flex;flex-direction:column;justify-content:center;padding:0 22px">
+      <p class="q" style="font-size:26px">What is the move?</p>
+      <div style="height:18px"></div>
+      <div class="field">Keep building features until it is good enough that people start sharing it<span class="caret"></span></div>
+    </div>
+    <div class="bot"><button class="cta">Continue</button></div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note">One question, one field, their own words. No coaching yet, no reaction. The counter says this costs two questions total, so the end is always visible.</p>
+</div>
+
+<!-- I4 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">04</span><span class="item__name">Door 1, question two</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack">
+    <div class="safe-t"></div>
+    <div class="pad" style="padding-top:14px"><span class="t-cap num">2 of 2</span></div>
+    <div class="grow" style="display:flex;flex-direction:column;justify-content:center;padding:0 22px">
+      <p class="q" style="font-size:26px">Have you been doing it, and is the number moving?</p>
+      <div style="height:22px"></div>
+      <button class="chip2">Doing it, and it is working</button>
+      <div style="height:9px"></div>
+      <button class="chip2 chip2--on">Doing it, but the number is not moving</button>
+      <div style="height:9px"></div>
+      <button class="chip2">Honestly not doing it</button>
+    </div>
+    <div class="bot"><button class="cta">Continue</button></div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note">The evidence question as three honest states instead of a text box, because this answer decides the verdict and chips cannot ramble. Each state routes differently: working confirms, not-moving challenges, not-doing shrinks the first motion instead of changing the move.</p>
+</div>
+
+<!-- I5 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">05</span><span class="item__name">The verdict</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack">
+    <div class="safe-t"></div>
+    <div class="grow" style="display:flex;flex-direction:column;justify-content:center;padding:0 22px">
+      <p class="theirs">"Keep building features until it is good enough that people start sharing it"</p>
+      <div style="height:22px"></div>
+      <p class="receipt">Four months of shipping got you 8 users. Your own number says building is not the bottleneck. Hearing them is.</p>
+      <div style="height:26px"></div>
+      <p class="t-cap">So the move is</p>
+      <div style="height:8px"></div>
+      <p class="newact">Talk to three users about why they signed up</p>
+    </div>
+    <div class="bot"><button class="cta">Lock it in</button></div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note">A Replace verdict, shown the only way the doctrine allows: their move in their words, the receipt built from their own numbers, then the replacement. Confirmed and Upgraded verdicts use this same skeleton with their move surviving instead of struck. Lock it in lands on the Action page from the loop, same action, now as the card.</p>
+</div>
+
+<!-- I6 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">06</span><span class="item__name">Door 2 ends here: the visible cut</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack">
+    <div class="safe-t"></div>
+    <div class="grow" style="display:flex;flex-direction:column;justify-content:center;padding:0 22px">
+      <p class="t-cap">You told Action you have tried</p>
+      <div style="height:10px"></div>
+      <div class="cutrow">Posting build updates on Twitter</div>
+      <div class="cutrow">Redesigning the landing page</div>
+      <div class="cutrow">Adding more features</div>
+      <div style="height:22px"></div>
+      <p class="receipt">None of these put you in a room with the 8 people already paying attention.</p>
+      <div style="height:26px"></div>
+      <p class="t-cap">So the move is</p>
+      <div style="height:8px"></div>
+      <p class="newact">Talk to three users about why they signed up</p>
+    </div>
+    <div class="bot"><button class="cta">Lock it in</button></div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note">The other door's ending. When Action chooses, the choice is made visibly: what they have tried, struck through one by one, then the one thing. Naming the cuts is half the weight of the choice. Same Lock it in, same landing.</p>
+</div>
+
+</div></div>
+<script src="_kit.js"></script>
+</body></html>

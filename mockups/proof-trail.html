@@ -1,0 +1,615 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Proof trail, 20 ways</title>
+<link rel="stylesheet" href="_shared.css">
+<style>
+/* ---- round two: more experimental shapes ---- */
+.tape { background:rgba(var(--ink),.045); border-radius:4px; padding:14px 16px 18px;
+  box-shadow:var(--glass-hi); position:relative; }
+.tape::after { content:''; position:absolute; left:0; right:0; bottom:-7px; height:8px;
+  background:repeating-linear-gradient(90deg, rgba(var(--ink),.045) 0 8px, transparent 8px 16px); }
+.tl { display:grid; grid-template-columns:54px 1fr auto; gap:10px; padding:7px 0;
+  font-size:13px; font-variant-numeric:tabular-nums; letter-spacing:-.005em; color:var(--text-mid); }
+.tl b { font-weight:600; color:var(--text-hi); }
+.rings { position:relative; width:272px; height:272px; margin:0 auto; }
+.rings i { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); border-radius:50%; }
+.pola { position:relative; height:342px; }
+.pola > div { position:absolute; left:50%; width:190px; border-radius:12px; padding:9px 9px 11px;
+  background:rgba(24,27,31,.97); box-shadow:0 16px 34px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.09); }
+.pola .im { height:142px; border-radius:7px; }
+.pola .cap { font-size:12px; margin-top:9px; color:var(--text-mid); }
+.toc { display:flex; align-items:baseline; gap:9px; padding:12px 0; border-bottom:1px solid var(--hairline); }
+.toc__d { flex:1; border-bottom:1px dotted rgba(235,238,248,.2); transform:translateY(-4px); }
+.metro { position:relative; padding-left:38px; }
+.metro::before { content:''; position:absolute; left:10px; top:8px; bottom:8px; width:5px; border-radius:3px;
+  background:linear-gradient(180deg, var(--cyan), var(--green)); }
+.stn { position:relative; padding:0 0 26px; }
+.stn::before { content:''; position:absolute; left:-33px; top:2px; width:12px; height:12px; border-radius:50%;
+  background:var(--bg-deep); box-shadow:0 0 0 3.5px #fff; }
+.stn--m::before { background:var(--green); box-shadow:0 0 0 3.5px var(--green); }
+.stn--sk::before { box-shadow:0 0 0 3px #3d444c; }
+.log { font-size:12.5px; line-height:1.95; font-variant-numeric:tabular-nums; letter-spacing:.01em; }
+.log span { color:var(--text-lo); }
+.cal { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
+.cal i { aspect-ratio:1; border-radius:4px; background:rgba(var(--ink),.055); }
+.cal i.on { background:rgba(63,217,78,.5); }
+.cal i.big { background:var(--cyan); }
+.cal i.pad { background:transparent; }
+.brick { display:flex; flex-wrap:wrap-reverse; gap:4px; align-content:flex-start;
+  width:214px; margin:0 auto; }
+.brick i { width:39px; height:19px; border-radius:3px; background:rgba(63,217,78,.5); }
+.brick i.dim { background:rgba(var(--ink),.1); }
+.chart { position:relative; height:180px; }
+.chart svg { position:absolute; inset:0; width:100%; height:100%; }
+.ann { position:absolute; font-size:11.5px; color:var(--text-lo); }
+/* 1 spine */
+.v1-row { position: relative; padding: 0 0 26px 46px; }
+.v1-d { font-size: 12.5px; color: var(--text-lo); }
+.v1-t { font-size: 15.5px; font-weight: 650; margin: 2px 0 0; line-height: 1.35; }
+/* 2 chapters */
+.v2-ch { margin-bottom: 26px; }
+.v2-hd { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 10px; }
+.v2-name { font-size: 17px; font-weight: 750; letter-spacing: -0.01em; }
+.v2-n { font-size: 12.5px; color: var(--text-lo); }
+.v2-bars { display: flex; gap: 3px; }
+.v2-bar { height: 26px; flex: 1; border-radius: 3px; background: rgba(var(--ink),0.08); }
+.v2-bar.on { background: var(--green); }
+.v2-bar.cy { background: var(--cyan); }
+.v2-line { font-size: 13.5px; color: var(--text-mid); margin: 9px 0 0; line-height: 1.5; }
+/* 3 ribbon */
+.v3-rail { display: flex; gap: 10px; overflow-x: auto; padding: 0 20px 6px; scroll-snap-type: x mandatory; }
+.v3-rail::-webkit-scrollbar { height: 0; }
+.v3-c { flex: none; width: 210px; scroll-snap-align: center; background: rgba(var(--ink),0.045); border-radius: var(--r-card); padding: 16px; box-shadow: var(--glass-hi); }
+.v3-day { font-size: 34px; font-weight: 800; letter-spacing: -0.03em; }
+/* 4 constellation */
+.v4-sky { position: relative; height: 300px; margin: 0 20px; }
+.v4-s { position: absolute; width: 7px; height: 7px; border-radius: 50%; background: #fff; }
+.v4-s.big { width: 11px; height: 11px; box-shadow: 0 0 14px rgba(58,217,245,0.9); background: var(--cyan); }
+.v4-l { position: absolute; height: 1px; background: rgba(var(--ink),0.18); transform-origin: 0 0; }
+/* 5 ledger */
+.v5-r { display: grid; grid-template-columns: 58px 1fr auto; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--hairline); font-size: 13px; }
+.v5-r span:first-child { color: var(--text-lo); }
+.v5-k { color: var(--green); font-weight: 700; }
+/* 6 strata */
+.v6-stack { display: flex; flex-direction: column-reverse; gap: 4px; }
+.v6-l { border-radius: 6px; padding: 10px 13px; display: flex; justify-content: space-between; align-items: center; font-size: 13.5px; }
+/* 7 then/now */
+.v7-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.v7-col { background: rgba(var(--ink),0.04); border-radius: var(--r-card); padding: 16px; box-shadow: var(--glass-hi); }
+.v7-big { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; }
+/* 8 ladder */
+.v8-r { display: flex; align-items: center; gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--hairline); }
+.v8-tick { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; flex: none; }
+.v8-tick svg { width: 12px; height: 12px; }
+/* 9 heat */
+.v9-grid { display: grid; grid-template-columns: repeat(19, 1fr); gap: 3px; }
+.v9-c { aspect-ratio: 1; border-radius: 2px; background: rgba(var(--ink),0.07); }
+/* 10 words */
+.v10-q { border-left: 2px solid rgba(var(--ink),0.2); padding: 2px 0 2px 14px; margin-bottom: 22px; }
+.v10-w { font-size: 15.5px; line-height: 1.5; color: var(--text-hi); }
+</style>
+</head><body>
+<div class="gal">
+<a class="gal__back" href="index.html">&larr; all mockups</a>
+<h1>Proof trail, 20 ways</h1>
+<p class="gal__sub">Twenty answers to "show me the path I have been on." Same data every time: 11 day streak, 31 moves, goal set in March, four days missed. They differ in what they make you feel, not in styling.</p>
+<div class="grid">
+
+<!-- 1 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">01</span><span class="item__name">The spine</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:6px">
+      <h2 class="h-sec">Your path</h2>
+      <p class="t-body" style="margin-top:4px">31 moves since March 14.</p>
+    </div>
+    <div class="pad" style="position:relative;margin-top:26px">
+      <div class="spine" style="left:35px"></div>
+      <div class="v1-row"><span class="node node--g" style="top:2px;left:29px"></span>
+        <div class="v1-d">Today</div><p class="v1-t">Talked to three users about why they signed up</p></div>
+      <div class="v1-row"><span class="node node--g" style="top:2px;left:29px"></span>
+        <div class="v1-d">Yesterday</div><p class="v1-t">Shipped the account deletion flow</p></div>
+      <div class="v1-row"><span class="node" style="top:2px;left:29px"></span>
+        <div class="v1-d">Jul 21</div><p class="v1-t">Rewrote the paywall in one sitting</p></div>
+      <div class="v1-row"><span class="node node--dim" style="top:2px;left:29px"></span>
+        <div class="v1-d">Jul 19</div><p class="v1-t" style="color:var(--text-mid)">Missed. Came back the next morning.</p></div>
+      <div class="v1-row"><span class="node" style="top:2px;left:29px"></span>
+        <div class="v1-d">Jul 18</div><p class="v1-t">First paying user</p></div>
+      <div class="v1-row"><span class="node" style="top:2px;left:29px"></span>
+        <div class="v1-d">Jul 17</div><p class="v1-t">Cold emailed twelve people</p></div>
+      <div class="v1-row"><span class="node" style="top:2px;left:29px"></span>
+        <div class="v1-d">Jul 16</div><p class="v1-t">Rebuilt the onboarding in one sitting</p></div>
+      <div class="v1-row" style="padding-bottom:6px"><span class="node node--dim" style="top:2px;left:29px"></span>
+        <div class="v1-d">Jul 14</div><p class="v1-t" style="color:var(--text-mid)">Missed two days here.</p></div>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note"><b>What it is.</b> A vertical timeline down the left edge, newest first, one line per day.<br><b class="g">Good.</b> Cheapest to build and it already matches the 7-day page, so the app gains a memory without a new visual language. Missed days sit in it as dimmed dots instead of vanishing.<br><b class="b">Bad.</b> Turns into an endless list fast. By month three you are scrolling past 90 near-identical rows to reach anything.<br><span class="sn">Seen in Twitter and Instagram feeds, Apple Health's activity log, Day One's timeline.</span></p>
+</div>
+
+<!-- 2 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">02</span><span class="item__name">Chapters</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:6px">
+      <h2 class="h-sec">Four chapters in</h2>
+      <p class="t-body" style="margin-top:4px">March to today.</p>
+      <div style="height:24px"></div>
+      <div class="v2-ch"><div class="v2-hd"><span class="v2-name">Starting cold</span><span class="v2-n">Mar 14 &ndash; Apr 2</span></div>
+        <div class="v2-bars"><i class="v2-bar cy"></i><i class="v2-bar cy"></i><i class="v2-bar"></i><i class="v2-bar cy"></i><i class="v2-bar"></i><i class="v2-bar cy"></i><i class="v2-bar cy"></i></div>
+        <p class="v2-line">You shipped on 5 of 7 days and quit twice.</p></div>
+      <div class="v2-ch"><div class="v2-hd"><span class="v2-name">The dip</span><span class="v2-n">Apr &ndash; May</span></div>
+        <div class="v2-bars"><i class="v2-bar"></i><i class="v2-bar cy"></i><i class="v2-bar"></i><i class="v2-bar"></i><i class="v2-bar cy"></i><i class="v2-bar"></i><i class="v2-bar"></i></div>
+        <p class="v2-line">Six weeks of almost nothing. You came back anyway.</p></div>
+      <div class="v2-ch"><div class="v2-hd"><span class="v2-name">It clicked</span><span class="v2-n">June</span></div>
+        <div class="v2-bars"><i class="v2-bar on"></i><i class="v2-bar on"></i><i class="v2-bar on"></i><i class="v2-bar"></i><i class="v2-bar on"></i><i class="v2-bar on"></i><i class="v2-bar on"></i></div>
+        <p class="v2-line">Your first paying user landed on June 11.</p></div>
+      <div class="v2-ch"><div class="v2-hd"><span class="v2-name">Now</span><span class="v2-n">July</span></div>
+        <div class="v2-bars"><i class="v2-bar on"></i><i class="v2-bar on"></i><i class="v2-bar on"></i><i class="v2-bar on"></i><i class="v2-bar on"></i><i class="v2-bar on"></i><i class="v2-bar on"></i></div>
+        <p class="v2-line">11 straight. Your longest run yet.</p></div>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note"><b>What it is.</b> Your history grouped into named eras, each with one plain sentence.<br><b class="g">Good.</b> The only variant that turns a year into a story. Naming the April dip is what makes someone feel they have been through something rather than logged data.<br><b class="b">Bad.</b> The AI has to name the chapters, and a bad or generic name ruins the whole effect. Needs enough history to have chapters at all.<br><span class="sn">Seen in Spotify Wrapped's chaptered recap, Strava's Year in Sport, Apple's Memories.</span></p>
+</div>
+
+<!-- 3 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">03</span><span class="item__name">Ribbon</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:6px"><h2 class="h-sec">Swipe back through it</h2></div>
+    <div style="height:22px"></div>
+    <div class="v3-rail">
+      <div class="v3-c"><div class="v3-day num" style="color:var(--green)">31</div><p class="t-cap">moves done</p>
+        <hr class="rule"><p class="t-body" style="font-size:13.5px">Talked to three users today.</p></div>
+      <div class="v3-c"><div class="v3-day num">11</div><p class="t-cap">day streak</p>
+        <hr class="rule"><p class="t-body" style="font-size:13.5px">Longest run since you started.</p></div>
+      <div class="v3-c"><div class="v3-day num" style="color:var(--cyan)">1st</div><p class="t-cap">paying user</p>
+        <hr class="rule"><p class="t-body" style="font-size:13.5px">June 11. You emailed him back in nine minutes.</p></div>
+      <div class="v3-c"><div class="v3-day num" style="color:#565e69">6</div><p class="t-cap">weeks lost</p>
+        <hr class="rule"><p class="t-body" style="font-size:13.5px">April to May. You returned on a Tuesday.</p></div>
+    </div>
+    <div class="pad" style="margin-top:26px"><p class="t-cap">Four cards. Swipe.</p></div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note"><b>What it is.</b> A horizontal card rail you swipe sideways, one card per number or moment.<br><b class="g">Good.</b> Fastest to skim on a phone and costs almost no vertical space, so it can sit inside another page instead of needing its own.<br><b class="b">Bad.</b> Horizontal scrolling hides things. People miss cards three and four, and it is hard to feel total distance travelled.<br><span class="sn">Seen in Apple Health's summary cards, Google Fit, Oura's daily card rail.</span></p>
+</div>
+
+<!-- 4 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">04</span><span class="item__name">Constellation</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:6px"><h2 class="h-sec">31 points of light</h2>
+      <p class="t-body" style="margin-top:4px">Every move you kept.</p></div>
+    <div class="v4-sky" style="margin-top:20px">
+      <i class="v4-l" style="left:40px;top:250px;width:78px;transform:rotate(-38deg)"></i>
+      <i class="v4-l" style="left:110px;top:205px;width:72px;transform:rotate(-22deg)"></i>
+      <i class="v4-l" style="left:178px;top:178px;width:66px;transform:rotate(-30deg)"></i>
+      <i class="v4-l" style="left:238px;top:145px;width:74px;transform:rotate(-40deg)"></i>
+      <i class="v4-s" style="left:38px;top:248px"></i><i class="v4-s" style="left:72px;top:222px"></i>
+      <i class="v4-s" style="left:108px;top:203px"></i><i class="v4-s" style="left:142px;top:192px"></i>
+      <i class="v4-s" style="left:176px;top:176px"></i><i class="v4-s" style="left:210px;top:160px"></i>
+      <i class="v4-s" style="left:236px;top:143px"></i><i class="v4-s" style="left:268px;top:118px"></i>
+      <i class="v4-s big" style="left:300px;top:92px"></i>
+      <i class="v4-s" style="left:64px;top:120px;opacity:.3"></i><i class="v4-s" style="left:250px;top:52px;opacity:.3"></i>
+      <i class="v4-s" style="left:150px;top:70px;opacity:.25"></i>
+    </div>
+    <div class="pad"><p class="t-body">The bright one is the day someone first paid you.</p></div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note"><b>What it is.</b> Days as points joined by a faint line, brightest where something big happened.<br><b class="g">Good.</b> Ties the trail to the Neutron Star language you already own, and it is the version people screenshot.<br><b class="b">Bad.</b> Almost no information density. You cannot tell what any point means without tapping, and it gets crowded past 60 days.<br><span class="sn">Seen in Duolingo's path, Apple Fitness award constellations, game skill trees.</span></p>
+</div>
+
+<!-- 5 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">05</span><span class="item__name">Ledger</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:6px">
+      <h2 class="h-sec">31 kept</h2>
+      <p class="t-body" style="margin-top:4px">4 missed. 133 days.</p>
+      <div style="height:22px"></div>
+      <div class="v5-r"><span class="num">Jul 24</span><span>Talked to three users</span><span class="v5-k">&check;</span></div>
+      <div class="v5-r"><span class="num">Jul 23</span><span>Shipped deletion flow</span><span class="v5-k">&check;</span></div>
+      <div class="v5-r"><span class="num">Jul 22</span><span>Fixed the paywall copy</span><span class="v5-k">&check;</span></div>
+      <div class="v5-r"><span class="num">Jul 21</span><span>Rewrote onboarding</span><span class="v5-k">&check;</span></div>
+      <div class="v5-r"><span class="num">Jul 20</span><span>Cold emailed 12 people</span><span class="v5-k">&check;</span></div>
+      <div class="v5-r"><span class="num" style="color:rgba(235,238,248,.25)">Jul 19</span><span style="color:var(--text-lo)">&mdash;</span><span style="color:var(--text-lo)">&times;</span></div>
+      <div class="v5-r"><span class="num">Jul 18</span><span>First paying user</span><span class="v5-k">&check;</span></div>
+      <div class="v5-r"><span class="num">Jul 17</span><span>Shipped the card evolution</span><span class="v5-k">&check;</span></div>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note"><b>What it is.</b> A plain dated table: date, what you did, done or missed.<br><b class="g">Good.</b> Deliberately unglamorous and completely scannable. Honest about misses, which makes the wins believable, and it never needs redesigning.<br><b class="b">Bad.</b> Zero emotion. Nobody screenshots a table, and it does nothing for someone on day three with four rows.<br><span class="sn">Seen in Bank statements, GitHub commit history, Strava's activity list.</span></p>
+</div>
+
+<!-- 6 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">06</span><span class="item__name">Strata</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:6px">
+      <h2 class="h-sec">What you've stacked</h2>
+      <p class="t-body" style="margin-top:4px">Every layer is a week you showed up.</p>
+      <div style="height:24px"></div>
+      <div class="v6-stack">
+        <div class="v6-l" style="background:rgba(58,217,245,.13)"><span>Week 1</span><span class="t-cap num">3 moves</span></div>
+        <div class="v6-l" style="background:rgba(58,217,245,.17)"><span>Week 2</span><span class="t-cap num">4</span></div>
+        <div class="v6-l" style="background:rgba(58,217,245,.1)"><span>Week 3</span><span class="t-cap num">1</span></div>
+        <div class="v6-l" style="background:rgba(99,150,180,.13)"><span>April</span><span class="t-cap num">2</span></div>
+        <div class="v6-l" style="background:rgba(99,180,150,.18)"><span>May</span><span class="t-cap num">5</span></div>
+        <div class="v6-l" style="background:rgba(63,217,78,.22)"><span>June</span><span class="t-cap num">9</span></div>
+        <div class="v6-l" style="background:rgba(63,217,78,.32)"><span>July</span><span class="t-cap num">11</span></div>
+      </div>
+      <p class="t-body" style="margin-top:20px">You are building upward. Thin months are still layers.</p>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note"><b>What it is.</b> Time stacked as layers, months at the bottom, this week on top, thicker where you did more.<br><b class="g">Good.</b> The pile literally grows the longer you stay, so returning after months feels like arriving somewhere.<br><b class="b">Bad.</b> The metaphor needs explaining the first time, and thin months look like failures rather than facts.<br><span class="sn">Seen in Sediment charts in data journalism, Duolingo's league tiers.</span></p>
+</div>
+
+<!-- 7 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">07</span><span class="item__name">Then and now</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:6px">
+      <h2 class="h-sec">Since you started</h2>
+      <div style="height:20px"></div>
+      <div class="v7-2">
+        <div class="v7-col"><p class="t-cap">March 14</p><div class="v7-big num" style="margin-top:8px">0</div>
+          <p class="t-body" style="font-size:13px;margin-top:6px">paying users</p></div>
+        <div class="v7-col" style="background:rgba(63,217,78,.08)"><p class="t-cap">Today</p><div class="v7-big num" style="margin-top:8px;color:var(--green)">1</div>
+          <p class="t-body" style="font-size:13px;margin-top:6px">paying users</p></div>
+      </div>
+      <div style="height:12px"></div>
+      <div class="v7-2">
+        <div class="v7-col"><p class="t-cap">Longest run then</p><div class="v7-big num" style="margin-top:8px">2</div></div>
+        <div class="v7-col" style="background:rgba(63,217,78,.08)"><p class="t-cap">Longest run now</p><div class="v7-big num" style="margin-top:8px;color:var(--green)">11</div></div>
+      </div>
+      <hr class="rule" style="margin:22px 0">
+      <p class="t-body">In March you wrote: "I keep starting things and quitting when it gets boring."</p>
+      <p class="t-body" style="margin-top:12px;color:var(--text-hi)">You have not quit in 11 days.</p>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note"><b>What it is.</b> Two numbers side by side: what was true when you started, what is true now.<br><b class="g">Good.</b> Does the emotional work in one glance and pairs perfectly with the evidence wall.<br><b class="b">Bad.</b> Needs a captured starting point, which the app does not record today. Useless in week one when both numbers are the same.<br><span class="sn">Seen in Fitness before-and-after screens, Strava's fitness trend.</span></p>
+</div>
+
+<!-- 8 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">08</span><span class="item__name">Ladder</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:6px">
+      <h2 class="h-sec">100 paying users</h2>
+      <p class="t-body" style="margin-top:4px">You are on rung three.</p>
+      <div style="height:20px"></div>
+      <div class="v8-r"><span class="v8-tick" style="background:var(--green)"><svg viewBox="0 0 24 24" fill="none" stroke="#04140a" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><div><div style="font-weight:650">Something built</div><p class="t-cap">Mar 14</p></div></div>
+      <div class="v8-r"><span class="v8-tick" style="background:var(--green)"><svg viewBox="0 0 24 24" fill="none" stroke="#04140a" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><div><div style="font-weight:650">Someone used it</div><p class="t-cap">May 2</p></div></div>
+      <div class="v8-r"><span class="v8-tick" style="background:var(--green)"><svg viewBox="0 0 24 24" fill="none" stroke="#04140a" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><div><div style="font-weight:650">Someone paid</div><p class="t-cap">Jun 11</p></div></div>
+      <div class="v8-r"><span class="v8-tick" style="box-shadow:inset 0 0 0 2px var(--cyan)"></span><div><div style="font-weight:650;color:var(--cyan)">Ten paying</div><p class="t-cap">next</p></div></div>
+      <div class="v8-r" style="opacity:.45"><span class="v8-tick" style="box-shadow:inset 0 0 0 2px rgba(235,238,248,.3)"></span><div><div style="font-weight:650">Fifty paying</div></div></div>
+      <div class="v8-r" style="opacity:.3"><span class="v8-tick" style="box-shadow:inset 0 0 0 2px rgba(235,238,248,.3)"></span><div><div style="font-weight:650">One hundred</div></div></div>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note"><b>What it is.</b> Rungs from where you started to the goal, with passed ones ticked.<br><b class="g">Good.</b> Goal-shaped rather than time-shaped, so it shows what is still ahead. Motivating when the next rung feels close.<br><b class="b">Bad.</b> It needs real intermediate milestones, and if the AI invents bad ones the whole ladder feels fake.<br><span class="sn">Seen in Duolingo's unit path, Apple Fitness awards, onboarding checklists.</span></p>
+</div>
+
+<!-- 9 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">09</span><span class="item__name">Heat, then story</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:6px">
+      <h2 class="h-sec">133 days</h2>
+      <div style="height:18px"></div>
+      <div class="v9-grid" id="heat9"></div>
+      <hr class="rule" style="margin:20px 0">
+      <p class="t-body" style="color:var(--text-hi)">Your best stretch was 11 days, and it is the one you are in.</p>
+      <p class="t-body" style="margin-top:12px">Tap any square to read what you did that day.</p>
+      <div style="height:18px"></div>
+      <div class="panel"><p class="t-cap">Jun 11</p><p class="t-body" style="color:var(--text-hi);margin-top:6px">First paying user. You emailed him back in nine minutes.</p></div>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note"><b>What it is.</b> A heatmap of every day where tapping a square opens what you wrote that day.<br><b class="g">Good.</b> You already have the heatmap. This makes it a door into your own history instead of decoration, so it is the least new work here.<br><b class="b">Bad.</b> Squares with nothing behind them are dead ends, so it only works once daily writing exists.<br><span class="sn">Seen in GitHub's contribution graph, Duolingo's calendar.</span></p>
+</div>
+
+<!-- 10 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">10</span><span class="item__name">Your own words</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:6px">
+      <h2 class="h-sec">What you said</h2>
+      <p class="t-body" style="margin-top:4px">Only your words, oldest first.</p>
+      <div style="height:24px"></div>
+      <div class="v10-q"><p class="t-cap">March 14</p><p class="v10-w">"I keep starting things and quitting at the part where it gets boring."</p></div>
+      <div class="v10-q"><p class="t-cap">April 30</p><p class="v10-w">"Nobody is using it and I do not want to look at it."</p></div>
+      <div class="v10-q" style="border-color:var(--cyan)"><p class="t-cap">June 11</p><p class="v10-w">"Someone paid. A stranger paid for the thing I made."</p></div>
+      <div class="v10-q"><p class="t-cap">July 2</p><p class="v10-w">"I am tired but I do not want to stop this time."</p></div>
+      <div class="v10-q" style="border-color:var(--green)"><p class="t-cap">July 24</p><p class="v10-w">"Eleven days straight. This is the longest I have stuck with anything."</p></div>
+      <hr class="rule" style="margin:8px 0 0">
+      <p class="t-cap" style="margin-top:14px">Four months of you, in four lines.</p>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note"><b>What it is.</b> Only your own sentences, dated, nothing else on the page.<br><b class="g">Good.</b> The most personal thing in all 110 and the hardest to fake. It makes the one-line capture worth building on its own.<br><b class="b">Bad.</b> Completely empty until someone writes, and one skipped week leaves an obvious hole.<br><span class="sn">Seen in Day One's on-this-day, Apple Journal, Reflectly's history.</span></p>
+</div>
+
+<div class="split"><span class="split__t">The next ten are more out there</span><span class="split__d">Same data, stranger shapes. Receipt tape, tree rings, a card stack, a real chart, a transit line, a raw log, a calendar, a pile of blocks. These push the style further than the first ten, so treat them as gear-turners rather than finished proposals.</span></div>
+
+<!-- V11 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">11</span><span class="item__name">Receipt roll</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:16px">
+      <h2 class="h-sec">The tape</h2>
+      <p class="t-body" style="margin-top:4px">Every day printed, nothing edited out.</p>
+      <div style="height:20px"></div>
+      <div class="tape">
+        <div class="tl"><span>JUL 24</span><b>Talk to three users</b><span>&mdash;</span></div>
+        <div class="tl"><span>JUL 23</span><b>Shipped deletion flow</b><span>41m</span></div>
+        <div class="tl"><span>JUL 22</span><b>Fixed paywall copy</b><span>18m</span></div>
+        <div class="tl"><span>JUL 21</span><b>Rewrote onboarding</b><span>2h</span></div>
+        <div class="tl" style="color:var(--text-lo)"><span>JUL 20</span><span>no entry</span><span></span></div>
+        <div class="tl"><span>JUL 19</span><b>Cold emailed 12</b><span>35m</span></div>
+        <div class="tl"><span>JUL 18</span><b>First paying user</b><span>&mdash;</span></div>
+        <div class="tl"><span>JUL 17</span><b>Wrote the paywall</b><span>1h</span></div>
+        <hr class="rule" style="margin:10px 0">
+        <div class="tl"><span>TOTAL</span><b>31 moves</b><b>19h</b></div>
+      </div>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note"><b>What it is.</b> A continuous printed tape of every day with times, totalled at the bottom.<br><b class="g">Good.</b> Feels like a real record rather than an app screen, and the total hours line gives you a number nobody else is showing you.<br><b class="b">Bad.</b> Dense and slightly cold. The receipt styling is a look, and if you tire of it there is nothing else there.<br><span class="sn">Seen in Bank and till receipts, Notion databases, terminal output as an aesthetic.</span></p>
+</div>
+
+<!-- V12 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">12</span><span class="item__name">Tree rings</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:18px">
+      <h2 class="h-sec">Four rings</h2>
+      <p class="t-body" style="margin-top:4px">One a month. Thicker where you showed up.</p>
+    </div>
+    <div style="margin-top:26px">
+      <div class="rings">
+        <i style="width:272px;height:272px;border:9px solid rgba(63,217,78,.5)"></i>
+        <i style="width:224px;height:224px;border:4px solid rgba(58,217,245,.45)"></i>
+        <i style="width:180px;height:180px;border:2px solid rgba(235,238,248,.16)"></i>
+        <i style="width:140px;height:140px;border:7px solid rgba(128,150,255,.4)"></i>
+        <i style="width:82px;height:82px;border:3px solid rgba(235,238,248,.2)"></i>
+        <i style="width:14px;height:14px;background:#fff;border:0"></i>
+      </div>
+    </div>
+    <div class="pad" style="margin-top:28px">
+      <div style="display:flex;justify-content:space-between;padding:8px 0"><span class="t-body" style="font-size:13.5px">July</span><span class="t-cap">11 days</span></div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0"><span class="t-body" style="font-size:13.5px">June</span><span class="t-cap">6 days</span></div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0"><span class="t-body" style="font-size:13.5px">May</span><span class="t-cap">2 days</span></div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0"><span class="t-body" style="font-size:13.5px">April</span><span class="t-cap">9 days</span></div>
+      <p class="t-cap" style="margin-top:14px">The centre is the day you started.</p>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note"><b>What it is.</b> Concentric rings, one per month, thicker where you showed up more.<br><b class="g">Good.</b> Genuinely distinctive and beautiful. It rewards long use, because the shape only gets interesting after several months.<br><b class="b">Bad.</b> Hard to read precisely, needs a legend, and month one is a single dot. High effort to build well.<br><span class="sn">Seen in Tree rings as a data metaphor, Apple Watch rings, radial charts.</span></p>
+</div>
+
+<!-- V13 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">13</span><span class="item__name">The stack</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:16px">
+      <h2 class="h-sec">31 of these</h2>
+      <p class="t-body" style="margin-top:4px">Fan through them.</p>
+    </div>
+    <div class="pad" style="margin-top:24px">
+      <div class="pola">
+        <div style="transform:translateX(-50%) rotate(-6deg) translateY(26px);opacity:.4">
+          <div class="im" style="background:linear-gradient(150deg,rgba(90,110,130,.3),rgba(30,40,50,.5))"></div>
+          <p class="cap">Jul 12</p></div>
+        <div style="transform:translateX(-50%) rotate(4deg) translateY(14px);opacity:.62">
+          <div class="im" style="background:linear-gradient(150deg,rgba(128,150,255,.24),rgba(24,26,50,.55))"></div>
+          <p class="cap">Jul 18</p></div>
+        <div style="transform:translateX(-50%) rotate(-1.5deg)">
+          <div class="im" style="background:linear-gradient(150deg,rgba(63,217,78,.3),rgba(18,44,24,.6))"></div>
+          <p class="cap" style="color:var(--text-hi)">Jul 24 &middot; Talked to three users</p></div>
+      </div>
+      <hr class="rule" style="margin:22px 0 16px">
+      <p class="t-body">Each card is one day. Swipe to send it back and see the one underneath.</p>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note"><b>What it is.</b> Days as physical cards you fan and swipe through, one at a time.<br><b class="g">Good.</b> Tactile and slow in a good way. It makes each day feel like an object rather than a row.<br><b class="b">Bad.</b> Terrible for finding a specific day, and 133 cards is a long way to swipe. Needs real photos to look good.<br><span class="sn">Seen in Tinder's card stack, Apple Photos' Memories, Polaroid-style widgets.</span></p>
+</div>
+
+<!-- V14 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">14</span><span class="item__name">Momentum curve</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:18px">
+      <h2 class="h-sec">Momentum</h2>
+      <p class="t-body" style="margin-top:4px">March to today.</p>
+      <div style="height:26px"></div>
+      <div class="chart">
+        <svg viewBox="0 0 320 180" preserveAspectRatio="none">
+          <defs><linearGradient id="mg" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#3fd94e" stop-opacity=".26"/>
+            <stop offset="1" stop-color="#3fd94e" stop-opacity="0"/></linearGradient></defs>
+          <path d="M0 150 L40 132 L74 156 L110 168 L146 160 L182 120 L214 96 L248 104 L280 52 L320 26 L320 180 L0 180 Z" fill="url(#mg)"/>
+          <path d="M0 150 L40 132 L74 156 L110 168 L146 160 L182 120 L214 96 L248 104 L280 52 L320 26"
+            fill="none" stroke="#3fd94e" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+          <circle cx="110" cy="168" r="3.5" fill="#565e69"/>
+          <circle cx="248" cy="104" r="3.5" fill="#3ad9f5"/>
+          <circle cx="320" cy="26" r="4" fill="#fff"/>
+        </svg>
+        <span class="ann" style="left:22%;top:88%">April dip</span>
+        <span class="ann" style="left:60%;top:44%;color:var(--cyan)">first payment</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:10px">
+        <span class="t-cap">Mar</span><span class="t-cap">May</span><span class="t-cap">Jul</span></div>
+      <hr class="rule" style="margin:24px 0">
+      <p class="t-body">Momentum counts finished days, weighted so recent ones matter more. You are at your highest ever.</p>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note"><b>What it is.</b> A real line chart of momentum over time, with two annotations.<br><b class="g">Good.</b> The only variant that shows a trend rather than a list, so it answers whether you are speeding up or slowing down.<br><b class="b">Bad.</b> Momentum is a made-up metric. If the formula is not obvious people distrust the line, and a dip can feel like a verdict.<br><span class="sn">Seen in Whoop's strain trend, Apple Health trends, Strava fitness and freshness.</span></p>
+</div>
+
+<!-- V15 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">15</span><span class="item__name">Table of contents</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:18px">
+      <h2 class="h-sec">Contents</h2>
+      <p class="t-body" style="margin-top:4px">133 days, four parts.</p>
+      <div style="height:18px"></div>
+      <div class="toc"><span style="font-size:15px;font-weight:600">Starting cold</span><span class="toc__d"></span><span class="t-cap num">Mar 14</span></div>
+      <div class="toc"><span style="font-size:15px;font-weight:600">The dip</span><span class="toc__d"></span><span class="t-cap num">Apr 2</span></div>
+      <div class="toc"><span style="font-size:15px;font-weight:600">It clicked</span><span class="toc__d"></span><span class="t-cap num">Jun 11</span></div>
+      <div class="toc" style="border:0"><span style="font-size:15px;font-weight:600;color:var(--green)">Now</span><span class="toc__d"></span><span class="t-cap num">Jul 13</span></div>
+      <hr class="rule" style="margin:22px 0">
+      <p class="t-cap">Longest chapter</p>
+      <p class="t-body" style="margin-top:5px;color:var(--text-hi)">The dip, 70 days. You wrote three things in it and none of them were about giving up.</p>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note"><b>What it is.</b> A table of contents: four named parts with the date each began.<br><b class="g">Good.</b> The most restrained way to tell a story. Text only, no chart to maintain, and it reads as an index into a longer thing.<br><b class="b">Bad.</b> Same dependence on good AI naming as chapters, with less visual payoff. Can read as bookish rather than premium.<br><span class="sn">Seen in Book contents pages, Notion's outline, Apple Books' chapter list.</span></p>
+</div>
+
+<!-- V16 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">16</span><span class="item__name">The line</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:18px">
+      <h2 class="h-sec">The line so far</h2>
+      <div style="height:22px"></div>
+      <div class="metro">
+        <div class="stn stn--m"><p class="t-cap">Mar 14</p><p style="font-size:15px;font-weight:650;margin-top:2px">Set the goal</p></div>
+        <div class="stn"><p class="t-cap">Apr 2</p><p style="font-size:15px;font-weight:650;margin-top:2px">Something built</p></div>
+        <div class="stn stn--sk"><p class="t-cap">Apr &ndash; May</p><p style="font-size:15px;margin-top:2px;color:var(--text-mid)">Six weeks skipped</p></div>
+        <div class="stn stn--m"><p class="t-cap">Jun 11</p><p style="font-size:15px;font-weight:650;margin-top:2px">Someone paid</p></div>
+        <div class="stn"><p class="t-cap">Jul 24</p><p style="font-size:15px;font-weight:650;margin-top:2px">Day 11 of the longest run</p></div>
+        <div class="stn" style="padding-bottom:0;opacity:.45"><p class="t-cap">Ahead</p><p style="font-size:15px;margin-top:2px">Ten paying</p></div>
+      </div>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note"><b>What it is.</b> A transit-style line with stations for the moments that mattered, including a greyed-out skipped stretch.<br><b class="g">Good.</b> Reads instantly, shows the road ahead as well as behind, and handles gaps gracefully instead of hiding them.<br><b class="b">Bad.</b> Only works if there are real milestones. Without them it degrades into the spine with extra decoration.<br><span class="sn">Seen in Transit maps, Duolingo's path, GitHub's release timeline.</span></p>
+</div>
+
+<!-- V17 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">17</span><span class="item__name">The log</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:18px">
+      <h2 class="h-sec">Raw log</h2>
+      <div style="height:16px"></div>
+      <div class="log">
+        <div><span>07.24</span> &nbsp;talk to three users&nbsp; <span style="color:var(--text-lo)">open</span></div>
+        <div><span>07.23</span> &nbsp;deletion flow&nbsp; <span style="color:var(--green)">done 41m</span></div>
+        <div><span>07.22</span> &nbsp;paywall copy&nbsp; <span style="color:var(--green)">done 18m</span></div>
+        <div><span>07.21</span> &nbsp;onboarding&nbsp; <span style="color:var(--green)">done 2h04</span></div>
+        <div><span>07.20</span> &nbsp;<span style="color:var(--text-lo)">skipped</span></div>
+        <div><span>07.19</span> &nbsp;cold email x12&nbsp; <span style="color:var(--green)">done 35m</span></div>
+        <div><span>07.18</span> &nbsp;first payment&nbsp; <span style="color:var(--cyan)">milestone</span></div>
+        <div><span>07.17</span> &nbsp;paywall v1&nbsp; <span style="color:var(--green)">done 1h11</span></div>
+        <div><span>07.16</span> &nbsp;<span style="color:var(--text-lo)">skipped</span></div>
+        <div><span>07.15</span> &nbsp;pricing page&nbsp; <span style="color:var(--green)">done 52m</span></div>
+      </div>
+      <hr class="rule" style="margin:20px 0">
+      <div style="display:flex;justify-content:space-between">
+        <span class="t-cap num">31 done</span><span class="t-cap num">4 skipped</span><span class="t-cap num">19h04</span></div>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note"><b>What it is.</b> Raw log output: date, task, status, duration.<br><b class="g">Good.</b> The most information per pixel here and the most credible. Great for someone who wants receipts, not a story.<br><b class="b">Bad.</b> Cold and technical. It will alienate anyone who is not builder-minded, and the styling flirts with a look Memento otherwise avoids.<br><span class="sn">Seen in Terminal logs, Vercel deploy history, Linear's activity feed.</span></p>
+</div>
+
+<!-- V18 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">18</span><span class="item__name">Wall calendar</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:18px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <h2 class="h-sec">July</h2><span class="t-cap num">11 of 24</span></div>
+      <div style="height:14px"></div>
+      <div class="cal" style="margin-bottom:6px">
+        <span class="t-cap" style="text-align:center">M</span><span class="t-cap" style="text-align:center">T</span>
+        <span class="t-cap" style="text-align:center">W</span><span class="t-cap" style="text-align:center">T</span>
+        <span class="t-cap" style="text-align:center">F</span><span class="t-cap" style="text-align:center">S</span>
+        <span class="t-cap" style="text-align:center">S</span></div>
+      <div class="cal" id="cal7"></div>
+      <hr class="rule" style="margin:22px 0">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <h2 class="h-sec" style="font-size:16px;color:var(--text-mid)">June</h2><span class="t-cap num">6 of 30</span></div>
+      <div style="height:10px"></div>
+      <div class="cal" id="cal6"></div>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note"><b>What it is.</b> A wall calendar, month by month, filled squares for days you finished.<br><b class="g">Good.</b> The most familiar shape on earth, so it needs zero explanation, and gaps are instantly obvious in a way a list hides.<br><b class="b">Bad.</b> Familiar means forgettable. It is also the least Memento-looking of the twenty.<br><span class="sn">Seen in Apple Calendar, Streaks' month view, Duolingo's calendar.</span></p>
+</div>
+
+<!-- V19 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">19</span><span class="item__name">What you have stacked</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack" style="display:flex;flex-direction:column;min-height:844px">
+    <div class="safe-t"></div>
+    <div class="pad" style="padding-top:18px">
+      <h2 class="h-sec">31 blocks</h2>
+      <p class="t-body" style="margin-top:4px">One for every day you finished.</p>
+    </div>
+    <div style="flex:1;display:flex;align-items:flex-end;padding:24px 20px 0">
+      <div class="brick" id="brick" style="width:100%"></div>
+    </div>
+    <div class="pad" style="padding-top:18px;padding-bottom:16px">
+      <hr class="rule">
+      <p class="t-body" style="margin-top:14px">The grey ones are the four you missed. They stay in the pile.</p>
+    </div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note"><b>What it is.</b> Every finished day as a physical block, piled up, misses in grey at the bottom.<br><b class="g">Good.</b> Weight is the point. Thirty-one blocks feel like something you built, and the pile grows visibly week to week.<br><b class="b">Bad.</b> It says nothing about what you did, only how often. Past a few hundred days the pile stops being readable.<br><span class="sn">Seen in Brick and block metaphors in savings apps, Duolingo's XP piles.</span></p>
+</div>
+
+<!-- V20 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">20</span><span class="item__name">One day, in full</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:18px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <h2 class="h-sec">July 18</h2><span class="t-cap">day 5</span></div>
+      <div style="height:20px"></div>
+      <div class="ph" style="height:190px;border-radius:12px;background:linear-gradient(150deg,rgba(58,217,245,.3),rgba(20,40,52,.6))"></div>
+      <div style="height:18px"></div>
+      <p class="t-cap">The move</p>
+      <p style="font-size:16px;font-weight:650;margin:5px 0 0">Put the payment link somewhere people would find it</p>
+      <hr class="rule" style="margin:18px 0">
+      <p class="t-cap">What you wrote</p>
+      <p style="font-size:15.5px;line-height:1.5;margin:6px 0 0">"First payment. A stranger paid for the thing I made."</p>
+      <hr class="rule" style="margin:18px 0">
+      <div style="display:flex;justify-content:space-between">
+        <span class="t-cap">Focused 1h11</span><span class="t-cap">Streak was 5</span></div>
+      <div style="height:26px"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span class="t-cap">&larr; Jul 17</span>
+        <span class="t-cap" style="color:var(--text-mid)">swipe through days</span>
+        <span class="t-cap">Jul 19 &rarr;</span></div>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note"><b>What it is.</b> One day at a time in full: photo, the move, what you wrote, how long you focused.<br><b class="g">Good.</b> The most complete single-day record and the best possible destination when you tap a day in any other variant.<br><b class="b">Bad.</b> Not a trail on its own. It is the detail view that all nineteen others need, so it should be built alongside one, not instead.<br><span class="sn">Seen in Day One's entry view, Apple Photos' single-photo view, Strava's activity detail.</span></p>
+</div>
+
+</div></div>
+<script>
+var h = document.getElementById('heat9');
+if (h) { var seed = 7; for (var i=0;i<133;i++){ seed=(seed*1103515245+12345)%2147483648; var r=seed/2147483648;
+  var d=document.createElement('i'); d.className='v9-c';
+  var on = i>110 ? r<0.86 : (i>60 ? r<0.5 : r<0.32);
+  if (on) d.style.background = i>100 ? 'rgba(63,217,78,'+(0.45+r*0.5)+')' : 'rgba(63,217,78,'+(0.22+r*0.4)+')';
+  h.appendChild(d); } }
+
+/* July: starts Wed, 31 days. Green = finished, cyan = milestone. */
+(function(){
+  var c = document.getElementById('cal7'); if (!c) return;
+  var done = {1:1,2:1,5:1,8:1,9:1,12:1,14:1,15:1,17:1,19:1,21:1,22:1,23:1,24:1};
+  for (var p=0;p<2;p++){ var e=document.createElement('i'); e.className='pad'; c.appendChild(e); }
+  for (var d=1;d<=31;d++){ var e=document.createElement('i');
+    if (d===18) e.className='big'; else if (done[d]) e.className='on';
+    if (d>24) e.style.opacity='.35';
+    c.appendChild(e); }
+  var c6 = document.getElementById('cal6'); if (!c6) return;
+  var d6 = {3:1,9:1,11:1,17:1,24:1,28:1};
+  for (var p=0;p<6;p++){ var e=document.createElement('i'); e.className='pad'; c6.appendChild(e); }
+  for (var d=1;d<=30;d++){ var e=document.createElement('i'); if (d6[d]) e.className='on'; c6.appendChild(e); }
+})();
+
+(function(){
+  var b = document.getElementById('brick'); if (!b) return;
+  for (var i=0;i<4;i++){ var e=document.createElement('i'); e.className='dim'; b.appendChild(e); }
+  for (var i=0;i<31;i++){ var e=document.createElement('i');
+    e.style.background = 'rgba(63,217,78,' + (0.34 + (i/31)*0.42).toFixed(2) + ')';
+    b.appendChild(e); }
+})();
+</script>
+<script src="_kit.js"></script>
+</body></html>

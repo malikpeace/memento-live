@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Comeback, 5 ways</title>
+<link rel="stylesheet" href="_shared.css">
+<style>
+.stack { display:flex; flex-direction:column; min-height:844px; }
+.grow { flex:1; }
+.bot { padding:0 20px 14px; }
+.gap { display:flex; align-items:center; gap:10px; padding:14px 0; }
+.gapline { flex:1; height:1px; background:repeating-linear-gradient(90deg, rgba(235,238,248,.22) 0 4px, transparent 4px 9px); }
+.trow { position:relative; padding:0 0 22px 40px; }
+.tnode { position:absolute; left:9px; top:3px; width:12px; height:12px; border-radius:50%; background:var(--green); box-shadow:0 0 0 5px var(--bg-deep); }
+.tnode--off { background:#3a4048; }
+.tspine { position:absolute; left:14px; top:0; bottom:0; width:2px; background:rgba(235,238,248,.13); }
+.keep { border-radius:var(--r-card); background:rgba(var(--ink),.045); box-shadow:var(--glass-hi); padding:16px; }
+.fork { border-radius:var(--r-card); padding:18px; box-shadow:var(--glass-hi); }
+.dim-card { filter: grayscale(1) brightness(0.62); }
+</style>
+</head><body>
+<div class="gal">
+<h1>Comeback, 5 ways</h1>
+<p class="gal__sub">You have been gone six days. This is the first screen when you open the app again. Right now nothing special happens, which is the single biggest retention hole in Memento.</p>
+<div class="grid">
+
+<!-- R1 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">01</span><span class="item__name">No speech</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack">
+    <div class="safe-t"></div>
+    <div class="grow" style="display:flex;flex-direction:column;justify-content:center;padding:0 22px">
+      <p class="t-body">Six days.</p>
+      <h1 class="h-move" style="font-size:29px;margin-top:14px">Send Marcus the message you never sent.</h1>
+    </div>
+    <div class="bot"><button class="btn">Do it now</button></div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note"><b>What it is.</b> Two words about the absence, then a small move. No pep talk.<br><b class="g">Good.</b> Cheap to build and the smaller move is what actually gets someone going again. Currently returning gets you nothing at all.<br><b class="b">Bad.</b> Some people want an acknowledgement of the break. This gives them almost nothing to hold onto.<br><span class="sn">Seen in Duolingo's welcome-back lesson, Headspace's restart, Strava's return prompts.</span></p>
+</div>
+
+<!-- R2 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">02</span><span class="item__name">What is still true</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack">
+    <div class="safe-t"></div>
+    <div class="pad" style="padding-top:26px">
+      <h1 class="h-move" style="font-size:24px">Nothing you built went away.</h1>
+      <div style="height:20px"></div>
+      <div class="keep">
+        <div style="display:flex;justify-content:space-between;padding:9px 0">
+          <span class="t-body">Moves done</span><span class="num" style="font-weight:700">31</span></div>
+        <hr class="rule" style="margin:2px 0">
+        <div style="display:flex;justify-content:space-between;padding:9px 0">
+          <span class="t-body">Paying users</span><span class="num" style="font-weight:700">1</span></div>
+        <hr class="rule" style="margin:2px 0">
+        <div style="display:flex;justify-content:space-between;padding:9px 0">
+          <span class="t-body">Days in</span><span class="num" style="font-weight:700">139</span></div>
+        <hr class="rule" style="margin:2px 0">
+        <div style="display:flex;justify-content:space-between;padding:9px 0">
+          <span class="t-body">Streak</span><span class="num" style="font-weight:700;color:var(--text-lo)">gone</span></div>
+      </div>
+      <p class="t-body" style="margin-top:18px;color:var(--text-hi)">One number reset. The other three did not.</p>
+    </div>
+    <div class="grow"></div>
+    <div class="bot"><button class="btn">Keep going</button></div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note"><b>What it is.</b> A list of exactly what survived the break, including the streak that did not.<br><b class="g">Good.</b> Attacks the real reason people quit after a lapse: believing the whole thing is ruined.<br><b class="b">Bad.</b> It is a screen of numbers at an emotional moment, and showing 'streak: gone' in writing may land as a punishment.<br><span class="sn">Seen in Duolingo's streak repair, Apple Fitness' award history, Strava's totals.</span></p>
+</div>
+
+<!-- R3 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">03</span><span class="item__name">The gap, drawn</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack">
+    <div class="safe-t"></div>
+    <div class="pad" style="padding-top:22px;position:relative">
+      <div class="tspine"></div>
+      <div class="trow"><span class="tnode"></span>
+        <p class="t-cap">Jul 18</p><p style="font-size:15px;font-weight:600;margin-top:2px">Shipped the deletion flow</p></div>
+      <div class="gap" style="padding-left:40px"><span class="gapline"></span>
+        <span class="t-cap" style="white-space:nowrap">six days</span><span class="gapline"></span></div>
+      <div class="trow" style="padding-top:14px"><span class="tnode tnode--off" style="top:17px"></span>
+        <p class="t-cap">Today</p><p style="font-size:19px;font-weight:750;margin-top:3px;line-height:1.3">Pick the thread back up</p></div>
+    </div>
+    <div class="grow"></div>
+    <div class="bot"><button class="btn">Continue</button>
+      <p class="t-cap" style="text-align:center;margin-top:14px">The gap stays in your trail. It is part of it.</p></div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note"><b>What it is.</b> The gap drawn permanently into the timeline, labelled with how long it was.<br><b class="g">Good.</b> Honest instead of forgiving, and it refuses to call it a restart. The version most likely to earn respect.<br><b class="b">Bad.</b> A permanent visible scar. For some people that is motivating and for others it is a reason to delete the app.<br><span class="sn">Seen in GitHub's contribution gaps, Strava's training log, Apple Health's missing days.</span></p>
+</div>
+
+<!-- R4 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">04</span><span class="item__name">Your own last words</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack">
+    <div class="safe-t"></div>
+    <div class="grow" style="display:flex;flex-direction:column;justify-content:center;padding:0 22px">
+      <p class="t-cap">The last thing you wrote, six days ago</p>
+      <p style="font-size:20px;line-height:1.45;font-weight:600;margin:14px 0 0;padding-left:14px;border-left:2px solid rgba(235,238,248,.2)">"I keep building instead of talking to people."</p>
+      <div style="height:30px"></div>
+      <p class="t-body" style="color:var(--text-hi)">Still true?</p>
+    </div>
+    <div class="bot"><button class="btn">Still true</button>
+      <div style="height:9px"></div>
+      <button class="btn btn--ghost">Something changed</button></div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note"><b>What it is.</b> You are met by the last thing you wrote before the break.<br><b class="g">Good.</b> The app says nothing. Your own voice lands harder than any coaching line, and it costs nothing once daily writing exists.<br><b class="b">Bad.</b> Depends completely on there being something written, and the last entry might be bleak enough to push someone further away.<br><span class="sn">Seen in Day One's on-this-day, Apple Photos' memories, Timehop.</span></p>
+</div>
+
+<!-- R5 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">05</span><span class="item__name">The cold card</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack">
+    <div class="safe-t"></div>
+    <div class="grow" style="display:grid;place-items:center">
+      <div>
+        <div class="card dim-card" style="width:268px">
+          <div class="card__liquid"><i class="card__b c1"></i><i class="card__b c2"></i><i class="card__b c3"></i><i class="card__b c4"></i></div>
+          <div class="card__rim" style="box-shadow:inset 0 0 0 1.3px rgba(255,255,255,.4)"></div>
+        </div>
+        <p class="t-body" style="text-align:center;margin-top:24px;color:var(--text-hi)">It went grey on July 20.</p>
+        <p class="t-cap" style="text-align:center;margin-top:8px">One finished day brings the colour back.</p>
+      </div>
+    </div>
+    <div class="bot"><button class="btn">Today's move</button></div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note"><b>What it is.</b> The card went grey while you were away. One finished day brings it back.<br><b class="g">Good.</b> The consequence is visual and already happened, so nothing has to lecture you. Fits the object-first premise perfectly.<br><b class="b">Bad.</b> Needs the card cooling logic built first, and a punished-looking card is a real risk of making returning feel worse.<br><span class="sn">Seen in Finch's pet drooping, Forest's withered trees, Duolingo's cracked flame.</span></p>
+</div>
+
+</div></div>
+<script src="_kit.js"></script>
+</body></html>

@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Memento Mori, 5 ways</title>
+<link rel="stylesheet" href="_shared.css">
+<style>
+.stack { display:flex; flex-direction:column; min-height:844px; }
+.grow { flex:1; }
+.bot { padding:0 20px 14px; }
+/* one row = one year of your life, 52 weeks across */
+.weeks { display:grid; grid-template-columns:repeat(52,1fr); gap:1.5px; }
+.weeks i { aspect-ratio:1; border-radius:1px; background:rgba(var(--ink),.07); }
+.weeks i.spent { background:rgba(var(--ink),.24); }
+.weeks i.now { background:#fff; box-shadow:0 0 6px rgba(255,255,255,.95); }
+.huge { font-size:104px; font-weight:200; letter-spacing:-0.05em; line-height:0.88; font-variant-numeric:tabular-nums; }
+.zoom { display:grid; grid-template-columns:repeat(7,1fr); gap:9px; }
+.zoom i { aspect-ratio:1; border-radius:3px; background:rgba(var(--ink),.09); }
+.zoom i.spent { background:rgba(var(--ink),.3); }
+.zoom i.now { background:#fff; box-shadow:0 0 16px rgba(255,255,255,.75); }
+.trackrow { margin-bottom:22px; }
+.track { height:9px; border-radius:5px; background:rgba(var(--ink),.09); overflow:hidden; }
+.track i { display:block; height:100%; }
+.yr { position:relative; height:10px; border-radius:5px; background:rgba(var(--ink),.09); overflow:hidden; }
+.yr i { position:absolute; top:0; bottom:0; }
+.yrmark { position:absolute; top:-6px; bottom:-6px; width:2px; background:#fff; box-shadow:0 0 10px rgba(255,255,255,.8); }
+</style>
+</head><body>
+<div class="gal">
+<h1>Memento Mori, 5 ways</h1>
+<p class="gal__sub">The time-left surface. It is the most memorable thing in the app and currently the least visited. These treat it as a reason to act today rather than a poster about death.</p>
+<div class="grid">
+
+<!-- M1 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">01</span><span class="item__name">The grid</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack">
+    <div class="safe-t"></div>
+    <div class="pad" style="padding-top:18px">
+      <h2 class="h-sec">4,160 weeks</h2>
+      <p class="t-body" style="margin-top:4px">You have used 1,196.</p>
+      <div style="height:22px"></div>
+      <div class="weeks" id="w1"></div>
+      <p class="t-cap" style="margin-top:16px">The white one is this week.</p>
+    </div>
+    <div class="grow"></div>
+    <div class="bot"><button class="btn btn--ghost">Today's move</button></div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note"><b>What it is.</b> The full 4,160-week life grid, this week marked in white.<br><b class="g">Good.</b> Hits harder than anything else in the app on first view, and it costs almost nothing to build.<br><b class="b">Bad.</b> Loses force by the tenth visit and needs a birth date, which is a heavy thing to ask for in onboarding.<br><span class="sn">Seen in The Life in Weeks chart from Wait But Why, and the life-calendar apps built on it.</span></p>
+</div>
+
+<!-- M2 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">02</span><span class="item__name">One number</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack">
+    <div class="safe-t"></div>
+    <div class="grow" style="display:flex;flex-direction:column;justify-content:center;padding:0 24px">
+      <div class="huge">2,964</div>
+      <p style="font-size:22px;font-weight:550;margin:20px 0 0;letter-spacing:-0.01em">weeks left, roughly</p>
+      <p class="t-body" style="margin-top:18px">You spent one of them on this goal. Eleven days of it counted.</p>
+    </div>
+    <div class="bot"><button class="btn">Today's move</button></div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note"><b>What it is.</b> One figure, no metaphor, tied straight back to the work.<br><b class="g">Good.</b> Survives repeat visits better than the grid because the number moves and the line under it references what you did.<br><b class="b">Bad.</b> A number without a picture is easy to scroll past. It has no moment.<br><span class="sn">Seen in Apple's Screen Time totals, countdown apps, Whoop's recovery score.</span></p>
+</div>
+
+<!-- M3 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">03</span><span class="item__name">This week, zoomed</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack">
+    <div class="safe-t"></div>
+    <div class="pad" style="padding-top:20px">
+      <h2 class="h-sec">Week 1,197</h2>
+      <p class="t-body" style="margin-top:4px">Seven days. Two already gone.</p>
+    </div>
+    <div class="grow" style="display:flex;flex-direction:column;justify-content:center;padding:0 26px">
+      <div class="zoom">
+        <i class="spent"></i><i class="spent"></i><i class="now"></i><i></i><i></i><i></i><i></i>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:12px">
+        <span class="t-cap">Mon</span><span class="t-cap">Sun</span></div>
+      <p class="t-body" style="margin-top:30px;color:var(--text-hi)">Today is the white one. It is the only one you can do anything about.</p>
+    </div>
+    <div class="bot"><button class="btn">Today's move</button></div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note"><b>What it is.</b> Zoomed all the way in: seven squares, today lit.<br><b class="g">Good.</b> A week is a scale you can feel, so it works every single day rather than once. The best default face for the module.<br><b class="b">Bad.</b> Barely reads as Memento Mori. It is closer to a weekly tracker with a philosophical caption.<br><span class="sn">Seen in Apple Watch's weekly activity, Duolingo's week strip, Streaks.</span></p>
+</div>
+
+<!-- M4 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">04</span><span class="item__name">Against the goal</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack">
+    <div class="safe-t"></div>
+    <div class="pad" style="padding-top:20px">
+      <h2 class="h-sec">Two clocks</h2>
+      <div style="height:26px"></div>
+      <div class="trackrow">
+        <div style="display:flex;justify-content:space-between;margin-bottom:9px">
+          <span class="t-body" style="font-size:13.5px">100 paying users</span>
+          <span class="t-cap num">1 / 100</span></div>
+        <div class="track"><i style="width:4%;background:var(--cyan)"></i></div>
+      </div>
+      <div class="trackrow">
+        <div style="display:flex;justify-content:space-between;margin-bottom:9px">
+          <span class="t-body" style="font-size:13.5px">Your life</span>
+          <span class="t-cap num">1,196 / 4,160</span></div>
+        <div class="track"><i style="width:29%;background:rgba(235,238,248,.42)"></i></div>
+      </div>
+      <hr class="rule" style="margin:26px 0">
+      <p class="t-body" style="color:var(--text-hi)">At the pace of the last month, you reach 100 users in about 3 years. That is 156 of the weeks above.</p>
+    </div>
+    <div class="grow"></div>
+    <div class="bot"><button class="btn">Today's move</button></div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note"><b>What it is.</b> Your goal's clock next to your life's clock, with the arithmetic done out loud.<br><b class="g">Good.</b> The only one here that would change behaviour rather than just be felt. The pace calculation is genuinely confronting.<br><b class="b">Bad.</b> Needs a believable pace estimate. A wrong 'three years' is worse than saying nothing, and it can read as discouraging.<br><span class="sn">Seen in Retirement projections, Strava's goal pacing, savings calculators.</span></p>
+</div>
+
+<!-- M5 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">05</span><span class="item__name">The year</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack">
+    <div class="safe-t"></div>
+    <div class="pad" style="padding-top:22px">
+      <h2 class="h-sec">2026 is 56% gone</h2>
+      <p class="t-body" style="margin-top:4px">160 days left.</p>
+      <div style="height:26px"></div>
+      <div class="yr">
+        <i style="left:0;width:56%;background:rgba(235,238,248,.3)"></i>
+        <i style="left:20%;width:36%;background:rgba(63,217,78,.55)"></i>
+        <span class="yrmark" style="left:56%"></span>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:10px">
+        <span class="t-cap">Jan</span><span class="t-cap">Today</span><span class="t-cap">Dec</span></div>
+      <hr class="rule" style="margin:28px 0">
+      <p class="t-body">The green stretch is since you set this goal. You have been at it for 36% of the year.</p>
+    </div>
+    <div class="grow"></div>
+    <div class="bot"><button class="btn">Today's move</button></div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note"><b>What it is.</b> The year as one bar, with the stretch since you set the goal in green.<br><b class="g">Good.</b> A year is a scale people already feel, unlike 4,000 weeks, and it needs no birth date.<br><b class="b">Bad.</b> Resets every January, so it is weakest in December and meaningless on day one.<br><span class="sn">Seen in Year-progress bars, Apple Fitness' yearly rings, Wrapped's timeline.</span></p>
+</div>
+
+</div></div>
+<script>
+var g = document.getElementById('w1');
+if (g) { for (var i=0;i<4160;i++){ var d=document.createElement('i');
+  if (i < 1196) d.className='spent'; if (i===1196) d.className='now'; g.appendChild(d); } }
+</script>
+<script src="_kit.js"></script>
+</body></html>

@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Evidence wall, 15 ways</title>
+<link rel="stylesheet" href="_shared.css">
+<style>
+.ph { background: linear-gradient(150deg, rgba(90,110,130,.4), rgba(30,40,50,.55)); position: relative; overflow: hidden; }
+.ph::after { content:''; position:absolute; inset:0; background: radial-gradient(70% 60% at 30% 25%, rgba(255,255,255,.14), transparent 70%); }
+.ph--a { background: linear-gradient(160deg, rgba(58,217,245,.3), rgba(20,40,52,.6)); }
+.ph--b { background: linear-gradient(140deg, rgba(63,217,78,.26), rgba(18,44,24,.6)); }
+.ph--c { background: linear-gradient(200deg, rgba(128,150,255,.28), rgba(24,26,50,.6)); }
+/* 1 mosaic */
+.mos { display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; }
+.mos > * { border-radius:8px; aspect-ratio:1; }
+.mos .tall { grid-row: span 2; aspect-ratio: 1/2.045; }
+.mos .wide { grid-column: span 2; aspect-ratio: 2.045/1; }
+/* 2 stack */
+.ev { border-radius:var(--r-card); overflow:hidden; margin-bottom:14px; background:rgba(var(--ink),.04); box-shadow:var(--glass-hi); }
+.ev__img { height:190px; }
+.ev__b { padding:14px 16px 16px; }
+/* 3 shelf */
+.shelf { display:flex; gap:9px; overflow-x:auto; padding:0 20px; }
+.shelf::-webkit-scrollbar { height:0; }
+.shelf > div { flex:none; width:118px; }
+.shelf .ph { height:148px; border-radius:9px; }
+/* 4 pair */
+.pair { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.pair .ph { aspect-ratio:3/4; border-radius:10px; }
+/* 5 single */
+.hero .ph { height:420px; border-radius:16px; }
+.empty { border-radius:8px; aspect-ratio:1; background:rgba(var(--ink),.035); display:grid; place-items:center; }
+.empty svg { width:18px; height:18px; stroke:rgba(235,238,248,.22); fill:none; stroke-width:1.8; }
+/* ---- round two ---- */
+.strip { background:rgba(var(--ink),.05); border-radius:6px; padding:9px 8px; }
+.strip__r { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; }
+.strip__r .ph { aspect-ratio:3/2; border-radius:3px; }
+.strip__n { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-top:5px; }
+.strip__n span { font-size:9.5px; color:var(--text-lo); text-align:center; font-variant-numeric:tabular-nums; }
+.word { position:relative; border-radius:10px; overflow:hidden; aspect-ratio:1; display:grid; place-items:end start; }
+.word b { position:relative; z-index:2; padding:11px; font-size:14px; font-weight:700; letter-spacing:-.01em; }
+.word::after { content:''; position:absolute; inset:0; background:linear-gradient(0deg, rgba(0,0,0,.6), transparent 52%); }
+.mapc { position:relative; height:300px; border-radius:12px; overflow:hidden;
+  background:radial-gradient(80% 60% at 30% 30%, rgba(58,217,245,.07), transparent 70%), rgba(var(--ink),.035); }
+.pin { position:absolute; width:38px; height:38px; border-radius:9px; box-shadow:0 0 0 2px rgba(235,238,248,.5), 0 8px 18px rgba(0,0,0,.5); }
+.mrow { display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid var(--hairline); }
+.mrow__t { display:flex; gap:4px; }
+.mrow__t i { width:26px; height:26px; border-radius:5px; display:block; }
+.bleed { position:relative; }
+.bleed .ph { height:230px; border-radius:0; }
+.bleed span { position:absolute; left:16px; bottom:14px; font-size:12.5px; color:rgba(255,255,255,.85);
+  text-shadow:0 1px 8px rgba(0,0,0,.8); }
+.pairm { display:grid; grid-template-columns:96px 1fr; gap:14px; padding:14px 0; border-bottom:1px solid var(--hairline); }
+.pairm .ph { aspect-ratio:1; border-radius:9px; }
+.lockg { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+.lockg > * { aspect-ratio:1; border-radius:9px; }
+.lockg .lk { background:rgba(var(--ink),.03); display:grid; place-items:center; }
+.lockg .lk svg { width:15px; height:15px; stroke:rgba(235,238,248,.2); fill:none; stroke-width:1.9; }
+.rcpt { border-radius:10px; background:rgba(var(--ink),.045); box-shadow:var(--glass-hi); padding:14px; margin-bottom:10px; }
+.rcpt__k { font-size:11px; color:var(--text-lo); }
+.yrow { display:grid; grid-template-columns:34px 1fr; gap:10px; align-items:center; padding:7px 0; }
+.yrow__m { font-size:11.5px; color:var(--text-lo); }
+.yrow__t { display:flex; gap:4px; }
+.yrow__t i { width:24px; height:24px; border-radius:4px; flex:none; }
+</style>
+</head><body>
+<div class="gal">
+<a class="gal__back" href="index.html">&larr; all mockups</a>
+<h1>Evidence wall, 15 ways</h1>
+<p class="gal__sub">Vivere rebuilt as proof of what happened instead of a board of what you want. Prompted after a completed action, never on a schedule. The grey blocks are user photos.</p>
+<div class="grid">
+
+<!-- E1 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">01</span><span class="item__name">Mosaic</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:6px;display:flex;justify-content:space-between;align-items:baseline">
+      <h2 class="h-sec">Evidence</h2><span class="t-cap num">14</span></div>
+    <div class="pad" style="margin-top:16px">
+      <div class="mos">
+        <div class="ph ph--b tall"></div>
+        <div class="ph wide"></div>
+        <div class="ph ph--a"></div>
+        <div class="ph ph--c"></div>
+        <div class="ph"></div>
+        <div class="ph tall"></div>
+        <div class="ph ph--b"></div>
+        <div class="ph ph--a"></div>
+        <div class="ph ph--c"></div>
+        <div class="ph"></div>
+        <div class="ph ph--b"></div>
+        <div class="empty"><svg viewBox="0 0 24 24"><path d="M12 6v12M6 12h12" stroke-linecap="round"/></svg></div>
+      </div>
+      <p class="t-body" style="margin-top:18px">Every one of these came after a day you finished.</p>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note"><b>What it is.</b> A dense photo grid of everything you have captured, no captions.<br><b class="g">Good.</b> Zero words, most satisfying to scroll, and it makes months of work feel physical.<br><b class="b">Bad.</b> Only reads as a wall past ten photos, so month one looks empty and slightly sad.<br><span class="sn">Seen in Instagram's profile grid, Apple Photos' library, BeReal's memories.</span></p>
+</div>
+
+<!-- E2 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">02</span><span class="item__name">Dated stack</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:6px"><h2 class="h-sec">Evidence</h2>
+      <p class="t-body" style="margin-top:4px">14 days you have something to show for.</p></div>
+    <div class="pad" style="margin-top:18px">
+      <div class="ev"><div class="ph ph--b ev__img"></div>
+        <div class="ev__b"><p class="t-cap">Jul 24</p>
+          <p style="font-size:15px;font-weight:600;margin:5px 0 0;line-height:1.4">Three calls done. Marcus said he stayed for the streak.</p></div></div>
+      <div class="ev"><div class="ph ph--a ev__img"></div>
+        <div class="ev__b"><p class="t-cap">Jul 18</p>
+          <p style="font-size:15px;font-weight:600;margin:5px 0 0;line-height:1.4">First payment. A stranger paid for the thing I made.</p></div></div>
+      <div class="ev"><div class="ph ev__img"></div>
+        <div class="ev__b"><p class="t-cap">Jul 12</p>
+          <p style="font-size:15px;font-weight:600;margin:5px 0 0;line-height:1.4">Shipped the card evolution at 2am.</p></div></div>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note"><b>What it is.</b> One photo plus one line in your own words, newest first.<br><b class="g">Good.</b> Works from a single entry on day one and doubles as the proof trail, so one build covers two features.<br><b class="b">Bad.</b> Long lists of big images are slow to scroll and heavy to sync. It is also the most conventional option here.<br><span class="sn">Seen in Day One's entries, BeReal's daily post, Strava's activity photos.</span></p>
+</div>
+
+<!-- E3 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">03</span><span class="item__name">Shelf under the card</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div style="padding-top:14px">
+      <div class="card card--sm" style="width:190px">
+        <div class="card__liquid"><i class="card__b c1"></i><i class="card__b c2"></i><i class="card__b c3"></i><i class="card__b c4"></i></div>
+        <div class="card__rim"></div>
+      </div>
+    </div>
+    <div class="pad" style="margin-top:26px;display:flex;justify-content:space-between;align-items:baseline">
+      <h2 class="h-sec" style="font-size:17px">Evidence</h2><span class="t-cap num">14</span></div>
+    <div class="shelf" style="margin-top:12px">
+      <div><div class="ph ph--b"></div><p class="t-cap" style="margin-top:6px">Jul 24</p></div>
+      <div><div class="ph ph--a"></div><p class="t-cap" style="margin-top:6px">Jul 18</p></div>
+      <div><div class="ph"></div><p class="t-cap" style="margin-top:6px">Jul 12</p></div>
+      <div><div class="ph ph--c"></div><p class="t-cap" style="margin-top:6px">Jul 4</p></div>
+    </div>
+    <div class="pad" style="margin-top:26px">
+      <hr class="rule">
+      <p class="t-body" style="margin-top:14px">Today: talk to three users about why they signed up.</p>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note"><b>What it is.</b> Not its own page. A scrollable strip of proof living under the Memento.<br><b class="g">Good.</b> Adds no new destination at all, which directly answers the worry about adding features for the sake of it.<br><b class="b">Bad.</b> A strip holds four items. It is a reminder that proof exists, not a place to actually browse it.<br><span class="sn">Seen in Apple Music's recently played rail, Netflix rows, iOS photo suggestions.</span></p>
+</div>
+
+<!-- E4 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">04</span><span class="item__name">Then and now</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:6px"><h2 class="h-sec">How far</h2></div>
+    <div class="pad" style="margin-top:18px">
+      <div class="pair">
+        <div><div class="ph"></div><p class="t-cap" style="margin-top:7px">Mar 14</p></div>
+        <div><div class="ph ph--b"></div><p class="t-cap" style="margin-top:7px">Jul 24</p></div>
+      </div>
+      <p class="t-body" style="margin-top:16px;color:var(--text-hi)">The desk on day one, and the desk today.</p>
+      <hr class="rule" style="margin:26px 0">
+      <div class="pair">
+        <div><div class="ph ph--c"></div><p class="t-cap" style="margin-top:7px">Apr 2</p></div>
+        <div><div class="ph ph--a"></div><p class="t-cap" style="margin-top:7px">Jul 18</p></div>
+      </div>
+      <p class="t-body" style="margin-top:16px;color:var(--text-hi)">Zero users, then the first payment screen.</p>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note"><b>What it is.</b> An old photo paired with a recent one, with one line naming the change.<br><b class="g">Good.</b> The most emotionally powerful of the fifteen and the one people actually share.<br><b class="b">Bad.</b> Needs the app to choose pairs intelligently, and it does nothing at all in the first month.<br><span class="sn">Seen in Progress photos in Strong and Hevy, Google Photos' Then and Now.</span></p>
+</div>
+
+<!-- E5 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">05</span><span class="item__name">One at a time</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad hero" style="padding-top:20px">
+      <div class="ph ph--a"></div>
+      <p class="t-cap" style="margin-top:16px">Jul 18, day 5</p>
+      <p style="font-size:19px;font-weight:650;line-height:1.4;margin:8px 0 0">First payment. A stranger paid for the thing I made.</p>
+      <div style="display:flex;gap:6px;margin-top:26px;justify-content:center">
+        <i style="width:6px;height:6px;border-radius:50%;background:rgba(235,238,248,.25)"></i>
+        <i style="width:6px;height:6px;border-radius:50%;background:rgba(235,238,248,.25)"></i>
+        <i style="width:6px;height:6px;border-radius:50%;background:#fff"></i>
+        <i style="width:6px;height:6px;border-radius:50%;background:rgba(235,238,248,.25)"></i>
+        <i style="width:6px;height:6px;border-radius:50%;background:rgba(235,238,248,.25)"></i>
+      </div>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note"><b>What it is.</b> Full-bleed, one piece of proof per screen, swiped through.<br><b class="g">Good.</b> Treats each piece as worth its own moment, and it is the format people screenshot and send to someone.<br><b class="b">Bad.</b> Slow to browse and hopeless for finding anything specific. Fourteen swipes to see fourteen things.<br><span class="sn">Seen in Instagram Stories, BeReal's full-screen view, Apple Memories playback.</span></p>
+</div>
+
+<div class="split"><span class="split__t">The next ten are more out there</span><span class="split__d">Different shapes for the same wall, plus two that change what counts as evidence at all: one word instead of a sentence, and receipts instead of photos.</span></div>
+
+<!-- E6 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">06</span><span class="item__name">Contact sheet</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:16px">
+      <h2 class="h-sec">14 frames</h2>
+      <p class="t-body" style="margin-top:4px">Numbered in the order you took them.</p>
+      <div style="height:20px"></div>
+      <div class="strip" style="margin-bottom:10px">
+        <div class="strip__r"><div class="ph ph--b"></div><div class="ph"></div><div class="ph ph--a"></div><div class="ph ph--c"></div></div>
+        <div class="strip__n"><span>01</span><span>02</span><span>03</span><span>04</span></div>
+      </div>
+      <div class="strip" style="margin-bottom:10px">
+        <div class="strip__r"><div class="ph"></div><div class="ph ph--b"></div><div class="ph ph--c"></div><div class="ph ph--a"></div></div>
+        <div class="strip__n"><span>05</span><span>06</span><span>07</span><span>08</span></div>
+      </div>
+      <div class="strip" style="margin-bottom:10px">
+        <div class="strip__r"><div class="ph ph--a"></div><div class="ph ph--c"></div><div class="ph"></div><div class="ph ph--b"></div></div>
+        <div class="strip__n"><span>09</span><span>10</span><span>11</span><span>12</span></div>
+      </div>
+      <div class="strip">
+        <div class="strip__r"><div class="ph ph--b"></div><div class="ph ph--a"></div>
+          <div class="empty" style="aspect-ratio:3/2;border-radius:3px"><svg viewBox="0 0 24 24"><path d="M12 6v12M6 12h12" stroke-linecap="round"/></svg></div>
+          <div style="aspect-ratio:3/2"></div></div>
+        <div class="strip__n"><span>13</span><span>14</span><span></span><span></span></div>
+      </div>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note"><b>What it is.</b> A film contact sheet: numbered frames in strips.<br><b class="g">Good.</b> Distinctive without inventing anything, and the numbering makes the count feel real. Very dense per screen.<br><b class="b">Bad.</b> The film reference is a style choice that could date, and tiny frames are hard to actually see on a phone.<br><span class="sn">Seen in Darkroom contact sheets, Lightroom's grid, VSCO's library.</span></p>
+</div>
+
+<!-- E7 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">07</span><span class="item__name">One word each</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:16px">
+      <h2 class="h-sec">One word each</h2>
+      <p class="t-body" style="margin-top:4px">Faster than a sentence, still yours.</p>
+      <div style="height:18px"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div class="word" style="background:linear-gradient(150deg,rgba(63,217,78,.3),rgba(18,44,24,.6))"><b>Paid</b></div>
+        <div class="word" style="background:linear-gradient(150deg,rgba(90,110,130,.4),rgba(30,40,50,.55))"><b>Rebuilt</b></div>
+        <div class="word" style="background:linear-gradient(150deg,rgba(58,217,245,.3),rgba(20,40,52,.6))"><b>Shipped</b></div>
+        <div class="word" style="background:linear-gradient(150deg,rgba(128,150,255,.28),rgba(24,26,50,.6))"><b>Answered</b></div>
+        <div class="word" style="background:linear-gradient(150deg,rgba(90,110,130,.3),rgba(30,40,50,.55))"><b>Quiet</b></div>
+        <div class="word" style="background:linear-gradient(150deg,rgba(63,217,78,.22),rgba(18,44,24,.6))"><b>Called</b></div>
+      </div>
+      <p class="t-cap" style="margin-top:16px">Tap any one to read the whole day.</p>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note"><b>What it is.</b> Every photo captioned with a single word.<br><b class="g">Good.</b> Far lower friction than a sentence and the wall becomes readable at a glance. One word is still yours.<br><b class="b">Bad.</b> One word carries almost no information in a year. You will not remember what 'quiet' meant.<br><span class="sn">Seen in One-word journaling apps, Apple Photos' auto-titles, mood trackers.</span></p>
+</div>
+
+<!-- E8 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">08</span><span class="item__name">Where it happened</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:16px">
+      <h2 class="h-sec">Where the work happened</h2>
+      <div style="height:18px"></div>
+      <div class="mapc">
+        <div class="pin ph--b" style="left:22%;top:28%"></div>
+        <div class="pin ph" style="left:58%;top:20%"></div>
+        <div class="pin ph--a" style="left:38%;top:52%;width:52px;height:52px"></div>
+        <div class="pin ph--c" style="left:70%;top:62%"></div>
+        <div class="pin ph" style="left:16%;top:70%"></div>
+      </div>
+      <hr class="rule" style="margin:20px 0">
+      <div style="display:flex;justify-content:space-between;padding:7px 0">
+        <span class="t-body" style="font-size:14px">Your desk</span><span class="t-cap num">9</span></div>
+      <div style="display:flex;justify-content:space-between;padding:7px 0">
+        <span class="t-body" style="font-size:14px">The library</span><span class="t-cap num">3</span></div>
+      <div style="display:flex;justify-content:space-between;padding:7px 0">
+        <span class="t-body" style="font-size:14px">Elsewhere</span><span class="t-cap num">2</span></div>
+      <p class="t-cap" style="margin-top:14px">Nine of fourteen came from the same chair.</p>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note"><b>What it is.</b> Your proof pinned to where it happened.<br><b class="g">Good.</b> Turns the wall into a map of your life, and the 'nine of fourteen from the same chair' line is a genuinely interesting read.<br><b class="b">Bad.</b> Needs location permission, which is a real trust cost, and most people's answer is boring: their desk.<br><span class="sn">Seen in Apple Photos' Places, Strava's heatmaps, Google Timeline.</span></p>
+</div>
+
+<!-- E9 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">09</span><span class="item__name">By month</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:16px">
+      <h2 class="h-sec">Evidence</h2>
+      <p class="t-body" style="margin-top:4px">Four months, fourteen pieces.</p>
+      <div style="height:14px"></div>
+      <div class="mrow">
+        <span class="t-cap" style="width:40px">Jul</span>
+        <div class="mrow__t">
+          <i class="ph ph--b"></i><i class="ph"></i><i class="ph ph--a"></i><i class="ph ph--c"></i>
+          <i class="ph ph--b"></i><i class="ph"></i></div>
+        <span class="t-cap num" style="margin-left:auto">6</span></div>
+      <div class="mrow">
+        <span class="t-cap" style="width:40px">Jun</span>
+        <div class="mrow__t"><i class="ph ph--a"></i><i class="ph ph--c"></i><i class="ph"></i><i class="ph ph--b"></i></div>
+        <span class="t-cap num" style="margin-left:auto">4</span></div>
+      <div class="mrow">
+        <span class="t-cap" style="width:40px">May</span>
+        <div class="mrow__t"><i class="ph"></i></div>
+        <span class="t-cap num" style="margin-left:auto">1</span></div>
+      <div class="mrow" style="border:0">
+        <span class="t-cap" style="width:40px">Apr</span>
+        <div class="mrow__t"><i class="ph ph--c"></i><i class="ph"></i><i class="ph ph--b"></i></div>
+        <span class="t-cap num" style="margin-left:auto">3</span></div>
+      <hr class="rule" style="margin:18px 0">
+      <p class="t-body">May has one. That was the month you nearly stopped.</p>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note"><b>What it is.</b> Proof grouped by month with a count per row.<br><b class="g">Good.</b> Compact, honest, and the empty months tell the truth without any commentary. Scales to years.<br><b class="b">Bad.</b> Thumbnails are too small to enjoy, so it is a directory rather than a wall.<br><span class="sn">Seen in Apple Photos' Years view, Google Photos' month headers.</span></p>
+</div>
+
+<!-- E10 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">10</span><span class="item__name">Edge to edge</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:12px;padding-bottom:14px">
+      <h2 class="h-sec" style="font-size:17px">14 pieces of proof</h2></div>
+    <div class="bleed"><div class="ph ph--b"></div><span>Jul 24 &middot; Three calls done</span></div>
+    <div class="bleed"><div class="ph ph--a"></div><span>Jul 18 &middot; First payment</span></div>
+    <div class="bleed"><div class="ph"></div><span>Jul 12 &middot; Card evolution shipped</span></div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note"><b>What it is.</b> Edge-to-edge photos stacked with no gaps, dates overlaid.<br><b class="g">Good.</b> The most cinematic option and the closest to Memento's dark, full-bleed feel elsewhere in the app.<br><b class="b">Bad.</b> One photo per screen of scroll makes it a long journey, and text on unpredictable user photos is a contrast risk.<br><span class="sn">Seen in Unsplash's feed, Apple TV's rows, full-bleed editorial sites.</span></p>
+</div>
+
+<!-- E11 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">11</span><span class="item__name">Proof and the move</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:16px">
+      <h2 class="h-sec">What each one proves</h2>
+      <div style="height:12px"></div>
+      <div class="pairm">
+        <div class="ph ph--b"></div>
+        <div><p class="t-cap">Jul 24</p>
+          <p style="font-size:14.5px;font-weight:650;margin:4px 0 0;line-height:1.35">Talk to three users about why they signed up</p>
+          <p class="t-cap" style="margin-top:6px;color:var(--green)">Done in 52 minutes</p></div></div>
+      <div class="pairm">
+        <div class="ph ph--a"></div>
+        <div><p class="t-cap">Jul 18</p>
+          <p style="font-size:14.5px;font-weight:650;margin:4px 0 0;line-height:1.35">Put the payment link somewhere people would find it</p>
+          <p class="t-cap" style="margin-top:6px;color:var(--green)">Done in 1h11</p></div></div>
+      <div class="pairm" style="border:0">
+        <div class="ph ph--c"></div>
+        <div><p class="t-cap">Jul 12</p>
+          <p style="font-size:14.5px;font-weight:650;margin:4px 0 0;line-height:1.35">Make the card actually change when someone finishes a day</p>
+          <p class="t-cap" style="margin-top:6px;color:var(--green)">Done in 2h04</p></div></div>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note"><b>What it is.</b> Each photo shown next to the exact move it came from, and how long it took.<br><b class="g">Good.</b> The only variant where the proof proves something specific. It ties evidence directly to Action, which no other one does.<br><b class="b">Bad.</b> Requires evidence to always be captured against a move, so anything photographed casually has no home.<br><span class="sn">Seen in Strava's activity photos, GitHub PRs linked to issues, Linear attachments.</span></p>
+</div>
+
+<!-- E12 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">12</span><span class="item__name">Slots you unlock</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:16px">
+      <h2 class="h-sec">14 of 30</h2>
+      <p class="t-body" style="margin-top:4px">A slot opens every day you finish.</p>
+      <div style="height:18px"></div>
+      <div class="lockg">
+        <div class="ph ph--b"></div><div class="ph"></div><div class="ph ph--a"></div>
+        <div class="ph ph--c"></div><div class="ph"></div><div class="ph ph--b"></div>
+        <div class="ph ph--a"></div><div class="ph"></div><div class="ph ph--c"></div>
+        <div class="empty" style="border-radius:9px"><svg viewBox="0 0 24 24"><path d="M12 6v12M6 12h12" stroke-linecap="round"/></svg></div>
+        <div class="lk"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8.5 11V8a3.5 3.5 0 0 1 7 0v3"/></svg></div>
+        <div class="lk"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8.5 11V8a3.5 3.5 0 0 1 7 0v3"/></svg></div>
+      </div>
+      <hr class="rule" style="margin:20px 0">
+      <p class="t-body">The last row opens at day 30. Nothing you can buy fills those.</p>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note"><b>What it is.</b> A grid where future slots are visibly locked and open as you finish days.<br><b class="g">Good.</b> Creates real anticipation, and the empty slots are a goal in themselves. Nothing you can buy fills them.<br><b class="b">Bad.</b> Gamified in a way Memento mostly avoids, and locked boxes can feel like a nag rather than an invitation.<br><span class="sn">Seen in Apple Fitness awards, Duolingo's chest, collectible album pages.</span></p>
+</div>
+
+<!-- E13 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">13</span><span class="item__name">Receipts, not photos</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:16px">
+      <h2 class="h-sec">Receipts</h2>
+      <p class="t-body" style="margin-top:4px">Screenshots of things that actually happened.</p>
+      <div style="height:18px"></div>
+      <div class="rcpt">
+        <p class="rcpt__k">Jul 18 &middot; payment</p>
+        <p style="font-size:16px;font-weight:700;margin:6px 0 0;font-variant-numeric:tabular-nums">$29.00 from a stranger</p>
+        <p class="t-cap" style="margin-top:5px">First one. Six weeks after you nearly quit.</p></div>
+      <div class="rcpt">
+        <p class="rcpt__k">Jul 24 &middot; message</p>
+        <p style="font-size:15px;line-height:1.45;margin:6px 0 0">"I came for the card but I stayed for the streak."</p>
+        <p class="t-cap" style="margin-top:5px">Marcus</p></div>
+      <div class="rcpt" style="margin-bottom:0">
+        <p class="rcpt__k">Jul 23 &middot; shipped</p>
+        <p style="font-size:15px;font-weight:650;margin:6px 0 0">Account deletion flow, live</p>
+        <p class="t-cap" style="margin-top:5px">41 minutes</p></div>
+      <p class="t-cap" style="margin-top:18px">Paste anything. It gets dated and kept.</p>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note"><b>What it is.</b> Screenshots and artifacts instead of photos: payments, messages, shipped things.<br><b class="g">Good.</b> Solves the real problem, which is that most days produce no photograph. A payment screenshot is stronger proof than a desk picture.<br><b class="b">Bad.</b> Screenshots are visually ugly and inconsistent, so the wall will never look as good as one made of photos.<br><span class="sn">Seen in Stripe dashboards, testimonial walls, Twitter screenshot culture.</span></p>
+</div>
+
+<!-- E14 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">14</span><span class="item__name">The year sheet</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:16px">
+      <h2 class="h-sec">2026</h2>
+      <p class="t-body" style="margin-top:4px">Every month, whatever you had.</p>
+      <div style="height:16px"></div>
+      <div class="yrow"><span class="yrow__m">JAN</span><div class="yrow__t"></div></div>
+      <div class="yrow"><span class="yrow__m">FEB</span><div class="yrow__t"></div></div>
+      <div class="yrow"><span class="yrow__m">MAR</span><div class="yrow__t"><i class="ph"></i></div></div>
+      <div class="yrow"><span class="yrow__m">APR</span><div class="yrow__t"><i class="ph ph--c"></i><i class="ph"></i><i class="ph ph--b"></i></div></div>
+      <div class="yrow"><span class="yrow__m">MAY</span><div class="yrow__t"><i class="ph"></i></div></div>
+      <div class="yrow"><span class="yrow__m">JUN</span><div class="yrow__t"><i class="ph ph--a"></i><i class="ph ph--c"></i><i class="ph"></i><i class="ph ph--b"></i></div></div>
+      <div class="yrow"><span class="yrow__m" style="color:var(--text-hi)">JUL</span><div class="yrow__t"><i class="ph ph--b"></i><i class="ph"></i><i class="ph ph--a"></i><i class="ph ph--c"></i><i class="ph ph--b"></i></div></div>
+      <div class="yrow"><span class="yrow__m">AUG</span><div class="yrow__t"></div></div>
+      <div class="yrow"><span class="yrow__m">SEP</span><div class="yrow__t"></div></div>
+      <div class="yrow"><span class="yrow__m">OCT</span><div class="yrow__t"></div></div>
+      <div class="yrow"><span class="yrow__m">NOV</span><div class="yrow__t"></div></div>
+      <div class="yrow"><span class="yrow__m">DEC</span><div class="yrow__t"></div></div>
+      <hr class="rule" style="margin:16px 0">
+      <p class="t-body">The empty rows are the point. You started in March.</p>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note"><b>What it is.</b> Twelve rows, one per month of the year, with whatever you had.<br><b class="g">Good.</b> The empty rows do the work. Seeing January to February blank makes the months you did show up count for more.<br><b class="b">Bad.</b> Only interesting once a year is partly filled. In March it is one row and eleven blanks.<br><span class="sn">Seen in Year-in-review layouts, Apple Photos' Years, GitHub's yearly graph.</span></p>
+</div>
+
+<!-- E15 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">15</span><span class="item__name">Latest, then the rest</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+    <div class="pad" style="padding-top:14px">
+      <div class="ph ph--b" style="height:330px;border-radius:14px"></div>
+      <p class="t-cap" style="margin-top:14px">Yesterday</p>
+      <p style="font-size:18px;font-weight:650;line-height:1.4;margin:6px 0 0">Three calls done. Marcus said he stayed for the streak.</p>
+      <hr class="rule" style="margin:22px 0">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px">
+        <span class="t-cap">Before that</span><span class="t-cap num">13</span></div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">
+        <div class="ph ph--a" style="aspect-ratio:1;border-radius:7px"></div>
+        <div class="ph" style="aspect-ratio:1;border-radius:7px"></div>
+        <div class="ph ph--c" style="aspect-ratio:1;border-radius:7px"></div>
+        <div class="ph ph--b" style="aspect-ratio:1;border-radius:7px"></div>
+        <div class="ph" style="aspect-ratio:1;border-radius:7px"></div>
+      </div>
+    </div>
+  <div class="safe-b"></div></div></div>
+  <p class="item__note"><b>What it is.</b> The newest piece large, everything before it as a small strip.<br><b class="g">Good.</b> Gives the most recent thing the weight it deserves while keeping history one glance away. Good on day two and day two hundred.<br><b class="b">Bad.</b> The strip is a summary, not a browser, so it needs a full wall behind it anyway.<br><span class="sn">Seen in Apple Photos' For You, Spotify's recently played, Instagram's featured post.</span></p>
+</div>
+
+</div></div>
+<script src="_kit.js"></script>
+</body></html>

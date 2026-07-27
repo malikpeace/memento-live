@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Close the day, 5 ways</title>
+<link rel="stylesheet" href="_shared.css">
+<style>
+.stack { display:flex; flex-direction:column; min-height:844px; }
+.grow { flex:1; }
+.bot { padding:0 20px 14px; }
+.stamp { position:absolute; z-index:3; right:20px; bottom:20px; text-align:right; }
+.stamp__d { font-size:15px; font-weight:800; letter-spacing:.04em; color:rgba(10,16,18,.72); }
+.tick { display:flex; align-items:baseline; gap:12px; }
+.tick__o { font-size:44px; font-weight:200; letter-spacing:-0.03em; color:var(--text-lo); text-decoration:line-through; }
+.tick__n { font-size:56px; font-weight:750; letter-spacing:-0.03em; color:var(--green); }
+.write { border-radius:var(--r-card); background:rgba(var(--ink),.04); box-shadow:var(--glass-hi); padding:16px; min-height:104px; }
+.dayrow { display:grid; grid-template-columns:52px 1fr 20px; gap:10px; padding:10px 0; border-bottom:1px solid var(--hairline); font-size:13.5px; align-items:center; }
+.new { background:rgba(63,217,78,.09); border-radius:7px; padding:10px 8px; margin:0 -8px; }
+.opt { display:flex; align-items:center; gap:12px; padding:17px 16px; border-radius:var(--r-ctrl); background:rgba(var(--ink),.05); box-shadow:var(--glass-hi); font-size:16px; font-weight:650; }
+.opt svg { width:18px; height:18px; fill:none; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; flex:none; }
+</style>
+</head><body>
+<div class="gal">
+<h1>Close the day, 5 ways</h1>
+<p class="gal__sub">The moment at night when the day gets written down. Right now marking a move done is a button press and then nothing. This is the surface that turns a press into a record.</p>
+<div class="grid">
+
+<!-- C1 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">01</span><span class="item__name">Two taps</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack">
+    <div class="safe-t"></div>
+    <div class="grow" style="display:flex;flex-direction:column;justify-content:center;padding:0 22px">
+      <p class="t-cap">Friday, 9:40pm</p>
+      <h1 class="h-move" style="font-size:27px;margin-top:10px">Did you talk to three users?</h1>
+    </div>
+    <div class="bot">
+      <div class="opt" style="background:#fff;color:#0b1112;justify-content:center">
+        <svg viewBox="0 0 24 24" stroke="#0b1112"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Yes</div>
+      <div style="height:9px"></div>
+      <div class="opt" style="justify-content:center;color:var(--text-mid)">Not today</div>
+    </div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note"><b>What it is.</b> One question and two buttons at the end of the day.<br><b class="g">Good.</b> Ten seconds, no typing, works when you are half asleep. It turns a button press into a ritual for almost no build cost.<br><b class="b">Bad.</b> Captures nothing except yes or no, so it feeds none of the proof or evidence surfaces.<br><span class="sn">Seen in Streaks' check-off, Apple's close-your-rings, Habitica's dailies.</span></p>
+</div>
+
+<!-- C2 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">02</span><span class="item__name">The stamp</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack">
+    <div class="safe-t"></div>
+    <div class="grow" style="display:grid;place-items:center">
+      <div>
+        <div class="card" style="width:274px">
+          <div class="card__liquid"><i class="card__b c1"></i><i class="card__b c2"></i><i class="card__b c3"></i><i class="card__b c4"></i></div>
+          <div class="card__rim"></div>
+          <div class="stamp"><div class="stamp__d">JUL 24</div>
+            <div style="font-size:11.5px;color:rgba(10,16,18,.5);font-weight:650;margin-top:2px">DAY 11</div></div>
+        </div>
+        <p class="t-body" style="text-align:center;margin-top:22px;color:var(--text-hi)">Today is on it now.</p>
+      </div>
+    </div>
+    <div class="bot"><button class="btn">Close the day</button></div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note"><b>What it is.</b> Closing the day stamps the date onto the Memento card.<br><b class="g">Good.</b> The object carries the date of the last day you finished, so a stale card is visible proof you stopped. No words at all.<br><b class="b">Bad.</b> One more thing drawn on the card, which is already carrying a lot. Easy to make it look cluttered.<br><span class="sn">Seen in Passport stamps, Apple Watch monthly badges, Duolingo's chest.</span></p>
+</div>
+
+<!-- C3 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">03</span><span class="item__name">One line</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack">
+    <div class="safe-t"></div>
+    <div class="pad" style="padding-top:14px"><p class="t-cap">Day 11 done</p></div>
+    <div class="grow" style="display:flex;flex-direction:column;justify-content:center;padding:0 20px">
+      <h1 class="h-move" style="font-size:25px">What actually happened?</h1>
+      <div style="height:14px"></div>
+      <div class="write">
+        <p style="font-size:15.5px;line-height:1.5;color:var(--text-hi)">Marcus said he came for the card and stayed for the streak. Priya never replied.</p>
+      </div>
+      <p class="t-cap" style="margin-top:11px">One sentence. This is what you will read back in a year.</p>
+    </div>
+    <div class="bot"><button class="btn">Save</button>
+      <div style="height:9px"></div>
+      <button class="btn btn--ghost">Skip tonight</button></div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note"><b>What it is.</b> Mark it done, then write one sentence about what actually happened.<br><b class="g">Good.</b> Produces the only asset the app cannot regenerate. Every proof-trail and evidence variant gets better if this exists.<br><b class="b">Bad.</b> Asks for typing at the worst time of day. Skip it twice and the habit is gone.<br><span class="sn">Seen in Day One's daily prompt, Sunsama's shutdown, BeReal's caption.</span></p>
+</div>
+
+<!-- C4 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">04</span><span class="item__name">Written into the record</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack">
+    <div class="safe-t"></div>
+    <div class="pad" style="padding-top:22px">
+      <div class="tick"><span class="tick__o num">11</span><span class="tick__n num">12</span></div>
+      <p class="t-body" style="margin-top:6px">days in a row</p>
+      <div style="height:28px"></div>
+      <div class="dayrow new"><span class="num" style="color:var(--text-hi)">Jul 24</span>
+        <span style="color:var(--text-hi)">Talked to three users</span>
+        <span style="color:var(--green);font-weight:700">&check;</span></div>
+      <div class="dayrow"><span class="num" style="color:var(--text-lo)">Jul 23</span>
+        <span style="color:var(--text-mid)">Shipped deletion flow</span><span style="color:var(--text-lo)">&check;</span></div>
+      <div class="dayrow"><span class="num" style="color:var(--text-lo)">Jul 22</span>
+        <span style="color:var(--text-mid)">Fixed the paywall copy</span><span style="color:var(--text-lo)">&check;</span></div>
+      <div class="dayrow" style="border:0"><span class="num" style="color:var(--text-lo)">Jul 21</span>
+        <span style="color:var(--text-mid)">Rewrote onboarding</span><span style="color:var(--text-lo)">&check;</span></div>
+    </div>
+    <div class="grow"></div>
+    <div class="bot"><button class="btn">Done</button></div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note"><b>What it is.</b> You watch the streak tick up and today's row get written above the old ones.<br><b class="g">Good.</b> The reward is seeing the ledger grow rather than being congratulated, which ages far better.<br><b class="b">Bad.</b> Pure animation with no capture. Once you have seen it three times it is just a delay before you close the app.<br><span class="sn">Seen in Duolingo's XP counter, Apple's ring animation, GitHub's square filling.</span></p>
+</div>
+
+<!-- C5 -->
+<div class="item">
+  <div class="item__label"><span class="item__n">05</span><span class="item__name">Tomorrow, already set</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack">
+    <div class="safe-t"></div>
+    <div class="pad" style="padding-top:20px">
+      <p class="t-cap">Today</p>
+      <p style="font-size:17px;font-weight:650;line-height:1.35;margin:7px 0 0;color:var(--text-lo);text-decoration:line-through">Talk to three users about why they signed up</p>
+      <hr class="rule" style="margin:26px 0">
+      <p class="t-cap">Tomorrow</p>
+      <p style="font-size:23px;font-weight:750;letter-spacing:-0.015em;line-height:1.28;margin:8px 0 0">Write down the one sentence all three of them said</p>
+      <p class="t-body" style="margin-top:12px">Because Marcus and the Tuesday signup used almost the same words.</p>
+    </div>
+    <div class="grow"></div>
+    <div class="bot">
+      <button class="btn">Lock it in</button>
+      <div style="height:9px"></div>
+      <button class="btn btn--ghost">Give me a different one</button>
+    </div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note"><b>What it is.</b> Closing today shows you tomorrow's move, already chosen.<br><b class="g">Good.</b> The cheapest possible fix for day-two drop-off. The day never ends on an empty screen.<br><b class="b">Bad.</b> Committing to tomorrow at 11pm is when people are worst at judging what they can do.<br><span class="sn">Seen in Sunsama's next-day planning, Things' Upcoming, Todoist.</span></p>
+</div>
+
+</div></div>
+<script src="_kit.js"></script>
+</body></html>
