@@ -59,6 +59,20 @@
 .pill--off { background:rgba(var(--ink),.07); color:var(--text-hi); }
 .pill--go { background:var(--green); color:#04140a; }
 
+/* morning number carousel */
+.numrow { display:flex; align-items:center; justify-content:center; gap:26px; }
+.numbig { font-size:164px; font-weight:750; letter-spacing:-.055em; line-height:.9; font-variant-numeric:tabular-nums; }
+.numside { font-size:44px; font-weight:300; letter-spacing:-.02em; color:var(--text-lo); opacity:.55;
+  font-variant-numeric:tabular-nums; }
+.numlab { text-align:center; margin-top:14px; }
+
+/* evidence: the wall (mosaic) */
+.mx { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+.mx > * { border-radius:9px; aspect-ratio:1; min-width:0; }
+.mx .tall { grid-row:span 2; aspect-ratio:1/2.05; }
+.addt { background:rgba(var(--ink),.035); display:grid; place-items:center; }
+.addt svg { width:18px; height:18px; stroke:rgba(235,238,248,.24); fill:none; stroke-width:1.8; stroke-linecap:round; }
+
 /* evidence: the ocean */
 .orow { display:flex; justify-content:center; gap:9px; }
 .orow + .orow { margin-top:10px; }
@@ -111,7 +125,7 @@
 </head><body>
 <div class="gal">
 <h1>The loop, in sequence</h1>
-<p class="gal__sub">One flow, eight frames. The Action page, the size scale, completion, the day so far, the morning open in its two beats, then Evidence as two pages: the ocean you drift through, and the ledger that adds it all up.</p>
+<p class="gal__sub">One flow, eight frames. The Action page, the size scale, completion, the day so far, the morning open in its two beats, then Evidence as two pages: the wall and the ledger.</p>
 <div class="grid">
 
 <!-- 01 -->
@@ -238,18 +252,21 @@
   <div class="item__label"><span class="item__n">05</span><span class="item__name">The morning open, first beat</span></div>
   <div class="phone"><div class="phone__scroll"><div class="stack">
     <div class="safe-t"></div>
-    <div class="grow" style="display:flex;flex-direction:column;justify-content:center;padding:0 24px">
-      <p class="t-cap">Yesterday</p>
-      <div style="height:6px"></div>
-      <div class="giant">11</div>
-      <div style="height:26px"></div>
+    <div class="grow" style="display:flex;flex-direction:column;justify-content:center;padding:0 20px">
+      <div class="numrow">
+        <span class="numside">10</span>
+        <span class="numbig">11</span>
+        <span class="numside">12</span>
+      </div>
+      <p class="t-cap numlab">Yesterday</p>
+      <div style="height:30px"></div>
       <div class="rrow"><span class="rrow__tick">&check;</span><span class="rrow__t">Talked to three users</span></div>
       <div class="rrow"><span class="rrow__tick">&check;</span><span class="rrow__t">Four hours of deep work</span></div>
       <div class="rrow"><span class="rrow__tick">&check;</span><span class="rrow__t">Wrote down the sentence they all said</span></div>
     </div>
     <div class="safe-b"></div>
   </div></div></div>
-  <p class="item__note">First open of a new day starts on yesterday: the day you finished, enormous, with what it held. It sits for a beat, then the eleven slides up and takes the slash. Tap skips the wait.</p>
+  <p class="item__note">First open of a new day starts on yesterday: eleven huge in the centre, ten and twelve small and dim beside it, the label centred underneath, and what the day held below. It sits for a beat, then the whole line rotates left.</p>
 </div>
 
 <!-- 06 -->
@@ -257,12 +274,14 @@
   <div class="item__label"><span class="item__n">06</span><span class="item__name">The morning open, second beat</span></div>
   <div class="phone"><div class="phone__scroll"><div class="stack">
     <div class="safe-t"></div>
-    <div class="grow" style="display:flex;flex-direction:column;justify-content:center;padding:0 24px">
-      <span class="gsm">11<span class="slash"></span></span>
-      <div class="giant">12</div>
-      <div style="height:26px"></div>
-      <p class="t-cap">Today</p>
-      <div style="height:4px"></div>
+    <div class="grow" style="display:flex;flex-direction:column;justify-content:center;padding:0 20px">
+      <div class="numrow">
+        <span class="numside">11</span>
+        <span class="numbig">12</span>
+        <span class="numside">13</span>
+      </div>
+      <p class="t-cap numlab">Today</p>
+      <div style="height:30px"></div>
       <div class="rrow"><span class="openbox"></span><span class="rrow__t">Write down the one sentence all three of them said</span></div>
       <div class="rrow"><span class="openbox"></span><span class="rrow__t">Four hours of deep work</span></div>
     </div>
@@ -271,49 +290,33 @@
     </div>
     <div class="safe-b"></div>
   </div></div></div>
-  <p class="item__note">The eleven shrinks to the top and takes a diagonal red strike, twelve arrives huge, and the list flips from what happened to what is next: the action locked last night plus the cadence action, re-armed. Start today drops you onto the Action page.</p>
+  <p class="item__note">The line rotates: eleven slides left and dims, twelve lands in the centre, thirteen appears on the right, the label flips to Today, and the list flips to what is next: the action locked last night plus the cadence action, re-armed. Every day, the same rotation, one number to the left.</p>
 </div>
 
 <!-- 07 -->
 <div class="item">
-  <div class="item__label"><span class="item__n">07</span><span class="item__name">Evidence, the ocean</span></div>
+  <div class="item__label"><span class="item__n">07</span><span class="item__name">Evidence, the wall</span></div>
   <div class="phone"><div class="phone__scroll"><div class="stack">
     <div class="safe-t"></div>
     <div class="pad eh" style="padding-top:14px">
       <h2 class="h-sec" style="font-size:24px">Evidence</h2><span class="t-cap num">14</span></div>
-    <div class="grow" style="display:flex;flex-direction:column;justify-content:center;overflow:hidden">
-      <div class="orow" style="transform:scale(.68);opacity:.45">
-        <div class="oc" style="background:linear-gradient(150deg,rgba(90,110,130,.35),rgba(30,40,50,.55))"></div>
-        <div class="oc" style="background:linear-gradient(200deg,rgba(128,150,255,.24),rgba(24,26,50,.6))"></div>
-        <div class="oc" style="background:linear-gradient(160deg,rgba(58,217,245,.22),rgba(20,40,52,.6))"></div>
-        <div class="oc" style="background:linear-gradient(150deg,rgba(63,217,78,.2),rgba(18,44,24,.6))"></div>
-      </div>
-      <div class="orow" style="transform:scale(.85);opacity:.72;margin-top:-2px">
-        <div class="oc" style="background:linear-gradient(150deg,rgba(63,217,78,.24),rgba(18,44,24,.6))"></div>
-        <div class="oc oc--q"><p>"I am tired but I do not want to stop."</p></div>
-        <div class="oc" style="background:linear-gradient(150deg,rgba(90,110,130,.4),rgba(30,40,50,.55))"></div>
-      </div>
-      <div class="orow" style="margin-top:0">
-        <div class="oc" style="background:linear-gradient(160deg,rgba(58,217,245,.3),rgba(20,40,52,.6))"></div>
-        <div class="oc" style="width:112px;height:112px;background:linear-gradient(150deg,rgba(63,217,78,.3),rgba(18,44,24,.62))"></div>
-        <div class="oc oc--q"><p><b>$29</b><br>first payment</p></div>
-      </div>
-      <div class="orow" style="transform:scale(.85);opacity:.72;margin-top:-2px">
-        <div class="oc oc--q"><p>"Marcus stayed for the streak."</p></div>
-        <div class="oc" style="background:linear-gradient(200deg,rgba(128,150,255,.28),rgba(24,26,50,.6))"></div>
-        <div class="oc" style="background:linear-gradient(150deg,rgba(90,110,130,.35),rgba(30,40,50,.55))"></div>
-      </div>
-      <div class="orow" style="transform:scale(.68);opacity:.45;margin-top:-2px">
-        <div class="oc" style="background:linear-gradient(150deg,rgba(63,217,78,.2),rgba(18,44,24,.6))"></div>
-        <div class="oc" style="background:linear-gradient(160deg,rgba(58,217,245,.22),rgba(20,40,52,.6))"></div>
-        <div class="oc" style="background:linear-gradient(150deg,rgba(90,110,130,.3),rgba(30,40,50,.55))"></div>
-        <div class="oc" style="background:linear-gradient(200deg,rgba(128,150,255,.22),rgba(24,26,50,.6))"></div>
+    <div class="pad" style="margin-top:14px">
+      <div class="mx">
+        <div class="mph tall" style="background:linear-gradient(150deg,rgba(63,217,78,.28),rgba(18,44,24,.62))"></div>
+        <div class="tq"><p>"A stranger paid for the thing I made."</p><span class="d">Jul 18</span></div>
+        <div class="mph" style="background:linear-gradient(160deg,rgba(58,217,245,.3),rgba(20,40,52,.6))"></div>
+        <div class="tq tq--r"><p><b>$29.00</b>First payment</p><span class="d">Jul 18</span></div>
+        <div class="mph" style="background:linear-gradient(150deg,rgba(90,110,130,.4),rgba(30,40,50,.55))"></div>
+        <div class="mph" style="background:linear-gradient(200deg,rgba(128,150,255,.28),rgba(24,26,50,.6))"></div>
+        <div class="tq"><p>"Marcus stayed for the streak, not the card."</p><span class="d">Jul 24</span></div>
+        <div class="addt"><svg viewBox="0 0 24 24"><path d="M12 6v12M6 12h12"/></svg></div>
       </div>
     </div>
+    <div class="grow"></div>
     <div class="bot"><p class="t-cap" style="text-align:center;padding-bottom:8px">The ledger &rarr;</p></div>
     <div class="safe-b"></div>
   </div></div></div>
-  <p class="item__note">Page one of two: the ocean. Every piece as a floating tile, photos, your own lines, receipts, packed like the watch honeycomb with the edges falling away, and it drifts as you drag. Tap anything to open its day. No layout to read, just an amount of proof you can feel.</p>
+  <p class="item__note">Page one of two: the wall. The clean mosaic holding mixed pieces, photos, your own lines, receipts, with the add tile always last so putting something in is one tap. Grows downward forever as evidence stacks up.</p>
 </div>
 
 <!-- 08 -->
