@@ -57,6 +57,24 @@
 .pill { flex:1; padding:12px; border-radius:10px; text-align:center; font-size:13.5px; font-weight:700; }
 .pill--on { background:#fff; color:#0b1112; }
 .pill--off { background:rgba(var(--ink),.07); color:var(--text-hi); }
+.pill--go { background:var(--green); color:#04140a; }
+
+/* evidence: the ocean */
+.orow { display:flex; justify-content:center; gap:9px; }
+.orow + .orow { margin-top:10px; }
+.oc { width:88px; height:88px; border-radius:50%; flex:none; position:relative; overflow:hidden; }
+.oc::after { content:''; position:absolute; inset:0; border-radius:50%;
+  background:radial-gradient(60% 50% at 32% 26%, rgba(255,255,255,.16), transparent 70%); }
+.oc--q { background:rgba(var(--ink),.06); box-shadow:var(--glass-hi), inset 0 0 0 1px rgba(255,255,255,.07);
+  display:flex; align-items:center; justify-content:center; padding:12px; text-align:center; }
+.oc--q p { font-size:9.5px; line-height:1.35; margin:0; color:var(--text-hi); }
+.oc--q p b { font-size:13px; font-variant-numeric:tabular-nums; }
+
+/* evidence: the ledger */
+.led { display:grid; grid-template-columns:52px 1fr auto; gap:10px; padding:7px 0;
+  font-size:13px; font-variant-numeric:tabular-nums; color:var(--text-mid); }
+.led b { font-weight:600; color:var(--text-hi); }
+.led .dim { color:var(--text-lo); }
 
 /* morning open */
 .giant { font-size:196px; font-weight:750; letter-spacing:-.06em; line-height:.86; font-variant-numeric:tabular-nums; }
@@ -93,7 +111,7 @@
 </head><body>
 <div class="gal">
 <h1>The loop, in sequence</h1>
-<p class="gal__sub">One flow, nine frames. The Action page, the size scale, completion, the day so far, the morning open in its two beats, then three different Evidence layouts to react to, since the last one was not it.</p>
+<p class="gal__sub">One flow, eight frames. The Action page, the size scale, completion, the day so far, the morning open in its two beats, then Evidence as two pages: the ocean you drift through, and the ledger that adds it all up.</p>
 <div class="grid">
 
 <!-- 01 -->
@@ -107,7 +125,7 @@
       <div class="deckwrap">
         <div class="acard--behind"></div>
         <div class="acard">
-          <p class="t-cap">Today's move</p>
+          <p class="t-cap">Today's action</p>
           <p class="amove">Talk to three users about why they signed up</p>
           <p class="awhy">You have 8 users and no idea which part they actually needed. You cannot get to 100 guessing.</p>
           <hr class="rule" style="margin:16px 0 4px">
@@ -121,7 +139,7 @@
           </div>
         </div>
       </div>
-      <p class="notthis">Not this move</p>
+      <p class="notthis">Not this action</p>
     </div>
     <div class="bot">
       <button class="holdbtn">Hold to complete<small>press and hold</small></button>
@@ -130,7 +148,7 @@
     </div>
     <div class="safe-b"></div>
   </div></div></div>
-  <p class="item__note">The move as a card carrying the full brief, dots showing where it sits on the five sizes. Under the card, the quiet line for the rare case where the move itself is wrong: "Not this move" asks for a different one. That is its home.</p>
+  <p class="item__note">The action as a card carrying the full brief, dots showing where it sits on the five sizes. Under the card, the quiet line for the rare case where the action itself is wrong: "Not this action" asks for a different one. That is its home.</p>
 </div>
 
 <!-- 02 -->
@@ -145,7 +163,7 @@
       <div class="deckwrap">
         <div class="acard--behind"></div>
         <div class="acard">
-          <p class="t-cap">Today's move</p>
+          <p class="t-cap">Today's action</p>
           <p class="amove">Call five users and ask what nearly stopped them signing up</p>
           <p class="awhy">Calls beat messages. Five answers is a pattern, not a coincidence.</p>
           <hr class="rule" style="margin:16px 0 4px">
@@ -159,7 +177,7 @@
           </div>
         </div>
       </div>
-      <p class="notthis">Not this move</p>
+      <p class="notthis">Not this action</p>
     </div>
     <div class="bot">
       <button class="holdbtn">Hold to complete<small>press and hold</small></button>
@@ -185,7 +203,7 @@
     </div>
     <div class="safe-b"></div>
   </div></div></div>
-  <p class="item__note">The hold finishes, the screen floods green from the bottom, the move gets struck. Two seconds, nothing congratulates you, then it settles into the next frame.</p>
+  <p class="item__note">The hold finishes, the screen floods green from the bottom, the action gets struck. Two seconds, nothing congratulates you, then it settles into the next frame.</p>
 </div>
 
 <!-- 04 -->
@@ -193,26 +211,26 @@
   <div class="item__label"><span class="item__n">04</span><span class="item__name">Today so far</span></div>
   <div class="phone"><div class="phone__scroll"><div class="stack">
     <div class="safe-t"></div>
-    <div class="pad" style="padding-top:20px">
-      <h2 style="font-size:36px;font-weight:750;letter-spacing:-.025em;margin:0">Friday</h2>
+    <div class="pad" style="padding-top:22px">
+      <h2 style="font-size:48px;font-weight:750;letter-spacing:-.03em;margin:0;line-height:1">Friday</h2>
     </div>
     <div class="grow" style="display:flex;flex-direction:column;justify-content:center;padding:0 20px">
       <div class="nextcard">
         <div class="rrow"><span class="rrow__tick">&check;</span><span class="rrow__t">Talked to three users about why they signed up</span><span class="rrow__m">52m</span></div>
         <div class="rrow"><span class="rrow__tick">&check;</span><span class="rrow__t">Four hours of deep work on onboarding</span><span class="rrow__m">4h</span></div>
         <hr class="rule" style="margin:14px 0">
-        <p class="t-cap">Your next move</p>
+        <p class="t-cap">Your next action</p>
         <p style="font-size:17px;font-weight:700;line-height:1.35;margin:8px 0 0">Write down the one sentence all three of them said</p>
         <div class="pillrow">
           <span class="pill pill--off">Do it now</span>
-          <span class="pill pill--on">Tomorrow</span>
+          <span class="pill pill--go">Finish today</span>
         </div>
       </div>
     </div>
-    <div class="bot"><button class="focusbtn" style="background:transparent">Finish today</button></div>
+    <div style="height:56px"></div>
     <div class="safe-b"></div>
   </div></div></div>
-  <p class="item__note">One box in the middle holding the whole day: what got done, then your next move with the choice. No reason line under the move, no list stretching down the page. Most days this box holds one row and the choice, and it looks just as full.</p>
+  <p class="item__note">Two choices and both of them end the screen: Do it now chains the next action into today, the green Finish today locks it for tomorrow and closes the day. No third button, nothing below the box. Friday carries the top on its own.</p>
 </div>
 
 <!-- 05 -->
@@ -253,86 +271,76 @@
     </div>
     <div class="safe-b"></div>
   </div></div></div>
-  <p class="item__note">The eleven shrinks to the top and takes a diagonal red strike, twelve arrives huge, and the list flips from what happened to what is next: the move locked last night plus the cadence move, re-armed. Start today drops you onto the Action page.</p>
+  <p class="item__note">The eleven shrinks to the top and takes a diagonal red strike, twelve arrives huge, and the list flips from what happened to what is next: the action locked last night plus the cadence action, re-armed. Start today drops you onto the Action page.</p>
 </div>
 
 <!-- 07 -->
 <div class="item">
-  <div class="item__label"><span class="item__n">07</span><span class="item__name">Evidence, the latest large</span></div>
-  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
+  <div class="item__label"><span class="item__n">07</span><span class="item__name">Evidence, the ocean</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack">
+    <div class="safe-t"></div>
     <div class="pad eh" style="padding-top:14px">
       <h2 class="h-sec" style="font-size:24px">Evidence</h2><span class="t-cap num">14</span></div>
-    <div class="pad" style="margin-top:14px">
-      <div class="mph" style="height:296px;border-radius:14px;background:linear-gradient(150deg,rgba(63,217,78,.28),rgba(18,44,24,.62))">
-        <span class="cap">Jul 24 &middot; Three calls done</span>
+    <div class="grow" style="display:flex;flex-direction:column;justify-content:center;overflow:hidden">
+      <div class="orow" style="transform:scale(.68);opacity:.45">
+        <div class="oc" style="background:linear-gradient(150deg,rgba(90,110,130,.35),rgba(30,40,50,.55))"></div>
+        <div class="oc" style="background:linear-gradient(200deg,rgba(128,150,255,.24),rgba(24,26,50,.6))"></div>
+        <div class="oc" style="background:linear-gradient(160deg,rgba(58,217,245,.22),rgba(20,40,52,.6))"></div>
+        <div class="oc" style="background:linear-gradient(150deg,rgba(63,217,78,.2),rgba(18,44,24,.6))"></div>
       </div>
-      <p class="t-cap" style="text-align:center;margin:14px 0 18px">31 moves &middot; 19 hours &middot; 1 of 100 paying</p>
-      <div class="g2">
-        <div class="tq"><p>"A stranger paid for the thing I made."</p><span class="d">Jul 18</span></div>
-        <div class="mph" style="aspect-ratio:1;background:linear-gradient(160deg,rgba(58,217,245,.3),rgba(20,40,52,.6))"></div>
-        <div class="mph" style="aspect-ratio:1;background:linear-gradient(200deg,rgba(128,150,255,.28),rgba(24,26,50,.6))"></div>
-        <div class="tq tq--r"><p><b>$29.00</b>First payment</p><span class="d">Jul 18</span></div>
+      <div class="orow" style="transform:scale(.85);opacity:.72;margin-top:-2px">
+        <div class="oc" style="background:linear-gradient(150deg,rgba(63,217,78,.24),rgba(18,44,24,.6))"></div>
+        <div class="oc oc--q"><p>"I am tired but I do not want to stop."</p></div>
+        <div class="oc" style="background:linear-gradient(150deg,rgba(90,110,130,.4),rgba(30,40,50,.55))"></div>
+      </div>
+      <div class="orow" style="margin-top:0">
+        <div class="oc" style="background:linear-gradient(160deg,rgba(58,217,245,.3),rgba(20,40,52,.6))"></div>
+        <div class="oc" style="width:112px;height:112px;background:linear-gradient(150deg,rgba(63,217,78,.3),rgba(18,44,24,.62))"></div>
+        <div class="oc oc--q"><p><b>$29</b><br>first payment</p></div>
+      </div>
+      <div class="orow" style="transform:scale(.85);opacity:.72;margin-top:-2px">
+        <div class="oc oc--q"><p>"Marcus stayed for the streak."</p></div>
+        <div class="oc" style="background:linear-gradient(200deg,rgba(128,150,255,.28),rgba(24,26,50,.6))"></div>
+        <div class="oc" style="background:linear-gradient(150deg,rgba(90,110,130,.35),rgba(30,40,50,.55))"></div>
+      </div>
+      <div class="orow" style="transform:scale(.68);opacity:.45;margin-top:-2px">
+        <div class="oc" style="background:linear-gradient(150deg,rgba(63,217,78,.2),rgba(18,44,24,.6))"></div>
+        <div class="oc" style="background:linear-gradient(160deg,rgba(58,217,245,.22),rgba(20,40,52,.6))"></div>
+        <div class="oc" style="background:linear-gradient(150deg,rgba(90,110,130,.3),rgba(30,40,50,.55))"></div>
+        <div class="oc" style="background:linear-gradient(200deg,rgba(128,150,255,.22),rgba(24,26,50,.6))"></div>
       </div>
     </div>
-  <div class="safe-b"></div></div></div>
-  <p class="item__note">The newest piece gets the whole top, everything before it waits in a two-column wall underneath, and the totals shrink to one quiet line between them. The page leads with the most recent proof instead of treating all fourteen equally.</p>
+    <div class="bot"><p class="t-cap" style="text-align:center;padding-bottom:8px">The ledger &rarr;</p></div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note">Page one of two: the ocean. Every piece as a floating tile, photos, your own lines, receipts, packed like the watch honeycomb with the edges falling away, and it drifts as you drag. Tap anything to open its day. No layout to read, just an amount of proof you can feel.</p>
 </div>
 
 <!-- 08 -->
 <div class="item">
-  <div class="item__label"><span class="item__n">08</span><span class="item__name">Evidence, counted first</span></div>
+  <div class="item__label"><span class="item__n">08</span><span class="item__name">Evidence, the ledger</span></div>
   <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
     <div class="pad eh" style="padding-top:14px">
-      <h2 class="h-sec" style="font-size:24px">Evidence</h2><span class="t-cap num">14</span></div>
-    <div class="pad" style="margin-top:14px">
-      <div class="statrow">
-        <div class="stat"><b>31</b><span>moves</span></div>
-        <div class="stat"><b>19:04</b><span>hours</span></div>
-        <div class="stat"><b class="num" style="color:var(--cyan)">1<span style="font-size:12px;color:var(--text-lo);font-weight:600"> / 100</span></b><span>paying</span></div>
-      </div>
-      <div style="height:8px"></div>
-      <div class="g2">
-        <div class="mph" style="grid-row:span 2;background:linear-gradient(150deg,rgba(63,217,78,.28),rgba(18,44,24,.62))"></div>
-        <div class="tq"><p>"Marcus stayed for the streak, not the card."</p><span class="d">Jul 24</span></div>
-        <div class="mph" style="aspect-ratio:1.4;background:linear-gradient(160deg,rgba(58,217,245,.3),rgba(20,40,52,.6))"></div>
-      </div>
-      <div style="height:7px"></div>
-      <div class="tq tq--r" style="flex-direction:row;align-items:baseline;justify-content:space-between">
-        <p><b style="display:inline;margin-right:9px">$29.00</b>First payment</p><span class="d">Jul 18</span></div>
-      <div style="height:7px"></div>
-      <div class="g2">
-        <div class="mph" style="aspect-ratio:1;background:linear-gradient(200deg,rgba(128,150,255,.28),rgba(24,26,50,.6))"></div>
-        <div class="mph" style="aspect-ratio:1;background:linear-gradient(150deg,rgba(90,110,130,.35),rgba(30,40,50,.55))"></div>
+      <h2 class="h-sec" style="font-size:24px">The ledger</h2><span class="t-cap num">day 11</span></div>
+    <div class="pad" style="margin-top:16px">
+      <div class="tape2" style="padding:16px 18px 18px">
+        <div class="led"><span>JUL 24</span><b>Talked to three users</b><span>52m</span></div>
+        <div class="led"><span>JUL 24</span><b>Deep work, onboarding</b><span>4:00</span></div>
+        <div class="led"><span>JUL 23</span><b>Shipped the deletion flow</b><span>41m</span></div>
+        <div class="led"><span class="dim">JUL 22</span><span class="dim">skipped</span><span></span></div>
+        <div class="led"><span>JUL 21</span><b>Rewrote the paywall</b><span>2:04</span></div>
+        <div class="led"><span>JUL 21</span><b>Deep work</b><span>4:00</span></div>
+        <div class="led"><span>JUL 19</span><b>Cold emailed twelve people</b><span>35m</span></div>
+        <div class="led"><span>JUL 18</span><b>First paying user</b><span>&mdash;</span></div>
+        <hr class="rule" style="margin:10px 0">
+        <div class="led"><span>TOTAL</span><b>31 actions</b><b>19:04</b></div>
+        <div class="led"><span></span><b>14 pieces kept</b><span></span></div>
+        <hr class="rule" style="margin:10px 0">
+        <div class="led"><span>GOAL</span><b>Paying users</b><b>1 / 100</b></div>
       </div>
     </div>
   <div class="safe-b"></div></div></div>
-  <p class="item__note">The count leads: three earned numbers across the top, then the wall in mixed sizes with the receipt as a full-width band cutting through it. Closest to the receipt-roll feeling without being a receipt.</p>
-</div>
-
-<!-- 09 -->
-<div class="item">
-  <div class="item__label"><span class="item__n">09</span><span class="item__name">Evidence, one piece at a time</span></div>
-  <div class="phone"><div class="phone__scroll"><div class="safe-t"></div>
-    <div class="pad eh" style="padding-top:14px">
-      <h2 class="h-sec" style="font-size:24px">Evidence</h2><span class="t-cap num">14</span></div>
-    <div class="pad" style="margin-top:18px">
-      <div class="mph" style="height:212px;background:linear-gradient(150deg,rgba(63,217,78,.28),rgba(18,44,24,.62))">
-        <span class="cap">Jul 24 &middot; Three calls done</span></div>
-      <div style="height:22px"></div>
-      <div class="qbig"><p>"A stranger paid for the thing I made."</p>
-        <p class="t-cap" style="margin-top:7px">Jul 18</p></div>
-      <div style="height:22px"></div>
-      <div class="tape2">
-        <div class="trw"><span>Jul 18 &middot; payment</span><b>$29.00</b></div>
-      </div>
-      <div style="height:26px"></div>
-      <div class="mph" style="height:212px;background:linear-gradient(160deg,rgba(58,217,245,.3),rgba(20,40,52,.6))">
-        <span class="cap">Jul 12 &middot; Card evolution shipped</span></div>
-      <div style="height:22px"></div>
-      <p class="t-cap" style="text-align:center">31 moves &middot; 19 hours &middot; 1 of 100 paying</p>
-    </div>
-  <div class="safe-b"></div></div></div>
-  <p class="item__note">No grid at all. Every piece full width in its own shape, photos as photos, quotes as pulled lines, receipts as tape, generous air between them. The slowest to scan and the most like flipping through something that matters.</p>
+  <p class="item__note">Page two of two: the ledger. Every action line-itemed with its day and its time, misses printed instead of hidden, totalled at the bottom and pointed at the goal. The ocean is what it feels like, this is what it adds up to.</p>
 </div>
 
 </div></div>
