@@ -4,13 +4,13 @@
 
    v792 layout (the Relic, Malik's pick from the paywall labs):
    big pure glass card with a cyan under-glow, "Build your Memento.", the
-   features as glass chips, ONE visible plan (Founder's Lifetime, first 250
+   features as glass chips, ONE visible plan (Founder's Lifetime, first 200
    only) with the other plans collapsed behind a disclosure, the CTA carrying
    its own fine print, the guarantee, and Maybe later as the ONLY exit.
 
    This is the only hard paywall: Clarity is the free first win, Action +
-   Consistency + everything else are paid. The "Unlock" button is a placeholder
-   (no billing backend yet) and just flips state.entitlements.isPaid.
+   Consistency + everything else are paid. Checkout is handled by the
+   server-verified Polar billing bridge in js/22-billing.js.
    ─────────────────────────────────────────────────────────────────────────── */
 
 const ClarityPaywall = {
@@ -19,11 +19,11 @@ const ClarityPaywall = {
   // ONE place to change money (prices can move over time; the founder tier is
   // genuinely capped, after the first N buyers the price becomes the anchor).
   _PRICING: {
-    anchor: 400,      // lifetime price after the founder window
-    founder: 250,     // founder's lifetime, pay once
-    founderCap: 250,  // "first 250 people only"
-    yearly: 200,
-    monthly: 25
+    anchor: 1000,     // lifetime price after the founder window
+    founder: 500,     // founder's lifetime, pay once
+    founderCap: 200,  // "first 200 people only"
+    yearly: 300,
+    monthly: 30
   },
 
   // Social proof ships HIDDEN until the numbers are real. The layout below is
@@ -185,7 +185,7 @@ const ClarityPaywall = {
 
       document.body.appendChild(ov);
 
-      // Plan picker (visual only, no charge). Picking a plan re-writes the
+      // Picking a plan re-writes the
       // fine print inside the CTA so the button always states the real deal.
       const fine = ov.querySelector('#cpwBuyFine');
       ov.querySelectorAll('[data-plan]').forEach((pl) => {
@@ -224,15 +224,27 @@ const ClarityPaywall = {
     } catch (e) { this._open = false; }
   },
 
-  // Placeholder unlock: no billing backend yet. Flip the flag, persist, and
-  // reveal the now-unlocked app behind the screen.
+  // Checkout never grants access directly. The billing bridge sends the user
+  // to Polar, then calls _applyVerifiedUnlock only after the server confirms
+  // the sandbox purchase belongs to this signed-in account.
   _unlock() {
+    const picked = document.querySelector('#clarityPaywall [data-plan].is-picked');
+    const plan = picked ? (picked.getAttribute('data-plan') || 'founder') : 'founder';
+    try {
+      if (window.PolarBilling && PolarBilling.startCheckout) {
+        PolarBilling.startCheckout(plan);
+      }
+    } catch (e) {}
+  },
+
+  _applyVerifiedUnlock(access) {
     try {
       if (!state.entitlements) state.entitlements = { isPaid: false, paidAt: null, plan: '' };
       state.entitlements.isPaid = true;
-      state.entitlements.paidAt = Date.now();
-      const picked = document.querySelector('#clarityPaywall [data-plan].is-picked');
-      state.entitlements.plan = picked ? (picked.getAttribute('data-plan') || 'founder') : 'founder';
+      state.entitlements.paidAt = state.entitlements.paidAt || Date.now();
+      state.entitlements.plan = access && access.plan ? access.plan : state.entitlements.plan;
+      state.entitlements.source = 'polar_sandbox';
+      state.entitlements.verifiedAt = Date.now();
       if (typeof persistNow === 'function') persistNow();
       try { if (typeof Analytics !== 'undefined') Analytics.track('paywall_unlock', { plan: state.entitlements.plan }); } catch (e) {} // Funnel
       try { window.MementoPush && MementoPush.sync(); } catch (e) {} // reminder context: now paid

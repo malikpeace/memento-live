@@ -32,6 +32,7 @@ const PRECACHE = [
   './js/07-sheet-templates.js', './js/08-cards-grid-share.js', './js/09-controllers.js',
   './js/10-demo-backend.js', './js/17-journey.js', './js/18-install.js', './js/20-push.js',
   './js/11-init.js', './js/12-cloud-sync.js', './js/13-clarity-paywall.js',
+  './js/22-billing.js',
   './js/14-appearance-picker.js', './js/19-dev-beats.js', './js/20-sound.js',
   './js/21-descent.js', './js/15-router.js',
   './fonts/fonts.css', './fonts/geist-400.otf', './fonts/geist-500.otf', './fonts/geist-700.otf',
