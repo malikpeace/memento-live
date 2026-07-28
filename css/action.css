@@ -102,22 +102,41 @@ body:has(.clarity-exp.open)::after { display: none; }
    and disappearing. Opacity-only (compositor cheap), no loops visible as
    rhythm, and both die inside the dark ceremonies. */
 .action-exp__bg .action-exp__bg-orb3 {
-  display: block; position: absolute; inset: 0; width: auto; height: auto;
+  /* v995 (Malik: "it looks very stale and dead"): the highlight lattices now
+     DRIFT as well as breathe. Opacity alone at 0.08 alpha read as nothing.
+     Overhang by one tile so the travel never exposes an edge. */
+  display: block; position: absolute; inset: -66px; width: auto; height: auto;
   border-radius: 0; filter: none; transform: none;
   /* v885 (Malik: no NEW dots): a 66px tile = every third dot of the SAME
      22px lattice (66 = 3 x 22, position 0 0 is on-grid), so this layer only
      brightens existing dots and fades them back. */
   background-image: radial-gradient(rgba(255, 255, 255, 0.085) 1px, transparent 1px);
   background-size: 66px 66px; background-position: 0 0;
-  animation: actionDotsBreathe 9s ease-in-out infinite alternate;
+  animation: actionDotsBreathe 9s ease-in-out infinite alternate,
+             actionDotsDriftA 41s linear infinite;
 }
 .action-exp__bg::after {
-  content: ''; display: block; position: absolute; inset: 0;
+  content: ''; display: block; position: absolute; inset: -66px;
   width: auto; height: auto; border-radius: 0; filter: none; transform: none;
   /* A disjoint on-grid subset (offsets are multiples of 22px). */
   background: radial-gradient(rgba(255, 255, 255, 0.075) 1px, transparent 1px);
   background-size: 66px 66px; background-position: 22px 44px;
-  animation: actionDotsBreathe 13s ease-in-out -6s infinite alternate;
+  animation: actionDotsBreathe 13s ease-in-out -6s infinite alternate,
+             actionDotsDriftB 67s linear infinite;
+}
+/* Each travels exactly one 66px tile per cycle, so the loop closes on an
+   identical frame and never snaps. Transform only: compositor work on layers
+   that are already composited by the opacity breathe, no repaint, no new
+   layer. Two directions on two long clocks, so the interference never reads
+   as a rhythm. The base lattice stays put, so the field keeps its anchor and
+   this reads as light crossing the blueprint, not the page sliding. */
+@keyframes actionDotsDriftA {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(66px, 66px, 0); }
+}
+@keyframes actionDotsDriftB {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-66px, 66px, 0); }
 }
 html.theme-light .action-exp__bg .action-exp__bg-orb3 {
   background-image: radial-gradient(rgba(24, 26, 33, 0.09) 1px, transparent 1px);
@@ -3102,6 +3121,10 @@ html.theme-light .action-exp__bg::after {
    the screen. justify-content stays flex-start: question + input at the
    section's top, empty space below them. */
 .action-intake--cine .action-intake__current {
+  /* Fill the column instead of guessing a min-height. A tuned min-height left
+     a 24px dead strip under the beat, which is what put the CTA off Clarity's
+     line no matter how the paddings were tweaked. */
+  flex: 1 1 auto;
   min-height: calc(100dvh - var(--safe-t, 0px) - 108px);
   justify-content: flex-start;
 }
@@ -3110,8 +3133,15 @@ html.theme-light .action-exp__bg::after {
    onboarding (the beat composition law). Direct height, no flex-grow. */
 .action-intake--cine .action-intake__current .intake-beat,
 .action-intake__past ~ .action-intake__current .intake-beat {
-  min-height: calc(100dvh - var(--safe-t, 0px) - 132px);
-  padding-bottom: calc(var(--safe-b, 0px) + 8px);
+  /* Fills whatever the column gives it (its __body is margin:auto 0, so the
+     content stays optically centred and the CTA stays pinned to the bottom,
+     per the beat composition law). */
+  flex: 1 1 auto;
+  min-height: calc(100dvh - var(--safe-t, 0px) - 108px);
+  /* The ONLY bottom spacer under a beat's CTA, so the button lands exactly
+     where Clarity's nav lands (safe-b + 28). The column's own bottom padding
+     is zeroed above; three stacked paddings are what pushed it 26px low. */
+  padding-bottom: calc(var(--safe-b, 0px) + 28px);
 }
 /* Flat iMessage-style bubbles: solid fills, no gradients, no borders,
    no glassy blur. Tight corner radius with one squared-off corner facing
@@ -3440,7 +3470,9 @@ html.lowfx #actionExpStars {
      (.clarity-exp__page-inner is max-width 640 inside a 20px-padded wrap), so
      the two read as one layout on desktop instead of two column widths. */
   width: 100%; max-width: 680px; margin: 0 auto;
-  padding: calc(var(--safe-t, 0px) + 84px) 20px 24px;
+  /* Bottom is 0: the beat's own padding is the single spacer that puts the
+     CTA on Clarity's line. Anything here stacks on top of it. */
+  padding: calc(var(--safe-t, 0px) + 84px) 20px 0;
 }
 /* v920: the QUESTION page lands on Clarity's line, and it is a vh anchor, not
    a fixed pixel one. Clarity puts its headline at max(safe-t + 88px, 19vh)
@@ -3688,11 +3720,17 @@ body.exit-grabber .action-exp__close { display: none !important; }
 .intake-beat__sub { font-size: 0.875rem; color: rgba(var(--ink),0.72); line-height: 1.5; }
 .intake-beat__sub b { color: var(--text-hi); }
 .intake-beat__spacer { flex: 1; min-height: 34px; } /* legacy, beats now use __body */
+/* ONE bottom-button geometry for the whole module, lifted verbatim from
+   Clarity's .clarity-exp__nav-btn (padding 18px, --r-ctrl, --fs-lg, 600).
+   Malik has flagged this seam several times: Action's buttons were 48px tall
+   at 14.5px/700 and sat 88px off the bottom while Clarity's are 58.5px at
+   17.6px/600 sitting 62px off. Two products, one screen apart. If Clarity's
+   nav metrics ever change, change them here too. */
 .intake-beat__cta {
-  width: 100%; height: 48px; border: none; border-radius: calc(10px * var(--rx,1));
-  background: var(--solid-bg); color: var(--solid-fg); font-family: var(--font); font-size: 0.90625rem;
-  font-weight: 700; cursor: pointer; margin-bottom: 10px;
-  box-shadow: 0 6px 22px rgba(0,0,0,0.4); transition: transform 0.15s ease;
+  width: 100%; padding: 18px; border: none; border-radius: var(--r-ctrl);
+  background: var(--solid-bg); color: var(--solid-fg); font-family: var(--font); font-size: var(--fs-lg);
+  font-weight: 600; cursor: pointer; margin-bottom: 0;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.38); transition: transform 0.15s ease;
 }
 .intake-beat__cta:active { transform: scale(0.985); }
 /* Waiting on a choice. Same dim-until-ready language as Clarity's Next
@@ -4010,7 +4048,9 @@ html.theme-light .action-exp {
   flex: 1; min-height: 0; display: flex; flex-direction: column;
   justify-content: center; overflow: hidden;
 }
-.aloop-bot { flex: none; padding-top: 10px; padding-bottom: calc(var(--safe-b, 0px) + 16px); }
+/* Clarity's nav footer geometry: 16px above, safe-b + 28 below, 10px between
+   the two buttons. Same line the intake beats land on. */
+.aloop-bot { flex: none; padding-top: 16px; padding-bottom: calc(var(--safe-b, 0px) + 28px); }
 /* the room follows the size: a soft center glow that deepens tier by tier */
 .aloop-glow {
   position: absolute; left: 50%; top: 42%; width: min(150vw, 620px); height: min(150vw, 620px);
@@ -4029,12 +4069,19 @@ html.theme-light .action-exp {
 .aloop-deck {
   position: relative; touch-action: pan-y;
   display: flex; min-height: 0; overflow: hidden;
-  margin: 0 -20px; padding: 0 20px;   /* let pages bleed to the screen edge */
+  /* let pages bleed to the screen edge. Padding is the negative margin MINUS
+     the 6px slide gutter below, so the card keeps its exact 350px width at
+     x=20 while neighbouring pages stay 12px apart. */
+  margin: 0 -20px; padding: 0 14px;
 }
 .aloop-track { display: flex; width: 100%; min-height: 0; will-change: transform; }
 .aloop-slide {
   flex: 0 0 100%; min-width: 100%; min-height: 0;
-  display: flex; padding-right: 0;
+  /* A 12px gutter between neighbouring pages. Touching slides put the next
+     card's shadow inside this card's rounded corners, which read as dark
+     wedges at the bottom corners in light mode. The slide is still exactly
+     100% wide, so the track's translateX(-100%) paging math is unchanged. */
+  display: flex; padding: 0 6px;
 }
 /* (The stacked "card behind" ghost is gone: it read as a stray box poking out
    from under the real one, not as a deck.) */
@@ -4088,6 +4135,16 @@ html.theme-light .aloop-card[data-tier="tiny"]     { --aglass: rgba(255,255,255,
 html.theme-light .aloop-card[data-tier="light"]    { --aglass: rgba(252,252,253,0.93); }
 html.theme-light .aloop-card[data-tier="heavy"]    { --aglass: rgba(238,240,244,0.97); }
 html.theme-light .aloop-card[data-tier="extreme"]  { --aglass: rgba(228,231,237,0.99); }
+/* The shadows above are calibrated for dark, where a 0.28-0.55 black is
+   invisible against near-black. On a near-white page the same values pool as
+   grey in the notch between the card's rounded corner and its square bounding
+   box, which reads as dark wedges at the bottom corners. Light mode keeps the
+   same tier progression (heavier = deeper) at roughly a third of the weight. */
+html.theme-light .aloop-card                      { box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), 0 10px 30px rgba(24,26,33,0.10); }
+html.theme-light .aloop-card[data-tier="tiny"]    { box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), 0 6px 18px rgba(24,26,33,0.06); }
+html.theme-light .aloop-card[data-tier="light"]   { box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), 0 8px 24px rgba(24,26,33,0.08); }
+html.theme-light .aloop-card[data-tier="heavy"]   { box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), 0 14px 38px rgba(24,26,33,0.13); }
+html.theme-light .aloop-card[data-tier="extreme"] { box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), 0 18px 46px rgba(24,26,33,0.16), 0 0 0 1px rgba(24,26,33,0.05); }
 .aloop-card__cap { margin: 0; font-size: 0.78125rem; font-weight: 600; color: rgba(var(--ink),0.5); }
 .aloop-card__move {
   margin: 8px 0 0; font-size: 1.4375rem; font-weight: 750;
@@ -4114,9 +4171,10 @@ html.theme-light .aloop-card[data-tier="extreme"]  { --aglass: rgba(228,231,237,
 }
 .aloop-hold {
   position: relative; overflow: hidden; display: block; width: 100%;
-  padding: 15px 16px; border: none; border-radius: 14px; cursor: pointer;
+  padding: 18px; border: none; border-radius: var(--r-ctrl); cursor: pointer;
   background: var(--solid-bg); color: var(--solid-fg);
-  font-family: var(--font); font-size: 1rem; font-weight: 700;
+  font-family: var(--font); font-size: var(--fs-lg); font-weight: 600;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.38);
   -webkit-user-select: none; user-select: none; touch-action: none;
 }
 .aloop-hold span { position: relative; z-index: 1; }
@@ -4128,9 +4186,12 @@ html.theme-light .aloop-card[data-tier="extreme"]  { --aglass: rgba(228,231,237,
 }
 .aloop-focus {
   display: flex; align-items: center; justify-content: center; gap: 9px;
-  width: 100%; margin-top: 9px; padding: 13px; border: none; border-radius: 14px;
-  background: rgba(var(--ink),0.06); color: rgba(var(--ink),0.85); cursor: pointer;
-  font-family: var(--font); font-size: 0.875rem; font-weight: 650;
+  width: 100%; margin-top: 10px; padding: 18px; border: none; border-radius: var(--r-ctrl);
+  /* Clarity's geometry and type, but NOT its --kfill-04 fill: that works for
+     Clarity's 64px square back button and disappears entirely as a
+     full-width block on the light page. */
+  background: rgba(var(--ink),0.07); color: rgba(var(--ink),0.85); cursor: pointer;
+  font-family: var(--font); font-size: var(--fs-lg); font-weight: 600;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
 }
 .aloop-focus svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; }
