@@ -79,24 +79,20 @@
 
   /* THE ROOM. The card is bright enough that the walls catch it, which is what
      gives the shot its scale: the light does not stop at the card, it reaches
-     the edges of the screen. Two soft columns down the sides plus a wash off
-     the ceiling, every one of them a gradient that fades to nothing before its
-     own bounds and masked top and bottom, so none of them can draw an edge. */
+     the edges of the screen.
+     Every gradient is anchored to an edge and dies before the opposite one, so
+     the falloff is the shape itself: no masks, no extra layer, nothing that can
+     draw a straight edge. One element, static, opacity-driven. */
   .cer__room { position:absolute; inset:0; pointer-events:none;
     opacity:calc(var(--hf) * .95);
     background:
-      linear-gradient(to right, rgba(var(--fl),.34) 0%, rgba(var(--fl),.10) 10%, rgba(var(--fl),0) 28%),
-      linear-gradient(to left,  rgba(var(--fl),.34) 0%, rgba(var(--fl),.10) 10%, rgba(var(--fl),0) 28%),
-      linear-gradient(to bottom, rgba(var(--fl2),.18) 0%, rgba(var(--fl2),0) 26%);
-    -webkit-mask:linear-gradient(to bottom, transparent 0%, #000 16%, #000 58%, transparent 82%);
-            mask:linear-gradient(to bottom, transparent 0%, #000 16%, #000 58%, transparent 82%); }
-  /* the brightest catch is level with the card, where the light actually is */
-  .cer__room::after { content:''; position:absolute; inset:0;
-    background:
-      linear-gradient(to right, rgba(255,255,255,.22) 0%, rgba(255,255,255,0) 14%),
-      linear-gradient(to left,  rgba(255,255,255,.22) 0%, rgba(255,255,255,0) 14%);
-    -webkit-mask:radial-gradient(ellipse 120% 26% at 50% 34%, #000 0%, transparent 78%);
-            mask:radial-gradient(ellipse 120% 26% at 50% 34%, #000 0%, transparent 78%); }
+      /* the bright catch, level with the card, where the light actually is */
+      radial-gradient(ellipse 16% 26% at 0% 34%, rgba(255,255,255,.20), rgba(255,255,255,0) 72%),
+      radial-gradient(ellipse 16% 26% at 100% 34%, rgba(255,255,255,.20), rgba(255,255,255,0) 72%),
+      /* the walls either side, and the wash off the ceiling */
+      radial-gradient(ellipse 30% 46% at 0% 38%, rgba(var(--fl),.30), rgba(var(--fl),0) 74%),
+      radial-gradient(ellipse 30% 46% at 100% 38%, rgba(var(--fl),.30), rgba(var(--fl),0) 74%),
+      radial-gradient(ellipse 90% 20% at 50% 0%, rgba(var(--fl2),.18), rgba(var(--fl2),0) 76%); }
 
   /* the release: light leaving the card the instant the hold completes.
      Radial and fading to nothing well inside its own box, so it can never
@@ -119,10 +115,26 @@
     transform-style:preserve-3d; will-change:transform;
     transform:translateY(-126px) scale(var(--hs)); opacity:1; }
   .cer__float { transform-style:preserve-3d; }
-  /* their colour physically wells up inside the card as they hold. It is the
-     card's own liquid layer, just expanding, so nothing new is invented. */
-  .cer .daycard-ns__liquid { transform:scale(calc(1 + .12 * var(--hp))); }
-  .cer .daycard-bloom { transform:scale(calc(1 + .06 * var(--hp))); }
+
+  /* ── THE GRAPHICS BUDGET (why this is written the way it is) ───────────────
+     iOS crashed on this page. The cause was mine, and it is a rule worth
+     keeping: during the hold you may change the OPACITY of a blurred layer,
+     because the blur is rasterised once and the compositor just fades the
+     cached bitmap. You may NOT change a blurred layer's transform, its filter
+     parameters, or the opacity of its CHILDREN, because every one of those
+     re-runs the blur from scratch, every frame, at device resolution.
+     What I had been doing per frame, all of it now gone:
+       - scaling the liquid (46px blur) and bloom (34px blur) layers
+       - ramping --sat, which is a saturate() parameter on three blurred layers
+       - ramping --glow and --lit into the aura's brightness() parameter
+       - growing a 170px box-shadow radius on the stage
+     Each of those forced a full re-blur per frame. Stacked, they exhausted
+     graphics memory on a phone. The look is preserved; the mechanism is not. */
+
+  /* the aura: constant filter, opacity does the work */
+  .cer .daycard-wrap__aura {
+    filter:blur(28px) hue-rotate(var(--mm-hue, 0deg));
+    opacity:calc(var(--lit, 0) * .85); }
   /* The card was rendering at 179x352, a 0.51 ratio, because the living stage
      carries its own width:min(76%,270px). That squeeze is what read as skinny.
      These put it back on the app's real proportion: 320x452 is 0.708. */
@@ -199,17 +211,31 @@
       inset 0 0 20px rgba(214,240,255,.52),
       inset 0 0 48px rgba(160,205,255,.26),
       inset 0 0 104px rgba(130,185,255,.13); }
-  /* what the edge throws OUT. This is the difference between an outlined card
-     and a burning one: a hard white core right at the perimeter, then three
-     falloffs reaching progressively further into the room. */
-  .cer.look-platinum .daycard-theme-living .daycard-living-stage {
+  /* What the edge throws OUT: the difference between an outlined card and a
+     burning one. A hard white core at the perimeter, then three falloffs
+     reaching further into the room.
+     It lives on its own layer with FIXED radii, faded in by --act, because
+     animating a shadow's blur radius repaints it every frame (that is what was
+     killing the phone). Fixed radii rasterise once and fade for free. */
+  .cer__edge { position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+    opacity:var(--act, 0);
     box-shadow:
-      0 0 44px rgba(200,210,255,.10),
-      0 12px 38px rgba(0,0,0,.28),
-      0 0 calc(7px * var(--act,0)) rgba(255,255,255, calc(.92 * var(--act,0))),
-      0 0 calc(26px * var(--act,0)) rgba(226,244,255, calc(.60 * var(--act,0))),
-      0 0 calc(70px * var(--act,0)) rgba(170,212,255, calc(.36 * var(--act,0))),
-      0 0 calc(170px * var(--act,0)) rgba(130,185,255, calc(.20 * var(--act,0))); }
+      0 0 7px rgba(255,255,255,.92),
+      0 0 26px rgba(226,244,255,.60),
+      0 0 70px rgba(170,212,255,.36),
+      0 0 170px rgba(130,185,255,.20); }
+  .cer.look-bronze .cer__edge {
+    box-shadow:
+      0 0 7px rgba(255,246,226,.92),
+      0 0 26px rgba(255,216,160,.58),
+      0 0 70px rgba(226,168,96,.34),
+      0 0 170px rgba(198,142,78,.18); }
+  .cer.look-obsidian .cer__edge {
+    box-shadow:
+      0 0 6px rgba(255,255,255,.72),
+      0 0 24px rgba(206,228,255,.42),
+      0 0 68px rgba(150,190,255,.22),
+      0 0 150px rgba(120,160,220,.12); }
 
   /* BRONZE. Warm metal instead of platinum. The colour blobs themselves are
      recoloured rather than hue-rotated, because a rotation cannot warm the
@@ -303,6 +329,41 @@
   .cer.legacy.lit .cer__stage { opacity:1; transform:rotateY(0deg) scale(1) translateY(-126px); }
   .cer.legacy.back .cer__stage { opacity:1; transform:rotateY(0deg) scale(.78) translateY(-152px); }
 
+  /* ── PHONES ───────────────────────────────────────────────────────────────
+     The app already flattens the card onto one retained layer below 768px
+     (its own iOS eviction fix). This keeps that layer CLEAN during the hold:
+     the white act blob lives inside the 46px-blurred liquid layer, and inside
+     the 30px-blurred reflection, so fading it frame by frame re-blurred both,
+     twice per frame, at 3x. It now holds at zero and arrives ONCE on release,
+     as a single transition, which is exactly what the app itself does. The
+     flood during the hold comes from the wash, the rim and the room, all of
+     which are opacity-only and cost nothing. */
+  @media (max-width: 767.98px) {
+    .cer .daycard-theme-living .blob.b2 { opacity:0; transition:opacity .9s ease-out; }
+    .cer.lit .daycard-theme-living .blob.b2 { opacity:calc(var(--act, 0) * .82); }
+    /* same reasoning for the reflected rim: it is a child of a blurred parent */
+    .cer .daycard-floor .daycard-ns__rim { opacity:0; transition:opacity .9s ease-out; }
+    .cer.lit .daycard-floor .daycard-ns__rim { opacity:calc(var(--act, 0) * var(--rim-k, 1)); }
+    .cer .daycard-floor { filter:blur(22px) saturate(var(--sat,1.5)) hue-rotate(var(--mm-hue,0deg)); }
+    .cer__flare { width:420px; height:420px; }
+    /* The app kills its own card animation below 768px for this exact reason:
+       anything animating forever keeps the card dirty, so iOS can never cache
+       it as a still bitmap and re-blurs it instead. The breathing goes with it
+       until the page is proven stable on a real device. */
+    .cer.lit .cer__float, .cer.back .cer__float { animation:none; }
+    /* the gallery chrome, so a phone renders one screen instead of a 1100px
+       page scaled down (which rasterises every one of these layers oversized) */
+    .gal { padding:14px 12px 60px; }
+    .phone { width:100%; max-width:390px; height:auto; aspect-ratio:390 / 844; }
+    .ctl { flex:1 1 100%; }
+  }
+
+  /* ?lite=1 : the diagnostic. Drops the three heaviest optional layers (the
+     mirrored reflection, the room, the flare) and leaves the card, its edge and
+     the floor spill. If the phone survives this but not the full page, the
+     answer is layer count, not the hold. */
+  .cer.lite .daycard-floor, .cer.lite .cer__room, .cer.lite .cer__flare { display:none !important; }
+
   @media (prefers-reduced-motion: reduce) {
     .cer__stage, .cer__float, .cer__floor, .cer__glow, .cer__sweep, .cer__flare,
     .cer__hint, .cer__welcome, .cer__note, .cer__sign, .cer__cta { transition:none !important; animation:none !important; }
@@ -350,6 +411,7 @@
                  style="--clar:1.000; --act:0.000; --cons:0.000; --mix:0.000; --lit:0.000;">
               <span class="daycard-wrap__aura" aria-hidden="true"></span>
               <div class="daycard-living-stage">
+                <span class="cer__edge" aria-hidden="true"></span>
                 <span class="daycard-bloom" aria-hidden="true">
                   <i class="blob b1" style="transform:translate(7.62%,8%) scale(1.342)"></i>
                   <i class="blob b2" style="transform:translate(-21.48%,15.95%) scale(1.449)"></i>
@@ -473,12 +535,14 @@
   // release, so completing the hold is a break, not just the end of a ramp.
   var HOLD_CAP = 0.84;
 
+  // Only --act, --lit and --emit move, and all three land on layer OPACITY.
+  // --sat and --glow are deliberately left alone: they are filter parameters
+  // (saturate on three blurred layers, brightness on the aura), and ramping
+  // them re-ran those blurs on every frame. That is what crashed the phone.
   function paint(actV, litV){
     card.style.setProperty('--act',  num(actV));
     card.style.setProperty('--lit',  num(litV));
-    card.style.setProperty('--sat',  num(0.92 + 0.62 * litV));
     card.style.setProperty('--emit', num(0.30 + 0.28 * litV));
-    card.style.setProperty('--glow', num(0.15 + 0.28 * litV));
   }
 
   function render(){
@@ -547,7 +611,8 @@
     card.style.setProperty('--cons', s.cons.toFixed(3));
     card.style.setProperty('--mix',  s.mix.toFixed(3));
   }
-  function base(extra){ return 'cer look-' + look + (extra || ''); }
+  var LITE = /[?&]lite=1/.test(location.search);
+  function base(extra){ return 'cer look-' + look + (LITE ? ' lite' : '') + (extra || ''); }
 
   function reset(){
     clear();
