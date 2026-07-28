@@ -3237,7 +3237,7 @@ const ActionExperience = {
           '<div class="intake-beat__ask">Do you know what you have to do to get there?</div>' +
           '<div class="intake-beat__sub">Not the busywork. The one action that makes everything else easier or unnecessary.</div>' +
         '</div>' +
-        '<button type="button" class="door-card door-card--hi" id="doorKnow">' +
+        '<button type="button" class="door-card" id="doorKnow">' +
           '<span class="door-card__t">I know what to do</span>' +
           '<span class="door-card__s">Tell Action what it is. It gets tested against your own numbers, not obeyed.</span>' +
         '</button>' +
@@ -3245,27 +3245,43 @@ const ActionExperience = {
           '<span class="door-card__t">Find it for me</span>' +
           '<span class="door-card__s">Two questions and Action chooses. You will see exactly why.</span>' +
         '</button>' +
+        // Malik: picking a door must NOT fire instantly. A mis-tap is one tap
+        // away from the wrong branch, so the pick is a selection and Continue
+        // commits it. (This CTA is also what lets _typeRecapBeat run at all:
+        // it bails when a beat has no CTA, so before this the fork question
+        // never actually typewrote.)
+        '<button type="button" class="intake-beat__cta" id="doorGo" disabled>Continue</button>' +
       '</div>';
     this._cineActivate();
     // v876 (Malik): the doors open on a BLANK page and the question TYPES in
     // like onboarding; the CTAs fade in when the typing lands.
     this._typeRecapBeat(host);
-    const pick = (label) => {
+    const k = host.querySelector('#doorKnow'), f = host.querySelector('#doorFind');
+    const go = host.querySelector('#doorGo');
+    let picked = '';
+    const select = (btn, label) => {
+      picked = label;
+      [k, f].forEach(b => { if (b) b.classList.toggle('selected', b === btn); });
+      if (go) go.disabled = false;
+      try { if (typeof MementoSound !== 'undefined' && MementoSound.tick) MementoSound.tick(); } catch (_) {}
+    };
+    const commit = () => {
+      if (!picked) return;
       try {
         if (!Array.isArray(intake.aiMessages)) intake.aiMessages = [];
         if (!Array.isArray(intake.aiHistory)) intake.aiHistory = [];
         const opener = 'Do you know what you have to do to get there?';
         intake.aiMessages.push({ role: 'assistant', content: opener });
         intake.aiHistory.push({ message: opener, type: 'choices', options: ['I know what to do', 'Find it for me'] });
-        intake.aiMessages.push({ role: 'user', content: label });
+        intake.aiMessages.push({ role: 'user', content: picked });
         persistNow();
         // The scripted engine decides the next screen for BOTH doors.
         this._aiIntakeFetchNext();
       } catch (_) {}
     };
-    const k = host.querySelector('#doorKnow'), f = host.querySelector('#doorFind');
-    if (k) k.addEventListener('click', () => pick('I know what to do'));
-    if (f) f.addEventListener('click', () => pick('Find it for me'));
+    if (k) k.addEventListener('click', () => select(k, 'I know what to do'));
+    if (f) f.addEventListener('click', () => select(f, 'Find it for me'));
+    if (go) go.addEventListener('click', commit);
   },
 
   // Back-compat entry (older call sites).
@@ -3878,37 +3894,59 @@ const ActionExperience = {
   _cineGo() {
     if (!this._cineSubmit) return;
     if (this._cineQType === 'choices') { if (this._cinePicked) this._cineSubmit(this._cinePicked); return; }
-    // chips screens carry the free field as #intakeCustom (Night 3 locator).
+    // Chips screens (the Night 3 locator) carry BOTH a free field and escape
+    // chips. A picked chip wins; otherwise the typed answer goes.
+    if (this._cineQType === 'chips' && this._cinePicked) { this._cineSubmit(this._cinePicked); return; }
     const i = this.pageWrap.querySelector('#intakeInput') || this.pageWrap.querySelector('#intakeCustom');
     this._cineSubmit(i && i.value);
+  },
+
+  // One rule for every answer control: a tap SELECTS (and turns white), Next
+  // commits. Nothing on the intake fires straight off a single tap.
+  _cineSetReady(on) {
+    const nb = this.navEl.querySelector('#intakeSend');
+    if (nb) nb.disabled = !on;
   },
 
   _cineEnsureDelegation() {
     if (this._cineDelegated) return;
     this._cineDelegated = true;
     this.pageWrap.addEventListener('input', (e) => {
-      if (!e.target || e.target.id !== 'intakeInput') return;
-      const nb = this.navEl.querySelector('#intakeSend');
-      if (nb) nb.disabled = !((e.target.value || '').trim());
+      if (!e.target) return;
+      if (e.target.id !== 'intakeInput' && e.target.id !== 'intakeCustom') return;
+      // Typing is an answer in its own right, so it clears any picked chip.
+      if (e.target.id === 'intakeCustom' && (e.target.value || '').trim()) {
+        this._cinePicked = '';
+        this.pageWrap.querySelectorAll('#intakeChips .action-plan__when-chip')
+          .forEach(b => b.classList.remove('selected'));
+      }
+      this._cineSetReady(!!(e.target.value || '').trim());
     });
     this.pageWrap.addEventListener('keydown', (e) => {
       if (!e.target) return;
       if (e.target.id === 'intakeInput' && e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this._cineGo(); }
-      if (e.target.id === 'intakeCustom' && e.key === 'Enter') { e.preventDefault(); if (this._cineSubmit) this._cineSubmit(e.target.value); }
+      if (e.target.id === 'intakeCustom' && e.key === 'Enter') { e.preventDefault(); this._cineGo(); }
     });
     this.pageWrap.addEventListener('click', (e) => {
       const opt = e.target.closest && e.target.closest('.action-chat__opt');
       if (opt) {
         this._cinePicked = opt.dataset.value;
         this.pageWrap.querySelectorAll('.action-chat__opt').forEach(b => b.classList.toggle('selected', b === opt));
-        const nb = this.navEl.querySelector('#intakeSend');
-        if (nb) nb.disabled = false;
+        this._cineSetReady(true);
         return;
       }
       const chip = e.target.closest && e.target.closest('#intakeChips .action-plan__when-chip');
-      if (chip && this._cineSubmit) { this._cineSubmit(chip.dataset.chip); return; }
-      const saveBtn = e.target.closest && e.target.closest('#intakeCustomSave');
-      if (saveBtn && this._cineSubmit) { const c = this.pageWrap.querySelector('#intakeCustom'); this._cineSubmit(c && c.value); }
+      if (chip) {
+        // Picking the escape chip clears the free field: they are alternatives,
+        // and Next must never send both.
+        this._cinePicked = chip.dataset.chip;
+        this.pageWrap.querySelectorAll('#intakeChips .action-plan__when-chip')
+          .forEach(b => b.classList.toggle('selected', b === chip));
+        const c = this.pageWrap.querySelector('#intakeCustom');
+        if (c) c.value = '';
+        this._cineSetReady(true);
+        return;
+      }
     });
     this.navEl.addEventListener('click', (e) => {
       const nb = e.target.closest && e.target.closest('#intakeSend');

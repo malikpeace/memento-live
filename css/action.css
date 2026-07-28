@@ -3222,9 +3222,14 @@ html.theme-light .action-exp__bg::after {
   cursor: pointer;
   transition: background var(--t-base) ease, color var(--t-base) ease, transform 0.1s ease;
 }
-.action-chat__opt:hover {
-  background: var(--kfill-12);
-  color: #fff;
+/* Hover only where a pointer can actually hover. On iOS a tap leaves :hover
+   stuck on the tapped chip, which read as a washed-out half-selected state
+   competing with the real white .selected. */
+@media (hover: hover) {
+  .action-chat__opt:hover {
+    background: var(--kfill-12);
+    color: #fff;
+  }
 }
 .action-chat__opt:active { transform: scale(0.985); background: var(--kfill-18); }
 .action-chat__input-row {
@@ -3690,6 +3695,14 @@ body.exit-grabber .action-exp__close { display: none !important; }
   box-shadow: 0 6px 22px rgba(0,0,0,0.4); transition: transform 0.15s ease;
 }
 .intake-beat__cta:active { transform: scale(0.985); }
+/* Waiting on a choice. Same dim-until-ready language as Clarity's Next
+   (.clarity-exp__nav-btn--next:disabled), so a CTA that does nothing yet
+   never looks like a CTA that is broken. */
+.intake-beat__cta:disabled {
+  background: var(--kfill-04); color: rgba(var(--ink),0.4);
+  box-shadow: none; cursor: default;
+}
+.intake-beat__cta:disabled:active { transform: none; }
 .intake-beat__cta--ghost {
   background: rgba(var(--ink),0.07); color: rgba(var(--ink),0.94);
   box-shadow: var(--glass-highlight);
@@ -3717,17 +3730,21 @@ body.exit-grabber .action-exp__close { display: none !important; }
   transition: transform 0.15s ease;
 }
 .door-card:active { transform: scale(0.985); }
-.door-card--hi { background: var(--solid-bg); box-shadow: 0 6px 22px rgba(0,0,0,0.4); }
+/* Malik: a tapped answer goes SOLID WHITE, the same selection language as
+   Clarity's .wiz__option.selected. Neither door is pre-highlighted now that
+   Continue commits the choice: a resting white card would read as already
+   picked. (Was .door-card--hi, which is why these rules look familiar.) */
+.door-card.selected { background: var(--solid-bg); box-shadow: 0 6px 22px rgba(0,0,0,0.4); }
 .door-card__t {
   display: block; font-size: 1.1875rem; font-weight: 750; letter-spacing: -0.015em;
   color: var(--text-hi);
 }
-.door-card--hi .door-card__t { color: var(--solid-fg); }
+.door-card.selected .door-card__t { color: var(--solid-fg); }
 .door-card__s {
   display: block; font-size: 0.84375rem; line-height: 1.5;
   color: rgba(var(--ink),0.62); margin-top: 7px;
 }
-.door-card--hi .door-card__s { color: var(--solid-fg); opacity: 0.62; }
+.door-card.selected .door-card__s { color: var(--solid-fg); opacity: 0.62; }
 /* The quiet question counter: the end is always visible. */
 .intake-count {
   font-size: 0.75rem; color: rgba(var(--ink),0.42); margin-bottom: 26px;
@@ -3740,6 +3757,53 @@ body.exit-grabber .action-exp__close { display: none !important; }
   font-size: 0.875rem;
 }
 .action-intake #intakeChips .action-plan__when-chip:active { background: rgba(var(--ink),0.12); }
+
+/* ---- Malik: the intake answers ARE Clarity's controls ----
+   Two things were off. (1) GEOMETRY: .action-chat__opt overrode Clarity's
+   option to 12px/18px (14px/16px under 640) at --r-card with --fs-base, so
+   the chips sat shorter, tighter and smaller-typed than the identical control
+   in Clarity. These restore Clarity's exact values (16px/18px, --r-ctrl,
+   --fs-md/500 => a 52px chip, not 46px). (2) SEE-THROUGH: the blueprint dot
+   matrix marched straight through a 5% fill. Clarity's own .wiz__option
+   carries blur(18px), but the global `body.lite *{backdrop-filter:none}` perf
+   kill in js/11 strips it, and body.lite is the MOBILE path, so it died
+   exactly where Malik was looking. !important survives that kill, same
+   precedent (and same reasoning) as the v927 input/nav rule above. */
+.action-exp .action-intake--cine .action-chat__opt,
+.action-exp .action-intake--cine #intakeChips .action-plan__when-chip,
+.action-exp .action-intake--cine .door-card {
+  -webkit-backdrop-filter: blur(calc(22px * var(--bx, 1))) saturate(1.35) !important;
+  backdrop-filter: blur(calc(22px * var(--bx, 1))) saturate(1.35) !important;
+}
+.action-exp .action-intake--cine .action-chat__opt {
+  padding: 16px 18px;
+  border-radius: var(--r-ctrl);
+  font-size: var(--fs-md);
+  font-weight: 500;
+  /* Malik: "so u can't see through them". Blur alone cannot carry this at a
+     5% fill, and backdrop-filter is the first thing a low-power device drops,
+     so the opacity does the work and the blur is the finish. */
+  background: rgba(var(--ink),0.085);
+}
+.action-exp .action-intake--cine .door-card,
+.action-exp .action-intake--cine #intakeChips .action-plan__when-chip {
+  background: rgba(var(--ink),0.085);
+}
+/* Selected = solid white, Clarity's selection language. This needs to out-rank
+   .action-chat__opt:hover, which ties .wiz__option.selected on specificity and
+   wins only because action.css loads after onboarding.css. That tie is also
+   why a tap looked "sort of" selected on iOS, where :hover sticks after touch. */
+.action-exp .action-intake--cine .action-chat__opt.selected,
+.action-exp .action-intake--cine #intakeChips .action-plan__when-chip.selected {
+  background: #fff;
+  color: #0a0e0f;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+.action-exp .action-intake--cine .door-card.selected {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
 
 /* The narrowing: candidate moves struck one by one while the plan generates.
    Lives on the dark-cinema draft-loading surface (root theme rule, no opt-out). */
