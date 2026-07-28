@@ -552,19 +552,19 @@
      A blurred twin sits under it for the bloom, so the glow is in the ring's
      own colours rather than a single flat tint. Both are static and fade on
      opacity, so the phone's graphics budget is untouched. */
-  .cer__ring { position:absolute; inset:0; border-radius:inherit; padding:3.2px;
+  .cer__ring { position:absolute; inset:0; border-radius:inherit; padding:3.8px;
     pointer-events:none; opacity:0; z-index:2;
     -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite:xor;
             mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
             mask-composite:exclude; }
-  .cer__ring--glow { filter:blur(15px); z-index:1; }
+  .cer__ring--glow { filter:blur(18px) saturate(1.25); z-index:1; }
 
   /* the face stays near-black in all three, the way the reference does: the
      platinum flood is almost switched off so nothing washes the edge out */
   .cer.look-prism .daycard-theme-living,
   .cer.look-aurora .daycard-theme-living,
-  .cer.look-ember .daycard-theme-living { --plat-k:.10; --rim-k:.55; --sat:1.7; }
+  .cer.look-ember .daycard-theme-living { --plat-k:0; --rim-k:.45; --sat:1.85; }
   .cer.look-prism .daycard-ns, .cer.look-aurora .daycard-ns, .cer.look-ember .daycard-ns {
     background:linear-gradient(165deg, rgba(255,255,255,.055), rgba(255,255,255,.012) 48%, rgba(255,255,255,.03)); }
   .cer.look-prism .daycard-theme-living .blob.b2,
@@ -579,6 +579,93 @@
   .cer.look-aurora .daycard-ns__rim,
   .cer.look-ember .daycard-ns__rim {
     box-shadow:inset 0 0 0 1px rgba(255,255,255,.55), inset 0 0 26px rgba(255,255,255,.10); }
+
+  /* THE INSIDE.
+     What read as "a white blur in the middle" was three things stacked: the
+     card's iridescence layer (a white conic at 0.55 behind a 22px blur), the
+     sheen off the top edge, and the platinum wash. All three are white by
+     construction, so no amount of coloured blob survived under them. They go
+     down to almost nothing here, and each look paints its own interior instead.
+     The blobs' inline transforms are overridden too, so the colour can be
+     placed deliberately (fire at the bottom, curtains up the left) rather than
+     landing wherever the app's randomiser put it. */
+  .cer.look-prism .daycard-ns__iri,
+  .cer.look-aurora .daycard-ns__iri,
+  .cer.look-ember .daycard-ns__iri { opacity:.10; }
+  .cer.look-prism .daycard-ns__sheen,
+  .cer.look-aurora .daycard-ns__sheen,
+  .cer.look-ember .daycard-ns__sheen { opacity:.28; }
+  .cer.look-prism .daycard-theme-living .blob,
+  .cer.look-aurora .daycard-theme-living .blob,
+  .cer.look-ember .daycard-theme-living .blob { transform:none !important; }
+
+  /* PRISM inside: near-black, with the ring's two temperatures pooling in
+     opposite corners and nothing bright in the centre. */
+  .cer.look-prism .daycard-theme-living .blob.b1 {
+    width:120%; height:86%; left:-24%; top:-18%; right:auto; bottom:auto;
+    background:radial-gradient(circle, rgba(78,58,230,1), transparent 68%);
+    opacity:calc(var(--clar,0) * .38); }
+  .cer.look-prism .daycard-theme-living .blob.b3 {
+    width:112%; height:82%; right:-22%; bottom:-20%; left:auto; top:auto;
+    background:radial-gradient(circle, rgba(255,70,120,1), transparent 66%);
+    opacity:calc(var(--bk) * .42); }
+  .cer.look-prism .daycard-theme-living .blob.b4 {
+    width:78%; height:52%; right:-14%; bottom:-6%; left:auto; top:auto;
+    background:radial-gradient(circle, rgba(255,126,26,1), transparent 66%);
+    opacity:calc(var(--bk) * .34); }
+  .cer.look-prism .daycard-theme-living .blob.b5 {
+    width:74%; height:56%; right:-10%; top:-12%; left:auto; bottom:auto;
+    background:radial-gradient(circle, rgba(56,178,255,1), transparent 68%);
+    opacity:calc(var(--bk) * .32); }
+  .cer.look-prism .daycard-theme-living .blob.b6 {
+    width:80%; height:60%; left:-12%; bottom:-14%; right:auto; top:auto;
+    background:radial-gradient(circle, rgba(38,214,255,1), transparent 68%);
+    opacity:calc(var(--bk) * .26); }
+
+  /* AURORA inside: curtains. Green low and wide, teal through the middle,
+     violet at the top, which is the order a real aurora runs in. */
+  .cer.look-aurora .daycard-theme-living .blob.b1 {
+    width:140%; height:64%; left:-22%; top:16%; right:auto; bottom:auto;
+    background:radial-gradient(circle, rgba(38,232,206,1), transparent 68%);
+    opacity:calc(var(--clar,0) * .62); }
+  .cer.look-aurora .daycard-theme-living .blob.b3 {
+    width:104%; height:104%; left:-16%; bottom:-34%; right:auto; top:auto;
+    background:radial-gradient(circle, rgba(58,255,142,1), transparent 66%);
+    opacity:calc(var(--bk) * .66); }
+  .cer.look-aurora .daycard-theme-living .blob.b4 {
+    width:96%; height:72%; right:-18%; top:-22%; left:auto; bottom:auto;
+    background:radial-gradient(circle, rgba(126,84,255,1), transparent 68%);
+    opacity:calc(var(--bk) * .46); }
+  .cer.look-aurora .daycard-theme-living .blob.b5 {
+    width:56%; height:80%; left:26%; top:-6%; right:auto; bottom:auto;
+    background:radial-gradient(circle, rgba(178,255,228,1), transparent 70%);
+    opacity:calc(var(--bk) * .34); }
+  .cer.look-aurora .daycard-theme-living .blob.b6 {
+    width:70%; height:58%; right:-8%; bottom:-16%; left:auto; top:auto;
+    background:radial-gradient(circle, rgba(46,190,255,1), transparent 68%);
+    opacity:calc(var(--bk) * .38); }
+
+  /* EMBER inside: fire. Hottest at the base and rising, coal above it. */
+  .cer.look-ember .daycard-theme-living .blob.b1 {
+    width:150%; height:96%; left:-26%; bottom:-26%; right:auto; top:auto;
+    background:radial-gradient(circle, rgba(206,32,18,1), transparent 68%);
+    opacity:calc(var(--clar,0) * .60); }
+  .cer.look-ember .daycard-theme-living .blob.b3 {
+    width:118%; height:66%; left:-9%; bottom:-22%; right:auto; top:auto;
+    background:radial-gradient(circle, rgba(255,112,18,1), transparent 64%);
+    opacity:calc(var(--bk) * .70); }
+  .cer.look-ember .daycard-theme-living .blob.b4 {
+    width:72%; height:38%; left:14%; bottom:-10%; right:auto; top:auto;
+    background:radial-gradient(circle, rgba(255,206,72,1), transparent 62%);
+    opacity:calc(var(--bk) * .58); }
+  .cer.look-ember .daycard-theme-living .blob.b5 {
+    width:86%; height:54%; right:-16%; top:2%; left:auto; bottom:auto;
+    background:radial-gradient(circle, rgba(255,58,34,1), transparent 68%);
+    opacity:calc(var(--bk) * .34); }
+  .cer.look-ember .daycard-theme-living .blob.b6 {
+    width:64%; height:44%; left:-10%; top:-8%; right:auto; bottom:auto;
+    background:radial-gradient(circle, rgba(150,20,12,1), transparent 70%);
+    opacity:calc(var(--bk) * .30); }
   .cer.look-prism .cer__edge, .cer.look-aurora .cer__edge, .cer.look-ember .cer__edge {
     box-shadow:0 0 6px rgba(255,255,255,.34), 0 0 120px rgba(255,255,255,.08); }
 
