@@ -62,16 +62,19 @@
   .cer .daycard-theme-living { --rfl-d:48; --rfl-w:8; --rfl-i:.95; }
   .cer .daycard-floor {
     filter:blur(22px) saturate(var(--sat,1.5)) hue-rotate(var(--mm-hue,0deg));
-    /* the app's home mask fades the outer 20% each side, which is what made it
-       read as a dense column down the middle. Out here it holds full width and
-       only softens at the extreme edges. */
+    /* The sides are cut by a RADIAL falloff, not a linear one. A linear side
+       fade under the perspective tilt still ends somewhere, and that somewhere
+       renders as a straight diagonal: the reflection read as a trapezoid with
+       drawn edges instead of light dying out. The ellipse is anchored at the
+       contact and fades in every direction, so there is no edge to see, which
+       is the same rule the card's own bloom follows. */
     -webkit-mask-image:
-      linear-gradient(to top, transparent 0%, #000 7%, rgba(0,0,0,0.5) 52%, transparent 92%),
-      linear-gradient(to right, transparent 0%, #000 6%, #000 94%, transparent 100%);
+      linear-gradient(to top, transparent 0%, #000 9%, rgba(0,0,0,0.42) 44%, transparent 76%),
+      radial-gradient(ellipse 58% 108% at 50% 100%, #000 24%, rgba(0,0,0,0.5) 58%, transparent 82%);
     -webkit-mask-composite:source-in;
     mask-image:
-      linear-gradient(to top, transparent 0%, #000 7%, rgba(0,0,0,0.5) 52%, transparent 92%),
-      linear-gradient(to right, transparent 0%, #000 6%, #000 94%, transparent 100%);
+      linear-gradient(to top, transparent 0%, #000 9%, rgba(0,0,0,0.42) 44%, transparent 76%),
+      radial-gradient(ellipse 58% 108% at 50% 100%, #000 24%, rgba(0,0,0,0.5) 58%, transparent 82%);
     mask-composite:intersect; }
   /* THE FAN. A floor seen from standing height throws the reflection back as a
      trapezoid: the card's width at the contact, opening out as it comes toward
@@ -82,7 +85,7 @@
      contact), and the reflection hangs off it unchanged. */
   .cer__mirror { position:absolute; left:0; right:0; top:0; bottom:0;
     pointer-events:none; transform-origin:50% 100%;
-    transform:perspective(1100px) rotateX(28deg); }
+    transform:perspective(1200px) rotateX(21deg); }
 
   /* The spill reads as ONE piece of light on a floor: a hot contact line, then
      a single wide wash that runs off both sides of the screen. It used to be
