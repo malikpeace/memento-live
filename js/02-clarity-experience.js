@@ -4849,9 +4849,10 @@ Return ONLY the sentence text. No quotes, no labels.`;
   renderContent() {
     this.progressEl.innerHTML = '';
     this.navEl.innerHTML = '';
-    // The narrowing runs on a timer; any re-render kills it so it can never
+    // The narrowing runs on timers; any re-render kills them so it can never
     // keep striking lines inside a surface that no longer exists.
     if (this._narrowTimer) { clearTimeout(this._narrowTimer); this._narrowTimer = null; }
+    if (this._narrowWatch) { clearTimeout(this._narrowWatch); this._narrowWatch = null; }
 
     // Hard gate: intake must be completed before anything else renders.
     // Without this, returning users (or any flow that calls renderContent
@@ -4879,18 +4880,21 @@ Return ONLY the sentence text. No quotes, no labels.`;
       return;
     }
 
-    // Round 9: error state with retry, shown when draft generation failed.
+    // Generation failed. This is a screen a PAYING user actually reaches (the
+    // proxy times out on long plans), so it gets the same beat composition as
+    // every other surface and says what happened in human words. It used to be
+    // a top-aligned block showing the raw "API error (504)" string.
     if (actionChatError && !hasActionPlan()) {
-      this.pageWrap.innerHTML = `
-        <div class="action-exp__page-inner"><div class="action-exp__inner" style="padding-top:80px;text-align:center;">
-          <div style="font-size:1.2rem;font-weight:700;margin-bottom:8px;">Something blocked the plan.</div>
-          <div style="font-size:0.9rem;color:var(--text-2);line-height:1.6;max-width:32ch;margin:0 auto 20px;">${esc(actionChatError)}</div>
-          <button class="action-wiz__btn action-wiz__btn--generate" id="actionDraftRetry" style="padding:14px 28px;border-radius:calc(14px * var(--rx, 1));">Try again</button>
-        </div></div>`;
-      this.pageWrap.querySelector('#actionDraftRetry')?.addEventListener('click', () => {
-        actionChatError = null;
-        generateActionDraft();
-      });
+      const timedOut = /timed out|504|timeout/i.test(String(actionChatError));
+      const line = timedOut
+        ? 'The plan took too long to come back. Nothing you answered was lost.'
+        : 'Something got in the way of building your plan. Nothing you answered was lost.';
+      this._revealBeatShell(
+        `<p class="action-verdict__move">That did not land.</p>
+         <p class="action-verdict__receipt">${esc(line)}</p>`,
+        'Try again',
+        () => { actionChatError = null; generateActionDraft(); }
+      );
       return;
     }
 
@@ -5142,17 +5146,13 @@ Return ONLY the sentence text. No quotes, no labels.`;
   },
 
   _renderNarrowing() {
+    // Every entry invalidates the previous run's timers via the token, so a
+    // re-render can never leave two elimination loops racing on one surface.
+    this._narrowToken = (this._narrowToken || 0) + 1;
+    const token = this._narrowToken;
     const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const cands = this._narrowCandidates();
-    if (reduced || cands.length < 3) {
-      this.pageWrap.innerHTML = `
-        <div class="action-exp__page-inner"><div class="action-exp__inner action-draft-loading action-draft-loading--cine">
-          <div class="action-cine__thinking" aria-hidden="true"><i></i></div>
-          <div class="action-draft-loading__title">Building your path.</div>
-          <div class="action-draft-loading__line action-draft-loading__line--1">Testing every move against your answers.</div>
-        </div></div>`;
-      return;
-    }
+    if (reduced || cands.length < 3) { this._renderNarrowingCalm(); return; }
     this.pageWrap.innerHTML = `
       <div class="action-exp__page-inner"><div class="action-exp__inner action-draft-loading--cine action-narrow">
         <div class="action-narrow__col">
@@ -5171,9 +5171,15 @@ Return ONLY the sentence text. No quotes, no labels.`;
       if (a !== b) { order.push(a++); if (order.length < lines.length - 1) order.push(b--); }
       else { order.push(a); break; }
     }
+    // The elimination has a FIXED budget. It used to rotate forever, so a slow
+    // generation (the proxy can spend minutes on its retry ladder) left lines
+    // flashing endlessly, which reads as a hung screen and stops being honest
+    // theater the moment it outlives the work it is covering.
+    const MAX_WAVES = 2;
     let step = 0, wave = 0;
+    const alive = () => this.isOpen && actionAiLoading && this._narrowToken === token && col.isConnected;
     const tick = () => {
-      if (!this.isOpen || !actionAiLoading || !col.isConnected) return;
+      if (!alive()) return;
       if (step < lines.length - 1) {
         const el = lines[order[step]];
         if (el) el.classList.add('is-cut');
@@ -5183,8 +5189,9 @@ Return ONLY the sentence text. No quotes, no labels.`;
         const holdEl = lines[order[lines.length - 1]];
         if (holdEl) holdEl.classList.add('is-live');
         this._narrowTimer = setTimeout(() => {
-          if (!this.isOpen || !actionAiLoading || !col.isConnected) return;
+          if (!alive()) return;
           wave++;
+          if (wave >= MAX_WAVES) { this._renderNarrowingCalm(); return; }
           const rotated = cands.slice(wave % cands.length).concat(cands.slice(0, wave % cands.length));
           col.innerHTML = rotated.map(c => `<p class="action-narrow__cand">${esc(c)}</p>`).join('');
           lines = Array.from(col.querySelectorAll('.action-narrow__cand'));
@@ -5194,6 +5201,27 @@ Return ONLY the sentence text. No quotes, no labels.`;
       }
     };
     this._narrowTimer = setTimeout(tick, 650);
+  },
+
+  // The calm tail of the wait, and the screen's only exit. refreshActionSurface
+  // routes through render(), which only reaches renderContent() once
+  // tutorialSeen is set, so the loading screen cannot rely on anything else to
+  // repaint it. This watcher owns that: the moment generation ends, plan or
+  // error, it repaints. Without it the narrowing could strand forever.
+  _renderNarrowingCalm() {
+    const token = (this._narrowToken || 0);
+    this.pageWrap.innerHTML = `
+      <div class="action-exp__page-inner"><div class="action-exp__inner action-draft-loading action-draft-loading--cine">
+        <div class="action-cine__thinking" aria-hidden="true"><i></i></div>
+        <div class="action-draft-loading__title">Building your path.</div>
+        <div class="action-draft-loading__line action-draft-loading__line--1">Testing every move against your answers. This can take a minute.</div>
+      </div></div>`;
+    const watch = () => {
+      if (!this.isOpen || this._narrowToken !== token) return;
+      if (!actionAiLoading) { this.renderContent(); return; }
+      this._narrowWatch = setTimeout(watch, 400);
+    };
+    this._narrowWatch = setTimeout(watch, 400);
   },
 
   // (v875: renderTimeframeGate / bindTimeframeGate DELETED, Malik killed the
