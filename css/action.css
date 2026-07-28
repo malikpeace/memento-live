@@ -3732,6 +3732,14 @@ body.exit-grabber .action-exp__close { display: none !important; }
 .intake-count {
   font-size: 0.75rem; color: rgba(var(--ink),0.42); margin-bottom: 26px;
 }
+/* Locator chips (Night 3): fills, no borders, sized like real controls. */
+.action-intake #intakeChips .action-plan__when-chip {
+  border: none; padding: 12px 18px; border-radius: 12px;
+  background: rgba(var(--ink),0.07); color: rgba(var(--ink),0.88);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+  font-size: 0.875rem;
+}
+.action-intake #intakeChips .action-plan__when-chip:active { background: rgba(var(--ink),0.12); }
 
 /* The narrowing: candidate moves struck one by one while the plan generates.
    Lives on the dark-cinema draft-loading surface (root theme rule, no opt-out). */
@@ -3830,6 +3838,9 @@ body.exit-grabber .action-exp__close { display: none !important; }
 .aloop-top {
   display: flex; justify-content: space-between; align-items: baseline;
   padding-top: calc(var(--safe-t, 0px) + 14px);
+  /* clear the module's close button (top-right) so the weekday never sits
+     under it */
+  padding-right: 56px;
 }
 .aloop-mid { flex: 1; display: flex; flex-direction: column; justify-content: center; }
 .aloop-bot { padding-bottom: calc(var(--safe-b, 0px) + 14px); }
@@ -3969,6 +3980,10 @@ body.exit-grabber .action-exp__close { display: none !important; }
 /* the morning open */
 .aloop--morning .aloop-mid { transition: opacity 320ms ease-in, transform 320ms ease-in; }
 .aloop--morning .aloop-mid.is-rotating { opacity: 0; transform: translateX(-28px); }
+/* content optically centered, Start today pinned to the bottom (beat law);
+   .aloop-mid already stretches (flex:1) inside the .aloop column */
+.aloop--morning .aloop-mid { display: flex; flex-direction: column; justify-content: initial; }
+.aloop-morning__body { margin: auto 0; }
 .aloop-numrow { display: flex; align-items: center; justify-content: center; gap: 26px; }
 .aloop-numbig {
   font-size: clamp(120px, 42vw, 164px); font-weight: 750; letter-spacing: -0.055em;

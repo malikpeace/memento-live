@@ -3681,8 +3681,9 @@ function renderCommandCenter() {
     const _activeTier = _TK.indexOf(_selT) >= 0 ? _selT : pa.recommendedTier;
     // Night 3: the daily loop can chain a next action into today ("Do it
     // now") or lock one overnight; either outranks the cadence tier text so
-    // the home never contradicts the Action page.
-    const _loopNext = (state.action.loop && String(state.action.loop.chained || state.action.loop.nextAction || '').trim()) || '';
+    // the home never contradicts the Action page. Never after today is done:
+    // a locked-for-TOMORROW action under a green Completed reads as a lie.
+    const _loopNext = (!actionDoneToday() && state.action.loop && String(state.action.loop.chained || state.action.loop.nextAction || '').trim()) || '';
     const oneThing = _loopNext || (tiers[_activeTier] || tiers[pa.recommendedTier] || pa.title || '').trim() || 'Take one step toward your goal today';
     const tiny = tiers.tiny || '';
     const how = pa.howToStart || pa.recommendedWhy || '';

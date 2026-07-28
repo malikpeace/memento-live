@@ -3667,9 +3667,14 @@ const ActionExperience = {
     const door1 = /know/i.test(doorLabel) && !/find/i.test(doorLabel) && !slid;
 
     const push = (message, type, options, counter) => {
-      intake.aiMessages.push({ role: 'assistant', content: message });
-      intake.aiHistory.push({ message, type, options: options || [], counter: counter || '' });
-      persistNow();
+      // Dedupe: a double fetch (resume race, manual refresh) must never stack
+      // the same question twice in the transcript.
+      const last = intake.aiMessages[intake.aiMessages.length - 1];
+      if (!(last && last.role === 'assistant' && last.content === message)) {
+        intake.aiMessages.push({ role: 'assistant', content: message });
+        intake.aiHistory.push({ message, type, options: options || [], counter: counter || '' });
+        persistNow();
+      }
       this._renderIntakeFromState();
     };
     const finish = () => {
@@ -3873,7 +3878,8 @@ const ActionExperience = {
   _cineGo() {
     if (!this._cineSubmit) return;
     if (this._cineQType === 'choices') { if (this._cinePicked) this._cineSubmit(this._cinePicked); return; }
-    const i = this.pageWrap.querySelector('#intakeInput');
+    // chips screens carry the free field as #intakeCustom (Night 3 locator).
+    const i = this.pageWrap.querySelector('#intakeInput') || this.pageWrap.querySelector('#intakeCustom');
     this._cineSubmit(i && i.value);
   },
 
@@ -4031,7 +4037,9 @@ const ActionExperience = {
       }
 
       // Phase is aiDriven from here on. Send the user's answer to the AI.
-      if (phase === 'aiDriven') {
+      // A missing/unknown phase falls through here too, otherwise a corrupt
+      // resume swallows the answer silently and the intake wedges.
+      if (phase === 'aiDriven' || !phase) {
         // Edit short-circuit: if the user just hit Back and re-submitted the
         // SAME answer (typed or selected), restore the cached forward state
         // instead of burning another API call.
@@ -4324,14 +4332,15 @@ const ActionExperience = {
     } else if (q.type === 'chips') {
       const chipsSrc = (q.chips && q.chips.length) ? q.chips : (q.options || []);
       const chips = chipsSrc.map(c => `<button class="action-plan__when-chip" type="button" data-chip="${esc(c)}">${esc(c)}</button>`).join('');
-      // Always allow a custom answer alongside the chips. Users can either tap
-      // a chip or type their own phrasing and hit Use this / Enter.
+      // Night 3 (Malik's locator render, frame 11): the free field is the
+      // PRIMARY input, big like every other text question; the chips sit
+      // under it as quiet escapes. Enter or the nav's Next submits the text;
+      // a chip tap submits itself.
       const customRow = `
-        <div class="action-chat__chips-custom" style="display:flex;gap:8px;align-items:center;margin-top:12px;width:100%;max-width:520px;">
-          <input class="wiz__text-input" id="intakeCustom" type="text" placeholder="${esc(q.customPlaceholder || 'Or type your own...')}" style="flex:1;">
-          <button class="action-wiz__btn action-wiz__btn--generate" id="intakeCustomSave" type="button" style="padding:12px 20px;border-radius:calc(8px * var(--rx, 1));">Use this</button>
+        <div class="action-chat__chips-custom" style="margin-bottom:12px;width:100%;">
+          <textarea class="wiz__text-input action-cine__input" id="intakeCustom" rows="2" placeholder="${esc(q.customPlaceholder || 'Type it plainly...')}" autocomplete="off"></textarea>
         </div>`;
-      answers += `<div class="action-plan__when-edit" id="intakeChips">${chips}</div>${customRow}`;
+      answers += `${customRow}<div class="action-plan__when-edit" id="intakeChips">${chips}</div>`;
     } else {
       answers += `
         <textarea class="wiz__text-input action-cine__input" id="intakeInput" rows="2" placeholder="${esc(q.placeholder || 'Type your answer...')}" autocomplete="off"></textarea>
@@ -5200,12 +5209,16 @@ Return ONLY the sentence text. No quotes, no labels.`;
     const today = this._loopDayKey(new Date());
     const kept = this._loopKeptDays();
     // The morning open: a NEW day with history behind it gets the number
-    // rotation before anything else.
-    if (loop.lastOpenDay && loop.lastOpenDay !== today && kept.size > 0 && !this._morningShown) {
+    // rotation before anything else. Keyed to the day so a session that
+    // crosses 4am gets tomorrow's rotation too.
+    if (loop.lastOpenDay && loop.lastOpenDay !== today && kept.size > 0 && this._morningShownFor !== today) {
       this._renderMorningOpen();
       return;
     }
     if (loop.lastOpenDay !== today) { loop.lastOpenDay = today; try { persistNow(); } catch (e) {} }
+    // A chained "Do it now" action in flight outranks the summary: the card
+    // must survive re-renders (tab switch, reopen) until it is completed.
+    if (String(loop.chained || '').trim()) { this._renderLoopCard(); return; }
     const doneToday = this._loopCompletionsFor(today);
     if (doneToday.length > 0) { this._renderTodaySoFar(); return; }
     this._renderLoopCard();
@@ -5223,10 +5236,17 @@ Return ONLY the sentence text. No quotes, no labels.`;
     const dayN = this._loopDayNumber();
     const weekday = this._loopWeekday(0);
     const brief = (k, v) => v ? `<div class="aloop-brief"><span class="aloop-brief__k">${k}</span><span class="aloop-brief__v">${esc(v)}</span></div>` : '';
+    // The chained line tells the truth about where the action came from: a
+    // morning open means it was locked last night; mid-day means they just
+    // chained it with Do it now.
+    const doneTodayN = this._loopCompletionsFor(this._loopDayKey(new Date())).length;
+    const chainLine = doneTodayN > 0
+      ? 'Chained from what you just finished. Same day, same push.'
+      : 'You locked this in last night. Today starts here.';
     const cardHtml = chained
       ? `<p class="aloop-card__cap">Next action</p>
          <p class="aloop-card__move">${esc(chained)}</p>
-         <p class="aloop-card__why">Chained from what you just finished. Same day, same push.</p>`
+         <p class="aloop-card__why">${chainLine}</p>`
       : `<p class="aloop-card__cap">Today's action</p>
          <p class="aloop-card__move">${esc((pa.tiers && pa.tiers[tier]) || pa.title || '')}</p>
          ${pa.why ? `<p class="aloop-card__why">${esc(pa.why)}</p>` : ''}
@@ -5252,7 +5272,7 @@ Return ONLY the sentence text. No quotes, no labels.`;
         </div>
         <div class="aloop-bot">
           <button type="button" class="aloop-hold" id="aloopHold"><i class="aloop-hold__fill" aria-hidden="true"></i><span>Hold to complete</span><small>press and hold</small></button>
-          <button type="button" class="aloop-focus" id="aloopFocus"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9.5V13l2.2 1.6M9 2.5h6"/></svg>Focus${(pa.tierTime && pa.tierTime[tier]) ? ' ' + esc(String(pa.tierTime[tier]).replace(/utes?$/, '')) : ''}</button>
+          <button type="button" class="aloop-focus" id="aloopFocus"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9.5V13l2.2 1.6M9 2.5h6"/></svg>Focus${(!chained && pa.tierTime && pa.tierTime[tier]) ? ' ' + esc(String(pa.tierTime[tier]).replace(/utes?$/, '')) : ''}</button>
         </div>
       </div></div>`;
     const root = this.pageWrap.querySelector('.aloop');
@@ -5439,7 +5459,10 @@ Return ONLY the sentence text. No quotes, no labels.`;
     const closed = !!(loop.closedDays && loop.closedDays[today]);
     const weekday = this._loopWeekday(0);
     const rowHtml = rows.map(r => {
-      const t = (pa.tierTime && pa.tierTime[r.tier]) || '';
+      // The tier time is only true for the tier move itself; chained one-off
+      // actions carry no honest time, so they show none.
+      const isTierMove = !!(pa.tiers && pa.tiers[r.tier] && r.actionText === pa.tiers[r.tier]);
+      const t = isTierMove ? ((pa.tierTime && pa.tierTime[r.tier]) || '') : '';
       return `<div class="aloop-rrow"><span class="aloop-rrow__tick">&#10003;</span><span class="aloop-rrow__t">${esc(r.actionText)}</span>${t ? `<span class="aloop-rrow__m apl-num">${esc(t)}</span>` : ''}</div>`;
     }).join('');
     const next = String(loop.nextAction || '').trim();
@@ -5477,7 +5500,7 @@ Return ONLY the sentence text. No quotes, no labels.`;
   // The morning open: yesterday's number holds, then the line rotates left
   // and today lands with what is next.
   _renderMorningOpen() {
-    this._morningShown = true;
+    this._morningShownFor = this._loopDayKey(new Date());
     const loop = this._loopState();
     const pa = state.action.primaryAction || {};
     const today = this._loopDayKey(new Date());
@@ -5494,13 +5517,15 @@ Return ONLY the sentence text. No quotes, no labels.`;
     const tRows = [next, next === cadence ? '' : cadence].filter(Boolean).map(t =>
       `<div class="aloop-rrow"><span class="aloop-openbox" aria-hidden="true"></span><span class="aloop-rrow__t">${esc(t)}</span></div>`).join('');
     const beat = (a, b, c, label, rowsHtml, cta) => `
-      <div class="aloop-numrow">
-        <span class="aloop-numside apl-num">${a}</span>
-        <span class="aloop-numbig apl-num">${b}</span>
-        <span class="aloop-numside apl-num">${c}</span>
+      <div class="aloop-morning__body">
+        <div class="aloop-numrow">
+          <span class="aloop-numside apl-num">${a}</span>
+          <span class="aloop-numbig apl-num">${b}</span>
+          <span class="aloop-numside apl-num">${c}</span>
+        </div>
+        <p class="aloop-numlab">${label}</p>
+        <div class="aloop-morning__rows">${rowsHtml}</div>
       </div>
-      <p class="aloop-numlab">${label}</p>
-      <div class="aloop-morning__rows">${rowsHtml}</div>
       ${cta ? '<div class="aloop-bot"><button type="button" class="aloop-hold aloop-start" id="aloopStart"><span>Start today</span></button></div>' : ''}`;
     this.pageWrap.innerHTML = `
       <div class="action-exp__page-inner"><div class="aloop aloop--morning">
