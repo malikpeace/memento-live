@@ -369,6 +369,175 @@
   .cer.look-obsidian .cer__sign { color:rgba(14,18,24,.6); }
   .cer.look-obsidian .cer__cta { background:#0c1116; color:#fff; }
 
+  /* ================= THE WILDER LOOKS =========================================
+     Four more to look at, on Malik's ask, built from his references. These
+     leave the project palette behind on purpose, which is the point of showing
+     them: they are options to judge, not proposals. Same card, same geometry,
+     same motion as every other look.
+     --bk is the blob key: it drives the extra colour layers from --act, so the
+     palette arrives as the card ignites. On phones it holds at zero until the
+     release (see the phone block), because fading blobs inside a blurred layer
+     frame by frame is what crashed iOS. */
+  .cer { --bk:var(--act, 0); }
+
+  /* The platinum wash is a white flood at 0.85, which drowns any palette that
+     is not silver: these looks pull it down so their own colour survives the
+     ignition, and push saturation up to hold the neon. Both are static values,
+     never animated, so no blur re-runs. */
+  .cer.look-wild .daycard-theme-living,
+  .cer.look-rainbow .daycard-theme-living { --plat-k:.26; --sat:2.2; }
+  .cer.look-thermal .daycard-theme-living { --plat-k:.42; --sat:2; }
+  .cer.look-chroma .daycard-theme-living { --plat-k:.72; --sat:1.8; }
+
+  /* THERMAL. Cold core, molten edge, straight off the lava reference. */
+  .cer.look-thermal .daycard-theme-living .blob.b1 {
+    background:radial-gradient(circle, rgba(28,54,255,1), transparent 66%); }
+  .cer.look-thermal .daycard-theme-living .blob.b2 {
+    background:radial-gradient(circle, rgba(86,206,255,.98), transparent 66%); }
+  .cer.look-thermal .daycard-theme-living .blob.b3 {
+    background:radial-gradient(circle, rgba(255,214,64,1), transparent 62%);
+    opacity:calc(var(--bk) * .55); }
+  .cer.look-thermal .daycard-theme-living .blob.b4 {
+    background:radial-gradient(circle, rgba(255,96,28,1), transparent 64%);
+    opacity:calc(var(--bk) * .5); }
+  .cer.look-thermal .daycard-ns__plat {
+    background:radial-gradient(58% 52% at 50% 42%,
+      rgba(196,240,255,.72) 0%, rgba(70,150,255,.42) 46%,
+      rgba(30,60,220,.20) 78%, rgba(30,60,220,0) 100%); }
+  .cer.look-thermal .daycard-ns__rim {
+    box-shadow:
+      inset 0 0 0 2.6px rgba(255,244,214,1),
+      inset 0 0 8px 1px rgba(255,206,84,.92),
+      inset 0 0 22px rgba(255,120,32,.62),
+      inset 0 0 52px rgba(226,44,20,.32),
+      inset 0 0 110px rgba(120,20,10,.16); }
+  .cer.look-thermal .cer__edge {
+    box-shadow:
+      0 0 7px rgba(255,232,170,.92),
+      0 0 26px rgba(255,150,50,.60),
+      0 0 70px rgba(240,70,26,.34),
+      0 0 170px rgba(180,30,14,.18); }
+  .cer.look-thermal .cer__glow {
+    background:radial-gradient(circle, rgba(255,150,60,.18) 0%, rgba(200,60,30,.08) 34%, transparent 66%); }
+  .cer.look-thermal { --fl:255,206,140; --fl2:236,86,36; }
+  .cer.look-thermal .cer__flare {
+    background:radial-gradient(circle, rgba(255,246,220,.55) 0%, rgba(255,168,60,.26) 22%,
+      rgba(230,60,26,.10) 42%, rgba(230,60,26,0) 64%); }
+
+  /* CHROMA. The card stays platinum; the light splits at the edges, warm on one
+     side and cold on the other, the way a prism throws it. */
+  .cer.look-chroma .daycard-theme-living .blob.b1 {
+    background:radial-gradient(circle, rgba(90,180,255,1), transparent 66%); }
+  .cer.look-chroma .daycard-theme-living .blob.b3 {
+    background:radial-gradient(circle, rgba(255,80,190,1), transparent 64%);
+    opacity:calc(var(--bk) * .34); }
+  .cer.look-chroma .daycard-theme-living .blob.b4 {
+    background:radial-gradient(circle, rgba(255,190,60,1), transparent 64%);
+    opacity:calc(var(--bk) * .34); }
+  .cer.look-chroma .daycard-ns__rim {
+    box-shadow:
+      inset 0 0 0 2.2px rgba(255,255,255,1),
+      inset 4px 4px 7px rgba(255,96,20,.92),
+      inset -4px -4px 7px rgba(30,170,255,.92),
+      inset 7px 7px 16px rgba(255,40,120,.44),
+      inset -7px -7px 16px rgba(60,255,200,.40),
+      inset 0 0 26px rgba(255,255,255,.34),
+      inset 0 0 70px rgba(150,110,255,.24); }
+  .cer.look-chroma .cer__edge {
+    box-shadow:
+      9px 7px 16px rgba(255,110,20,.72),
+      -9px -7px 16px rgba(20,160,255,.72),
+      16px 12px 40px rgba(255,40,140,.36),
+      -16px -12px 40px rgba(60,255,190,.32),
+      0 0 7px rgba(255,255,255,.85),
+      0 0 120px rgba(150,150,255,.22); }
+  .cer.look-chroma .cer__glow {
+    background:radial-gradient(circle, rgba(220,190,255,.18) 0%, rgba(255,150,90,.07) 34%, transparent 66%); }
+  .cer.look-chroma { --fl:255,232,225; --fl2:150,180,255; }
+
+  /* WILD. The neon organic reference: every pillar in the card lit at once in a
+     colour that is not Memento's. Deliberately loud. */
+  .cer.look-wild .daycard-theme-living .blob.b1 {
+    background:radial-gradient(circle, rgba(255,64,186,1), transparent 66%); }
+  .cer.look-wild .daycard-theme-living .blob.b2 {
+    background:radial-gradient(circle, rgba(96,240,255,.98), transparent 66%); }
+  .cer.look-wild .daycard-theme-living .blob.b3 {
+    background:radial-gradient(circle, rgba(80,255,150,1), transparent 62%);
+    opacity:calc(var(--bk) * .62); }
+  .cer.look-wild .daycard-theme-living .blob.b4 {
+    background:radial-gradient(circle, rgba(150,84,255,1), transparent 64%);
+    opacity:calc(var(--bk) * .58); }
+  .cer.look-wild .daycard-theme-living .blob.b5 {
+    background:radial-gradient(circle, rgba(255,152,40,1), transparent 64%);
+    opacity:calc(var(--bk) * .5); }
+  .cer.look-wild .daycard-theme-living .blob.b6 {
+    background:radial-gradient(circle, rgba(255,80,120,1), transparent 64%);
+    opacity:calc(var(--bk) * .42); }
+  .cer.look-wild .daycard-ns__plat {
+    background:radial-gradient(58% 52% at 50% 42%,
+      rgba(255,255,255,.62) 0%, rgba(255,120,220,.32) 46%,
+      rgba(120,90,255,.18) 78%, rgba(120,90,255,0) 100%); }
+  .cer.look-wild .daycard-ns__rim {
+    box-shadow:
+      inset 0 0 0 2.4px rgba(255,255,255,1),
+      inset 0 0 8px 1px rgba(255,120,230,.80),
+      inset 0 0 24px rgba(120,240,255,.52),
+      inset 0 0 56px rgba(150,90,255,.30),
+      inset 0 0 116px rgba(255,90,160,.16); }
+  .cer.look-wild .cer__edge {
+    box-shadow:
+      0 0 7px rgba(255,255,255,.88),
+      0 0 26px rgba(255,90,210,.58),
+      0 0 70px rgba(110,230,255,.36),
+      0 0 170px rgba(150,90,255,.22); }
+  .cer.look-wild .cer__glow {
+    background:radial-gradient(circle, rgba(255,120,220,.18) 0%, rgba(100,200,255,.08) 34%, transparent 66%); }
+  .cer.look-wild { --fl:255,180,240; --fl2:120,200,255; }
+  .cer.look-wild .cer__flare {
+    background:radial-gradient(circle, rgba(255,255,255,.55) 0%, rgba(255,120,220,.26) 22%,
+      rgba(110,220,255,.10) 42%, rgba(110,220,255,0) 64%); }
+
+  /* RAINBOW. The spectrum ordered rather than scattered: the rim falls off
+     through the whole band, red at the edge to violet inboard. */
+  .cer.look-rainbow .daycard-theme-living .blob.b1 {
+    background:radial-gradient(circle, rgba(255,56,56,1), transparent 66%); }
+  .cer.look-rainbow .daycard-theme-living .blob.b2 {
+    background:radial-gradient(circle, rgba(255,255,255,.98), transparent 66%); }
+  .cer.look-rainbow .daycard-theme-living .blob.b3 {
+    background:radial-gradient(circle, rgba(60,230,90,1), transparent 62%);
+    opacity:calc(var(--bk) * .34); }
+  .cer.look-rainbow .daycard-theme-living .blob.b4 {
+    background:radial-gradient(circle, rgba(70,120,255,1), transparent 64%);
+    opacity:calc(var(--bk) * .34); }
+  .cer.look-rainbow .daycard-theme-living .blob.b5 {
+    background:radial-gradient(circle, rgba(255,216,50,1), transparent 64%);
+    opacity:calc(var(--bk) * .30); }
+  .cer.look-rainbow .daycard-theme-living .blob.b6 {
+    background:radial-gradient(circle, rgba(200,70,255,1), transparent 64%);
+    opacity:calc(var(--bk) * .26); }
+  /* The spectrum lives on the EDGE, not in the face: six blurred colour blobs
+     overlapping just average out to grey mush, but ordered bands falling
+     inward from the rim stay legible as red, amber, green, cyan, violet. */
+  .cer.look-rainbow .daycard-ns__rim {
+    box-shadow:
+      inset 0 0 0 2.2px rgba(255,255,255,1),
+      inset 0 0 9px rgba(255,48,48,.95),
+      inset 0 0 21px rgba(255,196,32,.82),
+      inset 0 0 37px rgba(48,232,96,.68),
+      inset 0 0 58px rgba(40,168,255,.56),
+      inset 0 0 96px rgba(168,56,255,.40); }
+  .cer.look-rainbow .cer__edge {
+    box-shadow:
+      0 0 7px rgba(255,255,255,.92),
+      0 0 20px rgba(255,60,60,.72),
+      0 0 46px rgba(255,200,40,.50),
+      0 0 88px rgba(50,220,120,.38),
+      0 0 140px rgba(50,150,255,.30),
+      0 0 200px rgba(160,60,255,.20); }
+  .cer.look-rainbow .cer__glow {
+    background:radial-gradient(circle, rgba(255,220,180,.16) 0%, rgba(120,160,255,.08) 34%, transparent 66%); }
+  .cer.look-rainbow { --fl:255,246,230; --fl2:140,170,255; }
+
   /* ---- the old version, kept only so the two can be compared side by side ---- */
   .cer.legacy { perspective:1600px; perspective-origin:50% 40%; }
   .cer.legacy .cer__stage { opacity:0; transform:rotateY(94deg) scale(.88) translateY(-78px); }
@@ -393,6 +562,10 @@
   @media (max-width: 767.98px) {
     .cer .daycard-theme-living .blob.b2 { opacity:0; transition:opacity .9s ease-out; }
     .cer.lit .daycard-theme-living .blob.b2 { opacity:calc(var(--act, 0) * .82); }
+    /* the themed looks' extra colour layers, held out of the blur the same way */
+    .cer { --bk:0; }
+    .cer.lit { --bk:var(--act, 0); }
+    .cer .daycard-theme-living .blob { transition:opacity .9s ease-out; }
     /* same reasoning for the reflected rim: it is a child of a blurred parent */
     .cer .daycard-floor .daycard-ns__rim { opacity:0; transition:opacity .9s ease-out; }
     .cer.lit .daycard-floor .daycard-ns__rim { opacity:calc(var(--act, 0) * var(--rim-k, 1)); }
@@ -537,6 +710,10 @@
       <button data-look="bronze" onclick="setLook('bronze')">Bronze</button>
       <button data-look="graphite" onclick="setLook('graphite')">Graphite, the edge lights, not the face</button>
       <button data-look="obsidian" onclick="setLook('obsidian')">Obsidian, light room and a black Memento</button>
+      <button data-look="thermal" onclick="setLook('thermal')">Thermal</button>
+      <button data-look="chroma" onclick="setLook('chroma')">Chroma</button>
+      <button data-look="wild" onclick="setLook('wild')">Wild</button>
+      <button data-look="rainbow" onclick="setLook('rainbow')">Rainbow</button>
 
       <h3 style="margin-top:12px">Hold a state</h3>
       <button onclick="freeze(0)">dormant</button>
