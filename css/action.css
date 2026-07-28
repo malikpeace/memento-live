@@ -3694,6 +3694,132 @@ body.exit-grabber .action-exp__close { display: none !important; }
   background: rgba(var(--ink),0.07); color: rgba(var(--ink),0.94);
   box-shadow: var(--glass-highlight);
 }
+/* ---- Night 3: the fixed-screen intake (Malik's locked renders) ---- */
+/* The star recap: Quick Reminder label, the star large, the timeframe under. */
+.intake-beat__quiet--reminder {
+  font-size: 0.90625rem; font-weight: 650; color: rgba(var(--ink),0.62);
+  margin-bottom: 14px;
+}
+.intake-beat__nstar {
+  font-size: 2rem; font-weight: 750; letter-spacing: -0.022em; line-height: 1.22;
+  color: var(--text-hi);
+}
+.intake-beat__nstf {
+  font-size: 1.0625rem; font-weight: 600; color: rgba(var(--ink),0.62);
+  margin-top: 10px;
+}
+/* The doors as real doors: title + one line of what happens behind each. */
+.door-card {
+  display: block; width: 100%; text-align: left; border: none;
+  border-radius: calc(16px * var(--rx,1)); padding: 20px 22px; cursor: pointer;
+  font-family: var(--font); background: rgba(var(--ink),0.05);
+  box-shadow: var(--glass-highlight); margin-bottom: 11px;
+  transition: transform 0.15s ease;
+}
+.door-card:active { transform: scale(0.985); }
+.door-card--hi { background: var(--solid-bg); box-shadow: 0 6px 22px rgba(0,0,0,0.4); }
+.door-card__t {
+  display: block; font-size: 1.1875rem; font-weight: 750; letter-spacing: -0.015em;
+  color: var(--text-hi);
+}
+.door-card--hi .door-card__t { color: var(--solid-fg); }
+.door-card__s {
+  display: block; font-size: 0.84375rem; line-height: 1.5;
+  color: rgba(var(--ink),0.62); margin-top: 7px;
+}
+.door-card--hi .door-card__s { color: var(--solid-fg); opacity: 0.62; }
+/* The quiet question counter: the end is always visible. */
+.intake-count {
+  font-size: 0.75rem; color: rgba(var(--ink),0.42); margin-bottom: 26px;
+}
+
+/* The narrowing: candidate moves struck one by one while the plan generates.
+   Lives on the dark-cinema draft-loading surface (root theme rule, no opt-out). */
+.action-narrow {
+  display: flex; flex-direction: column; justify-content: center;
+  min-height: 76vh; padding: 0 24px;
+}
+.action-narrow__col { display: flex; flex-direction: column; }
+.action-narrow__cand {
+  margin: 0; padding: 8px 0; text-align: center;
+  font-size: 0.9375rem; line-height: 1.5; color: var(--text-hi);
+  opacity: 0.92; transition: opacity 260ms ease-out, color 260ms ease-out;
+}
+.action-narrow__cand.is-cut {
+  color: var(--text-lo); opacity: 0.35;
+  text-decoration: line-through;
+  text-decoration-color: rgba(235,238,248,0.25);
+}
+.action-narrow__cand.is-live {
+  color: var(--text-hi); opacity: 1; font-weight: 650; font-size: 1.03125rem;
+  text-decoration: none;
+}
+.action-narrow__foot {
+  margin-top: 30px; text-align: center;
+  font-size: 0.8125rem; color: var(--text-lo);
+}
+
+/* The reveal sequence: verdict, bridge, breath, first step. Rides the
+   .action-cine-reveal root theme rule; only the geometry changes here. */
+.action-verdict {
+  text-align: left; align-items: stretch; justify-content: flex-start;
+  padding: 0 22px;
+}
+/* Beat composition law: content optically centered, CTA bottom-anchored. */
+.action-verdict .intake-beat {
+  width: 100%; min-height: 82vh;
+  display: flex; flex-direction: column;
+}
+.action-verdict .intake-beat__body { margin: auto 0; }
+.action-verdict .action-verdict__cta { margin-top: 18px; }
+.action-verdict__theirs {
+  margin: 0 0 22px; font-size: 1.0625rem; line-height: 1.5; color: var(--text-hi);
+  transition: color 500ms ease-out, opacity 500ms ease-out;
+}
+.action-verdict__theirs.is-cut {
+  color: var(--text-lo); opacity: 0.75;
+  text-decoration: line-through; text-decoration-color: rgba(235,238,248,0.35);
+}
+.action-verdict__receipt {
+  margin: 0 0 26px; font-size: 0.96875rem; line-height: 1.6; color: var(--text-hi);
+}
+.action-verdict__cap {
+  margin: 0 0 8px; font-size: 0.8125rem; font-weight: 600; color: var(--text-lo);
+}
+.action-verdict__move {
+  margin: 0 0 10px; font-size: 1.6875rem; font-weight: 750;
+  letter-spacing: -0.02em; line-height: 1.25; color: var(--text-hi);
+}
+.action-verdict__cutrow {
+  margin: 0; padding: 9px 0; font-size: 1rem; line-height: 1.5; color: var(--text-hi);
+  transition: color 400ms ease-out;
+}
+.action-verdict__cutrow.is-cut {
+  color: var(--text-lo);
+  text-decoration: line-through; text-decoration-color: rgba(235,238,248,0.3);
+}
+.action-verdict__cutrow:last-of-type { margin-bottom: 22px; }
+.action-verdict__bridge-line {
+  margin: 0 0 24px; font-size: 1.1875rem; font-weight: 650; line-height: 1.35;
+  color: var(--text-hi);
+}
+.action-verdict__bridge-line--star { font-size: 1.375rem; font-weight: 750; letter-spacing: -0.015em; }
+.action-verdict__scale { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+.action-verdict__scale-row {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 14px;
+  padding: 11px 14px; border-radius: 10px;
+  background: rgba(255,255,255,0.04); opacity: 0.72;
+}
+.action-verdict__scale-row.is-rec {
+  background: rgba(255,255,255,0.09); opacity: 1;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+}
+.action-verdict__scale-move { font-size: 0.9375rem; line-height: 1.45; color: var(--text-hi); }
+.action-verdict__scale-time { flex: none; font-size: 0.78125rem; color: var(--text-lo); }
+.action-verdict__mori {
+  margin: 26px 0 0; font-size: 0.875rem; color: var(--text-lo);
+}
+
 .intake-beat__ghostline {
   border: none; background: transparent; padding: 10px; cursor: pointer;
   font-family: var(--font); font-size: 0.78125rem; color: rgba(var(--ink),0.45);

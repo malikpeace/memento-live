@@ -1100,12 +1100,20 @@ RESPONSE FORMAT - strict JSON, raw, no markdown fences, no commentary:
       "extreme": "2-6 word verb-phrase, max grind. Example: 'Ship the full feature today.'"
     },
     "tierTime": {
-      "tiny": "the DURATION ONLY, 1-3 words, nothing else: '5 min'. Never a phrase like '1 hr phone-free', just '1 hr'.",
+      "tiny": "the DURATION ONLY, 1-3 words, nothing else: '5 min'. Never a phrase like '1 hr phone-free', just '1 hr'. Ranges are welcome when honest ('30-45 min'); never fake precision.",
       "light": "'15 min'",
       "moderate": "'45 min' (or '2 hrs', 'one evening', whatever is TRUE for this goal)",
       "heavy": "'2 hrs'",
       "extreme": "'half a day' (bigger scales allowed: 'a full Saturday')"
     },
+    "tierDone": {
+      "tiny": "the FINISH LINE of that tier, one short verifiable sentence in plain words: 'One message sent.' It happened or it did not; never a feeling, never 'made progress'.",
+      "light": "'Three answers written down.'",
+      "moderate": "same rule, sized to the moderate tier",
+      "heavy": "same rule",
+      "extreme": "same rule"
+    },
+    "ifStuck": "ONE alternate MODE for the same move when the main form stalls, under 14 words: 'Send a voice note instead of asking for a call.' A mode switch, never a smaller dose (the tiers already scale size). Only facts they gave you.",
     "howToStart": "ONE ignition motion, executable TODAY (never gated on a future day), in minutes, never a chained multi-hour plan (the workout/session/batch itself belongs to the tiers). Under 45 words, complete sentences. So specific it feels autistic: name the place or the category (never an unstated brand), the exact search phrase / first sentence / first rep, and exact durations when they matter ('hum a melody into the mic for 60 seconds'). Every time anchor must be named in the same sentence ('set a 7pm alarm'), never a dangling referent like 'that same time'. Any message you tell them to send is written out verbatim and contains only facts THEY stated. Not 'start looking into events', not a full day compressed into a sentence.",
     "verdict": "'confirmed' | 'upgraded' | 'replaced' when the user named their own move; null on the find-it-for-me path.",
     "verdictReason": "ONE sentence. For replaced/upgraded: their own words or numbers as the receipt. For confirmed: why their instinct passes the tests. For a visible cut on the find path: what was cut. Empty string when nothing to say.",
@@ -1335,6 +1343,18 @@ function normalizeActionPlan(raw = {}) {
       validTiers.forEach(k => { delete tierTime[k]; });
     }
   })();
+  // Night 3 (Malik's brief spec): per-tier finish lines + one mode-switch
+  // fallback. Optional everywhere downstream; a missing field renders nothing
+  // rather than breaking a plan.
+  const rawTierDone = raw.primaryAction?.tierDone || {};
+  const tierDone = {};
+  validTiers.forEach(k => {
+    let d = trimText(clean(rawTierDone[k]), 90).trim();
+    // Finish lines are statements, not headlines: keep them sentence-shaped.
+    if (d && !/[.!?]$/.test(d)) d += '.';
+    if (d) tierDone[k] = d;
+  });
+  const ifStuck = trimText(clean(raw.primaryAction?.ifStuck), 110);
   const primaryAction = {
     title: cleanTitle,
     // v889: caps raised, the old 240/200 chopped real sentences mid-argument
@@ -1344,6 +1364,8 @@ function normalizeActionPlan(raw = {}) {
     path: path,
     tiers: tiersRaw,
     tierTime: tierTime,
+    tierDone: tierDone,
+    ifStuck: ifStuck,
     // Hard-force moderate. Per product spec the UI always defaults to
     // Medium and the user picks their own intensity, the AI no longer
     // recommends a tier.
@@ -1540,7 +1562,12 @@ async function generateActionDraft(options = {}) {
     const nextStepInstruction = isNextStep
       ? '\n\nNEXT-STEP MODE: They already finished the actions listed under "COMPLETED ALREADY". Generate 5 new tier options (tiny → extreme) that represent the NEXT logical move now. Do not regenerate any action that is essentially the same as one in the history. Build on top of what they did. The primaryAction.title can stay the same OR shift if the next step belongs to a different sub-goal.'
       : '';
-    const userBody = `PERSON CONTEXT:\n${contextLines}\n\nReturn the full plan JSON now. No conversation. If their "ONE THING" guess is close to a real high-leverage move, USE IT as the primaryAction title (lightly rewritten in your voice). Their guess at the main move is data, not a constraint - but anchor to it when it lines up.${nextStepInstruction}`;
+    // Night 3, decision 9 (Malik): "Keep my version" on a Replace/Upgrade
+    // verdict. Their move is still mechanized, never obeyed raw.
+    const keepTheirsInstruction = options.keepTheirs && String(intake.mainMove || '').trim()
+      ? `\n\nKEEP-THEIR-VERSION OVERRIDE: The user saw your verdict and chose to keep THEIR OWN move: "${String(intake.mainMove).trim()}". Build the ENTIRE plan around their move. Do not swap in a different lever. Make their move mechanical: a count, a cadence, a verifiable finish line; the tiers scale THEIR move on one axis. Set verdict to "confirmed" and write verdictReason as a straight sentence about what makes their version workable, citing their own words. No lecture, no told-you-so.`
+      : '';
+    const userBody = `PERSON CONTEXT:\n${contextLines}\n\nReturn the full plan JSON now. No conversation. If their "ONE THING" guess is close to a real high-leverage move, USE IT as the primaryAction title (lightly rewritten in your voice). Their guess at the main move is data, not a constraint - but anchor to it when it lines up.${nextStepInstruction}${keepTheirsInstruction}`;
 
     // v887: soft/emotional goals (no scoreboard) make Sonnet think for its
     // ENTIRE output budget and return a thinking-only block with no text,
@@ -1579,7 +1606,14 @@ async function generateActionDraft(options = {}) {
         }
         break;
       } catch (emptyErr) {
-        if (/empty response/i.test(String(emptyErr && emptyErr.message)) && emptyTries < softNudges.length) {
+        // Night 3: the proxy 504s when Sonnet's thinking outlasts its window
+        // (three in a row on 2026-07-28). Walk 5xx/timeouts down the SAME
+        // ladder as empty responses; the last rung turns thinking off, which
+        // generates fast enough to beat the proxy's clock.
+        const msg = String(emptyErr && emptyErr.message);
+        const retryable = /empty response/i.test(msg) ||
+          /API error \(5\d\d\)/i.test(msg) || /timed out/i.test(msg);
+        if (retryable && emptyTries < softNudges.length) {
           emptyTries++;
         } else { throw emptyErr; }
       }
@@ -1811,12 +1845,20 @@ async function refreshActionSection(field) {
       "extreme": "2-6 word verb phrase, max grind."
     },
     "tierTime": {
-      "tiny": "duration ONLY, 1-3 words: '5 min'",
+      "tiny": "duration ONLY, 1-3 words: '5 min' (honest ranges fine: '30-45 min')",
       "light": "'15 min'",
       "moderate": "'45 min'",
       "heavy": "'2 hrs'",
       "extreme": "'half a day'"
     },
+    "tierDone": {
+      "tiny": "that tier's finish line, one short verifiable sentence: 'One message sent.'",
+      "light": "'Three answers written down.'",
+      "moderate": "same rule, sized to the tier",
+      "heavy": "same rule",
+      "extreme": "same rule"
+    },
+    "ifStuck": "one alternate MODE for the same move when the main form stalls, under 14 words. A mode switch, never a smaller dose.",
     "howToStart": "one concrete first move, sized to the moderate tier",
     "shape": "'lever' (repeated move, the default) or 'door' (genuine one-shot finishable today)",
     "targetCompletions": "INTEGER. How many times they complete this exact move to satisfy the commitment. A 'door' is always 1. Daily for two weeks = 14; three times a week for two weeks = 6; a steady habit defaults to 7. Must be >= 1 and <= windowDays.",

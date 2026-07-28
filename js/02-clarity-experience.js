@@ -3065,11 +3065,12 @@ const ActionExperience = {
     // Current question metadata (aiHistory tail wins, matching the live path).
     let current = null;
     if (mode === 'question') {
-      let q = pairs[pairs.length - 1].q, type = 'text', options = [];
+      let q = pairs[pairs.length - 1].q, type = 'text', options = [], counter = '';
       const h = (intake.aiHistory || [])[(intake.aiHistory || []).length - 1];
-      if (h && h.message) { q = h.message; type = h.type || 'text'; options = h.options || []; }
-      if (type === 'chips') type = 'text';
-      current = { question: q, type, options };
+      if (h && h.message) { q = h.message; type = h.type || 'text'; options = h.options || []; counter = h.counter || ''; }
+      // Night 3: chips are real again (chips = options + a custom row). The
+      // fixed-screen script chooses types deliberately, nothing to demote.
+      current = { question: q, type, options, counter };
     }
     return { mode, past, current, goal };
   },
@@ -3079,16 +3080,15 @@ const ActionExperience = {
     const ca = (state.clarity && state.clarity.answers) || {};
     const goal = (ca.neutronStar || '').trim();
     const tf = ((ca.timeHorizon || ca.timeframe || '') + '').trim();
-    const why = ((ca.coreWhy || ca.whyItMatters || '') + '').trim();
-    const goalEmbed = (goal.length > 1 && /^[A-Z][a-z]/.test(goal))
-      ? goal.charAt(0).toLowerCase() + goal.slice(1) : goal;
+    // Night 3 (Malik's locked render): a quick reminder, nothing more. The
+    // star and its timeframe exactly as Clarity locked them, no edit option,
+    // three seconds and through.
+    const tfLine = tf ? (/^within\b/i.test(tf) ? tf.charAt(0).toUpperCase() + tf.slice(1) : 'Within ' + tf) : '';
     return '<div class="intake-beat" data-beat="summary">' +
       '<div class="intake-beat__body">' +
-        '<div class="intake-beat__quiet">Quick recap</div>' +
-        '<div class="intake-beat__sum">You want to <b>' + esc(goalEmbed) + '</b>' +
-          (tf ? ', within <b>' + esc(tf) + '</b>' : '') + '.</div>' +
-        (why ? '<div class="intake-beat__sum intake-beat__sum--why">In your own words: &ldquo;' + esc(why) + '&rdquo;</div>' : '') +
-        '<div class="intake-beat__sum">Let\'s find out <b>exactly</b> how to get you there.</div>' +
+        '<div class="intake-beat__quiet intake-beat__quiet--reminder">Quick Reminder: Your Neutron Star</div>' +
+        '<div class="intake-beat__nstar">' + esc(goal) + '</div>' +
+        (tfLine ? '<div class="intake-beat__nstf">' + esc(tfLine) + '</div>' : '') +
       '</div>' +
       (withCta ? '<button type="button" class="intake-beat__cta" id="missionConfirmBtn">Continue</button>' : '') +
     '</div>';
@@ -3210,14 +3210,23 @@ const ActionExperience = {
   // The doors beat, painted only by _renderIntakeFromState.
   _renderDoorsBeat(host) {
     const intake = state.action.intake;
+    // Night 3 (Malik's locked render): the doors as real doors, each saying
+    // what happens behind it. Both doors route into the scripted fixed-screen
+    // engine; the AI never speaks between answers anymore.
     host.innerHTML =
       '<div class="intake-beat" data-beat="doors">' +
         '<div class="intake-beat__body">' +
           '<div class="intake-beat__ask">Do you know what you have to do to get there?</div>' +
-          '<div class="intake-beat__sub">Not the busywork. The one move that makes everything else easier or unnecessary.</div>' +
+          '<div class="intake-beat__sub">Not the busywork. The one action that makes everything else easier or unnecessary.</div>' +
         '</div>' +
-        '<button type="button" class="intake-beat__cta" id="doorKnow">I know the move</button>' +
-        '<button type="button" class="intake-beat__cta intake-beat__cta--ghost" id="doorFind">Find it for me</button>' +
+        '<button type="button" class="door-card door-card--hi" id="doorKnow">' +
+          '<span class="door-card__t">I know what to do</span>' +
+          '<span class="door-card__s">Tell Action what it is. It gets tested against your own numbers, not obeyed.</span>' +
+        '</button>' +
+        '<button type="button" class="door-card" id="doorFind">' +
+          '<span class="door-card__t">Find it for me</span>' +
+          '<span class="door-card__s">Two questions and Action chooses. You will see exactly why.</span>' +
+        '</button>' +
       '</div>';
     this._cineActivate();
     // v876 (Malik): the doors open on a BLANK page and the question TYPES in
@@ -3229,23 +3238,15 @@ const ActionExperience = {
         if (!Array.isArray(intake.aiHistory)) intake.aiHistory = [];
         const opener = 'Do you know what you have to do to get there?';
         intake.aiMessages.push({ role: 'assistant', content: opener });
-        intake.aiHistory.push({ message: opener, type: 'choices', options: ['I know the move', 'Find it for me'] });
+        intake.aiHistory.push({ message: opener, type: 'choices', options: ['I know what to do', 'Find it for me'] });
         intake.aiMessages.push({ role: 'user', content: label });
-        // v873 (Malik): "I know the move" needs no thinking, the next question
-        // is fixed. Push it locally and render instantly; the AI takes over
-        // from their answer. "Find it for me" stays AI (the capacity line is
-        // personalized), so that path derives thinking mode and fetches.
-        if (label === 'I know the move') {
-          const q = "That's great! What do you think you have to do? The most literal, tangible actions.";
-          intake.aiMessages.push({ role: 'assistant', content: q });
-          intake.aiHistory.push({ message: q, type: 'text', options: [] });
-        }
         persistNow();
-        this._renderIntakeFromState();
+        // The scripted engine decides the next screen for BOTH doors.
+        this._aiIntakeFetchNext();
       } catch (_) {}
     };
     const k = host.querySelector('#doorKnow'), f = host.querySelector('#doorFind');
-    if (k) k.addEventListener('click', () => pick('I know the move'));
+    if (k) k.addEventListener('click', () => pick('I know what to do'));
     if (f) f.addEventListener('click', () => pick('Find it for me'));
   },
 
@@ -3618,202 +3619,125 @@ const ActionExperience = {
   },
 
   async _aiIntakeFetchNextInner(intake) {
-    // v867: a restored/seeded intake can carry messages without the snapshot
-    // scaffolding (the logged "reading 'goalConfirm' of undefined" promise
-    // crash). Heal the shape before any read.
+    // Night 3 (Malik's locked decision): the intake is FIXED SCREENS. The
+    // conversation state (aiMessages / aiHistory / aiSnapshot) is unchanged so
+    // resume, back-nav and the plan generator all keep working, but the next
+    // question comes from a local script, never an AI call. The AI speaks
+    // exactly twice in Action now: the narrowing (plan generation) and the
+    // verdict. Screens per the locked intake renders:
+    //   door 1: what is it (text)  ->  been doing it? (3 chips)  ->  done
+    //   door 2: capacity still true? (chips, one follow-up if changed)
+    //           ->  what have you tried? (chips w/ custom + nothing)  ->  done
+    // "I don't know" typed inside door 1 slides quietly into door 2.
     if (!intake.aiSnapshot) intake.aiSnapshot = { goalConfirm: '', timeframe: '', pastProgress: '', mainMove: '' };
     if (!Array.isArray(intake.aiHistory)) intake.aiHistory = [];
     if (!intake.answers) intake.answers = {};
     const ca = state.clarity.answers || {};
-    const ns = ca.neutronStar || '';
-    const tfHint = ca.timeframe || ca.timeHorizon || '';
+    const snap = intake.aiSnapshot;
 
-    // Show typing indicator while we wait.
-    const currentEl = this.pageWrap.querySelector('.action-intake__current');
-    if (currentEl) currentEl.innerHTML = '<div class="action-cine__thinking" aria-label="Thinking"><i></i></div>';
-    try { this.navEl.innerHTML = ''; } catch (e) {}
+    // Prefill what Clarity already locked; never re-asked.
+    if (!snap.goalConfirm && ca.neutronStar) snap.goalConfirm = ca.neutronStar;
+    if (!snap.timeframe) snap.timeframe = String(ca.timeframe || ca.timeHorizon || '').trim();
 
-    const context = `User context for this conversation:
-Their locked Neutron Star: "${ns}"
-${ca.coreWhy ? `Why it matters to them (from Clarity, reference it when it sharpens a question, never recite it): "${ca.coreWhy}"` : ''}
-${ca.antiVision ? `What they fear if they never act (from Clarity, background context only): "${ca.antiVision}"` : ''}
-A timeframe they mentioned in Clarity (use as a starting reference, but confirm): "${tfHint}"
-${ca.dailyTime ? `Their committed daily time from Clarity (door 2 reconfirms this in your own words): ${ca.dailyTime} minutes a day${ca.intensity ? ', self-rated intensity: ' + ca.intensity : ''}` : ''}
-Current snapshot (what you have captured so far): ${JSON.stringify(intake.aiSnapshot)}
+    const userMsgs = intake.aiMessages
+      .filter(m => m.role === 'user')
+      .map(m => String(m.content || '').trim());
+    const doorLabel = userMsgs[0] || '';
+    const after = userMsgs.slice(1);
+    const dontKnow = (t) => /^(i\s*)?(don'?t|dont|do not)\s*know\b|^idk\b|^no idea\b|^not sure\b/i.test(String(t || '').trim());
+    const slid = !!intake._slidDoor2 || (after.length >= 1 && dontKnow(after[0]) && !intake._slidHandled);
+    const door1 = /know/i.test(doorLabel) && !/find/i.test(doorLabel) && !slid;
 
-Reminder: ONLY put a value in snapshot.X when the user's most recent answer is substantive for field X. If it's vague, garbage, sarcastic, or a platitude, leave the field empty and push back in your message.${(intake.aiMessages.length === 0 && intake.aiSnapshot.goalConfirm) ? `
-
-The goal and timeframe are already locked from Clarity (see snapshot); they are shown on screen as editable confirmations. Do NOT greet them like a returning user (never "welcome back"), do NOT re-confirm the goal or the timeframe, and NO emojis. One short grounded line that carries the momentum, then ask what they have actually done toward it so far. This is the ONLY question in this conversation; the moment their answer is substantive, the plan builds. If they say they want to change the goal wording or the timeframe, handle that in one turn (capture the new value), then return to the one question.` : ''}`;
-
-    // Build API messages: inject context into the FIRST user message of the convo.
-    const apiMessages = [];
-    let injected = false;
-    intake.aiMessages.forEach(m => {
-      if (!injected && m.role === 'user') {
-        apiMessages.push({ role: 'user', content: context + '\n\nUser response: ' + m.content });
-        injected = true;
-      } else {
-        apiMessages.push({ role: m.role, content: m.content });
-      }
-    });
-    if (!injected) {
-      apiMessages.push({ role: 'user', content: context + '\n\nNo user response yet. Start the next turn now.' });
-    }
-
-    try {
-      // v621: the intake is the paid first minute; it runs on Sonnet like the
-      // Clarity conversation (it was silently falling to the Haiku default,
-      // which kept slipping on the voice rules).
-      const raw = await callClaude(apiMessages, AI_ACTION_INTAKE_SYSTEM_PROMPT, { maxTokens: 1200, model: (typeof ANTHROPIC_MODEL_CLARITY === 'string' ? ANTHROPIC_MODEL_CLARITY : undefined) });
-      const parsed = this._parseAiIntakeResponse(raw, intake.aiSnapshot);
-
-      // Update snapshot from the AI's judgment. The AI is the SOLE authority
-      // on whether the previous answer was substantive enough to capture.
-      if (parsed.snapshot && typeof parsed.snapshot === 'object') {
-        Object.keys(intake.aiSnapshot).forEach(k => {
-          const v = parsed.snapshot[k];
-          if (typeof v === 'string' && v.trim().length > 0) {
-            intake.aiSnapshot[k] = v;
-            intake.answers[k] = v;
-          } else {
-            // The AI cleared / declined to capture this field.
-            intake.aiSnapshot[k] = '';
-            if (intake.answers) delete intake.answers[k];
-          }
-        });
-      }
-
-      // Mirror captures to clarity state where used downstream.
-      if (intake.aiSnapshot.timeframe) state.clarity.answers.timeframe = intake.aiSnapshot.timeframe;
-      try { this._renderIntakeGiven(); } catch (_) {}
-      if (intake.aiSnapshot.goalConfirm && intake.aiSnapshot.goalConfirm.length >= 8) {
-        // Only overwrite Neutron Star if the captured goalConfirm looks like a real goal.
-        const chipLabels = ["yeah, that's still it", "close, but i'd word it differently", "no, i want to change it"];
-        if (!chipLabels.includes(intake.aiSnapshot.goalConfirm.toLowerCase().trim())) {
-          state.clarity.answers.neutronStar = intake.aiSnapshot.goalConfirm;
-        }
-      }
-
-      persistNow();
-
-      // Decide if we're truly done. Honor ready ONLY when all four fields have
-      // real substance (so a hallucinated ready: true cannot end the convo early).
-      const snap = intake.aiSnapshot;
-      const lengthOk = (s, n) => typeof s === 'string' && s.trim().length >= n;
-      // v845 (Malik's branches): door 1 ("I know the move") needs the move AND
-      // the is-it-working answer; door 2 ("Find it for me") needs the
-      // commitment check + locator, which both land in pastProgress. The AI
-      // keeps its lazy-answer authority: vague answers stay uncaptured.
-      const door1 = (intake.aiMessages.find(m => m.role === 'user') || {}).content === 'I know the move';
-      // v871 CAPTURE NET (the sweep's "Good to go?" stall): the model
-      // sometimes fails to capture a clearly substantive answer and then
-      // recaps forever. The field mapping is deterministic by contract, so
-      // stamp it ourselves when the model slips: door 1's first substantive
-      // answer IS mainMove and its second IS pastProgress; door 2's second
-      // IS pastProgress (the first is the capacity reconfirm). Lazy answers
-      // stay uncaptured (BS check + length bar keep the AI's push-back
-      // authority intact).
-      try {
-        const doorIdx = intake.aiMessages.findIndex(m => m.role === 'user');
-        const afterDoor = intake.aiMessages.slice(doorIdx + 1)
-          .filter(m => m.role === 'user').map(m => String(m.content || ''));
-        const substantive = (s) => {
-          if (typeof s !== 'string' || s.trim().length < 16) return false;
-          try { if (typeof detectBSAnswer === 'function' && detectBSAnswer(s)) return false; } catch (e2) {}
-          return true;
-        };
-        const stamp = (k, v) => { snap[k] = v; intake.answers[k] = v; };
-        if (door1) {
-          if (!lengthOk(snap.mainMove, 8) && substantive(afterDoor[0])) stamp('mainMove', afterDoor[0]);
-          if (!lengthOk(snap.pastProgress, 4) && substantive(afterDoor[1])) stamp('pastProgress', afterDoor[1]);
-        } else {
-          if (!lengthOk(snap.pastProgress, 4) && substantive(afterDoor[1])) stamp('pastProgress', afterDoor[1]);
-        }
-      } catch (eNet) {}
-      const doneNow = door1
-        ? (lengthOk(snap.mainMove, 8) && lengthOk(snap.pastProgress, 4))
-        : lengthOk(snap.pastProgress, 4);
-      if (doneNow) {
-        intake.completed = true;
-        persistNow();
-        this._aiIntakeRenderClosing();
-        return;
-      }
-      const snapComplete = lengthOk(snap.goalConfirm, 8) && lengthOk(snap.timeframe, 2) && lengthOk(snap.pastProgress, 4) && lengthOk(snap.mainMove, 4);
-      // v620 backstop: the reality-check calibration is NON-SKIPPABLE and small
-      // models skip it when the user pre-accepts. If no assistant turn ever ran
-      // the comfortable-or-stretch calibration, refuse ready once and force it.
-      const calibrated = intake.aiMessages.some(m => m.role === 'assistant'
-        && /comfortab|stretch|realistic(ally)? (do|get|fit)|actually (get|fit) (this|it)/i.test(String(m.content)))
-        || /comfortab|stretch/i.test(String(parsed.message || ''));
-      if (parsed.ready === true && snapComplete && !calibrated && !intake._calibrationForced) {
-        intake._calibrationForced = true;
-        intake.aiMessages.push({ role: 'assistant', content: JSON.stringify(parsed) });
-        intake.aiMessages.push({ role: 'user', content: '[System note: you set ready without running the reality-check calibration. Ask ONE question now, in your own words: with their real week and the capacity they described, is this move comfortable or a stretch? Adjust the move if the answer says so, then finish.]' });
-        persistNow();
-        await this._aiIntakeFetchNext();
-        return;
-      }
-      if (parsed.ready === true && snapComplete) {
-        intake.completed = true;
-        persistNow();
-        this._aiIntakeRenderClosing();
-        return;
-      }
-
-      // Render the AI's message + appropriate input type.
-      const message = (parsed.message || parsed.question || '').toString().trim();
-      // Client-side safety: force chips back to text. The user wants to type
-      // freeform answers, not pick from a pre-selected list.
-      let type = (['text', 'choices', 'chips'].includes(parsed.type)) ? parsed.type : 'text';
-      if (type === 'chips') type = 'text';
-      const options = Array.isArray(parsed.options) ? parsed.options : [];
-
-      if (!message || message.length < 3) {
-        // Defensive fallback if AI returned nothing usable: nudge toward whichever
-        // field is still empty.
-        const missing = ['goalConfirm', 'timeframe', 'pastProgress', 'mainMove'].find(k => !snap[k] || snap[k].length < 2) || 'mainMove';
-        const fallback = {
-          goalConfirm: { msg: "Quick check, what's the goal you actually want to chase?", type: 'text' },
-          timeframe:   { msg: "And when would you like to ship this or get it done? Like a time frame?", type: 'chips', opts: ['1 month','3 months','6 months','1 year','2 years','5 years'] },
-          pastProgress:{ msg: "What have you actually done on this so far? Be honest.", type: 'text' },
-          mainMove:    { msg: "If you had to guess, what's the one move that would actually move the needle?", type: 'text' }
-        }[missing];
-        intake.aiMessages.push({ role: 'assistant', content: fallback.msg });
-        intake.aiHistory.push({ message: fallback.msg, type: fallback.type, options: fallback.opts || [] });
-        persistNow();
-        this._renderIntakeFromState();
-        return;
-      }
-
+    const push = (message, type, options, counter) => {
       intake.aiMessages.push({ role: 'assistant', content: message });
-      // Save the rendering metadata so back nav can restore the same input type.
-      intake.aiHistory.push({ message, type, options });
+      intake.aiHistory.push({ message, type, options: options || [], counter: counter || '' });
       persistNow();
       this._renderIntakeFromState();
-    } catch (e) {
-      console.warn('AI intake error', e);
-      // v870 (Malik): one SILENT retry first, a single radio blip should never
-      // surface. Only a second failure shows the human line + tap-to-retry.
-      if (!this._intakeRetried) {
-        this._intakeRetried = true;
-        this._setTimeout(() => { if (this.isOpen) this._aiIntakeFetchNext(); }, 1600);
+    };
+    const finish = () => {
+      intake.completed = true;
+      persistNow();
+      this._aiIntakeRenderClosing();
+    };
+
+    // Door 2's capacity phrasing, from Clarity's committed daily time.
+    const daily = parseInt(ca.dailyTime, 10) || 0;
+    const phrase = !daily ? ''
+      : daily >= 105 ? ('about ' + (Math.round(daily / 30) / 2) + ' hours a day')
+      : daily >= 75 ? 'about an hour and a half a day'
+      : daily >= 45 ? 'about an hour a day'
+      : ('about ' + daily + ' minutes a day');
+    const capacityQ = phrase
+      ? ('You said you can give this ' + phrase + '. Still true?')
+      : 'How much time can you actually give this on a normal day?';
+    const capacityType = phrase ? 'choices' : 'text';
+    const capacityOpts = phrase ? ['Still true', 'It changed'] : [];
+    const triedQ = 'What have you already tried?';
+    const NOTHING = 'Honestly, nothing yet';
+
+    const D1_Q2 = 'Have you been doing it, and is the number moving?';
+    const D1_OPTS = ['Doing it, and it is working', 'Doing it, but the number is not moving', 'Honestly not doing it'];
+
+    try {
+      if (door1) {
+        if (after.length === 0) {
+          push('What do you have to do? The most literal, tangible version.', 'text', [], '1 of 2');
+          return;
+        }
+        if (after.length === 1) {
+          snap.mainMove = after[0];
+          intake.answers.mainMove = after[0];
+          push(D1_Q2, 'choices', D1_OPTS, '2 of 2');
+          return;
+        }
+        // Defensive: if a resume lands here with both answers already in the
+        // transcript, capture the move too, never finish with it blank.
+        if (!snap.mainMove) { snap.mainMove = after[0]; intake.answers.mainMove = after[0]; }
+        snap.pastProgress = after[1];
+        intake.answers.pastProgress = after[1];
+        finish();
         return;
       }
-      this._intakeRetried = false;
-      const currentEl2 = this.pageWrap.querySelector('.action-intake__current');
-      if (currentEl2) {
-        currentEl2.innerHTML = `
-          <button type="button" class="intake-retry" id="intakeRetryBtn">
-            <span class="intake-retry__line">Oops, something went wrong with Memento.</span>
-            <span class="intake-retry__cta">Tap to retry</span>
-          </button>`;
-        const btn = currentEl2.querySelector('#intakeRetryBtn');
-        if (btn) btn.addEventListener('click', () => {
-          currentEl2.innerHTML = '<div class="action-cine__thinking" aria-label="Thinking"><i></i></div>';
-          this._aiIntakeFetchNext();
-        });
+
+      // Door 2 (including the quiet slide out of door 1).
+      if (slid && !intake._slidDoor2) {
+        intake._slidDoor2 = true;
+        intake._slidHandled = true;
+        snap.mainMove = '';
+        if (intake.answers) delete intake.answers.mainMove;
+        persistNow();
       }
+      // Answers that belong to door 2's script (drop the door-1 "idk" turn).
+      const d2 = intake._slidDoor2 && after.length && dontKnow(after[0]) ? after.slice(1) : after;
+      const changed = d2[0] === 'It changed';
+      const capNote = capacityType === 'text'
+        ? (d2[0] || '')
+        : (changed ? (d2[1] || '') : '');
+      const triedIdx = capacityType === 'text' ? 1 : (changed ? 2 : 1);
+
+      if (d2.length === 0) {
+        push(capacityQ, capacityType, capacityOpts, '1 of 2');
+        return;
+      }
+      if (changed && d2.length === 1) {
+        push('What can you actually give it a day right now?', 'text', [], '1 of 2');
+        return;
+      }
+      if (d2.length === triedIdx) {
+        push(triedQ, 'chips', [NOTHING], '2 of 2');
+        return;
+      }
+      const tried = d2[triedIdx] || '';
+      const triedTxt = tried === NOTHING ? 'Nothing tried yet, clean slate.' : tried;
+      snap.pastProgress = (capNote && capNote !== 'Still true'
+        ? 'capacity: ' + capNote + '. ' : '') + triedTxt;
+      intake.answers.pastProgress = snap.pastProgress;
+      finish();
+    } catch (e) {
+      console.warn('intake script error', e);
+      // The script is local and deterministic; if it ever throws, repaint the
+      // derived state rather than showing a retry wall.
+      try { this._renderIntakeFromState(); } catch (_) {}
     }
   },
 
@@ -3838,6 +3762,14 @@ The goal and timeframe are already locked from Clarity (see snapshot); they are 
     // v871: the past stack is built declaratively by _renderIntakeFromState;
     // this function only paints the CURRENT question.
     current.innerHTML = this._buildCurrentSectionHtml(fakeQ);
+    // Night 3 (the jank fix from the locked render): a quiet "1 of 2" so the
+    // end of the questions is always visible. Reserved space, top of the beat.
+    if (parsed.counter) {
+      const c = document.createElement('div');
+      c.className = 'intake-count apl-num';
+      c.textContent = parsed.counter;
+      current.insertBefore(c, current.firstChild);
+    }
     this._cineActivate();
     // v874 (Malik: typed text invisible under the keyboard): the settle-glide
     // recipe is WRONG for this surface, its precondition is a HIGH field and
@@ -4852,6 +4784,9 @@ Return ONLY the sentence text. No quotes, no labels.`;
   renderContent() {
     this.progressEl.innerHTML = '';
     this.navEl.innerHTML = '';
+    // The narrowing runs on a timer; any re-render kills it so it can never
+    // keep striking lines inside a surface that no longer exists.
+    if (this._narrowTimer) { clearTimeout(this._narrowTimer); this._narrowTimer = null; }
 
     // Hard gate: intake must be completed before anything else renders.
     // Without this, returning users (or any flow that calls renderContent
@@ -4875,12 +4810,7 @@ Return ONLY the sentence text. No quotes, no labels.`;
     // (v875: the Round 10 timeframe gate is DEAD, Malik killed it. Timeframe
     // is Clarity's question; a missing one never blocks the module.)
     if (actionAiLoading) {
-      this.pageWrap.innerHTML = `
-        <div class="action-exp__page-inner"><div class="action-exp__inner action-draft-loading action-draft-loading--cine">
-          <div class="action-cine__thinking" aria-hidden="true"><i></i></div>
-          <div class="action-draft-loading__title">Building your path.</div>
-          <div class="action-draft-loading__line action-draft-loading__line--1">Finding the highest leverage move you can make today.</div>
-        </div></div>`;
+      this._renderNarrowing();
       return;
     }
 
@@ -4900,46 +4830,14 @@ Return ONLY the sentence text. No quotes, no labels.`;
     }
 
     if (hasActionPlan() && actionPlanMatchesClarity()) {
-      // v615: the FIRST time the plan exists, the ONE move gets its reveal,
-      // big on black, word by word, then the plan settles in underneath.
+      // Night 3 (Malik's locked renders): the FIRST time the plan exists it
+      // arrives as a SEQUENCE, not a flash: the verdict (their move judged on
+      // their own numbers), the bridge (today -> this week -> the star), the
+      // scale breath (the five sizes), then the first step, right now. The
+      // flag is set only at the END so a relaunch mid-ceremony replays it
+      // (resume never lands ahead).
       state.meta = state.meta || {};
-      if (!state.meta.planRevealSeen) {
-        state.meta.planRevealSeen = true;
-        try { persistNow(); } catch (e) {}
-        const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        if (!reduced) {
-          const pa = state.action.primaryAction || {};
-          const tier = (state.action.selectedTier || pa.recommendedTier || 'moderate');
-          const move = (pa.tiers && pa.tiers[tier]) || pa.howToStart || pa.title || '';
-          if (move) {
-            const words = String(move).split(/\s+/).filter(Boolean).map((w, i) =>
-              `<span class="action-cine__rw" style="animation-delay:${380 + i * 170}ms">${esc(w)}</span>`
-            ).join(' ');
-            // v886 (ACTION-PHILOSOPHY.md): the reveal frames the VERDICT.
-            // Their instinct confirmed, sharpened, or replaced with their own
-            // receipt on screen. Find-path keeps the classic line.
-            const verdict = pa.verdict || null;
-            const eyebrow = verdict === 'confirmed' ? 'Your instinct was right'
-              : verdict === 'upgraded' ? 'Your move, sharpened'
-              : verdict === 'replaced' ? 'The real lever'
-              : 'The first move';
-            // v887 (doctrine): the receipt line also shows on the find path
-            // when the model chose visibly between several of their moves,
-            // the cut is named on screen. Confirmed stays eyebrow-only.
-            const reason = (verdict === 'replaced' || verdict === 'upgraded' || verdict === null) && pa.verdictReason
-              ? `<div class="action-cine-reveal__reason">${esc(pa.verdictReason)}</div>` : '';
-            this.pageWrap.innerHTML = `
-              <div class="action-exp__page-inner"><div class="action-exp__inner action-cine-reveal">
-                <div class="action-cine-reveal__eyebrow">${esc(eyebrow)}</div>
-                <div class="action-cine-reveal__move">${words}</div>
-                ${reason}
-              </div></div>`;
-            const holdMs = 380 + String(move).split(/\s+/).length * 170 + (reason ? 3400 : 1900);
-            setTimeout(() => { if (this.isOpen) this.renderContent(); }, Math.min(holdMs, 9000));
-            return;
-          }
-        }
-      }
+      if (!state.meta.planRevealSeen) { this._renderVerdictBeat(); return; }
       this._renderPlanByMode();
       return;
     }
@@ -4953,6 +4851,284 @@ Return ONLY the sentence text. No quotes, no labels.`;
     // If we somehow get here pre-intro, route back to the intro so the
     // normal intake flow takes over.
     this._showActionIntro();
+  },
+
+  // ---- Night 3: the reveal sequence (verdict -> bridge -> breath -> first
+  // step). One beat per screen, typed in, CTA bottom-anchored, all on the
+  // dark-cinema reveal surface (the .action-cine-reveal root rule).
+
+  _revealBeatShell(bodyHtml, ctaLabel, onCta, ghostLabel, onGhost) {
+    this.pageWrap.innerHTML = `
+      <div class="action-exp__page-inner"><div class="action-exp__inner action-cine-reveal action-verdict">
+        <div class="intake-beat" data-beat="verdict">
+          <div class="intake-beat__body">${bodyHtml}</div>
+          <button type="button" class="intake-beat__cta action-verdict__cta">${esc(ctaLabel)}</button>
+          ${ghostLabel ? `<button type="button" class="intake-beat__ghostline action-verdict__ghost">${esc(ghostLabel)}</button>` : ''}
+        </div>
+      </div></div>`;
+    const beat = this.pageWrap.querySelector('.intake-beat');
+    beat.querySelector('.action-verdict__cta').addEventListener('click', () => onCta && onCta());
+    const g = beat.querySelector('.action-verdict__ghost');
+    if (g && onGhost) g.addEventListener('click', () => onGhost());
+    this._typeRecapBeat(this.pageWrap);
+    return beat;
+  },
+
+  // Their tried list as separate strikeable rows (door 2's visible cut).
+  _triedRows() {
+    const snap = (state.action.intake && state.action.intake.aiSnapshot) || {};
+    return String(snap.pastProgress || '')
+      .replace(/^capacity:[^.]*\.\s*/i, '')
+      .split(/,|;|\band\b|\./)
+      .map(t => t.trim().replace(/^(i\s+|i've\s+|ive\s+)/i, ''))
+      .filter(t => t.length > 6 && !/nothing tried yet|clean slate/i.test(t))
+      .slice(0, 4);
+  },
+
+  _renderVerdictBeat() {
+    const pa = state.action.primaryAction || {};
+    const tier = pa.recommendedTier || 'moderate';
+    const move = (pa.tiers && pa.tiers[tier]) || pa.title || '';
+    const verdict = pa.verdict || null;
+    const snap = (state.action.intake && state.action.intake.aiSnapshot) || {};
+    const theirs = String(snap.mainMove || '').trim();
+    const reason = String(pa.verdictReason || '').trim();
+    let body = '';
+    if (theirs && verdict) {
+      // Door 1: their move in their words, the receipt, then the ending.
+      body += `<p class="action-verdict__theirs${verdict === 'replaced' ? ' will-cut' : ''}">&ldquo;${esc(theirs)}&rdquo;</p>`;
+      if (reason) body += `<p class="action-verdict__receipt">${esc(reason)}</p>`;
+      body += `<p class="action-verdict__cap">${verdict === 'confirmed' ? 'So the action is' : 'So the move is'}</p>`;
+      body += `<p class="action-verdict__move">${esc(move)}</p>`;
+    } else {
+      // Door 2: the visible cut when they listed tries; a clean arrival when
+      // they had nothing to strike.
+      const rows = this._triedRows();
+      if (rows.length) {
+        body += `<p class="action-verdict__cap">You told Action you have tried</p>`;
+        body += rows.map(r => `<p class="action-verdict__cutrow will-cut">${esc(r)}</p>`).join('');
+        if (reason) body += `<p class="action-verdict__receipt">${esc(reason)}</p>`;
+      } else if (reason) {
+        body += `<p class="action-verdict__receipt">${esc(reason)}</p>`;
+      }
+      body += `<p class="action-verdict__cap">So the move is</p>`;
+      body += `<p class="action-verdict__move">${esc(move)}</p>`;
+    }
+    const keepable = verdict === 'replaced' || verdict === 'upgraded';
+    const beat = this._revealBeatShell(
+      body, 'Lock it in', () => this._renderBridgeBeat(),
+      keepable ? 'Keep my version' : null,
+      keepable ? () => this._keepMyVersion() : null
+    );
+    // The strikes land AFTER the words exist: rough delay keyed to how much
+    // text the typewriter has to lay down first.
+    const chars = beat.querySelector('.intake-beat__body').textContent.length;
+    const base = Math.min(1200 + chars * 14, 6000);
+    Array.from(beat.querySelectorAll('.will-cut')).forEach((el, i) => {
+      this._setTimeout(() => el.classList.add('is-cut'), base + i * 420);
+    });
+  },
+
+  _keepMyVersion() {
+    // Decision 9 (Malik): on Replace and Upgrade they may keep their own
+    // version. It is still mechanized, never obeyed raw: the plan regenerates
+    // built AROUND their move.
+    generateActionDraft({ keepTheirs: true });
+  },
+
+  _renderBridgeBeat() {
+    const pa = state.action.primaryAction || {};
+    const tier = pa.recommendedTier || 'moderate';
+    const move = (pa.tiers && pa.tiers[tier]) || pa.title || '';
+    // The path runs far -> near; "this week" is the LAST step (or the one
+    // whose horizon says week).
+    const steps = Array.isArray(pa.path) ? pa.path : [];
+    const weekStep = steps.find(s => /week/i.test(String(s && s.horizon))) || steps[steps.length - 1];
+    const week = (weekStep && (weekStep.milestone || weekStep.looksLike)) || '';
+    const star = (state.clarity.answers && state.clarity.answers.neutronStar) || '';
+    let body = `<p class="action-verdict__cap">Today</p><p class="action-verdict__bridge-line">${esc(move)}</p>`;
+    if (week) body += `<p class="action-verdict__cap">This week</p><p class="action-verdict__bridge-line">${esc(week)}</p>`;
+    if (star) body += `<p class="action-verdict__cap">The star</p><p class="action-verdict__bridge-line action-verdict__bridge-line--star">${esc(star)}</p>`;
+    this._revealBeatShell(body, 'Continue', () => this._renderScaleBreath());
+  },
+
+  _renderScaleBreath() {
+    const pa = state.action.primaryAction || {};
+    const KEYS = ['tiny', 'light', 'moderate', 'heavy', 'extreme'];
+    const rec = pa.recommendedTier || 'moderate';
+    const rows = KEYS.map(k => {
+      const t = pa.tiers && pa.tiers[k];
+      if (!t) return '';
+      const time = (pa.tierTime && pa.tierTime[k]) ? `<span class="action-verdict__scale-time apl-num">${esc(pa.tierTime[k])}</span>` : '';
+      return `<div class="action-verdict__scale-row${k === rec ? ' is-rec' : ''}"><span class="action-verdict__scale-move">${esc(t)}</span>${time}</div>`;
+    }).join('');
+    const body =
+      `<p class="action-verdict__receipt">Some days you will have an hour. Some days ten minutes. The move scales. The day still counts.</p>` +
+      `<div class="action-verdict__scale">${rows}</div>`;
+    this._revealBeatShell(body, 'Continue', () => this._renderFirstStepNow());
+  },
+
+  _renderFirstStepNow() {
+    const pa = state.action.primaryAction || {};
+    const how = String(pa.howToStart || '').trim();
+    let body = `<p class="action-verdict__move">Do the first step. Right now.</p>`;
+    if (how) body += `<p class="action-verdict__receipt">${esc(how)}</p>`;
+    body += `<p class="action-verdict__mori">You do not get today back.</p>`;
+    this._revealBeatShell(body, 'Start now', () => this._finishReveal(), 'I will start today', () => this._finishReveal());
+  },
+
+  _finishReveal() {
+    state.meta = state.meta || {};
+    state.meta.planRevealSeen = true;
+    try { persistNow(); } catch (e) {}
+    this.renderContent();
+  },
+
+  // The narrowing (Night 3, from the intake.html render, frame 07). While the
+  // plan generates, candidate moves seeded from THEIR goal and THEIR answers
+  // flash past and get struck one by one. Latency theater, but honest theater:
+  // elimination is literally what the engine is doing. Both doors cross this.
+  _narrowCandidates() {
+    const ca = state.clarity.answers || {};
+    const snap = (state.action.intake && state.action.intake.aiSnapshot) || {};
+    const goal = String(ca.neutronStar || '').toLowerCase();
+    const has = (re) => re.test(goal);
+    // Family templates. Each entry: [test, moves]. First matching families
+    // contribute; the generic tail always applies.
+    const fams = [
+      [/(user|customer|client|revenue|sale|paying|business|startup|product|app|saas|mrr)/, [
+        'Run paid ads to the landing page',
+        'Post a launch thread every week',
+        'Redesign the onboarding first',
+        'Cold email fifty prospects',
+        'Talk to three users about why they signed up',
+        'Ship the referral feature',
+        'Start a build-in-public newsletter'
+      ]],
+      [/(follower|audience|subscriber|view|content|video|channel|tiktok|youtube|instagram|brand)/, [
+        'Post three times a day for a month',
+        'Study the top ten accounts in the niche',
+        'Buy a better camera setup',
+        'Remake the best old post with a new hook',
+        'Collab with a bigger account',
+        'Batch a week of content on Sunday'
+      ]],
+      [/(weight|fit|gym|muscle|run|marathon|health|body|lift)/, [
+        'Find a new training program',
+        'Meal prep every Sunday',
+        'Hire a coach',
+        'Track every meal for a week',
+        'Book the same gym slot daily',
+        'Cut the one worst food first'
+      ]],
+      [/(book|write|novel|album|song|music|art|portfolio|film)/, [
+        'Outline the whole thing first',
+        'Set a daily word count',
+        'Study the craft for a month',
+        'Show a rough draft to one person',
+        'Finish one small piece end to end',
+        'Block the same hour every morning'
+      ]],
+      [/(learn|skill|code|language|degree|exam|study|school|grade)/, [
+        'Buy the best course',
+        'Build one real project with it',
+        'Find a study partner',
+        'Do one hour before anything else',
+        'Test yourself weekly',
+        'Teach what you learned this week'
+      ]],
+      [/(money|save|debt|invest|income|job|career|promotion|raise)/, [
+        'Cut the three biggest expenses',
+        'Ask for the raise directly',
+        'Apply to ten roles this week',
+        'Start the side income small',
+        'Track every dollar for a month',
+        'Talk to someone two steps ahead'
+      ]]
+    ];
+    let pool = [];
+    fams.forEach(([re, moves]) => { if (has(re)) pool = pool.concat(moves); });
+    if (!pool.length) pool = [
+      'Plan the perfect roadmap first',
+      'Wait until the timing is right',
+      'Do one small piece of it today',
+      'Tell one person the real goal',
+      'Clear one hour and start ugly',
+      'Copy what worked for someone else'
+    ];
+    // Their OWN words go in the pool, that is what sells it as real.
+    const theirs = [];
+    const mm = String(snap.mainMove || '').trim();
+    if (mm) theirs.push(mm.length > 52 ? mm.slice(0, 49).replace(/\s+\S*$/, '') + '…' : mm);
+    String(snap.pastProgress || '').split(/[.;]/).forEach(t => {
+      t = t.replace(/^capacity:[^.]*$/i, '').trim();
+      // Door 1's evidence chips echo into pastProgress; they are states, not
+      // moves, and must never appear as candidates.
+      if (/^doing it|^honestly not doing/i.test(t)) return;
+      if (t && t.length > 8 && t.length <= 52 && !/nothing tried yet/i.test(t)) theirs.push(t);
+    });
+    // Deterministic shuffle (seeded by goal length) so replays don't reorder.
+    const seedN = goal.length + pool.length;
+    pool = pool.slice().sort((a, b) =>
+      ((a.length * 7 + seedN) % 13) - ((b.length * 7 + seedN) % 13));
+    const out = pool.slice(0, 6 - Math.min(theirs.length, 2));
+    theirs.slice(0, 2).forEach((t, i) => out.splice(1 + i * 2, 0, t));
+    return out.slice(0, 7);
+  },
+
+  _renderNarrowing() {
+    const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const cands = this._narrowCandidates();
+    if (reduced || cands.length < 3) {
+      this.pageWrap.innerHTML = `
+        <div class="action-exp__page-inner"><div class="action-exp__inner action-draft-loading action-draft-loading--cine">
+          <div class="action-cine__thinking" aria-hidden="true"><i></i></div>
+          <div class="action-draft-loading__title">Building your path.</div>
+          <div class="action-draft-loading__line action-draft-loading__line--1">Testing every move against your answers.</div>
+        </div></div>`;
+      return;
+    }
+    this.pageWrap.innerHTML = `
+      <div class="action-exp__page-inner"><div class="action-exp__inner action-draft-loading--cine action-narrow">
+        <div class="action-narrow__col">
+          ${cands.map(c => `<p class="action-narrow__cand">${esc(c)}</p>`).join('')}
+        </div>
+        <div class="action-narrow__foot">Testing every move against your answers.</div>
+      </div></div>`;
+    const col = this.pageWrap.querySelector('.action-narrow__col');
+    if (!col) return;
+    let lines = Array.from(col.querySelectorAll('.action-narrow__cand'));
+    // Strike order: outside in, so the held line lands mid-column like the
+    // render. The last survivor holds briefly, then the wave resets with the
+    // pool rotated, and it keeps eliminating until the plan lands.
+    const order = [];
+    for (let a = 0, b = lines.length - 1; a <= b;) {
+      if (a !== b) { order.push(a++); if (order.length < lines.length - 1) order.push(b--); }
+      else { order.push(a); break; }
+    }
+    let step = 0, wave = 0;
+    const tick = () => {
+      if (!this.isOpen || !actionAiLoading || !col.isConnected) return;
+      if (step < lines.length - 1) {
+        const el = lines[order[step]];
+        if (el) el.classList.add('is-cut');
+        step++;
+        this._narrowTimer = setTimeout(tick, 340 + Math.random() * 220);
+      } else {
+        const holdEl = lines[order[lines.length - 1]];
+        if (holdEl) holdEl.classList.add('is-live');
+        this._narrowTimer = setTimeout(() => {
+          if (!this.isOpen || !actionAiLoading || !col.isConnected) return;
+          wave++;
+          const rotated = cands.slice(wave % cands.length).concat(cands.slice(0, wave % cands.length));
+          col.innerHTML = rotated.map(c => `<p class="action-narrow__cand">${esc(c)}</p>`).join('');
+          lines = Array.from(col.querySelectorAll('.action-narrow__cand'));
+          step = 0;
+          this._narrowTimer = setTimeout(tick, 500);
+        }, 2400);
+      }
+    };
+    this._narrowTimer = setTimeout(tick, 650);
   },
 
   // (v875: renderTimeframeGate / bindTimeframeGate DELETED, Malik killed the
