@@ -5335,8 +5335,11 @@ Return ONLY the sentence text. No quotes, no labels.`;
     // rewriting one card in place. Each card carries its OWN tier on
     // data-tier, which is what lets the five sizes look different from each
     // other while you are still deciding.
+    // Only the slide you are looking at carries the scroll mask. Masks are
+    // composited layers, and five of them at once is part of what crashed
+    // iOS on v993.
     const cardFor = (k) => `
-      <div class="aloop-slide">
+      <div class="aloop-slide${KEYS.indexOf(k) === idx ? ' is-live' : ''}">
         <div class="aloop-card" data-tier="${k}">
           <div class="aloop-card__scroll">
             <p class="aloop-card__cap">Action</p>
@@ -5399,7 +5402,9 @@ Return ONLY the sentence text. No quotes, no labels.`;
         track.style.transition = animate ? 'transform 340ms cubic-bezier(.22,1,.36,1)' : 'none';
         track.style.transform = `translateX(calc(${i * -100}% + ${px}px))`;
       };
+      const slides = Array.prototype.slice.call(root.querySelectorAll('.aloop-slide'));
       const commit = () => {
+        slides.forEach((s, n) => s.classList.toggle('is-live', n === i));
         state.action.selectedTier = KEYS[i];
         try { persistNow(); } catch (e) {}
         root.dataset.tier = KEYS[i];

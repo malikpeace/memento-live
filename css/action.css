@@ -4054,10 +4054,13 @@ html.theme-light .action-exp {
 }
 .aloop-card__scroll::-webkit-scrollbar { display: none; }
 /* a soft hint that there is more, sitting just above the pinned footer. Long
-   enough to read as a fade rather than a chop. */
-.aloop-card__scroll { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 52px), transparent 100%);
+   enough to read as a fade rather than a chop.
+   Scoped to the LIVE slide: a mask is a composited layer, and five of them
+   at once is part of what crashed iOS on v993. Off-screen slides do not need
+   it, nobody can see their bottom edge. */
+.aloop-slide.is-live .aloop-card__scroll { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 52px), transparent 100%);
   mask-image: linear-gradient(to bottom, #000 calc(100% - 52px), transparent 100%); }
-.aloop-card__scroll.is-end { -webkit-mask-image: none; mask-image: none; }
+.aloop-slide.is-live .aloop-card__scroll.is-end { -webkit-mask-image: none; mask-image: none; }
 
 /* ---- the five sizes should not look the same ----
    Malik: give some differentiation BEFORE they commit. Easier reads lighter
@@ -4182,15 +4185,13 @@ html.theme-light .aloop-card[data-tier="extreme"]  { --aglass: rgba(228,231,237,
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
 }
 
-/* The blur has to out-specify js/11's global perf kill
-   (`body.lite *{backdrop-filter:none!important}`, specificity 0,0,1,1), which
-   is why these are written long. body.lite is the MOBILE path, so a shorter
-   selector would have blurred on desktop only and never on the phone. */
-.action-exp .aloop .aloop-card,
-.action-exp .aloop .aloop-nextcard {
-  -webkit-backdrop-filter: blur(calc(24px * var(--bx, 1))) saturate(1.35) !important;
-  backdrop-filter: blur(calc(24px * var(--bx, 1))) saturate(1.35) !important;
-}
+/* NO backdrop-filter on the loop cards. v993 turned this surface into a
+   five-slide carousel, so this rule went from one blurred layer to five, and
+   the `!important` was defeating js/11's `body.lite *{backdrop-filter:none}`
+   perf kill, which is the MOBILE path and exists precisely to stop this. Five
+   backdrop-filter layers plus five masks crashed iOS Safari on v993. The cards
+   are already opaque from the underlay above, so the blur was buying nothing
+   visible. If it ever comes back, it comes back on the ACTIVE slide only. */
 .aloop-rrow { display: flex; gap: 11px; padding: 11px 0; align-items: baseline; }
 .aloop-rrow + .aloop-rrow { border-top: 1px solid rgba(var(--ink),0.07); }
 .aloop-rrow__tick { color: var(--success, #3fd94e); font-weight: 700; flex: none; }
