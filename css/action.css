@@ -3770,6 +3770,49 @@ body.exit-grabber .action-exp__close { display: none !important; }
 }
 .action-intake #intakeChips .action-plan__when-chip:active { background: rgba(var(--ink),0.12); }
 
+/* ============================================================
+   ONE GLASS RECIPE FOR EVERY ACTION SURFACE.
+
+   Malik, three times: the boxes are see-through, the blueprint dots read
+   straight through them. The mistake was treating `backdrop-filter` as the
+   thing that makes a surface opaque. It is not. It blurs what is behind, it
+   does not cover it, and it silently no-ops on the mobile perf path
+   (`body.lite`) and in some renderers, so a 6-8% white film over near-black
+   stayed ~92% transparent and the dots came through anyway. Reading the
+   computed style said "blur applied" while the pixels said otherwise.
+
+   So the UNDERLAY does the covering, on every device, and the blur is only
+   depth on top of it. Never make a surface depend on backdrop-filter again.
+   ============================================================ */
+.action-exp {
+  --aglass: rgba(23, 25, 31, 0.94);        /* opaque base, lifted off the page */
+  --aglass-film: rgba(255, 255, 255, 0.05); /* the glassy sheen on top */
+}
+html.theme-light .action-exp {
+  --aglass: rgba(255, 255, 255, 0.94);
+  --aglass-film: rgba(10, 14, 15, 0.045);
+}
+/* Specificity here is deliberately kept AT OR BELOW each surface's .selected
+   rule, so a selected control still goes solid white. */
+.action-exp .door-card,
+.action-exp .action-intake--cine .action-chat__opt,
+.action-exp .action-intake--cine #intakeChips .action-plan__when-chip,
+.action-exp .aloop .aloop-card,
+.action-exp .aloop .aloop-nextcard,
+.action-exp .aloop .aloop-focus,
+.action-exp .aloop-capture__input,
+.action-exp .aloop-capture__btn,
+.action-exp .aloop .aloop-pill,
+.action-exp .action-verdict__scale-row,
+.action-exp .intake-beat__cta:disabled,
+.action-exp .intake-beat__cta--ghost,
+/* The nav buttons are Clarity's classes. Only the BACK button and the
+   DISABLED next are targeted: the enabled next is solid white and must stay. */
+.action-exp .action-exp__nav .clarity-exp__nav-btn--back,
+.action-exp .action-exp__nav .clarity-exp__nav-btn--next:disabled {
+  background: linear-gradient(var(--aglass-film), var(--aglass-film)), var(--aglass);
+}
+
 /* ---- Malik: the intake answers ARE Clarity's controls ----
    Two things were off. (1) GEOMETRY: .action-chat__opt overrode Clarity's
    option to 12px/18px (14px/16px under 640) at --r-card with --fs-base, so
@@ -3792,14 +3835,8 @@ body.exit-grabber .action-exp__close { display: none !important; }
   border-radius: var(--r-ctrl);
   font-size: var(--fs-md);
   font-weight: 500;
-  /* Malik: "so u can't see through them". Blur alone cannot carry this at a
-     5% fill, and backdrop-filter is the first thing a low-power device drops,
-     so the opacity does the work and the blur is the finish. */
-  background: rgba(var(--ink),0.085);
-}
-.action-exp .action-intake--cine .door-card,
-.action-exp .action-intake--cine #intakeChips .action-plan__when-chip {
-  background: rgba(var(--ink),0.085);
+  /* background comes from the shared glass recipe above (an opaque underlay);
+     a translucent fill here would win on specificity and undo it. */
 }
 /* Selected = solid white, Clarity's selection language. This needs to out-rank
    .action-chat__opt:hover, which ties .wiz__option.selected on specificity and
@@ -3960,9 +3997,7 @@ body.exit-grabber .action-exp__close { display: none !important; }
    from under the real one, not as a deck.) */
 .aloop-card {
   position: relative; border-radius: 18px; padding: 22px;
-  /* Real glass. The fill does the work and the blur is the finish, because
-     backdrop-filter is the first thing a low-power device drops. */
-  background: rgba(var(--ink),0.085);
+  /* background comes from the shared glass recipe (opaque underlay). */
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 18px 44px rgba(0,0,0,0.28);
 }
 .aloop-card__cap { margin: 0; font-size: 0.78125rem; font-weight: 600; color: rgba(var(--ink),0.5); }
@@ -4058,7 +4093,7 @@ body.exit-grabber .action-exp__close { display: none !important; }
 }
 .aloop-nextcard {
   border-radius: 16px; padding: 19px;
-  background: rgba(var(--ink),0.085);
+  /* background comes from the shared glass recipe (opaque underlay). */
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
 }
 
