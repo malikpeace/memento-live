@@ -3800,10 +3800,19 @@ body.exit-grabber .action-exp__close { display: none !important; }
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
 }
+/* The raised fill above is 3 classes and out-ranked the 2-class
+   .door-card.selected background, while the 3-class selected TEXT colour still
+   applied: a dark card with near-black text on it. The selected state must be
+   restated at this specificity or the door goes unreadable the moment it is
+   picked. */
 .action-exp .action-intake--cine .door-card.selected {
+  background: var(--solid-bg);
+  box-shadow: 0 6px 22px rgba(0,0,0,0.4);
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
 }
+.action-exp .action-intake--cine .door-card.selected .door-card__t { color: var(--solid-fg); }
+.action-exp .action-intake--cine .door-card.selected .door-card__s { color: var(--solid-fg); opacity: 0.62; }
 
 /* The narrowing: candidate moves struck one by one while the plan generates.
    Lives on the dark-cinema draft-loading surface (root theme rule, no opt-out). */
