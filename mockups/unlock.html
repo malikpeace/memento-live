@@ -55,44 +55,48 @@
         than one blurred ellipse, which is what read as a simple blur. */
   .cer { --fl:226,240,255; --fl2:150,196,255; }
   .cer.legacy .daycard-floor { display:none !important; }
-  /* the mirrored reflection: shallower, softer and dimmer than the app's home
-     default. At full strength you could read the blobs in it as separate
-     shapes, and separate shapes in a reflection look like noise, not light. */
-  .cer .daycard-theme-living { --rfl-d:34; --rfl-w:4; --rfl-i:.58; }
-  .cer .daycard-floor { filter:blur(30px) saturate(var(--sat,1.5)) hue-rotate(var(--mm-hue,0deg)); }
+  /* the mirrored reflection, run hard: deep, near full strength, and blurred
+     less than before so it reads as a wet floor throwing the card back rather
+     than a haze under it. It carries the rim, so the burning edge comes back
+     up off the ground with it, which is the whole effect. */
+  .cer .daycard-theme-living { --rfl-d:48; --rfl-w:8; --rfl-i:.95; }
+  .cer .daycard-floor { filter:blur(22px) saturate(var(--sat,1.5)) hue-rotate(var(--mm-hue,0deg)); }
 
   /* The spill reads as ONE piece of light on a floor: a hot contact line, then
      a single wide wash that runs off both sides of the screen. It used to be
      four stacked ellipses of different sizes, and where their falloffs crossed
      you could see the seams, which is what looked choppy. */
-  .cer__floor { position:absolute; left:50%; top:calc(50% + 52px);
-    width:150%; height:280px; transform:translate(-50%,0);
+  /* above the card's own reflection on purpose: the contact burn has to sit ON
+     the mirror, washing it out where the two meet, or the reflection covers the
+     brightest part of the shot and the light looks like it stops at the card. */
+  /* the top edge of this layer sits exactly on the card's base (the card bottom
+     lands 63px below centre), because the whole effect is the line where the
+     two meet */
+  /* Every gradient is centred 3% down (9px), NOT on the element's top edge: an
+     ellipse centred at 0% has half of itself outside the box, so the blur eats
+     what is left and the burn disappears. That is why it kept reading as haze
+     instead of a line. 56px + 9px puts it on the card's base at 63px. */
+  .cer__floor { position:absolute; left:50%; top:calc(50% + 56px); z-index:3;
+    width:150%; height:300px; transform:translate(-50%,0); transform-origin:50% 0;
     pointer-events:none; opacity:var(--hf);
     background:
-      radial-gradient(ellipse 15% 7% at 50% 2%, rgba(255,255,255,.80), rgba(255,255,255,0) 76%),
-      radial-gradient(ellipse 34% 30% at 50% 4%, rgba(var(--fl),.30), rgba(var(--fl),0) 76%),
-      radial-gradient(ellipse 78% 62% at 50% 6%, rgba(var(--fl2),.14), rgba(var(--fl2),0) 78%);
-    filter:blur(16px); }
+      /* the burn where the card meets the floor: the brightest thing on screen */
+      radial-gradient(ellipse 15% 1.7% at 50% 3%, rgba(255,255,255,1), rgba(255,255,255,0) 62%),
+      radial-gradient(ellipse 23% 3.6% at 50% 3%, rgba(255,255,255,.72), rgba(255,255,255,0) 70%),
+      /* light running away along the floor, left and right */
+      radial-gradient(ellipse 55% 5.5% at 50% 3%, rgba(var(--fl),.58), rgba(var(--fl),0) 74%),
+      /* the smear straight down: the card's own light held in the surface */
+      radial-gradient(ellipse 20% 38% at 50% 7%, rgba(var(--fl),.32), rgba(var(--fl),0) 74%),
+      /* the pool it all sits in */
+      radial-gradient(ellipse 74% 50% at 50% 5%, rgba(var(--fl2),.15), rgba(var(--fl2),0) 78%);
+    filter:blur(8px); }
   .cer.lit .cer__floor { opacity:1; transition:opacity 1.5s ease-out, transform 1.5s ease-out; }
-  .cer.back .cer__floor { opacity:.6; transform:translate(-50%,-52px) scale(.82);
+  /* When the card draws back it shrinks and rises, so its base rises with it.
+     The origin is the top edge (the contact line), so scaling cannot drag the
+     burn away from the card: without this the band floated 36px below the card
+     and landed straight across the welcome. */
+  .cer.back .cer__floor { opacity:.62; transform:translate(-50%,-70px) scale(.82);
     transition:opacity 1.5s ease-out, transform 1.5s ease-out; }
-
-  /* THE ROOM. The card is bright enough that the walls catch it, which is what
-     gives the shot its scale: the light does not stop at the card, it reaches
-     the edges of the screen.
-     Every gradient is anchored to an edge and dies before the opposite one, so
-     the falloff is the shape itself: no masks, no extra layer, nothing that can
-     draw a straight edge. One element, static, opacity-driven. */
-  .cer__room { position:absolute; inset:0; pointer-events:none;
-    opacity:calc(var(--hf) * .95);
-    background:
-      /* the bright catch, level with the card, where the light actually is */
-      radial-gradient(ellipse 16% 26% at 0% 34%, rgba(255,255,255,.20), rgba(255,255,255,0) 72%),
-      radial-gradient(ellipse 16% 26% at 100% 34%, rgba(255,255,255,.20), rgba(255,255,255,0) 72%),
-      /* the walls either side, and the wash off the ceiling */
-      radial-gradient(ellipse 30% 46% at 0% 38%, rgba(var(--fl),.30), rgba(var(--fl),0) 74%),
-      radial-gradient(ellipse 30% 46% at 100% 38%, rgba(var(--fl),.30), rgba(var(--fl),0) 74%),
-      radial-gradient(ellipse 90% 20% at 50% 0%, rgba(var(--fl2),.18), rgba(var(--fl2),0) 76%); }
 
   /* the release: light leaving the card the instant the hold completes.
      Radial and fading to nothing well inside its own box, so it can never
@@ -111,7 +115,7 @@
   /* stage = the beat transforms. float = the idle breathing.
      They live on SEPARATE elements on purpose: sharing one element made the
      keyframe animation and the beat transform overwrite each other. */
-  .cer__stage { position:absolute; left:50%; top:50%; margin-left:-134px; margin-top:-189px;
+  .cer__stage { position:absolute; left:50%; top:50%; margin-left:-134px; margin-top:-189px; z-index:2;
     transform-style:preserve-3d; will-change:transform;
     transform:translateY(-126px) scale(var(--hs)); opacity:1; }
   .cer__float { transform-style:preserve-3d; }
@@ -358,11 +362,11 @@
     .ctl { flex:1 1 100%; }
   }
 
-  /* ?lite=1 : the diagnostic. Drops the three heaviest optional layers (the
-     mirrored reflection, the room, the flare) and leaves the card, its edge and
-     the floor spill. If the phone survives this but not the full page, the
-     answer is layer count, not the hold. */
-  .cer.lite .daycard-floor, .cer.lite .cer__room, .cer.lite .cer__flare { display:none !important; }
+  /* ?lite=1 : the diagnostic. Drops the two heaviest optional layers (the
+     mirrored reflection and the flare) and leaves the card, its edge and the
+     floor spill. If the phone survives this but not the full page, the answer
+     is layer count, not the hold. */
+  .cer.lite .daycard-floor, .cer.lite .cer__flare { display:none !important; }
 
   @media (prefers-reduced-motion: reduce) {
     .cer__stage, .cer__float, .cer__floor, .cer__glow, .cer__sweep, .cer__flare,
@@ -399,7 +403,6 @@
     <div class="phone">
       <div class="cer" id="cer">
         <span class="cer__glow" aria-hidden="true"></span>
-        <span class="cer__room" aria-hidden="true"></span>
         <span class="cer__floor" aria-hidden="true"></span>
         <span class="cer__flare" aria-hidden="true"></span>
 
