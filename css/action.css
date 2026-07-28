@@ -3745,6 +3745,18 @@ body.exit-grabber .action-exp__close { display: none !important; }
   color: rgba(var(--ink),0.62); margin-top: 7px;
 }
 .door-card.selected .door-card__s { color: var(--solid-fg); opacity: 0.62; }
+/* Anything that should arrive only AFTER the beat has finished typing starts
+   hidden in the markup itself. Hiding it from JS after render left a frame or
+   two where the button was already painted, which flashed. */
+.intake-beat.is-typing .intake-beat__cta,
+.intake-beat.is-typing .intake-beat__ghostline,
+.intake-beat.is-typing .door-card {
+  opacity: 0; pointer-events: none;
+}
+.intake-beat__cta, .intake-beat__ghostline, .door-card {
+  transition: opacity 0.5s ease;
+}
+
 /* The quiet question counter: the end is always visible. */
 .intake-count {
   font-size: 0.75rem; color: rgba(var(--ink),0.42); margin-bottom: 26px;
@@ -3838,6 +3850,20 @@ body.exit-grabber .action-exp__close { display: none !important; }
 .action-narrow__foot {
   margin-top: 30px; text-align: center;
   font-size: 0.8125rem; color: var(--text-lo);
+  transition: color 600ms ease-out;
+}
+/* The settled tail: the candidates leave, the line stays. Same screen, calmer,
+   so the long wait never looks like a different (older) loading screen. The
+   pulse arrives with it: a motionless screen during a minute-long wait is what
+   read as frozen. */
+.action-narrow__dot { opacity: 0; margin-top: 22px; transition: opacity 900ms ease-out; }
+.action-narrow.is-settled .action-narrow__dot { opacity: 1; }
+.action-narrow.is-settled .action-narrow__col {
+  opacity: 0; transition: opacity 900ms ease-out;
+  pointer-events: none; position: absolute;
+}
+.action-narrow.is-settled .action-narrow__foot {
+  color: var(--text-hi); opacity: 0.92;
 }
 
 /* The reveal sequence: verdict, bridge, breath, first step. Rides the
@@ -3930,13 +3956,13 @@ body.exit-grabber .action-exp__close { display: none !important; }
 .aloop[data-tier="heavy"] .aloop-glow { opacity: 0.8; }
 .aloop[data-tier="extreme"] .aloop-glow { opacity: 1; }
 .aloop-deck { position: relative; touch-action: pan-y; transition: transform 200ms ease-out; }
-.aloop-card__behind {
-  position: absolute; left: 9px; right: 9px; top: -9px; height: 60px;
-  border-radius: 18px; background: rgba(var(--ink),0.035);
-}
+/* (The stacked "card behind" ghost is gone: it read as a stray box poking out
+   from under the real one, not as a deck.) */
 .aloop-card {
   position: relative; border-radius: 18px; padding: 22px;
-  background: rgba(var(--ink),0.05);
+  /* Real glass. The fill does the work and the blur is the finish, because
+     backdrop-filter is the first thing a low-power device drops. */
+  background: rgba(var(--ink),0.085);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 18px 44px rgba(0,0,0,0.28);
 }
 .aloop-card__cap { margin: 0; font-size: 0.78125rem; font-weight: 600; color: rgba(var(--ink),0.5); }
@@ -4032,8 +4058,18 @@ body.exit-grabber .action-exp__close { display: none !important; }
 }
 .aloop-nextcard {
   border-radius: 16px; padding: 19px;
-  background: rgba(var(--ink),0.05);
+  background: rgba(var(--ink),0.085);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+/* The blur has to out-specify js/11's global perf kill
+   (`body.lite *{backdrop-filter:none!important}`, specificity 0,0,1,1), which
+   is why these are written long. body.lite is the MOBILE path, so a shorter
+   selector would have blurred on desktop only and never on the phone. */
+.action-exp .aloop .aloop-card,
+.action-exp .aloop .aloop-nextcard {
+  -webkit-backdrop-filter: blur(calc(24px * var(--bx, 1))) saturate(1.35) !important;
+  backdrop-filter: blur(calc(24px * var(--bx, 1))) saturate(1.35) !important;
 }
 .aloop-rrow { display: flex; gap: 11px; padding: 11px 0; align-items: baseline; }
 .aloop-rrow + .aloop-rrow { border-top: 1px solid rgba(var(--ink),0.07); }

@@ -3102,7 +3102,7 @@ const ActionExperience = {
     // star and its timeframe exactly as Clarity locked them, no edit option,
     // three seconds and through.
     const tfLine = tf ? (/^within\b/i.test(tf) ? tf.charAt(0).toUpperCase() + tf.slice(1) : 'Within ' + tf) : '';
-    return '<div class="intake-beat" data-beat="summary">' +
+    return '<div class="intake-beat is-typing" data-beat="summary">' +
       '<div class="intake-beat__body">' +
         '<div class="intake-beat__quiet intake-beat__quiet--reminder">Quick Reminder: Your Neutron Star</div>' +
         '<div class="intake-beat__nstar">' + esc(goal) + '</div>' +
@@ -3168,21 +3168,27 @@ const ActionExperience = {
   // nothing shifts; the CTA fades in when typing ends; any tap skips. Types
   // once per open (resume re-renders show instantly).
   _typeRecapBeat(host) {
+    const _beat = host && host.querySelector('.intake-beat');
+    // Beats render with .is-typing so their CTA / doors are hidden from the
+    // FIRST painted frame. Every exit from here must clear it, or the controls
+    // stay invisible forever.
+    const _reveal = () => { try { if (_beat) _beat.classList.remove('is-typing'); } catch (e) {} };
     try {
       const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (reduce) return;
-      const beat = host.querySelector('.intake-beat');
+      if (reduce) { _reveal(); return; }
+      const beat = _beat;
       // The recap types once per open; the doors beat types on every arrival
       // (it is only reachable via Continue in-session).
       const isRecap = beat && beat.getAttribute('data-beat') === 'summary';
-      if (isRecap && this._recapTyped) return;
+      if (isRecap && this._recapTyped) { _reveal(); return; }
       if (isRecap) this._recapTyped = true;
       const body = beat && beat.querySelector('.intake-beat__body');
       const ctas = beat ? Array.from(beat.querySelectorAll('.intake-beat__cta, .intake-beat__ghostline')) : [];
       const cta = ctas[0];
-      if (!beat || !body || !cta) return;
+      if (!beat || !body || !cta) { _reveal(); return; }
       body.style.minHeight = body.offsetHeight + 'px';
-      ctas.forEach(c => { c.style.opacity = '0'; c.style.pointerEvents = 'none'; c.style.transition = 'opacity 0.5s ease'; });
+      // (No inline hiding here any more: .is-typing already hid them in the
+      // markup, before the first paint.)
       const stash = Array.from(body.children).map((el) => {
         const segs = Array.from(el.childNodes).map((n) =>
           n.nodeType === 3 ? { text: n.textContent, el: null } : { text: n.textContent, el: n.cloneNode(false) });
@@ -3190,7 +3196,7 @@ const ActionExperience = {
       });
       stash.forEach((s) => { s.el.innerHTML = ''; });
       let done = false;
-      const showCta = () => { ctas.forEach(c => { c.style.opacity = '1'; c.style.pointerEvents = 'auto'; }); };
+      const showCta = () => { _reveal(); };
       const finish = () => {
         if (done) return; done = true;
         stash.forEach((s) => { s.el.innerHTML = s.html; });
@@ -3232,18 +3238,18 @@ const ActionExperience = {
     // what happens behind it. Both doors route into the scripted fixed-screen
     // engine; the AI never speaks between answers anymore.
     host.innerHTML =
-      '<div class="intake-beat" data-beat="doors">' +
+      '<div class="intake-beat is-typing" data-beat="doors">' +
         '<div class="intake-beat__body">' +
           '<div class="intake-beat__ask">Do you know what you have to do to get there?</div>' +
           '<div class="intake-beat__sub">Not the busywork. The one action that makes everything else easier or unnecessary.</div>' +
         '</div>' +
         '<button type="button" class="door-card" id="doorKnow">' +
           '<span class="door-card__t">I know what to do</span>' +
-          '<span class="door-card__s">Tell Action what it is. It gets tested against your own numbers, not obeyed.</span>' +
+          '<span class="door-card__s">Insert the actions you think are needed to achieve your goal and we will test to confirm it is true and make sure it is actually working.</span>' +
         '</button>' +
         '<button type="button" class="door-card" id="doorFind">' +
           '<span class="door-card__t">Find it for me</span>' +
-          '<span class="door-card__s">Two questions and Action chooses. You will see exactly why.</span>' +
+          '<span class="door-card__s">We will find the highest leverage action forward for you.</span>' +
         '</button>' +
         // Malik: picking a door must NOT fire instantly. A mis-tap is one tap
         // away from the wrong branch, so the pick is a selection and Continue
@@ -4287,11 +4293,10 @@ const ActionExperience = {
   // After ready:true, briefly show a "Building your plan..." state, then kick off
   // the existing plan generation pipeline.
   _aiIntakeRenderClosing() {
-    const current = this.pageWrap.querySelector('.action-intake__current');
-    if (current) {
-      current.innerHTML = `<div class="action-chat__bubble action-chat__bubble--ai action-chat__bubble--current">Got it. Building your plan now.</div>`;
-    }
-    setTimeout(() => this._finishIntake(), 1200);
+    // (Malik: the "Got it. Building your plan now." bubble is gone. The
+    // narrowing screen that follows already says the app is working, so the
+    // bubble was a redundant beat between the last answer and that screen.)
+    this._finishIntake();
   },
 
   _renderIntakeStep(opts) {
@@ -4929,7 +4934,7 @@ Return ONLY the sentence text. No quotes, no labels.`;
   _revealBeatShell(bodyHtml, ctaLabel, onCta, ghostLabel, onGhost) {
     this.pageWrap.innerHTML = `
       <div class="action-exp__page-inner"><div class="action-exp__inner action-cine-reveal action-verdict">
-        <div class="intake-beat" data-beat="verdict">
+        <div class="intake-beat is-typing" data-beat="verdict">
           <div class="intake-beat__body">${bodyHtml}</div>
           <button type="button" class="intake-beat__cta action-verdict__cta">${esc(ctaLabel)}</button>
           ${ghostLabel ? `<button type="button" class="intake-beat__ghostline action-verdict__ghost">${esc(ghostLabel)}</button>` : ''}
@@ -5158,6 +5163,7 @@ Return ONLY the sentence text. No quotes, no labels.`;
         <div class="action-narrow__col">
           ${cands.map(c => `<p class="action-narrow__cand">${esc(c)}</p>`).join('')}
         </div>
+        <div class="action-cine__thinking action-narrow__dot" aria-hidden="true"><i></i></div>
         <div class="action-narrow__foot">Testing every move against your answers.</div>
       </div></div>`;
     const col = this.pageWrap.querySelector('.action-narrow__col');
@@ -5208,14 +5214,27 @@ Return ONLY the sentence text. No quotes, no labels.`;
   // tutorialSeen is set, so the loading screen cannot rely on anything else to
   // repaint it. This watcher owns that: the moment generation ends, plan or
   // error, it repaints. Without it the narrowing could strand forever.
+  // The tail of the wait. This is the SAME screen, settling: the candidates
+  // fade out and the line stays. It used to swap in the old "Building your
+  // path." loading screen, which read as a second, older screen appearing
+  // partway through (Malik: "why is that there?").
   _renderNarrowingCalm() {
     const token = (this._narrowToken || 0);
-    this.pageWrap.innerHTML = `
-      <div class="action-exp__page-inner"><div class="action-exp__inner action-draft-loading action-draft-loading--cine">
-        <div class="action-cine__thinking" aria-hidden="true"><i></i></div>
-        <div class="action-draft-loading__title">Building your path.</div>
-        <div class="action-draft-loading__line action-draft-loading__line--1">Testing every move against your answers. This can take a minute.</div>
-      </div></div>`;
+    const root = this.pageWrap.querySelector('.action-narrow');
+    if (root) {
+      root.classList.add('is-settled');
+      const foot = root.querySelector('.action-narrow__foot');
+      if (foot) foot.textContent = 'Testing every move against your answers. This can take a minute.';
+    } else {
+      // No narrowing surface to settle (reduced motion, or too few candidates
+      // to run the elimination): render the calm state directly.
+      this.pageWrap.innerHTML = `
+        <div class="action-exp__page-inner"><div class="action-exp__inner action-draft-loading--cine action-narrow is-settled">
+          <div class="action-narrow__col"></div>
+          <div class="action-cine__thinking action-narrow__dot" aria-hidden="true"><i></i></div>
+          <div class="action-narrow__foot">Testing every move against your answers. This can take a minute.</div>
+        </div></div>`;
+    }
     const watch = () => {
       if (!this.isOpen || this._narrowToken !== token) return;
       if (!actionAiLoading) { this.renderContent(); return; }
@@ -5331,7 +5350,6 @@ Return ONLY the sentence text. No quotes, no labels.`;
         <div class="aloop-top"><span class="aloop-cap apl-num">Day ${dayN}</span><span class="aloop-cap">${esc(weekday)}</span></div>
         <div class="aloop-mid">
           <div class="aloop-deck">
-            <div class="aloop-card__behind" aria-hidden="true"></div>
             <div class="aloop-card">${cardHtml}</div>
           </div>
           <button type="button" class="aloop-notthis" id="aloopNotThis">Not this action</button>
