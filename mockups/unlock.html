@@ -55,23 +55,48 @@
         than one blurred ellipse, which is what read as a simple blur. */
   .cer { --fl:226,240,255; --fl2:150,196,255; }
   .cer.legacy .daycard-floor { display:none !important; }
-  .cer .daycard-theme-living { --rfl-d:38; --rfl-w:6; --rfl-i:.72; }
+  /* the mirrored reflection: shallower, softer and dimmer than the app's home
+     default. At full strength you could read the blobs in it as separate
+     shapes, and separate shapes in a reflection look like noise, not light. */
+  .cer .daycard-theme-living { --rfl-d:34; --rfl-w:4; --rfl-i:.58; }
+  .cer .daycard-floor { filter:blur(30px) saturate(var(--sat,1.5)) hue-rotate(var(--mm-hue,0deg)); }
 
-  .cer__floor { position:absolute; left:50%; top:calc(50% + 56px);
-    width:520px; height:230px; transform:translate(-50%,0);
+  /* The spill reads as ONE piece of light on a floor: a hot contact line, then
+     a single wide wash that runs off both sides of the screen. It used to be
+     four stacked ellipses of different sizes, and where their falloffs crossed
+     you could see the seams, which is what looked choppy. */
+  .cer__floor { position:absolute; left:50%; top:calc(50% + 52px);
+    width:150%; height:280px; transform:translate(-50%,0);
     pointer-events:none; opacity:var(--hf);
     background:
-      /* the contact line: the ground is brightest right where the card meets it */
-      radial-gradient(ellipse 20% 4% at 50% 3%, rgba(255,255,255,.80), rgba(255,255,255,0) 74%),
-      radial-gradient(ellipse 32% 8% at 50% 4%, rgba(var(--fl),.44), rgba(var(--fl),0) 78%),
-      /* the near pool */
-      radial-gradient(ellipse 42% 24% at 50% 11%, rgba(var(--fl),.22), rgba(var(--fl),0) 76%),
-      /* the wide spill, falling away with distance */
-      radial-gradient(ellipse 62% 54% at 50% 17%, rgba(var(--fl2),.14), rgba(var(--fl2),0) 78%);
-    filter:blur(9px); }
+      radial-gradient(ellipse 15% 7% at 50% 2%, rgba(255,255,255,.80), rgba(255,255,255,0) 76%),
+      radial-gradient(ellipse 34% 30% at 50% 4%, rgba(var(--fl),.30), rgba(var(--fl),0) 76%),
+      radial-gradient(ellipse 78% 62% at 50% 6%, rgba(var(--fl2),.14), rgba(var(--fl2),0) 78%);
+    filter:blur(16px); }
   .cer.lit .cer__floor { opacity:1; transition:opacity 1.5s ease-out, transform 1.5s ease-out; }
   .cer.back .cer__floor { opacity:.6; transform:translate(-50%,-52px) scale(.82);
     transition:opacity 1.5s ease-out, transform 1.5s ease-out; }
+
+  /* THE ROOM. The card is bright enough that the walls catch it, which is what
+     gives the shot its scale: the light does not stop at the card, it reaches
+     the edges of the screen. Two soft columns down the sides plus a wash off
+     the ceiling, every one of them a gradient that fades to nothing before its
+     own bounds and masked top and bottom, so none of them can draw an edge. */
+  .cer__room { position:absolute; inset:0; pointer-events:none;
+    opacity:calc(var(--hf) * .95);
+    background:
+      linear-gradient(to right, rgba(var(--fl),.34) 0%, rgba(var(--fl),.10) 10%, rgba(var(--fl),0) 28%),
+      linear-gradient(to left,  rgba(var(--fl),.34) 0%, rgba(var(--fl),.10) 10%, rgba(var(--fl),0) 28%),
+      linear-gradient(to bottom, rgba(var(--fl2),.18) 0%, rgba(var(--fl2),0) 26%);
+    -webkit-mask:linear-gradient(to bottom, transparent 0%, #000 16%, #000 58%, transparent 82%);
+            mask:linear-gradient(to bottom, transparent 0%, #000 16%, #000 58%, transparent 82%); }
+  /* the brightest catch is level with the card, where the light actually is */
+  .cer__room::after { content:''; position:absolute; inset:0;
+    background:
+      linear-gradient(to right, rgba(255,255,255,.22) 0%, rgba(255,255,255,0) 14%),
+      linear-gradient(to left,  rgba(255,255,255,.22) 0%, rgba(255,255,255,0) 14%);
+    -webkit-mask:radial-gradient(ellipse 120% 26% at 50% 34%, #000 0%, transparent 78%);
+            mask:radial-gradient(ellipse 120% 26% at 50% 34%, #000 0%, transparent 78%); }
 
   /* the release: light leaving the card the instant the hold completes.
      Radial and fading to nothing well inside its own box, so it can never
@@ -139,10 +164,10 @@
      space, which pulled the welcome up into the floor glow. */
   .cer__welcome { position:absolute; left:0; right:0; text-align:center; top:50%;
     transform:translateY(196px);
-    font-size:27px; font-weight:750; letter-spacing:-.02em; color:#fff; opacity:0;
+    font-size:32px; font-weight:800; letter-spacing:-.032em; color:#fff; opacity:0;
     transition:opacity 1.1s ease-out, transform 1.4s cubic-bezier(.33,.9,.28,1); }
   .cer.back .cer__welcome { transform:translateY(48px); }
-  .cer__copy { position:absolute; left:0; right:0; bottom:0; padding:0 30px calc(38px + env(safe-area-inset-bottom,0px));
+  .cer__copy { position:absolute; left:0; right:0; bottom:0; padding:0 30px calc(74px + env(safe-area-inset-bottom,0px));
     display:flex; flex-direction:column; align-items:center; text-align:center; }
   .cer__note { font-size:15px; line-height:1.62; color:rgba(255,255,255,.92); max-width:32ch; opacity:0;
     transition:opacity 1s ease-out; }
@@ -169,17 +194,22 @@
      Both are rounded and radial by construction, so neither can draw a box. */
   .cer.look-platinum .daycard-ns__rim {
     box-shadow:
-      inset 0 0 0 1.2px rgba(255,255,255,1),
-      inset 0 0 8px rgba(255,255,255,.58),
-      inset 0 0 22px rgba(214,238,255,.30),
-      inset 0 0 60px rgba(150,195,255,.13); }
+      inset 0 0 0 2.6px rgba(255,255,255,1),
+      inset 0 0 7px 1px rgba(255,255,255,.88),
+      inset 0 0 20px rgba(214,240,255,.52),
+      inset 0 0 48px rgba(160,205,255,.26),
+      inset 0 0 104px rgba(130,185,255,.13); }
+  /* what the edge throws OUT. This is the difference between an outlined card
+     and a burning one: a hard white core right at the perimeter, then three
+     falloffs reaching progressively further into the room. */
   .cer.look-platinum .daycard-theme-living .daycard-living-stage {
     box-shadow:
       0 0 44px rgba(200,210,255,.10),
       0 12px 38px rgba(0,0,0,.28),
-      0 0 calc(12px * var(--act,0)) rgba(255,255,255, calc(.50 * var(--act,0))),
-      0 0 calc(48px * var(--act,0)) rgba(186,218,255, calc(.34 * var(--act,0))),
-      0 0 calc(116px * var(--act,0)) rgba(150,195,255, calc(.18 * var(--act,0))); }
+      0 0 calc(7px * var(--act,0)) rgba(255,255,255, calc(.92 * var(--act,0))),
+      0 0 calc(26px * var(--act,0)) rgba(226,244,255, calc(.60 * var(--act,0))),
+      0 0 calc(70px * var(--act,0)) rgba(170,212,255, calc(.36 * var(--act,0))),
+      0 0 calc(170px * var(--act,0)) rgba(130,185,255, calc(.20 * var(--act,0))); }
 
   /* BRONZE. Warm metal instead of platinum. The colour blobs themselves are
      recoloured rather than hue-rotated, because a rotation cannot warm the
@@ -308,6 +338,7 @@
     <div class="phone">
       <div class="cer" id="cer">
         <span class="cer__glow" aria-hidden="true"></span>
+        <span class="cer__room" aria-hidden="true"></span>
         <span class="cer__floor" aria-hidden="true"></span>
         <span class="cer__flare" aria-hidden="true"></span>
 
