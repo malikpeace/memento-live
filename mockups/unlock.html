@@ -1,0 +1,734 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The unlock, after payment</title>
+
+<!-- The REAL card CSS, so this is Memento's actual card and not a lookalike.
+     Path differs between the repo (mockups/ next to memento-app/) and the live
+     mirror (mockups/ inside the app root), so each link falls back. -->
+<link rel="stylesheet" href="../memento-app/css/base.css" onerror="this.href='../css/base.css'">
+<link rel="stylesheet" href="../memento-app/css/dashboard.css" onerror="this.href='../css/dashboard.css'">
+<link rel="stylesheet" href="../memento-app/css/daycard-living.css" onerror="this.href='../css/daycard-living.css'">
+<link rel="stylesheet" href="_shared.css">
+
+<style>
+  body { background:#08090b; color:#ebeef8; font-family:var(--font, -apple-system, system-ui, sans-serif); margin:0; }
+  .gal { max-width:1100px; margin:0 auto; padding:28px 20px 90px; }
+  h1 { font-size:26px; font-weight:750; letter-spacing:-.02em; margin:0 0 6px; }
+  .gal__sub { font-size:14.5px; line-height:1.6; color:rgba(235,238,248,.62); max-width:74ch; margin:0 0 26px; }
+  .row { display:flex; gap:26px; align-items:flex-start; flex-wrap:wrap; }
+
+  .phone { width:390px; height:844px; border-radius:44px; overflow:hidden; position:relative;
+    background:#000; box-shadow:0 30px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.07); flex:none; }
+
+  /* ---- the ceremony ---- */
+  /* --hp = hold progress 0..1, driven per frame from the actual press.
+     --hf = the same, squared, for things that should arrive late.
+     --hs = the card's scale, so the press reads as pressure. */
+  .cer { position:absolute; inset:0; background:#000; overflow:hidden;
+    perspective:1600px; perspective-origin:50% 40%;
+    --hp:0; --hf:0; --hs:1;
+    touch-action:none; user-select:none; -webkit-user-select:none; cursor:default; }
+
+  /* the room lifting behind the card. During the hold it tracks the press
+     frame by frame (no transition); once lit it settles on its own. */
+  .cer__glow { position:absolute; left:50%; top:38%; width:160%; aspect-ratio:1; transform:translate(-50%,-50%);
+    background:radial-gradient(circle, rgba(180,205,255,.19) 0%, rgba(120,150,220,.085) 34%, transparent 66%);
+    opacity:calc(var(--hf) * .9); pointer-events:none; }
+  .cer.lit .cer__glow { opacity:1; transition:opacity 1.6s ease-out; }
+  .cer.back .cer__glow { opacity:.66; transition:opacity 1.6s ease-out; }
+
+  /* THE GROUND.
+     Two things, and they do different jobs.
+
+     1. The card's OWN mirrored reflection (.daycard-floor, the app's asset:
+        flipped, blurred, masked, carrying the same colour blobs and the rim).
+        It was switched off before because the old entrance rotated the card and
+        dragged the reflection around with it. Nothing rotates now, so the real
+        one is back, and it is what makes the light read as coming off the card
+        rather than a grey smudge under it. It is gated by --lit, so the hold
+        brings it up. Only the legacy compare still hides it.
+     2. The SPILL (.cer__floor): light thrown past the reflection onto the
+        ground. Built as a hot contact line, a near pool and a wide haze rather
+        than one blurred ellipse, which is what read as a simple blur. */
+  .cer { --fl:226,240,255; --fl2:150,196,255; }
+  .cer.legacy .daycard-floor { display:none !important; }
+  /* the mirrored reflection, run hard: deep, near full strength, and blurred
+     less than before so it reads as a wet floor throwing the card back rather
+     than a haze under it. It carries the rim, so the burning edge comes back
+     up off the ground with it, which is the whole effect. */
+  .cer .daycard-theme-living { --rfl-d:48; --rfl-w:8; --rfl-i:.95; }
+  .cer .daycard-floor {
+    filter:blur(22px) saturate(var(--sat,1.5)) hue-rotate(var(--mm-hue,0deg));
+    /* the app's home mask fades the outer 20% each side, which is what made it
+       read as a dense column down the middle. Out here it holds full width and
+       only softens at the extreme edges. */
+    -webkit-mask-image:
+      linear-gradient(to top, transparent 0%, #000 7%, rgba(0,0,0,0.5) 52%, transparent 92%),
+      linear-gradient(to right, transparent 0%, #000 6%, #000 94%, transparent 100%);
+    -webkit-mask-composite:source-in;
+    mask-image:
+      linear-gradient(to top, transparent 0%, #000 7%, rgba(0,0,0,0.5) 52%, transparent 92%),
+      linear-gradient(to right, transparent 0%, #000 6%, #000 94%, transparent 100%);
+    mask-composite:intersect; }
+  /* THE FAN. A floor seen from standing height throws the reflection back as a
+     trapezoid: the card's width at the contact, opening out as it comes toward
+     you. It has to be a WRAPPER, not the reflection's own transform: the
+     reflection is already flipped with scaleY(-1) about its centre, and moving
+     that origin to the contact line sends the whole mirror up over the card.
+     The wrapper matches the card's box, tilts about its bottom edge (the
+     contact), and the reflection hangs off it unchanged. */
+  .cer__mirror { position:absolute; left:0; right:0; top:0; bottom:0;
+    pointer-events:none; transform-origin:50% 100%;
+    transform:perspective(1100px) rotateX(28deg); }
+
+  /* The spill reads as ONE piece of light on a floor: a hot contact line, then
+     a single wide wash that runs off both sides of the screen. It used to be
+     four stacked ellipses of different sizes, and where their falloffs crossed
+     you could see the seams, which is what looked choppy. */
+  /* above the card's own reflection on purpose: the contact burn has to sit ON
+     the mirror, washing it out where the two meet, or the reflection covers the
+     brightest part of the shot and the light looks like it stops at the card. */
+  /* the top edge of this layer sits exactly on the card's base (the card bottom
+     lands 63px below centre), because the whole effect is the line where the
+     two meet */
+  /* Every gradient is centred 3% down (9px), NOT on the element's top edge: an
+     ellipse centred at 0% has half of itself outside the box, so the blur eats
+     what is left and the burn disappears. That is why it kept reading as haze
+     instead of a line. 56px + 9px puts it on the card's base at 63px. */
+  .cer__floor { position:absolute; left:50%; top:calc(50% + 56px); z-index:3;
+    width:150%; height:300px; transform:translate(-50%,0); transform-origin:50% 0;
+    pointer-events:none; opacity:var(--hf);
+    background:
+      /* the burn where the card meets the floor: the brightest thing on screen */
+      radial-gradient(ellipse 15% 1.7% at 50% 3%, rgba(255,255,255,1), rgba(255,255,255,0) 62%),
+      radial-gradient(ellipse 23% 3.6% at 50% 3%, rgba(255,255,255,.72), rgba(255,255,255,0) 70%),
+      /* light running away along the floor, left and right */
+      radial-gradient(ellipse 55% 5.5% at 50% 3%, rgba(var(--fl),.58), rgba(var(--fl),0) 74%),
+      /* the smear coming down off the card, opening out as it goes: three
+         ellipses, each wider and lower than the last, so the light fans with
+         the reflection instead of running down the middle as a column */
+      radial-gradient(ellipse 22% 16% at 50% 5%, rgba(var(--fl),.30), rgba(var(--fl),0) 74%),
+      radial-gradient(ellipse 32% 28% at 50% 10%, rgba(var(--fl),.22), rgba(var(--fl),0) 76%),
+      radial-gradient(ellipse 46% 40% at 50% 16%, rgba(var(--fl),.14), rgba(var(--fl),0) 78%),
+      /* the pool it all sits in */
+      radial-gradient(ellipse 74% 50% at 50% 5%, rgba(var(--fl2),.15), rgba(var(--fl2),0) 78%);
+    filter:blur(8px); }
+  .cer.lit .cer__floor { opacity:1; transition:opacity 1.5s ease-out, transform 1.5s ease-out; }
+  /* When the card draws back it shrinks and rises, so its base rises with it.
+     The origin is the top edge (the contact line), so scaling cannot drag the
+     burn away from the card: without this the band floated 36px below the card
+     and landed straight across the welcome. */
+  .cer.back .cer__floor { opacity:.62; transform:translate(-50%,-70px) scale(.82);
+    transition:opacity 1.5s ease-out, transform 1.5s ease-out; }
+
+  /* the release: light leaving the card the instant the hold completes.
+     Radial and fading to nothing well inside its own box, so it can never
+     draw a straight edge. */
+  .cer__flare { position:absolute; left:50%; top:calc(50% - 126px); width:600px; height:600px;
+    transform:translate(-50%,-50%) scale(.42); pointer-events:none; opacity:0;
+    background:radial-gradient(circle, rgba(255,255,255,.55) 0%, rgba(206,228,255,.26) 22%,
+      rgba(160,200,255,.10) 42%, rgba(160,200,255,0) 64%); }
+  .cer.flare .cer__flare { animation:cerFlare 1.15s cubic-bezier(.16,.7,.3,1) forwards; }
+  @keyframes cerFlare {
+    0%   { opacity:0;   transform:translate(-50%,-50%) scale(.42); }
+    16%  { opacity:1;   transform:translate(-50%,-50%) scale(.78); }
+    100% { opacity:0;   transform:translate(-50%,-50%) scale(1.5); }
+  }
+
+  /* stage = the beat transforms. float = the idle breathing.
+     They live on SEPARATE elements on purpose: sharing one element made the
+     keyframe animation and the beat transform overwrite each other. */
+  .cer__stage { position:absolute; left:50%; top:50%; margin-left:-134px; margin-top:-189px; z-index:2;
+    transform-style:preserve-3d; will-change:transform;
+    transform:translateY(-126px) scale(var(--hs)); opacity:1; }
+  .cer__float { transform-style:preserve-3d; }
+
+  /* ── THE GRAPHICS BUDGET (why this is written the way it is) ───────────────
+     iOS crashed on this page. The cause was mine, and it is a rule worth
+     keeping: during the hold you may change the OPACITY of a blurred layer,
+     because the blur is rasterised once and the compositor just fades the
+     cached bitmap. You may NOT change a blurred layer's transform, its filter
+     parameters, or the opacity of its CHILDREN, because every one of those
+     re-runs the blur from scratch, every frame, at device resolution.
+     What I had been doing per frame, all of it now gone:
+       - scaling the liquid (46px blur) and bloom (34px blur) layers
+       - ramping --sat, which is a saturate() parameter on three blurred layers
+       - ramping --glow and --lit into the aura's brightness() parameter
+       - growing a 170px box-shadow radius on the stage
+     Each of those forced a full re-blur per frame. Stacked, they exhausted
+     graphics memory on a phone. The look is preserved; the mechanism is not. */
+
+  /* the aura: constant filter, opacity does the work */
+  .cer .daycard-wrap__aura {
+    filter:blur(28px) hue-rotate(var(--mm-hue, 0deg));
+    opacity:calc(var(--lit, 0) * .85); }
+  /* The card was rendering at 179x352, a 0.51 ratio, because the living stage
+     carries its own width:min(76%,270px). That squeeze is what read as skinny.
+     These put it back on the app's real proportion: 320x452 is 0.708. */
+  .cer__stage .daycard-wrap { margin:0; width:268px; }
+  .cer__stage .daycard-living-stage { width:100%; margin:0; }
+  .cer__stage .daycard-ns { width:100%; min-height:378px; margin:0; }
+
+  /* the step back: a transform transition on the stage alone, so nothing fights it */
+  .cer.back .cer__stage { transform:translateY(-152px) scale(.78);
+    transition:transform 1.5s cubic-bezier(.33,.9,.28,1); }
+
+  /* idle breathing. It only starts once the card is alive; dormant is still. */
+  @keyframes cerBreathe { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-9px); } }
+  .cer.lit .cer__float, .cer.back .cer__float { animation:cerBreathe 8s ease-in-out infinite; }
+
+  /* the shimmer across the face on release. Wide, soft, slow. */
+  .cer__sweep { position:absolute; inset:-14% -55%; pointer-events:none; opacity:0; z-index:6;
+    background:linear-gradient(100deg,
+      rgba(255,255,255,0) 34%, rgba(255,255,255,.10) 44%,
+      rgba(255,255,255,.34) 50%, rgba(255,255,255,.10) 56%, rgba(255,255,255,0) 66%); }
+  .cer.sweep .cer__sweep { animation:cerSweep 1.7s cubic-bezier(.4,0,.3,1) forwards; }
+  @keyframes cerSweep {
+    0%   { opacity:0; transform:translateX(-62%); }
+    22%  { opacity:1; }
+    78%  { opacity:1; }
+    100% { opacity:0; transform:translateX(62%); }
+  }
+
+  /* the only instruction on the screen, and it stays away until they need it */
+  .cer__hint { position:absolute; left:0; right:0; text-align:center; top:50%;
+    transform:translateY(104px); margin:0;
+    font-size:14.5px; font-weight:550; letter-spacing:-.01em; color:rgba(255,255,255,.74);
+    opacity:0; pointer-events:none; transition:opacity .9s ease-out; }
+  .cer.ask .cer__hint { opacity:1; }
+  .cer.lit .cer__hint { opacity:0; transition:opacity .35s ease-in; }
+
+  /* copy. The welcome is positioned on its own rather than sitting on top of
+     the note stack: while the note is still hidden it was reserving layout
+     space, which pulled the welcome up into the floor glow. */
+  /* z-index 5 puts the copy above the ground (3) and the card (2): the light
+     passes behind the words instead of washing them out */
+  .cer__welcome { position:absolute; left:0; right:0; text-align:center; top:50%; z-index:5;
+    transform:translateY(196px);
+    font-size:32px; font-weight:800; letter-spacing:-.032em; color:#fff; opacity:0;
+    transition:opacity 1.1s ease-out, transform 1.4s cubic-bezier(.33,.9,.28,1); }
+  .cer.back .cer__welcome { transform:translateY(48px); }
+  .cer__copy { position:absolute; left:0; right:0; bottom:0; z-index:5; padding:0 30px calc(74px + env(safe-area-inset-bottom,0px));
+    display:flex; flex-direction:column; align-items:center; text-align:center; }
+  .cer__note { font-size:15px; line-height:1.62; color:rgba(255,255,255,.92); max-width:32ch; opacity:0;
+    transition:opacity 1s ease-out; }
+  .cer__sign { margin-top:14px; font-size:14.5px; font-weight:650; color:rgba(255,255,255,.62); opacity:0;
+    transition:opacity 1s ease-out .3s; }
+  .cer__cta { margin-top:26px; width:100%; max-width:330px; padding:15px; border:0; border-radius:14px;
+    background:#fff; color:#0b1112; font-family:inherit; font-size:15.5px; font-weight:700; cursor:pointer; opacity:0;
+    transition:opacity .9s ease-out .6s; }
+  .cer.lit .cer__welcome, .cer.back .cer__welcome { opacity:1; }
+  .cer.back .cer__note, .cer.back .cer__sign, .cer.back .cer__cta { opacity:1; }
+
+  /* ================= THE LOOKS =================================================
+     Options to look at, not decisions. Same card, same geometry, same motion:
+     only what arrives with --act changes, so each one is the same ceremony in a
+     different material. Platinum is the app's real reward and the default.
+     Note for the record: the project law bans gold and warm-cream palettes
+     (killed v546). Bronze is here because Malik asked to see it. */
+
+  /* PLATINUM + THE GRAPHITE EDGE (Malik's combine).
+     On a bright face the app's wide 14/38/82 rim washes out, so the edge is
+     pulled TIGHT: a hard white line with a short falloff inward, which is what
+     made graphite's edge read. Then the edge throws light OUTWARD into the room
+     via the stage's shadow stack, so it is genuinely emitting, not outlined.
+     Both are rounded and radial by construction, so neither can draw a box. */
+  .cer.look-platinum .daycard-ns__rim {
+    box-shadow:
+      inset 0 0 0 2.6px rgba(255,255,255,1),
+      inset 0 0 7px 1px rgba(255,255,255,.88),
+      inset 0 0 20px rgba(214,240,255,.52),
+      inset 0 0 48px rgba(160,205,255,.26),
+      inset 0 0 104px rgba(130,185,255,.13); }
+  /* What the edge throws OUT: the difference between an outlined card and a
+     burning one. A hard white core at the perimeter, then three falloffs
+     reaching further into the room.
+     It lives on its own layer with FIXED radii, faded in by --act, because
+     animating a shadow's blur radius repaints it every frame (that is what was
+     killing the phone). Fixed radii rasterise once and fade for free. */
+  .cer__edge { position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+    opacity:var(--act, 0);
+    box-shadow:
+      0 0 7px rgba(255,255,255,.92),
+      0 0 26px rgba(226,244,255,.60),
+      0 0 70px rgba(170,212,255,.36),
+      0 0 170px rgba(130,185,255,.20); }
+  .cer.look-bronze .cer__edge {
+    box-shadow:
+      0 0 7px rgba(255,246,226,.92),
+      0 0 26px rgba(255,216,160,.58),
+      0 0 70px rgba(226,168,96,.34),
+      0 0 170px rgba(198,142,78,.18); }
+  .cer.look-obsidian .cer__edge {
+    box-shadow:
+      0 0 6px rgba(255,255,255,.72),
+      0 0 24px rgba(206,228,255,.42),
+      0 0 68px rgba(150,190,255,.22),
+      0 0 150px rgba(120,160,220,.12); }
+
+  /* BRONZE. Warm metal instead of platinum. The colour blobs themselves are
+     recoloured rather than hue-rotated, because a rotation cannot warm the
+     white act blob, which left a cold white reflection under a gold card. */
+  .cer.look-bronze .daycard-theme-living .blob.b1 {
+    background:radial-gradient(circle, rgba(255,196,116,1), transparent 66%); }
+  .cer.look-bronze .daycard-theme-living .blob.b2 {
+    background:radial-gradient(circle, rgba(255,228,182,.98), transparent 66%); }
+  .cer.look-bronze .daycard-ns__plat {
+    background:radial-gradient(58% 52% at 50% 42%,
+      rgba(255,244,226,.92) 0%, rgba(238,196,138,.62) 46%,
+      rgba(198,142,78,.26) 78%, rgba(198,142,78,0) 100%); }
+  .cer.look-bronze .daycard-ns__rim {
+    box-shadow:
+      inset 0 0 0 1px rgba(255,232,198,.92),
+      inset 0 0 14px rgba(255,214,158,.50),
+      inset 0 0 38px rgba(226,168,96,.34),
+      inset 0 0 82px rgba(190,132,64,.18); }
+  .cer.look-bronze .daycard-theme-living .daycard-living-stage {
+    box-shadow:0 0 44px rgba(255,214,160,.10), 0 12px 38px rgba(0,0,0,.28),
+      0 0 calc(34px * var(--act,0)) rgba(255,200,132, calc(.30 * var(--act,0))); }
+  .cer.look-bronze .cer__glow {
+    background:radial-gradient(circle, rgba(255,214,164,.19) 0%, rgba(214,156,84,.085) 34%, transparent 66%); }
+  .cer.look-bronze { --fl:255,238,208; --fl2:222,164,92; }
+  .cer.look-bronze .cer__flare {
+    background:radial-gradient(circle, rgba(255,246,230,.55) 0%, rgba(250,208,150,.26) 22%,
+      rgba(220,160,80,.10) 42%, rgba(220,160,80,0) 64%); }
+
+  /* GRAPHITE. The opposite bet: the card never brightens, it stays near-black
+     and the reward is the edge lighting up and the room finally seeing it. */
+  .cer.look-graphite .daycard-ns {
+    background:linear-gradient(165deg, rgba(255,255,255,.07), rgba(255,255,255,.015) 48%, rgba(255,255,255,.04)); }
+  .cer.look-graphite .daycard-theme-living .blob.b2 { opacity:calc(var(--act,0) * .16); }
+  .cer.look-graphite .daycard-ns__plat { opacity:calc(var(--act,0) * .20);
+    background:radial-gradient(58% 52% at 50% 42%,
+      rgba(226,236,248,.55) 0%, rgba(150,168,190,.26) 48%, rgba(120,138,160,0) 100%); }
+  .cer.look-graphite .daycard-ns__rim {
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,.95),
+      inset 0 0 10px rgba(255,255,255,.42),
+      inset 0 0 30px rgba(206,230,255,.22),
+      inset 0 0 70px rgba(140,180,255,.10); }
+  .cer.look-graphite .cer__glow { opacity:calc(var(--hf) * .5); }
+  .cer.look-graphite .cer__floor { opacity:calc(var(--hf) * .55); }
+  .cer.look-graphite.lit .cer__floor { opacity:.6; }
+
+  /* OBSIDIAN. Light room, black Memento. Runs with the app's own theme-light,
+     so the card's light-mode reward values are the real ones. */
+  .cer.look-obsidian { background:#eef0f4; }
+  .cer.look-obsidian .daycard-ns {
+    background:linear-gradient(165deg, rgba(16,19,23,.97), rgba(26,30,36,.94) 48%, rgba(12,14,18,.97));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.14), 0 26px 60px rgba(24,32,48,.26); }
+  .cer.look-obsidian .daycard-ns__emblem { fill:rgba(255,255,255,.55);
+    filter:drop-shadow(0 1.5px 0 rgba(255,255,255,.22)) drop-shadow(0 -1.5px 1.5px rgba(0,0,0,.6)); }
+  .cer.look-obsidian .daycard-ns__name { color:rgba(255,255,255,.72); }
+  /* it has to STAY black. The flood would wash it silver, so the wash and the
+     white act blob are held right down and the reward moves to the edge. */
+  .cer.look-obsidian .daycard-theme-living .blob.b2 { opacity:calc(var(--act,0) * .10); }
+  .cer.look-obsidian .daycard-ns__plat { opacity:calc(var(--act,0) * .14); }
+  .cer.look-obsidian .daycard-ns__rim {
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,.92),
+      inset 0 0 12px rgba(255,255,255,.44),
+      inset 0 0 34px rgba(206,230,255,.24),
+      inset 0 0 78px rgba(150,190,255,.12); }
+  .cer.look-obsidian .daycard-theme-living .daycard-living-stage {
+    box-shadow:0 0 44px rgba(60,80,120,.10), 0 18px 44px rgba(30,42,64,.22),
+      0 0 calc(30px * var(--act,0)) rgba(120,150,200, calc(.26 * var(--act,0))); }
+  .cer.look-obsidian .cer__glow {
+    background:radial-gradient(circle, rgba(120,142,180,.17) 0%, rgba(120,142,180,.06) 34%, transparent 66%); }
+  /* on a light floor the spill has to read as a SHADOW cooling away from the
+     card, not as more white, so the pool goes to a cool grey */
+  .cer.look-obsidian { --fl:118,138,175; --fl2:86,106,146; }
+  .cer.look-obsidian .cer__floor { filter:blur(14px); }
+  .cer.look-obsidian .cer__flare {
+    background:radial-gradient(circle, rgba(255,255,255,.55) 0%, rgba(186,206,238,.22) 24%, rgba(186,206,238,0) 62%); }
+  .cer.look-obsidian .cer__hint { color:rgba(18,24,32,.66); }
+  .cer.look-obsidian .cer__welcome { color:#0c1116; }
+  .cer.look-obsidian .cer__note { color:rgba(14,18,24,.92); }
+  .cer.look-obsidian .cer__sign { color:rgba(14,18,24,.6); }
+  .cer.look-obsidian .cer__cta { background:#0c1116; color:#fff; }
+
+  /* ---- the old version, kept only so the two can be compared side by side ---- */
+  .cer.legacy .cer__stage { opacity:0; transform:rotateY(94deg) scale(.88) translateY(-78px); }
+  @keyframes cerEnter {
+    0%   { opacity:0;  transform:rotateY(94deg) scale(.88) translateY(-112px); }
+    30%  { opacity:.5; }
+    100% { opacity:1;  transform:rotateY(0deg)  scale(1)   translateY(-126px); }
+  }
+  .cer.legacy.enter .cer__stage { animation:cerEnter 3.1s cubic-bezier(.15,.72,.24,1) forwards; }
+  .cer.legacy.lit .cer__stage { opacity:1; transform:rotateY(0deg) scale(1) translateY(-126px); }
+  .cer.legacy.back .cer__stage { opacity:1; transform:rotateY(0deg) scale(.78) translateY(-152px); }
+
+  /* ── PHONES ───────────────────────────────────────────────────────────────
+     The app already flattens the card onto one retained layer below 768px
+     (its own iOS eviction fix). This keeps that layer CLEAN during the hold:
+     the white act blob lives inside the 46px-blurred liquid layer, and inside
+     the 30px-blurred reflection, so fading it frame by frame re-blurred both,
+     twice per frame, at 3x. It now holds at zero and arrives ONCE on release,
+     as a single transition, which is exactly what the app itself does. The
+     flood during the hold comes from the wash, the rim and the room, all of
+     which are opacity-only and cost nothing. */
+  @media (max-width: 767.98px) {
+    .cer .daycard-theme-living .blob.b2 { opacity:0; transition:opacity .9s ease-out; }
+    .cer.lit .daycard-theme-living .blob.b2 { opacity:calc(var(--act, 0) * .82); }
+    /* same reasoning for the reflected rim: it is a child of a blurred parent */
+    .cer .daycard-floor .daycard-ns__rim { opacity:0; transition:opacity .9s ease-out; }
+    .cer.lit .daycard-floor .daycard-ns__rim { opacity:calc(var(--act, 0) * var(--rim-k, 1)); }
+    .cer .daycard-floor { filter:blur(22px) saturate(var(--sat,1.5)) hue-rotate(var(--mm-hue,0deg)); }
+    .cer__flare { width:420px; height:420px; }
+    /* The app kills its own card animation below 768px for this exact reason:
+       anything animating forever keeps the card dirty, so iOS can never cache
+       it as a still bitmap and re-blurs it instead. The breathing goes with it
+       until the page is proven stable on a real device. */
+    .cer.lit .cer__float, .cer.back .cer__float { animation:none; }
+    /* the gallery chrome, so a phone renders one screen instead of a 1100px
+       page scaled down (which rasterises every one of these layers oversized) */
+    .gal { padding:14px 12px 60px; }
+    .phone { width:100%; max-width:390px; height:auto; aspect-ratio:390 / 844; }
+    .ctl { flex:1 1 100%; }
+  }
+
+  /* ?lite=1 : the diagnostic. Drops the two heaviest optional layers (the
+     mirrored reflection and the flare) and leaves the card, its edge and the
+     floor spill. If the phone survives this but not the full page, the answer
+     is layer count, not the hold. */
+  .cer.lite .daycard-floor, .cer.lite .cer__flare { display:none !important; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cer__stage, .cer__float, .cer__floor, .cer__glow, .cer__sweep, .cer__flare,
+    .cer__hint, .cer__welcome, .cer__note, .cer__sign, .cer__cta { transition:none !important; animation:none !important; }
+  }
+
+  /* The obsidian look runs the app's real light theme on <html>, which would
+     otherwise repaint this whole gallery page white. The page stays dark. */
+  html.theme-light body { background:#08090b !important; color:#ebeef8 !important; }
+  html.theme-light body::after { display:none; }
+  html.theme-light .gal__sub { color:rgba(235,238,248,.62); }
+
+  /* fixed basis so the longer button labels cannot push the panel below the
+     phone on a wide screen (it was wrapping at 1440) */
+  .ctl { display:flex; flex-direction:column; gap:10px; flex:0 0 320px; min-width:0; }
+  .ctl h3 { font-size:13px; font-weight:650; letter-spacing:.06em; text-transform:uppercase;
+    color:rgba(235,238,248,.45); margin:0 0 2px; }
+  .ctl button { padding:11px 15px; border:0; border-radius:11px; background:rgba(235,238,248,.08);
+    color:#ebeef8; font-family:inherit; font-size:14px; font-weight:650; cursor:pointer; text-align:left; }
+  .ctl button:hover { background:rgba(235,238,248,.14); }
+  .ctl button.primary { background:#fff; color:#0b1112; }
+  .ctl button.on { background:rgba(58,217,245,.22); }
+  .ctl .note { font-size:12.5px; line-height:1.55; color:rgba(235,238,248,.5); margin-top:6px; }
+</style>
+</head>
+<!-- ns-bloom is required: without it the app hard-kills the plat/tint/rim layers
+     (opacity:0 !important), which are the whole ignition. -->
+<body class="ns-bloom memento-paid">
+<div class="gal">
+  <h1>The unlock, after payment</h1>
+  <p class="gal__sub">What plays the instant the payment clears. Their Memento is already sitting there when the screen arrives, dormant: their Clarity colour is in it, because they just earned that, but it is asleep. Nothing moves. They have to press and hold it, and the hold drives the ignition itself, frame by frame: colour surges, the platinum floods, the rim lights, light spills onto the floor and the room comes up. Let go early and it drains back. Hold it through and it releases, welcomes them, then draws back so the note can arrive. Press and hold the card in the phone below to feel it. The card is the REAL card, same markup and stylesheet as the app, ignited by the same <code>--act</code> the app's own evolutions animate. The panel switches whose card it is (Clarity done, or paid before it) and what the unlock is made of. Nothing here is in Memento yet.</p>
+
+  <div class="row">
+    <div class="phone">
+      <div class="cer" id="cer">
+        <span class="cer__glow" aria-hidden="true"></span>
+        <span class="cer__floor" aria-hidden="true"></span>
+        <span class="cer__flare" aria-hidden="true"></span>
+
+        <div class="cer__stage" id="stage">
+          <div class="cer__float">
+            <!-- the real card markup, lifted verbatim from the running app -->
+            <!-- A day-one payer: Clarity done (cyan), nothing else earned yet. -->
+            <div class="daycard-wrap daycard-theme-living daycard-reveal daycard--bright" id="card"
+                 style="--clar:1.000; --act:0.000; --cons:0.000; --mix:0.000; --lit:0.000;">
+              <span class="daycard-wrap__aura" aria-hidden="true"></span>
+              <div class="daycard-living-stage">
+                <span class="cer__edge" aria-hidden="true"></span>
+                <span class="daycard-bloom" aria-hidden="true">
+                  <i class="blob b1" style="transform:translate(7.62%,8%) scale(1.342)"></i>
+                  <i class="blob b2" style="transform:translate(-21.48%,15.95%) scale(1.449)"></i>
+                  <i class="blob b3" style="transform:translate(8.31%,-6.35%) scale(1.5)"></i>
+                  <i class="blob b4" style="transform:translate(42.68%,-59.06%) scale(.966)"></i>
+                  <i class="blob b5" style="transform:translate(-16.79%,-51.67%) scale(1.454)"></i>
+                  <i class="blob b6" style=""></i>
+                </span>
+                <!-- the app's own mirrored ground reflection, same blobs, plus
+                     the rim so the earned edge shows in the reflection too.
+                     The wrapper only carries the perspective fan. -->
+                <span class="cer__mirror" aria-hidden="true">
+                <span class="daycard-floor" aria-hidden="true">
+                  <i class="blob b1" style="transform:translate(7.62%,8%) scale(1.342)"></i>
+                  <i class="blob b2" style="transform:translate(-21.48%,15.95%) scale(1.449)"></i>
+                  <i class="blob b3" style="transform:translate(8.31%,-6.35%) scale(1.5)"></i>
+                  <i class="blob b4" style="transform:translate(42.68%,-59.06%) scale(.966)"></i>
+                  <i class="blob b5" style="transform:translate(-16.79%,-51.67%) scale(1.454)"></i>
+                  <i class="blob b6"></i>
+                  <span class="daycard-ns__rim" aria-hidden="true"></span>
+                </span>
+                </span>
+                <div class="daycard-ns" id="dayCardNs">
+                  <span class="daycard-ns__liquid" aria-hidden="true">
+                    <i class="blob b1" style="transform:translate(-15.04%,35.37%) scale(.702)"></i>
+                    <i class="blob b2" style="transform:translate(-21.87%,31.55%) scale(1.07)"></i>
+                    <i class="blob b3" style="transform:translate(46.1%,-54.39%) scale(.938)"></i>
+                    <i class="blob b4" style="transform:translate(-4.37%,41.56%) scale(1.252)"></i>
+                    <i class="blob b5" style="transform:translate(38.8%,50.27%) scale(1.293)"></i>
+                    <i class="blob b6" style=""></i>
+                  </span>
+                  <span class="daycard-ns__iri" aria-hidden="true"></span>
+                  <span class="daycard-ns__sheen" aria-hidden="true"></span>
+                  <span class="daycard-ns__burn" aria-hidden="true"></span>
+                  <span class="daycard-ns__plat" aria-hidden="true"></span>
+                  <span class="daycard-ns__tint" aria-hidden="true"></span>
+                  <span class="daycard-ns__rim" aria-hidden="true"></span>
+                  <span class="cer__sweep" aria-hidden="true"></span>
+                  <div class="daycard-ns__body">
+                    <svg class="daycard-ns__emblem" viewBox="0 0 512 512" aria-hidden="true">
+                      <path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path>
+                    </svg>
+                  </div>
+                  <div class="daycard-ns__foot"><span class="daycard-ns__name">Sam</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p class="cer__hint" id="hint">Press and hold</p>
+        <p class="cer__welcome">Welcome to Memento.</p>
+        <div class="cer__copy">
+          <p class="cer__note">Thank you for buying Memento. My number one goal is that you get the most out of your existence, and that this serves you well for years to come.</p>
+          <p class="cer__sign">Malik</p>
+          <button class="cer__cta" type="button">Find today's move</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ctl">
+      <h3>The unlock</h3>
+      <button class="primary" onclick="reset()">Reset to dormant, then hold the card</button>
+      <button onclick="autoPlay()">If they never hold (the failsafe)</button>
+
+      <h3 style="margin-top:12px">Whose card is it</h3>
+      <button data-start="post" onclick="setStart('post')">They finished Clarity</button>
+      <button data-start="pre" onclick="setStart('pre')">They paid before Clarity</button>
+
+      <h3 style="margin-top:12px">The look when it unlocks</h3>
+      <button data-look="platinum" onclick="setLook('platinum')">Platinum, the app's own</button>
+      <button data-look="bronze" onclick="setLook('bronze')">Bronze</button>
+      <button data-look="graphite" onclick="setLook('graphite')">Graphite, the edge lights, not the face</button>
+      <button data-look="obsidian" onclick="setLook('obsidian')">Obsidian, light room and a black Memento</button>
+
+      <h3 style="margin-top:12px">Hold a state</h3>
+      <button onclick="freeze(0)">dormant</button>
+      <button onclick="freeze(.45)">mid hold</button>
+      <button onclick="freeze(1)">unlocked, welcoming</button>
+      <button onclick="freeze(2)">drawn back, the note</button>
+
+      <h3 style="margin-top:12px">Compare</h3>
+      <button onclick="legacy()">The old one, where it is given</button>
+      <p class="note">The ignition is the card's own <code>--act</code> driven directly by the press, so the colour is theirs to pull out. Release before the end and it drains back. Nobody gets stranded: the prompt arrives at 2.6s and it ignites itself at 10s.</p>
+      <p class="note">A card that has done Clarity carries cyan and nothing else: a payer on day one has no consistency and no action yet, so green and platinum are both still unearned. A card that has not done Clarity is blank glass, and unlocking it gives platinum with no colour under it, which is the honest picture of what they own.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  var cer  = document.getElementById('cer');
+  var card = document.getElementById('card');
+  var hint = document.getElementById('hint');
+
+  var HOLD_MS    = 2600;   // the star's ignition hold is 2500, this matches its weight
+  var RELEASE_MS = 760;    // draining back is slower than filling, so letting go stings
+  var AUTO_MS    = 2300;   // the failsafe pulls it up itself, a shade faster than a real hold
+  var ASK_AT     = 2600;
+  var AUTO_AT    = 10000;
+
+  var p = 0, holding = false, auto = false, done = false;
+  var raf = null, last = 0, timers = [];
+
+  // What the card actually is when the payment clears. Everything a payer has
+  // not earned yet stays at 0, so the dormant card is never a flattering lie.
+  var START = {
+    post: { clar: 1, cons: 0, mix: 0 },   // finished Clarity: their cyan, asleep
+    pre:  { clar: 0, cons: 0, mix: 0 }    // paid first: blank glass
+  };
+  var startMode = 'post', look = 'platinum';
+
+  function clear(){ timers.forEach(clearTimeout); timers = []; }
+  function at(ms, fn){ timers.push(setTimeout(fn, ms)); }
+  function num(v){ return v.toFixed(3); }
+
+  // the press reads as pressure: it sinks a little the instant they touch it,
+  // then grows past its resting size as the charge builds
+  function scaleAt(x){
+    if (x < 0.12) return 1 - 0.014 * Math.sin(x / 0.12 * Math.PI);
+    return 1 + 0.055 * Math.pow((x - 0.12) / 0.88, 1.25);
+  }
+
+  // The hold deliberately stops short of full power. The last of it arrives on
+  // release, so completing the hold is a break, not just the end of a ramp.
+  var HOLD_CAP = 0.84;
+
+  // Only --act, --lit and --emit move, and all three land on layer OPACITY.
+  // --sat and --glow are deliberately left alone: they are filter parameters
+  // (saturate on three blurred layers, brightness on the aura), and ramping
+  // them re-ran those blurs on every frame. That is what crashed the phone.
+  function paint(actV, litV){
+    card.style.setProperty('--act',  num(actV));
+    card.style.setProperty('--lit',  num(litV));
+    card.style.setProperty('--emit', num(0.30 + 0.28 * litV));
+  }
+
+  function render(){
+    var e = Math.pow(p, 1.3);           // colour back-loads, so the end erupts
+    paint(e * HOLD_CAP, p * HOLD_CAP);
+    cer.style.setProperty('--hp', num(p));
+    cer.style.setProperty('--hf', num(p * p));
+    cer.style.setProperty('--hs', scaleAt(p).toFixed(4));
+  }
+
+  function loop(t){
+    var dt = Math.min(64, t - last) / 1000; last = t;
+    var rising = holding || auto;
+    p += rising ? dt / ((auto ? AUTO_MS : HOLD_MS) / 1000) : -dt / (RELEASE_MS / 1000);
+    if (p >= 1) { p = 1; render(); complete(); return; }
+    if (p <= 0) { p = 0; render(); raf = null; return; }
+    render();
+    raf = requestAnimationFrame(loop);
+  }
+  function run(){ if (raf) return; last = performance.now(); raf = requestAnimationFrame(loop); }
+
+  function begin(e){
+    if (done || auto) return;
+    e.preventDefault();
+    clear();
+    holding = true;
+    cer.classList.remove('ask');
+    run();
+  }
+  function cancel(){
+    if (done || auto || !holding) return;
+    holding = false;
+    cer.classList.add('ask');
+    run();
+  }
+
+  function complete(){
+    done = true; holding = false; auto = false; raf = null;
+    cer.classList.remove('ask');
+    cer.classList.add('flare');
+    cer.classList.add('lit');
+    release();
+    at(140,  function(){ cer.classList.add('sweep'); });
+    at(3600, function(){ cer.classList.add('back'); });
+  }
+
+  // the break: what they were holding back lets go, overshoots, settles
+  function release(){
+    var t0 = performance.now(), DUR = 1000;
+    var ss = function(x){ return x * x * (3 - 2 * x); };
+    (function step(now){
+      var q = Math.min(1, (now - t0) / DUR);
+      var v = q < 0.4
+        ? HOLD_CAP + (1.10 - HOLD_CAP) * ss(q / 0.4)
+        : 1.10 - 0.10 * ss((q - 0.4) / 0.6);
+      paint(v, Math.min(1, v));
+      cer.style.setProperty('--hs', (1.055 + 0.03 * Math.sin(Math.min(1, q / 0.55) * Math.PI) - 0.055 * ss(q)).toFixed(4));
+      if (q < 1) requestAnimationFrame(step);
+    })(t0);
+  }
+
+  // the card as it stands the second before they touch it
+  function applyStart(){
+    var s = START[startMode];
+    card.style.setProperty('--clar', s.clar.toFixed(3));
+    card.style.setProperty('--cons', s.cons.toFixed(3));
+    card.style.setProperty('--mix',  s.mix.toFixed(3));
+  }
+  var LITE = /[?&]lite=1/.test(location.search);
+  function base(extra){ return 'cer look-' + look + (LITE ? ' lite' : '') + (extra || ''); }
+
+  function reset(){
+    clear();
+    if (raf) cancelAnimationFrame(raf);
+    raf = null; p = 0; holding = false; auto = false; done = false;
+    cer.className = base();
+    applyStart();
+    render();
+    at(ASK_AT,  function(){ if (!done && !holding) cer.classList.add('ask'); });
+    at(AUTO_AT, function(){ if (!done && !holding) { auto = true; cer.classList.remove('ask'); run(); } });
+  }
+
+  function autoPlay(){ reset(); clear(); auto = true; cer.classList.remove('ask'); run(); }
+
+  // n: 0 dormant, .45 mid hold, 1 unlocked, 2 drawn back
+  function freeze(n){
+    clear();
+    if (raf) cancelAnimationFrame(raf);
+    raf = null; holding = false; auto = false;
+    done = n >= 1;
+    cer.className = base(n === 1 ? ' lit' : n === 2 ? ' lit back' : '');
+    applyStart();
+    p = n > 1 ? 1 : n;
+    render();
+    if (n >= 1) {  // settled, past the release, at full power
+      paint(1, 1);
+      cer.style.setProperty('--hp', '1'); cer.style.setProperty('--hf', '1');
+      cer.style.setProperty('--hs', '1');
+    }
+  }
+
+  function syncBtns(){
+    [].forEach.call(document.querySelectorAll('[data-start]'), function(b){
+      b.classList.toggle('on', b.getAttribute('data-start') === startMode); });
+    [].forEach.call(document.querySelectorAll('[data-look]'), function(b){
+      b.classList.toggle('on', b.getAttribute('data-look') === look); });
+  }
+  function setStart(mode){ startMode = mode; syncBtns(); reset(); }
+  function setLook(name){
+    look = name;
+    // obsidian runs on the app's REAL light theme, so the card's light-mode
+    // reward values are the ones being judged, not a repaint of the dark ones
+    document.documentElement.classList.toggle('theme-light', name === 'obsidian');
+    syncBtns(); reset();
+  }
+
+  function legacy(){
+    clear();
+    if (raf) cancelAnimationFrame(raf);
+    raf = null; p = 1; holding = false; auto = false; done = true;
+    cer.className = base(' legacy');
+    applyStart();
+    card.style.setProperty('--act', '0.000');
+    card.style.setProperty('--lit', '0.000');
+    cer.style.setProperty('--hp', '0'); cer.style.setProperty('--hf', '0'); cer.style.setProperty('--hs', '1');
+    void cer.offsetWidth;
+    at(180,  function(){ cer.classList.add('enter'); });
+    at(700,  function(){ legacyIgnite(2000); });
+    at(1100, function(){ cer.classList.add('lit'); });
+    at(2000, function(){ cer.classList.add('sweep'); });
+    at(5200, function(){ cer.classList.add('back'); });
+  }
+  function legacyIgnite(dur){
+    var t0 = performance.now();
+    (function step(now){
+      var q = Math.min(1, (now - t0) / dur);
+      var e = q * q * q * (q * (q * 6 - 15) + 10);
+      paint(e, e);
+      cer.style.setProperty('--hp', num(e));
+      cer.style.setProperty('--hf', num(e * e));
+      if (q < 1) requestAnimationFrame(step);
+    })(t0);
+  }
+
+  cer.addEventListener('pointerdown', begin);
+  document.addEventListener('pointerup', cancel);
+  document.addEventListener('pointercancel', cancel);
+
+  syncBtns();
+  var lite = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (lite) { freeze(1); at(1400, function(){ cer.classList.add('back'); }); }
+  else reset();
+</script>
+</body>
+</html>
