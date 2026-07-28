@@ -41,6 +41,12 @@
 .receipt { font-size:15.5px; line-height:1.6; color:var(--text-hi); }
 .newact { font-size:27px; font-weight:750; letter-spacing:-.02em; line-height:1.25; }
 
+/* the narrowing */
+.cand { text-align:center; font-size:15px; padding:8px 0; color:var(--text-lo);
+  text-decoration:line-through; text-decoration-color:rgba(235,238,248,.25); }
+.cand--fade { opacity:.35; }
+.cand--live { color:var(--text-hi); font-weight:650; text-decoration:none; font-size:16.5px; }
+
 /* the cut (door 2) */
 .cutrow { font-size:16px; line-height:1.5; color:var(--text-lo); text-decoration:line-through;
   text-decoration-color:rgba(235,238,248,.3); padding:9px 0; }
@@ -48,7 +54,7 @@
 </head><body>
 <div class="gal">
 <h1>Action, the first two minutes</h1>
-<p class="gal__sub">The intake done properly, from the paywall to the Action page you already approved. Same person as every other render: their star is 100 paying users, and the action the whole loop shows was born here as a Replace verdict. One screen per beat, one thing per screen, opening with the fade-in and the explainer the app already has. Frames 05 to 07 are door 1, frames 08 to 10 are door 2. When shipped, every line of copy types in with the typewriter effect, into reserved height so nothing jumps.</p>
+<p class="gal__sub">The intake done properly, from the paywall to the Action page you already approved. Same person as every other render: their star is 100 paying users, and the action the whole loop shows was born here as a Replace verdict. One screen per beat, one thing per screen, opening with the fade-in and the explainer the app already has. Frames 05, 06, 08 and 09 are door 1, frames 10 to 12 are door 2, and frame 07 is the narrowing both doors cross while the plan generates. When shipped, every line of copy types in with the typewriter effect, into reserved height so nothing jumps.</p>
 <div class="grid">
 
 <!-- I1 -->
@@ -164,9 +170,28 @@
   <p class="item__note">The evidence question as three honest states instead of a text box, because this answer decides the verdict and chips cannot ramble. Each state routes differently: working confirms, not-moving challenges, not-doing shrinks the first motion instead of changing the move.</p>
 </div>
 
+<!-- NARROW -->
+<div class="item">
+  <div class="item__label"><span class="item__n">07</span><span class="item__name">The narrowing</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack">
+    <div class="safe-t"></div>
+    <div class="grow" style="display:flex;flex-direction:column;justify-content:center;padding:0 24px">
+      <p class="cand cand--fade">Run paid ads to the landing page</p>
+      <p class="cand cand--fade">Post a launch thread every week</p>
+      <p class="cand">Redesign onboarding first</p>
+      <p class="cand">Cold email fifty startups</p>
+      <p class="cand--live cand">Talk to three users about why they signed up</p>
+      <p class="cand">Ship the referral feature</p>
+      <p class="cand cand--fade">Start a build-in-public newsletter</p>
+    </div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note">Both doors pass through this while the plan generates. Candidate actions seeded from their goal and their own answers flash past fast and get struck one by one until one holds. It is latency theater, the AI call takes real seconds anyway, but it is honest theater: elimination is literally what the engine is doing. Two to three seconds, fast enough that nobody reads the losers closely.</p>
+</div>
+
 <!-- I5 -->
 <div class="item">
-  <div class="item__label"><span class="item__n">07</span><span class="item__name">The verdict</span></div>
+  <div class="item__label"><span class="item__n">08</span><span class="item__name">The verdict, replaced</span></div>
   <div class="phone"><div class="phone__scroll"><div class="stack">
     <div class="safe-t"></div>
     <div class="grow" style="display:flex;flex-direction:column;justify-content:center;padding:0 22px">
@@ -184,9 +209,29 @@
   <p class="item__note">A Replace verdict, shown the only way the doctrine allows: their move in their words, the receipt built from their own numbers, then the replacement. Confirmed and Upgraded verdicts use this same skeleton with their move surviving instead of struck. Lock it in lands on the Action page from the loop, same action, now as the card.</p>
 </div>
 
+<!-- CONF -->
+<div class="item">
+  <div class="item__label"><span class="item__n">09</span><span class="item__name">The verdict, confirmed</span></div>
+  <div class="phone"><div class="phone__scroll"><div class="stack">
+    <div class="safe-t"></div>
+    <div class="grow" style="display:flex;flex-direction:column;justify-content:center;padding:0 22px">
+      <p style="font-size:17px;line-height:1.5;color:var(--text-hi)">"DM people who follow the build every morning"</p>
+      <div style="height:22px"></div>
+      <p class="receipt">Two of your eight users came from those DMs. The number moves when you send them. Your instinct holds.</p>
+      <div style="height:26px"></div>
+      <p class="t-cap">So the action is</p>
+      <div style="height:8px"></div>
+      <p class="newact">DM ten followers of the build every morning</p>
+    </div>
+    <div class="bot"><button class="cta">Lock it in</button></div>
+    <div class="safe-b"></div>
+  </div></div></div>
+  <p class="item__note">The working case, and it is never taken at face value. The move still passes the three tests, currency, constraint, evidence, and the receipt cites their own numbers back as proof it holds. What changes is the ending: their words survive unstruck, and the action is their move sharpened mechanical, a count and a cadence added. Ownership is the point: it was their idea, now it has edges.</p>
+</div>
+
 <!-- D2Q1 -->
 <div class="item">
-  <div class="item__label"><span class="item__n">08</span><span class="item__name">Door 2, question one</span></div>
+  <div class="item__label"><span class="item__n">10</span><span class="item__name">Door 2, question one</span></div>
   <div class="phone"><div class="phone__scroll"><div class="stack">
     <div class="safe-t"></div>
     <div class="pad" style="padding-top:14px"><span class="t-cap num">1 of 2</span></div>
@@ -205,7 +250,7 @@
 
 <!-- D2Q2 -->
 <div class="item">
-  <div class="item__label"><span class="item__n">09</span><span class="item__name">Door 2, question two</span></div>
+  <div class="item__label"><span class="item__n">11</span><span class="item__name">Door 2, question two</span></div>
   <div class="phone"><div class="phone__scroll"><div class="stack">
     <div class="safe-t"></div>
     <div class="pad" style="padding-top:14px"><span class="t-cap num">2 of 2</span></div>
@@ -213,16 +258,18 @@
       <p class="q" style="font-size:26px">What have you already tried?</p>
       <div style="height:18px"></div>
       <div class="field">Posting build updates on Twitter, redesigned the landing page twice, mostly just adding features<span class="caret"></span></div>
+      <div style="height:11px"></div>
+      <button class="chip2">Honestly, nothing yet</button>
     </div>
     <div class="bot"><button class="cta">Continue</button></div>
     <div class="safe-b"></div>
   </div></div></div>
-  <p class="item__note">The locator. Everything they list here becomes raw material for the cut on the next screen, which is why it stays a free field: the AI needs their words to strike through. Two questions total on this door too, and the counter keeps that promise visible.</p>
+  <p class="item__note">The locator. Everything they list here becomes raw material for the cut on the next screen, which is why it stays a free field: the AI needs their words to strike through. Two questions total on this door too, and the counter keeps that promise visible. The nothing chip is there for the person with a genuinely clean slate: they skip the cut entirely and the action just arrives, because there is nothing to strike.</p>
 </div>
 
 <!-- I6 -->
 <div class="item">
-  <div class="item__label"><span class="item__n">10</span><span class="item__name">Door 2 ends here: the visible cut</span></div>
+  <div class="item__label"><span class="item__n">12</span><span class="item__name">Door 2 ends here: the visible cut</span></div>
   <div class="phone"><div class="phone__scroll"><div class="stack">
     <div class="safe-t"></div>
     <div class="grow" style="display:flex;flex-direction:column;justify-content:center;padding:0 22px">
