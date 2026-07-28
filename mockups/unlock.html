@@ -27,8 +27,11 @@
   /* --hp = hold progress 0..1, driven per frame from the actual press.
      --hf = the same, squared, for things that should arrive late.
      --hs = the card's scale, so the press reads as pressure. */
+  /* No perspective on the room. It exists only for the old given version's
+     rotateY, and an ancestor 3D context with perspective-origin at 50% 40%
+     was warping the reflection's own perspective from a point above and off
+     the card, which is what made the fan look skewed and lopsided. */
   .cer { position:absolute; inset:0; background:#000; overflow:hidden;
-    perspective:1600px; perspective-origin:50% 40%;
     --hp:0; --hf:0; --hs:1;
     touch-action:none; user-select:none; -webkit-user-select:none; cursor:default; }
 
@@ -62,6 +65,12 @@
   .cer .daycard-theme-living { --rfl-d:48; --rfl-w:8; --rfl-i:.95; }
   .cer .daycard-floor {
     filter:blur(22px) saturate(var(--sat,1.5)) hue-rotate(var(--mm-hue,0deg));
+    /* THE TRAPEZOID. The app's reflection carries overflow:hidden, which is a
+       hard rectangular clip on blurred content. Tilt that rectangle in
+       perspective and the clip becomes a trapezoid with straight sides, drawn
+       right through the blur: a box, exactly what the edge-safety law forbids.
+       The mask alone shapes it now, and a mask fades where a clip cuts. */
+    overflow:visible;
     /* The sides are cut by a RADIAL falloff, not a linear one. A linear side
        fade under the perspective tilt still ends somewhere, and that somewhere
        renders as a straight diagonal: the reflection read as a trapezoid with
@@ -354,6 +363,7 @@
   .cer.look-obsidian .cer__cta { background:#0c1116; color:#fff; }
 
   /* ---- the old version, kept only so the two can be compared side by side ---- */
+  .cer.legacy { perspective:1600px; perspective-origin:50% 40%; }
   .cer.legacy .cer__stage { opacity:0; transform:rotateY(94deg) scale(.88) translateY(-78px); }
   @keyframes cerEnter {
     0%   { opacity:0;  transform:rotateY(94deg) scale(.88) translateY(-112px); }
