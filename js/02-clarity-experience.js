@@ -3765,7 +3765,10 @@ const ActionExperience = {
         return;
       }
       if (changed && d2.length === 1) {
-        push('What can you actually give it a day right now?', 'text', [], '1 of 2');
+        // A time budget has five honest answers, so asking for prose is pure
+        // friction. Chips lead, the free field stays for anything else.
+        push('What can you actually give it a day right now?', 'chips',
+          ['15 minutes', '30 minutes', 'An hour', 'A few hours', 'Most of the day'], '1 of 2');
         return;
       }
       if (d2.length === triedIdx) {
@@ -4375,15 +4378,22 @@ const ActionExperience = {
     } else if (q.type === 'chips') {
       const chipsSrc = (q.chips && q.chips.length) ? q.chips : (q.options || []);
       const chips = chipsSrc.map(c => `<button class="action-plan__when-chip" type="button" data-chip="${esc(c)}">${esc(c)}</button>`).join('');
-      // Night 3 (Malik's locator render, frame 11): the free field is the
-      // PRIMARY input, big like every other text question; the chips sit
-      // under it as quiet escapes. Enter or the nav's Next submits the text;
-      // a chip tap submits itself.
+      // Which input leads depends on what the chips ARE.
+      //   ONE chip  = an escape hatch off a question that wants prose (the
+      //     "nothing tried yet" case). The free field leads, chip sits under.
+      //   SEVERAL   = the chips are the actual answer set (a time budget has
+      //     five honest answers). They lead, and the field becomes the
+      //     "something else" row. Malik: a question like this should not be
+      //     "just only a text box".
+      // Either way they are alternatives: picking one clears the other, and
+      // Next sends whichever is live.
+      const choiceLed = chipsSrc.length > 1;
       const customRow = `
-        <div class="action-chat__chips-custom" style="margin-bottom:12px;width:100%;">
-          <textarea class="wiz__text-input action-cine__input" id="intakeCustom" rows="2" placeholder="${esc(q.customPlaceholder || 'Type it plainly...')}" autocomplete="off"></textarea>
+        <div class="action-chat__chips-custom" style="${choiceLed ? 'margin-top:12px' : 'margin-bottom:12px'};width:100%;">
+          <textarea class="wiz__text-input action-cine__input" id="intakeCustom" rows="2" placeholder="${esc(q.customPlaceholder || (choiceLed ? 'Or say it in your own words...' : 'Type it plainly...'))}" autocomplete="off"></textarea>
         </div>`;
-      answers += `${customRow}<div class="action-plan__when-edit" id="intakeChips">${chips}</div>`;
+      const chipRow = `<div class="action-plan__when-edit" id="intakeChips">${chips}</div>`;
+      answers += choiceLed ? `${chipRow}${customRow}` : `${customRow}${chipRow}`;
     } else {
       answers += `
         <textarea class="wiz__text-input action-cine__input" id="intakeInput" rows="2" placeholder="${esc(q.placeholder || 'Type your answer...')}" autocomplete="off"></textarea>
