@@ -5331,34 +5331,50 @@ Return ONLY the sentence text. No quotes, no labels.`;
     // The brief lives in its own scroll region so a long plan scrolls INSIDE
     // the card. The card keeps its shape and its footer; it is never sliced
     // through by the viewport edge.
-    const cardHtml = chained
-      ? `<div class="aloop-card__scroll">
-           <p class="aloop-card__cap">Next action</p>
-           <p class="aloop-card__move">${esc(chained)}</p>
-           <p class="aloop-card__why">${chainLine}</p>
+    // One card per tier, so swiping moves through real pages instead of
+    // rewriting one card in place. Each card carries its OWN tier on
+    // data-tier, which is what lets the five sizes look different from each
+    // other while you are still deciding.
+    const cardFor = (k) => `
+      <div class="aloop-slide">
+        <div class="aloop-card" data-tier="${k}">
+          <div class="aloop-card__scroll">
+            <p class="aloop-card__cap">Action</p>
+            <p class="aloop-card__move">${esc((pa.tiers && pa.tiers[k]) || pa.title || '')}</p>
+            ${pa.why ? `<p class="aloop-card__why">${esc(pa.why)}</p>` : ''}
+            <hr class="aloop-rule">
+            ${brief('First step', pa.howToStart)}
+            ${brief('Done when', pa.tierDone && pa.tierDone[k])}
+            ${brief('Roughly', pa.tierTime && pa.tierTime[k])}
+            ${brief('If stuck', pa.ifStuck)}
+          </div>
+          <div class="aloop-swaphint">
+            <div class="aloop-dots">${KEYS.map((_, i) => `<i${i === KEYS.indexOf(k) ? ' class="on"' : ''}></i>`).join('')}</div>
+            <span class="aloop-count apl-num">${KEYS.indexOf(k) + 1} of 5</span>
+          </div>
+        </div>
+      </div>`;
+    const deckHtml = chained
+      ? `<div class="aloop-track" style="transform:translateX(0)">
+           <div class="aloop-slide">
+             <div class="aloop-card" data-tier="${tier}">
+               <div class="aloop-card__scroll">
+                 <p class="aloop-card__cap">Next action</p>
+                 <p class="aloop-card__move">${esc(chained)}</p>
+                 <p class="aloop-card__why">${chainLine}</p>
+               </div>
+             </div>
+           </div>
          </div>`
-      : `<div class="aloop-card__scroll">
-           <p class="aloop-card__cap">Today's action</p>
-           <p class="aloop-card__move">${esc((pa.tiers && pa.tiers[tier]) || pa.title || '')}</p>
-           ${pa.why ? `<p class="aloop-card__why">${esc(pa.why)}</p>` : ''}
-           <hr class="aloop-rule">
-           ${brief('First step', pa.howToStart)}
-           ${brief('Done when', pa.tierDone && pa.tierDone[tier])}
-           ${brief('Roughly', pa.tierTime && pa.tierTime[tier])}
-           ${brief('If stuck', pa.ifStuck)}
-         </div>
-         <div class="aloop-swaphint">
-           <div class="aloop-dots">${KEYS.map((k, i) => `<i${i === idx ? ' class="on"' : ''}></i>`).join('')}</div>
-           <span class="aloop-count apl-num">${idx + 1} of 5</span>
-         </div>`;
+      : `<div class="aloop-track" style="transform:translateX(${idx * -100}%)">${KEYS.map(cardFor).join('')}</div>`;
     this.pageWrap.innerHTML = `
       <div class="action-exp__page-inner"><div class="aloop" data-tier="${tier}">
         <div class="aloop-glow" aria-hidden="true"></div>
-        <div class="aloop-top"><span class="aloop-cap apl-num">Day ${dayN}</span><span class="aloop-cap">${esc(weekday)}</span></div>
+        <div class="aloop-top">
+          <div class="aloop-day"><span class="aloop-day__k">Day</span><span class="aloop-day__n apl-num">${dayN}</span></div>
+        </div>
         <div class="aloop-mid">
-          <div class="aloop-deck">
-            <div class="aloop-card">${cardHtml}</div>
-          </div>
+          <div class="aloop-deck">${deckHtml}</div>
           <button type="button" class="aloop-notthis" id="aloopNotThis">Not this action</button>
         </div>
         <div class="aloop-bot">
@@ -5368,37 +5384,61 @@ Return ONLY the sentence text. No quotes, no labels.`;
       </div></div>`;
     const root = this.pageWrap.querySelector('.aloop');
 
-    // Swipe right = bigger, swipe left = smaller. The screen stays, only the
-    // card rewrites and the room's glow follows the size.
+    // The tier is read LIVE from state wherever it is used, so a swipe never
+    // has to re-render the screen (re-rendering mid-gesture is what made the
+    // old version feel like a jump cut rather than a swipe).
+    const liveTier = () => (KEYS.indexOf(state.action.selectedTier) >= 0 ? state.action.selectedTier : tier);
+
+    // A real horizontal carousel: the track follows the finger and snaps.
     if (!chained) {
       const deck = root.querySelector('.aloop-deck');
-      let sx = null, sy = null, moved = false;
-      deck.addEventListener('pointerdown', (e) => { sx = e.clientX; sy = e.clientY; moved = false; });
+      const track = root.querySelector('.aloop-track');
+      const focusBtn = root.querySelector('#aloopFocus');
+      let i = idx, sx = null, sy = null, dragging = false, w = 1;
+      const place = (px, animate) => {
+        track.style.transition = animate ? 'transform 340ms cubic-bezier(.22,1,.36,1)' : 'none';
+        track.style.transform = `translateX(calc(${i * -100}% + ${px}px))`;
+      };
+      const commit = () => {
+        state.action.selectedTier = KEYS[i];
+        try { persistNow(); } catch (e) {}
+        root.dataset.tier = KEYS[i];
+        const t = pa.tierTime && pa.tierTime[KEYS[i]];
+        if (focusBtn) {
+          const label = t ? ' ' + String(t).replace(/utes?$/, '') : '';
+          focusBtn.lastChild.nodeValue = 'Focus' + label;
+        }
+        try { if (typeof MementoSound !== 'undefined' && MementoSound.tick) MementoSound.tick(); } catch (e) {}
+      };
+      deck.addEventListener('pointerdown', (e) => {
+        // ignore drags that start inside a scrolling brief
+        sx = e.clientX; sy = e.clientY; dragging = false;
+        w = deck.clientWidth || 1;
+      });
       deck.addEventListener('pointermove', (e) => {
         if (sx === null) return;
         const dx = e.clientX - sx, dy = e.clientY - sy;
-        if (Math.abs(dx) > 12 && Math.abs(dx) > Math.abs(dy)) {
-          moved = true;
-          deck.style.transform = `translateX(${Math.max(-34, Math.min(34, dx * 0.25))}px)`;
-        }
+        if (!dragging && Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) dragging = true;
+        if (!dragging) return;
+        // resist past the ends so the track never runs off into empty space
+        let d = dx;
+        if ((i === 0 && d > 0) || (i === KEYS.length - 1 && d < 0)) d = d * 0.28;
+        place(d, false);
       });
       const settle = (e) => {
         if (sx === null) return;
-        const dx = e.clientX - sx;
-        deck.style.transform = '';
+        const dx = (e.clientX || 0) - sx;
         sx = null;
-        if (!moved || Math.abs(dx) < 56) return;
-        const KEYS2 = ['tiny', 'light', 'moderate', 'heavy', 'extreme'];
-        const cur = KEYS2.indexOf(tier);
-        const next = dx < 0 ? Math.min(4, cur + 1) : Math.max(0, cur - 1);
-        if (next === cur) return;
-        state.action.selectedTier = KEYS2[next];
-        try { persistNow(); } catch (e2) {}
-        try { if (typeof MementoSound !== 'undefined' && MementoSound.tick) MementoSound.tick(); } catch (e3) {}
-        this._renderLoopCard();
+        if (!dragging) { place(0, true); return; }
+        dragging = false;
+        if (Math.abs(dx) > w * 0.22) {
+          const next = dx < 0 ? Math.min(KEYS.length - 1, i + 1) : Math.max(0, i - 1);
+          if (next !== i) { i = next; commit(); }
+        }
+        place(0, true);
       };
       deck.addEventListener('pointerup', settle);
-      deck.addEventListener('pointercancel', () => { deck.style.transform = ''; sx = null; });
+      deck.addEventListener('pointercancel', () => { sx = null; dragging = false; place(0, true); });
     }
 
     // Hold to complete: a real press, not a tap. Fill runs ~900ms; letting go
@@ -5415,7 +5455,7 @@ Return ONLY the sentence text. No quotes, no labels.`;
       e.preventDefault();
       fill.style.transition = 'transform 900ms linear';
       fill.style.transform = 'scaleX(1)';
-      holdT = setTimeout(() => { holdT = null; this._loopComplete(tier, chained); }, 920);
+      holdT = setTimeout(() => { holdT = null; this._loopComplete(liveTier(), chained); }, 920);
     });
     hold.addEventListener('pointerup', cancel);
     hold.addEventListener('pointerleave', cancel);
@@ -5424,7 +5464,7 @@ Return ONLY the sentence text. No quotes, no labels.`;
     // Focus preloads THIS tier's honest time (Malik, decision 12).
     root.querySelector('#aloopFocus').addEventListener('click', (e) => {
       e.stopPropagation();
-      this._loopOpenFocus(pa, tier, chained);
+      this._loopOpenFocus(pa, liveTier(), chained);
     });
 
     // The rare case where the action itself is wrong: quiet, two-step, honest.

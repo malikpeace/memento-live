@@ -3980,6 +3980,17 @@ html.theme-light .action-exp {
   padding: 0 20px;
 }
 .aloop-cap { font-size: 0.78125rem; font-weight: 600; color: rgba(var(--ink),0.5); }
+/* The day is the count that matters, so it is stated at size. (The weekday was
+   removed: it is on their lock screen already and it competed with this.) */
+.aloop-day { display: flex; align-items: baseline; gap: 9px; }
+.aloop-day__k {
+  font-size: 0.9375rem; font-weight: 600; letter-spacing: -0.01em;
+  color: rgba(var(--ink),0.45);
+}
+.aloop-day__n {
+  font-size: 2.375rem; font-weight: 750; letter-spacing: -0.035em; line-height: 1;
+  color: rgba(var(--ink),0.97);
+}
 .aloop-top {
   display: flex; justify-content: space-between; align-items: baseline;
   padding-top: calc(var(--safe-t, 0px) + 14px);
@@ -4012,8 +4023,19 @@ html.theme-light .action-exp {
 .aloop[data-tier="moderate"] .aloop-glow { opacity: 0.55; }
 .aloop[data-tier="heavy"] .aloop-glow { opacity: 0.8; }
 .aloop[data-tier="extreme"] .aloop-glow { opacity: 1; }
-.aloop-deck { position: relative; touch-action: pan-y; transition: transform 200ms ease-out;
-  display: flex; min-height: 0; }
+/* A real carousel: five pages on a track, the track follows the finger.
+   The old version nudged one card 34px and rewrote its text, which read as a
+   jump cut rather than moving between sizes. */
+.aloop-deck {
+  position: relative; touch-action: pan-y;
+  display: flex; min-height: 0; overflow: hidden;
+  margin: 0 -20px; padding: 0 20px;   /* let pages bleed to the screen edge */
+}
+.aloop-track { display: flex; width: 100%; min-height: 0; will-change: transform; }
+.aloop-slide {
+  flex: 0 0 100%; min-width: 100%; min-height: 0;
+  display: flex; padding-right: 0;
+}
 /* (The stacked "card behind" ghost is gone: it read as a stray box poking out
    from under the real one, not as a deck.) */
 .aloop-card {
@@ -4031,10 +4053,38 @@ html.theme-light .action-exp {
   scrollbar-width: none;
 }
 .aloop-card__scroll::-webkit-scrollbar { display: none; }
-/* a soft hint that there is more, sitting just above the pinned footer */
-.aloop-card__scroll { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 20px), transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 calc(100% - 20px), transparent 100%); }
+/* a soft hint that there is more, sitting just above the pinned footer. Long
+   enough to read as a fade rather than a chop. */
+.aloop-card__scroll { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 52px), transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 52px), transparent 100%); }
 .aloop-card__scroll.is-end { -webkit-mask-image: none; mask-image: none; }
+
+/* ---- the five sizes should not look the same ----
+   Malik: give some differentiation BEFORE they commit. Easier reads lighter
+   and airier, harder reads darker, denser and more lit. Only existing tokens:
+   no new colours, just weight of surface, rim and shadow. */
+.aloop-card[data-tier="tiny"] {
+  --aglass: rgba(38, 41, 49, 0.86);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 10px 26px rgba(0,0,0,0.20);
+}
+.aloop-card[data-tier="light"] {
+  --aglass: rgba(32, 35, 43, 0.90);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.07), 0 14px 34px rgba(0,0,0,0.24);
+}
+.aloop-card[data-tier="moderate"] { /* the baseline recipe */ }
+.aloop-card[data-tier="heavy"] {
+  --aglass: rgba(17, 18, 23, 0.96);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 22px 54px rgba(0,0,0,0.42);
+}
+.aloop-card[data-tier="extreme"] {
+  --aglass: rgba(11, 12, 16, 0.98);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 26px 64px rgba(0,0,0,0.55),
+              0 0 0 1px rgba(255,255,255,0.05);
+}
+html.theme-light .aloop-card[data-tier="tiny"]     { --aglass: rgba(255,255,255,0.90); }
+html.theme-light .aloop-card[data-tier="light"]    { --aglass: rgba(252,252,253,0.93); }
+html.theme-light .aloop-card[data-tier="heavy"]    { --aglass: rgba(238,240,244,0.97); }
+html.theme-light .aloop-card[data-tier="extreme"]  { --aglass: rgba(228,231,237,0.99); }
 .aloop-card__cap { margin: 0; font-size: 0.78125rem; font-weight: 600; color: rgba(var(--ink),0.5); }
 .aloop-card__move {
   margin: 8px 0 0; font-size: 1.4375rem; font-weight: 750;
