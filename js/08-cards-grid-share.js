@@ -3679,7 +3679,11 @@ function renderCommandCenter() {
     const _TK = ['tiny', 'light', 'moderate', 'heavy', 'extreme'];
     const _selT = state.action && state.action.selectedTier;
     const _activeTier = _TK.indexOf(_selT) >= 0 ? _selT : pa.recommendedTier;
-    const oneThing = (tiers[_activeTier] || tiers[pa.recommendedTier] || pa.title || '').trim() || 'Take one step toward your goal today';
+    // Night 3: the daily loop can chain a next action into today ("Do it
+    // now") or lock one overnight; either outranks the cadence tier text so
+    // the home never contradicts the Action page.
+    const _loopNext = (state.action.loop && String(state.action.loop.chained || state.action.loop.nextAction || '').trim()) || '';
+    const oneThing = _loopNext || (tiers[_activeTier] || tiers[pa.recommendedTier] || pa.title || '').trim() || 'Take one step toward your goal today';
     const tiny = tiers.tiny || '';
     const how = pa.howToStart || pa.recommendedWhy || '';
     const todayStr = getTodayISO();

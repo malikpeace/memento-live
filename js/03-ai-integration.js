@@ -1494,6 +1494,33 @@ async function generateCommitmentReview(opts = {}) {
 }
 try { if (typeof window !== 'undefined') window.generateCommitmentReview = generateCommitmentReview; } catch (e) {}
 
+// === Night 3 - the daily-loop chain ==============================
+// After a completion, ONE small fast call names the next concrete action so
+// "Do it now" can chain it into today and "Finish today" can lock it for
+// tomorrow. Never blocks the UI; on failure the loop just shows the cadence
+// move re-armed instead.
+async function generateNextLoopAction() {
+  if (!hasAnthropicKey()) return '';
+  const pa = (state.action && state.action.primaryAction) || {};
+  const goal = (state.clarity && state.clarity.answers && state.clarity.answers.neutronStar) || '';
+  const todayDone = (Array.isArray(state.action.completionHistory) ? state.action.completionHistory : [])
+    .slice(-6).map(h => `- [${h.tier}] ${h.actionText}${h.note ? ' (their note: ' + h.note + ')' : ''}`).join('\n');
+  const sys = `You name the single next physical action in a daily execution loop. Given the goal, the current main move, and what was just completed today, return ONE next action: the most direct thing they can do next, TODAY, that builds on what they just did. Under 14 words, a complete verb phrase, concrete and verifiable, no cadence words, no durations, no advice, no explanation. It must NOT repeat anything already completed today. ${MALIK_VOICE_SPEC}\n\nReturn ONLY the action phrase, no quotes, no label.`;
+  const body = [
+    goal ? `Goal: ${goal}` : '',
+    pa.title ? `Main move: ${pa.title}` : '',
+    todayDone ? `Completed today:\n${todayDone}` : ''
+  ].filter(Boolean).join('\n');
+  try {
+    const raw = await callClaude([{ role: 'user', content: body }], sys,
+      { maxTokens: 200, model: ANTHROPIC_MODEL_PLANS, timeout: 45000, thinking: 'off' });
+    let t = String(raw || '').trim().replace(/^["']|["']$/g, '').replace(/[—–]/g, ',').trim();
+    if (!t || t.split(/\s+/).length > 18 || (typeof voiceLint === 'function' && voiceLint(t).length)) return '';
+    return trimText(t, 110);
+  } catch (e) { return ''; }
+}
+try { if (typeof window !== 'undefined') window.generateNextLoopAction = generateNextLoopAction; } catch (e) {}
+
 
 // === Round 9 - Draft-first Action generation =====================
 // Called when the user taps Begin (or has no plan yet). Builds the full plan

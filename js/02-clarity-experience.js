@@ -2876,6 +2876,24 @@ const ActionExperience = {
   _showActionIntro() {
     this.progressEl.innerHTML = '';
     this.navEl.innerHTML = '';
+    // Night 3, unlock beat v1: the FIRST paid arrival gets a two-second
+    // ignition, one word on black, before Action fades in. Decorative flag
+    // set at start; a killed beat lands on the intro, never ahead of it.
+    if (state.entitlements && state.entitlements.isPaid && !(state.meta && state.meta.unlockBeatSeen)) {
+      state.meta = state.meta || {};
+      state.meta.unlockBeatSeen = true;
+      try { persistNow(); } catch (e) {}
+      const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!reduced) {
+        this.pageWrap.innerHTML = `
+          <div class="action-exp__page-inner"><div class="action-exp__inner action-cine-reveal">
+            <div class="action-ignite">Unlocked.</div>
+          </div></div>`;
+        try { if (typeof MementoSound !== 'undefined' && MementoSound.chime) MementoSound.chime(); } catch (e) {}
+        this._setTimeout(() => { if (this.isOpen) this._showActionIntro(); }, 2100);
+        return;
+      }
+    }
     // v842 (Malik): the Action intro speaks Clarity's exact language: same
     // classes (same stylesheet), the title pops in centered + blurry, focuses,
     // flies to its top-left spot, THEN the lines typewrite in char-by-char and
@@ -5137,9 +5155,376 @@ Return ONLY the sentence text. No quotes, no labels.`;
   // Route the plan page to the active view mode. Vine is the default; the
   // mountain stays available behind the toggle.
   _renderPlanByMode() {
-    // New Leverage Ladder plan screen. renderPlan / renderVinePlan remain
-    // defined below for reference but are no longer the active view.
-    this.renderActionPlan();
+    // Night 3 (Malik's locked loop.html render): the daily loop replaces the
+    // Leverage Ladder screen wholesale. renderActionPlan and the older
+    // renderers stay defined below but are no longer routed to.
+    this._renderDailyLoop();
+  },
+
+  // ---- Night 3: the daily loop ------------------------------------------
+  // Day boundary is 4am LOCAL (Malik's call): a 1am session still belongs to
+  // the evening before. Only the loop surfaces use this key; streak math in
+  // js/06 keeps its midnight day until Malik migrates it deliberately.
+  _loopDayKey(d) {
+    const t = d instanceof Date ? d : new Date(d || Date.now());
+    return isoToLocalDay(new Date(t.getTime() - 4 * 3600 * 1000).toISOString());
+  },
+  _loopState() {
+    if (!state.action.loop) state.action.loop = { lastOpenDay: '', closedDays: {}, nextAction: '', chained: '' };
+    return state.action.loop;
+  },
+  _loopCompletionsFor(dayKey) {
+    const hist = Array.isArray(state.action.completionHistory) ? state.action.completionHistory : [];
+    return hist.filter(h => h && h.date && this._loopDayKey(new Date(h.date)) === dayKey);
+  },
+  _loopKeptDays() {
+    const hist = Array.isArray(state.action.completionHistory) ? state.action.completionHistory : [];
+    const set = new Set();
+    hist.forEach(h => { if (h && h.date) set.add(this._loopDayKey(new Date(h.date))); });
+    return set;
+  },
+  // Day N counts days KEPT (Malik, decision 11): a missed day never advances
+  // the number. The day being worked is always kept+1 until it is kept.
+  _loopDayNumber() {
+    const kept = this._loopKeptDays();
+    const today = this._loopDayKey(new Date());
+    return kept.has(today) ? kept.size : kept.size + 1;
+  },
+  _loopWeekday(offsetDays) {
+    const d = new Date(Date.now() - 4 * 3600 * 1000 + (offsetDays || 0) * 86400 * 1000);
+    return d.toLocaleDateString(undefined, { weekday: 'long' });
+  },
+
+  _renderDailyLoop() {
+    const loop = this._loopState();
+    const today = this._loopDayKey(new Date());
+    const kept = this._loopKeptDays();
+    // The morning open: a NEW day with history behind it gets the number
+    // rotation before anything else.
+    if (loop.lastOpenDay && loop.lastOpenDay !== today && kept.size > 0 && !this._morningShown) {
+      this._renderMorningOpen();
+      return;
+    }
+    if (loop.lastOpenDay !== today) { loop.lastOpenDay = today; try { persistNow(); } catch (e) {} }
+    const doneToday = this._loopCompletionsFor(today);
+    if (doneToday.length > 0) { this._renderTodaySoFar(); return; }
+    this._renderLoopCard();
+  },
+
+  _renderLoopCard() {
+    const pa = state.action.primaryAction || {};
+    const KEYS = ['tiny', 'light', 'moderate', 'heavy', 'extreme'];
+    let tier = KEYS.indexOf(state.action.selectedTier) >= 0 ? state.action.selectedTier
+      : (KEYS.indexOf(pa.recommendedTier) >= 0 ? pa.recommendedTier : 'moderate');
+    // A chained "Do it now" action takes over the card until completed.
+    const loop = this._loopState();
+    const chained = String(loop.chained || '').trim();
+    const idx = KEYS.indexOf(tier);
+    const dayN = this._loopDayNumber();
+    const weekday = this._loopWeekday(0);
+    const brief = (k, v) => v ? `<div class="aloop-brief"><span class="aloop-brief__k">${k}</span><span class="aloop-brief__v">${esc(v)}</span></div>` : '';
+    const cardHtml = chained
+      ? `<p class="aloop-card__cap">Next action</p>
+         <p class="aloop-card__move">${esc(chained)}</p>
+         <p class="aloop-card__why">Chained from what you just finished. Same day, same push.</p>`
+      : `<p class="aloop-card__cap">Today's action</p>
+         <p class="aloop-card__move">${esc((pa.tiers && pa.tiers[tier]) || pa.title || '')}</p>
+         ${pa.why ? `<p class="aloop-card__why">${esc(pa.why)}</p>` : ''}
+         <hr class="aloop-rule">
+         ${brief('First step', pa.howToStart)}
+         ${brief('Done when', pa.tierDone && pa.tierDone[tier])}
+         ${brief('Roughly', pa.tierTime && pa.tierTime[tier])}
+         ${brief('If stuck', pa.ifStuck)}
+         <div class="aloop-swaphint">
+           <div class="aloop-dots">${KEYS.map((k, i) => `<i${i === idx ? ' class="on"' : ''}></i>`).join('')}</div>
+           <span class="aloop-count apl-num">${idx + 1} of 5</span>
+         </div>`;
+    this.pageWrap.innerHTML = `
+      <div class="action-exp__page-inner"><div class="aloop" data-tier="${tier}">
+        <div class="aloop-glow" aria-hidden="true"></div>
+        <div class="aloop-top"><span class="aloop-cap apl-num">Day ${dayN}</span><span class="aloop-cap">${esc(weekday)}</span></div>
+        <div class="aloop-mid">
+          <div class="aloop-deck">
+            <div class="aloop-card__behind" aria-hidden="true"></div>
+            <div class="aloop-card">${cardHtml}</div>
+          </div>
+          <button type="button" class="aloop-notthis" id="aloopNotThis">Not this action</button>
+        </div>
+        <div class="aloop-bot">
+          <button type="button" class="aloop-hold" id="aloopHold"><i class="aloop-hold__fill" aria-hidden="true"></i><span>Hold to complete</span><small>press and hold</small></button>
+          <button type="button" class="aloop-focus" id="aloopFocus"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9.5V13l2.2 1.6M9 2.5h6"/></svg>Focus${(pa.tierTime && pa.tierTime[tier]) ? ' ' + esc(String(pa.tierTime[tier]).replace(/utes?$/, '')) : ''}</button>
+        </div>
+      </div></div>`;
+    const root = this.pageWrap.querySelector('.aloop');
+
+    // Swipe right = bigger, swipe left = smaller. The screen stays, only the
+    // card rewrites and the room's glow follows the size.
+    if (!chained) {
+      const deck = root.querySelector('.aloop-deck');
+      let sx = null, sy = null, moved = false;
+      deck.addEventListener('pointerdown', (e) => { sx = e.clientX; sy = e.clientY; moved = false; });
+      deck.addEventListener('pointermove', (e) => {
+        if (sx === null) return;
+        const dx = e.clientX - sx, dy = e.clientY - sy;
+        if (Math.abs(dx) > 12 && Math.abs(dx) > Math.abs(dy)) {
+          moved = true;
+          deck.style.transform = `translateX(${Math.max(-34, Math.min(34, dx * 0.25))}px)`;
+        }
+      });
+      const settle = (e) => {
+        if (sx === null) return;
+        const dx = e.clientX - sx;
+        deck.style.transform = '';
+        sx = null;
+        if (!moved || Math.abs(dx) < 56) return;
+        const KEYS2 = ['tiny', 'light', 'moderate', 'heavy', 'extreme'];
+        const cur = KEYS2.indexOf(tier);
+        const next = dx < 0 ? Math.min(4, cur + 1) : Math.max(0, cur - 1);
+        if (next === cur) return;
+        state.action.selectedTier = KEYS2[next];
+        try { persistNow(); } catch (e2) {}
+        try { if (typeof MementoSound !== 'undefined' && MementoSound.tick) MementoSound.tick(); } catch (e3) {}
+        this._renderLoopCard();
+      };
+      deck.addEventListener('pointerup', settle);
+      deck.addEventListener('pointercancel', () => { deck.style.transform = ''; sx = null; });
+    }
+
+    // Hold to complete: a real press, not a tap. Fill runs ~900ms; letting go
+    // early resets with no penalty.
+    const hold = root.querySelector('#aloopHold');
+    const fill = hold.querySelector('.aloop-hold__fill');
+    let holdT = null;
+    const cancel = () => {
+      if (holdT) { clearTimeout(holdT); holdT = null; }
+      fill.style.transition = 'transform 180ms ease-out';
+      fill.style.transform = 'scaleX(0)';
+    };
+    hold.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      fill.style.transition = 'transform 900ms linear';
+      fill.style.transform = 'scaleX(1)';
+      holdT = setTimeout(() => { holdT = null; this._loopComplete(tier, chained); }, 920);
+    });
+    hold.addEventListener('pointerup', cancel);
+    hold.addEventListener('pointerleave', cancel);
+    hold.addEventListener('pointercancel', cancel);
+
+    // Focus preloads THIS tier's honest time (Malik, decision 12).
+    root.querySelector('#aloopFocus').addEventListener('click', (e) => {
+      e.stopPropagation();
+      this._loopOpenFocus(pa, tier, chained);
+    });
+
+    // The rare case where the action itself is wrong: quiet, two-step, honest.
+    const notThis = root.querySelector('#aloopNotThis');
+    notThis.addEventListener('click', () => {
+      if (!notThis.dataset.armed) {
+        notThis.dataset.armed = '1';
+        notThis.textContent = 'Ask for a different action?';
+        this._setTimeout(() => { try { notThis.dataset.armed = ''; notThis.textContent = 'Not this action'; } catch (e) {} }, 3200);
+        return;
+      }
+      state.meta.planRevealSeen = true; // a swap is not a new ceremony
+      try { persistNow(); } catch (e) {}
+      generateActionDraft();
+    });
+  },
+
+  _loopOpenFocus(pa, tier, chained) {
+    try {
+      if (state.introsSeen && !state.introsSeen.deepwork) { state.introsSeen.deepwork = true; try { persistNow(); } catch (e) {} }
+      if (typeof Sheet === 'undefined' || !Sheet.open) return;
+      window.__dwFromAction = true;
+      Sheet.open('deepwork');
+      try { rememberView('action'); } catch (e) {}
+      const moveText = chained || (pa.tiers && pa.tiers[tier]) || pa.title || '';
+      const mins = parseInt(String((pa.tierTime && pa.tierTime[tier]) || ''), 10) || 25;
+      setTimeout(() => {
+        try {
+          const body = Sheet.body;
+          if (!body) return;
+          const inp = body.querySelector('#dwIntention');
+          if (inp && moveText) inp.value = moveText;
+          // Pick the closest preset at or above the tier's honest time.
+          const presets = Array.from(body.querySelectorAll('.dw-preset[data-min]'))
+            .map(b => ({ b, m: parseInt(b.getAttribute('data-min'), 10) || 0 }))
+            .filter(p => p.m > 0).sort((a, b2) => a.m - b2.m);
+          const pick = presets.find(p => p.m >= mins) || presets[presets.length - 1];
+          if (pick) pick.b.click();
+          const fb = body.querySelector('#dwFocus');
+          if (fb) fb.click();
+        } catch (e) {}
+      }, 60);
+    } catch (e) {}
+  },
+
+  _loopComplete(tier, chainedText) {
+    const pa = state.action.primaryAction || {};
+    const actionText = chainedText || (pa.tiers && pa.tiers[tier]) || pa.title || '';
+    if (!Array.isArray(state.action.completionHistory)) state.action.completionHistory = [];
+    const completion = createActionCompletionRecord(pa, tier, actionText);
+    state.action.completionHistory.push(completion);
+    const loop = this._loopState();
+    if (chainedText) loop.chained = '';
+    loop.nextAction = '';
+    try { writeProofEvent('action-complete', { title: actionText || pa.title || 'Action completed', module: 'action', metadata: { tier, missionId: completion.missionId } }); } catch (e) {}
+    if (typeof recalculateStreak === 'function') { try { recalculateStreak(); } catch (e) {} }
+    try { persistNow(); } catch (e) {}
+    try { if (typeof TabBar !== 'undefined' && TabBar.updateHomeDot) TabBar.updateHomeDot(); } catch (e) {}
+    // The chain: one small fast call names the next action while the green
+    // flood and the capture play. Fire and forget; empty on failure.
+    try {
+      if (typeof generateNextLoopAction === 'function') {
+        generateNextLoopAction().then(t => {
+          if (t) { this._loopState().nextAction = t; try { persistNow(); } catch (e) {} }
+        }).catch(() => {});
+      }
+    } catch (e) {}
+    // v886 doctrine: a completed DOOR rolls into the next move the same day.
+    try {
+      if (pa.shape === 'door' && typeof regenerateActionPlanForNextStep === 'function') {
+        setTimeout(() => { try { regenerateActionPlanForNextStep(); } catch (e2) {} }, 2600);
+      }
+    } catch (e) {}
+    this._renderGreenFlood(actionText, completion);
+  },
+
+  _renderGreenFlood(actionText, completion) {
+    const n = this._loopCompletionsFor(this._loopDayKey(new Date())).length;
+    const words = ['one', 'two', 'three', 'four', 'five', 'six', 'seven'];
+    const line = 'That is ' + (words[n - 1] || n) + '.';
+    this.pageWrap.innerHTML = `
+      <div class="action-exp__page-inner"><div class="aloop-green">
+        <div class="aloop-green__flood" aria-hidden="true"></div>
+        <div class="aloop-green__body">
+          <p class="aloop-green__struck">${esc(actionText)}</p>
+          <p class="aloop-green__line">${esc(line)}</p>
+        </div>
+      </div></div>`;
+    try { if (typeof MementoSound !== 'undefined' && MementoSound.done) MementoSound.done(); } catch (e) {}
+    this._setTimeout(() => { if (this.isOpen) this._renderCapture(completion); }, 2100);
+  },
+
+  // One line about it, or skip: EQUAL weight (Malik's call). The line lands
+  // on the completion record and becomes evidence later.
+  _renderCapture(completion) {
+    this.pageWrap.innerHTML = `
+      <div class="action-exp__page-inner"><div class="aloop-capture">
+        <div class="aloop-capture__body">
+          <p class="aloop-capture__q">One line about it. What happened?</p>
+          <textarea class="aloop-capture__input" id="aloopNote" rows="2" maxlength="200" placeholder=""></textarea>
+        </div>
+        <div class="aloop-capture__row">
+          <button type="button" class="aloop-capture__btn" id="aloopSkip">Skip</button>
+          <button type="button" class="aloop-capture__btn" id="aloopSave">Save</button>
+        </div>
+      </div></div>`;
+    const done = (save) => {
+      if (save) {
+        const v = String((this.pageWrap.querySelector('#aloopNote') || {}).value || '').trim();
+        if (v && completion) { completion.note = v; try { persistNow(); } catch (e) {} }
+      }
+      this._renderTodaySoFar();
+    };
+    this.pageWrap.querySelector('#aloopSkip').addEventListener('click', () => done(false));
+    this.pageWrap.querySelector('#aloopSave').addEventListener('click', () => done(true));
+  },
+
+  _renderTodaySoFar() {
+    const pa = state.action.primaryAction || {};
+    const loop = this._loopState();
+    const today = this._loopDayKey(new Date());
+    const rows = this._loopCompletionsFor(today);
+    const closed = !!(loop.closedDays && loop.closedDays[today]);
+    const weekday = this._loopWeekday(0);
+    const rowHtml = rows.map(r => {
+      const t = (pa.tierTime && pa.tierTime[r.tier]) || '';
+      return `<div class="aloop-rrow"><span class="aloop-rrow__tick">&#10003;</span><span class="aloop-rrow__t">${esc(r.actionText)}</span>${t ? `<span class="aloop-rrow__m apl-num">${esc(t)}</span>` : ''}</div>`;
+    }).join('');
+    const next = String(loop.nextAction || '').trim();
+    const nextBlock = closed
+      ? `<hr class="aloop-rule"><p class="aloop-card__cap">Day ${this._loopDayNumber()} kept. Locked for tomorrow${next ? ':' : '.'}</p>${next ? `<p class="aloop-next__t">${esc(next)}</p>` : ''}`
+      : `<hr class="aloop-rule"><p class="aloop-card__cap">Your next action</p>
+         <p class="aloop-next__t">${esc(next || (pa.tiers && pa.tiers[state.action.selectedTier || pa.recommendedTier || 'moderate']) || pa.title || '')}</p>
+         <div class="aloop-pillrow">
+           <button type="button" class="aloop-pill" id="aloopDoNow">Do it now</button>
+           <button type="button" class="aloop-pill aloop-pill--go" id="aloopFinish">Finish today</button>
+         </div>`;
+    this.pageWrap.innerHTML = `
+      <div class="action-exp__page-inner"><div class="aloop aloop--sofar">
+        <div class="aloop-dayname">${esc(weekday)}</div>
+        <div class="aloop-mid">
+          <div class="aloop-nextcard">${rowHtml}${nextBlock}</div>
+        </div>
+      </div></div>`;
+    if (closed) return;
+    this.pageWrap.querySelector('#aloopDoNow').addEventListener('click', () => {
+      const loop2 = this._loopState();
+      loop2.chained = next || '';
+      try { persistNow(); } catch (e) {}
+      this._renderLoopCard();
+    });
+    this.pageWrap.querySelector('#aloopFinish').addEventListener('click', () => {
+      const loop2 = this._loopState();
+      if (!loop2.closedDays) loop2.closedDays = {};
+      loop2.closedDays[today] = true;
+      try { persistNow(); } catch (e) {}
+      try { exitToModules('action'); } catch (e) { this._renderTodaySoFar(); }
+    });
+  },
+
+  // The morning open: yesterday's number holds, then the line rotates left
+  // and today lands with what is next.
+  _renderMorningOpen() {
+    this._morningShown = true;
+    const loop = this._loopState();
+    const pa = state.action.primaryAction || {};
+    const today = this._loopDayKey(new Date());
+    const kept = this._loopKeptDays();
+    const yNum = kept.size;               // days kept through yesterday
+    const tNum = yNum + 1;                // the day being opened
+    const yKey = loop.lastOpenDay;
+    const yRows = this._loopCompletionsFor(yKey).map(r =>
+      `<div class="aloop-rrow"><span class="aloop-rrow__tick">&#10003;</span><span class="aloop-rrow__t">${esc(r.actionText)}</span></div>`).join('');
+    const KEYS = ['tiny', 'light', 'moderate', 'heavy', 'extreme'];
+    const tier = KEYS.indexOf(state.action.selectedTier) >= 0 ? state.action.selectedTier : (pa.recommendedTier || 'moderate');
+    const cadence = (pa.tiers && pa.tiers[tier]) || pa.title || '';
+    const next = String(loop.nextAction || '').trim();
+    const tRows = [next, next === cadence ? '' : cadence].filter(Boolean).map(t =>
+      `<div class="aloop-rrow"><span class="aloop-openbox" aria-hidden="true"></span><span class="aloop-rrow__t">${esc(t)}</span></div>`).join('');
+    const beat = (a, b, c, label, rowsHtml, cta) => `
+      <div class="aloop-numrow">
+        <span class="aloop-numside apl-num">${a}</span>
+        <span class="aloop-numbig apl-num">${b}</span>
+        <span class="aloop-numside apl-num">${c}</span>
+      </div>
+      <p class="aloop-numlab">${label}</p>
+      <div class="aloop-morning__rows">${rowsHtml}</div>
+      ${cta ? '<div class="aloop-bot"><button type="button" class="aloop-hold aloop-start" id="aloopStart"><span>Start today</span></button></div>' : ''}`;
+    this.pageWrap.innerHTML = `
+      <div class="action-exp__page-inner"><div class="aloop aloop--morning">
+        <div class="aloop-mid" id="aloopMorning">${beat(yNum - 1 > 0 ? yNum - 1 : '', yNum, tNum, 'Yesterday', yRows, false)}</div>
+      </div></div>`;
+    const host = this.pageWrap.querySelector('#aloopMorning');
+    this._setTimeout(() => {
+      if (!this.isOpen || !host.isConnected) return;
+      host.classList.add('is-rotating');
+      this._setTimeout(() => {
+        if (!this.isOpen || !host.isConnected) return;
+        host.classList.remove('is-rotating');
+        host.innerHTML = beat(yNum, tNum, tNum + 1, 'Today', tRows, true);
+        const btn = host.querySelector('#aloopStart');
+        if (btn) btn.addEventListener('click', () => {
+          loop.lastOpenDay = today;
+          // The day opens ON the action locked last night; the cadence move
+          // waits underneath it. Consumed here so it never goes stale.
+          if (next) { loop.chained = next; loop.nextAction = ''; }
+          try { persistNow(); } catch (e) {}
+          this._renderDailyLoop();
+        });
+      }, 340);
+    }, 2400);
   },
 
   // Small segmented control shared by both views. Appended after render so it
