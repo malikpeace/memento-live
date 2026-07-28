@@ -128,13 +128,20 @@
       /* the pool it all sits in */
       radial-gradient(ellipse 74% 50% at 50% 5%, rgba(var(--fl2),.15), rgba(var(--fl2),0) 78%);
     filter:blur(8px); }
-  .cer.lit .cer__floor { opacity:1; transition:opacity 1.5s ease-out, transform 1.5s ease-out; }
+  /* The ground moves on the CARD's curve, not its own. The stage draws back on
+     cubic-bezier(.33,.9,.28,1), which is 90% travelled by a third of the way
+     through, and the floor was on plain ease-out. Same duration, wildly
+     different speed, so the card leapt and the light trailed after it. With the
+     curves identical the two stay within about 2px of each other the whole way,
+     and only the opacity is allowed its own timing. */
+  .cer.lit .cer__floor { opacity:1;
+    transition:opacity 1.5s ease-out, transform 1.5s cubic-bezier(.33,.9,.28,1); }
   /* When the card draws back it shrinks and rises, so its base rises with it.
      The origin is the top edge (the contact line), so scaling cannot drag the
      burn away from the card: without this the band floated 36px below the card
      and landed straight across the welcome. */
   .cer.back .cer__floor { opacity:.62; transform:translate(-50%,-70px) scale(.82);
-    transition:opacity 1.5s ease-out, transform 1.5s ease-out; }
+    transition:opacity 1.5s ease-out, transform 1.5s cubic-bezier(.33,.9,.28,1); }
 
   /* the release: light leaving the card the instant the hold completes.
      Radial and fading to nothing well inside its own box, so it can never
