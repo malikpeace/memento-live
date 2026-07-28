@@ -3966,9 +3966,18 @@ html.theme-light .action-exp {
 
 /* ---- Night 3: the daily loop (loop.html render, frames 01-06) ----
    Theme-faithful (v859 law): everyday Action surfaces follow the theme. */
+/* FIXED height, not min-height. With min-height a tall card (a long First
+   step, which real plans have) grew the column past the viewport and pushed
+   Hold to complete and Focus off the bottom of the screen. The buttons are the
+   whole point of this screen, so the column is now pinned to the viewport and
+   the CARD scrolls instead. */
 .aloop {
   position: relative; display: flex; flex-direction: column;
-  min-height: calc(100dvh - 24px); padding: 0 20px;
+  /* Fill the page-inner exactly. A viewport-based guess (100dvh minus a magic
+     number) overshot by however much chrome sits above this, which put the
+     buttons back under the bottom edge. */
+  height: 100%; min-height: 100%;
+  padding: 0 20px;
 }
 .aloop-cap { font-size: 0.78125rem; font-weight: 600; color: rgba(var(--ink),0.5); }
 .aloop-top {
@@ -3978,8 +3987,19 @@ html.theme-light .action-exp {
      under it */
   padding-right: 56px;
 }
-.aloop-mid { flex: 1; display: flex; flex-direction: column; justify-content: center; }
-.aloop-bot { padding-bottom: calc(var(--safe-b, 0px) + 14px); }
+/* min-height:0 is what lets a flex child actually shrink and scroll; without it
+   it refuses to go below its content height and overflows the column instead.
+   The auto margins centre the card when there is room and collapse to 0 when
+   there is not, so a tall card starts at the top rather than having its head
+   clipped (flex centring + overflow clips the top, it does not scroll to it). */
+/* The column never scrolls; the CARD does, inside itself. Scrolling out here
+   sliced the card in half at the viewport edge and took its bottom corner and
+   "Not this action" with it. */
+.aloop-mid {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+  justify-content: center; overflow: hidden;
+}
+.aloop-bot { flex: none; padding-top: 10px; padding-bottom: calc(var(--safe-b, 0px) + 16px); }
 /* the room follows the size: a soft center glow that deepens tier by tier */
 .aloop-glow {
   position: absolute; left: 50%; top: 42%; width: min(150vw, 620px); height: min(150vw, 620px);
@@ -3992,14 +4012,29 @@ html.theme-light .action-exp {
 .aloop[data-tier="moderate"] .aloop-glow { opacity: 0.55; }
 .aloop[data-tier="heavy"] .aloop-glow { opacity: 0.8; }
 .aloop[data-tier="extreme"] .aloop-glow { opacity: 1; }
-.aloop-deck { position: relative; touch-action: pan-y; transition: transform 200ms ease-out; }
+.aloop-deck { position: relative; touch-action: pan-y; transition: transform 200ms ease-out;
+  display: flex; min-height: 0; }
 /* (The stacked "card behind" ghost is gone: it read as a stray box poking out
    from under the real one, not as a deck.) */
 .aloop-card {
   position: relative; border-radius: 18px; padding: 22px;
   /* background comes from the shared glass recipe (opaque underlay). */
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 18px 44px rgba(0,0,0,0.28);
+  /* a whole object that fits: it shrinks to the space available and its brief
+     scrolls inside, so the shape and the footer always survive */
+  display: flex; flex-direction: column; min-height: 0; max-height: 100%;
+  width: 100%;
 }
+.aloop-card__scroll {
+  min-height: 0; overflow-y: auto; overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.aloop-card__scroll::-webkit-scrollbar { display: none; }
+/* a soft hint that there is more, sitting just above the pinned footer */
+.aloop-card__scroll { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 20px), transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 20px), transparent 100%); }
+.aloop-card__scroll.is-end { -webkit-mask-image: none; mask-image: none; }
 .aloop-card__cap { margin: 0; font-size: 0.78125rem; font-weight: 600; color: rgba(var(--ink),0.5); }
 .aloop-card__move {
   margin: 8px 0 0; font-size: 1.4375rem; font-weight: 750;

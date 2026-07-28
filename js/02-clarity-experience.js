@@ -5328,18 +5328,25 @@ Return ONLY the sentence text. No quotes, no labels.`;
     const chainLine = doneTodayN > 0
       ? 'Chained from what you just finished. Same day, same push.'
       : 'You locked this in last night. Today starts here.';
+    // The brief lives in its own scroll region so a long plan scrolls INSIDE
+    // the card. The card keeps its shape and its footer; it is never sliced
+    // through by the viewport edge.
     const cardHtml = chained
-      ? `<p class="aloop-card__cap">Next action</p>
-         <p class="aloop-card__move">${esc(chained)}</p>
-         <p class="aloop-card__why">${chainLine}</p>`
-      : `<p class="aloop-card__cap">Today's action</p>
-         <p class="aloop-card__move">${esc((pa.tiers && pa.tiers[tier]) || pa.title || '')}</p>
-         ${pa.why ? `<p class="aloop-card__why">${esc(pa.why)}</p>` : ''}
-         <hr class="aloop-rule">
-         ${brief('First step', pa.howToStart)}
-         ${brief('Done when', pa.tierDone && pa.tierDone[tier])}
-         ${brief('Roughly', pa.tierTime && pa.tierTime[tier])}
-         ${brief('If stuck', pa.ifStuck)}
+      ? `<div class="aloop-card__scroll">
+           <p class="aloop-card__cap">Next action</p>
+           <p class="aloop-card__move">${esc(chained)}</p>
+           <p class="aloop-card__why">${chainLine}</p>
+         </div>`
+      : `<div class="aloop-card__scroll">
+           <p class="aloop-card__cap">Today's action</p>
+           <p class="aloop-card__move">${esc((pa.tiers && pa.tiers[tier]) || pa.title || '')}</p>
+           ${pa.why ? `<p class="aloop-card__why">${esc(pa.why)}</p>` : ''}
+           <hr class="aloop-rule">
+           ${brief('First step', pa.howToStart)}
+           ${brief('Done when', pa.tierDone && pa.tierDone[tier])}
+           ${brief('Roughly', pa.tierTime && pa.tierTime[tier])}
+           ${brief('If stuck', pa.ifStuck)}
+         </div>
          <div class="aloop-swaphint">
            <div class="aloop-dots">${KEYS.map((k, i) => `<i${i === idx ? ' class="on"' : ''}></i>`).join('')}</div>
            <span class="aloop-count apl-num">${idx + 1} of 5</span>
