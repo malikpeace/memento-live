@@ -2134,8 +2134,31 @@ window.addEventListener('keydown', (e) => {
     try { return !!document.querySelector('.sheet.open, .action-exp.open, .clarity-exp.open, .welcome-intro.open'); } catch (e) { return false; }
   }
   // Don't hijack swipes over things that use horizontal drag themselves.
+  // (v997, Malik: swiping the Action tier carousel was closing the whole
+  // module.) This list used to be the ONLY defence, so every horizontal
+  // surface built after it silently inherited the bug. The touch-action walk
+  // below makes it self-maintaining instead: an element that owns horizontal
+  // drag has to declare `touch-action: pan-y` anyway to stop the browser
+  // scrolling underneath it, so that declaration IS the honest signal that
+  // this gesture must keep its hands off.
+  function ownsHorizontal(el) {
+    try {
+      // Stop AT body: `body { touch-action: pan-y }` is set app-wide on mobile
+      // to block pinch-zoom, and reading it would disable this gesture
+      // everywhere.
+      for (var n = el; n && n !== document.body && n.nodeType === 1; n = n.parentElement) {
+        var ta = (getComputedStyle(n).touchAction || '').trim();
+        if (ta === 'none' || (ta.indexOf('pan-y') !== -1 && ta.indexOf('pan-x') === -1)) return true;
+      }
+    } catch (e) {}
+    return false;
+  }
   function blocked(el) {
-    return !!(el && el.closest && el.closest('.vcanvas__viewport, canvas, input[type="range"], .rtoolbar, .menu-peek, .sidebar, [data-no-swipe]'));
+    if (!el || !el.closest) return false;
+    // .wi-cine runs its own left/right beat swipe, so the global gesture would
+    // fire on top of it and close onboarding outright.
+    if (el.closest('.vcanvas__viewport, canvas, input[type="range"], .rtoolbar, .menu-peek, .sidebar, .wi-cine, [data-no-swipe]')) return true;
+    return ownsHorizontal(el);
   }
   document.addEventListener('touchstart', function (e) {
     if (!e.touches || e.touches.length !== 1) { tracking = false; return; }
