@@ -1543,6 +1543,62 @@ function archiveNeutronStar(nextStar) {
   try { state.action.starChangeReason = ''; } catch (e) {}
 }
 
+/* ---- WHO THEY ARE (v1009) ------------------------------------------------
+   Onboarding and Clarity collect roughly forty fields about a person: what
+   they are running toward and from, what they fear, what they would regret in
+   a year, the identity they are reaching for, when they doomscroll, the cost
+   of doing nothing. Before this, NONE of it reached a daily decision. The
+   first plan got a 12-message tail of the Clarity conversation and that was
+   the whole of it; every day after that decided from a goal string and a
+   scoreboard, which is exactly how an app starts producing generic advice.
+
+   This is the standing answer to "who am I talking to". It changes rarely, so
+   it is cheap to carry on every call, and it is what separates "grow your
+   channel" advice from advice that knows the person. */
+function buildPersonContext() {
+  try {
+    const p = (state && state.profile) || {};
+    const a = (state && state.clarity && state.clarity.answers) || {};
+    const L = [];
+    const put = (label, v) => { const t = String(v || '').trim(); if (t) L.push(`${label}: ${t}`); };
+
+    put('Name', p.name || p.fullName);
+    put('In their own words, where they are', p.story);
+    put('Running TOWARD', p.runningToward);
+    put('Running FROM', p.runningFrom);
+    put('What they value', p.values);
+    put('Their main distraction', p.distraction || a.doomscrollWhen);
+    put('What doing nothing costs them', p.costOfInaction);
+    put('Their weakest pillar', p.weakestPillar);
+    put('What gets them back when they drift', p.returnCue);
+
+    put('Why this matters more than anything', a.whyMoreThanAnything || a.whyMatters);
+    put('The core why', a.coreWhy);
+    put('Who they are becoming', a.identityLine || a.identitySentence);
+    put('What they FEAR / the pain driving this', a.fearPain);
+    put('What they would be proud of', a.prideOutcome);
+    put('What they want as a reward', a.rewardDesire);
+    put('The future they are afraid of if nothing changes', a.antiVision);
+    put('The future they want', a.futureVision);
+    put('A year from now if they keep scrolling', a.oneYearScrolling);
+    put('What was on their mind', a.whatsOnMind);
+    put('Their biggest blocker', a.biggestBlocker);
+    if (Array.isArray(a.triggerApps) && a.triggerApps.length) put('Apps that pull them under', a.triggerApps.join(', '));
+    put('Energy baseline', a.energyBaseline);
+    put('Minutes a day they committed', a.dailyTime);
+    put('Self-rated intensity', a.intensity);
+    put('How they will measure progress', a.progressMeasurement);
+    put('Their anchor', a.anchor);
+
+    const letter = (state && state.clarity && state.clarity.letter && state.clarity.letter.text) || p.letterToFutureSelf;
+    put('Their sealed letter to their future self (their own voice, use it sparingly and never quote it back cheaply)', letter);
+
+    if (!L.length) return '';
+    return 'WHO THIS PERSON IS (from onboarding and Clarity, in their own words. ' +
+      'Use it to make the move specific to THEM. Never quote it back at them as if reciting a file):\n' + L.join('\n');
+  } catch (e) { return ''; }
+}
+
 function buildActionProfile() {
   try {
     const led = (state.action && Array.isArray(state.action.ledger)) ? state.action.ledger : [];
@@ -1680,8 +1736,10 @@ async function generateNextLoopAction() {
     .slice(-6).map(h => `- [${h.tier}] ${h.actionText}${h.note ? ' (their note: ' + h.note + ')' : ''}`).join('\n');
   const sys = `You name the single next physical action in a daily execution loop. Given the goal, the current main move, and what was just completed today, return ONE next action: the most direct thing they can do next, TODAY, that builds on what they just did. Under 14 words, a complete verb phrase, concrete and verifiable, no cadence words, no durations, no advice, no explanation. It must NOT repeat anything already completed today. ${MALIK_VOICE_SPEC}\n\nReturn ONLY the action phrase, no quotes, no label.`;
   const profile = (typeof buildActionProfile === 'function') ? buildActionProfile() : '';
+  const person = (typeof buildPersonContext === 'function') ? buildPersonContext() : '';
   const body = [
     goal ? `Goal: ${goal}` : '',
+    person,
     pa.title ? `Main move: ${pa.title}` : '',
     profile ? `Their track record (the app's own ledger, treat as fact):\n${profile}` : '',
     todayDone ? `Completed today:\n${todayDone}` : ''
@@ -1736,7 +1794,9 @@ async function generateActionDraft(options = {}) {
 
   try {
     const summary = normalizeClaritySummary(state.clarity.answers);
-    const tail = (state.clarity.answers.aiConversation || []).slice(-12)
+    // v1009: 12 messages was a keyhole into an entire conversation. 40 keeps
+    // the arc of how they got to the star, not just the closing exchange.
+    const tail = (state.clarity.answers.aiConversation || []).slice(-40)
       .map(m => (m.role === 'user' ? 'User: ' : 'Coach: ') + m.content).join('\n');
     // Action intake answers - the short chat the user just completed.
     // Bake these into the prompt so the plan is grounded in what they
@@ -1756,6 +1816,9 @@ async function generateActionDraft(options = {}) {
       ? history.slice(-10).map(h => `- ${new Date(h.date).toLocaleDateString()} [${h.tier}] ${h.actionText}`).join('\n')
       : '';
     const contextLines = [
+      // v1009: the standing "who am I talking to" block. Carried on the first
+      // plan AND every regeneration, so a day-90 plan is as informed as day 1.
+      (typeof buildPersonContext === 'function') ? buildPersonContext() : '',
       `Neutron Star: ${summary.neutronStar || ''}`,
       `Why it matters: ${summary.coreWhy || ''}`,
       `Identity statement: ${state.clarity.answers.identityLine || ''}`,
