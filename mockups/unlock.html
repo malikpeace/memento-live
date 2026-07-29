@@ -339,8 +339,9 @@
   .cer.look-obsidian .daycard-ns {
     background:linear-gradient(165deg, rgba(16,19,23,.97), rgba(26,30,36,.94) 48%, rgba(12,14,18,.97));
     box-shadow:inset 0 1px 0 rgba(255,255,255,.14), 0 26px 60px rgba(24,32,48,.26); }
-  .cer.look-obsidian .daycard-ns__emblem { fill:rgba(255,255,255,.55);
-    filter:drop-shadow(0 1.5px 0 rgba(255,255,255,.22)) drop-shadow(0 -1.5px 1.5px rgba(0,0,0,.6)); }
+  .cer.look-obsidian { --m-a:rgba(255,255,255,.78); --m-b:rgba(226,238,252,.46); --m-c:rgba(180,200,224,.26);
+    --m-lit:rgba(255,255,255,.45); --m-shade:rgba(0,0,0,.55);
+    --m-cool:rgba(150,190,240,.5); --m-warm:rgba(230,238,250,.28); }
   .cer.look-obsidian .daycard-ns__name { color:rgba(255,255,255,.72); }
   /* it has to STAY black. The flood would wash it silver, so the wash and the
      white act blob are held right down and the reward moves to the edge. */
@@ -609,9 +610,9 @@
     background:linear-gradient(165deg, rgba(255,255,255,.030), rgba(255,255,255,.006) 48%, rgba(255,255,255,.016)); }
   .cer.look-prism .daycard-ns__iri { opacity:.04; }
   .cer.look-prism .daycard-ns__sheen { opacity:.14; }
-  .cer.look-prism .daycard-ns__emblem {
-    fill:rgba(255,255,255,.94);
-    filter:drop-shadow(0 1px 0 rgba(255,255,255,.30)) drop-shadow(0 -1px 2px rgba(0,0,0,.75)); }
+  .cer.look-prism { --m-a:rgba(255,255,255,.96); --m-b:rgba(214,226,255,.62); --m-c:rgba(150,170,220,.34);
+    --m-lit:rgba(255,255,255,.6); --m-shade:rgba(0,0,0,.8);
+    --m-cool:rgba(120,180,255,.6); --m-warm:rgba(255,140,60,.5); }
 
   /* the corner colour, kept to a trace */
   .cer.look-prism .daycard-theme-living .blob.b1 {
@@ -737,9 +738,49 @@
   .cer.look-ember { --fl:255,214,150; --fl2:230,70,30; }
 
   /* on a platinum face the light mark vanishes, so aurora takes the dark one */
-  .cer.look-aurora .daycard-ns__emblem {
-    fill:rgba(16,30,38,.66);
-    filter:drop-shadow(0 1.5px 0 rgba(255,255,255,.70)) drop-shadow(0 -1.5px 1.5px rgba(0,0,0,.28)); }
+  .cer.look-aurora { --m-cool:rgba(60,230,206,.5); --m-warm:rgba(120,200,255,.34); }
+
+  /* ================= THE MARK =================================================
+     The M was a flat fill, which is why it read as a sticker on every look. It
+     is now a lit object, three things stacked:
+       1. a gradient FACE (the SVG defs above), bright where the light is and
+          falling off away from it, so the shape has a direction;
+       2. a BEVEL, two zero-blur drop-shadows a fraction of a pixel apart, one
+          light on the lit side and one dark under the opposite edge. Zero blur
+          is what makes it an edge and not a glow;
+       3. RIM LIGHT, two coloured drop-shadows offset toward the light sources
+          in the room, cool from one side and warm from the other, so the mark
+          picks up the same colours the card does.
+     drop-shadow follows the alpha shape, so all of it hugs the M's real
+     outline, including the notch. Every look sets its own four vars. */
+  /* specificity note: the app's .daycard-wrap.daycard--bright rule is 0,3,1 and
+     was out-ranking a plain .cer .daycard-ns__emblem, so this matches it. */
+  .cer .daycard-wrap.daycard--bright .daycard-ns__emblem {
+    fill:url(#mFace);
+    filter:
+      drop-shadow(-0.7px -0.7px 0 var(--m-lit, rgba(255,255,255,.6)))
+      drop-shadow(0.8px 1.2px 0 var(--m-shade, rgba(0,0,0,.7)))
+      drop-shadow(-4px -3px 4px var(--m-cool, rgba(140,205,255,.6)))
+      drop-shadow(4.5px 4.5px 6px var(--m-warm, rgba(255,170,80,.5))); }
+
+  /* THE ADAPTIVE HALF. On the looks whose face floods bright, a light mark is
+     white-on-white and disappears, so those flip to a dark material with the
+     highlight on the lit edge instead. Same rule the app already follows with
+     its own mark; these are the looks that need it. */
+  .cer.look-platinum, .cer.look-bronze, .cer.look-chroma,
+  .cer.look-rainbow, .cer.look-wild, .cer.look-aurora {
+    --m-a:rgba(16,26,36,.70); --m-b:rgba(30,44,58,.54); --m-c:rgba(46,62,78,.34);
+    --m-lit:rgba(255,255,255,.78); --m-shade:rgba(0,0,0,.22); }
+
+  /* the remaining looks take their own two temperatures */
+  .cer.look-bronze  { --m-cool:rgba(255,226,190,.40); --m-warm:rgba(255,168,64,.66); }
+  .cer.look-thermal { --m-cool:rgba(96,206,255,.68); --m-warm:rgba(255,132,26,.62); }
+  .cer.look-chroma  { --m-cool:rgba(60,180,255,.7); --m-warm:rgba(255,120,40,.7); }
+  .cer.look-wild    { --m-cool:rgba(110,230,255,.62); --m-warm:rgba(255,90,210,.62); }
+  .cer.look-rainbow { --m-cool:rgba(60,180,255,.6); --m-warm:rgba(255,80,60,.6); }
+  .cer.look-ember   { --m-a:rgba(255,240,214,.86); --m-b:rgba(226,168,110,.50); --m-c:rgba(150,70,30,.30);
+    --m-cool:rgba(255,200,120,.34); --m-warm:rgba(255,110,20,.72); }
+  .cer.look-graphite{ --m-cool:rgba(160,210,255,.55); --m-warm:rgba(220,232,255,.30); }
 
   /* ================= THE FACE =================================================
      Answering "is a dot in the middle the best we've got". Four treatments that
@@ -860,9 +901,9 @@
   .cer.look-caustic .daycard-theme-living .blob.b4,
   .cer.look-caustic .daycard-theme-living .blob.b5,
   .cer.look-caustic .daycard-theme-living .blob.b6 { opacity:0; }
-  .cer.look-caustic .daycard-ns__emblem {
-    fill:rgba(255,255,255,.90);
-    filter:drop-shadow(0 1px 0 rgba(255,255,255,.28)) drop-shadow(0 -1px 2px rgba(0,0,0,.75)); }
+  .cer.look-caustic { --m-a:rgba(236,246,255,.80); --m-b:rgba(168,186,214,.42); --m-c:rgba(120,96,86,.22);
+    --m-lit:rgba(220,240,255,.75); --m-shade:rgba(0,0,0,.85);
+    --m-cool:rgba(60,170,255,.8); --m-warm:rgba(255,132,26,.8); }
 
   /* the rim agrees with the blade: white across the top, running hot down the
      right where the light leaves, cool along the lower-left where it enters */
@@ -1047,6 +1088,16 @@
                   <span class="cer__caustic" aria-hidden="true"></span>
                   <div class="daycard-ns__body">
                     <svg class="daycard-ns__emblem" viewBox="0 0 512 512" aria-hidden="true">
+                      <!-- the mark's own material: a two-stop face so it reads as
+                           a surface catching light rather than a flat fill. The
+                           stops are CSS vars, so every look tints its own. -->
+                      <defs>
+                        <linearGradient id="mFace" x1="0.12" y1="0" x2="0.78" y2="1">
+                          <stop offset="0"   stop-color="var(--m-a, rgba(255,255,255,.72))"></stop>
+                          <stop offset="0.46" stop-color="var(--m-b, rgba(255,255,255,.42))"></stop>
+                          <stop offset="1"   stop-color="var(--m-c, rgba(255,255,255,.24))"></stop>
+                        </linearGradient>
+                      </defs>
                       <path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path>
                     </svg>
                   </div>
