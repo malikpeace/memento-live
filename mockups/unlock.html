@@ -780,12 +780,23 @@
   .cer__impact { position:absolute; inset:0; z-index:6; pointer-events:none; opacity:0;
     background:radial-gradient(circle at 50% 40%,
       #ffffff 0%, #ffffff 46%, rgba(255,255,255,.86) 72%, rgba(255,255,255,.6) 100%); }
-  .cer.flare .cer__impact { animation:cerImpact 440ms cubic-bezier(.12,.8,.3,1); }
+  /* Timing, because the first version read as a glitch rather than an impact:
+     it hit peak in 30ms and was gone in 440ms, which is a camera flash, not
+     light arriving. It BLOOMS over ~130ms (fast enough to still be a hit, slow
+     enough that the eye tracks it) and then decays for a full second on a long
+     tail, the way real light leaves a room. 1.3s total, which also lets it sit
+     with the flare at 1.15s and the sweep at 1.7s instead of finishing before
+     either has started. */
+  .cer.flare .cer__impact { animation:cerImpact 1300ms cubic-bezier(.22,.66,.28,1); }
   @keyframes cerImpact {
     0%   { opacity:0; }
-    7%   { opacity:.88; }
-    18%  { opacity:.5; }
-    46%  { opacity:.16; }
+    4%   { opacity:.34; }
+    10%  { opacity:.92; }
+    16%  { opacity:.88; }
+    28%  { opacity:.58; }
+    46%  { opacity:.32; }
+    66%  { opacity:.16; }
+    84%  { opacity:.06; }
     100% { opacity:0; }
   }
 
