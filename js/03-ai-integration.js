@@ -1570,7 +1570,11 @@ function buildActionProfile() {
     if (hist.length) {
       out.push('PREVIOUS STARS (they changed direction before, this is real history):\n' +
         hist.slice(-3).map(h =>
-          `- "${h.star}" (${h.startedDay} to ${h.retiredDay}, ${h.daysKept}/${h.daysTotal} days kept` +
+          // Duration, not a date RANGE: a range implied the star ran from
+          // startedDay to retiredDay, but a star retired after a gap in usage
+          // spans more calendar time than it was ever live. daysTotal is the
+          // truth, so say that and keep the end date only as an anchor.
+          `- "${h.star}" (${h.daysTotal} tracked days, ${h.daysKept} kept, ended ${h.retiredDay}` +
           (h.topMove ? `, main move was "${h.topMove}"` : '') +
           (h.reason ? `, changed because: ${h.reason}` : '') + ')'
         ).join('\n'));
@@ -1615,9 +1619,12 @@ function buildActionProfile() {
       out.push(`They have DROPPED from ${RN[modeAll]} to ${RN[modeRecent]} since starting.`);
     }
 
+    const rhythm = detectRestRhythm(led.slice(-21));
+    if (rhythm) out.push(`RHYTHM: they run ${rhythm.on} day${rhythm.on === 1 ? '' : 's'} on, 1 off, repeating. Those off days are their PATTERN, not lapses. Do not treat the next one as a miss.`);
+
     let gap = 0;
     for (let i = led.length - 1; i >= 0 && led[i].outcome === 'missed'; i--) gap++;
-    if (gap > 0) out.push(`Currently ${gap} day${gap === 1 ? '' : 's'} since the last completion.`);
+    if (gap > 0 && !(rhythm && gap <= 1)) out.push(`Currently ${gap} day${gap === 1 ? '' : 's'} since the last completion.`);
     const longest = longestGapIn(led);
     if (longest >= 3) out.push(`Longest gap on record: ${longest} days.`);
 
@@ -1637,6 +1644,28 @@ function weekKeyOf(day) {
     return d.toISOString().slice(5, 10);
   } catch (e) { return day.slice(0, 7); }
 }
+/* A deliberate rest day looks identical to a miss in the data, and calling it
+   a miss is how an app starts nagging someone doing exactly what they planned.
+   If misses fall on an even cycle across the recent window, that is a rhythm.
+   Requires 3+ misses, exact spacing, and every non-rest day kept, so a patchy
+   stretch cannot masquerade as a schedule. */
+function detectRestRhythm(rows) {
+  try {
+    if (!rows || rows.length < 9) return null;
+    const missAt = [];
+    rows.forEach((r, i) => { if (r.outcome === 'missed') missAt.push(i); });
+    if (missAt.length < 3) return null;
+    const gaps = [];
+    for (let i = 1; i < missAt.length; i++) gaps.push(missAt[i] - missAt[i - 1]);
+    const first = gaps[0];
+    if (first < 2 || first > 8) return null;
+    if (!gaps.every(g => g === first)) return null;
+    const solid = rows.every((r, i) => (missAt.indexOf(i) >= 0) || r.outcome === 'done');
+    if (!solid) return null;
+    return { on: first - 1, cycle: first };
+  } catch (e) { return null; }
+}
+
 function longestGapIn(led) {
   let best = 0, run = 0;
   for (const r of led) { if (r.outcome === 'missed') { run++; if (run > best) best = run; } else run = 0; }
