@@ -762,8 +762,12 @@
        than hiding it. */
     fill:url(#mFace);
     clip-path:polygon(29.3% 28.5%, 50% 49.2%, 70.7% 28.5%, 70.7% 71.5%, 29.3% 71.5%);
-    -webkit-backdrop-filter:blur(5px) saturate(1.8) brightness(1.18);
-            backdrop-filter:blur(5px) saturate(1.8) brightness(1.18);
+    /* The sample has to SHIFT what it reads or the mark is the same colour as
+       the card and disappears, which is exactly what happened on platinum. On a
+       dark card it brightens, on a bright card it darkens. Still sampled, still
+       dynamic, but always separated from what is behind it. */
+    -webkit-backdrop-filter:var(--m-bd, blur(5px) saturate(1.8) brightness(1.35));
+            backdrop-filter:var(--m-bd, blur(5px) saturate(1.8) brightness(1.35));
     /* the lit edge runs along the outline itself. Offsetting a shadow to fake it
        is what produced a visible second M. */
     stroke:url(#mEdge);
@@ -780,7 +784,8 @@
      its own mark; these are the looks that need it. */
   .cer.look-platinum, .cer.look-bronze, .cer.look-chroma,
   .cer.look-rainbow, .cer.look-wild, .cer.look-aurora {
-    --m-a:rgba(14,24,34,.42); --m-b:rgba(26,40,54,.30); --m-c:rgba(40,56,72,.18); }
+    --m-a:rgba(14,24,34,.46); --m-b:rgba(26,40,54,.34); --m-c:rgba(40,56,72,.22);
+    --m-bd:blur(5px) saturate(1.5) brightness(0.52); }
 
   /* the remaining looks take their own two temperatures */
   .cer.look-ember   { --m-a:rgba(255,238,208,.26); --m-b:rgba(226,168,110,.16); --m-c:rgba(150,70,30,.10); }
