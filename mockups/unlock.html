@@ -777,9 +777,10 @@
      screen, easing off at the corners, which reads as light filling the room
      instead of a rectangle being switched on. Opacity only, no fill-mode, so
      nothing is left promoted afterwards. */
-  .cer__impact { position:absolute; inset:0; z-index:6; pointer-events:none; opacity:0;
-    background:radial-gradient(circle at 50% 40%,
-      #ffffff 0%, #ffffff 46%, rgba(255,255,255,.86) 72%, rgba(255,255,255,.6) 100%); }
+  .cer__impact { position:absolute; inset:0; z-index:6; pointer-events:none;
+    opacity:var(--wht, 0);
+    background:radial-gradient(circle at 50% 42%,
+      #ffffff 0%, #ffffff 72%, rgba(255,255,255,.95) 100%); }
   /* Timing, because the first version read as a glitch rather than an impact:
      it hit peak in 30ms and was gone in 440ms, which is a camera flash, not
      light arriving. It BLOOMS over ~130ms (fast enough to still be a hit, slow
@@ -787,21 +788,57 @@
      tail, the way real light leaves a room. 1.3s total, which also lets it sit
      with the flare at 1.15s and the sweep at 1.7s instead of finishing before
      either has started. */
-  .cer.flare .cer__impact { animation:cerImpact 1500ms cubic-bezier(.25,.55,.2,1); }
+  .cer.flare .cer__impact { animation:cerImpact 2400ms cubic-bezier(.3,.5,.2,1); }
+  /* It starts at .88, not 0, because by the time the hold completes the screen
+     is ALREADY most of the way white. The keyframe picks the value up exactly
+     where the hold left it, so there is no seam between what they did and what
+     the release does. No fill-mode: the base value is set to 0 on release, so
+     when the animation ends nothing is left promoted and nothing snaps back. */
   @keyframes cerImpact {
-    0%   { opacity:0; }
-    3%   { opacity:.22; }
-    7%   { opacity:.62; }
-    12%  { opacity:.9; }
-    20%  { opacity:.9; }
-    32%  { opacity:.66; }
-    46%  { opacity:.44; }
-    60%  { opacity:.27; }
-    74%  { opacity:.15; }
-    87%  { opacity:.06; }
+    0%   { opacity:.88; }
+    6%   { opacity:1; }
+    34%  { opacity:1; }
+    50%  { opacity:.84; }
+    64%  { opacity:.56; }
+    78%  { opacity:.31; }
+    90%  { opacity:.13; }
     100% { opacity:0; }
   }
 
+  /* THE MARK THAT SURVIVES THE WHITEOUT. At full white the screen holds one
+     thing: their card's own M, dark. It is not a logo dropped on top, it is the
+     same path at the same place at the same size as the emblem on the card
+     underneath, so when the white recedes the mark does not move, the card
+     simply arrives around it.
+     Geometry is mirrored rather than shared because the white layer sits above
+     the stage and a child of the stage could never paint over it. The outer box
+     copies the stage's transform, the inner one copies the float's breathing,
+     and the svg is pinned by JS to the emblem's measured rect: three copies,
+     zero drift. */
+  .cer__wm { position:absolute; left:50%; top:50%; margin-left:-160px; margin-top:-226px;
+    width:320px; height:452px; z-index:7; pointer-events:none;
+    opacity:var(--wmo, 0);
+    transform:translateY(-30px) scale(var(--hs, 1)); }
+  .cer.back .cer__wm { transform:translateY(-168px) scale(.78);
+    transition:transform 1.3s cubic-bezier(.33,.9,.28,1); }
+  .cer__wm > span { position:absolute; inset:0; }
+  .cer.lit .cer__wm > span, .cer.back .cer__wm > span {
+    animation:cerBreathe 8s ease-in-out infinite; }
+  .cer__wm svg { position:absolute; left:98px; top:152px; width:124px; height:124px; }
+  .cer__wm path { fill:#0e1218; }
+  /* The mark leaves BEFORE the white does. It has to: the real emblem is
+     fading up underneath it, and two marks at slightly different darknesses
+     sitting on the same pixels reads as a double. By the time the card is
+     legible through the white, only the card's own mark is left. */
+  .cer.flare .cer__wm { animation:cerMark 2400ms cubic-bezier(.3,.5,.2,1); }
+  @keyframes cerMark {
+    0%   { opacity:1; }
+    40%  { opacity:1; }
+    54%  { opacity:.72; }
+    66%  { opacity:.3; }
+    76%  { opacity:0; }
+    100% { opacity:0; }
+  }
   /* THE PULSE. The edge carries a heartbeat: nothing for most of the cycle,
      then a beat and a smaller second beat, then nothing again. Occasional is
      the whole point, a constant pulse would read as a loading state. Opacity on
@@ -1087,7 +1124,8 @@
        anything animating forever keeps the card dirty, so iOS can never cache
        it as a still bitmap and re-blurs it instead. The breathing goes with it
        until the page is proven stable on a real device. */
-    .cer.lit .cer__float, .cer.back .cer__float { animation:none; }
+    .cer.lit .cer__float, .cer.back .cer__float,
+    .cer.lit .cer__wm > span, .cer.back .cer__wm > span { animation:none; }
     /* the gallery chrome, so a phone renders one screen instead of a 1100px
        page scaled down (which rasterises every one of these layers oversized) */
     .gal { padding:14px 12px 60px; }
@@ -1105,7 +1143,11 @@
     .cer__stage, .cer__float, .cer__floor, .cer__glow, .cer__sweep, .cer__flare,
     .cer__hint, .cer__welcome, .cer__note, .cer__sign, .cer__cta,
     .cer__life, .cer__life i, .cer__spark, .cer__pulse,
-    .cer__impact { transition:none !important; animation:none !important; }
+    .cer__impact, .cer__wm { transition:none !important; animation:none !important; }
+    /* and no whiteout at all here. Reduced motion is the setting people with a
+       photosensitivity set, and a full-screen white is exactly the thing it is
+       there to prevent. They go straight to the lit card. */
+    .cer__impact, .cer__wm { opacity:0 !important; }
   }
 
   /* The obsidian look runs the app's real light theme on <html>, which would
@@ -1141,6 +1183,9 @@
         <span class="cer__floor" aria-hidden="true"></span>
         <span class="cer__flare" aria-hidden="true"></span>
         <span class="cer__impact" aria-hidden="true"></span>
+        <span class="cer__wm" id="wm" aria-hidden="true"><span>
+          <svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg>
+        </span></span>
 
         <div class="cer__stage" id="stage">
           <div class="cer__float">
@@ -1276,6 +1321,8 @@
   var cer  = document.getElementById('cer');
   var card = document.getElementById('card');
   var hint = document.getElementById('hint');
+  var wm    = document.getElementById('wm');
+  var stage = document.getElementById('stage');
 
   var HOLD_MS    = 2600;   // the star's ignition hold is 2500, this matches its weight
   var RELEASE_MS = 760;    // draining back is slower than filling, so letting go stings
@@ -1319,12 +1366,32 @@
     card.style.setProperty('--emit', num(0.30 + 0.28 * litV));
   }
 
+  /* THE WHITEOUT. The last third of the hold stops being about the card and
+     becomes about the room: the light they are pulling out of it overwhelms
+     everything, the screen goes white, and the only thing left standing in it
+     is their own mark. It is squared so it arrives late and hard rather than
+     as an even wash, and it is driven straight off hold progress, so letting
+     go drains the room back out exactly the way it filled. Like the colour, it
+     deliberately stops short of full: the last of the white is the release. */
+  var WHITE_FROM = 0.56, WHITE_CAP = 0.88;
+  function white(x){
+    var w = (x - WHITE_FROM) / (1 - WHITE_FROM);
+    if (w <= 0) return 0;
+    w = Math.min(1, w); w = w * w;
+    cer.style.setProperty('--wht', num(w * WHITE_CAP));
+    /* the mark comes up slightly ahead of the white, so it is already solid by
+       the time there is nothing else on screen */
+    cer.style.setProperty('--wmo', num(Math.min(1, w * 1.6)));
+    return w;
+  }
+
   function render(){
     var e = Math.pow(p, 1.3);           // colour back-loads, so the end erupts
     paint(e * HOLD_CAP, p * HOLD_CAP);
     cer.style.setProperty('--hp', num(p));
     cer.style.setProperty('--hf', num(p * p));
     cer.style.setProperty('--hs', scaleAt(p).toFixed(4));
+    if (white(p) === 0) { cer.style.setProperty('--wht', '0'); cer.style.setProperty('--wmo', '0'); }
   }
 
   function loop(t){
@@ -1356,6 +1423,11 @@
   function complete(){
     done = true; holding = false; auto = false; raf = null;
     cer.classList.remove('ask');
+    /* Hand the white over to the keyframes. The base values go to zero now, so
+       when the animation ends there is nothing to snap back to; the 0% frame
+       picks up at .88 where the hold left it. */
+    cer.style.setProperty('--wht', '0');
+    cer.style.setProperty('--wmo', '0');
     cer.classList.add('flare');
     cer.classList.add('lit');
     release();
@@ -1363,15 +1435,14 @@
        has settled does the copy come in, one line at a time. The welcome does
        not travel any more: it sits where it will end up and simply fades, which
        is what stopped it reading as a scale-up. */
-    at(140,  function(){ cer.classList.add('sweep'); });
-    /* The card is left ALONE for a second and a half after the flash has fully
-       decayed. Nothing moves, nothing arrives. That pause is the moment they
-       actually look at the thing they just bought; before, the raise started
-       while the flash was still fading and it read as the card fleeing. */
-    at(3000, function(){ cer.classList.add('back');  });   // the raise, 1.3s
-    at(4550, function(){ cer.classList.add('say');   });   // once it has landed
-    at(5600, function(){ cer.classList.add('tell');  });   // the note
-    at(6600, function(){ cer.classList.add('go');    });   // the button
+    at(900,  function(){ cer.classList.add('sweep'); });   // under the white, arrives with it
+    /* The whiteout runs 2400ms and the card is only properly legible through
+       the last third of it, so the raise waits well past the end: the card is
+       left standing alone, in silence, for over a second before anything moves. */
+    at(3900, function(){ cer.classList.add('back');  });   // the raise, 1.3s
+    at(5450, function(){ cer.classList.add('say');   });   // once it has landed
+    at(6500, function(){ cer.classList.add('tell');  });   // the note
+    at(7500, function(){ cer.classList.add('go');    });   // the button
   }
 
   // the break: what they were holding back lets go, overshoots, settles
@@ -1396,6 +1467,27 @@
     card.style.setProperty('--cons', s.cons.toFixed(3));
     card.style.setProperty('--mix',  s.mix.toFixed(3));
   }
+  /* Pin the whiteout's mark to the card's REAL emblem rather than trusting the
+     hardcoded rect. If the card's own CSS ever moves its mark, this follows it,
+     and the two can never end up a few pixels apart during the handoff. */
+  function pinMark(){
+    var em = card.querySelector('.daycard-ns__emblem'), svg = wm.querySelector('svg');
+    if (!em || !svg) return;
+    /* Measured against the CARD, not the stage. The card breathes (an 8s +-9px
+       drift once it is lit) and the overlay mirrors that breathing itself, so
+       measuring from the stage baked the current breath into a static offset
+       and then added the breath again on top: the two marks sat 8.4px apart at
+       the exact moment they cross-fade, which reads as a doubled M. The card
+       and the emblem breathe together, so their difference is breath-free. */
+    var e = em.getBoundingClientRect(), c = card.getBoundingClientRect();
+    if (!e.width || !c.width) return;
+    var k = 320 / c.width;                        // undo whatever scale is live
+    svg.style.left   = ((e.left - c.left) * k).toFixed(2) + 'px';
+    svg.style.top    = ((e.top  - c.top)  * k).toFixed(2) + 'px';
+    svg.style.width  = (e.width  * k).toFixed(2) + 'px';
+    svg.style.height = (e.height * k).toFixed(2) + 'px';
+  }
+
   var LITE = /[?&]lite=1/.test(location.search);
   function base(extra){
     return 'cer look-' + look + ' face-' + face + (LITE ? ' lite' : '') + (extra || '');
@@ -1408,13 +1500,14 @@
     cer.className = base();
     applyStart();
     render();
+    pinMark();
     at(ASK_AT,  function(){ if (!done && !holding) cer.classList.add('ask'); });
     at(AUTO_AT, function(){ if (!done && !holding) { auto = true; cer.classList.remove('ask'); run(); } });
   }
 
   function autoPlay(){ reset(); clear(); auto = true; cer.classList.remove('ask'); run(); }
 
-  // n: 0 dormant, .45 mid hold, 1 unlocked, 2 drawn back
+  // n: 0 dormant, .45 mid hold, .99 peak whiteout, 1 unlocked, 2 drawn back
   function freeze(n){
     clear();
     if (raf) cancelAnimationFrame(raf);
@@ -1424,6 +1517,7 @@
     applyStart();
     p = n > 1 ? 1 : n;
     render();
+    pinMark();
     if (n >= 1) {  // settled, past the release, at full power
       paint(1, 1);
       cer.style.setProperty('--hp', '1'); cer.style.setProperty('--hf', '1');
@@ -1458,6 +1552,7 @@
     card.style.setProperty('--act', '0.000');
     card.style.setProperty('--lit', '0.000');
     cer.style.setProperty('--hp', '0'); cer.style.setProperty('--hf', '0'); cer.style.setProperty('--hs', '1');
+    cer.style.setProperty('--wht', '0'); cer.style.setProperty('--wmo', '0');
     void cer.offsetWidth;
     at(180,  function(){ cer.classList.add('enter'); });
     at(700,  function(){ legacyIgnite(2000); });
