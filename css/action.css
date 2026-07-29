@@ -3901,44 +3901,39 @@ html.theme-light .action-exp {
 .action-exp .action-intake--cine .door-card.selected .door-card__t { color: var(--solid-fg); }
 .action-exp .action-intake--cine .door-card.selected .door-card__s { color: var(--solid-fg); opacity: 0.62; }
 
-/* The narrowing: candidate moves struck one by one while the plan generates.
+/* The decode loader (v998, Malik's spec). ONE surface for the whole wait:
+   characters churn through letters, digits and symbols, then decode left to
+   right into the real move when the plan lands. Replaces the old
+   narrowing + settle pair, which read as two loading pages back to back.
    Lives on the dark-cinema draft-loading surface (root theme rule, no opt-out). */
-.action-narrow {
+.action-scram {
   display: flex; flex-direction: column; justify-content: center;
   min-height: 76vh; padding: 0 24px;
 }
-.action-narrow__col { display: flex; flex-direction: column; }
-.action-narrow__cand {
-  margin: 0; padding: 8px 0; text-align: center;
-  font-size: 0.9375rem; line-height: 1.5; color: var(--text-hi);
-  opacity: 0.92; transition: opacity 260ms ease-out, color 260ms ease-out;
+.action-scram__line {
+  margin: 0; text-align: center;
+  /* Tabular figures + a fixed line-height keep the block from twitching as
+     glyph widths change 20 times a second. */
+  font-variant-numeric: tabular-nums;
+  font-size: 1.0625rem; line-height: 1.7; letter-spacing: 0.02em;
+  word-break: break-word;
+  /* Reserve the block so the decode never reflows the page under it. */
+  min-height: 5.1em;
 }
-.action-narrow__cand.is-cut {
-  color: var(--text-lo); opacity: 0.35;
-  text-decoration: line-through;
-  text-decoration-color: rgba(235,238,248,0.25);
-}
-.action-narrow__cand.is-live {
-  color: var(--text-hi); opacity: 1; font-weight: 650; font-size: 1.03125rem;
-  text-decoration: none;
-}
-.action-narrow__foot {
+/* Decoded characters: the answer, at full strength. */
+.action-scram__on { color: var(--text-hi); font-weight: 650; }
+/* Still churning: present but clearly not yet meaning anything. */
+.action-scram__off { color: var(--text-lo); opacity: 0.5; }
+.action-scram__foot {
   margin-top: 30px; text-align: center;
   font-size: 0.8125rem; color: var(--text-lo);
-  transition: color 600ms ease-out;
+  transition: opacity 500ms ease-out;
 }
-/* The settled tail: the candidates leave, the line stays. Same screen, calmer,
-   so the long wait never looks like a different (older) loading screen. The
-   pulse arrives with it: a motionless screen during a minute-long wait is what
-   read as frozen. */
-.action-narrow__dot { opacity: 0; margin-top: 22px; transition: opacity 900ms ease-out; }
-.action-narrow.is-settled .action-narrow__dot { opacity: 1; }
-.action-narrow.is-settled .action-narrow__col {
-  opacity: 0; transition: opacity 900ms ease-out;
-  pointer-events: none; position: absolute;
-}
-.action-narrow.is-settled .action-narrow__foot {
-  color: var(--text-hi); opacity: 0.92;
+/* Once the decode starts, the waiting line gets out of the way: the answer is
+   the only thing that should be arriving. */
+.action-scram__foot.is-out { opacity: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .action-scram__off { display: none; }
 }
 
 /* The reveal sequence: verdict, bridge, breath, first step. Rides the

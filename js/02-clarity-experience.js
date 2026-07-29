@@ -5160,97 +5160,118 @@ Return ONLY the sentence text. No quotes, no labels.`;
     return out.slice(0, 7);
   },
 
+  // ---- The decode loader (v998, Malik's spec) -------------------------
+  // Replaces BOTH old loading screens. The elimination-then-settle pair read
+  // as two different pages appearing back to back ("why the hell are there
+  // TWO loading pages?"), because the candidate list vanished and the layout
+  // re-centred halfway through the wait.
+  //
+  // This is ONE surface for the whole wait: a block of characters churning
+  // through letters, digits and symbols. When the plan lands the noise
+  // decodes, left to right, into the actual move, so the wait ENDS on the
+  // answer instead of cutting to another screen.
   _renderNarrowing() {
     // Every entry invalidates the previous run's timers via the token, so a
-    // re-render can never leave two elimination loops racing on one surface.
+    // re-render can never leave two loops racing on one surface.
     this._narrowToken = (this._narrowToken || 0) + 1;
     const token = this._narrowToken;
     const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const cands = this._narrowCandidates();
-    if (reduced || cands.length < 3) { this._renderNarrowingCalm(); return; }
+
     this.pageWrap.innerHTML = `
-      <div class="action-exp__page-inner"><div class="action-exp__inner action-draft-loading--cine action-narrow">
-        <div class="action-narrow__col">
-          ${cands.map(c => `<p class="action-narrow__cand">${esc(c)}</p>`).join('')}
-        </div>
-        <div class="action-cine__thinking action-narrow__dot" aria-hidden="true"><i></i></div>
-        <div class="action-narrow__foot">Testing every move against your answers.</div>
+      <div class="action-exp__page-inner"><div class="action-exp__inner action-draft-loading--cine action-scram">
+        <p class="action-scram__line" aria-live="polite"><span class="action-scram__on"></span><span class="action-scram__off"></span></p>
+        <p class="action-scram__foot">Testing every move against your answers.</p>
       </div></div>`;
-    const col = this.pageWrap.querySelector('.action-narrow__col');
-    if (!col) return;
-    let lines = Array.from(col.querySelectorAll('.action-narrow__cand'));
-    // Strike order: outside in, so the held line lands mid-column like the
-    // render. The last survivor holds briefly, then the wave resets with the
-    // pool rotated, and it keeps eliminating until the plan lands.
-    const order = [];
-    for (let a = 0, b = lines.length - 1; a <= b;) {
-      if (a !== b) { order.push(a++); if (order.length < lines.length - 1) order.push(b--); }
-      else { order.push(a); break; }
-    }
-    // The elimination has a FIXED budget. It used to rotate forever, so a slow
-    // generation (the proxy can spend minutes on its retry ladder) left lines
-    // flashing endlessly, which reads as a hung screen and stops being honest
-    // theater the moment it outlives the work it is covering.
-    const MAX_WAVES = 2;
-    let step = 0, wave = 0;
-    const alive = () => this.isOpen && actionAiLoading && this._narrowToken === token && col.isConnected;
-    const tick = () => {
-      if (!alive()) return;
-      if (step < lines.length - 1) {
-        const el = lines[order[step]];
-        if (el) el.classList.add('is-cut');
-        step++;
-        this._narrowTimer = setTimeout(tick, 340 + Math.random() * 220);
-      } else {
-        const holdEl = lines[order[lines.length - 1]];
-        if (holdEl) holdEl.classList.add('is-live');
-        this._narrowTimer = setTimeout(() => {
-          if (!alive()) return;
-          wave++;
-          if (wave >= MAX_WAVES) { this._renderNarrowingCalm(); return; }
-          const rotated = cands.slice(wave % cands.length).concat(cands.slice(0, wave % cands.length));
-          col.innerHTML = rotated.map(c => `<p class="action-narrow__cand">${esc(c)}</p>`).join('');
-          lines = Array.from(col.querySelectorAll('.action-narrow__cand'));
-          step = 0;
-          this._narrowTimer = setTimeout(tick, 500);
-        }, 2400);
-      }
+
+    const onEl = this.pageWrap.querySelector('.action-scram__on');
+    const offEl = this.pageWrap.querySelector('.action-scram__off');
+    const footEl = this.pageWrap.querySelector('.action-scram__foot');
+    if (!onEl || !offEl) return;
+
+    const GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789#$%&*+=/<>[]{}~^?!';
+    const NOISE_LEN = 78;          // reads as a few lines of mess on a phone
+    const rnd = () => GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+    // Word-shaped gaps so it reads as a scrambled SENTENCE, not a data dump.
+    const gaps = new Set([6, 13, 21, 26, 34, 43, 49, 57, 62, 70]);
+    const noise = (len) => {
+      let out = '';
+      for (let i = 0; i < len; i++) out += gaps.has(i) ? ' ' : rnd();
+      return out;
     };
-    this._narrowTimer = setTimeout(tick, 650);
+
+    // Reduced motion gets no churn at all, just the honest waiting line.
+    if (reduced) {
+      offEl.textContent = '';
+      footEl.textContent = 'Testing every move against your answers. This can take a minute.';
+      this._scramWatch(token, null);
+      return;
+    }
+
+    let target = null;      // set once the plan lands
+    let locked = 0;         // how many characters have decoded
+    let elapsed = 0;
+    const TICK = 50;
+    const DECODE_MS = 1400;
+
+    const frame = () => {
+      if (!this.isOpen || this._narrowToken !== token || !onEl.isConnected) return;
+      if (target == null) {
+        // Still working: pure noise, plus an honest nudge once it drags.
+        onEl.textContent = '';
+        offEl.textContent = noise(NOISE_LEN);
+        elapsed += TICK;
+        if (elapsed === 6000) footEl.textContent = 'Testing every move against your answers. This can take a minute.';
+        this._narrowTimer = setTimeout(frame, TICK);
+        return;
+      }
+      // Decoding: the answer emerges from the left, the tail keeps churning.
+      const pct = Math.min(1, locked / DECODE_MS);
+      const cut = Math.round(pct * target.length);
+      onEl.textContent = target.slice(0, cut);
+      offEl.textContent = cut >= target.length ? '' : noise(target.length - cut).slice(0, target.length - cut);
+      if (cut >= target.length) { this._onDecoded(token); return; }
+      locked += TICK;
+      this._narrowTimer = setTimeout(frame, TICK);
+    };
+    this._narrowTimer = setTimeout(frame, TICK);
+
+    // Hand the decode its answer the moment generation finishes.
+    this._scramWatch(token, (text) => {
+      if (!text) return;                       // failed: the watcher repaints
+      target = String(text).trim();
+      locked = 0;
+      footEl.classList.add('is-out');
+    });
   },
 
-  // The calm tail of the wait, and the screen's only exit. refreshActionSurface
-  // routes through render(), which only reaches renderContent() once
-  // tutorialSeen is set, so the loading screen cannot rely on anything else to
-  // repaint it. This watcher owns that: the moment generation ends, plan or
-  // error, it repaints. Without it the narrowing could strand forever.
-  // The tail of the wait. This is the SAME screen, settling: the candidates
-  // fade out and the line stays. It used to swap in the old "Building your
-  // path." loading screen, which read as a second, older screen appearing
-  // partway through (Malik: "why is that there?").
-  _renderNarrowingCalm() {
-    const token = (this._narrowToken || 0);
-    const root = this.pageWrap.querySelector('.action-narrow');
-    if (root) {
-      root.classList.add('is-settled');
-      const foot = root.querySelector('.action-narrow__foot');
-      if (foot) foot.textContent = 'Testing every move against your answers. This can take a minute.';
-    } else {
-      // No narrowing surface to settle (reduced motion, or too few candidates
-      // to run the elimination): render the calm state directly.
-      this.pageWrap.innerHTML = `
-        <div class="action-exp__page-inner"><div class="action-exp__inner action-draft-loading--cine action-narrow is-settled">
-          <div class="action-narrow__col"></div>
-          <div class="action-cine__thinking action-narrow__dot" aria-hidden="true"><i></i></div>
-          <div class="action-narrow__foot">Testing every move against your answers. This can take a minute.</div>
-        </div></div>`;
-    }
+  // The screen's only exit. refreshActionSurface routes through render(),
+  // which only reaches renderContent() once tutorialSeen is set, so this
+  // surface cannot rely on anything else to repaint it. Without this watcher
+  // the loader could strand forever.
+  _scramWatch(token, onPlan) {
     const watch = () => {
       if (!this.isOpen || this._narrowToken !== token) return;
-      if (!actionAiLoading) { this.renderContent(); return; }
+      if (!actionAiLoading) {
+        const pa = (state.action && state.action.primaryAction) || {};
+        const move = pa.title || (pa.tiers && pa.tiers[pa.recommendedTier || 'moderate']) || '';
+        // No move (generation failed) or no decode to run: repaint normally,
+        // which lands on the plan or the honest error screen.
+        if (!onPlan || !move) { this.renderContent(); return; }
+        onPlan(move);
+        return;
+      }
       this._narrowWatch = setTimeout(watch, 400);
     };
     this._narrowWatch = setTimeout(watch, 400);
+  },
+
+  // The decode finished on the real move. Hold it for a beat so it registers
+  // as an answer, then continue into the normal reveal.
+  _onDecoded(token) {
+    this._narrowTimer = setTimeout(() => {
+      if (!this.isOpen || this._narrowToken !== token) return;
+      this.renderContent();
+    }, 900);
   },
 
   // (v875: renderTimeframeGate / bindTimeframeGate DELETED, Malik killed the

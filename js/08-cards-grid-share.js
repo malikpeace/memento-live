@@ -4155,6 +4155,39 @@ function bindCommandCenter(cc) {
       else if (a === 'didit') return;
       else if (typeof ActionExperience !== 'undefined') ActionExperience.open();
     }));
+    // v998 (Malik: "I don't see a place where I can go into the action
+    // module"): the WHOLE Today card opens Action, not just the button inside
+    // it. The card is the biggest target on the home and it was inert.
+    // Clarity's card is excluded, it routes somewhere else entirely.
+    (function bindCardTap() {
+      const card = cc.querySelector('.cc-card');
+      if (!card) return;
+      const first = cc.querySelector('[data-cc-action]');
+      const a = first && first.getAttribute('data-cc-action');
+      if (a === 'clarity') return;
+      card.classList.add('cc-card--tappable');
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+      const go = () => {
+        if (card.classList.contains('is-launching')) return;
+        // The card lifts toward the viewer and fades as Action rises behind
+        // it, so the module reads as opening OUT OF the card that was tapped.
+        card.classList.add('is-launching');
+        setTimeout(() => {
+          try { if (typeof ActionExperience !== 'undefined') ActionExperience.open(); } catch (e) {}
+          setTimeout(() => { try { card.classList.remove('is-launching'); } catch (e) {} }, 500);
+        }, 190);
+      };
+      card.addEventListener('click', (e) => {
+        // Never steal a tap meant for a real control inside the card (the
+        // hold-to-complete button especially).
+        if (e.target.closest && e.target.closest('button, a, input, textarea, select, [data-cc-action], [data-cc-comeback], [data-cc-reason]')) return;
+        go();
+      });
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); }
+      });
+    })();
     // Comeback Mode: three ways back. Pre-select the chosen tier (the same
     // selectedTier the Action card reads), then route into Action like Start.
     cc.querySelectorAll('.cc-comeback-way').forEach(b => b.addEventListener('click', () => {
