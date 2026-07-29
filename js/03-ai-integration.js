@@ -1506,6 +1506,36 @@ try { if (typeof window !== 'undefined') window.generateCommitmentReview = gener
 // "Do it now" can chain it into today and "Finish today" can lock it for
 // tomorrow. Never blocks the UI; on failure the loop just shows the cadence
 // move re-armed instead.
+/* ---- The profile (v1005, Action v2 Phase B) -------------------------------
+   A compact, always-current picture of the person, derived from the offering
+   ledger (js/02) with zero AI cost. This is what turns five amnesiac prompts
+   into one mind: every action call reads it, so day 40's decision knows what
+   day 39 looked like. Facts only, no inference; the model does the judging. */
+function buildActionProfile() {
+  try {
+    const led = (state.action && Array.isArray(state.action.ledger)) ? state.action.ledger : [];
+    if (!led.length) return '';
+    const RN = ['', 'tiny', 'light', 'moderate', 'heavy', 'extreme'];
+    const kept = led.filter(r => r.outcome === 'done');
+    const last7 = led.slice(-7);
+    const kept7 = last7.filter(r => r.outcome === 'done').length;
+    let gap = 0;
+    for (let i = led.length - 1; i >= 0 && led[i].outcome === 'missed'; i--) gap++;
+    const rungCount = {};
+    kept.forEach(r => { rungCount[r.offeredRung] = (rungCount[r.offeredRung] || 0) + 1; });
+    const modeRung = Object.keys(rungCount).sort((a, b) => rungCount[b] - rungCount[a])[0];
+    const lines = [
+      `Sealed days on record: ${led.length} (since ${led[0].day}). Kept ${kept.length} of ${led.length}; ${kept7} of the last ${last7.length}.`,
+      gap > 0 ? `Currently ${gap} day${gap === 1 ? '' : 's'} since the last completion.` : '',
+      modeRung ? `Most often completes at the ${RN[modeRung] || 'moderate'} size.` : '',
+      kept.length ? 'Last completed: ' + kept.slice(-3).map(r => `"${r.offered}" (${r.day})`).join(', ') : ''
+    ];
+    const notes = kept.filter(r => r.note).slice(-2).map(r => `"${r.note}" (${r.day})`);
+    if (notes.length) lines.push('Their own notes: ' + notes.join(', '));
+    return lines.filter(Boolean).join('\n');
+  } catch (e) { return ''; }
+}
+
 async function generateNextLoopAction() {
   if (!hasAnthropicKey()) return '';
   const pa = (state.action && state.action.primaryAction) || {};
@@ -1513,9 +1543,11 @@ async function generateNextLoopAction() {
   const todayDone = (Array.isArray(state.action.completionHistory) ? state.action.completionHistory : [])
     .slice(-6).map(h => `- [${h.tier}] ${h.actionText}${h.note ? ' (their note: ' + h.note + ')' : ''}`).join('\n');
   const sys = `You name the single next physical action in a daily execution loop. Given the goal, the current main move, and what was just completed today, return ONE next action: the most direct thing they can do next, TODAY, that builds on what they just did. Under 14 words, a complete verb phrase, concrete and verifiable, no cadence words, no durations, no advice, no explanation. It must NOT repeat anything already completed today. ${MALIK_VOICE_SPEC}\n\nReturn ONLY the action phrase, no quotes, no label.`;
+  const profile = (typeof buildActionProfile === 'function') ? buildActionProfile() : '';
   const body = [
     goal ? `Goal: ${goal}` : '',
     pa.title ? `Main move: ${pa.title}` : '',
+    profile ? `Their track record (the app's own ledger, treat as fact):\n${profile}` : '',
     todayDone ? `Completed today:\n${todayDone}` : ''
   ].filter(Boolean).join('\n');
   try {
@@ -1598,7 +1630,12 @@ async function generateActionDraft(options = {}) {
       (state.clarity.answers.dailyTime ? `THEIR COMMITTED TIME (size the tiers so the moderate tier fits inside this): ${state.clarity.answers.dailyTime} minutes a day${state.clarity.answers.intensity ? ', self-rated intensity: ' + state.clarity.answers.intensity : ''}` : ''),
       intakeLines ? `Action intake answers (use these, do not re-ask them):\n${intakeLines}` : '',
       tail ? `Tail of Clarity conversation (verbatim, use their words):\n${tail}` : '',
-      historyLines ? `COMPLETED ALREADY (do NOT repeat these, generate the NEXT logical step that builds on top of them):\n${historyLines}` : ''
+      historyLines ? `COMPLETED ALREADY (do NOT repeat these, generate the NEXT logical step that builds on top of them):\n${historyLines}` : '',
+      // v1005: the profile. Only in next-step mode (a first plan has no
+      // ledger). This is what makes a regenerated plan KNOW them: their kept
+      // rate, their real working size, the gap they are in right now.
+      (isNextStep && typeof buildActionProfile === 'function' && buildActionProfile())
+        ? `THEIR TRACK RECORD (from the app's own daily ledger, treat every line as fact and let it shape the size and the move):\n${buildActionProfile()}` : ''
     ].filter(Boolean).join('\n\n');
 
     const nextStepInstruction = isNextStep
