@@ -1511,29 +1511,136 @@ try { if (typeof window !== 'undefined') window.generateCommitmentReview = gener
    ledger (js/02) with zero AI cost. This is what turns five amnesiac prompts
    into one mind: every action call reads it, so day 40's decision knows what
    day 39 looked like. Facts only, no inference; the model does the judging. */
+/* Retire the current Neutron Star into state.action.starHistory, carrying a
+   summary of everything done under it. Called before a new star overwrites the
+   old one. Summarising rather than keeping every row: a retired star needs the
+   ARC (how long, how well, what the move was), and the live ledger is where
+   specifics live. Roughly 200 bytes per retired star. */
+function archiveNeutronStar(nextStar) {
+  const prev = String((state.clarity && state.clarity.answers && state.clarity.answers.neutronStar) || '').trim();
+  const next = String(nextStar || '').trim();
+  if (!prev || prev === next) return;                 // nothing to retire
+  if (!state.action) state.action = {};
+  if (!Array.isArray(state.action.starHistory)) state.action.starHistory = [];
+  const led = Array.isArray(state.action.ledger) ? state.action.ledger : [];
+  const kept = led.filter(r => r.outcome === 'done');
+  const moves = {};
+  kept.forEach(r => { if (r.offered) moves[r.offered] = (moves[r.offered] || 0) + 1; });
+  const topMove = Object.keys(moves).sort((a, b) => moves[b] - moves[a])[0] || '';
+  state.action.starHistory.push({
+    star: prev,
+    startedDay: led.length ? led[0].day : '',
+    retiredDay: (typeof actionDayKey === 'function') ? actionDayKey(new Date()) : new Date().toISOString().slice(0, 10),
+    daysTotal: led.length,
+    daysKept: kept.length,
+    topMove: topMove,
+    reason: String((state.action && state.action.starChangeReason) || '').trim()
+  });
+  if (state.action.starHistory.length > 12) state.action.starHistory.shift();
+  // The ledger belongs to the retired star. Start the new one clean so its
+  // scores are not polluted by work aimed somewhere else.
+  state.action.ledger = [];
+  try { state.action.starChangeReason = ''; } catch (e) {}
+}
+
 function buildActionProfile() {
   try {
     const led = (state.action && Array.isArray(state.action.ledger)) ? state.action.ledger : [];
-    if (!led.length) return '';
     const RN = ['', 'tiny', 'light', 'moderate', 'heavy', 'extreme'];
-    const kept = led.filter(r => r.outcome === 'done');
-    const last7 = led.slice(-7);
-    const kept7 = last7.filter(r => r.outcome === 'done').length;
+    const out = [];
+    // NOT an early return on an empty ledger: archiveNeutronStar clears it on
+    // a direction change, and the days right after a change are exactly when
+    // the previous star's history is worth the most ("you chased that for 90
+    // days and kept 67"). Star and star history are emitted regardless; only
+    // the ledger-derived sections need rows.
+
+    /* Two-tier memory (Malik's design): the RECENT window stays raw and
+       specific, everything older compresses to a SCORE per period. A 3-year
+       user is then "June 80%, July 20%" instead of 1,095 rows, and the model
+       can still be handed the raw rows when a decision needs receipts. Detail
+       where it changes behaviour, scores where only the trend matters. */
+    const RECENT = 14;
+    const recent = led.slice(-RECENT);
+    const older = led.slice(0, -RECENT);
+
+    // 1. THE STAR, always first: the top of the pyramid.
+    const star = (state.clarity && state.clarity.answers && state.clarity.answers.neutronStar) || '';
+    if (star) out.push(`THEIR NEUTRON STAR: ${star}`);
+    const hist = (state.action && Array.isArray(state.action.starHistory)) ? state.action.starHistory : [];
+    if (hist.length) {
+      out.push('PREVIOUS STARS (they changed direction before, this is real history):\n' +
+        hist.slice(-3).map(h =>
+          `- "${h.star}" (${h.startedDay} to ${h.retiredDay}, ${h.daysKept}/${h.daysTotal} days kept` +
+          (h.topMove ? `, main move was "${h.topMove}"` : '') +
+          (h.reason ? `, changed because: ${h.reason}` : '') + ')'
+        ).join('\n'));
+    }
+
+    if (!led.length) return out.filter(Boolean).join('\n');
+
+    // 2. THE ARC: older history as period scores, months once it is long.
+    if (older.length) {
+      const byPeriod = {};
+      const useMonths = older.length > 56;
+      older.forEach(r => {
+        const key = useMonths ? r.day.slice(0, 7) : weekKeyOf(r.day);
+        if (!byPeriod[key]) byPeriod[key] = { kept: 0, total: 0 };
+        byPeriod[key].total++;
+        if (r.outcome === 'done') byPeriod[key].kept++;
+      });
+      const scored = Object.keys(byPeriod).sort().map(k => {
+        const p = byPeriod[k];
+        return useMonths
+          ? `${k}: ${Math.round(p.kept / p.total * 100)}%`
+          : `wk ${k}: ${p.kept}/${p.total}`;
+      });
+      out.push(`BEFORE THAT, ${useMonths ? 'by month' : 'by week'} (score = days kept):\n${scored.join('  ·  ')}`);
+    }
+
+    // 3. THE RECENT WINDOW, raw. This is what should drive today's decision.
+    const keptR = recent.filter(r => r.outcome === 'done');
+    const pattern = recent.map(r => r.outcome === 'done' ? RN[r.offeredRung].charAt(0).toUpperCase() : '.').join('');
+    out.push(`LAST ${recent.length} DAYS: kept ${keptR.length}. Pattern (letter = size completed, dot = missed): ${pattern}`);
+    const rungCount = {};
+    keptR.forEach(r => { rungCount[r.offeredRung] = (rungCount[r.offeredRung] || 0) + 1; });
+    const modeRecent = Object.keys(rungCount).sort((a, b) => rungCount[b] - rungCount[a])[0];
+    if (modeRecent) out.push(`Working size right now: ${RN[modeRecent]}.`);
+
+    // The slide the old profile missed: compare recent size against all-time.
+    const allKept = led.filter(r => r.outcome === 'done');
+    const allCount = {};
+    allKept.forEach(r => { allCount[r.offeredRung] = (allCount[r.offeredRung] || 0) + 1; });
+    const modeAll = Object.keys(allCount).sort((a, b) => allCount[b] - allCount[a])[0];
+    if (modeAll && modeRecent && Number(modeRecent) < Number(modeAll)) {
+      out.push(`They have DROPPED from ${RN[modeAll]} to ${RN[modeRecent]} since starting.`);
+    }
+
     let gap = 0;
     for (let i = led.length - 1; i >= 0 && led[i].outcome === 'missed'; i--) gap++;
-    const rungCount = {};
-    kept.forEach(r => { rungCount[r.offeredRung] = (rungCount[r.offeredRung] || 0) + 1; });
-    const modeRung = Object.keys(rungCount).sort((a, b) => rungCount[b] - rungCount[a])[0];
-    const lines = [
-      `Sealed days on record: ${led.length} (since ${led[0].day}). Kept ${kept.length} of ${led.length}; ${kept7} of the last ${last7.length}.`,
-      gap > 0 ? `Currently ${gap} day${gap === 1 ? '' : 's'} since the last completion.` : '',
-      modeRung ? `Most often completes at the ${RN[modeRung] || 'moderate'} size.` : '',
-      kept.length ? 'Last completed: ' + kept.slice(-3).map(r => `"${r.offered}" (${r.day})`).join(', ') : ''
-    ];
-    const notes = kept.filter(r => r.note).slice(-2).map(r => `"${r.note}" (${r.day})`);
-    if (notes.length) lines.push('Their own notes: ' + notes.join(', '));
-    return lines.filter(Boolean).join('\n');
+    if (gap > 0) out.push(`Currently ${gap} day${gap === 1 ? '' : 's'} since the last completion.`);
+    const longest = longestGapIn(led);
+    if (longest >= 3) out.push(`Longest gap on record: ${longest} days.`);
+
+    if (keptR.length) out.push('Recently completed: ' + keptR.slice(-3).map(r => `"${r.offered}" (${r.day})`).join(', '));
+    const rejected = led.filter(r => r.outcome === 'rejected').slice(-2);
+    if (rejected.length) out.push('They REJECTED these as wrong: ' + rejected.map(r => `"${r.offered}"`).join(', '));
+    const notes = led.filter(r => r.note).slice(-3).map(r => `"${r.note}" (${r.day})`);
+    if (notes.length) out.push('Their own words: ' + notes.join(', '));
+
+    return out.filter(Boolean).join('\n');
   } catch (e) { return ''; }
+}
+function weekKeyOf(day) {
+  try {
+    const d = new Date(day + 'T12:00:00');
+    d.setDate(d.getDate() - ((d.getDay() + 6) % 7));   // back to Monday
+    return d.toISOString().slice(5, 10);
+  } catch (e) { return day.slice(0, 7); }
+}
+function longestGapIn(led) {
+  let best = 0, run = 0;
+  for (const r of led) { if (r.outcome === 'missed') { run++; if (run > best) best = run; } else run = 0; }
+  return best;
 }
 
 async function generateNextLoopAction() {
@@ -4058,6 +4165,12 @@ function completeWizard() {
 
   // AI-generated fields
   if (aiSynthesisResult) {
+    // v1006: archive the OUTGOING star before it is overwritten. Without this
+    // a direction change erases the goal AND orphans every action taken
+    // toward it, so the AI can never say "you chased this for six weeks last
+    // time and here is what happened". The star is the top of the pyramid;
+    // its history is the most valuable context Memento can hold.
+    try { archiveNeutronStar(aiSynthesisResult.neutronStar || ''); } catch (e) {}
     state.clarity.answers.neutronStar = aiSynthesisResult.neutronStar || '';
     state.clarity.answers.coreWhy = aiSynthesisResult.coreWhy || '';
     state.clarity.answers.antiVision = aiSynthesisResult.antiVision || '';

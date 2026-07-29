@@ -7,7 +7,7 @@
    ONCE on mismatch. Kills the "phone silently runs old cached js under a new
    index" class (the SW's offline fallback can serve stale files on a bad
    connection; Malik hit this three times in one day). */
-window.MEMENTO_JS_BUILD = 'v1006';
+window.MEMENTO_JS_BUILD = 'v1007';
 /* ============================================
    STATE MANAGEMENT
    ============================================ */
@@ -79,6 +79,9 @@ const DEFAULT_STATE = {
     planSourceNeutronStar: '',
     lastGeneratedAt: null,
     completionHistory: [],
+    // v1006: retired Neutron Stars with a summary of everything done under
+    // each. Written by archiveNeutronStar (js/03) when the star changes.
+    starHistory: [],
     // v1003: the offering ledger. One sealed row per CLOSED day (4am
     // boundary), misses included, written by actionLedgerBackfill in js/02.
     // Today is live and read from completionHistory; a day's row is sealed on
