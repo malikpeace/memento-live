@@ -3456,8 +3456,18 @@ function creditTodayAction() {
     const _TK = ['tiny', 'light', 'moderate', 'heavy', 'extreme'];
     const _sel = state.action && state.action.selectedTier;
     const tier = _TK.indexOf(_sel) >= 0 ? _sel : (pa.recommendedTier || 'moderate');
-    const actionText = (pa.tiers && pa.tiers[tier]) || pa.howToStart || pa.title || '';
+    // v1002: log what the card SHOWED. When the loop chained a next action
+    // into today, the home displays it (the _loopNext read in
+    // renderCommandCenter) but this receipt used to record the tier text
+    // instead, so the ledger held words the user never saw, and `chained` was
+    // never cleared on this path (the Action module's own _loopComplete does
+    // both correctly, js/02:5570-5575). The completion record is the context
+    // every future decision reads; it has to be the truth.
+    const _chained = String((state.action && state.action.loop &&
+      (state.action.loop.chained || state.action.loop.nextAction)) || '').trim();
+    const actionText = _chained || (pa.tiers && pa.tiers[tier]) || pa.howToStart || pa.title || '';
     if (!state.action) state.action = {};
+    if (_chained && state.action.loop) { state.action.loop.chained = ''; state.action.loop.nextAction = ''; }
     if (!Array.isArray(state.action.completionHistory)) state.action.completionHistory = [];
     // The receipt owns both a stable record id (for undo) and the mission id
     // (for truth). A later same-day Door cannot inherit this completion.

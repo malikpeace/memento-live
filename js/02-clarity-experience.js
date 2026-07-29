@@ -5608,7 +5608,10 @@ Return ONLY the sentence text. No quotes, no labels.`;
           <p class="aloop-green__line">${esc(line)}</p>
         </div>
       </div></div>`;
-    try { if (typeof MementoSound !== 'undefined' && MementoSound.done) MementoSound.done(); } catch (e) {}
+    // v1002: MementoSound's public API is play(name)/tick only; .done was an
+    // authored SOUND (js/20-sound.js), not a method, so the old guarded call
+    // silently no-oped and completing the day was silent.
+    try { if (typeof MementoSound !== 'undefined' && MementoSound.play) MementoSound.play('done'); } catch (e) {}
     this._setTimeout(() => { if (this.isOpen) this._renderCapture(completion); }, 2100);
   },
 
