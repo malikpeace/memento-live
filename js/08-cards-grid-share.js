@@ -590,7 +590,8 @@ function renderGrid() {
   let _cpwLocked = false;
   try { _cpwLocked = (typeof ClarityPaywall !== 'undefined') && ClarityPaywall.isLockedByPaywall('action'); } catch (e) {}
   document.body.classList.toggle('cpw-locked', _cpwLocked);
-  const _hasPaidAccess = !!(state.entitlements && state.entitlements.isPaid);
+  let _hasPaidAccess = false;
+  try { _hasPaidAccess = (typeof ClarityPaywall !== 'undefined') && ClarityPaywall.isPaid(); } catch (e) {}
   document.body.classList.toggle('memento-paid', _hasPaidAccess);
 
   // v27 bento opt-out flag (kept current above the early returns so a stale
@@ -1326,7 +1327,7 @@ function renderGreeting() {
   // show the date only and expose no hidden weeks-left interaction.
   let weeksLeft = null;
   try {
-    const paid = !!(state.entitlements && state.entitlements.isPaid);
+    const paid = (typeof ClarityPaywall !== 'undefined') && ClarityPaywall.isPaid();
     const by = paid && state.mori && state.mori.birthYear;
     if (by && typeof moriWeeksLived === 'function' && typeof moriTotalWeeks === 'function') {
       const lived = moriWeeksLived(by);
@@ -4376,7 +4377,8 @@ function _maybeRunActionEvolution() {
     // Fires ONLY on a genuine first discovery (armed at plan generation in js/03),
     // so existing paid users never replay it out of context.
     if (!state.meta.actionRevealPending) return;
-    const paid = !!(state.entitlements && state.entitlements.isPaid);
+    let paid = false;
+    try { paid = (typeof ClarityPaywall !== 'undefined') && ClarityPaywall.isPaid(); } catch (e) {}
     const pa = state.action && state.action.primaryAction;
     const discovered = !!(state.action && state.action.planGenerated && pa && String(pa.title || '').trim());
     if (!paid || !discovered) return;

@@ -50,6 +50,10 @@ let aiUserAnswer = '';
 let actionAiLoading = false;
 let actionChatSending = false;
 let actionChatError = null;
+// Full Action plans may legitimately need nearly two minutes. Keep the server
+// abort slightly inside this browser deadline so failures arrive in time for
+// the existing retry ladder instead of racing the client's own timeout.
+const ACTION_PLAN_REQUEST_TIMEOUT_MS = 120000;
 // Action V2 - adaptive chat state
 let actionChatMessages = [];          // mirrors state.action.aiConversation in memory
 let actionChatCurrentQuestion = '';   // the AI's most recent question (not yet answered)
@@ -1476,7 +1480,7 @@ async function generateCommitmentReview(opts = {}) {
       // thinking OFF: a one-line reflection needs zero deliberation, and adaptive
       // thinking on a tiny budget was eating the whole allowance and returning
       // empty text (forcing the fallback). Off = fast + reliably non-empty.
-      { maxTokens: 320, model: ANTHROPIC_MODEL_PLANS, timeout: 60000, thinking: 'off' }
+      { maxTokens: 320, model: ANTHROPIC_MODEL_PLANS, timeout: 60000, thinking: 'off', paidAction: true }
     );
     let reflection = String(raw || '').trim().replace(/^["']|["']$/g, '').trim();
     // Strip em/en dashes AND spaced-hyphen em-dash substitutes (" - ") the model
@@ -1513,7 +1517,7 @@ async function generateNextLoopAction() {
   ].filter(Boolean).join('\n');
   try {
     const raw = await callClaude([{ role: 'user', content: body }], sys,
-      { maxTokens: 200, model: ANTHROPIC_MODEL_PLANS, timeout: 45000, thinking: 'off' });
+      { maxTokens: 200, model: ANTHROPIC_MODEL_PLANS, timeout: 45000, thinking: 'off', paidAction: true });
     let t = String(raw || '').trim().replace(/^["']|["']$/g, '').replace(/[—–]/g, ',').trim();
     if (!t || t.split(/\s+/).length > 18 || (typeof voiceLint === 'function' && voiceLint(t).length)) return '';
     return trimText(t, 110);
@@ -1529,6 +1533,14 @@ async function generateActionDraft(options = {}) {
   // options.nextStep: true means "user already has a plan, they've completed
   // some actions, generate the NEXT logical step using completionHistory".
   const isNextStep = !!options.nextStep;
+  // Official demo personas already ship with a complete seeded plan. Preserve
+  // that plan instead of asking the paid endpoint to generate another one.
+  if (typeof DEMO_MODE !== 'undefined' && DEMO_MODE) {
+    actionAiLoading = false;
+    actionChatError = null;
+    refreshActionSurface();
+    return state.action && state.action.planGenerated ? state.action : null;
+  }
   if (actionAiLoading) return;
   if (!hasAnthropicKey()) {
     actionChatError = 'AI is unavailable right now. Check your connection and try again.';
@@ -1620,7 +1632,7 @@ async function generateActionDraft(options = {}) {
         // plan generation, so the proxy wraps it in an ephemeral cache block
         // and repeat calls (bursts, or many users close together) read it at
         // ~10% the input cost. Output and behavior are unchanged.
-        const callOpts = { maxTokens: 16000, model: ANTHROPIC_MODEL_PLANS, timeout: 120000, cache: true };
+        const callOpts = { maxTokens: 16000, model: ANTHROPIC_MODEL_PLANS, timeout: ACTION_PLAN_REQUEST_TIMEOUT_MS, cache: true, paidAction: true };
         if (lastTry) callOpts.thinking = 'off';
         const body = userBody + (emptyTries ? softNudges[emptyTries - 1] : '');
         try {
@@ -1667,7 +1679,7 @@ async function generateActionDraft(options = {}) {
       const retryRaw = await callClaude(
         [{ role: 'user', content: userBody }],
         AI_ACTION_DRAFT_SYSTEM_PROMPT,
-        { maxTokens: 16000, model: ANTHROPIC_MODEL_PLANS, timeout: 120000, cache: true }
+        { maxTokens: 16000, model: ANTHROPIC_MODEL_PLANS, timeout: ACTION_PLAN_REQUEST_TIMEOUT_MS, cache: true, paidAction: true }
       );
       let rj = retryRaw.trim().replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();
       const fb2 = rj.indexOf('{');
@@ -1765,7 +1777,7 @@ async function generateActionDraft(options = {}) {
         const retryResponse = await callClaude(
           [{ role: 'user', content: retryBody }],
           AI_ACTION_DRAFT_SYSTEM_PROMPT,
-          { maxTokens: 16000, model: ANTHROPIC_MODEL_PLANS, timeout: 120000, cache: true }
+          { maxTokens: 16000, model: ANTHROPIC_MODEL_PLANS, timeout: ACTION_PLAN_REQUEST_TIMEOUT_MS, cache: true, paidAction: true }
         );
         let retryJson = retryResponse.trim()
           .replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();
@@ -1933,7 +1945,7 @@ ADDITIONAL RULES:
       sys,
       // v905: was 900, which could not fit a full primaryAction (5 tiers +
       // tierTime + path) even before the schema grew, so refines truncated.
-      { maxTokens: 6000, model: ANTHROPIC_MODEL_PLANS }
+      { maxTokens: 6000, model: ANTHROPIC_MODEL_PLANS, paidAction: true }
     );
     let jsonStr = response.trim();
     const fenced = jsonStr.match(/```(?:json)?\s*([\s\S]*?)```/);
@@ -2140,7 +2152,7 @@ async function generateInsights() {
   } catch (e) {}
   const momentum = buildMomentumLine();
   const messages = [{ role: 'user', content: 'Here is my logged data. Surface only grounded patterns, or return an empty list.\n\n' + (momentum ? momentum + '\n\n' : '') + context }];
-  const raw = await callClaude(messages, AI_INSIGHTS_SYSTEM_PROMPT, { maxTokens: 500, noProfile: true });
+  const raw = await callClaude(messages, AI_INSIGHTS_SYSTEM_PROMPT, { maxTokens: 500, noProfile: true, paidAction: true });
   const j = parseModelJson(raw);
   const result = (j && Array.isArray(j.insights)) ? j.insights.filter(s => typeof s === 'string' && s.trim()) : [];
   // Cache only non-empty results so a stale empty state never gets trapped.
@@ -2165,7 +2177,7 @@ async function generateAccountabilityCheck() {
   const context = buildInsightContext();
   const momentum = buildMomentumLine();
   const messages = [{ role: 'user', content: `My Neutron Star: ${ns}\n\n${momentum ? momentum + '\n\n' : ''}My recent activity:\n${context}\n\nGive me one grounded check-in measuring my recent activity against my Neutron Star.` }];
-  const raw = await callClaude(messages, AI_ACCOUNTABILITY_SYSTEM_PROMPT, { maxTokens: 200, noProfile: true });
+  const raw = await callClaude(messages, AI_ACCOUNTABILITY_SYSTEM_PROMPT, { maxTokens: 200, noProfile: true, paidAction: true });
   const j = parseModelJson(raw);
   const result = (j && typeof j.checkin === 'string') ? j.checkin.trim() : '';
   // Cache only non-empty results so a stale empty state never gets trapped.
@@ -2195,6 +2207,8 @@ const ANTHROPIC_MODEL = 'claude-sonnet-5';
 const ANTHROPIC_MODEL_CLARITY = 'claude-sonnet-5';
 const ANTHROPIC_MODEL_SYNTHESIS = 'claude-opus-4-8';
 const ANTHROPIC_MODEL_PLANS = 'claude-sonnet-5';
+const AI_SHARPEN_GOAL_SYSTEM_PROMPT = `You sharpen life goals into exact, verifiable sentences. Rewrite the user goal so a stranger could judge whether it happened: concrete outcome, a number or date when natural. Keep THEIR voice and intent. Maximum 140 characters. Reply with ONLY the rewritten goal sentence, nothing else.`;
+const AI_STAR_NAME_SYSTEM_PROMPT = `You name stars for a star registry. Given a person's life goal and why it matters, propose ONE short evocative star name: 1-2 words, latinate or celestial in feel (examples of the register: Solara, Vigil, Meridian Prime, Aurelia). No quotes, no explanation. Reply with ONLY the name.`;
 
 // Dynamic escalation: a Clarity conversation that runs long without converging
 // is a "tough" person. Once that trips, the REST of the discovery turns get Opus
@@ -2204,23 +2218,38 @@ let clarityEscalated = false;
 function clarityChatModel() {
   return clarityEscalated ? ANTHROPIC_MODEL_SYNTHESIS : ANTHROPIC_MODEL_CLARITY;
 }
+function clarityDiscoveryOptions(model) {
+  return {
+    model: model,
+    cache: true,
+    clarityOperation: 'clarity.discovery',
+    clarityQuality: model === ANTHROPIC_MODEL_SYNTHESIS ? 'deep' : 'standard'
+  };
+}
 async function callClaude(messages, systemPrompt, options = {}) {
-  // Routing: a personal dev key calls Anthropic directly (local development);
-  // otherwise the call goes through the ai-proxy Edge Function, which holds
-  // the real key server-side. The proxy returns Anthropic's response shape
-  // verbatim, so everything below the fetch is identical for both paths.
+  // A personal key is a local-development escape hatch. Every hosted request
+  // must declare one server-owned lane: free Clarity or paid Action.
   const apiKey = getAnthropicKey();
   let supaUrl = '', supaAnon = '';
   try { supaUrl = window.MEMENTO_SUPABASE_URL || ''; supaAnon = window.MEMENTO_SUPABASE_ANON || ''; } catch (e) {}
   const useProxy = !apiKey && !!supaUrl;
   if (!apiKey && !useProxy) throw new Error('No API key configured');
+  if (options.localOnly && !apiKey) {
+    throw new Error('This developer tool requires a local API key.');
+  }
+  const clarityOperation = String(options.clarityOperation || '');
+  const paidAction = options.paidAction === true;
+  if (useProxy && (!!clarityOperation === paidAction)) {
+    throw new Error('This AI request is missing a valid server route.');
+  }
 
-  // Personalize: prepend the (capped) profile block to the system prompt for
-  // every call. Skipped when options.noProfile is set (e.g. the dev backdoor).
+  // The strict Clarity endpoint owns its prompt and receives profile context
+  // separately. Direct local calls and paid Action calls keep the established
+  // prompt shape.
+  const profileContext = options.noProfile ? '' : buildProfileContext();
   let sys = systemPrompt || '';
-  if (!options.noProfile) {
-    const pc = buildProfileContext();
-    if (pc) sys = sys + '\n\nABOUT THIS PERSON (private context so your replies are personal and specific to them. Never quote it back verbatim or say you were given it):\n' + pc;
+  if (profileContext && (!useProxy || paidAction)) {
+    sys = sys + '\n\nABOUT THIS PERSON (private context so your replies are personal and specific to them. Never quote it back verbatim or say you were given it):\n' + profileContext;
   }
 
   const controller = new AbortController();
@@ -2229,17 +2258,26 @@ async function callClaude(messages, systemPrompt, options = {}) {
 
   try {
     const url = useProxy
-      ? (supaUrl + '/functions/v1/ai-proxy')
+      ? (supaUrl + '/functions/v1/' + (paidAction ? 'action-ai-proxy' : 'clarity-ai-proxy'))
       : 'https://api.anthropic.com/v1/messages';
+    let proxyToken = supaAnon;
+    if (useProxy && paidAction) {
+      try {
+        proxyToken = window.CloudSync && CloudSync.accessToken
+          ? String(CloudSync.accessToken() || '')
+          : '';
+      } catch (e) { proxyToken = ''; }
+      if (!proxyToken) {
+        throw new Error('Sign in to use paid Memento AI.');
+      }
+    }
     const headers = useProxy
       ? {
           'Content-Type': 'application/json',
-          // The anon key is public by design; it only proves "this is our
-          // app". The SECRET Anthropic key lives in the function's env.
-          'Authorization': 'Bearer ' + supaAnon,
+          // Paid Action sends the real user session. Free Clarity remains
+          // anonymous and uses the public app key plus strict server prompts.
+          'Authorization': 'Bearer ' + proxyToken,
           'apikey': supaAnon,
-          // Anonymous device id: the proxy keys its daily rate limits on it
-          // so one scripted device can never drain the shared AI balance.
           'x-memento-device': (typeof Analytics !== 'undefined' && Analytics.deviceId) ? Analytics.deviceId() : 'unknown'
         }
       : {
@@ -2248,12 +2286,9 @@ async function callClaude(messages, systemPrompt, options = {}) {
           'anthropic-version': '2023-06-01',
           'anthropic-dangerous-direct-browser-access': 'true'
         };
-    // Optional features: prompt caching (cache the big system prompt across a
-    // conversation so repeat turns read it cheap) and extended thinking (reason
-    // harder on the hardest calls). Proxy path: send a STRING system + simple
-    // flags; the new proxy applies them and an OLD proxy just ignores the flags
-    // (string system still works, zero breakage). Direct dev path: build the
-    // real Anthropic shapes here.
+    // Direct and paid calls retain the established model controls. Free
+    // Clarity sends no model, prompt, token, caching, or thinking controls;
+    // those are selected by the server from the operation name.
     const wantCache = !!options.cache;
     const wantThinking = (options.thinking && options.thinking.budget_tokens) ? options.thinking : null;
     // v890: options.thinking === 'off' explicitly disables extended thinking.
@@ -2261,7 +2296,14 @@ async function callClaude(messages, systemPrompt, options = {}) {
     // proxy's 8192 output cap and returns a thinking-only empty response.
     const thinkingOff = options.thinking === 'off';
     let reqBody;
-    if (useProxy) {
+    if (useProxy && clarityOperation) {
+      reqBody = {
+        operation: clarityOperation,
+        messages: messages,
+        profile_context: profileContext
+      };
+      if (options.clarityQuality) reqBody.quality = options.clarityQuality;
+    } else if (useProxy) {
       reqBody = {
         model: options.model || ANTHROPIC_MODEL,
         max_tokens: options.maxTokens || 2048,
@@ -2293,6 +2335,7 @@ async function callClaude(messages, systemPrompt, options = {}) {
     if (!response.ok) {
       const errorBody = await response.text();
       if (useProxy && response.status === 404) throw new Error('The AI service is temporarily unavailable. Try again in a moment.');
+      if (paidAction && response.status === 403) throw new Error('Paid Memento access is required for this step.');
       if (response.status === 401) throw new Error('The AI service rejected the request. Try again in a moment.');
       if (response.status === 429) throw new Error('Rate limited. Wait a moment and try again.');
       if (response.status === 529) throw new Error('API is overloaded. Please try again shortly.');
@@ -3387,7 +3430,7 @@ async function sendAiAnswer() {
         try { window._clarityFirstLight = true; } catch (eFL) {}
       }
     } catch (eEsc) {}
-    let response = await callClaude(apiMessages, AI_DISCOVERY_SYSTEM_PROMPT, { model: _turnModel, cache: true });
+    let response = await callClaude(apiMessages, AI_DISCOVERY_SYSTEM_PROMPT, clarityDiscoveryOptions(_turnModel));
     let parsed = parseAiQuestion(response);
 
     // JSON-envelope repair (v578): if the model answered in prose (no JSON found),
@@ -3399,7 +3442,7 @@ async function sendAiAnswer() {
           { role: 'assistant', content: response },
           { role: 'user', content: '[System: Your previous reply broke the contract, it was prose instead of JSON. Resend the SAME content as a single valid JSON object per the RESPONSE FORMAT (question/hint/type/options/progress). Nothing outside the JSON. If it offered choices in prose, use type "choices" with those options.]' }
         ]);
-        const fixed = await callClaude(fixMsgs, AI_DISCOVERY_SYSTEM_PROMPT, { model: _turnModel, cache: true });
+        const fixed = await callClaude(fixMsgs, AI_DISCOVERY_SYSTEM_PROMPT, clarityDiscoveryOptions(_turnModel));
         const reparsed = parseAiQuestion(fixed);
         if (reparsed && !reparsed._fallback) { response = fixed; parsed = reparsed; }
       } catch (eFix) { /* keep the prose fallback, same as pre-v578 behavior */ }
@@ -3417,7 +3460,7 @@ async function sendAiAnswer() {
       const retryMsg = { role: 'user', content: '[System: You just repeated a question you already asked. Ask a completely DIFFERENT question that moves the conversation forward. Do NOT repeat any previous question.]' };
       apiMessages.push({ role: 'assistant', content: response });
       apiMessages.push(retryMsg);
-      response = await callClaude(apiMessages, AI_DISCOVERY_SYSTEM_PROMPT, { model: _turnModel, cache: true });
+      response = await callClaude(apiMessages, AI_DISCOVERY_SYSTEM_PROMPT, clarityDiscoveryOptions(_turnModel));
       parsed = parseAiQuestion(response);
     }
 
@@ -3508,7 +3551,7 @@ async function rephraseAiQuestion() {
     // Add hidden rephrase request (not saved to conversation)
     apiMessages.push({ role: 'user', content: '[I don\'t understand this question. Please rephrase it completely differently using simpler, clearer language. Keep the same question TYPE (if it was "choices" use "choices" again with different/clearer options, if "text" keep "text", if "range" keep "range"). Do NOT ask a brand new question  - rephrase the SAME intent so I can actually answer it. Respond with ONLY a JSON object.]' });
 
-    const response = await callClaude(apiMessages, AI_DISCOVERY_SYSTEM_PROMPT, { model: clarityChatModel(), cache: true });
+    const response = await callClaude(apiMessages, AI_DISCOVERY_SYSTEM_PROMPT, clarityDiscoveryOptions(clarityChatModel()));
     const parsed = parseAiQuestion(response);
 
     // Update current question with rephrased version
@@ -3790,7 +3833,7 @@ async function autoStartAiChat() {
     const response = await callClaude(
       [{ role: 'user', content: context + '\n\n' + buildFirstQuestionInstruction() }],
       AI_DISCOVERY_SYSTEM_PROMPT,
-      { model: ANTHROPIC_MODEL_CLARITY, cache: true }
+      clarityDiscoveryOptions(ANTHROPIC_MODEL_CLARITY)
     );
 
     const parsed = parseAiQuestion(response);
@@ -3890,7 +3933,7 @@ async function triggerSynthesis() {
       // possible. (We used to pass an explicit extended-thinking budget here, but
       // the old `thinking: {type:'enabled', budget_tokens}` shape was retired on
       // this model and returned a 400; Opus's default effort covers it.)
-      { maxTokens: 4096, model: ANTHROPIC_MODEL_SYNTHESIS, cache: true }
+      { maxTokens: 4096, model: ANTHROPIC_MODEL_SYNTHESIS, cache: true, clarityOperation: 'clarity.synthesis' }
     );
 
     // Parse JSON robustly: strip code fences anywhere, then slice from the first
@@ -4057,9 +4100,8 @@ function completeWizard() {
 /* ---- Ignition v2 AI helpers (strict fallbacks, offline-safe) ---- */
 async function sharpenGoalAI(goal) {
   if (typeof hasAnthropicKey === 'function' && !hasAnthropicKey()) return null;
-  const sys = 'You sharpen life goals into exact, verifiable sentences. Rewrite the user goal so a stranger could judge whether it happened: concrete outcome, a number or date when natural. Keep THEIR voice and intent. Maximum 140 characters. Reply with ONLY the rewritten goal sentence, nothing else.';
   try {
-    const out = await callClaude([{ role: 'user', content: 'Goal: ' + String(goal || '').slice(0, 400) }], sys, { maxTokens: 200 });
+    const out = await callClaude([{ role: 'user', content: 'Goal: ' + String(goal || '').slice(0, 400) }], AI_SHARPEN_GOAL_SYSTEM_PROMPT, { maxTokens: 200, clarityOperation: 'clarity.sharpen_goal' });
     const line = String(out || '').replace(/^["'\s]+|["'\s]+$/g, '').split('\n')[0].trim();
     return line && line.length >= 8 ? line.slice(0, 160) : null;
   } catch (e) { return null; }
@@ -4068,9 +4110,8 @@ async function sharpenGoalAI(goal) {
 async function proposeStarNameAI(answers) {
   if (typeof hasAnthropicKey === 'function' && !hasAnthropicKey()) return null;
   const a = answers || {};
-  const sys = 'You name stars for a star registry. Given a person\'s life goal and why it matters, propose ONE short evocative star name: 1-2 words, latinate or celestial in feel (examples of the register: Solara, Vigil, Meridian Prime, Aurelia). No quotes, no explanation. Reply with ONLY the name.';
   try {
-    const out = await callClaude([{ role: 'user', content: 'Goal: ' + String(a.neutronStar || '').slice(0, 200) + '\nWhy: ' + String(a.coreWhy || '').slice(0, 200) }], sys, { maxTokens: 30 });
+    const out = await callClaude([{ role: 'user', content: 'Goal: ' + String(a.neutronStar || '').slice(0, 200) + '\nWhy: ' + String(a.coreWhy || '').slice(0, 200) }], AI_STAR_NAME_SYSTEM_PROMPT, { maxTokens: 30, clarityOperation: 'clarity.star_name' });
     const name = String(out || '').replace(/^["'\s]+|["'\s]+$/g, '').split('\n')[0].trim();
     return name && name.length >= 3 && name.length <= 40 ? name : null;
   } catch (e) { return null; }
@@ -4105,7 +4146,7 @@ window.runVoiceGolden = async function (mode) {
       text = await callClaude(
         [{ role: 'user', content: 'Voice test. Scenario: ' + sc + ' Reply with EXACTLY what you would say to the user, one line, no JSON, no commentary.' }],
         AI_DISCOVERY_SYSTEM_PROMPT,
-        { maxTokens: 200, noProfile: true, model: model, _voiceRetry: true }
+        { maxTokens: 200, noProfile: true, model: model, _voiceRetry: true, localOnly: true }
       );
       hits = voiceLint(text);
     } catch (e) { text = 'ERROR: ' + e.message; hits = ['call failed']; }

@@ -935,7 +935,7 @@ Rewrite it now. Different wording, same meaning, same voice. Return only the new
         const text = await callClaude(
           [{ role: 'user', content: 'Rephrase it.' }],
           sys,
-          { maxTokens: 220, timeout: 20000 }
+          { maxTokens: 220, timeout: 20000, localOnly: true }
         );
         const clean = (text || '').trim().replace(/^["']|["']$/g, '');
         if (clean) {

@@ -34,7 +34,14 @@ const ClarityPaywall = {
 
   // Has the user paid / been granted everything?
   isPaid() {
-    try { return !!(state.entitlements && state.entitlements.isPaid); } catch (e) { return false; }
+    try {
+      // Official demos may imitate the paid UI, but server-side billing still
+      // decides whether any paid AI request is authorized.
+      if (typeof DEMO_MODE !== 'undefined' && DEMO_MODE) return true;
+      return !!(window.PolarBilling
+        && PolarBilling.hasVerifiedAccess
+        && PolarBilling.hasVerifiedAccess());
+    } catch (e) { return false; }
   },
 
   // Modules other than Clarity are locked once Clarity is done and they have not
@@ -226,7 +233,7 @@ const ClarityPaywall = {
 
   // Checkout never grants access directly. The billing bridge sends the user
   // to Polar, then calls _applyVerifiedUnlock only after the server confirms
-  // the sandbox purchase belongs to this signed-in account.
+  // the purchase belongs to this signed-in account.
   _unlock() {
     const picked = document.querySelector('#clarityPaywall [data-plan].is-picked');
     const plan = picked ? (picked.getAttribute('data-plan') || 'founder') : 'founder';
@@ -239,14 +246,8 @@ const ClarityPaywall = {
 
   _applyVerifiedUnlock(access) {
     try {
-      if (!state.entitlements) state.entitlements = { isPaid: false, paidAt: null, plan: '' };
-      state.entitlements.isPaid = true;
-      state.entitlements.paidAt = state.entitlements.paidAt || Date.now();
-      state.entitlements.plan = access && access.plan ? access.plan : state.entitlements.plan;
-      state.entitlements.source = 'polar_sandbox';
-      state.entitlements.verifiedAt = Date.now();
-      if (typeof persistNow === 'function') persistNow();
-      try { if (typeof Analytics !== 'undefined') Analytics.track('paywall_unlock', { plan: state.entitlements.plan }); } catch (e) {} // Funnel
+      const plan = access && access.plan ? access.plan : '';
+      try { if (typeof Analytics !== 'undefined') Analytics.track('paywall_unlock', { plan }); } catch (e) {} // Funnel
       try { window.MementoPush && MementoPush.sync(); } catch (e) {} // reminder context: now paid
     } catch (e) {}
     this.hide();

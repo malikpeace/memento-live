@@ -31,6 +31,15 @@
   function isDemo() {
     try { return typeof DEMO_MODE !== 'undefined' && DEMO_MODE; } catch (e) { return false; }
   }
+  function hasVerifiedPaidAccess() {
+    try {
+      return !!(window.ClarityPaywall
+        && ClarityPaywall.isPaid
+        && ClarityPaywall.isPaid());
+    } catch (e) {
+      return false;
+    }
+  }
   function supported() {
     return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
   }
@@ -63,7 +72,7 @@
       move: null, dayDone: null,
       paid: false, clarity: false
     };
-    try { c.paid = !!(state.entitlements && state.entitlements.isPaid); } catch (e) {}
+    c.paid = hasVerifiedPaidAccess();
     try { c.clarity = !!(state.clarity && state.clarity.completed); } catch (e) {}
     try {
       var pa = (state.action && state.action.primaryAction) || {};
@@ -201,8 +210,7 @@
   }
 
   function cardCopy() {
-    var paid = false;
-    try { paid = !!(state.entitlements && state.entitlements.isPaid); } catch (e) {}
+    var paid = hasVerifiedPaidAccess();
     if (paid) {
       return {
         title: 'Get your move each morning',
@@ -310,8 +318,7 @@
     if (FORCE) { setTimeout(showCard, 900); return; }
     setTimeout(function () {
       if (!eligible()) return;
-      var paid = false, hasWhite = false;
-      try { paid = !!(state.entitlements && state.entitlements.isPaid); } catch (e) {}
+      var paid = hasVerifiedPaidAccess(), hasWhite = false;
       try { hasWhite = !!(state.action && state.action.completionHistory && state.action.completionHistory.length); } catch (e) {}
       if (paid && !hasWhite) return; // buyer mid-first-minute: the ceremony hook owns it
       offerCard();

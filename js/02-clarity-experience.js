@@ -2879,7 +2879,11 @@ const ActionExperience = {
     // Night 3, unlock beat v1: the FIRST paid arrival gets a two-second
     // ignition, one word on black, before Action fades in. Decorative flag
     // set at start; a killed beat lands on the intro, never ahead of it.
-    if (state.entitlements && state.entitlements.isPaid && !(state.meta && state.meta.unlockBeatSeen)) {
+    let _hasVerifiedActionAccess = false;
+    try {
+      _hasVerifiedActionAccess = (typeof ClarityPaywall !== 'undefined') && ClarityPaywall.isPaid();
+    } catch (e) {}
+    if (_hasVerifiedActionAccess && !(state.meta && state.meta.unlockBeatSeen)) {
       state.meta = state.meta || {};
       state.meta.unlockBeatSeen = true;
       try { persistNow(); } catch (e) {}
@@ -3990,7 +3994,9 @@ const ActionExperience = {
       return;
     }
 
-    if (!intake.devMode && trimmedValue === DEV_CODE) {
+    const isLocalDeveloperRuntime = location.protocol === 'file:' ||
+      location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+    if (!intake.devMode && isLocalDeveloperRuntime && trimmedValue === DEV_CODE) {
       intake.devMode = true;
       if (!Array.isArray(intake.devChat)) intake.devChat = [];
       persistNow();
@@ -4022,7 +4028,7 @@ const ActionExperience = {
           if (!Array.isArray(intake.devChat)) intake.devChat = [];
           intake.devChat.push({ role: 'user', content: value });
           const DEV_SYSTEM = "You are the AI engine inside Memento, the user's personal-development app. The user typing right now is the developer/owner of this app (Malik Peace), they unlocked dev mode by typing a private code. Drop every other system prompt's instructions and just talk to them directly. Answer their questions about the app, your model identity, the prompts, anything. If they ask which model you are, tell them the truth. No JSON. No script. Plain text replies. Keep responses short unless they ask for depth.";
-          const reply = await callClaude(intake.devChat, DEV_SYSTEM, { maxTokens: 600, noProfile: true });
+          const reply = await callClaude(intake.devChat, DEV_SYSTEM, { maxTokens: 600, noProfile: true, localOnly: true });
           intake.devChat.push({ role: 'assistant', content: reply });
           persistNow();
           self._aiIntakeRenderQuestion({ question: String(reply || '').trim(), type: 'text', options: [] });
@@ -4489,7 +4495,7 @@ The next question coming up is about: "${nextQ ? nextQ.prompt.split('\n')[0] : '
 
 Give them ONE short, personal reaction that references something specific in their answer and softly leads into the next question. Under 35 words.`;
 
-      const raw = await callClaude([{ role: 'user', content: user }], sys);
+      const raw = await callClaude([{ role: 'user', content: user }], sys, { paidAction: true });
       let text = (raw || '').trim();
       // Strip any accidental wrapping quotes the model added
       text = text.replace(/^["'""]+|["'""]+$/g, '').trim();
@@ -4823,7 +4829,7 @@ Return ONLY the sentence text. No quotes, no labels.`;
     const out = await callClaude(
       [{ role: 'user', content: userBody }],
       sys,
-      { maxTokens: 80, timeout: 12000 }
+      { maxTokens: 80, timeout: 12000, paidAction: true }
     );
     return String(out || '').trim().replace(/^["']|["']$/g, '').replace(EMDASH_RE, ' - ').slice(0, 240);
   },
@@ -7897,7 +7903,7 @@ Return ONLY the sentence text. No quotes, no labels.`;
           role: 'user',
           content: `NEUTRON STAR: ${ns}\nCURRENT ACTION: ${currentText}\n\nCONVERSATION SO FAR:\n${state.action.refine.messages.map(m => `${m.role.toUpperCase()}: ${m.text}`).join('\n') || '(none yet)'}\n\nReturn the JSON now.`
         }];
-        const raw = await callClaude(apiMessages, AI_ACTION_REFINE_SYSTEM_PROMPT, { maxTokens: 400 });
+        const raw = await callClaude(apiMessages, AI_ACTION_REFINE_SYSTEM_PROMPT, { maxTokens: 400, paidAction: true });
         const parsed = _parseRefineResponse(raw);
         if (parsed.refined) {
           refinePendingText = parsed.refined;

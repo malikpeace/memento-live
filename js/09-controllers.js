@@ -4445,11 +4445,15 @@ const TabBar = {
   // v800 sweep: prefs.unlockAll NO LONGER counts as paid here. It is the
   // module-noise ladder escape hatch, and the More-sheet "Unlock everything"
   // button let a FREE user flip it and walk straight into Do/Reflect. Paid
-  // status comes only from entitlements (or the console-only dev preview).
+  // status comes only from the server-verified billing receipt. The dev
+  // preview remains available on local/sandbox surfaces, never production.
   _unlocked() {
     try {
-      if (state.entitlements && state.entitlements.isPaid) return true;
-      if (state.dev && state.dev.previewAll) return true;
+      if (typeof ClarityPaywall !== 'undefined' && ClarityPaywall.isPaid()) return true;
+      const previewSurface = location.protocol === 'file:'
+        || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)
+        || new URLSearchParams(location.search).get('billing') === 'sandbox';
+      if (previewSurface && state.dev && state.dev.previewAll) return true;
     } catch (e) {}
     return false;
   },
@@ -5468,8 +5472,11 @@ const TabBar = {
       // v801 (Malik): paid users see their PLAN here, not the storage detail.
       let plan = '';
       try {
-        if (state.entitlements && state.entitlements.isPaid) {
-          const p = state.entitlements.plan || '';
+        const access = window.PolarBilling && PolarBilling.currentAccess
+          ? PolarBilling.currentAccess()
+          : null;
+        if (access && access.active) {
+          const p = access.plan || '';
           plan = (p === 'monthly') ? 'Pro &middot; monthly'
             : (p === 'yearly') ? 'Pro &middot; yearly'
             : 'Founder plan';
