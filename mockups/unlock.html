@@ -752,6 +752,11 @@
      outline, including the notch. Every look sets its own four vars. */
   /* specificity note: the app's .daycard-wrap.daycard--bright rule is 0,3,1 and
      was out-ranking a plain .cer .daycard-ns__emblem, so this matches it. */
+  /* obsidian runs the app's real theme-light, whose own emblem rule carries an
+     extra element in the selector and was beating this one: on that look alone
+     the mark kept the app's flat fill and, worse, its filter, which is the
+     rectangle-shadow bug again. Both selectors are matched here. */
+  html.theme-light .cer .daycard-wrap.daycard--bright .daycard-ns__emblem,
   .cer .daycard-wrap.daycard--bright .daycard-ns__emblem {
     /* THE FACE IS GLASS, and it is not a colour I chose. The element is clipped
        to the mark's own polygon and given a backdrop-filter, so what fills the M
@@ -773,10 +778,17 @@
     stroke:url(#mEdge);
     stroke-width:6;
     stroke-linejoin:round;
-    /* depth only: zero offset, so nothing can read as a duplicate */
+    /* NO filter on this element. filter is applied BEFORE clip-path, so a
+       drop-shadow here casts a shadow of the backdrop-filter's full RECTANGLE,
+       and the clip then cuts that rectangle down to the M, leaving its top edge
+       drawn straight across the mark. That was the line. The glow goes on the
+       parent instead, where it sees the already-clipped M and follows its real
+       outline. */
+    filter:none; }
+  .cer .daycard-wrap.daycard--bright .daycard-ns__body {
     filter:
       drop-shadow(0 0 5px var(--m-cool, rgb(var(--fl, 226,240,255))))
-      drop-shadow(0 1.5px 3px rgba(0,0,0,.55)); }
+      drop-shadow(0 1.5px 3px rgba(0,0,0,.5)); }
 
   /* THE ADAPTIVE HALF. On the looks whose face floods bright, a light mark is
      white-on-white and disappears, so those flip to a dark material with the
