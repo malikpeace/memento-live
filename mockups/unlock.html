@@ -1477,19 +1477,36 @@
   function pinMark(){
     var em = card.querySelector('.daycard-ns__emblem'), svg = wm.querySelector('svg');
     if (!em || !svg) return;
-    /* Measured against the CARD, not the stage. The card breathes (an 8s +-9px
-       drift once it is lit) and the overlay mirrors that breathing itself, so
-       measuring from the stage baked the current breath into a static offset
-       and then added the breath again on top: the two marks sat 8.4px apart at
-       the exact moment they cross-fade, which reads as a doubled M. The card
-       and the emblem breathe together, so their difference is breath-free. */
-    var e = em.getBoundingClientRect(), c = card.getBoundingClientRect();
-    if (!e.width || !c.width) return;
-    var k = 320 / c.width;                        // undo whatever scale is live
-    svg.style.left   = ((e.left - c.left) * k).toFixed(2) + 'px';
-    svg.style.top    = ((e.top  - c.top)  * k).toFixed(2) + 'px';
-    svg.style.width  = (e.width  * k).toFixed(2) + 'px';
-    svg.style.height = (e.height * k).toFixed(2) + 'px';
+    /* NEVER measure the svg itself. iOS includes a filter's extent in an SVG
+       element's getBoundingClientRect, and the app's emblem carries three
+       drop-shadows including a 22px bloom, so Safari returned very nearly the
+       whole card: the mark got pinned at 320px wide at offset 0 instead of
+       124px at 98,152, and the whiteout showed a mark two and a half times too
+       big, floating high. Chromium returns the tight CSS box, which is why it
+       measured clean in the preview and broke on the phone.
+       So: the SIZE comes from computed style (layout, filters excluded) and the
+       POSITION from the emblem's parent, a plain div with no filter on it. The
+       emblem is the only child of a centring flex column, so its offset inside
+       that div is exact rather than assumed. */
+    var body = em.parentNode;
+    var w = parseFloat(getComputedStyle(em).width), h = parseFloat(getComputedStyle(em).height);
+    var cw = parseFloat(getComputedStyle(card).width), ch = parseFloat(getComputedStyle(card).height);
+    var cr = card.getBoundingClientRect(), br = body.getBoundingClientRect();
+    if (!w || !h || !cw || !cr.width || !br.width) return;
+    var k = cw / cr.width;                        // undo whatever scale is live
+    var x = (br.left - cr.left) * k + (br.width  * k - w) / 2;
+    var y = (br.top  - cr.top)  * k + (br.height * k - h) / 2;
+    /* and if any of that comes back outside the card, keep the stylesheet's
+       values, which are the app's own numbers and always correct */
+    /* The invariant the phone violated: the mark is a mark, never more than a
+       fraction of the card. Anything bigger than that is a bad measurement, not
+       a bigger emblem. */
+    if (w > cw * 0.6 || h > ch * 0.6) return;
+    if (!(x >= 0 && y >= 0 && x + w <= cw + 1 && y + h <= ch + 1)) return;
+    svg.style.left   = x.toFixed(2) + 'px';
+    svg.style.top    = y.toFixed(2) + 'px';
+    svg.style.width  = w.toFixed(2) + 'px';
+    svg.style.height = h.toFixed(2) + 'px';
   }
 
   var LITE = /[?&]lite=1/.test(location.search);
