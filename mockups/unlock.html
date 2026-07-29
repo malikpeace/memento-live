@@ -801,28 +801,36 @@
   .cer__caustic { position:absolute; inset:0; z-index:5; opacity:0; pointer-events:none;
     background:
       radial-gradient(ellipse 166% 148% at 132% 132%,
-        transparent 54.6%,
-        rgba(140,16,4,.55) 55.6%,
-        rgba(255,58,6,1) 56.8%,
-        rgba(255,132,14,1) 58.2%,
-        rgba(255,198,72,1) 59.5%,
-        rgba(255,248,220,1) 60.7%,
+        transparent 53.5%,
+        rgba(120,12,4,.5) 54.6%,
+        rgba(255,52,6,1) 56%,
+        rgba(255,124,10,1) 57.6%,
+        rgba(255,190,60,1) 59.2%,
+        rgba(255,246,214,1) 60.6%,
         rgba(255,255,255,1) 61.4%,
-        rgba(186,242,255,1) 62.2%,
-        rgba(36,198,255,1) 63.2%,
-        rgba(20,100,255,1) 64.4%,
-        rgba(52,26,210,.6) 66%,
-        rgba(16,6,60,.2) 68%,
-        transparent 72%),
+        rgba(178,240,255,1) 62.2%,
+        rgba(30,192,255,1) 63.1%,
+        rgba(16,92,255,.9) 64.1%,
+        rgba(44,22,200,.45) 65.4%,
+        transparent 67.5%),
       radial-gradient(ellipse 166% 148% at 132% 132%,
-        transparent 69%,
-        rgba(255,110,16,.30) 70.2%,
-        rgba(255,255,255,.44) 71.1%,
-        rgba(54,186,255,.30) 72.2%,
-        transparent 74%);
-    /* barely trims: it only softens the two ends, it does not shape the blade */
-    -webkit-mask:radial-gradient(ellipse 170% 160% at 38% 104%, #000 46%, rgba(0,0,0,.9) 74%, transparent 96%);
-            mask:radial-gradient(ellipse 170% 160% at 38% 104%, #000 46%, rgba(0,0,0,.9) 74%, transparent 96%); }
+        transparent 68.5%,
+        rgba(255,104,14,.28) 69.8%,
+        rgba(255,255,255,.4) 70.7%,
+        rgba(48,180,255,.28) 71.8%,
+        transparent 73.6%);
+    /* THE TAPER. A radial band is the same width everywhere, which is exactly
+       what made it read as a rainbow rather than a blade. A conic mask around
+       the SAME centre varies alpha along the arc, so the light can be a faint
+       tail at one end and a broad flare at the other. Seen from that centre the
+       card spans roughly 285deg to 346deg, so the whole taper lives in that
+       window; aim it anywhere else and the blade vanishes entirely. */
+    -webkit-mask:conic-gradient(from 0deg at 132% 132%,
+      rgba(0,0,0,0) 276deg, rgba(0,0,0,.28) 292deg, rgba(0,0,0,.72) 308deg,
+      #000 326deg, #000 344deg, rgba(0,0,0,.55) 352deg, rgba(0,0,0,0) 358deg);
+            mask:conic-gradient(from 0deg at 132% 132%,
+      rgba(0,0,0,0) 276deg, rgba(0,0,0,.28) 292deg, rgba(0,0,0,.72) 308deg,
+      #000 326deg, #000 344deg, rgba(0,0,0,.55) 352deg, rgba(0,0,0,0) 358deg); }
   .cer__caustic--glow { z-index:4; filter:blur(16px) saturate(1.5); }
   .cer.look-caustic.lit .cer__caustic, .cer.look-caustic.back .cer__caustic { opacity:var(--act, 0); }
   .cer.look-caustic.lit .cer__caustic--glow, .cer.look-caustic.back .cer__caustic--glow {
@@ -863,18 +871,28 @@
       #3fb4ff 248deg, #9adcff 286deg, #ffffff 322deg, #ffffff 360deg); }
   .cer.look-caustic .cer__ring--glow { opacity:calc(var(--act,0) * .8); }
   .cer.look-caustic .cer__edge {
-    box-shadow:0 0 7px rgba(255,255,255,.55), 0 0 40px rgba(160,200,255,.22), 0 0 140px rgba(255,150,60,.14); }
+    box-shadow:
+      0 0 8px rgba(255,255,255,.85),
+      0 0 30px rgba(255,150,60,.42),
+      0 0 90px rgba(255,90,30,.28),
+      0 0 190px rgba(40,110,255,.20); }
+  /* the room takes the two temperatures too, cold wall on the left, hot on the
+     right, which is what stops the card floating in a void */
   .cer.look-caustic .cer__glow {
-    background:radial-gradient(circle, rgba(120,170,255,.14) 0%, rgba(255,140,60,.07) 34%, transparent 66%); }
+    background:
+      radial-gradient(ellipse 60% 70% at 22% 46%, rgba(30,90,255,.28), transparent 62%),
+      radial-gradient(ellipse 60% 70% at 80% 44%, rgba(255,70,20,.26), transparent 62%),
+      radial-gradient(circle, rgba(120,150,255,.10) 0%, transparent 62%); }
   /* the ground takes both temperatures, the way the render throws them */
+  /* two vivid streaks running down the floor, the way the render throws them */
   .cer.look-caustic .cer__floor {
     background:
       radial-gradient(ellipse 15% 1.7% at 50% 3%, rgba(255,255,255,1), rgba(255,255,255,0) 62%),
-      radial-gradient(ellipse 24% 5% at 32% 3%, rgba(70,160,255,.78), rgba(70,160,255,0) 74%),
-      radial-gradient(ellipse 24% 5% at 68% 3%, rgba(255,140,40,.78), rgba(255,140,40,0) 74%),
-      radial-gradient(ellipse 22% 36% at 34% 9%, rgba(60,150,255,.34), rgba(60,150,255,0) 76%),
-      radial-gradient(ellipse 22% 36% at 66% 9%, rgba(255,130,40,.34), rgba(255,130,40,0) 76%),
-      radial-gradient(ellipse 74% 50% at 50% 4%, rgba(140,140,255,.10), rgba(140,140,255,0) 78%); }
+      radial-gradient(ellipse 20% 4.5% at 30% 3%, rgba(40,140,255,.95), rgba(40,140,255,0) 74%),
+      radial-gradient(ellipse 20% 4.5% at 70% 3%, rgba(255,120,20,.95), rgba(255,120,20,0) 74%),
+      radial-gradient(ellipse 15% 44% at 31% 12%, rgba(30,120,255,.55), rgba(30,120,255,0) 74%),
+      radial-gradient(ellipse 15% 44% at 69% 12%, rgba(255,110,20,.55), rgba(255,110,20,0) 74%),
+      radial-gradient(ellipse 70% 46% at 50% 4%, rgba(120,120,255,.12), rgba(120,120,255,0) 78%); }
 
   /* ---- the old version, kept only so the two can be compared side by side ---- */
   .cer.legacy { perspective:1600px; perspective-origin:50% 40%; }
