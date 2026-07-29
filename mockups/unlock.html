@@ -339,8 +339,6 @@
   .cer.look-obsidian .daycard-ns {
     background:linear-gradient(165deg, rgba(16,19,23,.97), rgba(26,30,36,.94) 48%, rgba(12,14,18,.97));
     box-shadow:inset 0 1px 0 rgba(255,255,255,.14), 0 26px 60px rgba(24,32,48,.26); }
-  .cer.look-obsidian { --m-a:rgba(240,246,255,.30); --m-b:rgba(210,224,244,.18); --m-c:rgba(180,200,224,.12);
-    --m-cool:rgba(170,205,245,.92); --m-warm:rgba(236,242,252,.8); }
   .cer.look-obsidian .daycard-ns__name { color:rgba(255,255,255,.72); }
   /* it has to STAY black. The flood would wash it silver, so the wash and the
      white act blob are held right down and the reward moves to the edge. */
@@ -609,8 +607,6 @@
     background:linear-gradient(165deg, rgba(255,255,255,.030), rgba(255,255,255,.006) 48%, rgba(255,255,255,.016)); }
   .cer.look-prism .daycard-ns__iri { opacity:.04; }
   .cer.look-prism .daycard-ns__sheen { opacity:.14; }
-  .cer.look-prism { --m-a:rgba(236,242,255,.30); --m-b:rgba(200,214,246,.18); --m-c:rgba(150,170,220,.12);
-    --m-cool:rgba(150,190,255,.98); --m-warm:rgba(255,150,70,.95); }
 
   /* the corner colour, kept to a trace */
   .cer.look-prism .daycard-theme-living .blob.b1 {
@@ -737,70 +733,14 @@
 
   /* on a platinum face the light mark vanishes, so aurora takes the dark one */
 
-  /* ================= THE MARK =================================================
-     The M was a flat fill, which is why it read as a sticker on every look. It
-     is now a lit object, three things stacked:
-       1. a gradient FACE (the SVG defs above), bright where the light is and
-          falling off away from it, so the shape has a direction;
-       2. a BEVEL, two zero-blur drop-shadows a fraction of a pixel apart, one
-          light on the lit side and one dark under the opposite edge. Zero blur
-          is what makes it an edge and not a glow;
-       3. RIM LIGHT, two coloured drop-shadows offset toward the light sources
-          in the room, cool from one side and warm from the other, so the mark
-          picks up the same colours the card does.
-     drop-shadow follows the alpha shape, so all of it hugs the M's real
-     outline, including the notch. Every look sets its own four vars. */
-  /* specificity note: the app's .daycard-wrap.daycard--bright rule is 0,3,1 and
-     was out-ranking a plain .cer .daycard-ns__emblem, so this matches it. */
-  /* obsidian runs the app's real theme-light, whose own emblem rule carries an
-     extra element in the selector and was beating this one: on that look alone
-     the mark kept the app's flat fill and, worse, its filter, which is the
-     rectangle-shadow bug again. Both selectors are matched here. */
-  html.theme-light .cer .daycard-wrap.daycard--bright .daycard-ns__emblem,
-  .cer .daycard-wrap.daycard--bright .daycard-ns__emblem {
-    /* THE FACE IS GLASS, and it is not a colour I chose. The element is clipped
-       to the mark's own polygon and given a backdrop-filter, so what fills the M
-       is whatever the card is doing behind it, blurred and pushed: the blade,
-       the flood, their Clarity colour. Change the look and the mark changes with
-       it because it is sampling, not repeating a value.
-       The gradient fill on top is translucent, so it shades the glass rather
-       than hiding it. */
-    fill:url(#mFace);
-    clip-path:polygon(29.3% 28.5%, 50% 49.2%, 70.7% 28.5%, 70.7% 71.5%, 29.3% 71.5%);
-    /* The sample has to SHIFT what it reads or the mark is the same colour as
-       the card and disappears, which is exactly what happened on platinum. On a
-       dark card it brightens, on a bright card it darkens. Still sampled, still
-       dynamic, but always separated from what is behind it. */
-    -webkit-backdrop-filter:var(--m-bd, blur(5px) saturate(1.8) brightness(1.35));
-            backdrop-filter:var(--m-bd, blur(5px) saturate(1.8) brightness(1.35));
-    /* the lit edge runs along the outline itself. Offsetting a shadow to fake it
-       is what produced a visible second M. */
-    stroke:url(#mEdge);
-    stroke-width:6;
-    stroke-linejoin:round;
-    /* NO filter on this element. filter is applied BEFORE clip-path, so a
-       drop-shadow here casts a shadow of the backdrop-filter's full RECTANGLE,
-       and the clip then cuts that rectangle down to the M, leaving its top edge
-       drawn straight across the mark. That was the line. The glow goes on the
-       parent instead, where it sees the already-clipped M and follows its real
-       outline. */
-    filter:none; }
-  .cer .daycard-wrap.daycard--bright .daycard-ns__body {
-    filter:
-      drop-shadow(0 0 5px var(--m-cool, rgb(var(--fl, 226,240,255))))
-      drop-shadow(0 1.5px 3px rgba(0,0,0,.5)); }
-
-  /* THE ADAPTIVE HALF. On the looks whose face floods bright, a light mark is
-     white-on-white and disappears, so those flip to a dark material with the
-     highlight on the lit edge instead. Same rule the app already follows with
-     its own mark; these are the looks that need it. */
-  .cer.look-platinum, .cer.look-bronze, .cer.look-chroma,
-  .cer.look-rainbow, .cer.look-wild, .cer.look-aurora {
-    --m-a:rgba(14,24,34,.46); --m-b:rgba(26,40,54,.34); --m-c:rgba(40,56,72,.22);
-    --m-bd:blur(5px) saturate(1.5) brightness(0.52); }
-
-  /* the remaining looks take their own two temperatures */
-  .cer.look-ember   { --m-a:rgba(255,238,208,.26); --m-b:rgba(226,168,110,.16); --m-c:rgba(150,70,30,.10); }
+  /* THE MARK IS THE APP'S OWN, UNTOUCHED.
+     I tried making it a lit object: a gradient face, a bevel, then glass that
+     sampled the card behind it with a stroked edge. Malik's call, and he is
+     right: it read as mediocre, and on the one element that IS Memento that is
+     worse than plain. Every override is gone, so the mark renders exactly as
+     the app renders it, including the app's own adaptive dark/light treatment.
+     If it is ever revisited it should be a different idea, not a better version
+     of that one. */
 
   /* ================= THE FACE =================================================
      Answering "is a dot in the middle the best we've got". Four treatments that
@@ -921,8 +861,6 @@
   .cer.look-caustic .daycard-theme-living .blob.b4,
   .cer.look-caustic .daycard-theme-living .blob.b5,
   .cer.look-caustic .daycard-theme-living .blob.b6 { opacity:0; }
-  .cer.look-caustic { --m-a:rgba(226,240,255,.26); --m-b:rgba(150,170,200,.14); --m-c:rgba(120,96,86,.10);
-    --m-cool:rgba(96,196,255,.98); --m-warm:rgba(255,150,40,.98); }
 
   /* the rim agrees with the blade: white across the top, running hot down the
      right where the light leaves, cool along the lower-left where it enters */
@@ -1107,24 +1045,6 @@
                   <span class="cer__caustic" aria-hidden="true"></span>
                   <div class="daycard-ns__body">
                     <svg class="daycard-ns__emblem" viewBox="0 0 512 512" aria-hidden="true">
-                      <!-- the mark's own material: a two-stop face so it reads as
-                           a surface catching light rather than a flat fill. The
-                           stops are CSS vars, so every look tints its own. -->
-                      <defs>
-                        <linearGradient id="mFace" x1="0.12" y1="0" x2="0.78" y2="1">
-                          <stop offset="0"   stop-color="var(--m-a, rgba(255,255,255,.72))"></stop>
-                          <stop offset="0.46" stop-color="var(--m-b, rgba(255,255,255,.42))"></stop>
-                          <stop offset="1"   stop-color="var(--m-c, rgba(255,255,255,.24))"></stop>
-                        </linearGradient>
-                        <!-- the edge light: it runs ALONG the outline, cool where
-                             the light comes from, warm where it leaves. This is
-                             what a lit edge is; an offset shadow is a second M. -->
-                        <linearGradient id="mEdge" x1="0.1" y1="0" x2="0.9" y2="1">
-                          <stop offset="0"    stop-color="var(--m-cool, rgb(var(--fl, 226,240,255)))"></stop>
-                          <stop offset="0.42" stop-color="rgba(255,255,255,.98)"></stop>
-                          <stop offset="1"    stop-color="var(--m-warm, rgb(var(--fl2, 150,196,255)))"></stop>
-                        </linearGradient>
-                      </defs>
                       <path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path>
                     </svg>
                   </div>
