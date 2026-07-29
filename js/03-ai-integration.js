@@ -469,8 +469,10 @@ Every reply includes "act": 1, 2, or 3 (which act the conversation is in). The A
 
 You have THREE question types to choose from. Pick the best one for each question:
 
-1. OPEN TEXT (default): {"question": "...", "hint": "...", "type": "text"}
-   Use when you need them to explain something in their own words. Good for "why" questions.
+MULTIPLE CHOICE IS THE STRONG DEFAULT (Malik, 2026-07-29: typing paragraphs over and over is the number one drop-off risk). Every question ships as "choices" unless the answer genuinely cannot be optioned. The UI adds "My own answer" and "I don't know" under every choices question automatically, so nobody is ever boxed in; your options just need to cover the LIKELY answers. Reserve "text" for the few moments that must be in their own words: their goal statement itself, a reword they asked for, and the one or two emotional-core questions where any option you wrote would put words in their mouth.
+
+1. OPEN TEXT (rare, see above): {"question": "...", "hint": "...", "type": "text"}
+   Only when their own words ARE the answer.
 
 2. MULTIPLE CHOICE: {"question": "...", "hint": "...", "type": "choices", "options": ["Option A", "Option B", "Option C", "Option D"]}
    Use when there are clear distinct paths to choose from. Great for narrowing down what they mean. ALWAYS give exactly 4 options. No more, no less. Each option must be clearly different from the others with no overlap. Keep each option short (under 10 words). The UI automatically adds a "My own answer" text field below every multiple choice question.
@@ -506,6 +508,7 @@ Progress gating:
 
 RULES:
 - ONE question at a time. Keep questions under 30 words. Conversational.
+- EVERY QUESTION MUST OBVIOUSLY SERVE FINDING THEIR #1 GOAL, at a glance, to a casual user. Before asking anything, check: would a stranger instantly see why this question helps pin down what they want most? If not, cut it or reframe it. NEVER ask biography or curiosity questions: how they learned about a topic, who influenced them, what their thinking was like before and after a shift, where an interest came from. Those read as a survey, feel like homework, and people close the app. History is only worth one question when it directly changes what the goal IS, and even then ask about the goal, not the history.
 - NEVER say "which of these" or "pick one" in a text question. If your question implies choosing from options, you MUST use type "choices" and include the actual options array. A text box with "which of these" and no options is broken.
 - Hints are 1 short sentence. Real, not generic. In your voice.
 - ALWAYS include a "progress" integer 0-100 in every response. This represents how close you are to having enough understanding to synthesize their Neutron Star. Calibrate it: 0-25 = still surfacing the WHAT, 25-55 = exploring the WHY, 55-80 = pressure-testing and finding the emotional core, 80-95 = circling the summary and confirming, 100 = ready. The bar should creep up steadily across the conversation. Never decrease it. Never jump from 30 to 90 in one question.
@@ -885,9 +888,9 @@ CRITICAL RULES:
 INPUT TYPE, STRICT RULES:
 You pick the input type for each turn. Pick the right one or the user gets frustrated.
 
-- "text": DEFAULT. Use this for almost every question, including the timeframe question. Let the user type their own answer.
-- "choices": ONLY for binary or trinary branching/confirmation questions with 2-4 mutually exclusive options that cover the FULL space (e.g. "Yeah, that's it" / "Let me reword it"). If the user could plausibly answer with something outside your options, use text instead.
-- "chips": DO NOT USE THIS. Always use "text" for timeframe and any other freeform answer. The user wants to type.
+- "choices": THE STRONG DEFAULT (Malik: typing paragraphs is the top drop-off risk). 2-4 short, concrete, genuinely likely options; the UI adds an own-answer field under them automatically, so options only need to cover the LIKELY answers, never the full space.
+- "chips": for questions whose likely answers are short tokens (time budgets, frequencies). The UI adds an own-answer field here too.
+- "text": only when their own words ARE the answer (their move stated in their words, a personal why no option should put in their mouth).
 
 If you ever feel tempted to use chips or render a list of options for an open question (timeframe, past progress, main move), STOP and use "text" instead.
 - "ready": true ONLY when ALL four snapshot fields are filled with substance you've judged. Do NOT set ready early. Do NOT set ready if any field is empty.
@@ -1806,10 +1809,23 @@ async function generateActionDraft(options = {}) {
 
   try {
     const summary = normalizeClaritySummary(state.clarity.answers);
-    // v1009: 12 messages was a keyhole into an entire conversation. 40 keeps
-    // the arc of how they got to the star, not just the closing exchange.
-    const tail = (state.clarity.answers.aiConversation || []).slice(-40)
-      .map(m => (m.role === 'user' ? 'User: ' : 'Coach: ') + m.content).join('\n');
+    // v1012: the tail is capped by CHARACTERS, not just message count. v1009
+    // widened it from 12 to 40 messages with no size bound, and a long real
+    // Clarity conversation pushed the whole request past the proxy's body
+    // limit (413 content_too_large, caught by Malik mid-test). Newest
+    // messages win; older ones drop first. 12k chars is roughly 25-35 real
+    // messages and keeps the arc without ever sinking the request.
+    const TAIL_CHAR_CAP = 12000;
+    const _msgs = (state.clarity.answers.aiConversation || []).slice(-40);
+    const _lines = [];
+    let _tailChars = 0;
+    for (let i = _msgs.length - 1; i >= 0; i--) {
+      const line = (_msgs[i].role === 'user' ? 'User: ' : 'Coach: ') + _msgs[i].content;
+      if (_tailChars + line.length > TAIL_CHAR_CAP) break;
+      _lines.unshift(line);
+      _tailChars += line.length + 1;
+    }
+    const tail = _lines.join('\n');
     // Action intake answers - the short chat the user just completed.
     // Bake these into the prompt so the plan is grounded in what they
     // actually said, not just their Clarity output.
