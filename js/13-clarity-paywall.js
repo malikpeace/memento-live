@@ -274,6 +274,24 @@ const ClarityPaywall = {
   hide() {
     const ov = document.getElementById('clarityPaywall');
     this._open = false;
+    // v1001: the paywall is a dismissible overlay, so whatever sits under it
+    // MUST be a screen the user can actually land on. Several paths raise it
+    // over an app that was deliberately faded to opacity 0 (boot restore is
+    // the one Malik hit: the saved view was Action, Action's open() bounced
+    // off this paywall, and nothing ever faded the app back in). Dismissing
+    // then showed an empty screen. Runs before the !ov guard so it fires on
+    // every dismissal path, and only when no real module is open, since those
+    // own the fade themselves.
+    try {
+      const opened =
+        (typeof ActionExperience !== 'undefined' && ActionExperience.isOpen) ||
+        (typeof ClarityExperience !== 'undefined' && ClarityExperience.isOpen) ||
+        !!document.querySelector('.sheet.open, #n7dRoot');
+      if (!opened) {
+        const app = document.getElementById('app');
+        if (app && getComputedStyle(app).opacity !== '1') app.style.opacity = '1';
+      }
+    } catch (e) {}
     if (!ov) return;
     ov.classList.remove('cpw--open');
     document.body.style.overflow = '';

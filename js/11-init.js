@@ -172,6 +172,36 @@ document.addEventListener('keydown', (e) => {
           try { const app3 = document.getElementById('app'); if (app3) app3.style.opacity = '1'; } catch (_2) {}
           try { if (typeof TabBar !== 'undefined' && TabBar.switchTo) TabBar.switchTo('home'); } catch (_2) {}
         }
+        // v1001: a restore that THREW is handled above, but a restore that
+        // simply DECLINED to open is not. ActionExperience.open() returns
+        // early when the paywall gates it, so the app stayed at opacity 0
+        // with the paywall on top, and dismissing the paywall left a blank
+        // screen (Malik: "nothing loaded and everything just disappeared").
+        // The paywall is deliberately NOT counted as an overlay here: it is
+        // opaque and dismissible, so the app must already be visible
+        // underneath by the time it goes away.
+        setTimeout(() => {
+          try {
+            // Read the modules' OWN isOpen flags, not DOM classes. Both set
+            // isOpen synchronously inside open(), while the .open/.open-bg
+            // classes arrive later on a timeout, so a class check here races
+            // the entrance animation and wrongly "rescues" a restore that was
+            // working (it killed the paid Action restore in testing).
+            const opened =
+              (typeof ActionExperience !== 'undefined' && ActionExperience.isOpen) ||
+              (typeof ClarityExperience !== 'undefined' && ClarityExperience.isOpen) ||
+              !!document.querySelector('.sheet.open, #n7dRoot');
+            // Deliberately only REVEALS. It does not clear the saved view:
+            // revealing is harmless and idempotent, but if this check ever
+            // misses a restore that actually worked, clearing lastView would
+            // silently break the NEXT launch too. Fixing a blank screen is
+            // not worth risking that.
+            if (!opened) {
+              const app4 = document.getElementById('app');
+              if (app4) app4.style.opacity = '1';
+            }
+          } catch (_3) {}
+        }, 120);
       }, 50);
     }
   } catch (_) { /* never block the page if state is malformed */ }
