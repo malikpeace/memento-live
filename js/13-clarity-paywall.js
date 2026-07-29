@@ -172,7 +172,7 @@ const ClarityPaywall = {
             '<div class="cpw__speed">Your first move is five minutes away.</div>' +
           '</div>' +
           '<div class="cpw__guarantee cpw__guarantee--v2">' + shieldSvg +
-            '<span><b>The Locked-In Guarantee.</b> Show up for 30 days. If your life isn\'t measurably moving, email me and I refund every cent, and you keep the app. Drifting stays free.</span>' +
+            '<span><b>The Locked-In Guarantee.</b> Show up for 30 days. If your life isn\'t measurably moving, email me within 60 days of purchase and I refund every cent. A full refund ends your paid access. Drifting stays free.</span>' +
           '</div>' +
           '<button type="button" class="cpw__skip" id="cpwSkip">Maybe later</button>' +
 
