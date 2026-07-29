@@ -788,7 +788,7 @@
      tail, the way real light leaves a room. 1.3s total, which also lets it sit
      with the flare at 1.15s and the sweep at 1.7s instead of finishing before
      either has started. */
-  .cer.flare .cer__impact { animation:cerImpact 2400ms cubic-bezier(.3,.5,.2,1); }
+  .cer.flare .cer__impact { animation:cerImpact 3300ms cubic-bezier(.3,.5,.2,1); }
   /* It starts at .88, not 0, because by the time the hold completes the screen
      is ALREADY most of the way white. The keyframe picks the value up exactly
      where the hold left it, so there is no seam between what they did and what
@@ -796,12 +796,16 @@
      when the animation ends nothing is left promoted and nothing snaps back. */
   @keyframes cerImpact {
     0%   { opacity:.88; }
-    6%   { opacity:1; }
-    34%  { opacity:1; }
-    50%  { opacity:.84; }
-    64%  { opacity:.56; }
-    78%  { opacity:.31; }
-    90%  { opacity:.13; }
+    4.8% { opacity:1; }
+    /* The plateau is the whole point of the beat, so it is the longest thing in
+       the sequence: a second and six tenths of nothing but white and their
+       mark. It was 670ms before, which is long enough to register and too short
+       to look at. */
+    53%  { opacity:1; }
+    64%  { opacity:.84; }
+    76%  { opacity:.56; }
+    86%  { opacity:.31; }
+    94%  { opacity:.13; }
     100% { opacity:0; }
   }
 
@@ -830,13 +834,13 @@
      fading up underneath it, and two marks at slightly different darknesses
      sitting on the same pixels reads as a double. By the time the card is
      legible through the white, only the card's own mark is left. */
-  .cer.flare .cer__wm { animation:cerMark 2400ms cubic-bezier(.3,.5,.2,1); }
+  .cer.flare .cer__wm { animation:cerMark 3300ms cubic-bezier(.3,.5,.2,1); }
   @keyframes cerMark {
     0%   { opacity:1; }
-    40%  { opacity:1; }
-    54%  { opacity:.72; }
-    66%  { opacity:.3; }
-    76%  { opacity:0; }
+    60%  { opacity:1; }
+    70%  { opacity:.72; }
+    80%  { opacity:.3; }
+    88%  { opacity:0; }
     100% { opacity:0; }
   }
   /* THE PULSE. The edge carries a heartbeat: nothing for most of the cycle,
@@ -1435,14 +1439,14 @@
        has settled does the copy come in, one line at a time. The welcome does
        not travel any more: it sits where it will end up and simply fades, which
        is what stopped it reading as a scale-up. */
-    at(900,  function(){ cer.classList.add('sweep'); });   // under the white, arrives with it
-    /* The whiteout runs 2400ms and the card is only properly legible through
+    at(2000, function(){ cer.classList.add('sweep'); });   // crosses the face as it comes back out
+    /* The whiteout runs 3300ms and the card is only properly legible through
        the last third of it, so the raise waits well past the end: the card is
        left standing alone, in silence, for over a second before anything moves. */
-    at(3900, function(){ cer.classList.add('back');  });   // the raise, 1.3s
-    at(5450, function(){ cer.classList.add('say');   });   // once it has landed
-    at(6500, function(){ cer.classList.add('tell');  });   // the note
-    at(7500, function(){ cer.classList.add('go');    });   // the button
+    at(4700, function(){ cer.classList.add('back');  });   // the raise, 1.3s
+    at(6250, function(){ cer.classList.add('say');   });   // once it has landed
+    at(7300, function(){ cer.classList.add('tell');  });   // the note
+    at(8300, function(){ cer.classList.add('go');    });   // the button
   }
 
   // the break: what they were holding back lets go, overshoots, settles
