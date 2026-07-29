@@ -1758,6 +1758,18 @@ try { if (typeof window !== 'undefined') window.generateNextLoopAction = generat
 // === Round 9 - Draft-first Action generation =====================
 // Called when the user taps Begin (or has no plan yet). Builds the full plan
 // from Clarity context alone, with no conversation, and renders it immediately.
+// Prompt lab (v1011, dev-only): when a ?plab= arm is active and it is the
+// arm carrying the condensed prompt, plan generation uses the condensed
+// assembly from js/22. Inert for every real user; the blind side-by-side is
+// how the condensed prompts earn their wire-in.
+function actionDraftSystemPrompt() {
+  try {
+    const lab = window.PROMPT_LAB;
+    if (lab && lab.arm && lab.arm === lab._k && lab.condensedActionPrompt) return lab.condensedActionPrompt;
+  } catch (e) {}
+  return AI_ACTION_DRAFT_SYSTEM_PROMPT;
+}
+
 async function generateActionDraft(options = {}) {
   // options.nextStep: true means "user already has a plan, they've completed
   // some actions, generate the NEXT logical step using completionHistory".
@@ -1881,12 +1893,12 @@ async function generateActionDraft(options = {}) {
         const callOpts = { maxTokens: 16000, model: ANTHROPIC_MODEL_PLANS, timeout: ACTION_PLAN_REQUEST_TIMEOUT_MS, cache: true, paidAction: true, thinking: 'off' };
         const body = userBody + (emptyTries ? softNudges[emptyTries - 1] : '');
         try {
-          response = await callClaude([{ role: 'user', content: body }], AI_ACTION_DRAFT_SYSTEM_PROMPT, callOpts);
+          response = await callClaude([{ role: 'user', content: body }], actionDraftSystemPrompt(), callOpts);
         } catch (offErr) {
           // Reachable on EVERY attempt now, since thinking is off from the start.
           if (callOpts.thinking && /API error \(400\)/i.test(String(offErr && offErr.message))) {
             delete callOpts.thinking;
-            response = await callClaude([{ role: 'user', content: body }], AI_ACTION_DRAFT_SYSTEM_PROMPT, callOpts);
+            response = await callClaude([{ role: 'user', content: body }], actionDraftSystemPrompt(), callOpts);
           } else { throw offErr; }
         }
         break;
@@ -1924,7 +1936,7 @@ async function generateActionDraft(options = {}) {
     catch (parseErr) {
       const retryRaw = await callClaude(
         [{ role: 'user', content: userBody }],
-        AI_ACTION_DRAFT_SYSTEM_PROMPT,
+        actionDraftSystemPrompt(),
         { maxTokens: 16000, model: ANTHROPIC_MODEL_PLANS, timeout: ACTION_PLAN_REQUEST_TIMEOUT_MS, cache: true, paidAction: true, thinking: 'off' }
       );
       let rj = retryRaw.trim().replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();
@@ -2027,7 +2039,7 @@ async function generateActionDraft(options = {}) {
         const retryBody = userBody + `\n\nRETRY: Your previous output failed validation on these tiers:\n${failedTiers}\n\nRule reminders you broke:\n- "cadence-anywhere" = you put "this week", "every day", "daily", etc. anywhere in the text. Tier text is for TODAY only.\n- "cadence-only" = the tier was ONLY a cadence ("Three days a week") with no action in it.\n- "hard-deadline" = you put "by Friday", "by tomorrow". No dates.\n- "setup-verb" = you used "sit down", "work on", "focus on". Use OUTPUT verbs that produce a thing.\n- "bare-pronoun" = you used "it"/"this"/"that" as the object. Name the actual sub-unit.\n- "single-word" / "gutted" = the tier was too short to be a real action. Be specific from the start.\n\nReturn the full plan JSON again, but this time make all 5 tiers obey the rules. Cadence may live in the TITLE (when frequency is the diagnosis); durations inside tier text are allowed only as the honest size of that rung's motion. No hard deadlines anywhere.`;
         const retryResponse = await callClaude(
           [{ role: 'user', content: retryBody }],
-          AI_ACTION_DRAFT_SYSTEM_PROMPT,
+          actionDraftSystemPrompt(),
           { maxTokens: 16000, model: ANTHROPIC_MODEL_PLANS, timeout: ACTION_PLAN_REQUEST_TIMEOUT_MS, cache: true, paidAction: true, thinking: 'off' }
         );
         let retryJson = retryResponse.trim()
