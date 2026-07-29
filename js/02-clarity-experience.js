@@ -45,10 +45,17 @@ function actionCompletionMatchesMission(entry, primaryAction) {
 }
 
 function actionCompletionForDay(day, primaryAction) {
+  // v1004: ONE day boundary. Every caller passes today; the loop and the
+  // ledger key days at 4am (a 1am session belongs to the evening before),
+  // while this function compared at midnight, so between 00:00 and 04:00 the
+  // home card and the Action page disagreed about whether today was done.
+  // Both sides now compare in 4am action-day space. The day param is kept for
+  // signature stability and used only as a calendar-today check.
+  const key = actionDayKey(new Date());
   const history = (state.action && Array.isArray(state.action.completionHistory)) ? state.action.completionHistory : [];
   for (let i = history.length - 1; i >= 0; i--) {
     const entry = history[i];
-    if (entry && entry.date && isoToLocalDay(entry.date) === day && actionCompletionMatchesMission(entry, primaryAction)) return entry;
+    if (entry && entry.date && actionDayKey(new Date(entry.date)) === key && actionCompletionMatchesMission(entry, primaryAction)) return entry;
   }
   return null;
 }
