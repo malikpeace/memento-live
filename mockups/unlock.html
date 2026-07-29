@@ -769,6 +769,80 @@
      If it is ever revisited it should be a different idea, not a better version
      of that one. */
 
+  /* ================= THE CARD BREATHING =======================================
+     Three soft lights drifting inside the card so it morphs instead of sitting
+     there. Two rules made this safe and made it read as alive rather than as an
+     animation:
+
+     1. They are plain radial-gradient elements, NOT the card's own colour blobs.
+        The card's blobs live inside a 46px blur, and moving anything in there
+        re-runs that blur every frame at device resolution, which is exactly what
+        crashed iOS. A gradient is already soft, so it needs no filter, and
+        transform plus opacity on it is compositor work the phone does for free.
+     2. The three durations are coprime (23s, 31s, 41s), so the combination only
+        repeats after about eight hours. There is no pattern to catch, which is
+        the difference between breathing and blinking.
+
+     They run only once the card is lit. Dormant stays still, the hold stays a
+     build, and the settled card is the thing that is alive. */
+  .cer__life { position:absolute; inset:-8%; z-index:5; pointer-events:none;
+    opacity:0; transition:opacity 1.4s ease-out; }
+  .cer.lit .cer__life, .cer.back .cer__life { opacity:1; }
+  .cer__life i { position:absolute; border-radius:50%; }
+  .cer__life i:nth-child(1) { width:64%; height:48%; left:4%;  top:6%;
+    background:radial-gradient(circle, rgba(255,255,255,.50), rgba(255,255,255,0) 68%); }
+  /* the cyan one, their Clarity colour moving through the platinum */
+  .cer__life i:nth-child(2) { width:56%; height:42%; right:0%; top:32%;
+    background:radial-gradient(circle, rgba(178,238,255,.44), rgba(178,238,255,0) 70%); }
+  .cer__life i:nth-child(3) { width:72%; height:54%; left:10%; bottom:0%;
+    background:radial-gradient(circle, rgba(255,255,255,.38), rgba(255,255,255,0) 70%); }
+  .cer.lit .cer__life i, .cer.back .cer__life i,
+  .cer.lit .cer__spark, .cer.back .cer__spark { will-change:transform, opacity; }
+  .cer.lit .cer__life i:nth-child(1), .cer.back .cer__life i:nth-child(1) {
+    animation:lifeA 23s ease-in-out infinite; }
+  .cer.lit .cer__life i:nth-child(2), .cer.back .cer__life i:nth-child(2) {
+    animation:lifeB 31s ease-in-out infinite; }
+  .cer.lit .cer__life i:nth-child(3), .cer.back .cer__life i:nth-child(3) {
+    animation:lifeC 41s ease-in-out infinite; }
+  @keyframes lifeA {
+    0%   { transform:translate(0,0) scale(1);            opacity:.75; }
+    23%  { transform:translate(14%,9%) scale(1.18);      opacity:1; }
+    51%  { transform:translate(-9%,17%) scale(.88);      opacity:.55; }
+    76%  { transform:translate(6%,-7%) scale(1.10);      opacity:.9; }
+    100% { transform:translate(0,0) scale(1);            opacity:.75; }
+  }
+  @keyframes lifeB {
+    0%   { transform:translate(0,0) scale(1);            opacity:.6; }
+    19%  { transform:translate(-16%,-11%) scale(1.24);   opacity:.95; }
+    44%  { transform:translate(-4%,12%) scale(.82);      opacity:.45; }
+    71%  { transform:translate(11%,4%) scale(1.12);      opacity:.85; }
+    100% { transform:translate(0,0) scale(1);            opacity:.6; }
+  }
+  @keyframes lifeC {
+    0%   { transform:translate(0,0) scale(1);            opacity:.7; }
+    31%  { transform:translate(10%,-13%) scale(1.16);    opacity:.95; }
+    58%  { transform:translate(-13%,-4%) scale(.86);     opacity:.5; }
+    83%  { transform:translate(4%,8%) scale(1.06);       opacity:.8; }
+    100% { transform:translate(0,0) scale(1);            opacity:.7; }
+  }
+
+  /* THE SPARK. A single point of light drifting the lower-right of the ring,
+     slowly, fading in and out at both ends so it never announces itself. It sits
+     ON the ring, and it is a radial gradient so it cannot draw an edge. */
+  .cer__spark { position:absolute; right:-8px; top:0; width:18px; height:86px;
+    z-index:3; pointer-events:none; opacity:0; border-radius:50%;
+    background:radial-gradient(ellipse 50% 50% at 50% 50%,
+      rgba(255,255,255,.9) 0%, rgba(206,238,255,.42) 44%, rgba(206,238,255,0) 74%);
+    filter:blur(3px); }
+  .cer.lit .cer__spark, .cer.back .cer__spark { animation:cerSpark 21s ease-in-out infinite; }
+  @keyframes cerSpark {
+    0%   { opacity:0;   transform:translateY(150px) scaleY(.7); }
+    16%  { opacity:.5;  }
+    50%  { opacity:.78; transform:translateY(290px) scaleY(1.15); }
+    84%  { opacity:.42; }
+    100% { opacity:0;   transform:translateY(410px) scaleY(.7); }
+  }
+
   /* ================= THE FACE =================================================
      Answering "is a dot in the middle the best we've got". Four treatments that
      stack on top of any look, all built from the card's own geometry, no new
@@ -974,7 +1048,8 @@
 
   @media (prefers-reduced-motion: reduce) {
     .cer__stage, .cer__float, .cer__floor, .cer__glow, .cer__sweep, .cer__flare,
-    .cer__hint, .cer__welcome, .cer__note, .cer__sign, .cer__cta { transition:none !important; animation:none !important; }
+    .cer__hint, .cer__welcome, .cer__note, .cer__sign, .cer__cta,
+    .cer__life, .cer__life i, .cer__spark { transition:none !important; animation:none !important; }
   }
 
   /* The obsidian look runs the app's real light theme on <html>, which would
@@ -1023,6 +1098,7 @@
                      follows the card's radius, plus a blurred twin for its bloom -->
                 <span class="cer__ring" aria-hidden="true"></span>
                 <span class="cer__ring cer__ring--glow" aria-hidden="true"></span>
+                <span class="cer__spark" aria-hidden="true"></span>
                 <span class="daycard-bloom" aria-hidden="true">
                   <i class="blob b1" style="transform:translate(7.62%,8%) scale(1.342)"></i>
                   <i class="blob b2" style="transform:translate(-21.48%,15.95%) scale(1.449)"></i>
@@ -1067,6 +1143,8 @@
                   <span class="cer__sweep" aria-hidden="true"></span>
                   <!-- the face treatments live here, under the mark -->
                   <span class="cer__face" aria-hidden="true"></span>
+                  <!-- the card breathing: three soft lights drifting inside it -->
+                  <span class="cer__life" aria-hidden="true"><i></i><i></i><i></i></span>
                   <!-- the caustic: a bent blade of light with a dispersed edge -->
                   <span class="cer__caustic cer__caustic--glow" aria-hidden="true"></span>
                   <span class="cer__caustic" aria-hidden="true"></span>
