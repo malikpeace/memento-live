@@ -2019,7 +2019,12 @@ async function generateActionDraft(options = {}) {
         const failedTiers = Object.entries(stats.reasons)
           .map(([k, why]) => `- ${k}: ${why}`)
           .join('\n');
-        const retryBody = userBody + `\n\nRETRY: Your previous output failed validation on these tiers:\n${failedTiers}\n\nRule reminders you broke:\n- "cadence-anywhere" = you put "this week", "every day", "daily", etc. anywhere in the text. Tier text is for TODAY only.\n- "time-duration" = you put "20 minutes", "two hours", etc. No timed sessions.\n- "hard-deadline" = you put "by Friday", "by tomorrow". No dates.\n- "duplicate" = two tiers had the same text. All 5 must be different scoped sub-units.\n- "setup-verb" = you used "sit down", "work on", "focus on". Use OUTPUT verbs that produce a thing.\n- "bare-pronoun" = you used "it"/"this"/"that" as the object. Name the actual sub-unit.\n- "gutted" = the cleaned text was too short. Be specific from the start.\n\nReturn the full plan JSON again, but this time make all 5 tiers obey the rules. Cadence may live in the TITLE (when frequency is the diagnosis) and exact durations in howToStart, never in tiers. No hard deadlines anywhere.`;
+        // v1010: this feedback must mirror the LIVE validators in js/01
+        // (sanitizeTierText). It used to teach a "time-duration" ban that
+        // v909 repealed and a "duplicate" reason the code never emits, so a
+        // retry actively contradicted the tier ladder's duration scaling.
+        // Rule inventory finding, verified by grep before changing.
+        const retryBody = userBody + `\n\nRETRY: Your previous output failed validation on these tiers:\n${failedTiers}\n\nRule reminders you broke:\n- "cadence-anywhere" = you put "this week", "every day", "daily", etc. anywhere in the text. Tier text is for TODAY only.\n- "cadence-only" = the tier was ONLY a cadence ("Three days a week") with no action in it.\n- "hard-deadline" = you put "by Friday", "by tomorrow". No dates.\n- "setup-verb" = you used "sit down", "work on", "focus on". Use OUTPUT verbs that produce a thing.\n- "bare-pronoun" = you used "it"/"this"/"that" as the object. Name the actual sub-unit.\n- "single-word" / "gutted" = the tier was too short to be a real action. Be specific from the start.\n\nReturn the full plan JSON again, but this time make all 5 tiers obey the rules. Cadence may live in the TITLE (when frequency is the diagnosis); durations inside tier text are allowed only as the honest size of that rung's motion. No hard deadlines anywhere.`;
         const retryResponse = await callClaude(
           [{ role: 'user', content: retryBody }],
           AI_ACTION_DRAFT_SYSTEM_PROMPT,
