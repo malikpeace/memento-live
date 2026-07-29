@@ -5006,7 +5006,13 @@ Return ONLY the sentence text. No quotes, no labels.`;
     }
     const keepable = verdict === 'replaced' || verdict === 'upgraded';
     const beat = this._revealBeatShell(
-      body, 'Lock it in', () => this._renderBridgeBeat(),
+      // v999 (Malik: the reveal pages 'feel very very cheap'). The bridge,
+      // the scale breath and the first-step page are cut. The verdict is the
+      // only one that IS the product: it judges what they said and cites
+      // their own words. The other three were a page each for a caption, a
+      // list they were about to swipe anyway, and a pep talk. Straight to the
+      // plan now.
+      body, 'Lock it in', () => this._finishReveal(),
       keepable ? 'Keep my version' : null,
       keepable ? () => this._keepMyVersion() : null
     );
@@ -5026,6 +5032,13 @@ Return ONLY the sentence text. No quotes, no labels.`;
     generateActionDraft({ keepTheirs: true });
   },
 
+  // ---- UNREACHABLE as of v999 -----------------------------------------
+  // The verdict now goes straight to _finishReveal, so these three never
+  // run. Kept, not deleted: they are working beats Malik may want back, and
+  // restoring one is a single line at the verdict's handoff above. Of the
+  // three, _renderFirstStepNow is the one with a real job (do the move
+  // before you leave); it was cut with the others because the whole run of
+  // pages read cheap, not because that idea is wrong.
   _renderBridgeBeat() {
     const pa = state.action.primaryAction || {};
     const tier = pa.recommendedTier || 'moderate';

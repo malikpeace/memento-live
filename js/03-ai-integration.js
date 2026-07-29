@@ -53,7 +53,10 @@ let actionChatError = null;
 // Full Action plans may legitimately need nearly two minutes. Keep the server
 // abort slightly inside this browser deadline so failures arrive in time for
 // the existing retry ladder instead of racing the client's own timeout.
-const ACTION_PLAN_REQUEST_TIMEOUT_MS = 120000;
+// v1000: 75s, not 120s. The proxy kills its own upstream at 65s, so every
+// second past that was dead waiting in front of a retry that was already
+// coming. Malik sat on the loading screen for over two minutes.
+const ACTION_PLAN_REQUEST_TIMEOUT_MS = 75000;
 // Action V2 - adaptive chat state
 let actionChatMessages = [];          // mirrors state.action.aiConversation in memory
 let actionChatCurrentQuestion = '';   // the AI's most recent question (not yet answered)
@@ -1627,18 +1630,25 @@ async function generateActionDraft(options = {}) {
         // budget can no longer be eaten by deliberation. If the proxy or
         // API rejects the disabled flag (400), fall back to the same
         // nudged call without it.
-        const lastTry = emptyTries === softNudges.length;
         // v893: cache the ~15k-token system prompt. It's identical on every
         // plan generation, so the proxy wraps it in an ephemeral cache block
         // and repeat calls (bursts, or many users close together) read it at
         // ~10% the input cost. Output and behavior are unchanged.
-        const callOpts = { maxTokens: 16000, model: ANTHROPIC_MODEL_PLANS, timeout: ACTION_PLAN_REQUEST_TIMEOUT_MS, cache: true, paidAction: true };
-        if (lastTry) callOpts.thinking = 'off';
+        // v1000: thinking is OFF from the FIRST call, not the last rung. It
+        // used to be the final rescue, so a generation walked up to three
+        // slow failures before reaching the one setting that works. Under the
+        // current proxy thinking is a liability, not a feature: output is
+        // clamped to 8192 tokens and the upstream dies at 65s, so
+        // deliberation either eats the whole budget (empty response) or
+        // outlasts the window (504), and each costs a full retry.
+        // Revisit once the proxy's ceiling and timeout are raised.
+        const callOpts = { maxTokens: 16000, model: ANTHROPIC_MODEL_PLANS, timeout: ACTION_PLAN_REQUEST_TIMEOUT_MS, cache: true, paidAction: true, thinking: 'off' };
         const body = userBody + (emptyTries ? softNudges[emptyTries - 1] : '');
         try {
           response = await callClaude([{ role: 'user', content: body }], AI_ACTION_DRAFT_SYSTEM_PROMPT, callOpts);
         } catch (offErr) {
-          if (lastTry && /API error \(400\)/i.test(String(offErr && offErr.message))) {
+          // Reachable on EVERY attempt now, since thinking is off from the start.
+          if (callOpts.thinking && /API error \(400\)/i.test(String(offErr && offErr.message))) {
             delete callOpts.thinking;
             response = await callClaude([{ role: 'user', content: body }], AI_ACTION_DRAFT_SYSTEM_PROMPT, callOpts);
           } else { throw offErr; }
@@ -1679,7 +1689,7 @@ async function generateActionDraft(options = {}) {
       const retryRaw = await callClaude(
         [{ role: 'user', content: userBody }],
         AI_ACTION_DRAFT_SYSTEM_PROMPT,
-        { maxTokens: 16000, model: ANTHROPIC_MODEL_PLANS, timeout: ACTION_PLAN_REQUEST_TIMEOUT_MS, cache: true, paidAction: true }
+        { maxTokens: 16000, model: ANTHROPIC_MODEL_PLANS, timeout: ACTION_PLAN_REQUEST_TIMEOUT_MS, cache: true, paidAction: true, thinking: 'off' }
       );
       let rj = retryRaw.trim().replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();
       const fb2 = rj.indexOf('{');
@@ -1777,7 +1787,7 @@ async function generateActionDraft(options = {}) {
         const retryResponse = await callClaude(
           [{ role: 'user', content: retryBody }],
           AI_ACTION_DRAFT_SYSTEM_PROMPT,
-          { maxTokens: 16000, model: ANTHROPIC_MODEL_PLANS, timeout: ACTION_PLAN_REQUEST_TIMEOUT_MS, cache: true, paidAction: true }
+          { maxTokens: 16000, model: ANTHROPIC_MODEL_PLANS, timeout: ACTION_PLAN_REQUEST_TIMEOUT_MS, cache: true, paidAction: true, thinking: 'off' }
         );
         let retryJson = retryResponse.trim()
           .replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();
