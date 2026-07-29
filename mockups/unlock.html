@@ -800,41 +800,43 @@
      the first, the way a real caustic doubles. */
   .cer__caustic { position:absolute; inset:0; z-index:5; opacity:0; pointer-events:none;
     background:
-      radial-gradient(ellipse 166% 148% at 132% 132%,
-        transparent 53.5%,
-        rgba(120,12,4,.5) 54.6%,
-        rgba(255,52,6,1) 56%,
-        rgba(255,124,10,1) 57.6%,
-        rgba(255,190,60,1) 59.2%,
-        rgba(255,246,214,1) 60.6%,
-        rgba(255,255,255,1) 61.4%,
-        rgba(178,240,255,1) 62.2%,
-        rgba(30,192,255,1) 63.1%,
-        rgba(16,92,255,.9) 64.1%,
-        rgba(44,22,200,.45) 65.4%,
-        transparent 67.5%),
-      radial-gradient(ellipse 166% 148% at 132% 132%,
-        transparent 68.5%,
-        rgba(255,104,14,.28) 69.8%,
-        rgba(255,255,255,.4) 70.7%,
-        rgba(48,180,255,.28) 71.8%,
-        transparent 73.6%);
-    /* THE TAPER. A radial band is the same width everywhere, which is exactly
-       what made it read as a rainbow rather than a blade. A conic mask around
-       the SAME centre varies alpha along the arc, so the light can be a faint
-       tail at one end and a broad flare at the other. Seen from that centre the
-       card spans roughly 285deg to 346deg, so the whole taper lives in that
-       window; aim it anywhere else and the blade vanishes entirely. */
-    -webkit-mask:conic-gradient(from 0deg at 132% 132%,
-      rgba(0,0,0,0) 276deg, rgba(0,0,0,.28) 292deg, rgba(0,0,0,.72) 308deg,
-      #000 326deg, #000 344deg, rgba(0,0,0,.55) 352deg, rgba(0,0,0,0) 358deg);
-            mask:conic-gradient(from 0deg at 132% 132%,
-      rgba(0,0,0,0) 276deg, rgba(0,0,0,.28) 292deg, rgba(0,0,0,.72) 308deg,
-      #000 326deg, #000 344deg, rgba(0,0,0,.55) 352deg, rgba(0,0,0,0) 358deg); }
+      radial-gradient(ellipse 60% 55% at -6% -8%,
+        transparent 152%,
+        rgba(46,20,190,.45) 156%,
+        rgba(20,100,255,.95) 160%,
+        rgba(38,200,255,1) 164%,
+        rgba(190,244,255,1) 167.5%,
+        rgba(255,255,255,1) 169.5%,
+        rgba(255,244,206,1) 172%,
+        rgba(255,196,66,1) 176%,
+        rgba(255,138,16,1) 182%,
+        rgba(255,86,8,.92) 189%,
+        rgba(200,32,4,.55) 196%,
+        rgba(90,10,2,.22) 203%,
+        transparent 212%);
+    /* THE TAPER. A radial band is the same width everywhere, which is what made
+       it read as a rainbow rather than a blade. A conic mask around the SAME
+       centre varies alpha along the arc, so the light is a faint tail at one
+       end and a broad flare at the other. Seen from this centre the card spans
+       roughly 84deg to 179deg; aim the taper anywhere else and the blade
+       vanishes entirely (it did, twice). */
+    -webkit-mask:conic-gradient(from 0deg at -6% -8%,
+      rgba(0,0,0,0) 84deg, rgba(0,0,0,.22) 96deg, rgba(0,0,0,.62) 108deg,
+      #000 124deg, #000 152deg, rgba(0,0,0,.5) 168deg, rgba(0,0,0,0) 179deg);
+            mask:conic-gradient(from 0deg at -6% -8%,
+      rgba(0,0,0,0) 84deg, rgba(0,0,0,.22) 96deg, rgba(0,0,0,.62) 108deg,
+      #000 124deg, #000 152deg, rgba(0,0,0,.5) 168deg, rgba(0,0,0,0) 179deg); }
   .cer__caustic--glow { z-index:4; filter:blur(16px) saturate(1.5); }
   .cer.look-caustic.lit .cer__caustic, .cer.look-caustic.back .cer__caustic { opacity:var(--act, 0); }
   .cer.look-caustic.lit .cer__caustic--glow, .cer.look-caustic.back .cer__caustic--glow {
     opacity:calc(var(--act, 0) * .62); }
+  .cer.look-caustic.lit .cer__caustic--rfl, .cer.look-caustic.back .cer__caustic--rfl {
+    opacity:calc(var(--act, 0) * .85); }
+  .cer.look-caustic.lit .cer__caustic--glow.cer__caustic--rfl,
+  .cer.look-caustic.back .cer__caustic--glow.cer__caustic--rfl {
+    opacity:calc(var(--act, 0) * .5); }
+  /* the mark sits smaller here, the way it does in the render */
+  .cer.look-caustic .daycard-ns__emblem { width:108px; height:108px; }
 
   /* the card underneath it: black, so the blade is the only thing lit */
   .cer.look-caustic .daycard-theme-living { --plat-k:0; --rim-k:.35; --sat:1.8; }
@@ -1016,6 +1018,10 @@
                   <i class="blob b5" style="transform:translate(-16.79%,-51.67%) scale(1.454)"></i>
                   <i class="blob b6"></i>
                   <span class="daycard-ns__rim" aria-hidden="true"></span>
+                  <!-- the blade again, so the floor throws it back. The floor is
+                       already flipped and blurred, so this inherits both. -->
+                  <span class="cer__caustic cer__caustic--glow cer__caustic--rfl" aria-hidden="true"></span>
+                  <span class="cer__caustic cer__caustic--rfl" aria-hidden="true"></span>
                 </span>
                 </span>
                 <div class="daycard-ns" id="dayCardNs">
