@@ -7,7 +7,7 @@
    ONCE on mismatch. Kills the "phone silently runs old cached js under a new
    index" class (the SW's offline fallback can serve stale files on a bad
    connection; Malik hit this three times in one day). */
-window.MEMENTO_JS_BUILD = 'v1002';
+window.MEMENTO_JS_BUILD = 'v1003';
 /* ============================================
    STATE MANAGEMENT
    ============================================ */
@@ -78,7 +78,12 @@ const DEFAULT_STATE = {
     planGenerated: false,
     planSourceNeutronStar: '',
     lastGeneratedAt: null,
-    completionHistory: []
+    completionHistory: [],
+    // v1003: the offering ledger. One sealed row per CLOSED day (4am
+    // boundary), misses included, written by actionLedgerBackfill in js/02.
+    // Today is live and read from completionHistory; a day's row is sealed on
+    // the first open after it ends. This is the memory the AI reads.
+    ledger: []
   },
   streak: { count: 0, lastCheckDate: null, history: [], minutesReclaimed: 0, bestEver: 0, bestEverShown: 0, milestonesShown: [], grace: { bank: 0, lastEarnMilestone: 0, used: {} } },
   flow: { items: JSON.parse(JSON.stringify(DEFAULT_FLOW_ITEMS)) },

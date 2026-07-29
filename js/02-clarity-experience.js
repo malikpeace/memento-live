@@ -66,6 +66,85 @@ function createActionCompletionRecord(primaryAction, tier, actionText) {
   };
 }
 
+/* ---- The offering ledger (v1003, Action v2 Phase A) -----------------------
+   One row per CLOSED day, misses included. This is the memory that lets the
+   AI tell "working" from "grinding": completionHistory alone records only
+   successes, so a 6-day gap was literally nothing. The ledger makes a miss a
+   fact with a date.
+
+   Design: ONE writer. Days seal on the first open after they end (4am
+   boundary); today is never in the ledger, it is live in completionHistory.
+   Four different code paths push completions, and deriving sealed rows from
+   completionHistory afterwards means none of them can drift from the ledger.
+   Rows for days with a completion carry the exact text that was credited
+   (the truth after v1002); missed days carry the standing move as a best
+   effort, marked source:'standing'. */
+function actionDayKey(d) {
+  const t = d instanceof Date ? d : new Date(d || Date.now());
+  return isoToLocalDay(new Date(t.getTime() - 4 * 3600 * 1000).toISOString());
+}
+function actionLedgerBackfill() {
+  try {
+    if (!state.action || !state.action.planGenerated) return;
+    const pa = state.action.primaryAction || {};
+    if (!pa.title && !(pa.tiers && pa.tiers.moderate)) return;
+    if (!Array.isArray(state.action.ledger)) state.action.ledger = [];
+    const ledger = state.action.ledger;
+    const today = actionDayKey(new Date());
+    const TK = ['tiny', 'light', 'moderate', 'heavy', 'extreme'];
+
+    // completions grouped by 4am day key
+    const hist = Array.isArray(state.action.completionHistory) ? state.action.completionHistory : [];
+    const doneBy = {};
+    for (const h of hist) { if (h && h.date) doneBy[actionDayKey(new Date(h.date))] = h; }
+
+    // Anchor: the day after the last sealed row, else the earliest completion.
+    // A user with no completions yet has no history to seal; their first
+    // sealed rows appear once day one has been kept or missed AFTER activity
+    // exists, so a fresh plan never backfills phantom misses.
+    let startKey = null;
+    if (ledger.length) {
+      const last = ledger[ledger.length - 1].day;
+      const d = new Date(last + 'T12:00:00'); d.setDate(d.getDate() + 1);
+      startKey = isoToLocalDay(d.toISOString());
+    } else if (hist.length) {
+      startKey = actionDayKey(new Date(hist[0].date));
+    }
+    if (!startKey || startKey >= today) return;
+
+    const sealed = new Set(ledger.map(r => r.day));
+    const cur = new Date(startKey + 'T12:00:00');
+    let guard = 0;
+    while (guard++ < 180) {
+      const key = isoToLocalDay(cur.toISOString());
+      if (key >= today) break;
+      if (!sealed.has(key)) {
+        const done = doneBy[key];
+        const tier = done ? (done.tier || 'moderate')
+          : (TK.indexOf(state.action.selectedTier) >= 0 ? state.action.selectedTier : (pa.recommendedTier || 'moderate'));
+        // A credited text that matches no tier was a chained next action.
+        const tierTexts = pa.tiers ? Object.values(pa.tiers).map(t => String(t || '').trim()) : [];
+        const wasChained = !!(done && done.actionText && tierTexts.indexOf(String(done.actionText).trim()) < 0);
+        ledger.push({
+          day: key,
+          missionId: (done && done.missionId) || pa.missionId || '',
+          offered: done ? (done.actionText || '') : ((pa.tiers && pa.tiers[tier]) || pa.title || ''),
+          offeredRung: TK.indexOf(tier) + 1 || 3,
+          source: wasChained ? 'chained' : 'standing',
+          outcome: done ? 'done' : 'missed',
+          reason: '',
+          note: (done && done.note) || '',
+          ts: Date.now()
+        });
+      }
+      cur.setDate(cur.getDate() + 1);
+    }
+    // Bound it: ~13 months of daily rows is plenty for any decision.
+    if (ledger.length > 400) ledger.splice(0, ledger.length - 400);
+    try { persistNow(); } catch (e) {}
+  } catch (e) {}
+}
+
 const ClarityExperience = {
   el: null, pageWrap: null, navEl: null, progressEl: null,
   isOpen: false,
@@ -5340,6 +5419,8 @@ Return ONLY the sentence text. No quotes, no labels.`;
   },
 
   _renderDailyLoop() {
+    // Seal any days that closed since the last open (misses become facts).
+    try { actionLedgerBackfill(); } catch (e) {}
     const loop = this._loopState();
     const today = this._loopDayKey(new Date());
     const kept = this._loopKeptDays();

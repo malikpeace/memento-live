@@ -3621,6 +3621,9 @@ function hasFreshWeeklyCard() {
 
 function renderCommandCenter() {
   try {
+    // Seal closed days into the offering ledger (defined in js/02, loaded
+    // first). Idempotent and cheap after the first call of the day.
+    try { if (typeof actionLedgerBackfill === 'function') actionLedgerBackfill(); } catch (_) {}
     const hasClarity = !!(state.clarity && state.clarity.completed && state.clarity.answers && state.clarity.answers.neutronStar);
     const pa = (state.action && state.action.primaryAction) || {};
     const tiers = pa.tiers || {};
