@@ -1873,7 +1873,16 @@ async function generateActionDraft(options = {}) {
     const keepTheirsInstruction = options.keepTheirs && String(intake.mainMove || '').trim()
       ? `\n\nKEEP-THEIR-VERSION OVERRIDE: The user saw your verdict and chose to keep THEIR OWN move: "${String(intake.mainMove).trim()}". Build the ENTIRE plan around their move. Do not swap in a different lever. Make their move mechanical: a count, a cadence, a verifiable finish line; the tiers scale THEIR move on one axis. Set verdict to "confirmed" and write verdictReason as a straight sentence about what makes their version workable, citing their own words. No lecture, no told-you-so.`
       : '';
-    const userBody = `PERSON CONTEXT:\n${contextLines}\n\nReturn the full plan JSON now. No conversation. If their "ONE THING" guess is close to a real high-leverage move, USE IT as the primaryAction title (lightly rewritten in your voice). Their guess at the main move is data, not a constraint - but anchor to it when it lines up.${nextStepInstruction}${keepTheirsInstruction}`;
+    // v1019 (Malik: the loading screen takes WAAYY too long): the plan is
+    // written in TWO calls. This one writes the MOVE, which is everything the
+    // first reveal screens show; the ladder and the focus plan come from a
+    // second call that runs while they read the verdict. Measured on a real
+    // plan: the whole thing is ~810 output tokens and the first screen needs
+    // ~80 of them, so waiting for all of it before painting anything WAS the
+    // wait. The prompt, the rules and the fields are unchanged; only the
+    // order they arrive in moved.
+    const partOneInstruction = '\n\nPART 1 OF 2: write everything EXCEPT the ladder and the focus plan. Set "path" to [] and omit "focusPlan" entirely. A second call will ask you for those, with this output as context, so do NOT compensate by padding any other field. Every other rule still applies in full.';
+    const userBody = `PERSON CONTEXT:\n${contextLines}\n\nReturn the full plan JSON now. No conversation. If their "ONE THING" guess is close to a real high-leverage move, USE IT as the primaryAction title (lightly rewritten in your voice). Their guess at the main move is data, not a constraint - but anchor to it when it lines up.${nextStepInstruction}${keepTheirsInstruction}${partOneInstruction}`;
 
     // v887: soft/emotional goals (no scoreboard) make Sonnet think for its
     // ENTIRE output budget and return a thinking-only block with no text,
@@ -2107,6 +2116,14 @@ async function generateActionDraft(options = {}) {
     actionChatCurrentType = 'text';
     actionChatCurrentOptions = [];
     persistNow();
+    // v1019: part 2, the ladder. Deliberately NOT awaited, that is the whole
+    // point: the verdict paints now and this lands while they read it. It can
+    // never break the plan, a failure just leaves the path empty and the
+    // bridge beat already renders fine without it.
+    try {
+      const _pa = plan.primaryAction || {};
+      if (!Array.isArray(_pa.path) || !_pa.path.length) startActionLadder(contextLines, plan);
+    } catch (ladderErr) { console.warn('ladder kickoff failed', ladderErr); }
   } catch (err) {
     actionChatError = (err && err.message) || 'Could not generate plan. Try again.';
   } finally {
@@ -2114,6 +2131,97 @@ async function generateActionDraft(options = {}) {
     refreshActionSurface();
     renderAll();
   }
+}
+
+// ---- v1019: THE LADDER (part 2 of plan generation) ----
+// The path (goal -> this week) plus the focus plan. Measured at ~445 output
+// tokens, 54% of the whole plan, and NOT shown until the second reveal screen.
+// Splitting it off is what makes the first screen arrive early. Everything
+// here is defensive: the plan is already saved and usable before this runs.
+
+// Resolves when the ladder call settles. The bridge beat awaits it (briefly)
+// so a fast reader never sees a path-less screen.
+let actionLadderPending = null;
+
+function startActionLadder(contextLines, plan) {
+  if (actionLadderPending) return actionLadderPending;
+  actionLadderPending = generateActionLadder(contextLines, plan)
+    .catch(err => { console.warn('ladder failed', err); })
+    .finally(() => { actionLadderPending = null; });
+  return actionLadderPending;
+}
+
+// Lets a renderer wait for the ladder without ever hanging on it.
+function actionLadderReady(timeoutMs) {
+  if (!actionLadderPending) return Promise.resolve();
+  return Promise.race([
+    actionLadderPending,
+    new Promise(res => setTimeout(res, timeoutMs || 6000))
+  ]);
+}
+
+// Asked by the reveal instead of reading the variable across script files:
+// a top-level `let` read before js/03 initialises throws, a function does not.
+function actionLadderInFlight() {
+  return !!actionLadderPending;
+}
+
+async function generateActionLadder(contextLines, plan) {
+  if (typeof DEMO_MODE !== 'undefined' && DEMO_MODE) return;
+  if (!hasAnthropicKey()) return;
+  const pa = (plan && plan.primaryAction) || {};
+  // The move, so the milestones ladder into the action they were just given
+  // instead of a second, subtly different plan.
+  const moveContext = JSON.stringify({
+    title: pa.title || '',
+    why: pa.why || '',
+    tiers: pa.tiers || {},
+    shape: pa.shape || 'lever',
+    verdict: pa.verdict || null,
+    verdictReason: pa.verdictReason || ''
+  });
+  const body = `PERSON CONTEXT:\n${contextLines}\n\nPART 2 OF 2. You already wrote this person's move in part 1:\n${moveContext}\n\nNow write ONLY the ladder and the focus plan for that exact move. Obey THE PATH rules (length from their timeframe, each step a specific measurable outcome in their words, "this week" a countable checkpoint, horizons in plain English, four fields per step) and the focusPlan shape, exactly as specified. Every receipts rule still applies: no fact about them that they did not state.\n\nReturn ONLY raw JSON, no markdown fences, no commentary:\n{"path":[{"horizon":"...","milestone":"...","looksLike":"...","bridge":"...","signal":"..."}],"focusPlan":{"frame":"...","frictionRemove":["..."],"frictionAdd":["..."]}}`;
+
+  let raw = '';
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      raw = await callClaude(
+        [{ role: 'user', content: body }],
+        actionDraftSystemPrompt(),
+        { maxTokens: 4000, model: ANTHROPIC_MODEL_PLANS, timeout: ACTION_PLAN_REQUEST_TIMEOUT_MS, cache: true, paidAction: true, thinking: 'off' }
+      );
+      if (String(raw || '').trim()) break;
+    } catch (err) {
+      if (attempt === 1) throw err;
+    }
+  }
+  let jsonStr = String(raw || '').trim()
+    .replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();
+  const fb = jsonStr.indexOf('{');
+  const lb = jsonStr.lastIndexOf('}');
+  if (fb > 0 || (fb !== -1 && lb !== -1)) jsonStr = jsonStr.slice(fb, lb + 1);
+  const parsed = JSON.parse(jsonStr);
+
+  // Reuse the ONE normalizer so the ladder gets the same trimming, dash
+  // stripping and field caps a single-call plan always got.
+  const norm = normalizeActionPlan({
+    primaryAction: Object.assign({}, pa, { path: parsed.path }),
+    focusPlan: parsed.focusPlan
+  });
+
+  // The plan on screen wins for every field except the two this call owns:
+  // a regeneration could have replaced it while this was in flight.
+  if (!state.action.primaryAction) return;
+  state.action.primaryAction.path = norm.primaryAction.path;
+  state.action.focusPlan = norm.focusPlan;
+  persistNow();
+  // Do NOT repaint while the reveal ceremony is on screen: renderContent
+  // restarts that sequence at the verdict beat, so a late ladder would yank
+  // the user back to screen one mid-ceremony. The bridge beat reads the path
+  // itself when they tap through to it.
+  const revealRunning = !!(typeof ActionExperience !== 'undefined' && ActionExperience.isOpen
+    && state.meta && !state.meta.planRevealSeen);
+  if (!revealRunning) refreshActionSurface();
 }
 
 // Thin wrapper that calls generateActionDraft in next-step mode. Used by

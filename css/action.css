@@ -3551,8 +3551,12 @@ html.lowfx #actionExpStars {
 .action-cine__thinking { display: flex; justify-content: flex-start; padding: 8px 2px; min-height: 3.6em; align-items: center; }
 .action-cine__thinking i {
   width: 9px; height: 9px; border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 0 18px rgba(255, 255, 255, 0.7);
+  /* v1019: the ink token, never hard white. The intake follows the theme
+     (v859, Malik's call), so on light mode a white dot sat invisible on the
+     off-white surface. Identical to the old value on dark. The dark-cinema
+     loading beat keeps its hard white via the html.theme-light rule below. */
+  background: rgb(var(--ink));
+  box-shadow: 0 0 18px rgba(var(--ink), 0.7);
   animation: cineThink 1.5s ease-in-out infinite;
 }
 @keyframes cineThink { 0%, 100% { opacity: 0.35; transform: scale(0.85); } 50% { opacity: 1; transform: scale(1.1); } }
@@ -3572,6 +3576,12 @@ html.lowfx #actionExpStars {
   min-height: 70vh; text-align: center; gap: 18px;
 }
 .action-draft-loading--cine .action-cine__thinking { justify-content: center; min-height: 0; padding: 0; }
+/* v1019 (Malik sent a screenshot of it stranded): when the dot is ALONE on the
+   screen it centers, exactly like the draft-loading beat on the line above.
+   Flush left it reads as a stray speck in a void, especially on desktop where
+   the column is 720px inside a 1440px window. The text margin is only the
+   right home for it when there is text around it. */
+[data-beat="thinking"] .action-cine__thinking { justify-content: center; min-height: 0; padding: 0; }
 .action-draft-loading--cine .action-draft-loading__title {
   font-size: 21px; font-weight: 800; color: rgba(var(--ink, 255, 255, 255), 0.97);
 }

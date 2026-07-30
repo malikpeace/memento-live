@@ -217,7 +217,7 @@
         var tries = 0;
         (function put() {
           var host = document.querySelector('.action-intake__current');
-          if (host) { host.innerHTML = '<div class="action-cine__thinking" aria-label="Thinking"><i></i></div>'; return; }
+          if (host) { host.innerHTML = ActionExperience._thinkingBeatHtml(); return; }
           if (tries++ < 12) setTimeout(put, 250);
         })();
       }]

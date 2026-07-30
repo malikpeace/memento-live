@@ -3191,6 +3191,19 @@ const ActionExperience = {
     return { mode, past, current, goal };
   },
 
+  // v1019 (Malik sent a screenshot of a lone dot stranded at the top of an
+  // empty screen): the waiting state is a BEAT like every other one. Wrapping
+  // it in the beat skeleton puts the dot exactly where the question line it is
+  // replacing would sit, instead of pinned to the top of the page. One helper,
+  // used by all three render sites, so they can never drift apart again.
+  _thinkingBeatHtml() {
+    return '<div class="intake-beat" data-beat="thinking">' +
+      '<div class="intake-beat__body">' +
+        '<div class="action-cine__thinking" aria-label="Thinking"><i></i></div>' +
+      '</div>' +
+    '</div>';
+  },
+
   // The summary beat's inner HTML, shared by the live beat and the past stack.
   _summaryBeatHtml(withCta) {
     const ca = (state.clarity && state.clarity.answers) || {};
@@ -3239,7 +3252,7 @@ const ActionExperience = {
     } else if (v.mode === 'doors') {
       this._renderDoorsBeat(host);
     } else if (v.mode === 'thinking') {
-      host.innerHTML = '<div class="action-cine__thinking" aria-label="Thinking"><i></i></div>';
+      host.innerHTML = this._thinkingBeatHtml();
       this._aiIntakeFetchNext();
     } else {
       // Current question: the existing question machinery (input building,
@@ -4272,7 +4285,7 @@ const ActionExperience = {
       oldOptions.style.transform = 'translateY(4px)';
     }
     setTimeout(() => {
-      current.innerHTML = '<div class="action-cine__thinking" aria-label="Thinking"><i></i></div>';
+      current.innerHTML = this._thinkingBeatHtml();
       try { this.navEl.innerHTML = ''; } catch (e) {}
       if (then) then();
     }, 280);
@@ -4355,7 +4368,7 @@ const ActionExperience = {
 
     // 4. Show typing indicator in current section after a beat, then fetch next.
     setTimeout(() => {
-      current.innerHTML = '<div class="action-cine__thinking" aria-label="Thinking"><i></i></div>';
+      current.innerHTML = this._thinkingBeatHtml();
       try { this.navEl.innerHTML = ''; } catch (e) {}
       this._aiIntakeFetchNext(answer);
     }, 280);
@@ -5141,6 +5154,23 @@ Return ONLY the sentence text. No quotes, no labels.`;
   // before you leave); it was cut with the others because the whole run of
   // pages read cheap, not because that idea is wrong.
   _renderBridgeBeat() {
+    // v1019: the ladder is written by a second call that starts as soon as
+    // the move lands, so by the time someone reads the verdict and taps
+    // Continue it is normally already here. If they are faster than the call,
+    // hold this beat on the thinking dot rather than showing it with the
+    // "this week" line missing. Bounded: it renders regardless after the wait.
+    if (typeof actionLadderInFlight === 'function' && actionLadderInFlight()) {
+      const pa0 = state.action.primaryAction || {};
+      if (!Array.isArray(pa0.path) || !pa0.path.length) {
+        this.pageWrap.innerHTML =
+          '<div class="action-exp__page-inner"><div class="action-exp__inner action-cine-reveal action-verdict">' +
+          this._thinkingBeatHtml() +
+          '</div></div>';
+        try { this.navEl.innerHTML = ''; } catch (e) {}
+        actionLadderReady(7000).then(() => { if (this.isOpen) this._renderBridgeBeat(); });
+        return;
+      }
+    }
     const pa = state.action.primaryAction || {};
     const tier = pa.recommendedTier || 'moderate';
     const move = (pa.tiers && pa.tiers[tier]) || pa.title || '';
