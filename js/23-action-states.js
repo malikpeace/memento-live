@@ -156,6 +156,10 @@
   }
 
   function intakeAt(phase, fn) {
+    // Seed the star FIRST: the recap derivation falls back to the doors when
+    // clarity has no neutronStar, which is exactly the fresh-page case (Malik
+    // hit this live; my local tab had a star left over from other states).
+    seedPlan();
     state.action.intake = { phase: 'summary', aiMessages: [], aiHistory: [], answers: {}, completed: false, aiSnapshot: { goalConfirm: '', timeframe: '', pastProgress: '', mainMove: '' } };
     state.action.introSeen = true;
     state.action.planGenerated = false;
