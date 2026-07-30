@@ -769,6 +769,70 @@
      If it is ever revisited it should be a different idea, not a better version
      of that one. */
 
+  /* MATTE BLACK. A curiosity, and the only look here that is not made of light.
+     Matte means no specular: no hairline, no bloom, no gloss sweep, no pool of
+     emitted light on the floor, no mirrored reflection. Which means the hold
+     cannot pull light OUT of it, so it does the opposite instead: a broad soft
+     key falls ACROSS the card from the top left, the surface resolves out of the
+     dark, and the mark surfaces as a change of finish rather than a change of
+     colour. Every value here is wide and low contrast, because a matte surface
+     is read by the ABSENCE of a sharp falloff. */
+  .cer.look-matte { --fl:158,160,166; --fl2:88,90,96; }
+  .cer.look-matte .daycard-theme-living { --plat-k:0; --rim-k:.5; --sat:1; --pop-k:0; }
+  /* the face, near black: one wide gradient and nothing else */
+  .cer.look-matte .daycard-ns {
+    background:linear-gradient(158deg, rgba(255,255,255,.028), rgba(255,255,255,.007) 56%, rgba(0,0,0,.16)); }
+  /* every specular layer the card owns, off. All of them are white by
+     construction, and any one left on reads as gloss. */
+  .cer.look-matte .daycard-ns__iri,
+  .cer.look-matte .daycard-ns__sheen,
+  .cer.look-matte .daycard-ns__plat,
+  .cer.look-matte .daycard-theme-living .blob { opacity:0 !important; }
+  /* no hairline. A matte edge does not catch a line, it lifts faintly where the
+     surface turns away from the light, so this is wide, dim and even. Static
+     values: the app already ramps this layer's OPACITY off --act, so the edge
+     still arrives with the hold without anything repainting per frame. */
+  .cer.look-matte .daycard-ns__rim {
+    box-shadow:
+      inset 0 0 0 1.2px rgba(255,255,255,.30),
+      inset 0 0 16px rgba(255,255,255,.10),
+      inset 0 0 54px rgba(255,255,255,.05); }
+  /* the key light, which IS the ignition for this look. Two gradients, so no
+     filter and no cost: a soft broad source top-left, and the floor of the
+     card falling off into black. */
+  .cer.look-matte .cer__face { opacity:var(--act, 0) !important;
+    background:
+      radial-gradient(74% 58% at 24% 16%, rgba(255,255,255,.11) 0%, rgba(255,255,255,.048) 42%, rgba(255,255,255,0) 78%),
+      radial-gradient(120% 92% at 50% 122%, rgba(0,0,0,.36) 0%, rgba(0,0,0,0) 66%); }
+  /* the mark as a finish, not a colour. Matte has no glint, so the deboss loses
+     its bright top edge and keeps only the soft shadow above it. */
+  .cer.look-matte .daycard-wrap.daycard--bright .daycard-ns__emblem,
+  .cer.look-matte .daycard-ns__emblem {
+    fill:rgba(255,255,255,.17);
+    filter:drop-shadow(0 -1px 1.5px rgba(0,0,0,.55)); }
+  /* asleep it is dimmer still, so the mark SURFACES as the key comes up instead
+     of dimming. The dormant rule further up carries two :not()s, which count
+     toward specificity, so it needs matching here or it wins and the mark ends
+     up brighter before the hold than after it. */
+  .cer.look-matte:not(.lit):not(.back) .daycard-wrap.daycard--bright .daycard-ns__emblem,
+  .cer.look-matte:not(.lit):not(.back) .daycard-ns__emblem {
+    fill:rgba(255,255,255,.085);
+    filter:drop-shadow(0 -1px 1.5px rgba(0,0,0,.5)); }
+  /* the room. Matte absorbs, so it gives almost nothing back: a trace of a
+     contact pool, and no mirrored reflection at all. */
+  .cer.look-matte .daycard-floor { display:none !important; }
+  .cer.look-matte .cer__floor { opacity:calc(var(--hf) * .22); }
+  .cer.look-matte.lit .cer__floor, .cer.look-matte.back .cer__floor { opacity:.2; }
+  .cer.look-matte .cer__glow { opacity:calc(var(--hf) * .24); }
+  .cer.look-matte.lit .cer__glow, .cer.look-matte.back .cer__glow { opacity:.22; }
+  /* and every emissive flourish platinum earned, off */
+  .cer.look-matte .cer__edge,
+  .cer.look-matte .cer__pulse,
+  .cer.look-matte .cer__life,
+  .cer.look-matte .cer__spark,
+  .cer.look-matte .cer__sweep,
+  .cer.look-matte .cer__flare { opacity:0 !important; animation:none !important; }
+
   /* THE IMPACT FRAME. The hold was a build with no moment in it: the light
      arrived gradually and then it was simply on. This is the frame where it
      lands. The screen goes white on release, hard, then falls away in under
@@ -1299,6 +1363,7 @@
       <button data-look="aurora" onclick="setLook('aurora')">Aurora</button>
       <button data-look="ember" onclick="setLook('ember')">Ember</button>
       <button data-look="caustic" onclick="setLook('caustic')">Caustic, light bending through it</button>
+      <button data-look="matte" onclick="setLook('matte')">Matte black, no light at all</button>
 
       <h3 style="margin-top:12px">The face</h3>
       <button data-face="plain" onclick="setFace('plain')">Plain</button>
@@ -1543,6 +1608,10 @@
       paint(1, 1);
       cer.style.setProperty('--hp', '1'); cer.style.setProperty('--hf', '1');
       cer.style.setProperty('--hs', '1');
+      /* and the whiteout is spent by then. render() leaves it at the hold's cap
+         because p is 1, which had freeze(1) reviewing a white screen instead of
+         the settled card. */
+      cer.style.setProperty('--wht', '0'); cer.style.setProperty('--wmo', '0');
     }
   }
 
