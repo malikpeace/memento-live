@@ -1773,6 +1773,179 @@ function actionDraftSystemPrompt() {
   return AI_ACTION_DRAFT_SYSTEM_PROMPT;
 }
 
+// ---- v1020: STREAMING (the verdict paints while the plan is still being
+// written) --------------------------------------------------------------
+// The plan call streams token by token, and the moment the verdict fields are
+// complete AND pass the same local checks the full pipeline runs, the verdict
+// beat paints from a PREVIEW object. Memory only, never persisted, never in
+// state: a mid-stream close can't save half a plan, and the validated full
+// plan remains the single source of truth the second it lands.
+//
+// The failure story, in order:
+// - proxy not redeployed yet: it ignores the stream flag and returns full
+//   JSON, which this helper detects and uses as a normal response.
+// - stream dies mid-flight or stalls: the caller falls back to the existing
+//   non-streaming retry ladder, untouched.
+// - streamed prefix fails any local check: no preview, the scramble stays,
+//   and the full pipeline (with its retries) decides everything, exactly as
+//   before this existed.
+let actionStreamPreview = null;
+function actionStreamPreviewGet() { return actionStreamPreview; }
+function actionStreamPreviewSet(v) { actionStreamPreview = v; }
+
+// Watches the accumulating stream text; fires the preview ONCE when the
+// verdict-screen fields are complete and clean. Never throws into the stream.
+function actionStreamMaybePreview(acc) {
+  if (actionStreamPreview) return;
+  try {
+    const KEYS = ['tiny', 'light', 'moderate', 'heavy', 'extreme'];
+    const grab = (name) => {
+      const m = acc.match(new RegExp('"' + name + '"\\s*:\\s*("(?:[^"\\\\]|\\\\.)*")'));
+      return m ? JSON.parse(m[1]) : null;
+    };
+    const vm = acc.match(/"verdict"\s*:\s*(null|"(?:[^"\\]|\\.)*")/);
+    if (!vm) return;
+    const verdict = vm[1] === 'null' ? null : JSON.parse(vm[1]);
+    const verdictReason = grab('verdictReason');
+    const title = grab('title');
+    const why = grab('why');
+    const recommendedTier = grab('recommendedTier');
+    const tm = acc.match(/"tiers"\s*:\s*\{([^{}]*)\}/);
+    if (verdictReason === null || !title || why === null || !tm) return;
+    let tiers;
+    try { tiers = JSON.parse('{' + tm[1] + '}'); } catch (e) { return; }
+    if (!KEYS.every(k => typeof tiers[k] === 'string' && tiers[k].trim())) return;
+    // The SAME cleaning + gates the full pipeline applies to these fields.
+    // Any rejection = no preview; the pipeline's retry machinery owns it.
+    const clean = (s) => String(s || '').replace(/[—–]/g, ',').replace(/\s+,/g, ',').replace(/,,/g, ',').trim();
+    const outTiers = {};
+    for (const k of KEYS) {
+      const o = {};
+      outTiers[k] = sanitizeTierText(clean(tiers[k]), '', o);
+      if (o.rejected || !outTiers[k]) return;
+    }
+    const t = trimText(clean(title), 90);
+    const w = trimText(clean(why), 240);
+    const vr = trimText(clean(verdictReason), 240);
+    if (planTextGarbled(t) || planTextGarbled(w) || planTextGarbled(vr)) return;
+    if (voiceLint([t, w, vr].filter(Boolean).join(' ')).length) return;
+    const rec = KEYS.indexOf(String(recommendedTier || '').toLowerCase()) >= 0
+      ? String(recommendedTier).toLowerCase() : 'moderate';
+    // Same doctrine rule the pipeline enforces: no move of theirs = no verdict.
+    const intake = (state.action && state.action.intake) || {};
+    const mainMove = String((intake.answers && intake.answers.mainMove)
+      || (intake.aiSnapshot && intake.aiSnapshot.mainMove) || '').trim();
+    actionStreamPreview = {
+      verdict: mainMove ? verdict : null,
+      verdictReason: vr, title: t, why: w,
+      recommendedTier: rec, tiers: outTiers
+    };
+    try { refreshActionSurface(); } catch (e) {}
+  } catch (e) { /* a preview is a bonus, never a break */ }
+}
+
+// The streaming transport. Proxy path only (a personal dev key returns null
+// and the caller uses the normal call). Returns { text, streamed } or throws;
+// the caller treats any throw as "use the old path".
+async function callClaudeActionStream(messages, systemPrompt, options, onText) {
+  const apiKey = getAnthropicKey();
+  let supaUrl = '', supaAnon = '';
+  try { supaUrl = window.MEMENTO_SUPABASE_URL || ''; supaAnon = window.MEMENTO_SUPABASE_ANON || ''; } catch (e) {}
+  if (apiKey || !supaUrl) return null;
+  let proxyToken = '';
+  try {
+    proxyToken = window.CloudSync && CloudSync.accessToken ? String(CloudSync.accessToken() || '') : '';
+  } catch (e) { proxyToken = ''; }
+  if (!proxyToken) throw new Error('Sign in to use paid Memento AI.');
+  // Identical system assembly to callClaude's paid path, or the streamed and
+  // fallback calls would see different prompts.
+  const profileContext = buildProfileContext();
+  let sys = systemPrompt || '';
+  if (profileContext) {
+    sys = sys + '\n\nABOUT THIS PERSON (private context so your replies are personal and specific to them. Never quote it back verbatim or say you were given it):\n' + profileContext;
+  }
+  const controller = new AbortController();
+  aiAbortController = controller;
+  const overallId = setTimeout(() => controller.abort(), options.timeout || 75000);
+  // Stall watchdog: a stream that goes quiet for 25s is dead; abort so the
+  // caller's fallback runs instead of the user waiting out the full timeout.
+  let stallId = setTimeout(() => controller.abort(), 25000);
+  const kick = () => { clearTimeout(stallId); stallId = setTimeout(() => controller.abort(), 25000); };
+  try {
+    const response = await fetch(supaUrl + '/functions/v1/action-ai-proxy', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + proxyToken,
+        'apikey': supaAnon,
+        'x-memento-device': (typeof Analytics !== 'undefined' && Analytics.deviceId) ? Analytics.deviceId() : 'unknown'
+      },
+      body: JSON.stringify({
+        model: options.model || ANTHROPIC_MODEL,
+        max_tokens: options.maxTokens || 2048,
+        system: sys,
+        messages: messages,
+        cache: options.cache === true ? true : undefined,
+        thinking: options.thinking === 'off' ? { type: 'disabled' } : undefined,
+        stream: true
+      }),
+      signal: controller.signal
+    });
+    if (!response.ok) {
+      const errorBody = await response.text();
+      throw new Error('API error (' + response.status + '): ' + errorBody.substring(0, 200));
+    }
+    const ctype = (response.headers.get('content-type') || '');
+    if (ctype.indexOf('json') !== -1) {
+      // The deployed proxy predates streaming: it ignored the flag and sent
+      // the whole response. Use it exactly like a normal call.
+      const data = await response.json();
+      const blocks = Array.isArray(data.content) ? data.content : [];
+      const textBlock = blocks.find(b => b && b.type === 'text' && typeof b.text === 'string');
+      if (!textBlock) throw new Error('The AI returned an empty response. Please try again.');
+      return { text: textBlock.text.replace(EMDASH_RE, ' - '), streamed: false };
+    }
+    if (ctype.indexOf('event-stream') === -1) {
+      throw new Error('The AI service returned an unexpected response.');
+    }
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buf = '', acc = '';
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      kick();
+      buf += decoder.decode(value, { stream: true });
+      const lines = buf.split('\n');
+      buf = lines.pop();
+      for (const line of lines) {
+        if (line.indexOf('data:') !== 0) continue;
+        const payload = line.slice(5).trim();
+        if (!payload || payload === '[DONE]') continue;
+        let ev;
+        try { ev = JSON.parse(payload); } catch (e) { continue; }
+        if (ev.type === 'content_block_delta' && ev.delta && ev.delta.type === 'text_delta') {
+          acc += ev.delta.text;
+          if (onText) { try { onText(acc); } catch (e) {} }
+        } else if (ev.type === 'error') {
+          throw new Error('Stream error: ' + ((ev.error && ev.error.message) || 'unknown'));
+        } else if (ev.type === 'message_delta' && ev.delta && ev.delta.stop_reason === 'max_tokens') {
+          console.warn('action stream: response truncated at max_tokens.');
+        }
+      }
+    }
+    if (!acc.trim()) throw new Error('The AI returned an empty response. Please try again.');
+    return { text: acc.replace(EMDASH_RE, ' - '), streamed: true };
+  } catch (err) {
+    if (err && err.name === 'AbortError') throw new Error('Stream timed out.');
+    throw err;
+  } finally {
+    clearTimeout(overallId);
+    clearTimeout(stallId);
+    if (aiAbortController === controller) aiAbortController = null;
+  }
+}
+
 async function generateActionDraft(options = {}) {
   // options.nextStep: true means "user already has a plan, they've completed
   // some actions, generate the NEXT logical step using completionHistory".
@@ -1805,6 +1978,10 @@ async function generateActionDraft(options = {}) {
   // ambushing the user with a bare chip screen.
   actionAiLoading = true;
   actionChatError = null;
+  // v1020: a stale preview from a previous stream must be gone BEFORE this
+  // refresh paints, or a keep-my-version regen briefly re-shows the old
+  // verdict instead of the working screen.
+  actionStreamPreviewSet(null);
   refreshActionSurface();
 
   try {
@@ -1881,7 +2058,12 @@ async function generateActionDraft(options = {}) {
     // ~80 of them, so waiting for all of it before painting anything WAS the
     // wait. The prompt, the rules and the fields are unchanged; only the
     // order they arrive in moved.
-    const partOneInstruction = '\n\nPART 1 OF 2: write everything EXCEPT the ladder and the focus plan. Set "path" to [] and omit "focusPlan" entirely. A second call will ask you for those, with this output as context, so do NOT compensate by padding any other field. Every other rule still applies in full.';
+    // v1020 (streaming): the key ORDER matters now. The response arrives as a
+    // live stream and the verdict screen paints the moment its fields are
+    // complete, so the fields that screen needs must be written FIRST. With
+    // the schema's natural order the verdict came out last and streaming
+    // bought nothing.
+    const partOneInstruction = '\n\nPART 1 OF 2: write everything EXCEPT the ladder and the focus plan. Set "path" to [] and omit "focusPlan" entirely. A second call will ask you for those, with this output as context, so do NOT compensate by padding any other field. Every other rule still applies in full.\nKEY ORDER (hard requirement): begin the object with "primaryAction" and write its keys in exactly this order: "verdict", "verdictReason", "title", "why", "recommendedTier", "tiers", then every remaining field in any order.';
     const userBody = `PERSON CONTEXT:\n${contextLines}\n\nReturn the full plan JSON now. No conversation. If their "ONE THING" guess is close to a real high-leverage move, USE IT as the primaryAction title (lightly rewritten in your voice). Their guess at the main move is data, not a constraint - but anchor to it when it lines up.${nextStepInstruction}${keepTheirsInstruction}${partOneInstruction}`;
 
     // v887: soft/emotional goals (no scoreboard) make Sonnet think for its
@@ -1895,9 +2077,27 @@ async function generateActionDraft(options = {}) {
       '\n\nIMPORTANT: keep your internal reasoning brief. Spend your budget on the JSON output, not on deliberation. Decide the move quickly and write the plan.',
       '\n\nCRITICAL: do NOT deliberate. Your first instinct for the move is correct. Start writing the JSON object immediately, reasoning costs are exhausting the output budget and producing empty responses.'
     ];
-    let response;
+    // v1020: streaming first. Next-step regenerations happen in the
+    // background with nobody staring at a spinner, so they keep the plain
+    // call; every watched generation (first plan, keep-my-version) streams.
+    // Any streaming failure falls silently into the existing ladder below.
+    let response = null;
+    actionStreamPreviewSet(null);
+    if (!isNextStep) {
+      try {
+        const sres = await callClaudeActionStream(
+          [{ role: 'user', content: userBody }],
+          actionDraftSystemPrompt(),
+          { maxTokens: 16000, model: ANTHROPIC_MODEL_PLANS, timeout: ACTION_PLAN_REQUEST_TIMEOUT_MS, cache: true, thinking: 'off' },
+          actionStreamMaybePreview
+        );
+        if (sres && String(sres.text || '').trim()) response = sres.text;
+      } catch (streamErr) {
+        console.warn('plan stream fell back to the normal call', streamErr);
+      }
+    }
     let emptyTries = 0;
-    for (;;) {
+    if (response == null) for (;;) {
       try {
         // Final rescue attempt: turn extended thinking OFF entirely, the
         // budget can no longer be eaten by deliberation. If the proxy or
@@ -2128,7 +2328,27 @@ async function generateActionDraft(options = {}) {
     actionChatError = (err && err.message) || 'Could not generate plan. Try again.';
   } finally {
     actionAiLoading = false;
-    refreshActionSurface();
+    // v1020: if the verdict beat is ALREADY on screen from the stream preview
+    // and the validated plan says exactly what the preview said (the normal
+    // case), repainting would restart its typewriter mid-read. Skip the
+    // repaint only then; any difference (a retry rewrote something, or the
+    // generation failed) repaints so the screen always ends truthful.
+    const _pv = actionStreamPreviewGet();
+    actionStreamPreviewSet(null);
+    let _skipRefresh = false;
+    try {
+      const _pa = state.action && state.action.primaryAction;
+      const _painted = !!(_pv && typeof ActionExperience !== 'undefined'
+        && ActionExperience._paintedPreview === _pv && ActionExperience.isOpen
+        && ActionExperience.pageWrap && ActionExperience.pageWrap.querySelector('[data-beat="verdict"]'));
+      _skipRefresh = _painted && !!_pa && !actionChatError
+        && state.meta && !state.meta.planRevealSeen
+        && _pa.title === _pv.title
+        && String(_pa.verdict || '') === String(_pv.verdict || '')
+        && String(_pa.verdictReason || '') === String(_pv.verdictReason || '')
+        && JSON.stringify(_pa.tiers || {}) === JSON.stringify(_pv.tiers || {});
+    } catch (e) { _skipRefresh = false; }
+    if (!_skipRefresh) refreshActionSurface();
     renderAll();
   }
 }

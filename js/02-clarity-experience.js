@@ -2924,6 +2924,7 @@ const ActionExperience = {
   close() {
     if (!this.isOpen) return;
     this.isOpen = false;
+    this._paintedPreview = null;
     this._clearTimers();
     try { if (typeof KeyboardPin !== 'undefined') KeyboardPin.release(this.el); } catch (e) {}
     if (this._kbSettleCleanup) { try { this._kbSettleCleanup(); } catch (e) {} this._kbSettleCleanup = null; }
@@ -5011,6 +5012,17 @@ Return ONLY the sentence text. No quotes, no labels.`;
     // (v875: the Round 10 timeframe gate is DEAD, Malik killed it. Timeframe
     // is Clarity's question; a missing one never blocks the module.)
     if (actionAiLoading) {
+      // v1020: the streamed verdict paints the moment its fields are complete
+      // and clean, while the rest of the plan is still arriving. The painted-
+      // preview identity guard stops repeat refreshes from restarting the
+      // beat's typewriter, and lets a NEW preview (keep-my-version regen)
+      // replace an old one.
+      const _pv = (typeof actionStreamPreviewGet === 'function') ? actionStreamPreviewGet() : null;
+      state.meta = state.meta || {};
+      if (_pv && !state.meta.planRevealSeen) {
+        if (this._paintedPreview !== _pv) this._renderVerdictBeat();
+        return;
+      }
       this._renderNarrowing();
       return;
     }
@@ -5090,7 +5102,13 @@ Return ONLY the sentence text. No quotes, no labels.`;
   },
 
   _renderVerdictBeat() {
-    const pa = state.action.primaryAction || {};
+    // v1020: while the plan is still streaming, this beat reads the preview
+    // (already cleaned by the same gates the pipeline runs); once the
+    // validated plan is in state, state wins, always.
+    const _pv = (typeof actionAiLoading !== 'undefined' && actionAiLoading
+      && typeof actionStreamPreviewGet === 'function') ? actionStreamPreviewGet() : null;
+    this._paintedPreview = _pv || null;
+    const pa = _pv || state.action.primaryAction || {};
     const tier = pa.recommendedTier || 'moderate';
     const move = (pa.tiers && pa.tiers[tier]) || pa.title || '';
     const verdict = pa.verdict || null;
@@ -5143,7 +5161,7 @@ Return ONLY the sentence text. No quotes, no labels.`;
     // Decision 9 (Malik): on Replace and Upgrade they may keep their own
     // version. It is still mechanized, never obeyed raw: the plan regenerates
     // built AROUND their move.
-    generateActionDraft({ keepTheirs: true });
+    this._holdForPlanThen(() => { generateActionDraft({ keepTheirs: true }); });
   },
 
   // ---- UNREACHABLE as of v999 -----------------------------------------
@@ -5211,11 +5229,33 @@ Return ONLY the sentence text. No quotes, no labels.`;
     this._revealBeatShell(body, 'Start now', () => this._finishReveal(), 'I will start today', () => this._finishReveal());
   },
 
+  // v1020: with the verdict streaming in ahead of the full plan, both of the
+  // beat's buttons can be tapped while the rest is still arriving. Each holds
+  // on the thinking dot until the generation settles (bounded), then proceeds.
+  // Without this, "Lock it in" bounced BACK to the scramble screen and "Keep
+  // my version" silently did nothing (the regen entry no-ops while loading).
+  _holdForPlanThen(fn) {
+    if (!(typeof actionAiLoading !== 'undefined' && actionAiLoading)) { fn(); return; }
+    this.pageWrap.innerHTML =
+      '<div class="action-exp__page-inner"><div class="action-exp__inner action-cine-reveal action-verdict">' +
+      this._thinkingBeatHtml() +
+      '</div></div>';
+    try { this.navEl.innerHTML = ''; } catch (e) {}
+    let waited = 0;
+    const iv = setInterval(() => {
+      if (!this.isOpen) { clearInterval(iv); return; }
+      waited += 250;
+      if (!actionAiLoading || waited >= 20000) { clearInterval(iv); fn(); }
+    }, 250);
+  },
+
   _finishReveal() {
-    state.meta = state.meta || {};
-    state.meta.planRevealSeen = true;
-    try { persistNow(); } catch (e) {}
-    this.renderContent();
+    this._holdForPlanThen(() => {
+      state.meta = state.meta || {};
+      state.meta.planRevealSeen = true;
+      try { persistNow(); } catch (e) {}
+      this.renderContent();
+    });
   },
 
   // The narrowing (Night 3, from the intake.html render, frame 07). While the
@@ -5321,6 +5361,9 @@ Return ONLY the sentence text. No quotes, no labels.`;
   // decodes, left to right, into the actual move, so the wait ENDS on the
   // answer instead of cutting to another screen.
   _renderNarrowing() {
+    // v1020: the scramble replaces whatever beat was up, so the painted-
+    // preview marker is stale the moment this renders.
+    this._paintedPreview = null;
     // Every entry invalidates the previous run's timers via the token, so a
     // re-render can never leave two loops racing on one surface.
     this._narrowToken = (this._narrowToken || 0) + 1;
