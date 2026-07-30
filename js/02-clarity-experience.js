@@ -3810,11 +3810,17 @@ const ActionExperience = {
       : daily >= 75 ? 'about an hour and a half a day'
       : daily >= 45 ? 'about an hour a day'
       : ('about ' + daily + ' minutes a day');
+    // A time budget has five honest answers, so it is a chip ladder wherever
+    // it is asked: as the follow-up when their committed number changed, and
+    // (v1018, Malik) as the FIRST question when Clarity never captured one.
+    // That fallback was a bare text box, the exact "write a paragraph" friction
+    // he flagged. Chips lead, the free field stays for anything else.
+    const TIME_CHIPS = ['15 minutes', '30 minutes', 'An hour', 'A few hours', 'Most of the day'];
     const capacityQ = phrase
       ? ('You said you can give this ' + phrase + '. Still true?')
       : 'How much time can you actually give this on a normal day?';
-    const capacityType = phrase ? 'choices' : 'text';
-    const capacityOpts = phrase ? ['Still true', 'It changed'] : [];
+    const capacityType = phrase ? 'choices' : 'chips';
+    const capacityOpts = phrase ? ['Still true', 'It changed'] : TIME_CHIPS;
     const triedQ = 'What have you already tried?';
     const NOTHING = 'Honestly, nothing yet';
 
@@ -3853,20 +3859,21 @@ const ActionExperience = {
       // Answers that belong to door 2's script (drop the door-1 "idk" turn).
       const d2 = intake._slidDoor2 && after.length && dontKnow(after[0]) ? after.slice(1) : after;
       const changed = d2[0] === 'It changed';
-      const capNote = capacityType === 'text'
+      // Key off whether Clarity gave us a committed number, NOT off the input
+      // type: the fallback question became chips in v1018 and its answer is
+      // still the capacity itself, sitting at index 0.
+      const askedFresh = !phrase;
+      const capNote = askedFresh
         ? (d2[0] || '')
         : (changed ? (d2[1] || '') : '');
-      const triedIdx = capacityType === 'text' ? 1 : (changed ? 2 : 1);
+      const triedIdx = askedFresh ? 1 : (changed ? 2 : 1);
 
       if (d2.length === 0) {
         push(capacityQ, capacityType, capacityOpts, '1 of 2');
         return;
       }
       if (changed && d2.length === 1) {
-        // A time budget has five honest answers, so asking for prose is pure
-        // friction. Chips lead, the free field stays for anything else.
-        push('What can you actually give it a day right now?', 'chips',
-          ['15 minutes', '30 minutes', 'An hour', 'A few hours', 'Most of the day'], '1 of 2');
+        push('What can you actually give it a day right now?', 'chips', TIME_CHIPS, '1 of 2');
         return;
       }
       if (d2.length === triedIdx) {

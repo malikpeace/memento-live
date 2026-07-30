@@ -174,6 +174,20 @@
     if (fn) setTimeout(fn, 350);
   }
 
+  // Walk to door 2's first question. dailyMinutes 0 = Clarity never captured a
+  // number (the chip ladder); a number = the "still true?" confirm.
+  function capacityState(dailyMinutes) {
+    intakeAt('summary', function () {
+      state.clarity.answers.dailyTime = dailyMinutes || '';
+      var b = document.getElementById('missionConfirmBtn'); if (b) b.click();
+      setTimeout(function () {
+        var doors = document.querySelectorAll('.door-card');
+        if (doors[1]) doors[1].click();
+        setTimeout(function () { var go = document.getElementById('doorGo'); if (go) go.click(); }, 250);
+      }, 350);
+    });
+  }
+
   var STATES = [
     ['INTAKE', [
       ['Star recap (Quick Reminder)', function () { intakeAt('summary'); }],
@@ -182,12 +196,16 @@
           var b = document.getElementById('missionConfirmBtn'); if (b) b.click();
         });
       }],
-      ['Capacity question (chips)', function () {
+      // The capacity question has two faces, and which one you get depends on
+      // whether Clarity captured a daily-time number. Both are browsable.
+      ['Capacity: no number yet (chips)', function () { capacityState(0); }],
+      ['Capacity: confirm their number', function () { capacityState(45); }],
+      ['Door 1: name your own move', function () {
         intakeAt('summary', function () {
           var b = document.getElementById('missionConfirmBtn'); if (b) b.click();
           setTimeout(function () {
             var doors = document.querySelectorAll('.door-card');
-            if (doors[1]) doors[1].click();
+            if (doors[0]) doors[0].click();
             setTimeout(function () { var go = document.getElementById('doorGo'); if (go) go.click(); }, 250);
           }, 350);
         });
