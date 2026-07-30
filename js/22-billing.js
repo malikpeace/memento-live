@@ -7,6 +7,7 @@ const PolarBilling = (function () {
 
   const PENDING_KEY = 'memento_polar_pending_plan';
   const ACCESS_CACHE_KEY = 'memento_polar_access_receipt_v1';
+  const ACTION_QUEUE_KEY = 'memento_action_receipt_queue_v1';
   const VALID_PLANS = ['founder', 'monthly', 'yearly'];
   const ACCESS_TTL_MS = 5 * 60 * 1000;
   const OFFLINE_GRACE_MS = 72 * 60 * 60 * 1000;
@@ -21,7 +22,9 @@ const PolarBilling = (function () {
     production: {
       checkout: 'polar-production-checkout',
       access: 'polar-production-access',
-      portal: 'polar-production-portal'
+      portal: 'polar-production-portal',
+      refund: 'locked-in-guarantee',
+      receipt: 'record-action-completion'
     }
   };
   let busy = false;
@@ -32,6 +35,7 @@ const PolarBilling = (function () {
   let verifiedSubject = '';
   let refreshTimer = null;
   let refreshInFlight = null;
+  let receiptTimer = null;
 
   function sandboxMode() {
     try { return new URLSearchParams(location.search).get('billing') === 'sandbox'; }
@@ -100,7 +104,7 @@ const PolarBilling = (function () {
     } catch (e) { return 'unknown'; }
   }
 
-  async function invoke(name, body) {
+  async function invoke(name, body, timeoutMs) {
     const base = String(window.MEMENTO_SUPABASE_URL || '');
     const anon = String(window.MEMENTO_SUPABASE_ANON || '');
     const token = accessToken();
@@ -115,7 +119,7 @@ const PolarBilling = (function () {
         'x-memento-device': deviceId()
       },
       body: JSON.stringify(body || {}),
-      signal: AbortSignal.timeout(15000)
+      signal: AbortSignal.timeout(Number(timeoutMs) || 15000)
     });
     let data = null;
     try { data = await response.json(); } catch (e) {}
@@ -447,9 +451,287 @@ const PolarBilling = (function () {
     }
   }
 
+  function readReceiptQueue() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(ACTION_QUEUE_KEY) || '[]');
+      return Array.isArray(parsed) ? parsed.slice(-40) : [];
+    } catch (e) { return []; }
+  }
+
+  function writeReceiptQueue(queue) {
+    try {
+      if (!queue.length) localStorage.removeItem(ACTION_QUEUE_KEY);
+      else localStorage.setItem(ACTION_QUEUE_KEY, JSON.stringify(queue.slice(-40)));
+    } catch (e) {}
+  }
+
+  function receiptStillExists(proofId) {
+    try {
+      const history = state.action && Array.isArray(state.action.completionHistory)
+        ? state.action.completionHistory
+        : [];
+      return history.some(function (entry) {
+        return entry && String(entry.id || '') === proofId;
+      });
+    } catch (e) { return false; }
+  }
+
+  function scheduleReceiptFlush(delay) {
+    clearTimeout(receiptTimer);
+    receiptTimer = setTimeout(function () {
+      receiptTimer = null;
+      flushActionReceipts();
+    }, Math.max(1000, Number(delay) || 6500));
+  }
+
+  function recordActionCompletion(record) {
+    if (billingEnvironment() !== 'production' || !hasVerifiedAccess()) return false;
+    const proofId = String(record && record.id || '');
+    const completedAt = String(record && record.date || '');
+    if (!/^act_[a-z0-9]+$/i.test(proofId) || !Number.isFinite(Date.parse(completedAt))) {
+      return false;
+    }
+    const queue = readReceiptQueue().filter(function (item) {
+      return item && item.proof_id !== proofId;
+    });
+    queue.push({
+      proof_id: proofId,
+      completed_at: completedAt,
+      timezone_offset_minutes: new Date(completedAt).getTimezoneOffset()
+    });
+    writeReceiptQueue(queue);
+    scheduleReceiptFlush(6500);
+    return true;
+  }
+
+  async function flushActionReceipts() {
+    if (billingEnvironment() !== 'production' || !loggedIn() || !hasVerifiedAccess()) {
+      return false;
+    }
+    const queued = readReceiptQueue();
+    const remaining = [];
+    for (const receipt of queued) {
+      const proofId = String(receipt && receipt.proof_id || '');
+      if (!receiptStillExists(proofId)) continue;
+      try {
+        await invoke(FUNCTIONS.production.receipt, {
+          proof_id: proofId,
+          completed_at: String(receipt.completed_at || ''),
+          timezone_offset_minutes: Number(receipt.timezone_offset_minutes) || 0
+        }, 30000);
+      } catch (error) {
+        const status = Number(error && error.status) || 0;
+        if (status === 0 || status === 408 || status === 425 || status === 429 || status >= 500) {
+          remaining.push(receipt);
+        }
+      }
+    }
+    writeReceiptQueue(remaining);
+    if (remaining.length) scheduleReceiptFlush(RETRY_DELAY_MS);
+    return remaining.length === 0;
+  }
+
+  async function refundStatus() {
+    if (billingEnvironment() !== 'production') throw new Error('refunds_production_only');
+    return invoke(FUNCTIONS.production.refund, { action: 'status' }, 30000);
+  }
+
+  async function claimRefund() {
+    if (billingEnvironment() !== 'production') throw new Error('refunds_production_only');
+    const result = await invoke(FUNCTIONS.production.refund, { action: 'claim' }, 120000);
+    if (result && result.completed) {
+      clearAccess(true);
+      clearLegacyBillingCache();
+    }
+    return result;
+  }
+
+  function guaranteeCopy(status) {
+    const deadline = status && status.claimDeadline
+      ? new Date(status.claimDeadline).toLocaleDateString(undefined, {
+        month: 'long', day: 'numeric', year: 'numeric'
+      })
+      : '';
+    if (!status) return 'We could not load your refund status.';
+    if (status.completed || status.reason === 'refund_completed') {
+      return 'Your refund was submitted and paid access has ended.';
+    }
+    if (status.eligible && status.claimKind === 'initial') {
+      return 'Your full 30-day refund is available through ' + deadline + '.';
+    }
+    if (status.eligible && status.claimKind === 'locked_in') {
+      return 'Your Locked-In Guarantee is available through ' + deadline
+        + '. All 30 Action days were verified.';
+    }
+    if (status.eligible && status.claimKind === 'renewal') {
+      return 'Your latest renewal can be refunded through ' + deadline + '.';
+    }
+    if (status.reason === 'locked_in_action_days_missing') {
+      return String(status.verifiedActionDays || 0)
+        + ' of 30 Action days were verified. The extended guarantee requires all 30.';
+    }
+    if (status.reason === 'no_memento_purchase') return 'No Memento purchase was found for this account.';
+    if (status.reason === 'refund_in_progress') return 'Your refund is processing. You can safely retry.';
+    return 'Your automatic refund window has closed. Your legal refund rights are unchanged.';
+  }
+
+  function closeRefundDialog() {
+    const existing = document.getElementById('mementoRefundDialog');
+    if (existing) existing.remove();
+  }
+
+  async function showRefundDialog() {
+    closeRefundDialog();
+    const overlay = document.createElement('div');
+    overlay.id = 'mementoRefundDialog';
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-labelledby', 'refundDialogTitle');
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,.78);'
+      + 'display:flex;align-items:center;justify-content:center;padding:20px;';
+    overlay.innerHTML = '<div style="width:min(460px,100%);max-height:90vh;overflow:auto;'
+      + 'background:#111214;color:#f6f6f7;border:1px solid rgba(255,255,255,.14);'
+      + 'border-radius:8px;padding:24px;font-family:inherit">'
+      + '<button id="refundDialogClose" aria-label="Close" style="float:right;background:none;'
+      + 'border:0;color:#aaa;font-size:24px;cursor:pointer">×</button>'
+      + '<p style="margin:0 0 8px;color:#8c8f96;font-size:12px;text-transform:uppercase">Billing</p>'
+      + '<h2 id="refundDialogTitle" style="margin:0 32px 10px 0;font-size:24px">Refunds</h2>'
+      + '<p id="refundDialogStatus" style="color:#b8bbc2;line-height:1.55">Checking your account…</p>'
+      + '<div id="refundDialogActions"></div>'
+      + '</div>';
+    document.body.appendChild(overlay);
+    overlay.querySelector('#refundDialogClose').addEventListener('click', closeRefundDialog);
+    overlay.addEventListener('click', function (event) {
+      if (event.target === overlay) closeRefundDialog();
+    });
+
+    const message = overlay.querySelector('#refundDialogStatus');
+    const actions = overlay.querySelector('#refundDialogActions');
+    let status = null;
+    try {
+      status = await refundStatus();
+      message.textContent = guaranteeCopy(status);
+    } catch (error) {
+      message.textContent = 'We could not check your refund status. Please try again.';
+    }
+
+    const portal = document.createElement('button');
+    portal.type = 'button';
+    portal.textContent = 'Manage billing';
+    portal.style.cssText = 'width:100%;padding:14px 18px;margin-top:10px;border-radius:6px;'
+      + 'border:1px solid rgba(255,255,255,.14);background:#202125;color:#fff;font-weight:700;';
+    portal.addEventListener('click', openPortal);
+
+    if (!status || !status.eligible) {
+      actions.appendChild(portal);
+      return;
+    }
+
+    const claim = document.createElement('button');
+    claim.type = 'button';
+    claim.textContent = 'Request refund';
+    claim.style.cssText = 'width:100%;padding:14px 18px;margin-top:14px;border-radius:6px;'
+      + 'border:0;background:#f5f5f5;color:#111;font-weight:800;';
+    claim.addEventListener('click', async function () {
+      claim.disabled = true;
+      message.textContent = 'Sending a fresh sign-in code to confirm it is you…';
+      try {
+        const email = window.CloudSync && CloudSync.email ? String(CloudSync.email() || '') : '';
+        if (!email || !CloudSync.sendCode || !CloudSync.verifyCode) throw new Error('account_required');
+        const sent = await CloudSync.sendCode(email);
+        if (!sent || !sent.ok) throw new Error('confirmation_send_failed');
+        actions.innerHTML = '';
+        const label = document.createElement('label');
+        label.textContent = 'Enter the 6-digit code sent to ' + email;
+        label.style.cssText = 'display:block;color:#b8bbc2;margin:14px 0 8px;';
+        const input = document.createElement('input');
+        input.inputMode = 'numeric';
+        input.autocomplete = 'one-time-code';
+        input.maxLength = 6;
+        input.style.cssText = 'box-sizing:border-box;width:100%;padding:14px;border-radius:6px;'
+          + 'border:1px solid rgba(255,255,255,.18);background:#090a0c;color:#fff;font-size:18px;';
+        const confirm = document.createElement('button');
+        confirm.type = 'button';
+        confirm.textContent = 'Confirm refund';
+        confirm.style.cssText = claim.style.cssText;
+        confirm.addEventListener('click', async function () {
+          const code = input.value.replace(/\D/g, '');
+          if (code.length !== 6) {
+            message.textContent = 'Enter the complete 6-digit code.';
+            return;
+          }
+          confirm.disabled = true;
+          message.textContent = 'Canceling access and submitting your refund…';
+          try {
+            const verified = await CloudSync.verifyCode(email, code);
+            if (!verified || !verified.ok) {
+              message.textContent = verified && verified.error
+                ? verified.error
+                : 'That confirmation code did not work. Please try again.';
+              confirm.disabled = false;
+              return;
+            }
+            const result = await claimRefund();
+            message.textContent = guaranteeCopy(result);
+            actions.innerHTML = '';
+            let remaining = null;
+            if (result && result.completed) {
+              try {
+                remaining = await refundStatus();
+              } catch (_) {}
+            }
+            if (remaining && remaining.eligible) {
+              message.textContent += ' Another refund is still available. ' + guaranteeCopy(remaining);
+              claim.disabled = false;
+              actions.appendChild(claim);
+            }
+            actions.appendChild(portal);
+          } catch (error) {
+            const codeName = String(error && error.message || '');
+            message.textContent = codeName === 'refund_access_revocation_pending'
+              ? 'Polar is finishing the refund. Tap confirm again in a moment; you will not be refunded twice.'
+              : 'The refund could not finish yet. Nothing was duplicated. Please try again.';
+            confirm.disabled = false;
+          }
+        });
+        actions.appendChild(label);
+        actions.appendChild(input);
+        actions.appendChild(confirm);
+        input.focus();
+      } catch (error) {
+        message.textContent = 'We could not send the confirmation code. Please try again.';
+        claim.disabled = false;
+      }
+    });
+    actions.appendChild(claim);
+    actions.appendChild(portal);
+  }
+
+  function installBillingAccountUi() {
+    try {
+      if (typeof TabBar === 'undefined' || TabBar.__billingRefundUi) return;
+      const originalRender = TabBar.renderAccountSection;
+      const originalBind = TabBar.bindAccountSection;
+      if (typeof originalRender !== 'function' || typeof originalBind !== 'function') return;
+      TabBar.__billingRefundUi = true;
+      TabBar.renderAccountSection = function () {
+        const html = originalRender.apply(this, arguments);
+        if (!loggedIn() || billingEnvironment() !== 'production') return html;
+        return html + '<button class="acct-btn" id="acctRefunds">Manage billing and refunds</button>';
+      };
+      TabBar.bindAccountSection = function () {
+        const result = originalBind.apply(this, arguments);
+        const refunds = document.getElementById('acctRefunds');
+        if (refunds) refunds.addEventListener('click', showRefundDialog);
+        return result;
+      };
+    } catch (e) {}
+  }
+
   function init() {
     clearLegacyBillingCache();
     restoreAccessReceipt();
+    installBillingAccountUi();
     const params = new URLSearchParams(location.search);
     const checkoutId = params.get('checkout_id') || '';
     const returned = params.get('polar') === 'success';
@@ -480,6 +762,7 @@ const PolarBilling = (function () {
       if (loggedIn()) {
         restoreAccessReceipt();
         refreshAccess('');
+        flushActionReceipts();
       }
       if (sessionStorage.getItem(PENDING_KEY)) waitForAccount();
     }, 900);
@@ -491,9 +774,13 @@ const PolarBilling = (function () {
       }
       restoreAccessReceipt();
       refreshAccess('');
+      flushActionReceipts();
     });
     window.addEventListener('online', function () {
-      if (loggedIn()) refreshAccess('');
+      if (loggedIn()) {
+        refreshAccess('');
+        flushActionReceipts();
+      }
     });
   }
 
@@ -505,7 +792,10 @@ const PolarBilling = (function () {
     currentAccess,
     startCheckout,
     refreshAccess,
-    openPortal
+    openPortal,
+    refundStatus,
+    claimRefund,
+    recordActionCompletion
   };
 })();
 

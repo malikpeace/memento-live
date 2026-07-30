@@ -62,7 +62,7 @@ function actionCompletionForDay(day, primaryAction) {
 
 function createActionCompletionRecord(primaryAction, tier, actionText) {
   const pa = primaryAction || (state.action && state.action.primaryAction) || {};
-  return {
+  const record = {
     id: 'act_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
     missionId: ensureActionMissionId(pa),
     clarityGoal: (state.action && state.action.planSourceNeutronStar) || (state.clarity && state.clarity.answers && state.clarity.answers.neutronStar) || '',
@@ -71,6 +71,14 @@ function createActionCompletionRecord(primaryAction, tier, actionText) {
     actionText: actionText || '',
     planTitle: pa.title || ''
   };
+  setTimeout(function () {
+    try {
+      if (window.PolarBilling && PolarBilling.recordActionCompletion) {
+        PolarBilling.recordActionCompletion(record);
+      }
+    } catch (e) {}
+  }, 0);
+  return record;
 }
 
 /* ---- The offering ledger (v1003, Action v2 Phase A) -----------------------
