@@ -3737,7 +3737,7 @@ body.exit-grabber .action-exp__close { display: none !important; }
    (.clarity-exp__nav-btn--next:disabled), so a CTA that does nothing yet
    never looks like a CTA that is broken. */
 .intake-beat__cta:disabled {
-  background: var(--kfill-04); color: rgba(var(--ink),0.4);
+  background: var(--kfill-04); color: rgba(var(--ink),0.58);
   box-shadow: none; cursor: default;
 }
 .intake-beat__cta:disabled:active { transform: none; }

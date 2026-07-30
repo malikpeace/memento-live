@@ -160,6 +160,11 @@
     state.action.introSeen = true;
     state.action.planGenerated = false;
     state.action.plan = null;
+    // _doorsLive survives from a previous doors/capacity click and makes the
+    // view derivation skip the recap beat entirely; _recapTyped would skip
+    // the typewriter. Both are per-open flags, reset them per state.
+    ActionExperience._doorsLive = false;
+    ActionExperience._recapTyped = false;
     openExp();
     try { ActionExperience._startAiIntake(); ActionExperience._renderIntakeFromState(); } catch (e) {}
     if (fn) setTimeout(fn, 350);

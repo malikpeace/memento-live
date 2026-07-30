@@ -110,7 +110,10 @@ html.theme-light .clarity-exp__neb2 { display: none; }
   transform: scale(0.97);
 }
 .clarity-exp__nav-btn--next:disabled {
-  background: var(--kfill-04); color: rgba(var(--ink),0.4);
+  /* v1015 (Malik): 0.4 read as broken-faded, not waiting. Bright enough to
+     read, still clearly not the live CTA. Action's intake-beat__cta:disabled
+     mirrors this value; change both together. */
+  background: var(--kfill-04); color: rgba(var(--ink),0.58);
   box-shadow: none; cursor: default; opacity: 1;
 }
 .clarity-exp__nav-btn--next:disabled:hover {
