@@ -156,12 +156,14 @@ const PolarBilling = (function () {
   }
 
   function clearAccess(clearStored) {
+    const had = !!verifiedAccess;
     verifiedAccess = null;
     verifiedUntil = 0;
     verifiedGraceUntil = 0;
     verifiedSubject = '';
     clearRefreshTimer();
     if (clearStored) clearStoredAccess();
+    if (had) refreshProfilePanel();
   }
 
   function clearLegacyBillingCache() {
@@ -255,7 +257,26 @@ const PolarBilling = (function () {
     verifiedSubject = subject;
     saveAccessReceipt();
     scheduleRefresh(ACCESS_TTL_MS - REFRESH_LEAD_MS);
+    refreshProfilePanel();
     return true;
+  }
+
+  // v1022: access changed while the You panel is open -> repaint the whole
+  // panel, or the plan chip / Plan card / Unlock row keep whatever was true at
+  // open time. Guarded, because renderProfile itself reads access state and an
+  // expired receipt clears access mid-render: without the guard that would
+  // repaint forever.
+  let repainting = false;
+  function refreshProfilePanel() {
+    if (repainting) return;
+    repainting = true;
+    try {
+      const body = document.getElementById('profileBody');
+      if (body && body.childElementCount && typeof TabBar !== 'undefined' && TabBar.renderProfile) {
+        TabBar.renderProfile();
+      }
+    } catch (e) {}
+    repainting = false;
   }
 
   function restoreAccessReceipt() {

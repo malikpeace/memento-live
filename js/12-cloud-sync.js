@@ -962,6 +962,19 @@ const CloudSync = (function () {
 
   // Re-render just the settings Account card when sync state changes.
   function refreshAccountCard() {
+    // v1022: the session restores ASYNC after boot, and this used to refresh
+    // only the Account drawer. Everything else that reads login state (the
+    // sync line under the name, the plan chip, the Unlock row, the sign-in
+    // row) sat stale, so a signed-in user could stare at "On this device" +
+    // "Already bought Memento? Sign in". If the profile panel is up, re-render
+    // the whole thing; the drawer-only path stays as the fallback.
+    try {
+      const body = document.getElementById('profileBody');
+      if (body && body.childElementCount && typeof TabBar !== 'undefined' && TabBar.renderProfile) {
+        TabBar.renderProfile();
+        return;
+      }
+    } catch (e) {}
     try {
       const sec = document.getElementById('acctSection');
       if (sec && typeof TabBar !== 'undefined' && TabBar.renderAccountSection) {
