@@ -5455,6 +5455,93 @@ const TabBar = {
     if (openAuth) openAuth.addEventListener('click', () => { try { cs.openDialog(); } catch (_) {} });
   },
 
+  // The Plan section (v1021): the billing destination. Everything here is
+  // wired to what already exists: plan + renewal date from the verified access
+  // receipt, Manage plan opens the Polar portal, the guarantee row opens the
+  // refund dialog. Renders nothing unless the server has verified access, so
+  // free users and demo personas never see a billing card.
+  renderPlanSection() {
+    let access = null;
+    try {
+      access = window.PolarBilling && PolarBilling.currentAccess
+        ? PolarBilling.currentAccess() : null;
+    } catch (e) {}
+    if (!access || !access.active) return '';
+    const plan = String(access.plan || '');
+    const lifetime = (plan !== 'monthly' && plan !== 'yearly');
+    let price = '';
+    try {
+      const P = (typeof ClarityPaywall !== 'undefined') ? ClarityPaywall._PRICING : null;
+      if (P) price = plan === 'monthly' ? ('$' + P.monthly) : plan === 'yearly' ? ('$' + P.yearly) : '';
+    } catch (e) {}
+    let renewText = '';
+    try {
+      const t = access.validUntil ? new Date(access.validUntil) : null;
+      if (t && !isNaN(t)) renewText = t.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' });
+    } catch (e) {}
+    const label = lifetime ? 'Founder' : 'Pro';
+    const val = lifetime ? 'Lifetime'
+      : (plan === 'monthly' ? 'Monthly' : 'Yearly') + (price ? ' &middot; ' + price : '');
+    const status = lifetime
+      ? 'Yours for life &middot; nothing renews, nothing expires'
+      : renewText
+        ? 'Active &middot; renews <b style="color:var(--text-1);font-weight:650;">' + esc(renewText) + '</b>'
+        : 'Active';
+    // The guarantee runs on production billing only; in sandbox it would just
+    // throw, so the row does not render there.
+    let production = true;
+    try { production = PolarBilling.billingEnvironment() === 'production'; } catch (e) {}
+    const _od = TabBar._youDrawers || (TabBar._youDrawers = {});
+    return '<div class="you-h">Plan</div>' +
+      '<div class="you-card">' +
+        '<button type="button" class="you-vrow" id="planRow" aria-expanded="' + (_od.plan ? 'true' : 'false') + '">' +
+          '<span class="you-vrow__label">' + label + '</span>' +
+          '<span class="you-vrow__val">' + val + '</span>' +
+          '<span class="you-chev you-chev--turn' + (_od.plan ? ' is-open' : '') + '" aria-hidden="true">&rsaquo;</span>' +
+        '</button>' +
+        '<div class="you-drawer" id="planDrawer"' + (_od.plan ? '' : ' hidden') + '>' +
+          '<div style="display:flex;align-items:baseline;gap:7px;font-size:0.78rem;color:var(--text-2);line-height:1.45;margin:2px 0 14px;">' +
+            '<span style="width:6px;height:6px;border-radius:50%;background:var(--color-consistency);flex:none;position:relative;top:-1px;"></span>' +
+            '<span style="flex:1;min-width:0;">' + status + '</span>' +
+          '</div>' +
+          (lifetime
+            ? '<button type="button" class="pb-btn" id="planPortal">Payment method and receipts</button>'
+            : '<button type="button" class="pb-btn" id="planPortal">Manage plan</button>') +
+          (production ? '<button type="button" class="pb-btn pb-btn--quiet" id="planGuarantee">Locked-In Guarantee</button>' : '') +
+          (!lifetime && renewText
+            ? '<div style="font-size:0.6875rem;color:var(--text-3);line-height:1.45;margin:10px 0 12px;">Cancel anytime in Manage plan. Your access stays until <b style="color:var(--text-2);font-weight:650;">' + esc(renewText) + '</b>, and everything you have built stays on this device either way.</div>'
+            : '') +
+          '<div id="planMsg" style="font-size:0.6875rem;color:var(--text-3);margin-top:2px;"></div>' +
+        '</div>' +
+      '</div>';
+  },
+
+  bindPlanSection() {
+    const row = document.getElementById('planRow');
+    if (!row) return;
+    const _od = TabBar._youDrawers || (TabBar._youDrawers = {});
+    const drawer = document.getElementById('planDrawer');
+    row.addEventListener('click', () => {
+      _od.plan = !_od.plan;
+      if (drawer) drawer.hidden = !_od.plan;
+      row.setAttribute('aria-expanded', _od.plan ? 'true' : 'false');
+      const ch = row.querySelector('.you-chev--turn');
+      if (ch) ch.classList.toggle('is-open', _od.plan);
+    });
+    const msg = (t) => { const m = document.getElementById('planMsg'); if (m) m.textContent = t; };
+    const portal = document.getElementById('planPortal');
+    if (portal) portal.addEventListener('click', async () => {
+      msg('Opening your billing page...');
+      let ok = false;
+      try { ok = await PolarBilling.openPortal(); } catch (e) {}
+      if (!ok) msg('Could not reach billing right now. Try again in a moment.');
+    });
+    const guarantee = document.getElementById('planGuarantee');
+    if (guarantee) guarantee.addEventListener('click', () => {
+      try { PolarBilling.showRefundDialog(); } catch (e) {}
+    });
+  },
+
   renderProfile() {
     const body = document.getElementById('profileBody');
     // The cheat bar lives at the foot of this panel on mobile (v685). Capture
@@ -5524,8 +5611,21 @@ const TabBar = {
           <span class="you-vrow__label">Unlock Memento</span>
           <span class="you-vrow__val" style="color:var(--color-clarity);">${_unlockPrice}</span>
           <span class="you-chev" aria-hidden="true">&rsaquo;</span>
-        </button>` : ''}
+        </button>
+        ${(function(){
+          try {
+            const cs = window.CloudSync;
+            if (cs && cs.available() && !cs.isLoggedIn()) {
+              return '<button type="button" id="profSigninOwned" class="you-vrow">' +
+                '<span class="you-vrow__label" style="font-weight:500;color:var(--text-2);">Already bought Memento?</span>' +
+                '<span class="you-vrow__val" style="color:var(--color-clarity);font-weight:650;">Sign in</span>' +
+              '</button>';
+            }
+          } catch (e) {}
+          return '';
+        })()}` : ''}
       </div>` : ''}
+      ${this.renderPlanSection()}
       <div id="prefsSection">${this.renderPreferencesSection()}</div>
       <div class="you-h">Identity</div>
       <div class="you-card">
@@ -5624,6 +5724,11 @@ const TabBar = {
     this.bindPreferences();
     // Optional account / sync card.
     try { this.bindAccountSection(); } catch (e) {}
+    try { this.bindPlanSection(); } catch (e) {}
+    try {
+      const so = document.getElementById('profSigninOwned');
+      if (so) so.addEventListener('click', () => { try { window.CloudSync.openDialog(); } catch (e) {} });
+    } catch (e) {}
     try { this.bindSupportSection(); } catch (e) {}
     // Cheat Code Bar's mobile home (Malik v685): the drawer is gone on phones,
     // so the dev-only creator box rides at the foot of the You panel instead.

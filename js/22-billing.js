@@ -715,9 +715,11 @@ const PolarBilling = (function () {
       if (typeof originalRender !== 'function' || typeof originalBind !== 'function') return;
       TabBar.__billingRefundUi = true;
       TabBar.renderAccountSection = function () {
-        const html = originalRender.apply(this, arguments);
-        if (!loggedIn() || billingEnvironment() !== 'production') return html;
-        return html + '<button class="acct-btn" id="acctRefunds">Manage billing and refunds</button>';
+        // v1021: billing moved out of the Account drawer into the You panel's
+        // own Plan section (TabBar.renderPlanSection). The wrapper itself stays
+        // so the patch chain (cloud-sync's delete-account wrapper sits on top
+        // of this one) is untouched.
+        return originalRender.apply(this, arguments);
       };
       TabBar.bindAccountSection = function () {
         const result = originalBind.apply(this, arguments);
@@ -793,6 +795,7 @@ const PolarBilling = (function () {
     startCheckout,
     refreshAccess,
     openPortal,
+    showRefundDialog,
     refundStatus,
     claimRefund,
     recordActionCompletion
