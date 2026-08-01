@@ -1820,6 +1820,12 @@ const CreatorTools = {
     bind('creatorJumpSynth', () => this.jumpSynth());
     bind('creatorJump7Days', () => this.jump7Days());
     bind('creatorJumpPaywall', () => this.jumpPaywall());
+    // The post-payment unlock ceremony (unlock.html in an iframe). dev:true =
+    // replay only: the play-once seen flag is never written from here.
+    bind('creatorJumpPayCeremony', () => {
+      try { this._closeAll(); } catch (e) {}
+      if (typeof UnlockCeremony !== 'undefined') UnlockCeremony.show({ clarityDone: true, dev: true });
+    });
     bind('creatorTogglePaid', () => this.togglePaid());
     try { this._paidLabel(); } catch (e) {}
     bind('creatorJumpDay1', () => this.jumpDay1());
