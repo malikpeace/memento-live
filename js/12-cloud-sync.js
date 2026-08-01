@@ -1298,6 +1298,10 @@ const CloudSync = (function () {
           hideSplashLink();
           closeDialog();
           beginFirstSync();
+          // v1024: tell billing the session is REAL and current, so the paid
+          // receipt restores the moment auth lands (not on the next lucky
+          // focus) and an on-screen "Unlock" row repaints away.
+          try { if (window.PolarBilling && PolarBilling.noteAuthArrived) PolarBilling.noteAuthArrived(); } catch (e) {}
         } else {
           firstSyncState = FIRST_SYNC_WAITING;
           firstSyncPromise = null;
@@ -1305,6 +1309,12 @@ const CloudSync = (function () {
           lastCloudRevision = 0;
           clearRestoreReload();
           hideRestoreScreen();
+          // v1024: an EXPLICIT sign-out event is the one moment the stored
+          // paid receipt is destroyed on purpose; transient not-ready states
+          // no longer clear it anywhere else.
+          if (ev === 'SIGNED_OUT') {
+            try { if (window.PolarBilling && PolarBilling.noteSignedOut) PolarBilling.noteSignedOut(); } catch (e) {}
+          }
         }
         if (had !== isLoggedIn()) refreshAccountCard();
       });

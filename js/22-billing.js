@@ -330,10 +330,18 @@ const PolarBilling = (function () {
       return false;
     }
     const subject = tokenSubject();
-    if (!subject || subject !== verifiedSubject) {
+    // v1024 (Malik, paid account shown the $500 unlock row): an EMPTY subject
+    // means the session is mid-restore or the token is mid-refresh, not that
+    // the user signed out. Destroying the stored receipt here was a timing
+    // lottery that intermittently unpaid real customers. Only a DIFFERENT
+    // account's subject clears; a transient blank just answers false for this
+    // instant and leaves the receipt for the next call. Real sign-outs clear
+    // via noteSignedOut (wired to the auth event in js/12).
+    if (subject && subject !== verifiedSubject) {
       clearAccess(true);
       return false;
     }
+    if (!subject) return false;
     if (verifiedUntil <= now && !refreshInFlight && !refreshTimer) scheduleRefresh(1000);
     return true;
   }
@@ -431,10 +439,9 @@ const PolarBilling = (function () {
   }
 
   async function refreshAccess(checkoutId) {
-    if (!loggedIn()) {
-      clearAccess(true);
-      return null;
-    }
+    // v1024: a refresh attempted while the session is transiently absent is a
+    // no-op, never a receipt wipe. Real sign-outs clear via noteSignedOut.
+    if (!loggedIn()) return null;
     if (refreshInFlight) return refreshInFlight;
     const environment = billingEnvironment();
     refreshInFlight = (async function () {
@@ -791,10 +798,12 @@ const PolarBilling = (function () {
     }, 900);
 
     window.addEventListener('focus', function () {
-      if (!loggedIn()) {
-        clearAccess(true);
-        return;
-      }
+      // v1024: on iOS the app can regain focus BEFORE CloudSync finishes
+      // restoring the session; treating that instant as signed-out wiped paid
+      // receipts (the intermittent "$500 unlock" on Malik's own account).
+      // Not-logged-in on focus is now a no-op; real sign-outs clear via
+      // noteSignedOut from the auth event.
+      if (!loggedIn()) return;
       restoreAccessReceipt();
       refreshAccess('');
       flushActionReceipts();
@@ -807,12 +816,31 @@ const PolarBilling = (function () {
     });
   }
 
+  // v1024: the two EXPLICIT auth transitions, driven by the real auth event in
+  // js/12 instead of inferred from focus timing. Arrival restores the receipt
+  // the moment the session lands and repaints the profile so a visible
+  // "Unlock" row disappears without reopening; sign-out is the ONE place a
+  // stored receipt is destroyed on purpose.
+  function noteAuthArrived() {
+    try {
+      restoreAccessReceipt();
+      refreshAccess('');
+      flushActionReceipts();
+      refreshProfilePanel();
+    } catch (e) {}
+  }
+  function noteSignedOut() {
+    clearAccess(true);
+  }
+
   return {
     init,
     sandboxMode,
     billingEnvironment,
     hasVerifiedAccess,
     currentAccess,
+    noteAuthArrived,
+    noteSignedOut,
     startCheckout,
     refreshAccess,
     openPortal,
