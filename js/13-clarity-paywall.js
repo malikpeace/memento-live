@@ -266,7 +266,19 @@ const ClarityPaywall = {
     // pre-star home already points them at Clarity, and Action needs a star.
     let clarityDone = false;
     try { clarityDone = !!(state.clarity && state.clarity.completed); } catch (e) {}
-    if (clarityDone) setTimeout(() => {
+    // v1026: the first thing their money buys is watching their own card come
+    // alive under their thumb. The unlock ceremony plays once (its CTA routes
+    // a Clarity finisher into Action, a pre-Clarity buyer back home toward the
+    // star); the old direct ActionExperience.open() is the fallback if the
+    // ceremony module is ever missing.
+    const alreadySeen = !!(state.meta && state.meta.unlockCeremonySeen);
+    if (typeof UnlockCeremony !== 'undefined' && !alreadySeen) {
+      setTimeout(() => {
+        try { UnlockCeremony.show({ clarityDone }); } catch (e) {
+          if (clarityDone) { try { ActionExperience.open(); } catch (e2) {} }
+        }
+      }, 460);
+    } else if (clarityDone) setTimeout(() => {
       try { if (typeof ActionExperience !== 'undefined') ActionExperience.open(); } catch (e) {}
     }, 460);
   },

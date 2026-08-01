@@ -1,0 +1,1155 @@
+/* THE UNLOCK CEREMONY (v1026). Ported VERBATIM from mockups/unlock.html (the
+   version Malik picked); every .cer value below is the mockup's, untouched
+   (ship-picked-mockups-verbatim). Only this overlay layer is new: it gives the
+   ceremony a fullscreen home and the desktop treatment Malik specced ("full
+   page thing, simple and clean, elements in the middle"): the 390x844 scene
+   centers as ONE unit, scales down on short windows via --ucfit (set by js/24),
+   and centers explicitly with translate so tall windows can never strand it
+   (the margin:auto overflow trap, law v811). Relies on the app's own
+   base/dashboard/daycard-living css for the card itself, exactly like the
+   mockup did. */
+.unlockcer { position:fixed; inset:0; z-index:12000; background:#000; overflow:hidden;
+  opacity:1; transition:opacity .5s ease-in; }
+.unlockcer--out { opacity:0; pointer-events:none; }
+.unlockcer__frame { position:absolute; left:50%; top:50%; width:390px; height:844px;
+  transform:translate(-50%,-50%) scale(var(--ucfit,1)); }
+@media (max-width: 700px) {
+  .unlockcer__frame { width:100vw; height:100lvh; transform:translate(-50%,-50%); }
+}
+
+
+  .gal__sub { font-size:14.5px; line-height:1.6; color:rgba(235,238,248,.62); max-width:74ch; margin:0 0 26px; }
+
+  /* ---- the ceremony ---- */
+  /* --hp = hold progress 0..1, driven per frame from the actual press.
+     --hf = the same, squared, for things that should arrive late.
+     --hs = the card's scale, so the press reads as pressure. */
+  /* No perspective on the room. It exists only for the old given version's
+     rotateY, and an ancestor 3D context with perspective-origin at 50% 40%
+     was warping the reflection's own perspective from a point above and off
+     the card, which is what made the fan look skewed and lopsided. */
+  .cer { position:absolute; inset:0; background:#000; overflow:hidden;
+    --hp:0; --hf:0; --hs:1;
+    touch-action:none; user-select:none; -webkit-user-select:none; cursor:default; }
+
+  /* the room lifting behind the card. During the hold it tracks the press
+     frame by frame (no transition); once lit it settles on its own. */
+  .cer__glow { position:absolute; left:50%; top:38%; width:160%; aspect-ratio:1; transform:translate(-50%,-50%);
+    background:radial-gradient(circle, rgba(180,205,255,.19) 0%, rgba(120,150,220,.085) 34%, transparent 66%);
+    opacity:calc(var(--hf) * .9); pointer-events:none; }
+  .cer.lit .cer__glow { opacity:1; transition:opacity 1.6s ease-out; }
+  .cer.back .cer__glow { opacity:.66; transition:opacity 1.6s ease-out; }
+
+  /* THE GROUND.
+     Two things, and they do different jobs.
+
+     1. The card's OWN mirrored reflection (.daycard-floor, the app's asset:
+        flipped, blurred, masked, carrying the same colour blobs and the rim).
+        It was switched off before because the old entrance rotated the card and
+        dragged the reflection around with it. Nothing rotates now, so the real
+        one is back, and it is what makes the light read as coming off the card
+        rather than a grey smudge under it. It is gated by --lit, so the hold
+        brings it up. Only the legacy compare still hides it.
+     2. The SPILL (.cer__floor): light thrown past the reflection onto the
+        ground. Built as a hot contact line, a near pool and a wide haze rather
+        than one blurred ellipse, which is what read as a simple blur. */
+  .cer { --fl:226,240,255; --fl2:150,196,255; }
+  .cer.legacy .daycard-floor { display:none !important; }
+  /* the mirrored reflection, run hard: deep, near full strength, and blurred
+     less than before so it reads as a wet floor throwing the card back rather
+     than a haze under it. It carries the rim, so the burning edge comes back
+     up off the ground with it, which is the whole effect. */
+  .cer .daycard-theme-living { --rfl-d:48; --rfl-w:8; --rfl-i:.95; }
+  .cer .daycard-floor {
+    filter:blur(22px) saturate(var(--sat,1.5)) hue-rotate(var(--mm-hue,0deg));
+    /* THE TRAPEZOID. The app's reflection carries overflow:hidden, which is a
+       hard rectangular clip on blurred content. Tilt that rectangle in
+       perspective and the clip becomes a trapezoid with straight sides, drawn
+       right through the blur: a box, exactly what the edge-safety law forbids.
+       The mask alone shapes it now, and a mask fades where a clip cuts. */
+    overflow:visible;
+    /* The sides are cut by a RADIAL falloff, not a linear one. A linear side
+       fade under the perspective tilt still ends somewhere, and that somewhere
+       renders as a straight diagonal: the reflection read as a trapezoid with
+       drawn edges instead of light dying out. The ellipse is anchored at the
+       contact and fades in every direction, so there is no edge to see, which
+       is the same rule the card's own bloom follows. */
+    -webkit-mask-image:
+      linear-gradient(to top, transparent 0%, #000 9%, rgba(0,0,0,0.42) 44%, transparent 76%),
+      radial-gradient(ellipse 58% 108% at 50% 100%, #000 24%, rgba(0,0,0,0.5) 58%, transparent 82%);
+    -webkit-mask-composite:source-in;
+    mask-image:
+      linear-gradient(to top, transparent 0%, #000 9%, rgba(0,0,0,0.42) 44%, transparent 76%),
+      radial-gradient(ellipse 58% 108% at 50% 100%, #000 24%, rgba(0,0,0,0.5) 58%, transparent 82%);
+    mask-composite:intersect; }
+  /* THE FAN. A floor seen from standing height throws the reflection back as a
+     trapezoid: the card's width at the contact, opening out as it comes toward
+     you. It has to be a WRAPPER, not the reflection's own transform: the
+     reflection is already flipped with scaleY(-1) about its centre, and moving
+     that origin to the contact line sends the whole mirror up over the card.
+     The wrapper matches the card's box, tilts about its bottom edge (the
+     contact), and the reflection hangs off it unchanged. */
+  .cer__mirror { position:absolute; left:0; right:0; top:0; bottom:0;
+    pointer-events:none; transform-origin:50% 100%;
+    transform:perspective(1200px) rotateX(21deg); }
+
+  /* The spill reads as ONE piece of light on a floor: a hot contact line, then
+     a single wide wash that runs off both sides of the screen. It used to be
+     four stacked ellipses of different sizes, and where their falloffs crossed
+     you could see the seams, which is what looked choppy. */
+  /* above the card's own reflection on purpose: the contact burn has to sit ON
+     the mirror, washing it out where the two meet, or the reflection covers the
+     brightest part of the shot and the light looks like it stops at the card. */
+  /* the top edge of this layer sits exactly on the card's base (the card bottom
+     lands 63px below centre), because the whole effect is the line where the
+     two meet */
+  /* Every gradient is centred 3% down (9px), NOT on the element's top edge: an
+     ellipse centred at 0% has half of itself outside the box, so the blur eats
+     what is left and the burn disappears. That is why it kept reading as haze
+     instead of a line. 56px + 9px puts it on the card's base at 63px. */
+  .cer__floor { position:absolute; left:50%; top:calc(50% + 187px); z-index:3;
+    width:150%; height:300px; transform:translate(-50%,0); transform-origin:50% 0;
+    pointer-events:none; opacity:var(--hf);
+    background:
+      /* the burn where the card meets the floor: the brightest thing on screen */
+      radial-gradient(ellipse 15% 1.7% at 50% 3%, rgba(255,255,255,1), rgba(255,255,255,0) 62%),
+      radial-gradient(ellipse 23% 3.6% at 50% 3%, rgba(255,255,255,.72), rgba(255,255,255,0) 70%),
+      /* light running away along the floor, left and right */
+      radial-gradient(ellipse 55% 5.5% at 50% 3%, rgba(var(--fl),.58), rgba(var(--fl),0) 74%),
+      /* the smear coming down off the card, opening out as it goes: three
+         ellipses, each wider and lower than the last, so the light fans with
+         the reflection instead of running down the middle as a column */
+      radial-gradient(ellipse 22% 16% at 50% 5%, rgba(var(--fl),.30), rgba(var(--fl),0) 74%),
+      radial-gradient(ellipse 32% 28% at 50% 10%, rgba(var(--fl),.22), rgba(var(--fl),0) 76%),
+      radial-gradient(ellipse 46% 40% at 50% 16%, rgba(var(--fl),.14), rgba(var(--fl),0) 78%),
+      /* the pool it all sits in */
+      radial-gradient(ellipse 74% 50% at 50% 5%, rgba(var(--fl2),.15), rgba(var(--fl2),0) 78%);
+    filter:blur(8px); }
+  /* The ground moves on the CARD's curve, not its own. The stage draws back on
+     cubic-bezier(.33,.9,.28,1), which is 90% travelled by a third of the way
+     through, and the floor was on plain ease-out. Same duration, wildly
+     different speed, so the card leapt and the light trailed after it. With the
+     curves identical the two stay within about 2px of each other the whole way,
+     and only the opacity is allowed its own timing. */
+  .cer.lit .cer__floor { opacity:1;
+    transition:opacity 1.6s ease-out, transform 1.3s cubic-bezier(.33,.9,.28,1); }
+  /* When the card draws back it shrinks and rises, so its base rises with it.
+     The origin is the top edge (the contact line), so scaling cannot drag the
+     burn away from the card: without this the band floated 36px below the card
+     and landed straight across the welcome. */
+  .cer.back .cer__floor { opacity:.62; transform:translate(-50%,-186px) scale(.82);
+    transition:opacity 1.6s ease-out, transform 1.3s cubic-bezier(.33,.9,.28,1); }
+
+  /* the release: light leaving the card the instant the hold completes.
+     Radial and fading to nothing well inside its own box, so it can never
+     draw a straight edge. */
+  .cer__flare { position:absolute; left:50%; top:calc(50% - 30px); width:600px; height:600px;
+    transform:translate(-50%,-50%) scale(.42); pointer-events:none; opacity:0;
+    background:radial-gradient(circle, rgba(255,255,255,.55) 0%, rgba(206,228,255,.26) 22%,
+      rgba(160,200,255,.10) 42%, rgba(160,200,255,0) 64%); }
+  .cer.flare .cer__flare { animation:cerFlare 1.15s cubic-bezier(.16,.7,.3,1) forwards; }
+  @keyframes cerFlare {
+    0%   { opacity:0;   transform:translate(-50%,-50%) scale(.42); }
+    16%  { opacity:1;   transform:translate(-50%,-50%) scale(.78); }
+    100% { opacity:0;   transform:translate(-50%,-50%) scale(1.5); }
+  }
+
+  /* stage = the beat transforms. float = the idle breathing.
+     They live on SEPARATE elements on purpose: sharing one element made the
+     keyframe animation and the beat transform overwrite each other. */
+  .cer__stage { position:absolute; left:50%; top:50%; margin-left:-160px; margin-top:-226px; z-index:2;
+    transform-style:preserve-3d; will-change:transform;
+    transform:translateY(-30px) scale(var(--hs)); opacity:1; }
+  .cer__float { transform-style:preserve-3d; }
+
+  /* ── THE GRAPHICS BUDGET (why this is written the way it is) ───────────────
+     iOS crashed on this page. The cause was mine, and it is a rule worth
+     keeping: during the hold you may change the OPACITY of a blurred layer,
+     because the blur is rasterised once and the compositor just fades the
+     cached bitmap. You may NOT change a blurred layer's transform, its filter
+     parameters, or the opacity of its CHILDREN, because every one of those
+     re-runs the blur from scratch, every frame, at device resolution.
+     What I had been doing per frame, all of it now gone:
+       - scaling the liquid (46px blur) and bloom (34px blur) layers
+       - ramping --sat, which is a saturate() parameter on three blurred layers
+       - ramping --glow and --lit into the aura's brightness() parameter
+       - growing a 170px box-shadow radius on the stage
+     Each of those forced a full re-blur per frame. Stacked, they exhausted
+     graphics memory on a phone. The look is preserved; the mechanism is not. */
+
+  /* the aura: constant filter, opacity does the work */
+  .cer .daycard-wrap__aura {
+    filter:blur(28px) hue-rotate(var(--mm-hue, 0deg));
+    opacity:calc(var(--lit, 0) * .85); }
+  /* The card was rendering at 179x352, a 0.51 ratio, because the living stage
+     carries its own width:min(76%,270px). That squeeze is what read as skinny.
+     These put it back on the app's real proportion: 320x452 is 0.708. */
+  .cer__stage .daycard-wrap { margin:0; width:320px; }
+  .cer__stage .daycard-living-stage { width:100%; margin:0; }
+  .cer__stage .daycard-ns { width:100%; min-height:452px; margin:0; }
+
+  /* the step back: a transform transition on the stage alone, so nothing fights it */
+  .cer.back .cer__stage { transform:translateY(-168px) scale(.78);
+    transition:transform 1.3s cubic-bezier(.33,.9,.28,1); }
+
+  /* idle breathing. It only starts once the card is alive; dormant is still. */
+  @keyframes cerBreathe { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-9px); } }
+  .cer.lit .cer__float, .cer.back .cer__float { animation:cerBreathe 8s ease-in-out infinite; }
+
+  /* the shimmer across the face on release. Wide, soft, slow. */
+  .cer__sweep { position:absolute; inset:-14% -55%; pointer-events:none; opacity:0; z-index:6;
+    background:linear-gradient(100deg,
+      rgba(255,255,255,0) 34%, rgba(255,255,255,.10) 44%,
+      rgba(255,255,255,.34) 50%, rgba(255,255,255,.10) 56%, rgba(255,255,255,0) 66%); }
+  .cer.sweep .cer__sweep { animation:cerSweep 1.7s cubic-bezier(.4,0,.3,1) forwards; }
+  @keyframes cerSweep {
+    0%   { opacity:0; transform:translateX(-62%); }
+    22%  { opacity:1; }
+    78%  { opacity:1; }
+    100% { opacity:0; transform:translateX(62%); }
+  }
+
+  /* the only instruction on the screen, and it stays away until they need it */
+  .cer__hint { position:absolute; left:0; right:0; text-align:center; top:50%;
+    transform:translateY(237px); margin:0;
+    font-size:14.5px; font-weight:550; letter-spacing:-.01em; color:rgba(255,255,255,.74);
+    opacity:0; pointer-events:none; transition:opacity .9s ease-out; }
+  .cer.ask .cer__hint { opacity:1; }
+  .cer.lit .cer__hint { opacity:0; transition:opacity .35s ease-in; }
+
+  /* copy. The welcome is positioned on its own rather than sitting on top of
+     the note stack: while the note is still hidden it was reserving layout
+     space, which pulled the welcome up into the floor glow. */
+  /* z-index 5 puts the copy above the ground (3) and the card (2): the light
+     passes behind the words instead of washing them out */
+  .cer__welcome { position:absolute; left:0; right:0; text-align:center; top:50%; z-index:5;
+    transform:translateY(48px);
+    font-size:32px; font-weight:800; letter-spacing:-.032em; color:#fff; opacity:0;
+    transition:opacity .9s ease-out; }
+  .cer__copy { position:absolute; left:0; right:0; bottom:0; z-index:5; padding:0 30px calc(74px + env(safe-area-inset-bottom,0px));
+    display:flex; flex-direction:column; align-items:center; text-align:center; }
+  .cer__note { font-size:15px; line-height:1.62; color:rgba(255,255,255,.92); max-width:32ch; opacity:0;
+    transition:opacity 1s ease-out; }
+  .cer__sign { margin-top:14px; font-size:14.5px; font-weight:650; color:rgba(255,255,255,.62); opacity:0;
+    transition:opacity .9s ease-out; }
+  .cer__cta { margin-top:26px; width:100%; max-width:330px; padding:15px; border:0; border-radius:14px;
+    background:#fff; color:#0b1112; font-family:inherit; font-size:15.5px; font-weight:700; cursor:pointer; opacity:0;
+    transition:opacity .8s ease-out; }
+  .cer.say .cer__welcome { opacity:1; }
+  .cer.tell .cer__note, .cer.tell .cer__sign { opacity:1; }
+  .cer.go .cer__cta { opacity:1; }
+
+  /* ================= THE LOOKS =================================================
+     Options to look at, not decisions. Same card, same geometry, same motion:
+     only what arrives with --act changes, so each one is the same ceremony in a
+     different material. Platinum is the app's real reward and the default.
+     Note for the record: the project law bans gold and warm-cream palettes
+     (killed v546). Bronze is here because Malik asked to see it. */
+
+  /* PLATINUM + THE GRAPHITE EDGE (Malik's combine).
+     On a bright face the app's wide 14/38/82 rim washes out, so the edge is
+     pulled TIGHT: a hard white line with a short falloff inward, which is what
+     made graphite's edge read. Then the edge throws light OUTWARD into the room
+     via the stage's shadow stack, so it is genuinely emitting, not outlined.
+     Both are rounded and radial by construction, so neither can draw a box. */
+  /* THE FLOOD. The app's wash tops out at --plat-k .85, which is right for a
+     card earning platinum over weeks and too polite for the second someone pays
+     $500. Pushed past 1 and given a wider, whiter gradient, so the inside reads
+     as genuinely powered rather than lightly lit. Opacity-driven, so it costs
+     the phone nothing. */
+  .cer.look-platinum .daycard-theme-living { --plat-k:1.18; --pop-k:.42; }
+  .cer.look-platinum .daycard-ns__plat {
+    background:radial-gradient(64% 58% at 50% 42%,
+      rgba(255,255,255,1) 0%, rgba(240,248,255,.88) 40%,
+      rgba(208,226,248,.48) 72%, rgba(208,226,248,0) 100%);
+    filter:blur(18px) saturate(1.06); }
+
+  /* THE BURN. Heavier core, and it holds its brightness further in before it
+     falls off, which is what makes an edge read as burning instead of outlined. */
+  .cer.look-platinum .daycard-ns__rim {
+    box-shadow:
+      inset 0 0 0 3.4px rgba(255,255,255,1),
+      inset 0 0 11px 2px rgba(255,255,255,.96),
+      inset 0 0 28px rgba(226,244,255,.64),
+      inset 0 0 64px rgba(170,212,255,.36),
+      inset 0 0 130px rgba(140,190,255,.19); }
+  /* What the edge throws OUT: the difference between an outlined card and a
+     burning one. A hard white core at the perimeter, then three falloffs
+     reaching further into the room.
+     It lives on its own layer with FIXED radii, faded in by --act, because
+     animating a shadow's blur radius repaints it every frame (that is what was
+     killing the phone). Fixed radii rasterise once and fade for free. */
+  .cer__edge { position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+    opacity:var(--act, 0);
+    box-shadow:
+      0 0 10px rgba(255,255,255,1),
+      0 0 34px rgba(232,246,255,.72),
+      0 0 84px rgba(180,218,255,.46),
+      0 0 200px rgba(140,190,255,.26); }
+  .cer.look-bronze .cer__edge {
+    box-shadow:
+      0 0 7px rgba(255,246,226,.92),
+      0 0 26px rgba(255,216,160,.58),
+      0 0 70px rgba(226,168,96,.34),
+      0 0 170px rgba(198,142,78,.18); }
+  .cer.look-obsidian .cer__edge {
+    box-shadow:
+      0 0 6px rgba(255,255,255,.72),
+      0 0 24px rgba(206,228,255,.42),
+      0 0 68px rgba(150,190,255,.22),
+      0 0 150px rgba(120,160,220,.12); }
+
+  /* BRONZE. Warm metal instead of platinum. The colour blobs themselves are
+     recoloured rather than hue-rotated, because a rotation cannot warm the
+     white act blob, which left a cold white reflection under a gold card. */
+  .cer.look-bronze .daycard-theme-living .blob.b1 {
+    background:radial-gradient(circle, rgba(255,196,116,1), transparent 66%); }
+  .cer.look-bronze .daycard-theme-living .blob.b2 {
+    background:radial-gradient(circle, rgba(255,228,182,.98), transparent 66%); }
+  .cer.look-bronze .daycard-ns__plat {
+    background:radial-gradient(58% 52% at 50% 42%,
+      rgba(255,244,226,.92) 0%, rgba(238,196,138,.62) 46%,
+      rgba(198,142,78,.26) 78%, rgba(198,142,78,0) 100%); }
+  .cer.look-bronze .daycard-ns__rim {
+    box-shadow:
+      inset 0 0 0 1px rgba(255,232,198,.92),
+      inset 0 0 14px rgba(255,214,158,.50),
+      inset 0 0 38px rgba(226,168,96,.34),
+      inset 0 0 82px rgba(190,132,64,.18); }
+  .cer.look-bronze .daycard-theme-living .daycard-living-stage {
+    box-shadow:0 0 44px rgba(255,214,160,.10), 0 12px 38px rgba(0,0,0,.28),
+      0 0 calc(34px * var(--act,0)) rgba(255,200,132, calc(.30 * var(--act,0))); }
+  .cer.look-bronze .cer__glow {
+    background:radial-gradient(circle, rgba(255,214,164,.19) 0%, rgba(214,156,84,.085) 34%, transparent 66%); }
+  .cer.look-bronze { --fl:255,238,208; --fl2:222,164,92; }
+  .cer.look-bronze .cer__flare {
+    background:radial-gradient(circle, rgba(255,246,230,.55) 0%, rgba(250,208,150,.26) 22%,
+      rgba(220,160,80,.10) 42%, rgba(220,160,80,0) 64%); }
+
+  /* GRAPHITE. The opposite bet: the card never brightens, it stays near-black
+     and the reward is the edge lighting up and the room finally seeing it. */
+  .cer.look-graphite .daycard-ns {
+    background:linear-gradient(165deg, rgba(255,255,255,.07), rgba(255,255,255,.015) 48%, rgba(255,255,255,.04)); }
+  .cer.look-graphite .daycard-theme-living .blob.b2 { opacity:calc(var(--act,0) * .16); }
+  .cer.look-graphite .daycard-ns__plat { opacity:calc(var(--act,0) * .20);
+    background:radial-gradient(58% 52% at 50% 42%,
+      rgba(226,236,248,.55) 0%, rgba(150,168,190,.26) 48%, rgba(120,138,160,0) 100%); }
+  .cer.look-graphite .daycard-ns__rim {
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,.95),
+      inset 0 0 10px rgba(255,255,255,.42),
+      inset 0 0 30px rgba(206,230,255,.22),
+      inset 0 0 70px rgba(140,180,255,.10); }
+  .cer.look-graphite .cer__glow { opacity:calc(var(--hf) * .5); }
+  .cer.look-graphite .cer__floor { opacity:calc(var(--hf) * .55); }
+  .cer.look-graphite.lit .cer__floor { opacity:.6; }
+
+  /* OBSIDIAN. Light room, black Memento. Runs with the app's own theme-light,
+     so the card's light-mode reward values are the real ones. */
+  .cer.look-obsidian { background:#eef0f4; }
+  .cer.look-obsidian .daycard-ns {
+    background:linear-gradient(165deg, rgba(16,19,23,.97), rgba(26,30,36,.94) 48%, rgba(12,14,18,.97));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.14), 0 26px 60px rgba(24,32,48,.26); }
+  .cer.look-obsidian .daycard-ns__name { color:rgba(255,255,255,.72); }
+  /* it has to STAY black. The flood would wash it silver, so the wash and the
+     white act blob are held right down and the reward moves to the edge. */
+  .cer.look-obsidian .daycard-theme-living .blob.b2 { opacity:calc(var(--act,0) * .10); }
+  .cer.look-obsidian .daycard-ns__plat { opacity:calc(var(--act,0) * .14); }
+  .cer.look-obsidian .daycard-ns__rim {
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,.92),
+      inset 0 0 12px rgba(255,255,255,.44),
+      inset 0 0 34px rgba(206,230,255,.24),
+      inset 0 0 78px rgba(150,190,255,.12); }
+  .cer.look-obsidian .daycard-theme-living .daycard-living-stage {
+    box-shadow:0 0 44px rgba(60,80,120,.10), 0 18px 44px rgba(30,42,64,.22),
+      0 0 calc(30px * var(--act,0)) rgba(120,150,200, calc(.26 * var(--act,0))); }
+  .cer.look-obsidian .cer__glow {
+    background:radial-gradient(circle, rgba(120,142,180,.17) 0%, rgba(120,142,180,.06) 34%, transparent 66%); }
+  /* on a light floor the spill has to read as a SHADOW cooling away from the
+     card, not as more white, so the pool goes to a cool grey */
+  .cer.look-obsidian { --fl:118,138,175; --fl2:86,106,146; }
+  .cer.look-obsidian .cer__floor { filter:blur(14px); }
+  .cer.look-obsidian .cer__flare {
+    background:radial-gradient(circle, rgba(255,255,255,.55) 0%, rgba(186,206,238,.22) 24%, rgba(186,206,238,0) 62%); }
+  .cer.look-obsidian .cer__hint { color:rgba(18,24,32,.66); }
+  .cer.look-obsidian .cer__welcome { color:#0c1116; }
+  .cer.look-obsidian .cer__note { color:rgba(14,18,24,.92); }
+  .cer.look-obsidian .cer__sign { color:rgba(14,18,24,.6); }
+  .cer.look-obsidian .cer__cta { background:#0c1116; color:#fff; }
+
+  /* ================= THE WILDER LOOKS =========================================
+     Four more to look at, on Malik's ask, built from his references. These
+     leave the project palette behind on purpose, which is the point of showing
+     them: they are options to judge, not proposals. Same card, same geometry,
+     same motion as every other look.
+     --bk is the blob key: it drives the extra colour layers from --act, so the
+     palette arrives as the card ignites. On phones it holds at zero until the
+     release (see the phone block), because fading blobs inside a blurred layer
+     frame by frame is what crashed iOS. */
+  .cer { --bk:var(--act, 0); }
+
+  /* The platinum wash is a white flood at 0.85, which drowns any palette that
+     is not silver: these looks pull it down so their own colour survives the
+     ignition, and push saturation up to hold the neon. Both are static values,
+     never animated, so no blur re-runs. */
+  .cer.look-wild .daycard-theme-living,
+  .cer.look-rainbow .daycard-theme-living { --plat-k:.26; --sat:2.2; }
+  .cer.look-thermal .daycard-theme-living { --plat-k:.42; --sat:2; }
+  .cer.look-chroma .daycard-theme-living { --plat-k:.72; --sat:1.8; }
+
+  /* THERMAL. Cold core, molten edge, straight off the lava reference. */
+  .cer.look-thermal .daycard-theme-living .blob.b1 {
+    background:radial-gradient(circle, rgba(28,54,255,1), transparent 66%); }
+  .cer.look-thermal .daycard-theme-living .blob.b2 {
+    background:radial-gradient(circle, rgba(86,206,255,.98), transparent 66%); }
+  .cer.look-thermal .daycard-theme-living .blob.b3 {
+    background:radial-gradient(circle, rgba(255,214,64,1), transparent 62%);
+    opacity:calc(var(--bk) * .55); }
+  .cer.look-thermal .daycard-theme-living .blob.b4 {
+    background:radial-gradient(circle, rgba(255,96,28,1), transparent 64%);
+    opacity:calc(var(--bk) * .5); }
+  .cer.look-thermal .daycard-ns__plat {
+    background:radial-gradient(58% 52% at 50% 42%,
+      rgba(196,240,255,.72) 0%, rgba(70,150,255,.42) 46%,
+      rgba(30,60,220,.20) 78%, rgba(30,60,220,0) 100%); }
+  .cer.look-thermal .daycard-ns__rim {
+    box-shadow:
+      inset 0 0 0 2.6px rgba(255,244,214,1),
+      inset 0 0 8px 1px rgba(255,206,84,.92),
+      inset 0 0 22px rgba(255,120,32,.62),
+      inset 0 0 52px rgba(226,44,20,.32),
+      inset 0 0 110px rgba(120,20,10,.16); }
+  .cer.look-thermal .cer__edge {
+    box-shadow:
+      0 0 7px rgba(255,232,170,.92),
+      0 0 26px rgba(255,150,50,.60),
+      0 0 70px rgba(240,70,26,.34),
+      0 0 170px rgba(180,30,14,.18); }
+  .cer.look-thermal .cer__glow {
+    background:radial-gradient(circle, rgba(255,150,60,.18) 0%, rgba(200,60,30,.08) 34%, transparent 66%); }
+  .cer.look-thermal { --fl:255,206,140; --fl2:236,86,36; }
+  .cer.look-thermal .cer__flare {
+    background:radial-gradient(circle, rgba(255,246,220,.55) 0%, rgba(255,168,60,.26) 22%,
+      rgba(230,60,26,.10) 42%, rgba(230,60,26,0) 64%); }
+
+  /* CHROMA. The card stays platinum; the light splits at the edges, warm on one
+     side and cold on the other, the way a prism throws it. */
+  .cer.look-chroma .daycard-theme-living .blob.b1 {
+    background:radial-gradient(circle, rgba(90,180,255,1), transparent 66%); }
+  .cer.look-chroma .daycard-theme-living .blob.b3 {
+    background:radial-gradient(circle, rgba(255,80,190,1), transparent 64%);
+    opacity:calc(var(--bk) * .34); }
+  .cer.look-chroma .daycard-theme-living .blob.b4 {
+    background:radial-gradient(circle, rgba(255,190,60,1), transparent 64%);
+    opacity:calc(var(--bk) * .34); }
+  .cer.look-chroma .daycard-ns__rim {
+    box-shadow:
+      inset 0 0 0 2.2px rgba(255,255,255,1),
+      inset 4px 4px 7px rgba(255,96,20,.92),
+      inset -4px -4px 7px rgba(30,170,255,.92),
+      inset 7px 7px 16px rgba(255,40,120,.44),
+      inset -7px -7px 16px rgba(60,255,200,.40),
+      inset 0 0 26px rgba(255,255,255,.34),
+      inset 0 0 70px rgba(150,110,255,.24); }
+  .cer.look-chroma .cer__edge {
+    box-shadow:
+      9px 7px 16px rgba(255,110,20,.72),
+      -9px -7px 16px rgba(20,160,255,.72),
+      16px 12px 40px rgba(255,40,140,.36),
+      -16px -12px 40px rgba(60,255,190,.32),
+      0 0 7px rgba(255,255,255,.85),
+      0 0 120px rgba(150,150,255,.22); }
+  .cer.look-chroma .cer__glow {
+    background:radial-gradient(circle, rgba(220,190,255,.18) 0%, rgba(255,150,90,.07) 34%, transparent 66%); }
+  .cer.look-chroma { --fl:255,232,225; --fl2:150,180,255; }
+
+  /* WILD. The neon organic reference: every pillar in the card lit at once in a
+     colour that is not Memento's. Deliberately loud. */
+  .cer.look-wild .daycard-theme-living .blob.b1 {
+    background:radial-gradient(circle, rgba(255,64,186,1), transparent 66%); }
+  .cer.look-wild .daycard-theme-living .blob.b2 {
+    background:radial-gradient(circle, rgba(96,240,255,.98), transparent 66%); }
+  .cer.look-wild .daycard-theme-living .blob.b3 {
+    background:radial-gradient(circle, rgba(80,255,150,1), transparent 62%);
+    opacity:calc(var(--bk) * .62); }
+  .cer.look-wild .daycard-theme-living .blob.b4 {
+    background:radial-gradient(circle, rgba(150,84,255,1), transparent 64%);
+    opacity:calc(var(--bk) * .58); }
+  .cer.look-wild .daycard-theme-living .blob.b5 {
+    background:radial-gradient(circle, rgba(255,152,40,1), transparent 64%);
+    opacity:calc(var(--bk) * .5); }
+  .cer.look-wild .daycard-theme-living .blob.b6 {
+    background:radial-gradient(circle, rgba(255,80,120,1), transparent 64%);
+    opacity:calc(var(--bk) * .42); }
+  .cer.look-wild .daycard-ns__plat {
+    background:radial-gradient(58% 52% at 50% 42%,
+      rgba(255,255,255,.62) 0%, rgba(255,120,220,.32) 46%,
+      rgba(120,90,255,.18) 78%, rgba(120,90,255,0) 100%); }
+  .cer.look-wild .daycard-ns__rim {
+    box-shadow:
+      inset 0 0 0 2.4px rgba(255,255,255,1),
+      inset 0 0 8px 1px rgba(255,120,230,.80),
+      inset 0 0 24px rgba(120,240,255,.52),
+      inset 0 0 56px rgba(150,90,255,.30),
+      inset 0 0 116px rgba(255,90,160,.16); }
+  .cer.look-wild .cer__edge {
+    box-shadow:
+      0 0 7px rgba(255,255,255,.88),
+      0 0 26px rgba(255,90,210,.58),
+      0 0 70px rgba(110,230,255,.36),
+      0 0 170px rgba(150,90,255,.22); }
+  .cer.look-wild .cer__glow {
+    background:radial-gradient(circle, rgba(255,120,220,.18) 0%, rgba(100,200,255,.08) 34%, transparent 66%); }
+  .cer.look-wild { --fl:255,180,240; --fl2:120,200,255; }
+  .cer.look-wild .cer__flare {
+    background:radial-gradient(circle, rgba(255,255,255,.55) 0%, rgba(255,120,220,.26) 22%,
+      rgba(110,220,255,.10) 42%, rgba(110,220,255,0) 64%); }
+
+  /* RAINBOW. The spectrum ordered rather than scattered: the rim falls off
+     through the whole band, red at the edge to violet inboard. */
+  .cer.look-rainbow .daycard-theme-living .blob.b1 {
+    background:radial-gradient(circle, rgba(255,56,56,1), transparent 66%); }
+  .cer.look-rainbow .daycard-theme-living .blob.b2 {
+    background:radial-gradient(circle, rgba(255,255,255,.98), transparent 66%); }
+  .cer.look-rainbow .daycard-theme-living .blob.b3 {
+    background:radial-gradient(circle, rgba(60,230,90,1), transparent 62%);
+    opacity:calc(var(--bk) * .34); }
+  .cer.look-rainbow .daycard-theme-living .blob.b4 {
+    background:radial-gradient(circle, rgba(70,120,255,1), transparent 64%);
+    opacity:calc(var(--bk) * .34); }
+  .cer.look-rainbow .daycard-theme-living .blob.b5 {
+    background:radial-gradient(circle, rgba(255,216,50,1), transparent 64%);
+    opacity:calc(var(--bk) * .30); }
+  .cer.look-rainbow .daycard-theme-living .blob.b6 {
+    background:radial-gradient(circle, rgba(200,70,255,1), transparent 64%);
+    opacity:calc(var(--bk) * .26); }
+  /* The spectrum lives on the EDGE, not in the face: six blurred colour blobs
+     overlapping just average out to grey mush, but ordered bands falling
+     inward from the rim stay legible as red, amber, green, cyan, violet. */
+  .cer.look-rainbow .daycard-ns__rim {
+    box-shadow:
+      inset 0 0 0 2.2px rgba(255,255,255,1),
+      inset 0 0 9px rgba(255,48,48,.95),
+      inset 0 0 21px rgba(255,196,32,.82),
+      inset 0 0 37px rgba(48,232,96,.68),
+      inset 0 0 58px rgba(40,168,255,.56),
+      inset 0 0 96px rgba(168,56,255,.40); }
+  .cer.look-rainbow .cer__edge {
+    box-shadow:
+      0 0 7px rgba(255,255,255,.92),
+      0 0 20px rgba(255,60,60,.72),
+      0 0 46px rgba(255,200,40,.50),
+      0 0 88px rgba(50,220,120,.38),
+      0 0 140px rgba(50,150,255,.30),
+      0 0 200px rgba(160,60,255,.20); }
+  .cer.look-rainbow .cer__glow {
+    background:radial-gradient(circle, rgba(255,220,180,.16) 0%, rgba(120,160,255,.08) 34%, transparent 66%); }
+  .cer.look-rainbow { --fl:255,246,230; --fl2:140,170,255; }
+
+  /* ================= THE RING LOOKS ===========================================
+     Why these read as objects and the earlier themes read as blurs: colour in
+     the card's FACE goes through a 46px blur and averages into mush, no matter
+     how saturated it starts. Colour on the EDGE keeps its hue, and if the hue
+     travels around the perimeter the card stops being a flat panel and starts
+     being a lit thing with a light source.
+
+     The ring is a conic gradient cut down to a hairline that follows the card's
+     radius exactly: two masks, one clipped to the content box and one to the
+     border box, XOR'd, which leaves only the padding band. There is no other
+     way to get a rounded-rect gradient border that cannot show a corner seam.
+     A blurred twin sits under it for the bloom, so the glow is in the ring's
+     own colours rather than a single flat tint. Both are static and fade on
+     opacity, so the phone's graphics budget is untouched. */
+  .cer__ring { position:absolute; inset:0; border-radius:inherit; padding:3.8px;
+    pointer-events:none; opacity:0; z-index:2;
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor;
+            mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            mask-composite:exclude; }
+  .cer__ring--glow { filter:blur(18px) saturate(1.25); z-index:1; }
+
+  /* the face stays near-black in all three, the way the reference does: the
+     platinum flood is almost switched off so nothing washes the edge out */
+  .cer.look-prism .daycard-theme-living,
+  .cer.look-aurora .daycard-theme-living,
+  .cer.look-ember .daycard-theme-living { --plat-k:0; --rim-k:.45; --sat:1.85; }
+  .cer.look-prism .daycard-ns, .cer.look-aurora .daycard-ns, .cer.look-ember .daycard-ns {
+    background:linear-gradient(165deg, rgba(255,255,255,.055), rgba(255,255,255,.012) 48%, rgba(255,255,255,.03)); }
+  .cer.look-prism .daycard-theme-living .blob.b2,
+  .cer.look-aurora .daycard-theme-living .blob.b2,
+  .cer.look-ember .daycard-theme-living .blob.b2 { opacity:calc(var(--act,0) * .14); }
+  /* their Clarity colour stays, but way down: enough to see it is their card,
+     not enough to stop the face reading as black under the ring */
+  .cer.look-prism .daycard-theme-living .blob.b1,
+  .cer.look-aurora .daycard-theme-living .blob.b1,
+  .cer.look-ember .daycard-theme-living .blob.b1 { opacity:calc(var(--clar,0) * .26); }
+  .cer.look-prism .daycard-ns__rim,
+  .cer.look-aurora .daycard-ns__rim,
+  .cer.look-ember .daycard-ns__rim {
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.55), inset 0 0 26px rgba(255,255,255,.10); }
+
+  /* THE INSIDE.
+     What read as "a white blur in the middle" was three things stacked: the
+     card's iridescence layer (a white conic at 0.55 behind a 22px blur), the
+     sheen off the top edge, and the platinum wash. All three are white by
+     construction, so no amount of coloured blob survived under them. They go
+     down to almost nothing here, and each look paints its own interior instead.
+     The blobs' inline transforms are overridden too, so the colour can be
+     placed deliberately (fire at the bottom, curtains up the left) rather than
+     landing wherever the app's randomiser put it. */
+  .cer.look-prism .daycard-ns__iri,
+  .cer.look-aurora .daycard-ns__iri,
+  .cer.look-ember .daycard-ns__iri { opacity:.10; }
+  .cer.look-prism .daycard-ns__sheen,
+  .cer.look-aurora .daycard-ns__sheen,
+  .cer.look-ember .daycard-ns__sheen { opacity:.28; }
+  .cer.look-prism .daycard-theme-living .blob,
+  .cer.look-aurora .daycard-theme-living .blob,
+  .cer.look-ember .daycard-theme-living .blob { transform:none !important; }
+
+  /* PRISM inside: as close to pure black as the card's own glass allows, so the
+     only bright things on screen are the ring and the mark. Every interior
+     source is pulled to a trace: the colour is a suggestion in the corners, not
+     a fill. The mark goes white, because on a black face the app's low-contrast
+     deboss disappears entirely. */
+  .cer.look-prism .daycard-theme-living { --plat-k:0; }
+  .cer.look-prism .daycard-ns {
+    background:linear-gradient(165deg, rgba(255,255,255,.030), rgba(255,255,255,.006) 48%, rgba(255,255,255,.016)); }
+  .cer.look-prism .daycard-ns__iri { opacity:.04; }
+  .cer.look-prism .daycard-ns__sheen { opacity:.14; }
+
+  /* the corner colour, kept to a trace */
+  .cer.look-prism .daycard-theme-living .blob.b1 {
+    width:120%; height:86%; left:-24%; top:-18%; right:auto; bottom:auto;
+    background:radial-gradient(circle, rgba(78,58,230,1), transparent 68%);
+    opacity:calc(var(--clar,0) * .17); }
+  .cer.look-prism .daycard-theme-living .blob.b3 {
+    width:112%; height:82%; right:-22%; bottom:-20%; left:auto; top:auto;
+    background:radial-gradient(circle, rgba(255,70,120,1), transparent 66%);
+    opacity:calc(var(--bk) * .19); }
+  .cer.look-prism .daycard-theme-living .blob.b4 {
+    width:78%; height:52%; right:-14%; bottom:-6%; left:auto; top:auto;
+    background:radial-gradient(circle, rgba(255,126,26,1), transparent 66%);
+    opacity:calc(var(--bk) * .15); }
+  .cer.look-prism .daycard-theme-living .blob.b5 {
+    width:74%; height:56%; right:-10%; top:-12%; left:auto; bottom:auto;
+    background:radial-gradient(circle, rgba(56,178,255,1), transparent 68%);
+    opacity:calc(var(--bk) * .14); }
+  .cer.look-prism .daycard-theme-living .blob.b6 {
+    width:80%; height:60%; left:-12%; bottom:-14%; right:auto; top:auto;
+    background:radial-gradient(circle, rgba(38,214,255,1), transparent 68%);
+    opacity:calc(var(--bk) * .11); }
+
+  /* AURORA inside: the opposite bet to prism. A platinum face with a cyan cast,
+     so the card reads as bright metal and the aurora lives entirely in the ring
+     and the ground. The wash comes back up to carry the white, and the colour
+     layers drop to a tint on top of it. */
+  .cer.look-aurora .daycard-theme-living { --plat-k:.66; }
+  .cer.look-aurora .daycard-ns__iri { opacity:.30; }
+  .cer.look-aurora .daycard-ns__sheen { opacity:.62; }
+  .cer.look-aurora .daycard-ns__plat {
+    background:radial-gradient(58% 52% at 50% 42%,
+      rgba(255,255,255,.94) 0%, rgba(224,248,255,.66) 44%,
+      rgba(176,226,240,.28) 76%, rgba(176,226,240,0) 100%); }
+  .cer.look-aurora .daycard-theme-living .blob.b2 { opacity:calc(var(--act,0) * .46); }
+
+  /* the cyan hint, and the rest held right back so it stays platinum */
+  .cer.look-aurora .daycard-theme-living .blob.b1 {
+    width:140%; height:64%; left:-22%; top:16%; right:auto; bottom:auto;
+    background:radial-gradient(circle, rgba(38,232,206,1), transparent 68%);
+    opacity:calc(var(--clar,0) * .40); }
+  .cer.look-aurora .daycard-theme-living .blob.b3 {
+    width:104%; height:104%; left:-16%; bottom:-34%; right:auto; top:auto;
+    background:radial-gradient(circle, rgba(58,255,142,1), transparent 66%);
+    opacity:calc(var(--bk) * .16); }
+  .cer.look-aurora .daycard-theme-living .blob.b4 {
+    width:96%; height:72%; right:-18%; top:-22%; left:auto; bottom:auto;
+    background:radial-gradient(circle, rgba(126,84,255,1), transparent 68%);
+    opacity:calc(var(--bk) * .13); }
+  .cer.look-aurora .daycard-theme-living .blob.b5 {
+    width:56%; height:80%; left:26%; top:-6%; right:auto; bottom:auto;
+    background:radial-gradient(circle, rgba(178,255,228,1), transparent 70%);
+    opacity:calc(var(--bk) * .22); }
+  .cer.look-aurora .daycard-theme-living .blob.b6 {
+    width:70%; height:58%; right:-8%; bottom:-16%; left:auto; top:auto;
+    background:radial-gradient(circle, rgba(46,190,255,1), transparent 68%);
+    opacity:calc(var(--bk) * .15); }
+
+  /* EMBER inside: fire. Hottest at the base and rising, coal above it. */
+  .cer.look-ember .daycard-theme-living .blob.b1 {
+    width:150%; height:96%; left:-26%; bottom:-26%; right:auto; top:auto;
+    background:radial-gradient(circle, rgba(206,32,18,1), transparent 68%);
+    opacity:calc(var(--clar,0) * .60); }
+  .cer.look-ember .daycard-theme-living .blob.b3 {
+    width:118%; height:66%; left:-9%; bottom:-22%; right:auto; top:auto;
+    background:radial-gradient(circle, rgba(255,112,18,1), transparent 64%);
+    opacity:calc(var(--bk) * .70); }
+  .cer.look-ember .daycard-theme-living .blob.b4 {
+    width:72%; height:38%; left:14%; bottom:-10%; right:auto; top:auto;
+    background:radial-gradient(circle, rgba(255,206,72,1), transparent 62%);
+    opacity:calc(var(--bk) * .58); }
+  .cer.look-ember .daycard-theme-living .blob.b5 {
+    width:86%; height:54%; right:-16%; top:2%; left:auto; bottom:auto;
+    background:radial-gradient(circle, rgba(255,58,34,1), transparent 68%);
+    opacity:calc(var(--bk) * .34); }
+  .cer.look-ember .daycard-theme-living .blob.b6 {
+    width:64%; height:44%; left:-10%; top:-8%; right:auto; bottom:auto;
+    background:radial-gradient(circle, rgba(150,20,12,1), transparent 70%);
+    opacity:calc(var(--bk) * .30); }
+  .cer.look-prism .cer__edge, .cer.look-aurora .cer__edge, .cer.look-ember .cer__edge {
+    box-shadow:0 0 6px rgba(255,255,255,.34), 0 0 120px rgba(255,255,255,.08); }
+
+  /* PRISM. White at the top-left where the light lands, splitting cold down one
+     side and hot down the other, closing back to white. */
+  .cer.look-prism .cer__ring { opacity:var(--act,0);
+    background:conic-gradient(from 196deg,
+      #ffffff 0deg, #cfefff 22deg, #62d8ff 52deg, #2f6dff 92deg,
+      #7a3cff 128deg, #ff3d78 168deg, #ff6a1e 206deg, #ffb545 240deg,
+      #ffe9c2 276deg, #ffffff 318deg, #ffffff 360deg); }
+  .cer.look-prism .cer__ring--glow { opacity:calc(var(--act,0) * .95); }
+  .cer.look-prism .cer__glow {
+    background:radial-gradient(circle, rgba(150,120,255,.16) 0%, rgba(255,120,60,.07) 34%, transparent 66%); }
+  /* the floor takes both temperatures, cold on one side and hot on the other,
+     the way the reference throws them */
+  .cer.look-prism .cer__floor {
+    background:
+      radial-gradient(ellipse 15% 1.7% at 50% 3%, rgba(255,255,255,1), rgba(255,255,255,0) 62%),
+      radial-gradient(ellipse 26% 5% at 34% 3%, rgba(70,170,255,.72), rgba(70,170,255,0) 74%),
+      radial-gradient(ellipse 26% 5% at 66% 3%, rgba(255,130,40,.72), rgba(255,130,40,0) 74%),
+      radial-gradient(ellipse 24% 34% at 36% 8%, rgba(60,150,255,.32), rgba(60,150,255,0) 76%),
+      radial-gradient(ellipse 24% 34% at 64% 8%, rgba(255,120,40,.32), rgba(255,120,40,0) 76%),
+      radial-gradient(ellipse 74% 50% at 50% 4%, rgba(150,120,255,.12), rgba(150,120,255,0) 78%); }
+
+  /* AURORA. The cold half of the spectrum only: teal into green into violet,
+     the closest of the three to something Memento could actually ship. */
+  .cer.look-aurora .cer__ring { opacity:var(--act,0);
+    background:conic-gradient(from 210deg,
+      #eafff8 0deg, #4ff0c4 46deg, #2ad9f5 96deg, #3a7dff 146deg,
+      #8a4cff 196deg, #4ff0a8 252deg, #bffff0 306deg, #eafff8 360deg); }
+  .cer.look-aurora .cer__ring--glow { opacity:calc(var(--act,0) * .95); }
+  .cer.look-aurora .cer__glow {
+    background:radial-gradient(circle, rgba(60,230,200,.16) 0%, rgba(90,120,255,.07) 34%, transparent 66%); }
+  .cer.look-aurora { --fl:190,255,238; --fl2:70,190,255; }
+
+  /* EMBER. The hot half only: gold through red to deep coal. */
+  .cer.look-ember .cer__ring { opacity:var(--act,0);
+    background:conic-gradient(from 200deg,
+      #fff3d6 0deg, #ffc247 44deg, #ff7a12 92deg, #ff3a1e 140deg,
+      #c41436 190deg, #ff6a12 244deg, #ffd489 300deg, #fff3d6 360deg); }
+  .cer.look-ember .cer__ring--glow { opacity:calc(var(--act,0) * .95); }
+  .cer.look-ember .cer__glow {
+    background:radial-gradient(circle, rgba(255,150,50,.17) 0%, rgba(200,40,30,.08) 34%, transparent 66%); }
+  .cer.look-ember { --fl:255,214,150; --fl2:230,70,30; }
+
+  /* on a platinum face the light mark vanishes, so aurora takes the dark one */
+
+  /* THE DORMANT MARK. The app forces its DARK mark on this card (the wrap
+     carries daycard--bright), which is right once the platinum floods and wrong
+     while the card is still asleep: on a near-black face a dark mark is
+     invisible, and this is the one screen where the card is the only thing
+     there. Before the flood it takes the app's OWN dark-card treatment, the
+     exact values from daycard-living, and hands back the moment it lights.
+     Nothing invented, just the right one of the app's two. */
+  .cer:not(.lit):not(.back) .daycard-wrap.daycard--bright .daycard-ns__emblem {
+    fill:rgba(255,255,255,.55);
+    filter:
+      drop-shadow(0 1.5px 0 rgba(255,255,255,.30))
+      drop-shadow(0 -1.5px 1.5px rgba(0,0,0,.60)); }
+
+  /* THE MARK IS THE APP'S OWN, UNTOUCHED.
+     I tried making it a lit object: a gradient face, a bevel, then glass that
+     sampled the card behind it with a stroked edge. Malik's call, and he is
+     right: it read as mediocre, and on the one element that IS Memento that is
+     worse than plain. Every override is gone, so the mark renders exactly as
+     the app renders it, including the app's own adaptive dark/light treatment.
+     If it is ever revisited it should be a different idea, not a better version
+     of that one. */
+
+  /* MATTE BLACK. A curiosity, and the only look here that is not made of light.
+     Matte means no specular: no hairline, no bloom, no gloss sweep, no pool of
+     emitted light on the floor, no mirrored reflection. Which means the hold
+     cannot pull light OUT of it, so it does the opposite instead: a broad soft
+     key falls ACROSS the card from the top left, the surface resolves out of the
+     dark, and the mark surfaces as a change of finish rather than a change of
+     colour. Every value here is wide and low contrast, because a matte surface
+     is read by the ABSENCE of a sharp falloff. */
+  .cer.look-matte { --fl:158,160,166; --fl2:88,90,96; }
+  .cer.look-matte .daycard-theme-living { --plat-k:0; --rim-k:.5; --sat:1; --pop-k:0; }
+  /* the face, near black: one wide gradient and nothing else */
+  .cer.look-matte .daycard-ns {
+    background:linear-gradient(158deg, rgba(255,255,255,.028), rgba(255,255,255,.007) 56%, rgba(0,0,0,.16)); }
+  /* every specular layer the card owns, off. All of them are white by
+     construction, and any one left on reads as gloss. */
+  .cer.look-matte .daycard-ns__iri,
+  .cer.look-matte .daycard-ns__sheen,
+  .cer.look-matte .daycard-ns__plat,
+  .cer.look-matte .daycard-theme-living .blob { opacity:0 !important; }
+  /* no hairline. A matte edge does not catch a line, it lifts faintly where the
+     surface turns away from the light, so this is wide, dim and even. Static
+     values: the app already ramps this layer's OPACITY off --act, so the edge
+     still arrives with the hold without anything repainting per frame. */
+  .cer.look-matte .daycard-ns__rim {
+    box-shadow:
+      inset 0 0 0 1.2px rgba(255,255,255,.30),
+      inset 0 0 16px rgba(255,255,255,.10),
+      inset 0 0 54px rgba(255,255,255,.05); }
+  /* the key light, which IS the ignition for this look. Two gradients, so no
+     filter and no cost: a soft broad source top-left, and the floor of the
+     card falling off into black. */
+  .cer.look-matte .cer__face { opacity:var(--act, 0) !important;
+    background:
+      radial-gradient(74% 58% at 24% 16%, rgba(255,255,255,.11) 0%, rgba(255,255,255,.048) 42%, rgba(255,255,255,0) 78%),
+      radial-gradient(120% 92% at 50% 122%, rgba(0,0,0,.36) 0%, rgba(0,0,0,0) 66%); }
+  /* the mark as a finish, not a colour. Matte has no glint, so the deboss loses
+     its bright top edge and keeps only the soft shadow above it. */
+  .cer.look-matte .daycard-wrap.daycard--bright .daycard-ns__emblem,
+  .cer.look-matte .daycard-ns__emblem {
+    fill:rgba(255,255,255,.17);
+    filter:drop-shadow(0 -1px 1.5px rgba(0,0,0,.55)); }
+  /* asleep it is dimmer still, so the mark SURFACES as the key comes up instead
+     of dimming. The dormant rule further up carries two :not()s, which count
+     toward specificity, so it needs matching here or it wins and the mark ends
+     up brighter before the hold than after it. */
+  .cer.look-matte:not(.lit):not(.back) .daycard-wrap.daycard--bright .daycard-ns__emblem,
+  .cer.look-matte:not(.lit):not(.back) .daycard-ns__emblem {
+    fill:rgba(255,255,255,.085);
+    filter:drop-shadow(0 -1px 1.5px rgba(0,0,0,.5)); }
+  /* the room. Matte absorbs, so it gives almost nothing back: a trace of a
+     contact pool, and no mirrored reflection at all. */
+  .cer.look-matte .daycard-floor { display:none !important; }
+  .cer.look-matte .cer__floor { opacity:calc(var(--hf) * .22); }
+  .cer.look-matte.lit .cer__floor, .cer.look-matte.back .cer__floor { opacity:.2; }
+  .cer.look-matte .cer__glow { opacity:calc(var(--hf) * .24); }
+  .cer.look-matte.lit .cer__glow, .cer.look-matte.back .cer__glow { opacity:.22; }
+  /* and every emissive flourish platinum earned, off */
+  .cer.look-matte .cer__edge,
+  .cer.look-matte .cer__pulse,
+  .cer.look-matte .cer__life,
+  .cer.look-matte .cer__spark,
+  .cer.look-matte .cer__sweep,
+  .cer.look-matte .cer__flare { opacity:0 !important; animation:none !important; }
+
+  /* THE IMPACT FRAME. The hold was a build with no moment in it: the light
+     arrived gradually and then it was simply on. This is the frame where it
+     lands. The screen goes white on release, hard, then falls away in under
+     half a second, so it reads as one impact rather than a flash.
+     It is a radial rather than a flat fill: white across effectively the whole
+     screen, easing off at the corners, which reads as light filling the room
+     instead of a rectangle being switched on. Opacity only, no fill-mode, so
+     nothing is left promoted afterwards. */
+  .cer__impact { position:absolute; inset:0; z-index:6; pointer-events:none;
+    opacity:var(--wht, 0);
+    background:radial-gradient(circle at 50% 42%,
+      #ffffff 0%, #ffffff 72%, rgba(255,255,255,.95) 100%); }
+  /* Timing, because the first version read as a glitch rather than an impact:
+     it hit peak in 30ms and was gone in 440ms, which is a camera flash, not
+     light arriving. It BLOOMS over ~130ms (fast enough to still be a hit, slow
+     enough that the eye tracks it) and then decays for a full second on a long
+     tail, the way real light leaves a room. 1.3s total, which also lets it sit
+     with the flare at 1.15s and the sweep at 1.7s instead of finishing before
+     either has started. */
+  .cer.flare .cer__impact { animation:cerImpact 3300ms cubic-bezier(.3,.5,.2,1); }
+  /* It starts at .88, not 0, because by the time the hold completes the screen
+     is ALREADY most of the way white. The keyframe picks the value up exactly
+     where the hold left it, so there is no seam between what they did and what
+     the release does. No fill-mode: the base value is set to 0 on release, so
+     when the animation ends nothing is left promoted and nothing snaps back. */
+  @keyframes cerImpact {
+    0%   { opacity:.88; }
+    4.8% { opacity:1; }
+    /* The plateau is the whole point of the beat, so it is the longest thing in
+       the sequence: a second and six tenths of nothing but white and their
+       mark. It was 670ms before, which is long enough to register and too short
+       to look at. */
+    53%  { opacity:1; }
+    64%  { opacity:.84; }
+    76%  { opacity:.56; }
+    86%  { opacity:.31; }
+    94%  { opacity:.13; }
+    100% { opacity:0; }
+  }
+
+  /* THE MARK THAT SURVIVES THE WHITEOUT. At full white the screen holds one
+     thing: their card's own M, dark. It is not a logo dropped on top, it is the
+     same path at the same place at the same size as the emblem on the card
+     underneath, so when the white recedes the mark does not move, the card
+     simply arrives around it.
+     Geometry is mirrored rather than shared because the white layer sits above
+     the stage and a child of the stage could never paint over it. The outer box
+     copies the stage's transform, the inner one copies the float's breathing,
+     and the svg is pinned by JS to the emblem's measured rect: three copies,
+     zero drift. */
+  .cer__wm { position:absolute; left:50%; top:50%; margin-left:-160px; margin-top:-226px;
+    width:320px; height:452px; z-index:7; pointer-events:none;
+    opacity:var(--wmo, 0);
+    transform:translateY(-30px) scale(var(--hs, 1)); }
+  .cer.back .cer__wm { transform:translateY(-168px) scale(.78);
+    transition:transform 1.3s cubic-bezier(.33,.9,.28,1); }
+  .cer__wm > span { position:absolute; inset:0; }
+  .cer.lit .cer__wm > span, .cer.back .cer__wm > span {
+    animation:cerBreathe 8s ease-in-out infinite; }
+  .cer__wm svg { position:absolute; left:98px; top:152px; width:124px; height:124px; }
+  .cer__wm path { fill:#0e1218; }
+  /* The mark leaves BEFORE the white does. It has to: the real emblem is
+     fading up underneath it, and two marks at slightly different darknesses
+     sitting on the same pixels reads as a double. By the time the card is
+     legible through the white, only the card's own mark is left. */
+  .cer.flare .cer__wm { animation:cerMark 3300ms cubic-bezier(.3,.5,.2,1); }
+  @keyframes cerMark {
+    0%   { opacity:1; }
+    60%  { opacity:1; }
+    70%  { opacity:.72; }
+    80%  { opacity:.3; }
+    88%  { opacity:0; }
+    100% { opacity:0; }
+  }
+  /* THE PULSE. The edge carries a heartbeat: nothing for most of the cycle,
+     then a beat and a smaller second beat, then nothing again. Occasional is
+     the whole point, a constant pulse would read as a loading state. Opacity on
+     a fixed-radius shadow, so it costs nothing. */
+  .cer__pulse { position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+    opacity:0; z-index:3;
+    box-shadow:
+      inset 0 0 0 2px rgba(255,255,255,.85),
+      inset 0 0 14px rgba(226,244,255,.45),
+      0 0 8px rgba(255,255,255,.85),
+      0 0 30px rgba(214,238,255,.55),
+      0 0 70px rgba(170,212,255,.32); }
+  .cer.lit .cer__pulse, .cer.back .cer__pulse {
+    animation:cerPulse 9.3s ease-in-out infinite; will-change:opacity; }
+  @keyframes cerPulse {
+    0%, 68%, 100% { opacity:0; }
+    76%           { opacity:.5; }
+    83%           { opacity:.1; }
+    89%           { opacity:.3; }
+    96%           { opacity:0; }
+  }
+
+  /* ================= THE CARD BREATHING =======================================
+     Three soft lights drifting inside the card so it morphs instead of sitting
+     there. Two rules made this safe and made it read as alive rather than as an
+     animation:
+
+     1. They are plain radial-gradient elements, NOT the card's own colour blobs.
+        The card's blobs live inside a 46px blur, and moving anything in there
+        re-runs that blur every frame at device resolution, which is exactly what
+        crashed iOS. A gradient is already soft, so it needs no filter, and
+        transform plus opacity on it is compositor work the phone does for free.
+     2. The three durations are coprime (23s, 31s, 41s), so the combination only
+        repeats after about eight hours. There is no pattern to catch, which is
+        the difference between breathing and blinking.
+
+     They run only once the card is lit. Dormant stays still, the hold stays a
+     build, and the settled card is the thing that is alive. */
+  .cer__life { position:absolute; inset:-8%; z-index:5; pointer-events:none;
+    opacity:0; transition:opacity 1.4s ease-out; }
+  .cer.lit .cer__life, .cer.back .cer__life { opacity:1; }
+  .cer__life i { position:absolute; border-radius:50%; }
+  .cer__life i:nth-child(1) { width:64%; height:48%; left:4%;  top:6%;
+    background:radial-gradient(circle, rgba(255,255,255,.50), rgba(255,255,255,0) 68%); }
+  /* the cyan one, their Clarity colour moving through the platinum */
+  .cer__life i:nth-child(2) { width:56%; height:42%; right:0%; top:32%;
+    background:radial-gradient(circle, rgba(178,238,255,.44), rgba(178,238,255,0) 70%); }
+  .cer__life i:nth-child(3) { width:72%; height:54%; left:10%; bottom:0%;
+    background:radial-gradient(circle, rgba(255,255,255,.38), rgba(255,255,255,0) 70%); }
+  .cer.lit .cer__life i, .cer.back .cer__life i,
+  .cer.lit .cer__spark, .cer.back .cer__spark { will-change:transform, opacity; }
+  .cer.lit .cer__life i:nth-child(1), .cer.back .cer__life i:nth-child(1) {
+    animation:lifeA 23s ease-in-out infinite; }
+  .cer.lit .cer__life i:nth-child(2), .cer.back .cer__life i:nth-child(2) {
+    animation:lifeB 31s ease-in-out infinite; }
+  .cer.lit .cer__life i:nth-child(3), .cer.back .cer__life i:nth-child(3) {
+    animation:lifeC 41s ease-in-out infinite; }
+  @keyframes lifeA {
+    0%   { transform:translate(0,0) scale(1);            opacity:.75; }
+    23%  { transform:translate(14%,9%) scale(1.18);      opacity:1; }
+    51%  { transform:translate(-9%,17%) scale(.88);      opacity:.55; }
+    76%  { transform:translate(6%,-7%) scale(1.10);      opacity:.9; }
+    100% { transform:translate(0,0) scale(1);            opacity:.75; }
+  }
+  @keyframes lifeB {
+    0%   { transform:translate(0,0) scale(1);            opacity:.6; }
+    19%  { transform:translate(-16%,-11%) scale(1.24);   opacity:.95; }
+    44%  { transform:translate(-4%,12%) scale(.82);      opacity:.45; }
+    71%  { transform:translate(11%,4%) scale(1.12);      opacity:.85; }
+    100% { transform:translate(0,0) scale(1);            opacity:.6; }
+  }
+  @keyframes lifeC {
+    0%   { transform:translate(0,0) scale(1);            opacity:.7; }
+    31%  { transform:translate(10%,-13%) scale(1.16);    opacity:.95; }
+    58%  { transform:translate(-13%,-4%) scale(.86);     opacity:.5; }
+    83%  { transform:translate(4%,8%) scale(1.06);       opacity:.8; }
+    100% { transform:translate(0,0) scale(1);            opacity:.7; }
+  }
+
+  /* THE SPARK. A single point of light drifting the lower-right of the ring,
+     slowly, fading in and out at both ends so it never announces itself. It sits
+     ON the ring, and it is a radial gradient so it cannot draw an edge. */
+  .cer__spark { position:absolute; right:-8px; top:0; width:18px; height:86px;
+    z-index:3; pointer-events:none; opacity:0; border-radius:50%;
+    background:radial-gradient(ellipse 50% 50% at 50% 50%,
+      rgba(255,255,255,.9) 0%, rgba(206,238,255,.42) 44%, rgba(206,238,255,0) 74%);
+    filter:blur(3px); }
+  .cer.lit .cer__spark, .cer.back .cer__spark { animation:cerSpark 21s ease-in-out infinite; }
+  @keyframes cerSpark {
+    0%   { opacity:0;   transform:translateY(150px) scaleY(.7); }
+    16%  { opacity:.5;  }
+    50%  { opacity:.78; transform:translateY(290px) scaleY(1.15); }
+    84%  { opacity:.42; }
+    100% { opacity:0;   transform:translateY(410px) scaleY(.7); }
+  }
+
+  /* ================= THE FACE =================================================
+     Answering "is a dot in the middle the best we've got". Four treatments that
+     stack on top of any look, all built from the card's own geometry, no new
+     assets and no new colours. They sit UNDER the mark and the foot, which the
+     app already lifts above the reward layers.  */
+  .cer__face { position:absolute; inset:0; border-radius:inherit; z-index:5;
+    pointer-events:none; opacity:0; }
+  .cer.lit .cer__face, .cer.back .cer__face { opacity:var(--act, 0); }
+
+  /* ETCHED. Machined hairlines, the way a metal card is turned on a lathe.
+     Reads as material rather than decoration, and at a glance you register
+     texture without registering lines. */
+  .cer.face-etched .cer__face {
+    background:repeating-linear-gradient(114deg,
+      rgba(255,255,255,.055) 0 1px, rgba(255,255,255,0) 1px 5px);
+    -webkit-mask:radial-gradient(ellipse 78% 74% at 50% 46%, #000 12%, transparent 82%);
+            mask:radial-gradient(ellipse 78% 74% at 50% 46%, #000 12%, transparent 82%); }
+
+  /* SWEEP. One frozen specular highlight across the glass, as if the ring's
+     light is catching the surface. Nothing moves; it is a still. */
+  .cer.face-sweep .cer__face {
+    background:linear-gradient(112deg,
+      rgba(255,255,255,0) 26%, rgba(255,255,255,.07) 40%,
+      rgba(255,255,255,.16) 49%, rgba(255,255,255,.05) 58%, rgba(255,255,255,0) 72%); }
+
+  /* MARK. The M stops being a dot and becomes the face: scaled to fill, dropped
+     to a whisper, pressed in. Same asset, no new anything. */
+  .cer.face-mark .daycard-ns__emblem { width:250px; height:250px; opacity:.34; }
+  .cer.face-mark.look-prism .daycard-ns__emblem { opacity:.30; }
+
+  /* HORIZON. The face darkens toward the top and holds light at the base, so
+     the card looks lit from the floor it is standing on rather than evenly
+     filled. The cheapest of the four and possibly the most convincing. */
+  .cer.face-horizon .cer__face {
+    background:linear-gradient(to top,
+      rgba(255,255,255,.12) 0%, rgba(255,255,255,.04) 26%,
+      rgba(0,0,0,.20) 62%, rgba(0,0,0,.42) 100%); }
+
+  /* ================= CAUSTIC ==================================================
+     The look from Malik's render: a blade of light bending through the card,
+     with the spectrum splitting across its width, cool on the inside of the
+     curve and hot on the outside.
+
+     It is one enormous ellipse whose CENTRE sits off the card, down and to the
+     left. Only a thin band of that ellipse is opaque, so what falls inside the
+     card is an arc sweeping from the bottom-left up to the right. The colour
+     order across the band IS the dispersion: blue, cyan, white core, amber,
+     ember. A blurred twin underneath carries the bloom. Both are clipped by the
+     card's own contain:paint, so nothing escapes, and both are static and
+     opacity-driven, so the phone pays nothing for them. */
+  /* The ellipse centre sits off the BOTTOM-RIGHT, which is what makes the blade
+     shallow at the lower-left and steep as it leaves the right edge. Centring
+     it bottom-left mirrors the curve, which is the first thing that was wrong.
+     Colour order follows from that: stops run outward from the centre, so the
+     HOT stops come first (they land on the lower-right, convex side) and the
+     cool ones after (concave, upper-left). A second, fainter band sits outside
+     the first, the way a real caustic doubles. */
+  .cer__caustic { position:absolute; inset:0; z-index:5; opacity:0; pointer-events:none;
+    background:
+      radial-gradient(ellipse 60% 55% at -6% -8%,
+        transparent 152%,
+        rgba(46,20,190,.45) 156%,
+        rgba(20,100,255,.95) 160%,
+        rgba(38,200,255,1) 164%,
+        rgba(190,244,255,1) 167.5%,
+        rgba(255,255,255,1) 169.5%,
+        rgba(255,244,206,1) 172%,
+        rgba(255,196,66,1) 176%,
+        rgba(255,138,16,1) 182%,
+        rgba(255,86,8,.92) 189%,
+        rgba(200,32,4,.55) 196%,
+        rgba(90,10,2,.22) 203%,
+        transparent 212%);
+    /* THE TAPER. A radial band is the same width everywhere, which is what made
+       it read as a rainbow rather than a blade. A conic mask around the SAME
+       centre varies alpha along the arc, so the light is a faint tail at one
+       end and a broad flare at the other. Seen from this centre the card spans
+       roughly 84deg to 179deg; aim the taper anywhere else and the blade
+       vanishes entirely (it did, twice). */
+    -webkit-mask:conic-gradient(from 0deg at -6% -8%,
+      rgba(0,0,0,0) 84deg, rgba(0,0,0,.22) 96deg, rgba(0,0,0,.62) 108deg,
+      #000 124deg, #000 152deg, rgba(0,0,0,.5) 168deg, rgba(0,0,0,0) 179deg);
+            mask:conic-gradient(from 0deg at -6% -8%,
+      rgba(0,0,0,0) 84deg, rgba(0,0,0,.22) 96deg, rgba(0,0,0,.62) 108deg,
+      #000 124deg, #000 152deg, rgba(0,0,0,.5) 168deg, rgba(0,0,0,0) 179deg); }
+  .cer__caustic--glow { z-index:4; filter:blur(16px) saturate(1.5); }
+  .cer.look-caustic.lit .cer__caustic, .cer.look-caustic.back .cer__caustic { opacity:var(--act, 0); }
+  .cer.look-caustic.lit .cer__caustic--glow, .cer.look-caustic.back .cer__caustic--glow {
+    opacity:calc(var(--act, 0) * .62); }
+  .cer.look-caustic.lit .cer__caustic--rfl, .cer.look-caustic.back .cer__caustic--rfl {
+    opacity:calc(var(--act, 0) * .85); }
+  .cer.look-caustic.lit .cer__caustic--glow.cer__caustic--rfl,
+  .cer.look-caustic.back .cer__caustic--glow.cer__caustic--rfl {
+    opacity:calc(var(--act, 0) * .5); }
+  /* the mark sits smaller here, the way it does in the render */
+  .cer.look-caustic .daycard-ns__emblem { width:108px; height:108px; }
+
+  /* the card underneath it: black, so the blade is the only thing lit */
+  .cer.look-caustic .daycard-theme-living { --plat-k:0; --rim-k:.35; --sat:1.8; }
+  /* black, and I mean black: the face is a trace of glass, nothing more */
+  .cer.look-caustic .daycard-ns {
+    background:linear-gradient(165deg, rgba(255,255,255,.018), rgba(255,255,255,.004) 48%, rgba(255,255,255,.010)); }
+  .cer.look-caustic .daycard-ns__iri { opacity:.02; }
+  .cer.look-caustic .daycard-ns__sheen { opacity:.06; }
+  .cer.look-caustic .daycard-theme-living .blob { transform:none !important; }
+  /* the two pools the blade leaves behind it: cold at the lower-left where it
+     enters, hot at the lower-right where it exits */
+  .cer.look-caustic .daycard-theme-living .blob.b1 {
+    width:100%; height:70%; left:-30%; bottom:-20%; right:auto; top:auto;
+    background:radial-gradient(circle, rgba(30,110,255,1), transparent 68%);
+    opacity:calc(var(--bk) * .30); }
+  .cer.look-caustic .daycard-theme-living .blob.b3 {
+    width:96%; height:74%; right:-24%; bottom:-22%; left:auto; top:auto;
+    background:radial-gradient(circle, rgba(255,120,20,1), transparent 66%);
+    opacity:calc(var(--bk) * .42); }
+  .cer.look-caustic .daycard-theme-living .blob.b2,
+  .cer.look-caustic .daycard-theme-living .blob.b4,
+  .cer.look-caustic .daycard-theme-living .blob.b5,
+  .cer.look-caustic .daycard-theme-living .blob.b6 { opacity:0; }
+
+  /* the rim agrees with the blade: white across the top, running hot down the
+     right where the light leaves, cool along the lower-left where it enters */
+  .cer.look-caustic .cer__ring { opacity:calc(var(--act,0) * .95);
+    background:conic-gradient(from 0deg,
+      #ffffff 0deg, #ffe3c2 38deg, #ff8a24 76deg, #ff400e 102deg,
+      #ff8c2c 132deg, #ffeacb 162deg, #ffffff 188deg, #d6ecff 214deg,
+      #3fb4ff 248deg, #9adcff 286deg, #ffffff 322deg, #ffffff 360deg); }
+  .cer.look-caustic .cer__ring--glow { opacity:calc(var(--act,0) * .8); }
+  .cer.look-caustic .cer__edge {
+    box-shadow:
+      0 0 8px rgba(255,255,255,.85),
+      0 0 30px rgba(255,150,60,.42),
+      0 0 90px rgba(255,90,30,.28),
+      0 0 190px rgba(40,110,255,.20); }
+  /* the room takes the two temperatures too, cold wall on the left, hot on the
+     right, which is what stops the card floating in a void */
+  .cer.look-caustic .cer__glow {
+    background:
+      radial-gradient(ellipse 60% 70% at 22% 46%, rgba(30,90,255,.28), transparent 62%),
+      radial-gradient(ellipse 60% 70% at 80% 44%, rgba(255,70,20,.26), transparent 62%),
+      radial-gradient(circle, rgba(120,150,255,.10) 0%, transparent 62%); }
+  /* the ground takes both temperatures, the way the render throws them */
+  /* two vivid streaks running down the floor, the way the render throws them */
+  .cer.look-caustic .cer__floor {
+    background:
+      radial-gradient(ellipse 15% 1.7% at 50% 3%, rgba(255,255,255,1), rgba(255,255,255,0) 62%),
+      radial-gradient(ellipse 20% 4.5% at 30% 3%, rgba(40,140,255,.95), rgba(40,140,255,0) 74%),
+      radial-gradient(ellipse 20% 4.5% at 70% 3%, rgba(255,120,20,.95), rgba(255,120,20,0) 74%),
+      radial-gradient(ellipse 15% 44% at 31% 12%, rgba(30,120,255,.55), rgba(30,120,255,0) 74%),
+      radial-gradient(ellipse 15% 44% at 69% 12%, rgba(255,110,20,.55), rgba(255,110,20,0) 74%),
+      radial-gradient(ellipse 70% 46% at 50% 4%, rgba(120,120,255,.12), rgba(120,120,255,0) 78%); }
+
+  
