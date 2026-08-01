@@ -151,6 +151,32 @@ const CloudSync = (function () {
       sessionStorage.setItem(ADOPT_GUARD_KEY, JSON.stringify(r));
     } catch (e) {}
   }
+  // THE URL BRAKE. Malik's iPad PWA proved a loop the storage guard cannot
+  // stop: its storage container was wedged, so the adopted state never stuck
+  // (every reload woke up "fresh" and adopted again) AND the sessionStorage
+  // counter never stuck either. The chain count now rides the URL itself,
+  // which needs no storage at all: each adopt-reload navigates to the same
+  // URL with ?syncr=N+1, and N >= 3 refuses further adopts no matter what.
+  // A healthy first sync strips the token (see beginFirstSync), ending the
+  // chain, so a later legitimate adopt starts counting from zero.
+  function urlSyncCount() {
+    try { return parseInt(new URL(location.href).searchParams.get('syncr') || '0', 10) || 0; } catch (e) { return 0; }
+  }
+  function adoptReloadUrl() {
+    try {
+      const u = new URL(location.href);
+      u.searchParams.set('syncr', String(urlSyncCount() + 1));
+      return u.toString();
+    } catch (e) { return null; }
+  }
+  function clearUrlBrake() {
+    try {
+      if (!urlSyncCount()) return;
+      const u = new URL(location.href);
+      u.searchParams.delete('syncr');
+      history.replaceState(null, '', u.toString());
+    } catch (e) {}
+  }
   // fresh = this device holds nothing real. Such a device can NEVER be in a
   // destructive loop: adopting onto an empty app loses nothing, and once
   // adopted the device is no longer fresh, so the same decision cannot
@@ -158,8 +184,12 @@ const CloudSync = (function () {
   // strands a signed-in device with an empty app while its real data sits in
   // the cloud (Malik's iPad, 2026-08-01: "row found, real=true, decision
   // adoptCloud, adopt BLOCKED").
+  // ...UNLESS the adopt never sticks (the wedged-storage case above): the
+  // URL brake outranks the fresh exemption, because three reloads that each
+  // woke up still-fresh mean the writes are not persisting.
   function adoptWouldLoop(fresh) {
     try {
+      if (urlSyncCount() >= 3) return true;
       if (fresh) return false;
       return adoptGuardRead().n >= 2; // this would be the 3rd reload in 12s
     } catch (e) { return false; }
@@ -401,10 +431,12 @@ const CloudSync = (function () {
       } catch (e) {}
       console.info('CloudSync: merged with the cloud copy per module (' + (why || '') + '). The previous local copy was backed up to localStorage "' + BACKUP_KEY + '".');
       localStorage.setItem(APP_KEY, JSON.stringify(merged));
+      dnote('adopting the merged copy, reloading now (chain ' + (urlSyncCount() + 1) + ')');
       noteAdoptReload();
       markRestoreReload();
       showRestoreScreen();
-      location.reload();
+      const next = adoptReloadUrl();
+      if (next) location.replace(next); else location.reload();
       return true;
     } catch (e) { adopting = false; return false; }
   }
@@ -481,11 +513,12 @@ const CloudSync = (function () {
       } catch (e) {}
       console.info('CloudSync: adopting the cloud copy (' + (why || 'newer') + '). The previous local copy was backed up to localStorage "' + BACKUP_KEY + '".');
       localStorage.setItem(APP_KEY, JSON.stringify(row.state));
-      dnote('adopting the cloud copy, reloading now');
+      dnote('adopting the cloud copy, reloading now (chain ' + (urlSyncCount() + 1) + ')');
       noteAdoptReload();
       markRestoreReload();
       showRestoreScreen();
-      location.reload();
+      const next = adoptReloadUrl();
+      if (next) location.replace(next); else location.reload();
       return true;
     } catch (e) { adopting = false; return false; }
   }
@@ -561,6 +594,7 @@ const CloudSync = (function () {
       dnote('first sync: READY');
       firstSyncState = FIRST_SYNC_READY;
       clearAdoptGuard();
+      clearUrlBrake(); // a settled sync ends the reload chain
       clearRestoreReload();
       hideRestoreScreen();
       const shouldPush = !!result.shouldPush || pushQueued;
