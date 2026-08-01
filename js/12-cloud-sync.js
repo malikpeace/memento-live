@@ -54,7 +54,9 @@ const CloudSync = (function () {
   // local copy up. A clean load with no adopt clears the counter.
   const ADOPT_GUARD_KEY = 'memento_sync_adopt_guard';
   const RESTORE_MARKER_KEY = 'memento_sync_restoring';
+  const RESTORE_SCREEN_MAX_MS = 15000;
   let restoreEl = null;
+  let restoreFailsafe = null;
 
   function showRestoreScreen() {
     try {
@@ -80,11 +82,18 @@ const CloudSync = (function () {
       restoreEl.style.display = 'flex';
       const raf = (window && window.requestAnimationFrame) ? window.requestAnimationFrame.bind(window) : function (fn) { setTimeout(fn, 0); };
       raf(function () { if (restoreEl) restoreEl.style.opacity = '1'; });
+      // Hard failsafe: this screen may NEVER trap the user. Whatever the sync
+      // engine is doing (hung request, dead promise, a path that forgot to
+      // hide), the app is usable from local data after this window; a real
+      // adopt that finishes later still lands via its reload.
+      clearTimeout(restoreFailsafe);
+      restoreFailsafe = setTimeout(hideRestoreScreen, RESTORE_SCREEN_MAX_MS);
     } catch (e) {}
   }
 
   function hideRestoreScreen() {
     try {
+      clearTimeout(restoreFailsafe);
       if (!restoreEl) return;
       restoreEl.style.opacity = '0';
       setTimeout(function () { if (restoreEl && restoreEl.style.opacity === '0') restoreEl.style.display = 'none'; }, 220);
@@ -456,6 +465,23 @@ const CloudSync = (function () {
     } catch (e) { return { ok: false }; }
   }
 
+  // The first pull must never hang the boot: a request that neither resolves
+  // nor rejects (flaky network, stalled fetch) left Malik's iPad stuck behind
+  // the restore screen forever (2026-08-01). A pull that outlives this window
+  // counts as failed; the app boots from local and the focus retry keeps
+  // trying in the background.
+  const FIRST_PULL_TIMEOUT_MS = 12000;
+  function withTimeout(promise, ms, fallback) {
+    return new Promise((resolve) => {
+      let done = false;
+      const t = setTimeout(() => { if (!done) { done = true; resolve(fallback); } }, ms);
+      promise.then(
+        (v) => { if (!done) { done = true; clearTimeout(t); resolve(v); } },
+        () => { if (!done) { done = true; clearTimeout(t); resolve(fallback); } }
+      );
+    });
+  }
+
   async function beginFirstSync() {
     if (!client || !isLoggedIn() || demo() || adopting) return false;
     if (firstSyncState === FIRST_SYNC_READY) return true;
@@ -463,7 +489,7 @@ const CloudSync = (function () {
     firstSyncState = FIRST_SYNC_RESTORING;
     showRestoreScreen();
     firstSyncPromise = (async function () {
-      const result = await pullAndMerge();
+      const result = await withTimeout(pullAndMerge(), FIRST_PULL_TIMEOUT_MS, { ok: false });
       if (result && result.adopting) return !!result.ok;
       if (!result || !result.ok) {
         firstSyncState = FIRST_SYNC_FAILED;
@@ -1293,6 +1319,9 @@ const CloudSync = (function () {
         // of leaving the user silently signed out until a manual reload.
         try { console.warn('CloudSync: session restore failed, will retry on focus.', e); } catch (_) {}
         sessionRetryNeeded = true;
+        // The marker path above may have shown the restore screen; a failed
+        // session check must release it, not strand the user behind it.
+        hideRestoreScreen();
       });
       client.auth.onAuthStateChange((ev, s) => {
         const had = isLoggedIn();
