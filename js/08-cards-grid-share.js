@@ -1312,12 +1312,10 @@ const MoreSpace = {
 
 function renderGreeting() {
   const now = new Date();
-  const h = now.getHours();
-  const greet = h < 5 ? 'Up late,' : h < 12 ? 'Good morning,' : h < 17 ? 'Good afternoon,' : 'Good evening,';
+  // v1042 (Malik): no time-of-day greeting anywhere. This function now only
+  // renders the date lines (mobile whisper bar, desktop header) and the
+  // headline; the name and the "Good evening," half are gone.
   const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-  setText('greetingTime', greet);
-  const name = state.profile.name || 'Builder';
-  setText('greetingName', name);
   // Mobile slot: same greeting, rendered below the Memento card (the header
   // shows the brand lockup there instead; CSS swaps the two at <860px).
   // Search rides along: the dashboard page gets its own search button on
@@ -1415,22 +1413,12 @@ function renderGreeting() {
     else { streakWrap.style.display = 'none'; }
   }
 
-  // Live clock (time of day) in the top hub.
-  updateHubClock();
-  if (!renderGreeting._clockTimer) {
-    renderGreeting._clockTimer = setInterval(updateHubClock, 1000);
-  }
+  // v1042 (Malik): the live clock is gone, and so is its every-second timer.
+  // The device's own status bar already shows the time; a ticking readout was
+  // looping decoration burning a wakeup per second for nothing.
 
   // v25 prune (Malik): the greeting is not a hit target anymore; Settings is
   // reachable from the sidebar profile and the tab bar.
-}
-
-function updateHubClock() {
-  const el = document.getElementById('hubClockTime');
-  if (!el) return;
-  const s = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit' });
-  const parts = s.split(' ');
-  el.innerHTML = esc(parts[0]) + (parts[1] ? ' <span class="hub-clock__mer">' + esc(parts[1]) + '</span>' : '');
 }
 
 // Customizable mission headline. 'auto' keeps the original dynamic line (mission
