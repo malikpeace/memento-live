@@ -35,6 +35,7 @@ const CloudSync = (function () {
   let pushing = false;
   let pushQueued = false;   // a push failed or arrived mid-flight; retry on next change/focus
   let sessionRetryNeeded = false; // boot-time getSession failed (offline); retry on focus
+  let sessionChecked = false;     // boot-time getSession has resolved (either way)
   let adopting = false;     // a cloud copy is being adopted (reload imminent); freeze all sync
   const FIRST_SYNC_WAITING = 'waiting';
   const FIRST_SYNC_RESTORING = 'restoring';
@@ -1405,6 +1406,7 @@ const CloudSync = (function () {
     try {
       client.auth.getSession().then((r) => {
         session = (r && r.data && r.data.session) || null;
+        sessionChecked = true;
         dnote('boot session: ' + (session ? ('signed in as ' + email()) : 'none'));
         if (session) {
           hideSplashLink();
@@ -1421,6 +1423,7 @@ const CloudSync = (function () {
         // of leaving the user silently signed out until a manual reload.
         try { console.warn('CloudSync: session restore failed, will retry on focus.', e); } catch (_) {}
         sessionRetryNeeded = true;
+        sessionChecked = true;
         // The marker path above may have shown the restore screen; a failed
         // session check must release it, not strand the user behind it.
         hideRestoreScreen();
@@ -1511,8 +1514,19 @@ const CloudSync = (function () {
     }
   } catch (e) {}
 
+  // For the splash's restore gate: is a cloud restore possibly still on the
+  // way? True while the boot session check is unresolved, and while a
+  // signed-in first sync has not settled. A signed-out device reads false
+  // the moment the session check lands, so the gate never touches new users.
+  function firstSyncPending() {
+    if (!client) return false;
+    if (!sessionChecked) return true;
+    if (!isLoggedIn()) return false;
+    return firstSyncState === FIRST_SYNC_WAITING || firstSyncState === FIRST_SYNC_RESTORING;
+  }
+
   return {
-    init, available, isLoggedIn, email, accessToken,
+    init, available, isLoggedIn, email, accessToken, firstSyncPending,
     schedulePush, pushNow, syncNow,
     sendCode, verifyCode, signOut, mergeDecision, buildMergedState, createShare, lastSyncedText,
     communityDays, openDialog, closeDialog, openDeletionDialog

@@ -6145,6 +6145,31 @@ const Splash = {
 
   dismiss() {
     if (!this.el || this._dismissing || this.el.classList.contains('dismissed')) return;
+    // THE RESTORE GATE (Malik's iPad, 2026-08-01). A signed-in device whose
+    // cloud restore has not resolved yet must NOT proceed: on a cold PWA
+    // launch the local read can come up empty a beat before the restore
+    // lands, and tapping Get started in that window walked a full account
+    // into new-user onboarding. Hold here, show "Restoring", and continue
+    // the moment sync resolves (its own 12s timeout bounds the wait, plus a
+    // hard 15s cap here); by then the restored state routes returning users
+    // home. Signed-out devices are untouched: the gate reads as not pending.
+    try {
+      if (window.CloudSync && CloudSync.firstSyncPending && CloudSync.firstSyncPending()) {
+        const label = this.el.querySelector('.splash__cta-label');
+        if (label) label.textContent = 'Restoring your Memento...';
+        const startedAt = Date.now();
+        const poll = setInterval(() => {
+          const stillPending = (() => {
+            try { return CloudSync.firstSyncPending(); } catch (e) { return false; }
+          })();
+          if (stillPending && Date.now() - startedAt < 15000) return;
+          clearInterval(poll);
+          if (label) label.textContent = 'Get started';
+          this.dismiss();
+        }, 250);
+        return;
+      }
+    } catch (e) {}
     this._dismissing = true;
 
     // Returning = ANY trusted sign this account has lived, not only
