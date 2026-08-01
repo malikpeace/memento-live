@@ -1552,7 +1552,8 @@ body { margin:0; padding:0; overflow:hidden; }
     render();
     pinMark();
     at(ASK_AT,  function(){ if (!done && !holding) cer.classList.add('ask'); });
-    at(AUTO_AT, function(){ if (!done && !holding) { auto = true; cer.classList.remove('ask'); run(); } });
+    /* Malik 2026-08-01: no auto-play. The ignition is theirs alone; the app
+       waits with the "Press and hold" hint until they actually hold it. */
   }
 
   function autoPlay(){ reset(); clear(); auto = true; cer.classList.remove('ask'); run(); }

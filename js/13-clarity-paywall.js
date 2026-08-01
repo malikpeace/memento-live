@@ -245,6 +245,12 @@ const ClarityPaywall = {
   },
 
   _applyVerifiedUnlock(access) {
+    // Whether this is the MOMENT of buying (the paywall is on screen) or just
+    // an already-paid account arriving on a new device. Captured before
+    // hide() flips it. Only the buying moment gets the ceremony and the
+    // shove into Action; Malik signed in on his iPad (2026-08-01) and got
+    // re-thanked for paying, which is wrong: a sign-in is not a purchase.
+    const buyingMoment = !!this._open;
     try {
       const plan = access && access.plan ? access.plan : '';
       try { if (typeof Analytics !== 'undefined') Analytics.track('paywall_unlock', { plan }); } catch (e) {} // Funnel
@@ -271,6 +277,7 @@ const ClarityPaywall = {
     // a Clarity finisher into Action, a pre-Clarity buyer back home toward the
     // star); the old direct ActionExperience.open() is the fallback if the
     // ceremony module is ever missing.
+    if (!buyingMoment) return; // new-device sign-in: unlocked quietly, no re-celebration
     const alreadySeen = !!(state.meta && state.meta.unlockCeremonySeen);
     if (typeof UnlockCeremony !== 'undefined' && !alreadySeen) {
       setTimeout(() => {
