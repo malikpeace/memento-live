@@ -58,6 +58,19 @@ const CloudSync = (function () {
   let restoreEl = null;
   let restoreFailsafe = null;
 
+  // On-device sync journal for the ?dev=sync panel (see devSyncPanel below).
+  // Timestamped one-line notes about what the engine saw and decided, kept in
+  // memory only. This exists because the iPad restore bug (2026-08-01) was
+  // undebuggable from outside: the decisions happened silently on the device.
+  const _diag = [];
+  function dnote(msg) {
+    try {
+      _diag.push(new Date().toISOString().slice(11, 19) + ' ' + msg);
+      if (_diag.length > 60) _diag.shift();
+      if (typeof window !== 'undefined' && window._syncPanelRepaint) window._syncPanelRepaint();
+    } catch (e) {}
+  }
+
   function showRestoreScreen() {
     try {
       if (!restoreEl) {
@@ -340,6 +353,7 @@ const CloudSync = (function () {
   function adoptMerged(merged, why) {
     if (adopting) return true;
     if (adoptWouldLoop()) {
+      dnote('merge-adopt BLOCKED: reload-loop guard tripped');
       try { console.warn('CloudSync: merge reload loop detected. Sync is paused so neither copy can be overwritten.'); } catch (e) {}
       return false;
     }
@@ -418,6 +432,7 @@ const CloudSync = (function () {
   function adoptCloud(row, why) {
     if (adopting) return true;
     if (adoptWouldLoop()) {
+      dnote('adopt BLOCKED: reload-loop guard tripped');
       try { console.warn('CloudSync: adopt reload loop detected. Sync is paused so neither copy can be overwritten.'); } catch (e) {}
       return false;
     }
@@ -446,11 +461,14 @@ const CloudSync = (function () {
   // Login/boot pull: fetch the row and decide. It never pushes by itself;
   // beginFirstSync marks the pull complete before allowing any write.
   async function pullAndMerge() {
-    if (!client || !isLoggedIn() || demo() || adopting) return { ok: false };
+    if (!client || !isLoggedIn() || demo() || adopting) { dnote('pull skipped (client=' + !!client + ' login=' + isLoggedIn() + ' demo=' + demo() + ' adopting=' + adopting + ')'); return { ok: false }; }
     try {
+      dnote('pull: fetching cloud row');
       const f = await fetchRow();
-      if (!f.ok) return { ok: false };
+      if (!f.ok) { dnote('pull FAILED: could not read the cloud row'); return { ok: false }; }
+      dnote('pull: row ' + (f.row ? ('found, rev ' + (f.row.revision || 0) + ', updated ' + String(f.row.updated_at || '').slice(0, 19) + ', real=' + isRealState(f.row.state)) : 'ABSENT (no cloud copy)'));
       const d = mergeDecision(state, f.row);
+      dnote('decision: ' + d.action + ' (' + (d.reason || '') + ')');
       if (d.action === 'adoptCloud') {
         const didAdopt = adoptCloud(f.row, d.reason);
         return { ok: didAdopt, adopting: didAdopt };
@@ -489,15 +507,18 @@ const CloudSync = (function () {
     firstSyncState = FIRST_SYNC_RESTORING;
     showRestoreScreen();
     firstSyncPromise = (async function () {
-      const result = await withTimeout(pullAndMerge(), FIRST_PULL_TIMEOUT_MS, { ok: false });
-      if (result && result.adopting) return !!result.ok;
+      const result = await withTimeout(pullAndMerge(), FIRST_PULL_TIMEOUT_MS, { ok: false, timedOut: true });
+      if (result && result.timedOut) dnote('first sync TIMED OUT after ' + (FIRST_PULL_TIMEOUT_MS / 1000) + 's');
+      if (result && result.adopting) { dnote('first sync: adopting + reloading'); return !!result.ok; }
       if (!result || !result.ok) {
+        dnote('first sync: FAILED, app stays on local data, focus retries');
         firstSyncState = FIRST_SYNC_FAILED;
         pushQueued = true;
         hideRestoreScreen();
         refreshAccountCard();
         return false;
       }
+      dnote('first sync: READY');
       firstSyncState = FIRST_SYNC_READY;
       clearAdoptGuard();
       clearRestoreReload();
@@ -1304,6 +1325,7 @@ const CloudSync = (function () {
     try {
       client.auth.getSession().then((r) => {
         session = (r && r.data && r.data.session) || null;
+        dnote('boot session: ' + (session ? ('signed in as ' + email()) : 'none'));
         if (session) {
           hideSplashLink();
           beginFirstSync();
@@ -1356,6 +1378,42 @@ const CloudSync = (function () {
       document.addEventListener('visibilitychange', () => { if (!document.hidden) onFocus(); });
     } catch (e) {}
   }
+
+  /* ---------- ?dev=sync: the on-device sync journal ----------
+     URL-gated like every dev tool: inert on a plain URL. Shows what THIS
+     device's sync engine sees and decides, live, so a "why is this device
+     not restoring" report can be diagnosed from a screenshot instead of
+     guesswork. Shows flags and counts, never content. */
+  function devSyncPanel() {
+    const el = document.createElement('div');
+    el.id = 'devSyncPanel';
+    el.setAttribute('data-cloud-keep', '');
+    el.style.cssText = 'position:fixed;left:8px;right:8px;bottom:8px;max-height:46vh;overflow:auto;z-index:2147483100;background:rgba(8,10,14,.94);color:#cfe3ff;font:11px/1.5 ui-monospace,Menlo,monospace;padding:10px 12px;border-radius:10px;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);white-space:pre-wrap;';
+    document.body.appendChild(el);
+    const flag = (v) => v ? 'YES' : 'no';
+    function repaint() {
+      try {
+        const s = (typeof state !== 'undefined' && state) || {};
+        const head = [
+          'MEMENTO ' + (typeof MEMENTO_VERSION !== 'undefined' ? MEMENTO_VERSION : '?') + '  ·  sync: ' + firstSyncState,
+          'account: ' + (isLoggedIn() ? email() : 'NOT SIGNED IN') + (lastSyncMs ? ('  ·  last ok ' + Math.round((Date.now() - lastSyncMs) / 1000) + 's ago') : ''),
+          'local: real=' + flag(isRealState(s)) + '  welcomeSeen=' + flag(s.meta && s.meta.welcomeSeen) + '  onboarded=' + flag(s.profile && s.profile.onboarded) + '  clarity=' + flag(s.clarity && s.clarity.completed) + '  proof=' + ((s.proofEvents || []).length),
+          '────────────────────────────'
+        ];
+        el.textContent = head.concat(_diag.slice(-30)).join('\n');
+        el.scrollTop = el.scrollHeight;
+      } catch (e) {}
+    }
+    window._syncPanelRepaint = repaint;
+    repaint();
+    setInterval(repaint, 2000);
+  }
+  try {
+    if (/[?&]dev=sync(?:&|$)/.test(location.search || '')) {
+      if (document.body) devSyncPanel();
+      else document.addEventListener('DOMContentLoaded', devSyncPanel);
+    }
+  } catch (e) {}
 
   return {
     init, available, isLoggedIn, email, accessToken,
