@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <script>
 /* Single source of truth for the app version. Surfaced in Settings > About. */
-window.MEMENTO_VERSION = 'v1042';
+window.MEMENTO_VERSION = 'v1043';
 /* LOWFX: touch / mobile devices get a lighter render path (no backdrop blur,
    no will-change layers, no background canvas animations) so iOS does not kill
    the tab from graphics-memory pressure. Desktop (fine pointer) is untouched.
@@ -55,14 +55,14 @@ window.MEMENTO_VERSION = 'v1042';
 <link rel="stylesheet" href="fonts/fonts.css">
 <link rel="stylesheet" href="css/base.css?v=v1021">
 <link rel="stylesheet" href="css/sidebar.css?v=v1020">
-<link rel="stylesheet" href="css/dashboard.css?v=v1020">
+<link rel="stylesheet" href="css/dashboard.css?v=v1043">
 <link rel="stylesheet" href="css/misc.css?v=v1020">
 <link rel="stylesheet" href="css/vivere.css?v=v1020">
 <link rel="stylesheet" href="css/notes.css?v=v1020">
 <link rel="stylesheet" href="css/onboarding.css?v=v1020">
-<link rel="stylesheet" href="css/clarity.css?v=v1042">
+<link rel="stylesheet" href="css/clarity.css?v=v1043">
 <link rel="stylesheet" href="css/action.css?v=v1020">
-<link rel="stylesheet" href="css/unlock-ceremony.css?v=v1042">
+<link rel="stylesheet" href="css/unlock-ceremony.css?v=v1043">
 <link rel="stylesheet" href="css/daycard-living.css?v=v1020">
 <link rel="stylesheet" href="css/clarity-paywall.css?v=v1020">
 <link rel="stylesheet" href="css/appearance-picker.css?v=v1020">
@@ -430,7 +430,7 @@ window.MEMENTO_VERSION = 'v1042';
     <!-- Plain container (not a button): Settings is reachable from the sidebar
          profile and the tab bar, so the greeting itself is not a hit target. -->
     <div class="dash-header__greeting dash-header__hub" id="dashAvatar">
-      <!-- v1042 (Malik): the "Good evening, Name." line is gone. It carried no
+      <!-- v1043 (Malik): the "Good evening, Name." line is gone. It carried no
            information and orphaned itself at the top edge, away from the
            content. -->
       <div class="hub-headline" id="hubHeadline" role="button" tabindex="0" aria-haspopup="true" aria-expanded="false" aria-label="Change your dashboard headline"><span class="hub-headline__text" id="hubHeadlineText">What&rsquo;s today&rsquo;s Action?</span><svg class="hub-headline__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></div>
@@ -450,13 +450,10 @@ window.MEMENTO_VERSION = 'v1042';
         </span>
         <span class="spotify-pill__bars" id="spotifyBars" aria-hidden="true"><i></i><i></i><i></i></span>
       </button>
-      <!-- v1042 (Malik): the live time is gone. Every device already shows a
-           clock in its own status bar, and a ticking seconds readout is
-           looping decoration. The date stays: it carries weeks-left on a paid
-           account (the desktop twin of the mobile whisper bar). -->
-      <div class="hub-clock">
-        <span class="hub-clock__date" id="headerDate"></span>
-      </div>
+      <!-- v1043 (Malik): the whole clock block is gone, date included. Every
+           device shows its own date and time in its status bar; the greeting
+           moved down to sit with today's box instead. -->
+
     </div>
   </header>
   <!-- Mobile date, pulled up onto the brand row (page 1 of the scroll-snap home)
@@ -529,7 +526,13 @@ window.MEMENTO_VERSION = 'v1042';
   <!-- v909 Desktop Editorial home (Malik's pick, prototypes/home-desktop-lab-v4):
        the mission as a 42px headline beside the card. Desktop-only twin of the
        command center (display:none <1024); same data-cc-action wiring. -->
-  <div id="deskMission"></div>
+  <!-- v1043 (Malik): the greeting lives here now, right above today's box and
+       flush with its left edge, instead of orphaned at the top of the screen.
+       The wrapper carries the grid slot so the two read as one block. -->
+  <div id="deskMissionWrap">
+    <div id="deskGreeting"></div>
+    <div id="deskMission"></div>
+  </div>
   <!-- Page 2 on mobile: the modules dashboard. One snap section that the card
        screen page-flips to with native scroll physics. display:contents on
        desktop = zero layout effect there (the bento places each child). -->
@@ -813,8 +816,8 @@ window.MEMENTO_VERSION = 'v1042';
 <script src="js/05-vivere.js?v=v1020"></script>
 <script src="js/06-consistency-mori.js?v=v1020"></script>
 <script src="js/07-sheet-templates.js?v=v1020"></script>
-<script src="js/08-cards-grid-share.js?v=v1042"></script>
-<script src="js/09-controllers.js?v=v1042"></script>
+<script src="js/08-cards-grid-share.js?v=v1043"></script>
+<script src="js/09-controllers.js?v=v1043"></script>
 <script src="js/00-backup-security.js?v=v1020"></script>
 <script src="js/10-demo-backend.js?v=v1020"></script>
 <!-- The Path + Your Story: the journey views. Client-side, read existing state. -->
@@ -823,9 +826,9 @@ window.MEMENTO_VERSION = 'v1042';
 <script src="js/18-install.js?v=v1020"></script>
 <script src="js/20-push.js?v=v1020"></script>
 <script src="js/11-init.js?v=v1020"></script>
-<script src="js/12-cloud-sync.js?v=v1042"></script>
-<script src="js/13-clarity-paywall.js?v=v1042"></script>
-<script src="js/22-billing.js?v=v1042"></script>
+<script src="js/12-cloud-sync.js?v=v1043"></script>
+<script src="js/13-clarity-paywall.js?v=v1043"></script>
+<script src="js/22-billing.js?v=v1043"></script>
 <script src="js/14-appearance-picker.js?v=v1020"></script>
 <!-- DEV-ONLY: ?dev=beats live preview for the onboarding chapter pages. Inert without the param. -->
 <script src="js/19-dev-beats.js?v=v1020"></script>
@@ -834,7 +837,7 @@ window.MEMENTO_VERSION = 'v1042';
 <script src="js/21-descent.js?v=v1020"></script>
 <script src="js/22-prompt-lab.js?v=v1020"></script>
 <script src="js/23-action-states.js?v=v1020"></script>
-<script src="js/24-unlock-ceremony.js?v=v1042"></script>
+<script src="js/24-unlock-ceremony.js?v=v1043"></script>
 <!-- Back/forward + hash-URL routing. Loads LAST so every open/close fn it wraps
      already exists. Inert until onboarding is done; touches only location.hash. -->
 <script src="js/15-router.js?v=v1020"></script>

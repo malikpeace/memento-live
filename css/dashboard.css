@@ -4092,6 +4092,7 @@ body.card-square { --card-w: 360px; --card-h: 360px; }
    line and the heatmap's streak header are all OFF this layout.
    Desktop only (>=1024); the skeleton is stable from first visit onward. */
 #deskMission { display: none; }
+#deskMissionWrap { display: none; }
 .dash-cgram__range { display: none; }
 @media (min-width: 1024px) {
   body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 {
@@ -4147,7 +4148,10 @@ body.card-square { --card-w: 360px; --card-h: 360px; }
     --card-w: 206px; --card-h: 277px;
   }
   body.card-square:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #dayCard { --card-w: 240px; --card-h: 240px; }
-  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #deskMission { display: block; grid-area: dmission; }
+  /* v1043: the wrapper owns the grid slot; the panel is just its second
+     child, so the greeting above it shares the panel's left edge exactly. */
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #deskMissionWrap { display: block; grid-area: dmission; }
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #deskMission { display: block; }
   body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #dashConsistency {
     grid-area: dheat; display: block; align-self: start; margin: 48px 0 0; padding: 0;
     background: none; box-shadow: none; border: none;
@@ -4203,6 +4207,18 @@ html.theme-light #deskMission {
     inset 0 1px 0 rgba(255, 255, 255, 0.9),
     0 18px 46px rgba(64, 92, 134, 0.14);
 }
+
+/* v1043: the greeting, sitting above today's box and flush with its left
+   edge. Quiet by design, it is a hello and not a heading, so it stays below
+   the panel headline in weight and never competes with it. */
+#deskGreeting {
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--text-mid, var(--text-2));
+  margin: 0 0 14px 2px;
+}
+#deskGreeting:empty { display: none; }
 
 /* the mission-as-headline (dkm) pieces, tokens only, no borders */
 .dkm__label { font-size: 13px; font-weight: 600; color: var(--text-mid, var(--text-2)); margin-bottom: 14px; }

@@ -1363,9 +1363,8 @@ function renderGreeting() {
       });
     }
   }
-  // Desktop header adds Mori only after paid access.
-  const _hdDate = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-  setText('headerDate', weeksLeft != null ? (_hdDate + '  ·  ~' + weeksLeft.toLocaleString() + ' weeks left') : _hdDate);
+  // v1043: the desktop header date is gone with the clock block, so nothing
+  // is written there. Weeks-left still lives on the mobile whisper bar above.
 
   // Hub headline: a calm welcoming prompt, matching the render. Shifts to a
   // quiet acknowledgement once today's action is already done.
@@ -3920,6 +3919,20 @@ function renderDeskMission() {
     const el = document.getElementById('deskMission');
     if (!el) return;
     const hasClarity = !!(state.clarity && state.clarity.completed && state.clarity.answers && state.clarity.answers.neutronStar);
+    // v1043 (Malik): the greeting above today's box. Someone who has not found
+    // their star yet is still arriving, so they get "Welcome"; everyone after
+    // that gets the time of day. Rendered here rather than in renderGreeting
+    // so it can never disagree with the panel underneath it.
+    try {
+      const g = document.getElementById('deskGreeting');
+      if (g) {
+        const name = (state.profile && state.profile.name || '').trim();
+        const h = new Date().getHours();
+        const when = h < 5 ? 'Up late' : h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+        const word = hasClarity ? when : 'Welcome';
+        g.textContent = name ? (word + ', ' + name + '.') : (word + '.');
+      }
+    } catch (e) {}
     const pa = (state.action && state.action.primaryAction) || {};
     const tiers = pa.tiers || {};
     const hasPlan = !!(state.action && state.action.planGenerated && pa.title);
