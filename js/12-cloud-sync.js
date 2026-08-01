@@ -116,15 +116,39 @@ const CloudSync = (function () {
   function markRestoreReload() { try { sessionStorage.setItem(RESTORE_MARKER_KEY, '1'); } catch (e) {} }
   function clearRestoreReload() { try { sessionStorage.removeItem(RESTORE_MARKER_KEY); } catch (e) {} }
   function restoreReloadPending() { try { return sessionStorage.getItem(RESTORE_MARKER_KEY) === '1'; } catch (e) { return false; } }
-  function adoptWouldLoop() {
+  // Read the adopt-reload counter for the current 12s window (an expired
+  // window reads as zero). PURE: reading never counts. The old version
+  // incremented inside the check, so every ATTEMPT counted even when no
+  // reload followed, and the boot's two entry points (getSession and the
+  // auth event) burned the budget on their own.
+  function adoptGuardRead() {
     try {
       const now = Date.now();
       let r = null;
       try { r = JSON.parse(sessionStorage.getItem(ADOPT_GUARD_KEY) || 'null'); } catch (e) { r = null; }
-      if (!r || typeof r.first !== 'number' || (now - r.first) > 12000) r = { first: now, n: 0 };
+      if (!r || typeof r.first !== 'number' || (now - r.first) > 12000) return { first: now, n: 0 };
+      return r;
+    } catch (e) { return { first: Date.now(), n: 0 }; }
+  }
+  // Counted ONLY where a reload actually happens.
+  function noteAdoptReload() {
+    try {
+      const r = adoptGuardRead();
       r.n += 1;
-      try { sessionStorage.setItem(ADOPT_GUARD_KEY, JSON.stringify(r)); } catch (e) {}
-      return r.n > 2; // 3rd adopt-reload inside 12s = a loop; stop reloading
+      sessionStorage.setItem(ADOPT_GUARD_KEY, JSON.stringify(r));
+    } catch (e) {}
+  }
+  // fresh = this device holds nothing real. Such a device can NEVER be in a
+  // destructive loop: adopting onto an empty app loses nothing, and once
+  // adopted the device is no longer fresh, so the same decision cannot
+  // repeat. Blocking there is strictly worse than the loop it prevents, it
+  // strands a signed-in device with an empty app while its real data sits in
+  // the cloud (Malik's iPad, 2026-08-01: "row found, real=true, decision
+  // adoptCloud, adopt BLOCKED").
+  function adoptWouldLoop(fresh) {
+    try {
+      if (fresh) return false;
+      return adoptGuardRead().n >= 2; // this would be the 3rd reload in 12s
     } catch (e) { return false; }
   }
   function clearAdoptGuard() { try { sessionStorage.removeItem(ADOPT_GUARD_KEY); } catch (e) {} }
@@ -352,7 +376,7 @@ const CloudSync = (function () {
   // and pushes the merged copy up, completing the cycle.
   function adoptMerged(merged, why) {
     if (adopting) return true;
-    if (adoptWouldLoop()) {
+    if (adoptWouldLoop(!isRealState(state))) {
       dnote('merge-adopt BLOCKED: reload-loop guard tripped');
       try { console.warn('CloudSync: merge reload loop detected. Sync is paused so neither copy can be overwritten.'); } catch (e) {}
       return false;
@@ -364,6 +388,7 @@ const CloudSync = (function () {
       } catch (e) {}
       console.info('CloudSync: merged with the cloud copy per module (' + (why || '') + '). The previous local copy was backed up to localStorage "' + BACKUP_KEY + '".');
       localStorage.setItem(APP_KEY, JSON.stringify(merged));
+      noteAdoptReload();
       markRestoreReload();
       showRestoreScreen();
       location.reload();
@@ -431,7 +456,7 @@ const CloudSync = (function () {
   // module re-reads state on boot). Never logs state contents.
   function adoptCloud(row, why) {
     if (adopting) return true;
-    if (adoptWouldLoop()) {
+    if (adoptWouldLoop(!isRealState(state))) {
       dnote('adopt BLOCKED: reload-loop guard tripped');
       try { console.warn('CloudSync: adopt reload loop detected. Sync is paused so neither copy can be overwritten.'); } catch (e) {}
       return false;
@@ -443,6 +468,8 @@ const CloudSync = (function () {
       } catch (e) {}
       console.info('CloudSync: adopting the cloud copy (' + (why || 'newer') + '). The previous local copy was backed up to localStorage "' + BACKUP_KEY + '".');
       localStorage.setItem(APP_KEY, JSON.stringify(row.state));
+      dnote('adopting the cloud copy, reloading now');
+      noteAdoptReload();
       markRestoreReload();
       showRestoreScreen();
       location.reload();
@@ -1351,6 +1378,10 @@ const CloudSync = (function () {
         if (session) {
           hideSplashLink();
           closeDialog();
+          // A person signing in is a deliberate act, never a reload loop.
+          // Clearing here means an earlier tripped guard can never haunt the
+          // one moment that matters most: the first restore on a new device.
+          if (ev === 'SIGNED_IN') { clearAdoptGuard(); dnote('signed in: adopt guard cleared'); }
           beginFirstSync();
           // v1024: tell billing the session is REAL and current, so the paid
           // receipt restores the moment auth lands (not on the next lucky
