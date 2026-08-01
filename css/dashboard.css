@@ -4237,6 +4237,13 @@ html.theme-light #deskMission {
   font-size: 42px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.08;
   color: var(--text-hi); margin-bottom: 28px; text-wrap: balance; max-width: 18ch;
 }
+/* v1046: the explainer under a headline (mobile's twin). When it is present it
+   owns the gap to the button, so the headline's own bottom margin collapses. */
+.dkm__headline:has(+ .dkm__sub) { margin-bottom: 14px; }
+.dkm__sub {
+  font-size: 16px; line-height: 1.55; font-weight: 400;
+  color: var(--text-2); max-width: 46ch; margin: 0 0 26px;
+}
 .dkm__row { display: flex; align-items: center; gap: 26px; flex-wrap: wrap; }
 .dkm__btn {
   display: flex; align-items: center; justify-content: center; gap: 8px;

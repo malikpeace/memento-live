@@ -3939,9 +3939,14 @@ function renderDeskMission() {
     const label = (t) => '<div class="dkm__label">' + t + '</div>';
     const head = (t) => '<div class="dkm__headline">' + esc(t) + '</div>';
     const solid = (t, action) => '<button class="dkm__btn dkm__btn--solid" data-cc-action="' + action + '">' + esc(t) + '</button>';
+    const sub = (t) => '<div class="dkm__sub">' + esc(t) + '</div>';
 
     if (!hasClarity) {
+      // v1046 (Malik): the explainer that mobile has always shown here was
+      // missing on desktop, so the very first screen said less on the bigger
+      // display. Same sentence, same state, both places.
       el.innerHTML = label('First step') + head('Find your Neutron Star.') +
+        sub('Get clear on the one goal that actually matters to you above all else. This will be the foundation of your Memento.') +
         '<div class="dkm__row">' + solid('Start', 'clarity') + '</div>';
     } else if (!hasPlan) {
       el.innerHTML = label('Next step') + head('Turn your Neutron Star into a tangible daily action.') +
