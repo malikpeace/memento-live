@@ -431,6 +431,10 @@ const CloudSync = (function () {
         localStorage.setItem(BACKUP_KEY, JSON.stringify({ savedAt: new Date().toISOString(), reason: why || 'merged with cloud', state: state }));
       } catch (e) {}
       console.info('CloudSync: merged with the cloud copy per module (' + (why || '') + '). The previous local copy was backed up to localStorage "' + BACKUP_KEY + '".');
+      // Same save-over-restore guard as adoptCloud: the reload's pagehide
+      // flush must not re-persist the pre-merge in-memory state over the
+      // merged copy we just wrote.
+      try { IS_RESETTING = true; } catch (e) {}
       localStorage.setItem(APP_KEY, JSON.stringify(merged));
       dnote('adopting the merged copy, reloading now (chain ' + (urlSyncCount() + 1) + ')');
       noteAdoptReload();
@@ -439,7 +443,11 @@ const CloudSync = (function () {
       const next = adoptReloadUrl();
       if (next) location.replace(next); else location.reload();
       return true;
-    } catch (e) { adopting = false; return false; }
+    } catch (e) {
+      adopting = false;
+      try { IS_RESETTING = false; } catch (e2) {}
+      return false;
+    }
   }
 
   /* ---------- sync engine ---------- */
@@ -513,6 +521,14 @@ const CloudSync = (function () {
         localStorage.setItem(BACKUP_KEY, JSON.stringify({ savedAt: new Date().toISOString(), reason: why || 'cloud adopted', state: state }));
       } catch (e) {}
       console.info('CloudSync: adopting the cloud copy (' + (why || 'newer') + '). The previous local copy was backed up to localStorage "' + BACKUP_KEY + '".');
+      // THE SAVE-OVER-RESTORE RACE (Malik's iPad, 2026-08-01; Codex found it).
+      // The reload below fires the pagehide "save before closing" flush, and
+      // without this gate that flush re-persisted the OLD in-memory state
+      // right over the freshly adopted copy: the device woke up blank again,
+      // forever. Same hazard the hard reset already guards with this exact
+      // flag; the adopt paths get the same guard. The reload re-initializes
+      // everything, so it never needs unsetting on success.
+      try { IS_RESETTING = true; } catch (e) {}
       localStorage.setItem(APP_KEY, JSON.stringify(row.state));
       dnote('adopting the cloud copy, reloading now (chain ' + (urlSyncCount() + 1) + ')');
       noteAdoptReload();
@@ -521,7 +537,12 @@ const CloudSync = (function () {
       const next = adoptReloadUrl();
       if (next) location.replace(next); else location.reload();
       return true;
-    } catch (e) { adopting = false; return false; }
+    } catch (e) {
+      adopting = false;
+      // The adopt never reached its reload; persistence must come back.
+      try { IS_RESETTING = false; } catch (e2) {}
+      return false;
+    }
   }
 
   async function fetchRow(columns) {
