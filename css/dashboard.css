@@ -4145,9 +4145,19 @@ body.card-square { --card-w: 360px; --card-h: 360px; }
   body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 .dash-header { grid-area: dhead; align-self: start; }
   body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #dayCard {
     grid-area: dcard; display: flex; justify-content: center; margin: 0;
-    --card-w: 206px; --card-h: 277px;
+    /* v1045 (Malik): the Memento is the foundation of this page and read far
+       too small at a fixed 206x277 inside a ~475px column. It is height-driven
+       now so it grows with the window instead of sitting at one anchor
+       (the desktop law: fixed-px anchors need a vh variant), with the width
+       derived from the card's own 0.744 proportion so the shape never drifts.
+       Floors keep short laptops safe, ceilings keep it from going silly. */
+    --card-h: clamp(300px, 44vh, 400px);
+    --card-w: calc(var(--card-h) * 0.744);
   }
-  body.card-square:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #dayCard { --card-w: 240px; --card-h: 240px; }
+  body.card-square:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #dayCard {
+    --card-h: clamp(280px, 40vh, 360px);
+    --card-w: var(--card-h);
+  }
   /* v1043: the wrapper owns the grid slot; the panel is just its second
      child, so the greeting above it shares the panel's left edge exactly. */
   body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #deskMissionWrap { display: block; grid-area: dmission; }
@@ -4267,8 +4277,14 @@ html.theme-light #deskMission {
   body.sidebar-active:not(.sidebar-collapsed):not(.has-custom-layout) .app.dash-v2 {
     margin-left: max(var(--sidebar-w), calc((100vw - 1400px) / 2));
   }
-  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #dayCard { --card-w: 232px; --card-h: 312px; }
-  body.card-square:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #dayCard { --card-w: 268px; --card-h: 268px; }
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #dayCard {
+    --card-h: clamp(340px, 48vh, 440px);
+    --card-w: calc(var(--card-h) * 0.744);
+  }
+  body.card-square:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #dayCard {
+    --card-h: clamp(320px, 44vh, 400px);
+    --card-w: var(--card-h);
+  }
   .dkm__headline { font-size: 47px; }
 }
 /* editorial breathes, never stretches silly: below 1150 the gap tightens */
