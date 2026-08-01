@@ -677,6 +677,12 @@ const CloudSync = (function () {
     try {
       const r = await client.auth.verifyOtp({ email: addr, token: token, type: 'email' });
       if (r && r.error) return { ok: false, error: r.error.message || 'That code did not work. Double-check it.' };
+      // A person typing their code is the one truly deliberate sign-in act,
+      // so THIS is where an earlier tripped reload-loop guard is forgiven.
+      // (Not in onAuthStateChange: every reload's first auth event looks
+      // like an arrival, and a loop must never wipe its own brake.)
+      clearAdoptGuard();
+      dnote('code verified: adopt guard cleared');
       return { ok: true };
     } catch (e) { return { ok: false, error: 'That code did not work. Try again.' }; }
   }
@@ -1401,10 +1407,11 @@ const CloudSync = (function () {
           if (!genuineArrival) return;
           hideSplashLink();
           closeDialog();
-          // A person signing in is a deliberate act, never a reload loop.
-          // Clearing here means an earlier tripped guard can never haunt the
-          // one moment that matters most: the first restore on a new device.
-          clearAdoptGuard(); dnote('auth arrival: adopt guard cleared');
+          // NOTE deliberately no clearAdoptGuard here. Every page load's
+          // first auth event looks like an arrival, so clearing here let a
+          // reload loop wipe its own brake each cycle (Safari, 2026-08-01,
+          // rev 130). The guard clears only on a truly deliberate act: the
+          // person typing their sign-in code (verifyCode below).
           beginFirstSync();
           // v1024: tell billing the session is REAL and current, so the paid
           // receipt restores the moment auth lands (not on the next lucky
