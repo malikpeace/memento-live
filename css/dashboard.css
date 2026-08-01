@@ -4212,11 +4212,12 @@ html.theme-light #deskMission {
    edge. Quiet by design, it is a hello and not a heading, so it stays below
    the panel headline in weight and never competes with it. */
 #deskGreeting {
-  font-size: 15px;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  color: var(--text-mid, var(--text-2));
-  margin: 0 0 14px 2px;
+  font-size: 28px;
+  font-weight: 650;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  color: var(--text-hi);
+  margin: 0 0 18px 2px;
 }
 #deskGreeting:empty { display: none; }
 
