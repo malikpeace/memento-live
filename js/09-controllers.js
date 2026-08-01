@@ -6147,7 +6147,15 @@ const Splash = {
     if (!this.el || this._dismissing || this.el.classList.contains('dismissed')) return;
     this._dismissing = true;
 
-    const isReturning = state.meta.welcomeSeen;
+    // Returning = ANY trusted sign this account has lived, not only
+    // meta.welcomeSeen. A cloud copy restored onto a fresh device (iPad,
+    // 2026-08-01) carried profile.onboarded + completed Clarity but not
+    // welcomeSeen (the phone never needed it: its saved lastView skipped this
+    // check via hasRestorable below), and the one-flag gate dumped a fully
+    // restored account into new-user onboarding.
+    const isReturning = !!(state.meta.welcomeSeen
+      || (state.profile && state.profile.onboarded)
+      || (state.clarity && state.clarity.completed));
 
     // If the user has a Neutron Star summary or Action view persisted, skip
     // the new-user welcome flow and go straight to the returning-user path so
