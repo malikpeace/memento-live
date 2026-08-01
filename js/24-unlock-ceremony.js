@@ -37,9 +37,28 @@
     overlay.appendChild(iframe);
     document.body.appendChild(overlay);
 
+    // If the ceremony page never reports in, it did not render: tear the
+    // overlay down and route onward rather than leaving a black wall over a
+    // working app (the iPad incident, 2026-08-01). The seen flag stays unset
+    // so a healthy launch can still play it.
+    var ready = false;
+    var failsafe = setTimeout(function () {
+      if (ready) return;
+      try { console.warn('UnlockCeremony: page never reported ready; skipping the ceremony.'); } catch (e) {}
+      window.removeEventListener('message', onMsg);
+      overlay.remove();
+      openNow = false;
+      try {
+        if (opts.clarityDone && typeof ActionExperience !== 'undefined') ActionExperience.open();
+        else if (typeof renderAll === 'function') renderAll();
+      } catch (e) {}
+    }, 7000);
+
     function onMsg(ev) {
-      if (!ev || !ev.data || ev.data.memento !== 'unlock-cta') return;
-      if (ev.source !== iframe.contentWindow) return;
+      if (!ev || !ev.data || ev.source !== iframe.contentWindow) return;
+      if (ev.data.memento === 'unlock-ready') { ready = true; clearTimeout(failsafe); return; }
+      if (ev.data.memento !== 'unlock-cta') return;
+      clearTimeout(failsafe);
       window.removeEventListener('message', onMsg);
       try {
         if (!opts.dev) {

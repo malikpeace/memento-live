@@ -70,6 +70,19 @@ const CloudSync = (function () {
       if (typeof window !== 'undefined' && window._syncPanelRepaint) window._syncPanelRepaint();
     } catch (e) {}
   }
+  // Crashes land in the journal too: a boot that dies mid-render looks like
+  // "nothing happened" from outside, and the ?dev=sync panel is exactly where
+  // someone will be looking when it does.
+  try {
+    window.addEventListener('error', function (ev) {
+      const src = String((ev && ev.filename) || '').split('/').pop();
+      dnote('JS ERROR: ' + String((ev && ev.message) || 'unknown').slice(0, 120) + (src ? (' @ ' + src + ':' + (ev.lineno || '?')) : ''));
+    });
+    window.addEventListener('unhandledrejection', function (ev) {
+      const r = ev && ev.reason;
+      dnote('PROMISE ERROR: ' + String((r && (r.message || r)) || 'unknown').slice(0, 120));
+    });
+  } catch (e) {}
 
   function showRestoreScreen() {
     try {

@@ -1644,6 +1644,10 @@ body { margin:0; padding:0; overflow:hidden; }
      verifies. It passes who the buyer is via the query string, and the CTA
      reports back so the app can route and remember the ceremony played. */
   (function(){
+    /* Handshake: tell the host app this page is alive. If this never
+       arrives, the app tears the ceremony down instead of leaving a black
+       wall (the iPad incident, 2026-08-01). */
+    try { if (window.parent !== window) window.parent.postMessage({ memento: 'unlock-ready' }, '*'); } catch (e) {}
     var q = new URLSearchParams(location.search);
     if (q.get('mode') === 'pre') {
       setStart('pre');
