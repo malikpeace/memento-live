@@ -13,10 +13,15 @@
   'use strict';
 
   var openNow = false;
+  var playedThisLoad = false;
 
   function show(opts) {
     opts = opts || {};
     if (openNow) return;
+    // Belt-and-braces: whatever a caller does, the ceremony runs at most once
+    // per app launch (the iPad flash loop, 2026-08-01). Dev replays exempt.
+    if (playedThisLoad && !opts.dev) return;
+    playedThisLoad = true;
     openNow = true;
 
     var name = '';

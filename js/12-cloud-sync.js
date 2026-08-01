@@ -1385,22 +1385,33 @@ const CloudSync = (function () {
         // session check must release it, not strand the user behind it.
         hideRestoreScreen();
       });
+      let lastAuthUser = '';
       client.auth.onAuthStateChange((ev, s) => {
         const had = isLoggedIn();
-        session = s || null;
+        session = s || null; // ALWAYS take the newest session (fresh tokens)
         if (session) {
+          // Supabase re-emits SIGNED_IN endlessly (tab focus, token refresh);
+          // Malik's iPad journal showed it twice per second, and every repeat
+          // re-ran the arrival machinery, including billing's "you just became
+          // paid" celebration. Only a genuine arrival (nobody before, or a
+          // different person) runs the machinery; repeats just keep the token.
+          const uid = (session.user && session.user.id) || '';
+          const genuineArrival = !had || uid !== lastAuthUser;
+          lastAuthUser = uid;
+          if (!genuineArrival) return;
           hideSplashLink();
           closeDialog();
           // A person signing in is a deliberate act, never a reload loop.
           // Clearing here means an earlier tripped guard can never haunt the
           // one moment that matters most: the first restore on a new device.
-          if (ev === 'SIGNED_IN') { clearAdoptGuard(); dnote('signed in: adopt guard cleared'); }
+          clearAdoptGuard(); dnote('auth arrival: adopt guard cleared');
           beginFirstSync();
           // v1024: tell billing the session is REAL and current, so the paid
           // receipt restores the moment auth lands (not on the next lucky
           // focus) and an on-screen "Unlock" row repaints away.
           try { if (window.PolarBilling && PolarBilling.noteAuthArrived) PolarBilling.noteAuthArrived(); } catch (e) {}
         } else {
+          lastAuthUser = '';
           firstSyncState = FIRST_SYNC_WAITING;
           firstSyncPromise = null;
           lastCloudStamp = '';

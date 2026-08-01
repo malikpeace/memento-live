@@ -352,8 +352,20 @@ const PolarBilling = (function () {
 
   function finishVerifiedUnlock(access) {
     const environment = billingEnvironment();
+    // The celebration (paywall dismissal, unlock ceremony, routing into
+    // Action) belongs to the MOMENT of becoming paid, not to every routine
+    // re-verification. The app re-verifies constantly (boot, focus, auth
+    // events); on Malik's iPad each pass replayed the ceremony, which read as
+    // endless flashing (2026-08-01). Already-verified means: refresh the
+    // receipt quietly, celebrate nothing, unless the paywall is actually on
+    // screen (a genuine just-bought moment always has it up).
+    const wasActive = !!(verifiedAccess && verifiedAccess.active);
+    const paywallOpen = (() => {
+      try { return typeof ClarityPaywall !== 'undefined' && !!ClarityPaywall._open; } catch (e) { return false; }
+    })();
     if (!applyAccess(access, environment)) return;
     clearPending();
+    if (wasActive && !paywallOpen) return;
     try {
       if (typeof ClarityPaywall !== 'undefined'
           && ClarityPaywall._applyVerifiedUnlock) {
