@@ -17,7 +17,7 @@ const PRECACHE = [
   './index.html',
   './share.html',
   './manifest.json',
-  './legal/privacy.html', './legal/terms.html',
+  './legal/privacy.html', './legal/terms.html', './unlock.html',
   './Abstract Black Purple Blur Mountain.mp4',
   './assets/mountain-bg.png',
   './bg/mountain.jpg', './bg/streaks.jpg',
