@@ -65,11 +65,14 @@ const CloudSync = (function () {
         restoreEl.setAttribute('aria-live', 'polite');
         restoreEl.setAttribute('data-cloud-keep', '');
         restoreEl.style.cssText = 'position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;background:#050608;color:#f5f5f7;font-family:inherit;opacity:0;transition:opacity .2s ease;';
-        restoreEl.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center;padding:28px"><svg viewBox="0 0 64 64" width="48" height="48" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#0a0a0e"/><path d="M14 14L32 32 50 14v37H14z" fill="#f5f5f7"/></svg><div style="font-size:17px;font-weight:650">Restoring your Memento...</div><div style="width:120px;height:2px;overflow:hidden;background:rgba(255,255,255,.12)"><span style="display:block;width:45%;height:100%;background:#5bdaf3;animation:mementoRestoreSlide 1.1s ease-in-out infinite alternate"></span></div></div>';
+        // Malik's pick (2026-08-01, mockups/restore-loading.html option 2):
+        // the bare M alone, breathing. No sentence, no progress bar.
+        restoreEl.setAttribute('aria-label', 'Restoring your Memento');
+        restoreEl.innerHTML = '<svg viewBox="140 136 232 240" width="56" height="58" aria-hidden="true" style="display:block;animation:mementoRestoreBreathe 2.6s ease-in-out infinite"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z" fill="#f5f5f7"/></svg>';
         if (!document.getElementById('cloudRestoreStyle')) {
           const style = document.createElement('style');
           style.id = 'cloudRestoreStyle';
-          style.textContent = '@keyframes mementoRestoreSlide{from{transform:translateX(-15%)}to{transform:translateX(135%)}}@media(prefers-reduced-motion:reduce){#cloudRestoreScreen span{animation:none!important;transform:none!important;width:100%!important}}';
+          style.textContent = '@keyframes mementoRestoreBreathe{0%,100%{opacity:.4}50%{opacity:.95}}@media(prefers-reduced-motion:reduce){#cloudRestoreScreen svg{animation:none!important;opacity:.9}}';
           document.body.appendChild(style);
         }
         document.body.appendChild(restoreEl);

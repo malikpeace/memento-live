@@ -689,9 +689,9 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
 .gs__fulcrum::after { display: none; }
 .gs__beam {
   position: absolute; bottom: 22px; left: 8px; right: 8px;
-  height: 3px;
+  height: 4px;
   background: #fff;
-  border-radius: 0;
+  border-radius: 2px;
   transform-origin: center bottom;
   box-shadow: none;
 }
@@ -704,34 +704,48 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
   border: none;
   box-shadow: none;
 }
+/* The depth skin (Malik's pick 2026-08-01, mockups/scale-styles.html option 4):
+   lit top edge, darker seat, soft drop shadow. Every weight keeps its flat
+   base colour on background-color (the explode animation interpolates it) and
+   the depth shading rides on top as a constant background-image overlay, so
+   the gradient look and the smooth colour morphs coexist. */
 /* Red distraction weight */
 .gs__weight--red {
-  width: 56px; height: 46px; border-radius: 6px;
-  background: #ff4b33;
+  width: 56px; height: 46px; border-radius: 8px;
+  background-color: #ec4227;
+  background-image: linear-gradient(180deg, rgba(255,255,255,.32) 0%, rgba(255,255,255,0) 46%, rgba(0,0,0,.24) 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.38), inset 0 -3px 6px rgba(0,0,0,.28), 0 8px 16px rgba(0,0,0,.5);
 }
 /* Purple purpose weight */
 .gs__weight--purple {
-  width: 24px; height: 20px; border-radius: 4px;
-  background: #6fe9ff;
+  width: 24px; height: 20px; border-radius: 6px;
+  background-color: #4ecdec;
+  background-image: linear-gradient(180deg, rgba(255,255,255,.42) 0%, rgba(255,255,255,0) 46%, rgba(0,20,30,.26) 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.5), inset 0 -2px 5px rgba(0,20,30,.3), 0 6px 14px rgba(0,0,0,.45);
 }
 /* Purple weight BIG (for flip page) */
 .gs__weight--purple-big {
-  width: 24px; height: 20px; border-radius: 4px;
-  background: #6fe9ff;
+  width: 24px; height: 20px; border-radius: 6px;
+  background-color: #4ecdec;
+  background-image: linear-gradient(180deg, rgba(255,255,255,.42) 0%, rgba(255,255,255,0) 46%, rgba(0,20,30,.26) 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.5), inset 0 -2px 5px rgba(0,20,30,.3), 0 6px 14px rgba(0,0,0,.45);
   animation: gsExplode 5s ease-in-out infinite;
 }
 /* As it grows it shifts purple -> light blue (Malik: mark the transformation), then
-   settles back to purple as it shrinks. background color interpolates across the frames. */
+   settles back to purple as it shrinks. background-COLOR interpolates across the
+   frames (never the shorthand: that would wipe the depth overlay). */
 @keyframes gsExplode {
-  0%, 40% { width: 24px; height: 20px; background: #6fe9ff; }
-  52% { width: 64px; height: 52px; background: #4db8ff; }
-  60%, 88% { width: 58px; height: 48px; background: #4db8ff; }
-  100% { width: 24px; height: 20px; background: #6fe9ff; }
+  0%, 40% { width: 24px; height: 20px; background-color: #4ecdec; }
+  52% { width: 64px; height: 52px; background-color: #4db8ff; }
+  60%, 88% { width: 58px; height: 48px; background-color: #4db8ff; }
+  100% { width: 24px; height: 20px; background-color: #4ecdec; }
 }
 /* Red weight shrinking */
 .gs__weight--red-shrink {
-  width: 56px; height: 46px; border-radius: 6px;
-  background: #ff4b33;
+  width: 56px; height: 46px; border-radius: 8px;
+  background-color: #ec4227;
+  background-image: linear-gradient(180deg, rgba(255,255,255,.32) 0%, rgba(255,255,255,0) 46%, rgba(0,0,0,.24) 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.38), inset 0 -3px 6px rgba(0,0,0,.28), 0 8px 16px rgba(0,0,0,.5);
   animation: gsShrink 4s ease-in-out infinite;
 }
 .gs__weight--red-shrink { transform-origin: bottom center; }
@@ -742,8 +756,10 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
 /* Red weight dimming (on flip). transform-origin bottom center so the shrink stays
    SEATED on the beam (Malik: it used to lift off and float as it scaled down). */
 .gs__weight--red-dim {
-  width: 56px; height: 46px; border-radius: 6px;
-  background: #ff4b33;
+  width: 56px; height: 46px; border-radius: 8px;
+  background-color: #ec4227;
+  background-image: linear-gradient(180deg, rgba(255,255,255,.32) 0%, rgba(255,255,255,0) 46%, rgba(0,0,0,.24) 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.38), inset 0 -3px 6px rgba(0,0,0,.28), 0 8px 16px rgba(0,0,0,.5);
   transform-origin: bottom center;
   animation: gsDim 5s ease-in-out infinite;
 }
