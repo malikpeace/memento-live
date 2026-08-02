@@ -4202,6 +4202,10 @@ body.card-square { --card-w: 360px; --card-h: 360px; }
    the house recipe: translucent fill + blur + a 1px inset highlight, NO border
    (his standing rule), 16px radius per the cards/sheets tier. */
 #deskMission {
+  /* v1049 (Malik): the panel used to stretch the whole column while the type
+     inside stopped at 18ch, leaving a wide dead strip on its right. It hugs
+     its content now. */
+  max-width: 540px;
   padding: 28px 30px 30px;
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.045);

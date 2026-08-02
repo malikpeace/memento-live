@@ -1812,8 +1812,8 @@ const ComebackPicker = {
         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>' +
       '</button>' +
       '<div class="cbp__body">' +
-        '<h2 class="cbp__head">Pick the smallest way back in.</h2>' +
-        '<p class="cbp__sub">Any of these counts. Starting is the whole point today.</p>' +
+        '<h2 class="cbp__head">Pick the action you can do now.</h2>' +
+        '<p class="cbp__sub">It&rsquo;s better to start small than not at all.</p>' +
         '<div class="cbp__ways">' +
           ways.map((w, i) =>
             '<button class="cbp__way' + (i === 0 ? ' cbp__way--first' : '') + '" type="button" data-cbp-tier="' + esc(w.tier) + '">' +
@@ -3700,7 +3700,10 @@ function renderCommandCenter() {
     const hasPlan = !!(state.action && state.action.planGenerated && pa.title);
     const C = ccAccentColor();
     const wrap = (inner) => '<section class="cc-card" style="margin:0 0 14px;padding:22px 22px 20px;border-radius:var(--card-r);background:var(--surface-1);box-shadow:var(--shadow-card), inset 0 1px 0 rgba(255,255,255,0.06);">' + inner + '</section>';
-    const eyebrow = (t) => '<div style="font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:' + C + ';font-weight:700;margin-bottom:8px;">' + t + '</div>';
+    // v1049 (Malik): the label is NEUTRAL, never the accent. Colour on a tiny
+    // uppercase kicker is the fastest way for a surface to read cheap, and the
+    // today box is the one people see every day.
+    const eyebrow = (t) => '<div style="font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-lo);font-weight:700;margin-bottom:8px;">' + t + '</div>';
     const primaryBtn = (label, action) => '<button class="cc-primary" data-cc-action="' + action + '" style="flex:0 1 auto;min-width:180px;font:inherit;font-weight:700;font-size:0.92rem;cursor:pointer;border:none;border-radius:calc(8px * var(--rx, 1));padding:12px 40px;background:var(--solid-bg);color:var(--solid-fg);">' + esc(label) + '</button>';
 
     if (!hasClarity) {
