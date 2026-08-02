@@ -6,8 +6,8 @@
 <title>Today box, every state</title>
 
 <!-- the app's REAL stylesheets, so these are the actual components -->
-<link rel="stylesheet" href="../memento-app/css/base.css?v=1048" onerror="this.href='../css/base.css?v=1048'">
-<link rel="stylesheet" href="../memento-app/css/dashboard.css?v=1048" onerror="this.href='../css/dashboard.css?v=1048'">
+<link rel="stylesheet" href="../memento-app/css/base.css?v=1049" onerror="this.href='../css/base.css?v=1049'">
+<link rel="stylesheet" href="../memento-app/css/dashboard.css?v=1049" onerror="this.href='../css/dashboard.css?v=1049'">
 
 <style>
   html, body { margin:0; background:#08090b; color:#f5f5f7;
@@ -116,22 +116,15 @@
   <!-- 3 -->
   <div class="state">
     <p class="state__name">3 &middot; A normal day</p>
-    <p class="state__when">The one you will see almost every day. This is where they differ most.</p>
+    <p class="state__when">The one you see almost every day.</p>
     <div class="pair">
       <div class="phone">
         <p class="col__cap">Phone</p>
         <div class="phone__inner">
           <section class="cc-card" style="margin:0;padding:22px 22px 20px;border-radius:var(--card-r);background:var(--surface-1);box-shadow:var(--shadow-card), inset 0 1px 0 rgba(255,255,255,0.06);">
-            <div style="font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:#3fd94e;font-weight:700;margin-bottom:8px;">Consistency &middot; today</div>
-            <div style="font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-lo);font-weight:700;margin-bottom:6px;">Goal today</div>
-            <div style="font-size:1.15rem;font-weight:700;color:var(--text-hi);margin-bottom:6px;">Write the first draft of this week's video script</div>
-            <div style="font-size:0.86rem;color:var(--text-2);margin-bottom:14px;">Minimum: open the doc and write one line</div>
-            <div style="display:flex;margin-bottom:16px;"><button class="cc-primary" style="flex:0 1 auto;min-width:180px;font:inherit;font-weight:700;font-size:0.92rem;border:none;border-radius:8px;padding:12px 40px;background:var(--solid-bg);color:var(--solid-fg);">Mark Complete</button></div>
-            <div style="border-top:1px solid rgba(255,255,255,.07);padding-top:13px;">
-              <div style="font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-lo);font-weight:700;margin-bottom:5px;">One thing to live</div>
-              <div style="font-size:0.92rem;color:var(--text-hi);margin-bottom:7px;">Play a game with no point.</div>
-              <div style="font-size:0.85rem;color:#3ad9f5;font-weight:600;">Live it &rarr;</div>
-            </div>
+            <div style="font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-lo);font-weight:700;margin-bottom:8px;">Today</div>
+            <div style="font-size:1.15rem;font-weight:700;color:var(--text-hi);line-height:1.3;margin-bottom:16px;">Write the first draft of this week&#39;s video script</div>
+            <div style="border-top:1px solid rgba(255,255,255,.08);padding-top:14px;"><button class="cc-primary" style="width:100%;font:inherit;font-weight:700;font-size:0.95rem;border:none;border-radius:10px;padding:14px;background:var(--solid-bg);color:var(--solid-fg);">Mark Complete</button></div>
           </section>
         </div>
       </div>
@@ -141,14 +134,11 @@
           <div class="greet">Good evening, Malik.</div>
           <div class="dkmbox">
             <div class="dkm__label">Today&rsquo;s Action</div>
-            <div class="dkm__headline">Write the first draft of this week's video script.</div>
+            <div class="dkm__headline">Write the first draft of this week&#39;s video script.</div>
             <div class="dkm__row">
               <button class="dkm__btn dkm__btn--solid">Mark Complete</button>
               <div class="dkm__streak">
-                <div class="dkm__streak-top">
-                  <span class="dkm__streak-n">8</span>
-                  <span class="dkm__streak-l">day streak</span>
-                </div>
+                <div class="dkm__streak-top"><span class="dkm__streak-n">8</span><span class="dkm__streak-l">day streak</span></div>
                 <div class="dkm__streak-sub">Best 8 &middot; 20 active days</div>
               </div>
             </div>
@@ -156,32 +146,21 @@
         </div>
       </div>
     </div>
-    <p class="diff">Different. The phone also carries a consistency strip, the &ldquo;Minimum:&rdquo; fallback version of the move, and the Vivere &ldquo;one thing to live&rdquo; prompt. Desktop carries the streak instead. Decide: does desktop pick up the phone&rsquo;s extras, or does the phone slim down to this?</p>
+    <p class="diff same">Effectively the same. Both are just Today, the move, and Mark Complete. Desktop adds the streak beside the button; the phone keeps that for the Consistency view.</p>
   </div>
 
   <!-- 4 -->
   <div class="state">
     <p class="state__name">4 &middot; Coming back after missing days</p>
-    <p class="state__when">Two or more days with nothing logged.</p>
+    <p class="state__when">Rebuilt to Malik&rsquo;s spec (v1048): the box stays quiet, the choosing moved to its own page.</p>
     <div class="pair">
       <div class="phone">
         <p class="col__cap">Phone</p>
         <div class="phone__inner">
           <section class="cc-card" style="margin:0;padding:22px 22px 20px;border-radius:var(--card-r);background:var(--surface-1);box-shadow:var(--shadow-card), inset 0 1px 0 rgba(255,255,255,0.06);">
-            <div style="font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:#3ad9f5;font-weight:700;margin-bottom:8px;">Welcome back</div>
-            <div style="font-size:1.05rem;font-weight:700;color:var(--text-hi);margin-bottom:12px;">Pick the smallest way back in.</div>
-            <button style="text-align:left;width:100%;font:inherit;border-radius:14px;padding:13px 15px;display:block;margin-bottom:8px;background:var(--solid-bg);color:var(--solid-fg);border:none;">
-              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:3px;"><span style="font-weight:700;font-size:0.95rem;">Open the doc</span><span style="font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;color:rgba(11,17,18,.55);">2 min</span></div>
-              <div style="font-size:0.8rem;color:rgba(11,17,18,.62);">The smallest possible version</div>
-            </button>
-            <button style="text-align:left;width:100%;font:inherit;border-radius:14px;padding:13px 15px;display:block;margin-bottom:8px;background:var(--glass-bg);border:1px solid var(--glass-border);color:var(--text-hi);">
-              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:3px;"><span style="font-weight:700;font-size:0.95rem;">Write one paragraph</span><span style="font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;color:var(--text-3);">10 min</span></div>
-              <div style="font-size:0.8rem;color:var(--text-2);">A real but gentle start</div>
-            </button>
-            <button style="text-align:left;width:100%;font:inherit;border-radius:14px;padding:13px 15px;display:block;background:var(--glass-bg);border:1px solid var(--glass-border);color:var(--text-hi);">
-              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:3px;"><span style="font-weight:700;font-size:0.95rem;">Write the script</span><span style="font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;color:var(--text-3);">45 min</span></div>
-              <div style="font-size:0.8rem;color:var(--text-2);">The full move</div>
-            </button>
+            <div style="font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:#3ad9f5;font-weight:700;margin-bottom:8px;">4 days missed</div>
+            <div style="font-size:1.15rem;font-weight:700;color:var(--text-hi);margin-bottom:14px;">No worries, let&rsquo;s get back to it.</div>
+            <div style="display:flex;"><button class="cc-primary" style="flex:0 1 auto;min-width:180px;font:inherit;font-weight:700;font-size:0.92rem;border:none;border-radius:8px;padding:12px 40px;background:var(--solid-bg);color:var(--solid-fg);">Keep going</button></div>
           </section>
         </div>
       </div>
@@ -190,14 +169,33 @@
         <div class="desk__inner">
           <div class="greet">Good evening, Malik.</div>
           <div class="dkmbox">
-            <div class="dkm__label">Welcome back</div>
-            <div class="dkm__headline">Pick the smallest way back in.</div>
-            <div class="dkm__row"><button class="dkm__btn dkm__btn--solid">Choose</button></div>
+            <div class="dkm__label">4 days missed</div>
+            <div class="dkm__headline">No worries, let&rsquo;s get back to it.</div>
+            <div class="dkm__row"><button class="dkm__btn dkm__btn--solid">Keep going</button></div>
           </div>
         </div>
       </div>
     </div>
-    <p class="diff">Different. The phone offers three doors right there, easiest first. Desktop offers one button that sends you into Action to choose. My read: the phone version is the kinder one on a bad day, and desktop should match it.</p>
+    <p class="diff same">Identical now, word for word.</p>
+  </div>
+
+  <div class="state">
+    <p class="state__name">4b &middot; What &ldquo;Keep going&rdquo; opens</p>
+    <p class="state__when">Its own page, same on both. Pick one and it goes straight into Action at that size.</p>
+    <div class="pair">
+      <div class="phone">
+        <p class="col__cap">Both</p>
+        <div class="phone__inner" style="padding:26px 20px 30px;">
+          <h2 class="cbp__head" style="font-size:26px;">Pick the smallest way back in.</h2>
+          <p class="cbp__sub" style="margin-bottom:20px;">Any of these counts. Starting is the whole point today.</p>
+          <div class="cbp__ways">
+            <button class="cbp__way cbp__way--first"><span class="cbp__way-top"><span class="cbp__way-title">Write the first three sentences</span><span class="cbp__way-mins">2 min</span></span><span class="cbp__way-sub">The smallest honest version</span></button>
+            <button class="cbp__way"><span class="cbp__way-top"><span class="cbp__way-title">Outline the video in five bullets</span><span class="cbp__way-mins">10 min</span></span><span class="cbp__way-sub">A real but gentle start</span></button>
+            <button class="cbp__way"><span class="cbp__way-top"><span class="cbp__way-title">Write the first draft</span></span><span class="cbp__way-sub">The full move</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 </body>

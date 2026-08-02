@@ -4318,3 +4318,60 @@ html.theme-light #deskMission {
     transition: none; transform: none; opacity: 1;
   }
 }
+
+/* ── THE COMEBACK PICKER (v1048, Malik) ─────────────────────────────────────
+   The today box stays quiet on a bad day and the three ways back live here,
+   on their own page. Same glass, same radii, same solid CTA as everywhere
+   else; the only "special" thing about it is that it asks for nothing. */
+.cbp {
+  position: fixed; inset: 0; z-index: 11000;
+  /* surface-0 is the token that actually flips with the theme (#040405 dark,
+     #eef0f3 light). A hardcoded near-black here left light mode reading dark
+     text on a dark page. */
+  background: var(--surface-0);
+  display: flex; align-items: center; justify-content: center;
+  padding: calc(var(--safe-t, 0px) + 64px) 22px calc(var(--safe-b, 0px) + 34px);
+  box-sizing: border-box;
+  opacity: 0; transition: opacity .26s ease-out;
+}
+.cbp--open { opacity: 1; }
+.cbp__close {
+  position: absolute; top: calc(var(--safe-t, 0px) + 16px); right: 16px;
+  width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;
+  border: 0; border-radius: 999px; cursor: pointer;
+  background: var(--glass-bg); color: var(--text-hi);
+  -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+}
+.cbp__body { width: 100%; max-width: 460px; }
+.cbp__head {
+  font-size: clamp(26px, 6vw, 32px); font-weight: 700; letter-spacing: -.03em;
+  line-height: 1.12; color: var(--text-hi); margin: 0 0 10px; text-wrap: balance;
+}
+.cbp__sub {
+  font-size: 15px; line-height: 1.55; color: var(--text-2); margin: 0 0 26px;
+}
+.cbp__ways { display: flex; flex-direction: column; gap: 10px; }
+.cbp__way {
+  display: block; width: 100%; text-align: left; font: inherit; cursor: pointer;
+  border: 0; border-radius: calc(14px * var(--rx, 1)); padding: 15px 17px;
+  background: var(--glass-bg); color: var(--text-hi);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: transform .16s ease-out, box-shadow .16s ease-out;
+}
+.cbp__way--first { background: var(--solid-bg); color: var(--solid-fg); }
+.cbp__way:active { transform: scale(.985); }
+.cbp__way-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 4px; }
+.cbp__way-title { font-size: 16px; font-weight: 700; letter-spacing: -.01em; }
+.cbp__way-mins {
+  font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  white-space: nowrap; color: var(--text-3);
+}
+.cbp__way-sub { display: block; font-size: 13.5px; line-height: 1.45; color: var(--text-2); }
+/* On the solid button both secondary lines INHERIT the button's own label
+   colour and just dim. Hardcoding a dark ink here made them invisible in
+   light mode, where the solid fill is dark and its label is light. */
+.cbp__way--first .cbp__way-mins,
+.cbp__way--first .cbp__way-sub { color: inherit; opacity: 0.66; }
+@media (prefers-reduced-motion: reduce) {
+  .cbp, .cbp__way { transition: none; }
+}

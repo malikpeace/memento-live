@@ -1782,6 +1782,83 @@ const DEMO_CLARITY_PAYOFF = {
   }
 };
 
+/* THE COMEBACK PICKER (v1048, Malik's call).
+   The three ways back used to sit inline in the today box, which made a bad
+   day's home screen the busiest screen in the app. The box now says the quiet
+   thing ("4 days missed. No worries, let's get back to it.") behind one
+   button, and the choosing happens here, on its own page, easiest first.
+   Picking a way does exactly what the old inline buttons did: pre-select that
+   tier and open Action. */
+const ComebackPicker = {
+  _el: null,
+
+  open() {
+    if (this._el) return;
+    const pa = (state.action && state.action.primaryAction) || {};
+    const tiers = pa.tiers || {};
+    const full = (tiers[pa.recommendedTier] || pa.title || 'Your one thing').trim();
+    const ways = [
+      { tier: 'tiny',  text: (tiers.tiny || full), mins: '2 min',  sub: 'The smallest honest version' },
+      { tier: 'light', text: (tiers.light || tiers.tiny || full), mins: '10 min', sub: 'A real but gentle start' },
+      { tier: (['tiny','light','moderate','heavy','extreme'].indexOf(pa.recommendedTier) >= 0 ? pa.recommendedTier : 'moderate'),
+        text: full, mins: '', sub: 'The full move' }
+    ];
+    const el = document.createElement('div');
+    el.className = 'cbp';
+    el.setAttribute('role', 'dialog');
+    el.setAttribute('aria-label', 'Pick a way back in');
+    el.innerHTML =
+      '<button class="cbp__close" type="button" aria-label="Close">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>' +
+      '</button>' +
+      '<div class="cbp__body">' +
+        '<h2 class="cbp__head">Pick the smallest way back in.</h2>' +
+        '<p class="cbp__sub">Any of these counts. Starting is the whole point today.</p>' +
+        '<div class="cbp__ways">' +
+          ways.map((w, i) =>
+            '<button class="cbp__way' + (i === 0 ? ' cbp__way--first' : '') + '" type="button" data-cbp-tier="' + esc(w.tier) + '">' +
+              '<span class="cbp__way-top">' +
+                '<span class="cbp__way-title">' + esc(w.text) + '</span>' +
+                (w.mins ? '<span class="cbp__way-mins">' + esc(w.mins) + '</span>' : '') +
+              '</span>' +
+              '<span class="cbp__way-sub">' + esc(w.sub) + '</span>' +
+            '</button>'
+          ).join('') +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(el);
+    this._el = el;
+    void el.offsetWidth;
+    el.classList.add('cbp--open');
+
+    el.querySelector('.cbp__close').addEventListener('click', () => this.close());
+    el.querySelectorAll('[data-cbp-tier]').forEach((b) => {
+      b.addEventListener('click', () => {
+        const tier = b.getAttribute('data-cbp-tier');
+        try {
+          if (['tiny','light','moderate','heavy','extreme'].indexOf(tier) >= 0) {
+            state.action.selectedTier = tier;
+            persistNow();
+          }
+        } catch (e) {}
+        this.close();
+        setTimeout(() => { try { if (typeof ActionExperience !== 'undefined') ActionExperience.open(); } catch (e) {} }, 240);
+      });
+    });
+    this._esc = (e) => { if (e.key === 'Escape') this.close(); };
+    document.addEventListener('keydown', this._esc);
+  },
+
+  close() {
+    const el = this._el;
+    if (!el) return;
+    this._el = null;
+    try { document.removeEventListener('keydown', this._esc); } catch (e) {}
+    el.classList.remove('cbp--open');
+    setTimeout(() => { try { el.remove(); } catch (e) {} }, 280);
+  }
+};
+
 const CreatorTools = {
   init() {
     const bind = (id, fn) => {
@@ -3644,41 +3721,16 @@ function renderCommandCenter() {
     // show a calm, shame-free way back in instead of the normal "today's one
     // thing". Normal path below is unchanged when there is no gap.
     if (typeof isComebackGap === 'function' && isComebackGap()) {
-      const recTierKey = (['tiny','light','moderate','heavy','extreme'].indexOf(pa.recommendedTier) >= 0) ? pa.recommendedTier : 'moderate';
-      const recText = tiers[recTierKey] || pa.title || 'Your one thing';
-      const tinyText = tiers.tiny || recText;
-      const lightText = tiers.light || tiers.tiny || recText;
-      // Three ways back, easiest first. Each carries the tier to pre-select.
-      const wayBtn = (minutes, label, text, tierKey, recommended) => {
-        const base = 'text-align:left;width:100%;font:inherit;cursor:pointer;border-radius:calc(14px * var(--rx, 1));padding:13px 15px;display:block;margin-bottom:8px;';
-        const skin = recommended
-          ? 'background:var(--solid-bg);color:var(--solid-fg);border:none;'
-          : 'background:var(--glass-bg);border:1px solid var(--glass-border);color:var(--text-hi);';
-        const sub = recommended ? 'color:rgba(11, 17, 18,0.62);' : 'color:var(--text-2);';
-        const tag = 'color:' + (recommended ? 'rgba(11, 17, 18,0.55)' : 'var(--text-3)') + ';font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;';
-        return '<button class="cc-comeback-way" data-cc-comeback="' + tierKey + '" style="' + base + skin + '">' +
-          '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:3px;">' +
-            '<span style="font-weight:700;font-size:0.95rem;">' + esc(label) + '</span>' +
-            '<span style="' + tag + 'white-space:nowrap;">' + esc(minutes) + (recommended ? ' &middot; recommended' : '') + '</span>' +
-          '</div>' +
-          '<div style="font-size:0.83rem;line-height:1.4;' + sub + '">' + esc(text) + '</div>' +
-        '</button>';
-      };
-      const chips = ['Too big','Unclear','Tired','Distracted','Scared','Forgot','Other']
-        .map(r => '<button class="cc-comeback-reason" data-cc-reason="' + esc(r) + '" style="font:inherit;font-weight:650;font-size:0.82rem;cursor:pointer;border:1px solid var(--glass-border);border-radius:999px;padding:7px 13px;background:var(--glass-bg);color:var(--text-hi);">' + esc(r) + '</button>')
-        .join('');
-      let cb = eyebrow('Welcome back');
-      cb += '<div style="font-size:1.2rem;font-weight:700;line-height:1.3;color:var(--text-hi);margin-bottom:6px;">Pick the smallest way back in.</div>';
-      cb += '<div style="font-size:0.88rem;line-height:1.5;color:var(--text-2);margin-bottom:14px;">No catching up, no making up for lost days. You just start again, as small as you want.</div>';
-      cb += wayBtn('2 min', 'Just open it', tinyText, 'tiny', false);
-      cb += wayBtn('10 min', 'A small block', lightText, 'light', false);
-      cb += wayBtn('Full', 'Your normal action', recText, recTierKey, true);
-      cb += '<div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--glass-border);">' +
-        '<div style="font-size:0.88rem;font-weight:650;color:var(--text-hi);margin-bottom:10px;">What knocked you off? <span style="color:var(--text-3);font-weight:500;">(optional)</span></div>' +
-        '<div id="ccComebackChips" style="display:flex;gap:8px;flex-wrap:wrap;">' + chips + '</div>' +
-        '<div id="ccComebackThanks" style="display:none;font-size:0.83rem;line-height:1.45;color:var(--text-2);margin-top:10px;">Got it. That is useful, not a verdict. Now pick a way back in above.</div>' +
-      '</div>';
-      return wrap(cb);
+      // v1048 (Malik): the box stays quiet on a bad day. It names the gap,
+      // says the kind thing, and offers ONE button; the choosing moved to
+      // ComebackPicker on its own page. A home screen should never be busiest
+      // on the day someone feels worst.
+      let gap = 0;
+      try { gap = (typeof comebackGapDays === 'function') ? comebackGapDays() : 0; } catch (e) {}
+      const dayWord = gap === 1 ? 'day' : 'days';
+      return wrap(eyebrow(gap + ' ' + dayWord + ' missed') +
+        '<div style="font-size:1.15rem;font-weight:700;color:var(--text-hi);margin-bottom:14px;">No worries, let&rsquo;s get back to it.</div>' +
+        '<div style="display:flex;">' + primaryBtn('Keep going', 'comeback') + '</div>');
     }
 
     // honor the user's chosen intensity (Action picker or a coach shrink), the
@@ -3952,10 +4004,13 @@ function renderDeskMission() {
       el.innerHTML = label('Next step') + head('Turn your Neutron Star into a tangible daily action.') +
         '<div class="dkm__row">' + solid('Build my plan', 'action') + '</div>';
     } else if (typeof isComebackGap === 'function' && isComebackGap()) {
-      // Comeback: the full shame-free chooser lives in the command center /
-      // Action module; the desktop hero keeps the calm one-liner + one door.
-      el.innerHTML = label('Welcome back') + head('Pick the smallest way back in.') +
-        '<div class="dkm__row">' + solid('Choose', 'action') + '</div>';
+      // v1048: identical to the phone now, word for word. Name the gap, say
+      // the kind thing, one door; the ways back live in ComebackPicker.
+      let gap = 0;
+      try { gap = (typeof comebackGapDays === 'function') ? comebackGapDays() : 0; } catch (e) {}
+      el.innerHTML = label(gap + ' ' + (gap === 1 ? 'day' : 'days') + ' missed') +
+        head('No worries, let’s get back to it.') +
+        '<div class="dkm__row">' + solid('Keep going', 'comeback') + '</div>';
     } else {
       const _TK = ['tiny', 'light', 'moderate', 'heavy', 'extreme'];
       const _selT = state.action && state.action.selectedTier;
@@ -4179,6 +4234,7 @@ function bindCommandCenter(cc) {
       const a = b.getAttribute('data-cc-action');
       if (a === 'clarity' && typeof ClarityExperience !== 'undefined') ClarityExperience.open();
       else if (a === 'didit') return;
+      else if (a === 'comeback') ComebackPicker.open();
       else if (typeof ActionExperience !== 'undefined') ActionExperience.open();
     }));
     // v998 (Malik: "I don't see a place where I can go into the action
