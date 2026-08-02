@@ -3700,6 +3700,35 @@ const CC_PILLARS = ['action', 'clarity', 'consistency'];
 // the face remembers. Until they ever pick, the default follows tenure:
 // week in the early days (day 5 = five honest squares, not a wasteland),
 // month once there IS a month, year once there is a year.
+// The star statement, outcome bright and qualifier quiet, inside ONE
+// sentence (his pick "two tone statement", with his condition: "only if it's
+// actually done right and works perfectly no matter what"). Deterministic:
+// split at the first clear connector; no connector, no split, plain render.
+function ccStarTwoTone(star) {
+  try {
+    const s = String(star || '');
+    const m = s.match(/\s(by|so that|so I|so my|while|without|before|through)\s/i);
+    if (m && m.index >= 12 && s.length - m.index >= 10) {
+      return esc(s.slice(0, m.index)) +
+        ' <span style="color:var(--text-2);font-weight:650;">' + esc(s.slice(m.index + 1)) + '</span>';
+    }
+    return esc(s);
+  } catch (e) { return esc(String(star || '')); }
+}
+// "Day 62 with this star": the quiet line that gives the statement a history.
+function ccStarTenureLine() {
+  try {
+    // ignitedAt is a millisecond number; completedAt is an ISO string.
+    // Date.parse normalizes both, and anything unparseable renders nothing
+    // rather than "Day NaN".
+    const raw = (state.clarity && (state.clarity.ignitedAt || state.clarity.completedAt)) || 0;
+    const t0 = typeof raw === 'number' ? raw : Date.parse(raw);
+    if (!t0 || isNaN(t0)) return '';
+    const d = Math.max(1, Math.floor((Date.now() - t0) / 86400000) + 1);
+    return '<div class="cc-startenure">Day ' + d.toLocaleString() + ' with this star</div>';
+  } catch (e) { return ''; }
+}
+
 const CC_FACE_VIEWS = ['week', 'month', 'year', 'curve'];
 function ccFaceViewDefault() {
   try {
@@ -3807,11 +3836,17 @@ function renderCommandCenter() {
         const a = (state.clarity && state.clarity.answers) || {};
         const star = String(a.neutronStar || '').trim();
         const why = String(a.coreWhy || a.whyItMatters || '').trim();
-        // v1057 (Malik, twice): the why is NOT on the glance face. Label +
-        // statement only; the why lives inside the Clarity module, one tap
-        // away. Three lines of text made the glance stop being a glance.
+        // v1057 (Malik, twice): the why is NOT on the glance face; it lives
+        // inside the module. v1061 (Malik: "it feels kinda bland... very
+        // empty"): the statement gets the two-tone treatment (outcome
+        // bright, qualifier quiet) and a tenure line underneath, so the face
+        // reads as a commitment with a history, not a floating sentence.
+        // Two-tone is heuristic and FAIL-SAFE: it only splits on a clear
+        // connector, and any star without one renders plain, so it can never
+        // mangle anyone's words.
         return wrap(eyebrow('Your Neutron Star') +
-          '<div style="font-size:1.15rem;font-weight:700;line-height:1.3;color:var(--text-hi);">' + esc(star || 'Your Neutron Star') + '</div>' +
+          '<div style="font-size:1.15rem;font-weight:700;line-height:1.3;color:var(--text-hi);">' + ccStarTwoTone(star || 'Your Neutron Star') + '</div>' +
+          ccStarTenureLine() +
           dots(1));
       }
       let _s = 0, _b = 0, _act = 0;
@@ -3830,9 +3865,18 @@ function renderCommandCenter() {
       const _vsel = '<select class="cc-vsel" aria-label="Consistency view">' +
         CC_FACE_VIEWS.map((v) => '<option value="' + v + '"' + (v === ccFaceView() ? ' selected' : '') + '>' +
           v.charAt(0).toUpperCase() + v.slice(1) + '</option>').join('') + '</select>';
+      let _flame = '';
+      try {
+        if (_s > 0 && typeof streakFlameTier === 'function') {
+          const fl = streakFlameTier(_s);
+          _flame = '<svg class="cc-flame" width="' + fl.s + '" height="' + fl.s + '" viewBox="0 0 24 24" fill="' + fl.c +
+            '" style="filter:drop-shadow(0 0 ' + fl.g + 'px ' + fl.c + ') brightness(1.15) saturate(1.2);flex:0 0 auto;" aria-hidden="true">' +
+            '<path fill-rule="evenodd" clip-rule="evenodd" d="M12.963 2.286a.75.75 0 0 0-1.071-.136 9.742 9.742 0 0 0-3.539 6.177A7.547 7.547 0 0 1 6.648 6.61a.75.75 0 0 0-1.152-.082A9 9 0 1 0 15.68 4.534a7.46 7.46 0 0 1-2.717-2.248ZM15.75 14.25a3.75 3.75 0 1 1-7.313-1.172c.628.465 1.35.81 2.133 1a5.989 5.989 0 0 1 1.925-3.547 3.75 3.75 0 0 1 3.255 3.719Z"/></svg>';
+        }
+      } catch (e) {}
       return wrap(eyebrow('Consistency') +
         '<div class="cc-bigrow">' +
-          '<span class="cc-bignum">' + _s.toLocaleString() + '</span>' +
+          '<span class="cc-bignum">' + _s.toLocaleString() + '</span>' + _flame +
           '<span class="cc-bigmeta">' + (_s === 1 ? 'day in a row' : 'days in a row') +
             '<br>' + (_score ? 'score ' + _score + '%' : '') +
               (_score && _b ? ' \u00b7 ' : '') + (_b ? 'best ' + _b.toLocaleString() : '') +
@@ -4250,14 +4294,19 @@ function renderDeskMission() {
         return '<div class="cc-dayline" aria-hidden="true"><b style="width:' + (rem * 100).toFixed(1) + '%"></b></div>';
       };
       const PILL = {
+        // v1061 (Malik): the streak chip is gone from Action; the streak
+        // lives on the consistency face now, where the number already is.
         action: () => label('Today&rsquo;s Action') + head(mission) + dayline() +
-          '<div class="dkm__row">' + doneBtn + streakChip + '</div>',
+          '<div class="dkm__row">' + doneBtn + '</div>',
         clarity: () => {
           const a = (state.clarity && state.clarity.answers) || {};
           const star = String(a.neutronStar || '').trim();
           const why = String(a.coreWhy || a.whyItMatters || '').trim();
           // v1057 (Malik): statement only; the why waits inside the module.
-          return label('Your Neutron Star') + head(star || 'Your Neutron Star');
+          // v1061: two-tone + tenure, same treatment as the phone face.
+          return label('Your Neutron Star') +
+            '<div class="dkm__headline">' + ccStarTwoTone(star || 'Your Neutron Star') + '</div>' +
+            ccStarTenureLine();
         },
         consistency: () => {
           // v1058 (Malik's variants 1+2 + his view spec): the number IS the
@@ -4275,6 +4324,7 @@ function renderDeskMission() {
           return label('Consistency') +
             '<div class="cc-bigrow cc-bigrow--desk">' +
               '<span class="cc-bignum">' + streak.toLocaleString() + '</span>' +
+              (streak > 0 ? flameSvg(streak) : '') +
               '<span class="cc-bigmeta">' + (streak === 1 ? 'day in a row' : 'days in a row') +
                 '<br>' + (_score30 ? 'score ' + _score30 + '%' : '') +
                   (_score30 && _best ? ' \u00b7 ' : '') + (_best ? 'best ' + _best.toLocaleString() : '') +

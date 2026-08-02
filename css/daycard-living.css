@@ -187,24 +187,32 @@ body:not(.ns-bloom) .daycard-theme-living .daycard-wrap__aura {
 /* ── Ground reflection: a true vertical MIRROR of the card's color layer ───── */
 .daycard-theme-living .daycard-floor {
   position: absolute; left: 50%; top: 100%;
-  transform: translateX(-50%) scaleY(-1);
+  /* v1061 (Malik: "the reflection moves with the movement of the card and
+     looks very meh"): the ground does not tilt when the object above it
+     does. The stage carries the pointer tilt (v1056), so the floor counter-
+     rotates by the same angles and stays flat on the ground while the card
+     leans. Same 0.18s ease as the stage so they move as one system. */
+  transform: translateX(-50%) scaleY(-1)
+    rotateY(calc(var(--dc-ry, 0deg) * -1)) rotateX(calc(var(--dc-rx, 0deg) * -1));
+  transition: opacity 0.6s ease, transform 0.18s ease-out;
   transform-origin: center center;
   width: calc(100% + var(--rfl-w, 10) * 2%);
   height: calc(var(--rfl-d, 42) * 1%); z-index: 4;
   pointer-events: none; overflow: hidden;
   border-radius: var(--r-card);
-  opacity: calc(var(--lit, 0) * var(--rfl-i, 1));
+  opacity: calc(var(--lit, 0) * var(--rfl-i, 1) * 0.8);
   filter: blur(22px) saturate(var(--sat, 1.5)) hue-rotate(var(--mm-hue, 0deg));
-  transition: opacity 0.6s ease;
-  /* vertical fade (flipped: local-bottom = the card edge = brightest, soft top
-     fade-in then fade down) intersected with a horizontal fade toward the ends */
+  /* v1061 ("you can cleanly see where it stops, like it's contained in a
+     box"): the fades reach much further in from every edge, so the blurred
+     light dies well BEFORE the rect that carries it and no boundary can
+     print. Glow-edge law: a mask must fade out before the bounds do. */
   -webkit-mask-image:
-    linear-gradient(to top, transparent 0%, #000 9%, rgba(0,0,0,0.45) 54%, transparent 90%),
-    linear-gradient(to right, transparent 0%, #000 20%, #000 80%, transparent 100%);
+    linear-gradient(to top, transparent 0%, #000 12%, rgba(0,0,0,0.35) 48%, transparent 76%),
+    linear-gradient(to right, transparent 4%, #000 34%, #000 66%, transparent 96%);
   -webkit-mask-composite: source-in;
   mask-image:
-    linear-gradient(to top, transparent 0%, #000 9%, rgba(0,0,0,0.45) 54%, transparent 90%),
-    linear-gradient(to right, transparent 0%, #000 20%, #000 80%, transparent 100%);
+    linear-gradient(to top, transparent 0%, #000 12%, rgba(0,0,0,0.35) 48%, transparent 76%),
+    linear-gradient(to right, transparent 4%, #000 34%, #000 66%, transparent 96%);
   mask-composite: intersect;
 }
 .daycard-theme-living .daycard-floor .blob {

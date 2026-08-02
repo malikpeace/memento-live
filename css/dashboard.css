@@ -4230,15 +4230,15 @@ body.card-square { --card-w: 360px; --card-h: 360px; }
   max-width: 540px;
   padding: 28px 30px 30px;
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.045);
-  -webkit-backdrop-filter: blur(calc(28px * var(--bx, 1))) saturate(1.35);
-  backdrop-filter: blur(calc(28px * var(--bx, 1))) saturate(1.35);
+  /* v1061 (Malik): tinted, not glassy, and IDENTICAL to the phone box. The
+     blur stack is gone with the translucency it existed to serve. */
+  background: #16181d;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.07),
     0 20px 54px rgba(0, 0, 0, 0.34);
 }
 html.theme-light #deskMission {
-  background: rgba(255, 255, 255, 0.62);
+  background: #ffffff;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.9),
     0 18px 46px rgba(64, 92, 134, 0.14);
@@ -4538,13 +4538,14 @@ html.theme-light .cc-dots i.on { background: var(--text-hi); }
    transform, this only keeps the drag from selecting text or firing the
    browser's own horizontal gestures. */
 .cc-card { touch-action: pan-y; }
-/* THE DECK (v1060). While a swipe is live the cards must read as solid
-   objects stacked on each other, so both layers go OPAQUE: a translucent
-   glass card would show the one beneath THROUGH itself, which reads as a
-   glitch, not a stack (the deck-mockup lesson). Solid surface, same hue. */
-.cc-deck-live .cc-card,
+/* ONE SURFACE (v1061, Malik: "I prefer the more tinted less glass look,
+   more timeless, simple and utilitarian", after catching the glass->grey pop
+   at drag start). The today box is the SAME opaque tint on every platform,
+   at rest and mid-swipe: phone matches desktop, and the deck no longer has
+   a second style to snap to because there is only one style. */
+#commandCenter .cc-card,
 .cc-under { background: #16181d !important; }
-html.theme-light .cc-deck-live .cc-card,
+html.theme-light #commandCenter .cc-card,
 html.theme-light .cc-under { background: #ffffff !important; }
 .cc-under { pointer-events: none; box-shadow: var(--shadow-card); overflow: hidden; }
 .cc-under .cc-dots { visibility: hidden; } /* one set of dots at a time */
@@ -4649,6 +4650,9 @@ body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-card--pill
    its meaning in small type beside it. Below it, whichever view of the
    record is picked (week / month / year / curve). */
 .cc-bigrow { display: flex; align-items: center; gap: 14px; }
+.cc-flame { align-self: center; }
+.cc-startenure { font-size: 12.5px; color: var(--text-2); margin-top: 10px; }
+#deskMission .cc-startenure { font-size: 13px; margin-top: 12px; }
 /* v1060: the view picker on the phone face is a NATIVE select dressed as a
    quiet label: no border, no fill, small chevron, right-aligned. Tapping it
    opens the system picker (that is the "native" feel), and it never competes

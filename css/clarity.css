@@ -2780,7 +2780,12 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
   display: flex; align-items: center; justify-content: center;
   cursor: pointer; transition: color var(--t-fast), opacity var(--t-fast);
   font-family: var(--font);
-  pointer-events: auto;
+  /* v1061 (Malik: the phone profile button was dead): pointer-events is
+     INHERITED, and this button hardcoded "auto", so the invisible X kept
+     swallowing top-right taps whenever Clarity was closed, the exact bug
+     the bar above was already fixed for. Inheriting means: bar none ->
+     button none when closed, bar auto -> button auto when open. */
+  pointer-events: inherit;
   position: relative;
   z-index: 20;
   touch-action: manipulation;
