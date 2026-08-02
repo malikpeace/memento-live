@@ -23,6 +23,24 @@ try {
   }
 } catch (e) {}
 
+/* v1073 SAFE-AREA SIMULATOR (dev only, URL-gated, inert without the param).
+   The headless preview renders env(safe-area-inset-*) as 0, so every layout
+   I verified was a case Malik's phone never runs: his notch and home
+   indicator change the arithmetic completely, and that is where the home
+   kept breaking after passing in preview. ?safe=59,34 forces those insets so
+   the phone's real geometry can be reproduced and screenshotted here.
+   Plain URL = untouched. */
+try {
+  const _sp = new URL(location.href).searchParams.get('safe');
+  if (_sp) {
+    const [_st, _sb] = _sp.split(',').map((n) => parseInt(n, 10) || 0);
+    const _s = document.createElement('style');
+    _s.id = 'safeAreaSim';
+    _s.textContent = ':root{--safe-t:' + _st + 'px !important;--safe-b:' + _sb + 'px !important;}';
+    document.head.appendChild(_s);
+  }
+} catch (e) {}
+
 /* v1072 (Malik: "idk if the update didn't push, this is still how it looks").
    The guard above only runs on a page LOAD, and an installed iOS PWA does not
    load when you reopen it: it RESTORES the frozen page. So a phone could sit

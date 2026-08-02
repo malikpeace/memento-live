@@ -3731,7 +3731,7 @@ body.pre-clarity .capture-fab { display: none !important; }
   /* Non-bloom states need the same 29px flow compensation the bloom home has
      (the fixed header vacates its flow space; v245 card-top law). */
   body:not(.has-custom-layout):not(.ns-bloom) .app.dash-v2 #dayCard {
-    margin-top: calc(var(--safe-t, 0px) + 18px) !important; /* v1062: matches the bloom home */
+    margin-top: 18px !important; /* v1073: no double-counted notch, as above */
   }
   /* Gradient tint under the pinned header so content scrolling beneath stays
      legible. GRADIENT ONLY, no backdrop-filter, no mask: the v709 masked-blur
@@ -3781,11 +3781,14 @@ body.pre-clarity .capture-fab { display: none !important; }
        of nearly touching it. PADDING, not more margin: #dayCard's top margin
        collapses against its neighbours, so raising it barely moved the card.
        The height reserve grows to match, so page 1 stays exactly one screen. */
-    /* v1062: the flow offset EQUALS the snap offset (safe-t + 18), so the
-       page rests at the same geometry at load (scrollY 0) and after a snap,
-       and the bottom-anchor math holds on every phone. The old flat 29px
-       disagreed with the snap position by safe-t dependent amounts. */
-    margin: calc(var(--safe-t, 0px) + 18px) 0 0 0 !important; padding-top: 34px !important;
+    /* v1073 (Malik, on a real notched phone): the safe-area inset was counted
+       TWICE at the top. The app already pads its top by the notch, and the
+       page-1 column starts below that padding (--p1-top measured 75 on his
+       phone), then this margin added the SAME inset again. 59px of his card
+       went to a notch that was already cleared, which is why the Memento
+       looked short with the header floating far above it. The column owns
+       the notch now; this is just the gap to the header. */
+    margin: 18px 0 0 0 !important; padding-top: 34px !important;
     grid-column: auto !important; grid-row: auto !important;
   }
   /* v979 (Malik): the card is BIGGER now that the bottom bar is gone, and page 1
