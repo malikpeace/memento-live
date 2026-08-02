@@ -565,11 +565,21 @@ function renderConsistencyViews() {
   const view = (state.ui && state.ui.consistencyView) || 'heatmap';
   const seg = (v, label) => '<button type="button" class="hmseg__btn' + (v === view ? ' hmseg__btn--on' : '') + '" data-cview="' + v + '" aria-pressed="' + (v === view) + '">' + label + '</button>';
   const control = '<div class="hmseg cview__seg">' + seg('heatmap', 'Heatmap') + seg('chain', 'Chain') + seg('month', 'Month') + '</div>';
+  // v1058 (Malik): what the HOME CARD's consistency face shows. Picked here,
+  // remembered everywhere (state.ui.consistencyFaceView; the desktop hover
+  // fan writes the same preference). Until a pick is ever made the face
+  // follows tenure, so the row shows which one is live either way.
+  const fv = (typeof ccFaceView === 'function') ? ccFaceView() : 'week';
+  const fseg = (v, label) => '<button type="button" class="hmseg__btn' + (v === fv ? ' hmseg__btn--on' : '') + '" data-cfview="' + v + '" aria-pressed="' + (v === fv) + '">' + label + '</button>';
+  const faceControl = '<div class="cview__facepick">' +
+    '<div class="cview__facepick-l">Home card</div>' +
+    '<div class="hmseg">' + fseg('week', 'Week') + fseg('month', 'Month') + fseg('year', 'Year') + fseg('curve', 'Curve') + '</div>' +
+    '</div>';
   let body = '';
   if (view === 'chain') body = renderChainCalendar();
   else if (view === 'month') { const now = new Date(); const y = (typeof calYear === 'number') ? calYear : now.getFullYear(); const m = (typeof calMonth === 'number') ? calMonth : now.getMonth(); body = renderCalendar(y, m); }
   else body = renderConsistencyHeatmap() + renderHeatmapControls();
-  return '<div class="cview">' + control + '<div class="cview__body">' + body + '</div></div>';
+  return '<div class="cview">' + control + '<div class="cview__body">' + body + '</div>' + faceControl + '</div>';
 }
 
 // "Don't break the chain": a continuous run of green X marks, most recent at the

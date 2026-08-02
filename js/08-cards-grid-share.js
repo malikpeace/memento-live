@@ -3693,6 +3693,70 @@ function hasFreshWeeklyCard() {
 // fan: never persisted, so every launch lands on today's action.
 let _ccPillar = 'action';
 const CC_PILLARS = ['action', 'clarity', 'consistency'];
+// ── The consistency FACE VIEWS (v1058, Malik's spec) ─────────────────
+// Four ways to see the same record: week / month / year / curve. The
+// person picks inside the Consistency module (or the desktop hover fan);
+// the face remembers. Until they ever pick, the default follows tenure:
+// week in the early days (day 5 = five honest squares, not a wasteland),
+// month once there IS a month, year once there is a year.
+const CC_FACE_VIEWS = ['week', 'month', 'year', 'curve'];
+function ccFaceViewDefault() {
+  try {
+    const c = consistencyStats().counts || {};
+    const keys = Object.keys(c).filter((k) => consistencyDayHasMainAction(c[k])).sort();
+    if (!keys.length) return 'week';
+    const span = (Date.now() - new Date(keys[0] + 'T00:00:00')) / 86400000;
+    if (span >= 350) return 'year';
+    if (span >= 28) return 'month';
+  } catch (e) {}
+  return 'week';
+}
+function ccFaceView() {
+  const v = state.ui && state.ui.consistencyFaceView;
+  return CC_FACE_VIEWS.indexOf(v) >= 0 ? v : ccFaceViewDefault();
+}
+function ccFaceGraph(view, wide) {
+  try {
+    const st = consistencyStats();
+    const c = st.counts || {};
+    const tn = _dayNum(getTodayISO());
+    const on = (dn) => consistencyDayHasMainAction(c[_keyFromDayNum(dn)]);
+    const cell = (dn) => '<i class="ccvg__c' + (dn === tn ? ' now' : (on(dn) ? ' on' : '')) + '"></i>';
+    if (view === 'week') {
+      let h = '';
+      for (let d = 6; d >= 0; d--) h += cell(tn - d);
+      return '<div class="cc-vg cc-vg--week" aria-hidden="true">' + h + '</div>';
+    }
+    if (view === 'month') {
+      let h = '';
+      for (let d = 27; d >= 0; d--) h += cell(tn - d);
+      return '<div class="cc-vg cc-vg--month" aria-hidden="true">' + h + '</div>';
+    }
+    if (view === 'curve') {
+      // Active days per week, last 10 weeks, one line. Momentum, not a
+      // record: the shape is the message, so no axes and no labels.
+      const pts = [];
+      for (let w = 9; w >= 0; w--) {
+        let n = 0;
+        for (let d = 0; d < 7; d++) if (on(tn - (w * 7 + d))) n++;
+        pts.push(n);
+      }
+      const W = 300, H = 52, max = Math.max(1, Math.max.apply(null, pts));
+      const xy = pts.map((v, i) => [(i / (pts.length - 1)) * W, H - 5 - (v / max) * (H - 10)]);
+      const path = xy.map((pt, i) => (i ? 'L' : 'M') + pt[0].toFixed(1) + ' ' + pt[1].toFixed(1)).join(' ');
+      const last = xy[xy.length - 1];
+      return '<div class="cc-vg cc-vg--curve" aria-hidden="true">' +
+        '<svg width="100%" height="52" viewBox="0 0 300 52" preserveAspectRatio="none">' +
+        '<path d="' + path + '" fill="none" stroke="var(--color-consistency, #3fd94e)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>' +
+        '<circle cx="' + last[0].toFixed(1) + '" cy="' + last[1].toFixed(1) + '" r="3.4" fill="var(--color-consistency, #3fd94e)"/>' +
+        '</svg></div>';
+    }
+    let hm = '';
+    try { hm = renderConsistencyHeatmap(wide ? 53 : 40, 'rolling', true); } catch (e) {}
+    return hm ? '<div class="cc-heat">' + hm + '</div>' : '';
+  } catch (e) { return ''; }
+}
+
 function renderCommandCenter() {
   try {
     // Seal closed days into the offering ledger (defined in js/02, loaded
@@ -3754,28 +3818,19 @@ function renderCommandCenter() {
         const cs = (typeof consistencyStats === 'function') ? consistencyStats() : null;
         _s = (cs && cs.current) || 0; _b = (cs && cs.longest) || 0; _act = (cs && cs.totalActiveDays) || 0;
       } catch (e) {}
-      // v1054 (Malik): the real heatmap, not a description of one. Same
-      // renderer the Consistency band uses. The week count is doing double
-      // duty here: 'fit' sizes each square to the card width, so FEWER weeks
-      // means BIGGER squares and a TALLER block. The card's height budget is
-      // fixed (see .cc-card--pillars), so the range is what buys the fit: 14
-      // weeks overflowed by ~150px, 40 lands inside it and shows most of a
-      // year, which is the more honest picture anyway.
-      let _hm = '';
-      try { _hm = renderConsistencyHeatmap(40, 'rolling', true); } catch (e) {}
+      // v1058 (Malik: "I kinda want the 8 to be bigger", his variants 1+2):
+      // the number IS the headline, its meaning beside it in small type, the
+      // picked view underneath. The graph carries the history, so no
+      // sentence restates it.
       return wrap(eyebrow('Consistency') +
-        '<div style="font-size:1.15rem;font-weight:700;line-height:1.3;color:var(--text-hi);">' +
-          (_s === 1 ? '1 day in a row.' : _s.toLocaleString() + ' days in a row.') + '</div>' +
-        // When the graph is in the card it already SHOWS the active days and
-        // the long runs, so the sentence restating them is both redundant and
-        // the ~26px that pushed the card under the home indicator. It stays as
-        // the fallback for anyone whose graph failed to render.
-        (_hm ? '' :
-          '<div style="font-size:0.9rem;line-height:1.5;color:var(--text-2);margin-top:5px;">' +
-            (_act ? _act.toLocaleString() + ' active days' : '') +
-            (_act && _b ? ' \u00b7 ' : '') +
-            (_b ? 'longest run ' + _b.toLocaleString() : '') + '</div>') +
-        (_hm ? '<div class="cc-heat">' + _hm + '</div>' : '') +
+        '<div class="cc-bigrow">' +
+          '<span class="cc-bignum">' + _s.toLocaleString() + '</span>' +
+          '<span class="cc-bigmeta">' + (_s === 1 ? 'day in a row' : 'days in a row') +
+            ((_b || _act) ? '<br>' + (_b ? 'best ' + _b.toLocaleString() : '') +
+              (_b && _act ? ' \u00b7 ' : '') + (_act ? _act.toLocaleString() + ' active' : '') : '') +
+          '</span>' +
+        '</div>' +
+        ccFaceGraph(ccFaceView(), false) +
         dots(2));
     }
 
@@ -4169,25 +4224,27 @@ function renderDeskMission() {
           return label('Your Neutron Star') + head(star || 'Your Neutron Star');
         },
         consistency: () => {
-          const days = streak.toLocaleString();
-          let hm = '';
-          // Same trade as the phone card: 'fit' sizes the squares to the
-          // container, so on this much wider card a short range made them
-          // huge and the graph overflowed the box by 134px. A full year both
-          // fits and suits the width.
-          try { hm = renderConsistencyHeatmap(53, 'rolling', true); } catch (e) {}
+          // v1058 (Malik's variants 1+2 + his view spec): the number IS the
+          // headline, meta beside it, the picked view under it, and a small
+          // fan of the OTHER views that arrives on hover (desktop has the
+          // room; the phone picks inside the module only).
+          const view = ccFaceView();
+          const VNAMES = { week: 'Week', month: 'Month', year: 'Year', curve: 'Curve' };
+          const vfan = '<div class="dkm__vfan">' +
+            '<span class="dkm__vfan-cur">' + VNAMES[view] + '</span>' +
+            CC_FACE_VIEWS.filter((v) => v !== view).map((v) =>
+              '<button class="dkm__vfan-btn" type="button" data-dkm-view="' + v + '">' + VNAMES[v] + '</button>').join('') +
+            '</div>';
           return label('Consistency') +
-            head(streak === 1 ? '1 day in a row.' : days + ' days in a row.') +
-            // The graph shows the active days and the long runs, so the
-            // sentence restating them is redundant, and its ~28px is what
-            // pushed the graph flush against the card's bottom edge. Kept as
-            // the fallback for anyone whose graph failed to render.
-            (hm ? '' :
-              '<div class="dkm__sub">' +
-                (_active ? _active.toLocaleString() + ' active days so far. ' : '') +
-                (_best ? 'Longest run: ' + _best.toLocaleString() + '.' : '') +
-              '</div>') +
-            (hm ? '<div class="dkm__heat">' + hm + '</div>' : '');
+            '<div class="cc-bigrow cc-bigrow--desk">' +
+              '<span class="cc-bignum">' + streak.toLocaleString() + '</span>' +
+              '<span class="cc-bigmeta">' + (streak === 1 ? 'day in a row' : 'days in a row') +
+                ((_best || _active) ? '<br>' + (_best ? 'best ' + _best.toLocaleString() : '') +
+                  (_best && _active ? ' \u00b7 ' : '') + (_active ? _active.toLocaleString() + ' active' : '') : '') +
+              '</span>' +
+            '</div>' +
+            vfan +
+            ccFaceGraph(view, true);
         }
       };
       const NAMES = { action: 'Today&rsquo;s Action', clarity: 'Your Neutron Star', consistency: 'Consistency' };
@@ -4219,6 +4276,19 @@ function renderDeskMission() {
         b.addEventListener('click', (ev) => {
           ev.stopPropagation();
           _deskPillar = b.getAttribute('data-dkm-pillar');
+          renderDeskMission();
+        });
+      });
+      // v1058: the consistency view fan. Picking here is the same act as
+      // picking inside the module: one persisted preference, every surface
+      // (this card, the phone card) follows it.
+      el.querySelectorAll('[data-dkm-view]').forEach((b) => {
+        if (b.closest('.dkm__inv')) return;
+        b.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          if (!state.ui) state.ui = {};
+          state.ui.consistencyFaceView = b.getAttribute('data-dkm-view');
+          try { persistNow(); } catch (e) {}
           renderDeskMission();
         });
       });

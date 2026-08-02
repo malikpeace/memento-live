@@ -2052,6 +2052,17 @@ const SHEET_TEMPLATES = {
         if (vb) { if (!state.ui) state.ui = {}; state.ui.consistencyView = vb.getAttribute('data-cview'); try { persistNow(); } catch (_) {} reRender(); return; }
         const sb = e.target.closest('[data-cscale]');
         if (sb) { if (!state.ui) state.ui = {}; state.ui.consistencyScale = sb.getAttribute('data-cscale'); try { persistNow(); } catch (_) {} reRender(); return; }
+        // v1058: the home-card face view. Persist AND repaint the home behind
+        // the sheet, so the card has already changed when the sheet closes.
+        const fb = e.target.closest('[data-cfview]');
+        if (fb) {
+          if (!state.ui) state.ui = {};
+          state.ui.consistencyFaceView = fb.getAttribute('data-cfview');
+          try { persistNow(); } catch (_) {}
+          try { renderAll(); } catch (_) {}
+          reRender();
+          return;
+        }
       });
 
       // Calendar nav (only present in Month view)

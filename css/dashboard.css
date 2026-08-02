@@ -4621,6 +4621,62 @@ body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-card--pill
    the Consistency band, just given a short rolling range and told to fill the
    width it is handed. */
 .cc-heat, .dkm__heat { margin-top: 12px; }
+
+/* ── The consistency face: big number + switchable views (v1058) ─────────
+   The number is the headline (his variants 1 and 2): huge, tabular, with
+   its meaning in small type beside it. Below it, whichever view of the
+   record is picked (week / month / year / curve). */
+.cc-bigrow { display: flex; align-items: baseline; gap: 12px; }
+.cc-bignum {
+  font-size: 44px; font-weight: 750; letter-spacing: -0.035em; line-height: 1;
+  font-variant-numeric: tabular-nums; color: var(--text-hi);
+}
+.cc-bigrow--desk .cc-bignum { font-size: 54px; }
+.cc-bigmeta { font-size: 12.5px; line-height: 1.45; color: var(--text-2); }
+/* The week/month cell views. Sized so week reads chunky and month reads as
+   four calm rows; both stay well inside the phone card's height budget. */
+.cc-vg { margin-top: 14px; }
+.cc-vg--week { display: flex; gap: 6px; }
+.cc-vg--week .ccvg__c { flex: 1 1 0; max-width: 34px; height: 14px; border-radius: 3px; }
+.cc-vg--month { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; max-width: 220px; }
+.cc-vg--month .ccvg__c { height: 10px; border-radius: 2px; }
+.ccvg__c { background: var(--ccvg-off, rgba(255, 255, 255, 0.10)); }
+.ccvg__c.on { background: rgba(var(--success-rgb), 0.72); }
+.ccvg__c.now { background: var(--color-consistency, #3fd94e); }
+.cc-vg--curve svg { display: block; width: 100%; }
+html.theme-light .ccvg__c { background: var(--ccvg-off, rgba(var(--ink), 0.10)); }
+html.theme-light .ccvg__c.on { background: rgba(var(--success-rgb), 0.72); }
+html.theme-light .ccvg__c.now { background: var(--color-consistency, #3fd94e); }
+/* Inside the invert twin the ground flips, so the empty cells flip with it
+   (the active greens hold in both worlds, same rule as the heatmap). */
+.cc-inv .cc-vg, #deskMission .dkm__inv .cc-vg { --ccvg-off: rgba(11, 17, 18, 0.12); }
+html.theme-light .cc-inv .cc-vg,
+html.theme-light #deskMission .dkm__inv .cc-vg { --ccvg-off: rgba(255, 255, 255, 0.16); }
+
+/* The desktop view fan: same motion language as the pillar fan. At rest only
+   the live view's word; the other three widen in when the mouse arrives. */
+.dkm__vfan { display: flex; align-items: baseline; margin: 10px 0 0; min-height: 14px; }
+.dkm__vfan-cur, .dkm__vfan-btn {
+  font-size: 11.5px; font-weight: 650; letter-spacing: 0.01em;
+  line-height: 1; white-space: nowrap;
+}
+.dkm__vfan-cur { color: var(--text-mid, var(--text-2)); }
+.dkm__vfan-btn {
+  color: var(--text-lo); background: none; border: 0; padding: 0; margin: 0; cursor: pointer;
+  max-width: 0; opacity: 0; overflow: hidden;
+  transition: max-width 280ms cubic-bezier(.3, .85, .3, 1),
+              opacity 200ms ease-out,
+              margin-left 280ms cubic-bezier(.3, .85, .3, 1),
+              color 160ms ease;
+}
+#deskMission.dkm--pillars:hover .dkm__vfan-btn,
+#deskMission.dkm--pillars:focus-within .dkm__vfan-btn {
+  max-width: 80px; opacity: 0.7; margin-left: 14px;
+}
+.dkm__vfan-btn:hover { color: var(--text-hi); }
+#deskMission .dkm__inv .dkm__vfan-cur { color: rgba(11, 17, 18, 0.55); }
+html.theme-light #deskMission .dkm__inv .dkm__vfan-cur { color: rgba(245, 245, 247, 0.6); }
+@media (prefers-reduced-motion: reduce) { .dkm__vfan-btn { transition: opacity 120ms ease-out; } }
 /* v1057, Malik's "Day remaining" pick: a 2px hairline that drains toward the
    4am day boundary. No numbers, no clock; the length IS the message. The
    bright segment is what REMAINS, so it shortens as the day burns down. */

@@ -622,6 +622,10 @@ body.calm-motion .sheet--exp.open .exp-reveal { animation: none; opacity: 1; tra
 /* === Consistency module: view toggle, chain, breakdowns, milestone ladder === */
 .cview { margin-top: 2px; }
 .cview__seg { display: inline-flex; margin: 0 auto 14px; }
+
+/* v1058: the "what the home card shows" picker, quiet, under the views. */
+.cview__facepick { display: flex; align-items: center; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
+.cview__facepick-l { font-size: 12px; font-weight: 650; color: var(--text-lo); }
 .cview { text-align: center; }
 .cview__body { text-align: left; }
 /* Don't break the chain */
