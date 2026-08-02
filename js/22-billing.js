@@ -203,7 +203,8 @@ const PolarBilling = (function () {
         verifiedAt: verifiedAccess.verifiedAt,
         freshUntil: verifiedUntil,
         graceUntil: verifiedGraceUntil,
-        validUntil: verifiedAccess.validUntil || null
+        validUntil: verifiedAccess.validUntil || null,
+        willRenew: typeof verifiedAccess.willRenew === 'boolean' ? verifiedAccess.willRenew : null
       }));
     } catch (e) {}
   }
@@ -240,6 +241,9 @@ const PolarBilling = (function () {
     }
     const now = Date.now();
     const validUntil = access.validUntil || access.valid_until || null;
+    const willRenew = typeof access.willRenew === 'boolean'
+      ? access.willRenew
+      : (typeof access.will_renew === 'boolean' ? access.will_renew : null);
     const graceUntil = accessDeadline(now, validUntil);
     if (graceUntil <= now) {
       clearAccess(true);
@@ -250,7 +254,8 @@ const PolarBilling = (function () {
       plan,
       environment,
       verifiedAt: now,
-      validUntil
+      validUntil,
+      willRenew
     };
     verifiedUntil = now + ACCESS_TTL_MS;
     verifiedGraceUntil = graceUntil;
@@ -311,7 +316,8 @@ const PolarBilling = (function () {
       plan: receipt.plan,
       environment,
       verifiedAt: receipt.verifiedAt,
-      validUntil: receipt.validUntil || null
+      validUntil: receipt.validUntil || null,
+      willRenew: typeof receipt.willRenew === 'boolean' ? receipt.willRenew : null
     };
     verifiedUntil = receipt.freshUntil;
     verifiedGraceUntil = receipt.graceUntil;
@@ -450,12 +456,33 @@ const PolarBilling = (function () {
     return status === 0 || status === 408 || status === 425 || status === 429 || status >= 500;
   }
 
+  function errorEndpoint(environment, action) {
+    const prefix = environment === 'production' ? 'polar_production_' : 'polar_';
+    return prefix + action;
+  }
+
+  function markBilling(value) {
+    try { if (window.MementoErrors) MementoErrors.mark(value); } catch (e) {}
+  }
+
+  function reportBillingFailure(environment, action, error, phase) {
+    try {
+      if (!window.MementoErrors) return;
+      MementoErrors.reportBackend({
+        endpoint: errorEndpoint(environment, action),
+        status: Number(error && error.status) || 0,
+        phase: phase
+      });
+    } catch (e) {}
+  }
+
   async function refreshAccess(checkoutId) {
     // v1024: a refresh attempted while the session is transiently absent is a
     // no-op, never a receipt wipe. Real sign-outs clear via noteSignedOut.
     if (!loggedIn()) return null;
     if (refreshInFlight) return refreshInFlight;
     const environment = billingEnvironment();
+    markBilling('billing_refresh');
     refreshInFlight = (async function () {
       try {
         const access = await invoke(FUNCTIONS[environment].access, checkoutId
@@ -463,8 +490,10 @@ const PolarBilling = (function () {
           : {});
         if (access.active) finishVerifiedUnlock(access);
         else clearAccess(true);
+        markBilling(access.active ? 'billing_verified' : 'billing_inactive');
         return access;
       } catch (e) {
+        reportBillingFailure(environment, 'access', e, 'verify');
         if (!transientRefreshFailure(e)) clearAccess(true);
         else if (hasVerifiedAccess()) scheduleRefresh(RETRY_DELAY_MS);
         return null;
@@ -482,9 +511,11 @@ const PolarBilling = (function () {
     try {
       const result = await invoke(FUNCTIONS[environment].portal, {});
       if (!result.portal_url || result.environment !== environment) return false;
+      markBilling('billing_portal');
       location.assign(result.portal_url);
       return true;
     } catch (e) {
+      reportBillingFailure(environment, 'portal', e, 'fetch');
       return false;
     } finally {
       busy = false;

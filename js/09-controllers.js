@@ -5485,7 +5485,7 @@ const TabBar = {
     const status = lifetime
       ? 'Yours for life &middot; nothing renews, nothing expires'
       : renewText
-        ? 'Active &middot; renews <b style="color:var(--text-1);font-weight:650;">' + esc(renewText) + '</b>'
+        ? 'Active &middot; ' + (access.willRenew === false ? 'access until ' : 'renews ') + '<b style="color:var(--text-1);font-weight:650;">' + esc(renewText) + '</b>'
         : 'Active';
     // The guarantee runs on production billing only; in sandbox it would just
     // throw, so the row does not render there.
@@ -5509,7 +5509,7 @@ const TabBar = {
             : '<button type="button" class="pb-btn" id="planPortal">Manage plan</button>') +
           (production ? '<button type="button" class="pb-btn pb-btn--quiet" id="planGuarantee">Locked-In Guarantee</button>' : '') +
           (!lifetime && renewText
-            ? '<div style="font-size:0.6875rem;color:var(--text-3);line-height:1.45;margin:10px 0 12px;">Cancel anytime in Manage plan. Your access stays until <b style="color:var(--text-2);font-weight:650;">' + esc(renewText) + '</b>, and everything you have built stays on this device either way.</div>'
+            ? '<div style="font-size:0.6875rem;color:var(--text-3);line-height:1.45;margin:10px 0 12px;">' + (access.willRenew === false ? 'Your subscription is canceled.' : 'Cancel anytime in Manage plan.') + ' Your access stays until <b style="color:var(--text-2);font-weight:650;">' + esc(renewText) + '</b>, and everything you have built stays on this device either way.</div>'
             : '') +
           '<div id="planMsg" style="font-size:0.6875rem;color:var(--text-3);margin-top:2px;"></div>' +
         '</div>' +

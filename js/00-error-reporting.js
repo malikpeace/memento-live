@@ -12,15 +12,18 @@
   const MAX_QUEUE = 20;
   const BREADCRUMBS = new Set([
     'app_boot', 'app_ready', 'became_hidden', 'became_visible',
-    'network_offline', 'network_online', 'sync_pull', 'sync_push'
+    'network_offline', 'network_online', 'sync_pull', 'sync_push',
+    'billing_refresh', 'billing_verified', 'billing_inactive', 'billing_portal'
   ]);
   const ENDPOINTS = new Set([
     'account_delete', 'ai_proxy', 'auth', 'cloud_sync',
-    'ics_proxy', 'push', 'unknown'
+    'ics_proxy', 'polar_access', 'polar_checkout', 'polar_portal',
+    'polar_production_access', 'polar_production_checkout',
+    'polar_production_portal', 'push', 'unknown'
   ]);
   const PHASES = new Set([
-    'boot', 'delete', 'fetch', 'flush', 'pull',
-    'push', 'reauth', 'render', 'restore', 'unknown'
+    'boot', 'create', 'delete', 'fetch', 'flush', 'pull',
+    'push', 'reauth', 'render', 'restore', 'verify', 'unknown'
   ]);
 
   let breadcrumbs = ['app_boot'];
