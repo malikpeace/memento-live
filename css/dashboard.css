@@ -3094,22 +3094,25 @@ body.lite .daycard-motion-cta, html.lowfx .daycard-motion-cta { backdrop-filter:
   will-change: transform;
   -webkit-tap-highlight-color: transparent;
 }
-/* v1056 (Malik: "whenever the card is tilting you can see behind it and you
-   see this black"). The tilt used to rotate the CARD alone while its bloom
-   and floor stayed bolted to the page, so any tilt pulled the card's edge
-   away from the glow that hugs it and opened a black seam between them.
-   The card, its bloom and its floor are one physical object, so the STAGE
-   carries the rotation and everything moves together; the card's own
-   transform is disabled inside a stage so the two can never double-rotate.
-   (bindDayCardTilt sets the vars on the stage when one exists.) The card
-   keeps its clip-path + contain:paint corner fix; the stage rotating as a
-   flat unit does not re-open that. */
-.daycard-living-stage {
+/* v1056 -> v1062. v1056 rotated the whole STAGE so the bloom stopped
+   detaching from the card (the black tilt seam). But the stage also carries
+   the FLOOR, and a 3D rotation on that blurred+masked layer made the whole
+   reflection drop out on desktop (Malik: "it just completely disappears").
+   v1062: the rotating group is the CARD + BLOOM only, each carrying the
+   identical transform about the same centre (the bloom is inset
+   symmetrically, so their centres coincide and they move as one). The floor
+   never rotates: the ground does not lean when the object above it does.
+   The vars still live on the stage (bindDayCardTilt), inherited by both. */
+.daycard-living-stage .daycard-ns {
   transform: perspective(900px) rotateX(var(--dc-rx, 0deg)) rotateY(var(--dc-ry, 0deg));
   transition: transform 0.18s ease-out;
   will-change: transform;
 }
-.daycard-living-stage .daycard-ns { transform: none; }
+.daycard-theme-living .daycard-bloom {
+  transform: perspective(900px) rotateX(var(--dc-rx, 0deg)) rotateY(var(--dc-ry, 0deg));
+  transition: opacity 0.9s ease, transform 0.18s ease-out;
+  will-change: transform;
+}
 /* Liquid-glass rim: a 1.5px ring of caught light drawn with a gradient and
    a mask (NOT a border, so it reads as the edge of glass catching the room,
    bright top-left, dark mid, soft return at bottom-right). */
@@ -3640,13 +3643,17 @@ body.pre-clarity .capture-fab { display: none !important; }
      (the v696 note recorded the JS version as janky on the home). */
   html { scroll-snap-type: y mandatory; scroll-padding-top: calc(var(--safe-t, 0px) + 18px); }
   /* ONE source of truth for page-1 sizing, so the blank and the colored home can
-     never drift apart (the v245 pixel-parity law). The height reserve is: the
-     card's own top offset (45) + the gap to the Today box (26) + the box (205) +
-     the breathing room under it (40). The clamp keeps a small phone from
-     overflowing and a huge one from going silly. */
+     never drift apart (the v245 pixel-parity law).
+     v1062, MALIK'S LAYOUT LAW (he had to say it several times, never again):
+     the today box sits at the VERY BOTTOM of the screen, 15px above the home
+     indicator, and the Memento takes EVERYTHING else. No dead band below the
+     box, ever. The reserve is exact: snap offset (safe-t+18) + card top pad
+     (34) + gap (16) + box (212) + bottom buffer (15 + safe-b), so the card's
+     height IS the leftover space. The old 560px ceiling is gone: on a tall
+     phone the card grows, that is the point. */
   :root {
     --p1-card-w: min(88vw, 352px);
-    --p1-card-h: clamp(330px, calc(100svh - var(--safe-t, 0px) - 332px), 560px);
+    --p1-card-h: clamp(330px, calc(100svh - var(--safe-t, 0px) - var(--safe-b, 0px) - 309px), 900px); /* 309 = 18 snap + 34 pad + 14 stage margin + 16 gap + 212 box + 15 buffer */
   }
   /* The two snap stops: page 1 starts at the card, page 2 starts at the modules. */
   body:not(.has-custom-layout) .app.dash-v2 #dayCard { scroll-snap-align: start; }
@@ -3681,7 +3688,7 @@ body.pre-clarity .capture-fab { display: none !important; }
   /* Non-bloom states need the same 29px flow compensation the bloom home has
      (the fixed header vacates its flow space; v245 card-top law). */
   body:not(.has-custom-layout):not(.ns-bloom) .app.dash-v2 #dayCard {
-    margin-top: 29px !important;
+    margin-top: calc(var(--safe-t, 0px) + 18px) !important; /* v1062: matches the bloom home */
   }
   /* Gradient tint under the pinned header so content scrolling beneath stays
      legible. GRADIENT ONLY, no backdrop-filter, no mask: the v709 masked-blur
@@ -3731,7 +3738,11 @@ body.pre-clarity .capture-fab { display: none !important; }
        of nearly touching it. PADDING, not more margin: #dayCard's top margin
        collapses against its neighbours, so raising it barely moved the card.
        The height reserve grows to match, so page 1 stays exactly one screen. */
-    margin: 29px 0 0 0 !important; padding-top: 34px !important;
+    /* v1062: the flow offset EQUALS the snap offset (safe-t + 18), so the
+       page rests at the same geometry at load (scrollY 0) and after a snap,
+       and the bottom-anchor math holds on every phone. The old flat 29px
+       disagreed with the snap position by safe-t dependent amounts. */
+    margin: calc(var(--safe-t, 0px) + 18px) 0 0 0 !important; padding-top: 34px !important;
     grid-column: auto !important; grid-row: auto !important;
   }
   /* v979 (Malik): the card is BIGGER now that the bottom bar is gone, and page 1

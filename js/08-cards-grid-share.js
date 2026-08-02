@@ -4450,6 +4450,7 @@ function bindCommandCenter(cc) {
         if (e.target && e.target.closest && e.target.closest('.cc-vsel')) return;
         x0 = e.clientX; y0 = e.clientY; axis = null;
         card.dataset.swiping = '';
+        prebuildDeck();
       });
       // ── THE DECK (v1060, Malik: "like swiping through a layer of photos
       // on iPhone, smooth clean and simple"). The cards are a physical stack:
@@ -4457,6 +4458,7 @@ function bindCommandCenter(cc) {
       // finger moves the top card 1:1 out of the way, and committing sends it
       // off while the one beneath rises into place. No fade-and-replace.
       let under = null, underPillar = null;
+      const preEls = {};   // pillar -> prebuilt under-card, made at touch-down
       const nextPillar = (dir) => {
         const i = CC_PILLARS.indexOf(_ccPillar);
         return CC_PILLARS[(i + (dir < 0 ? 1 : -1) + CC_PILLARS.length) % CC_PILLARS.length];
@@ -4491,24 +4493,46 @@ function bindCommandCenter(cc) {
           return u;
         } catch (e) { return null; }
       };
+      // v1062 (Malik: "sometimes it's a bit choppy"): both neighbours are
+      // prebuilt at TOUCH-DOWN, while the finger is still resting, so the
+      // first dragged frame never pays for a render. armDeck just reveals.
+      const prebuildDeck = () => {
+        try {
+          const i = CC_PILLARS.indexOf(_ccPillar);
+          [CC_PILLARS[(i + 1) % CC_PILLARS.length], CC_PILLARS[(i + 2) % CC_PILLARS.length]].forEach((pl) => {
+            if (preEls[pl]) return;
+            const u = buildUnder(pl);
+            if (u) { u.style.display = 'none'; preEls[pl] = u; cc.insertBefore(u, card); }
+          });
+          cc.style.position = 'relative';
+        } catch (e) {}
+      };
       const armDeck = (dir) => {
         const want = nextPillar(dir);
         if (under && underPillar === want) return;
-        if (under) under.remove();
+        if (under) under.style.display = 'none';
         underPillar = want;
-        under = buildUnder(want);
+        under = preEls[want] || (preEls[want] = buildUnder(want));
         if (under) {
           cc.style.position = 'relative';
           cc.classList.add('cc-deck-live');
           card.style.position = 'relative';
           card.style.zIndex = '1';
-          cc.insertBefore(under, card);
+          if (!under.parentNode) cc.insertBefore(under, card);
+          // rest pose, in case a direction reversal re-reveals it mid-gesture
+          under.style.transition = 'none';
+          under.style.transform = 'scale(0.94) translateY(7px)';
+          under.style.opacity = '0.85';
+          under.style.display = '';
+          void under.offsetWidth;
+          under.style.transition = '';
         }
       };
       const disarmDeck = () => {
         cc.classList.remove('cc-deck-live');
         card.style.zIndex = '';
-        if (under) { under.remove(); under = null; underPillar = null; }
+        Object.keys(preEls).forEach((k) => { try { preEls[k].remove(); } catch (e) {} delete preEls[k]; });
+        under = null; underPillar = null;
       };
       card.addEventListener('pointermove', (e) => {
         if (x0 === null) return;
@@ -4527,6 +4551,7 @@ function bindCommandCenter(cc) {
         if (axis !== 'x') return;
         e.preventDefault();
         if (dx !== 0) armDeck(dx);
+        void 0;
         // 1:1 follow with a whisper of rotation; the top card is an object in
         // the hand, not a value being interpolated.
         card.style.transform = 'translateX(' + dx.toFixed(1) + 'px) rotate(' + (dx * 0.02).toFixed(2) + 'deg)';
@@ -4562,7 +4587,7 @@ function bindCommandCenter(cc) {
             card.dataset.swiping = '';
             card.style.transition = ''; card.style.transform = '';
             try { cc.innerHTML = renderCommandCenter(); bindCommandCenter(cc); } catch (e2) {}
-          }, 250);
+          }, 300);
           return;
         }
         // CANCEL: spring home, the stack settles back down.
@@ -4791,11 +4816,18 @@ function bindCommandCenter(cc) {
         // horizontal drag is live, so letting go after a swipe never opens
         // Action underneath it.
         if (card.dataset.swiping === '1') return;
-        // The card lifts toward the viewer and fades as Action rises behind
-        // it, so the module reads as opening OUT OF the card that was tapped.
+        // The card lifts toward the viewer and fades as the module rises
+        // behind it, so it reads as opening OUT OF the card that was tapped.
         card.classList.add('is-launching');
         setTimeout(() => {
-          try { if (typeof ActionExperience !== 'undefined') ActionExperience.open(); } catch (e) {}
+          // v1062 (Malik's glitch report): the tap opens the FACE's module.
+          // Star face -> Clarity, consistency face -> the Consistency module,
+          // action face -> Action. One gesture, one meaning, per pillar.
+          try {
+            if (_ccPillar === 'clarity' && typeof ClarityExperience !== 'undefined') ClarityExperience.open();
+            else if (_ccPillar === 'consistency' && typeof Sheet !== 'undefined') Sheet.open('streak');
+            else if (typeof ActionExperience !== 'undefined') ActionExperience.open();
+          } catch (e) {}
           setTimeout(() => { try { card.classList.remove('is-launching'); } catch (e) {} }, 500);
         }, 190);
       };
