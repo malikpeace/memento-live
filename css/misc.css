@@ -947,13 +947,18 @@ html.theme-light body.lite .tab-bar, html.theme-light.lowfx .tab-bar {
      with air. At the installed app's full height this resolves to the stock
      452px, so the locked-layout law is untouched where it was defined.
      Budget: 100dvh - (45 header + 14 gap + ~205 hero + 8 gap + 92 bar zone). */
+  /* v1063, MALIK'S LAYOUT LAW (supersedes the v245/v748 452px lock): the
+     blank pre-Clarity home obeys the SAME geometry as the earned home: the
+     card's height is the measured leftover space (--p1-card-h, fed by the
+     live box height), the box lands 15px above the bottom, no dead band.
+     The aspect lock died with the fixed height; the card is a portrait
+     rectangle by construction (width min(88vw,352) vs a taller height). */
   body.home-locked #dayCard .daycard-ns,
   body.home-locked #dayCard .daycard-theme-living .daycard-living-stage {
-    height: clamp(260px, calc(100dvh - 414px - var(--safe-b, 0px)), 452px) !important;
+    height: var(--p1-card-h) !important;
     min-height: 0 !important;
-    width: auto !important;
-    aspect-ratio: 320 / 452;
-    max-width: min(82vw, 320px);
+    width: var(--p1-card-w) !important;
+    max-width: none;
   }
   body.home-locked #dashBelow { display: none !important; }
 }

@@ -4623,6 +4623,40 @@ function bindCommandCenter(cc) {
       });
     }
   } catch (e) {}
+  // v1063 (the layout law's missing half): the page-1 card height formula
+  // needs the box's REAL height, because the box is not a constant (the
+  // pre-Clarity first-step copy runs ~260px, a long move grows the Action
+  // face). Measured after every render, so the card always absorbs exactly
+  // the leftover space and the box always lands 15px above the bottom.
+  try {
+    const _b = cc.querySelector('.cc-card');
+    if (_b && window.innerWidth < 768) {
+      document.documentElement.style.setProperty('--p1-box-h', _b.offsetHeight + 'px');
+      // v1064: CLOSED LOOP. Every home state has slightly different chrome
+      // above the card (greeting, margins, per-state paddings), and chasing
+      // each one with arithmetic kept missing by a margin here and a margin
+      // there, which is exactly how the box drifted off the bottom three
+      // times. So: render, MEASURE where the box bottom actually landed,
+      // and trim/grow the card by the exact miss. One pass, no model of the
+      // page needed, correct in every state by construction.
+      // setTimeout, not rAF: rAF is paused on hidden pages, and a PWA can
+      // resume in the background; the anchor must land regardless.
+      setTimeout(() => {
+        try {
+          if (window.scrollY > 50) return;   // only meaningful at page 1 rest
+          const ns = document.querySelector('#dayCard .daycard-ns');
+          if (!ns) return;
+          const safeB = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--safe-b')) || 0;
+          const target = window.innerHeight - safeB - 15;
+          const delta = Math.round(_b.getBoundingClientRect().bottom - target);
+          if (Math.abs(delta) > 2) {
+            const h = Math.max(300, ns.getBoundingClientRect().height - delta);
+            document.documentElement.style.setProperty('--p1-card-h', h.toFixed(0) + 'px');
+          }
+        } catch (e) {}
+      }, 60);
+    }
+  } catch (e) {}
   // v608 (Malik, overnight item 5): first open of a NEW day with a move still
   // pending, the Today panel breathes once so the move is the first thing the
   // eye lands on. Once per day, never when today's action is already done.

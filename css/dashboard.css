@@ -3653,7 +3653,7 @@ body.pre-clarity .capture-fab { display: none !important; }
      phone the card grows, that is the point. */
   :root {
     --p1-card-w: min(88vw, 352px);
-    --p1-card-h: clamp(330px, calc(100svh - var(--safe-t, 0px) - var(--safe-b, 0px) - 309px), 900px); /* 309 = 18 snap + 34 pad + 14 stage margin + 16 gap + 212 box + 15 buffer */
+    --p1-card-h: clamp(300px, calc(100svh - var(--safe-t, 0px) - var(--safe-b, 0px) - 97px - var(--p1-box-h, 212px)), 900px); /* 97 = 18 snap + 34 pad + 14 stage margin + 16 gap + 15 buffer; the box term is MEASURED by js/08 after every render, so a taller face (the pre-Clarity first-step copy, a long move) shrinks the card instead of shoving the box off the bottom */
   }
   /* The two snap stops: page 1 starts at the card, page 2 starts at the modules. */
   body:not(.has-custom-layout) .app.dash-v2 #dayCard { scroll-snap-align: start; }
@@ -3729,7 +3729,7 @@ body.pre-clarity .capture-fab { display: none !important; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter {
     position: relative; z-index: 30;
   }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard {
+  body:is(.ns-bloom, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #dayCard {
     display: flex !important; flex-direction: column; justify-content: center;
     min-height: 0 !important;
     /* top 29px = the pinned header's vacated flow space (v709), so the card
@@ -3751,12 +3751,12 @@ body.pre-clarity .capture-fab { display: none !important; }
      is a clamp instead of a flat 452 so page 1 fills a tall phone without
      overflowing a small one; it is NOT edge-to-edge, it leaves real breathing room
      above the Today box and below it (Malik: "not literally to the exact edges"). */
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-ns {
+  body:is(.ns-bloom, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-ns {
     width: var(--p1-card-w) !important;
     min-height: var(--p1-card-h) !important;
   }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-theme-living .daycard-living-stage { width: var(--p1-card-w) !important; margin-bottom: 0 !important; }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter {
+  body:is(.ns-bloom, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-theme-living .daycard-living-stage { width: var(--p1-card-w) !important; margin-bottom: 0 !important; }
+  body:is(.ns-bloom, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #commandCenter {
     margin: 16px 0 0 !important; grid-column: auto !important; grid-row: auto !important;
   }
   /* v979: the Today box is taller and sits lower, taking back the room the

@@ -27,8 +27,19 @@
 /* INTERNAL colour (clipped INSIDE .daycard-ns) is what lights up during the
    cinema's surge/orb, so it is exempt from the pre-star hide. */
 body:not(.ns-bloom):not(.evo2-surge):not(.evo2-orb) .daycard-theme-living .daycard-ns__liquid,
-body:not(.ns-bloom):not(.evo2-surge):not(.evo2-orb) .daycard-theme-living .daycard-ns__burn {
+body:not(.ns-bloom):not(.evo2-surge):not(.evo2-orb) .daycard-theme-living .daycard-ns__burn,
+body:not(.ns-bloom):not(.evo2-surge):not(.evo2-orb) .daycard-theme-living .daycard-ns__rim {
   opacity: 0 !important;
+}
+/* v1063 (Malik: "in the very beginning it's supposed to be blank"): before
+   the star exists the card emits NOTHING. The stage's ambient halo and the
+   card's own 60px glow are gone pre-Clarity; only the dark lift shadow
+   stays so the card still sits on the page rather than floating flat. */
+body.pre-clarity .daycard-theme-living .daycard-living-stage {
+  box-shadow: 0 12px 38px rgba(0, 0, 0, 0.28);
+}
+body.pre-clarity .daycard-ns {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10), 0 26px 60px rgba(0, 0, 0, 0.45);
 }
 /* EXTERNAL colour (bloom echo, floor reflection, ambient aura) lives OUTSIDE the
    card and would read as a purple BOX around it. It is hidden until the card is
