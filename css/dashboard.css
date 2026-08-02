@@ -4463,8 +4463,14 @@ html.theme-light #deskMission {
 }
 #deskMission.dkm--pillars:hover .dkm__fan-btn,
 #deskMission.dkm--pillars:focus-within .dkm__fan-btn {
-  max-width: 220px; opacity: 0.72; margin-left: 20px;
+  max-width: 220px; opacity: 0.72;
 }
+/* Spacing lives on SIBLINGS, not on the buttons: in the frozen (held) order
+   the live word can sit mid-row, and it needs the same gap the buttons get.
+   First child never gets a margin, so the row's left edge never shifts. */
+.dkm__fan > * + * { margin-left: 0; transition: margin-left 300ms cubic-bezier(.3, .85, .3, 1); }
+#deskMission.dkm--pillars:hover .dkm__fan > * + *,
+#deskMission.dkm--pillars:focus-within .dkm__fan > * + * { margin-left: 20px; }
 .dkm__fan-btn:hover { color: var(--text-hi); }
 
 /* THE INVERT. It rides the EXISTING hold-to-complete (js/08's
@@ -4532,6 +4538,16 @@ html.theme-light .cc-dots i.on { background: var(--text-hi); }
    transform, this only keeps the drag from selecting text or firing the
    browser's own horizontal gestures. */
 .cc-card { touch-action: pan-y; }
+/* THE DECK (v1060). While a swipe is live the cards must read as solid
+   objects stacked on each other, so both layers go OPAQUE: a translucent
+   glass card would show the one beneath THROUGH itself, which reads as a
+   glitch, not a stack (the deck-mockup lesson). Solid surface, same hue. */
+.cc-deck-live .cc-card,
+.cc-under { background: #16181d !important; }
+html.theme-light .cc-deck-live .cc-card,
+html.theme-light .cc-under { background: #ffffff !important; }
+.cc-under { pointer-events: none; box-shadow: var(--shadow-card); overflow: hidden; }
+.cc-under .cc-dots { visibility: hidden; } /* one set of dots at a time */
 @media (prefers-reduced-motion: reduce) { .cc-dots i { transition: none; } }
 
 /* The phone card's invert (v1051). The card starts in the CURRENT theme and
@@ -4620,13 +4636,32 @@ body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-card--pill
 /* The heatmap living inside the today box (v1054). It is the same renderer as
    the Consistency band, just given a short rolling range and told to fill the
    width it is handed. */
+/* v1060 (Malik, resized his window into the in-between band): the old hub
+   headline ("What's today's Action?") belongs to a retired header; no
+   current surface wants it, so it is off everywhere rather than leaking at
+   one odd width. The picker code stays for the dead-code sweep. */
+#hubHeadline { display: none !important; }
+
 .cc-heat, .dkm__heat { margin-top: 12px; }
 
 /* ── The consistency face: big number + switchable views (v1058) ─────────
    The number is the headline (his variants 1 and 2): huge, tabular, with
    its meaning in small type beside it. Below it, whichever view of the
    record is picked (week / month / year / curve). */
-.cc-bigrow { display: flex; align-items: baseline; gap: 12px; }
+.cc-bigrow { display: flex; align-items: center; gap: 14px; }
+/* v1060: the view picker on the phone face is a NATIVE select dressed as a
+   quiet label: no border, no fill, small chevron, right-aligned. Tapping it
+   opens the system picker (that is the "native" feel), and it never competes
+   with the tap-opens-module rule because it stops its own events. */
+.cc-vsel {
+  margin-left: auto; align-self: flex-start;
+  appearance: none; -webkit-appearance: none;
+  font: inherit; font-size: 12px; font-weight: 650;
+  color: var(--text-lo); background: transparent; border: 0; padding: 2px 16px 2px 2px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'><path d='M1 1l3 3 3-3' fill='none' stroke='%23888f9b' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-repeat: no-repeat; background-position: right 2px center;
+}
+.cc-inv .cc-vsel { visibility: hidden; } /* a control has no business on the negative */
 .cc-bignum {
   font-size: 44px; font-weight: 750; letter-spacing: -0.035em; line-height: 1;
   font-variant-numeric: tabular-nums; color: var(--text-hi);
@@ -4671,8 +4706,11 @@ html.theme-light #deskMission .dkm__inv .cc-vg { --ccvg-off: rgba(255, 255, 255,
 }
 #deskMission.dkm--pillars:hover .dkm__vfan-btn,
 #deskMission.dkm--pillars:focus-within .dkm__vfan-btn {
-  max-width: 80px; opacity: 0.7; margin-left: 14px;
+  max-width: 80px; opacity: 0.7;
 }
+.dkm__vfan > * + * { margin-left: 0; transition: margin-left 280ms cubic-bezier(.3, .85, .3, 1); }
+#deskMission.dkm--pillars:hover .dkm__vfan > * + *,
+#deskMission.dkm--pillars:focus-within .dkm__vfan > * + * { margin-left: 14px; }
 .dkm__vfan-btn:hover { color: var(--text-hi); }
 #deskMission .dkm__inv .dkm__vfan-cur { color: rgba(11, 17, 18, 0.55); }
 html.theme-light #deskMission .dkm__inv .dkm__vfan-cur { color: rgba(245, 245, 247, 0.6); }

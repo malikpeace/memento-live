@@ -1346,9 +1346,10 @@ function renderGreeting() {
     // v976: the mobile Settings/You corner icon sits beside the date (the retired
     // bottom bar's You tab). Opens the profile panel via the TabBar machinery.
     const gearHTML = '<button class="wbar__settings" id="wbarSettings" type="button" aria-label="You and settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.5" r="3.4"/><path d="M5.5 19.5c1.2-3.4 3.6-5 6.5-5s5.3 1.6 6.5 5"/></svg></button>';
-    mg.innerHTML = gearHTML + (weeksLeft != null
+    // v1060 (Malik): date first, the profile button on the far right.
+    mg.innerHTML = (weeksLeft != null
       ? '<span class="wbar__date" id="wbarDate" role="button" tabindex="0" aria-label="Show weeks left to live">' + esc(dateStr) + '</span>'
-      : '<span class="wbar__date" id="wbarDate">' + esc(dateStr) + '</span>');
+      : '<span class="wbar__date" id="wbarDate">' + esc(dateStr) + '</span>') + gearHTML;
     const _ws = document.getElementById('wbarSettings');
     if (_ws) _ws.addEventListener('click', function () { try { if (typeof TabBar !== 'undefined' && TabBar.switchTo) TabBar.switchTo('profile'); } catch (e) {} });
     const wd = document.getElementById('wbarDate');
@@ -3822,13 +3823,21 @@ function renderCommandCenter() {
       // the number IS the headline, its meaning beside it in small type, the
       // picked view underneath. The graph carries the history, so no
       // sentence restates it.
+      // v1060: score joins the meta (pct of the last 30 days active), and the
+      // view picker rides the face as a native select, top-right.
+      let _score = 0;
+      try { _score = consistencyStats().pct30 || 0; } catch (e) {}
+      const _vsel = '<select class="cc-vsel" aria-label="Consistency view">' +
+        CC_FACE_VIEWS.map((v) => '<option value="' + v + '"' + (v === ccFaceView() ? ' selected' : '') + '>' +
+          v.charAt(0).toUpperCase() + v.slice(1) + '</option>').join('') + '</select>';
       return wrap(eyebrow('Consistency') +
         '<div class="cc-bigrow">' +
           '<span class="cc-bignum">' + _s.toLocaleString() + '</span>' +
           '<span class="cc-bigmeta">' + (_s === 1 ? 'day in a row' : 'days in a row') +
-            ((_b || _act) ? '<br>' + (_b ? 'best ' + _b.toLocaleString() : '') +
-              (_b && _act ? ' \u00b7 ' : '') + (_act ? _act.toLocaleString() + ' active' : '') : '') +
+            '<br>' + (_score ? 'score ' + _score + '%' : '') +
+              (_score && _b ? ' \u00b7 ' : '') + (_b ? 'best ' + _b.toLocaleString() : '') +
           '</span>' +
+          _vsel +
         '</div>' +
         ccFaceGraph(ccFaceView(), false) +
         dots(2));
@@ -3943,8 +3952,13 @@ function renderCommandCenter() {
           row += '<div style="font-size:0.85rem;line-height:1.45;color:var(--text-mid);margin-bottom:6px;"><span style="color:' + C + ';font-weight:650;">You planned this last night: </span>' + esc(tp.text) + '</div>';
         }
       }
-      if (tiny) row += '<div class="cc-od-sub" style="font-size:0.85rem;line-height:1.45;color:var(--text-mid);margin-bottom:6px;"><span style="color:var(--text-lo);">Minimum: </span>' + esc(tiny) + '</div>';
-      if (how) row += '<div class="cc-od-sub" style="font-size:0.85rem;line-height:1.45;color:var(--text-mid);"><span style="color:var(--text-lo);">If resistance hits: </span>' + esc(how) + '</div>';
+      // v1060 (Malik): the glance face carries the move, the dayline and the
+      // button, nothing else. Minimum and the resistance line are module
+      // detail; on the face they read as clutter (his resized-window catch).
+      if (!_pillared) {
+        if (tiny) row += '<div class="cc-od-sub" style="font-size:0.85rem;line-height:1.45;color:var(--text-mid);margin-bottom:6px;"><span style="color:var(--text-lo);">Minimum: </span>' + esc(tiny) + '</div>';
+        if (how) row += '<div class="cc-od-sub" style="font-size:0.85rem;line-height:1.45;color:var(--text-mid);"><span style="color:var(--text-lo);">If resistance hits: </span>' + esc(how) + '</div>';
+      }
       // v1057 (Malik's pick from the pillar gallery: "Day remaining"). A
       // hairline that DRAINS as the day does, no clock, no numbers: urgency
       // without a countdown reading as cheap. The day is Action's day, 4am
@@ -4111,6 +4125,27 @@ function _ccHeroSwap(mutate) {
 // a relaunch always lands on today's action, never on a screen the person did
 // not choose this session (resume never lands ahead).
 let _deskPillar = 'action';
+// v1060: while the mouse is inside the desktop box, the fans keep the order
+// they were showing when it arrived, so clicks never shuffle the words under
+// the cursor. Cleared on pointerleave; canonical order returns on re-entry.
+let _deskFanHold = null;
+let _deskVfanHold = null;
+function _freezeDeskFans(el) {
+  try {
+    if (!_deskFanHold) {
+      const seen = [...el.querySelectorAll('.dkm__fan .dkm__fan-cur, .dkm__fan .dkm__fan-btn')]
+        .filter((n) => !n.closest('.dkm__inv'))
+        .map((n) => n.getAttribute('data-dkm-pillar') || _deskPillar);
+      if (seen.length === 3) _deskFanHold = seen;
+    }
+    if (!_deskVfanHold) {
+      const seenV = [...el.querySelectorAll('.dkm__vfan .dkm__vfan-cur, .dkm__vfan .dkm__vfan-btn')]
+        .filter((n) => !n.closest('.dkm__inv'))
+        .map((n) => n.getAttribute('data-dkm-view') || ((typeof ccFaceView === 'function') ? ccFaceView() : 'week'));
+      if (seenV.length === 4) _deskVfanHold = seenV;
+    }
+  } catch (e) {}
+}
 function renderDeskMission() {
   try {
     const el = document.getElementById('deskMission');
@@ -4177,6 +4212,7 @@ function renderDeskMission() {
       try { _cs = (typeof consistencyStats === 'function') ? consistencyStats() : null; } catch (e) {}
       const _best = _cs ? (_cs.longest || 0) : 0;
       const _active = _cs ? (_cs.totalActiveDays || 0) : 0;
+      const _score30 = _cs ? (_cs.pct30 || 0) : 0;
       const flameSvg = (n) => {
         const fl = streakFlameTier(n);
         return '<svg class="dkm__flame" width="' + fl.s + '" height="' + fl.s + '" viewBox="0 0 24 24" fill="' + fl.c +
@@ -4230,17 +4266,19 @@ function renderDeskMission() {
           // room; the phone picks inside the module only).
           const view = ccFaceView();
           const VNAMES = { week: 'Week', month: 'Month', year: 'Year', curve: 'Curve' };
+          const vOrder = _deskVfanHold || [view].concat(CC_FACE_VIEWS.filter((v) => v !== view));
           const vfan = '<div class="dkm__vfan">' +
-            '<span class="dkm__vfan-cur">' + VNAMES[view] + '</span>' +
-            CC_FACE_VIEWS.filter((v) => v !== view).map((v) =>
-              '<button class="dkm__vfan-btn" type="button" data-dkm-view="' + v + '">' + VNAMES[v] + '</button>').join('') +
+            vOrder.map((v) => (v === view
+              ? '<span class="dkm__vfan-cur">' + VNAMES[v] + '</span>'
+              : '<button class="dkm__vfan-btn" type="button" data-dkm-view="' + v + '">' + VNAMES[v] + '</button>')).join('') +
             '</div>';
           return label('Consistency') +
             '<div class="cc-bigrow cc-bigrow--desk">' +
               '<span class="cc-bignum">' + streak.toLocaleString() + '</span>' +
               '<span class="cc-bigmeta">' + (streak === 1 ? 'day in a row' : 'days in a row') +
-                ((_best || _active) ? '<br>' + (_best ? 'best ' + _best.toLocaleString() : '') +
-                  (_best && _active ? ' \u00b7 ' : '') + (_active ? _active.toLocaleString() + ' active' : '') : '') +
+                '<br>' + (_score30 ? 'score ' + _score30 + '%' : '') +
+                  (_score30 && _best ? ' \u00b7 ' : '') + (_best ? 'best ' + _best.toLocaleString() : '') +
+                  ((_score30 || _best) && _active ? ' \u00b7 ' : '') + (_active ? _active.toLocaleString() + ' active' : '') +
               '</span>' +
             '</div>' +
             vfan +
@@ -4251,9 +4289,16 @@ function renderDeskMission() {
       const ORDER = ['action', 'clarity', 'consistency'];
       if (ORDER.indexOf(_deskPillar) < 0) _deskPillar = 'action';
       const rest = ORDER.filter((p) => p !== _deskPillar);
+      // v1060 (Malik: "when someone clicks a toggle, the rest of the options
+      // DON'T move"). While the mouse is inside the box the fan's ORDER is
+      // frozen (held), so a click only moves the highlight and swaps the
+      // body; the words stay under the cursor. The canonical order (live one
+      // first, others tucked) comes back only when the mouse leaves.
+      const fanOrder = _deskFanHold || [_deskPillar].concat(rest);
       const fan = '<div class="dkm__fan">' +
-        '<span class="dkm__fan-cur">' + NAMES[_deskPillar] + '</span>' +
-        rest.map((p) => '<button class="dkm__fan-btn" type="button" data-dkm-pillar="' + p + '">' + NAMES[p] + '</button>').join('') +
+        fanOrder.map((p) => (p === _deskPillar
+          ? '<span class="dkm__fan-cur">' + NAMES[p] + '</span>'
+          : '<button class="dkm__fan-btn" type="button" data-dkm-pillar="' + p + '">' + NAMES[p] + '</button>')).join('') +
         '</div>';
       // The label lives in the fan now, so each pillar's own body drops it.
       const bodyOf = (p) => PILL[p]().replace(/^<div class="dkm__label">.*?<\/div>/, '');
@@ -4275,10 +4320,19 @@ function renderDeskMission() {
         if (b.closest('.dkm__inv')) return;   // the twin is decoration, never a control
         b.addEventListener('click', (ev) => {
           ev.stopPropagation();
+          _freezeDeskFans(el);
           _deskPillar = b.getAttribute('data-dkm-pillar');
           renderDeskMission();
         });
       });
+      if (!el.dataset.fanLeaveBound) {
+        el.dataset.fanLeaveBound = '1';
+        el.addEventListener('pointerleave', () => {
+          if (!_deskFanHold && !_deskVfanHold) return;
+          _deskFanHold = null; _deskVfanHold = null;
+          renderDeskMission();
+        });
+      }
       // v1058: the consistency view fan. Picking here is the same act as
       // picking inside the module: one persisted preference, every surface
       // (this card, the phone card) follows it.
@@ -4286,6 +4340,7 @@ function renderDeskMission() {
         if (b.closest('.dkm__inv')) return;
         b.addEventListener('click', (ev) => {
           ev.stopPropagation();
+          _freezeDeskFans(el);
           if (!state.ui) state.ui = {};
           state.ui.consistencyFaceView = b.getAttribute('data-dkm-view');
           try { persistNow(); } catch (e) {}
@@ -4341,9 +4396,70 @@ function bindCommandCenter(cc) {
         // the finger sideways. The class is the same condition the render
         // uses to offer pillars at all, so the two can never disagree.
         if (!card.classList.contains('cc-card--pillars')) return;
+        // The view select is a control: touching it must never begin a swipe.
+        if (e.target && e.target.closest && e.target.closest('.cc-vsel')) return;
         x0 = e.clientX; y0 = e.clientY; axis = null;
         card.dataset.swiping = '';
       });
+      // ── THE DECK (v1060, Malik: "like swiping through a layer of photos
+      // on iPhone, smooth clean and simple"). The cards are a physical stack:
+      // the next face is ALREADY THERE underneath (scaled down a touch), the
+      // finger moves the top card 1:1 out of the way, and committing sends it
+      // off while the one beneath rises into place. No fade-and-replace.
+      let under = null, underPillar = null;
+      const nextPillar = (dir) => {
+        const i = CC_PILLARS.indexOf(_ccPillar);
+        return CC_PILLARS[(i + (dir < 0 ? 1 : -1) + CC_PILLARS.length) % CC_PILLARS.length];
+      };
+      const buildUnder = (pillar) => {
+        try {
+          const prev = _ccPillar;
+          _ccPillar = pillar;
+          const html = renderCommandCenter();
+          _ccPillar = prev;
+          const shell = document.createElement('div');
+          shell.innerHTML = html;
+          const src = shell.querySelector('.cc-card');
+          if (!src) return null;
+          src.querySelector(':scope > .cc-inv')?.remove();
+          const u = document.createElement('div');
+          u.className = 'cc-under';
+          u.setAttribute('aria-hidden', 'true');
+          u.setAttribute('style', src.getAttribute('style') || '');
+          u.innerHTML = src.innerHTML;
+          u.querySelectorAll('[id]').forEach((n) => n.removeAttribute('id'));
+          // Geometry: sit exactly where the card sits, one layer down.
+          u.style.position = 'absolute';
+          u.style.left = card.offsetLeft + 'px';
+          u.style.top = card.offsetTop + 'px';
+          u.style.width = card.offsetWidth + 'px';
+          u.style.height = card.offsetHeight + 'px';
+          u.style.margin = '0';
+          u.style.transform = 'scale(0.94) translateY(7px)';
+          u.style.opacity = '0.85';
+          u.style.zIndex = '0';
+          return u;
+        } catch (e) { return null; }
+      };
+      const armDeck = (dir) => {
+        const want = nextPillar(dir);
+        if (under && underPillar === want) return;
+        if (under) under.remove();
+        underPillar = want;
+        under = buildUnder(want);
+        if (under) {
+          cc.style.position = 'relative';
+          cc.classList.add('cc-deck-live');
+          card.style.position = 'relative';
+          card.style.zIndex = '1';
+          cc.insertBefore(under, card);
+        }
+      };
+      const disarmDeck = () => {
+        cc.classList.remove('cc-deck-live');
+        card.style.zIndex = '';
+        if (under) { under.remove(); under = null; underPillar = null; }
+      };
       card.addEventListener('pointermove', (e) => {
         if (x0 === null) return;
         const dx = e.clientX - x0, dy = e.clientY - y0;
@@ -4352,6 +4468,7 @@ function bindCommandCenter(cc) {
           axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
           if (axis === 'x') {
             card.dataset.swiping = '1';
+            try { card.setPointerCapture(e.pointerId); } catch (e2) {}
             // A hold that turns into a swipe is not a completion.
             const held = card.querySelector('.cc-hold-complete.is-holding');
             if (held) held.dispatchEvent(new PointerEvent('pointerup', { bubbles: true }));
@@ -4359,27 +4476,76 @@ function bindCommandCenter(cc) {
         }
         if (axis !== 'x') return;
         e.preventDefault();
-        card.style.transform = 'translateX(' + (dx * 0.35).toFixed(1) + 'px)';
+        if (dx !== 0) armDeck(dx);
+        // 1:1 follow with a whisper of rotation; the top card is an object in
+        // the hand, not a value being interpolated.
+        card.style.transform = 'translateX(' + dx.toFixed(1) + 'px) rotate(' + (dx * 0.02).toFixed(2) + 'deg)';
+        if (under) {
+          const p = Math.min(1, Math.abs(dx) / (COMMIT * 2.2));
+          under.style.transform = 'scale(' + (0.94 + p * 0.06).toFixed(3) + ') translateY(' + (7 - p * 7).toFixed(1) + 'px)';
+          under.style.opacity = (0.85 + p * 0.15).toFixed(2);
+        }
       });
       const finish = (e) => {
         if (x0 === null) return;
         const dx = (e && e.clientX != null) ? e.clientX - x0 : 0;
         const wasX = axis === 'x';
         x0 = null; y0 = null; axis = null;
-        card.style.transition = 'transform .28s cubic-bezier(.3,.85,.3,1)';
-        card.style.transform = 'translateX(0)';
-        setTimeout(() => { card.style.transition = ''; card.dataset.swiping = ''; }, 300);
-        if (!wasX || Math.abs(dx) < COMMIT) return;
-        const i = CC_PILLARS.indexOf(_ccPillar);
-        _ccPillar = CC_PILLARS[(i + (dx < 0 ? 1 : -1) + CC_PILLARS.length) % CC_PILLARS.length];
-        // _ccHeroSwap is the app's own re-render path: it measures the old
-        // hero, swaps, and animates the height, so a pillar change reads like
-        // every other content change on this card.
-        try { _ccHeroSwap(function () {}); }
-        catch (err) { try { cc.innerHTML = renderCommandCenter(); bindCommandCenter(cc); } catch (e2) {} }
+        const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (wasX && Math.abs(dx) >= COMMIT && under) {
+          // COMMIT: the top card leaves the way it was moving, the one
+          // beneath rises to full size, then the real render takes over.
+          _ccPillar = underPillar;
+          const off = (dx < 0 ? -1 : 1) * (card.offsetWidth + 60);
+          if (reduced) {
+            disarmDeck();
+            try { cc.innerHTML = renderCommandCenter(); bindCommandCenter(cc); } catch (e2) {}
+            return;
+          }
+          card.style.transition = 'transform .24s cubic-bezier(.4,.0,.9,.6)';
+          card.style.transform = 'translateX(' + off + 'px) rotate(' + (off * 0.02) + 'deg)';
+          under.style.transition = 'transform .24s cubic-bezier(.2,.8,.3,1), opacity .24s ease-out';
+          under.style.transform = 'scale(1) translateY(0)';
+          under.style.opacity = '1';
+          setTimeout(() => {
+            disarmDeck();
+            card.dataset.swiping = '';
+            card.style.transition = ''; card.style.transform = '';
+            try { cc.innerHTML = renderCommandCenter(); bindCommandCenter(cc); } catch (e2) {}
+          }, 250);
+          return;
+        }
+        // CANCEL: spring home, the stack settles back down.
+        card.style.transition = 'transform .3s cubic-bezier(.3,.85,.3,1)';
+        card.style.transform = 'translateX(0) rotate(0deg)';
+        if (under) {
+          under.style.transition = 'transform .3s cubic-bezier(.3,.85,.3,1), opacity .3s ease-out';
+          under.style.transform = 'scale(0.94) translateY(7px)';
+          under.style.opacity = '0.85';
+        }
+        setTimeout(() => {
+          card.style.transition = ''; card.dataset.swiping = '';
+          disarmDeck();
+        }, 320);
       };
       card.addEventListener('pointerup', finish);
       card.addEventListener('pointercancel', finish);
+    }
+    // v1060: the consistency face's native view select. Change = the same
+    // persisted pick the module and the desktop fan write.
+    const vsel = card && card.querySelector && card.querySelector('.cc-vsel:not([data-bound])');
+    if (vsel && !vsel.closest('.cc-inv')) {
+      vsel.dataset.bound = '1';
+      vsel.addEventListener('pointerdown', (ev) => ev.stopPropagation());
+      vsel.addEventListener('click', (ev) => ev.stopPropagation());
+      vsel.addEventListener('change', (ev) => {
+        ev.stopPropagation();
+        if (!state.ui) state.ui = {};
+        state.ui.consistencyFaceView = vsel.value;
+        try { persistNow(); } catch (e2) {}
+        try { _ccHeroSwap(function () {}); }
+        catch (e2) { try { cc.innerHTML = renderCommandCenter(); bindCommandCenter(cc); } catch (e3) {} }
+      });
     }
   } catch (e) {}
   // v608 (Malik, overnight item 5): first open of a NEW day with a move still
