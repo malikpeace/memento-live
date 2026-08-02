@@ -58,6 +58,14 @@ const CloudSync = (function () {
   const RESTORE_SCREEN_MAX_MS = 15000;
   let restoreEl = null;
   let restoreFailsafe = null;
+  // v1057 (Malik: the breathing M held his desktop hostage for ~2 minutes).
+  // The screen itself was capped at 15s, but every focus/auth retry after a
+  // failed first pull called beginFirstSync again and re-showed it, so a bad
+  // network turned "one capped wait" into a chain of them. The screen is a
+  // one-shot per page load: after its first hide, retries run SILENTLY and
+  // the app stays usable on local data. (The adopt paths still show it
+  // unconditionally; they are about to reload the page, which resets this.)
+  let restoreScreenSpent = false;
 
   // On-device sync journal for the ?dev=sync panel (see devSyncPanel below).
   // Timestamped one-line notes about what the engine saw and decided, kept in
@@ -121,6 +129,7 @@ const CloudSync = (function () {
   function hideRestoreScreen() {
     try {
       clearTimeout(restoreFailsafe);
+      restoreScreenSpent = true;
       if (!restoreEl) return;
       restoreEl.style.opacity = '0';
       setTimeout(function () { if (restoreEl && restoreEl.style.opacity === '0') restoreEl.style.display = 'none'; }, 220);
@@ -600,7 +609,7 @@ const CloudSync = (function () {
     if (firstSyncState === FIRST_SYNC_READY) return true;
     if (firstSyncState === FIRST_SYNC_RESTORING && firstSyncPromise) return firstSyncPromise;
     firstSyncState = FIRST_SYNC_RESTORING;
-    showRestoreScreen();
+    if (!restoreScreenSpent) showRestoreScreen();
     firstSyncPromise = (async function () {
       const result = await withTimeout(pullAndMerge(), FIRST_PULL_TIMEOUT_MS, { ok: false, timedOut: true });
       if (result && result.timedOut) dnote('first sync TIMED OUT after ' + (FIRST_PULL_TIMEOUT_MS / 1000) + 's');

@@ -390,6 +390,20 @@ body.evo2-green .evo2-wash {
    are force-hidden regardless of ns-bloom; removing evo2 at finish fades them in
    with everything else (Malik v677: nothing outside the card until the end). */
 body.evo2 .ambient__rays { opacity: 0 !important; }
+/* v1057 (Malik, with the welcome-ceremony screenshot as the reference): during
+   the evolution moment itself the rim's outward throw runs at the ceremony's
+   FULL cer__edge strength, so the card visibly emits into the dark room while
+   it transforms. The everyday home keeps the calmer throw above; this is the
+   one moment that earns the full burn. Radii fixed, alphas ride --act. */
+body.evo2 .daycard-theme-living .daycard-living-stage {
+  box-shadow:
+    0 0 44px rgba(200, 210, 255, 0.10),
+    0 12px 38px rgba(0, 0, 0, 0.28),
+    0 0 10px rgba(255, 255, 255, calc(1 * var(--act, 0))),
+    0 0 34px rgba(232, 246, 255, calc(0.72 * var(--act, 0))),
+    0 0 84px rgba(180, 218, 255, calc(0.46 * var(--act, 0))),
+    0 0 200px rgba(140, 190, 255, calc(0.26 * var(--act, 0)));
+}
 body.evo2 .daycard-theme-living .daycard-bloom,
 body.evo2 .daycard-theme-living .daycard-floor,
 body.evo2 .daycard-theme-living .daycard-wrap__aura { opacity: 0 !important; }
@@ -505,11 +519,18 @@ html.theme-light .daycard-theme-living .daycard-ns__plat {
   z-index: 6; pointer-events: none;
   opacity: calc(var(--act, 0) * var(--rim-k));
   transition: opacity 0.6s ease;
+  /* v1057 (Malik: "make the border thicker and brighter to show more
+     platinum, like the unlock ceremony"). These are the ceremony's own
+     look-platinum values from unlock.html, ported verbatim rather than
+     re-tuned: a real 3.4px white core that holds its brightness inward
+     before falling off, so the edge reads as burning instead of outlined.
+     Still gated by --act * --rim-k, so a cold card shows none of it. */
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.92),
-    inset 0 0 14px rgba(255, 255, 255, 0.50),
-    inset 0 0 38px rgba(206, 230, 255, 0.34),
-    inset 0 0 82px rgba(170, 205, 255, 0.18);
+    inset 0 0 0 3.4px rgba(255, 255, 255, 1),
+    inset 0 0 11px 2px rgba(255, 255, 255, 0.96),
+    inset 0 0 28px rgba(226, 244, 255, 0.64),
+    inset 0 0 64px rgba(170, 212, 255, 0.36),
+    inset 0 0 130px rgba(140, 190, 255, 0.19);
 }
 /* Light mode: a bright edge cannot out-shine a near-white card (measured about
    1.26:1 against the 3:1 a graphic needs), but the card's interior is cyan and
@@ -531,10 +552,19 @@ html.theme-light .daycard-theme-living .daycard-ns__rim {
    live, and it is APPENDED to them rather than replacing them, so the lift and
    the ground shadow Malik likes are untouched. */
 .daycard-theme-living .daycard-living-stage {
+  /* v1057: the ceremony's cer__edge throw (10/34/84/200), scaled by --act so
+     it arrives with the card's activation. FIXED radii on purpose: animating
+     a shadow's blur radius repaints every frame (the ceremony learned this
+     killing a phone); opacity-via-colour-alpha rasterises once and fades
+     free. This is what makes the evolution moment's edge read as powerful:
+     the same rim, throwing light OUT into the room, not just inward. */
   box-shadow:
     0 0 44px rgba(200, 210, 255, 0.10),
     0 12px 38px rgba(0, 0, 0, 0.28),
-    0 0 calc(34px * var(--act, 0)) rgba(186, 218, 255, calc(0.30 * var(--act, 0)));
+    0 0 10px rgba(255, 255, 255, calc(0.55 * var(--act, 0))),
+    0 0 34px rgba(232, 246, 255, calc(0.40 * var(--act, 0))),
+    0 0 84px rgba(180, 218, 255, calc(0.26 * var(--act, 0))),
+    0 0 200px rgba(140, 190, 255, calc(0.15 * var(--act, 0)));
 }
 html.theme-light .daycard-theme-living .daycard-living-stage {
   box-shadow:

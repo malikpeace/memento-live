@@ -345,6 +345,13 @@ const DeeperRoom = {
 
   // ---- boot + resume hooks --------------------------------------------------
   init() {
+    // v1057 (Malik, seeing "Day 3. The dip." ambush him on desktop): the
+    // auto-fire is OFF. He wants this moment gone, fixed, or moved, and until
+    // that call is made deliberately it must not interrupt anyone's open.
+    // The experience itself is intact and still reachable from the cheat bar
+    // (jumpMori / jumpVivere use force: true), so it can be judged and
+    // re-placed without rebuilding. Re-enable by deleting this return.
+    return;
     // On boot: after the reveal settles.
     setTimeout(() => this.maybeFire(), 2600);
     // On resume after a real gap (same 5-minute bar as the tab-snap rule).

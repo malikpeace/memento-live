@@ -3742,9 +3742,11 @@ function renderCommandCenter() {
         const a = (state.clarity && state.clarity.answers) || {};
         const star = String(a.neutronStar || '').trim();
         const why = String(a.coreWhy || a.whyItMatters || '').trim();
+        // v1057 (Malik, twice): the why is NOT on the glance face. Label +
+        // statement only; the why lives inside the Clarity module, one tap
+        // away. Three lines of text made the glance stop being a glance.
         return wrap(eyebrow('Your Neutron Star') +
           '<div style="font-size:1.15rem;font-weight:700;line-height:1.3;color:var(--text-hi);">' + esc(star || 'Your Neutron Star') + '</div>' +
-          (why ? '<div class="cc-why-clamp" style="font-size:0.9rem;line-height:1.5;color:var(--text-2);margin-top:9px;">' + esc(why) + '</div>' : '') +
           dots(1));
       }
       let _s = 0, _b = 0, _act = 0;
@@ -3888,8 +3890,27 @@ function renderCommandCenter() {
       }
       if (tiny) row += '<div class="cc-od-sub" style="font-size:0.85rem;line-height:1.45;color:var(--text-mid);margin-bottom:6px;"><span style="color:var(--text-lo);">Minimum: </span>' + esc(tiny) + '</div>';
       if (how) row += '<div class="cc-od-sub" style="font-size:0.85rem;line-height:1.45;color:var(--text-mid);"><span style="color:var(--text-lo);">If resistance hits: </span>' + esc(how) + '</div>';
+      // v1057 (Malik's pick from the pillar gallery: "Day remaining"). A
+      // hairline that DRAINS as the day does, no clock, no numbers: urgency
+      // without a countdown reading as cheap. The day is Action's day, 4am
+      // to 4am (the Phase A3 boundary), so it agrees with when a move
+      // actually rolls over. Hidden once today's move is done: a drained
+      // bar over a completed day would read as a scold.
+      if (!doneToday) {
+        let _rem = 0.5;
+        try {
+          const _n = new Date();
+          const _st = new Date(_n.getFullYear(), _n.getMonth(), _n.getDate(), 4, 0, 0);
+          if (_n < _st) _st.setDate(_st.getDate() - 1);
+          _rem = Math.max(0, Math.min(1, 1 - (_n - _st) / 86400000));
+        } catch (e) {}
+        row += '<div class="cc-dayline" aria-hidden="true"><b style="width:' + (_rem * 100).toFixed(1) + '%"></b></div>';
+      }
       // ---- the daily loop (lives only in Today) --------------------------------
-      row += '<div style="margin-top:8px;padding-top:6px;border-top:1px solid var(--hairline);">';
+      // The dayline IS a hairline, so on days it renders, the divider that
+      // used to sit here would read as a doubled line 8px away. One or the
+      // other, never both.
+      row += '<div style="margin-top:8px;padding-top:6px;' + (doneToday ? 'border-top:1px solid var(--hairline);' : '') + '">';
       row += '<div style="display:flex;">';
       if (doneToday) {
         row += '<div class="cc-completed-action" role="status">Completed</div>';
@@ -4124,15 +4145,28 @@ function renderDeskMission() {
       // width and widen when the mouse comes near, so the live word never
       // moves. The box is one fixed height for all three (CSS), so switching
       // changes the words and nothing else.
+      // v1057 (Malik's pick: "Day remaining"): same drained-by-the-day
+      // hairline as the phone card, same 4am Action day, hidden once done.
+      const dayline = () => {
+        if (done) return '';
+        let rem = 0.5;
+        try {
+          const n = new Date();
+          const st = new Date(n.getFullYear(), n.getMonth(), n.getDate(), 4, 0, 0);
+          if (n < st) st.setDate(st.getDate() - 1);
+          rem = Math.max(0, Math.min(1, 1 - (n - st) / 86400000));
+        } catch (e) {}
+        return '<div class="cc-dayline" aria-hidden="true"><b style="width:' + (rem * 100).toFixed(1) + '%"></b></div>';
+      };
       const PILL = {
-        action: () => label('Today&rsquo;s Action') + head(mission) +
+        action: () => label('Today&rsquo;s Action') + head(mission) + dayline() +
           '<div class="dkm__row">' + doneBtn + streakChip + '</div>',
         clarity: () => {
           const a = (state.clarity && state.clarity.answers) || {};
           const star = String(a.neutronStar || '').trim();
           const why = String(a.coreWhy || a.whyItMatters || '').trim();
-          return label('Your Neutron Star') + head(star || 'Your Neutron Star') +
-            (why ? '<div class="dkm__sub">' + esc(why) + '</div>' : '');
+          // v1057 (Malik): statement only; the why waits inside the module.
+          return label('Your Neutron Star') + head(star || 'Your Neutron Star');
         },
         consistency: () => {
           const days = streak.toLocaleString();
