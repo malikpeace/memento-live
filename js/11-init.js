@@ -22,6 +22,50 @@ try {
     }
   }
 } catch (e) {}
+
+/* v1072 (Malik: "idk if the update didn't push, this is still how it looks").
+   The guard above only runs on a page LOAD, and an installed iOS PWA does not
+   load when you reopen it: it RESTORES the frozen page. So a phone could sit
+   on a weeks-old build forever while the server served something new, which
+   is exactly what happened (the mirror had v1071, his phone rendered v106x).
+   This closes it: whenever the app comes back to the foreground, ask the
+   server what the current build is and reload once if it moved. Cheap (one
+   conditional GET of index.html, throttled to 60s), silent on failure, and
+   never reloads mid-flow: a module or ceremony on screen defers the check to
+   the next resume, so an update can never interrupt someone's moment. */
+try {
+  let _verLastCheck = 0;
+  const _busyOnScreen = () => {
+    try {
+      if (typeof ActionExperience !== 'undefined' && ActionExperience.isOpen) return true;
+      if (typeof ClarityExperience !== 'undefined' && ClarityExperience.isOpen) return true;
+      if (typeof Sheet !== 'undefined' && Sheet.isOpen) return true;
+      if (document.querySelector('.action-exp.open-bg, .cer, #clarityPaywall, #n7dRoot')) return true;
+    } catch (e) {}
+    return false;
+  };
+  const _checkForUpdate = () => {
+    const now = Date.now();
+    if (document.visibilityState !== 'visible') return;
+    if (!navigator.onLine) return;
+    if (now - _verLastCheck < 60000) return;
+    _verLastCheck = now;
+    if (_busyOnScreen()) return;
+    fetch('./index.html', { cache: 'no-store', credentials: 'same-origin' })
+      .then((r) => (r.ok ? r.text() : null))
+      .then((html) => {
+        if (!html) return;
+        const m = html.match(/MEMENTO_VERSION\s*=\s*'(v[0-9]+)'/);
+        if (!m || !window.MEMENTO_VERSION) return;
+        if (m[1] !== window.MEMENTO_VERSION) location.reload();
+      })
+      .catch(() => {});
+  };
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') setTimeout(_checkForUpdate, 400);
+  });
+  window.addEventListener('pageshow', (e) => { if (e.persisted) setTimeout(_checkForUpdate, 400); });
+} catch (e) {}
 loadState();
 migrateState();
 applyPrefs(); // additive: stamp accent/motion/density prefs (no-op if unset)
