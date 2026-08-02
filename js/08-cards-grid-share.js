@@ -4632,29 +4632,17 @@ function bindCommandCenter(cc) {
     const _b = cc.querySelector('.cc-card');
     if (_b && window.innerWidth < 768) {
       document.documentElement.style.setProperty('--p1-box-h', _b.offsetHeight + 'px');
-      // v1064: CLOSED LOOP. Every home state has slightly different chrome
-      // above the card (greeting, margins, per-state paddings), and chasing
-      // each one with arithmetic kept missing by a margin here and a margin
-      // there, which is exactly how the box drifted off the bottom three
-      // times. So: render, MEASURE where the box bottom actually landed,
-      // and trim/grow the card by the exact miss. One pass, no model of the
-      // page needed, correct in every state by construction.
-      // setTimeout, not rAF: rAF is paused on hidden pages, and a PWA can
-      // resume in the background; the anchor must land regardless.
-      setTimeout(() => {
-        try {
-          if (window.scrollY > 50) return;   // only meaningful at page 1 rest
-          const ns = document.querySelector('#dayCard .daycard-ns');
-          if (!ns) return;
-          const safeB = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--safe-b')) || 0;
-          const target = window.innerHeight - safeB - 15;
-          const delta = Math.round(_b.getBoundingClientRect().bottom - target);
-          if (Math.abs(delta) > 2) {
-            const h = Math.max(300, ns.getBoundingClientRect().height - delta);
-            document.documentElement.style.setProperty('--p1-card-h', h.toFixed(0) + 'px');
-          }
-        } catch (e) {}
-      }, 60);
+      // v1068: one static measurement, not a correction loop. The page-1
+      // column starts below the app's own top padding, so its height must be
+      // the viewport MINUS that offset or it hangs off the bottom. The offset
+      // is fixed chrome, so this is read once at rest and cached.
+      try {
+        const _p1 = document.getElementById('homePage1');
+        if (_p1 && window.scrollY < 50) {
+          const off = Math.round(_p1.getBoundingClientRect().top + window.scrollY);
+          if (off >= 0 && off < 200) document.documentElement.style.setProperty('--p1-top', off + 'px');
+        }
+      } catch (e) {}
     }
   } catch (e) {}
   // v608 (Malik, overnight item 5): first open of a NEW day with a move still

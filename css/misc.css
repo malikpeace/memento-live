@@ -939,7 +939,11 @@ html.theme-light body.lite .tab-bar, html.theme-light.lowfx .tab-bar {
     overflow: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    padding-bottom: calc(92px + var(--safe-b, 0px)) !important;
+    /* v1067 (Malik: "so much more dead space from the bottom"): this 92px
+       reserved room for the RETIRED bottom tab bar. It was the dead band
+       under the first-step box on the blank home, and it squeezed the card
+       short to boot. The page-1 column owns the bottom buffer now. */
+    padding-bottom: 0 !important;
   }
   /* v748 (Malik): NOTHING may touch. On short viewports (in-browser Safari,
      its toolbar eats ~110px) the card is the only flexible element: it scales
@@ -953,9 +957,10 @@ html.theme-light body.lite .tab-bar, html.theme-light.lowfx .tab-bar {
      live box height), the box lands 15px above the bottom, no dead band.
      The aspect lock died with the fixed height; the card is a portrait
      rectangle by construction (width min(88vw,352) vs a taller height). */
+  /* v1067: height comes from the page-1 flex column now (the card is the
+     growing item), so only the WIDTH is stated here. */
   body.home-locked #dayCard .daycard-ns,
   body.home-locked #dayCard .daycard-theme-living .daycard-living-stage {
-    height: var(--p1-card-h) !important;
     min-height: 0 !important;
     width: var(--p1-card-w) !important;
     max-width: none;

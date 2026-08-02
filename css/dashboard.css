@@ -3655,8 +3655,51 @@ body.pre-clarity .capture-fab { display: none !important; }
     --p1-card-w: min(88vw, 352px);
     --p1-card-h: clamp(300px, calc(100svh - var(--safe-t, 0px) - var(--safe-b, 0px) - 97px - var(--p1-box-h, 212px)), 900px); /* 97 = 18 snap + 34 pad + 14 stage margin + 16 gap + 15 buffer; the box term is MEASURED by js/08 after every render, so a taller face (the pre-Clarity first-step copy, a long move) shrinks the card instead of shoving the box off the bottom */
   }
-  /* The two snap stops: page 1 starts at the card, page 2 starts at the modules. */
-  body:not(.has-custom-layout) .app.dash-v2 #dayCard { scroll-snap-align: start; }
+  /* ══ MALIK'S LAYOUT LAW, STRUCTURAL (v1067) ═════════════════════════════
+     Page 1 is a flex column exactly one viewport tall. The card is the ONLY
+     growing item, the today box is the last item, and the column's bottom
+     padding is the 15px buffer plus the home indicator. So: box at the very
+     bottom, card fills everything above it, dead space impossible. No card
+     height formula, no correction pass, nothing left to drift.
+     (Three earlier attempts tuned numbers and kept missing; this removes the
+     numbers.) */
+  body:not(.has-custom-layout) .app.dash-v2 #homePage1 {
+    display: flex; flex-direction: column;
+    /* The column does not start at the viewport top (the app has its own top
+       padding), so a flat 100svh hangs off the bottom by exactly that offset.
+       --p1-top is that static offset, measured once by js/08 (it is a fixed
+       piece of chrome, not a per-render correction). */
+    height: calc(100svh - var(--p1-top, 0px));
+    box-sizing: border-box;
+    padding-bottom: calc(15px + var(--safe-b, 0px));
+    scroll-snap-align: start;
+  }
+  body:not(.has-custom-layout) .app.dash-v2 #homePage1 > #dayCard {
+    flex: 1 1 auto; min-height: 0;
+  }
+  body:not(.has-custom-layout) .app.dash-v2 #homePage1 > #commandCenter {
+    flex: 0 0 auto;
+  }
+  /* The card section carries an inline margin-bottom:14px from the renderer,
+     which sat between the box and the column's bottom padding and made the
+     buffer 29px instead of 15. The column owns the buffer. */
+  body:not(.has-custom-layout) .app.dash-v2 #homePage1 > #commandCenter > .cc-card {
+    margin-bottom: 0 !important;
+  }
+  /* The card's own chain stretches to the space the column hands it. */
+  body:not(.has-custom-layout) .app.dash-v2 #homePage1 > #dayCard > .daycard-wrap { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+  body:not(.has-custom-layout) .app.dash-v2 #homePage1 .daycard-theme-living .daycard-living-stage,
+  body:not(.has-custom-layout) .app.dash-v2 #homePage1 .daycard-ns {
+    height: 100% !important; min-height: 0 !important;
+  }
+  /* The stage's own 14/26 margins sit OUTSIDE its height:100%, so they pushed
+     the card past the column and ate the gap to the box (they measured 2px
+     apart). Zeroed here; the column and #commandCenter's 16px own the
+     spacing now. */
+  body:not(.has-custom-layout) .app.dash-v2 #homePage1 .daycard-theme-living .daycard-living-stage {
+    margin-top: 0 !important; margin-bottom: 0 !important;
+  }
+  /* The two snap stops: page 1, then the modules. */
   body:not(.has-custom-layout) .app.dash-v2 #dashBelow { scroll-snap-align: start; }
   html, body { overflow-x: clip; max-width: 100vw; }
   body { touch-action: pan-y; overscroll-behavior-x: none; }
@@ -3751,9 +3794,12 @@ body.pre-clarity .capture-fab { display: none !important; }
      is a clamp instead of a flat 452 so page 1 fills a tall phone without
      overflowing a small one; it is NOT edge-to-edge, it leaves real breathing room
      above the Today box and below it (Malik: "not literally to the exact edges"). */
+  /* v1069: WIDTH only. The card's height is whatever the page-1 flex column
+     hands it; the old --p1-card-h formula was still forcing a fixed height
+     and stopping the card from filling (this is the last of the numbers). */
   body:is(.ns-bloom, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-ns {
     width: var(--p1-card-w) !important;
-    min-height: var(--p1-card-h) !important;
+    min-height: 0 !important;
   }
   body:is(.ns-bloom, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-theme-living .daycard-living-stage { width: var(--p1-card-w) !important; margin-bottom: 0 !important; }
   body:is(.ns-bloom, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #commandCenter {
@@ -4124,6 +4170,11 @@ body.card-square { --card-w: 360px; --card-h: 360px; }
    year=heatmap, time/death=clock), so the module tiles, quote, proof-trail
    line and the heatmap's streak header are all OFF this layout.
    Desktop only (>=1024); the skeleton is stable from first visit onward. */
+/* v1067: the page-1 wrapper is layout-invisible everywhere except the phone
+   home, so the desktop bento grid still places #dayCard and #commandCenter
+   itself and nothing about desktop changes. */
+#homePage1 { display: contents; }
+
 #deskMission { display: none; }
 #deskMissionWrap { display: none; }
 .dash-cgram__range { display: none; }
