@@ -1092,7 +1092,9 @@ body::after {
 body.boot-revealed #bootMask { display: none; }
 .bootmask__mark {
   display: block;
-  width: 96px; height: 96px;
+  /* v1047: matched to the restoring screen's mark (js/12) exactly, so the two
+     loading surfaces read as one. Change one, change the other. */
+  width: 56px; height: 58px;
 }
 
 
