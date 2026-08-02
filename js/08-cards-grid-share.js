@@ -4229,6 +4229,11 @@ function bindCommandCenter(cc) {
       const THRESH = 12, COMMIT = 56;
       card.addEventListener('pointerdown', (e) => {
         if (e.pointerType === 'mouse' && e.button !== 0) return;
+        // v1056 (Malik): pre-Clarity there is ONE face ("Find your neutron
+        // star") and nothing to swipe to, so the card must not even follow
+        // the finger sideways. The class is the same condition the render
+        // uses to offer pillars at all, so the two can never disagree.
+        if (!card.classList.contains('cc-card--pillars')) return;
         x0 = e.clientX; y0 = e.clientY; axis = null;
         card.dataset.swiping = '';
       });
@@ -5540,11 +5545,14 @@ function openMementoFull() {
       // setting them on the wrap (as before) did nothing.
       liveWrap.classList.remove('daycard-materialize', 'daycard-reveal');
       if (ns) {
-        ns.style.transition = 'none';
-        ns.style.setProperty('--dc-rx', '0deg');
-        ns.style.setProperty('--dc-ry', '0deg');
-        void ns.offsetWidth;        // commit the flat state with no animation
-        ns.style.transition = '';   // restore (in-view tilt, if any, still works)
+        // v1056: the rotation moved from the card to its stage (so the bloom
+        // and floor tilt with it); flatten whichever element carries it.
+        const tiltHost = ns.closest('.daycard-living-stage') || ns;
+        tiltHost.style.transition = 'none';
+        tiltHost.style.setProperty('--dc-rx', '0deg');
+        tiltHost.style.setProperty('--dc-ry', '0deg');
+        void tiltHost.offsetWidth;  // commit the flat state with no animation
+        tiltHost.style.transition = '';  // restore (in-view tilt, if any, still works)
       }
       if (H) {
         if (stage) { stage.style.width = sw + 'px'; stage.style.margin = '0 auto'; if (ns) ns.style.width = '100%'; sizedEls.push(stage); }
@@ -5923,12 +5931,18 @@ function bindDayCardTilt(card) {
     // Done with its own px vars, not translateZ + preserve-3d, because the card
     // carries clip-path + contain:paint (the corner-poke law) and both force
     // 3D flattening, so a translateZ child would do nothing.
+    // v1056: the vars land on the STAGE when there is one, so the bloom and
+    // floor rotate WITH the card instead of staying bolted to the page while
+    // the card pulls away from them (the black seam Malik caught on desktop).
+    // The pointer is still tracked on the card itself; only where the
+    // rotation is applied changes.
+    const host = card.closest('.daycard-living-stage') || card;
     const set = (c, nx, ny, amp) => {
-      c.style.setProperty('--dc-rx', (ny * -3.2 * amp).toFixed(2) + 'deg');
-      c.style.setProperty('--dc-ry', (nx * 4 * amp).toFixed(2) + 'deg');
+      host.style.setProperty('--dc-rx', (ny * -3.2 * amp).toFixed(2) + 'deg');
+      host.style.setProperty('--dc-ry', (nx * 4 * amp).toFixed(2) + 'deg');
     };
     const reset = () => {
-      card.style.setProperty('--dc-rx', '0deg'); card.style.setProperty('--dc-ry', '0deg');
+      host.style.setProperty('--dc-rx', '0deg'); host.style.setProperty('--dc-ry', '0deg');
     };
     card.addEventListener('pointermove', (e) => {
       const r = card.getBoundingClientRect();
@@ -5976,8 +5990,12 @@ function bindDayCardMotion(wrap, card) {
       if (!card.isConnected) { stopDayCardMotion(); return; }
       curRx += (tgtRx - curRx) * 0.16;
       curRy += (tgtRy - curRy) * 0.16;
-      card.style.setProperty('--dc-rx', curRx.toFixed(2) + 'deg');
-      card.style.setProperty('--dc-ry', curRy.toFixed(2) + 'deg');
+      // v1056: same host rule as the pointer tilt, stage over card, so the
+      // glow layers lean with the glass here too (this path is currently
+      // disabled, but it must not resurrect the seam if revived).
+      const mh = card.closest('.daycard-living-stage') || card;
+      mh.style.setProperty('--dc-rx', curRx.toFixed(2) + 'deg');
+      mh.style.setProperty('--dc-ry', curRy.toFixed(2) + 'deg');
       _dcMotionRaf = requestAnimationFrame(loop);
     };
     const onOrient = (e) => {

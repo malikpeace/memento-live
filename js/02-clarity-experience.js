@@ -2829,6 +2829,19 @@ const ActionExperience = {
 
   open() {
     if (this.isOpen) return;
+    // THE WALL (v1056, Malik): no Clarity, no Action. Ever. This is above the
+    // paywall check on purpose: the paywall gates on PAYMENT, so a paid
+    // account with no star sailed straight through it, and a stale saved
+    // view ("action" in state.ui.lastView from dev poking) then reopened the
+    // intake on every single boot, landing him on a verdict screen for a
+    // star he never set. Action's whole premise is "a plan built from your
+    // star"; without the star there is nothing to build from, so the door
+    // simply is not there. Also scrub the saved view so the boot restore
+    // stops retrying it forever.
+    if (!(state.clarity && state.clarity.completed)) {
+      try { rememberView(null); } catch (e) {}
+      return;
+    }
     // Paywall gate: Action is paid. This is the "Build my plan" moment the
     // evolved card hands off to. The FIRST time, future-pace through the First
     // 7 Days screen for EVERYONE (it is the trust timeline, not the sell), then

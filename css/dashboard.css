@@ -3088,6 +3088,22 @@ body.lite .daycard-motion-cta, html.lowfx .daycard-motion-cta { backdrop-filter:
   will-change: transform;
   -webkit-tap-highlight-color: transparent;
 }
+/* v1056 (Malik: "whenever the card is tilting you can see behind it and you
+   see this black"). The tilt used to rotate the CARD alone while its bloom
+   and floor stayed bolted to the page, so any tilt pulled the card's edge
+   away from the glow that hugs it and opened a black seam between them.
+   The card, its bloom and its floor are one physical object, so the STAGE
+   carries the rotation and everything moves together; the card's own
+   transform is disabled inside a stage so the two can never double-rotate.
+   (bindDayCardTilt sets the vars on the stage when one exists.) The card
+   keeps its clip-path + contain:paint corner fix; the stage rotating as a
+   flat unit does not re-open that. */
+.daycard-living-stage {
+  transform: perspective(900px) rotateX(var(--dc-rx, 0deg)) rotateY(var(--dc-ry, 0deg));
+  transition: transform 0.18s ease-out;
+  will-change: transform;
+}
+.daycard-living-stage .daycard-ns { transform: none; }
 /* Liquid-glass rim: a 1.5px ring of caught light drawn with a gradient and
    a mask (NOT a border, so it reads as the edge of glass catching the room,
    bright top-left, dark mid, soft return at bottom-right). */
@@ -4455,7 +4471,11 @@ html.theme-light #deskMission {
 #deskMission .dkm__inv .dkm__streak-n { color: #0b1112; }
 #deskMission .dkm__inv .dkm__sub,
 #deskMission .dkm__inv .dkm__streak-l { color: rgba(11, 17, 18, 0.72); }
+/* The fan's live label replaced .dkm__label as the card's eyebrow, so it has
+   to be listed here too or it keeps the page's text colour and vanishes into
+   the twin's opposite ground. */
 #deskMission .dkm__inv .dkm__label,
+#deskMission .dkm__inv .dkm__fan-cur,
 #deskMission .dkm__inv .dkm__streak-sub { color: rgba(11, 17, 18, 0.55); }
 #deskMission .dkm__inv .dkm__btn--solid { background: #0b1112; color: #f5f5f7; }
 #deskMission .dkm__inv .dkm__btn--done { color: rgba(11, 17, 18, 0.6); }
@@ -4465,6 +4485,7 @@ html.theme-light #deskMission .dkm__inv .dkm__streak-n { color: #f5f5f7; }
 html.theme-light #deskMission .dkm__inv .dkm__sub,
 html.theme-light #deskMission .dkm__inv .dkm__streak-l { color: rgba(245, 245, 247, 0.76); }
 html.theme-light #deskMission .dkm__inv .dkm__label,
+html.theme-light #deskMission .dkm__inv .dkm__fan-cur,
 html.theme-light #deskMission .dkm__inv .dkm__streak-sub { color: rgba(245, 245, 247, 0.6); }
 html.theme-light #deskMission .dkm__inv .dkm__btn--solid { background: #f5f5f7; color: #0b1112; }
 @media (prefers-reduced-motion: reduce) {
