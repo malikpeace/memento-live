@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Today box, round 2</title>
+
+<link rel="stylesheet" href="../memento-app/css/base.css?v=r2a" onerror="this.href='../css/base.css?v=r2a'">
+<link rel="stylesheet" href="../memento-app/css/dashboard.css?v=r2a" onerror="this.href='../css/dashboard.css?v=r2a'">
+
+<style>
+  html, body { margin:0; background:#08090b; color:#f5f5f7;
+    font-family:-apple-system, system-ui, sans-serif; }
+  .wrap { max-width:1200px; margin:0 auto; padding:26px 20px 110px; }
+  h1 { font-size:23px; font-weight:750; letter-spacing:-.02em; margin:0 0 6px; }
+  .lede { font-size:14px; line-height:1.6; color:rgba(245,245,247,.62); max-width:74ch; margin:0 0 12px; }
+  .sect { font-size:12px; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+    color:rgba(245,245,247,.40); margin:34px 0 18px; padding-top:18px;
+    border-top:1px solid rgba(255,255,255,.09); }
+
+  .v { margin:0 0 44px; }
+  .v__name { font-size:15.5px; font-weight:700; letter-spacing:-.01em; margin:0 0 3px; }
+  .v__why  { font-size:13px; line-height:1.5; color:rgba(245,245,247,.55); margin:0 0 15px; max-width:78ch; }
+  .try { display:inline-block; font-size:11px; font-weight:700; letter-spacing:.08em;
+    text-transform:uppercase; color:#0b1112; background:#f5f5f7; border-radius:4px;
+    padding:2px 7px; margin-left:8px; vertical-align:2px; }
+  .pair { display:flex; gap:20px; align-items:flex-start; flex-wrap:wrap; }
+  .cap { font-size:11px; font-weight:650; letter-spacing:.06em; text-transform:uppercase;
+    color:rgba(245,245,247,.34); margin:0 0 8px; }
+  .phone { width:340px; flex:none; }
+  .desk  { flex:1 1 440px; min-width:400px; max-width:540px; }
+  .stage { border-radius:16px; background:#000; padding:16px; }
+
+  /* shared skeleton */
+  .tb { border-radius:16px; background:var(--surface-1); padding:20px;
+        box-shadow:var(--shadow-card), inset 0 1px 0 rgba(255,255,255,.06); }
+  .tb__lab { font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+             color:var(--text-lo); margin:0 0 8px; }
+  .tb__move { font-size:19px; font-weight:700; line-height:1.3; letter-spacing:-.015em;
+              color:var(--text-hi); margin:0 0 16px; }
+  .tb__go { font:inherit; font-weight:700; font-size:15px; border:0; cursor:pointer;
+            border-radius:10px; padding:13px 22px; background:var(--solid-bg); color:var(--solid-fg); }
+  .desk .tb { padding:26px 28px; }
+  .desk .tb__move { font-size:31px; letter-spacing:-.028em; line-height:1.14; }
+
+  /* ═════ THE FIVE HE KEPT ═════ */
+  .k2 .tb__lab { display:none; }
+
+  .k5 .tb { padding:0; overflow:hidden; }
+  .k5 .tb__move { padding:20px 20px 20px; margin:0; }
+  .k5 .tb__go { width:100%; border-radius:0; padding:16px; }
+  .desk.k5 .tb__move { padding:26px 28px 24px; }
+
+  .k8 .tb { background:none; box-shadow:none; padding:4px 2px; }
+  .k8 .tb__lab { display:none; }
+
+  .k11 .tb__lab { display:none; }
+  .k11 .tb__go { background:transparent; color:var(--text-hi);
+                 box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.30); }
+
+  .k13 .tb__lab { display:none; }
+
+  /* ═════ SHARED PARTS FOR THE NEW TEN ═════ */
+
+  /* the swipe rail (13 + 18) */
+  .rail { position:relative; height:54px; border-radius:12px; background:rgba(255,255,255,.06);
+          display:flex; align-items:center; box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+          overflow:hidden; touch-action:none; user-select:none; }
+  .rail__fill { position:absolute; left:0; top:0; bottom:0; width:0; background:rgba(255,255,255,.10); }
+  .rail__knob { position:absolute; left:4px; width:46px; height:46px; border-radius:9px;
+                background:var(--solid-bg); display:flex; align-items:center; justify-content:center;
+                will-change:transform; }
+  .rail__knob svg { width:19px; height:19px; color:var(--solid-fg); }
+  .rail__txt { width:100%; text-align:center; font-size:13.5px; font-weight:650; color:var(--text-2); }
+
+  /* the hold button (16) */
+  .hold { position:relative; overflow:hidden; }
+  .hold__fill { position:absolute; left:0; top:0; bottom:0; width:0; background:rgba(0,0,0,.16); }
+  .hold__lbl { position:relative; }
+
+  /* 17 · the move is the button */
+  .n17 .tb__lab { display:none; }
+  .n17 .tb__move { margin:0; cursor:pointer; position:relative; padding-right:34px; }
+  .n17 .tb__move::after { content:''; position:absolute; right:0; top:50%; margin-top:-9px;
+    width:18px; height:18px; border-radius:999px; box-shadow:inset 0 0 0 1.6px rgba(255,255,255,.30); }
+  .n17 .tb__move.is-done::after { background:var(--solid-bg); box-shadow:none; }
+  .n17 .tb__move.is-done { color:var(--text-2); text-decoration:line-through; text-decoration-thickness:1.5px; }
+
+  /* 18 · swipe the whole card away */
+  .n18 .tb { touch-action:none; user-select:none; cursor:grab; will-change:transform; }
+  .n18 .tb__lab { display:none; }
+  .n18 .tb__move { margin:0; }
+  .n18 .hint { font-size:12px; color:var(--text-lo); margin:10px 0 0; }
+
+  /* 19 · the underline fills */
+  .n19 .tb__lab { display:none; }
+  .n19 .tb__move { margin:0 0 14px; }
+  .n19 .ul { position:relative; height:2px; background:rgba(255,255,255,.14); border-radius:2px;
+             cursor:pointer; touch-action:none; }
+  .n19 .ul__fill { position:absolute; left:0; top:0; bottom:0; width:0; background:#fff; border-radius:2px; }
+  .n19 .ul__txt { margin:12px 0 0; font-size:12.5px; font-weight:650; color:var(--text-lo); }
+
+  /* 20 · the mark is the button */
+  .n20 .tb__lab { display:none; }
+  .n20 .row { display:flex; align-items:center; gap:18px; }
+  .n20 .tb__move { margin:0; flex:1; }
+  .n20 .mbtn { flex:none; width:58px; height:58px; border-radius:14px; border:0; cursor:pointer;
+    background:rgba(255,255,255,.07); box-shadow:inset 0 1px 0 rgba(255,255,255,.10);
+    display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; }
+  .n20 .mbtn svg { width:26px; height:27px; }
+  .n20 .mbtn path { fill:rgba(255,255,255,.42); transition:fill .3s ease; }
+  .n20 .mbtn .fill { position:absolute; left:0; right:0; bottom:0; height:0; background:#fff; }
+  .n20 .mbtn.is-done path { fill:#0b1112; }
+
+  /* 21 · notched card (the M's own cut) */
+  .n21 .tb { --notch:26px; clip-path:polygon(0 0, calc(100% - var(--notch)) 0, 100% var(--notch), 100% 100%, 0 100%); }
+  .n21 .tb__lab { display:none; }
+
+  /* 22 · full-screen type */
+  .n22 .stage { padding:0; }
+  .n22 .tb { background:none; box-shadow:none; border-radius:16px; padding:30px 22px 24px;
+             min-height:250px; display:flex; flex-direction:column; justify-content:flex-end; }
+  .n22 .tb__lab { display:none; }
+  .n22 .tb__move { font-size:30px; line-height:1.08; letter-spacing:-.03em; margin:0 0 22px; }
+  .desk.n22 .tb__move { font-size:44px; }
+  .n22 .tb__go { align-self:flex-start; background:transparent; color:var(--text-hi);
+                 padding:0; border-radius:0; font-size:15px;
+                 box-shadow:0 1.5px 0 rgba(255,255,255,.55); }
+
+  /* 23 · tally streak */
+  .n23 .tb__lab { display:none; }
+  .n23 .tally { display:flex; align-items:flex-end; gap:5px; height:20px; margin:0 0 14px; }
+  .n23 .tally i { display:block; width:2px; height:100%; background:rgba(255,255,255,.55); border-radius:1px; }
+  .n23 .tally i:nth-child(5n) { transform:rotate(24deg); transform-origin:bottom; margin-left:-9px; }
+  .n23 .tally span { margin-left:8px; font-size:11px; font-weight:700; letter-spacing:.1em;
+                     text-transform:uppercase; color:var(--text-lo); align-self:center; }
+
+  /* 24 · day ticks */
+  .n24 .tb__lab { display:none; }
+  .n24 .ticks { display:flex; align-items:flex-end; gap:6px; height:26px; margin:0 0 16px; }
+  .n24 .ticks i { display:block; width:2px; height:12px; background:rgba(255,255,255,.20); border-radius:1px; }
+  .n24 .ticks i.on { background:rgba(255,255,255,.50); }
+  .n24 .ticks i.now { height:26px; background:#fff; }
+
+  /* 25 · the action is a word */
+  .n25 .tb__lab { display:none; }
+  .n25 .tb__move { font-size:24px; line-height:1.18; margin:0 0 20px; }
+  .desk.n25 .tb__move { font-size:38px; }
+  .n25 .tb__go { background:transparent; color:var(--text-hi); padding:0; border-radius:0;
+                 font-size:16px; box-shadow:0 1.5px 0 rgba(255,255,255,.55); }
+</style>
+</head>
+<body class="ns-bloom">
+<div class="wrap">
+  <h1>Today box, round 2</h1>
+  <p class="lede">Your five keepers up top, unchanged. Then ten new ones that push harder on the thing your picks had in common: less chrome, and the act of finishing made physical. Still no colour, still nothing extra to read. The ones marked TRY ME actually work, hold or drag them.</p>
+
+  <div class="sect">The five you kept</div>
+  <div id="keep"></div>
+
+  <div class="sect">Ten new</div>
+  <div id="out"></div>
+</div>
+
+<script>
+const MOVE = "Write the first draft of this week's video script";
+const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+const MARK = '<svg viewBox="140 136 232 240"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
+
+const KEEP = [
+  { k:'k2',  n:2,  name:'No label',          why:'The move alone. Nothing tells you it is today because nothing needs to.',
+    body:()=>`<p class="tb__move">${MOVE}</p><button class="tb__go">Mark Complete</button>` },
+  { k:'k5',  n:5,  name:'Full-bleed action', why:'The button is the base of the card. One enormous target.',
+    body:()=>`<p class="tb__move">${MOVE}</p><button class="tb__go">Mark Complete</button>` },
+  { k:'k8',  n:8,  name:'No card',           why:'No panel at all. The move floats on the room.',
+    body:()=>`<p class="tb__move">${MOVE}</p><button class="tb__go">Mark Complete</button>` },
+  { k:'k11', n:11, name:'Outline action',    why:'Quieter button, so the move stays the loudest thing.',
+    body:()=>`<p class="tb__move">${MOVE}</p><button class="tb__go">Mark Complete</button>` },
+  { k:'k13', n:13, name:'Swipe to finish',   why:'Finishing takes a deliberate drag.', try:true,
+    body:()=>`<p class="tb__move">${MOVE}</p><div class="rail" data-rail><span class="rail__fill"></span><span class="rail__knob">${CHECK}</span><span class="rail__txt">Slide to complete</span></div>` }
+];
+
+const NEW = [
+  { k:'n16', n:16, name:'Hold to complete', try:true,
+    why:'Press and hold and the button fills under your thumb. The same gesture that ignites the card when you pay, so the app has ONE language for anything that matters.',
+    body:()=>`<p class="tb__move">${MOVE}</p><button class="tb__go hold" data-hold><span class="hold__fill"></span><span class="hold__lbl">Hold to complete</span></button>` },
+  { k:'n17', n:17, name:'The move is the button', try:true,
+    why:'No control at all. Tap the sentence and it strikes through. The fewest possible elements: one line of text that is also the verb.',
+    body:()=>`<p class="tb__move" data-tap>${MOVE}</p>` },
+  { k:'n18', n:18, name:'Swipe the card away', try:true,
+    why:'Drag the whole card off to finish the day. The object leaves the screen, which is exactly what happened in your head.',
+    body:()=>`<p class="tb__move">${MOVE}</p><p class="hint">Drag the card right &rarr;</p>` },
+  { k:'n19', n:19, name:'The line fills', try:true,
+    why:'A hairline under the move. Hold anywhere on it and the line fills left to right. Progress made out of the rule itself, no button anywhere.',
+    body:()=>`<p class="tb__move">${MOVE}</p><div class="ul" data-ul><span class="ul__fill"></span></div><p class="ul__txt">Hold the line to complete</p>` },
+  { k:'n20', n:20, name:'The mark is the button', try:true,
+    why:'Your own M is the control. Hold it and it floods solid. Nothing is more iconic than making the logo the verb.',
+    body:()=>`<div class="row"><p class="tb__move">${MOVE}</p><button class="mbtn" data-mark><span class="fill"></span>${MARK}</button></div>` },
+  { k:'n21', n:21, name:'Notched card',
+    why:'The card takes the M&rsquo;s own cut corner. Recognisable at a glance from across the room, and it costs one line of CSS.',
+    body:()=>`<p class="tb__move">${MOVE}</p><button class="tb__go">Mark Complete</button>` },
+  { k:'n22', n:22, name:'Full-screen type',
+    why:'The extreme of your no-card pick. The move is the whole surface, bottom-weighted like a poster, and the action is one underlined word.',
+    body:()=>`<p class="tb__move">${MOVE}</p><button class="tb__go">Mark complete</button>` },
+  { k:'n23', n:23, name:'Tally streak',
+    why:'The streak as hand-cut tally strokes instead of a number. Physical, human, and it grows visibly without ever showing a digit.',
+    body:()=>`<div class="tally">${'<i></i>'.repeat(8)}<span>8 days</span></div><p class="tb__move">${MOVE}</p><button class="tb__go">Mark Complete</button>` },
+  { k:'n24', n:24, name:'Day ticks',
+    why:'A week of hairlines, today standing tallest. You read where you are instantly, with no numbers and no colour.',
+    body:()=>`<div class="ticks"><i class="on"></i><i class="on"></i><i></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="now"></i></div><p class="tb__move">${MOVE}</p><button class="tb__go">Mark Complete</button>` },
+  { k:'n25', n:25, name:'The action is a word',
+    why:'No button shape at all. The move gets big, and finishing is a single underlined word. Type doing all the work.',
+    body:()=>`<p class="tb__move">${MOVE}</p><button class="tb__go">Mark complete</button>` }
+];
+
+const render = (list) => list.map(v => `
+  <div class="v">
+    <p class="v__name">${v.n} &middot; ${v.name}${v.try ? '<span class="try">Try me</span>' : ''}</p>
+    <p class="v__why">${v.why}</p>
+    <div class="pair">
+      <div class="phone ${v.k}"><p class="cap">Phone</p><div class="stage"><div class="tb">${v.body()}</div></div></div>
+      <div class="desk ${v.k}"><p class="cap">Desktop &amp; iPad</p><div class="stage"><div class="tb">${v.body()}</div></div></div>
+    </div>
+  </div>`).join('');
+
+document.getElementById('keep').innerHTML = render(KEEP);
+document.getElementById('out').innerHTML = render(NEW);
+
+/* ── make the physical ones actually work ─────────────────────────────── */
+const HOLD_MS = 1200;
+
+// hold-to-fill (buttons, the line, the mark)
+function wireHold(el, fill, onDone, vertical) {
+  let raf = null, t0 = 0, done = false;
+  const set = (p) => {
+    if (vertical) fill.style.height = (p * 100) + '%';
+    else fill.style.width = (p * 100) + '%';
+  };
+  const step = (now) => {
+    const p = Math.min(1, (now - t0) / HOLD_MS);
+    set(p);
+    if (p >= 1) { done = true; onDone(); return; }
+    raf = requestAnimationFrame(step);
+  };
+  const start = (e) => { if (done) return; e.preventDefault(); t0 = performance.now(); raf = requestAnimationFrame(step); };
+  const stop = () => { if (done) return; if (raf) cancelAnimationFrame(raf); raf = null; set(0); };
+  el.addEventListener('pointerdown', start);
+  document.addEventListener('pointerup', stop);
+  document.addEventListener('pointercancel', stop);
+}
+
+document.querySelectorAll('[data-hold]').forEach(b => {
+  const lbl = b.querySelector('.hold__lbl');
+  wireHold(b, b.querySelector('.hold__fill'), () => { lbl.textContent = 'Done'; });
+});
+
+document.querySelectorAll('[data-ul]').forEach(u => {
+  wireHold(u, u.querySelector('.ul__fill'), () => {
+    const t = u.parentElement.querySelector('.ul__txt'); if (t) t.textContent = 'Done';
+  });
+});
+
+document.querySelectorAll('[data-mark]').forEach(m => {
+  wireHold(m, m.querySelector('.fill'), () => { m.classList.add('is-done'); }, true);
+});
+
+// tap the sentence
+document.querySelectorAll('[data-tap]').forEach(p => {
+  p.addEventListener('click', () => p.classList.toggle('is-done'));
+});
+
+// drag rails
+document.querySelectorAll('[data-rail]').forEach(rail => {
+  const knob = rail.querySelector('.rail__knob');
+  const fill = rail.querySelector('.rail__fill');
+  const txt = rail.querySelector('.rail__txt');
+  let dragging = false, startX = 0, max = 0;
+  const reset = () => { knob.style.transform = 'translateX(0)'; fill.style.width = '0'; };
+  rail.addEventListener('pointerdown', (e) => {
+    dragging = true; startX = e.clientX; max = rail.clientWidth - knob.offsetWidth - 8;
+    rail.setPointerCapture(e.pointerId);
+  });
+  rail.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    const x = Math.max(0, Math.min(max, e.clientX - startX));
+    knob.style.transform = 'translateX(' + x + 'px)';
+    fill.style.width = (x + knob.offsetWidth) + 'px';
+    if (x >= max - 2) { dragging = false; txt.textContent = 'Done'; }
+  });
+  rail.addEventListener('pointerup', () => { if (dragging) { dragging = false; reset(); } });
+});
+
+// drag the whole card away
+document.querySelectorAll('.n18 .tb').forEach(card => {
+  let dragging = false, startX = 0;
+  card.addEventListener('pointerdown', (e) => { dragging = true; startX = e.clientX; card.style.transition = 'none'; card.setPointerCapture(e.pointerId); });
+  card.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    const dx = Math.max(0, e.clientX - startX);
+    card.style.transform = 'translateX(' + dx + 'px)';
+    card.style.opacity = String(Math.max(0, 1 - dx / 260));
+  });
+  const end = () => {
+    if (!dragging) return; dragging = false;
+    card.style.transition = 'transform .3s ease-out, opacity .3s ease-out';
+    card.style.transform = 'translateX(0)'; card.style.opacity = '1';
+  };
+  card.addEventListener('pointerup', end);
+  card.addEventListener('pointercancel', end);
+});
+</script>
+</body>
+</html>
