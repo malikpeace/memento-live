@@ -3969,6 +3969,10 @@ function _ccHeroSwap(mutate) {
 // fact appears exactly once on the desktop home; mission = this headline,
 // done = the button, streak + proofs = the stat pair, the year = the heatmap,
 // time/death = the clock. Reuses the same data-cc-action wiring.
+// v1050: which pillar the desktop box is showing. Deliberately NOT persisted:
+// a relaunch always lands on today's action, never on a screen the person did
+// not choose this session (resume never lands ahead).
+let _deskPillar = 'action';
 function renderDeskMission() {
   try {
     const el = document.getElementById('deskMission');
@@ -4053,11 +4057,57 @@ function renderDeskMission() {
               ' &middot; ' + _active.toLocaleString() + ' active days</div>'
             : '') +
         '</div>';
-      el.innerHTML =
-        label('Today&rsquo;s Action') +
-        head(mission) +
-        '<div class="dkm__row">' + doneBtn + streakChip + '</div>';
+      // v1050 (Malik's pick): the fan. At rest the card carries only the word
+      // it already had; the other two pillars live in the same row at zero
+      // width and widen when the mouse comes near, so the live word never
+      // moves. The box is one fixed height for all three (CSS), so switching
+      // changes the words and nothing else.
+      const PILL = {
+        action: () => label('Today&rsquo;s Action') + head(mission) +
+          '<div class="dkm__row">' + doneBtn + streakChip + '</div>',
+        clarity: () => {
+          const a = (state.clarity && state.clarity.answers) || {};
+          const star = String(a.neutronStar || '').trim();
+          const why = String(a.coreWhy || a.whyItMatters || '').trim();
+          return label('Your Neutron Star') + head(star || 'Your Neutron Star') +
+            (why ? '<div class="dkm__sub">' + esc(why) + '</div>' : '');
+        },
+        consistency: () => {
+          const days = streak.toLocaleString();
+          return label('Rhythm') +
+            head(streak === 1 ? '1 day in a row.' : days + ' days in a row.') +
+            '<div class="dkm__sub">' +
+              (_active ? _active.toLocaleString() + ' active days so far. ' : '') +
+              (_best ? 'Longest run: ' + _best.toLocaleString() + '.' : '') +
+            '</div>';
+        }
+      };
+      const NAMES = { action: 'Today&rsquo;s Action', clarity: 'Your Neutron Star', consistency: 'Rhythm' };
+      const ORDER = ['action', 'clarity', 'consistency'];
+      if (ORDER.indexOf(_deskPillar) < 0) _deskPillar = 'action';
+      const rest = ORDER.filter((p) => p !== _deskPillar);
+      const fan = '<div class="dkm__fan">' +
+        '<span class="dkm__fan-cur">' + NAMES[_deskPillar] + '</span>' +
+        rest.map((p) => '<button class="dkm__fan-btn" type="button" data-dkm-pillar="' + p + '">' + NAMES[p] + '</button>').join('') +
+        '</div>';
+      // The label lives in the fan now, so each pillar's own body drops it.
+      const bodyOf = (p) => PILL[p]().replace(/^<div class="dkm__label">.*?<\/div>/, '');
+      el.classList.add('dkm--pillars');
+      // The negative is a PIXEL-IDENTICAL twin, fan row included. Leaving the
+      // fan out of it put the two copies on different baselines, so the wipe
+      // showed the headline jumping as it crossed.
+      const face = fan + '<div class="dkm__body">' + bodyOf(_deskPillar) + '</div>';
+      el.innerHTML = face + '<div class="dkm__inv" aria-hidden="true">' + face + '</div>';
+      el.querySelectorAll('[data-dkm-pillar]').forEach((b) => {
+        if (b.closest('.dkm__inv')) return;   // the twin is decoration, never a control
+        b.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          _deskPillar = b.getAttribute('data-dkm-pillar');
+          renderDeskMission();
+        });
+      });
     }
+    if (!el.classList.contains('dkm--pillars')) el.classList.remove('dkm--pillars');
     bindCommandCenter(el);
   } catch (e) {}
 }

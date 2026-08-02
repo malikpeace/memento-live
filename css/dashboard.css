@@ -4379,3 +4379,77 @@ html.theme-light #deskMission {
 @media (prefers-reduced-motion: reduce) {
   .cbp, .cbp__way { transition: none; }
 }
+
+/* ── THE FAN + THE INVERT (v1050, Malik's picks) ────────────────────────
+   Desktop only. At rest the box carries the one small word it always had;
+   the other two pillars sit in the same row at ZERO width and widen when
+   the pointer comes near, so the live word never moves and nothing below
+   it shifts. The box is one fixed height for all three pillars, so
+   switching changes words and nothing else. */
+#deskMission.dkm--pillars { position: relative; height: 268px; overflow: hidden; }
+#deskMission.dkm--pillars .dkm__body { display: flex; flex-direction: column; height: 100%; }
+#deskMission.dkm--pillars .dkm__headline { margin-bottom: 14px; }
+#deskMission.dkm--pillars .dkm__row { margin-top: auto; }
+
+.dkm__fan { display: flex; align-items: baseline; margin: 0 0 14px; min-height: 15px; }
+.dkm__fan-cur,
+.dkm__fan-btn {
+  font-size: 13px; font-weight: 600; letter-spacing: -0.005em;
+  line-height: 1; white-space: nowrap;
+}
+.dkm__fan-cur { color: var(--text-mid, var(--text-2)); }
+.dkm__fan-btn {
+  color: var(--text-lo); background: none; border: 0; padding: 0; margin: 0; cursor: pointer;
+  max-width: 0; opacity: 0; overflow: hidden;
+  transition: max-width 300ms cubic-bezier(.3, .85, .3, 1),
+              opacity 220ms ease-out,
+              margin-left 300ms cubic-bezier(.3, .85, .3, 1),
+              color 160ms ease;
+}
+#deskMission.dkm--pillars:hover .dkm__fan-btn,
+#deskMission.dkm--pillars:focus-within .dkm__fan-btn {
+  max-width: 220px; opacity: 0.72; margin-left: 20px;
+}
+.dkm__fan-btn:hover { color: var(--text-hi); }
+
+/* THE INVERT. It rides the EXISTING hold-to-complete (js/08's
+   bindHomeActionHold, 3000ms), so the gesture that already does the real
+   completion drives it and no second timer exists. Holding sweeps the
+   negative across the card; letting go drains it back faster than it
+   filled, so an abandoned hold stings a little. */
+#deskMission .dkm__inv {
+  position: absolute; inset: 0; background: #f5f5f7;
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 600ms ease-out;
+  pointer-events: none;
+  padding: 28px 30px 30px; box-sizing: border-box;
+}
+#deskMission.dkm--pillars:has(.cc-hold-complete.is-holding) .dkm__inv {
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 3000ms linear;
+}
+#deskMission .dkm__inv .dkm__headline,
+#deskMission .dkm__inv .dkm__streak-n { color: #0b1112; }
+#deskMission .dkm__inv .dkm__sub,
+#deskMission .dkm__inv .dkm__streak-l { color: rgba(11, 17, 18, 0.72); }
+#deskMission .dkm__inv .dkm__label,
+#deskMission .dkm__inv .dkm__streak-sub { color: rgba(11, 17, 18, 0.55); }
+#deskMission .dkm__inv .dkm__btn--solid { background: #0b1112; color: #f5f5f7; }
+#deskMission .dkm__inv .dkm__btn--done { color: rgba(11, 17, 18, 0.6); }
+html.theme-light #deskMission .dkm__inv { background: #14161c; }
+html.theme-light #deskMission .dkm__inv .dkm__headline,
+html.theme-light #deskMission .dkm__inv .dkm__streak-n { color: #f5f5f7; }
+html.theme-light #deskMission .dkm__inv .dkm__sub,
+html.theme-light #deskMission .dkm__inv .dkm__streak-l { color: rgba(245, 245, 247, 0.76); }
+html.theme-light #deskMission .dkm__inv .dkm__label,
+html.theme-light #deskMission .dkm__inv .dkm__streak-sub { color: rgba(245, 245, 247, 0.6); }
+html.theme-light #deskMission .dkm__inv .dkm__btn--solid { background: #f5f5f7; color: #0b1112; }
+@media (prefers-reduced-motion: reduce) {
+  .dkm__fan-btn { transition: opacity 120ms ease-out; }
+  #deskMission .dkm__inv { transition: none; }
+}
+/* The streak flame carries an inline fill and a coloured glow, which reads as
+   a stray dot once the negative sweeps past it. Inside the twin it goes ink. */
+#deskMission .dkm__inv .dkm__flame path { fill: #0b1112; }
+#deskMission .dkm__inv .dkm__flame { filter: none; opacity: 0.75; }
+html.theme-light #deskMission .dkm__inv .dkm__flame path { fill: #f5f5f7; }
