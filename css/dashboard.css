@@ -4413,13 +4413,23 @@ html.theme-light #deskMission {
    above it; the body then ran 29px past the bottom padding and the graph sat
    flush on the card's edge. Flexing it takes the fan's height into account. */
 #deskMission.dkm--pillars {
-  position: relative; height: 268px; overflow: hidden;
+  /* min-height, NOT height (v1058): a three-line move at headline size needs
+     more than 268px, and with a fixed height + overflow:hidden the box was
+     guillotining its own Mark Complete button (Malik's screenshot). 268 is
+     the floor so short faces stay uniform; a long move grows the box, and
+     clipping content is structurally impossible. overflow stays hidden only
+     to keep the invert twin's wipe inside the radius. */
+  position: relative; min-height: 268px; overflow: hidden;
   display: flex; flex-direction: column;
 }
 #deskMission.dkm--pillars .dkm__body {
   display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0;
 }
 #deskMission.dkm--pillars .dkm__headline { margin-bottom: 14px; }
+/* A long move steps the type down one notch (42 -> 32) so the box grows a
+   little instead of a lot. The class comes from the render, keyed on text
+   length; the move always reads in full either way. */
+#deskMission.dkm--pillars.dkm--long .dkm__headline { font-size: 32px; line-height: 1.16; }
 /* A star statement is a sentence, not a three-word mission, so at the Action
    headline's size it filled the whole card and pushed the "why" off the
    bottom. Smaller type and a line cap keep it inside the same box. */

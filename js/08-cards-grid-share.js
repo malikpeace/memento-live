@@ -4206,6 +4206,9 @@ function renderDeskMission() {
       // and the CSS sizes the headline to suit.
       el.classList.remove('dkm--p-action', 'dkm--p-clarity', 'dkm--p-consistency');
       el.classList.add('dkm--p-' + _deskPillar);
+      // v1058: a long move steps the headline down so the box grows a little
+      // instead of a lot (42px * 3 lines was what clipped the button).
+      el.classList.toggle('dkm--long', _deskPillar === 'action' && String(mission || '').length > 34);
       // The negative is a PIXEL-IDENTICAL twin, fan row included. Leaving the
       // fan out of it put the two copies on different baselines, so the wipe
       // showed the headline jumping as it crossed.
