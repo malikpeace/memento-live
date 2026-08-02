@@ -3674,6 +3674,18 @@ body.pre-clarity .capture-fab { display: none !important; }
     padding-bottom: calc(15px + var(--safe-b, 0px));
     scroll-snap-align: start;
   }
+  /* v1075 (Malik: "why does your screenshot have such a better layout than
+     mine??"): because the INSTALLED app is the one place the preview cannot
+     be. In standalone iOS, svh reports SHORT of the real screen; this repo
+     already proved it on his device (the bottom-black-bar saga: 100dvh and
+     100svh both short, 100lvh correct, see mobile-fullscreen-safe-area).
+     My preview's svh is honest, his phone's is not, so the column ended
+     ~40px shy and the box floated. Standalone gets the proven unit. */
+  @media (display-mode: standalone) {
+    body:not(.has-custom-layout) .app.dash-v2 #homePage1 {
+      height: calc(100lvh - var(--p1-top, 0px));
+    }
+  }
   body:not(.has-custom-layout) .app.dash-v2 #homePage1 > #dayCard {
     flex: 1 1 auto; min-height: 0;
   }
