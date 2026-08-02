@@ -3669,23 +3669,19 @@ body.pre-clarity .capture-fab { display: none !important; }
        padding), so a flat 100svh hangs off the bottom by exactly that offset.
        --p1-top is that static offset, measured once by js/08 (it is a fixed
        piece of chrome, not a per-render correction). */
-    height: calc(100svh - var(--p1-top, 0px));
+    /* v1076: MEASURED, not a unit. svh came up ~40px short in his installed
+       app and lvh ~40px long, because iOS standalone disagrees with both
+       about where the screen ends. --p1-vh is the real visible height read
+       from visualViewport (js/11), so no unit has to be trusted. The svh
+       fallback only matters for the first frame before JS runs. */
+    height: calc(var(--p1-vh, 100svh) - var(--p1-top, 0px));
     box-sizing: border-box;
     padding-bottom: calc(15px + var(--safe-b, 0px));
     scroll-snap-align: start;
   }
-  /* v1075 (Malik: "why does your screenshot have such a better layout than
-     mine??"): because the INSTALLED app is the one place the preview cannot
-     be. In standalone iOS, svh reports SHORT of the real screen; this repo
-     already proved it on his device (the bottom-black-bar saga: 100dvh and
-     100svh both short, 100lvh correct, see mobile-fullscreen-safe-area).
-     My preview's svh is honest, his phone's is not, so the column ended
-     ~40px shy and the box floated. Standalone gets the proven unit. */
-  @media (display-mode: standalone) {
-    body:not(.has-custom-layout) .app.dash-v2 #homePage1 {
-      height: calc(100lvh - var(--p1-top, 0px));
-    }
-  }
+  /* (v1075's standalone lvh override is gone: lvh overshot by ~40px on his
+     device. The measured --p1-vh above is correct on every device by
+     construction, so no per-mode unit override is needed.) */
   body:not(.has-custom-layout) .app.dash-v2 #homePage1 > #dayCard {
     flex: 1 1 auto; min-height: 0;
   }

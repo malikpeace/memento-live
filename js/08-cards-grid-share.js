@@ -4642,6 +4642,27 @@ function bindCommandCenter(cc) {
           const off = Math.round(_p1.getBoundingClientRect().top + window.scrollY);
           if (off >= 0 && off < 200) document.documentElement.style.setProperty('--p1-top', off + 'px');
         }
+        // v1077: the column's height, MEASURED rather than trusted to a
+        // viewport unit (svh ran ~40px short in Malik's installed app and lvh
+        // ~40px long; only the real number is right on every device). This
+        // lives beside the --p1-top read on purpose: it is the render path
+        // that provably runs, unlike the boot-time attempt.
+        const _vv = window.visualViewport;
+        const _vh = Math.round((_vv && _vv.height) || window.innerHeight || 0);
+        if (_vh > 200) document.documentElement.style.setProperty('--p1-vh', _vh + 'px');
+        if (!window.__p1VhBound) {
+          window.__p1VhBound = true;
+          const _re = () => {
+            try {
+              const v2 = window.visualViewport;
+              const h2 = Math.round((v2 && v2.height) || window.innerHeight || 0);
+              if (h2 > 200) document.documentElement.style.setProperty('--p1-vh', h2 + 'px');
+            } catch (e2) {}
+          };
+          window.addEventListener('resize', _re);
+          window.addEventListener('orientationchange', () => setTimeout(_re, 140));
+          if (window.visualViewport) window.visualViewport.addEventListener('resize', _re);
+        }
       } catch (e) {}
     }
   } catch (e) {}

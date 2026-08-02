@@ -23,6 +23,9 @@ try {
   }
 } catch (e) {}
 
+/* (the page-1 viewport measurement lives in js/08 beside the --p1-top
+   read: this file's top-level attempt never ran.) */
+
 /* v1073 SAFE-AREA SIMULATOR (dev only, URL-gated, inert without the param).
    The headless preview renders env(safe-area-inset-*) as 0, so every layout
    I verified was a case Malik's phone never runs: his notch and home
