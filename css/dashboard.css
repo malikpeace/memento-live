@@ -4386,9 +4386,32 @@ html.theme-light #deskMission {
    the pointer comes near, so the live word never moves and nothing below
    it shifts. The box is one fixed height for all three pillars, so
    switching changes words and nothing else. */
-#deskMission.dkm--pillars { position: relative; height: 268px; overflow: hidden; }
-#deskMission.dkm--pillars .dkm__body { display: flex; flex-direction: column; height: 100%; }
+/* The card is a column: fan row, then body. The body used to be height:100%,
+   which resolves against the WHOLE content box and so ignored the fan sitting
+   above it; the body then ran 29px past the bottom padding and the graph sat
+   flush on the card's edge. Flexing it takes the fan's height into account. */
+#deskMission.dkm--pillars {
+  position: relative; height: 268px; overflow: hidden;
+  display: flex; flex-direction: column;
+}
+#deskMission.dkm--pillars .dkm__body {
+  display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0;
+}
 #deskMission.dkm--pillars .dkm__headline { margin-bottom: 14px; }
+/* A star statement is a sentence, not a three-word mission, so at the Action
+   headline's size it filled the whole card and pushed the "why" off the
+   bottom. Smaller type and a line cap keep it inside the same box. */
+#deskMission.dkm--p-clarity .dkm__headline {
+  font-size: 23px; line-height: 1.28;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4;
+  overflow: hidden;
+}
+/* Free text, fixed box: the star's "why" can run past the card and get
+   clipped mid-sentence. Two lines is what the height budget allows. */
+#deskMission.dkm--pillars .dkm__sub {
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+  overflow: hidden;
+}
 #deskMission.dkm--pillars .dkm__row { margin-top: auto; }
 
 .dkm__fan { display: flex; align-items: baseline; margin: 0 0 14px; min-height: 15px; }
@@ -4453,3 +4476,123 @@ html.theme-light #deskMission .dkm__inv .dkm__btn--solid { background: #f5f5f7; 
 #deskMission .dkm__inv .dkm__flame path { fill: #0b1112; }
 #deskMission .dkm__inv .dkm__flame { filter: none; opacity: 0.75; }
 html.theme-light #deskMission .dkm__inv .dkm__flame path { fill: #f5f5f7; }
+
+/* The phone card's pillar dots (v1051). Six pixels of chrome so the swipe is
+   discoverable; no colour, and they never move the content. */
+.cc-dots { display: flex; gap: 7px; justify-content: center; margin: 16px 0 0; }
+.cc-dots i {
+  width: 6px; height: 6px; border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+  transition: background 200ms ease, transform 200ms ease;
+}
+.cc-dots i.on { background: var(--text-hi); transform: scale(1.15); }
+html.theme-light .cc-dots i { background: rgba(var(--ink), 0.22); }
+/* The light-mode rule above is more specific than `.cc-dots i.on`, so without
+   this the live dot loses its highlight in light mode and all three read the
+   same: the swipe position becomes invisible. */
+html.theme-light .cc-dots i.on { background: var(--text-hi); }
+/* The card follows the finger a little during a swipe; the handler owns the
+   transform, this only keeps the drag from selecting text or firing the
+   browser's own horizontal gestures. */
+.cc-card { touch-action: pan-y; }
+@media (prefers-reduced-motion: reduce) { .cc-dots i { transition: none; } }
+
+/* The phone card's invert (v1051). The card starts in the CURRENT theme and
+   the hold flips it to the opposite: dark card goes light, light card goes
+   dark. Same 3000ms as the hold that does the real completion, draining back
+   in 600ms if it is abandoned. */
+.cc-card { position: relative; overflow: hidden; }
+.cc-inv {
+  position: absolute; inset: 0; z-index: 2;
+  background: #f5f5f7; color: #0b1112;
+  /* inherit, never a guess: the card's padding is set inline and differs by
+     state, and a hardcoded copy here put the twin's text ~20px off the real
+     one, so the headline slid as the wipe crossed it. */
+  padding: inherit; box-sizing: border-box;
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 600ms ease-out;
+  pointer-events: none;
+}
+.cc-card:has(.cc-hold-complete.is-holding) > .cc-inv {
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 3000ms linear;
+}
+/* Everything inside the twin takes ink, whatever inline colour it inherited
+   from the real card's markup. */
+.cc-inv, .cc-inv * { color: #0b1112 !important; }
+.cc-inv .cc-primary,
+.cc-inv .cc-hold-complete { background: #0b1112 !important; }
+.cc-inv .cc-primary, .cc-inv .cc-primary *,
+.cc-inv .cc-hold-complete, .cc-inv .cc-hold-complete * { color: #f5f5f7 !important; }
+.cc-inv .cc-dots i { background: rgba(11, 17, 18, 0.22); }
+/* The twin is always the OPPOSITE ground from the page, so anything tinted by
+   the theme has to be flipped by hand or it disappears into it. The graph's
+   rest-day fill is the case that bit: in light mode the twin is dark and the
+   dark rest-day squares vanished, leaving the streak floating on nothing.
+   (The active squares are green in both themes, so they need no flip.) */
+.cc-inv .cc-heat, .dkm__inv .dkm__heat { --kfill-06: rgba(11, 17, 18, 0.10); }
+html.theme-light .cc-inv .cc-heat,
+html.theme-light .dkm__inv .dkm__heat { --kfill-06: rgba(255, 255, 255, 0.14); }
+.cc-inv .cc-dots i.on { background: #0b1112; }
+.cc-inv [style*="border-top"] { border-top-color: rgba(11, 17, 18, 0.12) !important; }
+html.theme-light .cc-inv { background: #14161c; }
+html.theme-light .cc-inv, html.theme-light .cc-inv * { color: #f5f5f7 !important; }
+html.theme-light .cc-inv .cc-primary,
+html.theme-light .cc-inv .cc-hold-complete { background: #f5f5f7 !important; }
+html.theme-light .cc-inv .cc-primary, html.theme-light .cc-inv .cc-primary *,
+html.theme-light .cc-inv .cc-hold-complete, html.theme-light .cc-inv .cc-hold-complete * { color: #0b1112 !important; }
+html.theme-light .cc-inv .cc-dots i { background: rgba(245, 245, 247, 0.28); }
+html.theme-light .cc-inv .cc-dots i.on { background: #f5f5f7; }
+html.theme-light .cc-inv [style*="border-top"] { border-top-color: rgba(245, 245, 247, 0.14) !important; }
+@media (prefers-reduced-motion: reduce) { .cc-inv { transition: none; } }
+
+/* One height for all three phone pillars (v1051, Malik: the box must not
+   resize when you swipe). Sized to the tallest measured pillar (Clarity at
+   253 on a 390 phone) with headroom for a longer star, and the content sits
+   top-aligned so the eyebrow never moves. Only applied while swiping is
+   offered, so every other card state keeps its natural height. */
+/* v981 pins EVERY page-1 card to 206px with !important (see the block above).
+   That rule is right, and it is a HARD budget, not a preference: page 1 is the
+   relic plus this box plus the bottom bar inside one viewport, so a taller box
+   simply falls off the screen (300px put its bottom at 894 in an 844 phone).
+   The three pillars therefore fit THEMSELVES into the budget rather than
+   growing it. Same selector plus the pillars class, so it wins on specificity
+   rather than by shouting louder. 212 is the tallest pillar's natural height,
+   so nothing is squeezed. */
+body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-card--pillars {
+  min-height: 212px !important;
+  /* The pillared card carries the three dots that a plain card does not, and
+     the height is a hard budget, so the dots have to be paid for out of the
+     padding rather than out of the card growing. Without this the content
+     overflowed the locked height and the dots landed on top of the button. */
+  padding-bottom: 12px !important;
+}
+.cc-card--pillars .cc-dots { margin-top: 12px; }
+.cc-card--pillars { display: flex; flex-direction: column; }
+
+/* The star's "why" line is free text and can run long. Two lines is the most
+   the budget allows; past that it pushes the box off the screen. */
+.cc-card--pillars .cc-why-clamp {
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.cc-card--pillars > .cc-dots { margin-top: auto; }
+.cc-card--pillars > .cc-inv { display: flex; flex-direction: column; }
+.cc-card--pillars > .cc-inv > .cc-dots { margin-top: auto; }
+
+/* The heatmap living inside the today box (v1054). It is the same renderer as
+   the Consistency band, just given a short rolling range and told to fill the
+   width it is handed. */
+.cc-heat, .dkm__heat { margin-top: 12px; }
+/* At card scale the squares are only a few pixels wide, and the default gap
+   is a large fraction of that: with it the cells round down into faint dots
+   and the block reads as texture instead of data. Tightening the gap keeps
+   them square and legible. The month strip and legend do not survive the
+   shrink at all, so those come off rather than the grid itself. */
+.cc-heat .cgraph__col, .cc-heat .cgraph__cols,
+.dkm__heat .cgraph__col, .dkm__heat .cgraph__cols { gap: 2px; }
+.cc-heat .cgraph__months, .cc-heat .cgraph__legend, .cc-heat .cgraph__cap,
+.dkm__heat .cgraph__months, .dkm__heat .cgraph__legend, .dkm__heat .cgraph__cap { display: none; }
+.dkm__heat { margin-top: auto; padding-top: 16px; }
+.cc-heat .cgram, .dkm__heat .cgram { width: 100%; }
+.cc-heat svg, .dkm__heat svg { width: 100%; height: auto; display: block; }

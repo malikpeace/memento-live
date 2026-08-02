@@ -3689,6 +3689,10 @@ function hasFreshWeeklyCard() {
   try { return (state.updates || []).some(u => u && u.type === 'weekly' && !u.read); } catch (e) { return false; }
 }
 
+// v1051: which pillar the PHONE card is showing. Same rule as the desktop
+// fan: never persisted, so every launch lands on today's action.
+let _ccPillar = 'action';
+const CC_PILLARS = ['action', 'clarity', 'consistency'];
 function renderCommandCenter() {
   try {
     // Seal closed days into the offering ledger (defined in js/02, loaded
@@ -3699,7 +3703,12 @@ function renderCommandCenter() {
     const tiers = pa.tiers || {};
     const hasPlan = !!(state.action && state.action.planGenerated && pa.title);
     const C = ccAccentColor();
-    const wrap = (inner) => '<section class="cc-card" style="margin:0 0 14px;padding:22px 22px 20px;border-radius:var(--card-r);background:var(--surface-1);box-shadow:var(--shadow-card), inset 0 1px 0 rgba(255,255,255,0.06);">' + inner + '</section>';
+    // v1051: --pillars is the class that locks ONE height across the three
+    // swipeable pillars, so the box never resizes under the swipe. It is only
+    // added where swiping is offered; every other card state keeps its own
+    // natural height.
+    const _pillared = hasClarity && hasPlan;
+    const wrap = (inner) => '<section class="cc-card' + (_pillared ? ' cc-card--pillars' : '') + '" style="margin:0 0 14px;padding:22px 22px 20px;border-radius:var(--card-r);background:var(--surface-1);box-shadow:var(--shadow-card), inset 0 1px 0 rgba(255,255,255,0.06);">' + inner + '</section>';
     // v1049 (Malik): the label is NEUTRAL, never the accent. Colour on a tiny
     // uppercase kicker is the fastest way for a surface to read cheap, and the
     // today box is the one people see every day.
@@ -3718,6 +3727,54 @@ function renderCommandCenter() {
       return wrap(eyebrow('Next step') +
         '<div style="font-size:1.15rem;font-weight:700;color:var(--text-hi);margin-bottom:14px;">Turn your Neutron Star into a tangible daily action</div>' +
         '<div style="display:flex;">' + primaryBtn('Build my plan', 'action') + '</div>');
+    }
+
+    // v1051 (Malik): swipe the phone card between the three pillars. The
+    // ACTION pillar is untouched, it falls through to the exact card that
+    // shipped before, so the everyday screen carries zero risk. The other two
+    // are their own small cards. Only offered once there is a plan to swipe
+    // away from; before that the card is a single next step and swiping would
+    // be noise.
+    if (hasClarity && hasPlan && _ccPillar !== 'action') {
+      const dots = (live) => '<div class="cc-dots" aria-hidden="true">' +
+        [0, 1, 2].map((n) => '<i' + (n === live ? ' class="on"' : '') + '></i>').join('') + '</div>';
+      if (_ccPillar === 'clarity') {
+        const a = (state.clarity && state.clarity.answers) || {};
+        const star = String(a.neutronStar || '').trim();
+        const why = String(a.coreWhy || a.whyItMatters || '').trim();
+        return wrap(eyebrow('Your Neutron Star') +
+          '<div style="font-size:1.15rem;font-weight:700;line-height:1.3;color:var(--text-hi);">' + esc(star || 'Your Neutron Star') + '</div>' +
+          (why ? '<div class="cc-why-clamp" style="font-size:0.9rem;line-height:1.5;color:var(--text-2);margin-top:9px;">' + esc(why) + '</div>' : '') +
+          dots(1));
+      }
+      let _s = 0, _b = 0, _act = 0;
+      try {
+        const cs = (typeof consistencyStats === 'function') ? consistencyStats() : null;
+        _s = (cs && cs.current) || 0; _b = (cs && cs.longest) || 0; _act = (cs && cs.totalActiveDays) || 0;
+      } catch (e) {}
+      // v1054 (Malik): the real heatmap, not a description of one. Same
+      // renderer the Consistency band uses. The week count is doing double
+      // duty here: 'fit' sizes each square to the card width, so FEWER weeks
+      // means BIGGER squares and a TALLER block. The card's height budget is
+      // fixed (see .cc-card--pillars), so the range is what buys the fit: 14
+      // weeks overflowed by ~150px, 40 lands inside it and shows most of a
+      // year, which is the more honest picture anyway.
+      let _hm = '';
+      try { _hm = renderConsistencyHeatmap(40, 'rolling', true); } catch (e) {}
+      return wrap(eyebrow('Consistency') +
+        '<div style="font-size:1.15rem;font-weight:700;line-height:1.3;color:var(--text-hi);">' +
+          (_s === 1 ? '1 day in a row.' : _s.toLocaleString() + ' days in a row.') + '</div>' +
+        // When the graph is in the card it already SHOWS the active days and
+        // the long runs, so the sentence restating them is both redundant and
+        // the ~26px that pushed the card under the home indicator. It stays as
+        // the fallback for anyone whose graph failed to render.
+        (_hm ? '' :
+          '<div style="font-size:0.9rem;line-height:1.5;color:var(--text-2);margin-top:5px;">' +
+            (_act ? _act.toLocaleString() + ' active days' : '') +
+            (_act && _b ? ' \u00b7 ' : '') +
+            (_b ? 'longest run ' + _b.toLocaleString() : '') + '</div>') +
+        (_hm ? '<div class="cc-heat">' + _hm + '</div>' : '') +
+        dots(2));
     }
 
     // COMEBACK MODE: when the user has fallen off (no activity for 2+ days),
@@ -3923,6 +3980,11 @@ function renderCommandCenter() {
     }
 
     row += '</div>'; // close .cc-hero-body (the swappable hero content)
+    // v1051: the three dots, so the swipe is discoverable. Only once there is
+    // a plan, matching where swiping is offered at all.
+    if (hasClarity && hasPlan) {
+      row += '<div class="cc-dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>';
+    }
     return wrap(row);
   } catch (e) { return ''; }
 }
@@ -4074,15 +4136,27 @@ function renderDeskMission() {
         },
         consistency: () => {
           const days = streak.toLocaleString();
-          return label('Rhythm') +
+          let hm = '';
+          // Same trade as the phone card: 'fit' sizes the squares to the
+          // container, so on this much wider card a short range made them
+          // huge and the graph overflowed the box by 134px. A full year both
+          // fits and suits the width.
+          try { hm = renderConsistencyHeatmap(53, 'rolling', true); } catch (e) {}
+          return label('Consistency') +
             head(streak === 1 ? '1 day in a row.' : days + ' days in a row.') +
-            '<div class="dkm__sub">' +
-              (_active ? _active.toLocaleString() + ' active days so far. ' : '') +
-              (_best ? 'Longest run: ' + _best.toLocaleString() + '.' : '') +
-            '</div>';
+            // The graph shows the active days and the long runs, so the
+            // sentence restating them is redundant, and its ~28px is what
+            // pushed the graph flush against the card's bottom edge. Kept as
+            // the fallback for anyone whose graph failed to render.
+            (hm ? '' :
+              '<div class="dkm__sub">' +
+                (_active ? _active.toLocaleString() + ' active days so far. ' : '') +
+                (_best ? 'Longest run: ' + _best.toLocaleString() + '.' : '') +
+              '</div>') +
+            (hm ? '<div class="dkm__heat">' + hm + '</div>' : '');
         }
       };
-      const NAMES = { action: 'Today&rsquo;s Action', clarity: 'Your Neutron Star', consistency: 'Rhythm' };
+      const NAMES = { action: 'Today&rsquo;s Action', clarity: 'Your Neutron Star', consistency: 'Consistency' };
       const ORDER = ['action', 'clarity', 'consistency'];
       if (ORDER.indexOf(_deskPillar) < 0) _deskPillar = 'action';
       const rest = ORDER.filter((p) => p !== _deskPillar);
@@ -4093,6 +4167,11 @@ function renderDeskMission() {
       // The label lives in the fan now, so each pillar's own body drops it.
       const bodyOf = (p) => PILL[p]().replace(/^<div class="dkm__label">.*?<\/div>/, '');
       el.classList.add('dkm--pillars');
+      // The three pillars carry very different amounts of text (a one-line
+      // mission vs a whole star statement), so the card says which one it is
+      // and the CSS sizes the headline to suit.
+      el.classList.remove('dkm--p-action', 'dkm--p-clarity', 'dkm--p-consistency');
+      el.classList.add('dkm--p-' + _deskPillar);
       // The negative is a PIXEL-IDENTICAL twin, fan row included. Leaving the
       // fan out of it put the two copies on different baselines, so the wipe
       // showed the headline jumping as it crossed.
@@ -4116,6 +4195,81 @@ function bindCommandCenter(cc) {
   // v812: the desktop editorial hero mirrors every command-center re-render
   // through this single chokepoint (guarded against self-recursion).
   try { if (cc && cc.id === 'commandCenter') renderDeskMission(); } catch (e) {}
+
+  /* v1051: swipe the phone card between the three pillars.
+     Three gestures now live on this card (tap opens Action, hold completes,
+     swipe switches), so they are told apart the only way that is reliable:
+     by MOVEMENT. Under 12px is not a swipe and nothing happens, so a tap
+     stays a tap. Past 12px horizontally the card takes the gesture, marks
+     itself swiping (which the tap handler checks) and cancels any hold in
+     progress by releasing the button. A mostly-vertical drag is the page
+     scrolling and is left alone. */
+  /* v1051: the phone card's invert twin. Built by CLONING the rendered card
+     rather than rendering the body twice, so no id in the real card is ever
+     duplicated (ids are stripped from the clone) and the render path stays
+     untouched. Same rule as desktop: it rides the existing hold. */
+  try {
+    const card0 = cc && cc.querySelector && cc.querySelector('.cc-card');
+    if (card0 && cc.id === 'commandCenter' && !card0.querySelector(':scope > .cc-inv')) {
+      const twin = document.createElement('div');
+      twin.className = 'cc-inv';
+      twin.setAttribute('aria-hidden', 'true');
+      twin.innerHTML = card0.innerHTML;
+      twin.querySelectorAll('[id]').forEach((n) => n.removeAttribute('id'));
+      twin.querySelectorAll('input, button, a, [tabindex]').forEach((n) => n.setAttribute('tabindex', '-1'));
+      card0.appendChild(twin);
+    }
+  } catch (e) {}
+
+  try {
+    const card = cc && cc.querySelector && cc.querySelector('.cc-card');
+    if (card && !card.dataset.swipeBound && cc.id === 'commandCenter') {
+      card.dataset.swipeBound = '1';
+      let x0 = null, y0 = null, axis = null;
+      const THRESH = 12, COMMIT = 56;
+      card.addEventListener('pointerdown', (e) => {
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        x0 = e.clientX; y0 = e.clientY; axis = null;
+        card.dataset.swiping = '';
+      });
+      card.addEventListener('pointermove', (e) => {
+        if (x0 === null) return;
+        const dx = e.clientX - x0, dy = e.clientY - y0;
+        if (!axis) {
+          if (Math.abs(dx) < THRESH && Math.abs(dy) < THRESH) return;
+          axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+          if (axis === 'x') {
+            card.dataset.swiping = '1';
+            // A hold that turns into a swipe is not a completion.
+            const held = card.querySelector('.cc-hold-complete.is-holding');
+            if (held) held.dispatchEvent(new PointerEvent('pointerup', { bubbles: true }));
+          }
+        }
+        if (axis !== 'x') return;
+        e.preventDefault();
+        card.style.transform = 'translateX(' + (dx * 0.35).toFixed(1) + 'px)';
+      });
+      const finish = (e) => {
+        if (x0 === null) return;
+        const dx = (e && e.clientX != null) ? e.clientX - x0 : 0;
+        const wasX = axis === 'x';
+        x0 = null; y0 = null; axis = null;
+        card.style.transition = 'transform .28s cubic-bezier(.3,.85,.3,1)';
+        card.style.transform = 'translateX(0)';
+        setTimeout(() => { card.style.transition = ''; card.dataset.swiping = ''; }, 300);
+        if (!wasX || Math.abs(dx) < COMMIT) return;
+        const i = CC_PILLARS.indexOf(_ccPillar);
+        _ccPillar = CC_PILLARS[(i + (dx < 0 ? 1 : -1) + CC_PILLARS.length) % CC_PILLARS.length];
+        // _ccHeroSwap is the app's own re-render path: it measures the old
+        // hero, swaps, and animates the height, so a pillar change reads like
+        // every other content change on this card.
+        try { _ccHeroSwap(function () {}); }
+        catch (err) { try { cc.innerHTML = renderCommandCenter(); bindCommandCenter(cc); } catch (e2) {} }
+      };
+      card.addEventListener('pointerup', finish);
+      card.addEventListener('pointercancel', finish);
+    }
+  } catch (e) {}
   // v608 (Malik, overnight item 5): first open of a NEW day with a move still
   // pending, the Today panel breathes once so the move is the first thing the
   // eye lands on. Once per day, never when today's action is already done.
@@ -4305,6 +4459,10 @@ function bindCommandCenter(cc) {
       card.setAttribute('tabindex', '0');
       const go = () => {
         if (card.classList.contains('is-launching')) return;
+        // v1051: a swipe is not a tap. The swipe handler sets this while a
+        // horizontal drag is live, so letting go after a swipe never opens
+        // Action underneath it.
+        if (card.dataset.swiping === '1') return;
         // The card lifts toward the viewer and fades as Action rises behind
         // it, so the module reads as opening OUT OF the card that was tapped.
         card.classList.add('is-launching');
