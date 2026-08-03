@@ -543,12 +543,10 @@ function _injectDemoBar(persona) {
     // assigning an identical location.search can read as a silent no-op (Malik
     // v684, stuck re-tapping Founder), so force a clean reload in that case.
     row.querySelectorAll('[data-demo]').forEach(b => b.addEventListener('click', () => {
-      const k = b.getAttribute('data-demo');
-      if (new RegExp('[?&]demo=' + k + '(&|$)').test(location.search)) location.reload();
-      else location.search = '?demo=' + k;
+      enterDemoMode(b.getAttribute('data-demo'));
     }));
     const ex = document.getElementById('demoExit');
-    if (ex) ex.addEventListener('click', () => { location.href = location.pathname; });
+    if (ex) ex.addEventListener('click', () => { exitDemoMode(); });
     return true;
   };
   if (mount()) return;
@@ -620,9 +618,35 @@ function _resetDemoTodayAction() {
   } catch (e) {}
 }
 
+// Leaving a demo, from anywhere (v1096). Strips ?demo= AND records the choice,
+// because on an installed app the launch URL is not something the user can
+// edit: if it still carries ?demo=, every relaunch would drop them back into
+// someone else's Memento with no way out. The flag is cleared the moment a
+// demo is opened deliberately again, so it never blocks a real demo link.
+function exitDemoMode() {
+  try { localStorage.setItem('memento_demo_off', '1'); } catch (e) {}
+  try { localStorage.setItem('memento_view', ''); } catch (e) {}
+  location.href = location.pathname;
+}
+function enterDemoMode(persona) {
+  try { localStorage.removeItem('memento_demo_off'); } catch (e) {}
+  if (new RegExp('[?&]demo=' + persona + '(&|$)').test(location.search)) location.reload();
+  else location.search = '?demo=' + persona;
+}
 function applyDemoModeIfRequested() {
   const m = /[?&]demo=([a-z0-9]+)/i.exec(location.search);
   if (!m) return;
+  // The user asked to leave a demo. Honour that over the URL, but ONLY in the
+  // installed app, where the launch URL is fixed and they cannot edit it. In a
+  // browser a ?demo= address is always something they just chose, so it wins.
+  try {
+    const installed = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
+      || window.navigator.standalone === true;
+    if (installed && localStorage.getItem('memento_demo_off') === '1') {
+      if (history && history.replaceState) history.replaceState(null, '', location.pathname);
+      return;
+    }
+  } catch (e) {}
   DEMO_MODE = true;
   const raw = (m[1] || '').toLowerCase();
   const persona = DEMO_PERSONAS[raw] ? raw : 'creator';

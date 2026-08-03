@@ -5598,6 +5598,20 @@ const TabBar = {
         </div>
       </div>
       <input type="file" id="profAvatarFile" accept="image/*" hidden>
+      ${(typeof DEMO_MODE !== 'undefined' && DEMO_MODE) ? `
+      <div class="you-h">Demo</div>
+      <div class="you-card">
+        <div class="pref-row">
+          <div class="pref-row__text">
+            <div class="pref-row__title">You are viewing an example</div>
+            <div style="font-size:0.78rem; color:var(--text-2); margin-top:3px; line-height:1.4;">Someone else's Memento, filled in so you can see what it looks like. Nothing here is yours and nothing you do is saved.</div>
+          </div>
+        </div>
+        <button type="button" id="profExitDemo" class="you-vrow">
+          <span class="you-vrow__label">Return to my Memento</span>
+          <span class="you-chev" aria-hidden="true">&rsaquo;</span>
+        </button>
+      </div>` : ''}
       ${(_showInstall || _showUnlock) ? `
       <div class="you-h">Memento</div>
       <div class="you-card">
@@ -5786,6 +5800,15 @@ const TabBar = {
     try { const _pathBtn = document.getElementById('profPathOpen'); if (_pathBtn) _pathBtn.addEventListener('click', () => { try { if (typeof MementoPath !== 'undefined') MementoPath.open(); } catch (e) {} }); } catch (e) {}
     try { const _storyBtn = document.getElementById('profStoryOpen'); if (_storyBtn) _storyBtn.addEventListener('click', () => { try { if (typeof MementoStory !== 'undefined') MementoStory.open(); } catch (e) {} }); } catch (e) {}
     try { const _instBtn = document.getElementById('profInstallApp'); if (_instBtn) _instBtn.addEventListener('click', () => { try { if (window.MementoInstall) window.MementoInstall.show(); } catch (e) {} }); } catch (e) {}
+    // The way OUT of a demo (v1096, Malik: "I want a way to return to the actual
+    // flow of memento"). The only exit used to live inside the dev cheat bar,
+    // which a real user (and Malik on his phone) has no reason to open, so a
+    // demo could feel like a trap. exitDemoMode also remembers the choice, so a
+    // launch URL that still carries ?demo= cannot pull him back in.
+    try {
+      const _exitDemo = document.getElementById('profExitDemo');
+      if (_exitDemo) _exitDemo.addEventListener('click', () => { try { exitDemoMode(); } catch (e) {} });
+    } catch (e) {}
     // Early buy: anyone can pay before the paywall would ever find them (v792).
     try { const _unlBtn = document.getElementById('profUnlock'); if (_unlBtn) _unlBtn.addEventListener('click', () => { try { if (typeof ClarityPaywall !== 'undefined' && ClarityPaywall.show) ClarityPaywall.show(); } catch (e) {} }); } catch (e) {}
     // Birthday: save on change, keep Mori's birthYear in sync, refresh the
