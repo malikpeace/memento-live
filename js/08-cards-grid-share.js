@@ -4422,7 +4422,15 @@ function bindCommandCenter(cc) {
      untouched. Same rule as desktop: it rides the existing hold. */
   try {
     const card0 = cc && cc.querySelector && cc.querySelector('.cc-card');
-    if (card0 && cc.id === 'commandCenter' && !card0.querySelector(':scope > .cc-inv')) {
+    if (card0 && cc.id === 'commandCenter') {
+      // v1080 (the swipe ghosting): the twin used to be built ONCE and then
+      // skipped forever, so after a face change it still held the PREVIOUS
+      // pillar's content. That stale copy is what bled through mid-swipe
+      // (Malik's screenshot: the Action headline and Mark Complete ghosted
+      // behind the star face). Always rebuild it from the card as rendered
+      // NOW, so it can never show something that is not on screen.
+      const _old = card0.querySelector(':scope > .cc-inv');
+      if (_old) _old.remove();
       const twin = document.createElement('div');
       twin.className = 'cc-inv';
       twin.setAttribute('aria-hidden', 'true');
@@ -4495,7 +4503,11 @@ function bindCommandCenter(cc) {
           u.style.width = card.offsetWidth + 'px';
           u.style.margin = '0';
           u.style.transform = 'scale(0.94) translateY(7px)';
-          u.style.opacity = '0.85';
+          // v1080: FULLY opaque. At 0.85 the card behind it showed straight
+          // through, which is the "see through the cards" Malik reported. A
+          // stacked card reads as depth through scale and shadow, never
+          // through transparency.
+          u.style.opacity = '1';
           u.style.zIndex = '0';
           return u;
         } catch (e) { return null; }
@@ -4529,7 +4541,7 @@ function bindCommandCenter(cc) {
           // rest pose, in case a direction reversal re-reveals it mid-gesture
           under.style.transition = 'none';
           under.style.transform = 'scale(0.94) translateY(7px)';
-          under.style.opacity = '0.85';
+          under.style.opacity = '1';
           under.style.display = '';
           void under.offsetWidth;
           under.style.transition = '';
@@ -4565,7 +4577,6 @@ function bindCommandCenter(cc) {
         if (under) {
           const p = Math.min(1, Math.abs(dx) / (COMMIT * 2.2));
           under.style.transform = 'scale(' + (0.94 + p * 0.06).toFixed(3) + ') translateY(' + (7 - p * 7).toFixed(1) + 'px)';
-          under.style.opacity = (0.85 + p * 0.15).toFixed(2);
         }
       });
       const finish = (e) => {
@@ -4586,9 +4597,8 @@ function bindCommandCenter(cc) {
           }
           card.style.transition = 'transform .24s cubic-bezier(.4,.0,.9,.6)';
           card.style.transform = 'translateX(' + off + 'px) rotate(' + (off * 0.02) + 'deg)';
-          under.style.transition = 'transform .24s cubic-bezier(.2,.8,.3,1), opacity .24s ease-out';
+          under.style.transition = 'transform .24s cubic-bezier(.2,.8,.3,1)';
           under.style.transform = 'scale(1) translateY(0)';
-          under.style.opacity = '1';
           setTimeout(() => {
             disarmDeck();
             card.dataset.swiping = '';
@@ -4601,9 +4611,8 @@ function bindCommandCenter(cc) {
         card.style.transition = 'transform .3s cubic-bezier(.3,.85,.3,1)';
         card.style.transform = 'translateX(0) rotate(0deg)';
         if (under) {
-          under.style.transition = 'transform .3s cubic-bezier(.3,.85,.3,1), opacity .3s ease-out';
+          under.style.transition = 'transform .3s cubic-bezier(.3,.85,.3,1)';
           under.style.transform = 'scale(0.94) translateY(7px)';
-          under.style.opacity = '0.85';
         }
         setTimeout(() => {
           card.style.transition = ''; card.dataset.swiping = '';

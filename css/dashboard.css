@@ -4619,6 +4619,12 @@ html.theme-light .cc-dots i.on { background: var(--text-hi); }
 #commandCenter .cc-card { background: #16181d !important; }
 html.theme-light #commandCenter .cc-card { background: #ffffff !important; }
 .cc-under { pointer-events: none; box-shadow: var(--shadow-card); overflow: hidden; }
+/* v1080: no invert twin anywhere near a live swipe. The twin is a full-size
+   copy of the card that only the hold gesture ever reveals, and a hold and a
+   swipe are mutually exclusive, so during a deck drag it is removed from the
+   picture entirely. Clip-path alone was not enough: under the drag transform
+   the clipped copy bled through as ghost text. */
+.cc-deck-live .cc-inv { display: none !important; }
 /* v1079: the under card shows its OWN dots, because it is the real card and
    its dots are part of what you are swiping to. Hiding them made the landing
    card visibly gain dots the instant the swipe finished. */
