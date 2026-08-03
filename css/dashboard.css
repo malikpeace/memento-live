@@ -4662,32 +4662,39 @@ html.theme-light .cc-dots i.on { background: var(--text-hi); }
    transform, this only keeps the drag from selecting text or firing the
    browser's own horizontal gestures. */
 .cc-card { touch-action: pan-y; }
-/* ONE SURFACE, NOW GLASS (v1096, Malik: "a bit too flat, make the cards
-   glassier again with NO border"). Still ONE style for the whole deck, at
-   rest and mid-swipe, which is what killed the v1061 glass->grey pop: the
-   under card is the real card with the same classes, so there is nothing to
-   snap to. The glass is built in LAYERS (tint + top sheen + inset lit edge)
-   so it reads as glass even where the backdrop blur is dropped, and the
-   translucency lets the Memento's bloom fall into the top of the box.
-   No border: fill + sheen + shadow carry the edge (Malik's standing rule). */
+/* ONE SURFACE, LIT GLASS, FULLY OPAQUE (v1096, Malik: "a bit too flat, make
+   the cards glassier again with NO border", then v1098: "for the boxes you
+   can see behind them").
+
+   The glass is a LIT GRADIENT, not transparency. A deck stacks two cards
+   mid-swipe, so any see-through at all shows the neighbour's text: even at
+   96% opaque, large white type bled through on a dark card and read as
+   ghosting. And a phone runs body.lite, which strips every backdrop blur for
+   battery, so blur cannot do the hiding either. So the base is SOLID and the
+   glassiness comes from the top-down white wash, the lit top edge and the
+   deep shadow. Same look, nothing behind it, no perf cost.
+
+   Still ONE style for the whole deck, at rest and mid-swipe: the under card
+   is the real card with the same classes, so there is nothing to snap to
+   (the v1061 glass-to-grey pop is not coming back).
+
+   No border: fill + lit edge + shadow carry it (Malik's standing rule). */
 #commandCenter .cc-card {
   background:
     linear-gradient(180deg, rgba(255,255,255,0.105) 0%, rgba(255,255,255,0.055) 34%, rgba(255,255,255,0.032) 100%),
-    rgba(14,16,20,0.34) !important;
+    #0d0f13 !important;
   border: 0 !important;
   box-shadow:
     0 18px 44px rgba(0,0,0,0.46),
     inset 0 1px 0 rgba(255,255,255,0.14) !important;
-  -webkit-backdrop-filter: blur(30px) saturate(1.45);
-  backdrop-filter: blur(30px) saturate(1.45);
 }
 html.theme-light #commandCenter .cc-card {
   background:
-    linear-gradient(180deg, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0.52) 100%),
-    rgba(255,255,255,0.60) !important;
+    linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.30) 100%),
+    #f4f6f9 !important;
   box-shadow:
     0 14px 34px rgba(16,20,28,0.12),
-    inset 0 1px 0 rgba(255,255,255,0.85) !important;
+    inset 0 1px 0 rgba(255,255,255,0.9) !important;
 }
 /* The Glass setting still rules. OFF (html.flat-ui) = the flat matte box he
    picked in v1061, exactly as it was; base.css already strips every blur
