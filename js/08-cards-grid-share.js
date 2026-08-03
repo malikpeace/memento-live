@@ -4667,29 +4667,6 @@ function bindCommandCenter(cc) {
       // squeeze the Memento into a square, which is exactly the glitch Malik
       // caught. The box is a FIXED height now and the faces are clamped to
       // fit it, so neither the box nor the card can ever change size.)
-      // v1091 SAFETY NET. Whatever the viewport APIs claim, the box may never
-      // cross the bottom of the screen. One pass after layout: if it has,
-      // shrink the column by exactly the overflow. It only ever corrects an
-      // overflow, so a correct layout is left untouched (no oscillation).
-      try {
-        if (cc.id === 'commandCenter' && window.innerWidth < 768) {
-          setTimeout(() => {
-            try {
-              if (window.scrollY > 50) return;
-              const bx = cc.querySelector('.cc-card');
-              const p1e = document.getElementById('homePage1');
-              if (!bx || !p1e) return;
-              const safeB = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--safe-b')) || 0;
-              const limit = window.innerHeight - safeB - 15;
-              const over = Math.round(bx.getBoundingClientRect().bottom - limit);
-              if (over > 2) {
-                const cur = Math.round(p1e.getBoundingClientRect().height + (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--p1-top')) || 0));
-                document.documentElement.style.setProperty('--p1-vh', Math.max(320, cur - over) + 'px');
-              }
-            } catch (e) {}
-          }, 80);
-        }
-      } catch (e) {}
       try {
         const _p1 = document.getElementById('homePage1');
         if (_p1 && window.scrollY < 50) {
@@ -4701,34 +4678,11 @@ function bindCommandCenter(cc) {
         // ~40px long; only the real number is right on every device). This
         // lives beside the --p1-top read on purpose: it is the render path
         // that provably runs, unlike the boot-time attempt.
-        // v1091: the SMALLEST of the three sources. On Malik's installed app
-        // one of them reported ~70px MORE than the real screen, so the column
-        // overshot and the box ran off the bottom edge. Any single reading can
-        // be transiently wrong (launch, keyboard dismissal, rotation); the
-        // minimum of three cannot be too big.
-        const _vv = window.visualViewport;
-        const _cands = [
-          _vv && _vv.height, window.innerHeight,
-          document.documentElement && document.documentElement.clientHeight
-        ].map((n) => Math.round(n || 0)).filter((n) => n > 200);
-        const _vh = _cands.length ? Math.min.apply(null, _cands) : 0;
-        if (_vh > 200) document.documentElement.style.setProperty('--p1-vh', _vh + 'px');
-        if (!window.__p1VhBound) {
-          window.__p1VhBound = true;
-          const _re = () => {
-            try {
-              const v2 = window.visualViewport;
-              const h2 = Math.round((v2 && v2.height) || window.innerHeight || 0);
-              if (h2 > 200) document.documentElement.style.setProperty('--p1-vh', h2 + 'px');
-            } catch (e2) {}
-          };
-          window.addEventListener('resize', _re);
-          window.addEventListener('orientationchange', () => setTimeout(_re, 140));
-          if (window.visualViewport) window.visualViewport.addEventListener('resize', _re);
-          document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible') setTimeout(_re, 80);
-          });
-        }
+        // v1092: the viewport is measured ONCE per page load and on real
+        // resize events only (see syncHomeViewport in js/11). Measuring it
+        // here, on every render, is what made both elements visibly resize on
+        // every swipe: the render reset the value and the safety pass shrank
+        // it again, over and over. One owner, one moment.
       } catch (e) {}
     }
   } catch (e) {}

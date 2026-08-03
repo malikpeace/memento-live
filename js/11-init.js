@@ -26,6 +26,60 @@ try {
 /* (the page-1 viewport measurement lives in js/08 beside the --p1-top
    read: this file's top-level attempt never ran.) */
 
+/* v1092: ONE owner for the home's page-1 geometry.
+   Malik, fairly: "is it hard just to make sure the memento is big and the
+   card sits a little above the bottom?" No. I made it hard by stacking four
+   mechanisms that each adjusted the same two numbers, on every render, so
+   they fought and the sizes visibly changed on every swipe.
+
+   This is the only thing that sets them now, and it runs on real events
+   only (load, resize, orientation, returning to the app), never per render:
+     1. base height = the SMALLEST of the three viewport readings, because
+        any one of them can transiently report too big (that is what pushed
+        the box off his screen), and a minimum cannot be too big.
+     2. one correction pass a frame later: if the box actually crosses the
+        bottom, subtract exactly the overflow.
+   Step 2 only ever corrects an overflow, and because nothing else rewrites
+   the value afterwards, it settles once and stays. */
+function syncHomeViewport() {
+  try {
+    if (window.innerWidth >= 768) return;
+    const root = document.documentElement;
+    const vv = window.visualViewport;
+    const cands = [vv && vv.height, window.innerHeight, root && root.clientHeight]
+      .map((n) => Math.round(n || 0)).filter((n) => n > 200);
+    if (!cands.length) return;
+    root.style.setProperty('--p1-vh', Math.min.apply(null, cands) + 'px');
+    setTimeout(() => {
+      try {
+        if (window.scrollY > 50) return;
+        const box = document.querySelector('#commandCenter .cc-card');
+        const p1 = document.getElementById('homePage1');
+        if (!box || !p1) return;
+        const safeB = parseFloat(getComputedStyle(root).getPropertyValue('--safe-b')) || 0;
+        const over = Math.round(box.getBoundingClientRect().bottom - (window.innerHeight - safeB - 15));
+        if (over > 2) {
+          const top = parseFloat(getComputedStyle(root).getPropertyValue('--p1-top')) || 0;
+          root.style.setProperty('--p1-vh',
+            Math.max(320, Math.round(p1.getBoundingClientRect().height + top) - over) + 'px');
+        }
+      } catch (e) {}
+    }, 90);
+  } catch (e) {}
+}
+try {
+  const _sync = () => setTimeout(syncHomeViewport, 60);
+  _sync();
+  document.addEventListener('DOMContentLoaded', _sync);
+  window.addEventListener('load', _sync);
+  window.addEventListener('resize', _sync);
+  window.addEventListener('orientationchange', () => setTimeout(syncHomeViewport, 200));
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', _sync);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') _sync();
+  });
+} catch (e) {}
+
 /* v1073 SAFE-AREA SIMULATOR (dev only, URL-gated, inert without the param).
    The headless preview renders env(safe-area-inset-*) as 0, so every layout
    I verified was a case Malik's phone never runs: his notch and home
