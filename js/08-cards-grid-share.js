@@ -4662,6 +4662,36 @@ function bindCommandCenter(cc) {
       // column starts below the app's own top padding, so its height must be
       // the viewport MINUS that offset or it hangs off the bottom. The offset
       // is fixed chrome, so this is read once at rest and cached.
+      // v1083 (Malik: "I want them to be the exact same size so the only
+      // thing that changes is what the card says"). The three faces have
+      // different natural heights, so swiping nudged everything up and down.
+      // Measure all three off-screen (inside #commandCenter, so every scoped
+      // rule applies) and lock the box to the tallest. Content top-aligns and
+      // the dots pin to the bottom, so the eyebrow and the dots never move:
+      // only the middle changes.
+      try {
+        if (cc.id === 'commandCenter' && cc.querySelector('.cc-card--pillars')) {
+          let probe = cc.querySelector(':scope > #ccProbe');
+          if (!probe) {
+            probe = document.createElement('div');
+            probe.id = 'ccProbe';
+            probe.setAttribute('aria-hidden', 'true');
+            probe.style.cssText = 'position:absolute;left:0;right:0;top:0;visibility:hidden;pointer-events:none;z-index:-1;';
+            cc.appendChild(probe);
+          }
+          const _prevP = _ccPillar;
+          let _max = 0;
+          CC_PILLARS.forEach((pl) => {
+            _ccPillar = pl;
+            probe.innerHTML = renderCommandCenter();
+            const pc = probe.querySelector('.cc-card');
+            if (pc) _max = Math.max(_max, pc.getBoundingClientRect().height);
+          });
+          _ccPillar = _prevP;
+          probe.innerHTML = '';
+          if (_max > 120) document.documentElement.style.setProperty('--cc-box-h', Math.ceil(_max) + 'px');
+        }
+      } catch (e) {}
       try {
         const _p1 = document.getElementById('homePage1');
         if (_p1 && window.scrollY < 50) {

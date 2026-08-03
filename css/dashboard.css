@@ -4701,15 +4701,34 @@ html.theme-light .cc-inv [style*="border-top"] { border-top-color: rgba(245, 245
    growing it. Same selector plus the pillars class, so it wins on specificity
    rather than by shouting louder. 212 is the tallest pillar's natural height,
    so nothing is squeezed. */
-body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-card--pillars {
-  min-height: 212px !important;
+/* The :not() mirrors the v981 rule above so this ties on specificity and
+   wins by source order; without it that rule's justify-content:center kept
+   winning and each face's label sat at a different height (31 / 47 / 60). */
+body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-card--pillars:not([style*="display: none"]) {
+  /* v1083: ONE height for all three faces (the tallest, measured by js/08),
+     so swiping never moves anything vertically. Content top-aligns and the
+     dots pin to the bottom, so only the words in the middle change. */
+  height: var(--cc-box-h, 212px) !important;
+  justify-content: flex-start !important;
+  min-height: 0 !important;
   /* The pillared card carries the three dots that a plain card does not, and
      the height is a hard budget, so the dots have to be paid for out of the
      padding rather than out of the card growing. Without this the content
      overflowed the locked height and the dots landed on top of the button. */
   padding-bottom: 12px !important;
 }
-.cc-card--pillars .cc-dots { margin-top: 12px; }
+/* v1083: the dots are PINNED to the card's bottom, not flowed. Flow made
+   them land wherever each face's content ended (the fuller Action face
+   pushed them 12px lower than the others), so they twitched on every swipe.
+   Absolute = identical on every face by construction. */
+.cc-card--pillars .cc-dots {
+  position: absolute; left: 0; right: 0; bottom: 12px;
+  margin: 0; padding: 0;
+}
+/* The pinned dots leave the flow, so the content reserves their space. */
+.cc-card--pillars { padding-bottom: 30px !important; }
+/* The probe measures NATURAL heights, so it must never inherit the locked one. */
+#ccProbe .cc-card { height: auto !important; min-height: 0 !important; }
 .cc-card--pillars { display: flex; flex-direction: column; }
 
 /* The star's "why" line is free text and can run long. Two lines is the most
