@@ -5612,6 +5612,23 @@ const TabBar = {
           <span class="you-chev" aria-hidden="true">&rsaquo;</span>
         </button>
       </div>` : ''}
+      ${/* DEV BYPASS - DELETE THIS BLOCK BEFORE LAUNCH. The way back out of the
+            paywall bypass, since an unlocked app never shows the paywall again
+            and the five-tap trigger lives on the paywall. */
+        (function () {
+          try { if (!(typeof ClarityPaywall !== 'undefined' && ClarityPaywall._devUnlocked && ClarityPaywall._devUnlocked())) return ''; } catch (e) { return ''; }
+          return '<div class="you-h">Dev</div>' +
+            '<div class="you-card">' +
+              '<div class="pref-row"><div class="pref-row__text">' +
+                '<div class="pref-row__title">Paywall bypass is on</div>' +
+                '<div style="font-size:0.78rem; color:var(--text-2); margin-top:3px; line-height:1.4;">Memento is unlocked without a purchase. This whole feature is deleted before launch.</div>' +
+              '</div></div>' +
+              '<button type="button" id="profDevLock" class="you-vrow">' +
+                '<span class="you-vrow__label">Lock it again</span>' +
+                '<span class="you-chev" aria-hidden="true">&rsaquo;</span>' +
+              '</button>' +
+            '</div>';
+        })()}
       ${(_showInstall || _showUnlock) ? `
       <div class="you-h">Memento</div>
       <div class="you-card">
@@ -5808,6 +5825,16 @@ const TabBar = {
     try {
       const _exitDemo = document.getElementById('profExitDemo');
       if (_exitDemo) _exitDemo.addEventListener('click', () => { try { exitDemoMode(); } catch (e) {} });
+    } catch (e) {}
+    // DEV BYPASS - delete before launch.
+    try {
+      const _devLock = document.getElementById('profDevLock');
+      if (_devLock) _devLock.addEventListener('click', () => {
+        try { localStorage.removeItem('memento_dev_unlock'); } catch (e) {}
+        try { if (state.meta) state.meta.unlockCeremonySeen = false; } catch (e) {}
+        try { persistState(); } catch (e) {}
+        location.reload();
+      });
     } catch (e) {}
     // Early buy: anyone can pay before the paywall would ever find them (v792).
     try { const _unlBtn = document.getElementById('profUnlock'); if (_unlBtn) _unlBtn.addEventListener('click', () => { try { if (typeof ClarityPaywall !== 'undefined' && ClarityPaywall.show) ClarityPaywall.show(); } catch (e) {} }); } catch (e) {}
