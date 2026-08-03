@@ -92,69 +92,85 @@ body:has(.clarity-exp.open)::after { display: none; }
   position: absolute; inset: 0; overflow: hidden; pointer-events: none;
   /* v628 (Malik): BLUEPRINT. Near-black with an ultra-faint dot matrix and a
      vignette, replaces the four white glow orbs that read as AI haze. */
+  /* v1102 (Malik picked graph paper over the dot blueprint): the room is a
+     sheet of drafting paper now, not a starfield. Fine 18px rule with a heavy
+     line every fifth. Action is planning and thinking, so the surface should
+     be the thing you plan ON. */
   background-color: #07070a;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.075) 1px, transparent 1px);
-  background-size: 22px 22px;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.032) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.032) 1px, transparent 1px),
+    linear-gradient(to right, rgba(255, 255, 255, 0.075) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.075) 1px, transparent 1px);
+  background-size: 18px 18px, 18px 18px, 90px 90px, 90px 90px;
 }
+/* Light-mode paper is defined in the v858 theme block near the end of this
+   file, which comes later and wins. */
 /* v884 (Malik: "the background feels kinda dead"): the blueprint BREATHES.
    Two extra dot lattices at offset tile positions fade in and out on
    different slow clocks; the interference reads as dots randomly appearing
    and disappearing. Opacity-only (compositor cheap), no loops visible as
    rhythm, and both die inside the dark ceremonies. */
+/* THE LIGHT PASS (v1102, Malik's pick from the motion mockups). A soft band
+   of light travels down the sheet, brightens whatever lines it crosses, and
+   lets them go. The paper itself NEVER moves, which is the whole point: the
+   drift options read as the page sliding, and this is a screen you are meant
+   to stop and read.
+
+   Mechanism: the band slides down while the grid INSIDE it slides up by the
+   same amount, so the bright lines stay pinned to the exact pixels of the
+   lines underneath. Both animations share one duration and easing, so they
+   cannot drift apart. Transform only, both layers, so this is compositor
+   work with no repaint (an animated mask would repaint every frame).
+
+   Reuses the existing orb3 element rather than adding DOM, so every rule that
+   already hides the background during the dark ceremonies keeps working. */
 .action-exp__bg .action-exp__bg-orb3 {
-  /* v995 (Malik: "it looks very stale and dead"): the highlight lattices now
-     DRIFT as well as breathe. Opacity alone at 0.08 alpha read as nothing.
-     Overhang by one tile so the travel never exposes an edge. */
-  display: block; position: absolute; inset: -66px; width: auto; height: auto;
-  border-radius: 0; filter: none; transform: none;
-  /* v885 (Malik: no NEW dots): a 66px tile = every third dot of the SAME
-     22px lattice (66 = 3 x 22, position 0 0 is on-grid), so this layer only
-     brightens existing dots and fades them back. */
-  background-image: radial-gradient(rgba(255, 255, 255, 0.085) 1px, transparent 1px);
-  background-size: 66px 66px; background-position: 0 0;
-  animation: actionDotsBreathe 9s ease-in-out infinite alternate,
-             actionDotsDriftA 41s linear infinite;
+  display: block; position: absolute; left: -90px; right: -90px; top: 0;
+  width: auto; height: 34lvh; inset: auto;
+  border-radius: 0; filter: none; overflow: hidden;
+  background: none;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 42%, #000 58%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 42%, #000 58%, transparent 100%);
+  animation: actionBeamDown 17s ease-in-out infinite;
 }
-.action-exp__bg::after {
-  content: ''; display: block; position: absolute; inset: -66px;
-  width: auto; height: auto; border-radius: 0; filter: none; transform: none;
-  /* A disjoint on-grid subset (offsets are multiples of 22px). */
-  background: radial-gradient(rgba(255, 255, 255, 0.075) 1px, transparent 1px);
-  background-size: 66px 66px; background-position: 22px 44px;
-  animation: actionDotsBreathe 13s ease-in-out -6s infinite alternate,
-             actionDotsDriftB 67s linear infinite;
+.action-exp__bg .action-exp__bg-orb3::before {
+  content: ''; display: block; position: absolute;
+  left: 0; right: 0; top: 0; height: 100lvh;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.10) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.10) 1px, transparent 1px),
+    linear-gradient(to right, rgba(255, 255, 255, 0.19) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.19) 1px, transparent 1px);
+  background-size: 18px 18px, 18px 18px, 90px 90px, 90px 90px;
+  animation: actionBeamGrid 17s ease-in-out infinite;
 }
-/* Each travels exactly one 66px tile per cycle, so the loop closes on an
-   identical frame and never snaps. Transform only: compositor work on layers
-   that are already composited by the opacity breathe, no repaint, no new
-   layer. Two directions on two long clocks, so the interference never reads
-   as a rhythm. The base lattice stays put, so the field keeps its anchor and
-   this reads as light crossing the blueprint, not the page sliding. */
-@keyframes actionDotsDriftA {
-  from { transform: translate3d(0, 0, 0); }
-  to   { transform: translate3d(66px, 66px, 0); }
+/* The band starts above the screen and ends below it, so a cycle never
+   exposes a hard edge. The inner grid mirrors it exactly. */
+@keyframes actionBeamDown {
+  from { transform: translate3d(0, -38lvh, 0); }
+  to   { transform: translate3d(0, 118lvh, 0); }
 }
-@keyframes actionDotsDriftB {
-  from { transform: translate3d(0, 0, 0); }
-  to   { transform: translate3d(-66px, 66px, 0); }
+@keyframes actionBeamGrid {
+  from { transform: translate3d(0, 38lvh, 0); }
+  to   { transform: translate3d(0, -118lvh, 0); }
 }
-html.theme-light .action-exp__bg .action-exp__bg-orb3 {
-  background-image: radial-gradient(rgba(24, 26, 33, 0.09) 1px, transparent 1px);
+html.theme-light .action-exp__bg .action-exp__bg-orb3::before {
+  background-image:
+    linear-gradient(to right, rgba(24, 26, 33, 0.09) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(24, 26, 33, 0.09) 1px, transparent 1px),
+    linear-gradient(to right, rgba(24, 26, 33, 0.17) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(24, 26, 33, 0.17) 1px, transparent 1px);
+  background-size: 18px 18px, 18px 18px, 90px 90px, 90px 90px;
 }
-html.theme-light .action-exp__bg::after {
-  background: radial-gradient(rgba(24, 26, 33, 0.08) 1px, transparent 1px);
-  background-size: 66px 66px; background-position: 22px 44px;
-}
-@keyframes actionDotsBreathe {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
-}
+/* The second dot lattice has no job on graph paper. */
+.action-exp__bg::after { display: none; }
 .action-exp:has(.action-draft-loading--cine) .action-exp__bg-orb3,
-.action-exp:has(.action-cine-reveal) .action-exp__bg-orb3,
-.action-exp:has(.action-draft-loading--cine) .action-exp__bg::after,
-.action-exp:has(.action-cine-reveal) .action-exp__bg::after { display: none; }
+.action-exp:has(.action-cine-reveal) .action-exp__bg-orb3 { display: none; }
+/* Reduced motion gets the paper with no light crossing it, not a frozen band
+   parked somewhere arbitrary on the page. */
 @media (prefers-reduced-motion: reduce) {
-  .action-exp__bg .action-exp__bg-orb3, .action-exp__bg::after { animation: none; opacity: 0.35; }
+  .action-exp__bg .action-exp__bg-orb3 { display: none; }
 }
 .action-exp__stars {
   position: absolute; inset: 0;
@@ -4445,11 +4461,17 @@ html.theme-light .action-exp:has(.action-intake-page--cine) .action-exp__nav {
    blocks above (which flip --ink to white inside themselves). Everyday
    screens therefore use ink-based colors, never literal white.
    ============================================================ */
-/* Blueprint, light mode: ink dots on the light surface. */
+/* Graph paper, light mode: ink ruling on the light surface (v1102). This rule
+   sits after the one at the top of the file and wins, so the paper is defined
+   HERE for light and the top rule only carries the colour. */
 html.theme-light .action-exp__bg {
   background-color: #eef0f3;
-  background-image: radial-gradient(rgba(24, 26, 33, 0.10) 1px, transparent 1px);
-  background-size: 22px 22px;
+  background-image:
+    linear-gradient(to right, rgba(24, 26, 33, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(24, 26, 33, 0.05) 1px, transparent 1px),
+    linear-gradient(to right, rgba(24, 26, 33, 0.10) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(24, 26, 33, 0.10) 1px, transparent 1px);
+  background-size: 18px 18px, 18px 18px, 90px 90px, 90px 90px;
 }
 html.theme-light .action-exp__bg::before {
   background: radial-gradient(110% 80% at 50% 30%, transparent 40%, rgba(238, 240, 243, 0.9) 100%);
