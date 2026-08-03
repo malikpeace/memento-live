@@ -3696,9 +3696,29 @@ body.pre-clarity .capture-fab { display: none !important; }
   }
   /* The card's own chain stretches to the space the column hands it. */
   body:not(.has-custom-layout) .app.dash-v2 #homePage1 > #dayCard > .daycard-wrap { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
-  body:not(.has-custom-layout) .app.dash-v2 #homePage1 .daycard-theme-living .daycard-living-stage,
-  body:not(.has-custom-layout) .app.dash-v2 #homePage1 .daycard-ns {
+  /* v1088 (Malik: "sometimes the memento is square"). The card filled the
+     leftover height with NO shape constraint, so on any short viewport (a
+     small phone, Safari with its toolbar up, a transient viewport reading)
+     it squashed into a square. It now keeps the portrait aspect and gives up
+     WIDTH instead: the stage is height-driven with a locked ratio, capped by
+     the usual width, so the Memento can get smaller but can never change
+     shape. The bloom and floor track the stage, so they follow it exactly. */
+  /* Two IDs on purpose: the older per-state rules carry #dayCard plus six
+     classes, and without matching that these lose and the width rule wins
+     (which is what let the card go square). */
+  body:not(.has-custom-layout) .app.dash-v2 #homePage1 #dayCard .daycard-theme-living .daycard-living-stage {
     height: 100% !important; min-height: 0 !important;
+    width: auto !important;
+    aspect-ratio: 320 / 452;
+    max-width: var(--p1-card-w) !important;
+    /* min-width:0 releases the contents' min-content floor, which was the
+       last thing that could force the shape open on a very short viewport. */
+    min-width: 0 !important;
+    margin-left: auto !important; margin-right: auto !important;
+  }
+  body:not(.has-custom-layout) .app.dash-v2 #homePage1 #dayCard .daycard-ns {
+    height: 100% !important; min-height: 0 !important; width: 100% !important;
+    min-width: 0 !important;
   }
   /* The stage's own 14/26 margins sit OUTSIDE its height:100%, so they pushed
      the card past the column and ate the gap to the box (they measured 2px
@@ -4708,7 +4728,10 @@ body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-card--pill
   /* v1083: ONE height for all three faces (the tallest, measured by js/08),
      so swiping never moves anything vertically. Content top-aligns and the
      dots pin to the bottom, so only the words in the middle change. */
-  height: var(--cc-box-h, 212px) !important;
+  /* FIXED. Not measured, not min-height: one constant the faces must fit
+     inside. The measured version could be inflated by a single long line,
+     which grew the box and squeezed the Memento square (Malik's glitch). */
+  height: 212px !important;
   justify-content: flex-start !important;
   min-height: 0 !important;
   /* The pillared card carries the three dots that a plain card does not, and
@@ -4727,8 +4750,15 @@ body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-card--pill
 }
 /* The pinned dots leave the flow, so the content reserves their space. */
 .cc-card--pillars { padding-bottom: 30px !important; }
-/* The probe measures NATURAL heights, so it must never inherit the locked one. */
-#ccProbe .cc-card { height: auto !important; min-height: 0 !important; }
+/* Every face's headline is line-clamped so no amount of text can outgrow the
+   fixed box. Three lines is what 212px allows beside the label and dots. */
+.cc-card--pillars .cc-face-hd {
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+/* The Action face also carries the dayline and the button, so it gets two
+   lines where the star gets three (three clipped it by 17px). */
+.cc-card--pillars .cc-od-title.cc-face-hd { -webkit-line-clamp: 2; }
 .cc-card--pillars { display: flex; flex-direction: column; }
 
 /* The star's "why" line is free text and can run long. Two lines is the most

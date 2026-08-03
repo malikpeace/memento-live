@@ -3845,7 +3845,7 @@ function renderCommandCenter() {
         // connector, and any star without one renders plain, so it can never
         // mangle anyone's words.
         return wrap(eyebrow('Your Neutron Star') +
-          '<div style="font-size:1.15rem;font-weight:700;line-height:1.3;color:var(--text-hi);">' + ccStarTwoTone(star || 'Your Neutron Star') + '</div>' +
+          '<div class="cc-face-hd" style="font-size:1.15rem;font-weight:700;line-height:1.3;color:var(--text-hi);">' + ccStarTwoTone(star || 'Your Neutron Star') + '</div>' +
           ccStarTenureLine() +
           dots(1));
       }
@@ -3981,7 +3981,7 @@ function renderCommandCenter() {
       // in / review) and the Vivere "one thing to live". This is the only tab the
       // daily loop lives in, so the Consistency and Goal tabs stay focused.
       row += '<div class="cc-od-eyebrow" style="font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-lo);margin-bottom:6px;">Today</div>';
-      row += '<div class="cc-od-title" style="font-size:1.5rem;font-weight:700;line-height:1.25;letter-spacing:-0.01em;color:var(--text-hi);margin-bottom:12px;">' + esc(oneThing) + '</div>';
+      row += '<div class="cc-od-title cc-face-hd" style="font-size:1.5rem;font-weight:700;line-height:1.25;letter-spacing:-0.01em;color:var(--text-hi);margin-bottom:12px;">' + esc(oneThing) + '</div>';
       // One quiet, derived "why": ties today's action back to the goal so it
       // never reads as busywork. Only in this normal oneThing state.
       {
@@ -4662,36 +4662,11 @@ function bindCommandCenter(cc) {
       // column starts below the app's own top padding, so its height must be
       // the viewport MINUS that offset or it hangs off the bottom. The offset
       // is fixed chrome, so this is read once at rest and cached.
-      // v1083 (Malik: "I want them to be the exact same size so the only
-      // thing that changes is what the card says"). The three faces have
-      // different natural heights, so swiping nudged everything up and down.
-      // Measure all three off-screen (inside #commandCenter, so every scoped
-      // rule applies) and lock the box to the tallest. Content top-aligns and
-      // the dots pin to the bottom, so the eyebrow and the dots never move:
-      // only the middle changes.
-      try {
-        if (cc.id === 'commandCenter' && cc.querySelector('.cc-card--pillars')) {
-          let probe = cc.querySelector(':scope > #ccProbe');
-          if (!probe) {
-            probe = document.createElement('div');
-            probe.id = 'ccProbe';
-            probe.setAttribute('aria-hidden', 'true');
-            probe.style.cssText = 'position:absolute;left:0;right:0;top:0;visibility:hidden;pointer-events:none;z-index:-1;';
-            cc.appendChild(probe);
-          }
-          const _prevP = _ccPillar;
-          let _max = 0;
-          CC_PILLARS.forEach((pl) => {
-            _ccPillar = pl;
-            probe.innerHTML = renderCommandCenter();
-            const pc = probe.querySelector('.cc-card');
-            if (pc) _max = Math.max(_max, pc.getBoundingClientRect().height);
-          });
-          _ccPillar = _prevP;
-          probe.innerHTML = '';
-          if (_max > 120) document.documentElement.style.setProperty('--cc-box-h', Math.ceil(_max) + 'px');
-        }
-      } catch (e) {}
+      // (v1083's height-measuring probe is gone. Sizing the box to the
+      // TALLEST face meant one long line of text could inflate the box and
+      // squeeze the Memento into a square, which is exactly the glitch Malik
+      // caught. The box is a FIXED height now and the faces are clamped to
+      // fit it, so neither the box nor the card can ever change size.)
       try {
         const _p1 = document.getElementById('homePage1');
         if (_p1 && window.scrollY < 50) {

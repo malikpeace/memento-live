@@ -959,11 +959,12 @@ html.theme-light body.lite .tab-bar, html.theme-light.lowfx .tab-bar {
      rectangle by construction (width min(88vw,352) vs a taller height). */
   /* v1067: height comes from the page-1 flex column now (the card is the
      growing item), so only the WIDTH is stated here. */
+  /* v1088: width comes from the aspect-locked stage now (see dashboard.css),
+     so the blank home cannot force a square either. */
   body.home-locked #dayCard .daycard-ns,
   body.home-locked #dayCard .daycard-theme-living .daycard-living-stage {
     min-height: 0 !important;
-    width: var(--p1-card-w) !important;
-    max-width: none;
+    max-width: var(--p1-card-w) !important;
   }
   body.home-locked #dashBelow { display: none !important; }
 }
