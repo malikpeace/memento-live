@@ -50,6 +50,17 @@ function syncHomeViewport() {
       .map((n) => Math.round(n || 0)).filter((n) => n > 200);
     if (!cands.length) return;
     root.style.setProperty('--p1-vh', Math.min.apply(null, cands) + 'px');
+    // --p1-top belongs here too. It is the column's start offset, and the
+    // column height is (viewport - p1-top), so it is geometry: while the
+    // render path still re-read it every swipe, any drift in it resized the
+    // card and the box, which is what Malik kept seeing after two "fixes".
+    try {
+      const p1e = document.getElementById('homePage1');
+      if (p1e && window.scrollY < 50) {
+        const off = Math.round(p1e.getBoundingClientRect().top + window.scrollY);
+        if (off >= 0 && off < 200) root.style.setProperty('--p1-top', off + 'px');
+      }
+    } catch (e) {}
     setTimeout(() => {
       try {
         if (window.scrollY > 50) return;

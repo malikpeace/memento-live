@@ -4654,38 +4654,9 @@ function bindCommandCenter(cc) {
   // pre-Clarity first-step copy runs ~260px, a long move grows the Action
   // face). Measured after every render, so the card always absorbs exactly
   // the leftover space and the box always lands 15px above the bottom.
-  try {
-    const _b = cc.querySelector('.cc-card');
-    if (_b && window.innerWidth < 768) {
-      document.documentElement.style.setProperty('--p1-box-h', _b.offsetHeight + 'px');
-      // v1068: one static measurement, not a correction loop. The page-1
-      // column starts below the app's own top padding, so its height must be
-      // the viewport MINUS that offset or it hangs off the bottom. The offset
-      // is fixed chrome, so this is read once at rest and cached.
-      // (v1083's height-measuring probe is gone. Sizing the box to the
-      // TALLEST face meant one long line of text could inflate the box and
-      // squeeze the Memento into a square, which is exactly the glitch Malik
-      // caught. The box is a FIXED height now and the faces are clamped to
-      // fit it, so neither the box nor the card can ever change size.)
-      try {
-        const _p1 = document.getElementById('homePage1');
-        if (_p1 && window.scrollY < 50) {
-          const off = Math.round(_p1.getBoundingClientRect().top + window.scrollY);
-          if (off >= 0 && off < 200) document.documentElement.style.setProperty('--p1-top', off + 'px');
-        }
-        // v1077: the column's height, MEASURED rather than trusted to a
-        // viewport unit (svh ran ~40px short in Malik's installed app and lvh
-        // ~40px long; only the real number is right on every device). This
-        // lives beside the --p1-top read on purpose: it is the render path
-        // that provably runs, unlike the boot-time attempt.
-        // v1092: the viewport is measured ONCE per page load and on real
-        // resize events only (see syncHomeViewport in js/11). Measuring it
-        // here, on every render, is what made both elements visibly resize on
-        // every swipe: the render reset the value and the safety pass shrank
-        // it again, over and over. One owner, one moment.
-      } catch (e) {}
-    }
-  } catch (e) {}
+  // v1093: the render path writes NO geometry at all. (--p1-box-h is dead:
+  // the box is a fixed height now, and writing it here was another per-render
+  // value that could shift the layout mid-swipe.)
   // v608 (Malik, overnight item 5): first open of a NEW day with a move still
   // pending, the Today panel breathes once so the move is the first thing the
   // eye lands on. Once per day, never when today's action is already done.

@@ -3653,7 +3653,7 @@ body.pre-clarity .capture-fab { display: none !important; }
      phone the card grows, that is the point. */
   :root {
     --p1-card-w: min(88vw, 352px);
-    --p1-card-h: clamp(300px, calc(100svh - var(--safe-t, 0px) - var(--safe-b, 0px) - 97px - var(--p1-box-h, 212px)), 900px); /* 97 = 18 snap + 34 pad + 14 stage margin + 16 gap + 15 buffer; the box term is MEASURED by js/08 after every render, so a taller face (the pre-Clarity first-step copy, a long move) shrinks the card instead of shoving the box off the bottom */
+    --p1-card-h: 0px; /* dead: the card's height comes from the page-1 flex column, not a formula. Kept as a defined value so any stale reference resolves to nothing rather than to a stale size. */
   }
   /* ══ MALIK'S LAYOUT LAW, STRUCTURAL (v1067) ═════════════════════════════
      Page 1 is a flex column exactly one viewport tall. The card is the ONLY
