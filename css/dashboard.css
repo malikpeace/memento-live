@@ -4616,12 +4616,12 @@ html.theme-light .cc-dots i.on { background: var(--text-hi); }
    at drag start). The today box is the SAME opaque tint on every platform,
    at rest and mid-swipe: phone matches desktop, and the deck no longer has
    a second style to snap to because there is only one style. */
-#commandCenter .cc-card,
-.cc-under { background: #16181d !important; }
-html.theme-light #commandCenter .cc-card,
-html.theme-light .cc-under { background: #ffffff !important; }
+#commandCenter .cc-card { background: #16181d !important; }
+html.theme-light #commandCenter .cc-card { background: #ffffff !important; }
 .cc-under { pointer-events: none; box-shadow: var(--shadow-card); overflow: hidden; }
-.cc-under .cc-dots { visibility: hidden; } /* one set of dots at a time */
+/* v1079: the under card shows its OWN dots, because it is the real card and
+   its dots are part of what you are swiping to. Hiding them made the landing
+   card visibly gain dots the instant the swipe finished. */
 @media (prefers-reduced-motion: reduce) { .cc-dots i { transition: none; } }
 
 /* The phone card's invert (v1051). The card starts in the CURRENT theme and

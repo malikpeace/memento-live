@@ -4474,18 +4474,25 @@ function bindCommandCenter(cc) {
           const src = shell.querySelector('.cc-card');
           if (!src) return null;
           src.querySelector(':scope > .cc-inv')?.remove();
-          const u = document.createElement('div');
-          u.className = 'cc-under';
+          // v1079 (Malik caught it in two screenshots): the card you swipe to
+          // must BE the card you land on. This used to be a bare <div> that
+          // only borrowed the card's inline style, so every rule scoped to
+          // .cc-card / .cc-card--pillars missed it: its dots were hidden and
+          // its content sat ~24px high, then snapped when the real render
+          // replaced it. It is now the rendered card element itself, classes
+          // and all, so the preview and the landing are the same thing.
+          const u = src;
+          u.classList.add('cc-under');
           u.setAttribute('aria-hidden', 'true');
-          u.setAttribute('style', src.getAttribute('style') || '');
-          u.innerHTML = src.innerHTML;
           u.querySelectorAll('[id]').forEach((n) => n.removeAttribute('id'));
-          // Geometry: sit exactly where the card sits, one layer down.
+          u.querySelectorAll('input, button, a, [tabindex]').forEach((n) => n.setAttribute('tabindex', '-1'));
+          // Geometry: sit exactly where the card sits, one layer down. Height
+          // is NOT forced: each face has its own natural height, and forcing
+          // the outgoing card's height was the other half of the jump.
           u.style.position = 'absolute';
           u.style.left = card.offsetLeft + 'px';
           u.style.top = card.offsetTop + 'px';
           u.style.width = card.offsetWidth + 'px';
-          u.style.height = card.offsetHeight + 'px';
           u.style.margin = '0';
           u.style.transform = 'scale(0.94) translateY(7px)';
           u.style.opacity = '0.85';
