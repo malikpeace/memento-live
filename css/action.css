@@ -126,8 +126,13 @@ body:has(.clarity-exp.open)::after { display: none; }
    Reuses the existing orb3 element rather than adding DOM, so every rule that
    already hides the background during the dark ceremonies keeps working. */
 .action-exp__bg .action-exp__bg-orb3 {
-  display: block; position: absolute; left: -90px; right: -90px; top: 0;
-  width: auto; height: 34lvh; inset: auto;
+  display: block; position: absolute;
+  /* v1102a: ONE shorthand, not longhands followed by `inset: auto`. Written
+     that way round, the shorthand came last and reset top/left/right back to
+     auto, so the band had no anchor and never appeared on the phone.
+     top 0 / right -90 / bottom auto / left -90. */
+  inset: 0 -90px auto;
+  width: auto; height: 34lvh;
   border-radius: 0; filter: none; overflow: hidden;
   background: none;
   -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 42%, #000 58%, transparent 100%);
