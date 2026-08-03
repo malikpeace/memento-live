@@ -3687,6 +3687,15 @@ body.pre-clarity .capture-fab { display: none !important; }
   }
   body:not(.has-custom-layout) .app.dash-v2 #homePage1 > #commandCenter {
     flex: 0 0 auto;
+    /* v1094: margin-top:auto PINS the box to the column's bottom. Without it
+       the items packed from the top, and once v1088 capped the card by its
+       aspect ratio the card could no longer absorb the leftover height, so
+       the surplus piled up UNDER the box and it floated (Malik's comeback
+       screenshot: ~114px of dead space below it instead of 49). Now any
+       surplus sits between the card and the box, where it reads as air, and
+       the box is bottom-anchored by construction rather than by the card
+       happening to be exactly the right height. */
+    margin-top: auto;
   }
   /* The card section carries an inline margin-bottom:14px from the renderer,
      which sat between the box and the column's bottom padding and made the
