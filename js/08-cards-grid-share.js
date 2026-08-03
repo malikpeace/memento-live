@@ -4506,7 +4506,13 @@ function bindCommandCenter(cc) {
           u.style.top = card.offsetTop + 'px';
           u.style.width = card.offsetWidth + 'px';
           u.style.margin = '0';
-          u.style.transform = 'scale(0.94) translateY(7px)';
+          // v1095 (Codex's catch, and it is the bug Malik kept reporting):
+          // this used to be scale(0.94) growing to 1 during the swipe. My
+          // tests measured RESTING rectangles, which were stable, so they
+          // said "nothing moved" while his eyes correctly saw the incoming
+          // card grow on every single swipe. Depth now comes from the offset
+          // and the shadow only. Cards slide at exactly their real size.
+          u.style.transform = 'translateY(7px)';
           // v1080: FULLY opaque. At 0.85 the card behind it showed straight
           // through, which is the "see through the cards" Malik reported. A
           // stacked card reads as depth through scale and shadow, never
@@ -4550,7 +4556,7 @@ function bindCommandCenter(cc) {
           Object.keys(preEls).forEach((k) => { if (preEls[k] !== under) preEls[k].style.display = 'none'; });
           // rest pose, in case a direction reversal re-reveals it mid-gesture
           under.style.transition = 'none';
-          under.style.transform = 'scale(0.94) translateY(7px)';
+          under.style.transform = 'translateY(7px)';
           under.style.opacity = '1';
           under.style.display = '';
           void under.offsetWidth;
@@ -4586,7 +4592,7 @@ function bindCommandCenter(cc) {
         card.style.transform = 'translateX(' + dx.toFixed(1) + 'px) rotate(' + (dx * 0.02).toFixed(2) + 'deg)';
         if (under) {
           const p = Math.min(1, Math.abs(dx) / (COMMIT * 2.2));
-          under.style.transform = 'scale(' + (0.94 + p * 0.06).toFixed(3) + ') translateY(' + (7 - p * 7).toFixed(1) + 'px)';
+          under.style.transform = 'translateY(' + (7 - p * 7).toFixed(1) + 'px)';
         }
       });
       const finish = (e) => {
@@ -4608,7 +4614,7 @@ function bindCommandCenter(cc) {
           card.style.transition = 'transform .24s cubic-bezier(.4,.0,.9,.6)';
           card.style.transform = 'translateX(' + off + 'px) rotate(' + (off * 0.02) + 'deg)';
           under.style.transition = 'transform .24s cubic-bezier(.2,.8,.3,1)';
-          under.style.transform = 'scale(1) translateY(0)';
+          under.style.transform = 'translateY(0)';
           setTimeout(() => {
             disarmDeck();
             card.dataset.swiping = '';
@@ -4622,7 +4628,7 @@ function bindCommandCenter(cc) {
         card.style.transform = 'translateX(0) rotate(0deg)';
         if (under) {
           under.style.transition = 'transform .3s cubic-bezier(.3,.85,.3,1)';
-          under.style.transform = 'scale(0.94) translateY(7px)';
+          under.style.transform = 'translateY(7px)';
         }
         setTimeout(() => {
           card.style.transition = ''; card.dataset.swiping = '';

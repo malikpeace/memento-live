@@ -3686,7 +3686,10 @@ body.pre-clarity .capture-fab { display: none !important; }
     flex: 1 1 auto; min-height: 0;
   }
   body:not(.has-custom-layout) .app.dash-v2 #homePage1 > #commandCenter {
-    flex: 0 0 auto;
+    /* Codex (4): the CONTAINER is fixed too, not just the card inside it, so
+       a content change can never alter the row's height. */
+    flex: 0 0 212px;
+    height: 212px;
     /* v1094: margin-top:auto PINS the box to the column's bottom. Without it
        the items packed from the top, and once v1088 capped the card by its
        aspect ratio the card could no longer absorb the leftover height, so
@@ -4183,9 +4186,14 @@ html.theme-light .ambient__rays { display: none !important; }
   }
 }
 @keyframes hubFadeIn { from { opacity: 0; } to { opacity: 1; } }
+/* v1095 (Codex's catch): the Memento no longer SCALES as the page scrolls.
+   It shrank to 94% on any slight scroll, which read as the card changing
+   size, and it is invisible to any test that measures resting rectangles.
+   It still fades and lifts on the way to page two; its dimensions never
+   change. */
 @keyframes heroCardDissolve {
-  from { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
-  to   { opacity: 0; transform: translateY(90px) scale(0.94); pointer-events: none; }
+  from { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  to   { opacity: 0; transform: translateY(90px); pointer-events: none; }
 }
 @keyframes mmGlowIn { from { opacity: 0; } to { opacity: 1; } }
 
@@ -4443,7 +4451,12 @@ html.theme-light #deskMission {
    card toward the viewer and fades it while the module rises behind, so the
    two read as one movement instead of a cut. */
 .cc-card--tappable { cursor: pointer; transition: transform 180ms ease-out; }
-.cc-card--tappable:active { transform: scale(0.985); }
+/* v1095: NOT on the swipeable pillar card. :active fires the instant a finger
+   lands, which is the start of every swipe, so the box visibly shrank before
+   the drag even began. On a card whose main gesture is a swipe, press-scale
+   is a lie about what is happening. The tap still has feedback: the launch
+   animation when the module opens. */
+.cc-card--tappable:not(.cc-card--pillars):active { transform: scale(0.985); }
 .cc-card--tappable.is-launching {
   transform: scale(1.02);
   opacity: 0;
@@ -4657,6 +4670,10 @@ html.theme-light .cc-dots i.on { background: var(--text-hi); }
 #commandCenter .cc-card { background: #16181d !important; }
 html.theme-light #commandCenter .cc-card { background: #ffffff !important; }
 .cc-under { pointer-events: none; box-shadow: var(--shadow-card); overflow: hidden; }
+/* v1095 (Codex): during a live swipe NOTHING may scale. Belt and braces on
+   top of the JS, so any future scale rule cannot reintroduce the resize. */
+.cc-deck-live .cc-card, .cc-deck-live .cc-under { transform: none; }
+
 /* v1080: no invert twin anywhere near a live swipe. The twin is a full-size
    copy of the card that only the hold gesture ever reveals, and a hold and a
    swipe are mutually exclusive, so during a deck drag it is removed from the

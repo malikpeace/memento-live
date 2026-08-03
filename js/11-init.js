@@ -45,37 +45,33 @@ function syncHomeViewport() {
   try {
     if (window.innerWidth >= 768) return;
     const root = document.documentElement;
-    const vv = window.visualViewport;
-    const cands = [vv && vv.height, window.innerHeight, root && root.clientHeight]
-      .map((n) => Math.round(n || 0)).filter((n) => n > 200);
-    if (!cands.length) return;
-    root.style.setProperty('--p1-vh', Math.min.apply(null, cands) + 'px');
-    // --p1-top belongs here too. It is the column's start offset, and the
-    // column height is (viewport - p1-top), so it is geometry: while the
-    // render path still re-read it every swipe, any drift in it resized the
-    // card and the box, which is what Malik kept seeing after two "fixes".
-    try {
-      const p1e = document.getElementById('homePage1');
-      if (p1e && window.scrollY < 50) {
-        const off = Math.round(p1e.getBoundingClientRect().top + window.scrollY);
-        if (off >= 0 && off < 200) root.style.setProperty('--p1-top', off + 'px');
-      }
-    } catch (e) {}
-    setTimeout(() => {
-      try {
-        if (window.scrollY > 50) return;
-        const box = document.querySelector('#commandCenter .cc-card');
-        const p1 = document.getElementById('homePage1');
-        if (!box || !p1) return;
-        const safeB = parseFloat(getComputedStyle(root).getPropertyValue('--safe-b')) || 0;
-        const over = Math.round(box.getBoundingClientRect().bottom - (window.innerHeight - safeB - 15));
-        if (over > 2) {
-          const top = parseFloat(getComputedStyle(root).getPropertyValue('--p1-top')) || 0;
-          root.style.setProperty('--p1-vh',
-            Math.max(320, Math.round(p1.getBoundingClientRect().height + top) - over) + 'px');
-        }
-      } catch (e) {}
-    }, 90);
+    // v1095, per Codex: ONE stable height, read at launch and on orientation
+    // change only. No visualViewport listener, no resize listener, no
+    // foreground listener, and no delayed correction pass. Those all fed the
+    // layout's own result back into the layout, which is the pattern that
+    // produced the launch jumps and the mid-swipe resizes.
+    // In an installed app innerHeight is the full screen, and screen.height
+    // is a hard ceiling for it: a static clamp, not a feedback loop, so a
+    // transiently over-large reading cannot stick. In a normal browser we set
+    // nothing at all and CSS falls back to 100svh, which WebKit defines as
+    // stable (unlike dvh).
+    const standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
+      || window.navigator.standalone === true;
+    if (standalone) {
+      const inner = Math.round(window.innerHeight || 0);
+      const scr = Math.round((window.screen && window.screen.height) || 0);
+      const h = (inner > 200 && scr > 200) ? Math.min(inner, scr) : inner;
+      if (h > 200) root.style.setProperty('--p1-vh', h + 'px');
+    } else {
+      root.style.removeProperty('--p1-vh');
+    }
+    // The column's start offset is fixed chrome, so it is read in the same
+    // one-time pass rather than on every render (v1093).
+    const p1e = document.getElementById('homePage1');
+    if (p1e && window.scrollY < 50) {
+      const off = Math.round(p1e.getBoundingClientRect().top + window.scrollY);
+      if (off >= 0 && off < 200) root.style.setProperty('--p1-top', off + 'px');
+    }
   } catch (e) {}
 }
 try {
@@ -83,12 +79,8 @@ try {
   _sync();
   document.addEventListener('DOMContentLoaded', _sync);
   window.addEventListener('load', _sync);
-  window.addEventListener('resize', _sync);
-  window.addEventListener('orientationchange', () => setTimeout(syncHomeViewport, 200));
-  if (window.visualViewport) window.visualViewport.addEventListener('resize', _sync);
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') _sync();
-  });
+  // Orientation only. Nothing else re-runs this.
+  window.addEventListener('orientationchange', () => setTimeout(syncHomeViewport, 250));
 } catch (e) {}
 
 /* v1073 SAFE-AREA SIMULATOR (dev only, URL-gated, inert without the param).
