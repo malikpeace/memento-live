@@ -4662,13 +4662,45 @@ html.theme-light .cc-dots i.on { background: var(--text-hi); }
    transform, this only keeps the drag from selecting text or firing the
    browser's own horizontal gestures. */
 .cc-card { touch-action: pan-y; }
-/* ONE SURFACE (v1061, Malik: "I prefer the more tinted less glass look,
-   more timeless, simple and utilitarian", after catching the glass->grey pop
-   at drag start). The today box is the SAME opaque tint on every platform,
-   at rest and mid-swipe: phone matches desktop, and the deck no longer has
-   a second style to snap to because there is only one style. */
-#commandCenter .cc-card { background: #16181d !important; }
-html.theme-light #commandCenter .cc-card { background: #ffffff !important; }
+/* ONE SURFACE, NOW GLASS (v1096, Malik: "a bit too flat, make the cards
+   glassier again with NO border"). Still ONE style for the whole deck, at
+   rest and mid-swipe, which is what killed the v1061 glass->grey pop: the
+   under card is the real card with the same classes, so there is nothing to
+   snap to. The glass is built in LAYERS (tint + top sheen + inset lit edge)
+   so it reads as glass even where the backdrop blur is dropped, and the
+   translucency lets the Memento's bloom fall into the top of the box.
+   No border: fill + sheen + shadow carry the edge (Malik's standing rule). */
+#commandCenter .cc-card {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.105) 0%, rgba(255,255,255,0.055) 34%, rgba(255,255,255,0.032) 100%),
+    rgba(14,16,20,0.34) !important;
+  border: 0 !important;
+  box-shadow:
+    0 18px 44px rgba(0,0,0,0.46),
+    inset 0 1px 0 rgba(255,255,255,0.14) !important;
+  -webkit-backdrop-filter: blur(30px) saturate(1.45);
+  backdrop-filter: blur(30px) saturate(1.45);
+}
+html.theme-light #commandCenter .cc-card {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0.52) 100%),
+    rgba(255,255,255,0.60) !important;
+  box-shadow:
+    0 14px 34px rgba(16,20,28,0.12),
+    inset 0 1px 0 rgba(255,255,255,0.85) !important;
+}
+/* The Glass setting still rules. OFF (html.flat-ui) = the flat matte box he
+   picked in v1061, exactly as it was; base.css already strips every blur
+   app-wide, this puts the opaque tint and the plain shadow back with it. */
+html.flat-ui #commandCenter .cc-card {
+  background: #16181d !important;
+  box-shadow: var(--shadow-card), inset 0 1px 0 rgba(255,255,255,0.05) !important;
+}
+html.flat-ui.theme-light #commandCenter .cc-card {
+  background: #ffffff !important;
+  box-shadow: var(--shadow-card) !important;
+}
+html.flat-ui #commandCenter .cc-card::before { display: none; }
 .cc-under { pointer-events: none; box-shadow: var(--shadow-card); overflow: hidden; }
 /* v1095 (Codex): during a live swipe NOTHING may scale. Belt and braces on
    top of the JS, so any future scale rule cannot reintroduce the resize. */
