@@ -3823,10 +3823,19 @@ body.pre-clarity .capture-fab { display: none !important; }
      calc that 15px difference fell out as dead space at the bottom of whichever
      state was shorter. One height means the card can be packed tight and both
      states fill the screen identically. */
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-card {
+  /* v1081: :not([style*="display: none"]) so a PREBUILT preview card that
+     the deck has hidden inline stays hidden. This rule's display:flex
+     !important beat the inline hide, so both prebuilt neighbours rendered
+     and one showed through behind the incoming card (Malik: "I can see a
+     card behind the card that's coming"). */
+  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-card:not([style*="display: none"]) {
     padding-top: 32px !important; padding-bottom: 30px !important;
     min-height: 206px !important;
     display: flex !important; flex-direction: column !important; justify-content: center !important;
+  }
+  /* Belt and braces: nothing may un-hide a hidden preview card. */
+  body:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-under[style*="display: none"] {
+    display: none !important;
   }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-od-sub { display: none; }
 

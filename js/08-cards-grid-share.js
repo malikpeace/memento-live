@@ -4458,6 +4458,10 @@ function bindCommandCenter(cc) {
         if (e.target && e.target.closest && e.target.closest('.cc-vsel')) return;
         x0 = e.clientX; y0 = e.clientY; axis = null;
         card.dataset.swiping = '';
+        // A new drag always starts from a clean deck. Starting one DURING
+        // the previous drag's settle left its cards in the DOM, which is how
+        // a third card appeared behind the incoming one.
+        disarmDeck();
         prebuildDeck();
       });
       // ── THE DECK (v1060, Malik: "like swiping through a layer of photos
@@ -4519,7 +4523,11 @@ function bindCommandCenter(cc) {
         try {
           const i = CC_PILLARS.indexOf(_ccPillar);
           [CC_PILLARS[(i + 1) % CC_PILLARS.length], CC_PILLARS[(i + 2) % CC_PILLARS.length]].forEach((pl) => {
-            if (preEls[pl]) return;
+            // v1081 (Malik: "I can see a card behind the card that's coming"):
+            // a REUSED prebuild could still be display:'' from the previous
+            // drag, so two preview cards showed at once. Anything reused is
+            // re-hidden unconditionally; only armDeck ever reveals one.
+            if (preEls[pl]) { preEls[pl].style.display = 'none'; return; }
             const u = buildUnder(pl);
             if (u) { u.style.display = 'none'; preEls[pl] = u; cc.insertBefore(u, card); }
           });
@@ -4538,6 +4546,8 @@ function bindCommandCenter(cc) {
           card.style.position = 'relative';
           card.style.zIndex = '1';
           if (!under.parentNode) cc.insertBefore(under, card);
+          // Exactly one preview card is ever visible, whatever happened before.
+          Object.keys(preEls).forEach((k) => { if (preEls[k] !== under) preEls[k].style.display = 'none'; });
           // rest pose, in case a direction reversal re-reveals it mid-gesture
           under.style.transition = 'none';
           under.style.transform = 'scale(0.94) translateY(7px)';
