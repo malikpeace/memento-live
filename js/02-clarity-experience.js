@@ -5128,27 +5128,29 @@ Return ONLY the sentence text. No quotes, no labels.`;
     const snap = (state.action.intake && state.action.intake.aiSnapshot) || {};
     const theirs = String(snap.mainMove || '').trim();
     const reason = String(pa.verdictReason || '').trim();
+    // v1110 (Malik): this beat is a HAND-OFF, not a second copy of the move.
+    // It used to end with "So the move is" + the move, and the very next
+    // screen is the card showing that same move, so on the empty path (door 2,
+    // nothing tried, no reason) the whole page was a caption, a repeat and a
+    // button. It now ends by handing over, and only carries the things the
+    // user would otherwise never learn: their own words, and why the app kept,
+    // sharpened or replaced them. The move itself waits for the card.
     let body = '';
     if (theirs && verdict) {
-      // Door 1: their move in their words, the receipt, then the ending.
+      // Door 1: their move in their words, then the receipt for the verdict.
       body += `<p class="action-verdict__theirs${verdict === 'replaced' ? ' will-cut' : ''}">&ldquo;${esc(theirs)}&rdquo;</p>`;
       if (reason) body += `<p class="action-verdict__receipt">${esc(reason)}</p>`;
-      body += `<p class="action-verdict__cap">${verdict === 'confirmed' ? 'So the action is' : 'So the move is'}</p>`;
-      body += `<p class="action-verdict__move">${esc(move)}</p>`;
     } else {
-      // Door 2: the visible cut when they listed tries; a clean arrival when
-      // they had nothing to strike.
+      // Door 2: the visible cut when they listed tries (naming the cuts is
+      // half the weight); nothing to strike means nothing to say.
       const rows = this._triedRows();
       if (rows.length) {
         body += `<p class="action-verdict__cap">You told Action you have tried</p>`;
         body += rows.map(r => `<p class="action-verdict__cutrow will-cut">${esc(r)}</p>`).join('');
-        if (reason) body += `<p class="action-verdict__receipt">${esc(reason)}</p>`;
-      } else if (reason) {
-        body += `<p class="action-verdict__receipt">${esc(reason)}</p>`;
       }
-      body += `<p class="action-verdict__cap">So the move is</p>`;
-      body += `<p class="action-verdict__move">${esc(move)}</p>`;
+      if (reason) body += `<p class="action-verdict__receipt">${esc(reason)}</p>`;
     }
+    body += `<p class="action-verdict__move">Here is your action plan.</p>`;
     const keepable = verdict === 'replaced' || verdict === 'upgraded';
     const beat = this._revealBeatShell(
       // v999 (Malik: the reveal pages 'feel very very cheap'). The bridge,
@@ -5157,7 +5159,7 @@ Return ONLY the sentence text. No quotes, no labels.`;
       // their own words. The other three were a page each for a caption, a
       // list they were about to swipe anyway, and a pep talk. Straight to the
       // plan now.
-      body, 'Lock it in', () => this._finishReveal(),
+      body, 'Continue', () => this._finishReveal(),
       keepable ? 'Keep my version' : null,
       keepable ? () => this._keepMyVersion() : null
     );
