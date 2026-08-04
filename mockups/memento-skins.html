@@ -78,6 +78,24 @@
   .skin .sub { color:var(--ink, rgba(28,32,40,.55)) !important; }
   .skin .daycard-ns__rim { opacity:var(--rim-op,1) !important; }
 
+  /* flat: an opaque painted object. Every colour layer switched off, the face
+     is the whole card, a white hairline edge and a white glow in the room.
+     This is the matte-black/void reference: no transparency, no bleed. */
+  .flat .daycard-theme-living .daycard-ns__liquid { display:none !important; }
+  .flat .daycard-theme-living .daycard-bloom,
+  .flat .daycard-wrap__aura { opacity:0 !important; }
+  .flat .daycard-ns__plat, .flat .daycard-ns__iri,
+  .flat .daycard-ns__sheen, .flat .daycard-ns__burn,
+  .flat .daycard-ns__tint { opacity:0 !important; }
+  .flat .daycard-ns__rim { opacity:1 !important;
+    box-shadow: inset 0 0 0 1.5px var(--edge, rgba(255,255,255,.9)) !important; }
+  .flat .daycard-ns {
+    box-shadow: 0 0 var(--halo-r, 46px) var(--halo-s, 8px) var(--halo, rgba(238,244,255,.34)),
+                inset 0 1px 0 rgba(255,255,255,.06) !important; }
+  /* a whisper of vignette so the surface reads as an object, not a swatch */
+  .flat .daycard-ns__body::before { content:''; position:absolute; inset:-40%; z-index:-1;
+    background:radial-gradient(ellipse 60% 50% at 50% 38%, var(--lift, rgba(255,255,255,.05)), transparent 70%); }
+
   /* matte: SOLID. No gloss, no screen-blend, barely any blur. The face is the
      colour; the lights only give it depth. A painted surface, not glass. */
   .matte .daycard-theme-living .daycard-ns__liquid { filter:blur(16px) saturate(1.02) !important; opacity:.5 !important; }
@@ -194,14 +212,20 @@ const SKINS = [
   plat:'.05', face:'linear-gradient(165deg,#0c0710,#050308)', mark:'rgba(242,232,255,.95)', ink:'rgba(230,214,255,.85)'},
  {n:'Gold',        sk1:'rgba(255,196,60,1)',  sk2:'rgba(255,236,170,.95)', sk3:'rgba(196,132,0,1)', sk4:'rgba(255,214,110,.9)',
   plat:'.22', face:'linear-gradient(165deg,#1f1503,#0d0901)', mark:'rgba(255,248,228,.95)', ink:'rgba(255,240,200,.9)'},
- {n:'Matte Black', sk1:'rgba(58,62,70,.5)',  sk2:'rgba(40,44,52,.45)', sk3:'rgba(30,33,40,.5)', sk4:'rgba(48,52,60,.4)',
-  plat:'.03', face:'linear-gradient(168deg,#161719,#0e0f11 60%,#0a0b0c)', mark:'rgba(228,231,238,.9)', ink:'rgba(214,219,228,.7)', cls:'matte'},
- {n:'Matte White', sk1:'rgba(232,233,236,.9)', sk2:'rgba(244,245,247,.9)', sk3:'rgba(220,222,227,.9)', sk4:'rgba(236,237,240,.8)',
-  plat:'.55', face:'linear-gradient(168deg,#eceded,#e2e3e4 60%,#dcdddf)', mark:'#4c5158', ink:'rgba(48,52,58,.75)', cls:'matte'},
+ {n:'Matte Black', sk1:'none',sk2:'none',sk3:'none',sk4:'none',
+  plat:'0', face:'linear-gradient(168deg,#1c1d20 0%,#141518 55%,#101113 100%)',
+  mark:'rgba(244,246,250,.97)', ink:'rgba(226,231,240,.75)', cls:'flat',
+  edge:'rgba(255,255,255,.92)', halo:'rgba(238,244,255,.40)', lift:'rgba(255,255,255,.05)'},
+ {n:'Matte White', sk1:'none',sk2:'none',sk3:'none',sk4:'none',
+  plat:'0', face:'linear-gradient(168deg,#f0f1f2 0%,#e7e8e9 55%,#dfe0e2 100%)',
+  mark:'rgba(62,67,74,.95)', ink:'rgba(52,57,64,.7)', cls:'flat',
+  edge:'rgba(255,255,255,.95)', halo:'rgba(240,244,252,.42)', lift:'rgba(255,255,255,.5)'},
  {n:'Pure Glass',  sk1:'rgba(180,225,255,.75)', sk2:'rgba(255,255,255,.95)', sk3:'rgba(150,205,255,.7)', sk4:'rgba(210,240,255,.7)',
   plat:'.62', face:'linear-gradient(165deg,#eef7fd,#e2eef8)', mark:'rgba(70,92,110,.85)', ink:'rgba(30,50,66,.75)', cls:'glass'},
- {n:'Void',        sk1:'rgba(90,100,120,.35)', sk2:'rgba(70,78,96,.3)', sk3:'rgba(50,56,70,.3)', sk4:'rgba(80,88,108,.25)',
-  plat:'.02', face:'linear-gradient(165deg,#0a0b0d,#030304)', mark:'rgba(236,239,246,.92)', ink:'rgba(226,231,240,.75)'},
+ {n:'Void', sk1:'none',sk2:'none',sk3:'none',sk4:'none',
+  plat:'0', face:'linear-gradient(168deg,#0a0a0c 0%,#060607 55%,#040405 100%)',
+  mark:'rgba(240,242,247,.96)', ink:'rgba(214,219,228,.6)', cls:'flat',
+  edge:'rgba(255,255,255,.22)', halo:'rgba(226,234,250,.16)', haloR:'34px', lift:'rgba(255,255,255,.02)'},
  {n:'Emerald',     sk1:'rgba(0,220,130,1)',   sk2:'rgba(120,255,200,.9)', sk3:'rgba(0,150,90,1)',   sk4:'rgba(40,255,160,.85)',
   plat:'.12', face:'linear-gradient(165deg,#03150e,#010806)', mark:'rgba(232,255,246,.95)', ink:'rgba(214,255,238,.9)'},
  {n:'Crimson',     sk1:'rgba(255,30,70,1)',   sk2:'rgba(255,110,120,.9)', sk3:'rgba(150,0,40,1)',   sk4:'rgba(255,70,90,.9)',
@@ -223,8 +247,10 @@ const SKINS = [
   plat:'.16', face:'linear-gradient(165deg,#20080a,#0c0204)', mark:'rgba(255,232,224,.95)', ink:'rgba(255,224,214,.85)'},
  {n:'Sapphire',    sk1:'rgba(0,110,255,1)',   sk2:'rgba(140,210,255,.85)', sk3:'rgba(0,50,160,1)',  sk4:'rgba(60,150,255,.9)',
   plat:'.26', face:'linear-gradient(165deg,#03102a,#010614)', mark:'rgba(224,238,255,.95)', ink:'rgba(212,232,255,.85)'},
- {n:'Bone',        sk1:'rgba(238,230,214,.95)', sk2:'rgba(250,246,238,.95)', sk3:'rgba(222,212,194,.9)', sk4:'rgba(242,234,220,.85)',
-  plat:'.60', face:'linear-gradient(168deg,#f3efe7,#e9e3d8)', mark:'#5d564b', ink:'rgba(58,52,44,.75)', cls:'matte'},
+ {n:'Bone', sk1:'none',sk2:'none',sk3:'none',sk4:'none',
+  plat:'0', face:'linear-gradient(168deg,#f4f0e8 0%,#ece7dc 55%,#e3ddd0 100%)',
+  mark:'rgba(78,71,60,.94)', ink:'rgba(66,60,50,.72)', cls:'flat',
+  edge:'rgba(255,253,246,.9)', halo:'rgba(246,238,222,.38)', lift:'rgba(255,255,255,.45)'},
  {n:'Toxic',       sk1:'rgba(180,255,0,1)',   sk2:'rgba(0,255,140,.9)', sk3:'rgba(120,200,0,1)',  sk4:'rgba(220,255,80,.85)',
   plat:'.10', face:'linear-gradient(165deg,#0f1603,#050801)', mark:'rgba(246,255,224,.95)', ink:'rgba(238,255,200,.9)'},
  {n:'Titanium',    sk1:'rgba(190,200,214,.9)', sk2:'rgba(226,232,240,.9)', sk3:'rgba(140,152,170,.85)', sk4:'rgba(200,210,224,.8)',
@@ -233,14 +259,22 @@ const SKINS = [
   plat:'.58', face:'linear-gradient(165deg,#fbeef2,#f4e2e8)', mark:'#6b4a55', ink:'rgba(70,44,52,.75)'},
  {n:'Ultraviolet', sk1:'rgba(110,0,255,1)',   sk2:'rgba(190,120,255,.85)', sk3:'rgba(60,0,160,1)',  sk4:'rgba(150,60,255,.9)',
   plat:'.06', face:'linear-gradient(165deg,#0b0318,#04010a)', mark:'rgba(236,224,255,.95)', ink:'rgba(226,210,255,.85)'},
- {n:'Matte Clay',  sk1:'rgba(196,110,80,.55)', sk2:'rgba(214,140,110,.45)', sk3:'rgba(150,74,52,.5)', sk4:'rgba(180,96,68,.45)',
-  plat:'.04', face:'linear-gradient(168deg,#8f4a34,#7a3d2a 60%,#6b3423)', mark:'rgba(255,238,230,.95)', ink:'rgba(255,232,222,.8)', cls:'matte'},
- {n:'Matte Forest', sk1:'rgba(60,120,80,.5)', sk2:'rgba(96,150,110,.4)', sk3:'rgba(30,80,52,.5)', sk4:'rgba(70,130,90,.4)',
-  plat:'.04', face:'linear-gradient(168deg,#24402f,#1b3324 60%,#152a1d)', mark:'rgba(236,250,240,.95)', ink:'rgba(226,244,232,.8)', cls:'matte'},
- {n:'Matte Navy',  sk1:'rgba(60,86,150,.5)', sk2:'rgba(96,120,180,.4)', sk3:'rgba(28,44,96,.5)', sk4:'rgba(70,96,160,.4)',
-  plat:'.04', face:'linear-gradient(168deg,#1e2b4d,#16203a 60%,#111829)', mark:'rgba(234,240,252,.95)', ink:'rgba(224,232,248,.8)', cls:'matte'},
- {n:'Matte Sand',  sk1:'rgba(214,196,164,.6)', sk2:'rgba(232,218,192,.5)', sk3:'rgba(190,168,132,.55)', sk4:'rgba(220,202,172,.5)',
-  plat:'.10', face:'linear-gradient(168deg,#d8c8a8,#cdbb98 60%,#c3af8b)', mark:'rgba(58,48,32,.9)', ink:'rgba(52,42,28,.8)', cls:'matte'},
+ {n:'Matte Clay', sk1:'none',sk2:'none',sk3:'none',sk4:'none',
+  plat:'0', face:'linear-gradient(168deg,#9a5238 0%,#87452e 55%,#763a26 100%)',
+  mark:'rgba(255,242,236,.96)', ink:'rgba(255,236,228,.75)', cls:'flat',
+  edge:'rgba(255,236,226,.55)', halo:'rgba(255,214,196,.22)', lift:'rgba(255,255,255,.05)'},
+ {n:'Matte Forest', sk1:'none',sk2:'none',sk3:'none',sk4:'none',
+  plat:'0', face:'linear-gradient(168deg,#284834 0%,#1e3927 55%,#172d1f 100%)',
+  mark:'rgba(238,250,242,.96)', ink:'rgba(228,244,234,.72)', cls:'flat',
+  edge:'rgba(226,246,234,.5)', halo:'rgba(190,240,208,.18)', lift:'rgba(255,255,255,.04)'},
+ {n:'Matte Navy', sk1:'none',sk2:'none',sk3:'none',sk4:'none',
+  plat:'0', face:'linear-gradient(168deg,#20304f 0%,#17243c 55%,#111a2c 100%)',
+  mark:'rgba(238,243,254,.96)', ink:'rgba(226,234,250,.72)', cls:'flat',
+  edge:'rgba(226,236,255,.5)', halo:'rgba(180,206,255,.2)', lift:'rgba(255,255,255,.04)'},
+ {n:'Matte Sand', sk1:'none',sk2:'none',sk3:'none',sk4:'none',
+  plat:'0', face:'linear-gradient(168deg,#dccBa8 0%,#d2c09a 55%,#c7b48d 100%)',
+  mark:'rgba(52,44,30,.92)', ink:'rgba(48,40,26,.72)', cls:'flat',
+  edge:'rgba(255,250,238,.7)', halo:'rgba(244,228,196,.3)', lift:'rgba(255,255,255,.28)'},
  {n:'Midnight',    sk1:'rgba(30,60,140,.9)',  sk2:'rgba(70,110,190,.8)', sk3:'rgba(10,25,70,.9)', sk4:'rgba(50,90,170,.8)',
   plat:'.08', face:'linear-gradient(165deg,#060a16,#02030a)', mark:'rgba(226,234,250,.92)', ink:'rgba(212,224,246,.8)'},
 ];
@@ -266,6 +300,8 @@ function skinFor(name, forced){
 function skinVars(sk){
   return {'--sk1':sk.sk1,'--sk2':sk.sk2,'--sk3':sk.sk3,'--sk4':sk.sk4,
     '--plat-op':sk.plat,'--face':sk.face,'--mark':sk.mark,'--ink':sk.ink,
+    '--edge':sk.edge||'rgba(255,255,255,.9)','--halo':sk.halo||'rgba(238,244,255,.34)',
+    '--halo-r':sk.haloR||'46px','--lift':sk.lift||'rgba(255,255,255,.05)',
     '--mm-hue':(sk.rot||0)+'deg','--sat':'1.7',
     '--clar':'1','--act':'1','--cons':'1','--mix':'.9','--lit':'1','--glow':'.7','--emit':'.7','--ring':'.5'};
 }
