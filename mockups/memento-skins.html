@@ -120,9 +120,83 @@
   .more:hover { background:rgba(255,255,255,.11); }
   .hidden-tier { display:none; }
   .hidden-tier.open { display:flex; }
+
+  /* ── topographic prototype ─────────────────────────────────────────
+     Real contour bands: fractal noise posterised into discrete steps,
+     coloured per channel. Same card, a map of a person's terrain. */
+  .topo-layer { position:absolute; inset:-12%; z-index:1; pointer-events:none;
+    opacity:var(--topo-op,.85); mix-blend-mode:var(--topo-blend, normal); }
+  .topo-grid { position:absolute; inset:0; z-index:2; pointer-events:none;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(255,255,255,.07) 0 1px, transparent 1px 13px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,.07) 0 1px, transparent 1px 13px);
+    opacity:var(--grid-op,0); }
 </style>
 </head>
 <body class="ns-bloom">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <!-- pastel elevation, the Taiwan look -->
+  <filter id="topoElev" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.007" numOctaves="4" seed="11" result="n"/>
+    <feColorMatrix in="n" type="saturate" values="0" result="g"/>
+    <feComponentTransfer in="g">
+      <feFuncR type="discrete" tableValues="0.94 0.86 0.62 0.48 0.98 0.99 0.95 0.72"/>
+      <feFuncG type="discrete" tableValues="0.93 0.88 0.78 0.72 0.82 0.62 0.44 0.38"/>
+      <feFuncB type="discrete" tableValues="0.88 0.84 0.86 0.80 0.52 0.34 0.28 0.30"/>
+      <feFuncA type="discrete" tableValues="1 1 1 1 1 1 1 1"/>
+    </feComponentTransfer>
+  </filter>
+  <!-- thermal, the Apple look: blue to cyan to yellow to orange -->
+  <filter id="topoTherm" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.006" numOctaves="5" seed="4" result="n"/>
+    <feColorMatrix in="n" type="saturate" values="0" result="g"/>
+    <feComponentTransfer in="g">
+      <feFuncR type="discrete" tableValues="0.02 0.05 0.10 0.35 0.85 1 1 1"/>
+      <feFuncG type="discrete" tableValues="0.05 0.22 0.62 0.92 0.98 0.86 0.55 0.35"/>
+      <feFuncB type="discrete" tableValues="0.55 0.95 0.98 0.72 0.25 0.05 0.02 0.02"/>
+      <feFuncA type="discrete" tableValues="1 1 1 1 1 1 1 1"/>
+    </feComponentTransfer>
+  </filter>
+  <!-- density, the heatmap look -->
+  <filter id="topoDens" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.011" numOctaves="3" seed="19" result="n"/>
+    <feColorMatrix in="n" type="saturate" values="0" result="g"/>
+    <feComponentTransfer in="g">
+      <feFuncR type="discrete" tableValues="0.02 0.06 0.12 0.20 0.34 0.52 0.70 0.86"/>
+      <feFuncG type="discrete" tableValues="0.01 0.04 0.10 0.24 0.52 0.78 0.94 1"/>
+      <feFuncB type="discrete" tableValues="0.16 0.42 0.70 0.92 1 1 1 1"/>
+      <feFuncA type="discrete" tableValues="1 1 1 1 1 1 1 1"/>
+    </feComponentTransfer>
+  </filter>
+  <!-- contour lines: thin light rings on dark -->
+  <filter id="topoLine" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.0055" numOctaves="3" seed="8" result="n"/>
+    <feColorMatrix in="n" type="saturate" values="0" result="g"/>
+    <feComponentTransfer in="g" result="spread">
+      <feFuncR type="linear" slope="5" intercept="-2"/>
+      <feFuncG type="linear" slope="5" intercept="-2"/>
+      <feFuncB type="linear" slope="5" intercept="-2"/>
+    </feComponentTransfer>
+    <feComponentTransfer in="spread">
+      <feFuncR type="discrete" tableValues="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1"/>
+      <feFuncG type="discrete" tableValues="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1"/>
+      <feFuncB type="discrete" tableValues="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1"/>
+      <feFuncA type="discrete" tableValues="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1"/>
+    </feComponentTransfer>
+  </filter>
+  <!-- depth: ocean bands -->
+  <filter id="topoDeep" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.0085" numOctaves="4" seed="27" result="n"/>
+    <feColorMatrix in="n" type="saturate" values="0" result="g"/>
+    <feComponentTransfer in="g">
+      <feFuncR type="discrete" tableValues="0.01 0.02 0.03 0.05 0.09 0.20 0.45 0.75"/>
+      <feFuncG type="discrete" tableValues="0.06 0.14 0.26 0.42 0.62 0.80 0.92 0.98"/>
+      <feFuncB type="discrete" tableValues="0.14 0.28 0.42 0.56 0.70 0.82 0.92 0.98"/>
+      <feFuncA type="discrete" tableValues="1 1 1 1 1 1 1 1"/>
+    </feComponentTransfer>
+  </filter>
+</defs></svg>
+
 <div class="wrap">
   <h1>Your Color — on the actual card</h1>
   <p class="lede">Every card on this page is the app's real <code style="font-size:12px;opacity:.7">.daycard-ns</code> element, the same markup and the same three stylesheets the running app uses. Nothing is redrawn. The only thing that changes per person is <code style="font-size:12px;opacity:.7">--mm-hue</code>, the card's own hue-rotation variable, which the app already supports.</p>
@@ -141,7 +215,11 @@
   <p class="why">Forty-eight materials on the identical card. Same markup, same rim, same mark, same engine. Orange, voltage yellow, obsidian violet, pure white, void black, emerald, crimson, ice, magenta, cobalt, copper, jade.</p>
   <div class="row" id="crowdRow"></div>
 
-  <div class="sect">3 · The Founder card</div>
+
+  <div class="sect">4 · Prototype — topographic</div>
+  <p class="why">A different idea entirely: the card as terrain. Fractal noise posterised into discrete elevation bands, so every person's card is a map of a landscape that only exists for them. Same real card, same rim, same mark. These are prototypes, not finished skins.</p>
+  <div class="row" id="topoRow"></div>
+  <div class="sect">5 · The Founder card</div>
   <p class="why">The same real card, numbered. Platinum keeps the shipped face; obsidian holds the platinum flood off so their colour is the only light in the room. (Both follow the generator.)</p>
   <div class="row" id="founderRow"></div>
 </div>
@@ -325,6 +403,17 @@ const SKINS = [
   plat:'.50', face:'linear-gradient(165deg,#2a2013,#140f08)', mark:'rgba(255,250,240,.97)', ink:'rgba(255,244,224,.88)'},
  {n:'Pearl', sk1:'rgba(255,170,215,.85)', sk2:'rgba(170,225,255,.85)', sk3:'rgba(255,240,170,.8)', sk4:'rgba(200,180,255,.85)',
   plat:'.52', face:'linear-gradient(165deg,#fbf7ff,#eef4fb)', mark:'rgba(92,84,106,.9)', ink:'rgba(70,62,86,.72)', cls:'glass'},
+ {n:'Thermal',     sk1:'rgba(30,60,255,1)', sk2:'rgba(0,220,255,.95)', sk3:'rgba(255,230,0,1)', sk4:'rgba(255,110,0,1)',
+  plat:'.06', face:'linear-gradient(165deg,#04061a,#01020a)', mark:'rgba(240,246,255,.97)', ink:'rgba(226,238,255,.88)',
+  edge:'rgba(120,180,255,.5)', halo:'rgba(60,120,255,.26)'},
+ {n:'Heat Rise',   sk1:'rgba(255,150,0,1)', sk2:'rgba(255,60,0,.9)', sk3:'rgba(255,230,140,.85)', sk4:'rgba(10,6,4,.98)',
+  plat:'0', face:'linear-gradient(0deg,#f08a10 -18%,#3a1200 16%,#0a0503 44%,#050303 100%)',
+  mark:'rgba(255,248,240,.97)', ink:'rgba(255,232,204,.85)', edge:'rgba(255,180,90,.32)', halo:'rgba(255,140,20,.2)'},
+ {n:'Density',     sk1:'rgba(60,40,255,1)', sk2:'rgba(20,10,120,.95)', sk3:'rgba(120,220,255,.95)', sk4:'rgba(10,4,60,.98)',
+  plat:'.04', face:'linear-gradient(165deg,#04021a,#010008)', mark:'rgba(232,240,255,.96)', ink:'rgba(190,214,255,.85)',
+  edge:'rgba(120,160,255,.45)', halo:'rgba(60,60,255,.22)'},
+ {n:'Elevation',   sk1:'rgba(255,190,90,.9)', sk2:'rgba(150,200,235,.85)', sk3:'rgba(120,205,175,.85)', sk4:'rgba(240,120,110,.8)',
+  plat:'.46', face:'linear-gradient(165deg,#e9e6dc,#dcd8cc)', mark:'rgba(70,74,86,.9)', ink:'rgba(56,60,72,.78)'},
 ];
 
 /* a seeded generator so each person's lights land somewhere nobody could
@@ -400,6 +489,53 @@ function renderFounder(name, sk){
     + realCard(Object.assign({}, skinVars(SKINS[4]), {'--rim-op':'1'}),
         {cls:'skin', cap:'C · Void founder — black, the rim, the number', name:name, num:num, sub:'First two hundred'});
 }
+
+
+/* ── topographic prototypes ─────────────────────────────────────── */
+function topoCard(o){
+  const B = blobPlan(o.name||'topo');
+  const style = Object.entries(o.vars||{}).map(([k,v])=>`${k}:${v}`).join(';');
+  return `<div class="slot skin ${o.cls||''}" >
+    <p class="cap">${o.cap||''}</p>
+    <div class="cage">
+      <div class="daycard-wrap daycard-theme-living daycard-reveal daycard--bright" style="${style}">
+        <div class="daycard-living-stage">
+          <div class="daycard-ns">
+            <span class="topo-layer" style="filter:url(#${o.filter}); background:#888"></span>
+            <span class="topo-grid"></span>
+            <span class="daycard-ns__rim" aria-hidden="true"></span>
+            <div class="daycard-ns__body">
+              <svg class="daycard-ns__emblem" viewBox="0 0 512 512" aria-hidden="true">
+                <path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path>
+              </svg>
+            </div>
+            <div class="sub">${o.sub||''}</div>
+            <div class="daycard-ns__foot"><span class="daycard-ns__name">${o.name||''}</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+document.getElementById('topoRow').innerHTML =
+  topoCard({filter:'topoElev', cap:'Elevation — pastel land', name:'Ava', sub:'topographic',
+    vars:{'--face':'#e9e6dc','--mark':'rgba(58,62,74,.92)','--ink':'rgba(58,62,74,.7)','--topo-op':'.9',
+          '--edge':'rgba(255,255,255,.9)','--halo':'rgba(240,238,230,.35)'}, cls:'flat'})
+  + topoCard({filter:'topoTherm', cap:'Thermal — the whole spectrum', name:'Jordan', sub:'topographic',
+    vars:{'--face':'#02030c','--mark':'rgba(255,255,255,.97)','--ink':'rgba(226,238,255,.85)','--topo-op':'.95',
+          '--edge':'rgba(140,190,255,.5)','--halo':'rgba(60,120,255,.28)'}, cls:'flat'})
+  + topoCard({filter:'topoDens', cap:'Density — heat map', name:'Sofia', sub:'topographic',
+    vars:{'--face':'#03011a','--mark':'rgba(240,246,255,.97)','--ink':'rgba(200,220,255,.85)','--topo-op':'.92','--grid-op':'.5',
+          '--edge':'rgba(120,160,255,.45)','--halo':'rgba(60,60,255,.24)'}, cls:'flat'})
+  + topoCard({filter:'topoLine', cap:'Contour — lines only', name:'Darius', sub:'topographic',
+    vars:{'--face':'#07080a','--mark':'rgba(244,248,255,.97)','--ink':'rgba(214,224,240,.8)','--topo-op':'.9',
+          '--topo-blend':'screen','--edge':'rgba(255,255,255,.5)','--halo':'rgba(226,236,255,.2)'}, cls:'flat'})
+  + topoCard({filter:'topoDeep', cap:'Depth — ocean floor', name:'Lena', sub:'topographic',
+    vars:{'--face':'#01060e','--mark':'rgba(226,244,255,.97)','--ink':'rgba(196,226,248,.82)','--topo-op':'.9',
+          '--edge':'rgba(120,200,255,.4)','--halo':'rgba(0,140,255,.2)'}, cls:'flat'})
+  + topoCard({filter:'topoElev', cap:'Elevation, dark — same map, night', name:'Theo', sub:'topographic',
+    vars:{'--face':'#0a0b0d','--mark':'rgba(244,248,255,.97)','--ink':'rgba(220,230,244,.8)','--topo-op':'.34',
+          '--topo-blend':'screen','--edge':'rgba(255,255,255,.35)','--halo':'rgba(226,236,255,.16)'}, cls:'flat'});
 
 document.getElementById('nameIn').addEventListener('input', renderYour);
 renderYour();
