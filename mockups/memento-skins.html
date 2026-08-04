@@ -138,7 +138,7 @@
   <div class="row" id="yourRow"></div>
 
   <div class="sect">2 · The skin library</div>
-  <p class="why">Twenty-four materials on the identical card. Same markup, same rim, same mark, same engine. Orange, voltage yellow, obsidian violet, pure white, void black, emerald, crimson, ice, magenta, cobalt, copper, jade.</p>
+  <p class="why">Forty-eight materials on the identical card. Same markup, same rim, same mark, same engine. Orange, voltage yellow, obsidian violet, pure white, void black, emerald, crimson, ice, magenta, cobalt, copper, jade.</p>
   <div class="row" id="crowdRow"></div>
 
   <div class="sect">3 · The Founder card</div>
@@ -277,6 +277,52 @@ const SKINS = [
   edge:'rgba(255,250,238,.7)', halo:'rgba(244,228,196,.3)', lift:'rgba(255,255,255,.28)'},
  {n:'Midnight',    sk1:'rgba(30,60,140,.9)',  sk2:'rgba(70,110,190,.8)', sk3:'rgba(10,25,70,.9)', sk4:'rgba(50,90,170,.8)',
   plat:'.08', face:'linear-gradient(165deg,#060a16,#02030a)', mark:'rgba(226,234,250,.92)', ink:'rgba(212,224,246,.8)'},
+ /* ── tier three: 20 more ──────────────────────────────────── */
+ {n:'Nebula',      sk1:'rgba(255,60,180,.95)', sk2:'rgba(90,60,255,.9)', sk3:'rgba(0,220,255,.85)', sk4:'rgba(255,150,60,.7)',
+  plat:'.06', face:'linear-gradient(165deg,#0a0614,#04020a)', mark:'rgba(244,238,255,.96)', ink:'rgba(232,222,255,.85)'},
+ {n:'Oil Slick',   sk1:'rgba(0,255,200,.85)', sk2:'rgba(180,0,255,.8)', sk3:'rgba(255,90,0,.75)', sk4:'rgba(0,120,255,.8)',
+  plat:'.10', face:'linear-gradient(165deg,#0b0d10,#040506)', mark:'rgba(240,244,250,.96)', ink:'rgba(226,232,242,.82)'},
+ {n:'Blood Orange',sk1:'rgba(255,70,20,1)', sk2:'rgba(255,150,40,.9)', sk3:'rgba(190,10,40,1)', sk4:'rgba(255,110,60,.9)',
+  plat:'.12', face:'linear-gradient(165deg,#1d0604,#0a0201)', mark:'rgba(255,238,230,.96)', ink:'rgba(255,226,214,.85)'},
+ {n:'Moss',        sk1:'none',sk2:'none',sk3:'none',sk4:'none', plat:'0',
+  face:'linear-gradient(168deg,#4a5b34,#3c4b2a 55%,#313e22)', mark:'rgba(244,250,232,.95)', ink:'rgba(236,244,220,.75)',
+  cls:'flat', edge:'rgba(236,248,214,.5)', halo:'rgba(196,226,150,.18)'},
+ {n:'Porcelain',   sk1:'rgba(255,255,255,.9)', sk2:'rgba(246,250,255,.95)', sk3:'rgba(224,236,248,.8)', sk4:'rgba(255,255,255,.85)',
+  plat:'.9', face:'linear-gradient(165deg,#fbfdff,#f0f5fa)', mark:'rgba(96,108,122,.9)', ink:'rgba(56,66,78,.72)', cls:'glass'},
+ {n:'Graphite',    sk1:'none',sk2:'none',sk3:'none',sk4:'none', plat:'0',
+  face:'linear-gradient(168deg,#3a3d42,#2c2f34 55%,#232629)', mark:'rgba(246,248,252,.96)', ink:'rgba(230,234,240,.75)',
+  cls:'flat', edge:'rgba(255,255,255,.7)', halo:'rgba(226,232,244,.24)'},
+ {n:'Neon Noir',   sk1:'rgba(255,0,110,1)', sk2:'rgba(0,220,255,.9)', sk3:'rgba(90,0,180,.9)', sk4:'rgba(255,40,140,.85)',
+  plat:'.04', face:'linear-gradient(165deg,#08060c,#030205)', mark:'rgba(250,240,250,.96)', ink:'rgba(255,214,238,.85)'},
+ {n:'Champagne',   sk1:'rgba(240,214,170,.9)', sk2:'rgba(252,240,220,.95)', sk3:'rgba(214,180,130,.85)', sk4:'rgba(246,226,190,.85)',
+  plat:'.66', face:'linear-gradient(165deg,#f6efe3,#ece1cf)', mark:'rgba(96,80,58,.9)', ink:'rgba(76,62,44,.72)'},
+ {n:'Storm',       sk1:'rgba(120,140,170,.8)', sk2:'rgba(180,196,214,.75)', sk3:'rgba(60,76,100,.85)', sk4:'rgba(100,124,158,.7)',
+  plat:'.30', face:'linear-gradient(165deg,#171b22,#0c0f14)', mark:'rgba(238,242,248,.95)', ink:'rgba(220,228,240,.78)'},
+ {n:'Coral',       sk1:'rgba(255,110,110,1)', sk2:'rgba(255,180,150,.9)', sk3:'rgba(255,60,120,.95)', sk4:'rgba(255,150,130,.85)',
+  plat:'.42', face:'linear-gradient(165deg,#2a0d10,#140406)', mark:'rgba(255,240,236,.96)', ink:'rgba(255,228,222,.85)'},
+ {n:'Deep Sea',    sk1:'rgba(0,140,190,.95)', sk2:'rgba(0,80,140,.85)', sk3:'rgba(0,200,190,.8)', sk4:'rgba(20,60,120,.85)',
+  plat:'.06', face:'linear-gradient(165deg,#02090f,#010406)', mark:'rgba(228,244,252,.95)', ink:'rgba(212,236,248,.8)'},
+ {n:'Terracotta',  sk1:'none',sk2:'none',sk3:'none',sk4:'none', plat:'0',
+  face:'linear-gradient(168deg,#b2634a,#9d5540 55%,#8a4936)', mark:'rgba(255,244,238,.96)', ink:'rgba(255,236,228,.78)',
+  cls:'flat', edge:'rgba(255,238,228,.6)', halo:'rgba(255,196,168,.22)'},
+ {n:'Prism',       sk1:'rgba(255,80,80,.8)', sk2:'rgba(255,240,120,.75)', sk3:'rgba(80,255,140,.75)', sk4:'rgba(120,140,255,.8)',
+  plat:'.55', face:'linear-gradient(165deg,#f4f6fa,#e8ecf4)', mark:'rgba(70,78,92,.9)', ink:'rgba(48,56,70,.75)', cls:'glass'},
+ {n:'Ink',         sk1:'none',sk2:'none',sk3:'none',sk4:'none', plat:'0',
+  face:'linear-gradient(168deg,#111827,#0b1120 55%,#070b16)', mark:'rgba(236,242,255,.96)', ink:'rgba(214,226,248,.72)',
+  cls:'flat', edge:'rgba(190,214,255,.45)', halo:'rgba(140,180,255,.18)'},
+ {n:'Peach',       sk1:'rgba(255,180,140,.95)', sk2:'rgba(255,224,200,.9)', sk3:'rgba(255,140,170,.85)', sk4:'rgba(255,200,170,.85)',
+  plat:'.6', face:'linear-gradient(165deg,#fdf0e8,#f8e2d6)', mark:'rgba(110,72,58,.9)', ink:'rgba(90,58,46,.72)'},
+ {n:'Volcanic',    sk1:'rgba(255,60,0,.95)', sk2:'rgba(120,20,0,.9)', sk3:'rgba(255,160,40,.8)', sk4:'rgba(60,20,20,.9)',
+  plat:'.03', face:'linear-gradient(165deg,#120504,#050101)', mark:'rgba(255,236,224,.95)', ink:'rgba(255,214,196,.8)'},
+ {n:'Mint',        sk1:'rgba(120,255,210,.9)', sk2:'rgba(230,255,246,.9)', sk3:'rgba(60,220,180,.85)', sk4:'rgba(180,255,230,.8)',
+  plat:'.68', face:'linear-gradient(165deg,#eefaf5,#e0f3ec)', mark:'rgba(52,86,76,.9)', ink:'rgba(36,68,58,.72)'},
+ {n:'Oxblood',     sk1:'none',sk2:'none',sk3:'none',sk4:'none', plat:'0',
+  face:'linear-gradient(168deg,#5c1a20,#4a1419 55%,#3c0f14)', mark:'rgba(255,238,238,.96)', ink:'rgba(250,224,224,.75)',
+  cls:'flat', edge:'rgba(255,224,224,.5)', halo:'rgba(255,150,150,.18)'},
+ {n:'Solar Wind',  sk1:'rgba(255,220,120,.9)', sk2:'rgba(120,200,255,.85)', sk3:'rgba(255,150,80,.8)', sk4:'rgba(200,180,255,.8)',
+  plat:'.34', face:'linear-gradient(165deg,#15121c,#08070d)', mark:'rgba(252,248,240,.96)', ink:'rgba(244,236,222,.82)'},
+ {n:'Pearl',       sk1:'rgba(255,230,245,.85)', sk2:'rgba(230,245,255,.9)', sk3:'rgba(245,255,235,.8)', sk4:'rgba(240,230,255,.8)',
+  plat:'.88', face:'linear-gradient(165deg,#fdfcff,#f4f2f8)', mark:'rgba(104,98,116,.88)', ink:'rgba(70,64,82,.7)', cls:'glass'},
 ];
 
 /* a seeded generator so each person's lights land somewhere nobody could
@@ -320,7 +366,9 @@ function renderYour(){
 }
 
 const CROWD=['Ava','Jordan Cole','Sofia M','Darius','Lena Park','Theo','Maya R','Chris B','Rae','Ben O','Nia','Sam K',
-  'Iris','Malik','Zara','Owen','Priya','Kai','June','Marcus','Elle','Dev','Nora','Tomas'];
+  'Iris','Malik','Zara','Owen','Priya','Kai','June','Marcus','Elle','Dev','Nora','Tomas',
+  'Asha','Cole','Remy','Vera','Ines','Otto','Suki','Bo','Anya','Rafa','Mira','Idris',
+  'Leo','Sana','Wren','Jules','Nico','Ida','Tobi','Halle','Quinn','Pia','Ezra','Lux'];
 (function(){
   const row=document.getElementById('crowdRow');
   const cards=CROWD.map((n,i)=>{ const sk=skinFor(n, i%SKINS.length);
@@ -330,9 +378,9 @@ const CROWD=['Ava','Jordan Cole','Sofia M','Darius','Lena Park','Theo','Maya R',
   tier2.className='row hidden-tier'; tier2.id='tier2';
   tier2.innerHTML = cards.slice(12).join('');
   const btn=document.createElement('button');
-  btn.className='more'; btn.textContent='View all 24 materials';
+  btn.className='more'; btn.textContent='View the whole library';
   btn.onclick=()=>{ tier2.classList.toggle('open');
-    btn.textContent = tier2.classList.contains('open') ? 'Show fewer' : 'View all 24 materials'; };
+    btn.textContent = tier2.classList.contains('open') ? 'Show fewer' : 'View the whole library'; };
   row.after(tier2); tier2.after(btn);
 })();
 
