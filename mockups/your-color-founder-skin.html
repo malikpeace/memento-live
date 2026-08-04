@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Your Color + Founder Skin — on the real Memento</title>
+<title>Your Color on the real Memento</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
-  html, body { background:#050509; color:#f5f5f7;
+  html, body { background:#060709; color:#f5f5f7;
     font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
     -webkit-font-smoothing:antialiased; }
   .wrap { max-width:1240px; margin:0 auto; padding:30px 20px 140px; }
@@ -16,59 +16,48 @@
     color:rgba(245,245,247,.40); margin:44px 0 6px; padding-top:20px;
     border-top:1px solid rgba(255,255,255,.09); }
   .why { font-size:13px; line-height:1.55; color:rgba(245,245,247,.55); max-width:78ch; margin:0 0 20px; }
-
-  /* ═══ THE REAL CARD — production recipe from css/daycard-living.css ═══
-     liquid: inset -28%, blur(46px) saturate(1.5), screen-blend blobs
-     b1 cyan rgba(116,234,255)  b2 platinum rgba(236,239,255)
-     b3 green rgba(56,236,71)   b4 periwinkle rgba(128,150,255)
-     card: clip-path inset round, contain:paint, inset 0 1px 0 white .22
-     bloom behind: edge-safe radial mask (the v682 law) */
-  .row { display:flex; gap:26px; flex-wrap:wrap; align-items:flex-start; }
-  .slot { width:236px; }
+  .row { display:flex; gap:30px; flex-wrap:wrap; align-items:flex-start; }
+  .slot { width:238px; }
   .cap { font-size:11px; font-weight:650; letter-spacing:.06em; text-transform:uppercase;
     color:rgba(245,245,247,.38); margin:0 0 10px; min-height:2.4em; }
 
-  .m-stage { position:relative; width:100%;
-    filter:drop-shadow(0 26px 44px rgba(0,0,0,.55)); }
-  .m-bloom { position:absolute; inset:-14%; z-index:0; pointer-events:none;
-    filter:blur(34px) saturate(1.5) hue-rotate(var(--mm-hue,0deg));
-    opacity:calc(.5 * var(--lit,1));
-    -webkit-mask:radial-gradient(ellipse 68% 66% at 50% 44%, #000 42%, transparent 71%);
-            mask:radial-gradient(ellipse 68% 66% at 50% 44%, #000 42%, transparent 71%); }
-  .m-bloom .blob { position:absolute; border-radius:50%; mix-blend-mode:screen; }
-
-  .m-card { position:relative; width:100%; aspect-ratio:320/452;
-    border-radius:16px; clip-path:inset(0 round 16px); contain:paint;
-    background:linear-gradient(178deg, #121419 0%, #0a0b0e 55%, #08090b 100%);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.22); z-index:1; }
-  .m-liquid { position:absolute; inset:-28%; pointer-events:none; z-index:0;
-    filter:blur(46px) saturate(1.5) hue-rotate(var(--mm-hue,0deg)); }
-  .m-liquid .blob { position:absolute; border-radius:50%; mix-blend-mode:screen; }
-  .b1 { width:94%; height:72%; left:-12%; top:-14%;
-    background:radial-gradient(circle, rgba(116,234,255,1), transparent 66%);
-    opacity:var(--clar,.85); }
-  .b2 { width:150%; height:120%; left:-25%; top:-8%;
-    background:radial-gradient(circle, rgba(236,239,255,.98), transparent 66%);
-    opacity:calc(var(--act,.28) * .82); }
-  .b3 { width:98%; height:76%; right:-14%; bottom:-16%;
-    background:radial-gradient(circle, rgba(56,236,71,1), transparent 64%);
-    opacity:var(--cons,.8); }
-  .b4 { width:72%; height:58%; left:0%; bottom:4%;
-    background:radial-gradient(circle, var(--accent-blob, rgba(128,150,255,.85)), transparent 66%);
-    opacity:var(--mix,.55); }
-
-  .m-mark { position:absolute; left:50%; top:43%; transform:translate(-50%,-50%);
-    width:33%; z-index:3; }
-  .m-mark path { fill:rgba(245,246,250,.92); }
+  /* ═══ THE REAL MEMENTO — the evolved platinum card ═══
+     bright platinum face · soft colour washes in the corners · dark mark ·
+     edge-lit rim throwing light into the room. Washes are where a person's
+     colour lives; everything else is identical on every card. */
+  .m-stage { position:relative; width:100%; }
+  .m-halo { position:absolute; inset:-12%; z-index:0; pointer-events:none;
+    background:radial-gradient(ellipse 62% 58% at 50% 50%, rgba(235,240,248,.55), rgba(235,240,248,.12) 55%, transparent 72%);
+    filter:blur(22px); }
+  .m-card { position:relative; width:100%; aspect-ratio:320/452; z-index:1;
+    border-radius:18px; clip-path:inset(0 round 18px); contain:paint;
+    background:linear-gradient(170deg, #e8ebf2 0%, #e3e7ee 45%, #dde3ea 100%); }
+  /* the colour washes: top-left + bottom-right, exactly like the real card */
+  .m-wash { position:absolute; inset:-20%; pointer-events:none; z-index:0;
+    filter:blur(40px) saturate(1.25); }
+  .m-wash .w { position:absolute; border-radius:50%; }
+  .w1 { width:95%; height:80%; left:-18%; top:-16%;
+    background:radial-gradient(circle, var(--wash1, rgba(128,150,255,.5)), transparent 66%); }
+  .w2 { width:95%; height:80%; right:-18%; bottom:-14%;
+    background:radial-gradient(circle, var(--wash2, rgba(56,236,71,.38)), transparent 66%); }
+  /* the lit rim: a crisp line at the edge + light thrown outward */
+  .m-rim { position:absolute; inset:0; border-radius:18px; z-index:4; pointer-events:none;
+    box-shadow:
+      inset 0 0 0 2px rgba(255,255,255,.95),
+      inset 0 0 14px 2px rgba(255,255,255,.55); }
+  .m-rimglow { position:absolute; inset:-3%; z-index:0; pointer-events:none; border-radius:22px;
+    box-shadow:0 0 34px 6px rgba(240,245,252,.55); }
+  .m-mark { position:absolute; left:50%; top:44%; transform:translate(-50%,-50%);
+    width:26%; z-index:3; }
+  .m-mark path { fill:#484f58; }
   .m-date { position:absolute; top:6.4%; right:8.5%; z-index:3;
     font-size:11.5px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
-    color:rgba(245,245,247,.62); font-variant-numeric:tabular-nums; }
-  .m-foot { position:absolute; left:0; right:0; bottom:7%; z-index:3; text-align:center;
-    font-size:12px; font-weight:650; letter-spacing:.05em;
-    color:rgba(245,245,247,.88); }
-  .m-sub { position:absolute; left:0; right:0; bottom:12.5%; z-index:3; text-align:center;
-    font-size:10.5px; font-weight:650; letter-spacing:.12em; text-transform:uppercase;
-    color:var(--accent-ink, rgba(148,166,255,.85)); font-variant-numeric:tabular-nums; }
+    color:rgba(38,44,52,.55); font-variant-numeric:tabular-nums; }
+  .m-foot { position:absolute; left:0; right:0; bottom:6.6%; z-index:3; text-align:center;
+    font-size:12.5px; font-weight:700; letter-spacing:.03em; color:rgba(30,35,42,.82); }
+  .m-sub { position:absolute; left:0; right:0; bottom:11.8%; z-index:3; text-align:center;
+    font-size:10.5px; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--ink, rgba(90,104,130,.75)); font-variant-numeric:tabular-nums; }
 
   /* generator bar */
   .gen { display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin:0 0 24px; }
@@ -81,31 +70,25 @@
   .swatch { width:22px; height:22px; border-radius:6px; box-shadow:inset 0 1px 0 rgba(255,255,255,.25); }
   .colorname { font-weight:700; color:#fff; }
 
-  .sig .b4 { width:92%; height:74%; left:-4%; bottom:-2%; }
-  .sig .b1 { background:radial-gradient(circle, var(--accent-blob, rgba(116,234,255,1)), transparent 66%);
-             opacity:.5; left:auto; right:-16%; top:-12%; }
-
-  /* founder treatment: the house lights fall almost to black; only their color
-     breathes. engraved number takes the date slot; their name takes the foot. */
-  .founder .m-card { background:linear-gradient(178deg, #0e1013 0%, #08090b 60%, #060708 100%); }
-  .founder { --clar:.10; --act:.10; --cons:.08; --mix:.5; }
-  .founder .m-card::after { content:''; position:absolute; inset:9px; border-radius:9px;
-    box-shadow:inset 0 0 0 1px var(--edge, rgba(229,231,235,.16)); z-index:4; pointer-events:none; }
-  .founder .m-date { color:var(--accent-ink); opacity:.9; }
-  .founder .m-mark path { fill:rgba(240,242,247,.95); }
+  /* founder: the same real card, the number engraved where the date lives.
+     dark variant: obsidian face, light mark, their colour as the only light. */
+  .f-dark .m-card { background:linear-gradient(178deg, #101216 0%, #08090b 60%, #060708 100%); }
+  .f-dark .m-mark path { fill:rgba(240,242,247,.95); }
+  .f-dark .m-date { color:var(--ink-l, rgba(235,238,244,.75)); }
+  .f-dark .m-foot { color:rgba(240,242,246,.9); }
+  .f-dark .m-sub { color:var(--ink-l, rgba(235,238,244,.7)); }
+  .f-dark .m-rim { box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.28), inset 0 0 12px 1px rgba(255,255,255,.10); }
+  .f-dark .m-rimglow { box-shadow:0 0 26px 3px var(--glow, rgba(240,245,252,.18)); }
+  .f-dark .m-halo { background:radial-gradient(ellipse 62% 58% at 50% 50%, var(--glow, rgba(235,240,248,.2)), transparent 70%); }
+  .f-dark .w2 { opacity:.55; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>Your Color, on the real Memento</h1>
-  <p class="lede">Every card below is built with the production card recipe (the exact liquid layer, blob colors, positions, 46px blur, screen blending and clip rules from <code style="font-size:12px;opacity:.7">daycard-living.css</code>). The house lights are the four you named: cyan (Clarity), platinum (Action), green (Consistency), periwinkle (the accent). The idea: the first three lights are MEANING and never change. The periwinkle slot is the ACCENT slot, and that is where a person's own color lives.</p>
+  <p class="lede">This is the evolved card exactly as it looks in the app: platinum face, dark mark, edge-lit rim, and two soft colour washes breathing in the corners. The washes are the only thing that changes from person to person. House card: periwinkle + green. Your card: your colour, both corners.</p>
 
-  <div class="sect">1 · The house card, as the app builds it</div>
-  <p class="why">All four lights at their real values. This is the Memento everyone recognizes.</p>
-  <div class="row" id="houseRow"></div>
-
-  <div class="sect">2 · The generator — their color takes the accent slot</div>
-  <p class="why">Type a name. Cyan, platinum and green stay exactly where they are, because they mean Clarity, Action and Consistency. Their color takes over the card, full spectrum, twelve tuned families around the entire wheel, deterministic, never muddy. Two Mementos side by side read as siblings, never twins.</p>
+  <div class="sect">1 · The house card vs. yours</div>
   <div class="gen">
     <input id="nameIn" placeholder="Type a name…" value="Malik Peace" autocomplete="off">
     <div class="swatchline"><span class="swatch" id="sw"></span>
@@ -114,12 +97,12 @@
   </div>
   <div class="row" id="yourRow"></div>
 
-  <div class="sect">3 · Same idea across many people</div>
-  <p class="why">Eight names across eight different regions of the wheel. This is the share feed: instantly one product, instantly eight different people.</p>
+  <div class="sect">2 · The same card across the whole spectrum</div>
+  <p class="why">Eight names from eight regions of the wheel. Same platinum card, same rim, same mark, a different person every time.</p>
   <div class="row" id="crowdRow"></div>
 
-  <div class="sect">4 · The Founder card — refined</div>
-  <p class="why">The house lights fall to a breath. Their color is the only light. The date slot carries the engraved number, the foot carries their name. 200 ever made: uniform in the dark, unique in the light. (The number and name follow the generator above.)</p>
+  <div class="sect">3 · The Founder card</div>
+  <p class="why">Two treatments, both numbered, both carrying their name and their colour. Platinum founder is the real card with the engraved number. Obsidian founder is the dark ceremony version, their colour as the only light. (Follows the generator above.)</p>
   <div class="row" id="founderRow"></div>
 </div>
 
@@ -128,18 +111,18 @@ const MARK = '<svg class="m-mark" viewBox="140 136 232 240"><path d="M150 146 L2
 
 function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
 const FAMILIES=[
-  ['Ember',     354, 372, 80, 58],
-  ['Amber',      22,  38, 86, 56],
-  ['Solar',      44,  56, 88, 58],
-  ['Spring',     96, 132, 72, 56],
-  ['Emerald',   140, 162, 70, 52],
-  ['Deep Teal', 166, 186, 74, 54],
-  ['Glacier',   192, 210, 84, 62],
-  ['Azure',     212, 226, 82, 62],
-  ['Indigo',    228, 246, 74, 64],
-  ['Violet',    252, 276, 68, 64],
-  ['Magenta',   288, 318, 72, 60],
-  ['Rose',      326, 348, 76, 60],
+  ['Ember',     354, 372, 80, 56],
+  ['Amber',      22,  38, 86, 54],
+  ['Solar',      44,  56, 88, 55],
+  ['Spring',     96, 132, 72, 52],
+  ['Emerald',   140, 162, 70, 48],
+  ['Deep Teal', 166, 186, 74, 50],
+  ['Glacier',   192, 210, 84, 58],
+  ['Azure',     212, 226, 82, 58],
+  ['Indigo',    228, 246, 74, 60],
+  ['Violet',    252, 276, 68, 60],
+  ['Magenta',   288, 318, 72, 56],
+  ['Rose',      326, 348, 76, 56],
 ];
 function colorFor(name, forceBand){
   const h=hash((name||'memento').trim().toLowerCase());
@@ -148,87 +131,71 @@ function colorFor(name, forceBand){
   const sat=fam[3]+((h>>>9)%8)-4, lit=fam[4]+((h>>>13)%8)-4;
   return {family:fam[0], hue,
     css:`hsl(${hue} ${sat}% ${lit}%)`,
-    blob:`hsl(${hue} ${sat}% ${lit}% / .9)`,
-    ink:`hsl(${hue} ${Math.min(sat,70)}% ${Math.min(lit+14,78)}% / .9)`,
-    edge:`hsl(${hue} ${sat}% ${lit}% / .3)`};
+    wash:`hsl(${hue} ${sat}% ${lit}% / .52)`,
+    washSoft:`hsl(${hue} ${sat}% ${Math.min(lit+10,72)}% / .38)`,
+    ink:`hsl(${hue} ${Math.min(sat,64)}% ${Math.max(lit-18,26)}% / .85)`,
+    inkL:`hsl(${hue} ${Math.min(sat,70)}% ${Math.min(lit+22,80)}% / .9)`,
+    glow:`hsl(${hue} ${sat}% ${lit}% / .3)`};
 }
 
-function card(opts){
-  // opts: cap, name, sub, date, cls, vars{}
-  const style=Object.entries(opts.vars||{}).map(([k,v])=>`${k}:${v}`).join(';');
-  return `<div class="slot ${opts.cls||''}" ${style?`style="${style}"`:''}>
-    <p class="cap">${opts.cap||''}</p>
+function card(o){
+  const style=Object.entries(o.vars||{}).map(([k,v])=>`${k}:${v}`).join(';');
+  return `<div class="slot ${o.cls||''}" ${style?`style="${style}"`:''}>
+    <p class="cap">${o.cap||''}</p>
     <div class="m-stage">
-      <div class="m-bloom"><span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span><span class="blob b4"></span></div>
+      <div class="m-halo"></div>
+      <div class="m-rimglow"></div>
       <div class="m-card">
-        <div class="m-liquid"><span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span><span class="blob b4"></span></div>
+        <div class="m-wash"><span class="w w1"></span><span class="w w2"></span></div>
         ${MARK}
-        <div class="m-date">${opts.date||'TODAY'}</div>
-        ${opts.sub?`<div class="m-sub">${opts.sub}</div>`:''}
-        <div class="m-foot">${opts.name||''}</div>
+        <div class="m-date">${o.date||'TODAY'}</div>
+        ${o.sub?`<div class="m-sub">${o.sub}</div>`:''}
+        <div class="m-foot">${o.name||''}</div>
+        <div class="m-rim"></div>
       </div>
     </div>
   </div>`;
 }
 
-// 1 · house
-document.getElementById('houseRow').innerHTML =
-  card({cap:'The four house lights — cyan · platinum · green · periwinkle', name:'Memento', date:'TODAY'})
-  + card({cap:'Clarity only (post-star, pre-payment)', name:'Memento', date:'TODAY',
-      vars:{'--act':'0','--cons':'0','--mix':'0','--clar':'1'}})
-  + card({cap:'Platinum forward (first paid action)', name:'Memento', date:'TODAY',
-      vars:{'--act':'1','--clar':'.35','--cons':'.3','--mix':'.2'}})
-  + card({cap:'Green forward (consistency era)', name:'Memento', date:'TODAY',
-      vars:{'--cons':'1','--clar':'.3','--act':'.2','--mix':'.2'}});
-
-// 2 · generator card + a full-signature variant
-const yourRow=document.getElementById('yourRow');
 function renderYour(){
   const name=document.getElementById('nameIn').value||'Memento';
   const c=colorFor(name);
   document.getElementById('sw').style.background=c.css;
   document.getElementById('cname').textContent=`${c.family} ${c.hue}°`;
   document.getElementById('chex').textContent=c.css;
-  yourRow.innerHTML =
-    card({cap:'House accent (periwinkle) — everyone', name:'Memento', date:'TODAY'})
-    + card({cls:'sig', cap:`Theirs — ${c.family} ${c.hue}° owns the card`, name:name, date:'TODAY',
+  document.getElementById('yourRow').innerHTML =
+    card({cap:'The house card — periwinkle + green, everyone', name:'Memento'})
+    + card({cap:`Yours — ${c.family} ${c.hue}°, both washes`, name:name,
         sub:`${c.family} ${c.hue}° · one of one`,
-        vars:{'--accent-blob':c.blob, '--accent-ink':c.ink, '--mix':'.95',
-              '--clar':'.15','--cons':'.12','--act':'.1'}})
-    + card({cap:'Subtle option — house lights stay, theirs replaces only the accent slot', name:name, date:'TODAY',
-        sub:`${c.family} ${c.hue}° · accent`,
-        vars:{'--accent-blob':c.blob, '--accent-ink':c.ink, '--mix':'.9',
-              '--clar':'.5','--cons':'.4','--act':'.18'}});
+        vars:{'--wash1':c.wash, '--wash2':c.washSoft, '--ink':c.ink}})
+    + card({cap:'Blend — your colour top, house green stays', name:name,
+        sub:`${c.family} ${c.hue}° · with the house green`,
+        vars:{'--wash1':c.wash, '--ink':c.ink}});
   renderFounder(name, c);
 }
 
-// 3 · crowd
 const CROWD=['Ava','Jordan Cole','Sofia M','Darius','Lena Park','Theo','Maya R','Chris B'];
-const BANDS=[0,2,3,5,7,8,10,11]; // ember, solar, spring, teal, azure, indigo, magenta, rose
+const BANDS=[0,2,3,5,7,8,10,11];
 document.getElementById('crowdRow').innerHTML = CROWD.map((n,i)=>{
   const c=colorFor(n, BANDS[i]);
-  return card({cls:'sig', cap:`${n} — ${c.family} ${c.hue}°`, name:n, date:'TODAY',
+  return card({cap:`${n} — ${c.family} ${c.hue}°`, name:n,
     sub:`${c.family} ${c.hue}°`,
-    vars:{'--accent-blob':c.blob, '--accent-ink':c.ink, '--mix':'.95',
-          '--clar':'.15','--cons':'.12','--act':'.1'}});
+    vars:{'--wash1':c.wash, '--wash2':c.washSoft, '--ink':c.ink}});
 }).join('');
 
-// 4 · founder (follows generator)
 function renderFounder(name, c){
-  const row=document.getElementById('founderRow');
   const num=(hash(name.toLowerCase())%200+1).toString().padStart(3,'0');
-  row.innerHTML =
-    card({cls:'founder', cap:`A · Signature founder — engraved ${num} / 200, their light only`,
+  document.getElementById('founderRow').innerHTML =
+    card({cap:`A · Platinum founder — the real card, engraved ${num} / 200`,
       name:name, date:`${num} / 200`, sub:'FOUNDER · ONE OF ONE',
-      vars:{'--accent-blob':c.blob, '--accent-ink':c.ink, '--edge':c.edge}})
-    + card({cls:'founder', cap:'B · Founder, platinum edge — no color, pure obsidian + number',
+      vars:{'--wash1':c.wash, '--wash2':c.washSoft, '--ink':c.ink}})
+    + card({cls:'f-dark', cap:'B · Obsidian founder — their colour as the only light',
+      name:name, date:`${num} / 200`, sub:'FOUNDER · ONE OF ONE',
+      vars:{'--wash1':c.wash, '--wash2':c.washSoft, '--ink-l':c.inkL, '--glow':c.glow}})
+    + card({cls:'f-dark', cap:'C · Obsidian, no colour — pure black + number',
       name:name, date:`${num} / 200`, sub:'FIRST TWO HUNDRED',
-      vars:{'--accent-blob':'rgba(236,239,255,.5)', '--accent-ink':'rgba(226,229,236,.85)',
-            '--edge':'rgba(229,231,235,.2)', '--mix':'.35'}})
-    + card({cls:'founder', cap:'C · Founder lit — their color + a breath of all four house lights',
-      name:name, date:`${num} / 200`, sub:'FOUNDER · ONE OF ONE',
-      vars:{'--accent-blob':c.blob, '--accent-ink':c.ink, '--edge':c.edge,
-            '--clar':'.3','--act':'.25','--cons':'.25','--mix':'.6'}});
+      vars:{'--wash1':'rgba(236,239,255,.16)', '--wash2':'rgba(236,239,255,.10)',
+            '--ink-l':'rgba(226,229,236,.8)', '--glow':'rgba(240,245,252,.14)'}});
 }
 
 document.getElementById('nameIn').addEventListener('input', renderYour);
