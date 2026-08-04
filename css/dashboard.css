@@ -3674,7 +3674,18 @@ body.pre-clarity .capture-fab { display: none !important; }
        about where the screen ends. --p1-vh is the real visible height read
        from visualViewport (js/11), so no unit has to be trusted. The svh
        fallback only matters for the first frame before JS runs. */
-    height: calc(var(--p1-vh, 100svh) - var(--p1-top, 0px));
+    /* v1104 lock-in: the measured value can never make the column TALLER than
+       the largest real viewport. min() against 100lvh means a bad reading (a
+       transitional launch value, a mid-rotation read, anything) can only make
+       the column shorter, never push the box off the bottom of the screen.
+       Too-short reads as air above the box; too-tall was the recurring clip.
+       One direction of failure is survivable, the other never happens now. */
+    /* The --p1-top fallback is the REAL chrome height (top safe inset + the
+       app's 16px), not 0. With a 0 fallback, any frame before js/11 measured
+       (a fresh boot is exactly when the evolution cinema arms) laid the
+       column out a header too tall, which is where the cinema's stale
+       measurements came from. */
+    height: calc(min(var(--p1-vh, 100svh), 100lvh) - var(--p1-top, calc(var(--safe-t, 0px) + 16px)));
     box-sizing: border-box;
     padding-bottom: calc(15px + var(--safe-b, 0px));
     scroll-snap-align: start;
@@ -3686,10 +3697,23 @@ body.pre-clarity .capture-fab { display: none !important; }
     flex: 1 1 auto; min-height: 0;
   }
   body:not(.has-custom-layout) .app.dash-v2 #homePage1 > #commandCenter {
-    /* Codex (4): the CONTAINER is fixed too, not just the card inside it, so
-       a content change can never alter the row's height. */
-    flex: 0 0 212px;
-    height: 212px;
+    /* v1104, THE CLIPPING FIX (his First-step screenshot: the card painted
+       24px past the safe line). A fixed 212px row assumed every face fits in
+       212px; the First step and Next step faces are TALLER, and a box in a
+       fixed slot overflows straight off the bottom of the screen. The slot
+       now sizes to its content and the column's fixed height + bottom
+       padding place its BOTTOM; the Memento above absorbs the difference.
+       Overflow past the bottom is impossible by construction: the box is in
+       normal flow inside a bounded column, and the slot can always grow.
+       The SWIPE deck stays visually fixed because .cc-card--pillars itself
+       is hard-fixed at 212px; this row simply inherits that. */
+    flex: 0 0 auto;
+    min-height: 212px;
+    /* The face fills the slot even when its content is shorter than the 212
+       floor, so every state's box bottom lands on the same line (the
+       Next-step card is 206px of content and sat 6px high without this). */
+    display: flex;
+    flex-direction: column;
     /* v1094: margin-top:auto PINS the box to the column's bottom. Without it
        the items packed from the top, and once v1088 capped the card by its
        aspect ratio the card could no longer absorb the leftover height, so
@@ -3705,6 +3729,9 @@ body.pre-clarity .capture-fab { display: none !important; }
      buffer 29px instead of 15. The column owns the buffer. */
   body:not(.has-custom-layout) .app.dash-v2 #homePage1 > #commandCenter > .cc-card {
     margin-bottom: 0 !important;
+    /* Stretch to the slot's 212 floor when content is shorter, so every
+       face's box bottom lands on the same line. */
+    flex: 1 0 auto;
   }
   /* The card's own chain stretches to the space the column hands it. */
   body:not(.has-custom-layout) .app.dash-v2 #homePage1 > #dayCard > .daycard-wrap { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }

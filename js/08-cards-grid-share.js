@@ -3694,6 +3694,20 @@ function hasFreshWeeklyCard() {
 // fan: never persisted, so every launch lands on today's action.
 let _ccPillar = 'action';
 const CC_PILLARS = ['action', 'clarity', 'consistency'];
+// v1104 (Malik: "when someone has already completed their neutron star, they
+// should be able to swipe between their neutron star and action cards"). The
+// deck goes live the moment the star exists: two faces before a plan, three
+// after. One list, derived from state, used by the renderer, the swipe
+// machinery and the dots, so they can never disagree about what is swipeable.
+function ccPillarList() {
+  try {
+    const hasStar = !!(state.clarity && state.clarity.completed && state.clarity.answers && state.clarity.answers.neutronStar);
+    if (!hasStar) return ['action'];
+    const pa = (state.action && state.action.primaryAction) || {};
+    const hasPlan = !!(state.action && state.action.planGenerated && pa.title);
+    return hasPlan ? CC_PILLARS : ['action', 'clarity'];
+  } catch (e) { return CC_PILLARS; }
+}
 // ── The consistency FACE VIEWS (v1058, Malik's spec) ─────────────────
 // Four ways to see the same record: week / month / year / curve. The
 // person picks inside the Consistency module (or the desktop hover fan);
@@ -3797,11 +3811,22 @@ function renderCommandCenter() {
     const tiers = pa.tiers || {};
     const hasPlan = !!(state.action && state.action.planGenerated && pa.title);
     const C = ccAccentColor();
-    // v1051: --pillars is the class that locks ONE height across the three
+    // v1051: --pillars is the class that locks ONE height across the
     // swipeable pillars, so the box never resizes under the swipe. It is only
     // added where swiping is offered; every other card state keeps its own
-    // natural height.
-    const _pillared = hasClarity && hasPlan;
+    // natural height. v1104: swiping is offered from the moment the star
+    // exists (two faces pre-plan), not only once there is a plan.
+    const _pillars = ccPillarList();
+    const _pillared = _pillars.length > 1;
+    // A face that no longer exists (the plan was reset while consistency was
+    // showing) falls back to the action face instead of rendering nothing.
+    if (_pillars.indexOf(_ccPillar) === -1) _ccPillar = 'action';
+    const dots = (pillar) => {
+      if (!_pillared) return '';
+      const li = _pillars.indexOf(pillar);
+      return '<div class="cc-dots" aria-hidden="true">' +
+        _pillars.map((p, n) => '<i' + (n === li ? ' class="on"' : '') + '></i>').join('') + '</div>';
+    };
     const wrap = (inner) => '<section class="cc-card' + (_pillared ? ' cc-card--pillars' : '') + '" style="margin:0 0 14px;padding:22px 22px 20px;border-radius:var(--card-r);background:var(--surface-1);box-shadow:var(--shadow-card), inset 0 1px 0 rgba(255,255,255,0.06);">' + inner + '</section>';
     // v1049 (Malik): the label is NEUTRAL, never the accent. Colour on a tiny
     // uppercase kicker is the fastest way for a surface to read cheap, and the
@@ -3815,23 +3840,22 @@ function renderCommandCenter() {
         '<div style="font-size:0.9rem;line-height:1.5;color:var(--text-2);margin-bottom:14px;">Get clear on the one goal that actually matters to you above all else. This will be the foundation of your Memento.</div>' +
         '<div style="display:flex;">' + primaryBtn('Start', 'clarity') + '</div>');
     }
-    if (!hasPlan) {
+    if (!hasPlan && _ccPillar === 'action') {
       // v777 (Malik): ONE eyebrow, one line, one button. The goal text is gone,
       // they literally just forged it; repeating it here read as AI over-explaining.
+      // v1104: now a deck face (it swipes to the star), so it carries the dots.
       return wrap(eyebrow('Next step') +
         '<div style="font-size:1.15rem;font-weight:700;color:var(--text-hi);margin-bottom:14px;">Turn your Neutron Star into a tangible daily action</div>' +
-        '<div style="display:flex;">' + primaryBtn('Build my plan', 'action') + '</div>');
+        '<div style="display:flex;">' + primaryBtn('Build my plan', 'action') + '</div>' +
+        dots('action'));
     }
 
-    // v1051 (Malik): swipe the phone card between the three pillars. The
-    // ACTION pillar is untouched, it falls through to the exact card that
-    // shipped before, so the everyday screen carries zero risk. The other two
-    // are their own small cards. Only offered once there is a plan to swipe
-    // away from; before that the card is a single next step and swiping would
-    // be noise.
-    if (hasClarity && hasPlan && _ccPillar !== 'action') {
-      const dots = (live) => '<div class="cc-dots" aria-hidden="true">' +
-        [0, 1, 2].map((n) => '<i' + (n === live ? ' class="on"' : '') + '></i>').join('') + '</div>';
+    // v1051 (Malik): swipe the phone card between the pillars. The ACTION
+    // pillar is untouched, it falls through to the exact card that shipped
+    // before, so the everyday screen carries zero risk. The other faces are
+    // their own small cards. v1104: offered from the star onward, not only
+    // once there is a plan.
+    if (_pillared && _ccPillar !== 'action') {
       if (_ccPillar === 'clarity') {
         const a = (state.clarity && state.clarity.answers) || {};
         const star = String(a.neutronStar || '').trim();
@@ -3847,7 +3871,7 @@ function renderCommandCenter() {
         return wrap(eyebrow('Your Neutron Star') +
           '<div class="cc-face-hd" style="font-size:1.15rem;font-weight:700;line-height:1.3;color:var(--text-hi);">' + ccStarTwoTone(star || 'Your Neutron Star') + '</div>' +
           ccStarTenureLine() +
-          dots(1));
+          dots('clarity'));
       }
       let _s = 0, _b = 0, _act = 0;
       try {
@@ -3884,7 +3908,7 @@ function renderCommandCenter() {
           _vsel +
         '</div>' +
         ccFaceGraph(ccFaceView(), false) +
-        dots(2));
+        dots('consistency'));
     }
 
     // COMEBACK MODE: when the user has fallen off (no activity for 2+ days),
@@ -4114,11 +4138,9 @@ function renderCommandCenter() {
     }
 
     row += '</div>'; // close .cc-hero-body (the swappable hero content)
-    // v1051: the three dots, so the swipe is discoverable. Only once there is
-    // a plan, matching where swiping is offered at all.
-    if (hasClarity && hasPlan) {
-      row += '<div class="cc-dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>';
-    }
+    // v1051: the dots, so the swipe is discoverable. Count and highlight come
+    // from the live pillar list, matching where swiping is offered at all.
+    row += dots('action');
     return wrap(row);
   } catch (e) { return ''; }
 }
@@ -4472,8 +4494,9 @@ function bindCommandCenter(cc) {
       let under = null, underPillar = null;
       const preEls = {};   // pillar -> prebuilt under-card, made at touch-down
       const nextPillar = (dir) => {
-        const i = CC_PILLARS.indexOf(_ccPillar);
-        return CC_PILLARS[(i + (dir < 0 ? 1 : -1) + CC_PILLARS.length) % CC_PILLARS.length];
+        const list = ccPillarList();
+        const i = Math.max(0, list.indexOf(_ccPillar));
+        return list[(i + (dir < 0 ? 1 : -1) + list.length) % list.length];
       };
       const buildUnder = (pillar) => {
         try {
@@ -4527,8 +4550,13 @@ function bindCommandCenter(cc) {
       // first dragged frame never pays for a render. armDeck just reveals.
       const prebuildDeck = () => {
         try {
-          const i = CC_PILLARS.indexOf(_ccPillar);
-          [CC_PILLARS[(i + 1) % CC_PILLARS.length], CC_PILLARS[(i + 2) % CC_PILLARS.length]].forEach((pl) => {
+          const list = ccPillarList();
+          const i = Math.max(0, list.indexOf(_ccPillar));
+          // Unique neighbours only, never the current face: with a two-face
+          // deck, +1 and +2 are the SAME card and one of them is this one.
+          const _nbrs = Array.from(new Set([list[(i + 1) % list.length], list[(i + list.length - 1) % list.length]]))
+            .filter((p) => p !== _ccPillar);
+          _nbrs.forEach((pl) => {
             // v1081 (Malik: "I can see a card behind the card that's coming"):
             // a REUSED prebuild could still be display:'' from the previous
             // drag, so two preview cards showed at once. Anything reused is
@@ -5178,16 +5206,26 @@ function _runClarityUnlockCinema(onDone, opts) {
   window._evoWashAnims = [];
   const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   // Measure the grow: the card scales up to ALMOST full screen from its own spot
-  // (Malik v678). JS computes the exact scale + vertical centering once, so the
+  // (Malik v678). JS computes the exact scale + vertical centering, so the
   // CSS transform is a pure compositor animation with no layout guesswork.
-  try {
-    const r = wrap.getBoundingClientRect();
-    const vw = window.innerWidth, vh = window.innerHeight;
-    const sc = Math.min((vw * 0.94) / Math.max(r.width, 1), (vh * 0.86) / Math.max(r.height, 1), 1.6);
-    const ty = (vh / 2) - (r.top + r.height / 2);
-    wrap.style.setProperty('--evo-sc', sc.toFixed(4));
-    wrap.style.setProperty('--evo-ty', ty.toFixed(1) + 'px');
-  } catch (e) {}
+  // v1104 (his two cinema screenshots: blank card near full-bleed and shifted,
+  // grown card riding up behind the status bar): this used to measure ONCE,
+  // here, at cinema start. On a fresh boot that is before the page-1 geometry
+  // has settled (--p1-top, the column height), so the measured rectangle was
+  // stale and the card flew to a target computed from a layout that no longer
+  // existed. The measurement is now a function, run again at GROW time, 0.9s
+  // in, when the room is clear and the layout is final.
+  const _evoMeasure = () => {
+    try {
+      const r = wrap.getBoundingClientRect();
+      const vw = window.innerWidth, vh = window.innerHeight;
+      const sc = Math.min((vw * 0.94) / Math.max(r.width, 1), (vh * 0.86) / Math.max(r.height, 1), 1.6);
+      const ty = (vh / 2) - (r.top + r.height / 2);
+      wrap.style.setProperty('--evo-sc', sc.toFixed(4));
+      wrap.style.setProperty('--evo-ty', ty.toFixed(1) + 'px');
+    } catch (e) {}
+  };
+  _evoMeasure();
   // Cinematic pacing (the feel Malik picked in the motion lab), now with his full
   // v678 choreography: chrome clears -> the card GROWS near full screen -> floods
   // full purple -> recedes to the subtle resting blur -> shrinks home -> the room
@@ -5203,6 +5241,7 @@ function _runClarityUnlockCinema(onDone, opts) {
   const tShrink = tSettle + SETTLE;                     // ~7.2s
   const tFinish = tShrink + SHRINK + 100;               // ~8.45s
   T.push(setTimeout(() => {                     // THE GROW: card rises near full screen
+    _evoMeasure();                              // v1104: from the LIVE rect, not the arm-time one
     document.body.classList.add('evo2-grow');
   }, tGrow));
   T.push(setTimeout(() => {                     // THE FILL: rise to the earned state
