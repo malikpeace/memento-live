@@ -105,7 +105,7 @@
   <div class="row" id="houseRow"></div>
 
   <div class="sect">2 · The generator — their color takes the accent slot</div>
-  <p class="why">Type a name. Cyan, platinum and green stay exactly where they are, because they mean Clarity, Action and Consistency. Only the fourth light becomes theirs, deterministic, curated families, no purple, no gold, no uglies. Two Mementos side by side read as siblings, never twins.</p>
+  <p class="why">Type a name. Cyan, platinum and green stay exactly where they are, because they mean Clarity, Action and Consistency. Their color takes over the card, full spectrum, twelve tuned families around the entire wheel, deterministic, never muddy. Two Mementos side by side read as siblings, never twins.</p>
   <div class="gen">
     <input id="nameIn" placeholder="Type a name…" value="Malik Peace" autocomplete="off">
     <div class="swatchline"><span class="swatch" id="sw"></span>
@@ -115,7 +115,7 @@
   <div class="row" id="yourRow"></div>
 
   <div class="sect">3 · Same idea across many people</div>
-  <p class="why">Eight names, eight accents, one product. This is what the share feed looks like when every screenshot is someone's own light.</p>
+  <p class="why">Eight names across eight different regions of the wheel. This is the share feed: instantly one product, instantly eight different people.</p>
   <div class="row" id="crowdRow"></div>
 
   <div class="sect">4 · The Founder card — refined</div>
@@ -128,15 +128,22 @@ const MARK = '<svg class="m-mark" viewBox="140 136 232 240"><path d="M150 146 L2
 
 function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
 const FAMILIES=[
-  ['Glacier', 196, 214, 82, 64],
-  ['Deep Teal', 168, 184, 72, 55],
-  ['Spring',   96, 138, 70, 58],
-  ['Ember',   352, 372, 76, 60],
-  ['Indigo',  218, 236, 68, 66],
+  ['Ember',     354, 372, 80, 58],
+  ['Amber',      22,  38, 86, 56],
+  ['Solar',      44,  56, 88, 58],
+  ['Spring',     96, 132, 72, 56],
+  ['Emerald',   140, 162, 70, 52],
+  ['Deep Teal', 166, 186, 74, 54],
+  ['Glacier',   192, 210, 84, 62],
+  ['Azure',     212, 226, 82, 62],
+  ['Indigo',    228, 246, 74, 64],
+  ['Violet',    252, 276, 68, 64],
+  ['Magenta',   288, 318, 72, 60],
+  ['Rose',      326, 348, 76, 60],
 ];
-function colorFor(name){
+function colorFor(name, forceBand){
   const h=hash((name||'memento').trim().toLowerCase());
-  const fam=FAMILIES[h%FAMILIES.length];
+  const fam=FAMILIES[forceBand!==undefined?forceBand:(h%FAMILIES.length)];
   const hue=(fam[1] + (h>>>3)%(fam[2]-fam[1]))%360;
   const sat=fam[3]+((h>>>9)%8)-4, lit=fam[4]+((h>>>13)%8)-4;
   return {family:fam[0], hue,
@@ -184,25 +191,26 @@ function renderYour(){
   document.getElementById('chex').textContent=c.css;
   yourRow.innerHTML =
     card({cap:'House accent (periwinkle) — everyone', name:'Memento', date:'TODAY'})
-    + card({cap:`Their accent — ${c.family} ${c.hue}° in the fourth slot`, name:name, date:'TODAY',
+    + card({cls:'sig', cap:`Theirs — ${c.family} ${c.hue}° owns the card`, name:name, date:'TODAY',
         sub:`${c.family} ${c.hue}° · one of one`,
-        vars:{'--accent-blob':c.blob, '--accent-ink':c.ink, '--mix':'.9',
-              '--clar':'.55','--cons':'.45','--act':'.2'}})
-    + card({cls:'sig', cap:'Full signature — their color owns the card, house lights to a whisper', name:name, date:'TODAY',
-        sub:`${c.family} ${c.hue}° · signature`,
         vars:{'--accent-blob':c.blob, '--accent-ink':c.ink, '--mix':'.95',
-              '--clar':'.22','--cons':'.18','--act':'.14'}});
+              '--clar':'.15','--cons':'.12','--act':'.1'}})
+    + card({cap:'Subtle option — house lights stay, theirs replaces only the accent slot', name:name, date:'TODAY',
+        sub:`${c.family} ${c.hue}° · accent`,
+        vars:{'--accent-blob':c.blob, '--accent-ink':c.ink, '--mix':'.9',
+              '--clar':'.5','--cons':'.4','--act':'.18'}});
   renderFounder(name, c);
 }
 
 // 3 · crowd
 const CROWD=['Ava','Jordan Cole','Sofia M','Darius','Lena Park','Theo','Maya R','Chris B'];
-document.getElementById('crowdRow').innerHTML = CROWD.map(n=>{
-  const c=colorFor(n);
-  return card({cap:`${n} — ${c.family} ${c.hue}°`, name:n, date:'TODAY',
+const BANDS=[0,2,3,5,7,8,10,11]; // ember, solar, spring, teal, azure, indigo, magenta, rose
+document.getElementById('crowdRow').innerHTML = CROWD.map((n,i)=>{
+  const c=colorFor(n, BANDS[i]);
+  return card({cls:'sig', cap:`${n} — ${c.family} ${c.hue}°`, name:n, date:'TODAY',
     sub:`${c.family} ${c.hue}°`,
-    vars:{'--accent-blob':c.blob, '--accent-ink':c.ink, '--mix':'.9',
-          '--clar':'.5','--cons':'.42','--act':'.18'}});
+    vars:{'--accent-blob':c.blob, '--accent-ink':c.ink, '--mix':'.95',
+          '--clar':'.15','--cons':'.12','--act':'.1'}});
 }).join('');
 
 // 4 · founder (follows generator)
