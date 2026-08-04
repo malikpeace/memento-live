@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Your Color — the real Memento card</title>
+
+<!-- THE APP'S OWN STYLESHEETS. Every card below is the real .daycard-ns
+     element from the running app, not a lookalike. -->
+<link rel="stylesheet" href="../memento-app/css/base.css" onerror="this.href='../css/base.css'">
+<link rel="stylesheet" href="../memento-app/css/dashboard.css" onerror="this.href='../css/dashboard.css'">
+<link rel="stylesheet" href="../memento-app/css/daycard-living.css" onerror="this.href='../css/daycard-living.css'">
+
+<style>
+  html, body { margin:0; background:#060709; color:#f5f5f7;
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    -webkit-font-smoothing:antialiased; }
+  .wrap { max-width:1280px; margin:0 auto; padding:30px 20px 140px; }
+  h1 { font-size:23px; font-weight:750; letter-spacing:-.02em; margin:0 0 6px; }
+  .lede { font-size:14px; line-height:1.6; color:rgba(245,245,247,.62); max-width:80ch; margin:0 0 8px; }
+  .sect { font-size:12px; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+    color:rgba(245,245,247,.40); margin:44px 0 6px; padding-top:20px;
+    border-top:1px solid rgba(255,255,255,.09); }
+  .why { font-size:13px; line-height:1.55; color:rgba(245,245,247,.55); max-width:80ch; margin:0 0 22px; }
+  .row { display:flex; gap:34px; flex-wrap:wrap; align-items:flex-start; }
+  .slot { width:250px; }
+  .cap { font-size:11px; font-weight:650; letter-spacing:.06em; text-transform:uppercase;
+    color:rgba(245,245,247,.38); margin:0 0 12px; min-height:2.4em; }
+
+  /* Cage the app card into a fixed slot. Nothing here restyles the card
+     itself: it only sizes the stage, exactly like the unlock renders do. */
+  .cage { position:relative; }
+  .cage .daycard-wrap { margin:0; width:100%; }
+  .cage .daycard-living-stage { width:100% !important; margin:0; }
+  .cage .daycard-ns { width:100%; min-height:0; aspect-ratio:320/452; margin:0; }
+  .cage .daycard-ns__foot { bottom:6%; }
+
+  /* the engraved founder number, in the card's own type language */
+  .num { position:absolute; top:6.2%; right:8.5%; z-index:6;
+    font-size:11px; font-weight:700; letter-spacing:.16em;
+    font-variant-numeric:tabular-nums; color:rgba(28,32,38,.5); }
+  .f-dark .num { color:rgba(240,243,248,.6); }
+  .sub { position:absolute; left:0; right:0; bottom:12.4%; z-index:6; text-align:center;
+    font-size:10px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--sub-ink, rgba(70,84,110,.6)); }
+  .f-dark .sub { color:var(--sub-ink, rgba(235,238,244,.55)); }
+
+  /* the obsidian founder: hold the platinum flood off so the face stays black
+     and their colour is the only light. Same element, different levels. */
+  .f-dark .daycard-ns__plat { opacity:.06 !important; }
+  .f-dark .daycard-ns { background:linear-gradient(178deg,#101216,#08090b 60%,#060708) !important; }
+  .f-dark .daycard-ns__emblem path { fill:rgba(242,244,249,.95) !important; }
+  .f-dark .daycard-ns__name { color:rgba(242,244,249,.92) !important; }
+
+  .gen { display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin:0 0 26px; }
+  .gen input { font:inherit; font-size:15px; color:#f5f5f7; background:rgba(255,255,255,.06);
+    border:0; border-radius:10px; padding:12px 16px; width:280px; outline:none;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.08); }
+  .swatchline { display:flex; align-items:center; gap:10px; font-size:13px; color:rgba(245,245,247,.72); }
+  .swatch { width:22px; height:22px; border-radius:6px; box-shadow:inset 0 1px 0 rgba(255,255,255,.25); }
+  .colorname { font-weight:700; color:#fff; }
+  .miss { font-size:12px; color:#ffb4b4; margin:10px 0 0; display:none; }
+
+  /* ═══ SKINS ═══ Drive the app's own layers directly: recolour the blobs,
+     set how hard the platinum floods, set the face, set the mark. Same card,
+     wildly different material. */
+  .skin .daycard-theme-living .blob.b1 { background:radial-gradient(circle, var(--sk1), transparent 68%) !important; opacity:var(--o1,1) !important; }
+  .skin .daycard-theme-living .blob.b2 { background:radial-gradient(circle, var(--sk2), transparent 68%) !important; opacity:var(--o2,.9) !important; }
+  .skin .daycard-theme-living .blob.b3 { background:radial-gradient(circle, var(--sk3), transparent 66%) !important; opacity:var(--o3,1) !important; }
+  .skin .daycard-theme-living .blob.b4 { background:radial-gradient(circle, var(--sk4, var(--sk1)), transparent 66%) !important; opacity:var(--o4,.85) !important; }
+  .skin .daycard-theme-living .blob.b5 { background:radial-gradient(circle, var(--sk2), transparent 68%) !important; opacity:var(--o5,.5) !important; }
+  .skin .daycard-theme-living .blob.b6 { opacity:0 !important; }
+  .skin .daycard-ns__plat { opacity:var(--plat-op,.28) !important; }
+  .skin .daycard-ns { background:var(--face, linear-gradient(165deg,#14161b,#0a0b0e)) !important; }
+  .skin .daycard-ns__emblem path { fill:var(--mark,#484f58) !important; }
+  .skin .daycard-ns__name { color:var(--ink, rgba(28,32,40,.85)) !important; }
+  .skin .num { color:var(--ink, rgba(28,32,40,.6)) !important; }
+  .skin .sub { color:var(--ink, rgba(28,32,40,.55)) !important; }
+  .skin .daycard-ns__rim { opacity:var(--rim-op,1) !important; }
+
+  /* matte: no gloss, no burn, no iridescence. A surface, not a jewel. */
+  .matte .daycard-ns__sheen { opacity:.04 !important; }
+  .matte .daycard-ns__iri   { opacity:0 !important; }
+  .matte .daycard-ns__burn  { opacity:0 !important; }
+  .matte .daycard-ns__rim   { opacity:.35 !important; }
+  .matte .daycard-wrap__aura,
+  .matte .daycard-bloom     { opacity:.18 !important; }
+  /* glass: everything gloss turned up, colour turned down */
+  .glass .daycard-ns__sheen { opacity:.95 !important; }
+  .glass .daycard-ns__iri   { opacity:.8 !important; }
+  .glass .daycard-ns__rim   { opacity:1 !important; }
+  /* the reveal control */
+  .more { display:block; margin:26px auto 0; font:inherit; font-size:13px; font-weight:650;
+    letter-spacing:.02em; color:#f5f5f7; background:rgba(255,255,255,.07); border:0;
+    border-radius:999px; padding:12px 26px; cursor:pointer;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.12); }
+  .more:hover { background:rgba(255,255,255,.11); }
+  .hidden-tier { display:none; }
+  .hidden-tier.open { display:flex; }
+</style>
+</head>
+<body class="ns-bloom">
+<div class="wrap">
+  <h1>Your Color — on the actual card</h1>
+  <p class="lede">Every card on this page is the app's real <code style="font-size:12px;opacity:.7">.daycard-ns</code> element, the same markup and the same three stylesheets the running app uses. Nothing is redrawn. The only thing that changes per person is <code style="font-size:12px;opacity:.7">--mm-hue</code>, the card's own hue-rotation variable, which the app already supports.</p>
+  <p class="miss" id="miss">The app stylesheets did not load. Open this page from the repo (mockups/) or the live mirror so <code>../memento-app/css/</code> resolves.</p>
+
+  <div class="sect">1 · The card as it ships, then as theirs</div>
+  <div class="gen">
+    <input id="nameIn" placeholder="Type a name…" value="Malik Peace" autocomplete="off">
+    <div class="swatchline"><span class="swatch" id="sw"></span>
+      <span><span class="colorname" id="cname">—</span> <span id="chex" style="opacity:.6"></span></span>
+    </div>
+  </div>
+  <div class="row" id="yourRow"></div>
+
+  <div class="sect">2 · The skin library</div>
+  <p class="why">Twenty-four materials on the identical card. Same markup, same rim, same mark, same engine. Orange, voltage yellow, obsidian violet, pure white, void black, emerald, crimson, ice, magenta, cobalt, copper, jade.</p>
+  <div class="row" id="crowdRow"></div>
+
+  <div class="sect">3 · The Founder card</div>
+  <p class="why">The same real card, numbered. Platinum keeps the shipped face; obsidian holds the platinum flood off so their colour is the only light in the room. (Both follow the generator.)</p>
+  <div class="row" id="founderRow"></div>
+</div>
+
+<script>
+/* The app's real card markup, lifted verbatim (same source as the unlock
+   renders). Levels are the app's own CSS variables. */
+function realCard(vars, opts){
+  const o = opts || {};
+  const style = Object.entries(vars).map(([k,v])=>`${k}:${v}`).join(';');
+  return `<div class="slot ${o.cls||''}">
+    <p class="cap">${o.cap||''}</p>
+    <div class="cage">
+      <div class="daycard-wrap daycard-theme-living daycard-reveal daycard--bright" style="${style}">
+        <span class="daycard-wrap__aura" aria-hidden="true"></span>
+        <div class="daycard-living-stage">
+          <span class="daycard-bloom" aria-hidden="true">
+            <i class="blob b1" style="transform:translate(7.62%,8%) scale(1.342)"></i>
+            <i class="blob b2" style="transform:translate(-21.48%,15.95%) scale(1.449)"></i>
+            <i class="blob b3" style="transform:translate(8.31%,-6.35%) scale(1.5)"></i>
+            <i class="blob b4" style="transform:translate(42.68%,-59.06%) scale(.966)"></i>
+            <i class="blob b5" style="transform:translate(-16.79%,-51.67%) scale(1.454)"></i>
+            <i class="blob b6"></i>
+          </span>
+          <div class="daycard-ns">
+            <span class="daycard-ns__liquid" aria-hidden="true">
+              <i class="blob b1" style="transform:translate(-15.04%,35.37%) scale(.702)"></i>
+              <i class="blob b2" style="transform:translate(-21.87%,31.55%) scale(1.07)"></i>
+              <i class="blob b3" style="transform:translate(46.1%,-54.39%) scale(.938)"></i>
+              <i class="blob b4" style="transform:translate(-4.37%,41.56%) scale(1.252)"></i>
+              <i class="blob b5" style="transform:translate(38.8%,50.27%) scale(1.293)"></i>
+              <i class="blob b6"></i>
+            </span>
+            <span class="daycard-ns__iri" aria-hidden="true"></span>
+            <span class="daycard-ns__sheen" aria-hidden="true"></span>
+            <span class="daycard-ns__burn" aria-hidden="true"></span>
+            <span class="daycard-ns__plat" aria-hidden="true"></span>
+            <span class="daycard-ns__tint" aria-hidden="true"></span>
+            <span class="daycard-ns__rim" aria-hidden="true"></span>
+            ${o.num?`<div class="num">${o.num}</div>`:''}
+            <div class="daycard-ns__body">
+              <svg class="daycard-ns__emblem" viewBox="0 0 512 512" aria-hidden="true">
+                <path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path>
+              </svg>
+            </div>
+            ${o.sub?`<div class="sub">${o.sub}</div>`:''}
+            <div class="daycard-ns__foot"><span class="daycard-ns__name">${o.name||''}</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+
+/* ═══ THE SKINS ═══ Each is a real material, not a hue nudge.
+   sk1/sk2/sk3/sk4 = the four lights. plat = how hard platinum floods.
+   face = the card's own surface. mark/ink = what reads on top. */
+const SKINS = [
+ /* ── tier one ─────────────────────────────────────────────── */
+ {n:'Solar Flare', sk1:'rgba(255,138,0,1)',  sk2:'rgba(255,206,64,.95)', sk3:'rgba(255,72,0,1)',    sk4:'rgba(255,170,40,.9)',
+  plat:'.14', face:'linear-gradient(165deg,#2a1405,#160a02)', mark:'#2a1200', ink:'rgba(255,236,214,.9)'},
+ {n:'Voltage',     sk1:'rgba(255,238,0,1)',   sk2:'rgba(190,255,60,.95)', sk3:'rgba(255,196,0,1)',  sk4:'rgba(230,255,120,.85)',
+  plat:'.16', face:'linear-gradient(165deg,#1d1e04,#0d0e02)', mark:'#221f00', ink:'rgba(252,255,214,.9)'},
+ {n:'Obsidian Violet', sk1:'rgba(150,60,255,1)', sk2:'rgba(80,20,180,.9)', sk3:'rgba(215,120,255,.95)', sk4:'rgba(110,40,220,.9)',
+  plat:'.05', face:'linear-gradient(165deg,#0c0710,#050308)', mark:'rgba(242,232,255,.95)', ink:'rgba(230,214,255,.85)'},
+ {n:'Gold',        sk1:'rgba(255,196,60,1)',  sk2:'rgba(255,236,170,.95)', sk3:'rgba(196,132,0,1)', sk4:'rgba(255,214,110,.9)',
+  plat:'.22', face:'linear-gradient(165deg,#1f1503,#0d0901)', mark:'rgba(40,26,0,.9)', ink:'rgba(255,240,200,.9)'},
+ {n:'Matte Black', sk1:'rgba(58,62,70,.5)',  sk2:'rgba(40,44,52,.45)', sk3:'rgba(30,33,40,.5)', sk4:'rgba(48,52,60,.4)',
+  plat:'.03', face:'linear-gradient(168deg,#161719,#0e0f11 60%,#0a0b0c)', mark:'rgba(228,231,238,.9)', ink:'rgba(214,219,228,.7)', cls:'matte'},
+ {n:'Matte White', sk1:'rgba(232,233,236,.9)', sk2:'rgba(244,245,247,.9)', sk3:'rgba(220,222,227,.9)', sk4:'rgba(236,237,240,.8)',
+  plat:'.55', face:'linear-gradient(168deg,#eceded,#e2e3e4 60%,#dcdddf)', mark:'#4c5158', ink:'rgba(48,52,58,.75)', cls:'matte'},
+ {n:'Pure Glass',  sk1:'rgba(180,225,255,.75)', sk2:'rgba(255,255,255,.95)', sk3:'rgba(150,205,255,.7)', sk4:'rgba(210,240,255,.7)',
+  plat:'.62', face:'linear-gradient(165deg,#eef7fd,#e2eef8)', mark:'rgba(70,92,110,.85)', ink:'rgba(30,50,66,.75)', cls:'glass'},
+ {n:'Void',        sk1:'rgba(90,100,120,.35)', sk2:'rgba(70,78,96,.3)', sk3:'rgba(50,56,70,.3)', sk4:'rgba(80,88,108,.25)',
+  plat:'.02', face:'linear-gradient(165deg,#0a0b0d,#030304)', mark:'rgba(236,239,246,.92)', ink:'rgba(226,231,240,.75)'},
+ {n:'Emerald',     sk1:'rgba(0,220,130,1)',   sk2:'rgba(120,255,200,.9)', sk3:'rgba(0,150,90,1)',   sk4:'rgba(40,255,160,.85)',
+  plat:'.12', face:'linear-gradient(165deg,#03150e,#010806)', mark:'#022417', ink:'rgba(214,255,238,.9)'},
+ {n:'Crimson',     sk1:'rgba(255,30,70,1)',   sk2:'rgba(255,110,120,.9)', sk3:'rgba(150,0,40,1)',   sk4:'rgba(255,70,90,.9)',
+  plat:'.10', face:'linear-gradient(165deg,#1c0308,#0b0103)', mark:'rgba(255,228,232,.95)', ink:'rgba(255,220,226,.85)'},
+ {n:'Ice',         sk1:'rgba(120,235,255,1)', sk2:'rgba(255,255,255,.95)', sk3:'rgba(60,180,255,.95)', sk4:'rgba(190,245,255,.9)',
+  plat:'.72', face:'linear-gradient(165deg,#e9f6fb,#dceaf4)', mark:'#3d5866', ink:'rgba(24,42,54,.8)'},
+ {n:'Magenta',     sk1:'rgba(255,0,170,1)',   sk2:'rgba(255,120,215,.9)', sk3:'rgba(170,0,140,1)',  sk4:'rgba(255,70,190,.9)',
+  plat:'.10', face:'linear-gradient(165deg,#1a0316,#0a010a)', mark:'rgba(255,224,246,.95)', ink:'rgba(255,214,242,.85)'},
+ /* ── tier two, behind View more ───────────────────────────── */
+ {n:'Cobalt',      sk1:'rgba(40,90,255,1)',   sk2:'rgba(120,180,255,.9)', sk3:'rgba(10,40,190,1)',  sk4:'rgba(80,130,255,.9)',
+  plat:'.12', face:'linear-gradient(165deg,#050a20,#02040e)', mark:'rgba(226,235,255,.95)', ink:'rgba(214,228,255,.85)'},
+ {n:'Copper',      sk1:'rgba(230,120,50,1)',  sk2:'rgba(255,190,130,.9)', sk3:'rgba(150,60,10,1)',  sk4:'rgba(255,150,80,.85)',
+  plat:'.30', face:'linear-gradient(165deg,#20120a,#0d0704)', mark:'rgba(255,232,214,.9)', ink:'rgba(255,226,204,.85)'},
+ {n:'Jade Gold',   sk1:'rgba(0,200,160,1)',   sk2:'rgba(255,215,90,.85)', sk3:'rgba(0,140,120,1)',  sk4:'rgba(120,255,210,.8)',
+  plat:'.16', face:'linear-gradient(165deg,#04140f,#010706)', mark:'rgba(224,255,244,.95)', ink:'rgba(210,255,238,.85)'},
+ {n:'Aurora',      sk1:'rgba(0,255,190,.95)', sk2:'rgba(150,90,255,.85)', sk3:'rgba(40,200,255,.9)', sk4:'rgba(255,90,200,.7)',
+  plat:'.08', face:'linear-gradient(165deg,#050b12,#02040a)', mark:'rgba(238,246,255,.95)', ink:'rgba(222,238,255,.85)'},
+ {n:'Sunset',      sk1:'rgba(255,90,60,1)',   sk2:'rgba(255,160,90,.9)', sk3:'rgba(190,40,120,1)', sk4:'rgba(255,120,150,.85)',
+  plat:'.16', face:'linear-gradient(165deg,#20080a,#0c0204)', mark:'rgba(255,232,224,.95)', ink:'rgba(255,224,214,.85)'},
+ {n:'Sapphire',    sk1:'rgba(0,110,255,1)',   sk2:'rgba(140,210,255,.85)', sk3:'rgba(0,50,160,1)',  sk4:'rgba(60,150,255,.9)',
+  plat:'.26', face:'linear-gradient(165deg,#03102a,#010614)', mark:'rgba(224,238,255,.95)', ink:'rgba(212,232,255,.85)'},
+ {n:'Bone',        sk1:'rgba(238,230,214,.95)', sk2:'rgba(250,246,238,.95)', sk3:'rgba(222,212,194,.9)', sk4:'rgba(242,234,220,.85)',
+  plat:'.60', face:'linear-gradient(168deg,#f3efe7,#e9e3d8)', mark:'#5d564b', ink:'rgba(58,52,44,.75)', cls:'matte'},
+ {n:'Toxic',       sk1:'rgba(180,255,0,1)',   sk2:'rgba(0,255,140,.9)', sk3:'rgba(120,200,0,1)',  sk4:'rgba(220,255,80,.85)',
+  plat:'.10', face:'linear-gradient(165deg,#0f1603,#050801)', mark:'rgba(20,30,0,.9)', ink:'rgba(238,255,200,.9)'},
+ {n:'Titanium',    sk1:'rgba(190,200,214,.9)', sk2:'rgba(226,232,240,.9)', sk3:'rgba(140,152,170,.85)', sk4:'rgba(200,210,224,.8)',
+  plat:'.48', face:'linear-gradient(165deg,#22262c,#131619)', mark:'rgba(238,242,248,.92)', ink:'rgba(226,232,240,.8)'},
+ {n:'Blush',       sk1:'rgba(255,180,200,.95)', sk2:'rgba(255,225,235,.9)', sk3:'rgba(240,140,175,.9)', sk4:'rgba(255,205,220,.85)',
+  plat:'.58', face:'linear-gradient(165deg,#fbeef2,#f4e2e8)', mark:'#6b4a55', ink:'rgba(70,44,52,.75)'},
+ {n:'Ultraviolet', sk1:'rgba(110,0,255,1)',   sk2:'rgba(190,120,255,.85)', sk3:'rgba(60,0,160,1)',  sk4:'rgba(150,60,255,.9)',
+  plat:'.06', face:'linear-gradient(165deg,#0b0318,#04010a)', mark:'rgba(236,224,255,.95)', ink:'rgba(226,210,255,.85)'},
+ {n:'Midnight',    sk1:'rgba(30,60,140,.9)',  sk2:'rgba(70,110,190,.8)', sk3:'rgba(10,25,70,.9)', sk4:'rgba(50,90,170,.8)',
+  plat:'.08', face:'linear-gradient(165deg,#060a16,#02030a)', mark:'rgba(226,234,250,.92)', ink:'rgba(212,224,246,.8)'},
+];
+
+function skinFor(name, forced){
+  const h = hash((name||'memento').trim().toLowerCase());
+  const sk = SKINS[forced!==undefined ? forced : (h % SKINS.length)];
+  return Object.assign({}, sk, {rot: (h>>>7)%22 - 11}); // a small personal drift within the family
+}
+function skinVars(sk){
+  return {'--sk1':sk.sk1,'--sk2':sk.sk2,'--sk3':sk.sk3,'--sk4':sk.sk4,
+    '--plat-op':sk.plat,'--face':sk.face,'--mark':sk.mark,'--ink':sk.ink,
+    '--mm-hue':(sk.rot||0)+'deg','--sat':'1.7',
+    '--clar':'1','--act':'1','--cons':'1','--mix':'.9','--lit':'1','--glow':'.7','--emit':'.7','--ring':'.5'};
+}
+
+function renderYour(){
+  const name=document.getElementById('nameIn').value||'Memento';
+  const sk=skinFor(name);
+  document.getElementById('sw').style.background=sk.sk1;
+  document.getElementById('cname').textContent=sk.n;
+  document.getElementById('chex').textContent='drift '+(sk.rot>0?'+':'')+sk.rot+'\u00b0';
+  document.getElementById('yourRow').innerHTML =
+    realCard({'--clar':'1','--act':'.52','--cons':'.92','--mix':'.6','--lit':'1','--glow':'.6','--emit':'.6','--ring':'.45','--sat':'1.9'},
+      {cap:'The card as it ships — everyone', name:'Memento'})
+    + realCard(skinVars(sk), {cls:'skin '+(sk.cls||''), cap:`Theirs — ${sk.n}`, name:name, sub:sk.n+' \u00b7 one of one'});
+  renderFounder(name, sk);
+}
+
+const CROWD=['Ava','Jordan Cole','Sofia M','Darius','Lena Park','Theo','Maya R','Chris B','Rae','Ben O','Nia','Sam K',
+  'Iris','Malik','Zara','Owen','Priya','Kai','June','Marcus','Elle','Dev','Nora','Tomas'];
+(function(){
+  const row=document.getElementById('crowdRow');
+  const cards=CROWD.map((n,i)=>{ const sk=skinFor(n, i%SKINS.length);
+    return realCard(skinVars(sk), {cls:'skin '+(sk.cls||''), cap:`${n} — ${sk.n}`, name:n, sub:sk.n}); });
+  row.innerHTML = cards.slice(0,12).join('');
+  const tier2=document.createElement('div');
+  tier2.className='row hidden-tier'; tier2.id='tier2';
+  tier2.innerHTML = cards.slice(12).join('');
+  const btn=document.createElement('button');
+  btn.className='more'; btn.textContent='View all 24 materials';
+  btn.onclick=()=>{ tier2.classList.toggle('open');
+    btn.textContent = tier2.classList.contains('open') ? 'Show fewer' : 'View all 24 materials'; };
+  row.after(tier2); tier2.after(btn);
+})();
+
+function renderFounder(name, sk){
+  const num=(hash(name.toLowerCase())%200+1).toString().padStart(3,'0')+' / 200';
+  const obsidian = Object.assign({}, skinVars(sk), {'--plat-op':'.04',
+    '--face':'linear-gradient(165deg,#0c0d11,#040506)','--mark':'rgba(242,245,250,.95)','--ink':'rgba(236,240,248,.8)',
+    '--o1':'.85','--o2':'.5','--o3':'.8','--o4':'.7','--emit':'.9','--glow':'.9'});
+  const platinum = Object.assign({}, skinVars(sk), {'--plat-op':'.92',
+    '--face':'linear-gradient(165deg,#f2f5fa,#e6ebf3)','--mark':'#4b535f','--ink':'rgba(34,40,50,.8)',
+    '--o1':'.7','--o2':'.6','--o3':'.6','--o4':'.5'});
+  document.getElementById('founderRow').innerHTML =
+    realCard(platinum, {cls:'skin', cap:'A \u00b7 Platinum founder — their colour under the flood', name:name, num:num, sub:'Founder \u00b7 one of one'})
+    + realCard(obsidian, {cls:'skin', cap:'B · Obsidian founder — their colour is the only light', name:name, num:num, sub:'Founder \u00b7 one of one'})
+    + realCard(Object.assign({}, skinVars(SKINS[4]), {'--rim-op':'1'}),
+        {cls:'skin', cap:'C · Void founder — black, the rim, the number', name:name, num:num, sub:'First two hundred'});
+}
+
+document.getElementById('nameIn').addEventListener('input', renderYour);
+renderYour();
+
+/* honest failure: if the app CSS did not load, say so instead of showing junk */
+setTimeout(()=>{
+  const el=document.querySelector('.daycard-ns');
+  if(!el || getComputedStyle(el).position!=='relative'){ document.getElementById('miss').style.display='block'; }
+}, 400);
+</script>
+</body>
+</html>
