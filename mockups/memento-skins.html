@@ -165,6 +165,23 @@
   .code-grid i { display:block; }
   @media (prefers-reduced-motion: reduce) {
     .therm-field { animation:none; } }
+
+  /* ── THERMAL M ── the heat field takes the shape of the mark. The M is
+     blurred into a soft body, then the blur's own falloff is quantised into
+     the same measured bands, so the colour reads as heat radiating off the
+     letterform rather than a gradient laid on top. */
+  .thermM { position:absolute; inset:0; z-index:1; pointer-events:none;
+    animation:thermMBreathe 30s ease-in-out infinite alternate; }
+  .thermM span { position:absolute; inset:0; display:block; }
+  .thermM svg { position:absolute; left:50%; top:46%; width:var(--mw,78%);
+    transform:translate(-50%,-50%); overflow:visible; }
+  @keyframes thermMBreathe {
+    0%   { transform:scale(1.00); }
+    100% { transform:scale(1.045); } }
+  .thermM-bloom { position:absolute; inset:-24%; z-index:0; pointer-events:none;
+    background:radial-gradient(ellipse 46% 42% at 50% 46%, rgba(70,120,255,.4), rgba(255,120,0,.10) 58%, transparent 78%);
+    filter:blur(34px); }
+  @media (prefers-reduced-motion: reduce) { .thermM { animation:none; } }
 </style>
 </head>
 <body class="ns-bloom">
@@ -227,6 +244,20 @@
       <feFuncG type="discrete" tableValues="0.06 0.14 0.26 0.42 0.62 0.80 0.92 0.98"/>
       <feFuncB type="discrete" tableValues="0.14 0.28 0.42 0.56 0.70 0.82 0.92 0.98"/>
       <feFuncA type="discrete" tableValues="1 1 1 1 1 1 1 1"/>
+    </feComponentTransfer>
+  </filter>
+
+  <!-- thermal, shaped to the mark: blur -> quantise the falloff into bands -->
+  <filter id="thermalM" x="-60%" y="-60%" width="220%" height="220%" color-interpolation-filters="sRGB">
+    <feGaussianBlur in="SourceAlpha" stdDeviation="26" result="soft"/>
+    <feComponentTransfer in="soft" result="ramp">
+      <feFuncA type="linear" slope="2.6" intercept="0"/>
+    </feComponentTransfer>
+    <feComponentTransfer in="ramp">
+      <feFuncR type="discrete" tableValues="0 0.04 0.06 0.09 0.14 0.72 1 1 1 0.86 0.30 0.10 0.06"/>
+      <feFuncG type="discrete" tableValues="0 0.02 0.05 0.24 0.62 0.90 0.86 0.64 0.34 0.90 0.44 0.16 0.05"/>
+      <feFuncB type="discrete" tableValues="0 0.10 0.34 0.86 0.98 0.62 0.10 0.02 0.00 0.72 0.80 0.55 0.30"/>
+      <feFuncA type="discrete" tableValues="0 0.55 0.85 1 1 1 1 1 1 1 1 0.9 0.75"/>
     </feComponentTransfer>
   </filter>
 </defs></svg>
@@ -631,8 +662,8 @@ function codeGrid(seedName, cols){
 document.getElementById('heroRow').innerHTML =
   shellCard('<span class="therm-bloom"></span><span class="therm-field"></span>',
     {cap:'Thermal — heat signature', name:'Malik Peace', sub:'thermal',
-     face:'#02030a', mark:'rgba(6,10,40,.96)', ink:'rgba(210,230,255,.85)',
-     edge:'rgba(140,190,255,.5)', halo:'rgba(80,140,255,.34)'})
+     face:'#010206', mark:'rgba(4,7,24,.96)', ink:'rgba(210,230,255,.85)',
+     edge:'rgba(120,170,255,.4)', halo:'rgba(60,110,255,.24)'})
   + shellCard('<span class="therm-bloom" style="opacity:.7"></span><span class="therm-field" style="--therm-blur:16px"></span>',
     {cap:'Thermal, soft — the same field, bloomed', name:'Malik Peace', sub:'thermal',
      face:'#02030a', mark:'rgba(255,255,255,.97)', ink:'rgba(214,232,255,.85)',
@@ -646,6 +677,51 @@ document.getElementById('heroRow').innerHTML =
      face:'#000003', mark:'rgba(190,245,255,.98)', ink:'rgba(150,200,255,.8)',
      edge:'rgba(90,150,255,.4)', halo:'rgba(40,60,255,.26)'});
 
+
+
+
+/* Thermal M: bands run INSIDE the letterform, hot at the edge, cool at the
+   core, exactly like a heat signature. Each layer is the mark eroded a little
+   further (feMorphology), so the colour steps follow the shape, not a circle. */
+(function(){
+  const RAMP=['#ff3000','#ff6a00','#ff9e00','#ffc61a','#ffe94a','#dcfaa8',
+              '#8ef2ff','#33ccff','#2f7dff','#1f45ee','#1428c8','#0b1596','#060c62'];
+  const defs=document.querySelector('svg defs');
+  RAMP.forEach((c,i)=>{
+    if(document.getElementById('ero'+i)) return;
+    const f=document.createElementNS('http://www.w3.org/2000/svg','filter');
+    f.setAttribute('id','ero'+i); f.setAttribute('x','-30%'); f.setAttribute('y','-30%');
+    f.setAttribute('width','160%'); f.setAttribute('height','160%');
+    f.innerHTML = `<feMorphology operator="erode" radius="${i*3.4}"/><feGaussianBlur stdDeviation="${1.4+i*0.35}"/>`;
+    defs.appendChild(f);
+  });
+  const mark='<path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/>';
+  window.thermalM = function(width, glow){
+    const layers = RAMP.map((c,i)=>
+      `<span style="filter:url(#ero${i})"><svg viewBox="0 0 512 512" fill="${c}" aria-hidden="true">${mark}</svg></span>`
+    ).join('');
+    // the heat thrown into the room, from the shape itself
+    const halo = `
+      <span style="filter:blur(54px);opacity:${(glow||.55)*1.15}">
+        <svg viewBox="0 0 512 512" fill="#1a3ae6" aria-hidden="true">${mark}</svg></span>
+      <span style="filter:blur(34px);opacity:${(glow||.55)*.9}">
+        <svg viewBox="0 0 512 512" fill="#2f8dff" aria-hidden="true">${mark}</svg></span>
+      <span style="filter:blur(18px);opacity:${(glow||.55)*.8}">
+        <svg viewBox="0 0 512 512" fill="#ff7a00" aria-hidden="true">${mark}</svg></span>`;
+    return `<span class="thermM" style="--mw:${width||78}%">${halo}${layers}</span>`;
+  };
+})();
+
+document.getElementById('heroRow').insertAdjacentHTML('beforeend',
+  shellCard(thermalM(80,.5),
+    {cap:'Thermal M — the field IS the mark', name:'Malik Peace', sub:'thermal',
+     face:'#010207', mark:'', ink:'rgba(186,210,255,.8)',
+     edge:'rgba(110,160,255,.34)', halo:'rgba(60,110,255,.18)', hideMark:true})
+  + shellCard(thermalM(62,.3),
+    {cap:'Thermal M, deeper — smaller core, darker room', name:'Malik Peace', sub:'thermal',
+     face:'#000103', mark:'', ink:'rgba(150,180,235,.7)',
+     edge:'rgba(80,130,230,.24)', halo:'rgba(30,70,210,.1)', hideMark:true}));
+/* the original two thermals: take the room down a stop, per Malik */
 document.getElementById('nameIn').addEventListener('input', renderYour);
 renderYour();
 
