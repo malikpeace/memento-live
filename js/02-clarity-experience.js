@@ -5614,6 +5614,7 @@ Return ONLY the sentence text. No quotes, no labels.`;
         <div class="aloop-glow" aria-hidden="true"></div>
         <div class="aloop-top">
           <div class="aloop-day"><span class="aloop-day__k">Day</span><span class="aloop-day__n apl-num">${dayN}</span></div>
+          <button type="button" class="aloop-receipt" id="aloopReceipt">Built from</button>
         </div>
         <div class="aloop-mid">
           <div class="aloop-deck">${deckHtml}</div>
@@ -5710,6 +5711,10 @@ Return ONLY the sentence text. No quotes, no labels.`;
       e.stopPropagation();
       this._loopOpenFocus(pa, liveTier(), chained);
     });
+
+    // The receipt (v1105): the facts this plan is built from, editable.
+    const receiptBtn = root.querySelector('#aloopReceipt');
+    if (receiptBtn) receiptBtn.addEventListener('click', (e) => { e.stopPropagation(); this.openReceipt(); });
 
     // The rare case where the action itself is wrong: quiet, two-step, honest.
     const notThis = root.querySelector('#aloopNotThis');
@@ -6148,6 +6153,10 @@ Return ONLY the sentence text. No quotes, no labels.`;
       '.a5-rlabel{color:var(--a5-lo);}',
       '.a5-rval{font-weight:700;color:var(--a5-hi);text-align:right;}',
       '.a5-ghost{width:100%;height:44px;border:none;border-radius:calc(10px * var(--rx,1));background:rgba(var(--ink),0.07);color:var(--a5-hi);font-family:inherit;font-size:0.84375rem;font-weight:600;cursor:pointer;box-shadow:var(--glass-highlight);}',
+      // v1105: the everyday foot is a quiet row: stats left, the receipt entry right.
+      '.a5-foot--row{flex-direction:row;justify-content:space-between;align-items:center;gap:10px;}',
+      '.a5-from{width:auto;height:auto;background:transparent;box-shadow:none;padding:6px 0;color:var(--a5-mid);font-weight:600;font-size:0.75rem;}',
+      '.a5-from:active,.a5-from:hover{color:var(--a5-hi);}',
       '@media (prefers-reduced-motion:reduce){.a5-cta,.a5-bar i{transition-duration:0.01ms;}}',
       // v858: A5 follows the theme (Malik's call); the light bg is set above.
     ].join('');
@@ -6288,8 +6297,9 @@ Return ONLY the sentence text. No quotes, no labels.`;
             '<button type="button" class="a5-cta" id="aplMarkDone">I did it</button>' +
             '<button type="button" class="a5-focus" id="aplFocus">Focus for 25 min</button>' +
           '</div>' +
-          '<div class="a5-foot">' +
+          '<div class="a5-foot a5-foot--row">' +
             '<div class="a5-stats apl-num">day ' + streakCount + ' &middot; ' + doneCount + ' proofs</div>' +
+            '<button type="button" class="a5-ghost a5-from" id="a5Receipt">What this is built from</button>' +
           '</div>' +
         '</div>';
     }
@@ -6313,6 +6323,10 @@ Return ONLY the sentence text. No quotes, no labels.`;
     inst.pageWrap.querySelectorAll('#a5Bars .a5-bar').forEach(b => {
       b.addEventListener('click', (e) => { e.stopPropagation(); if (!completedToday) selectTier(b.getAttribute('data-tier')); });
     });
+
+    // The receipt: what the plan is built from (v1105).
+    const receiptBtn = inst.pageWrap.querySelector('#a5Receipt');
+    if (receiptBtn) receiptBtn.addEventListener('click', (e) => { e.stopPropagation(); inst.openReceipt(); });
 
     // Done today: record completion + proof event, credit streak, refresh.
     const creditToday = () => {
@@ -6391,6 +6405,201 @@ Return ONLY the sentence text. No quotes, no labels.`;
           } catch (_) {}
         }, 60);
       } catch (_) {}
+    });
+  },
+
+  // ══ THE RECEIPT (v1105, Malik's A2 pick from the logic-screen mockups) ══
+  // "Here is what I have": the facts the plan is built from, spoken as
+  // sentences, each editable fact underlined. A real screen he can reopen any
+  // time from the plan view, not a loading state seen once. Editing a fact
+  // marks the receipt dirty and offers ONE primary act: rebuild the plan.
+  // The star itself is deliberately NOT edited here: refine-wording vs
+  // change-my-star are Clarity's two loud doors (his architecture), so the
+  // goal span routes there instead of quietly forking a third editor.
+  _receiptFacts() {
+    const a = (state.clarity && state.clarity.answers) || {};
+    const intake = (state.action && state.action.intake && state.action.intake.answers) || {};
+    const pa = (state.action && state.action.primaryAction) || {};
+    const daily = parseInt(a.dailyTime, 10) || 0;
+    const dailyPhrase = !daily ? ''
+      : daily >= 105 ? ('about ' + (Math.round(daily / 30) / 2) + ' hours a day')
+      : daily >= 75 ? 'about an hour and a half a day'
+      : daily >= 45 ? 'about an hour a day'
+      : ('about ' + daily + ' minutes a day');
+    return {
+      star: String(a.neutronStar || '').trim(),
+      tf: String(a.timeframe || a.timeHorizon || '').trim(),
+      dailyPhrase,
+      prog: String(intake.pastProgress || '').replace(/^capacity:[^.]*\.\s*/i, '').trim(),
+      move: String(pa.title || '').trim()
+    };
+  },
+  _injectReceiptStyles() {
+    if (document.getElementById('acrStyles')) return;
+    const s = document.createElement('style');
+    s.id = 'acrStyles';
+    s.textContent = [
+      // Own token set (mirrors the plan screens): ink-based, theme-faithful.
+      '.acr{position:fixed;inset:0;z-index:2147483000;display:flex;background:#060608;--a5-hi:rgba(var(--ink),0.96);--a5-mid:rgba(var(--ink),0.72);--a5-lo:rgba(var(--ink),0.5);opacity:0;transition:opacity 0.26s ease;}',
+      'html.theme-light .acr{background:#eef0f3;}',
+      '.acr--open{opacity:1;}',
+      '.acr__inner{position:relative;flex:1;display:flex;flex-direction:column;padding:max(56px,calc(var(--safe-t,0px) + 34px)) 26px calc(22px + var(--safe-b,0px));max-width:560px;margin:0 auto;width:100%;box-sizing:border-box;overflow-y:auto;}',
+      '.acr__x{position:absolute;top:max(14px,var(--safe-t,0px));right:16px;width:40px;height:40px;border:none;background:transparent;color:var(--a5-lo);font-size:1.4rem;line-height:1;cursor:pointer;}',
+      '.acr__h{font-size:clamp(1.4rem,5.6vw,1.6rem);font-weight:700;letter-spacing:-0.025em;color:var(--a5-hi);margin:0 0 4px;}',
+      '.acr__sub{font-size:0.84375rem;color:var(--a5-mid);margin:0 0 8px;}',
+      '.acr__body{flex:1;display:flex;flex-direction:column;justify-content:center;padding-bottom:24px;}',
+      '.acr__body p{font-size:clamp(1.15rem,4.9vw,1.3rem);line-height:1.5;font-weight:500;letter-spacing:-0.015em;color:var(--a5-hi);margin:0 0 18px;}',
+      '.acr-f{font-weight:650;color:var(--a5-hi);cursor:pointer;text-decoration:underline;text-decoration-color:rgba(58,217,245,0.7);text-decoration-thickness:2px;text-underline-offset:5px;}',
+      '.acr-f--missing{color:var(--a5-mid);font-weight:550;}',
+      '.acr__out{color:var(--a5-mid) !important;font-size:0.95rem !important;margin-top:6px !important;}',
+      '.acr__move{font-weight:650;color:var(--a5-hi);}',
+      '.acr__ed{margin:-6px 0 20px;}',
+      '.acr__note{font-size:0.8125rem;color:var(--a5-mid);margin-bottom:10px;line-height:1.45;}',
+      '.acr__chips{display:flex;flex-wrap:wrap;gap:8px;}',
+      '.acr__chip{border:none;font-family:inherit;font-size:0.8125rem;font-weight:600;padding:9px 14px;border-radius:calc(9px * var(--rx,1));background:rgba(var(--ink),0.08);color:var(--a5-hi);cursor:pointer;box-shadow:var(--glass-highlight);}',
+      '.acr__chip--go{background:var(--solid-bg);color:var(--solid-fg);margin-top:10px;}',
+      '.acr__ta{width:100%;box-sizing:border-box;font-family:inherit;font-size:0.9375rem;line-height:1.5;color:var(--a5-hi);background:rgba(var(--ink),0.06);border:none;border-radius:calc(10px * var(--rx,1));padding:12px;resize:vertical;box-shadow:var(--glass-highlight);}',
+      '.acr__foot{display:flex;flex-direction:column;gap:8px;}',
+      '.acr__cta{width:100%;height:48px;border:none;border-radius:calc(10px * var(--rx,1));background:var(--solid-bg);color:var(--solid-fg);font-family:inherit;font-size:0.90625rem;font-weight:700;cursor:pointer;box-shadow:0 6px 22px rgba(0,0,0,0.4);}',
+      '.acr__done{width:100%;height:44px;border:none;border-radius:calc(10px * var(--rx,1));background:rgba(var(--ink),0.07);color:var(--a5-hi);font-family:inherit;font-size:0.84375rem;font-weight:600;cursor:pointer;box-shadow:var(--glass-highlight);}',
+      '@media (prefers-reduced-motion:reduce){.acr{transition-duration:0.01ms;}}',
+    ].join('');
+    document.head.appendChild(s);
+  },
+  openReceipt() {
+    this._injectReceiptStyles();
+    const inst = this;
+    document.querySelector('#actionReceiptSheet')?.remove();
+    const f = this._receiptFacts();
+    // The sentences supply their own punctuation; a fact that arrives with a
+    // trailing period would double it ("it exists.." in testing).
+    ['star', 'tf', 'prog', 'move'].forEach((k) => { f[k] = String(f[k] || '').replace(/[.\s]+$/, ''); });
+    const b = (edit, text, missing) => '<b class="acr-f' + (missing ? ' acr-f--missing' : '') + '" data-edit="' + edit + '" role="button" tabindex="0">' + esc(text) + '</b>';
+    const host = document.createElement('div');
+    host.id = 'actionReceiptSheet';
+    host.className = 'acr';
+    host.innerHTML =
+      '<div class="acr__inner">' +
+        '<button type="button" class="acr__x" id="acrClose" aria-label="Close">&times;</button>' +
+        '<h1 class="acr__h">Here is what I have.</h1>' +
+        '<p class="acr__sub">Tap anything that is wrong.</p>' +
+        '<div class="acr__body">' +
+          '<p>You want ' + b('goal', f.star || 'your goal') +
+            (f.tf ? ', within ' + b('tf', f.tf) + '.' : '. ' + b('tf', 'You have not picked a timeframe yet.', true)) + '</p>' +
+          '<div class="acr__ed" data-for="tf" hidden></div>' +
+          '<p>Most days you have ' + (f.dailyPhrase ? b('daily', f.dailyPhrase) : b('daily', 'not told me how much time you have', true)) + '.</p>' +
+          '<div class="acr__ed" data-for="daily" hidden></div>' +
+          '<p>So far: ' + (f.prog ? b('prog', f.prog) : b('prog', 'you have not told me where you are yet', true)) + '.</p>' +
+          '<div class="acr__ed" data-for="prog" hidden></div>' +
+          (f.move ? '<p class="acr__out">Out of all that came <span class="acr__move">' + esc(f.move) + '</span>.</p>' : '') +
+        '</div>' +
+        '<div class="acr__foot">' +
+          '<button type="button" class="acr__cta" id="acrRebuild" hidden>Update my plan</button>' +
+          '<button type="button" class="acr__done" id="acrDone">This is right</button>' +
+        '</div>' +
+      '</div>';
+    // Fixed to the viewport and appended to body: the module's page wrap is a
+    // sliding transform layer, and an absolutely-positioned child of a
+    // translated layer lands wherever the slide is, not on the screen.
+    (document.body).appendChild(host);
+    requestAnimationFrame(() => host.classList.add('acr--open'));
+
+    let dirty = false;
+    const markDirty = () => {
+      dirty = true;
+      const cta = host.querySelector('#acrRebuild'); const done = host.querySelector('#acrDone');
+      if (cta) cta.hidden = false;
+      if (done) done.textContent = 'Keep the current plan';
+    };
+    const close = () => { host.classList.remove('acr--open'); setTimeout(() => host.remove(), 260); };
+    const reopen = () => { const wasDirty = dirty; this.openReceipt(); if (wasDirty) { try { markAgain(); } catch (_) {} } };
+    // Re-marking after a re-render: simplest is to re-render and re-apply.
+    const markAgain = () => {
+      const h2 = document.querySelector('#actionReceiptSheet');
+      if (!h2) return;
+      const cta = h2.querySelector('#acrRebuild'); const done = h2.querySelector('#acrDone');
+      if (cta) cta.hidden = false;
+      if (done) done.textContent = 'Keep the current plan';
+    };
+
+    const TIME_CHIPS = [['15 minutes', 15], ['30 minutes', 30], ['An hour', 60], ['A few hours', 180], ['Most of the day', 480]];
+    const TF_CHIPS = ['3 months', '6 months', 'A year', 'Ongoing'];
+    const chipRow = (items, onPick) => {
+      const row = document.createElement('div');
+      row.className = 'acr__chips';
+      items.forEach((it) => {
+        const label = Array.isArray(it) ? it[0] : it;
+        const btn = document.createElement('button');
+        btn.type = 'button'; btn.className = 'acr__chip'; btn.textContent = label;
+        btn.addEventListener('click', () => onPick(it));
+        row.appendChild(btn);
+      });
+      return row;
+    };
+
+    const editors = {
+      goal() {
+        // The star's own doors live in Clarity. Say so, offer the trip.
+        const ed = host.querySelector('[data-for="tf"]');
+        ed.hidden = false;
+        ed.innerHTML = '<div class="acr__note">Your star lives in Clarity, with its two doors: refine the wording, or change it outright.</div>';
+        const go = document.createElement('button');
+        go.type = 'button'; go.className = 'acr__chip acr__chip--go'; go.textContent = 'Open Clarity';
+        go.addEventListener('click', () => {
+          close();
+          try { inst.close(); } catch (_) {}
+          setTimeout(() => { try { if (typeof ClarityExperience !== 'undefined') ClarityExperience.open(); } catch (_) {} }, 320);
+        });
+        ed.appendChild(go);
+      },
+      tf() {
+        const ed = host.querySelector('[data-for="tf"]');
+        ed.hidden = false; ed.innerHTML = '';
+        ed.appendChild(chipRow(TF_CHIPS, (pick) => {
+          state.clarity.answers.timeframe = pick;
+          try { persistNow(); } catch (_) {}
+          markDirty(); reopen();
+        }));
+      },
+      daily() {
+        const ed = host.querySelector('[data-for="daily"]');
+        ed.hidden = false; ed.innerHTML = '';
+        ed.appendChild(chipRow(TIME_CHIPS, (pick) => {
+          state.clarity.answers.dailyTime = String(pick[1]);
+          try { persistNow(); } catch (_) {}
+          markDirty(); reopen();
+        }));
+      },
+      prog() {
+        const ed = host.querySelector('[data-for="prog"]');
+        ed.hidden = false;
+        ed.innerHTML = '<textarea class="acr__ta" rows="3" placeholder="Where are you, honestly? Numbers help.">' + esc(inst._receiptFacts().prog) + '</textarea>';
+        const save = document.createElement('button');
+        save.type = 'button'; save.className = 'acr__chip acr__chip--go'; save.textContent = 'Save';
+        save.addEventListener('click', () => {
+          const v = String(ed.querySelector('.acr__ta').value || '').trim();
+          if (!v) return;
+          state.action.intake = state.action.intake || {};
+          state.action.intake.answers = state.action.intake.answers || {};
+          state.action.intake.answers.pastProgress = v;
+          try { persistNow(); } catch (_) {}
+          markDirty(); reopen();
+        });
+        ed.appendChild(save);
+      }
+    };
+
+    host.querySelectorAll('.acr-f').forEach((el) => {
+      const open = () => { try { editors[el.getAttribute('data-edit')](); } catch (_) {} };
+      el.addEventListener('click', open);
+      el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+    });
+    host.querySelector('#acrClose').addEventListener('click', close);
+    host.querySelector('#acrDone').addEventListener('click', close);
+    host.querySelector('#acrRebuild').addEventListener('click', () => {
+      close();
+      // The real regeneration path: same engine, now with the edited facts.
+      try { if (typeof generateActionDraft === 'function') generateActionDraft(); } catch (_) {}
     });
   },
 

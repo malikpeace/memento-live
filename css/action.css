@@ -4062,6 +4062,13 @@ html.theme-light .action-exp {
      under it */
   padding-right: 56px;
 }
+/* v1105: quiet entry to the receipt (what the plan is built from). */
+.aloop-receipt {
+  border: none; background: transparent; padding: 6px 0;
+  font-family: inherit; font-size: 0.75rem; font-weight: 600;
+  color: rgba(var(--ink), 0.5); cursor: pointer;
+}
+.aloop-receipt:hover, .aloop-receipt:active { color: rgba(var(--ink), 0.92); }
 /* min-height:0 is what lets a flex child actually shrink and scroll; without it
    it refuses to go below its content height and overflows the column instead.
    The auto margins centre the card when there is room and collapse to 0 when
