@@ -182,6 +182,43 @@
     background:radial-gradient(ellipse 46% 42% at 50% 46%, rgba(70,120,255,.4), rgba(255,120,0,.10) 58%, transparent 78%);
     filter:blur(34px); }
   @media (prefers-reduced-motion: reduce) { .thermM { animation:none; } }
+
+  /* ── RING MODE ──────────────────────────────────────────────────────
+     Default: the shipped white rim. body.ring-colour swaps every card's
+     rim + room glow to the card's own colour, driven by --edge/--halo
+     which each skin already sets. */
+  body.ring-colour .flat .daycard-ns__rim {
+    box-shadow: inset 0 0 0 1.5px var(--edge, rgba(255,255,255,.9)) !important; }
+  body.ring-colour .daycard-ns__rim {
+    box-shadow: inset 0 0 0 1.4px var(--ring-c, var(--edge, rgba(255,255,255,.85))),
+                inset 0 0 16px 2px var(--ring-soft, rgba(255,255,255,.18)) !important; }
+  body.ring-colour .flat .daycard-ns {
+    box-shadow: 0 0 var(--halo-r,46px) var(--halo-s,8px) var(--halo, rgba(238,244,255,.34)),
+                inset 0 1px 0 rgba(255,255,255,.06) !important; }
+
+  /* the thermal burning ring: the heat ramp travelling round the edge */
+  .therm-ring { position:absolute; inset:0; z-index:6; pointer-events:none;
+    border-radius:14px; padding:2px;
+    background:conic-gradient(from var(--burn,0deg),
+      #ff3000, #ff8a00 12%, #ffe94a 22%, #8ef2ff 34%, #2f7dff 46%,
+      #1428c8 56%, #2f7dff 66%, #8ef2ff 76%, #ffe94a 86%, #ff8a00 94%, #ff3000);
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude;
+    animation:burnSpin 14s linear infinite; }
+  .therm-ring--glow { inset:2px; padding:7px; filter:blur(10px); opacity:.75; z-index:5; }
+  @keyframes burnSpin { to { --burn:360deg; } }
+  @property --burn { syntax:'<angle>'; initial-value:0deg; inherits:false; }
+  @media (prefers-reduced-motion: reduce) { .therm-ring { animation:none; } }
+
+  /* the toggle */
+  .ringtog { position:fixed; top:16px; right:18px; z-index:99;
+    display:flex; gap:2px; padding:3px; border-radius:999px;
+    background:rgba(255,255,255,.07); box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+    backdrop-filter:blur(18px) saturate(1.4); }
+  .ringtog button { font:inherit; font-size:11.5px; font-weight:650; letter-spacing:.02em;
+    color:rgba(245,245,247,.6); background:none; border:0; cursor:pointer;
+    padding:7px 13px; border-radius:999px; }
+  .ringtog button.on { color:#0b0c0e; background:#f2f3f6; }
 </style>
 </head>
 <body class="ns-bloom">
@@ -262,6 +299,10 @@
   </filter>
 </defs></svg>
 
+<div class="ringtog" role="group" aria-label="Ring style">
+  <button id="ringWhite" class="on" type="button">White ring</button>
+  <button id="ringColour" type="button">Colour-matched</button>
+</div>
 <div class="wrap">
   <h1>Your Color — on the actual card</h1>
   <p class="lede">Every card on this page is the app's real <code style="font-size:12px;opacity:.7">.daycard-ns</code> element, the same markup and the same three stylesheets the running app uses. Nothing is redrawn. The only thing that changes per person is <code style="font-size:12px;opacity:.7">--mm-hue</code>, the card's own hue-rotation variable, which the app already supports.</p>
@@ -507,7 +548,10 @@ function skinFor(name, forced){
 function skinVars(sk){
   return {'--sk1':sk.sk1,'--sk2':sk.sk2,'--sk3':sk.sk3,'--sk4':sk.sk4,
     '--plat-op':sk.plat,'--face':sk.face,'--mark':sk.mark,'--ink':sk.ink,
-    '--edge':sk.edge||'rgba(255,255,255,.9)','--halo':sk.halo||'rgba(238,244,255,.34)',
+    '--edge':sk.edge||sk.sk1||'rgba(255,255,255,.9)',
+    '--halo':sk.halo||(sk.sk1&&sk.sk1!=='none'?sk.sk1:'rgba(238,244,255,.34)'),
+    '--ring-c':sk.edge||(sk.sk1&&sk.sk1!=='none'?sk.sk1:'rgba(255,255,255,.85)'),
+    '--ring-soft':(sk.sk2&&sk.sk2!=='none'?sk.sk2:'rgba(255,255,255,.18)'),
     '--halo-r':sk.haloR||'46px','--lift':sk.lift||'rgba(255,255,255,.05)',
     '--mm-hue':(sk.rot||0)+'deg','--sat':'1.7',
     '--clar':'1','--act':'1','--cons':'1','--mix':'.9','--lit':'1','--glow':'.7','--emit':'.7','--ring':'.5'};
@@ -713,15 +757,23 @@ document.getElementById('heroRow').innerHTML =
 })();
 
 document.getElementById('heroRow').insertAdjacentHTML('beforeend',
-  shellCard(thermalM(80,.5),
+  shellCard('<span class="therm-ring therm-ring--glow"></span>' + thermalM(80,.5) + '<span class="therm-ring"></span>',
     {cap:'Thermal M — the field IS the mark', name:'Malik Peace', sub:'thermal',
      face:'#010207', mark:'', ink:'rgba(186,210,255,.8)',
      edge:'rgba(110,160,255,.34)', halo:'rgba(60,110,255,.18)', hideMark:true})
-  + shellCard(thermalM(62,.3),
+  + shellCard('<span class="therm-ring therm-ring--glow" style="opacity:.4"></span>' + thermalM(62,.3) + '<span class="therm-ring" style="opacity:.85"></span>',
     {cap:'Thermal M, deeper — smaller core, darker room', name:'Malik Peace', sub:'thermal',
      face:'#000103', mark:'', ink:'rgba(150,180,235,.7)',
      edge:'rgba(80,130,230,.24)', halo:'rgba(30,70,210,.1)', hideMark:true}));
 /* the original two thermals: take the room down a stop, per Malik */
+
+/* ring style toggle */
+(function(){
+  const w=document.getElementById('ringWhite'), c=document.getElementById('ringColour');
+  const set=(colour)=>{ document.body.classList.toggle('ring-colour', colour);
+    w.classList.toggle('on', !colour); c.classList.toggle('on', colour); };
+  w.onclick=()=>set(false); c.onclick=()=>set(true);
+})();
 document.getElementById('nameIn').addEventListener('input', renderYour);
 renderYour();
 
