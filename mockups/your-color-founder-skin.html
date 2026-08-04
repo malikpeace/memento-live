@@ -3,92 +3,72 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Your Color on the real Memento</title>
+<title>Your Color — the real Memento card</title>
+
+<!-- THE APP'S OWN STYLESHEETS. Every card below is the real .daycard-ns
+     element from the running app, not a lookalike. -->
+<link rel="stylesheet" href="../memento-app/css/base.css" onerror="this.href='../css/base.css'">
+<link rel="stylesheet" href="../memento-app/css/dashboard.css" onerror="this.href='../css/dashboard.css'">
+<link rel="stylesheet" href="../memento-app/css/daycard-living.css" onerror="this.href='../css/daycard-living.css'">
+
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; }
-  html, body { background:#060709; color:#f5f5f7;
+  html, body { margin:0; background:#060709; color:#f5f5f7;
     font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
     -webkit-font-smoothing:antialiased; }
-  .wrap { max-width:1240px; margin:0 auto; padding:30px 20px 140px; }
+  .wrap { max-width:1280px; margin:0 auto; padding:30px 20px 140px; }
   h1 { font-size:23px; font-weight:750; letter-spacing:-.02em; margin:0 0 6px; }
-  .lede { font-size:14px; line-height:1.6; color:rgba(245,245,247,.62); max-width:78ch; margin:0 0 8px; }
+  .lede { font-size:14px; line-height:1.6; color:rgba(245,245,247,.62); max-width:80ch; margin:0 0 8px; }
   .sect { font-size:12px; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
     color:rgba(245,245,247,.40); margin:44px 0 6px; padding-top:20px;
     border-top:1px solid rgba(255,255,255,.09); }
-  .why { font-size:13px; line-height:1.55; color:rgba(245,245,247,.55); max-width:78ch; margin:0 0 20px; }
-  .row { display:flex; gap:30px; flex-wrap:wrap; align-items:flex-start; }
-  .slot { width:238px; }
+  .why { font-size:13px; line-height:1.55; color:rgba(245,245,247,.55); max-width:80ch; margin:0 0 22px; }
+  .row { display:flex; gap:34px; flex-wrap:wrap; align-items:flex-start; }
+  .slot { width:250px; }
   .cap { font-size:11px; font-weight:650; letter-spacing:.06em; text-transform:uppercase;
-    color:rgba(245,245,247,.38); margin:0 0 10px; min-height:2.4em; }
+    color:rgba(245,245,247,.38); margin:0 0 12px; min-height:2.4em; }
 
-  /* ═══ THE REAL MEMENTO — the evolved platinum card ═══
-     bright platinum face · soft colour washes in the corners · dark mark ·
-     edge-lit rim throwing light into the room. Washes are where a person's
-     colour lives; everything else is identical on every card. */
-  .m-stage { position:relative; width:100%; }
-  .m-halo { position:absolute; inset:-12%; z-index:0; pointer-events:none;
-    background:radial-gradient(ellipse 62% 58% at 50% 50%, rgba(235,240,248,.55), rgba(235,240,248,.12) 55%, transparent 72%);
-    filter:blur(22px); }
-  .m-card { position:relative; width:100%; aspect-ratio:320/452; z-index:1;
-    border-radius:18px; clip-path:inset(0 round 18px); contain:paint;
-    background:linear-gradient(170deg, #e8ebf2 0%, #e3e7ee 45%, #dde3ea 100%); }
-  /* the colour washes: top-left + bottom-right, exactly like the real card */
-  .m-wash { position:absolute; inset:-20%; pointer-events:none; z-index:0;
-    filter:blur(40px) saturate(1.25); }
-  .m-wash .w { position:absolute; border-radius:50%; }
-  .w1 { width:95%; height:80%; left:-18%; top:-16%;
-    background:radial-gradient(circle, var(--wash1, rgba(128,150,255,.5)), transparent 66%); }
-  .w2 { width:95%; height:80%; right:-18%; bottom:-14%;
-    background:radial-gradient(circle, var(--wash2, rgba(56,236,71,.38)), transparent 66%); }
-  /* the lit rim: a crisp line at the edge + light thrown outward */
-  .m-rim { position:absolute; inset:0; border-radius:18px; z-index:4; pointer-events:none;
-    box-shadow:
-      inset 0 0 0 2px rgba(255,255,255,.95),
-      inset 0 0 14px 2px rgba(255,255,255,.55); }
-  .m-rimglow { position:absolute; inset:-3%; z-index:0; pointer-events:none; border-radius:22px;
-    box-shadow:0 0 34px 6px rgba(240,245,252,.55); }
-  .m-mark { position:absolute; left:50%; top:44%; transform:translate(-50%,-50%);
-    width:26%; z-index:3; }
-  .m-mark path { fill:#484f58; }
-  .m-date { position:absolute; top:6.4%; right:8.5%; z-index:3;
-    font-size:11.5px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
-    color:rgba(38,44,52,.55); font-variant-numeric:tabular-nums; }
-  .m-foot { position:absolute; left:0; right:0; bottom:6.6%; z-index:3; text-align:center;
-    font-size:12.5px; font-weight:700; letter-spacing:.03em; color:rgba(30,35,42,.82); }
-  .m-sub { position:absolute; left:0; right:0; bottom:11.8%; z-index:3; text-align:center;
-    font-size:10.5px; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
-    color:var(--ink, rgba(90,104,130,.75)); font-variant-numeric:tabular-nums; }
+  /* Cage the app card into a fixed slot. Nothing here restyles the card
+     itself: it only sizes the stage, exactly like the unlock renders do. */
+  .cage { position:relative; }
+  .cage .daycard-wrap { margin:0; width:100%; }
+  .cage .daycard-living-stage { width:100% !important; margin:0; }
+  .cage .daycard-ns { width:100%; min-height:0; aspect-ratio:320/452; margin:0; }
+  .cage .daycard-ns__foot { bottom:6%; }
 
-  /* generator bar */
-  .gen { display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin:0 0 24px; }
+  /* the engraved founder number, in the card's own type language */
+  .num { position:absolute; top:6.2%; right:8.5%; z-index:6;
+    font-size:11px; font-weight:700; letter-spacing:.16em;
+    font-variant-numeric:tabular-nums; color:rgba(28,32,38,.5); }
+  .f-dark .num { color:rgba(240,243,248,.6); }
+  .sub { position:absolute; left:0; right:0; bottom:12.4%; z-index:6; text-align:center;
+    font-size:10px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--sub-ink, rgba(70,84,110,.6)); }
+  .f-dark .sub { color:var(--sub-ink, rgba(235,238,244,.55)); }
+
+  /* the obsidian founder: hold the platinum flood off so the face stays black
+     and their colour is the only light. Same element, different levels. */
+  .f-dark .daycard-ns__plat { opacity:.06 !important; }
+  .f-dark .daycard-ns { background:linear-gradient(178deg,#101216,#08090b 60%,#060708) !important; }
+  .f-dark .daycard-ns__emblem path { fill:rgba(242,244,249,.95) !important; }
+  .f-dark .daycard-ns__name { color:rgba(242,244,249,.92) !important; }
+
+  .gen { display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin:0 0 26px; }
   .gen input { font:inherit; font-size:15px; color:#f5f5f7; background:rgba(255,255,255,.06);
     border:0; border-radius:10px; padding:12px 16px; width:280px; outline:none;
     box-shadow:inset 0 1px 0 rgba(255,255,255,.08); }
-  .gen input::placeholder { color:rgba(245,245,247,.35); }
-  .swatchline { display:flex; align-items:center; gap:10px; font-size:13px;
-    color:rgba(245,245,247,.72); }
+  .swatchline { display:flex; align-items:center; gap:10px; font-size:13px; color:rgba(245,245,247,.72); }
   .swatch { width:22px; height:22px; border-radius:6px; box-shadow:inset 0 1px 0 rgba(255,255,255,.25); }
   .colorname { font-weight:700; color:#fff; }
-
-  /* founder: the same real card, the number engraved where the date lives.
-     dark variant: obsidian face, light mark, their colour as the only light. */
-  .f-dark .m-card { background:linear-gradient(178deg, #101216 0%, #08090b 60%, #060708 100%); }
-  .f-dark .m-mark path { fill:rgba(240,242,247,.95); }
-  .f-dark .m-date { color:var(--ink-l, rgba(235,238,244,.75)); }
-  .f-dark .m-foot { color:rgba(240,242,246,.9); }
-  .f-dark .m-sub { color:var(--ink-l, rgba(235,238,244,.7)); }
-  .f-dark .m-rim { box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.28), inset 0 0 12px 1px rgba(255,255,255,.10); }
-  .f-dark .m-rimglow { box-shadow:0 0 26px 3px var(--glow, rgba(240,245,252,.18)); }
-  .f-dark .m-halo { background:radial-gradient(ellipse 62% 58% at 50% 50%, var(--glow, rgba(235,240,248,.2)), transparent 70%); }
-  .f-dark .w2 { opacity:.55; }
+  .miss { font-size:12px; color:#ffb4b4; margin:10px 0 0; display:none; }
 </style>
 </head>
-<body>
+<body class="ns-bloom">
 <div class="wrap">
-  <h1>Your Color, on the real Memento</h1>
-  <p class="lede">This is the evolved card exactly as it looks in the app: platinum face, dark mark, edge-lit rim, and two soft colour washes breathing in the corners. The washes are the only thing that changes from person to person. House card: periwinkle + green. Your card: your colour, both corners.</p>
+  <h1>Your Color — on the actual card</h1>
+  <p class="lede">Every card on this page is the app's real <code style="font-size:12px;opacity:.7">.daycard-ns</code> element, the same markup and the same three stylesheets the running app uses. Nothing is redrawn. The only thing that changes per person is <code style="font-size:12px;opacity:.7">--mm-hue</code>, the card's own hue-rotation variable, which the app already supports.</p>
+  <p class="miss" id="miss">The app stylesheets did not load. Open this page from the repo (mockups/) or the live mirror so <code>../memento-app/css/</code> resolves.</p>
 
-  <div class="sect">1 · The house card vs. yours</div>
+  <div class="sect">1 · The card as it ships, then as theirs</div>
   <div class="gen">
     <input id="nameIn" placeholder="Type a name…" value="Malik Peace" autocomplete="off">
     <div class="swatchline"><span class="swatch" id="sw"></span>
@@ -97,80 +77,104 @@
   </div>
   <div class="row" id="yourRow"></div>
 
-  <div class="sect">2 · The same card across the whole spectrum</div>
-  <p class="why">Eight names from eight regions of the wheel. Same platinum card, same rim, same mark, a different person every time.</p>
+  <div class="sect">2 · Eight people, one product</div>
+  <p class="why">Eight names, eight rotations around the wheel. Identical card, identical rim, identical mark. The light is the only thing that belongs to a person.</p>
   <div class="row" id="crowdRow"></div>
 
   <div class="sect">3 · The Founder card</div>
-  <p class="why">Two treatments, both numbered, both carrying their name and their colour. Platinum founder is the real card with the engraved number. Obsidian founder is the dark ceremony version, their colour as the only light. (Follows the generator above.)</p>
+  <p class="why">The same real card, numbered. Platinum keeps the shipped face; obsidian holds the platinum flood off so their colour is the only light in the room. (Both follow the generator.)</p>
   <div class="row" id="founderRow"></div>
 </div>
 
 <script>
-const MARK = '<svg class="m-mark" viewBox="140 136 232 240"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
-
-function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
-const FAMILIES=[
-  ['Ember',     354, 372, 80, 56],
-  ['Amber',      22,  38, 86, 54],
-  ['Solar',      44,  56, 88, 55],
-  ['Spring',     96, 132, 72, 52],
-  ['Emerald',   140, 162, 70, 48],
-  ['Deep Teal', 166, 186, 74, 50],
-  ['Glacier',   192, 210, 84, 58],
-  ['Azure',     212, 226, 82, 58],
-  ['Indigo',    228, 246, 74, 60],
-  ['Violet',    252, 276, 68, 60],
-  ['Magenta',   288, 318, 72, 56],
-  ['Rose',      326, 348, 76, 56],
-];
-function colorFor(name, forceBand){
-  const h=hash((name||'memento').trim().toLowerCase());
-  const fam=FAMILIES[forceBand!==undefined?forceBand:(h%FAMILIES.length)];
-  const hue=(fam[1] + (h>>>3)%(fam[2]-fam[1]))%360;
-  const sat=fam[3]+((h>>>9)%8)-4, lit=fam[4]+((h>>>13)%8)-4;
-  return {family:fam[0], hue,
-    css:`hsl(${hue} ${sat}% ${lit}%)`,
-    wash:`hsl(${hue} ${sat}% ${lit}% / .52)`,
-    washSoft:`hsl(${hue} ${sat}% ${Math.min(lit+10,72)}% / .38)`,
-    ink:`hsl(${hue} ${Math.min(sat,64)}% ${Math.max(lit-18,26)}% / .85)`,
-    inkL:`hsl(${hue} ${Math.min(sat,70)}% ${Math.min(lit+22,80)}% / .9)`,
-    glow:`hsl(${hue} ${sat}% ${lit}% / .3)`};
-}
-
-function card(o){
-  const style=Object.entries(o.vars||{}).map(([k,v])=>`${k}:${v}`).join(';');
-  return `<div class="slot ${o.cls||''}" ${style?`style="${style}"`:''}>
+/* The app's real card markup, lifted verbatim (same source as the unlock
+   renders). Levels are the app's own CSS variables. */
+function realCard(vars, opts){
+  const o = opts || {};
+  const style = Object.entries(vars).map(([k,v])=>`${k}:${v}`).join(';');
+  return `<div class="slot ${o.cls||''}">
     <p class="cap">${o.cap||''}</p>
-    <div class="m-stage">
-      <div class="m-halo"></div>
-      <div class="m-rimglow"></div>
-      <div class="m-card">
-        <div class="m-wash"><span class="w w1"></span><span class="w w2"></span></div>
-        ${MARK}
-        <div class="m-date">${o.date||'TODAY'}</div>
-        ${o.sub?`<div class="m-sub">${o.sub}</div>`:''}
-        <div class="m-foot">${o.name||''}</div>
-        <div class="m-rim"></div>
+    <div class="cage">
+      <div class="daycard-wrap daycard-theme-living daycard-reveal daycard--bright" style="${style}">
+        <span class="daycard-wrap__aura" aria-hidden="true"></span>
+        <div class="daycard-living-stage">
+          <span class="daycard-bloom" aria-hidden="true">
+            <i class="blob b1" style="transform:translate(7.62%,8%) scale(1.342)"></i>
+            <i class="blob b2" style="transform:translate(-21.48%,15.95%) scale(1.449)"></i>
+            <i class="blob b3" style="transform:translate(8.31%,-6.35%) scale(1.5)"></i>
+            <i class="blob b4" style="transform:translate(42.68%,-59.06%) scale(.966)"></i>
+            <i class="blob b5" style="transform:translate(-16.79%,-51.67%) scale(1.454)"></i>
+            <i class="blob b6"></i>
+          </span>
+          <div class="daycard-ns">
+            <span class="daycard-ns__liquid" aria-hidden="true">
+              <i class="blob b1" style="transform:translate(-15.04%,35.37%) scale(.702)"></i>
+              <i class="blob b2" style="transform:translate(-21.87%,31.55%) scale(1.07)"></i>
+              <i class="blob b3" style="transform:translate(46.1%,-54.39%) scale(.938)"></i>
+              <i class="blob b4" style="transform:translate(-4.37%,41.56%) scale(1.252)"></i>
+              <i class="blob b5" style="transform:translate(38.8%,50.27%) scale(1.293)"></i>
+              <i class="blob b6"></i>
+            </span>
+            <span class="daycard-ns__iri" aria-hidden="true"></span>
+            <span class="daycard-ns__sheen" aria-hidden="true"></span>
+            <span class="daycard-ns__burn" aria-hidden="true"></span>
+            <span class="daycard-ns__plat" aria-hidden="true"></span>
+            <span class="daycard-ns__tint" aria-hidden="true"></span>
+            <span class="daycard-ns__rim" aria-hidden="true"></span>
+            ${o.num?`<div class="num">${o.num}</div>`:''}
+            <div class="daycard-ns__body">
+              <svg class="daycard-ns__emblem" viewBox="0 0 512 512" aria-hidden="true">
+                <path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path>
+              </svg>
+            </div>
+            ${o.sub?`<div class="sub">${o.sub}</div>`:''}
+            <div class="daycard-ns__foot"><span class="daycard-ns__name">${o.name||''}</span></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>`;
 }
 
+function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+/* Twelve tuned bands around the whole wheel. The value stored is the ROTATION
+   applied to the card's shipped palette (the app's own --mm-hue), so every
+   layer, blobs, bloom, rim, floor, moves together and stays Memento-grade. */
+const FAMILIES=[
+  ['Ember',    130, 150], ['Amber',    160, 178], ['Solar',    182, 198],
+  ['Spring',   238, 262], ['Emerald',  272, 292], ['Deep Teal',300, 318],
+  ['Glacier',  330, 348], ['Azure',      0,  14], ['Indigo',    16,  32],
+  ['Violet',    40,  62], ['Magenta',   68,  92], ['Rose',      98, 124],
+];
+function colorFor(name, band){
+  const h=hash((name||'memento').trim().toLowerCase());
+  const fam=FAMILIES[band!==undefined?band:(h%FAMILIES.length)];
+  const rot=(fam[1] + (h>>>5)%(fam[2]-fam[1]))%360;
+  /* the swatch: the app's periwinkle accent, rotated the same amount */
+  const baseHue=231; // rgb(128,150,255)
+  const shown=(baseHue+rot)%360;
+  return {family:fam[0], rot, shown,
+    css:`hsl(${shown} 74% 62%)`,
+    ink:`hsl(${shown} 50% 34% / .8)`,
+    inkL:`hsl(${shown} 70% 74% / .85)`};
+}
+
+/* the shipped house levels: clarity + action + consistency all earned */
+const HOUSE={'--clar':'1','--act':'.52','--cons':'.92','--mix':'.6','--lit':'1','--glow':'.6','--emit':'.6','--ring':'.45','--sat':'1.9'};
+const lv=(extra)=>Object.assign({}, HOUSE, extra||{});
+
 function renderYour(){
   const name=document.getElementById('nameIn').value||'Memento';
   const c=colorFor(name);
   document.getElementById('sw').style.background=c.css;
-  document.getElementById('cname').textContent=`${c.family} ${c.hue}°`;
+  document.getElementById('cname').textContent=`${c.family} · rotate ${c.rot}°`;
   document.getElementById('chex').textContent=c.css;
   document.getElementById('yourRow').innerHTML =
-    card({cap:'The house card — periwinkle + green, everyone', name:'Memento'})
-    + card({cap:`Yours — ${c.family} ${c.hue}°, both washes`, name:name,
-        sub:`${c.family} ${c.hue}° · one of one`,
-        vars:{'--wash1':c.wash, '--wash2':c.washSoft, '--ink':c.ink}})
-    + card({cap:'Blend — your colour top, house green stays', name:name,
-        sub:`${c.family} ${c.hue}° · with the house green`,
-        vars:{'--wash1':c.wash, '--ink':c.ink}});
+    realCard(lv(), {cap:'The card as it ships — everyone', name:'Memento'})
+    + realCard(lv({'--mm-hue':c.rot+'deg'}), {cap:`Theirs — ${c.family}, the whole card rotated ${c.rot}°`,
+        name:name, sub:`${c.family} · one of one`})
+    + realCard(lv({'--mm-hue':c.rot+'deg','--sat':'2.6','--act':'.34'}), {cap:`Theirs, richer — same rotation, colour turned up`,
+        name:name, sub:`${c.family} · deep`});
   renderFounder(name, c);
 }
 
@@ -178,28 +182,29 @@ const CROWD=['Ava','Jordan Cole','Sofia M','Darius','Lena Park','Theo','Maya R',
 const BANDS=[0,2,3,5,7,8,10,11];
 document.getElementById('crowdRow').innerHTML = CROWD.map((n,i)=>{
   const c=colorFor(n, BANDS[i]);
-  return card({cap:`${n} — ${c.family} ${c.hue}°`, name:n,
-    sub:`${c.family} ${c.hue}°`,
-    vars:{'--wash1':c.wash, '--wash2':c.washSoft, '--ink':c.ink}});
+  return realCard(lv({'--mm-hue':c.rot+'deg'}), {cap:`${n} — ${c.family}`, name:n, sub:c.family});
 }).join('');
 
 function renderFounder(name, c){
-  const num=(hash(name.toLowerCase())%200+1).toString().padStart(3,'0');
+  const num=(hash(name.toLowerCase())%200+1).toString().padStart(3,'0')+' / 200';
   document.getElementById('founderRow').innerHTML =
-    card({cap:`A · Platinum founder — the real card, engraved ${num} / 200`,
-      name:name, date:`${num} / 200`, sub:'FOUNDER · ONE OF ONE',
-      vars:{'--wash1':c.wash, '--wash2':c.washSoft, '--ink':c.ink}})
-    + card({cls:'f-dark', cap:'B · Obsidian founder — their colour as the only light',
-      name:name, date:`${num} / 200`, sub:'FOUNDER · ONE OF ONE',
-      vars:{'--wash1':c.wash, '--wash2':c.washSoft, '--ink-l':c.inkL, '--glow':c.glow}})
-    + card({cls:'f-dark', cap:'C · Obsidian, no colour — pure black + number',
-      name:name, date:`${num} / 200`, sub:'FIRST TWO HUNDRED',
-      vars:{'--wash1':'rgba(236,239,255,.16)', '--wash2':'rgba(236,239,255,.10)',
-            '--ink-l':'rgba(226,229,236,.8)', '--glow':'rgba(240,245,252,.14)'}});
+    realCard(lv({'--mm-hue':c.rot+'deg'}),
+      {cap:'A · Platinum founder — the shipped card, engraved', name:name, num:num, sub:'Founder · one of one'})
+    + realCard(lv({'--mm-hue':c.rot+'deg','--sat':'2','--emit':'.8','--glow':'.8'}),
+      {cls:'f-dark', cap:'B · Obsidian founder — their colour is the only light',
+       name:name, num:num, sub:'Founder · one of one'})
+    + realCard(lv({'--clar':'.25','--act':'.2','--cons':'.2','--mix':'.15','--emit':'.35'}),
+      {cls:'f-dark', cap:'C · Obsidian, no colour — black and the number', name:name, num:num, sub:'First two hundred'});
 }
 
 document.getElementById('nameIn').addEventListener('input', renderYour);
 renderYour();
+
+/* honest failure: if the app CSS did not load, say so instead of showing junk */
+setTimeout(()=>{
+  const el=document.querySelector('.daycard-ns');
+  if(!el || getComputedStyle(el).position!=='relative'){ document.getElementById('miss').style.display='block'; }
+}, 400);
 </script>
 </body>
 </html>
