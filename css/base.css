@@ -807,8 +807,7 @@ body.calm-motion .ambient__orb,
 body.calm-motion .splash-blob,
 body.calm-motion .welcome-intro__btn--orbit,
 body.calm-motion .ai-progress__fill,
-body.calm-motion .streak-hero__num,
-body.calm-motion .memento-visual__beam {
+body.calm-motion .streak-hero__num {
   animation: none !important;
 }
 

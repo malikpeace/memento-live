@@ -1408,7 +1408,7 @@ body.calm-motion .welcome-intro__pillar-ground {
      gradient every frame) so the GPU isn't pegged the whole time. */
   .ambient__rays, .ambient__rays-source, .ambient__rays-beam, .ambient__rays-beam-shaft,
   .ambient__ns-bloom, .ambient__orb, .ambient__blob-bg, .apl-rays .ambient__rays-beam,
-  .splash-blob, .login__orb, .memento-visual__beam {
+  .splash-blob, .login__orb {
     animation: none !important;
     will-change: auto !important;
   }
@@ -2607,7 +2607,7 @@ body:has(.action-intake-page--cine) .fullscreen-close-global {
   .splash__rays { animation: none; }
   /* These reveal themselves via entrance animations. If motion is reduced,
      force them visible so the splash (and the tap prompt) never stays blank. */
-  .splash__swipe, .splash-wrap, .hyperblob { opacity: 1 !important; animation: none !important; }
+  .splash__swipe, .splash-wrap { opacity: 1 !important; animation: none !important; }
 }
 /* ── REVERT MARKER: SPLASH GOD RAYS END ── */
 
@@ -2741,23 +2741,6 @@ body:has(.action-intake-page--cine) .fullscreen-close-global {
   50% { opacity: 1; }
 }
 
-/* --- Hypercolor Blob --- */
-.hyperblob {
-  width: 320px;
-  height: 320px;
-  border-radius: 26%;
-  margin-bottom: -50px;
-  opacity: 0;
-  animation: splashTitleIn 1s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
-  filter: drop-shadow(0 0 22px rgba(120,150,255,0.22)) drop-shadow(0 0 56px rgba(96,118,255,0.14));
-}
-.memento-icon__energy {
-  animation: memEnergyPulse 4s ease-in-out infinite;
-}
-@keyframes memEnergyPulse {
-  0%, 100% { opacity: 0.55; }
-  50%      { opacity: 0.95; }
-}
 
 /* --- Minimal Glass Landing Scene --- */
 .splash__scene {
@@ -2789,10 +2772,6 @@ body:has(.action-intake-page--cine) .fullscreen-close-global {
 @keyframes splashTitleIn {
   0% { opacity: 0; transform: scale(0.85); filter: blur(8px); }
   100% { opacity: 1; transform: scale(1); filter: blur(0); }
-}
-@keyframes splashBlobOut {
-  0% { opacity: 1; transform: scale(1); }
-  100% { opacity: 0; transform: scale(0.96); }
 }
 @keyframes splashSwipeIn {
   from { opacity: 0; transform: translateY(10px); }
@@ -2835,10 +2814,6 @@ body:has(.action-intake-page--cine) .fullscreen-close-global {
 }
 .splash__title-word { display: inline-block; }
 
-.hyperblob {
-  transition: opacity 0.58s ease var(--t-base), transform 0.72s cubic-bezier(0.16, 1, 0.3, 1) var(--t-base), filter 0.72s ease var(--t-base);
-}
-
 /* Premium dismiss: the hint ("tap to continue") drops out immediately, then
    the wordmark follows a beat later. */
 .splash--exiting .splash__title {
@@ -2846,9 +2821,6 @@ body:has(.action-intake-page--cine) .fullscreen-close-global {
   filter: blur(8px);
   transform: translateY(-6px);
   transition: opacity 0.85s ease var(--t-slow), filter 0.85s ease var(--t-slow), transform 0.85s ease var(--t-slow);
-}
-.splash--exiting .hyperblob {
-  animation: splashBlobOut 2s ease forwards;
 }
 .splash--exiting .splash__swipe {
   opacity: 0;
@@ -2861,17 +2833,6 @@ body:has(.action-intake-page--cine) .fullscreen-close-global {
   animation: none !important;
 }
 
-/* Shrink-to-welcome: blob shrinks from 320px to 80px, text fades */
-.splash--to-welcome .hyperblob {
-  width: 80px;
-  height: 80px;
-  transition: width 0.7s cubic-bezier(0.16, 1, 0.3, 1),
-              height 0.7s cubic-bezier(0.16, 1, 0.3, 1),
-              filter 0.7s ease,
-              border-radius 0.7s ease;
-  border-radius: 22%;
-  filter: drop-shadow(0 0 18px rgba(120,150,255,0.3));
-}
 .splash--to-welcome .splash__title {
   opacity: 0;
   filter: blur(8px);

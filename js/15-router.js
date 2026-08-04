@@ -115,7 +115,7 @@
   // never create a history entry, or the iOS edge swipe "goes back" through old
   // tabs from the Home page. Tab -> tab is a REPLACE; only genuinely deeper
   // screens (modules, experiences, paywall) push and get back-to-close.
-  var TAB_SLUGS = { home: 1, path: 1, reflect: 1, profile: 1, memento: 1 };
+  var TAB_SLUGS = { home: 1, path: 1, reflect: 1, profile: 1 };
 
   function reconcile() {
     if (!routerEnabled() || R.navLock) return;
@@ -199,7 +199,7 @@
       else if (slug === 'clarity') { if (typeof exitToModules === 'function') exitToModules('clarity'); }
       else if (slug === 'action') { if (typeof exitToModules === 'function') exitToModules('action'); }
       else if (slug.indexOf('m/') === 0) { if (typeof Sheet !== 'undefined') Sheet.close(); }
-      else if (slug === 'profile' || slug === 'memento') { if (typeof TabBar !== 'undefined') TabBar.switchTo('home'); }
+      else if (slug === 'profile') { if (typeof TabBar !== 'undefined') TabBar.switchTo('home'); }
     } catch (e) {}
     // release the lock after the close animation settles
     setTimeout(function () { R.navLock = false; }, 360);
@@ -218,10 +218,6 @@
         resolved = 'home';
       } else if (slug === 'profile') {
         if (typeof TabBar !== 'undefined') TabBar.switchTo('profile'); resolved = 'profile';
-      } else if (slug === 'memento') {
-        // desktop: trinity panel. mobile: resolves to modules switcher.
-        if (typeof TabBar !== 'undefined') TabBar.switchTo('memento');
-        resolved = currentTopSlug();
       } else if (slug === 'modules') {
         if (typeof MoreSpace !== 'undefined') MoreSpace.open({ mode: 'switcher' });
         resolved = currentTopSlug();

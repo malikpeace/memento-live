@@ -2635,18 +2635,6 @@ const CreatorTools = {
   }
 };
 
-const MementoVisual = {
-  blob: null,
-  destroy() {
-    if (this.blob && this.blob.stop) this.blob.stop();
-    this.blob = null;
-  },
-  init() {
-    this.destroy();
-    this.blob = initMiniBlob('mementoGlyph', 84);
-  }
-};
-
 /* ============================================
    DAILY COMMAND CENTER
    The "what do I do right now" front door: one premium card above the dashboard

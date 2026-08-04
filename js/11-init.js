@@ -506,19 +506,6 @@ function initMiniBlob(canvasId, size) {
   return { stop: () => cancelAnimationFrame(animId) };
 }
 
-// Splash blob - use shared initMiniBlob
-(function() {
-  const blob = initMiniBlob('hyperblob', 320);
-  if (!blob) return;
-  const splashEl = document.getElementById('splash');
-  const observer = new MutationObserver(() => {
-    if (splashEl.classList.contains('dismissed')) {
-      blob.stop();
-      observer.disconnect();
-    }
-  });
-  observer.observe(splashEl, { attributes: true, attributeFilter: ['class'] });
-})();
 
 // Star blob initializer (circular version of hyperblob)
 function initStarBlob(canvas, size = 240, variant) {

@@ -4147,8 +4147,6 @@ const Sidebar = {
         const el = this.el.querySelector('.sidebar__nav-item[data-nav="' + nav + '"]');
         if (el) el.style.display = clarityDone ? '' : 'none';
       });
-      const mementoNav = this.el.querySelector('.sidebar__nav-item[data-tab="memento"]');
-      if (mementoNav) mementoNav.style.display = clarityDone ? '' : 'none';
 
       // Today's action quick view.
       const todaySection = document.getElementById('sidebarTodaySection');
@@ -4564,29 +4562,6 @@ const TabBar = {
       try { if (window.Spotlight && window.Spotlight.open) window.Spotlight.open(); } catch (e) {}
       return;
     }
-    // Middle tab, MOBILE: acts as a Modules switcher (opens the MoreSpace sheet
-    // listing every module) instead of the decorative trinity panel. The sheet
-    // is an overlay, so the tab does not become active; Home stays underneath.
-    // Desktop keeps the original behavior via the sidebar (sidebar-active).
-    // Note: the bar is position:fixed, so offsetParent is always null; use
-    // getClientRects (fixed-safe) to detect whether the bar is actually shown.
-    const barVisible = (() => { try { const el = document.querySelector('.tab-bar'); return !!(el && el.getClientRects().length && getComputedStyle(el).display !== 'none'); } catch (e) { return false; } })();
-    if (tabId === 'memento' && barVisible) {
-      try { MoreSpace.open({ mode: 'switcher' }); } catch (e) {}
-      return;
-    }
-    // Desktop guard: the trinity panel is only meaningful after the user has
-    // done SOMETHING; before that, tapping it dumps them into an empty glyph.
-    if (tabId === 'memento') {
-      const hasAny = !!(
-        state.clarity?.completed ||
-        state.action?.planGenerated ||
-        (state.streak?.history || []).length > 0 ||
-        (state.streak?.count || 0) > 0
-      );
-      if (!hasAny) return; // do nothing
-    }
-
     this.activeTab = tabId;
     // Refresh-survival: a non-home tab is a place worth restoring. Never
     // overwrite a module/experience view (they own lastView while open).
@@ -4609,15 +4584,14 @@ const TabBar = {
     if (welcomeOverlay) welcomeOverlay.remove();
 
     const app = document.getElementById('app');
-    const panels = ['memento', 'path', 'reflect', 'profile'];
+    const panels = ['path', 'reflect', 'profile'];
     const getPanel = (p) => document.getElementById('panel' + p.charAt(0).toUpperCase() + p.slice(1));
 
     if (tabId === 'home') {
       // Home is the base layer under the panels; reveal it, then fade the active
-      // panel out over it (crossfade). Destroy the WebGL glyph AFTER the fade so
-      // the memento panel does not blank mid-transition.
+      // panel out over it (crossfade).
       app.style.display = '';
-      panels.forEach(p => this._hidePanel(getPanel(p), p === 'memento' ? () => MementoVisual.destroy() : null));
+      panels.forEach(p => this._hidePanel(getPanel(p)));
     } else {
       // Keep home painted UNDER the incoming panel during the fade, then stop it
       // once the (opaque) panel is fully shown.
@@ -4630,7 +4604,7 @@ const TabBar = {
           this.renderPanel(p);
           this._showPanel(panel);
         } else {
-          this._hidePanel(panel, p === 'memento' ? () => MementoVisual.destroy() : null);
+          this._hidePanel(panel);
         }
       });
       // v694 (Malik): hide the home SYNCHRONOUSLY. The 230ms grace timer served
@@ -4669,53 +4643,11 @@ const TabBar = {
   },
 
   renderPanel(panelId) {
-    const mementoInner = document.querySelector('#panelMemento .tab-panel__inner');
-    if (mementoInner) mementoInner.classList.remove('tab-panel__inner--memento');
     switch (panelId) {
-      case 'memento': this.renderMemento(); break;
       case 'path': if (typeof renderPathTab === 'function') renderPathTab(); break;
       case 'reflect': if (typeof renderReflectTab === 'function') renderReflectTab(); break;
       case 'profile': this.renderProfile(); break;
     }
-  },
-
-  renderMemento() {
-    const body = document.getElementById('mementoBody');
-    const panelInner = document.querySelector('#panelMemento .tab-panel__inner');
-    if (panelInner) panelInner.classList.add('tab-panel__inner--memento');
-    const summary = normalizeClaritySummary(state.clarity.answers);
-    const _tp = (state.action && state.action.todayPlan) || {};
-    const actionStarted = !!(
-      (_tp.deepWork || '').trim() ||
-      (_tp.proofTask || '').trim() ||
-      (_tp.tinyUpgrade || '').trim() ||
-      _tp.proofDone ||
-      _tp.tinyDone ||
-      _tp.deepWorkDone ||
-      (state.action.sprint || []).some(s => s.done)
-    );
-    const consistencyStarted = (state.streak.history || []).length > 0 || (state.streak.count || 0) > 0;
-
-    body.innerHTML = `
-      <div class="memento-flow">
-        <div class="memento-visual">
-          <div class="memento-visual__glow"></div>
-          <div class="memento-visual__icon-wrap">
-            <!-- LEGACY hyperblob canvas (kept for restore): <canvas class="memento-visual__icon" id="mementoGlyph" width="84" height="84"></canvas> -->
-            ${mementoMemorialSVG({ id: 'mementoGlyph', className: 'memento-visual__icon', size: 84 })}
-          </div>
-          <div class="memento-visual__beam memento-visual__beam--clarity ${state.clarity.completed ? 'is-on' : 'is-preview'}"></div>
-          <div class="memento-visual__beam memento-visual__beam--action ${actionStarted ? 'is-on' : 'is-preview'}"></div>
-          <div class="memento-visual__beam memento-visual__beam--consistency ${consistencyStarted ? 'is-on' : 'is-preview'}"></div>
-          <div class="memento-visual__hover" id="mementoHoverCard">
-            <div class="memento-visual__hover-label">Memento</div>
-            <div class="memento-visual__hover-copy">${esc(summary.neutronStar || summary.heroWhy || summary.coreWhy || 'This is where Clarity, Action, and Consistency come together.')}</div>
-          </div>
-          <div class="memento-visual__caption">Clarity • Action • Consistency</div>
-        </div>
-      </div>
-    `;
-    setTimeout(() => MementoVisual.init(), 40);
   },
 
   // Glass-styled Preferences block (accent swatches + reduce-motion +

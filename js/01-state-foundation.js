@@ -7,7 +7,7 @@
    ONCE on mismatch. Kills the "phone silently runs old cached js under a new
    index" class (the SW's offline fallback can serve stale files on a bad
    connection; Malik hit this three times in one day). */
-window.MEMENTO_JS_BUILD = 'v1111';
+window.MEMENTO_JS_BUILD = 'v1112';
 /* ============================================
    STATE MANAGEMENT
    ============================================ */
@@ -2333,111 +2333,6 @@ const ICONS = {
   checkin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2.5-6 5 12 2.5-6h4"/></svg>'
 };
 
-// Memento memorial icon - used on splash, welcome intro, and dashboard glyph.
-// Returns SVG markup. Each call uses a unique suffix on gradient IDs to avoid
-// collisions when multiple instances live in the DOM at once.
-let __memIconSeed = 0;
-function mementoMemorialSVG(opts) {
-  opts = opts || {};
-  const id = opts.id ? ` id="${opts.id}"` : '';
-  const cls = opts.className ? ` class="${opts.className}"` : '';
-  const size = opts.size ? ` width="${opts.size}" height="${opts.size}"` : '';
-  const s = '_' + (++__memIconSeed);
-  return `<svg${id}${cls}${size} viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <defs>
-      <linearGradient id="memLit${s}" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#c4f6ff"/><stop offset="45%" stop-color="#a3f1ff"/><stop offset="100%" stop-color="#7d92ff"/>
-      </linearGradient>
-      <linearGradient id="memShadow${s}" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#7ac8d6"/><stop offset="45%" stop-color="#6bb7c4"/><stop offset="100%" stop-color="#3a5aa8"/>
-      </linearGradient>
-      <linearGradient id="memPedTop${s}" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#d4f9ff"/><stop offset="100%" stop-color="#a4f1ff"/>
-      </linearGradient>
-      <linearGradient id="memPedFront${s}" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#8aedff"/><stop offset="100%" stop-color="#5a78e0"/>
-      </linearGradient>
-      <linearGradient id="memPedSide${s}" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#59a7b5"/><stop offset="100%" stop-color="#3a4ea0"/>
-      </linearGradient>
-      <linearGradient id="memRingGrad${s}" x1="0" y1="0" x2="1" y2="0.6">
-        <stop offset="0%" stop-color="#84edff"/><stop offset="55%" stop-color="#7debff"/><stop offset="100%" stop-color="#5dc7ff"/>
-      </linearGradient>
-      <filter id="memRingGlow${s}" x="-60%" y="-60%" width="220%" height="220%">
-        <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="b1"/>
-        <feGaussianBlur in="SourceGraphic" stdDeviation="14" result="b2"/>
-        <feMerge><feMergeNode in="b2"/><feMergeNode in="b1"/><feMergeNode in="SourceGraphic"/></feMerge>
-      </filter>
-      <filter id="memObeliskGlow${s}" x="-30%" y="-30%" width="160%" height="160%">
-        <feGaussianBlur in="SourceGraphic" stdDeviation="1.2" result="b"/>
-        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-      </filter>
-    </defs>
-    <path class="memento-icon__energy" d="M 160 78 L 147 112 L 143 232 L 132 232 L 132 246 L 120 246 L 120 258 L 200 258 L 200 246 L 188 246 L 188 232 L 177 232 L 173 112 Z" fill="none" stroke="url(#memRingGrad${s})" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" filter="url(#memRingGlow${s})" opacity="0.7"/>
-    <g filter="url(#memObeliskGlow${s})">
-      <path d="M160 78 L147 112 L143 232 L160 232 Z" fill="url(#memLit${s})"/>
-      <path d="M160 78 L173 112 L177 232 L160 232 Z" fill="url(#memShadow${s})"/>
-      <path d="M132 232 L188 232 L185 228 L135 228 Z" fill="url(#memPedTop${s})"/>
-      <path d="M132 232 L188 232 L188 246 L132 246 Z" fill="url(#memPedFront${s})"/>
-      <path d="M188 232 L185 228 L185 242 L188 246 Z" fill="url(#memPedSide${s})"/>
-      <path d="M120 246 L200 246 L197 242 L123 242 Z" fill="url(#memPedTop${s})"/>
-      <path d="M120 246 L200 246 L200 258 L120 258 Z" fill="url(#memPedFront${s})"/>
-      <path d="M200 246 L197 242 L197 254 L200 258 Z" fill="url(#memPedSide${s})"/>
-    </g>
-  </svg>`;
-}
-
-// Colored variant of the memorial icon - pillar pages use this tinted to their hue.
-function coloredMemorialSVG(hexColor, opts) {
-  opts = opts || {};
-  const size = opts.size ? ` width="${opts.size}" height="${opts.size}"` : '';
-  const vb = opts.viewBox || '0 0 320 320';
-  const s = '_p' + (++__memIconSeed);
-  return `<svg${size} viewBox="${vb}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <defs>
-      <linearGradient id="memLit${s}" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="${hexColor}" stop-opacity="1"/>
-        <stop offset="100%" stop-color="${hexColor}" stop-opacity="0.7"/>
-      </linearGradient>
-      <linearGradient id="memShadow${s}" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="${hexColor}" stop-opacity="0.55"/>
-        <stop offset="100%" stop-color="${hexColor}" stop-opacity="0.32"/>
-      </linearGradient>
-      <linearGradient id="memPedTop${s}" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="${hexColor}" stop-opacity="1"/>
-        <stop offset="100%" stop-color="${hexColor}" stop-opacity="0.8"/>
-      </linearGradient>
-      <linearGradient id="memPedFront${s}" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="${hexColor}" stop-opacity="0.85"/>
-        <stop offset="100%" stop-color="${hexColor}" stop-opacity="0.55"/>
-      </linearGradient>
-      <linearGradient id="memPedSide${s}" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="${hexColor}" stop-opacity="0.45"/>
-        <stop offset="100%" stop-color="${hexColor}" stop-opacity="0.28"/>
-      </linearGradient>
-      <filter id="memRingGlow${s}" x="-60%" y="-60%" width="220%" height="220%">
-        <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="b1"/>
-        <feGaussianBlur in="SourceGraphic" stdDeviation="14" result="b2"/>
-        <feMerge><feMergeNode in="b2"/><feMergeNode in="b1"/><feMergeNode in="SourceGraphic"/></feMerge>
-      </filter>
-      <filter id="memObeliskGlow${s}" x="-30%" y="-30%" width="160%" height="160%">
-        <feGaussianBlur in="SourceGraphic" stdDeviation="1.2" result="b"/>
-        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-      </filter>
-    </defs>
-    <path d="M 160 78 L 147 112 L 143 232 L 132 232 L 132 246 L 120 246 L 120 258 L 200 258 L 200 246 L 188 246 L 188 232 L 177 232 L 173 112 Z" fill="none" stroke="${hexColor}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" filter="url(#memRingGlow${s})" opacity="0.7"/>
-    <g filter="url(#memObeliskGlow${s})">
-      <path d="M160 78 L147 112 L143 232 L160 232 Z" fill="url(#memLit${s})"/>
-      <path d="M160 78 L173 112 L177 232 L160 232 Z" fill="url(#memShadow${s})"/>
-      <path d="M132 232 L188 232 L185 228 L135 228 Z" fill="url(#memPedTop${s})"/>
-      <path d="M132 232 L188 232 L188 246 L132 246 Z" fill="url(#memPedFront${s})"/>
-      <path d="M188 232 L185 228 L185 242 L188 246 Z" fill="url(#memPedSide${s})"/>
-      <path d="M120 246 L200 246 L197 242 L123 242 Z" fill="url(#memPedTop${s})"/>
-      <path d="M120 246 L200 246 L200 258 L120 258 Z" fill="url(#memPedFront${s})"/>
-      <path d="M200 246 L197 242 L197 254 L200 258 Z" fill="url(#memPedSide${s})"/>
-    </g>
-  </svg>`;
-}
 
 const ACTION_ICON_SOURCE = 'data:image/png;base64,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';
 let _actionIconImagePromise = null;
