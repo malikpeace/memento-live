@@ -5022,6 +5022,12 @@ function _evoFinish(wrap, onDone, opts) {
   // the grow vars so the card sits exactly at its resting spot.
   wrap = document.querySelector('#dayCard .daycard-wrap') || wrap;
   try { if (wrap) { wrap.style.removeProperty('--evo-sc'); wrap.style.removeProperty('--evo-ty'); } } catch (e) {}
+  // v1109: release the cinema's size freeze so the card returns to the live
+  // computed geometry. Belt: clear it on every stage in the document, so an
+  // interrupted or superseded run can never leave a card pinned.
+  try {
+    document.querySelectorAll('.daycard-wrap').forEach((el) => el.style.removeProperty('--evo-card-w'));
+  } catch (e) {}
   // Land on the lit end state: a dev hold keeps its staged look, a real run
   // returns to live data (and the beams marker ns-bloom for a star user).
   if (opts.holdOverride) { window._evoStageOverride = opts.holdOverride; window._evoHold = true; }
@@ -5220,14 +5226,41 @@ function _runClarityUnlockCinema(onDone, opts) {
   // stale and the card flew to a target computed from a layout that no longer
   // existed. The measurement is now a function, run again at GROW time, 0.9s
   // in, when the room is clear and the layout is final.
-  const _evoMeasure = () => {
+  // pin=true FREEZES the card's rendered size for the rest of the cinema.
+  // Since v1108 the card's width is computed from its container's height, and
+  // this cinema deliberately flips the home layout under it (ns-bloom at fill
+  // time). Without the freeze the card kept growing AFTER the scale was set,
+  // landing 20px off each edge (Malik: "the action evolution is a bit wacky").
+  // Inline styles, so there is no specificity fight, and _evoFinish clears
+  // them, so nothing about the resting card can inherit this.
+  const _evoMeasure = (pin) => {
     try {
-      const r = wrap.getBoundingClientRect();
+      // v1109: measure the VISIBLE CARD, not the wrap. The transform is applied
+      // to the wrap, but the wrap is a full-size flex box and the card sits
+      // inside it, so scaling by the wrap's dimensions overshot: at 430x932 the
+      // wrap measured 601 tall against a 497 card, the height constraint won,
+      // and the grown card ran 20px off each side (Malik's screenshot). Since
+      // v1108 the card's size is computed independently of its box, so the two
+      // are no longer interchangeable. Scale comes from the card; the offset
+      // maps the CARD's centre to the screen's centre THROUGH the wrap's
+      // transform origin, so it is correct even if the card is not centred in
+      // its wrap.
+      const wrapR = wrap.getBoundingClientRect();
+      const stage = wrap.querySelector('.daycard-living-stage')
+                 || wrap.querySelector('.daycard-ns') || wrap;
+      const r = stage.getBoundingClientRect();
       const vw = window.innerWidth, vh = window.innerHeight;
       const sc = Math.min((vw * 0.94) / Math.max(r.width, 1), (vh * 0.86) / Math.max(r.height, 1), 1.6);
-      const ty = (vh / 2) - (r.top + r.height / 2);
+      const originY = wrapR.top + wrapR.height / 2;   // scale pivots here
+      const cardY = r.top + r.height / 2;
+      const ty = (vh / 2) - originY - (cardY - originY) * sc;
       wrap.style.setProperty('--evo-sc', sc.toFixed(4));
       wrap.style.setProperty('--evo-ty', ty.toFixed(1) + 'px');
+      // Freeze via an inherited CUSTOM PROPERTY, never inline geometry: writing
+      // width/height straight onto the stage mutated layout mid-cinema and the
+      // run bailed out ~400ms in. The stage's own width formula reads this var
+      // when present, so the size simply stops depending on the container.
+      if (pin) wrap.style.setProperty('--evo-card-w', Math.round(r.width) + 'px');
     } catch (e) {}
   };
   _evoMeasure();
@@ -5246,7 +5279,7 @@ function _runClarityUnlockCinema(onDone, opts) {
   const tShrink = tSettle + SETTLE;                     // ~7.2s
   const tFinish = tShrink + SHRINK + 100;               // ~8.45s
   T.push(setTimeout(() => {                     // THE GROW: card rises near full screen
-    _evoMeasure();                              // v1104: from the LIVE rect, not the arm-time one
+    _evoMeasure(true);            // v1104: from the LIVE rect; v1109: and freeze it
     document.body.classList.add('evo2-grow');
   }, tGrow));
   T.push(setTimeout(() => {                     // THE FILL: rise to the earned state
@@ -5265,13 +5298,18 @@ function _runClarityUnlockCinema(onDone, opts) {
     // rode the shift down-screen. Measure the on-screen top across the flip and
     // fold the delta back into --evo-ty in the same frame (transition off), so
     // the card visually stays pinned at center.
-    const _beforeTop = (() => { try { return wrap.getBoundingClientRect().top; } catch (e) { return null; } })();
+    // v1109: track the CARD across the layout flip, not its wrapper. The wrap
+    // is a flex box whose own height changes when ns-bloom lands, so folding
+    // the wrap's delta back left the (now size-frozen) card sitting 66px below
+    // centre. The card is what the eye is on, so the card is what stays put.
+    const _evoTracked = wrap.querySelector('.daycard-living-stage') || wrap;
+    const _beforeTop = (() => { try { return _evoTracked.getBoundingClientRect().top; } catch (e) { return null; } })();
     document.body.classList.add('ns-bloom');
     document.body.classList.add('evo2-surge');   // fades the resting liquid in (opacity only)
     try {
       if (_beforeTop !== null) {
         void document.body.offsetWidth;
-        const delta = wrap.getBoundingClientRect().top - _beforeTop;
+        const delta = _evoTracked.getBoundingClientRect().top - _beforeTop;
         if (Math.abs(delta) > 1) {
           const prevTrans = wrap.style.transition;
           wrap.style.transition = 'none';

@@ -3790,8 +3790,13 @@ body.pre-clarity .capture-fab { display: none !important; }
      everywhere, by construction. */
   body .app.dash-v2 #homePage1 > #dayCard { container-type: size; }
   body .app.dash-v2 #homePage1 #dayCard .daycard-theme-living .daycard-living-stage {
-    width: min(var(--p1-card-w), calc(100cqh * 320 / 452)) !important;
+    width: var(--evo-card-w, min(var(--p1-card-w), calc(100cqh * 320 / 452))) !important;
     height: auto !important; min-height: 0 !important;
+    /* v1109: the wrap is a COLUMN flex box, so the stage is a flex item on the
+       vertical axis and flex-shrink was squashing its height (164 instead of
+       the 215 the ratio asks for, a 1.08 card). Nothing may shrink it: the
+       width formula already guarantees it fits. */
+    flex: none !important;
     aspect-ratio: 320 / 452 !important;
     max-width: none !important; min-width: 0 !important;
     margin: 0 auto !important;
@@ -3838,8 +3843,9 @@ body.pre-clarity .capture-fab { display: none !important; }
   }
   body .app.dash-v2 #homePage1 > #dayCard { container-type: size; }
   body .app.dash-v2 #homePage1 #dayCard .daycard-theme-living .daycard-living-stage {
-    width: min(40vw, calc(100cqh * 320 / 452)) !important;
+    width: var(--evo-card-w, min(40vw, calc(100cqh * 320 / 452))) !important;
     height: auto !important; min-height: 0 !important;
+    flex: none !important;
     aspect-ratio: 320 / 452 !important;
     max-width: none !important; min-width: 0 !important;
     margin: 0 !important;
