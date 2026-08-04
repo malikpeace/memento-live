@@ -1553,6 +1553,213 @@ let actionStreamPreview = null;
 function actionStreamPreviewGet() { return actionStreamPreview; }
 function actionStreamPreviewSet(v) { actionStreamPreview = v; }
 
+// A hosted paid Action plan is handed to a private server job before the
+// browser waits for it. The job survives iOS suspending or closing the PWA.
+// The small receipt below is part of normal synced state, so reopening this
+// device or another signed-in device resumes the same paid request.
+function actionBackgroundSupported() {
+  try {
+    return !getAnthropicKey()
+      && !!window.MEMENTO_SUPABASE_URL
+      && !!(window.CloudSync && CloudSync.accessToken && CloudSync.accessToken());
+  } catch (e) { return false; }
+}
+
+function actionBackgroundId() {
+  try { if (crypto && crypto.randomUUID) return crypto.randomUUID(); } catch (e) {}
+  const b = new Uint8Array(16);
+  try { crypto.getRandomValues(b); } catch (e) { for (let i = 0; i < b.length; i++) b[i] = Math.floor(Math.random() * 256); }
+  b[6] = (b[6] & 15) | 64;
+  b[8] = (b[8] & 63) | 128;
+  const h = Array.from(b).map(v => v.toString(16).padStart(2, '0')).join('');
+  return h.slice(0, 8) + '-' + h.slice(8, 12) + '-' + h.slice(12, 16) + '-' + h.slice(16, 20) + '-' + h.slice(20);
+}
+
+async function actionBackgroundHash(value) {
+  const bytes = new TextEncoder().encode(String(value || ''));
+  const digest = await crypto.subtle.digest('SHA-256', bytes);
+  return Array.from(new Uint8Array(digest)).map(v => v.toString(16).padStart(2, '0')).join('');
+}
+
+function actionBackgroundInputStamp() {
+  try {
+    const source = {
+      clarity: state.clarity && state.clarity.answers,
+      intake: state.action && state.action.intake,
+      history: state.action && state.action.completionHistory,
+      profile: state.profile,
+      goals: state.goals
+    };
+    const s = JSON.stringify(source);
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return (h >>> 0).toString(16).padStart(8, '0');
+  } catch (e) { return ''; }
+}
+
+function actionBackgroundPending() {
+  try {
+    const p = state.action && state.action.backgroundGeneration;
+    return p && typeof p === 'object' ? p : null;
+  } catch (e) { return null; }
+}
+
+function actionBackgroundSave(pending) {
+  state.action = state.action || {};
+  state.action.backgroundGeneration = pending;
+  persistNow();
+}
+
+function actionBackgroundClear(generationId) {
+  const pending = actionBackgroundPending();
+  if (!pending || (generationId && pending.generationId !== generationId)) return;
+  delete state.action.backgroundGeneration;
+  persistNow();
+}
+
+function actionBackgroundRequestBody(messages, systemPrompt, options, stream) {
+  const body = {
+    model: options.model || ANTHROPIC_MODEL,
+    max_tokens: options.maxTokens || 2048,
+    system: systemPrompt || '',
+    messages: messages
+  };
+  if (options.cache) body.cache = true;
+  if (options.thinking && options.thinking.budget_tokens) {
+    body.thinking = { type: 'enabled', budget_tokens: options.thinking.budget_tokens };
+  }
+  if (options.thinking === 'off') body.thinking = { type: 'disabled' };
+  if (stream) body.stream = true;
+  return body;
+}
+
+async function actionBackgroundFetch(payload) {
+  let supaUrl = '', supaAnon = '', token = '';
+  try {
+    supaUrl = window.MEMENTO_SUPABASE_URL || '';
+    supaAnon = window.MEMENTO_SUPABASE_ANON || '';
+    token = window.CloudSync && CloudSync.accessToken ? String(CloudSync.accessToken() || '') : '';
+  } catch (e) {}
+  if (!supaUrl || !supaAnon || !token) throw new Error('Sign in to use paid Memento AI.');
+  let lastError = null;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+    try {
+      return await fetch(supaUrl + '/functions/v1/action-ai-proxy', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token,
+          'apikey': supaAnon,
+          'x-memento-device': (typeof Analytics !== 'undefined' && Analytics.deviceId) ? Analytics.deviceId() : 'unknown'
+        },
+        body: JSON.stringify(payload),
+        signal: controller.signal
+      });
+    } catch (e) {
+      lastError = e;
+      if (attempt < 2) await new Promise(resolve => setTimeout(resolve, 700));
+    } finally { clearTimeout(timeoutId); }
+  }
+  throw lastError || new Error('The Action job could not be reached.');
+}
+
+async function actionBackgroundResult(messages, systemPrompt, options, onProgress, stream) {
+  const meta = options.backgroundActionJob;
+  if (!meta || !meta.generationId || !meta.requestKey || !meta.contextKey) {
+    throw new Error('Action job receipt is missing.');
+  }
+  const statusPayload = {
+    job_action: 'status',
+    generation_id: meta.generationId,
+    request_key: meta.requestKey
+  };
+  let response = await actionBackgroundFetch(statusPayload);
+  if (response.status === 404) {
+    response = await actionBackgroundFetch({
+      job_action: 'start',
+      generation_id: meta.generationId,
+      request_key: meta.requestKey,
+      job_kind: meta.kind,
+      context_key: meta.contextKey,
+      request: actionBackgroundRequestBody(messages, systemPrompt, options, stream)
+    });
+  }
+  if (!response.ok) {
+    const body = await response.text();
+    if (response.status === 409) throw new Error('Another Action plan is already finishing. Reopen Memento in a moment.');
+    if (response.status === 403) throw new Error('Paid Memento access is required for this step.');
+    if (response.status === 429) throw new Error('Rate limited. Wait a moment and try again.');
+    throw new Error('API error (' + response.status + '): ' + body.substring(0, 160));
+  }
+
+  const deadline = Date.now() + 240000;
+  let lastProgress = '';
+  for (;;) {
+    let data;
+    try { data = await response.json(); } catch (e) { data = null; }
+    const job = data && data.job;
+    if (!job || job.generation_id !== meta.generationId
+        || job.request_key !== meta.requestKey
+        || job.context_key !== meta.contextKey) {
+      actionBackgroundClear(meta.generationId);
+      throw new Error('The Action job receipt did not match this plan.');
+    }
+    if (job.progress && job.progress !== lastProgress) {
+      lastProgress = job.progress;
+      if (onProgress) try { onProgress(lastProgress); } catch (e) {}
+    }
+    if (job.status === 'succeeded') return job.result;
+    if (job.status === 'failed' && (!job.retryable || Number(job.attempts) >= 3)) {
+      const terminalError = new Error(job.error_code === 'timeout'
+        ? 'The AI request timed out. Please try again.'
+        : 'The AI service could not finish that plan. Please try again.');
+      terminalError.actionJobTerminal = true;
+      throw terminalError;
+    }
+    if (Date.now() >= deadline) throw new Error('The plan is still finishing. Close Memento and reopen it in a moment.');
+    await new Promise(resolve => setTimeout(resolve, 1200));
+    response = await actionBackgroundFetch(statusPayload);
+    if (!response.ok) throw new Error('The plan status could not be checked. Reopen Memento in a moment.');
+  }
+}
+
+async function actionBackgroundText(messages, systemPrompt, options, onProgress, stream) {
+  const result = await actionBackgroundResult(messages, systemPrompt, options, onProgress, stream);
+  const blocks = result && Array.isArray(result.content) ? result.content : [];
+  const textBlock = blocks.find(b => b && b.type === 'text' && typeof b.text === 'string');
+  if (!textBlock) throw new Error('The AI returned an empty response. Please try again.');
+  const cleaned = textBlock.text.replace(EMDASH_RE, ' - ');
+  if (!options._voiceRetry) {
+    const hits = voiceLint(cleaned);
+    if (hits.length) {
+      const retryOptions = Object.assign({}, options, {
+        _voiceRetry: true,
+        noProfile: true,
+        backgroundActionJob: Object.assign({}, options.backgroundActionJob, {
+          requestKey: options.backgroundActionJob.requestKey + '.voice'
+        })
+      });
+      try {
+        const retried = await callClaude(
+          messages.concat([
+            { role: 'assistant', content: cleaned },
+            { role: 'user', content: 'Your last reply used banned phrasing (see the VOICE rules in your instructions): ' + hits.join('; ') + '. Rewrite the ENTIRE reply with those phrases replaced, changing nothing else. Keep the exact same format and structure (if it was JSON, return the same JSON with only the offending text fixed).' }
+          ]),
+          systemPrompt,
+          retryOptions
+        );
+        if (retried && voiceLint(retried).length < hits.length) return retried;
+      } catch (e) {}
+    }
+  }
+  return cleaned;
+}
+
 // Watches the accumulating stream text; fires the preview ONCE when the
 // verdict-screen fields are complete and clean. Never throws into the stream.
 function actionStreamMaybePreview(acc) {
@@ -1623,6 +1830,10 @@ async function callClaudeActionStream(messages, systemPrompt, options, onText) {
   let sys = systemPrompt || '';
   if (profileContext) {
     sys = sys + '\n\nABOUT THIS PERSON (private context so your replies are personal and specific to them. Never quote it back verbatim or say you were given it):\n' + profileContext;
+  }
+  if (options.backgroundActionJob) {
+    const text = await actionBackgroundText(messages, sys, options, onText, true);
+    return { text: text, streamed: true };
   }
   const controller = new AbortController();
   aiAbortController = controller;
@@ -1825,6 +2036,42 @@ async function generateActionDraft(options = {}) {
     // bought nothing.
     const partOneInstruction = '\n\nPART 1 OF 2: write everything EXCEPT the ladder and the focus plan. Set "path" to [] and omit "focusPlan" entirely. A second call will ask you for those, with this output as context, so do NOT compensate by padding any other field. Every other rule still applies in full.\nKEY ORDER (hard requirement): begin the object with "primaryAction" and write its keys in exactly this order: "verdict", "verdictReason", "title", "why", "recommendedTier", "tiers", then every remaining field in any order.';
     const userBody = `PERSON CONTEXT:\n${contextLines}\n\nReturn the full plan JSON now. No conversation. If their "ONE THING" guess is close to a real high-leverage move, USE IT as the primaryAction title (lightly rewritten in your voice). Their guess at the main move is data, not a constraint - but anchor to it when it lines up.${nextStepInstruction}${keepTheirsInstruction}${partOneInstruction}`;
+    const useBackground = actionBackgroundSupported();
+    const oldPending = actionBackgroundPending();
+    const generationId = useBackground
+      ? (options.backgroundGenerationId
+        || (oldPending && oldPending.stage === 'draft' ? oldPending.generationId : '')
+        || actionBackgroundId())
+      : '';
+    const contextKey = useBackground
+      ? await actionBackgroundHash(actionDraftSystemPrompt() + '\n' + userBody)
+      : '';
+    const inputStamp = useBackground ? actionBackgroundInputStamp() : '';
+    if (useBackground && options.resumeBackground && oldPending
+        && (oldPending.generationId !== generationId
+          || oldPending.contextKey !== contextKey
+          || oldPending.inputStamp !== inputStamp)) {
+      actionBackgroundClear(oldPending.generationId);
+      throw new Error('Your goal changed, so the older unfinished plan was safely ignored.');
+    }
+    if (useBackground) {
+      actionBackgroundSave({
+        generationId: generationId,
+        stage: 'draft',
+        contextKey: contextKey,
+        inputStamp: inputStamp,
+        nextStep: isNextStep,
+        keepTheirs: !!options.keepTheirs,
+        startedAt: (oldPending && oldPending.generationId === generationId && oldPending.startedAt)
+          || new Date().toISOString()
+      });
+    }
+    const backgroundJob = (requestKey) => useBackground ? {
+      generationId: generationId,
+      requestKey: requestKey,
+      kind: 'draft',
+      contextKey: contextKey
+    } : null;
 
     // v887: soft/emotional goals (no scoreboard) make Sonnet think for its
     // ENTIRE output budget and return a thinking-only block with no text,
@@ -1848,11 +2095,14 @@ async function generateActionDraft(options = {}) {
         const sres = await callClaudeActionStream(
           [{ role: 'user', content: userBody }],
           actionDraftSystemPrompt(),
-          { maxTokens: 16000, model: ANTHROPIC_MODEL_PLANS, timeout: ACTION_PLAN_REQUEST_TIMEOUT_MS, cache: true, thinking: 'off' },
+          { maxTokens: 16000, model: ANTHROPIC_MODEL_PLANS, timeout: ACTION_PLAN_REQUEST_TIMEOUT_MS, cache: true, thinking: 'off', backgroundActionJob: backgroundJob('draft-primary') },
           actionStreamMaybePreview
         );
         if (sres && String(sres.text || '').trim()) response = sres.text;
       } catch (streamErr) {
+        if (useBackground) {
+          throw streamErr;
+        }
         console.warn('plan stream fell back to the normal call', streamErr);
       }
     }
@@ -1875,7 +2125,7 @@ async function generateActionDraft(options = {}) {
         // deliberation either eats the whole budget (empty response) or
         // outlasts the window (504), and each costs a full retry.
         // Revisit once the proxy's ceiling and timeout are raised.
-        const callOpts = { maxTokens: 16000, model: ANTHROPIC_MODEL_PLANS, timeout: ACTION_PLAN_REQUEST_TIMEOUT_MS, cache: true, paidAction: true, thinking: 'off' };
+        const callOpts = { maxTokens: 16000, model: ANTHROPIC_MODEL_PLANS, timeout: ACTION_PLAN_REQUEST_TIMEOUT_MS, cache: true, paidAction: true, thinking: 'off', backgroundActionJob: backgroundJob('draft-fallback-' + emptyTries) };
         const body = userBody + (emptyTries ? softNudges[emptyTries - 1] : '');
         try {
           response = await callClaude([{ role: 'user', content: body }], actionDraftSystemPrompt(), callOpts);
@@ -1895,7 +2145,7 @@ async function generateActionDraft(options = {}) {
         const msg = String(emptyErr && emptyErr.message);
         const retryable = /empty response/i.test(msg) ||
           /API error \(5\d\d\)/i.test(msg) || /timed out/i.test(msg);
-        if (retryable && emptyTries < softNudges.length) {
+        if (!useBackground && retryable && emptyTries < softNudges.length) {
           emptyTries++;
         } else { throw emptyErr; }
       }
@@ -1922,7 +2172,7 @@ async function generateActionDraft(options = {}) {
       const retryRaw = await callClaude(
         [{ role: 'user', content: userBody }],
         actionDraftSystemPrompt(),
-        { maxTokens: 16000, model: ANTHROPIC_MODEL_PLANS, timeout: ACTION_PLAN_REQUEST_TIMEOUT_MS, cache: true, paidAction: true, thinking: 'off' }
+        { maxTokens: 16000, model: ANTHROPIC_MODEL_PLANS, timeout: ACTION_PLAN_REQUEST_TIMEOUT_MS, cache: true, paidAction: true, thinking: 'off', backgroundActionJob: backgroundJob('draft-parse-retry') }
       );
       let rj = retryRaw.trim().replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();
       const fb2 = rj.indexOf('{');
@@ -2025,7 +2275,7 @@ async function generateActionDraft(options = {}) {
         const retryResponse = await callClaude(
           [{ role: 'user', content: retryBody }],
           actionDraftSystemPrompt(),
-          { maxTokens: 16000, model: ANTHROPIC_MODEL_PLANS, timeout: ACTION_PLAN_REQUEST_TIMEOUT_MS, cache: true, paidAction: true, thinking: 'off' }
+          { maxTokens: 16000, model: ANTHROPIC_MODEL_PLANS, timeout: ACTION_PLAN_REQUEST_TIMEOUT_MS, cache: true, paidAction: true, thinking: 'off', backgroundActionJob: backgroundJob('draft-quality-retry') }
         );
         let retryJson = retryResponse.trim()
           .replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();
@@ -2057,6 +2307,16 @@ async function generateActionDraft(options = {}) {
       plan.primaryAction.verdict = null;
     }
 
+    if (useBackground) {
+      const currentPending = actionBackgroundPending();
+      if (!currentPending
+          || currentPending.generationId !== generationId
+          || currentPending.contextKey !== contextKey
+          || currentPending.inputStamp !== actionBackgroundInputStamp()) {
+        throw new Error('A newer goal replaced this plan while it was finishing.');
+      }
+    }
+
     // v973: arm the one-time platinum card evolution ONLY on a genuine first
     // discovery (planGenerated flipping false->true), never on a regenerate and
     // never for users who already had a plan before this shipped. The home
@@ -2082,9 +2342,22 @@ async function generateActionDraft(options = {}) {
     // bridge beat already renders fine without it.
     try {
       const _pa = plan.primaryAction || {};
-      if (!Array.isArray(_pa.path) || !_pa.path.length) startActionLadder(contextLines, plan);
+      if (!Array.isArray(_pa.path) || !_pa.path.length) {
+        startActionLadder(contextLines, plan, useBackground ? {
+          generationId: generationId,
+          inputStamp: inputStamp
+        } : null);
+      } else if (useBackground) {
+        actionBackgroundClear(generationId);
+      }
     } catch (ladderErr) { console.warn('ladder kickoff failed', ladderErr); }
   } catch (err) {
+    if (err && err.actionJobTerminal) {
+      const failedPending = actionBackgroundPending();
+      if (failedPending && failedPending.stage === 'draft') {
+        actionBackgroundClear(failedPending.generationId);
+      }
+    }
     actionChatError = (err && err.message) || 'Could not generate plan. Try again.';
   } finally {
     actionAiLoading = false;
@@ -2123,10 +2396,18 @@ async function generateActionDraft(options = {}) {
 // so a fast reader never sees a path-less screen.
 let actionLadderPending = null;
 
-function startActionLadder(contextLines, plan) {
+function startActionLadder(contextLines, plan, backgroundMeta) {
   if (actionLadderPending) return actionLadderPending;
-  actionLadderPending = generateActionLadder(contextLines, plan)
-    .catch(err => { console.warn('ladder failed', err); })
+  actionLadderPending = generateActionLadder(contextLines, plan, backgroundMeta)
+    .catch(err => {
+      if (err && err.actionJobTerminal) {
+        const failedPending = actionBackgroundPending();
+        if (failedPending && failedPending.stage === 'ladder') {
+          actionBackgroundClear(failedPending.generationId);
+        }
+      }
+      console.warn('ladder failed', err);
+    })
     .finally(() => { actionLadderPending = null; });
   return actionLadderPending;
 }
@@ -2146,7 +2427,7 @@ function actionLadderInFlight() {
   return !!actionLadderPending;
 }
 
-async function generateActionLadder(contextLines, plan) {
+async function generateActionLadder(contextLines, plan, backgroundMeta) {
   if (typeof DEMO_MODE !== 'undefined' && DEMO_MODE) return;
   if (!hasAnthropicKey()) return;
   const pa = (plan && plan.primaryAction) || {};
@@ -2161,6 +2442,37 @@ async function generateActionLadder(contextLines, plan) {
     verdictReason: pa.verdictReason || ''
   });
   const body = `PERSON CONTEXT:\n${contextLines}\n\nPART 2 OF 2. You already wrote this person's move in part 1:\n${moveContext}\n\nNow write ONLY the ladder and the focus plan for that exact move. Obey THE PATH rules (length from their timeframe, each step a specific measurable outcome in their words, "this week" a countable checkpoint, horizons in plain English, four fields per step) and the focusPlan shape, exactly as specified. Every receipts rule still applies: no fact about them that they did not state.\n\nReturn ONLY raw JSON, no markdown fences, no commentary:\n{"path":[{"horizon":"...","milestone":"...","looksLike":"...","bridge":"...","signal":"..."}],"focusPlan":{"frame":"...","frictionRemove":["..."],"frictionAdd":["..."]}}`;
+  const useBackground = actionBackgroundSupported();
+  const pending = actionBackgroundPending();
+  const generationId = useBackground
+    ? ((backgroundMeta && backgroundMeta.generationId)
+      || (pending && pending.stage === 'ladder' ? pending.generationId : '')
+      || actionBackgroundId())
+    : '';
+  const contextKey = useBackground
+    ? await actionBackgroundHash(actionDraftSystemPrompt() + '\n' + body)
+    : '';
+  const planKey = useBackground ? await actionBackgroundHash(moveContext) : '';
+  if (useBackground && pending && pending.stage === 'ladder'
+      && (pending.generationId !== generationId
+        || pending.contextKey !== contextKey
+        || pending.planKey !== planKey
+        || pending.inputStamp !== actionBackgroundInputStamp())) {
+    actionBackgroundClear(pending.generationId);
+    return;
+  }
+  if (useBackground) {
+    actionBackgroundSave({
+      generationId: generationId,
+      stage: 'ladder',
+      contextKey: contextKey,
+      planKey: planKey,
+      inputStamp: actionBackgroundInputStamp(),
+      contextLines: contextLines,
+      startedAt: (pending && pending.generationId === generationId && pending.startedAt)
+        || new Date().toISOString()
+    });
+  }
 
   let raw = '';
   for (let attempt = 0; attempt < 2; attempt++) {
@@ -2168,11 +2480,11 @@ async function generateActionLadder(contextLines, plan) {
       raw = await callClaude(
         [{ role: 'user', content: body }],
         actionDraftSystemPrompt(),
-        { maxTokens: 4000, model: ANTHROPIC_MODEL_PLANS, timeout: ACTION_PLAN_REQUEST_TIMEOUT_MS, cache: true, paidAction: true, thinking: 'off' }
+        { maxTokens: 4000, model: ANTHROPIC_MODEL_PLANS, timeout: ACTION_PLAN_REQUEST_TIMEOUT_MS, cache: true, paidAction: true, thinking: 'off', backgroundActionJob: useBackground ? { generationId: generationId, requestKey: 'ladder-' + attempt, kind: 'ladder', contextKey: contextKey } : null }
       );
       if (String(raw || '').trim()) break;
     } catch (err) {
-      if (attempt === 1) throw err;
+      if (attempt === 1 || useBackground) throw err;
     }
   }
   let jsonStr = String(raw || '').trim()
@@ -2192,8 +2504,32 @@ async function generateActionLadder(contextLines, plan) {
   // The plan on screen wins for every field except the two this call owns:
   // a regeneration could have replaced it while this was in flight.
   if (!state.action.primaryAction) return;
+  if (useBackground) {
+    const currentMove = JSON.stringify({
+      title: state.action.primaryAction.title || '',
+      why: state.action.primaryAction.why || '',
+      tiers: state.action.primaryAction.tiers || {},
+      shape: state.action.primaryAction.shape || 'lever',
+      verdict: state.action.primaryAction.verdict || null,
+      verdictReason: state.action.primaryAction.verdictReason || ''
+    });
+    const currentPending = actionBackgroundPending();
+    if (!currentPending
+        || currentPending.generationId !== generationId
+        || currentPending.contextKey !== contextKey
+        || currentPending.inputStamp !== actionBackgroundInputStamp()
+        || await actionBackgroundHash(currentMove) !== planKey) {
+      return;
+    }
+  }
   state.action.primaryAction.path = norm.primaryAction.path;
   state.action.focusPlan = norm.focusPlan;
+  if (useBackground) {
+    const finishedPending = actionBackgroundPending();
+    if (finishedPending && finishedPending.generationId === generationId) {
+      delete state.action.backgroundGeneration;
+    }
+  }
   persistNow();
   // Do NOT repaint while the reveal ceremony is on screen: renderContent
   // restarts that sequence at the verdict beat, so a late ladder would yank
@@ -2203,6 +2539,44 @@ async function generateActionLadder(contextLines, plan) {
     && state.meta && !state.meta.planRevealSeen);
   if (!revealRunning) refreshActionSurface();
 }
+
+let actionBackgroundResumeBusy = false;
+async function resumePendingActionGeneration() {
+  if (actionBackgroundResumeBusy || actionAiLoading || actionLadderPending) return;
+  if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
+  if (!actionBackgroundSupported()) return;
+  const pending = actionBackgroundPending();
+  if (!pending || !pending.generationId || !pending.stage) return;
+  actionBackgroundResumeBusy = true;
+  try {
+    if (pending.stage === 'draft') {
+      await generateActionDraft({
+        nextStep: !!pending.nextStep,
+        keepTheirs: !!pending.keepTheirs,
+        resumeBackground: true,
+        backgroundGenerationId: pending.generationId
+      });
+    } else if (pending.stage === 'ladder'
+        && pending.contextLines
+        && state.action && state.action.primaryAction) {
+      await startActionLadder(pending.contextLines, state.action, {
+        generationId: pending.generationId,
+        inputStamp: pending.inputStamp
+      });
+    }
+  } catch (e) {
+    console.warn('Action background resume will retry on the next open.', e);
+  } finally { actionBackgroundResumeBusy = false; }
+}
+
+try {
+  window.addEventListener('focus', () => setTimeout(resumePendingActionGeneration, 300));
+  window.addEventListener('pageshow', () => setTimeout(resumePendingActionGeneration, 1200));
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) setTimeout(resumePendingActionGeneration, 300);
+  });
+  setTimeout(resumePendingActionGeneration, 2500);
+} catch (e) {}
 
 // Thin wrapper that calls generateActionDraft in next-step mode. Used by
 // the "Get next step" button that appears after the user marks the
@@ -2617,6 +2991,10 @@ async function callClaude(messages, systemPrompt, options = {}) {
   let sys = systemPrompt || '';
   if (profileContext && (!useProxy || paidAction)) {
     sys = sys + '\n\nABOUT THIS PERSON (private context so your replies are personal and specific to them. Never quote it back verbatim or say you were given it):\n' + profileContext;
+  }
+
+  if (useProxy && paidAction && options.backgroundActionJob) {
+    return actionBackgroundText(messages, sys, options, null, false);
   }
 
   const controller = new AbortController();
