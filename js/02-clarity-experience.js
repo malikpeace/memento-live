@@ -2736,96 +2736,16 @@ const ActionExperience = {
     }
   },
 
-  getIntroPages() {
-    return [
-      {
-        headline: 'Without action, literally nothing matters.',
-        sub: 'You can have the best plan in the world. You can think, wish, and manifest for years. But if it never turns into actual tangible action, you will go nowhere.',
-        illust: 'bolt'
-      },
-      {
-        headline: "Most people stay busy, but aren't moving forward.",
-        sub: "They spend time and energy on tasks that make them feel productive but do not actually move their life forward. Causing them to trick themselves into thinking they're making progress.",
-        illust: 'scatter',
-        vShift: true
-      },
-      {
-        headline: 'Action is where your focus should go',
-        sub: 'Not ideas. Not intention. Not overplanning. Action. Action is what brings your goals into reality.',
-        illust: 'arrow'
-      },
-      {
-        headline: 'Not all action is created equal',
-        sub: 'This module is about leverage. The goal is not to do more just to do more. It is to first find the few moves that actually matter most right now. The actions that if not done, the rest don\'t matter.',
-        illust: 'target'
-      },
-      {
-        headline: 'Now we find your next moves.',
-        sub: 'Using your Neutron Star, Action will filter the noise and show you the highest-leverage steps to move toward what actually matters.',
-        illust: 'magnify'
-      }
-    ];
-  },
+  // v1111: DELETED, the five-page Action tutorial deck ("Without action,
+  // literally nothing matters", "Most people stay busy", "Action is where
+  // your focus should go", "Not all action is created equal", "Now we find
+  // your next moves") and its illustrations. The module's real explainer is
+  // _showActionIntro below ("Clarity gave you the what. This is the how.").
+  // The deck was unreachable by design but not by accident: any regeneration
+  // calls refreshActionSurface -> ActionExperience.render(), which painted
+  // this deck whenever an old tutorialSeen flag was still false. That is how
+  // Malik hit it from "Not this action" inside a live module.
 
-  renderIllustration(type) {
-    switch (type) {
-      case 'bolt':
-        return `
-          <div class="action-illust-bolt" aria-hidden="true">
-            <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M45 7 L24 43 H38 L33 73 L57 33 H42 L45 7 Z" fill="#FFFFFF" fill-opacity="0.92"/>
-            </svg>
-          </div>
-        `;
-      case 'scatter':
-        return `
-          <div class="action-illust-scatter" aria-hidden="true">
-            <svg viewBox="0 0 120 120" width="120" height="120" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <marker id="circleArrow" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
-                  <path d="M0,0.5 L5,3 L0,5.5 Z" fill="rgba(var(--ink),0.85)"/>
-                </marker>
-              </defs>
-              <!-- Faint background ring -->
-              <circle cx="60" cy="60" r="38" stroke="rgba(var(--ink),0.1)" stroke-width="2.5" fill="none"/>
-              <!-- Spinning circular arrow -->
-              <g class="circles-head">
-                <path d="M 98,60 A 38,38 0 1 1 79,27" stroke="rgba(var(--ink),0.75)" stroke-width="3" stroke-linecap="round" fill="none" marker-end="url(#circleArrow)"/>
-              </g>
-            </svg>
-          </div>
-        `;
-      case 'arrow':
-        return `
-          <div class="action-illust-arrow" aria-hidden="true">
-            <svg viewBox="0 0 80 80" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
-              <path d="M16 64 L60 20"/>
-              <path d="M37 18 H62 V43"/>
-            </svg>
-          </div>
-        `;
-      case 'target':
-        return `
-          <div class="action-illust-target" aria-hidden="true">
-            <svg viewBox="0 0 80 80" fill="none" stroke="#FFFFFF" stroke-width="4" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="40" cy="40" r="30"/>
-              <circle cx="40" cy="40" r="16"/>
-              <circle cx="40" cy="40" r="4.5" fill="#FFFFFF" stroke="none"/>
-            </svg>
-          </div>
-        `;
-      case 'magnify':
-      default:
-        return `
-          <div class="action-illust-magnify" aria-hidden="true">
-            <svg viewBox="0 0 80 80" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="34" cy="34" r="20"/>
-              <line x1="49" y1="49" x2="67" y2="67"/>
-            </svg>
-          </div>
-        `;
-    }
-  },
 
   open() {
     if (this.isOpen) return;
@@ -2896,7 +2816,6 @@ const ActionExperience = {
     this._zoomTy = ty;
 
     // No app zoom/scale - the dashboard fade-out class handles the transition.
-    this.currentPage = 0;
     this.el.classList.add('open-bg');
     requestAnimationFrame(() => this.el.classList.add('open-bg-visible'));
 
@@ -4975,24 +4894,6 @@ Return ONLY the sentence text. No quotes, no labels.`;
     persistNow();
     // Kick off plan generation with the intake answers as extra context.
     generateActionDraft();
-  },
-
-  renderPage(index) {
-    const page = this.getIntroPages()[index];
-    if (!page) return;
-    this.pageWrap.innerHTML = `
-      <div class="action-exp__page-inner">
-        <div class="action-exp__tut">
-          <div class="action-exp__tut-illust">
-            ${this.renderIllustration(page.illust)}
-          </div>
-          <div class="action-exp__tut-card">
-            <div class="action-exp__tut-headline">${page.headline}</div>
-            <div class="action-exp__tut-sub">${page.sub}</div>
-          </div>
-        </div>
-      </div>
-    `;
   },
 
   renderContent() {
@@ -8569,69 +8470,12 @@ Return ONLY the sentence text. No quotes, no labels.`;
     });
   },
 
+  // v1111: the tutorial pager (render/next/back/transitionTo/updateProgress/
+  // updateNav) is gone with the deck it paged through. render() is called by
+  // refreshActionSurface() on every regeneration, so it now goes where every
+  // other entry point already goes: the module's real content.
   render() {
-    if (state.action.tutorialSeen) {
-      this.renderContent();
-      return;
-    }
-    this.renderPage(this.currentPage);
-    this.updateProgress();
-    this.updateNav();
-  },
-
-  next() {
-    if (this.transitioning || state.action.tutorialSeen) return;
-    const total = this.getIntroPages().length;
-    if (this.currentPage >= total - 1) {
-      state.action.tutorialSeen = true;
-      persistNow();
-      this.renderContent();
-      return;
-    }
-    this.transitionTo(this.currentPage + 1);
-  },
-
-  back() {
-    if (this.transitioning || state.action.tutorialSeen) return;
-    if (this.currentPage <= 0) {
-      state.action.introSeen = false;
-      persistNow();
-      this._showActionIntro();
-      return;
-    }
-    this.transitionTo(this.currentPage - 1);
-  },
-
-  transitionTo(newPage) {
-    this.transitioning = true;
-    const inner = this.pageWrap.querySelector('.action-exp__page-inner');
-    if (inner) inner.classList.add('exit');
-    setTimeout(() => {
-      this.currentPage = newPage;
-      this.renderPage(this.currentPage);
-      this.updateProgress();
-      this.updateNav();
-      this.transitioning = false;
-    }, 220);
-  },
-
-  updateProgress() {
-    this.progressEl.innerHTML = '';
-  },
-
-  updateNav() {
-    if (state.action.tutorialSeen) {
-      this.navEl.innerHTML = '';
-      return;
-    }
-    const isLast = this.currentPage === this.getIntroPages().length - 1;
-    let html = '<button class="action-exp__nav-btn action-exp__nav-btn--back" id="aexpBack">Back</button>';
-    html += `<button class="action-exp__nav-btn ${isLast ? 'action-exp__nav-btn--cta' : 'action-exp__nav-btn--next'}" id="aexpNext">${isLast ? 'Enter Action' : 'Continue'}</button>`;
-    this.navEl.innerHTML = html;
-    const nextBtn = document.getElementById('aexpNext');
-    const backBtn = document.getElementById('aexpBack');
-    if (nextBtn) nextBtn.addEventListener('click', () => this.next());
-    if (backBtn) backBtn.addEventListener('click', () => this.back());
+    this.renderContent();
   }
 };
 
