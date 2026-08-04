@@ -2760,3 +2760,62 @@ document.addEventListener('keydown', (e) => {
 // mobile home has no other search affordance (dash-header__right and
 // .mgreet__search are display:none under 860px), so there is intentionally no
 // search on phones now. Desktop still opens Spotlight via Cmd/Ctrl+K and "/".
+
+// ═══ ON-DEVICE LAYOUT DIAGNOSTIC (v1106b) ═════════════════════════════════
+// Malik's home layout has now failed on his installed phone in ways no
+// preview reproduces, twice. This ends the guessing: FIVE quick taps on the
+// header date open a small overlay that reports the facts a screenshot of
+// the broken frame cannot (version, body classes, which layout rules
+// actually matched, the card's real geometry). Read-only, invisible until
+// summoned, tap Close to dismiss. Harmless to ship, but listed in
+// LAUNCH-CHECKLIST.md alongside the other dev affordances.
+(function () {
+  let n = 0, last = 0;
+  const build = () => {
+    try {
+      const st = document.querySelector('.daycard-living-stage');
+      const cc = document.getElementById('commandCenter');
+      const p1 = document.getElementById('homePage1');
+      const de = document.documentElement;
+      const r = st ? st.getBoundingClientRect() : null;
+      const c = cc ? cc.getBoundingClientRect() : null;
+      const scs = st ? getComputedStyle(st) : null;
+      const lines = [
+        'shell ' + (window.MEMENTO_VERSION || '?') + '  js ' + (window.MEMENTO_JS_BUILD || '?'),
+        'view ' + innerWidth + 'x' + innerHeight + '  screen ' + screen.width + 'x' + screen.height,
+        'standalone ' + ((matchMedia('(display-mode: standalone)').matches || navigator.standalone === true) ? 'yes' : 'no'),
+        'body ' + document.body.className.split(' ').filter(x => /custom|bloom|locked|clarity|lite|evo|paid/.test(x)).join(' '),
+        'layoutCustomized ' + !!(window.state && state.ui && state.ui.layoutCustomized),
+        'p1 display ' + (p1 ? getComputedStyle(p1).display : 'MISSING'),
+        'card in p1 ' + (p1 && p1.contains(document.getElementById('dayCard'))),
+        'stack query ' + matchMedia('(max-width: 1023.98px) and (orientation: portrait), (max-width: 1023.98px) and (min-height: 600px)').matches,
+        'card ' + (r ? Math.round(r.left) + ',' + Math.round(r.top) + ' ' + Math.round(r.width) + 'x' + Math.round(r.height) : 'none'),
+        'card maxW ' + (scs ? scs.maxWidth : '-') + '  mL/mR ' + (scs ? scs.marginLeft + '/' + scs.marginRight : '-'),
+        'box bottom ' + (c ? Math.round(c.bottom) : '-') + ' of ' + innerHeight,
+        'page wider than screen: ' + (de.scrollWidth > de.clientWidth ? 'YES by ' + (de.scrollWidth - de.clientWidth) : 'no'),
+        '--p1-vh ' + (de.style.getPropertyValue('--p1-vh') || 'unset') + '  --p1-top ' + (de.style.getPropertyValue('--p1-top') || 'unset'),
+        'safe-t ' + getComputedStyle(de).getPropertyValue('--safe-t') + '  safe-b ' + getComputedStyle(de).getPropertyValue('--safe-b')
+      ];
+      const old = document.getElementById('layoutDiag');
+      if (old) old.remove();
+      const box = document.createElement('div');
+      box.id = 'layoutDiag';
+      box.style.cssText = 'position:fixed;left:10px;right:10px;top:calc(env(safe-area-inset-top,0px) + 54px);z-index:2147483600;background:rgba(8,9,12,0.96);color:#e8ebf0;font:500 12px/1.55 ui-monospace,Menlo,monospace;padding:14px 14px 10px;border-radius:12px;box-shadow:0 18px 50px rgba(0,0,0,0.6);white-space:pre-wrap;';
+      box.textContent = lines.join('\n');
+      const btn = document.createElement('button');
+      btn.textContent = 'Close';
+      btn.style.cssText = 'display:block;margin:10px auto 0;font:600 12px ui-monospace,Menlo,monospace;background:#fff;color:#101216;border:none;border-radius:8px;padding:7px 22px;';
+      btn.addEventListener('click', () => box.remove());
+      box.appendChild(btn);
+      document.body.appendChild(box);
+    } catch (e) {}
+  };
+  document.addEventListener('click', (e) => {
+    const t = e.target && e.target.closest && e.target.closest('#wbarDate');
+    if (!t) return;
+    const now = Date.now();
+    n = (now - last < 600) ? n + 1 : 1;
+    last = now;
+    if (n >= 5) { n = 0; build(); }
+  }, true);
+})();

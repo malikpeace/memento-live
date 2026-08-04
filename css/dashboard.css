@@ -927,7 +927,7 @@ body.ns-bloom .app.dash-v2 #commandCenter .cc-live { display: none; }
    by DESCENDANT (not `>` from .app); the extra .app.dash-v2 + body.ns-bloom
    specificity out-ranks the legacy .widget-grid placement rules above. */
 @media (min-width: 1024px) {
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 {
+  body.ns-bloom .app.dash-v2 {
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
     gap: 16px;
@@ -956,7 +956,7 @@ body.ns-bloom .app.dash-v2 #commandCenter .cc-live { display: none; }
   /* CENTER hero, caption: today's action fused DIRECTLY under the card, reading
      as its caption (the card is the goal made visible; the action is how you move
      it today). Same center columns so they stack as one object. */
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter { grid-column: 4 / span 6; grid-row: 3; }
+  body.ns-bloom .app.dash-v2 #commandCenter { grid-column: 4 / span 6; grid-row: 3; }
   /* LEFT flank: the quote of the day, a quiet supporting element centered beside
      the hero (the card + its caption define the band height it sits within). */
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dailyMemento  { grid-column: 1 / span 3; grid-row: 2 / span 2; overflow: hidden; align-self: center; }
@@ -1006,13 +1006,13 @@ body.ns-bloom .app.dash-v2 #commandCenter .cc-live { display: none; }
      The secondary helper lines and the "one thing to live" block (already the
      full-width Vivere strip below) are hidden here so it reads like the mockup
      and matches the card's height instead of towering over it. */
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-live,
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-od-sub { display: none; }
+  body.ns-bloom .app.dash-v2 #commandCenter .cc-live,
+  body.ns-bloom .app.dash-v2 #commandCenter .cc-od-sub { display: none; }
   /* the hero toggle carries an inline display, so !important is needed to retire
      it on the bento Home (the mission card leads with Today; Consistency has its
      own tile and the goal lives in Clarity). */
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-hero-toggle { display: none !important; }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-od-title { font-size: 1.05rem !important; line-height: 1.2 !important; margin-bottom: 10px !important; }
+  body.ns-bloom .app.dash-v2 #commandCenter .cc-hero-toggle { display: none !important; }
+  body.ns-bloom .app.dash-v2 #commandCenter .cc-od-title { font-size: 1.05rem !important; line-height: 1.2 !important; margin-bottom: 10px !important; }
 
   /* cap the "On this day" / quote so it never towers over the mission card; the
      soft bottom fade keeps a clipped line from hard-cutting at the card edge. */
@@ -1041,7 +1041,7 @@ body.ns-bloom .app.dash-v2 #commandCenter .cc-live { display: none; }
    and the Vivere strip. Same display:contents flatten as desktop so the card,
    command center, quote and widgets share ONE grid on .app. */
 @media (max-width: 767.98px) {
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 {
+  body.ns-bloom .app.dash-v2 {
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
     column-gap: 8px;
@@ -1068,11 +1068,11 @@ body.ns-bloom .app.dash-v2 #commandCenter .cc-live { display: none; }
      so the card sits alone and clean in the hero band. */
 
   /* focus / next-step (Today's action) */
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter { grid-column: 1 / -1; grid-row: 4; }
+  body.ns-bloom .app.dash-v2 #commandCenter { grid-column: 1 / -1; grid-row: 4; }
   /* retire the hero toggle + the duplicated "one thing to live" on mobile too
      (Vivere is the strip below); the command center is always the mission focus. */
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-hero-toggle { display: none !important; }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-live { display: none; }
+  body.ns-bloom .app.dash-v2 #commandCenter .cc-hero-toggle { display: none !important; }
+  body.ns-bloom .app.dash-v2 #commandCenter .cc-live { display: none; }
   /* Full year heatmap as a full-width strip under the card (Malik prefers the
      heatmap over the quiet dots line, which conveys the same thing). */
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashConsistency { display: block; grid-column: 1 / -1; grid-row: 5; }
@@ -1132,13 +1132,13 @@ body.ns-bloom .app.dash-v2 #commandCenter .cc-live { display: none; }
   /* slightly trim the hero so the card + today's action + the done affordance
      all clear the tab bar on shorter phones (still the dominant object). */
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-ns { min-height: 304px; }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter {
+  body.ns-bloom .app.dash-v2 #commandCenter {
     grid-row: 4; margin-top: 4px;
   }
   /* Today's action stays to one clean idea on the minimal home: the action +
      why + the done affordance. The "Minimum" / "If resistance hits" coaching
      lives one tap deeper, in the Action module, so the home stays calm. */
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-od-sub { display: none; }
+  body.ns-bloom .app.dash-v2 #commandCenter .cc-od-sub { display: none; }
 
   /* the Modules affordance: a quiet up-chevron + label below the Today box that
      teaches "swipe up for your modules" (the chevron is also a tap target, and the
@@ -3672,7 +3672,11 @@ body.pre-clarity .capture-fab { display: none !important; }
    the same law, and short screens get their own honest layout instead of a
    stacked one that cannot fit.
    ══════════════════════════════════════════════════════════════════════════ */
-@media (max-width: 1023.98px) and (not ((orientation: landscape) and (max-height: 599.98px))) {
+/* Plain, universally-parsed conditions (v1106b): a `not(...)` media query is
+   Level-4 syntax, and one unparsed condition silently drops this ENTIRE block
+   on an older WebKit, which would take the whole layout law with it. Portrait
+   always stacks; landscape stacks only when there is height for it. */
+@media (max-width: 1023.98px) and (orientation: portrait), (max-width: 1023.98px) and (min-height: 600px) {
   :root {
     /* Phones cap at 352; a tablet has room for a larger card and looks
        comically small at the phone cap. Still a min() so it can never
@@ -3691,7 +3695,7 @@ body.pre-clarity .capture-fab { display: none !important; }
      height formula, no correction pass, nothing left to drift.
      (Three earlier attempts tuned numbers and kept missing; this removes the
      numbers.) */
-  body:not(.has-custom-layout) .app.dash-v2 #homePage1 {
+  body .app.dash-v2 #homePage1 {
     display: flex; flex-direction: column;
     /* The column does not start at the viewport top (the app has its own top
        padding), so a flat 100svh hangs off the bottom by exactly that offset.
@@ -3721,10 +3725,10 @@ body.pre-clarity .capture-fab { display: none !important; }
   /* (v1075's standalone lvh override is gone: lvh overshot by ~40px on his
      device. The measured --p1-vh above is correct on every device by
      construction, so no per-mode unit override is needed.) */
-  body:not(.has-custom-layout) .app.dash-v2 #homePage1 > #dayCard {
+  body .app.dash-v2 #homePage1 > #dayCard {
     flex: 1 1 auto; min-height: 0;
   }
-  body:not(.has-custom-layout) .app.dash-v2 #homePage1 > #commandCenter {
+  body .app.dash-v2 #homePage1 > #commandCenter {
     /* v1104, THE CLIPPING FIX (his First-step screenshot: the card painted
        24px past the safe line). A fixed 212px row assumed every face fits in
        212px; the First step and Next step faces are TALLER, and a box in a
@@ -3755,14 +3759,14 @@ body.pre-clarity .capture-fab { display: none !important; }
   /* The card section carries an inline margin-bottom:14px from the renderer,
      which sat between the box and the column's bottom padding and made the
      buffer 29px instead of 15. The column owns the buffer. */
-  body:not(.has-custom-layout) .app.dash-v2 #homePage1 > #commandCenter > .cc-card {
+  body .app.dash-v2 #homePage1 > #commandCenter > .cc-card {
     margin-bottom: 0 !important;
     /* Stretch to the slot's 212 floor when content is shorter, so every
        face's box bottom lands on the same line. */
     flex: 1 0 auto;
   }
   /* The card's own chain stretches to the space the column hands it. */
-  body:not(.has-custom-layout) .app.dash-v2 #homePage1 > #dayCard > .daycard-wrap { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+  body .app.dash-v2 #homePage1 > #dayCard > .daycard-wrap { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
   /* v1088 (Malik: "sometimes the memento is square"). The card filled the
      leftover height with NO shape constraint, so on any short viewport (a
      small phone, Safari with its toolbar up, a transient viewport reading)
@@ -3773,7 +3777,7 @@ body.pre-clarity .capture-fab { display: none !important; }
   /* Two IDs on purpose: the older per-state rules carry #dayCard plus six
      classes, and without matching that these lose and the width rule wins
      (which is what let the card go square). */
-  body:not(.has-custom-layout) .app.dash-v2 #homePage1 #dayCard .daycard-theme-living .daycard-living-stage {
+  body .app.dash-v2 #homePage1 #dayCard .daycard-theme-living .daycard-living-stage {
     height: 100% !important; min-height: 0 !important;
     width: auto !important;
     aspect-ratio: 320 / 452;
@@ -3783,7 +3787,7 @@ body.pre-clarity .capture-fab { display: none !important; }
     min-width: 0 !important;
     margin-left: auto !important; margin-right: auto !important;
   }
-  body:not(.has-custom-layout) .app.dash-v2 #homePage1 #dayCard .daycard-ns {
+  body .app.dash-v2 #homePage1 #dayCard .daycard-ns {
     height: 100% !important; min-height: 0 !important; width: 100% !important;
     min-width: 0 !important;
   }
@@ -3791,7 +3795,7 @@ body.pre-clarity .capture-fab { display: none !important; }
      the card past the column and ate the gap to the box (they measured 2px
      apart). Zeroed here; the column and #commandCenter's 16px own the
      spacing now. */
-  body:not(.has-custom-layout) .app.dash-v2 #homePage1 .daycard-theme-living .daycard-living-stage {
+  body .app.dash-v2 #homePage1 .daycard-theme-living .daycard-living-stage {
     margin-top: 0 !important; margin-bottom: 0 !important;
   }
 }
@@ -3802,30 +3806,30 @@ body.pre-clarity .capture-fab { display: none !important; }
    on the left and the deck on the right, both fully visible, no scrolling.
    The swipe engine, the deck, the dots and every state are untouched. */
 @media (max-width: 1023.98px) and (orientation: landscape) and (max-height: 599.98px) {
-  body:not(.has-custom-layout) .app.dash-v2 #homePage1 {
+  body .app.dash-v2 #homePage1 {
     display: flex; flex-direction: row; align-items: stretch; gap: 18px;
     height: calc(min(var(--p1-vh, 100svh), 100lvh) - var(--p1-top, calc(var(--safe-t, 0px) + 16px)));
     box-sizing: border-box;
     padding: 0 max(14px, var(--safe-r, 0px)) calc(12px + var(--safe-b, 0px)) max(14px, var(--safe-l, 0px));
   }
-  body:not(.has-custom-layout) .app.dash-v2 #homePage1 > #dayCard {
+  body .app.dash-v2 #homePage1 > #dayCard {
     flex: 0 1 auto; min-width: 0; min-height: 0; display: flex;
     align-items: center; justify-content: center; margin: 0;
   }
-  body:not(.has-custom-layout) .app.dash-v2 #homePage1 > #commandCenter {
+  body .app.dash-v2 #homePage1 > #commandCenter {
     flex: 1 1 auto; min-width: 0; align-self: center; margin: 0;
     max-width: 460px;
   }
-  body:not(.has-custom-layout) .app.dash-v2 #homePage1 > #dayCard > .daycard-wrap {
+  body .app.dash-v2 #homePage1 > #dayCard > .daycard-wrap {
     display: flex; min-height: 0; height: 100%;
   }
-  body:not(.has-custom-layout) .app.dash-v2 #homePage1 #dayCard .daycard-theme-living .daycard-living-stage {
+  body .app.dash-v2 #homePage1 #dayCard .daycard-theme-living .daycard-living-stage {
     height: 100% !important; min-height: 0 !important;
     width: auto !important; aspect-ratio: 320 / 452;
     max-width: 40vw !important; min-width: 0 !important;
     margin: 0 !important;
   }
-  body:not(.has-custom-layout) .app.dash-v2 #homePage1 #dayCard .daycard-ns {
+  body .app.dash-v2 #homePage1 #dayCard .daycard-ns {
     height: 100% !important; min-height: 0 !important; width: 100% !important; min-width: 0 !important;
   }
   /* Page 2 is a scroll away, not a snap target, when there is no room to snap. */
@@ -3842,7 +3846,7 @@ html, body { overflow-x: clip; max-width: 100vw; }
 
 @media (max-width: 767.98px) {
   /* The two snap stops: page 1, then the modules. */
-  body:not(.has-custom-layout) .app.dash-v2 #dashBelow { scroll-snap-align: start; }
+  body .app.dash-v2 #dashBelow { scroll-snap-align: start; }
   html, body { overflow-x: clip; max-width: 100vw; }
   body { touch-action: pan-y; overscroll-behavior-x: none; }
 
@@ -3851,7 +3855,7 @@ html, body { overflow-x: clip; max-width: 100vw; }
      (app.style.display='none') still wins; this rule beats the bento grid by source
      order alone. The !important on display here used to leave the home rendered
      under the (transparent) Profile/Memento panels, bleeding through. */
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 {
+  body.ns-bloom .app.dash-v2 {
     display: block;
     align-content: normal !important;
     padding-bottom: 0 !important;
@@ -3864,7 +3868,7 @@ html, body { overflow-x: clip; max-width: 100vw; }
   /* v746 (Malik): pinned in EVERY home state, same scope as the date. It was
      gated on ns-bloom, so states without the bloom class scrolled the lockup
      away while the date stayed (his Safari report). */
-  body:not(.has-custom-layout) .app.dash-v2 .dash-header {
+  body .app.dash-v2 .dash-header {
     position: fixed; top: calc(var(--safe-t, 0px) + 12px); left: 0; right: 0;
     z-index: 50; margin-bottom: 0 !important;
     padding: 4px 14px 0 14px;
@@ -3872,7 +3876,7 @@ html, body { overflow-x: clip; max-width: 100vw; }
   }
   /* Non-bloom states need the same 29px flow compensation the bloom home has
      (the fixed header vacates its flow space; v245 card-top law). */
-  body:not(.has-custom-layout):not(.ns-bloom) .app.dash-v2 #dayCard {
+  body:not(.ns-bloom) .app.dash-v2 #dayCard {
     margin-top: 18px !important; /* v1073: no double-counted notch, as above */
   }
   /* Gradient tint under the pinned header so content scrolling beneath stays
@@ -3880,7 +3884,7 @@ html, body { overflow-x: clip; max-width: 100vw; }
      scrim melted iOS WebKit (compositor jank then the black crash screen,
      Malik's phone, 2026-07-12). A gradient fading to transparent is crash-proof
      and is the same fallback the topFade uses where blur cannot render. */
-  body:not(.has-custom-layout) .app.dash-v2 .dash-header::before {
+  body .app.dash-v2 .dash-header::before {
     content: ''; position: absolute; left: 0; right: 0; z-index: -1;
     top: calc(-12px - var(--safe-t, 0px)); height: calc(var(--safe-t, 0px) + 66px);
     background: linear-gradient(to bottom,
@@ -3889,7 +3893,7 @@ html, body { overflow-x: clip; max-width: 100vw; }
       rgba(4, 6, 6, 0) 100%);
     pointer-events: none;
   }
-  html.theme-light body:not(.has-custom-layout) .app.dash-v2 .dash-header::before {
+  html.theme-light body .app.dash-v2 .dash-header::before {
     background: linear-gradient(to bottom,
       rgba(230, 232, 236, 0.9) 0%,
       rgba(230, 232, 236, 0.55) 55%,
@@ -3903,7 +3907,7 @@ html, body { overflow-x: clip; max-width: 100vw; }
   /* The date floats top-right on BOTH the blank (pre-Clarity) and the worked-on
      home, aligned with the MEMENTO lockup, out of the flow (absolute) so it never
      pulls the card up. Same on both states so the two screens are identical. */
-  body:not(.has-custom-layout) .app.dash-v2 #dashGreetingMobile {
+  body .app.dash-v2 #dashGreetingMobile {
     /* v695 (Malik): the date's optical center matches the MEMENTO lockup's
        (it sat 8px low). v709: FIXED so it never scrolls, and tappable (tap
        swaps the date for the weeks you have left, js/08). */
@@ -3911,10 +3915,10 @@ html, body { overflow-x: clip; max-width: 100vw; }
     margin: 0 !important; z-index: 51; display: flex !important; justify-content: flex-end;
     pointer-events: auto; cursor: pointer;
   }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter {
+  body.ns-bloom .app.dash-v2 #commandCenter {
     position: relative; z-index: 30;
   }
-  body:is(.ns-bloom, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #dayCard {
+  body:is(.ns-bloom, .pre-clarity) .app.dash-v2 #dayCard {
     display: flex !important; flex-direction: column; justify-content: center;
     min-height: 0 !important;
     /* top 29px = the pinned header's vacated flow space (v709), so the card
@@ -3942,12 +3946,12 @@ html, body { overflow-x: clip; max-width: 100vw; }
   /* v1069: WIDTH only. The card's height is whatever the page-1 flex column
      hands it; the old --p1-card-h formula was still forcing a fixed height
      and stopping the card from filling (this is the last of the numbers). */
-  body:is(.ns-bloom, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-ns {
+  body:is(.ns-bloom, .pre-clarity) .app.dash-v2 #dayCard .daycard-ns {
     width: var(--p1-card-w) !important;
     min-height: 0 !important;
   }
-  body:is(.ns-bloom, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #dayCard .daycard-theme-living .daycard-living-stage { width: var(--p1-card-w) !important; margin-bottom: 0 !important; }
-  body:is(.ns-bloom, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #commandCenter {
+  body:is(.ns-bloom, .pre-clarity) .app.dash-v2 #dayCard .daycard-theme-living .daycard-living-stage { width: var(--p1-card-w) !important; margin-bottom: 0 !important; }
+  body:is(.ns-bloom, .pre-clarity) .app.dash-v2 #commandCenter {
     margin: 16px 0 0 !important; grid-column: auto !important; grid-row: auto !important;
   }
   /* v979: the Today box is taller and sits lower, taking back the room the
@@ -3962,16 +3966,16 @@ html, body { overflow-x: clip; max-width: 100vw; }
      !important beat the inline hide, so both prebuilt neighbours rendered
      and one showed through behind the incoming card (Malik: "I can see a
      card behind the card that's coming"). */
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-card:not([style*="display: none"]) {
+  body.ns-bloom .app.dash-v2 #commandCenter .cc-card:not([style*="display: none"]) {
     padding-top: 32px !important; padding-bottom: 30px !important;
     min-height: 206px !important;
     display: flex !important; flex-direction: column !important; justify-content: center !important;
   }
   /* Belt and braces: nothing may un-hide a hidden preview card. */
-  body:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-under[style*="display: none"] {
+  body .app.dash-v2 #commandCenter .cc-under[style*="display: none"] {
     display: none !important;
   }
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-od-sub { display: none; }
+  body.ns-bloom .app.dash-v2 #commandCenter .cc-od-sub { display: none; }
 
   /* PAGE 2 — the modules dashboard. #dashBelow becomes a real block that holds the
      dashboard, snaps as one page, with dead space above so the flip reads as
@@ -4903,7 +4907,7 @@ html.theme-light .cc-inv [style*="border-top"] { border-top-color: rgba(245, 245
 /* The :not() mirrors the v981 rule above so this ties on specificity and
    wins by source order; without it that rule's justify-content:center kept
    winning and each face's label sat at a different height (31 / 47 / 60). */
-body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-card--pillars:not([style*="display: none"]) {
+body.ns-bloom .app.dash-v2 #commandCenter .cc-card--pillars:not([style*="display: none"]) {
   /* v1083: ONE height for all three faces (the tallest, measured by js/08),
      so swiping never moves anything vertically. Content top-aligns and the
      dots pin to the bottom, so only the words in the middle change. */

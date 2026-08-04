@@ -596,7 +596,12 @@ function renderGrid() {
 
   // v27 bento opt-out flag (kept current above the early returns so a stale
   // has-custom-layout can never linger on brand-new / pre-clarity renders).
-  const _customized = !!(state.ui && state.ui.layoutCustomized);
+  // v1106b: the custom-layout opt-out is DESKTOP ONLY. On a phone or tablet
+  // the page-1 law has no exceptions (Malik: the Memento big, the box at the
+  // bottom, on ALL mobile views). A saved layoutCustomized flag from the old
+  // v19 feature was silently exempting the whole home from every layout rule
+  // on any device whose state carried it, across relaunches, immune to fixes.
+  const _customized = !!(state.ui && state.ui.layoutCustomized) && window.innerWidth >= 1024;
   document.body.classList.toggle('has-custom-layout', _customized);
 
   // Pre-star home is LOCKED SOLID (Malik): no scroll, no rubber-band, and the
