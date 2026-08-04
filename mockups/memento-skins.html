@@ -139,14 +139,32 @@
       repeating-linear-gradient(90deg, rgba(255,255,255,.07) 0 1px, transparent 1px 13px);
     opacity:var(--grid-op,0); }
 
-  /* ── 8-bit prototype ── a grid of lit cells; the mark is drawn in pixels */
-  .bit-grid { position:absolute; inset:0; z-index:1; display:grid;
-    grid-template-columns:repeat(var(--cols,14), 1fr);
-    grid-auto-rows:1fr; gap:var(--gap,1px); padding:var(--pad,8px); }
-  .bit-grid i { display:block; border-radius:var(--cell-r,1px); }
-  .bit-scan { position:absolute; inset:0; z-index:3; pointer-events:none;
-    background:repeating-linear-gradient(0deg, rgba(0,0,0,.16) 0 1px, transparent 1px 3px);
-    opacity:var(--scan,.35); }
+
+  /* ── THERMAL ── heat-signature banding: cool core, hot edge, hard-ish
+     stops so the colour reads as measured temperature, not a gradient. */
+  .therm-field { position:absolute; inset:-18%; z-index:1; pointer-events:none;
+    background:
+      radial-gradient(ellipse 62% 54% at 50% 44%,
+        #1428c8 0%, #1a3ae6 16%, #2f6bff 26%, #23c8ff 38%, #7ef0ff 46%,
+        #d8fbc8 53%, #ffe94a 60%, #ffc21a 68%, #ff8a00 76%, #ff4a00 84%,
+        #b81c00 90%, rgba(60,6,0,0) 97%);
+    filter:blur(var(--therm-blur,7px)) saturate(1.35);
+    animation:thermBreathe 26s ease-in-out infinite alternate; }
+  @keyframes thermBreathe {
+    0%   { transform:scale(1.00) translate(0,0); }
+    100% { transform:scale(1.09) translate(1.5%,-2%); } }
+  .therm-bloom { position:absolute; inset:-30%; z-index:0; pointer-events:none;
+    background:radial-gradient(ellipse 55% 48% at 50% 44%, rgba(90,150,255,.55), rgba(255,150,0,.16) 55%, transparent 76%);
+    filter:blur(30px); }
+
+  /* ── CODE BLUE ── a fine data grid. Small cells, pure black, luminance
+     from deep indigo to cyan. Reads as measurement, not as pixel art. */
+  .code-grid { position:absolute; inset:0; z-index:1; display:grid;
+    grid-template-columns:repeat(var(--cols,26), 1fr);
+    grid-auto-rows:1fr; gap:1px; padding:10px; }
+  .code-grid i { display:block; }
+  @media (prefers-reduced-motion: reduce) {
+    .therm-field { animation:none; } }
 </style>
 </head>
 <body class="ns-bloom">
@@ -227,7 +245,11 @@
   </div>
   <div class="row" id="yourRow"></div>
 
-  <div class="sect">2 · The skin library</div>
+
+  <div class="sect">2 · Thermal &amp; Code Blue</div>
+  <p class="why">Two cards built from the references: a heat signature with measured colour bands, and a fine data grid. Both on the real card, both alive.</p>
+  <div class="row" id="heroRow"></div>
+  <div class="sect">3 · The skin library</div>
   <p class="why">Forty-eight materials on the identical card. Same markup, same rim, same mark, same engine. Orange, voltage yellow, obsidian violet, pure white, void black, emerald, crimson, ice, magenta, cobalt, copper, jade.</p>
   <div class="row" id="crowdRow"></div>
 
@@ -236,9 +258,6 @@
   <p class="why">A different idea entirely: the card as terrain. Fractal noise posterised into discrete elevation bands, so every person's card is a map of a landscape that only exists for them. Same real card, same rim, same mark. These are prototypes, not finished skins.</p>
   <div class="row" id="topoRow"></div>
 
-  <div class="sect">5 · Prototype — 8-bit</div>
-  <p class="why">The card as a grid of lit cells, the mark drawn in pixels rather than vectors. Every cell's brightness is seeded from the person, so the pattern is theirs. Prototype, four directions.</p>
-  <div class="row" id="bitRow"></div>
   <div class="sect">6 · The Founder card</div>
   <p class="why">The same real card, numbered. Platinum keeps the shipped face; obsidian holds the platinum flood off so their colour is the only light in the room. (Both follow the generator.)</p>
   <div class="row" id="founderRow"></div>
@@ -562,60 +581,70 @@ document.getElementById('topoRow').innerHTML =
           '--topo-blend':'screen','--edge':'rgba(255,255,255,.35)','--halo':'rgba(226,236,255,.16)'}, cls:'flat'});
 
 
-/* ── 8-bit prototypes ─────────────────────────────────────────────── */
-function bitCard(o){
-  const COLS=o.cols||14, ROWS=Math.round(COLS*452/320);
-  const r=rng(hash(o.name+'::bits'));
-  const cells=[];
-  for(let y=0;y<ROWS;y++){
-    for(let x=0;x<COLS;x++){
-      const u=(x+.5)/COLS, v=(y+.5)/ROWS;
-      // the mark, drawn in cells: notched M inside a centred box
-      const mx=(u-0.30)/0.40, my=(v-0.30)/0.30;
-      const inMark = mx>=0 && mx<=1 && my>=0 && my<=1 && my >= 0.48*(1-Math.abs(2*mx-1));
-      if(inMark){ cells.push(`<i style="background:${o.mark}"></i>`); continue; }
-      const n=r();
-      const t=Math.min(1, Math.max(0, n*0.7 + (1-v)*0.45));   // brighter toward the top
-      const c=o.ramp(t, n);
-      cells.push(`<i style="background:${c}"></i>`);
-    }
-  }
+
+/* ── Thermal & Code Blue ─────────────────────────────────────────── */
+function shellCard(inner, o){
   return `<div class="slot skin flat">
     <p class="cap">${o.cap||''}</p>
     <div class="cage">
       <div class="daycard-wrap daycard-theme-living daycard-reveal daycard--bright"
-           style="--face:${o.face};--mark:${o.mark};--ink:${o.ink};--edge:${o.edge};--halo:${o.halo};--cols:${COLS};--scan:${o.scan||0};--gap:${o.gap||'1px'};--pad:${o.pad||'8px'}">
+           style="--face:${o.face};--mark:${o.mark};--ink:${o.ink};--edge:${o.edge};--halo:${o.halo};--halo-r:${o.haloR||'54px'};${o.extra||''}">
         <div class="daycard-living-stage">
           <div class="daycard-ns">
-            <span class="bit-grid">${cells.join('')}</span>
-            <span class="bit-scan"></span>
+            ${inner}
             <span class="daycard-ns__rim" aria-hidden="true"></span>
-            <div class="sub" style="z-index:4">${o.sub||'8-bit'}</div>
-            <div class="daycard-ns__foot" style="z-index:4"><span class="daycard-ns__name">${o.name}</span></div>
+            ${o.hideMark?'':`<div class="daycard-ns__body">
+              <svg class="daycard-ns__emblem" viewBox="0 0 512 512" aria-hidden="true">
+                <path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path>
+              </svg></div>`}
+            <div class="sub" style="z-index:5">${o.sub||''}</div>
+            <div class="daycard-ns__foot" style="z-index:5"><span class="daycard-ns__name">${o.name}</span></div>
           </div>
         </div>
       </div>
     </div>
   </div>`;
 }
-document.getElementById('bitRow').innerHTML =
-  bitCard({name:'Ava', cap:'Heat grid — the density map', sub:'8-bit', cols:14,
-    face:'#020018', mark:'rgba(180,240,255,.98)', ink:'rgba(190,214,255,.8)',
-    edge:'rgba(120,160,255,.4)', halo:'rgba(60,60,255,.22)', scan:.25,
-    ramp:(t,n)=>`rgba(${Math.round(20+t*90)},${Math.round(10+t*180)},${Math.round(120+t*135)},${(0.18+t*0.8).toFixed(2)})`})
-  + bitCard({name:'Jordan Cole', cap:'Terrain — pixel land', sub:'8-bit', cols:16, gap:'0px', pad:'0px',
-    face:'#1b2a1a', mark:'rgba(255,255,255,.96)', ink:'rgba(226,240,222,.8)',
-    edge:'rgba(220,244,214,.45)', halo:'rgba(140,220,140,.16)', scan:0,
-    ramp:(t,n)=> n<.30 ? 'rgba(46,86,58,1)' : n<.55 ? 'rgba(86,128,64,1)' : n<.75 ? 'rgba(150,168,86,1)'
-      : n<.9 ? 'rgba(198,178,120,1)' : 'rgba(238,238,232,1)'})
-  + bitCard({name:'Sofia M', cap:'Void grid — a few cells lit', sub:'8-bit', cols:12,
-    face:'#050506', mark:'rgba(255,255,255,.98)', ink:'rgba(220,226,238,.7)',
-    edge:'rgba(255,255,255,.3)', halo:'rgba(226,236,255,.14)', scan:.4,
-    ramp:(t,n)=> n>.93 ? 'rgba(255,255,255,.9)' : n>.82 ? 'rgba(150,170,200,.4)' : 'rgba(255,255,255,.045)'})
-  + bitCard({name:'Darius', cap:'Spectrum — arcade', sub:'8-bit', cols:15, scan:.3,
-    face:'#0a0410', mark:'rgba(255,255,255,.98)', ink:'rgba(255,225,245,.85)',
-    edge:'rgba(255,90,200,.4)', halo:'rgba(180,0,255,.2)',
-    ramp:(t,n)=>`hsl(${Math.round(n*330)} 92% ${Math.round(38+t*26)}% / ${(0.35+t*0.6).toFixed(2)})`});
+
+function codeGrid(seedName, cols){
+  const COLS=cols||26, ROWS=Math.round(COLS*452/320);
+  const r=rng(hash(seedName+'::code'));
+  const out=[];
+  for(let y=0;y<ROWS;y++){
+    for(let x=0;x<COLS;x++){
+      const u=(x+.5)/COLS, v=(y+.5)/ROWS;
+      const d=Math.hypot((u-.5)*1.15,(v-.46));           // distance from the core
+      const core=Math.max(0, 1-d*2.0);
+      const n=r();
+      const t=Math.min(1, Math.max(0, core*0.85 + n*0.34 - 0.12));
+      if(t<=0.02){ out.push('<i></i>'); continue; }
+      // deep indigo -> blue -> cyan -> white
+      const R=Math.round(10 + Math.pow(t,2.4)*225);
+      const G=Math.round(6  + Math.pow(t,1.7)*245);
+      const B=Math.round(90 + t*165);
+      out.push(`<i style="background:rgb(${R},${G},${B});opacity:${(0.14+t*0.86).toFixed(2)}"></i>`);
+    }
+  }
+  return `<span class="code-grid" style="--cols:${COLS}">${out.join('')}</span>`;
+}
+
+document.getElementById('heroRow').innerHTML =
+  shellCard('<span class="therm-bloom"></span><span class="therm-field"></span>',
+    {cap:'Thermal — heat signature', name:'Malik Peace', sub:'thermal',
+     face:'#02030a', mark:'rgba(6,10,40,.96)', ink:'rgba(210,230,255,.85)',
+     edge:'rgba(140,190,255,.5)', halo:'rgba(80,140,255,.34)'})
+  + shellCard('<span class="therm-bloom" style="opacity:.7"></span><span class="therm-field" style="--therm-blur:16px"></span>',
+    {cap:'Thermal, soft — the same field, bloomed', name:'Malik Peace', sub:'thermal',
+     face:'#02030a', mark:'rgba(255,255,255,.97)', ink:'rgba(214,232,255,.85)',
+     edge:'rgba(160,200,255,.45)', halo:'rgba(90,150,255,.3)'})
+  + shellCard(codeGrid('Malik Peace', 26),
+    {cap:'Code Blue — the data grid', name:'Malik Peace', sub:'code blue',
+     face:'#000003', mark:'rgba(190,245,255,.98)', ink:'rgba(150,200,255,.8)',
+     edge:'rgba(90,150,255,.4)', halo:'rgba(40,60,255,.26)'})
+  + shellCard(codeGrid('Ava Chen', 34),
+    {cap:'Code Blue, fine — a different person, denser read', name:'Ava Chen', sub:'code blue',
+     face:'#000003', mark:'rgba(190,245,255,.98)', ink:'rgba(150,200,255,.8)',
+     edge:'rgba(90,150,255,.4)', halo:'rgba(40,60,255,.26)'});
 
 document.getElementById('nameIn').addEventListener('input', renderYour);
 renderYour();
