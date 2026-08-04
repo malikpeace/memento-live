@@ -78,6 +78,11 @@
   .skin .sub { color:var(--ink, rgba(28,32,40,.55)) !important; }
   .skin .daycard-ns__rim { opacity:var(--rim-op,1) !important; }
 
+  /* matte: SOLID. No gloss, no screen-blend, barely any blur. The face is the
+     colour; the lights only give it depth. A painted surface, not glass. */
+  .matte .daycard-theme-living .daycard-ns__liquid { filter:blur(16px) saturate(1.02) !important; opacity:.5 !important; }
+  .matte .daycard-theme-living .daycard-ns__liquid .blob { mix-blend-mode:normal !important; }
+  .matte .daycard-ns__plat { mix-blend-mode:normal !important; }
   /* matte: no gloss, no burn, no iridescence. A surface, not a jewel. */
   .matte .daycard-ns__sheen { opacity:.04 !important; }
   .matte .daycard-ns__iri   { opacity:0 !important; }
@@ -128,6 +133,7 @@
    renders). Levels are the app's own CSS variables. */
 function realCard(vars, opts){
   const o = opts || {};
+  const B = o.blobs || blobPlan(o.name || 'memento');
   const style = Object.entries(vars).map(([k,v])=>`${k}:${v}`).join(';');
   return `<div class="slot ${o.cls||''}">
     <p class="cap">${o.cap||''}</p>
@@ -136,21 +142,21 @@ function realCard(vars, opts){
         <span class="daycard-wrap__aura" aria-hidden="true"></span>
         <div class="daycard-living-stage">
           <span class="daycard-bloom" aria-hidden="true">
-            <i class="blob b1" style="transform:translate(7.62%,8%) scale(1.342)"></i>
-            <i class="blob b2" style="transform:translate(-21.48%,15.95%) scale(1.449)"></i>
-            <i class="blob b3" style="transform:translate(8.31%,-6.35%) scale(1.5)"></i>
-            <i class="blob b4" style="transform:translate(42.68%,-59.06%) scale(.966)"></i>
-            <i class="blob b5" style="transform:translate(-16.79%,-51.67%) scale(1.454)"></i>
-            <i class="blob b6"></i>
+            <i class="blob b1" style="${B[0]}"></i>
+            <i class="blob b2" style="${B[1]}"></i>
+            <i class="blob b3" style="${B[2]}"></i>
+            <i class="blob b4" style="${B[3]}"></i>
+            <i class="blob b5" style="${B[4]}"></i>
+            <i class="blob b6" style="${B[5]}"></i>
           </span>
           <div class="daycard-ns">
             <span class="daycard-ns__liquid" aria-hidden="true">
-              <i class="blob b1" style="transform:translate(-15.04%,35.37%) scale(.702)"></i>
-              <i class="blob b2" style="transform:translate(-21.87%,31.55%) scale(1.07)"></i>
-              <i class="blob b3" style="transform:translate(46.1%,-54.39%) scale(.938)"></i>
-              <i class="blob b4" style="transform:translate(-4.37%,41.56%) scale(1.252)"></i>
-              <i class="blob b5" style="transform:translate(38.8%,50.27%) scale(1.293)"></i>
-              <i class="blob b6"></i>
+              <i class="blob b1" style="${B[0]}"></i>
+              <i class="blob b2" style="${B[1]}"></i>
+              <i class="blob b3" style="${B[2]}"></i>
+              <i class="blob b4" style="${B[3]}"></i>
+              <i class="blob b5" style="${B[4]}"></i>
+              <i class="blob b6" style="${B[5]}"></i>
             </span>
             <span class="daycard-ns__iri" aria-hidden="true"></span>
             <span class="daycard-ns__sheen" aria-hidden="true"></span>
@@ -181,13 +187,13 @@ function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i)
 const SKINS = [
  /* ── tier one ─────────────────────────────────────────────── */
  {n:'Solar Flare', sk1:'rgba(255,138,0,1)',  sk2:'rgba(255,206,64,.95)', sk3:'rgba(255,72,0,1)',    sk4:'rgba(255,170,40,.9)',
-  plat:'.14', face:'linear-gradient(165deg,#2a1405,#160a02)', mark:'#2a1200', ink:'rgba(255,236,214,.9)'},
+  plat:'.14', face:'linear-gradient(165deg,#2a1405,#160a02)', mark:'rgba(255,244,232,.95)', ink:'rgba(255,236,214,.9)'},
  {n:'Voltage',     sk1:'rgba(255,238,0,1)',   sk2:'rgba(190,255,60,.95)', sk3:'rgba(255,196,0,1)',  sk4:'rgba(230,255,120,.85)',
-  plat:'.16', face:'linear-gradient(165deg,#1d1e04,#0d0e02)', mark:'#221f00', ink:'rgba(252,255,214,.9)'},
+  plat:'.16', face:'linear-gradient(165deg,#1d1e04,#0d0e02)', mark:'rgba(255,253,230,.95)', ink:'rgba(252,255,214,.9)'},
  {n:'Obsidian Violet', sk1:'rgba(150,60,255,1)', sk2:'rgba(80,20,180,.9)', sk3:'rgba(215,120,255,.95)', sk4:'rgba(110,40,220,.9)',
   plat:'.05', face:'linear-gradient(165deg,#0c0710,#050308)', mark:'rgba(242,232,255,.95)', ink:'rgba(230,214,255,.85)'},
  {n:'Gold',        sk1:'rgba(255,196,60,1)',  sk2:'rgba(255,236,170,.95)', sk3:'rgba(196,132,0,1)', sk4:'rgba(255,214,110,.9)',
-  plat:'.22', face:'linear-gradient(165deg,#1f1503,#0d0901)', mark:'rgba(40,26,0,.9)', ink:'rgba(255,240,200,.9)'},
+  plat:'.22', face:'linear-gradient(165deg,#1f1503,#0d0901)', mark:'rgba(255,248,228,.95)', ink:'rgba(255,240,200,.9)'},
  {n:'Matte Black', sk1:'rgba(58,62,70,.5)',  sk2:'rgba(40,44,52,.45)', sk3:'rgba(30,33,40,.5)', sk4:'rgba(48,52,60,.4)',
   plat:'.03', face:'linear-gradient(168deg,#161719,#0e0f11 60%,#0a0b0c)', mark:'rgba(228,231,238,.9)', ink:'rgba(214,219,228,.7)', cls:'matte'},
  {n:'Matte White', sk1:'rgba(232,233,236,.9)', sk2:'rgba(244,245,247,.9)', sk3:'rgba(220,222,227,.9)', sk4:'rgba(236,237,240,.8)',
@@ -197,7 +203,7 @@ const SKINS = [
  {n:'Void',        sk1:'rgba(90,100,120,.35)', sk2:'rgba(70,78,96,.3)', sk3:'rgba(50,56,70,.3)', sk4:'rgba(80,88,108,.25)',
   plat:'.02', face:'linear-gradient(165deg,#0a0b0d,#030304)', mark:'rgba(236,239,246,.92)', ink:'rgba(226,231,240,.75)'},
  {n:'Emerald',     sk1:'rgba(0,220,130,1)',   sk2:'rgba(120,255,200,.9)', sk3:'rgba(0,150,90,1)',   sk4:'rgba(40,255,160,.85)',
-  plat:'.12', face:'linear-gradient(165deg,#03150e,#010806)', mark:'#022417', ink:'rgba(214,255,238,.9)'},
+  plat:'.12', face:'linear-gradient(165deg,#03150e,#010806)', mark:'rgba(232,255,246,.95)', ink:'rgba(214,255,238,.9)'},
  {n:'Crimson',     sk1:'rgba(255,30,70,1)',   sk2:'rgba(255,110,120,.9)', sk3:'rgba(150,0,40,1)',   sk4:'rgba(255,70,90,.9)',
   plat:'.10', face:'linear-gradient(165deg,#1c0308,#0b0103)', mark:'rgba(255,228,232,.95)', ink:'rgba(255,220,226,.85)'},
  {n:'Ice',         sk1:'rgba(120,235,255,1)', sk2:'rgba(255,255,255,.95)', sk3:'rgba(60,180,255,.95)', sk4:'rgba(190,245,255,.9)',
@@ -220,16 +226,37 @@ const SKINS = [
  {n:'Bone',        sk1:'rgba(238,230,214,.95)', sk2:'rgba(250,246,238,.95)', sk3:'rgba(222,212,194,.9)', sk4:'rgba(242,234,220,.85)',
   plat:'.60', face:'linear-gradient(168deg,#f3efe7,#e9e3d8)', mark:'#5d564b', ink:'rgba(58,52,44,.75)', cls:'matte'},
  {n:'Toxic',       sk1:'rgba(180,255,0,1)',   sk2:'rgba(0,255,140,.9)', sk3:'rgba(120,200,0,1)',  sk4:'rgba(220,255,80,.85)',
-  plat:'.10', face:'linear-gradient(165deg,#0f1603,#050801)', mark:'rgba(20,30,0,.9)', ink:'rgba(238,255,200,.9)'},
+  plat:'.10', face:'linear-gradient(165deg,#0f1603,#050801)', mark:'rgba(246,255,224,.95)', ink:'rgba(238,255,200,.9)'},
  {n:'Titanium',    sk1:'rgba(190,200,214,.9)', sk2:'rgba(226,232,240,.9)', sk3:'rgba(140,152,170,.85)', sk4:'rgba(200,210,224,.8)',
   plat:'.48', face:'linear-gradient(165deg,#22262c,#131619)', mark:'rgba(238,242,248,.92)', ink:'rgba(226,232,240,.8)'},
  {n:'Blush',       sk1:'rgba(255,180,200,.95)', sk2:'rgba(255,225,235,.9)', sk3:'rgba(240,140,175,.9)', sk4:'rgba(255,205,220,.85)',
   plat:'.58', face:'linear-gradient(165deg,#fbeef2,#f4e2e8)', mark:'#6b4a55', ink:'rgba(70,44,52,.75)'},
  {n:'Ultraviolet', sk1:'rgba(110,0,255,1)',   sk2:'rgba(190,120,255,.85)', sk3:'rgba(60,0,160,1)',  sk4:'rgba(150,60,255,.9)',
   plat:'.06', face:'linear-gradient(165deg,#0b0318,#04010a)', mark:'rgba(236,224,255,.95)', ink:'rgba(226,210,255,.85)'},
+ {n:'Matte Clay',  sk1:'rgba(196,110,80,.55)', sk2:'rgba(214,140,110,.45)', sk3:'rgba(150,74,52,.5)', sk4:'rgba(180,96,68,.45)',
+  plat:'.04', face:'linear-gradient(168deg,#8f4a34,#7a3d2a 60%,#6b3423)', mark:'rgba(255,238,230,.95)', ink:'rgba(255,232,222,.8)', cls:'matte'},
+ {n:'Matte Forest', sk1:'rgba(60,120,80,.5)', sk2:'rgba(96,150,110,.4)', sk3:'rgba(30,80,52,.5)', sk4:'rgba(70,130,90,.4)',
+  plat:'.04', face:'linear-gradient(168deg,#24402f,#1b3324 60%,#152a1d)', mark:'rgba(236,250,240,.95)', ink:'rgba(226,244,232,.8)', cls:'matte'},
+ {n:'Matte Navy',  sk1:'rgba(60,86,150,.5)', sk2:'rgba(96,120,180,.4)', sk3:'rgba(28,44,96,.5)', sk4:'rgba(70,96,160,.4)',
+  plat:'.04', face:'linear-gradient(168deg,#1e2b4d,#16203a 60%,#111829)', mark:'rgba(234,240,252,.95)', ink:'rgba(224,232,248,.8)', cls:'matte'},
+ {n:'Matte Sand',  sk1:'rgba(214,196,164,.6)', sk2:'rgba(232,218,192,.5)', sk3:'rgba(190,168,132,.55)', sk4:'rgba(220,202,172,.5)',
+  plat:'.10', face:'linear-gradient(168deg,#d8c8a8,#cdbb98 60%,#c3af8b)', mark:'rgba(58,48,32,.9)', ink:'rgba(52,42,28,.8)', cls:'matte'},
  {n:'Midnight',    sk1:'rgba(30,60,140,.9)',  sk2:'rgba(70,110,190,.8)', sk3:'rgba(10,25,70,.9)', sk4:'rgba(50,90,170,.8)',
   plat:'.08', face:'linear-gradient(165deg,#060a16,#02030a)', mark:'rgba(226,234,250,.92)', ink:'rgba(212,224,246,.8)'},
 ];
+
+/* a seeded generator so each person's lights land somewhere nobody could
+   predict, but the SAME place every time for them */
+function rng(seed){ let x=seed>>>0; return function(){ x=(Math.imul(x,1664525)+1013904223)>>>0; return x/4294967296; }; }
+function blobPlan(name){
+  const r=rng(hash((name||'memento')+'::blobs'));
+  const out=[];
+  for(let i=0;i<6;i++){
+    const x=(r()*130-65).toFixed(1), y=(r()*130-65).toFixed(1), sc=(0.62+r()*0.95).toFixed(3);
+    out.push(`transform:translate(${x}%,${y}%) scale(${sc})`);
+  }
+  return out;
+}
 
 function skinFor(name, forced){
   const h = hash((name||'memento').trim().toLowerCase());
