@@ -43,7 +43,12 @@ try {
    the value afterwards, it settles once and stays. */
 function syncHomeViewport() {
   try {
-    if (window.innerWidth >= 768) return;
+    // v1106: measure through the tablet range too. The guard used to stop at
+    // 768, so on a tablet --p1-top kept whatever a phone-width session last
+    // wrote (75 while the real chrome was 124) and the column ran 49px past
+    // the bottom of the screen. Desktop still opts out: it uses the bento
+    // grid, not this column.
+    if (window.innerWidth >= 1024) return;
     const root = document.documentElement;
     // v1095, per Codex: ONE stable height, read at launch and on orientation
     // change only. No visualViewport listener, no resize listener, no
@@ -81,6 +86,20 @@ try {
   window.addEventListener('load', _sync);
   // Orientation only. Nothing else re-runs this.
   window.addEventListener('orientationchange', () => setTimeout(syncHomeViewport, 250));
+  // v1106: recompute when the viewport WIDTH changes, and only then. A width
+  // change is a real layout change (rotation, split view, a resized window);
+  // it is never a swipe, a scroll, or the keyboard, which is what made the
+  // old resize listener a feedback loop in v1092. Without this the chrome
+  // offset stayed stale across a width change and the whole column sat 49px
+  // off, which is the "it stays wrong" shape rather than a transient one.
+  (function () {
+    let lastW = window.innerWidth;
+    window.addEventListener('resize', () => {
+      if (window.innerWidth === lastW) return;
+      lastW = window.innerWidth;
+      setTimeout(syncHomeViewport, 120);
+    });
+  })();
 } catch (e) {}
 
 /* v1073 SAFE-AREA SIMULATOR (dev only, URL-gated, inert without the param).

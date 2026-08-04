@@ -3651,9 +3651,37 @@ body.pre-clarity .capture-fab { display: none !important; }
      (34) + gap (16) + box (212) + bottom buffer (15 + safe-b), so the card's
      height IS the leftover space. The old 560px ceiling is gone: on a tall
      phone the card grows, that is the point. */
+}
+/* ══ ONE OWNER FOR THE PAGE-1 COMPOSITION (v1106) ══════════════════════════
+   Codex's audit was right about the root cause, and I confirmed both of its
+   broken cases myself before touching anything:
+     - 820x1180 (tablet portrait): the box floated 275px above where it
+       belongs and the card fell back to a fixed 320x440, because the whole
+       law lived inside `max-width: 767.98px` and `#homePage1` reverted to
+       `display: contents` above it.
+     - 844x390 (phone landscape): the card ran below the fold, the box was
+       off-screen entirely, AND the page overflowed horizontally by 19px
+       (scrollWidth 863 vs clientWidth 844). That last one is mine, not in
+       the audit, and it matters: horizontal overflow is how a layout gets
+       WIDER than the screen, which is the shape of Malik's screenshot (card
+       oversized and shoved right with its edge cut off).
+
+   So the composition is no longer scoped to a device guess. It is scoped to
+   the two things that actually decide it: how wide the screen is, and
+   whether there is enough height to stack. Everything through 1023px gets
+   the same law, and short screens get their own honest layout instead of a
+   stacked one that cannot fit.
+   ══════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 1023.98px) and (not ((orientation: landscape) and (max-height: 599.98px))) {
   :root {
+    /* Phones cap at 352; a tablet has room for a larger card and looks
+       comically small at the phone cap. Still a min() so it can never
+       exceed the screen. */
     --p1-card-w: min(88vw, 352px);
     --p1-card-h: 0px; /* dead: the card's height comes from the page-1 flex column, not a formula. Kept as a defined value so any stale reference resolves to nothing rather than to a stale size. */
+  }
+  @media (min-width: 768px) {
+    :root { --p1-card-w: min(68vw, 520px); }
   }
   /* ══ MALIK'S LAYOUT LAW, STRUCTURAL (v1067) ═════════════════════════════
      Page 1 is a flex column exactly one viewport tall. The card is the ONLY
@@ -3766,6 +3794,53 @@ body.pre-clarity .capture-fab { display: none !important; }
   body:not(.has-custom-layout) .app.dash-v2 #homePage1 .daycard-theme-living .daycard-living-stage {
     margin-top: 0 !important; margin-bottom: 0 !important;
   }
+}
+
+/* SHORT SCREENS GET THEIR OWN LAYOUT (v1106). A big Memento stacked above a
+   full-width box physically cannot fit in 390px of height, so stacking there
+   is not a bug to tune, it is the wrong composition. Landscape puts the card
+   on the left and the deck on the right, both fully visible, no scrolling.
+   The swipe engine, the deck, the dots and every state are untouched. */
+@media (max-width: 1023.98px) and (orientation: landscape) and (max-height: 599.98px) {
+  body:not(.has-custom-layout) .app.dash-v2 #homePage1 {
+    display: flex; flex-direction: row; align-items: stretch; gap: 18px;
+    height: calc(min(var(--p1-vh, 100svh), 100lvh) - var(--p1-top, calc(var(--safe-t, 0px) + 16px)));
+    box-sizing: border-box;
+    padding: 0 max(14px, var(--safe-r, 0px)) calc(12px + var(--safe-b, 0px)) max(14px, var(--safe-l, 0px));
+  }
+  body:not(.has-custom-layout) .app.dash-v2 #homePage1 > #dayCard {
+    flex: 0 1 auto; min-width: 0; min-height: 0; display: flex;
+    align-items: center; justify-content: center; margin: 0;
+  }
+  body:not(.has-custom-layout) .app.dash-v2 #homePage1 > #commandCenter {
+    flex: 1 1 auto; min-width: 0; align-self: center; margin: 0;
+    max-width: 460px;
+  }
+  body:not(.has-custom-layout) .app.dash-v2 #homePage1 > #dayCard > .daycard-wrap {
+    display: flex; min-height: 0; height: 100%;
+  }
+  body:not(.has-custom-layout) .app.dash-v2 #homePage1 #dayCard .daycard-theme-living .daycard-living-stage {
+    height: 100% !important; min-height: 0 !important;
+    width: auto !important; aspect-ratio: 320 / 452;
+    max-width: 40vw !important; min-width: 0 !important;
+    margin: 0 !important;
+  }
+  body:not(.has-custom-layout) .app.dash-v2 #homePage1 #dayCard .daycard-ns {
+    height: 100% !important; min-height: 0 !important; width: 100% !important; min-width: 0 !important;
+  }
+  /* Page 2 is a scroll away, not a snap target, when there is no room to snap. */
+  html { scroll-snap-type: none; }
+}
+
+/* NO HORIZONTAL OVERFLOW, ANY SIZE (v1106). Measured 863 vs 844 at landscape
+   before this. A layout wider than the screen is exactly how a card ends up
+   oversized and half off the right edge, and it survives relaunches because
+   nothing about it is transient. This is the belt: the app can never be
+   wider than the viewport, at any breakpoint. */
+html, body { overflow-x: clip; max-width: 100vw; }
+.app.dash-v2, #homePage1 { max-width: 100%; }
+
+@media (max-width: 767.98px) {
   /* The two snap stops: page 1, then the modules. */
   body:not(.has-custom-layout) .app.dash-v2 #dashBelow { scroll-snap-align: start; }
   html, body { overflow-x: clip; max-width: 100vw; }
