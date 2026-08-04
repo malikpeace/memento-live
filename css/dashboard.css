@@ -3777,15 +3777,28 @@ body.pre-clarity .capture-fab { display: none !important; }
   /* Two IDs on purpose: the older per-state rules carry #dayCard plus six
      classes, and without matching that these lose and the width rule wins
      (which is what let the card go square). */
+  /* v1108, THE ENGINE-PROOF CARD (from Malik's on-device truth panel):
+     height:100% + aspect-ratio + max-width is a CONSTRAINT FIGHT, and the
+     spec lets max-width win by BREAKING the ratio. Chrome resolved it
+     aspect-first (352x528, correct, which is all any preview ever showed);
+     his phone's WebKit resolved it height-first (352x573, stretched, then
+     mislaid). Same CSS, two legal answers. So there is no fight anymore:
+     the width is COMPUTED outright, the smaller of the width cap and what
+     the available height affords at the true ratio (cqh reads #dayCard's
+     height, the card's actual room), and the height always follows the
+     ratio. One deterministic answer on every engine, exact proportion
+     everywhere, by construction. */
+  body .app.dash-v2 #homePage1 > #dayCard { container-type: size; }
   body .app.dash-v2 #homePage1 #dayCard .daycard-theme-living .daycard-living-stage {
-    height: 100% !important; min-height: 0 !important;
-    width: auto !important;
-    aspect-ratio: 320 / 452;
-    max-width: var(--p1-card-w) !important;
-    /* min-width:0 releases the contents' min-content floor, which was the
-       last thing that could force the shape open on a very short viewport. */
-    min-width: 0 !important;
-    margin-left: auto !important; margin-right: auto !important;
+    width: min(var(--p1-card-w), calc(100cqh * 320 / 452)) !important;
+    height: auto !important; min-height: 0 !important;
+    aspect-ratio: 320 / 452 !important;
+    max-width: none !important; min-width: 0 !important;
+    margin: 0 auto !important;
+  }
+  /* The card centres in whatever room it has; surplus reads as air. */
+  body .app.dash-v2 #homePage1 > #dayCard > .daycard-wrap {
+    justify-content: center; align-items: center;
   }
   body .app.dash-v2 #homePage1 #dayCard .daycard-ns {
     height: 100% !important; min-height: 0 !important; width: 100% !important;
@@ -3823,10 +3836,12 @@ body.pre-clarity .capture-fab { display: none !important; }
   body .app.dash-v2 #homePage1 > #dayCard > .daycard-wrap {
     display: flex; min-height: 0; height: 100%;
   }
+  body .app.dash-v2 #homePage1 > #dayCard { container-type: size; }
   body .app.dash-v2 #homePage1 #dayCard .daycard-theme-living .daycard-living-stage {
-    height: 100% !important; min-height: 0 !important;
-    width: auto !important; aspect-ratio: 320 / 452;
-    max-width: 40vw !important; min-width: 0 !important;
+    width: min(40vw, calc(100cqh * 320 / 452)) !important;
+    height: auto !important; min-height: 0 !important;
+    aspect-ratio: 320 / 452 !important;
+    max-width: none !important; min-width: 0 !important;
     margin: 0 !important;
   }
   body .app.dash-v2 #homePage1 #dayCard .daycard-ns {

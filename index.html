@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <script>
 /* Single source of truth for the app version. Surfaced in Settings > About. */
-window.MEMENTO_VERSION = 'v1107';
+window.MEMENTO_VERSION = 'v1108';
 /* LOWFX: touch / mobile devices get a lighter render path (no backdrop blur,
    no will-change layers, no background canvas animations) so iOS does not kill
    the tab from graphics-memory pressure. Desktop (fine pointer) is untouched.
@@ -53,17 +53,17 @@ window.MEMENTO_VERSION = 'v1107';
      paint never waits on a third-party CDN. font-display: swap throughout. -->
 <link rel="preload" href="fonts/dmsans-1.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="fonts/fonts.css">
-<link rel="stylesheet" href="css/base.css?v=v1107">
+<link rel="stylesheet" href="css/base.css?v=v1108">
 <link rel="stylesheet" href="css/sidebar.css?v=v1020">
-<link rel="stylesheet" href="css/dashboard.css?v=v1107">
-<link rel="stylesheet" href="css/misc.css?v=v1107">
+<link rel="stylesheet" href="css/dashboard.css?v=v1108">
+<link rel="stylesheet" href="css/misc.css?v=v1108">
 <link rel="stylesheet" href="css/vivere.css?v=v1020">
 <link rel="stylesheet" href="css/notes.css?v=v1020">
 <link rel="stylesheet" href="css/onboarding.css?v=v1020">
-<link rel="stylesheet" href="css/clarity.css?v=v1107">
-<link rel="stylesheet" href="css/action.css?v=v1107">
-<link rel="stylesheet" href="css/unlock-ceremony.css?v=v1107">
-<link rel="stylesheet" href="css/daycard-living.css?v=v1107">
+<link rel="stylesheet" href="css/clarity.css?v=v1108">
+<link rel="stylesheet" href="css/action.css?v=v1108">
+<link rel="stylesheet" href="css/unlock-ceremony.css?v=v1108">
+<link rel="stylesheet" href="css/daycard-living.css?v=v1108">
 <link rel="stylesheet" href="css/clarity-paywall.css?v=v1020">
 <link rel="stylesheet" href="css/appearance-picker.css?v=v1020">
 <link rel="stylesheet" href="css/journey.css?v=v1020">
@@ -83,7 +83,7 @@ window.MEMENTO_VERSION = 'v1107';
      dashboard god rays on every refresh when restoring a deeper view. The
      reveal class .boot-revealed is added by JS at the end of the init block. -->
 <div id="bootMask" aria-hidden="true">
-  <!-- v1107 (Malik): the SAME bare M, at the SAME size, as the restoring
+  <!-- v1108 (Malik): the SAME bare M, at the SAME size, as the restoring
        screen in js/12. Boot used the 96px icon PNG and restore used a 56px
        mark, so the two loading screens clashed back to back. One mark now, so
        the restore simply starts fading what boot already put on screen. -->
@@ -431,14 +431,14 @@ window.MEMENTO_VERSION = 'v1107';
     <!-- Plain container (not a button): Settings is reachable from the sidebar
          profile and the tab bar, so the greeting itself is not a hit target. -->
     <div class="dash-header__greeting dash-header__hub" id="dashAvatar">
-      <!-- v1107 (Malik): the "Good evening, Name." line is gone. It carried no
+      <!-- v1108 (Malik): the "Good evening, Name." line is gone. It carried no
            information and orphaned itself at the top edge, away from the
            content. -->
       <div class="hub-headline" id="hubHeadline" role="button" tabindex="0" aria-haspopup="true" aria-expanded="false" aria-label="Change your dashboard headline"><span class="hub-headline__text" id="hubHeadlineText">What&rsquo;s today&rsquo;s Action?</span><svg class="hub-headline__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></div>
       <div class="hub-returncue" id="hubReturnCue" style="display:none"></div>
     </div>
     <div class="dash-header__right">
-      <!-- v1107 (Malik): no search icon in the header. Search is still there
+      <!-- v1108 (Malik): no search icon in the header. Search is still there
            for anyone who wants it, on Cmd/Ctrl+K and "/", both bound
            separately from this button. -->
       <button class="spotify-pill" id="spotifyPill" type="button" style="display:none" aria-label="Spotify now playing">
@@ -451,7 +451,7 @@ window.MEMENTO_VERSION = 'v1107';
         </span>
         <span class="spotify-pill__bars" id="spotifyBars" aria-hidden="true"><i></i><i></i><i></i></span>
       </button>
-      <!-- v1107 (Malik): the whole clock block is gone, date included. Every
+      <!-- v1108 (Malik): the whole clock block is gone, date included. Every
            device shows its own date and time in its status bar; the greeting
            moved down to sit with today's box instead. -->
 
@@ -517,7 +517,7 @@ window.MEMENTO_VERSION = 'v1107';
   </section>
   <!-- Day Card: the mobile hero prototype (Star / Ember / Hourglass themes,
        tap the object to switch). Hidden on desktop unless ?daycard=1. -->
-  <!-- v1107, MALIK'S LAYOUT LAW made structural: page 1 is a real flex column
+  <!-- v1108, MALIK'S LAYOUT LAW made structural: page 1 is a real flex column
        exactly one viewport tall. The card GROWS into whatever is left and the
        today box is the last item, so the box lands at the bottom by geometry
        instead of by arithmetic. display:contents on desktop, so the bento grid
@@ -534,7 +534,7 @@ window.MEMENTO_VERSION = 'v1107';
   <!-- v909 Desktop Editorial home (Malik's pick, prototypes/home-desktop-lab-v4):
        the mission as a 42px headline beside the card. Desktop-only twin of the
        command center (display:none <1024); same data-cc-action wiring. -->
-  <!-- v1107 (Malik): the greeting lives here now, right above today's box and
+  <!-- v1108 (Malik): the greeting lives here now, right above today's box and
        flush with its left edge, instead of orphaned at the top of the screen.
        The wrapper carries the grid slot so the two read as one block. -->
   <div id="deskMissionWrap">
@@ -818,34 +818,34 @@ window.MEMENTO_VERSION = 'v1107';
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
 <script src="js/00-error-reporting.js?v=v1020"></script>
 <script src="js/01-state-foundation.js?v=v1020"></script>
-<script src="js/02-clarity-experience.js?v=v1107"></script>
+<script src="js/02-clarity-experience.js?v=v1108"></script>
 <script src="js/03-ai-integration.js?v=v1020"></script>
 <script src="js/04-templates-proof.js?v=v1020"></script>
 <script src="js/05-vivere.js?v=v1020"></script>
-<script src="js/06-consistency-mori.js?v=v1107"></script>
-<script src="js/07-sheet-templates.js?v=v1107"></script>
-<script src="js/08-cards-grid-share.js?v=v1107"></script>
-<script src="js/09-controllers.js?v=v1107"></script>
+<script src="js/06-consistency-mori.js?v=v1108"></script>
+<script src="js/07-sheet-templates.js?v=v1108"></script>
+<script src="js/08-cards-grid-share.js?v=v1108"></script>
+<script src="js/09-controllers.js?v=v1108"></script>
 <script src="js/00-backup-security.js?v=v1020"></script>
-<script src="js/10-demo-backend.js?v=v1107"></script>
+<script src="js/10-demo-backend.js?v=v1108"></script>
 <!-- The Path + Your Story: the journey views. Client-side, read existing state. -->
 <script src="js/17-journey.js?v=v1020"></script>
 <!-- Add to Home Screen prompt: detects browser-tab vs installed PWA. -->
 <script src="js/18-install.js?v=v1020"></script>
 <script src="js/20-push.js?v=v1020"></script>
-<script src="js/11-init.js?v=v1107"></script>
-<script src="js/12-cloud-sync.js?v=v1107"></script>
-<script src="js/13-clarity-paywall.js?v=v1107"></script>
-<script src="js/22-billing.js?v=v1107"></script>
+<script src="js/11-init.js?v=v1108"></script>
+<script src="js/12-cloud-sync.js?v=v1108"></script>
+<script src="js/13-clarity-paywall.js?v=v1108"></script>
+<script src="js/22-billing.js?v=v1108"></script>
 <script src="js/14-appearance-picker.js?v=v1020"></script>
 <!-- DEV-ONLY: ?dev=beats live preview for the onboarding chapter pages. Inert without the param. -->
 <script src="js/19-dev-beats.js?v=v1020"></script>
 <!-- The sound engine: synthesized moments, off by default (Profile toggle). -->
 <script src="js/20-sound.js?v=v1020"></script>
-<script src="js/21-descent.js?v=v1107"></script>
+<script src="js/21-descent.js?v=v1108"></script>
 <script src="js/22-prompt-lab.js?v=v1020"></script>
 <script src="js/23-action-states.js?v=v1020"></script>
-<script src="js/24-unlock-ceremony.js?v=v1107"></script>
+<script src="js/24-unlock-ceremony.js?v=v1108"></script>
 <!-- Back/forward + hash-URL routing. Loads LAST so every open/close fn it wraps
      already exists. Inert until onboarding is done; touches only location.hash. -->
 <script src="js/15-router.js?v=v1020"></script>
