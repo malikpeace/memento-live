@@ -139,9 +139,20 @@
   @media (prefers-reduced-motion: reduce){
     .sheet{ transition:none; } .sheetwrap__scrim{ transition:none; } }
 
-  /* pressing and holding the card: it gives, so the gesture is felt */
-  .cage{ transition:transform .2s ease-out; }
-  .cage.is-pressing{ transform:scale(.972); }
+  /* pressing and holding the card: it gives, so the gesture is felt.
+     iOS kills a long press three separate ways, so all three are shut off:
+     the callout/magnifier, text selection, and the tap highlight. touch-action
+     stays pan-y so the page still scrolls when the finger actually moves. */
+  .cage{ transition:transform .18s ease-out;
+    touch-action:pan-y;
+    -webkit-touch-callout:none;
+    -webkit-user-select:none; user-select:none;
+    -webkit-tap-highlight-color:transparent; }
+  .cage *{ -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; }
+  .cage.is-pressing{ transform:scale(.968); }
+  /* the hint is also a button, so the customiser is never gesture-only */
+  .hint{ background:none; border:0; font:inherit; display:block; width:100%;
+    cursor:pointer; }
 
   /* ── the bar. Glass, only a back arrow, the name arrives on scroll ─────── */
   .bar{ position:sticky; top:0; z-index:20; display:flex; align-items:center; gap:12px;
@@ -370,7 +381,7 @@
 
     <div class="trail" id="trail"></div>
 
-    <p class="hint">Hold the card to change its theme.</p>
+    <button class="hint" type="button" id="hintBtn">Hold the card to change its theme.</button>
 
     <div class="origin">
       <span class="origin__k">Creation of Your Memento</span>
@@ -678,15 +689,23 @@ function tickMori(){
 tickMori();
 setInterval(tickMori, 1000);
 
-/* ── hold the card to open the customiser. 420ms, and the card gives under
-   the finger so the gesture is felt before the sheet arrives. A plain tap does
-   nothing, or every scroll that starts on the card would open it. */
+/* ── hold the card to open the customiser. The card gives under the finger so
+   the gesture is felt before the sheet arrives. A plain tap does nothing, or
+   every scroll that starts on the card would open it.
+
+   Why this is not just pointerdown/pointerup: on iOS a long press competes with
+   the selection callout, and pointerleave fires on a pixel of jitter, which
+   killed the hold before it ever completed. So the press cancels on real
+   MOVEMENT (12px) rather than on leaving the element, listens to touch events
+   as well as pointer events, and takes contextmenu as a second way in. */
 const wrap = document.getElementById('sheetWrap');
 const cage = document.getElementById('heroCard');
-let holdT = null, held = false;
+const HOLD_MS = 380, SLOP = 12;
+let holdT = null, sx = 0, sy = 0, armed = false;
 
 function openSheet(){
-  held = true;
+  holdT = null; armed = false;
+  cage.classList.remove('is-pressing');
   wrap.hidden = false;
   /* force a reflow so the closed transform is committed before the open class
      lands, otherwise the sheet jumps into place with no slide. rAF is not
@@ -699,19 +718,54 @@ function closeSheet(){
   wrap.classList.remove('is-open');
   setTimeout(()=>{ wrap.hidden = true; }, 280);
 }
-function pressStart(){
+function pressStart(x, y){
+  if (armed) return;
+  armed = true; sx = x; sy = y;
   cage.classList.add('is-pressing');
-  holdT = setTimeout(openSheet, 420);
+  clearTimeout(holdT);
+  holdT = setTimeout(openSheet, HOLD_MS);
+}
+function pressMove(x, y){
+  if (!armed) return;
+  if (Math.abs(x - sx) > SLOP || Math.abs(y - sy) > SLOP) pressEnd();
 }
 function pressEnd(){
+  armed = false;
   cage.classList.remove('is-pressing');
-  clearTimeout(holdT);
+  clearTimeout(holdT); holdT = null;
 }
-cage.addEventListener('pointerdown', pressStart);
-['pointerup','pointercancel','pointerleave'].forEach(ev=>
-  cage.addEventListener(ev, pressEnd));
-/* a long press on iOS raises the callout menu, which eats the gesture */
-cage.addEventListener('contextmenu', e=>e.preventDefault());
+
+/* touch first: iOS fires these reliably even when pointer events get cancelled */
+cage.addEventListener('touchstart', e=>{
+  const t = e.touches[0]; if(t) pressStart(t.clientX, t.clientY);
+}, {passive:true});
+cage.addEventListener('touchmove', e=>{
+  const t = e.touches[0]; if(t) pressMove(t.clientX, t.clientY);
+}, {passive:true});
+['touchend','touchcancel'].forEach(ev=>
+  cage.addEventListener(ev, pressEnd, {passive:true}));
+
+/* mouse/pen for everything else. pointerdown is ignored for touch so the two
+   paths can never both arm the same press. */
+cage.addEventListener('pointerdown', e=>{
+  if (e.pointerType === 'touch') return;
+  pressStart(e.clientX, e.clientY);
+});
+addEventListener('pointermove', e=>{
+  if (e.pointerType === 'touch') return;
+  pressMove(e.clientX, e.clientY);
+});
+['pointerup','pointercancel'].forEach(ev=>
+  addEventListener(ev, e=>{ if(e.pointerType !== 'touch') pressEnd(); }));
+
+/* if a platform gets to its own long-press menu first, take that as the hold */
+cage.addEventListener('contextmenu', e=>{
+  e.preventDefault();
+  if (wrap.hidden) openSheet();
+});
+
+/* and a plain tappable way in, so the customiser is never gesture-only */
+document.getElementById('hintBtn').addEventListener('click', openSheet);
 
 document.getElementById('sheetScrim').addEventListener('click', closeSheet);
 document.getElementById('sheetDone').addEventListener('click', closeSheet);
