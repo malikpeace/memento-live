@@ -397,76 +397,7 @@
   stroke: none !important;
 }
 
-/* ---- gr-none: bare material, no micro-surface at all. */
-.skin.gr-none .gr-layer { display: none; }
 
-/* ---- gr-film: fine photographic grain. Dense irregular speckle, no direction.
-   Built from four offset radial dot fields at coprime tile sizes so the repeat
-   never lands on a visible checkerboard. Reads as emulsion, not noise. */
-.skin.gr-film .daycard-ns {
-  --gr-img:
-    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.85) 0 0.6px, transparent 0.7px),
-    radial-gradient(circle at 70% 60%, rgba(0,0,0,0.85) 0 0.6px, transparent 0.7px),
-    radial-gradient(circle at 20% 80%, rgba(255,255,255,0.6) 0 0.5px, transparent 0.6px),
-    radial-gradient(circle at 85% 20%, rgba(0,0,0,0.6) 0 0.5px, transparent 0.6px);
-  --gr-size: 3px 3px, 4px 4px, 5px 5px, 7px 7px;
-  --gr-blend: overlay;
-  --gr-op: 0.5;
-}
-
-/* ---- gr-brushed: fine parallel brushed-metal lines. Near-vertical, tight pitch,
-   with a slow wide sweep across them so the "grain" catches light unevenly the way
-   real brushed aluminium does. Directional and obvious in raking light. */
-.skin.gr-brushed .daycard-ns {
-  --gr-img:
-    repeating-linear-gradient(94deg,
-      rgba(255,255,255,0.5) 0 0.5px,
-      rgba(0,0,0,0.42) 0.5px 1.4px,
-      rgba(255,255,255,0.22) 1.4px 2.1px,
-      transparent 2.1px 3px),
-    repeating-linear-gradient(94deg,
-      rgba(0,0,0,0.3) 0 1px,
-      transparent 1px 2.6px),
-    linear-gradient(96deg,
-      transparent 0%,
-      rgba(255,255,255,0.5) 22%,
-      transparent 40%,
-      rgba(0,0,0,0.35) 62%,
-      transparent 80%,
-      rgba(255,255,255,0.34) 100%);
-  --gr-size: auto, auto, auto;
-  --gr-blend: soft-light;
-  --gr-op: 0.62;
-}
-
-/* ---- gr-marble: soft veining. Large low-frequency ellipses at irregular
-   positions and scales, half lightening and half darkening, so the surface drifts
-   between cloudy and clear with no repeat you can name. Stone, not pattern. */
-.skin.gr-marble .daycard-ns {
-  --gr-img:
-    radial-gradient(120% 26% at 12% 18%, rgba(255,255,255,0.55) 0%, transparent 62%),
-    radial-gradient(90% 18% at 78% 34%, rgba(0,0,0,0.5) 0%, transparent 58%),
-    radial-gradient(140% 34% at 40% 66%, rgba(255,255,255,0.4) 0%, transparent 66%),
-    radial-gradient(70% 14% at 88% 82%, rgba(0,0,0,0.42) 0%, transparent 60%),
-    radial-gradient(60% 12% at 24% 92%, rgba(255,255,255,0.3) 0%, transparent 55%),
-    repeating-linear-gradient(66deg,
-      rgba(255,255,255,0.16) 0 1px,
-      transparent 1px 5px,
-      rgba(0,0,0,0.14) 5px 6px,
-      transparent 6px 17px);
-  --gr-size: auto, auto, auto, auto, auto, auto;
-  --gr-blend: soft-light;
-  --gr-op: 0.7;
-}
-
-/* Flat mattes have no gloss to fight, so the same texture reads louder there.
-   Pull every option back a step so a matte card stays matte. */
-.skin.flat .daycard-ns {
-  --gr-op: 0.4;
-}
-.skin.flat.gr-brushed .daycard-ns { --gr-op: 0.46; }
-.skin.flat.gr-marble  .daycard-ns { --gr-op: 0.5; }
-.skin.flat.gr-none    .daycard-ns { --gr-op: 0; }
 
 /* The card already tilts in 3D; the wash must ride with it and never animate
    a filter. Nothing here animates, and the layer is transform-free, so it
@@ -564,13 +495,6 @@
 }
 .skin.mk-embossed .daycard-ns__emblem path { fill: var(--mark, #ffffff) !important; }
 
-/* ── grain was too polite to see. Real presence now, still white/black only. */
-.skin.gr-film    .daycard-ns { --gr-op: 0.95; }
-.skin.gr-brushed .daycard-ns { --gr-op: 1; }
-.skin.gr-marble  .daycard-ns { --gr-op: 1; }
-.skin.flat.gr-film    .daycard-ns { --gr-op: 0.8; }
-.skin.flat.gr-brushed .daycard-ns { --gr-op: 0.85; }
-.skin.flat.gr-marble  .daycard-ns { --gr-op: 0.9; }
 
 /* ── Void emits black: the room around it darkens instead of lighting up. */
 .skin.void .daycard-ns {
@@ -579,6 +503,12 @@
               inset 0 1px 0 rgba(255,255,255,.03) !important; }
 .skin.void .daycard-ns__rim { box-shadow: inset 0 0 0 1px var(--edge) !important; }
 .skin.void .daycard-wrap__aura, .skin.void .daycard-bloom { opacity: 0 !important; }
+/* THE white ring was the stage's own glow, not the card's. Black it out. */
+.skin.void .daycard-living-stage {
+  box-shadow: 0 0 60px 10px rgba(0,0,0,.98),
+              0 0 120px 40px rgba(0,0,0,.92),
+              0 12px 34px rgba(0,0,0,.7) !important; }
+.skin.void .daycard-ns::before { opacity: .25 !important; }
 
 
   /* ── THE MIXER ─────────────────────────────────────────────────────── */
@@ -1158,7 +1088,6 @@ const AXES = [
                                    ['fin-irid','Iridescent'],['fin-frost','Frosted'],['fin-velvet','Velvet']]},
   {k:'mk',  label:'Mark',    opts:[['mk-plain','Plain'],['mk-engraved','Engraved'],['mk-embossed','Embossed'],
                                    ['mk-cutout','Cut-out']]},
-  {k:'gr',  label:'Grain',   opts:[['gr-none','None'],['gr-film','Film'],['gr-brushed','Brushed'],['gr-marble','Marble']]},
   {k:'rm',  label:'Rim',     opts:[['rm-hair','Hairline'],['rm-none','None'],['rm-bevel','Bevelled']]},
 ];
 const TOTAL = SKINS.length * AXES.reduce((n,a)=>n*a.opts.length,1);
@@ -1187,7 +1116,6 @@ function mixCardHTML(){
             <span class="daycard-ns__burn" aria-hidden="true"></span>
             <span class="daycard-ns__plat" aria-hidden="true"></span>
             <span class="daycard-ns__tint" aria-hidden="true"></span>
-            <span class="gr-layer" aria-hidden="true"></span>
             <span class="daycard-ns__rim" aria-hidden="true"></span>
             <div class="daycard-ns__body">
               <svg class="daycard-ns__emblem" viewBox="0 0 512 512" aria-hidden="true">
