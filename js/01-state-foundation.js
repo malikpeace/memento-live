@@ -7,7 +7,7 @@
    ONCE on mismatch. Kills the "phone silently runs old cached js under a new
    index" class (the SW's offline fallback can serve stale files on a bad
    connection; Malik hit this three times in one day). */
-window.MEMENTO_JS_BUILD = 'v1112';
+window.MEMENTO_JS_BUILD = 'v1113';
 /* ============================================
    STATE MANAGEMENT
    ============================================ */
@@ -88,6 +88,15 @@ const DEFAULT_STATE = {
     // the first open after it ends. This is the memory the AI reads.
     ledger: []
   },
+  // v1113: THE DISTANCE. If the star names a number ("100 paying users"),
+  // Memento tracks the climb toward it, because a habit tracker counts
+  // attendance and Memento is supposed to count arrival. target/unit are
+  // parsed from the star (starHash invalidates them when the star changes);
+  // baseline is where they said they were when tracking began; current is the
+  // latest pulse; history is one {day, value} per update, append-only.
+  // target === null means the star has no number: every distance surface
+  // stays dormant and asks for nothing.
+  goalProgress: { starHash: '', target: null, unit: '', baseline: null, current: null, updatedAt: '', askedDay: '', history: [] },
   streak: { count: 0, lastCheckDate: null, history: [], minutesReclaimed: 0, bestEver: 0, bestEverShown: 0, milestonesShown: [], grace: { bank: 0, lastEarnMilestone: 0, used: {} } },
   flow: { items: JSON.parse(JSON.stringify(DEFAULT_FLOW_ITEMS)) },
   // Day Card look. 'platinum' = the classic glass hero; 'living' = the
@@ -1913,6 +1922,12 @@ function migrateState() {
       if (state.action.primaryAction.tiers[k] === undefined) state.action.primaryAction.tiers[k] = '';
     });
   }
+  // v1113: the distance block for saves that predate it.
+  if (!state.goalProgress || typeof state.goalProgress !== 'object') {
+    state.goalProgress = { starHash: '', target: null, unit: '', baseline: null, current: null, updatedAt: '', askedDay: '', history: [] };
+  }
+  if (!Array.isArray(state.goalProgress.history)) state.goalProgress.history = [];
+  if (state.goalProgress.askedDay === undefined) state.goalProgress.askedDay = '';
   // Migrate legacy recommendedTier values.
   if (state.action.primaryAction.recommendedTier === 'minimum') state.action.primaryAction.recommendedTier = 'light';
   if (state.action.primaryAction.recommendedTier === 'ambitious') state.action.primaryAction.recommendedTier = 'heavy';

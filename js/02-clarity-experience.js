@@ -5429,6 +5429,146 @@ Return ONLY the sentence text. No quotes, no labels.`;
     return d.toLocaleDateString(undefined, { weekday: 'long' });
   },
 
+  /* ==================== THE DISTANCE (v1113) ====================
+     Attendance is the streak's job. This is arrival: if the star names a
+     number, the loop carries "62 / 100" and asks for a quiet pulse every few
+     days, so the module can eventually say "you are there" instead of only
+     "you showed up". A star with no number renders nothing and asks nothing. */
+  _distChipHtml() {
+    try {
+      const gp = (typeof ensureGoalTarget === 'function') ? ensureGoalTarget() : null;
+      if (!gp || gp.target === null) return '';
+      const t = Math.round(gp.target).toLocaleString();
+      if (gp.current === null) {
+        return `<button type="button" class="aloop-dist aloop-dist--empty" id="aloopDist">${t} ${esc(gp.unit)}<small>set your count</small></button>`;
+      }
+      const c = Math.round(gp.current).toLocaleString();
+      const there = gp.current >= gp.target;
+      return `<button type="button" class="aloop-dist${there ? ' aloop-dist--there' : ''}" id="aloopDist"><span class="aloop-dist__nums"><span class="apl-num">${c}</span><i>/</i><span class="apl-num">${t}</span></span><small>${there ? 'you are there' : esc(gp.unit)}</small></button>`;
+    } catch (e) { return ''; }
+  },
+
+  // One small sheet: a number, Save, and a skip that costs nothing. The same
+  // sheet serves the first ask ("where are you today?") and every pulse after.
+  openGoalPulse(source) {
+    try {
+      const gp = (typeof ensureGoalTarget === 'function') ? ensureGoalTarget() : null;
+      if (!gp || gp.target === null) return;
+      if (document.getElementById('gpulse')) return;
+      const day = this._loopDayKey(new Date());
+      gp.askedDay = day; try { persistNow(); } catch (e) {}
+      const first = gp.current === null;
+      const ov = document.createElement('div');
+      ov.id = 'gpulse'; ov.className = 'gpulse';
+      ov.innerHTML = `
+        <div class="gpulse__sheet" role="dialog" aria-label="progress pulse">
+          <p class="gpulse__q">${first ? 'Where are you today?' : 'Quick pulse. Where is it now?'}</p>
+          <p class="gpulse__u">${esc(gp.unit)} &middot; heading for ${Math.round(gp.target).toLocaleString()}${first ? ' &middot; 0 is a real answer' : ''}</p>
+          <input class="gpulse__in apl-num" type="text" inputmode="decimal" autocomplete="off"
+                 placeholder="${first ? '0' : (gp.current !== null ? Math.round(gp.current).toLocaleString() : '0')}" aria-label="current count">
+          <div class="gpulse__row">
+            <button type="button" class="gpulse__save">Save</button>
+            <button type="button" class="gpulse__skip">${first ? 'Not now' : 'Skip'}</button>
+          </div>
+        </div>`;
+      document.body.appendChild(ov);
+      requestAnimationFrame(() => ov.classList.add('is-open'));
+      const input = ov.querySelector('.gpulse__in');
+      const close = () => { ov.classList.remove('is-open'); setTimeout(() => { try { ov.remove(); } catch (e) {} }, 220); };
+      ov.addEventListener('click', (e) => { if (e.target === ov) close(); });
+      ov.querySelector('.gpulse__skip').addEventListener('click', close);
+      const save = () => {
+        const raw = String(input.value || '').replace(/[,\s$]/g, '');
+        if (raw === '') { close(); return; }
+        const n = Number(raw);
+        if (!isFinite(n) || n < 0) { input.value = ''; input.placeholder = 'a number'; return; }
+        if (typeof goalProgressUpdate === 'function') goalProgressUpdate(n);
+        close();
+        // repaint the chip in place; a full re-render would fight the deck
+        try {
+          const chip = document.getElementById('aloopDist');
+          if (chip && chip.parentNode) {
+            const wrap = document.createElement('div');
+            wrap.innerHTML = this._distChipHtml();
+            const fresh = wrap.firstElementChild;
+            if (fresh) {
+              chip.replaceWith(fresh);
+              fresh.addEventListener('click', (ev) => { ev.stopPropagation(); this.openGoalPulse('chip'); });
+            }
+          }
+        } catch (e) {}
+      };
+      ov.querySelector('.gpulse__save').addEventListener('click', save);
+      input.addEventListener('keydown', (e) => { if (e.key === 'Enter') save(); });
+      setTimeout(() => { try { input.focus(); } catch (e) {} }, 260);
+    } catch (e) {}
+  },
+
+  // Due = never pulsed, or the last pulse is 3+ days old. Asked at most once
+  // a day, only after a completion, never blocking anything.
+  _maybeAskGoalPulse() {
+    try {
+      const gp = state.goalProgress;
+      if (!gp || gp.target === null) return;
+      const day = this._loopDayKey(new Date());
+      if (gp.askedDay === day) return;
+      let due = gp.current === null;
+      if (!due && gp.updatedAt) {
+        const age = Math.round((new Date(day) - new Date(gp.updatedAt)) / 86400000);
+        due = age >= 3;
+      }
+      if (!due) return;
+      this._setTimeout(() => { if (this.isOpen) this.openGoalPulse('after-complete'); }, 2600);
+    } catch (e) {}
+  },
+
+  /* ==================== THE ADAPTIVE OPEN (v1113) ====================
+     The profile has noticed patterns for weeks; now the loop ACTS on one.
+     Deterministic and explainable, decided once per day at the morning
+     boundary, and it only moves the OPENING tier: the user can always swipe
+     away from it.
+       re-entry: 2+ missed days in a row -> open one rung below the last
+                 completed rung (floor tiny). Coming back small is how you
+                 come back at all.
+       groove:   last 3 completions all on one rung that is not the current
+                 opening -> open there. The pattern IS the preference.
+       growth:   last 3 completions all above the current opening -> open one
+                 rung up. They already outgrew the default.
+     The decision is written to state.action.tierAdapt so the AI profile can
+     say it out loud and the UI can whisper it later. */
+  _adaptOpeningTier() {
+    try {
+      const KEYS = ['tiny', 'light', 'moderate', 'heavy', 'extreme'];
+      const led = (state.action && Array.isArray(state.action.ledger)) ? state.action.ledger : [];
+      if (led.length < 3) return;
+      const pa = state.action.primaryAction || {};
+      const cur = KEYS.indexOf(state.action.selectedTier) >= 0 ? state.action.selectedTier
+        : (KEYS.indexOf(pa.recommendedTier) >= 0 ? pa.recommendedTier : 'moderate');
+      const curIdx = KEYS.indexOf(cur);
+      const recent = led.slice(-7);
+      let trailingMisses = 0;
+      for (let i = recent.length - 1; i >= 0 && recent[i].outcome === 'missed'; i--) trailingMisses++;
+      const doneRungs = led.filter(r => r.outcome === 'done').slice(-3).map(r => Number(r.offeredRung));
+      let to = null, reason = '';
+      if (trailingMisses >= 2) {
+        const lastDone = led.filter(r => r.outcome === 'done').slice(-1)[0];
+        const base = lastDone ? Number(lastDone.offeredRung) - 1 : 1;
+        to = KEYS[Math.max(0, Math.min(4, base - 1))];
+        reason = 're-entry';
+      } else if (doneRungs.length === 3 && doneRungs[0] === doneRungs[1] && doneRungs[1] === doneRungs[2] && (doneRungs[0] - 1) !== curIdx) {
+        to = KEYS[Math.max(0, Math.min(4, doneRungs[0] - 1))];
+        reason = 'groove';
+      } else if (doneRungs.length === 3 && doneRungs.every(r => (r - 1) > curIdx)) {
+        to = KEYS[Math.min(4, curIdx + 1)];
+        reason = 'growth';
+      }
+      if (!to || to === cur) return;
+      state.action.selectedTier = to;
+      state.action.tierAdapt = { day: this._loopDayKey(new Date()), from: cur, to: to, reason: reason };
+      try { persistNow(); } catch (e) {}
+    } catch (e) {}
+  },
+
   _renderDailyLoop() {
     // Seal any days that closed since the last open (misses become facts).
     try { actionLedgerBackfill(); } catch (e) {}
@@ -5442,7 +5582,12 @@ Return ONLY the sentence text. No quotes, no labels.`;
       this._renderMorningOpen();
       return;
     }
-    if (loop.lastOpenDay !== today) { loop.lastOpenDay = today; try { persistNow(); } catch (e) {} }
+    if (loop.lastOpenDay !== today) {
+      loop.lastOpenDay = today;
+      // v1113: the day's opening tier adapts to the pattern before first paint.
+      this._adaptOpeningTier();
+      try { persistNow(); } catch (e) {}
+    }
     // A chained "Do it now" action in flight outranks the summary: the card
     // must survive re-renders (tab switch, reopen) until it is completed.
     if (String(loop.chained || '').trim()) { this._renderLoopCard(); return; }
@@ -5517,6 +5662,7 @@ Return ONLY the sentence text. No quotes, no labels.`;
         <div class="aloop-glow" aria-hidden="true"></div>
         <div class="aloop-top">
           <div class="aloop-day"><span class="aloop-day__k">Day</span><span class="aloop-day__n apl-num">${dayN}</span></div>
+          ${this._distChipHtml()}
           <button type="button" class="aloop-receipt" id="aloopReceipt">Built from</button>
         </div>
         <div class="aloop-mid">
@@ -5619,6 +5765,10 @@ Return ONLY the sentence text. No quotes, no labels.`;
     const receiptBtn = root.querySelector('#aloopReceipt');
     if (receiptBtn) receiptBtn.addEventListener('click', (e) => { e.stopPropagation(); this.openReceipt(); });
 
+    // v1113: the distance chip opens the pulse sheet.
+    const distBtn = root.querySelector('#aloopDist');
+    if (distBtn) distBtn.addEventListener('click', (e) => { e.stopPropagation(); this.openGoalPulse('chip'); });
+
     // The rare case where the action itself is wrong: quiet, two-step, honest.
     const notThis = root.querySelector('#aloopNotThis');
     notThis.addEventListener('click', () => {
@@ -5691,6 +5841,8 @@ Return ONLY the sentence text. No quotes, no labels.`;
       }
     } catch (e) {}
     this._renderGreenFlood(actionText, completion);
+    // v1113: the pulse rides behind the completion moment, never in front.
+    this._maybeAskGoalPulse();
   },
 
   _renderGreenFlood(actionText, completion) {

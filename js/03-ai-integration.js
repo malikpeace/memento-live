@@ -1385,6 +1385,10 @@ function buildActionProfile() {
     // 1. THE STAR, always first: the top of the pyramid.
     const star = (state.clarity && state.clarity.answers && state.clarity.answers.neutronStar) || '';
     if (star) out.push(`THEIR NEUTRON STAR: ${star}`);
+    // v1113: the distance, right under the star. Attendance is the ledger's
+    // job; this is how far the climb has actually gone.
+    const distLine = (typeof goalDistanceLine === 'function') ? goalDistanceLine() : '';
+    if (distLine) out.push(distLine);
     const hist = (state.action && Array.isArray(state.action.starHistory)) ? state.action.starHistory : [];
     if (hist.length) {
       out.push('PREVIOUS STARS (they changed direction before, this is real history):\n' +
@@ -1441,6 +1445,15 @@ function buildActionProfile() {
     const rhythm = detectRestRhythm(led.slice(-21));
     if (rhythm) out.push(`RHYTHM: they run ${rhythm.on} day${rhythm.on === 1 ? '' : 's'} on, 1 off, repeating. Those off days are their PATTERN, not lapses. Do not treat the next one as a miss.`);
 
+    // v1113: when the loop adapted today's opening size, say so, with the why.
+    const ta = state.action && state.action.tierAdapt;
+    if (ta && ta.to) {
+      const why = ta.reason === 're-entry' ? 'coming back after missed days, so it opened smaller'
+        : ta.reason === 'groove' ? 'their last three completions were all that size'
+        : 'their completions have outgrown the old default';
+      out.push(`ADAPTIVE OPEN: on ${ta.day} the loop opened on ${ta.to} instead of ${ta.from} (${why}).`);
+    }
+
     let gap = 0;
     for (let i = led.length - 1; i >= 0 && led[i].outcome === 'missed'; i--) gap++;
     if (gap > 0 && !(rhythm && gap <= 1)) out.push(`Currently ${gap} day${gap === 1 ? '' : 's'} since the last completion.`);
@@ -1489,6 +1502,123 @@ function longestGapIn(led) {
   let best = 0, run = 0;
   for (const r of led) { if (r.outcome === 'missed') { run++; if (run > best) best = run; } else run = 0; }
   return best;
+}
+
+/* ============================================================
+   THE DISTANCE (v1113). A habit tracker counts attendance; Memento is
+   supposed to count ARRIVAL. If the star names a number, these read it,
+   track the climb toward it, and hand the AI the distance so moves are
+   pace-aware. A star with no number leaves target null and every distance
+   surface stays dormant.
+   ============================================================ */
+
+// Pull the target number and its unit out of the star's own words.
+// "Get my product to 100 paying users who would be upset" -> {target:100,
+// unit:"paying users"}. "$10k MRR" -> {target:10000, unit:"MRR"}.
+// Returns null when the star has no usable number, and is deliberately
+// conservative: a wrong number shown daily is worse than none.
+function extractGoalTarget(star) {
+  try {
+    const s = String(star || '');
+    if (!s) return null;
+    const STOP = new Set(['who', 'that', 'which', 'so', 'and', 'to', 'by', 'in', 'on', 'at', 'for', 'with', 'from', 'a', 'an', 'the', 'of', 'my', 'our', 'their', 'per']);
+    const TIME = /^(min|mins|minute|minutes|hour|hours|day|days|week|weeks|month|months|year|years|am|pm)$/i;
+    const re = /(\$|€|£)?(\d[\d,]*(?:\.\d+)?)\s*(k|m)?\b/gi;
+    let match;
+    while ((match = re.exec(s)) !== null) {
+      const before = s.slice(Math.max(0, match.index - 12), match.index).toLowerCase();
+      let n = parseFloat(match[2].replace(/,/g, ''));
+      if (!isFinite(n) || n <= 0) continue;
+      // a bare 1900-2099 is almost always a year, not a target
+      const isYearish = !match[1] && !match[3] && n >= 1900 && n <= 2099 && /\b(by|in|before|until|of)\s*$/.test(before);
+      if (isYearish || (!match[1] && !match[3] && n >= 1900 && n <= 2099 && String(n).length === 4 && /(19|20)\d\d/.test(match[2]))) continue;
+      if (match[3]) n *= (match[3].toLowerCase() === 'k' ? 1e3 : 1e6);
+      // unit: up to 3 real words after the number, stopping at connectives
+      const after = s.slice(match.index + match[0].length);
+      const words = [];
+      for (const w of after.split(/\s+/)) {
+        const clean = w.replace(/[^A-Za-z%$-]/g, '');
+        if (!clean) { if (words.length) break; else continue; }
+        if (STOP.has(clean.toLowerCase())) break;
+        words.push(clean);
+        if (words.length >= 3) break;
+      }
+      // a number whose only unit is a time word is a deadline, not a target
+      if (words.length && TIME.test(words[0])) continue;
+      if (!words.length && !match[1]) continue;   // bare number, no idea what of
+      const unit = match[1] ? (words.join(' ') || 'dollars') : words.join(' ');
+      return { target: n, unit: unit };
+    }
+    return null;
+  } catch (e) { return null; }
+}
+
+// Keep state.goalProgress honest against the CURRENT star: parse on first
+// sight, re-parse when the star changes (which also resets the count, a new
+// direction is a new climb). Safe to call from any render.
+function ensureGoalTarget() {
+  try {
+    const star = (state.clarity && state.clarity.answers && String(state.clarity.answers.neutronStar || '').trim()) || '';
+    const gp = state.goalProgress || (state.goalProgress = { starHash: '', target: null, unit: '', baseline: null, current: null, updatedAt: '', askedDay: '', history: [] });
+    let h = 2166136261;
+    for (let i = 0; i < star.length; i++) { h ^= star.charCodeAt(i); h = Math.imul(h, 16777619); }
+    const hash = (h >>> 0).toString(16);
+    if (gp.starHash === hash) return gp;
+    const found = star ? extractGoalTarget(star) : null;
+    gp.starHash = hash;
+    gp.target = found ? found.target : null;
+    gp.unit = found ? found.unit : '';
+    gp.baseline = null; gp.current = null; gp.updatedAt = ''; gp.askedDay = '';
+    gp.history = [];
+    try { persistNow(); } catch (e) {}
+    return gp;
+  } catch (e) { return state.goalProgress || null; }
+}
+
+// One pulse: "where are you now". Appends to history and moves current.
+function goalProgressUpdate(value) {
+  try {
+    const gp = ensureGoalTarget();
+    if (!gp || gp.target === null) return false;
+    const n = Number(value);
+    if (!isFinite(n) || n < 0) return false;
+    const day = (typeof actionDayKey === 'function') ? actionDayKey(new Date()) : new Date().toISOString().slice(0, 10);
+    if (gp.baseline === null) gp.baseline = n;
+    gp.current = n;
+    gp.updatedAt = day;
+    const last = gp.history[gp.history.length - 1];
+    if (last && last.day === day) last.value = n;
+    else gp.history.push({ day: day, value: n });
+    if (gp.history.length > 400) gp.history.splice(0, gp.history.length - 400);
+    try { persistNow(); } catch (e) {}
+    return true;
+  } catch (e) { return false; }
+}
+
+// The distance as one AI-readable line, or '' when dormant.
+function goalDistanceLine() {
+  try {
+    const gp = state.goalProgress;
+    if (!gp || gp.target === null) return '';
+    if (gp.current === null) return `GOAL TARGET: ${gp.target} ${gp.unit} (no progress pulse recorded yet).`;
+    let line = `GOAL DISTANCE: ${gp.current} of ${gp.target} ${gp.unit}`;
+    if (gp.baseline !== null && gp.baseline !== gp.current) line += ` (started at ${gp.baseline})`;
+    if (gp.history.length >= 2) {
+      const first = gp.history[0];
+      const lastPt = gp.history[gp.history.length - 1];
+      const days = Math.max(1, Math.round((new Date(lastPt.day) - new Date(first.day)) / 86400000));
+      const gained = lastPt.value - first.value;
+      if (gained > 0) {
+        const remaining = gp.target - gp.current;
+        const eta = remaining > 0 ? Math.ceil(remaining / (gained / days)) : 0;
+        line += `. Pace: +${gained} in ${days} day${days === 1 ? '' : 's'}` + (eta > 0 ? `, ~${eta} days to target at this pace` : '');
+      } else if (gained < 0) {
+        line += `. It has SLIPPED by ${Math.abs(gained)} since tracking began.`;
+      }
+    }
+    if (gp.current >= gp.target) line += '. THE TARGET IS REACHED.';
+    return line;
+  } catch (e) { return ''; }
 }
 
 async function generateNextLoopAction() {

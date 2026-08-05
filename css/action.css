@@ -4006,6 +4006,76 @@ html.theme-light .action-exp {
   color: rgba(var(--ink), 0.5); cursor: pointer;
 }
 .aloop-receipt:hover, .aloop-receipt:active { color: rgba(var(--ink), 0.92); }
+
+/* v1113 THE DISTANCE. "62 / 100 paying users" between the day number and the
+   receipt: the one number that says how far the climb has gone. Quiet fill,
+   no border (the standing law), tabular numerals, and it is a button because
+   tapping it is how a pulse is recorded. */
+.aloop-dist {
+  border: none; font-family: inherit; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 1px;
+  padding: 7px 12px; border-radius: 10px;
+  background: rgba(var(--ink), 0.06);
+  color: rgba(var(--ink), 0.92);
+  font-size: 0.86rem; font-weight: 700; line-height: 1.15;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+.aloop-dist__nums { display: inline-flex; align-items: baseline; }
+.aloop-dist i { font-style: normal; opacity: 0.4; padding: 0 3px; font-weight: 500; }
+.aloop-dist small {
+  font-size: 0.62rem; font-weight: 600; letter-spacing: 0.01em;
+  color: rgba(var(--ink), 0.5); max-width: 130px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.aloop-dist--empty { color: rgba(var(--ink), 0.6); font-size: 0.74rem; font-weight: 600; }
+.aloop-dist--empty small { color: rgba(var(--ink), 0.85); }
+.aloop-dist--there { color: var(--spring, #3fd94e); }
+.aloop-dist--there small { color: var(--spring, #3fd94e); opacity: 0.85; }
+
+/* the pulse sheet: one question, one number, gone. */
+.gpulse {
+  /* above the action-exp overlay (1001), below the cheat bar tools */
+  position: fixed; inset: 0; z-index: 1200;
+  display: flex; align-items: flex-end; justify-content: center;
+  background: rgba(0, 0, 0, 0);
+  transition: background 200ms ease-out;
+}
+.gpulse.is-open { background: rgba(0, 0, 0, 0.55); }
+.gpulse__sheet {
+  width: min(100%, 430px); margin: 0; box-sizing: border-box;
+  padding: 22px 20px calc(18px + var(--safe-b, 0px));
+  border-radius: 16px 16px 0 0;
+  background: var(--surface-0);
+  -webkit-backdrop-filter: blur(30px) saturate(1.4);
+  backdrop-filter: blur(30px) saturate(1.4);
+  box-shadow: inset 0 1px 0 rgba(var(--ink), 0.06), 0 -12px 40px rgba(0, 0, 0, 0.35);
+  transform: translateY(102%);
+  transition: transform 260ms cubic-bezier(0.22, 0.68, 0.24, 1);
+}
+.gpulse.is-open .gpulse__sheet { transform: translateY(0); }
+.gpulse__q { margin: 0; font-size: 1.05rem; font-weight: 700; color: rgba(var(--ink), 0.96); letter-spacing: -0.01em; }
+.gpulse__u { margin: 5px 0 14px; font-size: 0.8rem; color: rgba(var(--ink), 0.55); }
+.gpulse__in {
+  width: 100%; box-sizing: border-box; border: none; outline: none;
+  font-family: inherit; font-size: 1.7rem; font-weight: 700;
+  padding: 12px 14px; border-radius: 10px;
+  background: rgba(var(--ink), 0.06); color: rgba(var(--ink), 0.97);
+  box-shadow: inset 0 1px 0 rgba(var(--ink), 0.05);
+}
+.gpulse__row { display: flex; gap: 10px; margin-top: 14px; }
+.gpulse__save {
+  flex: 1; border: none; cursor: pointer; font-family: inherit;
+  font-size: 0.95rem; font-weight: 700; padding: 13px 0; border-radius: 10px;
+  background: rgba(var(--ink), 0.94); color: var(--surface-0, #0b0d12);
+}
+.gpulse__skip {
+  border: none; cursor: pointer; font-family: inherit;
+  font-size: 0.9rem; font-weight: 600; padding: 13px 18px; border-radius: 10px;
+  background: rgba(var(--ink), 0.07); color: rgba(var(--ink), 0.85);
+  box-shadow: inset 0 1px 0 rgba(var(--ink), 0.06);
+}
+/* theme-faithful by construction: every colour above is the ink/surface pair,
+   so light mode needs no opt-out (the loop is a theme-faithful surface). */
 /* min-height:0 is what lets a flex child actually shrink and scroll; without it
    it refuses to go below its content height and overflows the column instead.
    The auto margins centre the card when there is room and collapse to 0 when
