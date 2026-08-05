@@ -157,27 +157,17 @@
   .sect h2{ margin:0 0 4px; font-size:17px; font-weight:680; letter-spacing:-.015em; }
   .sect p{ margin:0; font-size:13.5px; line-height:1.5; color:var(--mid); }
 
-  /* ── 2 · the layers it earned ─────────────────────────────────────────── */
-  .layers{ display:flex; flex-direction:column; gap:2px; border-radius:15px; overflow:hidden; }
-  .lay{ display:flex; align-items:flex-start; gap:13px; padding:14px 15px; width:100%;
-    background:var(--fill); box-shadow:var(--inset); border:0; text-align:left;
-    font:inherit; color:var(--hi); cursor:pointer; transition:background .16s ease-out; }
-  .lay:active{ background:var(--fill-2); }
-  .lay__txt{ display:block; }
-  .lay__t, .lay__d{ display:block; }
-  .lay:first-child{ border-radius:15px 15px 3px 3px; }
-  .lay:last-child{ border-radius:3px 3px 15px 15px; }
-  .lay__dot{ flex:none; width:11px; height:11px; margin-top:4px; border-radius:50%;
-    background:var(--c); box-shadow:0 0 14px 1px color-mix(in srgb, var(--c) 60%, transparent); }
-  .lay__txt{ flex:1; min-width:0; }
-  .lay__t{ font-size:14.5px; font-weight:640; letter-spacing:-.01em; }
-  .lay__d{ margin-top:2px; font-size:13px; line-height:1.45; color:var(--mid); }
-  .lay__when{ flex:none; font-size:12px; font-weight:600; color:var(--lo);
-    padding-top:3px; letter-spacing:-.005em; }
-  .lay:not(.is-locked) .lay__when{ color:color-mix(in srgb, var(--c) 72%, white 28%); }
-  .lay.is-locked{ background:rgba(255,255,255,.028); }
-  .lay.is-locked .lay__dot{ background:rgba(255,255,255,.14); box-shadow:none; }
-  .lay.is-locked .lay__t{ color:var(--mid); }
+  /* ── the star. A signed document, so it gets a surface, unlike the note at
+     the top which is handwriting. Not italic, for the same reason. */
+  .star{ padding:20px 19px 17px; border-radius:16px;
+    background:var(--fill); box-shadow:var(--inset); }
+  .star__s{ margin:0; font-size:17px; line-height:1.5; letter-spacing:-.015em;
+    color:var(--hi); }
+  .star__w{ margin:11px 0 0; font-size:14px; line-height:1.5; color:var(--mid); }
+  .star__m{ display:flex; align-items:center; gap:8px; margin:16px 0 0;
+    font-size:12.5px; color:var(--mid); }
+  .star__dot{ flex:none; width:8px; height:8px; border-radius:50%;
+    background:var(--clar); box-shadow:0 0 12px 1px rgba(58,217,245,.5); }
 
   /* ── their own note, in their own words, said back to them. No panel, no
      label, no explanation. Italic is the only thing marking it as theirs. */
@@ -340,12 +330,18 @@
 
     <!-- 2 · what the card is made of -->
     <div class="sect">
-      <h2>The three pillars</h2>
-      <p id="laySub">Everything in Memento is one of these three. Each one puts a
-        layer into the card, and the card is only ever as far along as you are.</p>
+      <h2>Your Neutron Star</h2>
+      <p>The thing you signed. Everything the card records is the app pointing
+        you back at it.</p>
     </div>
-    <div class="layers" id="layers"></div>
-    <p class="matnote" id="layNote"></p>
+    <div class="star">
+      <p class="star__s">Ten thousand people paying me for something that makes
+        their week better, built by me, without a team I do not want.</p>
+      <p class="star__w">Because I am not doing another year of work that
+        disappears the moment I stop.</p>
+      <p class="star__m"><span class="star__dot"></span>Signed 19 June 2026.
+        Held for 47 days. Revisited once.</p>
+    </div>
 
     <!-- 4 · the material -->
     <div class="sect">
@@ -441,7 +437,7 @@ const MATS = [
  /* The card as it ships. No material overrides at all: the app's own cyan and
     green are the whole appearance, so the three earned layers ARE the colour. */
  {n:'Default', stock:true, tint:'rgba(58,217,245,1)',
-  note:'The card as it ships. The three layers you earned are its colour.'},
+  note:'The card as it ships. Its colour is whatever you have earned so far.'},
  {n:'Toxic', tint:'rgba(190,255,60,1)', sk1:'rgba(190,255,60,1)', sk2:'rgba(120,255,140,.9)', sk3:'rgba(90,190,30,1)', sk4:'rgba(220,255,110,.85)',
   plat:'.14', face:'linear-gradient(165deg,#0d1505,#060903)', mark:'rgba(246,255,226,.96)', ink:'rgba(228,255,190,.9)',
   note:'Yours since the day you started. Assigned, not picked.'},
@@ -496,17 +492,7 @@ function matVars(m, earned){
 
 /* ── the earned layers. Real order: cyan at Clarity, platinum when the Action
    plan is revealed, green on the first completed move. ─────────────────── */
-const LAYERS = [
-  {k:'clar', c:'#3ad9f5', t:'Clarity',
-   d:'Naming the one thing that actually matters, and signing it. Until that '
-    +'exists there is nothing to be consistent about, and the card stays blank.'},
-  {k:'act',  c:'#eef2fb', t:'Action',
-   d:'One move a day toward it. Not a list, not a plan you admire and skip. '
-    +'Clarity without this is just a nice sentence about yourself.'},
-  {k:'cons', c:'#3fd94e', t:'Consistency',
-   d:'Doing it again on the days you do not feel like it. This is the one that '
-    +'takes years, and the only one that compounds.'},
-];
+/* all three pillars are held; the card renders fully lit. */
 const earned = {clar:true, act:true, cons:true};
 
 /* ── the record. Only event types the app actually writes. ──────────────── */
@@ -554,19 +540,8 @@ function paint(){
      card the three ARE the colour. On any other, they still set how much light
      it gives off, so the dates never become a claim about a colour that is not
      on screen. */
-  document.getElementById('layNote').textContent = m.stock ? ''
-    : m.n + ' covers the colour. The default card wears the three raw.';
-
   document.querySelectorAll('.chip').forEach((c,i)=>
     c.setAttribute('aria-pressed', i===cur ? 'true' : 'false'));
-  /* state, not a date. Clarity and Action almost always land on the SAME day,
-     so two identical timestamps sat there looking broken. What matters is
-     whether the pillar is under you yet. */
-  document.querySelectorAll('.lay').forEach(l=>{
-    const on = !!earned[l.dataset.k];
-    l.classList.toggle('is-locked', !on);
-    l.querySelector('.lay__when').textContent = on ? 'Yours' : 'Not yet';
-  });
 }
 
 /* the strip */
@@ -581,19 +556,6 @@ document.getElementById('strip').addEventListener('click', e=>{
 });
 
 /* the layers */
-document.getElementById('layers').innerHTML = LAYERS.map(l=>
-  `<button class="lay" type="button" data-k="${l.k}" style="--c:${l.c}">
-     <span class="lay__dot"></span>
-     <span class="lay__txt"><span class="lay__t">${l.t}</span>
-       <span class="lay__d">${l.d}</span></span>
-     <span class="lay__when"></span>
-   </button>`).join('');
-/* Tap a layer to pull it back off. Proof that the colour is the record. */
-document.getElementById('layers').addEventListener('click', e=>{
-  const b = e.target.closest('.lay'); if(!b) return;
-  earned[b.dataset.k] = !earned[b.dataset.k]; paint();
-});
-
 /* the consistency grid, 47 real days then the rest empty */
 (function(){
   const r = rng(hash('grid')), out = [];
