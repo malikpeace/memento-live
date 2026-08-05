@@ -445,9 +445,18 @@
 /* ── Void emits black: the room around it darkens instead of lighting up. */
 .skin.void .daycard-ns {
   box-shadow: 0 0 var(--halo-r,70px) 22px var(--halo, #000),
-              0 0 130px 44px rgba(0,0,0,.9),
-              inset 0 1px 0 rgba(255,255,255,.03) !important; }
-.skin.void .daycard-ns__rim { box-shadow: inset 0 0 0 1px var(--edge) !important; }
+              0 0 130px 44px rgba(0,0,0,.9) !important;
+  background: #000 !important; }
+/* Nothing inside it emits. Pure black face, black rim, no lift, no liquid. */
+.skin.void .daycard-ns__rim { box-shadow: none !important; opacity: 0 !important; }
+.skin.void .daycard-ns::before,
+.skin.void .daycard-ns__body::before,
+.skin.void .daycard-ns__liquid,
+.skin.void .daycard-ns__iri,
+.skin.void .daycard-ns__sheen,
+.skin.void .daycard-ns__burn,
+.skin.void .daycard-ns__plat,
+.skin.void .daycard-ns__tint { opacity: 0 !important; background: none !important; }
 .skin.void .daycard-wrap__aura, .skin.void .daycard-bloom { opacity: 0 !important; }
 /* THE white ring was the stage's own glow, not the card's. Black it out. */
 .skin.void .daycard-living-stage {
@@ -711,9 +720,9 @@ const SKINS = [
   mark:'rgba(96,120,140,.75)', ink:'rgba(48,72,92,.65)', cls:'glass',
   edge:'rgba(255,255,255,1)', halo:'rgba(210,238,255,.5)'},
  {n:'Void', sk1:'none',sk2:'none',sk3:'none',sk4:'none',
-  plat:'0', face:'linear-gradient(168deg,#0a0a0c 0%,#060607 55%,#040405 100%)',
-  mark:'rgba(240,242,247,.96)', ink:'rgba(214,219,228,.55)', cls:'flat void',
-  edge:'rgba(255,255,255,.09)', halo:'rgba(0,0,0,1)', haloR:'70px', lift:'rgba(255,255,255,.012)'},
+  plat:'0', face:'#000000',
+  mark:'rgba(244,246,250,.97)', ink:'rgba(150,155,164,.62)', cls:'flat void',
+  edge:'rgba(0,0,0,1)', halo:'rgba(0,0,0,1)', haloR:'70px', lift:'rgba(0,0,0,0)'},
  {n:'Emerald',     sk1:'rgba(0,220,130,1)',   sk2:'rgba(120,255,200,.9)', sk3:'rgba(0,150,90,1)',   sk4:'rgba(40,255,160,.85)',
   plat:'.12', face:'linear-gradient(165deg,#03150e,#010806)', mark:'rgba(232,255,246,.95)', ink:'rgba(214,255,238,.9)'},
  {n:'Crimson',     sk1:'rgba(255,30,70,1)',   sk2:'rgba(255,110,120,.9)', sk3:'rgba(150,0,40,1)',   sk4:'rgba(255,70,90,.9)',
