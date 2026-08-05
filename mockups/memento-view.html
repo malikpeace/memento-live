@@ -232,9 +232,33 @@
     font-size:12px; color:var(--lo); }
 
   .trailtop{ margin:20px 0 0; font-size:12.5px; color:var(--mid); }
-  .trail{ margin:4px 0 0; }
-  .mon{ margin:22px 0 9px; font-size:13px; font-weight:640; color:var(--mid); }
-  .mon:first-child{ margin-top:6px; }
+  .trail{ margin:10px 0 0; }
+
+  /* ── a month. Closed it is one row that still shows its whole weight: a dot
+     per mark, and the count. Open it drops the full list underneath. */
+  .mo + .mo{ margin-top:2px; }
+  .mo__h{ display:flex; align-items:center; gap:11px; width:100%;
+    padding:13px 14px; border:0; border-radius:12px; cursor:pointer;
+    background:var(--fill); box-shadow:var(--inset); color:var(--hi);
+    font:inherit; text-align:left; transition:background .15s ease-out; }
+  .mo__h:active{ background:var(--fill-2); }
+  .mo__n{ flex:none; font-size:14px; font-weight:640; letter-spacing:-.01em; }
+  .mo__dots{ flex:1; min-width:0; display:flex; flex-wrap:wrap; gap:3px;
+    align-content:center; overflow:hidden; max-height:13px; }
+  .mo__dot{ width:5px; height:5px; border-radius:50%;
+    background:rgba(255,255,255,.24); }
+  .mo__dot.is-act{ background:var(--cons); }
+  .mo__dot.is-mark{ background:var(--act); }
+  .mo__dot.is-clar{ background:var(--clar); }
+  .mo__c{ flex:none; font-size:12.5px; color:var(--mid);
+    font-variant-numeric:tabular-nums; }
+  .mo__x{ flex:none; width:15px; height:15px; color:var(--lo);
+    transition:transform .2s ease-out; }
+  .mo.is-open .mo__x{ transform:rotate(180deg); }
+  .mo.is-open .mo__dots{ opacity:0; }
+  .mo__b{ display:none; padding:16px 2px 4px; }
+  .mo.is-open .mo__b{ display:block; }
+  @media (prefers-reduced-motion: reduce){ .mo__x{ transition:none; } }
   .ev{ position:relative; display:flex; gap:13px; padding:0 0 15px 0; }
   /* the spine: drawn on the row, stopping before the last one so it never
      dangles past the final entry */
@@ -605,14 +629,38 @@ document.getElementById('strip').addEventListener('click', e=>{
 })();
 
 /* the trail, all of it */
+/* Collapsed by month, newest open. The full weight still reads at a glance,
+   because a closed month carries its count AND a dot for every mark in it, so
+   nothing is hidden, it is compressed. Scrolling past 66 rows to reach the
+   bottom of the screen was the problem; losing the evidence would be worse. */
+const TOTAL_MARKS = TRAIL.reduce((n,g)=>n+g.evs.length,0);
 document.getElementById('trailTop').textContent =
-  TRAIL.reduce((n,g)=>n+g.evs.length,0) + ' marks, oldest at the bottom.';
-document.getElementById('trail').innerHTML = TRAIL.map(g=>
-  `<p class="mon">${g.mon}</p>` + g.evs.map(e=>
-    `<div class="ev"><span class="ev__dot ${e.k?'is-'+e.k:''}"></span>
-       <span class="ev__b"><span class="ev__t">${e.t}</span>
-         <span class="ev__m">${e.m}</span></span>
-       <span class="ev__d">${e.d}</span></div>`).join('')).join('');
+  TOTAL_MARKS + ' marks across ' + TRAIL.length + ' months. Tap a month to open it.';
+
+const evHtml = e =>
+  `<div class="ev"><span class="ev__dot ${e.k?'is-'+e.k:''}"></span>
+     <span class="ev__b"><span class="ev__t">${e.t}</span>
+       <span class="ev__m">${e.m}</span></span>
+     <span class="ev__d">${e.d}</span></div>`;
+
+document.getElementById('trail').innerHTML = TRAIL.map((g,i)=>
+  `<section class="mo${i===0?' is-open':''}">
+     <button class="mo__h" type="button">
+       <span class="mo__n">${g.mon}</span>
+       <span class="mo__dots">${g.evs.map(e=>
+         `<i class="mo__dot ${e.k?'is-'+e.k:''}"></i>`).join('')}</span>
+       <span class="mo__c">${g.evs.length}</span>
+       <svg class="mo__x" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
+            aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+     </button>
+     <div class="mo__b">${g.evs.map(evHtml).join('')}</div>
+   </section>`).join('');
+
+document.getElementById('trail').addEventListener('click', e=>{
+  const h = e.target.closest('.mo__h'); if(!h) return;
+  h.parentElement.classList.toggle('is-open');
+});
 
 /* ── Memento Mori. The app already models birth year and life expectancy
    (moriYearsRemaining in js/06), so this is the same number, ticking. Plain
