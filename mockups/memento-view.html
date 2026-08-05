@@ -178,17 +178,15 @@
   .lay.is-locked .lay__dot{ background:rgba(255,255,255,.14); box-shadow:none; }
   .lay.is-locked .lay__t{ color:var(--mid); }
 
-  /* ── the promise. Bigger and quieter than everything around it, because it
-     is the only text on this screen that the person wrote themselves. Fill and
-     inset highlight, no border. */
-  .promise{ padding:20px 19px 16px; border-radius:16px;
-    background:var(--fill); box-shadow:var(--inset); }
-  .promise__t{ margin:0; font-size:16.5px; line-height:1.52; letter-spacing:-.012em;
+  /* ── their own note, in their own words, said back to them. No panel, no
+     label, no explanation. Italic is the only thing marking it as theirs. */
+  .note{ margin:26px auto 0; max-width:31ch; text-align:center;
+    font-size:16px; line-height:1.6; letter-spacing:-.008em; font-style:italic;
     color:var(--hi); outline:none; }
-  .promise__t:focus{ opacity:.92; }
-  .promise__t:empty::before{ content:'Write the thing you want to hold yourself to.';
-    color:var(--lo); }
-  .promise__m{ margin:14px 0 0; font-size:12.5px; color:var(--lo); }
+  .note:empty::before{ content:'Tap to write a note to yourself.';
+    font-style:italic; color:var(--lo); }
+  .note__d{ margin:10px 0 0; text-align:center; font-size:12.5px;
+    font-style:normal; color:var(--lo); }
 
   /* ── 4 · the material ─────────────────────────────────────────────────── */
   .strip{ display:flex; gap:11px; overflow-x:auto; scroll-snap-type:x mandatory;
@@ -294,25 +292,15 @@
     <div class="cage" id="heroCard"></div>
     <p class="hero__name">Your Memento</p>
     <p class="hero__sub" id="heroSub"><span id="mori">&nbsp;</span></p>
+    <p class="note" id="promiseT" contenteditable="true" spellcheck="false">I do not
+      negotiate with myself before 7am. I open the laptop and I start, and how I
+      feel about it is not part of the decision.</p>
+    <p class="note__d" id="promiseM">19 June</p>
   </div>
 
   <div class="col">
 
-    <!-- 2 · the promise. Their own words, first thing under the card. -->
-    <div class="sect">
-      <h2>Your promise</h2>
-      <p>Written by you, to you. It is stored on your device and nobody else
-        ever sees it, not us either.</p>
-    </div>
-    <div class="promise" id="promise">
-      <p class="promise__t" id="promiseT" contenteditable="true"
-         spellcheck="false">I do not negotiate with myself before 7am. I open
-         the laptop and I start, and how I feel about it is not part of the
-         decision.</p>
-      <p class="promise__m" id="promiseM">Written 19 June. Tap to change it.</p>
-    </div>
-
-    <!-- 3 · what the card is made of -->
+    <!-- 2 · what the card is made of -->
     <div class="sect">
       <h2>The three pillars</h2>
       <p id="laySub">Everything in Memento is one of these three. Each one puts a
@@ -583,35 +571,18 @@ document.getElementById('moreBtn').onclick = function(){
 };
 
 /* ── Memento Mori. The app already models birth year and life expectancy
-   (moriYearsRemaining in js/06), so this is the same number, ticking. The
-   cascade is calendar-aware: months are real months, not 30-day blocks, or
-   the years figure drifts by weeks over a lifetime. ──────────────────────── */
+   (moriYearsRemaining in js/06), so this is the same number, ticking. Plain
+   total days plus the clock: two figures, both of them falling. ─────────── */
 const BIRTH_YEAR = 2004, LIFE_EXPECTANCY = 80;
-const END = new Date(BIRTH_YEAR + LIFE_EXPECTANCY, 0, 1);
+const END = new Date(BIRTH_YEAR + LIFE_EXPECTANCY, 0, 1).getTime();
 const moriEl = document.getElementById('mori');
 function tickMori(){
-  const now = new Date();
-  if (now >= END){ moriEl.textContent = 'No time left.'; return; }
-  // walk real calendar years then real calendar months, so neither is a fiction
-  let y = END.getFullYear() - now.getFullYear();
-  let cur = new Date(now); cur.setFullYear(cur.getFullYear() + y);
-  if (cur > END){ y--; cur = new Date(now); cur.setFullYear(cur.getFullYear() + y); }
-  let mo = 0;
-  while (true){
-    const nxt = new Date(cur); nxt.setMonth(nxt.getMonth() + 1);
-    if (nxt > END) break;
-    cur = nxt; mo++;
-  }
-  let ms = END - cur;
-  const w  = Math.floor(ms / 604800000); ms -= w * 604800000;
-  const d  = Math.floor(ms / 86400000);  ms -= d * 86400000;
-  const h  = Math.floor(ms / 3600000);   ms -= h * 3600000;
-  const mi = Math.floor(ms / 60000);     ms -= mi * 60000;
-  const sc = Math.floor(ms / 1000);
+  const ms = Math.max(0, END - Date.now());
+  const rest = ms % 86400000;
   const p = n => String(n).padStart(2, '0');
-  moriEl.innerHTML =
-      '<b>' + y  + '</b>y <b>' + mo + '</b>mo <b>' + w + '</b>w <b>' + d + '</b>d '
-    + '<b>' + p(h) + '</b>h <b>' + p(mi) + '</b>m <b>' + p(sc) + '</b>s left';
+  moriEl.innerHTML = '<b>' + Math.floor(ms / 86400000).toLocaleString() + '</b> days, <b>'
+    + p(Math.floor(rest/3600000)) + ':' + p(Math.floor(rest%3600000/60000))
+    + ':' + p(Math.floor(rest%60000/1000)) + '</b>';
 }
 tickMori();
 setInterval(tickMori, 1000);
@@ -620,8 +591,7 @@ setInterval(tickMori, 1000);
 const pT = document.getElementById('promiseT'), pM = document.getElementById('promiseM');
 function promiseState(){
   const has = pT.textContent.trim().length > 0;
-  pM.textContent = has ? 'Written 19 June. Tap to change it.'
-                       : 'Nobody but you will ever read it.';
+  pM.textContent = has ? '19 June' : '';
 }
 pT.addEventListener('input', promiseState);
 promiseState();
