@@ -33,23 +33,37 @@
 
   /* the room the card sits in: a single soft pool behind the hero, fading
      radially so it can never draw an edge (the v682 law) */
+  /* The chosen material lights the room. Radial and fading to transparent well
+     inside its own bounds, so it can never draw an edge (the v682 law). */
   .room{ position:fixed; inset:0; z-index:0; pointer-events:none;
-    background:radial-gradient(72% 44% at 50% 20%, rgba(58,217,245,.055), transparent 68%); }
+    background:
+      radial-gradient(64% 30% at 50% 14%,
+        color-mix(in srgb, var(--tint, #3ad9f5) 26%, transparent), transparent 72%),
+      radial-gradient(130% 70% at 50% 8%,
+        color-mix(in srgb, var(--tint, #3ad9f5) 10%, transparent), transparent 76%),
+      linear-gradient(180deg,
+        color-mix(in srgb, var(--tint, #3ad9f5) 5%, transparent) 0%,
+        color-mix(in srgb, var(--tint, #3ad9f5) 3%, transparent) 46%,
+        transparent 100%);
+    transition:background .5s ease-out; }
+  /* Void takes light OUT of the room instead of adding it. */
+  body.is-void .room{ background:
+      radial-gradient(88% 52% at 50% 20%, rgba(0,0,0,.92), transparent 74%); }
 
   .screen{ position:relative; z-index:1; max-width:430px; margin:0 auto;
     padding:0 20px calc(48px + var(--safe-b)); }
 
   /* ── the material drives the app's OWN layers, nothing more ───────────── */
-  .cage .daycard-theme-living .blob.b1{ background:radial-gradient(circle, var(--sk1), transparent 65%)!important; }
-  .cage .daycard-theme-living .blob.b2{ background:radial-gradient(circle, var(--sk2), transparent 65%)!important; }
-  .cage .daycard-theme-living .blob.b3{ background:radial-gradient(circle, var(--sk3), transparent 65%)!important; }
-  .cage .daycard-theme-living .blob.b4{ background:radial-gradient(circle, var(--sk4, var(--sk1)), transparent 66%)!important; }
-  .cage .daycard-theme-living .blob.b5{ background:radial-gradient(circle, var(--sk2), transparent 68%)!important; opacity:.5!important; }
-  .cage .daycard-theme-living .blob.b6{ opacity:0!important; }
-  .cage .daycard-ns__plat{ opacity:var(--plat-op,.28)!important; }
-  .cage .daycard-ns{ background:var(--face)!important; }
-  .cage .daycard-ns__emblem path{ fill:var(--mark)!important; }
-  .cage .daycard-ns__name{ color:var(--ink)!important; }
+  .cage:not(.is-stock) .daycard-theme-living .blob.b1{ background:radial-gradient(circle, var(--sk1), transparent 65%)!important; }
+  .cage:not(.is-stock) .daycard-theme-living .blob.b2{ background:radial-gradient(circle, var(--sk2), transparent 65%)!important; }
+  .cage:not(.is-stock) .daycard-theme-living .blob.b3{ background:radial-gradient(circle, var(--sk3), transparent 65%)!important; }
+  .cage:not(.is-stock) .daycard-theme-living .blob.b4{ background:radial-gradient(circle, var(--sk4, var(--sk1)), transparent 66%)!important; }
+  .cage:not(.is-stock) .daycard-theme-living .blob.b5{ background:radial-gradient(circle, var(--sk2), transparent 68%)!important; opacity:.5!important; }
+  .cage:not(.is-stock) .daycard-theme-living .blob.b6{ opacity:0!important; }
+  .cage:not(.is-stock) .daycard-ns__plat{ opacity:var(--plat-op,.28)!important; }
+  .cage:not(.is-stock) .daycard-ns{ background:var(--face)!important; }
+  .cage:not(.is-stock) .daycard-ns__emblem path{ fill:var(--mark)!important; }
+  .cage:not(.is-stock) .daycard-ns__name{ color:var(--ink)!important; }
 
   /* flat: an opaque painted object, every colour layer off */
   .flat .daycard-theme-living .daycard-ns__liquid{ display:none!important; }
@@ -68,15 +82,21 @@
   .void .daycard-ns__rim{ opacity:0!important; box-shadow:none!important; }
   .void .daycard-living-stage{ box-shadow:0 0 60px 10px rgba(0,0,0,.98)!important; }
   .void .daycard-wrap__aura, .void .daycard-bloom{ opacity:0!important; }
+  /* nothing inside it emits either: the app's own edge highlight and face lift
+     are what was drawing a visible outline on a card that must have none */
+  .void .daycard-ns::before, .void .daycard-ns__body::before,
+  .void .daycard-ns__liquid, .void .daycard-ns__iri, .void .daycard-ns__sheen,
+  .void .daycard-ns__burn, .void .daycard-ns__plat,
+  .void .daycard-ns__tint{ opacity:0!important; background:none!important; }
 
   /* the chips are the same card, small */
-  .chipcage .daycard-theme-living .blob.b1{ background:radial-gradient(circle, var(--sk1), transparent 65%)!important; }
-  .chipcage .daycard-theme-living .blob.b2{ background:radial-gradient(circle, var(--sk2), transparent 65%)!important; }
-  .chipcage .daycard-theme-living .blob.b3{ background:radial-gradient(circle, var(--sk3), transparent 65%)!important; }
-  .chipcage .daycard-theme-living .blob.b4{ background:radial-gradient(circle, var(--sk4, var(--sk1)), transparent 66%)!important; }
-  .chipcage .daycard-theme-living .blob.b5{ background:radial-gradient(circle, var(--sk2), transparent 68%)!important; opacity:.5!important; }
-  .chipcage .daycard-theme-living .blob.b6{ opacity:0!important; }
-  .chipcage .daycard-ns__plat{ opacity:var(--plat-op,.28)!important; }
+  .chipcage:not(.is-stock) .daycard-theme-living .blob.b1{ background:radial-gradient(circle, var(--sk1), transparent 65%)!important; }
+  .chipcage:not(.is-stock) .daycard-theme-living .blob.b2{ background:radial-gradient(circle, var(--sk2), transparent 65%)!important; }
+  .chipcage:not(.is-stock) .daycard-theme-living .blob.b3{ background:radial-gradient(circle, var(--sk3), transparent 65%)!important; }
+  .chipcage:not(.is-stock) .daycard-theme-living .blob.b4{ background:radial-gradient(circle, var(--sk4, var(--sk1)), transparent 66%)!important; }
+  .chipcage:not(.is-stock) .daycard-theme-living .blob.b5{ background:radial-gradient(circle, var(--sk2), transparent 68%)!important; opacity:.5!important; }
+  .chipcage:not(.is-stock) .daycard-theme-living .blob.b6{ opacity:0!important; }
+  .chipcage:not(.is-stock) .daycard-ns__plat{ opacity:var(--plat-op,.28)!important; }
   /* the chips are a catalogue, not the user's card, so the app's "star not lit
      yet" gate must not drain them. Specificity has to beat body:not(.ns-bloom). */
   body:not(.ns-bloom) .strip .chip .chipcage .daycard-theme-living .daycard-ns__liquid,
@@ -90,7 +110,7 @@
   .chipcage .daycard-ns__rim{ opacity:1!important;
     box-shadow:inset 0 0 0 1px rgba(255,255,255,.16)!important; }
   .chipcage.flat .daycard-ns, .chipcage.void .daycard-ns{ box-shadow:none!important; }
-  .chipcage .daycard-ns{ background:var(--face)!important; }
+  .chipcage:not(.is-stock) .daycard-ns{ background:var(--face)!important; }
 
   /* ── the bar. Glass, only a back arrow, the name arrives on scroll ─────── */
   .bar{ position:sticky; top:0; z-index:20; display:flex; align-items:center; gap:12px;
@@ -215,7 +235,9 @@
     .screen{ max-width:1080px; padding:0 40px 90px;
       display:grid; grid-template-columns:340px 1fr; gap:0 64px;
       align-items:start; }
-    .bar{ grid-column:1 / -1; margin:0 -40px; padding-left:34px; padding-right:34px; }
+    /* full-bleed, or the glass reads as a floating dark strip in the window */
+    .bar{ grid-column:1 / -1; width:100vw; margin-left:calc(50% - 50vw);
+      padding-left:calc(50vw - 500px); padding-right:calc(50vw - 500px); }
     .hero{ position:sticky; top:78px; padding-top:38px; }
     .cage{ width:286px; }
     .col{ padding-top:38px; min-width:0; }
@@ -247,10 +269,12 @@
 
     <!-- 2 · what the card is made of -->
     <div class="sect">
-      <h2>What it is made of</h2>
-      <p>The colour is not a setting. Each layer arrived the day you earned it.</p>
+      <h2>What you have earned</h2>
+      <p id="laySub">Three moments, each earned once. They are what makes the card
+        give off any light at all.</p>
     </div>
     <div class="layers" id="layers"></div>
+    <p class="matnote" id="layNote"></p>
 
     <!-- 3 · the material -->
     <div class="sect">
@@ -331,30 +355,34 @@ function blobPlan(name){
 
 /* a handful of materials from the skin library, enough to show the picker */
 const MATS = [
- {n:'Toxic', sk1:'rgba(190,255,60,1)', sk2:'rgba(120,255,140,.9)', sk3:'rgba(90,190,30,1)', sk4:'rgba(220,255,110,.85)',
+ /* The card as it ships. No material overrides at all: the app's own cyan and
+    green are the whole appearance, so the three earned layers ARE the colour. */
+ {n:'Default', stock:true, tint:'rgba(58,217,245,1)',
+  note:'The card as it ships. The three layers you earned are its colour.'},
+ {n:'Toxic', tint:'rgba(190,255,60,1)', sk1:'rgba(190,255,60,1)', sk2:'rgba(120,255,140,.9)', sk3:'rgba(90,190,30,1)', sk4:'rgba(220,255,110,.85)',
   plat:'.14', face:'linear-gradient(165deg,#0d1505,#060903)', mark:'rgba(246,255,226,.96)', ink:'rgba(228,255,190,.9)',
   note:'Yours since the day you started. Assigned, not picked.'},
- {n:'Void', sk1:'none',sk2:'none',sk3:'none',sk4:'none', plat:'0', face:'#000000',
+ {n:'Void', tint:'rgba(0,0,0,1)', sk1:'none',sk2:'none',sk3:'none',sk4:'none', plat:'0', face:'#000000',
   mark:'rgba(244,246,250,.97)', ink:'rgba(150,155,164,.62)', cls:'flat void',
   edge:'rgba(0,0,0,1)', halo:'rgba(0,0,0,1)', note:'Emits nothing. The only card with no edge.'},
- {n:'Gold', sk1:'rgba(255,214,110,1)', sk2:'rgba(255,240,190,.9)', sk3:'rgba(190,140,30,1)', sk4:'rgba(255,228,150,.85)',
+ {n:'Gold', tint:'rgba(255,214,110,1)', sk1:'rgba(255,214,110,1)', sk2:'rgba(255,240,190,.9)', sk3:'rgba(190,140,30,1)', sk4:'rgba(255,228,150,.85)',
   plat:'.3', face:'linear-gradient(165deg,#1a1408,#0b0904)', mark:'rgba(255,248,228,.96)', ink:'rgba(255,238,200,.9)',
   note:'The heaviest material in the set.'},
- {n:'Ice', sk1:'rgba(150,205,255,1)', sk2:'rgba(220,240,255,.9)', sk3:'rgba(90,150,220,1)', sk4:'rgba(190,225,255,.85)',
+ {n:'Ice', tint:'rgba(150,205,255,1)', sk1:'rgba(150,205,255,1)', sk2:'rgba(220,240,255,.9)', sk3:'rgba(90,150,220,1)', sk4:'rgba(190,225,255,.85)',
   plat:'.34', face:'linear-gradient(165deg,#0a1119,#05080c)', mark:'rgba(240,248,255,.96)', ink:'rgba(220,238,255,.9)',
   note:'Cold and clear. Reads almost white in daylight.'},
- {n:'Crimson', sk1:'rgba(255,60,80,1)', sk2:'rgba(255,140,150,.9)', sk3:'rgba(160,20,40,1)', sk4:'rgba(255,110,120,.85)',
+ {n:'Crimson', tint:'rgba(255,60,80,1)', sk1:'rgba(255,60,80,1)', sk2:'rgba(255,140,150,.9)', sk3:'rgba(160,20,40,1)', sk4:'rgba(255,110,120,.85)',
   plat:'.16', face:'linear-gradient(165deg,#160508,#080204)', mark:'rgba(255,236,238,.96)', ink:'rgba(255,214,218,.9)',
   note:'The loudest material. Not subtle, on purpose.'},
- {n:'Matte Black', sk1:'none',sk2:'none',sk3:'none',sk4:'none', plat:'0',
+ {n:'Matte Black', tint:'rgba(226,231,240,1)', sk1:'none',sk2:'none',sk3:'none',sk4:'none', plat:'0',
   face:'linear-gradient(168deg,#1c1d20 0%,#141518 55%,#101113 100%)',
   mark:'rgba(244,246,250,.97)', ink:'rgba(226,231,240,.75)', cls:'flat',
   edge:'rgba(255,255,255,.92)', halo:'rgba(238,244,255,.40)',
   note:'A solid object. No light inside it at all.'},
- {n:'Emerald', sk1:'rgba(0,220,130,1)', sk2:'rgba(120,255,200,.9)', sk3:'rgba(0,150,90,1)', sk4:'rgba(40,255,160,.85)',
+ {n:'Emerald', tint:'rgba(0,220,130,1)', sk1:'rgba(0,220,130,1)', sk2:'rgba(120,255,200,.9)', sk3:'rgba(0,150,90,1)', sk4:'rgba(40,255,160,.85)',
   plat:'.12', face:'linear-gradient(165deg,#03150e,#010806)', mark:'rgba(232,255,246,.95)', ink:'rgba(214,255,238,.9)',
   note:'Deep and wet. Holds the M brighter than most.'},
- {n:'Magenta', sk1:'rgba(255,70,200,1)', sk2:'rgba(255,160,230,.9)', sk3:'rgba(170,20,130,1)', sk4:'rgba(255,120,215,.85)',
+ {n:'Magenta', tint:'rgba(255,70,200,1)', sk1:'rgba(255,70,200,1)', sk2:'rgba(255,160,230,.9)', sk3:'rgba(170,20,130,1)', sk4:'rgba(255,120,215,.85)',
   plat:'.2', face:'linear-gradient(165deg,#160418,#08020a)', mark:'rgba(255,236,250,.96)', ink:'rgba(255,214,244,.9)',
   note:'Bright, close to the surface.'},
 ];
@@ -363,13 +391,22 @@ const MATS = [
 function matVars(m, earned){
   const e = earned || {clar:true, act:true, cons:true};
   const n = (e.clar?1:0) + (e.act?1:0) + (e.cons?1:0);
+  /* Stock passes NO material overrides, so the app's own defaults render. */
+  if (m.stock) return {'--clar': e.clar?'1':'0', '--act': e.act?'1':'0',
+    '--cons': e.cons?'1':'0', '--mix':'.9',
+    '--lit': n?String(0.34 + n*0.22):'0',
+    '--glow': n?'.7':'0', '--emit': n?'.7':'0', '--ring': n?'.5':'0'};
   return {'--sk1':m.sk1,'--sk2':m.sk2,'--sk3':m.sk3,'--sk4':m.sk4,
     '--plat-op': e.act ? m.plat : '0',
     '--face':m.face,'--mark':m.mark,'--ink':m.ink,
     '--edge':m.edge||m.sk1||'rgba(255,255,255,.9)',
     '--halo':m.halo||(m.sk1&&m.sk1!=='none'?m.sk1:'rgba(238,244,255,.34)'),
-    '--clar': e.clar?'1':'0', '--act': e.act?'1':'0', '--cons': e.cons?'1':'0',
-    '--mix':'.9', '--lit': n?String(0.34 + n*0.22):'0',
+    /* A material owns the hue outright. The app's own cyan/platinum/green
+       washes stay OFF here, or they bleed through and muddy the face (the
+       green haze at the foot of Crimson). What the earned layers still drive
+       is how much light there is, which is what the copy claims. */
+    '--clar':'0', '--act':'0', '--cons':'0', '--mix':'.9',
+    '--lit': n?String(0.34 + n*0.22):'0',
     '--glow': n?'.7':'0', '--emit': n?'.7':'0', '--ring': n?'.5':'0'};
 }
 
@@ -413,14 +450,31 @@ function paint(){
   /* The app's own gate: before the star is lit the card emits nothing at all.
      Turning the cyan off here does exactly what a blank pre-Clarity card does. */
   document.body.classList.toggle('ns-bloom', earned.clar);
-  document.getElementById('heroCard').innerHTML =
-    realCard(matVars(m, earned), {name:'Malik Peace'});
-  document.getElementById('heroCard').className = 'cage ' + (m.cls||'');
-  document.getElementById('heroName').textContent = m.n;
+  document.body.classList.toggle('is-void', m.n === 'Void');
+  /* the chosen material lights the whole page */
+  document.documentElement.style.setProperty('--tint', m.tint || '#3ad9f5');
+
+  const cage = document.getElementById('heroCard');
+  cage.innerHTML = realCard(matVars(m, earned), {name:'Malik Peace'});
+  cage.className = 'cage ' + (m.cls||'') + (m.stock ? ' is-stock' : '');
+
+  document.getElementById('heroName').textContent = m.n === 'Default' ? 'Malik Peace' : m.n;
   document.getElementById('heroSub').textContent = n
     ? 'Carried 47 days. ' + ['One layer','Two layers','Three layers'][n-1] + ' earned.'
     : 'Carried 47 days. Nothing earned yet.';
   document.getElementById('matNote').textContent = m.note;
+
+  /* The layers section has to stay true whichever material is on. On the stock
+     card the three ARE the colour. On any other, they still set how much light
+     it gives off, so the dates never become a claim about a colour that is not
+     on screen. */
+  document.getElementById('laySub').textContent = m.stock
+    ? 'Three moments, each earned once. On this card they are the colour itself.'
+    : 'Three moments, each earned once. They are what makes the card give off any light at all.';
+  document.getElementById('layNote').textContent = m.stock ? ''
+    : m.n + ' covers the colour. The three still set how much light it carries, and'
+      + ' the default card shows them raw.';
+
   document.querySelectorAll('.chip').forEach((c,i)=>
     c.setAttribute('aria-pressed', i===cur ? 'true' : 'false'));
   document.querySelectorAll('.lay').forEach(l=>
@@ -430,7 +484,7 @@ function paint(){
 /* the strip */
 document.getElementById('strip').innerHTML = MATS.map((m,i)=>
   `<button class="chip" type="button" aria-pressed="false" data-i="${i}">
-     <span class="chipcage ${m.cls||''}">${realCard(matVars(m), {name:''})}</span>
+     <span class="chipcage ${m.cls||''}${m.stock?' is-stock':''}">${realCard(matVars(m), {name:''})}</span>
      <span class="chip__n">${m.n}</span>
    </button>`).join('');
 document.getElementById('strip').addEventListener('click', e=>{
