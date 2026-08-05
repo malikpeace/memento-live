@@ -186,11 +186,14 @@
   .matnote{ margin:2px 0 0; font-size:13px; line-height:1.5; color:var(--mid); }
 
   /* ── 4 · the record ───────────────────────────────────────────────────── */
-  .tally{ display:grid; grid-template-columns:repeat(4,1fr); gap:2px;
+  .tally{ display:grid; grid-template-columns:repeat(3,1fr); gap:2px;
     border-radius:15px; overflow:hidden; }
   .tal{ padding:14px 8px 13px; text-align:center; background:var(--fill); box-shadow:var(--inset); }
   .tal b{ display:block; font-size:23px; font-weight:700; letter-spacing:-.03em; }
   .tal span{ display:block; margin-top:3px; font-size:11.5px; line-height:1.3; color:var(--mid); }
+  /* the one number that can go back to zero tonight */
+  .tal.is-live b{ color:var(--cons); }
+  .tallyfoot{ margin:9px 0 0; font-size:12.5px; line-height:1.5; color:var(--lo); }
 
   .grid{ margin:14px 0 0; padding:15px 15px 13px; border-radius:15px;
     background:var(--fill); box-shadow:var(--inset); }
@@ -290,12 +293,14 @@
       <p>Every mark the card was made from, in the order it happened.</p>
     </div>
 
+    <!-- Three, each doing a different job: what has elapsed, what was earned,
+         and what is at risk today. Reflections moved down into the trail. -->
     <div class="tally">
       <div class="tal"><b>47</b><span>days<br>carried</span></div>
       <div class="tal"><b>38</b><span>moves<br>done</span></div>
-      <div class="tal"><b>21</b><span>longest<br>run</span></div>
-      <div class="tal"><b>16</b><span>reflections<br>written</span></div>
+      <div class="tal is-live"><b>9</b><span>day<br>streak</span></div>
     </div>
+    <p class="tallyfoot">Carried since 19 June 2026. Longest run 21 days.</p>
 
     <div class="grid">
       <div class="grid__cells" id="cells"></div>
