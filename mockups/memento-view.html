@@ -63,7 +63,7 @@
   .cage:not(.is-stock) .daycard-ns__plat{ opacity:var(--plat-op,.28)!important; }
   .cage:not(.is-stock) .daycard-ns{ background:var(--face)!important; }
   .cage:not(.is-stock) .daycard-ns__emblem path{ fill:var(--mark)!important; }
-  .cage:not(.is-stock) .daycard-ns__name{ color:var(--ink)!important; }
+  .cage .daycard-ns__name{ color:var(--ink)!important; }
 
   /* flat: an opaque painted object, every colour layer off */
   .flat .daycard-theme-living .daycard-ns__liquid{ display:none!important; }
@@ -131,11 +131,25 @@
   .cage .daycard-wrap{ margin:0; width:100%; }
   .cage .daycard-living-stage{ width:100% !important; margin:0; }
   .cage .daycard-ns{ width:100%; min-height:0; aspect-ratio:320/452; margin:0; }
-  .cage .daycard-ns__foot{ bottom:6%; }
+  /* The shipped card hides the name outright (dashboard.css: display:none), so
+     this is new. It is cut INTO the face at the bottom-left: dark along the top
+     edge of each letter, a catch of light along the bottom, the way an
+     engraving reads. A maker's mark sits in a corner, not centred. */
+  .cage .daycard-ns__foot{ position:absolute; left:8.5%; right:auto; bottom:5.2%;
+    z-index:7; display:block; width:auto; text-align:left; }
+  .cage .daycard-ns__name{ display:inline; font-size:10.5px; font-weight:700;
+    letter-spacing:.15em; text-transform:uppercase;
+    color:color-mix(in srgb, var(--ink, rgba(24,28,36,.82)) 78%, transparent);
+    text-shadow: 0 -0.5px 0.6px rgba(0,0,0,.5), 0 1px 0.6px rgba(255,255,255,.26); }
+  /* on a dark face the engraving flips: the light catch goes on top */
+  .cage.flat .daycard-ns__name, .cage.void .daycard-ns__name{
+    text-shadow: 0 -0.5px 0.6px rgba(0,0,0,.75), 0 1px 0.6px rgba(255,255,255,.16); }
 
   .hero__name{ margin:22px 0 3px; text-align:center; font-size:22px; font-weight:700;
     letter-spacing:-.02em; }
-  .hero__sub{ margin:0; text-align:center; font-size:13.5px; line-height:1.5; color:var(--mid); }
+  .hero__sub{ margin:0; text-align:center; font-size:13.5px; line-height:1.55; color:var(--mid); }
+  /* the countdown ticks, because a number that moves is the whole argument */
+  #mori b{ font-weight:640; color:var(--hi); font-variant-numeric:tabular-nums; }
 
   /* ── shared section head. Sentence case, no tracked kickers. ──────────── */
   .sect{ margin:38px 0 12px; }
@@ -157,7 +171,9 @@
   .lay__txt{ flex:1; min-width:0; }
   .lay__t{ font-size:14.5px; font-weight:640; letter-spacing:-.01em; }
   .lay__d{ margin-top:2px; font-size:13px; line-height:1.45; color:var(--mid); }
-  .lay__when{ flex:none; font-size:12.5px; color:var(--lo); padding-top:2px; }
+  .lay__when{ flex:none; font-size:12px; font-weight:600; color:var(--lo);
+    padding-top:3px; letter-spacing:-.005em; }
+  .lay:not(.is-locked) .lay__when{ color:color-mix(in srgb, var(--c) 72%, white 28%); }
   .lay.is-locked{ background:rgba(255,255,255,.028); }
   .lay.is-locked .lay__dot{ background:rgba(255,255,255,.14); box-shadow:none; }
   .lay.is-locked .lay__t{ color:var(--mid); }
@@ -264,17 +280,17 @@
 
   <div class="hero">
     <div class="cage" id="heroCard"></div>
-    <p class="hero__name" id="heroName">Toxic</p>
-    <p class="hero__sub" id="heroSub">Carried 47 days. Three layers earned.</p>
+    <p class="hero__name">Your Memento</p>
+    <p class="hero__sub" id="heroSub"><span id="mori">&nbsp;</span></p>
   </div>
 
   <div class="col">
 
     <!-- 2 · what the card is made of -->
     <div class="sect">
-      <h2>What you have earned</h2>
-      <p id="laySub">Three moments, each earned once. They are what makes the card
-        give off any light at all.</p>
+      <h2>The three pillars</h2>
+      <p id="laySub">Everything in Memento is one of these three. Each one puts a
+        layer into the card, and the card is only ever as far along as you are.</p>
     </div>
     <div class="layers" id="layers"></div>
     <p class="matnote" id="layNote"></p>
@@ -397,7 +413,8 @@ function matVars(m, earned){
   const e = earned || {clar:true, act:true, cons:true};
   const n = (e.clar?1:0) + (e.act?1:0) + (e.cons?1:0);
   /* Stock passes NO material overrides, so the app's own defaults render. */
-  if (m.stock) return {'--clar': e.clar?'1':'0', '--act': e.act?'1':'0',
+  if (m.stock) return {'--ink':'rgba(24,28,36,.82)',
+    '--clar': e.clar?'1':'0', '--act': e.act?'1':'0',
     '--cons': e.cons?'1':'0', '--mix':'.9',
     '--lit': n?String(0.34 + n*0.22):'0',
     '--glow': n?'.7':'0', '--emit': n?'.7':'0', '--ring': n?'.5':'0'};
@@ -418,9 +435,15 @@ function matVars(m, earned){
 /* ── the earned layers. Real order: cyan at Clarity, platinum when the Action
    plan is revealed, green on the first completed move. ─────────────────── */
 const LAYERS = [
-  {k:'clar', c:'#3ad9f5', t:'The cyan', d:'Ignited your Neutron Star and signed the statement.', w:'19 Jun'},
-  {k:'act',  c:'#eef2fb', t:'The platinum', d:'Your first plan was revealed and you took the move.', w:'21 Jun'},
-  {k:'cons', c:'#3fd94e', t:'The green', d:'Seven days in a row without dropping it.', w:'4 Jul'},
+  {k:'clar', c:'#3ad9f5', t:'Clarity',
+   d:'Naming the one thing that actually matters, and signing it. Until that '
+    +'exists there is nothing to be consistent about, and the card stays blank.'},
+  {k:'act',  c:'#eef2fb', t:'Action',
+   d:'One move a day toward it. Not a list, not a plan you admire and skip. '
+    +'Clarity without this is just a nice sentence about yourself.'},
+  {k:'cons', c:'#3fd94e', t:'Consistency',
+   d:'Doing it again on the days you do not feel like it. This is the one that '
+    +'takes years, and the only one that compounds.'},
 ];
 const earned = {clar:true, act:true, cons:true};
 
@@ -463,27 +486,25 @@ function paint(){
   cage.innerHTML = realCard(matVars(m, earned), {name:'Malik Peace'});
   cage.className = 'cage ' + (m.cls||'') + (m.stock ? ' is-stock' : '');
 
-  document.getElementById('heroName').textContent = m.n === 'Default' ? 'Malik Peace' : m.n;
-  document.getElementById('heroSub').textContent = n
-    ? 'Carried 47 days. ' + ['One layer','Two layers','Three layers'][n-1] + ' earned.'
-    : 'Carried 47 days. Nothing earned yet.';
   document.getElementById('matNote').textContent = m.note;
 
   /* The layers section has to stay true whichever material is on. On the stock
      card the three ARE the colour. On any other, they still set how much light
      it gives off, so the dates never become a claim about a colour that is not
      on screen. */
-  document.getElementById('laySub').textContent = m.stock
-    ? 'Three moments, each earned once. On this card they are the colour itself.'
-    : 'Three moments, each earned once. They are what makes the card give off any light at all.';
   document.getElementById('layNote').textContent = m.stock ? ''
-    : m.n + ' covers the colour. The three still set how much light it carries, and'
-      + ' the default card shows them raw.';
+    : m.n + ' covers the colour. The default card wears the three raw.';
 
   document.querySelectorAll('.chip').forEach((c,i)=>
     c.setAttribute('aria-pressed', i===cur ? 'true' : 'false'));
-  document.querySelectorAll('.lay').forEach(l=>
-    l.classList.toggle('is-locked', !earned[l.dataset.k]));
+  /* state, not a date. Clarity and Action almost always land on the SAME day,
+     so two identical timestamps sat there looking broken. What matters is
+     whether the pillar is under you yet. */
+  document.querySelectorAll('.lay').forEach(l=>{
+    const on = !!earned[l.dataset.k];
+    l.classList.toggle('is-locked', !on);
+    l.querySelector('.lay__when').textContent = on ? 'Yours' : 'Not yet';
+  });
 }
 
 /* the strip */
@@ -503,7 +524,7 @@ document.getElementById('layers').innerHTML = LAYERS.map(l=>
      <span class="lay__dot"></span>
      <span class="lay__txt"><span class="lay__t">${l.t}</span>
        <span class="lay__d">${l.d}</span></span>
-     <span class="lay__when">${l.w}</span>
+     <span class="lay__when"></span>
    </button>`).join('');
 /* Tap a layer to pull it back off. Proof that the colour is the record. */
 document.getElementById('layers').addEventListener('click', e=>{
@@ -534,6 +555,25 @@ document.getElementById('moreBtn').onclick = function(){
   this.textContent = 'That is all of it, back to 19 June';
   this.disabled = true;
 };
+
+/* ── Memento Mori. The app already models birth year and life expectancy
+   (moriYearsRemaining in js/06), so this is the same number, ticking. The
+   point of the screen is what you did with the days; this is how many are
+   left to do it in. ─────────────────────────────────────────────────────── */
+const BIRTH_YEAR = 2004, LIFE_EXPECTANCY = 80;
+const END = new Date(BIRTH_YEAR + LIFE_EXPECTANCY, 0, 1).getTime();
+const moriEl = document.getElementById('mori');
+function tickMori(){
+  const ms = Math.max(0, END - Date.now());
+  const days = Math.floor(ms / 86400000);
+  const rest = ms % 86400000;
+  const p = n => String(n).padStart(2, '0');
+  moriEl.innerHTML = '<b>' + days.toLocaleString() + '</b> days, <b>'
+    + p(Math.floor(rest/3600000)) + ':' + p(Math.floor(rest%3600000/60000))
+    + ':' + p(Math.floor(rest%60000/1000)) + '</b> left.<br>47 of them carried here.';
+}
+tickMori();
+setInterval(tickMori, 1000);
 
 /* the bar title arrives once the card has gone */
 const bar = document.getElementById('bar');
