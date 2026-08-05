@@ -5662,7 +5662,9 @@ Return ONLY the sentence text. No quotes, no labels.`;
         <div class="aloop-glow" aria-hidden="true"></div>
         <div class="aloop-top">
           <div class="aloop-day"><span class="aloop-day__k">Day</span><span class="aloop-day__n apl-num">${dayN}</span></div>
-          ${this._distChipHtml()}
+          ${'' /* v1114: the distance chip is PULLED from the header (Malik: reads
+             cheap there). The engine, the pulse sheet and the AI line all stay
+             live; only this surface is gone until the redesign lands. */}
           <button type="button" class="aloop-receipt" id="aloopReceipt">Built from</button>
         </div>
         <div class="aloop-mid">
