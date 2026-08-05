@@ -398,60 +398,6 @@
 }
 
 
-
-/* The card already tilts in 3D; the wash must ride with it and never animate
-   a filter. Nothing here animates, and the layer is transform-free, so it
-   composites with the card's own layer. */
-@media (prefers-reduced-motion: reduce) {
-  .skin[class*="lt-"] .daycard-ns::after {
-    transition: none;
-  }
-.skin.rm-hair .daycard-ns .daycard-ns__rim::after { content: none !important; }
-
-/* rm-none — no edge at all. The card simply ends on its own face; the only
-   thing separating it from the room is the material and the outer halo. On a
-   flat matte this reads as a solid cut block, on glass as a floating pane. */
-.skin.rm-none .daycard-ns .daycard-ns__rim {
-  opacity: 0 !important;
-  box-shadow: none !important;
-}
-.skin.rm-none .daycard-ns .daycard-ns__rim::after { content: none !important; }
-
-/* rm-bevel — a machined chamfer. The top-left half of the border catches light,
-   the bottom-right half falls into shadow, so the edge reads as a cut angle on
-   a solid, not as a line drawn on a surface. Survives both extremes by design:
-   on a black face the light catch carries it, on a white face the shadow does,
-   and the direction of the bevel is legible either way. */
-.skin.rm-bevel .daycard-ns .daycard-ns__rim {
-  opacity: 1 !important;
-  box-shadow:
-    /* the crisp catch and the crisp shade, right at the edge */
-    inset 1px 1px 0 0 rgba(255, 255, 255, 0.52),
-    inset -1px -1px 0 0 rgba(0, 0, 0, 0.34),
-    /* the chamfer face itself, ~3px, softened so it reads as an angle */
-    inset 3px 3px 3px -0.5px rgba(255, 255, 255, 0.34),
-    inset -3px -3px 3px -0.5px rgba(0, 0, 0, 0.42),
-    /* a whisper of continuity so the rounded corners never break the bevel */
-    inset 0 0 0 1px rgba(255, 255, 255, 0.06) !important;
-}
-.skin.rm-bevel .daycard-ns .daycard-ns__rim::after { content: none !important; }
-  50%  { transform: translate3d(2.5%, -3%, 0)  scale(1.10); }
-  100% { transform: translate3d(4%, 3.5%, 0)   scale(1.05); }
-  50%  { transform: translate3d(-2%, 3%, 0) scale(1.08); opacity: 1; }
-  100% { transform: translate3d(-3.5%, -2.5%, 0) scale(1.05); opacity: 0.9; }
-  100% { transform: translate3d(-2.5%, -1.5%, 0) scale(1.06); }
-  46%      { transform: scale(1.045);  opacity: 1; }
-  46%      { transform: scaleY(1.06)  translate3d(0, 0.6%, 0);   opacity: 1; }
-  46%      { transform: scaleY(1.10)  translate3d(0, 1%, 0);   opacity: 1; }
-  6%   { opacity: 0.95; transform: translate3d(-50%, -50%, 0) scale(0.5); }
-  55%  { opacity: 0.28; transform: translate3d(-50%, -50%, 0) scale(2.1); }
-  78%  { opacity: 0;    transform: translate3d(-50%, -50%, 0) scale(2.9); }
-  100% { opacity: 0;    transform: translate3d(-50%, -50%, 0) scale(2.9); }
-  4%       { transform: scale(1.018); opacity: 1; }
-  18%      { transform: scale(1);     opacity: 0.94; }
-  40%      { transform: scale(1);     opacity: 1; }
-}
-
 /* --- fin-lacquer: a deep clear coat over the material. One soft, broad
    reflection falling from the top edge and fading by the middle, plus a little
    pooled depth at the foot. Piano finish, not a highlight streak. --- */
@@ -657,7 +603,7 @@
 
 
   <div class="sect">1 · The mixer</div>
-  <p class="why">Fifty-two materials against four modulators that earn their place. Nothing but the material may touch colour, so every combination is safe by construction. The weak axes were cut rather than padded.</p>
+  <p class="why">Fifty-two materials, and one modulator that earns its place. Nothing but the material may touch colour, so every combination is safe by construction. Grain, rim, lighting and motion were cut outright; finish is parked, not deleted.</p>
   <div class="mixer">
     <div class="mixer__card" id="mixCard"></div>
     <div class="mixer__ctrl" id="mixCtrl"></div>
@@ -1082,13 +1028,14 @@ document.getElementById('heroRow').insertAdjacentHTML('beforeend',
   mp.onclick=()=>setM(false); mt.onclick=()=>setM(true);
 })();
 
-/* ═══ THE MIXER ═══ 52 materials x 6 axes */
+/* ═══ THE MIXER ═══ 52 materials, and only what earns its place.
+   PARKED (CSS kept, control hidden, cards render stock):
+     fin — Lacquer / Matte / Brushed metal / Iridescent / Frosted / Velvet.
+   Put its line back into AXES to bring it live again.
+   DELETED: rim, grain, motion, lighting. */
 const AXES = [
-  {k:'fin', label:'Finish',  opts:[['fin-lacquer','Lacquer'],['fin-matte','Matte'],['fin-metal','Brushed metal'],
-                                   ['fin-irid','Iridescent'],['fin-frost','Frosted'],['fin-velvet','Velvet']]},
   {k:'mk',  label:'Mark',    opts:[['mk-plain','Plain'],['mk-engraved','Engraved'],['mk-embossed','Embossed'],
                                    ['mk-cutout','Cut-out']]},
-  {k:'rm',  label:'Rim',     opts:[['rm-hair','Hairline'],['rm-none','None'],['rm-bevel','Bevelled']]},
 ];
 const TOTAL = SKINS.length * AXES.reduce((n,a)=>n*a.opts.length,1);
 
