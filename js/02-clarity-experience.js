@@ -2858,6 +2858,8 @@ const ActionExperience = {
     this.isOpen = false;
     this._paintedPreview = null;
     this._clearTimers();
+    try { delete this.el.dataset.heat; } catch (e) {}
+    if (this._aheatResize) { try { window.removeEventListener('resize', this._aheatResize); } catch (e) {} this._aheatResize = null; }
     try { if (typeof KeyboardPin !== 'undefined') KeyboardPin.release(this.el); } catch (e) {}
     if (this._kbSettleCleanup) { try { this._kbSettleCleanup(); } catch (e) {} this._kbSettleCleanup = null; }
     if (recallView() === 'action') rememberView(null);
@@ -5601,140 +5603,208 @@ Return ONLY the sentence text. No quotes, no labels.`;
     const KEYS = ['tiny', 'light', 'moderate', 'heavy', 'extreme'];
     let tier = KEYS.indexOf(state.action.selectedTier) >= 0 ? state.action.selectedTier
       : (KEYS.indexOf(pa.recommendedTier) >= 0 ? pa.recommendedTier : 'moderate');
-    // A chained "Do it now" action takes over the card until completed.
     const loop = this._loopState();
     const chained = String(loop.chained || '').trim();
-    const idx = KEYS.indexOf(tier);
     const dayN = this._loopDayNumber();
-    const weekday = this._loopWeekday(0);
-    const brief = (k, v) => v ? `<div class="aloop-brief"><span class="aloop-brief__k">${k}</span><span class="aloop-brief__v">${esc(v)}</span></div>` : '';
-    // The chained line tells the truth about where the action came from: a
-    // morning open means it was locked last night; mid-day means they just
-    // chained it with Do it now.
     const doneTodayN = this._loopCompletionsFor(this._loopDayKey(new Date())).length;
     const chainLine = doneTodayN > 0
       ? 'Chained from what you just finished. Same day, same push.'
       : 'You locked this in last night. Today starts here.';
-    // The brief lives in its own scroll region so a long plan scrolls INSIDE
-    // the card. The card keeps its shape and its footer; it is never sliced
-    // through by the viewport edge.
-    // One card per tier, so swiping moves through real pages instead of
-    // rewriting one card in place. Each card carries its OWN tier on
-    // data-tier, which is what lets the five sizes look different from each
-    // other while you are still deciding.
-    // Only the slide you are looking at carries the scroll mask. Masks are
-    // composited layers, and five of them at once is part of what crashed
-    // iOS on v993.
-    const cardFor = (k) => `
-      <div class="aloop-slide${KEYS.indexOf(k) === idx ? ' is-live' : ''}">
-        <div class="aloop-card" data-tier="${k}">
-          <div class="aloop-card__scroll">
-            <p class="aloop-card__cap">Action</p>
-            <p class="aloop-card__move">${esc((pa.tiers && pa.tiers[k]) || pa.title || '')}</p>
-            ${pa.why ? `<p class="aloop-card__why">${esc(pa.why)}</p>` : ''}
-            <hr class="aloop-rule">
-            ${brief('First step', pa.howToStart)}
-            ${brief('Done when', pa.tierDone && pa.tierDone[k])}
-            ${brief('Roughly', pa.tierTime && pa.tierTime[k])}
-            ${brief('If stuck', pa.ifStuck)}
-          </div>
-          <div class="aloop-swaphint">
-            <div class="aloop-dots">${KEYS.map((_, i) => `<i${i === KEYS.indexOf(k) ? ' class="on"' : ''}></i>`).join('')}</div>
-            <span class="aloop-count apl-num">${KEYS.indexOf(k) + 1} of 5</span>
-          </div>
-        </div>
-      </div>`;
-    const deckHtml = chained
-      ? `<div class="aloop-track" style="transform:translateX(0)">
-           <div class="aloop-slide">
-             <div class="aloop-card" data-tier="${tier}">
-               <div class="aloop-card__scroll">
-                 <p class="aloop-card__cap">Next action</p>
-                 <p class="aloop-card__move">${esc(chained)}</p>
-                 <p class="aloop-card__why">${chainLine}</p>
-               </div>
-             </div>
-           </div>
-         </div>`
-      : `<div class="aloop-track" style="transform:translateX(${idx * -100}%)">${KEYS.map(cardFor).join('')}</div>`;
+    // v1115: THE HEAT LOOP (p01, Malik-approved). ONE content-sized card.
+    // Every tier's text lives in the DOM as .aheat-v/.aheat-vi spans and the
+    // root's data-tier picks the visible one, so changing the level never
+    // re-renders the screen (take the ELEMENT, not its text: flattening
+    // showed every time value at once in the mockup rounds).
+    const vBlock = (fn) => KEYS.map(k => `<span class="aheat-v aheat-v--${k}">${esc(String(fn(k) || ''))}</span>`).join('');
+    const viBlock = (fn) => KEYS.map(k => `<span class="aheat-vi aheat-vi--${k}">${esc(String(fn(k) || ''))}</span>`).join('');
+    const timeOf = (k) => String((pa.tierTime && pa.tierTime[k]) || '').replace(/utes?$/, '');
+    const hasTime = KEYS.some(k => timeOf(k));
+    const frontHtml = chained
+      ? `<h2 class="aheat-move">${esc(chained)}</h2><p class="aheat-chainline">${chainLine}</p>`
+      : `<h2 class="aheat-move">${vBlock(k => (pa.tiers && pa.tiers[k]) || pa.title)}</h2>` +
+        (hasTime ? `<p class="aheat-time apl-num"><span class="aheat-tilde">~</span><span>${viBlock(timeOf)}</span></p>` : '');
+    const bk = (label, inner) => inner ? `<div><span class="aheat-bk">${label}</span><span class="aheat-bv">${inner}</span></div>` : '';
+    // "Built from" left the card front (Malik: it is just the star restated),
+    // but the receipt is still the door to editing the plan's facts, so it
+    // lives quietly at the end of the BACK.
+    const backHtml = chained ? '' : `
+              <div class="aheat-face aheat-back"><div class="aheat-cbody">
+                ${pa.why ? `<p class="aheat-why">${esc(pa.why)}</p><hr class="aheat-brule">` : ''}
+                ${bk('First step', pa.howToStart ? esc(pa.howToStart) : '')}
+                ${bk('Done when', (pa.tierDone && KEYS.some(k => pa.tierDone[k])) ? viBlock(k => pa.tierDone && pa.tierDone[k]) : '')}
+                ${bk('If stuck', pa.ifStuck ? esc(pa.ifStuck) : '')}
+                <button type="button" class="aheat-builtfrom" id="aheatBuiltFrom">Built from</button>
+              </div></div>`;
     this.pageWrap.innerHTML = `
-      <div class="action-exp__page-inner"><div class="aloop" data-tier="${tier}">
-        <div class="aloop-glow" aria-hidden="true"></div>
+      <div class="action-exp__page-inner"><div class="aloop aheat${chained ? ' aheat--chained' : ''}" data-tier="${tier}">
+        <div class="aheat-level" aria-hidden="true">
+          <span class="aheat-level__k">Level</span>
+          <span class="aheat-level__n apl-num" id="aheatLevelN">${KEYS.indexOf(tier) + 1}</span>
+          <span class="aheat-level__t" id="aheatLevelT">${tier}</span>
+        </div>
         <div class="aloop-top">
           <div class="aloop-day"><span class="aloop-day__k">Day</span><span class="aloop-day__n apl-num">${dayN}</span></div>
-          ${'' /* v1114: the distance chip is PULLED from the header (Malik: reads
-             cheap there). The engine, the pulse sheet and the AI line all stay
-             live; only this surface is gone until the redesign lands. */}
-          <button type="button" class="aloop-receipt" id="aloopReceipt">Built from</button>
         </div>
         <div class="aloop-mid">
-          <div class="aloop-deck">${deckHtml}</div>
+          <div class="aheat-stage">
+            <div class="aheat-card" id="aheatCard">
+              <div class="aheat-face aheat-front">
+                <div class="aheat-cbody">${frontHtml}</div>
+                <div class="aheat-mark" aria-hidden="true"><svg viewBox="140 136 232 240"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z" fill="currentColor"/></svg></div>
+              </div>
+              ${backHtml}
+            </div>
+          </div>
           <button type="button" class="aloop-notthis" id="aloopNotThis">Not this action</button>
+          ${chained ? '' : `<div class="aheat-dial" id="aheatDial" aria-label="turn to set the level"><div class="aheat-dial__face"><div class="aheat-dial__knurl"></div></div><div class="aheat-dial__index"></div></div>`}
         </div>
         <div class="aloop-bot">
           <button type="button" class="aloop-hold" id="aloopHold"><i class="aloop-hold__fill" aria-hidden="true"></i><span>Hold to complete</span><small>press and hold</small></button>
-          <button type="button" class="aloop-focus" id="aloopFocus"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9.5V13l2.2 1.6M9 2.5h6"/></svg>Focus${(!chained && pa.tierTime && pa.tierTime[tier]) ? ' ' + esc(String(pa.tierTime[tier]).replace(/utes?$/, '')) : ''}</button>
+          <button type="button" class="aloop-focus" id="aloopFocus"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9.5V13l2.2 1.6M9 2.5h6"/></svg>Focus${chained || !hasTime ? '' : `<span class="apl-num">${viBlock(timeOf)}</span>`}</button>
         </div>
       </div></div>`;
     const root = this.pageWrap.querySelector('.aloop');
-
-    // The tier is read LIVE from state wherever it is used, so a swipe never
-    // has to re-render the screen (re-rendering mid-gesture is what made the
-    // old version feel like a jump cut rather than a swipe).
+    const expEl = this.el;
+    if (expEl) expEl.dataset.heat = tier;
     const liveTier = () => (KEYS.indexOf(state.action.selectedTier) >= 0 ? state.action.selectedTier : tier);
 
-    // A real horizontal carousel: the track follows the finger and snaps.
-    if (!chained) {
-      const deck = root.querySelector('.aloop-deck');
-      const track = root.querySelector('.aloop-track');
-      const focusBtn = root.querySelector('#aloopFocus');
-      let i = idx, sx = null, sy = null, dragging = false, w = 1;
-      const place = (px, animate) => {
-        track.style.transition = animate ? 'transform 340ms cubic-bezier(.22,1,.36,1)' : 'none';
-        track.style.transform = `translateX(calc(${i * -100}% + ${px}px))`;
-      };
-      const slides = Array.prototype.slice.call(root.querySelectorAll('.aloop-slide'));
-      const commit = () => {
-        slides.forEach((s, n) => s.classList.toggle('is-live', n === i));
-        state.action.selectedTier = KEYS[i];
-        try { persistNow(); } catch (e) {}
-        root.dataset.tier = KEYS[i];
-        const t = pa.tierTime && pa.tierTime[KEYS[i]];
-        if (focusBtn) {
-          const label = t ? ' ' + String(t).replace(/utes?$/, '') : '';
-          focusBtn.lastChild.nodeValue = 'Focus' + label;
+    const card = root.querySelector('#aheatCard');
+    const level = root.querySelector('.aheat-level');
+    const numEl = root.querySelector('#aheatLevelN');
+    const txtEl = root.querySelector('#aheatLevelT');
+    // the flat colour behind the level screen and the number's size, per rung;
+    // both interpolate from the FRACTIONAL level while turning.
+    const HUES = [[20, 23, 29], [43, 111, 214], [31, 194, 117], [179, 45, 28], [242, 244, 247]];
+    const SIZE = [20, 27, 34, 42, 52];
+
+    // Measured heights: a minimal front in a box sized for the back reads as
+    // an empty panel; a back clipped to the front's height reads as broken.
+    // So measure both and let one transition carry the card between them.
+    const sizeCard = () => {
+      try {
+        const fb = card.querySelector('.aheat-front .aheat-cbody');
+        const bb = card.querySelector('.aheat-back .aheat-cbody');
+        if (!fb) return;
+        const pad = 44; // the faces' 22px padding, both ends
+        const front = Math.max(120, fb.scrollHeight + pad + 8);
+        root.style.setProperty('--afront', Math.round(front) + 'px');
+        if (bb) {
+          const mid = root.querySelector('.aloop-mid');
+          const dialEl = root.querySelector('#aheatDial');
+          const nt = root.querySelector('#aloopNotThis');
+          const cap = mid ? mid.clientHeight
+            - (dialEl ? dialEl.offsetHeight + 14 : 0)
+            - (nt ? nt.offsetHeight + 16 : 0) : 0;
+          let back = bb.scrollHeight + pad;
+          if (cap > 160) back = Math.min(back, cap); // the back scrolls inside past this
+          root.style.setProperty('--aback', Math.round(Math.max(back, front)) + 'px');
         }
-        try { if (typeof MementoSound !== 'undefined' && MementoSound.tick) MementoSound.tick(); } catch (e) {}
-      };
-      deck.addEventListener('pointerdown', (e) => {
-        // ignore drags that start inside a scrolling brief
-        sx = e.clientX; sy = e.clientY; dragging = false;
-        w = deck.clientWidth || 1;
+      } catch (e) {}
+    };
+    sizeCard();
+    requestAnimationFrame(sizeCard);
+    if (this._aheatResize) { try { window.removeEventListener('resize', this._aheatResize); } catch (e) {} }
+    this._aheatResize = sizeCard;
+    window.addEventListener('resize', sizeCard);
+
+    // Only the INTEGER rung is committed to the card; the level screen rides
+    // the fraction. Committing re-measures because the move's length changes.
+    const commit = (i) => {
+      i = Math.max(0, Math.min(4, i));
+      const k = KEYS[i];
+      if (state.action.selectedTier === k && root.dataset.tier === k) return;
+      state.action.selectedTier = k;
+      try { persistNow(); } catch (e) {}
+      root.dataset.tier = k;
+      if (expEl) expEl.dataset.heat = k;
+      sizeCard();
+      try { if (typeof MementoSound !== 'undefined' && MementoSound.tick) MementoSound.tick(); } catch (e) {}
+    };
+    const lerp = (a, b, t) => a + (b - a) * t;
+    const mix = (f) => {
+      const lo = Math.max(0, Math.min(4, Math.floor(f)));
+      const hi = Math.min(4, lo + 1);
+      const t = Math.max(0, Math.min(1, f - lo));
+      const c = [0, 1, 2].map(n => Math.round(lerp(HUES[lo][n], HUES[hi][n], t)));
+      return { rgb: 'rgb(' + c.join(',') + ')', size: lerp(SIZE[lo], SIZE[hi], t),
+               dark: (c[0] * 0.299 + c[1] * 0.587 + c[2] * 0.114) > 150 };
+    };
+    const paint = (f) => {
+      const i = Math.max(0, Math.min(4, Math.round(f)));
+      const m = mix(Math.max(0, Math.min(4, f)));
+      if (level) {
+        level.style.backgroundColor = m.rgb;
+        level.style.setProperty('--ansize', m.size.toFixed(2));
+        level.style.color = m.dark ? 'rgba(12,14,20,0.97)' : 'rgba(255,255,255,0.97)';
+      }
+      if (numEl) numEl.textContent = String(i + 1);
+      if (txtEl) txtEl.textContent = KEYS[i];
+      commit(i);
+    };
+
+    // THE DIAL: it looks like a wheel but reads a horizontal drag, because a
+    // real rotary gesture is miserable with a thumb. 58px per level, rubber
+    // band past the ends, snaps to the nearest detent on release.
+    const dial = root.querySelector('#aheatDial');
+    if (dial) {
+      const knurl = dial.querySelector('.aheat-dial__knurl');
+      const STEP = 58;
+      let pid = null, x0 = 0, y0 = 0, startV = 2, val = 2, dir = 0;
+      dial.addEventListener('pointerdown', (e) => {
+        pid = e.pointerId; x0 = e.clientX; y0 = e.clientY;
+        startV = val = KEYS.indexOf(liveTier()); dir = 0;
+        try { dial.setPointerCapture(pid); } catch (err) {}
       });
-      deck.addEventListener('pointermove', (e) => {
+      dial.addEventListener('pointermove', (e) => {
+        if (e.pointerId !== pid) return;
+        const dx = e.clientX - x0, dy = e.clientY - y0;
+        if (!dir) {
+          if (Math.abs(dx) < 5 && Math.abs(dy) < 5) return;
+          dir = Math.abs(dx) > Math.abs(dy) * 1.1 ? 1 : -1;
+          if (dir === -1) { pid = null; return; }
+          root.classList.add('is-turning');
+        }
+        let raw = startV + dx / STEP;
+        if (raw < 0) raw = raw * 0.35;
+        if (raw > 4) raw = 4 + (raw - 4) * 0.35;
+        val = raw;
+        if (knurl) knurl.style.transform = 'translate3d(' + (dx * 0.9 % 44) + 'px,0,0)';
+        paint(val);
+      });
+      const release = (e) => {
+        if (e.pointerId !== pid) return;
+        try { dial.releasePointerCapture(pid); } catch (err) {}
+        pid = null;
+        if (dir === 1) { paint(Math.round(Math.max(0, Math.min(4, val)))); root.classList.remove('is-turning'); }
+        dir = 0;
+      };
+      dial.addEventListener('pointerup', release);
+      dial.addEventListener('pointercancel', release);
+      paint(KEYS.indexOf(tier));
+    }
+
+    // Tap flips to the brief; a horizontal swipe on the card is the SECONDARY
+    // way to change the level (the dial is primary). Chained cards do neither.
+    if (!chained && card) {
+      let sx = null, sy = null, moved = false;
+      card.addEventListener('pointerdown', (e) => { sx = e.clientX; sy = e.clientY; moved = false; });
+      card.addEventListener('pointermove', (e) => {
+        if (sx === null) return;
+        if (Math.abs(e.clientX - sx) > 8 || Math.abs(e.clientY - sy) > 8) moved = true;
+      });
+      card.addEventListener('pointerup', (e) => {
         if (sx === null) return;
         const dx = e.clientX - sx, dy = e.clientY - sy;
-        if (!dragging && Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) dragging = true;
-        if (!dragging) return;
-        // resist past the ends so the track never runs off into empty space
-        let d = dx;
-        if ((i === 0 && d > 0) || (i === KEYS.length - 1 && d < 0)) d = d * 0.28;
-        place(d, false);
-      });
-      const settle = (e) => {
-        if (sx === null) return;
-        const dx = (e.clientX || 0) - sx;
         sx = null;
-        if (!dragging) { place(0, true); return; }
-        dragging = false;
-        if (Math.abs(dx) > w * 0.22) {
-          const next = dx < 0 ? Math.min(KEYS.length - 1, i + 1) : Math.max(0, i - 1);
-          if (next !== i) { i = next; commit(); }
+        if (e.target && e.target.closest && e.target.closest('.aheat-builtfrom')) return;
+        if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+          const i = KEYS.indexOf(liveTier());
+          commit(dx < 0 ? Math.min(4, i + 1) : Math.max(0, i - 1));
+          return;
         }
-        place(0, true);
-      };
-      deck.addEventListener('pointerup', settle);
-      deck.addEventListener('pointercancel', () => { sx = null; dragging = false; place(0, true); });
+        if (!moved) root.classList.toggle('is-flip');
+      });
+      card.addEventListener('pointercancel', () => { sx = null; });
     }
 
     // Hold to complete: a real press, not a tap. Fill runs ~900ms; letting go
@@ -5764,12 +5834,8 @@ Return ONLY the sentence text. No quotes, no labels.`;
     });
 
     // The receipt (v1105): the facts this plan is built from, editable.
-    const receiptBtn = root.querySelector('#aloopReceipt');
-    if (receiptBtn) receiptBtn.addEventListener('click', (e) => { e.stopPropagation(); this.openReceipt(); });
-
-    // v1113: the distance chip opens the pulse sheet.
-    const distBtn = root.querySelector('#aloopDist');
-    if (distBtn) distBtn.addEventListener('click', (e) => { e.stopPropagation(); this.openGoalPulse('chip'); });
+    const bfBtn = root.querySelector('#aheatBuiltFrom');
+    if (bfBtn) bfBtn.addEventListener('click', (e) => { e.stopPropagation(); this.openReceipt(); });
 
     // The rare case where the action itself is wrong: quiet, two-step, honest.
     const notThis = root.querySelector('#aloopNotThis');
@@ -5815,6 +5881,7 @@ Return ONLY the sentence text. No quotes, no labels.`;
   },
 
   _loopComplete(tier, chainedText) {
+    try { if (this.el) delete this.el.dataset.heat; } catch (e) {}
     const pa = state.action.primaryAction || {};
     const actionText = chainedText || (pa.tiers && pa.tiers[tier]) || pa.title || '';
     if (!Array.isArray(state.action.completionHistory)) state.action.completionHistory = [];
@@ -5892,6 +5959,7 @@ Return ONLY the sentence text. No quotes, no labels.`;
   },
 
   _renderTodaySoFar() {
+    try { if (this.el) delete this.el.dataset.heat; } catch (e) {}
     const pa = state.action.primaryAction || {};
     const loop = this._loopState();
     const today = this._loopDayKey(new Date());
@@ -5940,6 +6008,7 @@ Return ONLY the sentence text. No quotes, no labels.`;
   // The morning open: yesterday's number holds, then the line rotates left
   // and today lands with what is next.
   _renderMorningOpen() {
+    try { if (this.el) delete this.el.dataset.heat; } catch (e) {}
     this._morningShownFor = this._loopDayKey(new Date());
     const loop = this._loopState();
     const pa = state.action.primaryAction || {};
