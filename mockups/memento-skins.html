@@ -367,11 +367,7 @@
   <div class="row" id="crowdRow"></div>
 
 
-  <div class="sect">4 · Prototype — topographic</div>
-  <p class="why">A different idea entirely: the card as terrain. Fractal noise posterised into discrete elevation bands, so every person's card is a map of a landscape that only exists for them. Same real card, same rim, same mark. These are prototypes, not finished skins.</p>
-  <div class="row" id="topoRow"></div>
-
-  <div class="sect">6 · The Founder card</div>
+  <div class="sect">4 · The Founder card</div>
   <p class="why">The same real card, numbered. Platinum keeps the shipped face; obsidian holds the platinum flood off so their colour is the only light in the room. (Both follow the generator.)</p>
   <div class="row" id="founderRow"></div>
 </div>
@@ -649,54 +645,6 @@ function renderFounder(name, sk){
     + realCard(Object.assign({}, skinVars(SKINS[4]), {'--rim-op':'1'}),
         {cls:'skin', cap:'C · Void founder — black, the rim, the number', name:name, num:num, sub:'First two hundred'});
 }
-
-
-/* ── topographic prototypes ─────────────────────────────────────── */
-function topoCard(o){
-  const B = blobPlan(o.name||'topo');
-  const style = Object.entries(o.vars||{}).map(([k,v])=>`${k}:${v}`).join(';');
-  return `<div class="slot skin ${o.cls||''}" >
-    <p class="cap">${o.cap||''}</p>
-    <div class="cage">
-      <div class="daycard-wrap daycard-theme-living daycard-reveal daycard--bright" style="${style}">
-        <div class="daycard-living-stage">
-          <div class="daycard-ns">
-            <span class="topo-layer" style="filter:url(#${o.filter}); background:#888"></span>
-            <span class="topo-grid"></span>
-            <span class="daycard-ns__rim" aria-hidden="true"></span>
-            <div class="daycard-ns__body">
-              <svg class="daycard-ns__emblem" viewBox="0 0 512 512" aria-hidden="true">
-                <path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path>
-              </svg>
-            </div>
-            <div class="sub">${o.sub||''}</div>
-            <div class="daycard-ns__foot"><span class="daycard-ns__name">${o.name||''}</span></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>`;
-}
-document.getElementById('topoRow').innerHTML =
-  topoCard({filter:'topoElev', cap:'Elevation — pastel land', name:'Ava', sub:'topographic',
-    vars:{'--face':'#e9e6dc','--mark':'rgba(58,62,74,.92)','--ink':'rgba(58,62,74,.7)','--topo-op':'.9',
-          '--edge':'rgba(255,255,255,.9)','--halo':'rgba(240,238,230,.35)'}, cls:'flat'})
-  + topoCard({filter:'topoTherm', cap:'Thermal — the whole spectrum', name:'Jordan', sub:'topographic',
-    vars:{'--face':'#02030c','--mark':'rgba(255,255,255,.97)','--ink':'rgba(226,238,255,.85)','--topo-op':'.95',
-          '--edge':'rgba(140,190,255,.5)','--halo':'rgba(60,120,255,.28)'}, cls:'flat'})
-  + topoCard({filter:'topoDens', cap:'Density — heat map', name:'Sofia', sub:'topographic',
-    vars:{'--face':'#03011a','--mark':'rgba(240,246,255,.97)','--ink':'rgba(200,220,255,.85)','--topo-op':'.92','--grid-op':'.5',
-          '--edge':'rgba(120,160,255,.45)','--halo':'rgba(60,60,255,.24)'}, cls:'flat'})
-  + topoCard({filter:'topoLine', cap:'Contour — lines only', name:'Darius', sub:'topographic',
-    vars:{'--face':'#07080a','--mark':'rgba(244,248,255,.97)','--ink':'rgba(214,224,240,.8)','--topo-op':'.9',
-          '--topo-blend':'screen','--edge':'rgba(255,255,255,.5)','--halo':'rgba(226,236,255,.2)'}, cls:'flat'})
-  + topoCard({filter:'topoDeep', cap:'Depth — ocean floor', name:'Lena', sub:'topographic',
-    vars:{'--face':'#01060e','--mark':'rgba(226,244,255,.97)','--ink':'rgba(196,226,248,.82)','--topo-op':'.9',
-          '--edge':'rgba(120,200,255,.4)','--halo':'rgba(0,140,255,.2)'}, cls:'flat'})
-  + topoCard({filter:'topoElev', cap:'Elevation, dark — same map, night', name:'Theo', sub:'topographic',
-    vars:{'--face':'#0a0b0d','--mark':'rgba(244,248,255,.97)','--ink':'rgba(220,230,244,.8)','--topo-op':'.34',
-          '--topo-blend':'screen','--edge':'rgba(255,255,255,.35)','--halo':'rgba(226,236,255,.16)'}, cls:'flat'});
-
 
 
 /* ── Thermal & Code Blue ─────────────────────────────────────────── */
