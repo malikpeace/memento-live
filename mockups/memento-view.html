@@ -157,18 +157,6 @@
   .sect h2{ margin:0 0 4px; font-size:17px; font-weight:680; letter-spacing:-.015em; }
   .sect p{ margin:0; font-size:13.5px; line-height:1.5; color:var(--mid); }
 
-  /* ── the star. A signed document, so it gets a surface, unlike the note at
-     the top which is handwriting. Not italic, for the same reason. */
-  .star{ padding:20px 19px 17px; border-radius:16px;
-    background:var(--fill); box-shadow:var(--inset); }
-  .star__s{ margin:0; font-size:17px; line-height:1.5; letter-spacing:-.015em;
-    color:var(--hi); }
-  .star__w{ margin:11px 0 0; font-size:14px; line-height:1.5; color:var(--mid); }
-  .star__m{ display:flex; align-items:center; gap:8px; margin:16px 0 0;
-    font-size:12.5px; color:var(--mid); }
-  .star__dot{ flex:none; width:8px; height:8px; border-radius:50%;
-    background:var(--clar); box-shadow:0 0 12px 1px rgba(58,217,245,.5); }
-
   /* ── their own note, in their own words, said back to them. No panel, no
      label, no explanation. Italic is the only thing marking it as theirs. */
   .note{ margin:26px auto 0; max-width:31ch; text-align:center;
@@ -243,7 +231,8 @@
   .grid__foot{ display:flex; justify-content:space-between; margin:11px 0 0;
     font-size:12px; color:var(--lo); }
 
-  .trail{ margin:16px 0 0; }
+  .trailtop{ margin:20px 0 0; font-size:12.5px; color:var(--mid); }
+  .trail{ margin:4px 0 0; }
   .mon{ margin:22px 0 9px; font-size:13px; font-weight:640; color:var(--mid); }
   .mon:first-child{ margin-top:6px; }
   .ev{ position:relative; display:flex; gap:13px; padding:0 0 15px 0; }
@@ -262,9 +251,6 @@
   .ev__m{ display:block; margin-top:2px; font-size:12.5px; line-height:1.45; color:var(--mid); }
   .ev__d{ flex:none; font-size:12.5px; color:var(--lo); padding-top:2px; }
 
-  .more{ display:block; width:100%; margin:8px 0 0; padding:14px; border:0; border-radius:12px;
-    background:var(--fill); box-shadow:var(--inset); color:var(--hi);
-    font:inherit; font-size:14.5px; font-weight:600; cursor:pointer; }
 
   /* ── the last block on the screen, and the oldest thing on it. Recessed
      rather than raised: a well cut into the page, with the date struck INTO
@@ -328,25 +314,35 @@
 
   <div class="col">
 
-    <!-- 2 · what the card is made of -->
+    <!-- 2 · the record. Moved to the top of the column: the evidence is the
+         reason to come back, so it goes before the customising. -->
     <div class="sect">
-      <h2>Your Neutron Star</h2>
-      <p>The thing you signed. Everything the card records is the app pointing
-        you back at it.</p>
-    </div>
-    <div class="star">
-      <p class="star__s">Ten thousand people paying me for something that makes
-        their week better, built by me, without a team I do not want.</p>
-      <p class="star__w">Because I am not doing another year of work that
-        disappears the moment I stop.</p>
-      <p class="star__m"><span class="star__dot"></span>Signed 19 June 2026.
-        Held for 47 days. Revisited once.</p>
+      <h2>Remember how far you have come</h2>
+      <p>Every mark since the day the card stopped being blank. None of this
+        can be rebuilt by starting over.</p>
     </div>
 
-    <!-- 4 · the material -->
+    <!-- Three, each doing a different job: what has elapsed, what was earned,
+         and what is at risk today. -->
+    <div class="tally">
+      <div class="tal"><b>47</b><span>days<br>carried</span></div>
+      <div class="tal"><b>41</b><span>moves<br>done</span></div>
+      <div class="tal is-live"><b>9</b><span>day<br>streak</span></div>
+    </div>
+    <p class="tallyfoot">Carried since 19 June 2026. Longest run 21 days.</p>
+
+    <div class="grid">
+      <div class="grid__cells" id="cells"></div>
+      <div class="grid__foot"><span>19 June</span><span>Today</span></div>
+    </div>
+
+    <p class="trailtop" id="trailTop"></p>
+    <div class="trail" id="trail"></div>
+
+    <!-- 3 · themes -->
     <div class="sect">
-      <h2>Its material</h2>
-      <p>The one thing here you choose. Same card, different substance.</p>
+      <h2>Themes</h2>
+      <p>How your Memento looks. Nothing above changes.</p>
     </div>
     <div class="strip" id="strip"></div>
     <div class="tog">
@@ -360,29 +356,6 @@
       </div>
     </div>
     <p class="matnote" id="matNote"></p>
-
-    <!-- 5 · the record -->
-    <div class="sect">
-      <h2>The record</h2>
-      <p>Every mark the card was made from, in the order it happened.</p>
-    </div>
-
-    <!-- Three, each doing a different job: what has elapsed, what was earned,
-         and what is at risk today. Reflections moved down into the trail. -->
-    <div class="tally">
-      <div class="tal"><b>47</b><span>days<br>carried</span></div>
-      <div class="tal"><b>38</b><span>moves<br>done</span></div>
-      <div class="tal is-live"><b>9</b><span>day<br>streak</span></div>
-    </div>
-    <p class="tallyfoot">Carried since 19 June 2026. Longest run 21 days.</p>
-
-    <div class="grid">
-      <div class="grid__cells" id="cells"></div>
-      <div class="grid__foot"><span>19 June</span><span>Today</span></div>
-    </div>
-
-    <div class="trail" id="trail"></div>
-    <button class="more" type="button" id="moreBtn">Show all 91 marks</button>
 
     <div class="origin">
       <span class="origin__k">Creation of Your Memento</span>
@@ -495,28 +468,92 @@ function matVars(m, earned){
 /* all three pillars are held; the card renders fully lit. */
 const earned = {clar:true, act:true, cons:true};
 
-/* ── the record. Only event types the app actually writes. ──────────────── */
-const TRAIL = [
-  {mon:'August', evs:[
-    {k:'act', t:'Sent the pricing email', m:'Action · the move for the day', d:'Tue 4'},
-    {k:'', t:'Reflection', m:'“Stopped negotiating with myself at 7am.”', d:'Mon 3'},
-    {k:'act', t:'Cut the third feature', m:'Action · the move for the day', d:'Sun 2'},
-    {k:'mark', t:'New longest run', m:'21 days, past the old record of 14', d:'Sat 1'},
-  ]},
-  {mon:'July', evs:[
-    {k:'act', t:'Called the two churned users', m:'Action · the move for the day', d:'Fri 31'},
-    {k:'', t:'Weekly review', m:'Four moves done, one dropped', d:'Sun 26'},
-    {k:'', t:'Distraction logged', m:'Opened the analytics tab 9 times before noon', d:'Thu 23'},
-    {k:'act', t:'Shipped the waitlist page', m:'Action · the move for the day', d:'Wed 15'},
-    {k:'clar', t:'Vision board', m:'Added: the room with one desk in it', d:'Sun 12'},
-    {k:'mark', t:'The green arrived', m:'Seven days unbroken. The card changed.', d:'Fri 4'},
-  ]},
-  {mon:'June', evs:[
-    {k:'act', t:'Wrote the first offer', m:'Action · the move for the day', d:'Mon 23'},
-    {k:'mark', t:'The platinum arrived', m:'Your first plan was revealed', d:'Sat 21'},
-    {k:'clar', t:'Ignition', m:'You signed and ignited your Neutron Star', d:'Thu 19'},
-  ]},
+/* ── the record. Only event types the app actually writes
+   (action-complete, proof, reflection-save, vivere, mori-moment,
+   weekly-review, new-record, distraction-log, deepwork-commit).
+   Generated across the whole 47 days so the page shows ALL of it: the volume
+   IS the argument, and a "show more" button hides exactly the thing that makes
+   the record hard to walk away from. ───────────────────────────────────── */
+const MOVES = [
+  'Sent the pricing email', 'Cut the third feature', 'Called the two churned users',
+  'Shipped the waitlist page', 'Wrote the first offer', 'Rewrote the landing headline',
+  'Recorded the demo in one take', 'Deleted the settings screen nobody opened',
+  'Asked ten people what they would pay', 'Fixed the signup that dropped 40%',
+  'Wrote to the four people who replied', 'Closed the tab and finished the migration',
+  'Shipped the paywall', 'Answered every support email', 'Cut the onboarding to three screens',
+  'Moved the deadline in instead of out', 'Wrote the follow-up nobody wanted to write',
+  'Killed the feature I spent a week on', 'Published the thing before it was ready',
+  'Turned off notifications until noon', 'Did the hard call first',
+  'Shipped the fix on the phone', 'Wrote the second offer', 'Raised the price',
+  'Sat with the numbers instead of guessing', 'Said no to the collaboration',
+  'Rebuilt the card render', 'Took the whole afternoon on one paragraph',
+  'Sent the cold email to the list of nine', 'Shipped without asking anyone first'
 ];
+const REFLECTIONS = [
+  'Stopped negotiating with myself at 7am.', 'Wanted to quit at 3pm and did not.',
+  'The work was boring today. Did it anyway.', 'Realised I was busy, not working.',
+  'Two hours of real focus beats a full day of touching things.',
+  'I keep reaching for the easy task first.', 'Nobody is coming. That is fine.',
+  'The fear was about being seen, not about the work.',
+  'Shipped something I would have sat on a month ago.',
+  'Tired is not the same as done.', 'Did it badly and it still counted.',
+  'I do not need to feel ready.'
+];
+const OTHER = [
+  ['weekly-review', 'Weekly review', ['Four moves done, one dropped', 'Five moves, none dropped', 'Three moves. Slower week.']],
+  ['distraction-log', 'Distraction logged', ['Opened the analytics tab 9 times before noon', 'Two hours gone to a rabbit hole', 'Phone in the other room from now on']],
+  ['vivere', 'Vision board', ['Added: the room with one desk in it', 'Added: the first thousand', 'Added: a morning nobody else owns']],
+  ['deepwork-commit', 'Deep work booked', ['Two hours, no phone', 'Ninety minutes before anyone was awake']],
+  ['mori-moment', 'Memento Mori', ['Looked at the weeks left', 'Twenty thousand days is not many']]
+];
+const MARKS = {
+  '2026-06-19': ['clar', 'Ignition', 'You signed and ignited your Neutron Star'],
+  '2026-06-21': ['mark', 'The platinum arrived', 'Your first plan was revealed'],
+  '2026-07-04': ['mark', 'The green arrived', 'Seven days unbroken. The card changed.'],
+  '2026-07-18': ['mark', 'New longest run', '14 days, past the old record of 9'],
+  '2026-08-01': ['mark', 'New longest run', '21 days, past the old record of 14']
+};
+
+const MONTHS = ['January','February','March','April','May','June','July','August',
+  'September','October','November','December'];
+const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+function buildTrail(){
+  const r = rng(hash('trail-v2'));
+  const start = new Date(2026, 5, 19), today = new Date(2026, 7, 4);
+  const out = [];
+  for (let d = new Date(today); d >= start; d.setDate(d.getDate() - 1)){
+    const iso = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0')
+              + '-' + String(d.getDate()).padStart(2,'0');
+    const stamp = DAYS[d.getDay()] + ' ' + d.getDate();
+    const day = [];
+    if (MARKS[iso]){
+      const [k, t, m] = MARKS[iso];
+      day.push({k, t, m, d: stamp});
+    }
+    // the move for the day, on most days
+    if (r() > 0.19) day.push({k:'act', t: MOVES[Math.floor(r()*MOVES.length)],
+      m:'Action · the move for the day', d: stamp});
+    // a reflection now and then
+    if (r() > 0.72) day.push({k:'', t:'Reflection',
+      m:'\u201c' + REFLECTIONS[Math.floor(r()*REFLECTIONS.length)] + '\u201d', d: stamp});
+    // everything else, sparsely
+    if (r() > 0.79){
+      const o = OTHER[Math.floor(r()*OTHER.length)];
+      day.push({k:'', t:o[1], m:o[2][Math.floor(r()*o[2].length)], d: stamp});
+    }
+    if (day.length) out.push({mon: MONTHS[d.getMonth()], evs: day});
+  }
+  // group consecutive days under one month heading
+  const groups = [];
+  out.forEach(day=>{
+    const last = groups[groups.length-1];
+    if (last && last.mon === day.mon) last.evs.push(...day.evs);
+    else groups.push({mon: day.mon, evs: day.evs.slice()});
+  });
+  return groups;
+}
+const TRAIL = buildTrail();
 
 let cur = 0;
 
@@ -567,18 +604,15 @@ document.getElementById('strip').addEventListener('click', e=>{
   document.getElementById('cells').innerHTML = out.join('');
 })();
 
-/* the trail */
+/* the trail, all of it */
+document.getElementById('trailTop').textContent =
+  TRAIL.reduce((n,g)=>n+g.evs.length,0) + ' marks, oldest at the bottom.';
 document.getElementById('trail').innerHTML = TRAIL.map(g=>
   `<p class="mon">${g.mon}</p>` + g.evs.map(e=>
     `<div class="ev"><span class="ev__dot ${e.k?'is-'+e.k:''}"></span>
        <span class="ev__b"><span class="ev__t">${e.t}</span>
          <span class="ev__m">${e.m}</span></span>
        <span class="ev__d">${e.d}</span></div>`).join('')).join('');
-
-document.getElementById('moreBtn').onclick = function(){
-  this.textContent = 'That is all of it, back to 19 June';
-  this.disabled = true;
-};
 
 /* ── Memento Mori. The app already models birth year and life expectancy
    (moriYearsRemaining in js/06), so this is the same number, ticking. Plain
