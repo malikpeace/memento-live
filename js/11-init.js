@@ -84,7 +84,22 @@ try {
   _sync();
   document.addEventListener('DOMContentLoaded', _sync);
   window.addEventListener('load', _sync);
-  // Orientation only. Nothing else re-runs this.
+  // v1118: a fresh install's FIRST launch can measure mid-transition (the
+  // sign-in flow, the cloud-restore reload, the launch animation), and a
+  // short reading then stuck for the whole session: box floating mid-screen,
+  // page 2 peeking under it (Malik's reinstall, 2026-08-05; reproduced by
+  // forcing --p1-vh 172px short). So the measure re-runs once the launch has
+  // settled and whenever the app returns to the foreground. This is NOT the
+  // v1092 feedback loop coming back: the inputs (innerHeight, screen.height,
+  // the chrome offset above the column) do not depend on the column's own
+  // layout, and the standalone value stays clamped by screen.height on one
+  // side and the CSS min(..., 100lvh) on the other.
+  setTimeout(syncHomeViewport, 2500);
+  window.addEventListener('pageshow', _sync);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') setTimeout(syncHomeViewport, 120);
+  });
+  // Orientation. (Foreground and settle re-runs above, width changes below.)
   window.addEventListener('orientationchange', () => setTimeout(syncHomeViewport, 250));
   // v1106: recompute when the viewport WIDTH changes, and only then. A width
   // change is a real layout change (rotation, split view, a resized window);
