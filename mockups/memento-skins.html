@@ -227,51 +227,7 @@
   body.mark-tint .skin .daycard-ns__name {
     color: color-mix(in srgb, var(--ink, #333) 78%, var(--tint, #ffffff) 22%) !important; }
 
-/* ═══════════ SKIN AXES ═══════════
-   Six independent modulators. THE LAW: only the material may touch hue;
-   every axis below modulates light, shadow, texture, geometry, motion.
-   Integrated with the adversarial review's four P0 fixes applied. */
 
-/* ===== AXIS: FINISH ===== */
-/* How light behaves on the card's surface: specular, scatter, direction, diffusion, falloff. No hue, only light. */
-/* options: .fin-gloss, .fin-matte, .fin-metal, .fin-irid, .fin-frost, .fin-velvet */
-
-
-/* --- fin-gloss: wet. One tight, bright specular streak high on the face, a hard
-   top edge highlight, and a small pooled reflection low. Reads like glass under a
-   single lamp. Existing sheen is pushed hot and narrow. --- */
-.skin.fin-gloss .daycard-ns__sheen {
-  opacity: 1;
-  background:
-    linear-gradient(101deg,
-      transparent 0%,
-      rgba(255,255,255,0) 30%,
-      rgba(255,255,255,0.10) 40%,
-      rgba(255,255,255,0.62) 46%,
-      rgba(255,255,255,0.88) 49%,
-      rgba(255,255,255,0.55) 52%,
-      rgba(255,255,255,0.06) 60%,
-      transparent 74%),
-    linear-gradient(180deg,
-      rgba(255,255,255,0.34) 0%,
-      rgba(255,255,255,0.05) 7%,
-      transparent 22%,
-      transparent 78%,
-      rgba(255,255,255,0.05) 94%,
-      rgba(255,255,255,0.16) 100%);
-  mix-blend-mode: screen;
-  filter: none;
-}
-/* pooled reflection at the foot + a darkening under the streak so it reads wet */
-.skin.fin-gloss .daycard-ns__tint {
-  opacity: 1;
-  background:
-    radial-gradient(120% 46% at 50% 118%, rgba(255,255,255,0.20), transparent 62%),
-    linear-gradient(180deg, transparent 55%, rgba(0,0,0,0.22) 100%);
-  mix-blend-mode: normal;
-}
-.skin.fin-gloss .daycard-ns__iri { opacity: 0.35; }
-.skin.fin-gloss .daycard-ns__emblem path { filter: drop-shadow(0 1px 0 rgba(255,255,255,0.45)); }
 
 
 /* --- fin-matte: chalk. Light scatters, no highlight anywhere. Perfectly even face,
@@ -399,31 +355,8 @@
 .skin.fin-velvet .daycard-ns__emblem path { filter: drop-shadow(0 0 14px color-mix(in srgb, var(--mark, #fff) 35%, transparent)); }
 .skin.fin-velvet .daycard-ns__foot,
 .skin.fin-velvet .sub { text-shadow: 0 0 12px rgba(0,0,0,0.35); }
-
-
-/* --- flat skins: keep every finish honest. Liquid is gone, so finishes that lean
-   on it fall back to face-level light only; gloss/metal keep their band, frost and
-   velvet keep their diffusion and falloff. --- */
-.skin.flat.fin-gloss .daycard-ns__tint,
-.skin.flat.fin-frost .daycard-ns__tint,
-.skin.flat.fin-velvet .daycard-ns__tint,
-.skin.flat.fin-matte .daycard-ns__tint { opacity: 1; }
-.skin.flat.fin-gloss .daycard-ns__sheen,
-.skin.flat.fin-metal .daycard-ns__sheen,
-.skin.flat.fin-frost .daycard-ns__sheen { opacity: 1; }
 .skin.flat.fin-metal .daycard-ns__iri,
 .skin.flat.fin-irid .daycard-ns__iri { opacity: 1; }
-/* ===== AXIS: MARK TREATMENT (mk-) ===== */
-/* How the M sits on the surface: flat, cut in, raised out, hollow, punched through, or radiating. */
-/* Colour is never introduced: every option is built from white, black, grey and the skin's own --mark. */
-/* options: .mk-plain, .mk-engraved, .mk-embossed, .mk-outline, .mk-cutout, .mk-halo */
-
-/* ── mk-plain ──────────────────────────────────────────────────────────────
-   As today. A flat, honest fill of the skin's mark colour. No bevel, no glow,
-   no depth cue at all. This is the baseline every other option is read against. */
-.skin.mk-plain .daycard-ns__emblem {
-  filter: none !important;
-}
 .skin.mk-plain .daycard-ns__emblem path {
   fill: var(--mark, rgba(255, 255, 255, 0.9)) !important;
   stroke: none !important;
@@ -497,42 +430,6 @@
   stroke: none !important;
 }
 
-/* ── mk-halo ───────────────────────────────────────────────────────────────
-   The mark is normal, but it is a light source. It bleeds its OWN colour onto
-   the surrounding face: a tight bloom hugging the glyph and a wide radial pool
-   underneath it. Radial only, fading to nothing well before any edge, so it can
-   never read as a box. On light skins the mark is dark and the pool reads as a
-   soft shadow bloom, which is the same behaviour inverted. */
-.skin.mk-halo .daycard-ns__emblem {
-  filter:
-    drop-shadow(0 0 10px color-mix(in srgb, var(--mark, #ffffff) 55%, transparent))
-    drop-shadow(0 0 30px color-mix(in srgb, var(--mark, #ffffff) 32%, transparent)) !important;
-}
-.skin.mk-halo .daycard-ns__emblem path {
-  fill: var(--mark, rgba(255, 255, 255, 0.95)) !important;
-  stroke: none !important;
-}
-/* ===== AXIS: GRAIN / TEXTURE ===== */
-/* The material the card is made of: modulates micro-surface only, never hue. */
-/* options: .gr-none, .gr-film, .gr-brushed, .gr-linen, .gr-carbon, .gr-marble */
-
-/* Shared texture plane. Sits above the colour/light layers (liquid 0, iri, sheen,
-   burn, plat, tint) and below the rim (4) and body (3)... it is inert until an
-   option fills --gr-img, so .gr-none costs nothing extra. Blend modes carry both
-   white and black stops so the texture reads on a Porcelain face AND a Void face. */
-.skin .gr-layer {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  border-radius: inherit;
-  pointer-events: none;
-  background-image: var(--gr-img, none);
-  background-size: var(--gr-size, auto);
-  background-position: var(--gr-pos, 0 0);
-  mix-blend-mode: var(--gr-blend, overlay);
-  opacity: var(--gr-op, 0);
-}
-
 /* ---- gr-none: bare material, no micro-surface at all. */
 .skin.gr-none .gr-layer { display: none; }
 
@@ -575,53 +472,6 @@
   --gr-op: 0.62;
 }
 
-/* ---- gr-linen: woven cross-hatch. Two perpendicular thread runs at equal weight,
-   plus a coarser slub pass so the weave is not a perfect grid. Cloth, not graph paper. */
-.skin.gr-linen .daycard-ns {
-  --gr-img:
-    repeating-linear-gradient(0deg,
-      rgba(255,255,255,0.4) 0 1px,
-      transparent 1px 2px,
-      rgba(0,0,0,0.34) 2px 3px,
-      transparent 3px 4px),
-    repeating-linear-gradient(90deg,
-      rgba(255,255,255,0.4) 0 1px,
-      transparent 1px 2px,
-      rgba(0,0,0,0.34) 2px 3px,
-      transparent 3px 4px),
-    repeating-linear-gradient(90deg,
-      rgba(0,0,0,0.18) 0 1px,
-      transparent 1px 9px),
-    repeating-linear-gradient(0deg,
-      rgba(255,255,255,0.18) 0 1px,
-      transparent 1px 11px);
-  --gr-size: auto, auto, auto, auto;
-  --gr-blend: soft-light;
-  --gr-op: 0.55;
-}
-
-/* ---- gr-carbon: carbon-fibre twill. Alternating 8px tiles of opposite 45deg
-   fibre runs, checkerboarded by offsetting the two diagonal fields half a tile,
-   with a dark seam between cells. The signature woven-square read. */
-.skin.gr-carbon .daycard-ns {
-  --gr-img:
-    repeating-linear-gradient(45deg,
-      rgba(255,255,255,0.5) 0 1px,
-      rgba(0,0,0,0.45) 1px 2.5px,
-      transparent 2.5px 4px),
-    repeating-linear-gradient(-45deg,
-      rgba(255,255,255,0.5) 0 1px,
-      rgba(0,0,0,0.45) 1px 2.5px,
-      transparent 2.5px 4px),
-    repeating-conic-gradient(from 0deg at 50% 50%,
-      rgba(0,0,0,0.3) 0% 25%,
-      rgba(255,255,255,0.26) 25% 50%);
-  --gr-size: 8px 8px, 8px 8px, 16px 16px;
-  --gr-pos: 0 0, 8px 8px, 0 0;
-  --gr-blend: overlay;
-  --gr-op: 0.5;
-}
-
 /* ---- gr-marble: soft veining. Large low-frequency ellipses at irregular
    positions and scales, half lightening and half darkening, so the surface drifts
    between cloudy and clear with no repeat you can name. Stone, not pattern. */
@@ -650,132 +500,6 @@
 .skin.flat.gr-brushed .daycard-ns { --gr-op: 0.46; }
 .skin.flat.gr-marble  .daycard-ns { --gr-op: 0.5; }
 .skin.flat.gr-none    .daycard-ns { --gr-op: 0; }
-
-/* ===== AXIS: LIGHTING ===== */
-/* Where the light in the room falls across the card face: flat, vignette, key-from-above, centre pool, or rim gather. Hue-free — white/black at low alpha through overlay/soft-light, so a dark face lightens and a light face darkens. */
-/* options: .lt-flat, .lt-vignette, .lt-top, .lt-centre, .lt-rim */
-
-/* Shared carrier: one pseudo-element on the card, above the material layers
-   (liquid/iri/sheen/burn/plat/tint) but BELOW the rim (4) and body (3)... note
-   body is 3, so we sit at 2.5 to stay under the mark and keep its contrast. */
-.skin[class*="lt-"] .daycard-ns::after,
-.skin.lt-flat .daycard-ns::after,
-.skin.lt-vignette .daycard-ns::after,
-.skin.lt-top .daycard-ns::after,
-.skin.lt-centre .daycard-ns::after,
-.skin.lt-rim .daycard-ns::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-  border-radius: inherit;
-  mix-blend-mode: soft-light;
-  opacity: 1;
-}
-
-/* lt-flat — even house light. No falloff at all, just a whisper of lift so the
-   face does not look unlit next to its siblings. Reads as clean, product-shot. */
-.skin.lt-flat .daycard-ns::after {
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.055) 0%,
-      rgba(255, 255, 255, 0.03) 100%
-    );
-  mix-blend-mode: soft-light;
-}
-
-/* lt-vignette — the four edges fall away into shadow, centre stays lit.
-   Strong, classic, obviously darker at every corner. */
-.skin.lt-vignette .daycard-ns::after {
-  background:
-    radial-gradient(
-      118% 88% at 50% 48%,
-      rgba(255, 255, 255, 0.10) 0%,
-      rgba(255, 255, 255, 0.03) 34%,
-      rgba(0, 0, 0, 0.16) 66%,
-      rgba(0, 0, 0, 0.5) 100%
-    );
-  mix-blend-mode: overlay;
-}
-
-/* lt-top — a key light hung above the card. Bright band across the top third,
-   the bottom sinks. The most "photographed object" of the five. */
-.skin.lt-top .daycard-ns::after {
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.34) 0%,
-      rgba(255, 255, 255, 0.16) 18%,
-      rgba(255, 255, 255, 0.02) 42%,
-      rgba(0, 0, 0, 0.18) 72%,
-      rgba(0, 0, 0, 0.42) 100%
-    ),
-    radial-gradient(
-      78% 42% at 50% -6%,
-      rgba(255, 255, 255, 0.28) 0%,
-      rgba(255, 255, 255, 0) 100%
-    );
-  mix-blend-mode: overlay;
-}
-
-/* lt-centre — a soft spotlight pool in the middle, falling off in every
-   direction well before the edges. Theatrical, the mark sits in the light. */
-.skin.lt-centre .daycard-ns::after {
-  background:
-    radial-gradient(
-      62% 46% at 50% 46%,
-      rgba(255, 255, 255, 0.30) 0%,
-      rgba(255, 255, 255, 0.13) 38%,
-      rgba(255, 255, 255, 0) 64%,
-      rgba(0, 0, 0, 0.22) 82%,
-      rgba(0, 0, 0, 0.44) 100%
-    );
-  mix-blend-mode: overlay;
-}
-
-/* lt-rim — the inverse: the middle goes dark and the light gathers along all
-   four edges, as if lit from behind/outside. Reads as a lit frame. */
-.skin.lt-rim .daycard-ns::after {
-  background:
-    radial-gradient(
-      104% 78% at 50% 50%,
-      rgba(0, 0, 0, 0.40) 0%,
-      rgba(0, 0, 0, 0.26) 44%,
-      rgba(255, 255, 255, 0.06) 72%,
-      rgba(255, 255, 255, 0.26) 100%
-    ),
-    linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0.14) 0%,
-      rgba(255, 255, 255, 0) 16%,
-      rgba(255, 255, 255, 0) 84%,
-      rgba(255, 255, 255, 0.14) 100%
-    );
-  mix-blend-mode: overlay;
-}
-
-.skin.lt-vignette .daycard-ns__foot,
-.skin.lt-rim .daycard-ns__foot,
-.skin.lt-top .daycard-ns__foot,
-.skin.lt-vignette .sub,
-.skin.lt-rim .sub,
-.skin.lt-top .sub {
-  position: relative;
-  z-index: 3;
-}
-
-/* Flat mattes get a softer hand: no material underneath to catch the light,
-   so full-strength falloff reads as dirt rather than lighting. */
-.skin.flat.lt-vignette .daycard-ns::after,
-.skin.flat.lt-centre .daycard-ns::after,
-.skin.flat.lt-rim .daycard-ns::after {
-  opacity: 0.72;
-}
-.skin.flat.lt-top .daycard-ns::after {
-  opacity: 0.8;
-}
 
 /* The card already tilts in 3D; the wash must ride with it and never animate
    a filter. Nothing here animates, and the layer is transform-free, so it
@@ -870,167 +594,46 @@
     inset 0 0 0 1px rgba(255, 255, 255, 0.06) !important;
 }
 .skin.rm-bevel .daycard-ns .daycard-ns__rim::after { content: none !important; }
-
-/* ===== AXIS: MOTION ===== */
-/* Ambient life: how (and whether) the card's light moves when nobody is touching it. */
-/* options: .mo-still, .mo-drift, .mo-breathe, .mo-pulse */
-
-/* --- shared: every motion option animates transform/opacity only, on layers that already exist --- */
-.skin[class*="mo-"] .daycard-ns__liquid,
-.skin[class*="mo-"] .daycard-ns__sheen,
-.skin[class*="mo-"] .daycard-ns__plat,
-.skin[class*="mo-"] .daycard-ns__body {
-  will-change: auto;
-}
-
-/* --- mo-still: dead calm. The card is an object, not a creature. --- */
-/* Explicitly cancels any inherited ambient animation so it is a true zero state. */
-.skin.mo-still .daycard-ns,
-.skin.mo-still .daycard-ns__liquid,
-.skin.mo-still .daycard-ns__iri,
-.skin.mo-still .daycard-ns__sheen,
-.skin.mo-still .daycard-ns__plat,
-.skin.mo-still .daycard-ns__tint,
-.skin.mo-still .daycard-ns__body {
-  animation: none;
-}
-
-/* --- mo-drift: the internal lights wander. Very slow, prime-ish periods so the --- */
-/* --- combined pattern never visibly repeats. Only the blob layer moves; it is --- */
-/* --- already blurred, so translating it reads as light shifting, not an object. --- */
-.skin.mo-drift .daycard-ns__liquid {
-  animation: mo-drift-a 71s ease-in-out infinite alternate;
-  transform-origin: 50% 50%;
-}
-.skin.mo-drift .daycard-ns__iri {
-  animation: mo-drift-b 97s ease-in-out infinite alternate;
-  transform-origin: 30% 70%;
-}
-/* the gloss counter-drifts a hair so highlights and colour never travel as one sheet */
-.skin.mo-drift .daycard-ns__sheen {
-  animation: mo-drift-c 113s ease-in-out infinite alternate;
-  transform-origin: 70% 20%;
-}
-/* flat skins have no liquid; keep the sheen/plat drift so .flat + mo-drift is not silently still */
-.skin.mo-drift.flat .daycard-ns__sheen {
-  animation-duration: 89s;
-}
-
-@keyframes mo-drift-a {
-  0%   { transform: translate3d(-3.5%, 2.5%, 0) scale(1.06); }
   50%  { transform: translate3d(2.5%, -3%, 0)  scale(1.10); }
   100% { transform: translate3d(4%, 3.5%, 0)   scale(1.05); }
-}
-@keyframes mo-drift-b {
-  0%   { transform: translate3d(3%, -2%, 0) scale(1.04); opacity: 0.85; }
   50%  { transform: translate3d(-2%, 3%, 0) scale(1.08); opacity: 1; }
   100% { transform: translate3d(-3.5%, -2.5%, 0) scale(1.05); opacity: 0.9; }
-}
-@keyframes mo-drift-c {
-  0%   { transform: translate3d(2%, 1%, 0) scale(1.03); }
   100% { transform: translate3d(-2.5%, -1.5%, 0) scale(1.06); }
-}
-
-/* --- mo-breathe: the whole card's light swells and settles. One slow inhale --- */
-/* --- every ~10s. Opacity-led so it works on a white face and a black face alike: --- */
-/* --- on Porcelain the highlight softens, on Void the light barely lifts out of dark. --- */
-.skin.mo-breathe .daycard-ns__liquid,
-.skin.mo-breathe .daycard-ns__plat {
-  animation: mo-breathe-light 10s ease-in-out infinite;
-  transform-origin: 50% 55%;
-}
-.skin.mo-breathe .daycard-ns__sheen {
-  animation: mo-breathe-sheen 10s ease-in-out infinite;
-  transform-origin: 50% 0%;
-}
-/* the mark holds still: only light breathes, never the type */
-.skin.mo-breathe .daycard-ns__body {
-  animation: none;
-}
-/* flat skins: the only breathing surface left is the sheen, so give it slightly more travel */
-.skin.mo-breathe.flat .daycard-ns__sheen {
-  animation-name: mo-breathe-sheen-flat;
-}
-
-@keyframes mo-breathe-light {
-  0%, 100% { transform: scale(1);      opacity: 0.88; }
   46%      { transform: scale(1.045);  opacity: 1; }
-}
-@keyframes mo-breathe-sheen {
-  0%, 100% { transform: scaleY(1)     translate3d(0, 0, 0);      opacity: 0.9; }
   46%      { transform: scaleY(1.06)  translate3d(0, 0.6%, 0);   opacity: 1; }
-}
-@keyframes mo-breathe-sheen-flat {
-  0%, 100% { transform: scaleY(1)     translate3d(0, 0, 0);    opacity: 0.72; }
   46%      { transform: scaleY(1.10)  translate3d(0, 1%, 0);   opacity: 1; }
-}
-
-/* --- mo-pulse: every ~6s one ring of light leaves the mark and dies at the edge. --- */
-/* --- A heartbeat the card registered. Uses one added pseudo-element on the body --- */
-/* --- (inside the card, so contain:paint clips it) coloured from the skin's own --- */
-/* --- --mark, with a white core so it survives a black face and a white face. --- */
-.skin.mo-pulse .daycard-ns__body {
-  position: relative;
-}
-.skin.mo-pulse .daycard-ns__body::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 46%;
-  aspect-ratio: 1;
-  margin: 0;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: -1;
-  /* radial, fades to nothing well inside its own box: no edge, ever */
-  background: radial-gradient(circle closest-side,
-                rgba(255, 255, 255, 0.34) 0%,
-                var(--mark, rgba(255, 255, 255, 0.22)) 34%,
-                rgba(255, 255, 255, 0.10) 58%,
-                transparent 72%);
-  opacity: 0;
-  transform: translate3d(-50%, -50%, 0) scale(0.35);
-  animation: mo-pulse-ring 6s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
-}
-/* the mark itself gives the faintest lift on the beat, so the pulse has a source */
-.skin.mo-pulse .daycard-ns__emblem {
-  transform-origin: 50% 50%;
-  animation: mo-pulse-mark 6s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
-}
-
-@keyframes mo-pulse-ring {
-  0%   { opacity: 0;    transform: translate3d(-50%, -50%, 0) scale(0.35); }
   6%   { opacity: 0.95; transform: translate3d(-50%, -50%, 0) scale(0.5); }
   55%  { opacity: 0.28; transform: translate3d(-50%, -50%, 0) scale(2.1); }
   78%  { opacity: 0;    transform: translate3d(-50%, -50%, 0) scale(2.9); }
   100% { opacity: 0;    transform: translate3d(-50%, -50%, 0) scale(2.9); }
-}
-@keyframes mo-pulse-mark {
-  0%, 100% { transform: scale(1);     opacity: 1; }
   4%       { transform: scale(1.018); opacity: 1; }
   18%      { transform: scale(1);     opacity: 0.94; }
   40%      { transform: scale(1);     opacity: 1; }
 }
 
-/* --- reduced motion: every option collapses to mo-still --- */
-@media (prefers-reduced-motion: reduce) {
-  .skin[class*="mo-"] .daycard-ns,
-  .skin[class*="mo-"] .daycard-ns__liquid,
-  .skin[class*="mo-"] .daycard-ns__iri,
-  .skin[class*="mo-"] .daycard-ns__sheen,
-  .skin[class*="mo-"] .daycard-ns__plat,
-  .skin[class*="mo-"] .daycard-ns__tint,
-  .skin[class*="mo-"] .daycard-ns__body,
-  .skin[class*="mo-"] .daycard-ns__emblem {
-    animation: none !important;
-  }
-  .skin.mo-pulse .daycard-ns__body::before,
-  .skin.mo-pulse .daycard-ns__body::after {
-    animation: none !important;
-    opacity: 0;
-  }
+/* --- fin-lacquer: a deep clear coat over the material. One soft, broad
+   reflection falling from the top edge and fading by the middle, plus a little
+   pooled depth at the foot. Piano finish, not a highlight streak. --- */
+.skin.fin-lacquer .daycard-ns__sheen {
+  opacity: 1;
+  mix-blend-mode: screen;
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,0.26) 0%,
+      rgba(255,255,255,0.13) 12%,
+      rgba(255,255,255,0.04) 30%,
+      rgba(255,255,255,0) 52%);
+  filter: blur(6px);
 }
+.skin.fin-lacquer .daycard-ns__tint {
+  opacity: 1;
+  mix-blend-mode: normal;
+  background:
+    linear-gradient(180deg, transparent 58%, rgba(0,0,0,0.18) 100%),
+    radial-gradient(120% 40% at 50% 104%, rgba(255,255,255,0.10), transparent 66%);
+}
+.skin.fin-lacquer .daycard-ns__iri { opacity: 0.22; }
+
 
   /* ── THE MIXER ─────────────────────────────────────────────────────── */
   .mixer { display:flex; gap:34px; flex-wrap:wrap; align-items:flex-start; margin:0 0 10px; }
@@ -1178,7 +781,7 @@
 
 
   <div class="sect">1 · The mixer</div>
-  <p class="why">Fifty-two materials against six independent modulators. Nothing but the material may touch colour, so every combination below is safe by construction. Spin it.</p>
+  <p class="why">Fifty-two materials against four modulators that earn their place. Nothing but the material may touch colour, so every combination is safe by construction. The weak axes were cut rather than padded.</p>
   <div class="mixer">
     <div class="mixer__card" id="mixCard"></div>
     <div class="mixer__ctrl" id="mixCtrl"></div>
@@ -1605,18 +1208,13 @@ document.getElementById('heroRow').insertAdjacentHTML('beforeend',
 
 /* ═══ THE MIXER ═══ 52 materials x 6 axes */
 const AXES = [
-  {k:'fin', label:'Finish',  opts:[['fin-gloss','Gloss'],['fin-matte','Matte'],['fin-metal','Brushed metal'],
+  {k:'fin', label:'Finish',  opts:[['fin-lacquer','Lacquer'],['fin-matte','Matte'],['fin-metal','Brushed metal'],
                                    ['fin-irid','Iridescent'],['fin-frost','Frosted'],['fin-velvet','Velvet']]},
   {k:'mk',  label:'Mark',    opts:[['mk-plain','Plain'],['mk-engraved','Engraved'],['mk-embossed','Embossed'],
-                                   ['mk-outline','Outline'],['mk-cutout','Cut-out'],['mk-halo','Halo']]},
-  {k:'gr',  label:'Grain',   opts:[['gr-none','None'],['gr-film','Film'],['gr-brushed','Brushed'],
-                                   ['gr-linen','Linen'],['gr-carbon','Carbon'],['gr-marble','Marble']]},
-  {k:'lt',  label:'Lighting',opts:[['lt-flat','Flat'],['lt-vignette','Vignette'],['lt-top','Top-lit'],
-                                   ['lt-centre','Spotlight'],['lt-rim','Rim-lit']]},
+                                   ['mk-outline','Outline'],['mk-cutout','Cut-out']]},
+  {k:'gr',  label:'Grain',   opts:[['gr-none','None'],['gr-film','Film'],['gr-brushed','Brushed'],['gr-marble','Marble']]},
   {k:'rm',  label:'Rim',     opts:[['rm-hair','Hairline'],['rm-colour','Colour-matched'],['rm-double','Double'],
                                    ['rm-none','None'],['rm-bevel','Bevelled']]},
-  {k:'mo',  label:'Motion',  opts:[['mo-still','Still'],['mo-drift','Drift'],['mo-breathe','Breathe'],
-                                   ['mo-pulse','Pulse']]},
 ];
 const TOTAL = SKINS.length * AXES.reduce((n,a)=>n*a.opts.length,1);
 
