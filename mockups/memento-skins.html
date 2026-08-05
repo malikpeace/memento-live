@@ -198,14 +198,14 @@
 
   /* the thermal burning ring: the heat ramp travelling round the edge */
   .therm-ring { position:absolute; inset:0; z-index:6; pointer-events:none;
-    border-radius:14px; padding:2px;
+    border-radius:14px; padding:1.2px;
     background:conic-gradient(from var(--burn,0deg),
       #ff3000, #ff8a00 12%, #ffe94a 22%, #8ef2ff 34%, #2f7dff 46%,
       #1428c8 56%, #2f7dff 66%, #8ef2ff 76%, #ffe94a 86%, #ff8a00 94%, #ff3000);
     -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite:xor; mask-composite:exclude;
     animation:burnSpin 14s linear infinite; }
-  .therm-ring--glow { inset:2px; padding:7px; filter:blur(10px); opacity:.75; z-index:5; }
+  .therm-ring--glow { inset:0; padding:3px; filter:blur(6px); opacity:.5; z-index:5; }
   @keyframes burnSpin { to { --burn:360deg; } }
   @property --burn { syntax:'<angle>'; initial-value:0deg; inherits:false; }
   @media (prefers-reduced-motion: reduce) { .therm-ring { animation:none; } }
@@ -219,6 +219,12 @@
     color:rgba(245,245,247,.6); background:none; border:0; cursor:pointer;
     padding:7px 13px; border-radius:999px; }
   .ringtog button.on { color:#0b0c0e; background:#f2f3f6; }
+
+  /* the mark, tinted toward the card's own colour (subtle, never full) */
+  body.mark-tint .skin .daycard-ns__emblem path {
+    fill: color-mix(in srgb, var(--mark, #484f58) 72%, var(--tint, #ffffff) 28%) !important; }
+  body.mark-tint .skin .daycard-ns__name {
+    color: color-mix(in srgb, var(--ink, #333) 78%, var(--tint, #ffffff) 22%) !important; }
 </style>
 </head>
 <body class="ns-bloom">
@@ -302,6 +308,10 @@
 <div class="ringtog" role="group" aria-label="Ring style">
   <button id="ringWhite" class="on" type="button">White ring</button>
   <button id="ringColour" type="button">Colour-matched</button>
+</div>
+<div class="ringtog" style="top:60px" role="group" aria-label="Mark style">
+  <button id="markPlain" class="on" type="button">Plain M</button>
+  <button id="markTint" type="button">Tinted M</button>
 </div>
 <div class="wrap">
   <h1>Your Color — on the actual card</h1>
@@ -552,6 +562,7 @@ function skinVars(sk){
     '--halo':sk.halo||(sk.sk1&&sk.sk1!=='none'?sk.sk1:'rgba(238,244,255,.34)'),
     '--ring-c':sk.edge||(sk.sk1&&sk.sk1!=='none'?sk.sk1:'rgba(255,255,255,.85)'),
     '--ring-soft':(sk.sk2&&sk.sk2!=='none'?sk.sk2:'rgba(255,255,255,.18)'),
+    '--tint':(sk.sk1&&sk.sk1!=='none'?sk.sk1:(sk.edge||'#ffffff')),
     '--halo-r':sk.haloR||'46px','--lift':sk.lift||'rgba(255,255,255,.05)',
     '--mm-hue':(sk.rot||0)+'deg','--sat':'1.7',
     '--clar':'1','--act':'1','--cons':'1','--mix':'.9','--lit':'1','--glow':'.7','--emit':'.7','--ring':'.5'};
@@ -760,11 +771,11 @@ document.getElementById('heroRow').insertAdjacentHTML('beforeend',
   shellCard('<span class="therm-ring therm-ring--glow"></span>' + thermalM(80,.5) + '<span class="therm-ring"></span>',
     {cap:'Thermal M — the field IS the mark', name:'Malik Peace', sub:'thermal',
      face:'#010207', mark:'', ink:'rgba(186,210,255,.8)',
-     edge:'rgba(110,160,255,.34)', halo:'rgba(60,110,255,.18)', hideMark:true})
+     extra:'--rim-op:0;', edge:'rgba(110,160,255,.34)', halo:'rgba(60,110,255,.18)', hideMark:true})
   + shellCard('<span class="therm-ring therm-ring--glow" style="opacity:.4"></span>' + thermalM(62,.3) + '<span class="therm-ring" style="opacity:.85"></span>',
     {cap:'Thermal M, deeper — smaller core, darker room', name:'Malik Peace', sub:'thermal',
      face:'#000103', mark:'', ink:'rgba(150,180,235,.7)',
-     edge:'rgba(80,130,230,.24)', halo:'rgba(30,70,210,.1)', hideMark:true}));
+     extra:'--rim-op:0;', edge:'rgba(80,130,230,.24)', halo:'rgba(30,70,210,.1)', hideMark:true}));
 /* the original two thermals: take the room down a stop, per Malik */
 
 /* ring style toggle */
@@ -773,6 +784,10 @@ document.getElementById('heroRow').insertAdjacentHTML('beforeend',
   const set=(colour)=>{ document.body.classList.toggle('ring-colour', colour);
     w.classList.toggle('on', !colour); c.classList.toggle('on', colour); };
   w.onclick=()=>set(false); c.onclick=()=>set(true);
+  const mp=document.getElementById('markPlain'), mt=document.getElementById('markTint');
+  const setM=(tint)=>{ document.body.classList.toggle('mark-tint', tint);
+    mp.classList.toggle('on', !tint); mt.classList.toggle('on', tint); };
+  mp.onclick=()=>setM(false); mt.onclick=()=>setM(true);
 })();
 document.getElementById('nameIn').addEventListener('input', renderYour);
 renderYour();
