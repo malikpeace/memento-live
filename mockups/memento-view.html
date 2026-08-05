@@ -221,16 +221,6 @@
   .tal.is-live b{ color:var(--cons); }
   .tallyfoot{ margin:9px 0 0; font-size:12.5px; line-height:1.5; color:var(--lo); }
 
-  .grid{ margin:14px 0 0; padding:15px 15px 13px; border-radius:15px;
-    background:var(--fill); box-shadow:var(--inset); }
-  .grid__cells{ display:grid; grid-template-columns:repeat(26, 1fr); gap:3px; }
-  .cel{ aspect-ratio:1; border-radius:2px; background:rgba(255,255,255,.055); }
-  .cel.l1{ background:rgba(63,217,78,.26); }
-  .cel.l2{ background:rgba(63,217,78,.5); }
-  .cel.l3{ background:rgba(63,217,78,.8); }
-  .grid__foot{ display:flex; justify-content:space-between; margin:11px 0 0;
-    font-size:12px; color:var(--lo); }
-
   .trailtop{ margin:20px 0 0; font-size:12.5px; color:var(--mid); }
   .trail{ margin:10px 0 0; }
 
@@ -274,7 +264,6 @@
   .ev__t{ display:block; font-size:14.5px; line-height:1.4; letter-spacing:-.01em; }
   .ev__m{ display:block; margin-top:2px; font-size:12.5px; line-height:1.45; color:var(--mid); }
   .ev__d{ flex:none; font-size:12.5px; color:var(--lo); padding-top:2px; }
-
 
   /* ── the last block on the screen, and the oldest thing on it. Recessed
      rather than raised: a well cut into the page, with the date struck INTO
@@ -354,11 +343,6 @@
       <div class="tal is-live"><b>9</b><span>day<br>streak</span></div>
     </div>
     <p class="tallyfoot">Carried since 19 June 2026. Longest run 21 days.</p>
-
-    <div class="grid">
-      <div class="grid__cells" id="cells"></div>
-      <div class="grid__foot"><span>19 June</span><span>Today</span></div>
-    </div>
 
     <p class="trailtop" id="trailTop"></p>
     <div class="trail" id="trail"></div>
@@ -617,17 +601,6 @@ document.getElementById('strip').addEventListener('click', e=>{
 });
 
 /* the layers */
-/* the consistency grid, 47 real days then the rest empty */
-(function(){
-  const r = rng(hash('grid')), out = [];
-  for(let i=0;i<104;i++){
-    if(i < 57){ out.push('<i class="cel"></i>'); continue; }
-    const v = r();
-    out.push('<i class="cel ' + (v>.72?'l3':v>.42?'l2':v>.16?'l1':'') + '"></i>');
-  }
-  document.getElementById('cells').innerHTML = out.join('');
-})();
-
 /* the trail, all of it */
 /* Collapsed by month, newest open. The full weight still reads at a glance,
    because a closed month carries its count AND a dot for every mark in it, so
