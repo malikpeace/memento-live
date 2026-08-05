@@ -79,6 +79,9 @@ const CloudSync = (function () {
       if (typeof window !== 'undefined' && window._syncPanelRepaint) window._syncPanelRepaint();
     } catch (e) {}
   }
+  // The boot watchdog (index.html, v1116) prints the tail of this journal on
+  // the splash when a boot dies on a real device.
+  try { window._syncDiag = _diag; } catch (e) {}
   // Crashes land in the journal too: a boot that dies mid-render looks like
   // "nothing happened" from outside, and the ?dev=sync panel is exactly where
   // someone will be looking when it does.
