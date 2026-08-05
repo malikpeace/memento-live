@@ -380,39 +380,6 @@
   stroke: none !important;
 }
 
-/* ── mk-embossed ───────────────────────────────────────────────────────────
-   The M is STAMPED OUT of the face, standing proud of it. Full-strength fill,
-   a bright lip on the lit top-left corner, a hard shadow off the bottom-right
-   plus a soft cast shadow beneath so it visibly floats above the material. */
-.skin.mk-embossed .daycard-ns__emblem {
-  filter:
-    drop-shadow(-1px -1px 0 rgba(255, 255, 255, 0.62))
-    drop-shadow(1.5px 2px 0 rgba(0, 0, 0, 0.55))
-    drop-shadow(3px 6px 9px rgba(0, 0, 0, 0.3)) !important;
-}
-.skin.mk-embossed .daycard-ns__emblem path {
-  fill: var(--mark, rgba(255, 255, 255, 0.95)) !important;
-  stroke: none !important;
-}
-
-/* ── mk-outline ────────────────────────────────────────────────────────────
-   Hollow. Only the contour is drawn, a hairline in the mark colour, the whole
-   centre left open to the material. Sharp mitred joints, no bevel, no glow:
-   the most graphic and the most restrained of the six. The two whisper-thin
-   offsets keep the line from disappearing on a same-value face. */
-.skin.mk-outline .daycard-ns__emblem {
-  filter:
-    drop-shadow(0 1px 0 rgba(0, 0, 0, 0.28))
-    drop-shadow(0 -1px 0 rgba(255, 255, 255, 0.22)) !important;
-}
-.skin.mk-outline .daycard-ns__emblem path {
-  fill: none !important;
-  stroke: var(--mark, rgba(255, 255, 255, 0.9)) !important;
-  stroke-width: 9;
-  stroke-linejoin: miter;
-  stroke-miterlimit: 6;
-}
-
 /* ── mk-cutout ─────────────────────────────────────────────────────────────
    The M is a HOLE punched clean through the card. The aperture is a near-void
    derived from the skin's own mark (so it stays a shade off a pure-black face
@@ -508,64 +475,7 @@
   .skin[class*="lt-"] .daycard-ns::after {
     transition: none;
   }
-}
-
-/* ===== AXIS: RIM ===== */
-/* The card's edge treatment: how the object terminates. No hue of its own, only white/black/grey and the skin's own --edge. */
-/* options: .rm-hair, .rm-colour, .rm-double, .rm-none, .rm-bevel */
-
-/* The rim layer is inside the card's clip-path + contain:paint, so every option
-   here is drawn with INSET shadows (or a pseudo-element held inside the bounds)
-   and can never escape as a box. Selectors carry .daycard-ns as an extra step so
-   they outrank the skin/flat/pre-clarity rules that force the rim's box-shadow
-   and opacity; this axis is the owner of the rim once it is applied, so it also
-   overrides --rim-op. Nothing here animates. */
-
-/* rm-hair — the shipped look: one crisp 1.5px white hairline hugging the edge.
-   The 1px of black behind it is invisible on dark faces and is the only thing
-   that keeps the edge legible on a pure-white skin, where white-on-white dies. */
-.skin.rm-hair .daycard-ns .daycard-ns__rim {
-  opacity: 1 !important;
-  box-shadow:
-    inset 0 0 0 1.5px rgba(255, 255, 255, 0.90),
-    inset 0 0 0 2.6px rgba(0, 0, 0, 0.16) !important;
-}
 .skin.rm-hair .daycard-ns .daycard-ns__rim::after { content: none !important; }
-
-/* rm-colour — the same hairline, but cut from the material itself: the skin's
-   own --edge, plus a tight inner fringe of that same colour so the edge reads
-   as the card glowing at its perimeter rather than as a drawn line. On a skin
-   with no --edge it falls back to white and is identical to rm-hair. */
-.skin.rm-colour .daycard-ns .daycard-ns__rim {
-  opacity: 1 !important;
-  box-shadow:
-    inset 0 0 0 1.5px var(--edge, rgba(255, 255, 255, 0.90)),
-    inset 0 0 12px -7px var(--edge, rgba(255, 255, 255, 0.90)) !important;
-}
-.skin.rm-colour .daycard-ns .daycard-ns__rim::after { content: none !important; }
-
-/* rm-double — two concentric hairlines with 3px of bare face between them, so
-   the card reads as plated: an outer edge and an inner frame line. The outer
-   ring is white (dark-backed for white skins), the inner ring is the skin's own
-   --edge at half strength, held 3px in with a matching radius so the corners
-   stay perfectly concentric with the card's clip. */
-.skin.rm-double .daycard-ns .daycard-ns__rim {
-  opacity: 1 !important;
-  box-shadow:
-    inset 0 0 0 1.25px rgba(255, 255, 255, 0.90),
-    inset 0 0 0 2.25px rgba(0, 0, 0, 0.16) !important;
-}
-.skin.rm-double .daycard-ns .daycard-ns__rim::after {
-  content: '';
-  position: absolute;
-  inset: 3px;
-  border-radius: calc(var(--r-card, 14px) - 3px);
-  pointer-events: none;
-  opacity: 0.55;
-  box-shadow:
-    inset 0 0 0 1px var(--edge, rgba(255, 255, 255, 0.85)),
-    inset 0 0 0 1.8px rgba(0, 0, 0, 0.18);
-}
 
 /* rm-none — no edge at all. The card simply ends on its own face; the only
    thing separating it from the room is the material and the outer halo. On a
@@ -633,6 +543,42 @@
     radial-gradient(120% 40% at 50% 104%, rgba(255,255,255,0.10), transparent 66%);
 }
 .skin.fin-lacquer .daycard-ns__iri { opacity: 0.22; }
+
+
+
+
+/* ── mk-embossed, rebuilt: the mark is RAISED. Its own face turns in the light
+   (lit top-left, shading to bottom-right), a hairline catch runs the lit edge,
+   a tight contact shadow sits under the dark edge, and one soft cast shadow
+   gives it weight above the material. White/black only; hue stays with the skin. */
+.skin.mk-embossed .daycard-ns__body { position: relative; }
+.skin.mk-embossed .daycard-ns__emblem {
+  overflow: visible;
+  filter:
+    drop-shadow(-1px -1px 0 rgba(255,255,255,0.75))
+    drop-shadow(-0.5px -0.5px 0 rgba(255,255,255,0.5))
+    drop-shadow(1px 1px 0 rgba(0,0,0,0.55))
+    drop-shadow(0.5px 0.5px 0 rgba(0,0,0,0.35))
+    drop-shadow(0 3px 4px rgba(0,0,0,0.34))
+    drop-shadow(0 8px 16px rgba(0,0,0,0.26)) !important;
+}
+.skin.mk-embossed .daycard-ns__emblem path { fill: var(--mark, #ffffff) !important; }
+
+/* ── grain was too polite to see. Real presence now, still white/black only. */
+.skin.gr-film    .daycard-ns { --gr-op: 0.95; }
+.skin.gr-brushed .daycard-ns { --gr-op: 1; }
+.skin.gr-marble  .daycard-ns { --gr-op: 1; }
+.skin.flat.gr-film    .daycard-ns { --gr-op: 0.8; }
+.skin.flat.gr-brushed .daycard-ns { --gr-op: 0.85; }
+.skin.flat.gr-marble  .daycard-ns { --gr-op: 0.9; }
+
+/* ── Void emits black: the room around it darkens instead of lighting up. */
+.skin.void .daycard-ns {
+  box-shadow: 0 0 var(--halo-r,70px) 22px var(--halo, #000),
+              0 0 130px 44px rgba(0,0,0,.9),
+              inset 0 1px 0 rgba(255,255,255,.03) !important; }
+.skin.void .daycard-ns__rim { box-shadow: inset 0 0 0 1px var(--edge) !important; }
+.skin.void .daycard-wrap__aura, .skin.void .daycard-bloom { opacity: 0 !important; }
 
 
   /* ── THE MIXER ─────────────────────────────────────────────────────── */
@@ -890,8 +836,8 @@ const SKINS = [
   edge:'rgba(255,255,255,1)', halo:'rgba(210,238,255,.5)'},
  {n:'Void', sk1:'none',sk2:'none',sk3:'none',sk4:'none',
   plat:'0', face:'linear-gradient(168deg,#0a0a0c 0%,#060607 55%,#040405 100%)',
-  mark:'rgba(240,242,247,.96)', ink:'rgba(214,219,228,.6)', cls:'flat',
-  edge:'rgba(255,255,255,.22)', halo:'rgba(226,234,250,.16)', haloR:'34px', lift:'rgba(255,255,255,.02)'},
+  mark:'rgba(240,242,247,.96)', ink:'rgba(214,219,228,.55)', cls:'flat void',
+  edge:'rgba(255,255,255,.09)', halo:'rgba(0,0,0,1)', haloR:'70px', lift:'rgba(255,255,255,.012)'},
  {n:'Emerald',     sk1:'rgba(0,220,130,1)',   sk2:'rgba(120,255,200,.9)', sk3:'rgba(0,150,90,1)',   sk4:'rgba(40,255,160,.85)',
   plat:'.12', face:'linear-gradient(165deg,#03150e,#010806)', mark:'rgba(232,255,246,.95)', ink:'rgba(214,255,238,.9)'},
  {n:'Crimson',     sk1:'rgba(255,30,70,1)',   sk2:'rgba(255,110,120,.9)', sk3:'rgba(150,0,40,1)',   sk4:'rgba(255,70,90,.9)',
@@ -1211,10 +1157,9 @@ const AXES = [
   {k:'fin', label:'Finish',  opts:[['fin-lacquer','Lacquer'],['fin-matte','Matte'],['fin-metal','Brushed metal'],
                                    ['fin-irid','Iridescent'],['fin-frost','Frosted'],['fin-velvet','Velvet']]},
   {k:'mk',  label:'Mark',    opts:[['mk-plain','Plain'],['mk-engraved','Engraved'],['mk-embossed','Embossed'],
-                                   ['mk-outline','Outline'],['mk-cutout','Cut-out']]},
+                                   ['mk-cutout','Cut-out']]},
   {k:'gr',  label:'Grain',   opts:[['gr-none','None'],['gr-film','Film'],['gr-brushed','Brushed'],['gr-marble','Marble']]},
-  {k:'rm',  label:'Rim',     opts:[['rm-hair','Hairline'],['rm-colour','Colour-matched'],['rm-double','Double'],
-                                   ['rm-none','None'],['rm-bevel','Bevelled']]},
+  {k:'rm',  label:'Rim',     opts:[['rm-hair','Hairline'],['rm-none','None'],['rm-bevel','Bevelled']]},
 ];
 const TOTAL = SKINS.length * AXES.reduce((n,a)=>n*a.opts.length,1);
 
