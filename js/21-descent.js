@@ -61,6 +61,9 @@ const DeeperRoom = {
         return;
       }
       // Vivere waits for Mori to be SEEN, at least a day later, and day >= 5.
+      // v1119: Vivere is parked; introducing a room with no door back to it
+      // reads as broken, so the day-5 moment waits with the feature.
+      if (typeof VIVERE_PARKED !== 'undefined' && VIVERE_PARKED) return;
       if (day >= 5 && state.meta.moriMomentAt && !state.meta.vivereMomentAt && !this._skippedThisSession.vivere) {
         const moriDay = new Date(state.meta.moriMomentAt);
         const since = Math.floor((Date.now() - moriDay.getTime()) / 86400000);

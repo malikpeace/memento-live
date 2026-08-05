@@ -648,6 +648,7 @@ function renderGrid() {
   grid.classList.toggle('is-custom', _customized);
 
   state.widgetOrder.forEach(({ key, size }) => {
+    if (typeof VIVERE_PARKED !== 'undefined' && VIVERE_PARKED && key === 'vivere') return; // v1119: parked
     const def = WIDGET_DEFS[key];
     if (!def) return;
     if (_hidden.indexOf(key) !== -1) return; // hidden by the user's custom layout
@@ -1027,6 +1028,7 @@ const MoreSpace = {
         // Action shows so the path is always visible (a gate rises if locked).
         ['clarity', 'action'].forEach(key => out.push({ key, locked: false }));
         this.MODULES.forEach(key => {
+          if (typeof VIVERE_PARKED !== 'undefined' && VIVERE_PARKED && key === 'vivere') return;
           if (isModuleUnlocked(key)) { out.push({ key, locked: false }); return; }
           if (key === teaser && key !== 'action') out.push({ key, locked: true });
         });
@@ -1038,6 +1040,7 @@ const MoreSpace = {
       (Array.isArray(state.widgetOrder) ? state.widgetOrder : []).forEach(w => { if (w && w.key && (w.key === 'action' || isModuleUnlocked(w.key))) onDash[w.key] = true; });
       (Array.isArray(state.hiddenWidgets) ? state.hiddenWidgets : []).forEach(k => { delete onDash[k]; });
       this.MODULES.forEach(key => {
+        if (typeof VIVERE_PARKED !== 'undefined' && VIVERE_PARKED && key === 'vivere') return;
         if (onDash[key]) return;
         if (isModuleUnlocked(key)) { out.push({ key, locked: false }); return; }
         if (key === teaser && key !== 'action') out.push({ key, locked: true });
@@ -1350,7 +1353,10 @@ function renderGreeting() {
     const dateStr = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
     // v976: the mobile Settings/You corner icon sits beside the date (the retired
     // bottom bar's You tab). Opens the profile panel via the TabBar machinery.
-    const gearHTML = '<button class="wbar__settings" id="wbarSettings" type="button" aria-label="You and settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.5" r="3.4"/><path d="M5.5 19.5c1.2-3.4 3.6-5 6.5-5s5.3 1.6 6.5 5"/></svg></button>';
+    // v1119 (Malik): a GEAR, not a person. Settings and profile are one
+    // surface (the You panel already opens on the account card), and a gear
+    // is what people expect to find in that corner.
+    const gearHTML = '<button class="wbar__settings" id="wbarSettings" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1.11-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.65 8.9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.01A1.7 1.7 0 0 0 10.05 3V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1.03 1.56h.01a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.01a1.7 1.7 0 0 0 1.56 1.03H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.56 1.03Z"/></svg></button>';
     // v1060 (Malik): date first, the profile button on the far right.
     mg.innerHTML = (weeksLeft != null
       ? '<span class="wbar__date" id="wbarDate" role="button" tabindex="0" aria-label="Show weeks left to live">' + esc(dateStr) + '</span>'
@@ -4062,7 +4068,8 @@ function renderCommandCenter() {
       // ---- "One thing to live" (Vivere). The calm counterweight to the build
       // loop above: today's life practice, one quiet line, tap to open Vivere.
       try {
-        const vToday = (typeof vivEnsureToday === 'function') ? vivEnsureToday() : null;
+        const vToday = (typeof VIVERE_PARKED !== 'undefined' && VIVERE_PARKED) ? null
+          : ((typeof vivEnsureToday === 'function') ? vivEnsureToday() : null);
         if (vToday && vToday.prompt) {
           const livedTxt = vToday.done ? 'Kept today. ' + esc(vToday.prompt) : esc(vToday.prompt);
           row += '<div class="cc-live">'

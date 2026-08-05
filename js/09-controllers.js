@@ -3616,7 +3616,7 @@ const Sidebar = {
         add('action', cmd('Open Action', 'Your plan', () => openExp(() => { if (typeof ActionExperience !== 'undefined') ActionExperience.open(); })));
         add('streak', cmd('Open Consistency', 'Your streak', () => openExp(() => Sheet.open('streak'))));
         add(null, cmd('Open Memento Mori', 'Time left', () => openExp(() => Sheet.open('mori'))));
-        add('vivere', cmd('Open Memento Vivere', 'Vision board', () => openExp(() => Sheet.open('vivere'))));
+        if (!(typeof VIVERE_PARKED !== 'undefined' && VIVERE_PARKED)) add('vivere', cmd('Open Memento Vivere', 'Vision board', () => openExp(() => Sheet.open('vivere'))));
         add(null, cmd('Open Energy', 'Your fuel', () => openExp(() => Sheet.open('lifestats'))));
         add('action', cmd('Open Projects', 'Milestones toward the goal', () => openExp(() => Sheet.open('projects'))));
         add(null, cmd('Plan time blocks', 'Shape the day', () => openExp(() => Sheet.open('timeblocks'))));
@@ -3667,7 +3667,6 @@ const Sidebar = {
         'open action': 'today task plan path do next step',
         'open consistency': 'streak habits heatmap chain daily',
         'open memento mori': 'death weeks life countdown mortality time left',
-        'open memento vivere': 'memories moodboard canvas photos jar alive board',
         'open energy': 'lifestats sleep stats health body fuel',
         'open projects': 'milestones goals roadmap',
         'plan time blocks': 'planner calendar schedule timebox agenda shape day',
@@ -6370,6 +6369,9 @@ const HeroShrink = {
       if (!this._active()) return;
       const below = document.getElementById('dashBelow');
       if (!below) return;
+      // v1119: the one-page home hides page 2 entirely on mobile; there is
+      // no fold to measure and nothing to push past it.
+      if (below.offsetParent === null) return;
       // The stylesheet's margin-top carries !important, so the override must too.
       below.style.setProperty('margin-top', '36px', 'important');
       const wasY = window.scrollY;

@@ -7,7 +7,7 @@
    ONCE on mismatch. Kills the "phone silently runs old cached js under a new
    index" class (the SW's offline fallback can serve stale files on a bad
    connection; Malik hit this three times in one day). */
-window.MEMENTO_JS_BUILD = 'v1113';
+window.MEMENTO_JS_BUILD = 'v1119';
 /* ============================================
    STATE MANAGEMENT
    ============================================ */
@@ -192,6 +192,11 @@ const DEFAULT_STATE = {
   analytics: { events: [], onceFlags: {}, firstOpenDay: null }
 };
 
+/* v1119 (Malik): Vivere is PARKED. No doors anywhere (home tile died with
+   page 2, modules hub, command palette, the day-5 descent moment, the
+   desktop widget). Code and saved boards stay intact; flip this to false
+   to bring every door back. */
+const VIVERE_PARKED = true;
 let state = {};
 let saveTimer = null;
 
