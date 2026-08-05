@@ -126,14 +126,12 @@
      coloured per channel. Same card, a map of a person's terrain. */
   .topo-layer { position:absolute; inset:-46%; z-index:1; pointer-events:none;
     opacity:var(--topo-op,.85); mix-blend-mode:var(--topo-blend, normal);
-    will-change:transform; animation:topoDrift var(--drift,42s) ease-in-out infinite; }
+    will-change:transform; animation:topoDrift var(--drift,71s) ease-in-out infinite; }
   @keyframes topoDrift {
-    0%   { transform:translate(-16%,-11%) scale(1.10) rotate(-3deg); }
-    22%  { transform:translate(9%,-15%)   scale(1.34) rotate(2.5deg); }
-    45%  { transform:translate(17%,10%)   scale(1.16) rotate(4.5deg); }
-    68%  { transform:translate(-6%,18%)   scale(1.40) rotate(-1.5deg); }
-    85%  { transform:translate(-18%,4%)   scale(1.22) rotate(-4deg); }
-    100% { transform:translate(-16%,-11%) scale(1.10) rotate(-3deg); }
+    0%   { transform:translate(-7%,-5%) scale(1.16) rotate(-1.6deg); }
+    33%  { transform:translate(5%,-8%)  scale(1.24) rotate(1.4deg); }
+    66%  { transform:translate(8%,6%)   scale(1.18) rotate(2.2deg); }
+    100% { transform:translate(-7%,-5%) scale(1.16) rotate(-1.6deg); }
   }
   @media (prefers-reduced-motion: reduce) { .topo-layer { animation:none; } }
   .topo-grid { position:absolute; inset:0; z-index:2; pointer-events:none;
@@ -233,48 +231,72 @@
 <body class="ns-bloom">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
   <!-- pastel elevation, the Taiwan look -->
-  <filter id="topoElev" x="0" y="0" width="100%" height="100%">
-    <feTurbulence type="fractalNoise" baseFrequency="0.007" numOctaves="4" seed="11" result="n"/>
+  <filter id="topoElev" x="-25%" y="-25%" width="150%" height="150%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.007" numOctaves="4" seed="11" result="n">
+      <animate attributeName="baseFrequency" dur="23s" repeatCount="indefinite" values="0.00574 0.00700;0.00882 0.00574;0.00700 0.00882;0.00574 0.00700"/>
+    </feTurbulence>
     <feColorMatrix in="n" type="saturate" values="0" result="g"/>
-    <feComponentTransfer in="g">
+    <feComponentTransfer in="g" result="bands">
       <feFuncR type="discrete" tableValues="0.94 0.86 0.62 0.48 0.98 0.99 0.95 0.72"/>
       <feFuncG type="discrete" tableValues="0.93 0.88 0.78 0.72 0.82 0.62 0.44 0.38"/>
       <feFuncB type="discrete" tableValues="0.88 0.84 0.86 0.80 0.52 0.34 0.28 0.30"/>
       <feFuncA type="discrete" tableValues="1 1 1 1 1 1 1 1"/>
     </feComponentTransfer>
+    <feTurbulence type="fractalNoise" baseFrequency="0.0035" numOctaves="2" seed="52" result="warp">
+      <animate attributeName="baseFrequency" dur="37s" repeatCount="indefinite" values="0.0026 0.0034;0.0055 0.0024;0.0031 0.0052;0.0026 0.0034"/>
+    </feTurbulence>
+    <feDisplacementMap in="bands" in2="warp" scale="26" xChannelSelector="R" yChannelSelector="G"/>
   </filter>
   <!-- thermal, the Apple look: blue to cyan to yellow to orange -->
-  <filter id="topoTherm" x="0" y="0" width="100%" height="100%">
-    <feTurbulence type="fractalNoise" baseFrequency="0.006" numOctaves="5" seed="4" result="n"/>
+  <filter id="topoTherm" x="-25%" y="-25%" width="150%" height="150%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.006" numOctaves="5" seed="4" result="n">
+      <animate attributeName="baseFrequency" dur="29s" repeatCount="indefinite" values="0.00492 0.00600;0.00756 0.00492;0.00600 0.00756;0.00492 0.00600"/>
+    </feTurbulence>
     <feColorMatrix in="n" type="saturate" values="0" result="g"/>
-    <feComponentTransfer in="g">
+    <feComponentTransfer in="g" result="bands">
       <feFuncR type="discrete" tableValues="0.02 0.05 0.10 0.35 0.85 1 1 1"/>
       <feFuncG type="discrete" tableValues="0.05 0.22 0.62 0.92 0.98 0.86 0.55 0.35"/>
       <feFuncB type="discrete" tableValues="0.55 0.95 0.98 0.72 0.25 0.05 0.02 0.02"/>
       <feFuncA type="discrete" tableValues="1 1 1 1 1 1 1 1"/>
     </feComponentTransfer>
+    <feTurbulence type="fractalNoise" baseFrequency="0.0035" numOctaves="2" seed="30" result="warp">
+      <animate attributeName="baseFrequency" dur="41s" repeatCount="indefinite" values="0.0026 0.0034;0.0055 0.0024;0.0031 0.0052;0.0026 0.0034"/>
+    </feTurbulence>
+    <feDisplacementMap in="bands" in2="warp" scale="30" xChannelSelector="R" yChannelSelector="G"/>
   </filter>
   <!-- density, the heatmap look -->
-  <filter id="topoDens" x="0" y="0" width="100%" height="100%">
-    <feTurbulence type="fractalNoise" baseFrequency="0.011" numOctaves="3" seed="19" result="n"/>
+  <filter id="topoDens" x="-25%" y="-25%" width="150%" height="150%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.011" numOctaves="3" seed="19" result="n">
+      <animate attributeName="baseFrequency" dur="19s" repeatCount="indefinite" values="0.00902 0.01100;0.01386 0.00902;0.01100 0.01386;0.00902 0.01100"/>
+    </feTurbulence>
     <feColorMatrix in="n" type="saturate" values="0" result="g"/>
-    <feComponentTransfer in="g">
+    <feComponentTransfer in="g" result="bands">
       <feFuncR type="discrete" tableValues="0.02 0.06 0.12 0.20 0.34 0.52 0.70 0.86"/>
       <feFuncG type="discrete" tableValues="0.01 0.04 0.10 0.24 0.52 0.78 0.94 1"/>
       <feFuncB type="discrete" tableValues="0.16 0.42 0.70 0.92 1 1 1 1"/>
       <feFuncA type="discrete" tableValues="1 1 1 1 1 1 1 1"/>
     </feComponentTransfer>
+    <feTurbulence type="fractalNoise" baseFrequency="0.0035" numOctaves="2" seed="27" result="warp">
+      <animate attributeName="baseFrequency" dur="43s" repeatCount="indefinite" values="0.0026 0.0034;0.0055 0.0024;0.0031 0.0052;0.0026 0.0034"/>
+    </feTurbulence>
+    <feDisplacementMap in="bands" in2="warp" scale="22" xChannelSelector="R" yChannelSelector="G"/>
   </filter>
   <!-- contour lines: thin light rings on dark -->
-  <filter id="topoLine" x="0" y="0" width="100%" height="100%">
-    <feTurbulence type="fractalNoise" baseFrequency="0.0055" numOctaves="3" seed="8" result="n"/>
+  <filter id="topoLine" x="-25%" y="-25%" width="150%" height="150%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.0055" numOctaves="3" seed="8" result="n">
+      <animate attributeName="baseFrequency" dur="31s" repeatCount="indefinite" values="0.00451 0.00550;0.00693 0.00451;0.00550 0.00693;0.00451 0.00550"/>
+    </feTurbulence>
     <feColorMatrix in="n" type="saturate" values="0" result="g"/>
     <feComponentTransfer in="g" result="spread">
       <feFuncR type="linear" slope="5" intercept="-2"/>
       <feFuncG type="linear" slope="5" intercept="-2"/>
       <feFuncB type="linear" slope="5" intercept="-2"/>
     </feComponentTransfer>
-    <feComponentTransfer in="spread">
+    <feTurbulence type="fractalNoise" baseFrequency="0.0035" numOctaves="2" seed="17" result="warp">
+      <animate attributeName="baseFrequency" dur="47s" repeatCount="indefinite" values="0.0026 0.0034;0.0055 0.0024;0.0031 0.0052;0.0026 0.0034"/>
+    </feTurbulence>
+    <feDisplacementMap in="bands" in2="warp" scale="34" xChannelSelector="R" yChannelSelector="G"/>
+    <feComponentTransfer in="spread" result="bands">
       <feFuncR type="discrete" tableValues="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1"/>
       <feFuncG type="discrete" tableValues="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1"/>
       <feFuncB type="discrete" tableValues="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1"/>
@@ -282,15 +304,21 @@
     </feComponentTransfer>
   </filter>
   <!-- depth: ocean bands -->
-  <filter id="topoDeep" x="0" y="0" width="100%" height="100%">
-    <feTurbulence type="fractalNoise" baseFrequency="0.0085" numOctaves="4" seed="27" result="n"/>
+  <filter id="topoDeep" x="-25%" y="-25%" width="150%" height="150%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.0085" numOctaves="4" seed="27" result="n">
+      <animate attributeName="baseFrequency" dur="26s" repeatCount="indefinite" values="0.00697 0.00850;0.01071 0.00697;0.00850 0.01071;0.00697 0.00850"/>
+    </feTurbulence>
     <feColorMatrix in="n" type="saturate" values="0" result="g"/>
-    <feComponentTransfer in="g">
+    <feComponentTransfer in="g" result="bands">
       <feFuncR type="discrete" tableValues="0.01 0.02 0.03 0.05 0.09 0.20 0.45 0.75"/>
       <feFuncG type="discrete" tableValues="0.06 0.14 0.26 0.42 0.62 0.80 0.92 0.98"/>
       <feFuncB type="discrete" tableValues="0.14 0.28 0.42 0.56 0.70 0.82 0.92 0.98"/>
       <feFuncA type="discrete" tableValues="1 1 1 1 1 1 1 1"/>
     </feComponentTransfer>
+    <feTurbulence type="fractalNoise" baseFrequency="0.0035" numOctaves="2" seed="41" result="warp">
+      <animate attributeName="baseFrequency" dur="53s" repeatCount="indefinite" values="0.0026 0.0034;0.0055 0.0024;0.0031 0.0052;0.0026 0.0034"/>
+    </feTurbulence>
+    <feDisplacementMap in="bands" in2="warp" scale="28" xChannelSelector="R" yChannelSelector="G"/>
   </filter>
 
   <!-- thermal, shaped to the mark: blur -> quantise the falloff into bands -->
