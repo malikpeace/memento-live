@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Memento view — tap the card</title>
+
+<!-- THE APP'S OWN STYLESHEETS. The card below is the real .daycard-ns element
+     from the running app, not a lookalike. -->
+<link rel="stylesheet" href="../memento-app/css/base.css" onerror="this.href='../css/base.css'">
+<link rel="stylesheet" href="../memento-app/css/dashboard.css" onerror="this.href='../css/dashboard.css'">
+<link rel="stylesheet" href="../memento-app/css/daycard-living.css" onerror="this.href='../css/daycard-living.css'">
+
+<style>
+  :root{
+    --hi: rgba(245,246,250,.97);
+    --mid: rgba(238,241,247,.78);
+    --lo: rgba(232,236,244,.50);
+    --fill: rgba(255,255,255,.055);
+    --fill-2: rgba(255,255,255,.085);
+    --inset: inset 0 1px 0 rgba(255,255,255,.07);
+    --clar: #3ad9f5;
+    --cons: #3fd94e;
+    --act: #eef2fb;
+    --safe-t: env(safe-area-inset-top, 0px);
+    --safe-b: env(safe-area-inset-bottom, 0px);
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; background:#050609; color:var(--hi);
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    -webkit-font-smoothing:antialiased; font-variant-numeric:tabular-nums; }
+  body{ min-height:100lvh; }
+
+  /* the room the card sits in: a single soft pool behind the hero, fading
+     radially so it can never draw an edge (the v682 law) */
+  .room{ position:fixed; inset:0; z-index:0; pointer-events:none;
+    background:radial-gradient(72% 44% at 50% 20%, rgba(58,217,245,.055), transparent 68%); }
+
+  .screen{ position:relative; z-index:1; max-width:430px; margin:0 auto;
+    padding:0 20px calc(48px + var(--safe-b)); }
+
+  /* ── the material drives the app's OWN layers, nothing more ───────────── */
+  .cage .daycard-theme-living .blob.b1{ background:radial-gradient(circle, var(--sk1), transparent 65%)!important; }
+  .cage .daycard-theme-living .blob.b2{ background:radial-gradient(circle, var(--sk2), transparent 65%)!important; }
+  .cage .daycard-theme-living .blob.b3{ background:radial-gradient(circle, var(--sk3), transparent 65%)!important; }
+  .cage .daycard-theme-living .blob.b4{ background:radial-gradient(circle, var(--sk4, var(--sk1)), transparent 66%)!important; }
+  .cage .daycard-theme-living .blob.b5{ background:radial-gradient(circle, var(--sk2), transparent 68%)!important; opacity:.5!important; }
+  .cage .daycard-theme-living .blob.b6{ opacity:0!important; }
+  .cage .daycard-ns__plat{ opacity:var(--plat-op,.28)!important; }
+  .cage .daycard-ns{ background:var(--face)!important; }
+  .cage .daycard-ns__emblem path{ fill:var(--mark)!important; }
+  .cage .daycard-ns__name{ color:var(--ink)!important; }
+
+  /* flat: an opaque painted object, every colour layer off */
+  .flat .daycard-theme-living .daycard-ns__liquid{ display:none!important; }
+  .flat .daycard-theme-living .daycard-bloom,
+  .flat .daycard-wrap__aura{ opacity:0!important; }
+  .flat .daycard-ns__plat, .flat .daycard-ns__iri, .flat .daycard-ns__sheen,
+  .flat .daycard-ns__burn, .flat .daycard-ns__tint{ opacity:0!important; }
+  .flat .daycard-ns__rim{ opacity:1!important;
+    box-shadow:inset 0 0 0 1.5px var(--edge, rgba(255,255,255,.9))!important; }
+  .flat .daycard-ns{ box-shadow:0 0 46px 8px var(--halo, rgba(238,244,255,.34)),
+    inset 0 1px 0 rgba(255,255,255,.06)!important; }
+
+  /* void: nothing inside it emits, and the room around it darkens */
+  .void .daycard-ns{ background:#000!important;
+    box-shadow:0 0 60px 20px #000, 0 0 120px 40px rgba(0,0,0,.9)!important; }
+  .void .daycard-ns__rim{ opacity:0!important; box-shadow:none!important; }
+  .void .daycard-living-stage{ box-shadow:0 0 60px 10px rgba(0,0,0,.98)!important; }
+  .void .daycard-wrap__aura, .void .daycard-bloom{ opacity:0!important; }
+
+  /* the chips are the same card, small */
+  .chipcage .daycard-theme-living .blob.b1{ background:radial-gradient(circle, var(--sk1), transparent 65%)!important; }
+  .chipcage .daycard-theme-living .blob.b2{ background:radial-gradient(circle, var(--sk2), transparent 65%)!important; }
+  .chipcage .daycard-theme-living .blob.b3{ background:radial-gradient(circle, var(--sk3), transparent 65%)!important; }
+  .chipcage .daycard-theme-living .blob.b4{ background:radial-gradient(circle, var(--sk4, var(--sk1)), transparent 66%)!important; }
+  .chipcage .daycard-theme-living .blob.b5{ background:radial-gradient(circle, var(--sk2), transparent 68%)!important; opacity:.5!important; }
+  .chipcage .daycard-theme-living .blob.b6{ opacity:0!important; }
+  .chipcage .daycard-ns__plat{ opacity:var(--plat-op,.28)!important; }
+  /* the chips are a catalogue, not the user's card, so the app's "star not lit
+     yet" gate must not drain them. Specificity has to beat body:not(.ns-bloom). */
+  body:not(.ns-bloom) .strip .chip .chipcage .daycard-theme-living .daycard-ns__liquid,
+  body .strip .chip .chipcage .daycard-theme-living .daycard-ns__liquid{ opacity:1!important; }
+  body:not(.ns-bloom) .strip .chip .chipcage .daycard-theme-living .daycard-ns__rim,
+  body .strip .chip .chipcage .daycard-theme-living .daycard-ns__rim{ opacity:1!important; }
+  /* at 62px the halo is bigger than the card and every material reads white.
+     Kill the room light on the chips so the face is what you are choosing. */
+  .chipcage .daycard-wrap__aura, .chipcage .daycard-bloom{ opacity:0!important; }
+  .chipcage .daycard-living-stage{ box-shadow:none!important; }
+  .chipcage .daycard-ns__rim{ opacity:1!important;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.16)!important; }
+  .chipcage.flat .daycard-ns, .chipcage.void .daycard-ns{ box-shadow:none!important; }
+  .chipcage .daycard-ns{ background:var(--face)!important; }
+
+  /* ── the bar. Glass, only a back arrow, the name arrives on scroll ─────── */
+  .bar{ position:sticky; top:0; z-index:20; display:flex; align-items:center; gap:12px;
+    height:52px; margin:0 -20px; padding:calc(var(--safe-t) + 4px) 14px 4px;
+    background:rgba(6,7,10,.62); backdrop-filter:blur(28px) saturate(1.4);
+    -webkit-backdrop-filter:blur(28px) saturate(1.4); }
+  .bar__back{ display:grid; place-items:center; width:34px; height:34px; border:0; padding:0;
+    border-radius:9px; background:var(--fill); box-shadow:var(--inset); color:var(--hi);
+    cursor:pointer; }
+  .bar__back svg{ width:17px; height:17px; }
+  .bar__title{ font-size:15px; font-weight:650; letter-spacing:-.01em; opacity:0;
+    transition:opacity .22s ease-out; }
+  .bar.is-scrolled .bar__title{ opacity:1; }
+
+  /* ── 1 · the card ─────────────────────────────────────────────────────── */
+  .hero{ padding:26px 0 0; }
+  .cage{ position:relative; width:min(74vw, 286px); margin:0 auto; }
+  .cage .daycard-wrap{ margin:0; width:100%; }
+  .cage .daycard-living-stage{ width:100% !important; margin:0; }
+  .cage .daycard-ns{ width:100%; min-height:0; aspect-ratio:320/452; margin:0; }
+  .cage .daycard-ns__foot{ bottom:6%; }
+
+  .hero__name{ margin:22px 0 3px; text-align:center; font-size:22px; font-weight:700;
+    letter-spacing:-.02em; }
+  .hero__sub{ margin:0; text-align:center; font-size:13.5px; line-height:1.5; color:var(--mid); }
+
+  /* ── shared section head. Sentence case, no tracked kickers. ──────────── */
+  .sect{ margin:38px 0 12px; }
+  .sect h2{ margin:0 0 4px; font-size:17px; font-weight:680; letter-spacing:-.015em; }
+  .sect p{ margin:0; font-size:13.5px; line-height:1.5; color:var(--mid); }
+
+  /* ── 2 · the layers it earned ─────────────────────────────────────────── */
+  .layers{ display:flex; flex-direction:column; gap:2px; border-radius:15px; overflow:hidden; }
+  .lay{ display:flex; align-items:flex-start; gap:13px; padding:14px 15px; width:100%;
+    background:var(--fill); box-shadow:var(--inset); border:0; text-align:left;
+    font:inherit; color:var(--hi); cursor:pointer; transition:background .16s ease-out; }
+  .lay:active{ background:var(--fill-2); }
+  .lay__txt{ display:block; }
+  .lay__t, .lay__d{ display:block; }
+  .lay:first-child{ border-radius:15px 15px 3px 3px; }
+  .lay:last-child{ border-radius:3px 3px 15px 15px; }
+  .lay__dot{ flex:none; width:11px; height:11px; margin-top:4px; border-radius:50%;
+    background:var(--c); box-shadow:0 0 14px 1px color-mix(in srgb, var(--c) 60%, transparent); }
+  .lay__txt{ flex:1; min-width:0; }
+  .lay__t{ font-size:14.5px; font-weight:640; letter-spacing:-.01em; }
+  .lay__d{ margin-top:2px; font-size:13px; line-height:1.45; color:var(--mid); }
+  .lay__when{ flex:none; font-size:12.5px; color:var(--lo); padding-top:2px; }
+  .lay.is-locked{ background:rgba(255,255,255,.028); }
+  .lay.is-locked .lay__dot{ background:rgba(255,255,255,.14); box-shadow:none; }
+  .lay.is-locked .lay__t{ color:var(--mid); }
+
+  /* ── 3 · the material ─────────────────────────────────────────────────── */
+  .strip{ display:flex; gap:11px; overflow-x:auto; scroll-snap-type:x mandatory;
+    margin:0 -20px; padding:4px 20px 14px; -webkit-overflow-scrolling:touch;
+    scrollbar-width:none; }
+  .strip::-webkit-scrollbar{ display:none; }
+  .chip{ flex:none; scroll-snap-align:center; width:62px; cursor:pointer;
+    background:none; border:0; padding:0; }
+  /* block, or the span's own line box adds a dead strip above the card that
+     the selected fill then paints as a grey bar */
+  .chipcage{ display:block; position:relative; width:62px; border-radius:10px; padding:3px;
+    background:transparent; transition:background .16s ease-out, transform .16s ease-out; }
+  .chip[aria-pressed="true"] .chipcage{ background:var(--fill-2); transform:translateY(-2px); }
+  .chipcage .daycard-wrap{ margin:0; width:100%; }
+  .chipcage .daycard-living-stage{ width:100% !important; margin:0; }
+  .chipcage .daycard-ns{ width:100%; min-height:0; aspect-ratio:320/452; margin:0;
+    border-radius:7px; clip-path:inset(0 round 7px); }
+  .chipcage .daycard-ns__foot, .chipcage .daycard-ns__body{ display:none; }
+  .chip__n{ display:block; margin-top:7px; font-size:10.5px; line-height:1.25;
+    color:var(--lo); letter-spacing:-.005em; }
+  .chip[aria-pressed="true"] .chip__n{ color:var(--hi); }
+
+  .matnote{ margin:2px 0 0; font-size:13px; line-height:1.5; color:var(--mid); }
+
+  /* ── 4 · the record ───────────────────────────────────────────────────── */
+  .tally{ display:grid; grid-template-columns:repeat(4,1fr); gap:2px;
+    border-radius:15px; overflow:hidden; }
+  .tal{ padding:14px 8px 13px; text-align:center; background:var(--fill); box-shadow:var(--inset); }
+  .tal b{ display:block; font-size:23px; font-weight:700; letter-spacing:-.03em; }
+  .tal span{ display:block; margin-top:3px; font-size:11.5px; line-height:1.3; color:var(--mid); }
+
+  .grid{ margin:14px 0 0; padding:15px 15px 13px; border-radius:15px;
+    background:var(--fill); box-shadow:var(--inset); }
+  .grid__cells{ display:grid; grid-template-columns:repeat(26, 1fr); gap:3px; }
+  .cel{ aspect-ratio:1; border-radius:2px; background:rgba(255,255,255,.055); }
+  .cel.l1{ background:rgba(63,217,78,.26); }
+  .cel.l2{ background:rgba(63,217,78,.5); }
+  .cel.l3{ background:rgba(63,217,78,.8); }
+  .grid__foot{ display:flex; justify-content:space-between; margin:11px 0 0;
+    font-size:12px; color:var(--lo); }
+
+  .trail{ margin:16px 0 0; }
+  .mon{ margin:22px 0 9px; font-size:13px; font-weight:640; color:var(--mid); }
+  .mon:first-child{ margin-top:6px; }
+  .ev{ position:relative; display:flex; gap:13px; padding:0 0 15px 0; }
+  /* the spine: drawn on the row, stopping before the last one so it never
+     dangles past the final entry */
+  .ev::before{ content:''; position:absolute; left:5px; top:16px; bottom:-2px; width:1px;
+    background:rgba(255,255,255,.10); }
+  .ev:last-child::before{ display:none; }
+  .ev__dot{ flex:none; width:11px; height:11px; margin-top:4px; border-radius:50%;
+    background:rgba(255,255,255,.18); }
+  .ev__dot.is-act{ background:var(--cons); box-shadow:0 0 12px rgba(63,217,78,.45); }
+  .ev__dot.is-mark{ background:var(--act); box-shadow:0 0 12px rgba(238,242,251,.4); }
+  .ev__dot.is-clar{ background:var(--clar); box-shadow:0 0 12px rgba(58,217,245,.45); }
+  .ev__b{ flex:1; min-width:0; }
+  .ev__t{ display:block; font-size:14.5px; line-height:1.4; letter-spacing:-.01em; }
+  .ev__m{ display:block; margin-top:2px; font-size:12.5px; line-height:1.45; color:var(--mid); }
+  .ev__d{ flex:none; font-size:12.5px; color:var(--lo); padding-top:2px; }
+
+  .more{ display:block; width:100%; margin:8px 0 0; padding:14px; border:0; border-radius:12px;
+    background:var(--fill); box-shadow:var(--inset); color:var(--hi);
+    font:inherit; font-size:14.5px; font-weight:600; cursor:pointer; }
+
+  .origin{ margin:26px 0 0; padding:16px 16px 17px; border-radius:15px;
+    background:var(--fill); box-shadow:var(--inset); }
+  .origin b{ display:block; font-size:14.5px; font-weight:640; }
+  .origin span{ display:block; margin-top:4px; font-size:13px; line-height:1.5; color:var(--mid); }
+
+  /* ── desktop: the same column, given air, with the card held beside it ── */
+  @media (min-width:900px){
+    .screen{ max-width:1080px; padding:0 40px 90px;
+      display:grid; grid-template-columns:340px 1fr; gap:0 64px;
+      align-items:start; }
+    .bar{ grid-column:1 / -1; margin:0 -40px; padding-left:34px; padding-right:34px; }
+    .hero{ position:sticky; top:78px; padding-top:38px; }
+    .cage{ width:286px; }
+    .col{ padding-top:38px; min-width:0; }
+    .sect:first-child{ margin-top:0; }
+    .strip{ margin:0; padding:4px 0 14px; flex-wrap:wrap; overflow:visible; }
+  }
+</style>
+</head>
+<body>
+<span class="room" aria-hidden="true"></span>
+
+<div class="screen">
+
+  <header class="bar" id="bar">
+    <button class="bar__back" type="button" aria-label="Back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+           stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+    </button>
+    <span class="bar__title">Your Memento</span>
+  </header>
+
+  <div class="hero">
+    <div class="cage" id="heroCard"></div>
+    <p class="hero__name" id="heroName">Toxic</p>
+    <p class="hero__sub" id="heroSub">Carried 47 days. Three layers earned.</p>
+  </div>
+
+  <div class="col">
+
+    <!-- 2 · what the card is made of -->
+    <div class="sect">
+      <h2>What it is made of</h2>
+      <p>The colour is not a setting. Each layer arrived the day you earned it.</p>
+    </div>
+    <div class="layers" id="layers"></div>
+
+    <!-- 3 · the material -->
+    <div class="sect">
+      <h2>Its material</h2>
+      <p>The one thing here you choose. Same card, different substance.</p>
+    </div>
+    <div class="strip" id="strip"></div>
+    <p class="matnote" id="matNote"></p>
+
+    <!-- 4 · the record -->
+    <div class="sect">
+      <h2>The record</h2>
+      <p>Every mark the card was made from, in the order it happened.</p>
+    </div>
+
+    <div class="tally">
+      <div class="tal"><b>47</b><span>days<br>carried</span></div>
+      <div class="tal"><b>38</b><span>moves<br>done</span></div>
+      <div class="tal"><b>21</b><span>longest<br>run</span></div>
+      <div class="tal"><b>16</b><span>reflections<br>written</span></div>
+    </div>
+
+    <div class="grid">
+      <div class="grid__cells" id="cells"></div>
+      <div class="grid__foot"><span>19 June</span><span>Today</span></div>
+    </div>
+
+    <div class="trail" id="trail"></div>
+    <button class="more" type="button" id="moreBtn">Show all 91 marks</button>
+
+    <div class="origin">
+      <b>19 June 2026</b>
+      <span>The day you ran Clarity and the card stopped being blank. Everything
+      above came after it.</span>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ── the app's real card markup, lifted verbatim ─────────────────────────── */
+function realCard(vars, o){
+  o = o || {};
+  const B = o.blobs || blobPlan(o.name || 'memento');
+  const style = Object.entries(vars).map(([k,v])=>k+':'+v).join(';');
+  const blobs = B.map((s,i)=>`<i class="blob b${i+1}" style="${s}"></i>`).join('');
+  return `<div class="daycard-wrap daycard-theme-living daycard-reveal daycard--bright" style="${style}">
+    <span class="daycard-wrap__aura" aria-hidden="true"></span>
+    <div class="daycard-living-stage">
+      <span class="daycard-bloom" aria-hidden="true">${blobs}</span>
+      <div class="daycard-ns">
+        <span class="daycard-ns__liquid" aria-hidden="true">${blobs}</span>
+        <span class="daycard-ns__iri" aria-hidden="true"></span>
+        <span class="daycard-ns__sheen" aria-hidden="true"></span>
+        <span class="daycard-ns__burn" aria-hidden="true"></span>
+        <span class="daycard-ns__plat" aria-hidden="true"></span>
+        <span class="daycard-ns__tint" aria-hidden="true"></span>
+        <span class="daycard-ns__rim" aria-hidden="true"></span>
+        <div class="daycard-ns__body">
+          <svg class="daycard-ns__emblem" viewBox="0 0 512 512" aria-hidden="true">
+            <path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path>
+          </svg>
+        </div>
+        <div class="daycard-ns__foot"><span class="daycard-ns__name">${o.name||''}</span></div>
+      </div>
+    </div>
+  </div>`;
+}
+function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+function rng(seed){let x=seed>>>0;return function(){x=(Math.imul(x,1664525)+1013904223)>>>0;return x/4294967296;};}
+function blobPlan(name){
+  const r=rng(hash((name||'memento')+'::blobs')), out=[];
+  for(let i=0;i<6;i++){
+    out.push(`transform:translate(${(r()*130-65).toFixed(1)}%,${(r()*130-65).toFixed(1)}%) scale(${(0.62+r()*0.95).toFixed(3)})`);
+  }
+  return out;
+}
+
+/* a handful of materials from the skin library, enough to show the picker */
+const MATS = [
+ {n:'Toxic', sk1:'rgba(190,255,60,1)', sk2:'rgba(120,255,140,.9)', sk3:'rgba(90,190,30,1)', sk4:'rgba(220,255,110,.85)',
+  plat:'.14', face:'linear-gradient(165deg,#0d1505,#060903)', mark:'rgba(246,255,226,.96)', ink:'rgba(228,255,190,.9)',
+  note:'Yours since the day you started. Assigned, not picked.'},
+ {n:'Void', sk1:'none',sk2:'none',sk3:'none',sk4:'none', plat:'0', face:'#000000',
+  mark:'rgba(244,246,250,.97)', ink:'rgba(150,155,164,.62)', cls:'flat void',
+  edge:'rgba(0,0,0,1)', halo:'rgba(0,0,0,1)', note:'Emits nothing. The only card with no edge.'},
+ {n:'Gold', sk1:'rgba(255,214,110,1)', sk2:'rgba(255,240,190,.9)', sk3:'rgba(190,140,30,1)', sk4:'rgba(255,228,150,.85)',
+  plat:'.3', face:'linear-gradient(165deg,#1a1408,#0b0904)', mark:'rgba(255,248,228,.96)', ink:'rgba(255,238,200,.9)',
+  note:'The heaviest material in the set.'},
+ {n:'Ice', sk1:'rgba(150,205,255,1)', sk2:'rgba(220,240,255,.9)', sk3:'rgba(90,150,220,1)', sk4:'rgba(190,225,255,.85)',
+  plat:'.34', face:'linear-gradient(165deg,#0a1119,#05080c)', mark:'rgba(240,248,255,.96)', ink:'rgba(220,238,255,.9)',
+  note:'Cold and clear. Reads almost white in daylight.'},
+ {n:'Crimson', sk1:'rgba(255,60,80,1)', sk2:'rgba(255,140,150,.9)', sk3:'rgba(160,20,40,1)', sk4:'rgba(255,110,120,.85)',
+  plat:'.16', face:'linear-gradient(165deg,#160508,#080204)', mark:'rgba(255,236,238,.96)', ink:'rgba(255,214,218,.9)',
+  note:'The loudest material. Not subtle, on purpose.'},
+ {n:'Matte Black', sk1:'none',sk2:'none',sk3:'none',sk4:'none', plat:'0',
+  face:'linear-gradient(168deg,#1c1d20 0%,#141518 55%,#101113 100%)',
+  mark:'rgba(244,246,250,.97)', ink:'rgba(226,231,240,.75)', cls:'flat',
+  edge:'rgba(255,255,255,.92)', halo:'rgba(238,244,255,.40)',
+  note:'A solid object. No light inside it at all.'},
+ {n:'Emerald', sk1:'rgba(0,220,130,1)', sk2:'rgba(120,255,200,.9)', sk3:'rgba(0,150,90,1)', sk4:'rgba(40,255,160,.85)',
+  plat:'.12', face:'linear-gradient(165deg,#03150e,#010806)', mark:'rgba(232,255,246,.95)', ink:'rgba(214,255,238,.9)',
+  note:'Deep and wet. Holds the M brighter than most.'},
+ {n:'Magenta', sk1:'rgba(255,70,200,1)', sk2:'rgba(255,160,230,.9)', sk3:'rgba(170,20,130,1)', sk4:'rgba(255,120,215,.85)',
+  plat:'.2', face:'linear-gradient(165deg,#160418,#08020a)', mark:'rgba(255,236,250,.96)', ink:'rgba(255,214,244,.9)',
+  note:'Bright, close to the surface.'},
+];
+/* The app's own earned-state levels. These are what the three layers actually
+   set, so the card here is lit by the record, not by a hardcoded look. */
+function matVars(m, earned){
+  const e = earned || {clar:true, act:true, cons:true};
+  const n = (e.clar?1:0) + (e.act?1:0) + (e.cons?1:0);
+  return {'--sk1':m.sk1,'--sk2':m.sk2,'--sk3':m.sk3,'--sk4':m.sk4,
+    '--plat-op': e.act ? m.plat : '0',
+    '--face':m.face,'--mark':m.mark,'--ink':m.ink,
+    '--edge':m.edge||m.sk1||'rgba(255,255,255,.9)',
+    '--halo':m.halo||(m.sk1&&m.sk1!=='none'?m.sk1:'rgba(238,244,255,.34)'),
+    '--clar': e.clar?'1':'0', '--act': e.act?'1':'0', '--cons': e.cons?'1':'0',
+    '--mix':'.9', '--lit': n?String(0.34 + n*0.22):'0',
+    '--glow': n?'.7':'0', '--emit': n?'.7':'0', '--ring': n?'.5':'0'};
+}
+
+/* ── the earned layers. Real order: cyan at Clarity, platinum when the Action
+   plan is revealed, green on the first completed move. ─────────────────── */
+const LAYERS = [
+  {k:'clar', c:'#3ad9f5', t:'The cyan', d:'Ignited your Neutron Star and signed the statement.', w:'19 Jun'},
+  {k:'act',  c:'#eef2fb', t:'The platinum', d:'Your first plan was revealed and you took the move.', w:'21 Jun'},
+  {k:'cons', c:'#3fd94e', t:'The green', d:'Seven days in a row without dropping it.', w:'4 Jul'},
+];
+const earned = {clar:true, act:true, cons:true};
+
+/* ── the record. Only event types the app actually writes. ──────────────── */
+const TRAIL = [
+  {mon:'August', evs:[
+    {k:'act', t:'Sent the pricing email', m:'Action · the move for the day', d:'Tue 4'},
+    {k:'', t:'Reflection', m:'“Stopped negotiating with myself at 7am.”', d:'Mon 3'},
+    {k:'act', t:'Cut the third feature', m:'Action · the move for the day', d:'Sun 2'},
+    {k:'mark', t:'New longest run', m:'21 days, past the old record of 14', d:'Sat 1'},
+  ]},
+  {mon:'July', evs:[
+    {k:'act', t:'Called the two churned users', m:'Action · the move for the day', d:'Fri 31'},
+    {k:'', t:'Weekly review', m:'Four moves done, one dropped', d:'Sun 26'},
+    {k:'', t:'Distraction logged', m:'Opened the analytics tab 9 times before noon', d:'Thu 23'},
+    {k:'act', t:'Shipped the waitlist page', m:'Action · the move for the day', d:'Wed 15'},
+    {k:'clar', t:'Vision board', m:'Added: the room with one desk in it', d:'Sun 12'},
+    {k:'mark', t:'The green arrived', m:'Seven days unbroken. The card changed.', d:'Fri 4'},
+  ]},
+  {mon:'June', evs:[
+    {k:'act', t:'Wrote the first offer', m:'Action · the move for the day', d:'Mon 23'},
+    {k:'mark', t:'The platinum arrived', m:'Your first plan was revealed', d:'Sat 21'},
+    {k:'clar', t:'Ignition', m:'You signed and ignited your Neutron Star', d:'Thu 19'},
+  ]},
+];
+
+let cur = 0;
+
+function paint(){
+  const m = MATS[cur];
+  const n = (earned.clar?1:0) + (earned.act?1:0) + (earned.cons?1:0);
+  /* The app's own gate: before the star is lit the card emits nothing at all.
+     Turning the cyan off here does exactly what a blank pre-Clarity card does. */
+  document.body.classList.toggle('ns-bloom', earned.clar);
+  document.getElementById('heroCard').innerHTML =
+    realCard(matVars(m, earned), {name:'Malik Peace'});
+  document.getElementById('heroCard').className = 'cage ' + (m.cls||'');
+  document.getElementById('heroName').textContent = m.n;
+  document.getElementById('heroSub').textContent = n
+    ? 'Carried 47 days. ' + ['One layer','Two layers','Three layers'][n-1] + ' earned.'
+    : 'Carried 47 days. Nothing earned yet.';
+  document.getElementById('matNote').textContent = m.note;
+  document.querySelectorAll('.chip').forEach((c,i)=>
+    c.setAttribute('aria-pressed', i===cur ? 'true' : 'false'));
+  document.querySelectorAll('.lay').forEach(l=>
+    l.classList.toggle('is-locked', !earned[l.dataset.k]));
+}
+
+/* the strip */
+document.getElementById('strip').innerHTML = MATS.map((m,i)=>
+  `<button class="chip" type="button" aria-pressed="false" data-i="${i}">
+     <span class="chipcage ${m.cls||''}">${realCard(matVars(m), {name:''})}</span>
+     <span class="chip__n">${m.n}</span>
+   </button>`).join('');
+document.getElementById('strip').addEventListener('click', e=>{
+  const b = e.target.closest('.chip'); if(!b) return;
+  cur = +b.dataset.i; paint();
+});
+
+/* the layers */
+document.getElementById('layers').innerHTML = LAYERS.map(l=>
+  `<button class="lay" type="button" data-k="${l.k}" style="--c:${l.c}">
+     <span class="lay__dot"></span>
+     <span class="lay__txt"><span class="lay__t">${l.t}</span>
+       <span class="lay__d">${l.d}</span></span>
+     <span class="lay__when">${l.w}</span>
+   </button>`).join('');
+/* Tap a layer to pull it back off. Proof that the colour is the record. */
+document.getElementById('layers').addEventListener('click', e=>{
+  const b = e.target.closest('.lay'); if(!b) return;
+  earned[b.dataset.k] = !earned[b.dataset.k]; paint();
+});
+
+/* the consistency grid, 47 real days then the rest empty */
+(function(){
+  const r = rng(hash('grid')), out = [];
+  for(let i=0;i<104;i++){
+    if(i < 57){ out.push('<i class="cel"></i>'); continue; }
+    const v = r();
+    out.push('<i class="cel ' + (v>.72?'l3':v>.42?'l2':v>.16?'l1':'') + '"></i>');
+  }
+  document.getElementById('cells').innerHTML = out.join('');
+})();
+
+/* the trail */
+document.getElementById('trail').innerHTML = TRAIL.map(g=>
+  `<p class="mon">${g.mon}</p>` + g.evs.map(e=>
+    `<div class="ev"><span class="ev__dot ${e.k?'is-'+e.k:''}"></span>
+       <span class="ev__b"><span class="ev__t">${e.t}</span>
+         <span class="ev__m">${e.m}</span></span>
+       <span class="ev__d">${e.d}</span></div>`).join('')).join('');
+
+document.getElementById('moreBtn').onclick = function(){
+  this.textContent = 'That is all of it, back to 19 June';
+  this.disabled = true;
+};
+
+/* the bar title arrives once the card has gone */
+const bar = document.getElementById('bar');
+addEventListener('scroll', ()=>{
+  bar.classList.toggle('is-scrolled', scrollY > 230);
+}, {passive:true});
+
+paint();
+</script>
+</body>
+</html>
