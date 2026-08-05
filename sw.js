@@ -84,9 +84,20 @@ self.addEventListener('fetch', (event) => {
   // so the browser's heuristic HTTP cache can never serve a stale file from
   // under us on servers without cache headers. Navigations cannot be passed
   // through Request reconstruction, so they go by URL.
-  const fresh = (req.mode === 'navigate')
-    ? fetch(req.url, { cache: 'no-cache', credentials: 'same-origin' })
-    : fetch(req, { cache: 'no-cache' });
+  // v1117: a fetch that neither resolves nor rejects (wedged iOS network
+  // process) used to hang respondWith FOREVER: on a navigation that meant the
+  // PWA sat on the system splash for good, running no code at all (Malik's
+  // phone, 2026-08-05). Cap the wait; the catch path below then serves the
+  // cached copy, so a wedged network degrades to "app loads from cache"
+  // instead of "app never loads".
+  const FETCH_CAP_MS = req.mode === 'navigate' ? 8000 : 20000;
+  const capped = new Promise((_, reject) => setTimeout(() => reject(new Error('sw-fetch-timeout')), FETCH_CAP_MS));
+  const fresh = Promise.race([
+    (req.mode === 'navigate')
+      ? fetch(req.url, { cache: 'no-cache', credentials: 'same-origin' })
+      : fetch(req, { cache: 'no-cache' }),
+    capped
+  ]);
   event.respondWith(
     fresh
       .then((res) => {
