@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The logic: from their words to their actions</title>
+<style>
+  :root{
+    --hi:rgba(255,255,255,.96); --mid:rgba(255,255,255,.68); --lo:rgba(255,255,255,.42);
+    --fill:rgba(255,255,255,.045); --fill2:rgba(255,255,255,.08);
+    --inset:inset 0 1px 0 rgba(255,255,255,.07);
+    --clar:#3ad9f5; --cons:#3fd94e; --act:#eef2fb;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:#050609;color:var(--hi);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:760px;margin:0 auto;padding:36px 20px 120px}
+  h1{margin:0 0 10px;font-size:25px;font-weight:750;letter-spacing:-.025em;line-height:1.15}
+  .lede{margin:0 0 6px;font-size:14.5px;line-height:1.65;color:var(--mid)}
+  .lede b{color:var(--hi);font-weight:640}
+
+  h2{margin:52px 0 6px;font-size:19px;font-weight:700;letter-spacing:-.02em}
+  .sub{margin:0 0 22px;font-size:13.5px;line-height:1.6;color:var(--mid)}
+
+  /* the principle */
+  .prin{margin:26px 0 0;padding:20px 20px 19px;border-radius:16px;background:var(--fill);box-shadow:var(--inset)}
+  .prin p{margin:0;font-size:16px;line-height:1.55;letter-spacing:-.012em}
+  .prin p b{font-weight:680}
+  .prin .q{margin-top:12px;font-size:13.5px;color:var(--mid)}
+
+  /* pipeline */
+  .step{position:relative;margin:0;padding:18px 18px 17px 56px;border-radius:15px;
+    background:var(--fill);box-shadow:var(--inset)}
+  .step + .step{margin-top:26px}
+  .step + .step::before{content:'';position:absolute;left:33px;top:-26px;width:2px;height:26px;
+    background:rgba(255,255,255,.14)}
+  .step__n{position:absolute;left:16px;top:17px;width:26px;height:26px;border-radius:50%;
+    display:grid;place-items:center;background:var(--fill2);box-shadow:var(--inset);
+    font-size:12.5px;font-weight:700;font-variant-numeric:tabular-nums}
+  .step__t{margin:0;font-size:15.5px;font-weight:680;letter-spacing:-.014em}
+  .step__d{margin:6px 0 0;font-size:13.5px;line-height:1.6;color:var(--mid)}
+  .step__d b{color:var(--hi);font-weight:640}
+  .step__ex{margin:12px 0 0;padding:10px 13px;border-radius:10px;background:rgba(255,255,255,.03);
+    font-size:13px;line-height:1.55;color:var(--mid)}
+  .step__ex b{color:var(--hi);font-weight:620}
+
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 0}
+  .chip{padding:6px 11px;border-radius:8px;background:rgba(255,255,255,.05);
+    font-size:12px;font-weight:620;color:var(--mid)}
+  .chip.on{background:rgba(58,217,245,.16);color:#a8ecfa}
+
+  table{width:100%;border-collapse:collapse;margin:12px 0 0;font-size:13px}
+  th{text-align:left;font-size:11.5px;font-weight:700;color:var(--lo);padding:0 10px 7px 0}
+  td{padding:7px 10px 7px 0;color:var(--mid);line-height:1.45;vertical-align:top;
+    border-top:1px solid rgba(255,255,255,.06)}
+  td b{color:var(--hi);font-weight:640}
+
+  /* worked examples */
+  .person{margin:0 0 26px;padding:20px 19px;border-radius:16px;background:var(--fill);box-shadow:var(--inset)}
+  .person__say{margin:0;font-size:16.5px;font-weight:650;letter-spacing:-.015em;line-height:1.4}
+  .person__say i{font-weight:400;color:var(--mid);font-style:normal;font-size:13px;display:block;margin-bottom:5px}
+  .person__row{display:flex;flex-wrap:wrap;gap:6px;margin:13px 0 0}
+  .tag{padding:5px 10px;border-radius:8px;font-size:11.5px;font-weight:680}
+  .tag--type{background:rgba(58,217,245,.15);color:#a8ecfa}
+  .tag--meta{background:rgba(255,255,255,.06);color:var(--mid)}
+  .person__h{margin:16px 0 7px;font-size:12.5px;font-weight:700;color:var(--lo)}
+  .person__engine{margin:0;font-size:13.5px;line-height:1.55;color:var(--mid)}
+  .person__engine b{color:var(--hi);font-weight:640}
+  .acts{margin:0;padding:0;list-style:none}
+  .acts li{display:flex;align-items:baseline;gap:9px;padding:7px 0;
+    border-top:1px solid rgba(255,255,255,.06);font-size:13.5px;line-height:1.45}
+  .acts li:first-child{border-top:0}
+  .acts .v{flex:none;width:64px;font-size:11px;font-weight:750;color:#a8ecfa}
+  .acts .c{flex:none;margin-left:auto;font-size:11.5px;color:var(--lo);white-space:nowrap}
+  .person__face{margin:0;padding:11px 13px;border-radius:10px;background:rgba(255,255,255,.03);
+    font-size:13px;line-height:1.55;color:var(--mid)}
+  .person__face b{color:var(--hi);font-weight:640}
+
+  /* the marriage answer */
+  .edge{margin:24px 0 0;padding:19px 19px 18px;border-radius:16px;background:var(--fill);box-shadow:var(--inset)}
+  .edge p{margin:0 0 11px;font-size:14px;line-height:1.65;color:var(--mid)}
+  .edge p:last-child{margin:0}
+  .edge b{color:var(--hi);font-weight:650}
+  .edge .rule{padding:12px 14px;border-radius:10px;background:rgba(63,217,78,.09);
+    color:var(--hi);font-size:14.5px;font-weight:600;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>From their words to their actions</h1>
+  <p class="lede">The machine behind Memento, end to end. Six steps, and the whole thing
+    rests on one principle and two questions.</p>
+
+  <div class="prin">
+    <p><b>The principle.</b> A goal is an outcome you do not control, reached through
+      behaviors you do. Memento's entire job is translating one into the other, and
+      showing whichever is honest that day.</p>
+    <p class="q">The two questions the AI answers, in order:
+      <b style="color:var(--hi)">1. What would count?</b> (classification)
+      <b style="color:var(--hi)">2. What do you control?</b> (decomposition)</p>
+  </div>
+
+  <h2>The pipeline</h2>
+  <p class="sub">What happens between someone typing a sentence and the home screen
+    knowing exactly what to show them.</p>
+
+  <div class="step">
+    <span class="step__n">1</span>
+    <p class="step__t">Their words</p>
+    <p class="step__d">The person arrives with a sentence in whatever shape their life
+      produced it. Nothing is required of it.</p>
+    <div class="step__ex"><b>"I want to keep bees."</b> &nbsp;·&nbsp; <b>"Lose weight."</b>
+      &nbsp;·&nbsp; <b>"100 people paying me."</b></div>
+  </div>
+
+  <div class="step">
+    <span class="step__n">2</span>
+    <p class="step__t">The signature</p>
+    <p class="step__d">Clarity sharpens the sentence into a star and keeps exactly three
+      things: <b>the goal</b>, <b>a why in their own words</b> (never generated), and
+      <b>the anti-vision</b>, what it costs them if this stays neglected. Nothing else.</p>
+  </div>
+
+  <div class="step">
+    <span class="step__n">3</span>
+    <p class="step__t">Classification: what would count?</p>
+    <p class="step__d">The AI that just wrote the synthesis names the goal's type. One of
+      six, nothing else is possible:</p>
+    <div class="chips">
+      <span class="chip">Quantity up</span><span class="chip">Quantity down</span>
+      <span class="chip">Frequency</span><span class="chip">Maintenance</span>
+      <span class="chip on">Milestone</span><span class="chip">Open</span>
+    </div>
+    <p class="step__d" style="margin-top:12px">Plus three optional facts:
+      a <b>target</b> if one is named (never forced),
+      a <b>deadline</b> (a date, or a bounding event like "before the baby comes"),
+      and for milestones the <b>hidden engine</b>, the countable thing underneath
+      ("pass the boards" runs on hours studied).</p>
+  </div>
+
+  <div class="step">
+    <span class="step__n">4</span>
+    <p class="step__t">Decomposition: what do you control?</p>
+    <p class="step__d">The pivot of the whole machine. The outcome is not controllable,
+      so the AI names the <b>input behaviors that cause it</b>. The scale is not
+      controllable; eating under 2,500 is. Getting hired is not; ten applications a week
+      is. Bees are not; building the hive box this weekend is.</p>
+    <p class="step__d">Milestones also get <b>stages</b>: becoming a beekeeper is
+      learn, equip, install, tend, and the app should know which act you are in.</p>
+  </div>
+
+  <div class="step">
+    <span class="step__n">5</span>
+    <p class="step__t">Actions: verb, size, cadence</p>
+    <p class="step__d">Every generated action carries three properties, and each does a
+      different job:</p>
+    <table>
+      <tr><th>Verb</th><th>Done means</th><th>The button it needs</th></tr>
+      <tr><td><b>Ship</b></td><td>the artifact exists</td><td>tap done</td></tr>
+      <tr><td><b>Attempt</b></td><td>the shots were taken</td><td>tap done</td></tr>
+      <tr><td><b>Rep</b></td><td>time or count served</td><td>counter / timer</td></tr>
+      <tr><td><b>Hold</b></td><td>the day ended compliant</td><td>evening confirm, never a 2pm checkbox</td></tr>
+      <tr><td><b>Check</b></td><td>measured on schedule</td><td>appears on its cadence, weekly is normal</td></tr>
+    </table>
+    <p class="step__d" style="margin-top:12px"><b>Size</b> is the five tiers that already
+      exist (tiny to extreme). <b>Cadence</b> is how often the action exists at all:
+      most are daily, a Check can be weekly, and that is how the beekeeper gets a
+      seven-day rhythm without the app calling six of those days a failure.</p>
+  </div>
+
+  <div class="step">
+    <span class="step__n">6</span>
+    <p class="step__t">The face</p>
+    <p class="step__d"><b>The goal's type picks what the home card shows. The action's
+      verb picks the button on it.</b> Quantity goals get the climb and the distance.
+      Frequency gets the rhythm. Maintenance gets the unbroken line and time held.
+      Milestones get the current act and the ledger. Open goals get evidence, their own
+      words accumulating, and never a meter pretending to measure the unmeasurable.</p>
+  </div>
+
+  <h2>Three people through the machine</h2>
+  <p class="sub">Same six steps, three completely different lives.</p>
+
+  <div class="person">
+    <p class="person__say"><i>They say</i>"I want to keep bees."</p>
+    <div class="person__row">
+      <span class="tag tag--type">Milestone</span>
+      <span class="tag tag--meta">no target</span>
+      <span class="tag tag--meta">no deadline</span>
+      <span class="tag tag--meta">engine: stages</span>
+    </div>
+    <p class="person__h">Decomposition</p>
+    <p class="person__engine">Acts: <b>learn &rarr; equip &rarr; install &rarr; tend</b>.
+      Currently in act one. The controllable inputs are study, purchases, and builds.</p>
+    <p class="person__h">A real week of actions</p>
+    <ul class="acts">
+      <li><span class="v">REP</span>Read the hive-anatomy chapter<span class="c">daily · tiny</span></li>
+      <li><span class="v">SHIP</span>Build the brood box<span class="c">Sat · heavy</span></li>
+      <li><span class="v">ATTEMPT</span>Message the local keepers' club<span class="c">once · light</span></li>
+      <li><span class="v">CHECK</span>Hive inspection<span class="c">weekly, once bees exist</span></li>
+    </ul>
+    <p class="person__h">So the home card shows</p>
+    <p class="person__face"><b>The act they are in and the ledger of made things.</b>
+      No streak guilt on the six days between inspections, because the Check's cadence
+      is weekly by design.</p>
+  </div>
+
+  <div class="person">
+    <p class="person__say"><i>They say</i>"Lose weight."</p>
+    <div class="person__row">
+      <span class="tag tag--type">Quantity down</span>
+      <span class="tag tag--meta">target optional</span>
+      <span class="tag tag--meta">no deadline</span>
+      <span class="tag tag--meta">output lags inputs</span>
+    </div>
+    <p class="person__h">Decomposition</p>
+    <p class="person__engine">The scale is an <b>output</b>: slow, noisy, not directly
+      controllable. The inputs are the calorie line and movement. The display must lead
+      with what they control, or a noisy week reads as failure they did not commit.</p>
+    <p class="person__h">A real week of actions</p>
+    <ul class="acts">
+      <li><span class="v">HOLD</span>Under 2,500 calories<span class="c">daily · evening confirm</span></li>
+      <li><span class="v">REP</span>A 20 minute walk<span class="c">daily · tiny</span></li>
+      <li><span class="v">CHECK</span>Weigh in<span class="c">weekly, same morning</span></li>
+    </ul>
+    <p class="person__h">So the home card shows</p>
+    <p class="person__face"><b>Days held, big and bold. The trend line, small and quiet.</b>
+      The Hold gets an evening confirm because a rule cannot be completed at 2pm,
+      it can only survive until midnight.</p>
+  </div>
+
+  <div class="person">
+    <p class="person__say"><i>They say</i>"100 people paying me."</p>
+    <div class="person__row">
+      <span class="tag tag--type">Quantity up</span>
+      <span class="tag tag--meta">target: 100 users</span>
+      <span class="tag tag--meta">no deadline</span>
+      <span class="tag tag--meta">direct inputs</span>
+    </div>
+    <p class="person__h">Decomposition</p>
+    <p class="person__engine">The number rises when things ship and people are asked.
+      The inputs are <b>artifacts and outreach</b>, both fully controllable, both
+      countable tonight.</p>
+    <p class="person__h">A real week of actions</p>
+    <ul class="acts">
+      <li><span class="v">ATTEMPT</span>Message 10 people who fit<span class="c">daily · moderate</span></li>
+      <li><span class="v">SHIP</span>Publish the pricing page<span class="c">Tue · heavy</span></li>
+      <li><span class="v">CHECK</span>Update the count<span class="c">weekly pulse</span></li>
+    </ul>
+    <p class="person__h">So the home card shows</p>
+    <p class="person__face"><b>The climb: 47 of 100, what this week added, and the
+      arrival date the current pace implies.</b> The one face where a projected date is
+      honest, because the number is real and the inputs move it.</p>
+  </div>
+
+  <h2>"Is that even a goal?"</h2>
+  <p class="sub">The marriage question, answered.</p>
+  <div class="edge">
+    <p>"Don't decide anything about the marriage until January" <b>does classify</b>:
+      maintenance, hold-until January. And maintenance goals do have progress, the same
+      way "stay sober" does. The unbroken line growing <b>is</b> the progress. Day 40
+      of 150 held is real.</p>
+    <p>But it is almost never a <b>star</b>. A sentence like that is usually a
+      <b>rule someone holds during a hard season</b>, which makes it an action, a Hold,
+      serving a larger goal they have not named yet. The taxonomy exists so nothing a
+      person types can break the machine. Clarity's job is still to steer them to a
+      star worth chasing, and to quietly file the rules under it.</p>
+    <p class="rule">The boundary test: if it cannot be the point of a year of your
+      life, it is an action, not a star.</p>
+  </div>
+</div>
+</body>
+</html>
