@@ -66,7 +66,7 @@
   .sect__hd p{margin:0 0 22px;font-size:13.5px;line-height:1.55;color:var(--text-mid)}
   .sect__hd b{color:var(--text-hi);font-weight:640}
 
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(354px,1fr));gap:34px 26px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:30px 22px}
   .slot{margin:0}
   .slot__cap{display:flex;align-items:baseline;gap:9px;margin:0 0 11px;padding-left:2px}
   .slot__n{font-size:11.5px;font-weight:700;color:var(--text-lo);font-variant-numeric:tabular-nums}
@@ -99,7 +99,9 @@
   .cc-dots i.on{background:rgba(255,255,255,.85)}
 
   .slot__meta{margin:13px 2px 0}
-  .slot__idea{margin:0;font-size:13.5px;line-height:1.55;color:var(--text-hi)}
+  .slot__idea{margin:0;font-size:13px;line-height:1.5;color:var(--text-mid)}
+  .bf{margin:9px 0 0;font-size:13.5px;line-height:1.5;color:var(--text-hi);font-weight:600}
+  .bf__x{display:block;margin:5px 0 0;font-size:12px;font-weight:500;color:#f0938f}
   .slot__evo{margin:8px 0 0;font-size:13px;line-height:1.55;color:var(--text-mid)}
   .slot__evo b{color:var(--text-hi);font-weight:640}
   .slot__data{margin:8px 0 0;font-size:11.5px;line-height:1.5;color:var(--text-lo)}
@@ -782,15 +784,8 @@
 <body>
 <div class="wrap">
   <h1>The sync box</h1>
-  <p class="lede">Forty-five candidates for the three swipeable faces under the Memento.
-    Thirty were designed conventionally, then fifteen more taking real risks.
-    Every one has honest pros and cons under it, written by a critic told to be harsh.</p>
-  <p class="lede">Every variant uses only data the app already stores. The test each had to
-    pass: <b>what visibly changes here between day 2 and day 60.</b> A card that shows state
-    teaches you its rule in about four viewings and then returns nothing. A card that shows
-    change stays worth a glance.</p>
-  <p class="lede">Prototypes, not shipped. The Memento above each card is a stand-in.</p>
-
+  <p class="lede">Fifty candidates for the three swipeable faces under the Memento.
+    Each one says who it is for and when to skip it. Prototypes, not shipped.</p>
   <div class="guide">
     <h3>Which face for which person</h3>
     <table>
@@ -841,11 +836,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">The move on top, then the number the star actually named: where the count stands, the slice of the rail this week added, and the date the current rate lands on the target.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the rail is a sliver and there is no pace line yet (it needs two data points), so the card is the move plus &quot;0 of 100 paying customers&quot;. By day 60 the bright week slice, the +N and the projected date all move without the user touching anything, and the date slides LATER when the week is slow. Stays dormant when goalProgress.target is null: the head, rail and pace line simply do not render.</p>
-          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>The projected date is the one value on this face the user cannot compute in their head, and it moves without being touched</li><li>Splitting the rail into base plus this week&#x27;s slice separates lifetime total from recent effort, which a single fill cannot do</li><li>A date that slides later is bad news the card delivers without scolding</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Two data points produce a wild projection, so day 3 can read a date in 2031 and burn the user&#x27;s trust in the line forever</li><li>The number appears three times in four rows (47, the rail, the read line), spending the tightest height budget on repetition</li><li>Null target kills the head, rail and pace line at once, leaving a different app for goal-less users than for numeric ones</li></ul></div></div><p class="slot__verdict">Right for the numeric-star user, but it is the Clarity face wearing Action&#x27;s clothes; ship it as the goal face or not at all.</p>
-          <p class="slot__data">primaryAction.title, goalProgress.current, goalProgress.target, goalProgress.unit, goalProgress.history[{day,value}] for this week&#x27;s delta and the pace-based arrival date</p>
+          <p class="slot__idea">The move on top, then the number the star actually named: where the count stands, the slice of the rail this week added, and the date the current rate lands on the target.</p><p class="bf">Quantity up or down with a target. The founder counting users toward 100.<span class="bf__x">Skip if no target number in the goal</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="today-today-weight">
@@ -867,11 +861,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">The move as hero, then the one thing that gives it weight: how heavy today&#x27;s version is on the five-tier ladder, and how this week&#x27;s run compares to the best week the user has ever put together.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the ladder sits low and the run line reads &quot;1 of the last 7 days&quot; with no best to beat yet. By day 60 the lit rung has usually climbed (light to heavy), and the run line becomes a live comparison that can go down as well as up, so 3 of 7 against a best of 6 is real bad news the card is willing to deliver.</p>
-          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Two independent live values (tier climb, 7-day run) in one row of text, the best information density per pixel in the set</li><li>The best-7 comparison can fall, so a bad week is stated by the card instead of hidden behind a streak</li><li>Reuses tiers the plan already carries, so nothing new has to be invented or stored</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>In the first week the current 7 and the best 7 are the same window, so the line reads as a tie and teaches the user it is meaningless</li><li>Five dots plus the words &quot;Moderate today&quot; encode the same fact twice, at glance distance the dots add nothing</li><li>The user has to subtract 4 from 6 to know where they stand, on a card built for a two-second glance</li></ul></div></div><p class="slot__verdict">Right for a user deep in a tier ladder they already understand; as the default Action face it asks for too much arithmetic.</p>
-          <p class="slot__data">primaryAction.tiers, primaryAction.recommendedTier, action.selectedTier, actionLocalDaysInWindow(7), proofEvents (type action-complete, for the best rolling 7-day window), actionDoneToday()</p>
+          <p class="slot__idea">The move as hero, then the one thing that gives it weight: how heavy today&#x27;s version is on the five-tier ladder, and how this week&#x27;s run compares to the best week the user has ever put together.</p><p class="bf">Rep and Attempt goals. The person whose reps must get heavier, not just repeat.<span class="bf__x">Skip if the plan carries no intensity ladder</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="today-today-open">
@@ -893,11 +886,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">The move as hero with the concrete entry point sitting right under it, so the card answers &quot;what do I physically do first&quot; instead of restating the goal, and one honest line about how long it has been since the last move.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> The entry line is rewritten with every plan, so it is never the same sentence twice. The gap line under it is the part that moves daily: on a good run it reads &quot;You moved yesterday&quot;, after a lapse it reads &quot;Four days since your last move&quot;, which is the one place this face is allowed to deliver bad news.</p>
-          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>The only face that answers the question that actually stalls people, what to physically touch first</li><li>howToStart is regenerated per plan, so the entry sentence is never identical twice without any extra data model</li><li>The gap line is the single piece of bad news that changes behaviour, and it is stated flatly</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>On a good run it reads &quot;You moved yesterday&quot; every day for weeks, which is exactly the state-not-change failure the brief names</li><li>A long move title plus a two-line entry sentence plus the gap line overflows the locked height on the wordiest plans</li><li>Day 1 has no last move, so the only moving element is absent precisely when the card most needs to feel alive</li></ul></div></div><p class="slot__verdict">Right for the first ten days; it should hand off to a face that shows change once the user knows how to start.</p>
-          <p class="slot__data">primaryAction.howToStart, primaryAction.tiers + action.selectedTier (the move text), proofEvents (type action-complete, most recent date), actionDoneToday()</p>
+          <p class="slot__idea">The move as hero with the concrete entry point sitting right under it, so the card answers &quot;what do I physically do first&quot; instead of restating the goal, and one honest line about how long it has been since the last move.</p><p class="bf">Open goals. The person with no number who stalls on where to physically begin.<span class="bf__x">Skip if the move is an all-day rule</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="today-today-run">
@@ -918,11 +910,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">Today&#x27;s move sits at the top of a live rail with the last two completed moves stacked underneath it, so the card shows the run it is continuing and the CTA visibly closes the open link at the top.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the rail is one open node with nothing below it and reads as a beginning. By week three there are always two real completions under it, pulled from the proof ledger with their own titles, so the card shows different history every single day and the top node is the only thing left unfilled.</p>
-          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>History turns over daily by construction, so the card is different every morning with no computed metric at all</li><li>The CTA visibly closes the open node at the top, giving the tap a physical consequence on the card itself</li><li>Past moves appear in the user&#x27;s own titles, which is proof no counter can fake</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Three wrapping titles at 350px is six or more lines whenever the plan writes full sentences, and the height is locked</li><li>Yesterday and the day before are the two things a user already remembers, so the card returns memory instead of information</li><li>At day 200 it shows the same three rows as at day 20, with nothing that acknowledges the 200</li></ul></div></div><p class="slot__verdict">Right for a user who needs momentum made visible, but only ships if titles are hard-clamped to one line each.</p>
-          <p class="slot__data">primaryAction.tiers + action.selectedTier (today&#x27;s move), proofEvents (type action-complete: title and date of the two most recent), actionDoneToday()</p>
+          <p class="slot__idea">Today&#x27;s move sits at the top of a live rail with the last two completed moves stacked underneath it, so the card shows the run it is continuing and the CTA visibly closes the open link at the top.</p><p class="bf">Frequency goals. The daily writer who keeps going because the run is visible.<span class="bf__x">Skip if fewer than two moves logged</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="today-week-rhythm">
@@ -949,11 +940,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">Leads with the shape of the current week as seven columns whose height is that day&#x27;s number of marks, headlined by the honest week-over-week delta rather than the streak.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> On day 2 it is one short column and no delta yet; by day 60 the seven columns carry a visible personal rhythm, the +/- against last week flips both ways as the week fills, and the streak has been demoted to a single quiet line at the bottom.</p>
-          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>The week-over-week delta flips both ways as the week fills, so a slow week is visible on Wednesday rather than Sunday</li><li>Demoting the streak to a quiet line removes the all-or-nothing cliff that makes one missed day feel terminal</li><li>Seven columns are readable at a glance without reading any number</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Column height encodes marks per day, which for a one-move-a-day user is always 0 or 1, so the rhythm it promises never appears</li><li>&quot;Three by now last week&quot; compares against a partial week and the comparison point silently shifts every day, which is hard to trust</li><li>This is the Consistency face with the move stapled on top, so swiping right afterwards shows the user the same week twice</li></ul></div></div><p class="slot__verdict">Should not ship on Action; it duplicates the Consistency face and its columns are flat for the intended one-move-a-day user.</p>
-          <p class="slot__data">consistencyStats().counts (per-day marks for the current week), consistencyStats().thisWeek, consistencyStats().lastWeek, consistencyStats().current, consistencyStats().longest</p>
+          <p class="slot__idea">Leads with the shape of the current week as seven columns whose height is that day&#x27;s number of marks, headlined by the honest week-over-week delta rather than the streak.</p><p class="bf">Frequency goals. The gym-3x person who should judge a week, not a streak.<span class="bf__x">Skip if a one-off milestone with no weekly rhythm</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="today-record-line">
@@ -975,11 +965,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">Leads with a verdict the user did not author (&quot;One day from your best week&quot;), proves it with two bars, this week against the best week they have ever had, and puts the move underneath as the way to close it.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 there is no record yet, so the face falls back to the move alone. From week three the verdict is recomputed nightly and reads differently most days: approaching, tied, beaten, or fallen behind. The reference is the best WEEK, never a lifetime streak, so it stays reachable inside seven days instead of becoming a trophy nobody can touch.</p>
-          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Leads with a judgement the user cannot make themselves, which is the strongest reason to look at a card on day 60</li><li>Best week as the reference is beatable inside seven days, unlike a lifetime streak that becomes unreachable</li><li>The verdict has four genuinely different states (approaching, tied, beaten, behind), so the wording changes most weeks</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Burying the move under the chart inverts the Action face&#x27;s priority, the eye lands on bars and finds today&#x27;s task third</li><li>It falls back to the move alone until week three, so the design&#x27;s whole point is missing during the period users decide whether to keep the app</li><li>The best bar is pinned at 100% forever, so after four viewings the second row carries no new shape, only a number</li></ul></div></div><p class="slot__verdict">Right for the competitive user past week three; do not ship it as the only Action face while the first fortnight shows nothing.</p>
-          <p class="slot__data">primaryAction.title, actionLocalDaysInWindow(7), proofEvents (action-complete) bucketed into weeks for the best-week value and its month, consistencyStats().thisWeek</p>
+          <p class="slot__idea">Leads with a verdict the user did not author (&quot;One day from your best week&quot;), proves it with two bars, this week against the best week they have ever had, and puts the move underneath as the way to close it.</p><p class="bf">Frequency goals. The competitor who moves when a record is one day away.<span class="bf__x">Skip if no completed week to beat yet</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="today-today-then">
@@ -1000,11 +989,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">The move as hero, held against the first version of itself from the proof ledger, so the card proves the work has escalated instead of quietly repeating day one forever.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> This face literally cannot exist on day 2, it stays as the move alone until there is a first completed move to compare against. From then on the origin line ages by itself, the day count climbs with no input, and if today&#x27;s move still reads like the first one the card says so plainly rather than hiding it.</p>
-          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>The origin comparison is genuinely un-guessable and lands hardest exactly at day 60, which is the brief&#x27;s test</li><li>Two elements only, the cheapest height in the set, which leaves room for the locked card to breathe</li><li>The day count ages on its own with zero input, so the card is never stale in the trivial sense</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Only the day number changes between escalations, so it can repeat verbatim for weeks and reads as a fixed caption</li><li>It cannot exist at all for the first stretch, and a face that is blank early is a face the user never learns to read</li><li>If the plan regenerated into an unrelated task, &quot;where this started&quot; compares two different jobs and the proof reads false</li></ul></div></div><p class="slot__verdict">Right as the day 60 payoff, too static to carry the everyday face by itself.</p>
-          <p class="slot__data">primaryAction.tiers + action.selectedTier (today&#x27;s move), proofEvents (type action-complete: earliest title and date), clarity.ignitedAt (day count), actionDoneToday()</p>
+          <p class="slot__idea">The move as hero, held against the first version of itself from the proof ledger, so the card proves the work has escalated instead of quietly repeating day one forever.</p><p class="bf">Rep goals months in. The person who fears they are still repeating day one.<span class="bf__x">Skip if the plan is under a month old</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="today-today-toward">
@@ -1025,11 +1013,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">The move as hero, sitting directly on the distance it serves: one thin rail carrying where the user started, where they are now, and the named number from their star, so today&#x27;s small task is visibly attached to the big one.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> The rail moves whenever the number is updated, and the thirty-day delta underneath is the live part: it can read +9, and it can read +0, which is the honest bad news. The baseline tick never moves, so the travelled distance keeps growing behind the fill. If the star has no number in it, the rail and delta stay out and the face falls back to the move alone.</p>
-          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Attaches today&#x27;s small task to the named number visually, which is the app&#x27;s actual thesis in one rail</li><li>The fixed baseline tick keeps travelled distance visible, so progress never looks like nothing on a long goal</li><li>+0 in 30 days is honest bad news the rail cannot hide</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>It is gap-close with the pace date removed, so it keeps that design&#x27;s height cost and null-target fallback while giving up its only un-computable value</li><li>A 30-day delta on a slow goal moves once or twice a month, leaving the card frozen on most mornings</li><li>Repeating the star&#x27;s number here spends the Action swipe on Clarity&#x27;s content</li></ul></div></div><p class="slot__verdict">Should not ship alongside gap-close; it is the same idea with the interesting part taken out.</p>
-          <p class="slot__data">primaryAction.tiers + action.selectedTier, goalProgress.target, goalProgress.unit, goalProgress.baseline, goalProgress.current, goalProgress.history (30-day delta), actionDoneToday()</p>
+          <p class="slot__idea">The move as hero, sitting directly on the distance it serves: one thin rail carrying where the user started, where they are now, and the named number from their star, so today&#x27;s small task is visibly attached to the big one.</p><p class="bf">Quantity up or down with a named number. The dieter 12 lbs into 40.<span class="bf__x">Skip if the goal carries no number</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="today-size-ladder">
@@ -1048,11 +1035,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">Shows today&#x27;s move on the five-step intensity ladder the plan already carries, the steps already climbed filled in behind it, and states plainly what this same move was on day one.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 step one is lit and the second sentence is absent (there is no earlier version to quote). By day 60 the lit step has walked up the ladder and the line reads &quot;On day one this was two people&quot;. It is also the one face that can call out stagnation: if the move never escalated, the ladder shows a single lonely lit step instead of hiding it.</p>
-          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Compresses escalation and current weight into two short rows, the tightest height of all the ladder ideas</li><li>Willing to display stagnation as one lonely lit step rather than dressing it up</li><li>The day-one quote gives the ladder a concrete meaning instead of an abstract scale</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>The lit step follows action.selectedTier, so it drops when the user picks an easier day and the card titled &quot;how big it got&quot; shows it getting smaller</li><li>&quot;On day one this was two people&quot; changes only when the tier changes, which can be never, so most mornings the whole line is a repeat</li><li>Five dots sit next to the word &quot;Moderate&quot; and say the same thing twice in a card with no spare rows</li></ul></div></div><p class="slot__verdict">Right as a compact ladder plus origin face, but only if the escalation is computed from completion history rather than today&#x27;s tier picker.</p>
-          <p class="slot__data">primaryAction.title, primaryAction.tiers {tiny, light, moderate, heavy, extreme}, primaryAction.recommendedTier, action.selectedTier, earliest proofEvents (action-complete) title and date for the day-one version</p>
+          <p class="slot__idea">Shows today&#x27;s move on the five-step intensity ladder the plan already carries, the steps already climbed filled in behind it, and states plainly what this same move was on day one.</p><p class="bf">Attempt and Rep goals. The person whose plan escalates on a fixed ladder.<span class="bf__x">Skip if the move is a fixed-size daily rule</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="today-move-ledger">
@@ -1077,11 +1063,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">Today&#x27;s move with a compact Done control on the same line, and under it the last three moves actually logged, by day, so the card reads as the running record of a climb rather than a single task.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the list holds one entry and the foot line is hidden, so the card is honestly just the move. By day 60 the three rows turn over daily and visibly show the work getting bigger (five people, then ten), and the foot carries a rate, nine of the last ten, which falls when the user drifts. It never becomes a pure lifetime counter, because the rate can go down.</p>
-          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>The foot line carries both a lifetime count and a rate that can fall, so it still says something new at day 200</li><li>Three past titles in the user&#x27;s own words show the work growing from five people to ten without any metric</li><li>Putting Done on the move&#x27;s line saves a full CTA row in the tightest height budget of the set</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Four text rows plus a foot at 350px truncates past titles into fragments, and truncated proof reads as clutter rather than a record</li><li>The small inline Done shrinks the app&#x27;s most-tapped control and breaks the one-primary-action-per-surface rule</li><li>Three recent rows and &quot;nine of the last ten&quot; measure the same recent window twice, so one of them is dead weight</li></ul></div></div><p class="slot__verdict">Right for the day 200 user who wants the record, but the inline Done must go back to a full CTA and titles must be clamped before it ships.</p>
-          <p class="slot__data">primaryAction.title, proofEvents type action-complete (title and date, last three, plus the lifetime count), clarity.ignitedAt for the day span, actionLocalDaysInWindow(10) for the recent rate, actionDoneToday() to flip the Done control</p>
+          <p class="slot__idea">Today&#x27;s move with a compact Done control on the same line, and under it the last three moves actually logged, by day, so the card reads as the running record of a climb rather than a single task.</p><p class="bf">Frequency and Ship goals. The person who wants the record, not the pep talk.<span class="bf__x">Skip if nothing logged yet</span></p>
+          
+          
+          
         </div>
       </figure></div>
     <h3 class="sect__sub">The riskier five</h3>
@@ -1102,11 +1087,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">The card stops reporting and asks one thing, then answers it in type so large the answer is the whole face.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 it reads &quot;Not yet.&quot; until you tap, then flips to &quot;Yes.&quot; with the move struck through and a quiet run count; by day 60 most evenings it is a one word card that says Yes and nothing else.</p>
-          <p class="slot__risk"><b>The risk.</b> An enormous &quot;Not yet.&quot; could read as nagging, but it is the honest state of the day and it is the only sentence on the card that changes, so the eye goes straight to the thing that matters and the move underneath is the answer to the question it just asked.</p><div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>&quot;Not yet.&quot; is the only word on the face that changes, so the eye lands on state before copy</li><li>completion makes the card quieter instead of louder, the rare reward shape in a habit app</li><li>needs only actionDoneToday() and a title, so day 1 renders identically to day 200 with no empty slots</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>the question is rhetorical and the user already knows the answer, so the top row carries zero information</li><li>a healthy 200-day user still faces a giant &quot;Not yet.&quot; for fifteen waking hours a day</li><li>the run count exists only after completion, so a collapsing week produces the same card as a perfect one</li></ul></div></div><p class="slot__verdict">Right for the first thirty days when a user needs a verdict rather than a dashboard, wrong for anyone who wants the card to notice a bad week.</p>
-          <p class="slot__data">actionDoneToday(), primaryAction.title, actionLocalDaysInWindow(7) for the post-completion run line</p>
+          <p class="slot__idea">The card stops reporting and asks one thing, then answers it in type so large the answer is the whole face.</p><p class="bf">Open goals. The person building evidence with no meter to read.<span class="bf__x">Skip if the goal has a number worth showing</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="today-mv-rule">
@@ -1138,11 +1122,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">The whole face is one instrument: a ruler of your waking day with a needle at now, so the size of the move is judged against the daylight actually left.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the needle sits near the left and the card is calm; by evening it crowds the right end and the reading shortens to minutes, and after 60 days you learn to read your own hour of the day before you read the words.</p>
-          <p class="slot__risk"><b>The risk.</b> Putting a clock on an anti-anxiety card is a real swing, but it is the one fact that decides whether tonight is a heavy version or a tiny one, and drawn as a rule rather than a countdown it informs without ticking.</p><div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>makes the tier decision legible instead of arbitrary, which no other variant here attempts</li><li>fixed marks rather than a ticking countdown is genuine restraint on an anxious mechanic</li><li>26px of SVG carries the whole instrument, cheaper in height than any chart variant</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>no waking window exists anywhere in state, so 6a to 11p is invented or a new onboarding question nobody approved</li><li>at 9pm it reads &quot;1h 4m of today left&quot; in the largest type, manufacturing the urgency the app exists to remove</li><li>&quot;Moderate is today&#x27;s size&quot; hangs as a fragment and hands the user the arithmetic of whether that fits the hours above</li></ul></div></div><p class="slot__verdict">Should not ship in this form, because its headline number depends on data the app does not have and its honest evening state is a countdown.</p>
-          <p class="slot__data">device clock against the waking window, primaryAction.title, primaryAction.recommendedTier, actionDoneToday() for the check state</p>
+          <p class="slot__idea">The whole face is one instrument: a ruler of your waking day with a needle at now, so the size of the move is judged against the daylight actually left.</p><p class="bf">Ship and Rep goals on a daily cadence. The person who puts it off until dark.<span class="bf__x">Skip if the cadence is weekly or seasonal</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="today-mv-ordinal">
@@ -1162,11 +1145,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">One enormous number owns the face: not what you have done, but the number today would become if you move.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 it reads 2nd and feels almost absurd, by day 60 it reads 149th and the number itself is the argument, a page number in a book you are visibly still writing.</p>
-          <p class="slot__risk"><b>The risk.</b> A giant number with no chart around it looks like it is bragging, but it is the cheapest possible proof of continuity and it reframes today as an increment of something long rather than a task standing alone.</p><div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>survives a bad week without flinching, since a lifetime count never decreases and cannot become an accusation</li><li>cheapest possible tenure proof, needing only a count and a first date, no chart or thresholds</li><li>reframes tonight as an increment of a long thing rather than a task standing alone</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>a monotonic count is drift-blind, so 149th after forty days of collapse looks identical to 149 unbroken days</li><li>day 1 reads &quot;1st move, if today counts. First one&quot; with nothing to name, so the subline breaks or says today</li><li>the first date comes from the derived proofEvents backfill, so it can confidently name a date the user never lived</li></ul></div></div><p class="slot__verdict">Right for a user past a hundred moves who wants the ledger, hollow and drift-blind for everyone before that.</p>
-          <p class="slot__data">proofEvents type &#x27;action-complete&#x27; (count and first date), primaryAction.title, actionDoneToday()</p>
+          <p class="slot__idea">One enormous number owns the face: not what you have done, but the number today would become if you move.</p><p class="bf">Maintenance goals. The sober person on day 412, where the count is the point.<span class="bf__x">Skip if the goal has no continuous count</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="today-mv-chain">
@@ -1196,11 +1178,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">Today&#x27;s move is drawn as the first link of a line that continues, with the move it sets up shown beneath it so the work reads as a sequence and not a chore.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the lower link is speculative and quiet, and as the loop learns the chain the second line becomes the thing you look at first, because it tells you what today is buying.</p>
-          <p class="slot__risk"><b>The risk.</b> Showing tomorrow on a card built for today is the exact thing most task apps refuse to do, but it is the only element here that answers why bother, and it stays honest because the next link is dimmer in weight, never in legibility.</p><div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>the only variant that answers what today buys, using the loop&#x27;s own text rather than a computed metric</li><li>four short rows, the lowest height of the five for the most forward-looking content</li><li>every character is real user-facing move text with no derived statistic to defend</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>action.loop.nextAction is empty until a day has closed, so day 1 shows a dangling &quot;Sets up&quot; slot or silently changes shape</li><li>no history on the face, so a 200-day user gets the identical card to a day-3 user and tenure lives nowhere</li><li>the &quot;dimmer in weight&quot; next line sits one opacity value from the dim-body-text ban Malik has flagged repeatedly</li></ul></div></div><p class="slot__verdict">Right once the loop has chained a few days, provided day 1 collapses to a single link instead of showing an empty second slot.</p>
-          <p class="slot__data">primaryAction.title, action.loop.chained, action.loop.nextAction, actionDoneToday()</p>
+          <p class="slot__idea">Today&#x27;s move is drawn as the first link of a line that continues, with the move it sets up shown beneath it so the work reads as a sequence and not a chore.</p><p class="bf">Milestone goals. The bar candidate whose steps only make sense in order.<span class="bf__x">Skip if every day repeats the same move</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="today-mv-trace">
@@ -1229,11 +1210,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">A single seismograph line of your moving rate over the last thirty days, with one word telling you which way it is going, and the move sitting under it.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 there is no line yet and the card shows only the move, by day 30 the trace fills the face and by day 60 the word at the top swings between Rising, Holding and Slipping, which is the earliest honest warning of drift.</p>
-          <p class="slot__risk"><b>The risk.</b> A curve on a card this small usually turns into decoration, so this one carries no axes, no grid and no second series, just the shape and the number that names it, and the shape is the only place in the app that shows a decline before a streak breaks.</p><div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>the only face that shows decline before a streak breaks, the earliest honest drift signal available</li><li>the word does the reading, so the curve never asks the user to interpret a shape</li><li>the subline states actual counts, 5 up from 3, so the headline is falsifiable rather than a vibe</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>a 7-day rolling count flips the headline on one skipped Tuesday, so Rising becomes Slipping from a single miss</li><li>the first month has no line, so the card shows an empty 46px box or changes shape while the user is still learning it</li><li>&quot;Slipping&quot; as the largest word lands on exactly the week the user is already losing, and the chart plus three text rows make it the tallest variant</li></ul></div></div><p class="slot__verdict">Right as a weekly or second face for a user past thirty days, too tall and too moody to be the daily card.</p>
-          <p class="slot__data">proofEvents type &#x27;action-complete&#x27; dates over 30 days as a rolling 7 day count, primaryAction.title, actionDoneToday()</p>
+          <p class="slot__idea">A single seismograph line of your moving rate over the last thirty days, with one word telling you which way it is going, and the move sitting under it.</p><p class="bf">Quantity and Frequency goals past a month. The person who drifts without noticing.<span class="bf__x">Skip if under thirty days of history</span></p>
+          
+          
+          
         </div>
       </figure></div>
     <h3 class="sect__sub sect__sub--new">Built for the new philosophy</h3>
@@ -1257,9 +1237,9 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">For a rule, not a task. The line they agreed to, the days it has survived, and a confirm that only makes sense after the day is over.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 it is the rule and an empty confirm. By day 60 the held count is the number they protect, and the button still refuses to be tappable before evening, so the count never lies.</p>
-          <p class="slot__data">primaryAction.tiers (the rule text), action verb = Hold, proofEvents type action-complete for days held</p>
+          <p class="slot__idea">For a rule, not a task. The line they agreed to, the days it has survived, and a confirm that only makes sense after the day is over.</p><p class="bf">Maintenance goals. The person holding a line all day and confirming it at night.<span class="bf__x">Skip if the move is a task, not a rule</span></p>
+          
+          
         </div>
       </figure>
       <figure class="slot" id="today-derived-line">
@@ -1280,9 +1260,9 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">Shows the arithmetic Memento did: the target, the timeline, and the daily number it implies, so today&#x27;s action is visibly the goal divided by the days.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> The daily number RECALCULATES as they fall behind or run ahead, so the line tightens after a bad week and eases after a good one, which is the app coaching rather than reporting.</p>
-          <p class="slot__data">goalProgress target/current/history, deadline flag, derived daily rate</p>
+          <p class="slot__idea">Shows the arithmetic Memento did: the target, the timeline, and the daily number it implies, so today&#x27;s action is visibly the goal divided by the days.</p><p class="bf">Quantity goals with a target and a deadline. The dieter cutting 40 lbs in 6 months.<span class="bf__x">Skip if no target or no deadline</span></p>
+          
+          
         </div>
       </figure></div>
 
@@ -1307,11 +1287,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">The star stays the hero sentence, and directly under it the distance engine turns the number inside that sentence into a live climb: where you are, the weekly delta, and the arrival date the current pace implies.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 it is the statement with 0 of 100 and no date. By day 60 the count has moved, the rail has filled, the weekly delta can be +6 or 0 (bad news is possible), and the projected arrival date moves on its own every time goalProgress.history gets a pulse, so the card is different without the user touching it. When goalProgress.target is null the number block and rail are simply not rendered and the face falls back to the statement plus the tenure line.</p>
-          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Keeps the signed sentence as the hero while adding the only motion a star can honestly have</li><li>Explicitly specifies the null-target fallback instead of leaving a broken face</li><li>A weekly delta of 0 or negative is showable, so the face can carry bad news</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Star sentence plus number row plus rail plus footer is four bands, and a two-line statement overflows the locked height</li><li>The projected date depends on manual pulses most users stop entering, so Nov 12 freezes while still looking live</li><li>Rewriting the star wipes goalProgress.history in code, so the whole lower half vanishes right after the biggest Clarity event</li></ul></div></div><p class="slot__verdict">Right for users whose star names a number and who keep counting; ship only if the null-target fallback is a designed face rather than leftovers.</p>
-          <p class="slot__data">clarity.answers.neutronStar, goalProgress.target, goalProgress.unit, goalProgress.current, goalProgress.history[{day,value}] (pace and projected date), clarity.ignitedAt (Day N)</p>
+          <p class="slot__idea">The star stays the hero sentence, and directly under it the distance engine turns the number inside that sentence into a live climb: where you are, the weekly delta, and the arrival date the current pace implies.</p><p class="bf">Quantity up or down with a target. The founder watching users climb week to week.<span class="bf__x">Skip if the goal names no number</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="star-star-surface">
@@ -1329,11 +1308,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">The statement with one of its own supporting answers brought up underneath it, chosen by what is true today, and the bottom line says plainly why that particular one is showing.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 it shows the concrete version of the star, because nothing has happened yet to react to. By day 60 the lower slot is unpredictable: the core why after a silent stretch, the anti vision when the gap widens, the identity line on a day the record was extended. Same words the user wrote, surfaced at the moment they land hardest, so the face changes without inventing any new data.</p>
-          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>The only face that works when the star names no number, which is a large share of real stars</li><li>Every word on it was typed by the user, so it can never read as AI-generated filler</li><li>The lower slot changes on real triggers without needing a single metric</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>The reason line explaining why this answer surfaced teaches its rule in four viewings and then reads as a machine narrating itself</li><li>coreWhy and antiVision are free text that often run three lines, so the locked height forces a clamp that cuts the user&#x27;s own sentence mid-thought</li><li>Users who one-worded the optional Clarity answers get the same slot repeating forever</li></ul></div></div><p class="slot__verdict">The safest default and the strongest candidate for the null-target majority, if the reason line is cut or reduced to a date.</p>
-          <p class="slot__data">clarity.answers.neutronStar, clarity.answers.coreWhy, clarity.answers.antiVision, clarity.answers.identityLine, clarity.answers.whatSpecifically (the four candidates for the lower slot), clarity.ignitedAt (Day N), actionDoneToday() and actionLocalDaysInWindow(7) (which one surfaces and the reason line)</p>
+          <p class="slot__idea">The statement with one of its own supporting answers brought up underneath it, chosen by what is true today, and the bottom line says plainly why that particular one is showing.</p><p class="bf">Open and maintenance goals. The person who forgets why they signed it.</p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="star-star-spine">
@@ -1352,11 +1330,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">The statement over a one-line spine of its entire life: one mark per day since it was signed, tall and lit where a move landed, flat where none did, so the sentence visibly carries a record instead of floating.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the spine is two marks and reads as a beginning, not a wasteland. By day 60 it is a legible shape with real gaps, the marks compress as tenure grows, the ratio line moves, and the longest silence is a number that can get worse, which is the honest bad news this face is allowed to deliver.</p>
-          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Honest on day 2, where two marks read as a beginning rather than an empty grid</li><li>Longest silence is a number that can get worse, which most faces here cannot deliver</li><li>Runs on consistency data that always exists, with no manual pulse to abandon</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>This is the Consistency face&#x27;s data drawn on the Clarity face, so a swipe between them shows the same record twice</li><li>At 200 days the marks fall under 2px each in a 350px card and become texture, not information</li><li>38 of those days carried a move says nothing about whether the star got any closer</li></ul></div></div><p class="slot__verdict">Cut while Consistency also renders a per-day record; the duplication is fatal on a three-face swipe.</p>
-          <p class="slot__data">clarity.answers.neutronStar, clarity.ignitedAt (signed date, Day N, and the span the spine covers), consistencyStats().counts per-day map restricted to days after ignition (lit marks, the count of active days, and the longest gap)</p>
+          <p class="slot__idea">The statement over a one-line spine of its entire life: one mark per day since it was signed, tall and lit where a move landed, flat where none did, so the sentence visibly carries a record instead of floating.</p><p class="bf">Frequency and maintenance. The person whose whole case is showing up daily.<span class="bf__x">Skip if signed less than two weeks ago</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="star-star-ledger">
@@ -1375,11 +1352,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">The statement sits quieter at the top and the weight moves to the evidence stacked under it: every move ever completed since this star was signed, this week measured against last week, and the most recent one named.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the count is 1 and there is no week comparison yet. By day 60 the total is a real body of work, the this-week/last-week pair can go down as easily as up so the card carries information rather than a trophy, and the named last move is a different sentence nearly every day.</p>
-          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Needs no parsed target, so it works for every star including qualitative ones</li><li>This week against last week can drop, so the number is information rather than a trophy</li><li>The named last move is a different sentence most days without the user doing anything</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Naming the last completed move duplicates the Action face the user just swiped away from</li><li>41 moves in its name measures effort, so someone 41 moves deep and zero users closer gets congratulated for motion</li><li>Demoting the statement to quiet top text abandons the one thing this face exists to hold</li></ul></div></div><p class="slot__verdict">Solid at day 60 and thin at day 1; usable only if the star stays hero-sized and the last-move line is dropped.</p>
-          <p class="slot__data">clarity.answers.neutronStar, proofEvents (type &#x27;action-complete&#x27;) filtered to entries after clarity.ignitedAt for the count and for the latest title + date, consistencyStats().thisWeek, consistencyStats().lastWeek</p>
+          <p class="slot__idea">The statement sits quieter at the top and the weight moves to the evidence stacked under it: every move ever completed since this star was signed, this week measured against last week, and the most recent one named.</p><p class="bf">Open and milestone goals. The person with no number, only moves done.<span class="bf__x">Skip if fewer than two weeks of moves</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="star-star-climb">
@@ -1408,11 +1384,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">The shape of the climb is the hero: an area chart scaled from the number they started at to the number the star names, with the target drawn as the ceiling, so the picture is literally how far up they are.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 is one point sitting on the floor and the chart reads honestly as untouched. By week six the curve has flats and jumps in it, the this-week delta swings, and the best-week reference gives every new week something to beat.</p>
-          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>The curve shows flats and jumps, the only face here that renders the texture of a climb instead of a scalar</li><li>Drawing the target as a ceiling makes remaining distance legible with no arithmetic</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>The signed statement is absent, so the Clarity face stops showing the sentence the whole module exists to produce</li><li>History points land only on days the user counted, and the path spaces them evenly, drawing a curve that misstates pace</li><li>Day 2 is a flat line on the floor that reads as a broken widget, and a null target renders nothing at all</li></ul></div></div><p class="slot__verdict">Should not ship as the Clarity face; it is a goal-tracker chart occupying Clarity&#x27;s slot.</p>
-          <p class="slot__data">goalProgress.history (the full series), goalProgress.baseline, goalProgress.current, goalProgress.target, goalProgress.unit, clarity.ignitedAt</p>
+          <p class="slot__idea">The shape of the climb is the hero: an area chart scaled from the number they started at to the number the star names, with the target drawn as the ceiling, so the picture is literally how far up they are.</p><p class="bf">Quantity up with a start and a target. The founder who wants the shape of it.<span class="bf__x">Skip if no starting number recorded</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="star-star-arrival">
@@ -1438,11 +1413,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">Leads with the projected arrival date computed from their own pace, so the headline is a fact that moves on its own every night, and the rail underneath shows where they started against where they are.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 there is no pace yet, so the date slot holds the target count and the rail is empty with only the baseline tick. From the second pulse the date appears and then walks forward or backward daily, and the cyan shift line can read later than a week ago, which is the face&#x27;s honest bad news.</p>
-          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>A headline that moves on its own every night is the clearest answer to the change-not-state brief</li><li>The shift line can invert to later than a week ago, which gives the face real teeth</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>baseline is set at the first pulse rather than at signing, so 12 when you signed it is simply false for anyone who counted late</li><li>Star, date, shift, rail and footer is five bands, which will not fit the locked height with a two-line statement</li><li>A date extrapolated from two or three manual pulses projects a fantasy the user learns to distrust</li></ul></div></div><p class="slot__verdict">Strong for a number star with a disciplined counter, but the date must stay hidden until a real minimum of pulses exists.</p>
-          <p class="slot__data">goalProgress.target, goalProgress.unit, goalProgress.baseline, goalProgress.current, goalProgress.history (pace and the same pace recomputed a week back), clarity.answers.neutronStar</p>
+          <p class="slot__idea">Leads with the projected arrival date computed from their own pace, so the headline is a fact that moves on its own every night, and the rail underneath shows where they started against where they are.</p><p class="bf">Quantity goals with a deadline. The dieter racing a date they picked.<span class="bf__x">Skip if pace too new or too flat to project</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="star-star-count">
@@ -1467,11 +1441,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">Treats the pulse as the ritual: the count leads, ten weekly gains sit underneath with a hairline ceiling at their best week, and the face says out loud how long it has been since they last counted.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the strip is empty and the card asks for the first count once. By week ten the bars have a real profile, the ceiling is a beatable reference that only moves when they beat it, and the staleness line grows into the card&#x27;s honest bad news.</p>
-          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>The only face that repairs its own dependency by collecting the pulse every other number face silently assumes</li><li>The staleness line surfaces exactly when the rest of the data has gone worthless</li><li>The best-week ceiling only moves when beaten, so it stays a real reference</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>A button inside a horizontally swiped card invites mistaps during the drag</li><li>Day 2 is an empty bar strip next to a prompt to count, the weakest first impression of the nine</li><li>Ten weekly bars means roughly seventy days before the strip has any profile</li></ul></div></div><p class="slot__verdict">The Update affordance should exist somewhere regardless, but as a face this is a data-entry form parked on the home screen.</p>
-          <p class="slot__data">goalProgress.current, goalProgress.target, goalProgress.history (weekly gains, best week, this week), goalProgress.updatedAt, clarity.answers.neutronStar</p>
+          <p class="slot__idea">Treats the pulse as the ritual: the count leads, ten weekly gains sit underneath with a hairline ceiling at their best week, and the face says out loud how long it has been since they last counted.</p><p class="bf">Check goals on a cadence. The weekly weigh-in, the beekeeper counting hives.<span class="bf__x">Skip if nothing gets measured on a schedule</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="star-star-revision">
@@ -1493,11 +1466,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">The current statement held up against the one it replaced, so the face is a record of a person revising their aim rather than a sentence that never changes.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Before any rewrite it shows the star, the signing tenure, and the identity line in the lower slot. The moment a star is replaced the face becomes a comparison: which version this is, the exact words of the one before it, and how long that one lasted, which is a number the current star is quietly chasing. Every rewrite adds another layer, so this is the only face that gets richer specifically because the goal changed.</p>
-          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Gets richer from the one event that resets every other face, a rewritten star</li><li>It lasted 88 days is a real number to chase and needs no parse and no pulse</li><li>clarity.history already stores completedAt and neutronStar, so nothing new has to be built</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Most users never rewrite, so it lives permanently in its fallback of star plus tenure plus identity line, which is static</li><li>Two full statements plus a label in one locked height forces a clamp, and clamping the old star ruins the comparison</li><li>Between rewrites the content is frozen for months at a time</li></ul></div></div><p class="slot__verdict">Excellent as a moment, wrong as a permanent face; make it a state the Clarity face enters for a stretch after a rewrite.</p>
-          <p class="slot__data">clarity.answers.neutronStar, clarity.history[] (previous star text, its replacement date, and its lifespan in days), clarity.ignitedAt (days since the current one was signed), clarity.answers.identityLine (fills the lower slot before any revision exists)</p>
+          <p class="slot__idea">The current statement held up against the one it replaced, so the face is a record of a person revising their aim rather than a sentence that never changes.</p><p class="bf">Any type, after a rewrite. The person who has changed their aim once already.<span class="bf__x">Skip if the star has never been revised</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="star-star-pot">
@@ -1519,11 +1491,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">Leads with distance travelled rather than distance remaining, then a notched rail where the dim head is where they began and the cyan is ground they personally covered, so the card is about what they added, not what they lack.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the cyan is zero width and the line reads that the count is set but not moved, which is true and not a scold. As pulses land the cyan block visibly eats the notches one at a time, and the halfway notch is a real threshold to cross.</p>
-          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Leading with the gain reframes without inventing data and never scolds a slow user</li><li>The notched rail turns the halfway crossing into a visible event</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>started 12 mislabels baseline, which is the first value ever counted and not the value at signing</li><li>Day 2 is a zero-width bar and a line saying the count has not moved, a face with nothing on it</li><li>Hiding distance remaining reads as the app flattering the user, and the star is demoted to the bottom line</li></ul></div></div><p class="slot__verdict">Right for long grinding targets, but only if the baseline label states when counting actually began.</p>
-          <p class="slot__data">goalProgress.baseline, goalProgress.current, goalProgress.target, goalProgress.unit, clarity.answers.neutronStar</p>
+          <p class="slot__idea">Leads with distance travelled rather than distance remaining, then a notched rail where the dim head is where they began and the cyan is ground they personally covered, so the card is about what they added, not what they lack.</p><p class="bf">Quantity down. The dieter 6 lbs into 40 who needs credit for the 6.<span class="bf__x">Skip if no starting number recorded</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="star-star-dial">
@@ -1554,11 +1525,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">A horizontal split: a dial carrying the fraction covered with a mark where they started, and beside it the single number that matters, how many are left, with the pace now against the pace a month ago.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the ring is empty, the side reads the full target as distance left and the pace line stays absent. Later the ring fills, the start mark drifts visibly behind them, and the pace comparison is the part that can drop, which is what keeps the face capable of bad news.</p>
-          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Pace now against pace a month ago is the most decision-useful number in this whole set</li><li>The start mark on the ring shows covered ground without spending a second element</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>A 104px ring beside a large numeral reads as a fitness dashboard rather than Memento</li><li>The percentage and the remaining count state the same fact twice, wasting a third of the face</li><li>The statement never appears, and the one before it ran 96 spends attention on a dead goal</li></ul></div></div><p class="slot__verdict">Cut; harvest the pace-now-versus-then line into whichever number face ships.</p>
-          <p class="slot__data">goalProgress.baseline, goalProgress.current, goalProgress.target, goalProgress.unit, goalProgress.history (trailing weekly rate now vs a month ago), clarity.ignitedAt, clarity.history</p>
+          <p class="slot__idea">A horizontal split: a dial carrying the fraction covered with a mark where they started, and beside it the single number that matters, how many are left, with the pace now against the pace a month ago.</p><p class="bf">Quantity goals near the end. The person counting down what is left.<span class="bf__x">Skip if no target number to subtract from</span></p>
+          
+          
+          
         </div>
       </figure></div>
     <h3 class="sect__sub">The riskier five</h3>
@@ -1586,11 +1556,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">The card is a core sample of everything you have ever aimed at: each star you have held is a layer whose thickness is the number of days you held it, newest on top, with the live star named beside its own thin bright band.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> On day 2 the top layer is a sliver against the mass of the stars you abandoned, and by day 60 it has grown into the thickest band on the column, which is the whole argument.</p>
-          <p class="slot__risk"><b>The risk.</b> It shows the user their own record of changing their mind, which stings, but that sting is exactly what makes a young layer worth thickening and it is the only surface in the app that proves a star was ever kept.</p><div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Thickness accrues daily with zero user input, so keeping a star is the only way to make the card look better</li><li>Uses clarity.history and ignitedAt as they already exist, no new tracking, no user-entered number</li><li>The only variant where a 200-day user gets a visibly different card than a 20-day user</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Day 1 has one layer one day thick and &#x27;days aiming&#x27; reads 1, so the card is a hairline on the exact day the ignition ceremony just ended</li><li>The abandoned 121d band is the largest object on the face, so the eye lands first on the thing he quit</li><li>Past labels are hand-placed at top:70 and top:140 against a narrow body column, so a long star wrapping to four lines collides with them and a fifth previous star has nowhere to go</li></ul></div></div><p class="slot__verdict">Right for a user two or three stars deep; dead weight through the first sixty days, which is exactly when the card has to earn its keep.</p>
-          <p class="slot__data">clarity.answers.neutronStar, clarity.ignitedAt (Day 34), clarity.history[] (previous star statements and the days each was held), summed days aiming (202)</p>
+          <p class="slot__idea">The card is a core sample of everything you have ever aimed at: each star you have held is a layer whose thickness is the number of days you held it, newest on top, with the live star named beside its own thin bright band.</p><p class="bf">Any type, on a long account. The person on their third or fourth star.<span class="bf__x">Skip if only one star has ever been held</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="star-star-meridian">
@@ -1608,11 +1577,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">One horizon line across the face with the star written above it and the life you are refusing written below it, and the line rides at the height you have actually reached between the two.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> On day 2 the line sits low, close to the sentence you are running from, and by day 60 it has climbed most of the way to the star with the anti vision pushed into the floor of the card.</p>
-          <p class="slot__risk"><b>The risk.</b> Putting the anti vision on the home card every single day is confrontational and could feel heavy, but it is the only reading that makes the line&#x27;s height mean something rather than being one more progress bar.</p><div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>One computed line, 6,400 of 10,000, with nothing for the user to work out</li><li>Height of the line and distance to the floor sentence are readable in under a second without reading either sentence</li><li>Compact, costs less vertical space than any variant except Folio</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>goalProgress.target is null whenever the star names no number, and the distance law forces the surface dormant, leaving two sentences and a decorative rule</li><li>Day 1 has current equal to baseline, so a brand new user&#x27;s first home card places him level with the life he just said he refuses</li><li>A flat month renders as a frozen bar he reads daily, and a falling metric like churn drags the line back toward the anti vision for reasons he does not control</li></ul></div></div><p class="slot__verdict">Right for a numeric star in an active climb; should not be the default face because a null target or a flat month leaves it inert.</p>
-          <p class="slot__data">clarity.answers.neutronStar, clarity.answers.antiVision, goalProgress.baseline / .current / .target / .unit (6,400 of 10,000)</p>
+          <p class="slot__idea">One horizon line across the face with the star written above it and the life you are refusing written below it, and the line rides at the height you have actually reached between the two.</p><p class="bf">Maintenance and quantity down. The person refusing the life written below.<span class="bf__x">Skip if open goals, it fakes a meter</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="star-star-folio">
@@ -1629,11 +1597,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">No chrome at all: the star set as a title page, sized to fill the whole face, with a single foot line carrying the day and the distance in tabular numerals.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Nothing about the setting changes from day 2 to day 60 except the foot, where the day count climbs and the two numbers close on each other, so the sentence gains weight by being the one thing that held still.</p>
-          <p class="slot__risk"><b>The risk.</b> It is almost the face that already exists, only louder, so it lives or dies on the typography being genuinely beautiful, and the payoff is that a sentence at this size stops being a label and starts being a commitment you read every time you unlock the phone.</p><div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>No edge case breaks it: no history, no goal number, day 1 and day 400 all render</li><li>Length-derived type size gives a short star real physical presence instead of a fixed label size</li><li>Cheapest to ship and the least likely to read as AI-generated, since it adds no new visual vocabulary</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Day 34 and day 340 differ by two digits in the foot, so the design has no answer to the question this variant round was called to solve</li><li>A 120 character star drops the type to body size and the title page premise collapses into a paragraph with a footer</li><li>The two foot items read as the only interactive elements on the face and both are inert, which trains a tap that does nothing</li></ul></div></div><p class="slot__verdict">Right as the safe fallback that never breaks; wrong as the answer to making a held star gain weight over time.</p>
-          <p class="slot__data">clarity.answers.neutronStar (type size derived from its length), clarity.ignitedAt for Day 34, goalProgress.current / .target for the right foot</p>
+          <p class="slot__idea">No chrome at all: the star set as a title page, sized to fill the whole face, with a single foot line carrying the day and the distance in tabular numerals.</p><p class="bf">Any type in its first week. The person who wants the sentence and nothing else.<span class="bf__x">Skip if week two, it shows state not change</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="star-star-plumb">
@@ -1659,11 +1626,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">One instrument and nothing else: the star is the fixed point at the top, a plumb line hangs from it, and the bob swings off true by how long it has been since you moved in the star&#x27;s name.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> On day 2 the line hangs dead straight against its reference and the card reads as still, and by day 60 you have learned to check one thing at a glance, whether the line is plumb or swung, long before you read the number.</p>
-          <p class="slot__risk"><b>The risk.</b> It encodes the whole state in an angle rather than a word, which is a bet that the user learns the instrument, and that bet pays because an angle is readable in a fifth of a second where a sentence never is.</p><div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Angle reads faster than any sentence, so the state is known before the eye reaches the text</li><li>Needs only ignitedAt and action-complete timestamps, so it works with a star that names no number</li><li>Day 1 renders correctly as a dead straight line rather than an empty or placeholder state</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>The good state is a plain vertical line, so the card looks most interesting on his worst week and dullest when he is doing everything right</li><li>The swing has to cap, and past the cap thirty idle days looks the same as nine, killing the read where the alarm matters most</li><li>A 92x168 instrument eats half the face to encode one scalar the meta line already states in words as &#x27;moved 3 days ago&#x27;</li></ul></div></div><p class="slot__verdict">Right for a many-times-a-day checker who wants status without reading; expensive in face area for a single number stated twice.</p>
-          <p class="slot__data">clarity.answers.neutronStar, clarity.ignitedAt (Day 34), proofEvents of type action-complete attributed to the current star for days since the last move</p>
+          <p class="slot__idea">One instrument and nothing else: the star is the fixed point at the top, a plumb line hangs from it, and the bob swings off true by how long it has been since you moved in the star&#x27;s name.</p><p class="bf">Hold and daily frequency. The person whose failure mode is going quiet.<span class="bf__x">Skip if weekly or seasonal cadence, silence is normal</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="star-star-vigil">
@@ -1682,11 +1648,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">A face that holds its tongue: most days it is the star alone in an empty card, and it only takes over the layout when something real has happened, here nine days of silence stated at full size with the star demoted to a footnote.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> On day 2 there is nothing to say so the card is one quiet sentence in a lot of space, and by day 60 the user has learned that when this face rearranges itself, it is worth stopping for.</p>
-          <p class="slot__risk"><b>The risk.</b> Deliberately wasting a third of the home screen on most days looks like an empty feature, and it works because scarcity is what gives the alarm its authority, a card that speaks every day is never heard.</p><div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>The layout itself carries the information, so the card is read before any word on it is read</li><li>Nine days of silence is the sharpest honest statement in the set and it names the absence the retention plan admits is currently painless</li><li>Runs entirely on proofEvents, ignitedAt and goalProgress milestones, no new fields</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>The quiet state is 90% of days and is asserted rather than designed, and the mobile card flex-grows to fill, so most days it produces the dead space he has killed repeatedly</li><li>The largest type on the face counts nothing happening, so a bad week gets the loudest typography while the star drops to a footnote at the moment it is most needed</li><li>Every new trigger is a new layout, so the surface grows without bound and one trigger firing on something trivial devalues the alarm permanently</li></ul></div></div><p class="slot__verdict">Should not ship as a standalone variant; it is a state another face enters, not a face, since it leaves most days undesigned.</p>
-          <p class="slot__data">proofEvents attributed to the current star for the silence count, clarity.answers.neutronStar, plus the same trigger set for milestones crossed in goalProgress and star age from clarity.ignitedAt</p>
+          <p class="slot__idea">A face that holds its tongue: most days it is the star alone in an empty card, and it only takes over the layout when something real has happened, here nine days of silence stated at full size with the star demoted to a footnote.</p><p class="bf">Maintenance and hold. The person who wants nothing from the app most days.<span class="bf__x">Skip if they need progress visible every day</span></p>
+          
+          
+          
         </div>
       </figure></div>
     <h3 class="sect__sub sect__sub--new">Built for the new philosophy</h3>
@@ -1711,9 +1676,9 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">For goals with nothing to count. The statement, then the things actually done in its name, in their own words. No bar, no percentage, ever.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 shows one entry and reads as a beginning. By day 60 the list has turned over dozens of times and the count underneath is the only number, because a meter on an open goal is a lie.</p>
-          <p class="slot__data">clarity.answers.neutronStar, proofEvents titles since ignition</p>
+          <p class="slot__idea">For goals with nothing to count. The statement, then the things actually done in its name, in their own words. No bar, no percentage, ever.</p><p class="bf">Open goals. The father with nothing countable, only things actually done.</p>
+          
+          
         </div>
       </figure></div>
 
@@ -1759,11 +1724,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">Leads with what the streak is actually made of over the last fourteen days, including the days that were covered rather than kept, so the number is never a lie and the grace bank becomes a visible resource.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the chain is two bars and empty track, and the bank line is absent because nothing is banked yet. Over weeks the texture changes constantly, quiet days and covered days move through the window, and the bank fills to two, empties when it is spent, then refills, so the right side of the head is a state that genuinely changes without any input.</p>
-          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>The 14 cell chain exposes the days the code silently bridged, so the hero number stops being a quiet lie</li><li>streak.grace.bank already exists in state and is surfaced nowhere else, so this face shows a real resource</li><li>The strip changes texture daily as covered and quiet days move through the window, with no user input</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Three cell states plus a shield icon is more legend than a 150px glance card can teach, and the part day reads as a covered day</li><li>The footer names one covered weekday and repeats it for six days, which reads as nagging after a miss</li><li>For the first thirteen days the strip is mostly empty track with no bank line, so the idea is invisible during onboarding</li></ul></div></div><p class="slot__verdict">Right for the user who already distrusts streak apps for lying; ship it only if grace becomes visible elsewhere too.</p>
-          <p class="slot__data">consistencyStats().current, consistencyStats().counts (last 14 days, main action vs support only), streak.grace.bank, streak.grace.used[iso]</p>
+          <p class="slot__idea">Leads with what the streak is actually made of over the last fourteen days, including the days that were covered rather than kept, so the number is never a lie and the grace bank becomes a visible resource.</p><p class="bf">Maintenance goals. The sober person who quits the app the day a streak breaks.<span class="bf__x">Skip if no grace days exist yet</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="consistency-run-rank">
@@ -1792,11 +1756,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">The streak keeps the hero slot, but the fact beside it is its rank among every run this user has ever had, plotted against a beatable neighbour instead of an unreachable lifetime peak.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the run is a sliver, the rank reads last and the copy names a small nearby run to pass. By day 60 the fill has crossed one or two notches, the rank has climbed, and the named target changes each time a previous run is overtaken, so the same card states a different beatable goal every few weeks.</p>
-          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Aiming at the second longest run gives a target five days away instead of a 103 day wall</li><li>The named target rewrites itself each time a run is overtaken, so the sentence changes without input</li><li>The footer maps straight onto thisWeek and lastWeek with no derivation</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Rank needs strict run lengths rebuilt from counts, which will disagree with the bridged current streak printed above them</li><li>On day 2 the user is first, last, and only, so the rank line is meaningless exactly when it is most needed</li><li>After a break the rank drops, which is the one moment this face should not be ranking anybody</li></ul></div></div><p class="slot__verdict">Right for a competitive user in months two through six, weakest at both ends of the lifecycle.</p>
-          <p class="slot__data">consistencyStats().current, consistencyStats().longest, run lengths derived from consistencyStats().counts (rank and second-longest), consistencyStats().thisWeek, consistencyStats().lastWeek</p>
+          <p class="slot__idea">The streak keeps the hero slot, but the fact beside it is its rank among every run this user has ever had, plotted against a beatable neighbour instead of an unreachable lifetime peak.</p><p class="bf">Frequency goals. The competitive restarter who has stopped and started many times.<span class="bf__x">Skip if first run ever, nothing to rank against</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="consistency-weekday-shape">
@@ -1822,11 +1785,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">Aggregates every mark you have ever made by day of the week, so the card names the day that carries you and the day that leaks, with seven bars underneath as the proof.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Below about three weeks it stays dormant because the sample is too thin to claim anything; after that the ranking is genuinely unpredictable, the percentages move a little every day, and the weak day can change, which turns the face into a finding rather than a total.</p>
-          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Names a leak day that no other surface in the app can tell the user</li><li>All time percentages barely move after one bad Sunday, so the face survives a bad week intact</li><li>The seven descending rows read as one shape before any number is read</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Seven rows of label, track, and percent is the tallest layout of the ten and will fight the locked height</li><li>Three dormant weeks kills the face during the period the user opens the app most</li><li>By day 200 the ranking is frozen, so the finding degenerates back into a static readout</li></ul></div></div><p class="slot__verdict">Strong as a monthly insight inside the Consistency module, weak as a face that must earn a daily glance.</p>
-          <p class="slot__data">consistencyStats().counts grouped by weekday (share of each weekday with at least one mark), consistencyStats().totalActiveDays</p>
+          <p class="slot__idea">Aggregates every mark you have ever made by day of the week, so the card names the day that carries you and the day that leaks, with seven bars underneath as the proof.</p><p class="bf">Frequency goals. The gym-3x person who leaks the same weekday every week.<span class="bf__x">Skip if under six weeks of marks</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="consistency-made-of">
@@ -1857,11 +1819,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">Holds the streak but answers a question the current face never does, which is what the last thirty days were actually filled with, using the typed proof spine so the mix itself becomes the story.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the bar is a single sliver of moves and the comparison line stays hidden because there is no prior thirty. By day 60 the proportions shift as reflection and deep work accumulate, and the footer compares each slice against the previous thirty days, which means the card can report a slice going down.</p>
-          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Answers what the last thirty days were filled with, a question the streak never touches</li><li>The footer is allowed to report a slice going down, which most of these faces cannot</li><li>One stacked bar plus three keys is compact for the amount it reports</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Three coloured slices force two invented accent colours onto a surface committed to a single spring green</li><li>Support activity is capped at 20% of a day in the scoring code, so the mix grades work that barely counts toward the streak above it</li><li>No prior thirty day window exists for the first month, so the only changing line on the card is absent</li></ul></div></div><p class="slot__verdict">A reasonable audit view, wrong for the home card, because it makes app activity look like the thing being measured.</p>
-          <p class="slot__data">consistencyStats().current, consistencyStats().last30, proofEvents filtered to the last 30 days by type (action-complete, reflection-save, deepwork-commit), same counts for the prior 30 day window</p>
+          <p class="slot__idea">Holds the streak but answers a question the current face never does, which is what the last thirty days were actually filled with, using the typed proof spine so the mix itself becomes the story.</p><p class="bf">Open goals. The better father with no number, who needs evidence of what he did.<span class="bf__x">Skip if only one action type logged</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="consistency-rate-drift">
@@ -1889,11 +1850,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">The streak stays, but the information is the rolling thirty day rate drawn over twelve weeks against the previous thirty, which is the one number on this face that is allowed to fall.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 there is no curve, only the number and a single point. As weeks accumulate the line grows a shape, and by day 60 the card is genuinely unpredictable because the rate moves with every day that ages out of the window, whether or not the user opens the app.</p>
-          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Keeps the streak hero while adding the one number allowed to fall, so bad news lands without deleting the user&#x27;s pride</li><li>The curve moves on its own as days age out of the window, even on days the app is never opened</li><li>The twelve week resample is cheap from counts and is the densest information per pixel here</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>A rising 42 beside a falling 6 points is two true readings the user has to reconcile at a glance</li><li>pct30 moves in 3.3 point jumps, so the line looks jagged and the delta flips sign every few days</li><li>Area fill, dashed reference, end dot, and two numbers is a lot of chart under a 42, with no x axis anchor</li></ul></div></div><p class="slot__verdict">The best honest signal option for a paying mid life user, but the streak and the rate must stop arguing on one line.</p>
-          <p class="slot__data">consistencyStats().current, consistencyStats().pct30, rolling 30 day rate resampled weekly from consistencyStats().counts, the prior 30 day rate from the same counts</p>
+          <p class="slot__idea">The streak stays, but the information is the rolling thirty day rate drawn over twelve weeks against the previous thirty, which is the one number on this face that is allowed to fall.</p><p class="bf">Quantity down goals. The dieter months in, whose effort fades before the scale shows it.<span class="bf__x">Skip if fewer than 60 days of history</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="consistency-returns">
@@ -1923,11 +1883,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">Keeps the number but pairs it with the honest statistic underneath a streak, which is how many times this person has come back after stopping, with the thirty day rate carried by the ring so the hero is not the only thing worth reading.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the ring is nearly empty and the returns count is zero, so the rail shows only the start date. Every break and recovery adds a return and can widen the longest gap, the ring moves with the rolling thirty, and by day 60 the rail is a short history that no calendar could reproduce.</p>
-          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>The arc reads current run against best run with no number reading at all</li><li>Returns after a break is the rare stat that rises when the user fails and recovers</li><li>Ring plus rail packs six facts into one row without a tall stack</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Four near identical small grey lines beside the ring give the eye no second stop after the 42</li><li>Measuring the ring against a 103 day best leaves a committed user at 40% full for months, reading as failing</li><li>Longest gap 4 days parks the user&#x27;s worst behaviour permanently on the home screen</li></ul></div></div><p class="slot__verdict">The returns framing is right and the rail is doing too much; keep the idea, cut three of the four lines.</p>
-          <p class="slot__data">consistencyStats().current, consistencyStats().last30, consistencyStats().pct30, consistencyStats().longest, consistencyStats().totalActiveDays, gaps and returns derived from consistencyStats().counts, first proof event date</p>
+          <p class="slot__idea">Keeps the number but pairs it with the honest statistic underneath a streak, which is how many times this person has come back after stopping, with the thirty day rate carried by the ring so the hero is not the only thing worth reading.</p><p class="bf">Frequency goals. The restarter who reads one missed day as total failure.<span class="bf__x">Skip if never missed a day yet</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="consistency-week-rhythm">
@@ -1953,11 +1912,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">Leads with the shape of the current week as seven columns whose height is that day&#x27;s number of marks, headlined by the honest week-over-week delta rather than the streak.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> On day 2 it is one short column and no delta yet; by day 60 the seven columns carry a visible personal rhythm, the +/- against last week flips both ways as the week fills, and the streak has been demoted to a single quiet line at the bottom.</p>
-          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Demoting the streak to a footer line is the boldest call in the set and the only layout that survives a broken streak</li><li>The week resets, so the face never becomes a wall of accumulated failure</li><li>The plus or minus versus last week delivers a verdict the user does not have to compute</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>counts stores a capped weighted day score, so real columns are near binary and the 33% and 66% heights shown here will almost never occur</li><li>thisWeek and lastWeek are rolling 7 and 14 day windows in code, so the delta will not match the Mon to Sun columns above it</li><li>Every Monday the face is one column and no delta, the emptiest state of any variant, weekly and forever</li></ul></div></div><p class="slot__verdict">Right for a first month user, but it is at its worst every single Monday, which is a permanent tax.</p>
-          <p class="slot__data">consistencyStats().counts (per-day marks for the current week), consistencyStats().thisWeek, consistencyStats().lastWeek, consistencyStats().current, consistencyStats().longest</p>
+          <p class="slot__idea">Leads with the shape of the current week as seven columns whose height is that day&#x27;s number of marks, headlined by the honest week-over-week delta rather than the streak.</p><p class="bf">Frequency goals. The daily writer who wants this week judged, not this year.<span class="bf__x">Skip if weekly or seasonal cadence plans</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="consistency-year-ribbon">
@@ -1976,11 +1934,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">The whole year as 52 slim columns, each one week&#x27;s active days, with the densest stretch brightened and named in the line above it so the picture and the sentence say the same thing.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 is a single stub column against an empty year; every week adds a column, the named densest stretch moves as new peaks form, and by day 200 the card is a portrait of the year&#x27;s terrain that no other surface in the app shows.</p>
-          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>52 columns of terrain exists nowhere else in the app and genuinely rewards a 200 day user</li><li>Tying a named stretch to the brightened columns makes the card say something instead of only showing something</li><li>The shape changes all year with no interaction at all</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>The 187 headline uses totalActiveDays, which is lifetime in the code and not this year, so the sentence is wrong as specified</li><li>Day 2 is one stub against 51 empty slots, the harshest empty state of the ten</li><li>At 350px each week is about 4px wide, too narrow to distinguish 3 active days from 4</li></ul></div></div><p class="slot__verdict">An excellent year in review surface, wrong as a face that must work on day 2 and during a slump.</p>
-          <p class="slot__data">consistencyStats().yearConsistency, consistencyStats().counts (weekly active-day totals and the densest run), consistencyStats().totalActiveDays</p>
+          <p class="slot__idea">The whole year as 52 slim columns, each one week&#x27;s active days, with the densest stretch brightened and named in the line above it so the picture and the sentence say the same thing.</p><p class="bf">Maintenance goals. The year-two holder with enough history to have a best stretch.<span class="bf__x">Skip if under a year in the app</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="consistency-rate-curve">
@@ -2008,11 +1965,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">Leads with the rate, not the run: what share of the last 30 days had a mark, drawn as a curve against a dashed line marking the 30 days before it, so the face can deliver bad news.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 has no curve to draw and the face stays dormant; from about week five the line has real terrain, and every day the rolling window moves the number and the delta on its own, which means it can fall as well as rise.</p>
-          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Leading with 61% means a single missed day cannot zero the hero number</li><li>The dashed prior window line carries the comparison without a second chart or number block</li><li>Using currentColor for the curve inherits the surface accent instead of inventing one</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Near identical to rate-drift with the streak removed, so shipping both is a duplicate face behind two dots</li><li>A percentage headlined on the home reads as a grade, and 61% is a grade the user can resent daily</li><li>The smooth bezier implies continuous change from a metric that actually moves in 3.3 point steps</li></ul></div></div><p class="slot__verdict">The more honest sibling of rate-drift; pick one of the two, and pick this one only if the streak is being demoted app wide.</p>
-          <p class="slot__data">consistencyStats().last30, consistencyStats().pct30, consistencyStats().counts (rolling 30-day rate history and the prior 30-day window), consistencyStats().totalActiveDays, consistencyStats().current</p>
+          <p class="slot__idea">Leads with the rate, not the run: what share of the last 30 days had a mark, drawn as a curve against a dashed line marking the 30 days before it, so the face can deliver bad news.</p><p class="bf">Quantity up goals. The founder who wants the face to tell him he is slowing down.<span class="bf__x">Skip if cadence plans, rest days read as misses</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="consistency-comeback">
@@ -2037,11 +1993,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">Leads with returns instead of runs: how many times you came back after a gap, sat beside a calm rolling six-week grid where density is white steps and days that have not happened yet are nearly invisible so the card never shows a wall of failure.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 shows a mostly empty grid and a zero that is honest; the comeback count is the one number that goes up when you miss and return, so unlike a streak it survives a bad week and by day 60 the grid has legible texture, gap length and recovery speed.</p>
-          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Never a fourth is the strongest line of copy in the set and it is derived from real gap data, not written</li><li>Rendering future days as nearly invisible avoids the wall of failure the full heatmap creates</li><li>The headline number rises after a miss, so the face rewards the return rather than scoring the break</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>The left number plus right grid split breaks the shared vertical skeleton the other two swipe faces use</li><li>A big 9 beside 42 shaded cells gives the eye two competing heroes and no reading order</li><li>Comeback counting needs strict break detection while the streak bridges a missed day and treats grace days as active, so two definitions of break coexist</li></ul></div></div><p class="slot__verdict">The best framing on this face for someone who has already broken a streak once, but the layout must fold into the shared skeleton before it ships.</p>
-          <p class="slot__data">consistencyStats().counts (rolling 6-week window and gap detection for comeback count, longest gap, recovery time), consistencyStats().last30</p>
+          <p class="slot__idea">Leads with returns instead of runs: how many times you came back after a gap, sat beside a calm rolling six-week grid where density is white steps and days that have not happened yet are nearly invisible so the card never shows a wall of failure.</p><p class="bf">Maintenance goals. The person in recovery who cannot be shown a wall of failure.<span class="bf__x">Skip if unbroken record, returns reads zero</span></p>
+          
+          
+          
         </div>
       </figure></div>
     <h3 class="sect__sub">The riskier five</h3>
@@ -2062,11 +2017,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">The streak is demoted to a footnote and the face is one enormous number: total days you ever showed up, against every day you have owned Memento.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 reads &quot;2 of 3&quot; and feels almost absurd, which is the point; by day 60 it is &quot;48 of 61&quot; and by year three it is a four-figure body of work with a small percentage that quietly tells you whether you are getting better or coasting.</p>
-          <p class="slot__risk"><b>The risk.</b> It deliberately takes the huge flame streak away from the founder&#x27;s current design and replaces it with the number that cannot break, which can feel less urgent day to day, but it is the only consistency figure that never punishes you and it is the one that compounds into identity.</p><div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>The denominator is days owned, so a missed day can never subtract from the hero figure and the face stays safe to open after a bad week</li><li>412 of 1,096 carries a legible ratio without printing a percentage the user has to defend to himself</li><li>Demoting the streak to a footer line retires the flame without deleting the number people still ask for</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Day 2 renders a hero-sized 2 next to &quot;of 3&quot; and the line &quot;never goes down&quot; is a claim about nothing, so the launch state reads as a broken widget</li><li>A sloppy first month drags the lifetime ratio for years and no later run can visibly repair it, the opposite of the compounding it promises</li><li>Nothing on the face moves fast enough to say whether this week was good, so there is no reason to look at it twice in a month</li></ul></div></div><p class="slot__verdict">Right for a user two years in who wants a body of work, wrong as the face a new user meets.</p>
-          <p class="slot__data">consistencyStats().totalActiveDays, current, longest; days since the earliest proofEvent (derived, no new tracking); actionDoneToday() drives the +1 today.</p>
+          <p class="slot__idea">The streak is demoted to a footnote and the face is one enormous number: total days you ever showed up, against every day you have owned Memento.</p><p class="bf">Milestone goals. The long-haul builder who counts total days, not current runs.<span class="bf__x">Skip if week one, the total reads tiny</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="consistency-water">
@@ -2091,11 +2045,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">The card is a level: one horizon line drawn edge to edge at the height of your 30 day rate, a fainter line lower down at your worst 30 day stretch this year, and nothing else.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the horizon is near the ceiling with no floor line drawn yet (no history to compare against); by day 60 the floor line has settled well below you and the gap between the two lines is the visible distance you have climbed, and if you slip the horizon physically falls toward the floor.</p>
-          <p class="slot__risk"><b>The risk.</b> A single horizontal rule with a tinted fade can be mistaken for a progress bar at first glance, and most of the card is deliberately empty, but a bar has a track and a goal while this has neither: it is a measured level with a real floor, and the emptiness underneath is exactly how far there is to fall.</p><div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Two horizontal lines encode current rate and worst rate with no axis, no legend and no chart, readable in under a second</li><li>The floor line turns a bad week into visible descent rather than a red mark, matching the no-punishment instinct</li><li>The emptiness below the horizon is doing semantic work, so the negative space is earned rather than styling</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>pct30 divides by a fixed 30, so a flawless first week shows 23% and the horizon sits near the floor, the opposite of the claimed near-the-ceiling day 2</li><li>The worst rolling 30 day window needs most of a year to mean anything and reads 0% for months, pinning the floor to the card&#x27;s bottom edge and erasing the gap the design depends on</li><li>A tinted fill rising to a percentage is the progress bar gestalt, so the first look is spent hunting for a goal that does not exist</li></ul></div></div><p class="slot__verdict">Excellent for a user with a year of history, but it misreports the level and has no floor for the first 60 days.</p>
-          <p class="slot__data">consistencyStats().pct30 and last30 set the horizon; the 30 minus last30 gap is the missing count; the floor is the lowest rolling 30 day window this year, read off the counts per day map.</p>
+          <p class="slot__idea">The card is a level: one horizon line drawn edge to edge at the height of your 30 day rate, a fainter line lower down at your worst 30 day stretch this year, and nothing else.</p><p class="bf">Open goals. The person with no number who still wants one level to read.<span class="bf__x">Skip if no year of history for the low line</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="consistency-pace">
@@ -2117,11 +2070,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">The face reports the future instead of the past: at your last 30 days&#x27; rate, the number of days you finish the year with, drawn on a single rule that runs from zero to 365.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 there is not enough rate to project and the face stays dormant with just the solid segment and no dashed reach; by day 60 the dashed projection is long and moves visibly week to week, so a bad fortnight shortens your year in a way you can see.</p>
-          <p class="slot__risk"><b>The risk.</b> A projection can read as a promise the app cannot keep, and a falling number could discourage, but it is the only view that makes today&#x27;s rate have a consequence, and the caption states the condition plainly so it is a forecast, not a guarantee.</p><div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>The only face where today&#x27;s behaviour changes a number about the future, which is what makes a consistency surface worth reopening</li><li>The conditional caption states the assumption in the same breath as the projection, so the forecast cannot be misread as a promise</li><li>Solid segment versus dashed reach separates earned from assumed on one rule, no second colour and no legend</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>The data note is wrong: yearConsistency is a rolling 365 day percentage, not days done this calendar year, so &quot;168 done&quot; has to be re-derived off the counts map first</li><li>By December the axis is nearly full and the dashed reach is a stub, then January 1 wipes a strong finish back to an empty rule</li><li>The projected number falls on days the user did nothing wrong, because the trailing window decays, reintroducing the punishing mechanic the other faces avoid</li></ul></div></div><p class="slot__verdict">The most motivating face for a mid tenure user, held back by a calendar year frame that makes it seasonal.</p>
-          <p class="slot__data">consistencyStats().yearConsistency for days done so far, pct30 for the rate, days remaining in the calendar year; the projection is done plus rate times remaining.</p>
+          <p class="slot__idea">The face reports the future instead of the past: at your last 30 days&#x27; rate, the number of days you finish the year with, drawn on a single rule that runs from zero to 365.</p><p class="bf">Quantity up goals with a deadline. The founder who thinks in year-end totals.<span class="bf__x">Skip if goals that end before the year does</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="consistency-held">
@@ -2139,11 +2091,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">A face that says almost nothing when there is nothing to say: one filled square, one sentence, and an enormous amount of deliberate silence once today is already in.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> The layout itself changes, not the numbers: unfinished before evening the square is hollow and the line reads &quot;Today is open. Day 23 is at stake.&quot;; late and still unfinished it fills the face with the exact thing at risk plus the banked grace day that would cover it; a new record or a return after a break gets its own single sentence for one day only, then the card goes quiet again.</p>
-          <p class="slot__risk"><b>The risk.</b> On most days it shows less information than any other face, which looks like an unfinished card in a design review, but a card that only speaks when something is actually happening is the one people keep trusting, and the silence is what makes the loud state land.</p><div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>The only variant whose layout responds to state rather than to numbers, so it takes attention only when something is genuinely at stake</li><li>Naming the banked grace day at the moment of risk turns an invisible mechanic into a rescue the user can actually use</li><li>One square and two lines survives any width, theme, and a four figure day count without a single reflow</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>On every day that ends done the face carries three tokens of information, so it will read as unfinished in review and get filled back up within a week</li><li>The design leans entirely on a live streak, so a user who broke and has not restarted gets the silent state permanently and the card never speaks again</li><li>&quot;Day 23 unbroken&quot; is the same flame counter the board variant exists to retire, so shipping both puts two contradictory philosophies on one home</li></ul></div></div><p class="slot__verdict">Right as the default for a user inside a run, dead weight for anyone who broke and has not come back.</p>
-          <p class="slot__data">actionDoneToday(), consistencyStats().current and longest, streak.grace.bank, plus local time of day to pick the state.</p>
+          <p class="slot__idea">A face that says almost nothing when there is nothing to say: one filled square, one sentence, and an enormous amount of deliberate silence once today is already in.</p><p class="bf">Hold goals. The person staying sober, who needs today confirmed and nothing else.<span class="bf__x">Skip if any goal with a number to watch</span></p>
+          
+          
+          
         </div>
       </figure>
       <figure class="slot" id="consistency-trace">
@@ -2178,11 +2129,10 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">Consistency drawn as an instrument trace: thirty days on a baseline where the height of each mark is how much you actually did that day, so presence and intensity are one reading.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 is two short marks on a long empty baseline and reads honestly as a beginning; by day 60 the trace has a personality, you can see the weeks you were loud, the flat stretches, and whether today is above or below the line you normally run at.</p>
-          <p class="slot__risk"><b>The risk.</b> It is close to a chart on a face that is meant to be glanceable, and flat days are shown as nothing rather than a red mark, but the single reading up top carries the whole meaning in under a second and the trace below only has to be felt, not read.</p><div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Height as intensity puts presence and effort in one shape, so showing up and actually working are distinguishable without a second metric</li><li>The headline carries the full meaning, which lets the trace below be felt rather than parsed</li><li>Today&#x27;s single green tick at the right edge anchors the reading with the only accent on the face</li></ul></div>
-        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Counting every proofEvent type lets a reflection save and a check-in out-measure a heavy Action day, so the trace rewards app usage over the move</li><li>Zero days render as blank gaps with no baseline tick, so a missed day and the end of a short history look identical</li><li>The mock draws 24 bars under a &quot;Last 30 days&quot; label, and a real 30 bars at 2px on a 390px card sit close enough to read as noise</li></ul></div></div><p class="slot__verdict">Best face for a heavy user with varied output, but only ship it if the event weighting excludes passive app activity.</p>
-          <p class="slot__data">proofEvents counted per day for the last 30 days (all types), today&#x27;s count, the 30 day mean, and the number of days with zero events.</p>
+          <p class="slot__idea">Consistency drawn as an instrument trace: thirty days on a baseline where the height of each mark is how much you actually did that day, so presence and intensity are one reading.</p><p class="bf">Quantity up goals. The writer whose 300-word day and 3,000-word day are not equal.<span class="bf__x">Skip if Hold and Check goals log no amount</span></p>
+          
+          
+          
         </div>
       </figure></div>
     <h3 class="sect__sub sect__sub--new">Built for the new philosophy</h3>
@@ -2208,9 +2158,9 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">Measures adherence, not attendance. The plan is 3 times a week, so 3 of 3 is a perfect week and the four quiet days are rest, not misses.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> The count resets weekly and the perfect-week tally is what accumulates, so a vacation or a seasonal gap never destroys anything and the number stays honest.</p>
-          <p class="slot__data">action cadence, consistencyStats().counts matched against the schedule</p>
+          <p class="slot__idea">Measures adherence, not attendance. The plan is 3 times a week, so 3 of 3 is a perfect week and the four quiet days are rest, not misses.</p><p class="bf">Frequency goals. The 3x-a-week lifter punished by every daily-streak face.<span class="bf__x">Skip if no schedule set, nothing to adhere to</span></p>
+          
+          
         </div>
       </figure>
       <figure class="slot" id="consistency-not-moving">
@@ -2233,9 +2183,9 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">The face that appears when someone keeps their schedule and the number still is not moving. It names the problem and offers to change the plan.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> It only exists when expected pace and actual pace disagree for long enough to be real, so most weeks it never appears at all, which is what makes it credible when it does.</p>
-          <p class="slot__data">expected rate from goalProgress derivation vs actual rate from history</p>
+          <p class="slot__idea">The face that appears when someone keeps their schedule and the number still is not moving. It names the problem and offers to change the plan.</p><p class="bf">Quantity goals with a target. The dieter keeping every rep as the scale sits still.<span class="bf__x">Skip if Open goals, no number to stall</span></p>
+          
+          
         </div>
       </figure></div>
 
