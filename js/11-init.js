@@ -61,12 +61,18 @@ function syncHomeViewport() {
     // nothing at all and CSS falls back to 100svh, which WebKit defines as
     // stable (unlike dvh).
     const standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
-      || window.navigator.standalone === true;
+      || window.navigator.standalone === true
+      || /[?&]standalone=1/.test(location.search || '');
     if (standalone) {
       const inner = Math.round(window.innerHeight || 0);
       const scr = Math.round((window.screen && window.screen.height) || 0);
       const h = (inner > 200 && scr > 200) ? Math.min(inner, scr) : inner;
-      if (h > 200) root.style.setProperty('--p1-vh', h + 'px');
+      // v1128: index.html already set this before the first paint. Rewrite it
+      // only when the screen REALLY changed (rotation, split view), never for
+      // a pixel or two of noise: a late write moves the card under his eyes,
+      // which is the jump he reported.
+      const prev = parseFloat(root.style.getPropertyValue('--p1-vh')) || 0;
+      if (h > 200 && Math.abs(h - prev) > 2) root.style.setProperty('--p1-vh', h + 'px');
     } else {
       root.style.removeProperty('--p1-vh');
     }
@@ -75,7 +81,9 @@ function syncHomeViewport() {
     const p1e = document.getElementById('homePage1');
     if (p1e && window.scrollY < 50) {
       const off = Math.round(p1e.getBoundingClientRect().top + window.scrollY);
-      if (off >= 0 && off < 200) root.style.setProperty('--p1-top', off + 'px');
+      const prevTop = parseFloat(root.style.getPropertyValue('--p1-top')) || 0;
+      // same guard: only a real change to the chrome above the column
+      if (off >= 0 && off < 200 && Math.abs(off - prevTop) > 2) root.style.setProperty('--p1-top', off + 'px');
     }
   } catch (e) {}
 }
