@@ -185,7 +185,11 @@ function recalculateStreak() {
   if (cur >= 2 && cur > (state.streak.bestEverShown || 0)) {
     state.streak._recordJustHit = cur;
     state.streak.bestEverShown = cur;
-    try { writeProofEvent('new-record', { title: cur + ' day record', module: 'streak', dedupeKey: 'record-' + cur, metadata: { count: cur } }); } catch (_) {}
+    // v1136 (Malik): NO 'N day record' event. This fired on EVERY day past the
+    // previous best, so a 103-day run wrote ~100 rows that buried the real
+    // record under its own applause (his trail: 103, 99, 62, 55, 8, 6...).
+    // The Path view already filtered them out as noise; now nothing writes
+    // them. The streak itself is the record, shown as a counter.
   }
   // (the day-7 backup-download nudge was removed in v775, Malik: accounts +
   // cloud sync are the real answer; Settings keeps the manual backup.)
@@ -328,7 +332,6 @@ function writeProofEvent(type, fields) {
     // 'new-record' write) never count as a fresh completion.
     if (type === 'action-complete') {
       try { pulseNeutronStar(); } catch (_) {}
-      try { maybeShowMilestoneBanner(); } catch (_) {}
       try { Backend.complete(ev.iso); } catch (_) {} // count toward today's public total
     }
     return ev;
@@ -440,68 +443,12 @@ function maybeGenerateWeeklyCard() {
   } catch (e) {}
 }
 
-function maybeShowMilestoneBanner() {
-  try {
-    if (typeof DEMO_MODE !== 'undefined' && DEMO_MODE) return;
-    if (!state.streak) return;
-    const count = state.streak.count || 0;
-    const THRESHOLDS = CONSISTENCY_MILESTONES.map(m => m.t);
-    if (!Array.isArray(state.streak.milestonesShown)) state.streak.milestonesShown = [];
-    // highest threshold reached and not yet celebrated
-    let hit = 0;
-    for (const t of THRESHOLDS) {
-      if (count >= t && state.streak.milestonesShown.indexOf(t) === -1) hit = t;
-    }
-    if (!hit) return;
-    state.streak.milestonesShown.push(hit);
-    try { persistNow(); } catch (_) {}
-    try { if (typeof pushUpdate === 'function') pushUpdate('milestone', hit + ' days kept', 'The record of it lives on your heatmap.'); } catch (_) {}
-    showMilestoneBanner(hit);
-  } catch (_) {}
-}
-
-function showMilestoneBanner(days) {
-  try {
-    if (typeof document === 'undefined' || !document.body) return;
-    const existing = document.getElementById('milestoneBanner');
-    if (existing) existing.remove();
-    const name = (state.profile && state.profile.name || '').trim();
-    const subById = {};
-    CONSISTENCY_MILESTONES.forEach(m => { subById[m.t] = m.earned; });
-    const banner = document.createElement('div');
-    banner.id = 'milestoneBanner';
-    banner.className = 'milestone-banner';
-    banner.setAttribute('role', 'status');
-    banner.setAttribute('aria-live', 'polite');
-    banner.innerHTML =
-      '<div class="milestone-banner__title">' + days + '-day streak' + (name ? ', ' + esc(name) : '') + '.</div>' +
-      '<div class="milestone-banner__sub">' + (subById[days] || 'You kept showing up.') + '</div>' +
-      '<div class="milestone-banner__row">' +
-        '<button type="button" class="milestone-banner__btn milestone-banner__btn--primary" id="milestoneShare">Copy to share</button>' +
-        '<button type="button" class="milestone-banner__btn" id="milestoneDismiss">Dismiss</button>' +
-      '</div>';
-    document.body.appendChild(banner);
-    // Reveal after paint (short timer, not rAF alone, so it still fires if the
-    // tab was hidden when the milestone hit).
-    setTimeout(() => { try { banner.classList.add('is-on'); } catch (e) {} }, 30);
-    const close = () => { try { banner.classList.remove('is-on'); setTimeout(() => banner.remove(), 500); } catch (e) {} };
-    const dismissBtn = banner.querySelector('#milestoneDismiss');
-    if (dismissBtn) dismissBtn.addEventListener('click', close);
-    const shareBtn = banner.querySelector('#milestoneShare');
-    if (shareBtn) shareBtn.addEventListener('click', () => {
-      const text = days + ' days in a row on Memento. Still showing up.';
-      const done = () => { try { shareBtn.textContent = 'Copied'; } catch (e) {} };
-      try {
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(text).then(done, done);
-        } else {
-          const ta = document.createElement('textarea');
-          ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
-          document.body.appendChild(ta); ta.select();
-          try { document.execCommand('copy'); } catch (e) {}
-          ta.remove(); done();
-        }
-      } catch (e) { done(); }
-    });
-  } catch (_) {}
-}
+/* v1136 (Malik: 'that's corny to me'): the streak MILESTONE system is gone.
+   It was seven named badges (One Week ... The Hundred 'this is rare air' ...
+   The Year 'you are a different person now'), a banner that popped itself on
+   7/14/30/60/100/180/365 with a 'Copy to share' button, and a ladder of
+   checkmarks in Consistency. Memento shows what you did; it does not hand out
+   trophies for it. maybeShowMilestoneBanner / showMilestoneBanner deleted
+   here, CONSISTENCY_MILESTONES + renderMilestoneLadder in js/06, the CSS in
+   misc.css. state.streak.milestonesShown is left in the schema as an inert
+   field so no saved copy breaks. */

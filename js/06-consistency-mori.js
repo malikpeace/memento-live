@@ -532,15 +532,6 @@ function renderDeepworkBars(days) {
    breakdowns, and the milestone ladder. All read-only derivations off the
    unified counts from consistencyStats(); taps route through toggleStreakDay.
    ============================================ */
-const CONSISTENCY_MILESTONES = [
-  { t: 7,   short: "1 wk",  name: "One Week",   earned: "Seven straight. The habit is forming." },
-  { t: 14,  short: "2 wk",  name: "Two Weeks",  earned: "Two weeks in. This is becoming who you are." },
-  { t: 30,  short: "1 mo",  name: "One Month",  earned: "Thirty days. You proved it was not a fluke." },
-  { t: 60,  short: "2 mo",  name: "Two Months", earned: "Sixty days. Most people never get here." },
-  { t: 100, short: "100",   name: "The Hundred",earned: "One hundred days. This is rare air." },
-  { t: 180, short: "6 mo",  name: "Half Year",  earned: "Half a year, unbroken. Quietly relentless." },
-  { t: 365, short: "1 yr",  name: "The Year",   earned: "One full year. You are a different person now." }
-];
 
 function consistencyMicroState(st, done) {
   const cur = (st && st.current) || 0;
@@ -666,27 +657,6 @@ function renderConsistencyBreakdowns() {
 }
 
 // Milestone ladder: earned nodes solid, the next one pulses, locked ones faint.
-function renderMilestoneLadder() {
-  const st = consistencyStats();
-  const cur = st.current || 0;
-  const best = Math.max((state.streak && state.streak.bestEver) || 0, st.longest || 0, cur);
-  // The next target is the first milestone never earned (best below it), so a
-  // user rebuilding after a break aims at new ground, not one already passed.
-  const next = CONSISTENCY_MILESTONES.find(m => best < m.t);
-  let head;
-  if (next) {
-    const gap = Math.max(1, next.t - cur);
-    head = gap === 1 ? 'One day to ' + next.t + '.' : (gap <= 3 ? gap + ' days to ' + next.t + ". Don't stop now." : gap + ' days to ' + next.t + '. Almost there.');
-  } else head = 'Every milestone earned. You are in rare company.';
-  let nodes = '';
-  CONSISTENCY_MILESTONES.forEach(m => {
-    const earned = best >= m.t;
-    const isNext = next && m.t === next.t;
-    const inner = earned ? '<svg viewBox="0 0 24 24" class="mile__check" aria-hidden="true"><path d="M20 6 L9 17 L4 12"/></svg>' : m.t;
-    nodes += '<div class="mile' + (earned ? ' mile--earned' : '') + (isNext ? ' mile--next' : '') + '" title="' + m.name + '"><div class="mile__node">' + inner + '</div><div class="mile__label">' + m.short + '</div></div>';
-  });
-  return '<div class="mlad"><div class="mlad__head">' + head + '</div><div class="mlad__track">' + nodes + '</div></div>';
-}
 
 // Surfaces one older reflection so past entries come back into view instead of
 // being buried. Priority: "this time last year" if an entry sits within +/- 3

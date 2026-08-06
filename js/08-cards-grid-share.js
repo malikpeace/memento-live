@@ -5972,6 +5972,11 @@ function openMementoFull() {
     const dotK = (t) => t === 'action-complete' ? 'is-act' : (t === 'new-record' || t === 'proof') ? 'is-mark' : (t === 'mori-moment') ? 'is-clar' : '';
     const evTitle = (e2) => e2.title || ({ 'action-complete': 'The move for the day', 'reflection-save': 'Reflection', 'vivere': 'Lived', 'mori-moment': 'Memento Mori', 'weekly-review': 'Weekly review', 'new-record': 'New record', 'distraction-log': 'Distraction logged', 'deepwork-commit': 'Deep work' }[e2.type] || 'Kept');
     const _wk = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    // v1136: the retired 'N day record' events (one per day past the old best)
+    // are hidden here too, so an existing user's trail stops being a wall of
+    // applause. The Path view has filtered them since it was built.
+    const _evs = evs.filter(e2 => e2 && e2.type !== 'new-record');
+    evs.length = 0; Array.prototype.push.apply(evs, _evs);
     evs.sort((a2, b2) => (b2.ts || 0) - (a2.ts || 0));
     const groups = [];
     const nowY = new Date().getFullYear();

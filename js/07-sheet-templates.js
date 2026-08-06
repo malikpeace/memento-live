@@ -2017,7 +2017,6 @@ const SHEET_TEMPLATES = {
       html += sec(3, proofLink);
       html += sec(4, renderConsistencyViews());
       html += sec(5, renderConsistencyBreakdowns());
-      html += sec(6, renderMilestoneLadder());
       html += oneThingFooterHtml();
       html += '</div>';
       return html;
@@ -2035,7 +2034,6 @@ const SHEET_TEMPLATES = {
         recalculateStreak();
         persistNow();
         renderAll();
-        try { maybeShowMilestoneBanner(); } catch (_) {}
         reRender();
       });
       const proofBtn = container.querySelector('#streakProofTrail');

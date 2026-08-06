@@ -3606,7 +3606,7 @@ const Sidebar = {
         const unlocked = (k) => { try { return typeof isModuleUnlocked !== 'function' || isModuleUnlocked(k); } catch (_) { return true; } };
         const out = [];
         const add = (gateKey, item) => { if (!gateKey || unlocked(gateKey)) out.push(item); };
-        add('streak', cmd('Mark today complete', 'Consistency', () => { try { const t = getTodayISO(); if (!state.streak.history.includes(t)) { state.streak.history.push(t); recalculateStreak(); persistNow(); renderAll(); try { maybeShowMilestoneBanner(); } catch (_) {} } } catch (_) {} }));
+        add('streak', cmd('Mark today complete', 'Consistency', () => { try { const t = getTodayISO(); if (!state.streak.history.includes(t)) { state.streak.history.push(t); recalculateStreak(); persistNow(); renderAll(); } } catch (_) {} }));
         add('checkin', cmd('Check in', 'How did today go', () => openExp(() => Sheet.open('checkin'))));
         add('reflection', cmd('New note', 'Notes', () => { if (state.reflection) state.reflection.activeNoteId = null; openExp(() => Sheet.open('reflection')); }));
         add(null, cmd('Start a deep work block', 'Deep Work', () => openExp(() => Sheet.open('deepwork'))));
