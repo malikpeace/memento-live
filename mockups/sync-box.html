@@ -1,0 +1,1158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The sync box, redesigned</title>
+<style>
+  :root{
+    --ink:255,255,255;
+    --text-hi:rgba(255,255,255,.96); --text-mid:rgba(255,255,255,.68);
+    --text-lo:rgba(255,255,255,.42); --hairline:rgba(255,255,255,.09);
+    --surface-1:rgba(255,255,255,.04);
+    --glass-bg:rgba(255,255,255,.045);
+    --glass-border:rgba(255,255,255,.10);
+    --glass-shadow:0 1px 2px rgba(0,0,0,.30), 0 8px 20px rgba(0,0,0,.22);
+    --glass-highlight:inset 0 1px 0 rgba(255,255,255,.06);
+    --glass-blur:blur(28px) saturate(1.4);
+    --card-r:18px; --rx:1;
+    --clar:#3ad9f5; --cons:#3fd94e; --act:#eef2fb;
+    --color-clarity:#3ad9f5; --color-consistency:#3fd94e;
+    --accent:#3fd94e; --accent-rgb:63,217,78;
+    --solid-bg:#f2f3f6; --solid-fg:#0b0c0e;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:#050609;color:var(--text-hi);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1340px;margin:0 auto;padding:34px 22px 120px}
+
+  h1{margin:0 0 8px;font-size:26px;font-weight:750;letter-spacing:-.025em}
+  .lede{margin:0 0 4px;font-size:14.5px;line-height:1.6;color:var(--text-mid);max-width:74ch}
+  .lede b{color:var(--text-hi);font-weight:640}
+
+  .nav{position:sticky;top:0;z-index:30;display:flex;gap:8px;flex-wrap:wrap;
+    margin:22px -22px 0;padding:12px 22px;background:rgba(5,6,9,.82);
+    backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
+  .nav a{font-size:13px;font-weight:620;text-decoration:none;color:var(--text-mid);
+    padding:8px 14px;border-radius:999px;background:var(--surface-1)}
+  .nav a:hover{color:var(--text-hi);background:rgba(255,255,255,.085)}
+
+  .sect{padding-top:40px;scroll-margin-top:72px}
+  .sect__hd h2{margin:0 0 5px;font-size:20px;font-weight:700;letter-spacing:-.02em}
+  .sect__hd p{margin:0 0 22px;font-size:13.5px;line-height:1.55;color:var(--text-mid)}
+  .sect__hd b{color:var(--text-hi);font-weight:640}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(354px,1fr));gap:34px 26px}
+  .slot{margin:0}
+  .slot__cap{display:flex;align-items:baseline;gap:9px;margin:0 0 11px;padding-left:2px}
+  .slot__n{font-size:11.5px;font-weight:700;color:var(--text-lo);font-variant-numeric:tabular-nums}
+  .slot__t{font-size:15px;font-weight:650;letter-spacing:-.012em}
+
+  /* the phone context: the Memento above, its glow, then the real glass card */
+  .phone{position:relative;padding:0 0 16px;border-radius:22px;overflow:hidden;
+    background:linear-gradient(180deg,#0a0c10,#07080b)}
+  .phone__glow{position:absolute;left:50%;top:-58px;width:290px;height:220px;
+    transform:translateX(-50%);pointer-events:none;
+    background:radial-gradient(closest-side,rgba(63,217,78,.30),transparent 72%);
+    filter:blur(14px)}
+  .phone__memento{position:relative;height:96px;margin:0 16px;border-radius:14px;
+    display:grid;place-items:center;
+    background:radial-gradient(120% 150% at 50% 30%,#3fbf6e,#1d8f52 62%,#116d3d);
+    box-shadow:0 10px 34px rgba(63,217,78,.20),inset 0 1px 0 rgba(255,255,255,.24)}
+  .phone__memento svg{width:26px;height:26px;fill:rgba(245,255,248,.95)}
+
+  .cc-card{position:relative;overflow:hidden;margin:14px 16px 0;
+    padding:22px 22px 20px;
+    background:var(--glass-bg);border-radius:var(--card-r);
+    box-shadow:var(--glass-shadow),var(--glass-highlight);
+    backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur)}
+  .cc-card::before{content:'';position:absolute;inset:0;border-radius:inherit;
+    pointer-events:none;z-index:0;
+    background:linear-gradient(180deg,rgba(255,255,255,.05),transparent 46%)}
+  .cc-card > *{position:relative;z-index:1}
+  .cc-dots{display:flex;gap:6px;justify-content:center;margin:16px 0 0}
+  .cc-dots i{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.22)}
+  .cc-dots i.on{background:rgba(255,255,255,.85)}
+
+  .slot__meta{margin:13px 2px 0}
+  .slot__idea{margin:0;font-size:13.5px;line-height:1.55;color:var(--text-hi)}
+  .slot__evo{margin:8px 0 0;font-size:13px;line-height:1.55;color:var(--text-mid)}
+  .slot__evo b{color:var(--text-hi);font-weight:640}
+  .slot__data{margin:8px 0 0;font-size:11.5px;line-height:1.5;color:var(--text-lo)}
+
+  @media (max-width:400px){ .grid{grid-template-columns:1fr;gap:30px} .wrap{padding:26px 14px 90px} }
+</style>
+<style id="variants">
+/* today-gap-close */
+.v-today-gap-close{display:flex;flex-direction:column;min-height:176px;padding-bottom:10px;font-variant-numeric:tabular-nums}
+.v-today-gap-close .gc-move{margin:0;font-size:18px;line-height:1.32;font-weight:600;letter-spacing:-.015em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-gap-close .gc-head{display:flex;align-items:baseline;gap:8px;margin:16px 0 0}
+.v-today-gap-close .gc-now{font-size:22px;line-height:1;font-weight:650;letter-spacing:-.03em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-gap-close .gc-of{font-size:13.5px;line-height:1;font-weight:450;color:rgba(var(--ink,255,255,255),.9)}
+.v-today-gap-close .gc-new{margin-left:auto;font-size:12.5px;line-height:1;font-weight:600;color:rgba(var(--ink,255,255,255),.9)}
+.v-today-gap-close .gc-rail{display:flex;height:5px;margin:11px 0 0;border-radius:999px;background:rgba(var(--ink,255,255,255),.1);overflow:hidden}
+.v-today-gap-close .gc-base{width:41%;background:rgba(var(--ink,255,255,255),.5)}
+.v-today-gap-close .gc-week{width:6%;background:var(--solid-bg,#eef2fb)}
+.v-today-gap-close .gc-read{margin:11px 0 0;font-size:13.5px;line-height:1.42;font-weight:450;color:rgba(var(--ink,255,255,255),.88)}
+.v-today-gap-close .gc-do{margin-top:auto;appearance:none;border:0;width:100%;height:46px;border-radius:10px;background:var(--solid-bg,#eef2fb);color:var(--solid-fg,#07080b);font-family:inherit;font-size:15.5px;font-weight:600;letter-spacing:-.01em;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.28);transition:transform 160ms ease-out,opacity 160ms ease-out}
+.v-today-gap-close .gc-do:active{transform:scale(.985);opacity:.94}
+@media (prefers-reduced-motion:reduce){.v-today-gap-close .gc-do{transition:none}}
+
+/* today-today-weight */
+.v-today-today-weight{display:flex;flex-direction:column;min-height:176px;padding-bottom:10px;font-variant-numeric:tabular-nums}
+.v-today-today-weight .tw-move{margin:0;font-size:19px;line-height:1.32;font-weight:600;letter-spacing:-.015em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-today-weight .tw-row{display:flex;align-items:center;gap:10px;margin-top:16px}
+.v-today-today-weight .tw-ladder{display:inline-flex;align-items:flex-end;gap:4px;height:16px}
+.v-today-today-weight .tw-ladder i{display:block;width:4px;border-radius:2px;background:rgba(var(--ink,255,255,255),.14)}
+.v-today-today-weight .tw-ladder i:nth-child(1){height:6px}
+.v-today-today-weight .tw-ladder i:nth-child(2){height:8.5px}
+.v-today-today-weight .tw-ladder i:nth-child(3){height:11px}
+.v-today-today-weight .tw-ladder i:nth-child(4){height:13.5px}
+.v-today-today-weight .tw-ladder i:nth-child(5){height:16px}
+.v-today-today-weight .tw-ladder i.is-past{background:rgba(var(--ink,255,255,255),.36)}
+.v-today-today-weight .tw-ladder i.is-on{background:var(--solid-bg,#eef2fb)}
+.v-today-today-weight .tw-tier{font-size:14px;line-height:1;font-weight:600;letter-spacing:-.005em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-today-weight .tw-run{margin:11px 0 0;font-size:13.5px;line-height:1.45;font-weight:450;color:rgba(var(--ink,255,255,255),.88)}
+.v-today-today-weight .tw-n{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-today-weight .tw-cta{margin-top:auto;appearance:none;border:0;width:100%;height:46px;border-radius:10px;background:var(--solid-bg,#eef2fb);color:var(--solid-fg,#07080b);font-family:inherit;font-size:15.5px;font-weight:600;letter-spacing:-.01em;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.28);transition:transform 160ms ease-out,opacity 160ms ease-out}
+.v-today-today-weight .tw-cta:active{transform:scale(.985);opacity:.94}
+@media (prefers-reduced-motion:reduce){.v-today-today-weight .tw-cta{transition:none}}
+
+/* today-today-open */
+.v-today-today-open{display:flex;flex-direction:column;min-height:176px;padding-bottom:10px;font-variant-numeric:tabular-nums}
+.v-today-today-open .to-move{margin:0;font-size:18.5px;line-height:1.32;font-weight:600;letter-spacing:-.015em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-today-open .to-start{display:flex;align-items:flex-start;gap:9px;margin-top:14px;padding:11px 12px;border-radius:10px;background:rgba(var(--ink,255,255,255),.06);box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.v-today-today-open .to-ic{flex:0 0 auto;margin-top:3px;color:rgba(var(--ink,255,255,255),.6)}
+.v-today-today-open .to-start p{margin:0;font-size:13.5px;line-height:1.42;font-weight:450;color:rgba(var(--ink,255,255,255),.92)}
+.v-today-today-open .to-gap{margin:11px 0 0;font-size:13px;line-height:1.3;font-weight:450;color:rgba(var(--ink,255,255,255),.72)}
+.v-today-today-open .to-cta{margin-top:auto;appearance:none;border:0;width:100%;height:46px;border-radius:10px;background:var(--solid-bg,#eef2fb);color:var(--solid-fg,#07080b);font-family:inherit;font-size:15.5px;font-weight:600;letter-spacing:-.01em;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.28);transition:transform 160ms ease-out,opacity 160ms ease-out}
+.v-today-today-open .to-cta:active{transform:scale(.985);opacity:.94}
+@media (prefers-reduced-motion:reduce){.v-today-today-open .to-cta{transition:none}}
+
+/* today-today-run */
+.v-today-today-run{display:flex;flex-direction:column;min-height:176px;padding-bottom:10px;font-variant-numeric:tabular-nums}
+.v-today-today-run .tr-list{list-style:none;margin:0;padding:0}
+.v-today-today-run .tr-list li{position:relative;display:flex;align-items:flex-start;gap:11px;padding-bottom:11px}
+.v-today-today-run .tr-list li:last-child{padding-bottom:0}
+.v-today-today-run .tr-list li:not(:last-child)::before{content:"";position:absolute;left:3px;top:15px;bottom:1px;width:1px;background:rgba(var(--ink,255,255,255),.14)}
+.v-today-today-run .tr-mk{flex:0 0 auto;width:7px;height:7px;margin-top:6px;border-radius:999px;box-shadow:inset 0 0 0 1.5px rgba(var(--ink,255,255,255),.5)}
+.v-today-today-run .tr-now .tr-mk{margin-top:8px;box-shadow:inset 0 0 0 1.5px rgba(var(--ink,255,255,255),.75)}
+.v-today-today-run .tr-mk--on{background:var(--solid-bg,#eef2fb);box-shadow:none;opacity:.85}
+.v-today-today-run .tr-list li p{margin:0;flex:1 1 auto;font-size:13.5px;line-height:1.4;font-weight:450;color:rgba(var(--ink,255,255,255),.82)}
+.v-today-today-run .tr-now p{font-size:18px;line-height:1.32;font-weight:600;letter-spacing:-.015em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-today-run .tr-list li time{flex:0 0 auto;font-size:12.5px;line-height:1.5;font-weight:500;color:rgba(var(--ink,255,255,255),.55)}
+.v-today-today-run .tr-cta{margin-top:auto;appearance:none;border:0;width:100%;height:46px;border-radius:10px;background:var(--solid-bg,#eef2fb);color:var(--solid-fg,#07080b);font-family:inherit;font-size:15.5px;font-weight:600;letter-spacing:-.01em;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.28);transition:transform 160ms ease-out,opacity 160ms ease-out}
+.v-today-today-run .tr-cta:active{transform:scale(.985);opacity:.94}
+@media (prefers-reduced-motion:reduce){.v-today-today-run .tr-cta{transition:none}}
+
+/* today-week-rhythm */
+.v-today-week-rhythm{display:flex;flex-direction:column;min-height:176px;padding-bottom:10px;font-variant-numeric:tabular-nums}
+.v-today-week-rhythm .wr-move{margin:0;font-size:18px;line-height:1.32;font-weight:600;letter-spacing:-.015em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-week-rhythm .wr-week{display:flex;gap:13px;margin:16px 0 0}
+.v-today-week-rhythm .wr-day{display:flex;flex-direction:column;align-items:center;gap:7px;width:22px;font-size:10.5px;line-height:1;font-weight:600;color:rgba(var(--ink,255,255,255),.42)}
+.v-today-week-rhythm .wr-day i{width:9px;height:9px;border-radius:50%;background:rgba(var(--ink,255,255,255),.12)}
+.v-today-week-rhythm .wr-day.is-done{color:rgba(var(--ink,255,255,255),.7)}
+.v-today-week-rhythm .wr-day.is-done i{background:var(--solid-bg,#eef2fb)}
+.v-today-week-rhythm .wr-day.is-now{color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-week-rhythm .wr-day.is-now i{background:transparent;box-shadow:inset 0 0 0 2px rgba(var(--ink,255,255,255),.62)}
+.v-today-week-rhythm .wr-read{margin:14px 0 0;font-size:13.5px;line-height:1.42;font-weight:450;color:rgba(var(--ink,255,255,255),.88)}
+.v-today-week-rhythm .wr-read b{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-week-rhythm .wr-do{margin-top:auto;appearance:none;border:0;width:100%;height:46px;border-radius:10px;background:var(--solid-bg,#eef2fb);color:var(--solid-fg,#07080b);font-family:inherit;font-size:15.5px;font-weight:600;letter-spacing:-.01em;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.28);transition:transform 160ms ease-out,opacity 160ms ease-out}
+.v-today-week-rhythm .wr-do:active{transform:scale(.985);opacity:.94}
+@media (prefers-reduced-motion:reduce){.v-today-week-rhythm .wr-do{transition:none}}
+
+/* today-record-line */
+.v-today-record-line{display:flex;flex-direction:column;min-height:176px;padding-bottom:10px;font-variant-numeric:tabular-nums}
+.v-today-record-line .rl-verdict{margin:0;font-size:18px;line-height:1.28;font-weight:600;letter-spacing:-.015em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-record-line .rl-rows{margin:15px 0 0;display:flex;flex-direction:column;gap:9px}
+.v-today-record-line .rl-row{display:flex;align-items:center;gap:10px;font-size:12.5px;font-weight:600;color:rgba(var(--ink,255,255,255),.8)}
+.v-today-record-line .rl-k{width:86px;flex:0 0 auto}
+.v-today-record-line .rl-bar{flex:1 1 auto;height:5px;border-radius:999px;background:rgba(var(--ink,255,255,255),.1);overflow:hidden}
+.v-today-record-line .rl-bar b{display:block;height:100%;border-radius:999px;background:var(--solid-bg,#eef2fb)}
+.v-today-record-line .rl-n{width:12px;flex:0 0 auto;text-align:right;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-record-line .rl-row.is-best{color:rgba(var(--ink,255,255,255),.55)}
+.v-today-record-line .rl-row.is-best .rl-bar b{background:rgba(var(--ink,255,255,255),.28)}
+.v-today-record-line .rl-row.is-best .rl-n{color:rgba(var(--ink,255,255,255),.55)}
+.v-today-record-line .rl-move{margin:15px 0 0;font-size:15px;line-height:1.34;font-weight:600;letter-spacing:-.01em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-record-line .rl-do{margin-top:auto;appearance:none;border:0;width:100%;height:46px;border-radius:10px;background:var(--solid-bg,#eef2fb);color:var(--solid-fg,#07080b);font-family:inherit;font-size:15.5px;font-weight:600;letter-spacing:-.01em;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.28);transition:transform 160ms ease-out,opacity 160ms ease-out}
+.v-today-record-line .rl-do:active{transform:scale(.985);opacity:.94}
+@media (prefers-reduced-motion:reduce){.v-today-record-line .rl-do{transition:none}}
+
+/* today-today-then */
+.v-today-today-then{display:flex;flex-direction:column;min-height:176px;padding-bottom:10px;font-variant-numeric:tabular-nums}
+.v-today-today-then .tn-move{margin:0;font-size:19.5px;line-height:1.32;font-weight:600;letter-spacing:-.016em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-today-then .tn-then{display:flex;align-items:stretch;gap:11px;margin-top:16px}
+.v-today-today-then .tn-rule{flex:0 0 auto;width:1px;border-radius:999px;background:linear-gradient(to bottom,rgba(var(--ink,255,255,255),.3),rgba(var(--ink,255,255,255),.07))}
+.v-today-today-then .tn-then p{margin:0;font-size:13.5px;line-height:1.45;font-weight:450;color:rgba(var(--ink,255,255,255),.7)}
+.v-today-today-then .tn-then p span{color:var(--text-hi,rgba(255,255,255,.96));font-weight:500}
+.v-today-today-then .tn-cta{margin-top:auto;appearance:none;border:0;width:100%;height:46px;border-radius:10px;background:var(--solid-bg,#eef2fb);color:var(--solid-fg,#07080b);font-family:inherit;font-size:15.5px;font-weight:600;letter-spacing:-.01em;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.28);transition:transform 160ms ease-out,opacity 160ms ease-out}
+.v-today-today-then .tn-cta:active{transform:scale(.985);opacity:.94}
+@media (prefers-reduced-motion:reduce){.v-today-today-then .tn-cta{transition:none}}
+
+/* star-star-distance */
+.v-star-star-distance{--cy:#3ad9f5;--cyglow:0 0 12px rgba(58,217,245,.45);--rail:rgba(255,255,255,.14);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+@media (prefers-color-scheme:light){.v-star-star-distance{--cy:#0b90b0;--cyglow:none;--rail:rgba(0,0,0,.12)}}
+:root[data-theme="light"] .v-star-star-distance{--cy:#0b90b0;--cyglow:none;--rail:rgba(0,0,0,.12)}
+:root[data-theme="dark"] .v-star-star-distance{--cy:#3ad9f5;--cyglow:0 0 12px rgba(58,217,245,.45);--rail:rgba(255,255,255,.14)}
+.v-star-star-distance .sd-star{margin:0;font-size:16.5px;line-height:1.32;font-weight:700;letter-spacing:-.011em;color:var(--text-hi,rgba(255,255,255,.96));display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.v-star-star-distance .sd-row{display:flex;align-items:baseline;gap:7px;margin-top:20px}
+.v-star-star-distance .sd-big{font-size:34px;font-weight:700;line-height:1;letter-spacing:-.028em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-distance .sd-of{min-width:0;font-size:13px;line-height:1.2;color:var(--text-mid,rgba(255,255,255,.62));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v-star-star-distance .sd-delta{flex:none;margin-left:auto;align-self:center;font-size:12.5px;font-weight:650;color:var(--cy)}
+.v-star-star-distance .sd-rail{position:relative;height:4px;border-radius:999px;background:var(--rail);box-shadow:inset 0 1px 0 rgba(255,255,255,.06);margin-top:14px;overflow:hidden}
+.v-star-star-distance .sd-fill{position:absolute;top:0;bottom:0;left:0;width:34%;border-radius:999px;background:var(--cy);box-shadow:var(--cyglow)}
+.v-star-star-distance .sd-foot{margin:14px 0 0;font-size:12.5px;line-height:1.4;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-distance .sd-foot b{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+
+/* star-star-surface */
+.v-star-star-surface{--cy:#3ad9f5;--cyglow:0 0 8px rgba(58,217,245,.7);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+@media (prefers-color-scheme:light){.v-star-star-surface{--cy:#0b90b0;--cyglow:none}}
+:root[data-theme="light"] .v-star-star-surface{--cy:#0b90b0;--cyglow:none}
+:root[data-theme="dark"] .v-star-star-surface{--cy:#3ad9f5;--cyglow:0 0 8px rgba(58,217,245,.7)}
+.v-star-star-surface .su-star{margin:0;font-size:16.5px;line-height:1.32;font-weight:700;letter-spacing:-.011em;color:var(--text-hi,rgba(255,255,255,.96));display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.v-star-star-surface .su-why{display:flex;gap:11px;margin-top:18px}
+.v-star-star-surface .su-dot{flex:0 0 auto;width:5px;height:5px;border-radius:999px;background:var(--cy);margin-top:7px;box-shadow:var(--cyglow)}
+.v-star-star-surface .su-txt{font-size:14px;line-height:1.44;color:var(--text-hi,rgba(255,255,255,.96));display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+.v-star-star-surface .su-foot{margin:16px 0 0;font-size:12.5px;line-height:1.4;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-surface .su-foot b{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+
+/* star-star-spine */
+.v-star-star-spine{--cy:#3ad9f5;--cydim:rgba(58,217,245,.55);--cyglow:0 0 8px rgba(58,217,245,.8);--mark:rgba(255,255,255,.13);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+@media (prefers-color-scheme:light){.v-star-star-spine{--cy:#0b90b0;--cydim:rgba(11,144,176,.55);--cyglow:none;--mark:rgba(0,0,0,.14)}}
+:root[data-theme="light"] .v-star-star-spine{--cy:#0b90b0;--cydim:rgba(11,144,176,.55);--cyglow:none;--mark:rgba(0,0,0,.14)}
+:root[data-theme="dark"] .v-star-star-spine{--cy:#3ad9f5;--cydim:rgba(58,217,245,.55);--cyglow:0 0 8px rgba(58,217,245,.8);--mark:rgba(255,255,255,.13)}
+.v-star-star-spine .ss-star{margin:0;font-size:16.5px;line-height:1.32;font-weight:700;letter-spacing:-.011em;color:var(--text-hi,rgba(255,255,255,.96));display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.v-star-star-spine .ss-spine{display:flex;align-items:flex-end;gap:2px;height:14px;margin-top:20px}
+.v-star-star-spine .ss-spine i{flex:1 1 0;min-width:1px;height:5px;border-radius:1px;background:var(--mark)}
+.v-star-star-spine .ss-spine i.on{height:14px;background:var(--cydim)}
+.v-star-star-spine .ss-spine i.now{background:var(--cy);box-shadow:var(--cyglow)}
+.v-star-star-spine .ss-meta{display:flex;align-items:baseline;margin:12px 0 0;font-size:12.5px;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-spine .ss-meta b{margin-left:auto;font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-spine .ss-line{margin:8px 0 0;font-size:12.5px;line-height:1.4;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-spine .ss-line b{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+
+/* star-star-ledger */
+.v-star-star-ledger{font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+.v-star-star-ledger .sl-star{margin:0;font-size:16px;line-height:1.34;font-weight:680;letter-spacing:-.01em;color:var(--text-hi,rgba(255,255,255,.96));display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.v-star-star-ledger .sl-rule{height:1px;background:var(--hairline,rgba(255,255,255,.09));margin:16px 0}
+.v-star-star-ledger .sl-row{display:flex;align-items:flex-end;gap:10px}
+.v-star-star-ledger .sl-big{font-size:36px;font-weight:700;line-height:.86;letter-spacing:-.028em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-ledger .sl-lab{font-size:13px;line-height:1.22;color:var(--text-mid,rgba(255,255,255,.62));padding-bottom:1px}
+.v-star-star-ledger .sl-wk{margin-left:auto;text-align:right;line-height:1.35}
+.v-star-star-ledger .sl-wk b{display:block;font-size:13px;font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-ledger .sl-wk span{display:block;font-size:12.5px;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-ledger .sl-last{margin:16px 0 0;font-size:12.5px;line-height:1.4;color:var(--text-mid,rgba(255,255,255,.62));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v-star-star-ledger .sl-last b{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+
+/* star-star-climb */
+.v-star-star-climb{--cy:#3ad9f5;--ceil:rgba(255,255,255,.26);display:flex;flex-direction:column;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+@media (prefers-color-scheme:light){.v-star-star-climb{--cy:#0b90b0;--ceil:rgba(0,0,0,.28)}}
+:root[data-theme="light"] .v-star-star-climb{--cy:#0b90b0;--ceil:rgba(0,0,0,.28)}
+:root[data-theme="dark"] .v-star-star-climb{--cy:#3ad9f5;--ceil:rgba(255,255,255,.26)}
+.v-star-star-climb__head{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.v-star-star-climb__now{display:flex;align-items:baseline;gap:7px;min-width:0}
+.v-star-star-climb__now b{font-size:34px;line-height:1;font-weight:700;letter-spacing:-.028em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-climb__now span{font-size:13px;line-height:1.2;color:var(--text-mid,rgba(255,255,255,.62));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v-star-star-climb__delta{flex:none;font-size:12.5px;font-weight:650;color:var(--cy)}
+.v-star-star-climb__chart{position:relative;margin-top:16px}
+.v-star-star-climb__chart svg{display:block}
+.v-star-star-climb__area{fill:color-mix(in srgb,var(--cy) 16%,transparent)}
+.v-star-star-climb__line{fill:none;stroke:var(--cy);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.v-star-star-climb__ceil{stroke:var(--ceil);stroke-width:1;stroke-dasharray:2 5}
+.v-star-star-climb__dot{fill:var(--cy)}
+.v-star-star-climb__ceilcap{position:absolute;right:0;top:5px;font-size:11px;line-height:1;font-weight:600;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-climb__foot{margin:14px 0 0;font-size:12.5px;line-height:1.4;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-climb__foot b{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+
+/* star-star-arrival */
+.v-star-star-arrival{--cy:#3ad9f5;--rail:rgba(255,255,255,.10);--tick:rgba(255,255,255,.38);--inset:inset 0 1px 0 rgba(255,255,255,.06);display:flex;flex-direction:column;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+@media (prefers-color-scheme:light){.v-star-star-arrival{--cy:#0b90b0;--rail:rgba(0,0,0,.10);--tick:rgba(0,0,0,.36);--inset:none}}
+:root[data-theme="light"] .v-star-star-arrival{--cy:#0b90b0;--rail:rgba(0,0,0,.10);--tick:rgba(0,0,0,.36);--inset:none}
+:root[data-theme="dark"] .v-star-star-arrival{--cy:#3ad9f5;--rail:rgba(255,255,255,.10);--tick:rgba(255,255,255,.38);--inset:inset 0 1px 0 rgba(255,255,255,.06)}
+.v-star-star-arrival__star{margin:0;font-size:13.5px;line-height:1.35;font-weight:600;letter-spacing:-.004em;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-arrival__lead{display:flex;align-items:baseline;gap:9px;margin-top:14px}
+.v-star-star-arrival__date{font-size:40px;line-height:.95;font-weight:680;letter-spacing:-.035em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-arrival__at{min-width:0;font-size:12.5px;line-height:1.25;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-arrival__shift{margin:10px 0 0;font-size:12.5px;line-height:1.2;font-weight:650;color:var(--cy)}
+.v-star-star-arrival__rail{position:relative;height:6px;border-radius:999px;background:var(--rail);box-shadow:var(--inset);margin-top:16px}
+.v-star-star-arrival__fill{position:absolute;left:0;top:0;bottom:0;width:38%;border-radius:999px;background:linear-gradient(90deg,color-mix(in srgb,var(--cy) 42%,transparent),var(--cy))}
+.v-star-star-arrival__base{position:absolute;left:12%;top:-3px;bottom:-3px;width:2px;border-radius:2px;background:var(--tick)}
+.v-star-star-arrival__foot{margin:14px 0 0;font-size:12.5px;line-height:1.4;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-arrival__foot b{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+
+/* star-star-count */
+.v-star-star-count{--cy:#3ad9f5;--bar:rgba(255,255,255,.20);--ceil:rgba(255,255,255,.22);--chip:rgba(255,255,255,.08);--inset:inset 0 1px 0 rgba(255,255,255,.08);display:flex;flex-direction:column;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+@media (prefers-color-scheme:light){.v-star-star-count{--cy:#0b90b0;--bar:rgba(0,0,0,.20);--ceil:rgba(0,0,0,.22);--chip:rgba(0,0,0,.07);--inset:none}}
+:root[data-theme="light"] .v-star-star-count{--cy:#0b90b0;--bar:rgba(0,0,0,.20);--ceil:rgba(0,0,0,.22);--chip:rgba(0,0,0,.07);--inset:none}
+:root[data-theme="dark"] .v-star-star-count{--cy:#3ad9f5;--bar:rgba(255,255,255,.20);--ceil:rgba(255,255,255,.22);--chip:rgba(255,255,255,.08);--inset:inset 0 1px 0 rgba(255,255,255,.08)}
+.v-star-star-count__star{margin:0;font-size:13.5px;line-height:1.35;font-weight:600;letter-spacing:-.004em;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-count__top{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-top:12px}
+.v-star-star-count__n{font-size:36px;line-height:1;font-weight:680;letter-spacing:-.032em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-count__n span{font-size:16px;font-weight:600;letter-spacing:-.02em;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-count__stale{flex:none;font-size:12px;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-count__bars{position:relative;display:flex;align-items:flex-end;gap:7px;height:38px;margin-top:16px}
+.v-star-star-count__bars i{flex:1;border-radius:3px;background:var(--bar)}
+.v-star-star-count__bars i.best{background:color-mix(in srgb,var(--cy) 34%,transparent)}
+.v-star-star-count__bars i.now{background:var(--cy)}
+.v-star-star-count__ceil{position:absolute;left:0;right:0;top:0;height:1px;background:var(--ceil)}
+.v-star-star-count__foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;font-size:12.5px;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-count__foot b{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-count__act{flex:none;appearance:none;border:0;border-radius:8px;padding:6px 11px;font:inherit;font-size:12px;font-weight:650;color:var(--text-hi,rgba(255,255,255,.96));background:var(--chip);box-shadow:var(--inset);cursor:pointer;transition:transform 160ms ease-out,opacity 160ms ease-out}
+.v-star-star-count__act:active{transform:scale(.97);opacity:.85}
+@media (prefers-reduced-motion:reduce){.v-star-star-count__act{transition:none}}
+
+/* star-star-revision */
+.v-star-star-revision{font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+.v-star-star-revision .sr-star{margin:0;font-size:16.5px;line-height:1.32;font-weight:700;letter-spacing:-.011em;color:var(--text-hi,rgba(255,255,255,.96));display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.v-star-star-revision .sr-now{margin:10px 0 0;font-size:12.5px;line-height:1.35;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-revision .sr-then{display:flex;gap:11px;margin-top:16px}
+.v-star-star-revision .sr-tick{flex:0 0 auto;width:1px;align-self:stretch;background:var(--hairline,rgba(255,255,255,.09))}
+.v-star-star-revision .sr-body{min-width:0}
+.v-star-star-revision .sr-lab{display:block;font-size:12px;line-height:1.2;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-revision .sr-old{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;margin-top:5px;font-size:13.5px;line-height:1.38;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-revision .sr-foot{margin:16px 0 0;font-size:12.5px;line-height:1.35;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-revision .sr-foot b{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+
+/* consistency-chain-slack */
+.v-consistency-chain-slack{color:var(--text-hi);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;}
+.v-consistency-chain-slack .cs-head{display:flex;align-items:flex-end;gap:9px;}
+.v-consistency-chain-slack .cs-num{font-size:3.25rem;line-height:.82;font-weight:700;letter-spacing:-.035em;color:var(--text-hi);}
+.v-consistency-chain-slack .cs-unit{font-size:.8rem;line-height:1.2;font-weight:600;color:var(--text-mid);padding-bottom:2px;}
+.v-consistency-chain-slack .cs-bank{margin-left:auto;display:inline-flex;align-items:center;gap:6px;padding-bottom:4px;font-size:.78rem;font-weight:600;color:var(--text-mid);white-space:nowrap;}
+.v-consistency-chain-slack .cs-bank svg{flex:0 0 auto;opacity:.75;}
+.v-consistency-chain-slack .cs-chain{display:flex;align-items:flex-end;gap:4px;height:34px;margin-top:24px;}
+.v-consistency-chain-slack .cs-chain i{flex:1 1 0;min-width:0;height:100%;border-radius:3px;display:block;}
+.v-consistency-chain-slack .cs-k{background:#3fd94e;opacity:.92;}
+.v-consistency-chain-slack .cs-p{background:#3fd94e;opacity:.34;height:38%;}
+.v-consistency-chain-slack .cs-g{background:currentColor;opacity:.22;}
+.v-consistency-chain-slack .cs-t{box-shadow:0 0 12px rgba(63,217,78,.45);}
+.v-consistency-chain-slack .cs-foot{margin-top:18px;font-size:.83rem;line-height:1.35;color:var(--text-mid);}
+
+/* consistency-run-rank */
+.v-consistency-run-rank{color:var(--text-hi);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;}
+.v-consistency-run-rank .rr-head{display:flex;align-items:flex-end;gap:9px;}
+.v-consistency-run-rank .rr-num{font-size:3.25rem;line-height:.82;font-weight:700;letter-spacing:-.035em;color:var(--text-hi);}
+.v-consistency-run-rank .rr-unit{font-size:.8rem;line-height:1.2;font-weight:600;color:var(--text-mid);padding-bottom:2px;}
+.v-consistency-run-rank .rr-rank{margin-left:auto;padding-bottom:3px;font-size:.8rem;font-weight:650;letter-spacing:-.005em;color:var(--text-hi);white-space:nowrap;}
+.v-consistency-run-rank .rr-bar{position:relative;height:6px;margin-top:24px;border-radius:999px;background:var(--hairline);}
+.v-consistency-run-rank .rr-fill{position:absolute;top:0;bottom:0;left:0;width:40.8%;border-radius:999px;background:#3fd94e;box-shadow:0 0 14px rgba(63,217,78,.32);}
+.v-consistency-run-rank .rr-notch{position:absolute;top:-4px;bottom:-4px;left:45.6%;width:2px;border-radius:2px;background:currentColor;opacity:.5;}
+.v-consistency-run-rank .rr-marks{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:11px;font-size:.79rem;}
+.v-consistency-run-rank .rr-near{font-weight:600;color:var(--text-hi);}
+.v-consistency-run-rank .rr-far{font-weight:600;color:var(--text-mid);white-space:nowrap;}
+.v-consistency-run-rank .rr-foot{margin-top:20px;font-size:.83rem;line-height:1.35;color:var(--text-mid);}
+
+/* consistency-weekday-shape */
+.v-consistency-weekday-shape{display:flex;flex-direction:column;color:var(--text-hi);font-variant-numeric:tabular-nums;}
+.v-consistency-weekday-shape .ws-h{font-size:16px;line-height:1.32;font-weight:600;letter-spacing:-.015em;color:var(--text-hi);}
+.v-consistency-weekday-shape .ws-h b{font-weight:600;color:#3fd94e;}
+.v-consistency-weekday-shape .ws-list{margin-top:16px;display:flex;flex-direction:column;gap:4px;}
+.v-consistency-weekday-shape .ws-r{display:flex;align-items:center;gap:10px;height:11px;}
+.v-consistency-weekday-shape .ws-d{width:26px;flex:none;font-size:11.5px;line-height:1;font-weight:520;color:var(--text-mid);}
+.v-consistency-weekday-shape .ws-tr{flex:1;height:9px;border-radius:5px;background:var(--hairline);overflow:hidden;}
+.v-consistency-weekday-shape .ws-fl{display:block;height:100%;border-radius:5px;background:currentColor;opacity:.66;width:var(--w);}
+.v-consistency-weekday-shape .ws-r.is-top .ws-fl{background:#3fd94e;opacity:1;}
+.v-consistency-weekday-shape .ws-r.is-low .ws-fl{opacity:.26;}
+.v-consistency-weekday-shape .ws-p{width:30px;flex:none;text-align:right;font-size:11.5px;line-height:1;color:var(--text-mid);}
+.v-consistency-weekday-shape .ws-r.is-top .ws-d,.v-consistency-weekday-shape .ws-r.is-top .ws-p{color:var(--text-hi);}
+.v-consistency-weekday-shape .ws-ft{margin-top:14px;font-size:12.5px;color:var(--text-mid);}
+
+/* consistency-made-of */
+.v-consistency-made-of{color:var(--text-hi);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;}
+.v-consistency-made-of .mo-head{display:flex;align-items:flex-end;gap:9px;}
+.v-consistency-made-of .mo-num{font-size:3.25rem;line-height:.82;font-weight:700;letter-spacing:-.035em;color:var(--text-hi);}
+.v-consistency-made-of .mo-unit{font-size:.8rem;line-height:1.2;font-weight:600;color:var(--text-mid);padding-bottom:2px;}
+.v-consistency-made-of .mo-win{margin-left:auto;padding-bottom:4px;font-size:.78rem;font-weight:600;color:var(--text-mid);}
+.v-consistency-made-of .mo-bar{display:flex;gap:3px;height:10px;margin-top:24px;}
+.v-consistency-made-of .mo-bar i{display:block;height:100%;border-radius:3px;}
+.v-consistency-made-of .mo-a{background:#3fd94e;opacity:.9;}
+.v-consistency-made-of .mo-b{background:currentColor;opacity:.44;}
+.v-consistency-made-of .mo-c{background:currentColor;opacity:.26;}
+.v-consistency-made-of .mo-key{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:14px;font-size:.78rem;color:var(--text-mid);}
+.v-consistency-made-of .mo-key span{display:inline-flex;align-items:center;gap:5px;white-space:nowrap;}
+.v-consistency-made-of .mo-key i{width:7px;height:7px;border-radius:2px;flex:0 0 auto;}
+.v-consistency-made-of .mo-key b{font-weight:700;color:var(--text-hi);}
+.v-consistency-made-of .mo-foot{margin-top:18px;font-size:.83rem;line-height:1.35;color:var(--text-mid);}
+
+/* consistency-rate-drift */
+.v-consistency-rate-drift{color:var(--text-hi);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;}
+.v-consistency-rate-drift .rd-head{display:flex;align-items:flex-end;gap:9px;}
+.v-consistency-rate-drift .rd-num{font-size:3.25rem;line-height:.82;font-weight:700;letter-spacing:-.035em;color:var(--text-hi);}
+.v-consistency-rate-drift .rd-unit{font-size:.8rem;line-height:1.2;font-weight:600;color:var(--text-mid);padding-bottom:2px;}
+.v-consistency-rate-drift .rd-rate{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:3px;padding-bottom:3px;}
+.v-consistency-rate-drift .rd-rate b{font-size:1.15rem;line-height:1;font-weight:700;letter-spacing:-.02em;color:var(--text-hi);}
+.v-consistency-rate-drift .rd-rate small{font-size:.74rem;line-height:1;font-weight:600;color:var(--text-mid);}
+.v-consistency-rate-drift .rd-graph{display:block;width:100%;height:54px;margin-top:20px;overflow:visible;}
+.v-consistency-rate-drift .rd-foot{margin-top:16px;font-size:.83rem;line-height:1.35;color:var(--text-mid);}
+
+/* consistency-returns */
+.v-consistency-returns{color:var(--text-hi);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;}
+.v-consistency-returns .rt-row{display:flex;align-items:center;gap:20px;}
+.v-consistency-returns .rt-ring{position:relative;flex:0 0 96px;width:96px;height:96px;}
+.v-consistency-returns .rt-ring svg{display:block;width:96px;height:96px;}
+.v-consistency-returns .rt-arc{filter:drop-shadow(0 0 8px rgba(63,217,78,.35));}
+.v-consistency-returns .rt-in{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;}
+.v-consistency-returns .rt-num{font-size:1.9rem;line-height:1;font-weight:700;letter-spacing:-.03em;color:var(--text-hi);}
+.v-consistency-returns .rt-lab{font-size:.7rem;font-weight:600;color:var(--text-mid);}
+.v-consistency-returns .rt-rail{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:9px;}
+.v-consistency-returns .rt-lead{margin:0;font-size:.94rem;line-height:1.25;font-weight:600;color:var(--text-hi);}
+.v-consistency-returns .rt-lead b{font-size:1.25rem;font-weight:700;letter-spacing:-.02em;margin-right:3px;}
+.v-consistency-returns .rt-sub{margin:0;font-size:.82rem;line-height:1.25;color:var(--text-mid);}
+.v-consistency-returns .rt-foot{margin-top:20px;font-size:.83rem;line-height:1.35;color:var(--text-mid);}
+
+/* consistency-week-rhythm */
+.v-consistency-week-rhythm{display:flex;flex-direction:column;color:var(--text-hi);font-variant-numeric:tabular-nums;}
+.v-consistency-week-rhythm .wr-top{display:flex;align-items:baseline;gap:8px;}
+.v-consistency-week-rhythm .wr-n{font-size:30px;line-height:1;font-weight:640;letter-spacing:-.03em;color:var(--text-hi);}
+.v-consistency-week-rhythm .wr-of{font-size:14px;font-weight:500;color:var(--text-hi);}
+.v-consistency-week-rhythm .wr-d{margin-left:auto;font-size:12.5px;font-weight:600;color:var(--text-hi);white-space:nowrap;}
+.v-consistency-week-rhythm .wr-row{display:flex;gap:8px;margin-top:20px;}
+.v-consistency-week-rhythm .wr-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:9px;}
+.v-consistency-week-rhythm .wr-tr{width:70%;height:58px;border-radius:4px;background:var(--hairline);display:flex;align-items:flex-end;overflow:hidden;}
+.v-consistency-week-rhythm .wr-fl{width:100%;border-radius:4px;background:currentColor;opacity:.8;}
+.v-consistency-week-rhythm .wr-col.is-today .wr-fl{background:#3fd94e;opacity:1;}
+.v-consistency-week-rhythm .wr-dy{font-size:10.5px;font-weight:520;color:var(--text-mid);}
+.v-consistency-week-rhythm .wr-col.is-today .wr-dy{color:var(--text-hi);}
+.v-consistency-week-rhythm .wr-ft{margin-top:17px;font-size:12.5px;color:var(--text-mid);}
+
+/* consistency-year-ribbon */
+.v-consistency-year-ribbon{display:flex;flex-direction:column;color:var(--text-hi);font-variant-numeric:tabular-nums;}
+.v-consistency-year-ribbon .yr-top{display:flex;align-items:baseline;gap:8px;}
+.v-consistency-year-ribbon .yr-n{font-size:30px;line-height:1;font-weight:640;letter-spacing:-.03em;color:var(--text-hi);}
+.v-consistency-year-ribbon .yr-of{font-size:13.5px;font-weight:500;color:var(--text-hi);}
+.v-consistency-year-ribbon .yr-sub{margin-top:9px;font-size:13px;line-height:1.35;color:var(--text-hi);}
+.v-consistency-year-ribbon .yr-rib{display:flex;align-items:flex-end;gap:1.5px;height:58px;margin-top:20px;}
+.v-consistency-year-ribbon .wk{flex:1;height:var(--h);border-radius:1.5px;background:currentColor;opacity:.4;}
+.v-consistency-year-ribbon .wk.is-peak{opacity:.85;}
+.v-consistency-year-ribbon .wk.is-off{opacity:.15;}
+.v-consistency-year-ribbon .wk.is-now{background:#3fd94e;opacity:1;}
+.v-consistency-year-ribbon .yr-ax{display:flex;margin-top:10px;font-size:10px;color:var(--text-mid);}
+.v-consistency-year-ribbon .yr-ax span{flex:1;}
+.v-consistency-year-ribbon .yr-ax span:last-child{flex:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>The sync box, redesigned</h1>
+  <p class="lede">Twenty-three candidates for the three swipeable faces under the Memento.
+    Ten were designed per face by two designers working opposite briefs, then an
+    adversarial critic fixed or killed each one. <b>Seven were killed as filler or
+    near-duplicates.</b></p>
+  <p class="lede">Every variant uses only data the app already stores. The test each one
+    had to pass: <b>what visibly changes here between day 2 and day 60.</b> A card that
+    shows state teaches you its rule in four viewings and is dead by week two. A card
+    that shows change stays worth a glance.</p>
+  <p class="lede">Prototypes, not shipped. The Memento above each card is a stand-in for
+    the real one.</p>
+
+  <nav class="nav">
+    <a href="#sect-today">Today</a>
+    <a href="#sect-star">Neutron Star</a>
+    <a href="#sect-consistency">Consistency</a>
+  </nav>
+
+  <section class="sect" id="sect-today">
+    <header class="sect__hd">
+      <h2>Today</h2>
+      <p>The one move for the day. Currently a label, a sentence and a button. <b>7 kept.</b></p>
+    </header>
+    <div class="grid">
+      <figure class="slot" id="today-gap-close">
+        <figcaption class="slot__cap">
+          <span class="slot__n">01</span>
+          <span class="slot__t">Closing the gap</span>
+        </figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card">
+            <div class="v v-today-gap-close">
+  <p class="gc-move">Message 10 people who fit the product</p>
+  <div class="gc-head">
+    <span class="gc-now">47</span>
+    <span class="gc-of">of 100 paying customers</span>
+    <span class="gc-new">+6 this week</span>
+  </div>
+  <div class="gc-rail" role="img" aria-label="47 of 100 paying customers, six of them added this week"><i class="gc-base"></i><i class="gc-week"></i></div>
+  <p class="gc-read">At this week's pace you cross 100 on October 2.</p>
+  <button class="gc-do" type="button">Mark it done</button>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">The move on top, then the number the star actually named: where the count stands, the slice of the rail this week added, and the date the current rate lands on the target.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the rail is a sliver and there is no pace line yet (it needs two data points), so the card is the move plus &quot;0 of 100 paying customers&quot;. By day 60 the bright week slice, the +N and the projected date all move without the user touching anything, and the date slides LATER when the week is slow. Stays dormant when goalProgress.target is null: the head, rail and pace line simply do not render.</p>
+          <p class="slot__data">primaryAction.title, goalProgress.current, goalProgress.target, goalProgress.unit, goalProgress.history[{day,value}] for this week&#x27;s delta and the pace-based arrival date</p>
+        </div>
+      </figure>
+      <figure class="slot" id="today-today-weight">
+        <figcaption class="slot__cap">
+          <span class="slot__n">02</span>
+          <span class="slot__t">Weighted move</span>
+        </figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card">
+            <div class="v v-today-today-weight">
+  <p class="tw-move">Send the beta invite to the five people who already asked for it</p>
+  <div class="tw-row">
+    <span class="tw-ladder" aria-hidden="true"><i class="is-past"></i><i class="is-past"></i><i class="is-on"></i><i></i><i></i></span>
+    <span class="tw-tier">Moderate today</span>
+  </div>
+  <p class="tw-run"><span class="tw-n">4</span> of the last 7 days. Your best 7 is <span class="tw-n">6</span>.</p>
+  <button class="tw-cta" type="button">Mark it done</button>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">The move as hero, then the one thing that gives it weight: how heavy today&#x27;s version is on the five-tier ladder, and how this week&#x27;s run compares to the best week the user has ever put together.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the ladder sits low and the run line reads &quot;1 of the last 7 days&quot; with no best to beat yet. By day 60 the lit rung has usually climbed (light to heavy), and the run line becomes a live comparison that can go down as well as up, so 3 of 7 against a best of 6 is real bad news the card is willing to deliver.</p>
+          <p class="slot__data">primaryAction.tiers, primaryAction.recommendedTier, action.selectedTier, actionLocalDaysInWindow(7), proofEvents (type action-complete, for the best rolling 7-day window), actionDoneToday()</p>
+        </div>
+      </figure>
+      <figure class="slot" id="today-today-open">
+        <figcaption class="slot__cap">
+          <span class="slot__n">03</span>
+          <span class="slot__t">First thirty seconds</span>
+        </figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card">
+            <div class="v v-today-today-open">
+  <p class="to-move">Call the three trial accounts that never came back</p>
+  <div class="to-start">
+    <svg class="to-ic" viewBox="0 0 16 16" width="13" height="13" fill="none" aria-hidden="true"><path d="M4 3.2 11.6 8 4 12.8V3.2Z" fill="currentColor"/></svg>
+    <p>Open the trial list and dial the top name before you think about it.</p>
+  </div>
+  <p class="to-gap">Two days since your last move.</p>
+  <button class="to-cta" type="button">Mark it done</button>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">The move as hero with the concrete entry point sitting right under it, so the card answers &quot;what do I physically do first&quot; instead of restating the goal, and one honest line about how long it has been since the last move.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> The entry line is rewritten with every plan, so it is never the same sentence twice. The gap line under it is the part that moves daily: on a good run it reads &quot;You moved yesterday&quot;, after a lapse it reads &quot;Four days since your last move&quot;, which is the one place this face is allowed to deliver bad news.</p>
+          <p class="slot__data">primaryAction.howToStart, primaryAction.tiers + action.selectedTier (the move text), proofEvents (type action-complete, most recent date), actionDoneToday()</p>
+        </div>
+      </figure>
+      <figure class="slot" id="today-today-run">
+        <figcaption class="slot__cap">
+          <span class="slot__n">04</span>
+          <span class="slot__t">The run</span>
+        </figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card">
+            <div class="v v-today-today-run">
+  <ol class="tr-list">
+    <li class="tr-now"><span class="tr-mk" aria-hidden="true"></span><p>Record lesson two, one take, no edits</p></li>
+    <li><span class="tr-mk tr-mk--on" aria-hidden="true"></span><p>Recorded lesson one</p><time>Mon</time></li>
+    <li><span class="tr-mk tr-mk--on" aria-hidden="true"></span><p>Outlined the whole module</p><time>Sat</time></li>
+  </ol>
+  <button class="tr-cta" type="button">Mark today done</button>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">Today&#x27;s move sits at the top of a live rail with the last two completed moves stacked underneath it, so the card shows the run it is continuing and the CTA visibly closes the open link at the top.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the rail is one open node with nothing below it and reads as a beginning. By week three there are always two real completions under it, pulled from the proof ledger with their own titles, so the card shows different history every single day and the top node is the only thing left unfilled.</p>
+          <p class="slot__data">primaryAction.tiers + action.selectedTier (today&#x27;s move), proofEvents (type action-complete: title and date of the two most recent), actionDoneToday()</p>
+        </div>
+      </figure>
+      <figure class="slot" id="today-week-rhythm">
+        <figcaption class="slot__cap">
+          <span class="slot__n">05</span>
+          <span class="slot__t">Week rhythm</span>
+        </figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card">
+            <div class="v v-today-week-rhythm">
+  <p class="wr-move">Message 10 people who fit the product</p>
+  <div class="wr-week" role="img" aria-label="Four moves so far this week. Today is still open.">
+    <span class="wr-day is-done"><i></i>m</span>
+    <span class="wr-day is-done"><i></i>t</span>
+    <span class="wr-day"><i></i>w</span>
+    <span class="wr-day is-done"><i></i>t</span>
+    <span class="wr-day is-done"><i></i>f</span>
+    <span class="wr-day is-now"><i></i>s</span>
+    <span class="wr-day"><i></i>s</span>
+  </div>
+  <p class="wr-read"><b>Four this week.</b> Three by now last week.</p>
+  <button class="wr-do" type="button">Mark it done</button>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">Today&#x27;s move sits inside the shape of the current week: seven dots for the last seven days, today&#x27;s dot still open, and one line comparing this week&#x27;s count to the same point last week.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the strip is almost empty and the comparison line is absent (no last week to compare to). By day 60 the strip is a dense, changing pattern that shifts every single day, and the reading line can go DOWN (&quot;Two this week. Four by now last week&quot;), which is the honest bad news the current card can never deliver.</p>
+          <p class="slot__data">primaryAction.title, actionLocalDaysInWindow(7), proofEvents (action-complete, bucketed per local day for the strip and the prior-week count), consistencyStats().thisWeek/lastWeek, actionDoneToday() for today&#x27;s open dot</p>
+        </div>
+      </figure>
+      <figure class="slot" id="today-record-line">
+        <figcaption class="slot__cap">
+          <span class="slot__n">06</span>
+          <span class="slot__t">Against your record</span>
+        </figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card">
+            <div class="v v-today-record-line">
+  <p class="rl-verdict">One day from your best week.</p>
+  <div class="rl-rows">
+    <div class="rl-row"><span class="rl-k">This week</span><i class="rl-bar"><b style="width:83%"></b></i><span class="rl-n">5</span></div>
+    <div class="rl-row is-best"><span class="rl-k">Best, in June</span><i class="rl-bar"><b style="width:100%"></b></i><span class="rl-n">6</span></div>
+  </div>
+  <p class="rl-move">Message 10 people who fit the product</p>
+  <button class="rl-do" type="button">Mark it done</button>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">Leads with a verdict the user did not author (&quot;One day from your best week&quot;), proves it with two bars, this week against the best week they have ever had, and puts the move underneath as the way to close it.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 there is no record yet, so the face falls back to the move alone. From week three the verdict is recomputed nightly and reads differently most days: approaching, tied, beaten, or fallen behind. The reference is the best WEEK, never a lifetime streak, so it stays reachable inside seven days instead of becoming a trophy nobody can touch.</p>
+          <p class="slot__data">primaryAction.title, actionLocalDaysInWindow(7), proofEvents (action-complete) bucketed into weeks for the best-week value and its month, consistencyStats().thisWeek</p>
+        </div>
+      </figure>
+      <figure class="slot" id="today-today-then">
+        <figcaption class="slot__cap">
+          <span class="slot__n">07</span>
+          <span class="slot__t">How far it has grown</span>
+        </figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card">
+            <div class="v v-today-today-then">
+  <p class="tn-move">Write 1,000 words on the chapter you keep avoiding</p>
+  <div class="tn-then">
+    <span class="tn-rule" aria-hidden="true"></span>
+    <p>Where this started, 63 days ago: <span>write 200 words, anywhere.</span></p>
+  </div>
+  <button class="tn-cta" type="button">Mark it done</button>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">The move as hero, held against the first version of itself from the proof ledger, so the card proves the work has escalated instead of quietly repeating day one forever.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> This face literally cannot exist on day 2, it stays as the move alone until there is a first completed move to compare against. From then on the origin line ages by itself, the day count climbs with no input, and if today&#x27;s move still reads like the first one the card says so plainly rather than hiding it.</p>
+          <p class="slot__data">primaryAction.tiers + action.selectedTier (today&#x27;s move), proofEvents (type action-complete: earliest title and date), clarity.ignitedAt (day count), actionDoneToday()</p>
+        </div>
+      </figure></div>
+  </section>
+  <section class="sect" id="sect-star">
+    <header class="sect__hd">
+      <h2>Neutron Star</h2>
+      <p>The signed statement. Currently a sentence that never changes. <b>8 kept.</b></p>
+    </header>
+    <div class="grid">
+      <figure class="slot" id="star-star-distance">
+        <figcaption class="slot__cap">
+          <span class="slot__n">01</span>
+          <span class="slot__t">Distance to the number</span>
+        </figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card">
+            <div class="v v-star-star-distance">
+  <p class="sd-star">Ship Memento to 100 paying users without abandoning it at 40.</p>
+  <div class="sd-row"><span class="sd-big">34</span><span class="sd-of">of 100 paying users</span><span class="sd-delta">+6 this week</span></div>
+  <div class="sd-rail" aria-hidden="true"><span class="sd-fill"></span></div>
+  <p class="sd-foot">Day 47. At this pace you arrive <b>Nov 12</b>.</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">The star stays the hero sentence, and directly under it the distance engine turns the number inside that sentence into a live climb: where you are, the weekly delta, and the arrival date the current pace implies.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 it is the statement with 0 of 100 and no date. By day 60 the count has moved, the rail has filled, the weekly delta can be +6 or 0 (bad news is possible), and the projected arrival date moves on its own every time goalProgress.history gets a pulse, so the card is different without the user touching it. When goalProgress.target is null the number block and rail are simply not rendered and the face falls back to the statement plus the tenure line.</p>
+          <p class="slot__data">clarity.answers.neutronStar, goalProgress.target, goalProgress.unit, goalProgress.current, goalProgress.history[{day,value}] (pace and projected date), clarity.ignitedAt (Day N)</p>
+        </div>
+      </figure>
+      <figure class="slot" id="star-star-surface">
+        <figcaption class="slot__cap">
+          <span class="slot__n">02</span>
+          <span class="slot__t">The reason, surfaced</span>
+        </figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card">
+            <div class="v v-star-star-surface">
+  <p class="su-star">Ship Memento to 100 paying users without abandoning it at 40.</p>
+  <div class="su-why"><span class="su-dot" aria-hidden="true"></span><span class="su-txt">Because I have quit at the almost-there point four times, and I am not doing that to this one.</span></div>
+  <p class="su-foot"><b>Day 47.</b> Your reason, surfaced after two days without a move.</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">The statement with one of its own supporting answers brought up underneath it, chosen by what is true today, and the bottom line says plainly why that particular one is showing.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 it shows the concrete version of the star, because nothing has happened yet to react to. By day 60 the lower slot is unpredictable: the core why after a silent stretch, the anti vision when the gap widens, the identity line on a day the record was extended. Same words the user wrote, surfaced at the moment they land hardest, so the face changes without inventing any new data.</p>
+          <p class="slot__data">clarity.answers.neutronStar, clarity.answers.coreWhy, clarity.answers.antiVision, clarity.answers.identityLine, clarity.answers.whatSpecifically (the four candidates for the lower slot), clarity.ignitedAt (Day N), actionDoneToday() and actionLocalDaysInWindow(7) (which one surfaces and the reason line)</p>
+        </div>
+      </figure>
+      <figure class="slot" id="star-star-spine">
+        <figcaption class="slot__cap">
+          <span class="slot__n">03</span>
+          <span class="slot__t">The star&#x27;s own spine</span>
+        </figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card">
+            <div class="v v-star-star-spine">
+  <p class="ss-star">Ship Memento to 100 paying users without abandoning it at 40.</p>
+  <div class="ss-spine" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i class="on"></i><i class="on"></i><i></i><i></i><i class="on"></i><i class="on"></i><i></i><i class="on now"></i></div>
+  <p class="ss-meta">Signed June 19<b>Day 47</b></p>
+  <p class="ss-line"><b>38 of those days</b> carried a move. Longest silence, 2 days.</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">The statement over a one-line spine of its entire life: one mark per day since it was signed, tall and lit where a move landed, flat where none did, so the sentence visibly carries a record instead of floating.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the spine is two marks and reads as a beginning, not a wasteland. By day 60 it is a legible shape with real gaps, the marks compress as tenure grows, the ratio line moves, and the longest silence is a number that can get worse, which is the honest bad news this face is allowed to deliver.</p>
+          <p class="slot__data">clarity.answers.neutronStar, clarity.ignitedAt (signed date, Day N, and the span the spine covers), consistencyStats().counts per-day map restricted to days after ignition (lit marks, the count of active days, and the longest gap)</p>
+        </div>
+      </figure>
+      <figure class="slot" id="star-star-ledger">
+        <figcaption class="slot__cap">
+          <span class="slot__n">04</span>
+          <span class="slot__t">What it has cost you</span>
+        </figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card">
+            <div class="v v-star-star-ledger">
+  <p class="sl-star">Ship Memento to 100 paying users without abandoning it at 40.</p>
+  <div class="sl-rule" aria-hidden="true"></div>
+  <div class="sl-row"><span class="sl-big">41</span><span class="sl-lab">moves made<br>in its name</span><span class="sl-wk"><b>4 this week</b><span>6 last week</span></span></div>
+  <p class="sl-last">Yesterday: <b>Rewrote the pricing page headline</b></p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">The statement sits quieter at the top and the weight moves to the evidence stacked under it: every move ever completed since this star was signed, this week measured against last week, and the most recent one named.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the count is 1 and there is no week comparison yet. By day 60 the total is a real body of work, the this-week/last-week pair can go down as easily as up so the card carries information rather than a trophy, and the named last move is a different sentence nearly every day.</p>
+          <p class="slot__data">clarity.answers.neutronStar, proofEvents (type &#x27;action-complete&#x27;) filtered to entries after clarity.ignitedAt for the count and for the latest title + date, consistencyStats().thisWeek, consistencyStats().lastWeek</p>
+        </div>
+      </figure>
+      <figure class="slot" id="star-star-climb">
+        <figcaption class="slot__cap">
+          <span class="slot__n">05</span>
+          <span class="slot__t">The climb</span>
+        </figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card">
+            <div class="v v-star-star-climb">
+  <div class="v-star-star-climb__head">
+    <div class="v-star-star-climb__now"><b>38</b><span>of 100 paying users</span></div>
+    <div class="v-star-star-climb__delta">+4 this week</div>
+  </div>
+  <div class="v-star-star-climb__chart">
+    <svg viewBox="0 0 300 66" preserveAspectRatio="none" width="100%" height="66" aria-hidden="true">
+      <path class="v-star-star-climb__area" d="M0 59 L30 58.5 L60 58 L90 58 L120 56.5 L150 55 L180 52 L210 50.5 L240 48 L270 47 L300 45.5 L300 66 L0 66 Z"/>
+      <path class="v-star-star-climb__line" d="M0 59 L30 58.5 L60 58 L90 58 L120 56.5 L150 55 L180 52 L210 50.5 L240 48 L270 47 L300 45.5" vector-effect="non-scaling-stroke"/>
+      <line class="v-star-star-climb__ceil" x1="0" y1="12" x2="272" y2="12" vector-effect="non-scaling-stroke"/>
+      <circle class="v-star-star-climb__dot" cx="296" cy="45.5" r="3.2"/>
+    </svg>
+    <span class="v-star-star-climb__ceilcap">100</span>
+  </div>
+  <p class="v-star-star-climb__foot">Best week was <b>+6</b>. Day 47 with this star.</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">The shape of the climb is the hero: an area chart scaled from the number they started at to the number the star names, with the target drawn as the ceiling, so the picture is literally how far up they are.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 is one point sitting on the floor and the chart reads honestly as untouched. By week six the curve has flats and jumps in it, the this-week delta swings, and the best-week reference gives every new week something to beat.</p>
+          <p class="slot__data">goalProgress.history (the full series), goalProgress.baseline, goalProgress.current, goalProgress.target, goalProgress.unit, clarity.ignitedAt</p>
+        </div>
+      </figure>
+      <figure class="slot" id="star-star-arrival">
+        <figcaption class="slot__cap">
+          <span class="slot__n">06</span>
+          <span class="slot__t">Arrival date</span>
+        </figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card">
+            <div class="v v-star-star-arrival">
+  <p class="v-star-star-arrival__star">Get Memento to 100 paying users</p>
+  <div class="v-star-star-arrival__lead">
+    <span class="v-star-star-arrival__date">Nov 25</span>
+    <span class="v-star-star-arrival__at">on the pace you have kept</span>
+  </div>
+  <p class="v-star-star-arrival__shift">9 days sooner than a week ago</p>
+  <div class="v-star-star-arrival__rail" aria-hidden="true">
+    <span class="v-star-star-arrival__fill"></span>
+    <span class="v-star-star-arrival__base"></span>
+  </div>
+  <p class="v-star-star-arrival__foot"><b>38</b> today, <b>12</b> when you signed it, <b>62</b> to go</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">Leads with the projected arrival date computed from their own pace, so the headline is a fact that moves on its own every night, and the rail underneath shows where they started against where they are.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 there is no pace yet, so the date slot holds the target count and the rail is empty with only the baseline tick. From the second pulse the date appears and then walks forward or backward daily, and the cyan shift line can read later than a week ago, which is the face&#x27;s honest bad news.</p>
+          <p class="slot__data">goalProgress.target, goalProgress.unit, goalProgress.baseline, goalProgress.current, goalProgress.history (pace and the same pace recomputed a week back), clarity.answers.neutronStar</p>
+        </div>
+      </figure>
+      <figure class="slot" id="star-star-count">
+        <figcaption class="slot__cap">
+          <span class="slot__n">07</span>
+          <span class="slot__t">The count</span>
+        </figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card">
+            <div class="v v-star-star-count">
+  <p class="v-star-star-count__star">Get Memento to 100 paying users</p>
+  <div class="v-star-star-count__top">
+    <div class="v-star-star-count__n">38<span>/100</span></div>
+    <div class="v-star-star-count__stale">counted 4 days ago</div>
+  </div>
+  <div class="v-star-star-count__bars" aria-hidden="true">
+    <span class="v-star-star-count__ceil"></span>
+    <i style="height:7px"></i><i style="height:7px"></i><i style="height:3px"></i><i style="height:13px"></i><i style="height:13px"></i><i class="best" style="height:38px"></i><i style="height:13px"></i><i style="height:32px"></i><i style="height:19px"></i><i class="now" style="height:25px"></i>
+  </div>
+  <div class="v-star-star-count__foot"><span><b>+4</b> this week, 2 off your best</span><button class="v-star-star-count__act" type="button">Update</button></div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">Treats the pulse as the ritual: the count leads, ten weekly gains sit underneath with a hairline ceiling at their best week, and the face says out loud how long it has been since they last counted.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the strip is empty and the card asks for the first count once. By week ten the bars have a real profile, the ceiling is a beatable reference that only moves when they beat it, and the staleness line grows into the card&#x27;s honest bad news.</p>
+          <p class="slot__data">goalProgress.current, goalProgress.target, goalProgress.history (weekly gains, best week, this week), goalProgress.updatedAt, clarity.answers.neutronStar</p>
+        </div>
+      </figure>
+      <figure class="slot" id="star-star-revision">
+        <figcaption class="slot__cap">
+          <span class="slot__n">08</span>
+          <span class="slot__t">Against who you were</span>
+        </figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card">
+            <div class="v v-star-star-revision">
+  <p class="sr-star">Ship Memento to 100 paying users without abandoning it at 40.</p>
+  <p class="sr-now">Second version, signed 47 days ago.</p>
+  <div class="sr-then">
+    <span class="sr-tick" aria-hidden="true"></span>
+    <span class="sr-body"><span class="sr-lab">The first one said</span><span class="sr-old">Build something people actually pay for and get in the best shape of my life.</span></span>
+  </div>
+  <p class="sr-foot">It lasted <b>88 days</b>.</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">The current statement held up against the one it replaced, so the face is a record of a person revising their aim rather than a sentence that never changes.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Before any rewrite it shows the star, the signing tenure, and the identity line in the lower slot. The moment a star is replaced the face becomes a comparison: which version this is, the exact words of the one before it, and how long that one lasted, which is a number the current star is quietly chasing. Every rewrite adds another layer, so this is the only face that gets richer specifically because the goal changed.</p>
+          <p class="slot__data">clarity.answers.neutronStar, clarity.history[] (previous star text, its replacement date, and its lifespan in days), clarity.ignitedAt (days since the current one was signed), clarity.answers.identityLine (fills the lower slot before any revision exists)</p>
+        </div>
+      </figure></div>
+  </section>
+  <section class="sect" id="sect-consistency">
+    <header class="sect__hd">
+      <h2>Consistency</h2>
+      <p>The record. Currently one big number and a wall of dots. <b>8 kept.</b></p>
+    </header>
+    <div class="grid">
+      <figure class="slot" id="consistency-chain-slack">
+        <figcaption class="slot__cap">
+          <span class="slot__n">01</span>
+          <span class="slot__t">Chain with slack</span>
+        </figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card">
+            <div class="v v-consistency-chain-slack">
+  <div class="cs-head">
+    <span class="cs-num">42</span>
+    <span class="cs-unit">days<br>in a row</span>
+    <span class="cs-bank">
+      <svg width="12" height="14" viewBox="0 0 13 15" aria-hidden="true"><path d="M6.5.7 12 2.6v5.1c0 3.2-2.2 5.6-5.5 6.6C3.2 13.3 1 10.9 1 7.7V2.6L6.5.7Z" fill="currentColor"/></svg>
+      2 saved days
+    </span>
+  </div>
+  <div class="cs-chain" role="img" aria-label="The last fourteen days: eleven kept, two part days, one covered by a saved day.">
+    <i class="cs-k"></i>
+    <i class="cs-k"></i>
+    <i class="cs-p"></i>
+    <i class="cs-k"></i>
+    <i class="cs-k"></i>
+    <i class="cs-k"></i>
+    <i class="cs-k"></i>
+    <i class="cs-k"></i>
+    <i class="cs-g"></i>
+    <i class="cs-k"></i>
+    <i class="cs-k"></i>
+    <i class="cs-p"></i>
+    <i class="cs-k"></i>
+    <i class="cs-k cs-t"></i>
+  </div>
+  <div class="cs-foot">A saved day covered Tuesday. The chain held.</div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">Leads with what the streak is actually made of over the last fourteen days, including the days that were covered rather than kept, so the number is never a lie and the grace bank becomes a visible resource.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the chain is two bars and empty track, and the bank line is absent because nothing is banked yet. Over weeks the texture changes constantly, quiet days and covered days move through the window, and the bank fills to two, empties when it is spent, then refills, so the right side of the head is a state that genuinely changes without any input.</p>
+          <p class="slot__data">consistencyStats().current, consistencyStats().counts (last 14 days, main action vs support only), streak.grace.bank, streak.grace.used[iso]</p>
+        </div>
+      </figure>
+      <figure class="slot" id="consistency-run-rank">
+        <figcaption class="slot__cap">
+          <span class="slot__n">02</span>
+          <span class="slot__t">Run rank</span>
+        </figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card">
+            <div class="v v-consistency-run-rank">
+  <div class="rr-head">
+    <span class="rr-num">42</span>
+    <span class="rr-unit">days<br>in a row</span>
+    <span class="rr-rank">3rd longest run</span>
+  </div>
+  <div class="rr-bar" role="img" aria-label="42 days into a run. Your second longest was 47. Your best was 103.">
+    <span class="rr-fill"></span>
+    <span class="rr-notch"></span>
+  </div>
+  <div class="rr-marks">
+    <span class="rr-near">5 days from your second longest</span>
+    <span class="rr-far">best 103</span>
+  </div>
+  <div class="rr-foot">6 of the last 7 days. Last week, 4.</div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">The streak keeps the hero slot, but the fact beside it is its rank among every run this user has ever had, plotted against a beatable neighbour instead of an unreachable lifetime peak.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the run is a sliver, the rank reads last and the copy names a small nearby run to pass. By day 60 the fill has crossed one or two notches, the rank has climbed, and the named target changes each time a previous run is overtaken, so the same card states a different beatable goal every few weeks.</p>
+          <p class="slot__data">consistencyStats().current, consistencyStats().longest, run lengths derived from consistencyStats().counts (rank and second-longest), consistencyStats().thisWeek, consistencyStats().lastWeek</p>
+        </div>
+      </figure>
+      <figure class="slot" id="consistency-weekday-shape">
+        <figcaption class="slot__cap">
+          <span class="slot__n">03</span>
+          <span class="slot__t">Your week&#x27;s signature</span>
+        </figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card">
+            <div class="v v-consistency-weekday-shape">
+  <div class="ws-h"><b>Wednesday</b> holds. Sunday is the gap.</div>
+  <div class="ws-list">
+    <div class="ws-r"><span class="ws-d">Mon</span><span class="ws-tr"><i class="ws-fl" style="--w:74%"></i></span><span class="ws-p">74%</span></div>
+    <div class="ws-r"><span class="ws-d">Tue</span><span class="ws-tr"><i class="ws-fl" style="--w:68%"></i></span><span class="ws-p">68%</span></div>
+    <div class="ws-r is-top"><span class="ws-d">Wed</span><span class="ws-tr"><i class="ws-fl" style="--w:86%"></i></span><span class="ws-p">86%</span></div>
+    <div class="ws-r"><span class="ws-d">Thu</span><span class="ws-tr"><i class="ws-fl" style="--w:71%"></i></span><span class="ws-p">71%</span></div>
+    <div class="ws-r"><span class="ws-d">Fri</span><span class="ws-tr"><i class="ws-fl" style="--w:63%"></i></span><span class="ws-p">63%</span></div>
+    <div class="ws-r"><span class="ws-d">Sat</span><span class="ws-tr"><i class="ws-fl" style="--w:45%"></i></span><span class="ws-p">45%</span></div>
+    <div class="ws-r is-low"><span class="ws-d">Sun</span><span class="ws-tr"><i class="ws-fl" style="--w:29%"></i></span><span class="ws-p">29%</span></div>
+  </div>
+  <div class="ws-ft">Across 187 active days</div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">Aggregates every mark you have ever made by day of the week, so the card names the day that carries you and the day that leaks, with seven bars underneath as the proof.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Below about three weeks it stays dormant because the sample is too thin to claim anything; after that the ranking is genuinely unpredictable, the percentages move a little every day, and the weak day can change, which turns the face into a finding rather than a total.</p>
+          <p class="slot__data">consistencyStats().counts grouped by weekday (share of each weekday with at least one mark), consistencyStats().totalActiveDays</p>
+        </div>
+      </figure>
+      <figure class="slot" id="consistency-made-of">
+        <figcaption class="slot__cap">
+          <span class="slot__n">04</span>
+          <span class="slot__t">What it is made of</span>
+        </figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card">
+            <div class="v v-consistency-made-of">
+  <div class="mo-head">
+    <span class="mo-num">42</span>
+    <span class="mo-unit">days<br>in a row</span>
+    <span class="mo-win">last 30 days</span>
+  </div>
+  <div class="mo-bar" role="img" aria-label="26 moves, 11 reflections, 7 deep work sessions in the last 30 days.">
+    <i class="mo-a" style="width:59%"></i>
+    <i class="mo-b" style="width:25%"></i>
+    <i class="mo-c" style="width:16%"></i>
+  </div>
+  <div class="mo-key">
+    <span><i class="mo-a"></i><b>26</b> moves</span>
+    <span><i class="mo-b"></i><b>11</b> reflections</span>
+    <span><i class="mo-c"></i><b>7</b> deep work</span>
+  </div>
+  <div class="mo-foot">Reflections up 4 on the thirty before. Moves down 1.</div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">Holds the streak but answers a question the current face never does, which is what the last thirty days were actually filled with, using the typed proof spine so the mix itself becomes the story.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the bar is a single sliver of moves and the comparison line stays hidden because there is no prior thirty. By day 60 the proportions shift as reflection and deep work accumulate, and the footer compares each slice against the previous thirty days, which means the card can report a slice going down.</p>
+          <p class="slot__data">consistencyStats().current, consistencyStats().last30, proofEvents filtered to the last 30 days by type (action-complete, reflection-save, deepwork-commit), same counts for the prior 30 day window</p>
+        </div>
+      </figure>
+      <figure class="slot" id="consistency-rate-drift">
+        <figcaption class="slot__cap">
+          <span class="slot__n">05</span>
+          <span class="slot__t">Rate drift</span>
+        </figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card">
+            <div class="v v-consistency-rate-drift">
+  <div class="rd-head">
+    <span class="rd-num">42</span>
+    <span class="rd-unit">days<br>in a row</span>
+    <span class="rd-rate"><b>87%</b><small>last 30 days</small></span>
+  </div>
+  <svg class="rd-graph" viewBox="0 0 306 54" preserveAspectRatio="none" role="img" aria-label="Thirty day rate over twelve weeks, now 87 percent, the thirty days before were 93 percent.">
+    <defs><linearGradient id="rdg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3fd94e" stop-opacity=".22"/><stop offset="1" stop-color="#3fd94e" stop-opacity="0"/></linearGradient></defs>
+    <path d="M3 36.9 30.3 32.3 57.5 27.8 84.8 23.2 112.1 20.9 139.4 15.6 166.6 13.3 193.9 11 221.2 13.3 248.5 15.6 275.7 17.1 303 18.1 303 54 3 54Z" fill="url(#rdg)"/>
+    <path d="M3 13.3H303" stroke="currentColor" stroke-opacity=".28" stroke-width="1" stroke-dasharray="2 4" vector-effect="non-scaling-stroke"/>
+    <path d="M3 36.9 30.3 32.3 57.5 27.8 84.8 23.2 112.1 20.9 139.4 15.6 166.6 13.3 193.9 11 221.2 13.3 248.5 15.6 275.7 17.1 303 18.1" fill="none" stroke="#3fd94e" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+    <circle cx="303" cy="18.1" r="2.6" fill="#3fd94e"/>
+  </svg>
+  <div class="rd-foot">Down 6 points. The 30 days before, 93%.</div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">The streak stays, but the information is the rolling thirty day rate drawn over twelve weeks against the previous thirty, which is the one number on this face that is allowed to fall.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 there is no curve, only the number and a single point. As weeks accumulate the line grows a shape, and by day 60 the card is genuinely unpredictable because the rate moves with every day that ages out of the window, whether or not the user opens the app.</p>
+          <p class="slot__data">consistencyStats().current, consistencyStats().pct30, rolling 30 day rate resampled weekly from consistencyStats().counts, the prior 30 day rate from the same counts</p>
+        </div>
+      </figure>
+      <figure class="slot" id="consistency-returns">
+        <figcaption class="slot__cap">
+          <span class="slot__n">06</span>
+          <span class="slot__t">Returns</span>
+        </figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card">
+            <div class="v v-consistency-returns">
+  <div class="rt-row">
+    <div class="rt-ring">
+      <svg viewBox="0 0 96 96" role="img" aria-label="42 days into this run, against a best run of 103.">
+        <circle cx="48" cy="48" r="43" fill="none" stroke="currentColor" stroke-opacity=".12" stroke-width="5"/>
+        <circle class="rt-arc" cx="48" cy="48" r="43" fill="none" stroke="#3fd94e" stroke-width="5" stroke-linecap="round" stroke-dasharray="110.2 270.2" transform="rotate(-90 48 48)"/>
+      </svg>
+      <div class="rt-in"><span class="rt-num">42</span><span class="rt-lab">days</span></div>
+    </div>
+    <div class="rt-rail">
+      <p class="rt-lead"><b>12</b> returns after a break</p>
+      <p class="rt-sub">Longest gap, 4 days</p>
+      <p class="rt-sub">Best run, 103</p>
+    </div>
+  </div>
+  <div class="rt-foot">26 of the last 30 days. 168 active in all.</div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">Keeps the number but pairs it with the honest statistic underneath a streak, which is how many times this person has come back after stopping, with the thirty day rate carried by the ring so the hero is not the only thing worth reading.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the ring is nearly empty and the returns count is zero, so the rail shows only the start date. Every break and recovery adds a return and can widen the longest gap, the ring moves with the rolling thirty, and by day 60 the rail is a short history that no calendar could reproduce.</p>
+          <p class="slot__data">consistencyStats().current, consistencyStats().last30, consistencyStats().pct30, consistencyStats().longest, consistencyStats().totalActiveDays, gaps and returns derived from consistencyStats().counts, first proof event date</p>
+        </div>
+      </figure>
+      <figure class="slot" id="consistency-week-rhythm">
+        <figcaption class="slot__cap">
+          <span class="slot__n">07</span>
+          <span class="slot__t">This week&#x27;s rhythm</span>
+        </figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card">
+            <div class="v v-consistency-week-rhythm">
+  <div class="wr-top"><span class="wr-n">5</span><span class="wr-of">days marked this week</span><span class="wr-d">+2 vs last</span></div>
+  <div class="wr-row">
+    <div class="wr-col"><div class="wr-tr"><div class="wr-fl" style="height:66%"></div></div><span class="wr-dy">M</span></div>
+    <div class="wr-col"><div class="wr-tr"><div class="wr-fl" style="height:33%"></div></div><span class="wr-dy">T</span></div>
+    <div class="wr-col"><div class="wr-tr"><div class="wr-fl" style="height:100%"></div></div><span class="wr-dy">W</span></div>
+    <div class="wr-col"><div class="wr-tr"></div><span class="wr-dy">T</span></div>
+    <div class="wr-col"><div class="wr-tr"><div class="wr-fl" style="height:66%"></div></div><span class="wr-dy">F</span></div>
+    <div class="wr-col"><div class="wr-tr"></div><span class="wr-dy">S</span></div>
+    <div class="wr-col is-today"><div class="wr-tr"><div class="wr-fl" style="height:33%"></div></div><span class="wr-dy">S</span></div>
+  </div>
+  <div class="wr-ft">14 in a row, best 103</div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">Leads with the shape of the current week as seven columns whose height is that day&#x27;s number of marks, headlined by the honest week-over-week delta rather than the streak.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> On day 2 it is one short column and no delta yet; by day 60 the seven columns carry a visible personal rhythm, the +/- against last week flips both ways as the week fills, and the streak has been demoted to a single quiet line at the bottom.</p>
+          <p class="slot__data">consistencyStats().counts (per-day marks for the current week), consistencyStats().thisWeek, consistencyStats().lastWeek, consistencyStats().current, consistencyStats().longest</p>
+        </div>
+      </figure>
+      <figure class="slot" id="consistency-year-ribbon">
+        <figcaption class="slot__cap">
+          <span class="slot__n">08</span>
+          <span class="slot__t">The year, week by week</span>
+        </figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card">
+            <div class="v v-consistency-year-ribbon">
+  <div class="yr-top"><span class="yr-n">187</span><span class="yr-of">days this year</span></div>
+  <div class="yr-sub">Densest stretch, late March into April.</div>
+  <div class="yr-rib" role="img" aria-label="Active days per week across the year, densest in late March into April."><i class="wk is-off" style="--h:2px"></i><i class="wk" style="--h:13px"></i><i class="wk" style="--h:19px"></i><i class="wk is-off" style="--h:2px"></i><i class="wk" style="--h:19px"></i><i class="wk" style="--h:26px"></i><i class="wk" style="--h:19px"></i><i class="wk" style="--h:32px"></i><i class="wk" style="--h:26px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:32px"></i><i class="wk" style="--h:45px"></i><i class="wk is-peak" style="--h:39px"></i><i class="wk is-peak" style="--h:39px"></i><i class="wk is-peak" style="--h:52px"></i><i class="wk is-peak" style="--h:45px"></i><i class="wk is-peak" style="--h:52px"></i><i class="wk is-peak" style="--h:45px"></i><i class="wk" style="--h:32px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:26px"></i><i class="wk" style="--h:32px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:32px"></i><i class="wk" style="--h:19px"></i><i class="wk" style="--h:26px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:32px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:52px"></i><i class="wk is-now" style="--h:32px"></i></div>
+  <div class="yr-ax"><span>Jan</span><span>Apr</span><span>Jul</span><span>Oct</span><span>Now</span></div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">The whole year as 52 slim columns, each one week&#x27;s active days, with the densest stretch brightened and named in the line above it so the picture and the sentence say the same thing.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 is a single stub column against an empty year; every week adds a column, the named densest stretch moves as new peaks form, and by day 200 the card is a portrait of the year&#x27;s terrain that no other surface in the app shows.</p>
+          <p class="slot__data">consistencyStats().yearConsistency, consistencyStats().counts (weekly active-day totals and the densest run), consistencyStats().totalActiveDays</p>
+        </div>
+      </figure></div>
+  </section>
+</div>
+</body>
+</html>
