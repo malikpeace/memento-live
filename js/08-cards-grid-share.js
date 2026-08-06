@@ -5878,10 +5878,17 @@ function renderDayCard() {
       // restore failsafe (pagehide + idempotent close), so the door reopens.
       // Slop guard: a tilt-drag or scroll that starts on the card is not a tap.
       (function () {
-        let tx = 0, ty = 0, moved = true;
-        wrap.addEventListener('pointerdown', (e) => { tx = e.clientX; ty = e.clientY; moved = false; });
+        let tx = 0, ty = 0, t0 = 0, moved = true;
+        wrap.addEventListener('pointerdown', (e) => { tx = e.clientX; ty = e.clientY; t0 = Date.now(); moved = false; });
         wrap.addEventListener('pointermove', (e) => { if (!moved && (Math.abs(e.clientX - tx) > 8 || Math.abs(e.clientY - ty) > 8)) moved = true; });
-        wrap.addEventListener('pointerup', () => { if (!moved) { try { openMementoFull(); } catch (e) {} } moved = true; });
+        wrap.addEventListener('pointerup', () => {
+          // v1132: a TAP opens it. A deliberate long press does not (a 600ms
+          // hold used to open the view on release, which no native card does).
+          // 700ms, not 400: the gate is only there to ignore a real long
+          // press, and a busy main thread can stretch an honest tap.
+          if (!moved && (Date.now() - t0) < 700) { try { openMementoFull(); } catch (e) {} }
+          moved = true;
+        });
       })();
       // FIRST WHITE: the one-time ceremony when the card earns its first action
       // light (FIRST-WIN-PLAN #4/#5: log the first move -> the card gains its
@@ -6024,6 +6031,18 @@ function openMementoFull() {
     // pin its size inline (the home's size CSS does not reach it out here), and land
     // it on its exact on-home position so it does not move a pixel. close() puts it
     // back. All wrapped so the card is always restorable.
+    // v1132 THE ACCUMULATING GLITCH: the tap and hold listeners are bound to
+    // the REAL card, which goes back to the home when the view closes. They
+    // were never removed, so every open left another set behind: pressing the
+    // home card scaled it (is-pressing) with nothing to open, closes fired on
+    // a dead overlay, and it compounded with each visit. One abort signal now
+    // owns every listener this view creates.
+    // (These live HERE, above the morph that assigns morphT: declaring them
+    // lower threw 'cannot access before initialization' on every open, which
+    // the outer catch swallowed and left the view half-wired.)
+    const viewAbort = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    const sig = viewAbort ? { signal: viewAbort.signal } : undefined;
+    let morphT = null;
     const dayCardEl = document.getElementById('dayCard');
     const liveWrap = dayCardEl ? dayCardEl.querySelector('.daycard-wrap') : null;
     const cardHost = ov.querySelector('.mf__card');
@@ -6075,9 +6094,17 @@ function openMementoFull() {
             stage2.style.transition = 'none';
             stage2.style.transform = 'translate(' + dx.toFixed(1) + 'px,' + dy.toFixed(1) + 'px) scale(' + s.toFixed(4) + ')';
             void stage2.offsetWidth;
+            stage2.style.willChange = 'transform';   // promote BEFORE the run, not mid-flight
             stage2.style.transition = 'transform 380ms cubic-bezier(0.22, 0.68, 0.24, 1)';
             stage2.style.transform = 'none';
-            setTimeout(() => { try { stage2.style.transition = ''; stage2.style.transform = ''; stage2.style.transformOrigin = ''; } catch (e) {} }, 420);
+            // v1132: a close that interrupts the opening morph used to hit this
+            // stale timeout, which wiped the transform mid-flight and teleported
+            // the card. It no-ops once closing has begun, and close() clears it.
+            morphT = setTimeout(() => {
+              morphT = null;
+              if (mfClosed) return;
+              try { stage2.style.transition = ''; stage2.style.transform = ''; stage2.style.transformOrigin = ''; stage2.style.willChange = ''; } catch (e) {}
+            }, 420);
           }
         }
       }
@@ -6128,11 +6155,15 @@ function openMementoFull() {
       if (mfClosed) return;   // idempotent: a 2nd trigger (a swipe + a stray tap, a
       mfClosed = true;        // double-tap, Escape while tapping) must NOT run the
       try { if (mfTick) clearInterval(mfTick); } catch (e) {}
+      try { if (morphT) { clearTimeout(morphT); morphT = null; } } catch (e) {}
       try { window.removeEventListener('pagehide', onHide); } catch (e) {}
+      try { if (viewAbort) viewAbort.abort(); } catch (e) {}
+      try { if (liveWrap) liveWrap.classList.remove('is-pressing'); } catch (e) {}
                               // restore twice, or the second pass removes the card it
                               // just put back (the else branch below) and the home
                               // ends up with no Memento at all.
       ov.classList.remove('mf--open');   // bg + stats fade out
+      ov.classList.add('mf--closing');   // ...in the SAME time the card flies
       document.body.style.overflow = '';
       document.removeEventListener('keydown', onKey);
       // v1127 (Malik: 'it just kinda sits there for a second'): the card used
@@ -6154,9 +6185,19 @@ function openMementoFull() {
           const stg = nsB.closest('.daycard-living-stage') || nsB;
           const reduced2 = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
           if (!reduced2) {
+            stg.style.willChange = 'transform';
             stg.style.transformOrigin = '50% 0';
             stg.style.transition = 'transform 300ms cubic-bezier(0.32, 0.72, 0, 1)';
             stg.style.transform = 'translate(' + dx2.toFixed(1) + 'px,' + dy2.toFixed(1) + 'px) scale(' + s2.toFixed(4) + ')';
+            // land the restore on the ACTUAL end of the animation, not a timer
+            // that can drift a frame past it (that drift is a visible snap).
+            try {
+              stg.addEventListener('transitionend', (ev) => {
+                if (ev.propertyName !== 'transform') return;
+                if (restoreT) { clearTimeout(restoreT); restoreT = null; }
+                restoreHome();
+              }, { once: true });
+            } catch (e) {}
           } else { backMs = 0; }
         } else { backMs = 0; }
       } catch (e) { backMs = 0; }
@@ -6164,11 +6205,18 @@ function openMementoFull() {
       // remove the overlay in the same tick so there's no gap. Putting it back early
       // would drop it behind the still-opaque bg and make it flash. Let the home size
       // CSS take over again. Guard against a re-render having rebuilt the card.
-      setTimeout(() => {
+      restoreT = setTimeout(() => { restoreT = null; restoreHome(); }, backMs + 40);
+    };
+    // The card goes home exactly once, whether the animation ended cleanly or
+    // the fallback timer had to step in.
+    let restoreT = null, restored = false;
+    function restoreHome() {
+      if (restored) return;
+      restored = true;
         try {
           if (liveWrap) {
             const stg2 = liveWrap.querySelector('.daycard-living-stage') || liveWrap.querySelector('.daycard-ns');
-            if (stg2) { stg2.style.transition = ''; stg2.style.transform = ''; stg2.style.transformOrigin = ''; }
+            if (stg2) { stg2.style.transition = ''; stg2.style.transform = ''; stg2.style.transformOrigin = ''; stg2.style.willChange = ''; }
             liveWrap.style.removeProperty('--dc-rx');
             liveWrap.style.removeProperty('--dc-ry');
             const existing = dayCardEl ? dayCardEl.querySelector('.daycard-wrap') : null;
@@ -6182,22 +6230,21 @@ function openMementoFull() {
           if (dayCardEl) dayCardEl.style.minHeight = '';
         } catch (e) {}
         try { ov.remove(); } catch (e) {}
-      }, backMs);
-    };
+    }
     const onKey = (e) => { if (e.key === 'Escape') close(); };
     // v1123 (Malik): tap the card again to go back; tap-and-hold customises.
     // Slop + duration guards so a scroll or a completed hold never closes,
     // and the sheet being up (the hold just fired) always wins over the tap.
     if (liveWrap) (function () {
       let tx = 0, ty = 0, t0 = 0, tMoved = true;
-      liveWrap.addEventListener('pointerdown', (e) => { tx = e.clientX; ty = e.clientY; t0 = Date.now(); tMoved = false; });
-      liveWrap.addEventListener('pointermove', (e) => { if (!tMoved && (Math.abs(e.clientX - tx) > 8 || Math.abs(e.clientY - ty) > 8)) tMoved = true; });
+      liveWrap.addEventListener('pointerdown', (e) => { tx = e.clientX; ty = e.clientY; t0 = Date.now(); tMoved = false; }, sig);
+      liveWrap.addEventListener('pointermove', (e) => { if (!tMoved && (Math.abs(e.clientX - tx) > 8 || Math.abs(e.clientY - ty) > 8)) tMoved = true; }, sig);
       liveWrap.addEventListener('pointerup', () => {
         const quick = (Date.now() - t0) < 320;
         const sheetUp = !!ov.querySelector('.mfsk-wrap:not([hidden])');
         if (!tMoved && quick && !sheetUp) close();
         tMoved = true;
-      });
+      }, sig);
     })();
     // v1120 FAILSAFE: a killed/backgrounded page must never strand the
     // borrowed card (the v668 stranding). pagehide restores it IMMEDIATELY,
@@ -6219,7 +6266,7 @@ function openMementoFull() {
         ov.remove();
       } catch (e) {}
     };
-    window.addEventListener('pagehide', onHide);
+    window.addEventListener('pagehide', onHide, sig);
     ov.addEventListener('click', (e) => { if (e.target === ov) close(); });
     // iOS-like swipe-down-to-close: pull the card view down (when scrolled to the
     // top) and it follows the finger, then flicks away or springs back.
@@ -6285,8 +6332,8 @@ function openMementoFull() {
       el.addEventListener('click', go);
       el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
     });
-    try { _mfSkinsInit(ov, liveWrap); } catch (e) {}
-    document.addEventListener('keydown', onKey);
+    try { _mfSkinsInit(ov, liveWrap, sig); } catch (e) {}
+    document.addEventListener('keydown', onKey, sig);
     try { window._mfClose = close; } catch (e) {}
   } catch (e) {}
 }
@@ -7077,7 +7124,7 @@ function _skChipHtml(sk, id, label, pressed) {
 
 // The customiser: held open from the card inside the Memento view. Paid only
 // (the house card is everyone's default; the material is what they own).
-function _mfSkinsInit(ov, wrap) {
+function _mfSkinsInit(ov, wrap, sig) {
   if (typeof ClarityPaywall !== 'undefined' && !ClarityPaywall.isPaid()) return;
   if (!ov || !wrap) return;
   const scroll = ov.querySelector('.mf__scroll');
@@ -7199,11 +7246,12 @@ function _mfSkinsInit(ov, wrap) {
     wrap.classList.remove('is-pressing');
     clearTimeout(holdT); holdT = null;
   };
-  wrap.addEventListener('touchstart', (e) => { const t = e.touches[0]; if (t) pressStart(t.clientX, t.clientY); }, { passive: true });
-  wrap.addEventListener('touchmove', (e) => { const t = e.touches[0]; if (t) pressMove(t.clientX, t.clientY); }, { passive: true });
-  ['touchend', 'touchcancel'].forEach(ev => wrap.addEventListener(ev, pressEnd, { passive: true }));
-  wrap.addEventListener('pointerdown', (e) => { if (e.pointerType === 'touch') return; pressStart(e.clientX, e.clientY); });
-  ov.addEventListener('pointermove', (e) => { if (e.pointerType === 'touch') return; pressMove(e.clientX, e.clientY); });
-  ['pointerup', 'pointercancel'].forEach(ev => ov.addEventListener(ev, (e) => { if (e.pointerType !== 'touch') pressEnd(); }));
-  wrap.addEventListener('contextmenu', (e) => { e.preventDefault(); if (sheet.hidden) openSheet(); });
+  const P = Object.assign({ passive: true }, sig || {});
+  wrap.addEventListener('touchstart', (e) => { const t = e.touches[0]; if (t) pressStart(t.clientX, t.clientY); }, P);
+  wrap.addEventListener('touchmove', (e) => { const t = e.touches[0]; if (t) pressMove(t.clientX, t.clientY); }, P);
+  ['touchend', 'touchcancel'].forEach(ev => wrap.addEventListener(ev, pressEnd, P));
+  wrap.addEventListener('pointerdown', (e) => { if (e.pointerType === 'touch') return; pressStart(e.clientX, e.clientY); }, sig);
+  ov.addEventListener('pointermove', (e) => { if (e.pointerType === 'touch') return; pressMove(e.clientX, e.clientY); }, sig);
+  ['pointerup', 'pointercancel'].forEach(ev => ov.addEventListener(ev, (e) => { if (e.pointerType !== 'touch') pressEnd(); }, sig));
+  wrap.addEventListener('contextmenu', (e) => { e.preventDefault(); if (sheet.hidden) openSheet(); }, sig);
 }

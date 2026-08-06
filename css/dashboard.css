@@ -5285,3 +5285,14 @@ body:has(#mementoFull) #topFade { display: none !important; }
 #mementoFull .mf-note, #mementoFull .mf-note * {
   -webkit-user-select: text; user-select: text; -webkit-touch-callout: default;
 }
+
+/* v1132: while closing, the room fades in the SAME time the card flies home
+   (300ms). It used to fade over 420ms and the overlay was torn out at 300,
+   cutting a still-visible backdrop, which read as a flash at the end. */
+#mementoFull.mf--closing .mf__bg { transition: opacity 250ms ease; }
+#mementoFull.mf--closing .mf-name, #mementoFull.mf--closing .mf-mori,
+#mementoFull.mf--closing .mf-note, #mementoFull.mf--closing .mf-note__d,
+#mementoFull.mf--closing .mf-tally, #mementoFull.mf--closing .mf-trail,
+#mementoFull.mf--closing .mf-origin, #mementoFull.mf--closing .mfsk-hint {
+  transition: opacity 180ms ease;
+}
