@@ -5296,3 +5296,22 @@ body:has(#mementoFull) #topFade { display: none !important; }
 #mementoFull.mf--closing .mf-origin, #mementoFull.mf--closing .mfsk-hint {
   transition: opacity 180ms ease;
 }
+
+/* v1133 (Malik): the origin plaque inverts so it always stands off the room.
+   DARK room (most materials): white plaque, black text, the date struck into
+   it the same way, just flipped (light catch above, shadow below). LIGHT room
+   (a bright material): the original black plaque with white text. */
+#mementoFull[data-room="dark"] .mf-origin {
+  background: linear-gradient(180deg, rgba(244,246,250,0.96), rgba(228,232,240,0.92));
+  box-shadow: inset 0 2px 3px rgba(255,255,255,0.9), inset 0 -1px 0 rgba(20,24,32,0.10),
+              0 10px 30px rgba(0,0,0,0.45);
+}
+#mementoFull[data-room="dark"] .mf-origin::before {
+  background: radial-gradient(76% 90% at 50% 118%, rgba(var(--skin-rgb, var(--accent-rgb, 58,217,245)), 0.12), transparent 72%);
+}
+#mementoFull[data-room="dark"] .mf-origin__k { color: rgba(24,28,36,0.55); }
+#mementoFull[data-room="dark"] .mf-origin__d {
+  color: rgba(16,20,28,0.92);
+  text-shadow: 0 1px 1px rgba(255,255,255,0.9), 0 -1px 0.5px rgba(0,0,0,0.18);
+}
+#mementoFull[data-room="dark"] .mf-origin__t { color: rgba(24,28,36,0.62); }

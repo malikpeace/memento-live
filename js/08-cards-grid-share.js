@@ -6114,6 +6114,32 @@ function openMementoFull() {
     // Commit the initial state with a forced reflow, then flip to open so the bg +
     // stats transitions play. rAF gets throttled when the tab is backgrounded, which
     // can leave the overlay stuck; a sync reflow never stalls.
+    // v1133 (Malik): the origin plaque must STICK OUT against whatever room
+    // the material makes. A bright material lights the room, so the plaque
+    // stays black with white text. A dark material leaves a dark room, so the
+    // plaque flips to white with black text. Read from the same tint the room
+    // itself is painted with.
+    try {
+      const sk0 = activeCardSkin();
+      const tint = sk0 ? skinTintRgb(sk0)
+        : ((getComputedStyle(document.body).getPropertyValue('--accent-rgb') || '').trim() || '58,217,245');
+      // The ROOM is not the tint: it is the tint laid over the near-black
+      // chamber at ~22% (the strongest pool in .mf__bg). Judge the blend, not
+      // the paint in the tin. Cyan looks bright on its own and still leaves a
+      // dark room, which is exactly the case that fooled the first attempt.
+      const p3 = String(tint).split(',').map(n => parseFloat(n) || 0);
+      const A = 0.22, BASE = [6, 7, 11];
+      const mix = [0, 1, 2].map(i => (p3[i] || 0) * A + BASE[i] * (1 - A));
+      const lum = 0.299 * mix[0] + 0.587 * mix[1] + 0.114 * mix[2];
+      // Judge the ROOM and nothing else. (A 'bright material floods the room'
+      // exception was tried and dropped: it fired on a bright ACCENT with the
+      // house card, whose room is still dark, and would have put a black
+      // plaque on a black room, the exact bug being fixed. With today's
+      // materials every room measures 6-62, so the plaque is white; the rule
+      // flips itself the day a genuinely light room exists.)
+      ov.dataset.room = lum > 128 ? 'light' : 'dark';
+    } catch (e) { ov.dataset.room = 'dark'; }
+
     void ov.offsetWidth;
     ov.classList.add('mf--open');
 
