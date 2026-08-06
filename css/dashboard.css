@@ -3444,10 +3444,13 @@ html.lowfx .daycard-ns {
   color: var(--text-hi); line-height: 1.55;
   text-wrap: balance;
 }
-/* Fallback sizing only (JS pins the opened card to the live home card's exact
-   size). Square to match the home card so a tap never reshapes it. */
-#mementoFull .daycard-ns { width: min(86vw, 360px); min-height: min(86vw, 360px); margin: 0; }
-#mementoFull .daycard-theme-living .daycard-living-stage { width: min(86vw, 360px); margin: 14px auto 26px; }
+/* v1123: the VIEW owns the card's size now (the mockup's contained hero).
+   The home card can be any height (it grows into the v1067 column), so
+   pinning the borrowed card to its home size filled the whole screen and
+   read as broken. The open animates a transform-only FLIP from the home
+   rect into this slot (js/08). */
+#mementoFull .daycard-theme-living .daycard-living-stage { width: min(74vw, 286px); margin: 10px auto 0; }
+#mementoFull .daycard-ns { width: 100%; min-height: 0; aspect-ratio: 320 / 452; margin: 0; }
 /* The "Where you stand" eyebrow was removed; the stats carry their own top
    spacing so they still breathe below the card. */
 .mf__stats { width: 100%; margin-top: 26px; display: flex; flex-direction: column; gap: 12px; }

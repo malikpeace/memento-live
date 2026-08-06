@@ -6029,55 +6029,50 @@ function openMementoFull() {
     const liveWrap = dayCardEl ? dayCardEl.querySelector('.daycard-wrap') : null;
     const cardHost = ov.querySelector('.mf__card');
     let homeParent = null, homeNext = null;
-    const sizedEls = [];
     if (liveWrap && cardHost) {
       const liveNs0 = liveWrap.querySelector('.daycard-ns');
-      // LAYOUT size (offsetW/H ignore any transient entrance scale) for the pin;
-      // RECT (H) for the on-screen position to land on.
-      const sw = liveNs0 ? liveNs0.offsetWidth : 0;
-      const sh = liveNs0 ? liveNs0.offsetHeight : 0;
+      // where the card sits on the home RIGHT NOW, for the morph below
       const H = liveNs0 ? liveNs0.getBoundingClientRect() : null;
       if (dayCardEl) dayCardEl.style.minHeight = dayCardEl.offsetHeight + 'px';
       homeParent = liveWrap.parentNode; homeNext = liveWrap.nextSibling;
       cardHost.appendChild(liveWrap);            // borrow the REAL card (no clone)
-      const stage = liveWrap.querySelector('.daycard-living-stage');
       const ns = liveWrap.querySelector('.daycard-ns');
-      // Drop the one-time entrance classes (the daily materialize animates a 0.9
-      // scale we don't want a snapshot of), and FREEZE the card's transform: snap
-      // any tilt flat with the 0.18s transform transition turned OFF, so the card
-      // cannot rotate or animate a hair as the view opens. The tilt vars live on
-      // the .daycard-ns itself (where bindDayCardTilt sets them), not the wrap, so
-      // setting them on the wrap (as before) did nothing.
       liveWrap.classList.remove('daycard-materialize', 'daycard-reveal');
       if (ns) {
-        // v1056: the rotation moved from the card to its stage (so the bloom
-        // and floor tilt with it); flatten whichever element carries it.
+        // v1056: the rotation moved from the card to its stage; flatten it with
+        // the transition off so the card cannot animate a hair as the view opens.
         const tiltHost = ns.closest('.daycard-living-stage') || ns;
         tiltHost.style.transition = 'none';
         tiltHost.style.setProperty('--dc-rx', '0deg');
         tiltHost.style.setProperty('--dc-ry', '0deg');
-        void tiltHost.offsetWidth;  // commit the flat state with no animation
-        tiltHost.style.transition = '';  // restore (in-view tilt, if any, still works)
+        void tiltHost.offsetWidth;
+        tiltHost.style.transition = '';
       }
-      if (H) {
-        if (stage) { stage.style.width = sw + 'px'; stage.style.margin = '0 auto'; if (ns) ns.style.width = '100%'; sizedEls.push(stage); }
-        else if (ns) { ns.style.width = sw + 'px'; }
-        if (ns) { ns.style.minHeight = sh + 'px'; sizedEls.push(ns); }
-        // Land it on its exact home spot -> zero visible movement. Vertical via
-        // padding (keeps the view scrollable, no transform to fight the swipe);
-        // horizontal only if the home card is off-centre. Force the flex layout to
-        // SETTLE after the size-pin before measuring, so C is the card's true
-        // resting position (not a half-resolved first pass) and the padding-top
-        // lands it exactly once, with no second-pass correction the eye can catch.
-        void ov.offsetWidth;
-        const C = ns ? ns.getBoundingClientRect() : null;
-        if (C) {
-          const dy = Math.round(H.top - C.top);
-          const dx = Math.round(H.left - C.left);
-          if (dy) ov.style.paddingTop = 'calc(36px + var(--safe-t, 0px) + ' + dy + 'px)';
-          if (Math.abs(dx) > 1) {
-            const scroll = ov.querySelector('.mf__scroll');
-            if (scroll) scroll.style.marginLeft = ((parseFloat(getComputedStyle(scroll).marginLeft) || 0) + dx) + 'px';
+      // v1123 (Malik: 'a bit broken, not very smooth'): the old land-on-the-
+      // exact-home-spot math pinned the card at its HOME size (huge, since the
+      // v1067 home lets it grow) and shoved the whole column sideways with a
+      // marginLeft correction, which is exactly the brokenness in his
+      // screenshot. Now the view owns the card's size (the mockup's contained
+      // hero, see the CSS) and the open is a transform-only FLIP: the card
+      // starts visually at its home rect and settles into the hero slot in
+      // one compositor move. No layout is touched mid-animation.
+      if (H && ns) {
+        void ov.offsetWidth;   // let the hero layout settle before measuring
+        const N = ns.getBoundingClientRect();
+        if (N.width > 0) {
+          const s = H.width / N.width;
+          const dx = (H.left + H.width / 2) - (N.left + N.width / 2);
+          const dy = H.top - N.top;
+          const stage2 = ns.closest('.daycard-living-stage') || ns;
+          const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          if (!reduced && (Math.abs(dx) > 2 || Math.abs(dy) > 2 || Math.abs(s - 1) > 0.02)) {
+            stage2.style.transformOrigin = '50% 0';
+            stage2.style.transition = 'none';
+            stage2.style.transform = 'translate(' + dx.toFixed(1) + 'px,' + dy.toFixed(1) + 'px) scale(' + s.toFixed(4) + ')';
+            void stage2.offsetWidth;
+            stage2.style.transition = 'transform 380ms cubic-bezier(0.22, 0.68, 0.24, 1)';
+            stage2.style.transform = 'none';
+            setTimeout(() => { try { stage2.style.transition = ''; stage2.style.transform = ''; stage2.style.transformOrigin = ''; } catch (e) {} }, 420);
           }
         }
       }
@@ -6142,7 +6137,6 @@ function openMementoFull() {
       setTimeout(() => {
         try {
           if (liveWrap) {
-            sizedEls.forEach((el) => { el.style.width = ''; el.style.minHeight = ''; el.style.margin = ''; });
             liveWrap.style.removeProperty('--dc-rx');
             liveWrap.style.removeProperty('--dc-ry');
             const existing = dayCardEl ? dayCardEl.querySelector('.daycard-wrap') : null;
@@ -6159,6 +6153,20 @@ function openMementoFull() {
       }, 430);
     };
     const onKey = (e) => { if (e.key === 'Escape') close(); };
+    // v1123 (Malik): tap the card again to go back; tap-and-hold customises.
+    // Slop + duration guards so a scroll or a completed hold never closes,
+    // and the sheet being up (the hold just fired) always wins over the tap.
+    if (liveWrap) (function () {
+      let tx = 0, ty = 0, t0 = 0, tMoved = true;
+      liveWrap.addEventListener('pointerdown', (e) => { tx = e.clientX; ty = e.clientY; t0 = Date.now(); tMoved = false; });
+      liveWrap.addEventListener('pointermove', (e) => { if (!tMoved && (Math.abs(e.clientX - tx) > 8 || Math.abs(e.clientY - ty) > 8)) tMoved = true; });
+      liveWrap.addEventListener('pointerup', () => {
+        const quick = (Date.now() - t0) < 320;
+        const sheetUp = !!ov.querySelector('.mfsk-wrap:not([hidden])');
+        if (!tMoved && quick && !sheetUp) close();
+        tMoved = true;
+      });
+    })();
     // v1120 FAILSAFE: a killed/backgrounded page must never strand the
     // borrowed card (the v668 stranding). pagehide restores it IMMEDIATELY,
     // no exit animation, no 430ms grace.
@@ -6168,7 +6176,6 @@ function openMementoFull() {
         mfClosed = true;
         if (mfTick) clearInterval(mfTick);
         if (liveWrap) {
-          sizedEls.forEach((el2) => { el2.style.width = ''; el2.style.minHeight = ''; el2.style.margin = ''; });
           const existing = dayCardEl ? dayCardEl.querySelector('.daycard-wrap') : null;
           if (dayCardEl && (!existing || existing === liveWrap)) {
             if (homeNext && homeNext.parentNode === homeParent) homeParent.insertBefore(liveWrap, homeNext);
