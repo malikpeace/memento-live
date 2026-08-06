@@ -6027,11 +6027,17 @@ function openMementoFull() {
     const dayCardEl = document.getElementById('dayCard');
     const liveWrap = dayCardEl ? dayCardEl.querySelector('.daycard-wrap') : null;
     const cardHost = ov.querySelector('.mf__card');
-    let homeParent = null, homeNext = null;
+    let homeParent = null, homeNext = null, homeRect = null, homeVw = 0, homeVh = 0;
     if (liveWrap && cardHost) {
       const liveNs0 = liveWrap.querySelector('.daycard-ns');
       // where the card sits on the home RIGHT NOW, for the morph below
       const H = liveNs0 ? liveNs0.getBoundingClientRect() : null;
+      // v1131: keep it. The close morph must fly back to the CARD's real home
+      // rect; measuring the #dayCard CONTAINER instead scaled the card up to
+      // the container's width and then CSS snapped it down (Malik: 'the
+      // memento is bigger before getting back to the normal size').
+      homeRect = H ? { w: H.width, h: H.height, top: H.top, left: H.left } : null;
+      homeVw = window.innerWidth; homeVh = window.innerHeight;
       if (dayCardEl) dayCardEl.style.minHeight = dayCardEl.offsetHeight + 'px';
       homeParent = liveWrap.parentNode; homeNext = liveWrap.nextSibling;
       cardHost.appendChild(liveWrap);            // borrow the REAL card (no clone)
@@ -6136,15 +6142,15 @@ function openMementoFull() {
       let backMs = 300;
       try {
         const nsB = liveWrap && liveWrap.querySelector('.daycard-ns');
-        const homeNsB = homeParent && homeParent.querySelector ? null : null;
-        if (nsB && dayCardEl) {
+        // The card's own home rect, captured at open. A viewport change since
+        // then (rotation) invalidates it, and we restore instantly instead of
+        // animating to a stale target.
+        const sameViewport = homeVw === window.innerWidth && homeVh === window.innerHeight;
+        if (nsB && homeRect && sameViewport) {
           const N = nsB.getBoundingClientRect();
-          const HB = dayCardEl.getBoundingClientRect();
-          // where the card will sit at home: the home slot's width, centred
-          const targetW = Math.max(80, HB.width - 0);
-          const s2 = targetW / Math.max(1, N.width);
-          const dx2 = (HB.left + HB.width / 2) - (N.left + N.width / 2);
-          const dy2 = HB.top - N.top;
+          const s2 = Math.max(0.05, homeRect.w / Math.max(1, N.width));
+          const dx2 = (homeRect.left + homeRect.w / 2) - (N.left + N.width / 2);
+          const dy2 = homeRect.top - N.top;
           const stg = nsB.closest('.daycard-living-stage') || nsB;
           const reduced2 = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
           if (!reduced2) {
