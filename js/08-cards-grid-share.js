@@ -5933,6 +5933,10 @@ function renderDayCard() {
     } else {
       stopLivingWander();
     }
+    // The render just replaced .daycard-wrap. If the record is open, the new
+    // node has to inherit the scroll offset THIS frame, or the card snaps back
+    // to the top for a beat before catching up.
+    try { if (typeof MementoView !== 'undefined') MementoView._sync(); } catch (e) {}
   } catch (e) {}
 }
 
@@ -6250,6 +6254,7 @@ const MementoView = (function () {
   let desiredOpen = false;
   let anim = null;          // THE animation, reused for both directions
   let openT = '';           // the open transform, recomputed only while idle
+  let openScale = 1;        // its scale, needed to keep the scroll link 1:1
   let guard = null;         // the dead-man switch, see jump()
   let dirty = false;        // the data moved under an open record
 
@@ -6276,6 +6281,7 @@ const MementoView = (function () {
     const dx = (window.innerWidth / 2) - ox - s * ((N.left + N.width / 2) - ox);
     const dy = top - oy - s * (N.top - oy);
     openT = 'translate(' + dx.toFixed(2) + 'px,' + dy.toFixed(2) + 'px) scale(' + s.toFixed(4) + ')';
+    openScale = s;
     if (view) { try { view.ov.style.setProperty('--mf-top', Math.round(top + targetH) + 'px'); } catch (e) {} }
     return true;
   }
@@ -6291,7 +6297,33 @@ const MementoView = (function () {
     // #app is a stacking context, so the record has to live inside it for the
     // card (z-index 1001, still in the home) to sit above it without moving.
     (document.getElementById('app') || document.body).appendChild(view.ov);
+    // v1140b (Malik): scrolling the record UP has to take the Memento with it.
+    // It was pinned, so the record slid underneath and the title read straight
+    // through the card. It now scrolls away like a header and fades out.
+    view.ov.addEventListener('scroll', onScroll, { passive: true });
     return true;
+  }
+
+  /* The scroll offset lives on .daycard-wrap, NOT on #dayCard. #dayCard is
+     owned by the open/close animation, and an inline transform cannot beat a
+     running animation; the wrap is free (the living wander writes to the stage
+     below it). Two elements, two jobs, no fight. */
+  function onScroll() {
+    if (!view) return;
+    const wrap = document.querySelector('#dayCard .daycard-wrap');
+    if (!wrap) return;
+    if (!desiredOpen) { wrap.style.transform = ''; wrap.style.opacity = ''; return; }
+    const y = Math.max(0, view.ov.scrollTop);
+    // Gone by the time it has scrolled its own height away, so the fade tracks
+    // the card leaving rather than running on some invented timer.
+    const span = Math.max(120, parseFloat(view.ov.style.getPropertyValue('--mf-top')) || 240);
+    const o = Math.max(0, 1 - (y / span));
+    // Divide by the open scale: this transform sits INSIDE the shrunken card,
+    // so a raw -y only moved the card 0.52 * y on screen and it lagged the
+    // content it is supposed to travel with.
+    wrap.style.transform = 'translate3d(0,' + (-y / (openScale || 1)).toFixed(2) + 'px,0)';
+    wrap.style.opacity = String(o);
+    wrap.style.pointerEvents = o < 0.12 ? 'none' : '';
   }
 
   /* One animation, born once, driven both ways. */
@@ -6341,6 +6373,8 @@ const MementoView = (function () {
     if (anim) { try { anim.cancel(); } catch (e) {} anim = null; }
     const el = cardEl();
     if (el) { el.style.transform = ''; el.style.transformOrigin = ''; el.style.willChange = ''; }
+    const wrap0 = el ? el.querySelector('.daycard-wrap') : null;
+    if (wrap0) { wrap0.style.transform = ''; wrap0.style.opacity = ''; wrap0.style.pointerEvents = ''; }
     document.body.classList.remove('mf-open');
     document.body.style.overflow = '';
     if (view) {
@@ -6358,6 +6392,8 @@ const MementoView = (function () {
     if (desiredOpen) {
       ov.hidden = false;
       ov.classList.remove('mf--closing');
+      if (phase === 'opening' && ov.scrollTop) { ov.scrollTop = 0; }
+      onScroll();
       void ov.offsetWidth;              // commit the hidden->shown state first
       ov.classList.add('mf--open');
       document.body.classList.add('mf-open');
@@ -6400,6 +6436,9 @@ const MementoView = (function () {
       // listeners the open record bound to it (hold-to-customise, the note).
       // We cannot tear the record down mid-view, so we remember and do it the
       // moment it closes.
+      // A re-render replaces .daycard-wrap, which silently drops the scroll
+      // offset that lives on it (the card stopped travelling with the record
+      // and the title read through it again). Re-apply it to the new node.
       if (desiredOpen || phase !== 'closed') { dirty = true; return; }
       if (view) {
         if (view.abort) { try { view.abort.abort(); } catch (e) {} }
@@ -6408,6 +6447,7 @@ const MementoView = (function () {
       }
       view = null;
     },
+    _sync: onScroll,
     _frozen: function () { if (phase === 'opening' || phase === 'closing') jump(); },
     _reflow: function () {
       // The home pose moved (rotate, resize, keyboard). Re-measure and, if the
