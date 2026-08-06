@@ -5108,3 +5108,142 @@ html.theme-light #deskMission .dkm__inv .cc-dayline b { background: rgba(245, 24
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashBelow,
   body .app.dash-v2 #dashBelow { display: none !important; }
 }
+
+/* ==================================================================== *
+ * v1120 — THE MEMENTO VIEW (Malik's mockup, ported). Tap the card and it
+ * becomes the person's own evidence: countdown, their note, three
+ * counters, the month-collapsed trail, the origin. SELF-LIT in both
+ * themes (dark chamber, one root block, no per-theme opt-outs); the
+ * mockup has no light design and the ceremonies set the precedent.
+ * ==================================================================== */
+#mementoFull {
+  /* SELF-LIT: the chamber is dark in BOTH themes. The mf__bg paints its aura
+     over var(--surface-0), which in light mode is near-white and washed every
+     word out; scoping the token here pins the base dark without restating the
+     whole gradient stack. */
+  --surface-0: #06070b;
+  --mfhi: rgba(245,246,250,0.97);
+  --mfmid: rgba(238,241,247,0.78);
+  --mflo: rgba(232,236,244,0.5);
+  --mffill: rgba(255,255,255,0.055);
+  --mfinset: inset 0 1px 0 rgba(255,255,255,0.07);
+  color: var(--mfhi);
+}
+/* the engraved name, unhidden ONLY here (the home card keeps it dead; that
+   hide is a hard lock). Cut INTO the face: dark above each letter, a catch of
+   light below, the way an engraving reads. */
+#mementoFull .daycard-ns__name {
+  display: inline; font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: rgba(24,28,36,0.78);
+  text-shadow: 0 -0.5px 0.6px rgba(0,0,0,0.5), 0 1px 0.6px rgba(255,255,255,0.26);
+}
+#mementoFull .daycard-ns__foot {
+  position: absolute; left: 8.5%; right: auto; bottom: 5.2%;
+  z-index: 7; display: block; width: auto; text-align: left; min-height: 0;
+}
+/* the view shows the NAME; the goal engraving stays a home-card thing */
+#mementoFull .daycard-ns__goal { display: none; }
+
+.mf-name {
+  margin: 20px 0 6px; text-align: center;
+  font-size: 1.375rem; font-weight: 700; letter-spacing: -0.02em;
+  color: var(--mfhi);
+}
+/* a thin clock, not a sentence: light weight, open tracking, running digits */
+.mf-mori {
+  margin: 0; text-align: center;
+  font-size: 1.1875rem; font-weight: 250; letter-spacing: 0.11em;
+  color: var(--mfhi); font-variant-numeric: tabular-nums;
+}
+/* their note, in their own words. No panel, no label; italic is the only
+   thing marking it as theirs. Body text stays bright (the reading law). */
+.mf-note {
+  margin: 24px auto 0; max-width: 31ch; text-align: center;
+  font-size: 1rem; line-height: 1.6; letter-spacing: -0.008em;
+  font-style: italic; color: var(--mfhi); outline: none;
+}
+.mf-note:empty::before {
+  content: 'Tap to write a note to yourself.';
+  font-style: italic; color: var(--mflo);
+}
+.mf-note__d { margin: 9px 0 0; text-align: center; font-size: 0.78rem; color: var(--mflo); }
+
+.mf-tally {
+  margin: 28px 0 0; display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 2px; border-radius: 15px; overflow: hidden; width: 100%;
+}
+.mf-tal { padding: 14px 8px 13px; text-align: center; background: var(--mffill); box-shadow: var(--mfinset); }
+.mf-tal b { display: block; font-size: 1.4375rem; font-weight: 700; letter-spacing: -0.03em; color: var(--mfhi); }
+.mf-tal span { display: block; margin-top: 3px; font-size: 0.72rem; line-height: 1.3; color: var(--mfmid); }
+.mf-tal.is-live b { color: var(--spring, #3fd94e); }
+
+/* the trail: a month is one row that carries its whole weight closed */
+.mf-trail { margin: 16px 0 0; width: 100%; }
+.mf-mo + .mf-mo { margin-top: 2px; }
+.mf-mo__h {
+  display: flex; align-items: center; gap: 11px; width: 100%;
+  padding: 13px 14px; border: 0; border-radius: 12px; cursor: pointer;
+  background: var(--mffill); box-shadow: var(--mfinset); color: var(--mfhi);
+  font: inherit; text-align: left; transition: background 0.15s ease-out;
+}
+.mf-mo__h:active { background: rgba(255,255,255,0.085); }
+.mf-mo__n { flex: none; font-size: 0.875rem; font-weight: 640; letter-spacing: -0.01em; }
+.mf-mo__dots {
+  flex: 1; min-width: 0; display: flex; flex-wrap: wrap; gap: 3px;
+  align-content: center; overflow: hidden; max-height: 13px;
+}
+.mf-mo__dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.24); }
+.mf-mo__dot.is-act { background: var(--spring, #3fd94e); }
+.mf-mo__dot.is-mark { background: #eef2fb; }
+.mf-mo__dot.is-clar { background: var(--color-clarity, #3ad9f5); }
+.mf-mo__c { flex: none; font-size: 0.78rem; color: var(--mfmid); font-variant-numeric: tabular-nums; }
+.mf-mo__x { flex: none; width: 15px; height: 15px; color: var(--mflo); transition: transform 0.2s ease-out; }
+.mf-mo.is-open .mf-mo__x { transform: rotate(180deg); }
+.mf-mo.is-open .mf-mo__dots { opacity: 0; }
+.mf-mo__b { display: none; padding: 16px 2px 4px; }
+.mf-mo.is-open .mf-mo__b { display: block; }
+.mf-ev { position: relative; display: flex; gap: 13px; padding: 0 0 15px 0; }
+.mf-ev::before {
+  content: ''; position: absolute; left: 5px; top: 16px; bottom: -2px; width: 1px;
+  background: rgba(255,255,255,0.10);
+}
+.mf-ev:last-child::before { display: none; }
+.mf-ev__dot { flex: none; width: 11px; height: 11px; margin-top: 4px; border-radius: 50%; background: rgba(255,255,255,0.18); }
+.mf-ev__dot.is-act { background: var(--spring, #3fd94e); box-shadow: 0 0 12px rgba(63,217,78,0.45); }
+.mf-ev__dot.is-mark { background: #eef2fb; box-shadow: 0 0 12px rgba(238,242,251,0.4); }
+.mf-ev__dot.is-clar { background: var(--color-clarity, #3ad9f5); box-shadow: 0 0 12px rgba(58,217,245,0.45); }
+.mf-ev__b { flex: 1; min-width: 0; }
+.mf-ev__t { display: block; font-size: 0.90625rem; line-height: 1.4; letter-spacing: -0.01em; color: var(--mfhi); }
+.mf-ev__m { display: block; margin-top: 2px; font-size: 0.78rem; line-height: 1.45; color: var(--mfmid); }
+.mf-ev__d { flex: none; font-size: 0.78rem; color: var(--mflo); padding-top: 2px; }
+
+/* the origin: a well cut into the page, the date struck INTO the surface in
+   the same engraving language as the name on the card */
+.mf-origin {
+  position: relative; margin: 32px 0 0; padding: 30px 22px 28px; width: 100%;
+  border-radius: 18px; text-align: center; overflow: hidden;
+  background: linear-gradient(180deg, rgba(0,0,0,0.34), rgba(0,0,0,0.16));
+  box-shadow: inset 0 2px 3px rgba(0,0,0,0.55), inset 0 -1px 0 rgba(255,255,255,0.07);
+}
+.mf-origin > * { position: relative; }
+.mf-origin__k { display: block; font-size: 0.75rem; font-weight: 600; color: var(--mflo); }
+.mf-origin__d {
+  display: block; margin: 9px 0 0; font-size: 1.25rem; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase; color: rgba(228,233,242,0.9);
+  text-shadow: 0 -1px 1px rgba(0,0,0,0.85), 0 1px 0.5px rgba(255,255,255,0.16);
+}
+.mf-origin__t { display: block; margin: 9px 0 0; font-size: 0.8125rem; color: var(--mfmid); font-variant-numeric: tabular-nums; }
+
+/* the content fades in around the perfectly still card, opacity only */
+.mf-name, .mf-mori, .mf-note, .mf-note__d, .mf-tally, .mf-trail, .mf-origin {
+  opacity: 0; transition: opacity 0.34s ease 0.08s;
+}
+#mementoFull.mf--open .mf-name, #mementoFull.mf--open .mf-mori,
+#mementoFull.mf--open .mf-note, #mementoFull.mf--open .mf-note__d,
+#mementoFull.mf--open .mf-tally, #mementoFull.mf--open .mf-trail,
+#mementoFull.mf--open .mf-origin { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .mf-name, .mf-mori, .mf-note, .mf-note__d, .mf-tally, .mf-trail, .mf-origin { transition: none; opacity: 1; }
+  .mf-mo__x { transition: none; }
+}

@@ -5872,6 +5872,16 @@ function renderDayCard() {
       const wrap = el.querySelector('.daycard-wrap');
       setLivingCardVars(wrap);
       startLivingWander(wrap);
+      // v1120 (Malik): the tap is BACK. It was removed in v668 because the
+      // borrow could strand the card on iOS; the view now carries a hard
+      // restore failsafe (pagehide + idempotent close), so the door reopens.
+      // Slop guard: a tilt-drag or scroll that starts on the card is not a tap.
+      (function () {
+        let tx = 0, ty = 0, moved = true;
+        wrap.addEventListener('pointerdown', (e) => { tx = e.clientX; ty = e.clientY; moved = false; });
+        wrap.addEventListener('pointermove', (e) => { if (!moved && (Math.abs(e.clientX - tx) > 8 || Math.abs(e.clientY - ty) > 8)) moved = true; });
+        wrap.addEventListener('pointerup', () => { if (!moved) { try { openMementoFull(); } catch (e) {} } moved = true; });
+      })();
       // FIRST WHITE: the one-time ceremony when the card earns its first action
       // light (FIRST-WIN-PLAN #4/#5: log the first move -> the card gains its
       // first white, 2-3s, not confetti). The white blob blooms in bright, holds
@@ -5923,51 +5933,65 @@ function openMementoFull() {
     // Refresh the :root --aura-* vars so the full view's background reflects the
     // user's latest state the instant it opens (the home no longer shows them).
     try { setAtmosphereVars(); } catch (e) {}
-    const L = (typeof livingCardLevels === 'function') ? livingCardLevels() : { clar: 0, act: 0, cons: 0 };
+    // v1120 THE MEMENTO VIEW (Malik's mockup, ported): the screen is the
+    // person's own evidence and nothing else. Countdown, their note, three
+    // counters, the month-collapsed trail, the origin. No explainer copy (two
+    // explainer blocks were built and killed in the mockup rounds).
     let cs = { current: 0, longest: 0, totalActiveDays: 0 };
     try { cs = consistencyStats(); } catch (e) {}
-    const streak = (state.streak && state.streak.count) || cs.current || 0;
-    const ans = (state.clarity && state.clarity.answers) || {};
-    const goal = ans.neutronStar || '';
-    const clarityDone = !!(state.clarity && state.clarity.completed);
-    const pa = (state.action && state.action.primaryAction) || {};
-    const tiers = pa.tiers || {};
-    const todayAction = tiers[pa.recommendedTier] || pa.title || '';
-    let act7 = 0;
-    try { act7 = actionLocalDaysInWindow(7); } catch (e) {}
-    // Carrot + stick why line (v604): the summary page is now star + goal only, so
-    // the WHY lives here. Two synthesized sentences, stick first then carrot: the
-    // antiVision (what happens if this stays neglected) and the coreWhy (the real
-    // reason it matters). Both are standalone declaratives from the AI synthesis;
-    // shown quietly under the card, only when a goal exists.
-    const whyStick = String(ans.antiVision || ans.fearPain || '').trim();
-    const whyCarrot = String(ans.coreWhy || ans.whyItMatters || '').trim();
-    const whyLine = (goal && (whyStick || whyCarrot))
-      ? '<div class="mf__why">' + esc([whyStick, whyCarrot].filter(Boolean).join(' ')) + '</div>'
-      : '';
-
-    const bar = (pct, color) => '<div class="mf-stat__track"><div class="mf-stat__fill" style="width:' + Math.max(2, Math.min(100, pct)) + '%;background:' + color + '"></div></div>';
-
-    const clarityBlock =
-      '<div class="mf-stat mf-stat--clarity" data-mf-open="clarity" role="button" tabindex="0">' +
-        '<div class="mf-stat__head"><span class="mf-stat__label">Clarity</span><span class="mf-stat__val">' + (clarityDone ? 'Locked in' : 'Not set') + '</span></div>' +
-        (goal ? '<div class="mf-stat__goal">' + esc(goal) + '</div>' : '<div class="mf-stat__sub">Find your Neutron Star, the one goal that actually matters.</div>') +
-        bar(clarityDone ? 100 : 0, 'var(--color-clarity)') +
-      '</div>';
-    const actionBlock =
-      '<div class="mf-stat mf-stat--action" data-mf-open="action" role="button" tabindex="0">' +
-        '<div class="mf-stat__head"><span class="mf-stat__label">Action</span><span class="mf-stat__val">' + act7 + '<span class="mf-stat__unit">/ 7 days</span></span></div>' +
-        (todayAction ? '<div class="mf-stat__sub"><span class="mf-stat__sub-key">Today</span> ' + esc(todayAction) + '</div>' : '<div class="mf-stat__sub">Turn your goal into one daily action.</div>') +
-        // linear days/7, NOT L.act: the bar sits next to the "N / 7 days" figure,
-        // so it must be the same math (L.* carries the light curve, see livingCardLevels)
-        bar(Math.round(act7 / 7 * 100), 'rgba(236,239,255,0.9)') +
-      '</div>';
-    const consBlock =
-      '<div class="mf-stat mf-stat--cons" data-mf-open="streak" role="button" tabindex="0">' +
-        '<div class="mf-stat__head"><span class="mf-stat__label">Consistency</span><span class="mf-stat__val">' + streak + '<span class="mf-stat__unit">day streak</span></span></div>' +
-        '<div class="mf-stat__sub">' + (cs.totalActiveDays || 0) + ' active day' + (cs.totalActiveDays === 1 ? '' : 's') + ' &middot; ' + Math.round(cs.pct30 || 0) + '% of the last 30</div>' +
-        bar(Math.round(cs.pct30 || 0), 'var(--color-consistency)') +
-      '</div>';
+    const evs = Array.isArray(state.proofEvents) ? state.proofEvents.slice() : [];
+    const totalMoves = evs.filter(e => e && e.type === 'action-complete').length;
+    // the countdown: same model the app already uses (birth year + expectancy)
+    const _by = state.mori && state.mori.birthYear;
+    const moriEnd = _by ? new Date(Number(_by) + Number((state.mori && state.mori.lifeExpectancy) || 80), 0, 1).getTime() : 0;
+    // the note: reuses the existing future-self field, no new state shape
+    const noteTxt = String((state.mori && state.mori.futureSelfNote) || '').trim();
+    const noteAt = (state.mori && state.mori.futureSelfNoteAt) || 0;
+    const _dfmt = (ts) => { try { return new Date(ts).toLocaleDateString('en-US', { day: 'numeric', month: 'long' }); } catch (e) { return ''; } };
+    // the origin: the day the Memento was made
+    const bornTs = (state.clarity && state.clarity.ignitedAt) || (evs.length ? Math.min.apply(null, evs.map(e => e.ts || Infinity).filter(isFinite)) : 0);
+    const bornD = bornTs ? new Date(bornTs) : null;
+    const originHtml = bornD ? (
+      '<div class="mf-origin">' +
+        '<span class="mf-origin__k">Creation of Your Memento</span>' +
+        '<span class="mf-origin__d">' + esc(bornD.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })) + '</span>' +
+        '<span class="mf-origin__t">' + esc(bornD.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })) + '</span>' +
+      '</div>') : '';
+    // THE TRAIL: every event the app has written, grouped by month, newest
+    // month open. A closed month is one row that still carries its weight (a
+    // dot per mark + the count); only the open month renders its list, which
+    // is what keeps a two-year record at ~24 rows (do not flatten this back).
+    const dotK = (t) => t === 'action-complete' ? 'is-act' : (t === 'new-record' || t === 'proof') ? 'is-mark' : (t === 'mori-moment') ? 'is-clar' : '';
+    const evTitle = (e2) => e2.title || ({ 'action-complete': 'The move for the day', 'reflection-save': 'Reflection', 'vivere': 'Lived', 'mori-moment': 'Memento Mori', 'weekly-review': 'Weekly review', 'new-record': 'New record', 'distraction-log': 'Distraction logged', 'deepwork-commit': 'Deep work' }[e2.type] || 'Kept');
+    const _wk = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    evs.sort((a2, b2) => (b2.ts || 0) - (a2.ts || 0));
+    const groups = [];
+    const nowY = new Date().getFullYear();
+    evs.forEach((e2) => {
+      const d2 = new Date(e2.ts || Date.parse(e2.iso) || Date.now());
+      const key = d2.getFullYear() + '-' + d2.getMonth();
+      let g = groups[groups.length - 1];
+      if (!g || g.key !== key) {
+        g = { key: key, label: d2.toLocaleDateString('en-US', { month: 'long' }) + (d2.getFullYear() !== nowY ? ' ' + d2.getFullYear() : ''), evs: [] };
+        groups.push(g);
+      }
+      g.evs.push({ k: dotK(e2.type), t: evTitle(e2), m: String(e2.text || '').slice(0, 140), d: _wk[d2.getDay()] + ' ' + d2.getDate() });
+    });
+    const evRow = (e2) =>
+      '<div class="mf-ev"><span class="mf-ev__dot ' + e2.k + '"></span>' +
+        '<span class="mf-ev__b"><span class="mf-ev__t">' + esc(e2.t) + '</span>' +
+        (e2.m ? '<span class="mf-ev__m">' + esc(e2.m) + '</span>' : '') + '</span>' +
+        '<span class="mf-ev__d">' + esc(e2.d) + '</span></div>';
+    const trailHtml = groups.map((g, i) =>
+      '<section class="mf-mo' + (i === 0 ? ' is-open' : '') + '">' +
+        '<button class="mf-mo__h" type="button">' +
+          '<span class="mf-mo__n">' + esc(g.label) + '</span>' +
+          '<span class="mf-mo__dots">' + g.evs.map(e2 => '<i class="mf-mo__dot ' + e2.k + '"></i>').join('') + '</span>' +
+          '<span class="mf-mo__c apl-num">' + g.evs.length + '</span>' +
+          '<svg class="mf-mo__x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>' +
+        '</button>' +
+        '<div class="mf-mo__b">' + g.evs.map(evRow).join('') + '</div>' +
+      '</section>').join('');
 
     const ov = document.createElement('div');
     ov.id = 'mementoFull';
@@ -5978,9 +6002,17 @@ function openMementoFull() {
       '<button class="mf__close" aria-label="Close">&times;</button>' +
       '<div class="mf__scroll">' +
         '<div class="mf__card"></div>' +
-        whyLine +
-        '<div class="mf__stats">' + clarityBlock + actionBlock + consBlock + '</div>' +
-        '<div class="mf__hint">Tap a pillar to dive in</div>' +
+        '<p class="mf-name">Your Memento</p>' +
+        (moriEnd ? '<p class="mf-mori apl-num" id="mfMori">&nbsp;</p>' : '') +
+        '<p class="mf-note" id="mfNote" contenteditable="true" spellcheck="false">' + esc(noteTxt) + '</p>' +
+        '<p class="mf-note__d" id="mfNoteD">' + esc(noteTxt && noteAt ? _dfmt(noteAt) : '') + '</p>' +
+        '<div class="mf-tally">' +
+          '<div class="mf-tal"><b class="apl-num">' + (cs.totalActiveDays || 0) + '</b><span>total<br>days</span></div>' +
+          '<div class="mf-tal"><b class="apl-num">' + totalMoves + '</b><span>total<br>moves</span></div>' +
+          '<div class="mf-tal is-live"><b class="apl-num">' + (cs.longest || 0) + '</b><span>longest<br>streak</span></div>' +
+        '</div>' +
+        '<div class="mf-trail" id="mfTrail">' + trailHtml + '</div>' +
+        originHtml +
       '</div>';
     document.body.appendChild(ov);
 
@@ -6057,10 +6089,45 @@ function openMementoFull() {
     void ov.offsetWidth;
     ov.classList.add('mf--open');
 
+    // the countdown ticks, because a number that moves is the whole argument
+    let mfTick = null;
+    const moriEl = ov.querySelector('#mfMori');
+    if (moriEl && moriEnd) {
+      const p2 = (n) => String(n).padStart(2, '0');
+      const tick = () => {
+        const ms = Math.max(0, moriEnd - Date.now());
+        const rest = ms % 86400000;
+        moriEl.textContent = Math.floor(ms / 86400000) + ':' + p2(Math.floor(rest / 3600000)) + ':' + p2(Math.floor(rest % 3600000 / 60000)) + ':' + p2(Math.floor(rest % 60000 / 1000));
+      };
+      tick();
+      mfTick = setInterval(tick, 1000);
+    }
+    // their note, saved quietly on blur (same field Mori's sheet edits)
+    const noteEl = ov.querySelector('#mfNote');
+    if (noteEl) noteEl.addEventListener('blur', () => {
+      try {
+        const t2 = String(noteEl.textContent || '').trim().slice(0, 600);
+        if (t2 === String((state.mori && state.mori.futureSelfNote) || '').trim()) return;
+        state.mori.futureSelfNote = t2;
+        state.mori.futureSelfNoteAt = t2 ? Date.now() : null;
+        persistNow();
+        const dEl = ov.querySelector('#mfNoteD');
+        if (dEl) dEl.textContent = t2 ? _dfmt(state.mori.futureSelfNoteAt) : '';
+      } catch (e) {}
+    });
+    // a month opens and closes in place
+    const trailEl = ov.querySelector('#mfTrail');
+    if (trailEl) trailEl.addEventListener('click', (e) => {
+      const h2 = e.target.closest('.mf-mo__h');
+      if (h2) h2.parentElement.classList.toggle('is-open');
+    });
+
     let mfClosed = false;
     const close = () => {
       if (mfClosed) return;   // idempotent: a 2nd trigger (a swipe + a stray tap, a
       mfClosed = true;        // double-tap, Escape while tapping) must NOT run the
+      try { if (mfTick) clearInterval(mfTick); } catch (e) {}
+      try { window.removeEventListener('pagehide', onHide); } catch (e) {}
                               // restore twice, or the second pass removes the card it
                               // just put back (the else branch below) and the home
                               // ends up with no Memento at all.
@@ -6091,6 +6158,28 @@ function openMementoFull() {
       }, 430);
     };
     const onKey = (e) => { if (e.key === 'Escape') close(); };
+    // v1120 FAILSAFE: a killed/backgrounded page must never strand the
+    // borrowed card (the v668 stranding). pagehide restores it IMMEDIATELY,
+    // no exit animation, no 430ms grace.
+    const onHide = () => {
+      try {
+        if (mfClosed) return;
+        mfClosed = true;
+        if (mfTick) clearInterval(mfTick);
+        if (liveWrap) {
+          sizedEls.forEach((el2) => { el2.style.width = ''; el2.style.minHeight = ''; el2.style.margin = ''; });
+          const existing = dayCardEl ? dayCardEl.querySelector('.daycard-wrap') : null;
+          if (dayCardEl && (!existing || existing === liveWrap)) {
+            if (homeNext && homeNext.parentNode === homeParent) homeParent.insertBefore(liveWrap, homeNext);
+            else (homeParent || dayCardEl).appendChild(liveWrap);
+          }
+        }
+        if (dayCardEl) dayCardEl.style.minHeight = '';
+        document.body.style.overflow = '';
+        ov.remove();
+      } catch (e) {}
+    };
+    window.addEventListener('pagehide', onHide);
     ov.querySelector('.mf__close').addEventListener('click', close);
     ov.addEventListener('click', (e) => { if (e.target === ov) close(); });
     // iOS-like swipe-down-to-close: pull the card view down (when scrolled to the
