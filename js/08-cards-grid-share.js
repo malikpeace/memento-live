@@ -6906,6 +6906,48 @@ function skinForName(name) {
   return Object.assign({}, sk, { rot: ((h >>> 7) % 22) - 11 });
 }
 
+// The material's own colour, for the room it sits in and for the app's
+// accent. Flat/void materials have no light, so their edge (or a neutral)
+// stands in.
+function skinTintRgb(sk) {
+  const pick = [sk && sk.sk1, sk && sk.edge, sk && sk.sk2].find(v => v && v !== 'none');
+  const m = String(pick || '').match(/(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+  return m ? (m[1] + ',' + m[2] + ',' + m[3]) : '226,232,240';
+}
+function _rgbToHex(rgb) {
+  const p = String(rgb).split(',').map(n => Math.max(0, Math.min(255, parseInt(n, 10) || 0)));
+  return '#' + p.map(n => n.toString(16).padStart(2, '0')).join('');
+}
+
+// v1126 (Malik: 'make the memento theme the theme of the app'): the chosen
+// material drives the app's accent through the EXISTING accent pipeline
+// (prefs.accent = custom + accentCustom), so every surface that already
+// reads --accent follows with no new plumbing. Only fires when the choice
+// actually changes, never on every render. Returning to the house card
+// restores whatever accent they had before their first material.
+let _skinAccentApplied = null;
+function syncAppAccentToSkin(sk) {
+  try {
+    const id = sk ? sk.n : '';
+    if (_skinAccentApplied === id) return;
+    if (!state.prefs) return;
+    if (sk) {
+      if (!state.cardSkin.prevAccent) {
+        state.cardSkin.prevAccent = { accent: state.prefs.accent || 'default', accentCustom: state.prefs.accentCustom || '' };
+      }
+      state.prefs.accent = 'custom';
+      state.prefs.accentCustom = _rgbToHex(skinTintRgb(sk));
+    } else if (state.cardSkin && state.cardSkin.prevAccent) {
+      state.prefs.accent = state.cardSkin.prevAccent.accent || 'default';
+      if (state.cardSkin.prevAccent.accentCustom) state.prefs.accentCustom = state.cardSkin.prevAccent.accentCustom;
+      state.cardSkin.prevAccent = null;
+    }
+    _skinAccentApplied = id;
+    try { persistNow(); } catch (e) {}
+    try { applyPrefs(); } catch (e) {}
+  } catch (e) {}
+}
+
 function activeCardSkin() {
   try {
     if (typeof ClarityPaywall !== 'undefined' && !ClarityPaywall.isPaid()) return null;
@@ -6923,6 +6965,13 @@ const _SKIN_VARS = ['--sk1', '--sk2', '--sk3', '--sk4', '--plat-op', '--face', '
 function applyCardSkin(wrap) {
   if (!wrap) return;
   const sk = activeCardSkin();
+  // the room the card sits in takes the material's colour (js/08 sets it,
+  // the view's CSS reads it). No material = the app's own accent.
+  try {
+    if (sk) document.documentElement.style.setProperty('--skin-rgb', skinTintRgb(sk));
+    else document.documentElement.style.removeProperty('--skin-rgb');
+  } catch (e) {}
+  syncAppAccentToSkin(sk);
   if (!sk) {
     if (wrap.dataset.skin) {
       delete wrap.dataset.skin;

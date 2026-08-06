@@ -3376,24 +3376,28 @@ html.lowfx .daycard-ns {
    scaled by --aura-energy so it tracks the user's real state (drift cools + dims).
    This is the ONLY thing that fades in on open, so the card never changes. */
 .mf__bg {
+  /* v1126 (Malik: 'why is the background a heavy green?'): it used to be the
+     app's REACTIVE AURA, whose green tracks consistency, so a long streak
+     painted the whole room green regardless of the card in it. In this view
+     the room belongs to the MATERIAL: one soft pool of the card's own colour
+     over the dark chamber, radial and fading well inside its own bounds so
+     it can never draw an edge (the v682 law). --skin-rgb is set by js/08
+     from the chosen material; the house card falls back to the app accent. */
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
   opacity: 0; transition: opacity 0.42s ease;
   background:
-    radial-gradient(1500px 1200px at 50% 26%,
-      rgba(56, 236, 71, calc(0.34 * var(--aura-cons, 0) * var(--aura-energy, 0.45))) 0%,
-      rgba(56, 236, 71, calc(0.16 * var(--aura-cons, 0) * var(--aura-energy, 0.45))) 30%,
-      transparent 60%),
-    radial-gradient(1400px 1100px at 52% 40%,
-      rgba(255, 206, 122, calc(0.24 * var(--aura-warmth, 0) * var(--aura-energy, 0.45))) 0%,
-      transparent 58%),
-    radial-gradient(1600px 1300px at 50% 30%,
-      rgba(116, 234, 255, calc(0.34 * var(--aura-clar, 0) * var(--aura-energy, 0.45))) 0%,
-      rgba(104, 225, 246, calc(0.16 * var(--aura-clar, 0) * var(--aura-energy, 0.45))) 34%,
-      transparent 64%),
-    radial-gradient(1700px 1400px at 50% 34%,
-      rgba(70, 92, 140, calc(0.18 * var(--aura-cool, 0) * var(--aura-energy, 0.45))) 0%,
-      transparent 66%),
-    radial-gradient(120% 70% at 50% 18%, rgba(255, 255, 255, 0.04), transparent 60%),
+    radial-gradient(64% 30% at 50% 14%, rgba(var(--skin-rgb, var(--accent-rgb, 58,217,245)), 0.22), transparent 72%),
+    radial-gradient(130% 70% at 50% 8%, rgba(var(--skin-rgb, var(--accent-rgb, 58,217,245)), 0.09), transparent 76%),
+    linear-gradient(180deg,
+      rgba(var(--skin-rgb, var(--accent-rgb, 58,217,245)), 0.05) 0%,
+      rgba(var(--skin-rgb, var(--accent-rgb, 58,217,245)), 0.028) 46%,
+      transparent 100%),
+    var(--surface-0);
+}
+/* Void takes light OUT of the room instead of adding it. */
+#mementoFull:has(.sk-void) .mf__bg {
+  background:
+    radial-gradient(88% 52% at 50% 20%, rgba(0,0,0,0.92), transparent 74%),
     var(--surface-0);
 }
 #mementoFull.mf--open .mf__bg { opacity: 1; }
