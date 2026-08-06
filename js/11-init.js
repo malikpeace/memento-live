@@ -78,17 +78,29 @@ function syncHomeViewport() {
     }
     // The column's start offset is fixed chrome, so it is read in the same
     // one-time pass rather than on every render (v1093).
+    // v1129 THE ACTUAL JUMP (Malik, reproduced with a simulated notch: the
+    // card went 281x397 -> 312x440 at 301ms, right after the boot mask
+    // lifted). --p1-top is the chrome above the column. On a PHONE that
+    // chrome IS the CSS fallback (safe-t + the app's 16px pad), so measuring
+    // buys nothing and every measurement is a chance to write a different
+    // number while the user is already looking. Phones take the CSS value and
+    // nothing can move it. Tablets still measure, because there the chrome
+    // genuinely differs (v1106: 124 real vs 75 assumed).
     const p1e = document.getElementById('homePage1');
-    if (p1e && window.scrollY < 50) {
+    if (window.innerWidth < 768) {
+      root.style.removeProperty('--p1-top');
+    } else if (p1e && window.scrollY < 50) {
       const off = Math.round(p1e.getBoundingClientRect().top + window.scrollY);
       const prevTop = parseFloat(root.style.getPropertyValue('--p1-top')) || 0;
-      // same guard: only a real change to the chrome above the column
       if (off >= 0 && off < 200 && Math.abs(off - prevTop) > 2) root.style.setProperty('--p1-top', off + 'px');
     }
   } catch (e) {}
 }
 try {
   const _sync = () => setTimeout(syncHomeViewport, 60);
+  // (Measuring at parse time was tried and is WRONG: the chrome above the
+  // column has not settled that early, so it reported 118px where the truth
+  // was 75, which is a bigger jump than the one being fixed.)
   _sync();
   document.addEventListener('DOMContentLoaded', _sync);
   window.addEventListener('load', _sync);
