@@ -578,10 +578,36 @@ const CloudSync = (function () {
       dnote('decision: ' + d.action + ' (' + (d.reason || '') + ')');
       if (d.action === 'adoptCloud') {
         const didAdopt = adoptCloud(f.row, d.reason);
+        // v1124 (Malik's phone, caught by the boot watchdog): when the
+        // reload-loop breaker blocks an adopt, "return false" left the first
+        // sync FAILED forever: every launch re-ran the same blocked decision
+        // and the app sat behind the restore screen. The breaker's documented
+        // intent was always "refuse to reload, fall back to pushing the local
+        // copy up". Do that: sync settles, the guard clears on READY, and the
+        // other device re-merges on ITS next boot, so nothing is lost for
+        // more than one round trip.
+        if (!didAdopt && !adopting) {
+          dnote('breaker fallback: keeping local, pushing it up');
+          lastCloudRevision = (f.row && Number(f.row.revision)) || 0;
+          if (f.row && f.row.updated_at) lastCloudStamp = f.row.updated_at;
+          return { ok: true, shouldPush: true };
+        }
         return { ok: didAdopt, adopting: didAdopt };
       }
       if (d.action === 'adoptMerged') {
         const didAdopt = adoptMerged(d.merged, d.reason);
+        if (!didAdopt && !adopting) {
+          // Same breaker fallback: keep LOCAL and push it up. (A first draft
+          // wrote the merged copy to storage here, but the running session's
+          // next persistNow would clobber it with in-memory state, the exact
+          // v1041 save-over-restore race. The other device still holds its
+          // own edits locally and re-merges on its next boot, so the union
+          // converges there instead.)
+          dnote('breaker fallback: keeping local, pushing it up');
+          lastCloudRevision = (f.row && Number(f.row.revision)) || 0;
+          if (f.row && f.row.updated_at) lastCloudStamp = f.row.updated_at;
+          return { ok: true, shouldPush: true };
+        }
         return { ok: didAdopt, adopting: didAdopt };
       }
       lastCloudRevision = (f.row && Number(f.row.revision)) || 0;
