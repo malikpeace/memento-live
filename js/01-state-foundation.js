@@ -7,7 +7,7 @@
    ONCE on mismatch. Kills the "phone silently runs old cached js under a new
    index" class (the SW's offline fallback can serve stale files on a bad
    connection; Malik hit this three times in one day). */
-window.MEMENTO_JS_BUILD = 'v1119';
+window.MEMENTO_JS_BUILD = 'v1122';
 /* ============================================
    STATE MANAGEMENT
    ============================================ */
@@ -1933,6 +1933,9 @@ function migrateState() {
   }
   if (!Array.isArray(state.goalProgress.history)) state.goalProgress.history = [];
   if (state.goalProgress.askedDay === undefined) state.goalProgress.askedDay = '';
+  // v1121: the card material (Job B of the memento-view port). id '' = the
+  // house card; 'name' = coded to their name; else a library skin name.
+  if (!state.cardSkin || typeof state.cardSkin !== 'object') state.cardSkin = { id: '', ring: 0, mark: 0 };
   // Migrate legacy recommendedTier values.
   if (state.action.primaryAction.recommendedTier === 'minimum') state.action.primaryAction.recommendedTier = 'light';
   if (state.action.primaryAction.recommendedTier === 'ambitious') state.action.primaryAction.recommendedTier = 'heavy';

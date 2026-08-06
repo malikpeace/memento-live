@@ -5871,6 +5871,7 @@ function renderDayCard() {
     if (living) {
       const wrap = el.querySelector('.daycard-wrap');
       setLivingCardVars(wrap);
+      try { applyCardSkin(wrap); } catch (e) {}
       startLivingWander(wrap);
       // v1120 (Malik): the tap is BACK. It was removed in v668 because the
       // borrow could strand the card on iOS; the view now carries a hard
@@ -6238,6 +6239,7 @@ function openMementoFull() {
       el.addEventListener('click', go);
       el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
     });
+    try { _mfSkinsInit(ov, liveWrap); } catch (e) {}
     document.addEventListener('keydown', onKey);
   } catch (e) {}
 }
@@ -6731,4 +6733,361 @@ function renderAll() {
   try { if (typeof HeroShrink !== 'undefined' && HeroShrink.layoutGap) HeroShrink.layoutGap(); } catch (e) {}
   // v703: the v702 floating cheat bar is retired, the bar (Today + You) exists
   // pre-star now, so the You panel and its cheat bar are always reachable.
+}
+
+
+/* ==================================================================== *
+ * v1121 — CARD SKINS (Job B of the memento-view port; design law in
+ * MEMENTO-SKINS.md). A skin drives the app's OWN layers through four
+ * dials (the four lights, the platinum flood, the face, the read) and
+ * NOTHING else: no new fonts, no new layout, no new components.
+ * Malik's model: everyone ships on the house card (cyan/green/white);
+ * paying unlocks coding the card to their NAME (deterministic hash +
+ * a small personal drift) plus the full library via holding the card
+ * inside the Memento view. The choice lives in state.cardSkin (synced).
+ * ==================================================================== */
+const CARD_SKINS = [
+ /* ── tier one ─────────────────────────────────────────────── */
+ {n:'Solar Flare', sk1:'rgba(255,170,0,1)', sk2:'rgba(255,230,120,1)', sk3:'rgba(255,120,0,1)', sk4:'rgba(255,200,60,.95)',
+  plat:'.22', face:'linear-gradient(165deg,#3a2003,#1d0f01)', mark:'rgba(255,248,232,.97)', ink:'rgba(255,240,214,.9)'},
+ {n:'Voltage',     sk1:'rgba(255,238,0,1)',   sk2:'rgba(190,255,60,.95)', sk3:'rgba(255,196,0,1)',  sk4:'rgba(230,255,120,.85)',
+  plat:'.16', face:'linear-gradient(165deg,#1d1e04,#0d0e02)', mark:'rgba(255,253,230,.95)', ink:'rgba(252,255,214,.9)'},
+ {n:'Obsidian Violet', sk1:'rgba(120,40,220,.9)', sk2:'rgba(40,10,90,.9)', sk3:'rgba(170,80,255,.75)', sk4:'rgba(20,6,40,.95)',
+  plat:'.02', face:'linear-gradient(165deg,#08040e,#030106)', mark:'rgba(240,230,255,.95)', ink:'rgba(226,208,255,.8)'},
+ {n:'Gold', sk1:'rgba(255,208,60,1)', sk2:'rgba(255,246,200,1)', sk3:'rgba(220,160,20,1)', sk4:'rgba(255,228,130,.95)',
+  plat:'.52', face:'linear-gradient(165deg,#imagined,#000)'.replace('#imagined','#4a3608').replace('#000','#241a03'),
+  mark:'rgba(40,28,2,.92)', ink:'rgba(58,42,6,.8)'},
+ {n:'Matte Black', sk1:'none',sk2:'none',sk3:'none',sk4:'none',
+  plat:'0', face:'linear-gradient(168deg,#1c1d20 0%,#141518 55%,#101113 100%)',
+  mark:'rgba(244,246,250,.97)', ink:'rgba(226,231,240,.75)', cls:'flat',
+  edge:'rgba(255,255,255,.92)', halo:'rgba(238,244,255,.40)', lift:'rgba(255,255,255,.05)'},
+ {n:'Matte White', sk1:'none',sk2:'none',sk3:'none',sk4:'none',
+  plat:'0', face:'linear-gradient(168deg,#f0f1f2 0%,#e7e8e9 55%,#dfe0e2 100%)',
+  mark:'rgba(62,67,74,.95)', ink:'rgba(52,57,64,.7)', cls:'flat',
+  edge:'rgba(255,255,255,.95)', halo:'rgba(240,244,252,.42)', lift:'rgba(255,255,255,.5)'},
+ {n:'Pure Glass', sk1:'rgba(255,255,255,.5)', sk2:'rgba(255,255,255,.35)', sk3:'rgba(210,240,255,.45)', sk4:'rgba(255,255,255,.3)',
+  plat:'.30', face:'linear-gradient(165deg,rgba(232,244,252,.55),rgba(206,226,242,.42))',
+  mark:'rgba(96,120,140,.75)', ink:'rgba(48,72,92,.65)', cls:'glass',
+  edge:'rgba(255,255,255,1)', halo:'rgba(210,238,255,.5)'},
+ {n:'Void', sk1:'none',sk2:'none',sk3:'none',sk4:'none',
+  plat:'0', face:'#000000',
+  mark:'rgba(244,246,250,.97)', ink:'rgba(150,155,164,.62)', cls:'flat void',
+  edge:'rgba(0,0,0,1)', halo:'rgba(0,0,0,1)', haloR:'70px', lift:'rgba(0,0,0,0)'},
+ {n:'Emerald',     sk1:'rgba(0,220,130,1)',   sk2:'rgba(120,255,200,.9)', sk3:'rgba(0,150,90,1)',   sk4:'rgba(40,255,160,.85)',
+  plat:'.12', face:'linear-gradient(165deg,#03150e,#010806)', mark:'rgba(232,255,246,.95)', ink:'rgba(214,255,238,.9)'},
+ {n:'Crimson',     sk1:'rgba(255,30,70,1)',   sk2:'rgba(255,110,120,.9)', sk3:'rgba(150,0,40,1)',   sk4:'rgba(255,70,90,.9)',
+  plat:'.10', face:'linear-gradient(165deg,#1c0308,#0b0103)', mark:'rgba(255,228,232,.95)', ink:'rgba(255,220,226,.85)'},
+ {n:'Ice', sk1:'rgba(60,190,255,1)', sk2:'rgba(220,248,255,.9)', sk3:'rgba(0,140,220,.95)', sk4:'rgba(140,225,255,.9)',
+  plat:'.46', face:'linear-gradient(165deg,#dff1fb,#c9e5f5)', mark:'rgba(20,58,80,.9)', ink:'rgba(14,48,68,.78)'},
+ {n:'Magenta',     sk1:'rgba(255,0,170,1)',   sk2:'rgba(255,120,215,.9)', sk3:'rgba(170,0,140,1)',  sk4:'rgba(255,70,190,.9)',
+  plat:'.10', face:'linear-gradient(165deg,#1a0316,#0a010a)', mark:'rgba(255,224,246,.95)', ink:'rgba(255,214,242,.85)'},
+ /* ── tier two, behind View more ───────────────────────────── */
+ {n:'Cobalt', sk1:'rgba(0,120,255,1)', sk2:'rgba(120,200,255,.95)', sk3:'rgba(0,60,220,1)', sk4:'rgba(60,160,255,.95)',
+  plat:'.28', face:'linear-gradient(165deg,#031a4d,#010c26)', mark:'rgba(232,242,255,.96)', ink:'rgba(220,234,255,.88)'},
+ {n:'Copper', sk1:'rgba(212,106,58,1)', sk2:'rgba(150,64,30,.95)', sk3:'rgba(240,150,100,.85)', sk4:'rgba(120,50,24,.9)',
+  plat:'.34', face:'linear-gradient(165deg,#4a2415,#2a130a)', mark:'rgba(255,236,222,.95)', ink:'rgba(255,226,208,.85)'},
+ {n:'Jade Gold',   sk1:'rgba(0,200,160,1)',   sk2:'rgba(255,215,90,.85)', sk3:'rgba(0,140,120,1)',  sk4:'rgba(120,255,210,.8)',
+  plat:'.16', face:'linear-gradient(165deg,#04140f,#010706)', mark:'rgba(224,255,244,.95)', ink:'rgba(210,255,238,.85)'},
+ {n:'Aurora',      sk1:'rgba(0,255,190,.95)', sk2:'rgba(150,90,255,.85)', sk3:'rgba(40,200,255,.9)', sk4:'rgba(255,90,200,.7)',
+  plat:'.08', face:'linear-gradient(165deg,#050b12,#02040a)', mark:'rgba(238,246,255,.95)', ink:'rgba(222,238,255,.85)'},
+ {n:'Sunset', sk1:'rgba(255,150,40,1)', sk2:'rgba(255,110,120,.95)', sk3:'rgba(255,200,90,.9)', sk4:'rgba(230,70,90,.9)',
+  plat:'.40', face:'linear-gradient(165deg,#40130c,#1d0705)', mark:'rgba(255,244,234,.97)', ink:'rgba(255,232,216,.9)'},
+ {n:'Sapphire', sk1:'rgba(20,40,180,1)', sk2:'rgba(60,20,150,.9)', sk3:'rgba(0,20,120,1)', sk4:'rgba(40,60,200,.9)',
+  plat:'.05', face:'linear-gradient(165deg,#050726,#020310)', mark:'rgba(226,232,255,.95)', ink:'rgba(210,220,255,.82)'},
+ {n:'Bone', sk1:'none',sk2:'none',sk3:'none',sk4:'none',
+  plat:'0', face:'linear-gradient(168deg,#f4f0e8 0%,#ece7dc 55%,#e3ddd0 100%)',
+  mark:'rgba(78,71,60,.94)', ink:'rgba(66,60,50,.72)', cls:'flat',
+  edge:'rgba(255,253,246,.9)', halo:'rgba(246,238,222,.38)', lift:'rgba(255,255,255,.45)'},
+ {n:'Toxic',       sk1:'rgba(180,255,0,1)',   sk2:'rgba(0,255,140,.9)', sk3:'rgba(120,200,0,1)',  sk4:'rgba(220,255,80,.85)',
+  plat:'.10', face:'linear-gradient(165deg,#0f1603,#050801)', mark:'rgba(246,255,224,.95)', ink:'rgba(238,255,200,.9)'},
+ {n:'Titanium', sk1:'rgba(226,232,240,.9)', sk2:'rgba(255,255,255,.95)', sk3:'rgba(150,162,178,.85)', sk4:'rgba(200,210,224,.8)',
+  plat:'.80', face:'linear-gradient(165deg,#c9cfd8,#b3bac4)', mark:'rgba(52,58,66,.92)', ink:'rgba(44,50,58,.75)', cls:'glass'},
+ {n:'Blush',       sk1:'rgba(255,180,200,.95)', sk2:'rgba(255,225,235,.9)', sk3:'rgba(240,140,175,.9)', sk4:'rgba(255,205,220,.85)',
+  plat:'.58', face:'linear-gradient(165deg,#fbeef2,#f4e2e8)', mark:'#6b4a55', ink:'rgba(70,44,52,.75)'},
+ {n:'Ultraviolet', sk1:'rgba(160,60,255,1)', sk2:'rgba(220,160,255,1)', sk3:'rgba(120,0,255,1)', sk4:'rgba(190,110,255,.95)',
+  plat:'.30', face:'linear-gradient(165deg,#1d0640,#0c0220)', mark:'rgba(248,240,255,.97)', ink:'rgba(240,224,255,.9)'},
+ {n:'Matte Clay', sk1:'none',sk2:'none',sk3:'none',sk4:'none', plat:'0',
+  face:'linear-gradient(168deg,#6d3a2c,#5c3024 55%,#4c261c)', mark:'rgba(255,238,230,.95)', ink:'rgba(252,230,220,.75)',
+  cls:'flat', edge:'rgba(255,226,212,.42)', halo:'rgba(220,140,110,.16)'},
+ {n:'Matte Forest', sk1:'none',sk2:'none',sk3:'none',sk4:'none', plat:'0',
+  face:'linear-gradient(168deg,#14311f,#0e2617 55%,#091c11)', mark:'rgba(236,250,240,.96)', ink:'rgba(222,242,228,.7)',
+  cls:'flat', edge:'rgba(180,232,196,.4)', halo:'rgba(100,200,140,.14)'},
+ {n:'Matte Navy', sk1:'none',sk2:'none',sk3:'none',sk4:'none', plat:'0',
+  face:'linear-gradient(168deg,#3a5a94,#2f4a7d 55%,#264066)', mark:'rgba(240,246,255,.96)', ink:'rgba(228,238,255,.78)',
+  cls:'flat', edge:'rgba(226,238,255,.6)', halo:'rgba(150,190,255,.24)'},
+ {n:'Matte Sand', sk1:'none',sk2:'none',sk3:'none',sk4:'none',
+  plat:'0', face:'linear-gradient(168deg,#dccBa8 0%,#d2c09a 55%,#c7b48d 100%)',
+  mark:'rgba(52,44,30,.92)', ink:'rgba(48,40,26,.72)', cls:'flat',
+  edge:'rgba(255,250,238,.7)', halo:'rgba(244,228,196,.3)', lift:'rgba(255,255,255,.28)'},
+ {n:'Midnight',    sk1:'rgba(30,60,140,.9)',  sk2:'rgba(70,110,190,.8)', sk3:'rgba(10,25,70,.9)', sk4:'rgba(50,90,170,.8)',
+  plat:'.08', face:'linear-gradient(165deg,#060a16,#02030a)', mark:'rgba(226,234,250,.92)', ink:'rgba(212,224,246,.8)'},
+ /* ── tier three: 20 more ──────────────────────────────────── */
+ {n:'Nebula', sk1:'rgba(80,40,200,1)', sk2:'rgba(30,14,70,.98)', sk3:'rgba(210,60,255,.85)', sk4:'rgba(20,10,50,.98)',
+  plat:'.03', face:'linear-gradient(165deg,#07051a,#02010a)', mark:'rgba(238,232,255,.96)', ink:'rgba(220,208,255,.8)'},
+ {n:'Oil Slick', sk1:'rgba(0,190,140,.95)', sk2:'rgba(180,140,40,.85)', sk3:'rgba(60,40,140,.8)', sk4:'rgba(0,140,150,.85)',
+  plat:'.04', face:'linear-gradient(165deg,#080a09,#020303)', mark:'rgba(236,244,240,.96)', ink:'rgba(214,232,226,.8)'},
+ {n:'Blood Orange', sk1:'rgba(255,40,10,1)', sk2:'rgba(190,0,30,.95)', sk3:'rgba(255,90,0,.9)', sk4:'rgba(140,0,20,.95)',
+  plat:'.06', face:'linear-gradient(165deg,#160203,#070001)', mark:'rgba(255,232,226,.96)', ink:'rgba(255,214,206,.85)'},
+ {n:'Moss', sk1:'none',sk2:'none',sk3:'none',sk4:'none', plat:'0',
+  face:'linear-gradient(168deg,#8a9a52,#7a8946 55%,#6c7a3c)', mark:'rgba(30,34,16,.9)', ink:'rgba(34,38,18,.75)',
+  cls:'flat', edge:'rgba(244,250,220,.6)', halo:'rgba(200,222,140,.24)'},
+ {n:'Porcelain', sk1:'rgba(255,255,255,.95)', sk2:'rgba(255,255,255,1)', sk3:'rgba(250,250,252,.9)', sk4:'rgba(255,255,255,.9)',
+  plat:'.99', face:'linear-gradient(165deg,#ffffff,#fafbfc)', mark:'rgba(120,126,134,.85)', ink:'rgba(88,94,104,.7)'},
+ {n:'Graphite', sk1:'none',sk2:'none',sk3:'none',sk4:'none', plat:'0',
+  face:'linear-gradient(168deg,#8a9098,#787e86 55%,#686e76)', mark:'rgba(28,32,38,.9)', ink:'rgba(30,34,40,.72)',
+  cls:'flat', edge:'rgba(255,255,255,.75)', halo:'rgba(226,232,240,.3)', lift:'rgba(255,255,255,.18)'},
+ {n:'Neon Noir', sk1:'rgba(255,0,120,1)', sk2:'rgba(0,0,0,0)', sk3:'rgba(0,240,255,1)', sk4:'rgba(0,0,0,0)',
+  plat:'0', face:'linear-gradient(165deg,#050506,#010102)', mark:'rgba(255,255,255,.98)', ink:'rgba(255,220,240,.9)',
+  edge:'rgba(255,60,160,.5)', halo:'rgba(255,0,120,.2)'},
+ {n:'Champagne', sk1:'rgba(226,192,120,.95)', sk2:'rgba(250,234,196,.9)', sk3:'rgba(198,158,86,.9)', sk4:'rgba(238,214,160,.85)',
+  plat:'.44', face:'linear-gradient(165deg,#efe2c8,#e2d0ad)', mark:'rgba(84,66,38,.9)', ink:'rgba(70,54,30,.75)'},
+ {n:'Storm', sk1:'rgba(40,60,90,.95)', sk2:'rgba(90,120,160,.6)', sk3:'rgba(10,18,32,.95)', sk4:'rgba(60,86,124,.7)',
+  plat:'.04', face:'linear-gradient(165deg,#0d1219,#05070b)', mark:'rgba(226,236,250,.95)', ink:'rgba(204,220,242,.75)'},
+ {n:'Coral', sk1:'rgba(255,140,120,.95)', sk2:'rgba(255,210,196,.9)', sk3:'rgba(255,110,90,.85)', sk4:'rgba(255,180,164,.85)',
+  plat:'.62', face:'linear-gradient(165deg,#ffeae4,#ffd9cf)', mark:'rgba(120,54,42,.9)', ink:'rgba(102,44,34,.75)'},
+ {n:'Deep Sea', sk1:'rgba(0,180,170,.95)', sk2:'rgba(0,90,110,.9)', sk3:'rgba(0,230,200,.7)', sk4:'rgba(0,60,80,.95)',
+  plat:'.04', face:'linear-gradient(165deg,#01100f,#000606)', mark:'rgba(220,248,244,.95)', ink:'rgba(200,242,236,.8)'},
+ {n:'Terracotta', sk1:'none',sk2:'none',sk3:'none',sk4:'none', plat:'0',
+  face:'linear-gradient(168deg,#c9764f,#b56541 55%,#a25835)', mark:'rgba(255,246,240,.96)', ink:'rgba(255,238,230,.8)',
+  cls:'flat', edge:'rgba(255,242,232,.65)', halo:'rgba(255,196,160,.26)'},
+ {n:'Prism', sk1:'rgba(255,0,80,.95)', sk2:'rgba(255,230,0,.9)', sk3:'rgba(0,220,120,.9)', sk4:'rgba(60,90,255,.95)',
+  plat:'.30', face:'linear-gradient(165deg,#fbfcff,#eef1f7)', mark:'rgba(50,56,68,.9)', ink:'rgba(36,42,54,.78)', cls:'glass'},
+ {n:'Ink', sk1:'none',sk2:'none',sk3:'none',sk4:'none', plat:'0',
+  face:'linear-gradient(168deg,#0d1426,#08101e 55%,#050a15)', mark:'rgba(232,240,255,.96)', ink:'rgba(206,222,250,.72)',
+  cls:'flat', edge:'rgba(150,190,255,.4)', halo:'rgba(90,140,255,.16)'},
+ {n:'Peach',       sk1:'rgba(255,180,140,.95)', sk2:'rgba(255,224,200,.9)', sk3:'rgba(255,140,170,.85)', sk4:'rgba(255,200,170,.85)',
+  plat:'.6', face:'linear-gradient(165deg,#fdf0e8,#f8e2d6)', mark:'rgba(110,72,58,.9)', ink:'rgba(90,58,46,.72)'},
+ {n:'Volcanic', sk1:'rgba(255,90,0,1)', sk2:'rgba(40,10,6,.95)', sk3:'rgba(255,180,40,.85)', sk4:'rgba(20,6,4,.98)',
+  plat:'0', face:'linear-gradient(168deg,#0d0403,#050101 60%,#020101)', mark:'rgba(255,226,200,.95)', ink:'rgba(255,200,164,.8)',
+  edge:'rgba(255,140,60,.45)', halo:'rgba(255,110,20,.22)'},
+ {n:'Mint', sk1:'rgba(80,255,200,1)', sk2:'rgba(200,255,236,.9)', sk3:'rgba(0,200,150,.95)', sk4:'rgba(140,255,220,.85)',
+  plat:'.40', face:'linear-gradient(165deg,#d8f7ec,#c2eddd)', mark:'rgba(16,72,56,.9)', ink:'rgba(12,62,48,.78)'},
+ {n:'Oxblood',     sk1:'none',sk2:'none',sk3:'none',sk4:'none', plat:'0',
+  face:'linear-gradient(168deg,#5c1a20,#4a1419 55%,#3c0f14)', mark:'rgba(255,238,238,.96)', ink:'rgba(250,224,224,.75)',
+  cls:'flat', edge:'rgba(255,224,224,.5)', halo:'rgba(255,150,150,.18)'},
+ {n:'Solar Wind', sk1:'rgba(255,236,180,.95)', sk2:'rgba(255,180,90,.9)', sk3:'rgba(255,255,240,.8)', sk4:'rgba(255,210,140,.85)',
+  plat:'.50', face:'linear-gradient(165deg,#2a2013,#140f08)', mark:'rgba(255,250,240,.97)', ink:'rgba(255,244,224,.88)'},
+ {n:'Pearl', sk1:'rgba(255,170,215,.85)', sk2:'rgba(170,225,255,.85)', sk3:'rgba(255,240,170,.8)', sk4:'rgba(200,180,255,.85)',
+  plat:'.52', face:'linear-gradient(165deg,#fbf7ff,#eef4fb)', mark:'rgba(92,84,106,.9)', ink:'rgba(70,62,86,.72)', cls:'glass'},
+ {n:'Thermal',     sk1:'rgba(30,60,255,1)', sk2:'rgba(0,220,255,.95)', sk3:'rgba(255,230,0,1)', sk4:'rgba(255,110,0,1)',
+  plat:'.06', face:'linear-gradient(165deg,#04061a,#01020a)', mark:'rgba(240,246,255,.97)', ink:'rgba(226,238,255,.88)',
+  edge:'rgba(120,180,255,.5)', halo:'rgba(60,120,255,.26)'},
+ {n:'Heat Rise',   sk1:'rgba(255,150,0,1)', sk2:'rgba(255,60,0,.9)', sk3:'rgba(255,230,140,.85)', sk4:'rgba(10,6,4,.98)',
+  plat:'0', face:'linear-gradient(0deg,#f08a10 -18%,#3a1200 16%,#0a0503 44%,#050303 100%)',
+  mark:'rgba(255,248,240,.97)', ink:'rgba(255,232,204,.85)', edge:'rgba(255,180,90,.32)', halo:'rgba(255,140,20,.2)'},
+ {n:'Density',     sk1:'rgba(60,40,255,1)', sk2:'rgba(20,10,120,.95)', sk3:'rgba(120,220,255,.95)', sk4:'rgba(10,4,60,.98)',
+  plat:'.04', face:'linear-gradient(165deg,#04021a,#010008)', mark:'rgba(232,240,255,.96)', ink:'rgba(190,214,255,.85)',
+  edge:'rgba(120,160,255,.45)', halo:'rgba(60,60,255,.22)'},
+ {n:'Elevation',   sk1:'rgba(255,190,90,.9)', sk2:'rgba(150,200,235,.85)', sk3:'rgba(120,205,175,.85)', sk4:'rgba(240,120,110,.8)',
+  plat:'.46', face:'linear-gradient(165deg,#e9e6dc,#dcd8cc)', mark:'rgba(70,74,86,.9)', ink:'rgba(56,60,72,.78)'},
+];
+
+function _skHash(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+
+// coded to their name: the same material every time for the same person,
+// plus a small hue drift inside the family so no two feel identical
+function skinForName(name) {
+  const h = _skHash(String(name || 'memento').trim().toLowerCase());
+  const sk = CARD_SKINS[h % CARD_SKINS.length];
+  return Object.assign({}, sk, { rot: ((h >>> 7) % 22) - 11 });
+}
+
+function activeCardSkin() {
+  try {
+    if (typeof ClarityPaywall !== 'undefined' && !ClarityPaywall.isPaid()) return null;
+    const pick = state.cardSkin && state.cardSkin.id;
+    if (!pick) return null;
+    if (pick === 'name') return skinForName((state.profile && state.profile.name) || '');
+    return CARD_SKINS.find(s => s.n === pick) || null;
+  } catch (e) { return null; }
+}
+
+const _SKIN_VARS = ['--sk1', '--sk2', '--sk3', '--sk4', '--plat-op', '--face', '--mark', '--ink', '--edge', '--halo', '--mm-hue', '--lit', '--glow', '--emit', '--ring', '--clar', '--act', '--cons', '--mix'];
+
+// Applies (or clears) the material on a card wrap. Always called AFTER
+// setLivingCardVars, so clearing can simply re-run it to restore stock.
+function applyCardSkin(wrap) {
+  if (!wrap) return;
+  const sk = activeCardSkin();
+  if (!sk) {
+    if (wrap.dataset.skin) {
+      delete wrap.dataset.skin;
+      delete wrap.dataset.skinRing;
+      delete wrap.dataset.skinMark;
+      wrap.classList.remove('sk-flat', 'sk-void', 'sk-glass');
+      _SKIN_VARS.forEach(v => wrap.style.removeProperty(v));
+      try { setLivingCardVars(wrap); } catch (e) {}
+    }
+    return;
+  }
+  const S = wrap.style;
+  S.setProperty('--sk1', sk.sk1 || 'none');
+  S.setProperty('--sk2', sk.sk2 || 'none');
+  S.setProperty('--sk3', sk.sk3 || 'none');
+  S.setProperty('--sk4', sk.sk4 || sk.sk1 || 'none');
+  S.setProperty('--plat-op', sk.plat || '0');
+  S.setProperty('--face', sk.face || '#0b0d12');
+  S.setProperty('--mark', sk.mark || 'rgba(244,246,250,.97)');
+  S.setProperty('--ink', sk.ink || 'rgba(226,231,240,.75)');
+  S.setProperty('--edge', sk.edge || (sk.sk1 && sk.sk1 !== 'none' ? sk.sk1 : 'rgba(255,255,255,.9)'));
+  S.setProperty('--halo', sk.halo || (sk.sk1 && sk.sk1 !== 'none' ? sk.sk1 : 'rgba(238,244,255,.34)'));
+  S.setProperty('--mm-hue', (sk.rot || 0) + 'deg');
+  // A material owns the hue outright: the app's cyan/platinum/green washes
+  // go OFF or they bleed through and muddy the face (the green haze at the
+  // foot of Crimson). The material's own lights carry the brightness.
+  S.setProperty('--clar', '0');
+  S.setProperty('--act', '0');
+  S.setProperty('--cons', '0');
+  S.setProperty('--mix', '.9');
+  // What the earned layers still drive is how much LIGHT there is: the same
+  // count the mockup used (pillars earned -> brightness), so a day-1 card in
+  // Crimson is dimmer than a day-50 one and the copy stays honest.
+  let n = 3;
+  try { const L2 = livingCardLevels(); n = (L2.clar > 0 ? 1 : 0) + (L2.act > 0 ? 1 : 0) + (L2.cons > 0 ? 1 : 0); } catch (e) {}
+  S.setProperty('--lit', n ? String(0.34 + n * 0.22) : '0');
+  S.setProperty('--glow', n ? '.7' : '0');
+  S.setProperty('--emit', n ? '.7' : '0');
+  S.setProperty('--ring', n ? '.5' : '0');
+  wrap.dataset.skin = sk.n;
+  wrap.dataset.skinRing = (state.cardSkin && state.cardSkin.ring) ? '1' : '0';
+  wrap.dataset.skinMark = (state.cardSkin && state.cardSkin.mark) ? '1' : '0';
+  const cls = String(sk.cls || '');
+  wrap.classList.toggle('sk-flat', cls.indexOf('flat') !== -1);
+  wrap.classList.toggle('sk-void', cls.indexOf('void') !== -1);
+  wrap.classList.toggle('sk-glass', cls.indexOf('glass') !== -1);
+}
+
+// a chip is the same card, small and static (no aura, no bloom: at 62px the
+// halo is bigger than the card and every material reads white)
+function _skChipHtml(sk, id, label, pressed) {
+  const v = sk ? [
+    '--sk1:' + (sk.sk1 || 'none'), '--sk2:' + (sk.sk2 || 'none'),
+    '--sk3:' + (sk.sk3 || 'none'), '--sk4:' + (sk.sk4 || sk.sk1 || 'none'),
+    '--plat-op:' + (sk.plat || '0'), '--face:' + (sk.face || '#0b0d12'),
+    '--mark:' + (sk.mark || 'rgba(244,246,250,.97)')
+  ].join(';') : '';
+  const cls = sk ? String(sk.cls || '').split(' ').filter(Boolean).map(c => 'sk-' + c).join(' ') : 'sk-stock';
+  return '<button class="mfsk-chip" type="button" data-skin-id="' + esc(id) + '" aria-pressed="' + (pressed ? 'true' : 'false') + '">' +
+    '<span class="mfsk-cage ' + cls + '" style="' + esc(v) + '">' +
+      '<span class="mfsk-mini">' +
+        (sk ? '<i class="mfsk-b mfsk-b1"></i><i class="mfsk-b mfsk-b2"></i><i class="mfsk-b mfsk-b3"></i>' : '<i class="mfsk-b mfsk-stock1"></i><i class="mfsk-b mfsk-stock2"></i>') +
+        '<span class="mfsk-plat"></span><span class="mfsk-rim"></span>' +
+        '<svg class="mfsk-m" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg>' +
+      '</span>' +
+    '</span>' +
+    '<span class="mfsk-chip__n">' + esc(label) + '</span>' +
+  '</button>';
+}
+
+// The customiser: held open from the card inside the Memento view. Paid only
+// (the house card is everyone's default; the material is what they own).
+function _mfSkinsInit(ov, wrap) {
+  if (typeof ClarityPaywall !== 'undefined' && !ClarityPaywall.isPaid()) return;
+  if (!ov || !wrap) return;
+  const scroll = ov.querySelector('.mf__scroll');
+  if (!scroll) return;
+
+  // the one line left in the page flow; without it the gesture is undiscoverable
+  const hint = document.createElement('button');
+  hint.className = 'mfsk-hint';
+  hint.type = 'button';
+  hint.textContent = 'Hold the card to change its theme.';
+  const origin = scroll.querySelector('.mf-origin');
+  if (origin) scroll.insertBefore(hint, origin); else scroll.appendChild(hint);
+
+  const yoursName = (state.profile && state.profile.name) || '';
+  const cur = () => (state.cardSkin && state.cardSkin.id) || '';
+  const sheet = document.createElement('div');
+  sheet.className = 'mfsk-wrap';
+  sheet.hidden = true;
+  sheet.innerHTML =
+    '<div class="mfsk-scrim"></div>' +
+    '<div class="mfsk-sheet" role="dialog" aria-label="Themes">' +
+      '<span class="mfsk-grab" aria-hidden="true"></span>' +
+      '<div class="mfsk-strip">' +
+        _skChipHtml(null, '', 'Default', cur() === '') +
+        (yoursName ? _skChipHtml(skinForName(yoursName), 'name', 'Yours', cur() === 'name') : '') +
+        CARD_SKINS.map(s => _skChipHtml(s, s.n, s.n, cur() === s.n)).join('') +
+      '</div>' +
+      '<div class="mfsk-tog">' +
+        '<div class="mfsk-tog__g" data-tog="ring">' +
+          '<button type="button" data-v="0"' + (!(state.cardSkin && state.cardSkin.ring) ? ' class="on"' : '') + '>White ring</button>' +
+          '<button type="button" data-v="1"' + ((state.cardSkin && state.cardSkin.ring) ? ' class="on"' : '') + '>Colour-matched</button>' +
+        '</div>' +
+        '<div class="mfsk-tog__g" data-tog="mark">' +
+          '<button type="button" data-v="0"' + (!(state.cardSkin && state.cardSkin.mark) ? ' class="on"' : '') + '>Plain M</button>' +
+          '<button type="button" data-v="1"' + ((state.cardSkin && state.cardSkin.mark) ? ' class="on"' : '') + '>Tinted M</button>' +
+        '</div>' +
+      '</div>' +
+      '<button class="mfsk-done" type="button">Done</button>' +
+    '</div>';
+  ov.appendChild(sheet);
+
+  const openSheet = () => {
+    wrap.classList.remove('is-pressing');
+    sheet.hidden = false;
+    void sheet.offsetHeight;   // commit the closed transform before the slide
+    sheet.classList.add('is-open');
+    try { navigator.vibrate && navigator.vibrate(8); } catch (e) {}
+  };
+  const closeSheet = () => {
+    sheet.classList.remove('is-open');
+    setTimeout(() => { sheet.hidden = true; }, 280);
+  };
+
+  sheet.querySelector('.mfsk-scrim').addEventListener('click', closeSheet);
+  sheet.querySelector('.mfsk-done').addEventListener('click', closeSheet);
+  hint.addEventListener('click', openSheet);
+
+  sheet.querySelector('.mfsk-strip').addEventListener('click', (e) => {
+    const b = e.target.closest('.mfsk-chip');
+    if (!b) return;
+    if (!state.cardSkin) state.cardSkin = { id: '', ring: 0, mark: 0 };
+    state.cardSkin.id = b.getAttribute('data-skin-id') || '';
+    try { persistNow(); } catch (err) {}
+    applyCardSkin(wrap);
+    sheet.querySelectorAll('.mfsk-chip').forEach(c =>
+      c.setAttribute('aria-pressed', c === b ? 'true' : 'false'));
+  });
+  sheet.querySelectorAll('.mfsk-tog__g').forEach(g => {
+    g.addEventListener('click', (e) => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      if (!state.cardSkin) state.cardSkin = { id: '', ring: 0, mark: 0 };
+      state.cardSkin[g.getAttribute('data-tog')] = b.getAttribute('data-v') === '1' ? 1 : 0;
+      try { persistNow(); } catch (err) {}
+      applyCardSkin(wrap);
+      g.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+    });
+  });
+
+  /* HOLD the card. iOS kills a long press three ways (callout, selection,
+     jitter-cancel), so: cancel on 12px of MOVEMENT not on pointerleave,
+     touch events are the primary path, contextmenu is a second way in.
+     Ported from the mockup verbatim; do not rewrite (PORT-MEMENTO-VIEW.md). */
+  const HOLD_MS = 380, SLOP = 12;
+  let holdT = null, hx = 0, hy = 0, armed = false;
+  const pressStart = (x, y) => {
+    if (armed) return;
+    armed = true; hx = x; hy = y;
+    wrap.classList.add('is-pressing');
+    clearTimeout(holdT);
+    holdT = setTimeout(() => { armed = false; holdT = null; openSheet(); }, HOLD_MS);
+  };
+  const pressMove = (x, y) => {
+    if (!armed) return;
+    if (Math.abs(x - hx) > SLOP || Math.abs(y - hy) > SLOP) pressEnd();
+  };
+  const pressEnd = () => {
+    armed = false;
+    wrap.classList.remove('is-pressing');
+    clearTimeout(holdT); holdT = null;
+  };
+  wrap.addEventListener('touchstart', (e) => { const t = e.touches[0]; if (t) pressStart(t.clientX, t.clientY); }, { passive: true });
+  wrap.addEventListener('touchmove', (e) => { const t = e.touches[0]; if (t) pressMove(t.clientX, t.clientY); }, { passive: true });
+  ['touchend', 'touchcancel'].forEach(ev => wrap.addEventListener(ev, pressEnd, { passive: true }));
+  wrap.addEventListener('pointerdown', (e) => { if (e.pointerType === 'touch') return; pressStart(e.clientX, e.clientY); });
+  ov.addEventListener('pointermove', (e) => { if (e.pointerType === 'touch') return; pressMove(e.clientX, e.clientY); });
+  ['pointerup', 'pointercancel'].forEach(ev => ov.addEventListener(ev, (e) => { if (e.pointerType !== 'touch') pressEnd(); }));
+  wrap.addEventListener('contextmenu', (e) => { e.preventDefault(); if (sheet.hidden) openSheet(); });
 }
