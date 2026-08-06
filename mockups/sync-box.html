@@ -43,6 +43,14 @@
   .tag{margin-left:8px;padding:3px 8px;border-radius:999px;font-size:10.5px;font-weight:700;letter-spacing:.02em}
   .tag--cut{background:rgba(255,255,255,.07);color:var(--text-lo)}
   .tag--risk{background:rgba(58,217,245,.14);color:#8fe6f7}
+  .tag--new{background:rgba(63,217,78,.16);color:#8ee79a}
+  .sect__sub--new{color:#8ee79a}
+  .guide{margin:26px 0 0;padding:18px 18px 16px;border-radius:15px;background:rgba(255,255,255,.045);box-shadow:inset 0 1px 0 rgba(255,255,255,.07);overflow-x:auto}
+  .guide h3{margin:0 0 10px;font-size:15px;font-weight:700;letter-spacing:-.015em}
+  .guide table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:520px}
+  .guide th{text-align:left;font-size:11px;font-weight:750;color:var(--text-lo);padding:0 9px 6px 0}
+  .guide td{padding:7px 9px 7px 0;color:var(--text-mid);line-height:1.45;vertical-align:top;border-top:1px solid rgba(255,255,255,.06)}
+  .guide td b{color:var(--text-hi);font-weight:640}
   .slot__risk{margin:9px 0 0;font-size:12.5px;line-height:1.55;color:var(--text-mid)}
   .slot__risk b{color:var(--text-hi);font-weight:640}
   .pc{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0 0;
@@ -99,6 +107,58 @@
   @media (max-width:400px){ .grid{grid-template-columns:1fr;gap:30px} .wrap{padding:26px 14px 90px} }
 </style>
 <style id="variants">
+/* NEW today-hold-tonight */
+.v-today-hold-tonight{display:flex;flex-direction:column;min-height:172px;font-variant-numeric:tabular-nums}
+.v-today-hold-tonight .ht-rule{margin:0;font-size:17.5px;font-weight:640;line-height:1.3;letter-spacing:-.015em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-hold-tonight .ht-row{display:flex;align-items:baseline;gap:10px;margin:15px 0 0}
+.v-today-hold-tonight .ht-n{font-size:34px;font-weight:700;letter-spacing:-.035em;line-height:1;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-hold-tonight .ht-m{font-size:12.5px;line-height:1.35;color:rgba(255,255,255,.62)}
+.v-today-hold-tonight .ht-btn{margin:16px 0 0;width:100%;padding:13px;border:0;border-radius:11px;background:rgba(255,255,255,.055);box-shadow:inset 0 1px 0 rgba(255,255,255,.07);color:rgba(255,255,255,.45);font:inherit;font-size:14.5px;font-weight:650}
+.v-today-hold-tonight .ht-note{margin:9px 0 0;font-size:11.5px;line-height:1.4;color:rgba(255,255,255,.4)}
+
+/* NEW today-derived-line */
+.v-today-derived-line{display:flex;flex-direction:column;min-height:172px;font-variant-numeric:tabular-nums}
+.v-today-derived-line .dl-top{margin:0;font-size:13px;font-weight:600;color:rgba(255,255,255,.62)}
+.v-today-derived-line .dl-math{margin:5px 0 0;font-size:13px;line-height:1.5;color:rgba(255,255,255,.62)}
+.v-today-derived-line .dl-math b{color:rgba(255,255,255,.96);font-weight:650}
+.v-today-derived-line .dl-act{margin:14px 0 0;font-size:18px;font-weight:680;letter-spacing:-.018em;line-height:1.28;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-derived-line .dl-bar{margin:15px 0 0;height:4px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+.v-today-derived-line .dl-bar i{display:block;height:100%;background:rgba(238,242,251,.85)}
+.v-today-derived-line .dl-foot{margin:10px 0 0;font-size:12.5px;color:rgba(255,255,255,.62)}
+
+/* NEW star-star-open-evidence */
+.v-star-star-open-evidence{display:flex;flex-direction:column;min-height:172px;font-variant-numeric:tabular-nums}
+.v-star-star-open-evidence .soe-star{margin:0;font-size:17px;font-weight:660;line-height:1.32;letter-spacing:-.016em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-open-evidence .soe-list{margin:14px 0 0;padding:0;list-style:none}
+.v-star-star-open-evidence .soe-list li{display:flex;gap:12px;align-items:baseline;padding:6px 0;font-size:13.5px;line-height:1.4;color:rgba(255,255,255,.86);border-top:1px solid rgba(255,255,255,.06)}
+.v-star-star-open-evidence .soe-list li:first-child{border-top:0}
+.v-star-star-open-evidence .soe-list li span:last-child{margin-left:auto;flex:none;font-size:11.5px;color:rgba(255,255,255,.4)}
+.v-star-star-open-evidence .soe-foot{margin:12px 0 0;font-size:12.5px;color:rgba(255,255,255,.62)}
+
+/* NEW consistency-cadence-week */
+.v-consistency-cadence-week{display:flex;flex-direction:column;min-height:172px;font-variant-numeric:tabular-nums}
+.v-consistency-cadence-week .cw-head{display:flex;align-items:baseline;gap:9px}
+.v-consistency-cadence-week .cw-n{font-size:38px;font-weight:700;letter-spacing:-.04em;line-height:1;color:#3fd94e}
+.v-consistency-cadence-week .cw-of{font-size:14px;font-weight:600;color:rgba(255,255,255,.86)}
+.v-consistency-cadence-week .cw-tag{margin-left:auto;padding:4px 10px;border-radius:999px;background:rgba(63,217,78,.14);color:#8ee79a;font-size:11px;font-weight:750}
+.v-consistency-cadence-week .cw-days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:18px 0 0}
+.v-consistency-cadence-week .cw-days i{height:26px;border-radius:6px;background:rgba(255,255,255,.05)}
+.v-consistency-cadence-week .cw-days i.on{background:#3fd94e}
+.v-consistency-cadence-week .cw-days i.rest{background:rgba(255,255,255,.05)}
+.v-consistency-cadence-week .cw-lbl{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:7px 0 0;text-align:center;font-size:10.5px;color:rgba(255,255,255,.4)}
+.v-consistency-cadence-week .cw-lbl span{display:block}
+.v-consistency-cadence-week .cw-foot{margin:auto 0 0;padding-top:12px;font-size:12.5px;color:rgba(255,255,255,.62)}
+.v-consistency-cadence-week .cw-foot b{color:rgba(255,255,255,.96);font-weight:650}
+
+/* NEW consistency-not-moving */
+.v-consistency-not-moving{display:flex;flex-direction:column;min-height:172px;font-variant-numeric:tabular-nums}
+.v-consistency-not-moving .nm-hd{margin:0;font-size:17px;font-weight:660;line-height:1.32;letter-spacing:-.016em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-consistency-not-moving .nm-two{display:flex;gap:22px;margin:15px 0 0}
+.v-consistency-not-moving .nm-two span{display:flex;flex-direction:column;font-size:12px;line-height:1.35;color:rgba(255,255,255,.62)}
+.v-consistency-not-moving .nm-two b{font-size:24px;font-weight:700;letter-spacing:-.03em;color:rgba(255,255,255,.96)}
+.v-consistency-not-moving .nm-say{margin:14px 0 0;font-size:13px;line-height:1.5;color:rgba(255,255,255,.62)}
+.v-consistency-not-moving .nm-btn{margin:auto 0 0;width:100%;padding:13px;border:0;border-radius:11px;background:#f2f3f6;color:#0b0c0e;font:inherit;font-size:14.5px;font-weight:680;cursor:pointer}
+
 /* today-gap-close */
 .v-today-gap-close{display:flex;flex-direction:column;min-height:176px;padding-bottom:10px;font-variant-numeric:tabular-nums}
 .v-today-gap-close .gc-move{margin:0;font-size:18px;line-height:1.32;font-weight:600;letter-spacing:-.015em;color:var(--text-hi,rgba(255,255,255,.96))}
@@ -730,6 +790,27 @@
     teaches you its rule in about four viewings and then returns nothing. A card that shows
     change stays worth a glance.</p>
   <p class="lede">Prototypes, not shipped. The Memento above each card is a stand-in.</p>
+
+  <div class="guide">
+    <h3>Which face for which person</h3>
+    <table>
+      <tr><th>Their goal</th><th>Today</th><th>Star</th><th>Consistency</th></tr>
+      <tr><td><b>Number + deadline</b><br>lose 40 lbs in 6 months</td>
+          <td>The derived line</td><td>Distance to the number</td><td>Your schedule, kept</td></tr>
+      <tr><td><b>Number, no deadline</b><br>100 paying users</td>
+          <td>Closing the gap</td><td>Arrival date</td><td>Rate drift</td></tr>
+      <tr><td><b>A rule to hold</b><br>stay sober, eat under 2,400</td>
+          <td>The rule, tonight</td><td>Evidence, no meter</td><td>Your schedule, kept</td></tr>
+      <tr><td><b>A rate</b><br>gym 3x a week</td>
+          <td>Weighted move</td><td>Evidence, no meter</td><td>Your schedule, kept</td></tr>
+      <tr><td><b>An event</b><br>pass the bar, first hive</td>
+          <td>First thirty seconds</td><td>The star's own spine</td><td>Returns</td></tr>
+      <tr><td><b>Open</b><br>be a better father</td>
+          <td>The ledger</td><td>Evidence, no meter</td><td>Returns</td></tr>
+      <tr><td><b>Kept it up, no result</b><br>any goal, stalled</td>
+          <td colspan="3">Doing it, not working, takes over until the plan is redone</td></tr>
+    </table>
+  </div>
   <nav class="nav">
     <a href="#sect-today">Today</a>
     <a href="#sect-star">Neutron Star</a>
@@ -1155,6 +1236,56 @@
           <p class="slot__data">proofEvents type &#x27;action-complete&#x27; dates over 30 days as a rolling 7 day count, primaryAction.title, actionDoneToday()</p>
         </div>
       </figure></div>
+    <h3 class="sect__sub sect__sub--new">Built for the new philosophy</h3>
+    <div class="grid">
+      <figure class="slot" id="today-hold-tonight">
+        <figcaption class="slot__cap"><span class="slot__n">N1</span>
+          <span class="slot__t">The rule, tonight</span>
+          <span class="tag tag--new">Hold action</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-today-hold-tonight">
+  <p class="ht-rule">Eat 2,000 to 2,400 calories</p>
+  <div class="ht-row">
+    <span class="ht-n">18</span><span class="ht-m">days held<br>best 24</span>
+  </div>
+  <button class="ht-btn" type="button">Confirm tonight</button>
+  <p class="ht-note">Opens at 8pm. A rule cannot be finished at lunch.</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">For a rule, not a task. The line they agreed to, the days it has survived, and a confirm that only makes sense after the day is over.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 it is the rule and an empty confirm. By day 60 the held count is the number they protect, and the button still refuses to be tappable before evening, so the count never lies.</p>
+          <p class="slot__data">primaryAction.tiers (the rule text), action verb = Hold, proofEvents type action-complete for days held</p>
+        </div>
+      </figure>
+      <figure class="slot" id="today-derived-line">
+        <figcaption class="slot__cap"><span class="slot__n">N2</span>
+          <span class="slot__t">The derived line</span>
+          <span class="tag tag--new">Quantity + deadline</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-today-derived-line">
+  <p class="dl-top">40 lbs in 6 months</p>
+  <p class="dl-math">is <b>1.5 lbs a week</b>, is a <b>750 calorie</b> daily deficit</p>
+  <p class="dl-act">Eat 2,000 to 2,400 today</p>
+  <div class="dl-bar" aria-hidden="true"><i style="width:34%"></i></div>
+  <p class="dl-foot">13.6 lbs down. On pace, 4 days ahead.</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">Shows the arithmetic Memento did: the target, the timeline, and the daily number it implies, so today&#x27;s action is visibly the goal divided by the days.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> The daily number RECALCULATES as they fall behind or run ahead, so the line tightens after a bad week and eases after a good one, which is the app coaching rather than reporting.</p>
+          <p class="slot__data">goalProgress target/current/history, deadline flag, derived daily rate</p>
+        </div>
+      </figure></div>
+
   </section>
   <section class="sect" id="sect-star">
     <header class="sect__hd"><h2>Neutron Star</h2>
@@ -1558,6 +1689,34 @@
           <p class="slot__data">proofEvents attributed to the current star for the silence count, clarity.answers.neutronStar, plus the same trigger set for milestones crossed in goalProgress and star age from clarity.ignitedAt</p>
         </div>
       </figure></div>
+    <h3 class="sect__sub sect__sub--new">Built for the new philosophy</h3>
+    <div class="grid">
+      <figure class="slot" id="star-star-open-evidence">
+        <figcaption class="slot__cap"><span class="slot__n">N1</span>
+          <span class="slot__t">Evidence, no meter</span>
+          <span class="tag tag--new">Open goal</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-star-star-open-evidence">
+  <p class="soe-star">Be a father my kids actually talk to.</p>
+  <ul class="soe-list">
+    <li><span>Phone in the drawer at 6</span><span>Tue</span></li>
+    <li><span>Drove Maya to practice, no radio</span><span>Sun</span></li>
+    <li><span>Said sorry first</span><span>Fri</span></li>
+  </ul>
+  <p class="soe-foot">61 things, since 19 June.</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">For goals with nothing to count. The statement, then the things actually done in its name, in their own words. No bar, no percentage, ever.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 shows one entry and reads as a beginning. By day 60 the list has turned over dozens of times and the count underneath is the only number, because a meter on an open goal is a lie.</p>
+          <p class="slot__data">clarity.answers.neutronStar, proofEvents titles since ignition</p>
+        </div>
+      </figure></div>
+
   </section>
   <section class="sect" id="sect-consistency">
     <header class="sect__hd"><h2>Consistency</h2>
@@ -2026,6 +2185,60 @@
           <p class="slot__data">proofEvents counted per day for the last 30 days (all types), today&#x27;s count, the 30 day mean, and the number of days with zero events.</p>
         </div>
       </figure></div>
+    <h3 class="sect__sub sect__sub--new">Built for the new philosophy</h3>
+    <div class="grid">
+      <figure class="slot" id="consistency-cadence-week">
+        <figcaption class="slot__cap"><span class="slot__n">N1</span>
+          <span class="slot__t">Your schedule, kept</span>
+          <span class="tag tag--new">Any cadence</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-cadence-week">
+  <div class="cw-head"><span class="cw-n">3</span><span class="cw-of">of 3 this week</span>
+    <span class="cw-tag">kept</span></div>
+  <div class="cw-days" aria-hidden="true">
+    <i class="on"></i><i class="rest"></i><i class="on"></i><i class="rest"></i>
+    <i class="on"></i><i class="rest"></i><i class="rest"></i>
+  </div>
+  <p class="cw-lbl"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></p>
+  <p class="cw-foot"><b>11 perfect weeks.</b> Rest days are not misses.</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">Measures adherence, not attendance. The plan is 3 times a week, so 3 of 3 is a perfect week and the four quiet days are rest, not misses.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> The count resets weekly and the perfect-week tally is what accumulates, so a vacation or a seasonal gap never destroys anything and the number stays honest.</p>
+          <p class="slot__data">action cadence, consistencyStats().counts matched against the schedule</p>
+        </div>
+      </figure>
+      <figure class="slot" id="consistency-not-moving">
+        <figcaption class="slot__cap"><span class="slot__n">N2</span>
+          <span class="slot__t">Doing it, not working</span>
+          <span class="tag tag--new">Recalibration</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-not-moving">
+  <p class="nm-hd">You kept every day. The number did not move.</p>
+  <div class="nm-two">
+    <span><b>19</b>of 21 days kept</span>
+    <span><b>0.4</b>lbs in 3 weeks</span>
+  </div>
+  <p class="nm-say">The plan expected 4.5. Something in it is wrong, not you.</p>
+  <button class="nm-btn" type="button">Redo the plan</button>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">The face that appears when someone keeps their schedule and the number still is not moving. It names the problem and offers to change the plan.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> It only exists when expected pace and actual pace disagree for long enough to be real, so most weeks it never appears at all, which is what makes it credible when it does.</p>
+          <p class="slot__data">expected rate from goalProgress derivation vs actual rate from history</p>
+        </div>
+      </figure></div>
+
   </section>
 </div>
 </body>
