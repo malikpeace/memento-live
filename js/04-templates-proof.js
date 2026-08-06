@@ -117,41 +117,13 @@ function recalculateStreak() {
   // backfilled as complete). Supporting app activity can shade the heatmap, but
   // it cannot preserve the streak by itself.
   const counts = buildConsistencyData();
-  // === Grace days ===================================================
-  // Every 7 consecutive active days banks one grace day (max 2 held). When a
-  // single missed day would break the run beyond the free never-miss-twice
-  // bridge, a banked day is spent automatically and permanently: the day
-  // renders as a muted heatmap cell, never red, and the chain holds.
-  const g = state.streak.grace = state.streak.grace || { bank: 0, lastEarnMilestone: 0, used: {} };
-  if (!g.used) g.used = {};
-  try {
-    const activeSet = new Set(Object.keys(counts).filter(k => consistencyDayHasMainAction(counts[k])).map(_dayNum));
-    Object.keys(g.used).forEach(k => activeSet.add(_dayNum(k)));
-    const today = _dayNum(getTodayISO());
-    let walk = activeSet.has(today) ? today : today - 1;
-    let bridged = false, started = false;
-    while (true) {
-      if (activeSet.has(walk)) { started = true; walk -= 1; continue; }
-      if (!started) break;                 // run has not begun yet
-      if (!activeSet.has(walk - 1)) break; // 2+ day gap is a real break
-      if (!bridged) { bridged = true; walk -= 1; continue; } // free bridge
-      if ((g.bank || 0) > 0) {
-        g.bank -= 1;
-        const iso = _keyFromDayNum(walk);
-        g.used[iso] = true;
-        activeSet.add(walk);
-        if (!DEMO_MODE) {
-          try {
-            let dayName = iso;
-            try { dayName = new Date(iso + 'T12:00:00').toLocaleDateString(undefined, { weekday: 'long' }); } catch (_) {}
-            if (typeof pushUpdate === 'function') pushUpdate('grace', 'A grace day covered ' + dayName, 'Life happened. The chain holds.');
-          } catch (_) {}
-        }
-        walk -= 1; continue;
-      }
-      break;
-    }
-  } catch (_) {}
+  // v1137 (Malik): GRACE DAYS are gone. Seven kept days banked a free miss
+  // (max two held), a banked day was spent automatically to hold a broken
+  // chain, the covered day rendered muted instead of empty, and both events
+  // announced themselves in Updates ('Grace day banked', 'A grace day covered
+  // Tuesday. Life happened. The chain holds.'). A missed day is a missed day;
+  // the ledger says so. The never-miss-twice bridge below is NOT this: it is
+  // the streak's own definition, not a granted favour.
   const cur = _currentStreakFrom(counts);
   state.streak.count = cur;
   // Earn: each new multiple of 7 in the current run banks one (cap 2). The
@@ -391,57 +363,10 @@ function pulseNeutronStar() {
    auto-dismiss). Fires once per threshold using the same one-shot idea as the
    record moment: a shown-set on state.streak that export/import already covers.
    No schema change beyond an additive array; demo never persists. */
-// === The Monday assessment ==========================================
-// A small generated letter about last week, landing in Updates on the first
-// open of each new week: days kept, grace days that held, one excerpt from
-// the week's notes, one question. Pure local computation, no AI, no email.
-// The artifact that makes a week feel witnessed.
-function maybeGenerateWeeklyCard() {
-  try {
-    if (typeof DEMO_MODE !== 'undefined' && DEMO_MODE) return;
-    if (!state.clarity || !state.clarity.completed) return;
-    if (!state.meta) return;
-    const today = new Date();
-    const dow = (today.getDay() + 6) % 7; // 0 = Monday
-    const monday = new Date(today); monday.setDate(today.getDate() - dow);
-    const mondayISO = localISO(monday);
-    if (state.meta.lastWeeklyCardFor === mondayISO) return;
-    // The week under review: the 7 days before this Monday.
-    const start = new Date(monday); start.setDate(monday.getDate() - 7);
-    const days = [];
-    for (let i = 0; i < 7; i++) { const d = new Date(start); d.setDate(start.getDate() + i); days.push(localISO(d)); }
-    let counts = {}; try { counts = buildConsistencyData(); } catch (e) {}
-    // No letter before there is any history at all; the first one should
-    // describe a week that was actually lived with Memento.
-    if (!Object.keys(counts).some(k => consistencyDayHasMainAction(counts[k]))) { state.meta.lastWeeklyCardFor = mondayISO; persistState(); return; }
-    const kept = days.filter(k => consistencyDayHasMainAction(counts[k])).length;
-    const used = (state.streak && state.streak.grace && state.streak.grace.used) || {};
-    const graceUsed = days.filter(k => used[k]).length;
-    let excerpt = '';
-    try {
-      const inWeek = ((state.reflection && state.reflection.entries) || []).filter(e => e && e.iso && days.indexOf(e.iso) !== -1 && (e.text || '').trim());
-      inWeek.sort((a, b) => (b.text || '').length - (a.text || '').length);
-      if (inWeek[0]) excerpt = (inWeek[0].text || '').trim().slice(0, 140);
-    } catch (e) {}
-    const QUESTIONS = [
-      'What would make this week count?',
-      'What did you avoid last week that still matters?',
-      'Which day felt most alive, and why?',
-      'What deserves less of you this week?',
-      'If this week repeated 52 times, where would you land?'
-    ];
-    const weekNum = Math.floor(Date.parse(mondayISO + 'T00:00:00Z') / (7 * 86400000));
-    const q = QUESTIONS[((weekNum % QUESTIONS.length) + QUESTIONS.length) % QUESTIONS.length];
-    const title = 'Your week, counted: ' + kept + ' of 7 days';
-    let text = '';
-    if (graceUsed) text += (graceUsed === 1 ? 'One grace day held the chain. ' : (graceUsed + ' grace days held the chain. '));
-    if (excerpt) text += 'You wrote: "' + excerpt + '" ';
-    text += q;
-    if (typeof pushUpdate === 'function') pushUpdate('weekly', title, text);
-    state.meta.lastWeeklyCardFor = mondayISO;
-    persistState();
-  } catch (e) {}
-}
+// v1137 (Malik): the MONDAY LETTER is gone. Every week's first open
+// generated a recap into Updates (days kept, grace days that held, an excerpt
+// from the week's notes, a question). Nobody asked for a newsletter from
+// their own app; the record is already on the card.
 
 /* v1136 (Malik: 'that's corny to me'): the streak MILESTONE system is gone.
    It was seven named badges (One Week ... The Hundred 'this is rare air' ...

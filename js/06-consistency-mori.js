@@ -109,7 +109,7 @@ function _currentStreakFrom(counts, strict) {
   // Grace days already spent are covered days forever: they keep the chain
   // intact in both modes (a covered day is not a break, even for the raw chain).
   try {
-    const used = (state.streak && state.streak.grace && state.streak.grace.used) || {};
+    const used = {};   // v1137: grace days retired; nothing is 'covered' any more
     Object.keys(used).forEach(k => active.add(_dayNum(k)));
   } catch (e) {}
   const today = _dayNum(getTodayISO());
@@ -219,8 +219,6 @@ function renderConsistencyHeatmap(weeks, mode, fit, scale) {
   const { counts } = consistencyStats();
   // Supporting activity stays faint; the main Action earns the full cell.
   const level = consistencyHeatmapLevel;
-  // Days covered by a spent grace day render muted (never red, never empty).
-  const _graceUsed = (state.streak && state.streak.grace && state.streak.grace.used) || {};
   // Week scale: a single row of the last 7 days with weekday letters, larger
   // cells. Keeps the graded 5-level green fill and the tap-to-fill behaviour.
   if (scale === 'week') {
@@ -233,12 +231,11 @@ function renderConsistencyHeatmap(weeks, mode, fit, scale) {
       const v = counts[key] || 0;
       const lvl = level(v);
       const isToday = dn === todayNum;
-      const isGrace = v === 0 && _graceUsed[key];
       const dow = new Date(dn * 86400000).getUTCDay();
-      const base = isGrace ? `${key}: covered by a grace day` : consistencyDaySummary(key, v);
-      const label = (isToday ? 'Today, ' : '') + (isGrace ? `${base}.` : consistencyDayHasMainAction(v) ? `${base}.` : `${base}. Tap to mark the main action complete.`);
+      const base = consistencyDaySummary(key, v);
+      const label = (isToday ? 'Today, ' : '') + (consistencyDayHasMainAction(v) ? `${base}.` : `${base}. Tap to mark the main action complete.`);
       row7 += `<div class="cgweek__day">` +
-        `<div class="cgraph__cell cgraph__cell--l${lvl}${isGrace ? ' cgraph__cell--grace' : ''} cgraph__cell--tap${isToday ? ' cgraph__cell--today' : ''}" data-date="${key}" role="button" tabindex="0" aria-label="${label}" title="${label}"></div>` +
+        `<div class="cgraph__cell cgraph__cell--l${lvl} cgraph__cell--tap${isToday ? ' cgraph__cell--today' : ''}" data-date="${key}" role="button" tabindex="0" aria-label="${label}" title="${label}"></div>` +
         `<span class="cgweek__dow${isToday ? ' cgweek__dow--today' : ''}">${DOWL[dow]}</span>` +
       `</div>`;
     }
@@ -304,10 +301,9 @@ function renderConsistencyHeatmap(weeks, mode, fit, scale) {
       const v = counts[key] || 0;
       const lvl = level(v);
       const isToday = dn === todayNum;
-      const isGrace = v === 0 && _graceUsed[key];
-      const base = isGrace ? `${key}: covered by a grace day` : consistencyDaySummary(key, v);
+      const base = consistencyDaySummary(key, v);
       // Non-future cells are tappable: same backfill toggle the calendar uses.
-      const label = (isToday ? 'Today, ' : '') + (isGrace ? `${base}.` : consistencyDayHasMainAction(v) ? `${base}.` : `${base}. Tap to mark the main action complete.`);
+      const label = (isToday ? 'Today, ' : '') + (consistencyDayHasMainAction(v) ? `${base}.` : `${base}. Tap to mark the main action complete.`);
       // Thermal: hue by recency (old=red -> now=blue); intensity sets vividness.
       let styleAttr = '';
       if (hmPalette === 'thermal' && lvl > 0) {
@@ -317,7 +313,7 @@ function renderConsistencyHeatmap(weeks, mode, fit, scale) {
         const glow = (lvl >= 5 && !isToday) ? `;box-shadow:0 0 5px rgba(${col[0]},${col[1]},${col[2]},0.55)` : '';
         styleAttr = ` style="background:rgba(${col[0]},${col[1]},${col[2]},${a})${glow}"`;
       }
-      cols += `<div class="cgraph__cell cgraph__cell--l${lvl}${isGrace ? ' cgraph__cell--grace' : ''} cgraph__cell--tap${isToday ? ' cgraph__cell--today' : ''}"${styleAttr} data-date="${key}" role="button" tabindex="0" aria-label="${label}" title="${label}"></div>`;
+      cols += `<div class="cgraph__cell cgraph__cell--l${lvl} cgraph__cell--tap${isToday ? ' cgraph__cell--today' : ''}"${styleAttr} data-date="${key}" role="button" tabindex="0" aria-label="${label}" title="${label}"></div>`;
     }
     cols += '</div>';
   }

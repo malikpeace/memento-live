@@ -686,12 +686,12 @@ const SHEET_TEMPLATES = {
       }
       if (this._mode === 'morning') {
         if (this._step === 0) {
-          // Yesterday, looked in the eye: counted, covered by grace, or quiet.
+          // Yesterday, looked in the eye: it counted, or it was quiet.
           const y = new Date(); y.setDate(y.getDate() - 1);
           const yk = localISO(y);
           let counts = {}; try { counts = buildConsistencyData(); } catch (_) {}
-          const used = (state.streak && state.streak.grace && state.streak.grace.used) || {};
-          const line = consistencyDayHasMainAction(counts[yk]) ? 'Yesterday counted.' : (used[yk] ? 'A grace day held the chain.' : 'Yesterday was quiet.');
+
+          const line = consistencyDayHasMainAction(counts[yk]) ? 'Yesterday counted.' : 'Yesterday was quiet.';
           const streak = (state.streak && state.streak.count) || 0;
           h += '<div class="be-ico">&#9728;&#65039;</div><div class="be-step">Morning &middot; step 1 of 3</div>';
           h += '<div class="be-q">' + line + '</div>';

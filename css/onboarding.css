@@ -533,9 +533,6 @@ body.lite .ai-thinking {
 .cgraph__cell--l3 { background: rgba(var(--success-rgb),0.58); }
 .cgraph__cell--l4 { background: rgba(var(--success-rgb),0.76); }
 .cgraph__cell--l5 { background: rgba(var(--success-rgb),0.95); }
-/* A day covered by a spent grace day: quietly held, not earned. Faint fill
-   with a hairline ring of the consistency green, clearly not a full cell. */
-.cgraph__cell--grace { background: rgba(var(--success-rgb),0.08); box-shadow: inset 0 0 0 1px rgba(var(--success-rgb),0.30); }
 /* Today: a crisp ring with a thin base-colored separator so it reads sharply
    even on a filled green cell, plus a slight glow. No blur on the square. */
 .cgraph__cell--today { box-shadow: 0 0 0 1px var(--surface-0), 0 0 0 2px var(--color-consistency), 0 0 4px rgba(var(--success-rgb),0.55); position: relative; z-index: 2; }

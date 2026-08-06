@@ -213,7 +213,6 @@ try { if (!DEMO_MODE && state.profile && state.profile.onboarded) _injectDemoBar
 if (!DEMO_MODE) { try { recalculateStreak(); } catch (_) {} }
 // The Monday assessment: first open of a new week writes last week's letter
 // into the Updates center (idempotent per week, no-op until there is history).
-if (!DEMO_MODE) { try { if (typeof maybeGenerateWeeklyCard === 'function') maybeGenerateWeeklyCard(); } catch (_) {} }
 // v23 unlock ladder: re-evaluate triggers on session open so a queued unlock
 // (max one per day) fires now and materializes in the first grid paint.
 if (!DEMO_MODE) { try { if (typeof evaluateUnlockLadder === 'function') evaluateUnlockLadder(); } catch (_) {} }
@@ -474,7 +473,6 @@ const HONEST_LOADING_GATE = false;
     day = now;
     try { renderAll(); } catch (_) {}
     try { if (typeof Sidebar !== 'undefined' && Sidebar.refresh) Sidebar.refresh(); } catch (_) {}
-    try { if (!DEMO_MODE && typeof maybeGenerateWeeklyCard === 'function') maybeGenerateWeeklyCard(); } catch (_) {}
   };
   setInterval(check, 60000);
   document.addEventListener('visibilitychange', () => {
