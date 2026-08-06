@@ -4799,22 +4799,12 @@ const TabBar = {
         // don't see them at all; the paywall's "Themes" chip is the only
         // tease). v798 revived these pickers and briefly leaked them free,
         // caught in the v800 paywall sweep.
-        (_colorLocked ? '' :
-          vrow('prefThemeRow', 'Theme', esc(themeName), !!openD.theme) +
-          drawer('prefThemeDrawer', !!openD.theme,
-            '<div class="you-tiles you-tiles--themes" id="prefThemes">' + themesHtml + '</div>' +
-            '<div class="you-sub">Background</div>' +
-            '<div class="you-tiles" id="prefBackground">' + bgHtml + '</div>' +
-            '<input type="file" id="prefBgUploadInput" accept="image/*" style="display:none;">' +
-            bgLinkRow + bgDimRow)) +
-        // Color is paid (v695). v705 (Malik): free users don't see it AT ALL,
-        // the paywall's "Make it yours" line is the only tease.
-        (_colorLocked ? '' :
-          vrow('prefAccentRow', 'Accent', accentDots, !!openD.accent) +
-          drawer('prefAccentDrawer', !!openD.accent,
-            '<div class="you-swatches" id="prefAccent">' + swatchHtml + '</div>' +
-            '<input type="color" id="prefAccentCustomInput" value="' + customHex + '" aria-label="Pick a custom accent color" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;" />' +
-            toggleRow('prefMatchMemento', 'Match Memento to color', 'Tints your Memento card toward the accent you pick.', prefs.matchMemento !== false))) +
+        /* v1127 (Malik): the THEME presets are gone for good, and the ACCENT
+           moved into the Memento customiser (hold the card). The Memento is
+           the app's theme now, so its look is chosen in one place, on the
+           object itself, instead of in a settings list. The theme/background
+           picker code is left unrendered rather than deleted, pending the
+           dead-code sweep. */
         (function () {
           const cur = prefs.theme === 'light' ? 'light' : (prefs.theme === 'dark' ? 'dark' : 'auto');
           const seg = [['auto', 'Auto'], ['light', 'Light'], ['dark', 'Dark']].map(function (o) {

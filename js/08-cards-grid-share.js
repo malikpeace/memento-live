@@ -6126,9 +6126,34 @@ function openMementoFull() {
                               // restore twice, or the second pass removes the card it
                               // just put back (the else branch below) and the home
                               // ends up with no Memento at all.
-      ov.classList.remove('mf--open');   // bg + stats fade out; the card stays put at H
+      ov.classList.remove('mf--open');   // bg + stats fade out
       document.body.style.overflow = '';
       document.removeEventListener('keydown', onKey);
+      // v1127 (Malik: 'it just kinda sits there for a second'): the card used
+      // to hold still for the full 430ms bg fade before teleporting home. Now
+      // it flies back the way it came, a transform-only reverse of the open
+      // morph, and the DOM restore happens as it lands.
+      let backMs = 300;
+      try {
+        const nsB = liveWrap && liveWrap.querySelector('.daycard-ns');
+        const homeNsB = homeParent && homeParent.querySelector ? null : null;
+        if (nsB && dayCardEl) {
+          const N = nsB.getBoundingClientRect();
+          const HB = dayCardEl.getBoundingClientRect();
+          // where the card will sit at home: the home slot's width, centred
+          const targetW = Math.max(80, HB.width - 0);
+          const s2 = targetW / Math.max(1, N.width);
+          const dx2 = (HB.left + HB.width / 2) - (N.left + N.width / 2);
+          const dy2 = HB.top - N.top;
+          const stg = nsB.closest('.daycard-living-stage') || nsB;
+          const reduced2 = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          if (!reduced2) {
+            stg.style.transformOrigin = '50% 0';
+            stg.style.transition = 'transform 300ms cubic-bezier(0.32, 0.72, 0, 1)';
+            stg.style.transform = 'translate(' + dx2.toFixed(1) + 'px,' + dy2.toFixed(1) + 'px) scale(' + s2.toFixed(4) + ')';
+          } else { backMs = 0; }
+        } else { backMs = 0; }
+      } catch (e) { backMs = 0; }
       // Restore the REAL Memento to the home AFTER the background has faded out, then
       // remove the overlay in the same tick so there's no gap. Putting it back early
       // would drop it behind the still-opaque bg and make it flash. Let the home size
@@ -6136,6 +6161,8 @@ function openMementoFull() {
       setTimeout(() => {
         try {
           if (liveWrap) {
+            const stg2 = liveWrap.querySelector('.daycard-living-stage') || liveWrap.querySelector('.daycard-ns');
+            if (stg2) { stg2.style.transition = ''; stg2.style.transform = ''; stg2.style.transformOrigin = ''; }
             liveWrap.style.removeProperty('--dc-rx');
             liveWrap.style.removeProperty('--dc-ry');
             const existing = dayCardEl ? dayCardEl.querySelector('.daycard-wrap') : null;
@@ -6149,7 +6176,7 @@ function openMementoFull() {
           if (dayCardEl) dayCardEl.style.minHeight = '';
         } catch (e) {}
         try { ov.remove(); } catch (e) {}
-      }, 430);
+      }, backMs);
     };
     const onKey = (e) => { if (e.key === 'Escape') close(); };
     // v1123 (Malik): tap the card again to go back; tap-and-hold customises.
@@ -7072,6 +7099,12 @@ function _mfSkinsInit(ov, wrap) {
         (yoursName ? _skChipHtml(skinForName(yoursName), 'name', 'Yours', cur() === 'name') : '') +
         CARD_SKINS.map(s => _skChipHtml(s, s.n, s.n, cur() === s.n)).join('') +
       '</div>' +
+      // v1127: the app accent lives HERE now (it left Settings). A material
+      // sets it automatically; these let them push it somewhere else.
+      '<div class="mfsk-acc" id="mfskAcc">' +
+        (typeof ACCENT_CHOICES !== 'undefined' ? ACCENT_CHOICES.filter(a => a !== 'custom').map(a =>
+          '<button type="button" class="mfsk-acc__sw' + ((state.prefs && state.prefs.accent) === a ? ' is-on' : '') + '" data-acc="' + a + '" aria-label="' + a + ' accent"><i style="background:' + (a === 'default' ? 'linear-gradient(135deg,#3ad9f5,#3fd94e)' : (typeof ACCENT_HEX !== 'undefined' && ACCENT_HEX[a]) || '#888') + '"></i></button>').join('') : '') +
+      '</div>' +
       '<div class="mfsk-tog">' +
         '<div class="mfsk-tog__g" data-tog="ring">' +
           '<button type="button" data-v="0"' + (!(state.cardSkin && state.cardSkin.ring) ? ' class="on"' : '') + '>White ring</button>' +
@@ -7111,6 +7144,20 @@ function _mfSkinsInit(ov, wrap) {
     applyCardSkin(wrap);
     sheet.querySelectorAll('.mfsk-chip').forEach(c =>
       c.setAttribute('aria-pressed', c === b ? 'true' : 'false'));
+  });
+  const accWrap = sheet.querySelector('#mfskAcc');
+  if (accWrap) accWrap.addEventListener('click', (e) => {
+    const b = e.target.closest('.mfsk-acc__sw');
+    if (!b) return;
+    try {
+      state.prefs.accent = b.getAttribute('data-acc');
+      // a hand-picked accent is a deliberate override of the material's own
+      if (state.cardSkin) state.cardSkin.prevAccent = null;
+      _skinAccentApplied = state.cardSkin ? (state.cardSkin.id || '') : '';
+      persistNow();
+      applyPrefs();
+      accWrap.querySelectorAll('.mfsk-acc__sw').forEach(x => x.classList.toggle('is-on', x === b));
+    } catch (err) {}
   });
   sheet.querySelectorAll('.mfsk-tog__g').forEach(g => {
     g.addEventListener('click', (e) => {

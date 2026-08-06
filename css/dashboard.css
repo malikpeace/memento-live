@@ -5275,3 +5275,13 @@ html.theme-light #deskMission .dkm__inv .cc-dayline b { background: rgba(245, 24
    has no business over it. (Same treatment the other full-screen surfaces
    get.) */
 body:has(#mementoFull) #topFade { display: none !important; }
+
+/* v1127 (Malik: the iOS Copy/Look Up/Translate bar popping up on a hold):
+   nothing in the Memento view is selectable text. The note is the ONE
+   exception, because it is theirs to write in. */
+#mementoFull, #mementoFull * {
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+}
+#mementoFull .mf-note, #mementoFull .mf-note * {
+  -webkit-user-select: text; user-select: text; -webkit-touch-callout: default;
+}
