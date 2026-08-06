@@ -192,8 +192,9 @@
     try {
       if (slug === 'paywall') { if (typeof ClarityPaywall !== 'undefined') ClarityPaywall.hide(); }
       else if (slug === 'memento-full') {
-        var x = document.querySelector('#mementoFull .mf__close');
-        if (x) x.click();
+        // v1125: the X is gone from the view; close through its own handle.
+        if (typeof window._mfClose === 'function') window._mfClose();
+        else { var x = document.querySelector('#mementoFull .mf__close'); if (x) x.click(); }
       }
       else if (slug === 'modules') { if (typeof MoreSpace !== 'undefined') MoreSpace.close(); }
       else if (slug === 'clarity') { if (typeof exitToModules === 'function') exitToModules('clarity'); }

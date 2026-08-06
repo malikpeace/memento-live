@@ -723,6 +723,12 @@ body:not(.ns-bloom) .daycard-theme-living .daycard-ns__rim {
 #mementoFull.mf--open .mfsk-hint { opacity: 1; }
 
 /* the customiser sheet: glass over a scrim, the card stays visible behind */
+/* THE tap blocker (v1125, Malik: 'I can't tap the dates'): an author
+   `display` rule OUTRANKS the HTML hidden attribute, so this wrapper sat
+   over the entire view with an invisible-but-hit-testable scrim whenever
+   the customiser existed (paid users, every time). Nothing below it could
+   be tapped. hidden means hidden. */
+.mfsk-wrap[hidden] { display: none !important; }
 .mfsk-wrap { position: fixed; inset: 0; z-index: 60; display: flex; align-items: flex-end; justify-content: center; }
 .mfsk-scrim {
   position: absolute; inset: 0; background: rgba(4,5,7,0.62);
@@ -742,6 +748,9 @@ body:not(.ns-bloom) .daycard-theme-living .daycard-ns__rim {
 .mfsk-wrap.is-open .mfsk-sheet { transform: translateY(0); }
 .mfsk-grab { display: block; width: 38px; height: 4px; margin: 0 auto 14px; border-radius: 999px; background: rgba(255,255,255,0.2); }
 .mfsk-strip {
+  /* the view locks touch to pan-y; the material strip is the ONE place that
+     still pans horizontally, so it opts back in */
+  touch-action: pan-x;
   display: flex; gap: 11px; overflow-x: auto; scroll-snap-type: x mandatory;
   margin: 0 -20px; padding: 4px 20px 12px; -webkit-overflow-scrolling: touch;
   scrollbar-width: none;

@@ -6000,7 +6000,6 @@ function openMementoFull() {
     ov.setAttribute('aria-label', 'Your Memento');
     ov.innerHTML =
       '<div class="mf__bg" aria-hidden="true"></div>' +
-      '<button class="mf__close" aria-label="Close">&times;</button>' +
       '<div class="mf__scroll">' +
         '<div class="mf__card"></div>' +
         '<p class="mf-name">Your Memento</p>' +
@@ -6188,25 +6187,32 @@ function openMementoFull() {
       } catch (e) {}
     };
     window.addEventListener('pagehide', onHide);
-    ov.querySelector('.mf__close').addEventListener('click', close);
     ov.addEventListener('click', (e) => { if (e.target === ov) close(); });
     // iOS-like swipe-down-to-close: pull the card view down (when scrolled to the
     // top) and it follows the finger, then flicks away or springs back.
     (function bindMfSwipe() {
       const scroll = ov.querySelector('.mf__scroll');
       if (!scroll) return;
-      let startY = 0, dy = 0, t0 = 0, active = false, decided = false, engaged = false;
+      let startY = 0, startX = 0, dy = 0, t0 = 0, active = false, decided = false, engaged = false;
       scroll.addEventListener('touchstart', (e) => {
         if (!e.touches || e.touches.length !== 1) return;
-        startY = e.touches[0].clientY; dy = 0; t0 = e.timeStamp || 0;
+        // a touch that starts on a control belongs to that control
+        if (e.target && e.target.closest && e.target.closest('button, [contenteditable], .mfsk-wrap')) { active = false; return; }
+        startY = e.touches[0].clientY; startX = e.touches[0].clientX; dy = 0; t0 = e.timeStamp || 0;
         active = true; decided = false; engaged = false;
       }, { passive: true });
       scroll.addEventListener('touchmove', (e) => {
         if (!active) return;
         const y = e.touches[0].clientY - startY;
+        const x = e.touches[0].clientX - startX;
         if (!decided) {
-          if (Math.abs(y) < 6) return;
-          engaged = y > 0 && scroll.scrollTop <= 0;
+          if (Math.abs(y) < 12) return;
+          // v1125: read the REAL scroller. #mementoFull carries overflow-y,
+          // not .mf__scroll, so scroll.scrollTop was always 0 and every
+          // downward drag hijacked the page (Malik: the dates would not tap
+          // and the whole thing felt cheap). Also require a clearly vertical
+          // pull, so a diagonal never steals the gesture.
+          engaged = y > 0 && ov.scrollTop <= 0 && Math.abs(y) > Math.abs(x) * 1.4;
           decided = true;
           if (!engaged) { active = false; return; }
         }
@@ -6248,6 +6254,7 @@ function openMementoFull() {
     });
     try { _mfSkinsInit(ov, liveWrap); } catch (e) {}
     document.addEventListener('keydown', onKey);
+    try { window._mfClose = close; } catch (e) {}
   } catch (e) {}
 }
 

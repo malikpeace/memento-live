@@ -3362,7 +3362,12 @@ html.lowfx .daycard-ns {
 #mementoFull {
   position: fixed; inset: 0; z-index: 1000;
   display: flex; flex-direction: column; align-items: center;
-  overflow-y: auto; -webkit-overflow-scrolling: touch;
+  /* v1125 (Malik: 'I can swipe left and right, it looks really cheap'):
+     overflow-y:auto with the default overflow-x computes to auto on BOTH
+     axes, so the whole view could be dragged sideways. Locked to vertical,
+     in the scroller and in the gesture. */
+  overflow-y: auto; overflow-x: hidden; touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
   padding: calc(36px + var(--safe-t)) 20px calc(56px + var(--safe-b));
   background: transparent;
 }
@@ -5251,3 +5256,18 @@ html.theme-light #deskMission .dkm__inv .cc-dayline b { background: rgba(245, 24
   .mf-mo__x { transition: none; }
 }
 
+
+/* v1125: the month rows are real targets. The pull-to-close used to eat
+   their taps (js/08, the scroller bug); this makes the intent explicit and
+   keeps the whole row comfortably above 44px. */
+.mf-mo__h { touch-action: manipulation; -webkit-tap-highlight-color: transparent; min-height: 48px; }
+/* the record is a column, not a banner: on a wide window the rows used to
+   stretch the full 1440 and read stretched-out. */
+.mf__scroll { max-width: min(100%, 430px); }
+
+/* v1125: the app's status-bar fade (#topFade, z-2000) painted a WHITE band
+   across the top of the Memento view in light mode, above the view's own
+   dark room. The view is a full-screen surface with its own top; the fade
+   has no business over it. (Same treatment the other full-screen surfaces
+   get.) */
+body:has(#mementoFull) #topFade { display: none !important; }
