@@ -39,6 +39,21 @@
   .nav a:hover{color:var(--text-hi);background:rgba(255,255,255,.085)}
 
   .sect{padding-top:40px;scroll-margin-top:72px}
+  .sect__sub{margin:44px 0 20px;font-size:16px;font-weight:680;letter-spacing:-.015em;color:var(--text-hi)}
+  .tag{margin-left:8px;padding:3px 8px;border-radius:999px;font-size:10.5px;font-weight:700;letter-spacing:.02em}
+  .tag--cut{background:rgba(255,255,255,.07);color:var(--text-lo)}
+  .tag--risk{background:rgba(58,217,245,.14);color:#8fe6f7}
+  .slot__risk{margin:9px 0 0;font-size:12.5px;line-height:1.55;color:var(--text-mid)}
+  .slot__risk b{color:var(--text-hi);font-weight:640}
+  .pc{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0 0;
+    padding:12px 13px;border-radius:12px;background:rgba(255,255,255,.032)}
+  .pc__h{display:block;margin:0 0 6px;font-size:11.5px;font-weight:700;color:var(--text-lo)}
+  .pc__col--p .pc__h{color:#7fe08c}
+  .pc__col--c .pc__h{color:#f0938f}
+  .pc ul{margin:0;padding-left:14px}
+  .pc li{margin:0 0 5px;font-size:12px;line-height:1.5;color:var(--text-mid)}
+  .slot__verdict{margin:11px 0 0;font-size:12.5px;line-height:1.55;color:var(--text-hi);font-weight:560}
+
   .sect__hd h2{margin:0 0 5px;font-size:20px;font-weight:700;letter-spacing:-.02em}
   .sect__hd p{margin:0 0 22px;font-size:13.5px;line-height:1.55;color:var(--text-mid)}
   .sect__hd b{color:var(--text-hi);font-weight:640}
@@ -190,6 +205,108 @@
 .v-today-today-then .tn-cta:active{transform:scale(.985);opacity:.94}
 @media (prefers-reduced-motion:reduce){.v-today-today-then .tn-cta{transition:none}}
 
+/* today-today-toward */
+.v-today-today-toward{display:flex;flex-direction:column;min-height:176px;padding-bottom:10px;font-variant-numeric:tabular-nums}
+.v-today-today-toward .tt-move{margin:0;font-size:18.5px;line-height:1.33;font-weight:600;letter-spacing:-.015em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-today-toward .tt-rail{margin-top:16px}
+.v-today-today-toward .tt-track{position:relative;display:block;height:5px;border-radius:999px;background:rgba(var(--ink,255,255,255),.1);overflow:hidden}
+.v-today-today-toward .tt-fill{position:absolute;left:0;top:0;bottom:0;width:34%;border-radius:999px;background:var(--solid-bg,#eef2fb)}
+.v-today-today-toward .tt-base{position:absolute;left:12%;top:0;bottom:0;width:1px;background:var(--solid-fg,#07080b);opacity:.55}
+.v-today-today-toward .tt-nums{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:11px}
+.v-today-today-toward .tt-cur{font-size:13.5px;line-height:1.3;font-weight:450;color:rgba(var(--ink,255,255,255),.88)}
+.v-today-today-toward .tt-cur b{font-size:16px;font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-today-toward .tt-delta{flex:0 0 auto;font-size:12.5px;line-height:1.3;font-weight:500;color:rgba(var(--ink,255,255,255),.7)}
+.v-today-today-toward .tt-cta{margin-top:auto;appearance:none;border:0;width:100%;height:46px;border-radius:10px;background:var(--solid-bg,#eef2fb);color:var(--solid-fg,#07080b);font-family:inherit;font-size:15.5px;font-weight:600;letter-spacing:-.01em;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.28);transition:transform 160ms ease-out,opacity 160ms ease-out}
+.v-today-today-toward .tt-cta:active{transform:scale(.985);opacity:.94}
+@media (prefers-reduced-motion:reduce){.v-today-today-toward .tt-cta{transition:none}}
+
+/* today-size-ladder */
+.v-today-size-ladder{display:flex;flex-direction:column;min-height:176px;padding-bottom:10px;font-variant-numeric:tabular-nums}
+.v-today-size-ladder .sl-move{margin:0;font-size:18px;line-height:1.32;font-weight:600;letter-spacing:-.015em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-size-ladder .sl-scale{display:flex;align-items:flex-end;gap:9px;height:30px;margin:16px 0 0}
+.v-today-size-ladder .sl-scale i{width:13px;border-radius:3px;background:rgba(var(--ink,255,255,255),.12)}
+.v-today-size-ladder .sl-scale i:nth-child(1){height:7px}
+.v-today-size-ladder .sl-scale i:nth-child(2){height:12px}
+.v-today-size-ladder .sl-scale i:nth-child(3){height:18px}
+.v-today-size-ladder .sl-scale i:nth-child(4){height:24px}
+.v-today-size-ladder .sl-scale i:nth-child(5){height:30px}
+.v-today-size-ladder .sl-scale i.is-past{background:rgba(var(--ink,255,255,255),.32)}
+.v-today-size-ladder .sl-scale i.is-now{background:var(--solid-bg,#eef2fb)}
+.v-today-size-ladder .sl-read{margin:14px 0 0;font-size:13.5px;line-height:1.42;font-weight:450;color:rgba(var(--ink,255,255,255),.88)}
+.v-today-size-ladder .sl-read b{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-size-ladder .sl-do{margin-top:auto;appearance:none;border:0;width:100%;height:46px;border-radius:10px;background:var(--solid-bg,#eef2fb);color:var(--solid-fg,#07080b);font-family:inherit;font-size:15.5px;font-weight:600;letter-spacing:-.01em;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.28);transition:transform 160ms ease-out,opacity 160ms ease-out}
+.v-today-size-ladder .sl-do:active{transform:scale(.985);opacity:.94}
+@media (prefers-reduced-motion:reduce){.v-today-size-ladder .sl-do{transition:none}}
+
+/* today-move-ledger */
+.v-today-move-ledger{display:flex;flex-direction:column;min-height:176px;padding-bottom:10px;font-variant-numeric:tabular-nums}
+.v-today-move-ledger .ml-top{display:flex;align-items:flex-start;gap:14px}
+.v-today-move-ledger .ml-move{margin:0;flex:1 1 auto;font-size:17.5px;line-height:1.3;font-weight:600;letter-spacing:-.015em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-move-ledger .ml-do{flex:0 0 auto;appearance:none;border:0;height:34px;padding:0 18px;border-radius:9px;background:var(--solid-bg,#eef2fb);color:var(--solid-fg,#07080b);font-family:inherit;font-size:13.5px;font-weight:600;letter-spacing:-.01em;cursor:pointer;transition:transform 160ms ease-out,opacity 160ms ease-out}
+.v-today-move-ledger .ml-do:active{transform:scale(.985);opacity:.94}
+.v-today-move-ledger .ml-list{margin:17px 0 0;display:flex;flex-direction:column;gap:9px}
+.v-today-move-ledger .ml-row{display:flex;align-items:baseline;gap:12px;font-size:13px;line-height:1.25}
+.v-today-move-ledger .ml-d{width:68px;flex:0 0 auto;font-weight:600;color:rgba(var(--ink,255,255,255),.5)}
+.v-today-move-ledger .ml-t{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:rgba(var(--ink,255,255,255),.86)}
+.v-today-move-ledger .ml-foot{margin:auto 0 0;font-size:12.5px;line-height:1.35;font-weight:450;color:rgba(var(--ink,255,255,255),.68)}
+@media (prefers-reduced-motion:reduce){.v-today-move-ledger .ml-do{transition:none}}
+
+/* today-mv-ask */
+.v-today-mv-ask{display:flex;flex-direction:column;min-height:170px;color:var(--text-hi,rgba(255,255,255,.96));}
+.v-today-mv-ask__q{margin:0;font-size:14px;line-height:1.1;font-weight:500;letter-spacing:-.006em;color:var(--text-mid,rgba(255,255,255,.62));}
+.v-today-mv-ask__a{margin:12px 0 0;font-size:46px;line-height:.96;letter-spacing:-.04em;font-weight:600;}
+.v-today-mv-ask__move{margin:16px 0 18px;font-size:16.5px;line-height:1.34;font-weight:500;letter-spacing:-.012em;color:var(--text-hi,rgba(255,255,255,.96));}
+.v-today-mv-ask__do{margin-top:auto;width:100%;height:40px;border:0;border-radius:10px;background:rgba(255,255,255,.055);box-shadow:inset 0 1px 0 rgba(255,255,255,.07);color:var(--text-hi,rgba(255,255,255,.96));font-family:inherit;font-size:15px;font-weight:600;letter-spacing:-.008em;cursor:pointer;}
+.v-today-mv-ask__do:active{background:rgba(255,255,255,.085);}
+
+/* today-mv-rule */
+.v-today-mv-rule{display:flex;flex-direction:column;min-height:170px;color:var(--text-hi,rgba(255,255,255,.96));}
+.v-today-mv-rule__head{margin:0;display:flex;align-items:baseline;gap:7px;}
+.v-today-mv-rule__big{font-size:27px;line-height:1;font-weight:600;letter-spacing:-.03em;font-variant-numeric:tabular-nums;}
+.v-today-mv-rule__sub{font-size:14.5px;line-height:1;font-weight:500;letter-spacing:-.008em;color:var(--text-mid,rgba(255,255,255,.62));}
+.v-today-mv-rule__svg{display:block;margin-top:15px;color:var(--text-hi,rgba(255,255,255,.96));}
+.v-today-mv-rule__ends{margin:2px 0 0;display:flex;justify-content:space-between;font-size:11.5px;line-height:1;font-weight:500;font-variant-numeric:tabular-nums;color:var(--text-lo,rgba(255,255,255,.40));}
+.v-today-mv-rule__row{margin-top:auto;padding-top:18px;display:flex;align-items:flex-start;gap:14px;}
+.v-today-mv-rule__move{margin:0;flex:1;font-size:16px;line-height:1.32;font-weight:500;letter-spacing:-.012em;color:var(--text-hi,rgba(255,255,255,.96));}
+.v-today-mv-rule__tier{display:block;margin-top:6px;font-size:13px;line-height:1.2;font-weight:500;color:var(--text-mid,rgba(255,255,255,.62));}
+.v-today-mv-rule__tick{flex:0 0 auto;width:30px;height:30px;margin-top:1px;border:0;border-radius:999px;background:rgba(255,255,255,.06);box-shadow:inset 0 1px 0 rgba(255,255,255,.07);color:var(--text-hi,rgba(255,255,255,.96));display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.v-today-mv-rule__tick:active{background:rgba(255,255,255,.1);}
+
+/* today-mv-ordinal */
+.v-today-mv-ordinal{display:flex;flex-direction:column;min-height:170px;color:var(--text-hi,rgba(255,255,255,.96));}
+.v-today-mv-ordinal__n{margin:0;font-size:62px;line-height:.9;font-weight:600;letter-spacing:-.052em;font-variant-numeric:tabular-nums;}
+.v-today-mv-ordinal__suf{font-size:26px;letter-spacing:-.03em;margin-left:2px;}
+.v-today-mv-ordinal__sub{margin:11px 0 0;font-size:13.5px;line-height:1.25;font-weight:500;letter-spacing:-.006em;color:var(--text-mid,rgba(255,255,255,.62));}
+.v-today-mv-ordinal__line{height:1px;margin:15px 0 0;background:var(--hairline,rgba(255,255,255,.09));}
+.v-today-mv-ordinal__move{margin:14px 0 16px;font-size:16.5px;line-height:1.32;font-weight:500;letter-spacing:-.012em;color:var(--text-hi,rgba(255,255,255,.96));}
+.v-today-mv-ordinal__do{margin-top:auto;width:100%;height:40px;border:0;border-radius:10px;background:rgba(255,255,255,.055);box-shadow:inset 0 1px 0 rgba(255,255,255,.07);color:var(--text-hi,rgba(255,255,255,.96));font-family:inherit;font-size:15px;font-weight:600;letter-spacing:-.008em;cursor:pointer;}
+.v-today-mv-ordinal__do:active{background:rgba(255,255,255,.085);}
+
+/* today-mv-chain */
+.v-today-mv-chain{display:flex;flex-direction:column;min-height:170px;color:var(--text-hi,rgba(255,255,255,.96));}
+.v-today-mv-chain__link{position:relative;display:flex;gap:14px;padding-bottom:18px;}
+.v-today-mv-chain__link:last-of-type{padding-bottom:16px;}
+.v-today-mv-chain__link--now::before{content:"";position:absolute;left:4px;top:14px;bottom:2px;width:1px;background:var(--hairline,rgba(255,255,255,.09));}
+.v-today-mv-chain__node{flex:0 0 auto;width:9px;height:9px;margin-top:5px;border-radius:999px;background:#eef2fb;}
+.v-today-mv-chain__node--open{background:transparent;box-shadow:inset 0 0 0 1px rgba(255,255,255,.34);}
+.v-today-mv-chain__body{flex:1;min-width:0;}
+.v-today-mv-chain__lbl{margin:0;font-size:12.5px;line-height:1.1;font-weight:500;letter-spacing:-.004em;color:var(--text-mid,rgba(255,255,255,.62));}
+.v-today-mv-chain__txt{margin:7px 0 0;font-size:16.5px;line-height:1.32;font-weight:600;letter-spacing:-.014em;color:var(--text-hi,rgba(255,255,255,.96));}
+.v-today-mv-chain__txt--next{font-size:15.5px;font-weight:500;letter-spacing:-.01em;}
+.v-today-mv-chain__do{margin-top:auto;width:100%;height:40px;border:0;border-radius:10px;background:rgba(255,255,255,.055);box-shadow:inset 0 1px 0 rgba(255,255,255,.07);color:var(--text-hi,rgba(255,255,255,.96));font-family:inherit;font-size:15px;font-weight:600;letter-spacing:-.008em;cursor:pointer;}
+.v-today-mv-chain__do:active{background:rgba(255,255,255,.085);}
+
+/* today-mv-trace */
+.v-today-mv-trace{display:flex;flex-direction:column;min-height:170px;color:var(--text-hi,rgba(255,255,255,.96));}
+.v-today-mv-trace__head{margin:0;font-size:25px;line-height:1;font-weight:600;letter-spacing:-.03em;}
+.v-today-mv-trace__sub{margin:8px 0 0;font-size:13.5px;line-height:1.2;font-weight:500;letter-spacing:-.006em;font-variant-numeric:tabular-nums;color:var(--text-mid,rgba(255,255,255,.62));}
+.v-today-mv-trace__svg{display:block;margin-top:13px;color:var(--text-hi,rgba(255,255,255,.96));}
+.v-today-mv-trace__span{margin:3px 0 0;text-align:right;font-size:11.5px;line-height:1;font-weight:500;color:var(--text-lo,rgba(255,255,255,.40));}
+.v-today-mv-trace__row{margin-top:auto;padding-top:16px;display:flex;align-items:flex-start;gap:14px;}
+.v-today-mv-trace__move{margin:0;flex:1;font-size:16px;line-height:1.32;font-weight:500;letter-spacing:-.012em;color:var(--text-hi,rgba(255,255,255,.96));}
+.v-today-mv-trace__tick{flex:0 0 auto;width:30px;height:30px;margin-top:1px;border:0;border-radius:999px;background:rgba(255,255,255,.06);box-shadow:inset 0 1px 0 rgba(255,255,255,.07);color:var(--text-hi,rgba(255,255,255,.96));display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.v-today-mv-trace__tick:active{background:rgba(255,255,255,.1);}
+
 /* star-star-distance */
 .v-star-star-distance{--cy:#3ad9f5;--cyglow:0 0 12px rgba(58,217,245,.45);--rail:rgba(255,255,255,.14);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
 @media (prefers-color-scheme:light){.v-star-star-distance{--cy:#0b90b0;--cyglow:none;--rail:rgba(0,0,0,.12)}}
@@ -314,6 +431,93 @@
 .v-star-star-revision .sr-foot{margin:16px 0 0;font-size:12.5px;line-height:1.35;color:var(--text-mid,rgba(255,255,255,.62))}
 .v-star-star-revision .sr-foot b{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
 
+/* star-star-pot */
+.v-star-star-pot{--cy:#3ad9f5;--rail:rgba(255,255,255,.09);--base:rgba(255,255,255,.24);--inset:inset 0 1px 0 rgba(255,255,255,.06);display:flex;flex-direction:column;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+@media (prefers-color-scheme:light){.v-star-star-pot{--cy:#0b90b0;--rail:rgba(0,0,0,.09);--base:rgba(0,0,0,.26);--inset:none}}
+:root[data-theme="light"] .v-star-star-pot{--cy:#0b90b0;--rail:rgba(0,0,0,.09);--base:rgba(0,0,0,.26);--inset:none}
+:root[data-theme="dark"] .v-star-star-pot{--cy:#3ad9f5;--rail:rgba(255,255,255,.09);--base:rgba(255,255,255,.24);--inset:inset 0 1px 0 rgba(255,255,255,.06)}
+.v-star-star-pot__lead{display:flex;align-items:baseline;gap:9px}
+.v-star-star-pot__lead b{font-size:38px;line-height:.95;font-weight:680;letter-spacing:-.035em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-pot__lead span{min-width:0;font-size:12.5px;line-height:1.25;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-pot__rail{position:relative;height:8px;border-radius:999px;background:var(--rail);box-shadow:var(--inset);overflow:hidden;margin-top:16px}
+.v-star-star-pot__base{position:absolute;left:0;top:0;bottom:0;width:12%;background:var(--base)}
+.v-star-star-pot__gain{position:absolute;left:12%;top:0;bottom:0;width:26%;background:var(--cy)}
+.v-star-star-pot__scale{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-top:10px;font-size:12px;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-pot__at{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-pot__star{margin:16px 0 0;font-size:13.5px;line-height:1.35;font-weight:600;letter-spacing:-.004em;color:var(--text-mid,rgba(255,255,255,.62))}
+
+/* star-star-dial */
+.v-star-star-dial{--cy:#3ad9f5;--track:rgba(255,255,255,.10);--mark:rgba(255,255,255,.42);display:flex;flex-direction:column;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+@media (prefers-color-scheme:light){.v-star-star-dial{--cy:#0b90b0;--track:rgba(0,0,0,.10);--mark:rgba(0,0,0,.40)}}
+:root[data-theme="light"] .v-star-star-dial{--cy:#0b90b0;--track:rgba(0,0,0,.10);--mark:rgba(0,0,0,.40)}
+:root[data-theme="dark"] .v-star-star-dial{--cy:#3ad9f5;--track:rgba(255,255,255,.10);--mark:rgba(255,255,255,.42)}
+.v-star-star-dial__row{display:flex;align-items:center;gap:20px}
+.v-star-star-dial__gauge{position:relative;flex:none;width:104px;height:104px}
+.v-star-star-dial__gauge svg{display:block}
+.v-star-star-dial__track{fill:none;stroke:var(--track);stroke-width:7}
+.v-star-star-dial__arc{fill:none;stroke:var(--cy);stroke-width:7;stroke-linecap:round}
+.v-star-star-dial__mark{fill:var(--mark)}
+.v-star-star-dial__pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:650;letter-spacing:-.02em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-dial__side{min-width:0}
+.v-star-star-dial__left{font-size:40px;line-height:.95;font-weight:680;letter-spacing:-.035em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-dial__unit{margin-top:5px;font-size:13px;line-height:1.3;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-dial__pace{margin-top:10px;font-size:12px;line-height:1.3;font-weight:650;color:var(--cy)}
+.v-star-star-dial__foot{margin:16px 0 0;font-size:12.5px;line-height:1.4;color:var(--text-mid,rgba(255,255,255,.62))}
+
+/* star-star-strata */
+.v-strata{position:relative;height:168px;--ink:rgba(255,255,255,.96);--ink2:rgba(255,255,255,.62);--ink3:rgba(255,255,255,.40);--f1:rgba(255,255,255,.12);--f2:rgba(255,255,255,.07);--lift:inset 0 1px 0 rgba(255,255,255,.07)}
+.v-strata *{box-sizing:border-box}
+.v-strata__core{position:absolute;left:0;top:0;width:20px}
+.v-strata__l{display:block;height:var(--h);margin-bottom:3px;border-radius:3px;box-shadow:var(--lift)}
+.v-strata__l--now{background:linear-gradient(180deg,rgba(58,217,245,.62),rgba(58,217,245,.30))}
+.v-strata__l--mid{background:var(--f1)}
+.v-strata__l--old{background:var(--f2)}
+.v-strata__body{position:absolute;left:36px;right:0;top:0;bottom:0}
+.v-strata__now{margin:0;font-size:16.5px;line-height:1.28;font-weight:600;letter-spacing:-.01em;color:var(--ink)}
+.v-strata__meta{margin:8px 0 0;font-size:12.5px;line-height:1;color:var(--ink2);font-variant-numeric:tabular-nums}
+.v-strata__meta i{font-style:normal;color:var(--ink3);padding:0 3px}
+.v-strata__past{position:absolute;left:0;right:0;margin:0;display:flex;align-items:baseline;gap:12px;font-size:13px;line-height:1.2;color:var(--ink2)}
+.v-strata__past span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.v-strata__past b{font-weight:500;font-size:12px;color:var(--ink3);font-variant-numeric:tabular-nums}
+@media (prefers-color-scheme:light){.v-strata{--ink:rgba(12,14,18,.95);--ink2:rgba(12,14,18,.60);--ink3:rgba(12,14,18,.38);--f1:rgba(12,14,18,.14);--f2:rgba(12,14,18,.08);--lift:inset 0 1px 0 rgba(255,255,255,.35)}.v-strata__l--now{background:linear-gradient(180deg,#1aa9c9,rgba(26,169,201,.55))}}
+
+/* star-star-meridian */
+.v-meridian{position:relative;height:172px;--ink:rgba(255,255,255,.96);--ink2:rgba(255,255,255,.62);--cy:rgba(58,217,245,.58)}
+.v-meridian__star{position:absolute;top:0;left:0;right:0;margin:0;font-size:16.5px;line-height:1.28;font-weight:600;letter-spacing:-.01em;color:var(--ink)}
+.v-meridian__line{position:absolute;left:0;right:0;height:1px;top:calc(152px - var(--p) * 104px);background:linear-gradient(90deg,transparent,var(--cy) 14%,var(--cy) 86%,transparent)}
+.v-meridian__read{position:absolute;right:0;bottom:8px;font-size:12.5px;line-height:1;color:var(--ink2);white-space:nowrap;font-variant-numeric:tabular-nums}
+.v-meridian__anti{position:absolute;left:0;right:0;bottom:0;margin:0;font-size:13px;line-height:1.34;font-weight:400;color:var(--ink)}
+@media (prefers-color-scheme:light){.v-meridian{--ink:rgba(12,14,18,.95);--ink2:rgba(12,14,18,.60);--cy:rgba(17,140,168,.75)}}
+
+/* star-star-folio */
+.v-folio{height:170px;display:flex;flex-direction:column;justify-content:space-between;padding-top:4px;--ink:rgba(255,255,255,.96);--ink2:rgba(255,255,255,.62)}
+.v-folio__star{margin:0;font-size:30px;line-height:1.14;font-weight:600;letter-spacing:-.024em;color:var(--ink);text-wrap:balance}
+.v-folio__foot{display:flex;align-items:baseline;justify-content:space-between;font-size:12.5px;line-height:1;color:var(--ink2);font-variant-numeric:tabular-nums}
+@media (prefers-color-scheme:light){.v-folio{--ink:rgba(12,14,18,.95);--ink2:rgba(12,14,18,.60)}}
+
+/* star-star-plumb */
+.v-plumb{height:170px;display:grid;grid-template-columns:1fr 92px;gap:14px;align-items:center;--ink:rgba(255,255,255,.96);--ink2:rgba(255,255,255,.62);--ink3:rgba(255,255,255,.40);--hair:rgba(255,255,255,.09);--cy:#3ad9f5}
+.v-plumb__star{margin:0;font-size:16px;line-height:1.3;font-weight:600;letter-spacing:-.01em;color:var(--ink)}
+.v-plumb__meta{margin:11px 0 0;font-size:12.5px;line-height:1;color:var(--ink2);font-variant-numeric:tabular-nums}
+.v-plumb__meta i{font-style:normal;color:var(--ink3);padding:0 3px}
+.v-plumb__svg{width:92px;height:168px;display:block}
+.v-plumb__ref{stroke:var(--hair);stroke-width:1}
+.v-plumb__cord{stroke:rgba(255,255,255,.52);stroke-width:1}
+.v-plumb__pin{fill:var(--cy)}
+.v-plumb__bob{fill:var(--cy);fill-opacity:.9}
+.v-plumb__off{stroke:var(--ink3);stroke-width:1;stroke-opacity:.55}
+@media (prefers-color-scheme:light){.v-plumb{--ink:rgba(12,14,18,.95);--ink2:rgba(12,14,18,.60);--ink3:rgba(12,14,18,.38);--hair:rgba(12,14,18,.14);--cy:#118ca8}.v-plumb__cord{stroke:rgba(12,14,18,.50)}}
+
+/* star-star-vigil */
+.v-vigil{height:168px;display:flex;flex-direction:column;justify-content:center;--ink:rgba(255,255,255,.96);--ink2:rgba(255,255,255,.62);--hair:rgba(255,255,255,.09)}
+.v-vigil__news{display:flex;align-items:baseline;gap:9px}
+.v-vigil__n{font-size:54px;line-height:.94;font-weight:600;letter-spacing:-.038em;color:var(--ink);font-variant-numeric:tabular-nums}
+.v-vigil__u{font-size:17px;font-weight:500;letter-spacing:-.01em;color:var(--ink)}
+.v-vigil__sub{margin:11px 0 0;font-size:13px;line-height:1.3;color:var(--ink2)}
+.v-vigil__rule{height:1px;background:var(--hair);margin:16px 0 14px}
+.v-vigil__star{margin:0;font-size:14.5px;line-height:1.34;font-weight:600;letter-spacing:-.005em;color:var(--ink)}
+@media (prefers-color-scheme:light){.v-vigil{--ink:rgba(12,14,18,.95);--ink2:rgba(12,14,18,.60);--hair:rgba(12,14,18,.13)}}
+
 /* consistency-chain-slack */
 .v-consistency-chain-slack{color:var(--text-hi);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;}
 .v-consistency-chain-slack .cs-head{display:flex;align-items:flex-end;gap:9px;}
@@ -430,44 +634,118 @@
 .v-consistency-year-ribbon .yr-ax{display:flex;margin-top:10px;font-size:10px;color:var(--text-mid);}
 .v-consistency-year-ribbon .yr-ax span{flex:1;}
 .v-consistency-year-ribbon .yr-ax span:last-child{flex:none;}
+
+/* consistency-rate-curve */
+.v-consistency-rate-curve{display:flex;flex-direction:column;color:var(--text-hi);font-variant-numeric:tabular-nums;}
+.v-consistency-rate-curve .rc-top{display:flex;align-items:baseline;gap:8px;}
+.v-consistency-rate-curve .rc-n{font-size:30px;line-height:1;font-weight:640;letter-spacing:-.03em;color:var(--text-hi);}
+.v-consistency-rate-curve .rc-of{font-size:13.5px;font-weight:500;color:var(--text-hi);}
+.v-consistency-rate-curve .rc-sub{margin-top:9px;font-size:13px;line-height:1.35;color:var(--text-hi);}
+.v-consistency-rate-curve .rc-chart{position:relative;margin-top:16px;height:64px;}
+.v-consistency-rate-curve .rc-chart svg{display:block;width:100%;height:64px;overflow:visible;}
+.v-consistency-rate-curve .rc-tag{position:absolute;left:0;top:48.8%;transform:translateY(-140%);font-size:10px;line-height:1;color:var(--text-mid);}
+.v-consistency-rate-curve .rc-ft{margin-top:15px;font-size:12.5px;color:var(--text-mid);}
+
+/* consistency-comeback */
+.v-consistency-comeback{display:flex;gap:16px;align-items:flex-start;color:var(--text-hi);font-variant-numeric:tabular-nums;}
+.v-consistency-comeback .cb-l{width:132px;flex:none;}
+.v-consistency-comeback .cb-n{font-size:30px;line-height:1;font-weight:640;letter-spacing:-.03em;color:var(--text-hi);}
+.v-consistency-comeback .cb-k{margin-top:6px;font-size:14px;font-weight:500;color:var(--text-hi);}
+.v-consistency-comeback .cb-sub{margin-top:16px;font-size:12.5px;line-height:1.55;color:var(--text-mid);}
+.v-consistency-comeback .cb-r{flex:1;display:flex;flex-direction:column;gap:7px;}
+.v-consistency-comeback .cb-hd{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;font-size:9px;color:var(--text-mid);text-align:center;}
+.v-consistency-comeback .cb-g{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.v-consistency-comeback .cel{aspect-ratio:1;border-radius:3px;background:currentColor;opacity:.08;}
+.v-consistency-comeback .cel.is-fut{opacity:.03;}
+.v-consistency-comeback .cel.lv1{opacity:.26;}
+.v-consistency-comeback .cel.lv2{opacity:.48;}
+.v-consistency-comeback .cel.lv3{opacity:.76;}
+.v-consistency-comeback .cel.is-now{background:#3fd94e;opacity:1;}
+.v-consistency-comeback .cb-cap{margin-top:1px;font-size:11px;color:var(--text-mid);text-align:right;}
+
+/* consistency-ledger */
+.v-consistency-ledger{min-height:168px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;font-variant-numeric:tabular-nums;}
+.v-consistency-ledger__hero{display:flex;align-items:baseline;gap:11px;}
+.v-consistency-ledger__n{font-size:76px;line-height:.84;font-weight:600;letter-spacing:-.048em;color:rgba(255,255,255,.96);}
+.v-consistency-ledger__of{font-size:19px;font-weight:400;letter-spacing:-.01em;color:rgba(255,255,255,.62);}
+.v-consistency-ledger__say{margin:15px 0 0;font-size:14.5px;line-height:1.34;letter-spacing:-.005em;color:rgba(255,255,255,.9);max-width:255px;}
+.v-consistency-ledger__rule{height:1px;background:rgba(255,255,255,.09);margin-top:16px;}
+.v-consistency-ledger__foot{display:flex;justify-content:space-between;align-items:baseline;margin-top:12px;font-size:13px;letter-spacing:-.005em;color:rgba(255,255,255,.72);}
+.v-consistency-ledger__today{color:#3fd94e;}
+
+/* consistency-water */
+.v-consistency-water{min-height:176px;box-sizing:border-box;font-variant-numeric:tabular-nums;}
+.v-consistency-water__gauge{position:relative;height:176px;}
+.v-consistency-water__miss{position:absolute;top:calc(13% - 18px);right:0;font-size:12.5px;letter-spacing:-.005em;color:rgba(255,255,255,.72);}
+.v-consistency-water__now{position:absolute;left:-22px;right:-22px;top:13%;height:1px;background:rgba(63,217,78,.6);}
+.v-consistency-water__now::after{content:"";position:absolute;left:0;right:0;top:1px;height:38px;background:linear-gradient(180deg, rgba(63,217,78,.10), rgba(63,217,78,0));}
+.v-consistency-water__body{position:absolute;top:13px;left:22px;right:22px;}
+.v-consistency-water__read{display:flex;align-items:baseline;gap:2px;}
+.v-consistency-water__n{font-size:44px;line-height:.9;font-weight:600;letter-spacing:-.045em;color:rgba(255,255,255,.96);}
+.v-consistency-water__pct{font-size:20px;font-weight:500;color:rgba(255,255,255,.62);}
+.v-consistency-water__sub{margin-top:8px;font-size:14px;letter-spacing:-.005em;color:rgba(255,255,255,.88);}
+.v-consistency-water__low{position:absolute;left:-22px;right:-22px;top:60%;height:1px;background:rgba(255,255,255,.11);}
+.v-consistency-water__low span{position:absolute;top:7px;right:22px;font-size:12.5px;letter-spacing:-.005em;color:rgba(255,255,255,.58);}
+
+/* consistency-pace */
+.v-consistency-pace{min-height:168px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;font-variant-numeric:tabular-nums;}
+.v-consistency-pace__hero{display:flex;align-items:baseline;gap:10px;}
+.v-consistency-pace__n{font-size:54px;line-height:.86;font-weight:600;letter-spacing:-.045em;color:rgba(255,255,255,.96);}
+.v-consistency-pace__u{font-size:17px;letter-spacing:-.012em;color:rgba(255,255,255,.9);}
+.v-consistency-pace__say{margin:13px 0 0;font-size:14px;line-height:1.34;letter-spacing:-.005em;color:rgba(255,255,255,.86);}
+.v-consistency-pace__axis{position:relative;height:34px;margin-top:22px;}
+.v-consistency-pace__track{position:absolute;top:0;left:0;right:0;height:1px;background:rgba(255,255,255,.12);}
+.v-consistency-pace__done{position:absolute;top:0;left:0;width:46%;height:1px;background:rgba(255,255,255,.62);}
+.v-consistency-pace__proj{position:absolute;top:0;left:46%;width:35.6%;height:1px;background:repeating-linear-gradient(90deg, rgba(63,217,78,.8) 0 3px, rgba(63,217,78,0) 3px 7px);}
+.v-consistency-pace__now{position:absolute;top:-6px;left:46%;width:1px;height:13px;background:rgba(255,255,255,.92);}
+.v-consistency-pace__lands{position:absolute;top:-6px;left:81.6%;width:1px;height:13px;background:#3fd94e;}
+.v-consistency-pace__cap{position:absolute;top:-3px;right:0;width:1px;height:7px;background:rgba(255,255,255,.22);}
+.v-consistency-pace__tag{position:absolute;top:13px;left:46%;margin-left:-2px;font-size:12.5px;letter-spacing:-.005em;color:rgba(255,255,255,.72);}
+.v-consistency-pace__end{position:absolute;top:13px;right:0;font-size:12.5px;color:rgba(255,255,255,.5);}
+
+/* consistency-held */
+.v-consistency-held{position:relative;min-height:172px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;padding-bottom:8px;}
+.v-consistency-held__mark{position:absolute;top:2px;left:0;width:7px;height:7px;background:#3fd94e;}
+.v-consistency-held__line{margin:0;font-size:29px;line-height:1.1;font-weight:500;letter-spacing:-.028em;color:rgba(255,255,255,.96);}
+.v-consistency-held__sub{margin:8px 0 0;font-size:15px;letter-spacing:-.008em;color:rgba(255,255,255,.82);font-variant-numeric:tabular-nums;}
+
+/* consistency-trace */
+.v-consistency-trace{min-height:168px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;font-variant-numeric:tabular-nums;}
+.v-consistency-trace__head{display:flex;align-items:baseline;gap:9px;}
+.v-consistency-trace__n{font-size:40px;line-height:.9;font-weight:600;letter-spacing:-.04em;color:rgba(255,255,255,.96);}
+.v-consistency-trace__u{font-size:16px;letter-spacing:-.012em;color:rgba(255,255,255,.9);}
+.v-consistency-trace__avg{margin-left:auto;font-size:13px;letter-spacing:-.005em;color:rgba(255,255,255,.72);}
+.v-consistency-trace__svg{display:block;width:100%;height:auto;margin-top:20px;}
+.v-consistency-trace__foot{display:flex;justify-content:space-between;margin-top:12px;font-size:12.5px;letter-spacing:-.005em;color:rgba(255,255,255,.62);}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>The sync box, redesigned</h1>
-  <p class="lede">Twenty-three candidates for the three swipeable faces under the Memento.
-    Ten were designed per face by two designers working opposite briefs, then an
-    adversarial critic fixed or killed each one. <b>Seven were killed as filler or
-    near-duplicates.</b></p>
-  <p class="lede">Every variant uses only data the app already stores. The test each one
-    had to pass: <b>what visibly changes here between day 2 and day 60.</b> A card that
-    shows state teaches you its rule in four viewings and is dead by week two. A card
-    that shows change stays worth a glance.</p>
-  <p class="lede">Prototypes, not shipped. The Memento above each card is a stand-in for
-    the real one.</p>
-
+  <h1>The sync box</h1>
+  <p class="lede">Forty-five candidates for the three swipeable faces under the Memento.
+    Thirty were designed conventionally, then fifteen more taking real risks.
+    Every one has honest pros and cons under it, written by a critic told to be harsh.</p>
+  <p class="lede">Every variant uses only data the app already stores. The test each had to
+    pass: <b>what visibly changes here between day 2 and day 60.</b> A card that shows state
+    teaches you its rule in about four viewings and then returns nothing. A card that shows
+    change stays worth a glance.</p>
+  <p class="lede">Prototypes, not shipped. The Memento above each card is a stand-in.</p>
   <nav class="nav">
     <a href="#sect-today">Today</a>
     <a href="#sect-star">Neutron Star</a>
     <a href="#sect-consistency">Consistency</a>
   </nav>
-
   <section class="sect" id="sect-today">
-    <header class="sect__hd">
-      <h2>Today</h2>
-      <p>The one move for the day. Currently a label, a sentence and a button. <b>7 kept.</b></p>
-    </header>
+    <header class="sect__hd"><h2>Today</h2>
+      <p>The one move for the day. <b>10 considered</b>, then <b>5 riskier ones</b> below.</p></header>
     <div class="grid">
       <figure class="slot" id="today-gap-close">
-        <figcaption class="slot__cap">
-          <span class="slot__n">01</span>
-          <span class="slot__t">Closing the gap</span>
-        </figcaption>
+        <figcaption class="slot__cap"><span class="slot__n">01</span>
+          <span class="slot__t">Closing the gap</span></figcaption>
         <div class="phone">
           <div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card">
-            <div class="v v-today-gap-close">
+          <section class="cc-card"><div class="v v-today-gap-close">
   <p class="gc-move">Message 10 people who fit the product</p>
   <div class="gc-head">
     <span class="gc-now">47</span>
@@ -484,19 +762,18 @@
         <div class="slot__meta">
           <p class="slot__idea">The move on top, then the number the star actually named: where the count stands, the slice of the rail this week added, and the date the current rate lands on the target.</p>
           <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the rail is a sliver and there is no pace line yet (it needs two data points), so the card is the move plus &quot;0 of 100 paying customers&quot;. By day 60 the bright week slice, the +N and the projected date all move without the user touching anything, and the date slides LATER when the week is slow. Stays dormant when goalProgress.target is null: the head, rail and pace line simply do not render.</p>
+          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>The projected date is the one value on this face the user cannot compute in their head, and it moves without being touched</li><li>Splitting the rail into base plus this week&#x27;s slice separates lifetime total from recent effort, which a single fill cannot do</li><li>A date that slides later is bad news the card delivers without scolding</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Two data points produce a wild projection, so day 3 can read a date in 2031 and burn the user&#x27;s trust in the line forever</li><li>The number appears three times in four rows (47, the rail, the read line), spending the tightest height budget on repetition</li><li>Null target kills the head, rail and pace line at once, leaving a different app for goal-less users than for numeric ones</li></ul></div></div><p class="slot__verdict">Right for the numeric-star user, but it is the Clarity face wearing Action&#x27;s clothes; ship it as the goal face or not at all.</p>
           <p class="slot__data">primaryAction.title, goalProgress.current, goalProgress.target, goalProgress.unit, goalProgress.history[{day,value}] for this week&#x27;s delta and the pace-based arrival date</p>
         </div>
       </figure>
       <figure class="slot" id="today-today-weight">
-        <figcaption class="slot__cap">
-          <span class="slot__n">02</span>
-          <span class="slot__t">Weighted move</span>
-        </figcaption>
+        <figcaption class="slot__cap"><span class="slot__n">02</span>
+          <span class="slot__t">Weighted move</span></figcaption>
         <div class="phone">
           <div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card">
-            <div class="v v-today-today-weight">
+          <section class="cc-card"><div class="v v-today-today-weight">
   <p class="tw-move">Send the beta invite to the five people who already asked for it</p>
   <div class="tw-row">
     <span class="tw-ladder" aria-hidden="true"><i class="is-past"></i><i class="is-past"></i><i class="is-on"></i><i></i><i></i></span>
@@ -511,19 +788,18 @@
         <div class="slot__meta">
           <p class="slot__idea">The move as hero, then the one thing that gives it weight: how heavy today&#x27;s version is on the five-tier ladder, and how this week&#x27;s run compares to the best week the user has ever put together.</p>
           <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the ladder sits low and the run line reads &quot;1 of the last 7 days&quot; with no best to beat yet. By day 60 the lit rung has usually climbed (light to heavy), and the run line becomes a live comparison that can go down as well as up, so 3 of 7 against a best of 6 is real bad news the card is willing to deliver.</p>
+          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Two independent live values (tier climb, 7-day run) in one row of text, the best information density per pixel in the set</li><li>The best-7 comparison can fall, so a bad week is stated by the card instead of hidden behind a streak</li><li>Reuses tiers the plan already carries, so nothing new has to be invented or stored</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>In the first week the current 7 and the best 7 are the same window, so the line reads as a tie and teaches the user it is meaningless</li><li>Five dots plus the words &quot;Moderate today&quot; encode the same fact twice, at glance distance the dots add nothing</li><li>The user has to subtract 4 from 6 to know where they stand, on a card built for a two-second glance</li></ul></div></div><p class="slot__verdict">Right for a user deep in a tier ladder they already understand; as the default Action face it asks for too much arithmetic.</p>
           <p class="slot__data">primaryAction.tiers, primaryAction.recommendedTier, action.selectedTier, actionLocalDaysInWindow(7), proofEvents (type action-complete, for the best rolling 7-day window), actionDoneToday()</p>
         </div>
       </figure>
       <figure class="slot" id="today-today-open">
-        <figcaption class="slot__cap">
-          <span class="slot__n">03</span>
-          <span class="slot__t">First thirty seconds</span>
-        </figcaption>
+        <figcaption class="slot__cap"><span class="slot__n">03</span>
+          <span class="slot__t">First thirty seconds</span></figcaption>
         <div class="phone">
           <div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card">
-            <div class="v v-today-today-open">
+          <section class="cc-card"><div class="v v-today-today-open">
   <p class="to-move">Call the three trial accounts that never came back</p>
   <div class="to-start">
     <svg class="to-ic" viewBox="0 0 16 16" width="13" height="13" fill="none" aria-hidden="true"><path d="M4 3.2 11.6 8 4 12.8V3.2Z" fill="currentColor"/></svg>
@@ -538,19 +814,18 @@
         <div class="slot__meta">
           <p class="slot__idea">The move as hero with the concrete entry point sitting right under it, so the card answers &quot;what do I physically do first&quot; instead of restating the goal, and one honest line about how long it has been since the last move.</p>
           <p class="slot__evo"><b>Day 2 to day 60.</b> The entry line is rewritten with every plan, so it is never the same sentence twice. The gap line under it is the part that moves daily: on a good run it reads &quot;You moved yesterday&quot;, after a lapse it reads &quot;Four days since your last move&quot;, which is the one place this face is allowed to deliver bad news.</p>
+          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>The only face that answers the question that actually stalls people, what to physically touch first</li><li>howToStart is regenerated per plan, so the entry sentence is never identical twice without any extra data model</li><li>The gap line is the single piece of bad news that changes behaviour, and it is stated flatly</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>On a good run it reads &quot;You moved yesterday&quot; every day for weeks, which is exactly the state-not-change failure the brief names</li><li>A long move title plus a two-line entry sentence plus the gap line overflows the locked height on the wordiest plans</li><li>Day 1 has no last move, so the only moving element is absent precisely when the card most needs to feel alive</li></ul></div></div><p class="slot__verdict">Right for the first ten days; it should hand off to a face that shows change once the user knows how to start.</p>
           <p class="slot__data">primaryAction.howToStart, primaryAction.tiers + action.selectedTier (the move text), proofEvents (type action-complete, most recent date), actionDoneToday()</p>
         </div>
       </figure>
       <figure class="slot" id="today-today-run">
-        <figcaption class="slot__cap">
-          <span class="slot__n">04</span>
-          <span class="slot__t">The run</span>
-        </figcaption>
+        <figcaption class="slot__cap"><span class="slot__n">04</span>
+          <span class="slot__t">The run</span></figcaption>
         <div class="phone">
           <div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card">
-            <div class="v v-today-today-run">
+          <section class="cc-card"><div class="v v-today-today-run">
   <ol class="tr-list">
     <li class="tr-now"><span class="tr-mk" aria-hidden="true"></span><p>Record lesson two, one take, no edits</p></li>
     <li><span class="tr-mk tr-mk--on" aria-hidden="true"></span><p>Recorded lesson one</p><time>Mon</time></li>
@@ -564,19 +839,18 @@
         <div class="slot__meta">
           <p class="slot__idea">Today&#x27;s move sits at the top of a live rail with the last two completed moves stacked underneath it, so the card shows the run it is continuing and the CTA visibly closes the open link at the top.</p>
           <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the rail is one open node with nothing below it and reads as a beginning. By week three there are always two real completions under it, pulled from the proof ledger with their own titles, so the card shows different history every single day and the top node is the only thing left unfilled.</p>
+          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>History turns over daily by construction, so the card is different every morning with no computed metric at all</li><li>The CTA visibly closes the open node at the top, giving the tap a physical consequence on the card itself</li><li>Past moves appear in the user&#x27;s own titles, which is proof no counter can fake</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Three wrapping titles at 350px is six or more lines whenever the plan writes full sentences, and the height is locked</li><li>Yesterday and the day before are the two things a user already remembers, so the card returns memory instead of information</li><li>At day 200 it shows the same three rows as at day 20, with nothing that acknowledges the 200</li></ul></div></div><p class="slot__verdict">Right for a user who needs momentum made visible, but only ships if titles are hard-clamped to one line each.</p>
           <p class="slot__data">primaryAction.tiers + action.selectedTier (today&#x27;s move), proofEvents (type action-complete: title and date of the two most recent), actionDoneToday()</p>
         </div>
       </figure>
       <figure class="slot" id="today-week-rhythm">
-        <figcaption class="slot__cap">
-          <span class="slot__n">05</span>
-          <span class="slot__t">Week rhythm</span>
-        </figcaption>
+        <figcaption class="slot__cap"><span class="slot__n">05</span>
+          <span class="slot__t">This week&#x27;s rhythm</span></figcaption>
         <div class="phone">
           <div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card">
-            <div class="v v-today-week-rhythm">
+          <section class="cc-card"><div class="v v-today-week-rhythm">
   <p class="wr-move">Message 10 people who fit the product</p>
   <div class="wr-week" role="img" aria-label="Four moves so far this week. Today is still open.">
     <span class="wr-day is-done"><i></i>m</span>
@@ -594,21 +868,20 @@
           </section>
         </div>
         <div class="slot__meta">
-          <p class="slot__idea">Today&#x27;s move sits inside the shape of the current week: seven dots for the last seven days, today&#x27;s dot still open, and one line comparing this week&#x27;s count to the same point last week.</p>
-          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the strip is almost empty and the comparison line is absent (no last week to compare to). By day 60 the strip is a dense, changing pattern that shifts every single day, and the reading line can go DOWN (&quot;Two this week. Four by now last week&quot;), which is the honest bad news the current card can never deliver.</p>
-          <p class="slot__data">primaryAction.title, actionLocalDaysInWindow(7), proofEvents (action-complete, bucketed per local day for the strip and the prior-week count), consistencyStats().thisWeek/lastWeek, actionDoneToday() for today&#x27;s open dot</p>
+          <p class="slot__idea">Leads with the shape of the current week as seven columns whose height is that day&#x27;s number of marks, headlined by the honest week-over-week delta rather than the streak.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> On day 2 it is one short column and no delta yet; by day 60 the seven columns carry a visible personal rhythm, the +/- against last week flips both ways as the week fills, and the streak has been demoted to a single quiet line at the bottom.</p>
+          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>The week-over-week delta flips both ways as the week fills, so a slow week is visible on Wednesday rather than Sunday</li><li>Demoting the streak to a quiet line removes the all-or-nothing cliff that makes one missed day feel terminal</li><li>Seven columns are readable at a glance without reading any number</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Column height encodes marks per day, which for a one-move-a-day user is always 0 or 1, so the rhythm it promises never appears</li><li>&quot;Three by now last week&quot; compares against a partial week and the comparison point silently shifts every day, which is hard to trust</li><li>This is the Consistency face with the move stapled on top, so swiping right afterwards shows the user the same week twice</li></ul></div></div><p class="slot__verdict">Should not ship on Action; it duplicates the Consistency face and its columns are flat for the intended one-move-a-day user.</p>
+          <p class="slot__data">consistencyStats().counts (per-day marks for the current week), consistencyStats().thisWeek, consistencyStats().lastWeek, consistencyStats().current, consistencyStats().longest</p>
         </div>
       </figure>
       <figure class="slot" id="today-record-line">
-        <figcaption class="slot__cap">
-          <span class="slot__n">06</span>
-          <span class="slot__t">Against your record</span>
-        </figcaption>
+        <figcaption class="slot__cap"><span class="slot__n">06</span>
+          <span class="slot__t">Against your record</span></figcaption>
         <div class="phone">
           <div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card">
-            <div class="v v-today-record-line">
+          <section class="cc-card"><div class="v v-today-record-line">
   <p class="rl-verdict">One day from your best week.</p>
   <div class="rl-rows">
     <div class="rl-row"><span class="rl-k">This week</span><i class="rl-bar"><b style="width:83%"></b></i><span class="rl-n">5</span></div>
@@ -623,19 +896,18 @@
         <div class="slot__meta">
           <p class="slot__idea">Leads with a verdict the user did not author (&quot;One day from your best week&quot;), proves it with two bars, this week against the best week they have ever had, and puts the move underneath as the way to close it.</p>
           <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 there is no record yet, so the face falls back to the move alone. From week three the verdict is recomputed nightly and reads differently most days: approaching, tied, beaten, or fallen behind. The reference is the best WEEK, never a lifetime streak, so it stays reachable inside seven days instead of becoming a trophy nobody can touch.</p>
+          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Leads with a judgement the user cannot make themselves, which is the strongest reason to look at a card on day 60</li><li>Best week as the reference is beatable inside seven days, unlike a lifetime streak that becomes unreachable</li><li>The verdict has four genuinely different states (approaching, tied, beaten, behind), so the wording changes most weeks</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Burying the move under the chart inverts the Action face&#x27;s priority, the eye lands on bars and finds today&#x27;s task third</li><li>It falls back to the move alone until week three, so the design&#x27;s whole point is missing during the period users decide whether to keep the app</li><li>The best bar is pinned at 100% forever, so after four viewings the second row carries no new shape, only a number</li></ul></div></div><p class="slot__verdict">Right for the competitive user past week three; do not ship it as the only Action face while the first fortnight shows nothing.</p>
           <p class="slot__data">primaryAction.title, actionLocalDaysInWindow(7), proofEvents (action-complete) bucketed into weeks for the best-week value and its month, consistencyStats().thisWeek</p>
         </div>
       </figure>
       <figure class="slot" id="today-today-then">
-        <figcaption class="slot__cap">
-          <span class="slot__n">07</span>
-          <span class="slot__t">How far it has grown</span>
-        </figcaption>
+        <figcaption class="slot__cap"><span class="slot__n">07</span>
+          <span class="slot__t">How far it has grown</span></figcaption>
         <div class="phone">
           <div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card">
-            <div class="v v-today-today-then">
+          <section class="cc-card"><div class="v v-today-today-then">
   <p class="tn-move">Write 1,000 words on the chapter you keep avoiding</p>
   <div class="tn-then">
     <span class="tn-rule" aria-hidden="true"></span>
@@ -649,26 +921,252 @@
         <div class="slot__meta">
           <p class="slot__idea">The move as hero, held against the first version of itself from the proof ledger, so the card proves the work has escalated instead of quietly repeating day one forever.</p>
           <p class="slot__evo"><b>Day 2 to day 60.</b> This face literally cannot exist on day 2, it stays as the move alone until there is a first completed move to compare against. From then on the origin line ages by itself, the day count climbs with no input, and if today&#x27;s move still reads like the first one the card says so plainly rather than hiding it.</p>
+          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>The origin comparison is genuinely un-guessable and lands hardest exactly at day 60, which is the brief&#x27;s test</li><li>Two elements only, the cheapest height in the set, which leaves room for the locked card to breathe</li><li>The day count ages on its own with zero input, so the card is never stale in the trivial sense</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Only the day number changes between escalations, so it can repeat verbatim for weeks and reads as a fixed caption</li><li>It cannot exist at all for the first stretch, and a face that is blank early is a face the user never learns to read</li><li>If the plan regenerated into an unrelated task, &quot;where this started&quot; compares two different jobs and the proof reads false</li></ul></div></div><p class="slot__verdict">Right as the day 60 payoff, too static to carry the everyday face by itself.</p>
           <p class="slot__data">primaryAction.tiers + action.selectedTier (today&#x27;s move), proofEvents (type action-complete: earliest title and date), clarity.ignitedAt (day count), actionDoneToday()</p>
+        </div>
+      </figure>
+      <figure class="slot" id="today-today-toward">
+        <figcaption class="slot__cap"><span class="slot__n">08</span>
+          <span class="slot__t">In service of</span><span class="tag tag--cut">was cut</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-today-today-toward">
+  <p class="tt-move">Ship the pricing page and post it in three communities</p>
+  <div class="tt-rail">
+    <span class="tt-track" aria-hidden="true"><span class="tt-fill"></span><span class="tt-base"></span></span>
+    <span class="tt-nums"><span class="tt-cur"><b>34</b> of 100 paying users</span><span class="tt-delta">+9 in 30 days</span></span>
+  </div>
+  <button class="tt-cta" type="button">Mark it done</button>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">The move as hero, sitting directly on the distance it serves: one thin rail carrying where the user started, where they are now, and the named number from their star, so today&#x27;s small task is visibly attached to the big one.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> The rail moves whenever the number is updated, and the thirty-day delta underneath is the live part: it can read +9, and it can read +0, which is the honest bad news. The baseline tick never moves, so the travelled distance keeps growing behind the fill. If the star has no number in it, the rail and delta stay out and the face falls back to the move alone.</p>
+          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Attaches today&#x27;s small task to the named number visually, which is the app&#x27;s actual thesis in one rail</li><li>The fixed baseline tick keeps travelled distance visible, so progress never looks like nothing on a long goal</li><li>+0 in 30 days is honest bad news the rail cannot hide</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>It is gap-close with the pace date removed, so it keeps that design&#x27;s height cost and null-target fallback while giving up its only un-computable value</li><li>A 30-day delta on a slow goal moves once or twice a month, leaving the card frozen on most mornings</li><li>Repeating the star&#x27;s number here spends the Action swipe on Clarity&#x27;s content</li></ul></div></div><p class="slot__verdict">Should not ship alongside gap-close; it is the same idea with the interesting part taken out.</p>
+          <p class="slot__data">primaryAction.tiers + action.selectedTier, goalProgress.target, goalProgress.unit, goalProgress.baseline, goalProgress.current, goalProgress.history (30-day delta), actionDoneToday()</p>
+        </div>
+      </figure>
+      <figure class="slot" id="today-size-ladder">
+        <figcaption class="slot__cap"><span class="slot__n">09</span>
+          <span class="slot__t">How big it got</span><span class="tag tag--cut">was cut</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-today-size-ladder">
+  <p class="sl-move">Message 10 people who fit the product</p>
+  <div class="sl-scale" role="img" aria-label="Moderate, the third of five sizes"><i class="is-past"></i><i class="is-past"></i><i class="is-now"></i><i></i><i></i></div>
+  <p class="sl-read"><b>Moderate.</b> On day one this was two people.</p>
+  <button class="sl-do" type="button">Mark it done</button>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">Shows today&#x27;s move on the five-step intensity ladder the plan already carries, the steps already climbed filled in behind it, and states plainly what this same move was on day one.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 step one is lit and the second sentence is absent (there is no earlier version to quote). By day 60 the lit step has walked up the ladder and the line reads &quot;On day one this was two people&quot;. It is also the one face that can call out stagnation: if the move never escalated, the ladder shows a single lonely lit step instead of hiding it.</p>
+          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Compresses escalation and current weight into two short rows, the tightest height of all the ladder ideas</li><li>Willing to display stagnation as one lonely lit step rather than dressing it up</li><li>The day-one quote gives the ladder a concrete meaning instead of an abstract scale</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>The lit step follows action.selectedTier, so it drops when the user picks an easier day and the card titled &quot;how big it got&quot; shows it getting smaller</li><li>&quot;On day one this was two people&quot; changes only when the tier changes, which can be never, so most mornings the whole line is a repeat</li><li>Five dots sit next to the word &quot;Moderate&quot; and say the same thing twice in a card with no spare rows</li></ul></div></div><p class="slot__verdict">Right as a compact ladder plus origin face, but only if the escalation is computed from completion history rather than today&#x27;s tier picker.</p>
+          <p class="slot__data">primaryAction.title, primaryAction.tiers {tiny, light, moderate, heavy, extreme}, primaryAction.recommendedTier, action.selectedTier, earliest proofEvents (action-complete) title and date for the day-one version</p>
+        </div>
+      </figure>
+      <figure class="slot" id="today-move-ledger">
+        <figcaption class="slot__cap"><span class="slot__n">10</span>
+          <span class="slot__t">The ledger</span><span class="tag tag--cut">was cut</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-today-move-ledger">
+  <div class="ml-top">
+    <p class="ml-move">Message 10 people who fit the product</p>
+    <button class="ml-do" type="button">Done</button>
+  </div>
+  <div class="ml-list">
+    <div class="ml-row"><span class="ml-d">Yesterday</span><span class="ml-t">Message 10 people who fit</span></div>
+    <div class="ml-row"><span class="ml-d">Thu</span><span class="ml-t">Rewrite the outreach opener</span></div>
+    <div class="ml-row"><span class="ml-d">Wed</span><span class="ml-t">Message 5 people who fit</span></div>
+  </div>
+  <p class="ml-foot">34 moves in 68 days, nine of the last ten.</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">Today&#x27;s move with a compact Done control on the same line, and under it the last three moves actually logged, by day, so the card reads as the running record of a climb rather than a single task.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the list holds one entry and the foot line is hidden, so the card is honestly just the move. By day 60 the three rows turn over daily and visibly show the work getting bigger (five people, then ten), and the foot carries a rate, nine of the last ten, which falls when the user drifts. It never becomes a pure lifetime counter, because the rate can go down.</p>
+          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>The foot line carries both a lifetime count and a rate that can fall, so it still says something new at day 200</li><li>Three past titles in the user&#x27;s own words show the work growing from five people to ten without any metric</li><li>Putting Done on the move&#x27;s line saves a full CTA row in the tightest height budget of the set</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Four text rows plus a foot at 350px truncates past titles into fragments, and truncated proof reads as clutter rather than a record</li><li>The small inline Done shrinks the app&#x27;s most-tapped control and breaks the one-primary-action-per-surface rule</li><li>Three recent rows and &quot;nine of the last ten&quot; measure the same recent window twice, so one of them is dead weight</li></ul></div></div><p class="slot__verdict">Right for the day 200 user who wants the record, but the inline Done must go back to a full CTA and titles must be clamped before it ships.</p>
+          <p class="slot__data">primaryAction.title, proofEvents type action-complete (title and date, last three, plus the lifetime count), clarity.ignitedAt for the day span, actionLocalDaysInWindow(10) for the recent rate, actionDoneToday() to flip the Done control</p>
+        </div>
+      </figure></div>
+    <h3 class="sect__sub">The riskier five</h3>
+    <div class="grid">
+      <figure class="slot" id="today-mv-ask">
+        <figcaption class="slot__cap"><span class="slot__n">11</span>
+          <span class="slot__t">The question</span><span class="tag tag--risk">risky</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-today-mv-ask">
+  <p class="v-today-mv-ask__q">Have you moved today?</p>
+  <p class="v-today-mv-ask__a">Not yet.</p>
+  <p class="v-today-mv-ask__move">Write the cold open for episode 12.</p>
+  <button class="v-today-mv-ask__do" type="button">I moved</button>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">The card stops reporting and asks one thing, then answers it in type so large the answer is the whole face.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 it reads &quot;Not yet.&quot; until you tap, then flips to &quot;Yes.&quot; with the move struck through and a quiet run count; by day 60 most evenings it is a one word card that says Yes and nothing else.</p>
+          <p class="slot__risk"><b>The risk.</b> An enormous &quot;Not yet.&quot; could read as nagging, but it is the honest state of the day and it is the only sentence on the card that changes, so the eye goes straight to the thing that matters and the move underneath is the answer to the question it just asked.</p><div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>&quot;Not yet.&quot; is the only word on the face that changes, so the eye lands on state before copy</li><li>completion makes the card quieter instead of louder, the rare reward shape in a habit app</li><li>needs only actionDoneToday() and a title, so day 1 renders identically to day 200 with no empty slots</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>the question is rhetorical and the user already knows the answer, so the top row carries zero information</li><li>a healthy 200-day user still faces a giant &quot;Not yet.&quot; for fifteen waking hours a day</li><li>the run count exists only after completion, so a collapsing week produces the same card as a perfect one</li></ul></div></div><p class="slot__verdict">Right for the first thirty days when a user needs a verdict rather than a dashboard, wrong for anyone who wants the card to notice a bad week.</p>
+          <p class="slot__data">actionDoneToday(), primaryAction.title, actionLocalDaysInWindow(7) for the post-completion run line</p>
+        </div>
+      </figure>
+      <figure class="slot" id="today-mv-rule">
+        <figcaption class="slot__cap"><span class="slot__n">12</span>
+          <span class="slot__t">The day rule</span><span class="tag tag--risk">risky</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-today-mv-rule">
+  <p class="v-today-mv-rule__head"><span class="v-today-mv-rule__big">6h 12m</span><span class="v-today-mv-rule__sub">of today left</span></p>
+  <svg class="v-today-mv-rule__svg" viewBox="0 0 306 26" width="100%" height="26" aria-hidden="true">
+    <g stroke="currentColor" stroke-linecap="square">
+      <path d="M3 18.5H303" stroke-opacity=".14"/>
+      <path d="M3 18.5H193.6" stroke-opacity=".32"/>
+      <g stroke-opacity=".2"><path d="M3 18.5v-4M20.6 18.5v-4M38.3 18.5v-4M55.9 18.5v-4M73.6 18.5v-4M91.2 18.5v-4M126.5 18.5v-4M144.1 18.5v-4M161.8 18.5v-4M179.4 18.5v-4M197.1 18.5v-4M214.7 18.5v-4M250 18.5v-4M267.6 18.5v-4M285.3 18.5v-4M303 18.5v-4"/></g>
+      <g stroke-opacity=".34"><path d="M108.9 18.5v-8M232.4 18.5v-8"/></g>
+      <path d="M193.6 25V6" stroke="#eef2fb" stroke-opacity=".92" stroke-width="1.5"/>
+    </g>
+  </svg>
+  <p class="v-today-mv-rule__ends"><span>6a</span><span>11p</span></p>
+  <div class="v-today-mv-rule__row">
+    <p class="v-today-mv-rule__move">Write the cold open for episode 12.<span class="v-today-mv-rule__tier">Moderate is today&rsquo;s size.</span></p>
+    <button class="v-today-mv-rule__tick" type="button" aria-label="Mark today's move done">
+      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 6.5"/></svg>
+    </button>
+  </div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">The whole face is one instrument: a ruler of your waking day with a needle at now, so the size of the move is judged against the daylight actually left.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the needle sits near the left and the card is calm; by evening it crowds the right end and the reading shortens to minutes, and after 60 days you learn to read your own hour of the day before you read the words.</p>
+          <p class="slot__risk"><b>The risk.</b> Putting a clock on an anti-anxiety card is a real swing, but it is the one fact that decides whether tonight is a heavy version or a tiny one, and drawn as a rule rather than a countdown it informs without ticking.</p><div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>makes the tier decision legible instead of arbitrary, which no other variant here attempts</li><li>fixed marks rather than a ticking countdown is genuine restraint on an anxious mechanic</li><li>26px of SVG carries the whole instrument, cheaper in height than any chart variant</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>no waking window exists anywhere in state, so 6a to 11p is invented or a new onboarding question nobody approved</li><li>at 9pm it reads &quot;1h 4m of today left&quot; in the largest type, manufacturing the urgency the app exists to remove</li><li>&quot;Moderate is today&#x27;s size&quot; hangs as a fragment and hands the user the arithmetic of whether that fits the hours above</li></ul></div></div><p class="slot__verdict">Should not ship in this form, because its headline number depends on data the app does not have and its honest evening state is a countdown.</p>
+          <p class="slot__data">device clock against the waking window, primaryAction.title, primaryAction.recommendedTier, actionDoneToday() for the check state</p>
+        </div>
+      </figure>
+      <figure class="slot" id="today-mv-ordinal">
+        <figcaption class="slot__cap"><span class="slot__n">13</span>
+          <span class="slot__t">The ordinal</span><span class="tag tag--risk">risky</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-today-mv-ordinal">
+  <p class="v-today-mv-ordinal__n">149<span class="v-today-mv-ordinal__suf">th</span></p>
+  <p class="v-today-mv-ordinal__sub">move, if today counts. First one 14 March.</p>
+  <div class="v-today-mv-ordinal__line"></div>
+  <p class="v-today-mv-ordinal__move">Write the cold open for episode 12.</p>
+  <button class="v-today-mv-ordinal__do" type="button">Completed</button>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">One enormous number owns the face: not what you have done, but the number today would become if you move.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 it reads 2nd and feels almost absurd, by day 60 it reads 149th and the number itself is the argument, a page number in a book you are visibly still writing.</p>
+          <p class="slot__risk"><b>The risk.</b> A giant number with no chart around it looks like it is bragging, but it is the cheapest possible proof of continuity and it reframes today as an increment of something long rather than a task standing alone.</p><div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>survives a bad week without flinching, since a lifetime count never decreases and cannot become an accusation</li><li>cheapest possible tenure proof, needing only a count and a first date, no chart or thresholds</li><li>reframes tonight as an increment of a long thing rather than a task standing alone</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>a monotonic count is drift-blind, so 149th after forty days of collapse looks identical to 149 unbroken days</li><li>day 1 reads &quot;1st move, if today counts. First one&quot; with nothing to name, so the subline breaks or says today</li><li>the first date comes from the derived proofEvents backfill, so it can confidently name a date the user never lived</li></ul></div></div><p class="slot__verdict">Right for a user past a hundred moves who wants the ledger, hollow and drift-blind for everyone before that.</p>
+          <p class="slot__data">proofEvents type &#x27;action-complete&#x27; (count and first date), primaryAction.title, actionDoneToday()</p>
+        </div>
+      </figure>
+      <figure class="slot" id="today-mv-chain">
+        <figcaption class="slot__cap"><span class="slot__n">14</span>
+          <span class="slot__t">The chain</span><span class="tag tag--risk">risky</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-today-mv-chain">
+  <div class="v-today-mv-chain__link v-today-mv-chain__link--now">
+    <span class="v-today-mv-chain__node"></span>
+    <div class="v-today-mv-chain__body">
+      <p class="v-today-mv-chain__lbl">Today</p>
+      <p class="v-today-mv-chain__txt">Write the cold open for episode 12.</p>
+    </div>
+  </div>
+  <div class="v-today-mv-chain__link">
+    <span class="v-today-mv-chain__node v-today-mv-chain__node--open"></span>
+    <div class="v-today-mv-chain__body">
+      <p class="v-today-mv-chain__lbl">Sets up</p>
+      <p class="v-today-mv-chain__txt v-today-mv-chain__txt--next">Record it in one take.</p>
+    </div>
+  </div>
+  <button class="v-today-mv-chain__do" type="button">Completed</button>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">Today&#x27;s move is drawn as the first link of a line that continues, with the move it sets up shown beneath it so the work reads as a sequence and not a chore.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the lower link is speculative and quiet, and as the loop learns the chain the second line becomes the thing you look at first, because it tells you what today is buying.</p>
+          <p class="slot__risk"><b>The risk.</b> Showing tomorrow on a card built for today is the exact thing most task apps refuse to do, but it is the only element here that answers why bother, and it stays honest because the next link is dimmer in weight, never in legibility.</p><div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>the only variant that answers what today buys, using the loop&#x27;s own text rather than a computed metric</li><li>four short rows, the lowest height of the five for the most forward-looking content</li><li>every character is real user-facing move text with no derived statistic to defend</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>action.loop.nextAction is empty until a day has closed, so day 1 shows a dangling &quot;Sets up&quot; slot or silently changes shape</li><li>no history on the face, so a 200-day user gets the identical card to a day-3 user and tenure lives nowhere</li><li>the &quot;dimmer in weight&quot; next line sits one opacity value from the dim-body-text ban Malik has flagged repeatedly</li></ul></div></div><p class="slot__verdict">Right once the loop has chained a few days, provided day 1 collapses to a single link instead of showing an empty second slot.</p>
+          <p class="slot__data">primaryAction.title, action.loop.chained, action.loop.nextAction, actionDoneToday()</p>
+        </div>
+      </figure>
+      <figure class="slot" id="today-mv-trace">
+        <figcaption class="slot__cap"><span class="slot__n">15</span>
+          <span class="slot__t">The trace</span><span class="tag tag--risk">risky</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-today-mv-trace">
+  <p class="v-today-mv-trace__head">Rising</p>
+  <p class="v-today-mv-trace__sub">5 moves in the last 7 days, up from 3</p>
+  <svg class="v-today-mv-trace__svg" viewBox="0 0 306 46" width="100%" height="46" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M3 26.6 13.3 26.6 23.7 21.4 34 21.4 44.4 26.6 54.7 31.7 65.1 31.7 75.4 26.6 85.8 26.6 96.1 21.4 106.5 21.4 116.8 21.4 127.1 26.6 137.5 26.6 147.8 21.4 158.2 16.3 168.5 16.3 178.9 21.4 189.2 21.4 199.6 16.3 209.9 16.3 220.2 21.4 230.6 16.3 240.9 16.3 251.3 11.1 261.6 16.3 272 16.3 282.3 16.3 292.7 16.3 303 16.3 303 42 3 42Z" fill="currentColor" fill-opacity=".07"/>
+    <path d="M3 42H303" stroke="currentColor" stroke-opacity=".12" vector-effect="non-scaling-stroke"/>
+    <path d="M3 26.6 13.3 26.6 23.7 21.4 34 21.4 44.4 26.6 54.7 31.7 65.1 31.7 75.4 26.6 85.8 26.6 96.1 21.4 106.5 21.4 116.8 21.4 127.1 26.6 137.5 26.6 147.8 21.4 158.2 16.3 168.5 16.3 178.9 21.4 189.2 21.4 199.6 16.3 209.9 16.3 220.2 21.4 230.6 16.3 240.9 16.3 251.3 11.1 261.6 16.3 272 16.3 282.3 16.3 292.7 16.3 303 16.3" fill="none" stroke="#eef2fb" stroke-opacity=".9" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+  </svg>
+  <p class="v-today-mv-trace__span">last 30 days</p>
+  <div class="v-today-mv-trace__row">
+    <p class="v-today-mv-trace__move">Write the cold open for episode 12.</p>
+    <button class="v-today-mv-trace__tick" type="button" aria-label="Mark today's move done">
+      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 6.5"/></svg>
+    </button>
+  </div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">A single seismograph line of your moving rate over the last thirty days, with one word telling you which way it is going, and the move sitting under it.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 there is no line yet and the card shows only the move, by day 30 the trace fills the face and by day 60 the word at the top swings between Rising, Holding and Slipping, which is the earliest honest warning of drift.</p>
+          <p class="slot__risk"><b>The risk.</b> A curve on a card this small usually turns into decoration, so this one carries no axes, no grid and no second series, just the shape and the number that names it, and the shape is the only place in the app that shows a decline before a streak breaks.</p><div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>the only face that shows decline before a streak breaks, the earliest honest drift signal available</li><li>the word does the reading, so the curve never asks the user to interpret a shape</li><li>the subline states actual counts, 5 up from 3, so the headline is falsifiable rather than a vibe</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>a 7-day rolling count flips the headline on one skipped Tuesday, so Rising becomes Slipping from a single miss</li><li>the first month has no line, so the card shows an empty 46px box or changes shape while the user is still learning it</li><li>&quot;Slipping&quot; as the largest word lands on exactly the week the user is already losing, and the chart plus three text rows make it the tallest variant</li></ul></div></div><p class="slot__verdict">Right as a weekly or second face for a user past thirty days, too tall and too moody to be the daily card.</p>
+          <p class="slot__data">proofEvents type &#x27;action-complete&#x27; dates over 30 days as a rolling 7 day count, primaryAction.title, actionDoneToday()</p>
         </div>
       </figure></div>
   </section>
   <section class="sect" id="sect-star">
-    <header class="sect__hd">
-      <h2>Neutron Star</h2>
-      <p>The signed statement. Currently a sentence that never changes. <b>8 kept.</b></p>
-    </header>
+    <header class="sect__hd"><h2>Neutron Star</h2>
+      <p>The signed statement. <b>10 considered</b>, then <b>5 riskier ones</b> below.</p></header>
     <div class="grid">
       <figure class="slot" id="star-star-distance">
-        <figcaption class="slot__cap">
-          <span class="slot__n">01</span>
-          <span class="slot__t">Distance to the number</span>
-        </figcaption>
+        <figcaption class="slot__cap"><span class="slot__n">01</span>
+          <span class="slot__t">Distance to the number</span></figcaption>
         <div class="phone">
           <div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card">
-            <div class="v v-star-star-distance">
+          <section class="cc-card"><div class="v v-star-star-distance">
   <p class="sd-star">Ship Memento to 100 paying users without abandoning it at 40.</p>
   <div class="sd-row"><span class="sd-big">34</span><span class="sd-of">of 100 paying users</span><span class="sd-delta">+6 this week</span></div>
   <div class="sd-rail" aria-hidden="true"><span class="sd-fill"></span></div>
@@ -680,19 +1178,18 @@
         <div class="slot__meta">
           <p class="slot__idea">The star stays the hero sentence, and directly under it the distance engine turns the number inside that sentence into a live climb: where you are, the weekly delta, and the arrival date the current pace implies.</p>
           <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 it is the statement with 0 of 100 and no date. By day 60 the count has moved, the rail has filled, the weekly delta can be +6 or 0 (bad news is possible), and the projected arrival date moves on its own every time goalProgress.history gets a pulse, so the card is different without the user touching it. When goalProgress.target is null the number block and rail are simply not rendered and the face falls back to the statement plus the tenure line.</p>
+          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Keeps the signed sentence as the hero while adding the only motion a star can honestly have</li><li>Explicitly specifies the null-target fallback instead of leaving a broken face</li><li>A weekly delta of 0 or negative is showable, so the face can carry bad news</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Star sentence plus number row plus rail plus footer is four bands, and a two-line statement overflows the locked height</li><li>The projected date depends on manual pulses most users stop entering, so Nov 12 freezes while still looking live</li><li>Rewriting the star wipes goalProgress.history in code, so the whole lower half vanishes right after the biggest Clarity event</li></ul></div></div><p class="slot__verdict">Right for users whose star names a number and who keep counting; ship only if the null-target fallback is a designed face rather than leftovers.</p>
           <p class="slot__data">clarity.answers.neutronStar, goalProgress.target, goalProgress.unit, goalProgress.current, goalProgress.history[{day,value}] (pace and projected date), clarity.ignitedAt (Day N)</p>
         </div>
       </figure>
       <figure class="slot" id="star-star-surface">
-        <figcaption class="slot__cap">
-          <span class="slot__n">02</span>
-          <span class="slot__t">The reason, surfaced</span>
-        </figcaption>
+        <figcaption class="slot__cap"><span class="slot__n">02</span>
+          <span class="slot__t">The reason, surfaced</span></figcaption>
         <div class="phone">
           <div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card">
-            <div class="v v-star-star-surface">
+          <section class="cc-card"><div class="v v-star-star-surface">
   <p class="su-star">Ship Memento to 100 paying users without abandoning it at 40.</p>
   <div class="su-why"><span class="su-dot" aria-hidden="true"></span><span class="su-txt">Because I have quit at the almost-there point four times, and I am not doing that to this one.</span></div>
   <p class="su-foot"><b>Day 47.</b> Your reason, surfaced after two days without a move.</p>
@@ -703,19 +1200,18 @@
         <div class="slot__meta">
           <p class="slot__idea">The statement with one of its own supporting answers brought up underneath it, chosen by what is true today, and the bottom line says plainly why that particular one is showing.</p>
           <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 it shows the concrete version of the star, because nothing has happened yet to react to. By day 60 the lower slot is unpredictable: the core why after a silent stretch, the anti vision when the gap widens, the identity line on a day the record was extended. Same words the user wrote, surfaced at the moment they land hardest, so the face changes without inventing any new data.</p>
+          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>The only face that works when the star names no number, which is a large share of real stars</li><li>Every word on it was typed by the user, so it can never read as AI-generated filler</li><li>The lower slot changes on real triggers without needing a single metric</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>The reason line explaining why this answer surfaced teaches its rule in four viewings and then reads as a machine narrating itself</li><li>coreWhy and antiVision are free text that often run three lines, so the locked height forces a clamp that cuts the user&#x27;s own sentence mid-thought</li><li>Users who one-worded the optional Clarity answers get the same slot repeating forever</li></ul></div></div><p class="slot__verdict">The safest default and the strongest candidate for the null-target majority, if the reason line is cut or reduced to a date.</p>
           <p class="slot__data">clarity.answers.neutronStar, clarity.answers.coreWhy, clarity.answers.antiVision, clarity.answers.identityLine, clarity.answers.whatSpecifically (the four candidates for the lower slot), clarity.ignitedAt (Day N), actionDoneToday() and actionLocalDaysInWindow(7) (which one surfaces and the reason line)</p>
         </div>
       </figure>
       <figure class="slot" id="star-star-spine">
-        <figcaption class="slot__cap">
-          <span class="slot__n">03</span>
-          <span class="slot__t">The star&#x27;s own spine</span>
-        </figcaption>
+        <figcaption class="slot__cap"><span class="slot__n">03</span>
+          <span class="slot__t">The star&#x27;s own spine</span></figcaption>
         <div class="phone">
           <div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card">
-            <div class="v v-star-star-spine">
+          <section class="cc-card"><div class="v v-star-star-spine">
   <p class="ss-star">Ship Memento to 100 paying users without abandoning it at 40.</p>
   <div class="ss-spine" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i class="on"></i><i class="on"></i><i></i><i></i><i class="on"></i><i class="on"></i><i></i><i class="on now"></i></div>
   <p class="ss-meta">Signed June 19<b>Day 47</b></p>
@@ -727,19 +1223,18 @@
         <div class="slot__meta">
           <p class="slot__idea">The statement over a one-line spine of its entire life: one mark per day since it was signed, tall and lit where a move landed, flat where none did, so the sentence visibly carries a record instead of floating.</p>
           <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the spine is two marks and reads as a beginning, not a wasteland. By day 60 it is a legible shape with real gaps, the marks compress as tenure grows, the ratio line moves, and the longest silence is a number that can get worse, which is the honest bad news this face is allowed to deliver.</p>
+          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Honest on day 2, where two marks read as a beginning rather than an empty grid</li><li>Longest silence is a number that can get worse, which most faces here cannot deliver</li><li>Runs on consistency data that always exists, with no manual pulse to abandon</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>This is the Consistency face&#x27;s data drawn on the Clarity face, so a swipe between them shows the same record twice</li><li>At 200 days the marks fall under 2px each in a 350px card and become texture, not information</li><li>38 of those days carried a move says nothing about whether the star got any closer</li></ul></div></div><p class="slot__verdict">Cut while Consistency also renders a per-day record; the duplication is fatal on a three-face swipe.</p>
           <p class="slot__data">clarity.answers.neutronStar, clarity.ignitedAt (signed date, Day N, and the span the spine covers), consistencyStats().counts per-day map restricted to days after ignition (lit marks, the count of active days, and the longest gap)</p>
         </div>
       </figure>
       <figure class="slot" id="star-star-ledger">
-        <figcaption class="slot__cap">
-          <span class="slot__n">04</span>
-          <span class="slot__t">What it has cost you</span>
-        </figcaption>
+        <figcaption class="slot__cap"><span class="slot__n">04</span>
+          <span class="slot__t">What it has cost you</span></figcaption>
         <div class="phone">
           <div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card">
-            <div class="v v-star-star-ledger">
+          <section class="cc-card"><div class="v v-star-star-ledger">
   <p class="sl-star">Ship Memento to 100 paying users without abandoning it at 40.</p>
   <div class="sl-rule" aria-hidden="true"></div>
   <div class="sl-row"><span class="sl-big">41</span><span class="sl-lab">moves made<br>in its name</span><span class="sl-wk"><b>4 this week</b><span>6 last week</span></span></div>
@@ -751,19 +1246,18 @@
         <div class="slot__meta">
           <p class="slot__idea">The statement sits quieter at the top and the weight moves to the evidence stacked under it: every move ever completed since this star was signed, this week measured against last week, and the most recent one named.</p>
           <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the count is 1 and there is no week comparison yet. By day 60 the total is a real body of work, the this-week/last-week pair can go down as easily as up so the card carries information rather than a trophy, and the named last move is a different sentence nearly every day.</p>
+          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Needs no parsed target, so it works for every star including qualitative ones</li><li>This week against last week can drop, so the number is information rather than a trophy</li><li>The named last move is a different sentence most days without the user doing anything</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Naming the last completed move duplicates the Action face the user just swiped away from</li><li>41 moves in its name measures effort, so someone 41 moves deep and zero users closer gets congratulated for motion</li><li>Demoting the statement to quiet top text abandons the one thing this face exists to hold</li></ul></div></div><p class="slot__verdict">Solid at day 60 and thin at day 1; usable only if the star stays hero-sized and the last-move line is dropped.</p>
           <p class="slot__data">clarity.answers.neutronStar, proofEvents (type &#x27;action-complete&#x27;) filtered to entries after clarity.ignitedAt for the count and for the latest title + date, consistencyStats().thisWeek, consistencyStats().lastWeek</p>
         </div>
       </figure>
       <figure class="slot" id="star-star-climb">
-        <figcaption class="slot__cap">
-          <span class="slot__n">05</span>
-          <span class="slot__t">The climb</span>
-        </figcaption>
+        <figcaption class="slot__cap"><span class="slot__n">05</span>
+          <span class="slot__t">The climb</span></figcaption>
         <div class="phone">
           <div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card">
-            <div class="v v-star-star-climb">
+          <section class="cc-card"><div class="v v-star-star-climb">
   <div class="v-star-star-climb__head">
     <div class="v-star-star-climb__now"><b>38</b><span>of 100 paying users</span></div>
     <div class="v-star-star-climb__delta">+4 this week</div>
@@ -785,19 +1279,18 @@
         <div class="slot__meta">
           <p class="slot__idea">The shape of the climb is the hero: an area chart scaled from the number they started at to the number the star names, with the target drawn as the ceiling, so the picture is literally how far up they are.</p>
           <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 is one point sitting on the floor and the chart reads honestly as untouched. By week six the curve has flats and jumps in it, the this-week delta swings, and the best-week reference gives every new week something to beat.</p>
+          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>The curve shows flats and jumps, the only face here that renders the texture of a climb instead of a scalar</li><li>Drawing the target as a ceiling makes remaining distance legible with no arithmetic</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>The signed statement is absent, so the Clarity face stops showing the sentence the whole module exists to produce</li><li>History points land only on days the user counted, and the path spaces them evenly, drawing a curve that misstates pace</li><li>Day 2 is a flat line on the floor that reads as a broken widget, and a null target renders nothing at all</li></ul></div></div><p class="slot__verdict">Should not ship as the Clarity face; it is a goal-tracker chart occupying Clarity&#x27;s slot.</p>
           <p class="slot__data">goalProgress.history (the full series), goalProgress.baseline, goalProgress.current, goalProgress.target, goalProgress.unit, clarity.ignitedAt</p>
         </div>
       </figure>
       <figure class="slot" id="star-star-arrival">
-        <figcaption class="slot__cap">
-          <span class="slot__n">06</span>
-          <span class="slot__t">Arrival date</span>
-        </figcaption>
+        <figcaption class="slot__cap"><span class="slot__n">06</span>
+          <span class="slot__t">Arrival date</span></figcaption>
         <div class="phone">
           <div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card">
-            <div class="v v-star-star-arrival">
+          <section class="cc-card"><div class="v v-star-star-arrival">
   <p class="v-star-star-arrival__star">Get Memento to 100 paying users</p>
   <div class="v-star-star-arrival__lead">
     <span class="v-star-star-arrival__date">Nov 25</span>
@@ -816,19 +1309,18 @@
         <div class="slot__meta">
           <p class="slot__idea">Leads with the projected arrival date computed from their own pace, so the headline is a fact that moves on its own every night, and the rail underneath shows where they started against where they are.</p>
           <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 there is no pace yet, so the date slot holds the target count and the rail is empty with only the baseline tick. From the second pulse the date appears and then walks forward or backward daily, and the cyan shift line can read later than a week ago, which is the face&#x27;s honest bad news.</p>
+          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>A headline that moves on its own every night is the clearest answer to the change-not-state brief</li><li>The shift line can invert to later than a week ago, which gives the face real teeth</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>baseline is set at the first pulse rather than at signing, so 12 when you signed it is simply false for anyone who counted late</li><li>Star, date, shift, rail and footer is five bands, which will not fit the locked height with a two-line statement</li><li>A date extrapolated from two or three manual pulses projects a fantasy the user learns to distrust</li></ul></div></div><p class="slot__verdict">Strong for a number star with a disciplined counter, but the date must stay hidden until a real minimum of pulses exists.</p>
           <p class="slot__data">goalProgress.target, goalProgress.unit, goalProgress.baseline, goalProgress.current, goalProgress.history (pace and the same pace recomputed a week back), clarity.answers.neutronStar</p>
         </div>
       </figure>
       <figure class="slot" id="star-star-count">
-        <figcaption class="slot__cap">
-          <span class="slot__n">07</span>
-          <span class="slot__t">The count</span>
-        </figcaption>
+        <figcaption class="slot__cap"><span class="slot__n">07</span>
+          <span class="slot__t">The count</span></figcaption>
         <div class="phone">
           <div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card">
-            <div class="v v-star-star-count">
+          <section class="cc-card"><div class="v v-star-star-count">
   <p class="v-star-star-count__star">Get Memento to 100 paying users</p>
   <div class="v-star-star-count__top">
     <div class="v-star-star-count__n">38<span>/100</span></div>
@@ -846,19 +1338,18 @@
         <div class="slot__meta">
           <p class="slot__idea">Treats the pulse as the ritual: the count leads, ten weekly gains sit underneath with a hairline ceiling at their best week, and the face says out loud how long it has been since they last counted.</p>
           <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the strip is empty and the card asks for the first count once. By week ten the bars have a real profile, the ceiling is a beatable reference that only moves when they beat it, and the staleness line grows into the card&#x27;s honest bad news.</p>
+          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>The only face that repairs its own dependency by collecting the pulse every other number face silently assumes</li><li>The staleness line surfaces exactly when the rest of the data has gone worthless</li><li>The best-week ceiling only moves when beaten, so it stays a real reference</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>A button inside a horizontally swiped card invites mistaps during the drag</li><li>Day 2 is an empty bar strip next to a prompt to count, the weakest first impression of the nine</li><li>Ten weekly bars means roughly seventy days before the strip has any profile</li></ul></div></div><p class="slot__verdict">The Update affordance should exist somewhere regardless, but as a face this is a data-entry form parked on the home screen.</p>
           <p class="slot__data">goalProgress.current, goalProgress.target, goalProgress.history (weekly gains, best week, this week), goalProgress.updatedAt, clarity.answers.neutronStar</p>
         </div>
       </figure>
       <figure class="slot" id="star-star-revision">
-        <figcaption class="slot__cap">
-          <span class="slot__n">08</span>
-          <span class="slot__t">Against who you were</span>
-        </figcaption>
+        <figcaption class="slot__cap"><span class="slot__n">08</span>
+          <span class="slot__t">Against who you were</span></figcaption>
         <div class="phone">
           <div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card">
-            <div class="v v-star-star-revision">
+          <section class="cc-card"><div class="v v-star-star-revision">
   <p class="sr-star">Ship Memento to 100 paying users without abandoning it at 40.</p>
   <p class="sr-now">Second version, signed 47 days ago.</p>
   <div class="sr-then">
@@ -873,26 +1364,212 @@
         <div class="slot__meta">
           <p class="slot__idea">The current statement held up against the one it replaced, so the face is a record of a person revising their aim rather than a sentence that never changes.</p>
           <p class="slot__evo"><b>Day 2 to day 60.</b> Before any rewrite it shows the star, the signing tenure, and the identity line in the lower slot. The moment a star is replaced the face becomes a comparison: which version this is, the exact words of the one before it, and how long that one lasted, which is a number the current star is quietly chasing. Every rewrite adds another layer, so this is the only face that gets richer specifically because the goal changed.</p>
+          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Gets richer from the one event that resets every other face, a rewritten star</li><li>It lasted 88 days is a real number to chase and needs no parse and no pulse</li><li>clarity.history already stores completedAt and neutronStar, so nothing new has to be built</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Most users never rewrite, so it lives permanently in its fallback of star plus tenure plus identity line, which is static</li><li>Two full statements plus a label in one locked height forces a clamp, and clamping the old star ruins the comparison</li><li>Between rewrites the content is frozen for months at a time</li></ul></div></div><p class="slot__verdict">Excellent as a moment, wrong as a permanent face; make it a state the Clarity face enters for a stretch after a rewrite.</p>
           <p class="slot__data">clarity.answers.neutronStar, clarity.history[] (previous star text, its replacement date, and its lifespan in days), clarity.ignitedAt (days since the current one was signed), clarity.answers.identityLine (fills the lower slot before any revision exists)</p>
+        </div>
+      </figure>
+      <figure class="slot" id="star-star-pot">
+        <figcaption class="slot__cap"><span class="slot__n">09</span>
+          <span class="slot__t">Ground covered</span><span class="tag tag--cut">was cut</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-star-star-pot">
+  <div class="v-star-star-pot__lead"><b>+26</b><span>paying users since you signed it</span></div>
+  <div class="v-star-star-pot__rail" aria-hidden="true">
+    <span class="v-star-star-pot__base"></span>
+    <span class="v-star-star-pot__gain"></span>
+  </div>
+  <div class="v-star-star-pot__scale"><span>started 12</span><span class="v-star-star-pot__at">38 today</span><span>100</span></div>
+  <p class="v-star-star-pot__star">Get Memento to 100 paying users</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">Leads with distance travelled rather than distance remaining, then a notched rail where the dim head is where they began and the cyan is ground they personally covered, so the card is about what they added, not what they lack.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the cyan is zero width and the line reads that the count is set but not moved, which is true and not a scold. As pulses land the cyan block visibly eats the notches one at a time, and the halfway notch is a real threshold to cross.</p>
+          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Leading with the gain reframes without inventing data and never scolds a slow user</li><li>The notched rail turns the halfway crossing into a visible event</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>started 12 mislabels baseline, which is the first value ever counted and not the value at signing</li><li>Day 2 is a zero-width bar and a line saying the count has not moved, a face with nothing on it</li><li>Hiding distance remaining reads as the app flattering the user, and the star is demoted to the bottom line</li></ul></div></div><p class="slot__verdict">Right for long grinding targets, but only if the baseline label states when counting actually began.</p>
+          <p class="slot__data">goalProgress.baseline, goalProgress.current, goalProgress.target, goalProgress.unit, clarity.answers.neutronStar</p>
+        </div>
+      </figure>
+      <figure class="slot" id="star-star-dial">
+        <figcaption class="slot__cap"><span class="slot__n">10</span>
+          <span class="slot__t">Distance left</span><span class="tag tag--cut">was cut</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-star-star-dial">
+  <div class="v-star-star-dial__row">
+    <div class="v-star-star-dial__gauge">
+      <svg viewBox="0 0 104 104" width="104" height="104" aria-hidden="true">
+        <circle class="v-star-star-dial__track" cx="52" cy="52" r="44"/>
+        <circle class="v-star-star-dial__arc" cx="52" cy="52" r="44" stroke-dasharray="105 277" transform="rotate(-90 52 52)"/>
+        <circle class="v-star-star-dial__mark" cx="82.1" cy="19.9" r="2.6"/>
+      </svg>
+      <span class="v-star-star-dial__pct">38%</span>
+    </div>
+    <div class="v-star-star-dial__side">
+      <div class="v-star-star-dial__left">62</div>
+      <div class="v-star-star-dial__unit">paying users to go</div>
+      <div class="v-star-star-dial__pace">+3.5 a week now, +2.5 a month ago</div>
+    </div>
+  </div>
+  <p class="v-star-star-dial__foot">Day 47 with this star. The one before it ran 96.</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">A horizontal split: a dial carrying the fraction covered with a mark where they started, and beside it the single number that matters, how many are left, with the pace now against the pace a month ago.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the ring is empty, the side reads the full target as distance left and the pace line stays absent. Later the ring fills, the start mark drifts visibly behind them, and the pace comparison is the part that can drop, which is what keeps the face capable of bad news.</p>
+          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Pace now against pace a month ago is the most decision-useful number in this whole set</li><li>The start mark on the ring shows covered ground without spending a second element</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>A 104px ring beside a large numeral reads as a fitness dashboard rather than Memento</li><li>The percentage and the remaining count state the same fact twice, wasting a third of the face</li><li>The statement never appears, and the one before it ran 96 spends attention on a dead goal</li></ul></div></div><p class="slot__verdict">Cut; harvest the pace-now-versus-then line into whichever number face ships.</p>
+          <p class="slot__data">goalProgress.baseline, goalProgress.current, goalProgress.target, goalProgress.unit, goalProgress.history (trailing weekly rate now vs a month ago), clarity.ignitedAt, clarity.history</p>
+        </div>
+      </figure></div>
+    <h3 class="sect__sub">The riskier five</h3>
+    <div class="grid">
+      <figure class="slot" id="star-star-strata">
+        <figcaption class="slot__cap"><span class="slot__n">11</span>
+          <span class="slot__t">Strata</span><span class="tag tag--risk">risky</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-strata">
+  <div class="v-strata__core" aria-hidden="true">
+    <i class="v-strata__l v-strata__l--now" style="--h:27px"></i>
+    <i class="v-strata__l v-strata__l--mid" style="--h:96px"></i>
+    <i class="v-strata__l v-strata__l--old" style="--h:37px"></i>
+  </div>
+  <div class="v-strata__body">
+    <p class="v-strata__now">Get 10,000 people using something I made.</p>
+    <p class="v-strata__meta">Day 34 <i>/</i> 202 days aiming</p>
+    <p class="v-strata__past" style="top:70px"><span>Publish something every week</span><b>121d</b></p>
+    <p class="v-strata__past" style="top:140px"><span>Get to 5k MRR</span><b>47d</b></p>
+  </div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">The card is a core sample of everything you have ever aimed at: each star you have held is a layer whose thickness is the number of days you held it, newest on top, with the live star named beside its own thin bright band.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> On day 2 the top layer is a sliver against the mass of the stars you abandoned, and by day 60 it has grown into the thickest band on the column, which is the whole argument.</p>
+          <p class="slot__risk"><b>The risk.</b> It shows the user their own record of changing their mind, which stings, but that sting is exactly what makes a young layer worth thickening and it is the only surface in the app that proves a star was ever kept.</p><div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Thickness accrues daily with zero user input, so keeping a star is the only way to make the card look better</li><li>Uses clarity.history and ignitedAt as they already exist, no new tracking, no user-entered number</li><li>The only variant where a 200-day user gets a visibly different card than a 20-day user</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Day 1 has one layer one day thick and &#x27;days aiming&#x27; reads 1, so the card is a hairline on the exact day the ignition ceremony just ended</li><li>The abandoned 121d band is the largest object on the face, so the eye lands first on the thing he quit</li><li>Past labels are hand-placed at top:70 and top:140 against a narrow body column, so a long star wrapping to four lines collides with them and a fifth previous star has nowhere to go</li></ul></div></div><p class="slot__verdict">Right for a user two or three stars deep; dead weight through the first sixty days, which is exactly when the card has to earn its keep.</p>
+          <p class="slot__data">clarity.answers.neutronStar, clarity.ignitedAt (Day 34), clarity.history[] (previous star statements and the days each was held), summed days aiming (202)</p>
+        </div>
+      </figure>
+      <figure class="slot" id="star-star-meridian">
+        <figcaption class="slot__cap"><span class="slot__n">12</span>
+          <span class="slot__t">Meridian</span><span class="tag tag--risk">risky</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-meridian">
+  <p class="v-meridian__star">Get 10,000 people using something I made.</p>
+  <div class="v-meridian__line" style="--p:.64"><span class="v-meridian__read">6,400 of 10,000</span></div>
+  <p class="v-meridian__anti">Another year of half built things nobody sees.</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">One horizon line across the face with the star written above it and the life you are refusing written below it, and the line rides at the height you have actually reached between the two.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> On day 2 the line sits low, close to the sentence you are running from, and by day 60 it has climbed most of the way to the star with the anti vision pushed into the floor of the card.</p>
+          <p class="slot__risk"><b>The risk.</b> Putting the anti vision on the home card every single day is confrontational and could feel heavy, but it is the only reading that makes the line&#x27;s height mean something rather than being one more progress bar.</p><div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>One computed line, 6,400 of 10,000, with nothing for the user to work out</li><li>Height of the line and distance to the floor sentence are readable in under a second without reading either sentence</li><li>Compact, costs less vertical space than any variant except Folio</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>goalProgress.target is null whenever the star names no number, and the distance law forces the surface dormant, leaving two sentences and a decorative rule</li><li>Day 1 has current equal to baseline, so a brand new user&#x27;s first home card places him level with the life he just said he refuses</li><li>A flat month renders as a frozen bar he reads daily, and a falling metric like churn drags the line back toward the anti vision for reasons he does not control</li></ul></div></div><p class="slot__verdict">Right for a numeric star in an active climb; should not be the default face because a null target or a flat month leaves it inert.</p>
+          <p class="slot__data">clarity.answers.neutronStar, clarity.answers.antiVision, goalProgress.baseline / .current / .target / .unit (6,400 of 10,000)</p>
+        </div>
+      </figure>
+      <figure class="slot" id="star-star-folio">
+        <figcaption class="slot__cap"><span class="slot__n">13</span>
+          <span class="slot__t">Folio</span><span class="tag tag--risk">risky</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-folio">
+  <p class="v-folio__star">Get 10,000 people using something I made.</p>
+  <div class="v-folio__foot"><span>Day 34</span><span>6,400 of 10,000</span></div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">No chrome at all: the star set as a title page, sized to fill the whole face, with a single foot line carrying the day and the distance in tabular numerals.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Nothing about the setting changes from day 2 to day 60 except the foot, where the day count climbs and the two numbers close on each other, so the sentence gains weight by being the one thing that held still.</p>
+          <p class="slot__risk"><b>The risk.</b> It is almost the face that already exists, only louder, so it lives or dies on the typography being genuinely beautiful, and the payoff is that a sentence at this size stops being a label and starts being a commitment you read every time you unlock the phone.</p><div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>No edge case breaks it: no history, no goal number, day 1 and day 400 all render</li><li>Length-derived type size gives a short star real physical presence instead of a fixed label size</li><li>Cheapest to ship and the least likely to read as AI-generated, since it adds no new visual vocabulary</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Day 34 and day 340 differ by two digits in the foot, so the design has no answer to the question this variant round was called to solve</li><li>A 120 character star drops the type to body size and the title page premise collapses into a paragraph with a footer</li><li>The two foot items read as the only interactive elements on the face and both are inert, which trains a tap that does nothing</li></ul></div></div><p class="slot__verdict">Right as the safe fallback that never breaks; wrong as the answer to making a held star gain weight over time.</p>
+          <p class="slot__data">clarity.answers.neutronStar (type size derived from its length), clarity.ignitedAt for Day 34, goalProgress.current / .target for the right foot</p>
+        </div>
+      </figure>
+      <figure class="slot" id="star-star-plumb">
+        <figcaption class="slot__cap"><span class="slot__n">14</span>
+          <span class="slot__t">Plumb</span><span class="tag tag--risk">risky</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-plumb">
+  <div class="v-plumb__t">
+    <p class="v-plumb__star">Get 10,000 people using something I made.</p>
+    <p class="v-plumb__meta">Day 34 <i>/</i> moved 3 days ago</p>
+  </div>
+  <svg class="v-plumb__svg" viewBox="0 0 92 168" aria-hidden="true">
+    <line class="v-plumb__ref" x1="46" y1="10" x2="46" y2="150"/>
+    <line class="v-plumb__cord" x1="46" y1="10" x2="73" y2="146"/>
+    <circle class="v-plumb__pin" cx="46" cy="10" r="3"/>
+    <path class="v-plumb__bob" d="M67.6 144 L78.4 144 L73 160 Z" transform="rotate(11 73 144)"/>
+    <line class="v-plumb__off" x1="46" y1="166" x2="73" y2="166"/>
+  </svg>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">One instrument and nothing else: the star is the fixed point at the top, a plumb line hangs from it, and the bob swings off true by how long it has been since you moved in the star&#x27;s name.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> On day 2 the line hangs dead straight against its reference and the card reads as still, and by day 60 you have learned to check one thing at a glance, whether the line is plumb or swung, long before you read the number.</p>
+          <p class="slot__risk"><b>The risk.</b> It encodes the whole state in an angle rather than a word, which is a bet that the user learns the instrument, and that bet pays because an angle is readable in a fifth of a second where a sentence never is.</p><div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Angle reads faster than any sentence, so the state is known before the eye reaches the text</li><li>Needs only ignitedAt and action-complete timestamps, so it works with a star that names no number</li><li>Day 1 renders correctly as a dead straight line rather than an empty or placeholder state</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>The good state is a plain vertical line, so the card looks most interesting on his worst week and dullest when he is doing everything right</li><li>The swing has to cap, and past the cap thirty idle days looks the same as nine, killing the read where the alarm matters most</li><li>A 92x168 instrument eats half the face to encode one scalar the meta line already states in words as &#x27;moved 3 days ago&#x27;</li></ul></div></div><p class="slot__verdict">Right for a many-times-a-day checker who wants status without reading; expensive in face area for a single number stated twice.</p>
+          <p class="slot__data">clarity.answers.neutronStar, clarity.ignitedAt (Day 34), proofEvents of type action-complete attributed to the current star for days since the last move</p>
+        </div>
+      </figure>
+      <figure class="slot" id="star-star-vigil">
+        <figcaption class="slot__cap"><span class="slot__n">15</span>
+          <span class="slot__t">Vigil</span><span class="tag tag--risk">risky</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-vigil">
+  <div class="v-vigil__news"><span class="v-vigil__n">9</span><span class="v-vigil__u">days</span></div>
+  <p class="v-vigil__sub">since anything moved in its name</p>
+  <div class="v-vigil__rule"></div>
+  <p class="v-vigil__star">Get 10,000 people using something I made.</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">A face that holds its tongue: most days it is the star alone in an empty card, and it only takes over the layout when something real has happened, here nine days of silence stated at full size with the star demoted to a footnote.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> On day 2 there is nothing to say so the card is one quiet sentence in a lot of space, and by day 60 the user has learned that when this face rearranges itself, it is worth stopping for.</p>
+          <p class="slot__risk"><b>The risk.</b> Deliberately wasting a third of the home screen on most days looks like an empty feature, and it works because scarcity is what gives the alarm its authority, a card that speaks every day is never heard.</p><div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>The layout itself carries the information, so the card is read before any word on it is read</li><li>Nine days of silence is the sharpest honest statement in the set and it names the absence the retention plan admits is currently painless</li><li>Runs entirely on proofEvents, ignitedAt and goalProgress milestones, no new fields</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>The quiet state is 90% of days and is asserted rather than designed, and the mobile card flex-grows to fill, so most days it produces the dead space he has killed repeatedly</li><li>The largest type on the face counts nothing happening, so a bad week gets the loudest typography while the star drops to a footnote at the moment it is most needed</li><li>Every new trigger is a new layout, so the surface grows without bound and one trigger firing on something trivial devalues the alarm permanently</li></ul></div></div><p class="slot__verdict">Should not ship as a standalone variant; it is a state another face enters, not a face, since it leaves most days undesigned.</p>
+          <p class="slot__data">proofEvents attributed to the current star for the silence count, clarity.answers.neutronStar, plus the same trigger set for milestones crossed in goalProgress and star age from clarity.ignitedAt</p>
         </div>
       </figure></div>
   </section>
   <section class="sect" id="sect-consistency">
-    <header class="sect__hd">
-      <h2>Consistency</h2>
-      <p>The record. Currently one big number and a wall of dots. <b>8 kept.</b></p>
-    </header>
+    <header class="sect__hd"><h2>Consistency</h2>
+      <p>The record. <b>10 considered</b>, then <b>5 riskier ones</b> below.</p></header>
     <div class="grid">
       <figure class="slot" id="consistency-chain-slack">
-        <figcaption class="slot__cap">
-          <span class="slot__n">01</span>
-          <span class="slot__t">Chain with slack</span>
-        </figcaption>
+        <figcaption class="slot__cap"><span class="slot__n">01</span>
+          <span class="slot__t">Chain with slack</span></figcaption>
         <div class="phone">
           <div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card">
-            <div class="v v-consistency-chain-slack">
+          <section class="cc-card"><div class="v v-consistency-chain-slack">
   <div class="cs-head">
     <span class="cs-num">42</span>
     <span class="cs-unit">days<br>in a row</span>
@@ -925,19 +1602,18 @@
         <div class="slot__meta">
           <p class="slot__idea">Leads with what the streak is actually made of over the last fourteen days, including the days that were covered rather than kept, so the number is never a lie and the grace bank becomes a visible resource.</p>
           <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the chain is two bars and empty track, and the bank line is absent because nothing is banked yet. Over weeks the texture changes constantly, quiet days and covered days move through the window, and the bank fills to two, empties when it is spent, then refills, so the right side of the head is a state that genuinely changes without any input.</p>
+          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>The 14 cell chain exposes the days the code silently bridged, so the hero number stops being a quiet lie</li><li>streak.grace.bank already exists in state and is surfaced nowhere else, so this face shows a real resource</li><li>The strip changes texture daily as covered and quiet days move through the window, with no user input</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Three cell states plus a shield icon is more legend than a 150px glance card can teach, and the part day reads as a covered day</li><li>The footer names one covered weekday and repeats it for six days, which reads as nagging after a miss</li><li>For the first thirteen days the strip is mostly empty track with no bank line, so the idea is invisible during onboarding</li></ul></div></div><p class="slot__verdict">Right for the user who already distrusts streak apps for lying; ship it only if grace becomes visible elsewhere too.</p>
           <p class="slot__data">consistencyStats().current, consistencyStats().counts (last 14 days, main action vs support only), streak.grace.bank, streak.grace.used[iso]</p>
         </div>
       </figure>
       <figure class="slot" id="consistency-run-rank">
-        <figcaption class="slot__cap">
-          <span class="slot__n">02</span>
-          <span class="slot__t">Run rank</span>
-        </figcaption>
+        <figcaption class="slot__cap"><span class="slot__n">02</span>
+          <span class="slot__t">Run rank</span></figcaption>
         <div class="phone">
           <div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card">
-            <div class="v v-consistency-run-rank">
+          <section class="cc-card"><div class="v v-consistency-run-rank">
   <div class="rr-head">
     <span class="rr-num">42</span>
     <span class="rr-unit">days<br>in a row</span>
@@ -959,19 +1635,18 @@
         <div class="slot__meta">
           <p class="slot__idea">The streak keeps the hero slot, but the fact beside it is its rank among every run this user has ever had, plotted against a beatable neighbour instead of an unreachable lifetime peak.</p>
           <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the run is a sliver, the rank reads last and the copy names a small nearby run to pass. By day 60 the fill has crossed one or two notches, the rank has climbed, and the named target changes each time a previous run is overtaken, so the same card states a different beatable goal every few weeks.</p>
+          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Aiming at the second longest run gives a target five days away instead of a 103 day wall</li><li>The named target rewrites itself each time a run is overtaken, so the sentence changes without input</li><li>The footer maps straight onto thisWeek and lastWeek with no derivation</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Rank needs strict run lengths rebuilt from counts, which will disagree with the bridged current streak printed above them</li><li>On day 2 the user is first, last, and only, so the rank line is meaningless exactly when it is most needed</li><li>After a break the rank drops, which is the one moment this face should not be ranking anybody</li></ul></div></div><p class="slot__verdict">Right for a competitive user in months two through six, weakest at both ends of the lifecycle.</p>
           <p class="slot__data">consistencyStats().current, consistencyStats().longest, run lengths derived from consistencyStats().counts (rank and second-longest), consistencyStats().thisWeek, consistencyStats().lastWeek</p>
         </div>
       </figure>
       <figure class="slot" id="consistency-weekday-shape">
-        <figcaption class="slot__cap">
-          <span class="slot__n">03</span>
-          <span class="slot__t">Your week&#x27;s signature</span>
-        </figcaption>
+        <figcaption class="slot__cap"><span class="slot__n">03</span>
+          <span class="slot__t">Your week&#x27;s signature</span></figcaption>
         <div class="phone">
           <div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card">
-            <div class="v v-consistency-weekday-shape">
+          <section class="cc-card"><div class="v v-consistency-weekday-shape">
   <div class="ws-h"><b>Wednesday</b> holds. Sunday is the gap.</div>
   <div class="ws-list">
     <div class="ws-r"><span class="ws-d">Mon</span><span class="ws-tr"><i class="ws-fl" style="--w:74%"></i></span><span class="ws-p">74%</span></div>
@@ -990,19 +1665,18 @@
         <div class="slot__meta">
           <p class="slot__idea">Aggregates every mark you have ever made by day of the week, so the card names the day that carries you and the day that leaks, with seven bars underneath as the proof.</p>
           <p class="slot__evo"><b>Day 2 to day 60.</b> Below about three weeks it stays dormant because the sample is too thin to claim anything; after that the ranking is genuinely unpredictable, the percentages move a little every day, and the weak day can change, which turns the face into a finding rather than a total.</p>
+          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Names a leak day that no other surface in the app can tell the user</li><li>All time percentages barely move after one bad Sunday, so the face survives a bad week intact</li><li>The seven descending rows read as one shape before any number is read</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Seven rows of label, track, and percent is the tallest layout of the ten and will fight the locked height</li><li>Three dormant weeks kills the face during the period the user opens the app most</li><li>By day 200 the ranking is frozen, so the finding degenerates back into a static readout</li></ul></div></div><p class="slot__verdict">Strong as a monthly insight inside the Consistency module, weak as a face that must earn a daily glance.</p>
           <p class="slot__data">consistencyStats().counts grouped by weekday (share of each weekday with at least one mark), consistencyStats().totalActiveDays</p>
         </div>
       </figure>
       <figure class="slot" id="consistency-made-of">
-        <figcaption class="slot__cap">
-          <span class="slot__n">04</span>
-          <span class="slot__t">What it is made of</span>
-        </figcaption>
+        <figcaption class="slot__cap"><span class="slot__n">04</span>
+          <span class="slot__t">What it is made of</span></figcaption>
         <div class="phone">
           <div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card">
-            <div class="v v-consistency-made-of">
+          <section class="cc-card"><div class="v v-consistency-made-of">
   <div class="mo-head">
     <span class="mo-num">42</span>
     <span class="mo-unit">days<br>in a row</span>
@@ -1026,19 +1700,18 @@
         <div class="slot__meta">
           <p class="slot__idea">Holds the streak but answers a question the current face never does, which is what the last thirty days were actually filled with, using the typed proof spine so the mix itself becomes the story.</p>
           <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the bar is a single sliver of moves and the comparison line stays hidden because there is no prior thirty. By day 60 the proportions shift as reflection and deep work accumulate, and the footer compares each slice against the previous thirty days, which means the card can report a slice going down.</p>
+          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Answers what the last thirty days were filled with, a question the streak never touches</li><li>The footer is allowed to report a slice going down, which most of these faces cannot</li><li>One stacked bar plus three keys is compact for the amount it reports</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Three coloured slices force two invented accent colours onto a surface committed to a single spring green</li><li>Support activity is capped at 20% of a day in the scoring code, so the mix grades work that barely counts toward the streak above it</li><li>No prior thirty day window exists for the first month, so the only changing line on the card is absent</li></ul></div></div><p class="slot__verdict">A reasonable audit view, wrong for the home card, because it makes app activity look like the thing being measured.</p>
           <p class="slot__data">consistencyStats().current, consistencyStats().last30, proofEvents filtered to the last 30 days by type (action-complete, reflection-save, deepwork-commit), same counts for the prior 30 day window</p>
         </div>
       </figure>
       <figure class="slot" id="consistency-rate-drift">
-        <figcaption class="slot__cap">
-          <span class="slot__n">05</span>
-          <span class="slot__t">Rate drift</span>
-        </figcaption>
+        <figcaption class="slot__cap"><span class="slot__n">05</span>
+          <span class="slot__t">Rate drift</span></figcaption>
         <div class="phone">
           <div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card">
-            <div class="v v-consistency-rate-drift">
+          <section class="cc-card"><div class="v v-consistency-rate-drift">
   <div class="rd-head">
     <span class="rd-num">42</span>
     <span class="rd-unit">days<br>in a row</span>
@@ -1059,19 +1732,18 @@
         <div class="slot__meta">
           <p class="slot__idea">The streak stays, but the information is the rolling thirty day rate drawn over twelve weeks against the previous thirty, which is the one number on this face that is allowed to fall.</p>
           <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 there is no curve, only the number and a single point. As weeks accumulate the line grows a shape, and by day 60 the card is genuinely unpredictable because the rate moves with every day that ages out of the window, whether or not the user opens the app.</p>
+          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Keeps the streak hero while adding the one number allowed to fall, so bad news lands without deleting the user&#x27;s pride</li><li>The curve moves on its own as days age out of the window, even on days the app is never opened</li><li>The twelve week resample is cheap from counts and is the densest information per pixel here</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>A rising 42 beside a falling 6 points is two true readings the user has to reconcile at a glance</li><li>pct30 moves in 3.3 point jumps, so the line looks jagged and the delta flips sign every few days</li><li>Area fill, dashed reference, end dot, and two numbers is a lot of chart under a 42, with no x axis anchor</li></ul></div></div><p class="slot__verdict">The best honest signal option for a paying mid life user, but the streak and the rate must stop arguing on one line.</p>
           <p class="slot__data">consistencyStats().current, consistencyStats().pct30, rolling 30 day rate resampled weekly from consistencyStats().counts, the prior 30 day rate from the same counts</p>
         </div>
       </figure>
       <figure class="slot" id="consistency-returns">
-        <figcaption class="slot__cap">
-          <span class="slot__n">06</span>
-          <span class="slot__t">Returns</span>
-        </figcaption>
+        <figcaption class="slot__cap"><span class="slot__n">06</span>
+          <span class="slot__t">Returns</span></figcaption>
         <div class="phone">
           <div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card">
-            <div class="v v-consistency-returns">
+          <section class="cc-card"><div class="v v-consistency-returns">
   <div class="rt-row">
     <div class="rt-ring">
       <svg viewBox="0 0 96 96" role="img" aria-label="42 days into this run, against a best run of 103.">
@@ -1094,19 +1766,18 @@
         <div class="slot__meta">
           <p class="slot__idea">Keeps the number but pairs it with the honest statistic underneath a streak, which is how many times this person has come back after stopping, with the thirty day rate carried by the ring so the hero is not the only thing worth reading.</p>
           <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the ring is nearly empty and the returns count is zero, so the rail shows only the start date. Every break and recovery adds a return and can widen the longest gap, the ring moves with the rolling thirty, and by day 60 the rail is a short history that no calendar could reproduce.</p>
+          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>The arc reads current run against best run with no number reading at all</li><li>Returns after a break is the rare stat that rises when the user fails and recovers</li><li>Ring plus rail packs six facts into one row without a tall stack</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Four near identical small grey lines beside the ring give the eye no second stop after the 42</li><li>Measuring the ring against a 103 day best leaves a committed user at 40% full for months, reading as failing</li><li>Longest gap 4 days parks the user&#x27;s worst behaviour permanently on the home screen</li></ul></div></div><p class="slot__verdict">The returns framing is right and the rail is doing too much; keep the idea, cut three of the four lines.</p>
           <p class="slot__data">consistencyStats().current, consistencyStats().last30, consistencyStats().pct30, consistencyStats().longest, consistencyStats().totalActiveDays, gaps and returns derived from consistencyStats().counts, first proof event date</p>
         </div>
       </figure>
       <figure class="slot" id="consistency-week-rhythm">
-        <figcaption class="slot__cap">
-          <span class="slot__n">07</span>
-          <span class="slot__t">This week&#x27;s rhythm</span>
-        </figcaption>
+        <figcaption class="slot__cap"><span class="slot__n">07</span>
+          <span class="slot__t">This week&#x27;s rhythm</span></figcaption>
         <div class="phone">
           <div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card">
-            <div class="v v-consistency-week-rhythm">
+          <section class="cc-card"><div class="v v-consistency-week-rhythm">
   <div class="wr-top"><span class="wr-n">5</span><span class="wr-of">days marked this week</span><span class="wr-d">+2 vs last</span></div>
   <div class="wr-row">
     <div class="wr-col"><div class="wr-tr"><div class="wr-fl" style="height:66%"></div></div><span class="wr-dy">M</span></div>
@@ -1125,19 +1796,18 @@
         <div class="slot__meta">
           <p class="slot__idea">Leads with the shape of the current week as seven columns whose height is that day&#x27;s number of marks, headlined by the honest week-over-week delta rather than the streak.</p>
           <p class="slot__evo"><b>Day 2 to day 60.</b> On day 2 it is one short column and no delta yet; by day 60 the seven columns carry a visible personal rhythm, the +/- against last week flips both ways as the week fills, and the streak has been demoted to a single quiet line at the bottom.</p>
+          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Demoting the streak to a footer line is the boldest call in the set and the only layout that survives a broken streak</li><li>The week resets, so the face never becomes a wall of accumulated failure</li><li>The plus or minus versus last week delivers a verdict the user does not have to compute</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>counts stores a capped weighted day score, so real columns are near binary and the 33% and 66% heights shown here will almost never occur</li><li>thisWeek and lastWeek are rolling 7 and 14 day windows in code, so the delta will not match the Mon to Sun columns above it</li><li>Every Monday the face is one column and no delta, the emptiest state of any variant, weekly and forever</li></ul></div></div><p class="slot__verdict">Right for a first month user, but it is at its worst every single Monday, which is a permanent tax.</p>
           <p class="slot__data">consistencyStats().counts (per-day marks for the current week), consistencyStats().thisWeek, consistencyStats().lastWeek, consistencyStats().current, consistencyStats().longest</p>
         </div>
       </figure>
       <figure class="slot" id="consistency-year-ribbon">
-        <figcaption class="slot__cap">
-          <span class="slot__n">08</span>
-          <span class="slot__t">The year, week by week</span>
-        </figcaption>
+        <figcaption class="slot__cap"><span class="slot__n">08</span>
+          <span class="slot__t">The year, week by week</span></figcaption>
         <div class="phone">
           <div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card">
-            <div class="v v-consistency-year-ribbon">
+          <section class="cc-card"><div class="v v-consistency-year-ribbon">
   <div class="yr-top"><span class="yr-n">187</span><span class="yr-of">days this year</span></div>
   <div class="yr-sub">Densest stretch, late March into April.</div>
   <div class="yr-rib" role="img" aria-label="Active days per week across the year, densest in late March into April."><i class="wk is-off" style="--h:2px"></i><i class="wk" style="--h:13px"></i><i class="wk" style="--h:19px"></i><i class="wk is-off" style="--h:2px"></i><i class="wk" style="--h:19px"></i><i class="wk" style="--h:26px"></i><i class="wk" style="--h:19px"></i><i class="wk" style="--h:32px"></i><i class="wk" style="--h:26px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:32px"></i><i class="wk" style="--h:45px"></i><i class="wk is-peak" style="--h:39px"></i><i class="wk is-peak" style="--h:39px"></i><i class="wk is-peak" style="--h:52px"></i><i class="wk is-peak" style="--h:45px"></i><i class="wk is-peak" style="--h:52px"></i><i class="wk is-peak" style="--h:45px"></i><i class="wk" style="--h:32px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:26px"></i><i class="wk" style="--h:32px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:32px"></i><i class="wk" style="--h:19px"></i><i class="wk" style="--h:26px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:32px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:52px"></i><i class="wk is-now" style="--h:32px"></i></div>
@@ -1149,7 +1819,211 @@
         <div class="slot__meta">
           <p class="slot__idea">The whole year as 52 slim columns, each one week&#x27;s active days, with the densest stretch brightened and named in the line above it so the picture and the sentence say the same thing.</p>
           <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 is a single stub column against an empty year; every week adds a column, the named densest stretch moves as new peaks form, and by day 200 the card is a portrait of the year&#x27;s terrain that no other surface in the app shows.</p>
+          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>52 columns of terrain exists nowhere else in the app and genuinely rewards a 200 day user</li><li>Tying a named stretch to the brightened columns makes the card say something instead of only showing something</li><li>The shape changes all year with no interaction at all</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>The 187 headline uses totalActiveDays, which is lifetime in the code and not this year, so the sentence is wrong as specified</li><li>Day 2 is one stub against 51 empty slots, the harshest empty state of the ten</li><li>At 350px each week is about 4px wide, too narrow to distinguish 3 active days from 4</li></ul></div></div><p class="slot__verdict">An excellent year in review surface, wrong as a face that must work on day 2 and during a slump.</p>
           <p class="slot__data">consistencyStats().yearConsistency, consistencyStats().counts (weekly active-day totals and the densest run), consistencyStats().totalActiveDays</p>
+        </div>
+      </figure>
+      <figure class="slot" id="consistency-rate-curve">
+        <figcaption class="slot__cap"><span class="slot__n">09</span>
+          <span class="slot__t">Rolling thirty</span><span class="tag tag--cut">was cut</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-rate-curve">
+  <div class="rc-top"><span class="rc-n">61%</span><span class="rc-of">of the last 30 days</span></div>
+  <div class="rc-sub">Up 13 points on the 30 days before it.</div>
+  <div class="rc-chart">
+    <svg viewBox="0 0 306 64" preserveAspectRatio="none" role="img" aria-label="Rolling thirty day rate, now 61 percent, the thirty days before were 48 percent.">
+      <defs><linearGradient id="vRateCurveFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="currentColor" stop-opacity=".15"/><stop offset=".75" stop-color="currentColor" stop-opacity="0"/></linearGradient></defs>
+      <path d="M0.0 58.0 C13.9 58.0 13.9 49.1 27.8 49.1 C41.7 49.1 41.7 52.6 55.6 52.6 C69.5 52.6 69.5 38.4 83.5 38.4 C97.4 38.4 97.4 43.7 111.3 43.7 C125.2 43.7 125.2 29.4 139.1 29.4 C153.0 29.4 153.0 33.0 166.9 33.0 C180.8 33.0 180.8 36.6 194.7 36.6 C208.6 36.6 208.6 20.5 222.5 20.5 C236.4 20.5 236.4 13.4 250.4 13.4 C264.3 13.4 264.3 18.7 278.2 18.7 C292.1 18.7 292.1 8.0 306.0 8.0 L306 64 L0 64 Z" fill="url(#vRateCurveFill)"/>
+      <path d="M0 31.2 L306 31.2" stroke="currentColor" stroke-opacity=".24" stroke-width="1" stroke-dasharray="2 4" vector-effect="non-scaling-stroke"/>
+      <path d="M0.0 58.0 C13.9 58.0 13.9 49.1 27.8 49.1 C41.7 49.1 41.7 52.6 55.6 52.6 C69.5 52.6 69.5 38.4 83.5 38.4 C97.4 38.4 97.4 43.7 111.3 43.7 C125.2 43.7 125.2 29.4 139.1 29.4 C153.0 29.4 153.0 33.0 166.9 33.0 C180.8 33.0 180.8 36.6 194.7 36.6 C208.6 36.6 208.6 20.5 222.5 20.5 C236.4 20.5 236.4 13.4 250.4 13.4 C264.3 13.4 264.3 18.7 278.2 18.7 C292.1 18.7 292.1 8.0 306.0 8.0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+      <circle cx="303" cy="8" r="2.8" fill="#3fd94e"/>
+    </svg>
+    <span class="rc-tag">48% before</span>
+  </div>
+  <div class="rc-ft">187 active days, 14 in a row</div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">Leads with the rate, not the run: what share of the last 30 days had a mark, drawn as a curve against a dashed line marking the 30 days before it, so the face can deliver bad news.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 has no curve to draw and the face stays dormant; from about week five the line has real terrain, and every day the rolling window moves the number and the delta on its own, which means it can fall as well as rise.</p>
+          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Leading with 61% means a single missed day cannot zero the hero number</li><li>The dashed prior window line carries the comparison without a second chart or number block</li><li>Using currentColor for the curve inherits the surface accent instead of inventing one</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Near identical to rate-drift with the streak removed, so shipping both is a duplicate face behind two dots</li><li>A percentage headlined on the home reads as a grade, and 61% is a grade the user can resent daily</li><li>The smooth bezier implies continuous change from a metric that actually moves in 3.3 point steps</li></ul></div></div><p class="slot__verdict">The more honest sibling of rate-drift; pick one of the two, and pick this one only if the streak is being demoted app wide.</p>
+          <p class="slot__data">consistencyStats().last30, consistencyStats().pct30, consistencyStats().counts (rolling 30-day rate history and the prior 30-day window), consistencyStats().totalActiveDays, consistencyStats().current</p>
+        </div>
+      </figure>
+      <figure class="slot" id="consistency-comeback">
+        <figcaption class="slot__cap"><span class="slot__n">10</span>
+          <span class="slot__t">The returns</span><span class="tag tag--cut">was cut</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-comeback">
+  <div class="cb-l">
+    <div class="cb-n">9</div>
+    <div class="cb-k">times you came back</div>
+    <div class="cb-sub">Longest gap, 3 days.<br>Never a fourth.</div>
+  </div>
+  <div class="cb-r">
+    <div class="cb-hd"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>
+    <div class="cb-g" role="img" aria-label="The last six weeks, 30 of 40 days marked."><i class="cel lv2"></i><i class="cel lv1"></i><i class="cel"></i><i class="cel lv3"></i><i class="cel lv2"></i><i class="cel lv1"></i><i class="cel"></i><i class="cel lv1"></i><i class="cel"></i><i class="cel"></i><i class="cel"></i><i class="cel lv2"></i><i class="cel lv3"></i><i class="cel lv1"></i><i class="cel lv2"></i><i class="cel lv2"></i><i class="cel lv1"></i><i class="cel"></i><i class="cel lv3"></i><i class="cel lv2"></i><i class="cel lv1"></i><i class="cel"></i><i class="cel lv2"></i><i class="cel lv3"></i><i class="cel lv2"></i><i class="cel lv1"></i><i class="cel"></i><i class="cel lv2"></i><i class="cel lv3"></i><i class="cel lv2"></i><i class="cel lv1"></i><i class="cel lv2"></i><i class="cel"></i><i class="cel lv1"></i><i class="cel lv2"></i><i class="cel lv2"></i><i class="cel lv3"></i><i class="cel lv1"></i><i class="cel"></i><i class="cel is-now"></i><i class="cel is-fut"></i><i class="cel is-fut"></i></div>
+    <div class="cb-cap">Last 6 weeks, 30 of 40</div>
+  </div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">Leads with returns instead of runs: how many times you came back after a gap, sat beside a calm rolling six-week grid where density is white steps and days that have not happened yet are nearly invisible so the card never shows a wall of failure.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 shows a mostly empty grid and a zero that is honest; the comeback count is the one number that goes up when you miss and return, so unlike a streak it survives a bad week and by day 60 the grid has legible texture, gap length and recovery speed.</p>
+          <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Never a fourth is the strongest line of copy in the set and it is derived from real gap data, not written</li><li>Rendering future days as nearly invisible avoids the wall of failure the full heatmap creates</li><li>The headline number rises after a miss, so the face rewards the return rather than scoring the break</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>The left number plus right grid split breaks the shared vertical skeleton the other two swipe faces use</li><li>A big 9 beside 42 shaded cells gives the eye two competing heroes and no reading order</li><li>Comeback counting needs strict break detection while the streak bridges a missed day and treats grace days as active, so two definitions of break coexist</li></ul></div></div><p class="slot__verdict">The best framing on this face for someone who has already broken a streak once, but the layout must fold into the shared skeleton before it ships.</p>
+          <p class="slot__data">consistencyStats().counts (rolling 6-week window and gap detection for comeback count, longest gap, recovery time), consistencyStats().last30</p>
+        </div>
+      </figure></div>
+    <h3 class="sect__sub">The riskier five</h3>
+    <div class="grid">
+      <figure class="slot" id="consistency-ledger">
+        <figcaption class="slot__cap"><span class="slot__n">11</span>
+          <span class="slot__t">The board</span><span class="tag tag--risk">risky</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-ledger">
+  <div class="v-consistency-ledger__hero"><span class="v-consistency-ledger__n">412</span><span class="v-consistency-ledger__of">of 1,096</span></div>
+  <p class="v-consistency-ledger__say">Days you showed up. The one number that never goes down.</p>
+  <div class="v-consistency-ledger__rule"></div>
+  <div class="v-consistency-ledger__foot"><span>Current run 23 &middot; best 41</span><span class="v-consistency-ledger__today">+1 today</span></div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">The streak is demoted to a footnote and the face is one enormous number: total days you ever showed up, against every day you have owned Memento.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 reads &quot;2 of 3&quot; and feels almost absurd, which is the point; by day 60 it is &quot;48 of 61&quot; and by year three it is a four-figure body of work with a small percentage that quietly tells you whether you are getting better or coasting.</p>
+          <p class="slot__risk"><b>The risk.</b> It deliberately takes the huge flame streak away from the founder&#x27;s current design and replaces it with the number that cannot break, which can feel less urgent day to day, but it is the only consistency figure that never punishes you and it is the one that compounds into identity.</p><div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>The denominator is days owned, so a missed day can never subtract from the hero figure and the face stays safe to open after a bad week</li><li>412 of 1,096 carries a legible ratio without printing a percentage the user has to defend to himself</li><li>Demoting the streak to a footer line retires the flame without deleting the number people still ask for</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Day 2 renders a hero-sized 2 next to &quot;of 3&quot; and the line &quot;never goes down&quot; is a claim about nothing, so the launch state reads as a broken widget</li><li>A sloppy first month drags the lifetime ratio for years and no later run can visibly repair it, the opposite of the compounding it promises</li><li>Nothing on the face moves fast enough to say whether this week was good, so there is no reason to look at it twice in a month</li></ul></div></div><p class="slot__verdict">Right for a user two years in who wants a body of work, wrong as the face a new user meets.</p>
+          <p class="slot__data">consistencyStats().totalActiveDays, current, longest; days since the earliest proofEvent (derived, no new tracking); actionDoneToday() drives the +1 today.</p>
+        </div>
+      </figure>
+      <figure class="slot" id="consistency-water">
+        <figcaption class="slot__cap"><span class="slot__n">12</span>
+          <span class="slot__t">Waterline</span><span class="tag tag--risk">risky</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-water">
+  <div class="v-consistency-water__gauge">
+    <div class="v-consistency-water__miss">4 days missing</div>
+    <div class="v-consistency-water__now">
+      <div class="v-consistency-water__body">
+        <div class="v-consistency-water__read"><span class="v-consistency-water__n">87</span><span class="v-consistency-water__pct">%</span></div>
+        <div class="v-consistency-water__sub">26 of the last 30 days</div>
+      </div>
+    </div>
+    <div class="v-consistency-water__low"><span>34% at your worst this year</span></div>
+  </div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">The card is a level: one horizon line drawn edge to edge at the height of your 30 day rate, a fainter line lower down at your worst 30 day stretch this year, and nothing else.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 the horizon is near the ceiling with no floor line drawn yet (no history to compare against); by day 60 the floor line has settled well below you and the gap between the two lines is the visible distance you have climbed, and if you slip the horizon physically falls toward the floor.</p>
+          <p class="slot__risk"><b>The risk.</b> A single horizontal rule with a tinted fade can be mistaken for a progress bar at first glance, and most of the card is deliberately empty, but a bar has a track and a goal while this has neither: it is a measured level with a real floor, and the emptiness underneath is exactly how far there is to fall.</p><div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Two horizontal lines encode current rate and worst rate with no axis, no legend and no chart, readable in under a second</li><li>The floor line turns a bad week into visible descent rather than a red mark, matching the no-punishment instinct</li><li>The emptiness below the horizon is doing semantic work, so the negative space is earned rather than styling</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>pct30 divides by a fixed 30, so a flawless first week shows 23% and the horizon sits near the floor, the opposite of the claimed near-the-ceiling day 2</li><li>The worst rolling 30 day window needs most of a year to mean anything and reads 0% for months, pinning the floor to the card&#x27;s bottom edge and erasing the gap the design depends on</li><li>A tinted fill rising to a percentage is the progress bar gestalt, so the first look is spent hunting for a goal that does not exist</li></ul></div></div><p class="slot__verdict">Excellent for a user with a year of history, but it misreports the level and has no floor for the first 60 days.</p>
+          <p class="slot__data">consistencyStats().pct30 and last30 set the horizon; the 30 minus last30 gap is the missing count; the floor is the lowest rolling 30 day window this year, read off the counts per day map.</p>
+        </div>
+      </figure>
+      <figure class="slot" id="consistency-pace">
+        <figcaption class="slot__cap"><span class="slot__n">13</span>
+          <span class="slot__t">On pace</span><span class="tag tag--risk">risky</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-pace">
+  <div class="v-consistency-pace__hero"><span class="v-consistency-pace__n">298</span><span class="v-consistency-pace__u">days by Dec 31</span></div>
+  <p class="v-consistency-pace__say">If the last 30 days hold. 168 done, 149 left in the year.</p>
+  <div class="v-consistency-pace__axis">
+    <div class="v-consistency-pace__track"></div><div class="v-consistency-pace__done"></div><div class="v-consistency-pace__proj"></div>
+    <div class="v-consistency-pace__now"></div><div class="v-consistency-pace__lands"></div><div class="v-consistency-pace__cap"></div>
+    <div class="v-consistency-pace__tag">168 today</div><div class="v-consistency-pace__end">365</div>
+  </div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">The face reports the future instead of the past: at your last 30 days&#x27; rate, the number of days you finish the year with, drawn on a single rule that runs from zero to 365.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 there is not enough rate to project and the face stays dormant with just the solid segment and no dashed reach; by day 60 the dashed projection is long and moves visibly week to week, so a bad fortnight shortens your year in a way you can see.</p>
+          <p class="slot__risk"><b>The risk.</b> A projection can read as a promise the app cannot keep, and a falling number could discourage, but it is the only view that makes today&#x27;s rate have a consequence, and the caption states the condition plainly so it is a forecast, not a guarantee.</p><div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>The only face where today&#x27;s behaviour changes a number about the future, which is what makes a consistency surface worth reopening</li><li>The conditional caption states the assumption in the same breath as the projection, so the forecast cannot be misread as a promise</li><li>Solid segment versus dashed reach separates earned from assumed on one rule, no second colour and no legend</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>The data note is wrong: yearConsistency is a rolling 365 day percentage, not days done this calendar year, so &quot;168 done&quot; has to be re-derived off the counts map first</li><li>By December the axis is nearly full and the dashed reach is a stub, then January 1 wipes a strong finish back to an empty rule</li><li>The projected number falls on days the user did nothing wrong, because the trailing window decays, reintroducing the punishing mechanic the other faces avoid</li></ul></div></div><p class="slot__verdict">The most motivating face for a mid tenure user, held back by a calendar year frame that makes it seasonal.</p>
+          <p class="slot__data">consistencyStats().yearConsistency for days done so far, pct30 for the rate, days remaining in the calendar year; the projection is done plus rate times remaining.</p>
+        </div>
+      </figure>
+      <figure class="slot" id="consistency-held">
+        <figcaption class="slot__cap"><span class="slot__n">14</span>
+          <span class="slot__t">Held</span><span class="tag tag--risk">risky</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-held">
+  <div class="v-consistency-held__mark"></div>
+  <p class="v-consistency-held__line">Today is in.</p>
+  <p class="v-consistency-held__sub">Day 23 unbroken.</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">A face that says almost nothing when there is nothing to say: one filled square, one sentence, and an enormous amount of deliberate silence once today is already in.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> The layout itself changes, not the numbers: unfinished before evening the square is hollow and the line reads &quot;Today is open. Day 23 is at stake.&quot;; late and still unfinished it fills the face with the exact thing at risk plus the banked grace day that would cover it; a new record or a return after a break gets its own single sentence for one day only, then the card goes quiet again.</p>
+          <p class="slot__risk"><b>The risk.</b> On most days it shows less information than any other face, which looks like an unfinished card in a design review, but a card that only speaks when something is actually happening is the one people keep trusting, and the silence is what makes the loud state land.</p><div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>The only variant whose layout responds to state rather than to numbers, so it takes attention only when something is genuinely at stake</li><li>Naming the banked grace day at the moment of risk turns an invisible mechanic into a rescue the user can actually use</li><li>One square and two lines survives any width, theme, and a four figure day count without a single reflow</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>On every day that ends done the face carries three tokens of information, so it will read as unfinished in review and get filled back up within a week</li><li>The design leans entirely on a live streak, so a user who broke and has not restarted gets the silent state permanently and the card never speaks again</li><li>&quot;Day 23 unbroken&quot; is the same flame counter the board variant exists to retire, so shipping both puts two contradictory philosophies on one home</li></ul></div></div><p class="slot__verdict">Right as the default for a user inside a run, dead weight for anyone who broke and has not come back.</p>
+          <p class="slot__data">actionDoneToday(), consistencyStats().current and longest, streak.grace.bank, plus local time of day to pick the state.</p>
+        </div>
+      </figure>
+      <figure class="slot" id="consistency-trace">
+        <figcaption class="slot__cap"><span class="slot__n">15</span>
+          <span class="slot__t">Trace</span><span class="tag tag--risk">risky</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-trace">
+  <div class="v-consistency-trace__head"><span class="v-consistency-trace__n">3</span><span class="v-consistency-trace__u">things today</span><span class="v-consistency-trace__avg">usually 2.0 a day</span></div>
+  <svg class="v-consistency-trace__svg" viewBox="0 0 306 62" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <rect x="0" y="55" width="306" height="1" fill="rgba(255,255,255,.14)"/>
+    <g fill="rgba(255,255,255,.6)">
+      <rect x="11" y="37" width="2" height="18"/><rect x="32" y="46" width="2" height="9"/>
+      <rect x="53" y="37" width="2" height="18"/><rect x="74" y="28" width="2" height="27"/>
+      <rect x="84" y="46" width="2" height="9"/><rect x="95" y="37" width="2" height="18"/>
+      <rect x="105" y="19" width="2" height="36"/><rect x="116" y="37" width="2" height="18"/>
+      <rect x="126" y="46" width="2" height="9"/><rect x="137" y="28" width="2" height="27"/>
+      <rect x="147" y="37" width="2" height="18"/><rect x="158" y="37" width="2" height="18"/>
+      <rect x="168" y="10" width="2" height="45"/><rect x="179" y="37" width="2" height="18"/>
+      <rect x="189" y="46" width="2" height="9"/><rect x="200" y="37" width="2" height="18"/>
+      <rect x="210" y="28" width="2" height="27"/><rect x="221" y="37" width="2" height="18"/>
+      <rect x="231" y="19" width="2" height="36"/><rect x="242" y="46" width="2" height="9"/>
+      <rect x="252" y="37" width="2" height="18"/><rect x="263" y="28" width="2" height="27"/>
+      <rect x="273" y="37" width="2" height="18"/><rect x="284" y="37" width="2" height="18"/>
+    </g>
+    <rect x="294" y="28" width="2" height="27" fill="#3fd94e"/>
+  </svg>
+  <div class="v-consistency-trace__foot"><span>Last 30 days</span><span>4 flat</span></div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="slot__idea">Consistency drawn as an instrument trace: thirty days on a baseline where the height of each mark is how much you actually did that day, so presence and intensity are one reading.</p>
+          <p class="slot__evo"><b>Day 2 to day 60.</b> Day 2 is two short marks on a long empty baseline and reads honestly as a beginning; by day 60 the trace has a personality, you can see the weeks you were loud, the flat stretches, and whether today is above or below the line you normally run at.</p>
+          <p class="slot__risk"><b>The risk.</b> It is close to a chart on a face that is meant to be glanceable, and flat days are shown as nothing rather than a red mark, but the single reading up top carries the whole meaning in under a second and the trace below only has to be felt, not read.</p><div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>Height as intensity puts presence and effort in one shape, so showing up and actually working are distinguishable without a second metric</li><li>The headline carries the full meaning, which lets the trace below be felt rather than parsed</li><li>Today&#x27;s single green tick at the right edge anchors the reading with the only accent on the face</li></ul></div>
+        <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Counting every proofEvent type lets a reflection save and a check-in out-measure a heavy Action day, so the trace rewards app usage over the move</li><li>Zero days render as blank gaps with no baseline tick, so a missed day and the end of a short history look identical</li><li>The mock draws 24 bars under a &quot;Last 30 days&quot; label, and a real 30 bars at 2px on a 390px card sit close enough to read as noise</li></ul></div></div><p class="slot__verdict">Best face for a heavy user with varied output, but only ship it if the event weighting excludes passive app activity.</p>
+          <p class="slot__data">proofEvents counted per day for the last 30 days (all types), today&#x27;s count, the 30 day mean, and the number of days with zero events.</p>
         </div>
       </figure></div>
   </section>
