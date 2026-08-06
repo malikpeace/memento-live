@@ -5758,6 +5758,10 @@ function renderDayCard() {
   try {
     const el = document.getElementById('dayCard');
     if (!el) return;
+    // The record is mounted once and reused, so it has to be told when the
+    // data under it moved. This only throws the built record away while it is
+    // shut; the next open composes fresh, and an open record is left alone.
+    try { if (typeof MementoView !== 'undefined') MementoView.invalidate(); } catch (e) {}
     // The unlock cinema OWNS the card while it runs. Rebuilding innerHTML here
     // detaches the exact nodes the cinema is animating, so the user stares at a
     // fresh blank card while the whole show plays on a dead one (Malik's
@@ -5873,9 +5877,9 @@ function renderDayCard() {
       setLivingCardVars(wrap);
       try { applyCardSkin(wrap); } catch (e) {}
       startLivingWander(wrap);
-      // v1120 (Malik): the tap is BACK. It was removed in v668 because the
-      // borrow could strand the card on iOS; the view now carries a hard
-      // restore failsafe (pagehide + idempotent close), so the door reopens.
+      // v1120 (Malik): the tap is BACK. It was removed in v668 because the old
+      // borrow could strand the card on iOS; since v1139 the card is never
+      // moved at all, so that whole failure mode no longer exists.
       // Slop guard: a tilt-drag or scroll that starts on the card is not a tap.
       (function () {
         let tx = 0, ty = 0, t0 = 0, moved = true;
@@ -5886,7 +5890,9 @@ function renderDayCard() {
           // hold used to open the view on release, which no native card does).
           // 700ms, not 400: the gate is only there to ignore a real long
           // press, and a busy main thread can stretch an honest tap.
-          if (!moved && (Date.now() - t0) < 700) { try { openMementoFull(); } catch (e) {} }
+          // v1140: TOGGLE. A second tap on the card closes the record, which
+          // is what a card that opened by tapping is expected to do.
+          if (!moved && (Date.now() - t0) < 700) { try { MementoView.toggle(); } catch (e) {} }
           moved = true;
         });
       })();
@@ -5934,10 +5940,14 @@ function renderDayCard() {
 // the three pillars - Clarity (your goal), Action (your daily follow-through),
 // Consistency (your streak). The card is the hero; the stats sit under it. A
 // snapshot clone of the live card carries its current theme + colour.
-function openMementoFull() {
-  try { if (typeof MementoSound !== 'undefined') MementoSound.play('arrival'); } catch (e) {}
+/* v1140 THE MEMENTO INTERACTION, REBUILT AS A STATE MACHINE.
+   Everything below the controller is now only a BUILDER: it composes the
+   record once and wires its own controls. It never opens, closes, animates,
+   appends on every visit, or destroys anything. MementoView owns all of that. */
+function _mfBuildOverlay() {
+  // v1138 (Malik): no 'arrival' chime on opening the Memento. Tapping your
+  // own card is not an event that needs announcing, and it fires every time.
   try {
-    if (document.getElementById('mementoFull')) return;
     // Refresh the :root --aura-* vars so the full view's background reflects the
     // user's latest state the instant it opens (the home no longer shows them).
     try { setAtmosphereVars(); } catch (e) {}
@@ -6013,7 +6023,6 @@ function openMementoFull() {
     ov.innerHTML =
       '<div class="mf__bg" aria-hidden="true"></div>' +
       '<div class="mf__scroll">' +
-        '<div class="mf__card"></div>' +
         '<p class="mf-name">Your Memento</p>' +
         (moriEnd ? '<p class="mf-mori apl-num" id="mfMori">&nbsp;</p>' : '') +
         '<p class="mf-note" id="mfNote" contenteditable="true" spellcheck="false">' + esc(noteTxt) + '</p>' +
@@ -6026,7 +6035,11 @@ function openMementoFull() {
         '<div class="mf-trail" id="mfTrail">' + trailHtml + '</div>' +
         originHtml +
       '</div>';
-    document.body.appendChild(ov);
+    // v1139: the record lives INSIDE .app, not on the body. #app is a stacking
+    // context (position:relative; z-index:1), so a card left in the home can
+    // never paint above a body-level overlay no matter its z-index. Same
+    // context = the card can sit above the record without being moved.
+    // (mounting is the controller's job, once, in MementoView._ensure)
 
     // LITERALLY do not touch the Memento. Instead of cloning it, MOVE the real
     // living card element into this view and animate only the background + stats
@@ -6050,72 +6063,7 @@ function openMementoFull() {
     let morphT = null;
     const dayCardEl = document.getElementById('dayCard');
     const liveWrap = dayCardEl ? dayCardEl.querySelector('.daycard-wrap') : null;
-    const cardHost = ov.querySelector('.mf__card');
-    let homeParent = null, homeNext = null, homeRect = null, homeVw = 0, homeVh = 0;
-    if (liveWrap && cardHost) {
-      const liveNs0 = liveWrap.querySelector('.daycard-ns');
-      // where the card sits on the home RIGHT NOW, for the morph below
-      const H = liveNs0 ? liveNs0.getBoundingClientRect() : null;
-      // v1131: keep it. The close morph must fly back to the CARD's real home
-      // rect; measuring the #dayCard CONTAINER instead scaled the card up to
-      // the container's width and then CSS snapped it down (Malik: 'the
-      // memento is bigger before getting back to the normal size').
-      homeRect = H ? { w: H.width, h: H.height, top: H.top, left: H.left } : null;
-      homeVw = window.innerWidth; homeVh = window.innerHeight;
-      if (dayCardEl) dayCardEl.style.minHeight = dayCardEl.offsetHeight + 'px';
-      homeParent = liveWrap.parentNode; homeNext = liveWrap.nextSibling;
-      cardHost.appendChild(liveWrap);            // borrow the REAL card (no clone)
-      const ns = liveWrap.querySelector('.daycard-ns');
-      liveWrap.classList.remove('daycard-materialize', 'daycard-reveal');
-      if (ns) {
-        // v1056: the rotation moved from the card to its stage; flatten it with
-        // the transition off so the card cannot animate a hair as the view opens.
-        const tiltHost = ns.closest('.daycard-living-stage') || ns;
-        tiltHost.style.transition = 'none';
-        tiltHost.style.setProperty('--dc-rx', '0deg');
-        tiltHost.style.setProperty('--dc-ry', '0deg');
-        void tiltHost.offsetWidth;
-        tiltHost.style.transition = '';
-      }
-      // v1123 (Malik: 'a bit broken, not very smooth'): the old land-on-the-
-      // exact-home-spot math pinned the card at its HOME size (huge, since the
-      // v1067 home lets it grow) and shoved the whole column sideways with a
-      // marginLeft correction, which is exactly the brokenness in his
-      // screenshot. Now the view owns the card's size (the mockup's contained
-      // hero, see the CSS) and the open is a transform-only FLIP: the card
-      // starts visually at its home rect and settles into the hero slot in
-      // one compositor move. No layout is touched mid-animation.
-      if (H && ns) {
-        void ov.offsetWidth;   // let the hero layout settle before measuring
-        const N = ns.getBoundingClientRect();
-        if (N.width > 0) {
-          const s = H.width / N.width;
-          const dx = (H.left + H.width / 2) - (N.left + N.width / 2);
-          const dy = H.top - N.top;
-          const stage2 = ns.closest('.daycard-living-stage') || ns;
-          const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-          if (!reduced && (Math.abs(dx) > 2 || Math.abs(dy) > 2 || Math.abs(s - 1) > 0.02)) {
-            stage2.style.transformOrigin = '50% 0';
-            stage2.style.transition = 'none';
-            stage2.style.transform = 'translate(' + dx.toFixed(1) + 'px,' + dy.toFixed(1) + 'px) scale(' + s.toFixed(4) + ')';
-            void stage2.offsetWidth;
-            stage2.style.willChange = 'transform';   // promote BEFORE the run, not mid-flight
-            stage2.style.transition = 'transform 380ms cubic-bezier(0.22, 0.68, 0.24, 1)';
-            stage2.style.transform = 'none';
-            // v1132: a close that interrupts the opening morph used to hit this
-            // stale timeout, which wiped the transform mid-flight and teleported
-            // the card. It no-ops once closing has begun, and close() clears it.
-            morphT = setTimeout(() => {
-              morphT = null;
-              if (mfClosed) return;
-              try { stage2.style.transition = ''; stage2.style.transform = ''; stage2.style.transformOrigin = ''; stage2.style.willChange = ''; } catch (e) {}
-            }, 420);
-          }
-        }
-      }
-    }
 
-    document.body.style.overflow = 'hidden';
     // Commit the initial state with a forced reflow, then flip to open so the bg +
     // stats transitions play. rAF gets throttled when the tab is backgrounded, which
     // can leave the overlay stuck; a sync reflow never stalls.
@@ -6145,11 +6093,10 @@ function openMementoFull() {
       ov.dataset.room = lum > 128 ? 'light' : 'dark';
     } catch (e) { ov.dataset.room = 'dark'; }
 
-    void ov.offsetWidth;
-    ov.classList.add('mf--open');
-
     // the countdown ticks, because a number that moves is the whole argument
     let mfTick = null;
+    let startTick = () => {};
+    let stopTick = () => {};
     const moriEl = ov.querySelector('#mfMori');
     if (moriEl && moriEnd) {
       const p2 = (n) => String(n).padStart(2, '0');
@@ -6159,7 +6106,11 @@ function openMementoFull() {
         moriEl.textContent = Math.floor(ms / 86400000) + ':' + p2(Math.floor(rest / 3600000)) + ':' + p2(Math.floor(rest % 3600000 / 60000)) + ':' + p2(Math.floor(rest % 60000 / 1000));
       };
       tick();
-      mfTick = setInterval(tick, 1000);
+      // v1140: the record is now mounted once and merely shown/hidden, so the
+      // timer must follow visibility. A 1s interval left running behind a
+      // hidden overlay is pure battery for a number nobody can see.
+      startTick = () => { if (mfTick) return; tick(); mfTick = setInterval(tick, 1000); };
+      stopTick = () => { if (mfTick) { clearInterval(mfTick); mfTick = null; } };
     }
     // their note, saved quietly on blur (same field Mori's sheet edits)
     const noteEl = ov.querySelector('#mfNote');
@@ -6181,87 +6132,8 @@ function openMementoFull() {
       if (h2) h2.parentElement.classList.toggle('is-open');
     });
 
-    let mfClosed = false;
-    const close = () => {
-      if (mfClosed) return;   // idempotent: a 2nd trigger (a swipe + a stray tap, a
-      mfClosed = true;        // double-tap, Escape while tapping) must NOT run the
-      try { if (mfTick) clearInterval(mfTick); } catch (e) {}
-      try { if (morphT) { clearTimeout(morphT); morphT = null; } } catch (e) {}
-      try { window.removeEventListener('pagehide', onHide); } catch (e) {}
-      try { if (viewAbort) viewAbort.abort(); } catch (e) {}
-      try { if (liveWrap) liveWrap.classList.remove('is-pressing'); } catch (e) {}
-                              // restore twice, or the second pass removes the card it
-                              // just put back (the else branch below) and the home
-                              // ends up with no Memento at all.
-      ov.classList.remove('mf--open');   // bg + stats fade out
-      ov.classList.add('mf--closing');   // ...in the SAME time the card flies
-      document.body.style.overflow = '';
-      document.removeEventListener('keydown', onKey);
-      // v1127 (Malik: 'it just kinda sits there for a second'): the card used
-      // to hold still for the full 430ms bg fade before teleporting home. Now
-      // it flies back the way it came, a transform-only reverse of the open
-      // morph, and the DOM restore happens as it lands.
-      let backMs = 300;
-      try {
-        const nsB = liveWrap && liveWrap.querySelector('.daycard-ns');
-        // The card's own home rect, captured at open. A viewport change since
-        // then (rotation) invalidates it, and we restore instantly instead of
-        // animating to a stale target.
-        const sameViewport = homeVw === window.innerWidth && homeVh === window.innerHeight;
-        if (nsB && homeRect && sameViewport) {
-          const N = nsB.getBoundingClientRect();
-          const s2 = Math.max(0.05, homeRect.w / Math.max(1, N.width));
-          const dx2 = (homeRect.left + homeRect.w / 2) - (N.left + N.width / 2);
-          const dy2 = homeRect.top - N.top;
-          const stg = nsB.closest('.daycard-living-stage') || nsB;
-          const reduced2 = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-          if (!reduced2) {
-            stg.style.willChange = 'transform';
-            stg.style.transformOrigin = '50% 0';
-            stg.style.transition = 'transform 300ms cubic-bezier(0.32, 0.72, 0, 1)';
-            stg.style.transform = 'translate(' + dx2.toFixed(1) + 'px,' + dy2.toFixed(1) + 'px) scale(' + s2.toFixed(4) + ')';
-            // land the restore on the ACTUAL end of the animation, not a timer
-            // that can drift a frame past it (that drift is a visible snap).
-            try {
-              stg.addEventListener('transitionend', (ev) => {
-                if (ev.propertyName !== 'transform') return;
-                if (restoreT) { clearTimeout(restoreT); restoreT = null; }
-                restoreHome();
-              }, { once: true });
-            } catch (e) {}
-          } else { backMs = 0; }
-        } else { backMs = 0; }
-      } catch (e) { backMs = 0; }
-      // Restore the REAL Memento to the home AFTER the background has faded out, then
-      // remove the overlay in the same tick so there's no gap. Putting it back early
-      // would drop it behind the still-opaque bg and make it flash. Let the home size
-      // CSS take over again. Guard against a re-render having rebuilt the card.
-      restoreT = setTimeout(() => { restoreT = null; restoreHome(); }, backMs + 40);
-    };
-    // The card goes home exactly once, whether the animation ended cleanly or
-    // the fallback timer had to step in.
-    let restoreT = null, restored = false;
-    function restoreHome() {
-      if (restored) return;
-      restored = true;
-        try {
-          if (liveWrap) {
-            const stg2 = liveWrap.querySelector('.daycard-living-stage') || liveWrap.querySelector('.daycard-ns');
-            if (stg2) { stg2.style.transition = ''; stg2.style.transform = ''; stg2.style.transformOrigin = ''; stg2.style.willChange = ''; }
-            liveWrap.style.removeProperty('--dc-rx');
-            liveWrap.style.removeProperty('--dc-ry');
-            const existing = dayCardEl ? dayCardEl.querySelector('.daycard-wrap') : null;
-            if (dayCardEl && (!existing || existing === liveWrap)) {
-              if (homeNext && homeNext.parentNode === homeParent) homeParent.insertBefore(liveWrap, homeNext);
-              else (homeParent || dayCardEl).appendChild(liveWrap);
-            } else {
-              liveWrap.remove();   // a DIFFERENT fresh card was rebuilt; drop the borrowed one
-            }
-          }
-          if (dayCardEl) dayCardEl.style.minHeight = '';
-        } catch (e) {}
-        try { ov.remove(); } catch (e) {}
-    }
+    // every close path in here is the controller's single close
+    const close = () => { try { MementoView.close(); } catch (e) {} };
     const onKey = (e) => { if (e.key === 'Escape') close(); };
     // v1123 (Malik): tap the card again to go back; tap-and-hold customises.
     // Slop + duration guards so a scroll or a completed hold never closes,
@@ -6277,27 +6149,8 @@ function openMementoFull() {
         tMoved = true;
       }, sig);
     })();
-    // v1120 FAILSAFE: a killed/backgrounded page must never strand the
-    // borrowed card (the v668 stranding). pagehide restores it IMMEDIATELY,
-    // no exit animation, no 430ms grace.
-    const onHide = () => {
-      try {
-        if (mfClosed) return;
-        mfClosed = true;
-        if (mfTick) clearInterval(mfTick);
-        if (liveWrap) {
-          const existing = dayCardEl ? dayCardEl.querySelector('.daycard-wrap') : null;
-          if (dayCardEl && (!existing || existing === liveWrap)) {
-            if (homeNext && homeNext.parentNode === homeParent) homeParent.insertBefore(liveWrap, homeNext);
-            else (homeParent || dayCardEl).appendChild(liveWrap);
-          }
-        }
-        if (dayCardEl) dayCardEl.style.minHeight = '';
-        document.body.style.overflow = '';
-        ov.remove();
-      } catch (e) {}
-    };
-    window.addEventListener('pagehide', onHide, sig);
+    // (The v1120 pagehide RESTORE failsafe is gone with the borrow it guarded:
+    // the card never leaves the home now, so a killed page cannot strand it.)
     ov.addEventListener('click', (e) => { if (e.target === ov) close(); });
     // iOS-like swipe-down-to-close: pull the card view down (when scrolled to the
     // top) and it follows the finger, then flicks away or springs back.
@@ -6365,9 +6218,229 @@ function openMementoFull() {
     });
     try { _mfSkinsInit(ov, liveWrap, sig); } catch (e) {}
     document.addEventListener('keydown', onKey, sig);
-    try { window._mfClose = close; } catch (e) {}
-  } catch (e) {}
+    return { ov: ov, abort: viewAbort, startTick: startTick, stopTick: stopTick };
+  } catch (e) { return null; }
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   v1140 MementoView, THE ONE OWNER OF THE HOME <-> RECORD TRANSITION.
+
+   Every earlier version was a pair of functions that each did their own
+   thing: open built and appended, close removed and rebuilt, and a tap
+   during either left the two fighting. That is where every "it feels
+   like a brand new memento", "it pops bigger before it settles" and
+   "sometimes it just stops" came from.
+
+   The rules, and they are not negotiable:
+   1. ONE record, mounted once, then shown and hidden. Never rebuilt.
+   2. ONE animation on the card, created once, reversed in place. A tap
+      mid-flight flips playbackRate, so it turns around from exactly
+      where it is instead of restarting.
+   3. desiredOpen is the ONLY truth. Everything else follows it.
+   4. The card is never moved in the DOM, never resized by CSS, never
+      re-parented. It gets a transform and nothing else, so the return
+      is 0px off by construction (cancel() = the untransformed element).
+   ══════════════════════════════════════════════════════════════════════ */
+const MementoView = (function () {
+  const DUR = 460;
+  const EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
+
+  let view = null;          // the built record { ov, abort, startTick, stopTick }
+  let phase = 'closed';     // closed | opening | open | closing
+  let desiredOpen = false;
+  let anim = null;          // THE animation, reused for both directions
+  let openT = '';           // the open transform, recomputed only while idle
+  let guard = null;         // the dead-man switch, see jump()
+  let dirty = false;        // the data moved under an open record
+
+  const cardEl = () => document.getElementById('dayCard');
+
+  /* The open pose, in real numbers.
+     translate(dx,dy) scale(s) maps a point p to origin + s*(p-origin) + (dx,dy),
+     so the translate has to pay for the origin term too. Leaving it out is why
+     the card used to land a few pixels off and read as a "pop". */
+  function measure() {
+    const el = cardEl();
+    if (!el) return false;
+    const face = el.querySelector('.daycard-ns') || el.querySelector('.daycard-wrap') || el;
+    const C = el.getBoundingClientRect();
+    const N = face.getBoundingClientRect();
+    if (!N.height || !C.height) return false;
+    const cs = getComputedStyle(document.documentElement);
+    const safeT = parseFloat(cs.getPropertyValue('--safe-t')) || 0;
+    const top = safeT + 22;
+    // Malik's call: the memento shrinks to about 30% of the screen.
+    const targetH = Math.max(140, Math.min(N.height, window.innerHeight * 0.30));
+    const s = targetH / N.height;
+    const ox = C.left + C.width / 2, oy = C.top + C.height / 2;
+    const dx = (window.innerWidth / 2) - ox - s * ((N.left + N.width / 2) - ox);
+    const dy = top - oy - s * (N.top - oy);
+    openT = 'translate(' + dx.toFixed(2) + 'px,' + dy.toFixed(2) + 'px) scale(' + s.toFixed(4) + ')';
+    if (view) { try { view.ov.style.setProperty('--mf-top', Math.round(top + targetH) + 'px'); } catch (e) {} }
+    return true;
+  }
+
+  function ensure() {
+    if (view && view.ov && view.ov.isConnected) return true;
+    if (view && view.abort) { try { view.abort.abort(); } catch (e) {} }
+    view = null;
+    const built = _mfBuildOverlay();
+    if (!built || !built.ov) return false;
+    view = built;
+    view.ov.hidden = true;
+    // #app is a stacking context, so the record has to live inside it for the
+    // card (z-index 1001, still in the home) to sit above it without moving.
+    (document.getElementById('app') || document.body).appendChild(view.ov);
+    return true;
+  }
+
+  /* One animation, born once, driven both ways. */
+  function drive() {
+    const el = cardEl();
+    if (!el) return;
+    if (!anim) {
+      el.style.transformOrigin = '50% 50%';
+      anim = el.animate(
+        [{ transform: 'none' }, { transform: openT }],
+        { duration: DUR, easing: EASE, fill: 'both' }
+      );
+      anim.onfinish = settle;
+      anim.oncancel = () => { anim = null; };
+    }
+    anim.playbackRate = desiredOpen ? 1 : -1;
+    try { anim.play(); } catch (e) { jump(); return; }
+    // THE DEAD-MAN SWITCH. A backgrounded tab freezes the document timeline:
+    // the animation stays 'running' forever, currentTime never advances and
+    // onfinish never fires, so the view would be stranded half-open with the
+    // scroll still locked. (Proven in the preview, whose pane is hidden:
+    // document.timeline.currentTime does not move at all.) If the animation
+    // has not finished well after it should have, we stop asking and land it.
+    if (guard) clearTimeout(guard);
+    guard = setTimeout(jump, DUR + 260);
+  }
+
+  /* Land on the desired end state immediately, no animation. Used when the
+     timeline is frozen or WAAPI is unavailable. */
+  function jump() {
+    if (guard) { clearTimeout(guard); guard = null; }
+    const el = cardEl();
+    if (anim) { try { anim.cancel(); } catch (e) {} anim = null; }
+    if (el) el.style.transform = desiredOpen ? openT : '';
+    settle();
+  }
+
+  function settle() {
+    if (guard) { clearTimeout(guard); guard = null; }
+    if (desiredOpen) {
+      phase = 'open';
+      return;
+    }
+    phase = 'closed';
+    // cancel() puts the card back to its own untransformed self. Not "near"
+    // its home pose: literally it, with no rounding to accumulate.
+    if (anim) { try { anim.cancel(); } catch (e) {} anim = null; }
+    const el = cardEl();
+    if (el) { el.style.transform = ''; el.style.transformOrigin = ''; el.style.willChange = ''; }
+    document.body.classList.remove('mf-open');
+    document.body.style.overflow = '';
+    if (view) {
+      view.ov.classList.remove('mf--open', 'mf--closing');
+      view.ov.hidden = true;
+      view.ov.scrollTop = 0;
+      try { view.stopTick(); } catch (e) {}
+    }
+    if (dirty) { dirty = false; MementoView.invalidate(); }
+  }
+
+  function apply() {
+    if (!view) return;
+    const ov = view.ov;
+    if (desiredOpen) {
+      ov.hidden = false;
+      ov.classList.remove('mf--closing');
+      void ov.offsetWidth;              // commit the hidden->shown state first
+      ov.classList.add('mf--open');
+      document.body.classList.add('mf-open');
+      document.body.style.overflow = 'hidden';
+      try { view.startTick(); } catch (e) {}
+    } else {
+      ov.classList.remove('mf--open');
+      ov.classList.add('mf--closing');
+    }
+    drive();
+    try { if (window.Router && Router.sync) Router.sync(); } catch (e) {}
+  }
+
+  return {
+    isActive: () => desiredOpen || phase !== 'closed',
+    open: function () {
+      if (desiredOpen) return;
+      if (!ensure()) return;
+      // Geometry is only trustworthy when nothing is animating. Mid-close the
+      // cached pose is still the right one, because nothing moved the home.
+      if (phase === 'closed') { if (!measure()) return; }
+      desiredOpen = true;
+      phase = 'opening';
+      const el0 = cardEl();
+      if (el0) el0.style.transform = '';   // the animation owns the transform
+      apply();
+    },
+    close: function () {
+      if (!desiredOpen && phase === 'closed') return;
+      desiredOpen = false;
+      phase = 'closing';
+      apply();
+    },
+    toggle: function () { if (desiredOpen) this.close(); else this.open(); },
+    /* The record's contents are state, not structure. When the day's data
+       changes underneath a closed record, throw the built one away so the
+       next open composes fresh. Cheap, because it only happens while shut. */
+    invalidate: function () {
+      // Re-rendering the home replaces the card's inner DOM, which kills the
+      // listeners the open record bound to it (hold-to-customise, the note).
+      // We cannot tear the record down mid-view, so we remember and do it the
+      // moment it closes.
+      if (desiredOpen || phase !== 'closed') { dirty = true; return; }
+      if (view) {
+        if (view.abort) { try { view.abort.abort(); } catch (e) {} }
+        try { view.stopTick(); } catch (e) {}
+        try { view.ov.remove(); } catch (e) {}
+      }
+      view = null;
+    },
+    _frozen: function () { if (phase === 'opening' || phase === 'closing') jump(); },
+    _reflow: function () {
+      // The home pose moved (rotate, resize, keyboard). Re-measure and, if the
+      // record is up, retarget without a restart.
+      if (phase === 'closed') { anim = null; return; }
+      if (!measure()) return;
+      const el = cardEl();
+      if (!el || !anim) return;
+      const t = anim.currentTime;
+      const rate = anim.playbackRate;
+      try { anim.cancel(); } catch (e) {}
+      anim = null;
+      drive();
+      if (anim) { anim.playbackRate = rate; try { anim.currentTime = t; } catch (e) {} }
+    }
+  };
+})();
+try {
+  window.MementoView = MementoView;
+  // Leaving the app mid-transition must not leave it mid-transition. Hiding the
+  // tab freezes the timeline, so we land the pose we were heading for before it
+  // can freeze, and land it again on return in case the freeze won the race.
+  document.addEventListener('visibilitychange', () => {
+    try { if (MementoView._frozen) MementoView._frozen(); } catch (e) {}
+  });
+  window.addEventListener('pagehide', () => { try { MementoView._frozen(); } catch (e) {} });
+  window.addEventListener('resize', () => { try { MementoView._reflow(); } catch (e) {} });
+  window.addEventListener('orientationchange', () => { setTimeout(() => { try { MementoView._reflow(); } catch (e) {} }, 220); });
+} catch (e) {}
+
+// The old entry point is now a one-liner into the controller, so every caller
+// (home tap, router, deep link) goes through the same state machine.
+function openMementoFull() { try { MementoView.open(); } catch (e) {} }
 
 // ── Living Day Card: data -> color, motion, theme toggle ──────────────────
 // Map real user data into the three pillar levels (0-100). "Reflects where you

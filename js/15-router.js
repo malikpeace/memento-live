@@ -62,7 +62,7 @@
   function currentTopSlug() {
     try {
       if (typeof ClarityPaywall !== 'undefined' && ClarityPaywall._open) return 'paywall';
-      if (document.getElementById('mementoFull')) return 'memento-full';
+      if (typeof MementoView !== 'undefined' && MementoView.isActive()) return 'memento-full';
       var ms = document.getElementById('moreSpace');
       if (ms && ms.classList.contains('open')) return 'modules';
       if (typeof ClarityExperience !== 'undefined' && ClarityExperience.isOpen) return 'clarity';
@@ -192,9 +192,9 @@
     try {
       if (slug === 'paywall') { if (typeof ClarityPaywall !== 'undefined') ClarityPaywall.hide(); }
       else if (slug === 'memento-full') {
-        // v1125: the X is gone from the view; close through its own handle.
-        if (typeof window._mfClose === 'function') window._mfClose();
-        else { var x = document.querySelector('#mementoFull .mf__close'); if (x) x.click(); }
+        // v1140: one owner, one close. The record is now persistent, so
+        // asking the DOM whether it exists is meaningless.
+        if (typeof MementoView !== 'undefined') MementoView.close();
       }
       else if (slug === 'modules') { if (typeof MoreSpace !== 'undefined') MoreSpace.close(); }
       else if (slug === 'clarity') { if (typeof exitToModules === 'function') exitToModules('clarity'); }
@@ -356,7 +356,11 @@
   }
 
   // Tiny debug/inspection surface.
-  window.Router = { init: init, enabled: routerEnabled, _state: R, _top: currentTopSlug };
+  // v1140: the Memento record no longer opens/closes through a wrapped global
+  // (it is a state machine with several close paths), so it tells the router
+  // directly whenever its state settles.
+  window.Router = { init: init, enabled: routerEnabled, _state: R, _top: currentTopSlug,
+    sync: function () { try { if (routerEnabled() && !R.navLock) scheduleReconcile(); } catch (e) {} } };
 
   function tryInit() {
     if (typeof state === 'undefined') { setTimeout(tryInit, 60); return; }

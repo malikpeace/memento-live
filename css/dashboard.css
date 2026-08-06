@@ -5315,3 +5315,42 @@ body:has(#mementoFull) #topFade { display: none !important; }
   text-shadow: 0 1px 1px rgba(255,255,255,0.9), 0 -1px 0.5px rgba(0,0,0,0.18);
 }
 #mementoFull[data-room="dark"] .mf-origin__t { color: rgba(24,28,36,0.62); }
+
+/* ==================================================================== *
+ * v1139 — THE MEMENTO NEVER MOVES. The card stays in the home, in its
+ * own parent, at its own size. Opening the record lifts it above the
+ * scrim with ONE transform (compositor only) and flows the record
+ * beneath it. Nothing is re-parented, so nothing re-renders.
+ * ==================================================================== */
+body.mf-open #dayCard,
+body.mf-open .app.dash-v2 #dayCard {
+  position: relative;
+  z-index: 1001 !important;   /* above #mementoFull (1000), same stacking context */
+  pointer-events: auto;
+}
+/* the name belongs to the card while the record is open */
+body.mf-open #dayCard .daycard-ns__name {
+  display: inline; font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: rgba(24,28,36,0.78);
+  text-shadow: 0 -0.5px 0.6px rgba(0,0,0,0.5), 0 1px 0.6px rgba(255,255,255,0.26);
+}
+body.mf-open #dayCard .daycard-ns__foot {
+  position: absolute; left: 8.5%; right: auto; bottom: 5.2%;
+  z-index: 7; display: block; width: auto; text-align: left; min-height: 0;
+}
+body.mf-open #dayCard .daycard-ns__goal { display: none; }
+/* everything else on the home steps back while the record is up */
+body.mf-open #commandCenter,
+body.mf-open #dashGreetingMobile { opacity: 0; transition: opacity 200ms ease; pointer-events: none; }
+/* the record begins under the lifted card */
+#mementoFull .mf__scroll { padding-top: calc(var(--mf-top, 220px) + 18px); }
+
+/* ══════════════════════════════════════════════════════════════════════
+   v1140 — the record is MOUNTED ONCE and shown/hidden, never rebuilt.
+   `hidden` alone is not enough: the base rule sets display:flex, and any
+   author display wins over the attribute's UA default. Without this the
+   closed record stays a full-screen scroller that eats every tap on the
+   home (the invisible-scrim bug, again).
+   ══════════════════════════════════════════════════════════════════════ */
+#mementoFull[hidden] { display: none !important; }

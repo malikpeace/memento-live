@@ -2424,7 +2424,7 @@ window.addEventListener('keydown', (e) => {
       if (!document.body.classList.contains('ns-bloom')) return false; // post-Clarity
       if (document.body.classList.contains('menu-peek')) return false;
       if (document.getElementById('moreSpace')) return false;     // already open
-      if (document.querySelector('.sheet.open, .action-exp.open, .clarity-exp.open, .welcome-intro.open, #mementoFull, #appearancePicker')) return false;
+      if (document.querySelector('.sheet.open, .action-exp.open, .clarity-exp.open, .welcome-intro.open, #mementoFull.mf--open, #appearancePicker')) return false;
       var dash = document.querySelector('.app.dash-v2');
       return !!(dash && dash.offsetParent !== null);
     } catch (e) { return false; }
