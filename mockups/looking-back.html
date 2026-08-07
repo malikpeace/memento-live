@@ -1,10 +1,15 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Looking back — five complete pages</title>
+<title>Looking back — inside the Memento view</title>
+<link rel="stylesheet" href="../memento-app/css/base.css" onerror="this.href='../css/base.css'">
+<link rel="stylesheet" href="../memento-app/css/dashboard.css" onerror="this.href='../css/dashboard.css'">
+<link rel="stylesheet" href="../memento-app/css/daycard-living.css" onerror="this.href='../css/daycard-living.css'">
 <style>
   :root{--hi:rgba(255,255,255,.96);--mid:rgba(255,255,255,.68);--lo:rgba(255,255,255,.44);
-    --fill:rgba(255,255,255,.045);--clar:#3ad9f5;--cons:#3fd94e;--act:#eef2fb}
+    --fill:rgba(255,255,255,.045);--clar:#3ad9f5;--cons:#3fd94e;--act:#eef2fb;
+    --text-hi:rgba(255,255,255,.96);--text-mid:rgba(255,255,255,.66);--text-lo:rgba(255,255,255,.42);
+    --safe-t:0px;--safe-b:0px}
   *{box-sizing:border-box}
   html,body{margin:0;background:#050609;color:var(--hi);
     font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
@@ -16,19 +21,19 @@
     padding:12px 20px;background:rgba(5,6,9,.88);backdrop-filter:blur(24px)}
   .nav a{font-size:12.5px;font-weight:620;text-decoration:none;color:var(--mid);
     padding:8px 13px;border-radius:999px;background:var(--fill)}
-  .nav a:hover{color:var(--hi);background:rgba(255,255,255,.09)}
   .pg{padding-top:46px;scroll-margin-top:70px}
   .pg__rank{display:inline-block;padding:3px 10px;border-radius:999px;background:rgba(255,216,102,.16);
     color:#ffd866;font-size:11.5px;font-weight:800;margin-bottom:8px}
   .pg__hd h2{margin:0 0 6px;font-size:22px;font-weight:720;letter-spacing:-.02em}
-  .pg__th{margin:0 0 8px;font-size:14px;line-height:1.6;color:var(--mid);max-width:78ch}
-  .pg__un{margin:0 0 20px;font-size:13.5px;line-height:1.6;color:var(--hi);max-width:78ch}
-  .pg__un b{font-weight:660}
+  .pg__th{margin:0 0 20px;font-size:14px;line-height:1.6;color:var(--mid);max-width:78ch}
   .pg__row{display:grid;grid-template-columns:390px 1fr;gap:30px;align-items:start}
-  .phone{position:relative;width:390px;height:720px;overflow:hidden;border-radius:22px;
-    background:#08090b;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 12px 40px rgba(0,0,0,.55)}
+  .phone{position:relative;width:390px;height:900px;overflow:hidden;border-radius:26px;
+    background:#050609;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 12px 40px rgba(0,0,0,.55)}
   .phone__in{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
   .phone__in::-webkit-scrollbar{display:none}
+  .screen{padding:0 20px 60px}
+  .memoir{margin:30px -20px 0}
+  .mori{font-size:19px;font-weight:250;letter-spacing:.11em;color:var(--hi);font-variant-numeric:tabular-nums}
   .pc{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:14px 15px;border-radius:13px;
     background:rgba(255,255,255,.032)}
   .pc__h{display:block;margin:0 0 7px;font-size:11.5px;font-weight:750;color:var(--lo)}
@@ -36,7 +41,325 @@
   .pc ul{margin:0;padding-left:15px}
   .pc li{margin:0 0 6px;font-size:12.5px;line-height:1.5;color:var(--mid)}
   .pg__v{margin:14px 0 0;font-size:13.5px;line-height:1.6;color:var(--hi);font-weight:560}
-  @media (max-width:860px){.pg__row{grid-template-columns:1fr}.phone{width:100%;max-width:390px;height:640px}}
+  @media (max-width:860px){.pg__row{grid-template-columns:1fr}.phone{width:100%;max-width:390px}}
+  .jumpbtn{padding:9px 15px;border:0;border-radius:10px;background:rgba(255,255,255,.08);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.07);color:var(--hi);font:inherit;font-size:13px;
+    font-weight:640;cursor:pointer}
+  .jumpbtn:hover{background:rgba(255,255,255,.13)}
+</style>
+<style id="mv">
+  :root{
+    --hi: rgba(245,246,250,.97);
+    --mid: rgba(238,241,247,.78);
+    --lo: rgba(232,236,244,.50);
+    --fill: rgba(255,255,255,.055);
+    --fill-2: rgba(255,255,255,.085);
+    --inset: inset 0 1px 0 rgba(255,255,255,.07);
+    --clar: #3ad9f5;
+    --cons: #3fd94e;
+    --act: #eef2fb;
+    --safe-t: env(safe-area-inset-top, 0px);
+    --safe-b: env(safe-area-inset-bottom, 0px);
+  }
+  *{ box-sizing:border-box; }
+  body{ min-height:100lvh; }
+
+  /* the room the card sits in: a single soft pool behind the hero, fading
+     radially so it can never draw an edge (the v682 law) */
+  /* The chosen material lights the room. Radial and fading to transparent well
+     inside its own bounds, so it can never draw an edge (the v682 law). */
+  .room{ position:fixed; inset:0; z-index:0; pointer-events:none;
+    background:
+      radial-gradient(64% 30% at 50% 14%,
+        color-mix(in srgb, var(--tint, #3ad9f5) 26%, transparent), transparent 72%),
+      radial-gradient(130% 70% at 50% 8%,
+        color-mix(in srgb, var(--tint, #3ad9f5) 10%, transparent), transparent 76%),
+      linear-gradient(180deg,
+        color-mix(in srgb, var(--tint, #3ad9f5) 5%, transparent) 0%,
+        color-mix(in srgb, var(--tint, #3ad9f5) 3%, transparent) 46%,
+        transparent 100%);
+    transition:background .5s ease-out; }
+  /* Void takes light OUT of the room instead of adding it. */
+  body.is-void .room{ background:
+      radial-gradient(88% 52% at 50% 20%, rgba(0,0,0,.92), transparent 74%); }
+
+  /* ── the material drives the app's OWN layers, nothing more ───────────── */
+  .cage:not(.is-stock) .daycard-theme-living .blob.b1{ background:radial-gradient(circle, var(--sk1), transparent 65%)!important; }
+  .cage:not(.is-stock) .daycard-theme-living .blob.b2{ background:radial-gradient(circle, var(--sk2), transparent 65%)!important; }
+  .cage:not(.is-stock) .daycard-theme-living .blob.b3{ background:radial-gradient(circle, var(--sk3), transparent 65%)!important; }
+  .cage:not(.is-stock) .daycard-theme-living .blob.b4{ background:radial-gradient(circle, var(--sk4, var(--sk1)), transparent 66%)!important; }
+  .cage:not(.is-stock) .daycard-theme-living .blob.b5{ background:radial-gradient(circle, var(--sk2), transparent 68%)!important; opacity:.5!important; }
+  .cage:not(.is-stock) .daycard-theme-living .blob.b6{ opacity:0!important; }
+  .cage:not(.is-stock) .daycard-ns__plat{ opacity:var(--plat-op,.28)!important; }
+  .cage:not(.is-stock) .daycard-ns{ background:var(--face)!important; }
+  .cage:not(.is-stock) .daycard-ns__emblem path{ fill:var(--mark)!important; }
+  .cage .daycard-ns__name{ color:var(--ink)!important; }
+
+  /* flat: an opaque painted object, every colour layer off */
+  .flat .daycard-theme-living .daycard-ns__liquid{ display:none!important; }
+  .flat .daycard-theme-living .daycard-bloom,
+  .flat .daycard-wrap__aura{ opacity:0!important; }
+  .flat .daycard-ns__plat, .flat .daycard-ns__iri, .flat .daycard-ns__sheen,
+  .flat .daycard-ns__burn, .flat .daycard-ns__tint{ opacity:0!important; }
+  .flat .daycard-ns__rim{ opacity:1!important;
+    box-shadow:inset 0 0 0 1.5px var(--edge, rgba(255,255,255,.9))!important; }
+  .flat .daycard-ns{ box-shadow:0 0 46px 8px var(--halo, rgba(238,244,255,.34)),
+    inset 0 1px 0 rgba(255,255,255,.06)!important; }
+
+  /* void: nothing inside it emits, and the room around it darkens */
+  .void .daycard-ns{ background:#000!important;
+    box-shadow:0 0 60px 20px #000, 0 0 120px 40px rgba(0,0,0,.9)!important; }
+  .void .daycard-ns__rim{ opacity:0!important; box-shadow:none!important; }
+  .void .daycard-living-stage{ box-shadow:0 0 60px 10px rgba(0,0,0,.98)!important; }
+  .void .daycard-wrap__aura, .void .daycard-bloom{ opacity:0!important; }
+  /* nothing inside it emits either: the app's own edge highlight and face lift
+     are what was drawing a visible outline on a card that must have none */
+  .void .daycard-ns::before, .void .daycard-ns__body::before,
+  .void .daycard-ns__liquid, .void .daycard-ns__iri, .void .daycard-ns__sheen,
+  .void .daycard-ns__burn, .void .daycard-ns__plat,
+  .void .daycard-ns__tint{ opacity:0!important; background:none!important; }
+
+  /* the chips are the same card, small */
+  .chipcage:not(.is-stock) .daycard-theme-living .blob.b1{ background:radial-gradient(circle, var(--sk1), transparent 65%)!important; }
+  .chipcage:not(.is-stock) .daycard-theme-living .blob.b2{ background:radial-gradient(circle, var(--sk2), transparent 65%)!important; }
+  .chipcage:not(.is-stock) .daycard-theme-living .blob.b3{ background:radial-gradient(circle, var(--sk3), transparent 65%)!important; }
+  .chipcage:not(.is-stock) .daycard-theme-living .blob.b4{ background:radial-gradient(circle, var(--sk4, var(--sk1)), transparent 66%)!important; }
+  .chipcage:not(.is-stock) .daycard-theme-living .blob.b5{ background:radial-gradient(circle, var(--sk2), transparent 68%)!important; opacity:.5!important; }
+  .chipcage:not(.is-stock) .daycard-theme-living .blob.b6{ opacity:0!important; }
+  .chipcage:not(.is-stock) .daycard-ns__plat{ opacity:var(--plat-op,.28)!important; }
+  /* the chips are a catalogue, not the user's card, so the app's "star not lit
+     yet" gate must not drain them. Specificity has to beat body:not(.ns-bloom). */
+  body:not(.ns-bloom) .strip .chip .chipcage .daycard-theme-living .daycard-ns__liquid,
+  body .strip .chip .chipcage .daycard-theme-living .daycard-ns__liquid{ opacity:1!important; }
+  body:not(.ns-bloom) .strip .chip .chipcage .daycard-theme-living .daycard-ns__rim,
+  body .strip .chip .chipcage .daycard-theme-living .daycard-ns__rim{ opacity:1!important; }
+  /* at 62px the halo is bigger than the card and every material reads white.
+     Kill the room light on the chips so the face is what you are choosing. */
+  .chipcage .daycard-wrap__aura, .chipcage .daycard-bloom{ opacity:0!important; }
+  .chipcage .daycard-living-stage{ box-shadow:none!important; }
+  .chipcage .daycard-ns__rim{ opacity:1!important;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.16)!important; }
+  .chipcage.flat .daycard-ns, .chipcage.void .daycard-ns{ box-shadow:none!important; }
+  .chipcage:not(.is-stock) .daycard-ns{ background:var(--face)!important; }
+
+  /* ── the customiser sheet. Held open from the card. Glass over a scrim, so
+     the card stays visible behind it and you can see what you are changing. */
+  .hint{ margin:26px 0 0; text-align:center; font-size:12.5px; color:var(--lo); }
+  .sheetwrap{ position:fixed; inset:0; z-index:60; display:flex;
+    align-items:flex-end; justify-content:center; }
+  .sheetwrap__scrim{ position:absolute; inset:0; background:rgba(4,5,7,.62);
+    backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
+    opacity:0; transition:opacity .22s ease-out; }
+  .sheetwrap.is-open .sheetwrap__scrim{ opacity:1; }
+  .sheet{ position:relative; width:100%; max-width:470px;
+    padding:10px 20px calc(20px + var(--safe-b));
+    border-radius:20px 20px 0 0;
+    background:rgba(16,18,23,.82);
+    backdrop-filter:blur(34px) saturate(1.5);
+    -webkit-backdrop-filter:blur(34px) saturate(1.5);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.09), 0 -20px 60px rgba(0,0,0,.6);
+    transform:translateY(102%); transition:transform .26s cubic-bezier(.32,.72,0,1); }
+  .sheetwrap.is-open .sheet{ transform:translateY(0); }
+  .sheet__grab{ display:block; width:38px; height:4px; margin:0 auto 14px;
+    border-radius:999px; background:rgba(255,255,255,.2); }
+  .sheet .strip{ margin:0 -20px; padding:2px 20px 12px; }
+  .sheet__done{ display:block; width:100%; margin:16px 0 0; padding:15px;
+    border:0; border-radius:13px; background:#f2f3f6; color:#0b0c0e;
+    font:inherit; font-size:15.5px; font-weight:650; cursor:pointer; }
+  @media (prefers-reduced-motion: reduce){
+    .sheet{ transition:none; } .sheetwrap__scrim{ transition:none; } }
+
+  /* pressing and holding the card: it gives, so the gesture is felt.
+     iOS kills a long press three separate ways, so all three are shut off:
+     the callout/magnifier, text selection, and the tap highlight. touch-action
+     stays pan-y so the page still scrolls when the finger actually moves. */
+  .cage{ transition:transform .18s ease-out;
+    touch-action:pan-y;
+    -webkit-touch-callout:none;
+    -webkit-user-select:none; user-select:none;
+    -webkit-tap-highlight-color:transparent; }
+  .cage *{ -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; }
+  .cage.is-pressing{ transform:scale(.968); }
+  /* the hint is also a button, so the customiser is never gesture-only */
+  .hint{ background:none; border:0; font:inherit; display:block; width:100%;
+    cursor:pointer; }
+
+  /* ── the bar. Glass, only a back arrow, the name arrives on scroll ─────── */
+  .bar{ position:sticky; top:0; z-index:20; display:flex; align-items:center; gap:12px;
+    height:52px; margin:0 -20px; padding:calc(var(--safe-t) + 4px) 14px 4px;
+    background:rgba(6,7,10,.62); backdrop-filter:blur(28px) saturate(1.4);
+    -webkit-backdrop-filter:blur(28px) saturate(1.4); }
+  .bar__back{ display:grid; place-items:center; width:34px; height:34px; border:0; padding:0;
+    border-radius:9px; background:var(--fill); box-shadow:var(--inset); color:var(--hi);
+    cursor:pointer; }
+  .bar__back svg{ width:17px; height:17px; }
+  .bar__title{ font-size:15px; font-weight:650; letter-spacing:-.01em; opacity:0;
+    transition:opacity .22s ease-out; }
+  .bar.is-scrolled .bar__title{ opacity:1; }
+
+  /* ── 1 · the card ─────────────────────────────────────────────────────── */
+  .hero{ padding:26px 0 0; }
+  .cage{ position:relative; width:min(74vw, 286px); margin:0 auto; }
+  .cage .daycard-wrap{ margin:0; width:100%; }
+  .cage .daycard-living-stage{ width:100% !important; margin:0; }
+  .cage .daycard-ns{ width:100%; min-height:0; aspect-ratio:320/452; margin:0; }
+  /* The shipped card hides the name outright (dashboard.css: display:none), so
+     this is new. It is cut INTO the face at the bottom-left: dark along the top
+     edge of each letter, a catch of light along the bottom, the way an
+     engraving reads. A maker's mark sits in a corner, not centred. */
+  .cage .daycard-ns__foot{ position:absolute; left:8.5%; right:auto; bottom:5.2%;
+    z-index:7; display:block; width:auto; text-align:left; }
+  .cage .daycard-ns__name{ display:inline; font-size:10.5px; font-weight:700;
+    letter-spacing:.15em; text-transform:uppercase;
+    color:color-mix(in srgb, var(--ink, rgba(24,28,36,.82)) 78%, transparent);
+    text-shadow: 0 -0.5px 0.6px rgba(0,0,0,.5), 0 1px 0.6px rgba(255,255,255,.26); }
+  /* on a dark face the engraving flips: the light catch goes on top */
+  .cage.flat .daycard-ns__name, .cage.void .daycard-ns__name{
+    text-shadow: 0 -0.5px 0.6px rgba(0,0,0,.75), 0 1px 0.6px rgba(255,255,255,.16); }
+
+  .hero__name{ margin:22px 0 7px; text-align:center; font-size:22px; font-weight:700;
+    letter-spacing:-.02em; }
+  .hero__sub{ margin:0; text-align:center; font-size:13.5px; line-height:1.55; color:var(--mid); }
+  /* the countdown ticks, because a number that moves is the whole argument */
+  /* a thin clock, not a sentence. Light weight and open tracking so the digits
+     read as a running timer rather than a statistic. */
+  #mori{ font-size:19px; font-weight:250; letter-spacing:.11em; color:var(--hi);
+    font-variant-numeric:tabular-nums; font-feature-settings:'tnum' 1; }
+
+  /* ── shared section head. Sentence case, no tracked kickers. ──────────── */
+  .sect{ margin:38px 0 12px; }
+  .sect h2{ margin:0 0 4px; font-size:17px; font-weight:680; letter-spacing:-.015em; }
+  .sect p{ margin:0; font-size:13.5px; line-height:1.5; color:var(--mid); }
+
+  /* ── their own note, in their own words, said back to them. No panel, no
+     label, no explanation. Italic is the only thing marking it as theirs. */
+  .note{ margin:26px auto 0; max-width:31ch; text-align:center;
+    font-size:16px; line-height:1.6; letter-spacing:-.008em; font-style:italic;
+    color:var(--hi); outline:none; }
+  .note:empty::before{ content:'Tap to write a note to yourself.';
+    font-style:italic; color:var(--lo); }
+  .note__d{ margin:10px 0 0; text-align:center; font-size:12.5px;
+    font-style:normal; color:var(--lo); }
+
+  /* ── 4 · the material ─────────────────────────────────────────────────── */
+  .strip{ display:flex; gap:11px; overflow-x:auto; scroll-snap-type:x mandatory;
+    margin:0 -20px; padding:4px 20px 14px; -webkit-overflow-scrolling:touch;
+    scrollbar-width:none; }
+  .strip::-webkit-scrollbar{ display:none; }
+  .chip{ flex:none; scroll-snap-align:center; width:62px; cursor:pointer;
+    background:none; border:0; padding:0; }
+  /* block, or the span's own line box adds a dead strip above the card that
+     the selected fill then paints as a grey bar */
+  .chipcage{ display:block; position:relative; width:62px; border-radius:10px; padding:3px;
+    background:transparent; transition:background .16s ease-out, transform .16s ease-out; }
+  .chip[aria-pressed="true"] .chipcage{ background:var(--fill-2); transform:translateY(-2px); }
+  .chipcage .daycard-wrap{ margin:0; width:100%; }
+  .chipcage .daycard-living-stage{ width:100% !important; margin:0; }
+  .chipcage .daycard-ns{ width:100%; min-height:0; aspect-ratio:320/452; margin:0;
+    border-radius:7px; clip-path:inset(0 round 7px); }
+  .chipcage .daycard-ns__foot, .chipcage .daycard-ns__body{ display:none; }
+  .chip__n{ display:block; margin-top:7px; font-size:10.5px; line-height:1.25;
+    color:var(--lo); letter-spacing:-.005em; }
+  .chip[aria-pressed="true"] .chip__n{ color:var(--hi); }
+
+  /* ring + mark: two small choices that ride on top of the material */
+  .tog{ display:flex; flex-wrap:wrap; gap:8px; margin:2px 0 14px; }
+  .tog__g{ display:flex; gap:2px; padding:2px; border-radius:999px;
+    background:var(--fill); box-shadow:var(--inset); }
+  .tog__g button{ font:inherit; font-size:12px; font-weight:620; letter-spacing:-.005em;
+    color:var(--mid); background:none; border:0; cursor:pointer;
+    padding:7px 13px; border-radius:999px; transition:background .15s ease-out; }
+  .tog__g button.on{ color:#0b0c0e; background:#f2f3f6; }
+
+  /* colour-matched ring: the rim and the room glow take the card's own colour */
+  body.ring-colour .cage .daycard-ns__rim{
+    box-shadow: inset 0 0 0 1.4px var(--edge, rgba(255,255,255,.85)),
+                inset 0 0 16px 2px color-mix(in srgb, var(--edge, #fff) 28%, transparent) !important; }
+  body.ring-colour .cage.flat .daycard-ns__rim{
+    box-shadow: inset 0 0 0 1.5px var(--edge, rgba(255,255,255,.9)) !important; }
+  /* the mark, pulled toward the card's colour. Tinted, never fully coloured. */
+  body.mark-tint .cage .daycard-ns__emblem path{
+    fill: color-mix(in srgb, var(--mark, #484f58) 72%, var(--edge, #ffffff) 28%) !important; }
+  body.mark-tint .cage .daycard-ns__name{
+    color: color-mix(in srgb, var(--ink, #333) 78%, var(--edge, #ffffff) 22%) !important; }
+
+  .matnote{ margin:2px 0 0; font-size:13px; line-height:1.5; color:var(--mid); }
+
+  /* ── 4 · the record ───────────────────────────────────────────────────── */
+  .tally{ margin:30px 0 0; display:grid; grid-template-columns:repeat(3,1fr); gap:2px;
+    border-radius:15px; overflow:hidden; }
+  .tal{ padding:14px 8px 13px; text-align:center; background:var(--fill); box-shadow:var(--inset); }
+  .tal b{ display:block; font-size:23px; font-weight:700; letter-spacing:-.03em; }
+  .tal span{ display:block; margin-top:3px; font-size:11.5px; line-height:1.3; color:var(--mid); }
+  /* the one number that can go back to zero tonight */
+  .tal.is-live b{ color:var(--cons); }
+
+  .trail{ margin:16px 0 0; }
+
+  /* ── a month. Closed it is one row that still shows its whole weight: a dot
+     per mark, and the count. Open it drops the full list underneath. */
+  .mo + .mo{ margin-top:2px; }
+  .mo__h{ display:flex; align-items:center; gap:11px; width:100%;
+    padding:13px 14px; border:0; border-radius:12px; cursor:pointer;
+    background:var(--fill); box-shadow:var(--inset); color:var(--hi);
+    font:inherit; text-align:left; transition:background .15s ease-out; }
+  .mo__h:active{ background:var(--fill-2); }
+  .mo__n{ flex:none; font-size:14px; font-weight:640; letter-spacing:-.01em; }
+  .mo__dots{ flex:1; min-width:0; display:flex; flex-wrap:wrap; gap:3px;
+    align-content:center; overflow:hidden; max-height:13px; }
+  .mo__dot{ width:5px; height:5px; border-radius:50%;
+    background:rgba(255,255,255,.24); }
+  .mo__dot.is-act{ background:var(--cons); }
+  .mo__dot.is-mark{ background:var(--act); }
+  .mo__dot.is-clar{ background:var(--clar); }
+  .mo__c{ flex:none; font-size:12.5px; color:var(--mid);
+    font-variant-numeric:tabular-nums; }
+  .mo__x{ flex:none; width:15px; height:15px; color:var(--lo);
+    transition:transform .2s ease-out; }
+  .mo.is-open .mo__x{ transform:rotate(180deg); }
+  .mo.is-open .mo__dots{ opacity:0; }
+  .mo__b{ display:none; padding:16px 2px 4px; }
+  .mo.is-open .mo__b{ display:block; }
+  @media (prefers-reduced-motion: reduce){ .mo__x{ transition:none; } }
+  .ev{ position:relative; display:flex; gap:13px; padding:0 0 15px 0; }
+  /* the spine: drawn on the row, stopping before the last one so it never
+     dangles past the final entry */
+  .ev::before{ content:''; position:absolute; left:5px; top:16px; bottom:-2px; width:1px;
+    background:rgba(255,255,255,.10); }
+  .ev:last-child::before{ display:none; }
+  .ev__dot{ flex:none; width:11px; height:11px; margin-top:4px; border-radius:50%;
+    background:rgba(255,255,255,.18); }
+  .ev__dot.is-act{ background:var(--cons); box-shadow:0 0 12px rgba(63,217,78,.45); }
+  .ev__dot.is-mark{ background:var(--act); box-shadow:0 0 12px rgba(238,242,251,.4); }
+  .ev__dot.is-clar{ background:var(--clar); box-shadow:0 0 12px rgba(58,217,245,.45); }
+  .ev__b{ flex:1; min-width:0; }
+  .ev__t{ display:block; font-size:14.5px; line-height:1.4; letter-spacing:-.01em; }
+  .ev__m{ display:block; margin-top:2px; font-size:12.5px; line-height:1.45; color:var(--mid); }
+  .ev__d{ flex:none; font-size:12.5px; color:var(--lo); padding-top:2px; }
+
+  /* ── the last block on the screen, and the oldest thing on it. Recessed
+     rather than raised: a well cut into the page, with the date struck INTO
+     the surface the same way the name is struck into the card. Same engraving
+     language, so the beginning and the object agree. */
+  .origin{ position:relative; margin:34px 0 0; padding:30px 22px 28px;
+    border-radius:18px; text-align:center; overflow:hidden;
+    background:linear-gradient(180deg, rgba(0,0,0,.34), rgba(0,0,0,.16));
+    box-shadow: inset 0 2px 3px rgba(0,0,0,.55),
+                inset 0 -1px 0 rgba(255,255,255,.07); }
+  /* one soft pool of the card's own light, radial so it never draws an edge */
+  .origin::before{ content:''; position:absolute; inset:0; pointer-events:none;
+    background:radial-gradient(76% 90% at 50% 118%,
+      color-mix(in srgb, var(--tint, #3ad9f5) 16%, transparent), transparent 72%); }
+  .origin > *{ position:relative; }
+  .origin__k{ display:block; font-size:12px; font-weight:600; color:var(--lo); }
+  .origin__d{ display:block; margin:9px 0 0; font-size:20px; font-weight:700;
+    letter-spacing:.14em; text-transform:uppercase; color:rgba(228,233,242,.9);
+    text-shadow: 0 -1px 1px rgba(0,0,0,.85), 0 1px 0.5px rgba(255,255,255,.16); }
+  .origin__t{ display:block; margin:9px 0 0; font-size:13px; color:var(--mid);
+    font-variant-numeric:tabular-nums; }
+
+  /* ── desktop: the same column, given air, with the card held beside it ── */
+  
 </style>
 <style id="pages">
 /* chapters */
@@ -968,23 +1291,32 @@
 @keyframes mm-receipt-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
 </style></head><body>
 <div class="wrap">
-  <h1>Looking back, rebuilt</h1>
-  <p class="lede">Five <b>complete pages</b>, not fifteen fragments. Same locked structure you chose:
-    then vs now first, reverse chronological, reflections as punctuation, one scroll that expands.
-    Ranked by an adversarial critic. Each frame scrolls on its own.</p>
-  <p class="lede">The last batch failed because they were charts. These are built to be a memoir:
-    named deeds, your own words, and eras of who you were trying to be.</p>
+  <h1>Looking back, inside the Memento view</h1>
+  <p class="lede">Each page shown where it actually lives: <b>the real Memento card on top</b>,
+    the countdown, your note, and the history beneath. Frames scroll on their own.</p>
+  <p class="lede"><button id="jump" class="jumpbtn" type="button">Scroll all frames to the history</button>
+    <span style="font-size:12.5px;color:var(--lo);margin-left:9px">the card sits above it, as it will in the app</span></p>
   <nav class="nav"><a href="#p-chapters">#1 The Book of Chapters</a><a href="#p-ledger">#2 The Ledger of Evidence</a><a href="#p-resurface">#3 Resurface</a><a href="#p-thenow">#4 Then, and now</a><a href="#p-receipt">#5 The Receipt</a></nav>
 
   <section class="pg" id="p-chapters">
-    <header class="pg__hd">
-      <span class="pg__rank">#1</span>
+    <header class="pg__hd"><span class="pg__rank">#1</span>
       <h2>The Book of Chapters</h2>
-      <p class="pg__th">A memoir of who they were trying to be, told as titled acts: the open chapter at the top with its named deeds and its wall of marks, closed volumes below it, and day one at the bottom in their own first words.</p>
-      <p class="pg__un"><b>Why it stops deletion.</b> Deleting it deletes the only record that &quot;I don&#x27;t think I can actually do this&quot; and &quot;Stopped negotiating with myself at 7am&quot; were written by the same person, 421 days apart, with 462 tally marks between them proving it.</p>
-    </header>
+      <p class="pg__th">A memoir of who they were trying to be, told as titled acts: the open chapter at the top with its named deeds and its wall of marks, closed volumes below it, and day one at the bottom in their own first words.</p></header>
     <div class="pg__row">
-      <div class="phone"><div class="phone__in"><div class="m mm-chapters">
+      <div class="phone"><div class="phone__in">
+        <div class="screen">
+          <header class="bar"><button class="bar__back" type="button" aria-label="Back">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+              stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+          </button><span class="bar__title">Your Memento</span></header>
+          <div class="hero"><div class="cage" id="heroCard-chapters"></div>
+            <p class="hero__name">Your Memento</p>
+            <p class="hero__sub"><span class="mori">20967:16:41:52</span></p>
+            <p class="note">I do not negotiate with myself before 7am. I open the laptop and I start,
+              and how I feel about it is not part of the decision.</p>
+            <p class="note__d">19 June</p>
+          </div>
+          <div class="memoir"><div class="m mm-chapters">
 
   <header class="mm-chapters__hero">
     <p class="mm-chapters__kept">You have kept this record for <b>421</b> days.</p>
@@ -1162,7 +1494,9 @@
     <p class="origin__now">This morning it asked for 1,000, and you are still here.</p>
   </section>
 
-</div></div></div>
+</div></div>
+        </div>
+      </div></div>
       <div class="pg__meta">
         <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>The event list is the memoir the brief actually asked for: a dated deed, then the sentence he wrote that day. &#x27;Raised the price. Nobody left. I had been scared of that for four months.&#x27; Nothing else in the five reads that human, and it is real data, not a metaphor.</li><li>Demoting the wall into a summary that reads &#x27;Every mark in this chapter, all 264&#x27; answers his own light-user constraint better than any other page. The count is stated in words, the grid is optional, so a sparse person is never confronted with their own sparseness.</li><li>&#x27;Still being written, day 205&#x27; on the open chapter, with closed volumes below it, gives the record a present tense. Eras were already the spine he blessed, and this is the version where one actually closes.</li></ul></div>
           <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>One chapter breaks the whole page. A user still holding their first star sees a hero where &#x27;The star you held&#x27; and &#x27;The star you hold&#x27; carry the same sentence on both sides, and a spine with nothing underneath the open chapter. That is the most common real state and there is no answer for it.</li><li>Two of the three deltas start at zero: 0 to 103 days, 0 to 318 of 421. Day one is zero by definition, so those rows report the passage of time rather than a change in the person. Only 200 to 1,000 words proves anything.</li><li>Opened, the wall is five tick classes (a, r, w, v, n) laid out in month grids with per-month counts. That is the colour-coded month chart he already killed, hidden behind a disclosure instead of fixed.</li></ul></div></div>
@@ -1171,14 +1505,24 @@
     </div>
   </section>
   <section class="pg" id="p-ledger">
-    <header class="pg__hd">
-      <span class="pg__rank">#2</span>
+    <header class="pg__hd"><span class="pg__rank">#2</span>
       <h2>The Ledger of Evidence</h2>
-      <p class="pg__th">A dated ledger of every real thing this person has done, 462 marks deep, opening on who they were against who they are and walking backwards month by month to the first 200 words.</p>
-      <p class="pg__un"><b>Why it stops deletion.</b> Deleting it deletes the only itemised, dated record that any of it happened: 462 named deeds in their own words, which no reinstall and no memory can reconstruct.</p>
-    </header>
+      <p class="pg__th">A dated ledger of every real thing this person has done, 462 marks deep, opening on who they were against who they are and walking backwards month by month to the first 200 words.</p></header>
     <div class="pg__row">
-      <div class="phone"><div class="phone__in"><div class="m mm-ledger">
+      <div class="phone"><div class="phone__in">
+        <div class="screen">
+          <header class="bar"><button class="bar__back" type="button" aria-label="Back">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+              stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+          </button><span class="bar__title">Your Memento</span></header>
+          <div class="hero"><div class="cage" id="heroCard-ledger"></div>
+            <p class="hero__name">Your Memento</p>
+            <p class="hero__sub"><span class="mori">20967:16:41:52</span></p>
+            <p class="note">I do not negotiate with myself before 7am. I open the laptop and I start,
+              and how I feel about it is not part of the decision.</p>
+            <p class="note__d">19 June</p>
+          </div>
+          <div class="memoir"><div class="m mm-ledger">
 
   <h1 class="mm-ledger__title">The record</h1>
   <p class="mm-ledger__span">12 June 2025 to 7 August 2026 &middot; 421 days</p>
@@ -1568,7 +1912,9 @@
     <p class="mm-ledger__end">Nothing below this. 421 days above it.</p>
   </section>
 
-</div></div></div>
+</div></div>
+        </div>
+      </div></div>
       <div class="pg__meta">
         <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>The wall of 462 marks is the one element he has already praised, and it arrives before any scrolling, sized so the volume registers as an object rather than as a number he has to read.</li><li>The hero pairs every fact on the same row, so 200 words against 1,000 words lands with no arithmetic. That is the single strongest then and now line produced across all five pages, and it is in the first screen.</li><li>The kinds list speaks in plain human language, &#x27;22 pictures of the life you want&#x27; and &#x27;8 times you stopped to remember it ends&#x27; rather than vivere adds and mori moments, so the by-kind information he liked arrives as memoir vocabulary.</li></ul></div>
           <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>A person with 40 marks fills two of the wall&#x27;s twenty-four rows. A layout built to say look how much then says look how little, in the loudest position on the page, and nothing about it changes shape for that person.</li><li>The wall uses two different tick shapes with no key anywhere on the page. The eye stops to decode a legend that does not exist, which is his &#x27;sore to understand what I am looking at&#x27; complaint reproduced in miniature.</li><li>The claim is 462 named deeds, but the top of the page shows 462 anonymous marks and the names only appear far below inside the chapters. The first screen asserts the evidence rather than showing any of it.</li></ul></div></div>
@@ -1577,14 +1923,24 @@
     </div>
   </section>
   <section class="pg" id="p-resurface">
-    <header class="pg__hd">
-      <span class="pg__rank">#3</span>
+    <header class="pg__hd"><span class="pg__rank">#3</span>
       <h2>Resurface</h2>
-      <p class="pg__th">The record opens by putting the sentence you wrote on day one beside the one you wrote this morning, then hands you a specific forgotten moment from a year ago today, then walks backwards through the two stars you have held, the weeks you showed up as strokes on a wall, and the moves you named, ending on day one.</p>
-      <p class="pg__un"><b>Why it stops deletion.</b> Deleting it deletes the only copy of a sentence he wrote a year ago and had completely forgotten, and the only proof that the day the app asked for 200 words became the day it asks for 1,000.</p>
-    </header>
+      <p class="pg__th">The record opens by putting the sentence you wrote on day one beside the one you wrote this morning, then hands you a specific forgotten moment from a year ago today, then walks backwards through the two stars you have held, the weeks you showed up as strokes on a wall, and the moves you named, ending on day one.</p></header>
     <div class="pg__row">
-      <div class="phone"><div class="phone__in"><div class="m mm-resurface">
+      <div class="phone"><div class="phone__in">
+        <div class="screen">
+          <header class="bar"><button class="bar__back" type="button" aria-label="Back">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+              stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+          </button><span class="bar__title">Your Memento</span></header>
+          <div class="hero"><div class="cage" id="heroCard-resurface"></div>
+            <p class="hero__name">Your Memento</p>
+            <p class="hero__sub"><span class="mori">20967:16:41:52</span></p>
+            <p class="note">I do not negotiate with myself before 7am. I open the laptop and I start,
+              and how I feel about it is not part of the decision.</p>
+            <p class="note__d">19 June</p>
+          </div>
+          <div class="memoir"><div class="m mm-resurface">
 
   <p class="mm-resurface__lede">Your record. 12 June 2025 to 7 August 2026. 421 days, kept by you.</p>
 
@@ -1825,7 +2181,9 @@
 
   <p class="mm-resurface__end">Nobody wrote any of this but you.</p>
 
-</div></div></div>
+</div></div>
+        </div>
+      </div></div>
       <div class="pg__meta">
         <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>&#x27;This came back today&#x27; is the only reason in the five to open the page a second time. Every other page is identical on every visit, which quietly makes them all a one-time reveal.</li><li>The resurfaced line is given distance rather than just displayed: written on day 57, and 52 more weeks and 405 more marks have happened since. That pairing of a forgotten sentence with how far he has travelled from it is the strongest single beat any of these produced.</li><li>The wall note names the two empty weeks and says &#x27;You came back both times&#x27;, which turns the gaps from evidence against him into part of the story. No other page has the nerve to point at a gap.</li></ul></div>
           <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>The mechanism has a hard cold start. Before roughly a year of use there is nothing to bring back, so the page&#x27;s whole differentiator is either empty or resurfacing something from three weeks ago, which reads as trivial. It fails hardest for exactly the users who most need keeping.</li><li>The weekly stroke wall, thirty spans each carrying its own stroke count, is a histogram of weeks drawn with tally marks. That is the same family as &#x27;field of days&#x27; and &#x27;everyday&#x27;, both of which he already threw out.</li><li>&#x27;Not this one&#x27; places a dismiss control in the middle of a memoir, and the page states no rule for what is safe to surface. A bad sentence from a bad week arriving on a bad day is a reason to delete the app, not to keep it.</li></ul></div></div>
@@ -1834,14 +2192,24 @@
     </div>
   </section>
   <section class="pg" id="p-thenow">
-    <header class="pg__hd">
-      <span class="pg__rank">#4</span>
+    <header class="pg__hd"><span class="pg__rank">#4</span>
       <h2>Then, and now</h2>
-      <p class="pg__th">The record read as one long paired comparison walking backwards in time: today&#x27;s ask beside day one&#x27;s ask, today&#x27;s sentence beside the first sentence, the goal held now beside the goal held then, so the person recognises themselves changing without being told they changed.</p>
-      <p class="pg__un"><b>Why it stops deletion.</b> Every pair on the page needs both halves to exist, and the left half was written by a version of him that no longer exists and cannot be asked to write it again.</p>
-    </header>
+      <p class="pg__th">The record read as one long paired comparison walking backwards in time: today&#x27;s ask beside day one&#x27;s ask, today&#x27;s sentence beside the first sentence, the goal held now beside the goal held then, so the person recognises themselves changing without being told they changed.</p></header>
     <div class="pg__row">
-      <div class="phone"><div class="phone__in"><div class="m mm-thenow">
+      <div class="phone"><div class="phone__in">
+        <div class="screen">
+          <header class="bar"><button class="bar__back" type="button" aria-label="Back">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+              stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+          </button><span class="bar__title">Your Memento</span></header>
+          <div class="hero"><div class="cage" id="heroCard-thenow"></div>
+            <p class="hero__name">Your Memento</p>
+            <p class="hero__sub"><span class="mori">20967:16:41:52</span></p>
+            <p class="note">I do not negotiate with myself before 7am. I open the laptop and I start,
+              and how I feel about it is not part of the decision.</p>
+            <p class="note__d">19 June</p>
+          </div>
+          <div class="memoir"><div class="m mm-thenow">
 
   <div class="mm-thenow__wrap">
 
@@ -2050,7 +2418,9 @@
     </section>
 
   </div>
-</div></div></div>
+</div></div>
+        </div>
+      </div></div>
       <div class="pg__meta">
         <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>&#x27;41 of your first 90&#x27; against &#x27;84 of your last 90&#x27; is the only rate comparison in the five. It survives the problem that everything else starts at zero, and it proves a changed person rather than an accumulated total.</li><li>&#x27;You are past 40. That was the number you named as the place you usually stop.&#x27; The page quotes his own stated fear back at him against the current number. One sentence, no graphic, and it does more than any block on the other four pages.</li><li>&#x27;You wrote both of those&#x27; after the two quotes finishes the emotional job of the hero in four words with no ornament at all.</li></ul></div>
           <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>Six large numerals in the first screen, each needing a left to right comparison with its own two-part label. The reader arrives and immediately starts computing, which is precisely the failure he named when he rejected the last fifteen.</li><li>Deeds are capped at &#x27;the last nine things you did for it&#x27;, so the volume he actually praised never appears anywhere. 462 marks are compressed into the summary line &#x27;263 marks since 14 January&#x27;, behind a disclosure.</li><li>&#x27;Same plan, five sizes. You have not been given the smallest one since October&#x27; explains the product&#x27;s mechanics inside what is meant to be a record of a life.</li></ul></div></div>
@@ -2059,14 +2429,24 @@
     </div>
   </section>
   <section class="pg" id="p-receipt">
-    <header class="pg__hd">
-      <span class="pg__rank">#5</span>
+    <header class="pg__hd"><span class="pg__rank">#5</span>
       <h2>The Receipt</h2>
-      <p class="pg__th">A statement of account for a year of a life: the opening balance of who they were against today&#x27;s closing balance, then every category counted exactly and every deed listed by date, walking backwards through the two stars they held until the page bottoms out on day one.</p>
-      <p class="pg__un"><b>Why it stops deletion.</b> Deleting it deletes 462 dated lines of what they actually did and the sentences they wrote on those days, and no reinstall, no export and no memory can reproduce a single one of them.</p>
-    </header>
+      <p class="pg__th">A statement of account for a year of a life: the opening balance of who they were against today&#x27;s closing balance, then every category counted exactly and every deed listed by date, walking backwards through the two stars they held until the page bottoms out on day one.</p></header>
     <div class="pg__row">
-      <div class="phone"><div class="phone__in"><div class="m mm-receipt">
+      <div class="phone"><div class="phone__in">
+        <div class="screen">
+          <header class="bar"><button class="bar__back" type="button" aria-label="Back">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+              stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+          </button><span class="bar__title">Your Memento</span></header>
+          <div class="hero"><div class="cage" id="heroCard-receipt"></div>
+            <p class="hero__name">Your Memento</p>
+            <p class="hero__sub"><span class="mori">20967:16:41:52</span></p>
+            <p class="note">I do not negotiate with myself before 7am. I open the laptop and I start,
+              and how I feel about it is not part of the decision.</p>
+            <p class="note__d">19 June</p>
+          </div>
+          <div class="memoir"><div class="m mm-receipt">
 
   <header>
     <h1 class="mm-receipt__h1">421 days on the record</h1>
@@ -2301,7 +2681,9 @@
     <p class="mm-receipt__d1foot">Nothing below this line. This is where the record starts.</p>
   </section>
 
-</div></div></div>
+</div></div>
+        </div>
+      </div></div>
       <div class="pg__meta">
         <div class="pc"><div class="pc__col pc__col--p"><span class="pc__h">Pros</span><ul><li>The leader-dot rows with a ruled total are the most instantly readable block in the five: label left, number right, nothing to decode. It renders the &#x27;by kind&#x27; information he liked as a statement rather than a graph.</li><li>&#x27;Paying users, as it moved&#x27;, as a dated running balance with each change and the new value, turns goal progress into a number changing over time with reasons attached. That beats the progress bars on every other page.</li><li>&#x27;The record does not count the days you only thought about it&#x27; earns its place. One dry line does the moral work with no graphic behind it.</li></ul></div>
           <div class="pc__col pc__col--c"><span class="pc__h">Cons</span><ul><li>The form is a bill. &#x27;Total 462&#x27; under a rule reads as an amount due, and the precision is bought at the cost of everything he asked for when he said very very personal and beautiful.</li><li>The named deeds, the only genuinely irreplaceable content, arrive after three screens of counts, quotes and a balance ledger. Anyone who stops scrolling early has seen nothing but arithmetic about themselves.</li><li>With 40 marks the account reads &#x27;Records broken 0, Mori moments 0, Total 40&#x27;. A zero on a ruled line reads as a failure in a way that an empty patch of wall never does, so the sparse user is handed a deficit notice.</li></ul></div></div>
@@ -2309,4 +2691,412 @@
       </div>
     </div>
   </section>
-</div></body></html>
+</div>
+<script>
+/* ── the app's real card markup, lifted verbatim ─────────────────────────── */
+function realCard(vars, o){
+  o = o || {};
+  const B = o.blobs || blobPlan(o.name || 'memento');
+  const style = Object.entries(vars).map(([k,v])=>k+':'+v).join(';');
+  const blobs = B.map((s,i)=>`<i class="blob b${i+1}" style="${s}"></i>`).join('');
+  return `<div class="daycard-wrap daycard-theme-living daycard-reveal daycard--bright" style="${style}">
+    <span class="daycard-wrap__aura" aria-hidden="true"></span>
+    <div class="daycard-living-stage">
+      <span class="daycard-bloom" aria-hidden="true">${blobs}</span>
+      <div class="daycard-ns">
+        <span class="daycard-ns__liquid" aria-hidden="true">${blobs}</span>
+        <span class="daycard-ns__iri" aria-hidden="true"></span>
+        <span class="daycard-ns__sheen" aria-hidden="true"></span>
+        <span class="daycard-ns__burn" aria-hidden="true"></span>
+        <span class="daycard-ns__plat" aria-hidden="true"></span>
+        <span class="daycard-ns__tint" aria-hidden="true"></span>
+        <span class="daycard-ns__rim" aria-hidden="true"></span>
+        <div class="daycard-ns__body">
+          <svg class="daycard-ns__emblem" viewBox="0 0 512 512" aria-hidden="true">
+            <path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path>
+          </svg>
+        </div>
+        <div class="daycard-ns__foot"><span class="daycard-ns__name">${o.name||''}</span></div>
+      </div>
+    </div>
+  </div>`;
+}
+function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+function rng(seed){let x=seed>>>0;return function(){x=(Math.imul(x,1664525)+1013904223)>>>0;return x/4294967296;};}
+function blobPlan(name){
+  const r=rng(hash((name||'memento')+'::blobs')), out=[];
+  for(let i=0;i<6;i++){
+    out.push(`transform:translate(${(r()*130-65).toFixed(1)}%,${(r()*130-65).toFixed(1)}%) scale(${(0.62+r()*0.95).toFixed(3)})`);
+  }
+  return out;
+}
+
+/* a handful of materials from the skin library, enough to show the picker */
+const MATS = [
+ /* The card as it ships. No material overrides at all: the app's own cyan and
+    green are the whole appearance, so the three earned layers ARE the colour. */
+ {n:'Default', stock:true, tint:'rgba(58,217,245,1)',
+  note:'The card as it ships. Its colour is whatever you have earned so far.'},
+ {n:'Toxic', tint:'rgba(190,255,60,1)', sk1:'rgba(190,255,60,1)', sk2:'rgba(120,255,140,.9)', sk3:'rgba(90,190,30,1)', sk4:'rgba(220,255,110,.85)',
+  plat:'.14', face:'linear-gradient(165deg,#0d1505,#060903)', mark:'rgba(246,255,226,.96)', ink:'rgba(228,255,190,.9)',
+  note:'Yours since the day you started. Assigned, not picked.'},
+ {n:'Void', tint:'rgba(0,0,0,1)', sk1:'none',sk2:'none',sk3:'none',sk4:'none', plat:'0', face:'#000000',
+  mark:'rgba(244,246,250,.97)', ink:'rgba(150,155,164,.62)', cls:'flat void',
+  edge:'rgba(0,0,0,1)', halo:'rgba(0,0,0,1)', note:'Emits nothing. The only card with no edge.'},
+ {n:'Gold', tint:'rgba(255,214,110,1)', sk1:'rgba(255,214,110,1)', sk2:'rgba(255,240,190,.9)', sk3:'rgba(190,140,30,1)', sk4:'rgba(255,228,150,.85)',
+  plat:'.3', face:'linear-gradient(165deg,#1a1408,#0b0904)', mark:'rgba(255,248,228,.96)', ink:'rgba(255,238,200,.9)',
+  note:'The heaviest material in the set.'},
+ {n:'Ice', tint:'rgba(150,205,255,1)', sk1:'rgba(150,205,255,1)', sk2:'rgba(220,240,255,.9)', sk3:'rgba(90,150,220,1)', sk4:'rgba(190,225,255,.85)',
+  plat:'.34', face:'linear-gradient(165deg,#0a1119,#05080c)', mark:'rgba(240,248,255,.96)', ink:'rgba(220,238,255,.9)',
+  note:'Cold and clear. Reads almost white in daylight.'},
+ {n:'Crimson', tint:'rgba(255,60,80,1)', sk1:'rgba(255,60,80,1)', sk2:'rgba(255,140,150,.9)', sk3:'rgba(160,20,40,1)', sk4:'rgba(255,110,120,.85)',
+  plat:'.16', face:'linear-gradient(165deg,#160508,#080204)', mark:'rgba(255,236,238,.96)', ink:'rgba(255,214,218,.9)',
+  note:'The loudest material. Not subtle, on purpose.'},
+ {n:'Matte Black', tint:'rgba(226,231,240,1)', sk1:'none',sk2:'none',sk3:'none',sk4:'none', plat:'0',
+  face:'linear-gradient(168deg,#1c1d20 0%,#141518 55%,#101113 100%)',
+  mark:'rgba(244,246,250,.97)', ink:'rgba(226,231,240,.75)', cls:'flat',
+  edge:'rgba(255,255,255,.92)', halo:'rgba(238,244,255,.40)',
+  note:'A solid object. No light inside it at all.'},
+ {n:'Emerald', tint:'rgba(0,220,130,1)', sk1:'rgba(0,220,130,1)', sk2:'rgba(120,255,200,.9)', sk3:'rgba(0,150,90,1)', sk4:'rgba(40,255,160,.85)',
+  plat:'.12', face:'linear-gradient(165deg,#03150e,#010806)', mark:'rgba(232,255,246,.95)', ink:'rgba(214,255,238,.9)',
+  note:'Deep and wet. Holds the M brighter than most.'},
+ {n:'Magenta', tint:'rgba(255,70,200,1)', sk1:'rgba(255,70,200,1)', sk2:'rgba(255,160,230,.9)', sk3:'rgba(170,20,130,1)', sk4:'rgba(255,120,215,.85)',
+  plat:'.2', face:'linear-gradient(165deg,#160418,#08020a)', mark:'rgba(255,236,250,.96)', ink:'rgba(255,214,244,.9)',
+  note:'Bright, close to the surface.'},
+];
+/* The app's own earned-state levels. These are what the three layers actually
+   set, so the card here is lit by the record, not by a hardcoded look. */
+function matVars(m, earned){
+  const e = earned || {clar:true, act:true, cons:true};
+  const n = (e.clar?1:0) + (e.act?1:0) + (e.cons?1:0);
+  /* Stock passes NO material overrides, so the app's own defaults render. */
+  if (m.stock) return {'--ink':'rgba(24,28,36,.82)',
+    '--clar': e.clar?'1':'0', '--act': e.act?'1':'0',
+    '--cons': e.cons?'1':'0', '--mix':'.9',
+    '--lit': n?String(0.34 + n*0.22):'0',
+    '--glow': n?'.7':'0', '--emit': n?'.7':'0', '--ring': n?'.5':'0'};
+  return {'--sk1':m.sk1,'--sk2':m.sk2,'--sk3':m.sk3,'--sk4':m.sk4,
+    '--plat-op': e.act ? m.plat : '0',
+    '--face':m.face,'--mark':m.mark,'--ink':m.ink,
+    '--edge':m.edge||m.sk1||'rgba(255,255,255,.9)',
+    '--halo':m.halo||(m.sk1&&m.sk1!=='none'?m.sk1:'rgba(238,244,255,.34)'),
+    /* A material owns the hue outright. The app's own cyan/platinum/green
+       washes stay OFF here, or they bleed through and muddy the face (the
+       green haze at the foot of Crimson). What the earned layers still drive
+       is how much light there is, which is what the copy claims. */
+    '--clar':'0', '--act':'0', '--cons':'0', '--mix':'.9',
+    '--lit': n?String(0.34 + n*0.22):'0',
+    '--glow': n?'.7':'0', '--emit': n?'.7':'0', '--ring': n?'.5':'0'};
+}
+
+/* ── the earned layers. Real order: cyan at Clarity, platinum when the Action
+   plan is revealed, green on the first completed move. ─────────────────── */
+/* all three pillars are held; the card renders fully lit. */
+const earned = {clar:true, act:true, cons:true};
+
+/* ── the record. Only event types the app actually writes
+   (action-complete, proof, reflection-save, vivere, mori-moment,
+   weekly-review, new-record, distraction-log, deepwork-commit).
+   Generated across the whole 47 days so the page shows ALL of it: the volume
+   IS the argument, and a "show more" button hides exactly the thing that makes
+   the record hard to walk away from. ───────────────────────────────────── */
+const MOVES = [
+  'Sent the pricing email', 'Cut the third feature', 'Called the two churned users',
+  'Shipped the waitlist page', 'Wrote the first offer', 'Rewrote the landing headline',
+  'Recorded the demo in one take', 'Deleted the settings screen nobody opened',
+  'Asked ten people what they would pay', 'Fixed the signup that dropped 40%',
+  'Wrote to the four people who replied', 'Closed the tab and finished the migration',
+  'Shipped the paywall', 'Answered every support email', 'Cut the onboarding to three screens',
+  'Moved the deadline in instead of out', 'Wrote the follow-up nobody wanted to write',
+  'Killed the feature I spent a week on', 'Published the thing before it was ready',
+  'Turned off notifications until noon', 'Did the hard call first',
+  'Shipped the fix on the phone', 'Wrote the second offer', 'Raised the price',
+  'Sat with the numbers instead of guessing', 'Said no to the collaboration',
+  'Rebuilt the card render', 'Took the whole afternoon on one paragraph',
+  'Sent the cold email to the list of nine', 'Shipped without asking anyone first'
+];
+const REFLECTIONS = [
+  'Stopped negotiating with myself at 7am.', 'Wanted to quit at 3pm and did not.',
+  'The work was boring today. Did it anyway.', 'Realised I was busy, not working.',
+  'Two hours of real focus beats a full day of touching things.',
+  'I keep reaching for the easy task first.', 'Nobody is coming. That is fine.',
+  'The fear was about being seen, not about the work.',
+  'Shipped something I would have sat on a month ago.',
+  'Tired is not the same as done.', 'Did it badly and it still counted.',
+  'I do not need to feel ready.'
+];
+const OTHER = [
+  ['weekly-review', 'Weekly review', ['Four moves done, one dropped', 'Five moves, none dropped', 'Three moves. Slower week.']],
+  ['distraction-log', 'Distraction logged', ['Opened the analytics tab 9 times before noon', 'Two hours gone to a rabbit hole', 'Phone in the other room from now on']],
+  ['vivere', 'Vision board', ['Added: the room with one desk in it', 'Added: the first thousand', 'Added: a morning nobody else owns']],
+  ['deepwork-commit', 'Deep work booked', ['Two hours, no phone', 'Ninety minutes before anyone was awake']],
+  ['mori-moment', 'Memento Mori', ['Looked at the weeks left', 'Twenty thousand days is not many']]
+];
+const MARKS = {
+  '2026-06-19': ['clar', 'Ignition', 'You signed and ignited your Neutron Star'],
+  '2026-06-21': ['mark', 'The platinum arrived', 'Your first plan was revealed'],
+  '2026-07-04': ['mark', 'The green arrived', 'Seven days unbroken. The card changed.'],
+  '2026-07-18': ['mark', 'New longest run', '14 days, past the old record of 9'],
+  '2026-08-01': ['mark', 'New longest run', '21 days, past the old record of 14']
+};
+
+const MONTHS = ['January','February','March','April','May','June','July','August',
+  'September','October','November','December'];
+const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+function buildTrail(){
+  const r = rng(hash('trail-v2'));
+  const start = new Date(2026, 5, 19), today = new Date(2026, 7, 4);
+  const out = [];
+  for (let d = new Date(today); d >= start; d.setDate(d.getDate() - 1)){
+    const iso = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0')
+              + '-' + String(d.getDate()).padStart(2,'0');
+    const stamp = DAYS[d.getDay()] + ' ' + d.getDate();
+    const day = [];
+    if (MARKS[iso]){
+      const [k, t, m] = MARKS[iso];
+      day.push({k, t, m, d: stamp});
+    }
+    // the move for the day, on most days
+    if (r() > 0.19) day.push({k:'act', t: MOVES[Math.floor(r()*MOVES.length)],
+      m:'Action · the move for the day', d: stamp});
+    // a reflection now and then
+    if (r() > 0.72) day.push({k:'', t:'Reflection',
+      m:'\u201c' + REFLECTIONS[Math.floor(r()*REFLECTIONS.length)] + '\u201d', d: stamp});
+    // everything else, sparsely
+    if (r() > 0.79){
+      const o = OTHER[Math.floor(r()*OTHER.length)];
+      day.push({k:'', t:o[1], m:o[2][Math.floor(r()*o[2].length)], d: stamp});
+    }
+    if (day.length) out.push({mon: MONTHS[d.getMonth()], evs: day});
+  }
+  // group consecutive days under one month heading
+  const groups = [];
+  out.forEach(day=>{
+    const last = groups[groups.length-1];
+    if (last && last.mon === day.mon) last.evs.push(...day.evs);
+    else groups.push({mon: day.mon, evs: day.evs.slice()});
+  });
+  return groups;
+}
+const TRAIL = buildTrail();
+
+let cur = 0;
+
+function paint(){
+  const m = MATS[cur];
+  const n = (earned.clar?1:0) + (earned.act?1:0) + (earned.cons?1:0);
+  /* The app's own gate: before the star is lit the card emits nothing at all.
+     Turning the cyan off here does exactly what a blank pre-Clarity card does. */
+  document.body.classList.toggle('ns-bloom', earned.clar);
+  document.body.classList.toggle('is-void', m.n === 'Void');
+  /* the chosen material lights the whole page */
+  document.documentElement.style.setProperty('--tint', m.tint || '#3ad9f5');
+
+  const cage = document.querySelectorAll('.cage')[0];
+  cage.innerHTML = realCard(matVars(m, earned), {name:'Malik Peace'});
+  cage.className = 'cage ' + (m.cls||'') + (m.stock ? ' is-stock' : '');
+
+  document.getElementById('matNote').textContent = m.note;
+
+  /* The layers section has to stay true whichever material is on. On the stock
+     card the three ARE the colour. On any other, they still set how much light
+     it gives off, so the dates never become a claim about a colour that is not
+     on screen. */
+  document.querySelectorAll('.chip').forEach((c,i)=>
+    c.setAttribute('aria-pressed', i===cur ? 'true' : 'false'));
+}
+
+/* the strip */
+document.getElementById('strip').innerHTML = MATS.map((m,i)=>
+  `<button class="chip" type="button" aria-pressed="false" data-i="${i}">
+     <span class="chipcage ${m.cls||''}${m.stock?' is-stock':''}">${realCard(matVars(m), {name:''})}</span>
+     <span class="chip__n">${m.n}</span>
+   </button>`).join('');
+document.getElementById('strip').addEventListener('click', e=>{
+  const b = e.target.closest('.chip'); if(!b) return;
+  cur = +b.dataset.i; paint();
+});
+
+/* the layers */
+/* the trail, all of it */
+/* Collapsed by month, newest open. The full weight still reads at a glance,
+   because a closed month carries its count AND a dot for every mark in it, so
+   nothing is hidden, it is compressed. Scrolling past 66 rows to reach the
+   bottom of the screen was the problem; losing the evidence would be worse. */
+const TOTAL_MARKS = TRAIL.reduce((n,g)=>n+g.evs.length,0);
+const evHtml = e =>
+  `<div class="ev"><span class="ev__dot ${e.k?'is-'+e.k:''}"></span>
+     <span class="ev__b"><span class="ev__t">${e.t}</span>
+       <span class="ev__m">${e.m}</span></span>
+     <span class="ev__d">${e.d}</span></div>`;
+
+document.getElementById('trail').innerHTML = TRAIL.map((g,i)=>
+  `<section class="mo${i===0?' is-open':''}">
+     <button class="mo__h" type="button">
+       <span class="mo__n">${g.mon}</span>
+       <span class="mo__dots">${g.evs.map(e=>
+         `<i class="mo__dot ${e.k?'is-'+e.k:''}"></i>`).join('')}</span>
+       <span class="mo__c">${g.evs.length}</span>
+       <svg class="mo__x" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
+            aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+     </button>
+     <div class="mo__b">${g.evs.map(evHtml).join('')}</div>
+   </section>`).join('');
+
+document.getElementById('trail').addEventListener('click', e=>{
+  const h = e.target.closest('.mo__h'); if(!h) return;
+  h.parentElement.classList.toggle('is-open');
+});
+
+/* ── Memento Mori. The app already models birth year and life expectancy
+   (moriYearsRemaining in js/06), so this is the same number, ticking. Plain
+   total days plus the clock: two figures, both of them falling. ─────────── */
+const BIRTH_YEAR = 2004, LIFE_EXPECTANCY = 80;
+const END = new Date(BIRTH_YEAR + LIFE_EXPECTANCY, 0, 1).getTime();
+const moriEl = document.getElementById('mori');
+function tickMori(){
+  const ms = Math.max(0, END - Date.now());
+  const rest = ms % 86400000;
+  const p = n => String(n).padStart(2, '0');
+  moriEl.textContent = Math.floor(ms / 86400000)
+    + ':' + p(Math.floor(rest/3600000))
+    + ':' + p(Math.floor(rest%3600000/60000))
+    + ':' + p(Math.floor(rest%60000/1000));
+}
+tickMori();
+setInterval(tickMori, 1000);
+
+/* ── hold the card to open the customiser. The card gives under the finger so
+   the gesture is felt before the sheet arrives. A plain tap does nothing, or
+   every scroll that starts on the card would open it.
+
+   Why this is not just pointerdown/pointerup: on iOS a long press competes with
+   the selection callout, and pointerleave fires on a pixel of jitter, which
+   killed the hold before it ever completed. So the press cancels on real
+   MOVEMENT (12px) rather than on leaving the element, listens to touch events
+   as well as pointer events, and takes contextmenu as a second way in. */
+const wrap = document.getElementById('sheetWrap');
+const cage = document.querySelectorAll('.cage')[0];
+const HOLD_MS = 380, SLOP = 12;
+let holdT = null, sx = 0, sy = 0, armed = false;
+
+function openSheet(){
+  holdT = null; armed = false;
+  cage.classList.remove('is-pressing');
+  wrap.hidden = false;
+  /* force a reflow so the closed transform is committed before the open class
+     lands, otherwise the sheet jumps into place with no slide. rAF is not
+     reliable here: a throttled or non-painting frame swallows it. */
+  void wrap.offsetHeight;
+  wrap.classList.add('is-open');
+  try{ navigator.vibrate && navigator.vibrate(8); }catch(e){}
+}
+function closeSheet(){
+  wrap.classList.remove('is-open');
+  setTimeout(()=>{ wrap.hidden = true; }, 280);
+}
+function pressStart(x, y){
+  if (armed) return;
+  armed = true; sx = x; sy = y;
+  cage.classList.add('is-pressing');
+  clearTimeout(holdT);
+  holdT = setTimeout(openSheet, HOLD_MS);
+}
+function pressMove(x, y){
+  if (!armed) return;
+  if (Math.abs(x - sx) > SLOP || Math.abs(y - sy) > SLOP) pressEnd();
+}
+function pressEnd(){
+  armed = false;
+  cage.classList.remove('is-pressing');
+  clearTimeout(holdT); holdT = null;
+}
+
+/* touch first: iOS fires these reliably even when pointer events get cancelled */
+cage.addEventListener('touchstart', e=>{
+  const t = e.touches[0]; if(t) pressStart(t.clientX, t.clientY);
+}, {passive:true});
+cage.addEventListener('touchmove', e=>{
+  const t = e.touches[0]; if(t) pressMove(t.clientX, t.clientY);
+}, {passive:true});
+['touchend','touchcancel'].forEach(ev=>
+  cage.addEventListener(ev, pressEnd, {passive:true}));
+
+/* mouse/pen for everything else. pointerdown is ignored for touch so the two
+   paths can never both arm the same press. */
+cage.addEventListener('pointerdown', e=>{
+  if (e.pointerType === 'touch') return;
+  pressStart(e.clientX, e.clientY);
+});
+addEventListener('pointermove', e=>{
+  if (e.pointerType === 'touch') return;
+  pressMove(e.clientX, e.clientY);
+});
+['pointerup','pointercancel'].forEach(ev=>
+  addEventListener(ev, e=>{ if(e.pointerType !== 'touch') pressEnd(); }));
+
+/* if a platform gets to its own long-press menu first, take that as the hold */
+cage.addEventListener('contextmenu', e=>{
+  e.preventDefault();
+  if (wrap.hidden) openSheet();
+});
+
+/* and a plain tappable way in, so the customiser is never gesture-only */
+document.getElementById('hintBtn').addEventListener('click', openSheet);
+
+document.getElementById('sheetScrim').addEventListener('click', closeSheet);
+document.getElementById('sheetDone').addEventListener('click', closeSheet);
+addEventListener('keydown', e=>{ if(e.key === 'Escape' && !wrap.hidden) closeSheet(); });
+
+/* ring + mark toggles */
+[['ringTog','ring-colour'], ['markTog','mark-tint']].forEach(([id, cls])=>{
+  const g = document.getElementById(id);
+  g.addEventListener('click', e=>{
+    const b = e.target.closest('button'); if(!b) return;
+    document.body.classList.toggle(cls, b.dataset.v === '1');
+    g.querySelectorAll('button').forEach(x=>x.classList.toggle('on', x === b));
+  });
+});
+
+/* the promise: the meta line has nothing to report until something is written */
+const pT = document.getElementById('promiseT'), pM = document.getElementById('promiseM');
+function promiseState(){
+  const has = pT.textContent.trim().length > 0;
+  pM.textContent = has ? '19 June' : '';
+}
+pT.addEventListener('input', promiseState);
+promiseState();
+
+/* the bar title arrives once the card has gone */
+const bar = document.getElementById('bar');
+addEventListener('scroll', ()=>{
+  bar.classList.toggle('is-scrolled', scrollY > 230);
+}, {passive:true});
+
+paint();
+</script>
+<script>
+(function(){
+  // paint the real app card into every frame
+  var m = MATS[0];
+  document.querySelectorAll('.cage').forEach(function(cage){
+    cage.className = 'cage is-stock';
+    cage.innerHTML = realCard(matVars(m, {clar:true,act:true,cons:true}), {name:'Malik Peace'});
+  });
+  document.body.classList.add('ns-bloom');
+})();
+</script>
+<script>
+document.getElementById('jump').addEventListener('click',function(){
+  var on=this.dataset.on==='1';
+  document.querySelectorAll('.phone__in').forEach(function(f){
+    var m=f.querySelector('.memoir');
+    f.scrollTo({top: on?0:(m.offsetTop-8), behavior:'smooth'});
+  });
+  this.dataset.on=on?'0':'1';
+  this.textContent=on?'Scroll all frames to the history':'Back to the top of each frame';
+});
+</script>
+</body></html>
