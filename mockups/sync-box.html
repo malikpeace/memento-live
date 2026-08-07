@@ -1042,15 +1042,20 @@
   .v-nf .pb{margin:16px 0 0;height:5px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
   .v-nf .pb i{display:block;height:100%;border-radius:999px;background:#3fd94e}
   .v-nf .pb-l{display:flex;justify-content:space-between;margin:7px 0 0;font-size:11.5px;color:rgba(255,255,255,.4)}
+  .look{display:inline-block;margin-left:9px;padding:3px 9px;border-radius:999px;font-size:10.5px;font-weight:800;letter-spacing:.02em}
+  .look--new{background:#ffd866;color:#1a1405}
+  .look--check{background:rgba(255,216,102,.16);color:#ffd866}
+  .slot.look-new .phone{box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 10px 34px rgba(0,0,0,.5),0 0 0 2px #ffd866}
+  .slot:not(.look-new):not(.look-check){opacity:.38}
+  .slot:not(.look-new):not(.look-check):hover{opacity:1}
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>The sync box</h1>
-  <p class="lede">Grouped by the person's situation. The pill on each card says which
-    of the three faces it is: <b style="color:#dfe6f5">Action</b>,
-    <b style="color:#a8ecfa">Clarity</b>, <b style="color:#8ee79a">Consistency</b>.
-    A gold star marks the one I would ship for that situation.</p>
+  <p class="lede"><b style="color:#ffd866">Only the marked cards need your eyes.</b>
+ Solid gold "LOOK: new" = two genuinely new designs. Faint gold "CHECK: your tweak" = your own
+ requested changes, confirm they landed. Everything dimmed is settled; hover to see it anyway.</p>
   <nav class="nav"><a href="#s-num-dl">A number and a deadline</a><a href="#s-num">A number, no deadline</a><a href="#s-rule">A rule to hold</a><a href="#s-rate">A rate to keep</a><a href="#s-event">An event to reach</a><a href="#s-open">Nothing to count</a><a href="#s-edge">Days one, off, and stalled</a><a href="#s-day1">Day one</a></nav>
   <section class="sect" id="s-day1">
     <header class="sect__hd"><h2>Day one, every kind of person</h2>
@@ -1075,8 +1080,8 @@
   <p class="c-meta">Day 1. The first weigh-in is Thursday.</p></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
         </div>
         <div class="slot__meta"><p class="bf">The math is complete before any history exists. Day one shows the plan, not progress.</p></div>
-      </figure><figure class="slot" id="d1-ndl-k">
-        <figcaption class="slot__cap"><span class="pil pil--cons">Consistency</span><span class="slot__t">The record starts</span><span class="tag tag--day">day 1</span></figcaption>
+      </figure><figure class="slot look-check" id="d1-ndl-k">
+        <figcaption class="slot__cap"><span class="look look--check">CHECK: your tweak</span><span class="pil pil--cons">Consistency</span><span class="slot__t">The record starts</span><span class="tag tag--day">day 1</span></figcaption>
         <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
           <section class="cc-card"><div class="v v-nf"><div class="d-row"><span class="d-big" style="font-size:48px">Day 1</span></div>
@@ -1092,8 +1097,8 @@
   <button class="a-btn" type="button">Mark it done</button></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
         </div>
         <div class="slot__meta"><p class="bf">Identical on day one. The move never needed history.</p></div>
-      </figure><figure class="slot" id="d1-n-c">
-        <figcaption class="slot__cap"><span class="pil pil--clar">Clarity</span><span class="slot__t">Distance to the number</span><span class="tag tag--day">day 1</span></figcaption>
+      </figure><figure class="slot look-check" id="d1-n-c">
+        <figcaption class="slot__cap"><span class="look look--check">CHECK: your tweak</span><span class="pil pil--clar">Clarity</span><span class="slot__t">Distance to the number</span><span class="tag tag--day">day 1</span></figcaption>
         <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
           <section class="cc-card"><div class="v v-nf"><p class="c-star">Get to 100 paying users.</p>
@@ -1101,8 +1106,8 @@
  <p class="d-foot">Day 1. The counter moves when the first person starts paying.</p></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
         </div>
         <div class="slot__meta"><p class="bf">Zero of 100 is honest and correct. No pace line until there are two data points.</p></div>
-      </figure><figure class="slot" id="d1-n-k">
-        <figcaption class="slot__cap"><span class="pil pil--cons">Consistency</span><span class="slot__t">The first mark</span><span class="tag tag--day">day 1</span></figcaption>
+      </figure><figure class="slot look-new" id="d1-n-k">
+        <figcaption class="slot__cap"><span class="look look--new">LOOK: new</span><span class="pil pil--cons">Consistency</span><span class="slot__t">The first mark</span><span class="tag tag--day">day 1</span></figcaption>
         <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
           <section class="cc-card"><div class="v v-nf"><p class="a-move" style="font-size:17px">Tonight&rsquo;s move is the first mark.</p>
@@ -1130,8 +1135,8 @@
   <p class="c-cost">Day 1. The cost of breaking it grows from here.</p></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
         </div>
         <div class="slot__meta"><p class="bf">The why carries the face before any days exist to lose.</p></div>
-      </figure><figure class="slot" id="d1-r-k">
-        <figcaption class="slot__cap"><span class="pil pil--cons">Consistency</span><span class="slot__t">Day one of the line</span><span class="tag tag--day">day 1</span></figcaption>
+      </figure><figure class="slot look-check" id="d1-r-k">
+        <figcaption class="slot__cap"><span class="look look--check">CHECK: your tweak</span><span class="pil pil--cons">Consistency</span><span class="slot__t">Day one of the line</span><span class="tag tag--day">day 1</span></figcaption>
         <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
           <section class="cc-card"><div class="v v-nf"><div class="d-row"><span class="d-big" style="font-size:48px">Day 1</span><span class="d-lbl">more<br>to come</span></div>
@@ -1156,16 +1161,16 @@
   <p class="c-meta">Your word, as of today</p></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
         </div>
         <div class="slot__meta"><p class="bf">Identical on day one.</p></div>
-      </figure><figure class="slot" id="d1-rt-k">
-        <figcaption class="slot__cap"><span class="pil pil--cons">Consistency</span><span class="slot__t">Week one</span><span class="tag tag--day">day 1</span></figcaption>
+      </figure><figure class="slot look-check" id="d1-rt-k">
+        <figcaption class="slot__cap"><span class="look look--check">CHECK: your tweak</span><span class="pil pil--cons">Consistency</span><span class="slot__t">Week one</span><span class="tag tag--day">day 1</span></figcaption>
         <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
           <section class="cc-card"><div class="v v-nf"><div class="d-row"><span class="d-big" style="color:#3fd94e">0</span><span class="d-lbl">of 3,<br>week one</span></div>
  <p class="d-foot" style="font-size:13.5px">Three sessions make a perfect first week. Rest days will not count against you.</p></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
         </div>
         <div class="slot__meta"><p class="bf">States the contract on day one so the quiet days never read as failure later.</p></div>
-      </figure></div></div><div class="d1grp"><h3>An event to reach</h3><p class="d1eg">keep bees by spring, decided today</p><div class="grid"><figure class="slot" id="d1-e-a">
-        <figcaption class="slot__cap"><span class="pil pil--act">Action</span><span class="slot__t">The part</span><span class="tag tag--day">day 1</span></figcaption>
+      </figure></div></div><div class="d1grp"><h3>An event to reach</h3><p class="d1eg">keep bees by spring, decided today</p><div class="grid"><figure class="slot look-check" id="d1-e-a">
+        <figcaption class="slot__cap"><span class="look look--check">CHECK: your tweak</span><span class="pil pil--act">Action</span><span class="slot__t">The part</span><span class="tag tag--day">day 1</span></figcaption>
         <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
           <section class="cc-card"><div class="v v-nf"><p class="a-sup" style="margin:0">Keep bees by spring &middot; part 1 of 4</p>
@@ -1174,8 +1179,8 @@
   <button class="a-btn" type="button">Mark it done</button></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
         </div>
         <div class="slot__meta"><p class="bf">Works day one: the acts exist the moment the plan is made.</p></div>
-      </figure><figure class="slot" id="d1-e-c">
-        <figcaption class="slot__cap"><span class="pil pil--clar">Clarity</span><span class="slot__t">The parts</span><span class="tag tag--day">day 1</span></figcaption>
+      </figure><figure class="slot look-check" id="d1-e-c">
+        <figcaption class="slot__cap"><span class="look look--check">CHECK: your tweak</span><span class="pil pil--clar">Clarity</span><span class="slot__t">The parts</span><span class="tag tag--day">day 1</span></figcaption>
         <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
           <section class="cc-card"><div class="v v-nf"><p class="c-star" style="font-size:18px">Keep bees by spring.</p>
@@ -1183,8 +1188,8 @@
   <p class="d-foot">Part one began today. The whole path is known before any of it is walked.</p></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
         </div>
         <div class="slot__meta"><p class="bf">The path is the day-one gift: they can see the entire shape of the goal immediately.</p></div>
-      </figure><figure class="slot" id="d1-e-k">
-        <figcaption class="slot__cap"><span class="pil pil--cons">Consistency</span><span class="slot__t">Days till</span><span class="tag tag--day">day 1</span></figcaption>
+      </figure><figure class="slot look-check" id="d1-e-k">
+        <figcaption class="slot__cap"><span class="look look--check">CHECK: your tweak</span><span class="pil pil--cons">Consistency</span><span class="slot__t">Days till</span><span class="tag tag--day">day 1</span></figcaption>
         <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
           <section class="cc-card"><div class="v v-nf v-cdt"><span class="d-big">231</span><span class="d-lbl">days till spring</span>
@@ -1209,8 +1214,8 @@
   <p class="c-meta">Signed today. The evidence starts tonight.</p></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
         </div>
         <div class="slot__meta"><p class="bf">The why is the whole face on day one, which is exactly right for an open goal.</p></div>
-      </figure><figure class="slot" id="d1-o-k">
-        <figcaption class="slot__cap"><span class="pil pil--cons">Consistency</span><span class="slot__t">The first thing</span><span class="tag tag--day">day 1</span></figcaption>
+      </figure><figure class="slot look-check" id="d1-o-k">
+        <figcaption class="slot__cap"><span class="look look--check">CHECK: your tweak</span><span class="pil pil--cons">Consistency</span><span class="slot__t">The first thing</span><span class="tag tag--day">day 1</span></figcaption>
         <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
           <section class="cc-card"><div class="v v-nf"><div class="d-row"><span class="d-big">1</span><span class="d-lbl">good day,<br>starting tonight</span></div>
@@ -1222,8 +1227,8 @@
 
   <section class="sect" id="s-num-dl">
     <header class="sect__hd"><h2>A number and a deadline</h2><p>lose 40 lbs in 6 months, $10k by December</p></header>
-    <div class="grid"><figure class="slot slot--pick" id="consistency-arrival-dl">
-        <figcaption class="slot__cap"><span class="pil pil--cons">Consistency</span><span class="slot__t">Arrival, moving</span><svg class="star" width="12" height="12" viewBox="0 0 24 24" fill="#ffd866" aria-label="recommended"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg><span class="tag tag--new">new</span></figcaption>
+    <div class="grid"><figure class="slot slot--pick look-new" id="consistency-arrival-dl">
+        <figcaption class="slot__cap"><span class="look look--new">LOOK: new</span><span class="pil pil--cons">Consistency</span><span class="slot__t">Arrival, moving</span><svg class="star" width="12" height="12" viewBox="0 0 24 24" fill="#ffd866" aria-label="recommended"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg><span class="tag tag--new">new</span></figcaption>
         <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
           <section class="cc-card"><div class="v v-nf">
@@ -1317,8 +1322,8 @@
 </div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
         </div>
         <div class="slot__meta"><p class="bf">Anyone whose signed date the math cannot survive, especially weight and money<span class="bf__x">Skip if The deadline is already achievable</span></p></div>
-      </figure><figure class="slot" id="consistency-cadence-week-dl">
-        <figcaption class="slot__cap"><span class="pil pil--cons">Consistency</span><span class="slot__n">N1</span>
+      </figure><figure class="slot look-check" id="consistency-cadence-week-dl">
+        <figcaption class="slot__cap"><span class="look look--check">CHECK: your tweak</span><span class="pil pil--cons">Consistency</span><span class="slot__n">N1</span>
           <span class="slot__t">Your schedule, kept</span>
           <span class="tag tag--new">new</span></figcaption>
         <div class="phone">
@@ -1346,8 +1351,8 @@
   </section>
   <section class="sect" id="s-num">
     <header class="sect__hd"><h2>A number, no deadline</h2><p>100 paying users, read 50 books</p></header>
-    <div class="grid"><figure class="slot" id="star-star-arrival">
-        <figcaption class="slot__cap"><span class="pil pil--clar">Clarity</span><span class="slot__n">06</span>
+    <div class="grid"><figure class="slot look-check" id="star-star-arrival">
+        <figcaption class="slot__cap"><span class="look look--check">CHECK: your tweak</span><span class="pil pil--clar">Clarity</span><span class="slot__n">06</span>
           <span class="slot__t">Arrival date</span></figcaption>
         <div class="phone">
           <div class="phone__glow" aria-hidden="true"></div>
@@ -1665,8 +1670,8 @@
   </section>
   <section class="sect" id="s-event">
     <header class="sect__hd"><h2>An event to reach</h2><p>pass the bar, first hive, publish the book</p></header>
-    <div class="grid"><figure class="slot slot--pick" id="today-n-act">
-        <figcaption class="slot__cap"><span class="pil pil--act">Action</span><span class="slot__t">The part</span><svg class="star" width="12" height="12" viewBox="0 0 24 24" fill="#ffd866" aria-label="recommended"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg>
+    <div class="grid"><figure class="slot slot--pick look-check" id="today-n-act">
+        <figcaption class="slot__cap"><span class="look look--check">CHECK: your tweak</span><span class="pil pil--act">Action</span><span class="slot__t">The part</span><svg class="star" width="12" height="12" viewBox="0 0 24 24" fill="#ffd866" aria-label="recommended"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg>
           <span class="tag tag--new">new</span></figcaption>
         <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
@@ -1690,8 +1695,8 @@
 </div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
         </div>
         <div class="slot__meta"><p class="bf">Milestone goals run in stages: which act they are in, and today&#x27;s move inside it<span class="bf__x">Skip if the plan has no stages</span></p></div>
-      </figure><figure class="slot slot--pick" id="star-n-acts">
-        <figcaption class="slot__cap"><span class="pil pil--clar">Clarity</span><span class="slot__t">The parts</span><svg class="star" width="12" height="12" viewBox="0 0 24 24" fill="#ffd866" aria-label="recommended"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg>
+      </figure><figure class="slot slot--pick look-check" id="star-n-acts">
+        <figcaption class="slot__cap"><span class="look look--check">CHECK: your tweak</span><span class="pil pil--clar">Clarity</span><span class="slot__t">The parts</span><svg class="star" width="12" height="12" viewBox="0 0 24 24" fill="#ffd866" aria-label="recommended"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg>
           <span class="tag tag--new">new</span></figcaption>
         <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
