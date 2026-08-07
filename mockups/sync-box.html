@@ -1,0 +1,2195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The sync box, redesigned</title>
+<style>
+  :root{
+    --ink:255,255,255;
+    --text-hi:rgba(255,255,255,.96); --text-mid:rgba(255,255,255,.68);
+    --text-lo:rgba(255,255,255,.42); --hairline:rgba(255,255,255,.09);
+    --surface-1:rgba(255,255,255,.04);
+    --glass-bg:rgba(255,255,255,.045);
+    --glass-border:rgba(255,255,255,.10);
+    --glass-shadow:0 1px 2px rgba(0,0,0,.30), 0 8px 20px rgba(0,0,0,.22);
+    --glass-highlight:inset 0 1px 0 rgba(255,255,255,.06);
+    --glass-blur:blur(28px) saturate(1.4);
+    --card-r:18px; --rx:1;
+    --clar:#3ad9f5; --cons:#3fd94e; --act:#eef2fb;
+    --color-clarity:#3ad9f5; --color-consistency:#3fd94e;
+    --accent:#3fd94e; --accent-rgb:63,217,78;
+    --solid-bg:#f2f3f6; --solid-fg:#0b0c0e;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:#050609;color:var(--text-hi);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1340px;margin:0 auto;padding:34px 22px 120px}
+
+  h1{margin:0 0 8px;font-size:26px;font-weight:750;letter-spacing:-.025em}
+  .lede{margin:0 0 4px;font-size:14.5px;line-height:1.6;color:var(--text-mid);max-width:74ch}
+  .lede b{color:var(--text-hi);font-weight:640}
+
+  .nav{position:sticky;top:0;z-index:30;display:flex;gap:8px;flex-wrap:wrap;
+    margin:22px -22px 0;padding:12px 22px;background:rgba(5,6,9,.82);
+    backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
+  .nav a{font-size:13px;font-weight:620;text-decoration:none;color:var(--text-mid);
+    padding:8px 14px;border-radius:999px;background:var(--surface-1)}
+  .nav a:hover{color:var(--text-hi);background:rgba(255,255,255,.085)}
+
+  .sect{padding-top:40px;scroll-margin-top:72px}
+  .sect__sub{margin:44px 0 20px;font-size:16px;font-weight:680;letter-spacing:-.015em;color:var(--text-hi)}
+  .tag{margin-left:8px;padding:3px 8px;border-radius:999px;font-size:10.5px;font-weight:700;letter-spacing:.02em}
+  .tag--cut{background:rgba(255,255,255,.07);color:var(--text-lo)}
+  .tag--risk{background:rgba(58,217,245,.14);color:#8fe6f7}
+  .tag--new{background:rgba(63,217,78,.16);color:#8ee79a}
+  .sect__sub--new{color:#8ee79a}
+  .guide{margin:26px 0 0;padding:18px 18px 16px;border-radius:15px;background:rgba(255,255,255,.045);box-shadow:inset 0 1px 0 rgba(255,255,255,.07);overflow-x:auto}
+  .guide h3{margin:0 0 10px;font-size:15px;font-weight:700;letter-spacing:-.015em}
+  .guide table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:520px}
+  .guide th{text-align:left;font-size:11px;font-weight:750;color:var(--text-lo);padding:0 9px 6px 0}
+  .guide td{padding:7px 9px 7px 0;color:var(--text-mid);line-height:1.45;vertical-align:top;border-top:1px solid rgba(255,255,255,.06)}
+  .guide td b{color:var(--text-hi);font-weight:640}
+  .slot__risk{margin:9px 0 0;font-size:12.5px;line-height:1.55;color:var(--text-mid)}
+  .slot__risk b{color:var(--text-hi);font-weight:640}
+  .pc{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0 0;
+    padding:12px 13px;border-radius:12px;background:rgba(255,255,255,.032)}
+  .pc__h{display:block;margin:0 0 6px;font-size:11.5px;font-weight:700;color:var(--text-lo)}
+  .pc__col--p .pc__h{color:#7fe08c}
+  .pc__col--c .pc__h{color:#f0938f}
+  .pc ul{margin:0;padding-left:14px}
+  .pc li{margin:0 0 5px;font-size:12px;line-height:1.5;color:var(--text-mid)}
+  .slot__verdict{margin:11px 0 0;font-size:12.5px;line-height:1.55;color:var(--text-hi);font-weight:560}
+
+  .sect__hd h2{margin:0 0 5px;font-size:20px;font-weight:700;letter-spacing:-.02em}
+  .sect__hd p{margin:0 0 22px;font-size:13.5px;line-height:1.55;color:var(--text-mid)}
+  .sect__hd b{color:var(--text-hi);font-weight:640}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:30px 22px}
+  .slot{margin:0}
+  .slot__cap{display:flex;align-items:baseline;gap:9px;margin:0 0 11px;padding-left:2px}
+  .slot__n{font-size:11.5px;font-weight:700;color:var(--text-lo);font-variant-numeric:tabular-nums}
+  .slot__t{font-size:15px;font-weight:650;letter-spacing:-.012em}
+
+  /* the phone context: the Memento above, its glow, then the real glass card */
+  .phone{position:relative;padding:0 0 16px;border-radius:22px;overflow:hidden;
+    background:linear-gradient(180deg,#0a0c10,#07080b)}
+  .phone__glow{position:absolute;left:50%;top:-58px;width:290px;height:220px;
+    transform:translateX(-50%);pointer-events:none;
+    background:radial-gradient(closest-side,rgba(63,217,78,.30),transparent 72%);
+    filter:blur(14px)}
+  .phone__memento{position:relative;height:96px;margin:0 16px;border-radius:14px;
+    display:grid;place-items:center;
+    background:radial-gradient(120% 150% at 50% 30%,#3fbf6e,#1d8f52 62%,#116d3d);
+    box-shadow:0 10px 34px rgba(63,217,78,.20),inset 0 1px 0 rgba(255,255,255,.24)}
+  .phone__memento svg{width:26px;height:26px;fill:rgba(245,255,248,.95)}
+
+  .cc-card{position:relative;overflow:hidden;margin:14px 16px 0;
+    padding:22px 22px 20px;
+    background:var(--glass-bg);border-radius:var(--card-r);
+    box-shadow:var(--glass-shadow),var(--glass-highlight);
+    backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur)}
+  .cc-card::before{content:'';position:absolute;inset:0;border-radius:inherit;
+    pointer-events:none;z-index:0;
+    background:linear-gradient(180deg,rgba(255,255,255,.05),transparent 46%)}
+  .cc-card > *{position:relative;z-index:1}
+  .cc-dots{display:flex;gap:6px;justify-content:center;margin:16px 0 0}
+  .cc-dots i{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.22)}
+  .cc-dots i.on{background:rgba(255,255,255,.85)}
+
+  .slot__meta{margin:13px 2px 0}
+  .slot__idea{margin:0;font-size:13px;line-height:1.5;color:var(--text-mid)}
+  .bf{margin:0;font-size:13.5px;line-height:1.5;color:var(--text-hi);font-weight:600}
+  .bf__x{display:block;margin:5px 0 0;font-size:12px;font-weight:500;color:#f0938f}
+  .slot__evo{margin:8px 0 0;font-size:13px;line-height:1.55;color:var(--text-mid)}
+  .slot__evo b{color:var(--text-hi);font-weight:640}
+  .slot__data{margin:8px 0 0;font-size:11.5px;line-height:1.5;color:var(--text-lo)}
+
+  @media (max-width:400px){ .grid{grid-template-columns:1fr;gap:30px} .wrap{padding:26px 14px 90px} }
+</style>
+<style id="variants">
+/* NEW today-hold-tonight */
+.v-today-hold-tonight{display:flex;flex-direction:column;min-height:172px;font-variant-numeric:tabular-nums}
+.v-today-hold-tonight .ht-rule{margin:0;font-size:17.5px;font-weight:640;line-height:1.3;letter-spacing:-.015em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-hold-tonight .ht-row{display:flex;align-items:baseline;gap:10px;margin:15px 0 0}
+.v-today-hold-tonight .ht-n{font-size:34px;font-weight:700;letter-spacing:-.035em;line-height:1;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-hold-tonight .ht-m{font-size:12.5px;line-height:1.35;color:rgba(255,255,255,.62)}
+.v-today-hold-tonight .ht-btn{margin:16px 0 0;width:100%;padding:13px;border:0;border-radius:11px;background:rgba(255,255,255,.055);box-shadow:inset 0 1px 0 rgba(255,255,255,.07);color:rgba(255,255,255,.45);font:inherit;font-size:14.5px;font-weight:650}
+.v-today-hold-tonight .ht-note{margin:9px 0 0;font-size:11.5px;line-height:1.4;color:rgba(255,255,255,.4)}
+
+/* NEW today-derived-line */
+.v-today-derived-line{display:flex;flex-direction:column;min-height:172px;font-variant-numeric:tabular-nums}
+.v-today-derived-line .dl-top{margin:0;font-size:13px;font-weight:600;color:rgba(255,255,255,.62)}
+.v-today-derived-line .dl-math{margin:5px 0 0;font-size:13px;line-height:1.5;color:rgba(255,255,255,.62)}
+.v-today-derived-line .dl-math b{color:rgba(255,255,255,.96);font-weight:650}
+.v-today-derived-line .dl-act{margin:14px 0 0;font-size:18px;font-weight:680;letter-spacing:-.018em;line-height:1.28;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-derived-line .dl-bar{margin:15px 0 0;height:4px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+.v-today-derived-line .dl-bar i{display:block;height:100%;background:rgba(238,242,251,.85)}
+.v-today-derived-line .dl-foot{margin:10px 0 0;font-size:12.5px;color:rgba(255,255,255,.62)}
+
+/* NEW star-star-open-evidence */
+.v-star-star-open-evidence{display:flex;flex-direction:column;min-height:172px;font-variant-numeric:tabular-nums}
+.v-star-star-open-evidence .soe-star{margin:0;font-size:17px;font-weight:660;line-height:1.32;letter-spacing:-.016em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-open-evidence .soe-list{margin:14px 0 0;padding:0;list-style:none}
+.v-star-star-open-evidence .soe-list li{display:flex;gap:12px;align-items:baseline;padding:6px 0;font-size:13.5px;line-height:1.4;color:rgba(255,255,255,.86);border-top:1px solid rgba(255,255,255,.06)}
+.v-star-star-open-evidence .soe-list li:first-child{border-top:0}
+.v-star-star-open-evidence .soe-list li span:last-child{margin-left:auto;flex:none;font-size:11.5px;color:rgba(255,255,255,.4)}
+.v-star-star-open-evidence .soe-foot{margin:12px 0 0;font-size:12.5px;color:rgba(255,255,255,.62)}
+
+/* NEW consistency-cadence-week */
+.v-consistency-cadence-week{display:flex;flex-direction:column;min-height:172px;font-variant-numeric:tabular-nums}
+.v-consistency-cadence-week .cw-head{display:flex;align-items:baseline;gap:9px}
+.v-consistency-cadence-week .cw-n{font-size:38px;font-weight:700;letter-spacing:-.04em;line-height:1;color:#3fd94e}
+.v-consistency-cadence-week .cw-of{font-size:14px;font-weight:600;color:rgba(255,255,255,.86)}
+.v-consistency-cadence-week .cw-tag{margin-left:auto;padding:4px 10px;border-radius:999px;background:rgba(63,217,78,.14);color:#8ee79a;font-size:11px;font-weight:750}
+.v-consistency-cadence-week .cw-days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:18px 0 0}
+.v-consistency-cadence-week .cw-days i{height:26px;border-radius:6px;background:rgba(255,255,255,.05)}
+.v-consistency-cadence-week .cw-days i.on{background:#3fd94e}
+.v-consistency-cadence-week .cw-days i.rest{background:rgba(255,255,255,.05)}
+.v-consistency-cadence-week .cw-lbl{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:7px 0 0;text-align:center;font-size:10.5px;color:rgba(255,255,255,.4)}
+.v-consistency-cadence-week .cw-lbl span{display:block}
+.v-consistency-cadence-week .cw-foot{margin:auto 0 0;padding-top:12px;font-size:12.5px;color:rgba(255,255,255,.62)}
+.v-consistency-cadence-week .cw-foot b{color:rgba(255,255,255,.96);font-weight:650}
+
+/* NEW consistency-not-moving */
+.v-consistency-not-moving{display:flex;flex-direction:column;min-height:172px;font-variant-numeric:tabular-nums}
+.v-consistency-not-moving .nm-hd{margin:0;font-size:17px;font-weight:660;line-height:1.32;letter-spacing:-.016em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-consistency-not-moving .nm-two{display:flex;gap:22px;margin:15px 0 0}
+.v-consistency-not-moving .nm-two span{display:flex;flex-direction:column;font-size:12px;line-height:1.35;color:rgba(255,255,255,.62)}
+.v-consistency-not-moving .nm-two b{font-size:24px;font-weight:700;letter-spacing:-.03em;color:rgba(255,255,255,.96)}
+.v-consistency-not-moving .nm-say{margin:14px 0 0;font-size:13px;line-height:1.5;color:rgba(255,255,255,.62)}
+.v-consistency-not-moving .nm-btn{margin:auto 0 0;width:100%;padding:13px;border:0;border-radius:11px;background:#f2f3f6;color:#0b0c0e;font:inherit;font-size:14.5px;font-weight:680;cursor:pointer}
+
+/* today-gap-close */
+.v-today-gap-close{display:flex;flex-direction:column;min-height:176px;padding-bottom:10px;font-variant-numeric:tabular-nums}
+.v-today-gap-close .gc-move{margin:0;font-size:18px;line-height:1.32;font-weight:600;letter-spacing:-.015em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-gap-close .gc-head{display:flex;align-items:baseline;gap:8px;margin:16px 0 0}
+.v-today-gap-close .gc-now{font-size:22px;line-height:1;font-weight:650;letter-spacing:-.03em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-gap-close .gc-of{font-size:13.5px;line-height:1;font-weight:450;color:rgba(var(--ink,255,255,255),.9)}
+.v-today-gap-close .gc-new{margin-left:auto;font-size:12.5px;line-height:1;font-weight:600;color:rgba(var(--ink,255,255,255),.9)}
+.v-today-gap-close .gc-rail{display:flex;height:5px;margin:11px 0 0;border-radius:999px;background:rgba(var(--ink,255,255,255),.1);overflow:hidden}
+.v-today-gap-close .gc-base{width:41%;background:rgba(var(--ink,255,255,255),.5)}
+.v-today-gap-close .gc-week{width:6%;background:var(--solid-bg,#eef2fb)}
+.v-today-gap-close .gc-read{margin:11px 0 0;font-size:13.5px;line-height:1.42;font-weight:450;color:rgba(var(--ink,255,255,255),.88)}
+.v-today-gap-close .gc-do{margin-top:auto;appearance:none;border:0;width:100%;height:46px;border-radius:10px;background:var(--solid-bg,#eef2fb);color:var(--solid-fg,#07080b);font-family:inherit;font-size:15.5px;font-weight:600;letter-spacing:-.01em;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.28);transition:transform 160ms ease-out,opacity 160ms ease-out}
+.v-today-gap-close .gc-do:active{transform:scale(.985);opacity:.94}
+@media (prefers-reduced-motion:reduce){.v-today-gap-close .gc-do{transition:none}}
+
+/* today-today-weight */
+.v-today-today-weight{display:flex;flex-direction:column;min-height:176px;padding-bottom:10px;font-variant-numeric:tabular-nums}
+.v-today-today-weight .tw-move{margin:0;font-size:19px;line-height:1.32;font-weight:600;letter-spacing:-.015em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-today-weight .tw-row{display:flex;align-items:center;gap:10px;margin-top:16px}
+.v-today-today-weight .tw-ladder{display:inline-flex;align-items:flex-end;gap:4px;height:16px}
+.v-today-today-weight .tw-ladder i{display:block;width:4px;border-radius:2px;background:rgba(var(--ink,255,255,255),.14)}
+.v-today-today-weight .tw-ladder i:nth-child(1){height:6px}
+.v-today-today-weight .tw-ladder i:nth-child(2){height:8.5px}
+.v-today-today-weight .tw-ladder i:nth-child(3){height:11px}
+.v-today-today-weight .tw-ladder i:nth-child(4){height:13.5px}
+.v-today-today-weight .tw-ladder i:nth-child(5){height:16px}
+.v-today-today-weight .tw-ladder i.is-past{background:rgba(var(--ink,255,255,255),.36)}
+.v-today-today-weight .tw-ladder i.is-on{background:var(--solid-bg,#eef2fb)}
+.v-today-today-weight .tw-tier{font-size:14px;line-height:1;font-weight:600;letter-spacing:-.005em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-today-weight .tw-run{margin:11px 0 0;font-size:13.5px;line-height:1.45;font-weight:450;color:rgba(var(--ink,255,255,255),.88)}
+.v-today-today-weight .tw-n{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-today-weight .tw-cta{margin-top:auto;appearance:none;border:0;width:100%;height:46px;border-radius:10px;background:var(--solid-bg,#eef2fb);color:var(--solid-fg,#07080b);font-family:inherit;font-size:15.5px;font-weight:600;letter-spacing:-.01em;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.28);transition:transform 160ms ease-out,opacity 160ms ease-out}
+.v-today-today-weight .tw-cta:active{transform:scale(.985);opacity:.94}
+@media (prefers-reduced-motion:reduce){.v-today-today-weight .tw-cta{transition:none}}
+
+/* today-today-open */
+.v-today-today-open{display:flex;flex-direction:column;min-height:176px;padding-bottom:10px;font-variant-numeric:tabular-nums}
+.v-today-today-open .to-move{margin:0;font-size:18.5px;line-height:1.32;font-weight:600;letter-spacing:-.015em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-today-open .to-start{display:flex;align-items:flex-start;gap:9px;margin-top:14px;padding:11px 12px;border-radius:10px;background:rgba(var(--ink,255,255,255),.06);box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.v-today-today-open .to-ic{flex:0 0 auto;margin-top:3px;color:rgba(var(--ink,255,255,255),.6)}
+.v-today-today-open .to-start p{margin:0;font-size:13.5px;line-height:1.42;font-weight:450;color:rgba(var(--ink,255,255,255),.92)}
+.v-today-today-open .to-gap{margin:11px 0 0;font-size:13px;line-height:1.3;font-weight:450;color:rgba(var(--ink,255,255,255),.72)}
+.v-today-today-open .to-cta{margin-top:auto;appearance:none;border:0;width:100%;height:46px;border-radius:10px;background:var(--solid-bg,#eef2fb);color:var(--solid-fg,#07080b);font-family:inherit;font-size:15.5px;font-weight:600;letter-spacing:-.01em;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.28);transition:transform 160ms ease-out,opacity 160ms ease-out}
+.v-today-today-open .to-cta:active{transform:scale(.985);opacity:.94}
+@media (prefers-reduced-motion:reduce){.v-today-today-open .to-cta{transition:none}}
+
+/* today-today-run */
+.v-today-today-run{display:flex;flex-direction:column;min-height:176px;padding-bottom:10px;font-variant-numeric:tabular-nums}
+.v-today-today-run .tr-list{list-style:none;margin:0;padding:0}
+.v-today-today-run .tr-list li{position:relative;display:flex;align-items:flex-start;gap:11px;padding-bottom:11px}
+.v-today-today-run .tr-list li:last-child{padding-bottom:0}
+.v-today-today-run .tr-list li:not(:last-child)::before{content:"";position:absolute;left:3px;top:15px;bottom:1px;width:1px;background:rgba(var(--ink,255,255,255),.14)}
+.v-today-today-run .tr-mk{flex:0 0 auto;width:7px;height:7px;margin-top:6px;border-radius:999px;box-shadow:inset 0 0 0 1.5px rgba(var(--ink,255,255,255),.5)}
+.v-today-today-run .tr-now .tr-mk{margin-top:8px;box-shadow:inset 0 0 0 1.5px rgba(var(--ink,255,255,255),.75)}
+.v-today-today-run .tr-mk--on{background:var(--solid-bg,#eef2fb);box-shadow:none;opacity:.85}
+.v-today-today-run .tr-list li p{margin:0;flex:1 1 auto;font-size:13.5px;line-height:1.4;font-weight:450;color:rgba(var(--ink,255,255,255),.82)}
+.v-today-today-run .tr-now p{font-size:18px;line-height:1.32;font-weight:600;letter-spacing:-.015em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-today-run .tr-list li time{flex:0 0 auto;font-size:12.5px;line-height:1.5;font-weight:500;color:rgba(var(--ink,255,255,255),.55)}
+.v-today-today-run .tr-cta{margin-top:auto;appearance:none;border:0;width:100%;height:46px;border-radius:10px;background:var(--solid-bg,#eef2fb);color:var(--solid-fg,#07080b);font-family:inherit;font-size:15.5px;font-weight:600;letter-spacing:-.01em;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.28);transition:transform 160ms ease-out,opacity 160ms ease-out}
+.v-today-today-run .tr-cta:active{transform:scale(.985);opacity:.94}
+@media (prefers-reduced-motion:reduce){.v-today-today-run .tr-cta{transition:none}}
+
+/* today-week-rhythm */
+.v-today-week-rhythm{display:flex;flex-direction:column;min-height:176px;padding-bottom:10px;font-variant-numeric:tabular-nums}
+.v-today-week-rhythm .wr-move{margin:0;font-size:18px;line-height:1.32;font-weight:600;letter-spacing:-.015em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-week-rhythm .wr-week{display:flex;gap:13px;margin:16px 0 0}
+.v-today-week-rhythm .wr-day{display:flex;flex-direction:column;align-items:center;gap:7px;width:22px;font-size:10.5px;line-height:1;font-weight:600;color:rgba(var(--ink,255,255,255),.42)}
+.v-today-week-rhythm .wr-day i{width:9px;height:9px;border-radius:50%;background:rgba(var(--ink,255,255,255),.12)}
+.v-today-week-rhythm .wr-day.is-done{color:rgba(var(--ink,255,255,255),.7)}
+.v-today-week-rhythm .wr-day.is-done i{background:var(--solid-bg,#eef2fb)}
+.v-today-week-rhythm .wr-day.is-now{color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-week-rhythm .wr-day.is-now i{background:transparent;box-shadow:inset 0 0 0 2px rgba(var(--ink,255,255,255),.62)}
+.v-today-week-rhythm .wr-read{margin:14px 0 0;font-size:13.5px;line-height:1.42;font-weight:450;color:rgba(var(--ink,255,255,255),.88)}
+.v-today-week-rhythm .wr-read b{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-week-rhythm .wr-do{margin-top:auto;appearance:none;border:0;width:100%;height:46px;border-radius:10px;background:var(--solid-bg,#eef2fb);color:var(--solid-fg,#07080b);font-family:inherit;font-size:15.5px;font-weight:600;letter-spacing:-.01em;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.28);transition:transform 160ms ease-out,opacity 160ms ease-out}
+.v-today-week-rhythm .wr-do:active{transform:scale(.985);opacity:.94}
+@media (prefers-reduced-motion:reduce){.v-today-week-rhythm .wr-do{transition:none}}
+
+/* today-record-line */
+.v-today-record-line{display:flex;flex-direction:column;min-height:176px;padding-bottom:10px;font-variant-numeric:tabular-nums}
+.v-today-record-line .rl-verdict{margin:0;font-size:18px;line-height:1.28;font-weight:600;letter-spacing:-.015em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-record-line .rl-rows{margin:15px 0 0;display:flex;flex-direction:column;gap:9px}
+.v-today-record-line .rl-row{display:flex;align-items:center;gap:10px;font-size:12.5px;font-weight:600;color:rgba(var(--ink,255,255,255),.8)}
+.v-today-record-line .rl-k{width:86px;flex:0 0 auto}
+.v-today-record-line .rl-bar{flex:1 1 auto;height:5px;border-radius:999px;background:rgba(var(--ink,255,255,255),.1);overflow:hidden}
+.v-today-record-line .rl-bar b{display:block;height:100%;border-radius:999px;background:var(--solid-bg,#eef2fb)}
+.v-today-record-line .rl-n{width:12px;flex:0 0 auto;text-align:right;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-record-line .rl-row.is-best{color:rgba(var(--ink,255,255,255),.55)}
+.v-today-record-line .rl-row.is-best .rl-bar b{background:rgba(var(--ink,255,255,255),.28)}
+.v-today-record-line .rl-row.is-best .rl-n{color:rgba(var(--ink,255,255,255),.55)}
+.v-today-record-line .rl-move{margin:15px 0 0;font-size:15px;line-height:1.34;font-weight:600;letter-spacing:-.01em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-record-line .rl-do{margin-top:auto;appearance:none;border:0;width:100%;height:46px;border-radius:10px;background:var(--solid-bg,#eef2fb);color:var(--solid-fg,#07080b);font-family:inherit;font-size:15.5px;font-weight:600;letter-spacing:-.01em;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.28);transition:transform 160ms ease-out,opacity 160ms ease-out}
+.v-today-record-line .rl-do:active{transform:scale(.985);opacity:.94}
+@media (prefers-reduced-motion:reduce){.v-today-record-line .rl-do{transition:none}}
+
+/* today-today-then */
+.v-today-today-then{display:flex;flex-direction:column;min-height:176px;padding-bottom:10px;font-variant-numeric:tabular-nums}
+.v-today-today-then .tn-move{margin:0;font-size:19.5px;line-height:1.32;font-weight:600;letter-spacing:-.016em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-today-then .tn-then{display:flex;align-items:stretch;gap:11px;margin-top:16px}
+.v-today-today-then .tn-rule{flex:0 0 auto;width:1px;border-radius:999px;background:linear-gradient(to bottom,rgba(var(--ink,255,255,255),.3),rgba(var(--ink,255,255,255),.07))}
+.v-today-today-then .tn-then p{margin:0;font-size:13.5px;line-height:1.45;font-weight:450;color:rgba(var(--ink,255,255,255),.7)}
+.v-today-today-then .tn-then p span{color:var(--text-hi,rgba(255,255,255,.96));font-weight:500}
+.v-today-today-then .tn-cta{margin-top:auto;appearance:none;border:0;width:100%;height:46px;border-radius:10px;background:var(--solid-bg,#eef2fb);color:var(--solid-fg,#07080b);font-family:inherit;font-size:15.5px;font-weight:600;letter-spacing:-.01em;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.28);transition:transform 160ms ease-out,opacity 160ms ease-out}
+.v-today-today-then .tn-cta:active{transform:scale(.985);opacity:.94}
+@media (prefers-reduced-motion:reduce){.v-today-today-then .tn-cta{transition:none}}
+
+/* today-today-toward */
+.v-today-today-toward{display:flex;flex-direction:column;min-height:176px;padding-bottom:10px;font-variant-numeric:tabular-nums}
+.v-today-today-toward .tt-move{margin:0;font-size:18.5px;line-height:1.33;font-weight:600;letter-spacing:-.015em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-today-toward .tt-rail{margin-top:16px}
+.v-today-today-toward .tt-track{position:relative;display:block;height:5px;border-radius:999px;background:rgba(var(--ink,255,255,255),.1);overflow:hidden}
+.v-today-today-toward .tt-fill{position:absolute;left:0;top:0;bottom:0;width:34%;border-radius:999px;background:var(--solid-bg,#eef2fb)}
+.v-today-today-toward .tt-base{position:absolute;left:12%;top:0;bottom:0;width:1px;background:var(--solid-fg,#07080b);opacity:.55}
+.v-today-today-toward .tt-nums{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:11px}
+.v-today-today-toward .tt-cur{font-size:13.5px;line-height:1.3;font-weight:450;color:rgba(var(--ink,255,255,255),.88)}
+.v-today-today-toward .tt-cur b{font-size:16px;font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-today-toward .tt-delta{flex:0 0 auto;font-size:12.5px;line-height:1.3;font-weight:500;color:rgba(var(--ink,255,255,255),.7)}
+.v-today-today-toward .tt-cta{margin-top:auto;appearance:none;border:0;width:100%;height:46px;border-radius:10px;background:var(--solid-bg,#eef2fb);color:var(--solid-fg,#07080b);font-family:inherit;font-size:15.5px;font-weight:600;letter-spacing:-.01em;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.28);transition:transform 160ms ease-out,opacity 160ms ease-out}
+.v-today-today-toward .tt-cta:active{transform:scale(.985);opacity:.94}
+@media (prefers-reduced-motion:reduce){.v-today-today-toward .tt-cta{transition:none}}
+
+/* today-size-ladder */
+.v-today-size-ladder{display:flex;flex-direction:column;min-height:176px;padding-bottom:10px;font-variant-numeric:tabular-nums}
+.v-today-size-ladder .sl-move{margin:0;font-size:18px;line-height:1.32;font-weight:600;letter-spacing:-.015em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-size-ladder .sl-scale{display:flex;align-items:flex-end;gap:9px;height:30px;margin:16px 0 0}
+.v-today-size-ladder .sl-scale i{width:13px;border-radius:3px;background:rgba(var(--ink,255,255,255),.12)}
+.v-today-size-ladder .sl-scale i:nth-child(1){height:7px}
+.v-today-size-ladder .sl-scale i:nth-child(2){height:12px}
+.v-today-size-ladder .sl-scale i:nth-child(3){height:18px}
+.v-today-size-ladder .sl-scale i:nth-child(4){height:24px}
+.v-today-size-ladder .sl-scale i:nth-child(5){height:30px}
+.v-today-size-ladder .sl-scale i.is-past{background:rgba(var(--ink,255,255,255),.32)}
+.v-today-size-ladder .sl-scale i.is-now{background:var(--solid-bg,#eef2fb)}
+.v-today-size-ladder .sl-read{margin:14px 0 0;font-size:13.5px;line-height:1.42;font-weight:450;color:rgba(var(--ink,255,255,255),.88)}
+.v-today-size-ladder .sl-read b{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-size-ladder .sl-do{margin-top:auto;appearance:none;border:0;width:100%;height:46px;border-radius:10px;background:var(--solid-bg,#eef2fb);color:var(--solid-fg,#07080b);font-family:inherit;font-size:15.5px;font-weight:600;letter-spacing:-.01em;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.28);transition:transform 160ms ease-out,opacity 160ms ease-out}
+.v-today-size-ladder .sl-do:active{transform:scale(.985);opacity:.94}
+@media (prefers-reduced-motion:reduce){.v-today-size-ladder .sl-do{transition:none}}
+
+/* today-move-ledger */
+.v-today-move-ledger{display:flex;flex-direction:column;min-height:176px;padding-bottom:10px;font-variant-numeric:tabular-nums}
+.v-today-move-ledger .ml-top{display:flex;align-items:flex-start;gap:14px}
+.v-today-move-ledger .ml-move{margin:0;flex:1 1 auto;font-size:17.5px;line-height:1.3;font-weight:600;letter-spacing:-.015em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-move-ledger .ml-do{flex:0 0 auto;appearance:none;border:0;height:34px;padding:0 18px;border-radius:9px;background:var(--solid-bg,#eef2fb);color:var(--solid-fg,#07080b);font-family:inherit;font-size:13.5px;font-weight:600;letter-spacing:-.01em;cursor:pointer;transition:transform 160ms ease-out,opacity 160ms ease-out}
+.v-today-move-ledger .ml-do:active{transform:scale(.985);opacity:.94}
+.v-today-move-ledger .ml-list{margin:17px 0 0;display:flex;flex-direction:column;gap:9px}
+.v-today-move-ledger .ml-row{display:flex;align-items:baseline;gap:12px;font-size:13px;line-height:1.25}
+.v-today-move-ledger .ml-d{width:68px;flex:0 0 auto;font-weight:600;color:rgba(var(--ink,255,255,255),.5)}
+.v-today-move-ledger .ml-t{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:rgba(var(--ink,255,255,255),.86)}
+.v-today-move-ledger .ml-foot{margin:auto 0 0;font-size:12.5px;line-height:1.35;font-weight:450;color:rgba(var(--ink,255,255,255),.68)}
+@media (prefers-reduced-motion:reduce){.v-today-move-ledger .ml-do{transition:none}}
+
+/* today-mv-ask */
+.v-today-mv-ask{display:flex;flex-direction:column;min-height:170px;color:var(--text-hi,rgba(255,255,255,.96));}
+.v-today-mv-ask__q{margin:0;font-size:14px;line-height:1.1;font-weight:500;letter-spacing:-.006em;color:var(--text-mid,rgba(255,255,255,.62));}
+.v-today-mv-ask__a{margin:12px 0 0;font-size:46px;line-height:.96;letter-spacing:-.04em;font-weight:600;}
+.v-today-mv-ask__move{margin:16px 0 18px;font-size:16.5px;line-height:1.34;font-weight:500;letter-spacing:-.012em;color:var(--text-hi,rgba(255,255,255,.96));}
+.v-today-mv-ask__do{margin-top:auto;width:100%;height:40px;border:0;border-radius:10px;background:rgba(255,255,255,.055);box-shadow:inset 0 1px 0 rgba(255,255,255,.07);color:var(--text-hi,rgba(255,255,255,.96));font-family:inherit;font-size:15px;font-weight:600;letter-spacing:-.008em;cursor:pointer;}
+.v-today-mv-ask__do:active{background:rgba(255,255,255,.085);}
+
+/* today-mv-rule */
+.v-today-mv-rule{display:flex;flex-direction:column;min-height:170px;color:var(--text-hi,rgba(255,255,255,.96));}
+.v-today-mv-rule__head{margin:0;display:flex;align-items:baseline;gap:7px;}
+.v-today-mv-rule__big{font-size:27px;line-height:1;font-weight:600;letter-spacing:-.03em;font-variant-numeric:tabular-nums;}
+.v-today-mv-rule__sub{font-size:14.5px;line-height:1;font-weight:500;letter-spacing:-.008em;color:var(--text-mid,rgba(255,255,255,.62));}
+.v-today-mv-rule__svg{display:block;margin-top:15px;color:var(--text-hi,rgba(255,255,255,.96));}
+.v-today-mv-rule__ends{margin:2px 0 0;display:flex;justify-content:space-between;font-size:11.5px;line-height:1;font-weight:500;font-variant-numeric:tabular-nums;color:var(--text-lo,rgba(255,255,255,.40));}
+.v-today-mv-rule__row{margin-top:auto;padding-top:18px;display:flex;align-items:flex-start;gap:14px;}
+.v-today-mv-rule__move{margin:0;flex:1;font-size:16px;line-height:1.32;font-weight:500;letter-spacing:-.012em;color:var(--text-hi,rgba(255,255,255,.96));}
+.v-today-mv-rule__tier{display:block;margin-top:6px;font-size:13px;line-height:1.2;font-weight:500;color:var(--text-mid,rgba(255,255,255,.62));}
+.v-today-mv-rule__tick{flex:0 0 auto;width:30px;height:30px;margin-top:1px;border:0;border-radius:999px;background:rgba(255,255,255,.06);box-shadow:inset 0 1px 0 rgba(255,255,255,.07);color:var(--text-hi,rgba(255,255,255,.96));display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.v-today-mv-rule__tick:active{background:rgba(255,255,255,.1);}
+
+/* today-mv-ordinal */
+.v-today-mv-ordinal{display:flex;flex-direction:column;min-height:170px;color:var(--text-hi,rgba(255,255,255,.96));}
+.v-today-mv-ordinal__n{margin:0;font-size:62px;line-height:.9;font-weight:600;letter-spacing:-.052em;font-variant-numeric:tabular-nums;}
+.v-today-mv-ordinal__suf{font-size:26px;letter-spacing:-.03em;margin-left:2px;}
+.v-today-mv-ordinal__sub{margin:11px 0 0;font-size:13.5px;line-height:1.25;font-weight:500;letter-spacing:-.006em;color:var(--text-mid,rgba(255,255,255,.62));}
+.v-today-mv-ordinal__line{height:1px;margin:15px 0 0;background:var(--hairline,rgba(255,255,255,.09));}
+.v-today-mv-ordinal__move{margin:14px 0 16px;font-size:16.5px;line-height:1.32;font-weight:500;letter-spacing:-.012em;color:var(--text-hi,rgba(255,255,255,.96));}
+.v-today-mv-ordinal__do{margin-top:auto;width:100%;height:40px;border:0;border-radius:10px;background:rgba(255,255,255,.055);box-shadow:inset 0 1px 0 rgba(255,255,255,.07);color:var(--text-hi,rgba(255,255,255,.96));font-family:inherit;font-size:15px;font-weight:600;letter-spacing:-.008em;cursor:pointer;}
+.v-today-mv-ordinal__do:active{background:rgba(255,255,255,.085);}
+
+/* today-mv-chain */
+.v-today-mv-chain{display:flex;flex-direction:column;min-height:170px;color:var(--text-hi,rgba(255,255,255,.96));}
+.v-today-mv-chain__link{position:relative;display:flex;gap:14px;padding-bottom:18px;}
+.v-today-mv-chain__link:last-of-type{padding-bottom:16px;}
+.v-today-mv-chain__link--now::before{content:"";position:absolute;left:4px;top:14px;bottom:2px;width:1px;background:var(--hairline,rgba(255,255,255,.09));}
+.v-today-mv-chain__node{flex:0 0 auto;width:9px;height:9px;margin-top:5px;border-radius:999px;background:#eef2fb;}
+.v-today-mv-chain__node--open{background:transparent;box-shadow:inset 0 0 0 1px rgba(255,255,255,.34);}
+.v-today-mv-chain__body{flex:1;min-width:0;}
+.v-today-mv-chain__lbl{margin:0;font-size:12.5px;line-height:1.1;font-weight:500;letter-spacing:-.004em;color:var(--text-mid,rgba(255,255,255,.62));}
+.v-today-mv-chain__txt{margin:7px 0 0;font-size:16.5px;line-height:1.32;font-weight:600;letter-spacing:-.014em;color:var(--text-hi,rgba(255,255,255,.96));}
+.v-today-mv-chain__txt--next{font-size:15.5px;font-weight:500;letter-spacing:-.01em;}
+.v-today-mv-chain__do{margin-top:auto;width:100%;height:40px;border:0;border-radius:10px;background:rgba(255,255,255,.055);box-shadow:inset 0 1px 0 rgba(255,255,255,.07);color:var(--text-hi,rgba(255,255,255,.96));font-family:inherit;font-size:15px;font-weight:600;letter-spacing:-.008em;cursor:pointer;}
+.v-today-mv-chain__do:active{background:rgba(255,255,255,.085);}
+
+/* today-mv-trace */
+.v-today-mv-trace{display:flex;flex-direction:column;min-height:170px;color:var(--text-hi,rgba(255,255,255,.96));}
+.v-today-mv-trace__head{margin:0;font-size:25px;line-height:1;font-weight:600;letter-spacing:-.03em;}
+.v-today-mv-trace__sub{margin:8px 0 0;font-size:13.5px;line-height:1.2;font-weight:500;letter-spacing:-.006em;font-variant-numeric:tabular-nums;color:var(--text-mid,rgba(255,255,255,.62));}
+.v-today-mv-trace__svg{display:block;margin-top:13px;color:var(--text-hi,rgba(255,255,255,.96));}
+.v-today-mv-trace__span{margin:3px 0 0;text-align:right;font-size:11.5px;line-height:1;font-weight:500;color:var(--text-lo,rgba(255,255,255,.40));}
+.v-today-mv-trace__row{margin-top:auto;padding-top:16px;display:flex;align-items:flex-start;gap:14px;}
+.v-today-mv-trace__move{margin:0;flex:1;font-size:16px;line-height:1.32;font-weight:500;letter-spacing:-.012em;color:var(--text-hi,rgba(255,255,255,.96));}
+.v-today-mv-trace__tick{flex:0 0 auto;width:30px;height:30px;margin-top:1px;border:0;border-radius:999px;background:rgba(255,255,255,.06);box-shadow:inset 0 1px 0 rgba(255,255,255,.07);color:var(--text-hi,rgba(255,255,255,.96));display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.v-today-mv-trace__tick:active{background:rgba(255,255,255,.1);}
+
+/* star-star-distance */
+.v-star-star-distance{--cy:#3ad9f5;--cyglow:0 0 12px rgba(58,217,245,.45);--rail:rgba(255,255,255,.14);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+@media (prefers-color-scheme:light){.v-star-star-distance{--cy:#0b90b0;--cyglow:none;--rail:rgba(0,0,0,.12)}}
+:root[data-theme="light"] .v-star-star-distance{--cy:#0b90b0;--cyglow:none;--rail:rgba(0,0,0,.12)}
+:root[data-theme="dark"] .v-star-star-distance{--cy:#3ad9f5;--cyglow:0 0 12px rgba(58,217,245,.45);--rail:rgba(255,255,255,.14)}
+.v-star-star-distance .sd-star{margin:0;font-size:16.5px;line-height:1.32;font-weight:700;letter-spacing:-.011em;color:var(--text-hi,rgba(255,255,255,.96));display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.v-star-star-distance .sd-row{display:flex;align-items:baseline;gap:7px;margin-top:20px}
+.v-star-star-distance .sd-big{font-size:34px;font-weight:700;line-height:1;letter-spacing:-.028em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-distance .sd-of{min-width:0;font-size:13px;line-height:1.2;color:var(--text-mid,rgba(255,255,255,.62));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v-star-star-distance .sd-delta{flex:none;margin-left:auto;align-self:center;font-size:12.5px;font-weight:650;color:var(--cy)}
+.v-star-star-distance .sd-rail{position:relative;height:4px;border-radius:999px;background:var(--rail);box-shadow:inset 0 1px 0 rgba(255,255,255,.06);margin-top:14px;overflow:hidden}
+.v-star-star-distance .sd-fill{position:absolute;top:0;bottom:0;left:0;width:34%;border-radius:999px;background:var(--cy);box-shadow:var(--cyglow)}
+.v-star-star-distance .sd-foot{margin:14px 0 0;font-size:12.5px;line-height:1.4;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-distance .sd-foot b{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+
+/* star-star-surface */
+.v-star-star-surface{--cy:#3ad9f5;--cyglow:0 0 8px rgba(58,217,245,.7);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+@media (prefers-color-scheme:light){.v-star-star-surface{--cy:#0b90b0;--cyglow:none}}
+:root[data-theme="light"] .v-star-star-surface{--cy:#0b90b0;--cyglow:none}
+:root[data-theme="dark"] .v-star-star-surface{--cy:#3ad9f5;--cyglow:0 0 8px rgba(58,217,245,.7)}
+.v-star-star-surface .su-star{margin:0;font-size:16.5px;line-height:1.32;font-weight:700;letter-spacing:-.011em;color:var(--text-hi,rgba(255,255,255,.96));display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.v-star-star-surface .su-why{display:flex;gap:11px;margin-top:18px}
+.v-star-star-surface .su-dot{flex:0 0 auto;width:5px;height:5px;border-radius:999px;background:var(--cy);margin-top:7px;box-shadow:var(--cyglow)}
+.v-star-star-surface .su-txt{font-size:14px;line-height:1.44;color:var(--text-hi,rgba(255,255,255,.96));display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+.v-star-star-surface .su-foot{margin:16px 0 0;font-size:12.5px;line-height:1.4;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-surface .su-foot b{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+
+/* star-star-spine */
+.v-star-star-spine{--cy:#3ad9f5;--cydim:rgba(58,217,245,.55);--cyglow:0 0 8px rgba(58,217,245,.8);--mark:rgba(255,255,255,.13);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+@media (prefers-color-scheme:light){.v-star-star-spine{--cy:#0b90b0;--cydim:rgba(11,144,176,.55);--cyglow:none;--mark:rgba(0,0,0,.14)}}
+:root[data-theme="light"] .v-star-star-spine{--cy:#0b90b0;--cydim:rgba(11,144,176,.55);--cyglow:none;--mark:rgba(0,0,0,.14)}
+:root[data-theme="dark"] .v-star-star-spine{--cy:#3ad9f5;--cydim:rgba(58,217,245,.55);--cyglow:0 0 8px rgba(58,217,245,.8);--mark:rgba(255,255,255,.13)}
+.v-star-star-spine .ss-star{margin:0;font-size:16.5px;line-height:1.32;font-weight:700;letter-spacing:-.011em;color:var(--text-hi,rgba(255,255,255,.96));display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.v-star-star-spine .ss-spine{display:flex;align-items:flex-end;gap:2px;height:14px;margin-top:20px}
+.v-star-star-spine .ss-spine i{flex:1 1 0;min-width:1px;height:5px;border-radius:1px;background:var(--mark)}
+.v-star-star-spine .ss-spine i.on{height:14px;background:var(--cydim)}
+.v-star-star-spine .ss-spine i.now{background:var(--cy);box-shadow:var(--cyglow)}
+.v-star-star-spine .ss-meta{display:flex;align-items:baseline;margin:12px 0 0;font-size:12.5px;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-spine .ss-meta b{margin-left:auto;font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-spine .ss-line{margin:8px 0 0;font-size:12.5px;line-height:1.4;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-spine .ss-line b{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+
+/* star-star-ledger */
+.v-star-star-ledger{font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+.v-star-star-ledger .sl-star{margin:0;font-size:16px;line-height:1.34;font-weight:680;letter-spacing:-.01em;color:var(--text-hi,rgba(255,255,255,.96));display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.v-star-star-ledger .sl-rule{height:1px;background:var(--hairline,rgba(255,255,255,.09));margin:16px 0}
+.v-star-star-ledger .sl-row{display:flex;align-items:flex-end;gap:10px}
+.v-star-star-ledger .sl-big{font-size:36px;font-weight:700;line-height:.86;letter-spacing:-.028em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-ledger .sl-lab{font-size:13px;line-height:1.22;color:var(--text-mid,rgba(255,255,255,.62));padding-bottom:1px}
+.v-star-star-ledger .sl-wk{margin-left:auto;text-align:right;line-height:1.35}
+.v-star-star-ledger .sl-wk b{display:block;font-size:13px;font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-ledger .sl-wk span{display:block;font-size:12.5px;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-ledger .sl-last{margin:16px 0 0;font-size:12.5px;line-height:1.4;color:var(--text-mid,rgba(255,255,255,.62));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v-star-star-ledger .sl-last b{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+
+/* star-star-climb */
+.v-star-star-climb{--cy:#3ad9f5;--ceil:rgba(255,255,255,.26);display:flex;flex-direction:column;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+@media (prefers-color-scheme:light){.v-star-star-climb{--cy:#0b90b0;--ceil:rgba(0,0,0,.28)}}
+:root[data-theme="light"] .v-star-star-climb{--cy:#0b90b0;--ceil:rgba(0,0,0,.28)}
+:root[data-theme="dark"] .v-star-star-climb{--cy:#3ad9f5;--ceil:rgba(255,255,255,.26)}
+.v-star-star-climb__head{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.v-star-star-climb__now{display:flex;align-items:baseline;gap:7px;min-width:0}
+.v-star-star-climb__now b{font-size:34px;line-height:1;font-weight:700;letter-spacing:-.028em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-climb__now span{font-size:13px;line-height:1.2;color:var(--text-mid,rgba(255,255,255,.62));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v-star-star-climb__delta{flex:none;font-size:12.5px;font-weight:650;color:var(--cy)}
+.v-star-star-climb__chart{position:relative;margin-top:16px}
+.v-star-star-climb__chart svg{display:block}
+.v-star-star-climb__area{fill:color-mix(in srgb,var(--cy) 16%,transparent)}
+.v-star-star-climb__line{fill:none;stroke:var(--cy);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.v-star-star-climb__ceil{stroke:var(--ceil);stroke-width:1;stroke-dasharray:2 5}
+.v-star-star-climb__dot{fill:var(--cy)}
+.v-star-star-climb__ceilcap{position:absolute;right:0;top:5px;font-size:11px;line-height:1;font-weight:600;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-climb__foot{margin:14px 0 0;font-size:12.5px;line-height:1.4;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-climb__foot b{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+
+/* star-star-arrival */
+.v-star-star-arrival{--cy:#3ad9f5;--rail:rgba(255,255,255,.10);--tick:rgba(255,255,255,.38);--inset:inset 0 1px 0 rgba(255,255,255,.06);display:flex;flex-direction:column;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+@media (prefers-color-scheme:light){.v-star-star-arrival{--cy:#0b90b0;--rail:rgba(0,0,0,.10);--tick:rgba(0,0,0,.36);--inset:none}}
+:root[data-theme="light"] .v-star-star-arrival{--cy:#0b90b0;--rail:rgba(0,0,0,.10);--tick:rgba(0,0,0,.36);--inset:none}
+:root[data-theme="dark"] .v-star-star-arrival{--cy:#3ad9f5;--rail:rgba(255,255,255,.10);--tick:rgba(255,255,255,.38);--inset:inset 0 1px 0 rgba(255,255,255,.06)}
+.v-star-star-arrival__star{margin:0;font-size:13.5px;line-height:1.35;font-weight:600;letter-spacing:-.004em;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-arrival__lead{display:flex;align-items:baseline;gap:9px;margin-top:14px}
+.v-star-star-arrival__date{font-size:40px;line-height:.95;font-weight:680;letter-spacing:-.035em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-arrival__at{min-width:0;font-size:12.5px;line-height:1.25;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-arrival__shift{margin:10px 0 0;font-size:12.5px;line-height:1.2;font-weight:650;color:var(--cy)}
+.v-star-star-arrival__rail{position:relative;height:6px;border-radius:999px;background:var(--rail);box-shadow:var(--inset);margin-top:16px}
+.v-star-star-arrival__fill{position:absolute;left:0;top:0;bottom:0;width:38%;border-radius:999px;background:linear-gradient(90deg,color-mix(in srgb,var(--cy) 42%,transparent),var(--cy))}
+.v-star-star-arrival__base{position:absolute;left:12%;top:-3px;bottom:-3px;width:2px;border-radius:2px;background:var(--tick)}
+.v-star-star-arrival__foot{margin:14px 0 0;font-size:12.5px;line-height:1.4;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-arrival__foot b{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+
+/* star-star-count */
+.v-star-star-count{--cy:#3ad9f5;--bar:rgba(255,255,255,.20);--ceil:rgba(255,255,255,.22);--chip:rgba(255,255,255,.08);--inset:inset 0 1px 0 rgba(255,255,255,.08);display:flex;flex-direction:column;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+@media (prefers-color-scheme:light){.v-star-star-count{--cy:#0b90b0;--bar:rgba(0,0,0,.20);--ceil:rgba(0,0,0,.22);--chip:rgba(0,0,0,.07);--inset:none}}
+:root[data-theme="light"] .v-star-star-count{--cy:#0b90b0;--bar:rgba(0,0,0,.20);--ceil:rgba(0,0,0,.22);--chip:rgba(0,0,0,.07);--inset:none}
+:root[data-theme="dark"] .v-star-star-count{--cy:#3ad9f5;--bar:rgba(255,255,255,.20);--ceil:rgba(255,255,255,.22);--chip:rgba(255,255,255,.08);--inset:inset 0 1px 0 rgba(255,255,255,.08)}
+.v-star-star-count__star{margin:0;font-size:13.5px;line-height:1.35;font-weight:600;letter-spacing:-.004em;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-count__top{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-top:12px}
+.v-star-star-count__n{font-size:36px;line-height:1;font-weight:680;letter-spacing:-.032em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-count__n span{font-size:16px;font-weight:600;letter-spacing:-.02em;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-count__stale{flex:none;font-size:12px;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-count__bars{position:relative;display:flex;align-items:flex-end;gap:7px;height:38px;margin-top:16px}
+.v-star-star-count__bars i{flex:1;border-radius:3px;background:var(--bar)}
+.v-star-star-count__bars i.best{background:color-mix(in srgb,var(--cy) 34%,transparent)}
+.v-star-star-count__bars i.now{background:var(--cy)}
+.v-star-star-count__ceil{position:absolute;left:0;right:0;top:0;height:1px;background:var(--ceil)}
+.v-star-star-count__foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;font-size:12.5px;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-count__foot b{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-count__act{flex:none;appearance:none;border:0;border-radius:8px;padding:6px 11px;font:inherit;font-size:12px;font-weight:650;color:var(--text-hi,rgba(255,255,255,.96));background:var(--chip);box-shadow:var(--inset);cursor:pointer;transition:transform 160ms ease-out,opacity 160ms ease-out}
+.v-star-star-count__act:active{transform:scale(.97);opacity:.85}
+@media (prefers-reduced-motion:reduce){.v-star-star-count__act{transition:none}}
+
+/* star-star-revision */
+.v-star-star-revision{font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+.v-star-star-revision .sr-star{margin:0;font-size:16.5px;line-height:1.32;font-weight:700;letter-spacing:-.011em;color:var(--text-hi,rgba(255,255,255,.96));display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.v-star-star-revision .sr-now{margin:10px 0 0;font-size:12.5px;line-height:1.35;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-revision .sr-then{display:flex;gap:11px;margin-top:16px}
+.v-star-star-revision .sr-tick{flex:0 0 auto;width:1px;align-self:stretch;background:var(--hairline,rgba(255,255,255,.09))}
+.v-star-star-revision .sr-body{min-width:0}
+.v-star-star-revision .sr-lab{display:block;font-size:12px;line-height:1.2;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-revision .sr-old{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;margin-top:5px;font-size:13.5px;line-height:1.38;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-revision .sr-foot{margin:16px 0 0;font-size:12.5px;line-height:1.35;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-revision .sr-foot b{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+
+/* star-star-pot */
+.v-star-star-pot{--cy:#3ad9f5;--rail:rgba(255,255,255,.09);--base:rgba(255,255,255,.24);--inset:inset 0 1px 0 rgba(255,255,255,.06);display:flex;flex-direction:column;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+@media (prefers-color-scheme:light){.v-star-star-pot{--cy:#0b90b0;--rail:rgba(0,0,0,.09);--base:rgba(0,0,0,.26);--inset:none}}
+:root[data-theme="light"] .v-star-star-pot{--cy:#0b90b0;--rail:rgba(0,0,0,.09);--base:rgba(0,0,0,.26);--inset:none}
+:root[data-theme="dark"] .v-star-star-pot{--cy:#3ad9f5;--rail:rgba(255,255,255,.09);--base:rgba(255,255,255,.24);--inset:inset 0 1px 0 rgba(255,255,255,.06)}
+.v-star-star-pot__lead{display:flex;align-items:baseline;gap:9px}
+.v-star-star-pot__lead b{font-size:38px;line-height:.95;font-weight:680;letter-spacing:-.035em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-pot__lead span{min-width:0;font-size:12.5px;line-height:1.25;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-pot__rail{position:relative;height:8px;border-radius:999px;background:var(--rail);box-shadow:var(--inset);overflow:hidden;margin-top:16px}
+.v-star-star-pot__base{position:absolute;left:0;top:0;bottom:0;width:12%;background:var(--base)}
+.v-star-star-pot__gain{position:absolute;left:12%;top:0;bottom:0;width:26%;background:var(--cy)}
+.v-star-star-pot__scale{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-top:10px;font-size:12px;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-pot__at{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-pot__star{margin:16px 0 0;font-size:13.5px;line-height:1.35;font-weight:600;letter-spacing:-.004em;color:var(--text-mid,rgba(255,255,255,.62))}
+
+/* star-star-dial */
+.v-star-star-dial{--cy:#3ad9f5;--track:rgba(255,255,255,.10);--mark:rgba(255,255,255,.42);display:flex;flex-direction:column;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+@media (prefers-color-scheme:light){.v-star-star-dial{--cy:#0b90b0;--track:rgba(0,0,0,.10);--mark:rgba(0,0,0,.40)}}
+:root[data-theme="light"] .v-star-star-dial{--cy:#0b90b0;--track:rgba(0,0,0,.10);--mark:rgba(0,0,0,.40)}
+:root[data-theme="dark"] .v-star-star-dial{--cy:#3ad9f5;--track:rgba(255,255,255,.10);--mark:rgba(255,255,255,.42)}
+.v-star-star-dial__row{display:flex;align-items:center;gap:20px}
+.v-star-star-dial__gauge{position:relative;flex:none;width:104px;height:104px}
+.v-star-star-dial__gauge svg{display:block}
+.v-star-star-dial__track{fill:none;stroke:var(--track);stroke-width:7}
+.v-star-star-dial__arc{fill:none;stroke:var(--cy);stroke-width:7;stroke-linecap:round}
+.v-star-star-dial__mark{fill:var(--mark)}
+.v-star-star-dial__pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:650;letter-spacing:-.02em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-dial__side{min-width:0}
+.v-star-star-dial__left{font-size:40px;line-height:.95;font-weight:680;letter-spacing:-.035em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-dial__unit{margin-top:5px;font-size:13px;line-height:1.3;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-dial__pace{margin-top:10px;font-size:12px;line-height:1.3;font-weight:650;color:var(--cy)}
+.v-star-star-dial__foot{margin:16px 0 0;font-size:12.5px;line-height:1.4;color:var(--text-mid,rgba(255,255,255,.62))}
+
+/* star-star-strata */
+.v-strata{position:relative;height:168px;--ink:rgba(255,255,255,.96);--ink2:rgba(255,255,255,.62);--ink3:rgba(255,255,255,.40);--f1:rgba(255,255,255,.12);--f2:rgba(255,255,255,.07);--lift:inset 0 1px 0 rgba(255,255,255,.07)}
+.v-strata *{box-sizing:border-box}
+.v-strata__core{position:absolute;left:0;top:0;width:20px}
+.v-strata__l{display:block;height:var(--h);margin-bottom:3px;border-radius:3px;box-shadow:var(--lift)}
+.v-strata__l--now{background:linear-gradient(180deg,rgba(58,217,245,.62),rgba(58,217,245,.30))}
+.v-strata__l--mid{background:var(--f1)}
+.v-strata__l--old{background:var(--f2)}
+.v-strata__body{position:absolute;left:36px;right:0;top:0;bottom:0}
+.v-strata__now{margin:0;font-size:16.5px;line-height:1.28;font-weight:600;letter-spacing:-.01em;color:var(--ink)}
+.v-strata__meta{margin:8px 0 0;font-size:12.5px;line-height:1;color:var(--ink2);font-variant-numeric:tabular-nums}
+.v-strata__meta i{font-style:normal;color:var(--ink3);padding:0 3px}
+.v-strata__past{position:absolute;left:0;right:0;margin:0;display:flex;align-items:baseline;gap:12px;font-size:13px;line-height:1.2;color:var(--ink2)}
+.v-strata__past span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.v-strata__past b{font-weight:500;font-size:12px;color:var(--ink3);font-variant-numeric:tabular-nums}
+@media (prefers-color-scheme:light){.v-strata{--ink:rgba(12,14,18,.95);--ink2:rgba(12,14,18,.60);--ink3:rgba(12,14,18,.38);--f1:rgba(12,14,18,.14);--f2:rgba(12,14,18,.08);--lift:inset 0 1px 0 rgba(255,255,255,.35)}.v-strata__l--now{background:linear-gradient(180deg,#1aa9c9,rgba(26,169,201,.55))}}
+
+/* star-star-meridian */
+.v-meridian{position:relative;height:172px;--ink:rgba(255,255,255,.96);--ink2:rgba(255,255,255,.62);--cy:rgba(58,217,245,.58)}
+.v-meridian__star{position:absolute;top:0;left:0;right:0;margin:0;font-size:16.5px;line-height:1.28;font-weight:600;letter-spacing:-.01em;color:var(--ink)}
+.v-meridian__line{position:absolute;left:0;right:0;height:1px;top:calc(152px - var(--p) * 104px);background:linear-gradient(90deg,transparent,var(--cy) 14%,var(--cy) 86%,transparent)}
+.v-meridian__read{position:absolute;right:0;bottom:8px;font-size:12.5px;line-height:1;color:var(--ink2);white-space:nowrap;font-variant-numeric:tabular-nums}
+.v-meridian__anti{position:absolute;left:0;right:0;bottom:0;margin:0;font-size:13px;line-height:1.34;font-weight:400;color:var(--ink)}
+@media (prefers-color-scheme:light){.v-meridian{--ink:rgba(12,14,18,.95);--ink2:rgba(12,14,18,.60);--cy:rgba(17,140,168,.75)}}
+
+/* star-star-folio */
+.v-folio{height:170px;display:flex;flex-direction:column;justify-content:space-between;padding-top:4px;--ink:rgba(255,255,255,.96);--ink2:rgba(255,255,255,.62)}
+.v-folio__star{margin:0;font-size:30px;line-height:1.14;font-weight:600;letter-spacing:-.024em;color:var(--ink);text-wrap:balance}
+.v-folio__foot{display:flex;align-items:baseline;justify-content:space-between;font-size:12.5px;line-height:1;color:var(--ink2);font-variant-numeric:tabular-nums}
+@media (prefers-color-scheme:light){.v-folio{--ink:rgba(12,14,18,.95);--ink2:rgba(12,14,18,.60)}}
+
+/* star-star-plumb */
+.v-plumb{height:170px;display:grid;grid-template-columns:1fr 92px;gap:14px;align-items:center;--ink:rgba(255,255,255,.96);--ink2:rgba(255,255,255,.62);--ink3:rgba(255,255,255,.40);--hair:rgba(255,255,255,.09);--cy:#3ad9f5}
+.v-plumb__star{margin:0;font-size:16px;line-height:1.3;font-weight:600;letter-spacing:-.01em;color:var(--ink)}
+.v-plumb__meta{margin:11px 0 0;font-size:12.5px;line-height:1;color:var(--ink2);font-variant-numeric:tabular-nums}
+.v-plumb__meta i{font-style:normal;color:var(--ink3);padding:0 3px}
+.v-plumb__svg{width:92px;height:168px;display:block}
+.v-plumb__ref{stroke:var(--hair);stroke-width:1}
+.v-plumb__cord{stroke:rgba(255,255,255,.52);stroke-width:1}
+.v-plumb__pin{fill:var(--cy)}
+.v-plumb__bob{fill:var(--cy);fill-opacity:.9}
+.v-plumb__off{stroke:var(--ink3);stroke-width:1;stroke-opacity:.55}
+@media (prefers-color-scheme:light){.v-plumb{--ink:rgba(12,14,18,.95);--ink2:rgba(12,14,18,.60);--ink3:rgba(12,14,18,.38);--hair:rgba(12,14,18,.14);--cy:#118ca8}.v-plumb__cord{stroke:rgba(12,14,18,.50)}}
+
+/* star-star-vigil */
+.v-vigil{height:168px;display:flex;flex-direction:column;justify-content:center;--ink:rgba(255,255,255,.96);--ink2:rgba(255,255,255,.62);--hair:rgba(255,255,255,.09)}
+.v-vigil__news{display:flex;align-items:baseline;gap:9px}
+.v-vigil__n{font-size:54px;line-height:.94;font-weight:600;letter-spacing:-.038em;color:var(--ink);font-variant-numeric:tabular-nums}
+.v-vigil__u{font-size:17px;font-weight:500;letter-spacing:-.01em;color:var(--ink)}
+.v-vigil__sub{margin:11px 0 0;font-size:13px;line-height:1.3;color:var(--ink2)}
+.v-vigil__rule{height:1px;background:var(--hair);margin:16px 0 14px}
+.v-vigil__star{margin:0;font-size:14.5px;line-height:1.34;font-weight:600;letter-spacing:-.005em;color:var(--ink)}
+@media (prefers-color-scheme:light){.v-vigil{--ink:rgba(12,14,18,.95);--ink2:rgba(12,14,18,.60);--hair:rgba(12,14,18,.13)}}
+
+/* consistency-chain-slack */
+.v-consistency-chain-slack{color:var(--text-hi);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;}
+.v-consistency-chain-slack .cs-head{display:flex;align-items:flex-end;gap:9px;}
+.v-consistency-chain-slack .cs-num{font-size:3.25rem;line-height:.82;font-weight:700;letter-spacing:-.035em;color:var(--text-hi);}
+.v-consistency-chain-slack .cs-unit{font-size:.8rem;line-height:1.2;font-weight:600;color:var(--text-mid);padding-bottom:2px;}
+.v-consistency-chain-slack .cs-bank{margin-left:auto;display:inline-flex;align-items:center;gap:6px;padding-bottom:4px;font-size:.78rem;font-weight:600;color:var(--text-mid);white-space:nowrap;}
+.v-consistency-chain-slack .cs-bank svg{flex:0 0 auto;opacity:.75;}
+.v-consistency-chain-slack .cs-chain{display:flex;align-items:flex-end;gap:4px;height:34px;margin-top:24px;}
+.v-consistency-chain-slack .cs-chain i{flex:1 1 0;min-width:0;height:100%;border-radius:3px;display:block;}
+.v-consistency-chain-slack .cs-k{background:#3fd94e;opacity:.92;}
+.v-consistency-chain-slack .cs-p{background:#3fd94e;opacity:.34;height:38%;}
+.v-consistency-chain-slack .cs-g{background:currentColor;opacity:.22;}
+.v-consistency-chain-slack .cs-t{box-shadow:0 0 12px rgba(63,217,78,.45);}
+.v-consistency-chain-slack .cs-foot{margin-top:18px;font-size:.83rem;line-height:1.35;color:var(--text-mid);}
+
+/* consistency-run-rank */
+.v-consistency-run-rank{color:var(--text-hi);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;}
+.v-consistency-run-rank .rr-head{display:flex;align-items:flex-end;gap:9px;}
+.v-consistency-run-rank .rr-num{font-size:3.25rem;line-height:.82;font-weight:700;letter-spacing:-.035em;color:var(--text-hi);}
+.v-consistency-run-rank .rr-unit{font-size:.8rem;line-height:1.2;font-weight:600;color:var(--text-mid);padding-bottom:2px;}
+.v-consistency-run-rank .rr-rank{margin-left:auto;padding-bottom:3px;font-size:.8rem;font-weight:650;letter-spacing:-.005em;color:var(--text-hi);white-space:nowrap;}
+.v-consistency-run-rank .rr-bar{position:relative;height:6px;margin-top:24px;border-radius:999px;background:var(--hairline);}
+.v-consistency-run-rank .rr-fill{position:absolute;top:0;bottom:0;left:0;width:40.8%;border-radius:999px;background:#3fd94e;box-shadow:0 0 14px rgba(63,217,78,.32);}
+.v-consistency-run-rank .rr-notch{position:absolute;top:-4px;bottom:-4px;left:45.6%;width:2px;border-radius:2px;background:currentColor;opacity:.5;}
+.v-consistency-run-rank .rr-marks{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:11px;font-size:.79rem;}
+.v-consistency-run-rank .rr-near{font-weight:600;color:var(--text-hi);}
+.v-consistency-run-rank .rr-far{font-weight:600;color:var(--text-mid);white-space:nowrap;}
+.v-consistency-run-rank .rr-foot{margin-top:20px;font-size:.83rem;line-height:1.35;color:var(--text-mid);}
+
+/* consistency-weekday-shape */
+.v-consistency-weekday-shape{display:flex;flex-direction:column;color:var(--text-hi);font-variant-numeric:tabular-nums;}
+.v-consistency-weekday-shape .ws-h{font-size:16px;line-height:1.32;font-weight:600;letter-spacing:-.015em;color:var(--text-hi);}
+.v-consistency-weekday-shape .ws-h b{font-weight:600;color:#3fd94e;}
+.v-consistency-weekday-shape .ws-list{margin-top:16px;display:flex;flex-direction:column;gap:4px;}
+.v-consistency-weekday-shape .ws-r{display:flex;align-items:center;gap:10px;height:11px;}
+.v-consistency-weekday-shape .ws-d{width:26px;flex:none;font-size:11.5px;line-height:1;font-weight:520;color:var(--text-mid);}
+.v-consistency-weekday-shape .ws-tr{flex:1;height:9px;border-radius:5px;background:var(--hairline);overflow:hidden;}
+.v-consistency-weekday-shape .ws-fl{display:block;height:100%;border-radius:5px;background:currentColor;opacity:.66;width:var(--w);}
+.v-consistency-weekday-shape .ws-r.is-top .ws-fl{background:#3fd94e;opacity:1;}
+.v-consistency-weekday-shape .ws-r.is-low .ws-fl{opacity:.26;}
+.v-consistency-weekday-shape .ws-p{width:30px;flex:none;text-align:right;font-size:11.5px;line-height:1;color:var(--text-mid);}
+.v-consistency-weekday-shape .ws-r.is-top .ws-d,.v-consistency-weekday-shape .ws-r.is-top .ws-p{color:var(--text-hi);}
+.v-consistency-weekday-shape .ws-ft{margin-top:14px;font-size:12.5px;color:var(--text-mid);}
+
+/* consistency-made-of */
+.v-consistency-made-of{color:var(--text-hi);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;}
+.v-consistency-made-of .mo-head{display:flex;align-items:flex-end;gap:9px;}
+.v-consistency-made-of .mo-num{font-size:3.25rem;line-height:.82;font-weight:700;letter-spacing:-.035em;color:var(--text-hi);}
+.v-consistency-made-of .mo-unit{font-size:.8rem;line-height:1.2;font-weight:600;color:var(--text-mid);padding-bottom:2px;}
+.v-consistency-made-of .mo-win{margin-left:auto;padding-bottom:4px;font-size:.78rem;font-weight:600;color:var(--text-mid);}
+.v-consistency-made-of .mo-bar{display:flex;gap:3px;height:10px;margin-top:24px;}
+.v-consistency-made-of .mo-bar i{display:block;height:100%;border-radius:3px;}
+.v-consistency-made-of .mo-a{background:#3fd94e;opacity:.9;}
+.v-consistency-made-of .mo-b{background:currentColor;opacity:.44;}
+.v-consistency-made-of .mo-c{background:currentColor;opacity:.26;}
+.v-consistency-made-of .mo-key{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:14px;font-size:.78rem;color:var(--text-mid);}
+.v-consistency-made-of .mo-key span{display:inline-flex;align-items:center;gap:5px;white-space:nowrap;}
+.v-consistency-made-of .mo-key i{width:7px;height:7px;border-radius:2px;flex:0 0 auto;}
+.v-consistency-made-of .mo-key b{font-weight:700;color:var(--text-hi);}
+.v-consistency-made-of .mo-foot{margin-top:18px;font-size:.83rem;line-height:1.35;color:var(--text-mid);}
+
+/* consistency-rate-drift */
+.v-consistency-rate-drift{color:var(--text-hi);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;}
+.v-consistency-rate-drift .rd-head{display:flex;align-items:flex-end;gap:9px;}
+.v-consistency-rate-drift .rd-num{font-size:3.25rem;line-height:.82;font-weight:700;letter-spacing:-.035em;color:var(--text-hi);}
+.v-consistency-rate-drift .rd-unit{font-size:.8rem;line-height:1.2;font-weight:600;color:var(--text-mid);padding-bottom:2px;}
+.v-consistency-rate-drift .rd-rate{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:3px;padding-bottom:3px;}
+.v-consistency-rate-drift .rd-rate b{font-size:1.15rem;line-height:1;font-weight:700;letter-spacing:-.02em;color:var(--text-hi);}
+.v-consistency-rate-drift .rd-rate small{font-size:.74rem;line-height:1;font-weight:600;color:var(--text-mid);}
+.v-consistency-rate-drift .rd-graph{display:block;width:100%;height:54px;margin-top:20px;overflow:visible;}
+.v-consistency-rate-drift .rd-foot{margin-top:16px;font-size:.83rem;line-height:1.35;color:var(--text-mid);}
+
+/* consistency-returns */
+.v-consistency-returns{color:var(--text-hi);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;}
+.v-consistency-returns .rt-row{display:flex;align-items:center;gap:20px;}
+.v-consistency-returns .rt-ring{position:relative;flex:0 0 96px;width:96px;height:96px;}
+.v-consistency-returns .rt-ring svg{display:block;width:96px;height:96px;}
+.v-consistency-returns .rt-arc{filter:drop-shadow(0 0 8px rgba(63,217,78,.35));}
+.v-consistency-returns .rt-in{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;}
+.v-consistency-returns .rt-num{font-size:1.9rem;line-height:1;font-weight:700;letter-spacing:-.03em;color:var(--text-hi);}
+.v-consistency-returns .rt-lab{font-size:.7rem;font-weight:600;color:var(--text-mid);}
+.v-consistency-returns .rt-rail{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:9px;}
+.v-consistency-returns .rt-lead{margin:0;font-size:.94rem;line-height:1.25;font-weight:600;color:var(--text-hi);}
+.v-consistency-returns .rt-lead b{font-size:1.25rem;font-weight:700;letter-spacing:-.02em;margin-right:3px;}
+.v-consistency-returns .rt-sub{margin:0;font-size:.82rem;line-height:1.25;color:var(--text-mid);}
+.v-consistency-returns .rt-foot{margin-top:20px;font-size:.83rem;line-height:1.35;color:var(--text-mid);}
+
+/* consistency-week-rhythm */
+.v-consistency-week-rhythm{display:flex;flex-direction:column;color:var(--text-hi);font-variant-numeric:tabular-nums;}
+.v-consistency-week-rhythm .wr-top{display:flex;align-items:baseline;gap:8px;}
+.v-consistency-week-rhythm .wr-n{font-size:30px;line-height:1;font-weight:640;letter-spacing:-.03em;color:var(--text-hi);}
+.v-consistency-week-rhythm .wr-of{font-size:14px;font-weight:500;color:var(--text-hi);}
+.v-consistency-week-rhythm .wr-d{margin-left:auto;font-size:12.5px;font-weight:600;color:var(--text-hi);white-space:nowrap;}
+.v-consistency-week-rhythm .wr-row{display:flex;gap:8px;margin-top:20px;}
+.v-consistency-week-rhythm .wr-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:9px;}
+.v-consistency-week-rhythm .wr-tr{width:70%;height:58px;border-radius:4px;background:var(--hairline);display:flex;align-items:flex-end;overflow:hidden;}
+.v-consistency-week-rhythm .wr-fl{width:100%;border-radius:4px;background:currentColor;opacity:.8;}
+.v-consistency-week-rhythm .wr-col.is-today .wr-fl{background:#3fd94e;opacity:1;}
+.v-consistency-week-rhythm .wr-dy{font-size:10.5px;font-weight:520;color:var(--text-mid);}
+.v-consistency-week-rhythm .wr-col.is-today .wr-dy{color:var(--text-hi);}
+.v-consistency-week-rhythm .wr-ft{margin-top:17px;font-size:12.5px;color:var(--text-mid);}
+
+/* consistency-year-ribbon */
+.v-consistency-year-ribbon{display:flex;flex-direction:column;color:var(--text-hi);font-variant-numeric:tabular-nums;}
+.v-consistency-year-ribbon .yr-top{display:flex;align-items:baseline;gap:8px;}
+.v-consistency-year-ribbon .yr-n{font-size:30px;line-height:1;font-weight:640;letter-spacing:-.03em;color:var(--text-hi);}
+.v-consistency-year-ribbon .yr-of{font-size:13.5px;font-weight:500;color:var(--text-hi);}
+.v-consistency-year-ribbon .yr-sub{margin-top:9px;font-size:13px;line-height:1.35;color:var(--text-hi);}
+.v-consistency-year-ribbon .yr-rib{display:flex;align-items:flex-end;gap:1.5px;height:58px;margin-top:20px;}
+.v-consistency-year-ribbon .wk{flex:1;height:var(--h);border-radius:1.5px;background:currentColor;opacity:.4;}
+.v-consistency-year-ribbon .wk.is-peak{opacity:.85;}
+.v-consistency-year-ribbon .wk.is-off{opacity:.15;}
+.v-consistency-year-ribbon .wk.is-now{background:#3fd94e;opacity:1;}
+.v-consistency-year-ribbon .yr-ax{display:flex;margin-top:10px;font-size:10px;color:var(--text-mid);}
+.v-consistency-year-ribbon .yr-ax span{flex:1;}
+.v-consistency-year-ribbon .yr-ax span:last-child{flex:none;}
+
+/* consistency-rate-curve */
+.v-consistency-rate-curve{display:flex;flex-direction:column;color:var(--text-hi);font-variant-numeric:tabular-nums;}
+.v-consistency-rate-curve .rc-top{display:flex;align-items:baseline;gap:8px;}
+.v-consistency-rate-curve .rc-n{font-size:30px;line-height:1;font-weight:640;letter-spacing:-.03em;color:var(--text-hi);}
+.v-consistency-rate-curve .rc-of{font-size:13.5px;font-weight:500;color:var(--text-hi);}
+.v-consistency-rate-curve .rc-sub{margin-top:9px;font-size:13px;line-height:1.35;color:var(--text-hi);}
+.v-consistency-rate-curve .rc-chart{position:relative;margin-top:16px;height:64px;}
+.v-consistency-rate-curve .rc-chart svg{display:block;width:100%;height:64px;overflow:visible;}
+.v-consistency-rate-curve .rc-tag{position:absolute;left:0;top:48.8%;transform:translateY(-140%);font-size:10px;line-height:1;color:var(--text-mid);}
+.v-consistency-rate-curve .rc-ft{margin-top:15px;font-size:12.5px;color:var(--text-mid);}
+
+/* consistency-comeback */
+.v-consistency-comeback{display:flex;gap:16px;align-items:flex-start;color:var(--text-hi);font-variant-numeric:tabular-nums;}
+.v-consistency-comeback .cb-l{width:132px;flex:none;}
+.v-consistency-comeback .cb-n{font-size:30px;line-height:1;font-weight:640;letter-spacing:-.03em;color:var(--text-hi);}
+.v-consistency-comeback .cb-k{margin-top:6px;font-size:14px;font-weight:500;color:var(--text-hi);}
+.v-consistency-comeback .cb-sub{margin-top:16px;font-size:12.5px;line-height:1.55;color:var(--text-mid);}
+.v-consistency-comeback .cb-r{flex:1;display:flex;flex-direction:column;gap:7px;}
+.v-consistency-comeback .cb-hd{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;font-size:9px;color:var(--text-mid);text-align:center;}
+.v-consistency-comeback .cb-g{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.v-consistency-comeback .cel{aspect-ratio:1;border-radius:3px;background:currentColor;opacity:.08;}
+.v-consistency-comeback .cel.is-fut{opacity:.03;}
+.v-consistency-comeback .cel.lv1{opacity:.26;}
+.v-consistency-comeback .cel.lv2{opacity:.48;}
+.v-consistency-comeback .cel.lv3{opacity:.76;}
+.v-consistency-comeback .cel.is-now{background:#3fd94e;opacity:1;}
+.v-consistency-comeback .cb-cap{margin-top:1px;font-size:11px;color:var(--text-mid);text-align:right;}
+
+/* consistency-ledger */
+.v-consistency-ledger{min-height:168px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;font-variant-numeric:tabular-nums;}
+.v-consistency-ledger__hero{display:flex;align-items:baseline;gap:11px;}
+.v-consistency-ledger__n{font-size:76px;line-height:.84;font-weight:600;letter-spacing:-.048em;color:rgba(255,255,255,.96);}
+.v-consistency-ledger__of{font-size:19px;font-weight:400;letter-spacing:-.01em;color:rgba(255,255,255,.62);}
+.v-consistency-ledger__say{margin:15px 0 0;font-size:14.5px;line-height:1.34;letter-spacing:-.005em;color:rgba(255,255,255,.9);max-width:255px;}
+.v-consistency-ledger__rule{height:1px;background:rgba(255,255,255,.09);margin-top:16px;}
+.v-consistency-ledger__foot{display:flex;justify-content:space-between;align-items:baseline;margin-top:12px;font-size:13px;letter-spacing:-.005em;color:rgba(255,255,255,.72);}
+.v-consistency-ledger__today{color:#3fd94e;}
+
+/* consistency-water */
+.v-consistency-water{min-height:176px;box-sizing:border-box;font-variant-numeric:tabular-nums;}
+.v-consistency-water__gauge{position:relative;height:176px;}
+.v-consistency-water__miss{position:absolute;top:calc(13% - 18px);right:0;font-size:12.5px;letter-spacing:-.005em;color:rgba(255,255,255,.72);}
+.v-consistency-water__now{position:absolute;left:-22px;right:-22px;top:13%;height:1px;background:rgba(63,217,78,.6);}
+.v-consistency-water__now::after{content:"";position:absolute;left:0;right:0;top:1px;height:38px;background:linear-gradient(180deg, rgba(63,217,78,.10), rgba(63,217,78,0));}
+.v-consistency-water__body{position:absolute;top:13px;left:22px;right:22px;}
+.v-consistency-water__read{display:flex;align-items:baseline;gap:2px;}
+.v-consistency-water__n{font-size:44px;line-height:.9;font-weight:600;letter-spacing:-.045em;color:rgba(255,255,255,.96);}
+.v-consistency-water__pct{font-size:20px;font-weight:500;color:rgba(255,255,255,.62);}
+.v-consistency-water__sub{margin-top:8px;font-size:14px;letter-spacing:-.005em;color:rgba(255,255,255,.88);}
+.v-consistency-water__low{position:absolute;left:-22px;right:-22px;top:60%;height:1px;background:rgba(255,255,255,.11);}
+.v-consistency-water__low span{position:absolute;top:7px;right:22px;font-size:12.5px;letter-spacing:-.005em;color:rgba(255,255,255,.58);}
+
+/* consistency-pace */
+.v-consistency-pace{min-height:168px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;font-variant-numeric:tabular-nums;}
+.v-consistency-pace__hero{display:flex;align-items:baseline;gap:10px;}
+.v-consistency-pace__n{font-size:54px;line-height:.86;font-weight:600;letter-spacing:-.045em;color:rgba(255,255,255,.96);}
+.v-consistency-pace__u{font-size:17px;letter-spacing:-.012em;color:rgba(255,255,255,.9);}
+.v-consistency-pace__say{margin:13px 0 0;font-size:14px;line-height:1.34;letter-spacing:-.005em;color:rgba(255,255,255,.86);}
+.v-consistency-pace__axis{position:relative;height:34px;margin-top:22px;}
+.v-consistency-pace__track{position:absolute;top:0;left:0;right:0;height:1px;background:rgba(255,255,255,.12);}
+.v-consistency-pace__done{position:absolute;top:0;left:0;width:46%;height:1px;background:rgba(255,255,255,.62);}
+.v-consistency-pace__proj{position:absolute;top:0;left:46%;width:35.6%;height:1px;background:repeating-linear-gradient(90deg, rgba(63,217,78,.8) 0 3px, rgba(63,217,78,0) 3px 7px);}
+.v-consistency-pace__now{position:absolute;top:-6px;left:46%;width:1px;height:13px;background:rgba(255,255,255,.92);}
+.v-consistency-pace__lands{position:absolute;top:-6px;left:81.6%;width:1px;height:13px;background:#3fd94e;}
+.v-consistency-pace__cap{position:absolute;top:-3px;right:0;width:1px;height:7px;background:rgba(255,255,255,.22);}
+.v-consistency-pace__tag{position:absolute;top:13px;left:46%;margin-left:-2px;font-size:12.5px;letter-spacing:-.005em;color:rgba(255,255,255,.72);}
+.v-consistency-pace__end{position:absolute;top:13px;right:0;font-size:12.5px;color:rgba(255,255,255,.5);}
+
+/* consistency-held */
+.v-consistency-held{position:relative;min-height:172px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;padding-bottom:8px;}
+.v-consistency-held__mark{position:absolute;top:2px;left:0;width:7px;height:7px;background:#3fd94e;}
+.v-consistency-held__line{margin:0;font-size:29px;line-height:1.1;font-weight:500;letter-spacing:-.028em;color:rgba(255,255,255,.96);}
+.v-consistency-held__sub{margin:8px 0 0;font-size:15px;letter-spacing:-.008em;color:rgba(255,255,255,.82);font-variant-numeric:tabular-nums;}
+
+/* consistency-trace */
+.v-consistency-trace{min-height:168px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;font-variant-numeric:tabular-nums;}
+.v-consistency-trace__head{display:flex;align-items:baseline;gap:9px;}
+.v-consistency-trace__n{font-size:40px;line-height:.9;font-weight:600;letter-spacing:-.04em;color:rgba(255,255,255,.96);}
+.v-consistency-trace__u{font-size:16px;letter-spacing:-.012em;color:rgba(255,255,255,.9);}
+.v-consistency-trace__avg{margin-left:auto;font-size:13px;letter-spacing:-.005em;color:rgba(255,255,255,.72);}
+.v-consistency-trace__svg{display:block;width:100%;height:auto;margin-top:20px;}
+.v-consistency-trace__foot{display:flex;justify-content:space-between;margin-top:12px;font-size:12.5px;letter-spacing:-.005em;color:rgba(255,255,255,.62);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>The sync box</h1>
+  <p class="lede">Fifty candidates for the three swipeable faces under the Memento.
+    Each one says who it is for and when to skip it. Prototypes, not shipped.</p>
+  <div class="guide">
+    <h3>Which face for which person</h3>
+    <table>
+      <tr><th>Their goal</th><th>Today</th><th>Star</th><th>Consistency</th></tr>
+      <tr><td><b>Number + deadline</b><br>lose 40 lbs in 6 months</td>
+          <td>The derived line</td><td>Distance to the number</td><td>Your schedule, kept</td></tr>
+      <tr><td><b>Number, no deadline</b><br>100 paying users</td>
+          <td>Closing the gap</td><td>Arrival date</td><td>Rate drift</td></tr>
+      <tr><td><b>A rule to hold</b><br>stay sober, eat under 2,400</td>
+          <td>The rule, tonight</td><td>Evidence, no meter</td><td>Your schedule, kept</td></tr>
+      <tr><td><b>A rate</b><br>gym 3x a week</td>
+          <td>Weighted move</td><td>Evidence, no meter</td><td>Your schedule, kept</td></tr>
+      <tr><td><b>An event</b><br>pass the bar, first hive</td>
+          <td>First thirty seconds</td><td>The star's own spine</td><td>Returns</td></tr>
+      <tr><td><b>Open</b><br>be a better father</td>
+          <td>The ledger</td><td>Evidence, no meter</td><td>Returns</td></tr>
+      <tr><td><b>Kept it up, no result</b><br>any goal, stalled</td>
+          <td colspan="3">Doing it, not working, takes over until the plan is redone</td></tr>
+    </table>
+  </div>
+  <nav class="nav">
+    <a href="#sect-today">Today</a>
+    <a href="#sect-star">Neutron Star</a>
+    <a href="#sect-consistency">Consistency</a>
+  </nav>
+  <section class="sect" id="sect-today">
+    <header class="sect__hd"><h2>Today</h2>
+      <p>The one move for the day. <b>10 considered</b>, then <b>5 riskier ones</b> below.</p></header>
+    <div class="grid">
+      <figure class="slot" id="today-gap-close">
+        <figcaption class="slot__cap"><span class="slot__n">01</span>
+          <span class="slot__t">Closing the gap</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-today-gap-close">
+  <p class="gc-move">Message 10 people who fit the product</p>
+  <div class="gc-head">
+    <span class="gc-now">47</span>
+    <span class="gc-of">of 100 paying customers</span>
+    <span class="gc-new">+6 this week</span>
+  </div>
+  <div class="gc-rail" role="img" aria-label="47 of 100 paying customers, six of them added this week"><i class="gc-base"></i><i class="gc-week"></i></div>
+  <p class="gc-read">At this week's pace you cross 100 on October 2.</p>
+  <button class="gc-do" type="button">Mark it done</button>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Quantity up or down with a target. The founder counting users toward 100.<span class="bf__x">Skip if no target number in the goal</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="today-today-weight">
+        <figcaption class="slot__cap"><span class="slot__n">02</span>
+          <span class="slot__t">Weighted move</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-today-today-weight">
+  <p class="tw-move">Send the beta invite to the five people who already asked for it</p>
+  <div class="tw-row">
+    <span class="tw-ladder" aria-hidden="true"><i class="is-past"></i><i class="is-past"></i><i class="is-on"></i><i></i><i></i></span>
+    <span class="tw-tier">Moderate today</span>
+  </div>
+  <p class="tw-run"><span class="tw-n">4</span> of the last 7 days. Your best 7 is <span class="tw-n">6</span>.</p>
+  <button class="tw-cta" type="button">Mark it done</button>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Rep and Attempt goals. The person whose reps must get heavier, not just repeat.<span class="bf__x">Skip if the plan carries no intensity ladder</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="today-today-open">
+        <figcaption class="slot__cap"><span class="slot__n">03</span>
+          <span class="slot__t">First thirty seconds</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-today-today-open">
+  <p class="to-move">Call the three trial accounts that never came back</p>
+  <div class="to-start">
+    <svg class="to-ic" viewBox="0 0 16 16" width="13" height="13" fill="none" aria-hidden="true"><path d="M4 3.2 11.6 8 4 12.8V3.2Z" fill="currentColor"/></svg>
+    <p>Open the trial list and dial the top name before you think about it.</p>
+  </div>
+  <p class="to-gap">Two days since your last move.</p>
+  <button class="to-cta" type="button">Mark it done</button>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Open goals. The person with no number who stalls on where to physically begin.<span class="bf__x">Skip if the move is an all-day rule</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="today-today-run">
+        <figcaption class="slot__cap"><span class="slot__n">04</span>
+          <span class="slot__t">The run</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-today-today-run">
+  <ol class="tr-list">
+    <li class="tr-now"><span class="tr-mk" aria-hidden="true"></span><p>Record lesson two, one take, no edits</p></li>
+    <li><span class="tr-mk tr-mk--on" aria-hidden="true"></span><p>Recorded lesson one</p><time>Mon</time></li>
+    <li><span class="tr-mk tr-mk--on" aria-hidden="true"></span><p>Outlined the whole module</p><time>Sat</time></li>
+  </ol>
+  <button class="tr-cta" type="button">Mark today done</button>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Frequency goals. The daily writer who keeps going because the run is visible.<span class="bf__x">Skip if fewer than two moves logged</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="today-week-rhythm">
+        <figcaption class="slot__cap"><span class="slot__n">05</span>
+          <span class="slot__t">This week&#x27;s rhythm</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-today-week-rhythm">
+  <p class="wr-move">Message 10 people who fit the product</p>
+  <div class="wr-week" role="img" aria-label="Four moves so far this week. Today is still open.">
+    <span class="wr-day is-done"><i></i>m</span>
+    <span class="wr-day is-done"><i></i>t</span>
+    <span class="wr-day"><i></i>w</span>
+    <span class="wr-day is-done"><i></i>t</span>
+    <span class="wr-day is-done"><i></i>f</span>
+    <span class="wr-day is-now"><i></i>s</span>
+    <span class="wr-day"><i></i>s</span>
+  </div>
+  <p class="wr-read"><b>Four this week.</b> Three by now last week.</p>
+  <button class="wr-do" type="button">Mark it done</button>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Frequency goals. The gym-3x person who should judge a week, not a streak.<span class="bf__x">Skip if a one-off milestone with no weekly rhythm</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="today-record-line">
+        <figcaption class="slot__cap"><span class="slot__n">06</span>
+          <span class="slot__t">Against your record</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-today-record-line">
+  <p class="rl-verdict">One day from your best week.</p>
+  <div class="rl-rows">
+    <div class="rl-row"><span class="rl-k">This week</span><i class="rl-bar"><b style="width:83%"></b></i><span class="rl-n">5</span></div>
+    <div class="rl-row is-best"><span class="rl-k">Best, in June</span><i class="rl-bar"><b style="width:100%"></b></i><span class="rl-n">6</span></div>
+  </div>
+  <p class="rl-move">Message 10 people who fit the product</p>
+  <button class="rl-do" type="button">Mark it done</button>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Frequency goals. The competitor who moves when a record is one day away.<span class="bf__x">Skip if no completed week to beat yet</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="today-today-then">
+        <figcaption class="slot__cap"><span class="slot__n">07</span>
+          <span class="slot__t">How far it has grown</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-today-today-then">
+  <p class="tn-move">Write 1,000 words on the chapter you keep avoiding</p>
+  <div class="tn-then">
+    <span class="tn-rule" aria-hidden="true"></span>
+    <p>Where this started, 63 days ago: <span>write 200 words, anywhere.</span></p>
+  </div>
+  <button class="tn-cta" type="button">Mark it done</button>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Rep goals months in. The person who fears they are still repeating day one.<span class="bf__x">Skip if the plan is under a month old</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="today-today-toward">
+        <figcaption class="slot__cap"><span class="slot__n">08</span>
+          <span class="slot__t">In service of</span><span class="tag tag--cut">was cut</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-today-today-toward">
+  <p class="tt-move">Ship the pricing page and post it in three communities</p>
+  <div class="tt-rail">
+    <span class="tt-track" aria-hidden="true"><span class="tt-fill"></span><span class="tt-base"></span></span>
+    <span class="tt-nums"><span class="tt-cur"><b>34</b> of 100 paying users</span><span class="tt-delta">+9 in 30 days</span></span>
+  </div>
+  <button class="tt-cta" type="button">Mark it done</button>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Quantity up or down with a named number. The dieter 12 lbs into 40.<span class="bf__x">Skip if the goal carries no number</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="today-size-ladder">
+        <figcaption class="slot__cap"><span class="slot__n">09</span>
+          <span class="slot__t">How big it got</span><span class="tag tag--cut">was cut</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-today-size-ladder">
+  <p class="sl-move">Message 10 people who fit the product</p>
+  <div class="sl-scale" role="img" aria-label="Moderate, the third of five sizes"><i class="is-past"></i><i class="is-past"></i><i class="is-now"></i><i></i><i></i></div>
+  <p class="sl-read"><b>Moderate.</b> On day one this was two people.</p>
+  <button class="sl-do" type="button">Mark it done</button>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Attempt and Rep goals. The person whose plan escalates on a fixed ladder.<span class="bf__x">Skip if the move is a fixed-size daily rule</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="today-move-ledger">
+        <figcaption class="slot__cap"><span class="slot__n">10</span>
+          <span class="slot__t">The ledger</span><span class="tag tag--cut">was cut</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-today-move-ledger">
+  <div class="ml-top">
+    <p class="ml-move">Message 10 people who fit the product</p>
+    <button class="ml-do" type="button">Done</button>
+  </div>
+  <div class="ml-list">
+    <div class="ml-row"><span class="ml-d">Yesterday</span><span class="ml-t">Message 10 people who fit</span></div>
+    <div class="ml-row"><span class="ml-d">Thu</span><span class="ml-t">Rewrite the outreach opener</span></div>
+    <div class="ml-row"><span class="ml-d">Wed</span><span class="ml-t">Message 5 people who fit</span></div>
+  </div>
+  <p class="ml-foot">34 moves in 68 days, nine of the last ten.</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Frequency and Ship goals. The person who wants the record, not the pep talk.<span class="bf__x">Skip if nothing logged yet</span></p>
+          
+          
+          
+        </div>
+      </figure></div>
+    <h3 class="sect__sub">The riskier five</h3>
+    <div class="grid">
+      <figure class="slot" id="today-mv-ask">
+        <figcaption class="slot__cap"><span class="slot__n">11</span>
+          <span class="slot__t">The question</span><span class="tag tag--risk">risky</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-today-mv-ask">
+  <p class="v-today-mv-ask__q">Have you moved today?</p>
+  <p class="v-today-mv-ask__a">Not yet.</p>
+  <p class="v-today-mv-ask__move">Write the cold open for episode 12.</p>
+  <button class="v-today-mv-ask__do" type="button">I moved</button>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Open goals. The person building evidence with no meter to read.<span class="bf__x">Skip if the goal has a number worth showing</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="today-mv-rule">
+        <figcaption class="slot__cap"><span class="slot__n">12</span>
+          <span class="slot__t">The day rule</span><span class="tag tag--risk">risky</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-today-mv-rule">
+  <p class="v-today-mv-rule__head"><span class="v-today-mv-rule__big">6h 12m</span><span class="v-today-mv-rule__sub">of today left</span></p>
+  <svg class="v-today-mv-rule__svg" viewBox="0 0 306 26" width="100%" height="26" aria-hidden="true">
+    <g stroke="currentColor" stroke-linecap="square">
+      <path d="M3 18.5H303" stroke-opacity=".14"/>
+      <path d="M3 18.5H193.6" stroke-opacity=".32"/>
+      <g stroke-opacity=".2"><path d="M3 18.5v-4M20.6 18.5v-4M38.3 18.5v-4M55.9 18.5v-4M73.6 18.5v-4M91.2 18.5v-4M126.5 18.5v-4M144.1 18.5v-4M161.8 18.5v-4M179.4 18.5v-4M197.1 18.5v-4M214.7 18.5v-4M250 18.5v-4M267.6 18.5v-4M285.3 18.5v-4M303 18.5v-4"/></g>
+      <g stroke-opacity=".34"><path d="M108.9 18.5v-8M232.4 18.5v-8"/></g>
+      <path d="M193.6 25V6" stroke="#eef2fb" stroke-opacity=".92" stroke-width="1.5"/>
+    </g>
+  </svg>
+  <p class="v-today-mv-rule__ends"><span>6a</span><span>11p</span></p>
+  <div class="v-today-mv-rule__row">
+    <p class="v-today-mv-rule__move">Write the cold open for episode 12.<span class="v-today-mv-rule__tier">Moderate is today&rsquo;s size.</span></p>
+    <button class="v-today-mv-rule__tick" type="button" aria-label="Mark today's move done">
+      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 6.5"/></svg>
+    </button>
+  </div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Ship and Rep goals on a daily cadence. The person who puts it off until dark.<span class="bf__x">Skip if the cadence is weekly or seasonal</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="today-mv-ordinal">
+        <figcaption class="slot__cap"><span class="slot__n">13</span>
+          <span class="slot__t">The ordinal</span><span class="tag tag--risk">risky</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-today-mv-ordinal">
+  <p class="v-today-mv-ordinal__n">149<span class="v-today-mv-ordinal__suf">th</span></p>
+  <p class="v-today-mv-ordinal__sub">move, if today counts. First one 14 March.</p>
+  <div class="v-today-mv-ordinal__line"></div>
+  <p class="v-today-mv-ordinal__move">Write the cold open for episode 12.</p>
+  <button class="v-today-mv-ordinal__do" type="button">Completed</button>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Maintenance goals. The sober person on day 412, where the count is the point.<span class="bf__x">Skip if the goal has no continuous count</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="today-mv-chain">
+        <figcaption class="slot__cap"><span class="slot__n">14</span>
+          <span class="slot__t">The chain</span><span class="tag tag--risk">risky</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-today-mv-chain">
+  <div class="v-today-mv-chain__link v-today-mv-chain__link--now">
+    <span class="v-today-mv-chain__node"></span>
+    <div class="v-today-mv-chain__body">
+      <p class="v-today-mv-chain__lbl">Today</p>
+      <p class="v-today-mv-chain__txt">Write the cold open for episode 12.</p>
+    </div>
+  </div>
+  <div class="v-today-mv-chain__link">
+    <span class="v-today-mv-chain__node v-today-mv-chain__node--open"></span>
+    <div class="v-today-mv-chain__body">
+      <p class="v-today-mv-chain__lbl">Sets up</p>
+      <p class="v-today-mv-chain__txt v-today-mv-chain__txt--next">Record it in one take.</p>
+    </div>
+  </div>
+  <button class="v-today-mv-chain__do" type="button">Completed</button>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Milestone goals. The bar candidate whose steps only make sense in order.<span class="bf__x">Skip if every day repeats the same move</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="today-mv-trace">
+        <figcaption class="slot__cap"><span class="slot__n">15</span>
+          <span class="slot__t">The trace</span><span class="tag tag--risk">risky</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-today-mv-trace">
+  <p class="v-today-mv-trace__head">Rising</p>
+  <p class="v-today-mv-trace__sub">5 moves in the last 7 days, up from 3</p>
+  <svg class="v-today-mv-trace__svg" viewBox="0 0 306 46" width="100%" height="46" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M3 26.6 13.3 26.6 23.7 21.4 34 21.4 44.4 26.6 54.7 31.7 65.1 31.7 75.4 26.6 85.8 26.6 96.1 21.4 106.5 21.4 116.8 21.4 127.1 26.6 137.5 26.6 147.8 21.4 158.2 16.3 168.5 16.3 178.9 21.4 189.2 21.4 199.6 16.3 209.9 16.3 220.2 21.4 230.6 16.3 240.9 16.3 251.3 11.1 261.6 16.3 272 16.3 282.3 16.3 292.7 16.3 303 16.3 303 42 3 42Z" fill="currentColor" fill-opacity=".07"/>
+    <path d="M3 42H303" stroke="currentColor" stroke-opacity=".12" vector-effect="non-scaling-stroke"/>
+    <path d="M3 26.6 13.3 26.6 23.7 21.4 34 21.4 44.4 26.6 54.7 31.7 65.1 31.7 75.4 26.6 85.8 26.6 96.1 21.4 106.5 21.4 116.8 21.4 127.1 26.6 137.5 26.6 147.8 21.4 158.2 16.3 168.5 16.3 178.9 21.4 189.2 21.4 199.6 16.3 209.9 16.3 220.2 21.4 230.6 16.3 240.9 16.3 251.3 11.1 261.6 16.3 272 16.3 282.3 16.3 292.7 16.3 303 16.3" fill="none" stroke="#eef2fb" stroke-opacity=".9" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+  </svg>
+  <p class="v-today-mv-trace__span">last 30 days</p>
+  <div class="v-today-mv-trace__row">
+    <p class="v-today-mv-trace__move">Write the cold open for episode 12.</p>
+    <button class="v-today-mv-trace__tick" type="button" aria-label="Mark today's move done">
+      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 6.5"/></svg>
+    </button>
+  </div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Quantity and Frequency goals past a month. The person who drifts without noticing.<span class="bf__x">Skip if under thirty days of history</span></p>
+          
+          
+          
+        </div>
+      </figure></div>
+    <h3 class="sect__sub sect__sub--new">Built for the new philosophy</h3>
+    <div class="grid">
+      <figure class="slot" id="today-hold-tonight">
+        <figcaption class="slot__cap"><span class="slot__n">N1</span>
+          <span class="slot__t">The rule, tonight</span>
+          <span class="tag tag--new">Hold action</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-today-hold-tonight">
+  <p class="ht-rule">Eat 2,000 to 2,400 calories</p>
+  <div class="ht-row">
+    <span class="ht-n">18</span><span class="ht-m">days held<br>best 24</span>
+  </div>
+  <button class="ht-btn" type="button">Confirm tonight</button>
+  <p class="ht-note">Opens at 8pm. A rule cannot be finished at lunch.</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Maintenance goals. The person holding a line all day and confirming it at night.<span class="bf__x">Skip if the move is a task, not a rule</span></p>
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="today-derived-line">
+        <figcaption class="slot__cap"><span class="slot__n">N2</span>
+          <span class="slot__t">The derived line</span>
+          <span class="tag tag--new">Quantity + deadline</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-today-derived-line">
+  <p class="dl-top">40 lbs in 6 months</p>
+  <p class="dl-math">is <b>1.5 lbs a week</b>, is a <b>750 calorie</b> daily deficit</p>
+  <p class="dl-act">Eat 2,000 to 2,400 today</p>
+  <div class="dl-bar" aria-hidden="true"><i style="width:34%"></i></div>
+  <p class="dl-foot">13.6 lbs down. On pace, 4 days ahead.</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Quantity goals with a target and a deadline. The dieter cutting 40 lbs in 6 months.<span class="bf__x">Skip if no target or no deadline</span></p>
+          
+          
+        </div>
+      </figure></div>
+
+  </section>
+  <section class="sect" id="sect-star">
+    <header class="sect__hd"><h2>Neutron Star</h2>
+      <p>The signed statement. <b>10 considered</b>, then <b>5 riskier ones</b> below.</p></header>
+    <div class="grid">
+      <figure class="slot" id="star-star-distance">
+        <figcaption class="slot__cap"><span class="slot__n">01</span>
+          <span class="slot__t">Distance to the number</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-star-star-distance">
+  <p class="sd-star">Ship Memento to 100 paying users without abandoning it at 40.</p>
+  <div class="sd-row"><span class="sd-big">34</span><span class="sd-of">of 100 paying users</span><span class="sd-delta">+6 this week</span></div>
+  <div class="sd-rail" aria-hidden="true"><span class="sd-fill"></span></div>
+  <p class="sd-foot">Day 47. At this pace you arrive <b>Nov 12</b>.</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Quantity up or down with a target. The founder watching users climb week to week.<span class="bf__x">Skip if the goal names no number</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="star-star-surface">
+        <figcaption class="slot__cap"><span class="slot__n">02</span>
+          <span class="slot__t">The reason, surfaced</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-star-star-surface">
+  <p class="su-star">Ship Memento to 100 paying users without abandoning it at 40.</p>
+  <div class="su-why"><span class="su-dot" aria-hidden="true"></span><span class="su-txt">Because I have quit at the almost-there point four times, and I am not doing that to this one.</span></div>
+  <p class="su-foot"><b>Day 47.</b> Your reason, surfaced after two days without a move.</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Open and maintenance goals. The person who forgets why they signed it.</p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="star-star-spine">
+        <figcaption class="slot__cap"><span class="slot__n">03</span>
+          <span class="slot__t">The star&#x27;s own spine</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-star-star-spine">
+  <p class="ss-star">Ship Memento to 100 paying users without abandoning it at 40.</p>
+  <div class="ss-spine" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i class="on"></i><i class="on"></i><i></i><i></i><i class="on"></i><i class="on"></i><i></i><i class="on now"></i></div>
+  <p class="ss-meta">Signed June 19<b>Day 47</b></p>
+  <p class="ss-line"><b>38 of those days</b> carried a move. Longest silence, 2 days.</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Frequency and maintenance. The person whose whole case is showing up daily.<span class="bf__x">Skip if signed less than two weeks ago</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="star-star-ledger">
+        <figcaption class="slot__cap"><span class="slot__n">04</span>
+          <span class="slot__t">What it has cost you</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-star-star-ledger">
+  <p class="sl-star">Ship Memento to 100 paying users without abandoning it at 40.</p>
+  <div class="sl-rule" aria-hidden="true"></div>
+  <div class="sl-row"><span class="sl-big">41</span><span class="sl-lab">moves made<br>in its name</span><span class="sl-wk"><b>4 this week</b><span>6 last week</span></span></div>
+  <p class="sl-last">Yesterday: <b>Rewrote the pricing page headline</b></p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Open and milestone goals. The person with no number, only moves done.<span class="bf__x">Skip if fewer than two weeks of moves</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="star-star-climb">
+        <figcaption class="slot__cap"><span class="slot__n">05</span>
+          <span class="slot__t">The climb</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-star-star-climb">
+  <div class="v-star-star-climb__head">
+    <div class="v-star-star-climb__now"><b>38</b><span>of 100 paying users</span></div>
+    <div class="v-star-star-climb__delta">+4 this week</div>
+  </div>
+  <div class="v-star-star-climb__chart">
+    <svg viewBox="0 0 300 66" preserveAspectRatio="none" width="100%" height="66" aria-hidden="true">
+      <path class="v-star-star-climb__area" d="M0 59 L30 58.5 L60 58 L90 58 L120 56.5 L150 55 L180 52 L210 50.5 L240 48 L270 47 L300 45.5 L300 66 L0 66 Z"/>
+      <path class="v-star-star-climb__line" d="M0 59 L30 58.5 L60 58 L90 58 L120 56.5 L150 55 L180 52 L210 50.5 L240 48 L270 47 L300 45.5" vector-effect="non-scaling-stroke"/>
+      <line class="v-star-star-climb__ceil" x1="0" y1="12" x2="272" y2="12" vector-effect="non-scaling-stroke"/>
+      <circle class="v-star-star-climb__dot" cx="296" cy="45.5" r="3.2"/>
+    </svg>
+    <span class="v-star-star-climb__ceilcap">100</span>
+  </div>
+  <p class="v-star-star-climb__foot">Best week was <b>+6</b>. Day 47 with this star.</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Quantity up with a start and a target. The founder who wants the shape of it.<span class="bf__x">Skip if no starting number recorded</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="star-star-arrival">
+        <figcaption class="slot__cap"><span class="slot__n">06</span>
+          <span class="slot__t">Arrival date</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-star-star-arrival">
+  <p class="v-star-star-arrival__star">Get Memento to 100 paying users</p>
+  <div class="v-star-star-arrival__lead">
+    <span class="v-star-star-arrival__date">Nov 25</span>
+    <span class="v-star-star-arrival__at">on the pace you have kept</span>
+  </div>
+  <p class="v-star-star-arrival__shift">9 days sooner than a week ago</p>
+  <div class="v-star-star-arrival__rail" aria-hidden="true">
+    <span class="v-star-star-arrival__fill"></span>
+    <span class="v-star-star-arrival__base"></span>
+  </div>
+  <p class="v-star-star-arrival__foot"><b>38</b> today, <b>12</b> when you signed it, <b>62</b> to go</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Quantity goals with a deadline. The dieter racing a date they picked.<span class="bf__x">Skip if pace too new or too flat to project</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="star-star-count">
+        <figcaption class="slot__cap"><span class="slot__n">07</span>
+          <span class="slot__t">The count</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-star-star-count">
+  <p class="v-star-star-count__star">Get Memento to 100 paying users</p>
+  <div class="v-star-star-count__top">
+    <div class="v-star-star-count__n">38<span>/100</span></div>
+    <div class="v-star-star-count__stale">counted 4 days ago</div>
+  </div>
+  <div class="v-star-star-count__bars" aria-hidden="true">
+    <span class="v-star-star-count__ceil"></span>
+    <i style="height:7px"></i><i style="height:7px"></i><i style="height:3px"></i><i style="height:13px"></i><i style="height:13px"></i><i class="best" style="height:38px"></i><i style="height:13px"></i><i style="height:32px"></i><i style="height:19px"></i><i class="now" style="height:25px"></i>
+  </div>
+  <div class="v-star-star-count__foot"><span><b>+4</b> this week, 2 off your best</span><button class="v-star-star-count__act" type="button">Update</button></div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Check goals on a cadence. The weekly weigh-in, the beekeeper counting hives.<span class="bf__x">Skip if nothing gets measured on a schedule</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="star-star-revision">
+        <figcaption class="slot__cap"><span class="slot__n">08</span>
+          <span class="slot__t">Against who you were</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-star-star-revision">
+  <p class="sr-star">Ship Memento to 100 paying users without abandoning it at 40.</p>
+  <p class="sr-now">Second version, signed 47 days ago.</p>
+  <div class="sr-then">
+    <span class="sr-tick" aria-hidden="true"></span>
+    <span class="sr-body"><span class="sr-lab">The first one said</span><span class="sr-old">Build something people actually pay for and get in the best shape of my life.</span></span>
+  </div>
+  <p class="sr-foot">It lasted <b>88 days</b>.</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Any type, after a rewrite. The person who has changed their aim once already.<span class="bf__x">Skip if the star has never been revised</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="star-star-pot">
+        <figcaption class="slot__cap"><span class="slot__n">09</span>
+          <span class="slot__t">Ground covered</span><span class="tag tag--cut">was cut</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-star-star-pot">
+  <div class="v-star-star-pot__lead"><b>+26</b><span>paying users since you signed it</span></div>
+  <div class="v-star-star-pot__rail" aria-hidden="true">
+    <span class="v-star-star-pot__base"></span>
+    <span class="v-star-star-pot__gain"></span>
+  </div>
+  <div class="v-star-star-pot__scale"><span>started 12</span><span class="v-star-star-pot__at">38 today</span><span>100</span></div>
+  <p class="v-star-star-pot__star">Get Memento to 100 paying users</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Quantity down. The dieter 6 lbs into 40 who needs credit for the 6.<span class="bf__x">Skip if no starting number recorded</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="star-star-dial">
+        <figcaption class="slot__cap"><span class="slot__n">10</span>
+          <span class="slot__t">Distance left</span><span class="tag tag--cut">was cut</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-star-star-dial">
+  <div class="v-star-star-dial__row">
+    <div class="v-star-star-dial__gauge">
+      <svg viewBox="0 0 104 104" width="104" height="104" aria-hidden="true">
+        <circle class="v-star-star-dial__track" cx="52" cy="52" r="44"/>
+        <circle class="v-star-star-dial__arc" cx="52" cy="52" r="44" stroke-dasharray="105 277" transform="rotate(-90 52 52)"/>
+        <circle class="v-star-star-dial__mark" cx="82.1" cy="19.9" r="2.6"/>
+      </svg>
+      <span class="v-star-star-dial__pct">38%</span>
+    </div>
+    <div class="v-star-star-dial__side">
+      <div class="v-star-star-dial__left">62</div>
+      <div class="v-star-star-dial__unit">paying users to go</div>
+      <div class="v-star-star-dial__pace">+3.5 a week now, +2.5 a month ago</div>
+    </div>
+  </div>
+  <p class="v-star-star-dial__foot">Day 47 with this star. The one before it ran 96.</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Quantity goals near the end. The person counting down what is left.<span class="bf__x">Skip if no target number to subtract from</span></p>
+          
+          
+          
+        </div>
+      </figure></div>
+    <h3 class="sect__sub">The riskier five</h3>
+    <div class="grid">
+      <figure class="slot" id="star-star-strata">
+        <figcaption class="slot__cap"><span class="slot__n">11</span>
+          <span class="slot__t">Strata</span><span class="tag tag--risk">risky</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-strata">
+  <div class="v-strata__core" aria-hidden="true">
+    <i class="v-strata__l v-strata__l--now" style="--h:27px"></i>
+    <i class="v-strata__l v-strata__l--mid" style="--h:96px"></i>
+    <i class="v-strata__l v-strata__l--old" style="--h:37px"></i>
+  </div>
+  <div class="v-strata__body">
+    <p class="v-strata__now">Get 10,000 people using something I made.</p>
+    <p class="v-strata__meta">Day 34 <i>/</i> 202 days aiming</p>
+    <p class="v-strata__past" style="top:70px"><span>Publish something every week</span><b>121d</b></p>
+    <p class="v-strata__past" style="top:140px"><span>Get to 5k MRR</span><b>47d</b></p>
+  </div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Any type, on a long account. The person on their third or fourth star.<span class="bf__x">Skip if only one star has ever been held</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="star-star-meridian">
+        <figcaption class="slot__cap"><span class="slot__n">12</span>
+          <span class="slot__t">Meridian</span><span class="tag tag--risk">risky</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-meridian">
+  <p class="v-meridian__star">Get 10,000 people using something I made.</p>
+  <div class="v-meridian__line" style="--p:.64"><span class="v-meridian__read">6,400 of 10,000</span></div>
+  <p class="v-meridian__anti">Another year of half built things nobody sees.</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Maintenance and quantity down. The person refusing the life written below.<span class="bf__x">Skip if open goals, it fakes a meter</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="star-star-folio">
+        <figcaption class="slot__cap"><span class="slot__n">13</span>
+          <span class="slot__t">Folio</span><span class="tag tag--risk">risky</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-folio">
+  <p class="v-folio__star">Get 10,000 people using something I made.</p>
+  <div class="v-folio__foot"><span>Day 34</span><span>6,400 of 10,000</span></div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Any type in its first week. The person who wants the sentence and nothing else.<span class="bf__x">Skip if week two, it shows state not change</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="star-star-plumb">
+        <figcaption class="slot__cap"><span class="slot__n">14</span>
+          <span class="slot__t">Plumb</span><span class="tag tag--risk">risky</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-plumb">
+  <div class="v-plumb__t">
+    <p class="v-plumb__star">Get 10,000 people using something I made.</p>
+    <p class="v-plumb__meta">Day 34 <i>/</i> moved 3 days ago</p>
+  </div>
+  <svg class="v-plumb__svg" viewBox="0 0 92 168" aria-hidden="true">
+    <line class="v-plumb__ref" x1="46" y1="10" x2="46" y2="150"/>
+    <line class="v-plumb__cord" x1="46" y1="10" x2="73" y2="146"/>
+    <circle class="v-plumb__pin" cx="46" cy="10" r="3"/>
+    <path class="v-plumb__bob" d="M67.6 144 L78.4 144 L73 160 Z" transform="rotate(11 73 144)"/>
+    <line class="v-plumb__off" x1="46" y1="166" x2="73" y2="166"/>
+  </svg>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Hold and daily frequency. The person whose failure mode is going quiet.<span class="bf__x">Skip if weekly or seasonal cadence, silence is normal</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="star-star-vigil">
+        <figcaption class="slot__cap"><span class="slot__n">15</span>
+          <span class="slot__t">Vigil</span><span class="tag tag--risk">risky</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-vigil">
+  <div class="v-vigil__news"><span class="v-vigil__n">9</span><span class="v-vigil__u">days</span></div>
+  <p class="v-vigil__sub">since anything moved in its name</p>
+  <div class="v-vigil__rule"></div>
+  <p class="v-vigil__star">Get 10,000 people using something I made.</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Maintenance and hold. The person who wants nothing from the app most days.<span class="bf__x">Skip if they need progress visible every day</span></p>
+          
+          
+          
+        </div>
+      </figure></div>
+    <h3 class="sect__sub sect__sub--new">Built for the new philosophy</h3>
+    <div class="grid">
+      <figure class="slot" id="star-star-open-evidence">
+        <figcaption class="slot__cap"><span class="slot__n">N1</span>
+          <span class="slot__t">Evidence, no meter</span>
+          <span class="tag tag--new">Open goal</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-star-star-open-evidence">
+  <p class="soe-star">Be a father my kids actually talk to.</p>
+  <ul class="soe-list">
+    <li><span>Phone in the drawer at 6</span><span>Tue</span></li>
+    <li><span>Drove Maya to practice, no radio</span><span>Sun</span></li>
+    <li><span>Said sorry first</span><span>Fri</span></li>
+  </ul>
+  <p class="soe-foot">61 things, since 19 June.</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Open goals. The father with nothing countable, only things actually done.</p>
+          
+          
+        </div>
+      </figure></div>
+
+  </section>
+  <section class="sect" id="sect-consistency">
+    <header class="sect__hd"><h2>Consistency</h2>
+      <p>The record. <b>10 considered</b>, then <b>5 riskier ones</b> below.</p></header>
+    <div class="grid">
+      <figure class="slot" id="consistency-chain-slack">
+        <figcaption class="slot__cap"><span class="slot__n">01</span>
+          <span class="slot__t">Chain with slack</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-chain-slack">
+  <div class="cs-head">
+    <span class="cs-num">42</span>
+    <span class="cs-unit">days<br>in a row</span>
+    <span class="cs-bank">
+      <svg width="12" height="14" viewBox="0 0 13 15" aria-hidden="true"><path d="M6.5.7 12 2.6v5.1c0 3.2-2.2 5.6-5.5 6.6C3.2 13.3 1 10.9 1 7.7V2.6L6.5.7Z" fill="currentColor"/></svg>
+      2 saved days
+    </span>
+  </div>
+  <div class="cs-chain" role="img" aria-label="The last fourteen days: eleven kept, two part days, one covered by a saved day.">
+    <i class="cs-k"></i>
+    <i class="cs-k"></i>
+    <i class="cs-p"></i>
+    <i class="cs-k"></i>
+    <i class="cs-k"></i>
+    <i class="cs-k"></i>
+    <i class="cs-k"></i>
+    <i class="cs-k"></i>
+    <i class="cs-g"></i>
+    <i class="cs-k"></i>
+    <i class="cs-k"></i>
+    <i class="cs-p"></i>
+    <i class="cs-k"></i>
+    <i class="cs-k cs-t"></i>
+  </div>
+  <div class="cs-foot">A saved day covered Tuesday. The chain held.</div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Maintenance goals. The sober person who quits the app the day a streak breaks.<span class="bf__x">Skip if no grace days exist yet</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="consistency-run-rank">
+        <figcaption class="slot__cap"><span class="slot__n">02</span>
+          <span class="slot__t">Run rank</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-run-rank">
+  <div class="rr-head">
+    <span class="rr-num">42</span>
+    <span class="rr-unit">days<br>in a row</span>
+    <span class="rr-rank">3rd longest run</span>
+  </div>
+  <div class="rr-bar" role="img" aria-label="42 days into a run. Your second longest was 47. Your best was 103.">
+    <span class="rr-fill"></span>
+    <span class="rr-notch"></span>
+  </div>
+  <div class="rr-marks">
+    <span class="rr-near">5 days from your second longest</span>
+    <span class="rr-far">best 103</span>
+  </div>
+  <div class="rr-foot">6 of the last 7 days. Last week, 4.</div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Frequency goals. The competitive restarter who has stopped and started many times.<span class="bf__x">Skip if first run ever, nothing to rank against</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="consistency-weekday-shape">
+        <figcaption class="slot__cap"><span class="slot__n">03</span>
+          <span class="slot__t">Your week&#x27;s signature</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-weekday-shape">
+  <div class="ws-h"><b>Wednesday</b> holds. Sunday is the gap.</div>
+  <div class="ws-list">
+    <div class="ws-r"><span class="ws-d">Mon</span><span class="ws-tr"><i class="ws-fl" style="--w:74%"></i></span><span class="ws-p">74%</span></div>
+    <div class="ws-r"><span class="ws-d">Tue</span><span class="ws-tr"><i class="ws-fl" style="--w:68%"></i></span><span class="ws-p">68%</span></div>
+    <div class="ws-r is-top"><span class="ws-d">Wed</span><span class="ws-tr"><i class="ws-fl" style="--w:86%"></i></span><span class="ws-p">86%</span></div>
+    <div class="ws-r"><span class="ws-d">Thu</span><span class="ws-tr"><i class="ws-fl" style="--w:71%"></i></span><span class="ws-p">71%</span></div>
+    <div class="ws-r"><span class="ws-d">Fri</span><span class="ws-tr"><i class="ws-fl" style="--w:63%"></i></span><span class="ws-p">63%</span></div>
+    <div class="ws-r"><span class="ws-d">Sat</span><span class="ws-tr"><i class="ws-fl" style="--w:45%"></i></span><span class="ws-p">45%</span></div>
+    <div class="ws-r is-low"><span class="ws-d">Sun</span><span class="ws-tr"><i class="ws-fl" style="--w:29%"></i></span><span class="ws-p">29%</span></div>
+  </div>
+  <div class="ws-ft">Across 187 active days</div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Frequency goals. The gym-3x person who leaks the same weekday every week.<span class="bf__x">Skip if under six weeks of marks</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="consistency-made-of">
+        <figcaption class="slot__cap"><span class="slot__n">04</span>
+          <span class="slot__t">What it is made of</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-made-of">
+  <div class="mo-head">
+    <span class="mo-num">42</span>
+    <span class="mo-unit">days<br>in a row</span>
+    <span class="mo-win">last 30 days</span>
+  </div>
+  <div class="mo-bar" role="img" aria-label="26 moves, 11 reflections, 7 deep work sessions in the last 30 days.">
+    <i class="mo-a" style="width:59%"></i>
+    <i class="mo-b" style="width:25%"></i>
+    <i class="mo-c" style="width:16%"></i>
+  </div>
+  <div class="mo-key">
+    <span><i class="mo-a"></i><b>26</b> moves</span>
+    <span><i class="mo-b"></i><b>11</b> reflections</span>
+    <span><i class="mo-c"></i><b>7</b> deep work</span>
+  </div>
+  <div class="mo-foot">Reflections up 4 on the thirty before. Moves down 1.</div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Open goals. The better father with no number, who needs evidence of what he did.<span class="bf__x">Skip if only one action type logged</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="consistency-rate-drift">
+        <figcaption class="slot__cap"><span class="slot__n">05</span>
+          <span class="slot__t">Rate drift</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-rate-drift">
+  <div class="rd-head">
+    <span class="rd-num">42</span>
+    <span class="rd-unit">days<br>in a row</span>
+    <span class="rd-rate"><b>87%</b><small>last 30 days</small></span>
+  </div>
+  <svg class="rd-graph" viewBox="0 0 306 54" preserveAspectRatio="none" role="img" aria-label="Thirty day rate over twelve weeks, now 87 percent, the thirty days before were 93 percent.">
+    <defs><linearGradient id="rdg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3fd94e" stop-opacity=".22"/><stop offset="1" stop-color="#3fd94e" stop-opacity="0"/></linearGradient></defs>
+    <path d="M3 36.9 30.3 32.3 57.5 27.8 84.8 23.2 112.1 20.9 139.4 15.6 166.6 13.3 193.9 11 221.2 13.3 248.5 15.6 275.7 17.1 303 18.1 303 54 3 54Z" fill="url(#rdg)"/>
+    <path d="M3 13.3H303" stroke="currentColor" stroke-opacity=".28" stroke-width="1" stroke-dasharray="2 4" vector-effect="non-scaling-stroke"/>
+    <path d="M3 36.9 30.3 32.3 57.5 27.8 84.8 23.2 112.1 20.9 139.4 15.6 166.6 13.3 193.9 11 221.2 13.3 248.5 15.6 275.7 17.1 303 18.1" fill="none" stroke="#3fd94e" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+    <circle cx="303" cy="18.1" r="2.6" fill="#3fd94e"/>
+  </svg>
+  <div class="rd-foot">Down 6 points. The 30 days before, 93%.</div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Quantity down goals. The dieter months in, whose effort fades before the scale shows it.<span class="bf__x">Skip if fewer than 60 days of history</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="consistency-returns">
+        <figcaption class="slot__cap"><span class="slot__n">06</span>
+          <span class="slot__t">Returns</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-returns">
+  <div class="rt-row">
+    <div class="rt-ring">
+      <svg viewBox="0 0 96 96" role="img" aria-label="42 days into this run, against a best run of 103.">
+        <circle cx="48" cy="48" r="43" fill="none" stroke="currentColor" stroke-opacity=".12" stroke-width="5"/>
+        <circle class="rt-arc" cx="48" cy="48" r="43" fill="none" stroke="#3fd94e" stroke-width="5" stroke-linecap="round" stroke-dasharray="110.2 270.2" transform="rotate(-90 48 48)"/>
+      </svg>
+      <div class="rt-in"><span class="rt-num">42</span><span class="rt-lab">days</span></div>
+    </div>
+    <div class="rt-rail">
+      <p class="rt-lead"><b>12</b> returns after a break</p>
+      <p class="rt-sub">Longest gap, 4 days</p>
+      <p class="rt-sub">Best run, 103</p>
+    </div>
+  </div>
+  <div class="rt-foot">26 of the last 30 days. 168 active in all.</div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Frequency goals. The restarter who reads one missed day as total failure.<span class="bf__x">Skip if never missed a day yet</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="consistency-week-rhythm">
+        <figcaption class="slot__cap"><span class="slot__n">07</span>
+          <span class="slot__t">This week&#x27;s rhythm</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-week-rhythm">
+  <div class="wr-top"><span class="wr-n">5</span><span class="wr-of">days marked this week</span><span class="wr-d">+2 vs last</span></div>
+  <div class="wr-row">
+    <div class="wr-col"><div class="wr-tr"><div class="wr-fl" style="height:66%"></div></div><span class="wr-dy">M</span></div>
+    <div class="wr-col"><div class="wr-tr"><div class="wr-fl" style="height:33%"></div></div><span class="wr-dy">T</span></div>
+    <div class="wr-col"><div class="wr-tr"><div class="wr-fl" style="height:100%"></div></div><span class="wr-dy">W</span></div>
+    <div class="wr-col"><div class="wr-tr"></div><span class="wr-dy">T</span></div>
+    <div class="wr-col"><div class="wr-tr"><div class="wr-fl" style="height:66%"></div></div><span class="wr-dy">F</span></div>
+    <div class="wr-col"><div class="wr-tr"></div><span class="wr-dy">S</span></div>
+    <div class="wr-col is-today"><div class="wr-tr"><div class="wr-fl" style="height:33%"></div></div><span class="wr-dy">S</span></div>
+  </div>
+  <div class="wr-ft">14 in a row, best 103</div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Frequency goals. The daily writer who wants this week judged, not this year.<span class="bf__x">Skip if weekly or seasonal cadence plans</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="consistency-year-ribbon">
+        <figcaption class="slot__cap"><span class="slot__n">08</span>
+          <span class="slot__t">The year, week by week</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-year-ribbon">
+  <div class="yr-top"><span class="yr-n">187</span><span class="yr-of">days this year</span></div>
+  <div class="yr-sub">Densest stretch, late March into April.</div>
+  <div class="yr-rib" role="img" aria-label="Active days per week across the year, densest in late March into April."><i class="wk is-off" style="--h:2px"></i><i class="wk" style="--h:13px"></i><i class="wk" style="--h:19px"></i><i class="wk is-off" style="--h:2px"></i><i class="wk" style="--h:19px"></i><i class="wk" style="--h:26px"></i><i class="wk" style="--h:19px"></i><i class="wk" style="--h:32px"></i><i class="wk" style="--h:26px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:32px"></i><i class="wk" style="--h:45px"></i><i class="wk is-peak" style="--h:39px"></i><i class="wk is-peak" style="--h:39px"></i><i class="wk is-peak" style="--h:52px"></i><i class="wk is-peak" style="--h:45px"></i><i class="wk is-peak" style="--h:52px"></i><i class="wk is-peak" style="--h:45px"></i><i class="wk" style="--h:32px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:26px"></i><i class="wk" style="--h:32px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:32px"></i><i class="wk" style="--h:19px"></i><i class="wk" style="--h:26px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:32px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:52px"></i><i class="wk is-now" style="--h:32px"></i></div>
+  <div class="yr-ax"><span>Jan</span><span>Apr</span><span>Jul</span><span>Oct</span><span>Now</span></div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Maintenance goals. The year-two holder with enough history to have a best stretch.<span class="bf__x">Skip if under a year in the app</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="consistency-rate-curve">
+        <figcaption class="slot__cap"><span class="slot__n">09</span>
+          <span class="slot__t">Rolling thirty</span><span class="tag tag--cut">was cut</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-rate-curve">
+  <div class="rc-top"><span class="rc-n">61%</span><span class="rc-of">of the last 30 days</span></div>
+  <div class="rc-sub">Up 13 points on the 30 days before it.</div>
+  <div class="rc-chart">
+    <svg viewBox="0 0 306 64" preserveAspectRatio="none" role="img" aria-label="Rolling thirty day rate, now 61 percent, the thirty days before were 48 percent.">
+      <defs><linearGradient id="vRateCurveFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="currentColor" stop-opacity=".15"/><stop offset=".75" stop-color="currentColor" stop-opacity="0"/></linearGradient></defs>
+      <path d="M0.0 58.0 C13.9 58.0 13.9 49.1 27.8 49.1 C41.7 49.1 41.7 52.6 55.6 52.6 C69.5 52.6 69.5 38.4 83.5 38.4 C97.4 38.4 97.4 43.7 111.3 43.7 C125.2 43.7 125.2 29.4 139.1 29.4 C153.0 29.4 153.0 33.0 166.9 33.0 C180.8 33.0 180.8 36.6 194.7 36.6 C208.6 36.6 208.6 20.5 222.5 20.5 C236.4 20.5 236.4 13.4 250.4 13.4 C264.3 13.4 264.3 18.7 278.2 18.7 C292.1 18.7 292.1 8.0 306.0 8.0 L306 64 L0 64 Z" fill="url(#vRateCurveFill)"/>
+      <path d="M0 31.2 L306 31.2" stroke="currentColor" stroke-opacity=".24" stroke-width="1" stroke-dasharray="2 4" vector-effect="non-scaling-stroke"/>
+      <path d="M0.0 58.0 C13.9 58.0 13.9 49.1 27.8 49.1 C41.7 49.1 41.7 52.6 55.6 52.6 C69.5 52.6 69.5 38.4 83.5 38.4 C97.4 38.4 97.4 43.7 111.3 43.7 C125.2 43.7 125.2 29.4 139.1 29.4 C153.0 29.4 153.0 33.0 166.9 33.0 C180.8 33.0 180.8 36.6 194.7 36.6 C208.6 36.6 208.6 20.5 222.5 20.5 C236.4 20.5 236.4 13.4 250.4 13.4 C264.3 13.4 264.3 18.7 278.2 18.7 C292.1 18.7 292.1 8.0 306.0 8.0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+      <circle cx="303" cy="8" r="2.8" fill="#3fd94e"/>
+    </svg>
+    <span class="rc-tag">48% before</span>
+  </div>
+  <div class="rc-ft">187 active days, 14 in a row</div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Quantity up goals. The founder who wants the face to tell him he is slowing down.<span class="bf__x">Skip if cadence plans, rest days read as misses</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="consistency-comeback">
+        <figcaption class="slot__cap"><span class="slot__n">10</span>
+          <span class="slot__t">The returns</span><span class="tag tag--cut">was cut</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-comeback">
+  <div class="cb-l">
+    <div class="cb-n">9</div>
+    <div class="cb-k">times you came back</div>
+    <div class="cb-sub">Longest gap, 3 days.<br>Never a fourth.</div>
+  </div>
+  <div class="cb-r">
+    <div class="cb-hd"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>
+    <div class="cb-g" role="img" aria-label="The last six weeks, 30 of 40 days marked."><i class="cel lv2"></i><i class="cel lv1"></i><i class="cel"></i><i class="cel lv3"></i><i class="cel lv2"></i><i class="cel lv1"></i><i class="cel"></i><i class="cel lv1"></i><i class="cel"></i><i class="cel"></i><i class="cel"></i><i class="cel lv2"></i><i class="cel lv3"></i><i class="cel lv1"></i><i class="cel lv2"></i><i class="cel lv2"></i><i class="cel lv1"></i><i class="cel"></i><i class="cel lv3"></i><i class="cel lv2"></i><i class="cel lv1"></i><i class="cel"></i><i class="cel lv2"></i><i class="cel lv3"></i><i class="cel lv2"></i><i class="cel lv1"></i><i class="cel"></i><i class="cel lv2"></i><i class="cel lv3"></i><i class="cel lv2"></i><i class="cel lv1"></i><i class="cel lv2"></i><i class="cel"></i><i class="cel lv1"></i><i class="cel lv2"></i><i class="cel lv2"></i><i class="cel lv3"></i><i class="cel lv1"></i><i class="cel"></i><i class="cel is-now"></i><i class="cel is-fut"></i><i class="cel is-fut"></i></div>
+    <div class="cb-cap">Last 6 weeks, 30 of 40</div>
+  </div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Maintenance goals. The person in recovery who cannot be shown a wall of failure.<span class="bf__x">Skip if unbroken record, returns reads zero</span></p>
+          
+          
+          
+        </div>
+      </figure></div>
+    <h3 class="sect__sub">The riskier five</h3>
+    <div class="grid">
+      <figure class="slot" id="consistency-ledger">
+        <figcaption class="slot__cap"><span class="slot__n">11</span>
+          <span class="slot__t">The board</span><span class="tag tag--risk">risky</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-ledger">
+  <div class="v-consistency-ledger__hero"><span class="v-consistency-ledger__n">412</span><span class="v-consistency-ledger__of">of 1,096</span></div>
+  <p class="v-consistency-ledger__say">Days you showed up. The one number that never goes down.</p>
+  <div class="v-consistency-ledger__rule"></div>
+  <div class="v-consistency-ledger__foot"><span>Current run 23 &middot; best 41</span><span class="v-consistency-ledger__today">+1 today</span></div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Milestone goals. The long-haul builder who counts total days, not current runs.<span class="bf__x">Skip if week one, the total reads tiny</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="consistency-water">
+        <figcaption class="slot__cap"><span class="slot__n">12</span>
+          <span class="slot__t">Waterline</span><span class="tag tag--risk">risky</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-water">
+  <div class="v-consistency-water__gauge">
+    <div class="v-consistency-water__miss">4 days missing</div>
+    <div class="v-consistency-water__now">
+      <div class="v-consistency-water__body">
+        <div class="v-consistency-water__read"><span class="v-consistency-water__n">87</span><span class="v-consistency-water__pct">%</span></div>
+        <div class="v-consistency-water__sub">26 of the last 30 days</div>
+      </div>
+    </div>
+    <div class="v-consistency-water__low"><span>34% at your worst this year</span></div>
+  </div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Open goals. The person with no number who still wants one level to read.<span class="bf__x">Skip if no year of history for the low line</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="consistency-pace">
+        <figcaption class="slot__cap"><span class="slot__n">13</span>
+          <span class="slot__t">On pace</span><span class="tag tag--risk">risky</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-pace">
+  <div class="v-consistency-pace__hero"><span class="v-consistency-pace__n">298</span><span class="v-consistency-pace__u">days by Dec 31</span></div>
+  <p class="v-consistency-pace__say">If the last 30 days hold. 168 done, 149 left in the year.</p>
+  <div class="v-consistency-pace__axis">
+    <div class="v-consistency-pace__track"></div><div class="v-consistency-pace__done"></div><div class="v-consistency-pace__proj"></div>
+    <div class="v-consistency-pace__now"></div><div class="v-consistency-pace__lands"></div><div class="v-consistency-pace__cap"></div>
+    <div class="v-consistency-pace__tag">168 today</div><div class="v-consistency-pace__end">365</div>
+  </div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Quantity up goals with a deadline. The founder who thinks in year-end totals.<span class="bf__x">Skip if goals that end before the year does</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="consistency-held">
+        <figcaption class="slot__cap"><span class="slot__n">14</span>
+          <span class="slot__t">Held</span><span class="tag tag--risk">risky</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-held">
+  <div class="v-consistency-held__mark"></div>
+  <p class="v-consistency-held__line">Today is in.</p>
+  <p class="v-consistency-held__sub">Day 23 unbroken.</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Hold goals. The person staying sober, who needs today confirmed and nothing else.<span class="bf__x">Skip if any goal with a number to watch</span></p>
+          
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="consistency-trace">
+        <figcaption class="slot__cap"><span class="slot__n">15</span>
+          <span class="slot__t">Trace</span><span class="tag tag--risk">risky</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-trace">
+  <div class="v-consistency-trace__head"><span class="v-consistency-trace__n">3</span><span class="v-consistency-trace__u">things today</span><span class="v-consistency-trace__avg">usually 2.0 a day</span></div>
+  <svg class="v-consistency-trace__svg" viewBox="0 0 306 62" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <rect x="0" y="55" width="306" height="1" fill="rgba(255,255,255,.14)"/>
+    <g fill="rgba(255,255,255,.6)">
+      <rect x="11" y="37" width="2" height="18"/><rect x="32" y="46" width="2" height="9"/>
+      <rect x="53" y="37" width="2" height="18"/><rect x="74" y="28" width="2" height="27"/>
+      <rect x="84" y="46" width="2" height="9"/><rect x="95" y="37" width="2" height="18"/>
+      <rect x="105" y="19" width="2" height="36"/><rect x="116" y="37" width="2" height="18"/>
+      <rect x="126" y="46" width="2" height="9"/><rect x="137" y="28" width="2" height="27"/>
+      <rect x="147" y="37" width="2" height="18"/><rect x="158" y="37" width="2" height="18"/>
+      <rect x="168" y="10" width="2" height="45"/><rect x="179" y="37" width="2" height="18"/>
+      <rect x="189" y="46" width="2" height="9"/><rect x="200" y="37" width="2" height="18"/>
+      <rect x="210" y="28" width="2" height="27"/><rect x="221" y="37" width="2" height="18"/>
+      <rect x="231" y="19" width="2" height="36"/><rect x="242" y="46" width="2" height="9"/>
+      <rect x="252" y="37" width="2" height="18"/><rect x="263" y="28" width="2" height="27"/>
+      <rect x="273" y="37" width="2" height="18"/><rect x="284" y="37" width="2" height="18"/>
+    </g>
+    <rect x="294" y="28" width="2" height="27" fill="#3fd94e"/>
+  </svg>
+  <div class="v-consistency-trace__foot"><span>Last 30 days</span><span>4 flat</span></div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Quantity up goals. The writer whose 300-word day and 3,000-word day are not equal.<span class="bf__x">Skip if Hold and Check goals log no amount</span></p>
+          
+          
+          
+        </div>
+      </figure></div>
+    <h3 class="sect__sub sect__sub--new">Built for the new philosophy</h3>
+    <div class="grid">
+      <figure class="slot" id="consistency-cadence-week">
+        <figcaption class="slot__cap"><span class="slot__n">N1</span>
+          <span class="slot__t">Your schedule, kept</span>
+          <span class="tag tag--new">Any cadence</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-cadence-week">
+  <div class="cw-head"><span class="cw-n">3</span><span class="cw-of">of 3 this week</span>
+    <span class="cw-tag">kept</span></div>
+  <div class="cw-days" aria-hidden="true">
+    <i class="on"></i><i class="rest"></i><i class="on"></i><i class="rest"></i>
+    <i class="on"></i><i class="rest"></i><i class="rest"></i>
+  </div>
+  <p class="cw-lbl"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></p>
+  <p class="cw-foot"><b>11 perfect weeks.</b> Rest days are not misses.</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Frequency goals. The 3x-a-week lifter punished by every daily-streak face.<span class="bf__x">Skip if no schedule set, nothing to adhere to</span></p>
+          
+          
+        </div>
+      </figure>
+      <figure class="slot" id="consistency-not-moving">
+        <figcaption class="slot__cap"><span class="slot__n">N2</span>
+          <span class="slot__t">Doing it, not working</span>
+          <span class="tag tag--new">Recalibration</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-not-moving">
+  <p class="nm-hd">You kept every day. The number did not move.</p>
+  <div class="nm-two">
+    <span><b>19</b>of 21 days kept</span>
+    <span><b>0.4</b>lbs in 3 weeks</span>
+  </div>
+  <p class="nm-say">The plan expected 4.5. Something in it is wrong, not you.</p>
+  <button class="nm-btn" type="button">Redo the plan</button>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Quantity goals with a target. The dieter keeping every rep as the scale sits still.<span class="bf__x">Skip if Open goals, no number to stall</span></p>
+          
+          
+        </div>
+      </figure></div>
+
+  </section>
+</div>
+</body>
+</html>

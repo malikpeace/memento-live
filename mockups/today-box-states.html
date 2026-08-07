@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Today box, every state</title>
+
+<!-- the app's REAL stylesheets, so these are the actual components -->
+<link rel="stylesheet" href="../memento-app/css/base.css?v=1049" onerror="this.href='../css/base.css?v=1049'">
+<link rel="stylesheet" href="../memento-app/css/dashboard.css?v=1049" onerror="this.href='../css/dashboard.css?v=1049'">
+
+<style>
+  html, body { margin:0; background:#08090b; color:#f5f5f7;
+    font-family:-apple-system, system-ui, sans-serif; }
+  .wrap { max-width:1180px; margin:0 auto; padding:26px 20px 90px; }
+  h1 { font-size:23px; font-weight:750; letter-spacing:-.02em; margin:0 0 6px; }
+  .lede { font-size:14px; line-height:1.6; color:rgba(245,245,247,.62); max-width:70ch; margin:0 0 8px; }
+  .note { font-size:13px; line-height:1.6; color:rgba(245,245,247,.5); max-width:70ch; margin:0 0 26px; }
+
+  .state { margin:0 0 46px; }
+  .state__name { font-size:16px; font-weight:700; letter-spacing:-.01em; margin:0 0 4px; }
+  .state__when { font-size:13px; color:rgba(245,245,247,.55); margin:0 0 16px; }
+  .pair { display:flex; gap:22px; align-items:flex-start; flex-wrap:wrap; }
+  .col__cap { font-size:11.5px; font-weight:650; letter-spacing:.06em; text-transform:uppercase;
+    color:rgba(245,245,247,.42); margin:0 0 9px; }
+
+  /* the phone: real width, the app's own card component inside */
+  .phone { width:390px; flex:none; }
+  .phone__inner { border-radius:18px; background:#000; padding:16px 16px 20px; }
+
+  /* the desktop panel: the real #deskMission look at its real column width */
+  .desk { flex:1 1 460px; min-width:420px; }
+  .desk__inner { border-radius:18px; background:#000; padding:22px; }
+  .dkmbox { padding:24px 26px 26px; border-radius:16px;
+    background:rgba(255,255,255,.045);
+    -webkit-backdrop-filter:blur(28px) saturate(1.35); backdrop-filter:blur(28px) saturate(1.35);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.07), 0 20px 54px rgba(0,0,0,.34); }
+  /* desktop type, scaled down a touch so both columns fit side by side here */
+  .dkmbox .dkm__headline { font-size:31px; margin-bottom:20px; }
+  .dkmbox .dkm__sub { font-size:15px; }
+  .greet { font-size:22px; font-weight:650; letter-spacing:-.025em; color:var(--text-hi); margin:0 0 14px 2px; }
+
+  .diff { margin-top:12px; font-size:12.5px; line-height:1.55; padding:9px 12px; border-radius:9px;
+    background:rgba(255,120,90,.10); color:#ffb3a0; }
+  .same { background:rgba(110,230,150,.09); color:#95e8b6; }
+</style>
+</head>
+<body class="ns-bloom">
+<div class="wrap">
+  <h1>Today box, every state</h1>
+  <p class="lede">The same four states, side by side: the phone version (left) and the desktop / iPad version (right). Built with the app's real stylesheets, so these are the actual components, not drawings.</p>
+  <p class="note">Green means the two already say the same thing. Orange marks a real difference to decide on.</p>
+
+  <!-- 1 -->
+  <div class="state">
+    <p class="state__name">1 &middot; Before you find your Neutron Star</p>
+    <p class="state__when">A brand new account. This is what you see on your iPad right now.</p>
+    <div class="pair">
+      <div class="phone">
+        <p class="col__cap">Phone</p>
+        <div class="phone__inner">
+          <section class="cc-card" style="margin:0;padding:22px 22px 20px;border-radius:var(--card-r);background:var(--surface-1);box-shadow:var(--shadow-card), inset 0 1px 0 rgba(255,255,255,0.06);">
+            <div style="font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:#3ad9f5;font-weight:700;margin-bottom:8px;">First step</div>
+            <div style="font-size:1.15rem;font-weight:700;color:var(--text-hi);margin-bottom:6px;">Find your Neutron Star</div>
+            <div style="font-size:0.9rem;line-height:1.5;color:var(--text-2);margin-bottom:14px;">Get clear on the one goal that actually matters to you above all else. This will be the foundation of your Memento.</div>
+            <div style="display:flex;"><button class="cc-primary" style="flex:0 1 auto;min-width:180px;font:inherit;font-weight:700;font-size:0.92rem;border:none;border-radius:8px;padding:12px 40px;background:var(--solid-bg);color:var(--solid-fg);">Start</button></div>
+          </section>
+        </div>
+      </div>
+      <div class="desk">
+        <p class="col__cap">Desktop &amp; iPad</p>
+        <div class="desk__inner">
+          <div class="greet">Welcome, Malik.</div>
+          <div class="dkmbox">
+            <div class="dkm__label">First step</div>
+            <div class="dkm__headline">Find your Neutron Star.</div>
+            <div class="dkm__sub">Get clear on the one goal that actually matters to you above all else. This will be the foundation of your Memento.</div>
+            <div class="dkm__row"><button class="dkm__btn dkm__btn--solid">Start</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="diff same">Identical as of v1046. The explainer used to be missing on desktop; you caught it and it is there now.</p>
+  </div>
+
+  <!-- 2 -->
+  <div class="state">
+    <p class="state__name">2 &middot; Star found, no plan yet</p>
+    <p class="state__when">Right after Clarity, before Action builds the daily move.</p>
+    <div class="pair">
+      <div class="phone">
+        <p class="col__cap">Phone</p>
+        <div class="phone__inner">
+          <section class="cc-card" style="margin:0;padding:22px 22px 20px;border-radius:var(--card-r);background:var(--surface-1);box-shadow:var(--shadow-card), inset 0 1px 0 rgba(255,255,255,0.06);">
+            <div style="font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:#3ad9f5;font-weight:700;margin-bottom:8px;">Next step</div>
+            <div style="font-size:1.15rem;font-weight:700;color:var(--text-hi);margin-bottom:14px;">Turn your Neutron Star into a tangible daily action</div>
+            <div style="display:flex;"><button class="cc-primary" style="flex:0 1 auto;min-width:180px;font:inherit;font-weight:700;font-size:0.92rem;border:none;border-radius:8px;padding:12px 40px;background:var(--solid-bg);color:var(--solid-fg);">Build my plan</button></div>
+          </section>
+        </div>
+      </div>
+      <div class="desk">
+        <p class="col__cap">Desktop &amp; iPad</p>
+        <div class="desk__inner">
+          <div class="greet">Good evening, Malik.</div>
+          <div class="dkmbox">
+            <div class="dkm__label">Next step</div>
+            <div class="dkm__headline">Turn your Neutron Star into a tangible daily action.</div>
+            <div class="dkm__row"><button class="dkm__btn dkm__btn--solid">Build my plan</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="diff same">Identical.</p>
+  </div>
+
+  <!-- 3 -->
+  <div class="state">
+    <p class="state__name">3 &middot; A normal day</p>
+    <p class="state__when">The one you see almost every day.</p>
+    <div class="pair">
+      <div class="phone">
+        <p class="col__cap">Phone</p>
+        <div class="phone__inner">
+          <section class="cc-card" style="margin:0;padding:22px 22px 20px;border-radius:var(--card-r);background:var(--surface-1);box-shadow:var(--shadow-card), inset 0 1px 0 rgba(255,255,255,0.06);">
+            <div style="font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-lo);font-weight:700;margin-bottom:8px;">Today</div>
+            <div style="font-size:1.15rem;font-weight:700;color:var(--text-hi);line-height:1.3;margin-bottom:16px;">Write the first draft of this week&#39;s video script</div>
+            <div style="border-top:1px solid rgba(255,255,255,.08);padding-top:14px;"><button class="cc-primary" style="width:100%;font:inherit;font-weight:700;font-size:0.95rem;border:none;border-radius:10px;padding:14px;background:var(--solid-bg);color:var(--solid-fg);">Mark Complete</button></div>
+          </section>
+        </div>
+      </div>
+      <div class="desk">
+        <p class="col__cap">Desktop &amp; iPad</p>
+        <div class="desk__inner">
+          <div class="greet">Good evening, Malik.</div>
+          <div class="dkmbox">
+            <div class="dkm__label">Today&rsquo;s Action</div>
+            <div class="dkm__headline">Write the first draft of this week&#39;s video script.</div>
+            <div class="dkm__row">
+              <button class="dkm__btn dkm__btn--solid">Mark Complete</button>
+              <div class="dkm__streak">
+                <div class="dkm__streak-top"><span class="dkm__streak-n">8</span><span class="dkm__streak-l">day streak</span></div>
+                <div class="dkm__streak-sub">Best 8 &middot; 20 active days</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="diff same">Effectively the same. Both are just Today, the move, and Mark Complete. Desktop adds the streak beside the button; the phone keeps that for the Consistency view.</p>
+  </div>
+
+  <!-- 4 -->
+  <div class="state">
+    <p class="state__name">4 &middot; Coming back after missing days</p>
+    <p class="state__when">Rebuilt to Malik&rsquo;s spec (v1048): the box stays quiet, the choosing moved to its own page.</p>
+    <div class="pair">
+      <div class="phone">
+        <p class="col__cap">Phone</p>
+        <div class="phone__inner">
+          <section class="cc-card" style="margin:0;padding:22px 22px 20px;border-radius:var(--card-r);background:var(--surface-1);box-shadow:var(--shadow-card), inset 0 1px 0 rgba(255,255,255,0.06);">
+            <div style="font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:#3ad9f5;font-weight:700;margin-bottom:8px;">4 days missed</div>
+            <div style="font-size:1.15rem;font-weight:700;color:var(--text-hi);margin-bottom:14px;">No worries, let&rsquo;s get back to it.</div>
+            <div style="display:flex;"><button class="cc-primary" style="flex:0 1 auto;min-width:180px;font:inherit;font-weight:700;font-size:0.92rem;border:none;border-radius:8px;padding:12px 40px;background:var(--solid-bg);color:var(--solid-fg);">Keep going</button></div>
+          </section>
+        </div>
+      </div>
+      <div class="desk">
+        <p class="col__cap">Desktop &amp; iPad</p>
+        <div class="desk__inner">
+          <div class="greet">Good evening, Malik.</div>
+          <div class="dkmbox">
+            <div class="dkm__label">4 days missed</div>
+            <div class="dkm__headline">No worries, let&rsquo;s get back to it.</div>
+            <div class="dkm__row"><button class="dkm__btn dkm__btn--solid">Keep going</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="diff same">Identical now, word for word.</p>
+  </div>
+
+  <div class="state">
+    <p class="state__name">4b &middot; What &ldquo;Keep going&rdquo; opens</p>
+    <p class="state__when">Its own page, same on both. Pick one and it goes straight into Action at that size.</p>
+    <div class="pair">
+      <div class="phone">
+        <p class="col__cap">Both</p>
+        <div class="phone__inner" style="padding:26px 20px 30px;">
+          <h2 class="cbp__head" style="font-size:26px;">Pick the smallest way back in.</h2>
+          <p class="cbp__sub" style="margin-bottom:20px;">Any of these counts. Starting is the whole point today.</p>
+          <div class="cbp__ways">
+            <button class="cbp__way cbp__way--first"><span class="cbp__way-top"><span class="cbp__way-title">Write the first three sentences</span><span class="cbp__way-mins">2 min</span></span><span class="cbp__way-sub">The smallest honest version</span></button>
+            <button class="cbp__way"><span class="cbp__way-top"><span class="cbp__way-title">Outline the video in five bullets</span><span class="cbp__way-mins">10 min</span></span><span class="cbp__way-sub">A real but gentle start</span></button>
+            <button class="cbp__way"><span class="cbp__way-top"><span class="cbp__way-title">Write the first draft</span></span><span class="cbp__way-sub">The full move</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
