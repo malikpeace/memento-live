@@ -5881,21 +5881,10 @@ function renderDayCard() {
       // borrow could strand the card on iOS; since v1139 the card is never
       // moved at all, so that whole failure mode no longer exists.
       // Slop guard: a tilt-drag or scroll that starts on the card is not a tap.
-      (function () {
-        let tx = 0, ty = 0, t0 = 0, moved = true;
-        wrap.addEventListener('pointerdown', (e) => { tx = e.clientX; ty = e.clientY; t0 = Date.now(); moved = false; });
-        wrap.addEventListener('pointermove', (e) => { if (!moved && (Math.abs(e.clientX - tx) > 8 || Math.abs(e.clientY - ty) > 8)) moved = true; });
-        wrap.addEventListener('pointerup', () => {
-          // v1132: a TAP opens it. A deliberate long press does not (a 600ms
-          // hold used to open the view on release, which no native card does).
-          // 700ms, not 400: the gate is only there to ignore a real long
-          // press, and a busy main thread can stretch an honest tap.
-          // v1140: TOGGLE. A second tap on the card closes the record, which
-          // is what a card that opened by tapping is expected to do.
-          if (!moved && (Date.now() - t0) < 700) { try { MementoView.toggle(); } catch (e) {} }
-          moved = true;
-        });
-      })();
+      // v1145: the tap gesture no longer lives here at all. See _mfBindCardTap
+      // below: it is bound ONCE to the document, because #dayCard itself gets
+      // replaced during boot and any listener on it went with it.
+      try { _mfBindCardTap(); } catch (e) {}
       // FIRST WHITE: the one-time ceremony when the card earns its first action
       // light (FIRST-WIN-PLAN #4/#5: log the first move -> the card gains its
       // first white, 2-3s, not confetti). The white blob blooms in bright, holds
@@ -6139,20 +6128,12 @@ function _mfBuildOverlay() {
     // every close path in here is the controller's single close
     const close = () => { try { MementoView.close(); } catch (e) {} };
     const onKey = (e) => { if (e.key === 'Escape') close(); };
-    // v1123 (Malik): tap the card again to go back; tap-and-hold customises.
-    // Slop + duration guards so a scroll or a completed hold never closes,
-    // and the sheet being up (the hold just fired) always wins over the tap.
-    if (liveWrap) (function () {
-      let tx = 0, ty = 0, t0 = 0, tMoved = true;
-      liveWrap.addEventListener('pointerdown', (e) => { tx = e.clientX; ty = e.clientY; t0 = Date.now(); tMoved = false; }, sig);
-      liveWrap.addEventListener('pointermove', (e) => { if (!tMoved && (Math.abs(e.clientX - tx) > 8 || Math.abs(e.clientY - ty) > 8)) tMoved = true; }, sig);
-      liveWrap.addEventListener('pointerup', () => {
-        const quick = (Date.now() - t0) < 320;
-        const sheetUp = !!ov.querySelector('.mfsk-wrap:not([hidden])');
-        if (!tMoved && quick && !sheetUp) close();
-        tMoved = true;
-      }, sig);
-    })();
+    // v1144 (Malik: "a glitch when I can't even open the memento"): the record
+    // used to bind its OWN tap-to-close to the live card here. That was safe
+    // while the record was built per visit, but it is persistent now, so the
+    // listener survived on the home: a quick tap fired the home's toggle AND
+    // this close, they cancelled, and the Memento would not open. The home's
+    // single toggle handler owns both directions. Nothing to bind here.
     // (The v1120 pagehide RESTORE failsafe is gone with the borrow it guarded:
     // the card never leaves the home now, so a killed page cannot strand it.)
     ov.addEventListener('click', (e) => { if (e.target === ov) close(); });
@@ -6365,6 +6346,14 @@ const MementoView = (function () {
     if (guard) { clearTimeout(guard); guard = null; }
     if (desiredOpen) {
       phase = 'open';
+      // v1147: OPEN is a settled, static pose, not an animation parked at its
+      // end. Handing the transform back to an inline style means a resize or a
+      // rotate is a one-line update instead of cancelling and re-running the
+      // animation (which, mid-view, restarts it from the home pose). Closing
+      // still animates: a fresh reverse run starts exactly at this same pose.
+      if (anim) { try { anim.cancel(); } catch (e) {} anim = null; }
+      const elO = cardEl();
+      if (elO) { elO.style.transformOrigin = '50% 50%'; elO.style.transform = openT; }
       return;
     }
     phase = 'closed';
@@ -6381,6 +6370,15 @@ const MementoView = (function () {
       view.ov.classList.remove('mf--open', 'mf--closing');
       view.ov.hidden = true;
       view.ov.scrollTop = 0;
+      // The customise sheet belongs to the record. Leaving it open behind a
+      // closed record is what jammed the tap (v1147), so it closes with it,
+      // now, not on a timer that a close can outrun.
+      try {
+        view.ov.querySelectorAll('.mfsk-wrap').forEach((sh) => {
+          sh.classList.remove('is-open');
+          sh.hidden = true;
+        });
+      } catch (e) {}
       try { view.stopTick(); } catch (e) {}
     }
     if (dirty) { dirty = false; MementoView.invalidate(); }
@@ -6453,6 +6451,15 @@ const MementoView = (function () {
       // The home pose moved (rotate, resize, keyboard). Re-measure and, if the
       // record is up, retarget without a restart.
       if (phase === 'closed') { anim = null; return; }
+      if (phase === 'open') {
+        // Settled: just move it. No animation to disturb.
+        const elR = cardEl();
+        if (elR) elR.style.transform = '';      // measure the true home pose
+        if (!measure()) return;
+        if (elR) elR.style.transform = openT;
+        onScroll();
+        return;
+      }
       if (!measure()) return;
       const el = cardEl();
       if (!el || !anim) return;
@@ -6477,6 +6484,50 @@ try {
   window.addEventListener('resize', () => { try { MementoView._reflow(); } catch (e) {} });
   window.addEventListener('orientationchange', () => { setTimeout(() => { try { MementoView._reflow(); } catch (e) {} }, 220); });
 } catch (e) {}
+
+/* v1145, THE TAP THAT SOMETIMES DID NOTHING.
+   Malik: "a glitch when I can't even open the memento". The gesture was bound
+   to .daycard-wrap, which the renderer replaces on every render, and then to
+   #dayCard, which is itself replaced while the home boots. Either way the
+   listener could die and the card went dead to the touch, at random, forever.
+   It now lives on the DOCUMENT, bound exactly once, and finds the card by
+   asking what was touched. No DOM swap can unbind it. */
+function _mfBindCardTap() {
+  if (window._mfTapBound) return;
+  window._mfTapBound = true;
+  let tx = 0, ty = 0, t0 = 0, moved = true, onCard = false;
+  document.addEventListener('pointerdown', (e) => {
+    onCard = !!(e.target && e.target.closest && e.target.closest('#dayCard'));
+    if (!onCard) return;
+    tx = e.clientX; ty = e.clientY; t0 = Date.now(); moved = false;
+  }, true);
+  document.addEventListener('pointermove', (e) => {
+    if (!onCard || moved) return;
+    if (Math.abs(e.clientX - tx) > 8 || Math.abs(e.clientY - ty) > 8) moved = true;
+  }, true);
+  document.addEventListener('pointerup', () => {
+    if (!onCard) return;
+    onCard = false;
+    // A tap opens or closes. A deliberate long press does not: 700ms, not 400,
+    // because a busy main thread stretches an honest tap. And if the customise
+    // sheet is up the hold just fired, so the release is not a tap.
+    const quick = (Date.now() - t0) < 700;
+    // v1147, THE MEMENTO THAT WOULD NOT OPEN AT ALL. This guard used to ask
+    // "does an unhidden customise sheet exist anywhere", and the sheet lives
+    // inside the record, which is now PERMANENT. Close the record while the
+    // sheet is open and the sheet stays hidden=false forever, invisible
+    // because the whole record is hidden, and every single tap on the card
+    // was swallowed from then on. Only a sheet inside an OPEN record counts.
+    let sheetUp = false;
+    try {
+      sheetUp = MementoView.isActive() &&
+        !!document.querySelector('#mementoFull:not([hidden]) .mfsk-wrap:not([hidden])');
+    } catch (e) {}
+    if (!moved && quick && !sheetUp) { try { MementoView.toggle(); } catch (e) {} }
+    moved = true;
+  }, true);
+}
+try { document.addEventListener('DOMContentLoaded', () => { try { _mfBindCardTap(); } catch (e) {} }); _mfBindCardTap(); } catch (e) {}
 
 // The old entry point is now a one-liner into the controller, so every caller
 // (home tap, router, deep link) goes through the same state machine.
@@ -7325,7 +7376,10 @@ function _mfSkinsInit(ov, wrap, sig) {
   };
   const closeSheet = () => {
     sheet.classList.remove('is-open');
-    setTimeout(() => { sheet.hidden = true; }, 280);
+    // Only hide if it has not been re-opened in the meantime, and never leave
+    // it un-hidden if the timer is throttled away: the record's own close
+    // hides it too (v1147).
+    setTimeout(() => { if (!sheet.classList.contains('is-open')) sheet.hidden = true; }, 280);
   };
 
   sheet.querySelector('.mfsk-scrim').addEventListener('click', closeSheet);
@@ -7376,8 +7430,13 @@ function _mfSkinsInit(ov, wrap, sig) {
   let holdT = null, hx = 0, hy = 0, armed = false;
   const pressStart = (x, y) => {
     if (armed) return;
+    // v1144: the record is persistent, so these listeners now outlive the view.
+    // Holding the card on the HOME must do nothing; customising belongs to the
+    // record. (Same cause as the tap bug above.)
+    try { if (typeof MementoView === 'undefined' || !MementoView.isActive()) return; } catch (e) { return; }
     armed = true; hx = x; hy = y;
-    wrap.classList.add('is-pressing');
+    const w2 = document.querySelector('#dayCard .daycard-wrap');
+    if (w2) w2.classList.add('is-pressing');
     clearTimeout(holdT);
     holdT = setTimeout(() => { armed = false; holdT = null; openSheet(); }, HOLD_MS);
   };
@@ -7387,15 +7446,21 @@ function _mfSkinsInit(ov, wrap, sig) {
   };
   const pressEnd = () => {
     armed = false;
-    wrap.classList.remove('is-pressing');
+    document.querySelectorAll('.daycard-wrap.is-pressing').forEach((n) => n.classList.remove('is-pressing'));
     clearTimeout(holdT); holdT = null;
   };
   const P = Object.assign({ passive: true }, sig || {});
-  wrap.addEventListener('touchstart', (e) => { const t = e.touches[0]; if (t) pressStart(t.clientX, t.clientY); }, P);
-  wrap.addEventListener('touchmove', (e) => { const t = e.touches[0]; if (t) pressMove(t.clientX, t.clientY); }, P);
-  ['touchend', 'touchcancel'].forEach(ev => wrap.addEventListener(ev, pressEnd, P));
-  wrap.addEventListener('pointerdown', (e) => { if (e.pointerType === 'touch') return; pressStart(e.clientX, e.clientY); }, sig);
+  // v1144: bound to #dayCard, not .daycard-wrap. The renderer replaces the wrap,
+  // which silently unbound the hold mid-view (same cause as the eaten tap).
+  const holdHost = document.getElementById('dayCard') || wrap;
+  holdHost.addEventListener('touchstart', (e) => { const t = e.touches[0]; if (t) pressStart(t.clientX, t.clientY); }, P);
+  holdHost.addEventListener('touchmove', (e) => { const t = e.touches[0]; if (t) pressMove(t.clientX, t.clientY); }, P);
+  ['touchend', 'touchcancel'].forEach(ev => holdHost.addEventListener(ev, pressEnd, P));
+  holdHost.addEventListener('pointerdown', (e) => { if (e.pointerType === 'touch') return; pressStart(e.clientX, e.clientY); }, sig);
   ov.addEventListener('pointermove', (e) => { if (e.pointerType === 'touch') return; pressMove(e.clientX, e.clientY); }, sig);
   ['pointerup', 'pointercancel'].forEach(ev => ov.addEventListener(ev, (e) => { if (e.pointerType !== 'touch') pressEnd(); }, sig));
-  wrap.addEventListener('contextmenu', (e) => { e.preventDefault(); if (sheet.hidden) openSheet(); }, sig);
+  holdHost.addEventListener('contextmenu', (e) => {
+    try { if (typeof MementoView === 'undefined' || !MementoView.isActive()) return; } catch (e2) { return; }
+    e.preventDefault(); if (sheet.hidden) openSheet();
+  }, sig);
 }
