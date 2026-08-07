@@ -6217,7 +6217,13 @@ function _mfBuildOverlay() {
    "sometimes it just stops" came from.
 
    The rules, and they are not negotiable:
-   1. ONE record, mounted once, then shown and hidden. Never rebuilt.
+   1. ONE record AT A TIME, built on open and destroyed on close. It was
+      made permanent in v1140 and that one decision caused four separate bugs
+      (v1148): its listeners and its state kept living on the home, where they
+      were never meant to run, and one of them jammed the card shut for good.
+      Nothing that belongs to the record is allowed to outlive it. (The card
+      itself is still never moved or rebuilt, which is what actually made it
+      feel like "a brand new memento". That fix is untouched.)
    2. ONE animation on the card, created once, reversed in place. A tap
       mid-flight flips playbackRate, so it turns around from exactly
       where it is instead of restarting.
@@ -6237,7 +6243,6 @@ const MementoView = (function () {
   let openT = '';           // the open transform, recomputed only while idle
   let openScale = 1;        // its scale, needed to keep the scroll link 1:1
   let guard = null;         // the dead-man switch, see jump()
-  let dirty = false;        // the data moved under an open record
 
   const cardEl = () => document.getElementById('dayCard');
 
@@ -6281,7 +6286,8 @@ const MementoView = (function () {
     // v1140b (Malik): scrolling the record UP has to take the Memento with it.
     // It was pinned, so the record slid underneath and the title read straight
     // through the card. It now scrolls away like a header and fades out.
-    view.ov.addEventListener('scroll', onScroll, { passive: true });
+    view.ov.addEventListener('scroll', onScroll,
+      view.abort ? { passive: true, signal: view.abort.signal } : { passive: true });
     return true;
   }
 
@@ -6366,22 +6372,20 @@ const MementoView = (function () {
     if (wrap0) { wrap0.style.transform = ''; wrap0.style.opacity = ''; wrap0.style.pointerEvents = ''; }
     document.body.classList.remove('mf-open');
     document.body.style.overflow = '';
-    if (view) {
-      view.ov.classList.remove('mf--open', 'mf--closing');
-      view.ov.hidden = true;
-      view.ov.scrollTop = 0;
-      // The customise sheet belongs to the record. Leaving it open behind a
-      // closed record is what jammed the tap (v1147), so it closes with it,
-      // now, not on a timer that a close can outrun.
-      try {
-        view.ov.querySelectorAll('.mfsk-wrap').forEach((sh) => {
-          sh.classList.remove('is-open');
-          sh.hidden = true;
-        });
-      } catch (e) {}
-      try { view.stopTick(); } catch (e) {}
-    }
-    if (dirty) { dirty = false; MementoView.invalidate(); }
+    // v1149: DESTROY IT. Every listener the record bound (including the ones
+    // on the card, which stays), its countdown, its customise sheet and its
+    // scroll position go with it. Nothing can be left behind to jam the next
+    // open, because there is nothing left.
+    destroy();
+  }
+
+  function destroy() {
+    if (!view) return;
+    const v = view;
+    view = null;
+    try { v.stopTick(); } catch (e) {}
+    if (v.abort) { try { v.abort.abort(); } catch (e) {} }
+    try { v.ov.remove(); } catch (e) {}
   }
 
   function apply() {
@@ -6426,25 +6430,9 @@ const MementoView = (function () {
       apply();
     },
     toggle: function () { if (desiredOpen) this.close(); else this.open(); },
-    /* The record's contents are state, not structure. When the day's data
-       changes underneath a closed record, throw the built one away so the
-       next open composes fresh. Cheap, because it only happens while shut. */
-    invalidate: function () {
-      // Re-rendering the home replaces the card's inner DOM, which kills the
-      // listeners the open record bound to it (hold-to-customise, the note).
-      // We cannot tear the record down mid-view, so we remember and do it the
-      // moment it closes.
-      // A re-render replaces .daycard-wrap, which silently drops the scroll
-      // offset that lives on it (the card stopped travelling with the record
-      // and the title read through it again). Re-apply it to the new node.
-      if (desiredOpen || phase !== 'closed') { dirty = true; return; }
-      if (view) {
-        if (view.abort) { try { view.abort.abort(); } catch (e) {} }
-        try { view.stopTick(); } catch (e) {}
-        try { view.ov.remove(); } catch (e) {}
-      }
-      view = null;
-    },
+    /* Kept as a no-op entry point: js/08's renderDayCard still calls it, and
+       there is nothing left to invalidate now that every open composes fresh. */
+    invalidate: function () {},
     _sync: onScroll,
     _frozen: function () { if (phase === 'opening' || phase === 'closing') jump(); },
     _reflow: function () {
