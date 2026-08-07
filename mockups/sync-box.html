@@ -779,44 +779,424 @@
 .v-consistency-trace__avg{margin-left:auto;font-size:13px;letter-spacing:-.005em;color:rgba(255,255,255,.72);}
 .v-consistency-trace__svg{display:block;width:100%;height:auto;margin-top:20px;}
 .v-consistency-trace__foot{display:flex;justify-content:space-between;margin-top:12px;font-size:12.5px;letter-spacing:-.005em;color:rgba(255,255,255,.62);}
+
+/* today-n-check */
+.v-today-n-check { display: flex; flex-direction: column; color: rgba(255,255,255,0.96); }
+.v-today-n-check__top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.v-today-n-check__what { font-size: 13.5px; font-weight: 600; letter-spacing: -0.012em; }
+.v-today-n-check__cad { font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.62); }
+.v-today-n-check__hero { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-top: 13px; }
+.v-today-n-check__day { font-size: 33px; font-weight: 700; letter-spacing: -0.038em; line-height: 1; }
+.v-today-n-check__in { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.62); font-variant-numeric: tabular-nums; }
+.v-today-n-check__read { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-top: 17px; }
+.v-today-n-check__val { font-size: 20px; font-weight: 650; letter-spacing: -0.022em; font-variant-numeric: tabular-nums; }
+.v-today-n-check__val span { margin-left: 5px; font-size: 12.5px; font-weight: 500; letter-spacing: 0; color: rgba(255,255,255,0.62); }
+.v-today-n-check__delta { font-size: 12.5px; font-weight: 600; color: rgba(255,255,255,0.88); font-variant-numeric: tabular-nums; }
+.v-today-n-check__rail { display: flex; align-items: center; gap: 6px; margin-top: 15px; }
+.v-today-n-check__dot { width: 7px; height: 7px; border-radius: 999px; background: rgba(255,255,255,0.90); }
+.v-today-n-check__dot--next { background: transparent; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.32); }
+.v-today-n-check__kept { margin-left: auto; font-size: 11.5px; font-weight: 500; color: rgba(255,255,255,0.62); font-variant-numeric: tabular-nums; }
+.v-today-n-check__foot { margin: 15px 0 0; font-size: 12.5px; font-weight: 500; line-height: 1.35; color: rgba(255,255,255,0.88); }
+
+/* today-n-act */
+.v-today-n-act { display: flex; flex-direction: column; color: rgba(255,255,255,0.96); }
+.v-today-n-act__top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.v-today-n-act__goal { font-size: 13.5px; font-weight: 600; letter-spacing: -0.012em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.v-today-n-act__count { flex: 0 0 auto; font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.62); font-variant-numeric: tabular-nums; }
+.v-today-n-act__rail { display: flex; gap: 6px; margin-top: 15px; }
+.v-today-n-act__seg { flex: 1 1 0; min-width: 0; }
+.v-today-n-act__seg i { display: block; height: 3px; border-radius: 2px; background: rgba(255,255,255,0.12); position: relative; }
+.v-today-n-act__seg i::after { content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 0; border-radius: 2px; background: rgba(255,255,255,0.92); }
+.v-today-n-act__seg--done i::after { width: 100%; }
+.v-today-n-act__seg--now i::after { width: 55%; }
+.v-today-n-act__seg b { display: block; margin-top: 7px; font-size: 11px; font-weight: 600; letter-spacing: -0.005em; color: rgba(255,255,255,0.34); }
+.v-today-n-act__seg--done b { color: rgba(255,255,255,0.58); }
+.v-today-n-act__seg--now b { color: rgba(255,255,255,0.96); }
+.v-today-n-act__lab { margin-top: 19px; font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.62); }
+.v-today-n-act__move { margin-top: 5px; font-size: 19px; font-weight: 650; line-height: 1.24; letter-spacing: -0.024em; }
+.v-today-n-act__foot { margin: 14px 0 0; font-size: 12.5px; font-weight: 500; line-height: 1.35; color: rgba(255,255,255,0.88); font-variant-numeric: tabular-nums; }
+
+/* today-n-pace */
+.v-today-n-pace { display: flex; flex-direction: column; color: rgba(255,255,255,0.96); }
+.v-today-n-pace__top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; font-size: 12px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.v-today-n-pace__left { color: rgba(255,255,255,0.96); font-weight: 600; }
+.v-today-n-pace__right { color: rgba(255,255,255,0.62); }
+.v-today-n-pace__hero { margin-top: 12px; font-size: 26px; font-weight: 700; line-height: 1.08; letter-spacing: -0.038em; font-variant-numeric: tabular-nums; }
+.v-today-n-pace__rows { margin-top: 18px; display: flex; flex-direction: column; gap: 10px; }
+.v-today-n-pace__row { display: flex; align-items: center; gap: 10px; }
+.v-today-n-pace__k { flex: 0 0 48px; font-size: 11.5px; font-weight: 600; color: rgba(255,255,255,0.62); }
+.v-today-n-pace__bar { flex: 1 1 auto; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.10); position: relative; overflow: hidden; }
+.v-today-n-pace__bar b { position: absolute; top: 0; bottom: 0; left: 0; border-radius: 2px; background: rgba(255,255,255,0.92); }
+.v-today-n-pace__row--you .v-today-n-pace__bar b { background: rgba(255,255,255,0.34); }
+.v-today-n-pace__n { flex: 0 0 auto; min-width: 54px; text-align: right; font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; color: rgba(255,255,255,0.96); }
+.v-today-n-pace__row--you .v-today-n-pace__n { color: rgba(255,255,255,0.72); }
+.v-today-n-pace__foot { margin: 16px 0 0; font-size: 12.5px; font-weight: 500; color: rgba(255,255,255,0.88); }
+
+/* today-n-first */
+.v-today-n-first { display: flex; flex-direction: column; color: rgba(255,255,255,0.96); }
+.v-today-n-first__said { margin: 0; font-size: 13px; font-weight: 500; line-height: 1.38; letter-spacing: -0.008em; color: rgba(255,255,255,0.72); }
+.v-today-n-first__move { margin-top: 15px; font-size: 25px; font-weight: 700; line-height: 1.1; letter-spacing: -0.036em; }
+.v-today-n-first__how { margin-top: 8px; font-size: 13px; font-weight: 500; line-height: 1.35; color: rgba(255,255,255,0.88); }
+.v-today-n-first__row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 18px; }
+.v-today-n-first__day { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.96); font-variant-numeric: tabular-nums; }
+.v-today-n-first__dots { display: flex; align-items: center; gap: 6px; }
+.v-today-n-first__d { width: 7px; height: 7px; border-radius: 999px; background: rgba(255,255,255,0.10); }
+.v-today-n-first__d--now { background: transparent; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.80); }
+.v-today-n-first__foot { margin: 14px 0 0; font-size: 12.5px; font-weight: 500; color: rgba(255,255,255,0.62); }
+
+/* today-n-hold */
+.v-today-n-hold { display: flex; flex-direction: column; color: rgba(255,255,255,0.96); }
+.v-today-n-hold__pill { display: inline-flex; align-items: center; gap: 7px; align-self: flex-start; padding: 5px 10px 5px 9px; border-radius: 8px; background: rgba(255,255,255,0.05); font-size: 11.5px; font-weight: 600; color: rgba(255,255,255,0.88); }
+.v-today-n-hold__pill i { width: 6px; height: 6px; border-radius: 999px; background: #3fd94e; }
+.v-today-n-hold__rule { margin-top: 14px; font-size: 21px; font-weight: 700; line-height: 1.16; letter-spacing: -0.032em; }
+.v-today-n-hold__stats { display: flex; align-items: flex-start; gap: 26px; margin-top: 18px; }
+.v-today-n-hold__stat { display: flex; flex-direction: column; min-width: 0; }
+.v-today-n-hold__stat b { font-size: 21px; font-weight: 700; line-height: 1; letter-spacing: -0.03em; color: rgba(255,255,255,0.96); font-variant-numeric: tabular-nums; }
+.v-today-n-hold__stat--lead b { color: #3fd94e; }
+.v-today-n-hold__stat span { margin-top: 6px; font-size: 11.5px; font-weight: 500; color: rgba(255,255,255,0.62); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.v-today-n-hold__cost { margin: 16px 0 0; font-size: 12.5px; font-weight: 500; line-height: 1.35; color: rgba(255,255,255,0.88); font-variant-numeric: tabular-nums; }
+
+/* star-n-acts */
+.v-star-n-acts { font-variant-numeric: tabular-nums; }
+.v-star-n-acts .v-star-n-acts__goal { font-size: 12.5px; font-weight: 500; letter-spacing: -0.01em; color: var(--text-mid, rgba(var(--ink), 0.62)); margin: 0 0 13px; }
+.v-star-n-acts .v-star-n-acts__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.v-star-n-acts .v-star-n-acts__act { display: grid; grid-template-columns: 7px 1fr auto; align-items: center; column-gap: 12px; row-gap: 9px; }
+.v-star-n-acts .v-star-n-acts__mark { width: 7px; height: 7px; border-radius: 50%; background: rgba(var(--ink), 0.16); }
+.v-star-n-acts .v-star-n-acts__name { font-size: 13.5px; font-weight: 500; letter-spacing: -0.012em; color: var(--text-mid, rgba(var(--ink), 0.62)); }
+.v-star-n-acts .v-star-n-acts__when { font-size: 12px; font-weight: 500; color: var(--text-lo, rgba(var(--ink), 0.40)); font-variant-numeric: tabular-nums; }
+.v-star-n-acts .v-star-n-acts__act--done .v-star-n-acts__mark { background: rgba(var(--ink), 0.34); }
+.v-star-n-acts .v-star-n-acts__act--done .v-star-n-acts__name { color: rgba(var(--ink), 0.52); }
+.v-star-n-acts .v-star-n-acts__act--next .v-star-n-acts__name { color: rgba(var(--ink), 0.34); }
+.v-star-n-acts .v-star-n-acts__act--now .v-star-n-acts__mark { background: #3ad9f5; box-shadow: 0 0 0 4px rgba(58, 217, 245, 0.13); }
+.v-star-n-acts .v-star-n-acts__act--now .v-star-n-acts__name { font-size: 18px; font-weight: 640; letter-spacing: -0.024em; color: var(--text-hi, rgba(var(--ink), 0.96)); }
+.v-star-n-acts .v-star-n-acts__act--now .v-star-n-acts__when { font-size: 13px; font-weight: 620; color: var(--text-hi, rgba(var(--ink), 0.96)); }
+.v-star-n-acts .v-star-n-acts__rail { grid-column: 2 / 4; height: 3px; border-radius: 2px; background: rgba(var(--ink), 0.10); overflow: hidden; }
+.v-star-n-acts .v-star-n-acts__rail i { display: block; height: 100%; width: 58.3%; border-radius: 2px; background: #3ad9f5; }
+
+/* star-n-held */
+.v-star-n-held { font-variant-numeric: tabular-nums; }
+.v-star-n-held .v-star-n-held__rule { font-size: 12.5px; font-weight: 500; letter-spacing: -0.01em; color: var(--text-mid, rgba(var(--ink), 0.62)); margin: 0 0 10px; }
+.v-star-n-held .v-star-n-held__count { display: flex; align-items: center; gap: 12px; margin: 0 0 18px; }
+.v-star-n-held .v-star-n-held__count b { font-size: 62px; line-height: 0.84; font-weight: 640; letter-spacing: -0.045em; color: var(--text-hi, rgba(var(--ink), 0.96)); font-variant-numeric: tabular-nums; }
+.v-star-n-held .v-star-n-held__count span { font-size: 13px; line-height: 1.22; font-weight: 560; letter-spacing: -0.012em; color: rgba(var(--ink), 0.74); padding-bottom: 2px; }
+.v-star-n-held .v-star-n-held__facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding-top: 13px; border-top: 1px solid rgba(var(--ink), 0.09); }
+.v-star-n-held .v-star-n-held__fact { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.v-star-n-held .v-star-n-held__fact b { font-size: 15px; font-weight: 620; letter-spacing: -0.02em; color: var(--text-hi, rgba(var(--ink), 0.96)); font-variant-numeric: tabular-nums; }
+.v-star-n-held .v-star-n-held__fact span { font-size: 11px; font-weight: 500; line-height: 1.28; letter-spacing: -0.006em; color: var(--text-lo, rgba(var(--ink), 0.40)); }
+
+/* star-n-holduntil */
+.v-hu { font-variant-numeric: tabular-nums; }
+.v-hu .v-hu__rule { font-size: 12.5px; font-weight: 500; letter-spacing: -0.01em; color: var(--text-mid, rgba(var(--ink), 0.62)); margin: 0 0 12px; }
+.v-hu .v-hu__head { display: flex; align-items: baseline; gap: 8px; margin: 0 0 16px; }
+.v-hu .v-hu__head b { font-size: 40px; line-height: 0.9; font-weight: 640; letter-spacing: -0.042em; color: var(--text-hi, rgba(var(--ink), 0.96)); font-variant-numeric: tabular-nums; }
+.v-hu .v-hu__head span { font-size: 13px; font-weight: 560; letter-spacing: -0.012em; color: rgba(var(--ink), 0.72); }
+.v-hu .v-hu__head em { margin-left: auto; font-style: normal; font-size: 12.5px; font-weight: 560; letter-spacing: -0.01em; color: var(--text-lo, rgba(var(--ink), 0.40)); font-variant-numeric: tabular-nums; }
+.v-hu .v-hu__rail { position: relative; height: 4px; border-radius: 2px; background: rgba(var(--ink), 0.10); margin: 0 0 9px; }
+.v-hu .v-hu__rail i { position: absolute; inset: 0 27% 0 0; border-radius: 2px; background: rgba(var(--ink), 0.30); }
+.v-hu .v-hu__rail s { position: absolute; top: 50%; left: 73%; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%; background: #3ad9f5; box-shadow: 0 0 0 4px rgba(58, 217, 245, 0.13); }
+.v-hu .v-hu__ends { display: flex; justify-content: space-between; font-size: 11.5px; font-weight: 500; color: var(--text-lo, rgba(var(--ink), 0.40)); font-variant-numeric: tabular-nums; }
+.v-hu .v-hu__ends span:last-child { color: rgba(var(--ink), 0.72); font-weight: 600; }
+.v-hu .v-hu__note { margin: 15px 0 0; font-size: 12px; line-height: 1.42; font-weight: 500; letter-spacing: -0.008em; color: rgba(var(--ink), 0.56); }
+
+/* star-n-arithmetic */
+.v-math { font-variant-numeric: tabular-nums; }
+.v-math .v-math__goal { font-size: 12.5px; font-weight: 500; letter-spacing: -0.01em; color: var(--text-mid, rgba(var(--ink), 0.62)); margin: 0 0 11px; }
+.v-math .v-math__eq { display: flex; align-items: baseline; flex-wrap: wrap; gap: 7px; margin: 0 0 7px; }
+.v-math .v-math__n { font-size: 15px; font-weight: 600; letter-spacing: -0.022em; color: rgba(var(--ink), 0.74); font-variant-numeric: tabular-nums; }
+.v-math .v-math__n--lit { color: var(--text-hi, rgba(var(--ink), 0.96)); }
+.v-math .v-math__o { font-size: 14px; font-weight: 500; color: var(--text-lo, rgba(var(--ink), 0.40)); }
+.v-math .v-math__step { font-size: 12px; font-weight: 500; letter-spacing: -0.008em; color: rgba(var(--ink), 0.52); padding: 0 0 13px; border-bottom: 1px solid rgba(var(--ink), 0.09); }
+.v-math .v-math__out { margin: 14px 0 9px; font-size: 23px; line-height: 1.06; font-weight: 640; letter-spacing: -0.034em; color: var(--text-hi, rgba(var(--ink), 0.96)); font-variant-numeric: tabular-nums; }
+.v-math .v-math__foot { font-size: 11.5px; line-height: 1.42; font-weight: 500; letter-spacing: -0.006em; color: rgba(var(--ink), 0.50); }
+
+/* star-n-honest */
+.v-true { font-variant-numeric: tabular-nums; }
+.v-true .v-true__goal { font-size: 12.5px; line-height: 1.34; font-weight: 500; letter-spacing: -0.01em; color: var(--text-mid, rgba(var(--ink), 0.62)); margin: 0 0 12px; }
+.v-true .v-true__rows { display: flex; flex-direction: column; gap: 9px; margin: 0 0 12px; }
+.v-true .v-true__row { display: flex; align-items: baseline; gap: 9px; }
+.v-true .v-true__row b { font-size: 21px; font-weight: 640; letter-spacing: -0.032em; font-variant-numeric: tabular-nums; }
+.v-true .v-true__row span { font-size: 12px; font-weight: 500; letter-spacing: -0.008em; }
+.v-true .v-true__row em { margin-left: auto; font-style: normal; font-size: 12.5px; font-weight: 600; letter-spacing: -0.012em; font-variant-numeric: tabular-nums; }
+.v-true .v-true__row--old b { color: rgba(var(--ink), 0.36); text-decoration: line-through; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+.v-true .v-true__row--old span, .v-true .v-true__row--old em { color: rgba(var(--ink), 0.36); }
+.v-true .v-true__row--new b { color: var(--text-hi, rgba(var(--ink), 0.96)); }
+.v-true .v-true__row--new span { color: rgba(var(--ink), 0.60); }
+.v-true .v-true__row--new em { color: #3ad9f5; }
+.v-true .v-true__why { font-size: 11.5px; line-height: 1.42; font-weight: 500; letter-spacing: -0.006em; color: rgba(var(--ink), 0.54); padding-top: 12px; border-top: 1px solid rgba(var(--ink), 0.09); margin: 0 0 12px; }
+.v-true .v-true__cta { display: block; width: 100%; border: 0; border-radius: 10px; padding: 10px 12px; background: rgba(var(--ink), 0.08); color: var(--text-hi, rgba(var(--ink), 0.96)); font: inherit; font-size: 12.5px; font-weight: 600; letter-spacing: -0.012em; text-align: center; cursor: pointer; }
+.v-true .v-true__cta:active { background: rgba(var(--ink), 0.13); }
+
+/* consistency-n-hold */
+.v-consistency-n-hold{display:flex;flex-direction:column;font-variant-numeric:tabular-nums}
+.v-consistency-n-hold__head{display:flex;align-items:baseline;gap:12px}
+.v-consistency-n-hold__num{font-size:54px;font-weight:600;line-height:.86;letter-spacing:-.04em;color:rgba(255,255,255,.96)}
+.v-consistency-n-hold__lab{font-size:15px;font-weight:500;line-height:1.2;color:rgba(255,255,255,.92)}
+.v-consistency-n-hold__lab span{display:block;margin-top:4px;font-size:12.5px;font-weight:400;color:rgba(255,255,255,.40)}
+.v-consistency-n-hold__rail{position:relative;height:6px;margin-top:16px;border-radius:3px;background:rgba(63,217,78,.13);overflow:hidden}
+.v-consistency-n-hold__rail i{position:absolute;inset:0;border-radius:3px;background:linear-gradient(90deg,rgba(63,217,78,.35),#3fd94e)}
+.v-consistency-n-hold__since{margin-top:10px;font-size:12.5px;line-height:1.35;color:rgba(255,255,255,.62)}
+.v-consistency-n-hold__facts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+.v-consistency-n-hold__k{font-size:12px;color:rgba(255,255,255,.40);margin-bottom:5px}
+.v-consistency-n-hold__v{font-size:14px;line-height:1.34;color:rgba(255,255,255,.93);font-weight:500}
+
+/* consistency-n-cadence */
+.v-cad{display:flex;flex-direction:column;font-variant-numeric:tabular-nums}
+.v-cad__head{font-size:23px;font-weight:600;letter-spacing:-.02em;line-height:1.15;color:rgba(255,255,255,.96)}
+.v-cad__sub{margin-top:7px;font-size:14.5px;line-height:1.35;color:rgba(255,255,255,.92)}
+.v-cad__weeks{margin-top:20px;display:flex;flex-direction:column;gap:12px}
+.v-cad__wk{display:flex;align-items:center;gap:10px}
+.v-cad__wl{width:70px;flex:none;font-size:12.5px;color:rgba(255,255,255,.62)}
+.v-cad__dots{flex:1;display:flex;align-items:center;gap:6px}
+.v-cad__d{width:12px;height:12px;border-radius:4px;background:rgba(255,255,255,.10)}
+.v-cad__d--kept{background:#3fd94e}
+.v-cad__d--today{background:rgba(255,255,255,.96)}
+.v-cad__d--open{background:rgba(255,255,255,.05)}
+.v-cad__wc{width:52px;flex:none;text-align:right;font-size:13px;font-weight:600;color:rgba(255,255,255,.62)}
+.v-cad__wc--ok{color:#3fd94e}
+.v-cad__foot{margin-top:20px;font-size:14.5px;font-weight:500;line-height:1.3;color:rgba(255,255,255,.93)}
+
+/* consistency-n-season */
+.v-consistency-n-season{display:flex;flex-direction:column;font-variant-numeric:tabular-nums}
+.v-consistency-n-season__head{display:flex;align-items:baseline;gap:12px}
+.v-consistency-n-season__num{font-size:46px;font-weight:600;line-height:.88;letter-spacing:-.04em;color:rgba(255,255,255,.96)}
+.v-consistency-n-season__lab{font-size:14.5px;font-weight:500;line-height:1.2;color:rgba(255,255,255,.92)}
+.v-consistency-n-season__lab span{display:block;margin-top:4px;font-size:12.5px;font-weight:400;color:rgba(255,255,255,.40)}
+.v-consistency-n-season__ribbon{display:flex;align-items:flex-end;gap:6px;margin-top:20px}
+.v-consistency-n-season__m{flex:1;display:flex;flex-direction:column;align-items:center;gap:7px}
+.v-consistency-n-season__b{width:100%;height:38px;border-radius:3px;background:rgba(255,255,255,.06);position:relative;overflow:hidden}
+.v-consistency-n-season__b::after{content:"";position:absolute;left:0;right:0;bottom:0;height:calc(var(--f,0) * 100%);border-radius:3px;background:#3fd94e}
+.v-consistency-n-season__m--off .v-consistency-n-season__b{height:5px;background:rgba(255,255,255,.10)}
+.v-consistency-n-season__m b{font-size:10.5px;font-weight:500;color:rgba(255,255,255,.40)}
+.v-consistency-n-season__m--now b{color:rgba(255,255,255,.96)}
+.v-consistency-n-season__foot{margin-top:18px;font-size:14px;line-height:1.35;color:rgba(255,255,255,.93)}
+.v-consistency-n-season__foot b{font-weight:600;color:#3fd94e}
+
+/* consistency-n-adhere */
+.v-consistency-n-adhere{display:flex;flex-direction:column;font-variant-numeric:tabular-nums}
+.v-consistency-n-adhere__head{display:flex;align-items:baseline;gap:12px}
+.v-consistency-n-adhere__num{font-size:44px;font-weight:600;line-height:.88;letter-spacing:-.04em;color:rgba(255,255,255,.96)}
+.v-consistency-n-adhere__num span{font-size:24px;font-weight:500;margin-left:1px}
+.v-consistency-n-adhere__lab{font-size:14.5px;font-weight:500;line-height:1.2;color:rgba(255,255,255,.92)}
+.v-consistency-n-adhere__lab span{display:block;margin-top:4px;font-size:12.5px;font-weight:400;color:rgba(255,255,255,.40)}
+.v-consistency-n-adhere__chart{position:relative;display:flex;align-items:flex-end;gap:4px;height:48px;margin-top:20px}
+.v-consistency-n-adhere__chart i{flex:1;height:calc(var(--h) * 100%);min-height:3px;border-radius:2px;background:#3fd94e}
+.v-consistency-n-adhere__chart i.lo{background:rgba(255,255,255,.26)}
+.v-consistency-n-adhere__plan{position:absolute;left:0;right:0;top:26%;height:1px;background:rgba(255,255,255,.20)}
+.v-consistency-n-adhere__axis{display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:rgba(255,255,255,.40)}
+.v-consistency-n-adhere__foot{margin-top:16px;font-size:14px;line-height:1.35;color:rgba(255,255,255,.93)}
+.v-consistency-n-adhere__foot b{font-weight:600}
+
+/* consistency-n-bought */
+.v-consistency-n-bought{display:flex;flex-direction:column;font-variant-numeric:tabular-nums}
+.v-consistency-n-bought__head{display:flex;align-items:baseline;gap:12px}
+.v-consistency-n-bought__num{font-size:42px;font-weight:600;line-height:.88;letter-spacing:-.04em;color:rgba(255,255,255,.96)}
+.v-consistency-n-bought__num span{font-size:19px;font-weight:500;margin-left:4px;color:rgba(255,255,255,.62)}
+.v-consistency-n-bought__lab{font-size:14.5px;font-weight:500;line-height:1.2;color:rgba(255,255,255,.92)}
+.v-consistency-n-bought__lab span{display:block;margin-top:4px;font-size:12.5px;font-weight:400;color:rgba(255,255,255,.40)}
+.v-consistency-n-bought__rows{display:flex;flex-direction:column;gap:9px;margin-top:18px}
+.v-consistency-n-bought__r{display:flex;align-items:center;gap:10px}
+.v-consistency-n-bought__m{width:28px;flex:none;font-size:12.5px;color:rgba(255,255,255,.62)}
+.v-consistency-n-bought__d{width:52px;flex:none;font-size:12.5px;color:rgba(255,255,255,.92)}
+.v-consistency-n-bought__t{flex:1;height:7px;border-radius:3px;background:rgba(255,255,255,.07);position:relative;overflow:hidden}
+.v-consistency-n-bought__t i{position:absolute;left:0;top:0;bottom:0;width:var(--w);border-radius:3px;background:#3fd94e}
+.v-consistency-n-bought__g{width:38px;flex:none;text-align:right;font-size:13.5px;font-weight:600;color:#3fd94e}
+.v-consistency-n-bought__g--flat{color:rgba(255,255,255,.40)}
+.v-consistency-n-bought__foot{margin-top:16px;font-size:14px;line-height:1.35;color:rgba(255,255,255,.93)}
+  .pil{display:inline-block;margin-right:8px;padding:3px 8px;border-radius:999px;
+    background:rgba(255,255,255,.07);font-size:10.5px;font-weight:750;color:var(--text-lo)}
+  .sect__hd h2{margin:0 0 4px;font-size:21px}
+  .sect__hd p{margin:0 0 22px;font-size:13px;color:var(--text-lo)}
+  .slot__n{display:none}
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>The sync box</h1>
-  <p class="lede">Fifty candidates for the three swipeable faces under the Memento.
-    Each one says who it is for and when to skip it. Prototypes, not shipped.</p>
-  <div class="guide">
-    <h3>Which face for which person</h3>
-    <table>
-      <tr><th>Their goal</th><th>Today</th><th>Star</th><th>Consistency</th></tr>
-      <tr><td><b>Number + deadline</b><br>lose 40 lbs in 6 months</td>
-          <td>The derived line</td><td>Distance to the number</td><td>Your schedule, kept</td></tr>
-      <tr><td><b>Number, no deadline</b><br>100 paying users</td>
-          <td>Closing the gap</td><td>Arrival date</td><td>Rate drift</td></tr>
-      <tr><td><b>A rule to hold</b><br>stay sober, eat under 2,400</td>
-          <td>The rule, tonight</td><td>Evidence, no meter</td><td>Your schedule, kept</td></tr>
-      <tr><td><b>A rate</b><br>gym 3x a week</td>
-          <td>Weighted move</td><td>Evidence, no meter</td><td>Your schedule, kept</td></tr>
-      <tr><td><b>An event</b><br>pass the bar, first hive</td>
-          <td>First thirty seconds</td><td>The star's own spine</td><td>Returns</td></tr>
-      <tr><td><b>Open</b><br>be a better father</td>
-          <td>The ledger</td><td>Evidence, no meter</td><td>Returns</td></tr>
-      <tr><td><b>Kept it up, no result</b><br>any goal, stalled</td>
-          <td colspan="3">Doing it, not working, takes over until the plan is redone</td></tr>
-    </table>
+  <p class="lede">Grouped by the person, not by the pillar. Find the situation, and the
+    faces that serve it are underneath. Each card says who it is for and when to skip it.</p>
+  <nav class="nav"><a href="#s-num-dl">A number and a deadline</a><a href="#s-num">A number, no deadline</a><a href="#s-rule">A rule to hold</a><a href="#s-rate">A rate to keep</a><a href="#s-event">An event to reach</a><a href="#s-open">Nothing to count</a><a href="#s-edge">Days one, off, and stalled</a></nav>
+
+  <section class="sect" id="s-num-dl">
+    <header class="sect__hd"><h2>A number and a deadline</h2><p>lose 40 lbs in 6 months, $10k by December</p></header>
+    <div class="grid"><figure class="slot" id="today-derived-line">
+        <figcaption class="slot__cap"><span class="pil">Today</span><span class="slot__n">N2</span>
+          <span class="slot__t">The derived line</span>
+          <span class="tag tag--new">Quantity + deadline</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-today-derived-line">
+  <p class="dl-top">40 lbs in 6 months</p>
+  <p class="dl-math">is <b>1.5 lbs a week</b>, is a <b>750 calorie</b> daily deficit</p>
+  <p class="dl-act">Eat 2,000 to 2,400 today</p>
+  <div class="dl-bar" aria-hidden="true"><i style="width:34%"></i></div>
+  <p class="dl-foot">13.6 lbs down. On pace, 4 days ahead.</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Quantity goals with a target and a deadline. The dieter cutting 40 lbs in 6 months.<span class="bf__x">Skip if no target or no deadline</span></p>
+          
+          
+        </div>
+      </figure><figure class="slot" id="today-n-pace">
+        <figcaption class="slot__cap"><span class="pil">Today</span><span class="slot__t">The pace debt</span>
+          <span class="tag tag--new">new</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-today-n-pace">
+  <div class="v-today-n-pace__top">
+    <span class="v-today-n-pace__left">34 days to Sep 9</span>
+    <span class="v-today-n-pace__right">11 lbs to go</span>
   </div>
-  <nav class="nav">
-    <a href="#sect-today">Today</a>
-    <a href="#sect-star">Neutron Star</a>
-    <a href="#sect-consistency">Consistency</a>
-  </nav>
-  <section class="sect" id="sect-today">
-    <header class="sect__hd"><h2>Today</h2>
-      <p>The one move for the day. <b>10 considered</b>, then <b>5 riskier ones</b> below.</p></header>
-    <div class="grid">
-      <figure class="slot" id="today-gap-close">
-        <figcaption class="slot__cap"><span class="slot__n">01</span>
+
+  <div class="v-today-n-pace__hero">You arrive<br>5 days late.</div>
+
+  <div class="v-today-n-pace__rows">
+    <div class="v-today-n-pace__row">
+      <span class="v-today-n-pace__k">Needed</span>
+      <i class="v-today-n-pace__bar"><b style="width:100%"></b></i>
+      <span class="v-today-n-pace__n">2.6 / wk</span>
+    </div>
+    <div class="v-today-n-pace__row v-today-n-pace__row--you">
+      <span class="v-today-n-pace__k">Yours</span>
+      <i class="v-today-n-pace__bar"><b style="width:62%"></b></i>
+      <span class="v-today-n-pace__n">1.6 / wk</span>
+    </div>
+  </div>
+
+  <p class="v-today-n-pace__foot">One more move a week closes it.</p>
+</div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Quantity goals with a deadline, once there is enough history to compute a rate<span class="bf__x">Skip if no deadline, or under two weeks of data</span></p></div>
+      </figure><figure class="slot" id="star-n-arithmetic">
+        <figcaption class="slot__cap"><span class="pil">Star</span><span class="slot__t">The arithmetic</span>
+          <span class="tag tag--new">new</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-math">
+  <div class="v-math__goal">Down 40 lbs by March 1</div>
+  <div class="v-math__eq">
+    <span class="v-math__n">28 lbs</span>
+    <span class="v-math__o">/</span>
+    <span class="v-math__n">22 weeks</span>
+    <span class="v-math__o">=</span>
+    <span class="v-math__n v-math__n--lit">1.3 a week</span>
+  </div>
+  <div class="v-math__step">1.3 lbs a week is a 750 calorie deficit a day</div>
+  <div class="v-math__out">Eat 2,000 to 2,400 today</div>
+  <div class="v-math__foot">12 lbs down since April 2. If the weight stalls for three weeks, this number gets re-derived.</div>
+</div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Quantity goals with a date: weight, revenue, subscribers, debt paid down<span class="bf__x">Skip if No target number or no deadline</span></p></div>
+      </figure><figure class="slot" id="star-star-arrival">
+        <figcaption class="slot__cap"><span class="pil">Star</span><span class="slot__n">06</span>
+          <span class="slot__t">Arrival date</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-star-star-arrival">
+  <p class="v-star-star-arrival__star">Get Memento to 100 paying users</p>
+  <div class="v-star-star-arrival__lead">
+    <span class="v-star-star-arrival__date">Nov 25</span>
+    <span class="v-star-star-arrival__at">on the pace you have kept</span>
+  </div>
+  <p class="v-star-star-arrival__shift">9 days sooner than a week ago</p>
+  <div class="v-star-star-arrival__rail" aria-hidden="true">
+    <span class="v-star-star-arrival__fill"></span>
+    <span class="v-star-star-arrival__base"></span>
+  </div>
+  <p class="v-star-star-arrival__foot"><b>38</b> today, <b>12</b> when you signed it, <b>62</b> to go</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Quantity goals with a deadline. The dieter racing a date they picked.<span class="bf__x">Skip if pace too new or too flat to project</span></p>
+          
+          
+          
+        </div>
+      </figure><figure class="slot" id="star-n-honest">
+        <figcaption class="slot__cap"><span class="pil">Star</span><span class="slot__t">The honest timeline</span>
+          <span class="tag tag--new">new</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-true">
+  <div class="v-true__goal">Down 40 lbs. Your date does not fit the math.</div>
+  <div class="v-true__rows">
+    <div class="v-true__row v-true__row--old">
+      <b>Oct 1</b>
+      <span>8 weeks left</span>
+      <em>2.4 lbs a week</em>
+    </div>
+    <div class="v-true__row v-true__row--new">
+      <b>Dec 14</b>
+      <span>19 weeks</span>
+      <em>1.0 lbs a week</em>
+    </div>
+  </div>
+  <div class="v-true__why">October needs 1,200 calories under maintenance every day. December needs 500, and it holds.</div>
+  <button class="v-true__cta" type="button">Move the date to Dec 14</button>
+</div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Anyone whose signed date the math cannot survive, especially weight and money<span class="bf__x">Skip if The deadline is already achievable</span></p></div>
+      </figure><figure class="slot" id="consistency-n-bought">
+        <figcaption class="slot__cap"><span class="pil">Consistency</span><span class="slot__t">What the days bought</span>
+          <span class="tag tag--new">new</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-n-bought">
+  <div class="v-consistency-n-bought__head">
+    <div class="v-consistency-n-bought__num">11.4<span>lbs</span></div>
+    <div class="v-consistency-n-bought__lab">gone since April
+      <span>62 days kept, month by month</span>
+    </div>
+  </div>
+
+  <div class="v-consistency-n-bought__rows">
+    <div class="v-consistency-n-bought__r"><span class="v-consistency-n-bought__m">Apr</span><span class="v-consistency-n-bought__d">18 days</span><span class="v-consistency-n-bought__t"><i style="--w:90%"></i></span><span class="v-consistency-n-bought__g">4.2</span></div>
+    <div class="v-consistency-n-bought__r"><span class="v-consistency-n-bought__m">May</span><span class="v-consistency-n-bought__d">16 days</span><span class="v-consistency-n-bought__t"><i style="--w:80%"></i></span><span class="v-consistency-n-bought__g">3.0</span></div>
+    <div class="v-consistency-n-bought__r"><span class="v-consistency-n-bought__m">Jun</span><span class="v-consistency-n-bought__d">20 days</span><span class="v-consistency-n-bought__t"><i style="--w:100%"></i></span><span class="v-consistency-n-bought__g">3.9</span></div>
+    <div class="v-consistency-n-bought__r"><span class="v-consistency-n-bought__m">Jul</span><span class="v-consistency-n-bought__d">8 days</span><span class="v-consistency-n-bought__t"><i style="--w:40%"></i></span><span class="v-consistency-n-bought__g v-consistency-n-bought__g--flat">0.3</span></div>
+  </div>
+
+  <div class="v-consistency-n-bought__foot">July kept eight days and the number nearly stopped.</div>
+</div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Quantity goals with tracked progress: proof the days are causing the number<span class="bf__x">Skip if goalProgress has no history to pair against</span></p></div>
+      </figure><figure class="slot" id="consistency-cadence-week">
+        <figcaption class="slot__cap"><span class="pil">Consistency</span><span class="slot__n">N1</span>
+          <span class="slot__t">Your schedule, kept</span>
+          <span class="tag tag--new">Any cadence</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-cadence-week">
+  <div class="cw-head"><span class="cw-n">3</span><span class="cw-of">of 3 this week</span>
+    <span class="cw-tag">kept</span></div>
+  <div class="cw-days" aria-hidden="true">
+    <i class="on"></i><i class="rest"></i><i class="on"></i><i class="rest"></i>
+    <i class="on"></i><i class="rest"></i><i class="rest"></i>
+  </div>
+  <p class="cw-lbl"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></p>
+  <p class="cw-foot"><b>11 perfect weeks.</b> Rest days are not misses.</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Frequency goals. The 3x-a-week lifter punished by every daily-streak face.<span class="bf__x">Skip if no schedule set, nothing to adhere to</span></p>
+          
+          
+        </div>
+      </figure></div>
+  </section>
+  <section class="sect" id="s-num">
+    <header class="sect__hd"><h2>A number, no deadline</h2><p>100 paying users, read 50 books</p></header>
+    <div class="grid"><figure class="slot" id="today-gap-close">
+        <figcaption class="slot__cap"><span class="pil">Today</span><span class="slot__n">01</span>
           <span class="slot__t">Closing the gap</span></figcaption>
         <div class="phone">
           <div class="phone__glow" aria-hidden="true"></div>
@@ -841,438 +1221,8 @@
           
           
         </div>
-      </figure>
-      <figure class="slot" id="today-today-weight">
-        <figcaption class="slot__cap"><span class="slot__n">02</span>
-          <span class="slot__t">Weighted move</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
-          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-today-today-weight">
-  <p class="tw-move">Send the beta invite to the five people who already asked for it</p>
-  <div class="tw-row">
-    <span class="tw-ladder" aria-hidden="true"><i class="is-past"></i><i class="is-past"></i><i class="is-on"></i><i></i><i></i></span>
-    <span class="tw-tier">Moderate today</span>
-  </div>
-  <p class="tw-run"><span class="tw-n">4</span> of the last 7 days. Your best 7 is <span class="tw-n">6</span>.</p>
-  <button class="tw-cta" type="button">Mark it done</button>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Rep and Attempt goals. The person whose reps must get heavier, not just repeat.<span class="bf__x">Skip if the plan carries no intensity ladder</span></p>
-          
-          
-          
-        </div>
-      </figure>
-      <figure class="slot" id="today-today-open">
-        <figcaption class="slot__cap"><span class="slot__n">03</span>
-          <span class="slot__t">First thirty seconds</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
-          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-today-today-open">
-  <p class="to-move">Call the three trial accounts that never came back</p>
-  <div class="to-start">
-    <svg class="to-ic" viewBox="0 0 16 16" width="13" height="13" fill="none" aria-hidden="true"><path d="M4 3.2 11.6 8 4 12.8V3.2Z" fill="currentColor"/></svg>
-    <p>Open the trial list and dial the top name before you think about it.</p>
-  </div>
-  <p class="to-gap">Two days since your last move.</p>
-  <button class="to-cta" type="button">Mark it done</button>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Open goals. The person with no number who stalls on where to physically begin.<span class="bf__x">Skip if the move is an all-day rule</span></p>
-          
-          
-          
-        </div>
-      </figure>
-      <figure class="slot" id="today-today-run">
-        <figcaption class="slot__cap"><span class="slot__n">04</span>
-          <span class="slot__t">The run</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
-          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-today-today-run">
-  <ol class="tr-list">
-    <li class="tr-now"><span class="tr-mk" aria-hidden="true"></span><p>Record lesson two, one take, no edits</p></li>
-    <li><span class="tr-mk tr-mk--on" aria-hidden="true"></span><p>Recorded lesson one</p><time>Mon</time></li>
-    <li><span class="tr-mk tr-mk--on" aria-hidden="true"></span><p>Outlined the whole module</p><time>Sat</time></li>
-  </ol>
-  <button class="tr-cta" type="button">Mark today done</button>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Frequency goals. The daily writer who keeps going because the run is visible.<span class="bf__x">Skip if fewer than two moves logged</span></p>
-          
-          
-          
-        </div>
-      </figure>
-      <figure class="slot" id="today-week-rhythm">
-        <figcaption class="slot__cap"><span class="slot__n">05</span>
-          <span class="slot__t">This week&#x27;s rhythm</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
-          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-today-week-rhythm">
-  <p class="wr-move">Message 10 people who fit the product</p>
-  <div class="wr-week" role="img" aria-label="Four moves so far this week. Today is still open.">
-    <span class="wr-day is-done"><i></i>m</span>
-    <span class="wr-day is-done"><i></i>t</span>
-    <span class="wr-day"><i></i>w</span>
-    <span class="wr-day is-done"><i></i>t</span>
-    <span class="wr-day is-done"><i></i>f</span>
-    <span class="wr-day is-now"><i></i>s</span>
-    <span class="wr-day"><i></i>s</span>
-  </div>
-  <p class="wr-read"><b>Four this week.</b> Three by now last week.</p>
-  <button class="wr-do" type="button">Mark it done</button>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Frequency goals. The gym-3x person who should judge a week, not a streak.<span class="bf__x">Skip if a one-off milestone with no weekly rhythm</span></p>
-          
-          
-          
-        </div>
-      </figure>
-      <figure class="slot" id="today-record-line">
-        <figcaption class="slot__cap"><span class="slot__n">06</span>
-          <span class="slot__t">Against your record</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
-          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-today-record-line">
-  <p class="rl-verdict">One day from your best week.</p>
-  <div class="rl-rows">
-    <div class="rl-row"><span class="rl-k">This week</span><i class="rl-bar"><b style="width:83%"></b></i><span class="rl-n">5</span></div>
-    <div class="rl-row is-best"><span class="rl-k">Best, in June</span><i class="rl-bar"><b style="width:100%"></b></i><span class="rl-n">6</span></div>
-  </div>
-  <p class="rl-move">Message 10 people who fit the product</p>
-  <button class="rl-do" type="button">Mark it done</button>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Frequency goals. The competitor who moves when a record is one day away.<span class="bf__x">Skip if no completed week to beat yet</span></p>
-          
-          
-          
-        </div>
-      </figure>
-      <figure class="slot" id="today-today-then">
-        <figcaption class="slot__cap"><span class="slot__n">07</span>
-          <span class="slot__t">How far it has grown</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
-          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-today-today-then">
-  <p class="tn-move">Write 1,000 words on the chapter you keep avoiding</p>
-  <div class="tn-then">
-    <span class="tn-rule" aria-hidden="true"></span>
-    <p>Where this started, 63 days ago: <span>write 200 words, anywhere.</span></p>
-  </div>
-  <button class="tn-cta" type="button">Mark it done</button>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Rep goals months in. The person who fears they are still repeating day one.<span class="bf__x">Skip if the plan is under a month old</span></p>
-          
-          
-          
-        </div>
-      </figure>
-      <figure class="slot" id="today-today-toward">
-        <figcaption class="slot__cap"><span class="slot__n">08</span>
-          <span class="slot__t">In service of</span><span class="tag tag--cut">was cut</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
-          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-today-today-toward">
-  <p class="tt-move">Ship the pricing page and post it in three communities</p>
-  <div class="tt-rail">
-    <span class="tt-track" aria-hidden="true"><span class="tt-fill"></span><span class="tt-base"></span></span>
-    <span class="tt-nums"><span class="tt-cur"><b>34</b> of 100 paying users</span><span class="tt-delta">+9 in 30 days</span></span>
-  </div>
-  <button class="tt-cta" type="button">Mark it done</button>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Quantity up or down with a named number. The dieter 12 lbs into 40.<span class="bf__x">Skip if the goal carries no number</span></p>
-          
-          
-          
-        </div>
-      </figure>
-      <figure class="slot" id="today-size-ladder">
-        <figcaption class="slot__cap"><span class="slot__n">09</span>
-          <span class="slot__t">How big it got</span><span class="tag tag--cut">was cut</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
-          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-today-size-ladder">
-  <p class="sl-move">Message 10 people who fit the product</p>
-  <div class="sl-scale" role="img" aria-label="Moderate, the third of five sizes"><i class="is-past"></i><i class="is-past"></i><i class="is-now"></i><i></i><i></i></div>
-  <p class="sl-read"><b>Moderate.</b> On day one this was two people.</p>
-  <button class="sl-do" type="button">Mark it done</button>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Attempt and Rep goals. The person whose plan escalates on a fixed ladder.<span class="bf__x">Skip if the move is a fixed-size daily rule</span></p>
-          
-          
-          
-        </div>
-      </figure>
-      <figure class="slot" id="today-move-ledger">
-        <figcaption class="slot__cap"><span class="slot__n">10</span>
-          <span class="slot__t">The ledger</span><span class="tag tag--cut">was cut</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
-          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-today-move-ledger">
-  <div class="ml-top">
-    <p class="ml-move">Message 10 people who fit the product</p>
-    <button class="ml-do" type="button">Done</button>
-  </div>
-  <div class="ml-list">
-    <div class="ml-row"><span class="ml-d">Yesterday</span><span class="ml-t">Message 10 people who fit</span></div>
-    <div class="ml-row"><span class="ml-d">Thu</span><span class="ml-t">Rewrite the outreach opener</span></div>
-    <div class="ml-row"><span class="ml-d">Wed</span><span class="ml-t">Message 5 people who fit</span></div>
-  </div>
-  <p class="ml-foot">34 moves in 68 days, nine of the last ten.</p>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Frequency and Ship goals. The person who wants the record, not the pep talk.<span class="bf__x">Skip if nothing logged yet</span></p>
-          
-          
-          
-        </div>
-      </figure></div>
-    <h3 class="sect__sub">The riskier five</h3>
-    <div class="grid">
-      <figure class="slot" id="today-mv-ask">
-        <figcaption class="slot__cap"><span class="slot__n">11</span>
-          <span class="slot__t">The question</span><span class="tag tag--risk">risky</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
-          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-today-mv-ask">
-  <p class="v-today-mv-ask__q">Have you moved today?</p>
-  <p class="v-today-mv-ask__a">Not yet.</p>
-  <p class="v-today-mv-ask__move">Write the cold open for episode 12.</p>
-  <button class="v-today-mv-ask__do" type="button">I moved</button>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Open goals. The person building evidence with no meter to read.<span class="bf__x">Skip if the goal has a number worth showing</span></p>
-          
-          
-          
-        </div>
-      </figure>
-      <figure class="slot" id="today-mv-rule">
-        <figcaption class="slot__cap"><span class="slot__n">12</span>
-          <span class="slot__t">The day rule</span><span class="tag tag--risk">risky</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
-          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-today-mv-rule">
-  <p class="v-today-mv-rule__head"><span class="v-today-mv-rule__big">6h 12m</span><span class="v-today-mv-rule__sub">of today left</span></p>
-  <svg class="v-today-mv-rule__svg" viewBox="0 0 306 26" width="100%" height="26" aria-hidden="true">
-    <g stroke="currentColor" stroke-linecap="square">
-      <path d="M3 18.5H303" stroke-opacity=".14"/>
-      <path d="M3 18.5H193.6" stroke-opacity=".32"/>
-      <g stroke-opacity=".2"><path d="M3 18.5v-4M20.6 18.5v-4M38.3 18.5v-4M55.9 18.5v-4M73.6 18.5v-4M91.2 18.5v-4M126.5 18.5v-4M144.1 18.5v-4M161.8 18.5v-4M179.4 18.5v-4M197.1 18.5v-4M214.7 18.5v-4M250 18.5v-4M267.6 18.5v-4M285.3 18.5v-4M303 18.5v-4"/></g>
-      <g stroke-opacity=".34"><path d="M108.9 18.5v-8M232.4 18.5v-8"/></g>
-      <path d="M193.6 25V6" stroke="#eef2fb" stroke-opacity=".92" stroke-width="1.5"/>
-    </g>
-  </svg>
-  <p class="v-today-mv-rule__ends"><span>6a</span><span>11p</span></p>
-  <div class="v-today-mv-rule__row">
-    <p class="v-today-mv-rule__move">Write the cold open for episode 12.<span class="v-today-mv-rule__tier">Moderate is today&rsquo;s size.</span></p>
-    <button class="v-today-mv-rule__tick" type="button" aria-label="Mark today's move done">
-      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 6.5"/></svg>
-    </button>
-  </div>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Ship and Rep goals on a daily cadence. The person who puts it off until dark.<span class="bf__x">Skip if the cadence is weekly or seasonal</span></p>
-          
-          
-          
-        </div>
-      </figure>
-      <figure class="slot" id="today-mv-ordinal">
-        <figcaption class="slot__cap"><span class="slot__n">13</span>
-          <span class="slot__t">The ordinal</span><span class="tag tag--risk">risky</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
-          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-today-mv-ordinal">
-  <p class="v-today-mv-ordinal__n">149<span class="v-today-mv-ordinal__suf">th</span></p>
-  <p class="v-today-mv-ordinal__sub">move, if today counts. First one 14 March.</p>
-  <div class="v-today-mv-ordinal__line"></div>
-  <p class="v-today-mv-ordinal__move">Write the cold open for episode 12.</p>
-  <button class="v-today-mv-ordinal__do" type="button">Completed</button>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Maintenance goals. The sober person on day 412, where the count is the point.<span class="bf__x">Skip if the goal has no continuous count</span></p>
-          
-          
-          
-        </div>
-      </figure>
-      <figure class="slot" id="today-mv-chain">
-        <figcaption class="slot__cap"><span class="slot__n">14</span>
-          <span class="slot__t">The chain</span><span class="tag tag--risk">risky</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
-          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-today-mv-chain">
-  <div class="v-today-mv-chain__link v-today-mv-chain__link--now">
-    <span class="v-today-mv-chain__node"></span>
-    <div class="v-today-mv-chain__body">
-      <p class="v-today-mv-chain__lbl">Today</p>
-      <p class="v-today-mv-chain__txt">Write the cold open for episode 12.</p>
-    </div>
-  </div>
-  <div class="v-today-mv-chain__link">
-    <span class="v-today-mv-chain__node v-today-mv-chain__node--open"></span>
-    <div class="v-today-mv-chain__body">
-      <p class="v-today-mv-chain__lbl">Sets up</p>
-      <p class="v-today-mv-chain__txt v-today-mv-chain__txt--next">Record it in one take.</p>
-    </div>
-  </div>
-  <button class="v-today-mv-chain__do" type="button">Completed</button>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Milestone goals. The bar candidate whose steps only make sense in order.<span class="bf__x">Skip if every day repeats the same move</span></p>
-          
-          
-          
-        </div>
-      </figure>
-      <figure class="slot" id="today-mv-trace">
-        <figcaption class="slot__cap"><span class="slot__n">15</span>
-          <span class="slot__t">The trace</span><span class="tag tag--risk">risky</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
-          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-today-mv-trace">
-  <p class="v-today-mv-trace__head">Rising</p>
-  <p class="v-today-mv-trace__sub">5 moves in the last 7 days, up from 3</p>
-  <svg class="v-today-mv-trace__svg" viewBox="0 0 306 46" width="100%" height="46" preserveAspectRatio="none" aria-hidden="true">
-    <path d="M3 26.6 13.3 26.6 23.7 21.4 34 21.4 44.4 26.6 54.7 31.7 65.1 31.7 75.4 26.6 85.8 26.6 96.1 21.4 106.5 21.4 116.8 21.4 127.1 26.6 137.5 26.6 147.8 21.4 158.2 16.3 168.5 16.3 178.9 21.4 189.2 21.4 199.6 16.3 209.9 16.3 220.2 21.4 230.6 16.3 240.9 16.3 251.3 11.1 261.6 16.3 272 16.3 282.3 16.3 292.7 16.3 303 16.3 303 42 3 42Z" fill="currentColor" fill-opacity=".07"/>
-    <path d="M3 42H303" stroke="currentColor" stroke-opacity=".12" vector-effect="non-scaling-stroke"/>
-    <path d="M3 26.6 13.3 26.6 23.7 21.4 34 21.4 44.4 26.6 54.7 31.7 65.1 31.7 75.4 26.6 85.8 26.6 96.1 21.4 106.5 21.4 116.8 21.4 127.1 26.6 137.5 26.6 147.8 21.4 158.2 16.3 168.5 16.3 178.9 21.4 189.2 21.4 199.6 16.3 209.9 16.3 220.2 21.4 230.6 16.3 240.9 16.3 251.3 11.1 261.6 16.3 272 16.3 282.3 16.3 292.7 16.3 303 16.3" fill="none" stroke="#eef2fb" stroke-opacity=".9" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
-  </svg>
-  <p class="v-today-mv-trace__span">last 30 days</p>
-  <div class="v-today-mv-trace__row">
-    <p class="v-today-mv-trace__move">Write the cold open for episode 12.</p>
-    <button class="v-today-mv-trace__tick" type="button" aria-label="Mark today's move done">
-      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 6.5"/></svg>
-    </button>
-  </div>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Quantity and Frequency goals past a month. The person who drifts without noticing.<span class="bf__x">Skip if under thirty days of history</span></p>
-          
-          
-          
-        </div>
-      </figure></div>
-    <h3 class="sect__sub sect__sub--new">Built for the new philosophy</h3>
-    <div class="grid">
-      <figure class="slot" id="today-hold-tonight">
-        <figcaption class="slot__cap"><span class="slot__n">N1</span>
-          <span class="slot__t">The rule, tonight</span>
-          <span class="tag tag--new">Hold action</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
-          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-today-hold-tonight">
-  <p class="ht-rule">Eat 2,000 to 2,400 calories</p>
-  <div class="ht-row">
-    <span class="ht-n">18</span><span class="ht-m">days held<br>best 24</span>
-  </div>
-  <button class="ht-btn" type="button">Confirm tonight</button>
-  <p class="ht-note">Opens at 8pm. A rule cannot be finished at lunch.</p>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Maintenance goals. The person holding a line all day and confirming it at night.<span class="bf__x">Skip if the move is a task, not a rule</span></p>
-          
-          
-        </div>
-      </figure>
-      <figure class="slot" id="today-derived-line">
-        <figcaption class="slot__cap"><span class="slot__n">N2</span>
-          <span class="slot__t">The derived line</span>
-          <span class="tag tag--new">Quantity + deadline</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
-          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-today-derived-line">
-  <p class="dl-top">40 lbs in 6 months</p>
-  <p class="dl-math">is <b>1.5 lbs a week</b>, is a <b>750 calorie</b> daily deficit</p>
-  <p class="dl-act">Eat 2,000 to 2,400 today</p>
-  <div class="dl-bar" aria-hidden="true"><i style="width:34%"></i></div>
-  <p class="dl-foot">13.6 lbs down. On pace, 4 days ahead.</p>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Quantity goals with a target and a deadline. The dieter cutting 40 lbs in 6 months.<span class="bf__x">Skip if no target or no deadline</span></p>
-          
-          
-        </div>
-      </figure></div>
-
-  </section>
-  <section class="sect" id="sect-star">
-    <header class="sect__hd"><h2>Neutron Star</h2>
-      <p>The signed statement. <b>10 considered</b>, then <b>5 riskier ones</b> below.</p></header>
-    <div class="grid">
-      <figure class="slot" id="star-star-distance">
-        <figcaption class="slot__cap"><span class="slot__n">01</span>
+      </figure><figure class="slot" id="star-star-distance">
+        <figcaption class="slot__cap"><span class="pil">Star</span><span class="slot__n">01</span>
           <span class="slot__t">Distance to the number</span></figcaption>
         <div class="phone">
           <div class="phone__glow" aria-hidden="true"></div>
@@ -1292,74 +1242,8 @@
           
           
         </div>
-      </figure>
-      <figure class="slot" id="star-star-surface">
-        <figcaption class="slot__cap"><span class="slot__n">02</span>
-          <span class="slot__t">The reason, surfaced</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
-          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-star-star-surface">
-  <p class="su-star">Ship Memento to 100 paying users without abandoning it at 40.</p>
-  <div class="su-why"><span class="su-dot" aria-hidden="true"></span><span class="su-txt">Because I have quit at the almost-there point four times, and I am not doing that to this one.</span></div>
-  <p class="su-foot"><b>Day 47.</b> Your reason, surfaced after two days without a move.</p>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Open and maintenance goals. The person who forgets why they signed it.</p>
-          
-          
-          
-        </div>
-      </figure>
-      <figure class="slot" id="star-star-spine">
-        <figcaption class="slot__cap"><span class="slot__n">03</span>
-          <span class="slot__t">The star&#x27;s own spine</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
-          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-star-star-spine">
-  <p class="ss-star">Ship Memento to 100 paying users without abandoning it at 40.</p>
-  <div class="ss-spine" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i class="on"></i><i class="on"></i><i></i><i></i><i class="on"></i><i class="on"></i><i></i><i class="on now"></i></div>
-  <p class="ss-meta">Signed June 19<b>Day 47</b></p>
-  <p class="ss-line"><b>38 of those days</b> carried a move. Longest silence, 2 days.</p>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Frequency and maintenance. The person whose whole case is showing up daily.<span class="bf__x">Skip if signed less than two weeks ago</span></p>
-          
-          
-          
-        </div>
-      </figure>
-      <figure class="slot" id="star-star-ledger">
-        <figcaption class="slot__cap"><span class="slot__n">04</span>
-          <span class="slot__t">What it has cost you</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
-          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-star-star-ledger">
-  <p class="sl-star">Ship Memento to 100 paying users without abandoning it at 40.</p>
-  <div class="sl-rule" aria-hidden="true"></div>
-  <div class="sl-row"><span class="sl-big">41</span><span class="sl-lab">moves made<br>in its name</span><span class="sl-wk"><b>4 this week</b><span>6 last week</span></span></div>
-  <p class="sl-last">Yesterday: <b>Rewrote the pricing page headline</b></p>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Open and milestone goals. The person with no number, only moves done.<span class="bf__x">Skip if fewer than two weeks of moves</span></p>
-          
-          
-          
-        </div>
-      </figure>
-      <figure class="slot" id="star-star-climb">
-        <figcaption class="slot__cap"><span class="slot__n">05</span>
+      </figure><figure class="slot" id="star-star-climb">
+        <figcaption class="slot__cap"><span class="pil">Star</span><span class="slot__n">05</span>
           <span class="slot__t">The climb</span></figcaption>
         <div class="phone">
           <div class="phone__glow" aria-hidden="true"></div>
@@ -1389,306 +1273,171 @@
           
           
         </div>
-      </figure>
-      <figure class="slot" id="star-star-arrival">
-        <figcaption class="slot__cap"><span class="slot__n">06</span>
-          <span class="slot__t">Arrival date</span></figcaption>
+      </figure><figure class="slot" id="consistency-not-moving">
+        <figcaption class="slot__cap"><span class="pil">Consistency</span><span class="slot__n">N2</span>
+          <span class="slot__t">Doing it, not working</span>
+          <span class="tag tag--new">Recalibration</span></figcaption>
         <div class="phone">
           <div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-star-star-arrival">
-  <p class="v-star-star-arrival__star">Get Memento to 100 paying users</p>
-  <div class="v-star-star-arrival__lead">
-    <span class="v-star-star-arrival__date">Nov 25</span>
-    <span class="v-star-star-arrival__at">on the pace you have kept</span>
+          <section class="cc-card"><div class="v v-consistency-not-moving">
+  <p class="nm-hd">You kept every day. The number did not move.</p>
+  <div class="nm-two">
+    <span><b>19</b>of 21 days kept</span>
+    <span><b>0.4</b>lbs in 3 weeks</span>
   </div>
-  <p class="v-star-star-arrival__shift">9 days sooner than a week ago</p>
-  <div class="v-star-star-arrival__rail" aria-hidden="true">
-    <span class="v-star-star-arrival__fill"></span>
-    <span class="v-star-star-arrival__base"></span>
-  </div>
-  <p class="v-star-star-arrival__foot"><b>38</b> today, <b>12</b> when you signed it, <b>62</b> to go</p>
+  <p class="nm-say">The plan expected 4.5. Something in it is wrong, not you.</p>
+  <button class="nm-btn" type="button">Redo the plan</button>
 </div>
             <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
           </section>
         </div>
         <div class="slot__meta">
-          <p class="bf">Quantity goals with a deadline. The dieter racing a date they picked.<span class="bf__x">Skip if pace too new or too flat to project</span></p>
-          
+          <p class="bf">Quantity goals with a target. The dieter keeping every rep as the scale sits still.<span class="bf__x">Skip if Open goals, no number to stall</span></p>
           
           
         </div>
-      </figure>
-      <figure class="slot" id="star-star-count">
-        <figcaption class="slot__cap"><span class="slot__n">07</span>
-          <span class="slot__t">The count</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
+      </figure><figure class="slot" id="consistency-n-bought">
+        <figcaption class="slot__cap"><span class="pil">Consistency</span><span class="slot__t">What the days bought</span>
+          <span class="tag tag--new">new</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-star-star-count">
-  <p class="v-star-star-count__star">Get Memento to 100 paying users</p>
-  <div class="v-star-star-count__top">
-    <div class="v-star-star-count__n">38<span>/100</span></div>
-    <div class="v-star-star-count__stale">counted 4 days ago</div>
-  </div>
-  <div class="v-star-star-count__bars" aria-hidden="true">
-    <span class="v-star-star-count__ceil"></span>
-    <i style="height:7px"></i><i style="height:7px"></i><i style="height:3px"></i><i style="height:13px"></i><i style="height:13px"></i><i class="best" style="height:38px"></i><i style="height:13px"></i><i style="height:32px"></i><i style="height:19px"></i><i class="now" style="height:25px"></i>
-  </div>
-  <div class="v-star-star-count__foot"><span><b>+4</b> this week, 2 off your best</span><button class="v-star-star-count__act" type="button">Update</button></div>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Check goals on a cadence. The weekly weigh-in, the beekeeper counting hives.<span class="bf__x">Skip if nothing gets measured on a schedule</span></p>
-          
-          
-          
-        </div>
-      </figure>
-      <figure class="slot" id="star-star-revision">
-        <figcaption class="slot__cap"><span class="slot__n">08</span>
-          <span class="slot__t">Against who you were</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
-          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-star-star-revision">
-  <p class="sr-star">Ship Memento to 100 paying users without abandoning it at 40.</p>
-  <p class="sr-now">Second version, signed 47 days ago.</p>
-  <div class="sr-then">
-    <span class="sr-tick" aria-hidden="true"></span>
-    <span class="sr-body"><span class="sr-lab">The first one said</span><span class="sr-old">Build something people actually pay for and get in the best shape of my life.</span></span>
-  </div>
-  <p class="sr-foot">It lasted <b>88 days</b>.</p>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Any type, after a rewrite. The person who has changed their aim once already.<span class="bf__x">Skip if the star has never been revised</span></p>
-          
-          
-          
-        </div>
-      </figure>
-      <figure class="slot" id="star-star-pot">
-        <figcaption class="slot__cap"><span class="slot__n">09</span>
-          <span class="slot__t">Ground covered</span><span class="tag tag--cut">was cut</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
-          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-star-star-pot">
-  <div class="v-star-star-pot__lead"><b>+26</b><span>paying users since you signed it</span></div>
-  <div class="v-star-star-pot__rail" aria-hidden="true">
-    <span class="v-star-star-pot__base"></span>
-    <span class="v-star-star-pot__gain"></span>
-  </div>
-  <div class="v-star-star-pot__scale"><span>started 12</span><span class="v-star-star-pot__at">38 today</span><span>100</span></div>
-  <p class="v-star-star-pot__star">Get Memento to 100 paying users</p>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Quantity down. The dieter 6 lbs into 40 who needs credit for the 6.<span class="bf__x">Skip if no starting number recorded</span></p>
-          
-          
-          
-        </div>
-      </figure>
-      <figure class="slot" id="star-star-dial">
-        <figcaption class="slot__cap"><span class="slot__n">10</span>
-          <span class="slot__t">Distance left</span><span class="tag tag--cut">was cut</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
-          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-star-star-dial">
-  <div class="v-star-star-dial__row">
-    <div class="v-star-star-dial__gauge">
-      <svg viewBox="0 0 104 104" width="104" height="104" aria-hidden="true">
-        <circle class="v-star-star-dial__track" cx="52" cy="52" r="44"/>
-        <circle class="v-star-star-dial__arc" cx="52" cy="52" r="44" stroke-dasharray="105 277" transform="rotate(-90 52 52)"/>
-        <circle class="v-star-star-dial__mark" cx="82.1" cy="19.9" r="2.6"/>
-      </svg>
-      <span class="v-star-star-dial__pct">38%</span>
-    </div>
-    <div class="v-star-star-dial__side">
-      <div class="v-star-star-dial__left">62</div>
-      <div class="v-star-star-dial__unit">paying users to go</div>
-      <div class="v-star-star-dial__pace">+3.5 a week now, +2.5 a month ago</div>
+          <section class="cc-card"><div class="v v-consistency-n-bought">
+  <div class="v-consistency-n-bought__head">
+    <div class="v-consistency-n-bought__num">11.4<span>lbs</span></div>
+    <div class="v-consistency-n-bought__lab">gone since April
+      <span>62 days kept, month by month</span>
     </div>
   </div>
-  <p class="v-star-star-dial__foot">Day 47 with this star. The one before it ran 96.</p>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Quantity goals near the end. The person counting down what is left.<span class="bf__x">Skip if no target number to subtract from</span></p>
-          
-          
-          
-        </div>
-      </figure></div>
-    <h3 class="sect__sub">The riskier five</h3>
-    <div class="grid">
-      <figure class="slot" id="star-star-strata">
-        <figcaption class="slot__cap"><span class="slot__n">11</span>
-          <span class="slot__t">Strata</span><span class="tag tag--risk">risky</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
-          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-strata">
-  <div class="v-strata__core" aria-hidden="true">
-    <i class="v-strata__l v-strata__l--now" style="--h:27px"></i>
-    <i class="v-strata__l v-strata__l--mid" style="--h:96px"></i>
-    <i class="v-strata__l v-strata__l--old" style="--h:37px"></i>
-  </div>
-  <div class="v-strata__body">
-    <p class="v-strata__now">Get 10,000 people using something I made.</p>
-    <p class="v-strata__meta">Day 34 <i>/</i> 202 days aiming</p>
-    <p class="v-strata__past" style="top:70px"><span>Publish something every week</span><b>121d</b></p>
-    <p class="v-strata__past" style="top:140px"><span>Get to 5k MRR</span><b>47d</b></p>
-  </div>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Any type, on a long account. The person on their third or fourth star.<span class="bf__x">Skip if only one star has ever been held</span></p>
-          
-          
-          
-        </div>
-      </figure>
-      <figure class="slot" id="star-star-meridian">
-        <figcaption class="slot__cap"><span class="slot__n">12</span>
-          <span class="slot__t">Meridian</span><span class="tag tag--risk">risky</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
-          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-meridian">
-  <p class="v-meridian__star">Get 10,000 people using something I made.</p>
-  <div class="v-meridian__line" style="--p:.64"><span class="v-meridian__read">6,400 of 10,000</span></div>
-  <p class="v-meridian__anti">Another year of half built things nobody sees.</p>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Maintenance and quantity down. The person refusing the life written below.<span class="bf__x">Skip if open goals, it fakes a meter</span></p>
-          
-          
-          
-        </div>
-      </figure>
-      <figure class="slot" id="star-star-folio">
-        <figcaption class="slot__cap"><span class="slot__n">13</span>
-          <span class="slot__t">Folio</span><span class="tag tag--risk">risky</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
-          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-folio">
-  <p class="v-folio__star">Get 10,000 people using something I made.</p>
-  <div class="v-folio__foot"><span>Day 34</span><span>6,400 of 10,000</span></div>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Any type in its first week. The person who wants the sentence and nothing else.<span class="bf__x">Skip if week two, it shows state not change</span></p>
-          
-          
-          
-        </div>
-      </figure>
-      <figure class="slot" id="star-star-plumb">
-        <figcaption class="slot__cap"><span class="slot__n">14</span>
-          <span class="slot__t">Plumb</span><span class="tag tag--risk">risky</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
-          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-plumb">
-  <div class="v-plumb__t">
-    <p class="v-plumb__star">Get 10,000 people using something I made.</p>
-    <p class="v-plumb__meta">Day 34 <i>/</i> moved 3 days ago</p>
-  </div>
-  <svg class="v-plumb__svg" viewBox="0 0 92 168" aria-hidden="true">
-    <line class="v-plumb__ref" x1="46" y1="10" x2="46" y2="150"/>
-    <line class="v-plumb__cord" x1="46" y1="10" x2="73" y2="146"/>
-    <circle class="v-plumb__pin" cx="46" cy="10" r="3"/>
-    <path class="v-plumb__bob" d="M67.6 144 L78.4 144 L73 160 Z" transform="rotate(11 73 144)"/>
-    <line class="v-plumb__off" x1="46" y1="166" x2="73" y2="166"/>
-  </svg>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Hold and daily frequency. The person whose failure mode is going quiet.<span class="bf__x">Skip if weekly or seasonal cadence, silence is normal</span></p>
-          
-          
-          
-        </div>
-      </figure>
-      <figure class="slot" id="star-star-vigil">
-        <figcaption class="slot__cap"><span class="slot__n">15</span>
-          <span class="slot__t">Vigil</span><span class="tag tag--risk">risky</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
-          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-vigil">
-  <div class="v-vigil__news"><span class="v-vigil__n">9</span><span class="v-vigil__u">days</span></div>
-  <p class="v-vigil__sub">since anything moved in its name</p>
-  <div class="v-vigil__rule"></div>
-  <p class="v-vigil__star">Get 10,000 people using something I made.</p>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Maintenance and hold. The person who wants nothing from the app most days.<span class="bf__x">Skip if they need progress visible every day</span></p>
-          
-          
-          
-        </div>
-      </figure></div>
-    <h3 class="sect__sub sect__sub--new">Built for the new philosophy</h3>
-    <div class="grid">
-      <figure class="slot" id="star-star-open-evidence">
-        <figcaption class="slot__cap"><span class="slot__n">N1</span>
-          <span class="slot__t">Evidence, no meter</span>
-          <span class="tag tag--new">Open goal</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
-          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-star-star-open-evidence">
-  <p class="soe-star">Be a father my kids actually talk to.</p>
-  <ul class="soe-list">
-    <li><span>Phone in the drawer at 6</span><span>Tue</span></li>
-    <li><span>Drove Maya to practice, no radio</span><span>Sun</span></li>
-    <li><span>Said sorry first</span><span>Fri</span></li>
-  </ul>
-  <p class="soe-foot">61 things, since 19 June.</p>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Open goals. The father with nothing countable, only things actually done.</p>
-          
-          
-        </div>
-      </figure></div>
 
+  <div class="v-consistency-n-bought__rows">
+    <div class="v-consistency-n-bought__r"><span class="v-consistency-n-bought__m">Apr</span><span class="v-consistency-n-bought__d">18 days</span><span class="v-consistency-n-bought__t"><i style="--w:90%"></i></span><span class="v-consistency-n-bought__g">4.2</span></div>
+    <div class="v-consistency-n-bought__r"><span class="v-consistency-n-bought__m">May</span><span class="v-consistency-n-bought__d">16 days</span><span class="v-consistency-n-bought__t"><i style="--w:80%"></i></span><span class="v-consistency-n-bought__g">3.0</span></div>
+    <div class="v-consistency-n-bought__r"><span class="v-consistency-n-bought__m">Jun</span><span class="v-consistency-n-bought__d">20 days</span><span class="v-consistency-n-bought__t"><i style="--w:100%"></i></span><span class="v-consistency-n-bought__g">3.9</span></div>
+    <div class="v-consistency-n-bought__r"><span class="v-consistency-n-bought__m">Jul</span><span class="v-consistency-n-bought__d">8 days</span><span class="v-consistency-n-bought__t"><i style="--w:40%"></i></span><span class="v-consistency-n-bought__g v-consistency-n-bought__g--flat">0.3</span></div>
+  </div>
+
+  <div class="v-consistency-n-bought__foot">July kept eight days and the number nearly stopped.</div>
+</div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Quantity goals with tracked progress: proof the days are causing the number<span class="bf__x">Skip if goalProgress has no history to pair against</span></p></div>
+      </figure></div>
   </section>
-  <section class="sect" id="sect-consistency">
-    <header class="sect__hd"><h2>Consistency</h2>
-      <p>The record. <b>10 considered</b>, then <b>5 riskier ones</b> below.</p></header>
-    <div class="grid">
-      <figure class="slot" id="consistency-chain-slack">
-        <figcaption class="slot__cap"><span class="slot__n">01</span>
+  <section class="sect" id="s-rule">
+    <header class="sect__hd"><h2>A rule to hold</h2><p>stay sober, eat under 2,400, no phone after 9</p></header>
+    <div class="grid"><figure class="slot" id="today-hold-tonight">
+        <figcaption class="slot__cap"><span class="pil">Today</span><span class="slot__n">N1</span>
+          <span class="slot__t">The rule, tonight</span>
+          <span class="tag tag--new">Hold action</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-today-hold-tonight">
+  <p class="ht-rule">Eat 2,000 to 2,400 calories</p>
+  <div class="ht-row">
+    <span class="ht-n">18</span><span class="ht-m">days held<br>best 24</span>
+  </div>
+  <button class="ht-btn" type="button">Confirm tonight</button>
+  <p class="ht-note">Opens at 8pm. A rule cannot be finished at lunch.</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Maintenance goals. The person holding a line all day and confirming it at night.<span class="bf__x">Skip if the move is a task, not a rule</span></p>
+          
+          
+        </div>
+      </figure><figure class="slot" id="star-n-held">
+        <figcaption class="slot__cap"><span class="pil">Star</span><span class="slot__t">The line held</span>
+          <span class="tag tag--new">new</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-star-n-held">
+  <div class="v-star-n-held__rule">No drinking. Confirmed every evening.</div>
+  <div class="v-star-n-held__count">
+    <b>214</b>
+    <span>days<br>unbroken</span>
+  </div>
+  <div class="v-star-n-held__facts">
+    <div class="v-star-n-held__fact"><b>Jan 4</b><span>the last one</span></div>
+    <div class="v-star-n-held__fact"><b>214</b><span>evenings confirmed</span></div>
+    <div class="v-star-n-held__fact"><b>46</b><span>longest before this</span></div>
+  </div>
+</div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Maintenance rules with no finish line: sobriety, no scrolling, no snooze<span class="bf__x">Skip if The goal has a target number to climb</span></p></div>
+      </figure><figure class="slot" id="star-n-holduntil">
+        <figcaption class="slot__cap"><span class="pil">Star</span><span class="slot__t">Hold until</span>
+          <span class="tag tag--new">new</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-hu">
+  <div class="v-hu__rule">Nothing new bought. Until January 1.</div>
+  <div class="v-hu__head">
+    <b>97</b><span>days to go</span>
+    <em>268 held</em>
+  </div>
+  <div class="v-hu__rail">
+    <i></i>
+    <s></s>
+  </div>
+  <div class="v-hu__ends"><span>Apr 7</span><span>Jan 1</span></div>
+  <div class="v-hu__note">Arrive at the date unbroken and it is done. There is nothing else to reach.</div>
+</div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">A rule with an end date: no-buy year, dry January, hold until launch<span class="bf__x">Skip if The maintenance rule has no end date</span></p></div>
+      </figure><figure class="slot" id="consistency-n-hold">
+        <figcaption class="slot__cap"><span class="pil">Consistency</span><span class="slot__t">The hold record</span>
+          <span class="tag tag--new">new</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-n-hold">
+  <div class="v-consistency-n-hold__head">
+    <div class="v-consistency-n-hold__num">138</div>
+    <div class="v-consistency-n-hold__lab">days held
+      <span>No drinking on weeknights</span>
+    </div>
+  </div>
+
+  <div class="v-consistency-n-hold__rail"><i></i></div>
+  <div class="v-consistency-n-hold__since">Unbroken since March 21. Nothing spent from your 2 grace days.</div>
+
+  <div class="v-consistency-n-hold__facts">
+    <div class="v-consistency-n-hold__fact">
+      <div class="v-consistency-n-hold__k">What it cost</div>
+      <div class="v-consistency-n-hold__v">138 evenings confirmed by hand</div>
+    </div>
+    <div class="v-consistency-n-hold__fact">
+      <div class="v-consistency-n-hold__k">What it bought</div>
+      <div class="v-consistency-n-hold__v">Resting heart rate 71 &#8594; 58</div>
+    </div>
+  </div>
+</div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Maintenance and Hold goals: someone months deep into an unbroken rule<span class="bf__x">Skip if No maintenance or Hold action in the plan</span></p></div>
+      </figure><figure class="slot" id="consistency-held">
+        <figcaption class="slot__cap"><span class="pil">Consistency</span><span class="slot__n">14</span>
+          <span class="slot__t">Held</span><span class="tag tag--risk">risky</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-held">
+  <div class="v-consistency-held__mark"></div>
+  <p class="v-consistency-held__line">Today is in.</p>
+  <p class="v-consistency-held__sub">Day 23 unbroken.</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Hold goals. The person staying sober, who needs today confirmed and nothing else.<span class="bf__x">Skip if any goal with a number to watch</span></p>
+          
+          
+          
+        </div>
+      </figure><figure class="slot" id="consistency-chain-slack">
+        <figcaption class="slot__cap"><span class="pil">Consistency</span><span class="slot__n">01</span>
           <span class="slot__t">Chain with slack</span></figcaption>
         <div class="phone">
           <div class="phone__glow" aria-hidden="true"></div>
@@ -1729,9 +1478,145 @@
           
           
         </div>
-      </figure>
-      <figure class="slot" id="consistency-run-rank">
-        <figcaption class="slot__cap"><span class="slot__n">02</span>
+      </figure></div>
+  </section>
+  <section class="sect" id="s-rate">
+    <header class="sect__hd"><h2>A rate to keep</h2><p>gym 3x a week, write daily, call mom every Sunday</p></header>
+    <div class="grid"><figure class="slot" id="today-week-rhythm">
+        <figcaption class="slot__cap"><span class="pil">Today</span><span class="slot__n">05</span>
+          <span class="slot__t">This week&#x27;s rhythm</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-today-week-rhythm">
+  <p class="wr-move">Message 10 people who fit the product</p>
+  <div class="wr-week" role="img" aria-label="Four moves so far this week. Today is still open.">
+    <span class="wr-day is-done"><i></i>m</span>
+    <span class="wr-day is-done"><i></i>t</span>
+    <span class="wr-day"><i></i>w</span>
+    <span class="wr-day is-done"><i></i>t</span>
+    <span class="wr-day is-done"><i></i>f</span>
+    <span class="wr-day is-now"><i></i>s</span>
+    <span class="wr-day"><i></i>s</span>
+  </div>
+  <p class="wr-read"><b>Four this week.</b> Three by now last week.</p>
+  <button class="wr-do" type="button">Mark it done</button>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Frequency goals. The gym-3x person who should judge a week, not a streak.<span class="bf__x">Skip if a one-off milestone with no weekly rhythm</span></p>
+          
+          
+          
+        </div>
+      </figure><figure class="slot" id="today-mv-ordinal">
+        <figcaption class="slot__cap"><span class="pil">Today</span><span class="slot__n">13</span>
+          <span class="slot__t">The ordinal</span><span class="tag tag--risk">risky</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-today-mv-ordinal">
+  <p class="v-today-mv-ordinal__n">149<span class="v-today-mv-ordinal__suf">th</span></p>
+  <p class="v-today-mv-ordinal__sub">move, if today counts. First one 14 March.</p>
+  <div class="v-today-mv-ordinal__line"></div>
+  <p class="v-today-mv-ordinal__move">Write the cold open for episode 12.</p>
+  <button class="v-today-mv-ordinal__do" type="button">Completed</button>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Maintenance goals. The sober person on day 412, where the count is the point.<span class="bf__x">Skip if the goal has no continuous count</span></p>
+          
+          
+          
+        </div>
+      </figure><figure class="slot" id="consistency-cadence-week">
+        <figcaption class="slot__cap"><span class="pil">Consistency</span><span class="slot__n">N1</span>
+          <span class="slot__t">Your schedule, kept</span>
+          <span class="tag tag--new">Any cadence</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-cadence-week">
+  <div class="cw-head"><span class="cw-n">3</span><span class="cw-of">of 3 this week</span>
+    <span class="cw-tag">kept</span></div>
+  <div class="cw-days" aria-hidden="true">
+    <i class="on"></i><i class="rest"></i><i class="on"></i><i class="rest"></i>
+    <i class="on"></i><i class="rest"></i><i class="rest"></i>
+  </div>
+  <p class="cw-lbl"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></p>
+  <p class="cw-foot"><b>11 perfect weeks.</b> Rest days are not misses.</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Frequency goals. The 3x-a-week lifter punished by every daily-streak face.<span class="bf__x">Skip if no schedule set, nothing to adhere to</span></p>
+          
+          
+        </div>
+      </figure><figure class="slot" id="consistency-n-adhere">
+        <figcaption class="slot__cap"><span class="pil">Consistency</span><span class="slot__t">Weeks you kept your own plan</span>
+          <span class="tag tag--new">new</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-n-adhere">
+  <div class="v-consistency-n-adhere__head">
+    <div class="v-consistency-n-adhere__num">87<span>%</span></div>
+    <div class="v-consistency-n-adhere__lab">of weeks hit the schedule you set
+      <span>22 of 26 weeks since February</span>
+    </div>
+  </div>
+
+  <div class="v-consistency-n-adhere__chart">
+    <div class="v-consistency-n-adhere__plan"></div>
+    <i style="--h:.74"></i><i style="--h:.74"></i><i class="lo" style="--h:.49"></i><i style="--h:.74"></i>
+    <i style="--h:.98"></i><i style="--h:.74"></i><i style="--h:.74"></i><i class="lo" style="--h:.25"></i>
+    <i style="--h:.74"></i><i style="--h:.98"></i><i style="--h:.74"></i><i style="--h:.74"></i>
+    <i style="--h:.74"></i><i style="--h:.74"></i><i style="--h:.98"></i><i style="--h:.74"></i>
+    <i style="--h:.74"></i><i class="lo" style="--h:.49"></i><i style="--h:.74"></i><i style="--h:.74"></i>
+    <i style="--h:.98"></i><i style="--h:.74"></i><i class="lo" style="--h:.49"></i><i style="--h:.74"></i>
+    <i style="--h:.74"></i><i style="--h:.74"></i>
+  </div>
+  <div class="v-consistency-n-adhere__axis"><span>Feb</span><span>Aug</span></div>
+
+  <div class="v-consistency-n-adhere__foot">Longest run at plan: <b>9 weeks</b>, April 7 to June 2.</div>
+</div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Any goal months in: the long view of adherence, week over week<span class="bf__x">Skip if Fewer than eight weeks of record</span></p></div>
+      </figure><figure class="slot" id="consistency-weekday-shape">
+        <figcaption class="slot__cap"><span class="pil">Consistency</span><span class="slot__n">03</span>
+          <span class="slot__t">Your week&#x27;s signature</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-weekday-shape">
+  <div class="ws-h"><b>Wednesday</b> holds. Sunday is the gap.</div>
+  <div class="ws-list">
+    <div class="ws-r"><span class="ws-d">Mon</span><span class="ws-tr"><i class="ws-fl" style="--w:74%"></i></span><span class="ws-p">74%</span></div>
+    <div class="ws-r"><span class="ws-d">Tue</span><span class="ws-tr"><i class="ws-fl" style="--w:68%"></i></span><span class="ws-p">68%</span></div>
+    <div class="ws-r is-top"><span class="ws-d">Wed</span><span class="ws-tr"><i class="ws-fl" style="--w:86%"></i></span><span class="ws-p">86%</span></div>
+    <div class="ws-r"><span class="ws-d">Thu</span><span class="ws-tr"><i class="ws-fl" style="--w:71%"></i></span><span class="ws-p">71%</span></div>
+    <div class="ws-r"><span class="ws-d">Fri</span><span class="ws-tr"><i class="ws-fl" style="--w:63%"></i></span><span class="ws-p">63%</span></div>
+    <div class="ws-r"><span class="ws-d">Sat</span><span class="ws-tr"><i class="ws-fl" style="--w:45%"></i></span><span class="ws-p">45%</span></div>
+    <div class="ws-r is-low"><span class="ws-d">Sun</span><span class="ws-tr"><i class="ws-fl" style="--w:29%"></i></span><span class="ws-p">29%</span></div>
+  </div>
+  <div class="ws-ft">Across 187 active days</div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Frequency goals. The gym-3x person who leaks the same weekday every week.<span class="bf__x">Skip if under six weeks of marks</span></p>
+          
+          
+          
+        </div>
+      </figure><figure class="slot" id="consistency-run-rank">
+        <figcaption class="slot__cap"><span class="pil">Consistency</span><span class="slot__n">02</span>
           <span class="slot__t">Run rank</span></figcaption>
         <div class="phone">
           <div class="phone__glow" aria-hidden="true"></div>
@@ -1761,38 +1646,184 @@
           
           
         </div>
-      </figure>
-      <figure class="slot" id="consistency-weekday-shape">
-        <figcaption class="slot__cap"><span class="slot__n">03</span>
-          <span class="slot__t">Your week&#x27;s signature</span></figcaption>
+      </figure></div>
+  </section>
+  <section class="sect" id="s-event">
+    <header class="sect__hd"><h2>An event to reach</h2><p>pass the bar, first hive, publish the book</p></header>
+    <div class="grid"><figure class="slot" id="today-n-act">
+        <figcaption class="slot__cap"><span class="pil">Today</span><span class="slot__t">The act</span>
+          <span class="tag tag--new">new</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-today-n-act">
+  <div class="v-today-n-act__top">
+    <span class="v-today-n-act__goal">Keep bees by spring</span>
+    <span class="v-today-n-act__count">act 3 of 4</span>
+  </div>
+
+  <div class="v-today-n-act__rail">
+    <div class="v-today-n-act__seg v-today-n-act__seg--done"><i></i><b>Learn</b></div>
+    <div class="v-today-n-act__seg v-today-n-act__seg--done"><i></i><b>Equip</b></div>
+    <div class="v-today-n-act__seg v-today-n-act__seg--now"><i></i><b>Install</b></div>
+    <div class="v-today-n-act__seg"><i></i><b>Tend</b></div>
+  </div>
+
+  <div class="v-today-n-act__lab">Today</div>
+  <div class="v-today-n-act__move">Mount the hive stand and level it.</div>
+
+  <p class="v-today-n-act__foot">Act 2 closed 9 days ago. Three moves left in this one.</p>
+</div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Milestone goals run in stages: which act they are in, and today&#x27;s move inside it<span class="bf__x">Skip if the plan has no stages</span></p></div>
+      </figure><figure class="slot" id="star-n-acts">
+        <figcaption class="slot__cap"><span class="pil">Star</span><span class="slot__t">The acts</span>
+          <span class="tag tag--new">new</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-star-n-acts">
+  <div class="v-star-n-acts__goal">Publish the record</div>
+  <ol class="v-star-n-acts__list">
+    <li class="v-star-n-acts__act v-star-n-acts__act--done">
+      <span class="v-star-n-acts__mark"></span>
+      <span class="v-star-n-acts__name">Write twelve songs</span>
+      <span class="v-star-n-acts__when">Feb 9</span>
+    </li>
+    <li class="v-star-n-acts__act v-star-n-acts__act--done">
+      <span class="v-star-n-acts__mark"></span>
+      <span class="v-star-n-acts__name">Track them all</span>
+      <span class="v-star-n-acts__when">Mar 30</span>
+    </li>
+    <li class="v-star-n-acts__act v-star-n-acts__act--now">
+      <span class="v-star-n-acts__mark"></span>
+      <span class="v-star-n-acts__name">Mix every track</span>
+      <span class="v-star-n-acts__when">7 of 12</span>
+      <span class="v-star-n-acts__rail"><i></i></span>
+    </li>
+    <li class="v-star-n-acts__act v-star-n-acts__act--next">
+      <span class="v-star-n-acts__mark"></span>
+      <span class="v-star-n-acts__name">Master and press</span>
+      <span class="v-star-n-acts__when"></span>
+    </li>
+  </ol>
+</div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Milestone goals built in stages: albums, launches, degrees, books<span class="bf__x">Skip if Goal has no natural stages</span></p></div>
+      </figure><figure class="slot" id="today-today-then">
+        <figcaption class="slot__cap"><span class="pil">Today</span><span class="slot__n">07</span>
+          <span class="slot__t">How far it has grown</span></figcaption>
         <div class="phone">
           <div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-consistency-weekday-shape">
-  <div class="ws-h"><b>Wednesday</b> holds. Sunday is the gap.</div>
-  <div class="ws-list">
-    <div class="ws-r"><span class="ws-d">Mon</span><span class="ws-tr"><i class="ws-fl" style="--w:74%"></i></span><span class="ws-p">74%</span></div>
-    <div class="ws-r"><span class="ws-d">Tue</span><span class="ws-tr"><i class="ws-fl" style="--w:68%"></i></span><span class="ws-p">68%</span></div>
-    <div class="ws-r is-top"><span class="ws-d">Wed</span><span class="ws-tr"><i class="ws-fl" style="--w:86%"></i></span><span class="ws-p">86%</span></div>
-    <div class="ws-r"><span class="ws-d">Thu</span><span class="ws-tr"><i class="ws-fl" style="--w:71%"></i></span><span class="ws-p">71%</span></div>
-    <div class="ws-r"><span class="ws-d">Fri</span><span class="ws-tr"><i class="ws-fl" style="--w:63%"></i></span><span class="ws-p">63%</span></div>
-    <div class="ws-r"><span class="ws-d">Sat</span><span class="ws-tr"><i class="ws-fl" style="--w:45%"></i></span><span class="ws-p">45%</span></div>
-    <div class="ws-r is-low"><span class="ws-d">Sun</span><span class="ws-tr"><i class="ws-fl" style="--w:29%"></i></span><span class="ws-p">29%</span></div>
+          <section class="cc-card"><div class="v v-today-today-then">
+  <p class="tn-move">Write 1,000 words on the chapter you keep avoiding</p>
+  <div class="tn-then">
+    <span class="tn-rule" aria-hidden="true"></span>
+    <p>Where this started, 63 days ago: <span>write 200 words, anywhere.</span></p>
   </div>
-  <div class="ws-ft">Across 187 active days</div>
+  <button class="tn-cta" type="button">Mark it done</button>
 </div>
             <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
           </section>
         </div>
         <div class="slot__meta">
-          <p class="bf">Frequency goals. The gym-3x person who leaks the same weekday every week.<span class="bf__x">Skip if under six weeks of marks</span></p>
+          <p class="bf">Rep goals months in. The person who fears they are still repeating day one.<span class="bf__x">Skip if the plan is under a month old</span></p>
           
           
           
         </div>
-      </figure>
-      <figure class="slot" id="consistency-made-of">
-        <figcaption class="slot__cap"><span class="slot__n">04</span>
+      </figure><figure class="slot" id="consistency-ledger">
+        <figcaption class="slot__cap"><span class="pil">Consistency</span><span class="slot__n">11</span>
+          <span class="slot__t">The board</span><span class="tag tag--risk">risky</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-ledger">
+  <div class="v-consistency-ledger__hero"><span class="v-consistency-ledger__n">412</span><span class="v-consistency-ledger__of">of 1,096</span></div>
+  <p class="v-consistency-ledger__say">Days you showed up. The one number that never goes down.</p>
+  <div class="v-consistency-ledger__rule"></div>
+  <div class="v-consistency-ledger__foot"><span>Current run 23 &middot; best 41</span><span class="v-consistency-ledger__today">+1 today</span></div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Milestone goals. The long-haul builder who counts total days, not current runs.<span class="bf__x">Skip if week one, the total reads tiny</span></p>
+          
+          
+          
+        </div>
+      </figure><figure class="slot" id="consistency-year-ribbon">
+        <figcaption class="slot__cap"><span class="pil">Consistency</span><span class="slot__n">08</span>
+          <span class="slot__t">The year, week by week</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-year-ribbon">
+  <div class="yr-top"><span class="yr-n">187</span><span class="yr-of">days this year</span></div>
+  <div class="yr-sub">Densest stretch, late March into April.</div>
+  <div class="yr-rib" role="img" aria-label="Active days per week across the year, densest in late March into April."><i class="wk is-off" style="--h:2px"></i><i class="wk" style="--h:13px"></i><i class="wk" style="--h:19px"></i><i class="wk is-off" style="--h:2px"></i><i class="wk" style="--h:19px"></i><i class="wk" style="--h:26px"></i><i class="wk" style="--h:19px"></i><i class="wk" style="--h:32px"></i><i class="wk" style="--h:26px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:32px"></i><i class="wk" style="--h:45px"></i><i class="wk is-peak" style="--h:39px"></i><i class="wk is-peak" style="--h:39px"></i><i class="wk is-peak" style="--h:52px"></i><i class="wk is-peak" style="--h:45px"></i><i class="wk is-peak" style="--h:52px"></i><i class="wk is-peak" style="--h:45px"></i><i class="wk" style="--h:32px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:26px"></i><i class="wk" style="--h:32px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:32px"></i><i class="wk" style="--h:19px"></i><i class="wk" style="--h:26px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:32px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:52px"></i><i class="wk is-now" style="--h:32px"></i></div>
+  <div class="yr-ax"><span>Jan</span><span>Apr</span><span>Jul</span><span>Oct</span><span>Now</span></div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Maintenance goals. The year-two holder with enough history to have a best stretch.<span class="bf__x">Skip if under a year in the app</span></p>
+          
+          
+          
+        </div>
+      </figure></div>
+  </section>
+  <section class="sect" id="s-open">
+    <header class="sect__hd"><h2>Nothing to count</h2><p>be a better father, make work I am proud of</p></header>
+    <div class="grid"><figure class="slot" id="star-star-open-evidence">
+        <figcaption class="slot__cap"><span class="pil">Star</span><span class="slot__n">N1</span>
+          <span class="slot__t">Evidence, no meter</span>
+          <span class="tag tag--new">Open goal</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-star-star-open-evidence">
+  <p class="soe-star">Be a father my kids actually talk to.</p>
+  <ul class="soe-list">
+    <li><span>Phone in the drawer at 6</span><span>Tue</span></li>
+    <li><span>Drove Maya to practice, no radio</span><span>Sun</span></li>
+    <li><span>Said sorry first</span><span>Fri</span></li>
+  </ul>
+  <p class="soe-foot">61 things, since 19 June.</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Open goals. The father with nothing countable, only things actually done.</p>
+          
+          
+        </div>
+      </figure><figure class="slot" id="star-star-ledger">
+        <figcaption class="slot__cap"><span class="pil">Star</span><span class="slot__n">04</span>
+          <span class="slot__t">What it has cost you</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-star-star-ledger">
+  <p class="sl-star">Ship Memento to 100 paying users without abandoning it at 40.</p>
+  <div class="sl-rule" aria-hidden="true"></div>
+  <div class="sl-row"><span class="sl-big">41</span><span class="sl-lab">moves made<br>in its name</span><span class="sl-wk"><b>4 this week</b><span>6 last week</span></span></div>
+  <p class="sl-last">Yesterday: <b>Rewrote the pricing page headline</b></p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Open and milestone goals. The person with no number, only moves done.<span class="bf__x">Skip if fewer than two weeks of moves</span></p>
+          
+          
+          
+        </div>
+      </figure><figure class="slot" id="consistency-made-of">
+        <figcaption class="slot__cap"><span class="pil">Consistency</span><span class="slot__n">04</span>
           <span class="slot__t">What it is made of</span></figcaption>
         <div class="phone">
           <div class="phone__glow" aria-hidden="true"></div>
@@ -1824,347 +1855,152 @@
           
           
         </div>
-      </figure>
-      <figure class="slot" id="consistency-rate-drift">
-        <figcaption class="slot__cap"><span class="slot__n">05</span>
-          <span class="slot__t">Rate drift</span></figcaption>
+      </figure><figure class="slot" id="star-star-folio">
+        <figcaption class="slot__cap"><span class="pil">Star</span><span class="slot__n">13</span>
+          <span class="slot__t">Folio</span><span class="tag tag--risk">risky</span></figcaption>
         <div class="phone">
           <div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-consistency-rate-drift">
-  <div class="rd-head">
-    <span class="rd-num">42</span>
-    <span class="rd-unit">days<br>in a row</span>
-    <span class="rd-rate"><b>87%</b><small>last 30 days</small></span>
-  </div>
-  <svg class="rd-graph" viewBox="0 0 306 54" preserveAspectRatio="none" role="img" aria-label="Thirty day rate over twelve weeks, now 87 percent, the thirty days before were 93 percent.">
-    <defs><linearGradient id="rdg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3fd94e" stop-opacity=".22"/><stop offset="1" stop-color="#3fd94e" stop-opacity="0"/></linearGradient></defs>
-    <path d="M3 36.9 30.3 32.3 57.5 27.8 84.8 23.2 112.1 20.9 139.4 15.6 166.6 13.3 193.9 11 221.2 13.3 248.5 15.6 275.7 17.1 303 18.1 303 54 3 54Z" fill="url(#rdg)"/>
-    <path d="M3 13.3H303" stroke="currentColor" stroke-opacity=".28" stroke-width="1" stroke-dasharray="2 4" vector-effect="non-scaling-stroke"/>
-    <path d="M3 36.9 30.3 32.3 57.5 27.8 84.8 23.2 112.1 20.9 139.4 15.6 166.6 13.3 193.9 11 221.2 13.3 248.5 15.6 275.7 17.1 303 18.1" fill="none" stroke="#3fd94e" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
-    <circle cx="303" cy="18.1" r="2.6" fill="#3fd94e"/>
-  </svg>
-  <div class="rd-foot">Down 6 points. The 30 days before, 93%.</div>
+          <section class="cc-card"><div class="v v-folio">
+  <p class="v-folio__star">Get 10,000 people using something I made.</p>
+  <div class="v-folio__foot"><span>Day 34</span><span>6,400 of 10,000</span></div>
 </div>
             <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
           </section>
         </div>
         <div class="slot__meta">
-          <p class="bf">Quantity down goals. The dieter months in, whose effort fades before the scale shows it.<span class="bf__x">Skip if fewer than 60 days of history</span></p>
-          
-          
-          
-        </div>
-      </figure>
-      <figure class="slot" id="consistency-returns">
-        <figcaption class="slot__cap"><span class="slot__n">06</span>
-          <span class="slot__t">Returns</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
-          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-consistency-returns">
-  <div class="rt-row">
-    <div class="rt-ring">
-      <svg viewBox="0 0 96 96" role="img" aria-label="42 days into this run, against a best run of 103.">
-        <circle cx="48" cy="48" r="43" fill="none" stroke="currentColor" stroke-opacity=".12" stroke-width="5"/>
-        <circle class="rt-arc" cx="48" cy="48" r="43" fill="none" stroke="#3fd94e" stroke-width="5" stroke-linecap="round" stroke-dasharray="110.2 270.2" transform="rotate(-90 48 48)"/>
-      </svg>
-      <div class="rt-in"><span class="rt-num">42</span><span class="rt-lab">days</span></div>
-    </div>
-    <div class="rt-rail">
-      <p class="rt-lead"><b>12</b> returns after a break</p>
-      <p class="rt-sub">Longest gap, 4 days</p>
-      <p class="rt-sub">Best run, 103</p>
-    </div>
-  </div>
-  <div class="rt-foot">26 of the last 30 days. 168 active in all.</div>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Frequency goals. The restarter who reads one missed day as total failure.<span class="bf__x">Skip if never missed a day yet</span></p>
-          
-          
-          
-        </div>
-      </figure>
-      <figure class="slot" id="consistency-week-rhythm">
-        <figcaption class="slot__cap"><span class="slot__n">07</span>
-          <span class="slot__t">This week&#x27;s rhythm</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
-          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-consistency-week-rhythm">
-  <div class="wr-top"><span class="wr-n">5</span><span class="wr-of">days marked this week</span><span class="wr-d">+2 vs last</span></div>
-  <div class="wr-row">
-    <div class="wr-col"><div class="wr-tr"><div class="wr-fl" style="height:66%"></div></div><span class="wr-dy">M</span></div>
-    <div class="wr-col"><div class="wr-tr"><div class="wr-fl" style="height:33%"></div></div><span class="wr-dy">T</span></div>
-    <div class="wr-col"><div class="wr-tr"><div class="wr-fl" style="height:100%"></div></div><span class="wr-dy">W</span></div>
-    <div class="wr-col"><div class="wr-tr"></div><span class="wr-dy">T</span></div>
-    <div class="wr-col"><div class="wr-tr"><div class="wr-fl" style="height:66%"></div></div><span class="wr-dy">F</span></div>
-    <div class="wr-col"><div class="wr-tr"></div><span class="wr-dy">S</span></div>
-    <div class="wr-col is-today"><div class="wr-tr"><div class="wr-fl" style="height:33%"></div></div><span class="wr-dy">S</span></div>
-  </div>
-  <div class="wr-ft">14 in a row, best 103</div>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Frequency goals. The daily writer who wants this week judged, not this year.<span class="bf__x">Skip if weekly or seasonal cadence plans</span></p>
-          
-          
-          
-        </div>
-      </figure>
-      <figure class="slot" id="consistency-year-ribbon">
-        <figcaption class="slot__cap"><span class="slot__n">08</span>
-          <span class="slot__t">The year, week by week</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
-          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-consistency-year-ribbon">
-  <div class="yr-top"><span class="yr-n">187</span><span class="yr-of">days this year</span></div>
-  <div class="yr-sub">Densest stretch, late March into April.</div>
-  <div class="yr-rib" role="img" aria-label="Active days per week across the year, densest in late March into April."><i class="wk is-off" style="--h:2px"></i><i class="wk" style="--h:13px"></i><i class="wk" style="--h:19px"></i><i class="wk is-off" style="--h:2px"></i><i class="wk" style="--h:19px"></i><i class="wk" style="--h:26px"></i><i class="wk" style="--h:19px"></i><i class="wk" style="--h:32px"></i><i class="wk" style="--h:26px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:32px"></i><i class="wk" style="--h:45px"></i><i class="wk is-peak" style="--h:39px"></i><i class="wk is-peak" style="--h:39px"></i><i class="wk is-peak" style="--h:52px"></i><i class="wk is-peak" style="--h:45px"></i><i class="wk is-peak" style="--h:52px"></i><i class="wk is-peak" style="--h:45px"></i><i class="wk" style="--h:32px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:26px"></i><i class="wk" style="--h:32px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:32px"></i><i class="wk" style="--h:19px"></i><i class="wk" style="--h:26px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:32px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:52px"></i><i class="wk is-now" style="--h:32px"></i></div>
-  <div class="yr-ax"><span>Jan</span><span>Apr</span><span>Jul</span><span>Oct</span><span>Now</span></div>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Maintenance goals. The year-two holder with enough history to have a best stretch.<span class="bf__x">Skip if under a year in the app</span></p>
-          
-          
-          
-        </div>
-      </figure>
-      <figure class="slot" id="consistency-rate-curve">
-        <figcaption class="slot__cap"><span class="slot__n">09</span>
-          <span class="slot__t">Rolling thirty</span><span class="tag tag--cut">was cut</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
-          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-consistency-rate-curve">
-  <div class="rc-top"><span class="rc-n">61%</span><span class="rc-of">of the last 30 days</span></div>
-  <div class="rc-sub">Up 13 points on the 30 days before it.</div>
-  <div class="rc-chart">
-    <svg viewBox="0 0 306 64" preserveAspectRatio="none" role="img" aria-label="Rolling thirty day rate, now 61 percent, the thirty days before were 48 percent.">
-      <defs><linearGradient id="vRateCurveFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="currentColor" stop-opacity=".15"/><stop offset=".75" stop-color="currentColor" stop-opacity="0"/></linearGradient></defs>
-      <path d="M0.0 58.0 C13.9 58.0 13.9 49.1 27.8 49.1 C41.7 49.1 41.7 52.6 55.6 52.6 C69.5 52.6 69.5 38.4 83.5 38.4 C97.4 38.4 97.4 43.7 111.3 43.7 C125.2 43.7 125.2 29.4 139.1 29.4 C153.0 29.4 153.0 33.0 166.9 33.0 C180.8 33.0 180.8 36.6 194.7 36.6 C208.6 36.6 208.6 20.5 222.5 20.5 C236.4 20.5 236.4 13.4 250.4 13.4 C264.3 13.4 264.3 18.7 278.2 18.7 C292.1 18.7 292.1 8.0 306.0 8.0 L306 64 L0 64 Z" fill="url(#vRateCurveFill)"/>
-      <path d="M0 31.2 L306 31.2" stroke="currentColor" stroke-opacity=".24" stroke-width="1" stroke-dasharray="2 4" vector-effect="non-scaling-stroke"/>
-      <path d="M0.0 58.0 C13.9 58.0 13.9 49.1 27.8 49.1 C41.7 49.1 41.7 52.6 55.6 52.6 C69.5 52.6 69.5 38.4 83.5 38.4 C97.4 38.4 97.4 43.7 111.3 43.7 C125.2 43.7 125.2 29.4 139.1 29.4 C153.0 29.4 153.0 33.0 166.9 33.0 C180.8 33.0 180.8 36.6 194.7 36.6 C208.6 36.6 208.6 20.5 222.5 20.5 C236.4 20.5 236.4 13.4 250.4 13.4 C264.3 13.4 264.3 18.7 278.2 18.7 C292.1 18.7 292.1 8.0 306.0 8.0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
-      <circle cx="303" cy="8" r="2.8" fill="#3fd94e"/>
-    </svg>
-    <span class="rc-tag">48% before</span>
-  </div>
-  <div class="rc-ft">187 active days, 14 in a row</div>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Quantity up goals. The founder who wants the face to tell him he is slowing down.<span class="bf__x">Skip if cadence plans, rest days read as misses</span></p>
-          
-          
-          
-        </div>
-      </figure>
-      <figure class="slot" id="consistency-comeback">
-        <figcaption class="slot__cap"><span class="slot__n">10</span>
-          <span class="slot__t">The returns</span><span class="tag tag--cut">was cut</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
-          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-consistency-comeback">
-  <div class="cb-l">
-    <div class="cb-n">9</div>
-    <div class="cb-k">times you came back</div>
-    <div class="cb-sub">Longest gap, 3 days.<br>Never a fourth.</div>
-  </div>
-  <div class="cb-r">
-    <div class="cb-hd"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>
-    <div class="cb-g" role="img" aria-label="The last six weeks, 30 of 40 days marked."><i class="cel lv2"></i><i class="cel lv1"></i><i class="cel"></i><i class="cel lv3"></i><i class="cel lv2"></i><i class="cel lv1"></i><i class="cel"></i><i class="cel lv1"></i><i class="cel"></i><i class="cel"></i><i class="cel"></i><i class="cel lv2"></i><i class="cel lv3"></i><i class="cel lv1"></i><i class="cel lv2"></i><i class="cel lv2"></i><i class="cel lv1"></i><i class="cel"></i><i class="cel lv3"></i><i class="cel lv2"></i><i class="cel lv1"></i><i class="cel"></i><i class="cel lv2"></i><i class="cel lv3"></i><i class="cel lv2"></i><i class="cel lv1"></i><i class="cel"></i><i class="cel lv2"></i><i class="cel lv3"></i><i class="cel lv2"></i><i class="cel lv1"></i><i class="cel lv2"></i><i class="cel"></i><i class="cel lv1"></i><i class="cel lv2"></i><i class="cel lv2"></i><i class="cel lv3"></i><i class="cel lv1"></i><i class="cel"></i><i class="cel is-now"></i><i class="cel is-fut"></i><i class="cel is-fut"></i></div>
-    <div class="cb-cap">Last 6 weeks, 30 of 40</div>
-  </div>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Maintenance goals. The person in recovery who cannot be shown a wall of failure.<span class="bf__x">Skip if unbroken record, returns reads zero</span></p>
+          <p class="bf">Any type in its first week. The person who wants the sentence and nothing else.<span class="bf__x">Skip if week two, it shows state not change</span></p>
           
           
           
         </div>
       </figure></div>
-    <h3 class="sect__sub">The riskier five</h3>
-    <div class="grid">
-      <figure class="slot" id="consistency-ledger">
-        <figcaption class="slot__cap"><span class="slot__n">11</span>
-          <span class="slot__t">The board</span><span class="tag tag--risk">risky</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
+  </section>
+  <section class="sect" id="s-edge">
+    <header class="sect__hd"><h2>Days one, off, and stalled</h2><p>the first day, a quiet season, a plan that is not working</p></header>
+    <div class="grid"><figure class="slot" id="today-n-first">
+        <figcaption class="slot__cap"><span class="pil">Today</span><span class="slot__t">Minute one</span>
+          <span class="tag tag--new">new</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-consistency-ledger">
-  <div class="v-consistency-ledger__hero"><span class="v-consistency-ledger__n">412</span><span class="v-consistency-ledger__of">of 1,096</span></div>
-  <p class="v-consistency-ledger__say">Days you showed up. The one number that never goes down.</p>
-  <div class="v-consistency-ledger__rule"></div>
-  <div class="v-consistency-ledger__foot"><span>Current run 23 &middot; best 41</span><span class="v-consistency-ledger__today">+1 today</span></div>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
+          <section class="cc-card"><div class="v v-today-n-first">
+  <p class="v-today-n-first__said">&ldquo;I want to stop feeling behind in my own life.&rdquo;</p>
+
+  <div class="v-today-n-first__move">Write 500 words.</div>
+  <div class="v-today-n-first__how">Open the doc before you open anything else.</div>
+
+  <div class="v-today-n-first__row">
+    <span class="v-today-n-first__day">Day 1</span>
+    <span class="v-today-n-first__dots">
+      <i class="v-today-n-first__d v-today-n-first__d--now"></i>
+      <i class="v-today-n-first__d"></i><i class="v-today-n-first__d"></i><i class="v-today-n-first__d"></i>
+      <i class="v-today-n-first__d"></i><i class="v-today-n-first__d"></i><i class="v-today-n-first__d"></i>
+    </span>
+  </div>
+
+  <p class="v-today-n-first__foot">Do it tonight and the record starts.</p>
+</div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
         </div>
-        <div class="slot__meta">
-          <p class="bf">Milestone goals. The long-haul builder who counts total days, not current runs.<span class="bf__x">Skip if week one, the total reads tiny</span></p>
-          
-          
-          
-        </div>
-      </figure>
-      <figure class="slot" id="consistency-water">
-        <figcaption class="slot__cap"><span class="slot__n">12</span>
-          <span class="slot__t">Waterline</span><span class="tag tag--risk">risky</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
+        <div class="slot__meta"><p class="bf">Day one from a rough sentence, before Clarity finishes: one move, no history<span class="bf__x">Skip if any proof event already exists</span></p></div>
+      </figure><figure class="slot" id="today-n-check">
+        <figcaption class="slot__cap"><span class="pil">Today</span><span class="slot__t">The check day</span>
+          <span class="tag tag--new">new</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-consistency-water">
-  <div class="v-consistency-water__gauge">
-    <div class="v-consistency-water__miss">4 days missing</div>
-    <div class="v-consistency-water__now">
-      <div class="v-consistency-water__body">
-        <div class="v-consistency-water__read"><span class="v-consistency-water__n">87</span><span class="v-consistency-water__pct">%</span></div>
-        <div class="v-consistency-water__sub">26 of the last 30 days</div>
-      </div>
+          <section class="cc-card"><div class="v v-today-n-check">
+  <div class="v-today-n-check__top">
+    <span class="v-today-n-check__what">Weigh in</span>
+    <span class="v-today-n-check__cad">every Thursday</span>
+  </div>
+
+  <div class="v-today-n-check__hero">
+    <span class="v-today-n-check__day">Thursday</span>
+    <span class="v-today-n-check__in">in 2 days</span>
+  </div>
+
+  <div class="v-today-n-check__read">
+    <span class="v-today-n-check__val">214.6<span>lbs, last check</span></span>
+    <span class="v-today-n-check__delta">-1.4 in a week</span>
+  </div>
+
+  <div class="v-today-n-check__rail">
+    <i class="v-today-n-check__dot"></i>
+    <i class="v-today-n-check__dot"></i>
+    <i class="v-today-n-check__dot"></i>
+    <i class="v-today-n-check__dot"></i>
+    <i class="v-today-n-check__dot"></i>
+    <i class="v-today-n-check__dot v-today-n-check__dot--next"></i>
+    <span class="v-today-n-check__kept">5 checks kept</span>
+  </div>
+
+  <p class="v-today-n-check__foot">Today is not a check day. The plan is holding.</p>
+</div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Check-cadence goals (weekly weigh-in, inspection) on a day that is not their day<span class="bf__x">Skip if the action&#x27;s cadence is daily</span></p></div>
+      </figure><figure class="slot" id="consistency-n-cadence">
+        <figcaption class="slot__cap"><span class="pil">Consistency</span><span class="slot__t">Back on rhythm</span>
+          <span class="tag tag--new">new</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-cad">
+  <div class="v-cad__head">Six quiet days.</div>
+  <div class="v-cad__sub">Your plan asks for three a week, not seven.</div>
+
+  <div class="v-cad__weeks">
+    <div class="v-cad__wk">
+      <span class="v-cad__wl">Last week</span>
+      <span class="v-cad__dots">
+        <i class="v-cad__d v-cad__d--kept"></i><i class="v-cad__d"></i><i class="v-cad__d v-cad__d--kept"></i><i class="v-cad__d"></i><i class="v-cad__d v-cad__d--kept"></i><i class="v-cad__d"></i><i class="v-cad__d"></i>
+      </span>
+      <span class="v-cad__wc v-cad__wc--ok">3 of 3</span>
     </div>
-    <div class="v-consistency-water__low"><span>34% at your worst this year</span></div>
+    <div class="v-cad__wk">
+      <span class="v-cad__wl">This week</span>
+      <span class="v-cad__dots">
+        <i class="v-cad__d"></i><i class="v-cad__d"></i><i class="v-cad__d"></i><i class="v-cad__d v-cad__d--today"></i><i class="v-cad__d v-cad__d--open"></i><i class="v-cad__d v-cad__d--open"></i><i class="v-cad__d v-cad__d--open"></i>
+      </span>
+      <span class="v-cad__wc">0 of 3</span>
+    </div>
   </div>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
+
+  <div class="v-cad__foot">Four days left. Three is still reachable.</div>
+</div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
         </div>
-        <div class="slot__meta">
-          <p class="bf">Open goals. The person with no number who still wants one level to read.<span class="bf__x">Skip if no year of history for the low line</span></p>
-          
-          
-          
-        </div>
-      </figure>
-      <figure class="slot" id="consistency-pace">
-        <figcaption class="slot__cap"><span class="slot__n">13</span>
-          <span class="slot__t">On pace</span><span class="tag tag--risk">risky</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
+        <div class="slot__meta"><p class="bf">Frequency plans (3x a week) shown to someone returning after a quiet stretch<span class="bf__x">Skip if Plan is daily, so a gap is a real miss</span></p></div>
+      </figure><figure class="slot" id="consistency-n-season">
+        <figcaption class="slot__cap"><span class="pil">Consistency</span><span class="slot__t">The season shape</span>
+          <span class="tag tag--new">new</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
           <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-consistency-pace">
-  <div class="v-consistency-pace__hero"><span class="v-consistency-pace__n">298</span><span class="v-consistency-pace__u">days by Dec 31</span></div>
-  <p class="v-consistency-pace__say">If the last 30 days hold. 168 done, 149 left in the year.</p>
-  <div class="v-consistency-pace__axis">
-    <div class="v-consistency-pace__track"></div><div class="v-consistency-pace__done"></div><div class="v-consistency-pace__proj"></div>
-    <div class="v-consistency-pace__now"></div><div class="v-consistency-pace__lands"></div><div class="v-consistency-pace__cap"></div>
-    <div class="v-consistency-pace__tag">168 today</div><div class="v-consistency-pace__end">365</div>
+          <section class="cc-card"><div class="v v-consistency-n-season">
+  <div class="v-consistency-n-season__head">
+    <div class="v-consistency-n-season__num">68</div>
+    <div class="v-consistency-n-season__lab">days until the hives open
+      <span>Dormant, and on plan</span>
+    </div>
   </div>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Quantity up goals with a deadline. The founder who thinks in year-end totals.<span class="bf__x">Skip if goals that end before the year does</span></p>
-          
-          
-          
-        </div>
-      </figure>
-      <figure class="slot" id="consistency-held">
-        <figcaption class="slot__cap"><span class="slot__n">14</span>
-          <span class="slot__t">Held</span><span class="tag tag--risk">risky</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
-          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-consistency-held">
-  <div class="v-consistency-held__mark"></div>
-  <p class="v-consistency-held__line">Today is in.</p>
-  <p class="v-consistency-held__sub">Day 23 unbroken.</p>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Hold goals. The person staying sober, who needs today confirmed and nothing else.<span class="bf__x">Skip if any goal with a number to watch</span></p>
-          
-          
-          
-        </div>
-      </figure>
-      <figure class="slot" id="consistency-trace">
-        <figcaption class="slot__cap"><span class="slot__n">15</span>
-          <span class="slot__t">Trace</span><span class="tag tag--risk">risky</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
-          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-consistency-trace">
-  <div class="v-consistency-trace__head"><span class="v-consistency-trace__n">3</span><span class="v-consistency-trace__u">things today</span><span class="v-consistency-trace__avg">usually 2.0 a day</span></div>
-  <svg class="v-consistency-trace__svg" viewBox="0 0 306 62" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <rect x="0" y="55" width="306" height="1" fill="rgba(255,255,255,.14)"/>
-    <g fill="rgba(255,255,255,.6)">
-      <rect x="11" y="37" width="2" height="18"/><rect x="32" y="46" width="2" height="9"/>
-      <rect x="53" y="37" width="2" height="18"/><rect x="74" y="28" width="2" height="27"/>
-      <rect x="84" y="46" width="2" height="9"/><rect x="95" y="37" width="2" height="18"/>
-      <rect x="105" y="19" width="2" height="36"/><rect x="116" y="37" width="2" height="18"/>
-      <rect x="126" y="46" width="2" height="9"/><rect x="137" y="28" width="2" height="27"/>
-      <rect x="147" y="37" width="2" height="18"/><rect x="158" y="37" width="2" height="18"/>
-      <rect x="168" y="10" width="2" height="45"/><rect x="179" y="37" width="2" height="18"/>
-      <rect x="189" y="46" width="2" height="9"/><rect x="200" y="37" width="2" height="18"/>
-      <rect x="210" y="28" width="2" height="27"/><rect x="221" y="37" width="2" height="18"/>
-      <rect x="231" y="19" width="2" height="36"/><rect x="242" y="46" width="2" height="9"/>
-      <rect x="252" y="37" width="2" height="18"/><rect x="263" y="28" width="2" height="27"/>
-      <rect x="273" y="37" width="2" height="18"/><rect x="284" y="37" width="2" height="18"/>
-    </g>
-    <rect x="294" y="28" width="2" height="27" fill="#3fd94e"/>
-  </svg>
-  <div class="v-consistency-trace__foot"><span>Last 30 days</span><span>4 flat</span></div>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
-        </div>
-        <div class="slot__meta">
-          <p class="bf">Quantity up goals. The writer whose 300-word day and 3,000-word day are not equal.<span class="bf__x">Skip if Hold and Check goals log no amount</span></p>
-          
-          
-          
-        </div>
-      </figure></div>
-    <h3 class="sect__sub sect__sub--new">Built for the new philosophy</h3>
-    <div class="grid">
-      <figure class="slot" id="consistency-cadence-week">
-        <figcaption class="slot__cap"><span class="slot__n">N1</span>
-          <span class="slot__t">Your schedule, kept</span>
-          <span class="tag tag--new">Any cadence</span></figcaption>
-        <div class="phone">
-          <div class="phone__glow" aria-hidden="true"></div>
-          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-          <section class="cc-card"><div class="v v-consistency-cadence-week">
-  <div class="cw-head"><span class="cw-n">3</span><span class="cw-of">of 3 this week</span>
-    <span class="cw-tag">kept</span></div>
-  <div class="cw-days" aria-hidden="true">
-    <i class="on"></i><i class="rest"></i><i class="on"></i><i class="rest"></i>
-    <i class="on"></i><i class="rest"></i><i class="rest"></i>
+
+  <div class="v-consistency-n-season__ribbon">
+    <div class="v-consistency-n-season__m v-consistency-n-season__m--off v-consistency-n-season__m--now"><i class="v-consistency-n-season__b"></i><b>J</b></div>
+    <div class="v-consistency-n-season__m v-consistency-n-season__m--off"><i class="v-consistency-n-season__b"></i><b>F</b></div>
+    <div class="v-consistency-n-season__m"><i class="v-consistency-n-season__b" style="--f:.62"></i><b>M</b></div>
+    <div class="v-consistency-n-season__m"><i class="v-consistency-n-season__b" style="--f:.88"></i><b>A</b></div>
+    <div class="v-consistency-n-season__m"><i class="v-consistency-n-season__b" style="--f:1"></i><b>M</b></div>
+    <div class="v-consistency-n-season__m"><i class="v-consistency-n-season__b" style="--f:1"></i><b>J</b></div>
+    <div class="v-consistency-n-season__m"><i class="v-consistency-n-season__b" style="--f:.75"></i><b>J</b></div>
+    <div class="v-consistency-n-season__m"><i class="v-consistency-n-season__b" style="--f:1"></i><b>A</b></div>
+    <div class="v-consistency-n-season__m"><i class="v-consistency-n-season__b" style="--f:.88"></i><b>S</b></div>
+    <div class="v-consistency-n-season__m"><i class="v-consistency-n-season__b" style="--f:.50"></i><b>O</b></div>
+    <div class="v-consistency-n-season__m v-consistency-n-season__m--off"><i class="v-consistency-n-season__b"></i><b>N</b></div>
+    <div class="v-consistency-n-season__m v-consistency-n-season__m--off"><i class="v-consistency-n-season__b"></i><b>D</b></div>
   </div>
-  <p class="cw-lbl"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></p>
-  <p class="cw-foot"><b>11 perfect weeks.</b> Rest days are not misses.</p>
-</div>
-            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
-          </section>
+
+  <div class="v-consistency-n-season__foot">Last season you kept <b>22 of 24</b> inspections. January owes nothing.</div>
+</div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
         </div>
-        <div class="slot__meta">
-          <p class="bf">Frequency goals. The 3x-a-week lifter punished by every daily-streak face.<span class="bf__x">Skip if no schedule set, nothing to adhere to</span></p>
-          
-          
-        </div>
-      </figure>
-      <figure class="slot" id="consistency-not-moving">
-        <figcaption class="slot__cap"><span class="slot__n">N2</span>
+        <div class="slot__meta"><p class="bf">Seasonal goals in the off-season: hives, harvests, sport off-cycles<span class="bf__x">Skip if Goal has no seasonal or dormant window</span></p></div>
+      </figure><figure class="slot" id="consistency-not-moving">
+        <figcaption class="slot__cap"><span class="pil">Consistency</span><span class="slot__n">N2</span>
           <span class="slot__t">Doing it, not working</span>
           <span class="tag tag--new">Recalibration</span></figcaption>
         <div class="phone">
@@ -2188,7 +2024,6 @@
           
         </div>
       </figure></div>
-
   </section>
 </div>
 </body>
