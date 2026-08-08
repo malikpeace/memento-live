@@ -187,6 +187,77 @@
     background:rgba(16,20,28,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.5);
     color:rgba(13,17,25,.94)}
   .in-flowh{margin:104px 0 10px;font-size:23px;font-weight:750;letter-spacing:-.024em;color:var(--hi)}
+  .in-flowh--sub{cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .in-flowh--sub::after{content:attr(data-sub);display:block;margin-top:7px;
+    font-size:14px;font-weight:600;letter-spacing:0;color:var(--mid);
+    opacity:0;transform:translateY(-3px);transition:opacity .35s ease,transform .35s ease}
+  .in-flowh--sub:hover::after,.in-flowh--sub.is-sub::after{opacity:1;transform:none}
+
+  /* the age of the Memento: the biggest number on the page */
+  .bigup{margin-top:40px;text-align:center}
+  .bigup__n{font-size:104px;line-height:.9;font-weight:800;letter-spacing:-.055em;
+    color:var(--cons);font-variant-numeric:tabular-nums;
+    text-shadow:0 0 80px color-mix(in srgb, var(--cons) 30%, transparent)}
+  .bigup__u{margin-top:14px;font-size:15px;color:var(--mid)}
+  .bigup__u b{color:var(--hi);font-weight:640;font-variant-numeric:tabular-nums}
+  .bigup__f{margin-top:8px;font-size:13px;color:var(--mid)}
+
+  /* the ambient life: a blur of white, cyan or green breathing in and out */
+  .in-amb{position:fixed;inset:0;pointer-events:none;z-index:0}
+  .in-amb i{position:absolute;width:340px;height:340px;border-radius:50%;
+    filter:blur(85px);opacity:0}
+  .in-amb i:nth-child(1){left:-90px;top:16%;background:rgba(238,244,255,.34);
+    animation:inAmb 21s ease-in-out infinite}
+  .in-amb i:nth-child(2){right:-110px;top:44%;background:rgba(58,217,245,.26);
+    animation:inAmb 27s ease-in-out 9s infinite}
+  .in-amb i:nth-child(3){left:14%;bottom:6%;background:rgba(63,217,78,.24);
+    animation:inAmb 33s ease-in-out 17s infinite}
+  @keyframes inAmb{0%,58%,100%{opacity:0}72%,84%{opacity:1}}
+  .in-col{position:relative;z-index:1}
+  @media (prefers-reduced-motion: reduce){.in-amb i{animation:none}}
+
+  /* the now cell breathes */
+  .mor-oneday__now{animation:inNow 2.8s ease-in-out infinite}
+  @keyframes inNow{0%,100%{opacity:1}50%{opacity:.4}}
+  @media (prefers-reduced-motion: reduce){.mor-oneday__now{animation:none}}
+
+  /* the board and the months announce themselves */
+  .rec-board .rec-board__t{font-size:21px!important;font-weight:750;letter-spacing:-.02em;margin-bottom:8px}
+  .rec-months .rec-months__t{font-size:21px!important;font-weight:750;letter-spacing:-.02em}
+  .cmb-wall .cmb-wall__h{font-size:21px!important;font-weight:750;letter-spacing:-.02em}
+
+  /* the dream and the wall */
+  .viv-dream{margin-top:22px;border-radius:16px;padding:20px 19px 17px;background:var(--fill);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+  .viv-dream__q{font-size:19px;font-weight:680;font-style:italic;letter-spacing:-.018em;
+    line-height:1.42;color:var(--hi)}
+  .viv-dream__d{margin-top:12px;font-size:12.5px;font-weight:640;color:var(--cons)}
+  .viv-dream__g{margin-top:4px;font-size:13px;color:var(--mid)}
+  .viv-wall{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:26px}
+  .viv-wall__note{border-radius:14px;padding:14px 13px;background:var(--fill);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.07);display:flex;flex-direction:column;justify-content:space-between;min-height:104px}
+  .viv-wall__note p{margin:0;font-size:14px;font-weight:600;line-height:1.4;color:var(--hi)}
+  .viv-wall__note span{margin-top:10px;font-size:11px;color:var(--lo)}
+  .viv-wall__pic{position:relative;border-radius:14px;min-height:104px;overflow:hidden;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
+  .viv-wall__pic--a{background:
+    radial-gradient(80% 60% at 30% 20%, rgba(58,217,245,.5), transparent 70%),
+    radial-gradient(90% 70% at 80% 90%, rgba(63,217,78,.4), transparent 70%),
+    linear-gradient(160deg,#20303c,#101a22)}
+  .viv-wall__pic--b{background:
+    radial-gradient(90% 70% at 70% 20%, rgba(238,244,255,.4), transparent 70%),
+    radial-gradient(80% 60% at 20% 85%, rgba(58,217,245,.3), transparent 70%),
+    linear-gradient(160deg,#1c2836,#0e141c)}
+  .viv-wall__pic span{position:absolute;left:11px;bottom:9px;font-size:11px;color:rgba(238,244,255,.75)}
+  .viv-wall__add{grid-column:1/-1;border:0;cursor:pointer;border-radius:14px;padding:14px;
+    background:rgba(255,255,255,.05);box-shadow:inset 0 1px 0 rgba(255,255,255,.07);
+    color:var(--mid);font:inherit;font-size:13.5px;font-weight:640}
+
+  /* the plaque, sunk into the page like set stone */
+  .inside .in-org{box-shadow:inset 0 3px 6px rgba(0,0,0,.85), inset 0 -1px 0 rgba(255,255,255,.09),
+    0 0 0 5px #030406, 0 1px 0 5px rgba(255,255,255,.055), 0 18px 44px rgba(0,0,0,.55)}
+  .inside.brd .in-org{box-shadow:inset 0 2px 3px rgba(255,255,255,.92), inset 0 -3px 6px rgba(20,24,32,.22),
+    0 0 0 5px #030406, 0 1px 0 6px rgba(255,255,255,.06), 0 18px 44px rgba(0,0,0,.6)}
   .cpick{margin-top:26px}
   .cpick > *{max-width:100%}
   /* the components were designed as tiles on near black, the ring room IS near black */
@@ -780,42 +851,27 @@
   </button>
 
   <div class="in-scroll" id="inScroll">
+    <div class="in-amb" aria-hidden="true"><i></i><i></i><i></i></div>
     <div class="in-col">
 
       <header class="in-head">
         <svg class="in-mark" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
         <h1 class="in-name">Malik Peace.</h1>
         <p class="in-count">20967:16:41:52</p>
-        <p class="in-since">On the path since October 12. Day 300.</p>
       </header>
 
-      <!-- 1. THE CLOCKS -->
-      <div class="cpick"><div class="mor-clocks">
-  <div class="mor-clocks__pane">
-    <div class="mor-clocks__num">20,967</div>
-    <div class="mor-clocks__cap">days left, on an 80 year estimate</div>
-  </div>
-  <div class="mor-clocks__pane mor-clocks__pane--up">
-    <div class="mor-clocks__num">300</div>
-    <div class="mor-clocks__cap">days since you made this, plus <span id="mor-clocks-tick">0h 00m 00s</span></div>
-  </div>
-  <p class="mor-clocks__foot">One falls. One climbs. The same day moves both.</p>
-</div></div>
-      <div class="cpick"><div class="clk-units">
-  <div class="clk-units__h">The same stretch, six ways.</div>
-  <div class="clk-units__r"><span>months</span><b>9</b></div>
-  <div class="clk-units__r"><span>weeks</span><b>43</b></div>
-  <div class="clk-units__r"><span>days</span><b>300</b></div>
-  <div class="clk-units__r"><span>hours</span><b>7,187</b></div>
-  <div class="clk-units__r"><span>minutes</span><b id="clk-units-m">431,238</b></div>
-  <div class="clk-units__r clk-units__r--live"><span>seconds</span><b id="clk-units-s">25,874,287</b></div>
-</div></div>
+      <!-- THE AGE OF THE MEMENTO: the biggest number on the page -->
+      <div class="bigup">
+        <div class="bigup__n">300</div>
+        <div class="bigup__u">days since you made this, plus <b id="bigupLive">12h 28m 35s</b></div>
+        <div class="bigup__f">Nothing you do can make this number smaller.</div>
+      </div>
 
       <!-- HOW FAR YOU'VE COME: stats and evidence -->
-      <h2 class="in-flowh">Progress</h2>
+      <h2 class="in-flowh">Progress so far</h2>
       <div class="cpick"><div class="vol-total">
   <div class="vol-total__n">462</div>
-  <div class="vol-total__cap">marks on the record, all time</div>
+  <div class="vol-total__cap">total marks on the record</div>
   <div class="vol-total__rows">
     <div class="vol-total__row"><span>Actions completed</span><b>312</b></div>
     <div class="vol-total__row"><span>Deep work sessions</span><b>88</b></div>
@@ -826,27 +882,22 @@
   <div class="vol-pages__text">
     <div class="vol-pages__n">45 pages</div>
     <p class="vol-pages__sub">You have written 11,240 words in here. At 250 a page that is a 45 page book, sitting on the table.</p>
-    <div class="vol-pages__raw">11,240 words, 250 a page</div>
+    
   </div>
   <div class="vol-pages__block" aria-hidden="true"><i></i></div>
 </div></div>
       <div class="cpick"><div class="vol-deep">
   <div class="vol-deep__n">5 days 12 hours</div>
-  <div class="vol-deep__cap">of your life spent with the door shut</div>
+  <div class="vol-deep__cap">of deep work</div>
   <div class="vol-deep__bar" aria-hidden="true"></div>
   <div class="vol-deep__raw">88 sessions, 90 minutes each, 132 hours</div>
 </div></div>
-      <div class="cpick"><div class="rec-board"><div class="rec-board__t">Personal bests</div><div class="rec-board__r"><div class="rec-board__a"><span>Longest run</span><b>23 days</b></div><div class="rec-board__b">Set June 24. Standing 44 days.</div></div><div class="rec-board__r"><div class="rec-board__a"><span>Best month</span><b>28 of 30</b></div><div class="rec-board__b">June. Standing 38 days.</div></div><div class="rec-board__r"><div class="rec-board__a"><span>Best week</span><b>7 of 7</b></div><div class="rec-board__b">Week of June 8. Standing 54 days.</div></div><div class="rec-board__r"><div class="rec-board__a"><span>Biggest day</span><b>9 marks</b></div><div class="rec-board__b">May 19. Standing 80 days.</div></div><div class="rec-board__r"><div class="rec-board__a"><span>Fastest promise kept</span><b>127 days</b></div><div class="rec-board__b">Run the half, January 17. Standing 202 days.</div></div></div></div>
+      <div class="cpick"><div class="rec-board"><div class="rec-board__t">Records</div><div class="rec-board__r"><div class="rec-board__a"><span>Longest run</span><b>23 days</b></div><div class="rec-board__b">Set June 24. Standing 44 days.</div></div><div class="rec-board__r"><div class="rec-board__a"><span>Best month</span><b>28 of 30</b></div><div class="rec-board__b">June. Standing 38 days.</div></div><div class="rec-board__r"><div class="rec-board__a"><span>Best week</span><b>7 of 7</b></div><div class="rec-board__b">Week of June 8. Standing 54 days.</div></div><div class="rec-board__r"><div class="rec-board__a"><span>Biggest day</span><b>9 marks</b></div><div class="rec-board__b">May 19. Standing 80 days.</div></div><div class="rec-board__r"><div class="rec-board__a"><span>Fastest promise kept</span><b>127 days</b></div><div class="rec-board__b">Run the half, January 17. Standing 202 days.</div></div></div></div>
       <div class="cpick"><div class="rec-hold"><svg class="rec-hold__m" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg><div class="rec-hold__num">23</div><div class="rec-hold__unit">days in a row. Your longest, ever.</div><div class="rec-hold__rule"></div><div class="rec-hold__meta"><span>June 2 to June 24, 2026</span><span>standing 44 days</span></div></div></div>
-      <div class="cpick"><div class="mil-500">
-  <div class="mil-500__row"><span class="mil-500__now">312</span><span class="mil-500__slash">/</span><span class="mil-500__goal">500</span></div>
-  <p class="mil-500__cap">actions completed</p>
-  <p class="mil-500__line">188 more and this reads 500.</p>
-</div></div>
 
       <!-- the wall and the months flow inside the same movement -->
       <div class="cpick"><div class="cmb-wall">
-  <p class="cmb-wall__h">Three hundred days. The lit cells are the days you started again.</p>
+  <p class="cmb-wall__h">Comebacks</p>
   <div class="cmb-wall__grid" id="cmb-wall-grid"></div>
   <div class="cmb-wall__legend">
     <span><i class="is-on"></i>231 marked</span>
@@ -860,7 +911,7 @@
       <div class="cpick"><div class="rec-months"><div class="rec-months__t">Best month</div><div class="rec-months__chart"><span style="height:70%"></span><span style="height:70%"></span><span style="height:71%"></span><span style="height:77%"></span><span style="height:79%"></span><span style="height:74%"></span><span style="height:63%" class="low"></span><span style="height:84%"></span><span style="height:93%" class="top"></span><span style="height:84%"></span><span style="height:86%" class="now"></span></div><div class="rec-months__ax"><i>O</i><i>N</i><i>D</i><i>J</i><i>F</i><i>M</i><i>A</i><i>M</i><i>J</i><i>J</i><i>A</i></div><div class="rec-months__c">June, 28 of 30. April was 19 of 30, the low one. August is still running.</div></div></div>
 
       <!-- 5. MEMENTO MORI -->
-      <h2 class="in-flowh">Mori</h2>
+      <h2 class="in-flowh in-flowh--sub" data-sub="Remember, you will die.">Mori</h2>
       <div class="cpick"><div class="amb-weeks">
   <canvas class="amb-weeks__cv" width="652" height="274"></canvas>
   <div class="amb-weeks__rows">
@@ -887,7 +938,13 @@
 </div></div>
 
       <!-- MEMENTO VIVERE: the promises they made to themselves -->
-      <h2 class="in-flowh">Vivere</h2>
+      <h2 class="in-flowh in-flowh--sub" data-sub="Remember, to live.">Vivere</h2>
+
+      <div class="viv-dream">
+        <p class="viv-dream__q">&ldquo;I run the thing I built. The work is hard and it is mine. My people can point at something real and say he made that.&rdquo;</p>
+        <p class="viv-dream__d">The dream, written February 3, 2026</p>
+        <p class="viv-dream__g">Get to 100 paying users. Signed the same morning.</p>
+      </div>
       <div class="cpick"><div class="amb-threads">
   <div class="amb-threads__t">
     <div class="amb-threads__l">Run the half</div>
@@ -925,6 +982,14 @@
     <li class="wrd-hardest__item"><div class="wrd-hardest__date">24 June 2026</div><p class="wrd-hardest__q">The 23 days ended today. I wrote it down and went to bed.</p></li>
   </ol>
 </div></div>
+
+      <div class="viv-wall">
+        <div class="viv-wall__note"><p>Found the pace again. Slow is fine.</p><span>July 19</span></div>
+        <div class="viv-wall__pic viv-wall__pic--a"><span>Jun 12</span></div>
+        <div class="viv-wall__pic viv-wall__pic--b"><span>May 4</span></div>
+        <div class="viv-wall__note"><p>She said she was proud of me.</p><span>June 12</span></div>
+        <button class="viv-wall__add" type="button">Add a note or a photo</button>
+      </div>
 
       <div class="in-seal">
         <div class="in-seal__hd">
@@ -971,13 +1036,13 @@
 
       <p class="d0line">The ledger opens with the first mark. That can be tonight.</p>
 
-      <h2 class="in-flowh">Mori</h2>
+      <h2 class="in-flowh in-flowh--sub" data-sub="Remember, you will die.">Mori</h2>
       <div class="d0wks">
         <canvas id="inWeeksD0" aria-label="an 80 year life in weeks, none on the path yet"></canvas>
         <p class="d0wks__cap">The filled ones are spent either way. The first green cell is this week, if you make it one.</p>
       </div>
 
-      <h2 class="in-flowh">Vivere</h2>
+      <h2 class="in-flowh in-flowh--sub" data-sub="Remember, to live.">Vivere</h2>
       <div class="in-seal">
         <div class="in-seal__hd">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
@@ -1134,6 +1199,21 @@ document.getElementById('inBack').addEventListener('click',function(){
   });});
   setTimeout(function(){inside.hidden=true;},700);
   document.getElementById('inScroll').scrollTop=0;
+});
+
+/* the age of the Memento climbs while you watch */
+(function(){
+  var b=document.getElementById('bigupLive'); if(!b)return;
+  var t0=Date.now(), base=44915;
+  setInterval(function(){
+    var e=base+Math.floor((Date.now()-t0)/1000);
+    b.textContent=Math.floor(e/3600)+'h '+Math.floor(e%3600/60)+'m '+(e%60)+'s';
+  },1000);
+})();
+
+/* Mori and Vivere answer a touch with what their names mean */
+document.querySelectorAll('.in-flowh--sub').forEach(function(h){
+  h.addEventListener('click',function(){h.classList.toggle('is-sub');});
 });
 
 /* day one: the same room before anything has happened */
