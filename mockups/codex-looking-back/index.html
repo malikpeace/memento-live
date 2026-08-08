@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Codex Looking Back Mockups</title>
+  <style>
+    @font-face{font-family:Geist;src:url('../fonts/geist-400.otf') format('opentype');font-weight:400;font-display:swap}
+    @font-face{font-family:Geist;src:url('../fonts/geist-500.otf') format('opentype');font-weight:500;font-display:swap}
+    @font-face{font-family:Geist;src:url('../fonts/geist-700.otf') format('opentype');font-weight:700;font-display:swap}
+    :root{--page:#090a0c;--phone:#030505;--ink:#f0f2f7;--mid:rgba(240,242,247,.7);--low:rgba(240,242,247,.42);--line:rgba(240,242,247,.1);--fill:rgba(240,242,247,.055);--fill2:rgba(240,242,247,.09);--cyan:#3ad9f5;--green:#3fd94e;--white:#f4f6fb;--red:#f09088;--font:Geist,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--page);color:var(--ink);font-family:var(--font);-webkit-font-smoothing:antialiased}
+    button{font:inherit}
+    .top{position:sticky;top:0;z-index:50;background:rgba(9,10,12,.88);backdrop-filter:blur(24px);border-bottom:1px solid var(--line)}
+    .top__in{max-width:1520px;margin:auto;padding:13px 20px;display:flex;gap:8px;overflow:auto;scrollbar-width:none}
+    .top__in::-webkit-scrollbar{display:none}
+    .top a{flex:none;text-decoration:none;color:var(--mid);font-size:13px;font-weight:600;padding:9px 12px;border-radius:10px;background:var(--fill)}
+    .top a:first-child{background:var(--white);color:#080a0b}
+    .page{max-width:1520px;margin:auto;padding:34px 20px 96px}
+    .intro{max-width:760px;margin-bottom:36px}
+    h1{font-size:clamp(30px,5vw,56px);line-height:1;letter-spacing:-.045em;margin:0 0 14px}
+    .intro p{margin:0;color:var(--mid);font-size:16px;line-height:1.6;max-width:65ch}
+    .concepts{display:grid;grid-template-columns:repeat(auto-fit,minmax(390px,1fr));gap:44px 34px;align-items:start}
+    .concept{scroll-margin-top:82px;min-width:0}
+    .concept__head{display:flex;gap:12px;align-items:flex-start;margin:0 0 12px}
+    .concept__n{font-size:12px;color:var(--low);font-variant-numeric:tabular-nums;padding-top:5px}
+    .concept__head h2{margin:0 0 4px;font-size:18px;letter-spacing:-.02em}
+    .concept__head p{margin:0;color:var(--mid);font-size:13px;line-height:1.45;max-width:44ch}
+    .phone{width:390px;height:844px;max-width:100%;position:relative;overflow:hidden;border-radius:28px;background:var(--phone);box-shadow:0 22px 70px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.08)}
+    .screen{position:absolute;inset:0;overflow:auto;scrollbar-width:none;padding-bottom:44px}
+    .screen::-webkit-scrollbar{display:none}
+    .bar{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;height:58px;padding:0 18px;background:rgba(3,5,5,.78);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.04)}
+    .bar__back,.bar__more{border:0;background:var(--fill);color:var(--ink);height:34px;min-width:34px;padding:0 10px;border-radius:10px;font-weight:700;cursor:pointer}
+    .bar__title{font-size:14px;font-weight:650}
+    .pad{padding-left:20px;padding-right:20px}
+    .kicker{color:var(--low);font-size:12px;font-weight:650;letter-spacing:.12em;text-transform:uppercase}
+    .hero{padding-top:24px;padding-bottom:22px}
+    .hero h3{font-size:31px;line-height:1.06;letter-spacing:-.04em;margin:8px 0 10px}
+    .hero p{margin:0;color:var(--mid);font-size:14px;line-height:1.55}
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+    .stat{padding:15px 10px 16px;border-right:1px solid var(--line)}
+    .stat:last-child{border:0}
+    .stat b{display:block;font-size:22px;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+    .stat span{display:block;margin-top:3px;color:var(--low);font-size:11px;line-height:1.2}
+    .section-title{display:flex;align-items:end;justify-content:space-between;margin:25px 0 12px}
+    .section-title h4{margin:0;font-size:17px;letter-spacing:-.02em}
+    .section-title span{color:var(--low);font-size:12px}
+    .event{position:relative;padding:0 0 20px 27px}
+    .event:before{content:"";position:absolute;left:6px;top:6px;bottom:-4px;width:1px;background:var(--line)}
+    .event:last-child:before{display:none}
+    .event:after{content:"";position:absolute;left:2px;top:5px;width:9px;height:9px;border-radius:50%;background:#737a86;box-shadow:0 0 0 4px var(--phone)}
+    .event--goal:after{background:var(--white)}.event--return:after{background:var(--green)}.event--reflection:after{background:var(--cyan)}
+    .event__date{color:var(--low);font-size:11px;margin-bottom:5px}
+    .event__title{font-size:15px;font-weight:650;line-height:1.35}
+    .event__copy{color:var(--mid);font-size:13px;line-height:1.5;margin-top:5px}
+    .event__proof{margin-top:9px;color:var(--ink);font-size:12px;padding:8px 10px;background:var(--fill);border-radius:8px}
+    .wide{width:100%;border:0;border-radius:10px;padding:14px;background:var(--fill2);color:var(--ink);font-weight:650;cursor:pointer}
+    .all-actions{display:none;margin-top:12px}.all-actions.is-open{display:block}
+    .action-row{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+    .action-row time{flex:0 0 44px;color:var(--low);font-size:11px;padding-top:2px}.action-row span{font-size:13px;line-height:1.4}
+    .tabs{display:flex;gap:7px;overflow:auto;padding:18px 20px 4px;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
+    .tab{flex:none;border:0;background:var(--fill);color:var(--mid);padding:9px 12px;border-radius:999px;font-size:12px;font-weight:650;cursor:pointer}.tab.is-on{background:var(--white);color:#080a0b}
+    .proof-total{padding:28px 20px 15px}.proof-total b{display:block;font-size:58px;line-height:.9;letter-spacing:-.06em}.proof-total span{display:block;color:var(--mid);font-size:14px;margin-top:12px}
+    .proof-list{padding:0 20px}.proof-item{padding:17px 0;border-top:1px solid var(--line)}.proof-item__meta{display:flex;justify-content:space-between;color:var(--low);font-size:11px;margin-bottom:7px}.proof-item__title{font-size:15px;font-weight:650;line-height:1.4}.proof-item__note{color:var(--mid);font-size:13px;line-height:1.5;margin-top:5px}
+    .origin{padding-top:28px}.origin__label{font-size:12px;color:var(--low)}.origin blockquote{margin:10px 0 22px;font-size:25px;line-height:1.25;letter-spacing:-.03em}.turn{height:1px;background:linear-gradient(90deg,var(--cyan),var(--green));position:relative;margin:22px 0}.turn:after{content:"";position:absolute;right:0;top:-4px;width:9px;height:9px;border-radius:50%;background:var(--green)}
+    .now{padding:22px 18px;border:1px solid rgba(63,217,78,.28);background:rgba(63,217,78,.05);border-radius:14px}.now__label{color:var(--green);font-size:12px;font-weight:650}.now h3{margin:8px 0 8px;font-size:22px;line-height:1.25}.now p{margin:0;color:var(--mid);font-size:13px;line-height:1.5}
+    .change-row{display:grid;grid-template-columns:82px 1fr;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}.change-row span{color:var(--low);font-size:12px}.change-row b{font-size:13px;line-height:1.45;font-weight:600}
+    .time-stage{padding-top:24px}.time-date{color:var(--cyan);font-size:12px;font-weight:650}.time-stage h3{margin:8px 0 9px;font-size:26px;line-height:1.12;letter-spacing:-.035em}.time-stage p{margin:0;color:var(--mid);font-size:14px;line-height:1.5}.time-card{margin:22px 0;padding:20px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(150deg,rgba(58,217,245,.09),rgba(255,255,255,.025) 55%,rgba(63,217,78,.07));min-height:240px;display:flex;flex-direction:column;justify-content:space-between}.time-card__mark{font-size:44px;letter-spacing:-.06em;font-weight:700}.time-card__goal{font-size:14px;line-height:1.45}.time-card__small{color:var(--low);font-size:11px;margin-top:8px}
+    input[type=range]{width:100%;accent-color:var(--white)}.years{display:flex;justify-content:space-between;color:var(--low);font-size:11px;margin-top:8px}
+    .reel{padding:22px 20px 0}.reel__count{color:var(--low);font-size:12px;margin-bottom:11px}.memory{min-height:520px;border-radius:18px;padding:24px;background:linear-gradient(155deg,rgba(58,217,245,.12),rgba(255,255,255,.035) 48%,rgba(63,217,78,.1));display:flex;flex-direction:column;justify-content:space-between;box-shadow:inset 0 1px 0 rgba(255,255,255,.09)}.memory__date{color:var(--mid);font-size:12px}.memory__main b{display:block;font-size:74px;line-height:.8;letter-spacing:-.08em}.memory__main h3{font-size:26px;line-height:1.15;margin:20px 0 9px;letter-spacing:-.035em}.memory__main p{margin:0;color:var(--mid);font-size:14px;line-height:1.5}.memory__foot{border-top:1px solid var(--line);padding-top:14px;font-size:12px;color:var(--mid)}.reel-controls{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.reel-controls button{border:0;border-radius:10px;padding:13px;background:var(--fill2);color:var(--ink);font-weight:650;cursor:pointer}
+    .idea-note{margin-top:12px;color:var(--mid);font-size:12px;line-height:1.5;max-width:390px}.idea-note b{color:var(--ink)}
+    @media(max-width:880px){.page{padding-left:12px;padding-right:12px}.concepts{display:flex;flex-direction:column;align-items:center}.concept{width:390px;max-width:100%}.intro{padding:0 8px}.concept__head{padding:0 4px}}
+    @media(max-width:410px){.phone{border-radius:0;width:100%;height:820px}.concept{width:100%}.concepts{gap:58px}.top__in{padding-left:12px}.page{padding-left:0;padding-right:0}.intro,.concept__head,.idea-note{margin-left:16px;margin-right:16px}.idea-note{max-width:none}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+  </style>
+</head>
+<body>
+  <nav class="top"><div class="top__in">
+    <a href="#record">1. The Record</a><a href="#proof">2. By Proof</a><a href="#then-now">3. Then and Now</a><a href="#time">4. Across Time</a><a href="#reel">5. Memory Reel</a>
+  </div></nav>
+  <main class="page">
+    <header class="intro">
+      <h1>Codex Looking Back Mockups</h1>
+      <p>Five different ways Memento could make a person feel the weight of what they have done, how they changed, and why they should keep going. These explore information structure, not final decoration.</p>
+    </header>
+
+    <div class="concepts">
+      <section class="concept" id="record">
+        <header class="concept__head"><span class="concept__n">01</span><div><h2>The Record</h2><p>A living chronological wall. Biggest proof first, every action still reachable.</p></div></header>
+        <div class="phone"><div class="screen">
+          <div class="bar"><button class="bar__back">Back</button><span class="bar__title">Looking back</span><button class="bar__more">2026</button></div>
+          <div class="hero pad"><span class="kicker">421 days with Memento</span><h3>You did not stay the same.</h3><p>The complete record of the promises you kept, the goals you finished, and the days you chose to return.</p></div>
+          <div class="stats"><div class="stat"><b>318</b><span>actions taken</span></div><div class="stat"><b>4</b><span>goals finished</span></div><div class="stat"><b>7</b><span>times returned</span></div></div>
+          <div class="pad"><div class="section-title"><h4>The evidence</h4><span>Newest first</span></div>
+            <article class="event event--goal"><div class="event__date">August 3, 2026</div><div class="event__title">Your fourth goal became real</div><div class="event__copy">Memento reached 100 paying people.</div><div class="event__proof">Finished after 187 recorded actions</div></article>
+            <article class="event event--reflection"><div class="event__date">June 14, 2026</div><div class="event__title">You noticed the change before the number</div><div class="event__copy">“I stopped needing to convince myself every morning.”</div></article>
+            <article class="event event--return"><div class="event__date">December 29, 2025</div><div class="event__title">You came back</div><div class="event__copy">Nineteen quiet days did not become forever.</div><div class="event__proof">29 actions followed this return</div></article>
+            <article class="event"><div class="event__date">November 2, 2025</div><div class="event__title">Ship the first working payment flow</div><div class="event__copy">Completed at 11:42 PM.</div></article>
+            <button class="wide js-actions">View every action</button>
+            <div class="all-actions"><div class="action-row"><time>Oct 28</time><span>Wrote the one-page launch promise</span></div><div class="action-row"><time>Oct 27</time><span>Tested the plan on a second device</span></div><div class="action-row"><time>Oct 26</time><span>Fixed the stuck welcome screen</span></div><div class="action-row"><time>Oct 25</time><span>Asked three people to try the first build</span></div><div class="action-row"><time>Oct 24</time><span>Finished the refund rules</span></div></div>
+          </div>
+        </div></div>
+        <p class="idea-note"><b>Best for:</b> making the account feel like a permanent personal archive.</p>
+      </section>
+
+      <section class="concept" id="proof">
+        <header class="concept__head"><span class="concept__n">02</span><div><h2>By Proof</h2><p>The clearest at-a-glance answer to “what has Memento actually helped me do?”</p></div></header>
+        <div class="phone"><div class="screen">
+          <div class="bar"><button class="bar__back">Back</button><span class="bar__title">Your proof</span><button class="bar__more">All time</button></div>
+          <div class="tabs"><button class="tab is-on" data-proof="actions">Actions</button><button class="tab" data-proof="goals">Goals</button><button class="tab" data-proof="returns">Returns</button><button class="tab" data-proof="milestones">Milestones</button><button class="tab" data-proof="reflections">Reflections</button></div>
+          <div class="proof-total"><b id="proofNumber">318</b><span id="proofLabel">actions you can point to</span></div>
+          <div class="proof-list" id="proofList"></div>
+        </div></div>
+        <p class="idea-note"><b>Best for:</b> usefulness. Nothing abstract, every category answers a concrete question.</p>
+      </section>
+
+      <section class="concept" id="then-now">
+        <header class="concept__head"><span class="concept__n">03</span><div><h2>Then and Now</h2><p>The emotional transformation, backed immediately by receipts.</p></div></header>
+        <div class="phone"><div class="screen">
+          <div class="bar"><button class="bar__back">Back</button><span class="bar__title">Then and now</span><button class="bar__more">421 days</button></div>
+          <div class="pad origin"><span class="origin__label">What you said when you began</span><blockquote>“I keep restarting this. I don’t know if I can actually finish it.”</blockquote><div class="turn"></div><div class="now"><span class="now__label">What is true now</span><h3>You built it, charged for it, and stayed when it got hard.</h3><p>318 actions, four finished goals, and seven returns make that more than a feeling.</p></div>
+            <div class="section-title"><h4>How you changed</h4><span>First day to today</span></div>
+            <div class="change-row"><span>Your goal</span><b>From “finish something” to “serve 100 paying people.”</b></div>
+            <div class="change-row"><span>Your pattern</span><b>From restarting every few weeks to returning after a miss.</b></div>
+            <div class="change-row"><span>Your proof</span><b>318 completed actions across 421 days.</b></div>
+            <div class="change-row"><span>Your words</span><b>“I stopped negotiating with myself at 7am.”</b></div>
+            <div class="section-title"><h4>The moments that proved it</h4></div>
+            <article class="event event--goal"><div class="event__date">August 3, 2026</div><div class="event__title">Reached 100 paying people</div></article>
+            <article class="event event--return"><div class="event__date">December 29, 2025</div><div class="event__title">Returned after nineteen days away</div></article>
+            <article class="event"><div class="event__date">September 4, 2025</div><div class="event__title">Completed the first seven-day plan</div></article>
+          </div>
+        </div></div>
+        <p class="idea-note"><b>Best for:</b> the “damn, I really changed” feeling Malik described.</p>
+      </section>
+
+      <section class="concept" id="time">
+        <header class="concept__head"><span class="concept__n">04</span><div><h2>Across Time</h2><p>Scrub through the person you were. The same Memento, different evidence.</p></div></header>
+        <div class="phone"><div class="screen">
+          <div class="bar"><button class="bar__back">Back</button><span class="bar__title">Across time</span><button class="bar__more">421 days</button></div>
+          <div class="pad time-stage"><span class="time-date" id="timeDate">June 8, 2025</span><h3 id="timeHeading">The day you began</h3><p id="timeCopy">You had a goal, doubt, and no proof yet.</p>
+            <div class="time-card"><div><div class="time-card__mark" id="timeMark">0</div><div class="time-card__small" id="timeMetric">actions recorded</div></div><div><div class="time-card__goal" id="timeGoal">“Finish the thing I keep restarting.”</div><div class="time-card__small" id="timeSmall">Your first Neutron Star</div></div></div>
+            <input id="timeRange" type="range" min="0" max="3" step="1" value="0" aria-label="Move through time">
+            <div class="years"><span>Beginning</span><span>First win</span><span>Comeback</span><span>Today</span></div>
+            <div class="section-title"><h4>What changed here</h4></div><div id="timeEvents"><div class="change-row"><span>Goal</span><b>You chose one thing worth finishing.</b></div><div class="change-row"><span>Evidence</span><b>No actions yet. This is the starting line.</b></div></div>
+          </div>
+        </div></div>
+        <p class="idea-note"><b>Best for:</b> feeling the distance traveled without turning the page into a dashboard.</p>
+      </section>
+
+      <section class="concept" id="reel">
+        <header class="concept__head"><span class="concept__n">05</span><div><h2>Memory Reel</h2><p>A personal recap of the strongest moments, followed by the complete record.</p></div></header>
+        <div class="phone"><div class="screen">
+          <div class="bar"><button class="bar__back">Back</button><span class="bar__title">Your moments</span><button class="bar__more">1 / 4</button></div>
+          <div class="reel"><div class="reel__count">The moments that changed the story</div><article class="memory"><div class="memory__date" id="memoryDate">June 8, 2025</div><div class="memory__main"><b id="memoryNumber">1</b><h3 id="memoryTitle">You chose the thing that mattered.</h3><p id="memoryCopy">“Finish the thing I keep restarting.” It was not impressive yet. It was honest.</p></div><div class="memory__foot" id="memoryFoot">The beginning</div></article><div class="reel-controls"><button id="memoryBack">Previous</button><button id="memoryNext">Next moment</button></div><button class="wide" style="margin-top:10px">Open the complete record</button></div>
+        </div></div>
+        <p class="idea-note"><b>Best for:</b> emotional re-entry. It makes the history feel like memories, not analytics.</p>
+      </section>
+    </div>
+  </main>
+  <script>
+    const proofData={
+      actions:{n:'318',label:'actions you can point to',items:[['Aug 3','Asked the hundredth customer what changed for them','This was action 187 toward your current goal.'],['Aug 2','Ran the full refund test','You proved a customer could leave safely.'],['Jul 31','Fixed paid access on a second device','A hard problem became part of the product.'],['Jul 30','Shipped payment recovery','Your oldest purchase finally walked through the front door.']]},
+      goals:{n:'4',label:'goals you finished',items:[['Aug 3','Serve 100 paying people','Finished after 187 actions.'],['Feb 18','Take the first real payment','Finished after 63 actions.'],['Nov 12','Ship Memento to another person','Finished after 41 actions.'],['Sep 4','Complete the first working version','Finished after 27 actions.']]},
+      returns:{n:'7',label:'times you came back',items:[['Dec 29','Returned after nineteen days','29 actions followed.'],['Nov 1','Returned after six days','You started smaller instead of restarting.'],['Sep 19','Returned after three days','You kept the same goal.'],['Aug 22','Returned the next morning','One miss stayed one miss.']]},
+      milestones:{n:'12',label:'milestones reached',items:[['Aug 3','100 paying people','The goal became real.'],['Jul 30','First complete payment cycle','Pay, unlock, cancel, refund.'],['Feb 18','First real payment','Someone trusted the thing you built.'],['Oct 3','100 actions','Proof began outweighing doubt.']]},
+      reflections:{n:'46',label:'reflections you kept',items:[['Jun 14','“I stopped needing to convince myself every morning.”','Written after action 244.'],['Dec 29','“Nineteen days is not the same as quitting.”','Written on your return.'],['Nov 12','“It works for someone who is not me.”','Written after the first outside user.'],['Sep 4','“I finished a version instead of imagining one.”','Written after your first goal.']]}
+    };
+    const proofList=document.getElementById('proofList');
+    function paintProof(key){const d=proofData[key];document.getElementById('proofNumber').textContent=d.n;document.getElementById('proofLabel').textContent=d.label;proofList.innerHTML=d.items.map(i=>`<article class="proof-item"><div class="proof-item__meta"><span>${i[0]}</span><span>${key.slice(0,-1)||key}</span></div><div class="proof-item__title">${i[1]}</div><div class="proof-item__note">${i[2]}</div></article>`).join('')}
+    document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('is-on'));b.classList.add('is-on');paintProof(b.dataset.proof)}));paintProof('actions');
+    document.querySelector('.js-actions').addEventListener('click',e=>{const list=document.querySelector('.all-actions');list.classList.toggle('is-open');e.currentTarget.textContent=list.classList.contains('is-open')?'Hide action list':'View every action'});
+    const timeData=[
+      {date:'June 8, 2025',heading:'The day you began',copy:'You had a goal, doubt, and no proof yet.',mark:'0',metric:'actions recorded',goal:'“Finish the thing I keep restarting.”',small:'Your first Neutron Star',events:[['Goal','You chose one thing worth finishing.'],['Evidence','No actions yet. This is the starting line.']]},
+      {date:'September 4, 2025',heading:'The first thing you finished',copy:'The story changed from trying to having done it.',mark:'27',metric:'actions recorded',goal:'First working version completed.',small:'Goal 1 of 4',events:[['Change','You stopped adding features and finished a version.'],['Evidence','27 completed actions over 88 days.']]},
+      {date:'December 29, 2025',heading:'The return that mattered',copy:'Nineteen days away did not get the final word.',mark:'+29',metric:'actions followed this return',goal:'“Start smaller. Keep the same promise.”',small:'Comeback 4 of 7',events:[['Change','You returned instead of choosing a new goal.'],['Evidence','Your longest later run began here.']]},
+      {date:'August 3, 2026',heading:'The person standing here now',copy:'The record is larger than the doubt that started it.',mark:'318',metric:'actions recorded',goal:'100 paying people served.',small:'Goal 4 of 4',events:[['Change','Your goal grew from finishing to serving.'],['Evidence','318 actions, four goals, seven returns.']]}
+    ];
+    function paintTime(i){const d=timeData[i];document.getElementById('timeDate').textContent=d.date;document.getElementById('timeHeading').textContent=d.heading;document.getElementById('timeCopy').textContent=d.copy;document.getElementById('timeMark').textContent=d.mark;document.getElementById('timeMetric').textContent=d.metric;document.getElementById('timeGoal').textContent=d.goal;document.getElementById('timeSmall').textContent=d.small;document.getElementById('timeEvents').innerHTML=d.events.map(x=>`<div class="change-row"><span>${x[0]}</span><b>${x[1]}</b></div>`).join('')}
+    document.getElementById('timeRange').addEventListener('input',e=>paintTime(+e.target.value));
+    const memories=[
+      {date:'June 8, 2025',n:'1',title:'You chose the thing that mattered.',copy:'“Finish the thing I keep restarting.” It was not impressive yet. It was honest.',foot:'The beginning'},
+      {date:'September 4, 2025',n:'27',title:'You finished a version.',copy:'For the first time, the proof was no longer imaginary. You had completed 27 actions and one whole goal.',foot:'First goal completed'},
+      {date:'December 29, 2025',n:'19',title:'Days away. Then you came back.',copy:'You did not erase the record or invent a new identity. You returned to the same promise.',foot:'Comeback 4 of 7'},
+      {date:'August 3, 2026',n:'318',title:'The doubt became the smaller story.',copy:'Four goals finished. One hundred people served. Seven returns. The record is yours.',foot:'Today'}
+    ];let memoryIndex=0;
+    function paintMemory(){const d=memories[memoryIndex];document.getElementById('memoryDate').textContent=d.date;document.getElementById('memoryNumber').textContent=d.n;document.getElementById('memoryTitle').textContent=d.title;document.getElementById('memoryCopy').textContent=d.copy;document.getElementById('memoryFoot').textContent=d.foot;document.querySelector('#reel .bar__more').textContent=`${memoryIndex+1} / ${memories.length}`}
+    document.getElementById('memoryNext').addEventListener('click',()=>{memoryIndex=(memoryIndex+1)%memories.length;paintMemory()});document.getElementById('memoryBack').addEventListener('click',()=>{memoryIndex=(memoryIndex+memories.length-1)%memories.length;paintMemory()});
+  </script>
+</body>
+</html>
