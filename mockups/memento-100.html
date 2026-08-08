@@ -25,10 +25,15 @@
   .dupes b{color:var(--hi)}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(370px,100%),1fr));
     gap:22px;margin-top:24px;align-items:start}
-  .tile{margin:0;border-radius:18px;padding:15px 15px 13px;background:rgba(255,255,255,.028);
-    box-shadow:var(--inset)}
+  .tile{position:relative;margin:0;border-radius:18px;padding:15px 15px 13px;
+    background:rgba(255,255,255,.028);box-shadow:var(--inset)}
+  .tile__no{position:absolute;top:10px;right:14px;font-size:34px;font-weight:800;
+    letter-spacing:-.04em;line-height:1;color:rgba(255,255,255,.11);
+    font-variant-numeric:tabular-nums;pointer-events:none}
+  .tile.is-star .tile__no{color:rgba(63,217,78,.34)}
   .tile.is-star{box-shadow:var(--inset),0 0 0 1.5px rgba(63,217,78,.42)}
-  .tile__hd{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:11px}
+  .tile__hd{display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+    margin-bottom:11px;padding-right:42px}
   .tile__n{font-size:14.5px;font-weight:700;letter-spacing:-.015em;color:var(--hi)}
   .tile__k{font-size:10.5px;color:var(--lo);font-variant-numeric:tabular-nums}
   .tile__stage{border-radius:14px;padding:14px;background:#050609;box-shadow:inset 0 0 0 1px rgba(255,255,255,.05)}
@@ -941,6 +946,7 @@
   <nav class="nav"><button class="f is-on" data-f="all" type="button">All 100</button><button class="f" data-f="clk" type="button">Clocks and living counters <i>10</i></button><button class="f" data-f="vol" type="button">Volume and accumulation <i>10</i></button><button class="f" data-f="rec" type="button">Records and personal bests <i>10</i></button><button class="f" data-f="cmb" type="button">Resilience and comebacks <i>10</i></button><button class="f" data-f="mor" type="button">Mortality and the cost of time <i>10</i></button><button class="f" data-f="idn" type="button">Identity and becoming <i>10</i></button><button class="f" data-f="wrd" type="button">Their own words <i>10</i></button><button class="f" data-f="mil" type="button">Milestones and the pull forward <i>10</i></button><button class="f" data-f="ctx" type="button">Context and comparison <i>10</i></button><button class="f" data-f="amb" type="button">Ambient and visual <i>10</i></button><button class="f" data-f="star" type="button">The 12 picks</button></nav>
   <div class="grid">
   <figure class="tile" data-set="clk" id="t-clk-mirror">
+    <span class="tile__no">1</span>
     <figcaption class="tile__hd">
       <span class="tile__n">The two clocks</span>
       <span class="tile__k">clk-mirror</span>
@@ -967,6 +973,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="clk" id="t-clk-odometer">
+    <span class="tile__no">2</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Seconds since</span>
       <span class="tile__k">clk-odometer</span>
@@ -984,6 +991,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="clk" id="t-clk-units">
+    <span class="tile__no">3</span>
     <figcaption class="tile__hd">
       <span class="tile__n">The same stretch, six ways</span>
       <span class="tile__k">clk-units</span>
@@ -1005,6 +1013,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="clk" id="t-clk-today">
+    <span class="tile__no">4</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Day 300, burning</span>
       <span class="tile__k">clk-today</span>
@@ -1022,6 +1031,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="clk" id="t-clk-standing">
+    <span class="tile__no">5</span>
     <figcaption class="tile__hd">
       <span class="tile__n">How long each record has stood</span>
       <span class="tile__k">clk-standing</span>
@@ -1042,6 +1052,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="clk" id="t-clk-lifeday">
+    <span class="tile__no">6</span>
     <figcaption class="tile__hd">
       <span class="tile__n">If your life were one day</span>
       <span class="tile__k">clk-lifeday</span>
@@ -1077,6 +1088,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="clk" id="t-clk-arrivals">
+    <span class="tile__no">7</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Arriving anyway</span>
       <span class="tile__k">clk-arrivals</span>
@@ -1097,6 +1109,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="clk" id="t-clk-dayface">
+    <span class="tile__no">8</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Clock face of days</span>
       <span class="tile__k">clk-dayface</span>
@@ -1116,6 +1129,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="clk" id="t-clk-share">
+    <span class="tile__no">9</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Share of your life</span>
       <span class="tile__k">clk-share</span>
@@ -1133,6 +1147,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="clk" id="t-clk-plain">
+    <span class="tile__no">10</span>
     <figcaption class="tile__hd">
       <span class="tile__n">The plain arithmetic</span>
       <span class="tile__k">clk-plain</span>
@@ -1150,6 +1165,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="vol" id="t-vol-total">
+    <span class="tile__no">11</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Everything, counted once</span>
       <span class="tile__k">vol-total</span>
@@ -1171,6 +1187,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="vol" id="t-vol-pages">
+    <span class="tile__no">12</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Words as a book block</span>
       <span class="tile__k">vol-pages</span>
@@ -1191,6 +1208,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="vol" id="t-vol-deep">
+    <span class="tile__no">13</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Deep work as days of your life</span>
       <span class="tile__k">vol-deep</span>
@@ -1209,6 +1227,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="vol" id="t-vol-ribbon">
+    <span class="tile__no">14</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Days done, next rung named</span>
       <span class="tile__k">vol-ribbon</span>
@@ -1228,6 +1247,7 @@
     </div>
   </figure>
   <figure class="tile is-star" data-set="vol" id="t-vol-jar">
+    <span class="tile__no">15</span>
     <figcaption class="tile__hd">
       <span class="tile__n">The pile</span>
       <span class="tile__k">vol-jar</span>
@@ -1244,6 +1264,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="vol" id="t-vol-tally">
+    <span class="tile__no">16</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Walked past</span>
       <span class="tile__k">vol-tally</span>
@@ -1261,6 +1282,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="vol" id="t-vol-depths">
+    <span class="tile__no">17</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Recent, this year, all time</span>
       <span class="tile__k">vol-depths</span>
@@ -1283,6 +1305,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="vol" id="t-vol-weight">
+    <span class="tile__no">18</span>
     <figcaption class="tile__hd">
       <span class="tile__n">One week in twenty seven</span>
       <span class="tile__k">vol-weight</span>
@@ -1299,6 +1322,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="vol" id="t-vol-clock">
+    <span class="tile__no">19</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Running since</span>
       <span class="tile__k">vol-clock</span>
@@ -1320,6 +1344,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="vol" id="t-vol-stair">
+    <span class="tile__no">20</span>
     <figcaption class="tile__hd">
       <span class="tile__n">The line that never went down</span>
       <span class="tile__k">vol-stair</span>
@@ -1342,6 +1367,7 @@
     </div>
   </figure>
   <figure class="tile is-star" data-set="rec" id="t-rec-hold">
+    <span class="tile__no">21</span>
     <figcaption class="tile__hd">
       <span class="tile__n">The hold record</span>
       <span class="tile__k">rec-hold</span>
@@ -1355,6 +1381,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="rec" id="t-rec-board">
+    <span class="tile__no">22</span>
     <figcaption class="tile__hd">
       <span class="tile__n">The board</span>
       <span class="tile__k">rec-board</span>
@@ -1368,6 +1395,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="rec" id="t-rec-chase">
+    <span class="tile__no">23</span>
     <figcaption class="tile__hd">
       <span class="tile__n">The record in reach</span>
       <span class="tile__k">rec-chase</span>
@@ -1381,6 +1409,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="rec" id="t-rec-rank">
+    <span class="tile__no">24</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Every run, ranked</span>
       <span class="tile__k">rec-rank</span>
@@ -1394,6 +1423,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="rec" id="t-rec-sumbest">
+    <span class="tile__no">25</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Sum of your best</span>
       <span class="tile__k">rec-sumbest</span>
@@ -1407,6 +1437,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="rec" id="t-rec-months">
+    <span class="tile__no">26</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Best month</span>
       <span class="tile__k">rec-months</span>
@@ -1420,6 +1451,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="rec" id="t-rec-splits">
+    <span class="tile__no">27</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Promise splits</span>
       <span class="tile__k">rec-splits</span>
@@ -1433,6 +1465,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="rec" id="t-rec-clock">
+    <span class="tile__no">28</span>
     <figcaption class="tile__hd">
       <span class="tile__n">How long it has stood</span>
       <span class="tile__k">rec-clock</span>
@@ -1446,6 +1479,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="rec" id="t-rec-day">
+    <span class="tile__no">29</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Biggest single day</span>
       <span class="tile__k">rec-day</span>
@@ -1459,6 +1493,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="rec" id="t-rec-staircase">
+    <span class="tile__no">30</span>
     <figcaption class="tile__hd">
       <span class="tile__n">How the record climbed</span>
       <span class="tile__k">rec-staircase</span>
@@ -1472,6 +1507,7 @@
     </div>
   </figure>
   <figure class="tile is-star" data-set="cmb" id="t-cmb-returns">
+    <span class="tile__no">31</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Returns and gaps</span>
       <span class="tile__k">cmb-returns</span>
@@ -1493,6 +1529,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="cmb" id="t-cmb-gaps">
+    <span class="tile__no">32</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Every gap, in order</span>
       <span class="tile__k">cmb-gaps</span>
@@ -1525,6 +1562,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="cmb" id="t-cmb-after">
+    <span class="tile__no">33</span>
     <figcaption class="tile__hd">
       <span class="tile__n">What followed the worst month</span>
       <span class="tile__k">cmb-after</span>
@@ -1557,6 +1595,7 @@
     </div>
   </figure>
   <figure class="tile is-star" data-set="cmb" id="t-cmb-hold">
+    <span class="tile__no">34</span>
     <figcaption class="tile__hd">
       <span class="tile__n">The day you nearly stopped</span>
       <span class="tile__k">cmb-hold</span>
@@ -1577,6 +1616,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="cmb" id="t-cmb-clock">
+    <span class="tile__no">35</span>
     <figcaption class="tile__hd">
       <span class="tile__n">The clock the gaps did not stop</span>
       <span class="tile__k">cmb-clock</span>
@@ -1598,6 +1638,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="cmb" id="t-cmb-past">
+    <span class="tile__no">36</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Walked past</span>
       <span class="tile__k">cmb-past</span>
@@ -1616,6 +1657,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="cmb" id="t-cmb-setdown">
+    <span class="tile__no">37</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Set down, not failed</span>
       <span class="tile__k">cmb-setdown</span>
@@ -1639,6 +1681,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="cmb" id="t-cmb-line">
+    <span class="tile__no">38</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Away against here</span>
       <span class="tile__k">cmb-line</span>
@@ -1654,6 +1697,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="cmb" id="t-cmb-wall">
+    <span class="tile__no">39</span>
     <figcaption class="tile__hd">
       <span class="tile__n">The wall, returns lit</span>
       <span class="tile__k">cmb-wall</span>
@@ -1676,6 +1720,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="cmb" id="t-cmb-climb">
+    <span class="tile__no">40</span>
     <figcaption class="tile__hd">
       <span class="tile__n">The line never went down</span>
       <span class="tile__k">cmb-climb</span>
@@ -1693,6 +1738,7 @@
     </div>
   </figure>
   <figure class="tile is-star" data-set="mor" id="t-mor-clocks">
+    <span class="tile__no">41</span>
     <figcaption class="tile__hd">
       <span class="tile__n">The two clocks</span>
       <span class="tile__k">mor-clocks</span>
@@ -1716,6 +1762,7 @@
     </div>
   </figure>
   <figure class="tile is-star" data-set="mor" id="t-mor-weeks">
+    <span class="tile__no">42</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Life in weeks</span>
       <span class="tile__k">mor-weeks</span>
@@ -1732,6 +1779,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="mor" id="t-mor-saturdays">
+    <span class="tile__no">43</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Saturdays left</span>
       <span class="tile__k">mor-saturdays</span>
@@ -1749,6 +1797,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="mor" id="t-mor-remaining">
+    <span class="tile__no">44</span>
     <figcaption class="tile__hd">
       <span class="tile__n">The same span, six ways</span>
       <span class="tile__k">mor-remaining</span>
@@ -1771,6 +1820,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="mor" id="t-mor-cost">
+    <span class="tile__no">45</span>
     <figcaption class="tile__hd">
       <span class="tile__n">What each promise cost</span>
       <span class="tile__k">mor-cost</span>
@@ -1799,6 +1849,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="mor" id="t-mor-strip">
+    <span class="tile__no">46</span>
     <figcaption class="tile__hd">
       <span class="tile__n">The whole line</span>
       <span class="tile__k">mor-strip</span>
@@ -1819,6 +1870,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="mor" id="t-mor-oneday">
+    <span class="tile__no">47</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Today, hour by hour</span>
       <span class="tile__k">mor-oneday</span>
@@ -1836,6 +1888,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="mor" id="t-mor-share">
+    <span class="tile__no">48</span>
     <figcaption class="tile__hd">
       <span class="tile__n">One day in 28</span>
       <span class="tile__k">mor-share</span>
@@ -1852,6 +1905,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="mor" id="t-mor-summers">
+    <span class="tile__no">49</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Summers</span>
       <span class="tile__k">mor-summers</span>
@@ -1869,6 +1923,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="mor" id="t-mor-landmarks">
+    <span class="tile__no">50</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Dates already set</span>
       <span class="tile__k">mor-landmarks</span>
@@ -1889,6 +1944,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="idn" id="t-idn-twocards">
+    <span class="tile__no">51</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Day one, and today</span>
       <span class="tile__k">idn-twocards</span>
@@ -1922,6 +1978,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="idn" id="t-idn-standing">
+    <span class="tile__no">52</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Standing</span>
       <span class="tile__k">idn-standing</span>
@@ -1941,6 +1998,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="idn" id="t-idn-cannow">
+    <span class="tile__no">53</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Things you can do now</span>
       <span class="tile__k">idn-cannow</span>
@@ -1962,6 +2020,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="idn" id="t-idn-chapters">
+    <span class="tile__no">54</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Three chapters</span>
       <span class="tile__k">idn-chapters</span>
@@ -1994,6 +2053,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="idn" id="t-idn-votes">
+    <span class="tile__no">55</span>
     <figcaption class="tile__hd">
       <span class="tile__n">312 votes</span>
       <span class="tile__k">idn-votes</span>
@@ -2012,6 +2072,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="idn" id="t-idn-portrait">
+    <span class="tile__no">56</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Portrait from the record</span>
       <span class="tile__k">idn-portrait</span>
@@ -2035,6 +2096,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="idn" id="t-idn-thennow">
+    <span class="tile__no">57</span>
     <figcaption class="tile__hd">
       <span class="tile__n">April next to June</span>
       <span class="tile__k">idn-thennow</span>
@@ -2062,6 +2124,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="idn" id="t-idn-theroom">
+    <span class="tile__no">58</span>
     <figcaption class="tile__hd">
       <span class="tile__n">The room you were afraid of</span>
       <span class="tile__k">idn-theroom</span>
@@ -2084,6 +2147,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="idn" id="t-idn-beenclock">
+    <span class="tile__no">59</span>
     <figcaption class="tile__hd">
       <span class="tile__n">How long you have been this</span>
       <span class="tile__k">idn-beenclock</span>
@@ -2103,6 +2167,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="idn" id="t-idn-lifebar">
+    <span class="tile__no">60</span>
     <figcaption class="tile__hd">
       <span class="tile__n">300 of 8,254</span>
       <span class="tile__k">idn-lifebar</span>
@@ -2122,6 +2187,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="wrd" id="t-wrd-sealed">
+    <span class="tile__no">61</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Day one, sealed</span>
       <span class="tile__k">wrd-sealed</span>
@@ -2147,6 +2213,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="wrd" id="t-wrd-twoways">
+    <span class="tile__no">62</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Both futures, your words</span>
       <span class="tile__k">wrd-twoways</span>
@@ -2170,6 +2237,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="wrd" id="t-wrd-count">
+    <span class="tile__no">63</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Words you have written</span>
       <span class="tile__k">wrd-count</span>
@@ -2191,6 +2259,7 @@
     </div>
   </figure>
   <figure class="tile is-star" data-set="wrd" id="t-wrd-hardest">
+    <span class="tile__no">64</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Written on the bad days</span>
       <span class="tile__k">wrd-hardest</span>
@@ -2211,6 +2280,7 @@
     </div>
   </figure>
   <figure class="tile is-star" data-set="wrd" id="t-wrd-span">
+    <span class="tile__no">65</span>
     <figcaption class="tile__hd">
       <span class="tile__n">First line, latest line</span>
       <span class="tile__k">wrd-span</span>
@@ -2234,6 +2304,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="wrd" id="t-wrd-wall">
+    <span class="tile__no">66</span>
     <figcaption class="tile__hd">
       <span class="tile__n">The whole thing in one breath</span>
       <span class="tile__k">wrd-wall</span>
@@ -2251,6 +2322,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="wrd" id="t-wrd-resurface">
+    <span class="tile__no">67</span>
     <figcaption class="tile__hd">
       <span class="tile__n">One from the pile</span>
       <span class="tile__k">wrd-resurface</span>
@@ -2271,6 +2343,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="wrd" id="t-wrd-promises">
+    <span class="tile__no">68</span>
     <figcaption class="tile__hd">
       <span class="tile__n">The three you named</span>
       <span class="tile__k">wrd-promises</span>
@@ -2299,6 +2372,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="wrd" id="t-wrd-antivision">
+    <span class="tile__no">69</span>
     <figcaption class="tile__hd">
       <span class="tile__n">The room you refuse</span>
       <span class="tile__k">wrd-antivision</span>
@@ -2317,6 +2391,7 @@
     </div>
   </figure>
   <figure class="tile is-star" data-set="wrd" id="t-wrd-vocab">
+    <span class="tile__no">70</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Words you keep reaching for</span>
       <span class="tile__k">wrd-vocab</span>
@@ -2341,6 +2416,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="mil" id="t-mil-500">
+    <span class="tile__no">71</span>
     <figcaption class="tile__hd">
       <span class="tile__n">The 500th action</span>
       <span class="tile__k">mil-500</span>
@@ -2358,6 +2434,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="mil" id="t-mil-yearone">
+    <span class="tile__no">72</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Day 300, and the clock to 365</span>
       <span class="tile__k">mil-yearone</span>
@@ -2377,6 +2454,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="mil" id="t-mil-standing">
+    <span class="tile__no">73</span>
     <figcaption class="tile__hd">
       <span class="tile__n">How long the record has stood</span>
       <span class="tile__k">mil-standing</span>
@@ -2396,6 +2474,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="mil" id="t-mil-rungs">
+    <span class="tile__no">74</span>
     <figcaption class="tile__hd">
       <span class="tile__n">The rungs</span>
       <span class="tile__k">mil-rungs</span>
@@ -2418,6 +2497,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="mil" id="t-mil-horizon">
+    <span class="tile__no">75</span>
     <figcaption class="tile__hd">
       <span class="tile__n">What arrives next</span>
       <span class="tile__k">mil-horizon</span>
@@ -2454,6 +2534,7 @@
     </div>
   </figure>
   <figure class="tile is-star" data-set="mil" id="t-mil-tomorrow">
+    <span class="tile__no">76</span>
     <figcaption class="tile__hd">
       <span class="tile__n">If you mark tomorrow</span>
       <span class="tile__k">mil-tomorrow</span>
@@ -2476,6 +2557,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="mil" id="t-mil-hundred">
+    <span class="tile__no">77</span>
     <figcaption class="tile__hd">
       <span class="tile__n">38 away</span>
       <span class="tile__k">mil-hundred</span>
@@ -2494,6 +2576,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="mil" id="t-mil-pace">
+    <span class="tile__no">78</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Where these read on day 365</span>
       <span class="tile__k">mil-pace</span>
@@ -2518,6 +2601,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="mil" id="t-mil-oneline">
+    <span class="tile__no">79</span>
     <figcaption class="tile__hd">
       <span class="tile__n">One more</span>
       <span class="tile__k">mil-oneline</span>
@@ -2534,6 +2618,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="mil" id="t-mil-comesround">
+    <span class="tile__no">80</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Comes round again</span>
       <span class="tile__k">mil-comesround</span>
@@ -2555,6 +2640,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="ctx" id="t-ctx-halves">
+    <span class="tile__no">81</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Your second 150 days</span>
       <span class="tile__k">ctx-halves</span>
@@ -2581,6 +2667,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="ctx" id="t-ctx-ladder">
+    <span class="tile__no">82</span>
     <figcaption class="tile__hd">
       <span class="tile__n">231 in other units</span>
       <span class="tile__k">ctx-ladder</span>
@@ -2603,6 +2690,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="ctx" id="t-ctx-months">
+    <span class="tile__no">83</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Every month you have had</span>
       <span class="tile__k">ctx-months</span>
@@ -2630,6 +2718,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="ctx" id="t-ctx-samepoint">
+    <span class="tile__no">84</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Day seven of every month</span>
       <span class="tile__k">ctx-samepoint</span>
@@ -2647,6 +2736,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="ctx" id="t-ctx-runs">
+    <span class="tile__no">85</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Record against typical</span>
       <span class="tile__k">ctx-runs</span>
@@ -2681,6 +2771,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="ctx" id="t-ctx-promises">
+    <span class="tile__no">86</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Three promises, one scale</span>
       <span class="tile__k">ctx-promises</span>
@@ -2712,6 +2803,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="ctx" id="t-ctx-silence">
+    <span class="tile__no">87</span>
     <figcaption class="tile__hd">
       <span class="tile__n">The longest silence</span>
       <span class="tile__k">ctx-silence</span>
@@ -2730,6 +2822,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="ctx" id="t-ctx-lifeweeks">
+    <span class="tile__no">88</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Weeks of your life</span>
       <span class="tile__k">ctx-lifeweeks</span>
@@ -2747,6 +2840,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="ctx" id="t-ctx-cohort">
+    <span class="tile__no">89</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Where starts usually end</span>
       <span class="tile__k">ctx-cohort</span>
@@ -2770,6 +2864,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="ctx" id="t-ctx-pace">
+    <span class="tile__no">90</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Where this pace lands</span>
       <span class="tile__k">ctx-pace</span>
@@ -2792,6 +2887,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="amb" id="t-amb-wall">
+    <span class="tile__no">91</span>
     <figcaption class="tile__hd">
       <span class="tile__n">The wall</span>
       <span class="tile__k">amb-wall</span>
@@ -2810,6 +2906,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="amb" id="t-amb-weeks">
+    <span class="tile__no">92</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Weeks</span>
       <span class="tile__k">amb-weeks</span>
@@ -2831,6 +2928,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="amb" id="t-amb-horizon">
+    <span class="tile__no">93</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Horizon</span>
       <span class="tile__k">amb-horizon</span>
@@ -2864,6 +2962,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="amb" id="t-amb-rings">
+    <span class="tile__no">94</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Month rings</span>
       <span class="tile__k">amb-rings</span>
@@ -2896,6 +2995,7 @@
     </div>
   </figure>
   <figure class="tile is-star" data-set="amb" id="t-amb-const">
+    <span class="tile__no">95</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Fifteen runs</span>
       <span class="tile__k">amb-const</span>
@@ -2920,6 +3020,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="amb" id="t-amb-core">
+    <span class="tile__no">96</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Core sample</span>
       <span class="tile__k">amb-core</span>
@@ -2942,6 +3043,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="amb" id="t-amb-field">
+    <span class="tile__no">97</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Field of light</span>
       <span class="tile__k">amb-field</span>
@@ -2958,6 +3060,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="amb" id="t-amb-threads">
+    <span class="tile__no">98</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Three threads</span>
       <span class="tile__k">amb-threads</span>
@@ -2987,6 +3090,7 @@
     </div>
   </figure>
   <figure class="tile is-star" data-set="amb" id="t-amb-stair">
+    <span class="tile__no">99</span>
     <figcaption class="tile__hd">
       <span class="tile__n">The staircase</span>
       <span class="tile__k">amb-stair</span>
@@ -3004,6 +3108,7 @@
     </div>
   </figure>
   <figure class="tile" data-set="amb" id="t-amb-returns">
+    <span class="tile__no">100</span>
     <figcaption class="tile__hd">
       <span class="tile__n">Fourteen returns</span>
       <span class="tile__k">amb-returns</span>
