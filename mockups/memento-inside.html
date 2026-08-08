@@ -156,6 +156,27 @@
   .evd.is-open .evd__story{display:block}
   .evcap{margin-top:12px;font-size:12px;color:var(--ink3);text-align:center}
 
+  .in-count{margin-top:10px;font-size:17px;font-weight:300;letter-spacing:.11em;
+    color:var(--hi);font-variant-numeric:tabular-nums}
+  .in-d0{position:fixed;top:calc(var(--safe-t) + 17px);right:14px;z-index:9;border:0;
+    padding:8px 13px;border-radius:999px;background:rgba(255,255,255,.08);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.09);color:var(--hi);
+    font:inherit;font-size:12px;font-weight:660;cursor:pointer}
+  .in-col--d0{display:block}
+  .d0clk{margin-top:30px;border-radius:16px;padding:20px 18px 16px;background:var(--fill);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+  .d0clk__n{font-size:46px;line-height:1;font-weight:600;letter-spacing:-.03em;
+    color:var(--hi);font-variant-numeric:tabular-nums}
+  .d0clk__n--up{color:var(--cons)}
+  .d0clk__u{margin-top:8px;font-size:14px;line-height:1.4;color:var(--mid)}
+  .d0clk__u b{color:var(--hi);font-weight:640;font-variant-numeric:tabular-nums}
+  .d0clk__rule{height:1px;background:rgba(255,255,255,.10);margin:16px 0}
+  .d0clk__f{margin-top:16px;font-size:13px;color:var(--mid)}
+  .d0line{margin-top:22px;font-size:14.5px;line-height:1.55;color:var(--hi);text-align:center}
+  .d0wks{margin-top:14px;border-radius:16px;padding:15px;background:var(--fill);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+  .d0wks canvas{display:block;width:100%;max-width:312px;height:auto;margin:0 auto}
+  .d0wks__cap{margin-top:12px;font-size:13px;line-height:1.5;color:var(--mid);text-align:center}
   .in-flowh{margin:52px 0 4px;font-size:22px;font-weight:750;letter-spacing:-.024em;color:var(--hi)}
   .cpick{margin-top:14px}
   .cpick > *{max-width:100%}
@@ -742,6 +763,7 @@
 <div class="inside" id="inside" hidden>
   <div class="rim" aria-hidden="true"></div>
   <div class="rim-cover" aria-hidden="true"></div>
+  <button class="in-d0" id="inD0btn" type="button">What day one looks like</button>
   <button class="in-back" id="inBack" type="button" aria-label="Back out of the card">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
       stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
@@ -753,6 +775,7 @@
       <header class="in-head">
         <svg class="in-mark" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
         <h1 class="in-name">Malik Peace.</h1>
+        <p class="in-count">20967:16:41:52</p>
         <p class="in-since">On the path since October 12. Day 300.</p>
       </header>
 
@@ -921,6 +944,54 @@
       </div>
 
     </div>
+
+    <div class="in-col in-col--d0" id="inD0col" hidden>
+      <header class="in-head">
+        <svg class="in-mark" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+        <h1 class="in-name">Malik Peace.</h1>
+        <p class="in-count">21267:16:41:52</p>
+        <p class="in-since">On the path since this morning. Day 1.</p>
+      </header>
+
+      <div class="d0clk">
+        <div class="d0clk__n">21,267</div>
+        <div class="d0clk__u">days left, on an 80 year estimate</div>
+        <div class="d0clk__rule"></div>
+        <div class="d0clk__n d0clk__n--up">0</div>
+        <div class="d0clk__u">days since you made this, plus <b id="inD0live">11h 16m 51s</b></div>
+        <div class="d0clk__f">One falls. One climbs. The climbing one is already moving.</div>
+      </div>
+
+      <p class="d0line">The ledger opens with the first mark. That can be tonight.</p>
+
+      <h2 class="in-flowh">Memento mori</h2>
+      <div class="d0wks">
+        <canvas id="inWeeksD0" aria-label="an 80 year life in weeks, none on the path yet"></canvas>
+        <p class="d0wks__cap">The filled ones are spent either way. The first green cell is this week, if you make it one.</p>
+      </div>
+
+      <h2 class="in-flowh">Memento vivere</h2>
+      <div class="in-seal">
+        <div class="in-seal__hd">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          <span>Unsealed, until tonight</span>
+        </div>
+        <p class="in-seal__b">Tonight you write one note to the person you are doing this for. It seals when you finish it, and it never changes again.</p>
+        <p class="in-seal__b">Some day you will need proof that you once wanted this badly. This is where the proof will live.</p>
+        <p class="in-seal__law">Written once. It cannot be edited, only kept. Only you can open it.</p>
+      </div>
+
+      <div class="in-org">
+        <span class="in-org__k">Creation of Your Memento</span>
+        <span class="in-org__d">August 7, 2026</span>
+        <span class="in-org__t">6:42 AM</span>
+      </div>
+
+      <div class="in-foot">
+        <p class="in-digits">0001 / 0000</p>
+        <p class="in-policy">Get the most out of your existence.</p>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1050,6 +1121,47 @@ document.getElementById('inBack').addEventListener('click',function(){
   setTimeout(function(){inside.hidden=true;},700);
   document.getElementById('inScroll').scrollTop=0;
 });
+
+/* day one: the same room before anything has happened */
+(function(){
+  var btn=document.getElementById('inD0btn'), col0=document.querySelector('.in-col:not(.in-col--d0)'),
+      col1=document.getElementById('inD0col'), cage=document.getElementById('homeCage');
+  if(!btn||!col1)return;
+  var on=false;
+  btn.addEventListener('click',function(){
+    on=!on;
+    col0.hidden=on; col1.hidden=!on;
+    btn.textContent=on?'Back to day 300':'What day one looks like';
+    if(cage){
+      cage.innerHTML=realCard(matVars(MATS[0],{clar:!on,act:!on,cons:!on}),{name:'Malik Peace'});
+      if(on)document.body.classList.remove('ns-bloom');else document.body.classList.add('ns-bloom');
+    }
+    document.getElementById('inScroll').scrollTop=0;
+  });
+  var cv=document.getElementById('inWeeksD0');
+  if(cv){
+    var cols=52,total=4175,lived=1179,cell=5,gap=1;
+    var rows=Math.ceil(total/cols), w=cols*(cell+gap)-gap, h=rows*(cell+gap)-gap;
+    cv.width=w*2;cv.height=h*2;cv.style.aspectRatio=w+' / '+h;
+    var cx=cv.getContext('2d');cx.scale(2,2);
+    for(var i=0;i<total;i++){
+      var c2=i%cols,r2=Math.floor(i/cols),x=c2*(cell+gap),y=r2*(cell+gap);
+      cx.fillStyle=i<lived?'rgba(255,255,255,0.42)':'rgba(255,255,255,0.10)';
+      cx.fillRect(x,y,cell,cell);
+    }
+    var cc=lived%cols,rr=Math.floor(lived/cols);
+    cx.strokeStyle='rgba(255,255,255,0.95)';cx.lineWidth=1;
+    cx.strokeRect(cc*(cell+gap)-0.5,rr*(cell+gap)-0.5,cell+1,cell+1);
+  }
+  var live=document.getElementById('inD0live');
+  if(live){
+    var t0=Date.now(), b=40611;
+    setInterval(function(){
+      var e=b+Math.floor((Date.now()-t0)/1000);
+      live.textContent=Math.floor(e/3600)+'h '+Math.floor(e%3600/60)+'m '+(e%60)+'s';
+    },1000);
+  }
+})();
 
 /* the barcode: generated from the person's own numbers, unique per memento */
 (function(){
