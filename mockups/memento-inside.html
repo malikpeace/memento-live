@@ -38,7 +38,7 @@
       radial-gradient(70% 34% at 20% 4%, color-mix(in srgb, var(--clar) 12%, transparent), transparent 70%),
       radial-gradient(64% 30% at 86% 30%, color-mix(in srgb, var(--cons) 9%, transparent), transparent 72%),
       linear-gradient(168deg,#eaeef5 0%,#dde3ec 46%,#cfd7e2 100%)}
-  .in-col{max-width:430px;margin:0 auto;padding:calc(var(--safe-t) + 112px) 24px 60px}
+  .in-col{max-width:430px;margin:0 auto;padding:calc(var(--safe-t) + 150px) 24px 60px}
 
   /* the rim: the device edges become the card's edge, open at the bottom */
   .rim{position:fixed;inset:0;z-index:8;pointer-events:none}
@@ -156,7 +156,7 @@
   .evd.is-open .evd__story{display:block}
   .evcap{margin-top:12px;font-size:12px;color:var(--ink3);text-align:center}
 
-  .in-count{margin-top:10px;font-size:17px;font-weight:300;letter-spacing:.11em;
+  .in-count{margin-top:14px;font-size:31px;font-weight:250;letter-spacing:.1em;
     color:var(--hi);font-variant-numeric:tabular-nums}
   .in-d0{position:fixed;top:calc(var(--safe-t) + 62px);right:14px;z-index:9;border:0;
     padding:8px 13px;border-radius:999px;background:rgba(255,255,255,.08);
@@ -186,8 +186,8 @@
   .inside:not(.brd) .in-mode,.inside:not(.brd) .in-d0{
     background:rgba(16,20,28,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.5);
     color:rgba(13,17,25,.94)}
-  .in-flowh{margin:52px 0 4px;font-size:22px;font-weight:750;letter-spacing:-.024em;color:var(--hi)}
-  .cpick{margin-top:14px}
+  .in-flowh{margin:104px 0 10px;font-size:23px;font-weight:750;letter-spacing:-.024em;color:var(--hi)}
+  .cpick{margin-top:26px}
   .cpick > *{max-width:100%}
   /* the components were designed as tiles on near black, the ring room IS near black */
   .in-head{text-align:center}
@@ -198,7 +198,7 @@
     font-variant-numeric:tabular-nums}
   .in-since{margin-top:6px;font-size:12.5px;color:var(--ink2)}
 
-  .in-hero{display:flex;align-items:center;gap:13px;margin-top:34px}
+  .in-hero{display:flex;align-items:center;gap:13px;margin-top:44px}
   .in-hero>b{font-size:68px;font-weight:800;letter-spacing:-.05em;line-height:.9;color:var(--ink1);
     font-variant-numeric:tabular-nums;text-shadow:0 1px 1px rgba(255,255,255,.8), 0 -1px .5px rgba(0,0,0,.14)}
   .in-herol{font-size:14px;font-weight:620;line-height:1.3;color:var(--ink2)}
@@ -279,7 +279,7 @@
   .in-viv__q .w.lit{opacity:1;text-shadow:0 0 20px color-mix(in srgb, var(--cons) 50%, transparent)}
   .in-viv__closer{margin-top:16px;font-size:13.5px;font-weight:660;
     color:color-mix(in srgb, var(--cons) 62%, #063313)}
-  .in-seal{margin-top:22px;border-radius:16px;padding:16px 16px 13px;
+  .in-seal{margin-top:26px;border-radius:16px;padding:16px 16px 13px;
     background:rgba(255,255,255,.4);box-shadow:inset 0 1px 0 rgba(255,255,255,.8)}
   .in-seal__hd{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:680;color:var(--ink2)}
   .in-seal__hd svg{width:14px;height:14px}
@@ -289,7 +289,7 @@
     font-size:11.5px;color:var(--ink3)}
 
   /* the plaque inverts on the light face: dark stone, light strike */
-  .in-org{position:relative;margin:52px 0 0;padding:30px 22px 28px;border-radius:18px;
+  .in-org{position:relative;margin:110px 0 0;padding:30px 22px 28px;border-radius:18px;
     text-align:center;overflow:hidden;
     background:linear-gradient(180deg, rgba(9,11,15,.94), rgba(14,17,22,.9));
     box-shadow:inset 0 2px 3px rgba(0,0,0,.7), inset 0 -1px 0 rgba(255,255,255,.08),
@@ -301,7 +301,7 @@
     text-shadow:0 -1px 1px rgba(0,0,0,.85), 0 1px .5px rgba(255,255,255,.16)}
   .in-org__t{margin:9px 0 0;font-size:13px;color:rgba(232,236,244,.62);font-variant-numeric:tabular-nums}
 
-  .in-foot{margin-top:44px;text-align:center}
+  .in-foot{margin-top:60px;text-align:center}
   .in-code{display:inline-flex;gap:2.5px;height:26px}
   .in-code i{width:2px;background:rgba(16,20,28,.8)}
   .in-code i:nth-child(3n){width:4px}
@@ -812,7 +812,7 @@
 </div></div>
 
       <!-- HOW FAR YOU'VE COME: stats and evidence -->
-      <h2 class="in-flowh">How far you've come</h2>
+      <h2 class="in-flowh">Progress</h2>
       <div class="cpick"><div class="vol-total">
   <div class="vol-total__n">462</div>
   <div class="vol-total__cap">marks on the record, all time</div>
@@ -860,7 +860,7 @@
       <div class="cpick"><div class="rec-months"><div class="rec-months__t">Best month</div><div class="rec-months__chart"><span style="height:70%"></span><span style="height:70%"></span><span style="height:71%"></span><span style="height:77%"></span><span style="height:79%"></span><span style="height:74%"></span><span style="height:63%" class="low"></span><span style="height:84%"></span><span style="height:93%" class="top"></span><span style="height:84%"></span><span style="height:86%" class="now"></span></div><div class="rec-months__ax"><i>O</i><i>N</i><i>D</i><i>J</i><i>F</i><i>M</i><i>A</i><i>M</i><i>J</i><i>J</i><i>A</i></div><div class="rec-months__c">June, 28 of 30. April was 19 of 30, the low one. August is still running.</div></div></div>
 
       <!-- 5. MEMENTO MORI -->
-      <h2 class="in-flowh">Memento mori</h2>
+      <h2 class="in-flowh">Mori</h2>
       <div class="cpick"><div class="amb-weeks">
   <canvas class="amb-weeks__cv" width="652" height="274"></canvas>
   <div class="amb-weeks__rows">
@@ -887,7 +887,7 @@
 </div></div>
 
       <!-- MEMENTO VIVERE: the promises they made to themselves -->
-      <h2 class="in-flowh">Memento vivere</h2>
+      <h2 class="in-flowh">Vivere</h2>
       <div class="cpick"><div class="amb-threads">
   <div class="amb-threads__t">
     <div class="amb-threads__l">Run the half</div>
@@ -971,13 +971,13 @@
 
       <p class="d0line">The ledger opens with the first mark. That can be tonight.</p>
 
-      <h2 class="in-flowh">Memento mori</h2>
+      <h2 class="in-flowh">Mori</h2>
       <div class="d0wks">
         <canvas id="inWeeksD0" aria-label="an 80 year life in weeks, none on the path yet"></canvas>
         <p class="d0wks__cap">The filled ones are spent either way. The first green cell is this week, if you make it one.</p>
       </div>
 
-      <h2 class="in-flowh">Memento vivere</h2>
+      <h2 class="in-flowh">Vivere</h2>
       <div class="in-seal">
         <div class="in-seal__hd">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
