@@ -22,6 +22,32 @@
   .brand svg{width:18px;height:18px;fill:var(--act)}
   p{margin:0}
 
+  /* the material's light on every block. Radial and fading well inside its own
+     bounds (the v682 law), so it can never draw an edge. */
+  :root{--mtint:#3ad9f5}
+  .mats{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:22px}
+  .mats button{width:30px;height:30px;border:0;border-radius:50%;cursor:pointer;padding:0;
+    background:var(--sw);box-shadow:inset 0 1px 0 rgba(255,255,255,.25), 0 4px 14px rgba(0,0,0,.5)}
+  .mats button.is-on{box-shadow:inset 0 1px 0 rgba(255,255,255,.25), 0 0 0 2.5px rgba(5,6,9,1), 0 0 0 4.5px var(--sw), 0 4px 14px rgba(0,0,0,.5)}
+  .mats button.mats__void{background:#000;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.28), 0 4px 14px rgba(0,0,0,.5)}
+  .mats__note{margin-top:12px;font-size:12px;color:var(--mid);text-align:center}
+  .slip__in,.post,.relb,.now,.tkt,.lgt,.wal,.cbk,.tnw,.wks,.wrd,.mth{position:relative;overflow:hidden}
+  .post::before,.relb::before,.now::before,.tkt::before,.lgt::before,.wal::before,
+  .cbk::before,.tnw::before,.wks::before,.wrd::before,.mth::before,.slip__in::before{
+    content:"";position:absolute;left:-10%;right:-10%;top:-30%;height:60%;pointer-events:none;
+    background:radial-gradient(52% 60% at 50% 30%, color-mix(in srgb, var(--mtint) 22%, transparent), transparent 72%);
+    transition:background .5s ease-out}
+  .slip__in>*,.post>*,.relb>*,.now>*,.tkt>*,.lgt>*,.wal>*,.cbk>*,.tnw>*,.wks>*,.wrd>*,.mth>*{position:relative}
+  .brand svg,.slip__head svg{fill:var(--mtint);transition:fill .5s ease-out}
+  .post__hero b{text-shadow:0 0 70px color-mix(in srgb, var(--mtint) 32%, transparent)}
+  .cbk__hero b{text-shadow:0 0 60px color-mix(in srgb, var(--mtint) 26%, transparent)}
+  body.is-void .post::before,body.is-void .relb::before,body.is-void .now::before,
+  body.is-void .tkt::before,body.is-void .lgt::before,body.is-void .wal::before,
+  body.is-void .cbk::before,body.is-void .tnw::before,body.is-void .wks::before,
+  body.is-void .wrd::before,body.is-void .mth::before,body.is-void .slip__in::before{background:none}
+  body.is-void .brand svg,body.is-void .slip__head svg{fill:var(--act)}
+  body.is-void .post__hero b,body.is-void .cbk__hero b{text-shadow:none}
+
   /* section chrome */
   .sec{margin-top:30px}
   .sec__hd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
@@ -92,7 +118,8 @@
   .now__goal{font-size:18px;font-weight:700;letter-spacing:-.02em;color:var(--hi)}
   .now__line{margin-top:6px;font-size:13.5px;color:var(--mid);font-variant-numeric:tabular-nums}
   .now__bar{height:6px;margin-top:12px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
-  .now__bar i{display:block;height:100%;border-radius:999px;background:var(--cons)}
+  .now__bar i{display:block;height:100%;border-radius:999px;background:var(--mtint);transition:background .5s ease-out}
+  body.is-void .now__bar i{background:var(--act)}
   .now__pace{margin-top:11px;font-size:13px;line-height:1.5;color:var(--mid)}
 
   /* current: ticket */
@@ -504,11 +531,15 @@
 </style>
 </head><body>
 
+<div class="room" aria-hidden="true"></div>
 <div class="screen">
   <div class="hero"><div class="cage" id="cage"></div>
     <p class="hero__name">Your Memento</p>
     <p class="hero__sub"><span class="mori">20967:16:41:52</span></p>
   </div>
+
+  <div class="mats" id="mats" aria-label="Your Memento's material tints the whole page"></div>
+  <p class="mats__note">The page wears your Memento. Pick a material and every section takes its light.</p>
 
   <!-- 2. EVERYTHING, the totality, first by Malik's call -->
   <section class="sec" id="sec-all">
@@ -800,10 +831,30 @@ function matVars(m, earned){
 </script>
 <script>
 
-/* the real card, one of them */
-document.getElementById('cage').className='cage is-stock';
-document.getElementById('cage').innerHTML=realCard(matVars(MATS[0],{clar:true,act:true,cons:true}),{name:'Malik Peace'});
+/* the real card, one of them, wearing whichever material is picked */
 document.body.classList.add('ns-bloom');
+var matsHost=document.getElementById('mats');
+MATS.forEach(function(m,i){
+  var b=document.createElement('button');
+  b.type='button'; b.title=m.n; b.setAttribute('aria-label',m.n);
+  b.style.setProperty('--sw', m.n==='Void' ? '#000' : m.tint);
+  if(m.n==='Void') b.className='mats__void';
+  b.addEventListener('click',function(){ pick(i); });
+  matsHost.appendChild(b);
+});
+function pick(i){
+  var m=MATS[i];
+  var cage=document.getElementById('cage');
+  cage.className='cage '+(m.cls||'')+(m.stock?' is-stock':'');
+  cage.innerHTML=realCard(matVars(m,{clar:true,act:true,cons:true}),{name:'Malik Peace'});
+  document.body.classList.toggle('is-void', m.n==='Void');
+  var tint = m.n==='Void' ? 'rgba(0,0,0,1)' : m.tint;
+  document.documentElement.style.setProperty('--mtint', tint);
+  document.documentElement.style.setProperty('--tint', tint);
+  var chips=matsHost.children;
+  for(var c=0;c<chips.length;c++) chips[c].classList.toggle('is-on', c===i);
+}
+pick(0);
 
 /* outfit switching: the pill shows the CURRENT look, tap cycles */
 document.querySelectorAll('.sec').forEach(function(sec){
