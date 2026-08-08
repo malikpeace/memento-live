@@ -268,8 +268,11 @@
   .rr-code i:nth-child(5n){width:1.5px;opacity:.55}
   .rr-code i:nth-child(7n){width:5px}
   .rr-policy{margin-top:12px;font-size:11px;color:var(--mid);text-align:center}
-  .rr-wm{position:absolute;right:-26px;bottom:-30px;width:150px;height:150px;
-    fill:rgba(255,255,255,.028);pointer-events:none}
+  .rr-tag{position:relative;text-align:left}
+  .rr-digits{margin-top:6px;font-size:12px;letter-spacing:.14em;line-height:1.35;
+    color:var(--lo);font-variant-numeric:tabular-nums}
+  .rr-wm{position:absolute;right:-14px;bottom:26px;width:168px;height:168px;
+    fill:rgba(255,255,255,.038);pointer-events:none}
 
   /* then and now: the card itself, dead against lit */
   .tnc{border-radius:22px;padding:20px 16px 18px;background:#060709;
@@ -700,7 +703,10 @@
             <p class="rr-foot__n">Malik Peace</p>
             <p class="rr-foot__s">1 of 1. Three promises, 300 days, still here.</p>
           </div>
-          <div class="rr-code" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="rr-tag" aria-hidden="true">
+            <div class="rr-code"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <p class="rr-digits">0300 /<br>0231</p>
+          </div>
         </div>
         <p class="rr-policy">No refunds on skipped days. This slip prints again tomorrow.</p>
         <svg class="rr-wm" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
@@ -771,7 +777,7 @@
 
   <!-- MORI -->
   <section class="sec" id="sec-weeks">
-    <div class="sec__hd"><span class="sec__t">Your life, in weeks</span><span class="sec__ctl"><button class="sw" type="button" data-sw></button><button class="sh" type="button" data-sh aria-label="Share this section"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M8 7l4-4 4 4"/><path d="M4 13v6h16v-6"/></svg></button></span></div>
+    <div class="sec__hd"><span class="sec__t">Memento mori</span><span class="sec__ctl"><button class="sw" type="button" data-sw></button><button class="sh" type="button" data-sh aria-label="Share this section"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M8 7l4-4 4 4"/><path d="M4 13v6h16v-6"/></svg></button></span></div>
     <div class="out is-on shot" data-out="The weeks">
       <div class="wks">
         <p class="wks__mori"><b>20,967</b> days left, give or take. 300 of them went to the path.</p>
@@ -790,14 +796,14 @@
 
   <!-- VIVERE -->
   <section class="sec" id="sec-words">
-    <div class="sec__hd"><span class="sec__t">In your words</span><span class="sec__ctl"><button class="sw" type="button" data-sw></button><button class="sh" type="button" data-sh aria-label="Share this section"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M8 7l4-4 4 4"/><path d="M4 13v6h16v-6"/></svg></button></span></div>
-    <div class="out is-on shot" data-out="The vow">
+    <div class="sec__hd"><span class="sec__t">Memento vivere</span><span class="sec__ctl"><button class="sw" type="button" data-sw></button><button class="sh" type="button" data-sh aria-label="Share this section"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M8 7l4-4 4 4"/><path d="M4 13v6h16v-6"/></svg></button></span></div>
+    <div class="out shot" data-out="The vow">
       <div class="wrd">
         <p class="wrd__q">&ldquo;Because I am done building things nobody pays for.&rdquo;</p>
         <p class="wrd__m">Written February 3. Kept 186 days.</p>
       </div>
     </div>
-    <div class="out shot" data-out="The picture">
+    <div class="out is-on shot" data-out="The picture">
       <div class="wrd">
         <p class="wrd__lead">You said this is what it looks like when it works:</p>
         <p class="wrd__q wrd__pic" id="picQuote">I run the thing I built. The work is hard and it is mine. My people can point at something real and say he made that.</p>
@@ -964,7 +970,7 @@ function unlite(){
   cage.className='cage '+(m.cls||'')+(m.stock?' is-stock':'');
   cage.innerHTML=realCard(matVars(m,{clar:false,act:false,cons:false}),{name:'Malik Peace'});
 }
-var T0={'sec-all':'Everything, from today','sec-now':'The open chapter','sec-days':'The days you show up','sec-then':'Then and now','sec-weeks':'Your life, in weeks','sec-words':'In your words','sec-month':'This month'};
+var T0={'sec-all':'Everything, from today','sec-now':'The open chapter','sec-days':'The days you show up','sec-then':'Then and now','sec-weeks':'Memento mori','sec-words':'Memento vivere','sec-month':'This month'};
 var T1={};
 document.querySelectorAll('.sec').forEach(function(sec){T1[sec.id]=sec.querySelector('.sec__t').textContent;});
 d0btn.addEventListener('click',function(){
@@ -996,7 +1002,8 @@ document.querySelectorAll('.sec').forEach(function(sec){
   var outs=[].slice.call(sec.querySelectorAll('.out'));
   var sw=sec.querySelector('[data-sw]');
   if(outs.length<2){ if(sw){sw.textContent=outs[0].dataset.out; sw.classList.add('solo');} return; }
-  var i=0; sw.textContent=outs[0].dataset.out;
+  var i=Math.max(0, outs.findIndex(function(o){return o.classList.contains('is-on');}));
+  sw.textContent=outs[i].dataset.out;
   sw.addEventListener('click',function(){
     outs[i].classList.remove('is-on');
     i=(i+1)%outs.length;
