@@ -2957,6 +2957,238 @@
 .month .mth-best p{color:var(--hi)}
 .month .mth-now i::after{background:rgba(58,217,245,.8)}
 .month .mth-read{margin-top:16px;font-size:14.5px;line-height:1.55;color:var(--mid)}
+
+/* ---- bill ---- */
+.bill{padding:0 0 28px;display:flex;flex-direction:column;align-items:center}
+.bill *{box-sizing:border-box}
+.bill p{margin:0}
+.bill .bil-slip{width:min(300px,100%);filter:drop-shadow(0 18px 40px rgba(0,0,0,.55))}
+.bill .bil-tear{height:12px;background:#0d0e13;
+  clip-path:polygon(0 100%,4% 0,8% 100%,12% 0,16% 100%,20% 0,24% 100%,28% 0,32% 100%,36% 0,40% 100%,44% 0,48% 100%,52% 0,56% 100%,60% 0,64% 100%,68% 0,72% 100%,76% 0,80% 100%,84% 0,88% 100%,92% 0,96% 100%,100% 0,100% 100%)}
+.bill .bil-tear-b{transform:scaleY(-1)}
+.bill .bil-in{background:#0d0e13;padding:20px 20px 16px;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+.bill .bil-head{text-align:center}
+.bill .bil-head svg{width:22px;height:22px;fill:var(--act);opacity:.9}
+.bill .bil-store{margin-top:4px;font-size:17px;font-weight:740;letter-spacing:-.015em;color:var(--hi)}
+.bill .bil-meta{margin-top:3px;font-size:11.5px;color:var(--mid)}
+.bill .bil-items{margin-top:18px;padding-top:12px;box-shadow:inset 0 1.5px 0 rgba(255,255,255,.14)}
+.bill .bil-r{display:flex;align-items:baseline;gap:7px;padding:4.5px 0;font-size:13.5px}
+.bill .bil-r span{color:var(--mid);white-space:nowrap}
+.bill .bil-r i{flex:1;height:1px;background-image:radial-gradient(circle, rgba(255,255,255,.3) 1px, transparent 1.2px);
+  background-size:6px 2px;background-repeat:repeat-x;background-position:bottom}
+.bill .bil-r b{font-weight:650;color:var(--hi);font-variant-numeric:tabular-nums}
+.bill .bil-sub{padding-left:16px;font-size:12.5px}
+.bill .bil-sub b{color:var(--mid);font-weight:550}
+.bill .bil-mark span{color:var(--hi)}
+.bill .bil-mark b{color:var(--cons)}
+.bill .bil-total{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-top:14px;
+  padding-top:12px;box-shadow:inset 0 1.5px 0 rgba(255,255,255,.14)}
+.bill .bil-total span{font-size:13.5px;font-weight:700;color:var(--hi)}
+.bill .bil-total b{font-size:30px;font-weight:800;letter-spacing:-.035em;color:var(--hi);font-variant-numeric:tabular-nums}
+.bill .bil-policy{margin-top:10px;font-size:11.5px;color:var(--mid);text-align:center}
+.bill .bil-code{display:flex;justify-content:center;gap:2.5px;height:30px;margin-top:16px}
+.bill .bil-code i{width:2px;background:rgba(238,242,251,.75)}
+.bill .bil-code i:nth-child(3n){width:4px}
+.bill .bil-code i:nth-child(5n){width:1.5px;opacity:.55}
+.bill .bil-code i:nth-child(7n){width:5px}
+.bill .bil-serial{margin-top:8px;font-size:10.5px;color:var(--lo);text-align:center}
+.bill .bil-read{margin-top:18px;font-size:14.5px;line-height:1.55;color:var(--mid);max-width:320px;text-align:center}
+
+/* ---- weeks ---- */
+.weeks{padding:0 0 28px}
+.weeks *{box-sizing:border-box}
+.weeks p{margin:0}
+.weeks .wks-card{border-radius:22px;padding:18px 18px 16px;background:#060709;
+  box-shadow:var(--inset), 0 22px 54px rgba(0,0,0,.6)}
+.weeks .wks-top{display:flex;align-items:center;justify-content:space-between}
+.weeks .wks-brand{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--mid)}
+.weeks .wks-brand svg{width:18px;height:18px;fill:var(--act)}
+.weeks .wks-count{font-size:12px;color:var(--mid);font-variant-numeric:tabular-nums}
+.weeks .wks-h{margin-top:14px;font-size:18px;font-weight:700;letter-spacing:-.02em;color:var(--hi)}
+.weeks #weeks-grid{display:block;width:100%;max-width:312px;height:auto;margin:16px auto 0}
+.weeks .wks-key{display:flex;flex-wrap:wrap;gap:6px 13px;justify-content:center;margin-top:14px;font-size:11px;color:var(--lo)}
+.weeks .wks-key span{display:inline-flex;align-items:center;gap:5px}
+.weeks .wks-key i{width:8px;height:8px;border-radius:2px}
+.weeks .wks-k1{background:rgba(255,255,255,.34)}
+.weeks .wks-k2{background:var(--cons)}
+.weeks .wks-k3{background:rgba(255,255,255,.08)}
+.weeks .wks-k4{background:transparent;box-shadow:inset 0 0 0 1.5px #fff}
+.weeks .wks-cap{margin-top:14px;font-size:13.5px;line-height:1.5;color:var(--mid);text-align:center}
+.weeks .wks-read{margin-top:16px;font-size:14.5px;line-height:1.55;color:var(--mid)}
+
+/* ---- refusal ---- */
+.refusal{padding:0 0 28px}
+.refusal *{box-sizing:border-box}
+.refusal p{margin:0}
+.refusal .ref-card{border-radius:22px;padding:20px 20px 20px;background:#050607;
+  box-shadow:var(--inset), 0 22px 54px rgba(0,0,0,.65)}
+.refusal .ref-top{display:flex;align-items:center;justify-content:space-between}
+.refusal .ref-brand{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--mid)}
+.refusal .ref-brand svg{width:18px;height:18px;fill:var(--act)}
+.refusal .ref-when{font-size:12px;color:var(--mid)}
+.refusal .ref-lead{margin-top:26px;font-size:13.5px;font-weight:640;color:var(--mid)}
+.refusal .ref-quote{margin-top:10px;font-size:23px;font-weight:720;letter-spacing:-.025em;line-height:1.3;color:var(--hi)}
+.refusal .ref-count{display:flex;align-items:baseline;gap:10px;margin-top:30px}
+.refusal .ref-count b{font-size:52px;font-weight:800;letter-spacing:-.045em;line-height:.9;color:var(--hi);
+  font-variant-numeric:tabular-nums}
+.refusal .ref-count span{font-size:14px;font-weight:620;color:var(--cons);max-width:16ch;line-height:1.3}
+.refusal .ref-path{position:relative;height:12px;margin-top:24px}
+.refusal .ref-path .ref-dark{position:absolute;left:0;top:0;bottom:0;width:26px;border-radius:4px;
+  background:rgba(255,255,255,.10)}
+.refusal .ref-path em{position:absolute;left:34px;right:26px;top:50%;height:2px;border-radius:2px;
+  background:linear-gradient(90deg, rgba(255,255,255,.12), rgba(63,217,78,.7))}
+.refusal .ref-path .ref-you{position:absolute;right:0;top:0;width:12px;height:12px;border-radius:50%;
+  background:var(--cons);box-shadow:0 0 14px rgba(63,217,78,.7)}
+.refusal .ref-block{margin-top:14px;border-radius:16px;padding:15px 16px;background:var(--fill);box-shadow:var(--inset)}
+.refusal .ref-body{font-size:14px;line-height:1.6;color:var(--mid)}
+.refusal .ref-quiet{margin-top:16px;font-size:13.5px;color:var(--mid);text-align:center}
+
+/* ---- trade ---- */
+.trade{padding:0 0 28px}
+.trade *{box-sizing:border-box}
+.trade p{margin:0}
+.trade .trd-card{border-radius:22px;padding:20px 20px 18px;background:#07080c;
+  box-shadow:var(--inset), 0 22px 54px rgba(0,0,0,.55)}
+.trade .trd-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.trade .trd-brand{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--mid)}
+.trade .trd-brand svg{width:18px;height:18px;fill:var(--act)}
+.trade .trd-goal{font-size:12px;color:var(--mid);text-align:right}
+.trade .trd-gone{margin-top:22px}
+.trade .trd-gone b{display:block;font-size:44px;font-weight:800;letter-spacing:-.04em;color:var(--hi);
+  font-variant-numeric:tabular-nums}
+.trade .trd-gone span{display:block;margin-top:4px;font-size:13.5px;color:var(--mid)}
+.trade .trd-arrow{display:flex;align-items:center;gap:10px;margin:20px 0}
+.trade .trd-arrow i{flex:1;height:1.5px;border-radius:2px;background:rgba(255,255,255,.14)}
+.trade .trd-arrow em{font-style:normal;font-size:11.5px;font-weight:640;color:var(--mid)}
+.trade .trd-bought{border-radius:14px;padding:6px 14px;background:rgba(63,217,78,.06);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.trade .trd-b{display:flex;gap:11px;align-items:flex-start;padding:9px 0}
+.trade .trd-b i{flex:0 0 8px;height:8px;margin-top:6px;border-radius:50%;background:var(--cons)}
+.trade .trd-b p{font-size:15px;font-weight:620;line-height:1.4;letter-spacing:-.012em;color:var(--hi)}
+.trade .trd-line{margin-top:18px;font-size:14px;font-weight:640;color:var(--hi);text-align:center}
+.trade .trd-read{margin-top:16px;font-size:14.5px;line-height:1.55;color:var(--mid)}
+
+/* ---- oneday ---- */
+.oneday{padding:0 0 28px}
+.oneday *{box-sizing:border-box}
+.oneday p{margin:0}
+.oneday .ody-card{border-radius:22px;padding:20px 20px 16px;
+  background:radial-gradient(120% 60% at 50% 0%, rgba(63,217,78,.09), transparent 60%), #07080c;
+  box-shadow:var(--inset), 0 22px 54px rgba(0,0,0,.55)}
+.oneday .ody-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.oneday .ody-brand{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--mid)}
+.oneday .ody-brand svg{width:18px;height:18px;fill:var(--cons)}
+.oneday .ody-tag{font-size:12px;color:var(--mid);text-align:right}
+.oneday .ody-date{margin-top:24px;font-size:46px;font-weight:800;letter-spacing:-.04em;line-height:.95;color:var(--hi)}
+.oneday .ody-sub{margin-top:8px;font-size:16px;font-weight:620;color:var(--mid)}
+.oneday .ody-bought{margin-top:22px;border-radius:14px;padding:12px 15px;background:rgba(255,255,255,.045);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.oneday .ody-h{font-size:13px;font-weight:700;color:var(--hi)}
+.oneday .ody-i{display:flex;gap:10px;align-items:flex-start;padding:7px 0 0}
+.oneday .ody-i i{flex:0 0 7px;height:7px;margin-top:6px;border-radius:50%;background:var(--cons)}
+.oneday .ody-i p{font-size:14.5px;font-weight:600;line-height:1.4;color:var(--hi)}
+.oneday .ody-foot{display:flex;justify-content:space-between;margin-top:20px;padding-top:12px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08);font-size:12.5px;color:var(--mid);
+  font-variant-numeric:tabular-nums}
+.oneday .ody-read{margin-top:16px;font-size:14.5px;line-height:1.55;color:var(--mid)}
+
+/* ---- thennow ---- */
+.thennow{padding:0 0 28px}
+.thennow *{box-sizing:border-box}
+.thennow p{margin:0}
+.thennow .tnw-card{border-radius:22px;padding:18px 18px 18px;background:#07080c;
+  box-shadow:var(--inset), 0 22px 54px rgba(0,0,0,.55)}
+.thennow .tnw-top{display:flex;align-items:center;justify-content:space-between}
+.thennow .tnw-brand{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--mid)}
+.thennow .tnw-brand svg{width:18px;height:18px;fill:var(--act)}
+.thennow .tnw-range{font-size:12px;color:var(--mid);font-variant-numeric:tabular-nums}
+.thennow .tnw-cols{display:flex;gap:1px;margin-top:18px;border-radius:16px;overflow:hidden;
+  background:rgba(255,255,255,.08)}
+.thennow .tnw-col{flex:1;padding:15px 13px 16px}
+.thennow .tnw-then{background:#0a0b0f}
+.thennow .tnw-now{background:linear-gradient(180deg, rgba(63,217,78,.10), rgba(63,217,78,.03)), #0a0b0f}
+.thennow .tnw-when{font-size:12px;font-weight:720;color:var(--mid)}
+.thennow .tnw-now .tnw-when{color:var(--cons)}
+.thennow .tnw-fact{margin-top:11px;font-size:14px;font-weight:600;line-height:1.4;letter-spacing:-.012em;color:var(--hi)}
+.thennow .tnw-then .tnw-fact{color:var(--mid);font-weight:560}
+.thennow .tnw-line{margin-top:16px;font-size:14px;font-weight:650;color:var(--hi);text-align:center}
+.thennow .tnw-block{margin-top:14px;border-radius:16px;padding:15px 16px;background:var(--fill);box-shadow:var(--inset)}
+.thennow .tnw-body{font-size:14px;line-height:1.6;color:var(--mid)}
+
+/* ---- picture ---- */
+.picture{padding:0 0 28px}
+.picture *{box-sizing:border-box}
+.picture p{margin:0}
+.picture .pic-card{border-radius:22px;padding:20px 20px 20px;background:#050608;
+  box-shadow:var(--inset), 0 22px 54px rgba(0,0,0,.6)}
+.picture .pic-top{display:flex;align-items:center;justify-content:space-between}
+.picture .pic-brand{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--mid)}
+.picture .pic-brand svg{width:18px;height:18px;fill:var(--act)}
+.picture .pic-when{font-size:12px;color:var(--mid)}
+.picture .pic-lead{margin-top:26px;font-size:13.5px;font-weight:640;color:var(--mid)}
+.picture .pic-quote{margin-top:12px;font-size:24px;font-weight:720;letter-spacing:-.025em;line-height:1.32;color:var(--hi)}
+.picture .pic-quote .pic-w{opacity:.18;transition:opacity .7s ease,text-shadow .7s ease}
+.picture .pic-quote .pic-w.pic-lit{opacity:1;text-shadow:0 0 24px rgba(238,242,251,.35)}
+.picture .pic-closer{margin-top:26px;font-size:14px;font-weight:640;color:var(--cons)}
+.picture .pic-block{margin-top:14px;border-radius:16px;padding:15px 16px;background:var(--fill);box-shadow:var(--inset)}
+.picture .pic-body{font-size:14px;line-height:1.6;color:var(--mid)}
+
+/* ---- lights ---- */
+.lights{padding:0 0 28px}
+.lights *{box-sizing:border-box}
+.lights p{margin:0}
+.lights .lgt-card{border-radius:22px;padding:18px 18px 18px;background:#040507;
+  box-shadow:var(--inset), 0 22px 54px rgba(0,0,0,.65)}
+.lights .lgt-top{display:flex;align-items:center;justify-content:space-between}
+.lights .lgt-brand{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--mid)}
+.lights .lgt-brand svg{width:18px;height:18px;fill:var(--act)}
+.lights .lgt-tag{font-size:12px;color:var(--mid)}
+.lights #lights-field{display:block;width:100%;height:auto;margin-top:14px}
+.lights .lgt-line{margin-top:14px;font-size:15px;line-height:1.45;color:var(--mid)}
+.lights .lgt-line b{color:var(--hi);font-weight:700}
+.lights .lgt-sub{margin-top:5px;font-size:13px;color:var(--mid)}
+.lights .lgt-read{margin-top:16px;font-size:14.5px;line-height:1.55;color:var(--mid)}
+
+/* ---- letter ---- */
+.letter{padding:0 0 28px}
+.letter *{box-sizing:border-box}
+.letter p{margin:0}
+.letter .ltr-card{border-radius:22px;padding:22px 22px 22px;background:#08090d;
+  box-shadow:var(--inset), 0 22px 54px rgba(0,0,0,.55)}
+.letter .ltr-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.letter .ltr-brand{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--mid)}
+.letter .ltr-brand svg{width:18px;height:18px;fill:var(--act)}
+.letter .ltr-tag{font-size:12px;color:var(--mid)}
+.letter .ltr-open{margin-top:24px;font-size:15px;font-weight:680;color:var(--hi)}
+.letter .ltr-body{margin-top:14px;font-size:15px;line-height:1.62;letter-spacing:-.008em;color:var(--hi)}
+.letter .ltr-sign{margin-top:22px;font-size:14px;line-height:1.5;font-weight:640;color:var(--mid)}
+.letter .ltr-read{margin-top:16px;font-size:14.5px;line-height:1.55;color:var(--mid)}
+
+/* ---- becoming ---- */
+.becoming{padding:0 0 28px}
+.becoming *{box-sizing:border-box}
+.becoming p{margin:0}
+.becoming .bcm-card{border-radius:22px;padding:20px 20px 18px;
+  background:radial-gradient(120% 60% at 50% 0%, rgba(58,217,245,.08), transparent 62%), #07080c;
+  box-shadow:var(--inset), 0 22px 54px rgba(0,0,0,.55)}
+.becoming .bcm-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.becoming .bcm-brand{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--mid)}
+.becoming .bcm-brand svg{width:18px;height:18px;fill:var(--clar)}
+.becoming .bcm-tag{font-size:12px;color:var(--mid)}
+.becoming .bcm-h{margin-top:18px;font-size:19px;font-weight:720;letter-spacing:-.022em;color:var(--hi)}
+.becoming .bcm-road{margin-top:16px}
+.becoming .bcm-m{position:relative;display:flex;gap:12px;align-items:flex-start;padding:12px 0}
+.becoming .bcm-m:not(:last-child)::after{content:"";position:absolute;left:57px;top:32px;bottom:-9px;width:1.5px;
+  background:rgba(255,255,255,.12)}
+.becoming .bcm-d{flex:0 0 46px;font-size:12px;font-weight:640;color:var(--mid);font-variant-numeric:tabular-nums;
+  padding-top:2px;text-align:right}
+.becoming .bcm-m i{flex:0 0 11px;height:11px;margin-top:4px;border-radius:50%;
+  background:transparent;box-shadow:inset 0 0 0 1.5px rgba(58,217,245,.8)}
+.becoming .bcm-done i{background:var(--cons);box-shadow:0 0 12px rgba(63,217,78,.5)}
+.becoming .bcm-m p{font-size:15px;font-weight:620;line-height:1.4;letter-spacing:-.012em;color:var(--hi)}
+.becoming .bcm-done p{color:var(--mid);font-weight:580}
+.becoming .bcm-cav{margin-top:14px;font-size:12.5px;line-height:1.5;color:var(--mid)}
+.becoming .bcm-read{margin-top:16px;font-size:14.5px;line-height:1.55;color:var(--mid)}
 </style>
 <style id="crashguard">
   /* iOS Safari compositing guard. Sections outside the viewport are not
@@ -3021,7 +3253,7 @@ document.addEventListener('DOMContentLoaded',function(){
     <button id="jump" class="jumpbtn" type="button">Scroll all frames past the card</button>
     <button id="marks" class="jumpbtn" type="button">Show the share block in each</button>
   </div>
-  <nav class="nav"><a href="#p-poster">The Poster</a><a href="#p-receipt">The Receipt</a><a href="#p-rings">The Rings</a><a href="#p-wall">The Wall</a><a href="#p-relic">The Relic</a><a href="#p-route">The Route</a><a href="#p-record">The Record</a><a href="#p-ticket">The Ticket</a><a href="#p-constellation">The Constellation</a><a href="#p-cover">The Cover</a><a href="#p-vow">The Vow</a><a href="#p-marks">The Tally</a><a href="#p-dash">The Dash</a><a href="#p-comeback">The Comeback</a><a href="#p-shelf">The Shelf</a><a href="#p-firsts">The Firsts</a><a href="#p-orbit">The Orbit</a><a href="#p-run">The Run</a><a href="#p-count">The Count</a><a href="#p-month">The Month</a></nav>
+  <nav class="nav"><a href="#p-poster">The Poster</a><a href="#p-receipt">The Receipt</a><a href="#p-rings">The Rings</a><a href="#p-wall">The Wall</a><a href="#p-relic">The Relic</a><a href="#p-route">The Route</a><a href="#p-record">The Record</a><a href="#p-ticket">The Ticket</a><a href="#p-constellation">The Constellation</a><a href="#p-cover">The Cover</a><a href="#p-vow">The Vow</a><a href="#p-marks">The Tally</a><a href="#p-dash">The Dash</a><a href="#p-comeback">The Comeback</a><a href="#p-shelf">The Shelf</a><a href="#p-firsts">The Firsts</a><a href="#p-orbit">The Orbit</a><a href="#p-run">The Run</a><a href="#p-count">The Count</a><a href="#p-month">The Month</a><a href="#p-bill">The Bill</a><a href="#p-weeks">The Weeks</a><a href="#p-refusal">The Refusal</a><a href="#p-trade">The Trade</a><a href="#p-oneday">The Day</a><a href="#p-thennow">Then and Now</a><a href="#p-picture">The Picture</a><a href="#p-lights">The Lights</a><a href="#p-letter">The Letter</a><a href="#p-becoming">The Becoming</a></nav>
   <div class="row">
   <section class="pg" id="p-poster">
     <header class="pg__hd"><h2>The Poster</h2>
@@ -4915,6 +5147,419 @@ document.addEventListener('DOMContentLoaded',function(){
 </div></div>
       </div>
     </div></div>
+  </section>
+  <div class="divide" id="morivivere">
+    <h2>Mori and Vivere</h2>
+    <p>The two poles of the app, five designs each. <b>Mori first</b>: the Bill, the Weeks,
+      the Refusal, the Trade, the Day, all about finite time and where you come from.
+      <b>Then Vivere</b>: Then and Now, the Picture, the Lights, the Letter, the Becoming,
+      all evidence that you became something more and reasons to keep going. Every one needs
+      only a birthday, the record of marks, and the person's own words, so they fit everyone.</p>
+  </div>
+  <section class="pg" id="p-bill">
+    <header class="pg__hd"><h2>The Bill</h2>
+      <p class="pg__th">The Receipt form Malik liked, pointed at the one purchase everyone made: a life. Days issued, days spent, days remaining, itemized, with no refunds. Needs nothing but a birthday, so it works for every human who has one.</p>
+      <dl class="pg__meta">
+        <dt>Best for</dt><dd>Everyone. This is the universal version of the receipt: the goal column is gone and the merchandise is time itself.</dd>
+        <dt>The share</dt><dd>The whole slip. Dark, funny for two seconds, then not funny at all, which is the exact register people repost.</dd>
+        <dt>On day 900</dt><dd>One line moves per day, forever. The bill on day 900 is the same bill with a bigger spent figure, which is exactly how bills work.</dd>
+      </dl></header>
+    <div class="phone"><div class="phone__in">
+      <div class="screen">
+        <header class="bar"><button class="bar__back" type="button" aria-label="Back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+            stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button><span class="bar__title">Your Memento</span></header>
+        <div class="hero"><div class="cage"></div>
+          <p class="hero__name">Your Memento</p>
+          <p class="hero__sub"><span class="mori">20967:16:41:52</span></p>
+        </div>
+        <div class="body"><div class="bill">
+  <div class="bil-slip shot">
+    <div class="bil-tear" aria-hidden="true"></div>
+    <div class="bil-in">
+      <div class="bil-head">
+        <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+        <p class="bil-store">Memento</p>
+        <p class="bil-meta">One customer. One account. Opened at birth.</p>
+      </div>
+      <div class="bil-items">
+        <div class="bil-r"><span>Days issued, estimate</span><i></i><b>29,221</b></div>
+        <div class="bil-r"><span>Days spent</span><i></i><b>8,254</b></div>
+        <div class="bil-r bil-sub"><span>spent asleep</span><i></i><b>2,751</b></div>
+        <div class="bil-r bil-sub"><span>spent before you could choose</span><i></i><b>2,190</b></div>
+        <div class="bil-r bil-sub"><span>spent on the thing you chose</span><i></i><b>186</b></div>
+        <div class="bil-r bil-mark"><span>days that earned a mark</span><i></i><b>141</b></div>
+      </div>
+      <div class="bil-total">
+        <span>Remaining, yours to spend</span>
+        <b>20,967</b>
+      </div>
+      <p class="bil-policy">No refunds. No exchanges. Balance falls daily.</p>
+      <div class="bil-code" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <p class="bil-serial">Account holder since day one</p>
+    </div>
+    <div class="bil-tear bil-tear-b" aria-hidden="true"></div>
+  </div>
+  <p class="bil-read">The estimate at the top is generous and the spent line is exact. The only line you have any say over is the one with the marks on it.</p>
+</div></div>
+      </div>
+    </div></div>
+  </section>
+  <section class="pg" id="p-weeks">
+    <header class="pg__hd"><h2>The Weeks</h2>
+      <p class="pg__th">The life-in-weeks grid from the Deeper Room, made a permanent object instead of a one-time ceremony. Every week of an 80 year life is a cell; the spent ones are dark, and the 27 green ones are the weeks that went to the thing. Your effort drawn inside your mortality.</p>
+      <dl class="pg__meta">
+        <dt>Best for</dt><dd>Everyone with a birthday. The single most honest chart that exists, and the app already owns it.</dd>
+        <dt>The share</dt><dd>The full grid with the ringed current week, instantly recognisable as a life and unmistakably yours.</dd>
+        <dt>On day 900</dt><dd>The grid never changes size. The dark edge advances one cell a week and the green territory grows behind it, which is the entire philosophy in one picture.</dd>
+      </dl></header>
+    <div class="phone"><div class="phone__in">
+      <div class="screen">
+        <header class="bar"><button class="bar__back" type="button" aria-label="Back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+            stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button><span class="bar__title">Your Memento</span></header>
+        <div class="hero"><div class="cage"></div>
+          <p class="hero__name">Your Memento</p>
+          <p class="hero__sub"><span class="mori">20967:16:41:52</span></p>
+        </div>
+        <div class="body"><div class="weeks">
+  <div class="wks-card shot">
+    <div class="wks-top">
+      <span class="wks-brand"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>Memento</span>
+      <span class="wks-count">Week 1,179 of 4,175</span>
+    </div>
+    <p class="wks-h">Your life, in weeks.</p>
+    <canvas id="weeks-grid" width="312" height="486" aria-label="an 80 year life as a grid of weeks"></canvas>
+    <div class="wks-key">
+      <span><i class="wks-k1"></i>spent</span>
+      <span><i class="wks-k2"></i>spent on the thing</span>
+      <span><i class="wks-k3"></i>still yours</span>
+      <span><i class="wks-k4"></i>this week</span>
+    </div>
+    <p class="wks-cap">The filled ones are spent. The green ones are the 27 you gave to the thing that matters.</p>
+  </div>
+  <p class="wks-read">2,996 cells are still open. Nobody is promised all of them, which is the reason the green ones exist at all.</p>
+</div></div>
+      </div>
+    </div></div>
+  </section>
+  <section class="pg" id="p-refusal">
+    <header class="pg__hd"><h2>The Refusal</h2>
+      <p class="pg__th">The anti-vision they wrote on day one, held up as the thing every mark walks away from. This is the reminder of where you come from: the life you refused, in your own words, with the count of days spent moving in the other direction.</p>
+      <dl class="pg__meta">
+        <dt>Best for</dt><dd>Anyone who wrote an anti-vision, which the app asks of everyone. Strongest for people whose fuel is escape rather than ambition.</dd>
+        <dt>The share</dt><dd>The refusal itself with the day count, which posts like a scar shown on purpose.</dd>
+        <dt>On day 900</dt><dd>The quote never changes and the day count under it never stops rising, so the distance between the two becomes the whole story.</dd>
+      </dl></header>
+    <div class="phone"><div class="phone__in">
+      <div class="screen">
+        <header class="bar"><button class="bar__back" type="button" aria-label="Back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+            stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button><span class="bar__title">Your Memento</span></header>
+        <div class="hero"><div class="cage"></div>
+          <p class="hero__name">Your Memento</p>
+          <p class="hero__sub"><span class="mori">20967:16:41:52</span></p>
+        </div>
+        <div class="body"><div class="refusal">
+  <div class="ref-card shot">
+    <div class="ref-top">
+      <span class="ref-brand"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>Memento</span>
+      <span class="ref-when">Written on day one</span>
+    </div>
+    <p class="ref-lead">The life you refused:</p>
+    <p class="ref-quote">&ldquo;Waking up at 30 in the same room, telling the same story about what I was going to do.&rdquo;</p>
+    <div class="ref-count">
+      <b>186</b>
+      <span>days of walking the other direction</span>
+    </div>
+    <div class="ref-path" aria-hidden="true">
+      <i class="ref-dark"></i>
+      <em></em>
+      <i class="ref-you"></i>
+    </div>
+  </div>
+  <div class="ref-block">
+    <p class="ref-body">Every mark in the record is a step away from this paragraph. Some days the goal was not enough to get you up, and this was. That is what it is for.</p>
+  </div>
+  <p class="ref-quiet">It stays written. You do not have to go back and read it. You will anyway.</p>
+</div></div>
+      </div>
+    </div></div>
+  </section>
+  <section class="pg" id="p-trade">
+    <header class="pg__hd"><h2>The Trade</h2>
+      <p class="pg__th">The days are gone either way, so the only question is what they were exchanged for. One side of the ledger is 186 days that will never come back; the other side is what they bought. This is the clearest possible evidence of becoming something more.</p>
+      <dl class="pg__meta">
+        <dt>Best for</dt><dd>Anyone who needs progress made visible without a percentage: craft, skills, care work, anything whose gains are real but unnumbered.</dd>
+        <dt>The share</dt><dd>The exchange itself: gone forever on the left, what it bought on the right, which posts as the most honest flex there is.</dd>
+        <dt>On day 900</dt><dd>The spent side grows on its own and the bought side grows only when you do, so on day 900 the ledger is either a brag or an indictment, in your own handwriting either way.</dd>
+      </dl></header>
+    <div class="phone"><div class="phone__in">
+      <div class="screen">
+        <header class="bar"><button class="bar__back" type="button" aria-label="Back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+            stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button><span class="bar__title">Your Memento</span></header>
+        <div class="hero"><div class="cage"></div>
+          <p class="hero__name">Your Memento</p>
+          <p class="hero__sub"><span class="mori">20967:16:41:52</span></p>
+        </div>
+        <div class="body"><div class="trade">
+  <div class="trd-card shot">
+    <div class="trd-top">
+      <span class="trd-brand"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>Memento</span>
+      <span class="trd-goal">Play Clair de Lune from memory</span>
+    </div>
+    <div class="trd-gone">
+      <b>186 days</b>
+      <span>gone forever, as of this morning</span>
+    </div>
+    <div class="trd-arrow" aria-hidden="true"><i></i><em>traded for</em><i></i></div>
+    <div class="trd-bought">
+      <div class="trd-b"><i></i><p>Four of six sections, by heart</p></div>
+      <div class="trd-b"><i></i><p>A 23 day run you did not break</p></div>
+      <div class="trd-b"><i></i><p>Hands that know the opening cold</p></div>
+      <div class="trd-b"><i></i><p>141 evenings that ended at the piano instead of the phone</p></div>
+    </div>
+    <p class="trd-line">The days were spending themselves either way.</p>
+  </div>
+  <p class="trd-read">Nothing on the right side existed in February. Everything on the left side was leaving whether you sat down or did not.</p>
+</div></div>
+      </div>
+    </div></div>
+  </section>
+  <section class="pg" id="p-oneday">
+    <header class="pg__hd"><h2>The Day</h2>
+      <p class="pg__th">One single day, treated as what it is: a coin that was spent today and will never exist again. The date is the hero, what it bought is the body, and the running balance sits at the bottom. A mori share that renews every 24 hours.</p>
+      <dl class="pg__meta">
+        <dt>Best for</dt><dd>Everyday promises where the win is small and daily: dinner with the kids, the walk, the pages. The day is the natural unit of the life they are building.</dd>
+        <dt>The share</dt><dd>Today&#x27;s card, datestamped, which gives people a reason to post on an ordinary Tuesday instead of waiting for a milestone.</dd>
+        <dt>On day 900</dt><dd>It never accumulates anything on screen; it is always exactly one day, which means it is as light on day 3,000 as on day 3.</dd>
+      </dl></header>
+    <div class="phone"><div class="phone__in">
+      <div class="screen">
+        <header class="bar"><button class="bar__back" type="button" aria-label="Back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+            stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button><span class="bar__title">Your Memento</span></header>
+        <div class="hero"><div class="cage"></div>
+          <p class="hero__name">Your Memento</p>
+          <p class="hero__sub"><span class="mori">20967:16:41:52</span></p>
+        </div>
+        <div class="body"><div class="oneday">
+  <div class="ody-card shot">
+    <div class="ody-top">
+      <span class="ody-brand"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>Memento</span>
+      <span class="ody-tag">Home for dinner by six</span>
+    </div>
+    <p class="ody-date">August 7.</p>
+    <p class="ody-sub">One of your days, spent.</p>
+    <div class="ody-bought">
+      <p class="ody-h">What it bought</p>
+      <div class="ody-i"><i></i><p>Dinner at six, all four of you</p></div>
+      <div class="ody-i"><i></i><p>Chapter twelve, read aloud, voices included</p></div>
+      <div class="ody-i"><i></i><p>The mark, made before nine</p></div>
+    </div>
+    <div class="ody-foot">
+      <span>8,254 spent</span>
+      <span>20,967, give or take, to go</span>
+    </div>
+  </div>
+  <p class="ody-read">Most days do not get a monument. This is the size a day actually is, and it was enough.</p>
+</div></div>
+      </div>
+    </div></div>
+  </section>
+  <section class="pg" id="p-thennow">
+    <header class="pg__hd"><h2>Then and Now</h2>
+      <p class="pg__th">Two panels, same person. The left is day one in plain words, the right is today, and the marks between them are the only explanation offered. This is the clearest &quot;I became something more&quot; of all thirty designs.</p>
+      <dl class="pg__meta">
+        <dt>Best for</dt><dd>Transformation goals where the before was real and unflattering: fitness, weight, skills, confidence. Anyone whose day one embarrasses them a little.</dd>
+        <dt>The share</dt><dd>The pair. Before and after in words instead of photos, which posts everywhere photos of yourself cannot.</dd>
+        <dt>On day 900</dt><dd>The left panel is frozen forever and only the right panel updates, so the gap between them can only widen.</dd>
+      </dl></header>
+    <div class="phone"><div class="phone__in">
+      <div class="screen">
+        <header class="bar"><button class="bar__back" type="button" aria-label="Back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+            stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button><span class="bar__title">Your Memento</span></header>
+        <div class="hero"><div class="cage"></div>
+          <p class="hero__name">Your Memento</p>
+          <p class="hero__sub"><span class="mori">20967:16:41:52</span></p>
+        </div>
+        <div class="body"><div class="thennow">
+  <div class="tnw-card shot">
+    <div class="tnw-top">
+      <span class="tnw-brand"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>Memento</span>
+      <span class="tnw-range">Feb 3 to Aug 7</span>
+    </div>
+    <div class="tnw-cols">
+      <div class="tnw-col tnw-then">
+        <p class="tnw-when">Day 1</p>
+        <p class="tnw-fact">Winded on the stairs.</p>
+        <p class="tnw-fact">One lap of the park, walking half of it.</p>
+        <p class="tnw-fact">Wrote a goal down and did not believe it.</p>
+      </div>
+      <div class="tnw-col tnw-now">
+        <p class="tnw-when">Day 186</p>
+        <p class="tnw-fact">Ten kilometres before work.</p>
+        <p class="tnw-fact">Resting heart rate down 11.</p>
+        <p class="tnw-fact">Reads the goal like a fact.</p>
+      </div>
+    </div>
+    <p class="tnw-line">Same person. 141 marks between them.</p>
+  </div>
+  <div class="tnw-block">
+    <p class="tnw-body">Nothing on the right happened in a moment. It happened in the 141 small squares of a heatmap nobody else will ever find interesting, which is what makes it yours.</p>
+  </div>
+</div></div>
+      </div>
+    </div></div>
+  </section>
+  <section class="pg" id="p-picture">
+    <header class="pg__hd"><h2>The Picture</h2>
+      <p class="pg__th">The vision they wrote in Clarity, lit up word by word the way the Deeper Room does it on day five. Their own picture of it working, kept where they can see it, with one line saying how much closer it is than when they wrote it.</p>
+      <dl class="pg__meta">
+        <dt>Best for</dt><dd>Anyone who wrote a future vision, which Clarity asks of everyone. The design is their own words, so it fits every goal by construction.</dd>
+        <dt>The share</dt><dd>Their lit vision in quotes, which is the single most personal thing the app could hand them to post.</dd>
+        <dt>On day 900</dt><dd>The words never change and the closer line under them does, so rereading it goes from aspiration to inventory over the years.</dd>
+      </dl></header>
+    <div class="phone"><div class="phone__in">
+      <div class="screen">
+        <header class="bar"><button class="bar__back" type="button" aria-label="Back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+            stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button><span class="bar__title">Your Memento</span></header>
+        <div class="hero"><div class="cage"></div>
+          <p class="hero__name">Your Memento</p>
+          <p class="hero__sub"><span class="mori">20967:16:41:52</span></p>
+        </div>
+        <div class="body"><div class="picture">
+  <div class="pic-card shot">
+    <div class="pic-top">
+      <span class="pic-brand"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>Memento</span>
+      <span class="pic-when">Written February 3</span>
+    </div>
+    <p class="pic-lead">You said this is what it looks like when it works:</p>
+    <p class="pic-quote" id="picture-quote">I run the thing I built. The work is hard and it is mine. My people can point at something real and say he made that.</p>
+    <p class="pic-closer">186 days closer than the day you wrote it.</p>
+  </div>
+  <div class="pic-block">
+    <p class="pic-body">The room read this back to you once, on day five. It lives here now, lit, so the picture is never more than one tap from the work that pays for it.</p>
+  </div>
+</div></div>
+      </div>
+    </div></div>
+  </section>
+  <section class="pg" id="p-lights">
+    <header class="pg__hd"><h2>The Lights</h2>
+      <p class="pg__th">Every day they showed up is a point of light in a dark field, 224 of them, scattered like a night sky that they switched on one evening at a time. Accumulation made beautiful with no chart anywhere.</p>
+      <dl class="pg__meta">
+        <dt>Best for</dt><dd>Rule holders and quiet daily promises, where each day is identical and the only thing that grows is the count of them.</dd>
+        <dt>The share</dt><dd>The lit field with one line under it, which reads as art first and a record second, and posts as both.</dd>
+        <dt>On day 900</dt><dd>The field gets denser forever and never larger, so a five year record becomes a wall of light in the same frame day one used.</dd>
+      </dl></header>
+    <div class="phone"><div class="phone__in">
+      <div class="screen">
+        <header class="bar"><button class="bar__back" type="button" aria-label="Back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+            stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button><span class="bar__title">Your Memento</span></header>
+        <div class="hero"><div class="cage"></div>
+          <p class="hero__name">Your Memento</p>
+          <p class="hero__sub"><span class="mori">20967:16:41:52</span></p>
+        </div>
+        <div class="body"><div class="lights">
+  <div class="lgt-card shot">
+    <div class="lgt-top">
+      <span class="lgt-brand"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>Memento</span>
+      <span class="lgt-tag">No drinking &middot; day 224</span>
+    </div>
+    <svg id="lights-field" viewBox="0 0 312 240" aria-label="224 nights as points of light"></svg>
+    <p class="lgt-line"><b>224 nights,</b> each one a light you switched on by hand.</p>
+    <p class="lgt-sub">The dark is what it looked like before.</p>
+  </div>
+  <p class="lgt-read">No streak number, no chart. Just the accumulated glow of every evening the vow held, getting denser for as long as you keep it.</p>
+</div></div>
+      </div>
+    </div></div>
+  </section>
+  <section class="pg" id="p-letter">
+    <header class="pg__hd"><h2>The Letter</h2>
+      <p class="pg__th">A short letter from today to the person who started, assembled from real record facts: what they could not do, what went wrong, what happened anyway. The strongest possible reminder of where you come from, written by the only witness who was there.</p>
+      <dl class="pg__meta">
+        <dt>Best for</dt><dd>Long goals with a hard early stretch. Anyone who has forgotten how bad day one actually felt, which is everyone eventually.</dd>
+        <dt>The share</dt><dd>A letter to yourself that happens to be checkable against a record, screenshot whole.</dd>
+        <dt>On day 900</dt><dd>The letter rewrites itself at milestones, each version longer in evidence and shorter in reassurance, because it needs less of it.</dd>
+      </dl></header>
+    <div class="phone"><div class="phone__in">
+      <div class="screen">
+        <header class="bar"><button class="bar__back" type="button" aria-label="Back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+            stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button><span class="bar__title">Your Memento</span></header>
+        <div class="hero"><div class="cage"></div>
+          <p class="hero__name">Your Memento</p>
+          <p class="hero__sub"><span class="mori">20967:16:41:52</span></p>
+        </div>
+        <div class="body"><div class="letter">
+  <div class="ltr-card shot">
+    <div class="ltr-top">
+      <span class="ltr-brand"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>Memento</span>
+      <span class="ltr-tag">Write the novel</span>
+    </div>
+    <p class="ltr-open">To the you of February 3,</p>
+    <p class="ltr-body">You typed the first page today and deleted it twice. Keep it. By March there is a chapter. In April you go missing for a week and come back, which turns out to matter more than the chapter.</p>
+    <p class="ltr-body">On May 30 someone reads it and cries at page 40.</p>
+    <p class="ltr-body">You do not believe any of this yet. You do not have to. You only have to show up tomorrow, and from here I can tell you that you did, 141 times.</p>
+    <p class="ltr-sign">From the you of August 7,<br>141 pages later.</p>
+  </div>
+  <p class="ltr-read">Every sentence above is checkable against the record. That is the difference between this and a pep talk.</p>
+</div></div>
+      </div>
+    </div></div>
+  </section>
+  <section class="pg" id="p-becoming">
+    <header class="pg__hd"><h2>The Becoming</h2>
+      <p class="pg__th">The road ahead, dated. Three milestones projected from their real pace, drawn as hollow points on the same line their record has been filling, with the caveat stated plainly. The reminder to keep going, made concrete instead of motivational.</p>
+      <dl class="pg__meta">
+        <dt>Best for</dt><dd>Practices where the future is earned by arithmetic: streaks, accumulations, anniversaries. Anyone who needs tomorrow to have a shape.</dd>
+        <dt>The share</dt><dd>The dated road: what falls in September, what falls by the birthday, each one a promise with a due date.</dd>
+        <dt>On day 900</dt><dd>Milestones convert from hollow to solid as they land, and the passed ones stay on the line, so the road behind grows in the same picture as the road ahead.</dd>
+      </dl></header>
+    <div class="phone"><div class="phone__in">
+      <div class="screen">
+        <header class="bar"><button class="bar__back" type="button" aria-label="Back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+            stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button><span class="bar__title">Your Memento</span></header>
+        <div class="hero"><div class="cage"></div>
+          <p class="hero__name">Your Memento</p>
+          <p class="hero__sub"><span class="mori">20967:16:41:52</span></p>
+        </div>
+        <div class="body"><div class="becoming">
+  <div class="bcm-card shot">
+    <div class="bcm-top">
+      <span class="bcm-brand"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>Memento</span>
+      <span class="bcm-tag">Sit every morning</span>
+    </div>
+    <p class="bcm-h">What falls next, at your pace.</p>
+    <div class="bcm-road">
+      <div class="bcm-m bcm-done"><span class="bcm-d">Jun 24</span><i></i><p>The record: 23 mornings, unbroken</p></div>
+      <div class="bcm-m"><span class="bcm-d">Sep 4</span><i></i><p>The record falls, if the current run holds</p></div>
+      <div class="bcm-m"><span class="bcm-d">Nov 1</span><i></i><p>One hundred mornings this year</p></div>
+      <div class="bcm-m"><span class="bcm-d">Feb 3</span><i></i><p>One year since the first sit</p></div>
+    </div>
+    <p class="bcm-cav">Projected from the last 30 days. The pace is yours to keep or to break.</p>
+  </div>
+  <p class="bcm-read">None of these dates is a prediction about luck. They are arithmetic about mornings, and the mornings are already yours.</p>
+</div></div>
+      </div>
+    </div></div>
   </section></div>
 </div>
 <script>
@@ -5346,6 +5991,68 @@ if(svg){
   }
 }
 })(); }catch(e){ console.error("orbit", e); }
+
+/* weeks */
+try{ (function(){
+var cv=document.getElementById('weeks-grid');
+if(cv){
+  var cols=52,total=4175,lived=1179,onthing=27,cell=5,gap=1;
+  var rows=Math.ceil(total/cols);
+  var w=cols*(cell+gap)-gap, h=rows*(cell+gap)-gap;
+  cv.width=w*2; cv.height=h*2; cv.style.aspectRatio=w+' / '+h;
+  var cx=cv.getContext('2d'); cx.scale(2,2);
+  for(var i=0;i<total;i++){
+    var col=i%cols,row=Math.floor(i/cols),x=col*(cell+gap),y=row*(cell+gap);
+    if(i>=lived-onthing&&i<lived) cx.fillStyle='rgba(63,217,78,0.9)';
+    else if(i<lived) cx.fillStyle='rgba(255,255,255,0.34)';
+    else cx.fillStyle='rgba(255,255,255,0.08)';
+    cx.fillRect(x,y,cell,cell);
+  }
+  var c2=lived%cols,r2=Math.floor(lived/cols);
+  cx.strokeStyle='rgba(255,255,255,0.95)';cx.lineWidth=1;
+  cx.strokeRect(c2*(cell+gap)-0.5,r2*(cell+gap)-0.5,cell+1,cell+1);
+}
+})(); }catch(e){ console.error("weeks", e); }
+
+/* picture */
+try{ (function(){
+var q=document.getElementById('picture-quote');
+if(q){
+  var words=q.textContent.split(/\s+/);
+  q.innerHTML=words.map(function(w){return '<span class="pic-w">'+w+'</span>';}).join(' ');
+  var spans=q.querySelectorAll('.pic-w');
+  for(var i=0;i<spans.length;i++){
+    (function(s,i){setTimeout(function(){if(s.isConnected)s.classList.add('pic-lit');},400+i*110);})(spans[i],i);
+  }
+  setTimeout(function(){for(var i=0;i<spans.length;i++)spans[i].classList.add('pic-lit');},4600);
+}
+})(); }catch(e){ console.error("picture", e); }
+
+/* lights */
+try{ (function(){
+var f=document.getElementById('lights-field');
+if(f){
+  var NS='http://www.w3.org/2000/svg';
+  var seed=17;
+  function rnd(){seed=(seed*1103515245+12345)%2147483648;return seed/2147483648;}
+  for(var i=0;i<224;i++){
+    var x=8+rnd()*296, y=8+rnd()*224;
+    var r=0.8+rnd()*1.6, o=0.35+rnd()*0.65;
+    var c=document.createElementNS(NS,'circle');
+    c.setAttribute('cx',x.toFixed(1)); c.setAttribute('cy',y.toFixed(1));
+    c.setAttribute('r',r.toFixed(2));
+    c.setAttribute('fill','rgba(238,242,251,'+o.toFixed(2)+')');
+    f.appendChild(c);
+    if(rnd()>0.86){
+      var g=document.createElementNS(NS,'circle');
+      g.setAttribute('cx',x.toFixed(1)); g.setAttribute('cy',y.toFixed(1));
+      g.setAttribute('r',(r*3.4).toFixed(2));
+      g.setAttribute('fill','rgba(238,242,251,0.06)');
+      f.appendChild(g);
+    }
+  }
+}
+})(); }catch(e){ console.error("lights", e); }
 </script>
 <script>
 /* Counters animate with requestAnimationFrame, which a backgrounded tab pauses.
