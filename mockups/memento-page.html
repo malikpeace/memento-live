@@ -7,12 +7,13 @@
 <link rel="stylesheet" href="../memento-app/css/daycard-living.css" onerror="this.href='../css/daycard-living.css'">
 <style>
   *{box-sizing:border-box}
-  html,body{margin:0;overflow-x:hidden;background:#050609;color:var(--hi);
+  html,body{margin:0;overflow-x:clip;background:#050609;color:var(--hi);
     font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
   :root{--hi:rgba(245,246,250,.97);--mid:rgba(238,241,247,.78);--lo:rgba(232,236,244,.50);
     --fill:rgba(255,255,255,.055);--inset:inset 0 1px 0 rgba(255,255,255,.07);
     --clar:#3ad9f5;--cons:#3fd94e;--act:#eef2fb;--safe-t:0px;--safe-b:0px}
-  .screen{position:relative;z-index:1;max-width:430px;margin:0 auto;padding:26px 20px 80px}
+  body{min-height:100lvh}
+  .screen{position:relative;z-index:1;max-width:430px;margin:0 auto;padding:26px 20px 90px}
   .cage{width:200px!important}
   .hero{padding:6px 0 0}
   .mori{font-size:18px;font-weight:250;letter-spacing:.11em;color:var(--hi);font-variant-numeric:tabular-nums}
@@ -49,7 +50,7 @@
   body.is-void .post__hero b,body.is-void .cbk__hero b{text-shadow:none}
 
   /* section chrome */
-  .sec{margin-top:30px}
+  .sec{margin-top:58px}
   .sec__hd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
   .sec__t{font-size:13.5px;font-weight:680;color:var(--mid)}
   .sec__ctl{display:inline-flex;gap:6px}
@@ -179,6 +180,8 @@
 
   /* weeks */
   .wks{border-radius:20px;padding:15px;background:#060709;box-shadow:var(--inset),0 18px 44px rgba(0,0,0,.55)}
+  .wks__mori{margin-bottom:14px;font-size:14.5px;line-height:1.5;color:var(--mid)}
+  .wks__mori b{color:var(--hi);font-weight:760;font-variant-numeric:tabular-nums}
   .wks canvas{display:block;width:100%;max-width:312px;height:auto;margin:0 auto}
   .wks__cap{margin-top:12px;font-size:13px;line-height:1.5;color:var(--mid);text-align:center}
 
@@ -203,6 +206,20 @@
   .mth__dots{display:flex;gap:6px;margin-top:11px}
   .mth__dots i{width:11px;height:11px;border-radius:50%;background:var(--cons);box-shadow:0 0 9px rgba(63,217,78,.5)}
   .mth__v{margin-top:10px;font-size:13px;color:var(--mid)}
+
+  /* day one: the page before anything has happened */
+  .d0btn{display:block;margin:14px auto 0;padding:9px 16px;border:0;border-radius:10px;
+    background:rgba(255,255,255,.07);box-shadow:var(--inset);color:var(--hi);
+    font:inherit;font-size:12.5px;font-weight:640;cursor:pointer}
+  .out--d0{display:none}
+  body.d0 .out{display:none!important}
+  body.d0 .out--d0{display:block}
+  body.d0 .sw{opacity:0;pointer-events:none}
+  body.d0 .door,body.d0 .door__sub{display:none}
+  .lgt__dark{min-height:150px;border-radius:12px;background:#030405;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.03)}
+  .tnw__wait{color:var(--mid)!important;font-weight:560!important;font-style:italic}
+  .mth__hollow{background:transparent!important;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.4)!important}
 
   /* door + toast */
   .door{display:flex;justify-content:space-between;align-items:center;width:100%;margin-top:30px;
@@ -540,6 +557,7 @@
 
   <div class="mats" id="mats" aria-label="Your Memento's material tints the whole page"></div>
   <p class="mats__note">The page wears your Memento. Pick a material and every section takes its light.</p>
+  <button class="d0btn" id="d0btn" type="button">What day one looks like</button>
 
   <!-- 2. EVERYTHING, the totality, first by Malik's call -->
   <section class="sec" id="sec-all">
@@ -595,6 +613,23 @@
         <p class="relb__note">Career notes: one promise finished, one set down at day 40 and kept on the record, one open at day 186. Best month June, 28 of 30.</p>
       </div>
     </div>
+    <div class="out--d0">
+      <div class="slip">
+        <div class="slip__tear"></div>
+        <div class="slip__in">
+          <div class="slip__head"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg><p class="slip__store">Memento</p>
+            <p class="slip__meta">Malik Peace. Day 1.</p></div>
+          <div class="slip__items">
+            <div class="slip__r"><span>Days that earned a mark</span><i></i><b>0</b></div>
+            <div class="slip__r"><span>Actions completed</span><i></i><b>0</b></div>
+            <div class="slip__r"><span>Promises made</span><i></i><b>1</b></div>
+          </div>
+          <div class="slip__total"><span>Days remaining, estimate</span><b>21,267</b></div>
+          <p class="slip__policy">The ledger opens with the first mark. That can be tonight.</p>
+        </div>
+        <div class="slip__tear slip__tear--b"></div>
+      </div>
+    </div>
   </section>
 
   <!-- 3. THE CURRENT CHAPTER -->
@@ -624,6 +659,14 @@
         </div>
       </div>
     </div>
+    <div class="out--d0">
+      <div class="now">
+        <p class="now__goal">Get to 100 paying users.</p>
+        <p class="now__line">Day 1 &middot; 0 of 100</p>
+        <div class="now__bar"><i style="width:0%"></i></div>
+        <p class="now__pace">The line starts at 5pm tonight. Everything after this is record.</p>
+      </div>
+    </div>
   </section>
 
   <!-- 4. THE DAYS -->
@@ -646,6 +689,12 @@
         <div class="cbk__hero"><b>14</b><span>times you stopped.<br><em>14 times you came back.</em></span></div>
         <div class="cbk__strip"><i style="flex:12"></i><u style="flex:3"></u><i style="flex:9"></i><u style="flex:2"></u><i style="flex:23"></i><u style="flex:9"></u><i style="flex:14"></i><u style="flex:4"></u><i style="flex:8"></i><u style="flex:3"></u><i style="flex:17"></i><u style="flex:5"></u><i style="flex:11"></i><u style="flex:2"></u><i class="cur" style="flex:6"></i></div>
         <p class="cbk__line">300 days. 69 missed. Zero quit.</p>
+      </div>
+    </div>
+    <div class="out--d0">
+      <div class="lgt">
+        <div class="lgt__dark"></div>
+        <p class="lgt__line"><b>No lights yet.</b> The dark is what it looks like before. The first one switches on the day you do.</p>
       </div>
     </div>
   </section>
@@ -674,18 +723,44 @@
         <p class="tnw__line">Same person. 231 marks between them.</p>
       </div>
     </div>
+    <div class="out--d0">
+      <div class="tnw">
+        <div class="tnw__cols">
+          <div class="tnw__col tnw__then">
+            <p class="tnw__when">Today, day 1</p>
+            <p>A goal, written down.</p>
+            <p>A reason, in your own words.</p>
+            <p>Nothing to show yet, honestly.</p>
+          </div>
+          <div class="tnw__col tnw__now">
+            <p class="tnw__when">Later</p>
+            <p class="tnw__wait">Being written.</p>
+          </div>
+        </div>
+        <p class="tnw__line">This column fills with what you do. Nothing else fills it.</p>
+      </div>
+    </div>
   </section>
 
-  <!-- 6. THE WEEKS, small, part of the page not the main page -->
+  <!-- MORI: after the record, before the why (Malik: record, mori, vivere) -->
   <section class="sec" id="sec-weeks">
     <div class="sec__hd"><span class="sec__t">Your life, in weeks</span><span class="sec__ctl"><button class="sw" type="button" data-sw></button><button class="sh" type="button" data-sh aria-label="Share this section"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M8 7l4-4 4 4"/><path d="M4 13v6h16v-6"/></svg></button></span></div>
     <div class="out is-on shot" data-out="The weeks">
       <div class="wks">
+        <p class="wks__mori"><b>20,967</b> days left, give or take. 300 of them went to the path.</p>
         <canvas id="weeksGrid" aria-label="an 80 year life in weeks"></canvas>
         <p class="wks__cap">The filled ones are spent. The green ones are the 43 you gave to the path. 2,996 are still yours.</p>
       </div>
     </div>
+    <div class="out--d0">
+      <div class="wks">
+        <p class="wks__mori"><b>21,267</b> days left, give or take. None of them have gone to the path yet.</p>
+        <canvas id="weeksGrid0" aria-label="an 80 year life in weeks, none on the path yet"></canvas>
+        <p class="wks__cap">The filled ones are spent either way. The first green cell is this week, if you make it one.</p>
+      </div>
+    </div>
   </section>
+
 
   <!-- 7. YOUR WORDS -->
   <section class="sec" id="sec-words">
@@ -711,6 +786,12 @@
         <p class="wrd__sign">From the you of August 7,<br>231 marks later.</p>
       </div>
     </div>
+    <div class="out--d0">
+      <div class="wrd">
+        <p class="wrd__q">&ldquo;Because I am done building things nobody pays for.&rdquo;</p>
+        <p class="wrd__m">Written today. The only thing on the page you control completely.</p>
+      </div>
+    </div>
   </section>
 
   <!-- 8. THIS MONTH, one line -->
@@ -721,6 +802,13 @@
         <div class="mth__row"><b>August.</b><span class="gr">Seven for seven.</span></div>
         <div class="mth__dots"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
         <p class="mth__v">The best start to a month yet.</p>
+      </div>
+    </div>
+    <div class="out--d0">
+      <div class="mth">
+        <div class="mth__row"><b>August.</b><span class="dim">Day 1.</span></div>
+        <div class="mth__dots"><i class="mth__hollow"></i></div>
+        <p class="mth__v">The first mark lands tonight or it does not. Either way it gets written down.</p>
       </div>
     </div>
   </section>
@@ -855,6 +943,42 @@ function pick(i){
   for(var c=0;c<chips.length;c++) chips[c].classList.toggle('is-on', c===i);
 }
 pick(0);
+
+/* day one: the card unlit (the app's own ns-bloom gate), every section empty */
+var d0btn=document.getElementById('d0btn'), curMat=0;
+var _pick=pick;
+pick=function(i){curMat=i;_pick(i);if(document.body.classList.contains('d0'))unlite();};
+function unlite(){
+  var m=MATS[curMat], cage=document.getElementById('cage');
+  cage.className='cage '+(m.cls||'')+(m.stock?' is-stock':'');
+  cage.innerHTML=realCard(matVars(m,{clar:false,act:false,cons:false}),{name:'Malik Peace'});
+}
+var T0={'sec-all':'Everything, from today','sec-now':'The open chapter','sec-days':'The days you show up','sec-then':'Then and now','sec-weeks':'Your life, in weeks','sec-words':'In your words','sec-month':'This month'};
+var T1={};
+document.querySelectorAll('.sec').forEach(function(sec){T1[sec.id]=sec.querySelector('.sec__t').textContent;});
+d0btn.addEventListener('click',function(){
+  var on=document.body.classList.toggle('d0');
+  d0btn.textContent=on?'Back to day 300':'What day one looks like';
+  document.querySelectorAll('.sec').forEach(function(sec){
+    sec.querySelector('.sec__t').textContent=(on?T0:T1)[sec.id]||T1[sec.id];});
+  if(on){document.body.classList.remove('ns-bloom');unlite();}
+  else{document.body.classList.add('ns-bloom');_pick(curMat);}
+});
+(function(){
+  var cv=document.getElementById('weeksGrid0'); if(!cv)return;
+  var cols=52,total=4175,lived=1179,cell=5,gap=1;
+  var rows=Math.ceil(total/cols), w=cols*(cell+gap)-gap, h=rows*(cell+gap)-gap;
+  cv.width=w*2;cv.height=h*2;cv.style.aspectRatio=w+' / '+h;
+  var cx=cv.getContext('2d');cx.scale(2,2);
+  for(var i=0;i<total;i++){
+    var col=i%cols,row=Math.floor(i/cols),x=col*(cell+gap),y=row*(cell+gap);
+    cx.fillStyle=i<lived?'rgba(255,255,255,0.42)':'rgba(255,255,255,0.10)';
+    cx.fillRect(x,y,cell,cell);
+  }
+  var c2=lived%cols,r2=Math.floor(lived/cols);
+  cx.strokeStyle='rgba(255,255,255,0.95)';cx.lineWidth=1;
+  cx.strokeRect(c2*(cell+gap)-0.5,r2*(cell+gap)-0.5,cell+1,cell+1);
+})();
 
 /* outfit switching: the pill shows the CURRENT look, tap cycles */
 document.querySelectorAll('.sec').forEach(function(sec){
