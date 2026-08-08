@@ -156,6 +156,10 @@
   .evd.is-open .evd__story{display:block}
   .evcap{margin-top:12px;font-size:12px;color:var(--ink3);text-align:center}
 
+  .in-flowh{margin:52px 0 4px;font-size:22px;font-weight:750;letter-spacing:-.024em;color:var(--hi)}
+  .cpick{margin-top:14px}
+  .cpick > *{max-width:100%}
+  /* the components were designed as tiles on near black, the ring room IS near black */
   .in-head{text-align:center}
   .in-mark{width:44px;height:44px;fill:#3a4150;display:block;margin:0 auto}
   .in-name{margin-top:16px;font-size:27px;font-weight:780;letter-spacing:-.028em;color:var(--ink1);
@@ -276,6 +280,138 @@
   .in-digits{margin-top:6px;font-size:12px;letter-spacing:.14em;color:var(--ink3);font-variant-numeric:tabular-nums}
   .in-policy{margin-top:12px;font-size:11px;color:var(--ink2)}
 </style>
+<style id="picks">/* mor-clocks */
+.mor-clocks{background:var(--fill);box-shadow:var(--inset);border-radius:14px;padding:16px 18px 14px;color:var(--hi)}
+.mor-clocks__pane{padding:10px 0 12px}
+.mor-clocks__pane--up{box-shadow:var(--inset);padding-top:16px;margin-top:2px}
+.mor-clocks__num{font-size:52px;line-height:1;font-weight:600;letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:var(--hi)}
+.mor-clocks__pane--up .mor-clocks__num{color:var(--cons)}
+.mor-clocks__cap{margin-top:9px;font-size:14px;line-height:1.4;color:var(--mid)}
+.mor-clocks__cap span{color:var(--hi);font-variant-numeric:tabular-nums}
+.mor-clocks__foot{margin:14px 0 0;font-size:13px;line-height:1.4;color:var(--mid)}
+
+/* clk-units */
+.clk-units{background:var(--fill);box-shadow:var(--inset);border-radius:14px;padding:18px;color:var(--hi)}
+.clk-units .clk-units__h{font-size:15px;color:var(--hi);margin-bottom:12px}
+.clk-units .clk-units__r{display:flex;align-items:baseline;justify-content:space-between;padding:9px 0;box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.clk-units .clk-units__r span{font-size:14px;color:var(--mid)}
+.clk-units .clk-units__r b{font-size:19px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.clk-units .clk-units__r--live b{font-size:22px;color:var(--act)}
+
+/* vol-total */
+.vol-total{background:var(--fill);box-shadow:var(--inset);border-radius:14px;padding:20px 18px 14px;color:var(--hi)}
+.vol-total__n{font-size:78px;line-height:.86;letter-spacing:-.035em;font-weight:600;font-variant-numeric:tabular-nums;color:var(--hi)}
+.vol-total__cap{margin-top:10px;font-size:14.5px;color:var(--mid)}
+.vol-total__rows{margin-top:16px}
+.vol-total__row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:9px 0;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.vol-total__row span{font-size:14px;color:var(--mid)}
+.vol-total__row b{font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--hi)}
+
+/* vol-pages */
+.vol-pages{display:grid;grid-template-columns:1fr 62px;gap:16px;align-items:end;background:var(--fill);box-shadow:var(--inset);border-radius:14px;padding:18px;color:var(--hi)}
+.vol-pages__n{font-size:34px;line-height:1;letter-spacing:-.02em;font-weight:600;font-variant-numeric:tabular-nums;color:var(--hi)}
+.vol-pages__sub{margin:12px 0 0;font-size:14.5px;line-height:1.45;color:var(--mid)}
+.vol-pages__raw{margin-top:12px;font-size:12px;font-variant-numeric:tabular-nums;color:var(--lo)}
+.vol-pages__block{position:relative;height:135px;border-radius:3px;background:repeating-linear-gradient(to bottom,rgba(255,255,255,.24) 0 1px,rgba(255,255,255,.02) 1px 3px);box-shadow:inset 1px 0 0 rgba(255,255,255,.10),inset -1px 0 0 rgba(0,0,0,.35)}
+.vol-pages__block i{position:absolute;left:0;right:0;top:-5px;height:5px;border-radius:2px 2px 0 0;background:rgba(238,241,247,.5)}
+
+/* vol-deep */
+.vol-deep{background:var(--fill);box-shadow:var(--inset);border-radius:14px;padding:18px;color:var(--hi)}
+.vol-deep__n{font-size:32px;line-height:1.05;letter-spacing:-.02em;font-weight:600;font-variant-numeric:tabular-nums;color:var(--hi)}
+.vol-deep__cap{margin-top:8px;font-size:14.5px;color:var(--mid)}
+.vol-deep__bar{margin-top:16px;height:26px;border-radius:4px;background:repeating-linear-gradient(90deg,rgba(238,241,247,.62) 0 1.7px,transparent 1.7px calc(100%/88))}
+.vol-deep__raw{margin-top:10px;font-size:12px;font-variant-numeric:tabular-nums;color:var(--lo)}
+
+/* rec-board */
+.rec-board{padding:16px 18px 6px;border-radius:14px;background:var(--fill);box-shadow:var(--inset)}.rec-board__t{font-size:15px;color:var(--hi);margin-bottom:4px}.rec-board__r{padding:11px 0;border-top:1px solid rgba(255,255,255,.07)}.rec-board__a{display:flex;align-items:baseline;justify-content:space-between;gap:12px}.rec-board__a span{font-size:14.5px;color:var(--mid)}.rec-board__a b{font-size:19px;font-weight:600;letter-spacing:-.01em;color:var(--act);font-variant-numeric:tabular-nums}.rec-board__b{margin-top:3px;font-size:12px;color:var(--mid);font-variant-numeric:tabular-nums}
+
+/* rec-hold */
+.rec-hold{position:relative;padding:20px 18px 16px;border-radius:14px;background:var(--fill);box-shadow:var(--inset);color:var(--mid)}.rec-hold__m{position:absolute;top:16px;right:16px;width:16px;height:16px;fill:var(--lo)}.rec-hold__num{font-size:92px;line-height:.84;font-weight:600;letter-spacing:-.05em;color:var(--act);font-variant-numeric:tabular-nums}.rec-hold__unit{margin-top:14px;font-size:16px;line-height:1.35;color:var(--hi)}.rec-hold__rule{height:1px;margin:14px 0 10px;background:rgba(255,255,255,.08)}.rec-hold__meta{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;color:var(--mid);font-variant-numeric:tabular-nums}
+
+/* mil-500 */
+.mil-500{background:var(--fill);box-shadow:var(--inset);border-radius:14px;padding:20px 16px 18px;color:var(--hi);font-variant-numeric:tabular-nums}
+.mil-500 .mil-500__row{display:flex;align-items:baseline;gap:6px}
+.mil-500 .mil-500__now{font-size:62px;line-height:.88;font-weight:640;letter-spacing:-.03em;color:var(--act)}
+.mil-500 .mil-500__slash{font-size:30px;line-height:1;font-weight:400;color:var(--lo)}
+.mil-500 .mil-500__goal{font-size:30px;line-height:1;font-weight:560;letter-spacing:-.02em;color:var(--mid)}
+.mil-500 .mil-500__cap{margin:12px 0 0;font-size:13px;color:var(--lo)}
+.mil-500 .mil-500__line{margin:14px 0 0;font-size:16px;line-height:1.45;color:var(--hi)}
+
+/* cmb-wall */
+.cmb-wall{padding:18px;border-radius:14px;background:var(--fill);box-shadow:var(--inset);color:var(--hi)}
+.cmb-wall .cmb-wall__h{margin:0 0 14px;font-size:14px;line-height:1.4;color:var(--mid)}
+.cmb-wall .cmb-wall__grid{display:grid;grid-template-columns:repeat(20,1fr);gap:3px}
+.cmb-wall .cmb-wall__c{display:block;width:100%;aspect-ratio:1/1;border-radius:2px;background:rgba(255,255,255,.05)}
+.cmb-wall .cmb-wall__c.is-on{background:rgba(255,255,255,.26)}
+.cmb-wall .cmb-wall__c.is-back{background:var(--cons)}
+.cmb-wall .cmb-wall__legend{display:flex;gap:14px;margin:14px 0 0;font-size:12px;color:var(--lo);font-variant-numeric:tabular-nums}
+.cmb-wall .cmb-wall__legend span{display:flex;align-items:center;gap:6px}
+.cmb-wall .cmb-wall__legend i{width:8px;height:8px;border-radius:2px;background:rgba(255,255,255,.05)}
+.cmb-wall .cmb-wall__legend i.is-on{background:rgba(255,255,255,.26)}
+.cmb-wall .cmb-wall__legend i.is-back{background:var(--cons)}
+.cmb-wall .cmb-wall__f{margin:12px 0 0;font-size:14px;line-height:1.45;color:var(--mid)}
+
+/* rec-months */
+.rec-months{padding:16px 18px;border-radius:14px;background:var(--fill);box-shadow:var(--inset)}.rec-months__t{font-size:15px;color:var(--hi)}.rec-months__chart{display:flex;align-items:flex-end;gap:5px;height:104px;margin-top:14px}.rec-months__chart span{flex:1;border-radius:2px 2px 0 0;background:rgba(255,255,255,.14)}.rec-months__chart span.top{background:var(--cons)}.rec-months__chart span.low{background:rgba(255,255,255,.09)}.rec-months__chart span.now{background:repeating-linear-gradient(180deg,rgba(255,255,255,.16) 0 3px,transparent 3px 6px)}.rec-months__ax{display:flex;gap:5px;margin-top:6px}.rec-months__ax i{flex:1;text-align:center;font-size:10px;font-style:normal;color:var(--lo)}.rec-months__c{margin-top:12px;font-size:13.5px;line-height:1.45;color:var(--mid);font-variant-numeric:tabular-nums}
+
+/* amb-weeks */
+.amb-weeks{background:var(--fill);box-shadow:var(--inset);border-radius:16px;padding:16px;color:var(--hi)}
+.amb-weeks__cv{display:block;width:100%;height:auto}
+.amb-weeks__rows{margin-top:16px;display:grid;gap:7px}
+.amb-weeks__r{display:flex;align-items:baseline;gap:9px}
+.amb-weeks__r b{font-size:20px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.01em;min-width:62px}
+.amb-weeks__g{color:var(--cons)}
+.amb-weeks__r span{font-size:13.5px;color:var(--mid);line-height:1.35}
+.amb-weeks__p{margin:14px 0 0;padding-top:12px;background:linear-gradient(90deg,rgba(255,255,255,.10),rgba(255,255,255,0)) top/100% 1px no-repeat;font-size:12.5px;color:var(--mid)}
+
+/* mor-remaining */
+.mor-remaining{background:var(--fill);box-shadow:var(--inset);border-radius:14px;padding:16px 18px 14px;color:var(--hi)}
+.mor-remaining__t{margin:0 0 6px;font-size:14px;color:var(--mid)}
+.mor-remaining__r{display:flex;align-items:baseline;justify-content:space-between;padding:11px 0;box-shadow:var(--inset)}
+.mor-remaining__r span{font-size:15px;color:var(--hi)}
+.mor-remaining__r b{font-size:22px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--hi)}
+.mor-remaining__f{margin:14px 0 0;font-size:13px;line-height:1.45;color:var(--mid)}
+
+/* mor-oneday */
+.mor-oneday{background:var(--fill);box-shadow:var(--inset);border-radius:14px;padding:16px 18px 14px;color:var(--hi)}
+.mor-oneday__t{margin:0 0 12px;font-size:14px;color:var(--mid)}
+.mor-oneday__row{display:flex;gap:3px;align-items:stretch}
+.mor-oneday__row i{flex:1 1 0;height:32px;border-radius:3px;background:var(--fill);box-shadow:var(--inset)}
+.mor-oneday__row i.mor-oneday__on{background:var(--act);opacity:.30;box-shadow:none}
+.mor-oneday__row i.mor-oneday__now{background:var(--act);opacity:1;box-shadow:none}
+.mor-oneday__f{margin:12px 0 0;font-size:14px;line-height:1.45;color:var(--hi)}
+.mor-oneday__f span{font-variant-numeric:tabular-nums}
+
+/* wrd-span */
+.wrd-span{background:var(--fill);border-radius:14px;box-shadow:var(--inset);padding:18px}
+.wrd-span .wrd-span__meta{font-size:12px;color:var(--lo);font-variant-numeric:tabular-nums}
+.wrd-span .wrd-span__q{margin:7px 0 0;font-size:16px;line-height:1.42;color:var(--hi)}
+.wrd-span .wrd-span__gap{display:flex;align-items:center;gap:10px;margin:16px 0}
+.wrd-span .wrd-span__gap i{flex:1;height:1px;background:rgba(255,255,255,.1)}
+.wrd-span .wrd-span__gap span{font-size:12.5px;color:var(--mid);font-variant-numeric:tabular-nums}
+
+/* wrd-hardest */
+.wrd-hardest{background:var(--fill);border-radius:14px;box-shadow:var(--inset);padding:18px}
+.wrd-hardest .wrd-hardest__head{font-size:14px;line-height:1.45;color:var(--mid)}
+.wrd-hardest .wrd-hardest__list{list-style:none;margin:14px 0 0;padding:0}
+.wrd-hardest .wrd-hardest__item{padding:12px 0;box-shadow:var(--inset)}
+.wrd-hardest .wrd-hardest__item:first-child{box-shadow:none;padding-top:0}
+.wrd-hardest .wrd-hardest__date{font-size:12px;color:var(--lo);font-variant-numeric:tabular-nums}
+.wrd-hardest .wrd-hardest__q{margin:6px 0 0;font-size:15.5px;line-height:1.4;color:var(--hi)}
+
+/* amb-threads */
+.amb-threads{background:var(--fill);box-shadow:var(--inset);border-radius:16px;padding:16px;color:var(--hi)}
+.amb-threads__t{padding:11px 0}
+.amb-threads__t+.amb-threads__t{background:linear-gradient(90deg,rgba(255,255,255,.09),rgba(255,255,255,0)) top/100% 1px no-repeat}
+.amb-threads__l{font-size:15px;font-weight:500;color:var(--hi)}
+.amb-threads__bar{position:relative;height:3px;border-radius:2px;margin:11px 0 9px}
+.amb-threads__bar i{position:absolute;right:-3px;top:50%;width:7px;height:7px;border-radius:50%;transform:translateY(-50%)}
+.amb-threads__bar--done{background:linear-gradient(90deg,rgba(63,217,78,.30),rgba(63,217,78,.85))}
+.amb-threads__bar--done i{background:var(--cons)}
+.amb-threads__bar--stop{background:linear-gradient(90deg,rgba(238,241,247,.12),rgba(238,241,247,.34))}
+.amb-threads__bar--stop i{background:rgba(5,6,9,1);box-shadow:0 0 0 1.5px rgba(238,241,247,.40)}
+.amb-threads__ticks{height:12px;margin:9px 0;background:linear-gradient(90deg,var(--act) 0 62%,rgba(255,255,255,.13) 62% 100%);-webkit-mask-image:repeating-linear-gradient(90deg,#000 0 1.7px,transparent 1.7px 3.1px);mask-image:repeating-linear-gradient(90deg,#000 0 1.7px,transparent 1.7px 3.1px)}
+.amb-threads__s{font-size:13px;color:var(--mid);line-height:1.35}</style>
 <style id="mv">
   :root{
     --hi: rgba(245,246,250,.97);
@@ -602,11 +738,10 @@
   </div>
 </div>
 
-<!-- STATE B: inside the card. The face is the page, the rim is the device. -->
+<!-- STATE B: inside the card. Dark middle, the ring is the device. -->
 <div class="inside" id="inside" hidden>
   <div class="rim" aria-hidden="true"></div>
   <div class="rim-cover" aria-hidden="true"></div>
-  <button class="in-mode" id="inMode" type="button">Middle: dark</button>
   <button class="in-back" id="inBack" type="button" aria-label="Back out of the card">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
       stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
@@ -618,108 +753,161 @@
       <header class="in-head">
         <svg class="in-mark" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
         <h1 class="in-name">Malik Peace.</h1>
-        <p class="in-count">20967:16:41:52</p>
         <p class="in-since">On the path since October 12. Day 300.</p>
       </header>
 
-      <h2 class="evh">The evidence</h2>
-      <p class="evsub">Not trophies. Eight things that actually happened, kept in stone.</p>
+      <!-- 1. THE CLOCKS -->
+      <div class="cpick"><div class="mor-clocks">
+  <div class="mor-clocks__pane">
+    <div class="mor-clocks__num">20,967</div>
+    <div class="mor-clocks__cap">days left, on an 80 year estimate</div>
+  </div>
+  <div class="mor-clocks__pane mor-clocks__pane--up">
+    <div class="mor-clocks__num">300</div>
+    <div class="mor-clocks__cap">days since you made this, plus <span id="mor-clocks-tick">0h 00m 00s</span></div>
+  </div>
+  <p class="mor-clocks__foot">One falls. One climbs. The same day moves both.</p>
+</div></div>
+      <div class="cpick"><div class="clk-units">
+  <div class="clk-units__h">The same stretch, six ways.</div>
+  <div class="clk-units__r"><span>months</span><b>9</b></div>
+  <div class="clk-units__r"><span>weeks</span><b>43</b></div>
+  <div class="clk-units__r"><span>days</span><b>300</b></div>
+  <div class="clk-units__r"><span>hours</span><b>7,187</b></div>
+  <div class="clk-units__r"><span>minutes</span><b id="clk-units-m">431,238</b></div>
+  <div class="clk-units__r clk-units__r--live"><span>seconds</span><b id="clk-units-s">25,874,287</b></div>
+</div></div>
 
-      <div class="evgrid" id="evGrid">
-        <button class="evd" type="button">
-          <span class="evd__t">The first mark</span>
-          <span class="evd__d">October 12, 6:42 AM</span>
-          <span class="evd__story">You almost did not download the app. The first mark was two minutes of work you nearly skipped. Everything on this page descends from it.</span>
-        </button>
-        <button class="evd" type="button">
-          <span class="evd__t">Run the half, finished</span>
-          <span class="evd__d">127 days &middot; January 17</span>
-          <span class="evd__story">Signed in October, finished in the January cold. The first promise you ever kept the whole way. It holds the door open for the others.</span>
-        </button>
-        <button class="evd" type="button">
-          <span class="evd__t">23 days, unbroken</span>
-          <span class="evd__d">June 2 to June 24</span>
-          <span class="evd__story">Your longest run. It did not end because you quit, it ended because life happened, and eleven days later you were back.</span>
-        </button>
-        <button class="evd" type="button">
-          <span class="evd__t">Came back after 9 days gone</span>
-          <span class="evd__d">April 2</span>
-          <span class="evd__story">The longest you have ever been away. Most people do not come back from nine days. You wrote one line that night: back.</span>
-        </button>
-        <button class="evd" type="button">
-          <span class="evd__t">Best month, June</span>
-          <span class="evd__d">28 of 30 days</span>
-          <span class="evd__story">Two missed days all month, both planned. This is what your ceiling looks like so far. It is on record that you can do this.</span>
-        </button>
-        <button class="evd" type="button">
-          <span class="evd__t">The biggest day</span>
-          <span class="evd__d">May 19</span>
-          <span class="evd__story">Six users in one day, off the cold email you rewrote four times and almost did not send.</span>
-        </button>
-        <button class="evd" type="button">
-          <span class="evd__t">14 comebacks, zero quits</span>
-          <span class="evd__d">the standing record</span>
-          <span class="evd__story">Every gap in the record has a return after it. Fourteen times it would have been easier to stop, and fourteen times you did not.</span>
-        </button>
-        <button class="evd evd--q" type="button">
-          <span class="evd__t">&ldquo;Wanted to quit at 3pm and did not.&rdquo;</span>
-          <span class="evd__d">your words &middot; March 4</span>
-          <span class="evd__story">Written the same evening, after the mark. The most valuable sentence in the record, because you wrote it on the way through, not after.</span>
-        </button>
-      </div>
-      <p class="evcap">Tap a stone. Evidence is stocked on the good days and read on the bad ones.</p>
+      <!-- 2. THE FIELD -->
+      <h2 class="in-flowh">The record</h2>
+      <div class="cpick"><div class="vol-total">
+  <div class="vol-total__n">462</div>
+  <div class="vol-total__cap">marks on the record, all time</div>
+  <div class="vol-total__rows">
+    <div class="vol-total__row"><span>Actions completed</span><b>312</b></div>
+    <div class="vol-total__row"><span>Deep work sessions</span><b>88</b></div>
+    <div class="vol-total__row"><span>Notes and reflections</span><b>62</b></div>
+  </div>
+</div></div>
+      <div class="cpick"><div class="vol-pages">
+  <div class="vol-pages__text">
+    <div class="vol-pages__n">45 pages</div>
+    <p class="vol-pages__sub">You have written 11,240 words in here. At 250 a page that is a 45 page book, sitting on the table.</p>
+    <div class="vol-pages__raw">11,240 words, 250 a page</div>
+  </div>
+  <div class="vol-pages__block" aria-hidden="true"><i></i></div>
+</div></div>
+      <div class="cpick"><div class="vol-deep">
+  <div class="vol-deep__n">5 days 12 hours</div>
+  <div class="vol-deep__cap">of your life spent with the door shut</div>
+  <div class="vol-deep__bar" aria-hidden="true"></div>
+  <div class="vol-deep__raw">88 sessions, 90 minutes each, 132 hours</div>
+</div></div>
+      <div class="cpick"><div class="rec-board"><div class="rec-board__t">Personal bests</div><div class="rec-board__r"><div class="rec-board__a"><span>Longest run</span><b>23 days</b></div><div class="rec-board__b">Set June 24. Standing 44 days.</div></div><div class="rec-board__r"><div class="rec-board__a"><span>Best month</span><b>28 of 30</b></div><div class="rec-board__b">June. Standing 38 days.</div></div><div class="rec-board__r"><div class="rec-board__a"><span>Best week</span><b>7 of 7</b></div><div class="rec-board__b">Week of June 8. Standing 54 days.</div></div><div class="rec-board__r"><div class="rec-board__a"><span>Biggest day</span><b>9 marks</b></div><div class="rec-board__b">May 19. Standing 80 days.</div></div><div class="rec-board__r"><div class="rec-board__a"><span>Fastest promise kept</span><b>127 days</b></div><div class="rec-board__b">Run the half, January 17. Standing 202 days.</div></div></div></div>
+      <div class="cpick"><div class="rec-hold"><svg class="rec-hold__m" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg><div class="rec-hold__num">23</div><div class="rec-hold__unit">days in a row. Your longest, ever.</div><div class="rec-hold__rule"></div><div class="rec-hold__meta"><span>June 2 to June 24, 2026</span><span>standing 44 days</span></div></div></div>
+      <div class="cpick"><div class="mil-500">
+  <div class="mil-500__row"><span class="mil-500__now">312</span><span class="mil-500__slash">/</span><span class="mil-500__goal">500</span></div>
+  <p class="mil-500__cap">actions completed</p>
+  <p class="mil-500__line">188 more and this reads 500.</p>
+</div></div>
 
-      <div class="in-then">
-        <div class="in-then__cards">
-          <div class="in-then__side">
-            <div class="cage-sm" id="inCardA"></div>
-            <p class="in-then__when">Day 1</p>
-            <p class="in-then__f">Dark. Zero marks.</p>
-          </div>
-          <div class="in-then__side">
-            <div class="cage-sm" id="inCardB"></div>
-            <p class="in-then__when in-then__now">Day 300</p>
-            <p class="in-then__f">Lit. 231 marks.</p>
-          </div>
+      <!-- 3. THE WALL -->
+      <h2 class="in-flowh">Every day, one glyph</h2>
+      <div class="cpick"><div class="cmb-wall">
+  <p class="cmb-wall__h">Three hundred days. The lit cells are the days you started again.</p>
+  <div class="cmb-wall__grid" id="cmb-wall-grid"></div>
+  <div class="cmb-wall__legend">
+    <span><i class="is-on"></i>231 marked</span>
+    <span><i class="is-back"></i>14 back</span>
+    <span><i class="is-off"></i>69 blank</span>
+  </div>
+  <p class="cmb-wall__f">Your longest run, 23 days in June, began on one of the green cells.</p>
+</div></div>
+
+      <!-- 4. THE MONTHS -->
+      <div class="cpick"><div class="rec-months"><div class="rec-months__t">Best month</div><div class="rec-months__chart"><span style="height:70%"></span><span style="height:70%"></span><span style="height:71%"></span><span style="height:77%"></span><span style="height:79%"></span><span style="height:74%"></span><span style="height:63%" class="low"></span><span style="height:84%"></span><span style="height:93%" class="top"></span><span style="height:84%"></span><span style="height:86%" class="now"></span></div><div class="rec-months__ax"><i>O</i><i>N</i><i>D</i><i>J</i><i>F</i><i>M</i><i>A</i><i>M</i><i>J</i><i>J</i><i>A</i></div><div class="rec-months__c">June, 28 of 30. April was 19 of 30, the low one. August is still running.</div></div></div>
+
+      <!-- 5. MEMENTO MORI -->
+      <h2 class="in-flowh">Memento mori</h2>
+      <div class="cpick"><div class="amb-weeks">
+  <canvas class="amb-weeks__cv" width="652" height="274"></canvas>
+  <div class="amb-weeks__rows">
+    <div class="amb-weeks__r"><b>1,179</b><span>weeks behind you</span></div>
+    <div class="amb-weeks__r"><b class="amb-weeks__g">43</b><span>of them went into this</span></div>
+    <div class="amb-weeks__r"><b>2,996</b><span>left, if the guess of eighty years holds</span></div>
+  </div>
+  <p class="amb-weeks__p">Each dot is one week. The white one is this week.</p>
+</div></div>
+      <div class="cpick"><div class="mor-remaining">
+  <p class="mor-remaining__t">What is left, counted six ways.</p>
+  <div class="mor-remaining__r"><span>Days</span><b>20,967</b></div>
+  <div class="mor-remaining__r"><span>Weeks</span><b>2,996</b></div>
+  <div class="mor-remaining__r"><span>Months</span><b>689</b></div>
+  <div class="mor-remaining__r"><span>Saturdays</span><b>2,995</b></div>
+  <div class="mor-remaining__r"><span>Summers</span><b>58</b></div>
+  <div class="mor-remaining__r"><span>Birthdays</span><b>59</b></div>
+  <p class="mor-remaining__f">One assumption, 80 years. Change it and every row moves.</p>
+</div></div>
+      <div class="cpick"><div class="mor-oneday">
+  <p class="mor-oneday__t">Today, hour by hour.</p>
+  <div class="mor-oneday__row" id="mor-oneday-row"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <p class="mor-oneday__f"><span id="mor-oneday-gone">0</span> hours gone, <span id="mor-oneday-left">24</span> to go. This is one of the 20,967.</p>
+</div></div>
+
+      <!-- 6. MEMENTO VIVERE: their words -->
+      <h2 class="in-flowh">Memento vivere</h2>
+      <div class="cpick"><div class="wrd-span">
+  <div class="wrd-span__row">
+    <div class="wrd-span__meta">12 October 2025, 6:42 AM. The first thing you typed.</div>
+    <p class="wrd-span__q">I do not want to be the person who talks about this.</p>
+  </div>
+  <div class="wrd-span__gap"><i></i><span>300 days</span><i></i></div>
+  <div class="wrd-span__row">
+    <div class="wrd-span__meta">7 August 2026. The latest.</div>
+    <p class="wrd-span__q">62 of 100. Slower than I said. Still going.</p>
+  </div>
+</div></div>
+      <div class="cpick"><div class="wrd-hardest">
+  <div class="wrd-hardest__head">You wrote on 14 days you wanted to stop. Here are three.</div>
+  <ol class="wrd-hardest__list">
+    <li class="wrd-hardest__item"><div class="wrd-hardest__date">4 March 2026</div><p class="wrd-hardest__q">Wanted to quit at 3pm and did not.</p></li>
+    <li class="wrd-hardest__item"><div class="wrd-hardest__date">21 April 2026</div><p class="wrd-hardest__q">Nine days gone. I opened it anyway.</p></li>
+    <li class="wrd-hardest__item"><div class="wrd-hardest__date">24 June 2026</div><p class="wrd-hardest__q">The 23 days ended today. I wrote it down and went to bed.</p></li>
+  </ol>
+</div></div>
+
+      <div class="in-seal">
+        <div class="in-seal__hd">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          <span>Sealed October 12, day one</span>
         </div>
-        <p class="in-then__line">Same card. You lit it.</p>
+        <p class="in-seal__b">I am writing this the night before day one. I can see the finished thing so clearly it hurts. If you are reading this because it got hard, good. It was always going to get hard.</p>
+        <p class="in-seal__b">You wanted this badly enough to write it down. Do not let the person reading this take it away from the person writing it.</p>
+        <p class="in-seal__sign">you, at the start</p>
+        <p class="in-seal__law">Written once. It cannot be edited, only kept. Only you can open it.</p>
       </div>
 
-      <!-- MORI: a dark well cut into the face -->
-      <div class="in-well">
-        <h2 class="in-well__h">Memento mori</h2>
-        <p class="in-well__lead"><b>20,967</b> days left, give or take. 300 of them went to the path.</p>
-        <div class="in-tiles">
-          <div><b>57</b><span>years</span></div>
-          <div><b>689</b><span>months</span></div>
-          <div><b>2,996</b><span>weeks</span></div>
-          <div><b>20,967</b><span>days</span></div>
-        </div>
-        <p class="in-well__ways">57 more summers. 2,996 more Saturdays. None of the counts is large.</p>
-        <canvas id="inWeeks" aria-label="an 80 year life in weeks"></canvas>
-        <p class="in-well__cap">The filled ones are spent. The green ones went to the path. 2,996 are still yours.</p>
-      </div>
+      <!-- 7. THE THREADS -->
+      <h2 class="in-flowh">Three promises</h2>
+      <div class="cpick"><div class="amb-threads">
+  <div class="amb-threads__t">
+    <div class="amb-threads__l">Run the half</div>
+    <div class="amb-threads__bar amb-threads__bar--done" style="width:68%"><i></i></div>
+    <div class="amb-threads__s">finished January 17, after 127 days</div>
+  </div>
+  <div class="amb-threads__t">
+    <div class="amb-threads__l">Morning pages</div>
+    <div class="amb-threads__bar amb-threads__bar--stop" style="width:22%"><i></i></div>
+    <div class="amb-threads__s">set down at day 40, and it stays here</div>
+  </div>
+  <div class="amb-threads__t">
+    <div class="amb-threads__l">Get to 100 paying users</div>
+    <div class="amb-threads__ticks"></div>
+    <div class="amb-threads__s">open, day 186, 62 of 100</div>
+  </div>
+</div></div>
 
-      <!-- VIVERE: the green light pools on the face itself -->
-      <div class="in-viv">
-        <h2 class="in-viv__h">Memento vivere</h2>
-        <p class="in-viv__lead">You said this is what it looks like when it works:</p>
-        <p class="in-viv__q" id="inQuote">I run the thing I built. The work is hard and it is mine. My people can point at something real and say he made that.</p>
-        <p class="in-viv__closer">186 days closer than the day you wrote it.</p>
-
-        <div class="in-seal">
-          <div class="in-seal__hd">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
-            <span>Sealed October 12, day one</span>
-          </div>
-          <p class="in-seal__b">I am writing this the night before day one. I can see the finished thing so clearly it hurts. If you are reading this because it got hard, good. It was always going to get hard.</p>
-          <p class="in-seal__b">You wanted this badly enough to write it down. Do not let the person reading this take it away from the person writing it.</p>
-          <p class="in-seal__sign">you, at the start</p>
-          <p class="in-seal__law">Written once. It cannot be edited, only kept. Only you can open it.</p>
-        </div>
-      </div>
-
-      <!-- the plaque inverts on the light face: the original dark stone -->
+      <!-- 8. THE ENDING -->
       <div class="in-org">
         <span class="in-org__k">Creation of Your Memento</span>
         <span class="in-org__d">October 12, 2025</span>
@@ -841,26 +1029,16 @@ document.body.classList.add('ns-bloom');
 var M = MATS[0];
 document.getElementById('homeCage').className='cage is-stock';
 document.getElementById('homeCage').innerHTML=realCard(matVars(M,{clar:true,act:true,cons:true}),{name:'Malik Peace'});
-var a=document.getElementById('inCardA'), b=document.getElementById('inCardB');
-a.className='cage-sm cage is-stock';
-a.innerHTML=realCard(matVars(M,{clar:false,act:false,cons:false}),{name:''});
-b.className='cage-sm cage is-stock';
-b.innerHTML=realCard(matVars(M,{clar:true,act:true,cons:true}),{name:''});
 
 var home=document.getElementById('home'), inside=document.getElementById('inside');
 inside.classList.add('brd');
-var modeBtn=document.getElementById('inMode');
-function setModeLabel(){modeBtn.textContent=inside.classList.contains('brd')?'Middle: dark':'Middle: the face';}
-setModeLabel();
-modeBtn.addEventListener('click',function(){inside.classList.toggle('brd');setModeLabel();});
-var lit=false;
 document.getElementById('homeCage').addEventListener('click',function(){
   inside.hidden=false;
+  inside.classList.remove('rim-done');
   requestAnimationFrame(function(){requestAnimationFrame(function(){
     home.classList.add('is-diving');
     inside.classList.add('is-open');
   });});
-  if(!lit){lit=true;setTimeout(lightQuote,900);}
   setTimeout(function(){home.style.display='none';},900);
 });
 document.getElementById('inBack').addEventListener('click',function(){
@@ -872,49 +1050,6 @@ document.getElementById('inBack').addEventListener('click',function(){
   setTimeout(function(){inside.hidden=true;},700);
   document.getElementById('inScroll').scrollTop=0;
 });
-
-/* the weeks, in the well */
-(function(){
-  var cv=document.getElementById('inWeeks'); if(!cv)return;
-  var cols=52,total=4175,lived=1179,onpath=43,cell=5,gap=1;
-  var rows=Math.ceil(total/cols), w=cols*(cell+gap)-gap, h=rows*(cell+gap)-gap;
-  cv.width=w*2;cv.height=h*2;cv.style.aspectRatio=w+' / '+h;
-  var cx=cv.getContext('2d');cx.scale(2,2);
-  for(var i=0;i<total;i++){
-    var col=i%cols,row=Math.floor(i/cols),x=col*(cell+gap),y=row*(cell+gap);
-    if(i>=lived-onpath&&i<lived)cx.fillStyle='rgba(63,217,78,1)';
-    else if(i<lived)cx.fillStyle='rgba(255,255,255,0.42)';
-    else cx.fillStyle='rgba(255,255,255,0.10)';
-    cx.fillRect(x,y,cell,cell);
-  }
-  var c2=lived%cols,r2=Math.floor(lived/cols);
-  cx.strokeStyle='rgba(255,255,255,0.95)';cx.lineWidth=1;
-  cx.strokeRect(c2*(cell+gap)-0.5,r2*(cell+gap)-0.5,cell+1,cell+1);
-})();
-
-/* the sky: every mark as a point of light, months stacked bottom to top */
-(function(){
-  var cv=document.getElementById('inSky'); if(!cv)return;
-  var W=340,H=430; cv.width=W*2;cv.height=H*2;cv.style.aspectRatio=W+' / '+H;
-  var cx=cv.getContext('2d');cx.scale(2,2);
-  var seed=61;
-  function rnd(){seed=(seed*1103515245+12345)%2147483648;return seed/2147483648;}
-  var months=[18,24,26,22,18,21,19,26,28,22,7]; // marks, Oct..Aug, bottom to top
-  var band=(H-40)/months.length;
-  function dot(m,color,r,glow){
-    var y=H-24-band*m-rnd()*band*0.94;
-    var x=16+rnd()*(W-32);
-    if(glow){cx.fillStyle='rgba(255,255,255,0.10)';cx.beginPath();cx.arc(x,y,r*3.2,0,7);cx.fill();}
-    cx.fillStyle=color;cx.beginPath();cx.arc(x,y,r,0,7);cx.fill();
-  }
-  for(var m=0;m<months.length;m++){
-    var acts=Math.round(months[m]*1.35), writes=Math.round(months[m]*0.6);
-    for(var i=0;i<acts;i++) dot(m,'rgba(63,217,78,'+(0.3+rnd()*0.55).toFixed(2)+')',0.9+rnd()*1.1,false);
-    for(var j=0;j<writes;j++) dot(m,'rgba(58,217,245,'+(0.25+rnd()*0.5).toFixed(2)+')',0.9+rnd()*1.0,false);
-  }
-  var recs=[1,2,4,5,7,8,9,10];
-  for(var k=0;k<recs.length;k++) dot(recs[k],'rgba(255,255,255,0.92)',2.1,true);
-})();
 
 /* the barcode: generated from the person's own numbers, unique per memento */
 (function(){
@@ -931,40 +1066,82 @@ document.getElementById('inBack').addEventListener('click',function(){
   host.innerHTML=out;
 })();
 
-/* the evidence: one stone open at a time */
-(function(){
-  var g=document.getElementById('evGrid'); if(!g)return;
-  g.addEventListener('click',function(e){
-    var st=e.target.closest('.evd'); if(!st)return;
-    var was=st.classList.contains('is-open');
-    g.querySelectorAll('.evd.is-open').forEach(function(o){o.classList.remove('is-open');});
-    if(!was) st.classList.add('is-open');
-  });
-})();
-
 /* the ring closes only when they reach the very bottom */
 (function(){
   var sc=document.getElementById('inScroll'); if(!sc)return;
   function check(){
-    var done = sc.scrollTop + sc.clientHeight >= sc.scrollHeight - 6;
+    var done = sc.scrollHeight > 0 && sc.scrollTop + sc.clientHeight >= sc.scrollHeight - 6;
     inside.classList.toggle('rim-done', done);
   }
   sc.addEventListener('scroll', check, {passive:true});
   check();
 })();
 
-/* the vision lights when you arrive at it */
-function lightQuote(){
-  var q=document.getElementById('inQuote'); if(!q||q.dataset.lit)return;
-  q.dataset.lit='1';
-  var words=q.textContent.split(/\s+/);
-  q.innerHTML=words.map(function(w){return '<span class="w">'+w+'</span>';}).join(' ');
-  var spans=q.querySelectorAll('.w');
-  for(var i=0;i<spans.length;i++){
-    (function(s,i){setTimeout(function(){if(s.isConnected)s.classList.add('lit');},500+i*110);})(spans[i],i);
-  }
-  setTimeout(function(){for(var i=0;i<spans.length;i++)spans[i].classList.add('lit');},5200);
+</script>
+<script>
+/* mor-clocks */
+try{ (function(){
+var el = document.getElementById('mor-clocks-tick');
+if (!el) { return; }
+function pad(n){ return (n < 10 ? '0' : '') + n; }
+function tick(){
+  var now = new Date();
+  var start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 6, 42, 0, 0);
+  if (now.getTime() < start.getTime()) { start = new Date(start.getTime() - 86400000); }
+  var s = Math.floor((now.getTime() - start.getTime()) / 1000);
+  el.textContent = Math.floor(s / 3600) + 'h ' + pad(Math.floor(s / 60) % 60) + 'm ' + pad(s % 60) + 's';
 }
+tick();
+setInterval(tick, 1000);
+})(); }catch(e){ console.error("mor-clocks",e); }
 
+/* clk-units */
+try{ (function(){
+var s=document.getElementById('clk-units-s'),m=document.getElementById('clk-units-m');if(!s)return;
+var base=25874287,t0=Date.now();
+function tick(){var v=base+Math.floor((Date.now()-t0)/1000);
+s.textContent=v.toLocaleString('en-US');
+if(m)m.textContent=Math.floor(v/60).toLocaleString('en-US');}
+tick();setInterval(tick,1000);
+})(); }catch(e){ console.error("clk-units",e); }
+
+/* cmb-wall */
+try{ (function(){
+var g=document.getElementById('cmb-wall-grid'); if(!g||g.childElementCount)return;
+var gaps=[[15,4],[37,7],[66,6],[87,5],[112,8],[136,6],[155,8],[180,9],[196,2],[210,4],[233,1],[258,1],[272,5],[292,3]];
+var blank={},back={},i,d;
+for(i=0;i<gaps.length;i++){ var s=gaps[i][0],l=gaps[i][1]; for(d=s;d<s+l;d++){ blank[d]=1; } back[s+l]=1; }
+var f=document.createDocumentFragment();
+for(d=1;d<=300;d++){
+  var c=document.createElement('i');
+  c.className='cmb-wall__c '+(blank[d]?'is-off':(back[d]?'is-back':'is-on'));
+  f.appendChild(c);
+}
+g.appendChild(f);
+})(); }catch(e){ console.error("cmb-wall",e); }
+
+/* amb-weeks */
+try{ (function(){
+var c=document.querySelector('.amb-weeks__cv');if(!c||!c.getContext)return;var g=c.getContext('2d');if(!g)return;var COLS=100,TOT=4175,LIV=1179,P=6.52,S=5.2,i;g.clearRect(0,0,c.width,c.height);for(i=0;i<TOT;i++){var x=(i%COLS)*P,y=((i/COLS)|0)*P,f;if(i<LIV-43){f='rgba(238,241,247,.20)';}else if(i<LIV-1){f='rgba(63,217,78,.72)';}else if(i===LIV-1){f='rgba(245,246,250,.97)';}else{f='rgba(255,255,255,.055)';}g.fillStyle=f;g.fillRect(x,y,S,S);}
+})(); }catch(e){ console.error("amb-weeks",e); }
+
+/* mor-oneday */
+try{ (function(){
+var row = document.getElementById('mor-oneday-row');
+if (!row) { return; }
+var gone = document.getElementById('mor-oneday-gone');
+var left = document.getElementById('mor-oneday-left');
+var cells = row.children;
+function paint(){
+  var h = new Date().getHours();
+  for (var i = 0; i < cells.length; i++) {
+    cells[i].className = i < h ? 'mor-oneday__on' : (i === h ? 'mor-oneday__now' : '');
+  }
+  if (gone) { gone.textContent = String(h); }
+  if (left) { left.textContent = String(24 - h); }
+}
+paint();
+setInterval(paint, 30000);
+})(); }catch(e){ console.error("mor-oneday",e); }
 </script>
 </body></html>
