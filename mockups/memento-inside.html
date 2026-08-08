@@ -135,6 +135,27 @@
   .inside.rim-done .rim-cover{opacity:0}
   .inside:not(.brd) .rim-cover{display:none}
 
+  .evh{margin-top:40px;font-size:21px;font-weight:750;letter-spacing:-.022em;color:var(--ink1)}
+  .evsub{margin-top:6px;font-size:13px;line-height:1.5;color:var(--ink3)}
+  .evgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+  .evd{position:relative;display:block;text-align:center;border:0;cursor:pointer;
+    border-radius:15px;padding:18px 13px 15px;overflow:hidden;font:inherit;
+    background:linear-gradient(180deg, rgba(244,246,250,.96), rgba(226,230,238,.92));
+    box-shadow:inset 0 2px 3px rgba(255,255,255,.9), inset 0 -1px 0 rgba(20,24,32,.10),
+      0 8px 22px rgba(0,0,0,.4)}
+  .evd__t{display:block;font-size:14px;font-weight:720;letter-spacing:-.015em;line-height:1.3;
+    color:rgba(16,20,28,.92);
+    text-shadow:0 1px 1px rgba(255,255,255,.9), 0 -1px .5px rgba(0,0,0,.16)}
+  .evd--q .evd__t{font-style:italic;font-weight:660}
+  .evd__d{display:block;margin-top:7px;font-size:10.5px;letter-spacing:.08em;
+    color:rgba(24,28,36,.55);font-variant-numeric:tabular-nums}
+  .evd__story{display:none;margin-top:12px;padding-top:11px;
+    box-shadow:inset 0 1.5px 0 rgba(16,20,28,.12);
+    font-size:13px;line-height:1.55;color:rgba(24,28,36,.78);text-align:left}
+  .evd.is-open{grid-column:1/-1}
+  .evd.is-open .evd__story{display:block}
+  .evcap{margin-top:12px;font-size:12px;color:var(--ink3);text-align:center}
+
   .in-head{text-align:center}
   .in-mark{width:44px;height:44px;fill:#3a4150;display:block;margin:0 auto}
   .in-name{margin-top:16px;font-size:27px;font-weight:780;letter-spacing:-.028em;color:var(--ink1);
@@ -601,60 +622,52 @@
         <p class="in-since">On the path since October 12. Day 300.</p>
       </header>
 
-      <p class="in-bigline">You left <b>462</b> marks in there.</p>
+      <h2 class="evh">The evidence</h2>
+      <p class="evsub">Not trophies. Eight things that actually happened, kept in stone.</p>
 
-      <div class="in-sky">
-        <canvas id="inSky" aria-label="every mark as a point of light, fourteen months bottom to top"></canvas>
-        <span class="in-sky__name">Malik</span>
+      <div class="evgrid" id="evGrid">
+        <button class="evd" type="button">
+          <span class="evd__t">The first mark</span>
+          <span class="evd__d">October 12, 6:42 AM</span>
+          <span class="evd__story">You almost did not download the app. The first mark was two minutes of work you nearly skipped. Everything on this page descends from it.</span>
+        </button>
+        <button class="evd" type="button">
+          <span class="evd__t">Run the half, finished</span>
+          <span class="evd__d">127 days &middot; January 17</span>
+          <span class="evd__story">Signed in October, finished in the January cold. The first promise you ever kept the whole way. It holds the door open for the others.</span>
+        </button>
+        <button class="evd" type="button">
+          <span class="evd__t">23 days, unbroken</span>
+          <span class="evd__d">June 2 to June 24</span>
+          <span class="evd__story">Your longest run. It did not end because you quit, it ended because life happened, and eleven days later you were back.</span>
+        </button>
+        <button class="evd" type="button">
+          <span class="evd__t">Came back after 9 days gone</span>
+          <span class="evd__d">April 2</span>
+          <span class="evd__story">The longest you have ever been away. Most people do not come back from nine days. You wrote one line that night: back.</span>
+        </button>
+        <button class="evd" type="button">
+          <span class="evd__t">Best month, June</span>
+          <span class="evd__d">28 of 30 days</span>
+          <span class="evd__story">Two missed days all month, both planned. This is what your ceiling looks like so far. It is on record that you can do this.</span>
+        </button>
+        <button class="evd" type="button">
+          <span class="evd__t">The biggest day</span>
+          <span class="evd__d">May 19</span>
+          <span class="evd__story">Six users in one day, off the cold email you rewrote four times and almost did not send.</span>
+        </button>
+        <button class="evd" type="button">
+          <span class="evd__t">14 comebacks, zero quits</span>
+          <span class="evd__d">the standing record</span>
+          <span class="evd__story">Every gap in the record has a return after it. Fourteen times it would have been easier to stop, and fourteen times you did not.</span>
+        </button>
+        <button class="evd evd--q" type="button">
+          <span class="evd__t">&ldquo;Wanted to quit at 3pm and did not.&rdquo;</span>
+          <span class="evd__d">your words &middot; March 4</span>
+          <span class="evd__story">Written the same evening, after the mark. The most valuable sentence in the record, because you wrote it on the way through, not after.</span>
+        </button>
       </div>
-      <div class="in-skykey">
-        <span><i class="k1"></i>you did it</span>
-        <span><i class="k2"></i>you wrote</span>
-        <span><i class="k3"></i>a record</span>
-      </div>
-      <p class="in-skycap">Eleven months, bottom to top.</p>
-
-      <div class="in-trio">
-        <div><b>231</b><span>days with<br>a mark</span></div>
-        <div><b>312</b><span>actions<br>completed</span></div>
-        <div><b>3</b><span>promises<br>made</span></div>
-      </div>
-
-      <div class="in-star">
-        <span class="in-star__dot"></span>
-        <div>
-          <p class="in-star__l">The star, now</p>
-          <p class="in-star__g">Get to 100 paying users.</p>
-        </div>
-      </div>
-
-      <div class="in-items">
-        <div class="in-cols"><span>Month</span><i></i><b>Marks</b><b>Acts</b></div>
-        <div class="in-r"><span>October</span><i></i><b>18</b><b>24</b></div>
-        <div class="in-r"><span>November</span><i></i><b>24</b><b>31</b></div>
-        <div class="in-r"><span>December</span><i></i><b>26</b><b>35</b></div>
-        <div class="in-r"><span>January</span><i></i><b>22</b><b>29</b></div>
-        <div class="in-r"><span>February</span><i></i><b>18</b><b>25</b></div>
-        <div class="in-r"><span>March</span><i></i><b>21</b><b>28</b></div>
-        <div class="in-r"><span>April</span><i></i><b>19</b><b>26</b></div>
-        <div class="in-r"><span>May</span><i></i><b>26</b><b>36</b></div>
-        <div class="in-r in-best"><span>June</span><i></i><b>28</b><b>39</b></div>
-        <div class="in-r"><span>July</span><i></i><b>22</b><b>30</b></div>
-        <div class="in-r"><span>August</span><i></i><b>7</b><b>9</b></div>
-        <div class="in-r in-sum"><span>Subtotal</span><i></i><b>231</b><b>312</b></div>
-        <div class="in-r in-meta"><span>Days you did not show up</span><i></i><b>69</b><b>0</b></div>
-      </div>
-      <div class="in-total"><span>Total</span><b>231<em> / 300</em></b></div>
-
-      <div class="in-items in-items--tight">
-        <div class="in-r in-meta"><span>Promises made</span><i></i><b class="in-wide">3</b></div>
-        <div class="in-r in-meta"><span>Finished, Run the half</span><i></i><b class="in-wide">Jan 17</b></div>
-        <div class="in-r in-meta"><span>Set down, Morning pages</span><i></i><b class="in-wide">day 40</b></div>
-        <div class="in-r in-meta"><span>Longest run</span><i></i><b class="in-wide">23 days</b></div>
-        <div class="in-r in-meta"><span>Times you came back</span><i></i><b class="in-wide">14</b></div>
-      </div>
-
-      <blockquote class="in-pull">&ldquo;Wanted to quit at 3pm and did not.&rdquo;<span>you, March 4, after the mark</span></blockquote>
+      <p class="evcap">Tap a stone. Evidence is stocked on the good days and read on the bad ones.</p>
 
       <div class="in-then">
         <div class="in-then__cards">
@@ -916,6 +929,17 @@ document.getElementById('inBack').addEventListener('click',function(){
     out+='<i style="width:'+w+'px;opacity:'+op+'"></i>';
   }
   host.innerHTML=out;
+})();
+
+/* the evidence: one stone open at a time */
+(function(){
+  var g=document.getElementById('evGrid'); if(!g)return;
+  g.addEventListener('click',function(e){
+    var st=e.target.closest('.evd'); if(!st)return;
+    var was=st.classList.contains('is-open');
+    g.querySelectorAll('.evd.is-open').forEach(function(o){o.classList.remove('is-open');});
+    if(!was) st.classList.add('is-open');
+  });
 })();
 
 /* the ring closes only when they reach the very bottom */
