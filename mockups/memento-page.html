@@ -303,6 +303,20 @@
   .tnw__wait{color:var(--mid)!important;font-weight:560!important;font-style:italic}
   .mth__hollow{background:transparent!important;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.4)!important}
 
+  /* the sealed note: written at the start, locked into vivere forever */
+  .seal{margin-top:14px;border-radius:20px;padding:18px 19px 15px;
+    background:linear-gradient(172deg, rgba(255,255,255,.05), rgba(255,255,255,.028));
+    box-shadow:var(--inset), 0 18px 44px rgba(0,0,0,.5)}
+  .seal__hd{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:680;color:var(--mid)}
+  .seal__lock{width:14px;height:14px;color:var(--mid)}
+  .seal__b{margin-top:12px;font-size:14.5px;line-height:1.6;letter-spacing:-.008em;color:var(--hi)}
+  .seal__sign{margin-top:12px;font-size:13px;font-style:italic;color:var(--mid)}
+  .seal__law{margin-top:14px;padding-top:11px;box-shadow:inset 0 1px 0 rgba(255,255,255,.07);
+    font-size:11.5px;color:var(--lo)}
+  .seal--d0{display:none}
+  body.d0 .seal{display:none}
+  body.d0 .seal--d0{display:block}
+
   /* door + toast */
   .door{display:flex;justify-content:space-between;align-items:center;width:100%;margin-top:30px;
     padding:15px 17px;border:0;border-radius:16px;background:rgba(255,255,255,.06);
@@ -823,6 +837,27 @@
         <p class="wrd__q">&ldquo;Because I am done building things nobody pays for.&rdquo;</p>
         <p class="wrd__m">Written today. The only thing on the page you control completely.</p>
       </div>
+    </div>
+
+    <div class="seal">
+      <div class="seal__hd">
+        <svg class="seal__lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        <span>Sealed October 12, day one</span>
+      </div>
+      <p class="seal__b">I am writing this the night before day one. I can see the finished thing so clearly it hurts. If you are reading this because it got hard, good. It was always going to get hard.</p>
+      <p class="seal__b">You wanted this badly enough to write it down. Do not let the person reading this take it away from the person writing it.</p>
+      <p class="seal__sign">you, at the start</p>
+      <p class="seal__law">Written once. It cannot be edited, only kept. Only you can open it.</p>
+    </div>
+
+    <div class="seal seal--d0">
+      <div class="seal__hd">
+        <svg class="seal__lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        <span>Unsealed, until tonight</span>
+      </div>
+      <p class="seal__b">Tonight you write one note to the person you are doing this for. It seals when you finish it, and it never changes again.</p>
+      <p class="seal__b">Some day you will need proof that you once wanted this badly. This is where the proof will live.</p>
+      <p class="seal__law">Written once. It cannot be edited, only kept. Only you can open it.</p>
     </div>
   </section>
 
