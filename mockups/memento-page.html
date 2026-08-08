@@ -317,6 +317,31 @@
   body.d0 .seal{display:none}
   body.d0 .seal--d0{display:block}
 
+  /* the clean scroll: controls float light, headings live in the flow */
+  .sec__hd--slim{justify-content:flex-end;margin-bottom:9px;min-height:0}
+  .flowh{margin:64px 0 16px;font-size:22px;font-weight:750;letter-spacing:-.025em;color:var(--hi)}
+  .flowh--viv{margin-top:70px}
+  .sec--flow{margin-top:0}
+
+  /* the origin plaque, ported verbatim from the app's v1133 dark-room variant:
+     a white plaque the date is struck INTO, standing off the dark room */
+  .org{position:relative;margin:70px 0 0;padding:30px 22px 28px;border-radius:18px;
+    text-align:center;overflow:hidden;
+    background:linear-gradient(180deg, rgba(244,246,250,.96), rgba(228,232,240,.92));
+    box-shadow:inset 0 2px 3px rgba(255,255,255,.9), inset 0 -1px 0 rgba(20,24,32,.10),
+               0 10px 30px rgba(0,0,0,.45)}
+  .org::before{content:"";position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(76% 90% at 50% 118%,
+      color-mix(in srgb, var(--mtint) 12%, transparent), transparent 72%)}
+  .org>*{position:relative}
+  .org__k{display:block;font-size:12px;font-weight:600;color:rgba(24,28,36,.55)}
+  .org__d{display:block;margin:9px 0 0;font-size:20px;font-weight:700;
+    letter-spacing:.14em;text-transform:uppercase;color:rgba(16,20,28,.92);
+    text-shadow:0 1px 1px rgba(255,255,255,.9), 0 -1px .5px rgba(0,0,0,.18)}
+  .org__t{display:block;margin:9px 0 0;font-size:13px;color:rgba(24,28,36,.62);
+    font-variant-numeric:tabular-nums}
+  body.is-void .org::before{background:none}
+
   /* door + toast */
   .door{display:flex;justify-content:space-between;align-items:center;width:100%;margin-top:30px;
     padding:15px 17px;border:0;border-radius:16px;background:rgba(255,255,255,.06);
@@ -657,7 +682,7 @@
 
   <!-- THE RECORD: the relic-receipt, everything ever, the star stated plainly -->
   <section class="sec" id="sec-all">
-    <div class="sec__hd"><span class="sec__t">Everything, since October 12</span><span class="sec__ctl"><button class="sw" type="button" data-sw></button><button class="sh" type="button" data-sh aria-label="Share this section"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M8 7l4-4 4 4"/><path d="M4 13v6h16v-6"/></svg></button></span></div>
+    <div class="sec__hd sec__hd--slim"><span class="sec__ctl"><button class="sw" type="button" data-sw>%s</button><button class="sh" type="button" data-sh aria-label="Share this section"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M8 7l4-4 4 4"/><path d="M4 13v6h16v-6"/></svg></button></span></div>
     <div class="out is-on shot" data-out="The relic">
       <div class="rr">
         <div class="rr-head">
@@ -767,7 +792,7 @@
 
   <!-- THEN AND NOW: the card itself, dead against lit -->
   <section class="sec" id="sec-then">
-    <div class="sec__hd"><span class="sec__t">Then and now</span><span class="sec__ctl"><button class="sw" type="button" data-sw></button><button class="sh" type="button" data-sh aria-label="Share this section"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M8 7l4-4 4 4"/><path d="M4 13v6h16v-6"/></svg></button></span></div>
+    <div class="sec__hd sec__hd--slim"><span class="sec__ctl"><button class="sw" type="button" data-sw>%s</button><button class="sh" type="button" data-sh aria-label="Share this section"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M8 7l4-4 4 4"/><path d="M4 13v6h16v-6"/></svg></button></span></div>
     <div class="out is-on shot" data-out="Two cards">
       <div class="tnc">
         <div class="tnc-cards">
@@ -789,9 +814,9 @@
     </div>
   </section>
 
-  <!-- MORI -->
-  <section class="sec" id="sec-weeks">
-    <div class="sec__hd"><span class="sec__t">Memento mori</span><span class="sec__ctl"><button class="sw" type="button" data-sw></button><button class="sh" type="button" data-sh aria-label="Share this section"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M8 7l4-4 4 4"/><path d="M4 13v6h16v-6"/></svg></button></span></div>
+  <h2 class="flowh">Memento mori</h2>
+  <section class="sec sec--flow" id="sec-weeks">
+    <div class="sec__hd sec__hd--slim"><span class="sec__ctl"><button class="sw" type="button" data-sw>%s</button><button class="sh" type="button" data-sh aria-label="Share this section"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M8 7l4-4 4 4"/><path d="M4 13v6h16v-6"/></svg></button></span></div>
     <div class="out is-on shot" data-out="The weeks">
       <div class="wks">
         <p class="wks__mori"><b>20,967</b> days left, give or take. 300 of them went to the path.</p>
@@ -808,9 +833,9 @@
     </div>
   </section>
 
-  <!-- VIVERE -->
-  <section class="sec" id="sec-words">
-    <div class="sec__hd"><span class="sec__t">Memento vivere</span><span class="sec__ctl"><button class="sw" type="button" data-sw></button><button class="sh" type="button" data-sh aria-label="Share this section"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M8 7l4-4 4 4"/><path d="M4 13v6h16v-6"/></svg></button></span></div>
+  <h2 class="flowh flowh--viv">Memento vivere</h2>
+  <section class="sec sec--flow" id="sec-words">
+    <div class="sec__hd sec__hd--slim"><span class="sec__ctl"><button class="sw" type="button" data-sw>%s</button><button class="sh" type="button" data-sh aria-label="Share this section"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M8 7l4-4 4 4"/><path d="M4 13v6h16v-6"/></svg></button></span></div>
     <div class="out shot" data-out="The vow">
       <div class="wrd">
         <p class="wrd__q">&ldquo;Because I am done building things nobody pays for.&rdquo;</p>
@@ -861,8 +886,11 @@
     </div>
   </section>
 
-  <button class="door" type="button">The record<span>&rsaquo;</span></button>
-  <p class="door__sub">Every mark, every day, since October 12.</p>
+  <div class="org">
+    <span class="org__k">Creation of Your Memento</span>
+    <span class="org__d">October 12, 2025</span>
+    <span class="org__t">6:42 AM</span>
+  </div>
 </div>
 <div class="toast" id="toast">Shared, in this look</div>
 
@@ -1005,14 +1033,9 @@ function unlite(){
   cage.className='cage '+(m.cls||'')+(m.stock?' is-stock':'');
   cage.innerHTML=realCard(matVars(m,{clar:false,act:false,cons:false}),{name:'Malik Peace'});
 }
-var T0={'sec-all':'Everything, from today','sec-now':'The open chapter','sec-days':'The days you show up','sec-then':'Then and now','sec-weeks':'Memento mori','sec-words':'Memento vivere','sec-month':'This month'};
-var T1={};
-document.querySelectorAll('.sec').forEach(function(sec){T1[sec.id]=sec.querySelector('.sec__t').textContent;});
 d0btn.addEventListener('click',function(){
   var on=document.body.classList.toggle('d0');
   d0btn.textContent=on?'Back to day 300':'What day one looks like';
-  document.querySelectorAll('.sec').forEach(function(sec){
-    sec.querySelector('.sec__t').textContent=(on?T0:T1)[sec.id]||T1[sec.id];});
   if(on){document.body.classList.remove('ns-bloom');unlite();}
   else{document.body.classList.add('ns-bloom');_pick(curMat);}
 });
