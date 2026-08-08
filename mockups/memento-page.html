@@ -207,6 +207,85 @@
   .mth__dots i{width:11px;height:11px;border-radius:50%;background:var(--cons);box-shadow:0 0 9px rgba(63,217,78,.5)}
   .mth__v{margin-top:10px;font-size:13px;color:var(--mid)}
 
+  /* the relic-receipt: the relic's body wearing receipt typography */
+  .rr{position:relative;overflow:hidden;border-radius:22px;padding:20px 20px 16px;
+    background:
+      repeating-linear-gradient(135deg, rgba(255,255,255,.014) 0 1px, transparent 1px 8px),
+      linear-gradient(170deg,#0c0d12,#08090d);
+    box-shadow:var(--inset), 0 22px 54px rgba(0,0,0,.55)}
+  .rr-head{display:flex;align-items:center;justify-content:space-between}
+  .rr-serial{padding:4px 11px;border-radius:999px;background:rgba(255,255,255,.06);
+    box-shadow:var(--inset);font-size:11.5px;color:var(--mid);font-variant-numeric:tabular-nums}
+  .rr-name{margin-top:18px;font-size:24px;font-weight:770;letter-spacing:-.025em;color:var(--hi)}
+  .rr-since{margin-top:4px;font-size:12.5px;line-height:1.45;color:var(--mid)}
+  .rr-hero{display:flex;align-items:center;gap:13px;margin-top:16px}
+  .rr-hero>b{font-size:64px;font-weight:800;letter-spacing:-.05em;line-height:.9;color:var(--hi);
+    font-variant-numeric:tabular-nums}
+  .rr-herol{font-size:14px;font-weight:620;line-height:1.3;color:var(--mid)}
+  .rr-heror{margin-left:auto;text-align:right;font-size:13px;line-height:1.45;color:var(--mid)}
+  .rr-heror b{font-weight:720;color:var(--hi)}
+  .rr-star{display:flex;gap:11px;align-items:flex-start;margin-top:18px;border-radius:14px;
+    padding:12px 14px;background:rgba(58,217,245,.06);box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+  .rr-star__dot{flex:0 0 9px;height:9px;margin-top:5px;border-radius:50%;
+    background:var(--clar);box-shadow:0 0 12px rgba(58,217,245,.7)}
+  .rr-star__l{font-size:11.5px;font-weight:640;color:var(--mid)}
+  .rr-star__g{margin-top:2px;font-size:16px;font-weight:700;letter-spacing:-.015em;color:var(--hi)}
+  .rr-items{margin-top:16px;padding-top:11px;box-shadow:inset 0 1.5px 0 rgba(255,255,255,.12)}
+  .rr-items--tight{margin-top:12px}
+  .rr-cols{display:flex;align-items:baseline;gap:7px;padding:0 0 5px;font-size:11.5px;color:var(--lo)}
+  .rr-cols i{flex:1}
+  .rr-cols b,.rr-r b{font-weight:640;font-variant-numeric:tabular-nums}
+  .rr-cd,.rr-r b:nth-of-type(1){width:40px;text-align:right}
+  .rr-cu,.rr-r b:nth-of-type(2){width:40px;text-align:right}
+  .rr-r{display:flex;align-items:baseline;gap:7px;padding:4px 0;font-size:13.5px}
+  .rr-r span{color:var(--mid);white-space:nowrap}
+  .rr-r i{flex:1;height:1px;background-image:radial-gradient(circle, rgba(255,255,255,.28) 1px, transparent 1.2px);
+    background-size:6px 2px;background-repeat:repeat-x;background-position:bottom}
+  .rr-r b{color:var(--hi)}
+  .rr-best span,.rr-best b{color:var(--hi);font-weight:700}
+  .rr-best b:nth-of-type(1){color:var(--cons)}
+  .rr-sum{margin-top:5px;padding-top:9px;box-shadow:inset 0 1.5px 0 rgba(255,255,255,.12)}
+  .rr-sum span{color:var(--hi);font-weight:700}
+  .rr-meta span,.rr-meta b{font-size:12.5px}
+  .rr-meta b{color:var(--mid);font-weight:560}
+  .rr-wide{width:auto!important;white-space:nowrap}
+  .rr-total{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-top:12px;
+    padding-top:11px;box-shadow:inset 0 1.5px 0 rgba(255,255,255,.12)}
+  .rr-total span{font-size:13.5px;font-weight:740;color:var(--hi)}
+  .rr-total b{font-size:34px;font-weight:800;letter-spacing:-.04em;color:var(--hi);font-variant-numeric:tabular-nums}
+  .rr-total em{font-style:normal;font-size:15px;font-weight:600;color:var(--mid)}
+  .rr-notes{margin-top:14px;font-size:12.5px;line-height:1.55;color:var(--mid)}
+  .rr-quote{margin:14px 0 0;padding:2px 0 2px 13px;box-shadow:inset 2.5px 0 0 var(--clar);
+    font-size:15px;font-style:italic;line-height:1.5;color:var(--hi)}
+  .rr-quote span{display:block;margin-top:5px;font-size:11.5px;font-style:normal;color:var(--mid)}
+  .rr-foot{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-top:16px;
+    padding-top:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+  .rr-foot__n{font-size:14.5px;font-weight:720;color:var(--hi)}
+  .rr-foot__s{margin-top:2px;font-size:11.5px;color:var(--mid)}
+  .rr-code{display:flex;gap:2.5px;height:26px}
+  .rr-code i{width:2px;background:rgba(238,242,251,.7)}
+  .rr-code i:nth-child(3n){width:4px}
+  .rr-code i:nth-child(5n){width:1.5px;opacity:.55}
+  .rr-code i:nth-child(7n){width:5px}
+  .rr-policy{margin-top:12px;font-size:11px;color:var(--mid);text-align:center}
+  .rr-wm{position:absolute;right:-26px;bottom:-30px;width:150px;height:150px;
+    fill:rgba(255,255,255,.028);pointer-events:none}
+
+  /* then and now: the card itself, dead against lit */
+  .tnc{border-radius:22px;padding:20px 16px 18px;background:#060709;
+    box-shadow:var(--inset), 0 22px 54px rgba(0,0,0,.55)}
+  .tnc-cards{display:flex;gap:14px;justify-content:center}
+  .tnc-side{flex:1;max-width:150px;text-align:center}
+  .cage-sm{width:100%;max-width:128px;margin:0 auto}
+  .cage-sm .daycard-ns__name{display:none!important}
+  .cage-sm *{animation:none!important;will-change:auto!important}
+  .tnc-when{margin-top:12px;font-size:12px;font-weight:720;color:var(--mid)}
+  .tnc-now{color:var(--cons)}
+  .tnc-f{margin-top:7px;font-size:13px;font-weight:600;line-height:1.35;color:var(--hi)}
+  .tnc-side:first-child .tnc-f{color:var(--mid);font-weight:560}
+  .tnc-line{margin-top:18px;font-size:15px;font-weight:680;letter-spacing:-.015em;color:var(--hi);text-align:center}
+  body.d0 #sec-then{display:none}
+
   /* day one: the page before anything has happened */
   .d0btn{display:block;margin:14px auto 0;padding:9px 16px;border:0;border-radius:10px;
     background:rgba(255,255,255,.07);box-shadow:var(--inset);color:var(--hi);
@@ -559,29 +638,72 @@
   <p class="mats__note">The page wears your Memento. Pick a material and every section takes its light.</p>
   <button class="d0btn" id="d0btn" type="button">What day one looks like</button>
 
-  <!-- 2. EVERYTHING, the totality, first by Malik's call -->
+  <!-- THE RECORD: the relic-receipt, everything ever, the star stated plainly -->
   <section class="sec" id="sec-all">
     <div class="sec__hd"><span class="sec__t">Everything, since October 12</span><span class="sec__ctl"><button class="sw" type="button" data-sw></button><button class="sh" type="button" data-sh aria-label="Share this section"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M8 7l4-4 4 4"/><path d="M4 13v6h16v-6"/></svg></button></span></div>
-    <div class="out is-on shot" data-out="Receipt">
-      <div class="slip">
-        <div class="slip__tear"></div>
-        <div class="slip__in">
-          <div class="slip__head"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg><p class="slip__store">Memento</p>
-            <p class="slip__meta">Malik Peace. On the path 300 days.</p></div>
-          <div class="slip__items">
-            <div class="slip__r"><span>Days that earned a mark</span><i></i><b class="gr">231</b></div>
-            <div class="slip__r"><span>Actions completed</span><i></i><b>312</b></div>
-            <div class="slip__r"><span>Promises made</span><i></i><b>3</b></div>
-            <div class="slip__r slip__sub"><span>finished</span><i></i><b>1</b></div>
-            <div class="slip__r slip__sub"><span>set down</span><i></i><b>1</b></div>
-            <div class="slip__r slip__sub"><span>open</span><i></i><b>1</b></div>
-            <div class="slip__r"><span>Longest run</span><i></i><b>23 days</b></div>
-            <div class="slip__r"><span>Times you came back</span><i></i><b>14</b></div>
-          </div>
-          <div class="slip__total"><span>Days remaining, estimate</span><b>20,967</b></div>
-          <p class="slip__policy">No refunds. Balance falls daily.</p>
+    <div class="out is-on shot" data-out="The relic">
+      <div class="rr">
+        <div class="rr-head">
+          <span class="brand"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>Memento</span>
+          <span class="rr-serial">No. 0001</span>
         </div>
-        <div class="slip__tear slip__tear--b"></div>
+        <p class="rr-name">Malik Peace.</p>
+        <p class="rr-since">On the path since October 12. Printed August 7, day 300.</p>
+
+        <div class="rr-hero">
+          <b>231</b>
+          <span class="rr-herol">days with<br>a mark</span>
+          <span class="rr-heror"><b>312 actions</b><br>3 promises</span>
+        </div>
+
+        <div class="rr-star">
+          <span class="rr-star__dot"></span>
+          <div>
+            <p class="rr-star__l">The star, now</p>
+            <p class="rr-star__g">Get to 100 paying users.</p>
+          </div>
+        </div>
+
+        <div class="rr-items">
+          <div class="rr-cols"><span>Month</span><i></i><b class="rr-cd">Marks</b><b class="rr-cu">Acts</b></div>
+          <div class="rr-r"><span>October</span><i></i><b>18</b><b>24</b></div>
+          <div class="rr-r"><span>November</span><i></i><b>24</b><b>31</b></div>
+          <div class="rr-r"><span>December</span><i></i><b>26</b><b>35</b></div>
+          <div class="rr-r"><span>January</span><i></i><b>22</b><b>29</b></div>
+          <div class="rr-r"><span>February</span><i></i><b>18</b><b>25</b></div>
+          <div class="rr-r"><span>March</span><i></i><b>21</b><b>28</b></div>
+          <div class="rr-r"><span>April</span><i></i><b>19</b><b>26</b></div>
+          <div class="rr-r"><span>May</span><i></i><b>26</b><b>36</b></div>
+          <div class="rr-r rr-best"><span>June</span><i></i><b>28</b><b>39</b></div>
+          <div class="rr-r"><span>July</span><i></i><b>22</b><b>30</b></div>
+          <div class="rr-r"><span>August</span><i></i><b>7</b><b>9</b></div>
+          <div class="rr-r rr-sum"><span>Subtotal</span><i></i><b>231</b><b>312</b></div>
+          <div class="rr-r rr-meta"><span>Days you did not show up</span><i></i><b>69</b><b>0</b></div>
+        </div>
+
+        <div class="rr-total"><span>Total</span><b>231<em> / 300</em></b></div>
+
+        <div class="rr-items rr-items--tight">
+          <div class="rr-r rr-meta"><span>Promises made</span><i></i><b class="rr-wide">3</b></div>
+          <div class="rr-r rr-meta"><span>Finished, Run the half</span><i></i><b class="rr-wide">Jan 17</b></div>
+          <div class="rr-r rr-meta"><span>Set down, Morning pages</span><i></i><b class="rr-wide">day 40</b></div>
+          <div class="rr-r rr-meta"><span>Longest run</span><i></i><b class="rr-wide">23 days</b></div>
+          <div class="rr-r rr-meta"><span>Times you came back</span><i></i><b class="rr-wide">14</b></div>
+        </div>
+
+        <p class="rr-notes">Career notes: Run the half finished January 17 after 127 days. Morning pages set down at day 40, kept on the record. The open star is at day 186 with 62 people paying.</p>
+
+        <blockquote class="rr-quote">Because I am done building things nobody pays for.<span>The open star, in your words.</span></blockquote>
+
+        <div class="rr-foot">
+          <div>
+            <p class="rr-foot__n">Malik Peace</p>
+            <p class="rr-foot__s">1 of 1. Three promises, 300 days, still here.</p>
+          </div>
+          <div class="rr-code" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        </div>
+        <p class="rr-policy">No refunds on skipped days. This slip prints again tomorrow.</p>
+        <svg class="rr-wm" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
       </div>
     </div>
     <div class="out shot" data-out="Poster">
@@ -597,152 +719,57 @@
         </div>
       </div>
     </div>
-    <div class="out shot" data-out="Card back">
-      <div class="relb">
-        <div class="relb__top"><span class="brand"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>Memento</span><span class="dim">No. 0001</span></div>
-        <p class="relb__name">Malik Peace</p>
-        <p class="relb__since">On the path since October 12, 2025</p>
-        <div class="relb__tbl">
-          <div><span>Marks</span><b>231</b></div>
-          <div><span>Actions</span><b>312</b></div>
-          <div><span>Promises</span><b>3</b></div>
-          <div><span>Finished</span><b>1</b></div>
-          <div><span>Record run</span><b>23</b></div>
-          <div><span>Comebacks</span><b>14</b></div>
-        </div>
-        <p class="relb__note">Career notes: one promise finished, one set down at day 40 and kept on the record, one open at day 186. Best month June, 28 of 30.</p>
-      </div>
-    </div>
     <div class="out--d0">
-      <div class="slip">
-        <div class="slip__tear"></div>
-        <div class="slip__in">
-          <div class="slip__head"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg><p class="slip__store">Memento</p>
-            <p class="slip__meta">Malik Peace. Day 1.</p></div>
-          <div class="slip__items">
-            <div class="slip__r"><span>Days that earned a mark</span><i></i><b>0</b></div>
-            <div class="slip__r"><span>Actions completed</span><i></i><b>0</b></div>
-            <div class="slip__r"><span>Promises made</span><i></i><b>1</b></div>
+      <div class="rr">
+        <div class="rr-head">
+          <span class="brand"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>Memento</span>
+          <span class="rr-serial">No. 0001</span>
+        </div>
+        <p class="rr-name">Malik Peace.</p>
+        <p class="rr-since">On the path since today. Day 1.</p>
+        <div class="rr-items rr-items--tight">
+          <div class="rr-r rr-meta"><span>Days with a mark</span><i></i><b class="rr-wide">0</b></div>
+          <div class="rr-r rr-meta"><span>Actions completed</span><i></i><b class="rr-wide">0</b></div>
+          <div class="rr-r rr-meta"><span>Promises made</span><i></i><b class="rr-wide">1</b></div>
+        </div>
+        <div class="rr-star">
+          <span class="rr-star__dot"></span>
+          <div>
+            <p class="rr-star__l">The star, now</p>
+            <p class="rr-star__g">Get to 100 paying users.</p>
           </div>
-          <div class="slip__total"><span>Days remaining, estimate</span><b>21,267</b></div>
-          <p class="slip__policy">The ledger opens with the first mark. That can be tonight.</p>
         </div>
-        <div class="slip__tear slip__tear--b"></div>
+        <p class="rr-policy">The ledger opens with the first mark. That can be tonight.</p>
+        <svg class="rr-wm" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
       </div>
     </div>
   </section>
 
-  <!-- 3. THE CURRENT CHAPTER -->
-  <section class="sec" id="sec-now">
-    <div class="sec__hd"><span class="sec__t">The open chapter</span><span class="sec__ctl"><button class="sw" type="button" data-sw></button><button class="sh" type="button" data-sh aria-label="Share this section"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M8 7l4-4 4 4"/><path d="M4 13v6h16v-6"/></svg></button></span></div>
-    <div class="out is-on shot" data-out="Plain">
-      <div class="now">
-        <p class="now__goal">Get to 100 paying users.</p>
-        <p class="now__line">Day 186 &middot; 62 of 100 &middot; 38 to go</p>
-        <div class="now__bar"><i style="width:62%"></i></div>
-        <p class="now__pace">At the pace of the last 30 days you arrive October 14. You signed for September 1.</p>
-      </div>
-    </div>
-    <div class="out shot" data-out="Ticket">
-      <div class="tkt">
-        <div class="tkt__route">
-          <div class="tkt__end"><b>0</b><span>Feb 3, departed</span></div>
-          <div class="tkt__line"><i></i><em class="tkt__you"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg><b>62</b></em><u></u></div>
-          <div class="tkt__end tkt__r"><b>100</b><span>arriving Oct 14</span></div>
-        </div>
-        <div class="tkt__delay"><s>Sep 1</s><b>Oct 14</b><span class="tkt__chip">6 weeks late</span></div>
-        <div class="tkt__perf"></div>
-        <div class="tkt__stub">
-          <div><span>Passenger</span><b>Malik Peace</b></div>
-          <div><span>Days flown</span><b>186</b></div>
-          <div><span>Shown up</span><b>141</b></div>
-        </div>
-      </div>
-    </div>
-    <div class="out--d0">
-      <div class="now">
-        <p class="now__goal">Get to 100 paying users.</p>
-        <p class="now__line">Day 1 &middot; 0 of 100</p>
-        <div class="now__bar"><i style="width:0%"></i></div>
-        <p class="now__pace">The line starts at 5pm tonight. Everything after this is record.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- 4. THE DAYS -->
-  <section class="sec" id="sec-days">
-    <div class="sec__hd"><span class="sec__t">The days you showed up</span><span class="sec__ctl"><button class="sw" type="button" data-sw></button><button class="sh" type="button" data-sh aria-label="Share this section"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M8 7l4-4 4 4"/><path d="M4 13v6h16v-6"/></svg></button></span></div>
-    <div class="out is-on shot" data-out="Lights">
-      <div class="lgt">
-        <svg id="lightsField" viewBox="0 0 340 210" aria-label="231 days as points of light"></svg>
-        <p class="lgt__line"><b>231 days,</b> each one a light you switched on by hand.</p>
-      </div>
-    </div>
-    <div class="out shot" data-out="Wall">
-      <div class="wal">
-        <canvas id="wallGrid" aria-label="every day since October 12"></canvas>
-        <p class="lgt__line"><b>231 of 300.</b> The holes are part of the record too.</p>
-      </div>
-    </div>
-    <div class="out shot" data-out="Comeback">
-      <div class="cbk">
-        <div class="cbk__hero"><b>14</b><span>times you stopped.<br><em>14 times you came back.</em></span></div>
-        <div class="cbk__strip"><i style="flex:12"></i><u style="flex:3"></u><i style="flex:9"></i><u style="flex:2"></u><i style="flex:23"></i><u style="flex:9"></u><i style="flex:14"></i><u style="flex:4"></u><i style="flex:8"></i><u style="flex:3"></u><i style="flex:17"></i><u style="flex:5"></u><i style="flex:11"></i><u style="flex:2"></u><i class="cur" style="flex:6"></i></div>
-        <p class="cbk__line">300 days. 69 missed. Zero quit.</p>
-      </div>
-    </div>
-    <div class="out--d0">
-      <div class="lgt">
-        <div class="lgt__dark"></div>
-        <p class="lgt__line"><b>No lights yet.</b> The dark is what it looks like before. The first one switches on the day you do.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- 5. THEN AND NOW, its own section by Malik's call -->
+  <!-- THEN AND NOW: the card itself, dead against lit -->
   <section class="sec" id="sec-then">
     <div class="sec__hd"><span class="sec__t">Then and now</span><span class="sec__ctl"><button class="sw" type="button" data-sw></button><button class="sh" type="button" data-sh aria-label="Share this section"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M8 7l4-4 4 4"/><path d="M4 13v6h16v-6"/></svg></button></span></div>
-    <div class="out is-on shot" data-out="Then and now">
-      <div class="tnw">
-        <div class="tnw__cols">
-          <div class="tnw__col tnw__then">
-            <p class="tnw__when">Oct 12, day 1</p>
-            <p>A notebook of starts, none finished.</p>
-            <p>Zero people paying for anything.</p>
-            <p>Longest streak of the year: 4 days.</p>
-            <p>Wrote a goal down and did not believe it.</p>
+    <div class="out is-on shot" data-out="Two cards">
+      <div class="tnc">
+        <div class="tnc-cards">
+          <div class="tnc-side">
+            <div class="cage-sm" id="tncA"></div>
+            <p class="tnc-when">Day 1</p>
+            <p class="tnc-f">Dark. Zero marks.</p>
+            <p class="tnc-f">A goal you did not believe.</p>
           </div>
-          <div class="tnw__col tnw__now">
-            <p class="tnw__when">Aug 7, day 300</p>
-            <p>One promise finished, one open.</p>
-            <p>62 people pay every month.</p>
-            <p>A 23 day record, rebuilt 14 times.</p>
-            <p>Reads the goal like a fact.</p>
+          <div class="tnc-side">
+            <div class="cage-sm" id="tncB"></div>
+            <p class="tnc-when tnc-now">Day 300</p>
+            <p class="tnc-f">Lit. 231 marks.</p>
+            <p class="tnc-f">62 people paying.</p>
           </div>
         </div>
-        <p class="tnw__line">Same person. 231 marks between them.</p>
-      </div>
-    </div>
-    <div class="out--d0">
-      <div class="tnw">
-        <div class="tnw__cols">
-          <div class="tnw__col tnw__then">
-            <p class="tnw__when">Today, day 1</p>
-            <p>A goal, written down.</p>
-            <p>A reason, in your own words.</p>
-            <p>Nothing to show yet, honestly.</p>
-          </div>
-          <div class="tnw__col tnw__now">
-            <p class="tnw__when">Later</p>
-            <p class="tnw__wait">Being written.</p>
-          </div>
-        </div>
-        <p class="tnw__line">This column fills with what you do. Nothing else fills it.</p>
+        <p class="tnc-line">Same card. You lit it.</p>
       </div>
     </div>
   </section>
 
-  <!-- MORI: after the record, before the why (Malik: record, mori, vivere) -->
+  <!-- MORI -->
   <section class="sec" id="sec-weeks">
     <div class="sec__hd"><span class="sec__t">Your life, in weeks</span><span class="sec__ctl"><button class="sw" type="button" data-sw></button><button class="sh" type="button" data-sh aria-label="Share this section"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M8 7l4-4 4 4"/><path d="M4 13v6h16v-6"/></svg></button></span></div>
     <div class="out is-on shot" data-out="The weeks">
@@ -761,8 +788,7 @@
     </div>
   </section>
 
-
-  <!-- 7. YOUR WORDS -->
+  <!-- VIVERE -->
   <section class="sec" id="sec-words">
     <div class="sec__hd"><span class="sec__t">In your words</span><span class="sec__ctl"><button class="sw" type="button" data-sw></button><button class="sh" type="button" data-sh aria-label="Share this section"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M8 7l4-4 4 4"/><path d="M4 13v6h16v-6"/></svg></button></span></div>
     <div class="out is-on shot" data-out="The vow">
@@ -794,26 +820,6 @@
     </div>
   </section>
 
-  <!-- 8. THIS MONTH, one line -->
-  <section class="sec" id="sec-month">
-    <div class="sec__hd"><span class="sec__t">This month</span><span class="sec__ctl"><button class="sw" type="button" data-sw></button><button class="sh" type="button" data-sh aria-label="Share this section"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M8 7l4-4 4 4"/><path d="M4 13v6h16v-6"/></svg></button></span></div>
-    <div class="out is-on shot" data-out="The month">
-      <div class="mth">
-        <div class="mth__row"><b>August.</b><span class="gr">Seven for seven.</span></div>
-        <div class="mth__dots"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-        <p class="mth__v">The best start to a month yet.</p>
-      </div>
-    </div>
-    <div class="out--d0">
-      <div class="mth">
-        <div class="mth__row"><b>August.</b><span class="dim">Day 1.</span></div>
-        <div class="mth__dots"><i class="mth__hollow"></i></div>
-        <p class="mth__v">The first mark lands tonight or it does not. Either way it gets written down.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- 9. THE DOOR -->
   <button class="door" type="button">The record<span>&rsaquo;</span></button>
   <p class="door__sub">Every mark, every day, since October 12.</p>
 </div>
@@ -935,6 +941,11 @@ function pick(i){
   var cage=document.getElementById('cage');
   cage.className='cage '+(m.cls||'')+(m.stock?' is-stock':'');
   cage.innerHTML=realCard(matVars(m,{clar:true,act:true,cons:true}),{name:'Malik Peace'});
+  var a=document.getElementById('tncA'), b=document.getElementById('tncB');
+  if(a){a.className='cage-sm cage is-stock';
+    a.innerHTML=realCard(matVars(MATS[0],{clar:false,act:false,cons:false}),{name:''});}
+  if(b){b.className='cage-sm cage '+(m.cls||'')+(m.stock?' is-stock':'');
+    b.innerHTML=realCard(matVars(m,{clar:true,act:true,cons:true}),{name:''});}
   document.body.classList.toggle('is-void', m.n==='Void');
   var tint = m.n==='Void' ? 'rgba(0,0,0,1)' : m.tint;
   document.documentElement.style.setProperty('--mtint', tint);
