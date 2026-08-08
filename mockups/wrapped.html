@@ -461,6 +461,110 @@
 .tw-doors button{padding:13px;border:0;border-radius:12px;background:rgba(255,255,255,.06);
   box-shadow:var(--inset);color:var(--hi);font:inherit;font-size:14.5px;font-weight:620;text-align:left;padding-left:16px}
 </style>
+
+
+<script id="crashguard-notes">
+document.addEventListener('DOMContentLoaded',function(){
+  var host=document.querySelector('.jumpbtn'); if(!host||!host.parentNode) return;
+  var b=document.createElement('button');
+  b.type='button'; b.className='jumpbtn notesbtn'; b.textContent='Show the notes';
+  b.addEventListener('click',function(){
+    var on=document.body.classList.toggle('notes-open');
+    b.textContent=on?'Hide the notes':'Show the notes';
+  });
+  host.parentNode.appendChild(b);
+});
+</script>
+
+<script id="crashguard-notes">
+document.addEventListener('DOMContentLoaded',function(){
+  var host=document.querySelector('.jumpbtn'); if(!host||!host.parentNode) return;
+  var b=document.createElement('button');
+  b.type='button'; b.className='jumpbtn notesbtn'; b.textContent='Show the notes';
+  b.addEventListener('click',function(){
+    var on=document.body.classList.toggle('notes-open');
+    b.textContent=on?'Hide the notes':'Show the notes';
+  });
+  host.parentNode.appendChild(b);
+});
+</script>
+
+<script id="crashguard-notes">
+document.addEventListener('DOMContentLoaded',function(){
+  var host=document.querySelector('.jumpbtn'); if(!host||!host.parentNode) return;
+  var b=document.createElement('button');
+  b.type='button'; b.className='jumpbtn notesbtn'; b.textContent='Show the notes';
+  b.addEventListener('click',function(){
+    var on=document.body.classList.toggle('notes-open');
+    b.textContent=on?'Hide the notes':'Show the notes';
+  });
+  host.parentNode.appendChild(b);
+});
+</script>
+
+<script id="crashguard-notes">
+document.addEventListener('DOMContentLoaded',function(){
+  var host=document.querySelector('.jumpbtn'); if(!host||!host.parentNode) return;
+  var b=document.createElement('button');
+  b.type='button'; b.className='jumpbtn notesbtn'; b.textContent='Show the notes';
+  b.addEventListener('click',function(){
+    var on=document.body.classList.toggle('notes-open');
+    b.textContent=on?'Hide the notes':'Show the notes';
+  });
+  host.parentNode.appendChild(b);
+});
+</script>
+
+<style id="crashguard">
+  /* iOS Safari compositing guard. Sections outside the viewport are not
+     rendered, so ten frames cost about as much as one. */
+  .pg{content-visibility:auto;contain-intrinsic-size:400px 1150px}
+  /* The card's looping glimmer and will-change hints pin a GPU layer per card.
+     On a page of cards that is the whole crash. Nothing here needs them. */
+  .cage .daycard-theme-living *,
+  .cage .daycard-wrap__aura,
+  .cage .daycard-bloom{animation:none!important;will-change:auto!important}
+  /* A cage with no card in it still holds its space, so mounting and
+     unmounting never moves the page under your thumb. */
+  .cage:empty{aspect-ratio:.716;border-radius:16px;
+    background:rgba(255,255,255,.04);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+  .notesbtn{display:none}
+  @media (max-width:520px){
+    /* On a phone the fake phone frame is a costume, and a 390px frame inside a
+       375px screen squeezes every design narrower than it will ever really be.
+       Drop the frame, render each design at the true device width, and lose ten
+       nested scroll containers while we are at it. */
+    .page{padding-left:0;padding-right:0}
+    .page > h1,.page > .lede,.page > div:not(.row),.pg__hd{padding-left:20px;padding-right:20px}
+    .nav{margin-left:0;margin-right:0;padding-left:20px;padding-right:20px}
+    .phone{max-width:none;height:auto;overflow:visible;border-radius:0;
+      box-shadow:none;background:transparent}
+    .phone__in{position:static;overflow:visible}
+    /* .screen keeps its own 20px, which is the app's real geometry, so the
+       elements that deliberately bleed past it (the bar, a full width deck)
+       land exactly on the screen edge instead of being clipped. */
+    .screen{padding-bottom:30px}
+    .row{gap:34px 0}
+    /* On a phone the notes are a wall of text between you and the screen you
+       came to look at, so they start folded and the design comes first. */
+    .pg__meta,.pg__wow{display:none}
+    body.notes-open .pg__meta{display:grid}
+    body.notes-open .pg__wow{display:block}
+    .notesbtn{display:inline-block}
+  }
+</style>
+<script id="crashguard-notes">
+document.addEventListener('DOMContentLoaded',function(){
+  var host=document.querySelector('.jumpbtn'); if(!host||!host.parentNode) return;
+  var b=document.createElement('button');
+  b.type='button'; b.className='jumpbtn notesbtn'; b.textContent='Show the notes';
+  b.addEventListener('click',function(){
+    var on=document.body.classList.toggle('notes-open');
+    b.textContent=on?'Hide the notes':'Show the notes';
+  });
+  host.parentNode.appendChild(b);
+});
+</script>
 </head><body>
 <div class="page">
   <h1>Tap the Memento: six ways to show the year</h1>
@@ -1098,9 +1202,33 @@ paint();
 <script>
 (function(){
   var m=MATS[0];
-  document.querySelectorAll('.cage').forEach(function(c){
-    c.className='cage is-stock';
-    c.innerHTML=realCard(matVars(m,{clar:true,act:true,cons:true}),{name:'Malik Peace'});});
+  /* Build on approach, destroy on leave. At most ONE card is alive on a phone
+     and three on a desktop, so the page can never hold ten compositing stacks. */
+  var CARD=realCard(matVars(m,{clar:true,act:true,cons:true}),{name:'Malik Peace'});
+  var cages=[].slice.call(document.querySelectorAll('.cage'));
+  cages.forEach(function(c){c.className='cage is-stock';});
+  var touch=(('ontouchstart' in window)||navigator.maxTouchPoints>0);
+  var LIVE=(window.innerWidth<900||touch)?1:3;
+  var live=[];
+  function mount(c){
+    if(c.getAttribute('data-on'))return;
+    c.setAttribute('data-on','1'); c.innerHTML=CARD; live.push(c);
+    while(live.length>LIVE){var o=live.shift(); if(o!==c) drop(o);}
+  }
+  function drop(c){
+    if(!c.getAttribute('data-on'))return;
+    c.removeAttribute('data-on'); c.innerHTML='';
+    var i=live.indexOf(c); if(i>-1) live.splice(i,1);
+  }
+  if(window.IntersectionObserver){
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting){mount(e.target);} else {drop(e.target);} });
+    },{rootMargin:'260px 0px'});
+    cages.forEach(function(c){io.observe(c);});
+  } else {
+    cages.slice(0,LIVE).forEach(mount);
+  }
+
   document.body.classList.add('ns-bloom');
 
   // the squares grid: 186 days lived + the days left before the deadline
