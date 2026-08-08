@@ -40,6 +40,10 @@
   .mori{font-size:18px;font-weight:250;letter-spacing:.11em;color:var(--hi);font-variant-numeric:tabular-nums}
   .jumpbtn{margin-top:12px;padding:9px 15px;border:0;border-radius:10px;background:rgba(255,255,255,.08);
     box-shadow:var(--inset);color:var(--hi);font:inherit;font-size:13px;font-weight:640;cursor:pointer}
+  .divide{grid-column:1/-1;margin-top:26px;padding:22px 22px 20px;border-radius:18px;
+    background:var(--fill);box-shadow:var(--inset)}
+  .divide h2{margin:0 0 8px;font-size:21px;font-weight:740;letter-spacing:-.022em}
+  .divide p{margin:0;font-size:13.5px;line-height:1.6;color:var(--mid);max-width:92ch}
   .shot{position:relative}
   body.mark-shots .shot::after{content:"screenshot this";position:absolute;top:6px;right:6px;z-index:9;
     padding:3px 7px;border-radius:6px;background:rgba(63,217,78,.9);color:#04140a;
@@ -2643,60 +2647,317 @@
 @media (prefers-reduced-motion:reduce){
   .cover__col,.cover__bar i{animation:none}
 }
+
+/* ---- vow ---- */
+.vow{padding:0 0 28px}
+.vow *{box-sizing:border-box}
+.vow p{margin:0}
+.vow .vow-card{position:relative;overflow:hidden;border-radius:22px;padding:20px 20px 16px;
+  background:radial-gradient(120% 70% at 50% 0%, rgba(63,217,78,.10), transparent 62%), #08090d;
+  box-shadow:var(--inset), 0 22px 54px rgba(0,0,0,.55)}
+.vow .vow-top{display:flex;align-items:center;justify-content:space-between}
+.vow .vow-brand{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--mid)}
+.vow .vow-brand svg{width:18px;height:18px;fill:var(--cons)}
+.vow .vow-day{font-size:12px;color:var(--mid);font-variant-numeric:tabular-nums}
+.vow .vow-rule{margin-top:26px;font-size:34px;font-weight:760;letter-spacing:-.035em;line-height:1.05;color:var(--hi)}
+.vow .vow-why{margin-top:12px;font-size:15px;line-height:1.5;font-style:italic;color:var(--mid);max-width:30ch}
+.vow .vow-count{display:flex;align-items:baseline;gap:10px;margin-top:30px}
+.vow .vow-count b{font-size:64px;font-weight:800;letter-spacing:-.05em;line-height:.9;color:var(--hi);
+  font-variant-numeric:tabular-nums;text-shadow:0 0 60px rgba(63,217,78,.30)}
+.vow .vow-count span{font-size:15px;font-weight:620;color:var(--cons)}
+.vow .vow-foot{display:flex;justify-content:space-between;gap:10px;margin-top:24px;padding-top:12px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08);font-size:11.5px;color:var(--lo)}
+.vow .vow-block{margin-top:14px;border-radius:16px;padding:15px 16px;background:var(--fill);box-shadow:var(--inset)}
+.vow .vow-h{font-size:13.5px;font-weight:700;color:var(--hi)}
+.vow .vow-row{display:flex;justify-content:space-between;gap:12px;padding:8px 0 0;font-size:14px}
+.vow .vow-row span{color:var(--mid)}
+.vow .vow-row b{font-weight:650;color:var(--hi);font-variant-numeric:tabular-nums;white-space:nowrap}
+.vow .vow-body{margin-top:7px;font-size:14px;line-height:1.55;color:var(--mid)}
+.vow .vow-quiet{margin-top:16px;font-size:13.5px;line-height:1.5;color:var(--mid);text-align:center}
+
+/* ---- marks ---- */
+.marks{padding:0 0 28px}
+.marks *{box-sizing:border-box}
+.marks p{margin:0}
+.marks .tly-card{border-radius:22px;padding:18px 18px 16px;background:#08090d;
+  box-shadow:var(--inset), 0 22px 54px rgba(0,0,0,.55)}
+.marks .tly-top{display:flex;align-items:center;justify-content:space-between}
+.marks .tly-brand{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--mid)}
+.marks .tly-brand svg{width:18px;height:18px;fill:var(--act)}
+.marks .tly-range{font-size:12px;color:var(--mid);font-variant-numeric:tabular-nums}
+.marks .tly-goal{margin-top:14px;font-size:17px;font-weight:680;letter-spacing:-.02em;color:var(--hi)}
+.marks .tly-wall{display:flex;flex-wrap:wrap;gap:12px 14px;margin-top:18px;min-height:120px}
+.marks .tly-g{position:relative;display:flex;gap:4px;height:26px;padding:0 1px}
+.marks .tly-g i{width:2.5px;height:100%;border-radius:2px;background:rgba(238,242,251,.92)}
+.marks .tly-g em{position:absolute;left:-4px;right:-4px;top:50%;height:2.5px;border-radius:2px;
+  background:rgba(238,242,251,.92);transform:rotate(-58deg)}
+.marks .tly-g.tly-open i{background:rgba(238,242,251,.55)}
+.marks .tly-line{display:flex;align-items:baseline;gap:9px;margin-top:18px;padding-top:12px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+.marks .tly-line b{font-size:40px;font-weight:800;letter-spacing:-.04em;color:var(--hi);font-variant-numeric:tabular-nums}
+.marks .tly-line span{font-size:14px;color:var(--mid)}
+.marks .tly-months{margin-top:14px;border-radius:16px;padding:13px 15px;background:var(--fill);box-shadow:var(--inset)}
+.marks .tly-m{display:flex;align-items:center;gap:11px;padding:5.5px 0}
+.marks .tly-m span{flex:0 0 32px;font-size:13px;font-weight:640;color:var(--mid)}
+.marks .tly-m i{flex:1;height:7px;border-radius:999px;background:rgba(255,255,255,.08);position:relative;overflow:hidden}
+.marks .tly-m i::after{content:"";position:absolute;left:0;top:0;bottom:0;width:var(--w);
+  border-radius:999px;background:rgba(238,242,251,.5)}
+.marks .tly-m b{flex:0 0 24px;text-align:right;font-size:13.5px;color:var(--hi);font-variant-numeric:tabular-nums}
+.marks .tly-best i::after{background:var(--cons)}
+.marks .tly-best span{color:var(--hi)}
+.marks .tly-now i::after{background:rgba(58,217,245,.8)}
+.marks .tly-read{margin-top:16px;font-size:14.5px;line-height:1.55;color:var(--mid)}
+
+/* ---- dash ---- */
+.dash{padding:0 0 28px}
+.dash *{box-sizing:border-box}
+.dash p{margin:0}
+.dash .dsh-card{border-radius:22px;padding:20px 20px 18px;background:#07080c;
+  box-shadow:var(--inset), 0 22px 54px rgba(0,0,0,.55)}
+.dash .dsh-top{display:flex}
+.dash .dsh-brand{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--mid)}
+.dash .dsh-brand svg{width:18px;height:18px;fill:var(--act)}
+.dash .dsh-goal{margin-top:16px;font-size:19px;font-weight:700;letter-spacing:-.022em;color:var(--hi)}
+.dash .dsh-span{display:flex;align-items:center;gap:14px;margin-top:34px}
+.dash .dsh-date b{display:block;font-size:19px;font-weight:740;letter-spacing:-.02em;color:var(--hi);
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+.dash .dsh-date span{display:block;margin-top:2px;font-size:11px;color:var(--lo);white-space:nowrap}
+.dash .dsh-right{text-align:right}
+.dash .dsh-line{position:relative;flex:1;height:3px;border-radius:999px;
+  background:linear-gradient(90deg, rgba(238,242,251,.9), rgba(238,242,251,.55))}
+.dash .dsh-tick{position:absolute;top:-4px;width:1.5px;height:11px;border-radius:1px;background:rgba(238,242,251,.35)}
+.dash .dsh-now{position:absolute;right:-2px;top:50%;width:11px;height:11px;border-radius:50%;
+  transform:translateY(-50%);background:var(--act);box-shadow:0 0 16px rgba(238,242,251,.75)}
+.dash .dsh-cap{margin-top:30px;font-size:15.5px;font-weight:650;color:var(--hi);text-align:center}
+.dash .dsh-facts{display:flex;gap:1px;margin-top:20px;border-radius:14px;overflow:hidden;background:rgba(255,255,255,.07)}
+.dash .dsh-f{flex:1;background:#0a0b10;padding:12px 10px;text-align:center}
+.dash .dsh-f b{display:block;font-size:19px;font-weight:740;letter-spacing:-.03em;color:var(--hi);font-variant-numeric:tabular-nums}
+.dash .dsh-f span{display:block;margin-top:3px;font-size:10.5px;line-height:1.35;color:var(--lo)}
+.dash .dsh-block{margin-top:14px;border-radius:16px;padding:15px 16px;background:var(--fill);box-shadow:var(--inset)}
+.dash .dsh-body{font-size:14px;line-height:1.6;color:var(--mid)}
+.dash .dsh-quiet{margin-top:16px;font-size:13.5px;color:var(--mid);text-align:center}
+
+/* ---- comeback ---- */
+.comeback{padding:0 0 28px}
+.comeback *{box-sizing:border-box}
+.comeback p{margin:0}
+.comeback .cbk-card{border-radius:22px;padding:18px 18px 16px;
+  background:radial-gradient(110% 60% at 50% 0%, rgba(63,217,78,.08), transparent 60%), #08090d;
+  box-shadow:var(--inset), 0 22px 54px rgba(0,0,0,.55)}
+.comeback .cbk-top{display:flex;align-items:center;justify-content:space-between}
+.comeback .cbk-brand{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--mid)}
+.comeback .cbk-brand svg{width:18px;height:18px;fill:var(--cons)}
+.comeback .cbk-range{font-size:12px;color:var(--mid);font-variant-numeric:tabular-nums}
+.comeback .cbk-goal{margin-top:14px;font-size:17px;font-weight:680;letter-spacing:-.02em;color:var(--hi)}
+.comeback .cbk-hero{display:flex;align-items:center;gap:16px;margin-top:20px}
+.comeback .cbk-hero b{font-size:88px;font-weight:800;letter-spacing:-.06em;line-height:.85;color:var(--hi);
+  font-variant-numeric:tabular-nums}
+.comeback .cbk-herotxt span{display:block;font-size:16.5px;font-weight:640;line-height:1.35;color:var(--hi)}
+.comeback .cbk-herotxt .cbk-green{color:var(--cons)}
+.comeback .cbk-strip{display:flex;gap:2px;height:14px;margin-top:24px;border-radius:7px;overflow:hidden}
+.comeback .cbk-strip i{background:rgba(63,217,78,.8);border-radius:2px}
+.comeback .cbk-strip u{background:rgba(255,255,255,.09);border-radius:2px}
+.comeback .cbk-strip .cbk-cur{background:var(--act)}
+.comeback .cbk-key{display:flex;gap:14px;margin-top:10px;font-size:11px;color:var(--lo)}
+.comeback .cbk-key span{display:inline-flex;align-items:center;gap:5px}
+.comeback .cbk-key i{width:9px;height:9px;border-radius:2px}
+.comeback .cbk-k1{background:rgba(63,217,78,.8)}
+.comeback .cbk-k2{background:rgba(255,255,255,.12)}
+.comeback .cbk-k3{background:var(--act)}
+.comeback .cbk-line{margin-top:16px;padding-top:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+  font-size:14.5px;font-weight:640;color:var(--hi)}
+.comeback .cbk-block{margin-top:14px;border-radius:16px;padding:13px 16px;background:var(--fill);box-shadow:var(--inset)}
+.comeback .cbk-row{display:flex;justify-content:space-between;gap:12px;padding:7px 0;font-size:14px}
+.comeback .cbk-row span{color:var(--mid)}
+.comeback .cbk-row b{font-weight:650;color:var(--hi);text-align:right}
+.comeback .cbk-read{margin-top:16px;font-size:14.5px;line-height:1.55;color:var(--mid)}
+
+/* ---- shelf ---- */
+.shelf{padding:0 0 28px}
+.shelf *{box-sizing:border-box}
+.shelf p{margin:0}
+.shelf .shf-card{border-radius:22px;padding:18px 18px 16px;background:#07080c;
+  box-shadow:var(--inset), 0 22px 54px rgba(0,0,0,.55)}
+.shelf .shf-top{display:flex;align-items:center;justify-content:space-between}
+.shelf .shf-brand{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--mid)}
+.shelf .shf-brand svg{width:18px;height:18px;fill:var(--act)}
+.shelf .shf-count{font-size:12px;color:var(--mid)}
+.shelf .shf-row{display:flex;align-items:flex-end;gap:10px;margin-top:24px;padding:0 6px}
+.shelf .shf-spine{flex:1;display:flex;flex-direction:column;justify-content:space-between;
+  border-radius:10px 10px 3px 3px;padding:14px 10px 12px;min-height:150px}
+.shelf .shf-title{writing-mode:vertical-rl;transform:rotate(180deg);align-self:center;
+  font-size:14px;font-weight:680;letter-spacing:-.01em;color:var(--hi);line-height:1.15;
+  max-height:120px;overflow:hidden}
+.shelf .shf-meta{writing-mode:vertical-rl;transform:rotate(180deg);align-self:center;margin-top:8px;
+  font-size:9.5px;color:var(--lo);white-space:nowrap}
+.shelf .shf-done{min-height:170px;background:linear-gradient(180deg, rgba(63,217,78,.16), rgba(63,217,78,.05));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
+.shelf .shf-down{min-height:128px;background:rgba(255,255,255,.05);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.shelf .shf-down .shf-title{color:var(--mid)}
+.shelf .shf-live{min-height:188px;background:linear-gradient(180deg, rgba(58,217,245,.16), rgba(58,217,245,.04));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14), 0 0 34px rgba(58,217,245,.18)}
+.shelf .shf-floor{height:3px;margin-top:0;border-radius:999px;background:rgba(255,255,255,.14)}
+.shelf .shf-cap{margin-top:16px;font-size:14px;font-weight:620;color:var(--hi);text-align:center}
+.shelf .shf-block{margin-top:14px;border-radius:16px;padding:14px 16px;background:var(--fill);box-shadow:var(--inset)}
+.shelf .shf-r{display:flex;gap:11px;padding:8px 0}
+.shelf .shf-r i{flex:0 0 9px;height:9px;margin-top:5px;border-radius:3px}
+.shelf .shf-d1{background:var(--cons)}
+.shelf .shf-d2{background:rgba(255,255,255,.28)}
+.shelf .shf-d3{background:var(--clar)}
+.shelf .shf-r b{display:block;font-size:14px;font-weight:680;color:var(--hi)}
+.shelf .shf-r span{display:block;margin-top:2px;font-size:13px;line-height:1.5;color:var(--mid)}
+.shelf .shf-quiet{margin-top:16px;font-size:13.5px;color:var(--mid);text-align:center}
+
+/* ---- firsts ---- */
+.firsts{padding:0 0 28px}
+.firsts *{box-sizing:border-box}
+.firsts p{margin:0}
+.firsts .fst-card{border-radius:22px;padding:18px 18px 18px;background:#08090d;
+  box-shadow:var(--inset), 0 22px 54px rgba(0,0,0,.55)}
+.firsts .fst-top{display:flex;align-items:center;justify-content:space-between}
+.firsts .fst-brand{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--mid)}
+.firsts .fst-brand svg{width:18px;height:18px;fill:var(--act)}
+.firsts .fst-year{font-size:12px;color:var(--mid);font-variant-numeric:tabular-nums}
+.firsts .fst-goal{margin-top:14px;font-size:17px;font-weight:680;letter-spacing:-.02em;color:var(--hi)}
+.firsts .fst-h{margin-top:6px;font-size:13.5px;line-height:1.5;color:var(--mid)}
+.firsts .fst-list{margin-top:18px}
+.firsts .fst-i{position:relative;display:flex;gap:12px;align-items:flex-start;padding:11px 0}
+.firsts .fst-i:not(:last-child)::after{content:"";position:absolute;left:57px;top:30px;bottom:-8px;width:1.5px;
+  background:rgba(255,255,255,.12)}
+.firsts .fst-d{flex:0 0 46px;font-size:12px;font-weight:640;color:var(--mid);font-variant-numeric:tabular-nums;
+  padding-top:2px;text-align:right}
+.firsts .fst-i i{flex:0 0 9px;height:9px;margin-top:5px;border-radius:50%;
+  background:var(--act);box-shadow:0 0 10px rgba(238,242,251,.5)}
+.firsts .fst-i p{font-size:15px;font-weight:600;line-height:1.4;letter-spacing:-.012em;color:var(--hi)}
+.firsts .fst-big i{background:var(--cons);box-shadow:0 0 14px rgba(63,217,78,.6)}
+.firsts .fst-big p{font-size:16.5px;font-weight:680}
+.firsts .fst-block{margin-top:14px;border-radius:16px;padding:15px 16px;background:var(--fill);box-shadow:var(--inset)}
+.firsts .fst-body{font-size:14px;line-height:1.6;color:var(--mid)}
+.firsts .fst-quiet{margin-top:16px;font-size:13.5px;color:var(--mid);text-align:center}
+
+/* ---- orbit ---- */
+.orbit{padding:0 0 28px}
+.orbit *{box-sizing:border-box}
+.orbit p{margin:0}
+.orbit .orb-card{border-radius:22px;padding:18px 18px 16px;background:#07080c;
+  box-shadow:var(--inset), 0 22px 54px rgba(0,0,0,.55)}
+.orbit .orb-top{display:flex;align-items:center;justify-content:space-between}
+.orbit .orb-brand{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--mid)}
+.orbit .orb-brand svg{width:18px;height:18px;fill:var(--clar)}
+.orbit .orb-range{font-size:12px;color:var(--mid);font-variant-numeric:tabular-nums}
+.orbit .orb-goal{margin-top:14px;font-size:17px;font-weight:680;letter-spacing:-.02em;color:var(--hi)}
+.orbit .orb-wrap{position:relative;width:min(272px,100%);margin:18px auto 0}
+.orbit .orb-wrap svg{display:block;width:100%;height:auto}
+.orbit .orb-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;pointer-events:none}
+.orbit .orb-center b{font-size:44px;font-weight:800;letter-spacing:-.045em;line-height:.95;color:var(--hi);
+  font-variant-numeric:tabular-nums}
+.orbit .orb-center span{margin-top:5px;font-size:12px;line-height:1.4;color:var(--mid)}
+.orbit .orb-legend{display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:center;margin-top:16px;
+  font-size:11px;color:var(--lo)}
+.orbit .orb-legend span{display:inline-flex;align-items:center;gap:5px}
+.orbit .orb-legend i{width:8px;height:8px;border-radius:50%}
+.orbit .orb-k1{background:var(--cons)}
+.orbit .orb-k2{background:rgba(255,255,255,.16)}
+.orbit .orb-k3{background:rgba(58,217,245,.35)}
+.orbit .orb-k4{background:var(--act)}
+.orbit .orb-block{margin-top:14px;border-radius:16px;padding:13px 16px;background:var(--fill);box-shadow:var(--inset)}
+.orbit .orb-row{display:flex;justify-content:space-between;gap:12px;padding:7px 0;font-size:14px}
+.orbit .orb-row span{color:var(--mid)}
+.orbit .orb-row b{font-weight:650;color:var(--hi);text-align:right;font-variant-numeric:tabular-nums}
+.orbit .orb-read{margin-top:16px;font-size:14.5px;line-height:1.55;color:var(--mid)}
+
+/* ---- run ---- */
+.run{padding:0 0 28px}
+.run *{box-sizing:border-box}
+.run p{margin:0}
+.run .run-card{border-radius:22px;padding:18px 18px 16px;
+  background:radial-gradient(110% 62% at 50% 0%, rgba(63,217,78,.11), transparent 62%), #08090d;
+  box-shadow:var(--inset), 0 22px 54px rgba(0,0,0,.55)}
+.run .run-top{display:flex;align-items:center;justify-content:space-between}
+.run .run-brand{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--mid)}
+.run .run-brand svg{width:18px;height:18px;fill:var(--cons)}
+.run .run-label{font-size:12px;color:var(--mid)}
+.run .run-goal{margin-top:14px;font-size:17px;font-weight:680;letter-spacing:-.02em;color:var(--hi)}
+.run .run-hero{display:flex;align-items:center;gap:14px;margin-top:18px}
+.run .run-hero b{font-size:96px;font-weight:800;letter-spacing:-.06em;line-height:.85;color:var(--hi);
+  font-variant-numeric:tabular-nums;text-shadow:0 0 70px rgba(63,217,78,.28)}
+.run .run-herotxt span{display:block;font-size:19px;font-weight:660;line-height:1.25;color:var(--mid)}
+.run .run-chain{display:flex;gap:2.5px;margin-top:22px}
+.run .run-chain i{flex:1;height:12px;border-radius:3px;background:var(--cons);opacity:.9}
+.run .run-chain i:last-child{box-shadow:0 0 12px rgba(63,217,78,.7)}
+.run .run-dates{margin-top:10px;font-size:12.5px;color:var(--mid);font-variant-numeric:tabular-nums}
+.run .run-block{margin-top:14px;border-radius:16px;padding:13px 15px;background:var(--fill);box-shadow:var(--inset)}
+.run .run-h{font-size:13.5px;font-weight:700;color:var(--hi);margin-bottom:4px}
+.run .run-r{display:flex;align-items:center;gap:11px;padding:5.5px 0}
+.run .run-r span{flex:0 0 32px;font-size:13px;font-weight:640;color:var(--mid)}
+.run .run-r i{flex:1;height:7px;border-radius:999px;background:rgba(255,255,255,.08);position:relative;overflow:hidden}
+.run .run-r i::after{content:"";position:absolute;left:0;top:0;bottom:0;width:var(--w);
+  border-radius:999px;background:rgba(238,242,251,.45)}
+.run .run-r b{flex:0 0 24px;text-align:right;font-size:13.5px;color:var(--hi);font-variant-numeric:tabular-nums}
+.run .run-best i::after{background:var(--cons)}
+.run .run-best span{color:var(--hi)}
+.run .run-cur i::after{background:rgba(58,217,245,.8)}
+.run .run-read{margin-top:16px;font-size:14.5px;line-height:1.55;color:var(--mid)}
+
+/* ---- count ---- */
+.count{padding:0 0 28px}
+.count *{box-sizing:border-box}
+.count p{margin:0}
+.count .cnt-card{border-radius:22px;padding:20px 20px 16px;background:#050608;
+  box-shadow:var(--inset), 0 22px 54px rgba(0,0,0,.6)}
+.count .cnt-top{display:flex;align-items:center;justify-content:space-between}
+.count .cnt-brand{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--mid)}
+.count .cnt-brand svg{width:18px;height:18px;fill:var(--act)}
+.count .cnt-date{font-size:12px;color:var(--mid)}
+.count .cnt-hero{margin-top:26px}
+.count .cnt-hero b{display:block;font-size:72px;font-weight:800;letter-spacing:-.05em;line-height:.9;
+  color:var(--hi);font-variant-numeric:tabular-nums}
+.count .cnt-hero span{display:block;margin-top:10px;font-size:16px;font-weight:620;color:var(--mid)}
+.count .cnt-goal{margin-top:26px;font-size:17px;font-weight:680;letter-spacing:-.02em;color:var(--hi)}
+.count .cnt-bar{height:6px;margin-top:12px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+.count .cnt-bar i{display:block;height:100%;border-radius:999px;background:rgba(238,242,251,.85)}
+.count .cnt-line{margin-top:10px;font-size:14px;line-height:1.5;color:var(--mid)}
+.count .cnt-foot{display:flex;justify-content:space-between;margin-top:20px;padding-top:12px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08);font-size:12.5px;font-weight:640;color:var(--hi);
+  font-variant-numeric:tabular-nums}
+.count .cnt-block{margin-top:14px;border-radius:16px;padding:13px 16px;background:var(--fill);box-shadow:var(--inset)}
+.count .cnt-row{display:flex;justify-content:space-between;gap:12px;padding:7px 0;font-size:14px}
+.count .cnt-row span{color:var(--mid)}
+.count .cnt-row b{font-weight:650;color:var(--hi);font-variant-numeric:tabular-nums}
+.count .cnt-read{margin-top:16px;font-size:14.5px;line-height:1.55;color:var(--mid)}
+
+/* ---- month ---- */
+.month{padding:0 0 28px}
+.month *{box-sizing:border-box}
+.month p{margin:0}
+.month .mth-card{border-radius:22px;padding:20px 20px 18px;
+  background:radial-gradient(120% 66% at 50% 0%, rgba(63,217,78,.10), transparent 62%), #08090d;
+  box-shadow:var(--inset), 0 22px 54px rgba(0,0,0,.55)}
+.month .mth-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.month .mth-brand{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--mid)}
+.month .mth-brand svg{width:18px;height:18px;fill:var(--cons)}
+.month .mth-goal-s{font-size:12px;color:var(--mid);text-align:right}
+.month .mth-name{margin-top:26px;font-size:52px;font-weight:800;letter-spacing:-.045em;line-height:.95;color:var(--hi)}
+.month .mth-score{margin-top:8px;font-size:22px;font-weight:700;letter-spacing:-.025em;color:var(--cons)}
+.month .mth-dots{display:flex;gap:7px;margin-top:18px}
+.month .mth-dots i{width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,.1)}
+.month .mth-dots i.on{background:var(--cons);box-shadow:0 0 10px rgba(63,217,78,.5)}
+.month .mth-verdict{margin-top:18px;font-size:14.5px;line-height:1.55;color:var(--mid);max-width:34ch}
+.month .mth-block{margin-top:14px;border-radius:16px;padding:14px 15px;background:var(--fill);box-shadow:var(--inset)}
+.month .mth-h{font-size:13.5px;font-weight:700;color:var(--hi);margin-bottom:6px}
+.month .mth-r{display:grid;grid-template-columns:32px 64px 1fr;align-items:center;gap:10px;padding:6px 0}
+.month .mth-r span{font-size:13px;font-weight:640;color:var(--mid)}
+.month .mth-r i{height:7px;border-radius:999px;background:rgba(255,255,255,.08);position:relative;overflow:hidden}
+.month .mth-r i::after{content:"";position:absolute;left:0;top:0;bottom:0;width:var(--w);
+  border-radius:999px;background:rgba(238,242,251,.5)}
+.month .mth-r p{font-size:13px;line-height:1.4;color:var(--mid)}
+.month .mth-best span{color:var(--hi)}
+.month .mth-best i::after{background:var(--cons)}
+.month .mth-best p{color:var(--hi)}
+.month .mth-now i::after{background:rgba(58,217,245,.8)}
+.month .mth-read{margin-top:16px;font-size:14.5px;line-height:1.55;color:var(--mid)}
 </style>
-
-<script id="crashguard-notes">
-document.addEventListener('DOMContentLoaded',function(){
-  var host=document.querySelector('.jumpbtn'); if(!host||!host.parentNode) return;
-  var b=document.createElement('button');
-  b.type='button'; b.className='jumpbtn notesbtn'; b.textContent='Show the notes';
-  b.addEventListener('click',function(){
-    var on=document.body.classList.toggle('notes-open');
-    b.textContent=on?'Hide the notes':'Show the notes';
-  });
-  host.parentNode.appendChild(b);
-});
-</script>
-
-<script id="crashguard-notes">
-document.addEventListener('DOMContentLoaded',function(){
-  var host=document.querySelector('.jumpbtn'); if(!host||!host.parentNode) return;
-  var b=document.createElement('button');
-  b.type='button'; b.className='jumpbtn notesbtn'; b.textContent='Show the notes';
-  b.addEventListener('click',function(){
-    var on=document.body.classList.toggle('notes-open');
-    b.textContent=on?'Hide the notes':'Show the notes';
-  });
-  host.parentNode.appendChild(b);
-});
-</script>
-
-<script id="crashguard-notes">
-document.addEventListener('DOMContentLoaded',function(){
-  var host=document.querySelector('.jumpbtn'); if(!host||!host.parentNode) return;
-  var b=document.createElement('button');
-  b.type='button'; b.className='jumpbtn notesbtn'; b.textContent='Show the notes';
-  b.addEventListener('click',function(){
-    var on=document.body.classList.toggle('notes-open');
-    b.textContent=on?'Hide the notes':'Show the notes';
-  });
-  host.parentNode.appendChild(b);
-});
-</script>
-
-<script id="crashguard-notes">
-document.addEventListener('DOMContentLoaded',function(){
-  var host=document.querySelector('.jumpbtn'); if(!host||!host.parentNode) return;
-  var b=document.createElement('button');
-  b.type='button'; b.className='jumpbtn notesbtn'; b.textContent='Show the notes';
-  b.addEventListener('click',function(){
-    var on=document.body.classList.toggle('notes-open');
-    b.textContent=on?'Hide the notes':'Show the notes';
-  });
-  host.parentNode.appendChild(b);
-});
-</script>
-
 <style id="crashguard">
   /* iOS Safari compositing guard. Sections outside the viewport are not
      rendered, so ten frames cost about as much as one. */
@@ -2753,14 +3014,14 @@ document.addEventListener('DOMContentLoaded',function(){
   <p class="lede">Ten more ways to fill the screen behind the card, each one built on a format that
     people already screenshot and post: Wrapped end cards, Receiptify, Apple rings, the GitHub wall,
     trading card backs, Strava routes, album labels, boarding passes, star charts, album covers.</p>
-  <p class="lede"><b>Same person as before:</b> signed <i>Get to 100 paying users</i> on February 3.
-    186 days in, 62 users, showed up 141 days, longest run 23, best month June, and running six weeks
-    behind the date they signed.</p>
+  <p class="lede"><b>The first ten</b> share one persona: <i>Get to 100 paying users</i>, signed
+    February 3, 186 days in, 62 users, 141 days shown up. <b>The ten after the divider</b> each carry
+    a different kind of promise, on purpose, to prove the page fits everyone and not just founders.</p>
   <div>
     <button id="jump" class="jumpbtn" type="button">Scroll all frames past the card</button>
     <button id="marks" class="jumpbtn" type="button">Show the share block in each</button>
   </div>
-  <nav class="nav"><a href="#p-poster">The Poster</a><a href="#p-receipt">The Receipt</a><a href="#p-rings">The Rings</a><a href="#p-wall">The Wall</a><a href="#p-relic">The Relic</a><a href="#p-route">The Route</a><a href="#p-record">The Record</a><a href="#p-ticket">The Ticket</a><a href="#p-constellation">The Constellation</a><a href="#p-cover">The Cover</a></nav>
+  <nav class="nav"><a href="#p-poster">The Poster</a><a href="#p-receipt">The Receipt</a><a href="#p-rings">The Rings</a><a href="#p-wall">The Wall</a><a href="#p-relic">The Relic</a><a href="#p-route">The Route</a><a href="#p-record">The Record</a><a href="#p-ticket">The Ticket</a><a href="#p-constellation">The Constellation</a><a href="#p-cover">The Cover</a><a href="#p-vow">The Vow</a><a href="#p-marks">The Tally</a><a href="#p-dash">The Dash</a><a href="#p-comeback">The Comeback</a><a href="#p-shelf">The Shelf</a><a href="#p-firsts">The Firsts</a><a href="#p-orbit">The Orbit</a><a href="#p-run">The Run</a><a href="#p-count">The Count</a><a href="#p-month">The Month</a></nav>
   <div class="row">
   <section class="pg" id="p-poster">
     <header class="pg__hd"><h2>The Poster</h2>
@@ -4162,10 +4423,501 @@ document.addEventListener('DOMContentLoaded',function(){
 </div></div>
       </div>
     </div></div>
+  </section>
+  <div class="divide" id="universal">
+    <h2>Ten more, built for everyone</h2>
+    <p>The first ten all lean on one founder chasing a number. These ten each carry a
+      DIFFERENT kind of promise from the taxonomy: a rule held (sobriety), a frequency (the gym),
+      an open goal (the writing), a deadline event (the bar exam), a daily practice (meditation),
+      a family rule (dinner by six), and one for people with many goals at once (the shelf).
+      None of them needs a countable target to work.</p>
+  </div>
+  <section class="pg" id="p-vow">
+    <header class="pg__hd"><h2>The Vow</h2>
+      <p class="pg__th">A written promise, kept. The rule they set for themselves is the headline, their own reason sits under it, and one number says how long it has held. For rule goals there is no distance to show, the holding is everything.</p>
+      <dl class="pg__meta">
+        <dt>Best for</dt><dd>Anyone holding a line: sobriety, no gambling, off the phone by ten, any promise where success is a day that looks like the day before.</dd>
+        <dt>The share</dt><dd>The whole vow card: the rule, their reason in their own words, and the unbroken count, which posts like a chip earned rather than a chart.</dd>
+        <dt>On day 900</dt><dd>On day 30 it reads as a beginning; on day 900 the same layout reads as a monument, because the only thing that changed is the number, and that is the point of a vow.</dd>
+      </dl></header>
+    <div class="phone"><div class="phone__in">
+      <div class="screen">
+        <header class="bar"><button class="bar__back" type="button" aria-label="Back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+            stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button><span class="bar__title">Your Memento</span></header>
+        <div class="hero"><div class="cage"></div>
+          <p class="hero__name">Your Memento</p>
+          <p class="hero__sub"><span class="mori">20967:16:41:52</span></p>
+        </div>
+        <div class="body"><div class="vow">
+  <div class="vow-card shot">
+    <div class="vow-top">
+      <span class="vow-brand"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>Memento</span>
+      <span class="vow-day">Day 224</span>
+    </div>
+    <p class="vow-rule">No drinking.</p>
+    <p class="vow-why">&ldquo;Because the version of me that drinks does not build anything.&rdquo;</p>
+    <div class="vow-count">
+      <b>224</b>
+      <span>days, unbroken</span>
+    </div>
+    <div class="vow-foot"><span>Written December 27, 2025</span><span>Kept every day since</span></div>
+  </div>
+
+  <div class="vow-block">
+    <p class="vow-h">What it has already held through</p>
+    <div class="vow-row"><span>Friday nights</span><b>32 of 32</b></div>
+    <div class="vow-row"><span>The birthday, the wedding, the launch</span><b>held</b></div>
+    <div class="vow-row"><span>The danger window, 6 to 9pm</span><b>224 evenings</b></div>
+  </div>
+
+  <div class="vow-block">
+    <p class="vow-h">The terms</p>
+    <p class="vow-body">One day at a time, decided each morning. The vow never asks for forever, it asks for today, and today has been kept 224 times in a row.</p>
+  </div>
+
+  <p class="vow-quiet">The cost of breaking it grows every day. That is what makes it worth keeping.</p>
+</div></div>
+      </div>
+    </div></div>
+  </section>
+  <section class="pg" id="p-marks">
+    <header class="pg__hd"><h2>The Tally</h2>
+      <p class="pg__th">Every session carved as a mark, in fives, the oldest way humans have ever counted effort. Nothing to interpret at a glance: more marks means more work, and the wall only ever gains marks.</p>
+      <dl class="pg__meta">
+        <dt>Best for</dt><dd>Frequency goals: the gym, practice sessions, therapy, anything where the promise is a number of times, not a destination.</dd>
+        <dt>The share</dt><dd>The tally wall itself, 87 marks and one line of copy, instantly legible in a feed at thumbnail size.</dd>
+        <dt>On day 900</dt><dd>Day 30 is a modest few rows; day 900 is a wall, and a wall of hand-counted marks reads as devotion in a way a percentage never will.</dd>
+      </dl></header>
+    <div class="phone"><div class="phone__in">
+      <div class="screen">
+        <header class="bar"><button class="bar__back" type="button" aria-label="Back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+            stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button><span class="bar__title">Your Memento</span></header>
+        <div class="hero"><div class="cage"></div>
+          <p class="hero__name">Your Memento</p>
+          <p class="hero__sub"><span class="mori">20967:16:41:52</span></p>
+        </div>
+        <div class="body"><div class="marks">
+  <div class="tly-card shot">
+    <div class="tly-top">
+      <span class="tly-brand"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>Memento</span>
+      <span class="tly-range">Mar 1 to Aug 7</span>
+    </div>
+    <p class="tly-goal">Train four days a week.</p>
+    <div class="tly-wall" id="marks-wall" aria-label="87 workouts as tally marks"></div>
+    <div class="tly-line"><b>87</b><span>workouts, counted one at a time</span></div>
+  </div>
+
+  <div class="tly-months">
+    <div class="tly-m"><span>Mar</span><i style="--w:84%"></i><b>16</b></div>
+    <div class="tly-m"><span>Apr</span><i style="--w:79%"></i><b>15</b></div>
+    <div class="tly-m tly-best"><span>May</span><i style="--w:100%"></i><b>19</b></div>
+    <div class="tly-m"><span>Jun</span><i style="--w:84%"></i><b>16</b></div>
+    <div class="tly-m"><span>Jul</span><i style="--w:74%"></i><b>14</b></div>
+    <div class="tly-m tly-now"><span>Aug</span><i style="--w:37%"></i><b>7</b></div>
+  </div>
+
+  <p class="tly-read">Four a week was the promise. You held it 19 of 23 weeks, and the four misses were all one short, never zero.</p>
+</div></div>
+      </div>
+    </div></div>
+  </section>
+  <section class="pg" id="p-dash">
+    <header class="pg__hd"><h2>The Dash</h2>
+      <p class="pg__th">Two dates and the line between them. A memorial gives every life exactly this shape, and this design borrows it while the person is still writing the line. What fills the line is the only content.</p>
+      <dl class="pg__meta">
+        <dt>Best for</dt><dd>Any goal at all, because every goal is two dates with effort in between. Strongest for open-ended promises with no finish number.</dd>
+        <dt>The share</dt><dd>The two dates with the drawn line between them, which reads as quietly monumental, plus three lines of what the dash contains.</dd>
+        <dt>On day 900</dt><dd>The left date never moves and the right date is always today, so the line only grows heavier with what it holds. It is identical in structure on day 30 and day 3,000.</dd>
+      </dl></header>
+    <div class="phone"><div class="phone__in">
+      <div class="screen">
+        <header class="bar"><button class="bar__back" type="button" aria-label="Back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+            stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button><span class="bar__title">Your Memento</span></header>
+        <div class="hero"><div class="cage"></div>
+          <p class="hero__name">Your Memento</p>
+          <p class="hero__sub"><span class="mori">20967:16:41:52</span></p>
+        </div>
+        <div class="body"><div class="dash">
+  <div class="dsh-card shot">
+    <div class="dsh-top">
+      <span class="dsh-brand"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>Memento</span>
+    </div>
+    <p class="dsh-goal">Play Clair de Lune from memory.</p>
+    <div class="dsh-span">
+      <div class="dsh-date"><b>Feb 3</b><span>the first day</span></div>
+      <div class="dsh-line">
+        <i class="dsh-tick" style="left:16%"></i>
+        <i class="dsh-tick" style="left:33%"></i>
+        <i class="dsh-tick" style="left:50%"></i>
+        <i class="dsh-tick" style="left:66%"></i>
+        <i class="dsh-tick" style="left:83%"></i>
+        <em class="dsh-now"></em>
+      </div>
+      <div class="dsh-date dsh-right"><b>Aug 7</b><span>so far</span></div>
+    </div>
+    <p class="dsh-cap">The line is what counts.</p>
+    <div class="dsh-facts">
+      <div class="dsh-f"><b>141</b><span>days at the piano</span></div>
+      <div class="dsh-f"><b>23</b><span>days, the longest unbroken run</span></div>
+      <div class="dsh-f"><b>4 of 6</b><span>sections now by heart</span></div>
+    </div>
+  </div>
+
+  <div class="dsh-block">
+    <p class="dsh-body">A life gets two dates and a line between them. Memento only keeps the line. Section three, the hard one, took all of May. It is in your hands now and it is not leaving.</p>
+  </div>
+
+  <p class="dsh-quiet">The right date moves every morning. What sits on the line does not.</p>
+</div></div>
+      </div>
+    </div></div>
+  </section>
+  <section class="pg" id="p-comeback">
+    <header class="pg__hd"><h2>The Comeback</h2>
+      <p class="pg__th">The number of times they returned, not the number of times they held. Every gap in the record is drawn honestly and every return is a bright mark, because for most people the skill that decides everything is restarting.</p>
+      <dl class="pg__meta">
+        <dt>Best for</dt><dd>Anyone whose record has holes in it, which is almost everyone. Weight loss, habits that lapse, long goals with hard patches.</dd>
+        <dt>The share</dt><dd>The big return count with the honest strip of runs and gaps under it, a brag that admits everything and is stronger for it.</dd>
+        <dt>On day 900</dt><dd>More gaps accumulate over time and the design only gets stronger, because the count of returns rises with them; a perfect record is the one thing it cannot flatter.</dd>
+      </dl></header>
+    <div class="phone"><div class="phone__in">
+      <div class="screen">
+        <header class="bar"><button class="bar__back" type="button" aria-label="Back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+            stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button><span class="bar__title">Your Memento</span></header>
+        <div class="hero"><div class="cage"></div>
+          <p class="hero__name">Your Memento</p>
+          <p class="hero__sub"><span class="mori">20967:16:41:52</span></p>
+        </div>
+        <div class="body"><div class="comeback">
+  <div class="cbk-card shot">
+    <div class="cbk-top">
+      <span class="cbk-brand"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>Memento</span>
+      <span class="cbk-range">Feb 3 to Aug 7</span>
+    </div>
+    <p class="cbk-goal">Down 40 lbs.</p>
+    <div class="cbk-hero">
+      <b>11</b>
+      <div class="cbk-herotxt">
+        <span>times you stopped.</span>
+        <span class="cbk-green">11 times you came back.</span>
+      </div>
+    </div>
+    <div class="cbk-strip" aria-label="runs and gaps across six months">
+      <i style="flex:12"></i><u style="flex:3"></u><i style="flex:5"></i><u style="flex:2"></u><i style="flex:9"></i><u style="flex:9"></u><i style="flex:23"></i><u style="flex:4"></u><i style="flex:8"></i><u style="flex:3"></u><i style="flex:11"></i><u style="flex:5"></u><i style="flex:17"></i><u style="flex:2"></u><i class="cbk-cur" style="flex:6"></i>
+    </div>
+    <div class="cbk-key"><span><i class="cbk-k1"></i>days on</span><span><i class="cbk-k2"></i>gaps</span><span><i class="cbk-k3"></i>the current run</span></div>
+    <p class="cbk-line">Six months. 45 missed days. Zero quit.</p>
+  </div>
+
+  <div class="cbk-block">
+    <div class="cbk-row"><span>Longest gap</span><b>9 days, April</b></div>
+    <div class="cbk-row"><span>Most common return</span><b>the next morning, 6 times</b></div>
+    <div class="cbk-row"><span>Current run</span><b>6 days</b></div>
+  </div>
+
+  <p class="cbk-read">Streaks break. Returning is the skill, and you have never once failed at it.</p>
+</div></div>
+      </div>
+    </div></div>
+  </section>
+  <section class="pg" id="p-shelf">
+    <header class="pg__hd"><h2>The Shelf</h2>
+      <p class="pg__th">Every promise they have ever made themselves, standing together as spines. Finished chapters keep their final numbers forever, set-down ones stay too, honestly labeled, and the open one glows. This is the design that answers what happens when there is more than one goal.</p>
+      <dl class="pg__meta">
+        <dt>Best for</dt><dd>Anyone past their first goal. The person with a finished chapter, an abandoned one, and a live one, which is what a real life looks like.</dd>
+        <dt>The share</dt><dd>The shelf itself: three spines that summarise years of a person in one image, with the live one lit.</dd>
+        <dt>On day 900</dt><dd>It gains one spine per chapter, a few per year at most, so it grows like a bookshelf and not like a feed; a decade fits on one screen.</dd>
+      </dl></header>
+    <div class="phone"><div class="phone__in">
+      <div class="screen">
+        <header class="bar"><button class="bar__back" type="button" aria-label="Back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+            stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button><span class="bar__title">Your Memento</span></header>
+        <div class="hero"><div class="cage"></div>
+          <p class="hero__name">Your Memento</p>
+          <p class="hero__sub"><span class="mori">20967:16:41:52</span></p>
+        </div>
+        <div class="body"><div class="shelf">
+  <div class="shf-card shot">
+    <div class="shf-top">
+      <span class="shf-brand"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>Memento</span>
+      <span class="shf-count">3 chapters</span>
+    </div>
+    <div class="shf-row">
+      <div class="shf-spine shf-done">
+        <span class="shf-title">Run the half</span>
+        <span class="shf-meta">2025 &middot; finished &middot; 127 days</span>
+      </div>
+      <div class="shf-spine shf-down">
+        <span class="shf-title">Morning pages</span>
+        <span class="shf-meta">set down at day 40</span>
+      </div>
+      <div class="shf-spine shf-live">
+        <span class="shf-title">Get to 100 paying users</span>
+        <span class="shf-meta">open &middot; day 186</span>
+      </div>
+    </div>
+    <div class="shf-floor"></div>
+    <p class="shf-cap">Every promise you have made yourself, on one shelf.</p>
+  </div>
+
+  <div class="shf-block">
+    <div class="shf-r"><i class="shf-d1"></i><div><b>Run the half</b><span>Closed October 2025 with its numbers frozen: 127 days, 96 runs, one finish line. It will read exactly this way in twenty years.</span></div></div>
+    <div class="shf-r"><i class="shf-d2"></i><div><b>Morning pages</b><span>Set down at day 40. It stays on the shelf anyway, because the honest record of what you tried is part of the record.</span></div></div>
+    <div class="shf-r"><i class="shf-d3"></i><div><b>Get to 100 paying users</b><span>The open chapter. The only spine that still changes.</span></div></div>
+  </div>
+
+  <p class="shf-quiet">Nothing is ever deleted. Chapters close, the shelf keeps them.</p>
+</div></div>
+      </div>
+    </div></div>
+  </section>
+  <section class="pg" id="p-firsts">
+    <header class="pg__hd"><h2>The Firsts</h2>
+      <p class="pg__th">Five dated things that had never happened before this year. Progress measured in moments instead of numbers, which works for every goal because every goal produces firsts even when it produces no metrics.</p>
+      <dl class="pg__meta">
+        <dt>Best for</dt><dd>Becoming goals and craft goals: write the novel, learn the instrument, build the thing, where the milestones are events, not counts.</dd>
+        <dt>The share</dt><dd>The dated list itself. Five lines and five dates tell a whole story with no chart at all.</dd>
+        <dt>On day 900</dt><dd>Firsts thin out over time and get bigger, which is honest: year one has five, year three has one, and that one is enormous.</dd>
+      </dl></header>
+    <div class="phone"><div class="phone__in">
+      <div class="screen">
+        <header class="bar"><button class="bar__back" type="button" aria-label="Back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+            stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button><span class="bar__title">Your Memento</span></header>
+        <div class="hero"><div class="cage"></div>
+          <p class="hero__name">Your Memento</p>
+          <p class="hero__sub"><span class="mori">20967:16:41:52</span></p>
+        </div>
+        <div class="body"><div class="firsts">
+  <div class="fst-card shot">
+    <div class="fst-top">
+      <span class="fst-brand"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>Memento</span>
+      <span class="fst-year">2026</span>
+    </div>
+    <p class="fst-goal">Write the novel.</p>
+    <p class="fst-h">Five things that had never happened before this year.</p>
+    <div class="fst-list">
+      <div class="fst-i"><span class="fst-d">Feb 3</span><i></i><p>The first page written.</p></div>
+      <div class="fst-i"><span class="fst-d">Feb 9</span><i></i><p>The first full week, seven mornings straight.</p></div>
+      <div class="fst-i"><span class="fst-d">Mar 22</span><i></i><p>The first chapter finished.</p></div>
+      <div class="fst-i"><span class="fst-d">Apr 2</span><i></i><p>The first comeback, after a week away.</p></div>
+      <div class="fst-i fst-big"><span class="fst-d">May 30</span><i></i><p>The first person read it. She cried at page 40.</p></div>
+    </div>
+  </div>
+
+  <div class="fst-block">
+    <p class="fst-body">Firsts are the one measure that fits every goal. There is no chart for the day someone read your pages, but it moved more than any number on this screen ever will. The list grows only when something genuinely new happens, so every line on it is load-bearing.</p>
+  </div>
+
+  <p class="fst-quiet">The next first is not scheduled. That is what makes it a first.</p>
+</div></div>
+      </div>
+    </div></div>
+  </section>
+  <section class="pg" id="p-orbit">
+    <header class="pg__hd"><h2>The Orbit</h2>
+      <p class="pg__th">The whole campaign as one ring of days. Every day is a dot, lit if they showed up, with today ringed and the end date flagged. Bounded by construction: the ring never grows, it only fills.</p>
+      <dl class="pg__meta">
+        <dt>Best for</dt><dd>Deadline events: the bar exam, the marathon, the defense, the audition, anything with a fixed day the whole effort points at.</dd>
+        <dt>The share</dt><dd>The ring at a glance: dense lit arcs mean work done, the gap to the flag says exactly how much runway is left.</dd>
+        <dt>On day 900</dt><dd>The ring fills clockwise until the event, then freezes as a completed object; a second campaign gets a fresh ring rather than stretching this one.</dd>
+      </dl></header>
+    <div class="phone"><div class="phone__in">
+      <div class="screen">
+        <header class="bar"><button class="bar__back" type="button" aria-label="Back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+            stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button><span class="bar__title">Your Memento</span></header>
+        <div class="hero"><div class="cage"></div>
+          <p class="hero__name">Your Memento</p>
+          <p class="hero__sub"><span class="mori">20967:16:41:52</span></p>
+        </div>
+        <div class="body"><div class="orbit">
+  <div class="orb-card shot">
+    <div class="orb-top">
+      <span class="orb-brand"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>Memento</span>
+      <span class="orb-range">Nov 3 to Feb 24</span>
+    </div>
+    <p class="orb-goal">Pass the February bar.</p>
+    <div class="orb-wrap">
+      <svg id="orbit-ring" viewBox="0 0 300 300" aria-label="113 days of the campaign as a ring of dots"></svg>
+      <div class="orb-center">
+        <b>81</b>
+        <span>of 97 days<br>studied</span>
+      </div>
+    </div>
+    <div class="orb-legend">
+      <span><i class="orb-k1"></i>studied</span>
+      <span><i class="orb-k2"></i>missed</span>
+      <span><i class="orb-k3"></i>still to come</span>
+      <span><i class="orb-k4"></i>exam day</span>
+    </div>
+  </div>
+
+  <div class="orb-block">
+    <div class="orb-row"><span>Days to the exam</span><b>16</b></div>
+    <div class="orb-row"><span>Longest run</span><b>19 days, December</b></div>
+    <div class="orb-row"><span>Missed</span><b>16 days, 9 of them in November</b></div>
+  </div>
+
+  <p class="orb-read">The ring closes on February 24 whatever happens. The only question it asks is how much of it will be lit.</p>
+</div></div>
+      </div>
+    </div></div>
+  </section>
+  <section class="pg" id="p-run">
+    <header class="pg__hd"><h2>The Run</h2>
+      <p class="pg__th">Their longest unbroken run held up like a record, with the runs that failed to beat it ranked underneath. Turns consistency into a personal best you can chase, which needs no goal number at all.</p>
+      <dl class="pg__meta">
+        <dt>Best for</dt><dd>Daily practices and maintenance promises: meditation, stretching, the walk, the pages, anything where the run itself is the achievement.</dd>
+        <dt>The share</dt><dd>The record number with its exact dates, which reads like an athlete posting a PB.</dd>
+        <dt>On day 900</dt><dd>The record only ever goes up, so on day 900 this screen holds a number that took years to build and cannot be faked.</dd>
+      </dl></header>
+    <div class="phone"><div class="phone__in">
+      <div class="screen">
+        <header class="bar"><button class="bar__back" type="button" aria-label="Back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+            stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button><span class="bar__title">Your Memento</span></header>
+        <div class="hero"><div class="cage"></div>
+          <p class="hero__name">Your Memento</p>
+          <p class="hero__sub"><span class="mori">20967:16:41:52</span></p>
+        </div>
+        <div class="body"><div class="run">
+  <div class="run-card shot">
+    <div class="run-top">
+      <span class="run-brand"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>Memento</span>
+      <span class="run-label">Personal record</span>
+    </div>
+    <p class="run-goal">Sit every morning.</p>
+    <div class="run-hero">
+      <b>23</b>
+      <div class="run-herotxt"><span>days,</span><span>unbroken</span></div>
+    </div>
+    <div class="run-chain" aria-label="the 23 day record run">
+      <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+    </div>
+    <p class="run-dates">June 2 to June 24</p>
+  </div>
+
+  <div class="run-block">
+    <p class="run-h">Every run this year</p>
+    <div class="run-r run-best"><span>Jun</span><i style="--w:100%"></i><b>23</b></div>
+    <div class="run-r"><span>Jul</span><i style="--w:74%"></i><b>17</b></div>
+    <div class="run-r"><span>Mar</span><i style="--w:52%"></i><b>12</b></div>
+    <div class="run-r"><span>Feb</span><i style="--w:39%"></i><b>9</b></div>
+    <div class="run-r run-cur"><span>now</span><i style="--w:26%"></i><b>6</b></div>
+  </div>
+
+  <p class="run-read">The current run is 6. It needs 18 more mornings to take the record, and the record does not care how you feel about that.</p>
+</div></div>
+      </div>
+    </div></div>
+  </section>
+  <section class="pg" id="p-count">
+    <header class="pg__hd"><h2>The Count</h2>
+      <p class="pg__th">The days they have left, spent honestly. Memento mori as the share itself: the big number is mortality, the small numbers are what this year took from it and what came back. The most on-brand design of the twenty.</p>
+      <dl class="pg__meta">
+        <dt>Best for</dt><dd>Open goals with no finish line: get better at writing, be a present father, build the body. The deadline is life, so the design uses it.</dd>
+        <dt>The share</dt><dd>The giant remaining-days figure over one line of what today cost, which is the darkest and most distinctive thing anyone could post from a habit app.</dd>
+        <dt>On day 900</dt><dd>The big number only falls, one per day, and the spent-well count only rises; the tension between the two lines IS the app, forever.</dd>
+      </dl></header>
+    <div class="phone"><div class="phone__in">
+      <div class="screen">
+        <header class="bar"><button class="bar__back" type="button" aria-label="Back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+            stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button><span class="bar__title">Your Memento</span></header>
+        <div class="hero"><div class="cage"></div>
+          <p class="hero__name">Your Memento</p>
+          <p class="hero__sub"><span class="mori">20967:16:41:52</span></p>
+        </div>
+        <div class="body"><div class="count">
+  <div class="cnt-card shot">
+    <div class="cnt-top">
+      <span class="cnt-brand"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>Memento</span>
+      <span class="cnt-date">August 7</span>
+    </div>
+    <div class="cnt-hero">
+      <b>20,967</b>
+      <span>days left, give or take.</span>
+    </div>
+    <p class="cnt-goal">Get better at writing.</p>
+    <div class="cnt-bar"><i style="width:76%"></i></div>
+    <p class="cnt-line">186 of them went to this. 141 got words on the page.</p>
+    <div class="cnt-foot"><span>Day 186</span><span>Showed up</span></div>
+  </div>
+
+  <div class="cnt-block">
+    <div class="cnt-row"><span>Days given to the writing</span><b>186</b></div>
+    <div class="cnt-row"><span>Days that produced pages</span><b>141</b></div>
+    <div class="cnt-row"><span>Days that will not come back either way</span><b>186</b></div>
+  </div>
+
+  <p class="cnt-read">The number at the top is an estimate. The numbers under it are not. Nobody gets to know the first one, everybody gets to decide the second.</p>
+</div></div>
+      </div>
+    </div></div>
+  </section>
+  <section class="pg" id="p-month">
+    <header class="pg__hd"><h2>The Month</h2>
+      <p class="pg__th">One month, one verdict, stacked into a year of one-line chapters. Gives every month a share moment of its own, so the thing people post is fresh twelve times a year instead of once.</p>
+      <dl class="pg__meta">
+        <dt>Best for</dt><dd>Everyday promises woven into family life: home for dinner, phone away by eight, the school run, where a month is the natural unit of pride.</dd>
+        <dt>The share</dt><dd>The current month card: the name, the score so far, one dry sentence of verdict, refreshed monthly which is exactly the cadence Wrapped proved people will repost.</dd>
+        <dt>On day 900</dt><dd>Twelve lines per year, each one a sentence and a bar; three years is thirty six lines, still one comfortable scroll.</dd>
+      </dl></header>
+    <div class="phone"><div class="phone__in">
+      <div class="screen">
+        <header class="bar"><button class="bar__back" type="button" aria-label="Back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+            stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button><span class="bar__title">Your Memento</span></header>
+        <div class="hero"><div class="cage"></div>
+          <p class="hero__name">Your Memento</p>
+          <p class="hero__sub"><span class="mori">20967:16:41:52</span></p>
+        </div>
+        <div class="body"><div class="month">
+  <div class="mth-card shot">
+    <div class="mth-top">
+      <span class="mth-brand"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>Memento</span>
+      <span class="mth-goal-s">Home for dinner by six</span>
+    </div>
+    <p class="mth-name">August.</p>
+    <p class="mth-score">Seven for seven.</p>
+    <div class="mth-dots"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
+    <p class="mth-verdict">The best start to a month yet. The kids have stopped asking if you will be there.</p>
+  </div>
+
+  <div class="mth-block">
+    <p class="mth-h">The year so far, one line each</p>
+    <div class="mth-r"><span>Feb</span><i style="--w:69%"></i><p>18 of 26. The start.</p></div>
+    <div class="mth-r"><span>Mar</span><i style="--w:68%"></i><p>21 of 31. Found the rhythm.</p></div>
+    <div class="mth-r"><span>Apr</span><i style="--w:63%"></i><p>19 of 30. The slip.</p></div>
+    <div class="mth-r"><span>May</span><i style="--w:84%"></i><p>26 of 31. Back.</p></div>
+    <div class="mth-r mth-best"><span>Jun</span><i style="--w:93%"></i><p>28 of 30. The best month.</p></div>
+    <div class="mth-r"><span>Jul</span><i style="--w:71%"></i><p>22 of 31. Held.</p></div>
+    <div class="mth-r mth-now"><span>Aug</span><i style="--w:100%"></i><p>7 of 7. So far, perfect.</p></div>
+  </div>
+
+  <p class="mth-read">A month is short enough to win and long enough to mean something. Twelve verdicts a year, written by what you did.</p>
+</div></div>
+      </div>
+    </div></div>
   </section></div>
 </div>
 <script>
-/* ── the app's real card markup, lifted verbatim ─────────────────────────── */
 function realCard(vars, o){
   o = o || {};
   const B = o.blobs || blobPlan(o.name || 'memento');
@@ -4260,6 +5012,8 @@ function matVars(m, earned){
     '--lit': n?String(0.34 + n*0.22):'0',
     '--glow': n?'.7':'0', '--emit': n?'.7':'0', '--ring': n?'.5':'0'};
 }
+
+
 </script>
 <script>
 (function(){
@@ -4532,6 +5286,66 @@ if (root) {
   });
 }
 })(); }catch(e){ console.error("ticket", e); }
+
+/* marks */
+try{ (function(){
+var wall=document.getElementById('marks-wall');
+if(wall){
+  var total=87, groups=Math.floor(total/5), rem=total%5, h='';
+  for(var g=0; g<groups; g++){
+    h+='<span class="tly-g"><i></i><i></i><i></i><i></i><em></em></span>';
+  }
+  if(rem>0){
+    h+='<span class="tly-g tly-open">';
+    for(var r=0;r<rem;r++) h+='<i></i>';
+    h+='</span>';
+  }
+  wall.innerHTML=h;
+  var marks=wall.querySelectorAll('.tly-g');
+  for(var i=0;i<marks.length;i++){
+    marks[i].style.opacity='0';
+    marks[i].style.transition='opacity .5s ease-out '+(i*38)+'ms';
+  }
+  requestAnimationFrame(function(){requestAnimationFrame(function(){
+    for(var i=0;i<marks.length;i++) marks[i].style.opacity='1';
+  });});
+  setTimeout(function(){for(var i=0;i<marks.length;i++) marks[i].style.opacity='1';},2200);
+}
+})(); }catch(e){ console.error("marks", e); }
+
+/* orbit */
+try{ (function(){
+var svg=document.getElementById('orbit-ring');
+if(svg){
+  var NS='http://www.w3.org/2000/svg';
+  var total=113, today=96, cx=150, cy=150, R=126;
+  var seed=41;
+  function rnd(){seed=(seed*1103515245+12345)%2147483648;return seed/2147483648;}
+  for(var i=0;i<total;i++){
+    var a=-Math.PI/2 + (i/total)*Math.PI*2;
+    var x=cx+R*Math.cos(a), y=cy+R*Math.sin(a);
+    var c=document.createElementNS(NS,'circle');
+    c.setAttribute('cx',x.toFixed(1)); c.setAttribute('cy',y.toFixed(1));
+    if(i===total-1){
+      c.setAttribute('r','5.5'); c.setAttribute('fill','#eef2fb');
+    } else if(i>today){
+      c.setAttribute('r','3'); c.setAttribute('fill','rgba(58,217,245,0.35)');
+    } else {
+      var lit = rnd() < 0.86 || i>today-6;
+      c.setAttribute('r', lit?'3.6':'3');
+      c.setAttribute('fill', lit?'rgba(63,217,78,0.9)':'rgba(255,255,255,0.16)');
+    }
+    svg.appendChild(c);
+    if(i===today){
+      var ring=document.createElementNS(NS,'circle');
+      ring.setAttribute('cx',x.toFixed(1)); ring.setAttribute('cy',y.toFixed(1));
+      ring.setAttribute('r','7'); ring.setAttribute('fill','none');
+      ring.setAttribute('stroke','rgba(255,255,255,0.9)'); ring.setAttribute('stroke-width','1.5');
+      svg.appendChild(ring);
+    }
+  }
+}
+})(); }catch(e){ console.error("orbit", e); }
 </script>
 <script>
 /* Counters animate with requestAnimationFrame, which a backgrounded tab pauses.
