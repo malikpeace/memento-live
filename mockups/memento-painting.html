@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The painting, four stages</title>
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;background:#050609;color:rgba(245,246,250,.97);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1200px;margin:0 auto;padding:36px 20px 110px}
+  h1{margin:0 0 10px;font-size:25px;font-weight:750;letter-spacing:-.025em}
+  .lede{margin:0 0 6px;font-size:14.5px;line-height:1.62;color:rgba(238,241,247,.78);max-width:82ch}
+  .lede b{color:rgba(245,246,250,.97);font-weight:640}
+  .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(270px,100%),1fr));gap:26px;margin-top:30px}
+  .stage h2{margin:0 0 4px;font-size:16.5px;font-weight:720;letter-spacing:-.018em}
+  .stage .sub{margin:0 0 12px;font-size:12.5px;line-height:1.5;color:rgba(238,241,247,.7)}
+  .frame{position:relative;border-radius:22px;overflow:hidden;background:#040507;
+    box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.85),
+      0 0 30px rgba(220,232,255,.16), 0 16px 44px rgba(0,0,0,.6)}
+  .frame canvas{display:block;width:100%;height:auto}
+  .frame .nm{position:absolute;left:13px;bottom:10px;font-size:10.5px;letter-spacing:.12em;
+    color:rgba(238,242,251,.34);text-transform:uppercase}
+  .frame .ct{position:absolute;right:13px;bottom:10px;font-size:11px;color:rgba(238,242,251,.4);
+    font-variant-numeric:tabular-nums}
+  .verdict{margin-top:34px;padding:18px 19px;border-radius:16px;background:rgba(255,255,255,.05);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.07);font-size:13.5px;line-height:1.62;
+    color:rgba(238,241,247,.78);max-width:82ch}
+  .verdict b{color:rgba(245,246,250,.97);font-weight:640}
+</style></head><body>
+<div class="wrap">
+  <h1>The painting, four stages of one life</h1>
+  <p class="lede">Same person, same rules, four moments in time. Green is a day you acted,
+    cyan is a day you wrote, white is a record. <b>The marks adapt to their count:</b>
+    when there are five, each is an ember with a halo. As the record grows they shrink
+    and gather into weather. Nothing is random: position comes from the date, size from
+    the count, weight from what the day was.</p>
+  <p class="lede">This is the honest test of the sparse canvas. Judge stage two hardest.</p>
+
+  <div class="row">
+    <div class="stage">
+      <h2>Week 2</h2>
+      <p class="sub">5 marks. Each one still has a name. The first stroke on a life of canvas.</p>
+      <div class="frame"><canvas data-n="5" data-seed="11"></canvas>
+        <span class="nm">Malik</span><span class="ct">5</span></div>
+    </div>
+    <div class="stage">
+      <h2>Month 2</h2>
+      <p class="sub">35 marks. The median real user. If this stage is not beautiful, the idea dies here.</p>
+      <div class="frame"><canvas data-n="35" data-seed="23"></canvas>
+        <span class="nm">Malik</span><span class="ct">35</span></div>
+    </div>
+    <div class="stage">
+      <h2>Month 5</h2>
+      <p class="sub">150 marks. The strokes begin to gather into currents.</p>
+      <div class="frame"><canvas data-n="150" data-seed="37"></canvas>
+        <span class="nm">Malik</span><span class="ct">150</span></div>
+    </div>
+    <div class="stage">
+      <h2>Month 10</h2>
+      <p class="sub">462 marks. A nebula nobody else could have painted.</p>
+      <div class="frame"><canvas data-n="462" data-seed="61"></canvas>
+        <span class="nm">Malik</span><span class="ct">462</span></div>
+    </div>
+  </div>
+
+  <p class="verdict"><b>The adaptive rule, plainly:</b> mark size scales with rarity, so five marks
+    are five jewels and five hundred are weather. Early days get halos and long tails because each
+    one is an event; later marks get density instead. The composition is anchored the same way the
+    card's blobs already are, seeded by the name, so the painting is theirs from stroke one and
+    only ever gains. Missed days paint nothing, and unpainted canvas is not a wrong mark, it is
+    room. This lives INSIDE the card, behind the pristine face, by Malik's call, August 8.</p>
+</div>
+<script>
+document.querySelectorAll('.frame canvas').forEach(function(cv){
+  var n=+cv.dataset.n, seed=+cv.dataset.seed;
+  var W=300,H=400; cv.width=W*2; cv.height=H*2; cv.style.aspectRatio=W+' / '+H;
+  var cx=cv.getContext('2d'); cx.scale(2,2);
+  function rnd(){seed=(seed*1103515245+12345)%2147483648;return seed/2147483648;}
+
+  /* the room inside the card: near-black with the faintest breath of depth */
+  var g=cx.createRadialGradient(W*0.5,H*0.42,20,W*0.5,H*0.5,H*0.72);
+  g.addColorStop(0,'rgba(16,20,28,1)'); g.addColorStop(1,'rgba(3,4,6,1)');
+  cx.fillStyle=g; cx.fillRect(0,0,W,H);
+
+  /* density-adaptive geometry */
+  var base = 46/Math.sqrt(n+3);           /* 5 -> ~16px, 35 -> ~7.5, 462 -> ~2.1 */
+  var margin = 26;
+
+  /* time flows bottom to top; each mark's band is its date */
+  for(var i=0;i<n;i++){
+    var t=i/n;                             /* 0 = first day, 1 = latest */
+    var y=H-margin-(H-2*margin)*t + (rnd()-0.5)*H*0.06;
+    var x=margin+rnd()*(W-2*margin);
+    var kind=rnd(); var col, glow;
+    if(kind<0.62){ col='63,217,78'; }      /* acted */
+    else if(kind<0.92){ col='58,217,245';} /* wrote */
+    else { col='238,244,255'; }            /* a record */
+    var r=base*(0.55+rnd()*0.9);
+    var a=0.35+rnd()*0.5;
+    var rec = kind>=0.92;
+    if(rec) r=Math.max(r, base*1.5);
+
+    /* the halo: big when marks are few, gone when they are many */
+    var haloR = r*(n<12? 5.5 : n<60? 3.6 : 2.2);
+    var hg=cx.createRadialGradient(x,y,0,x,y,haloR);
+    hg.addColorStop(0,'rgba('+col+','+(n<60?0.20:0.10)+')');
+    hg.addColorStop(1,'rgba('+col+',0)');
+    cx.fillStyle=hg; cx.beginPath(); cx.arc(x,y,haloR,0,7); cx.fill();
+
+    /* the stroke itself: a dab with a slight upward pull, paint not pixel */
+    var lean=(rnd()-0.5)*0.9;
+    cx.save(); cx.translate(x,y); cx.rotate(lean);
+    var dg=cx.createRadialGradient(0,0,0,0,0,r);
+    dg.addColorStop(0,'rgba('+col+','+Math.min(0.95,a+0.3)+')');
+    dg.addColorStop(0.7,'rgba('+col+','+(a*0.5).toFixed(2)+')');
+    dg.addColorStop(1,'rgba('+col+',0)');
+    cx.fillStyle=dg;
+    cx.beginPath(); cx.ellipse(0,0,r,r*(0.62+rnd()*0.3),0,0,7); cx.fill();
+    /* a rising tail on early sparse marks: the stroke was an act, not a dot */
+    if(n<60){
+      var tl=r*(1.6+rnd()*1.4);
+      var lg=cx.createLinearGradient(0,0,0,-tl);
+      lg.addColorStop(0,'rgba('+col+','+(a*0.5).toFixed(2)+')');
+      lg.addColorStop(1,'rgba('+col+',0)');
+      cx.fillStyle=lg;
+      cx.beginPath(); cx.ellipse(0,-tl*0.45,r*0.24,tl*0.55,0,0,7); cx.fill();
+    }
+    cx.restore();
+
+    if(rec){ cx.fillStyle='rgba(255,255,255,0.95)';
+      cx.beginPath(); cx.arc(x,y,Math.max(1.6,r*0.22),0,7); cx.fill(); }
+  }
+});
+</script>
+</body></html>
