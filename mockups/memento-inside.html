@@ -57,6 +57,51 @@
     box-shadow:inset 0 1px 0 rgba(255,255,255,.5)}
   .in-back svg{width:17px;height:17px}
 
+  .in-mode{position:fixed;top:calc(var(--safe-t) + 17px);right:14px;z-index:9;
+    border:0;padding:8px 13px;border-radius:999px;background:rgba(16,20,28,.1);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5);color:var(--ink1);
+    font:inherit;font-size:12px;font-weight:660;cursor:pointer}
+
+  /* ── BORDER MODE: the glow is the frame, the middle goes dark ─────────── */
+  .inside.brd .in-scroll{background:
+    radial-gradient(120% 26% at 50% 0%, rgba(210,225,250,.10), transparent 70%),
+    radial-gradient(46% 100% at 0% 50%, rgba(210,225,250,.06), transparent 70%),
+    radial-gradient(46% 100% at 100% 50%, rgba(210,225,250,.06), transparent 70%),
+    linear-gradient(180deg,#07080c,#050609)}
+  .inside.brd{--ink1:rgba(245,246,250,.97);--ink2:rgba(238,241,247,.74);--ink3:rgba(232,236,244,.5)}
+  .inside.brd .rim::before{inset:5px;height:auto;border-radius:46px;background:none;
+    box-shadow:0 0 0 2.5px #fff, 0 0 22px 4px rgba(238,244,255,.8),
+      0 0 60px 16px rgba(200,215,255,.35), inset 0 0 30px rgba(238,244,255,.30)}
+  .inside.brd .rim::after,.inside.brd .rim i{display:none}
+  .inside.brd .in-mark{fill:#c7cdd8}
+  .inside.brd .in-name,.inside.brd .in-hero>b,.inside.brd .in-total b{
+    text-shadow:0 0 34px rgba(238,244,255,.22)}
+  .inside.brd .in-star{background:color-mix(in srgb, var(--clar) 12%, rgba(255,255,255,.05));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.09)}
+  .inside.brd .in-items,.inside.brd .in-sum,.inside.brd .in-total{
+    box-shadow:inset 0 1.5px 0 rgba(255,255,255,.14)}
+  .inside.brd .in-r i{background-image:radial-gradient(circle, rgba(255,255,255,.3) 1px, transparent 1.2px)}
+  .inside.brd .in-best b:nth-of-type(1){color:var(--cons)}
+  .inside.brd .in-then__now{color:var(--cons)}
+  .inside.brd .in-well{box-shadow:inset 0 1px 0 rgba(255,255,255,.07), 0 18px 44px rgba(0,0,0,.5);
+    background:linear-gradient(180deg,#0c0e13,#08090d)}
+  .inside.brd .in-viv{background:
+    radial-gradient(70% 60% at 50% 0%, color-mix(in srgb, var(--cons) 13%, transparent), transparent 74%)}
+  .inside.brd .in-viv__closer{color:var(--cons)}
+  .inside.brd .in-seal{background:rgba(255,255,255,.05);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+  .inside.brd .in-seal__law{box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+  .inside.brd .in-org{background:linear-gradient(180deg, rgba(244,246,250,.96), rgba(228,232,240,.92));
+    box-shadow:inset 0 2px 3px rgba(255,255,255,.9), inset 0 -1px 0 rgba(20,24,32,.10),
+      0 10px 30px rgba(0,0,0,.45)}
+  .inside.brd .in-org__k{color:rgba(24,28,36,.55)}
+  .inside.brd .in-org__d{color:rgba(16,20,28,.92);
+    text-shadow:0 1px 1px rgba(255,255,255,.9), 0 -1px .5px rgba(0,0,0,.18)}
+  .inside.brd .in-org__t{color:rgba(24,28,36,.62)}
+  .inside.brd .in-code i{background:rgba(238,242,251,.75)}
+  .inside.brd .in-back,.inside.brd .in-mode{background:rgba(255,255,255,.08);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.09);color:var(--hi)}
+  .inside.brd .in-col{padding-top:calc(var(--safe-t) + 66px)}
+
   .in-head{text-align:center}
   .in-mark{width:44px;height:44px;fill:#3a4150;display:block;margin:0 auto}
   .in-name{margin-top:16px;font-size:27px;font-weight:780;letter-spacing:-.028em;color:var(--ink1);
@@ -506,6 +551,7 @@
 <!-- STATE B: inside the card. The face is the page, the rim is the device. -->
 <div class="inside" id="inside" hidden>
   <div class="rim" aria-hidden="true"></div>
+  <button class="in-mode" id="inMode" type="button">Middle: dark</button>
   <button class="in-back" id="inBack" type="button" aria-label="Back out of the card">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
       stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
@@ -740,6 +786,11 @@ b.className='cage-sm cage is-stock';
 b.innerHTML=realCard(matVars(M,{clar:true,act:true,cons:true}),{name:''});
 
 var home=document.getElementById('home'), inside=document.getElementById('inside');
+inside.classList.add('brd');
+var modeBtn=document.getElementById('inMode');
+function setModeLabel(){modeBtn.textContent=inside.classList.contains('brd')?'Middle: dark':'Middle: the face';}
+setModeLabel();
+modeBtn.addEventListener('click',function(){inside.classList.toggle('brd');setModeLabel();});
 var lit=false;
 document.getElementById('homeCage').addEventListener('click',function(){
   inside.hidden=false;
