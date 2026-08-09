@@ -3,7 +3,7 @@
   --bg:#050609;
   --hi:#eef2fb;
   --mid:#c9d1e0;
-  --lo:#767f90;
+  --lo:#8b94a5;
   --clar:#3ad9f5;
   --cons:#3fd94e;
   --act:#eef2fb;
@@ -28,7 +28,12 @@
 /* ---- the air: broad blooms that never touch a boundary ---- */
 .field .air{
   position:absolute;
-  inset:0;
+  left:50%;
+  top:0;
+  bottom:0;
+  width:100%;
+  max-width:760px;
+  transform:translateX(-50%);
   z-index:0;
   pointer-events:none;
 }
@@ -129,7 +134,7 @@
 }
 .field .lede{
   margin:14px auto 0;
-  max-width:300px;
+  max-width:322px;
   font-size:15.5px;
   color:var(--mid);
   text-align:center;
@@ -188,7 +193,7 @@
   color:var(--mid);
 }
 .field .lab.hi{color:var(--hi);}
-.field .when{margin:5px 0 0;font-size:12.5px;color:var(--lo);}
+.field .when{margin:5px 0 0;font-size:13px;color:var(--lo);}
 
 /* ---- quotes float, nothing holds them ---- */
 .field .said{
@@ -202,6 +207,13 @@
   text-align:center;
 }
 .field .said.small{font-size:17px;max-width:290px;}
+/* on a wide screen the field simply gets deeper. the column breathes a little. */
+@media (min-width:900px){
+  .field .col{max-width:408px;}
+  .field .open{padding-top:136px;}
+  .field .seam{height:126px;}
+}
+
 .field .close{
   margin:58px auto 0;
   max-width:292px;
