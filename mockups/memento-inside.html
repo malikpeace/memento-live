@@ -39,7 +39,7 @@
       radial-gradient(70% 34% at 20% 4%, color-mix(in srgb, var(--clar) 12%, transparent), transparent 70%),
       radial-gradient(64% 30% at 86% 30%, color-mix(in srgb, var(--cons) 9%, transparent), transparent 72%),
       linear-gradient(168deg,#eaeef5 0%,#dde3ec 46%,#cfd7e2 100%)}
-  .in-col{max-width:430px;margin:0 auto;padding:calc(var(--safe-t) + 150px) 24px 60px}
+  .in-col{max-width:430px;margin:0 auto;padding:calc(var(--safe-t) + 154px) 24px 60px}
 
   /* the rim: the device edges become the card's edge, open at the bottom */
   .rim{position:fixed;inset:0;z-index:8;pointer-events:none}
@@ -157,8 +157,8 @@
   .evd.is-open .evd__story{display:block}
   .evcap{margin-top:12px;font-size:12px;color:var(--ink3);text-align:center}
 
-  .in-count{margin-top:16px;font-size:29px;font-weight:250;letter-spacing:.09em;
-    color:var(--hi);font-variant-numeric:tabular-nums}
+  .in-count{margin-top:16px;font-size:24px;font-weight:250;letter-spacing:.1em;
+    color:var(--mid);font-variant-numeric:tabular-nums}
   .in-d0{position:fixed;top:calc(var(--safe-t) + 62px);right:14px;z-index:9;border:0;
     padding:8px 13px;border-radius:999px;background:rgba(255,255,255,.08);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.09);color:var(--hi);
@@ -169,6 +169,7 @@
   .vow{margin-top:46px;padding:20px 19px 17px;border-radius:16px;
     background:radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--clar) 11%, transparent), transparent 70%), var(--fill);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+  .vow{text-align:center}
   .vow__l{font-size:12px;font-weight:660;color:var(--clar)}
   .vow__q{margin-top:9px;font-size:24px;font-weight:740;letter-spacing:-.026em;line-height:1.22;color:var(--hi)}
   .vow__w{margin-top:12px;font-size:15px;font-style:italic;line-height:1.45;color:var(--mid)}
@@ -188,7 +189,8 @@
   .inside:not(.brd) .in-mode,.inside:not(.brd) .in-d0{
     background:rgba(16,20,28,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.5);
     color:rgba(13,17,25,.94)}
-  .in-flowh{margin:104px 0 10px;font-size:23px;font-weight:750;letter-spacing:-.024em;color:var(--hi)}
+  .in-flowh{margin:104px 0 10px;font-size:23px;font-weight:750;letter-spacing:-.024em;
+    color:var(--hi);text-align:center}
   .in-flowh--sub{margin-top:118px;font-size:46px;letter-spacing:-.035em;line-height:1.02}
   .in-flowh--sub{cursor:pointer;-webkit-tap-highlight-color:transparent}
   .in-flowh--sub::after{content:attr(data-sub);display:block;margin-top:10px;
@@ -197,12 +199,12 @@
   .in-flowh--sub:hover::after,.in-flowh--sub.is-sub::after{opacity:1;transform:none}
 
   /* the age of the Memento: the biggest number on the page */
-  .bigup{margin-top:52px;text-align:left}
-  .bigup__d{font-size:34px;font-weight:640;letter-spacing:-.03em;line-height:1;color:var(--mid)}
-  .bigup__d b{font-size:104px;font-weight:800;letter-spacing:-.055em;color:var(--cons);
+  .bigup{margin-top:44px;text-align:center}
+  .bigup__d{font-size:24px;font-weight:640;letter-spacing:-.025em;line-height:1;color:var(--mid)}
+  .bigup__d b{font-size:64px;font-weight:800;letter-spacing:-.045em;color:var(--cons);
     font-variant-numeric:tabular-nums;
-    text-shadow:0 0 80px color-mix(in srgb, var(--cons) 30%, transparent)}
-  .bigup__u{margin-top:14px;font-size:15px;color:var(--mid)}
+    text-shadow:0 0 60px color-mix(in srgb, var(--cons) 28%, transparent)}
+  .bigup__u{margin-top:10px;font-size:14px;color:var(--mid)}
   .bigup__u span{color:var(--hi);font-weight:640;font-variant-numeric:tabular-nums}
 
   /* the ambient life: a blur of white, cyan or green breathing in and out */
@@ -309,13 +311,13 @@
   .cpick{margin-top:26px}
   .cpick > *{max-width:100%}
   /* the components were designed as tiles on near black, the ring room IS near black */
-  .in-head{text-align:left}
-  .in-mark{width:34px;height:34px;fill:rgba(238,244,255,.65);display:block;margin:0}
+  .in-head{text-align:center}
+  .in-mark{width:30px;height:30px;fill:rgba(238,244,255,.65);display:block;margin:0 auto}
   .inside.brd .in-mark{fill:rgba(238,244,255,.65)}
-  .in-title{margin-top:16px;font-size:26px;font-weight:780;letter-spacing:-.028em;color:var(--hi)}
-  .in-owner{margin-top:12px;padding-top:11px;display:flex;align-items:baseline;gap:12px;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.10);font-size:12.5px;color:var(--lo)}
-  .in-owner b{font-size:16px;font-weight:700;letter-spacing:-.012em;color:var(--hi)}
+  .in-title{margin-top:16px;font-size:40px;font-weight:800;letter-spacing:-.032em;color:var(--hi)}
+  .in-owner{margin-top:8px;display:flex;align-items:baseline;justify-content:center;gap:8px;
+    font-size:12.5px;color:var(--lo)}
+  .in-owner b{font-size:15px;font-weight:680;letter-spacing:-.012em;color:var(--hi)}
   .in-name{margin-top:16px;font-size:27px;font-weight:780;letter-spacing:-.028em;color:var(--ink1);
     text-shadow:0 1px 1px rgba(255,255,255,.85), 0 -1px .5px rgba(0,0,0,.16)}
   .in-count{margin-top:8px;font-size:17px;font-weight:300;letter-spacing:.11em;color:var(--ink2);
@@ -1276,7 +1278,7 @@ document.getElementById('inBack').addEventListener('click',function(){
   var b=document.getElementById('bigupLive'); if(!b)return;
   var t0=Date.now(), base=44915;
   setInterval(function(){
-    var e=base+Math.floor((Date.now()-t0)/1000);
+    var e=(base+Math.floor((Date.now()-t0)/1000))%86400;
     b.textContent=Math.floor(e/3600)+'h '+Math.floor(e%3600/60)+'m '+(e%60)+'s';
   },1000);
 })();
@@ -1337,7 +1339,7 @@ document.querySelectorAll('.in-flowh--sub').forEach(function(h){
   if(live){
     var t0=Date.now(), b=40611;
     setInterval(function(){
-      var e=b+Math.floor((Date.now()-t0)/1000);
+      var e=(b+Math.floor((Date.now()-t0)/1000))%86400;
       live.textContent=Math.floor(e/3600)+'h '+Math.floor(e%3600/60)+'m '+(e%60)+'s';
     },1000);
   }
