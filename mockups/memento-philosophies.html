@@ -1468,7 +1468,7 @@
 .field .surface{position:relative;margin:40px 0 0;}
 .field .surface canvas{display:block;width:100%;}
 .field .surface.days canvas{height:158px;}
-.field .surface.life canvas{height:200px;}
+.field .surface.life canvas{height:248px;}
 .field .surface.vow canvas{height:112px;}
 .field .cap{
   margin:22px auto 0;
@@ -1634,7 +1634,7 @@
     <div class="surface life">
       <canvas id="fldLife" aria-label="4,175 weeks of a life, the spent ones dark"></canvas>
     </div>
-    <p class="cap">Every point is one week, running left to right. The dark ground is spent. The three green points are the weeks you have given to this.</p>
+    <p class="cap">Every point is one week. The dark middle is the part already spent. The three green points are the weeks you have given to this so far.</p>
 
     <div class="stat c">
       <div class="n pool sm"><span>1,179 of 4,175</span></div>
@@ -1809,45 +1809,41 @@
 
   function drawLife(){
     var cv = document.getElementById('fldLife');
-    var s = fit(cv, 200);
+    var s = fit(cv, 248);
     if(!s) return;
     var ctx=s.ctx, w=s.w, h=s.h;
     var total = 4175, lived = 1179;
-    var cols = 89, rows = 47;
-    var padX = 10, padY = 12;
-    var stepX = (w - padX*2) / (cols - 1);
-    var stepY = (h - padY*2) / (rows - 1);
     var gHI = grain(HI), gCO = grain(CO);
 
-    /* the water the weeks are suspended in */
-    bloom(ctx, w*0.64, h*0.52, w*0.58, HI, 0.06);
+    /* every week of a life, laid out from the middle outwards at the
+       golden angle, so nothing lines up and no boundary is a line.
+       the weeks already spent are the dark centre. what is left is the
+       light around it, thinning to nothing before it reaches any side. */
+    var cx = w/2, cy = h/2;
+    var R = Math.min(w*0.44, h*0.46);
+    var GOLD = 2.399963229728653;
 
-    /* time runs left to right. the spent weeks are the dark ground on the
-       left, the remaining ones are the light. both dissolve on every side. */
     function soft(v){
       var t = v < 0 ? 0 : (v > 1 ? 1 : v);
       return t*t*(3 - 2*t);
     }
 
     for(var k=0;k<total;k++){
-      var c = Math.floor(k / rows), rw = k % rows;
-      if(c >= cols) break;
-      var x = padX + c*stepX;
-      var y = padY + rw*stepY;
-
-      var dx = Math.abs((x - w/2) / (w/2));
-      var dy = Math.abs((y - h/2) / (h/2));
-      var f = soft((1 - dy) / 0.56) * soft((1 - dx) / 0.30);
+      var t = Math.sqrt((k + 0.5) / total);
+      var rr = R * t;
+      var th = k * GOLD;
+      var x = cx + rr*Math.cos(th);
+      var y = cy + rr*Math.sin(th);
+      var f = t <= 0.74 ? 1 : soft((1 - t) / 0.26);
       if(f <= 0.012) continue;
 
       if(k >= lived - 3 && k < lived){
-        var fg = f < 0.55 ? 0.55 : f;
-        bloom(ctx, x, y, 26, CO, 0.22*fg);
-        stamp(ctx, gCO, x, y, 5.4, 0.95*fg);
+        bloom(ctx, x, y, 26, CO, 0.22);
+        stamp(ctx, gCO, x, y, 5.6, 0.95);
       } else if(k < lived){
-        stamp(ctx, gHI, x, y, 2.4, 0.13*f);
+        stamp(ctx, gHI, x, y, 2.6, 0.115);
       } else {
-        stamp(ctx, gHI, x, y, 3.1, 0.62*f);
+        stamp(ctx, gHI, x, y, 3.2, 0.60*f);
       }
     }
   }

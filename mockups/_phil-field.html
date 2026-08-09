@@ -81,6 +81,9 @@
 .field .pool.cool::before{background:radial-gradient(50% 50% at 50% 50%, rgba(58,217,245,.16), rgba(58,217,245,0) 70%);}
 .field .pool.live::before{background:radial-gradient(50% 50% at 50% 50%, rgba(63,217,78,.15), rgba(63,217,78,0) 70%);}
 .field .pool.soft::before{width:300px;height:200px;background:radial-gradient(50% 50% at 50% 50%, rgba(238,242,251,.085), rgba(238,242,251,0) 70%);}
+/* headings and quotes hold the full column, so their light centres on the column */
+.field .mv.pool,
+.field .said.pool{display:block;}
 
 /* ---- opening ---- */
 .field .open{padding:104px 0 0;text-align:center;}
@@ -136,8 +139,8 @@
 .field .surface{position:relative;margin:40px 0 0;}
 .field .surface canvas{display:block;width:100%;}
 .field .surface.days canvas{height:158px;}
-.field .surface.life canvas{height:200px;}
-.field .surface.vow canvas{height:78px;}
+.field .surface.life canvas{height:248px;}
+.field .surface.vow canvas{height:112px;}
 .field .cap{
   margin:22px auto 0;
   max-width:308px;
@@ -302,7 +305,7 @@
     <div class="surface life">
       <canvas id="fldLife" aria-label="4,175 weeks of a life, the spent ones dark"></canvas>
     </div>
-    <p class="cap">Every point is one week. The dark ones are spent. The three green ones went to this.</p>
+    <p class="cap">Every point is one week. The dark middle is the part already spent. The three green points are the weeks you have given to this so far.</p>
 
     <div class="stat c">
       <div class="n pool sm"><span>1,179 of 4,175</span></div>
@@ -407,6 +410,33 @@
     ctx.fill();
   }
 
+  /* a reusable grain of light. cheap to stamp thousands of times,
+     and it has a halo, so nothing on the page is ever a hard speck. */
+  var sprites = {};
+  function grain(col){
+    if(sprites[col]) return sprites[col];
+    var S = 32, c = document.createElement('canvas');
+    c.width = S; c.height = S;
+    var x = c.getContext('2d');
+    if(!x) return null;
+    var g = x.createRadialGradient(S/2,S/2,0,S/2,S/2,S/2);
+    g.addColorStop(0,    'rgba('+col+',1)');
+    g.addColorStop(0.20, 'rgba('+col+',0.72)');
+    g.addColorStop(0.46, 'rgba('+col+',0.20)');
+    g.addColorStop(0.74, 'rgba('+col+',0.05)');
+    g.addColorStop(1,    'rgba('+col+',0)');
+    x.fillStyle = g;
+    x.fillRect(0,0,S,S);
+    sprites[col] = c;
+    return c;
+  }
+  function stamp(ctx,sp,x,y,r,a){
+    if(!sp || a<=0 || r<=0) return;
+    ctx.globalAlpha = a > 1 ? 1 : a;
+    ctx.drawImage(sp, x-r, y-r, r*2, r*2);
+    ctx.globalAlpha = 1;
+  }
+
   function drawDays(){
     var cv = document.getElementById('fldDays');
     var s = fit(cv, 158);
@@ -450,64 +480,71 @@
 
   function drawLife(){
     var cv = document.getElementById('fldLife');
-    var s = fit(cv, 200);
+    var s = fit(cv, 248);
     if(!s) return;
     var ctx=s.ctx, w=s.w, h=s.h;
     var total = 4175, lived = 1179;
-    var cols = 89, rows = 47;
-    var padX = 12, padY = 14;
-    var stepX = (w - padX*2) / (cols - 1);
-    var stepY = (h - padY*2) / (rows - 1);
+    var gHI = grain(HI), gCO = grain(CO);
 
-    bloom(ctx, w*0.54, h*0.54, w*0.60, HI, 0.05);
+    /* every week of a life, laid out from the middle outwards at the
+       golden angle, so nothing lines up and no boundary is a line.
+       the weeks already spent are the dark centre. what is left is the
+       light around it, thinning to nothing before it reaches any side. */
+    var cx = w/2, cy = h/2;
+    var R = Math.min(w*0.44, h*0.46);
+    var GOLD = 2.399963229728653;
+
+    function soft(v){
+      var t = v < 0 ? 0 : (v > 1 ? 1 : v);
+      return t*t*(3 - 2*t);
+    }
 
     for(var k=0;k<total;k++){
-      var c = k % cols, rw = Math.floor(k / cols);
-      if(rw >= rows) break;
-      var x = padX + c*stepX;
-      var y = padY + rw*stepY;
-
-      /* elliptical falloff so the grid dissolves before any bound */
-      var dx = (x - w/2) / (w/2);
-      var dy = (y - h/2) / (h/2);
-      var dd = Math.sqrt(dx*dx + dy*dy);
-      var f = dd >= 0.97 ? 0 : (dd <= 0.46 ? 1 : 1 - (dd - 0.46)/0.51);
-      f = f*f*(3 - 2*f);
-      if(f <= 0.01) continue;
+      var t = Math.sqrt((k + 0.5) / total);
+      var rr = R * t;
+      var th = k * GOLD;
+      var x = cx + rr*Math.cos(th);
+      var y = cy + rr*Math.sin(th);
+      var f = t <= 0.74 ? 1 : soft((1 - t) / 0.26);
+      if(f <= 0.012) continue;
 
       if(k >= lived - 3 && k < lived){
-        bloom(ctx, x, y, 20, CO, 0.16*f);
-        point(ctx, x, y, 2.3, CO, 0.95*f);
+        bloom(ctx, x, y, 26, CO, 0.22);
+        stamp(ctx, gCO, x, y, 5.6, 0.95);
       } else if(k < lived){
-        point(ctx, x, y, 1.15, HI, 0.10*f);
+        stamp(ctx, gHI, x, y, 2.6, 0.115);
       } else {
-        point(ctx, x, y, 1.30, HI, 0.36*f);
+        stamp(ctx, gHI, x, y, 3.2, 0.60*f);
       }
     }
   }
 
   function drawVow(){
     var cv = document.getElementById('fldVow');
-    var s = fit(cv, 78);
+    var s = fit(cv, 112);
     if(!s) return;
     var ctx=s.ctx, w=s.w, h=s.h;
-    var pad = 17;
+    var pad = 18;
     var pitch = (w - pad*2) / 99;
-    var y = h*0.5;
+    var mid = h*0.5;
+    var rnd = seeded(9100);
+    var gHI = grain(HI), gCO = grain(CO);
 
-    bloom(ctx, pad + pitch*4, y, 58, HI, 0.075);
+    /* the nine already lit sit in one shallow pool */
+    bloom(ctx, pad + pitch*4.5, mid, 74, HI, 0.085);
 
     for(var i=0;i<100;i++){
       var x = pad + i*pitch;
+      var y = mid + (rnd()*2-1)*31;
       if(i < 9){
-        bloom(ctx, x, y, 21, HI, 0.115);
-        point(ctx, x, y, 2.6, HI, 0.95);
+        bloom(ctx, x, y, 20, HI, 0.13);
+        stamp(ctx, gHI, x, y, 5.4, 0.95);
       } else if(i < 99){
         var t = (i - 9) / 89;
-        point(ctx, x, y, 1.15, HI, 0.155*(1-t) + 0.045);
+        stamp(ctx, gHI, x, y, 3.0, 0.185*(1-t) + 0.05);
       } else {
-        bloom(ctx, x, y, 26, CO, 0.11);
-        point(ctx, x, y, 2.4, CO, 0.55);
+        bloom(ctx, x, y, 30, CO, 0.13);
+        stamp(ctx, gCO, x, y, 5.0, 0.62);
       }
     }
   }
