@@ -9,7 +9,8 @@
   *{box-sizing:border-box}
   html,body{margin:0;overflow-x:clip;background:#050609;
     font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-  :root{--hi:rgba(245,246,250,.97);--mid:rgba(238,241,247,.78);--lo:rgba(232,236,244,.50);
+  :root{--mmask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M150 146 L256 252 L362 146 L362 366 L150 366 Z'/></svg>");
+    --hi:rgba(245,246,250,.97);--mid:rgba(238,241,247,.78);--lo:rgba(232,236,244,.50);
     --fill:rgba(255,255,255,.055);--inset:inset 0 1px 0 rgba(255,255,255,.07);
     --clar:#3ad9f5;--cons:#3fd94e;--act:#eef2fb;--safe-t:0px;--safe-b:0px;
     --ink1:rgba(13,17,25,.94);--ink2:rgba(24,28,36,.68);--ink3:rgba(24,28,36,.48)}
@@ -209,6 +210,58 @@
   @keyframes inAmb{0%,58%,100%{opacity:0}72%,84%{opacity:1}}
   .in-col{position:relative;z-index:1}
   @media (prefers-reduced-motion: reduce){.in-amb i{animation:none}}
+
+  /* the lock: shut by default, opened by their own word */
+  .in-seal .seal-open{display:none}
+  .in-seal.is-open .seal-open{display:block}
+  .in-seal.is-open .seal-shut{display:none}
+  .in-seal.is-open .seal-shackle{transform:translateY(-2px) rotate(-16deg);transform-origin:8px 11px}
+  .seal-lock .seal-shackle{transition:transform .5s cubic-bezier(.22,1,.36,1)}
+  .seal-shut__l{margin-top:14px;font-size:14.5px;line-height:1.5;color:var(--mid)}
+  .seal-form{display:flex;gap:8px;margin-top:14px}
+  .seal-in{flex:1;min-width:0;border:0;border-radius:11px;padding:12px 14px;font:inherit;
+    font-size:15px;color:var(--hi);background:rgba(255,255,255,.06);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+  .seal-in::placeholder{color:var(--lo)}
+  .seal-in:focus{outline:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.12),
+    0 0 0 2px color-mix(in srgb, var(--cons) 45%, transparent)}
+  .seal-go{border:0;cursor:pointer;border-radius:11px;padding:12px 18px;font:inherit;
+    font-size:14.5px;font-weight:680;color:#07110a;background:var(--cons)}
+  .seal-shut__h{margin-top:11px;font-size:12.5px;color:var(--lo)}
+  .in-seal.is-wrong .seal-in{box-shadow:inset 0 1px 0 rgba(255,255,255,.08),
+    0 0 0 2px rgba(238,244,255,.5);animation:sealNo .4s ease}
+  @keyframes sealNo{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+
+  /* the maker's mark, quiet, on every block */
+  .cpick > *, .viv-dream, .in-seal, .bigup{position:relative}
+  .cpick > *::before, .viv-dream::before, .in-seal::before{
+    content:"";position:absolute;right:12px;top:12px;width:13px;height:13px;z-index:2;
+    pointer-events:none;opacity:.16;
+    background:currentColor;
+    -webkit-mask:var(--mmask) center/contain no-repeat;mask:var(--mmask) center/contain no-repeat}
+  .cmb-wall::before,.amb-weeks::before{opacity:.1}
+
+  /* every graph moves the way its own subject moves */
+  /* the wall: the returns pulse, because a comeback is the live thing in it */
+  .cmb-wall__grid i.back{animation:mBack 4.2s ease-in-out infinite}
+  @keyframes mBack{0%,100%{opacity:1}50%{opacity:.45}}
+  /* the months: the running month breathes, the finished ones hold */
+  .rec-months__chart span.now{animation:mNow 3.4s ease-in-out infinite}
+  @keyframes mNow{0%,100%{opacity:1}50%{opacity:.55}}
+  /* the weeks: this week is the only cell that is still being lived */
+  .amb-weeks__cv{animation:mBreathe 6s ease-in-out infinite}
+  @keyframes mBreathe{0%,100%{opacity:1}50%{opacity:.93}}
+  /* the threads: the open promise is still being drawn */
+  .amb-threads__bar:not(.amb-threads__bar--done):not(.amb-threads__bar--stop){
+    animation:mOpen 5s ease-in-out infinite}
+  @keyframes mOpen{0%,100%{opacity:1}50%{opacity:.62}}
+  /* the total: it is a ratchet, so it settles upward rather than pulsing */
+  .vol-total__n{animation:mRatchet 9s ease-in-out infinite}
+  @keyframes mRatchet{0%,92%,100%{transform:none}96%{transform:translateY(-2px)}}
+  @media (prefers-reduced-motion: reduce){
+    .cmb-wall__grid i.back,.rec-months__chart span.now,.amb-weeks__cv,
+    .amb-threads__bar,.vol-total__n{animation:none}
+  }
 
   /* the now cell breathes */
   .mor-oneday__now{animation:inNow 2.8s ease-in-out infinite}
@@ -863,7 +916,7 @@
       <!-- THE AGE OF THE MEMENTO: the biggest number on the page -->
       <div class="bigup">
         <div class="bigup__d">Day <b>300</b></div>
-        <div class="bigup__u"><span id="bigupLive">12h 30m 7s</span> since its birth</div>
+        <div class="bigup__u">and <span id="bigupLive">12h 30m 7s</span></div>
       </div>
 
       <!-- HOW FAR YOU'VE COME: stats and evidence -->
@@ -990,15 +1043,27 @@
         <button class="viv-wall__add" type="button">Add a note or a photo</button>
       </div>
 
-      <div class="in-seal">
+      <div class="in-seal is-locked" id="seal">
         <div class="in-seal__hd">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          <svg class="seal-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path class="seal-shackle" d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
           <span>Sealed October 12, day one</span>
         </div>
-        <p class="in-seal__b">I am writing this the night before day one. I can see the finished thing so clearly it hurts. If you are reading this because it got hard, good. It was always going to get hard.</p>
-        <p class="in-seal__b">You wanted this badly enough to write it down. Do not let the person reading this take it away from the person writing it.</p>
-        <p class="in-seal__sign">you, at the start</p>
-        <p class="in-seal__law">Written once. It cannot be edited, only kept. Only you can open it.</p>
+
+        <div class="seal-shut">
+          <p class="seal-shut__l">The note you wrote before day one.</p>
+          <form class="seal-form" id="sealForm" autocomplete="off">
+            <input class="seal-in" id="sealPw" type="password" inputmode="text"
+              placeholder="Your word" aria-label="The word that opens this note">
+            <button class="seal-go" type="submit">Open</button>
+          </form>
+          <p class="seal-shut__h" id="sealHint">You chose this word on the day you sealed it.</p>
+        </div>
+
+        <div class="seal-open">
+          <p class="in-seal__b">I am writing this the night before day one. I can see the finished thing so clearly it hurts. If you are reading this because it got hard, good. It was always going to get hard.</p>
+          <p class="in-seal__b">You wanted this badly enough to write it down. Do not let the person reading this take it away from the person writing it.</p>
+          <p class="in-seal__sign">you, at the start</p>
+        </div>
       </div>
 
       <!-- 8. THE ENDING -->
@@ -1026,7 +1091,7 @@
 
       <div class="bigup">
         <div class="bigup__d">Day <b>1</b></div>
-        <div class="bigup__u"><span id="inD0live">11h 17m 16s</span> since its birth</div>
+        <div class="bigup__u">and <span id="inD0live">11h 17m 16s</span></div>
       </div>
 
       <p class="d0line">The ledger opens with the first mark. That can be tonight.</p>
@@ -1043,9 +1108,8 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
           <span>Unsealed, until tonight</span>
         </div>
-        <p class="in-seal__b">Tonight you write one note to the person you are doing this for. It seals when you finish it, and it never changes again.</p>
+        <p class="in-seal__b">Tonight you write one note to the person you are doing this for. You pick a word to lock it with, and it never changes again.</p>
         <p class="in-seal__b">Some day you will need proof that you once wanted this badly. This is where the proof will live.</p>
-        <p class="in-seal__law">Written once. It cannot be edited, only kept. Only you can open it.</p>
       </div>
 
       <div class="in-org">
@@ -1204,6 +1268,26 @@ document.getElementById('inBack').addEventListener('click',function(){
     var e=base+Math.floor((Date.now()-t0)/1000);
     b.textContent=Math.floor(e/3600)+'h '+Math.floor(e%3600/60)+'m '+(e%60)+'s';
   },1000);
+})();
+
+/* the seal opens to one word, chosen when it was written */
+(function(){
+  var seal=document.getElementById('seal'), form=document.getElementById('sealForm'),
+      pw=document.getElementById('sealPw'), hint=document.getElementById('sealHint');
+  if(!seal||!form)return;
+  var WORD='memento';   // in the app this is the word they chose on day one
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    if(pw.value.trim().toLowerCase()===WORD){
+      seal.classList.remove('is-wrong');
+      seal.classList.add('is-open');
+    } else {
+      seal.classList.add('is-wrong');
+      hint.textContent='Not that one. The word you chose on the day you sealed it.';
+      setTimeout(function(){seal.classList.remove('is-wrong');},600);
+    }
+  });
+  hint.textContent='You chose this word on the day you sealed it. For the mockup it is: memento';
 })();
 
 /* Mori and Vivere answer a touch with what their names mean */
