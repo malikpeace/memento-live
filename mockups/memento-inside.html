@@ -166,6 +166,14 @@
   /* [hidden] must win over any display rule, or the day one column renders
      underneath the main one and the page reads as having a second ending. */
   .in-col[hidden]{display:none!important}
+  .vow{margin-top:46px;padding:20px 19px 17px;border-radius:16px;
+    background:radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--clar) 11%, transparent), transparent 70%), var(--fill);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+  .vow__l{font-size:12px;font-weight:660;color:var(--clar)}
+  .vow__q{margin-top:9px;font-size:24px;font-weight:740;letter-spacing:-.026em;line-height:1.22;color:var(--hi)}
+  .vow__w{margin-top:12px;font-size:15px;font-style:italic;line-height:1.45;color:var(--mid)}
+  .vow__d{margin-top:13px;padding-top:11px;box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+    font-size:12.5px;color:var(--lo)}
   .d0line{margin-top:20px;font-size:14.5px;line-height:1.55;color:var(--hi);text-align:left}
   .d0wks{margin-top:14px;border-radius:16px;padding:15px;background:var(--fill);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
@@ -201,13 +209,13 @@
   .in-amb{position:fixed;inset:0;pointer-events:none;z-index:0}
   .in-amb i{position:absolute;width:340px;height:340px;border-radius:50%;
     filter:blur(85px);opacity:0}
-  .in-amb i:nth-child(1){left:-90px;top:16%;background:rgba(238,244,255,.34);
-    animation:inAmb 21s ease-in-out infinite}
-  .in-amb i:nth-child(2){right:-110px;top:44%;background:rgba(58,217,245,.26);
-    animation:inAmb 27s ease-in-out 9s infinite}
-  .in-amb i:nth-child(3){left:14%;bottom:6%;background:rgba(63,217,78,.24);
-    animation:inAmb 33s ease-in-out 17s infinite}
-  @keyframes inAmb{0%,58%,100%{opacity:0}72%,84%{opacity:1}}
+  .in-amb i:nth-child(1){left:-90px;top:16%;background:rgba(238,244,255,.22);
+    animation:inAmb 34s ease-in-out infinite}
+  .in-amb i:nth-child(2){right:-110px;top:44%;background:rgba(58,217,245,.18);
+    animation:inAmb 41s ease-in-out 14s infinite}
+  .in-amb i:nth-child(3){left:14%;bottom:6%;background:rgba(63,217,78,.16);
+    animation:inAmb 47s ease-in-out 27s infinite}
+  @keyframes inAmb{0%,62%,100%{opacity:0}76%,86%{opacity:1}}
   .in-col{position:relative;z-index:1}
   @media (prefers-reduced-motion: reduce){.in-amb i{animation:none}}
 
@@ -218,19 +226,15 @@
   .in-seal.is-open .seal-shackle{transform:translateY(-2px) rotate(-16deg);transform-origin:8px 11px}
   .seal-lock .seal-shackle{transition:transform .5s cubic-bezier(.22,1,.36,1)}
   .seal-shut__l{margin-top:14px;font-size:14.5px;line-height:1.5;color:var(--mid)}
-  .seal-form{display:flex;gap:8px;margin-top:14px}
-  .seal-in{flex:1;min-width:0;border:0;border-radius:11px;padding:12px 14px;font:inherit;
-    font-size:15px;color:var(--hi);background:rgba(255,255,255,.06);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
-  .seal-in::placeholder{color:var(--lo)}
-  .seal-in:focus{outline:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.12),
-    0 0 0 2px color-mix(in srgb, var(--cons) 45%, transparent)}
-  .seal-go{border:0;cursor:pointer;border-radius:11px;padding:12px 18px;font:inherit;
-    font-size:14.5px;font-weight:680;color:#07110a;background:var(--cons)}
-  .seal-shut__h{margin-top:11px;font-size:12.5px;color:var(--lo)}
-  .in-seal.is-wrong .seal-in{box-shadow:inset 0 1px 0 rgba(255,255,255,.08),
-    0 0 0 2px rgba(238,244,255,.5);animation:sealNo .4s ease}
-  @keyframes sealNo{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+  .seal-hold{position:relative;display:block;width:100%;margin-top:16px;border:0;cursor:pointer;
+    overflow:hidden;border-radius:12px;padding:15px;font:inherit;font-size:14.5px;font-weight:660;
+    color:var(--hi);background:rgba(255,255,255,.06);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.08);-webkit-tap-highlight-color:transparent;
+    -webkit-user-select:none;user-select:none;touch-action:none}
+  .seal-hold__fill{position:absolute;left:0;top:0;bottom:0;width:0;
+    background:color-mix(in srgb, var(--cons) 26%, transparent)}
+  .seal-hold.is-holding .seal-hold__fill{width:100%;transition:width 1.15s linear}
+  .seal-hold__t{position:relative}
 
   /* the maker's mark, quiet, on every block */
   .cpick > *, .viv-dream, .in-seal, .bigup{position:relative}
@@ -241,26 +245,23 @@
     -webkit-mask:var(--mmask) center/contain no-repeat;mask:var(--mmask) center/contain no-repeat}
   .cmb-wall::before,.amb-weeks::before{opacity:.1}
 
-  /* every graph moves the way its own subject moves */
-  /* the wall: the returns pulse, because a comeback is the live thing in it */
-  .cmb-wall__grid i.back{animation:mBack 4.2s ease-in-out infinite}
-  @keyframes mBack{0%,100%{opacity:1}50%{opacity:.45}}
-  /* the months: the running month breathes, the finished ones hold */
-  .rec-months__chart span.now{animation:mNow 3.4s ease-in-out infinite}
-  @keyframes mNow{0%,100%{opacity:1}50%{opacity:.55}}
-  /* the weeks: this week is the only cell that is still being lived */
-  .amb-weeks__cv{animation:mBreathe 6s ease-in-out infinite}
-  @keyframes mBreathe{0%,100%{opacity:1}50%{opacity:.93}}
-  /* the threads: the open promise is still being drawn */
-  .amb-threads__bar:not(.amb-threads__bar--done):not(.amb-threads__bar--stop){
-    animation:mOpen 5s ease-in-out infinite}
-  @keyframes mOpen{0%,100%{opacity:1}50%{opacity:.62}}
-  /* the total: it is a ratchet, so it settles upward rather than pulsing */
-  .vol-total__n{animation:mRatchet 9s ease-in-out infinite}
-  @keyframes mRatchet{0%,92%,100%{transform:none}96%{transform:translateY(-2px)}}
+  /* one shimmer, used everywhere something is alive. A slow band of light
+     crossing the marks, nothing more. */
+  @keyframes mShim{0%{background-position:-140% 0}100%{background-position:240% 0}}
+  .cmb-wall__grid i.back,
+  .vol-deep__bar i,
+  .rec-months__chart span.now,
+  .amb-threads__bar{
+    background-image:linear-gradient(100deg,
+      transparent 38%, rgba(255,255,255,.32) 50%, transparent 62%);
+    background-size:220% 100%;
+    animation:mShim 7s linear infinite}
+  .rec-months__chart span.now{animation-delay:1.4s}
+  .amb-threads__bar{animation-delay:2.8s}
+  .vol-deep__bar i{animation-delay:.7s}
   @media (prefers-reduced-motion: reduce){
-    .cmb-wall__grid i.back,.rec-months__chart span.now,.amb-weeks__cv,
-    .amb-threads__bar,.vol-total__n{animation:none}
+    .cmb-wall__grid i.back,.vol-deep__bar i,.rec-months__chart span.now,
+    .amb-threads__bar{animation:none;background-image:none}
   }
 
   /* the now cell breathes */
@@ -915,52 +916,59 @@
 
       <!-- THE AGE OF THE MEMENTO: the biggest number on the page -->
       <div class="bigup">
-        <div class="bigup__d">Day <b>300</b></div>
+        <div class="bigup__d">Day <b>24</b></div>
         <div class="bigup__u">and <span id="bigupLive">12h 30m 7s</span></div>
       </div>
 
       <!-- HOW FAR YOU'VE COME: stats and evidence -->
+      <div class="vow">
+        <p class="vow__l">The promise</p>
+        <p class="vow__q">Get to 100 paying users.</p>
+        <p class="vow__w">Because I am done building things nobody pays for.</p>
+        <p class="vow__d">Signed July 15, and not changed since.</p>
+      </div>
+
       <h2 class="in-flowh">Progress so far</h2>
       <div class="cpick"><div class="vol-total">
-  <div class="vol-total__n">462</div>
+  <div class="vol-total__n">31</div>
   <div class="vol-total__cap">total marks on the record</div>
   <div class="vol-total__rows">
-    <div class="vol-total__row"><span>Actions completed</span><b>312</b></div>
-    <div class="vol-total__row"><span>Deep work sessions</span><b>88</b></div>
-    <div class="vol-total__row"><span>Notes and reflections</span><b>62</b></div>
+    <div class="vol-total__row"><span>Actions completed</span><b>21</b></div>
+    <div class="vol-total__row"><span>Deep work sessions</span><b>6</b></div>
+    <div class="vol-total__row"><span>Notes and reflections</span><b>4</b></div>
   </div>
 </div></div>
       <div class="cpick"><div class="vol-pages">
   <div class="vol-pages__text">
-    <div class="vol-pages__n">45 pages</div>
-    <p class="vol-pages__sub">You have written 11,240 words in here. At 250 a page that is a 45 page book, sitting on the table.</p>
+    <div class="vol-pages__n">840 words</div>
+    <p class="vol-pages__sub">Written in here since July 15, in your own hand. Three and a half pages of a book that did not exist last month.</p>
     
   </div>
   <div class="vol-pages__block" aria-hidden="true"><i></i></div>
 </div></div>
       <div class="cpick"><div class="vol-deep">
-  <div class="vol-deep__n">5 days 12 hours</div>
+  <div class="vol-deep__n">9 hours</div>
   <div class="vol-deep__cap">of deep work</div>
   <div class="vol-deep__bar" aria-hidden="true"></div>
-  <div class="vol-deep__raw">88 sessions, 90 minutes each, 132 hours</div>
+  <div class="vol-deep__raw">6 sessions, 90 minutes each</div>
 </div></div>
-      <div class="cpick"><div class="rec-board"><div class="rec-board__t">Records</div><div class="rec-board__r"><div class="rec-board__a"><span>Longest run</span><b>23 days</b></div><div class="rec-board__b">Set June 24. Standing 44 days.</div></div><div class="rec-board__r"><div class="rec-board__a"><span>Best month</span><b>28 of 30</b></div><div class="rec-board__b">June. Standing 38 days.</div></div><div class="rec-board__r"><div class="rec-board__a"><span>Best week</span><b>7 of 7</b></div><div class="rec-board__b">Week of June 8. Standing 54 days.</div></div><div class="rec-board__r"><div class="rec-board__a"><span>Biggest day</span><b>9 marks</b></div><div class="rec-board__b">May 19. Standing 80 days.</div></div><div class="rec-board__r"><div class="rec-board__a"><span>Fastest promise kept</span><b>127 days</b></div><div class="rec-board__b">Run the half, January 17. Standing 202 days.</div></div></div></div>
-      <div class="cpick"><div class="rec-hold"><svg class="rec-hold__m" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg><div class="rec-hold__num">23</div><div class="rec-hold__unit">days in a row. Your longest, ever.</div><div class="rec-hold__rule"></div><div class="rec-hold__meta"><span>June 2 to June 24, 2026</span><span>standing 44 days</span></div></div></div>
+      <div class="cpick"><div class="rec-board"><div class="rec-board__t">Records</div><div class="rec-board__r"><div class="rec-board__a"><span>Longest run</span><b>6 days</b></div><div class="rec-board__b">Set July 27. Standing 11 days.</div></div><div class="rec-board__r"><div class="rec-board__a"><span>Best week</span><b>6 of 7</b></div><div class="rec-board__b">Week of July 22. Standing 11 days.</div></div><div class="rec-board__r"><div class="rec-board__a"><span>Biggest day</span><b>4 marks</b></div><div class="rec-board__b">July 24. Standing 14 days.</div></div><div class="rec-board__r"><div class="rec-board__a"><span>First mark</span><b>day 1</b></div><div class="rec-board__b">July 15, 6:42 AM. Everything descends from it.</div></div><div class="rec-board__r"><div class="rec-board__a"><span>Comebacks</span><b>2</b></div><div class="rec-board__b">Two gaps opened, two closed.</div></div></div></div>
+      <div class="cpick"><div class="rec-hold"><svg class="rec-hold__m" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg><div class="rec-hold__num">6</div><div class="rec-hold__unit">days in a row. Your longest, ever.</div><div class="rec-hold__rule"></div><div class="rec-hold__meta"><span>July 22 to July 27, 2026</span><span>standing 11 days</span></div></div></div>
 
       <!-- the wall and the months flow inside the same movement -->
       <div class="cpick"><div class="cmb-wall">
   <p class="cmb-wall__h">Comebacks</p>
   <div class="cmb-wall__grid" id="cmb-wall-grid"></div>
   <div class="cmb-wall__legend">
-    <span><i class="is-on"></i>231 marked</span>
-    <span><i class="is-back"></i>14 back</span>
-    <span><i class="is-off"></i>69 blank</span>
+    <span><i class="is-on"></i>17 marked</span>
+    <span><i class="is-back"></i>2 back</span>
+    <span><i class="is-off"></i>7 blank</span>
   </div>
-  <p class="cmb-wall__f">Your longest run, 23 days in June, began on one of the green cells.</p>
+  <p class="cmb-wall__f">Your longest run, 6 days in July, began on one of the green cells.</p>
 </div></div>
 
       <!-- 4. THE MONTHS -->
-      <div class="cpick"><div class="rec-months"><div class="rec-months__t">Best month</div><div class="rec-months__chart"><span style="height:70%"></span><span style="height:70%"></span><span style="height:71%"></span><span style="height:77%"></span><span style="height:79%"></span><span style="height:74%"></span><span style="height:63%" class="low"></span><span style="height:84%"></span><span style="height:93%" class="top"></span><span style="height:84%"></span><span style="height:86%" class="now"></span></div><div class="rec-months__ax"><i>O</i><i>N</i><i>D</i><i>J</i><i>F</i><i>M</i><i>A</i><i>M</i><i>J</i><i>J</i><i>A</i></div><div class="rec-months__c">June, 28 of 30. April was 19 of 30, the low one. August is still running.</div></div></div>
+      <div class="cpick"><div class="rec-months"><div class="rec-months__t">Every week so far</div><div class="rec-months__chart"><span style="height:43%" class="low"></span><span style="height:71%"></span><span style="height:86%" class="top"></span><span style="height:57%" class="now"></span></div><div class="rec-months__ax"><i>Jul 15</i><i>Jul 22</i><i>Jul 29</i><i>Aug 5</i></div><div class="rec-months__c">Week of July 22 was 6 of 7, the best so far. This week is still running.</div></div></div>
 
       <!-- 5. MEMENTO MORI -->
       <h2 class="in-flowh in-flowh--sub" data-sub="Remember, you will die.">Mori</h2>
@@ -968,7 +976,7 @@
   <canvas class="amb-weeks__cv" width="652" height="274"></canvas>
   <div class="amb-weeks__rows">
     <div class="amb-weeks__r"><b>1,179</b><span>weeks behind you</span></div>
-    <div class="amb-weeks__r"><b class="amb-weeks__g">43</b><span>of them went into this</span></div>
+    <div class="amb-weeks__r"><b class="amb-weeks__g">3</b><span>of them went into this</span></div>
     <div class="amb-weeks__r"><b>2,996</b><span>left, if the guess of eighty years holds</span></div>
   </div>
   <p class="amb-weeks__p">Each dot is one week. The white one is this week.</p>
@@ -994,44 +1002,42 @@
 
       <div class="viv-dream">
         <p class="viv-dream__q">&ldquo;I run the thing I built. The work is hard and it is mine. My people can point at something real and say he made that.&rdquo;</p>
-        <p class="viv-dream__d">The dream, written February 3, 2026</p>
+        <p class="viv-dream__d">The dream, written July 15, 2026</p>
         <p class="viv-dream__g">Get to 100 paying users. Signed the same morning.</p>
       </div>
       <div class="cpick"><div class="amb-threads">
   <div class="amb-threads__t">
-    <div class="amb-threads__l">Run the half</div>
-    <div class="amb-threads__bar amb-threads__bar--done" style="width:68%"><i></i></div>
-    <div class="amb-threads__s">finished January 17, after 127 days</div>
-  </div>
-  <div class="amb-threads__t">
-    <div class="amb-threads__l">Morning pages</div>
-    <div class="amb-threads__bar amb-threads__bar--stop" style="width:22%"><i></i></div>
-    <div class="amb-threads__s">set down at day 40, and it stays here</div>
-  </div>
-  <div class="amb-threads__t">
     <div class="amb-threads__l">Get to 100 paying users</div>
-    <div class="amb-threads__ticks"></div>
-    <div class="amb-threads__s">open, day 186, 62 of 100</div>
+    <div class="amb-threads__bar" style="width:100%"><i></i></div>
+    <div class="amb-threads__s">open, signed July 15, day 24, at 9 of 100</div>
+  </div>
+  <div class="amb-threads__t">
+    
+    
+    <div class="amb-threads__s"></div>
+  </div>
+  <div class="amb-threads__t">
+    
   </div>
 </div></div>
 
       <div class="cpick"><div class="wrd-span">
   <div class="wrd-span__row">
-    <div class="wrd-span__meta">12 October 2025, 6:42 AM. The first thing you typed.</div>
+    <div class="wrd-span__meta">15 July 2026, 6:42 AM. The first thing you typed.</div>
     <p class="wrd-span__q">I do not want to be the person who talks about this.</p>
   </div>
-  <div class="wrd-span__gap"><i></i><span>300 days</span><i></i></div>
+  <div class="wrd-span__gap"><i></i><span>24 days</span><i></i></div>
   <div class="wrd-span__row">
     <div class="wrd-span__meta">7 August 2026. The latest.</div>
-    <p class="wrd-span__q">62 of 100. Slower than I said. Still going.</p>
+    <p class="wrd-span__q">9 of 100. Slower than I said. Still going.</p>
   </div>
 </div></div>
       <div class="cpick"><div class="wrd-hardest">
-  <div class="wrd-hardest__head">You wrote on 14 days you wanted to stop. Here are three.</div>
+  <div class="wrd-hardest__head">You have written on two days you wanted to stop. Both are here.</div>
   <ol class="wrd-hardest__list">
-    <li class="wrd-hardest__item"><div class="wrd-hardest__date">4 March 2026</div><p class="wrd-hardest__q">Wanted to quit at 3pm and did not.</p></li>
-    <li class="wrd-hardest__item"><div class="wrd-hardest__date">21 April 2026</div><p class="wrd-hardest__q">Nine days gone. I opened it anyway.</p></li>
-    <li class="wrd-hardest__item"><div class="wrd-hardest__date">24 June 2026</div><p class="wrd-hardest__q">The 23 days ended today. I wrote it down and went to bed.</p></li>
+    <li class="wrd-hardest__item"><div class="wrd-hardest__date">28 July 2026</div><p class="wrd-hardest__q">Wanted to quit at 3pm and did not.</p></li>
+    <li class="wrd-hardest__item"><div class="wrd-hardest__date">2 August 2026</div><p class="wrd-hardest__q">Three days gone. I opened it anyway.</p></li>
+    
   </ol>
 </div></div>
 
@@ -1046,17 +1052,15 @@
       <div class="in-seal is-locked" id="seal">
         <div class="in-seal__hd">
           <svg class="seal-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path class="seal-shackle" d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
-          <span>Sealed October 12, day one</span>
+          <span>Sealed July 15, day one</span>
         </div>
 
         <div class="seal-shut">
           <p class="seal-shut__l">The note you wrote before day one.</p>
-          <form class="seal-form" id="sealForm" autocomplete="off">
-            <input class="seal-in" id="sealPw" type="password" inputmode="text"
-              placeholder="Your word" aria-label="The word that opens this note">
-            <button class="seal-go" type="submit">Open</button>
-          </form>
-          <p class="seal-shut__h" id="sealHint">You chose this word on the day you sealed it.</p>
+          <button class="seal-hold" id="sealHold" type="button">
+            <span class="seal-hold__fill"></span>
+            <span class="seal-hold__t">Hold to open</span>
+          </button>
         </div>
 
         <div class="seal-open">
@@ -1069,13 +1073,13 @@
       <!-- 8. THE ENDING -->
       <div class="in-org">
         <span class="in-org__k">Creation of Your Memento</span>
-        <span class="in-org__d">October 12, 2025</span>
+        <span class="in-org__d">July 15, 2026</span>
         <span class="in-org__t">6:42 AM</span>
       </div>
 
       <div class="in-foot">
         <div class="in-code" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-        <p class="in-digits">0300 / 0231</p>
+        <p class="in-digits">0024 / 0017</p>
         <p class="in-policy">Get the most out of your existence.</p>
       </div>
 
@@ -1092,6 +1096,13 @@
       <div class="bigup">
         <div class="bigup__d">Day <b>1</b></div>
         <div class="bigup__u">and <span id="inD0live">11h 17m 16s</span></div>
+      </div>
+
+      <div class="vow">
+        <p class="vow__l">The promise</p>
+        <p class="vow__q">Get to 100 paying users.</p>
+        <p class="vow__w">Because I am done building things nobody pays for.</p>
+        <p class="vow__d">Signed this morning. It does not change from here.</p>
       </div>
 
       <p class="d0line">The ledger opens with the first mark. That can be tonight.</p>
@@ -1270,24 +1281,20 @@ document.getElementById('inBack').addEventListener('click',function(){
   },1000);
 })();
 
-/* the seal opens to one word, chosen when it was written */
+/* the seal opens to a held finger. Reading it should cost a second. */
 (function(){
-  var seal=document.getElementById('seal'), form=document.getElementById('sealForm'),
-      pw=document.getElementById('sealPw'), hint=document.getElementById('sealHint');
-  if(!seal||!form)return;
-  var WORD='memento';   // in the app this is the word they chose on day one
-  form.addEventListener('submit',function(e){
-    e.preventDefault();
-    if(pw.value.trim().toLowerCase()===WORD){
-      seal.classList.remove('is-wrong');
-      seal.classList.add('is-open');
-    } else {
-      seal.classList.add('is-wrong');
-      hint.textContent='Not that one. The word you chose on the day you sealed it.';
-      setTimeout(function(){seal.classList.remove('is-wrong');},600);
-    }
-  });
-  hint.textContent='You chose this word on the day you sealed it. For the mockup it is: memento';
+  var seal=document.getElementById('seal'), btn=document.getElementById('sealHold');
+  if(!seal||!btn)return;
+  var t=null;
+  function start(e){
+    if(e.cancelable)e.preventDefault();
+    btn.classList.add('is-holding');
+    t=setTimeout(function(){seal.classList.add('is-open');},1150);
+  }
+  function stop(){ clearTimeout(t); btn.classList.remove('is-holding'); }
+  ['pointerdown','touchstart'].forEach(function(ev){btn.addEventListener(ev,start,{passive:false});});
+  ['pointerup','pointercancel','pointerleave','touchend','touchcancel'].forEach(function(ev){
+    btn.addEventListener(ev,stop);});
 })();
 
 /* Mori and Vivere answer a touch with what their names mean */
@@ -1339,7 +1346,7 @@ document.querySelectorAll('.in-flowh--sub').forEach(function(h){
 /* the barcode: generated from the person's own numbers, unique per memento */
 (function(){
   var host=document.querySelector('.in-code'); if(!host)return;
-  var data='MALIK-0001-0300-0231';
+  var data='MALIK-0001-0024-0017';
   var h=2166136261;
   for(var i=0;i<data.length;i++){h^=data.charCodeAt(i);h=Math.imul(h,16777619);}
   var out='',x=h>>>0;
@@ -1397,7 +1404,7 @@ var gaps=[[15,4],[37,7],[66,6],[87,5],[112,8],[136,6],[155,8],[180,9],[196,2],[2
 var blank={},back={},i,d;
 for(i=0;i<gaps.length;i++){ var s=gaps[i][0],l=gaps[i][1]; for(d=s;d<s+l;d++){ blank[d]=1; } back[s+l]=1; }
 var f=document.createDocumentFragment();
-for(d=1;d<=300;d++){
+for(d=1;d<=24;d++){
   var c=document.createElement('i');
   c.className='cmb-wall__c '+(blank[d]?'is-off':(back[d]?'is-back':'is-on'));
   f.appendChild(c);
