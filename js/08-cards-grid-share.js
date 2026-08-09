@@ -7374,14 +7374,8 @@ function _mfBuildOverlay() {
       // materials every room measures 6-62, so the plaque is white; the rule
       // flips itself the day a genuinely light room exists.)
       ov.dataset.room = lum > 128 ? 'light' : 'dark';
-      // v1151 (Malik): the RIM wears the skin's colour too. The stock card
-      // keeps the white ring; a material's ring takes its tint, brightened
-      // toward white so it still reads as light, not paint.
-      if (sk0) {
-        const lift = p3.map(n => Math.round(n + (255 - n) * 0.45));
-        ov.style.setProperty('--rim-c', 'rgb(' + lift.join(',') + ')');
-        ov.style.setProperty('--rim-rgb', lift.join(','));
-      }
+      // (the rim's skin tint is applyCardSkin's job, set globally on :root,
+      // so a skin change recolours an open record live)
     } catch (e) { ov.dataset.room = 'dark'; }
 
     // the countdown ticks, because a number that moves is the whole argument
@@ -8479,6 +8473,10 @@ function _rgbToHex(rgb) {
 let _skinAccentApplied = null;
 function syncAppAccentToSkin(sk) {
   try {
+    // v1152 (Malik): the Memento colours the app BY DEFAULT, with an opt-out
+    // in the hold-sheet. Off = the accent snaps back to their own; the card,
+    // its room and its rim keep the material either way (they ARE the skin).
+    if (state.prefs && state.prefs.skinColorsApp === false) sk = null;
     const id = sk ? sk.n : '';
     if (_skinAccentApplied === id) return;
     if (!state.prefs) return;
@@ -8519,8 +8517,20 @@ function applyCardSkin(wrap) {
   // the room the card sits in takes the material's colour (js/08 sets it,
   // the view's CSS reads it). No material = the app's own accent.
   try {
-    if (sk) document.documentElement.style.setProperty('--skin-rgb', skinTintRgb(sk));
-    else document.documentElement.style.removeProperty('--skin-rgb');
+    if (sk) {
+      const tint = skinTintRgb(sk);
+      document.documentElement.style.setProperty('--skin-rgb', tint);
+      // v1152: the record's rim wears the material too, lifted toward white
+      // so it still reads as light. Set globally so a skin change recolours
+      // an open record live.
+      const lift = String(tint).split(',').map(n => { const v = parseFloat(n) || 0; return Math.round(v + (255 - v) * 0.45); });
+      document.documentElement.style.setProperty('--rim-c', 'rgb(' + lift.join(',') + ')');
+      document.documentElement.style.setProperty('--rim-rgb', lift.join(','));
+    } else {
+      document.documentElement.style.removeProperty('--skin-rgb');
+      document.documentElement.style.removeProperty('--rim-c');
+      document.documentElement.style.removeProperty('--rim-rgb');
+    }
   } catch (e) {}
   syncAppAccentToSkin(sk);
   if (!sk) {
@@ -8606,8 +8616,11 @@ function _mfSkinsInit(ov, wrap, sig) {
   hint.className = 'mfsk-hint';
   hint.type = 'button';
   hint.textContent = 'Hold the card to change its theme.';
+  // v1151: the plaque lives inside .in-col now, so the hint is inserted in
+  // the plaque's own parent (insertBefore on the scroller threw and silently
+  // killed the whole sheet).
   const origin = scroll.querySelector('.mf-origin');
-  if (origin) scroll.insertBefore(hint, origin); else scroll.appendChild(hint);
+  if (origin) origin.parentElement.insertBefore(hint, origin); else scroll.appendChild(hint);
 
   const yoursName = (state.profile && state.profile.name) || '';
   const cur = () => (state.cardSkin && state.cardSkin.id) || '';
@@ -8630,6 +8643,10 @@ function _mfSkinsInit(ov, wrap, sig) {
           '<button type="button" class="mfsk-acc__sw' + ((state.prefs && state.prefs.accent) === a ? ' is-on' : '') + '" data-acc="' + a + '" aria-label="' + a + ' accent"><i style="background:' + (a === 'default' ? 'linear-gradient(135deg,#3ad9f5,#3fd94e)' : (typeof ACCENT_HEX !== 'undefined' && ACCENT_HEX[a]) || '#888') + '"></i></button>').join('') : '') +
       '</div>' +
       '<div class="mfsk-tog">' +
+        '<div class="mfsk-tog__g" data-tog="colorapp">' +
+          '<button type="button" data-v="1"' + (!(state.prefs && state.prefs.skinColorsApp === false) ? ' class="on"' : '') + '>Colours the app</button>' +
+          '<button type="button" data-v="0"' + ((state.prefs && state.prefs.skinColorsApp === false) ? ' class="on"' : '') + '>Card only</button>' +
+        '</div>' +
         '<div class="mfsk-tog__g" data-tog="ring">' +
           '<button type="button" data-v="0"' + (!(state.cardSkin && state.cardSkin.ring) ? ' class="on"' : '') + '>White ring</button>' +
           '<button type="button" data-v="1"' + ((state.cardSkin && state.cardSkin.ring) ? ' class="on"' : '') + '>Colour-matched</button>' +
@@ -8690,8 +8707,15 @@ function _mfSkinsInit(ov, wrap, sig) {
     g.addEventListener('click', (e) => {
       const b = e.target.closest('button');
       if (!b) return;
-      if (!state.cardSkin) state.cardSkin = { id: '', ring: 0, mark: 0 };
-      state.cardSkin[g.getAttribute('data-tog')] = b.getAttribute('data-v') === '1' ? 1 : 0;
+      const key = g.getAttribute('data-tog');
+      if (key === 'colorapp') {
+        // v1152: whether the Memento's colour flows into the app (default yes)
+        if (!state.prefs) state.prefs = {};
+        state.prefs.skinColorsApp = b.getAttribute('data-v') === '1';
+      } else {
+        if (!state.cardSkin) state.cardSkin = { id: '', ring: 0, mark: 0 };
+        state.cardSkin[key] = b.getAttribute('data-v') === '1' ? 1 : 0;
+      }
       try { persistNow(); } catch (err) {}
       applyCardSkin(wrap);
       g.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
