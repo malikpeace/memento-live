@@ -162,7 +162,9 @@
     padding:8px 13px;border-radius:999px;background:rgba(255,255,255,.08);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.09);color:var(--hi);
     font:inherit;font-size:12px;font-weight:660;cursor:pointer}
-  .in-col--d0{display:block}
+  /* [hidden] must win over any display rule, or the day one column renders
+     underneath the main one and the page reads as having a second ending. */
+  .in-col[hidden]{display:none!important}
   .d0clk{margin-top:30px;border-radius:16px;padding:20px 18px 16px;background:var(--fill);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
   .d0clk__n{font-size:46px;line-height:1;font-weight:600;letter-spacing:-.03em;
