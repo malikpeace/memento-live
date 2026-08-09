@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The mission, five ways</title>
+<style>
+  :root{--hi:rgba(245,246,250,.97);--mid:rgba(238,241,247,.78);--lo:rgba(232,236,244,.50);
+    --fill:rgba(255,255,255,.055);--inset:inset 0 1px 0 rgba(255,255,255,.07);
+    --clar:#3ad9f5;--cons:#3fd94e;--act:#eef2fb}
+  *{box-sizing:border-box}
+  html,body{margin:0;overflow-x:clip;background:#050609;color:var(--hi);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .page{max-width:560px;margin:0 auto;padding:36px 20px 120px}
+  h1{margin:0 0 8px;font-size:24px;font-weight:760;letter-spacing:-.026em}
+  .lede{margin:0 0 6px;font-size:14px;line-height:1.6;color:var(--mid)}
+  .var{margin-top:52px}
+  .var h2{margin:0 0 4px;font-size:16px;font-weight:720;letter-spacing:-.018em}
+  .var .note{margin:0 0 16px;font-size:12.5px;line-height:1.5;color:var(--lo)}
+  .stage{border-radius:20px;padding:26px 22px;background:#07080c;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.05)}
+  p{margin:0}
+
+  /* 1. the sentence */
+  .m1{font-size:17px;line-height:1.75;color:var(--mid);text-align:center;letter-spacing:-.012em}
+  .m1 b{color:var(--hi);font-weight:680}
+  .m1 .c1{color:var(--clar);font-weight:680}
+  .m1 .c3{color:var(--cons);font-weight:680}
+
+  /* 2. three numbers */
+  .m2{display:flex;gap:1px;border-radius:14px;overflow:hidden;background:rgba(255,255,255,.07)}
+  .m2>div{flex:1;background:#0a0b10;padding:15px 8px;text-align:center}
+  .m2 b{display:block;font-size:24px;font-weight:780;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+  .m2 .n1 b{color:var(--clar)}
+  .m2 .n3 b{color:var(--cons)}
+  .m2 span{display:block;margin-top:5px;font-size:11px;line-height:1.35;color:var(--lo)}
+  .m2 .n2 b{font-size:14.5px;letter-spacing:-.01em;line-height:1.3;padding-top:6px;color:var(--hi)}
+
+  /* 3. want, do, keep */
+  .m3{display:flex;align-items:stretch;gap:9px}
+  .m3>div{flex:1;text-align:center}
+  .m3 .k{font-size:12px;font-weight:700;color:var(--hi)}
+  .m3 .v{margin-top:6px;font-size:13px;line-height:1.45;color:var(--mid)}
+  .m3 .a{display:flex;align-items:center;color:var(--lo);font-size:14px;padding-top:2px}
+  .m3 .k i{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:1px}
+  .m3 .p1 i{background:var(--clar)}.m3 .p2 i{background:var(--act)}.m3 .p3 i{background:var(--cons)}
+
+  /* 4. the quiet rows */
+  .m4 .r{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:10px 0}
+  .m4 .r+.r{box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+  .m4 .l{font-size:13.5px;color:var(--mid);white-space:nowrap}
+  .m4 .l i{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:8px;vertical-align:1px}
+  .m4 .r:nth-child(1) i{background:var(--clar)}
+  .m4 .r:nth-child(2) i{background:var(--act)}
+  .m4 .r:nth-child(3) i{background:var(--cons)}
+  .m4 .v{font-size:14.5px;font-weight:650;color:var(--hi);text-align:right}
+
+  /* 5. one line */
+  .m5{text-align:center;font-size:14.5px;line-height:2;color:var(--mid)}
+  .m5 b{color:var(--hi);font-weight:680;font-variant-numeric:tabular-nums}
+  .m5 i{display:inline-block;width:6px;height:6px;border-radius:50%;margin:0 9px;vertical-align:2px}
+  .m5 .d1{background:var(--clar)}.m5 .d2{background:var(--act)}.m5 .d3{background:var(--cons)}
+</style></head><body>
+<div class="page">
+  <h1>The mission, five ways</h1>
+  <p class="lede">The same three facts every time: 9 of 100 are in, today's move, 17 of 24 days
+    with a run of 3. Pick the one that feels least like a widget.</p>
+
+  <div class="var">
+    <h2>1. The sentence</h2>
+    <p class="note">No labels at all. The mission read out loud as one human sentence, the three pillars living inside it as colour.</p>
+    <div class="stage"><p class="m1">You want <span class="c1">100 paying users</span>, and 9 are in.
+      Today you <b>message ten people who fit the product</b>.
+      You have shown up <span class="c3">17 of the 24 days</span>.</p></div>
+  </div>
+
+  <div class="var">
+    <h2>2. Three numbers</h2>
+    <p class="note">Stat-first. The words demoted to captions, the middle cell carrying today's move as the odd one out.</p>
+    <div class="stage"><div class="m2">
+      <div class="n1"><b>9<span style="font-size:14px;color:var(--lo)">/100</span></b><span>paying users</span></div>
+      <div class="n2"><b>Message ten people who fit</b><span>today's move</span></div>
+      <div class="n3"><b>17<span style="font-size:14px;color:var(--lo)">/24</span></b><span>days shown up</span></div>
+    </div></div>
+  </div>
+
+  <div class="var">
+    <h2>3. Want, do, keep</h2>
+    <p class="note">The pillars renamed to verbs and read left to right as a chain, which is what they actually are.</p>
+    <div class="stage"><div class="m3">
+      <div><p class="k p1"><i></i>Want</p><p class="v">100 paying users. 9 in.</p></div>
+      <div class="a">&rsaquo;</div>
+      <div><p class="k p2"><i></i>Do</p><p class="v">Message ten who fit.</p></div>
+      <div class="a">&rsaquo;</div>
+      <div><p class="k p3"><i></i>Keep</p><p class="v">17 of 24 days.</p></div>
+    </div></div>
+  </div>
+
+  <div class="var">
+    <h2>4. The quiet rows</h2>
+    <p class="note">A three-line ledger. Label left, fact right, hairlines between. The most invisible of the five.</p>
+    <div class="stage"><div class="m4">
+      <div class="r"><span class="l"><i></i>The goal</span><span class="v">9 of 100 in</span></div>
+      <div class="r"><span class="l"><i></i>Today</span><span class="v">Message ten who fit</span></div>
+      <div class="r"><span class="l"><i></i>Shown up</span><span class="v">17 of 24 days</span></div>
+    </div></div>
+  </div>
+
+  <div class="var">
+    <h2>5. One line</h2>
+    <p class="note">Everything in a single breath with pillar dots as punctuation. The smallest possible footprint.</p>
+    <div class="stage"><p class="m5"><i class="d1"></i><b>9 of 100</b> in
+      <i class="d2"></i>today, <b>message ten who fit</b>
+      <i class="d3"></i><b>17 of 24</b> days</p></div>
+  </div>
+</div>
+</body></html>
