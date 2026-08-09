@@ -194,10 +194,11 @@
   .tsc__l{margin-top:5px;font-size:13px;color:var(--mid)}
   .tsc__l span{color:var(--hi);font-weight:640;font-variant-numeric:tabular-nums}
 
-  .xtr{border-radius:14px;padding:18px;background:var(--fill);box-shadow:var(--inset)}
-  .xtr__n{font-size:26px;line-height:1.1;font-weight:790;letter-spacing:-.028em;color:var(--hi)}
-  .xtr__c{margin-top:8px;font-size:14px;line-height:1.5;color:var(--mid)}
-  .xtr__b{margin-top:10px;font-size:14px;line-height:1.5;font-weight:650;color:var(--hi)}
+  .lst{border-radius:14px;padding:20px 19px;background:var(--fill);box-shadow:var(--inset)}
+  .lst__q{margin:0;font-size:19px;font-weight:660;letter-spacing:-.018em;line-height:1.45;color:var(--hi)}
+  .lst__q b{font-weight:800;color:var(--hi);font-variant-numeric:tabular-nums}
+  .lst__f{margin:13px 0 0;padding-top:11px;box-shadow:inset 0 1px 0 rgba(255,255,255,.07);
+    font-size:12.5px;line-height:1.5;color:var(--mid)}
   .in-exline{margin:44px auto 0;max-width:30ch;text-align:center;
     font-size:14.5px;line-height:1.62;color:var(--mid)}
   .vow{text-align:center}
@@ -271,7 +272,7 @@
 
   /* the maker's mark: only on the roomy text cards, bottom right, quiet */
   .cpick > *, .viv-dream, .in-seal{position:relative}
-  .tsc::before, .xtr::before, .vol-total::before, .rec-board::before,
+  .tsc::before, .lst::before, .vol-total::before, .rec-board::before,
   .rec-hold::before, .viv-dream::before, .in-seal::before{
     content:"";position:absolute;right:13px;bottom:13px;width:11px;height:11px;z-index:2;
     pointer-events:none;opacity:.12;
@@ -962,11 +963,6 @@
     <div class="vol-total__row"><span>Notes and reflections</span><b>4</b></div>
   </div>
 </div></div>
-      <div class="cpick"><div class="xtr">
-        <div class="xtr__n">24 days of your life</div>
-        <div class="xtr__c">are gone since July 15. They were leaving whether you showed up or not.</div>
-        <div class="xtr__b">17 of them bought something. That is the entire difference.</div>
-      </div></div>
       <div class="cpick"><div class="vol-deep">
   <div class="vol-deep__n">9 hours</div>
   <div class="vol-deep__cap">of deep work</div>
@@ -1012,6 +1008,11 @@
   <div class="mor-remaining__r"><span>Birthdays</span><b>59</b></div>
   <p class="mor-remaining__f">One assumption, 80 years. Change it and every row moves.</p>
 </div></div>
+
+      <div class="cpick"><div class="lst">
+        <p class="lst__q">If you see your parents twice a year, you will see them about <b>60</b> more times.</p>
+        <p class="lst__f">An estimate, from the ages you gave. The visits are the only part you control.</p>
+      </div></div>
       <div class="cpick"><div class="mor-oneday">
   <p class="mor-oneday__t">Today, hour by hour.</p>
   <div class="mor-oneday__row" id="mor-oneday-row"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
