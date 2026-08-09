@@ -6622,6 +6622,620 @@ function renderDayCard() {
    Everything below the controller is now only a BUILDER: it composes the
    record once and wires its own controls. It never opens, closes, animates,
    appends on every visit, or destroys anything. MementoView owns all of that. */
+/* ═══════════════════════════════════════════════════════════════════════
+   v1151 THE MEMENTO PAGE (MEMENTO-PAGE-SPEC.md is the contract; the mockup
+   memento-inside.html is the face of record). The trophy room and the rescue
+   object in one jar. Three movements: Progress so far, Mori, Vivere. The
+   up-only law rules every number here; only the mortality countdown falls.
+   Day-zero law: every box exists from day one, holding zeros. Dark only.
+   These are BUILDERS: MementoView still owns open/close/destroy (v1140/1149).
+   ═══════════════════════════════════════════════════════════════════════ */
+
+// the birth of the record, persisted once so it survives reinstall via sync
+function _mfCreationAt() {
+  try {
+    if (!state.meta) state.meta = {};
+    if (state.meta.creationAt && isFinite(state.meta.creationAt)) return state.meta.creationAt;
+    // the EARLIEST trace wins: ignition, completion (ms or ISO), first proof,
+    // first counted day. Legacy accounts have activity older than ignitedAt,
+    // and a creation date after your own first mark is a lie.
+    const cands = [];
+    const push = (v) => {
+      const n = (typeof v === 'string') ? Date.parse(v) : Number(v);
+      if (isFinite(n) && n > 0) cands.push(n);
+    };
+    push(state.clarity && state.clarity.ignitedAt);
+    push(state.clarity && state.clarity.completedAt);
+    (Array.isArray(state.proofEvents) ? state.proofEvents : []).forEach(e => push(e && e.ts));
+    try {
+      const days = Object.keys(consistencyStats().counts || {}).sort();
+      if (days.length) push(days[0] + 'T12:00:00');
+    } catch (e) {}
+    const t = cands.length ? Math.min.apply(null, cands) : Date.now();
+    state.meta.creationAt = t;
+    try { persistNow(); } catch (e) {}
+    return t;
+  } catch (e) { return Date.now(); }
+}
+
+// one pass over the whole record: everything the page states, derived honestly
+function _mfDerive() {
+  const d = {};
+  const evs = Array.isArray(state.proofEvents) ? state.proofEvents.filter(e => e && e.type !== 'new-record') : [];
+  d.creationAt = _mfCreationAt();
+  d.born = new Date(d.creationAt);
+  d.dayN = Math.max(0, Math.floor((Date.now() - d.creationAt) / 86400000));
+  let cs = { current: 0, longest: 0, totalActiveDays: 0, counts: {} };
+  try { cs = consistencyStats(); } catch (e) {}
+  d.cs = cs;
+  // typed volume. Actions are the union of proof events and the completion
+  // history (one per day): legacy accounts carry months of history from
+  // before proof events existed, and 232 kept days must never read as 0.
+  const actDays = {};
+  evs.forEach(e => { if (e.type === 'action-complete') actDays[e.iso || new Date(e.ts || 0).toISOString().slice(0, 10)] = 1; });
+  (Array.isArray(state.action && state.action.completionHistory) ? state.action.completionHistory : []).forEach(hh => {
+    const iso = String(hh.date || hh.iso || '').slice(0, 10);
+    if (iso) actDays[iso] = 1;
+  });
+  d.acts = Object.keys(actDays).length;
+  d.deepEvs = evs.filter(e => e.type === 'deepwork-commit');
+  d.deep = d.deepEvs.length;
+  d.deepMin = d.deepEvs.reduce((n, e) => n + (Number(e.metadata && e.metadata.minutes) || 0), 0);
+  d.notes = evs.filter(e => e.type === 'reflection-save').length;
+  d.marks = d.acts + d.deep + d.notes;
+  // the day-by-day wall since creation: marked / blank / comeback-return
+  const dayIso = (t) => new Date(t).toISOString().slice(0, 10);
+  const isoAt = (i) => dayIso(d.creationAt + i * 86400000);
+  const marked = (iso) => { const c = cs.counts && cs.counts[iso]; return !!(c && (typeof consistencyDayHasMainAction !== 'function' || consistencyDayHasMainAction(c) || c > 0)); };
+  d.wallDays = [];
+  const totalDays = Math.min(d.dayN + 1, 3660);
+  let gapLen = 0; d.comebacks = 0; d.openGap = false;
+  for (let i = 0; i < totalDays; i++) {
+    const iso = isoAt(i);
+    const on = marked(iso);
+    let k = 'is-off';
+    if (on) { k = gapLen >= 2 ? 'is-back' : 'is-on'; if (gapLen >= 2) d.comebacks++; gapLen = 0; }
+    else gapLen++;
+    d.wallDays.push({ iso: iso, k: k });
+  }
+  d.openGap = gapLen >= 2;
+  d.backDays = d.wallDays.filter(w => w.k === 'is-back').length;
+  d.markedDays = d.wallDays.filter(w => w.k !== 'is-off').length;
+  d.blankDays = d.wallDays.length - d.markedDays;
+  // longest run, with dates
+  let run = 0, best = 0, bestEnd = -1;
+  d.wallDays.forEach((w, i) => {
+    if (w.k !== 'is-off') { run++; if (run > best) { best = run; bestEnd = i; } }
+    else run = 0;
+  });
+  d.longest = Math.max(best, cs.longest || 0, cs.current || 0);
+  d.runNow = cs.current || 0;
+  d.longestEnd = bestEnd >= 0 ? new Date(d.creationAt + bestEnd * 86400000) : null;
+  d.longestStart = bestEnd >= 0 ? new Date(d.creationAt + (bestEnd - best + 1) * 86400000) : null;
+  d.longestStanding = d.longestEnd ? Math.max(0, Math.floor((Date.now() - d.longestEnd.getTime()) / 86400000)) : 0;
+  // weeks since creation (calendar-free: 7-day slices from creation)
+  d.weeks = [];
+  for (let w = 0; w * 7 < totalDays; w++) {
+    let kept = 0, len = 0;
+    for (let i = w * 7; i < Math.min((w + 1) * 7, totalDays); i++) { len++; if (d.wallDays[i].k !== 'is-off') kept++; }
+    d.weeks.push({ kept: kept, len: len, start: new Date(d.creationAt + w * 7 * 86400000) });
+  }
+  let bw = null; d.weeks.forEach((w, i) => { if (w.len === 7 && (!bw || w.kept > bw.kept)) { bw = w; bw.i = i; } });
+  d.bestWeek = bw;
+  // biggest day: typed events plus history-only action days
+  const perDay = {};
+  const evActDays = {};
+  evs.forEach(e => {
+    const iso = e.iso || dayIso(e.ts || Date.now());
+    perDay[iso] = (perDay[iso] || 0) + 1;
+    if (e.type === 'action-complete') evActDays[iso] = 1;
+  });
+  Object.keys(actDays).forEach(iso => { if (!evActDays[iso]) perDay[iso] = (perDay[iso] || 0) + 1; });
+  let big = null;
+  Object.keys(perDay).forEach(iso => { if (!big || perDay[iso] > big.n) big = { iso: iso, n: perDay[iso] }; });
+  d.biggestDay = big;
+  // first mark: the earliest trace, proof event or history day
+  const withTs = evs.filter(e => isFinite(e.ts)).sort((a, b) => a.ts - b.ts);
+  d.firstEv = withTs[0] || null;
+  const firstActDay = Object.keys(actDays).sort()[0];
+  if (firstActDay) {
+    const t = Date.parse(firstActDay + 'T12:00:00');
+    if (!d.firstEv || t < d.firstEv.ts) d.firstEv = { ts: t, type: 'action-complete', histOnly: true };
+  }
+  // words: first and latest reflection with text, and the hardest days
+  const refl = withTs.filter(e => e.type === 'reflection-save' && String(e.text || '').trim());
+  d.firstLine = refl[0] || null;
+  d.lastLine = refl.length > 1 ? refl[refl.length - 1] : null;
+  const backSet = {}; d.wallDays.forEach(w => { if (w.k === 'is-back') backSet[w.iso] = 1; });
+  const distSet = {}; withTs.forEach(e => { if (e.type === 'distraction-log') distSet[e.iso || dayIso(e.ts)] = 1; });
+  d.hardest = refl.filter(e => { const iso = e.iso || dayIso(e.ts); return backSet[iso] || distSet[iso]; }).slice(-3);
+  // mori
+  const by = state.mori && Number(state.mori.birthYear);
+  const exp = Number((state.mori && state.mori.lifeExpectancy) || 80);
+  d.moriEnd = by ? new Date(by + exp, 0, 1).getTime() : 0;
+  d.exp = exp;
+  if (by) {
+    const bornLife = new Date(by, 0, 1).getTime();
+    d.weeksLived = Math.max(0, Math.floor((Date.now() - bornLife) / (7 * 86400000)));
+    d.weeksTotal = Math.floor(exp * 52.18);
+    d.daysLeft = Math.max(0, Math.floor((d.moriEnd - Date.now()) / 86400000));
+  }
+  d.weeksOnPath = Math.max(d.dayN > 0 ? 1 : 0, Math.floor(d.dayN / 7));
+  return d;
+}
+
+// the mission as one human sentence; the grammar bends per goal type and it
+// is tense-aware: after today's mark the middle clause flips to done.
+function _mfMissionHtml(d) {
+  try {
+    const shape = (typeof ccGoalShape === 'function') ? ccGoalShape() : null;
+    if (!shape) return '';
+    const gp = state.goalProgress || {};
+    const pa = (state.action && state.action.primaryAction) || {};
+    const tiers = pa.tiers || {};
+    const TK = ['tiny', 'light', 'moderate', 'heavy', 'extreme'];
+    const selT = state.action && state.action.selectedTier;
+    const move = (tiers[TK.indexOf(selT) >= 0 ? selT : pa.recommendedTier] || pa.title || '').trim();
+    const done = (typeof actionDoneToday === 'function') && actionDoneToday();
+    const E = esc;
+    let want = '';
+    const t = shape.type;
+    if ((t === 'quantity_up' || t === 'quantity_down') && shape.target !== null) {
+      const cur = (gp.current !== null && gp.current !== undefined) ? gp.current : 0;
+      const tgt = shape.target.toLocaleString() + (shape.unit ? ' ' + E(shape.unit) : '');
+      want = t === 'quantity_up'
+        ? 'You want <b class="msn__c">' + tgt + '</b>, and ' + cur.toLocaleString() + ' are in.'
+        : 'You want <b class="msn__c">' + tgt + '</b> gone, and ' + (gp.baseline !== null && gp.current !== null ? Math.max(0, gp.baseline - gp.current).toLocaleString() : '0') + ' of it is.';
+    } else if (t === 'maintenance') {
+      want = 'You are holding <b class="msn__c">' + E(shape.star) + '</b>.';
+    } else if (t === 'frequency') {
+      want = 'You keep <b class="msn__c">' + (shape.cadence === 7 ? 'this every day' : shape.cadence + ' a week') + '</b>: ' + E(shape.star) + '.';
+    } else if (t === 'milestone') {
+      want = 'You are headed for <b class="msn__c">' + E(shape.star) + '</b>.';
+    } else {
+      want = 'You are becoming <b class="msn__c">' + E(shape.star) + '</b>.';
+    }
+    let mid;
+    if (!move) mid = '';
+    else if (done) mid = ' Today you did the one thing: <b>' + E(move) + '</b>. The mark is made.';
+    else mid = ' Today asks one thing: <b>' + E(move) + '</b>.';
+    const days = d.dayN <= 0
+      ? ' Today is day 1. Let&rsquo;s begin.'
+      : ' You have shown up <b class="msn__k">' + d.markedDays + ' of the ' + (d.dayN + 1) + ' days</b>.';
+    return '<p class="msn">' + want + mid + days + '</p>';
+  } catch (e) { return ''; }
+}
+
+function _mfFmtD(dt, o) {
+  try {
+    // a date from another year always says so; "August 12" a year later lies
+    if (!o && dt.getFullYear() !== new Date().getFullYear()) o = { month: 'long', day: 'numeric', year: 'numeric' };
+    return dt.toLocaleDateString('en-US', o || { month: 'long', day: 'numeric' });
+  } catch (e) { return ''; }
+}
+
+// the whole inside column, from state. Everything renders from day zero.
+function _mfInsideHtml(d, trailHtml) {
+  const E = esc;
+  const star = String((state.clarity && state.clarity.answers && state.clarity.answers.neutronStar) || '').trim();
+  const M_PATH = '<path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/>';
+  const bornFull = _mfFmtD(d.born, { month: 'long', day: 'numeric', year: 'numeric' });
+  const bornShort = _mfFmtD(d.born);
+  const bornTime = (function () { try { return d.born.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); } catch (e) { return ''; } })();
+
+  /* header: the small mark, the name, the countdown, the promise bare */
+  let h = '<header class="in-head">' +
+    '<svg class="in-mark" viewBox="0 0 512 512" aria-hidden="true">' + M_PATH + '</svg>' +
+    '<p class="in-title">Your Memento</p>' +
+    (d.moriEnd ? '<p class="in-count apl-num" id="mfMori">&nbsp;</p>' : '') +
+    (star ? '<p class="in-vowline">&ldquo;' + E(star) + '&rdquo;<span>promised ' + E(bornShort) + '</span></p>' : '') +
+    '</header>';
+
+  h += _mfMissionHtml(d);
+
+  /* ── PROGRESS SO FAR ─────────────────────────────────────────────── */
+  h += '<h2 class="in-flowh">Progress so far</h2>';
+
+  h += '<div class="cpick"><div class="tsc">' +
+    '<div class="tsc__n apl-num">' + d.dayN + '</div>' +
+    '<div class="tsc__c">days since creation</div>' +
+    '<div class="tsc__l">and <span id="mfUpLive" class="apl-num"></span></div>' +
+    '</div></div>';
+
+  h += '<div class="cpick"><div class="vol-total">' +
+    '<div class="vol-total__n apl-num">' + d.marks + '</div>' +
+    '<div class="vol-total__cap">total marks on the record</div>' +
+    '<div class="vol-total__rows">' +
+    '<div class="vol-total__row"><span>Actions completed</span><b>' + d.acts + '</b></div>' +
+    '<div class="vol-total__row"><span>Deep work sessions</span><b>' + d.deep + '</b></div>' +
+    '<div class="vol-total__row"><span>Notes and reflections</span><b>' + d.notes + '</b></div>' +
+    '</div></div></div>';
+
+  const deepH = d.deepMin >= 60 ? (Math.round(d.deepMin / 6) / 10) + ' hours' : d.deepMin + ' min';
+  h += '<div class="cpick"><div class="vol-deep">' +
+    '<div class="vol-deep__n">' + (d.deep ? deepH : '0 hours') + '</div>' +
+    '<div class="vol-deep__cap">of deep work</div>' +
+    '<div class="vol-deep__bar" aria-hidden="true"></div>' +
+    '<div class="vol-deep__raw">' + (d.deep ? d.deep + ' session' + (d.deep === 1 ? '' : 's') : 'No sessions yet') + '</div>' +
+    '</div></div>';
+
+  /* Records. "Not set yet." until a record exists (the day-zero law). */
+  const rec = (k, v, b) => '<div class="rec-board__r"><div class="rec-board__a"><span>' + k + '</span><b>' + v + '</b></div><div class="rec-board__b">' + b + '</div></div>';
+  h += '<div class="cpick"><div class="rec-board"><div class="rec-board__t">Records</div>' +
+    (d.longest > 0
+      ? rec('Longest run', d.longest + ' day' + (d.longest === 1 ? '' : 's'),
+        (d.longestEnd ? 'Set ' + E(_mfFmtD(d.longestEnd)) + '. ' : '') + (d.runNow >= d.longest ? 'Standing now, still running.' : 'Standing ' + d.longestStanding + ' days.'))
+      : rec('Longest run', 'Not set yet', 'The first kept day starts it.')) +
+    (d.bestWeek
+      ? rec('Best week', d.bestWeek.kept + ' of 7', 'Week of ' + E(_mfFmtD(d.bestWeek.start)) + '.')
+      : rec('Best week', 'Not set yet', 'A full week has to pass first.')) +
+    (d.biggestDay
+      ? rec('Biggest day', d.biggestDay.n + ' mark' + (d.biggestDay.n === 1 ? '' : 's'), E(_mfFmtD(new Date(d.biggestDay.iso + 'T12:00:00'))) + '.')
+      : rec('Biggest day', 'Not set yet', 'The first mark takes it.')) +
+    (d.firstEv
+      ? rec('First mark', 'day 1', E(_mfFmtD(new Date(d.firstEv.ts))) + (d.firstEv.histOnly ? '' : ', ' + E(new Date(d.firstEv.ts).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }))) + '. Everything descends from it.')
+      : rec('First mark', 'Not made yet', 'Tonight, maybe.')) +
+    rec('Comebacks', String(d.comebacks), d.comebacks === 0 ? 'No gaps yet, or none closed.' : d.comebacks + ' gap' + (d.comebacks === 1 ? '' : 's') + ' opened and closed.') +
+    '</div></div>';
+
+  h += '<div class="cpick"><div class="rec-hold">' +
+    '<svg class="rec-hold__m" viewBox="0 0 512 512" aria-hidden="true">' + M_PATH + '</svg>' +
+    '<div class="rec-hold__num apl-num">' + d.longest + '</div>' +
+    '<div class="rec-hold__unit">' + (d.longest > 0 ? 'day' + (d.longest === 1 ? '' : 's') + ' in a row. Your longest, ever.' : 'days in a row. The record waits for its first day.') + '</div>' +
+    '<div class="rec-hold__rule"></div>' +
+    '<div class="rec-hold__meta">' +
+    '<span>' + (d.longestStart ? E(_mfFmtD(d.longestStart)) + ' to ' + E(_mfFmtD(d.longestEnd, { month: 'long', day: 'numeric', year: 'numeric' })) : 'not started') + '</span>' +
+    '<span>' + (d.longest > 0 ? (d.runNow >= d.longest ? 'still running' : 'standing ' + d.longestStanding + ' days') : '') + '</span>' +
+    '</div></div></div>';
+
+  /* the wall: every day one cell, returns lit green */
+  h += '<div class="cpick"><div class="cmb-wall">' +
+    '<p class="cmb-wall__h">Comebacks</p>' +
+    '<div class="cmb-wall__grid">' + d.wallDays.map(w => '<i class="cmb-wall__c ' + w.k + '"></i>').join('') + '</div>' +
+    '<div class="cmb-wall__legend">' +
+    '<span><i class="is-on"></i>' + d.markedDays + ' marked</span>' +
+    '<span><i class="is-back"></i>' + d.backDays + ' back</span>' +
+    '<span><i class="is-off"></i>' + d.blankDays + ' blank</span>' +
+    '</div>' +
+    '<p class="cmb-wall__f">' + (d.longest > 0 && d.longestStart
+      ? 'Your longest run, ' + d.longest + ' days in ' + E(_mfFmtD(d.longestStart, { month: 'long' })) + ', lives on this wall.'
+      : 'Every day gets a cell. The marked ones are yours.') + '</p>' +
+    '</div></div>';
+
+  /* the weeks, as bars */
+  const wk = d.weeks.slice(-26);
+  const wmax = 7;
+  h += '<div class="cpick"><div class="rec-months"><div class="rec-months__t">Every week so far</div>' +
+    '<div class="rec-months__chart">' + (wk.length ? wk.map((w, i) => {
+      const hpct = Math.max(6, Math.round(w.kept / wmax * 100));
+      const cls = (i === wk.length - 1 ? ' class="now"' : (d.bestWeek && w.start.getTime() === d.bestWeek.start.getTime() ? ' class="top"' : (w.kept <= 2 && w.len === 7 ? ' class="low"' : '')));
+      return '<span style="height:' + hpct + '%"' + cls + '></span>';
+    }).join('') : '<span style="height:6%" class="now"></span>') + '</div>' +
+    '<div class="rec-months__ax">' + (wk.length > 1
+      ? '<i>' + E(_mfFmtD(wk[0].start)) + '</i><i>' + E(_mfFmtD(wk[wk.length - 1].start)) + '</i>'
+      : '<i>' + E(bornShort) + '</i><i>now</i>') + '</div>' +
+    '<div class="rec-months__c">' + (d.bestWeek
+      ? 'Week of ' + E(_mfFmtD(d.bestWeek.start)) + ' was ' + d.bestWeek.kept + ' of 7, the best so far. This week is still running.'
+      : 'Week one is still running.') + '</div></div></div>';
+
+  /* ── MORI ─────────────────────────────────────────────────────────── */
+  h += '<h2 class="in-flowh in-flowh--sub" data-sub="Remember, you will die.">Mori</h2>';
+
+  if (d.moriEnd) {
+    h += '<div class="cpick"><div class="amb-weeks">' +
+      '<canvas class="amb-weeks__cv" width="652" height="' + (Math.ceil(d.weeksTotal / 100) * 7 + 6) + '"></canvas>' +
+      '<div class="amb-weeks__rows">' +
+      '<div class="amb-weeks__r"><b class="apl-num">' + d.weeksLived.toLocaleString() + '</b><span>weeks behind you</span></div>' +
+      '<div class="amb-weeks__r"><b class="amb-weeks__g apl-num">' + d.weeksOnPath + '</b><span>of them went into this</span></div>' +
+      '<div class="amb-weeks__r"><b class="apl-num">' + Math.max(0, d.weeksTotal - d.weeksLived).toLocaleString() + '</b><span>left, if the guess of ' + d.exp + ' years holds</span></div>' +
+      '</div>' +
+      '<p class="amb-weeks__p">Each dot is one week. The white one is this week.</p>' +
+      '</div></div>';
+    const left = d.daysLeft;
+    h += '<div class="cpick"><div class="mor-remaining">' +
+      '<p class="mor-remaining__t">What is left, counted six ways.</p>' +
+      '<div class="mor-remaining__r"><span>Days</span><b class="apl-num">' + left.toLocaleString() + '</b></div>' +
+      '<div class="mor-remaining__r"><span>Weeks</span><b class="apl-num">' + Math.floor(left / 7).toLocaleString() + '</b></div>' +
+      '<div class="mor-remaining__r"><span>Months</span><b class="apl-num">' + Math.floor(left / 30.44).toLocaleString() + '</b></div>' +
+      '<div class="mor-remaining__r"><span>Saturdays</span><b class="apl-num">' + Math.floor(left / 7).toLocaleString() + '</b></div>' +
+      '<div class="mor-remaining__r"><span>Summers</span><b class="apl-num">' + Math.floor(left / 365.25).toLocaleString() + '</b></div>' +
+      '<div class="mor-remaining__r"><span>Birthdays</span><b class="apl-num">' + Math.ceil(left / 365.25).toLocaleString() + '</b></div>' +
+      '<p class="mor-remaining__f">One assumption, ' + d.exp + ' years. Change it and every row moves.</p>' +
+      '</div></div>';
+  } else {
+    /* the day-zero law: the box exists, asking for the one number it needs */
+    h += '<div class="cpick"><div class="mor-remaining">' +
+      '<p class="mor-remaining__t">What is left, counted six ways.</p>' +
+      ['Days', 'Weeks', 'Months', 'Saturdays', 'Summers', 'Birthdays'].map(k =>
+        '<div class="mor-remaining__r"><span>' + k + '</span><b>&middot;&middot;&middot;</b></div>').join('') +
+      '<p class="mor-remaining__f">Set your birthday in Mori and every row fills in.</p>' +
+      '</div></div>';
+  }
+
+  /* the last-time counter renders ONLY with real data, never placeholders */
+
+  h += '<div class="cpick"><div class="mor-oneday">' +
+    '<p class="mor-oneday__t">Today, hour by hour.</p>' +
+    '<div class="mor-oneday__row" id="mfOnedayRow">' + new Array(24).fill('<i></i>').join('') + '</div>' +
+    '<p class="mor-oneday__f"><span id="mfOnedayGone">0</span> hours gone, <span id="mfOnedayLeft">24</span> to go.' + (d.moriEnd ? ' This is one of the ' + d.daysLeft.toLocaleString() + '.' : '') + '</p>' +
+    '</div></div>';
+
+  h += '<p class="in-exline">Most of these days you will not remember. The marked ones get to stay.</p>';
+
+  /* ── VIVERE ───────────────────────────────────────────────────────── */
+  h += '<h2 class="in-flowh in-flowh--sub" data-sub="Remember, to live.">Vivere</h2>';
+  h += '<p class="in-exline">You cannot make a wrong mark on a canvas headed for the void. So make the painting beautiful.</p>';
+
+  const dream = String((state.clarity && state.clarity.answers && state.clarity.answers.futureVision) || '').trim();
+  h += '<div class="viv-dream">' +
+    (dream ? '<p class="viv-dream__q">&ldquo;' + E(dream) + '&rdquo;</p>' +
+      '<p class="viv-dream__d">The dream, written ' + E(bornFull) + '</p>'
+      : '<p class="viv-dream__q">The dream is not written yet.</p>' +
+      '<p class="viv-dream__d">Clarity writes it with you.</p>') +
+    (star ? '<p class="viv-dream__g">' + E(star) + '. Signed the same morning.</p>' : '') +
+    '</div>';
+
+  /* the promise thread, at true length */
+  const gp = state.goalProgress || {};
+  const shape2 = (typeof ccGoalShape === 'function') ? ccGoalShape() : null;
+  const thrS = 'open, signed ' + bornShort + ', day ' + Math.max(1, d.dayN + 1) +
+    (shape2 && shape2.target !== null && gp.current !== null && gp.current !== undefined ? ', at ' + gp.current.toLocaleString() + ' of ' + shape2.target.toLocaleString() : '');
+  if (star) {
+    h += '<div class="cpick"><div class="amb-threads"><div class="amb-threads__t">' +
+      '<div class="amb-threads__l">' + E(star) + '</div>' +
+      '<div class="amb-threads__bar" style="width:100%"><i></i></div>' +
+      '<div class="amb-threads__s">' + E(thrS) + '</div>' +
+      '</div></div></div>';
+  }
+
+  /* first line vs latest line */
+  if (d.firstLine) {
+    const f = d.firstLine, l = d.lastLine;
+    h += '<div class="cpick"><div class="wrd-span">' +
+      '<div class="wrd-span__row">' +
+      '<div class="wrd-span__meta">' + E(_mfFmtD(new Date(f.ts), { day: 'numeric', month: 'long', year: 'numeric' })) + '. The first thing you wrote.</div>' +
+      '<p class="wrd-span__q">' + E(String(f.text).slice(0, 200)) + '</p></div>' +
+      (l ? '<div class="wrd-span__gap"><i></i><span>' + Math.max(1, Math.round((l.ts - f.ts) / 86400000)) + ' days</span><i></i></div>' +
+        '<div class="wrd-span__row">' +
+        '<div class="wrd-span__meta">' + E(_mfFmtD(new Date(l.ts), { day: 'numeric', month: 'long' })) + '. The latest.</div>' +
+        '<p class="wrd-span__q">' + E(String(l.text).slice(0, 200)) + '</p></div>' : '') +
+      '</div></div>';
+  } else {
+    h += '<div class="cpick"><div class="wrd-span"><div class="wrd-span__row">' +
+      '<div class="wrd-span__meta">Nothing written yet.</div>' +
+      '<p class="wrd-span__q">The first line becomes part of the record the night you write it.</p>' +
+      '</div></div></div>';
+  }
+
+  /* the hardest days, their own words */
+  if (d.hardest.length) {
+    h += '<div class="cpick"><div class="wrd-hardest">' +
+      '<div class="wrd-hardest__head">You have written on ' + (d.hardest.length === 1 ? 'a day you wanted to stop. It is here.' : d.hardest.length + ' days you wanted to stop. They are here.') + '</div>' +
+      '<ol class="wrd-hardest__list">' + d.hardest.map(e =>
+        '<li class="wrd-hardest__item"><div class="wrd-hardest__date">' + E(_mfFmtD(new Date(e.ts), { day: 'numeric', month: 'long', year: 'numeric' })) + '</div>' +
+        '<p class="wrd-hardest__q">' + E(String(e.text).slice(0, 160)) + '</p></li>').join('') +
+      '</ol></div></div>';
+  }
+
+  /* the wall: notes the user pinned; the old private note lives here now */
+  const wall = Array.isArray(state.wall) ? state.wall : [];
+  h += '<div class="viv-wall" id="mfWall">' +
+    wall.map((n, i) => '<div class="viv-wall__note"><p>' + E(String(n.text || '').slice(0, 300)) + '</p><span>' + E(n.at ? _mfFmtD(new Date(n.at)) : '') + '</span></div>').join('') +
+    '<button class="viv-wall__add" id="mfWallAdd" type="button">Add a note</button>' +
+    '</div>';
+
+  /* THE SEAL */
+  const seal = (state.seal && typeof state.seal === 'object') ? state.seal : null;
+  const LOCK = '<svg class="seal-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path class="seal-shackle" d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
+  if (seal && seal.sealedAt && seal.text) {
+    h += '<div class="in-seal is-locked" id="mfSeal">' +
+      '<div class="in-seal__hd">' + LOCK + '<span>Sealed ' + E(_mfFmtD(new Date(seal.sealedAt))) + ', after your first action</span></div>' +
+      '<div class="seal-shut">' +
+      '<p class="seal-shut__l">The note you wrote after your first action.</p>' +
+      '<button class="seal-hold" id="mfSealHold" type="button"><span class="seal-hold__fill"></span><span class="seal-hold__t">Hold to open</span></button>' +
+      '</div>' +
+      '<div class="seal-open">' +
+      String(seal.text).split(/\n+/).slice(0, 6).map(p => '<p class="in-seal__b">' + E(p.slice(0, 400)) + '</p>').join('') +
+      '<p class="in-seal__sign">you, at the start</p>' +
+      '</div></div>';
+  } else if (d.marks === 0) {
+    h += '<div class="in-seal" id="mfSeal">' +
+      '<div class="in-seal__hd">' + LOCK + '<span>Unsealed, until tonight</span></div>' +
+      '<p class="in-seal__b">Tonight, after your first action, you write one note to the person you are doing this for. It seals, and it never changes again.</p>' +
+      '<p class="in-seal__b">Some day you will need proof that you once wanted this badly. This is where the proof will live.</p>' +
+      '</div>';
+  } else {
+    h += '<div class="in-seal" id="mfSeal">' +
+      '<div class="in-seal__hd">' + LOCK + '<span>Unsealed</span></div>' +
+      '<p class="in-seal__b">One note to the person you are doing this for, written once, sealed forever. Opened only by a held finger, on the nights it is needed.</p>' +
+      '<div class="seal-write" id="mfSealWrite">' +
+      '<textarea id="mfSealText" rows="4" maxlength="900" placeholder="To the one reading this on a bad night..."></textarea>' +
+      '<button class="seal-hold" id="mfSealCommit" type="button"><span class="seal-hold__t">Seal it, forever</span></button>' +
+      '</div></div>';
+  }
+
+  /* the plaque (mf-origin class kept: the skins hint anchors to it) */
+  h += '<div class="in-org mf-origin">' +
+    '<span class="in-org__k">Creation of Your Memento</span>' +
+    '<span class="in-org__d">' + E(bornFull) + '</span>' +
+    '<span class="in-org__t">' + E(bornTime) + '</span>' +
+    '</div>';
+
+  /* THE RECORD DOOR: the full month-by-month trail, one tap below the plaque */
+  h += '<button class="in-door" id="mfDoor" type="button" aria-expanded="false">The full record' +
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>' +
+    '<div class="in-doorb" id="mfDoorB" hidden><div class="mf-trail" id="mfTrail">' + trailHtml + '</div></div>';
+
+  /* the foot: a barcode grown from their own numbers */
+  h += '<div class="in-foot">' +
+    '<div class="in-code" id="mfCode" aria-hidden="true"></div>' +
+    '<p class="in-digits apl-num">' + String(Math.max(0, d.dayN)).padStart(4, '0') + ' / ' + String(d.marks).padStart(4, '0') + '</p>' +
+    '<p class="in-policy">Get the most out of your existence.</p>' +
+    '</div>';
+
+  return '<div class="in-col">' + h + '</div>';
+}
+
+// behaviors owned by the record; every listener rides the view's abort signal
+function _mfInsideWire(ov, d, sig) {
+  const on = (el, ev, fn, opt) => { if (el) el.addEventListener(ev, fn, sig ? Object.assign({}, opt || {}, sig) : opt); };
+
+  // back chevron reverses the dive
+  on(ov.querySelector('.in-back'), 'click', () => { try { MementoView.close(); } catch (e) {} });
+
+  // the ring closes only at the very bottom of the scroll
+  const rimCheck = () => {
+    try {
+      const done = ov.scrollHeight > 0 && (ov.scrollTop + ov.clientHeight >= ov.scrollHeight - 6);
+      ov.classList.toggle('rim-done', done);
+    } catch (e) {}
+  };
+  on(ov, 'scroll', rimCheck, { passive: true });
+
+  // the up-clock under days-since-creation
+  const up = ov.querySelector('#mfUpLive');
+  if (up) {
+    const t0 = d.creationAt;
+    const paint = () => {
+      const e = Math.max(0, Math.floor((Date.now() - t0) / 1000)) % 86400;
+      up.textContent = Math.floor(e / 3600) + 'h ' + Math.floor(e % 3600 / 60) + 'm ' + (e % 60) + 's';
+    };
+    paint();
+    const iv = setInterval(paint, 1000);
+    if (sig && sig.signal) sig.signal.addEventListener('abort', () => clearInterval(iv));
+  }
+
+  // today, hour by hour
+  (function () {
+    const row = ov.querySelector('#mfOnedayRow');
+    if (!row) return;
+    const gone = ov.querySelector('#mfOnedayGone'), left = ov.querySelector('#mfOnedayLeft');
+    const paint = () => {
+      const hh = new Date().getHours();
+      for (let i = 0; i < row.children.length; i++) {
+        row.children[i].className = i < hh ? 'mor-oneday__on' : (i === hh ? 'mor-oneday__now' : '');
+      }
+      if (gone) gone.textContent = String(hh);
+      if (left) left.textContent = String(24 - hh);
+    };
+    paint();
+    const iv = setInterval(paint, 30000);
+    if (sig && sig.signal) sig.signal.addEventListener('abort', () => clearInterval(iv));
+  })();
+
+  // the life-in-weeks canvas: lived dim, on-the-path green, this week white
+  (function () {
+    const c = ov.querySelector('.amb-weeks__cv');
+    if (!c || !c.getContext || !d.moriEnd) return;
+    const g = c.getContext('2d');
+    const COLS = 100, TOT = d.weeksTotal, LIV = d.weeksLived, PATH = d.weeksOnPath;
+    const P = 6.52, S = 5.2;
+    c.height = Math.ceil(TOT / COLS) * P + 4;
+    g.clearRect(0, 0, c.width, c.height);
+    for (let i = 0; i < TOT; i++) {
+      const x = (i % COLS) * P, y = ((i / COLS) | 0) * P;
+      let f;
+      if (i < LIV - PATH) f = 'rgba(238,241,247,.20)';
+      else if (i < LIV - 1) f = 'rgba(63,217,78,.72)';
+      else if (i === LIV - 1) f = 'rgba(245,246,250,.97)';
+      else f = 'rgba(255,255,255,.055)';
+      g.fillStyle = f;
+      g.fillRect(x, y, S, S);
+    }
+  })();
+
+  // the barcode: bars grown deterministically from their own numbers
+  (function () {
+    const code = ov.querySelector('#mfCode');
+    if (!code) return;
+    let seed = (d.creationAt % 2147483647) ^ (d.marks * 2654435761) ^ (d.dayN * 40503);
+    const rnd = () => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; };
+    let bars = '';
+    for (let i = 0; i < 26; i++) {
+      bars += '<i style="width:' + (rnd() < 0.3 ? 4 : 2) + 'px;opacity:' + (0.5 + rnd() * 0.5).toFixed(2) + '"></i>';
+    }
+    code.innerHTML = bars;
+  })();
+
+  // the wall: add a note inline (their words, dated, persisted, synced)
+  (function () {
+    const add = ov.querySelector('#mfWallAdd');
+    const wall = ov.querySelector('#mfWall');
+    if (!add || !wall) return;
+    on(add, 'click', () => {
+      if (wall.querySelector('.viv-wall__write')) return;
+      const w = document.createElement('div');
+      w.className = 'viv-wall__note viv-wall__write';
+      w.innerHTML = '<textarea rows="3" maxlength="300" placeholder="A line worth keeping."></textarea>' +
+        '<button type="button" class="viv-wall__keep">Keep it</button>';
+      wall.insertBefore(w, add);
+      const ta = w.querySelector('textarea');
+      ta.focus();
+      w.querySelector('.viv-wall__keep').addEventListener('click', () => {
+        const txt = String(ta.value || '').trim().slice(0, 300);
+        if (!txt) { w.remove(); return; }
+        if (!Array.isArray(state.wall)) state.wall = [];
+        state.wall.push({ text: txt, at: Date.now() });
+        try { persistNow(); } catch (e) {}
+        w.classList.remove('viv-wall__write');
+        w.innerHTML = '<p>' + esc(txt) + '</p><span>' + esc(_mfFmtD(new Date())) + '</span>';
+      }, sig || {});
+    });
+  })();
+
+  _mfSealWire(ov, d, sig);
+
+  // the record door
+  const door = ov.querySelector('#mfDoor'), doorB = ov.querySelector('#mfDoorB');
+  wireDoor(door, doorB, on);
+  rimCheck();
+}
+
+function wireDoor(door, doorB, on) {
+  if (!door || !doorB || door.dataset.wired) return;
+  door.dataset.wired = '1';
+  on(door, 'click', () => {
+    const open = doorB.hidden;
+    doorB.hidden = !open;
+    door.setAttribute('aria-expanded', open ? 'true' : 'false');
+    door.classList.toggle('is-open', open);
+  });
+}
+
+// the seal's own wiring, callable alone so sealing can swap the block live
+function _mfSealWire(ov, d, sig) {
+  const on = (el, ev, fn, opt) => { if (el) el.addEventListener(ev, fn, sig ? Object.assign({}, opt || {}, sig) : opt); };
+  const seal = ov.querySelector('#mfSeal');
+  if (!seal || seal.dataset.wired) return;
+  seal.dataset.wired = '1';
+  const hold = ov.querySelector('#mfSealHold');
+  if (hold) {
+    let t = null;
+    const start = (e) => {
+      if (e.cancelable) e.preventDefault();
+      hold.classList.add('is-holding');
+      t = setTimeout(() => { seal.classList.remove('is-locked'); seal.classList.add('is-open'); }, 1150);
+    };
+    const stop = () => { clearTimeout(t); hold.classList.remove('is-holding'); };
+    ['pointerdown', 'touchstart'].forEach(ev => on(hold, ev, start, { passive: false }));
+    ['pointerup', 'pointercancel', 'pointerleave', 'touchend', 'touchcancel'].forEach(ev => on(hold, ev, stop));
+  }
+  const commit = ov.querySelector('#mfSealCommit');
+  if (commit) on(commit, 'click', () => {
+    try {
+      const ta = ov.querySelector('#mfSealText');
+      const txt = String((ta && ta.value) || '').trim();
+      if (txt.length < 3) return;
+      state.seal = { text: txt.slice(0, 900), sealedAt: Date.now() };
+      persistNow();
+      const tmp = document.createElement('div');
+      tmp.innerHTML = _mfInsideHtml(d, '');
+      const fresh = tmp.querySelector('#mfSeal');
+      if (fresh) { seal.replaceWith(fresh); _mfSealWire(ov, d, sig); }
+    } catch (e) {}
+  });
+}
+
 function _mfBuildOverlay() {
   // v1138 (Malik): no 'arrival' chime on opening the Memento. Tapping your
   // own card is not an event that needs announcing, and it fires every time.
@@ -6633,26 +7247,22 @@ function _mfBuildOverlay() {
     // person's own evidence and nothing else. Countdown, their note, three
     // counters, the month-collapsed trail, the origin. No explainer copy (two
     // explainer blocks were built and killed in the mockup rounds).
-    let cs = { current: 0, longest: 0, totalActiveDays: 0 };
-    try { cs = consistencyStats(); } catch (e) {}
+    // v1151: ONE derivation pass feeds the whole page (MEMENTO-PAGE-SPEC.md)
+    const d = _mfDerive();
+    const moriEnd = d.moriEnd;
     const evs = Array.isArray(state.proofEvents) ? state.proofEvents.slice() : [];
-    const totalMoves = evs.filter(e => e && e.type === 'action-complete').length;
-    // the countdown: same model the app already uses (birth year + expectancy)
-    const _by = state.mori && state.mori.birthYear;
-    const moriEnd = _by ? new Date(Number(_by) + Number((state.mori && state.mori.lifeExpectancy) || 80), 0, 1).getTime() : 0;
-    // the note: reuses the existing future-self field, no new state shape
-    const noteTxt = String((state.mori && state.mori.futureSelfNote) || '').trim();
-    const noteAt = (state.mori && state.mori.futureSelfNoteAt) || 0;
-    const _dfmt = (ts) => { try { return new Date(ts).toLocaleDateString('en-US', { day: 'numeric', month: 'long' }); } catch (e) { return ''; } };
-    // the origin: the day the Memento was made
-    const bornTs = (state.clarity && state.clarity.ignitedAt) || (evs.length ? Math.min.apply(null, evs.map(e => e.ts || Infinity).filter(isFinite)) : 0);
-    const bornD = bornTs ? new Date(bornTs) : null;
-    const originHtml = bornD ? (
-      '<div class="mf-origin">' +
-        '<span class="mf-origin__k">Creation of Your Memento</span>' +
-        '<span class="mf-origin__d">' + esc(bornD.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })) + '</span>' +
-        '<span class="mf-origin__t">' + esc(bornD.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })) + '</span>' +
-      '</div>') : '';
+    // the old private note becomes the first wall note, still theirs (spec's
+    // migration rule); the source field survives untouched for Mori's sheet.
+    try {
+      const noteTxt0 = String((state.mori && state.mori.futureSelfNote) || '').trim();
+      if (noteTxt0 && !(state.meta && state.meta.noteMigratedToWall)) {
+        if (!Array.isArray(state.wall)) state.wall = [];
+        state.wall.unshift({ text: noteTxt0.slice(0, 300), at: (state.mori && state.mori.futureSelfNoteAt) || d.creationAt });
+        if (!state.meta) state.meta = {};
+        state.meta.noteMigratedToWall = true;
+        persistNow();
+      }
+    } catch (e) {}
     // THE TRAIL: every event the app has written, grouped by month, newest
     // month open. A closed month is one row that still carries its weight (a
     // dot per mark + the count); only the open month renders its list, which
@@ -6698,21 +7308,16 @@ function _mfBuildOverlay() {
     ov.id = 'mementoFull';
     ov.setAttribute('role', 'dialog');
     ov.setAttribute('aria-label', 'Your Memento');
+    // v1151: the inside page (three movements + seal + plaque + door + foot);
+    // the trail lives behind the record door now.
     ov.innerHTML =
       '<div class="mf__bg" aria-hidden="true"></div>' +
-      '<div class="mf__scroll">' +
-        '<p class="mf-name">Your Memento</p>' +
-        (moriEnd ? '<p class="mf-mori apl-num" id="mfMori">&nbsp;</p>' : '') +
-        '<p class="mf-note" id="mfNote" contenteditable="true" spellcheck="false">' + esc(noteTxt) + '</p>' +
-        '<p class="mf-note__d" id="mfNoteD">' + esc(noteTxt && noteAt ? _dfmt(noteAt) : '') + '</p>' +
-        '<div class="mf-tally">' +
-          '<div class="mf-tal"><b class="apl-num">' + (cs.totalActiveDays || 0) + '</b><span>total<br>days</span></div>' +
-          '<div class="mf-tal"><b class="apl-num">' + totalMoves + '</b><span>total<br>moves</span></div>' +
-          '<div class="mf-tal is-live"><b class="apl-num">' + (cs.longest || 0) + '</b><span>longest<br>streak</span></div>' +
-        '</div>' +
-        '<div class="mf-trail" id="mfTrail">' + trailHtml + '</div>' +
-        originHtml +
-      '</div>';
+      '<div class="rim" aria-hidden="true"></div>' +
+      '<div class="rim-cover" aria-hidden="true"></div>' +
+      '<button class="in-back" type="button" aria-label="Back out of the card">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>' +
+      '</button>' +
+      '<div class="mf__scroll">' + _mfInsideHtml(d, trailHtml) + '</div>';
     // v1139: the record lives INSIDE .app, not on the body. #app is a stacking
     // context (position:relative; z-index:1), so a card left in the home can
     // never paint above a body-level overlay no matter its z-index. Same
@@ -6769,6 +7374,14 @@ function _mfBuildOverlay() {
       // materials every room measures 6-62, so the plaque is white; the rule
       // flips itself the day a genuinely light room exists.)
       ov.dataset.room = lum > 128 ? 'light' : 'dark';
+      // v1151 (Malik): the RIM wears the skin's colour too. The stock card
+      // keeps the white ring; a material's ring takes its tint, brightened
+      // toward white so it still reads as light, not paint.
+      if (sk0) {
+        const lift = p3.map(n => Math.round(n + (255 - n) * 0.45));
+        ov.style.setProperty('--rim-c', 'rgb(' + lift.join(',') + ')');
+        ov.style.setProperty('--rim-rgb', lift.join(','));
+      }
     } catch (e) { ov.dataset.room = 'dark'; }
 
     // the countdown ticks, because a number that moves is the whole argument
@@ -6790,19 +7403,8 @@ function _mfBuildOverlay() {
       startTick = () => { if (mfTick) return; tick(); mfTick = setInterval(tick, 1000); };
       stopTick = () => { if (mfTick) { clearInterval(mfTick); mfTick = null; } };
     }
-    // their note, saved quietly on blur (same field Mori's sheet edits)
-    const noteEl = ov.querySelector('#mfNote');
-    if (noteEl) noteEl.addEventListener('blur', () => {
-      try {
-        const t2 = String(noteEl.textContent || '').trim().slice(0, 600);
-        if (t2 === String((state.mori && state.mori.futureSelfNote) || '').trim()) return;
-        state.mori.futureSelfNote = t2;
-        state.mori.futureSelfNoteAt = t2 ? Date.now() : null;
-        persistNow();
-        const dEl = ov.querySelector('#mfNoteD');
-        if (dEl) dEl.textContent = t2 ? _dfmt(state.mori.futureSelfNoteAt) : '';
-      } catch (e) {}
-    });
+    // (the old editable private note is gone from this view: it migrated into
+    // the Vivere wall above, per the spec's rip list)
     // a month opens and closes in place
     const trailEl = ov.querySelector('#mfTrail');
     if (trailEl) trailEl.addEventListener('click', (e) => {
@@ -6887,6 +7489,7 @@ function _mfBuildOverlay() {
       el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
     });
     try { _mfSkinsInit(ov, liveWrap, sig); } catch (e) {}
+    try { _mfInsideWire(ov, d, sig); } catch (e) {}
     document.addEventListener('keydown', onKey, sig);
     return { ov: ov, abort: viewAbort, startTick: startTick, stopTick: stopTick };
   } catch (e) { return null; }
