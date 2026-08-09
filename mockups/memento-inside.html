@@ -157,8 +157,8 @@
   .evd.is-open .evd__story{display:block}
   .evcap{margin-top:12px;font-size:12px;color:var(--ink3);text-align:center}
 
-  .in-count{margin-top:16px;font-size:24px;font-weight:250;letter-spacing:.1em;
-    color:var(--mid);font-variant-numeric:tabular-nums}
+  .in-count{margin-top:14px;font-size:36px;font-weight:250;letter-spacing:.08em;
+    color:var(--hi);font-variant-numeric:tabular-nums}
   .in-d0{position:fixed;top:calc(var(--safe-t) + 62px);right:14px;z-index:9;border:0;
     padding:8px 13px;border-radius:999px;background:rgba(255,255,255,.08);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.09);color:var(--hi);
@@ -194,6 +194,12 @@
   .tsc__l{margin-top:5px;font-size:13px;color:var(--mid)}
   .tsc__l span{color:var(--hi);font-weight:640;font-variant-numeric:tabular-nums}
 
+  .xtr{border-radius:14px;padding:18px;background:var(--fill);box-shadow:var(--inset)}
+  .xtr__n{font-size:26px;line-height:1.1;font-weight:790;letter-spacing:-.028em;color:var(--hi)}
+  .xtr__c{margin-top:8px;font-size:14px;line-height:1.5;color:var(--mid)}
+  .xtr__b{margin-top:10px;font-size:14px;line-height:1.5;font-weight:650;color:var(--hi)}
+  .in-exline{margin:44px auto 0;max-width:30ch;text-align:center;
+    font-size:14.5px;line-height:1.62;color:var(--mid)}
   .vow{text-align:center}
   .vow__l{font-size:12px;font-weight:660;color:var(--clar)}
   .vow__q{margin-top:9px;font-size:24px;font-weight:740;letter-spacing:-.026em;line-height:1.22;color:var(--hi)}
@@ -263,14 +269,14 @@
   .seal-hold.is-holding .seal-hold__fill{width:100%;transition:width 1.15s linear}
   .seal-hold__t{position:relative}
 
-  /* the maker's mark, quiet, on every block */
-  .cpick > *, .viv-dream, .in-seal, .bigup{position:relative}
-  .cpick > *::before, .viv-dream::before, .in-seal::before{
-    content:"";position:absolute;right:12px;top:12px;width:13px;height:13px;z-index:2;
-    pointer-events:none;opacity:.16;
+  /* the maker's mark: only on the roomy text cards, bottom right, quiet */
+  .cpick > *, .viv-dream, .in-seal{position:relative}
+  .tsc::before, .xtr::before, .vol-total::before, .rec-board::before,
+  .rec-hold::before, .viv-dream::before, .in-seal::before{
+    content:"";position:absolute;right:13px;bottom:13px;width:11px;height:11px;z-index:2;
+    pointer-events:none;opacity:.12;
     background:currentColor;
     -webkit-mask:var(--mmask) center/contain no-repeat;mask:var(--mmask) center/contain no-repeat}
-  .cmb-wall::before,.amb-weeks::before{opacity:.1}
 
   /* one shimmer, used everywhere something is alive. A slow band of light
      crossing the marks, nothing more. */
@@ -487,14 +493,6 @@
 .vol-total__row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:9px 0;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
 .vol-total__row span{font-size:14px;color:var(--mid)}
 .vol-total__row b{font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--hi)}
-
-/* vol-pages */
-.vol-pages{display:grid;grid-template-columns:1fr 62px;gap:16px;align-items:end;background:var(--fill);box-shadow:var(--inset);border-radius:14px;padding:18px;color:var(--hi)}
-.vol-pages__n{font-size:34px;line-height:1;letter-spacing:-.02em;font-weight:600;font-variant-numeric:tabular-nums;color:var(--hi)}
-.vol-pages__sub{margin:12px 0 0;font-size:14.5px;line-height:1.45;color:var(--mid)}
-.vol-pages__raw{margin-top:12px;font-size:12px;font-variant-numeric:tabular-nums;color:var(--lo)}
-.vol-pages__block{position:relative;height:135px;border-radius:3px;background:repeating-linear-gradient(to bottom,rgba(255,255,255,.24) 0 1px,rgba(255,255,255,.02) 1px 3px);box-shadow:inset 1px 0 0 rgba(255,255,255,.10),inset -1px 0 0 rgba(0,0,0,.35)}
-.vol-pages__block i{position:absolute;left:0;right:0;top:-5px;height:5px;border-radius:2px 2px 0 0;background:rgba(238,241,247,.5)}
 
 /* vol-deep */
 .vol-deep{background:var(--fill);box-shadow:var(--inset);border-radius:14px;padding:18px;color:var(--hi)}
@@ -938,7 +936,7 @@
         <svg class="in-mark" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
         <p class="in-title">Your Memento</p>
         <p class="in-count">20967:16:41:52</p>
-        <p class="in-vowline">&ldquo;Get to 100 paying users.&rdquo;<span>July 15</span></p>
+        <p class="in-vowline">&ldquo;This is the one I do not quit.&rdquo;<span>promised July 15</span></p>
       </header>
 
       <!-- THE MISSION, RIGHT NOW: clarity, action, consistency, connected -->
@@ -964,14 +962,11 @@
     <div class="vol-total__row"><span>Notes and reflections</span><b>4</b></div>
   </div>
 </div></div>
-      <div class="cpick"><div class="vol-pages">
-  <div class="vol-pages__text">
-    <div class="vol-pages__n">840 words</div>
-    <p class="vol-pages__sub">Written in here since July 15, in your own hand. Three and a half pages of a book that did not exist last month.</p>
-    
-  </div>
-  <div class="vol-pages__block" aria-hidden="true"><i></i></div>
-</div></div>
+      <div class="cpick"><div class="xtr">
+        <div class="xtr__n">24 days of your life</div>
+        <div class="xtr__c">are gone since July 15. They were leaving whether you showed up or not.</div>
+        <div class="xtr__b">17 of them bought something. That is the entire difference.</div>
+      </div></div>
       <div class="cpick"><div class="vol-deep">
   <div class="vol-deep__n">9 hours</div>
   <div class="vol-deep__cap">of deep work</div>
@@ -1023,8 +1018,12 @@
   <p class="mor-oneday__f"><span id="mor-oneday-gone">0</span> hours gone, <span id="mor-oneday-left">24</span> to go. This is one of the 20,967.</p>
 </div></div>
 
+      <p class="in-exline">Most of these days you will not remember. The marked ones get to stay.</p>
+
       <!-- MEMENTO VIVERE: the promises they made to themselves -->
       <h2 class="in-flowh in-flowh--sub" data-sub="Remember, to live.">Vivere</h2>
+
+      <p class="in-exline">You cannot make a wrong mark on a canvas headed for the void. So make the painting beautiful.</p>
 
       <div class="viv-dream">
         <p class="viv-dream__q">&ldquo;I run the thing I built. The work is hard and it is mine. My people can point at something real and say he made that.&rdquo;</p>
@@ -1116,7 +1115,7 @@
         <svg class="in-mark" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
         <p class="in-title">Your Memento</p>
         <p class="in-count">21267:16:41:52</p>
-        <p class="in-vowline">&ldquo;Get to 100 paying users.&rdquo;<span>signed this morning</span></p>
+        <p class="in-vowline">&ldquo;This is the one I do not quit.&rdquo;<span>promised this morning</span></p>
       </header>
 
       <div class="bigup">
