@@ -156,7 +156,7 @@
   .evd.is-open .evd__story{display:block}
   .evcap{margin-top:12px;font-size:12px;color:var(--ink3);text-align:center}
 
-  .in-count{margin-top:14px;font-size:31px;font-weight:250;letter-spacing:.1em;
+  .in-count{margin-top:16px;font-size:29px;font-weight:250;letter-spacing:.09em;
     color:var(--hi);font-variant-numeric:tabular-nums}
   .in-d0{position:fixed;top:calc(var(--safe-t) + 62px);right:14px;z-index:9;border:0;
     padding:8px 13px;border-radius:999px;background:rgba(255,255,255,.08);
@@ -165,16 +165,7 @@
   /* [hidden] must win over any display rule, or the day one column renders
      underneath the main one and the page reads as having a second ending. */
   .in-col[hidden]{display:none!important}
-  .d0clk{margin-top:30px;border-radius:16px;padding:20px 18px 16px;background:var(--fill);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
-  .d0clk__n{font-size:46px;line-height:1;font-weight:600;letter-spacing:-.03em;
-    color:var(--hi);font-variant-numeric:tabular-nums}
-  .d0clk__n--up{color:var(--cons)}
-  .d0clk__u{margin-top:8px;font-size:14px;line-height:1.4;color:var(--mid)}
-  .d0clk__u b{color:var(--hi);font-weight:640;font-variant-numeric:tabular-nums}
-  .d0clk__rule{height:1px;background:rgba(255,255,255,.10);margin:16px 0}
-  .d0clk__f{margin-top:16px;font-size:13px;color:var(--mid)}
-  .d0line{margin-top:22px;font-size:14.5px;line-height:1.55;color:var(--hi);text-align:center}
+  .d0line{margin-top:20px;font-size:14.5px;line-height:1.55;color:var(--hi);text-align:left}
   .d0wks{margin-top:14px;border-radius:16px;padding:15px;background:var(--fill);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
   .d0wks canvas{display:block;width:100%;max-width:312px;height:auto;margin:0 auto}
@@ -189,20 +180,21 @@
     background:rgba(16,20,28,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.5);
     color:rgba(13,17,25,.94)}
   .in-flowh{margin:104px 0 10px;font-size:23px;font-weight:750;letter-spacing:-.024em;color:var(--hi)}
+  .in-flowh--sub{margin-top:118px;font-size:46px;letter-spacing:-.035em;line-height:1.02}
   .in-flowh--sub{cursor:pointer;-webkit-tap-highlight-color:transparent}
-  .in-flowh--sub::after{content:attr(data-sub);display:block;margin-top:7px;
-    font-size:14px;font-weight:600;letter-spacing:0;color:var(--mid);
+  .in-flowh--sub::after{content:attr(data-sub);display:block;margin-top:10px;
+    font-size:15px;font-weight:600;letter-spacing:0;color:var(--mid);
     opacity:0;transform:translateY(-3px);transition:opacity .35s ease,transform .35s ease}
   .in-flowh--sub:hover::after,.in-flowh--sub.is-sub::after{opacity:1;transform:none}
 
   /* the age of the Memento: the biggest number on the page */
-  .bigup{margin-top:40px;text-align:center}
-  .bigup__n{font-size:104px;line-height:.9;font-weight:800;letter-spacing:-.055em;
-    color:var(--cons);font-variant-numeric:tabular-nums;
+  .bigup{margin-top:52px;text-align:left}
+  .bigup__d{font-size:34px;font-weight:640;letter-spacing:-.03em;line-height:1;color:var(--mid)}
+  .bigup__d b{font-size:104px;font-weight:800;letter-spacing:-.055em;color:var(--cons);
+    font-variant-numeric:tabular-nums;
     text-shadow:0 0 80px color-mix(in srgb, var(--cons) 30%, transparent)}
   .bigup__u{margin-top:14px;font-size:15px;color:var(--mid)}
-  .bigup__u b{color:var(--hi);font-weight:640;font-variant-numeric:tabular-nums}
-  .bigup__f{margin-top:8px;font-size:13px;color:var(--mid)}
+  .bigup__u span{color:var(--hi);font-weight:640;font-variant-numeric:tabular-nums}
 
   /* the ambient life: a blur of white, cyan or green breathing in and out */
   .in-amb{position:fixed;inset:0;pointer-events:none;z-index:0}
@@ -263,8 +255,13 @@
   .cpick{margin-top:26px}
   .cpick > *{max-width:100%}
   /* the components were designed as tiles on near black, the ring room IS near black */
-  .in-head{text-align:center}
-  .in-mark{width:44px;height:44px;fill:#3a4150;display:block;margin:0 auto}
+  .in-head{text-align:left}
+  .in-mark{width:34px;height:34px;fill:rgba(238,244,255,.65);display:block;margin:0}
+  .inside.brd .in-mark{fill:rgba(238,244,255,.65)}
+  .in-title{margin-top:16px;font-size:26px;font-weight:780;letter-spacing:-.028em;color:var(--hi)}
+  .in-owner{margin-top:12px;padding-top:11px;display:flex;align-items:baseline;gap:12px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.10);font-size:12.5px;color:var(--lo)}
+  .in-owner b{font-size:16px;font-weight:700;letter-spacing:-.012em;color:var(--hi)}
   .in-name{margin-top:16px;font-size:27px;font-weight:780;letter-spacing:-.028em;color:var(--ink1);
     text-shadow:0 1px 1px rgba(255,255,255,.85), 0 -1px .5px rgba(0,0,0,.16)}
   .in-count{margin-top:8px;font-size:17px;font-weight:300;letter-spacing:.11em;color:var(--ink2);
@@ -858,15 +855,15 @@
 
       <header class="in-head">
         <svg class="in-mark" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
-        <h1 class="in-name">Malik Peace.</h1>
+        <p class="in-title">Your Memento</p>
+        <p class="in-owner">Owner<b>Malik Peace</b></p>
         <p class="in-count">20967:16:41:52</p>
       </header>
 
       <!-- THE AGE OF THE MEMENTO: the biggest number on the page -->
       <div class="bigup">
-        <div class="bigup__n">300</div>
-        <div class="bigup__u">days since you made this, plus <b id="bigupLive">12h 28m 35s</b></div>
-        <div class="bigup__f">Nothing you do can make this number smaller.</div>
+        <div class="bigup__d">Day <b>300</b></div>
+        <div class="bigup__u"><span id="bigupLive">12h 30m 7s</span> since its birth</div>
       </div>
 
       <!-- HOW FAR YOU'VE COME: stats and evidence -->
@@ -1022,18 +1019,14 @@
     <div class="in-col in-col--d0" id="inD0col" hidden>
       <header class="in-head">
         <svg class="in-mark" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
-        <h1 class="in-name">Malik Peace.</h1>
+        <p class="in-title">Your Memento</p>
+        <p class="in-owner">Owner<b>Malik Peace</b></p>
         <p class="in-count">21267:16:41:52</p>
-        <p class="in-since">On the path since this morning. Day 1.</p>
       </header>
 
-      <div class="d0clk">
-        <div class="d0clk__n">21,267</div>
-        <div class="d0clk__u">days left, on an 80 year estimate</div>
-        <div class="d0clk__rule"></div>
-        <div class="d0clk__n d0clk__n--up">0</div>
-        <div class="d0clk__u">days since you made this, plus <b id="inD0live">11h 16m 51s</b></div>
-        <div class="d0clk__f">One falls. One climbs. The climbing one is already moving.</div>
+      <div class="bigup">
+        <div class="bigup__d">Day <b>1</b></div>
+        <div class="bigup__u"><span id="inD0live">11h 17m 16s</span> since its birth</div>
       </div>
 
       <p class="d0line">The ledger opens with the first mark. That can be tonight.</p>
