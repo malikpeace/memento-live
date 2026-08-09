@@ -22,8 +22,8 @@
   .home.is-diving{opacity:0;pointer-events:none}
   .home__in{text-align:center}
   .home .cage{width:min(64vw,246px);margin:0 auto;cursor:pointer;
-    transition:transform .72s cubic-bezier(.55,0,.8,.4), opacity .5s ease .3s}
-  .home.is-diving .cage{transform:scale(10.5);opacity:0}
+    transition:transform .82s cubic-bezier(.7,0,.86,.22), opacity .38s ease .44s}
+  .home.is-diving .cage{transform:scale(15);opacity:0}
   .home__name{margin-top:24px;font-size:21px;font-weight:720;letter-spacing:-.02em;color:var(--hi);
     transition:opacity .3s ease}
   .home__mori{margin-top:8px;font-size:18px;font-weight:250;letter-spacing:.11em;color:var(--hi);
@@ -32,7 +32,7 @@
   .home.is-diving .home__name,.home.is-diving .home__mori,.home.is-diving .home__hint{opacity:0}
 
   /* ── STATE B: inside the card ──────────────────────────────────────── */
-  .inside{position:fixed;inset:0;z-index:5;opacity:0;transition:opacity .5s ease .32s}
+  .inside{position:fixed;inset:0;z-index:5;opacity:0;transition:opacity .55s ease .42s}
   .inside.is-open{opacity:1}
   .in-scroll{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
     background:
@@ -180,6 +180,8 @@
   .msn b{font-weight:680;color:var(--hi)}
   .msn .msn__c{color:var(--clar)}
   .msn .msn__k{color:var(--cons)}
+  .msn__alt{margin:14px auto 0;max-width:34ch;text-align:center;font-size:11.5px;
+    line-height:1.5;color:var(--lo)}
 
   /* time since creation, now a stat among the stats */
   .tsc{border-radius:14px;padding:18px;background:var(--fill);box-shadow:var(--inset)}
@@ -937,8 +939,9 @@
 
       <!-- THE MISSION AS ONE HUMAN SENTENCE: the pillars live inside it as colour -->
       <p class="msn">You want <b class="msn__c">100 paying users</b>, and 9 are in.
-        Today you <b>message ten people who fit the product</b>.
+        Today asks one thing: <b>message ten people who fit the product</b>.
         You have shown up <b class="msn__k">17 of the 24 days</b>.</p>
+      <p class="msn__alt">After the mark it reads: Today you messaged ten people. The mark is made.</p>
 
       <h2 class="in-flowh">Progress so far</h2>
 
@@ -1112,20 +1115,128 @@
         <p class="in-vowline">&ldquo;This is the one I do not quit.&rdquo;<span>promised this morning</span></p>
       </header>
 
-      <div class="bigup">
-        <div class="bigup__d">Day <b>1</b></div>
-        <div class="bigup__u">and <span id="inD0live">11h 17m 16s</span></div>
-      </div>
+      <p class="msn">You want <b class="msn__c">100 paying users</b>, and 0 are in.
+        Today asks one thing: <b>make the first move</b>.
+        You have shown up <b class="msn__k">0 of the 1 days</b>, so far.</p>
 
-      <p class="d0line">The ledger opens with the first mark. That can be tonight.</p>
+      <h2 class="in-flowh">Progress so far</h2>
+
+      <div class="cpick"><div class="tsc">
+        <div class="tsc__n">0</div>
+        <div class="tsc__c">days since creation</div>
+        <div class="tsc__l">and <span id="inD0live">11h 17m 16s</span></div>
+      </div></div>
+
+      <div class="cpick"><div class="vol-total">
+  <div class="vol-total__n">0</div>
+  <div class="vol-total__cap">total marks on the record</div>
+  <div class="vol-total__rows">
+    <div class="vol-total__row"><span>Actions completed</span><b>0</b></div>
+    <div class="vol-total__row"><span>Deep work sessions</span><b>0</b></div>
+    <div class="vol-total__row"><span>Notes and reflections</span><b>0</b></div>
+  </div>
+</div></div>
+      <div class="cpick"><div class="vol-deep">
+  <div class="vol-deep__n">0 hours</div>
+  <div class="vol-deep__cap">of deep work</div>
+  <div class="vol-deep__bar" aria-hidden="true"></div>
+  <div class="vol-deep__raw">No sessions yet</div>
+</div></div>
+      <div class="cpick"><div class="rec-board"><div class="rec-board__t">Records</div><div class="rec-board__r"><div class="rec-board__a"><span>Longest run</span><b>0 days</b></div><div class="rec-board__b">Not set yet.</div></div><div class="rec-board__r"><div class="rec-board__a"><span>Best week</span><b>0 of 7</b></div><div class="rec-board__b">Not set yet.</div></div><div class="rec-board__r"><div class="rec-board__a"><span>Biggest day</span><b>0 marks</b></div><div class="rec-board__b">Not set yet.</div></div><div class="rec-board__r"><div class="rec-board__a"><span>First mark</span><b>today</b></div><div class="rec-board__b">Waiting on the first mark.</div></div><div class="rec-board__r"><div class="rec-board__a"><span>Comebacks</span><b>0</b></div><div class="rec-board__b">Nothing to come back from yet.</div></div></div></div>
+      <div class="cpick"><div class="rec-hold"><svg class="rec-hold__m" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg><div class="rec-hold__num">0</div><div class="rec-hold__unit">days in a row. Your longest, ever.</div><div class="rec-hold__rule"></div><div class="rec-hold__meta"><span>Not started</span><span>the first run starts today</span></div></div></div>
+      <div class="cpick"><div class="cmb-wall">
+  <p class="cmb-wall__h">Comebacks</p>
+  <div class="cmb-wall__grid"></div>
+  <div class="cmb-wall__legend">
+    <span><i class="is-on"></i>0 marked</span>
+    <span><i class="is-back"></i>0 back</span>
+    <span><i class="is-off"></i>1 blank</span>
+  </div>
+  <p class="cmb-wall__f">The first cell fills tonight or it does not. Either way it gets recorded.</p>
+</div></div>
+      <div class="cpick"><div class="rec-months"><div class="rec-months__t">Every week so far</div><div class="rec-months__chart"><span style="height:43%" class="low"></span><span style="height:71%"></span><span style="height:86%" class="top"></span><span style="height:57%" class="now"></span></div><div class="rec-months__ax"><i>Jul 15</i><i>Jul 22</i><i>Jul 29</i><i>Aug 5</i></div><div class="rec-months__c">Week one starts now. The bars appear as you do.</div></div></div>
 
       <h2 class="in-flowh in-flowh--sub" data-sub="Remember, you will die.">Mori</h2>
-      <div class="d0wks">
-        <canvas id="inWeeksD0" aria-label="an 80 year life in weeks, none on the path yet"></canvas>
-        <p class="d0wks__cap">The filled ones are spent either way. The first green cell is this week, if you make it one.</p>
-      </div>
+      <div class="cpick"><div class="amb-weeks">
+  <canvas class="amb-weeks__cv" width="652" height="274"></canvas>
+  <div class="amb-weeks__rows">
+    <div class="amb-weeks__r"><b>1,179</b><span>weeks behind you</span></div>
+    <div class="amb-weeks__r"><b class="amb-weeks__g">0</b><span>of them went into this</span></div>
+    <div class="amb-weeks__r"><b>2,996</b><span>left, if the guess of eighty years holds</span></div>
+  </div>
+  <p class="amb-weeks__p">Each dot is one week. The white one is this week.</p>
+</div></div>
+      <div class="cpick"><div class="mor-remaining">
+  <p class="mor-remaining__t">What is left, counted six ways.</p>
+  <div class="mor-remaining__r"><span>Days</span><b>21,267</b></div>
+  <div class="mor-remaining__r"><span>Weeks</span><b>3,038</b></div>
+  <div class="mor-remaining__r"><span>Months</span><b>699</b></div>
+  <div class="mor-remaining__r"><span>Saturdays</span><b>3,037</b></div>
+  <div class="mor-remaining__r"><span>Summers</span><b>60</b></div>
+  <div class="mor-remaining__r"><span>Birthdays</span><b>60</b></div>
+  <p class="mor-remaining__f">One assumption, 80 years. Change it and every row moves.</p>
+</div></div>
+
+      <div class="cpick"><div class="lst">
+        <p class="lst__q">If you see your parents twice a year, you will see them about <b>60</b> more times.</p>
+        <p class="lst__f">An estimate, from the ages you gave. The visits are the only part you control.</p>
+      </div></div>
+      <div class="cpick"><div class="mor-oneday">
+  <p class="mor-oneday__t">Today, hour by hour.</p>
+  <div class="mor-oneday__row"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <p class="mor-oneday__f"><span>0</span> hours gone, <span>24</span> to go. This is one of the 20,967.</p>
+</div></div>
+
+      <p class="in-exline">Most of these days you will not remember. The marked ones get to stay.</p>
 
       <h2 class="in-flowh in-flowh--sub" data-sub="Remember, to live.">Vivere</h2>
+
+      <p class="in-exline">You cannot make a wrong mark on a canvas headed for the void. So make the painting beautiful.</p>
+
+      <div class="viv-dream">
+        <p class="viv-dream__q">&ldquo;I run the thing I built. The work is hard and it is mine. My people can point at something real and say he made that.&rdquo;</p>
+        <p class="viv-dream__d">The dream, written this morning</p>
+        <p class="viv-dream__g">Get to 100 paying users. Signed the same morning.</p>
+      </div>
+      <div class="cpick"><div class="wrd-span">
+  <div class="wrd-span__row">
+    <div class="wrd-span__meta">The first thing you type will be kept here.</div>
+    <p class="wrd-span__q">Nothing yet.</p>
+  </div>
+  <div class="wrd-span__gap"><i></i><span>day 1</span><i></i></div>
+  <div class="wrd-span__row">
+    <div class="wrd-span__meta">The latest will sit here, facing it.</div>
+    <p class="wrd-span__q">Nothing yet.</p>
+  </div>
+</div></div>
+      <div class="cpick"><div class="wrd-hardest">
+  <div class="wrd-hardest__head">The hard days will be written here, in your own words, when they come.</div>
+  <ol class="wrd-hardest__list">
+    <li class="wrd-hardest__item"><div class="wrd-hardest__date">someday</div><p class="wrd-hardest__q">Empty, for now.</p></li>
+    <li class="wrd-hardest__item"><div class="wrd-hardest__date">someday</div><p class="wrd-hardest__q">Empty, for now.</p></li>
+    
+  </ol>
+</div></div>
+      <div class="cpick"><div class="amb-threads">
+  <div class="amb-threads__t">
+    <div class="amb-threads__l">Get to 100 paying users</div>
+    <div class="amb-threads__bar" style="width:100%"><i></i></div>
+    <div class="amb-threads__s">open, signed this morning, day 1, at 0 of 100</div>
+  </div>
+  <div class="amb-threads__t">
+    
+    
+    <div class="amb-threads__s"></div>
+  </div>
+  <div class="amb-threads__t">
+    
+  </div>
+</div></div>
+
+      <div class="viv-wall">
+        <button class="viv-wall__add" type="button">Add a note or a photo</button>
+      </div>
+
       <div class="in-seal">
         <div class="in-seal__hd">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
@@ -1264,7 +1375,10 @@ if(modeBtn){
     modeBtn.textContent=brd?'Middle: dark':'Middle: the face';
   });
 }
+var _diving=false;
 document.getElementById('homeCage').addEventListener('click',function(){
+  if(_diving)return; _diving=true;
+  setTimeout(function(){_diving=false;},1400);
   inside.hidden=false;
   inside.classList.remove('rim-done');
   requestAnimationFrame(function(){requestAnimationFrame(function(){
