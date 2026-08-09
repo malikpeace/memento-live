@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Your Color — the real Memento card</title>
+<title>Your Color: the real Memento card</title>
 
 <!-- THE APP'S OWN STYLESHEETS. Every card below is the real .daycard-ns
      element from the running app, not a lookalike. -->
@@ -606,7 +606,7 @@
   <button id="markTint" type="button">Tinted M</button>
 </div>
 <div class="wrap">
-  <h1>Your Color — on the actual card</h1>
+  <h1>Your Color: on the actual card</h1>
   <p class="lede">Every card on this page is the app's real <code style="font-size:12px;opacity:.7">.daycard-ns</code> element, the same markup and the same three stylesheets the running app uses. Nothing is redrawn. The only thing that changes per person is <code style="font-size:12px;opacity:.7">--mm-hue</code>, the card's own hue-rotation variable, which the app already supports.</p>
   <p class="miss" id="miss">The app stylesheets did not load. Open this page from the repo (mockups/) or the live mirror so <code>../memento-app/css/</code> resolves.</p>
 
@@ -621,7 +621,7 @@
   <div class="gen">
     <input id="nameIn" placeholder="Type a name…" value="Malik Peace" autocomplete="off">
     <div class="swatchline"><span class="swatch" id="sw"></span>
-      <span><span class="colorname" id="cname">—</span> <span id="chex" style="opacity:.6"></span></span>
+      <span><span class="colorname" id="cname">·</span> <span id="chex" style="opacity:.6"></span></span>
     </div>
   </div>
   <div class="row" id="yourRow"></div>
@@ -871,8 +871,8 @@ function renderYour(){
   document.getElementById('chex').textContent='drift '+(sk.rot>0?'+':'')+sk.rot+'\u00b0';
   document.getElementById('yourRow').innerHTML =
     realCard({'--clar':'1','--act':'.52','--cons':'.92','--mix':'.6','--lit':'1','--glow':'.6','--emit':'.6','--ring':'.45','--sat':'1.9'},
-      {cap:'The card as it ships — everyone', name:'Memento'})
-    + realCard(skinVars(sk), {cls:'skin '+(sk.cls||''), cap:`Theirs — ${sk.n}`, name:name, sub:sk.n+' \u00b7 one of one'});
+      {cap:'The card as it ships: everyone', name:'Memento'})
+    + realCard(skinVars(sk), {cls:'skin '+(sk.cls||''), cap:`Theirs: ${sk.n}`, name:name, sub:sk.n+' \u00b7 one of one'});
   renderFounder(name, sk);
 }
 
@@ -886,7 +886,7 @@ const CROWD=['Ava','Jordan Cole','Sofia M','Darius','Lena Park','Theo','Maya R',
   const cards=SKINS.map((sk,i)=>{
     const nm=CROWD[i % CROWD.length];
     return realCard(skinVars(Object.assign({}, sk, {rot:0})),
-      {cls:'skin '+(sk.cls||''), cap:`${nm} — ${sk.n}`, name:nm, sub:sk.n});
+      {cls:'skin '+(sk.cls||''), cap:`${nm}: ${sk.n}`, name:nm, sub:sk.n});
   });
   row.innerHTML = cards.slice(0,12).join('');
   const tier2=document.createElement('div');
@@ -908,10 +908,10 @@ function renderFounder(name, sk){
     '--face':'linear-gradient(165deg,#f2f5fa,#e6ebf3)','--mark':'#4b535f','--ink':'rgba(34,40,50,.8)',
     '--o1':'.7','--o2':'.6','--o3':'.6','--o4':'.5'});
   document.getElementById('founderRow').innerHTML =
-    realCard(platinum, {cls:'skin', cap:'A \u00b7 Platinum founder — their colour under the flood', name:name, num:num, sub:'Founder \u00b7 one of one'})
-    + realCard(obsidian, {cls:'skin', cap:'B · Obsidian founder — their colour is the only light', name:name, num:num, sub:'Founder \u00b7 one of one'})
+    realCard(platinum, {cls:'skin', cap:'A \u00b7 Platinum founder: their colour under the flood', name:name, num:num, sub:'Founder \u00b7 one of one'})
+    + realCard(obsidian, {cls:'skin', cap:'B · Obsidian founder: their colour is the only light', name:name, num:num, sub:'Founder \u00b7 one of one'})
     + realCard(Object.assign({}, skinVars(SKINS[4]), {'--rim-op':'1'}),
-        {cls:'skin', cap:'C · Void founder — black, the rim, the number', name:name, num:num, sub:'First two hundred'});
+        {cls:'skin', cap:'C · Void founder: black, the rim, the number', name:name, num:num, sub:'First two hundred'});
 }
 
 
@@ -963,19 +963,19 @@ function codeGrid(seedName, cols){
 
 document.getElementById('heroRow').innerHTML =
   shellCard('<span class="therm-bloom"></span><span class="therm-field"></span>',
-    {cap:'Thermal — heat signature', name:'Malik Peace', sub:'thermal',
+    {cap:'Thermal: heat signature', name:'Malik Peace', sub:'thermal',
      face:'#010206', mark:'rgba(4,7,24,.96)', ink:'rgba(210,230,255,.85)',
      edge:'rgba(120,170,255,.4)', halo:'rgba(60,110,255,.24)'})
   + shellCard('<span class="therm-bloom" style="opacity:.7"></span><span class="therm-field" style="--therm-blur:16px"></span>',
-    {cap:'Thermal, soft — the same field, bloomed', name:'Malik Peace', sub:'thermal',
+    {cap:'Thermal, soft: the same field, bloomed', name:'Malik Peace', sub:'thermal',
      face:'#02030a', mark:'rgba(255,255,255,.97)', ink:'rgba(214,232,255,.85)',
      edge:'rgba(160,200,255,.45)', halo:'rgba(90,150,255,.3)'})
   + shellCard(codeGrid('Malik Peace', 26),
-    {cap:'Code Blue — the data grid', name:'Malik Peace', sub:'code blue',
+    {cap:'Code Blue: the data grid', name:'Malik Peace', sub:'code blue',
      face:'#000003', mark:'rgba(190,245,255,.98)', ink:'rgba(150,200,255,.8)',
      edge:'rgba(90,150,255,.4)', halo:'rgba(40,60,255,.26)'})
   + shellCard(codeGrid('Ava Chen', 34),
-    {cap:'Code Blue, fine — a different person, denser read', name:'Ava Chen', sub:'code blue',
+    {cap:'Code Blue, fine: a different person, denser read', name:'Ava Chen', sub:'code blue',
      face:'#000003', mark:'rgba(190,245,255,.98)', ink:'rgba(150,200,255,.8)',
      edge:'rgba(90,150,255,.4)', halo:'rgba(40,60,255,.26)'});
 
@@ -1016,11 +1016,11 @@ document.getElementById('heroRow').innerHTML =
 
 document.getElementById('heroRow').insertAdjacentHTML('beforeend',
   shellCard('<span class="therm-ring therm-ring--glow"></span>' + thermalM(80,.5) + '<span class="therm-ring"></span>',
-    {cap:'Thermal M — the field IS the mark', name:'Malik Peace', sub:'thermal',
+    {cap:'Thermal M: the field IS the mark', name:'Malik Peace', sub:'thermal',
      face:'#010207', mark:'', ink:'rgba(186,210,255,.8)',
      extra:'--rim-op:0;', edge:'rgba(110,160,255,.34)', halo:'rgba(60,110,255,.18)', hideMark:true})
   + shellCard('<span class="therm-ring therm-ring--glow" style="opacity:.4"></span>' + thermalM(62,.3) + '<span class="therm-ring" style="opacity:.85"></span>',
-    {cap:'Thermal M, deeper — smaller core, darker room', name:'Malik Peace', sub:'thermal',
+    {cap:'Thermal M, deeper: smaller core, darker room', name:'Malik Peace', sub:'thermal',
      face:'#000103', mark:'', ink:'rgba(150,180,235,.7)',
      extra:'--rim-op:0;', edge:'rgba(80,130,230,.24)', halo:'rgba(30,70,210,.1)', hideMark:true}));
 /* the original two thermals: take the room down a stop, per Malik */
@@ -1039,7 +1039,7 @@ document.getElementById('heroRow').insertAdjacentHTML('beforeend',
 
 /* ═══ THE MIXER ═══ 52 materials, and only what earns its place.
    PARKED (CSS kept, control hidden, cards render stock):
-     fin — Lacquer / Matte / Brushed metal / Iridescent / Frosted / Velvet.
+     fin: Lacquer / Matte / Brushed metal / Iridescent / Frosted / Velvet.
    Put its line back into AXES to bring it live again.
    DELETED: rim, grain, motion, lighting. */
 const AXES = [

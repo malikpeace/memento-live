@@ -1033,14 +1033,8 @@
     <div class="amb-threads__bar" style="width:100%"><i></i></div>
     <div class="amb-threads__s">open, signed July 15, day 24, at 9 of 100</div>
   </div>
-  <div class="amb-threads__t">
-    
-    
-    <div class="amb-threads__s"></div>
-  </div>
-  <div class="amb-threads__t">
-    
-  </div>
+  
+  
 </div></div>
 
       <div class="cpick"><div class="wrd-span">
@@ -1074,11 +1068,11 @@
       <div class="in-seal is-locked" id="seal">
         <div class="in-seal__hd">
           <svg class="seal-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path class="seal-shackle" d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
-          <span>Sealed July 15, day one</span>
+          <span>Sealed July 15, after your first action</span>
         </div>
 
         <div class="seal-shut">
-          <p class="seal-shut__l">The note you wrote before day one.</p>
+          <p class="seal-shut__l">The note you wrote after your first action.</p>
           <button class="seal-hold" id="sealHold" type="button">
             <span class="seal-hold__fill"></span>
             <span class="seal-hold__t">Hold to open</span>
@@ -1111,7 +1105,7 @@
       <header class="in-head">
         <svg class="in-mark" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
         <p class="in-title">Your Memento</p>
-        <p class="in-count">21267:16:41:52</p>
+        <p class="in-count">20991:16:41:52</p>
         <p class="in-vowline">&ldquo;This is the one I do not quit.&rdquo;<span>promised this morning</span></p>
       </header>
 
@@ -1223,14 +1217,8 @@
     <div class="amb-threads__bar" style="width:100%"><i></i></div>
     <div class="amb-threads__s">open, signed this morning, day 1, at 0 of 100</div>
   </div>
-  <div class="amb-threads__t">
-    
-    
-    <div class="amb-threads__s"></div>
-  </div>
-  <div class="amb-threads__t">
-    
-  </div>
+  
+  
 </div></div>
 
       <div class="viv-wall">
@@ -1437,7 +1425,7 @@ document.querySelectorAll('.in-flowh--sub').forEach(function(h){
   btn.addEventListener('click',function(){
     on=!on;
     col0.hidden=on; col1.hidden=!on;
-    btn.textContent=on?'Back to day 300':'What day one looks like';
+    btn.textContent=on?'Back to day 24':'What day one looks like';
     if(cage){
       cage.innerHTML=realCard(matVars(MATS[0],{clar:!on,act:!on,cons:!on}),{name:'Malik Peace'});
       if(on)document.body.classList.remove('ns-bloom');else document.body.classList.add('ns-bloom');
