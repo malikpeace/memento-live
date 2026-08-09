@@ -1,0 +1,391 @@
+<style>
+.chambers{
+  --bg:#050609;
+  --hi:#eef2fb;
+  --mid:rgba(238,242,251,.78);
+  --lo:rgba(238,242,251,.42);
+  --clar:#3ad9f5;
+  --cons:#3fd94e;
+  --act:#eef2fb;
+
+  position:relative;
+  width:100%;
+  max-width:350px;
+  margin:0 auto;
+  height:100vh;
+  overflow-y:auto;
+  overflow-x:hidden;
+  background:var(--bg);
+  color:var(--hi);
+  font:400 16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  font-variant-numeric:tabular-nums;
+  -webkit-font-smoothing:antialiased;
+  scroll-snap-type:y mandatory;
+  scroll-behavior:smooth;
+  scrollbar-width:none;
+}
+.chambers::-webkit-scrollbar{width:0;height:0}
+
+/* ---------- a room ---------- */
+.chambers .room{
+  position:relative;
+  min-height:78vh;
+  padding:0 30px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  scroll-snap-align:center;
+  scroll-snap-stop:always;
+}
+.chambers .room--tall{min-height:92vh}
+.chambers .room--short{min-height:56vh}
+
+/* the only ornament: rooms surface as you walk into them */
+.chambers .room > *{opacity:1}
+@supports (animation-timeline:view()){
+  @media (prefers-reduced-motion:no-preference){
+    .chambers .room > *{
+      animation:chSurface linear both;
+      animation-timeline:view();
+      animation-range:entry 8% cover 34%;
+    }
+    .chambers .room > *:nth-child(2){animation-range:entry 14% cover 40%}
+    .chambers .room > *:nth-child(3){animation-range:entry 20% cover 46%}
+    .chambers .room > *:nth-child(4){animation-range:entry 24% cover 50%}
+  }
+}
+@keyframes chSurface{
+  from{opacity:0;transform:translateY(14px)}
+  to{opacity:1;transform:none}
+}
+
+/* ---------- type ---------- */
+.chambers .huge{
+  font-size:clamp(76px,27vw,124px);
+  line-height:.86;
+  letter-spacing:-.045em;
+  font-weight:600;
+  color:var(--act);
+}
+.chambers .big{
+  font-size:clamp(52px,17vw,78px);
+  line-height:.9;
+  letter-spacing:-.035em;
+  font-weight:600;
+  color:var(--act);
+}
+.chambers .under{
+  margin-top:20px;
+  font-size:17px;
+  line-height:1.45;
+  color:var(--mid);
+  max-width:22ch;
+}
+.chambers .over{
+  margin-bottom:22px;
+  font-size:17px;
+  line-height:1.45;
+  color:var(--mid);
+  max-width:22ch;
+}
+.chambers .tiny{
+  margin-top:16px;
+  font-size:13.5px;
+  line-height:1.5;
+  color:var(--mid);
+  max-width:26ch;
+}
+.chambers .say{
+  font-size:23px;
+  line-height:1.42;
+  font-weight:500;
+  letter-spacing:-.015em;
+  color:var(--hi);
+  max-width:19ch;
+}
+.chambers .said{
+  font-size:20px;
+  line-height:1.5;
+  font-weight:450;
+  color:var(--hi);
+  max-width:21ch;
+}
+.chambers .name{
+  font-size:19px;
+  font-weight:500;
+  letter-spacing:-.01em;
+  color:var(--hi);
+}
+.chambers .mark{
+  font-size:15px;
+  font-weight:500;
+  letter-spacing:.02em;
+  color:var(--mid);
+}
+.chambers .cons{color:var(--cons)}
+.chambers .clar{color:var(--clar)}
+
+/* ---------- doorway: a room that only holds a movement's name ---------- */
+.chambers .door{
+  min-height:70vh;
+  gap:0;
+}
+.chambers .door .word{
+  font-size:30px;
+  font-weight:500;
+  letter-spacing:-.02em;
+  color:var(--hi);
+}
+.chambers .door .line{
+  width:1px;
+  height:64px;
+  margin:26px 0;
+  background:linear-gradient(180deg,transparent,rgba(238,242,251,.34),transparent);
+}
+.chambers .door .note{
+  font-size:15.5px;
+  color:var(--mid);
+  max-width:20ch;
+  line-height:1.5;
+}
+
+/* ---------- opening seal ---------- */
+.chambers .seal{
+  width:78px;height:78px;
+  display:block;
+  margin-bottom:34px;
+}
+.chambers .seal circle{
+  fill:none;
+  stroke:rgba(238,242,251,.22);
+  stroke-width:1;
+}
+.chambers .seal path{
+  fill:none;
+  stroke:var(--hi);
+  stroke-width:5;
+  stroke-linecap:square;
+  stroke-linejoin:miter;
+}
+
+/* ---------- the record bar (promise) ---------- */
+.chambers .bar{
+  position:relative;
+  width:180px;
+  height:3px;
+  margin-top:34px;
+  border-radius:2px;
+  background:rgba(238,242,251,.10);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+}
+.chambers .bar i{
+  position:absolute;
+  inset:0 auto 0 0;
+  width:9%;
+  border-radius:2px;
+  background:var(--clar);
+  box-shadow:0 0 18px rgba(58,217,245,.5);
+}
+
+/* ---------- the run of days ---------- */
+.chambers .days{
+  display:grid;
+  grid-template-columns:repeat(8,1fr);
+  gap:9px;
+  width:196px;
+  margin-top:34px;
+}
+.chambers .days span{
+  aspect-ratio:1;
+  border-radius:3px;
+  background:rgba(238,242,251,.09);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+}
+.chambers .days span.on{
+  background:var(--cons);
+  box-shadow:0 0 14px rgba(63,217,78,.42);
+}
+
+/* ---------- the weeks of a life ---------- */
+.chambers .weeks{
+  display:grid;
+  grid-template-columns:repeat(24,1fr);
+  gap:3px;
+  width:246px;
+  margin-top:34px;
+}
+.chambers .weeks span{
+  aspect-ratio:1;
+  border-radius:.5px;
+  background:rgba(238,242,251,.07);
+}
+.chambers .weeks span.lived{background:rgba(238,242,251,.34)}
+.chambers .weeks span.path{
+  background:var(--cons);
+  box-shadow:0 0 7px rgba(63,217,78,.75);
+}
+
+/* ---------- the falling number ---------- */
+.chambers .falls{
+  margin-top:18px;
+  font-size:13px;
+  color:var(--lo);
+}
+.chambers .glow-clar{text-shadow:0 0 46px rgba(58,217,245,.30)}
+.chambers .glow-cons{text-shadow:0 0 46px rgba(63,217,78,.28)}
+
+/* ---------- closing ---------- */
+.chambers .end{
+  min-height:88vh;
+  padding-bottom:64px;
+}
+</style>
+
+<div class="chambers">
+
+  <!-- ══════════ the door in ══════════ -->
+  <section class="room room--tall">
+    <svg class="seal" viewBox="0 0 100 100" aria-hidden="true">
+      <circle cx="50" cy="50" r="38"/>
+      <path d="M33 64 V38 L50 53 L67 38 V64"/>
+    </svg>
+    <div class="mark">Memento</div>
+    <div class="name" style="margin-top:10px">Malik Peace</div>
+    <div class="tiny">Opened July 15, 2026 at 6:42 in the morning. Still open.</div>
+  </section>
+
+  <section class="room">
+    <div class="huge">24</div>
+    <div class="under">days since you started keeping this.</div>
+  </section>
+
+  <!-- ══════════ movement one ══════════ -->
+  <section class="room door">
+    <div class="word">Progress so far</div>
+    <div class="line"></div>
+    <div class="note">Everything below already happened. None of it can be taken back.</div>
+  </section>
+
+  <section class="room">
+    <div class="over">Days carrying a mark</div>
+    <div class="huge cons glow-cons">17</div>
+    <div class="under">out of 24. Seven days are blank, and the record survived them.</div>
+    <div class="days">
+      <span class="on"></span><span class="on"></span><span></span><span class="on"></span><span></span><span class="on"></span><span></span><span class="on"></span>
+      <span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span></span><span class="on"></span><span class="on"></span>
+      <span class="on"></span><span></span><span class="on"></span><span></span><span></span><span class="on"></span><span class="on"></span><span class="on"></span>
+    </div>
+  </section>
+
+  <section class="room">
+    <div class="huge">21</div>
+    <div class="under">actions finished. Each one was a decision made while tired.</div>
+  </section>
+
+  <section class="room">
+    <div class="big">31</div>
+    <div class="under">marks in total.</div>
+    <div class="tiny">21 actions. 7 notes. 3 records.</div>
+  </section>
+
+  <section class="room">
+    <div class="over">Longest run</div>
+    <div class="huge cons glow-cons">6</div>
+    <div class="under">days without a gap, July 22 to July 27.</div>
+  </section>
+
+  <section class="room">
+    <div class="big cons">3</div>
+    <div class="under">days in the run you are standing in right now.</div>
+  </section>
+
+  <section class="room">
+    <div class="huge">2</div>
+    <div class="under">times you stopped and came back.</div>
+    <div class="tiny">You have never quit this.</div>
+  </section>
+
+  <section class="room">
+    <div class="over">Deep work</div>
+    <div class="big">9</div>
+    <div class="under">hours, across 6 sessions.</div>
+    <div class="tiny">840 words written down.</div>
+  </section>
+
+  <section class="room">
+    <div class="over">Biggest day</div>
+    <div class="say">July 24. Four marks in one day.</div>
+    <div class="tiny">The first mark of all of them landed July 15 at 6:42 AM.</div>
+  </section>
+
+  <!-- ══════════ movement two ══════════ -->
+  <section class="room door">
+    <div class="word">Mori</div>
+    <div class="line"></div>
+    <div class="note">The other number. It does not wait for you.</div>
+  </section>
+
+  <section class="room">
+    <div class="over">Days lived</div>
+    <div class="huge">8,254</div>
+    <div class="under">and every one of them is already spent.</div>
+  </section>
+
+  <section class="room room--tall">
+    <div class="over">Days left, if the average holds</div>
+    <div class="huge">20,967</div>
+    <div class="falls">This is the only number here that falls.</div>
+  </section>
+
+  <section class="room room--tall">
+    <div class="over">Weeks</div>
+    <div class="say">1,179 spent of 4,175.</div>
+    <div class="weeks">
+      <span class="lived"></span><span class="lived"></span><span class="lived"></span><span class="lived"></span><span class="lived"></span><span class="lived"></span><span class="lived"></span><span class="lived"></span><span class="lived"></span><span class="lived"></span><span class="lived"></span><span class="lived"></span><span class="lived"></span><span class="lived"></span><span class="lived"></span><span class="lived"></span><span class="lived"></span><span class="lived"></span><span class="lived"></span><span class="lived"></span><span class="lived"></span><span class="lived"></span><span class="lived"></span><span class="lived"></span>
+      <span class="lived"></span><span class="lived"></span><span class="lived"></span><span class="lived"></span><span class="lived"></span><span class="lived"></span><span class="lived"></span><span class="lived"></span><span class="lived"></span><span class="lived"></span><span class="lived"></span><span class="lived"></span><span class="lived"></span><span class="lived"></span><span class="path"></span><span class="path"></span><span class="path"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <div class="tiny">One life, drawn to scale. The green is the part you have given to this.</div>
+  </section>
+
+  <section class="room">
+    <div class="big cons glow-cons">3</div>
+    <div class="under">weeks of a finite life spent walking this path on purpose.</div>
+  </section>
+
+  <!-- ══════════ movement three ══════════ -->
+  <section class="room door">
+    <div class="word">Vivere</div>
+    <div class="line"></div>
+    <div class="note">What you told yourself you were doing all of this for.</div>
+  </section>
+
+  <section class="room room--tall">
+    <div class="over">Written July 15</div>
+    <div class="said">I run the thing I built. The work is hard and it is mine. My people can point at something real and say he made that.</div>
+  </section>
+
+  <section class="room">
+    <div class="over">One promise, still open</div>
+    <div class="say clar">Get to 100 paying users</div>
+    <div class="bar"><i></i></div>
+    <div class="tiny">Signed July 15. Standing at 9 of 100.</div>
+  </section>
+
+  <section class="room">
+    <div class="over">You wrote this on July 28</div>
+    <div class="said">Wanted to quit at 3pm and did not.</div>
+  </section>
+
+  <!-- ══════════ the way out ══════════ -->
+  <section class="room end">
+    <div class="say">You are 24 days in, and the record is still going up.</div>
+    <div class="tiny">Close this and go put one more mark in it.</div>
+  </section>
+
+</div>
