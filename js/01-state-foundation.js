@@ -7,7 +7,7 @@
    ONCE on mismatch. Kills the "phone silently runs old cached js under a new
    index" class (the SW's offline fallback can serve stale files on a bad
    connection; Malik hit this three times in one day). */
-window.MEMENTO_JS_BUILD = 'v1149';
+window.MEMENTO_JS_BUILD = 'v1150';
 /* ============================================
    STATE MANAGEMENT
    ============================================ */
@@ -1366,8 +1366,12 @@ function normalizeClaritySummary(source = {}) {
   const timeHorizon = trimText(source.timeHorizon || source.when || source.deadline || '', 48);
   const anchor = trimText(source.anchor || source.anchorWord || '', 28);
   const intensity = trimText(source.intensity || '', 20);
+  // v1150: the goal's taxonomy shape rides the summary untouched; the sync
+  // box (js/08 ccGoalShape) validates its fields itself.
+  const goalShape = (source.goalShape && typeof source.goalShape === 'object') ? source.goalShape : null;
   const hasRealResult = !!neutronStar && !/didn.?t get deep enough/i.test(neutronStar);
   return {
+    goalShape,
     hasRealResult,
     neutronStar,
     whatDetail,

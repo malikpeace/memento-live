@@ -3800,6 +3800,670 @@ function ccFaceGraph(view, wide) {
   } catch (e) { return ''; }
 }
 
+/* ============================================================================
+   THE SYNC BOX (v1150). SYNC-BOX-SPEC.md + GOAL-TAXONOMY.md are the contract;
+   mockups/sync-box.html is the face spec of record, ported verbatim with
+   sample data swapped for state. The goal's TYPE selects which three faces
+   render; faces unlock as data accrues. Laws: pillar purity, holds confirm in
+   the evening, rest days are never misses, up-only history, one accent per
+   face, no eyebrows, no em dashes.
+   Every builder returns HTML or null; null falls back to the legacy face so a
+   classification gap can never brick the home. */
+
+// The goal's shape: the AI field first (clarity.answers.goalShape, written by
+// synthesis from v1150 on), else a modest client fallback so accounts that
+// signed before the field existed still get situation faces. The fallback
+// NEVER invents a deadline; deadline faces need the AI's word.
+function ccGoalShape() {
+  try {
+    const ans = (state.clarity && state.clarity.answers) || {};
+    const star = String(ans.neutronStar || '').trim();
+    if (!star) return null;
+    const gp = (typeof ensureGoalTarget === 'function') ? ensureGoalTarget() : (state.goalProgress || null);
+    const ai = (ans.goalShape && typeof ans.goalShape === 'object') ? ans.goalShape : null;
+    const s = star.toLowerCase();
+    let type = ai && ai.type ? String(ai.type) : '';
+    const T = ['quantity_up', 'quantity_down', 'frequency', 'maintenance', 'milestone', 'open'];
+    if (T.indexOf(type) === -1) type = '';
+    if (!type) {
+      // the vow test can't run client-side; these words approximate it
+      if (/\b(stay|remain|never|quit|stop|sober|clean|no more|don'?t\s|do not\s|keep (it |myself |them )?(under|below|off))\b/.test(s)) type = 'maintenance';
+      else if (/\b\d+\s*(?:x|times?)\s*(?:a|per)\s*(?:day|week|month)\b|\b(daily|every (day|morning|night|week))\b/.test(s)) type = 'frequency';
+      else if (gp && gp.target !== null) type = /\b(lose|drop|cut|reduce|under|below|down to|pay off|debt)\b/.test(s) ? 'quantity_down' : 'quantity_up';
+      else if (/\b(pass|graduate|launch|publish|finish|complete|marathon|buy a (house|home)|get (the|a) (job|degree|offer))\b/.test(s)) type = 'milestone';
+      else type = 'open';
+    }
+    // deadline: ISO date string from the AI only
+    let deadline = null, deadlineText = '';
+    if (ai && ai.deadline && /^\d{4}-\d{2}-\d{2}$/.test(String(ai.deadline))) {
+      const d = new Date(ai.deadline + 'T00:00:00');
+      if (isFinite(d) && d > new Date()) { deadline = d; deadlineText = String(ai.deadlineText || ''); }
+    }
+    // cadence: sessions per week, for frequency goals
+    let cadence = 0;
+    if (ai && isFinite(Number(ai.cadence))) cadence = Math.max(0, Math.min(7, Number(ai.cadence)));
+    if (!cadence && type === 'frequency') {
+      const m = s.match(/(\d+)\s*(?:x|times?)\s*(?:a|per)\s*week/);
+      if (m) cadence = Math.max(1, Math.min(7, parseInt(m[1], 10)));
+      else if (/\b(daily|every (day|morning|night))\b/.test(s)) cadence = 7;
+      else cadence = 3;
+    }
+    // verb decides the done control; holds confirm in the evening
+    let verb = ai && ai.verb ? String(ai.verb) : '';
+    if (['ship', 'attempt', 'rep', 'hold', 'check'].indexOf(verb) === -1) verb = (type === 'maintenance') ? 'hold' : 'ship';
+    return {
+      type: type, dir: type === 'quantity_down' ? 'down' : 'up',
+      target: gp && gp.target !== null ? gp.target : (ai && isFinite(Number(ai.target)) ? Number(ai.target) : null),
+      unit: (gp && gp.unit) || (ai && ai.unit) || '',
+      deadline: deadline, deadlineText: deadlineText,
+      cadence: cadence, verb: verb, star: star
+    };
+  } catch (e) { return null; }
+}
+
+function ccSituation(shape) {
+  if (!shape) return '';
+  if (shape.type === 'quantity_up' || shape.type === 'quantity_down') return shape.deadline ? 'ndl' : 'n';
+  if (shape.type === 'maintenance') return 'rule';
+  if (shape.type === 'frequency') return 'rate';
+  if (shape.type === 'milestone') return 'event';
+  return 'open';
+}
+
+// day one: the day-one face set renders until a real mark exists
+function ccSyncDayOne() {
+  try { return (consistencyStats().totalActiveDays || 0) === 0; } catch (e) { return false; }
+}
+
+function ccSyncFmtDate(d) {
+  try { return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); } catch (e) { return ''; }
+}
+
+// days since the star was signed (day 1 = the signing day). Accounts from
+// before completedAt existed fall back to their first recorded proof.
+function ccSyncDayN() {
+  try {
+    let t0 = Number(state.clarity && state.clarity.completedAt) || 0;
+    if (!t0) {
+      // earliest day in the consistency record
+      const counts = consistencyStats().counts || {};
+      const days = Object.keys(counts).sort();
+      if (days.length) t0 = Date.parse(days[0] + 'T00:00:00');
+    }
+    if (!t0 || !isFinite(t0)) return 1;
+    return Math.max(1, Math.floor((Date.now() - t0) / 86400000) + 1);
+  } catch (e) { return 1; }
+}
+
+// pace and projected arrival from the goalProgress pulses.
+// Returns null until two pulses exist on different days.
+function ccSyncPace(shape) {
+  try {
+    const gp = state.goalProgress;
+    if (!gp || gp.target === null || !Array.isArray(gp.history) || gp.history.length < 2) return null;
+    const h = gp.history;
+    const first = h[0], last = h[h.length - 1];
+    const span = Math.max(1, Math.round((new Date(last.day) - new Date(first.day)) / 86400000));
+    const moved = (last.value - first.value) * (shape.dir === 'down' ? -1 : 1);
+    if (moved <= 0) return { perDay: 0, arrival: null, shiftDays: 0, weekDelta: 0, moved: moved, span: span };
+    const perDay = moved / span;
+    const remaining = Math.max(0, Math.abs(shape.target - last.value));
+    const days = Math.ceil(remaining / perDay);
+    const arrival = new Date(Date.now() + days * 86400000);
+    // the same projection computed a week ago, for "sooner than a week ago"
+    let shiftDays = 0;
+    const wk = new Date(Date.now() - 7 * 86400000);
+    const hOld = h.filter(p => new Date(p.day) <= wk);
+    if (hOld.length >= 2) {
+      const lo = hOld[hOld.length - 1];
+      const spanO = Math.max(1, Math.round((new Date(lo.day) - new Date(hOld[0].day)) / 86400000));
+      const movedO = (lo.value - hOld[0].value) * (shape.dir === 'down' ? -1 : 1);
+      if (movedO > 0) {
+        const perDayO = movedO / spanO;
+        const remO = Math.max(0, Math.abs(shape.target - lo.value));
+        const arrO = new Date(new Date(lo.day).getTime() + Math.ceil(remO / perDayO) * 86400000);
+        shiftDays = Math.round((arrO - arrival) / 86400000);
+      }
+    }
+    // this week's movement
+    let weekDelta = 0;
+    const recent = h.filter(p => new Date(p.day) > wk);
+    if (recent.length) weekDelta = (last.value - (hOld.length ? hOld[hOld.length - 1].value : first.value)) * (shape.dir === 'down' ? -1 : 1);
+    return { perDay: perDay, arrival: arrival, shiftDays: shiftDays, weekDelta: weekDelta, moved: moved, span: span };
+  } catch (e) { return null; }
+}
+
+// weekly kept-day counts, most recent first: [{kept, days:[bool x7 Mon..Sun], partial}]
+function ccSyncWeeks(maxWeeks) {
+  try {
+    const counts = consistencyStats().counts || {};
+    const out = [];
+    const now = new Date();
+    const dow = (now.getDay() + 6) % 7; // Mon=0
+    const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dow);
+    for (let w = 0; w < maxWeeks; w++) {
+      const days = []; let kept = 0;
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(monday.getTime() - w * 7 * 86400000 + i * 86400000);
+        const iso = d.toISOString().slice(0, 10);
+        const on = !!(counts[iso] && consistencyDayHasMainAction(counts[iso]));
+        days.push(on); if (on) kept++;
+      }
+      out.push({ kept: kept, days: days, partial: w === 0 });
+    }
+    return out;
+  } catch (e) { return []; }
+}
+
+// the shared done control: the app's one deliberate gesture (3s hold) wearing
+// the mockup button. bindHomeActionHold finds it by class.
+function ccSyncDoneBtn(label) {
+  return '<button class="a-btn cc-hold-complete" data-cc-action="didit" type="button" aria-label="Hold for three seconds to mark complete">' +
+    '<span class="cc-hold-complete__fill" aria-hidden="true"></span>' +
+    '<span class="cc-hold-complete__label">' + esc(label || 'Mark it done') + '</span></button>';
+}
+function ccSyncDoneState() {
+  return '<div class="cc-completed-action" role="status" style="margin-top:14px;">Completed</div>';
+}
+
+// holds confirm in the EVENING. Before 5pm the button is a promise, not a control.
+function ccSyncHoldControl(doneToday) {
+  if (doneToday) return '<div class="cc-completed-action" role="status" style="margin-top:14px;">Held</div>';
+  const hr = new Date().getHours();
+  if (hr < 17) {
+    return '<button class="a-btn a-btn--wait" type="button" disabled>Confirm tonight</button>' +
+      '<p class="a-note">Opens at 5pm. A rule cannot be finished at lunch.</p>';
+  }
+  return ccSyncDoneBtn('Confirm the day held');
+}
+
+/* ---- the faces --------------------------------------------------------- */
+
+// ACTION. "What do I do right now, and how?" One backward line max.
+function ccSyncFaceAction(shape, sit, d1) {
+  const pa = (state.action && state.action.primaryAction) || {};
+  const tiers = pa.tiers || {};
+  const TK = ['tiny', 'light', 'moderate', 'heavy', 'extreme'];
+  const selT = state.action && state.action.selectedTier;
+  const tier = TK.indexOf(selT) >= 0 ? selT : pa.recommendedTier;
+  const loopNext = (!actionDoneToday() && state.action.loop && String(state.action.loop.chained || state.action.loop.nextAction || '').trim()) || '';
+  const move = loopNext || (tiers[tier] || tiers[pa.recommendedTier] || pa.title || '').trim();
+  if (!move) return null;
+  const how = String(pa.howToStart || pa.recommendedWhy || '').trim();
+  const done = actionDoneToday();
+
+  if (sit === 'rule' || (sit === 'ndl' && shape.verb === 'hold')) {
+    // The rule, tonight / The rule for today (hold form)
+    return '<div class="v v-nf"><p class="a-move">' + esc(move) + '</p>' +
+      (how ? '<p class="a-sup">' + esc(how) + '</p>' : '') +
+      ccSyncHoldControl(done) + '</div>';
+  }
+  if (sit === 'rate') {
+    // The scheduled move: the session named plainly, and where the week stands
+    const wk = ccSyncWeeks(1)[0];
+    const kept = wk ? wk.kept : 0;
+    const cad = shape.cadence || 3;
+    const sup = d1 ? ('0/' + cad + ' this week. First one today.')
+      : (Math.min(kept, cad) + '/' + cad + ' this week.');
+    return '<div class="v v-nf"><p class="a-move">' + esc(move) + '</p>' +
+      '<p class="a-sup">' + esc(sup) + '</p>' +
+      (done ? ccSyncDoneState() : ccSyncDoneBtn('Mark it done')) + '</div>';
+  }
+  if (sit === 'event') {
+    // The part: which act they are in, and today's move inside it.
+    // Parts come from the first project's milestones; no parts = the plain move.
+    const pj = (state.action && Array.isArray(state.action.projects) && state.action.projects[0]) || null;
+    const ms = (pj && Array.isArray(pj.milestones) && pj.milestones.length >= 2) ? pj.milestones : null;
+    if (ms) {
+      const idx = Math.max(0, ms.findIndex(m => !m.done));
+      const cur = idx === -1 ? ms.length - 1 : idx;
+      const segs = ms.slice(0, 5).map((m, i) => {
+        const cls = i < cur ? ' v-today-n-act__seg--done' : (i === cur ? ' v-today-n-act__seg--now' : '');
+        return '<div class="v-today-n-act__seg' + cls + '"><i></i><b>' + esc(String(m.title || '').split(' ').slice(0, 2).join(' ')) + '</b></div>';
+      }).join('');
+      return '<div class="v v-today-n-act">' +
+        '<div class="v-today-n-act__top"><span class="v-today-n-act__goal">' + esc(shape.star) + '</span>' +
+        '<span class="v-today-n-act__count">part ' + (cur + 1) + ' of ' + ms.length + '</span></div>' +
+        '<div class="v-today-n-act__rail">' + segs + '</div>' +
+        '<div class="v-today-n-act__lab">Today</div>' +
+        '<div class="v-today-n-act__move">' + esc(move) + '</div>' +
+        (done ? ccSyncDoneState() : ccSyncDoneBtn('Mark it done')) + '</div>';
+    }
+    // fall through to the plain move face
+  }
+  // The move, ready / First thirty seconds / event-without-parts / ndl ship
+  return '<div class="v v-nf"><p class="a-move">' + esc(move) + '</p>' +
+    (how ? '<div class="a-how">' + esc(how) + '</div>' : '') +
+    (done ? ccSyncDoneState() : ccSyncDoneBtn('Mark it done')) + '</div>';
+}
+
+// CLARITY. "What am I chasing, why, and where do I stand?"
+function ccSyncFaceClarity(shape, sit, d1) {
+  const ans = (state.clarity && state.clarity.answers) || {};
+  const why = String(ans.coreWhy || ans.whyItMatters || '').trim();
+  const star = shape.star;
+  const gp = state.goalProgress || {};
+
+  if (sit === 'ndl') {
+    // The arithmetic: remaining / weeks = rate a week, then today's rule
+    if (shape.target === null || !shape.deadline) return null;
+    const cur = gp.current !== null && gp.current !== undefined ? gp.current : (gp.baseline !== null ? gp.baseline : null);
+    const remaining = cur === null ? shape.target : Math.max(0, Math.abs(shape.target - cur));
+    const weeks = Math.max(1, Math.round((shape.deadline - new Date()) / (7 * 86400000)));
+    const rate = remaining / weeks;
+    const rateTxt = (rate >= 10 ? Math.round(rate) : Math.round(rate * 10) / 10);
+    const unit = esc(shape.unit || '');
+    // climbing from zero reads as the target itself; only a real distance
+    // gets the Down/Up prefix
+    const goalLine = (shape.dir === 'down'
+      ? 'Down ' + remaining.toLocaleString() + (unit ? ' ' + unit : '')
+      : (cur === null || cur === 0
+        ? shape.target.toLocaleString() + (unit ? ' ' + unit : '')
+        : 'Up ' + remaining.toLocaleString() + (unit ? ' ' + unit : ''))) +
+      ' by ' + ccSyncFmtDate(shape.deadline);
+    const pace = ccSyncPace(shape);
+    let foot = 'If the number stalls for three weeks, this gets re-derived.';
+    if (pace && pace.moved > 0 && gp.history.length) {
+      foot = pace.moved.toLocaleString() + (unit ? ' ' + unit : '') + (shape.dir === 'down' ? ' down' : ' gained') + ' since ' + ccSyncFmtDate(new Date(gp.history[0].day)) + '. If it stalls for three weeks, this number gets re-derived.';
+    }
+    if (d1) {
+      return '<div class="v v-nf"><p class="a-sup" style="margin:0">' + esc(goalLine) + '</p>' +
+        '<p class="c-star" style="margin-top:8px">' + remaining.toLocaleString() + (unit ? ' ' + unit : '') + ' &divide; ' + weeks + ' weeks = ' + rateTxt + ' a week</p>' +
+        (why ? '<p class="c-why">' + esc(why) + '</p>' : '') +
+        '<p class="c-meta">Day 1. The plan exists before any history does.</p></div>';
+    }
+    return '<div class="v v-math">' +
+      '<div class="v-math__goal">' + esc(goalLine) + '</div>' +
+      '<div class="v-math__eq">' +
+      '<span class="v-math__n">' + remaining.toLocaleString() + (unit ? ' ' + unit : '') + '</span>' +
+      '<span class="v-math__o">/</span>' +
+      '<span class="v-math__n">' + weeks + ' weeks</span>' +
+      '<span class="v-math__o">=</span>' +
+      '<span class="v-math__n v-math__n--lit">' + rateTxt + ' a week</span></div>' +
+      '<div class="v-math__foot">' + esc(foot) + '</div></div>';
+  }
+  if (sit === 'n') {
+    // Distance to the number
+    if (shape.target === null) return null;
+    const cur = (gp.current !== null && gp.current !== undefined) ? gp.current : 0;
+    if (d1 || gp.current === null) {
+      return '<div class="v v-nf"><p class="c-star">' + esc(star) + '</p>' +
+        (why ? '<p class="c-why">' + esc(why) + '</p>' : '') +
+        '<p class="d-foot">Day ' + ccSyncDayN() + '. The counter moves when the number does.</p></div>';
+    }
+    const pct = Math.max(0, Math.min(100, Math.round((shape.dir === 'down'
+      ? (gp.baseline !== null && gp.baseline !== shape.target ? (gp.baseline - cur) / (gp.baseline - shape.target) : 0)
+      : cur / shape.target) * 100)));
+    const pace = ccSyncPace(shape);
+    const delta = pace && pace.weekDelta > 0 ? '+' + pace.weekDelta.toLocaleString() + ' this week' : '';
+    let foot = 'Day ' + ccSyncDayN() + '.';
+    if (pace && pace.arrival) foot = 'Day ' + ccSyncDayN() + '. At this pace you arrive <b>' + ccSyncFmtDate(pace.arrival) + '</b>.';
+    return '<div class="v v-star-star-distance">' +
+      '<p class="sd-star">' + esc(star) + '</p>' +
+      '<div class="sd-row"><span class="sd-big">' + cur.toLocaleString() + '</span>' +
+      '<span class="sd-of">of ' + shape.target.toLocaleString() + (shape.unit ? ' ' + esc(shape.unit) : '') + '</span>' +
+      (delta ? '<span class="sd-delta">' + esc(delta) + '</span>' : '') + '</div>' +
+      '<div class="sd-rail" aria-hidden="true"><span class="sd-fill" style="width:' + pct + '%"></span></div>' +
+      '<p class="sd-foot">' + foot + '</p></div>';
+  }
+  if (sit === 'rule') {
+    // The rule, signed: the rule, their why, and what breaking it costs
+    let daysHeld = 0;
+    try { daysHeld = consistencyStats().current || 0; } catch (e) {}
+    const cost = d1 || daysHeld === 0
+      ? 'Day ' + ccSyncDayN() + '. The cost of breaking it grows from here.'
+      : 'Breaking it costs ' + daysHeld.toLocaleString() + ' day' + (daysHeld === 1 ? '' : 's') + ' and the person who held them.';
+    return '<div class="v v-nf"><p class="c-star">' + esc(star) + '</p>' +
+      (why ? '<p class="c-why">' + esc(why) + '</p>' : '') +
+      '<p class="c-cost">' + esc(cost) + '</p></div>';
+  }
+  if (sit === 'rate') {
+    // The rate, signed
+    const since = state.clarity && state.clarity.completedAt ? ccSyncFmtDate(new Date(state.clarity.completedAt)) : '';
+    const meta = d1 ? 'Your word, as of today' : (since ? 'Your word, since ' + since : 'Your word.');
+    return '<div class="v v-nf"><p class="c-star">' + esc(star) + '</p>' +
+      (why ? '<p class="c-why">' + esc(why) + '</p>' : '') +
+      '<p class="c-meta">' + esc(meta) + '</p></div>';
+  }
+  if (sit === 'event') {
+    // The parts, when they exist; else the goal and the why
+    const pj = (state.action && Array.isArray(state.action.projects) && state.action.projects[0]) || null;
+    const ms = (pj && Array.isArray(pj.milestones) && pj.milestones.length >= 2) ? pj.milestones : null;
+    if (ms && !d1) {
+      const idx0 = ms.findIndex(m => !m.done);
+      const cur = idx0 === -1 ? ms.length - 1 : idx0;
+      const rows = ms.slice(0, 5).map((m, i) => {
+        const cls = m.done ? ' v-star-n-acts__act--done' : (i === cur ? ' v-star-n-acts__act--now' : ' v-star-n-acts__act--next');
+        return '<li class="v-star-n-acts__act' + cls + '">' +
+          '<span class="v-star-n-acts__mark"></span>' +
+          '<span class="v-star-n-acts__name">' + esc(m.title || '') + '</span>' +
+          '<span class="v-star-n-acts__when">' + (m.done && m.doneAt ? esc(ccSyncFmtDate(new Date(m.doneAt))) : (i === cur ? 'now' : '')) + '</span></li>';
+      }).join('');
+      return '<div class="v v-star-n-acts">' +
+        '<div class="v-star-n-acts__goal"><b style="font-size:16.5px;font-weight:700;color:var(--text-hi)">' + esc(star) + '</b></div>' +
+        '<ol class="v-star-n-acts__list">' + rows + '</ol></div>';
+    }
+    if (ms && d1) {
+      return '<div class="v v-nf"><p class="c-star" style="font-size:18px">' + esc(star) + '</p>' +
+        '<div style="margin-top:12px;font-size:15.5px;font-weight:680;color:var(--text-hi);letter-spacing:-.012em">' + ms.slice(0, 5).map(m => esc(String(m.title || '').split(' ').slice(0, 2).join(' '))).join(' &rarr; ') + '</div>' +
+        '<p class="d-foot">Part one began today. The whole path is known before any of it is walked.</p></div>';
+    }
+    // no parts: the goal and the why carry the face
+  }
+  // Evidence, no meter (open goals; also the event fallback)
+  let n = 0;
+  try { n = (state.proofEvents || []).filter(e => e && e.type !== 'distraction-log').length; } catch (e) {}
+  const since = state.clarity && state.clarity.completedAt ? ccSyncFmtDate(new Date(state.clarity.completedAt)) : '';
+  const meta = d1 ? 'Signed today. The evidence starts tonight.'
+    : (n > 0 ? n.toLocaleString() + ' thing' + (n === 1 ? '' : 's') + ' done in its name' + (since ? ' since ' + since : '') + '.' : (since ? 'Signed ' + since + '.' : ''));
+  return '<div class="v v-nf"><p class="c-star">' + esc(star) + '</p>' +
+    (why ? '<p class="c-why">' + esc(why) + '</p>' : '') +
+    (meta ? '<p class="c-meta">' + esc(meta) + '</p>' : '') + '</div>';
+}
+
+// CONSISTENCY. The only home of the past; always a number or a visual.
+function ccSyncFaceCons(shape, sit, d1) {
+  let cs = null;
+  try { cs = consistencyStats(); } catch (e) { cs = { current: 0, longest: 0, totalActiveDays: 0, counts: {} }; }
+  const gp = state.goalProgress || {};
+
+  // the stall override, numbered goals only: kept days meeting a flat number
+  if ((sit === 'n' || sit === 'ndl') && shape.target !== null && !d1) {
+    const stall = ccSyncStall(shape, cs);
+    if (stall) {
+      return '<div class="v v-consistency-not-moving">' +
+        '<p class="nm-hd">You kept every day. The number did not move.</p>' +
+        '<div class="nm-two">' +
+        '<span><b>' + stall.kept + '</b>of ' + stall.window + ' days kept</span>' +
+        '<span><b>' + stall.moved + '</b>' + esc((shape.unit || '') + ' in ' + stall.weeks + ' weeks') + '</span></div>' +
+        '<p class="nm-say">Something in the plan is wrong, not you.</p>' +
+        '<button class="nm-btn" data-cc-action="action" type="button">Redo the plan</button></div>';
+    }
+  }
+
+  if (sit === 'ndl') {
+    // Arrival, moving: the arrival date against the deadline they set
+    if (!shape.deadline) return null;
+    if (d1) {
+      const total = Math.max(1, Math.round((shape.deadline - new Date()) / 86400000));
+      return '<div class="v v-nf">' +
+        '<span class="d-big" style="font-size:48px">Day 1</span>' +
+        '<div class="pb" style="margin-top:14px"><i style="width:2%"></i></div>' +
+        '<p class="pb-l"><span>today</span><span>' + esc(ccSyncFmtDate(shape.deadline)) + '</span></p>' +
+        '<p class="d-foot" style="font-size:14px">Everything after this is record. ' + total.toLocaleString() + ' days on the clock.</p></div>';
+    }
+    const pace = ccSyncPace(shape);
+    if (!pace || !pace.arrival) {
+      // no pace yet: show the deadline holding still
+      const till = Math.max(0, Math.round((shape.deadline - new Date()) / 86400000));
+      return '<div class="v v-nf v-cdt"><span class="d-big">' + till.toLocaleString() + '</span><span class="d-lbl">days till your deadline</span>' +
+        '<p class="d-foot">' + (cs.totalActiveDays || 0).toLocaleString() + ' days shown up since you signed.' + (cs.longest ? ' Best run ' + cs.longest + '.' : '') + '</p></div>';
+    }
+    const diff = Math.round((shape.deadline - pace.arrival) / 86400000);
+    const line = diff >= 0 ? 'on pace to be ' + diff + ' day' + (diff === 1 ? '' : 's') + ' early'
+      : 'at this pace, ' + Math.abs(diff) + ' day' + (diff === -1 ? '' : 's') + ' past your date';
+    const pull = pace.shiftDays > 0 ? 'Last week&rsquo;s kept days pulled the arrival ' + pace.shiftDays + ' day' + (pace.shiftDays === 1 ? '' : 's') + ' earlier. ' : '';
+    return '<div class="v v-nf">' +
+      '<p class="a-sup" style="margin:0">Your deadline: ' + esc(ccSyncFmtDate(shape.deadline)) + '</p>' +
+      '<span class="d-big" style="font-size:38px;margin-top:8px">' + esc(ccSyncFmtDate(pace.arrival)) + '</span>' +
+      '<span style="margin-top:5px;font-size:13.5px;font-weight:650;color:' + (diff >= 0 ? '#3fd94e' : 'var(--text-mid)') + '">' + esc(line) + '</span>' +
+      '<p class="d-foot">' + pull + 'Miss days and this date walks back toward ' + esc(ccSyncFmtDate(shape.deadline)) + '.</p></div>';
+  }
+  if (sit === 'n') {
+    // Arrival date, projected; the pace made visible
+    if (shape.target === null) return null;
+    if (d1) {
+      return '<div class="v v-nf">' +
+        '<span class="d-big" style="font-size:40px">Day 1</span>' +
+        '<p class="a-move" style="font-size:15.5px;margin-top:8px">Tonight&rsquo;s move is the first mark.</p>' +
+        '<div style="margin:auto 0"><div class="pb"><i style="width:2%"></i></div>' +
+        '<p class="pb-l"><span>0</span><span>' + shape.target.toLocaleString() + (shape.unit ? ' ' + esc(shape.unit) : '') + '</span></p></div></div>';
+    }
+    const pace = ccSyncPace(shape);
+    if (!pace || !pace.arrival) {
+      // pace not talking yet: the record so far
+      return '<div class="v v-nf v-cdt"><span class="d-big">' + (cs.totalActiveDays || 0).toLocaleString() + '</span><span class="d-lbl">days shown up</span>' +
+        '<p class="d-foot">The arrival date appears when the number has moved twice.' + (cs.longest ? ' Best run ' + cs.longest + '.' : '') + '</p></div>';
+    }
+    const sooner = pace.shiftDays > 0 ? pace.shiftDays + ' days sooner than a week ago'
+      : (pace.shiftDays < 0 ? Math.abs(pace.shiftDays) + ' days later than a week ago' : 'holding steady');
+    return '<div class="v v-nf">' +
+      '<p class="a-sup" style="margin:0">Projected arrival</p>' +
+      '<span class="d-big" style="font-size:40px;margin-top:6px">' + esc(ccSyncFmtDate(pace.arrival)) + '</span>' +
+      '<span style="margin-top:5px;font-size:13.5px;font-weight:650;color:' + (pace.shiftDays >= 0 ? '#3fd94e' : 'var(--text-mid)') + '">' + esc(sooner) + '</span>' +
+      '<p class="d-foot">Projected from the pace you have kept. You set no deadline; this date is your pace talking.</p></div>';
+  }
+  if (sit === 'rule') {
+    // The hold record: the unbroken line, and nothing else
+    if (d1) {
+      return '<div class="v v-nf">' +
+        '<span class="d-big" style="font-size:48px">Day 1</span>' +
+        '<span style="margin-top:5px;font-size:14px;font-weight:600;color:rgba(var(--ink),.7)">more to come</span>' +
+        '<p class="d-foot" style="font-size:14px">Confirm this evening and the line exists.</p></div>';
+    }
+    const cur = cs.current || 0;
+    const best = Math.max(cs.longest || 0, cur);
+    const foot = cur > 0 && cur >= best ? 'Your longest ever. The line has never been this long.'
+      : 'Best ever: ' + best.toLocaleString() + '.';
+    return '<div class="v v-nf" style="align-items:center;text-align:center;justify-content:center">' +
+      '<span class="d-big" style="font-size:74px;letter-spacing:-.05em">' + cur.toLocaleString() + '</span>' +
+      '<span style="margin-top:2px;font-size:15px;font-weight:650;color:rgba(var(--ink),.8)">day' + (cur === 1 ? '' : 's') + ' unbroken</span>' +
+      '<p class="d-foot" style="margin-top:14px">' + esc(foot) + '</p></div>';
+  }
+  if (sit === 'rate') {
+    const cad = shape.cadence || 3;
+    if (d1) {
+      return '<div class="v v-nf">' +
+        '<span style="font-size:15px;font-weight:650;color:rgba(var(--ink),.9)"><b style="font-size:44px;font-weight:700;letter-spacing:-.04em;color:#3fd94e">0</b> of ' + cad + ', week one</span>' +
+        '<p class="d-foot" style="font-size:14px;margin-top:14px">' + (cad === 7 ? 'Seven' : ['One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven'][cad - 1]) + ' session' + (cad === 1 ? ' makes' : 's make') + ' a perfect first week. Rest days will not count against you.</p></div>';
+    }
+    const weeks = ccSyncWeeks(27);
+    const done = weeks.length ? weeks.slice(1) : [];
+    // eight weeks of record unlock the long adherence view
+    if (done.length >= 8) {
+      const shown = done.slice(0, 26).reverse();
+      const hit = shown.filter(w => w.kept >= cad).length;
+      const pct = Math.round(hit / shown.length * 100);
+      // longest run of weeks at plan
+      let run = 0, best = 0, bestEnd = -1;
+      shown.forEach((w, i) => { if (w.kept >= cad) { run++; if (run > best) { best = run; bestEnd = i; } } else run = 0; });
+      const bars = shown.map(w => {
+        const h = Math.max(0.12, Math.min(0.98, w.kept / Math.max(cad, 1) * 0.74));
+        return '<i' + (w.kept < cad ? ' class="lo"' : '') + ' style="--h:' + h.toFixed(2) + '"></i>';
+      }).join('');
+      return '<div class="v v-consistency-n-adhere">' +
+        '<div class="v-consistency-n-adhere__head">' +
+        '<div class="v-consistency-n-adhere__num">' + pct + '<span>%</span></div>' +
+        '<div class="v-consistency-n-adhere__lab">of weeks hit the schedule you set' +
+        '<span>' + hit + ' of ' + shown.length + ' weeks</span></div></div>' +
+        '<div class="v-consistency-n-adhere__chart"><div class="v-consistency-n-adhere__plan"></div>' + bars + '</div>' +
+        '<div class="v-consistency-n-adhere__foot">Longest run at plan: <b>' + best + ' week' + (best === 1 ? '' : 's') + '</b>.</div></div>';
+    }
+    // Your schedule, kept: this week against the plan
+    const wk = weeks[0] || { kept: 0, days: [false, false, false, false, false, false, false] };
+    const met = wk.kept >= cad;
+    const perfect = done.filter(w => w.kept >= cad).length;
+    const dots = wk.days.map(on => '<i class="' + (on ? 'on' : 'rest') + '"></i>').join('');
+    return '<div class="v v-consistency-cadence-week">' +
+      '<div class="cw-head"><span class="cw-n">' + Math.min(wk.kept, cad) + '</span><span class="cw-of">of ' + cad + ' this week</span>' +
+      (met ? '<span class="cw-tag">Done</span>' : '') + '</div>' +
+      '<div class="cw-days" aria-hidden="true">' + dots + '</div>' +
+      '<p class="cw-lbl"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></p>' +
+      '<p class="cw-foot">' + (perfect > 0 ? '<b>' + perfect + ' perfect week' + (perfect === 1 ? '' : 's') + '.</b> ' : '') + 'Rest days are not misses.</p></div>';
+  }
+  if (sit === 'event') {
+    // Days till, when a deadline exists
+    if (shape.deadline) {
+      const till = Math.max(0, Math.round((shape.deadline - new Date()) / 86400000));
+      const lbl = 'days till ' + (shape.deadlineText ? shape.deadlineText : ccSyncFmtDate(shape.deadline));
+      const foot = d1 ? 'Counting down to ' + ccSyncFmtDate(shape.deadline) + ', the date you set.'
+        : (cs.totalActiveDays || 0).toLocaleString() + ' days shown up since you signed.' + (cs.longest ? ' Best run ' + cs.longest + '.' : '');
+      return '<div class="v v-nf v-cdt"><span class="d-big">' + till.toLocaleString() + '</span><span class="d-lbl">' + esc(lbl) + '</span>' +
+        '<p class="d-foot">' + esc(foot) + '</p></div>';
+    }
+    // no date: what it is made of carries the past
+  }
+  // What it is made of (open goals; also the event-without-date fallback)
+  if (d1) {
+    return '<div class="v v-nf">' +
+      '<span style="font-size:15.5px;font-weight:650;color:rgba(var(--ink),.9)"><b style="font-size:46px;font-weight:700;letter-spacing:-.04em">1</b> good day, starting tonight</span>' +
+      '<p class="d-foot" style="font-size:14px;margin-top:14px">Open goals are built from evidence. Tonight is the first piece.</p></div>';
+  }
+  const mo = ccSyncMadeOf();
+  if (!mo || mo.total === 0 || mo.kinds < 2) {
+    // one action type so far: the first-thing framing holds until variety exists
+    const n = cs.totalActiveDays || 0;
+    return '<div class="v v-nf">' +
+      '<span style="font-size:15.5px;font-weight:650;color:rgba(var(--ink),.9)"><b style="font-size:46px;font-weight:700;letter-spacing:-.04em">' + n.toLocaleString() + '</b> good day' + (n === 1 ? '' : 's') + ' on record</span>' +
+      '<p class="d-foot" style="font-size:14px;margin-top:14px">Open goals are built from evidence. Every mark here is a piece.</p></div>';
+  }
+  const seg = (w, cls) => w > 0 ? '<i class="' + cls + '" style="width:' + w + '%"></i>' : '';
+  return '<div class="v v-consistency-made-of">' +
+    '<div class="mo-head">' +
+    '<span class="mo-num">' + (cs.current || 0).toLocaleString() + '</span>' +
+    '<span class="mo-unit">day' + ((cs.current || 0) === 1 ? '' : 's') + '<br>in a row</span>' +
+    '<span class="mo-win">last 30 days</span></div>' +
+    '<div class="mo-bar" role="img" aria-label="' + mo.moves + ' moves, ' + mo.notes + ' reflections, ' + mo.deep + ' deep work sessions in the last 30 days.">' +
+    seg(mo.movesPct, 'mo-a') + seg(mo.notesPct, 'mo-b') + seg(mo.deepPct, 'mo-c') + '</div>' +
+    '<div class="mo-key">' +
+    '<span><i class="mo-a"></i><b>' + mo.moves + '</b> moves</span>' +
+    '<span><i class="mo-b"></i><b>' + mo.notes + '</b> reflections</span>' +
+    '<span><i class="mo-c"></i><b>' + mo.deep + '</b> deep work</span></div></div>';
+}
+
+// typed proof in the last 30 days, for What it is made of
+function ccSyncMadeOf() {
+  try {
+    const ev = state.proofEvents || [];
+    const cut = Date.now() - 30 * 86400000;
+    let moves = 0, notes = 0, deep = 0;
+    ev.forEach(e => {
+      const t = e.ts || (e.iso ? Date.parse(e.iso) : 0);
+      if (!t || t < cut) return;
+      const k = String(e.type || '');
+      if (k === 'deepwork-commit') deep++;
+      else if (k === 'reflection-save') notes++;
+      else if (k === 'action-complete' || k === 'proof' || k === 'vivere') moves++;
+    });
+    const total = moves + notes + deep;
+    const kinds = (moves ? 1 : 0) + (notes ? 1 : 0) + (deep ? 1 : 0);
+    if (!total) return { total: 0, kinds: 0 };
+    return {
+      total: total, kinds: kinds, moves: moves, notes: notes, deep: deep,
+      movesPct: Math.round(moves / total * 100),
+      notesPct: Math.round(notes / total * 100),
+      deepPct: Math.round(deep / total * 100)
+    };
+  } catch (e) { return null; }
+}
+
+// stall: three weeks of mostly-kept days against a number that has not moved.
+// AUTO only where a number exists (the taxonomy's rule); never guesses.
+function ccSyncStall(shape, cs) {
+  try {
+    const gp = state.goalProgress;
+    if (!gp || gp.target === null || !Array.isArray(gp.history) || gp.history.length < 3) return null;
+    const cut = new Date(Date.now() - 21 * 86400000);
+    const recent = gp.history.filter(p => new Date(p.day) >= cut);
+    if (recent.length < 2) return null;
+    const span = Math.round((new Date(recent[recent.length - 1].day) - new Date(recent[0].day)) / 86400000);
+    if (span < 14) return null;
+    const moved = (recent[recent.length - 1].value - recent[0].value) * (shape.dir === 'down' ? -1 : 1);
+    const expected = Math.abs(shape.target - (gp.baseline !== null ? gp.baseline : 0)) * (span / 180);
+    if (moved > Math.max(expected * 0.15, Math.abs(shape.target) * 0.02)) return null;
+    // and the days were kept
+    const counts = cs.counts || {};
+    let kept = 0, window = 0;
+    for (let i = 1; i <= 21; i++) {
+      const iso = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
+      window++;
+      if (counts[iso] && consistencyDayHasMainAction(counts[iso])) kept++;
+    }
+    if (kept / window < 0.6) return null;
+    return { kept: kept, window: window, weeks: 3, moved: Math.round(moved * 10) / 10 };
+  } catch (e) { return null; }
+}
+
+// One deck height for the whole face set: the tallest of the three faces,
+// measured offscreen at the card's real width, clamped to [212, 320]. Set as
+// --cc-deck-h on #commandCenter; the CSS falls back to the old 212 when the
+// legacy faces are showing.
+function ccSyncDeckHeight(cc) {
+  try {
+    if (!cc || cc.id !== 'commandCenter') return;
+    const card = cc.querySelector('.cc-card--pillars');
+    if (!card) { cc.style.removeProperty('--cc-deck-h'); return; }
+    const faces = ['action', 'clarity', 'consistency'].map(p => ccSyncFace(p)).filter(Boolean);
+    if (!faces.length) { cc.style.removeProperty('--cc-deck-h'); return; }
+    const probe = document.createElement('div');
+    probe.style.cssText = 'position:absolute;left:-9999px;top:0;width:' + card.clientWidth + 'px;visibility:hidden;pointer-events:none;';
+    faces.forEach(h => {
+      const sec = document.createElement('section');
+      sec.style.cssText = 'padding:22px 22px 20px;box-sizing:border-box;';
+      sec.innerHTML = h;
+      probe.appendChild(sec);
+    });
+    document.body.appendChild(probe);
+    let maxH = 0;
+    probe.querySelectorAll(':scope > section').forEach(s => { maxH = Math.max(maxH, s.offsetHeight); });
+    probe.remove();
+    const H = Math.max(212, Math.min(320, maxH + 26));
+    cc.style.setProperty('--cc-deck-h', H + 'px');
+  } catch (e) {}
+}
+
+// the entry point: the situation face for a pillar, or null for the legacy card
+function ccSyncFace(pillar) {
+  try {
+    const shape = ccGoalShape();
+    if (!shape) return null;
+    const sit = ccSituation(shape);
+    if (!sit) return null;
+    const d1 = ccSyncDayOne();
+    if (pillar === 'action') return ccSyncFaceAction(shape, sit, d1);
+    if (pillar === 'clarity') return ccSyncFaceClarity(shape, sit, d1);
+    if (pillar === 'consistency') return ccSyncFaceCons(shape, sit, d1);
+    return null;
+  } catch (e) { return null; }
+}
+
+// Back on rhythm: a frequency plan returning after a quiet stretch. The plan
+// asked for N a week, not seven, so the gap is named without shame.
+function ccSyncBackOnRhythm(shape) {
+  try {
+    if (!shape || shape.type !== 'frequency' || (shape.cadence || 7) >= 7) return null;
+    const cad = shape.cadence || 3;
+    const gap = (typeof comebackGapDays === 'function') ? comebackGapDays() : 0;
+    if (gap < 2) return null;
+    const weeks = ccSyncWeeks(2);
+    const rows = weeks.slice(0, 2).reverse().map((w, ri) => {
+      const label = ri === 0 ? 'Last week' : 'This week';
+      const todayIdx = (new Date().getDay() + 6) % 7;
+      const dots = w.days.map((on, i) => {
+        let cls = 'v-cad__d';
+        if (on) cls += ' v-cad__d--kept';
+        else if (ri === 1 && i === todayIdx) cls += ' v-cad__d--today';
+        else if (ri === 1 && i > todayIdx) cls += ' v-cad__d--open';
+        return '<i class="' + cls + '"></i>';
+      }).join('');
+      const ok = w.kept >= cad;
+      return '<div class="v-cad__wk"><span class="v-cad__wl">' + label + '</span>' +
+        '<span class="v-cad__dots">' + dots + '</span>' +
+        '<span class="v-cad__wc' + (ok ? ' v-cad__wc--ok' : '') + '">' + Math.min(w.kept, cad) + ' of ' + cad + '</span></div>';
+    }).join('');
+    const thisWk = weeks[0] || { kept: 0 };
+    const daysLeft = 7 - ((new Date().getDay() + 6) % 7) - 1;
+    const reachable = (cad - thisWk.kept) <= daysLeft;
+    return '<div class="v v-cad">' +
+      '<div class="v-cad__head">' + (gap === 2 ? 'Two' : gap === 3 ? 'Three' : gap === 4 ? 'Four' : gap === 5 ? 'Five' : gap === 6 ? 'Six' : gap) + ' quiet days.</div>' +
+      '<div class="v-cad__sub">Your plan asks for ' + cad + ' a week, not seven.</div>' +
+      '<div class="v-cad__weeks">' + rows + '</div>' +
+      '<div class="v-cad__foot">' + (reachable
+        ? daysLeft + ' day' + (daysLeft === 1 ? '' : 's') + ' left. ' + cad + ' is still reachable.'
+        : 'This week is short. Next week starts even.') + '</div></div>';
+  } catch (e) { return null; }
+}
+
 function renderCommandCenter() {
   try {
     // Seal closed days into the offering ledger (defined in js/02, loaded
@@ -3855,6 +4519,10 @@ function renderCommandCenter() {
     // their own small cards. v1104: offered from the star onward, not only
     // once there is a plan.
     if (_pillared && _ccPillar !== 'action') {
+      // v1150: the sync box. The goal's type picks the face; null falls back
+      // to the legacy card so a classification gap can never brick the home.
+      const _sf = ccSyncFace(_ccPillar);
+      if (_sf) return wrap(_sf + dots(_ccPillar));
       if (_ccPillar === 'clarity') {
         const a = (state.clarity && state.clarity.answers) || {};
         const star = String(a.neutronStar || '').trim();
@@ -3914,6 +4582,13 @@ function renderCommandCenter() {
     // show a calm, shame-free way back in instead of the normal "today's one
     // thing". Normal path below is unchanged when there is no gap.
     if (typeof isComebackGap === 'function' && isComebackGap()) {
+      // v1150: a frequency plan returning after a quiet stretch gets Back on
+      // rhythm (the gap named against THEIR cadence, not seven days) instead
+      // of the generic comeback card.
+      {
+        const _bor = ccSyncBackOnRhythm(ccGoalShape());
+        if (_bor) return wrap(_bor + dots('action'));
+      }
       // v1048 (Malik): the box stays quiet on a bad day. It names the gap,
       // says the kind thing, and offers ONE button; the choosing moved to
       // ComebackPicker on its own page. A home screen should never be busiest
@@ -3926,6 +4601,11 @@ function renderCommandCenter() {
         '<div style="display:flex;">' + primaryBtn('Keep going', 'comeback') + '</div>');
     }
 
+    // v1150: the sync box Action face. Null falls back to the shipped hero.
+    {
+      const _sfA = ccSyncFace('action');
+      if (_sfA) return wrap(_sfA + dots('action'));
+    }
     // honor the user's chosen intensity (Action picker or a coach shrink), the
     // same way the Action module does, so the home never contradicts it
     const _TK = ['tiny', 'light', 'moderate', 'heavy', 'extreme'];
@@ -4429,6 +5109,11 @@ function bindCommandCenter(cc) {
   // v812: the desktop editorial hero mirrors every command-center re-render
   // through this single chokepoint (guarded against self-recursion).
   try { if (cc && cc.id === 'commandCenter') renderDeskMission(); } catch (e) {}
+  // v1150: the sync faces are taller than the old 212px deck. One shared
+  // height still rules the swipe (v1083's law); it is measured ONCE per face
+  // set here, never per swipe, and clamped so a runaway line can never
+  // squeeze the Memento the way the old measured version did.
+  try { ccSyncDeckHeight(cc); } catch (e) {}
 
   /* v1051: swipe the phone card between the three pillars.
      Three gestures now live on this card (tap opens Action, hold completes,
