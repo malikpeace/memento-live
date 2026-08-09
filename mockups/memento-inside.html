@@ -169,6 +169,31 @@
   .vow{margin-top:46px;padding:20px 19px 17px;border-radius:16px;
     background:radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--clar) 11%, transparent), transparent 70%), var(--fill);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+  .in-vowline{margin-top:24px;text-align:center;font-size:17px;font-weight:650;
+    font-style:italic;letter-spacing:-.015em;line-height:1.4;color:var(--hi)}
+  .in-vowline span{display:block;margin-top:7px;font-size:12px;font-weight:600;
+    font-style:normal;color:var(--lo)}
+
+  /* the mission, right now: three pillars on one thread */
+  .gp{position:relative;margin-top:52px;padding:2px 0}
+  .gp::before{content:"";position:absolute;left:5px;top:18px;bottom:18px;width:1.5px;
+    background:linear-gradient(180deg, var(--clar), var(--act), var(--cons));opacity:.35}
+  .gp__r{position:relative;display:flex;gap:14px;align-items:flex-start;padding:10px 0}
+  .gp__d{flex:0 0 11px;height:11px;margin-top:4px;border-radius:50%}
+  .gp__d--clar{background:var(--clar);box-shadow:0 0 11px color-mix(in srgb, var(--clar) 65%, transparent)}
+  .gp__d--act{background:var(--act);box-shadow:0 0 11px color-mix(in srgb, var(--act) 55%, transparent)}
+  .gp__d--cons{background:var(--cons);box-shadow:0 0 11px color-mix(in srgb, var(--cons) 65%, transparent)}
+  .gp__r p{margin:0;font-size:14.5px;line-height:1.45;color:var(--mid)}
+  .gp__r b{display:block;font-size:12px;font-weight:680;color:var(--hi);margin-bottom:2px}
+
+  /* time since creation, now a stat among the stats */
+  .tsc{border-radius:14px;padding:18px;background:var(--fill);box-shadow:var(--inset)}
+  .tsc__n{font-size:46px;line-height:1;font-weight:800;letter-spacing:-.04em;color:var(--cons);
+    font-variant-numeric:tabular-nums}
+  .tsc__c{margin-top:8px;font-size:14px;color:var(--mid)}
+  .tsc__l{margin-top:5px;font-size:13px;color:var(--mid)}
+  .tsc__l span{color:var(--hi);font-weight:640;font-variant-numeric:tabular-nums}
+
   .vow{text-align:center}
   .vow__l{font-size:12px;font-weight:660;color:var(--clar)}
   .vow__q{margin-top:9px;font-size:24px;font-weight:740;letter-spacing:-.026em;line-height:1.22;color:var(--hi)}
@@ -912,25 +937,24 @@
       <header class="in-head">
         <svg class="in-mark" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
         <p class="in-title">Your Memento</p>
-        <p class="in-owner">Owner<b>Malik Peace</b></p>
         <p class="in-count">20967:16:41:52</p>
+        <p class="in-vowline">&ldquo;Get to 100 paying users.&rdquo;<span>July 15</span></p>
       </header>
 
-      <!-- THE AGE OF THE MEMENTO: the biggest number on the page -->
-      <div class="bigup">
-        <div class="bigup__d">Day <b>24</b></div>
-        <div class="bigup__u">and <span id="bigupLive">12h 30m 7s</span></div>
-      </div>
-
-      <!-- HOW FAR YOU'VE COME: stats and evidence -->
-      <div class="vow">
-        <p class="vow__l">The promise</p>
-        <p class="vow__q">Get to 100 paying users.</p>
-        <p class="vow__w">Because I am done building things nobody pays for.</p>
-        <p class="vow__d">Signed July 15, and not changed since.</p>
+      <!-- THE MISSION, RIGHT NOW: clarity, action, consistency, connected -->
+      <div class="gp">
+        <div class="gp__r"><i class="gp__d gp__d--clar"></i><p><b>Clarity</b>100 paying users. 9 are in.</p></div>
+        <div class="gp__r"><i class="gp__d gp__d--act"></i><p><b>Action</b>Today: message ten people who fit the product.</p></div>
+        <div class="gp__r"><i class="gp__d gp__d--cons"></i><p><b>Consistency</b>17 of 24 days. The run is 3.</p></div>
       </div>
 
       <h2 class="in-flowh">Progress so far</h2>
+
+      <div class="cpick"><div class="tsc">
+        <div class="tsc__n">24</div>
+        <div class="tsc__c">days since creation</div>
+        <div class="tsc__l">and <span id="bigupLive">12h 30m 7s</span></div>
+      </div></div>
       <div class="cpick"><div class="vol-total">
   <div class="vol-total__n">31</div>
   <div class="vol-total__cap">total marks on the record</div>
@@ -1091,20 +1115,13 @@
       <header class="in-head">
         <svg class="in-mark" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
         <p class="in-title">Your Memento</p>
-        <p class="in-owner">Owner<b>Malik Peace</b></p>
         <p class="in-count">21267:16:41:52</p>
+        <p class="in-vowline">&ldquo;Get to 100 paying users.&rdquo;<span>signed this morning</span></p>
       </header>
 
       <div class="bigup">
         <div class="bigup__d">Day <b>1</b></div>
         <div class="bigup__u">and <span id="inD0live">11h 17m 16s</span></div>
-      </div>
-
-      <div class="vow">
-        <p class="vow__l">The promise</p>
-        <p class="vow__q">Get to 100 paying users.</p>
-        <p class="vow__w">Because I am done building things nobody pays for.</p>
-        <p class="vow__d">Signed this morning. It does not change from here.</p>
       </div>
 
       <p class="d0line">The ledger opens with the first mark. That can be tonight.</p>
