@@ -7990,6 +7990,9 @@ const MementoEditor = (function () {
         '</div>' +
       '</div>';
 
+    // v1166: the accent row is only meaningful when the material is NOT
+    // driving the app's colour, so the surface carries that state.
+    ov.dataset.cardonly = (state.prefs && state.prefs.skinColorsApp === false) ? '1' : '0';
     // #app is the stacking context the card lives in, same reason as the record
     (document.getElementById('app') || document.body).appendChild(ov);
 
@@ -8015,6 +8018,7 @@ const MementoEditor = (function () {
         if (key === 'colorapp') {
           if (!state.prefs) state.prefs = {};
           state.prefs.skinColorsApp = b.getAttribute('data-v') === '1';
+          ov.dataset.cardonly = state.prefs.skinColorsApp ? '0' : '1';
         } else {
           if (!state.cardSkin) state.cardSkin = { id: '', ring: 0, mark: 0 };
           state.cardSkin[key] = b.getAttribute('data-v') === '1' ? 1 : 0;
@@ -8070,6 +8074,38 @@ const MementoEditor = (function () {
     settle();
   }
 
+  // v1166: the pose can land off AND then move again, because the home's own
+  // layout owner re-runs after the scroll lock and the same transform then
+  // points somewhere else. So the pose SNAPS itself: measure what actually
+  // rendered, correct, re-check a few times. Bounded, and every timer dies
+  // with the view.
+  function snap(tries) {
+    // runs from the moment it opens, not only once it settles: in a throttled
+    // tab the animation's finish can never fire, and the pose still has to be
+    // right. desiredOpen is the only truth here (the v1140 rule).
+    if (!desiredOpen) return;
+    const el = cardEl();
+    const face = el && (el.querySelector('.daycard-ns') || el.querySelector('.daycard-wrap'));
+    if (!el || !face) return;
+    try {
+      const cs = getComputedStyle(document.documentElement);
+      const want = (parseFloat(cs.getPropertyValue('--safe-t')) || 0) + 64;
+      const got = face.getBoundingClientRect();
+      const dy = Math.round(want - got.top);
+      const dx = Math.round(window.innerWidth / 2 - (got.left + got.width / 2));
+      if (Math.abs(dy) > 2 || Math.abs(dx) > 2) {
+        openT = openT.replace(/^translate\(([-\d.]+)px,\s*([-\d.]+)px\)/,
+          (m, x, y) => 'translate(' + (parseFloat(x) + dx).toFixed(2) + 'px,' + (parseFloat(y) + dy).toFixed(2) + 'px)');
+        el.style.transform = openT;
+      }
+      if (ov) ov.style.setProperty('--mfe-top', Math.round(want + face.getBoundingClientRect().height) + 'px');
+    } catch (e) {}
+    if (tries < 8) {
+      const t = setTimeout(() => snap(tries + 1), 110);
+      if (abort && abort.signal) abort.signal.addEventListener('abort', () => clearTimeout(t));
+    }
+  }
+
   function settle() {
     if (guard) { clearTimeout(guard); guard = null; }
     if (desiredOpen) {
@@ -8077,6 +8113,7 @@ const MementoEditor = (function () {
       if (anim) { try { anim.cancel(); } catch (e) {} anim = null; }
       const el = cardEl();
       if (el) { el.style.transformOrigin = '50% 50%'; el.style.transform = openT; }
+      snap(0);
       return;
     }
     phase = 'closed';
@@ -8099,17 +8136,28 @@ const MementoEditor = (function () {
     try { if (typeof MementoView !== 'undefined' && MementoView.isActive()) return; } catch (e) {}
     try { if (typeof ClarityPaywall !== 'undefined' && !ClarityPaywall.isPaid()) return; } catch (e) {}
     if (!build()) return;
-    if (phase === 'closed' && !measure()) { destroy(); return; }
     desiredOpen = true;
     phase = 'opening';
     const el0 = cardEl();
     if (el0) el0.style.transform = '';     // the animation owns it
+    // v1166: the open state changes the home's layout (the scroll lock alone
+    // moves it), so the pose MUST be measured with that state applied.
     document.body.classList.add('mfe-open');
     document.body.style.overflow = 'hidden';
+    void document.body.offsetHeight;
+    if (!measure()) {
+      document.body.classList.remove('mfe-open');
+      document.body.style.overflow = '';
+      desiredOpen = false; phase = 'closed'; destroy(); return;
+    }
     void ov.offsetWidth;
     ov.classList.add('is-open');
     try { navigator.vibrate && navigator.vibrate(8); } catch (e) {}
     drive();
+    // the home relayouts a beat after the scroll lock; the pose corrects
+    // itself across that window instead of trusting one measurement
+    const t0 = setTimeout(() => snap(0), DUR + 40);
+    if (abort && abort.signal) abort.signal.addEventListener('abort', () => clearTimeout(t0));
   }
 
   function close() {
@@ -9008,12 +9056,31 @@ function applyCardSkin(wrap) {
 // a chip is the same card, small and static (no aura, no bloom: at 62px the
 // halo is bigger than the card and every material reads white)
 function _skChipHtml(sk, id, label, pressed) {
+  // v1166 (Malik): the three colour blobs used to sit at the SAME spots on
+  // every tile, so 54 materials read as one template in 54 paints. Their
+  // positions now scatter per material, hashed from its own name, so the
+  // field looks alive and a given material always looks like itself.
+  let _h = 2166136261;
+  const _key = String((sk && sk.n) || id || 'stock');
+  for (let _i = 0; _i < _key.length; _i++) { _h ^= _key.charCodeAt(_i); _h = Math.imul(_h, 16777619); }
+  const _pick = (n, lo, hi) => {
+    let x = Math.imul(_h ^ (n * 2654435761), 2246822507);
+    x = (x ^ (x >>> 15)) >>> 0;
+    return Math.round(lo + (x % 1000) / 1000 * (hi - lo));
+  };
+  const _scatter = [
+    '--b1x:' + _pick(1, -22, 6) + '%', '--b1y:' + _pick(2, -16, 14) + '%',
+    '--b2x:' + _pick(3, -20, 4) + '%', '--b2y:' + _pick(4, 12, 46) + '%',
+    '--b3x:' + _pick(5, -8, 22) + '%', '--b3y:' + _pick(6, -20, 6) + '%'
+  ].join(';');
   const v = sk ? [
     '--sk1:' + (sk.sk1 || 'none'), '--sk2:' + (sk.sk2 || 'none'),
     '--sk3:' + (sk.sk3 || 'none'), '--sk4:' + (sk.sk4 || sk.sk1 || 'none'),
     '--plat-op:' + (sk.plat || '0'), '--face:' + (sk.face || '#0b0d12'),
-    '--mark:' + (sk.mark || 'rgba(244,246,250,.97)')
-  ].join(';') : '';
+    '--mark:' + (sk.mark || 'rgba(244,246,250,.97)'),
+    '--halo:' + (sk.sk1 || 'transparent'),   // the tile's own soft glow
+    _scatter
+  ].join(';') : _scatter;
   const cls = sk ? String(sk.cls || '').split(' ').filter(Boolean).map(c => 'sk-' + c).join(' ') : 'sk-stock';
   return '<button class="mfsk-chip" type="button" data-skin-id="' + esc(id) + '" aria-pressed="' + (pressed ? 'true' : 'false') + '">' +
     '<span class="mfsk-cage ' + cls + '" style="' + esc(v) + '">' +

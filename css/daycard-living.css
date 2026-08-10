@@ -769,9 +769,11 @@ body:not(.ns-bloom) .daycard-theme-living .daycard-ns__rim {
   contain: paint;
 }
 .mfsk-b { position: absolute; width: 70%; height: 55%; border-radius: 50%; filter: blur(9px); }
-.mfsk-b1 { left: -10%; top: -6%; background: var(--sk1, transparent); }
-.mfsk-b2 { right: -12%; top: 30%; background: var(--sk2, transparent); }
-.mfsk-b3 { left: 4%; bottom: -12%; background: var(--sk3, transparent); }
+/* v1166: positions come from the material's own hash (js/08 _skChipHtml), so
+   every tile mixes its colour differently. The fallbacks are the old spots. */
+.mfsk-b1 { left: var(--b1x, -10%); top: var(--b1y, -6%); background: var(--sk1, transparent); }
+.mfsk-b2 { right: var(--b2x, -12%); top: var(--b2y, 30%); background: var(--sk2, transparent); }
+.mfsk-b3 { left: var(--b3x, 4%); bottom: var(--b3y, -12%); background: var(--sk3, transparent); }
 /* the house chip: the shipped cyan + green, small */
 .mfsk-stock1 { left: -10%; top: -8%; background: rgba(58,217,245,0.85); }
 .mfsk-stock2 { right: -12%; bottom: -12%; background: rgba(63,217,78,0.8); }
