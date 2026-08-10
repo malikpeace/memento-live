@@ -4961,7 +4961,13 @@ Return ONLY the sentence text. No quotes, no labels.`;
       return;
     }
 
-    if (hasActionPlan() && actionPlanMatchesClarity()) {
+    // v1163 (Malik: "why does it take so long? why is this the thing that
+    // comes up after selecting a small action?"). A plan whose source star no
+    // longer matches used to fall THROUGH to auto-generation, so opening
+    // Action (from the comeback picker, say) silently started a multi-minute
+    // regeneration. Their plan is still their plan: show it. Rebuilding is a
+    // deliberate act, never a side effect of opening a screen.
+    if (hasActionPlan()) {
       // Night 3 (Malik's locked renders): the FIRST time the plan exists it
       // arrives as a SEQUENCE, not a flash: the verdict (their move judged on
       // their own numbers), the bridge (today -> this week -> the star), the
@@ -5360,8 +5366,21 @@ Return ONLY the sentence text. No quotes, no labels.`;
   // surface cannot rely on anything else to repaint it. Without this watcher
   // the loader could strand forever.
   _scramWatch(token, onPlan) {
+    // v1163: a hard ceiling on the WAIT. Each request already times out at
+    // 75s, but the retry chain (empty, parse, quality) can stack them into
+    // minutes of a screen that just churns. Past this, we stop waiting, kill
+    // the in-flight call and land on the honest try-again screen.
+    const WAIT_CEILING_MS = 100000;
+    const startedAt = Date.now();
     const watch = () => {
       if (!this.isOpen || this._narrowToken !== token) return;
+      if (actionAiLoading && Date.now() - startedAt > WAIT_CEILING_MS) {
+        try { if (aiAbortController) aiAbortController.abort(); } catch (e) {}
+        try { actionAiLoading = false; } catch (e) {}
+        if (!hasActionPlan()) actionChatError = 'The plan took too long to come back.';
+        this.renderContent();
+        return;
+      }
       if (!actionAiLoading) {
         const pa = (state.action && state.action.primaryAction) || {};
         const move = pa.title || (pa.tiers && pa.tiers[pa.recommendedTier || 'moderate']) || '';
