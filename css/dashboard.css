@@ -6407,3 +6407,16 @@ body.is-dormant .ambient{opacity:.35;transition:opacity 1.2s ease}
 #commandCenter .cb-wrap--sm .cb-line{font-size:clamp(18px, 5.4vw, 22px)}
 #commandCenter .cb-wrap--xs .cb-hi{font-size:clamp(19px, 5.7vw, 24px);margin-bottom:9px}
 #commandCenter .cb-wrap--xs .cb-line{font-size:clamp(17px, 4.9vw, 20px)}
+/* v1159 (Malik: "make sure the buttons are NEVER that big"): the legacy
+   .cc-hold-complete carries flex:1 1 100% for the old ROW layout. Inside a
+   face (a flex COLUMN) that made it grow into every spare pixel, so a short
+   face shipped a 123px slab. A button in a face never grows. */
+#commandCenter .v .a-btn,
+#commandCenter .v .cc-hold-complete,
+#commandCenter .v .nm-btn,
+#commandCenter .v .ht-btn {
+  flex: 0 0 auto !important;
+  align-self: stretch;
+  min-height: 0;
+  height: auto;
+}
