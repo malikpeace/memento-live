@@ -38,6 +38,67 @@
     step(ph);
   }
 
+  /* Accent confetti, the onboarding burst-and-shower mechanic tinted to the
+     user's Memento colour (Malik: one system, shades of their colour + white).
+     Fires only where a beat carries data-confetti, which the chooser reserves
+     for day-ladder hits and FINAL milestones, so it stays rare. Self-kills in
+     ~4.5s; skipped entirely under reduced motion. */
+  function confetti(ph){
+    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var cv = ph.querySelector('.cel-confetti');
+    if (!cv) { cv = document.createElement('canvas'); cv.className='cel-confetti'; ph.appendChild(cv); }
+    var ctx = cv.getContext('2d'); if (!ctx) return;
+    var dpr = Math.min(devicePixelRatio||1, 2), W = ph.clientWidth, H = ph.clientHeight;
+    cv.width = W*dpr; cv.height = H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+    var rgb = getComputedStyle(ph.closest('body')||document.body).getPropertyValue('--accent-rgb').trim() || '43,212,212';
+    var p = rgb.split(',').map(Number);
+    function sh(f){ return 'rgb('+p.map(function(c){ return Math.round(Math.min(255, c*f + (f>1 ? (f-1)*140 : 0))); }).join(',')+')'; }
+    var colors = [sh(1), sh(1.35), sh(.72), '#ffffff', sh(1.15)];
+    var parts = [], t0 = performance.now();
+    function burst(ox, oy, count){
+      for (var i=0;i<count;i++){
+        var ang = Math.random()*Math.PI*2, sp = 1.6+Math.random()*3.2;
+        parts.push({ x:ox, y:oy, vx:Math.cos(ang)*sp, vy:Math.sin(ang)*sp-1.4,
+          g:.02+Math.random()*.03, size:4+Math.random()*5, rot:Math.random()*6.28,
+          vr:(Math.random()-.5)*.18, color:colors[(Math.random()*colors.length)|0],
+          life:0, max:150+Math.random()*120, shape:Math.random()<.5?'r':'c' });
+      }
+    }
+    burst(W*.5, H*.42, 54);
+    var ver = (ph._cfVer = (ph._cfVer||0)+1);
+    (function tick(){
+      if (ph._cfVer !== ver || !cv.isConnected) return;
+      ctx.clearRect(0,0,W,H);
+      var live = 0, done = performance.now()-t0 > 4500;
+      for (var i=0;i<parts.length;i++){ var q=parts[i];
+        if (q.life>q.max || q.y>H+24) continue; live++;
+        q.life++; q.vy+=q.g; q.x+=q.vx; q.y+=q.vy; q.vx*=.992; q.rot+=q.vr;
+        var a = q.life>q.max-40 ? (q.max-q.life)/40 : 1;
+        ctx.globalAlpha = Math.max(0,a); ctx.fillStyle = q.color;
+        ctx.save(); ctx.translate(q.x,q.y); ctx.rotate(q.rot);
+        if (q.shape==='r') ctx.fillRect(-q.size/2,-q.size/3,q.size,q.size*.66);
+        else { ctx.beginPath(); ctx.arc(0,0,q.size/2,0,6.29); ctx.fill(); }
+        ctx.restore();
+      }
+      ctx.globalAlpha = 1;
+      if (!live || done) { ctx.clearRect(0,0,W,H); return; }
+      requestAnimationFrame(tick);
+    })();
+  }
+
+  /* Every screen carries the M (Malik: a screenshot should promote Memento),
+     injected here so it is impossible to double: phones whose art already
+     contains the mark get nothing. Lives on .ph, outside the cloned stage. */
+  function ensureMark(ph){
+    if (ph.querySelector('path[d^="M150 146"]')) return;
+    var s = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    s.setAttribute('viewBox','0 0 512 512'); s.setAttribute('class','mark--foot');
+    s.setAttribute('aria-hidden','true');
+    var path = document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d','M150 146 L256 252 L362 146 L362 366 L150 366 Z');
+    s.appendChild(path); ph.appendChild(s);
+  }
+
   function step(ph){
     clearTimeout(ph._t);
     if (ph._i >= 0 && ph._beats[ph._i]) ph._beats[ph._i].classList.remove('on');
@@ -46,6 +107,7 @@
     if (!b) { ph.classList.add('done'); return; }
     b.classList.add('on');
     [].forEach.call(b.querySelectorAll('[data-count]'), countUp);
+    if (b.hasAttribute('data-confetti')) confetti(ph);
     if (ph._i === ph._beats.length - 1) { ph.classList.add('done'); return; }
     ph._t = setTimeout(function(){ step(ph); }, T[ph._i] || 2000);
   }
@@ -53,6 +115,7 @@
   window.CEL = {
     init:function(){
       [].forEach.call(document.querySelectorAll('.ph'), function(ph){
+        ensureMark(ph);
         ph.addEventListener('click', function(){
           // tap advances; once finished, tap replays
           if (ph.classList.contains('done')) play(ph); else step(ph);

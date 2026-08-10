@@ -15,11 +15,14 @@
 @keyframes ms5Cost{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
 [data-c="ms-5"] .ms5-rule{width:36px;height:1px;background:rgba(235,238,248,.18);margin-bottom:20px}
+[data-c="ms-5"] .b--flood .ms5-word{color:#0b0e12}
+[data-c="ms-5"] .b--flood .ms5-stamp{color:rgba(11,14,18,.72)}
 </style>
 <div class="ph" data-c="ms-5">
   <div class="st">
 
-    <div class="b b1">
+    <div class="b b1 b--flood" data-confetti>
+      <svg class="flood-m" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
       <div class="ms5-word">You passed<br>the bar.</div>
       <div class="ms5-stamp">4:12pm</div>
     </div>
@@ -33,7 +36,6 @@
     <div class="b b3">
       <div class="ms5-rule"></div>
       <div class="deposit">On this day at <b>4:12pm</b>, <b>you passed the bar.</b></div>
-      <svg class="mark--foot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
     </div>
 
   </div>

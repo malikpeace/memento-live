@@ -47,36 +47,27 @@
   background:repeating-linear-gradient(112deg,
     rgba(255,255,255,.007) 0 1px, rgba(255,255,255,0) 1px 6px)}
 
-[data-c="rf-card"] .cd__m{width:64px;height:64px;fill:rgba(255,255,255,.22);
-  margin-bottom:16px;opacity:.5}
-[data-c="rf-card"] .b3.on .cd__m{animation:rfCardCatch 900ms ease-out .5s forwards}
-@keyframes rfCardCatch{0%{opacity:.5}52%{opacity:1}100%{opacity:1}}
+[data-c="rf-card"] .cd__m{fill:rgba(255,255,255,.30)}
 
-/* the cuts already in the card, and the one being made now. centred at the
-   foot so they read as marks in the material, not as a corner indicator. */
-[data-c="rf-card"] .cd__cuts{position:absolute;left:50%;bottom:22px;
-  transform:translateX(-50%);display:flex;align-items:flex-end;gap:9px}
-[data-c="rf-card"] .cd__cuts i{display:block;width:2px;height:12px;border-radius:1px;
-  background:rgba(255,255,255,.13);box-shadow:1px 0 0 rgba(0,0,0,.6)}
-[data-c="rf-card"] .cd__cuts i.new{background:var(--accent);
-  opacity:0;transform:scaleY(.12);transform-origin:bottom}
-[data-c="rf-card"] .b3.on .cd__cuts i.new{animation:rfCardCut 500ms cubic-bezier(.2,.85,.25,1) .82s forwards}
-@keyframes rfCardCut{from{opacity:0;transform:scaleY(.12)}to{opacity:1;transform:scaleY(1)}}
-
-/* the light. it crosses once and leaves. */
-[data-c="rf-card"] .cd__sweep{position:absolute;left:-62%;top:-42%;width:82%;height:184%;
-  pointer-events:none;opacity:0;transform:rotate(18deg) translateX(-40px);
-  background:linear-gradient(90deg,
-    rgba(255,255,255,0) 0%, rgba(255,255,255,.035) 30%, rgba(255,255,255,.10) 44%,
-    rgba(255,255,255,.30) 50%, rgba(255,255,255,.10) 56%,
-    rgba(255,255,255,.035) 70%, rgba(255,255,255,0) 100%)}
-[data-c="rf-card"] .b3.on .cd__sweep{animation:rfCardSweep 1150ms cubic-bezier(.36,0,.26,1) .42s forwards}
-@keyframes rfCardSweep{
-  0%  {opacity:0;transform:rotate(18deg) translateX(-40px)}
-  11% {opacity:1}
-  84% {opacity:1}
-  100%{opacity:0;transform:rotate(18deg) translateX(330px)}
-}
+/* THE M POP (Malik's spec, replacing the cuts + sweep: nothing fictional on
+   the card, no marks it cannot really keep). The mark itself answers the
+   action: it swells a little, goes properly bright for a beat, then settles
+   back warm. Built iOS-safe: the base M animates TRANSFORM only, and the
+   brightness is a pre-rendered brighter twin cross-fading on top, opacity
+   only, so no filter ever animates. */
+[data-c="rf-card"] .cd__mwrap{position:relative;width:64px;height:64px;margin-bottom:16px}
+[data-c="rf-card"] .cd__mwrap svg{position:absolute;inset:0;width:100%;height:100%}
+[data-c="rf-card"] .cd__m2{opacity:0;fill:#fff}
+[data-c="rf-card"] .b3.on .cd__mwrap{animation:rfPopSize 900ms cubic-bezier(.2,.9,.25,1) .6s}
+@keyframes rfPopSize{
+  0%{transform:scale(1)} 28%{transform:scale(1.14)} 62%{transform:scale(1.05)} 100%{transform:scale(1)}}
+/* forwards: after the pop the twin keeps a trace of its light, so the card
+   visibly ends brighter than it began. (Port note: on the phone, swap the
+   fill-mode for setting the final opacity in JS on animationend, per the
+   hidden-animations law about held GPU layers.) */
+[data-c="rf-card"] .b3.on .cd__m2{animation:rfPopBright 1200ms ease-out .6s forwards}
+@keyframes rfPopBright{
+  0%{opacity:0} 22%{opacity:1} 46%{opacity:.9} 100%{opacity:.32}}
 
 [data-c="rf-card"] .cd__dep{margin-top:32px;opacity:0}
 [data-c="rf-card"] .b3.on .cd__dep{animation:rfCardDep 520ms ease-out 1.76s forwards}
@@ -87,16 +78,14 @@
 @media (prefers-reduced-motion:reduce){
   [data-c="rf-card"] .cd__amb{opacity:1}
   [data-c="rf-card"] .cd__shell{opacity:1;transform:none}
-  [data-c="rf-card"] .cd__m{opacity:1}
-  [data-c="rf-card"] .cd__cuts i.new{opacity:1;transform:none}
-  [data-c="rf-card"] .cd__sweep{opacity:0}
+  [data-c="rf-card"] .cd__m2{opacity:.32}
   [data-c="rf-card"] .cd__dep{opacity:1;transform:none}
 }
 </style>
 <div class="ph" data-c="rf-card">
   <div class="st">
 
-    <div class="b b1">
+    <div class="b b1" data-confetti>
       <div class="cd__land">You passed the bar.</div>
     </div>
 
@@ -111,9 +100,10 @@
         <span class="cd__amb"></span>
         <div class="cd__shell">
           <div class="cd">
-            <svg class="cd__m" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
-            <span class="cd__cuts"><i></i><i></i><i></i><i></i><i class="new"></i></span>
-            <span class="cd__sweep"></span>
+            <span class="cd__mwrap">
+              <svg class="cd__m" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+              <svg class="cd__m2" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+            </span>
           </div>
         </div>
       </div>

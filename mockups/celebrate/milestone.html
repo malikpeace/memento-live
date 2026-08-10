@@ -14,16 +14,16 @@
 /* ms-1 "The turn". The binary event landing. The screen inverts for one
    beat: the only thing on the light is the mark. Then back to black to weigh
    it. Accent moment: the 47 on beat 2. */
-[data-c="ms-1"] .ms1-flood{position:absolute;inset:0;background:#f2f4f8}
+[data-c="ms-1"] .ms1-flood{position:absolute;inset:0;background:var(--accent)}
 [data-c="ms-1"] .b1.on .ms1-flood{animation:ms1Flood .58s cubic-bezier(.2,.8,.3,1) both}
 @keyframes ms1Flood{from{opacity:0;transform:scale(1.05)}to{opacity:1;transform:scale(1)}}
 
-[data-c="ms-1"] .ms1-m{position:relative;width:78px;height:78px;fill:#0e1218}
+[data-c="ms-1"] .ms1-m{position:relative;width:78px;height:78px;fill:#0b0e12}
 [data-c="ms-1"] .b1.on .ms1-m{animation:ms1Mark .5s cubic-bezier(.2,.8,.3,1) .14s both}
 @keyframes ms1Mark{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
 
 [data-c="ms-1"] .ms1-word{position:relative;margin-top:30px;font-size:31px;font-weight:700;
-  letter-spacing:-.035em;line-height:1.06;color:rgba(14,18,24,.93);max-width:11ch}
+  letter-spacing:-.035em;line-height:1.06;color:rgba(11,14,18,.95);max-width:11ch}
 [data-c="ms-1"] .b1.on .ms1-word{animation:ms1Word .46s cubic-bezier(.2,.8,.3,1) .74s both}
 @keyframes ms1Word{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
 
@@ -38,7 +38,7 @@
 <div class="ph" data-c="ms-1">
   <div class="st">
 
-    <div class="b b1">
+    <div class="b b1" data-confetti>
       <div class="ms1-flood"></div>
       <svg class="ms1-m" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
       <div class="ms1-word">You got the job.</div>
@@ -85,8 +85,9 @@
 <div class="ph" data-c="ms-2">
   <div class="st">
 
-    <div class="b b1">
-      <div class="n n--hero ms2-num" data-count="0|300">300</div>
+    <div class="b b1 b--flood" data-confetti>
+      <svg class="flood-m" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+      <div class="n n--hero" data-count="0|300">300</div>
       <div class="sub">hours of studying for the boards.</div>
     </div>
 
@@ -131,11 +132,13 @@
 @keyframes ms3Cost{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
 [data-c="ms-3"] .ms3-rule{width:36px;height:1px;background:rgba(235,238,248,.18);margin-bottom:20px}
+[data-c="ms-3"] .b--flood .ms3-word{color:#0b0e12}
 </style>
 <div class="ph" data-c="ms-3">
   <div class="st">
 
-    <div class="b b1">
+    <div class="b b1 b--flood">
+      <svg class="flood-m" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
       <div class="ms3-word">Finished.</div>
       <div class="sub">The manuscript is done.</div>
     </div>
@@ -160,56 +163,46 @@
   <div class="hint">Tap to replay</div>
 </div>
 <p class="item__note">The deadline variant, drawn as a <b>plain subtraction instead of a bar</b>. Deadline, finish date, a rule, the margin. It reads like a receipt, which is honest, and it dodges every progress meter cliche. The margin is the only coloured thing on the screen because the margin is the entire story.</p></div><div class="item"><p class="item__label"><span class="item__n">4</span><span class="item__name">The fork</span></p><style>
-/* ms-4 "The fork". The milestone whose outcome was a decision rather than
-   an achievement.
-   The line you were on keeps going; the other branch stops. Accent moment:
-   the branch you took. */
-[data-c="ms-4"] .ms4-word{font-size:56px;font-weight:800;letter-spacing:-.045em;line-height:.94;
-  color:var(--text-hi)}
+/* ms-4 REBUILT (Malik: the fork diagram was meh). A decision milestone told
+   with the two names themselves: the one you chose stays solid, the one you
+   released lets go and dims. No diagram to decode; the typography IS the
+   decision. Land beat floods their colour like the rest of the family. */
+[data-c="ms-4"] .ms4-word{font-size:52px;font-weight:800;letter-spacing:-.045em;line-height:.96;color:#0b0e12}
+[data-c="ms-4"] .b--flood .sub{margin-top:16px}
 
-[data-c="ms-4"] .ms4-fig{position:relative;width:300px;height:140px}
-[data-c="ms-4"] .ms4-svg{display:block;width:300px;height:140px}
-[data-c="ms-4"] .ms4-stem,[data-c="ms-4"] .ms4-drop,[data-c="ms-4"] .ms4-stop{
-  fill:none;stroke:rgba(235,238,248,.26);stroke-width:1.5;stroke-linecap:round}
-[data-c="ms-4"] .ms4-take{fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round}
-[data-c="ms-4"] .ms4-lab{position:absolute;font-size:12px;font-weight:500;letter-spacing:-.01em;
-  color:var(--text-lo)}
-[data-c="ms-4"] .ms4-lab--a{right:46px;top:0}
-[data-c="ms-4"] .ms4-lab--b{right:2px;top:88px;color:var(--text-mid);font-weight:650}
-[data-c="ms-4"] .b2.on .ms4-take,[data-c="ms-4"] .b2.on .ms4-lab--b{
-  animation:ms4Take .5s cubic-bezier(.2,.8,.3,1) .44s both}
-@keyframes ms4Take{from{opacity:0}to{opacity:1}}
-[data-c="ms-4"] .b2.on .ms4-fig{animation:ms4Fig .55s cubic-bezier(.2,.8,.3,1) both}
-@keyframes ms4Fig{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+[data-c="ms-4"] .ms4-pair{display:flex;flex-direction:column;gap:18px;margin-bottom:30px}
+[data-c="ms-4"] .ms4-name{font-size:44px;font-weight:800;letter-spacing:-.04em;line-height:1;color:var(--text-hi)}
+[data-c="ms-4"] .ms4-name--gone{color:rgba(var(--ink),.26);font-weight:700;position:relative}
+[data-c="ms-4"] .ms4-name--gone::after{content:'';position:absolute;left:-4px;right:-4px;top:52%;
+  height:1.5px;background:rgba(var(--ink),.30);transform:scaleX(0);transform-origin:0 50%}
+[data-c="ms-4"] .b2.on .ms4-name--gone::after{animation:ms4Strike .5s cubic-bezier(.2,.8,.3,1) .85s forwards}
+@keyframes ms4Strike{to{transform:scaleX(1)}}
+[data-c="ms-4"] .b2.on .ms4-name{animation:ms4In .5s cubic-bezier(.2,.8,.3,1) backwards}
+[data-c="ms-4"] .b2.on .ms4-name--gone{animation-delay:.2s}
+@keyframes ms4In{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
 
-[data-c="ms-4"] .ms4-cost{margin-top:26px;padding-top:18px;border-top:1px solid var(--hairline);
-  font-size:15px;font-weight:500;line-height:1.7;color:var(--text-mid);letter-spacing:-.01em}
-[data-c="ms-4"] .ms4-cost b{font-variant-numeric:tabular-nums;font-weight:650;color:var(--text-hi)}
-[data-c="ms-4"] .b2.on .ms4-cost{animation:ms4Cost .5s cubic-bezier(.2,.8,.3,1) .62s both}
-@keyframes ms4Cost{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+[data-c="ms-4"] .ms4-cost{margin-top:6px;font-size:15px;font-weight:500;line-height:1.75;
+  color:var(--text-mid);letter-spacing:-.01em}
+[data-c="ms-4"] .ms4-cost b{color:var(--text-hi);font-variant-numeric:tabular-nums;font-weight:700}
+[data-c="ms-4"] .b2.on .ms4-cost{animation:ms4In .5s cubic-bezier(.2,.8,.3,1) 1.2s backwards}
 
-[data-c="ms-4"] .ms4-rule{width:36px;height:1px;background:rgba(235,238,248,.18);margin-bottom:20px}
-[data-c="ms-4"] .ms4-closed{margin-top:14px;font-size:13.5px;font-weight:500;color:var(--text-mid);
-  letter-spacing:-.01em}
+[data-c="ms-4"] .ms4-rule{width:36px;height:1px;background:rgba(var(--ink),.18);margin-bottom:20px}
+[data-c="ms-4"] .ms4-closed{margin-top:12px;font-size:12.5px;color:var(--text-lo)}
+[data-c="ms-4"] .deposit{max-width:24ch}
 </style>
 <div class="ph" data-c="ms-4">
   <div class="st">
 
-    <div class="b b1">
+    <div class="b b1 b--flood">
+      <svg class="flood-m" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
       <div class="ms4-word">Decided.</div>
       <div class="sub">You're staying in Chicago.</div>
     </div>
 
     <div class="b b2">
-      <div class="ms4-fig">
-        <svg class="ms4-svg" viewBox="0 0 300 140" aria-hidden="true">
-          <path class="ms4-stem" d="M4 78 L118 78"/>
-          <path class="ms4-drop" d="M118 78 L246 26"/>
-          <path class="ms4-stop" d="M243.7 20.4 L248.3 31.6"/>
-          <path class="ms4-take" d="M118 78 L296 78"/>
-        </svg>
-        <div class="ms4-lab ms4-lab--a">Lisbon</div>
-        <div class="ms4-lab ms4-lab--b">Chicago</div>
+      <div class="ms4-pair">
+        <div class="ms4-name">Chicago</div>
+        <div class="ms4-name ms4-name--gone">Lisbon</div>
       </div>
       <div class="ms4-cost"><b data-count="0|143">143</b> days carrying the question.<br>11 notes. 2 trips.</div>
     </div>
@@ -241,11 +234,14 @@
 @keyframes ms5Cost{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
 [data-c="ms-5"] .ms5-rule{width:36px;height:1px;background:rgba(235,238,248,.18);margin-bottom:20px}
+[data-c="ms-5"] .b--flood .ms5-word{color:#0b0e12}
+[data-c="ms-5"] .b--flood .ms5-stamp{color:rgba(11,14,18,.72)}
 </style>
 <div class="ph" data-c="ms-5">
   <div class="st">
 
-    <div class="b b1">
+    <div class="b b1 b--flood" data-confetti>
+      <svg class="flood-m" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
       <div class="ms5-word">You passed<br>the bar.</div>
       <div class="ms5-stamp">4:12pm</div>
     </div>
@@ -259,7 +255,6 @@
     <div class="b b3">
       <div class="ms5-rule"></div>
       <div class="deposit">On this day at <b>4:12pm</b>, <b>you passed the bar.</b></div>
-      <svg class="mark--foot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
     </div>
 
   </div>

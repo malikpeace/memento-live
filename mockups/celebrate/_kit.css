@@ -80,6 +80,22 @@ body{margin:0;background:#0a0b0d;color:var(--text-hi);font-family:var(--font);-w
 .deposit{font-size:15px;color:var(--text-mid);line-height:1.5;max-width:22ch}
 .deposit b{color:var(--text-hi);font-weight:650}
 
+/* the confetti canvas: one per phone, sits above beats, never eats taps */
+.cel-confetti{position:absolute;inset:0;z-index:24;pointer-events:none}
+
+/* ---------- the milestone flood ----------
+   The land beat of a milestone fills the screen with THEIR colour and the M.
+   Ink flips to near-black on the flood so it reads on all six accents
+   (every accent is a light colour by construction). Receipts return to dark. */
+.b--flood{background:var(--accent)}
+.b--flood .n,.b--flood .sub,.b--flood .cap,.b--flood .deposit{color:#0b0e12}
+.b--flood .sub b,.b--flood .cap b,.b--flood .deposit b{color:#0b0e12}
+.b--flood .sub,.b--flood .cap{opacity:.82}
+.flood-m{width:74px;height:74px;fill:#0b0e12;margin-bottom:26px}
+/* the flood beat leaves like light does: quick in, soft out */
+.b--flood.on{animation:floodIn .45s cubic-bezier(.2,.8,.3,1)}
+@keyframes floodIn{from{opacity:0}to{opacity:1}}
+
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media (max-width:860px){
   .item,.ph{width:100%;max-width:390px}
