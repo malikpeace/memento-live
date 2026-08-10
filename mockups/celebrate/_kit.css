@@ -102,3 +102,10 @@ body{margin:0;background:#0a0b0d;color:var(--text-hi);font-family:var(--font);-w
   .bar{padding:10px 14px;gap:8px}
   .gal{padding:16px 14px 70px}
 }
+
+/* review verdicts: Malik's at-a-glance approval state (gallery chrome only) */
+.vd{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;
+  border-radius:7px;font-size:12px;font-weight:800;margin-left:2px}
+.vd--g{background:rgba(63,217,78,.16)}
+.vd--y{background:rgba(255,183,61,.18);color:#ffb73d}
+.vd--r{background:rgba(255,95,95,.16);color:#ff6b6b;font-size:11px}
