@@ -2683,6 +2683,13 @@ async function resumePendingActionGeneration() {
   if (!actionBackgroundSupported()) return;
   const pending = actionBackgroundPending();
   if (!pending || !pending.generationId || !pending.stage) return;
+  // v1163: a FIRST-draft job left over from an earlier attempt is stale the
+  // moment a plan exists. Resuming it hijacked the Action screen with the
+  // multi-minute loader on a random focus, for a plan they already have.
+  if (pending.stage === 'draft' && !pending.nextStep && !pending.keepTheirs && hasActionPlan()) {
+    actionBackgroundClear(pending.generationId);
+    return;
+  }
   actionBackgroundResumeBusy = true;
   try {
     if (pending.stage === 'draft') {
@@ -4257,16 +4264,17 @@ async function sendAiAnswer() {
 
     // For early questions (first 4 exchanges), nudge AI to use choices and include "I don't know"
     const userMsgCount = aiChatMessages.filter(m => m.role === 'user').length;
+    // v1023: ALL per-turn steering notes collect here and ship as ONE separate
+    // trailing user message instead of being glued onto the real answer. The
+    // real history must stay byte-identical across turns or the proxy's
+    // conversation cache (added the same release) can never get a read hit:
+    // a note baked into the answer this turn is absent from history next turn,
+    // and prompt caching is an exact prefix match.
+    const turnNotes = [];
     if (userMsgCount <= 2) {
-      const lastMsg = apiMessages[apiMessages.length - 1];
-      if (lastMsg && lastMsg.role === 'user') {
-        lastMsg.content += '\n\n[System note: This is question ' + (userMsgCount + 1) + '. Use type "choices" with exactly 4 distinct, substantive options. Do NOT include any "I don\'t know" or "I\'m not sure" option. The UI already adds that automatically. Do NOT include an "Other" option either, the UI adds that too.]';
-      }
+      turnNotes.push('[System note: This is question ' + (userMsgCount + 1) + '. Use type "choices" with exactly 4 distinct, substantive options. Do NOT include any "I don\'t know" or "I\'m not sure" option. The UI already adds that automatically. Do NOT include an "Other" option either, the UI adds that too.]');
     } else if (userMsgCount <= 4) {
-      const lastMsg = apiMessages[apiMessages.length - 1];
-      if (lastMsg && lastMsg.role === 'user') {
-        lastMsg.content += '\n\n[System note: This is question ' + (userMsgCount + 1) + '. You can use choices or text. NEVER include "I don\'t know" options, the UI handles that.]';
-      }
+      turnNotes.push('[System note: This is question ' + (userMsgCount + 1) + '. You can use choices or text. NEVER include "I don\'t know" options, the UI handles that.]');
     }
 
     // Collect previous questions to detect duplicates
@@ -4276,22 +4284,22 @@ async function sendAiAnswer() {
     const lastUserText = text.toLowerCase().trim();
     const isIDK = /i don'?t know|not sure|no idea|i'?m not sure|haven'?t thought/i.test(lastUserText) || lastUserText.length < 20;
 
-    // Add anti-repeat note to the last user message
-    const lastApiMsg = apiMessages[apiMessages.length - 1];
-    if (lastApiMsg && lastApiMsg.role === 'user') {
-      if (prevQuestions.length > 0) {
-        lastApiMsg.content += '\n\n[System note: NEVER repeat or rephrase a question you already asked. Previous questions: ' + prevQuestions.map((q, i) => (i + 1) + '. "' + q.slice(0, 80) + '"').join('; ') + '. Ask something DIFFERENT.]';
-      }
-      if (isIDK) {
-        // Count how many times user has said IDK
-        const idkCount = aiChatMessages.filter(m => m.role === 'user' && /i don'?t know|not sure|no idea|i'?m not sure|haven'?t thought/i.test((m.content || '').toLowerCase())).length;
-        lastApiMsg.content += '\n\n[System note: The user just said they do not know or are not sure (they have said this ' + idkCount + ' time(s) now). Do NOT ask the same question in different words. CHANGE ANGLES COMPLETELY. Ask about something different, like their daily life, what they are good at, what they spend time on, or who they admire. Do not keep pressing on the same topic they just said they do not know about.]';
-      }
-      lastApiMsg.content += '\n\n[System note: For the hint field, set it to empty string "" most of the time. Only include a hint if it genuinely adds context the user needs. Most questions do not need hints.]';
-      // v578: the JSON-envelope reminder rides EVERY turn. The retest proved the
-      // model drops the contract deep into emotional open-text stretches, exactly
-      // where the v577 early-turns-only note never reached.
-      lastApiMsg.content += '\n\n[System note: Reply with ONLY one JSON object per the RESPONSE FORMAT (question/hint/type/options/progress/act), no prose before or after it. This applies to EVERY reply, including reflective or emotional moments and the final confirmation.]';
+    // Anti-repeat + IDK + format notes join the same trailing-notes message
+    if (prevQuestions.length > 0) {
+      turnNotes.push('[System note: NEVER repeat or rephrase a question you already asked. Previous questions: ' + prevQuestions.map((q, i) => (i + 1) + '. "' + q.slice(0, 80) + '"').join('; ') + '. Ask something DIFFERENT.]');
+    }
+    if (isIDK) {
+      // Count how many times user has said IDK
+      const idkCount = aiChatMessages.filter(m => m.role === 'user' && /i don'?t know|not sure|no idea|i'?m not sure|haven'?t thought/i.test((m.content || '').toLowerCase())).length;
+      turnNotes.push('[System note: The user just said they do not know or are not sure (they have said this ' + idkCount + ' time(s) now). Do NOT ask the same question in different words. CHANGE ANGLES COMPLETELY. Ask about something different, like their daily life, what they are good at, what they spend time on, or who they admire. Do not keep pressing on the same topic they just said they do not know about.]');
+    }
+    turnNotes.push('[System note: For the hint field, set it to empty string "" most of the time. Only include a hint if it genuinely adds context the user needs. Most questions do not need hints.]');
+    // v578: the JSON-envelope reminder rides EVERY turn. The retest proved the
+    // model drops the contract deep into emotional open-text stretches, exactly
+    // where the v577 early-turns-only note never reached.
+    turnNotes.push('[System note: Reply with ONLY one JSON object per the RESPONSE FORMAT (question/hint/type/options/progress/act), no prose before or after it. This applies to EVERY reply, including reflective or emotional moments and the final confirmation.]');
+    if (turnNotes.length && apiMessages.length && apiMessages[apiMessages.length - 1].role === 'user') {
+      apiMessages.push({ role: 'user', content: turnNotes.join('\n\n') });
     }
 
     // Opus heavy-hitter (Malik, v579): exactly ONE escalated call, the descent
