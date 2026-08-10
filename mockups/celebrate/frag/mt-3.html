@@ -1,0 +1,51 @@
+<style>
+/* mt-3 : the hard ones. 30 days held, and the days that nearly went. */
+[data-c="mt-3"] .b1.on .n--hero{animation:mt3land .55s cubic-bezier(.2,.8,.3,1) both}
+@keyframes mt3land{from{opacity:0;transform:scale(.955)}to{opacity:1;transform:none}}
+[data-c="mt-3"] .b1.on .sub{animation:mt3sub .5s cubic-bezier(.2,.8,.3,1) .26s both}
+@keyframes mt3sub{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+[data-c="mt-3"] .mt3-days{display:flex;align-items:flex-end;gap:6px;height:34px}
+[data-c="mt-3"] .mt3-bar{width:4px;height:16px;background:rgba(var(--ink),.28)}
+[data-c="mt-3"] .mt3-h{height:34px;background:rgba(var(--accent-rgb),.92);transform-origin:50% 100%}
+[data-c="mt-3"] .b2.on .mt3-h{animation:mt3rise .58s cubic-bezier(.2,.8,.3,1) .36s both}
+@keyframes mt3rise{from{transform:scaleY(.47)}to{transform:scaleY(1)}}
+
+[data-c="mt-3"] .mt3-note{font-size:13.5px;line-height:1.55;color:var(--text-mid);
+  max-width:27ch;margin-top:18px;letter-spacing:-.005em}
+</style>
+
+<div class="ph" data-c="mt-3">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="n n--hero" data-count="0|30">0</div>
+      <div class="sub">days without one</div>
+    </div>
+
+    <div class="b b2">
+      <div class="mt3-days">
+        <span class="mt3-bar mt3-h"></span><span class="mt3-bar mt3-h"></span><span class="mt3-bar mt3-h"></span>
+        <span class="mt3-bar"></span><span class="mt3-bar mt3-h"></span><span class="mt3-bar"></span>
+        <span class="mt3-bar"></span><span class="mt3-bar mt3-h"></span><span class="mt3-bar"></span>
+        <span class="mt3-bar"></span><span class="mt3-bar"></span><span class="mt3-bar mt3-h"></span>
+        <span class="mt3-bar"></span><span class="mt3-bar"></span><span class="mt3-bar"></span>
+        <span class="mt3-bar"></span><span class="mt3-bar mt3-h"></span><span class="mt3-bar"></span>
+        <span class="mt3-bar"></span><span class="mt3-bar"></span><span class="mt3-bar"></span>
+        <span class="mt3-bar"></span><span class="mt3-bar mt3-h"></span><span class="mt3-bar"></span>
+        <span class="mt3-bar"></span><span class="mt3-bar"></span><span class="mt3-bar"></span>
+        <span class="mt3-bar"></span><span class="mt3-bar mt3-h"></span><span class="mt3-bar"></span>
+      </div>
+      <div class="sub">Nine of these days you logged as hard. You held on all nine.</div>
+      <div class="cap">Jul 11 to Aug 9</div>
+    </div>
+
+    <div class="b b3">
+      <div class="deposit"><b>Day 30.</b> The line held.</div>
+      <div class="mt3-note">The nine hard days are spent and counted. They do not come back around.</div>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>

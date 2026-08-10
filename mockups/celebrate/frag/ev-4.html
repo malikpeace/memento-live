@@ -1,0 +1,112 @@
+<style>
+/* ev-4. STRATA. The days settle. Each month is a band as thick as it earned. */
+[data-c="ev-4"] .b1{justify-content:center;padding:30px 24px}
+[data-c="ev-4"] .lede{font-size:13.5px;line-height:1.5;font-weight:500;color:var(--text-mid);
+  max-width:31ch;letter-spacing:-.005em}
+
+[data-c="ev-4"] .ages{display:flex;align-items:flex-end;justify-content:center;gap:17px;margin-top:24px}
+[data-c="ev-4"] .age{display:flex;flex-direction:column;align-items:center}
+[data-c="ev-4"] .lab{margin-top:11px;font-size:11px;color:var(--text-lo);font-variant-numeric:tabular-nums}
+
+[data-c="ev-4"] .fc{position:relative;width:96px;height:128px;overflow:hidden;border-radius:5px;
+  background:linear-gradient(165deg,rgba(235,238,248,.12),rgba(235,238,248,.02) 48%,rgba(235,238,248,.05));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 10px 24px rgba(0,0,0,.55)}
+[data-c="ev-4"] .fc::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:5;
+  background:radial-gradient(150% 45% at 50% -12%,rgba(255,255,255,.13),transparent 56%)}
+
+[data-c="ev-4"] .sed{position:absolute;left:0;right:0;bottom:0;z-index:2;
+  display:flex;flex-direction:column-reverse}
+[data-c="ev-4"] .bd{position:relative;
+  background:linear-gradient(180deg,rgba(235,238,248,.145),rgba(235,238,248,.085));
+  box-shadow:inset 0 .5px 0 rgba(255,255,255,.30)}
+[data-c="ev-4"] .bd::after{content:"";position:absolute;inset:0;opacity:var(--d,.8);
+  background:repeating-linear-gradient(180deg,rgba(255,255,255,.055) 0 .5px,rgba(255,255,255,0) .5px 3.4px)}
+[data-c="ev-4"] .wl{position:absolute;left:0;right:0;height:1px;z-index:3;background:rgba(235,238,248,.46)}
+
+[data-c="ev-4"] .rule{width:100%;height:1px;background:var(--hairline);margin:26px 0 22px}
+
+[data-c="ev-4"] .fc--big{width:141px;height:188px;border-radius:8px}
+[data-c="ev-4"] .mk{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);z-index:1;
+  width:68px;height:68px;fill:rgba(255,255,255,.22)}
+[data-c="ev-4"] .eng{position:absolute;left:12px;bottom:10px;z-index:6;font-size:9.5px;font-weight:500;
+  letter-spacing:.005em;color:rgba(235,238,248,.66)}
+
+/* today: the filament that settles on top, the only colour on the screen */
+[data-c="ev-4"] .wl--now{background:var(--accent);height:1.4px;
+  box-shadow:0 0 10px rgba(var(--accent-rgb),.42)}
+[data-c="ev-4"] .b1.on .wl--now{animation:ev4settle .55s cubic-bezier(.2,.8,.3,1) .95s backwards}
+@keyframes ev4settle{from{opacity:0;transform:translateY(-7px)}}
+
+[data-c="ev-4"] .cap2{margin-top:13px;font-size:12px;line-height:1.5;color:var(--text-mid);max-width:31ch}
+[data-c="ev-4"] .state{margin-top:6px;font-size:11px;color:var(--text-lo)}
+</style>
+<div class="ph" data-c="ev-4">
+  <div class="st">
+    <div class="b b1">
+      <div class="lede">The days settle. Each month becomes a band, as thick as the days you kept in it.</div>
+
+      <div class="ages">
+        <div class="age">
+          <div class="fc">
+            <div class="sed"><div class="bd" style="height:2.5px;--d:.9"></div></div>
+            <div class="wl" style="bottom:2.5px"></div>
+          </div>
+          <div class="lab">Day 7</div>
+        </div>
+        <div class="age">
+          <div class="fc">
+            <div class="sed">
+              <div class="bd" style="height:9.4px;--d:.91"></div>
+              <div class="bd" style="height:10.4px;--d:.98"></div>
+              <div class="bd" style="height:7.9px;--d:.83"></div>
+            </div>
+            <div class="wl" style="bottom:27.7px"></div>
+          </div>
+          <div class="lab">Day 90</div>
+        </div>
+        <div class="age">
+          <div class="fc">
+            <div class="sed">
+              <div class="bd" style="height:9.4px;--d:.91"></div>
+              <div class="bd" style="height:10.4px;--d:.98"></div>
+              <div class="bd" style="height:7.9px;--d:.83"></div>
+              <div class="bd" style="height:10.8px;--d:1"></div>
+              <div class="bd" style="height:6.5px;--d:.74"></div>
+              <div class="bd" style="height:9.7px;--d:.94"></div>
+              <div class="bd" style="height:9px;--d:.89"></div>
+              <div class="bd" style="height:10.1px;--d:.96"></div>
+              <div class="bd" style="height:8.6px;--d:.87"></div>
+              <div class="bd" style="height:7.6px;--d:.81"></div>
+            </div>
+            <div class="wl" style="bottom:90px"></div>
+          </div>
+          <div class="lab">Day 300</div>
+        </div>
+      </div>
+
+      <div class="rule"></div>
+
+      <div class="fc fc--big">
+        <svg class="mk" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+        <div class="sed">
+          <div class="bd" style="height:13.8px;--d:.91"></div>
+          <div class="bd" style="height:15.4px;--d:.98"></div>
+          <div class="bd" style="height:11.7px;--d:.83"></div>
+          <div class="bd" style="height:15.9px;--d:1"></div>
+          <div class="bd" style="height:9.5px;--d:.74"></div>
+          <div class="bd" style="height:14.3px;--d:.94"></div>
+          <div class="bd" style="height:13.3px;--d:.89"></div>
+          <div class="bd" style="height:14.8px;--d:.96"></div>
+          <div class="bd" style="height:12.7px;--d:.87"></div>
+          <div class="bd" style="height:11.1px;--d:.81"></div>
+        </div>
+        <div class="wl wl--now" style="bottom:132.5px"></div>
+        <div class="eng">Lose 40 lbs</div>
+      </div>
+      <div class="lab">Day 301</div>
+      <div class="cap2">Today settles on top. Ten months under it, thickest where you kept the most.</div>
+      <div class="state">Nothing settles until the day is done.</div>
+    </div>
+  </div>
+  <div class="hint">Tap to replay</div>
+</div>

@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The four you picked</title>
+<link rel="stylesheet" href="_kit.css">
+</head><body data-accent="cyan">
+<div class="bar">
+  <a href="index.html" style="color:var(--text-mid);text-decoration:none;font-size:13px;font-weight:600">&lsaquo; All</a>
+  <span class="bar__t">The four you picked</span>
+  <span class="sw"><button data-a="cyan" style="background:#2bd4d4" class="on"></button><button data-a="green" style="background:#3fd94e"></button><button data-a="amber" style="background:#ffb73d"></button><button data-a="rose" style="background:#ff6b9d"></button><button data-a="blue" style="background:#4f8cff"></button><button data-a="teal" style="background:#19c3a6"></button></span>
+  <span class="bar__n">their Memento colour drives every screen &middot; <b>tap a phone to advance or replay</b></span>
+</div>
+<div class="gal"><h1>The four you picked</h1><p class="gal__sub">The Gap, The Fall, The Record and The Card Takes It, rebuilt properly: three beats, tap to advance, the accent now driven by their chosen Memento colour, a deposit line, and the M where it earns its place.</p><div class="grid"><div class="item"><p class="item__label"><span class="item__n">1</span><span class="item__name">The Gap</span></p><style>
+/* rf-gap. The Gap: the distance closing, the distance still open stated next
+   to it at the same weight. One accent moment: the closed rail. */
+[data-c="rf-gap"] .gp{width:100%;display:flex;flex-direction:column;align-items:center}
+
+[data-c="rf-gap"] .gp__scale{display:flex;justify-content:space-between;width:100%;
+  margin:0 0 10px;font-size:11px;color:var(--text-lo);font-variant-numeric:tabular-nums;
+  letter-spacing:0}
+
+[data-c="rf-gap"] .gp__rail{position:relative;width:100%;height:2px;border-radius:2px;
+  background:repeating-linear-gradient(90deg,
+    rgba(var(--ink),.20) 0 3px, rgba(var(--ink),0) 3px 8px)}
+
+/* the ground already closed. THE one coloured thing on this screen. */
+[data-c="rf-gap"] .gp__fill{position:absolute;left:0;top:-1px;bottom:-1px;width:60%;
+  border-radius:2px;background:var(--accent);
+  box-shadow:0 0 14px rgba(var(--accent-rgb),.50);
+  transform-origin:left center;transform:scaleX(.6667)}
+[data-c="rf-gap"] .b2.on .gp__fill{animation:rfGapFill 950ms cubic-bezier(.2,.85,.25,1) .3s forwards}
+@keyframes rfGapFill{from{transform:scaleX(.6667)}to{transform:scaleX(1)}}
+
+/* where they stood at the last marker, and where they stand now */
+[data-c="rf-gap"] .gp__was{position:absolute;left:40%;top:-5px;width:1px;height:12px;
+  background:rgba(var(--ink),.45)}
+[data-c="rf-gap"] .gp__now{position:absolute;left:60%;top:-8px;width:2px;height:18px;
+  margin-left:-1px;border-radius:1px;background:var(--text-hi);
+  opacity:0;transform:scaleY(.25);transform-origin:center}
+[data-c="rf-gap"] .b2.on .gp__now{animation:rfGapTick 420ms cubic-bezier(.2,.85,.25,1) 1.15s forwards}
+@keyframes rfGapTick{from{opacity:0;transform:scaleY(.25)}to{opacity:1;transform:scaleY(1)}}
+
+[data-c="rf-gap"] .gp__row{display:flex;justify-content:space-between;width:100%;
+  margin-top:19px;font-size:14.5px;color:var(--text-mid);letter-spacing:-.01em;
+  opacity:0}
+[data-c="rf-gap"] .gp__row b{color:var(--text-hi);font-weight:700;font-variant-numeric:tabular-nums}
+[data-c="rf-gap"] .b2.on .gp__row{animation:rfGapUp 460ms ease-out 1.28s forwards}
+
+[data-c="rf-gap"] .gp__cost{margin-top:30px;opacity:0}
+[data-c="rf-gap"] .b2.on .gp__cost{animation:rfGapUp 460ms ease-out 1.5s forwards}
+@keyframes rfGapUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+[data-c="rf-gap"] .gp__open{margin-top:20px;font-size:13.5px;color:var(--text-mid);
+  font-variant-numeric:tabular-nums;opacity:0}
+[data-c="rf-gap"] .b3.on .gp__open{animation:rfGapUp 480ms ease-out .34s forwards}
+
+@media (prefers-reduced-motion:reduce){
+  [data-c="rf-gap"] .gp__fill{transform:scaleX(1)}
+  [data-c="rf-gap"] .gp__now{opacity:1;transform:scaleY(1)}
+  [data-c="rf-gap"] .gp__row,
+  [data-c="rf-gap"] .gp__cost,
+  [data-c="rf-gap"] .gp__open{opacity:1;transform:none}
+}
+</style>
+<div class="ph" data-c="rf-gap">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="n n--hero" data-count="40|60">40</div>
+      <div class="sub">paying users</div>
+    </div>
+
+    <div class="b b2">
+      <div class="gp">
+        <div class="gp__scale"><span>0</span><span>100</span></div>
+        <div class="gp__rail">
+          <span class="gp__fill"></span>
+          <span class="gp__was"></span>
+          <span class="gp__now"></span>
+        </div>
+        <div class="gp__row">
+          <span><b>60</b> closed</span>
+          <span><b>40</b> to go</span>
+        </div>
+        <div class="sub gp__cost"><b>26 days</b> closed the last 20.</div>
+      </div>
+    </div>
+
+    <div class="b b3">
+      <div class="deposit">On this day, you passed <b>60 paying users</b>.</div>
+      <div class="gp__open">40 to go.</div>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>
+<p class="item__note">The goal is a distance, so the ceremony is that distance closing. The ground already covered goes solid in their colour, what is left stays a dotted line, and a faint tick marks where they stood at the last marker so the span they just closed is visible. <b>The remaining number is never hidden</b>, it sits at the same weight as the closed one and it is still there on the final beat. This is the honest version of a progress bar and the one that fits any quantity goal with a target.</p></div><div class="item"><p class="item__label"><span class="item__n">2</span><span class="item__name">The Fall</span></p><style>
+/* rf-fall. The Fall: the number they actually carry, what is LEFT, dropping
+   and settling onto a line that takes the weight. One accent moment: the
+   landing line at the moment of impact. */
+[data-c="rf-fall"] .fl{display:flex;flex-direction:column;align-items:center;width:100%}
+/* the shelf and its line add height under the number, so the landing beat is
+   offset to keep the hero number on the same line as every other screen */
+[data-c="rf-fall"] .b1 .fl{margin-top:30px}
+
+[data-c="rf-fall"] .fl__n{display:block;transform:translateY(-26px);opacity:0}
+[data-c="rf-fall"] .b1.on .fl__n{animation:rfFallDrop 1400ms cubic-bezier(.5,.02,.32,1) forwards}
+@keyframes rfFallDrop{
+  0%  {opacity:0;transform:translateY(-26px)}
+  16% {opacity:1}
+  86% {opacity:1;transform:translateY(0)}
+  92% {opacity:1;transform:translateY(4px)}
+  100%{opacity:1;transform:translateY(0)}
+}
+
+[data-c="rf-fall"] .fl__shelf{position:relative;width:190px;height:1px;margin-top:22px;
+  background:rgba(var(--ink),.13)}
+[data-c="rf-fall"] .fl__lit{position:absolute;left:0;right:0;top:-.5px;height:2px;
+  border-radius:1px;background:var(--accent);
+  box-shadow:0 0 13px rgba(var(--accent-rgb),.55);
+  opacity:0;transform:scaleX(.24)}
+[data-c="rf-fall"] .b1.on .fl__lit{animation:rfFallLand 460ms cubic-bezier(.2,.85,.25,1) 1.2s forwards}
+@keyframes rfFallLand{from{opacity:0;transform:scaleX(.24)}to{opacity:1;transform:scaleX(1)}}
+
+[data-c="rf-fall"] .fl__bloom{position:absolute;left:50%;top:50%;width:286px;height:112px;
+  transform:translate(-50%,-50%);pointer-events:none;opacity:0;
+  background:radial-gradient(50% 50% at 50% 50%,
+    rgba(var(--accent-rgb),.32), rgba(var(--accent-rgb),0) 72%)}
+[data-c="rf-fall"] .b1.on .fl__bloom{animation:rfFallBloom 760ms ease-out 1.2s forwards}
+@keyframes rfFallBloom{0%{opacity:0}34%{opacity:1}100%{opacity:.46}}
+
+[data-c="rf-fall"] .fl__sub{margin-top:20px}
+
+/* beat 2: the descent, as a ledger. every floor already passed, and the days
+   each one took. */
+[data-c="rf-fall"] .fl__led{width:100%;max-width:272px}
+[data-c="rf-fall"] .fl__hd{display:flex;justify-content:space-between;align-items:baseline;
+  padding:0 2px 9px;font-size:11.5px;color:var(--text-lo)}
+[data-c="rf-fall"] .fl__row{display:flex;justify-content:space-between;align-items:baseline;
+  padding:11px 2px;border-top:1px solid var(--hairline);opacity:0}
+[data-c="rf-fall"] .fl__day{font-size:12.5px;color:rgba(var(--ink),.52);
+  font-variant-numeric:tabular-nums}
+[data-c="rf-fall"] .fl__v{font-size:21px;font-weight:700;letter-spacing:-.03em;
+  color:var(--text-mid);font-variant-numeric:tabular-nums}
+[data-c="rf-fall"] .fl__row--now .fl__day{color:var(--text-mid)}
+[data-c="rf-fall"] .fl__row--now .fl__v{font-size:27px;color:var(--text-hi)}
+[data-c="rf-fall"] .b2.on .fl__row{animation:rfFallRow 440ms ease-out forwards;animation-delay:var(--d)}
+@keyframes rfFallRow{from{opacity:0;transform:translateY(-7px)}to{opacity:1;transform:translateY(0)}}
+
+[data-c="rf-fall"] .fl__cost{margin-top:28px;opacity:0}
+[data-c="rf-fall"] .b2.on .fl__cost{animation:rfFallRow 480ms ease-out .68s forwards}
+
+@media (prefers-reduced-motion:reduce){
+  [data-c="rf-fall"] .fl__n{opacity:1;transform:none}
+  [data-c="rf-fall"] .fl__lit{opacity:1;transform:none}
+  [data-c="rf-fall"] .fl__bloom{opacity:.46}
+  [data-c="rf-fall"] .fl__row,
+  [data-c="rf-fall"] .fl__cost{opacity:1;transform:none}
+}
+</style>
+<div class="ph" data-c="rf-fall">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="fl">
+        <div class="n n--hero fl__n" data-count="16|12">16</div>
+        <div class="fl__shelf">
+          <span class="fl__bloom"></span>
+          <span class="fl__lit"></span>
+        </div>
+        <div class="sub fl__sub">lbs to go</div>
+      </div>
+    </div>
+
+    <div class="b b2">
+      <div class="fl">
+        <div class="fl__led">
+          <div class="fl__hd"><span></span><span>lbs left</span></div>
+          <div class="fl__row" style="--d:60ms"><span class="fl__day">Day 1</span><span class="fl__v">24</span></div>
+          <div class="fl__row" style="--d:170ms"><span class="fl__day">Day 26</span><span class="fl__v">20</span></div>
+          <div class="fl__row" style="--d:280ms"><span class="fl__day">Day 58</span><span class="fl__v">16</span></div>
+          <div class="fl__row fl__row--now" style="--d:430ms"><span class="fl__day">Day 84</span><span class="fl__v">12</span></div>
+        </div>
+        <div class="sub fl__cost">The last four took <b>26 days</b>.</div>
+      </div>
+    </div>
+
+    <div class="b b3">
+      <div class="deposit">On this day, you crossed halfway. <b>12 lbs left</b>.</div>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>
+<p class="item__note">For a losing or paying-off goal, the number people carry in their head is what is <b>left</b>, so that is the number that drops. It falls with weight, presses into the line under it, and the line takes the impact and lights. Beat two turns the whole descent into a ledger: every floor already passed and the day it happened, which says the drop was work and not luck. Suits quantity down, where a percentage would feel like the app grading them.</p></div><div class="item"><p class="item__label"><span class="item__n">3</span><span class="item__name">The Record</span></p><style>
+/* rf-rec. The Record: twelve weeks of days, the ones they showed up lighting
+   in the order they happened. The grid is evidence they kept. One accent
+   moment: today's square, the last one to land. */
+[data-c="rf-rec"] .rc{display:flex;flex-direction:column;align-items:center;width:100%}
+
+[data-c="rf-rec"] .rc__grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;
+  width:184px;margin-bottom:32px}
+[data-c="rf-rec"] .rc__d{position:relative;aspect-ratio:1;border-radius:2px;
+  background:rgba(var(--ink),.07)}
+[data-c="rf-rec"] .rc__f{position:absolute;inset:0;border-radius:2px;display:block;
+  background:rgba(var(--ink),.34);opacity:0;transform:scale(.62)}
+[data-c="rf-rec"] .b2.on .rc__f{animation:rfRecOn 360ms cubic-bezier(.2,.8,.3,1) forwards;
+  animation-delay:var(--d)}
+@keyframes rfRecOn{from{opacity:0;transform:scale(.62)}to{opacity:1;transform:scale(1)}}
+
+[data-c="rf-rec"] .rc__f--now{background:var(--accent);
+  box-shadow:0 0 15px rgba(var(--accent-rgb),.6)}
+[data-c="rf-rec"] .b2.on .rc__f--now{animation:rfRecNow 520ms cubic-bezier(.2,.8,.3,1) forwards;
+  animation-delay:var(--d)}
+@keyframes rfRecNow{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:scale(1)}}
+
+[data-c="rf-rec"] .rc__cost{opacity:0}
+[data-c="rf-rec"] .b2.on .rc__cost{animation:rfRecUp 520ms ease-out .26s forwards}
+@keyframes rfRecUp{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+
+[data-c="rf-rec"] .rc__note{margin-top:11px;font-size:13px;color:var(--text-mid);
+  letter-spacing:-.01em;opacity:0}
+[data-c="rf-rec"] .b2.on .rc__note{animation:rfRecUp 520ms ease-out 1.28s forwards}
+
+@media (prefers-reduced-motion:reduce){
+  [data-c="rf-rec"] .rc__f{opacity:1;transform:none}
+  [data-c="rf-rec"] .rc__cost,
+  [data-c="rf-rec"] .rc__note{opacity:1;transform:none}
+}
+</style>
+<div class="ph" data-c="rf-rec">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="n n--hero" data-count="0|50">0</div>
+      <div class="sub">runs</div>
+    </div>
+
+    <div class="b b2">
+      <div class="rc">
+        <div class="rc__grid">
+        <span class="rc__d"><i class="rc__f" style="--d:0ms"></i></span><span class="rc__d"><i class="rc__f" style="--d:11ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:33ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:55ms"></i></span><span class="rc__d"></span>
+        <span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:88ms"></i></span><span class="rc__d"><i class="rc__f" style="--d:99ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:121ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:143ms"></i></span>
+        <span class="rc__d"><i class="rc__f" style="--d:154ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:176ms"></i></span><span class="rc__d"><i class="rc__f" style="--d:187ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:209ms"></i></span><span class="rc__d"><i class="rc__f" style="--d:220ms"></i></span>
+        <span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:242ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:264ms"></i></span><span class="rc__d"></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:297ms"></i></span>
+        <span class="rc__d"><i class="rc__f" style="--d:308ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:330ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:352ms"></i></span><span class="rc__d"><i class="rc__f" style="--d:363ms"></i></span><span class="rc__d"></span>
+        <span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:396ms"></i></span><span class="rc__d"><i class="rc__f" style="--d:407ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:429ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:451ms"></i></span>
+        <span class="rc__d"><i class="rc__f" style="--d:462ms"></i></span><span class="rc__d"></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:495ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:517ms"></i></span><span class="rc__d"><i class="rc__f" style="--d:528ms"></i></span>
+        <span class="rc__d"><i class="rc__f" style="--d:539ms"></i></span><span class="rc__d"><i class="rc__f" style="--d:550ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:572ms"></i></span><span class="rc__d"><i class="rc__f" style="--d:583ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:605ms"></i></span>
+        <span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:627ms"></i></span><span class="rc__d"><i class="rc__f" style="--d:638ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:660ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:682ms"></i></span>
+        <span class="rc__d"><i class="rc__f" style="--d:693ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:715ms"></i></span><span class="rc__d"><i class="rc__f" style="--d:726ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:748ms"></i></span><span class="rc__d"></span>
+        <span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:781ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:803ms"></i></span><span class="rc__d"><i class="rc__f" style="--d:814ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:836ms"></i></span>
+        <span class="rc__d"><i class="rc__f" style="--d:847ms"></i></span><span class="rc__d"><i class="rc__f" style="--d:858ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:880ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:902ms"></i></span><span class="rc__d"><i class="rc__f rc__f--now" style="--d:1080ms"></i></span>
+        </div>
+        <div class="rc__cost">
+          <div class="n n--big" data-count="0|84">0</div>
+          <div class="sub">days since the first run</div>
+        </div>
+        <div class="rc__note">You ran on 50. Never a week without one.</div>
+      </div>
+    </div>
+
+    <div class="b b3">
+      <div class="deposit">On this day, you ran for the <b>50th time</b>.</div>
+      <svg class="mark--foot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>
+<p class="item__note">Twelve weeks of days, and the ones they showed up light in the order they actually happened. The empty squares stay in, because a four times a week goal has gaps and hiding them would make it a trophy instead of <b>evidence</b>. Today is the only square in their colour, the last one to land. Built from the consistency data the app already keeps, which is why it fits frequency goals better than any counter.</p></div><div class="item"><p class="item__label"><span class="item__n">4</span><span class="item__name">The Card Takes It</span></p><style>
+/* rf-card. The Card Takes It: the Memento is presented as a real object,
+   light crosses its face, and when the light leaves the card is holding a cut
+   it did not have before. Beat 3 is where the deposit lands, so the card is
+   the thing that receives it. One accent moment: the new cut. */
+[data-c="rf-card"] .cd__land{font-size:41px;font-weight:800;letter-spacing:-.035em;
+  line-height:1.06;color:var(--text-hi);max-width:9ch}
+
+[data-c="rf-card"] .cd__stage{position:relative;perspective:1000px;
+  display:flex;align-items:center;justify-content:center}
+
+/* the shallow pool of light the object sits in. radial, so it can never
+   show an edge. */
+[data-c="rf-card"] .cd__amb{position:absolute;left:50%;top:50%;width:430px;height:430px;
+  transform:translate(-50%,-50%);pointer-events:none;opacity:0;
+  background:radial-gradient(closest-side,
+    rgba(255,255,255,.062), rgba(255,255,255,.022) 44%, rgba(255,255,255,0) 74%)}
+[data-c="rf-card"] .b3.on .cd__amb{animation:rfCardAmb 900ms ease-out .12s forwards}
+@keyframes rfCardAmb{from{opacity:0}to{opacity:1}}
+
+/* shell carries the outside shadow, the face carries the clip. splitting them
+   is the only way a clipped card keeps its cast shadow. */
+[data-c="rf-card"] .cd__shell{position:relative;border-radius:18px;
+  box-shadow:0 30px 64px rgba(0,0,0,.72), 0 8px 20px rgba(0,0,0,.55);
+  opacity:0;transform:translateY(15px) rotateX(7deg) scale(.972)}
+[data-c="rf-card"] .b3.on .cd__shell{animation:rfCardIn 800ms cubic-bezier(.2,.8,.28,1) forwards}
+@keyframes rfCardIn{
+  from{opacity:0;transform:translateY(15px) rotateX(7deg) scale(.972)}
+  to  {opacity:1;transform:translateY(0) rotateX(0deg) scale(1)}
+}
+
+[data-c="rf-card"] .cd{position:relative;width:224px;height:315px;border-radius:18px;
+  clip-path:inset(0 round 18px);contain:paint;
+  display:flex;align-items:center;justify-content:center;
+  background:
+    linear-gradient(157deg,
+      rgba(255,255,255,.052) 0%, rgba(255,255,255,.014) 36%,
+      rgba(255,255,255,.004) 62%, rgba(255,255,255,.028) 100%),
+    radial-gradient(130% 82% at 50% -18%, rgba(255,255,255,.05), rgba(255,255,255,0) 60%),
+    linear-gradient(180deg, #0e1116 0%, #08090c 58%, #0b0d11 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.14),
+    inset 0 -1px 0 rgba(0,0,0,.7),
+    inset 0 0 0 1px rgba(255,255,255,.045)}
+/* a whisper of grain, so the face is material and not a flat fill */
+[data-c="rf-card"] .cd::after{content:'';position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(112deg,
+    rgba(255,255,255,.007) 0 1px, rgba(255,255,255,0) 1px 6px)}
+
+[data-c="rf-card"] .cd__m{width:64px;height:64px;fill:rgba(255,255,255,.22);
+  margin-bottom:16px;opacity:.5}
+[data-c="rf-card"] .b3.on .cd__m{animation:rfCardCatch 900ms ease-out .5s forwards}
+@keyframes rfCardCatch{0%{opacity:.5}52%{opacity:1}100%{opacity:1}}
+
+/* the cuts already in the card, and the one being made now. centred at the
+   foot so they read as marks in the material, not as a corner indicator. */
+[data-c="rf-card"] .cd__cuts{position:absolute;left:50%;bottom:22px;
+  transform:translateX(-50%);display:flex;align-items:flex-end;gap:9px}
+[data-c="rf-card"] .cd__cuts i{display:block;width:2px;height:12px;border-radius:1px;
+  background:rgba(255,255,255,.13);box-shadow:1px 0 0 rgba(0,0,0,.6)}
+[data-c="rf-card"] .cd__cuts i.new{background:var(--accent);
+  box-shadow:0 0 14px rgba(var(--accent-rgb),.78);
+  opacity:0;transform:scaleY(.12);transform-origin:bottom}
+[data-c="rf-card"] .b3.on .cd__cuts i.new{animation:rfCardCut 500ms cubic-bezier(.2,.85,.25,1) .82s forwards}
+@keyframes rfCardCut{from{opacity:0;transform:scaleY(.12)}to{opacity:1;transform:scaleY(1)}}
+
+/* the light. it crosses once and leaves. */
+[data-c="rf-card"] .cd__sweep{position:absolute;left:-62%;top:-42%;width:82%;height:184%;
+  pointer-events:none;opacity:0;transform:rotate(18deg) translateX(-40px);
+  background:linear-gradient(90deg,
+    rgba(255,255,255,0) 0%, rgba(255,255,255,.035) 30%, rgba(255,255,255,.10) 44%,
+    rgba(255,255,255,.30) 50%, rgba(255,255,255,.10) 56%,
+    rgba(255,255,255,.035) 70%, rgba(255,255,255,0) 100%)}
+[data-c="rf-card"] .b3.on .cd__sweep{animation:rfCardSweep 1150ms cubic-bezier(.36,0,.26,1) .42s forwards}
+@keyframes rfCardSweep{
+  0%  {opacity:0;transform:rotate(18deg) translateX(-40px)}
+  11% {opacity:1}
+  84% {opacity:1}
+  100%{opacity:0;transform:rotate(18deg) translateX(330px)}
+}
+
+[data-c="rf-card"] .cd__dep{margin-top:32px;opacity:0}
+[data-c="rf-card"] .b3.on .cd__dep{animation:rfCardDep 520ms ease-out 1.76s forwards}
+@keyframes rfCardDep{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+[data-c="rf-card"] .cd__cost{margin-top:14px}
+
+@media (prefers-reduced-motion:reduce){
+  [data-c="rf-card"] .cd__amb{opacity:1}
+  [data-c="rf-card"] .cd__shell{opacity:1;transform:none}
+  [data-c="rf-card"] .cd__m{opacity:1}
+  [data-c="rf-card"] .cd__cuts i.new{opacity:1;transform:none}
+  [data-c="rf-card"] .cd__sweep{opacity:0}
+  [data-c="rf-card"] .cd__dep{opacity:1;transform:none}
+}
+</style>
+<div class="ph" data-c="rf-card">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="cd__land">You passed the bar.</div>
+    </div>
+
+    <div class="b b2">
+      <div class="n n--big" data-count="0|640">0</div>
+      <div class="sub">hours of study behind it</div>
+      <div class="sub cd__cost">Over fourteen months.</div>
+    </div>
+
+    <div class="b b3">
+      <div class="cd__stage">
+        <span class="cd__amb"></span>
+        <div class="cd__shell">
+          <div class="cd">
+            <svg class="cd__m" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+            <span class="cd__cuts"><i></i><i></i><i></i><i></i><i class="new"></i></span>
+            <span class="cd__sweep"></span>
+          </div>
+        </div>
+      </div>
+      <div class="deposit cd__dep">On this day at 4:12pm, you <b>passed the bar</b>.</div>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>
+<p class="item__note">The Memento is the object that carries their life, so the milestone lands <b>on it</b>. Beat three is where the deposit goes, so the card is what receives it: it rises and settles flat, light crosses the face once, and where the light passed there is a cut at the foot that was not there before. The four cuts beside it are older moments, the new one is the only colour on the screen, and the mark is debossed on the card. The light leaves. The cut stays.</p></div></div></div>
+<script src="_kit.js"></script><script>CEL.init()</script>
+</body></html>

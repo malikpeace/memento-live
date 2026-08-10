@@ -1,0 +1,47 @@
+<style>
+/* ms-2 "The engine". A milestone hides a quantity engine underneath. The
+   event is still 41 days away; the hours are real now. Accent moment: the
+   300 on beat 1. The rail of sessions stays white. */
+[data-c="ms-2"] .ms2-num{color:var(--accent)}
+
+[data-c="ms-2"] .ms2-rail{display:grid;grid-template-columns:repeat(40,1fr);gap:3px;
+  width:298px;margin:2px auto 0;transform-origin:left center}
+[data-c="ms-2"] .ms2-t{display:block;height:15px;border-radius:1.5px;background:rgba(235,238,248,.22)}
+[data-c="ms-2"] .ms2-t--now{background:rgba(235,238,248,.7)}
+[data-c="ms-2"] .b2.on .ms2-rail{animation:ms2Rail .72s cubic-bezier(.2,.8,.3,1) .1s both}
+@keyframes ms2Rail{from{opacity:0;transform:scaleX(0)}to{opacity:1;transform:scaleX(1)}}
+
+[data-c="ms-2"] .ms2-ahead{margin-top:20px;padding-top:17px;border-top:1px solid var(--hairline);
+  font-size:14.5px;font-weight:500;color:var(--text-mid);letter-spacing:-.01em}
+[data-c="ms-2"] .b2.on .ms2-ahead{animation:ms2Ahead .5s cubic-bezier(.2,.8,.3,1) .52s both}
+@keyframes ms2Ahead{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+[data-c="ms-2"] .ms2-rule{width:36px;height:1px;background:rgba(235,238,248,.18);margin-bottom:20px}
+[data-c="ms-2"] .deposit b{white-space:nowrap}
+[data-c="ms-2"] .ms2-open{margin-top:14px;font-size:13.5px;font-weight:500;color:var(--text-mid);
+  letter-spacing:-.01em}
+</style>
+<div class="ph" data-c="ms-2">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="n n--hero ms2-num" data-count="0|300">300</div>
+      <div class="sub">hours of studying for the boards.</div>
+    </div>
+
+    <div class="b b2">
+      <div class="ms2-rail"><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t ms2-t--now"></i></div>
+      <div class="sub">118 sessions since January 4.</div>
+      <div class="ms2-ahead">The exam is 41 days out.</div>
+    </div>
+
+    <div class="b b3">
+      <div class="ms2-rule"></div>
+      <div class="deposit">On this day, you crossed <b>300 hours</b> of studying for the boards.</div>
+      <div class="ms2-open">The exam is still ahead.</div>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>

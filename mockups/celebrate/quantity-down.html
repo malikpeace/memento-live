@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quantity down</title>
+<link rel="stylesheet" href="_kit.css">
+</head><body data-accent="cyan">
+<div class="bar">
+  <a href="index.html" style="color:var(--text-mid);text-decoration:none;font-size:13px;font-weight:600">&lsaquo; All</a>
+  <span class="bar__t">Quantity down</span>
+  <span class="sw"><button data-a="cyan" style="background:#2bd4d4" class="on"></button><button data-a="green" style="background:#3fd94e"></button><button data-a="amber" style="background:#ffb73d"></button><button data-a="rose" style="background:#ff6b9d"></button><button data-a="blue" style="background:#4f8cff"></button><button data-a="teal" style="background:#19c3a6"></button></span>
+  <span class="bar__n">their Memento colour drives every screen &middot; <b>tap a phone to advance or replay</b></span>
+</div>
+<div class="gal"><h1>Quantity down</h1><p class="gal__sub">A number falling. Lose 20 lbs, pay off $8,000, screen time under an hour. The most emotionally loaded type in the set, so the voice stays matter of fact and never coaches at them.</p><div class="grid"><div class="item"><p class="item__label"><span class="item__n">1</span><span class="item__name">Marks on the way down</span></p><style>
+[data-c="qd-1"] .lead{display:flex;align-items:baseline;gap:11px}
+[data-c="qd-1"] .lead .of{font-size:24px;font-weight:650;letter-spacing:-.02em;
+  color:var(--text-mid);font-variant-numeric:tabular-nums}
+
+[data-c="qd-1"] .rail{position:relative;width:78px;height:238px;
+  display:grid;grid-template-rows:repeat(5,1fr);margin-bottom:8px}
+[data-c="qd-1"] .rail::before{content:"";position:absolute;left:0;top:10%;bottom:10%;
+  width:1px;background:rgba(var(--ink),.10)}
+[data-c="qd-1"] .rail::after{content:"";position:absolute;left:0;top:10%;height:20%;
+  width:1px;background:rgba(var(--ink),.32)}
+
+[data-c="qd-1"] .mk{display:grid;grid-template-columns:52px auto;align-items:center;
+  opacity:0;transform:translateY(5px)}
+[data-c="qd-1"] .mk i{display:block;width:20px;height:1px;background:rgba(var(--ink),.18)}
+[data-c="qd-1"] .mk span{justify-self:start;font-size:16px;font-weight:700;letter-spacing:-.025em;
+  font-variant-numeric:tabular-nums;color:var(--text-lo)}
+[data-c="qd-1"] .mk--done i{background:rgba(var(--ink),.30)}
+[data-c="qd-1"] .mk--done span{color:rgba(var(--ink),.60)}
+[data-c="qd-1"] .mk--now i{width:42px;height:2px;background:var(--accent);
+  box-shadow:0 0 18px rgba(var(--accent-rgb),.55)}
+[data-c="qd-1"] .mk--now span{font-size:22px;color:var(--text-hi)}
+
+[data-c="qd-1"] .b.on .mk{animation:qd1mk .5s cubic-bezier(.2,.8,.3,1) forwards}
+[data-c="qd-1"] .b.on .mk:nth-child(1){animation-delay:.05s}
+[data-c="qd-1"] .b.on .mk:nth-child(2){animation-delay:.12s}
+[data-c="qd-1"] .b.on .mk:nth-child(3){animation-delay:.19s}
+[data-c="qd-1"] .b.on .mk:nth-child(4){animation-delay:.26s}
+[data-c="qd-1"] .b.on .mk:nth-child(5){animation-delay:.33s}
+@keyframes qd1mk{to{opacity:1;transform:translateY(0)}}
+
+[data-c="qd-1"] .sub{text-wrap:balance}
+[data-c="qd-1"] .sub + .sub{margin-top:7px}
+
+[data-c="qd-1"] .deposit{text-wrap:balance}
+@media (prefers-reduced-motion:reduce){
+  [data-c="qd-1"] .mk{opacity:1;transform:none}
+}
+</style>
+<div class="ph" data-c="qd-1">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="lead">
+        <span class="n n--hero" data-count="0|8">8</span>
+        <span class="of">of 20</span>
+      </div>
+      <div class="sub">lbs down</div>
+    </div>
+
+    <div class="b b2">
+      <div class="rail">
+        <div class="mk mk--done"><i></i><span>4</span></div>
+        <div class="mk mk--now"><i></i><span>8</span></div>
+        <div class="mk"><i></i><span>12</span></div>
+        <div class="mk"><i></i><span>16</span></div>
+        <div class="mk"><i></i><span>20</span></div>
+      </div>
+      <div class="sub">63 days made this.</div>
+      <div class="sub">12 lbs still open.</div>
+    </div>
+
+    <div class="b b3">
+      <div class="deposit">On this day, you reached <b>8 lbs down</b> of 20.</div>
+      <svg class="mark--foot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>
+<p class="item__note">The 20 lbs target broken into five marks running downward, with only the one you just crossed lit. The marks still below stay dim, so the road left is visible without becoming the headline, which is the honest way to show a fifth crossed on a number that falls.</p></div><div class="item"><p class="item__label"><span class="item__n">2</span><span class="item__name">The record book</span></p><style>
+[data-c="qd-2"] .lead{display:flex;align-items:baseline;gap:10px}
+[data-c="qd-2"] .lead .u{font-size:26px;font-weight:650;letter-spacing:-.02em;color:var(--text-mid)}
+
+[data-c="qd-2"] .log{width:216px;margin-bottom:10px}
+[data-c="qd-2"] .lgr{display:flex;align-items:baseline;justify-content:space-between;
+  padding:9px 0;opacity:0;transform:translateY(5px)}
+[data-c="qd-2"] .lgr .d{font-size:12.5px;letter-spacing:-.01em;color:var(--text-lo)}
+[data-c="qd-2"] .lgr .v{font-size:17px;font-weight:700;letter-spacing:-.03em;
+  font-variant-numeric:tabular-nums;color:rgba(var(--ink),.56)}
+[data-c="qd-2"] .lgr--now{padding-top:13px}
+[data-c="qd-2"] .lgr--now .d{color:var(--text-mid)}
+[data-c="qd-2"] .lgr--now .v{font-size:23px;color:var(--accent)}
+
+[data-c="qd-2"] .b.on .lgr{animation:qd2row .5s cubic-bezier(.2,.8,.3,1) forwards}
+[data-c="qd-2"] .b.on .lgr:nth-child(1){animation-delay:.05s}
+[data-c="qd-2"] .b.on .lgr:nth-child(2){animation-delay:.12s}
+[data-c="qd-2"] .b.on .lgr:nth-child(3){animation-delay:.19s}
+[data-c="qd-2"] .b.on .lgr:nth-child(4){animation-delay:.26s}
+[data-c="qd-2"] .b.on .lgr:nth-child(5){animation-delay:.36s}
+@keyframes qd2row{to{opacity:1;transform:translateY(0)}}
+
+[data-c="qd-2"] .sub{text-wrap:balance}
+[data-c="qd-2"] .sub + .sub{margin-top:7px}
+[data-c="qd-2"] .deposit{max-width:23ch;text-wrap:balance}
+
+@media (prefers-reduced-motion:reduce){
+  [data-c="qd-2"] .lgr{opacity:1;transform:none}
+}
+</style>
+<div class="ph" data-c="qd-2">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="lead">
+        <span class="n n--hero">3</span>
+        <span class="u">a day</span>
+      </div>
+      <div class="sub">your lowest week yet</div>
+    </div>
+
+    <div class="b b2">
+      <div class="log">
+        <div class="lgr"><span class="d">Mar 4</span><span class="v">11</span></div>
+        <div class="lgr"><span class="d">Apr 22</span><span class="v">8</span></div>
+        <div class="lgr"><span class="d">Jun 3</span><span class="v">6</span></div>
+        <div class="lgr"><span class="d">Jul 15</span><span class="v">4</span></div>
+        <div class="lgr lgr--now"><span class="d">this week</span><span class="v">3</span></div>
+      </div>
+      <div class="sub">19 weeks of counting made this.</div>
+      <div class="sub">No number on this goal. Each new low is the marker.</div>
+    </div>
+
+    <div class="b b3">
+      <div class="deposit">On this day, your week came in at <b>3 a day</b>. A new low.</div>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>
+<p class="item__note">No target was ever set on this goal, so there is no percentage to draw. Instead every previous low is listed with its date and only the newest one is coloured, because when nobody set a number the <b>new low itself</b> is the whole event.</p></div><div class="item"><p class="item__label"><span class="item__n">3</span><span class="item__name">The number you carry</span></p><style>
+[data-c="qd-3"] .wash{position:absolute;left:50%;top:52%;width:296px;height:158px;z-index:0;
+  transform:translate(-50%,-50%);pointer-events:none;opacity:0;
+  background:radial-gradient(ellipse at center,
+    rgba(var(--accent-rgb),.15) 0%,
+    rgba(var(--accent-rgb),.05) 40%,
+    rgba(var(--accent-rgb),0) 72%)}
+[data-c="qd-3"] .b.on .wash{animation:qd3wash .9s cubic-bezier(.2,.8,.3,1) forwards}
+@keyframes qd3wash{
+  from{opacity:0;transform:translate(-50%,-50%) scale(.84)}
+  to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+
+[data-c="qd-3"] .b1 .sub{position:relative;z-index:1}
+[data-c="qd-3"] .lead{position:relative;display:flex;align-items:baseline;justify-content:center}
+[data-c="qd-3"] .lead .n{position:relative;z-index:1}
+[data-c="qd-3"] .sub{text-wrap:balance}
+[data-c="qd-3"] .sub + .sub{margin-top:7px}
+[data-c="qd-3"] .deposit{max-width:24ch;text-wrap:balance}
+
+@media (prefers-reduced-motion:reduce){
+  [data-c="qd-3"] .wash{opacity:1;transform:translate(-50%,-50%)}
+}
+</style>
+<div class="ph" data-c="qd-3">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="lead"><i class="wash"></i><span class="n n--hero" data-count="214|199">199</span></div>
+      <div class="sub">lbs. Under 200.</div>
+    </div>
+
+    <div class="b b2">
+      <div class="n n--big" data-count="0|96">96</div>
+      <div class="sub">days since the scale read 214.</div>
+      <div class="sub">The last time you were under 200 was 2019.</div>
+    </div>
+
+    <div class="b b3">
+      <div class="deposit">On this day, you weighed <b>199</b>. First time under 200 since 2019.</div>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>
+<p class="item__note">The scale reading falls from 214 to 199 in front of you with a soft breath of your colour behind it. For weight and debt the number people hold in their head is the current one, not the amount lost, so the current one is the hero and beat 2 pays the receipt: 96 days, and the last time you were under 200 was 2019.</p></div><div class="item"><p class="item__label"><span class="item__n">4</span><span class="item__name">The fall, drawn</span></p><style>
+[data-c="qd-4"] .lead{display:flex;align-items:baseline;justify-content:center}
+[data-c="qd-4"] .lead .cur{font-size:34px;font-weight:700;letter-spacing:-.02em;
+  color:var(--text-mid);margin-right:3px}
+[data-c="qd-4"] .b1 .sub{max-width:21ch}
+
+[data-c="qd-4"] .fall{position:relative;width:210px;padding-left:26px;text-align:left;margin-bottom:12px}
+[data-c="qd-4"] .fall .drop{position:absolute;left:0;top:12px;bottom:26px;width:2px;border-radius:2px;
+  background:linear-gradient(180deg,rgba(var(--accent-rgb),.16),var(--accent));
+  box-shadow:0 0 16px rgba(var(--accent-rgb),.30);
+  transform-origin:50% 0;transform:scaleY(0)}
+[data-c="qd-4"] .b.on .drop{animation:qd4drop .62s cubic-bezier(.2,.8,.3,1) .18s forwards}
+@keyframes qd4drop{to{transform:scaleY(1)}}
+
+[data-c="qd-4"] .frow{opacity:0;transform:translateY(5px)}
+[data-c="qd-4"] .frow + .frow{margin-top:24px}
+[data-c="qd-4"] .frow .v{font-size:34px;font-weight:800;letter-spacing:-.04em;
+  line-height:1;font-variant-numeric:tabular-nums;color:var(--text-hi)}
+[data-c="qd-4"] .frow .v--was{font-size:26px;color:rgba(var(--ink),.44)}
+[data-c="qd-4"] .frow .d{font-size:12.5px;color:var(--text-lo);margin-top:5px}
+[data-c="qd-4"] .b.on .frow{animation:qd4row .5s cubic-bezier(.2,.8,.3,1) forwards}
+[data-c="qd-4"] .b.on .frow:nth-of-type(1){animation-delay:.05s}
+[data-c="qd-4"] .b.on .frow:nth-of-type(2){animation-delay:.5s}
+@keyframes qd4row{to{opacity:1;transform:translateY(0)}}
+
+[data-c="qd-4"] .sub{text-wrap:balance}
+[data-c="qd-4"] .sub + .sub{margin-top:7px}
+[data-c="qd-4"] .deposit{max-width:23ch;text-wrap:balance}
+
+@media (prefers-reduced-motion:reduce){
+  [data-c="qd-4"] .frow{opacity:1;transform:none}
+  [data-c="qd-4"] .fall .drop{transform:scaleY(1)}
+}
+</style>
+<div class="ph" data-c="qd-4">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="lead">
+        <span class="cur">$</span><span class="n n--big">29,900</span>
+      </div>
+      <div class="sub">left on the loan. Under 30,000 for the first time.</div>
+    </div>
+
+    <div class="b b2">
+      <div class="fall">
+        <i class="drop"></i>
+        <div class="frow"><div class="v v--was">$34,000</div><div class="d">January 6</div></div>
+        <div class="frow"><div class="v">$29,900</div><div class="d">today</div></div>
+      </div>
+      <div class="sub">14 payments over 7 months. It has not risen once.</div>
+      <div class="sub">$4,100 closed. $29,900 open.</div>
+    </div>
+
+    <div class="b b3">
+      <div class="deposit">On this day, the balance went under <b>$30,000</b>.</div>
+      <svg class="mark--foot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>
+<p class="item__note">A 34,000 loan with 29,900 still open, so the win is the balance dropping and a line is literally drawn from the old figure down to the new one. The closed and open amounts sit together underneath, because on a long road hiding the remainder is what makes a screen feel fake.</p></div><div class="item"><p class="item__label"><span class="item__n">5</span><span class="item__name">The line you got under</span></p><style>
+[data-c="qd-5"] .ceil{display:flex;align-items:center;gap:11px;margin-bottom:26px}
+[data-c="qd-5"] .ceil i{display:block;width:168px;height:2px;border-radius:2px;background:var(--accent);
+  box-shadow:0 0 18px rgba(var(--accent-rgb),.50);transform-origin:0 50%;transform:scaleX(0)}
+[data-c="qd-5"] .ceil span{font-size:12.5px;font-weight:600;letter-spacing:-.01em;
+  font-variant-numeric:tabular-nums;color:var(--text-lo)}
+[data-c="qd-5"] .b.on .ceil i{animation:qd5ceil .55s cubic-bezier(.2,.8,.3,1) forwards}
+@keyframes qd5ceil{to{transform:scaleX(1)}}
+
+[data-c="qd-5"] .lead{display:flex;align-items:baseline;justify-content:center;gap:2px}
+[data-c="qd-5"] .lead .u{font-size:40px;font-weight:800;letter-spacing:-.04em;color:var(--text-hi)}
+[data-c="qd-5"] .lead .u--sm{font-size:28px;color:var(--text-mid);font-weight:650;margin-left:2px}
+[data-c="qd-5"] .sub{text-wrap:balance}
+[data-c="qd-5"] .sub + .sub{margin-top:7px}
+[data-c="qd-5"] .deposit{max-width:23ch;text-wrap:balance}
+
+@media (prefers-reduced-motion:reduce){
+  [data-c="qd-5"] .ceil i{transform:scaleX(1)}
+}
+</style>
+<div class="ph" data-c="qd-5">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="ceil"><i></i><span>1h</span></div>
+      <div class="lead"><span class="n n--hero">58</span><span class="u">m</span></div>
+      <div class="sub">your daily average this week</div>
+    </div>
+
+    <div class="b b2">
+      <div class="lead"><span class="n n--big" data-count="0|15">15</span><span class="u--sm">h</span></div>
+      <div class="sub">back this week.</div>
+      <div class="sub">3h 08m a day in April. 58m a day now, 11 weeks later.</div>
+    </div>
+
+    <div class="b b3">
+      <div class="deposit">On this day, your week averaged <b>58m</b> a day. First week under 1h.</div>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>
+<p class="item__note">A threshold goal, so the accent is the 1h line and the week's average sits under it. Beat 2 turns the drop into something you can feel, 15 hours of your week handed back, which is the only reward a falling number can really offer.</p></div></div></div>
+<script src="_kit.js"></script><script>CEL.init()</script>
+</body></html>

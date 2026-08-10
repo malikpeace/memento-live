@@ -1,0 +1,82 @@
+<style>
+/* ev-1. LAMINAE. The card is a stack. One sheet per day held. */
+[data-c="ev-1"] .b1{justify-content:center;padding:30px 24px}
+[data-c="ev-1"] .lede{font-size:13.5px;line-height:1.5;font-weight:500;color:var(--text-mid);
+  max-width:31ch;letter-spacing:-.005em}
+[data-c="ev-1"] .lede b{color:var(--text-hi);font-weight:650}
+
+[data-c="ev-1"] .ages{display:flex;align-items:flex-end;justify-content:center;gap:17px;margin-top:24px}
+[data-c="ev-1"] .age{display:flex;flex-direction:column;align-items:center}
+[data-c="ev-1"] .lab{margin-top:11px;font-size:11px;color:var(--text-lo);font-variant-numeric:tabular-nums}
+
+[data-c="ev-1"] .obj{position:relative;width:96px;border-radius:5px;
+  box-shadow:0 10px 24px rgba(0,0,0,.55)}
+[data-c="ev-1"] .fc{position:relative;z-index:2;height:128px;overflow:hidden;border-radius:5px 5px 0 0;
+  background:linear-gradient(165deg,rgba(235,238,248,.12),rgba(235,238,248,.02) 48%,rgba(235,238,248,.05));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.24)}
+[data-c="ev-1"] .fc::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(150% 45% at 50% -12%,rgba(255,255,255,.13),transparent 56%)}
+[data-c="ev-1"] .slab{position:relative;z-index:1;overflow:hidden;border-radius:0 0 5px 5px;
+  background:linear-gradient(180deg,rgba(235,238,248,.17),rgba(235,238,248,.06) 34%,rgba(0,0,0,.5))}
+[data-c="ev-1"] .slab::before{content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(180deg,rgba(255,255,255,.34) 0 .5px,rgba(255,255,255,0) .5px 1.5px);
+  -webkit-mask-image:linear-gradient(180deg,#000,rgba(0,0,0,.12) 58%,rgba(0,0,0,0));
+          mask-image:linear-gradient(180deg,#000,rgba(0,0,0,.12) 58%,rgba(0,0,0,0))}
+
+[data-c="ev-1"] .rule{width:100%;height:1px;background:var(--hairline);margin:26px 0 22px}
+
+[data-c="ev-1"] .obj--big{width:141px;border-radius:8px}
+[data-c="ev-1"] .obj--big .fc{height:188px;border-radius:8px 8px 0 0}
+[data-c="ev-1"] .obj--big .slab{border-radius:0 0 8px 8px}
+[data-c="ev-1"] .mk{position:absolute;left:50%;top:43%;transform:translate(-50%,-50%);
+  width:68px;height:68px;fill:rgba(255,255,255,.22)}
+[data-c="ev-1"] .eng{position:absolute;left:11px;bottom:9px;font-size:9.5px;font-weight:500;
+  letter-spacing:.005em;color:rgba(235,238,248,.56)}
+
+/* today: one sheet, the only colour on the screen */
+[data-c="ev-1"] .new{position:absolute;left:0;right:0;top:0;height:1.8px;background:var(--accent);
+  box-shadow:0 0 11px rgba(var(--accent-rgb),.42)}
+[data-c="ev-1"] .b1.on .new{animation:ev1sheet .5s cubic-bezier(.2,.8,.3,1) .95s backwards}
+@keyframes ev1sheet{from{opacity:0;transform:translateY(7px)}}
+[data-c="ev-1"] .b1.on .obj--big .fc{animation:ev1lift .5s cubic-bezier(.2,.8,.3,1) .95s backwards}
+@keyframes ev1lift{from{transform:translateY(1.8px)}}
+
+[data-c="ev-1"] .cap2{margin-top:13px;font-size:12px;line-height:1.5;color:var(--text-mid);max-width:30ch}
+[data-c="ev-1"] .state{margin-top:6px;font-size:11px;color:var(--text-lo)}
+</style>
+<div class="ph" data-c="ev-1">
+  <div class="st">
+    <div class="b b1">
+      <div class="lede">One sheet for every day you hold. The card thickens, and nothing under the top ever moves.</div>
+
+      <div class="ages">
+        <div class="age">
+          <div class="obj"><div class="fc"></div><div class="slab" style="height:4px"></div></div>
+          <div class="lab">Day 7</div>
+        </div>
+        <div class="age">
+          <div class="obj"><div class="fc"></div><div class="slab" style="height:19px"></div></div>
+          <div class="lab">Day 90</div>
+        </div>
+        <div class="age">
+          <div class="obj"><div class="fc"></div><div class="slab" style="height:38px"></div></div>
+          <div class="lab">Day 300</div>
+        </div>
+      </div>
+
+      <div class="rule"></div>
+
+      <div class="obj obj--big">
+        <div class="fc">
+          <svg class="mk" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+          <div class="eng">Stay sober</div>
+        </div>
+        <div class="slab" style="height:48px"><div class="new"></div></div>
+      </div>
+      <div class="lab">Day 301</div>
+      <div class="cap2">Today's sheet goes on top of three hundred. The face lifts by the thickness of one day.</div>
+      <div class="state">Until the day is held, the top sheet is not there.</div>
+    </div>
+  </div>
+  <div class="hint">Tap to replay</div>
+</div>

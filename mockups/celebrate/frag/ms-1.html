@@ -1,0 +1,49 @@
+<style>
+/* ms-1 "The turn". The binary event landing. The screen inverts for one
+   beat: the only thing on the light is the mark. Then back to black to weigh
+   it. Accent moment: the 47 on beat 2. */
+[data-c="ms-1"] .ms1-flood{position:absolute;inset:0;background:#f2f4f8}
+[data-c="ms-1"] .b1.on .ms1-flood{animation:ms1Flood .58s cubic-bezier(.2,.8,.3,1) both}
+@keyframes ms1Flood{from{opacity:0;transform:scale(1.05)}to{opacity:1;transform:scale(1)}}
+
+[data-c="ms-1"] .ms1-m{position:relative;width:78px;height:78px;fill:#0e1218}
+[data-c="ms-1"] .b1.on .ms1-m{animation:ms1Mark .5s cubic-bezier(.2,.8,.3,1) .14s both}
+@keyframes ms1Mark{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+
+[data-c="ms-1"] .ms1-word{position:relative;margin-top:30px;font-size:31px;font-weight:700;
+  letter-spacing:-.035em;line-height:1.06;color:rgba(14,18,24,.93);max-width:11ch}
+[data-c="ms-1"] .b1.on .ms1-word{animation:ms1Word .46s cubic-bezier(.2,.8,.3,1) .74s both}
+@keyframes ms1Word{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+
+[data-c="ms-1"] .ms1-num{color:var(--accent)}
+[data-c="ms-1"] .ms1-cost{margin-top:22px;padding-top:18px;border-top:1px solid var(--hairline);
+  font-size:15px;font-weight:500;line-height:1.75;color:var(--text-mid);letter-spacing:-.01em}
+[data-c="ms-1"] .b2.on .ms1-cost{animation:ms1Cost .5s cubic-bezier(.2,.8,.3,1) .46s both}
+@keyframes ms1Cost{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+[data-c="ms-1"] .ms1-rule{width:36px;height:1px;background:rgba(235,238,248,.18);margin-bottom:20px}
+</style>
+<div class="ph" data-c="ms-1">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="ms1-flood"></div>
+      <svg class="ms1-m" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+      <div class="ms1-word">You got the job.</div>
+    </div>
+
+    <div class="b b2">
+      <div class="n n--big ms1-num" data-count="0|47">47</div>
+      <div class="sub">applications since last November.</div>
+      <div class="ms1-cost">6 final rounds.<br>271 days of looking.</div>
+    </div>
+
+    <div class="b b3">
+      <div class="ms1-rule"></div>
+      <div class="deposit">On this day, <b>you got the job.</b></div>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>

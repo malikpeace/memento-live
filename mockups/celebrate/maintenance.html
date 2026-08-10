@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maintenance</title>
+<link rel="stylesheet" href="_kit.css">
+</head><body data-accent="cyan">
+<div class="bar">
+  <a href="index.html" style="color:var(--text-mid);text-decoration:none;font-size:13px;font-weight:600">&lsaquo; All</a>
+  <span class="bar__t">Maintenance</span>
+  <span class="sw"><button data-a="cyan" style="background:#2bd4d4" class="on"></button><button data-a="green" style="background:#3fd94e"></button><button data-a="amber" style="background:#ffb73d"></button><button data-a="rose" style="background:#ff6b9d"></button><button data-a="blue" style="background:#4f8cff"></button><button data-a="teal" style="background:#19c3a6"></button></span>
+  <span class="bar__n">their Memento colour drives every screen &middot; <b>tap a phone to advance or replay</b></span>
+</div>
+<div class="gal"><h1>Maintenance</h1><p class="gal__sub">A line held. Stay sober, keep under 180, a no-buy year. The design problem: celebrating a long run makes a future break hurt more, so days held are framed as deposits already banked, never as a tower that can fall.</p><div class="grid"><div class="item"><p class="item__label"><span class="item__n">1</span><span class="item__name">The ledger of days</span></p><style>
+/* mt-1 : the ledger of days. 100 days held, no end date in sight. */
+[data-c="mt-1"] .b1.on .n--hero{animation:mt1land .55s cubic-bezier(.2,.8,.3,1) both}
+@keyframes mt1land{from{opacity:0;transform:scale(.955)}to{opacity:1;transform:none}}
+[data-c="mt-1"] .b1.on .sub{animation:mt1sub .5s cubic-bezier(.2,.8,.3,1) .26s both}
+@keyframes mt1sub{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+[data-c="mt-1"] .mt1-field{display:flex;flex-direction:column;gap:10px;align-items:center}
+[data-c="mt-1"] .mt1-row{width:225px;height:18px;
+  background:repeating-linear-gradient(90deg,rgba(var(--accent-rgb),.78) 0 3px,transparent 3px 9px)}
+[data-c="mt-1"] .b2.on .mt1-row{animation:mt1row .5s cubic-bezier(.2,.8,.3,1) both}
+[data-c="mt-1"] .b2.on .mt1-row:nth-child(2){animation-delay:.09s}
+[data-c="mt-1"] .b2.on .mt1-row:nth-child(3){animation-delay:.18s}
+[data-c="mt-1"] .b2.on .mt1-row:nth-child(4){animation-delay:.27s}
+@keyframes mt1row{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+
+[data-c="mt-1"] .mt1-note{font-size:13.5px;line-height:1.55;color:var(--text-mid);
+  max-width:27ch;margin-top:18px;letter-spacing:-.005em}
+</style>
+
+<div class="ph" data-c="mt-1">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="n n--hero" data-count="0|100">0</div>
+      <div class="sub">days sober</div>
+    </div>
+
+    <div class="b b2">
+      <div class="mt1-field">
+        <div class="mt1-row"></div>
+        <div class="mt1-row"></div>
+        <div class="mt1-row"></div>
+        <div class="mt1-row"></div>
+      </div>
+      <div class="sub">You made the same call on a hundred separate days.</div>
+      <div class="cap">May 2 to Aug 9</div>
+    </div>
+
+    <div class="b b3">
+      <div class="deposit"><b>Day 100.</b> The line held.</div>
+      <div class="mt1-note">No end date on this one. The hundred days are in the record now, and nothing later takes them out.</div>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>
+<p class="item__note">Day 100 sober on a goal with no end date. Beat 2 draws the hundred days as a dense block of tick marks, four rows of twenty five, so the days read as a <b>ledger already written</b> rather than a streak that could snap. The closing line says it out loud: no end date, and the hundred days are in the record now. Fits maintenance because the only honest number a held line has is time, and time already spent cannot be withdrawn.</p></div><div class="item"><p class="item__label"><span class="item__n">2</span><span class="item__name">Held to the date</span></p><style>
+/* mt-2 : held to the date. Hold-until-deadline completion, the goal closes. */
+[data-c="mt-2"] .b1.on .n--hero{animation:mt2land .55s cubic-bezier(.2,.8,.3,1) both}
+@keyframes mt2land{from{opacity:0;transform:scale(.955)}to{opacity:1;transform:none}}
+[data-c="mt-2"] .b1.on .sub{animation:mt2sub .5s cubic-bezier(.2,.8,.3,1) .26s both}
+@keyframes mt2sub{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+[data-c="mt-2"] .mt2-rail{position:relative;width:268px;height:12px}
+[data-c="mt-2"] .mt2-track{position:absolute;left:0;right:0;top:5px;height:2px;background:rgba(var(--ink),.13)}
+[data-c="mt-2"] .mt2-fill{position:absolute;left:0;right:0;top:5px;height:2px;
+  background:var(--accent);transform-origin:0 50%}
+[data-c="mt-2"] .b2.on .mt2-fill{animation:mt2fill 1s cubic-bezier(.2,.8,.3,1) both}
+@keyframes mt2fill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+[data-c="mt-2"] .mt2-start{position:absolute;left:0;top:2px;width:2px;height:8px;background:rgba(var(--ink),.40)}
+[data-c="mt-2"] .mt2-end{position:absolute;right:0;top:0;width:2px;height:12px;
+  background:rgba(var(--ink),.62);transform-origin:50% 50%}
+[data-c="mt-2"] .b2.on .mt2-end{animation:mt2end .38s cubic-bezier(.2,.8,.3,1) .86s both}
+@keyframes mt2end{from{opacity:0;transform:scaleY(.25)}to{opacity:1;transform:none}}
+
+[data-c="mt-2"] .mt2-dates{display:flex;justify-content:space-between;width:268px;margin-top:11px;
+  font-size:11.5px;color:var(--text-lo);font-variant-numeric:tabular-nums}
+
+[data-c="mt-2"] .mt2-line2{font-size:13px;line-height:1.5;color:var(--text-mid);
+  max-width:29ch;margin-top:9px;letter-spacing:-.005em}
+[data-c="mt-2"] .mt2-note{font-size:13.5px;line-height:1.55;color:var(--text-mid);
+  max-width:26ch;margin-top:18px;letter-spacing:-.005em}
+</style>
+
+<div class="ph" data-c="mt-2">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="n n--hero" data-count="0|365">0</div>
+      <div class="sub">days held</div>
+    </div>
+
+    <div class="b b2">
+      <div class="mt2-rail">
+        <span class="mt2-track"></span>
+        <span class="mt2-fill"></span>
+        <span class="mt2-start"></span>
+        <span class="mt2-end"></span>
+      </div>
+      <div class="mt2-dates"><span>Aug 10, 2025</span><span>Aug 9, 2026</span></div>
+      <div class="sub">Twelve months. Nothing bought outside food, rent and fuel.</div>
+      <div class="mt2-line2">You picked the end date yourself. It arrived with the rule intact.</div>
+    </div>
+
+    <div class="b b3">
+      <div class="deposit"><b>Day 365.</b> The year held. The goal is complete.</div>
+      <div class="mt2-note">It closes here. There is nothing left to hold.</div>
+      <svg class="mark--foot" viewBox="0 0 512 512" aria-hidden="true">
+        <path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/>
+      </svg>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>
+<p class="item__note">The hold-until-deadline completion, a no-buy year that reaches its own end date. A rail runs from the start date to the date they picked and fills all the way across, and the end node lands. This is the one maintenance case where the goal actually <b>finishes</b>, so beat 3 says the year held and the goal is complete, then adds that there is nothing left to hold. No fear of tomorrow because there is no tomorrow on this one.</p></div><div class="item"><p class="item__label"><span class="item__n">3</span><span class="item__name">The hard ones</span></p><style>
+/* mt-3 : the hard ones. 30 days held, and the days that nearly went. */
+[data-c="mt-3"] .b1.on .n--hero{animation:mt3land .55s cubic-bezier(.2,.8,.3,1) both}
+@keyframes mt3land{from{opacity:0;transform:scale(.955)}to{opacity:1;transform:none}}
+[data-c="mt-3"] .b1.on .sub{animation:mt3sub .5s cubic-bezier(.2,.8,.3,1) .26s both}
+@keyframes mt3sub{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+[data-c="mt-3"] .mt3-days{display:flex;align-items:flex-end;gap:6px;height:34px}
+[data-c="mt-3"] .mt3-bar{width:4px;height:16px;background:rgba(var(--ink),.28)}
+[data-c="mt-3"] .mt3-h{height:34px;background:rgba(var(--accent-rgb),.92);transform-origin:50% 100%}
+[data-c="mt-3"] .b2.on .mt3-h{animation:mt3rise .58s cubic-bezier(.2,.8,.3,1) .36s both}
+@keyframes mt3rise{from{transform:scaleY(.47)}to{transform:scaleY(1)}}
+
+[data-c="mt-3"] .mt3-note{font-size:13.5px;line-height:1.55;color:var(--text-mid);
+  max-width:27ch;margin-top:18px;letter-spacing:-.005em}
+</style>
+
+<div class="ph" data-c="mt-3">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="n n--hero" data-count="0|30">0</div>
+      <div class="sub">days without one</div>
+    </div>
+
+    <div class="b b2">
+      <div class="mt3-days">
+        <span class="mt3-bar mt3-h"></span><span class="mt3-bar mt3-h"></span><span class="mt3-bar mt3-h"></span>
+        <span class="mt3-bar"></span><span class="mt3-bar mt3-h"></span><span class="mt3-bar"></span>
+        <span class="mt3-bar"></span><span class="mt3-bar mt3-h"></span><span class="mt3-bar"></span>
+        <span class="mt3-bar"></span><span class="mt3-bar"></span><span class="mt3-bar mt3-h"></span>
+        <span class="mt3-bar"></span><span class="mt3-bar"></span><span class="mt3-bar"></span>
+        <span class="mt3-bar"></span><span class="mt3-bar mt3-h"></span><span class="mt3-bar"></span>
+        <span class="mt3-bar"></span><span class="mt3-bar"></span><span class="mt3-bar"></span>
+        <span class="mt3-bar"></span><span class="mt3-bar mt3-h"></span><span class="mt3-bar"></span>
+        <span class="mt3-bar"></span><span class="mt3-bar"></span><span class="mt3-bar"></span>
+        <span class="mt3-bar"></span><span class="mt3-bar mt3-h"></span><span class="mt3-bar"></span>
+      </div>
+      <div class="sub">Nine of these days you logged as hard. You held on all nine.</div>
+      <div class="cap">Jul 11 to Aug 9</div>
+    </div>
+
+    <div class="b b3">
+      <div class="deposit"><b>Day 30.</b> The line held.</div>
+      <div class="mt3-note">The nine hard days are spent and counted. They do not come back around.</div>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>
+<p class="item__note">Day 30 off nicotine pouches, told through the days that nearly went. Thirty bars sit at one height, then the nine days they logged as hard stand up in the accent. It acknowledges the cost without any drama, just a count. The close is the whole point for this type: the nine hard days are <b>spent and counted</b>, they do not come back around.</p></div><div class="item"><p class="item__label"><span class="item__n">4</span><span class="item__name">The first seven</span></p><style>
+/* mt-4 : the first seven. The smallest maintenance marker, treated seriously. */
+[data-c="mt-4"] .mt4-hero{position:relative;display:flex;align-items:center;justify-content:center}
+[data-c="mt-4"] .mt4-glow{position:absolute;left:50%;top:50%;width:440px;height:440px;
+  transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;
+  background:radial-gradient(50% 50% at 50% 50%,
+    rgba(var(--accent-rgb),.26) 0%,rgba(var(--accent-rgb),.12) 28%,
+    rgba(var(--accent-rgb),.035) 50%,rgba(var(--accent-rgb),0) 68%)}
+[data-c="mt-4"] .b1.on .mt4-glow{animation:mt4glow .9s cubic-bezier(.2,.8,.3,1) both}
+@keyframes mt4glow{from{opacity:0;transform:translate(-50%,-50%) scale(.86)}
+  to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+[data-c="mt-4"] .mt4-hero .n--hero{position:relative}
+[data-c="mt-4"] .b1.on .n--hero{animation:mt4land .55s cubic-bezier(.2,.8,.3,1) both}
+@keyframes mt4land{from{opacity:0;transform:scale(.955)}to{opacity:1;transform:none}}
+[data-c="mt-4"] .b1.on .sub{animation:mt4sub .5s cubic-bezier(.2,.8,.3,1) .3s both}
+@keyframes mt4sub{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+[data-c="mt-4"] .mt4-week{display:flex;gap:16px;align-items:center}
+[data-c="mt-4"] .mt4-week span{display:block;width:2px;height:28px;background:rgba(var(--ink),.44)}
+[data-c="mt-4"] .b2.on .mt4-week span{animation:mt4tick .42s cubic-bezier(.2,.8,.3,1) both}
+[data-c="mt-4"] .b2.on .mt4-week span:nth-child(2){animation-delay:.07s}
+[data-c="mt-4"] .b2.on .mt4-week span:nth-child(3){animation-delay:.14s}
+[data-c="mt-4"] .b2.on .mt4-week span:nth-child(4){animation-delay:.21s}
+[data-c="mt-4"] .b2.on .mt4-week span:nth-child(5){animation-delay:.28s}
+[data-c="mt-4"] .b2.on .mt4-week span:nth-child(6){animation-delay:.35s}
+[data-c="mt-4"] .b2.on .mt4-week span:nth-child(7){animation-delay:.42s}
+@keyframes mt4tick{from{opacity:0;transform:scaleY(.3)}to{opacity:1;transform:none}}
+
+[data-c="mt-4"] .mt4-note{font-size:13.5px;line-height:1.55;color:var(--text-mid);
+  max-width:26ch;margin-top:18px;letter-spacing:-.005em}
+</style>
+
+<div class="ph" data-c="mt-4">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="mt4-hero">
+        <span class="mt4-glow"></span>
+        <div class="n n--hero" data-count="0|7">0</div>
+      </div>
+      <div class="sub">days</div>
+    </div>
+
+    <div class="b b2">
+      <div class="mt4-week">
+        <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <div class="sub">Seven nights, seven times you left it in the kitchen.</div>
+      <div class="cap">Aug 3 to Aug 9</div>
+    </div>
+
+    <div class="b b3">
+      <div class="deposit"><b>Day 7.</b> The line held.</div>
+      <div class="mt4-note">Seven days are in the record. The visible part comes later.</div>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>
+<p class="item__note">The smallest maintenance marker taken seriously. A soft accent wash behind the number 7, then seven plain strokes for seven nights the phone stayed out of the bedroom. Week one is where people quit because nothing has changed yet, so the deposit line answers that directly: nothing looks different yet, the count does. Restraint is the design, a big ceremony on day 7 would be a lie.</p></div><div class="item"><p class="item__label"><span class="item__n">5</span><span class="item__name">The trail of markers</span></p><style>
+/* mt-5 : the trail of markers. A year held, and the three markers already banked behind it. */
+[data-c="mt-5"] .b1.on .n--hero{animation:mt5land .55s cubic-bezier(.2,.8,.3,1) both}
+@keyframes mt5land{from{opacity:0;transform:scale(.955)}to{opacity:1;transform:none}}
+[data-c="mt-5"] .b1.on .sub{animation:mt5sub .5s cubic-bezier(.2,.8,.3,1) .26s both}
+@keyframes mt5sub{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+[data-c="mt-5"] .mt5-trail{position:relative;display:flex;justify-content:space-between;
+  align-items:flex-start;width:264px}
+[data-c="mt-5"] .mt5-rail{position:absolute;left:5px;right:5px;top:3px;height:1px;
+  background:rgba(var(--ink),.16);transform-origin:0 50%}
+[data-c="mt-5"] .b2.on .mt5-rail{animation:mt5rail .62s cubic-bezier(.2,.8,.3,1) both}
+@keyframes mt5rail{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+
+[data-c="mt-5"] .mt5-stop{position:relative;display:flex;flex-direction:column;align-items:center;gap:12px}
+[data-c="mt-5"] .mt5-dot{display:block;width:7px;height:7px;border-radius:50%;background:rgba(var(--ink),.34)}
+[data-c="mt-5"] .mt5-num{font-size:13px;font-weight:600;color:var(--text-mid);
+  font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+[data-c="mt-5"] .mt5-now .mt5-dot{width:9px;height:9px;margin:-1px 0;background:var(--accent)}
+[data-c="mt-5"] .mt5-now .mt5-num{color:var(--text-hi);font-weight:700}
+[data-c="mt-5"] .b2.on .mt5-stop{animation:mt5stop .42s cubic-bezier(.2,.8,.3,1) both}
+[data-c="mt-5"] .b2.on .mt5-stop:nth-child(2){animation-delay:.16s}
+[data-c="mt-5"] .b2.on .mt5-stop:nth-child(3){animation-delay:.28s}
+[data-c="mt-5"] .b2.on .mt5-stop:nth-child(4){animation-delay:.40s}
+[data-c="mt-5"] .b2.on .mt5-stop:nth-child(5){animation-delay:.52s}
+@keyframes mt5stop{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+[data-c="mt-5"] .mt5-note{font-size:13.5px;line-height:1.55;color:var(--text-mid);
+  max-width:27ch;margin-top:18px;letter-spacing:-.005em}
+</style>
+
+<div class="ph" data-c="mt-5">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="n n--hero" data-count="0|365">0</div>
+      <div class="sub">days sober</div>
+    </div>
+
+    <div class="b b2">
+      <div class="mt5-trail">
+        <span class="mt5-rail"></span>
+        <span class="mt5-stop"><i class="mt5-dot"></i><span class="mt5-num">7</span></span>
+        <span class="mt5-stop"><i class="mt5-dot"></i><span class="mt5-num">30</span></span>
+        <span class="mt5-stop"><i class="mt5-dot"></i><span class="mt5-num">100</span></span>
+        <span class="mt5-stop mt5-now"><i class="mt5-dot"></i><span class="mt5-num">365</span></span>
+      </div>
+      <div class="sub">Four markers behind you now. None of them can be handed back.</div>
+    </div>
+
+    <div class="b b3">
+      <div class="deposit"><b>Day 365.</b> One year. The line held.</div>
+      <div class="mt5-note">Whatever tomorrow does, these 365 days already happened.</div>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>
+<p class="item__note">One year sober, shown as the fourth marker on a trail: 7, 30, 100, and today, with only today in the accent. It reframes a long hold as a <b>set of separate deposits</b> instead of one tall thing that can fall, since every earlier marker stays passed no matter what happens next. The close states it plainly, whatever tomorrow does, these 365 days already happened.</p></div></div></div>
+<script src="_kit.js"></script><script>CEL.init()</script>
+</body></html>

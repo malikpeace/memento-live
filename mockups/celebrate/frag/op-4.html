@@ -1,0 +1,45 @@
+<style>
+[data-c="op-4"] .op4-bloom{position:absolute;left:50%;top:50%;width:520px;height:420px;
+  transform:translate(-50%,-50%);pointer-events:none;
+  background:radial-gradient(50% 50% at 50% 50%,
+    rgba(var(--accent-rgb),.17),
+    rgba(var(--accent-rgb),.06) 44%,
+    rgba(var(--accent-rgb),0) 72%)}
+[data-c="op-4"] .op4-goal{position:relative;max-width:288px;font-size:25px;font-weight:600;
+  line-height:1.34;letter-spacing:-.022em;color:var(--text-hi)}
+[data-c="op-4"] .op4-time{font-size:13.5px;color:var(--text-mid);margin-bottom:16px}
+[data-c="op-4"] .op4-time b{color:var(--text-hi);font-weight:650}
+[data-c="op-4"] .op4-why{width:100%;max-width:300px;text-align:left;margin:0;font-size:16.5px;
+  font-weight:500;line-height:1.56;letter-spacing:-.008em;color:var(--text-hi)}
+[data-c="op-4"] .op4-bloom{opacity:0;transform:translate(-50%,-50%) scale(.88)}
+[data-c="op-4"] .b.on .op4-bloom{animation:op4bloom .8s cubic-bezier(.2,.8,.3,1) forwards}
+@keyframes op4bloom{to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+[data-c="op-4"] .op4-why{opacity:0;transform:translateY(8px)}
+[data-c="op-4"] .b.on .op4-why{animation:op4rise .6s cubic-bezier(.2,.8,.3,1) .2s forwards}
+@keyframes op4rise{to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  [data-c="op-4"] .op4-bloom{opacity:1;transform:translate(-50%,-50%)}
+  [data-c="op-4"] .op4-why{opacity:1;transform:none}
+}
+</style>
+<div class="ph" data-c="op-4">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="op4-bloom" aria-hidden="true"></div>
+      <div class="op4-goal">“Be someone my friends can actually reach.”</div>
+    </div>
+
+    <div class="b b2">
+      <div class="op4-time">Why you wrote it, <b>30 days ago</b></div>
+      <p class="op4-why">“I haven't called anyone first in about two years. I keep waiting for people to give up on me and then acting surprised when they do.”</p>
+    </div>
+
+    <div class="b b3">
+      <div class="deposit"><b>Day 30.</b> One month since you wrote it.</div>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>

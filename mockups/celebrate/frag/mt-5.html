@@ -1,0 +1,59 @@
+<style>
+/* mt-5 : the trail of markers. A year held, and the three markers already banked behind it. */
+[data-c="mt-5"] .b1.on .n--hero{animation:mt5land .55s cubic-bezier(.2,.8,.3,1) both}
+@keyframes mt5land{from{opacity:0;transform:scale(.955)}to{opacity:1;transform:none}}
+[data-c="mt-5"] .b1.on .sub{animation:mt5sub .5s cubic-bezier(.2,.8,.3,1) .26s both}
+@keyframes mt5sub{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+[data-c="mt-5"] .mt5-trail{position:relative;display:flex;justify-content:space-between;
+  align-items:flex-start;width:264px}
+[data-c="mt-5"] .mt5-rail{position:absolute;left:5px;right:5px;top:3px;height:1px;
+  background:rgba(var(--ink),.16);transform-origin:0 50%}
+[data-c="mt-5"] .b2.on .mt5-rail{animation:mt5rail .62s cubic-bezier(.2,.8,.3,1) both}
+@keyframes mt5rail{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+
+[data-c="mt-5"] .mt5-stop{position:relative;display:flex;flex-direction:column;align-items:center;gap:12px}
+[data-c="mt-5"] .mt5-dot{display:block;width:7px;height:7px;border-radius:50%;background:rgba(var(--ink),.34)}
+[data-c="mt-5"] .mt5-num{font-size:13px;font-weight:600;color:var(--text-mid);
+  font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+[data-c="mt-5"] .mt5-now .mt5-dot{width:9px;height:9px;margin:-1px 0;background:var(--accent)}
+[data-c="mt-5"] .mt5-now .mt5-num{color:var(--text-hi);font-weight:700}
+[data-c="mt-5"] .b2.on .mt5-stop{animation:mt5stop .42s cubic-bezier(.2,.8,.3,1) both}
+[data-c="mt-5"] .b2.on .mt5-stop:nth-child(2){animation-delay:.16s}
+[data-c="mt-5"] .b2.on .mt5-stop:nth-child(3){animation-delay:.28s}
+[data-c="mt-5"] .b2.on .mt5-stop:nth-child(4){animation-delay:.40s}
+[data-c="mt-5"] .b2.on .mt5-stop:nth-child(5){animation-delay:.52s}
+@keyframes mt5stop{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+[data-c="mt-5"] .mt5-note{font-size:13.5px;line-height:1.55;color:var(--text-mid);
+  max-width:27ch;margin-top:18px;letter-spacing:-.005em}
+</style>
+
+<div class="ph" data-c="mt-5">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="n n--hero" data-count="0|365">0</div>
+      <div class="sub">days sober</div>
+    </div>
+
+    <div class="b b2">
+      <div class="mt5-trail">
+        <span class="mt5-rail"></span>
+        <span class="mt5-stop"><i class="mt5-dot"></i><span class="mt5-num">7</span></span>
+        <span class="mt5-stop"><i class="mt5-dot"></i><span class="mt5-num">30</span></span>
+        <span class="mt5-stop"><i class="mt5-dot"></i><span class="mt5-num">100</span></span>
+        <span class="mt5-stop mt5-now"><i class="mt5-dot"></i><span class="mt5-num">365</span></span>
+      </div>
+      <div class="sub">Four markers behind you now. None of them can be handed back.</div>
+    </div>
+
+    <div class="b b3">
+      <div class="deposit"><b>Day 365.</b> One year. The line held.</div>
+      <div class="mt5-note">Whatever tomorrow does, these 365 days already happened.</div>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>

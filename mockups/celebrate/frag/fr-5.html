@@ -1,0 +1,62 @@
+<style>
+[data-c="fr-5"] .fr5-sub{max-width:25ch}
+
+[data-c="fr-5"] .fr5-wrap{width:290px;margin-bottom:30px}
+[data-c="fr-5"] .fr5-rail{display:flex;gap:3px;align-items:center}
+[data-c="fr-5"] .fr5-s{width:15px;height:9px;border-radius:3px;
+  background:rgba(var(--ink),.10);transform-origin:0 50%}
+[data-c="fr-5"] .fr5-s.kept{background:var(--accent)}
+[data-c="fr-5"] .fr5-s:nth-child(9){box-shadow:0 0 20px rgba(var(--accent-rgb),.45)}
+[data-c="fr-5"] .fr5-end{width:2px;height:22px;border-radius:1px;
+  background:rgba(var(--ink),.38);margin-left:3px}
+[data-c="fr-5"] .fr5-legend{display:flex;justify-content:space-between;margin-top:15px;
+  font-size:11px;color:var(--text-lo);letter-spacing:.01em}
+
+[data-c="fr-5"] .b2.on .fr5-s{animation:fr5Fill .38s cubic-bezier(.2,.8,.3,1) backwards}
+[data-c="fr-5"] .b2.on .fr5-s:nth-child(1){animation-delay:.02s}
+[data-c="fr-5"] .b2.on .fr5-s:nth-child(2){animation-delay:.05s}
+[data-c="fr-5"] .b2.on .fr5-s:nth-child(3){animation-delay:.08s}
+[data-c="fr-5"] .b2.on .fr5-s:nth-child(4){animation-delay:.11s}
+[data-c="fr-5"] .b2.on .fr5-s:nth-child(5){animation-delay:.14s}
+[data-c="fr-5"] .b2.on .fr5-s:nth-child(6){animation-delay:.17s}
+[data-c="fr-5"] .b2.on .fr5-s:nth-child(7){animation-delay:.20s}
+[data-c="fr-5"] .b2.on .fr5-s:nth-child(8){animation-delay:.23s}
+[data-c="fr-5"] .b2.on .fr5-s:nth-child(9){animation-delay:.26s}
+[data-c="fr-5"] .b2.on .fr5-s:nth-child(n+10){animation-delay:.34s}
+@keyframes fr5Fill{from{transform:scaleX(0);opacity:0}to{transform:scaleX(1);opacity:1}}
+[data-c="fr-5"] .b2.on .fr5-end{animation:fr5Tick .4s cubic-bezier(.2,.8,.3,1) .42s backwards}
+@keyframes fr5Tick{from{opacity:0;transform:scaleY(.3)}to{opacity:1;transform:scaleY(1)}}
+
+[data-c="fr-5"] .b3.on .deposit{animation:fr5Settle .5s cubic-bezier(.2,.8,.3,1) .1s backwards}
+@keyframes fr5Settle{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+</style>
+
+<div class="ph" data-c="fr-5"><div class="st">
+
+  <div class="b b1">
+    <div class="n n--hero" data-count="0|9">9</div>
+    <div class="sub fr5-sub">Weeks at rate.</div>
+  </div>
+
+  <div class="b b2">
+    <div class="fr5-wrap">
+      <div class="fr5-rail">
+        <i class="fr5-s kept"></i><i class="fr5-s kept"></i><i class="fr5-s kept"></i>
+        <i class="fr5-s kept"></i><i class="fr5-s kept"></i><i class="fr5-s kept"></i>
+        <i class="fr5-s kept"></i><i class="fr5-s kept"></i><i class="fr5-s kept"></i>
+        <i class="fr5-s"></i><i class="fr5-s"></i><i class="fr5-s"></i>
+        <i class="fr5-s"></i><i class="fr5-s"></i><i class="fr5-s"></i><i class="fr5-s"></i>
+        <span class="fr5-end"></span>
+      </div>
+      <div class="fr5-legend"><span>9 weeks kept</span><span>race day, Sept 20</span></div>
+    </div>
+    <div class="sub fr5-sub">27 swims. Seven weeks between here and the start line.</div>
+  </div>
+
+  <div class="b b3">
+    <div class="deposit">This week, you swam <b>3 of 3</b>. Nine weeks at rate.</div>
+    <div class="cap">Race day, September 20</div>
+  </div>
+
+</div>
+<div class="keepbtn">Keep</div><div class="hint">Tap to replay</div></div>

@@ -1,0 +1,70 @@
+<style>
+[data-c="op-3"] .op3-today{font-size:12.5px;color:var(--text-lo);margin-bottom:18px}
+[data-c="op-3"] .op3-act{max-width:262px;font-size:27px;font-weight:600;line-height:1.28;
+  letter-spacing:-.022em;color:var(--text-hi)}
+[data-c="op-3"] .op3-ledger{width:100%;max-width:306px;text-align:left}
+[data-c="op-3"] .op3-row{display:flex;align-items:flex-start;gap:10px;padding:9px 0}
+[data-c="op-3"] .op3-dot{display:block;flex:0 0 6px;width:6px;height:6px;border-radius:50%;
+  margin-top:6px;background:rgba(var(--ink),.22)}
+[data-c="op-3"] .op3-date{flex:0 0 48px;width:48px;font-size:12px;line-height:1.55;
+  color:var(--text-lo);font-variant-numeric:tabular-nums}
+[data-c="op-3"] .op3-what{font-size:13.5px;line-height:1.55;color:var(--text-mid);letter-spacing:-.004em}
+[data-c="op-3"] .op3-row--new .op3-dot{background:var(--accent);box-shadow:0 0 10px rgba(var(--accent-rgb),.55)}
+[data-c="op-3"] .op3-row--new .op3-what{color:var(--text-hi)}
+[data-c="op-3"] .op3-back{margin:16px 0 0 64px;font-size:12px;color:var(--text-lo)}
+[data-c="op-3"] .op3-older{opacity:0;transform:translateY(9px)}
+[data-c="op-3"] .b.on .op3-older{animation:op3rise .58s cubic-bezier(.2,.8,.3,1) .24s forwards}
+@keyframes op3rise{to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  [data-c="op-3"] .op3-older{opacity:1;transform:none}
+}
+</style>
+<div class="ph" data-c="op-3">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="op3-today">Today</div>
+      <div class="op3-act">“didnt send the email”</div>
+    </div>
+
+    <div class="b b2">
+      <div class="op3-ledger">
+        <div class="op3-row op3-row--new">
+          <span class="op3-dot"></span>
+          <span class="op3-date">Today</span>
+          <span class="op3-what">didnt send the email</span>
+        </div>
+        <div class="op3-older">
+          <div class="op3-row">
+            <span class="op3-dot"></span>
+            <span class="op3-date">Aug 1</span>
+            <span class="op3-what">waited a day to reply to mark</span>
+          </div>
+          <div class="op3-row">
+            <span class="op3-dot"></span>
+            <span class="op3-date">Jul 19</span>
+            <span class="op3-what">left the room and came back</span>
+          </div>
+          <div class="op3-row">
+            <span class="op3-dot"></span>
+            <span class="op3-date">Jul 2</span>
+            <span class="op3-what">counted to ten before answering dana</span>
+          </div>
+          <div class="op3-row">
+            <span class="op3-dot"></span>
+            <span class="op3-date">Jun 14</span>
+            <span class="op3-what">apologized that night instead of days later</span>
+          </div>
+          <div class="op3-back">Older entries go back to March 18.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="b b3">
+      <div class="deposit">On this day, <b>you did not send the email.</b></div>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>

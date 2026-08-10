@@ -1,0 +1,77 @@
+<style>
+/* rf-rec. The Record: twelve weeks of days, the ones they showed up lighting
+   in the order they happened. The grid is evidence they kept. One accent
+   moment: today's square, the last one to land. */
+[data-c="rf-rec"] .rc{display:flex;flex-direction:column;align-items:center;width:100%}
+
+[data-c="rf-rec"] .rc__grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;
+  width:184px;margin-bottom:32px}
+[data-c="rf-rec"] .rc__d{position:relative;aspect-ratio:1;border-radius:2px;
+  background:rgba(var(--ink),.07)}
+[data-c="rf-rec"] .rc__f{position:absolute;inset:0;border-radius:2px;display:block;
+  background:rgba(var(--ink),.34);opacity:0;transform:scale(.62)}
+[data-c="rf-rec"] .b2.on .rc__f{animation:rfRecOn 360ms cubic-bezier(.2,.8,.3,1) forwards;
+  animation-delay:var(--d)}
+@keyframes rfRecOn{from{opacity:0;transform:scale(.62)}to{opacity:1;transform:scale(1)}}
+
+[data-c="rf-rec"] .rc__f--now{background:var(--accent);
+  box-shadow:0 0 15px rgba(var(--accent-rgb),.6)}
+[data-c="rf-rec"] .b2.on .rc__f--now{animation:rfRecNow 520ms cubic-bezier(.2,.8,.3,1) forwards;
+  animation-delay:var(--d)}
+@keyframes rfRecNow{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:scale(1)}}
+
+[data-c="rf-rec"] .rc__cost{opacity:0}
+[data-c="rf-rec"] .b2.on .rc__cost{animation:rfRecUp 520ms ease-out .26s forwards}
+@keyframes rfRecUp{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+
+[data-c="rf-rec"] .rc__note{margin-top:11px;font-size:13px;color:var(--text-mid);
+  letter-spacing:-.01em;opacity:0}
+[data-c="rf-rec"] .b2.on .rc__note{animation:rfRecUp 520ms ease-out 1.28s forwards}
+
+@media (prefers-reduced-motion:reduce){
+  [data-c="rf-rec"] .rc__f{opacity:1;transform:none}
+  [data-c="rf-rec"] .rc__cost,
+  [data-c="rf-rec"] .rc__note{opacity:1;transform:none}
+}
+</style>
+<div class="ph" data-c="rf-rec">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="n n--hero" data-count="0|50">0</div>
+      <div class="sub">runs</div>
+    </div>
+
+    <div class="b b2">
+      <div class="rc">
+        <div class="rc__grid">
+        <span class="rc__d"><i class="rc__f" style="--d:0ms"></i></span><span class="rc__d"><i class="rc__f" style="--d:11ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:33ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:55ms"></i></span><span class="rc__d"></span>
+        <span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:88ms"></i></span><span class="rc__d"><i class="rc__f" style="--d:99ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:121ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:143ms"></i></span>
+        <span class="rc__d"><i class="rc__f" style="--d:154ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:176ms"></i></span><span class="rc__d"><i class="rc__f" style="--d:187ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:209ms"></i></span><span class="rc__d"><i class="rc__f" style="--d:220ms"></i></span>
+        <span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:242ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:264ms"></i></span><span class="rc__d"></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:297ms"></i></span>
+        <span class="rc__d"><i class="rc__f" style="--d:308ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:330ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:352ms"></i></span><span class="rc__d"><i class="rc__f" style="--d:363ms"></i></span><span class="rc__d"></span>
+        <span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:396ms"></i></span><span class="rc__d"><i class="rc__f" style="--d:407ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:429ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:451ms"></i></span>
+        <span class="rc__d"><i class="rc__f" style="--d:462ms"></i></span><span class="rc__d"></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:495ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:517ms"></i></span><span class="rc__d"><i class="rc__f" style="--d:528ms"></i></span>
+        <span class="rc__d"><i class="rc__f" style="--d:539ms"></i></span><span class="rc__d"><i class="rc__f" style="--d:550ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:572ms"></i></span><span class="rc__d"><i class="rc__f" style="--d:583ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:605ms"></i></span>
+        <span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:627ms"></i></span><span class="rc__d"><i class="rc__f" style="--d:638ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:660ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:682ms"></i></span>
+        <span class="rc__d"><i class="rc__f" style="--d:693ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:715ms"></i></span><span class="rc__d"><i class="rc__f" style="--d:726ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:748ms"></i></span><span class="rc__d"></span>
+        <span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:781ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:803ms"></i></span><span class="rc__d"><i class="rc__f" style="--d:814ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:836ms"></i></span>
+        <span class="rc__d"><i class="rc__f" style="--d:847ms"></i></span><span class="rc__d"><i class="rc__f" style="--d:858ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:880ms"></i></span><span class="rc__d"></span><span class="rc__d"><i class="rc__f" style="--d:902ms"></i></span><span class="rc__d"><i class="rc__f rc__f--now" style="--d:1080ms"></i></span>
+        </div>
+        <div class="rc__cost">
+          <div class="n n--big" data-count="0|84">0</div>
+          <div class="sub">days since the first run</div>
+        </div>
+        <div class="rc__note">You ran on 50. Never a week without one.</div>
+      </div>
+    </div>
+
+    <div class="b b3">
+      <div class="deposit">On this day, you ran for the <b>50th time</b>.</div>
+      <svg class="mark--foot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>

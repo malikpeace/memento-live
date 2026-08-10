@@ -1,0 +1,42 @@
+<style>
+/* ms-5 "4:12pm". The minute gets kept, not only the day. Accent moment:
+   the timestamp. Beat 3 carries the mark as a quiet maker's mark, because
+   this beat is a record. */
+[data-c="ms-5"] .ms5-word{font-size:46px;font-weight:800;letter-spacing:-.042em;line-height:1.0;
+  color:var(--text-hi)}
+[data-c="ms-5"] .ms5-stamp{margin-top:24px;font-variant-numeric:tabular-nums;font-size:22px;
+  font-weight:650;letter-spacing:-.015em;color:var(--accent)}
+[data-c="ms-5"] .b1.on .ms5-stamp{animation:ms5Stamp .5s cubic-bezier(.2,.8,.3,1) .5s both}
+@keyframes ms5Stamp{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+
+[data-c="ms-5"] .ms5-cost{margin-top:22px;padding-top:18px;border-top:1px solid var(--hairline);
+  font-size:15px;font-weight:500;line-height:1.75;color:var(--text-mid);letter-spacing:-.01em}
+[data-c="ms-5"] .b2.on .ms5-cost{animation:ms5Cost .5s cubic-bezier(.2,.8,.3,1) .46s both}
+@keyframes ms5Cost{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+[data-c="ms-5"] .ms5-rule{width:36px;height:1px;background:rgba(235,238,248,.18);margin-bottom:20px}
+</style>
+<div class="ph" data-c="ms-5">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="ms5-word">You passed<br>the bar.</div>
+      <div class="ms5-stamp">4:12pm</div>
+    </div>
+
+    <div class="b b2">
+      <div class="n n--big" data-count="0|874">874</div>
+      <div class="sub">days since your first study block.</div>
+      <div class="ms5-cost">1,140 hours logged.<br>Your third sitting.</div>
+    </div>
+
+    <div class="b b3">
+      <div class="ms5-rule"></div>
+      <div class="deposit">On this day at <b>4:12pm</b>, <b>you passed the bar.</b></div>
+      <svg class="mark--foot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>

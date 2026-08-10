@@ -1,0 +1,64 @@
+<style>
+/* qu-3. the days you will not need. A deadline goal, reached early;
+   the lit tail is the time given back. */
+[data-c="qu-3"] .qu3-hero{font-size:68px}
+[data-c="qu-3"] .qu3-span{position:relative;width:286px;height:60px;margin:4px auto 22px}
+[data-c="qu-3"] .qu3-tag{position:absolute;top:0;right:0;font-size:13px;font-weight:650;
+  color:var(--text-hi);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+[data-c="qu-3"] .qu3-track{position:absolute;left:0;right:0;top:31px;height:2px;border-radius:1px;
+  background:rgba(var(--ink),.12)}
+[data-c="qu-3"] .qu3-done{position:absolute;left:0;top:31px;width:84.1%;height:2px;border-radius:1px;
+  background:rgba(var(--ink),.46);transform-origin:left center}
+[data-c="qu-3"] .qu3-early{position:absolute;right:0;top:30px;width:15.9%;height:4px;border-radius:2px;
+  background:var(--accent);transform-origin:left center}
+[data-c="qu-3"] .qu3-early::after{content:'';position:absolute;left:50%;top:50%;
+  width:154px;height:84px;transform:translate(-50%,-50%);pointer-events:none;
+  background:radial-gradient(ellipse at center,
+    rgba(var(--accent-rgb),.42) 0%,
+    rgba(var(--accent-rgb),.13) 36%,
+    rgba(var(--accent-rgb),0) 68%)}
+[data-c="qu-3"] .qu3-ends{position:absolute;left:0;right:0;top:44px;display:flex;
+  justify-content:space-between;font-size:10.5px;color:var(--text-lo);
+  font-variant-numeric:tabular-nums}
+[data-c="qu-3"] .qu3-sub{max-width:23ch}
+[data-c="qu-3"] .qu3-cap{max-width:34ch}
+[data-c="qu-3"] .b3{padding-bottom:96px}
+
+[data-c="qu-3"] .b.on .qu3-done{animation:qu3Run .58s cubic-bezier(.2,.8,.3,1) both}
+[data-c="qu-3"] .b.on .qu3-early{animation:qu3Land .44s cubic-bezier(.2,.8,.3,1) both;
+  animation-delay:.42s}
+[data-c="qu-3"] .b.on .qu3-tag{animation:qu3Up .40s cubic-bezier(.2,.8,.3,1) both;
+  animation-delay:.60s}
+@keyframes qu3Run{from{opacity:0;transform:scaleX(.04)}to{opacity:1;transform:none}}
+@keyframes qu3Land{from{opacity:0;transform:scaleX(.3)}to{opacity:1;transform:none}}
+@keyframes qu3Up{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+</style>
+
+<div class="ph" data-c="qu-3">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="n qu3-hero">$10,000</div>
+      <div class="sub">a month.</div>
+    </div>
+
+    <div class="b b2">
+      <div class="qu3-span">
+        <div class="qu3-tag">53 days</div>
+        <div class="qu3-track"></div>
+        <div class="qu3-done"></div>
+        <div class="qu3-early"></div>
+        <div class="qu3-ends"><span>Feb 1</span><span>Dec 31</span></div>
+      </div>
+      <div class="sub qu3-sub">You said December 31. You got there today.</div>
+      <div class="cap qu3-cap">Time you set aside and never needed.</div>
+    </div>
+
+    <div class="b b3">
+      <div class="deposit">On this day, you reached <b>$10,000</b> a month, 53 days before the date you set.</div>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>

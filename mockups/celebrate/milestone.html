@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Milestone</title>
+<link rel="stylesheet" href="_kit.css">
+</head><body data-accent="cyan">
+<div class="bar">
+  <a href="index.html" style="color:var(--text-mid);text-decoration:none;font-size:13px;font-weight:600">&lsaquo; All</a>
+  <span class="bar__t">Milestone</span>
+  <span class="sw"><button data-a="cyan" style="background:#2bd4d4" class="on"></button><button data-a="green" style="background:#3fd94e"></button><button data-a="amber" style="background:#ffb73d"></button><button data-a="rose" style="background:#ff6b9d"></button><button data-a="blue" style="background:#4f8cff"></button><button data-a="teal" style="background:#19c3a6"></button></span>
+  <span class="bar__n">their Memento colour drives every screen &middot; <b>tap a phone to advance or replay</b></span>
+</div>
+<div class="gal"><h1>Milestone</h1><p class="gal__sub">A binary event. Pass the bar, get the job, ship it. No partial credit, so these can be the boldest screens in the set. One of them celebrates the engine underneath before the event even lands.</p><div class="grid"><div class="item"><p class="item__label"><span class="item__n">1</span><span class="item__name">The turn</span></p><style>
+/* ms-1 "The turn". The binary event landing. The screen inverts for one
+   beat: the only thing on the light is the mark. Then back to black to weigh
+   it. Accent moment: the 47 on beat 2. */
+[data-c="ms-1"] .ms1-flood{position:absolute;inset:0;background:#f2f4f8}
+[data-c="ms-1"] .b1.on .ms1-flood{animation:ms1Flood .58s cubic-bezier(.2,.8,.3,1) both}
+@keyframes ms1Flood{from{opacity:0;transform:scale(1.05)}to{opacity:1;transform:scale(1)}}
+
+[data-c="ms-1"] .ms1-m{position:relative;width:78px;height:78px;fill:#0e1218}
+[data-c="ms-1"] .b1.on .ms1-m{animation:ms1Mark .5s cubic-bezier(.2,.8,.3,1) .14s both}
+@keyframes ms1Mark{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+
+[data-c="ms-1"] .ms1-word{position:relative;margin-top:30px;font-size:31px;font-weight:700;
+  letter-spacing:-.035em;line-height:1.06;color:rgba(14,18,24,.93);max-width:11ch}
+[data-c="ms-1"] .b1.on .ms1-word{animation:ms1Word .46s cubic-bezier(.2,.8,.3,1) .74s both}
+@keyframes ms1Word{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+
+[data-c="ms-1"] .ms1-num{color:var(--accent)}
+[data-c="ms-1"] .ms1-cost{margin-top:22px;padding-top:18px;border-top:1px solid var(--hairline);
+  font-size:15px;font-weight:500;line-height:1.75;color:var(--text-mid);letter-spacing:-.01em}
+[data-c="ms-1"] .b2.on .ms1-cost{animation:ms1Cost .5s cubic-bezier(.2,.8,.3,1) .46s both}
+@keyframes ms1Cost{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+[data-c="ms-1"] .ms1-rule{width:36px;height:1px;background:rgba(235,238,248,.18);margin-bottom:20px}
+</style>
+<div class="ph" data-c="ms-1">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="ms1-flood"></div>
+      <svg class="ms1-m" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+      <div class="ms1-word">You got the job.</div>
+    </div>
+
+    <div class="b b2">
+      <div class="n n--big ms1-num" data-count="0|47">47</div>
+      <div class="sub">applications since last November.</div>
+      <div class="ms1-cost">6 final rounds.<br>271 days of looking.</div>
+    </div>
+
+    <div class="b b3">
+      <div class="ms1-rule"></div>
+      <div class="deposit">On this day, <b>you got the job.</b></div>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>
+<p class="item__note">The one screen that inverts. The instant the binary event lands, the whole phone floods to light and the <b>bare M is the only dark shape left</b>, then the line arrives under it. Beats 2 and 3 fall back to black to weigh it and file it. A milestone has no partial credit, so it gets the biggest gesture in the set, and it gets it with light and silence instead of confetti. The single accent moment is the 47 applications on beat 2, not the flood.</p></div><div class="item"><p class="item__label"><span class="item__n">2</span><span class="item__name">The engine underneath</span></p><style>
+/* ms-2 "The engine". A milestone hides a quantity engine underneath. The
+   event is still 41 days away; the hours are real now. Accent moment: the
+   300 on beat 1. The rail of sessions stays white. */
+[data-c="ms-2"] .ms2-num{color:var(--accent)}
+
+[data-c="ms-2"] .ms2-rail{display:grid;grid-template-columns:repeat(40,1fr);gap:3px;
+  width:298px;margin:2px auto 0;transform-origin:left center}
+[data-c="ms-2"] .ms2-t{display:block;height:15px;border-radius:1.5px;background:rgba(235,238,248,.22)}
+[data-c="ms-2"] .ms2-t--now{background:rgba(235,238,248,.7)}
+[data-c="ms-2"] .b2.on .ms2-rail{animation:ms2Rail .72s cubic-bezier(.2,.8,.3,1) .1s both}
+@keyframes ms2Rail{from{opacity:0;transform:scaleX(0)}to{opacity:1;transform:scaleX(1)}}
+
+[data-c="ms-2"] .ms2-ahead{margin-top:20px;padding-top:17px;border-top:1px solid var(--hairline);
+  font-size:14.5px;font-weight:500;color:var(--text-mid);letter-spacing:-.01em}
+[data-c="ms-2"] .b2.on .ms2-ahead{animation:ms2Ahead .5s cubic-bezier(.2,.8,.3,1) .52s both}
+@keyframes ms2Ahead{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+[data-c="ms-2"] .ms2-rule{width:36px;height:1px;background:rgba(235,238,248,.18);margin-bottom:20px}
+[data-c="ms-2"] .deposit b{white-space:nowrap}
+[data-c="ms-2"] .ms2-open{margin-top:14px;font-size:13.5px;font-weight:500;color:var(--text-mid);
+  letter-spacing:-.01em}
+</style>
+<div class="ph" data-c="ms-2">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="n n--hero ms2-num" data-count="0|300">300</div>
+      <div class="sub">hours of studying for the boards.</div>
+    </div>
+
+    <div class="b b2">
+      <div class="ms2-rail"><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t"></i><i class="ms2-t ms2-t--now"></i></div>
+      <div class="sub">118 sessions since January 4.</div>
+      <div class="ms2-ahead">The exam is 41 days out.</div>
+    </div>
+
+    <div class="b b3">
+      <div class="ms2-rule"></div>
+      <div class="deposit">On this day, you crossed <b>300 hours</b> of studying for the boards.</div>
+      <div class="ms2-open">The exam is still ahead.</div>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>
+<p class="item__note">Celebrates the hidden quantity engine <b>before</b> the event, which is the only way this type gets more than one moment in its whole life. 300 hours lands as the hero, then the rail shows all 118 study sessions as marks with today lit at the end of an unfinished row. Beat 3 says the hours are kept and says plainly that the exam is still ahead, so nothing pretends the goal is done.</p></div><div class="item"><p class="item__label"><span class="item__n">3</span><span class="item__name">Nine days early</span></p><style>
+/* ms-3 "Early by". The deadline variant, shown as a plain subtraction
+   instead of a bar. Two dates, a rule, the margin. Accent moment: the
+   margin, because the margin is the whole story. */
+[data-c="ms-3"] .ms3-word{font-size:56px;font-weight:800;letter-spacing:-.045em;line-height:.94;
+  color:var(--text-hi)}
+
+[data-c="ms-3"] .ms3-calc{width:100%;max-width:268px;margin-top:2px}
+[data-c="ms-3"] .ms3-row{display:flex;align-items:baseline;justify-content:space-between;
+  padding:9px 0;font-size:15px;font-weight:500;letter-spacing:-.01em;color:var(--text-mid)}
+[data-c="ms-3"] .ms3-v{font-variant-numeric:tabular-nums;font-weight:650;color:var(--text-hi)}
+[data-c="ms-3"] .ms3-hr{height:1px;background:rgba(235,238,248,.16);margin:7px 0 3px}
+[data-c="ms-3"] .ms3-sum{font-variant-numeric:tabular-nums;font-size:21px;font-weight:700;
+  letter-spacing:-.03em;color:var(--accent)}
+[data-c="ms-3"] .b2.on .ms3-hr{animation:ms3Hr .5s cubic-bezier(.2,.8,.3,1) .3s both}
+@keyframes ms3Hr{from{opacity:0;transform:scaleX(.2)}to{opacity:1;transform:scaleX(1)}}
+[data-c="ms-3"] .b2.on .ms3-row--sum{animation:ms3Sum .52s cubic-bezier(.2,.8,.3,1) .42s both}
+@keyframes ms3Sum{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+
+[data-c="ms-3"] .ms3-cost{margin-top:24px;font-size:14.5px;font-weight:500;color:var(--text-mid);
+  letter-spacing:-.01em}
+[data-c="ms-3"] .b2.on .ms3-cost{animation:ms3Cost .5s cubic-bezier(.2,.8,.3,1) .6s both}
+@keyframes ms3Cost{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+[data-c="ms-3"] .ms3-rule{width:36px;height:1px;background:rgba(235,238,248,.18);margin-bottom:20px}
+</style>
+<div class="ph" data-c="ms-3">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="ms3-word">Finished.</div>
+      <div class="sub">The manuscript is done.</div>
+    </div>
+
+    <div class="b b2">
+      <div class="ms3-calc">
+        <div class="ms3-row"><span>Your deadline</span><span class="ms3-v">Aug 15</span></div>
+        <div class="ms3-row"><span>You finished</span><span class="ms3-v">Aug 6</span></div>
+        <div class="ms3-hr"></div>
+        <div class="ms3-row ms3-row--sum"><span>Early by</span><span class="ms3-sum">9 days</span></div>
+      </div>
+      <div class="ms3-cost">246 days of writing. 71,400 words.</div>
+    </div>
+
+    <div class="b b3">
+      <div class="ms3-rule"></div>
+      <div class="deposit">On this day, <b>you finished the manuscript</b>, 9 days before your deadline.</div>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>
+<p class="item__note">The deadline variant, drawn as a <b>plain subtraction instead of a bar</b>. Deadline, finish date, a rule, the margin. It reads like a receipt, which is honest, and it dodges every progress meter cliche. The margin is the only coloured thing on the screen because the margin is the entire story.</p></div><div class="item"><p class="item__label"><span class="item__n">4</span><span class="item__name">The fork</span></p><style>
+/* ms-4 "The fork". The milestone whose outcome was a decision rather than
+   an achievement.
+   The line you were on keeps going; the other branch stops. Accent moment:
+   the branch you took. */
+[data-c="ms-4"] .ms4-word{font-size:56px;font-weight:800;letter-spacing:-.045em;line-height:.94;
+  color:var(--text-hi)}
+
+[data-c="ms-4"] .ms4-fig{position:relative;width:300px;height:140px}
+[data-c="ms-4"] .ms4-svg{display:block;width:300px;height:140px}
+[data-c="ms-4"] .ms4-stem,[data-c="ms-4"] .ms4-drop,[data-c="ms-4"] .ms4-stop{
+  fill:none;stroke:rgba(235,238,248,.26);stroke-width:1.5;stroke-linecap:round}
+[data-c="ms-4"] .ms4-take{fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round}
+[data-c="ms-4"] .ms4-lab{position:absolute;font-size:12px;font-weight:500;letter-spacing:-.01em;
+  color:var(--text-lo)}
+[data-c="ms-4"] .ms4-lab--a{right:46px;top:0}
+[data-c="ms-4"] .ms4-lab--b{right:2px;top:88px;color:var(--text-mid);font-weight:650}
+[data-c="ms-4"] .b2.on .ms4-take,[data-c="ms-4"] .b2.on .ms4-lab--b{
+  animation:ms4Take .5s cubic-bezier(.2,.8,.3,1) .44s both}
+@keyframes ms4Take{from{opacity:0}to{opacity:1}}
+[data-c="ms-4"] .b2.on .ms4-fig{animation:ms4Fig .55s cubic-bezier(.2,.8,.3,1) both}
+@keyframes ms4Fig{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+[data-c="ms-4"] .ms4-cost{margin-top:26px;padding-top:18px;border-top:1px solid var(--hairline);
+  font-size:15px;font-weight:500;line-height:1.7;color:var(--text-mid);letter-spacing:-.01em}
+[data-c="ms-4"] .ms4-cost b{font-variant-numeric:tabular-nums;font-weight:650;color:var(--text-hi)}
+[data-c="ms-4"] .b2.on .ms4-cost{animation:ms4Cost .5s cubic-bezier(.2,.8,.3,1) .62s both}
+@keyframes ms4Cost{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+[data-c="ms-4"] .ms4-rule{width:36px;height:1px;background:rgba(235,238,248,.18);margin-bottom:20px}
+[data-c="ms-4"] .ms4-closed{margin-top:14px;font-size:13.5px;font-weight:500;color:var(--text-mid);
+  letter-spacing:-.01em}
+</style>
+<div class="ph" data-c="ms-4">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="ms4-word">Decided.</div>
+      <div class="sub">You're staying in Chicago.</div>
+    </div>
+
+    <div class="b b2">
+      <div class="ms4-fig">
+        <svg class="ms4-svg" viewBox="0 0 300 140" aria-hidden="true">
+          <path class="ms4-stem" d="M4 78 L118 78"/>
+          <path class="ms4-drop" d="M118 78 L246 26"/>
+          <path class="ms4-stop" d="M243.7 20.4 L248.3 31.6"/>
+          <path class="ms4-take" d="M118 78 L296 78"/>
+        </svg>
+        <div class="ms4-lab ms4-lab--a">Lisbon</div>
+        <div class="ms4-lab ms4-lab--b">Chicago</div>
+      </div>
+      <div class="ms4-cost"><b data-count="0|143">143</b> days carrying the question.<br>11 notes. 2 trips.</div>
+    </div>
+
+    <div class="b b3">
+      <div class="ms4-rule"></div>
+      <div class="deposit">On this day, <b>you decided not to move.</b></div>
+      <div class="ms4-closed">The question is closed.</div>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>
+<p class="item__note">For the milestone whose outcome was a decision, not a win. Two lines leave one point: the one you took keeps running to the edge in the accent, the other stops with a small tick. <b>Deciding not to move is still a closed question</b>, and 143 days of carrying it deserves the same log entry as any other landing. No praise, just closure.</p></div><div class="item"><p class="item__label"><span class="item__n">5</span><span class="item__name">The exact minute</span></p><style>
+/* ms-5 "4:12pm". The minute gets kept, not only the day. Accent moment:
+   the timestamp. Beat 3 carries the mark as a quiet maker's mark, because
+   this beat is a record. */
+[data-c="ms-5"] .ms5-word{font-size:46px;font-weight:800;letter-spacing:-.042em;line-height:1.0;
+  color:var(--text-hi)}
+[data-c="ms-5"] .ms5-stamp{margin-top:24px;font-variant-numeric:tabular-nums;font-size:22px;
+  font-weight:650;letter-spacing:-.015em;color:var(--accent)}
+[data-c="ms-5"] .b1.on .ms5-stamp{animation:ms5Stamp .5s cubic-bezier(.2,.8,.3,1) .5s both}
+@keyframes ms5Stamp{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+
+[data-c="ms-5"] .ms5-cost{margin-top:22px;padding-top:18px;border-top:1px solid var(--hairline);
+  font-size:15px;font-weight:500;line-height:1.75;color:var(--text-mid);letter-spacing:-.01em}
+[data-c="ms-5"] .b2.on .ms5-cost{animation:ms5Cost .5s cubic-bezier(.2,.8,.3,1) .46s both}
+@keyframes ms5Cost{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+[data-c="ms-5"] .ms5-rule{width:36px;height:1px;background:rgba(235,238,248,.18);margin-bottom:20px}
+</style>
+<div class="ph" data-c="ms-5">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="ms5-word">You passed<br>the bar.</div>
+      <div class="ms5-stamp">4:12pm</div>
+    </div>
+
+    <div class="b b2">
+      <div class="n n--big" data-count="0|874">874</div>
+      <div class="sub">days since your first study block.</div>
+      <div class="ms5-cost">1,140 hours logged.<br>Your third sitting.</div>
+    </div>
+
+    <div class="b b3">
+      <div class="ms5-rule"></div>
+      <div class="deposit">On this day at <b>4:12pm</b>, <b>you passed the bar.</b></div>
+      <svg class="mark--foot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>
+<p class="item__note">The record keeps the <b>minute, not just the day</b>. The statement lands white and large, the timestamp signs it underneath as the only accent. Beat 2 is the honest cost, 874 days and a third sitting. Beat 3 is the line Malik asked for, on this day at 4:12pm, with the quiet maker's mark at the foot because that beat is a record.</p></div></div></div>
+<script src="_kit.js"></script><script>CEL.init()</script>
+</body></html>

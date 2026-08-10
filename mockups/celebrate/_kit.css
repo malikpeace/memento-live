@@ -1,0 +1,88 @@
+/* THE CELEBRATION KIT. Shared chrome + tokens. Fragments style INSIDE this,
+   scoped to their own data-c key. Nothing here is a fragment's to override. */
+@font-face { font-family:'Geist'; src:url('../fonts/geist-400.otf') format('opentype'); font-weight:400; font-display:swap; }
+@font-face { font-family:'Geist'; src:url('../fonts/geist-500.otf') format('opentype'); font-weight:500; font-display:swap; }
+@font-face { font-family:'Geist'; src:url('../fonts/geist-700.otf') format('opentype'); font-weight:700; font-display:swap; }
+
+:root{
+  --ink:235,238,248;
+  --text-hi:rgba(var(--ink),.96); --text-mid:rgba(var(--ink),.78); --text-lo:rgba(var(--ink),.42);
+  --hairline:rgba(var(--ink),.09);
+  --font:'Geist',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+  --accent:#2bd4d4; --accent-rgb:43,212,212; --accent-strong:#1796a6;
+}
+/* the user's Memento colour drives every celebration. Six real app values. */
+body[data-accent="cyan"] { --accent:#2bd4d4; --accent-rgb:43,212,212;  --accent-strong:#1796a6; }
+body[data-accent="green"]{ --accent:#3fd94e; --accent-rgb:63,217,78;   --accent-strong:#1f9e2a; }
+body[data-accent="amber"]{ --accent:#ffb73d; --accent-rgb:255,183,61;  --accent-strong:#cc8a1f; }
+body[data-accent="rose"] { --accent:#ff6b9d; --accent-rgb:255,107,157; --accent-strong:#cc3f72; }
+body[data-accent="blue"] { --accent:#4f8cff; --accent-rgb:79,140,255;  --accent-strong:#2f63cc; }
+body[data-accent="teal"] { --accent:#19c3a6; --accent-rgb:25,195,166;  --accent-strong:#0f8f79; }
+
+*{box-sizing:border-box}
+body{margin:0;background:#0a0b0d;color:var(--text-hi);font-family:var(--font);-webkit-font-smoothing:antialiased}
+
+/* ---------- gallery chrome ---------- */
+.bar{position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  padding:11px 20px;background:rgba(10,11,13,.88);
+  -webkit-backdrop-filter:blur(20px) saturate(1.4);backdrop-filter:blur(20px) saturate(1.4);
+  border-bottom:1px solid var(--hairline)}
+.bar__t{font-size:13px;font-weight:700;letter-spacing:-.01em;margin-right:4px}
+.sw{display:flex;gap:6px;align-items:center}
+.sw button{-webkit-appearance:none;appearance:none;width:22px;height:22px;border-radius:50%;
+  border:0;cursor:pointer;padding:0;transition:box-shadow .16s ease,transform .16s ease}
+.sw button.on{box-shadow:0 0 0 2px #0a0b0d,0 0 0 4px rgba(var(--ink),.55);transform:scale(1.08)}
+.bar__n{font-size:12px;color:var(--text-lo)}
+.bar__n b{color:var(--text-mid);font-weight:600}
+.gal{padding:22px 20px 90px;max-width:1760px;margin:0 auto}
+.gal h1{font-size:26px;font-weight:700;letter-spacing:-.02em;margin:0 0 6px}
+.gal__sub{color:var(--text-mid);font-size:14px;margin:0 0 24px;max-width:74ch;line-height:1.55}
+.sec{width:100%;margin:34px 0 6px;padding-top:24px;border-top:1px solid rgba(var(--ink),.16)}
+.sec__t{font-size:18px;font-weight:700;letter-spacing:-.015em}
+.sec__d{font-size:13.5px;color:var(--text-mid);line-height:1.55;margin-top:6px;max-width:80ch}
+.grid{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}
+.item{width:390px}
+.item__label{display:flex;align-items:center;gap:8px;margin:0 0 8px}
+.item__n{font-size:12px;color:var(--text-lo);font-variant-numeric:tabular-nums}
+.item__name{font-size:14px;font-weight:650}
+.item__note{font-size:12.5px;color:var(--text-mid);line-height:1.55;margin:10px 2px 0}
+.item__note b{color:var(--text-hi);font-weight:650}
+
+/* ---------- the phone ---------- */
+.ph{width:390px;height:760px;border-radius:44px;overflow:hidden;position:relative;
+  background:#000;cursor:pointer;box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.07)}
+.st{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:34px 30px;text-align:center}
+
+/* ---------- beats ---------- */
+.b{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:34px 30px;opacity:0;pointer-events:none}
+.b.on{opacity:1;pointer-events:auto;animation:beatIn .5s cubic-bezier(.2,.8,.3,1)}
+@keyframes beatIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* the dismiss control: quiet, never competes with the accent moment */
+.keepbtn{position:absolute;left:0;right:0;bottom:30px;z-index:30;text-align:center;
+  font-size:14px;font-weight:600;color:var(--text-mid);opacity:0;transition:opacity .5s ease;
+  pointer-events:none}
+.ph.done .keepbtn{opacity:1}
+.hint{position:absolute;left:0;right:0;bottom:12px;z-index:30;text-align:center;
+  font-size:10.5px;letter-spacing:.04em;color:rgba(var(--ink),.20)}
+
+/* ---------- shared type ---------- */
+.n{font-variant-numeric:tabular-nums;font-weight:800;letter-spacing:-.045em;line-height:.9;color:var(--text-hi)}
+.n--hero{font-size:104px}
+.n--big{font-size:68px}
+.sub{font-size:15px;color:var(--text-mid);font-weight:500;margin-top:14px;letter-spacing:-.01em}
+.sub b{color:var(--text-hi);font-weight:650}
+.cap{font-size:12.5px;color:var(--text-lo);margin-top:9px}
+.mark--foot{position:absolute;bottom:64px;left:50%;transform:translateX(-50%);width:18px;height:18px;
+  fill:rgba(255,255,255,.14);pointer-events:none}
+.deposit{font-size:15px;color:var(--text-mid);line-height:1.5;max-width:22ch}
+.deposit b{color:var(--text-hi);font-weight:650}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:860px){
+  .item,.ph{width:100%;max-width:390px}
+  .bar{padding:10px 14px;gap:8px}
+  .gal{padding:16px 14px 70px}
+}

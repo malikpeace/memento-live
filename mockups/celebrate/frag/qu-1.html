@@ -1,0 +1,75 @@
+<style>
+/* qu-1. the marker posts. Fifths of a target, each one dated. */
+[data-c="qu-1"] .qu1-hero{font-size:104px}
+[data-c="qu-1"] .qu1-sub{max-width:24ch}
+[data-c="qu-1"] .qu1-cap{max-width:24ch}
+[data-c="qu-1"] .qu1-axis{width:288px;margin:2px auto 24px}
+[data-c="qu-1"] .qu1-marks{display:flex;align-items:flex-end;height:30px;
+  border-bottom:1px solid var(--hairline)}
+[data-c="qu-1"] .qu1-cell{flex:1;display:flex;justify-content:center}
+[data-c="qu-1"] .qu1-p{width:2px;height:13px;border-radius:1px;
+  background:rgba(var(--ink),.22)}
+[data-c="qu-1"] .qu1-cell.is-past .qu1-p{height:19px;background:rgba(var(--ink),.55)}
+[data-c="qu-1"] .qu1-cell.is-now .qu1-p{height:27px;background:var(--accent);position:relative}
+[data-c="qu-1"] .qu1-cell.is-now .qu1-p::after{content:'';position:absolute;left:50%;top:50%;
+  width:104px;height:104px;transform:translate(-50%,-50%);pointer-events:none;
+  background:radial-gradient(circle,
+    rgba(var(--accent-rgb),.42) 0%,
+    rgba(var(--accent-rgb),.14) 36%,
+    rgba(var(--accent-rgb),0) 66%)}
+[data-c="qu-1"] .qu1-labels{display:flex;margin-top:9px}
+[data-c="qu-1"] .qu1-lc{flex:1;text-align:center}
+[data-c="qu-1"] .qu1-num{font-size:13px;font-weight:650;font-variant-numeric:tabular-nums;
+  letter-spacing:-.02em;color:var(--text-lo)}
+[data-c="qu-1"] .qu1-lc.is-past .qu1-num{color:rgba(var(--ink),.62)}
+[data-c="qu-1"] .qu1-lc.is-now .qu1-num{color:var(--text-hi)}
+[data-c="qu-1"] .qu1-date{font-size:10.5px;color:var(--text-lo);margin-top:4px;height:13px;
+  font-variant-numeric:tabular-nums}
+[data-c="qu-1"] .b3{padding-bottom:96px}
+
+[data-c="qu-1"] .b.on .qu1-cell{animation:qu1Rise .44s cubic-bezier(.2,.8,.3,1) both}
+[data-c="qu-1"] .b.on .qu1-cell:nth-child(1){animation-delay:.02s}
+[data-c="qu-1"] .b.on .qu1-cell:nth-child(2){animation-delay:.10s}
+[data-c="qu-1"] .b.on .qu1-cell:nth-child(3){animation-delay:.18s}
+[data-c="qu-1"] .b.on .qu1-cell:nth-child(4){animation-delay:.26s}
+[data-c="qu-1"] .b.on .qu1-cell:nth-child(5){animation-delay:.34s}
+@keyframes qu1Rise{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+</style>
+
+<div class="ph" data-c="qu-1">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="n qu1-hero" data-count="0|60">60</div>
+      <div class="sub">paying users.</div>
+    </div>
+
+    <div class="b b2">
+      <div class="qu1-axis">
+        <div class="qu1-marks">
+          <div class="qu1-cell is-past"><div class="qu1-p"></div></div>
+          <div class="qu1-cell is-past"><div class="qu1-p"></div></div>
+          <div class="qu1-cell is-now"><div class="qu1-p"></div></div>
+          <div class="qu1-cell"><div class="qu1-p"></div></div>
+          <div class="qu1-cell"><div class="qu1-p"></div></div>
+        </div>
+        <div class="qu1-labels">
+          <div class="qu1-lc is-past"><div class="qu1-num">20</div><div class="qu1-date">Mar 3</div></div>
+          <div class="qu1-lc is-past"><div class="qu1-num">40</div><div class="qu1-date">Jun 1</div></div>
+          <div class="qu1-lc is-now"><div class="qu1-num">60</div><div class="qu1-date">today</div></div>
+          <div class="qu1-lc"><div class="qu1-num">80</div><div class="qu1-date"></div></div>
+          <div class="qu1-lc"><div class="qu1-num">100</div><div class="qu1-date"></div></div>
+        </div>
+      </div>
+      <div class="sub qu1-sub"><b>216 days</b> made these 60.</div>
+      <div class="cap qu1-cap">40 still open.</div>
+    </div>
+
+    <div class="b b3">
+      <div class="deposit">On this day, you passed <b>60 of 100</b> paying users.</div>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>

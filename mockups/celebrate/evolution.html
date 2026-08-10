@@ -1,0 +1,1067 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The card evolving</title>
+<link rel="stylesheet" href="_kit.css">
+</head><body data-accent="cyan">
+<div class="bar">
+  <a href="index.html" style="color:var(--text-mid);text-decoration:none;font-size:13px;font-weight:600">&lsaquo; All</a>
+  <span class="bar__t">The card evolving</span>
+  <span class="sw"><button data-a="cyan" style="background:#2bd4d4" class="on"></button><button data-a="green" style="background:#3fd94e"></button><button data-a="amber" style="background:#ffb73d"></button><button data-a="rose" style="background:#ff6b9d"></button><button data-a="blue" style="background:#4f8cff"></button><button data-a="teal" style="background:#19c3a6"></button></span>
+  <span class="bar__n">their Memento colour drives every screen &middot; <b>tap a phone to advance or replay</b></span>
+</div>
+<div class="gal"><h1>The card evolving</h1><p class="gal__sub">Not ceremonies. This is the Memento itself changing as they live with it, on the both-layers model: a permanent base that accumulates forever plus a daily surface state. Each shows the same card at day 7, day 90 and day 300 so you can see the accumulation actually working.</p><div class="grid"><div class="item"><p class="item__label"><span class="item__n">1</span><span class="item__name">The stack thickens</span></p><style>
+/* ev-1. LAMINAE. The card is a stack. One sheet per day held. */
+[data-c="ev-1"] .b1{justify-content:center;padding:30px 24px}
+[data-c="ev-1"] .lede{font-size:13.5px;line-height:1.5;font-weight:500;color:var(--text-mid);
+  max-width:31ch;letter-spacing:-.005em}
+[data-c="ev-1"] .lede b{color:var(--text-hi);font-weight:650}
+
+[data-c="ev-1"] .ages{display:flex;align-items:flex-end;justify-content:center;gap:17px;margin-top:24px}
+[data-c="ev-1"] .age{display:flex;flex-direction:column;align-items:center}
+[data-c="ev-1"] .lab{margin-top:11px;font-size:11px;color:var(--text-lo);font-variant-numeric:tabular-nums}
+
+[data-c="ev-1"] .obj{position:relative;width:96px;border-radius:5px;
+  box-shadow:0 10px 24px rgba(0,0,0,.55)}
+[data-c="ev-1"] .fc{position:relative;z-index:2;height:128px;overflow:hidden;border-radius:5px 5px 0 0;
+  background:linear-gradient(165deg,rgba(235,238,248,.12),rgba(235,238,248,.02) 48%,rgba(235,238,248,.05));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.24)}
+[data-c="ev-1"] .fc::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(150% 45% at 50% -12%,rgba(255,255,255,.13),transparent 56%)}
+[data-c="ev-1"] .slab{position:relative;z-index:1;overflow:hidden;border-radius:0 0 5px 5px;
+  background:linear-gradient(180deg,rgba(235,238,248,.17),rgba(235,238,248,.06) 34%,rgba(0,0,0,.5))}
+[data-c="ev-1"] .slab::before{content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(180deg,rgba(255,255,255,.34) 0 .5px,rgba(255,255,255,0) .5px 1.5px);
+  -webkit-mask-image:linear-gradient(180deg,#000,rgba(0,0,0,.12) 58%,rgba(0,0,0,0));
+          mask-image:linear-gradient(180deg,#000,rgba(0,0,0,.12) 58%,rgba(0,0,0,0))}
+
+[data-c="ev-1"] .rule{width:100%;height:1px;background:var(--hairline);margin:26px 0 22px}
+
+[data-c="ev-1"] .obj--big{width:141px;border-radius:8px}
+[data-c="ev-1"] .obj--big .fc{height:188px;border-radius:8px 8px 0 0}
+[data-c="ev-1"] .obj--big .slab{border-radius:0 0 8px 8px}
+[data-c="ev-1"] .mk{position:absolute;left:50%;top:43%;transform:translate(-50%,-50%);
+  width:68px;height:68px;fill:rgba(255,255,255,.22)}
+[data-c="ev-1"] .eng{position:absolute;left:11px;bottom:9px;font-size:9.5px;font-weight:500;
+  letter-spacing:.005em;color:rgba(235,238,248,.56)}
+
+/* today: one sheet, the only colour on the screen */
+[data-c="ev-1"] .new{position:absolute;left:0;right:0;top:0;height:1.8px;background:var(--accent);
+  box-shadow:0 0 11px rgba(var(--accent-rgb),.42)}
+[data-c="ev-1"] .b1.on .new{animation:ev1sheet .5s cubic-bezier(.2,.8,.3,1) .95s backwards}
+@keyframes ev1sheet{from{opacity:0;transform:translateY(7px)}}
+[data-c="ev-1"] .b1.on .obj--big .fc{animation:ev1lift .5s cubic-bezier(.2,.8,.3,1) .95s backwards}
+@keyframes ev1lift{from{transform:translateY(1.8px)}}
+
+[data-c="ev-1"] .cap2{margin-top:13px;font-size:12px;line-height:1.5;color:var(--text-mid);max-width:30ch}
+[data-c="ev-1"] .state{margin-top:6px;font-size:11px;color:var(--text-lo)}
+</style>
+<div class="ph" data-c="ev-1">
+  <div class="st">
+    <div class="b b1">
+      <div class="lede">One sheet for every day you hold. The card thickens, and nothing under the top ever moves.</div>
+
+      <div class="ages">
+        <div class="age">
+          <div class="obj"><div class="fc"></div><div class="slab" style="height:4px"></div></div>
+          <div class="lab">Day 7</div>
+        </div>
+        <div class="age">
+          <div class="obj"><div class="fc"></div><div class="slab" style="height:19px"></div></div>
+          <div class="lab">Day 90</div>
+        </div>
+        <div class="age">
+          <div class="obj"><div class="fc"></div><div class="slab" style="height:38px"></div></div>
+          <div class="lab">Day 300</div>
+        </div>
+      </div>
+
+      <div class="rule"></div>
+
+      <div class="obj obj--big">
+        <div class="fc">
+          <svg class="mk" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+          <div class="eng">Stay sober</div>
+        </div>
+        <div class="slab" style="height:48px"><div class="new"></div></div>
+      </div>
+      <div class="lab">Day 301</div>
+      <div class="cap2">Today's sheet goes on top of three hundred. The face lifts by the thickness of one day.</div>
+      <div class="state">Until the day is held, the top sheet is not there.</div>
+    </div>
+  </div>
+  <div class="hint">Tap to replay</div>
+</div>
+<p class="item__note">The card is a stack and every day you hold lays down one sheet, so day 300 is a physically thicker object than day 30 and nothing under the top sheet ever moves again. Across all five, the accumulated base is grey and <b>the accent is only ever today</b>, which is the both layers model in one picture.</p></div><div class="item"><p class="item__label"><span class="item__n">2</span><span class="item__name">The grain fills in</span></p><style>
+/* ev-2. THE GRAIN. One engraved mark per day done, filling the face. */
+[data-c="ev-2"] .b1{justify-content:center;padding:30px 24px}
+[data-c="ev-2"] .lede{font-size:13.5px;line-height:1.5;font-weight:500;color:var(--text-mid);
+  max-width:31ch;letter-spacing:-.005em}
+
+[data-c="ev-2"] .ages{display:flex;align-items:flex-end;justify-content:center;gap:17px;margin-top:24px}
+[data-c="ev-2"] .age{display:flex;flex-direction:column;align-items:center}
+[data-c="ev-2"] .lab{margin-top:11px;font-size:11px;color:var(--text-lo);font-variant-numeric:tabular-nums}
+
+[data-c="ev-2"] .fc{position:relative;width:96px;height:128px;overflow:hidden;border-radius:5px;
+  background:linear-gradient(165deg,rgba(235,238,248,.12),rgba(235,238,248,.02) 48%,rgba(235,238,248,.05));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 10px 24px rgba(0,0,0,.55)}
+[data-c="ev-2"] .fc::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:3;
+  background:radial-gradient(150% 45% at 50% -12%,rgba(255,255,255,.13),transparent 56%)}
+
+[data-c="ev-2"] .field{position:absolute;left:10px;top:10px;width:75px;height:105px}
+[data-c="ev-2"] .rows{position:absolute;left:0;top:0;width:100%;
+  background:repeating-linear-gradient(90deg,rgba(235,238,248,.34) 0 3px,rgba(235,238,248,0) 3px 5px);
+  -webkit-mask-image:repeating-linear-gradient(180deg,#000 0 1px,rgba(0,0,0,0) 1px 5px);
+          mask-image:repeating-linear-gradient(180deg,#000 0 1px,rgba(0,0,0,0) 1px 5px)}
+[data-c="ev-2"] .part{position:absolute;left:0;height:1px;
+  background:repeating-linear-gradient(90deg,rgba(235,238,248,.34) 0 3px,rgba(235,238,248,0) 3px 5px)}
+
+[data-c="ev-2"] .rule{width:100%;height:1px;background:var(--hairline);margin:26px 0 22px}
+
+[data-c="ev-2"] .fc--big{width:141px;height:188px;border-radius:8px}
+[data-c="ev-2"] .fc--big .field{left:15px;top:15px;width:111px;height:156px}
+[data-c="ev-2"] .fc--big .rows{
+  background:repeating-linear-gradient(90deg,rgba(235,238,248,.34) 0 4.5px,rgba(235,238,248,0) 4.5px 7.4px);
+  -webkit-mask-image:repeating-linear-gradient(180deg,#000 0 1.2px,rgba(0,0,0,0) 1.2px 7.4px);
+          mask-image:repeating-linear-gradient(180deg,#000 0 1.2px,rgba(0,0,0,0) 1.2px 7.4px)}
+[data-c="ev-2"] .fc--big .part{height:1.2px;
+  background:repeating-linear-gradient(90deg,rgba(235,238,248,.34) 0 4.5px,rgba(235,238,248,0) 4.5px 7.4px)}
+[data-c="ev-2"] .eng{position:absolute;left:11px;bottom:9px;z-index:4;font-size:9.5px;font-weight:500;
+  letter-spacing:.005em;color:rgba(235,238,248,.62)}
+
+/* today: the mark being cut, the only colour on the screen */
+[data-c="ev-2"] .now{position:absolute;left:96.2px;top:125.8px;width:4.5px;height:1.2px;z-index:4;
+  background:var(--accent);box-shadow:0 0 9px rgba(var(--accent-rgb),.5);transform-origin:0 50%}
+[data-c="ev-2"] .b1.on .now{animation:ev2cut .34s cubic-bezier(.2,.8,.3,1) 1s backwards}
+@keyframes ev2cut{from{opacity:.2;transform:scaleX(0)}}
+
+[data-c="ev-2"] .cap2{margin-top:13px;font-size:12px;line-height:1.5;color:var(--text-mid);max-width:31ch}
+[data-c="ev-2"] .state{margin-top:6px;font-size:11px;color:var(--text-lo)}
+</style>
+<div class="ph" data-c="ev-2">
+  <div class="st">
+    <div class="b b1">
+      <div class="lede">Every morning you write cuts one mark into the face. Scattered at first, woven after a year.</div>
+
+      <div class="ages">
+        <div class="age">
+          <div class="fc"><div class="field">
+            <div class="rows" style="height:0"></div>
+            <div class="part" style="top:0;width:35px"></div>
+          </div></div>
+          <div class="lab">Day 7</div>
+        </div>
+        <div class="age">
+          <div class="fc"><div class="field">
+            <div class="rows" style="height:25px"></div>
+            <div class="part" style="top:25px;width:15px"></div>
+          </div></div>
+          <div class="lab">Day 90</div>
+        </div>
+        <div class="age">
+          <div class="fc"><div class="field">
+            <div class="rows" style="height:85px"></div>
+            <div class="part" style="top:85px;width:65px"></div>
+          </div></div>
+          <div class="lab">Day 300</div>
+        </div>
+      </div>
+
+      <div class="rule"></div>
+
+      <div class="fc fc--big">
+        <div class="field">
+          <div class="rows" style="height:125.8px"></div>
+          <div class="part" style="top:125.8px;width:96.2px"></div>
+          <div class="now"></div>
+        </div>
+        <div class="eng">Write every morning</div>
+      </div>
+      <div class="lab">Day 301</div>
+      <div class="cap2">Mark 269, cut this morning. The 32 days you missed are simply not on the card.</div>
+      <div class="state">Before the writing is done, the mark is not cut.</div>
+    </div>
+  </div>
+  <div class="hint">Tap to replay</div>
+</div>
+<p class="item__note">One mark cut into the face for every day done, so the surface goes from a few scratches at day 7 to a woven material by the end of a year. You can <b>count a single day</b> if you look for it, and days you missed leave no mark at all, so the card stays an honest record without ever showing a hole.</p></div><div class="item"><p class="item__label"><span class="item__n">3</span><span class="item__name">The rim laps inward</span></p><style>
+/* ev-3. THE RIM. Edge light steps once per day kept, laps inward each 100. */
+[data-c="ev-3"] .b1{justify-content:center;padding:30px 24px}
+[data-c="ev-3"] .lede{font-size:13.5px;line-height:1.5;font-weight:500;color:var(--text-mid);
+  max-width:31ch;letter-spacing:-.005em}
+
+[data-c="ev-3"] .ages{display:flex;align-items:flex-end;justify-content:center;gap:17px;margin-top:24px}
+[data-c="ev-3"] .age{display:flex;flex-direction:column;align-items:center}
+[data-c="ev-3"] .lab{margin-top:11px;font-size:11px;color:var(--text-lo);font-variant-numeric:tabular-nums}
+
+[data-c="ev-3"] .fc{position:relative;width:96px;height:128px;border-radius:5px;
+  background:linear-gradient(165deg,rgba(235,238,248,.12),rgba(235,238,248,.02) 48%,rgba(235,238,248,.05));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.20),0 10px 24px rgba(0,0,0,.55)}
+[data-c="ev-3"] .fc::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(150% 45% at 50% -12%,rgba(255,255,255,.12),transparent 56%)}
+[data-c="ev-3"] .rim{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+[data-c="ev-3"] .l{fill:none;stroke:rgba(235,238,248,.17);stroke-width:1;stroke-linecap:butt}
+[data-c="ev-3"] .l--live{stroke:rgba(235,238,248,.42)}
+
+[data-c="ev-3"] .rule{width:100%;height:1px;background:var(--hairline);margin:26px 0 22px}
+
+[data-c="ev-3"] .fc--big{width:141px;height:188px;border-radius:8px}
+[data-c="ev-3"] .fc--big .l{stroke-width:.7}
+/* no M on this one: the rim laps would frame it, and a boxed mark is dead app-wide */
+[data-c="ev-3"] .eng{position:absolute;left:14px;right:14px;bottom:12px;text-align:left;font-size:9px;font-weight:500;
+  letter-spacing:.005em;color:rgba(235,238,248,.62)}
+
+/* today: one step of the third lap, the only colour on the screen */
+[data-c="ev-3"] .l--now{stroke:var(--accent);stroke-width:1.7;
+  filter:drop-shadow(0 0 3px rgba(var(--accent-rgb),.7))}
+[data-c="ev-3"] .b1.on .l--now{animation:ev3step .42s cubic-bezier(.2,.8,.3,1) 1s backwards}
+@keyframes ev3step{from{opacity:0}}
+
+[data-c="ev-3"] .cap2{margin-top:13px;font-size:12px;line-height:1.5;color:var(--text-mid);max-width:31ch}
+[data-c="ev-3"] .state{margin-top:6px;font-size:11px;color:var(--text-lo)}
+</style>
+<div class="ph" data-c="ev-3">
+  <div class="st">
+    <div class="b b1">
+      <div class="lede">Every day you keep moves the edge light one step. A hundred days closes a lap, then a new one starts inside it.</div>
+
+      <div class="ages">
+        <div class="age">
+          <div class="fc">
+            <svg class="rim" viewBox="0 0 96 128" aria-hidden="true">
+              <path class="l l--live" d="M 48 127 L 5.5 127 A 4.5 4.5 0 0 1 1 122.5 L 1 5.5 A 4.5 4.5 0 0 1 5.5 1 L 90.5 1 A 4.5 4.5 0 0 1 95 5.5 L 95 122.5 A 4.5 4.5 0 0 1 90.5 127 Z" style="stroke-dasharray:30.3 999"/>
+            </svg>
+          </div>
+          <div class="lab">Day 7</div>
+        </div>
+        <div class="age">
+          <div class="fc">
+            <svg class="rim" viewBox="0 0 96 128" aria-hidden="true">
+              <path class="l l--live" d="M 48 127 L 5.5 127 A 4.5 4.5 0 0 1 1 122.5 L 1 5.5 A 4.5 4.5 0 0 1 5.5 1 L 90.5 1 A 4.5 4.5 0 0 1 95 5.5 L 95 122.5 A 4.5 4.5 0 0 1 90.5 127 Z" style="stroke-dasharray:363.1 999"/>
+            </svg>
+          </div>
+          <div class="lab">Day 90</div>
+        </div>
+        <div class="age">
+          <div class="fc">
+            <svg class="rim" viewBox="0 0 96 128" aria-hidden="true">
+              <path class="l" d="M 48 127 L 5.5 127 A 4.5 4.5 0 0 1 1 122.5 L 1 5.5 A 4.5 4.5 0 0 1 5.5 1 L 90.5 1 A 4.5 4.5 0 0 1 95 5.5 L 95 122.5 A 4.5 4.5 0 0 1 90.5 127 Z"/>
+              <path class="l" d="M 48 124.4 L 7.2 124.4 A 3.6 3.6 0 0 1 3.6 120.8 L 3.6 7.2 A 3.6 3.6 0 0 1 7.2 3.6 L 88.8 3.6 A 3.6 3.6 0 0 1 92.4 7.2 L 92.4 120.8 A 3.6 3.6 0 0 1 88.8 124.4 Z"/>
+              <path class="l l--live" d="M 48 121.8 L 9.2 121.8 A 3 3 0 0 1 6.2 118.8 L 6.2 9.2 A 3 3 0 0 1 9.2 6.2 L 86.8 6.2 A 3 3 0 0 1 89.8 9.2 L 89.8 118.8 A 3 3 0 0 1 86.8 121.8 Z" style="stroke-dasharray:306.7 999"/>
+            </svg>
+          </div>
+          <div class="lab">Day 300</div>
+        </div>
+      </div>
+
+      <div class="rule"></div>
+
+      <div class="fc fc--big">
+        <svg class="rim" viewBox="0 0 96 128" aria-hidden="true">
+          <path class="l" d="M 48 127 L 5.5 127 A 4.5 4.5 0 0 1 1 122.5 L 1 5.5 A 4.5 4.5 0 0 1 5.5 1 L 90.5 1 A 4.5 4.5 0 0 1 95 5.5 L 95 122.5 A 4.5 4.5 0 0 1 90.5 127 Z"/>
+          <path class="l" d="M 48 124.4 L 7.2 124.4 A 3.6 3.6 0 0 1 3.6 120.8 L 3.6 7.2 A 3.6 3.6 0 0 1 7.2 3.6 L 88.8 3.6 A 3.6 3.6 0 0 1 92.4 7.2 L 92.4 120.8 A 3.6 3.6 0 0 1 88.8 124.4 Z"/>
+          <path class="l l--live" d="M 48 121.8 L 9.2 121.8 A 3 3 0 0 1 6.2 118.8 L 6.2 9.2 A 3 3 0 0 1 9.2 6.2 L 86.8 6.2 A 3 3 0 0 1 89.8 9.2 L 89.8 118.8 A 3 3 0 0 1 86.8 121.8 Z" style="stroke-dasharray:306.7 999"/>
+          <path class="l l--now" d="M 48 121.8 L 9.2 121.8 A 3 3 0 0 1 6.2 118.8 L 6.2 9.2 A 3 3 0 0 1 9.2 6.2 L 86.8 6.2 A 3 3 0 0 1 89.8 9.2 L 89.8 118.8 A 3 3 0 0 1 86.8 121.8 Z" style="stroke-dasharray:3.9 999;stroke-dashoffset:-306.7"/>
+        </svg>
+        <div class="eng">Screen time under 1h</div>
+      </div>
+      <div class="lab">Day 301</div>
+      <div class="cap2">Day 301 kept. The third lap steps forward by the width of one day.</div>
+      <div class="state">A day not kept moves nothing. The light waits where it is.</div>
+    </div>
+  </div>
+  <div class="hint">Tap to replay</div>
+</div>
+<p class="item__note">The edge light steps forward one day per day kept, a hundred days closes a lap, and the next lap draws inside the one before it. It <b>never finishes</b>, it just coils tighter every hundred days, and today is a visible step you can find at the frontier.</p></div><div class="item"><p class="item__label"><span class="item__n">4</span><span class="item__name">Months settle as strata</span></p><style>
+/* ev-4. STRATA. The days settle. Each month is a band as thick as it earned. */
+[data-c="ev-4"] .b1{justify-content:center;padding:30px 24px}
+[data-c="ev-4"] .lede{font-size:13.5px;line-height:1.5;font-weight:500;color:var(--text-mid);
+  max-width:31ch;letter-spacing:-.005em}
+
+[data-c="ev-4"] .ages{display:flex;align-items:flex-end;justify-content:center;gap:17px;margin-top:24px}
+[data-c="ev-4"] .age{display:flex;flex-direction:column;align-items:center}
+[data-c="ev-4"] .lab{margin-top:11px;font-size:11px;color:var(--text-lo);font-variant-numeric:tabular-nums}
+
+[data-c="ev-4"] .fc{position:relative;width:96px;height:128px;overflow:hidden;border-radius:5px;
+  background:linear-gradient(165deg,rgba(235,238,248,.12),rgba(235,238,248,.02) 48%,rgba(235,238,248,.05));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 10px 24px rgba(0,0,0,.55)}
+[data-c="ev-4"] .fc::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:5;
+  background:radial-gradient(150% 45% at 50% -12%,rgba(255,255,255,.13),transparent 56%)}
+
+[data-c="ev-4"] .sed{position:absolute;left:0;right:0;bottom:0;z-index:2;
+  display:flex;flex-direction:column-reverse}
+[data-c="ev-4"] .bd{position:relative;
+  background:linear-gradient(180deg,rgba(235,238,248,.145),rgba(235,238,248,.085));
+  box-shadow:inset 0 .5px 0 rgba(255,255,255,.30)}
+[data-c="ev-4"] .bd::after{content:"";position:absolute;inset:0;opacity:var(--d,.8);
+  background:repeating-linear-gradient(180deg,rgba(255,255,255,.055) 0 .5px,rgba(255,255,255,0) .5px 3.4px)}
+[data-c="ev-4"] .wl{position:absolute;left:0;right:0;height:1px;z-index:3;background:rgba(235,238,248,.46)}
+
+[data-c="ev-4"] .rule{width:100%;height:1px;background:var(--hairline);margin:26px 0 22px}
+
+[data-c="ev-4"] .fc--big{width:141px;height:188px;border-radius:8px}
+[data-c="ev-4"] .mk{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);z-index:1;
+  width:68px;height:68px;fill:rgba(255,255,255,.22)}
+[data-c="ev-4"] .eng{position:absolute;left:12px;bottom:10px;z-index:6;font-size:9.5px;font-weight:500;
+  letter-spacing:.005em;color:rgba(235,238,248,.66)}
+
+/* today: the filament that settles on top, the only colour on the screen */
+[data-c="ev-4"] .wl--now{background:var(--accent);height:1.4px;
+  box-shadow:0 0 10px rgba(var(--accent-rgb),.42)}
+[data-c="ev-4"] .b1.on .wl--now{animation:ev4settle .55s cubic-bezier(.2,.8,.3,1) .95s backwards}
+@keyframes ev4settle{from{opacity:0;transform:translateY(-7px)}}
+
+[data-c="ev-4"] .cap2{margin-top:13px;font-size:12px;line-height:1.5;color:var(--text-mid);max-width:31ch}
+[data-c="ev-4"] .state{margin-top:6px;font-size:11px;color:var(--text-lo)}
+</style>
+<div class="ph" data-c="ev-4">
+  <div class="st">
+    <div class="b b1">
+      <div class="lede">The days settle. Each month becomes a band, as thick as the days you kept in it.</div>
+
+      <div class="ages">
+        <div class="age">
+          <div class="fc">
+            <div class="sed"><div class="bd" style="height:2.5px;--d:.9"></div></div>
+            <div class="wl" style="bottom:2.5px"></div>
+          </div>
+          <div class="lab">Day 7</div>
+        </div>
+        <div class="age">
+          <div class="fc">
+            <div class="sed">
+              <div class="bd" style="height:9.4px;--d:.91"></div>
+              <div class="bd" style="height:10.4px;--d:.98"></div>
+              <div class="bd" style="height:7.9px;--d:.83"></div>
+            </div>
+            <div class="wl" style="bottom:27.7px"></div>
+          </div>
+          <div class="lab">Day 90</div>
+        </div>
+        <div class="age">
+          <div class="fc">
+            <div class="sed">
+              <div class="bd" style="height:9.4px;--d:.91"></div>
+              <div class="bd" style="height:10.4px;--d:.98"></div>
+              <div class="bd" style="height:7.9px;--d:.83"></div>
+              <div class="bd" style="height:10.8px;--d:1"></div>
+              <div class="bd" style="height:6.5px;--d:.74"></div>
+              <div class="bd" style="height:9.7px;--d:.94"></div>
+              <div class="bd" style="height:9px;--d:.89"></div>
+              <div class="bd" style="height:10.1px;--d:.96"></div>
+              <div class="bd" style="height:8.6px;--d:.87"></div>
+              <div class="bd" style="height:7.6px;--d:.81"></div>
+            </div>
+            <div class="wl" style="bottom:90px"></div>
+          </div>
+          <div class="lab">Day 300</div>
+        </div>
+      </div>
+
+      <div class="rule"></div>
+
+      <div class="fc fc--big">
+        <svg class="mk" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+        <div class="sed">
+          <div class="bd" style="height:13.8px;--d:.91"></div>
+          <div class="bd" style="height:15.4px;--d:.98"></div>
+          <div class="bd" style="height:11.7px;--d:.83"></div>
+          <div class="bd" style="height:15.9px;--d:1"></div>
+          <div class="bd" style="height:9.5px;--d:.74"></div>
+          <div class="bd" style="height:14.3px;--d:.94"></div>
+          <div class="bd" style="height:13.3px;--d:.89"></div>
+          <div class="bd" style="height:14.8px;--d:.96"></div>
+          <div class="bd" style="height:12.7px;--d:.87"></div>
+          <div class="bd" style="height:11.1px;--d:.81"></div>
+        </div>
+        <div class="wl wl--now" style="bottom:132.5px"></div>
+        <div class="eng">Lose 40 lbs</div>
+      </div>
+      <div class="lab">Day 301</div>
+      <div class="cap2">Today settles on top. Ten months under it, thickest where you kept the most.</div>
+      <div class="state">Nothing settles until the day is done.</div>
+    </div>
+  </div>
+  <div class="hint">Tap to replay</div>
+</div>
+<p class="item__note">Each month settles into a band as thick as the days you actually kept in it, so a year reads like rock: fat layers where you were solid, thin ones where you were not. This is the only one that <b>shows the shape of your history</b> and not just how much of it there is.</p></div><div class="item"><p class="item__label"><span class="item__n">5</span><span class="item__name">The core lights up</span></p><style>
+/* ev-5. THE CORE. Light from inside, reaching as far as the days behind it. */
+[data-c="ev-5"] .b1{justify-content:center;padding:30px 24px}
+[data-c="ev-5"] .lede{font-size:13.5px;line-height:1.5;font-weight:500;color:var(--text-mid);
+  max-width:31ch;letter-spacing:-.005em}
+
+[data-c="ev-5"] .ages{display:flex;align-items:flex-end;justify-content:center;gap:17px;margin-top:24px}
+[data-c="ev-5"] .age{display:flex;flex-direction:column;align-items:center}
+[data-c="ev-5"] .lab{margin-top:11px;font-size:11px;color:var(--text-lo);font-variant-numeric:tabular-nums}
+
+[data-c="ev-5"] .obj{position:relative}
+[data-c="ev-5"] .fc{position:relative;z-index:2;width:96px;height:128px;overflow:hidden;border-radius:5px;
+  background:linear-gradient(165deg,rgba(235,238,248,.12),rgba(235,238,248,.02) 48%,rgba(235,238,248,.05));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 10px 24px rgba(0,0,0,.55)}
+[data-c="ev-5"] .fc::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:5;
+  background:radial-gradient(150% 45% at 50% -12%,rgba(255,255,255,.11),transparent 56%)}
+[data-c="ev-5"] .glow{position:absolute;left:50%;top:58%;z-index:1;
+  width:calc(var(--r) * 2);height:calc(var(--r) * 2);transform:translate(-50%,-50%);border-radius:50%;
+  background:radial-gradient(circle,rgba(235,238,248,.72),rgba(235,238,248,.18) 40%,rgba(235,238,248,0) 72%)}
+[data-c="ev-5"] .spill{position:absolute;z-index:0;left:50%;bottom:-15px;transform:translateX(-50%);
+  width:150%;height:30px;pointer-events:none;
+  background:radial-gradient(50% 50% at 50% 50%,rgba(235,238,248,.30),rgba(235,238,248,0) 72%)}
+
+[data-c="ev-5"] .rule{width:100%;height:1px;background:var(--hairline);margin:26px 0 22px}
+
+[data-c="ev-5"] .fc--big{width:141px;height:188px;border-radius:8px}
+[data-c="ev-5"] .mk{position:absolute;left:50%;top:34%;transform:translate(-50%,-50%);z-index:3;
+  width:68px;height:68px;fill:rgba(255,255,255,.22)}
+[data-c="ev-5"] .eng{position:absolute;left:12px;bottom:10px;z-index:6;font-size:9.5px;font-weight:500;
+  letter-spacing:.005em;color:rgba(235,238,248,.62)}
+
+/* today: the ember at the core, the only colour on the screen */
+[data-c="ev-5"] .ember{position:absolute;left:50%;top:58%;z-index:4;width:5px;height:5px;border-radius:50%;
+  transform:translate(-50%,-50%);background:var(--accent);
+  box-shadow:0 0 14px 4px rgba(var(--accent-rgb),.42)}
+[data-c="ev-5"] .b1.on .ember{animation:ev5lit .5s cubic-bezier(.2,.8,.3,1) 1s backwards}
+@keyframes ev5lit{from{opacity:0;transform:translate(-50%,-50%) scale(.4)}}
+[data-c="ev-5"] .b1.on .fc--big .glow{animation:ev5reach .7s cubic-bezier(.2,.8,.3,1) 1s backwards}
+@keyframes ev5reach{from{transform:translate(-50%,-50%) scale(.955)}}
+
+[data-c="ev-5"] .cap2{margin-top:13px;font-size:12px;line-height:1.5;color:var(--text-mid);max-width:31ch}
+[data-c="ev-5"] .state{margin-top:6px;font-size:11px;color:var(--text-lo)}
+</style>
+<div class="ph" data-c="ev-5">
+  <div class="st">
+    <div class="b b1">
+      <div class="lede">The light inside reaches as far as the days behind it. At a year it starts to spill past the edge.</div>
+
+      <div class="ages">
+        <div class="age">
+          <div class="obj"><div class="fc"><div class="glow" style="--r:20px"></div></div></div>
+          <div class="lab">Day 7</div>
+        </div>
+        <div class="age">
+          <div class="obj"><div class="fc"><div class="glow" style="--r:52px"></div></div></div>
+          <div class="lab">Day 90</div>
+        </div>
+        <div class="age">
+          <div class="obj">
+            <div class="spill"></div>
+            <div class="fc"><div class="glow" style="--r:96px"></div></div>
+          </div>
+          <div class="lab">Day 300</div>
+        </div>
+      </div>
+
+      <div class="rule"></div>
+
+      <div class="obj">
+        <div class="spill" style="bottom:-19px;height:38px"></div>
+        <div class="fc fc--big">
+          <div class="glow" style="--r:141px"></div>
+          <svg class="mk" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+          <div class="ember"></div>
+          <div class="eng">100 paying customers</div>
+        </div>
+      </div>
+      <div class="lab">Day 301</div>
+      <div class="cap2">Today's ember, lit at the core. The reach grows by one more day.</div>
+      <div class="state">Before the day is done the core is dark, however far the light already goes.</div>
+    </div>
+  </div>
+  <div class="hint">Tap to replay</div>
+</div>
+<p class="item__note">The light inside reaches as far as the days behind it, so the card goes from an inert wafer to something that lights the surface it sits on around the one year mark. This one is the <b>least countable on purpose</b>, for the person who wants to feel the accumulation instead of auditing it.</p></div><div class="item"><p class="item__label"><span class="item__n">6</span><span class="item__name">The colour is earned</span></p><style>
+/* ex-1 THE COLOUR IS EARNED. Every day held drops one bead of colour into the
+   glass. A bead stays sharp for about a week, then diffuses into the body and
+   never leaves it. Base layer: how saturated the material is, permanent.
+   Surface layer: the handful of beads still undiffused, today's the sharpest.
+   Count the beads at a week. At 300 days the whole body carries them. */
+[data-c="ex-1"] .b{padding:24px 22px 42px}
+[data-c="ex-1"] .exhd{font-size:18px;font-weight:650;letter-spacing:-.022em;color:var(--text-hi)}
+[data-c="ex-1"] .exsub{font-size:13.5px;line-height:1.5;color:var(--text-mid);margin-top:8px;max-width:31ch}
+
+[data-c="ex-1"] .exrow{display:flex;justify-content:center;gap:14px;margin-top:24px}
+[data-c="ex-1"] .excol{width:96px;display:flex;flex-direction:column;align-items:center}
+
+[data-c="ex-1"] .exc{position:relative;width:78px;height:106px;border-radius:10px;overflow:hidden;
+  clip-path:inset(0 round 10px);contain:paint;
+  background:linear-gradient(165deg,rgba(255,255,255,.12),rgba(255,255,255,.025) 48%,rgba(255,255,255,.06));
+  box-shadow:0 12px 26px rgba(0,0,0,.5)}
+[data-c="ex-1"] .exc::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;
+  background:linear-gradient(140deg,rgba(255,255,255,.55),rgba(255,255,255,.10) 26%,
+    rgba(255,255,255,.02) 52%,rgba(255,255,255,.20) 80%,rgba(255,255,255,.42));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
+          mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude;
+  pointer-events:none;z-index:3}
+
+/* THE ONE ACCENT MOMENT: the colour in the glass. The body it has soaked up,
+   and the few beads that have not soaked in yet. Radial to transparent, hard
+   clipped by the card, so no layer can ever draw a straight edge. */
+[data-c="ex-1"] .extint{position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:
+    radial-gradient(58% 42% at 30% 16%,rgba(var(--accent-rgb),calc(var(--ta) * 2.1)),rgba(var(--accent-rgb),0) 72%),
+    radial-gradient(54% 38% at 74% 44%,rgba(var(--accent-rgb),calc(var(--ta) * 1.7)),rgba(var(--accent-rgb),0) 74%),
+    radial-gradient(72% 50% at 44% 84%,rgba(var(--accent-rgb),calc(var(--ta) * 1.3)),rgba(var(--accent-rgb),0) 78%),
+    radial-gradient(150% 108% at 50% 4%,rgba(var(--accent-rgb),calc(var(--ta) * .5)),rgba(var(--accent-rgb),0) 100%)}
+[data-c="ex-1"] .bd{position:absolute;left:var(--x);top:var(--y);width:var(--w);height:var(--h);z-index:2;
+  transform:translate(-50%,-50%);opacity:var(--o);border-radius:50%;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 44%,rgba(var(--accent-rgb),.72),
+    rgba(var(--accent-rgb),.34) 30%,rgba(var(--accent-rgb),.11) 52%,rgba(var(--accent-rgb),0) 76%)}
+[data-c="ex-1"] .a7{--ta:.008}
+[data-c="ex-1"] .a90{--ta:.05}
+[data-c="ex-1"] .a300,[data-c="ex-1"] .exc.big{--ta:.115}
+
+[data-c="ex-1"] .exlab{font-size:11px;color:var(--text-lo);margin-top:13px;line-height:1.35}
+[data-c="ex-1"] .exlab b{display:block;color:var(--text-mid);font-weight:600;font-size:11.5px;
+  font-variant-numeric:tabular-nums;letter-spacing:-.005em}
+
+[data-c="ex-1"] .exrule{width:56px;height:1px;background:var(--hairline);margin:22px 0 16px}
+[data-c="ex-1"] .extod{font-size:11.5px;color:var(--text-lo);margin-bottom:12px}
+[data-c="ex-1"] .exc.big{width:118px;height:160px;border-radius:13px;clip-path:inset(0 round 13px);
+  box-shadow:0 20px 42px rgba(0,0,0,.6)}
+
+/* today's bead landing, then starting to give itself up to the body */
+[data-c="ex-1"] .bdnew{opacity:.62;animation:ex1drop .9s cubic-bezier(.2,.8,.3,1) .5s both}
+@keyframes ex1drop{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.28)}
+  34%{opacity:1;transform:translate(-50%,-50%) scale(.78)}
+  100%{opacity:.62;transform:translate(-50%,-50%) scale(1)}}
+
+[data-c="ex-1"] .exdep{font-size:14.5px;color:var(--text-mid);line-height:1.5;margin-top:16px;max-width:26ch}
+[data-c="ex-1"] .exdep b{color:var(--text-hi);font-weight:650}
+[data-c="ex-1"] .excap{font-size:12px;color:var(--text-mid);line-height:1.5;margin-top:8px;max-width:33ch}
+</style>
+<div class="ph" data-c="ex-1"><div class="st">
+  <div class="b b1">
+    <div class="exhd">Sober.</div>
+    <div class="exsub">Every day held drops one bead of colour into the glass. None of it comes back out.</div>
+
+    <div class="exrow">
+      <div class="excol">
+        <div class="exc a7">
+          <div class="extint"></div>
+          <div class="bd" style="--x:46px;--y:88px;--w:36px;--h:22px;--o:.07"></div>
+          <div class="bd" style="--x:28px;--y:76px;--w:33px;--h:21px;--o:.10"></div>
+          <div class="bd" style="--x:52px;--y:66px;--w:30px;--h:20px;--o:.13"></div>
+          <div class="bd" style="--x:34px;--y:54px;--w:27px;--h:19px;--o:.18"></div>
+          <div class="bd" style="--x:54px;--y:42px;--w:24px;--h:17px;--o:.24"></div>
+          <div class="bd" style="--x:30px;--y:32px;--w:20px;--h:15px;--o:.30"></div>
+          <div class="bd" style="--x:44px;--y:20px;--w:16px;--h:13px;--o:.42"></div>
+        </div>
+        <div class="exlab"><b>Day 7</b>you can count them</div>
+      </div>
+      <div class="excol">
+        <div class="exc a90">
+          <div class="extint"></div>
+          <div class="bd" style="--x:48px;--y:58px;--w:28px;--h:19px;--o:.11"></div>
+          <div class="bd" style="--x:32px;--y:40px;--w:22px;--h:16px;--o:.20"></div>
+          <div class="bd" style="--x:46px;--y:22px;--w:15px;--h:12px;--o:.36"></div>
+        </div>
+        <div class="exlab"><b>Day 90</b>3 months in it</div>
+      </div>
+      <div class="excol">
+        <div class="exc a300">
+          <div class="extint"></div>
+          <div class="bd" style="--x:46px;--y:56px;--w:27px;--h:18px;--o:.10"></div>
+          <div class="bd" style="--x:32px;--y:38px;--w:21px;--h:16px;--o:.19"></div>
+          <div class="bd" style="--x:50px;--y:20px;--w:14px;--h:12px;--o:.34"></div>
+        </div>
+        <div class="exlab"><b>Day 300</b>the body carries it</div>
+      </div>
+    </div>
+
+    <div class="exrule"></div>
+    <div class="extod">Today</div>
+
+    <div class="exc big">
+      <div class="extint"></div>
+      <div class="bd" style="--x:46px;--y:124px;--w:50px;--h:32px;--o:.07"></div>
+      <div class="bd" style="--x:74px;--y:92px;--w:42px;--h:28px;--o:.12"></div>
+      <div class="bd" style="--x:50px;--y:58px;--w:32px;--h:24px;--o:.21"></div>
+      <div class="bd bdnew" style="--x:74px;--y:30px;--w:22px;--h:18px"></div>
+    </div>
+
+    <div class="exdep">On this day, you held the line <b>301 days</b>.</div>
+    <div class="excap">Today's bead is the sharp one. Inside a week it gives itself up to the body and stays there.</div>
+  </div>
+</div>
+<div class="hint">Tap to replay</div></div>
+<p class="item__note">Every day held drops one bead of colour into the glass. A bead stays sharp about a week, then gives itself up to the body and never leaves. So the base layer is <b>how saturated the material is</b>, permanent, and the surface layer is the handful of beads not soaked in yet, today's the sharpest. Fits <b>maintenance</b>: nothing to count but days, and at a week you can literally count them on the card, while at 300 the whole body carries them.</p></div><div class="item"><p class="item__label"><span class="item__n">7</span><span class="item__name">The core</span></p><style>
+/* ex-2 THE CORE. A light inside the glass. Its SIZE is every rep ever done and
+   never shrinks. Its BRIGHTNESS is the last thirty days, so a soft month dims
+   the card without taking anything off it. */
+[data-c="ex-2"] .b{padding:24px 22px 42px}
+[data-c="ex-2"] .exhd{font-size:18px;font-weight:650;letter-spacing:-.022em;color:var(--text-hi)}
+[data-c="ex-2"] .exsub{font-size:13.5px;line-height:1.5;color:var(--text-mid);margin-top:8px;max-width:31ch}
+
+[data-c="ex-2"] .exrow{display:flex;justify-content:center;gap:14px;margin-top:24px}
+[data-c="ex-2"] .excol{width:96px;display:flex;flex-direction:column;align-items:center}
+
+[data-c="ex-2"] .exc{position:relative;width:78px;height:106px;border-radius:10px;overflow:hidden;
+  clip-path:inset(0 round 10px);contain:paint;
+  background:linear-gradient(165deg,rgba(255,255,255,.11),rgba(255,255,255,.02) 48%,rgba(255,255,255,.05));
+  box-shadow:0 12px 26px rgba(0,0,0,.5)}
+[data-c="ex-2"] .exc::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;
+  background:linear-gradient(140deg,rgba(255,255,255,.55),rgba(255,255,255,.10) 26%,
+    rgba(255,255,255,.02) 52%,rgba(255,255,255,.20) 80%,rgba(255,255,255,.42));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
+          mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude;
+  pointer-events:none;z-index:2}
+
+/* THE ONE ACCENT MOMENT: the core. Radial to transparent, so it can never
+   show a straight edge, and hard clipped by the card. */
+[data-c="ex-2"] .excore{position:absolute;left:50%;top:50%;border-radius:50%;pointer-events:none;
+  transform:translate(-50%,-50%);
+  background:radial-gradient(circle at 50% 50%,
+    rgba(var(--accent-rgb),1) 0%,
+    rgba(var(--accent-rgb),.70) 13%,
+    rgba(var(--accent-rgb),.26) 30%,
+    rgba(var(--accent-rgb),.08) 48%,
+    rgba(var(--accent-rgb),0) 68%)}
+[data-c="ex-2"] .k7{width:34px;height:34px;opacity:.9}
+[data-c="ex-2"] .k90{width:74px;height:74px;opacity:.5}
+[data-c="ex-2"] .k300{width:136px;height:136px;opacity:.94}
+
+[data-c="ex-2"] .exlab{font-size:11px;color:var(--text-lo);margin-top:13px;line-height:1.35}
+[data-c="ex-2"] .exlab b{display:block;color:var(--text-mid);font-weight:600;font-size:11.5px;
+  font-variant-numeric:tabular-nums;letter-spacing:-.005em}
+
+[data-c="ex-2"] .exrule{width:56px;height:1px;background:var(--hairline);margin:22px 0 16px}
+[data-c="ex-2"] .extod{font-size:11.5px;color:var(--text-lo);margin-bottom:12px}
+
+[data-c="ex-2"] .exc.big{width:118px;height:160px;border-radius:13px;clip-path:inset(0 round 13px);
+  box-shadow:0 20px 42px rgba(0,0,0,.6)}
+[data-c="ex-2"] .kH{width:208px;height:208px;opacity:.96;
+  animation:ex2burn .82s cubic-bezier(.2,.8,.3,1) .5s both}
+@keyframes ex2burn{
+  from{opacity:.44;transform:translate(-50%,-50%) scale(.93)}
+  to{opacity:.96;transform:translate(-50%,-50%) scale(1)}}
+
+[data-c="ex-2"] .exdep{font-size:14.5px;color:var(--text-mid);line-height:1.5;margin-top:16px;max-width:26ch}
+[data-c="ex-2"] .exdep b{color:var(--text-hi);font-weight:650}
+[data-c="ex-2"] .excap{font-size:12px;color:var(--text-mid);line-height:1.5;margin-top:8px;max-width:33ch}
+</style>
+<div class="ph" data-c="ex-2"><div class="st">
+  <div class="b b1">
+    <div class="exhd">Run 4x a week.</div>
+    <div class="exsub">Every run feeds a light inside the glass. The light gets bigger and never gets smaller.</div>
+
+    <div class="exrow">
+      <div class="excol">
+        <div class="exc"><div class="excore k7"></div></div>
+        <div class="exlab"><b>Day 7</b>4 runs</div>
+      </div>
+      <div class="excol">
+        <div class="exc"><div class="excore k90"></div></div>
+        <div class="exlab"><b>Day 90</b>51 runs, quiet month</div>
+      </div>
+      <div class="excol">
+        <div class="exc"><div class="excore k300"></div></div>
+        <div class="exlab"><b>Day 300</b>172 runs</div>
+      </div>
+    </div>
+
+    <div class="exrule"></div>
+    <div class="extod">Today</div>
+
+    <div class="exc big"><div class="excore kH"></div></div>
+
+    <div class="exdep">On this day, you ran. That makes <b>173</b>.</div>
+    <div class="excap">Size is every run you have ever done. Brightness is this month, so a slow stretch dims the card and takes nothing off it.</div>
+  </div>
+</div>
+<div class="hint">Tap to replay</div></div>
+<p class="item__note">A light inside the glass. Its <b>size is every rep ever done</b> and never shrinks. Its <b>brightness is the last thirty days</b>, so a quiet month dims the card and takes nothing off it. Two different facts on one object, which is what separates it from a glow that only grows. Fits <b>frequency</b>, where the honest question is not the lifetime total, it is whether you are still running.</p></div><div class="item"><p class="item__label"><span class="item__n">8</span><span class="item__name">It stops being see through</span></p><style>
+/* ex-3 TRANSLUCENCY RESOLVING INTO SOLIDITY. On day one the card is nearly not
+   there: the room reads straight through it. Marks give it body. By day 300 it
+   is opaque and blocks what is behind it, which is the whole argument for an
+   open goal that can never be counted. */
+[data-c="ex-3"] .b{padding:24px 22px 42px}
+[data-c="ex-3"] .exhd{font-size:18px;font-weight:650;letter-spacing:-.022em;color:var(--text-hi)}
+[data-c="ex-3"] .exsub{font-size:13.5px;line-height:1.5;color:var(--text-mid);margin-top:8px;max-width:31ch}
+
+[data-c="ex-3"] .exstage{position:relative;margin-top:24px}
+[data-c="ex-3"] .exwall{position:absolute;left:-10px;right:-10px;top:-14px;height:134px;pointer-events:none;
+  background:repeating-linear-gradient(180deg,rgba(235,238,248,.19) 0 1px,rgba(235,238,248,0) 1px 11px);
+  -webkit-mask-image:radial-gradient(ellipse 62% 58% at 50% 50%,#000 34%,transparent 84%);
+          mask-image:radial-gradient(ellipse 62% 58% at 50% 50%,#000 34%,transparent 84%)}
+[data-c="ex-3"] .exrow{position:relative;display:flex;justify-content:center;gap:14px}
+[data-c="ex-3"] .excol{width:96px;display:flex;flex-direction:column;align-items:center}
+
+[data-c="ex-3"] .exc{position:relative;width:78px;height:106px;border-radius:10px;overflow:hidden;
+  clip-path:inset(0 round 10px)}
+[data-c="ex-3"] .exfill{position:absolute;inset:0;background:#0b0d11}
+[data-c="ex-3"] .exfilm{position:absolute;inset:0;
+  background:linear-gradient(165deg,rgba(255,255,255,.14),rgba(255,255,255,.02) 48%,rgba(255,255,255,.06))}
+[data-c="ex-3"] .exrim{position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;
+  background:linear-gradient(140deg,rgba(255,255,255,.55),rgba(255,255,255,.10) 26%,
+    rgba(255,255,255,.02) 52%,rgba(255,255,255,.20) 80%,rgba(255,255,255,.42));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
+          mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude}
+
+[data-c="ex-3"] .a7 .exfill{opacity:.05}
+[data-c="ex-3"] .a7 .exfilm{opacity:.30}
+[data-c="ex-3"] .a7 .exrim{opacity:.22}
+[data-c="ex-3"] .a90 .exfill{opacity:.56}
+[data-c="ex-3"] .a90 .exfilm{opacity:.70}
+[data-c="ex-3"] .a90 .exrim{opacity:.62}
+[data-c="ex-3"] .a300 .exfill{opacity:.94}
+[data-c="ex-3"] .a300 .exfilm{opacity:1}
+[data-c="ex-3"] .a300 .exrim{opacity:1}
+[data-c="ex-3"] .a90{box-shadow:0 10px 22px rgba(0,0,0,.35)}
+[data-c="ex-3"] .a300{box-shadow:0 14px 30px rgba(0,0,0,.6)}
+
+[data-c="ex-3"] .exlab{font-size:11px;color:var(--text-lo);margin-top:13px;line-height:1.35}
+[data-c="ex-3"] .exlab b{display:block;color:var(--text-mid);font-weight:600;font-size:11.5px;
+  font-variant-numeric:tabular-nums;letter-spacing:-.005em}
+
+[data-c="ex-3"] .exrule{width:56px;height:1px;background:var(--hairline);margin:22px 0 16px}
+[data-c="ex-3"] .extod{font-size:11.5px;color:var(--text-lo);margin-bottom:12px}
+
+[data-c="ex-3"] .exstage.big{margin-top:0}
+[data-c="ex-3"] .exstage.big .exwall{top:-12px;height:186px;left:14px;right:14px;
+  -webkit-mask-image:radial-gradient(ellipse 68% 62% at 50% 50%,#000 42%,transparent 88%);
+          mask-image:radial-gradient(ellipse 68% 62% at 50% 50%,#000 42%,transparent 88%)}
+[data-c="ex-3"] .exc.big{width:118px;height:160px;border-radius:13px;clip-path:inset(0 round 13px);
+  box-shadow:0 20px 40px rgba(0,0,0,.62)}
+[data-c="ex-3"] .exc.big .exfill{opacity:.96;animation:ex3body .8s cubic-bezier(.2,.8,.3,1) .5s both}
+@keyframes ex3body{from{opacity:.80}to{opacity:.96}}
+
+/* THE ONE ACCENT MOMENT: the edge finally catching light, the day the object
+   becomes solid enough to have one. */
+/* on today's card the lit edge IS the edge, so the neutral rim steps back and
+   the one accent moment is the only thing catching light. */
+[data-c="ex-3"] .exc.big .exrim{opacity:.3}
+[data-c="ex-3"] .exlit{position:absolute;inset:0;border-radius:inherit;padding:1.6px;pointer-events:none;
+  background:linear-gradient(140deg,rgba(var(--accent-rgb),.95),rgba(var(--accent-rgb),.18) 34%,
+    rgba(var(--accent-rgb),.06) 58%,rgba(var(--accent-rgb),.55) 84%,rgba(var(--accent-rgb),.9));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
+          mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude;
+  opacity:.95;animation:ex3edge .7s cubic-bezier(.2,.8,.3,1) .62s both}
+@keyframes ex3edge{from{opacity:0;transform:scale(.985)}to{opacity:.95;transform:scale(1)}}
+
+[data-c="ex-3"] .exdep{font-size:14.5px;color:var(--text-mid);line-height:1.5;margin-top:16px;max-width:26ch}
+[data-c="ex-3"] .exdep b{color:var(--text-hi);font-weight:650}
+[data-c="ex-3"] .excap{font-size:12px;color:var(--text-mid);line-height:1.5;margin-top:8px;max-width:33ch}
+</style>
+<div class="ph" data-c="ex-3"><div class="st">
+  <div class="b b1">
+    <div class="exhd">Be a better father.</div>
+    <div class="exsub">Nothing here can be counted, so the card earns a body instead of a number.</div>
+
+    <div class="exstage">
+      <div class="exwall"></div>
+      <div class="exrow">
+        <div class="excol">
+          <div class="exc a7"><div class="exfill"></div><div class="exfilm"></div><div class="exrim"></div></div>
+          <div class="exlab"><b>Day 7</b>4 marks</div>
+        </div>
+        <div class="excol">
+          <div class="exc a90"><div class="exfill"></div><div class="exfilm"></div><div class="exrim"></div></div>
+          <div class="exlab"><b>Day 90</b>61 marks</div>
+        </div>
+        <div class="excol">
+          <div class="exc a300"><div class="exfill"></div><div class="exfilm"></div><div class="exrim"></div></div>
+          <div class="exlab"><b>Day 300</b>214 marks</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exrule"></div>
+    <div class="extod">Today</div>
+
+    <div class="exstage big">
+      <div class="exwall"></div>
+      <div class="exc big a300">
+        <div class="exfill"></div><div class="exfilm"></div><div class="exrim"></div><div class="exlit"></div>
+      </div>
+    </div>
+
+    <div class="exdep">On this day, you wrote about <b>Theo</b> again.</div>
+    <div class="excap">At a week it is a rumour you can see through. At 300 days it blocks the light behind it.</div>
+  </div>
+</div>
+<div class="hint">Tap to replay</div></div>
+<p class="item__note">On day one the card is nearly not there and the room reads straight through it. Marks give it body until at 300 days it is opaque and blocks the light behind it. Fits an <b>open goal</b> exactly, because there is no number to show and no meter that would not be a lie. The reward is that the thing became undeniable, and you can see that in one glance without counting anything.</p></div><div class="item"><p class="item__label"><span class="item__n">9</span><span class="item__name">Growth rings</span></p><style>
+/* ex-4 GROWTH RINGS. The material lays down one contour every thirty days,
+   outward from the middle, the way a tree does. The ring being drawn is dotted
+   for the days not yet lived, solid for the ones that are. Count the rings for
+   the months, look at the tip for today. Twelve rings reaches the rim. */
+[data-c="ex-4"] .b{padding:24px 22px 42px}
+[data-c="ex-4"] .exhd{font-size:18px;font-weight:650;letter-spacing:-.022em;color:var(--text-hi)}
+[data-c="ex-4"] .exsub{font-size:13.5px;line-height:1.5;color:var(--text-mid);margin-top:8px;max-width:31ch}
+
+[data-c="ex-4"] .exrow{display:flex;justify-content:center;gap:14px;margin-top:24px}
+[data-c="ex-4"] .excol{width:96px;display:flex;flex-direction:column;align-items:center}
+
+[data-c="ex-4"] .exc{position:relative;width:78px;height:106px;border-radius:10px;overflow:hidden;
+  clip-path:inset(0 round 10px);
+  background:linear-gradient(165deg,rgba(255,255,255,.11),rgba(255,255,255,.02) 48%,rgba(255,255,255,.05));
+  box-shadow:0 12px 26px rgba(0,0,0,.5)}
+[data-c="ex-4"] .exc::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;
+  background:linear-gradient(140deg,rgba(255,255,255,.55),rgba(255,255,255,.10) 26%,
+    rgba(255,255,255,.02) 52%,rgba(255,255,255,.20) 80%,rgba(255,255,255,.42));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
+          mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude;
+  pointer-events:none;z-index:2}
+[data-c="ex-4"] .exrings{position:absolute;inset:0;width:100%;height:100%;z-index:1}
+[data-c="ex-4"] .exrings rect{fill:none;vector-effect:non-scaling-stroke}
+[data-c="ex-4"] .rs{stroke:rgba(235,238,248,.17);stroke-width:1}
+[data-c="ex-4"] .rn{stroke:rgba(235,238,248,.32);stroke-width:1}
+[data-c="ex-4"] .rg{stroke:rgba(235,238,248,.13);stroke-width:1;stroke-dasharray:.5 .5}
+[data-c="ex-4"] .ra{stroke:rgba(235,238,248,.58);stroke-width:1.6;stroke-linecap:round}
+
+[data-c="ex-4"] .exlab{font-size:11px;color:var(--text-lo);margin-top:13px;line-height:1.35}
+[data-c="ex-4"] .exlab b{display:block;color:var(--text-mid);font-weight:600;font-size:11.5px;
+  font-variant-numeric:tabular-nums;letter-spacing:-.005em}
+
+[data-c="ex-4"] .exrule{width:56px;height:1px;background:var(--hairline);margin:22px 0 16px}
+[data-c="ex-4"] .extod{font-size:11.5px;color:var(--text-lo);margin-bottom:12px}
+[data-c="ex-4"] .exc.big{width:118px;height:160px;border-radius:13px;clip-path:inset(0 round 13px);
+  box-shadow:0 20px 42px rgba(0,0,0,.6)}
+
+/* THE ONE ACCENT MOMENT: today's tick, the first day of the eleventh ring. */
+[data-c="ex-4"] .rt{stroke:rgba(var(--accent-rgb),.98);stroke-width:2.4;stroke-linecap:round;
+  opacity:1;animation:ex4tick .55s cubic-bezier(.2,.8,.3,1) .6s both}
+@keyframes ex4tick{from{opacity:0}to{opacity:1}}
+
+[data-c="ex-4"] .exdep{font-size:14.5px;color:var(--text-mid);line-height:1.5;margin-top:16px;max-width:26ch}
+[data-c="ex-4"] .exdep b{color:var(--text-hi);font-weight:650}
+[data-c="ex-4"] .excap{font-size:12px;color:var(--text-mid);line-height:1.5;margin-top:8px;max-width:33ch}
+</style>
+<div class="ph" data-c="ex-4"><div class="st">
+  <div class="b b1">
+    <div class="exhd">Lose 40 lbs.</div>
+    <div class="exsub">The material lays down a ring every thirty days, outward from the middle.</div>
+
+    <div class="exrow">
+      <div class="excol">
+        <div class="exc">
+          <svg class="exrings" viewBox="0 0 78 106" aria-hidden="true">
+            <rect class="rg" x="26.48" y="36.05" width="25.05" height="33.9" rx="3.6" pathLength="30"/>
+            <rect class="ra" x="26.48" y="36.05" width="25.05" height="33.9" rx="3.6" pathLength="30" stroke-dasharray="7 30"/>
+          </svg>
+        </div>
+        <div class="exlab"><b>Day 7</b>down 2 lbs</div>
+      </div>
+      <div class="excol">
+        <div class="exc">
+          <svg class="exrings" viewBox="0 0 78 106" aria-hidden="true">
+            <rect class="rs" x="26.48" y="36.05" width="25.05" height="33.9" rx="3.6"/>
+            <rect class="rs" x="23.95" y="32.6" width="30.1" height="40.8" rx="4.2"/>
+            <rect class="rn" x="21.43" y="29.15" width="35.15" height="47.7" rx="4.8"/>
+            <rect class="rg" x="18.9" y="25.7" width="40.2" height="54.6" rx="5.4" pathLength="30"/>
+          </svg>
+        </div>
+        <div class="exlab"><b>Day 90</b>down 14 lbs</div>
+      </div>
+      <div class="excol">
+        <div class="exc">
+          <svg class="exrings" viewBox="0 0 78 106" aria-hidden="true">
+            <rect class="rs" x="26.48" y="36.05" width="25.05" height="33.9" rx="3.6"/>
+            <rect class="rs" x="23.95" y="32.6" width="30.1" height="40.8" rx="4.2"/>
+            <rect class="rs" x="21.43" y="29.15" width="35.15" height="47.7" rx="4.8"/>
+            <rect class="rs" x="18.9" y="25.7" width="40.2" height="54.6" rx="5.4"/>
+            <rect class="rs" x="16.38" y="22.25" width="45.25" height="61.5" rx="6.0"/>
+            <rect class="rs" x="13.85" y="18.8" width="50.3" height="68.4" rx="6.6"/>
+            <rect class="rs" x="11.32" y="15.35" width="55.35" height="75.3" rx="7.2"/>
+            <rect class="rs" x="8.8" y="11.9" width="60.4" height="82.2" rx="7.8"/>
+            <rect class="rs" x="6.28" y="8.45" width="65.45" height="89.1" rx="8.4"/>
+            <rect class="rn" x="3.75" y="5.0" width="70.5" height="96.0" rx="9.0"/>
+            <rect class="rg" x="1.23" y="1.55" width="75.55" height="102.9" rx="9.6" pathLength="30"/>
+          </svg>
+        </div>
+        <div class="exlab"><b>Day 300</b>down 38 lbs</div>
+      </div>
+    </div>
+
+    <div class="exrule"></div>
+    <div class="extod">Today</div>
+
+    <div class="exc big">
+      <svg class="exrings" viewBox="0 0 78 106" aria-hidden="true">
+        <rect class="rs" x="26.48" y="36.05" width="25.05" height="33.9" rx="3.6"/>
+        <rect class="rs" x="23.95" y="32.6" width="30.1" height="40.8" rx="4.2"/>
+        <rect class="rs" x="21.43" y="29.15" width="35.15" height="47.7" rx="4.8"/>
+        <rect class="rs" x="18.9" y="25.7" width="40.2" height="54.6" rx="5.4"/>
+        <rect class="rs" x="16.38" y="22.25" width="45.25" height="61.5" rx="6.0"/>
+        <rect class="rs" x="13.85" y="18.8" width="50.3" height="68.4" rx="6.6"/>
+        <rect class="rs" x="11.32" y="15.35" width="55.35" height="75.3" rx="7.2"/>
+        <rect class="rs" x="8.8" y="11.9" width="60.4" height="82.2" rx="7.8"/>
+        <rect class="rs" x="6.28" y="8.45" width="65.45" height="89.1" rx="8.4"/>
+        <rect class="rn" x="3.75" y="5.0" width="70.5" height="96.0" rx="9.0"/>
+        <rect class="rg" x="1.23" y="1.55" width="75.55" height="102.9" rx="9.6" pathLength="30"/>
+        <rect class="rt" x="1.23" y="1.55" width="75.55" height="102.9" rx="9.6" pathLength="30" stroke-dasharray="1 60"/>
+      </svg>
+    </div>
+
+    <div class="exdep">On this day, you were down <b>38 lbs</b>.</div>
+    <div class="excap">Ten rings closed, and the eleventh opened today. Twelve reaches the rim, which is a year.</div>
+  </div>
+</div>
+<div class="hint">Tap to replay</div></div>
+<p class="item__note">The material lays down one contour every thirty days, outward from the middle, and the ring being drawn is dotted for the days not yet lived. Count the rings for the months, look at the bright tip for today. Twelve rings reaches the rim, so a year is unmistakable. Fits <b>quantity down</b>, where the weight moves slowly and the person needs proof that time has actually passed underneath it.</p></div><div class="item"><p class="item__label"><span class="item__n">10</span><span class="item__name">The glass clears</span></p><style>
+/* ex-5 THE GLASS CLEARS. A milestone shows nothing until the day it happens, so
+   the engine underneath does the showing: every session wipes fog off the pane.
+   Day 7 the card is milk and you cannot read it. Day 300 it says what it is,
+   corner to corner. Today wipes the last patch. */
+[data-c="ex-5"] .b{padding:24px 22px 42px}
+[data-c="ex-5"] .exhd{font-size:18px;font-weight:650;letter-spacing:-.022em;color:var(--text-hi)}
+[data-c="ex-5"] .exsub{font-size:13.5px;line-height:1.5;color:var(--text-mid);margin-top:8px;max-width:31ch}
+[data-c="ex-5"] .exdefs{position:absolute;width:0;height:0;overflow:hidden;pointer-events:none}
+
+[data-c="ex-5"] .exrow{display:flex;justify-content:center;gap:14px;margin-top:24px}
+[data-c="ex-5"] .excol{width:96px;display:flex;flex-direction:column;align-items:center}
+
+[data-c="ex-5"] .exc{position:relative;width:78px;height:106px;border-radius:10px;overflow:hidden;
+  clip-path:inset(0 round 10px);contain:paint;
+  background:linear-gradient(165deg,rgba(255,255,255,.11),rgba(255,255,255,.02) 48%,rgba(255,255,255,.05));
+  box-shadow:0 12px 26px rgba(0,0,0,.5)}
+[data-c="ex-5"] .exc::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;
+  background:linear-gradient(140deg,rgba(255,255,255,.55),rgba(255,255,255,.10) 26%,
+    rgba(255,255,255,.02) 52%,rgba(255,255,255,.20) 80%,rgba(255,255,255,.42));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
+          mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude;
+  pointer-events:none;z-index:4}
+[data-c="ex-5"] .exface{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center}
+[data-c="ex-5"] .exg{font-size:8.5px;font-weight:600;letter-spacing:-.01em;color:rgba(235,238,248,.74)}
+[data-c="ex-5"] .exn{font-size:18px;font-weight:800;letter-spacing:-.045em;line-height:.95;
+  font-variant-numeric:tabular-nums;color:var(--text-hi);margin-top:4px}
+[data-c="ex-5"] .exn span{display:block;font-size:8px;font-weight:500;letter-spacing:0;
+  color:rgba(235,238,248,.55);margin-top:3px}
+[data-c="ex-5"] .f7{filter:blur(4px);opacity:.5}
+[data-c="ex-5"] .f90{filter:blur(1.4px);opacity:.86}
+[data-c="ex-5"] .exhaze{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none}
+/* the fog is the neutral ink token, never its own colour */
+[data-c="ex-5"] .exhaze rect{fill:rgb(var(--ink));fill-opacity:.2}
+
+[data-c="ex-5"] .exlab{font-size:11px;color:var(--text-lo);margin-top:13px;line-height:1.35}
+[data-c="ex-5"] .exlab b{display:block;color:var(--text-mid);font-weight:600;font-size:11.5px;
+  font-variant-numeric:tabular-nums;letter-spacing:-.005em}
+
+[data-c="ex-5"] .exrule{width:56px;height:1px;background:var(--hairline);margin:22px 0 16px}
+[data-c="ex-5"] .extod{font-size:11.5px;color:var(--text-lo);margin-bottom:12px}
+[data-c="ex-5"] .exc.big{width:118px;height:160px;border-radius:13px;clip-path:inset(0 round 13px);
+  box-shadow:0 20px 42px rgba(0,0,0,.6)}
+[data-c="ex-5"] .big .exg{font-size:12px}
+[data-c="ex-5"] .big .exn{font-size:27px;margin-top:6px}
+[data-c="ex-5"] .big .exn span{font-size:11px;margin-top:4px}
+
+/* yesterday's fog over the patch today wipes: it lifts, and nothing stacks. */
+[data-c="ex-5"] .exyest{opacity:0;animation:ex5lift .75s cubic-bezier(.2,.8,.3,1) .55s both}
+@keyframes ex5lift{from{opacity:1}to{opacity:0}}
+
+/* THE ONE ACCENT MOMENT: the corner that just came clear, still bright. */
+[data-c="ex-5"] .exglint{position:absolute;left:76.9%;top:83%;width:84px;height:84px;z-index:3;
+  transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle at 50% 50%,rgba(var(--accent-rgb),.52) 0%,
+    rgba(var(--accent-rgb),.20) 38%,rgba(var(--accent-rgb),0) 72%);
+  opacity:.38;animation:ex5glint .9s cubic-bezier(.2,.8,.3,1) .5s both}
+@keyframes ex5glint{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.72)}
+  38%{opacity:.9;transform:translate(-50%,-50%) scale(1.05)}
+  100%{opacity:.38;transform:translate(-50%,-50%) scale(1)}}
+
+[data-c="ex-5"] .exdep{font-size:14.5px;color:var(--text-mid);line-height:1.5;margin-top:16px;max-width:26ch}
+[data-c="ex-5"] .exdep b{color:var(--text-hi);font-weight:650}
+[data-c="ex-5"] .excap{font-size:12px;color:var(--text-mid);line-height:1.5;margin-top:8px;max-width:33ch}
+</style>
+<div class="ph" data-c="ex-5"><div class="st">
+  <div class="b b1">
+    <svg class="exdefs" aria-hidden="true"><defs>
+      <radialGradient id="ex5hole">
+        <stop offset="0" stop-color="#000" stop-opacity="1"/>
+        <stop offset=".5" stop-color="#000" stop-opacity=".9"/>
+        <stop offset="1" stop-color="#000" stop-opacity="0"/>
+      </radialGradient>
+      <radialGradient id="ex5wipe">
+        <stop offset="0" stop-color="#fff" stop-opacity="1"/>
+        <stop offset=".5" stop-color="#fff" stop-opacity=".9"/>
+        <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+      </radialGradient>
+      <mask id="ex5m7" maskUnits="userSpaceOnUse" x="0" y="0" width="78" height="106">
+        <rect width="78" height="106" fill="#fff"/>
+        <g fill="url(#ex5hole)">
+          <circle cx="39" cy="50" r="21"/><circle cx="32" cy="43" r="15"/><circle cx="46" cy="56" r="15"/>
+        </g>
+      </mask>
+      <mask id="ex5m90" maskUnits="userSpaceOnUse" x="0" y="0" width="78" height="106">
+        <rect width="78" height="106" fill="#fff"/>
+        <g fill="url(#ex5hole)">
+          <circle cx="39" cy="52" r="36"/><circle cx="27" cy="38" r="24"/><circle cx="52" cy="62" r="24"/>
+          <circle cx="39" cy="74" r="22"/>
+        </g>
+      </mask>
+      <mask id="ex5m300" maskUnits="userSpaceOnUse" x="0" y="0" width="78" height="106">
+        <rect width="78" height="106" fill="#fff"/>
+        <g fill="url(#ex5hole)">
+          <circle cx="34" cy="46" r="44"/><circle cx="16" cy="20" r="28"/><circle cx="60" cy="18" r="28"/>
+          <circle cx="14" cy="86" r="28"/><circle cx="60" cy="60" r="26"/><circle cx="30" cy="86" r="26"/>
+        </g>
+      </mask>
+      <mask id="ex5m301" maskUnits="userSpaceOnUse" x="0" y="0" width="78" height="106">
+        <rect width="78" height="106" fill="#fff"/>
+        <g fill="url(#ex5hole)">
+          <circle cx="34" cy="46" r="44"/><circle cx="16" cy="20" r="28"/><circle cx="60" cy="18" r="28"/>
+          <circle cx="14" cy="86" r="28"/><circle cx="60" cy="60" r="26"/><circle cx="30" cy="86" r="26"/>
+          <circle cx="60" cy="88" r="28"/>
+        </g>
+      </mask>
+      <mask id="ex5new" maskUnits="userSpaceOnUse" x="0" y="0" width="78" height="106">
+        <rect width="78" height="106" fill="#000"/>
+        <circle cx="60" cy="88" r="28" fill="url(#ex5wipe)"/>
+      </mask>
+    </defs></svg>
+
+    <div class="exhd">Pass the bar.</div>
+    <div class="exsub">One event, still far off, nothing to count. So the hours behind it wipe the fog off the glass.</div>
+
+    <div class="exrow">
+      <div class="excol">
+        <div class="exc">
+          <div class="exface f7"><div class="exg">Pass the bar</div><div class="exn">9<span>hours</span></div></div>
+          <svg class="exhaze" viewBox="0 0 78 106" preserveAspectRatio="none" aria-hidden="true">
+            <rect width="78" height="106" mask="url(#ex5m7)"/>
+          </svg>
+        </div>
+        <div class="exlab"><b>Day 7</b>9 hours</div>
+      </div>
+      <div class="excol">
+        <div class="exc">
+          <div class="exface f90"><div class="exg">Pass the bar</div><div class="exn">128<span>hours</span></div></div>
+          <svg class="exhaze" viewBox="0 0 78 106" preserveAspectRatio="none" aria-hidden="true">
+            <rect width="78" height="106" mask="url(#ex5m90)"/>
+          </svg>
+        </div>
+        <div class="exlab"><b>Day 90</b>128 hours</div>
+      </div>
+      <div class="excol">
+        <div class="exc">
+          <div class="exface"><div class="exg">Pass the bar</div><div class="exn">441<span>hours</span></div></div>
+          <svg class="exhaze" viewBox="0 0 78 106" preserveAspectRatio="none" aria-hidden="true">
+            <rect width="78" height="106" mask="url(#ex5m300)"/>
+          </svg>
+        </div>
+        <div class="exlab"><b>Day 300</b>441 hours</div>
+      </div>
+    </div>
+
+    <div class="exrule"></div>
+    <div class="extod">Today</div>
+
+    <div class="exc big">
+      <div class="exface"><div class="exg">Pass the bar</div><div class="exn">444<span>hours</span></div></div>
+      <svg class="exhaze" viewBox="0 0 78 106" preserveAspectRatio="none" aria-hidden="true">
+        <rect width="78" height="106" mask="url(#ex5m301)"/>
+        <rect class="exyest" width="78" height="106" mask="url(#ex5new)"/>
+      </svg>
+      <div class="exglint"></div>
+    </div>
+
+    <div class="exdep">On this day, you studied <b>3 hours</b>. 444 in all.</div>
+    <div class="excap">At a week you cannot read it yet. At 300 days the card says what it is, and the last corner clears today.</div>
+  </div>
+</div>
+<div class="hint">Tap to replay</div></div>
+<p class="item__note">A milestone shows nothing until the day it happens, so the engine underneath does the showing: every session wipes one patch of fog off the pane. At a week the card is milk and you cannot read it. At 300 days it says what it is, and today wipes the last corner. Fits <b>milestone</b>, the one type where the goal itself gives you nothing to look at for years.</p></div></div></div>
+<script src="_kit.js"></script><script>CEL.init()</script>
+</body></html>

@@ -1,0 +1,58 @@
+<style>
+/* qu-5. the record board. No target on this goal, so the only thing to
+   beat is the last time. The new week takes the seat the old one held. */
+[data-c="qu-5"] .qu5-hero{font-size:88px}
+[data-c="qu-5"] .qu5-board{width:224px;margin:2px auto 22px;text-align:left}
+[data-c="qu-5"] .qu5-row{position:relative;display:flex;align-items:baseline;
+  justify-content:space-between;padding:7px 0 7px 15px}
+[data-c="qu-5"] .qu5-row + .qu5-row{border-top:1px solid var(--hairline)}
+[data-c="qu-5"] .qu5-when{font-size:12.5px;color:var(--text-lo);letter-spacing:-.01em}
+[data-c="qu-5"] .qu5-v{font-size:17px;font-weight:600;color:rgba(var(--ink),.58);
+  font-variant-numeric:tabular-nums;letter-spacing:-.025em}
+[data-c="qu-5"] .qu5-row.is-new .qu5-when{color:var(--text-mid)}
+[data-c="qu-5"] .qu5-row.is-new .qu5-v{color:var(--text-hi);font-size:23px;font-weight:700}
+[data-c="qu-5"] .qu5-row.is-new::before{content:'';position:absolute;left:0;top:6px;bottom:6px;
+  width:2px;border-radius:1px;background:var(--accent)}
+[data-c="qu-5"] .qu5-row.is-new::after{content:'';position:absolute;left:1px;top:50%;
+  width:94px;height:64px;transform:translate(-50%,-50%);pointer-events:none;
+  background:radial-gradient(ellipse at center,
+    rgba(var(--accent-rgb),.42) 0%,
+    rgba(var(--accent-rgb),.12) 34%,
+    rgba(var(--accent-rgb),0) 68%)}
+[data-c="qu-5"] .qu5-sub{max-width:22ch}
+[data-c="qu-5"] .qu5-cap{max-width:34ch}
+[data-c="qu-5"] .b3{padding-bottom:96px}
+
+[data-c="qu-5"] .b.on .qu5-row{animation:qu5Seat .46s cubic-bezier(.2,.8,.3,1) both}
+[data-c="qu-5"] .b.on .qu5-row:nth-child(1){animation-delay:.04s}
+[data-c="qu-5"] .b.on .qu5-row:nth-child(2){animation-delay:.20s}
+[data-c="qu-5"] .b.on .qu5-row:nth-child(3){animation-delay:.28s}
+@keyframes qu5Seat{from{opacity:0;transform:translateY(-9px)}to{opacity:1;transform:none}}
+</style>
+
+<div class="ph" data-c="qu-5">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="n qu5-hero">1,412</div>
+      <div class="sub">new followers this week.</div>
+    </div>
+
+    <div class="b b2">
+      <div class="qu5-board">
+        <div class="qu5-row is-new"><span class="qu5-when">this week</span><span class="qu5-v">1,412</span></div>
+        <div class="qu5-row"><span class="qu5-when">Mar 4</span><span class="qu5-v">906</span></div>
+        <div class="qu5-row"><span class="qu5-when">Jan 21</span><span class="qu5-v">874</span></div>
+      </div>
+      <div class="sub qu5-sub">Your best week yet.</div>
+      <div class="cap qu5-cap">The one it beat stood 22 weeks.</div>
+    </div>
+
+    <div class="b b3">
+      <div class="deposit">On this day, you set a record. <b>1,412</b> new followers in a week.</div>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>

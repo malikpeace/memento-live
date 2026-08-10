@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quantity up</title>
+<link rel="stylesheet" href="_kit.css">
+</head><body data-accent="cyan">
+<div class="bar">
+  <a href="index.html" style="color:var(--text-mid);text-decoration:none;font-size:13px;font-weight:600">&lsaquo; All</a>
+  <span class="bar__t">Quantity up</span>
+  <span class="sw"><button data-a="cyan" style="background:#2bd4d4" class="on"></button><button data-a="green" style="background:#3fd94e"></button><button data-a="amber" style="background:#ffb73d"></button><button data-a="rose" style="background:#ff6b9d"></button><button data-a="blue" style="background:#4f8cff"></button><button data-a="teal" style="background:#19c3a6"></button></span>
+  <span class="bar__n">their Memento colour drives every screen &middot; <b>tap a phone to advance or replay</b></span>
+</div>
+<div class="gal"><h1>Quantity up</h1><p class="gal__sub">A number rising. 100 paying users, $10k a month, or just "grow my audience" with no target at all. The hard case here is the goal with no number to divide, where a percentage does not exist and the win has to be the fact itself.</p><div class="grid"><div class="item"><p class="item__label"><span class="item__n">1</span><span class="item__name">The marker posts</span></p><style>
+/* qu-1. the marker posts. Fifths of a target, each one dated. */
+[data-c="qu-1"] .qu1-hero{font-size:104px}
+[data-c="qu-1"] .qu1-sub{max-width:24ch}
+[data-c="qu-1"] .qu1-cap{max-width:24ch}
+[data-c="qu-1"] .qu1-axis{width:288px;margin:2px auto 24px}
+[data-c="qu-1"] .qu1-marks{display:flex;align-items:flex-end;height:30px;
+  border-bottom:1px solid var(--hairline)}
+[data-c="qu-1"] .qu1-cell{flex:1;display:flex;justify-content:center}
+[data-c="qu-1"] .qu1-p{width:2px;height:13px;border-radius:1px;
+  background:rgba(var(--ink),.22)}
+[data-c="qu-1"] .qu1-cell.is-past .qu1-p{height:19px;background:rgba(var(--ink),.55)}
+[data-c="qu-1"] .qu1-cell.is-now .qu1-p{height:27px;background:var(--accent);position:relative}
+[data-c="qu-1"] .qu1-cell.is-now .qu1-p::after{content:'';position:absolute;left:50%;top:50%;
+  width:104px;height:104px;transform:translate(-50%,-50%);pointer-events:none;
+  background:radial-gradient(circle,
+    rgba(var(--accent-rgb),.42) 0%,
+    rgba(var(--accent-rgb),.14) 36%,
+    rgba(var(--accent-rgb),0) 66%)}
+[data-c="qu-1"] .qu1-labels{display:flex;margin-top:9px}
+[data-c="qu-1"] .qu1-lc{flex:1;text-align:center}
+[data-c="qu-1"] .qu1-num{font-size:13px;font-weight:650;font-variant-numeric:tabular-nums;
+  letter-spacing:-.02em;color:var(--text-lo)}
+[data-c="qu-1"] .qu1-lc.is-past .qu1-num{color:rgba(var(--ink),.62)}
+[data-c="qu-1"] .qu1-lc.is-now .qu1-num{color:var(--text-hi)}
+[data-c="qu-1"] .qu1-date{font-size:10.5px;color:var(--text-lo);margin-top:4px;height:13px;
+  font-variant-numeric:tabular-nums}
+[data-c="qu-1"] .b3{padding-bottom:96px}
+
+[data-c="qu-1"] .b.on .qu1-cell{animation:qu1Rise .44s cubic-bezier(.2,.8,.3,1) both}
+[data-c="qu-1"] .b.on .qu1-cell:nth-child(1){animation-delay:.02s}
+[data-c="qu-1"] .b.on .qu1-cell:nth-child(2){animation-delay:.10s}
+[data-c="qu-1"] .b.on .qu1-cell:nth-child(3){animation-delay:.18s}
+[data-c="qu-1"] .b.on .qu1-cell:nth-child(4){animation-delay:.26s}
+[data-c="qu-1"] .b.on .qu1-cell:nth-child(5){animation-delay:.34s}
+@keyframes qu1Rise{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+</style>
+
+<div class="ph" data-c="qu-1">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="n qu1-hero" data-count="0|60">60</div>
+      <div class="sub">paying users.</div>
+    </div>
+
+    <div class="b b2">
+      <div class="qu1-axis">
+        <div class="qu1-marks">
+          <div class="qu1-cell is-past"><div class="qu1-p"></div></div>
+          <div class="qu1-cell is-past"><div class="qu1-p"></div></div>
+          <div class="qu1-cell is-now"><div class="qu1-p"></div></div>
+          <div class="qu1-cell"><div class="qu1-p"></div></div>
+          <div class="qu1-cell"><div class="qu1-p"></div></div>
+        </div>
+        <div class="qu1-labels">
+          <div class="qu1-lc is-past"><div class="qu1-num">20</div><div class="qu1-date">Mar 3</div></div>
+          <div class="qu1-lc is-past"><div class="qu1-num">40</div><div class="qu1-date">Jun 1</div></div>
+          <div class="qu1-lc is-now"><div class="qu1-num">60</div><div class="qu1-date">today</div></div>
+          <div class="qu1-lc"><div class="qu1-num">80</div><div class="qu1-date"></div></div>
+          <div class="qu1-lc"><div class="qu1-num">100</div><div class="qu1-date"></div></div>
+        </div>
+      </div>
+      <div class="sub qu1-sub"><b>216 days</b> made these 60.</div>
+      <div class="cap qu1-cap">40 still open.</div>
+    </div>
+
+    <div class="b b3">
+      <div class="deposit">On this day, you passed <b>60 of 100</b> paying users.</div>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>
+<p class="item__note">The fifth you just crossed, shown as five posts on one line with the <b>date each one fell</b>. Quantity up with a target has natural chapters at every fifth, and dating them turns a progress bar into a history: Mar 3, Jun 1, today. The line says 216 days made these 60, then 40 still open, so the distance closed and the distance left both get stated. One accent: the post that just landed.</p></div><div class="item"><p class="item__label"><span class="item__n">2</span><span class="item__name">Four figures</span></p><style>
+/* qu-2. four figures. No target on the goal, so the win is the digit
+   the number just grew. The lit rule is the thousand line. */
+[data-c="qu-2"] .qu2-hero{font-size:78px}
+[data-c="qu-2"] .qu2-ledger{width:212px;margin:0 auto 22px;text-align:left}
+[data-c="qu-2"] .qu2-row{display:flex;align-items:baseline;justify-content:space-between;
+  padding:5px 0}
+[data-c="qu-2"] .qu2-m{font-size:12.5px;color:var(--text-lo);letter-spacing:-.01em}
+[data-c="qu-2"] .qu2-v{font-size:16px;font-weight:600;color:rgba(var(--ink),.60);
+  font-variant-numeric:tabular-nums;letter-spacing:-.025em}
+[data-c="qu-2"] .qu2-row.is-new .qu2-m{color:var(--text-mid)}
+[data-c="qu-2"] .qu2-row.is-new .qu2-v{color:var(--text-hi);font-size:21px;font-weight:700}
+[data-c="qu-2"] .qu2-line{position:relative;height:2px;border-radius:1px;margin:9px 0 11px;
+  background:var(--accent)}
+[data-c="qu-2"] .qu2-line::after{content:'';position:absolute;left:50%;top:50%;
+  width:246px;height:66px;transform:translate(-50%,-50%);pointer-events:none;
+  background:radial-gradient(ellipse at center,
+    rgba(var(--accent-rgb),.42) 0%,
+    rgba(var(--accent-rgb),.11) 34%,
+    rgba(var(--accent-rgb),0) 68%)}
+[data-c="qu-2"] .qu2-sub{max-width:27ch}
+[data-c="qu-2"] .qu2-cap{max-width:34ch}
+[data-c="qu-2"] .b3{padding-bottom:96px}
+
+[data-c="qu-2"] .b.on .qu2-row{animation:qu2In .42s cubic-bezier(.2,.8,.3,1) both}
+[data-c="qu-2"] .b.on .qu2-row.is-new{animation-delay:.02s}
+[data-c="qu-2"] .b.on .qu2-line{animation:qu2Wipe .46s cubic-bezier(.2,.8,.3,1) both;
+  animation-delay:.16s;transform-origin:left center}
+[data-c="qu-2"] .b.on .qu2-row:nth-of-type(3){animation-delay:.24s}
+[data-c="qu-2"] .b.on .qu2-row:nth-of-type(4){animation-delay:.32s}
+[data-c="qu-2"] .b.on .qu2-row:nth-of-type(5){animation-delay:.40s}
+[data-c="qu-2"] .b.on .qu2-row:nth-of-type(6){animation-delay:.48s}
+@keyframes qu2In{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+@keyframes qu2Wipe{from{opacity:0;transform:scaleX(.2)}to{opacity:1;transform:none}}
+</style>
+
+<div class="ph" data-c="qu-2">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="n qu2-hero">$1,000</div>
+      <div class="sub">in one month, from writing.</div>
+    </div>
+
+    <div class="b b2">
+      <div class="qu2-ledger">
+        <div class="qu2-row is-new"><span class="qu2-m">August</span><span class="qu2-v">$1,000</span></div>
+        <div class="qu2-line"></div>
+        <div class="qu2-row"><span class="qu2-m">July</span><span class="qu2-v">$840</span></div>
+        <div class="qu2-row"><span class="qu2-m">June</span><span class="qu2-v">$612</span></div>
+        <div class="qu2-row"><span class="qu2-m">May</span><span class="qu2-v">$704</span></div>
+        <div class="qu2-row"><span class="qu2-m">April</span><span class="qu2-v">$355</span></div>
+      </div>
+      <div class="sub qu2-sub"><b>14 months</b> to add a digit.</div>
+      <div class="cap qu2-cap">$840 was the best month before it.</div>
+    </div>
+
+    <div class="b b3">
+      <div class="deposit">On this day, you had your first <b>$1,000</b> month.</div>
+      <svg class="mark--foot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>
+<p class="item__note">No target on this goal, so the win is that the number <b>grew a digit</b>. The last five months sit as a small ledger and the lit rule is the thousand line, with August above it for the first time. Order of magnitude works when a percentage cannot exist, and the old best (840) is right there for scale. The M sits quiet at the foot of the deposit.</p></div><div class="item"><p class="item__label"><span class="item__n">3</span><span class="item__name">The days you will not need</span></p><style>
+/* qu-3. the days you will not need. A deadline goal, reached early;
+   the lit tail is the time given back. */
+[data-c="qu-3"] .qu3-hero{font-size:68px}
+[data-c="qu-3"] .qu3-span{position:relative;width:286px;height:60px;margin:4px auto 22px}
+[data-c="qu-3"] .qu3-tag{position:absolute;top:0;right:0;font-size:13px;font-weight:650;
+  color:var(--text-hi);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+[data-c="qu-3"] .qu3-track{position:absolute;left:0;right:0;top:31px;height:2px;border-radius:1px;
+  background:rgba(var(--ink),.12)}
+[data-c="qu-3"] .qu3-done{position:absolute;left:0;top:31px;width:84.1%;height:2px;border-radius:1px;
+  background:rgba(var(--ink),.46);transform-origin:left center}
+[data-c="qu-3"] .qu3-early{position:absolute;right:0;top:30px;width:15.9%;height:4px;border-radius:2px;
+  background:var(--accent);transform-origin:left center}
+[data-c="qu-3"] .qu3-early::after{content:'';position:absolute;left:50%;top:50%;
+  width:154px;height:84px;transform:translate(-50%,-50%);pointer-events:none;
+  background:radial-gradient(ellipse at center,
+    rgba(var(--accent-rgb),.42) 0%,
+    rgba(var(--accent-rgb),.13) 36%,
+    rgba(var(--accent-rgb),0) 68%)}
+[data-c="qu-3"] .qu3-ends{position:absolute;left:0;right:0;top:44px;display:flex;
+  justify-content:space-between;font-size:10.5px;color:var(--text-lo);
+  font-variant-numeric:tabular-nums}
+[data-c="qu-3"] .qu3-sub{max-width:23ch}
+[data-c="qu-3"] .qu3-cap{max-width:34ch}
+[data-c="qu-3"] .b3{padding-bottom:96px}
+
+[data-c="qu-3"] .b.on .qu3-done{animation:qu3Run .58s cubic-bezier(.2,.8,.3,1) both}
+[data-c="qu-3"] .b.on .qu3-early{animation:qu3Land .44s cubic-bezier(.2,.8,.3,1) both;
+  animation-delay:.42s}
+[data-c="qu-3"] .b.on .qu3-tag{animation:qu3Up .40s cubic-bezier(.2,.8,.3,1) both;
+  animation-delay:.60s}
+@keyframes qu3Run{from{opacity:0;transform:scaleX(.04)}to{opacity:1;transform:none}}
+@keyframes qu3Land{from{opacity:0;transform:scaleX(.3)}to{opacity:1;transform:none}}
+@keyframes qu3Up{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+</style>
+
+<div class="ph" data-c="qu-3">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="n qu3-hero">$10,000</div>
+      <div class="sub">a month.</div>
+    </div>
+
+    <div class="b b2">
+      <div class="qu3-span">
+        <div class="qu3-tag">53 days</div>
+        <div class="qu3-track"></div>
+        <div class="qu3-done"></div>
+        <div class="qu3-early"></div>
+        <div class="qu3-ends"><span>Feb 1</span><span>Dec 31</span></div>
+      </div>
+      <div class="sub qu3-sub">You said December 31. You got there today.</div>
+      <div class="cap qu3-cap">Time you set aside and never needed.</div>
+    </div>
+
+    <div class="b b3">
+      <div class="deposit">On this day, you reached <b>$10,000</b> a month, 53 days before the date you set.</div>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>
+<p class="item__note">A deadline goal reached early, where the reward is the <b>time handed back</b>. The run from Feb 1 to Dec 31 is drawn once, and the lit tail is the 53 days you set aside and never needed. Beating a date is worth more than hitting a number, and this is the only way to show it without a countdown. One accent: the unused stretch.</p></div><div class="item"><p class="item__label"><span class="item__n">4</span><span class="item__name">Twenty marks</span></p><style>
+/* qu-4. twenty marks. Far from the target, so nothing empty is ever drawn.
+   It counts what exists, one stroke per person. */
+[data-c="qu-4"] .qu4-hero{position:relative;display:flex;flex-direction:column;align-items:center}
+[data-c="qu-4"] .qu4-hero::before{content:'';position:absolute;left:50%;top:46px;
+  width:300px;height:300px;transform:translate(-50%,-50%);pointer-events:none;
+  background:radial-gradient(circle,
+    rgba(var(--accent-rgb),.42) 0%,
+    rgba(var(--accent-rgb),.15) 32%,
+    rgba(var(--accent-rgb),0) 66%)}
+[data-c="qu-4"] .qu4-hero .n,[data-c="qu-4"] .qu4-hero .sub{position:relative}
+[data-c="qu-4"] .qu4-n{font-size:104px}
+[data-c="qu-4"] .qu4-tally{display:flex;justify-content:center;gap:8px;height:38px;
+  align-items:flex-end;width:300px;margin:0 auto 24px}
+[data-c="qu-4"] .qu4-t{width:3px;height:30px;border-radius:1.5px;background:rgba(var(--ink),.52)}
+[data-c="qu-4"] .qu4-t:nth-child(5n){margin-right:12px}
+[data-c="qu-4"] .qu4-t:last-child{margin-right:0}
+[data-c="qu-4"] .qu4-t.is-last{height:38px;background:rgba(var(--ink),.96)}
+[data-c="qu-4"] .qu4-sub{max-width:24ch}
+[data-c="qu-4"] .qu4-cap{max-width:24ch}
+[data-c="qu-4"] .b3{padding-bottom:96px}
+
+[data-c="qu-4"] .b.on .qu4-hero::before{animation:qu4Bloom .9s cubic-bezier(.2,.8,.3,1) both}
+[data-c="qu-4"] .b.on .qu4-t{animation:qu4Mark .34s cubic-bezier(.2,.8,.3,1) both}
+[data-c="qu-4"] .b.on .qu4-t:nth-child(1){animation-delay:.00s}
+[data-c="qu-4"] .b.on .qu4-t:nth-child(2){animation-delay:.03s}
+[data-c="qu-4"] .b.on .qu4-t:nth-child(3){animation-delay:.06s}
+[data-c="qu-4"] .b.on .qu4-t:nth-child(4){animation-delay:.09s}
+[data-c="qu-4"] .b.on .qu4-t:nth-child(5){animation-delay:.12s}
+[data-c="qu-4"] .b.on .qu4-t:nth-child(6){animation-delay:.15s}
+[data-c="qu-4"] .b.on .qu4-t:nth-child(7){animation-delay:.18s}
+[data-c="qu-4"] .b.on .qu4-t:nth-child(8){animation-delay:.21s}
+[data-c="qu-4"] .b.on .qu4-t:nth-child(9){animation-delay:.24s}
+[data-c="qu-4"] .b.on .qu4-t:nth-child(10){animation-delay:.27s}
+[data-c="qu-4"] .b.on .qu4-t:nth-child(11){animation-delay:.30s}
+[data-c="qu-4"] .b.on .qu4-t:nth-child(12){animation-delay:.33s}
+[data-c="qu-4"] .b.on .qu4-t:nth-child(13){animation-delay:.36s}
+[data-c="qu-4"] .b.on .qu4-t:nth-child(14){animation-delay:.39s}
+[data-c="qu-4"] .b.on .qu4-t:nth-child(15){animation-delay:.42s}
+[data-c="qu-4"] .b.on .qu4-t:nth-child(16){animation-delay:.45s}
+[data-c="qu-4"] .b.on .qu4-t:nth-child(17){animation-delay:.48s}
+[data-c="qu-4"] .b.on .qu4-t:nth-child(18){animation-delay:.51s}
+[data-c="qu-4"] .b.on .qu4-t:nth-child(19){animation-delay:.54s}
+[data-c="qu-4"] .b.on .qu4-t:nth-child(20){animation-delay:.60s}
+@keyframes qu4Bloom{from{opacity:0;transform:translate(-50%,-50%) scale(.84)}
+  to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+@keyframes qu4Mark{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+</style>
+
+<div class="ph" data-c="qu-4">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="qu4-hero">
+        <div class="n qu4-n" data-count="0|20">20</div>
+        <div class="sub">paying users.</div>
+      </div>
+    </div>
+
+    <div class="b b2">
+      <div class="qu4-tally">
+        <div class="qu4-t"></div><div class="qu4-t"></div><div class="qu4-t"></div>
+        <div class="qu4-t"></div><div class="qu4-t"></div><div class="qu4-t"></div>
+        <div class="qu4-t"></div><div class="qu4-t"></div><div class="qu4-t"></div>
+        <div class="qu4-t"></div><div class="qu4-t"></div><div class="qu4-t"></div>
+        <div class="qu4-t"></div><div class="qu4-t"></div><div class="qu4-t"></div>
+        <div class="qu4-t"></div><div class="qu4-t"></div><div class="qu4-t"></div>
+        <div class="qu4-t"></div><div class="qu4-t is-last"></div>
+      </div>
+      <div class="sub qu4-sub">46 days ago there were none.</div>
+      <div class="cap qu4-cap">80 still open.</div>
+    </div>
+
+    <div class="b b3">
+      <div class="deposit">On this day, you reached <b>20</b> paying users.</div>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>
+<p class="item__note">20 of 100 and nothing empty is ever drawn. It counts <b>what exists</b>, one stroke per person, grouped in fives like a tally, instead of showing 80 blank slots. 46 days ago there were none, and 80 still open sits under it as a plain fact, not a scold. This is the screen for someone a long way out, and the only colour is a soft bloom behind the number.</p></div><div class="item"><p class="item__label"><span class="item__n">5</span><span class="item__name">The record board</span></p><style>
+/* qu-5. the record board. No target on this goal, so the only thing to
+   beat is the last time. The new week takes the seat the old one held. */
+[data-c="qu-5"] .qu5-hero{font-size:88px}
+[data-c="qu-5"] .qu5-board{width:224px;margin:2px auto 22px;text-align:left}
+[data-c="qu-5"] .qu5-row{position:relative;display:flex;align-items:baseline;
+  justify-content:space-between;padding:7px 0 7px 15px}
+[data-c="qu-5"] .qu5-row + .qu5-row{border-top:1px solid var(--hairline)}
+[data-c="qu-5"] .qu5-when{font-size:12.5px;color:var(--text-lo);letter-spacing:-.01em}
+[data-c="qu-5"] .qu5-v{font-size:17px;font-weight:600;color:rgba(var(--ink),.58);
+  font-variant-numeric:tabular-nums;letter-spacing:-.025em}
+[data-c="qu-5"] .qu5-row.is-new .qu5-when{color:var(--text-mid)}
+[data-c="qu-5"] .qu5-row.is-new .qu5-v{color:var(--text-hi);font-size:23px;font-weight:700}
+[data-c="qu-5"] .qu5-row.is-new::before{content:'';position:absolute;left:0;top:6px;bottom:6px;
+  width:2px;border-radius:1px;background:var(--accent)}
+[data-c="qu-5"] .qu5-row.is-new::after{content:'';position:absolute;left:1px;top:50%;
+  width:94px;height:64px;transform:translate(-50%,-50%);pointer-events:none;
+  background:radial-gradient(ellipse at center,
+    rgba(var(--accent-rgb),.42) 0%,
+    rgba(var(--accent-rgb),.12) 34%,
+    rgba(var(--accent-rgb),0) 68%)}
+[data-c="qu-5"] .qu5-sub{max-width:22ch}
+[data-c="qu-5"] .qu5-cap{max-width:34ch}
+[data-c="qu-5"] .b3{padding-bottom:96px}
+
+[data-c="qu-5"] .b.on .qu5-row{animation:qu5Seat .46s cubic-bezier(.2,.8,.3,1) both}
+[data-c="qu-5"] .b.on .qu5-row:nth-child(1){animation-delay:.04s}
+[data-c="qu-5"] .b.on .qu5-row:nth-child(2){animation-delay:.20s}
+[data-c="qu-5"] .b.on .qu5-row:nth-child(3){animation-delay:.28s}
+@keyframes qu5Seat{from{opacity:0;transform:translateY(-9px)}to{opacity:1;transform:none}}
+</style>
+
+<div class="ph" data-c="qu-5">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="n qu5-hero">1,412</div>
+      <div class="sub">new followers this week.</div>
+    </div>
+
+    <div class="b b2">
+      <div class="qu5-board">
+        <div class="qu5-row is-new"><span class="qu5-when">this week</span><span class="qu5-v">1,412</span></div>
+        <div class="qu5-row"><span class="qu5-when">Mar 4</span><span class="qu5-v">906</span></div>
+        <div class="qu5-row"><span class="qu5-when">Jan 21</span><span class="qu5-v">874</span></div>
+      </div>
+      <div class="sub qu5-sub">Your best week yet.</div>
+      <div class="cap qu5-cap">The one it beat stood 22 weeks.</div>
+    </div>
+
+    <div class="b b3">
+      <div class="deposit">On this day, you set a record. <b>1,412</b> new followers in a week.</div>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>
+<p class="item__note">No target at all, so the only thing to beat is the last time you were best. The new week takes the <b>top seat</b> and pushes the old records down, and the caption says the one it beat stood 22 weeks, which is what makes it mean something. A personal record rewards the fact instead of a fraction, so a goal with no end still gets a real moment.</p></div></div></div>
+<script src="_kit.js"></script><script>CEL.init()</script>
+</body></html>

@@ -1,0 +1,164 @@
+<style>
+/* ex-5 THE GLASS CLEARS. A milestone shows nothing until the day it happens, so
+   the engine underneath does the showing: every session wipes fog off the pane.
+   Day 7 the card is milk and you cannot read it. Day 300 it says what it is,
+   corner to corner. Today wipes the last patch. */
+[data-c="ex-5"] .b{padding:24px 22px 42px}
+[data-c="ex-5"] .exhd{font-size:18px;font-weight:650;letter-spacing:-.022em;color:var(--text-hi)}
+[data-c="ex-5"] .exsub{font-size:13.5px;line-height:1.5;color:var(--text-mid);margin-top:8px;max-width:31ch}
+[data-c="ex-5"] .exdefs{position:absolute;width:0;height:0;overflow:hidden;pointer-events:none}
+
+[data-c="ex-5"] .exrow{display:flex;justify-content:center;gap:14px;margin-top:24px}
+[data-c="ex-5"] .excol{width:96px;display:flex;flex-direction:column;align-items:center}
+
+[data-c="ex-5"] .exc{position:relative;width:78px;height:106px;border-radius:10px;overflow:hidden;
+  clip-path:inset(0 round 10px);contain:paint;
+  background:linear-gradient(165deg,rgba(255,255,255,.11),rgba(255,255,255,.02) 48%,rgba(255,255,255,.05));
+  box-shadow:0 12px 26px rgba(0,0,0,.5)}
+[data-c="ex-5"] .exc::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;
+  background:linear-gradient(140deg,rgba(255,255,255,.55),rgba(255,255,255,.10) 26%,
+    rgba(255,255,255,.02) 52%,rgba(255,255,255,.20) 80%,rgba(255,255,255,.42));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
+          mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude;
+  pointer-events:none;z-index:4}
+[data-c="ex-5"] .exface{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center}
+[data-c="ex-5"] .exg{font-size:8.5px;font-weight:600;letter-spacing:-.01em;color:rgba(235,238,248,.74)}
+[data-c="ex-5"] .exn{font-size:18px;font-weight:800;letter-spacing:-.045em;line-height:.95;
+  font-variant-numeric:tabular-nums;color:var(--text-hi);margin-top:4px}
+[data-c="ex-5"] .exn span{display:block;font-size:8px;font-weight:500;letter-spacing:0;
+  color:rgba(235,238,248,.55);margin-top:3px}
+[data-c="ex-5"] .f7{filter:blur(4px);opacity:.5}
+[data-c="ex-5"] .f90{filter:blur(1.4px);opacity:.86}
+[data-c="ex-5"] .exhaze{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none}
+/* the fog is the neutral ink token, never its own colour */
+[data-c="ex-5"] .exhaze rect{fill:rgb(var(--ink));fill-opacity:.2}
+
+[data-c="ex-5"] .exlab{font-size:11px;color:var(--text-lo);margin-top:13px;line-height:1.35}
+[data-c="ex-5"] .exlab b{display:block;color:var(--text-mid);font-weight:600;font-size:11.5px;
+  font-variant-numeric:tabular-nums;letter-spacing:-.005em}
+
+[data-c="ex-5"] .exrule{width:56px;height:1px;background:var(--hairline);margin:22px 0 16px}
+[data-c="ex-5"] .extod{font-size:11.5px;color:var(--text-lo);margin-bottom:12px}
+[data-c="ex-5"] .exc.big{width:118px;height:160px;border-radius:13px;clip-path:inset(0 round 13px);
+  box-shadow:0 20px 42px rgba(0,0,0,.6)}
+[data-c="ex-5"] .big .exg{font-size:12px}
+[data-c="ex-5"] .big .exn{font-size:27px;margin-top:6px}
+[data-c="ex-5"] .big .exn span{font-size:11px;margin-top:4px}
+
+/* yesterday's fog over the patch today wipes: it lifts, and nothing stacks. */
+[data-c="ex-5"] .exyest{opacity:0;animation:ex5lift .75s cubic-bezier(.2,.8,.3,1) .55s both}
+@keyframes ex5lift{from{opacity:1}to{opacity:0}}
+
+/* THE ONE ACCENT MOMENT: the corner that just came clear, still bright. */
+[data-c="ex-5"] .exglint{position:absolute;left:76.9%;top:83%;width:84px;height:84px;z-index:3;
+  transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle at 50% 50%,rgba(var(--accent-rgb),.52) 0%,
+    rgba(var(--accent-rgb),.20) 38%,rgba(var(--accent-rgb),0) 72%);
+  opacity:.38;animation:ex5glint .9s cubic-bezier(.2,.8,.3,1) .5s both}
+@keyframes ex5glint{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.72)}
+  38%{opacity:.9;transform:translate(-50%,-50%) scale(1.05)}
+  100%{opacity:.38;transform:translate(-50%,-50%) scale(1)}}
+
+[data-c="ex-5"] .exdep{font-size:14.5px;color:var(--text-mid);line-height:1.5;margin-top:16px;max-width:26ch}
+[data-c="ex-5"] .exdep b{color:var(--text-hi);font-weight:650}
+[data-c="ex-5"] .excap{font-size:12px;color:var(--text-mid);line-height:1.5;margin-top:8px;max-width:33ch}
+</style>
+<div class="ph" data-c="ex-5"><div class="st">
+  <div class="b b1">
+    <svg class="exdefs" aria-hidden="true"><defs>
+      <radialGradient id="ex5hole">
+        <stop offset="0" stop-color="#000" stop-opacity="1"/>
+        <stop offset=".5" stop-color="#000" stop-opacity=".9"/>
+        <stop offset="1" stop-color="#000" stop-opacity="0"/>
+      </radialGradient>
+      <radialGradient id="ex5wipe">
+        <stop offset="0" stop-color="#fff" stop-opacity="1"/>
+        <stop offset=".5" stop-color="#fff" stop-opacity=".9"/>
+        <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+      </radialGradient>
+      <mask id="ex5m7" maskUnits="userSpaceOnUse" x="0" y="0" width="78" height="106">
+        <rect width="78" height="106" fill="#fff"/>
+        <g fill="url(#ex5hole)">
+          <circle cx="39" cy="50" r="21"/><circle cx="32" cy="43" r="15"/><circle cx="46" cy="56" r="15"/>
+        </g>
+      </mask>
+      <mask id="ex5m90" maskUnits="userSpaceOnUse" x="0" y="0" width="78" height="106">
+        <rect width="78" height="106" fill="#fff"/>
+        <g fill="url(#ex5hole)">
+          <circle cx="39" cy="52" r="36"/><circle cx="27" cy="38" r="24"/><circle cx="52" cy="62" r="24"/>
+          <circle cx="39" cy="74" r="22"/>
+        </g>
+      </mask>
+      <mask id="ex5m300" maskUnits="userSpaceOnUse" x="0" y="0" width="78" height="106">
+        <rect width="78" height="106" fill="#fff"/>
+        <g fill="url(#ex5hole)">
+          <circle cx="34" cy="46" r="44"/><circle cx="16" cy="20" r="28"/><circle cx="60" cy="18" r="28"/>
+          <circle cx="14" cy="86" r="28"/><circle cx="60" cy="60" r="26"/><circle cx="30" cy="86" r="26"/>
+        </g>
+      </mask>
+      <mask id="ex5m301" maskUnits="userSpaceOnUse" x="0" y="0" width="78" height="106">
+        <rect width="78" height="106" fill="#fff"/>
+        <g fill="url(#ex5hole)">
+          <circle cx="34" cy="46" r="44"/><circle cx="16" cy="20" r="28"/><circle cx="60" cy="18" r="28"/>
+          <circle cx="14" cy="86" r="28"/><circle cx="60" cy="60" r="26"/><circle cx="30" cy="86" r="26"/>
+          <circle cx="60" cy="88" r="28"/>
+        </g>
+      </mask>
+      <mask id="ex5new" maskUnits="userSpaceOnUse" x="0" y="0" width="78" height="106">
+        <rect width="78" height="106" fill="#000"/>
+        <circle cx="60" cy="88" r="28" fill="url(#ex5wipe)"/>
+      </mask>
+    </defs></svg>
+
+    <div class="exhd">Pass the bar.</div>
+    <div class="exsub">One event, still far off, nothing to count. So the hours behind it wipe the fog off the glass.</div>
+
+    <div class="exrow">
+      <div class="excol">
+        <div class="exc">
+          <div class="exface f7"><div class="exg">Pass the bar</div><div class="exn">9<span>hours</span></div></div>
+          <svg class="exhaze" viewBox="0 0 78 106" preserveAspectRatio="none" aria-hidden="true">
+            <rect width="78" height="106" mask="url(#ex5m7)"/>
+          </svg>
+        </div>
+        <div class="exlab"><b>Day 7</b>9 hours</div>
+      </div>
+      <div class="excol">
+        <div class="exc">
+          <div class="exface f90"><div class="exg">Pass the bar</div><div class="exn">128<span>hours</span></div></div>
+          <svg class="exhaze" viewBox="0 0 78 106" preserveAspectRatio="none" aria-hidden="true">
+            <rect width="78" height="106" mask="url(#ex5m90)"/>
+          </svg>
+        </div>
+        <div class="exlab"><b>Day 90</b>128 hours</div>
+      </div>
+      <div class="excol">
+        <div class="exc">
+          <div class="exface"><div class="exg">Pass the bar</div><div class="exn">441<span>hours</span></div></div>
+          <svg class="exhaze" viewBox="0 0 78 106" preserveAspectRatio="none" aria-hidden="true">
+            <rect width="78" height="106" mask="url(#ex5m300)"/>
+          </svg>
+        </div>
+        <div class="exlab"><b>Day 300</b>441 hours</div>
+      </div>
+    </div>
+
+    <div class="exrule"></div>
+    <div class="extod">Today</div>
+
+    <div class="exc big">
+      <div class="exface"><div class="exg">Pass the bar</div><div class="exn">444<span>hours</span></div></div>
+      <svg class="exhaze" viewBox="0 0 78 106" preserveAspectRatio="none" aria-hidden="true">
+        <rect width="78" height="106" mask="url(#ex5m301)"/>
+        <rect class="exyest" width="78" height="106" mask="url(#ex5new)"/>
+      </svg>
+      <div class="exglint"></div>
+    </div>
+
+    <div class="exdep">On this day, you studied <b>3 hours</b>. 444 in all.</div>
+    <div class="excap">At a week you cannot read it yet. At 300 days the card says what it is, and the last corner clears today.</div>
+  </div>
+</div>
+<div class="hint">Tap to replay</div></div>
