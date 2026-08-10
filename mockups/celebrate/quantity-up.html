@@ -10,7 +10,7 @@
   <span class="sw"><button data-a="cyan" style="background:#2bd4d4" class="on"></button><button data-a="green" style="background:#3fd94e"></button><button data-a="amber" style="background:#ffb73d"></button><button data-a="rose" style="background:#ff6b9d"></button><button data-a="blue" style="background:#4f8cff"></button><button data-a="teal" style="background:#19c3a6"></button></span>
   <span class="bar__n">their Memento colour drives every screen &middot; <b>tap a phone to advance or replay</b></span>
 </div>
-<div class="gal"><h1>Quantity up</h1><p class="gal__sub">A number rising. 100 paying users, $10k a month, or just "grow my audience" with no target at all. The hard case here is the goal with no number to divide, where a percentage does not exist and the win has to be the fact itself.</p><div class="grid"><div class="item"><p class="item__label"><span class="item__n">1</span><span class="item__name">The marker posts</span><span class="vd vd--g" title="Approved by Malik">&#128077;</span></p><style>
+<div class="gal"><h1>Quantity up</h1><p class="gal__sub">A number rising. 100 paying users, $10k a month, or just "grow my audience" with no target at all. The hard case here is the goal with no number to divide, where a percentage does not exist and the win has to be the fact itself.</p><div class="grid"><div class="item"><p class="item__label"><span class="item__n">1</span><span class="item__name">The marker posts</span><span class="vd vd--y" title="Changed since review / ungraded — needs your eyes">!</span></p><style>
 /* qu-1. the marker posts. Fifths of a target, each one dated. */
 [data-c="qu-1"] .qu1-hero{font-size:104px}
 [data-c="qu-1"] .qu1-sub{max-width:24ch}
@@ -21,7 +21,11 @@
 [data-c="qu-1"] .qu1-cell{flex:1;display:flex;justify-content:center}
 [data-c="qu-1"] .qu1-p{width:2px;height:13px;border-radius:1px;
   background:rgba(var(--ink),.22)}
-[data-c="qu-1"] .qu1-cell.is-past .qu1-p{height:19px;background:rgba(var(--ink),.55)}
+/* passed posts climb toward today (Malik: taller as they pass, still
+   uncolored). --ph is set per post; in the app it interpolates 16px -> 23px
+   across however many marks are behind, so any count of passed marks reads
+   as a staircase up to the accent post. */
+[data-c="qu-1"] .qu1-cell.is-past .qu1-p{height:var(--ph,19px);background:rgba(var(--ink),.55)}
 [data-c="qu-1"] .qu1-cell.is-now .qu1-p{height:27px;background:var(--accent);position:relative}[data-c="qu-1"] .qu1-labels{display:flex;margin-top:9px}
 [data-c="qu-1"] .qu1-lc{flex:1;text-align:center}
 [data-c="qu-1"] .qu1-num{font-size:13px;font-weight:650;font-variant-numeric:tabular-nums;
@@ -52,8 +56,8 @@
     <div class="b b2">
       <div class="qu1-axis">
         <div class="qu1-marks">
-          <div class="qu1-cell is-past"><div class="qu1-p"></div></div>
-          <div class="qu1-cell is-past"><div class="qu1-p"></div></div>
+          <div class="qu1-cell is-past" style="--ph:16px"><div class="qu1-p"></div></div>
+          <div class="qu1-cell is-past" style="--ph:22px"><div class="qu1-p"></div></div>
           <div class="qu1-cell is-now"><div class="qu1-p"></div></div>
           <div class="qu1-cell"><div class="qu1-p"></div></div>
           <div class="qu1-cell"><div class="qu1-p"></div></div>
@@ -78,7 +82,7 @@
   <div class="keepbtn">Keep</div>
   <div class="hint">Tap to replay</div>
 </div>
-<p class="item__note">The fifth you just crossed, shown as five posts on one line with the <b>date each one fell</b>. Quantity up with a target has natural chapters at every fifth, and dating them turns a progress bar into a history: Mar 3, Jun 1, today. The line says 216 days made these 60, then 40 still open, so the distance closed and the distance left both get stated. One accent: the post that just landed.</p></div><div class="item"><p class="item__label"><span class="item__n">2</span><span class="item__name">Four figures</span><span class="vd vd--g" title="Approved by Malik">&#128077;</span></p><style>
+<p class="item__note">The fifth you just crossed, shown as five posts on one line with the <b>date each one fell</b>. Quantity up with a target has natural chapters at every fifth, and dating them turns a progress bar into a history: Mar 3, Jun 1, today. The line says 216 days made these 60, then 40 still open, so the distance closed and the distance left both get stated. One accent: the post that just landed. Passed posts now step taller toward today, still uncolored (2026-08-10).</p></div><div class="item"><p class="item__label"><span class="item__n">2</span><span class="item__name">Four figures</span><span class="vd vd--g" title="Approved by Malik">&#128077;</span></p><style>
 /* qu-2. four figures. No target on the goal, so the win is the digit
    the number just grew. The lit rule is the thousand line. */
 [data-c="qu-2"] .qu2-hero{font-size:78px}
@@ -194,81 +198,7 @@
   <div class="keepbtn">Keep</div>
   <div class="hint">Tap to replay</div>
 </div>
-<p class="item__note">A deadline goal reached early, where the reward is the <b>time handed back</b>. The run from Feb 1 to Dec 31 is drawn once, and the lit tail is the 53 days you set aside and never needed. Beating a date is worth more than hitting a number, and this is the only way to show it without a countdown. One accent: the unused stretch.</p></div><div class="item"><p class="item__label"><span class="item__n">4</span><span class="item__name">Twenty marks</span><span class="vd vd--y" title="Changed since review / ungraded — needs your eyes">!</span></p><style>
-/* qu-4. twenty marks. Far from the target, so nothing empty is ever drawn.
-   It counts what exists, one stroke per person. */
-[data-c="qu-4"] .qu4-hero{position:relative;display:flex;flex-direction:column;align-items:center}[data-c="qu-4"] .qu4-hero .n,[data-c="qu-4"] .qu4-hero .sub{position:relative}
-[data-c="qu-4"] .qu4-n{font-size:104px}
-[data-c="qu-4"] .qu4-tally{display:flex;justify-content:center;gap:8px;height:38px;
-  align-items:flex-end;width:300px;margin:0 auto 24px}
-[data-c="qu-4"] .qu4-t{width:3px;height:30px;border-radius:1.5px;background:rgba(var(--ink),.52)}
-[data-c="qu-4"] .qu4-t:nth-child(5n){margin-right:12px}
-[data-c="qu-4"] .qu4-t:last-child{margin-right:0}
-[data-c="qu-4"] .qu4-t.is-last{height:38px;background:rgba(var(--ink),.96)}
-[data-c="qu-4"] .qu4-sub{max-width:24ch}
-[data-c="qu-4"] .qu4-cap{max-width:24ch}
-[data-c="qu-4"] .b3{padding-bottom:96px}
-
-[data-c="qu-4"] .b.on .qu4-hero::before{animation:qu4Bloom .9s cubic-bezier(.2,.8,.3,1) both}
-[data-c="qu-4"] .b.on .qu4-t{animation:qu4Mark .34s cubic-bezier(.2,.8,.3,1) both}
-[data-c="qu-4"] .b.on .qu4-t:nth-child(1){animation-delay:.00s}
-[data-c="qu-4"] .b.on .qu4-t:nth-child(2){animation-delay:.03s}
-[data-c="qu-4"] .b.on .qu4-t:nth-child(3){animation-delay:.06s}
-[data-c="qu-4"] .b.on .qu4-t:nth-child(4){animation-delay:.09s}
-[data-c="qu-4"] .b.on .qu4-t:nth-child(5){animation-delay:.12s}
-[data-c="qu-4"] .b.on .qu4-t:nth-child(6){animation-delay:.15s}
-[data-c="qu-4"] .b.on .qu4-t:nth-child(7){animation-delay:.18s}
-[data-c="qu-4"] .b.on .qu4-t:nth-child(8){animation-delay:.21s}
-[data-c="qu-4"] .b.on .qu4-t:nth-child(9){animation-delay:.24s}
-[data-c="qu-4"] .b.on .qu4-t:nth-child(10){animation-delay:.27s}
-[data-c="qu-4"] .b.on .qu4-t:nth-child(11){animation-delay:.30s}
-[data-c="qu-4"] .b.on .qu4-t:nth-child(12){animation-delay:.33s}
-[data-c="qu-4"] .b.on .qu4-t:nth-child(13){animation-delay:.36s}
-[data-c="qu-4"] .b.on .qu4-t:nth-child(14){animation-delay:.39s}
-[data-c="qu-4"] .b.on .qu4-t:nth-child(15){animation-delay:.42s}
-[data-c="qu-4"] .b.on .qu4-t:nth-child(16){animation-delay:.45s}
-[data-c="qu-4"] .b.on .qu4-t:nth-child(17){animation-delay:.48s}
-[data-c="qu-4"] .b.on .qu4-t:nth-child(18){animation-delay:.51s}
-[data-c="qu-4"] .b.on .qu4-t:nth-child(19){animation-delay:.54s}
-[data-c="qu-4"] .b.on .qu4-t:nth-child(20){animation-delay:.60s}
-@keyframes qu4Bloom{from{opacity:0;transform:translate(-50%,-50%) scale(.84)}
-  to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
-@keyframes qu4Mark{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-</style>
-
-<div class="ph" data-c="qu-4">
-  <div class="st">
-
-    <div class="b b1">
-      <div class="qu4-hero">
-        <div class="n qu4-n" data-count="0|20">20</div>
-        <div class="sub">paying users.</div>
-      </div>
-    </div>
-
-    <div class="b b2">
-      <div class="qu4-tally">
-        <div class="qu4-t"></div><div class="qu4-t"></div><div class="qu4-t"></div>
-        <div class="qu4-t"></div><div class="qu4-t"></div><div class="qu4-t"></div>
-        <div class="qu4-t"></div><div class="qu4-t"></div><div class="qu4-t"></div>
-        <div class="qu4-t"></div><div class="qu4-t"></div><div class="qu4-t"></div>
-        <div class="qu4-t"></div><div class="qu4-t"></div><div class="qu4-t"></div>
-        <div class="qu4-t"></div><div class="qu4-t"></div><div class="qu4-t"></div>
-        <div class="qu4-t"></div><div class="qu4-t is-last"></div>
-      </div>
-      <div class="sub qu4-sub">46 days ago there were none.</div>
-      <div class="cap qu4-cap">80 still open.</div>
-    </div>
-
-    <div class="b b3">
-      <div class="deposit">On this day, you reached <b>20</b> paying users.</div>
-    </div>
-
-  </div>
-  <div class="keepbtn">Keep</div>
-  <div class="hint">Tap to replay</div>
-</div>
-<p class="item__note">20 of 100 and nothing empty is ever drawn. It counts <b>what exists</b>, one stroke per person, grouped in fives like a tally, instead of showing 80 blank slots. 46 days ago there were none, and 80 still open sits under it as a plain fact, not a scold. This is the screen for someone a long way out, and the only colour is a soft bloom behind the number.</p></div><div class="item"><p class="item__label"><span class="item__n">5</span><span class="item__name">The record board</span><span class="vd vd--y" title="Changed since review / ungraded — needs your eyes">!</span></p><style>
+<p class="item__note">A deadline goal reached early, where the reward is the <b>time handed back</b>. The run from Feb 1 to Dec 31 is drawn once, and the lit tail is the 53 days you set aside and never needed. Beating a date is worth more than hitting a number, and this is the only way to show it without a countdown. One accent: the unused stretch.</p></div><div class="item"><p class="item__label"><span class="item__n">4</span><span class="item__name">The record board</span><span class="vd vd--g" title="Approved by Malik">&#128077;</span></p><style>
 /* qu-5. the record board. No target on this goal, so the only thing to
    beat is the last time. The new week takes the seat the old one held. */
 [data-c="qu-5"] .qu5-hero{font-size:88px}

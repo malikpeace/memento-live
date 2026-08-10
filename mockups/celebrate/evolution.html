@@ -10,89 +10,7 @@
   <span class="sw"><button data-a="cyan" style="background:#2bd4d4" class="on"></button><button data-a="green" style="background:#3fd94e"></button><button data-a="amber" style="background:#ffb73d"></button><button data-a="rose" style="background:#ff6b9d"></button><button data-a="blue" style="background:#4f8cff"></button><button data-a="teal" style="background:#19c3a6"></button></span>
   <span class="bar__n">their Memento colour drives every screen &middot; <b>tap a phone to advance or replay</b></span>
 </div>
-<div class="gal"><h1>The card evolving</h1><p class="gal__sub">Not ceremonies. This is the Memento itself changing as they live with it, on the both-layers model: a permanent base that accumulates forever plus a daily surface state. Each shows the same card at day 7, day 90 and day 300 so you can see the accumulation actually working.</p><div class="grid"><div class="item"><p class="item__label"><span class="item__n">1</span><span class="item__name">The stack thickens</span><span class="vd vd--r" title="Malik said no">&#10005;</span></p><style>
-/* ev-1. LAMINAE. The card is a stack. One sheet per day held. */
-[data-c="ev-1"] .b1{justify-content:center;padding:30px 24px}
-[data-c="ev-1"] .lede{font-size:13.5px;line-height:1.5;font-weight:500;color:var(--text-mid);
-  max-width:31ch;letter-spacing:-.005em}
-[data-c="ev-1"] .lede b{color:var(--text-hi);font-weight:650}
-
-[data-c="ev-1"] .ages{display:flex;align-items:flex-end;justify-content:center;gap:17px;margin-top:24px}
-[data-c="ev-1"] .age{display:flex;flex-direction:column;align-items:center}
-[data-c="ev-1"] .lab{margin-top:11px;font-size:11px;color:var(--text-lo);font-variant-numeric:tabular-nums}
-
-[data-c="ev-1"] .obj{position:relative;width:96px;border-radius:5px;
-  box-shadow:0 10px 24px rgba(0,0,0,.55)}
-[data-c="ev-1"] .fc{position:relative;z-index:2;height:128px;overflow:hidden;border-radius:5px 5px 0 0;
-  background:linear-gradient(165deg,rgba(235,238,248,.12),rgba(235,238,248,.02) 48%,rgba(235,238,248,.05));
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.24)}
-[data-c="ev-1"] .fc::after{content:"";position:absolute;inset:0;pointer-events:none;
-  background:radial-gradient(150% 45% at 50% -12%,rgba(255,255,255,.13),transparent 56%)}
-[data-c="ev-1"] .slab{position:relative;z-index:1;overflow:hidden;border-radius:0 0 5px 5px;
-  background:linear-gradient(180deg,rgba(235,238,248,.17),rgba(235,238,248,.06) 34%,rgba(0,0,0,.5))}
-[data-c="ev-1"] .slab::before{content:"";position:absolute;inset:0;
-  background:repeating-linear-gradient(180deg,rgba(255,255,255,.34) 0 .5px,rgba(255,255,255,0) .5px 1.5px);
-  -webkit-mask-image:linear-gradient(180deg,#000,rgba(0,0,0,.12) 58%,rgba(0,0,0,0));
-          mask-image:linear-gradient(180deg,#000,rgba(0,0,0,.12) 58%,rgba(0,0,0,0))}
-
-[data-c="ev-1"] .rule{width:100%;height:1px;background:var(--hairline);margin:26px 0 22px}
-
-[data-c="ev-1"] .obj--big{width:141px;border-radius:8px}
-[data-c="ev-1"] .obj--big .fc{height:188px;border-radius:8px 8px 0 0}
-[data-c="ev-1"] .obj--big .slab{border-radius:0 0 8px 8px}
-[data-c="ev-1"] .mk{position:absolute;left:50%;top:43%;transform:translate(-50%,-50%);
-  width:68px;height:68px;fill:rgba(255,255,255,.22)}
-[data-c="ev-1"] .eng{position:absolute;left:11px;bottom:9px;font-size:9.5px;font-weight:500;
-  letter-spacing:.005em;color:rgba(235,238,248,.56)}
-
-/* today: one sheet, the only colour on the screen */
-[data-c="ev-1"] .new{position:absolute;left:0;right:0;top:0;height:1.8px;background:var(--accent);
-  box-shadow:0 0 11px rgba(var(--accent-rgb),.42)}
-[data-c="ev-1"] .b1.on .new{animation:ev1sheet .5s cubic-bezier(.2,.8,.3,1) .95s backwards}
-@keyframes ev1sheet{from{opacity:0;transform:translateY(7px)}}
-[data-c="ev-1"] .b1.on .obj--big .fc{animation:ev1lift .5s cubic-bezier(.2,.8,.3,1) .95s backwards}
-@keyframes ev1lift{from{transform:translateY(1.8px)}}
-
-[data-c="ev-1"] .cap2{margin-top:13px;font-size:12px;line-height:1.5;color:var(--text-mid);max-width:30ch}
-[data-c="ev-1"] .state{margin-top:6px;font-size:11px;color:var(--text-lo)}
-</style>
-<div class="ph" data-c="ev-1">
-  <div class="st">
-    <div class="b b1">
-      <div class="lede">One sheet for every day you hold. The card thickens, and nothing under the top ever moves.</div>
-
-      <div class="ages">
-        <div class="age">
-          <div class="obj"><div class="fc"></div><div class="slab" style="height:4px"></div></div>
-          <div class="lab">Day 7</div>
-        </div>
-        <div class="age">
-          <div class="obj"><div class="fc"></div><div class="slab" style="height:19px"></div></div>
-          <div class="lab">Day 90</div>
-        </div>
-        <div class="age">
-          <div class="obj"><div class="fc"></div><div class="slab" style="height:38px"></div></div>
-          <div class="lab">Day 300</div>
-        </div>
-      </div>
-
-      <div class="rule"></div>
-
-      <div class="obj obj--big">
-        <div class="fc">
-          <svg class="mk" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
-          <div class="eng">Stay sober</div>
-        </div>
-        <div class="slab" style="height:48px"><div class="new"></div></div>
-      </div>
-      <div class="lab">Day 301</div>
-      <div class="cap2">Today's sheet goes on top of three hundred. The face lifts by the thickness of one day.</div>
-      <div class="state">Until the day is held, the top sheet is not there.</div>
-    </div>
-  </div>
-  <div class="hint">Tap to replay</div>
-</div>
-<p class="item__note">The card is a stack and every day you hold lays down one sheet, so day 300 is a physically thicker object than day 30 and nothing under the top sheet ever moves again. Across all five, the accumulated base is grey and <b>the accent is only ever today</b>, which is the both layers model in one picture.</p></div><div class="item"><p class="item__label"><span class="item__n">2</span><span class="item__name">The grain fills in</span><span class="vd vd--g" title="Approved by Malik">&#128077;</span></p><style>
+<div class="gal"><h1>The card evolving</h1><p class="gal__sub">Not ceremonies. This is the Memento itself changing as they live with it, on the both-layers model: a permanent base that accumulates forever plus a daily surface state. Each shows the same card at day 7, day 90 and day 300 so you can see the accumulation actually working.</p><div class="grid"><div class="item"><p class="item__label"><span class="item__n">1</span><span class="item__name">The grain fills in</span><span class="vd vd--g" title="Approved by Malik">&#128077;</span></p><style>
 /* ev-2. THE GRAIN. One engraved mark per day done, filling the face. */
 [data-c="ev-2"] .b1{justify-content:center;padding:30px 24px}
 [data-c="ev-2"] .lede{font-size:13.5px;line-height:1.5;font-weight:500;color:var(--text-mid);
@@ -184,7 +102,7 @@
   </div>
   <div class="hint">Tap to replay</div>
 </div>
-<p class="item__note">One mark cut into the face for every day done, so the surface goes from a few scratches at day 7 to a woven material by the end of a year. You can <b>count a single day</b> if you look for it, and days you missed leave no mark at all, so the card stays an honest record without ever showing a hole.</p></div><div class="item"><p class="item__label"><span class="item__n">3</span><span class="item__name">The rim laps inward</span><span class="vd vd--g" title="Approved by Malik">&#128077;</span></p><style>
+<p class="item__note">One mark cut into the face for every day done, so the surface goes from a few scratches at day 7 to a woven material by the end of a year. You can <b>count a single day</b> if you look for it, and days you missed leave no mark at all, so the card stays an honest record without ever showing a hole.</p></div><div class="item"><p class="item__label"><span class="item__n">2</span><span class="item__name">The rim laps inward</span><span class="vd vd--g" title="Approved by Malik">&#128077;</span></p><style>
 /* ev-3. THE RIM. Edge light steps once per day kept, laps inward each 100. */
 [data-c="ev-3"] .b1{justify-content:center;padding:30px 24px}
 [data-c="ev-3"] .lede{font-size:13.5px;line-height:1.5;font-weight:500;color:var(--text-mid);
@@ -272,203 +190,7 @@
   </div>
   <div class="hint">Tap to replay</div>
 </div>
-<p class="item__note">The edge light steps forward one day per day kept, a hundred days closes a lap, and the next lap draws inside the one before it. It <b>never finishes</b>, it just coils tighter every hundred days, and today is a visible step you can find at the frontier.</p></div><div class="item"><p class="item__label"><span class="item__n">4</span><span class="item__name">Months settle as strata</span><span class="vd vd--r" title="Malik said no">&#10005;</span></p><style>
-/* ev-4. STRATA. The days settle. Each month is a band as thick as it earned. */
-[data-c="ev-4"] .b1{justify-content:center;padding:30px 24px}
-[data-c="ev-4"] .lede{font-size:13.5px;line-height:1.5;font-weight:500;color:var(--text-mid);
-  max-width:31ch;letter-spacing:-.005em}
-
-[data-c="ev-4"] .ages{display:flex;align-items:flex-end;justify-content:center;gap:17px;margin-top:24px}
-[data-c="ev-4"] .age{display:flex;flex-direction:column;align-items:center}
-[data-c="ev-4"] .lab{margin-top:11px;font-size:11px;color:var(--text-lo);font-variant-numeric:tabular-nums}
-
-[data-c="ev-4"] .fc{position:relative;width:96px;height:128px;overflow:hidden;border-radius:5px;
-  background:linear-gradient(165deg,rgba(235,238,248,.12),rgba(235,238,248,.02) 48%,rgba(235,238,248,.05));
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 10px 24px rgba(0,0,0,.55)}
-[data-c="ev-4"] .fc::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:5;
-  background:radial-gradient(150% 45% at 50% -12%,rgba(255,255,255,.13),transparent 56%)}
-
-[data-c="ev-4"] .sed{position:absolute;left:0;right:0;bottom:0;z-index:2;
-  display:flex;flex-direction:column-reverse}
-[data-c="ev-4"] .bd{position:relative;
-  background:linear-gradient(180deg,rgba(235,238,248,.145),rgba(235,238,248,.085));
-  box-shadow:inset 0 .5px 0 rgba(255,255,255,.30)}
-[data-c="ev-4"] .bd::after{content:"";position:absolute;inset:0;opacity:var(--d,.8);
-  background:repeating-linear-gradient(180deg,rgba(255,255,255,.055) 0 .5px,rgba(255,255,255,0) .5px 3.4px)}
-[data-c="ev-4"] .wl{position:absolute;left:0;right:0;height:1px;z-index:3;background:rgba(235,238,248,.46)}
-
-[data-c="ev-4"] .rule{width:100%;height:1px;background:var(--hairline);margin:26px 0 22px}
-
-[data-c="ev-4"] .fc--big{width:141px;height:188px;border-radius:8px}
-[data-c="ev-4"] .mk{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);z-index:1;
-  width:68px;height:68px;fill:rgba(255,255,255,.22)}
-[data-c="ev-4"] .eng{position:absolute;left:12px;bottom:10px;z-index:6;font-size:9.5px;font-weight:500;
-  letter-spacing:.005em;color:rgba(235,238,248,.66)}
-
-/* today: the filament that settles on top, the only colour on the screen */
-[data-c="ev-4"] .wl--now{background:var(--accent);height:1.4px;
-  box-shadow:0 0 10px rgba(var(--accent-rgb),.42)}
-[data-c="ev-4"] .b1.on .wl--now{animation:ev4settle .55s cubic-bezier(.2,.8,.3,1) .95s backwards}
-@keyframes ev4settle{from{opacity:0;transform:translateY(-7px)}}
-
-[data-c="ev-4"] .cap2{margin-top:13px;font-size:12px;line-height:1.5;color:var(--text-mid);max-width:31ch}
-[data-c="ev-4"] .state{margin-top:6px;font-size:11px;color:var(--text-lo)}
-</style>
-<div class="ph" data-c="ev-4">
-  <div class="st">
-    <div class="b b1">
-      <div class="lede">The days settle. Each month becomes a band, as thick as the days you kept in it.</div>
-
-      <div class="ages">
-        <div class="age">
-          <div class="fc">
-            <div class="sed"><div class="bd" style="height:2.5px;--d:.9"></div></div>
-            <div class="wl" style="bottom:2.5px"></div>
-          </div>
-          <div class="lab">Day 7</div>
-        </div>
-        <div class="age">
-          <div class="fc">
-            <div class="sed">
-              <div class="bd" style="height:9.4px;--d:.91"></div>
-              <div class="bd" style="height:10.4px;--d:.98"></div>
-              <div class="bd" style="height:7.9px;--d:.83"></div>
-            </div>
-            <div class="wl" style="bottom:27.7px"></div>
-          </div>
-          <div class="lab">Day 90</div>
-        </div>
-        <div class="age">
-          <div class="fc">
-            <div class="sed">
-              <div class="bd" style="height:9.4px;--d:.91"></div>
-              <div class="bd" style="height:10.4px;--d:.98"></div>
-              <div class="bd" style="height:7.9px;--d:.83"></div>
-              <div class="bd" style="height:10.8px;--d:1"></div>
-              <div class="bd" style="height:6.5px;--d:.74"></div>
-              <div class="bd" style="height:9.7px;--d:.94"></div>
-              <div class="bd" style="height:9px;--d:.89"></div>
-              <div class="bd" style="height:10.1px;--d:.96"></div>
-              <div class="bd" style="height:8.6px;--d:.87"></div>
-              <div class="bd" style="height:7.6px;--d:.81"></div>
-            </div>
-            <div class="wl" style="bottom:90px"></div>
-          </div>
-          <div class="lab">Day 300</div>
-        </div>
-      </div>
-
-      <div class="rule"></div>
-
-      <div class="fc fc--big">
-        <svg class="mk" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
-        <div class="sed">
-          <div class="bd" style="height:13.8px;--d:.91"></div>
-          <div class="bd" style="height:15.4px;--d:.98"></div>
-          <div class="bd" style="height:11.7px;--d:.83"></div>
-          <div class="bd" style="height:15.9px;--d:1"></div>
-          <div class="bd" style="height:9.5px;--d:.74"></div>
-          <div class="bd" style="height:14.3px;--d:.94"></div>
-          <div class="bd" style="height:13.3px;--d:.89"></div>
-          <div class="bd" style="height:14.8px;--d:.96"></div>
-          <div class="bd" style="height:12.7px;--d:.87"></div>
-          <div class="bd" style="height:11.1px;--d:.81"></div>
-        </div>
-        <div class="wl wl--now" style="bottom:132.5px"></div>
-        <div class="eng">Lose 40 lbs</div>
-      </div>
-      <div class="lab">Day 301</div>
-      <div class="cap2">Today settles on top. Ten months under it, thickest where you kept the most.</div>
-      <div class="state">Nothing settles until the day is done.</div>
-    </div>
-  </div>
-  <div class="hint">Tap to replay</div>
-</div>
-<p class="item__note">Each month settles into a band as thick as the days you actually kept in it, so a year reads like rock: fat layers where you were solid, thin ones where you were not. This is the only one that <b>shows the shape of your history</b> and not just how much of it there is.</p></div><div class="item"><p class="item__label"><span class="item__n">5</span><span class="item__name">The core lights up</span><span class="vd vd--r" title="Malik said no">&#10005;</span></p><style>
-/* ev-5. THE CORE. Light from inside, reaching as far as the days behind it. */
-[data-c="ev-5"] .b1{justify-content:center;padding:30px 24px}
-[data-c="ev-5"] .lede{font-size:13.5px;line-height:1.5;font-weight:500;color:var(--text-mid);
-  max-width:31ch;letter-spacing:-.005em}
-
-[data-c="ev-5"] .ages{display:flex;align-items:flex-end;justify-content:center;gap:17px;margin-top:24px}
-[data-c="ev-5"] .age{display:flex;flex-direction:column;align-items:center}
-[data-c="ev-5"] .lab{margin-top:11px;font-size:11px;color:var(--text-lo);font-variant-numeric:tabular-nums}
-
-[data-c="ev-5"] .obj{position:relative}
-[data-c="ev-5"] .fc{position:relative;z-index:2;width:96px;height:128px;overflow:hidden;border-radius:5px;
-  background:linear-gradient(165deg,rgba(235,238,248,.12),rgba(235,238,248,.02) 48%,rgba(235,238,248,.05));
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 10px 24px rgba(0,0,0,.55)}
-[data-c="ev-5"] .fc::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:5;
-  background:radial-gradient(150% 45% at 50% -12%,rgba(255,255,255,.11),transparent 56%)}
-[data-c="ev-5"] .glow{position:absolute;left:50%;top:58%;z-index:1;
-  width:calc(var(--r) * 2);height:calc(var(--r) * 2);transform:translate(-50%,-50%);border-radius:50%;
-  background:radial-gradient(circle,rgba(235,238,248,.72),rgba(235,238,248,.18) 40%,rgba(235,238,248,0) 72%)}
-[data-c="ev-5"] .spill{position:absolute;z-index:0;left:50%;bottom:-15px;transform:translateX(-50%);
-  width:150%;height:30px;pointer-events:none;
-  background:radial-gradient(50% 50% at 50% 50%,rgba(235,238,248,.30),rgba(235,238,248,0) 72%)}
-
-[data-c="ev-5"] .rule{width:100%;height:1px;background:var(--hairline);margin:26px 0 22px}
-
-[data-c="ev-5"] .fc--big{width:141px;height:188px;border-radius:8px}
-[data-c="ev-5"] .mk{position:absolute;left:50%;top:34%;transform:translate(-50%,-50%);z-index:3;
-  width:68px;height:68px;fill:rgba(255,255,255,.22)}
-[data-c="ev-5"] .eng{position:absolute;left:12px;bottom:10px;z-index:6;font-size:9.5px;font-weight:500;
-  letter-spacing:.005em;color:rgba(235,238,248,.62)}
-
-/* today: the ember at the core, the only colour on the screen */
-[data-c="ev-5"] .ember{position:absolute;left:50%;top:58%;z-index:4;width:5px;height:5px;border-radius:50%;
-  transform:translate(-50%,-50%);background:var(--accent);
-  box-shadow:0 0 14px 4px rgba(var(--accent-rgb),.42)}
-[data-c="ev-5"] .b1.on .ember{animation:ev5lit .5s cubic-bezier(.2,.8,.3,1) 1s backwards}
-@keyframes ev5lit{from{opacity:0;transform:translate(-50%,-50%) scale(.4)}}
-[data-c="ev-5"] .b1.on .fc--big .glow{animation:ev5reach .7s cubic-bezier(.2,.8,.3,1) 1s backwards}
-@keyframes ev5reach{from{transform:translate(-50%,-50%) scale(.955)}}
-
-[data-c="ev-5"] .cap2{margin-top:13px;font-size:12px;line-height:1.5;color:var(--text-mid);max-width:31ch}
-[data-c="ev-5"] .state{margin-top:6px;font-size:11px;color:var(--text-lo)}
-</style>
-<div class="ph" data-c="ev-5">
-  <div class="st">
-    <div class="b b1">
-      <div class="lede">The light inside reaches as far as the days behind it. At a year it starts to spill past the edge.</div>
-
-      <div class="ages">
-        <div class="age">
-          <div class="obj"><div class="fc"><div class="glow" style="--r:20px"></div></div></div>
-          <div class="lab">Day 7</div>
-        </div>
-        <div class="age">
-          <div class="obj"><div class="fc"><div class="glow" style="--r:52px"></div></div></div>
-          <div class="lab">Day 90</div>
-        </div>
-        <div class="age">
-          <div class="obj">
-            <div class="spill"></div>
-            <div class="fc"><div class="glow" style="--r:96px"></div></div>
-          </div>
-          <div class="lab">Day 300</div>
-        </div>
-      </div>
-
-      <div class="rule"></div>
-
-      <div class="obj">
-        <div class="spill" style="bottom:-19px;height:38px"></div>
-        <div class="fc fc--big">
-          <div class="glow" style="--r:141px"></div>
-          <svg class="mk" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
-          <div class="ember"></div>
-          <div class="eng">100 paying customers</div>
-        </div>
-      </div>
-      <div class="lab">Day 301</div>
-      <div class="cap2">Today's ember, lit at the core. The reach grows by one more day.</div>
-      <div class="state">Before the day is done the core is dark, however far the light already goes.</div>
-    </div>
-  </div>
-  <div class="hint">Tap to replay</div>
-</div>
-<p class="item__note">The light inside reaches as far as the days behind it, so the card goes from an inert wafer to something that lights the surface it sits on around the one year mark. This one is the <b>least countable on purpose</b>, for the person who wants to feel the accumulation instead of auditing it.</p></div><div class="item"><p class="item__label"><span class="item__n">6</span><span class="item__name">The colour is earned</span><span class="vd vd--y" title="Changed since review / ungraded — needs your eyes">!</span></p><style>
+<p class="item__note">The edge light steps forward one day per day kept, a hundred days closes a lap, and the next lap draws inside the one before it. It <b>never finishes</b>, it just coils tighter every hundred days, and today is a visible step you can find at the frontier.</p></div><div class="item"><p class="item__label"><span class="item__n">3</span><span class="item__name">The colour is earned</span><span class="vd vd--y" title="Changed since review / ungraded — needs your eyes">!</span></p><style>
 /* ex-1 THE COLOUR IS EARNED. Every day held drops one bead of colour into the
    glass. A bead stays sharp for about a week, then diffuses into the body and
    never leaves it. Base layer: how saturated the material is, permanent.
@@ -584,7 +306,7 @@
   </div>
 </div>
 <div class="hint">Tap to replay</div></div>
-<p class="item__note">Every day held drops one bead of colour into the glass. A bead stays sharp about a week, then gives itself up to the body and never leaves. So the base layer is <b>how saturated the material is</b>, permanent, and the surface layer is the handful of beads not soaked in yet, today's the sharpest. Fits <b>maintenance</b>: nothing to count but days, and at a week you can literally count them on the card, while at 300 the whole body carries them.</p></div><div class="item"><p class="item__label"><span class="item__n">7</span><span class="item__name">The core</span><span class="vd vd--y" title="Changed since review / ungraded — needs your eyes">!</span></p><style>
+<p class="item__note">Every day held drops one bead of colour into the glass. A bead stays sharp about a week, then gives itself up to the body and never leaves. So the base layer is <b>how saturated the material is</b>, permanent, and the surface layer is the handful of beads not soaked in yet, today's the sharpest. Fits <b>maintenance</b>: nothing to count but days, and at a week you can literally count them on the card, while at 300 the whole body carries them.</p></div><div class="item"><p class="item__label"><span class="item__n">4</span><span class="item__name">The core</span><span class="vd vd--y" title="Changed since review / ungraded — needs your eyes">!</span></p><style>
 /* ex-2 THE CORE. A light inside the glass. Its SIZE is every rep ever done and
    never shrinks. Its BRIGHTNESS is the last thirty days, so a soft month dims
    the card without taking anything off it. */
@@ -669,7 +391,7 @@
   </div>
 </div>
 <div class="hint">Tap to replay</div></div>
-<p class="item__note">A light inside the glass. Its <b>size is every rep ever done</b> and never shrinks. Its <b>brightness is the last thirty days</b>, so a quiet month dims the card and takes nothing off it. Two different facts on one object, which is what separates it from a glow that only grows. Fits <b>frequency</b>, where the honest question is not the lifetime total, it is whether you are still running.</p></div><div class="item"><p class="item__label"><span class="item__n">8</span><span class="item__name">It stops being see through</span><span class="vd vd--y" title="Changed since review / ungraded — needs your eyes">!</span></p><style>
+<p class="item__note">A light inside the glass. Its <b>size is every rep ever done</b> and never shrinks. Its <b>brightness is the last thirty days</b>, so a quiet month dims the card and takes nothing off it. Two different facts on one object, which is what separates it from a glow that only grows. Fits <b>frequency</b>, where the honest question is not the lifetime total, it is whether you are still running.</p></div><div class="item"><p class="item__label"><span class="item__n">5</span><span class="item__name">It stops being see through</span><span class="vd vd--y" title="Changed since review / ungraded — needs your eyes">!</span></p><style>
 /* ex-3 TRANSLUCENCY RESOLVING INTO SOLIDITY. On day one the card is nearly not
    there: the room reads straight through it. Marks give it body. By day 300 it
    is opaque and blocks what is behind it, which is the whole argument for an
@@ -780,7 +502,7 @@
   </div>
 </div>
 <div class="hint">Tap to replay</div></div>
-<p class="item__note">On day one the card is nearly not there and the room reads straight through it. Marks give it body until at 300 days it is opaque and blocks the light behind it. Fits an <b>open goal</b> exactly, because there is no number to show and no meter that would not be a lie. The reward is that the thing became undeniable, and you can see that in one glance without counting anything.</p></div><div class="item"><p class="item__label"><span class="item__n">9</span><span class="item__name">Growth rings</span><span class="vd vd--y" title="Changed since review / ungraded — needs your eyes">!</span></p><style>
+<p class="item__note">On day one the card is nearly not there and the room reads straight through it. Marks give it body until at 300 days it is opaque and blocks the light behind it. Fits an <b>open goal</b> exactly, because there is no number to show and no meter that would not be a lie. The reward is that the thing became undeniable, and you can see that in one glance without counting anything.</p></div><div class="item"><p class="item__label"><span class="item__n">6</span><span class="item__name">Growth rings</span><span class="vd vd--y" title="Changed since review / ungraded — needs your eyes">!</span></p><style>
 /* ex-4 GROWTH RINGS. The material lays down one contour every thirty days,
    outward from the middle, the way a tree does. The ring being drawn is dotted
    for the days not yet lived, solid for the ones that are. Count the rings for
@@ -898,7 +620,7 @@
   </div>
 </div>
 <div class="hint">Tap to replay</div></div>
-<p class="item__note">The material lays down one contour every thirty days, outward from the middle, and the ring being drawn is dotted for the days not yet lived. Count the rings for the months, look at the bright tip for today. Twelve rings reaches the rim, so a year is unmistakable. Fits <b>quantity down</b>, where the weight moves slowly and the person needs proof that time has actually passed underneath it.</p></div><div class="item"><p class="item__label"><span class="item__n">10</span><span class="item__name">The glass clears</span><span class="vd vd--g" title="Approved by Malik">&#128077;</span></p><style>
+<p class="item__note">The material lays down one contour every thirty days, outward from the middle, and the ring being drawn is dotted for the days not yet lived. Count the rings for the months, look at the bright tip for today. Twelve rings reaches the rim, so a year is unmistakable. Fits <b>quantity down</b>, where the weight moves slowly and the person needs proof that time has actually passed underneath it.</p></div><div class="item"><p class="item__label"><span class="item__n">7</span><span class="item__name">The glass clears</span><span class="vd vd--g" title="Approved by Malik">&#128077;</span></p><style>
 /* ex-5 THE GLASS CLEARS. A milestone shows nothing until the day it happens, so
    the engine underneath does the showing: every session wipes fog off the pane.
    Day 7 the card is milk and you cannot read it. Day 300 it says what it is,

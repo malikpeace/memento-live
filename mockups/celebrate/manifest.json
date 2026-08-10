@@ -8,7 +8,7 @@
     {
      "key": "qu-1",
      "name": "The marker posts",
-     "note": "The fifth you just crossed, shown as five posts on one line with the <b>date each one fell</b>. Quantity up with a target has natural chapters at every fifth, and dating them turns a progress bar into a history: Mar 3, Jun 1, today. The line says 216 days made these 60, then 40 still open, so the distance closed and the distance left both get stated. One accent: the post that just landed."
+     "note": "The fifth you just crossed, shown as five posts on one line with the <b>date each one fell</b>. Quantity up with a target has natural chapters at every fifth, and dating them turns a progress bar into a history: Mar 3, Jun 1, today. The line says 216 days made these 60, then 40 still open, so the distance closed and the distance left both get stated. One accent: the post that just landed. Passed posts now step taller toward today, still uncolored (2026-08-10)."
     },
     {
      "key": "qu-2",
@@ -43,18 +43,18 @@
    "concepts": [
     {
      "key": "qd-1",
-     "name": "Marks on the way down",
-     "note": "The 20 lbs target broken into five marks running downward, with only the one you just crossed lit. The marks still below stay dim, so the road left is visible without becoming the headline, which is the honest way to show a fifth crossed on a number that falls."
+     "name": "The slider down",
+     "note": "REBUILT 2026-08-10 (Malik: horizontal, numbers on a slider showing where they are and where they are going). One line: the start weight named on the left, the goal named on the right, the real fifths as small weights above the line, and the accent post carrying today's number. The travelled stretch of the line is brighter. Positions are plain percentages of start-to-goal, so any pair of numbers lays out correctly."
     },
     {
      "key": "qd-2",
      "name": "The record book",
-     "note": "No target was ever set on this goal, so there is no percentage to draw. Instead every previous low is listed with its date and only the newest one is coloured, because when nobody set a number the <b>new low itself</b> is the whole event."
+     "note": "REBUILT AGAIN 2026-08-10 (Malik: screen time, his audience's real fight). One concrete case: \"less time on my phone\", no hard target, the week's daily average logged. The record book is their own lowest weeks; the only thing to beat is themselves."
     },
     {
      "key": "qd-3",
      "name": "The number you carry",
-     "note": "The scale reading falls from 214 to 199 in front of you with a soft breath of your colour behind it. For weight and debt the number people hold in their head is the current one, not the amount lost, so the current one is the hero and beat 2 pays the receipt: 96 days, and the last time you were under 200 was 2019."
+     "note": "The scale reading falls from 214 to 199 in front of you with a soft breath of your colour behind it. For weight and debt the number people hold in their head is the current one, not the amount lost, so the current one is the hero and beat 2 pays the receipt: 96 days, and the last time you were under 200 was 2019. His line added verbatim: \"You said you wanted to be under 200.\""
     },
     {
      "key": "qd-4",
@@ -90,7 +90,7 @@
     {
      "key": "fr-3",
      "name": "The fiftieth",
-     "note": "Fifty runs as fifty dots, the last one lit. The number lands alone first, then the cost arrives, 101 days and 268 miles. Rep milestones are the one place frequency gets a real, rare hit, and a countable field of evidence beats any badge. This is the only screen in my five carrying the M, quiet at the foot."
+     "note": "Fifty runs as fifty dots, the last one lit. The number lands alone first, then the cost arrives, 101 days and 268 miles. Rep milestones are the one place frequency gets a real, rare hit, and a countable field of evidence beats any badge. This is the only screen in my five carrying the M, quiet at the foot. Label now \"Total runs\" (2026-08-10)."
     },
     {
      "key": "fr-4",
@@ -127,7 +127,7 @@
     {
      "key": "mt-3",
      "name": "The hard ones",
-     "note": "Day 30 off nicotine pouches, told through the days that nearly went. Thirty bars sit at one height, then the nine days they logged as hard stand up in the accent. It acknowledges the cost without any drama, just a count. The close is the whole point for this type: the nine hard days are <b>spent and counted</b>, they do not come back around. <b>Data note:</b> the hard days are REAL, they come from the daily check-in (mood 1-2 of 5, already in state.checkins). The beat only renders when check-ins exist; without them it swaps to a plain day-count receipt. Nothing invented."
+     "note": "Day 30 off nicotine pouches, told through the days that nearly went. Thirty bars sit at one height, then the nine days they logged as hard stand up in the accent. It acknowledges the cost without any drama, just a count. The close is the whole point for this type: the nine hard days are <b>spent and counted</b>, they do not come back around. <b>Data note:</b> the hard days are REAL, they come from the daily check-in (mood 1-2 of 5, already in state.checkins). The beat only renders when check-ins exist; without them it swaps to a plain day-count receipt. Nothing invented. SCOPE (Malik 2026-08-10): the \"today felt hard\" log is OFFERED ONLY on maintenance/quit-a-habit goals, never forced on everyone; mt-3 renders only when hard days were actually logged."
     },
     {
      "key": "mt-4",
@@ -191,7 +191,7 @@
     {
      "key": "op-1",
      "name": "Two entries, 90 days apart",
-     "note": "Their day one journal lands alone, then this week's entry appears under it with the accent rule beside it. <b>Their words are the whole screen</b>, awkward spelling and the tuesday he still snapped included. Open goals have nothing to count, so the only honest proof is that the person writing today is not the person who wrote in March."
+     "note": "Their day one journal lands alone, then this week's entry appears under it with the accent rule beside it. <b>Their words are the whole screen</b>, awkward spelling and the tuesday he still snapped included. Open goals have nothing to count, so the only honest proof is that the person writing today is not the person who wrote in March. CADENCE (Malik 2026-08-10): fires first at day 30, then on the ladder, never a 90-day wait."
     },
     {
      "key": "op-2",
@@ -200,18 +200,18 @@
     },
     {
      "key": "op-3",
-     "name": "The ledger of moves",
-     "note": "Opens on the one thing they just did, in their words, then stacks the moves that came before it with dates. <b>No count, no total, no rating</b>, just the pile of real things getting taller. The deposit is literally what they did that day, which is the whole point of an open goal."
+     "name": "Proof number 14",
+     "note": "CHANGED COMPLETELY 2026-08-10 (Malik did not buy the ledger wall). Tonight's logged moment held up alone, then the one honest number an open goal has: how many such moments they have written down, and the date of the first."
     },
     {
      "key": "op-4",
      "name": "Day 30, the goal and the why",
-     "note": "A month in there is nothing to show yet, so the screen shows the goal sentence, then the why they wrote underneath it. <b>Two pieces of their own writing, one month old.</b> The accent is a soft bloom behind the words, small ceremony for a small marker, no meter anywhere near it."
+     "note": "ENRICHED 2026-08-10 (was goal + why alone, \"meh\"). The why quote stays the heart; the land beat now carries real receipts, days carried and entries written, before the deposit line."
     },
     {
      "key": "op-5",
      "name": "A year, still open",
-     "note": "Their sentence with a thin accent line running off the bottom of the screen, then 365 and the plain fact that this one has no finish. <b>Open goals never complete</b>, and pretending otherwise would be a lie, so the deposit says still open and leaves it there."
+     "note": "Their sentence with a thin accent line running off the bottom of the screen, then 365 and the plain fact that this one has no finish. <b>Open goals never complete</b>, and pretending otherwise would be a lie, so the deposit says still open and leaves it there. Malik loves it but a year must not be the first sighting; earlier rungs come from the same day ladder."
     }
    ],
    "pass": true,

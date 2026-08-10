@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Field test — fuck with the values</title>
+<link rel="stylesheet" href="_kit.css">
+<style>
+  .fx-wrap{padding:22px 20px 90px;max-width:1760px;margin:0 auto}
+  .fx-wrap h1{font-size:26px;font-weight:700;letter-spacing:-.02em;margin:0 0 6px}
+  .fx-sub{color:var(--text-mid);font-size:14px;margin:0 0 18px;max-width:78ch;line-height:1.55}
+
+  .fx-presets{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 26px}
+  .fx-presets button{-webkit-appearance:none;appearance:none;border:0;cursor:pointer;
+    font:600 13px/1 var(--font);color:var(--text-hi);padding:10px 14px;border-radius:9px;
+    background:rgba(var(--ink),.07);box-shadow:inset 0 1px 0 rgba(var(--ink),.06)}
+  .fx-presets button:active{background:rgba(var(--ink),.12)}
+
+  .fx-row{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start;margin-bottom:44px}
+  .fx-cell{width:390px;max-width:100%}
+  .fx-cell h2{font-size:15px;font-weight:700;letter-spacing:-.01em;margin:0 0 3px}
+  .fx-cell .fx-d{font-size:12.5px;color:var(--text-mid);line-height:1.5;margin:0 0 12px}
+
+  .fx-ctl{margin:14px 0 0;padding:14px;border-radius:14px;background:rgba(var(--ink),.05);
+    box-shadow:inset 0 1px 0 rgba(var(--ink),.06)}
+  .fx-ctl label{display:flex;align-items:center;gap:10px;margin:9px 0;font-size:12.5px;color:var(--text-mid)}
+  .fx-ctl label span{flex:0 0 96px}
+  .fx-ctl input[type=range]{flex:1;accent-color:var(--accent)}
+  .fx-ctl input[type=number],.fx-ctl input[type=text],.fx-ctl select{
+    width:96px;padding:7px 9px;border:0;border-radius:8px;font:600 14px/1 var(--font);
+    color:var(--text-hi);background:rgba(var(--ink),.08);box-shadow:inset 0 1px 0 rgba(var(--ink),.06);
+    font-variant-numeric:tabular-nums}
+  .fx-ctl input[type=text]{width:130px}
+  .fx-ctl .fx-out{margin-left:auto;font-size:12.5px;font-weight:700;color:var(--text-hi);
+    font-variant-numeric:tabular-nums}
+  .fx-fire{margin-top:10px;font-size:12px;line-height:1.5;color:var(--text-lo)}
+  .fx-fire b{color:var(--accent);font-weight:650}
+
+  /* smaller phone for the rig so controls + phone fit one screen */
+  .fx-cell .ph{height:660px;cursor:default}
+
+  /* ---------- shared stage pieces (mirrors the approved fragments) ---------- */
+  .fxst{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+    justify-content:center;padding:34px 26px;text-align:center}
+  .fx-heroline{display:flex;align-items:baseline;gap:11px;justify-content:center;max-width:100%}
+  .fx-heroline .of{font-size:22px;font-weight:650;letter-spacing:-.02em;color:var(--text-mid);
+    font-variant-numeric:tabular-nums}
+  .fx-mfoot{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);width:18px;height:18px;
+    fill:rgba(255,255,255,.14)}
+
+  /* posts (qu-1) */
+  .fxq-axis{width:100%;max-width:312px;margin:26px auto 0}
+  .fxq-marks{display:flex;align-items:flex-end;height:30px;border-bottom:1px solid var(--hairline)}
+  .fxq-cell{flex:1;display:flex;justify-content:center}
+  .fxq-p{width:2px;height:13px;border-radius:1px;background:rgba(var(--ink),.22)}
+  .fxq-cell.is-past .fxq-p{background:rgba(var(--ink),.55)}
+  .fxq-cell.is-now .fxq-p{background:var(--accent)}
+  .fxq-labels{display:flex;margin-top:9px}
+  .fxq-lc{flex:1;text-align:center;min-width:0}
+  .fxq-num{font-size:12.5px;font-weight:650;font-variant-numeric:tabular-nums;
+    letter-spacing:-.02em;color:var(--text-lo);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 1px}
+  .fxq-lc.is-past .fxq-num{color:rgba(var(--ink),.62)}
+  .fxq-lc.is-now .fxq-num{color:var(--text-hi)}
+  .fxq-date{font-size:10px;color:var(--text-lo);margin-top:4px;height:12px;font-variant-numeric:tabular-nums;
+    overflow:hidden;white-space:nowrap}
+
+  /* slider (qd-1) */
+  .fxsl{position:relative;width:100%;max-width:300px;height:78px;margin:26px auto 0}
+  .fxsl-track{position:absolute;left:0;right:0;top:46px;height:1px;background:rgba(var(--ink),.12)}
+  .fxsl-gone{position:absolute;left:0;top:46px;height:1px;background:rgba(var(--ink),.34)}
+  .fxsl-t{position:absolute;top:39px;width:2px;height:15px;border-radius:1px;
+    background:rgba(var(--ink),.20);transform:translateX(-50%)}
+  .fxsl-t.is-past{background:rgba(var(--ink),.50)}
+  .fxsl-t small{position:absolute;bottom:19px;left:50%;transform:translateX(-50%);
+    font-size:10.5px;font-weight:650;letter-spacing:-.02em;color:var(--text-lo);
+    font-variant-numeric:tabular-nums;white-space:nowrap}
+  .fxsl-t.is-past small{color:rgba(var(--ink),.55)}
+  .fxsl-now{position:absolute;top:33px;width:2.5px;height:21px;border-radius:1px;
+    background:var(--accent);transform:translateX(-50%)}
+  .fxsl-now b{position:absolute;bottom:25px;left:50%;transform:translateX(-50%);
+    font-size:18px;font-weight:750;letter-spacing:-.03em;color:var(--text-hi);
+    font-variant-numeric:tabular-nums;white-space:nowrap}
+  .fxsl-end{position:absolute;top:62px;font-size:10.5px;color:var(--text-lo);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .fxsl-end--a{left:0}
+  .fxsl-end--b{right:0;text-align:right}
+  .fxsl-end b{display:block;font-size:12.5px;font-weight:700;letter-spacing:-.02em;color:var(--text-mid)}
+
+  /* record grid (rf-rec) */
+  .fxg{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;width:238px;margin:24px auto 0}
+  .fxg i{display:block;width:100%;aspect-ratio:1;border-radius:3.5px;background:rgba(var(--ink),.10)}
+  .fxg i.on{background:var(--accent);opacity:.92}
+  .fxg i.today{box-shadow:0 0 0 1.5px rgba(var(--ink),.5)}
+
+  /* week chips (fr-4) */
+  .fxch{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:300px;margin:24px auto 0}
+  .fxch .c{padding:8px 10px;border-radius:9px;background:rgba(var(--ink),.07);
+    box-shadow:inset 0 1px 0 rgba(var(--ink),.06);font-size:12px;font-weight:650;
+    color:var(--text-mid);font-variant-numeric:tabular-nums}
+  .fxch .c.met{background:rgba(var(--accent-rgb),.16);color:var(--text-hi)}
+  .fxch .c.now{box-shadow:0 0 0 1.5px var(--accent)}
+
+  /* op receipts */
+  .fxrc{display:flex;gap:34px;justify-content:center;margin:26px 0 0}
+  .fxrc > div{text-align:center}
+  .fxrc b{display:block;font-size:34px;font-weight:750;letter-spacing:-.03em;
+    color:var(--text-hi);font-variant-numeric:tabular-nums}
+  .fxrc span{font-size:12.5px;color:var(--text-lo)}
+
+  .fx-idle{font-size:13px;color:var(--text-lo);max-width:24ch;line-height:1.5}
+</style>
+</head><body data-accent="cyan">
+<div class="bar">
+  <a href="index.html" style="color:var(--text-mid);text-decoration:none;font-size:13px;font-weight:600">&lsaquo; All</a>
+  <span class="bar__t">Field test</span>
+  <span class="sw" id="sw"></span>
+  <span class="bar__n">move any slider &middot; the screens re-lay themselves from the REAL chooser logic</span>
+</div>
+<div class="fx-wrap">
+  <h1>Fuck with the values</h1>
+  <p class="fx-sub">Every phone below is driven by the same logic file the app will use (chooser.js), not by hand-placed pixels. Change the numbers and watch the layout solve itself. The line under each phone tells you whether a celebration would actually FIRE at that state, because part of being dynamic is knowing when to stay silent.</p>
+
+  <div class="fx-presets" id="presets">
+    <button data-p="users">100 users, day 216</button>
+    <button data-p="day5">Day 5, brand new</button>
+    <button data-p="weight">Weight 270 &rarr; 250</button>
+    <button data-p="debt">Debt $8,000 &rarr; 0</button>
+    <button data-p="million">$1M revenue goal</button>
+    <button data-p="books">Write 3 books</button>
+    <button data-p="year2">Day 500, year two</button>
+    <button data-p="chaos">Ugly numbers</button>
+  </div>
+
+  <div class="fx-row">
+
+    <!-- ================= THE ROAD ================= -->
+    <div class="fx-cell">
+      <h2>The road (marker posts / the slider)</h2>
+      <p class="fx-d">One renderer, both directions. Goal below start = the slider down; above = the posts. Marks come from chooser.milestones(), never hand-picked.</p>
+      <div class="ph"><div class="fxst" id="road"></div></div>
+      <div class="fx-ctl">
+        <label><span>Start</span><input type="number" id="r-start" value="0"></label>
+        <label><span>Goal</span><input type="number" id="r-goal" value="100"></label>
+        <label><span>Today</span><input type="range" id="r-cur" min="0" max="100" value="60" step="1"><b class="fx-out" id="r-cur-out">60</b></label>
+        <label><span>Unit</span><input type="text" id="r-unit" value="paying users"></label>
+        <label><span>Days in</span><input type="range" id="r-days" min="1" max="900" value="216"><b class="fx-out" id="r-days-out">216</b></label>
+        <div class="fx-fire" id="r-fire"></div>
+      </div>
+    </div>
+
+    <!-- ================= THE COUNT ================= -->
+    <div class="fx-cell">
+      <h2>The count (Total runs)</h2>
+      <p class="fx-d">The big number has to survive 5 and 5,000,000. The font fits itself; the ceremony fires on ladder rungs only.</p>
+      <div class="ph"><div class="fxst" id="count"></div></div>
+      <div class="fx-ctl">
+        <label><span>Total</span><input type="range" id="c-n" min="1" max="2000" value="50"><b class="fx-out" id="c-n-out">50</b></label>
+        <label><span>Exact</span><input type="number" id="c-exact" value="50"></label>
+        <label><span>Word</span><input type="text" id="c-word" value="runs"></label>
+        <label><span>Days in</span><input type="range" id="c-days" min="1" max="900" value="132"><b class="fx-out" id="c-days-out">132</b></label>
+        <div class="fx-fire" id="c-fire"></div>
+      </div>
+    </div>
+
+    <!-- ================= DAYS HELD ================= -->
+    <div class="fx-cell">
+      <h2>Days held (maintenance)</h2>
+      <p class="fx-d">The ladder is 7 / 30 / 50 / 100 / 200 / 365, then every 100. Day 6 and day 87 stay silent on purpose.</p>
+      <div class="ph"><div class="fxst" id="days"></div></div>
+      <div class="fx-ctl">
+        <label><span>Day</span><input type="range" id="d-n" min="1" max="1500" value="100"><b class="fx-out" id="d-n-out">100</b></label>
+        <label><span>The line held</span><input type="text" id="d-what" value="without a drink"></label>
+        <div class="fx-fire" id="d-fire"></div>
+      </div>
+    </div>
+
+    <!-- ================= THE RECORD GRID ================= -->
+    <div class="fx-cell">
+      <h2>The record (twelve weeks of days)</h2>
+      <p class="fx-d">The grid is a WINDOW: always the last 12 weeks at most, older history becomes one quiet line. It can never grow off the screen.</p>
+      <div class="ph"><div class="fxst" id="grid"></div></div>
+      <div class="fx-ctl">
+        <label><span>Weeks of history</span><input type="range" id="g-w" min="1" max="60" value="12"><b class="fx-out" id="g-w-out">12</b></label>
+        <label><span>Show-up rate</span><input type="range" id="g-r" min="10" max="100" value="72"><b class="fx-out" id="g-r-out">72%</b></label>
+      </div>
+    </div>
+
+    <!-- ================= WEEK CHIPS ================= -->
+    <div class="fx-cell">
+      <h2>Week chips (frequency)</h2>
+      <p class="fx-d">Also windowed: the last 8 weeks as chips, everything older summarised. Tolerant by design, a missed week is a dimmer chip, not a broken streak.</p>
+      <div class="ph"><div class="fxst" id="chips"></div></div>
+      <div class="fx-ctl">
+        <label><span>Weeks running</span><input type="range" id="h-w" min="1" max="30" value="6"><b class="fx-out" id="h-w-out">6</b></label>
+        <label><span>Target / week</span><input type="range" id="h-t" min="1" max="7" value="4"><b class="fx-out" id="h-t-out">4</b></label>
+      </div>
+    </div>
+
+    <!-- ================= OPEN RECEIPTS ================= -->
+    <div class="fx-cell">
+      <h2>Open receipts (day N, the goal and the why)</h2>
+      <p class="fx-d">Words + counts only, since an open goal has no metric. Singular and plural both have to read like a human wrote them.</p>
+      <div class="ph"><div class="fxst" id="op"></div></div>
+      <div class="fx-ctl">
+        <label><span>Days carried</span><input type="range" id="o-d" min="1" max="400" value="30"><b class="fx-out" id="o-d-out">30</b></label>
+        <label><span>Entries</span><input type="range" id="o-e" min="0" max="500" value="22"><b class="fx-out" id="o-e-out">22</b></label>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="chooser.js"></script>
+<script>
+(function(){
+  var C = MilestoneChooser;
+  var $ = function(id){ return document.getElementById(id); };
+  function fmt(n){ return Number(n).toLocaleString('en-US'); }
+  function esc(s){ var d=document.createElement('i'); d.textContent=s; return d.innerHTML; }
+  function plural(n, one, many){ return n === 1 ? one : many; }
+
+  /* fit a hero number to the phone: shrink until it clears the padding box */
+  function fitHero(el, max, min){
+    el.style.fontSize = max + 'px';
+    var box = el.parentNode.clientWidth || 320, s = max;
+    while (el.scrollWidth > box && s > min) { s -= 4; el.style.fontSize = s + 'px'; }
+  }
+  function dateBack(days){
+    var d = new Date(Date.now() - days * 86400000);
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  }
+
+  /* ---------------- THE ROAD ---------------- */
+  function road(){
+    var start = +$('r-start').value, goal = +$('r-goal').value;
+    var cur = +$('r-cur').value, unit = $('r-unit').value.trim(), days = +$('r-days').value;
+    $('r-cur-out').textContent = fmt(cur); $('r-days-out').textContent = days;
+    var lo = Math.min(start, goal), hi = Math.max(start, goal);
+    var rng = $('r-cur'); rng.min = lo; rng.max = hi;
+    var host = $('road'), fire = $('r-fire');
+    if (start === goal) {
+      host.innerHTML = '<div class="fx-idle">Start and goal are the same number. The chooser refuses this goal shape; nothing to celebrate, nothing to draw.</div>';
+      fire.textContent = 'No milestones exist for a zero-length road.';
+      return;
+    }
+    var dir = goal < start ? 'down' : 'up';
+    var gp = { target: goal, baseline: start, unit: unit, current: cur, updatedAt: '', history: [] };
+    var marks = C.milestones(gp, dir);
+    var passed = marks.filter(function(m){ return dir === 'down' ? cur <= m : cur >= m; });
+    var nowMark = passed.length ? passed[passed.length - 1] : null;
+    var span = Math.abs(goal - start);
+    var done = Math.abs(cur - start), frac = Math.max(0, Math.min(1, done / span));
+    var remaining = Math.abs(goal - cur);
+    var h = '';
+    h += '<div class="fx-heroline"><span class="n" id="road-hero">' + fmt(cur) + '</span>' + (dir === 'down' && unit ? '<span class="of">' + esc(unit.split(' ')[0]) + '</span>' : '') + '</div>';
+    if (dir === 'up') {
+      /* marker posts: heights climb across the passed set */
+      var cells = '', labels = '';
+      marks.forEach(function(m, i){
+        var isNow = m === nowMark, isPast = passed.indexOf(m) > -1 && !isNow;
+        var ph = 13;
+        if (isPast) {
+          var k = passed.indexOf(m), n = Math.max(1, passed.length - 1);
+          ph = Math.round(16 + (22 - 16) * (n === 1 ? 0 : k / (n - 1)));
+        }
+        if (isNow) ph = 27;
+        cells += '<div class="fxq-cell' + (isNow ? ' is-now' : isPast ? ' is-past' : '') + '"><div class="fxq-p" style="height:' + ph + 'px"></div></div>';
+        var when = '';
+        if (isNow) when = 'today';
+        else if (isPast || passed.indexOf(m) > -1) when = dateBack(Math.round(days * (1 - (Math.abs(m - start) / span))));
+        labels += '<div class="fxq-lc' + (isNow ? ' is-now' : (passed.indexOf(m) > -1 ? ' is-past' : '')) + '">'
+                + '<div class="fxq-num">' + fmt(m) + '</div><div class="fxq-date">' + when + '</div></div>';
+      });
+      h += '<div class="fxq-axis"><div class="fxq-marks">' + cells + '</div><div class="fxq-labels">' + labels + '</div></div>';
+      h += '<div class="sub"><b>' + days + ' days</b> made these ' + fmt(cur) + '.</div>';
+      h += '<div class="cap">' + fmt(remaining) + ' still open.</div>';
+    } else {
+      /* the slider down */
+      var inner = '<span class="fxsl-end fxsl-end--a"><b>' + fmt(start) + '</b>started, ' + dateBack(days) + '</span>'
+                + '<div class="fxsl-track"></div><div class="fxsl-gone" style="width:' + (frac * 100).toFixed(1) + '%"></div>';
+      marks.forEach(function(m){
+        if (m === goal) return;
+        var p = Math.abs(m - start) / span * 100;
+        var isNow = m === nowMark, isPast = passed.indexOf(m) > -1 && !isNow;
+        if (isNow) return;                       /* the accent post carries today */
+        var lbl = (p > 11 && p < 89) ? '<small>' + fmt(m) + '</small>' : '';
+        inner += '<div class="fxsl-t' + (isPast ? ' is-past' : '') + '" style="left:' + p.toFixed(1) + '%">' + lbl + '</div>';
+      });
+      inner += '<div class="fxsl-now" style="left:' + (frac * 100).toFixed(1) + '%"><b>' + fmt(cur) + '</b></div>';
+      inner += '<span class="fxsl-end fxsl-end--b"><b>' + fmt(goal) + '</b>the goal</span>';
+      h += '<div class="fxsl">' + inner + '</div>';
+      h += '<div class="sub">Started at ' + fmt(start) + ', ' + days + ' days ago.</div>';
+      h += '<div class="sub">' + fmt(goal) + ' is ' + fmt(remaining) + ' away.</div>';
+    }
+    h += '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
+    host.innerHTML = h;
+    fitHero($('road-hero'), 84, 30);
+    if (nowMark === null) fire.textContent = 'No mark crossed yet. NOTHING fires; the first ceremony waits for ' + fmt(marks[0]) + '.';
+    else if (nowMark === goal) fire.innerHTML = 'The target itself: the <b>final</b> ceremony fires (and swallows any step under it).';
+    else fire.innerHTML = 'A <b>step</b> fires at ' + fmt(nowMark) + ' (once, ever; recrossing after a bounce is silent). ' + marks.length + ' marks on this road.';
+  }
+
+  /* ---------------- THE COUNT ---------------- */
+  function ladderHit(n){
+    var hit = null;
+    C.DAY_LADDER.forEach(function(r){ if (n >= r) hit = r; });
+    if (n >= 365) hit = 365 + Math.floor((n - 365) / 100) * 100;
+    return hit;
+  }
+  function count(){
+    var n = +$('c-exact').value || 1, word = $('c-word').value.trim() || 'runs', days = +$('c-days').value;
+    $('c-n-out').textContent = fmt(+$('c-n').value); $('c-days-out').textContent = days;
+    var host = $('count');
+    host.innerHTML =
+      '<div class="cap" style="margin:0 0 10px">Total ' + esc(word) + '</div>'
+      + '<div class="n" id="count-hero">' + fmt(n) + '</div>'
+      + '<div class="sub" style="max-width:24ch"><b>' + days + ' ' + plural(days, 'day', 'days') + '</b> of showing up made this number.</div>'
+      + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
+    fitHero($('count-hero'), 104, 34);
+    var hit = ladderHit(n), next = null;
+    for (var i = 0; i < C.DAY_LADDER.length; i++) if (C.DAY_LADDER[i] > n) { next = C.DAY_LADDER[i]; break; }
+    if (next === null) next = (365 + Math.floor((n - 365) / 100) * 100) + 100;
+    $('c-fire').innerHTML = hit === n
+      ? '<b>' + fmt(n) + ' is a rung.</b> This screen fires today.'
+      : 'Not a rung: the screen stays silent at ' + fmt(n) + '. Next ceremony at <b>' + fmt(next) + '</b>.';
+  }
+
+  /* ---------------- DAYS HELD ---------------- */
+  function days(){
+    var n = +$('d-n').value, what = $('d-what').value.trim();
+    $('d-n-out').textContent = fmt(n);
+    var host = $('days');
+    host.innerHTML =
+      '<div class="n" id="days-hero">' + fmt(n) + '</div>'
+      + '<div class="sub" style="max-width:22ch"><b>' + fmt(n) + ' ' + plural(n, 'day', 'days') + '</b> ' + esc(what) + '.</div>'
+      + '<div class="cap" style="max-width:26ch">Every one already banked. Nothing later takes them out.</div>'
+      + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
+    fitHero($('days-hero'), 104, 34);
+    var hit = ladderHit(n);
+    $('d-fire').innerHTML = hit === n
+      ? '<b>Day ' + fmt(n) + ' is a rung.</b> The ceremony fires, once ever, via the ledger.'
+      : (hit === null
+        ? 'Before day 7 nothing fires; the first deposit needs a week.'
+        : 'Day ' + fmt(n) + ' is quiet. Last rung was ' + fmt(hit) + '; the ladder decides, not the calendar.');
+  }
+
+  /* ---------------- THE RECORD GRID ---------------- */
+  function seededRand(seed){ return function(){ seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; }; }
+  function grid(){
+    var w = +$('g-w').value, rate = +$('g-r').value;
+    $('g-w-out').textContent = w; $('g-r-out').textContent = rate + '%';
+    var shown = Math.min(w, 12), older = w - shown;
+    var rnd = seededRand(w * 97 + rate);
+    var cells = '', total = shown * 7, onCount = 0;
+    for (var i = 0; i < total; i++) {
+      var on = rnd() * 100 < rate;
+      if (on) onCount++;
+      cells += '<i class="' + (on ? 'on' : '') + (i === total - 1 ? ' today' : '') + '"></i>';
+    }
+    $('grid').innerHTML =
+      '<div class="n n--big">' + onCount + '</div>'
+      + '<div class="sub">of the last ' + fmt(total) + ' days, you showed up.</div>'
+      + '<div class="fxg" style="width:' + Math.round(Math.min(238, 34 * 7)) + 'px">' + cells + '</div>'
+      + (older > 0 ? '<div class="cap">+ ' + older + ' earlier ' + plural(older, 'week', 'weeks') + ' in the record before this window.</div>' : '')
+      + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
+  }
+
+  /* ---------------- WEEK CHIPS ---------------- */
+  function chips(){
+    var w = +$('h-w').value, t = +$('h-t').value;
+    $('h-w-out').textContent = w; $('h-t-out').textContent = t;
+    var shown = Math.min(w, 8), older = w - shown;
+    var rnd = seededRand(w * 131 + t), html = '', met = 0;
+    for (var i = 0; i < shown; i++) {
+      var hits = Math.max(0, Math.min(7, Math.round(t + (rnd() * 2.4 - 1.1))));
+      var ok = hits >= t; if (ok) met++;
+      html += '<span class="c' + (ok ? ' met' : '') + (i === shown - 1 ? ' now' : '') + '">' + hits + '/' + t + '</span>';
+    }
+    $('chips').innerHTML =
+      '<div class="n n--big">' + met + ' of ' + shown + '</div>'
+      + '<div class="sub" style="max-width:24ch">' + plural(met, 'week', 'weeks') + ' at target in this window.</div>'
+      + '<div class="fxch">' + html + '</div>'
+      + (older > 0 ? '<div class="cap">+ ' + older + ' earlier ' + plural(older, 'week', 'weeks') + ', all still counted in the total.</div>' : '')
+      + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
+  }
+
+  /* ---------------- OPEN RECEIPTS ---------------- */
+  function op(){
+    var d = +$('o-d').value, e = +$('o-e').value;
+    $('o-d-out').textContent = d; $('o-e-out').textContent = e;
+    $('op').innerHTML =
+      '<div style="max-width:288px;font-size:24px;font-weight:600;line-height:1.34;letter-spacing:-.022em;color:var(--text-hi)">&ldquo;Be someone my friends can actually reach.&rdquo;</div>'
+      + '<div class="fxrc">'
+      +   '<div><b>' + fmt(d) + '</b><span>' + plural(d, 'day carried', 'days carried') + '</span></div>'
+      +   '<div><b>' + fmt(e) + '</b><span>' + plural(e, 'entry written', 'entries written') + '</span></div>'
+      + '</div>'
+      + '<div class="deposit" style="margin-top:22px"><b>Day ' + fmt(d) + '.</b> Still yours, in your own words.</div>'
+      + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
+  }
+
+  /* ---------------- presets ---------------- */
+  var PRESETS = {
+    users:   { rs:0, rg:100, rc:60, ru:'paying users', rd:216, c:50, cw:'runs', cd:132, d:100, g:12, gr:72, h:6, ht:4, od:30, oe:22 },
+    day5:    { rs:0, rg:100, rc:4, ru:'paying users', rd:5, c:2, cw:'runs', cd:5, d:5, g:1, gr:60, h:1, ht:4, od:5, oe:1 },
+    weight:  { rs:270, rg:250, rc:262, ru:'lbs', rd:63, c:41, cw:'workouts', cd:63, d:63, g:9, gr:78, h:9, ht:5, od:63, oe:18 },
+    debt:    { rs:8000, rg:0, rc:4700, ru:'$', rd:151, c:14, cw:'payments', cd:151, d:151, g:21, gr:64, h:21, ht:2, od:151, oe:40 },
+    million: { rs:0, rg:1000000, rc:620000, ru:'$', rd:411, c:365, cw:'sales', cd:411, d:411, g:58, gr:88, h:30, ht:6, od:411, oe:120 },
+    books:   { rs:0, rg:3, rc:2, ru:'books', rd:290, c:2, cw:'books', cd:290, d:290, g:41, gr:52, h:12, ht:3, od:290, oe:65 },
+    year2:   { rs:0, rg:1000, rc:743, ru:'subscribers', rd:500, c:500, cw:'posts', cd:500, d:500, g:60, gr:81, h:30, ht:5, od:400, oe:500 },
+    chaos:   { rs:187, rg:11, rc:63, ru:'open tickets', rd:733, c:1847, cw:'sessions', cd:733, d:1387, g:60, gr:33, h:30, ht:7, od:399, oe:0 }
+  };
+  function apply(p){
+    $('r-start').value = p.rs; $('r-goal').value = p.rg;
+    var rng = $('r-cur'); rng.min = Math.min(p.rs, p.rg); rng.max = Math.max(p.rs, p.rg); rng.value = p.rc;
+    $('r-unit').value = p.ru; $('r-days').value = p.rd;
+    $('c-exact').value = p.c; $('c-n').value = Math.min(2000, p.c); $('c-word').value = p.cw; $('c-days').value = p.cd;
+    $('d-n').value = Math.min(1500, p.d);
+    $('g-w').value = p.g; $('g-r').value = p.gr;
+    $('h-w').value = p.h; $('h-t').value = p.ht;
+    $('o-d').value = Math.min(400, p.od); $('o-e').value = p.oe;
+    all();
+  }
+  document.getElementById('presets').addEventListener('click', function(e){
+    var b = e.target.closest('button'); if (b && PRESETS[b.getAttribute('data-p')]) apply(PRESETS[b.getAttribute('data-p')]);
+  });
+
+  /* the range slider mirrors the exact count field both ways */
+  $('c-n').addEventListener('input', function(){ $('c-exact').value = this.value; count(); });
+
+  function all(){ road(); count(); days(); grid(); chips(); op(); }
+  ['r-start','r-goal','r-cur','r-unit','r-days'].forEach(function(id){ $(id).addEventListener('input', road); });
+  ['c-exact','c-word','c-days'].forEach(function(id){ $(id).addEventListener('input', count); });
+  ['d-n','d-what'].forEach(function(id){ $(id).addEventListener('input', days); });
+  ['g-w','g-r'].forEach(function(id){ $(id).addEventListener('input', grid); });
+  ['h-w','h-t'].forEach(function(id){ $(id).addEventListener('input', chips); });
+  ['o-d','o-e'].forEach(function(id){ $(id).addEventListener('input', op); });
+
+  /* accent switcher, same as the gallery */
+  var ACC = [['cyan','#2bd4d4'],['green','#3fd94e'],['amber','#ffb73d'],['rose','#ff6b9d'],['blue','#4f8cff'],['teal','#19c3a6']];
+  var sw = document.getElementById('sw');
+  ACC.forEach(function(a, i){
+    var b = document.createElement('button');
+    b.style.background = a[1]; if (!i) b.className = 'on';
+    b.addEventListener('click', function(){
+      document.body.setAttribute('data-accent', a[0]);
+      [].forEach.call(sw.children, function(x){ x.classList.toggle('on', x === b); });
+    });
+    sw.appendChild(b);
+  });
+
+  all();
+})();
+</script>
+</body></html>

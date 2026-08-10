@@ -1,39 +1,53 @@
 <style>
+/* qd-1 REBUILT (Malik: the vertical rail did not land; show the numbers on a
+   slider, where they are and where they are going). One horizontal line:
+   the start weight on the left, the target on the right, the real fifths as
+   ticks in between, and the accent post standing where the scale is today.
+   Travel toward the goal reads left to right no matter which way the number
+   moves. */
 [data-c="qd-1"] .lead{display:flex;align-items:baseline;gap:11px}
 [data-c="qd-1"] .lead .of{font-size:24px;font-weight:650;letter-spacing:-.02em;
   color:var(--text-mid);font-variant-numeric:tabular-nums}
 
-[data-c="qd-1"] .rail{position:relative;width:78px;height:238px;
-  display:grid;grid-template-rows:repeat(5,1fr);margin-bottom:8px}
-[data-c="qd-1"] .rail::before{content:"";position:absolute;left:0;top:10%;bottom:10%;
-  width:1px;background:rgba(var(--ink),.10)}
-[data-c="qd-1"] .rail::after{content:"";position:absolute;left:0;top:10%;height:20%;
-  width:1px;background:rgba(var(--ink),.32)}
+[data-c="qd-1"] .sl{position:relative;width:296px;height:74px;margin-bottom:14px}
+[data-c="qd-1"] .sl__track{position:absolute;left:0;right:0;top:46px;height:1px;
+  background:rgba(var(--ink),.12)}
+/* the road already travelled, slightly brighter than the road ahead */
+[data-c="qd-1"] .sl__gone{position:absolute;left:0;top:46px;height:1px;width:40%;
+  background:rgba(var(--ink),.34)}
+[data-c="qd-1"] .sl__t{position:absolute;top:39px;width:2px;height:15px;border-radius:1px;
+  background:rgba(var(--ink),.20);transform:translateX(-50%)}
+[data-c="qd-1"] .sl__t.is-past{background:rgba(var(--ink),.50)}
+/* interim weights ride ABOVE the line; the two ends are named below it, so
+   a tick near an end never collides with the end label */
+[data-c="qd-1"] .sl__t small{position:absolute;bottom:19px;left:50%;transform:translateX(-50%);
+  font-size:11px;font-weight:650;letter-spacing:-.02em;color:var(--text-lo);
+  font-variant-numeric:tabular-nums}
+[data-c="qd-1"] .sl__t.is-past small{color:rgba(var(--ink),.55)}
+/* today: the accent post, its weight carried above it */
+[data-c="qd-1"] .sl__now{position:absolute;top:33px;width:2.5px;height:21px;border-radius:1px;
+  background:var(--accent);transform:translateX(-50%)}
+[data-c="qd-1"] .sl__now b{position:absolute;bottom:25px;left:50%;transform:translateX(-50%);
+  font-size:19px;font-weight:750;letter-spacing:-.03em;color:var(--text-hi);
+  font-variant-numeric:tabular-nums}
+/* the two ends, named under the line */
+[data-c="qd-1"] .sl__end{position:absolute;top:62px;font-size:11px;color:var(--text-lo);
+  font-variant-numeric:tabular-nums}
+[data-c="qd-1"] .sl__end--a{left:0}
+[data-c="qd-1"] .sl__end--b{right:0;text-align:right}
+[data-c="qd-1"] .sl__end b{display:block;font-size:13px;font-weight:700;letter-spacing:-.02em;
+  color:var(--text-mid)}
 
-[data-c="qd-1"] .mk{display:grid;grid-template-columns:52px auto;align-items:center;
-  opacity:0;transform:translateY(5px)}
-[data-c="qd-1"] .mk i{display:block;width:20px;height:1px;background:rgba(var(--ink),.18)}
-[data-c="qd-1"] .mk span{justify-self:start;font-size:16px;font-weight:700;letter-spacing:-.025em;
-  font-variant-numeric:tabular-nums;color:var(--text-lo)}
-[data-c="qd-1"] .mk--done i{background:rgba(var(--ink),.30)}
-[data-c="qd-1"] .mk--done span{color:rgba(var(--ink),.60)}
-[data-c="qd-1"] .mk--now i{width:42px;height:2px;background:var(--accent)}
-[data-c="qd-1"] .mk--now span{font-size:22px;color:var(--text-hi)}
-
-[data-c="qd-1"] .b.on .mk{animation:qd1mk .5s cubic-bezier(.2,.8,.3,1) forwards}
-[data-c="qd-1"] .b.on .mk:nth-child(1){animation-delay:.05s}
-[data-c="qd-1"] .b.on .mk:nth-child(2){animation-delay:.12s}
-[data-c="qd-1"] .b.on .mk:nth-child(3){animation-delay:.19s}
-[data-c="qd-1"] .b.on .mk:nth-child(4){animation-delay:.26s}
-[data-c="qd-1"] .b.on .mk:nth-child(5){animation-delay:.33s}
-@keyframes qd1mk{to{opacity:1;transform:translateY(0)}}
+[data-c="qd-1"] .b.on .sl__gone{transform-origin:left;animation:qd1gone .7s cubic-bezier(.2,.8,.3,1) .15s both}
+@keyframes qd1gone{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+[data-c="qd-1"] .b.on .sl__now{animation:qd1now .5s cubic-bezier(.2,.8,.3,1) .55s both}
+@keyframes qd1now{from{opacity:0;transform:translateX(-50%) translateY(6px)}to{opacity:1;transform:translateX(-50%)}}
 
 [data-c="qd-1"] .sub{text-wrap:balance}
 [data-c="qd-1"] .sub + .sub{margin-top:7px}
-
 [data-c="qd-1"] .deposit{text-wrap:balance}
 @media (prefers-reduced-motion:reduce){
-  [data-c="qd-1"] .mk{opacity:1;transform:none}
+  [data-c="qd-1"] .b.on .sl__gone,[data-c="qd-1"] .b.on .sl__now{animation:none}
 }
 </style>
 <div class="ph" data-c="qd-1">
@@ -48,15 +62,18 @@
     </div>
 
     <div class="b b2">
-      <!-- the marks are REAL scale weights on the way down to the target
-           (Malik: if you're 300 going to 250, show the road in those numbers,
-           never in "X of Y down" arithmetic they have to convert) -->
-      <div class="rail">
-        <div class="mk mk--done"><i></i><span>266</span></div>
-        <div class="mk mk--now"><i></i><span>262</span></div>
-        <div class="mk"><i></i><span>258</span></div>
-        <div class="mk"><i></i><span>254</span></div>
-        <div class="mk"><i></i><span>250</span></div>
+      <!-- the ticks are REAL scale weights on the way down (Malik: real
+           numbers, never "X of Y down" arithmetic). Positions are simple
+           percentages of |start - target|, so any weights land correctly. -->
+      <div class="sl">
+        <span class="sl__end sl__end--a"><b>270</b>started, Mar 3</span>
+        <div class="sl__track"></div>
+        <div class="sl__gone"></div>
+        <div class="sl__t is-past" style="left:20%"><small>266</small></div>
+        <div class="sl__now" style="left:40%"><b>262</b></div>
+        <div class="sl__t" style="left:60%"><small>258</small></div>
+        <div class="sl__t" style="left:80%"><small>254</small></div>
+        <span class="sl__end sl__end--b"><b>250</b>the goal</span>
       </div>
       <div class="sub">Started at 270, 63 days ago.</div>
       <div class="sub">250 is 12 away.</div>

@@ -81,6 +81,10 @@
          v += sign * step) {
       out.push(Math.round(v));
     }
+    /* rounding can leave a stray mark almost on top of the target (187->11
+       gave ...47, 12, 11). A step that lands within 60% of a step of the
+       final is noise: drop it, the final IS that celebration. */
+    while (out.length && Math.abs(gp.target - out[out.length - 1]) < step * 0.6) out.pop();
     out.push(gp.target);
     return out;
   }

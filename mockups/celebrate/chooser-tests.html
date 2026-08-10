@@ -44,6 +44,9 @@ t('L1 tiny target: write 3 books celebrates per unit', function () {
 t('L1 down with no baseline: only the end is knowable', function () {
   eq(C.milestones(gpOf({ target:199, baseline:null }), 'down'), [199]);
 });
+t('L1 rounding never strands a mark on the target: 187->11', function () {
+  eq(C.milestones(gpOf({ target:11, baseline:187 }), 'down'), [152,117,82,47,11]);
+});
 
 /* ---------- L7 direction ---------- */
 t('L7 baseline beats verbs: 214 -> 164 is down', function () {
