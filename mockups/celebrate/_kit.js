@@ -26,6 +26,11 @@
     var fresh = st.cloneNode(true);
     st.parentNode.replaceChild(fresh, st);     // hard reset every animation
     ph._beats = [].slice.call(fresh.querySelectorAll('.b'));
+    /* cloneNode copies the LIVE class list, so a replay carried the finished
+       beat's .on into the fresh stage and lit it underneath beat 1. Two beats
+       on at once, stacked and unreadable. Clear the flag on every beat before
+       the sequence starts. */
+    ph._beats.forEach(function(b){ b.classList.remove('on'); });
     ph._i = -1;
     step(ph);
   }
