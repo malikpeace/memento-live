@@ -7782,6 +7782,10 @@ const MementoView = (function () {
   }
 
   function destroy() {
+    // the customize-from-home flag belongs to ONE visit; a record closed any
+    // other way (chevron, swipe, escape) must not leave it armed for a later
+    // sheet opened from inside.
+    try { _mfCustomizeFromHome = false; } catch (e) {}
     if (!view) return;
     const v = view;
     view = null;
@@ -7886,8 +7890,14 @@ try {
 // the customise sheet lives inside the record, which is destroyed on close,
 // so a HOME hold had nothing to open. This opens the record and then the
 // sheet the moment the builder has it.
+// v1161 (Malik): holding the card on the HOME is a customize gesture, not a
+// way in. The sheet lives inside the record, so the record still has to be
+// built, but when they are done we put them back exactly where they were.
+// The flag is only set when the record was NOT already open.
+let _mfCustomizeFromHome = false;
 function _mfOpenCustomize() {
   try {
+    try { _mfCustomizeFromHome = !MementoView.isActive(); } catch (e) { _mfCustomizeFromHome = false; }
     MementoView.open();
     let tries = 0;
     const t = setInterval(() => {
@@ -8817,6 +8827,12 @@ function _mfSkinsInit(ov, wrap, sig) {
   };
   const closeSheet = () => {
     sheet.classList.remove('is-open');
+    // v1161: opened by a hold on the HOME, so Done (or the scrim) returns
+    // them to the home instead of stranding them inside the Memento.
+    if (_mfCustomizeFromHome) {
+      _mfCustomizeFromHome = false;
+      setTimeout(() => { try { MementoView.close(); } catch (e) {} }, 200);
+    }
     // Only hide if it has not been re-opened in the meantime, and never leave
     // it un-hidden if the timer is throttled away: the record's own close
     // hides it too (v1147).
