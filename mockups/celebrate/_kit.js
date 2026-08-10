@@ -64,15 +64,35 @@
           life:0, max:150+Math.random()*120, shape:Math.random()<.5?'r':'c' });
       }
     }
+    /* the onboarding shower, ported (Malik: rain from the top like the
+       onboarding celebration, common theme): a CONSTANT gentle fall, a couple
+       of pieces per second, barely accelerating, swaying as they drop. */
+    function rainDrop(){
+      if (parts.length > 200) return;
+      parts.push({ x:Math.random()*W, y:-12,
+        vx:(Math.random()-.5)*.5, vy:.7+Math.random()*.9,
+        g:.004+Math.random()*.006, size:4+Math.random()*5,
+        rot:Math.random()*6.28, vr:(Math.random()-.5)*.14,
+        color:colors[(Math.random()*colors.length)|0],
+        life:0, max:900, sway:.2+Math.random()*.5, sp:Math.random()*6.28,
+        shape:Math.random()<.5?'r':'c' });
+    }
     burst(W*.5, H*.42, 54);
-    var ver = (ph._cfVer = (ph._cfVer||0)+1);
+    var ver = (ph._cfVer = (ph._cfVer||0)+1), _frame = 0;
     (function tick(){
       if (ph._cfVer !== ver || !cv.isConnected) return;
       ctx.clearRect(0,0,W,H);
-      var live = 0, done = performance.now()-t0 > 4500;
+      _frame++;
+      /* the shower keeps falling while the celebration is up; it stops when
+         the ceremony is replayed/advanced (ver bump) or after 30s as a guard */
+      var showering = performance.now()-t0 < 30000;
+      if (showering && _frame % 13 === 0) rainDrop();
+      if (_frame % 400 === 0) parts = parts.filter(function(q){ return q.life<=q.max && q.y<H+30; });
+      var live = 0;
       for (var i=0;i<parts.length;i++){ var q=parts[i];
         if (q.life>q.max || q.y>H+24) continue; live++;
         q.life++; q.vy+=q.g; q.x+=q.vx; q.y+=q.vy; q.vx*=.992; q.rot+=q.vr;
+        if (q.sway) q.x += Math.sin(q.life*.03+q.sp)*q.sway;
         var a = q.life>q.max-40 ? (q.max-q.life)/40 : 1;
         ctx.globalAlpha = Math.max(0,a); ctx.fillStyle = q.color;
         ctx.save(); ctx.translate(q.x,q.y); ctx.rotate(q.rot);
@@ -81,7 +101,7 @@
         ctx.restore();
       }
       ctx.globalAlpha = 1;
-      if (!live || done) { ctx.clearRect(0,0,W,H); return; }
+      if (!live && !showering) { ctx.clearRect(0,0,W,H); return; }
       requestAnimationFrame(tick);
     })();
   }
