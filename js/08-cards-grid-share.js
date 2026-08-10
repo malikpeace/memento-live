@@ -3839,17 +3839,24 @@ function ccGoalShape() {
       const d = new Date(ai.deadline + 'T00:00:00');
       if (isFinite(d) && d > new Date()) { deadline = d; deadlineText = String(ai.deadlineText || ''); }
     }
-    // cadence: sessions per week, for frequency goals
+    // cadence: sessions per week. The PLAN is the best witness (v1153): its
+    // commitment contract (targetCompletions over windowDays) IS the rate.
+    const pa0 = (state.action && state.action.primaryAction) || {};
     let cadence = 0;
-    if (ai && isFinite(Number(ai.cadence))) cadence = Math.max(0, Math.min(7, Number(ai.cadence)));
+    if (pa0.shape === 'lever' && Number(pa0.windowDays) >= 7 && Number(pa0.targetCompletions) >= 1) {
+      cadence = Math.max(1, Math.min(7, Math.round(Number(pa0.targetCompletions) / Number(pa0.windowDays) * 7)));
+    }
+    if (!cadence && ai && isFinite(Number(ai.cadence))) cadence = Math.max(0, Math.min(7, Number(ai.cadence)));
     if (!cadence && type === 'frequency') {
       const m = s.match(/(\d+)\s*(?:x|times?)\s*(?:a|per)\s*week/);
       if (m) cadence = Math.max(1, Math.min(7, parseInt(m[1], 10)));
       else if (/\b(daily|every (day|morning|night))\b/.test(s)) cadence = 7;
       else cadence = 3;
     }
-    // verb decides the done control; holds confirm in the evening
-    let verb = ai && ai.verb ? String(ai.verb) : '';
+    // verb decides the done control; holds confirm in the evening. The plan's
+    // own verb (v1153, AI-written) outranks the classifier's guess.
+    let verb = (pa0.verb && ['ship', 'attempt', 'rep', 'hold', 'check'].indexOf(pa0.verb) >= 0) ? pa0.verb
+      : (ai && ai.verb ? String(ai.verb) : '');
     if (['ship', 'attempt', 'rep', 'hold', 'check'].indexOf(verb) === -1) verb = (type === 'maintenance') ? 'hold' : 'ship';
     return {
       type: type, dir: type === 'quantity_down' ? 'down' : 'up',
@@ -4407,9 +4414,25 @@ function ccSyncDeckHeight(cc) {
     let maxH = 0;
     probe.querySelectorAll(':scope > section').forEach(s => { maxH = Math.max(maxH, s.offsetHeight); });
     probe.remove();
-    const H = Math.max(212, Math.min(320, maxH + 26));
+    // v1153: dots left the card, and Malik wants the deck a touch taller so
+    // the sparser faces never read as empty.
+    const H = Math.max(240, Math.min(340, maxH + 18));
     cc.style.setProperty('--cc-deck-h', H + 'px');
   } catch (e) {}
+}
+
+// v1153 (Malik): does a quiet stretch actually MATTER for this goal? Rest
+// days on a cadence plan are never misses, and a check-cadence plan is
+// SUPPOSED to be quiet. Punishing those with a "days missed" box failed his
+// review. Everyone else (rules, daily plans, quantity climbs, milestones,
+// open goals) missed real days.
+function ccComebackMatters(shape) {
+  try {
+    if (!shape) return true;
+    if (shape.verb === 'check') return false;
+    if (shape.type === 'frequency' && (shape.cadence || 7) < 7) return false;
+    return true;
+  } catch (e) { return true; }
 }
 
 // the entry point: the situation face for a pillar, or null for the legacy card
@@ -4480,7 +4503,18 @@ function renderCommandCenter() {
     // natural height. v1104: swiping is offered from the moment the star
     // exists (two faces pre-plan), not only once there is a plan.
     const _pillars = ccPillarList();
-    const _pillared = _pillars.length > 1;
+    // v1153 THE LOCKDOWN (Malik): a real gap owns the whole box. One face, no
+    // swipe, no dots, until Keep going is tapped. Only when missing days
+    // actually matters for this goal (ccComebackMatters); rate plans get the
+    // calm Back on rhythm face instead and stay swipeable.
+    let _lockdown = false;
+    try {
+      _lockdown = hasClarity && hasPlan &&
+        typeof isComebackGap === 'function' && isComebackGap() &&
+        ccComebackMatters(ccGoalShape());
+    } catch (e) { _lockdown = false; }
+    try { document.body.classList.toggle('is-dormant', _lockdown); } catch (e) {}
+    const _pillared = _pillars.length > 1 && !_lockdown;
     // A face that no longer exists (the plan was reset while consistency was
     // showing) falls back to the action face instead of rendering nothing.
     if (_pillars.indexOf(_ccPillar) === -1) _ccPillar = 'action';
@@ -4496,6 +4530,21 @@ function renderCommandCenter() {
     // today box is the one people see every day.
     const eyebrow = (t) => '<div style="font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-lo);font-weight:700;margin-bottom:8px;">' + t + '</div>';
     const primaryBtn = (label, action) => '<button class="cc-primary" data-cc-action="' + action + '" style="flex:0 1 auto;min-width:180px;font:inherit;font-weight:700;font-size:0.92rem;cursor:pointer;border:none;border-radius:calc(8px * var(--rx, 1));padding:12px 40px;background:var(--solid-bg);color:var(--solid-fg);">' + esc(label) + '</button>';
+
+    if (_lockdown) {
+      // the one face. Same deck language (v-nf scale), sentence case, and the
+      // box keeps the deck's height so the return never feels like a demotion.
+      let gap = 0;
+      try { gap = (typeof comebackGapDays === 'function') ? comebackGapDays() : 0; } catch (e) {}
+      const dayWord = gap === 1 ? 'day' : 'days';
+      return '<section class="cc-card cc-card--solo" style="margin:0 0 14px;padding:22px 22px 20px;border-radius:var(--card-r);background:var(--surface-1);box-shadow:var(--shadow-card), inset 0 1px 0 rgba(255,255,255,0.06);">' +
+        '<div class="v v-nf">' +
+        '<p class="a-sup" style="margin:0">' + gap + ' ' + dayWord + ' missed.</p>' +
+        '<p class="a-move" style="margin-top:8px">No worries, let&rsquo;s get back to it.</p>' +
+        '<div style="margin-top:auto"></div>' +
+        '<button class="a-btn" data-cc-action="comeback" type="button">Keep going</button>' +
+        '</div></section>';
+    }
 
     if (!hasClarity) {
       return wrap(eyebrow('First step') +
@@ -4578,27 +4627,13 @@ function renderCommandCenter() {
         dots('consistency'));
     }
 
-    // COMEBACK MODE: when the user has fallen off (no activity for 2+ days),
-    // show a calm, shame-free way back in instead of the normal "today's one
-    // thing". Normal path below is unchanged when there is no gap.
+    // COMEBACK, the calm kind (v1153): the lockdown above owns the gaps that
+    // matter. Down here only the goals whose quiet days are legitimate reach
+    // us: a rate plan gets Back on rhythm (the gap against THEIR cadence),
+    // and everyone else is simply not punished, the normal faces render.
     if (typeof isComebackGap === 'function' && isComebackGap()) {
-      // v1150: a frequency plan returning after a quiet stretch gets Back on
-      // rhythm (the gap named against THEIR cadence, not seven days) instead
-      // of the generic comeback card.
-      {
-        const _bor = ccSyncBackOnRhythm(ccGoalShape());
-        if (_bor) return wrap(_bor + dots('action'));
-      }
-      // v1048 (Malik): the box stays quiet on a bad day. It names the gap,
-      // says the kind thing, and offers ONE button; the choosing moved to
-      // ComebackPicker on its own page. A home screen should never be busiest
-      // on the day someone feels worst.
-      let gap = 0;
-      try { gap = (typeof comebackGapDays === 'function') ? comebackGapDays() : 0; } catch (e) {}
-      const dayWord = gap === 1 ? 'day' : 'days';
-      return wrap(eyebrow(gap + ' ' + dayWord + ' missed') +
-        '<div style="font-size:1.15rem;font-weight:700;color:var(--text-hi);margin-bottom:14px;">No worries, let&rsquo;s get back to it.</div>' +
-        '<div style="display:flex;">' + primaryBtn('Keep going', 'comeback') + '</div>');
+      const _bor = ccSyncBackOnRhythm(ccGoalShape());
+      if (_bor) return wrap(_bor + dots('action'));
     }
 
     // v1150: the sync box Action face. Null falls back to the shipped hero.
@@ -5114,6 +5149,15 @@ function bindCommandCenter(cc) {
   // set here, never per swipe, and clamped so a runaway line can never
   // squeeze the Memento the way the old measured version did.
   try { ccSyncDeckHeight(cc); } catch (e) {}
+  // v1153 (Malik): the deck dots live UNDER the box, near the bottom of the
+  // screen, not inside the card. Hoisted after every render so each face
+  // keeps authoring them in place.
+  try {
+    if (cc && cc.id === 'commandCenter') {
+      const dn = cc.querySelector('.cc-card .cc-dots');
+      if (dn) { dn.classList.add('cc-dots--deck'); cc.appendChild(dn); }
+    }
+  } catch (e) {}
 
   /* v1051: swipe the phone card between the three pillars.
      Three gestures now live on this card (tap opens Action, hold completes,
@@ -7358,7 +7402,7 @@ function _mfBuildOverlay() {
     try {
       const sk0 = activeCardSkin();
       const tint = sk0 ? skinTintRgb(sk0)
-        : ((getComputedStyle(document.body).getPropertyValue('--accent-rgb') || '').trim() || '58,217,245');
+        : '168,186,212'; // v1153: the house card's room is its own cool steel, not the accent (Malik: the pools looked mismatched)
       // The ROOM is not the tint: it is the tint laid over the near-black
       // chamber at ~22% (the strongest pool in .mf__bg). Judge the blend, not
       // the paint in the tin. Cyan looks bright on its own and still leaves a
@@ -7762,20 +7806,47 @@ try {
    listener could die and the card went dead to the touch, at random, forever.
    It now lives on the DOCUMENT, bound exactly once, and finds the card by
    asking what was touched. No DOM swap can unbind it. */
+// v1153 (Malik: "holding down on the memento doesn't open up the editor"):
+// the customise sheet lives inside the record, which is destroyed on close,
+// so a HOME hold had nothing to open. This opens the record and then the
+// sheet the moment the builder has it.
+function _mfOpenCustomize() {
+  try {
+    MementoView.open();
+    let tries = 0;
+    const t = setInterval(() => {
+      tries++;
+      const ov = document.getElementById('mementoFull');
+      const wrapEl = ov && ov.querySelector('.mfsk-wrap');
+      if (wrapEl && !wrapEl.hidden) { clearInterval(t); return; }
+      const hint = ov && ov.querySelector('.mfsk-hint');
+      if (hint) { clearInterval(t); hint.click(); }
+      else if (tries > 24) clearInterval(t);
+    }, 60);
+  } catch (e) {}
+}
+
 function _mfBindCardTap() {
   if (window._mfTapBound) return;
   window._mfTapBound = true;
-  let tx = 0, ty = 0, t0 = 0, moved = true, onCard = false;
+  let tx = 0, ty = 0, t0 = 0, moved = true, onCard = false, holdT = null, held = false;
+  const cancelHold = () => { if (holdT) { clearTimeout(holdT); holdT = null; } };
   document.addEventListener('pointerdown', (e) => {
     onCard = !!(e.target && e.target.closest && e.target.closest('#dayCard'));
     if (!onCard) return;
-    tx = e.clientX; ty = e.clientY; t0 = Date.now(); moved = false;
+    tx = e.clientX; ty = e.clientY; t0 = Date.now(); moved = false; held = false;
+    // the HOME hold opens the customise sheet (inside the record the sheet's
+    // own binding fires first and this one finds it already open and stops)
+    cancelHold();
+    holdT = setTimeout(() => { holdT = null; if (!moved) { held = true; _mfOpenCustomize(); } }, 480);
   }, true);
   document.addEventListener('pointermove', (e) => {
     if (!onCard || moved) return;
-    if (Math.abs(e.clientX - tx) > 8 || Math.abs(e.clientY - ty) > 8) moved = true;
+    if (Math.abs(e.clientX - tx) > 8 || Math.abs(e.clientY - ty) > 8) { moved = true; cancelHold(); }
   }, true);
   document.addEventListener('pointerup', () => {
+    cancelHold();
+    if (held) { held = false; onCard = false; moved = true; return; }
     if (!onCard) return;
     onCard = false;
     // A tap opens or closes. A deliberate long press does not: 700ms, not 400,
@@ -7796,6 +7867,7 @@ function _mfBindCardTap() {
     if (!moved && quick && !sheetUp) { try { MementoView.toggle(); } catch (e) {} }
     moved = true;
   }, true);
+  document.addEventListener('pointercancel', () => { cancelHold(); onCard = false; moved = true; held = false; }, true);
 }
 try { document.addEventListener('DOMContentLoaded', () => { try { _mfBindCardTap(); } catch (e) {} }); _mfBindCardTap(); } catch (e) {}
 

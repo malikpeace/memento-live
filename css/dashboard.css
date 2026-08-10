@@ -3386,8 +3386,8 @@ html.lowfx .daycard-ns {
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
   opacity: 0; transition: opacity 0.42s ease;
   background:
-    radial-gradient(64% 30% at 50% 14%, rgba(var(--skin-rgb, var(--accent-rgb, 58,217,245)), 0.22), transparent 72%),
-    radial-gradient(130% 70% at 50% 8%, rgba(var(--skin-rgb, var(--accent-rgb, 58,217,245)), 0.09), transparent 76%),
+    radial-gradient(64% 30% at 50% 14%, rgba(var(--skin-rgb, 168,186,212), 0.22), transparent 72%),
+    radial-gradient(130% 70% at 50% 8%, rgba(var(--skin-rgb, 168,186,212), 0.09), transparent 76%),
     linear-gradient(180deg,
       rgba(var(--skin-rgb, var(--accent-rgb, 58,217,245)), 0.05) 0%,
       rgba(var(--skin-rgb, var(--accent-rgb, 58,217,245)), 0.028) 46%,
@@ -4954,7 +4954,7 @@ body.ns-bloom .app.dash-v2 #commandCenter .cc-card--pillars:not([style*="display
      which grew the box and squeezed the Memento square (Malik's glitch). */
   /* v1150: the sync faces measure their own shared height (ccSyncDeckHeight);
      212 stays the floor and the legacy fallback. */
-  height: var(--cc-deck-h, 212px) !important;
+  height: var(--cc-deck-h, 240px) !important;
   justify-content: flex-start !important;
   min-height: 0 !important;
   /* The pillared card carries the three dots that a plain card does not, and
@@ -6347,3 +6347,27 @@ body.mf-open #dashGreetingMobile { opacity: 0; transition: opacity 200ms ease; p
 #mementoFull .viv-wall__keep{margin-top:8px;width:100%;padding:11px;border:0;border-radius:10px;
   cursor:pointer;font:inherit;font-size:14px;font-weight:650;color:var(--hi);
   background:rgba(255,255,255,.09);box-shadow:var(--inset)}
+
+/* ============================================================================
+   v1153 Malik's on-device round. */
+/* The deck dots live under the box, near the screen's bottom edge. */
+#commandCenter > .cc-dots--deck{position:static;display:flex;justify-content:center;
+  gap:7px;margin:12px 0 0;}
+#commandCenter > .cc-dots--deck i{width:6px;height:6px;border-radius:50%;
+  background:rgba(var(--ink),.18)}
+#commandCenter > .cc-dots--deck i.on{background:rgba(var(--ink),.85)}
+/* The lockdown face keeps the deck's stature. */
+.cc-card--solo{min-height:var(--cc-deck-h, 240px);display:flex;flex-direction:column}
+.cc-card--solo .v{flex:1;display:flex;flex-direction:column}
+/* DORMANT (a real gap): the Memento dims like a thing left unlit. */
+body.is-dormant #dayCard{filter:saturate(.55) brightness(.62);transition:filter 1.2s ease}
+body.is-dormant .ambient{opacity:.35;transition:opacity 1.2s ease}
+#dayCard{transition:filter 1.2s ease}
+/* The card's ground reflection stays UNDER the sync box text. */
+#commandCenter{position:relative;z-index:31}
+/* No text selection on the identity surfaces (PWA long-press blue boxes).
+   Anything that takes typing stays selectable. */
+#dayCard, #commandCenter .cc-card, #commandCenter .cc-dots--deck, #mementoFull{
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#mementoFull textarea, #mementoFull [contenteditable], #mementoFull input{
+  -webkit-user-select:text;user-select:text}

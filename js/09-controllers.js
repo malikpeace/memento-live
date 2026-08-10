@@ -4833,18 +4833,8 @@ const TabBar = {
             '</div>' +
           '</div>';
         })() +
-        // Card shape (Malik v807): the Memento card, tall (default) or square.
-        (function () {
-          const cur = (prefs.cardShape === 'square') ? 'square' : 'tall';
-          return '<div class="pref-row">' +
-            '<div class="pref-row__text"><div class="pref-row__title">Card shape</div></div>' +
-            '<div class="you-seg" id="prefShapeSeg" role="radiogroup" aria-label="Card shape">' +
-              [['Tall', 'tall'], ['Square', 'square']].map(o =>
-                '<button type="button" data-shape="' + o[1] + '" role="radio" aria-checked="' + (o[1] === cur) + '"' +
-                (o[1] === cur ? ' class="is-on"' : '') + '>' + o[0] + '</button>').join('') +
-            '</div>' +
-          '</div>';
-        })() +
+        // (Card shape removed v1153, Malik: the tall card is universal until
+        // further notice; js/01 forces tall even on accounts that had square.)
       '</div>' +
       '<div class="you-h">Behavior</div>' +
       '<div class="you-card">' +
@@ -5061,17 +5051,7 @@ const TabBar = {
         this.refreshPrefsSection();
       });
     });
-    // v807: card shape, tall (default) or square.
-    const shapeSeg = document.getElementById('prefShapeSeg');
-    if (shapeSeg) shapeSeg.querySelectorAll('[data-shape]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        state.prefs.cardShape = btn.getAttribute('data-shape') === 'square' ? 'square' : 'tall';
-        persistNow();
-        applyPrefs();
-        try { renderGrid(); } catch (e) {}
-        this.refreshPrefsSection();
-      });
-    });
+    // (card shape control removed v1153; the tall card is universal)
     const feelReset = document.getElementById('prefFeelReset');
     if (feelReset) feelReset.addEventListener('click', () => {
       state.prefs.uiRadius = 1;

@@ -846,6 +846,7 @@ RESPONSE FORMAT - strict raw JSON, no markdown fences, no commentary (a parser r
     "verdict": "'confirmed' | 'upgraded' | 'replaced' when they named their own move; null on the find-it-for-me path.",
     "verdictReason": "ONE sentence, 30 words max. Replaced/upgraded: their own words or numbers as the receipt. Confirmed: why their instinct passes the tests. A visible cut on the find path: what was cut. Empty string when nothing to say.",
     "shape": "'lever' (repeated move, the default) or 'door' (genuine one-shot finishable today).",
+    "verb": "the done-control for this move, exactly one of: 'ship' (an artifact exists when done), 'attempt' (the shots were taken), 'rep' (time or count served), 'hold' (done means the day ENDED compliant: rules like no drinking, under 2,000 calories, no buying; these confirm in the evening), 'check' (measured or inspected on a schedule, like a weekly weigh-in). Most moves are ship or attempt; never mark a rule as ship.",
     "targetCompletions": "INTEGER, completions that satisfy the commitment, sized to THEIR goal and timeframe. Door = 1. Daily lever over two weeks = 14; three-a-week over two weeks = 6; steady open-ended habit defaults to 7. >= 1 and <= windowDays.",
     "windowDays": "INTEGER, days to hit targetCompletions. Door = 1. 'Train three times weekly for two weeks' = 14 (window stays 14 even though target is 6). >= targetCompletions, <= 90."
   },
@@ -1147,7 +1148,11 @@ function normalizeActionPlan(raw = {}) {
     // the find-it path) + its receipt sentence, and the move's shape.
     verdict: ['confirmed', 'upgraded', 'replaced'].includes(raw.primaryAction?.verdict) ? raw.primaryAction.verdict : null,
     verdictReason: trimText(clean(raw.primaryAction?.verdictReason), 300),
-    shape: raw.primaryAction?.shape === 'door' ? 'door' : 'lever'
+    shape: raw.primaryAction?.shape === 'door' ? 'door' : 'lever',
+    // v1153 (GOAL-TAXONOMY): the done-control verb. Hold = evening confirm,
+    // check = cadence face, everything else keeps the tap. The sync box
+    // (js/08 ccGoalShape) reads this before its own guesses.
+    verb: ['ship', 'attempt', 'rep', 'hold', 'check'].includes(raw.primaryAction?.verb) ? raw.primaryAction.verb : ''
   };
   // v900 commitment contract (Codex builds the `N of M` progress line against
   // these two fields): targetCompletions = how many times to do the exact move,

@@ -7,7 +7,7 @@
    ONCE on mismatch. Kills the "phone silently runs old cached js under a new
    index" class (the SW's offline fallback can serve stale files on a bad
    connection; Malik hit this three times in one day). */
-window.MEMENTO_JS_BUILD = 'v1152';
+window.MEMENTO_JS_BUILD = 'v1153';
 /* ============================================
    STATE MANAGEMENT
    ============================================ */
@@ -875,7 +875,9 @@ function applyPrefs() {
     b.classList.toggle('density-compact', p.density === 'compact');
     // v807 (Malik): the Memento card's shape. 'tall' (default, the locked
     // 320x440 card) or 'square'. Pure CSS via body.card-square.
-    b.classList.toggle('card-square', p.cardShape === 'square');
+    // v1153 (Malik): the tall card is universal until further notice; the
+    // square variant is retired even for accounts that had picked it.
+    b.classList.remove('card-square');
     // Feel sliders: corner radius multiplier (--rx) + surface-opacity buckets.
     // At the exact defaults (radius 1, glass 0) the inline overrides are
     // REMOVED so the look comes purely from the CSS token defaults.
