@@ -6442,3 +6442,105 @@ body.is-dormant .ambient{opacity:.35;transition:opacity 1.2s ease}
 /* v1162: the home editor is its own surface. It sits above the home (the
    card is z 20/30 there, not the record's 1001) and never touches the record. */
 .mfsk-wrap--home { z-index: 1200; }
+
+/* ============================================================================
+   v1164 THE MEMENTO EDITOR. A room of its own: the card lifts to the top and
+   the materials sit on a plane beneath it, repainting the real card live.
+   Dark-only cinema surface, same family as the record. */
+#mfEditor {
+  position: fixed; inset: 0; z-index: 1000;
+  overflow: hidden; overscroll-behavior: contain;
+  opacity: 0; transition: opacity 0.34s ease;
+  /* self-lit: the room is dark in BOTH themes, like the record */
+  --surface-0: #050609;
+  --mfe-hi: rgba(245,246,250,.97);
+  --mfe-mid: rgba(238,241,247,.78);
+  --mfe-lo: rgba(232,236,244,.50);
+  color: var(--mfe-hi);
+}
+#mfEditor.is-open { opacity: 1; }
+#mfEditor .mfe__bg {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(70% 34% at 50% 6%, rgba(var(--skin-rgb, var(--accent-rgb, 58,217,245)), 0.16), transparent 72%),
+    radial-gradient(120% 60% at 50% 0%, rgba(var(--skin-rgb, var(--accent-rgb, 58,217,245)), 0.07), transparent 70%),
+    #050609;
+}
+#mfEditor .mfe__title {
+  position: absolute; top: calc(var(--safe-t, 0px) + 20px); left: 0; right: 0;
+  margin: 0; text-align: center; font-size: 15px; font-weight: 700;
+  letter-spacing: -0.01em; color: var(--mfe-mid); pointer-events: none;
+}
+#mfEditor .mfe__close {
+  position: absolute; top: calc(var(--safe-t, 0px) + 12px); right: 14px; z-index: 3;
+  border: 0; cursor: pointer; font: inherit; font-size: 14.5px; font-weight: 650;
+  padding: 9px 17px; border-radius: 999px;
+  background: rgba(255,255,255,0.10); color: var(--mfe-hi);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.09);
+}
+/* the plane: it starts under the lifted card and owns the rest of the screen */
+#mfEditor .mfe__plane {
+  position: absolute; left: 0; right: 0;
+  top: calc(var(--mfe-top, 300px) + 26px); bottom: 0;
+  display: flex; flex-direction: column;
+  padding: 0 20px calc(var(--safe-b, 0px) + 18px);
+  overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  transform: translateY(14px); opacity: 0;
+  transition: transform 0.42s cubic-bezier(0.22,1,0.36,1) 0.06s, opacity 0.34s ease 0.06s;
+}
+#mfEditor .mfe__plane::-webkit-scrollbar { display: none; }
+#mfEditor.is-open .mfe__plane { transform: none; opacity: 1; }
+#mfEditor .mfe__name {
+  margin: 0 0 14px; text-align: center; font-size: 19px; font-weight: 700;
+  letter-spacing: -0.02em; color: var(--mfe-hi);
+}
+/* the materials, as a field you move through, not a strip you scrub */
+#mfEditor .mfe__grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(74px, 1fr));
+  gap: 15px 11px; padding-bottom: 6px;
+}
+#mfEditor .mfe__grid .mfsk-chip { width: 100%; scroll-snap-align: none; }
+#mfEditor .mfe__grid .mfsk-cage { width: 100%; }
+#mfEditor .mfe__rows {
+  margin-top: 22px; padding-top: 4px;
+  display: flex; flex-direction: column; gap: 2px;
+}
+#mfEditor .mfe__row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 13px 0; box-shadow: inset 0 1px 0 rgba(255,255,255,0.07);
+}
+#mfEditor .mfe__row-k { font-size: 14.5px; font-weight: 600; color: var(--mfe-mid); }
+#mfEditor .mfe__seg {
+  display: inline-flex; gap: 2px; padding: 3px; border-radius: 10px;
+  background: rgba(255,255,255,0.055); box-shadow: inset 0 1px 0 rgba(255,255,255,0.07);
+}
+#mfEditor .mfe__seg button {
+  border: 0; cursor: pointer; font: inherit; font-size: 13px; font-weight: 650;
+  padding: 7px 13px; border-radius: 8px; background: transparent; color: var(--mfe-lo);
+  transition: background .18s ease, color .18s ease;
+}
+#mfEditor .mfe__seg button.on { background: rgba(255,255,255,0.13); color: var(--mfe-hi); }
+#mfEditor .mfe__acc { display: inline-flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+#mfEditor .mfe__sw {
+  width: 26px; height: 26px; padding: 0; border: 0; cursor: pointer;
+  border-radius: 50%; background: none;
+}
+#mfEditor .mfe__sw i {
+  display: block; width: 100%; height: 100%; border-radius: 50%;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.22);
+}
+#mfEditor .mfe__sw.is-on i { box-shadow: 0 0 0 2px #050609, 0 0 0 4px rgba(255,255,255,0.75); }
+/* the card rides above the room, exactly as it does inside the record */
+body.mfe-open #dayCard, body.mfe-open .app.dash-v2 #dayCard {
+  position: relative; z-index: 1001 !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  #mfEditor, #mfEditor .mfe__plane { transition: none; }
+}
+/* desktop: the editor is still one column, centred. A 16-across grid of
+   materials read as a swatch library, not somebody's Memento. */
+@media (min-width: 860px) {
+  #mfEditor .mfe__plane { max-width: 620px; margin: 0 auto; padding-left: 24px; padding-right: 24px; }
+  #mfEditor .mfe__grid { grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 18px 14px; }
+}

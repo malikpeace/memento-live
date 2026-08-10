@@ -7886,6 +7886,261 @@ try {
 // the customise sheet lives inside the record, which is destroyed on close,
 // so a HOME hold had nothing to open. This opens the record and then the
 // sheet the moment the builder has it.
+/* ═══════════════════════════════════════════════════════════════════════
+   v1164 THE MEMENTO EDITOR (Malik). Holding the card opens a full-screen
+   room of its own: the real card lifts to the top at about a third size, and
+   the materials live on a plane underneath, so every tap repaints the card
+   they are actually holding, live.
+
+   It obeys the record's laws because they were learned the hard way:
+   - the card is NEVER moved or re-parented, only transformed (v1139),
+   - ONE animation, created once, reversed in place (v1140),
+   - nothing outlives the view: the surface and all its listeners are
+     destroyed on close (v1149),
+   - it never opens while the record is up, and the record's own hold path
+     is untouched.
+   ═══════════════════════════════════════════════════════════════════════ */
+const MementoEditor = (function () {
+  const DUR = 460;
+  const EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
+
+  let ov = null, abort = null, anim = null, openT = '', guard = null;
+  let phase = 'closed';     // closed | opening | open | closing
+  let desiredOpen = false;
+
+  const cardEl = () => document.getElementById('dayCard');
+
+  /* the open pose. Same maths as the record: translate has to pay for the
+     origin term too, or the card lands a few pixels off and reads as a pop. */
+  function measure() {
+    const el = cardEl();
+    if (!el) return false;
+    const face = el.querySelector('.daycard-ns') || el.querySelector('.daycard-wrap') || el;
+    const C = el.getBoundingClientRect();
+    const N = face.getBoundingClientRect();
+    if (!N.height || !C.height) return false;
+    const cs = getComputedStyle(document.documentElement);
+    const safeT = parseFloat(cs.getPropertyValue('--safe-t')) || 0;
+    const top = safeT + 64;                       // clear of the title row
+    const targetH = Math.max(150, Math.min(N.height, window.innerHeight * 0.31));
+    const s = targetH / N.height;
+    const ox = C.left + C.width / 2, oy = C.top + C.height / 2;
+    const dx = (window.innerWidth / 2) - ox - s * ((N.left + N.width / 2) - ox);
+    const dy = top - oy - s * (N.top - oy);
+    openT = 'translate(' + dx.toFixed(2) + 'px,' + dy.toFixed(2) + 'px) scale(' + s.toFixed(4) + ')';
+    if (ov) ov.style.setProperty('--mfe-top', Math.round(top + targetH) + 'px');
+    return true;
+  }
+
+  function build() {
+    const wrap = document.querySelector('#dayCard .daycard-wrap');
+    if (!wrap) return false;
+    abort = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    const sig = abort ? { signal: abort.signal } : undefined;
+    const on = (el, ev, fn, opt) => { if (el) el.addEventListener(ev, fn, sig ? Object.assign({}, opt || {}, sig) : opt); };
+
+    ov = document.createElement('div');
+    ov.id = 'mfEditor';
+    ov.setAttribute('role', 'dialog');
+    ov.setAttribute('aria-label', 'Edit your Memento');
+
+    const cur = () => (state.cardSkin && state.cardSkin.id) || '';
+    const yoursName = (state.profile && state.profile.name) || '';
+    const tiles = [_skChipHtml(null, '', 'Default', cur() === '')]
+      .concat(yoursName ? [_skChipHtml(skinForName(yoursName), 'name', 'Yours', cur() === 'name')] : [])
+      .concat(CARD_SKINS.map(s => _skChipHtml(s, s.n, s.n, cur() === s.n)))
+      .join('');
+
+    ov.innerHTML =
+      '<div class="mfe__bg" aria-hidden="true"></div>' +
+      '<button class="mfe__close" type="button" aria-label="Done">Done</button>' +
+      '<p class="mfe__title">Your Memento</p>' +
+      '<div class="mfe__plane">' +
+        '<p class="mfe__name" id="mfeName">' + esc(cur() || 'Default') + '</p>' +
+        '<div class="mfe__grid" id="mfeGrid">' + tiles + '</div>' +
+        '<div class="mfe__rows">' +
+          '<div class="mfe__row" data-tog="colorapp">' +
+            '<span class="mfe__row-k">Colours the app</span>' +
+            '<span class="mfe__seg">' +
+              '<button type="button" data-v="1"' + (!(state.prefs && state.prefs.skinColorsApp === false) ? ' class="on"' : '') + '>On</button>' +
+              '<button type="button" data-v="0"' + ((state.prefs && state.prefs.skinColorsApp === false) ? ' class="on"' : '') + '>Card only</button>' +
+            '</span>' +
+          '</div>' +
+          '<div class="mfe__row" data-tog="ring">' +
+            '<span class="mfe__row-k">The ring</span>' +
+            '<span class="mfe__seg">' +
+              '<button type="button" data-v="0"' + (!(state.cardSkin && state.cardSkin.ring) ? ' class="on"' : '') + '>White</button>' +
+              '<button type="button" data-v="1"' + ((state.cardSkin && state.cardSkin.ring) ? ' class="on"' : '') + '>Matched</button>' +
+            '</span>' +
+          '</div>' +
+          '<div class="mfe__row" data-tog="mark">' +
+            '<span class="mfe__row-k">The M</span>' +
+            '<span class="mfe__seg">' +
+              '<button type="button" data-v="0"' + (!(state.cardSkin && state.cardSkin.mark) ? ' class="on"' : '') + '>Plain</button>' +
+              '<button type="button" data-v="1"' + ((state.cardSkin && state.cardSkin.mark) ? ' class="on"' : '') + '>Tinted</button>' +
+            '</span>' +
+          '</div>' +
+          '<div class="mfe__row mfe__row--acc">' +
+            '<span class="mfe__row-k">Accent</span>' +
+            '<span class="mfe__acc" id="mfeAcc">' +
+              (typeof ACCENT_CHOICES !== 'undefined' ? ACCENT_CHOICES.filter(a => a !== 'custom').map(a =>
+                '<button type="button" class="mfe__sw' + ((state.prefs && state.prefs.accent) === a ? ' is-on' : '') + '" data-acc="' + a + '" aria-label="' + a + ' accent"><i style="background:' + (a === 'default' ? 'linear-gradient(135deg,#3ad9f5,#3fd94e)' : (typeof ACCENT_HEX !== 'undefined' && ACCENT_HEX[a]) || '#888') + '"></i></button>').join('') : '') +
+            '</span>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+
+    // #app is the stacking context the card lives in, same reason as the record
+    (document.getElementById('app') || document.body).appendChild(ov);
+
+    const nameEl = ov.querySelector('#mfeName');
+    const paint = () => { if (nameEl) nameEl.textContent = cur() || 'Default'; };
+
+    on(ov.querySelector('.mfe__close'), 'click', () => close());
+    on(ov.querySelector('#mfeGrid'), 'click', (e) => {
+      const b = e.target.closest('.mfsk-chip');
+      if (!b) return;
+      if (!state.cardSkin) state.cardSkin = { id: '', ring: 0, mark: 0 };
+      state.cardSkin.id = b.getAttribute('data-skin-id') || '';
+      try { persistNow(); } catch (err) {}
+      applyCardSkin(document.querySelector('#dayCard .daycard-wrap'));
+      ov.querySelectorAll('.mfsk-chip').forEach(c => c.setAttribute('aria-pressed', c === b ? 'true' : 'false'));
+      paint();
+    });
+    ov.querySelectorAll('.mfe__row[data-tog]').forEach(row => {
+      on(row, 'click', (e) => {
+        const b = e.target.closest('button');
+        if (!b) return;
+        const key = row.getAttribute('data-tog');
+        if (key === 'colorapp') {
+          if (!state.prefs) state.prefs = {};
+          state.prefs.skinColorsApp = b.getAttribute('data-v') === '1';
+        } else {
+          if (!state.cardSkin) state.cardSkin = { id: '', ring: 0, mark: 0 };
+          state.cardSkin[key] = b.getAttribute('data-v') === '1' ? 1 : 0;
+        }
+        try { persistNow(); } catch (err) {}
+        applyCardSkin(document.querySelector('#dayCard .daycard-wrap'));
+        row.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+      });
+    });
+    const acc = ov.querySelector('#mfeAcc');
+    on(acc, 'click', (e) => {
+      const b = e.target.closest('.mfe__sw');
+      if (!b) return;
+      try {
+        state.prefs.accent = b.getAttribute('data-acc');
+        // a hand-picked accent is a deliberate override of the material's own
+        if (state.cardSkin) state.cardSkin.prevAccent = null;
+        _skinAccentApplied = state.cardSkin ? (state.cardSkin.id || '') : '';
+        persistNow();
+        applyPrefs();
+        acc.querySelectorAll('.mfe__sw').forEach(x => x.classList.toggle('is-on', x === b));
+      } catch (err) {}
+    });
+    on(document, 'keydown', (e) => { if (e.key === 'Escape') close(); });
+    // the scrim closes it; the plane does not
+    on(ov, 'click', (e) => { if (e.target === ov || e.target.classList.contains('mfe__bg')) close(); });
+    return true;
+  }
+
+  function drive() {
+    const el = cardEl();
+    if (!el) return;
+    if (!anim) {
+      el.style.transformOrigin = '50% 50%';
+      anim = el.animate([{ transform: 'none' }, { transform: openT }],
+        { duration: DUR, easing: EASE, fill: 'both' });
+      anim.onfinish = settle;
+      anim.oncancel = () => { anim = null; };
+    }
+    anim.playbackRate = desiredOpen ? 1 : -1;
+    try { anim.play(); } catch (e) { jump(); return; }
+    // the dead-man switch: a hidden tab freezes the timeline and onfinish
+    // never fires, which would strand the card mid-flight (v1140)
+    if (guard) clearTimeout(guard);
+    guard = setTimeout(jump, DUR + 260);
+  }
+
+  function jump() {
+    if (guard) { clearTimeout(guard); guard = null; }
+    const el = cardEl();
+    if (anim) { try { anim.cancel(); } catch (e) {} anim = null; }
+    if (el) el.style.transform = desiredOpen ? openT : '';
+    settle();
+  }
+
+  function settle() {
+    if (guard) { clearTimeout(guard); guard = null; }
+    if (desiredOpen) {
+      phase = 'open';
+      if (anim) { try { anim.cancel(); } catch (e) {} anim = null; }
+      const el = cardEl();
+      if (el) { el.style.transformOrigin = '50% 50%'; el.style.transform = openT; }
+      return;
+    }
+    phase = 'closed';
+    if (anim) { try { anim.cancel(); } catch (e) {} anim = null; }
+    const el = cardEl();
+    if (el) { el.style.transform = ''; el.style.transformOrigin = ''; el.style.willChange = ''; }
+    document.body.classList.remove('mfe-open');
+    document.body.style.overflow = '';
+    destroy();
+  }
+
+  function destroy() {
+    if (abort) { try { abort.abort(); } catch (e) {} abort = null; }
+    if (ov) { try { ov.remove(); } catch (e) {} ov = null; }
+  }
+
+  function open() {
+    if (desiredOpen) return;
+    // the record owns the card while it is up; its own sheet edits there
+    try { if (typeof MementoView !== 'undefined' && MementoView.isActive()) return; } catch (e) {}
+    try { if (typeof ClarityPaywall !== 'undefined' && !ClarityPaywall.isPaid()) return; } catch (e) {}
+    if (!build()) return;
+    if (phase === 'closed' && !measure()) { destroy(); return; }
+    desiredOpen = true;
+    phase = 'opening';
+    const el0 = cardEl();
+    if (el0) el0.style.transform = '';     // the animation owns it
+    document.body.classList.add('mfe-open');
+    document.body.style.overflow = 'hidden';
+    void ov.offsetWidth;
+    ov.classList.add('is-open');
+    try { navigator.vibrate && navigator.vibrate(8); } catch (e) {}
+    drive();
+  }
+
+  function close() {
+    if (!desiredOpen && phase === 'closed') return;
+    desiredOpen = false;
+    phase = 'closing';
+    if (ov) ov.classList.remove('is-open');
+    drive();
+  }
+
+  return {
+    open: open,
+    close: close,
+    isActive: () => desiredOpen || phase !== 'closed',
+    _reflow: function () {
+      if (phase === 'closed') { anim = null; return; }
+      const el = cardEl();
+      if (el) el.style.transform = '';
+      if (!measure()) return;
+      if (el) el.style.transform = openT;
+    },
+    _frozen: function () { if (phase === 'opening' || phase === 'closing') jump(); }
+  };
+})();
+try {
+  window.MementoEditor = MementoEditor;
+  window.addEventListener('resize', () => { try { MementoEditor._reflow(); } catch (e) {} });
+  window.addEventListener('orientationchange', () => { setTimeout(() => { try { MementoEditor._reflow(); } catch (e) {} }, 220); });
+  document.addEventListener('visibilitychange', () => { try { MementoEditor._frozen(); } catch (e) {} });
+} catch (e) {}
+
 // v1162 (Malik): "whenever somebody edits the Memento it would have no
 // connection to going inside." The editor is now its OWN surface on the home:
 // the sheet mounts straight onto #app, the record is never opened, never
@@ -7894,6 +8149,10 @@ try {
 let _mfHomeSkin = null;
 function _mfOpenCustomize() {
   try {
+    // v1164: the home hold opens the full-screen EDITOR (the card lifts, the
+    // materials live on a plane under it and repaint it live). The old
+    // bottom sheet stays for the record's own hint path.
+    if (typeof MementoEditor !== 'undefined') { MementoEditor.open(); return; }
     // inside the record, the record's own sheet owns this gesture
     if (typeof MementoView !== 'undefined' && MementoView.isActive()) return;
     if (typeof ClarityPaywall !== 'undefined' && !ClarityPaywall.isPaid()) return;
