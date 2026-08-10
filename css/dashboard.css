@@ -6397,3 +6397,8 @@ body.is-dormant .ambient{opacity:.35;transition:opacity 1.2s ease}
   text-wrap:pretty;
 }
 #commandCenter .cb-line b{font-weight:700;color:var(--text-hi)}
+/* the greeting opens the sentence and starts its own line, so the box reads
+   "Welcome back, Malik." then the rest, without splitting into two blocks. */
+#commandCenter .cb-hi{display:block}
+#commandCenter .cb-line--sm{font-size:clamp(20px, 6.1vw, 26px)}
+#commandCenter .cb-line--xs{font-size:clamp(18px, 5.4vw, 23px)}

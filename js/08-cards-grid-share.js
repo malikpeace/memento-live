@@ -4431,16 +4431,24 @@ function ccSyncDeckHeight(cc) {
     const card = cc.querySelector('.cc-card--pillars');
     if (!card) { cc.style.removeProperty('--cc-deck-h'); return; }
     const faces = ['action', 'clarity', 'consistency'].map(p => ccSyncFace(p)).filter(Boolean);
+    // v1156: during a lockdown the comeback sentence is the tallest face on
+    // the deck, so it has to be measured too or a long variant overruns it.
+    try { if (ccLockdownActive()) faces.push('<div class="v v-nf">' + ccComebackSentence() + '<button class="a-btn" type="button">Build momentum</button></div>'); } catch (e) {}
     if (!faces.length) { cc.style.removeProperty('--cc-deck-h'); return; }
     const probe = document.createElement('div');
     probe.style.cssText = 'position:absolute;left:-9999px;top:0;width:' + card.clientWidth + 'px;visibility:hidden;pointer-events:none;';
     faces.forEach(h => {
+      // the probe wears .cc-card so every face-scoped rule applies; without
+      // it the measured heights were of UNSTYLED text (v1156: that is why a
+      // long comeback sentence overran a deck measured at its floor).
       const sec = document.createElement('section');
-      sec.style.cssText = 'padding:22px 22px 20px;box-sizing:border-box;';
+      sec.className = 'cc-card';
+      sec.style.cssText = 'position:static;height:auto;min-height:0;margin:0;padding:22px 22px 20px;box-sizing:border-box;';
       sec.innerHTML = h;
       probe.appendChild(sec);
     });
-    document.body.appendChild(probe);
+    // inside #commandCenter, so #commandCenter-scoped face CSS resolves
+    cc.appendChild(probe);
     let maxH = 0;
     probe.querySelectorAll(':scope > section').forEach(s => { maxH = Math.max(maxH, s.offsetHeight); });
     probe.remove();
@@ -4488,10 +4496,21 @@ function ccComebackSentence() {
   const shrug = CC_CB_SHRUG[mix(seed) % CC_CB_SHRUG.length];
   const back = CC_CB_BACK[mix(seed + 101) % CC_CB_BACK.length];
   const end = (mix(seed + 977) % 3 === 0) ? '!' : '.';
+  // the greeting opens it (Malik) and the sentence carries the rest, one
+  // block so the whole thing reads as a single held breath.
+  const firstName = String((state.profile && state.profile.name) || '').trim().split(/\s+/)[0] || '';
+  const hello = 'Welcome back' + (firstName ? ', ' + esc(firstName) : '') + '.';
   // the wrapper does the centring; the <p> must stay a normal block, a flex
   // <p> turns its own text runs into flex items and shreds the sentence.
-  return '<div class="cb-wrap"><p class="cb-line">You missed <b>' + gap + ' ' + dayWord + '</b>, ' +
-    shrug + ', ' + back + end + '</p></div>';
+  const body = 'You missed ' + gap + ' ' + dayWord + ', ' + shrug + ', ' + back + end;
+  // one type step down past ~95 visible characters (a long name plus a long
+  // variant), a second past ~120, so the sentence always fits the locked deck
+  const len = hello.length + body.length;
+  const size = len > 120 ? ' cb-line--xs' : (len > 95 ? ' cb-line--sm' : '');
+  return '<div class="cb-wrap"><p class="cb-line' + size + '">' +
+    '<span class="cb-hi">' + hello + '</span> ' +
+    'You missed <b>' + gap + ' ' + dayWord + '</b>, ' + shrug + ', ' + back + end +
+    '</p></div>';
 }
 
 // v1153 (Malik): does a quiet stretch actually MATTER for this goal? Rest
