@@ -7782,10 +7782,6 @@ const MementoView = (function () {
   }
 
   function destroy() {
-    // the customize-from-home flag belongs to ONE visit; a record closed any
-    // other way (chevron, swipe, escape) must not leave it armed for a later
-    // sheet opened from inside.
-    try { _mfCustomizeFromHome = false; } catch (e) {}
     if (!view) return;
     const v = view;
     view = null;
@@ -7890,25 +7886,36 @@ try {
 // the customise sheet lives inside the record, which is destroyed on close,
 // so a HOME hold had nothing to open. This opens the record and then the
 // sheet the moment the builder has it.
-// v1161 (Malik): holding the card on the HOME is a customize gesture, not a
-// way in. The sheet lives inside the record, so the record still has to be
-// built, but when they are done we put them back exactly where they were.
-// The flag is only set when the record was NOT already open.
-let _mfCustomizeFromHome = false;
+// v1162 (Malik): "whenever somebody edits the Memento it would have no
+// connection to going inside." The editor is now its OWN surface on the home:
+// the sheet mounts straight onto #app, the record is never opened, never
+// built, and cannot be reached by accident. Inside the record the same sheet
+// is reached by its own hint, and that path is untouched.
+let _mfHomeSkin = null;
 function _mfOpenCustomize() {
   try {
-    try { _mfCustomizeFromHome = !MementoView.isActive(); } catch (e) { _mfCustomizeFromHome = false; }
-    MementoView.open();
-    let tries = 0;
-    const t = setInterval(() => {
-      tries++;
-      const ov = document.getElementById('mementoFull');
-      const wrapEl = ov && ov.querySelector('.mfsk-wrap');
-      if (wrapEl && !wrapEl.hidden) { clearInterval(t); return; }
-      const hint = ov && ov.querySelector('.mfsk-hint');
-      if (hint) { clearInterval(t); hint.click(); }
-      else if (tries > 24) clearInterval(t);
-    }, 60);
+    // inside the record, the record's own sheet owns this gesture
+    if (typeof MementoView !== 'undefined' && MementoView.isActive()) return;
+    if (typeof ClarityPaywall !== 'undefined' && !ClarityPaywall.isPaid()) return;
+    if (_mfHomeSkin) { _mfHomeSkin.openSheet(); return; }
+    const wrap = document.querySelector('#dayCard .daycard-wrap');
+    const host = document.getElementById('app') || document.body;
+    if (!wrap) return;
+    const abort = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    const sig = abort ? { signal: abort.signal } : undefined;
+    const built = _mfBuildSkinSheet(host, wrap, sig, () => {
+      // the editor is torn down with its listeners, so nothing of it can
+      // outlive the visit (the v1149 law: nothing outlives its view)
+      setTimeout(() => {
+        try { if (abort) abort.abort(); } catch (e) {}
+        try { built.sheet.remove(); } catch (e) {}
+        _mfHomeSkin = null;
+      }, 320);
+    });
+    if (!built) return;
+    built.sheet.classList.add('mfsk-wrap--home');
+    _mfHomeSkin = built;
+    built.openSheet();
   } catch (e) {}
 }
 
@@ -8763,23 +8770,12 @@ function _skChipHtml(sk, id, label, pressed) {
 
 // The customiser: held open from the card inside the Memento view. Paid only
 // (the house card is everyone's default; the material is what they own).
-function _mfSkinsInit(ov, wrap, sig) {
-  if (typeof ClarityPaywall !== 'undefined' && !ClarityPaywall.isPaid()) return;
-  if (!ov || !wrap) return;
-  const scroll = ov.querySelector('.mf__scroll');
-  if (!scroll) return;
-
-  // the one line left in the page flow; without it the gesture is undiscoverable
-  const hint = document.createElement('button');
-  hint.className = 'mfsk-hint';
-  hint.type = 'button';
-  hint.textContent = 'Hold the card to change its theme.';
-  // v1151: the plaque lives inside .in-col now, so the hint is inserted in
-  // the plaque's own parent (insertBefore on the scroller threw and silently
-  // killed the whole sheet).
-  const origin = scroll.querySelector('.mf-origin');
-  if (origin) origin.parentElement.insertBefore(hint, origin); else scroll.appendChild(hint);
-
+/* v1162 (Malik): the EDITOR and the record are two separate things. The sheet
+   markup + wiring live here so it can be mounted anywhere: inside the record
+   (the hint by the plaque) or straight onto the HOME, where holding the card
+   must never reveal the inside of the Memento. host = where it mounts,
+   onClose = what to do after Done/scrim. */
+function _mfBuildSkinSheet(host, wrap, sig, onClose) {
   const yoursName = (state.profile && state.profile.name) || '';
   const cur = () => (state.cardSkin && state.cardSkin.id) || '';
   const sheet = document.createElement('div');
@@ -8816,7 +8812,7 @@ function _mfSkinsInit(ov, wrap, sig) {
       '</div>' +
       '<button class="mfsk-done" type="button">Done</button>' +
     '</div>';
-  ov.appendChild(sheet);
+  host.appendChild(sheet);
 
   const openSheet = () => {
     wrap.classList.remove('is-pressing');
@@ -8827,21 +8823,15 @@ function _mfSkinsInit(ov, wrap, sig) {
   };
   const closeSheet = () => {
     sheet.classList.remove('is-open');
-    // v1161: opened by a hold on the HOME, so Done (or the scrim) returns
-    // them to the home instead of stranding them inside the Memento.
-    if (_mfCustomizeFromHome) {
-      _mfCustomizeFromHome = false;
-      setTimeout(() => { try { MementoView.close(); } catch (e) {} }, 200);
-    }
     // Only hide if it has not been re-opened in the meantime, and never leave
     // it un-hidden if the timer is throttled away: the record's own close
     // hides it too (v1147).
     setTimeout(() => { if (!sheet.classList.contains('is-open')) sheet.hidden = true; }, 280);
+    try { if (onClose) onClose(); } catch (e) {}
   };
 
   sheet.querySelector('.mfsk-scrim').addEventListener('click', closeSheet);
   sheet.querySelector('.mfsk-done').addEventListener('click', closeSheet);
-  hint.addEventListener('click', openSheet);
 
   sheet.querySelector('.mfsk-strip').addEventListener('click', (e) => {
     const b = e.target.closest('.mfsk-chip');
@@ -8885,6 +8875,30 @@ function _mfSkinsInit(ov, wrap, sig) {
       g.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
     });
   });
+
+  return { sheet: sheet, openSheet: openSheet, closeSheet: closeSheet };
+}
+
+function _mfSkinsInit(ov, wrap, sig) {
+  if (typeof ClarityPaywall !== 'undefined' && !ClarityPaywall.isPaid()) return;
+  if (!ov || !wrap) return;
+  const scroll = ov.querySelector('.mf__scroll');
+  if (!scroll) return;
+
+  // the one line left in the page flow; without it the gesture is undiscoverable
+  const hint = document.createElement('button');
+  hint.className = 'mfsk-hint';
+  hint.type = 'button';
+  hint.textContent = 'Hold the card to change its theme.';
+  // v1151: the plaque lives inside .in-col now, so the hint is inserted in
+  // the plaque's own parent (insertBefore on the scroller threw and silently
+  // killed the whole sheet).
+  const origin = scroll.querySelector('.mf-origin');
+  if (origin) origin.parentElement.insertBefore(hint, origin); else scroll.appendChild(hint);
+
+  const _sk = _mfBuildSkinSheet(ov, wrap, sig, null);
+  const sheet = _sk.sheet, openSheet = _sk.openSheet, closeSheet = _sk.closeSheet;
+  hint.addEventListener('click', openSheet);
 
   /* HOLD the card. iOS kills a long press three ways (callout, selection,
      jitter-cancel), so: cancel on 12px of MOVEMENT not on pointerleave,

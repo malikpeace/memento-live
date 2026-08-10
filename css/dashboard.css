@@ -6439,3 +6439,6 @@ body.is-dormant .ambient{opacity:.35;transition:opacity 1.2s ease}
   padding: 7px 0 0 13px;
   box-shadow: inset 2px 0 0 rgba(var(--ink), 0.16);
 }
+/* v1162: the home editor is its own surface. It sits above the home (the
+   card is z 20/30 there, not the record's 1001) and never touches the record. */
+.mfsk-wrap--home { z-index: 1200; }
