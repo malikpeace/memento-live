@@ -4054,6 +4054,13 @@ const SHEET_TEMPLATES = {
         // BOTH themes, huge tabular time, dimmed task, no amber, no borders.
         o.style.cssText = 'position:fixed;inset:0;z-index:100000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;background:#060608;padding:40px;text-align:center;';
         o.innerHTML =
+          // v1167 (Malik): a way OUT that is always visible, in the same place
+          // every other full-screen surface puts it. The buttons in the middle
+          // stay (End and log is the one that keeps the session), but nobody
+          // should have to read copy to find the door.
+          '<button id="dwFocusBack" type="button" aria-label="Leave focus" style="position:absolute;top:calc(var(--safe-t, 0px) + 14px);left:14px;z-index:2;display:grid;place-items:center;width:36px;height:36px;border:0;border-radius:50%;cursor:pointer;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.92);box-shadow:inset 0 1px 0 rgba(255,255,255,0.09);">' +
+            '<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>' +
+          '</button>' +
           '<div id="dwFocusTimer" style="font-size:clamp(3.6rem,16vw,8rem);font-weight:700;letter-spacing:-0.03em;color:rgba(255,255,255,0.96);font-variant-numeric:tabular-nums;line-height:0.9;">' + fmt(cur) + '</div>' +
           '<div style="width:120px;height:3px;border-radius:2px;background:rgba(255,255,255,0.1);overflow:hidden;"><div id="dwFocusBar" style="width:0%;height:100%;border-radius:2px;background:var(--success);"></div></div>' +
           '<div style="font-size:0.84375rem;font-weight:500;color:rgba(255,255,255,0.5);max-width:480px;line-height:1.45;">' + esc(intention) + '</div>' +
@@ -4066,6 +4073,7 @@ const SHEET_TEMPLATES = {
         document.body.appendChild(o);
         focusTimerEl = o.querySelector('#dwFocusTimer');
         o.querySelector('#dwFocusExit').addEventListener('click', _exitFocus);
+        o.querySelector('#dwFocusBack').addEventListener('click', _exitFocus);
         o.querySelector('#dwFocusEnd').addEventListener('click', finish);
         // v19 Deep Work Studio: distraction parking lot. A thought that would
         // break focus goes straight to the capture inbox instead of a tab.
