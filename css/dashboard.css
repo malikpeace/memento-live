@@ -6420,3 +6420,22 @@ body.is-dormant .ambient{opacity:.35;transition:opacity 1.2s ease}
   min-height: 0;
   height: auto;
 }
+/* v1160 (Malik: the why "clashes with the main goal... looks like a wall of
+   text"). The star and the why were two paragraphs of near-identical colour
+   and rhythm, so the eye read one block. The why is now set as an ASIDE: a
+   hairline rule down its left edge and an indent, the way a quote is set.
+   Contrast stays high (the no-dim-body-text law); the SHAPE carries the
+   difference, not a fade. */
+#commandCenter .v-nf .c-why{
+  margin: 16px 0 0;
+  padding-left: 13px;
+  font-size: 14px;
+  line-height: 1.62;
+  box-shadow: inset 2px 0 0 rgba(var(--ink), 0.16);
+}
+/* the cost line belongs to the why, so it shares the indent and the rule */
+#commandCenter .v-nf .c-why + .c-cost{
+  margin-top: 0;
+  padding: 7px 0 0 13px;
+  box-shadow: inset 2px 0 0 rgba(var(--ink), 0.16);
+}
