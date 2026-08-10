@@ -5377,6 +5377,11 @@ body.mf-open #dashGreetingMobile { opacity: 0; transition: opacity 200ms ease; p
    rgba(var(--ink),x) so both themes read correctly; nothing else changed.
    The .v-* scope keeps every rule inert outside a face. */
 .cc-card .v{display:flex;flex-direction:column;min-height:0}
+/* v1155 (Malik: "the spacing of this box is VERY awkward"): inside the
+   height-locked deck the face fills the card, so margin-top:auto spacers and
+   bottom buttons actually reach the bottom instead of hugging the text. */
+.cc-card--pillars .v, .cc-card--solo .v{flex:1 1 auto;height:100%}
+.cc-card--pillars .v > .a-btn:last-child, .cc-card--solo .v > .a-btn:last-child{margin-top:auto}
 .cc-card .a-btn.cc-hold-complete{position:relative;overflow:hidden}
 .v-today-hold-tonight .ht-rule{margin:0;font-size:17.5px;font-weight:640;line-height:1.3;letter-spacing:-.015em;color:var(--text-hi,rgba(var(--ink),.96))}
 .v-today-hold-tonight .ht-row{display:flex;align-items:baseline;gap:10px;margin:15px 0 0}
@@ -6066,7 +6071,9 @@ body.mf-open #dashGreetingMobile { opacity: 0; transition: opacity 200ms ease; p
 .v-nf .a-sup{margin:10px 0 0;font-size:13.5px;line-height:1.5;color:rgba(var(--ink),.62)}
 .v-nf .a-how{margin:12px 0 0;padding:10px 13px;border-radius:10px;background:rgba(var(--ink),.05);box-shadow:inset 0 1px 0 rgba(var(--ink),.06);font-size:13px;line-height:1.5;color:rgba(var(--ink),.9)}
 .v-nf .a-urg{margin:11px 0 0;font-size:12.5px;color:rgba(var(--ink),.62)}
-.v-nf .a-btn{margin:auto 0 0;width:100%;padding:13px;border:0;border-radius:11px;background:#f2f3f6;color:#0b0c0e;font:inherit;font-size:14.5px;font-weight:680;cursor:pointer}
+/* v1155: the CTA follows the theme (the mockup hard-coded its dark-room
+   near-white, which turned gray-on-white in light mode) */
+.v-nf .a-btn{margin:auto 0 0;width:100%;padding:13px;border:0;border-radius:11px;background:var(--solid-bg,#f2f3f6);color:var(--solid-fg,#0b0c0e);font:inherit;font-size:14.5px;font-weight:680;cursor:pointer}
 .v-nf .a-btn--wait{background:rgba(var(--ink),.055);box-shadow:inset 0 1px 0 rgba(var(--ink),.07);color:rgba(var(--ink),.45)}
 .v-nf .a-note{margin:9px 0 0;font-size:11.5px;color:rgba(var(--ink),.4)}
 .v-nf .c-star{margin:0;font-size:22px;font-weight:700;line-height:1.28;letter-spacing:-.025em}
