@@ -761,3 +761,84 @@ html.theme-light body.lite .tab-bar, html.theme-light.lowfx .tab-bar {
 /* Two tabs get a bar sized for two: each slot keeps the 4-tab slot width
    instead of stretching across the full 392px. */
 .tab-bar--prestar { width: min(224px, calc(100vw - 20px)); }
+
+/* ============================================================================
+   v1168 DEEP WORK (Malik: "very very minimal", "less AI slop"). Two states.
+   SET is a page with three things on it. RUN is a room with a clock in it. */
+.dw { display: flex; flex-direction: column; align-items: center; text-align: center;
+  padding: 26px 4px 8px; }
+.dw__for {
+  margin: 0 0 34px; max-width: 30ch; font-size: 1.25rem; font-weight: 700;
+  line-height: 1.3; letter-spacing: -0.02em; color: var(--text-hi);
+}
+.dw__dial { display: flex; align-items: center; gap: 22px; }
+.dw__step {
+  display: grid; place-items: center; width: 46px; height: 46px; border: 0;
+  border-radius: 50%; cursor: pointer; color: var(--text-hi);
+  background: var(--kfill-06); box-shadow: inset 0 1px 0 rgba(var(--ink), 0.07);
+  transition: opacity .18s ease, transform .12s ease;
+}
+.dw__step:active { transform: scale(0.94); }
+.dw__step:disabled { opacity: 0.3; cursor: default; }
+.dw__amount {
+  min-width: 6.2ch; font-size: 2.4rem; font-weight: 700; letter-spacing: -0.035em;
+  color: var(--text-hi); font-variant-numeric: tabular-nums;
+}
+.dw__begin {
+  margin-top: 34px; width: 100%; max-width: 260px; padding: 15px;
+  border: 0; border-radius: calc(12px * var(--rx, 1)); cursor: pointer;
+  font: inherit; font-size: 1rem; font-weight: 700;
+  background: var(--solid-bg); color: var(--solid-fg);
+}
+.dw__begin:active { transform: scale(0.985); }
+.dw__record { margin: 26px 0 0; font-size: 0.85rem; color: var(--text-lo); }
+
+/* the block: a room with a clock in it, in the Memento's own colour */
+.dwrun {
+  /* the block is a dark room in BOTH themes (a dark-cinema surface, same
+     family as the record), so its ink is pinned here instead of following
+     the theme, which would have printed near-black text on near-black. */
+  --dwink: 245, 246, 250;
+  position: fixed; inset: 0; z-index: 100000;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: calc(var(--safe-t, 0px) + 40px) 28px calc(var(--safe-b, 0px) + 40px);
+  background: #050609; text-align: center;
+  animation: dwrun-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes dwrun-in { from { opacity: 0; } to { opacity: 1; } }
+.dwrun__room {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(78% 42% at 50% 34%, rgba(var(--skin-rgb, var(--accent-rgb, 58,217,245)), 0.16), transparent 74%),
+    radial-gradient(140% 70% at 50% 100%, rgba(var(--skin-rgb, var(--accent-rgb, 58,217,245)), 0.06), transparent 72%);
+  transition: opacity 0.6s ease;
+}
+.dwrun.is-paused .dwrun__room { opacity: 0.25; }
+.dwrun__mid { flex: 1 1 auto; display: flex; align-items: center; justify-content: center; }
+.dwrun__clock {
+  margin: 0; font-size: clamp(4rem, 21vw, 9rem); font-weight: 700;
+  letter-spacing: -0.045em; line-height: 0.9; color: rgba(var(--dwink), 0.97);
+  font-variant-numeric: tabular-nums; transition: opacity 0.4s ease;
+}
+.dwrun.is-paused .dwrun__clock { opacity: 0.45; }
+.dwrun__foot { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 22px; }
+.dwrun__quote {
+  margin: 0; max-width: 26ch; font-size: 0.92rem; line-height: 1.5;
+  color: rgba(var(--dwink), 0.5);
+}
+.dwrun__acts { display: flex; gap: 10px; }
+.dwrun__btn {
+  min-width: 118px; padding: 13px 22px; border: 0; border-radius: 999px;
+  cursor: pointer; font: inherit; font-size: 0.92rem; font-weight: 650;
+  background: rgba(var(--dwink), 0.08); color: rgba(var(--dwink), 0.92);
+  box-shadow: inset 0 1px 0 rgba(var(--dwink), 0.08);
+}
+.dwrun__btn--end { background: rgba(var(--dwink), 0.95); color: #0a0c0e; }
+.dwrun__leave {
+  border: 0; background: none; cursor: pointer; font: inherit; font-size: 0.82rem;
+  color: rgba(var(--dwink), 0.42); padding: 4px 8px;
+}
+/* the block holds the screen: nothing else in Memento is reachable until they
+   pause or end it (Malik's call, so a block is a block) */
+body.dw-blocking { overflow: hidden; }
+@media (prefers-reduced-motion: reduce) { .dwrun { animation: none; } }

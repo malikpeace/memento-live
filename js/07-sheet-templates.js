@@ -3864,21 +3864,20 @@ const SHEET_TEMPLATES = {
   },
 
   deepwork: {
-    // Timer state lives on the template object (not the bind closure) so that
-    // Sheet.close() can clear the interval and save an in-progress session no
-    // matter how the sheet is dismissed (backdrop, close button, drag-down).
+    /* v1168 THE DEEP WORK BLOCK (Malik: "very very minimal", "less AI slop").
+       Two states and nothing else.
+       SET: the one thing at the top, a dial from 15 minutes to 5 hours, begin.
+       RUN: the clock, the quote, and the way out. The room takes the colour
+       of the Memento they chose. While it runs, the rest of Memento is
+       behind the block on purpose: the only doors are pause and end. */
     _intervalId: null,
     _elapsed: 0,
     _running: false,
-    // Save (>= 1 min) or cleanly discard a running session, then reset. Called
-    // both from the Stop button and from Sheet.close(). Returns true if a
-    // session was logged.
+    _paused: false,
     _intention: '',
-    _targetSec: 0,
+    _targetSec: 25 * 60,
     _commit() {
       if (this._intervalId) { clearInterval(this._intervalId); this._intervalId = null; }
-      // If the focus overlay is open (e.g. the sheet is being dismissed), remove
-      // it so it can never linger with a frozen timer.
       try { const o = document.getElementById('dwFocusOverlay'); if (o) o.remove(); } catch (e) {}
       const wasRunning = this._running;
       const mins = Math.round(this._elapsed / 60);
@@ -3892,8 +3891,6 @@ const SHEET_TEMPLATES = {
           minutes: mins,
           intention: intention,
           note: '',
-          // Additive: when the session STARTED, so the planner can draw
-          // planned-vs-actual on the timeline.
           startedAt: Date.now() - mins * 60000
         });
         if (state.deepwork.sessions.length > 180) state.deepwork.sessions = state.deepwork.sessions.slice(-180);
@@ -3901,201 +3898,168 @@ const SHEET_TEMPLATES = {
         logged = true;
       }
       this._running = false;
+      this._paused = false;
       this._elapsed = 0;
       this._intention = '';
-      this._targetSec = 0;
       return logged;
+    },
+    _fmtTarget(min) {
+      if (min < 60) return min + ' min';
+      const h = Math.floor(min / 60), m = min % 60;
+      return m ? h + 'h ' + m + 'm' : h + (h === 1 ? ' hour' : ' hours');
     },
     render() {
       const sessions = state.deepwork.sessions || [];
-      const totalMin = sessions.reduce((a, s) => a + (s.minutes || 0), 0);
-      const totalH = totalMin / 60;
-      // v19 Deep Work Studio: link the session to today's one thing by default.
       const oneThing = (state.action && state.action.primaryAction && state.action.primaryAction.title) || '';
-      const presets = [['25 min', 25], ['50 min', 50], ['90 min', 90], ['3 h', 180], ['4 h', 240], ['Open', 0]];
-      let html = `
-        <div style="padding: 8px 0 4px;">
-          <div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-lo);font-weight:700;margin-bottom:8px;">What are you building?</div>
-          <input id="dwIntention" type="text" autocomplete="off" value="${esc(oneThing)}" placeholder="One sentence. The thing this session is for." style="width:100%;box-sizing:border-box;font:inherit;font-size:0.9rem;color:var(--text-hi);background:var(--surface-1);border:1px solid var(--hairline);border-radius:calc(8px * var(--rx, 1));padding:11px 13px;outline:none;">${oneThing ? '<div style="font-size:0.68rem;color:var(--text-lo);margin-top:6px;">Linked to today&rsquo;s one thing. Edit if this session is for something else.</div>' : ''}
-          <div id="dwPresets" style="display:flex;gap:7px;flex-wrap:wrap;margin-top:12px;">`;
-      presets.forEach(([label, m]) => {
-        html += `<button class="dw-preset" data-min="${m}" aria-label="${m ? 'Set a ' + label + ' focus target' : 'Open ended session'}" style="font:inherit;font-size:0.78rem;font-weight:650;cursor:pointer;border:1px solid var(--hairline);border-radius:999px;padding:6px 13px;background:transparent;color:var(--text-mid);">${label}</button>`;
-      });
-      html += `</div>
-        </div>
-        <div style="text-align:center; padding: 22px 0 8px;">
-          <div style="font-size: 3.75rem; font-weight: 800; color: var(--color-deepwork); letter-spacing: -0.04em; font-variant-numeric: tabular-nums;" id="dwTimer">0:00</div>
-          <div style="font-size: 0.8rem; color: var(--text-lo); margin-top: 6px;" id="dwTargetLabel">Open session</div>
-          <button class="sheet-btn" id="dwStart" style="margin-top: 22px; max-width: 240px; margin-left: auto; margin-right: auto; background: var(--color-deepwork); color: #fff;">Start</button>
-          <button id="dwFocus" style="margin: 12px auto 0; max-width: 240px; display:block; width:100%; font:inherit; font-weight:600; font-size:0.85rem; cursor:pointer; border:1px solid var(--hairline); border-radius:calc(8px * var(--rx, 1)); padding:11px 16px; background:transparent; color:var(--text-mid);">Enter focus mode</button>
-        </div>`;
-      // Post-session note: if the most recent session is from today and has no
-      // note yet, invite one line about what got produced.
-      const last = sessions.length ? sessions[sessions.length - 1] : null;
-      if (last && last.iso === getTodayISO() && !last.note) {
-        html += `<div style="margin-top:8px;padding:14px;border-radius:var(--card-r);background:var(--surface-1);border:1px solid var(--hairline);">
-          <div style="font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-lo);font-weight:700;margin-bottom:8px;">What did you produce?</div>
-          <input id="dwLastNote" type="text" autocomplete="off" placeholder="Name the evidence. One line." style="width:100%;box-sizing:border-box;font:inherit;font-size:0.88rem;color:var(--text-hi);background:transparent;border:1px solid var(--hairline);border-radius:calc(8px * var(--rx, 1));padding:9px 11px;outline:none;">
-        </div>`;
+      const min = Math.round((this._targetSec || 1500) / 60);
+      const totalH = sessions.reduce((a, s) => a + (s.minutes || 0), 0) / 60;
+      let html = '<div class="dw">';
+      // the one thing, at the top, in their own words
+      if (oneThing) {
+        html += '<p class="dw__for">' + esc(oneThing) + '</p>';
       }
+      // the dial: 15 minutes to 5 hours, a quarter hour at a time
+      html += '<div class="dw__dial">' +
+        '<button class="dw__step" id="dwMinus" type="button" aria-label="Less time">' +
+          '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 12h12"/></svg>' +
+        '</button>' +
+        '<div class="dw__amount"><span id="dwTargetText">' + esc(this._fmtTarget(min)) + '</span></div>' +
+        '<button class="dw__step" id="dwPlus" type="button" aria-label="More time">' +
+          '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 6v12M6 12h12"/></svg>' +
+        '</button>' +
+      '</div>';
+      html += '<button class="dw__begin" id="dwStart" type="button">Begin</button>';
+      // one quiet line of record, and only once there is one
       if (sessions.length) {
-        const bars = renderDeepworkBars();
-        if (bars) {
-          html += '<div style="margin-top: 16px; border-top: 1px solid var(--hairline); padding-top: 16px;">';
-          html += `<div style="font-size: 0.7rem; color: var(--text-lo); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Last 14 days</div>`;
-          html += bars;
-          html += '</div>';
-        }
-        html += '<div style="margin-top: 16px; border-top: 1px solid var(--hairline); padding-top: 16px;">';
-        // v19 Deep Work Studio: focus analytics from existing sessions.
-        const _todayN = Math.floor(Date.parse(getTodayISO() + 'T00:00:00Z') / 86400000);
-        const _isoToN = (iso) => { const t = Date.parse((iso || '') + 'T00:00:00Z'); return isNaN(t) ? null : Math.floor(t / 86400000); };
-        let thisWeekMin = 0; const daySet = {};
-        sessions.forEach(s => { const n = _isoToN(s.iso); if (n == null) return; if (_todayN - n >= 0 && _todayN - n < 7) thisWeekMin += (s.minutes || 0); daySet[n] = true; });
-        let dayStreak = 0, cursor = _todayN; if (!daySet[cursor]) cursor = _todayN - 1; while (daySet[cursor]) { dayStreak++; cursor--; }
-        const _stat = (v, l) => '<div style="text-align:center;"><div style="font-size:1.45rem;font-weight:800;color:var(--text-hi);letter-spacing:-0.02em;font-variant-numeric:tabular-nums;line-height:1;">' + v + '</div><div style="font-size:0.58rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-lo);margin-top:5px;">' + l + '</div></div>';
-        html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;">' + _stat((thisWeekMin / 60).toFixed(1) + 'h', 'This week') + _stat(totalH.toFixed(1) + 'h', 'Total deep') + _stat(sessions.length, 'Sessions') + _stat(dayStreak, 'Day streak') + '</div>';
-        sessions.slice(-6).reverse().forEach(s => {
-          const mins = s.minutes || 0;
-          const dur = mins >= 60 ? `${Math.floor(mins / 60)}h ${mins % 60}m` : `${mins} min`;
-          const sub = s.note || s.intention || '';
-          html += `<div style="padding: 9px 0; border-bottom: 1px solid var(--hairline);">
-            <div style="display:flex;justify-content:space-between;font-size: 0.8125rem; color: var(--text-mid);"><span>${esc(s.date)}</span><span style="color:var(--color-deepwork);">${dur}</span></div>`;
-          if (sub) html += `<div style="font-size:0.8rem;color:var(--text-lo);margin-top:3px;line-height:1.4;">${esc(sub)}</div>`;
-          html += `</div>`;
-        });
-        html += '</div>';
+        html += '<p class="dw__record">' + sessions.length + ' session' + (sessions.length === 1 ? '' : 's') +
+          ', ' + (totalH >= 10 ? Math.round(totalH) : totalH.toFixed(1)) + ' hours deep.</p>';
       }
-      html += oneThingFooterHtml();
+      html += '</div>';
       return '<div class="exp-shell exp-shell--top">' + html + '</div>';
     },
     bind(container) {
       const self = this;
-      // Defensively clear any orphaned interval before (re)binding.
       if (self._intervalId) { clearInterval(self._intervalId); self._intervalId = null; }
       self._running = false;
+      self._paused = false;
       self._elapsed = 0;
-      self._targetSec = 0;
-      const timerEl = container.querySelector('#dwTimer');
-      const startBtn = container.querySelector('#dwStart');
-      const targetLabel = container.querySelector('#dwTargetLabel');
-      const intentionEl = container.querySelector('#dwIntention');
+      if (!self._targetSec) self._targetSec = 25 * 60;
+
+      const targetText = container.querySelector('#dwTargetText');
+      const oneThing = (state.action && state.action.primaryAction && state.action.primaryAction.title) || '';
+      const MIN = 15, MAX = 300, STEP = 15;
+      const paintTarget = () => {
+        const m = Math.round(self._targetSec / 60);
+        if (targetText) targetText.textContent = self._fmtTarget(m);
+        const minus = container.querySelector('#dwMinus'), plus = container.querySelector('#dwPlus');
+        if (minus) minus.disabled = m <= MIN;
+        if (plus) plus.disabled = m >= MAX;
+      };
+      const nudge = (dir) => {
+        const m = Math.min(MAX, Math.max(MIN, Math.round(self._targetSec / 60) + dir * STEP));
+        self._targetSec = m * 60;
+        paintTarget();
+        try { feel('tick'); } catch (e) {}
+      };
+      const minusBtn = container.querySelector('#dwMinus');
+      const plusBtn = container.querySelector('#dwPlus');
+      if (minusBtn) minusBtn.addEventListener('click', () => nudge(-1));
+      if (plusBtn) plusBtn.addEventListener('click', () => nudge(1));
+      paintTarget();
+
       const fmt = (sec) => {
         const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
-        return h > 0 ? `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}` : `${m}:${String(s).padStart(2, '0')}`;
+        return h > 0 ? h + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0')
+                     : m + ':' + String(s).padStart(2, '0');
       };
-      // Preset chips set a target (0 = open). Disabled once running.
-      container.querySelectorAll('.dw-preset').forEach(chip => chip.addEventListener('click', () => {
-        if (self._running) return;
-        const m = parseInt(chip.dataset.min) || 0;
-        self._targetSec = m * 60;
-        container.querySelectorAll('.dw-preset').forEach(c => { const on = c === chip; c.style.background = on ? 'var(--color-deepwork)' : 'transparent'; c.style.color = on ? '#fff' : 'var(--text-mid)'; c.style.borderColor = on ? 'var(--color-deepwork)' : 'var(--hairline)'; });
-        if (targetLabel) targetLabel.textContent = m ? ('Target ' + (m >= 60 ? (m / 60) + ' h' : m + ' min')) : 'Open session';
-      }));
-      // Full-screen focus mode: a calm, chrome-free overlay with the intention
-      // and the running timer. The interval updates both the sheet display and
-      // (if open) the focus overlay. Exiting focus keeps the session running.
-      let focusTimerEl = null;
-      const _updateTimer = (text) => {
-        if (timerEl) timerEl.textContent = text;
-        if (focusTimerEl) focusTimerEl.textContent = text;
-        // A3 thin progress line: fills toward the target; hidden-by-empty on open-ended runs.
-        try {
-          const bar = document.getElementById('dwFocusBar');
-          if (bar && self._targetSec > 0) bar.style.width = Math.min(100, (self._elapsed / self._targetSec) * 100) + '%';
-        } catch (_) {}
+
+      /* ---- the block itself ------------------------------------------- */
+      let overlay = null, clockEl = null;
+      const paintClock = () => {
+        if (!clockEl) return;
+        const remain = Math.max(0, self._targetSec - self._elapsed);
+        clockEl.textContent = fmt(remain);
       };
-      const _exitFocus = () => {
-        const o = document.getElementById('dwFocusOverlay'); if (o) o.remove(); focusTimerEl = null;
-        // v872 (Action sweep): focus launched FROM the Action plan (aplFocus)
-        // opens this sheet as plumbing; exiting focus must land back on A5,
-        // not strand the user on the Deep Work sheet.
+      const tick = () => {
+        if (self._paused) return;
+        self._elapsed++;
+        paintClock();
+        if (self._targetSec > 0 && self._elapsed >= self._targetSec) end();
+      };
+      const closeOverlay = () => {
+        if (self._intervalId) { clearInterval(self._intervalId); self._intervalId = null; }
+        if (overlay) { try { overlay.remove(); } catch (e) {} overlay = null; clockEl = null; }
+        try { document.body.classList.remove('dw-blocking'); } catch (e) {}
+      };
+      const end = () => {
+        const logged = self._commit();
+        if (logged) { try { persistNow(); renderWidget('streak'); } catch (e) {} }
+        closeOverlay();
+        // launched from the Action plan: land back there, not on this sheet
         if (window.__dwFromAction) {
           window.__dwFromAction = false;
           try { if (typeof Sheet !== 'undefined' && Sheet.close) Sheet.close(); } catch (e) {}
+          return;
         }
-      };
-      const finish = () => {
-        const logged = self._commit();
-        if (logged) { persistNow(); renderWidget('streak'); }
-        _exitFocus();
         Sheet.body.innerHTML = SHEET_TEMPLATES.deepwork.render();
         SHEET_TEMPLATES.deepwork.bind(Sheet.body);
       };
-      const startTimer = () => {
+      const setPaused = (on) => {
+        self._paused = !!on;
+        if (!overlay) return;
+        overlay.classList.toggle('is-paused', self._paused);
+        const p = overlay.querySelector('#dwPause');
+        if (p) p.textContent = self._paused ? 'Resume' : 'Pause';
+        const leave = overlay.querySelector('#dwLeave');
+        if (leave) leave.hidden = !self._paused;
+      };
+      const begin = () => {
         if (self._running) return;
         self._running = true;
-        self._intention = intentionEl ? intentionEl.value.trim() : '';
-        startBtn.textContent = 'Stop & Log';
-        if (intentionEl) intentionEl.setAttribute('readonly', 'readonly');
-        self._intervalId = setInterval(() => {
-          self._elapsed++;
-          if (self._targetSec > 0) {
-            const remain = Math.max(0, self._targetSec - self._elapsed);
-            _updateTimer(fmt(remain));
-            if (remain <= 0) { finish(); return; }
-          } else {
-            _updateTimer(fmt(self._elapsed));
-          }
-        }, 1000);
-      };
-      startBtn.addEventListener('click', () => { if (!self._running) startTimer(); else finish(); });
-      const focusBtn = container.querySelector('#dwFocus');
-      if (focusBtn) focusBtn.addEventListener('click', () => {
-        startTimer();
-        _exitFocus();
-        const intention = self._intention || (intentionEl ? intentionEl.value.trim() : '') || 'Deep work';
-        const cur = self._targetSec > 0 ? Math.max(0, self._targetSec - self._elapsed) : self._elapsed;
-        const o = document.createElement('div');
-        o.id = 'dwFocusOverlay';
-        o.setAttribute('role', 'dialog');
-        o.setAttribute('aria-label', 'Deep work focus mode');
-        // v827: the A3 running state (Malik's locked finals). Flat near-black in
-        // BOTH themes, huge tabular time, dimmed task, no amber, no borders.
-        o.style.cssText = 'position:fixed;inset:0;z-index:100000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;background:#060608;padding:40px;text-align:center;';
-        o.innerHTML =
-          // v1167 (Malik): a way OUT that is always visible, in the same place
-          // every other full-screen surface puts it. The buttons in the middle
-          // stay (End and log is the one that keeps the session), but nobody
-          // should have to read copy to find the door.
-          '<button id="dwFocusBack" type="button" aria-label="Leave focus" style="position:absolute;top:calc(var(--safe-t, 0px) + 14px);left:14px;z-index:2;display:grid;place-items:center;width:36px;height:36px;border:0;border-radius:50%;cursor:pointer;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.92);box-shadow:inset 0 1px 0 rgba(255,255,255,0.09);">' +
-            '<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>' +
-          '</button>' +
-          '<div id="dwFocusTimer" style="font-size:clamp(3.6rem,16vw,8rem);font-weight:700;letter-spacing:-0.03em;color:rgba(255,255,255,0.96);font-variant-numeric:tabular-nums;line-height:0.9;">' + fmt(cur) + '</div>' +
-          '<div style="width:120px;height:3px;border-radius:2px;background:rgba(255,255,255,0.1);overflow:hidden;"><div id="dwFocusBar" style="width:0%;height:100%;border-radius:2px;background:var(--success);"></div></div>' +
-          '<div style="font-size:0.84375rem;font-weight:500;color:rgba(255,255,255,0.5);max-width:480px;line-height:1.45;">' + esc(intention) + '</div>' +
-          '<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:10px;">' +
-            '<button id="dwFocusEnd" style="font:inherit;font-weight:700;font-size:0.875rem;cursor:pointer;border:none;border-radius:calc(10px * var(--rx, 1));padding:13px 24px;background:#fff;color:#0a0c0e;">End and log</button>' +
-            '<button id="dwFocusExit" style="font:inherit;font-weight:600;font-size:0.875rem;cursor:pointer;border:none;border-radius:calc(10px * var(--rx, 1));padding:13px 24px;background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.9);box-shadow:inset 0 1px 0 rgba(255,255,255,0.07);">Exit focus</button>' +
+        self._paused = false;
+        self._elapsed = 0;
+        self._intention = oneThing;
+
+        overlay = document.createElement('div');
+        overlay.id = 'dwFocusOverlay';
+        overlay.className = 'dwrun';
+        overlay.setAttribute('role', 'dialog');
+        overlay.setAttribute('aria-label', 'Deep work in progress');
+        overlay.innerHTML =
+          '<div class="dwrun__room" aria-hidden="true"></div>' +
+          '<div class="dwrun__mid">' +
+            '<p class="dwrun__clock" id="dwFocusTimer">' + fmt(self._targetSec) + '</p>' +
           '</div>' +
-          '<input id="dwPark" type="text" autocomplete="off" placeholder="Park a distraction, then stay. Enter to save." aria-label="Park a distraction to your inbox" style="margin-top:4px;max-width:440px;width:100%;box-sizing:border-box;font:inherit;font-size:0.85rem;color:rgba(255,255,255,0.85);background:rgba(255,255,255,0.05);border:none;box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);border-radius:calc(8px * var(--rx, 1));padding:11px 14px;outline:none;text-align:center;">' +
-          '<div id="dwParkMsg" aria-live="polite" style="font-size:0.7rem;color:rgba(255,255,255,0.6);min-height:14px;margin-top:-16px;">&nbsp;</div>';
-        document.body.appendChild(o);
-        focusTimerEl = o.querySelector('#dwFocusTimer');
-        o.querySelector('#dwFocusExit').addEventListener('click', _exitFocus);
-        o.querySelector('#dwFocusBack').addEventListener('click', _exitFocus);
-        o.querySelector('#dwFocusEnd').addEventListener('click', finish);
-        // v19 Deep Work Studio: distraction parking lot. A thought that would
-        // break focus goes straight to the capture inbox instead of a tab.
-        const parkEl = o.querySelector('#dwPark'); const parkMsg = o.querySelector('#dwParkMsg');
-        if (parkEl) parkEl.addEventListener('keydown', (e) => {
-          if (e.key !== 'Enter') return;
-          const v = parkEl.value.trim(); if (!v) return;
-          try { if (typeof captureToNotes === 'function') captureToNotes(v); } catch (_) {}
-          parkEl.value = '';
-          if (parkMsg) { parkMsg.textContent = 'Parked in Notes. Back to work.'; setTimeout(() => { if (parkMsg) parkMsg.textContent = ' '; }, 1800); }
+          '<div class="dwrun__foot">' +
+            '<p class="dwrun__quote">A focused fool can accomplish more than a distracted genius.</p>' +
+            '<div class="dwrun__acts">' +
+              '<button class="dwrun__btn" id="dwPause" type="button">Pause</button>' +
+              '<button class="dwrun__btn dwrun__btn--end" id="dwEnd" type="button">End</button>' +
+            '</div>' +
+            '<button class="dwrun__leave" id="dwLeave" type="button" hidden>Leave without logging</button>' +
+          '</div>';
+        document.body.appendChild(overlay);
+        document.body.classList.add('dw-blocking');
+        clockEl = overlay.querySelector('#dwFocusTimer');
+        paintClock();
+        overlay.querySelector('#dwPause').addEventListener('click', () => setPaused(!self._paused));
+        overlay.querySelector('#dwEnd').addEventListener('click', end);
+        overlay.querySelector('#dwLeave').addEventListener('click', () => {
+          self._running = false; self._paused = false; self._elapsed = 0;
+          closeOverlay();
+          if (window.__dwFromAction) {
+            window.__dwFromAction = false;
+            try { if (typeof Sheet !== 'undefined' && Sheet.close) Sheet.close(); } catch (e) {}
+            return;
+          }
+          Sheet.body.innerHTML = SHEET_TEMPLATES.deepwork.render();
+          SHEET_TEMPLATES.deepwork.bind(Sheet.body);
         });
-      });
-      // Post-session note saves onto the most recent session.
-      const noteEl = container.querySelector('#dwLastNote');
-      if (noteEl) {
-        const save = () => {
-          const sess = state.deepwork.sessions;
-          if (sess && sess.length) { sess[sess.length - 1].note = noteEl.value.trim().slice(0, 200); persistNow(); }
-        };
-        noteEl.addEventListener('blur', save);
-        noteEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') { save(); noteEl.blur(); } });
-      }
+        self._intervalId = setInterval(tick, 1000);
+        try { feel('complete'); } catch (e) {}
+      };
+      const startBtn = container.querySelector('#dwStart');
+      if (startBtn) startBtn.addEventListener('click', begin);
     }
   },
 

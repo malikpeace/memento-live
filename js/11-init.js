@@ -2029,11 +2029,13 @@ window.addEventListener('keydown', (e) => {
   // Deep Work full-screen focus: Escape should mirror "Exit focus" (keep the
   // session running), not fall through to the sheet-close path which would end
   // and log it.
+  // v1168: a running block holds the screen. Escape PAUSES it (which is the
+  // door), it never quietly ends and logs the session behind their back.
   const _dwFocus = document.getElementById('dwFocusOverlay');
   if (_dwFocus) {
     e.preventDefault(); e.stopPropagation();
-    const exitBtn = _dwFocus.querySelector('#dwFocusExit');
-    if (exitBtn) exitBtn.click();
+    const pauseBtn = _dwFocus.querySelector('#dwPause');
+    if (pauseBtn && !_dwFocus.classList.contains('is-paused')) pauseBtn.click();
     return;
   }
 
