@@ -3974,17 +3974,30 @@ const SHEET_TEMPLATES = {
       };
 
       /* ---- the block itself ------------------------------------------- */
-      let overlay = null, clockEl = null;
+      let overlay = null, clockEl = null, ringEl = null, riseEl = null;
+      const RING_LEN = 2 * Math.PI * 112;
       const paintClock = () => {
-        if (!clockEl) return;
         const remain = Math.max(0, self._targetSec - self._elapsed);
-        clockEl.textContent = fmt(remain);
+        if (clockEl) clockEl.textContent = fmt(remain);
+        const done = self._targetSec > 0 ? Math.min(1, self._elapsed / self._targetSec) : 0;
+        // the ring keeps what is LEFT
+        if (ringEl) ringEl.style.strokeDashoffset = (RING_LEN * done).toFixed(2);
+        // the floor rises with what is SPENT
+        if (riseEl) riseEl.style.height = (done * 100).toFixed(3) + '%';
       };
       const tick = () => {
         if (self._paused) return;
         self._elapsed++;
         paintClock();
-        if (self._targetSec > 0 && self._elapsed >= self._targetSec) end();
+        if (self._targetSec > 0 && self._elapsed >= self._targetSec) {
+          // the block ran its full length: the screen is fully inverted, it
+          // rings, and it holds there for a beat before logging
+          if (self._intervalId) { clearInterval(self._intervalId); self._intervalId = null; }
+          try { if (typeof MementoSound !== 'undefined') MementoSound.play('arrival'); } catch (e) {}
+          try { feel('complete'); } catch (e) {}
+          if (overlay) overlay.classList.add('is-done');
+          setTimeout(end, 2600);
+        }
       };
       const closeOverlay = () => {
         if (self._intervalId) { clearInterval(self._intervalId); self._intervalId = null; }
@@ -4028,6 +4041,12 @@ const SHEET_TEMPLATES = {
         overlay.innerHTML =
           '<div class="dwrun__room" aria-hidden="true"></div>' +
           '<div class="dwrun__mid">' +
+            // the ring depletes with the time left; the rise below inverts it
+            // as it passes, so one gesture reads two ways
+            '<svg class="dwrun__ring" viewBox="0 0 240 240" aria-hidden="true">' +
+              '<circle class="dwrun__ring-track" cx="120" cy="120" r="112"></circle>' +
+              '<circle class="dwrun__ring-live" id="dwRing" cx="120" cy="120" r="112"></circle>' +
+            '</svg>' +
             '<p class="dwrun__clock" id="dwFocusTimer">' + fmt(self._targetSec) + '</p>' +
           '</div>' +
           '<div class="dwrun__foot">' +
@@ -4037,10 +4056,17 @@ const SHEET_TEMPLATES = {
               '<button class="dwrun__btn dwrun__btn--end" id="dwEnd" type="button">End</button>' +
             '</div>' +
             '<button class="dwrun__leave" id="dwLeave" type="button" hidden>Leave without logging</button>' +
-          '</div>';
+          '</div>' +
+          // THE RISE: a white plane climbing from the floor, blended as a
+          // difference, so everything it covers inverts. At the end the whole
+          // screen has flipped. One element, no repaint of anything else.
+          '<div class="dwrun__rise" id="dwRise" aria-hidden="true"></div>';
         document.body.appendChild(overlay);
         document.body.classList.add('dw-blocking');
         clockEl = overlay.querySelector('#dwFocusTimer');
+        ringEl = overlay.querySelector('#dwRing');
+        riseEl = overlay.querySelector('#dwRise');
+        if (ringEl) { ringEl.style.strokeDasharray = RING_LEN.toFixed(2); ringEl.style.strokeDashoffset = '0'; }
         paintClock();
         overlay.querySelector('#dwPause').addEventListener('click', () => setPaused(!self._paused));
         overlay.querySelector('#dwEnd').addEventListener('click', end);

@@ -842,3 +842,43 @@ html.theme-light body.lite .tab-bar, html.theme-light.lowfx .tab-bar {
    pause or end it (Malik's call, so a block is a block) */
 body.dw-blocking { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) { .dwrun { animation: none; } }
+
+/* v1169 THE RISE AND THE RING (Malik). The block now shows its own time two
+   ways at once: a hairline ring that empties around the clock, and the floor
+   of the screen rising as a DIFFERENCE blend, so everything it passes flips
+   to its opposite. At zero the whole screen has inverted, and it rings. */
+.dwrun { isolation: isolate; }          /* the blend stays inside the block */
+.dwrun__mid { position: relative; }
+.dwrun__ring {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: min(78vw, 320px); height: min(78vw, 320px); pointer-events: none;
+  overflow: visible;
+}
+.dwrun__ring circle {
+  fill: none; stroke-width: 1.5; stroke-linecap: round;
+  transform: rotate(-90deg); transform-origin: 120px 120px;
+}
+.dwrun__ring-track { stroke: rgba(var(--dwink), 0.10); }
+.dwrun__ring-live {
+  stroke: rgba(var(--dwink), 0.55);
+  transition: stroke-dashoffset 0.98s linear;
+}
+.dwrun.is-paused .dwrun__ring-live { stroke: rgba(var(--dwink), 0.22); transition: stroke 0.4s ease; }
+/* the rising floor. White + difference = a clean inversion of whatever is
+   under it, which is the whole point: one plane, no second render. */
+.dwrun__rise {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 0;
+  background: #fff; mix-blend-mode: difference; pointer-events: none;
+  transition: height 0.98s linear;
+  z-index: 5;
+}
+.dwrun.is-done .dwrun__rise { height: 100% !important; transition: height 0.5s ease-out; }
+.dwrun.is-done .dwrun__clock { opacity: 1; }
+/* Safari/iOS: a blended layer needs the parent to be its own stacking context
+   or it composites against the page behind and washes the whole app. */
+@supports not (mix-blend-mode: difference) {
+  .dwrun__rise { background: rgba(var(--dwink), 0.10); mix-blend-mode: normal; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dwrun__rise, .dwrun__ring-live { transition: none; }
+}
