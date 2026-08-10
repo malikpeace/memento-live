@@ -109,3 +109,16 @@ body{margin:0;background:#0a0b0d;color:var(--text-hi);font-family:var(--font);-w
 .vd--g{background:rgba(63,217,78,.16)}
 .vd--y{background:rgba(255,183,61,.18);color:#ffb73d}
 .vd--r{background:rgba(255,95,95,.16);color:#ff6b6b;font-size:11px}
+
+/* ---------- the tweak layer (controls under every phone) ---------- */
+.tw{margin:12px 0 0;padding:12px 14px;border-radius:14px;background:rgba(var(--ink),.05);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.06)}
+.tw__t{font-size:10.5px;letter-spacing:.05em;font-weight:700;color:var(--text-lo);margin-bottom:4px}
+.tw label{display:flex;align-items:center;gap:10px;margin:8px 0;font-size:12.5px;color:var(--text-mid)}
+.tw label .tl{flex:0 0 118px}
+.tw input[type=range]{flex:1;accent-color:var(--accent);min-width:60px}
+.tw input[type=number],.tw input[type=text]{width:96px;padding:6px 9px;border:0;border-radius:8px;
+  font:600 13.5px/1 var(--font);color:var(--text-hi);background:rgba(var(--ink),.08);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.06);font-variant-numeric:tabular-nums}
+.tw input[type=text]{width:158px;font-size:16px}
+.tw .to{margin-left:auto;font-size:12.5px;font-weight:700;color:var(--text-hi);font-variant-numeric:tabular-nums}
