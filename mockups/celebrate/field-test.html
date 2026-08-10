@@ -62,26 +62,28 @@
   .fxq-date{font-size:10px;color:var(--text-lo);margin-top:4px;height:12px;font-variant-numeric:tabular-nums;
     overflow:hidden;white-space:nowrap}
 
-  /* slider (qd-1) */
-  .fxsl{position:relative;width:100%;max-width:300px;height:78px;margin:26px auto 0}
-  .fxsl-track{position:absolute;left:0;right:0;top:46px;height:1px;background:rgba(var(--ink),.12)}
-  .fxsl-gone{position:absolute;left:0;top:46px;height:1px;background:rgba(var(--ink),.34)}
-  .fxsl-t{position:absolute;top:39px;width:2px;height:15px;border-radius:1px;
+  /* slider (qd-1): the ends are part of the line, number - line - number */
+  .fxsl{display:flex;align-items:center;gap:12px;width:100%;max-width:308px;margin:26px auto 14px}
+  .fxsl-endcol{position:relative;flex:0 0 auto}
+  .fxsl-endcol b{font-size:14px;font-weight:700;letter-spacing:-.02em;color:var(--text-mid);
+    font-variant-numeric:tabular-nums;white-space:nowrap}
+  .fxsl-endcol span{position:absolute;top:calc(100% + 4px);left:50%;transform:translateX(-50%);
+    font-size:10px;color:var(--text-lo);white-space:nowrap}
+  .fxsl-mid{position:relative;flex:1;height:78px;min-width:110px}
+  .fxsl-track{position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(var(--ink),.12)}
+  .fxsl-gone{position:absolute;left:0;top:50%;height:1px;background:rgba(var(--ink),.34)}
+  .fxsl-t{position:absolute;top:calc(50% - 7px);width:2px;height:15px;border-radius:1px;
     background:rgba(var(--ink),.20);transform:translateX(-50%)}
   .fxsl-t.is-past{background:rgba(var(--ink),.50)}
   .fxsl-t small{position:absolute;bottom:19px;left:50%;transform:translateX(-50%);
     font-size:10.5px;font-weight:650;letter-spacing:-.02em;color:var(--text-lo);
     font-variant-numeric:tabular-nums;white-space:nowrap}
   .fxsl-t.is-past small{color:rgba(var(--ink),.55)}
-  .fxsl-now{position:absolute;top:33px;width:2.5px;height:21px;border-radius:1px;
+  .fxsl-now{position:absolute;top:calc(50% - 13px);width:2.5px;height:21px;border-radius:1px;
     background:var(--accent);transform:translateX(-50%)}
   .fxsl-now b{position:absolute;bottom:25px;left:50%;transform:translateX(-50%);
     font-size:18px;font-weight:750;letter-spacing:-.03em;color:var(--text-hi);
     font-variant-numeric:tabular-nums;white-space:nowrap}
-  .fxsl-end{position:absolute;top:62px;font-size:10.5px;color:var(--text-lo);font-variant-numeric:tabular-nums;white-space:nowrap}
-  .fxsl-end--a{left:0}
-  .fxsl-end--b{right:0;text-align:right}
-  .fxsl-end b{display:block;font-size:12.5px;font-weight:700;letter-spacing:-.02em;color:var(--text-mid)}
 
   /* record grid (rf-rec) */
   .fxg{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;width:238px;margin:24px auto 0}
@@ -273,8 +275,7 @@
       h += '<div class="cap">' + fmt(remaining) + ' still open.</div>';
     } else {
       /* the slider down */
-      var inner = '<span class="fxsl-end fxsl-end--a"><b>' + fmt(start) + '</b>started, ' + dateBack(days) + '</span>'
-                + '<div class="fxsl-track"></div><div class="fxsl-gone" style="width:' + (frac * 100).toFixed(1) + '%"></div>';
+      var inner = '<div class="fxsl-track"></div><div class="fxsl-gone" style="width:' + (frac * 100).toFixed(1) + '%"></div>';
       marks.forEach(function(m){
         if (m === goal) return;
         var p = Math.abs(m - start) / span * 100;
@@ -284,8 +285,11 @@
         inner += '<div class="fxsl-t' + (isPast ? ' is-past' : '') + '" style="left:' + p.toFixed(1) + '%">' + lbl + '</div>';
       });
       inner += '<div class="fxsl-now" style="left:' + (frac * 100).toFixed(1) + '%"><b>' + fmt(cur) + '</b></div>';
-      inner += '<span class="fxsl-end fxsl-end--b"><b>' + fmt(goal) + '</b>the goal</span>';
-      h += '<div class="fxsl">' + inner + '</div>';
+      h += '<div class="fxsl">'
+         + '<div class="fxsl-endcol"><b>' + fmt(start) + '</b><span>started, ' + dateBack(days) + '</span></div>'
+         + '<div class="fxsl-mid">' + inner + '</div>'
+         + '<div class="fxsl-endcol"><b>' + fmt(goal) + '</b><span>the goal</span></div>'
+         + '</div>';
       h += '<div class="sub">Started at ' + fmt(start) + ', ' + days + ' days ago.</div>';
       h += '<div class="sub">' + fmt(goal) + ' is ' + fmt(remaining) + ' away.</div>';
     }

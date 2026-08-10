@@ -118,7 +118,8 @@ def main():
         made.append((slug, title, blurb, len(items)))
 
     total = sum(n for _,_,_,n in made)
-    made.append(('field-test', 'Field test: fuck with the values', 'Sliders and inputs driving the risky layouts (the road, the big count, the day ladder, the record grid, week chips, open receipts) through the REAL chooser logic. Change the numbers, watch the screens re-lay themselves, and see exactly when a ceremony fires vs stays silent.', 6))
+    # the rig rides FIRST so Malik cannot miss it
+    made.insert(0, ('field-test', 'FIELD TEST: fuck with the values', 'YOUR sliders. Change start / goal / today / days / weeks and watch the road, the big count, the day ladder, the record grid, week chips and open receipts re-lay themselves through the REAL chooser logic, with a line saying when a ceremony fires vs stays silent.', 6))
     cards = ''.join(
       '<a class="item" style="text-decoration:none;display:block" href="%s.html">'
       '<div style="padding:20px;border-radius:16px;background:rgba(var(--ink),.05);'

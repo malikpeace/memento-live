@@ -21,34 +21,35 @@
 [data-c="qd-1"] .lead .of{font-size:24px;font-weight:650;letter-spacing:-.02em;
   color:var(--text-mid);font-variant-numeric:tabular-nums}
 
-[data-c="qd-1"] .sl{position:relative;width:296px;height:74px;margin-bottom:14px}
-[data-c="qd-1"] .sl__track{position:absolute;left:0;right:0;top:46px;height:1px;
+/* the ends are PART of the line (Malik: 270 at the line's far left, 250 at
+   its far right, never under it): number - line - number, one row, the
+   captions hang quietly beneath their numbers */
+[data-c="qd-1"] .sl{display:flex;align-items:center;gap:12px;width:300px;margin-bottom:26px}
+[data-c="qd-1"] .sl__endcol{position:relative;flex:0 0 auto}
+[data-c="qd-1"] .sl__endcol b{font-size:15px;font-weight:700;letter-spacing:-.02em;
+  color:var(--text-mid);font-variant-numeric:tabular-nums}
+[data-c="qd-1"] .sl__endcol span{position:absolute;top:calc(100% + 4px);left:50%;
+  transform:translateX(-50%);font-size:10.5px;color:var(--text-lo);white-space:nowrap}
+[data-c="qd-1"] .sl__mid{position:relative;flex:1;height:74px}
+[data-c="qd-1"] .sl__track{position:absolute;left:0;right:0;top:50%;height:1px;
   background:rgba(var(--ink),.12)}
 /* the road already travelled, slightly brighter than the road ahead */
-[data-c="qd-1"] .sl__gone{position:absolute;left:0;top:46px;height:1px;width:40%;
+[data-c="qd-1"] .sl__gone{position:absolute;left:0;top:50%;height:1px;width:40%;
   background:rgba(var(--ink),.34)}
-[data-c="qd-1"] .sl__t{position:absolute;top:39px;width:2px;height:15px;border-radius:1px;
+[data-c="qd-1"] .sl__t{position:absolute;top:calc(50% - 7px);width:2px;height:15px;border-radius:1px;
   background:rgba(var(--ink),.20);transform:translateX(-50%)}
 [data-c="qd-1"] .sl__t.is-past{background:rgba(var(--ink),.50)}
-/* interim weights ride ABOVE the line; the two ends are named below it, so
-   a tick near an end never collides with the end label */
+/* interim weights ride ABOVE the line */
 [data-c="qd-1"] .sl__t small{position:absolute;bottom:19px;left:50%;transform:translateX(-50%);
   font-size:11px;font-weight:650;letter-spacing:-.02em;color:var(--text-lo);
   font-variant-numeric:tabular-nums}
 [data-c="qd-1"] .sl__t.is-past small{color:rgba(var(--ink),.55)}
 /* today: the accent post, its weight carried above it */
-[data-c="qd-1"] .sl__now{position:absolute;top:33px;width:2.5px;height:21px;border-radius:1px;
+[data-c="qd-1"] .sl__now{position:absolute;top:calc(50% - 13px);width:2.5px;height:21px;border-radius:1px;
   background:var(--accent);transform:translateX(-50%)}
 [data-c="qd-1"] .sl__now b{position:absolute;bottom:25px;left:50%;transform:translateX(-50%);
   font-size:19px;font-weight:750;letter-spacing:-.03em;color:var(--text-hi);
   font-variant-numeric:tabular-nums}
-/* the two ends, named under the line */
-[data-c="qd-1"] .sl__end{position:absolute;top:62px;font-size:11px;color:var(--text-lo);
-  font-variant-numeric:tabular-nums}
-[data-c="qd-1"] .sl__end--a{left:0}
-[data-c="qd-1"] .sl__end--b{right:0;text-align:right}
-[data-c="qd-1"] .sl__end b{display:block;font-size:13px;font-weight:700;letter-spacing:-.02em;
-  color:var(--text-mid)}
 
 [data-c="qd-1"] .b.on .sl__gone{transform-origin:left;animation:qd1gone .7s cubic-bezier(.2,.8,.3,1) .15s both}
 @keyframes qd1gone{from{transform:scaleX(0)}to{transform:scaleX(1)}}
@@ -78,14 +79,16 @@
            numbers, never "X of Y down" arithmetic). Positions are simple
            percentages of |start - target|, so any weights land correctly. -->
       <div class="sl">
-        <span class="sl__end sl__end--a"><b>270</b>started, Mar 3</span>
-        <div class="sl__track"></div>
-        <div class="sl__gone"></div>
-        <div class="sl__t is-past" style="left:20%"><small>266</small></div>
-        <div class="sl__now" style="left:40%"><b>262</b></div>
-        <div class="sl__t" style="left:60%"><small>258</small></div>
-        <div class="sl__t" style="left:80%"><small>254</small></div>
-        <span class="sl__end sl__end--b"><b>250</b>the goal</span>
+        <div class="sl__endcol"><b>270</b><span>started, Mar 3</span></div>
+        <div class="sl__mid">
+          <div class="sl__track"></div>
+          <div class="sl__gone"></div>
+          <div class="sl__t is-past" style="left:20%"><small>266</small></div>
+          <div class="sl__now" style="left:40%"><b>262</b></div>
+          <div class="sl__t" style="left:60%"><small>258</small></div>
+          <div class="sl__t" style="left:80%"><small>254</small></div>
+        </div>
+        <div class="sl__endcol"><b>250</b><span>the goal</span></div>
       </div>
       <div class="sub">Started at 270, 63 days ago.</div>
       <div class="sub">250 is 12 away.</div>
