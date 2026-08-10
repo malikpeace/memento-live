@@ -29,8 +29,7 @@
   font-variant-numeric:tabular-nums;color:var(--text-lo)}
 [data-c="qd-1"] .mk--done i{background:rgba(var(--ink),.30)}
 [data-c="qd-1"] .mk--done span{color:rgba(var(--ink),.60)}
-[data-c="qd-1"] .mk--now i{width:42px;height:2px;background:var(--accent);
-  box-shadow:0 0 18px rgba(var(--accent-rgb),.55)}
+[data-c="qd-1"] .mk--now i{width:42px;height:2px;background:var(--accent)}
 [data-c="qd-1"] .mk--now span{font-size:22px;color:var(--text-hi)}
 
 [data-c="qd-1"] .b.on .mk{animation:qd1mk .5s cubic-bezier(.2,.8,.3,1) forwards}
@@ -142,14 +141,7 @@
   <div class="keepbtn">Keep</div>
   <div class="hint">Tap to replay</div>
 </div>
-<p class="item__note">No target was ever set on this goal, so there is no percentage to draw. Instead every previous low is listed with its date and only the newest one is coloured, because when nobody set a number the <b>new low itself</b> is the whole event.</p></div><div class="item"><p class="item__label"><span class="item__n">3</span><span class="item__name">The number you carry</span></p><style>
-[data-c="qd-3"] .wash{position:absolute;left:50%;top:52%;width:296px;height:158px;z-index:0;
-  transform:translate(-50%,-50%);pointer-events:none;opacity:0;
-  background:radial-gradient(ellipse at center,
-    rgba(var(--accent-rgb),.15) 0%,
-    rgba(var(--accent-rgb),.05) 40%,
-    rgba(var(--accent-rgb),0) 72%)}
-[data-c="qd-3"] .b.on .wash{animation:qd3wash .9s cubic-bezier(.2,.8,.3,1) forwards}
+<p class="item__note">No target was ever set on this goal, so there is no percentage to draw. Instead every previous low is listed with its date and only the newest one is coloured, because when nobody set a number the <b>new low itself</b> is the whole event.</p></div><div class="item"><p class="item__label"><span class="item__n">3</span><span class="item__name">The number you carry</span></p>[data-c="qd-3"] .b.on .wash{animation:qd3wash .9s cubic-bezier(.2,.8,.3,1) forwards}
 @keyframes qd3wash{
   from{opacity:0;transform:translate(-50%,-50%) scale(.84)}
   to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
@@ -196,7 +188,6 @@
 [data-c="qd-4"] .fall{position:relative;width:210px;padding-left:26px;text-align:left;margin-bottom:12px}
 [data-c="qd-4"] .fall .drop{position:absolute;left:0;top:12px;bottom:26px;width:2px;border-radius:2px;
   background:linear-gradient(180deg,rgba(var(--accent-rgb),.16),var(--accent));
-  box-shadow:0 0 16px rgba(var(--accent-rgb),.30);
   transform-origin:50% 0;transform:scaleY(0)}
 [data-c="qd-4"] .b.on .drop{animation:qd4drop .62s cubic-bezier(.2,.8,.3,1) .18s forwards}
 @keyframes qd4drop{to{transform:scaleY(1)}}
@@ -252,8 +243,7 @@
 </div>
 <p class="item__note">A 34,000 loan with 29,900 still open, so the win is the balance dropping and a line is literally drawn from the old figure down to the new one. The closed and open amounts sit together underneath, because on a long road hiding the remainder is what makes a screen feel fake.</p></div><div class="item"><p class="item__label"><span class="item__n">5</span><span class="item__name">The line you got under</span></p><style>
 [data-c="qd-5"] .ceil{display:flex;align-items:center;gap:11px;margin-bottom:26px}
-[data-c="qd-5"] .ceil i{display:block;width:168px;height:2px;border-radius:2px;background:var(--accent);
-  box-shadow:0 0 18px rgba(var(--accent-rgb),.50);transform-origin:0 50%;transform:scaleX(0)}
+[data-c="qd-5"] .ceil i{display:block;width:168px;height:2px;border-radius:2px;background:var(--accent);transform-origin:0 50%;transform:scaleX(0)}
 [data-c="qd-5"] .ceil span{font-size:12.5px;font-weight:600;letter-spacing:-.01em;
   font-variant-numeric:tabular-nums;color:var(--text-lo)}
 [data-c="qd-5"] .b.on .ceil i{animation:qd5ceil .55s cubic-bezier(.2,.8,.3,1) forwards}

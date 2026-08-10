@@ -21,16 +21,9 @@
   background:rgba(var(--ink),.13)}
 [data-c="rf-fall"] .fl__lit{position:absolute;left:0;right:0;top:-.5px;height:2px;
   border-radius:1px;background:var(--accent);
-  box-shadow:0 0 13px rgba(var(--accent-rgb),.55);
   opacity:0;transform:scaleX(.24)}
 [data-c="rf-fall"] .b1.on .fl__lit{animation:rfFallLand 460ms cubic-bezier(.2,.85,.25,1) 1.2s forwards}
-@keyframes rfFallLand{from{opacity:0;transform:scaleX(.24)}to{opacity:1;transform:scaleX(1)}}
-
-[data-c="rf-fall"] .fl__bloom{position:absolute;left:50%;top:50%;width:286px;height:112px;
-  transform:translate(-50%,-50%);pointer-events:none;opacity:0;
-  background:radial-gradient(50% 50% at 50% 50%,
-    rgba(var(--accent-rgb),.32), rgba(var(--accent-rgb),0) 72%)}
-[data-c="rf-fall"] .b1.on .fl__bloom{animation:rfFallBloom 760ms ease-out 1.2s forwards}
+@keyframes rfFallLand{from{opacity:0;transform:scaleX(.24)}to{opacity:1;transform:scaleX(1)}}[data-c="rf-fall"] .b1.on .fl__bloom{animation:rfFallBloom 760ms ease-out 1.2s forwards}
 @keyframes rfFallBloom{0%{opacity:0}34%{opacity:1}100%{opacity:.46}}
 
 [data-c="rf-fall"] .fl__sub{margin-top:20px}

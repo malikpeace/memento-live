@@ -2,7 +2,10 @@
    advance on tap; the last beat SITS until the user dismisses it (Malik:
    never auto-dismiss, and no hold gesture anywhere). */
 (function(){
-  var T = [1900, 2300];   // b1, b2 dwell; b3 persists
+  /* Dwell per beat before auto-advance. Malik: the pauses went by too fast
+     to look at, so these are review-friendly; a tap still advances instantly,
+     and the shipped app can shorten them again. */
+  var T = [3600, 4200];   // b1, b2 dwell; b3 persists
 
   function countUp(el){
     var p = (el.getAttribute('data-count')||'').split('|');

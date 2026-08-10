@@ -26,7 +26,6 @@
 /* the ground already closed. THE one coloured thing on this screen. */
 [data-c="rf-gap"] .gp__fill{position:absolute;left:0;top:-1px;bottom:-1px;width:60%;
   border-radius:2px;background:var(--accent);
-  box-shadow:0 0 14px rgba(var(--accent-rgb),.50);
   transform-origin:left center;transform:scaleX(.6667)}
 [data-c="rf-gap"] .b2.on .gp__fill{animation:rfGapFill 950ms cubic-bezier(.2,.85,.25,1) .3s forwards}
 @keyframes rfGapFill{from{transform:scaleX(.6667)}to{transform:scaleX(1)}}
@@ -118,16 +117,9 @@
   background:rgba(var(--ink),.13)}
 [data-c="rf-fall"] .fl__lit{position:absolute;left:0;right:0;top:-.5px;height:2px;
   border-radius:1px;background:var(--accent);
-  box-shadow:0 0 13px rgba(var(--accent-rgb),.55);
   opacity:0;transform:scaleX(.24)}
 [data-c="rf-fall"] .b1.on .fl__lit{animation:rfFallLand 460ms cubic-bezier(.2,.85,.25,1) 1.2s forwards}
-@keyframes rfFallLand{from{opacity:0;transform:scaleX(.24)}to{opacity:1;transform:scaleX(1)}}
-
-[data-c="rf-fall"] .fl__bloom{position:absolute;left:50%;top:50%;width:286px;height:112px;
-  transform:translate(-50%,-50%);pointer-events:none;opacity:0;
-  background:radial-gradient(50% 50% at 50% 50%,
-    rgba(var(--accent-rgb),.32), rgba(var(--accent-rgb),0) 72%)}
-[data-c="rf-fall"] .b1.on .fl__bloom{animation:rfFallBloom 760ms ease-out 1.2s forwards}
+@keyframes rfFallLand{from{opacity:0;transform:scaleX(.24)}to{opacity:1;transform:scaleX(1)}}[data-c="rf-fall"] .b1.on .fl__bloom{animation:rfFallBloom 760ms ease-out 1.2s forwards}
 @keyframes rfFallBloom{0%{opacity:0}34%{opacity:1}100%{opacity:.46}}
 
 [data-c="rf-fall"] .fl__sub{margin-top:20px}
@@ -210,8 +202,7 @@
   animation-delay:var(--d)}
 @keyframes rfRecOn{from{opacity:0;transform:scale(.62)}to{opacity:1;transform:scale(1)}}
 
-[data-c="rf-rec"] .rc__f--now{background:var(--accent);
-  box-shadow:0 0 15px rgba(var(--accent-rgb),.6)}
+[data-c="rf-rec"] .rc__f--now{background:var(--accent)}
 [data-c="rf-rec"] .b2.on .rc__f--now{animation:rfRecNow 520ms cubic-bezier(.2,.8,.3,1) forwards;
   animation-delay:var(--d)}
 @keyframes rfRecNow{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:scale(1)}}
@@ -332,7 +323,6 @@
 [data-c="rf-card"] .cd__cuts i{display:block;width:2px;height:12px;border-radius:1px;
   background:rgba(255,255,255,.13);box-shadow:1px 0 0 rgba(0,0,0,.6)}
 [data-c="rf-card"] .cd__cuts i.new{background:var(--accent);
-  box-shadow:0 0 14px rgba(var(--accent-rgb),.78);
   opacity:0;transform:scaleY(.12);transform-origin:bottom}
 [data-c="rf-card"] .b3.on .cd__cuts i.new{animation:rfCardCut 500ms cubic-bezier(.2,.85,.25,1) .82s forwards}
 @keyframes rfCardCut{from{opacity:0;transform:scaleY(.12)}to{opacity:1;transform:scaleY(1)}}
