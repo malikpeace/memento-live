@@ -6677,6 +6677,22 @@ function renderDayCard() {
         inner +
       '</div>';
 
+    // v1170: an entrance that never finishes must not leave the card blurred.
+    // A backgrounded tab freezes the timeline (fill:both holds the FIRST
+    // frame, which is the blurred one), and that stranded frame is what read
+    // as a dark box on desktop. The class is stripped on end and on a hard
+    // deadline, so the card always lands clean.
+    if (reveal || materialize) {
+      try {
+        const _wrapEl = el.querySelector('.daycard-wrap');
+        const _cls = reveal ? 'daycard-reveal' : 'daycard-materialize';
+        const _clear = () => { try { if (_wrapEl) _wrapEl.classList.remove(_cls); } catch (e) {} };
+        const _face = _wrapEl && _wrapEl.querySelector('.daycard-ns');
+        if (_face) _face.addEventListener('animationend', _clear, { once: true });
+        setTimeout(_clear, reveal ? 1800 : 1200);
+      } catch (e) {}
+    }
+
     const nsEl = el.querySelector('#dayCardNs');
     bindDayCardTilt(nsEl);
     bindDayCardMotion(el.querySelector('.daycard-wrap'), nsEl);
