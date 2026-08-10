@@ -4451,6 +4451,49 @@ function ccSyncDeckHeight(cc) {
   } catch (e) {}
 }
 
+/* v1155 THE COMEBACK SENTENCE (Malik). One big line that fills the box, in
+   three parts: the count, a shrug, and a way back in. The shrug and the way
+   back rotate (and the ending punctuation flips between . and !) so a person
+   who falls off twice in a month never reads the same sentence, but it is
+   SEEDED by the day + the gap, not random per render, so it cannot reshuffle
+   under their eyes mid-session. Voice law: no em dashes, no "it's not X it's
+   Y", plain words. */
+const CC_CB_SHRUG = [
+  'no worries', 'it happens', 'it be like that sometimes',
+  'life got loud', 'that is allowed', 'no guilt here',
+  'the record kept waiting', 'you are still here'
+];
+const CC_CB_BACK = [
+  'let&rsquo;s get back into it',
+  'pick a small one to get back in',
+  'knock the cobwebs off and keep going',
+  'start with the easiest version',
+  'let&rsquo;s make today count',
+  'one small move and the line is alive again',
+  'grab the smallest win on the board'
+];
+function ccComebackSentence() {
+  let gap = 0;
+  try { gap = (typeof comebackGapDays === 'function') ? comebackGapDays() : 0; } catch (e) {}
+  const dayWord = gap === 1 ? 'day' : 'days';
+  // the seed: today + the gap. Same sentence all day, a new one next time.
+  let seed = 0;
+  try {
+    const k = (typeof getTodayISO === 'function' ? getTodayISO() : '') + ':' + gap;
+    for (let i = 0; i < k.length; i++) { seed = (seed * 31 + k.charCodeAt(i)) >>> 0; }
+  } catch (e) { seed = gap * 7; }
+  // mix before slicing: consecutive days differ by one character, so the raw
+  // hash's high bits move in lockstep and every pick would correlate.
+  const mix = (n) => { n = Math.imul(n ^ (n >>> 16), 2246822507); n = Math.imul(n ^ (n >>> 13), 3266489909); return (n ^ (n >>> 16)) >>> 0; };
+  const shrug = CC_CB_SHRUG[mix(seed) % CC_CB_SHRUG.length];
+  const back = CC_CB_BACK[mix(seed + 101) % CC_CB_BACK.length];
+  const end = (mix(seed + 977) % 3 === 0) ? '!' : '.';
+  // the wrapper does the centring; the <p> must stay a normal block, a flex
+  // <p> turns its own text runs into flex items and shreds the sentence.
+  return '<div class="cb-wrap"><p class="cb-line">You missed <b>' + gap + ' ' + dayWord + '</b>, ' +
+    shrug + ', ' + back + end + '</p></div>';
+}
+
 // v1153 (Malik): does a quiet stretch actually MATTER for this goal? Rest
 // days on a cadence plan are never misses, and a check-cadence plan is
 // SUPPOSED to be quiet. Punishing those with a "days missed" box failed his
@@ -4560,13 +4603,7 @@ function renderCommandCenter() {
     if (_lockdown && _ccPillar !== 'clarity') {
       // the comeback face, in the deck's own language. The goal face stays a
       // swipe away (Malik: "so they can remember"); consistency waits.
-      let gap = 0;
-      try { gap = (typeof comebackGapDays === 'function') ? comebackGapDays() : 0; } catch (e) {}
-      const dayWord = gap === 1 ? 'day' : 'days';
-      const firstName = String((state.profile && state.profile.name) || '').trim().split(/\s+/)[0] || '';
-      return wrap('<div class="v v-nf">' +
-        '<p class="a-move" style="margin:0">Welcome back' + (firstName ? ', ' + esc(firstName) : '') + '.</p>' +
-        '<p class="a-sup" style="margin-top:8px">You missed ' + gap + ' ' + dayWord + '.</p>' +
+      return wrap('<div class="v v-nf">' + ccComebackSentence() +
         '<div style="margin-top:auto"></div>' +
         '<button class="a-btn" data-cc-action="comeback" type="button">Build momentum</button>' +
         '</div>' + dots('action'));
