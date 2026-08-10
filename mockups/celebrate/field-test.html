@@ -117,7 +117,7 @@
 </div>
 <div class="fx-wrap">
   <h1>Fuck with the values</h1>
-  <p class="fx-sub">Every phone below is driven by the same logic file the app will use (chooser.js), not by hand-placed pixels. Change the numbers and watch the layout solve itself. The line under each phone tells you whether a celebration would actually FIRE at that state, because part of being dynamic is knowing when to stay silent.</p>
+  <p class="fx-sub">Every phone below is driven by the same logic file the app will use (chooser.js), not by hand-placed pixels. Change the numbers and watch the layout solve itself. The line under each phone tells you whether a celebration would actually FIRE at that state, because part of being dynamic is knowing when to stay silent. Fourteen panels cover every approved screen that HAS variables; the ones missing here (qd-3's "under 200" line, ms-1's flood, ms-4's decision, op-3's proof count, the card's M pop) are words and motion around these same numbers, so tuning the panels tunes them too.</p>
 
   <div class="fx-presets" id="presets">
     <button data-p="users">100 users, day 216</button>
@@ -134,7 +134,7 @@
 
     <!-- ================= THE ROAD ================= -->
     <div class="fx-cell">
-      <h2>The road (marker posts / the slider)</h2>
+      <h2>Quantity: the marker posts (qu-1) / the slider down (qd-1)</h2>
       <p class="fx-d">One renderer, both directions. Goal below start = the slider down; above = the posts. Marks come from chooser.milestones(), never hand-picked.</p>
       <div class="ph"><div class="fxst" id="road"></div></div>
       <div class="fx-ctl">
@@ -147,9 +147,48 @@
       </div>
     </div>
 
+    <!-- ================= FOUR FIGURES ================= -->
+    <div class="fx-cell">
+      <h2>Quantity up, no target: four figures (qu-2)</h2>
+      <p class="fx-d">No goal number, so the win is the digit itself. Fires only the day the number grows a digit.</p>
+      <div class="ph"><div class="fxst" id="figs"></div></div>
+      <div class="fx-ctl">
+        <label><span>Today</span><input type="number" id="f-cur" value="1042"></label>
+        <label><span>Yesterday</span><input type="number" id="f-prev" value="987"></label>
+        <label><span>Unit</span><input type="text" id="f-unit" value="followers"></label>
+        <div class="fx-fire" id="f-fire"></div>
+      </div>
+    </div>
+
+    <!-- ================= THE RECORD BOARD ================= -->
+    <div class="fx-cell">
+      <h2>No-target records: the record board (qu-5) / the record book (qd-2)</h2>
+      <p class="fx-d">The only thing to beat is themselves. A new best must clear the old one by 2% (or a whole unit), at most once a week.</p>
+      <div class="ph"><div class="fxst" id="rec"></div></div>
+      <div class="fx-ctl">
+        <label><span>Old best</span><input type="number" id="x-prev" value="840"></label>
+        <label><span>Today</span><input type="number" id="x-cur" value="1412"></label>
+        <label><span>Direction</span><select id="x-dir"><option value="up">higher is better</option><option value="down">lower is better</option></select></label>
+        <label><span>Unit</span><input type="text" id="x-unit" value="new followers in a week"></label>
+        <div class="fx-fire" id="x-fire"></div>
+      </div>
+    </div>
+
+    <!-- ================= EARLY BY ================= -->
+    <div class="fx-cell">
+      <h2>Deadlines: the days you will not need (qu-3) / early by (ms-3)</h2>
+      <p class="fx-d">A deadline goal finished early. The celebration is the plain subtraction.</p>
+      <div class="ph"><div class="fxst" id="early"></div></div>
+      <div class="fx-ctl">
+        <label><span>Days given</span><input type="range" id="e-total" min="7" max="730" value="180"><b class="fx-out" id="e-total-out">180</b></label>
+        <label><span>Days used</span><input type="range" id="e-used" min="1" max="730" value="151"><b class="fx-out" id="e-used-out">151</b></label>
+        <div class="fx-fire" id="e-fire"></div>
+      </div>
+    </div>
+
     <!-- ================= THE COUNT ================= -->
     <div class="fx-cell">
-      <h2>The count (Total runs)</h2>
+      <h2>Frequency: Total runs (fr-3)</h2>
       <p class="fx-d">The big number has to survive 5 and 5,000,000. The font fits itself; the ceremony fires on ladder rungs only.</p>
       <div class="ph"><div class="fxst" id="count"></div></div>
       <div class="fx-ctl">
@@ -163,7 +202,7 @@
 
     <!-- ================= DAYS HELD ================= -->
     <div class="fx-cell">
-      <h2>Days held (maintenance)</h2>
+      <h2>Maintenance: the ledger of days (mt-1) / the first seven (mt-4)</h2>
       <p class="fx-d">The ladder is 7 / 30 / 50 / 100 / 200 / 365, then every 100. Day 6 and day 87 stay silent on purpose.</p>
       <div class="ph"><div class="fxst" id="days"></div></div>
       <div class="fx-ctl">
@@ -173,9 +212,75 @@
       </div>
     </div>
 
+    <!-- ================= HELD TO THE DATE ================= -->
+    <div class="fx-cell">
+      <h2>Maintenance: held to the date (mt-2)</h2>
+      <p class="fx-d">A hold with a finish line. The goal closes the day the deadline passes with the line unbroken.</p>
+      <div class="ph"><div class="fxst" id="mt2"></div></div>
+      <div class="fx-ctl">
+        <label><span>Days promised</span><input type="range" id="m-total" min="7" max="365" value="90"><b class="fx-out" id="m-total-out">90</b></label>
+        <label><span>Days held</span><input type="range" id="m-held" min="1" max="365" value="90"><b class="fx-out" id="m-held-out">90</b></label>
+        <label><span>The line held</span><input type="text" id="m-what" value="without buying anything new"></label>
+        <div class="fx-fire" id="m-fire"></div>
+      </div>
+    </div>
+
+    <!-- ================= THE HARD ONES ================= -->
+    <div class="fx-cell">
+      <h2>Maintenance: the hard ones (mt-3)</h2>
+      <p class="fx-d">Only exists when hard days were REALLY logged (the log is offered on quit-a-habit goals only). The list windows to the last few; it can never overflow.</p>
+      <div class="ph"><div class="fxst" id="mt3"></div></div>
+      <div class="fx-ctl">
+        <label><span>Days held</span><input type="range" id="t-days" min="7" max="365" value="30"><b class="fx-out" id="t-days-out">30</b></label>
+        <label><span>Hard days logged</span><input type="range" id="t-hard" min="0" max="60" value="4"><b class="fx-out" id="t-hard-out">4</b></label>
+        <label><span>The line held</span><input type="text" id="t-what" value="without a drink"></label>
+        <div class="fx-fire" id="t-fire"></div>
+      </div>
+    </div>
+
+    <!-- ================= THE ENGINE ================= -->
+    <div class="fx-cell">
+      <h2>Milestone: the engine (ms-2)</h2>
+      <p class="fx-d">A binary event with the quantity engine underneath. The counts are whatever they actually logged, never invented.</p>
+      <div class="ph"><div class="fxst" id="eng"></div></div>
+      <div class="fx-ctl">
+        <label><span>The event</span><input type="text" id="n-event" value="You got the job."></label>
+        <label><span>Count</span><input type="range" id="n-count" min="1" max="900" value="87"><b class="fx-out" id="n-count-out">87</b></label>
+        <label><span>Count word</span><input type="text" id="n-word" value="applications"></label>
+        <label><span>Days in</span><input type="range" id="n-days" min="1" max="900" value="140"><b class="fx-out" id="n-days-out">140</b></label>
+        <div class="fx-fire" id="n-fire"></div>
+      </div>
+    </div>
+
+    <!-- ================= THE GAP AND THE FALL ================= -->
+    <div class="fx-cell">
+      <h2>Your picks: the gap (rf-gap) / the fall (rf-fall)</h2>
+      <p class="fx-d">Same three numbers, two tellings: the distance closing, or the number they carry dropping. Toggle to compare.</p>
+      <div class="ph"><div class="fxst" id="gf"></div></div>
+      <div class="fx-ctl">
+        <label><span>View</span><select id="v-mode"><option value="gap">the gap</option><option value="fall">the fall</option></select></label>
+        <label><span>Start</span><input type="number" id="v-start" value="0"></label>
+        <label><span>Goal</span><input type="number" id="v-goal" value="10000"></label>
+        <label><span>Today</span><input type="number" id="v-cur" value="6200"></label>
+        <label><span>Unit</span><input type="text" id="v-unit" value="$"></label>
+        <div class="fx-fire" id="v-fire"></div>
+      </div>
+    </div>
+
+    <!-- ================= THEN VS NOW ================= -->
+    <div class="fx-cell">
+      <h2>Open: then vs now (op-1)</h2>
+      <p class="fx-d">Two of their own entries held apart. Fires first at day 30, then on the ladder, never a surprise year later.</p>
+      <div class="ph"><div class="fxst" id="op1"></div></div>
+      <div class="fx-ctl">
+        <label><span>Days apart</span><input type="range" id="p-days" min="7" max="500" value="30"><b class="fx-out" id="p-days-out">30</b></label>
+        <div class="fx-fire" id="p-fire"></div>
+      </div>
+    </div>
+
     <!-- ================= THE RECORD GRID ================= -->
     <div class="fx-cell">
-      <h2>The record (twelve weeks of days)</h2>
+      <h2>Your picks: the record (rf-rec)</h2>
       <p class="fx-d">The grid is a WINDOW: always the last 12 weeks at most, older history becomes one quiet line. It can never grow off the screen.</p>
       <div class="ph"><div class="fxst" id="grid"></div></div>
       <div class="fx-ctl">
@@ -186,7 +291,7 @@
 
     <!-- ================= WEEK CHIPS ================= -->
     <div class="fx-cell">
-      <h2>Week chips (frequency)</h2>
+      <h2>Frequency: week chips (fr-4)</h2>
       <p class="fx-d">Also windowed: the last 8 weeks as chips, everything older summarised. Tolerant by design, a missed week is a dimmer chip, not a broken streak.</p>
       <div class="ph"><div class="fxst" id="chips"></div></div>
       <div class="fx-ctl">
@@ -197,7 +302,7 @@
 
     <!-- ================= OPEN RECEIPTS ================= -->
     <div class="fx-cell">
-      <h2>Open receipts (day N, the goal and the why)</h2>
+      <h2>Open: day N, the goal and the why (op-4)</h2>
       <p class="fx-d">Words + counts only, since an open goal has no metric. Singular and plural both have to read like a human wrote them.</p>
       <div class="ph"><div class="fxst" id="op"></div></div>
       <div class="fx-ctl">
@@ -399,6 +504,161 @@
       + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
   }
 
+  /* ---------------- FOUR FIGURES (qu-2) ---------------- */
+  function figWord(d){
+    return d===2?'double digits':d===3?'three figures':d===4?'four figures'
+         :d===5?'five figures':d===6?'six figures':d===7?'seven figures':d+' digits';
+  }
+  function figs(){
+    var cur = Math.max(1, Math.round(+$('f-cur').value||1)), prev = Math.max(0, Math.round(+$('f-prev').value||0));
+    var unit = $('f-unit').value.trim();
+    var d = String(cur).length, dp = String(prev).length;
+    $('figs').innerHTML =
+      '<div class="n" id="figs-hero">' + fmt(cur) + '</div>'
+      + '<div class="sub" style="max-width:24ch">' + esc(unit) + '. ' + (d>dp ? 'First time in <b>' + figWord(d) + '</b>.' : figWord(d) + '.') + '</div>'
+      + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
+    fitHero($('figs-hero'), 104, 34);
+    $('f-fire').innerHTML = d>dp
+      ? '<b>The number grew a digit.</b> This fires today, once; it cannot fire again until ' + fmt(Math.pow(10,d)) + '.'
+      : 'Same digit count as yesterday: silent. Next fire at <b>' + fmt(Math.pow(10,d)) + '</b>.';
+  }
+
+  /* ---------------- THE RECORD BOARD (qu-5 / qd-2) ---------------- */
+  function rec(){
+    var prev = +$('x-prev').value||0, cur = +$('x-cur').value||0, dir = $('x-dir').value, unit = $('x-unit').value.trim();
+    var margin = Math.max(1, Math.abs(prev)*0.02);
+    var beaten = dir==='down' ? (cur <= prev - margin) : (cur >= prev + margin);
+    $('rec').innerHTML =
+      '<div class="n" id="rec-hero">' + fmt(cur) + '</div>'
+      + '<div class="sub" style="max-width:24ch">' + esc(unit) + '.</div>'
+      + '<div class="cap" style="margin-top:16px">' + (beaten ? 'Old best: ' + fmt(prev) + '. It stood until today.' : 'The best is still ' + fmt(prev) + '.') + '</div>'
+      + (beaten ? '<div class="deposit" style="margin-top:20px">On this day, you set a record. <b>' + fmt(cur) + '</b> ' + esc(unit) + '.</div>' : '')
+      + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
+    fitHero($('rec-hero'), 96, 34);
+    $('x-fire').innerHTML = beaten
+      ? '<b>A record fires</b> (clears the old best by the 2% margin; then a 7-day cooldown so records stay rare).'
+      : 'No fire: it must beat ' + fmt(prev) + ' by at least ' + fmt(Math.ceil(margin)) + ' (' + (dir==='down'?'lower':'higher') + '). A hair past the best is noise, not a record.';
+  }
+
+  /* ---------------- EARLY BY (qu-3 / ms-3) ---------------- */
+  function early(){
+    var total = +$('e-total').value, used = +$('e-used').value;
+    $('e-total-out').textContent = total; $('e-used-out').textContent = used;
+    var left = total - used;
+    if (left >= 0) {
+      $('early').innerHTML =
+        '<div class="n" id="early-hero">' + fmt(left) + '</div>'
+        + '<div class="sub" style="max-width:24ch">' + plural(left,'day','days') + ' you will not need.</div>'
+        + '<div class="cap">You gave it ' + fmt(total) + ' days. It took ' + fmt(used) + '.</div>'
+        + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
+      fitHero($('early-hero'), 104, 34);
+      $('e-fire').innerHTML = left === 0
+        ? 'Landed ON the deadline: the final still fires, this screen just is not the one chosen (nothing to subtract).'
+        : '<b>Fires with the final:</b> finishing early is told as the plain subtraction, nothing invented.';
+    } else {
+      $('early').innerHTML = '<div class="fx-idle">Finished after the deadline. This screen NEVER appears late; the final ceremony fires alone, and the lateness is simply not mentioned.</div>';
+      $('e-fire').textContent = 'Late finish: the subtraction screen is skipped by the chooser, never shown negative.';
+    }
+  }
+
+  /* ---------------- HELD TO THE DATE (mt-2) ---------------- */
+  function mt2(){
+    var total = +$('m-total').value, held = +$('m-held').value, what = $('m-what').value.trim();
+    $('m-total-out').textContent = total; $('m-held-out').textContent = held;
+    if (held > total) { $('m-held').value = held = total; }
+    var done = held >= total;
+    $('mt2').innerHTML =
+      '<div class="n" id="mt2-hero">' + fmt(held) + '</div>'
+      + '<div class="sub" style="max-width:23ch"><b>of ' + fmt(total) + ' days</b> ' + esc(what) + '.</div>'
+      + (done ? '<div class="deposit" style="margin-top:20px">The date came. The line held the whole way. <b>Closed.</b></div>'
+              : '<div class="cap">' + fmt(total-held) + ' ' + plural(total-held,'day','days') + ' between you and the date.</div>')
+      + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
+    fitHero($('mt2-hero'), 104, 34);
+    $('m-fire').innerHTML = done
+      ? '<b>The final fires:</b> a hold with a deadline closes like any target.'
+      : 'Mid-hold: only ladder rungs speak (' + (ladderHit(held)===held ? 'day ' + held + ' IS one, a step fires' : 'day ' + held + ' is not one, silent') + ').';
+  }
+
+  /* ---------------- THE HARD ONES (mt-3) ---------------- */
+  var HARD_POOL = ['the wedding','a bad day at work','out with the old crowd','the flight delay','the anniversary','a Friday that almost won','the empty Sunday','the argument'];
+  function mt3(){
+    var d = +$('t-days').value, hard = +$('t-hard').value, what = $('t-what').value.trim();
+    $('t-days-out').textContent = d; $('t-hard-out').textContent = hard;
+    if (hard > d) { $('t-hard').value = hard = d; }
+    var shown = Math.min(hard, 4), rows = '';
+    for (var i = 0; i < shown; i++) {
+      var back = Math.max(1, Math.round(d * (i + 1) / (shown + 1)));
+      rows += '<div style="display:flex;gap:10px;align-items:baseline;padding:7px 0;text-align:left">'
+            + '<span style="flex:0 0 52px;font-size:11.5px;color:var(--text-lo);font-variant-numeric:tabular-nums">' + dateBack(back) + '</span>'
+            + '<span style="font-size:13.5px;color:var(--text-mid)">' + HARD_POOL[i % HARD_POOL.length] + '</span></div>';
+    }
+    $('mt3').innerHTML =
+      '<div class="n n--big">' + fmt(d) + '</div>'
+      + '<div class="sub" style="max-width:22ch"><b>' + plural(d,'day','days') + '</b> ' + esc(what) + '.</div>'
+      + (hard > 0
+        ? '<div style="width:100%;max-width:280px;margin-top:18px">'
+          + '<div class="cap" style="margin-bottom:2px;text-align:left">The ones that nearly went:</div>' + rows
+          + (hard > shown ? '<div class="cap" style="text-align:left">+ ' + (hard - shown) + ' more in the record.</div>' : '')
+          + '</div>'
+        : '<div class="cap" style="margin-top:16px">No hard days logged. Every one counted anyway.</div>')
+      + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
+    $('t-fire').innerHTML = hard > 0
+      ? 'The hard rows are REAL logged days (the optional "today felt hard" flag, offered on quit-a-habit goals only). List windows at 4 + a count.'
+      : 'Zero hard days logged: the screen still works, it just says less. Nothing is ever invented to fill it.';
+  }
+
+  /* ---------------- THE ENGINE (ms-2) ---------------- */
+  function eng(){
+    var ev = $('n-event').value.trim(), c = +$('n-count').value, w = $('n-word').value.trim(), dd = +$('n-days').value;
+    $('n-count-out').textContent = fmt(c); $('n-days-out').textContent = fmt(dd);
+    $('eng').innerHTML =
+      '<div style="max-width:280px;font-size:26px;font-weight:700;letter-spacing:-.02em;line-height:1.3;color:var(--text-hi)">' + esc(ev) + '</div>'
+      + '<div class="fxrc" style="margin-top:26px">'
+      +   '<div><b>' + fmt(c) + '</b><span>' + esc(plural(c, w.replace(/s$/,''), w)) + '</span></div>'
+      +   '<div><b>' + fmt(dd) + '</b><span>' + plural(dd,'day','days') + '</span></div>'
+      + '</div>'
+      + '<div class="deposit" style="margin-top:22px">The event was one day. <b>The engine was ' + fmt(c) + ' ' + esc(plural(c, w.replace(/s$/,''), w)) + '.</b></div>'
+      + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
+    $('n-fire').innerHTML = 'Fires when they mark the milestone done. The counts shown are whatever they actually logged; if they logged nothing, the event stands alone.';
+  }
+
+  /* ---------------- THE GAP / THE FALL (rf-gap / rf-fall) ---------------- */
+  function gf(){
+    var mode = $('v-mode').value, start = +$('v-start').value, goal = +$('v-goal').value, cur = +$('v-cur').value;
+    var unit = $('v-unit').value.trim();
+    var span = Math.abs(goal - start), closed = Math.abs(cur - start), open = Math.abs(goal - cur);
+    var h;
+    if (mode === 'fall') {
+      h = '<div class="cap" style="margin-bottom:10px">left of ' + esc(unit) + fmt(span) + '</div>'
+        + '<div class="n" id="gf-hero">' + esc(unit) + fmt(open) + '</div>'
+        + '<div class="sub" style="max-width:24ch">The number you carry. It only falls.</div>';
+    } else {
+      h = '<div class="n" id="gf-hero">' + esc(unit) + fmt(closed) + '</div>'
+        + '<div class="sub" style="max-width:24ch">closed, of the ' + esc(unit) + fmt(span) + ' between you and it.</div>'
+        + '<div class="cap">' + esc(unit) + fmt(open) + ' still open. Both get said.</div>';
+    }
+    $('gf').innerHTML = h + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
+    fitHero($('gf-hero'), 88, 30);
+    $('v-fire').innerHTML = 'Same three numbers, two tellings; the chooser picks per goal type. Fires on fifths like the road.';
+  }
+
+  /* ---------------- THEN VS NOW (op-1) ---------------- */
+  function op1(){
+    var d = +$('p-days').value;
+    $('p-days-out').textContent = d;
+    $('op1').innerHTML =
+      '<div class="cap" style="margin-bottom:8px">What you wrote on ' + dateBack(d) + '</div>'
+      + '<div style="max-width:290px;text-align:left;font-size:15.5px;line-height:1.55;color:var(--text-mid)">&ldquo;I keep waiting for people to give up on me and then acting surprised when they do.&rdquo;</div>'
+      + '<div class="cap" style="margin:20px 0 8px">Tonight</div>'
+      + '<div style="max-width:290px;text-align:left;font-size:15.5px;line-height:1.55;color:var(--text-hi)">&ldquo;Called dad on the drive home. No reason. It was good.&rdquo;</div>'
+      + '<div class="fxrc" style="margin-top:24px"><div><b>' + fmt(d) + '</b><span>' + plural(d,'day apart','days apart') + '</span></div></div>'
+      + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
+    var hit = ladderHit(d);
+    $('p-fire').innerHTML = hit === d
+      ? '<b>Day ' + d + ' is a rung:</b> the then-vs-now moment fires (first ever at day 30).'
+      : (d < 30 ? 'Before day 30 there is no "then" worth holding up; silent.' : 'Day ' + d + ' is not a rung; the pair waits for ' + 'the next one.');
+  }
+
   /* ---------------- presets ---------------- */
   var PRESETS = {
     users:   { rs:0, rg:100, rc:60, ru:'paying users', rd:216, c:50, cw:'runs', cd:132, d:100, g:12, gr:72, h:6, ht:4, od:30, oe:22 },
@@ -428,7 +688,15 @@
   /* the range slider mirrors the exact count field both ways */
   $('c-n').addEventListener('input', function(){ $('c-exact').value = this.value; count(); });
 
-  function all(){ road(); count(); days(); grid(); chips(); op(); }
+  function all(){ road(); figs(); rec(); early(); count(); days(); mt2(); mt3(); eng(); gf(); op1(); grid(); chips(); op(); }
+  ['f-cur','f-prev','f-unit'].forEach(function(id){ $(id).addEventListener('input', figs); });
+  ['x-prev','x-cur','x-dir','x-unit'].forEach(function(id){ $(id).addEventListener('input', rec); });
+  ['e-total','e-used'].forEach(function(id){ $(id).addEventListener('input', early); });
+  ['m-total','m-held','m-what'].forEach(function(id){ $(id).addEventListener('input', mt2); });
+  ['t-days','t-hard','t-what'].forEach(function(id){ $(id).addEventListener('input', mt3); });
+  ['n-event','n-count','n-word','n-days'].forEach(function(id){ $(id).addEventListener('input', eng); });
+  ['v-mode','v-start','v-goal','v-cur','v-unit'].forEach(function(id){ $(id).addEventListener('input', gf); });
+  $('p-days').addEventListener('input', op1);
   ['r-start','r-goal','r-cur','r-unit','r-days'].forEach(function(id){ $(id).addEventListener('input', road); });
   ['c-exact','c-word','c-days'].forEach(function(id){ $(id).addEventListener('input', count); });
   ['d-n','d-what'].forEach(function(id){ $(id).addEventListener('input', days); });
