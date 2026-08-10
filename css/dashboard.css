@@ -4183,7 +4183,11 @@ html.flat-ui.theme-light body .daycard-ns::before {
    stacks above the spill everywhere, so its text is always readable. */
 body.ns-bloom .app.dash-v2 #commandCenter {
   position: relative;
-  z-index: 4;
+  /* v1154 (Malik, caught on-device twice): 4 lost to the card's own stacking
+     (z 20 on the mobile home, 30 in evo2), so the floor reflection washed the
+     sync-box text. Above them all; the record's card (z 1001) is the only
+     thing meant to outrank the box, and the box is hidden behind that view. */
+  z-index: 31;
 }
 
 /* ── v605: THE EVOLUTION (Malik) ──
@@ -4652,7 +4656,16 @@ html.theme-light #deskMission {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
   transition: transform .16s ease-out, box-shadow .16s ease-out;
 }
-.cbp__way--first { background: var(--solid-bg); color: var(--solid-fg); }
+/* v1154: the highlight follows the PICK, not the position; a pre-lit first
+   row read as already chosen under the new confirm step. */
+.cbp__way.is-picked { background: var(--solid-bg); color: var(--solid-fg); }
+.cbp__way.is-picked .cbp__way-sub,
+.cbp__way.is-picked .cbp__way-mins { color: inherit; opacity: .62; }
+.cbp__confirm { display: block; width: 100%; margin-top: 18px; padding: 15px;
+  border: 0; border-radius: 13px; cursor: pointer; font: inherit;
+  font-size: 16px; font-weight: 700; color: var(--solid-fg);
+  background: var(--solid-bg); transition: opacity .2s ease; }
+.cbp__confirm:disabled { opacity: .32; cursor: default; }
 .cbp__way:active { transform: scale(.985); }
 .cbp__way-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 4px; }
 .cbp__way-title { font-size: 16px; font-weight: 700; letter-spacing: -.01em; }
@@ -6103,14 +6116,8 @@ body.mf-open #dashGreetingMobile { opacity: 0; transition: opacity 200ms ease; p
 /* the wall photos are a later pass; notes only for now */
 #mementoFull.mf--open{opacity:1}
 #mementoFull .in-col{padding:26px 24px 60px}
-#mementoFull .rim{position:fixed;inset:0;z-index:8;pointer-events:none}
-#mementoFull .rim::before{content:"";position:absolute;left:0;right:0;top:0;height:2.5px; background:#fff;box-shadow:0 0 18px 3px rgba(238,244,255,.85), 0 0 44px 8px rgba(200,215,255,.4)}
-#mementoFull .rim::after{content:"";position:absolute;top:0;bottom:0;left:0;width:2.5px; background:linear-gradient(180deg,#fff 62%,rgba(255,255,255,0)); box-shadow:0 0 18px 3px rgba(238,244,255,.7)}
-#mementoFull .rim i{position:absolute;top:0;bottom:0;right:0;width:2.5px; background:linear-gradient(180deg,#fff 62%,rgba(255,255,255,0)); box-shadow:0 0 18px 3px rgba(238,244,255,.7)}
 #mementoFull .in-back{position:fixed;top:calc(var(--safe-t) + 14px);left:14px;z-index:9; display:grid;place-items:center;width:36px;height:36px;border:0;border-radius:50%; background:rgba(255,255,255,.08);color:var(--ink1);cursor:pointer; box-shadow:inset 0 1px 0 rgba(255,255,255,.09)}
 #mementoFull .in-back svg{width:17px;height:17px}
-#mementoFull .rim::before{inset:5px;height:auto;border-radius:46px;background:none; box-shadow:0 0 0 2.5px var(--rim-c,#fff), 0 0 22px 4px rgba(var(--rim-rgb,238,244,255),.8), 0 0 60px 16px rgba(var(--rim-rgb,200,215,255),.35), inset 0 0 30px rgba(var(--rim-rgb,238,244,255),.30)}
-#mementoFull .rim::after, #mementoFull .rim i{display:none}
 #mementoFull .in-mark{fill:#c7cdd8}
 #mementoFull .in-seal{background:rgba(255,255,255,.05);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
 #mementoFull .in-seal__law{box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
@@ -6121,8 +6128,6 @@ body.mf-open #dashGreetingMobile { opacity: 0; transition: opacity 200ms ease; p
 #mementoFull .in-code i{background:rgba(238,242,251,.75)}
 #mementoFull .in-back{background:rgba(255,255,255,.08); box-shadow:inset 0 1px 0 rgba(255,255,255,.09);color:var(--hi)}
 #mementoFull .in-col{padding-top:calc(var(--safe-t) + 66px)}
-#mementoFull .rim-cover{position:fixed;left:0;right:0;bottom:0;height:76px;z-index:8;pointer-events:none; background:linear-gradient(to top, #050609 26%, rgba(5,6,9,0)); transition:opacity .6s ease}
-#mementoFull.rim-done .rim-cover{opacity:0}
 #mementoFull .in-count{margin-top:14px;font-size:36px;font-weight:250;letter-spacing:.08em; color:var(--hi);font-variant-numeric:tabular-nums}
 #mementoFull .in-vowline{margin-top:24px;text-align:center;font-size:17px;font-weight:650; font-style:italic;letter-spacing:-.015em;line-height:1.4;color:var(--hi)}
 #mementoFull .in-vowline span{display:block;margin-top:7px;font-size:12px;font-weight:600; font-style:normal;color:var(--lo)}
@@ -6363,11 +6368,12 @@ body.mf-open #dashGreetingMobile { opacity: 0; transition: opacity 200ms ease; p
 body.is-dormant #dayCard{filter:saturate(.55) brightness(.62);transition:filter 1.2s ease}
 body.is-dormant .ambient{opacity:.35;transition:opacity 1.2s ease}
 #dayCard{transition:filter 1.2s ease}
-/* The card's ground reflection stays UNDER the sync box text. */
-#commandCenter{position:relative;z-index:31}
 /* No text selection on the identity surfaces (PWA long-press blue boxes).
    Anything that takes typing stays selectable. */
 #dayCard, #commandCenter .cc-card, #commandCenter .cc-dots--deck, #mementoFull{
   -webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 #mementoFull textarea, #mementoFull [contenteditable], #mementoFull input{
   -webkit-user-select:text;user-select:text}
+/* v1154: the pull-down-to-close must win against iOS rubber-banding; contain
+   the overscroll so the gesture engages the moment the top is reached. */
+#mementoFull { overscroll-behavior-y: contain; }

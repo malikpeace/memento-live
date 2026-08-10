@@ -1828,7 +1828,7 @@ const ComebackPicker = {
         '<p class="cbp__sub">It&rsquo;s better to start small than not at all.</p>' +
         '<div class="cbp__ways">' +
           ways.map((w, i) =>
-            '<button class="cbp__way' + (i === 0 ? ' cbp__way--first' : '') + '" type="button" data-cbp-tier="' + esc(w.tier) + '">' +
+            '<button class="cbp__way' + (i === 0 ? ' cbp__way--first' : '') + '" type="button" data-cbp-tier="' + esc(w.tier) + '" aria-pressed="false">' +
               '<span class="cbp__way-top">' +
                 '<span class="cbp__way-title">' + esc(w.text) + '</span>' +
                 (w.mins ? '<span class="cbp__way-mins">' + esc(w.mins) + '</span>' : '') +
@@ -1837,6 +1837,9 @@ const ComebackPicker = {
             '</button>'
           ).join('') +
         '</div>' +
+        // v1154 (Malik): picking is a two-step. Tap to choose, then a
+        // deliberate confirm at the bottom, so nobody commits by accident.
+        '<button class="cbp__confirm" type="button" disabled>Choose one above</button>' +
       '</div>';
     document.body.appendChild(el);
     this._el = el;
@@ -1844,18 +1847,30 @@ const ComebackPicker = {
     el.classList.add('cbp--open');
 
     el.querySelector('.cbp__close').addEventListener('click', () => this.close());
+    let picked = '';
+    const confirm = el.querySelector('.cbp__confirm');
     el.querySelectorAll('[data-cbp-tier]').forEach((b) => {
       b.addEventListener('click', () => {
-        const tier = b.getAttribute('data-cbp-tier');
-        try {
-          if (['tiny','light','moderate','heavy','extreme'].indexOf(tier) >= 0) {
-            state.action.selectedTier = tier;
-            persistNow();
-          }
-        } catch (e) {}
-        this.close();
-        setTimeout(() => { try { if (typeof ActionExperience !== 'undefined') ActionExperience.open(); } catch (e) {} }, 240);
+        picked = b.getAttribute('data-cbp-tier');
+        el.querySelectorAll('[data-cbp-tier]').forEach(x => {
+          const on = x === b;
+          x.classList.toggle('is-picked', on);
+          x.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+        confirm.disabled = false;
+        confirm.textContent = 'Start this one';
       });
+    });
+    confirm.addEventListener('click', () => {
+      if (!picked) return;
+      try {
+        if (['tiny','light','moderate','heavy','extreme'].indexOf(picked) >= 0) {
+          state.action.selectedTier = picked;
+          persistNow();
+        }
+      } catch (e) {}
+      this.close();
+      setTimeout(() => { try { if (typeof ActionExperience !== 'undefined') ActionExperience.open(); } catch (e) {} }, 240);
     });
     this._esc = (e) => { if (e.key === 'Escape') this.close(); };
     document.addEventListener('keydown', this._esc);
@@ -3698,12 +3713,27 @@ const CC_PILLARS = ['action', 'clarity', 'consistency'];
 // deck goes live the moment the star exists: two faces before a plan, three
 // after. One list, derived from state, used by the renderer, the swipe
 // machinery and the dots, so they can never disagree about what is swipeable.
+// v1154 (Malik): is the box in lockdown? A gap that matters owns the deck:
+// the comeback face plus the GOAL face (so they can remember why), nothing
+// else, until Build momentum is tapped.
+function ccLockdownActive() {
+  try {
+    const hasStar = !!(state.clarity && state.clarity.completed && state.clarity.answers && state.clarity.answers.neutronStar);
+    const pa = (state.action && state.action.primaryAction) || {};
+    const hasPlan = !!(state.action && state.action.planGenerated && pa.title);
+    return hasStar && hasPlan &&
+      typeof isComebackGap === 'function' && isComebackGap() &&
+      ccComebackMatters(ccGoalShape());
+  } catch (e) { return false; }
+}
+
 function ccPillarList() {
   try {
     const hasStar = !!(state.clarity && state.clarity.completed && state.clarity.answers && state.clarity.answers.neutronStar);
     if (!hasStar) return ['action'];
     const pa = (state.action && state.action.primaryAction) || {};
     const hasPlan = !!(state.action && state.action.planGenerated && pa.title);
+    if (hasPlan && ccLockdownActive()) return ['action', 'clarity'];
     return hasPlan ? CC_PILLARS : ['action', 'clarity'];
   } catch (e) { return CC_PILLARS; }
 }
@@ -4503,18 +4533,14 @@ function renderCommandCenter() {
     // natural height. v1104: swiping is offered from the moment the star
     // exists (two faces pre-plan), not only once there is a plan.
     const _pillars = ccPillarList();
-    // v1153 THE LOCKDOWN (Malik): a real gap owns the whole box. One face, no
-    // swipe, no dots, until Keep going is tapped. Only when missing days
-    // actually matters for this goal (ccComebackMatters); rate plans get the
-    // calm Back on rhythm face instead and stay swipeable.
+    // v1153/v1154 THE LOCKDOWN (Malik): a real gap owns the box. The deck
+    // shrinks to the comeback face + the goal face (ccPillarList), the
+    // Memento dims dormant, and Build momentum is the way forward. Rate
+    // plans get the calm Back on rhythm face instead and keep the full deck.
     let _lockdown = false;
-    try {
-      _lockdown = hasClarity && hasPlan &&
-        typeof isComebackGap === 'function' && isComebackGap() &&
-        ccComebackMatters(ccGoalShape());
-    } catch (e) { _lockdown = false; }
+    try { _lockdown = ccLockdownActive(); } catch (e) { _lockdown = false; }
     try { document.body.classList.toggle('is-dormant', _lockdown); } catch (e) {}
-    const _pillared = _pillars.length > 1 && !_lockdown;
+    const _pillared = _pillars.length > 1;
     // A face that no longer exists (the plan was reset while consistency was
     // showing) falls back to the action face instead of rendering nothing.
     if (_pillars.indexOf(_ccPillar) === -1) _ccPillar = 'action';
@@ -4531,19 +4557,19 @@ function renderCommandCenter() {
     const eyebrow = (t) => '<div style="font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-lo);font-weight:700;margin-bottom:8px;">' + t + '</div>';
     const primaryBtn = (label, action) => '<button class="cc-primary" data-cc-action="' + action + '" style="flex:0 1 auto;min-width:180px;font:inherit;font-weight:700;font-size:0.92rem;cursor:pointer;border:none;border-radius:calc(8px * var(--rx, 1));padding:12px 40px;background:var(--solid-bg);color:var(--solid-fg);">' + esc(label) + '</button>';
 
-    if (_lockdown) {
-      // the one face. Same deck language (v-nf scale), sentence case, and the
-      // box keeps the deck's height so the return never feels like a demotion.
+    if (_lockdown && _ccPillar !== 'clarity') {
+      // the comeback face, in the deck's own language. The goal face stays a
+      // swipe away (Malik: "so they can remember"); consistency waits.
       let gap = 0;
       try { gap = (typeof comebackGapDays === 'function') ? comebackGapDays() : 0; } catch (e) {}
       const dayWord = gap === 1 ? 'day' : 'days';
-      return '<section class="cc-card cc-card--solo" style="margin:0 0 14px;padding:22px 22px 20px;border-radius:var(--card-r);background:var(--surface-1);box-shadow:var(--shadow-card), inset 0 1px 0 rgba(255,255,255,0.06);">' +
-        '<div class="v v-nf">' +
-        '<p class="a-sup" style="margin:0">' + gap + ' ' + dayWord + ' missed.</p>' +
-        '<p class="a-move" style="margin-top:8px">No worries, let&rsquo;s get back to it.</p>' +
+      const firstName = String((state.profile && state.profile.name) || '').trim().split(/\s+/)[0] || '';
+      return wrap('<div class="v v-nf">' +
+        '<p class="a-move" style="margin:0">Welcome back' + (firstName ? ', ' + esc(firstName) : '') + '.</p>' +
+        '<p class="a-sup" style="margin-top:8px">You missed ' + gap + ' ' + dayWord + '.</p>' +
         '<div style="margin-top:auto"></div>' +
-        '<button class="a-btn" data-cc-action="comeback" type="button">Keep going</button>' +
-        '</div></section>';
+        '<button class="a-btn" data-cc-action="comeback" type="button">Build momentum</button>' +
+        '</div>' + dots('action'));
     }
 
     if (!hasClarity) {
@@ -7127,14 +7153,7 @@ function _mfInsideWire(ov, d, sig) {
   // back chevron reverses the dive
   on(ov.querySelector('.in-back'), 'click', () => { try { MementoView.close(); } catch (e) {} });
 
-  // the ring closes only at the very bottom of the scroll
-  const rimCheck = () => {
-    try {
-      const done = ov.scrollHeight > 0 && (ov.scrollTop + ov.clientHeight >= ov.scrollHeight - 6);
-      ov.classList.toggle('rim-done', done);
-    } catch (e) {}
-  };
-  on(ov, 'scroll', rimCheck, { passive: true });
+  // (the rim and its close-at-the-bottom moment were removed in v1154)
 
   // the up-clock under days-since-creation
   const up = ov.querySelector('#mfUpLive');
@@ -7232,7 +7251,6 @@ function _mfInsideWire(ov, d, sig) {
   // the record door
   const door = ov.querySelector('#mfDoor'), doorB = ov.querySelector('#mfDoorB');
   wireDoor(door, doorB, on);
-  rimCheck();
 }
 
 function wireDoor(door, doorB, on) {
@@ -7354,10 +7372,9 @@ function _mfBuildOverlay() {
     ov.setAttribute('aria-label', 'Your Memento');
     // v1151: the inside page (three movements + seal + plaque + door + foot);
     // the trail lives behind the record door now.
+    // (v1154, Malik: the rim is GONE. Only the colour-matched room remains.)
     ov.innerHTML =
       '<div class="mf__bg" aria-hidden="true"></div>' +
-      '<div class="rim" aria-hidden="true"></div>' +
-      '<div class="rim-cover" aria-hidden="true"></div>' +
       '<button class="in-back" type="button" aria-label="Back out of the card">' +
         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>' +
       '</button>' +
