@@ -69,9 +69,10 @@ t('step: 15->22 of 100 crosses 20 as a step', function () {
   eq([ev.kind, ev.milestone, ev.intensity], ['step', 20, 'step']);
   eq(ev.remaining, 78);
 });
-t('no crossing, no event', function () {
+t('no crossing: once the first move is paid, quiet until a mark', function () {
+  var led = {}; led[C.starHash(EARN) + ':first-move'] = '2026-06-01';
   eq(run(gpOf({ target:100, baseline:0, current:19,
-    history:[{day:'2026-06-01',value:5},{day:'2026-08-09',value:19}] }), EARN, 15, {}), null);
+    history:[{day:'2026-06-01',value:5},{day:'2026-08-09',value:19}] }), EARN, 15, led), null);
 });
 t('L3 one pulse over two marks fires ONLY the furthest', function () {
   var ev = run(gpOf({ target:100, baseline:0, current:45,
@@ -156,6 +157,33 @@ t('L8 cooldown: two records in one week collapse to one', function () {
   eq(C.evaluate({ gp:gp, star:EARN, prevValue:1000, ledger:led, today:'2026-08-12' }), null, 'inside cooldown');
   gp.history.push({day:'2026-08-17',value:1400}); gp.current = 1400;
   eq(C.evaluate({ gp:gp, star:EARN, prevValue:1200, ledger:led, today:'2026-08-17' }).kind, 'record', 'after cooldown');
+});
+
+/* ---------- L8 decimal margins ---------- */
+t('L8 decimal goal: 1.5h -> 1.0h screen time IS a record', function () {
+  var ev = run(gpOf({ target:null, current:1.0,
+    history:[{day:'2026-04-01',value:2.5},{day:'2026-07-01',value:1.5},{day:'2026-08-09',value:1.0}] }), LOSE, 1.5, {});
+  eq([ev.kind, ev.milestone, ev.prev], ['record', 1.0, 1.5]);
+});
+t('L8 decimal goal: a hair under the best still is not one', function () {
+  eq(run(gpOf({ target:null, current:1.49,
+    history:[{day:'2026-04-01',value:2.5},{day:'2026-07-01',value:1.5},{day:'2026-08-09',value:1.49}] }), LOSE, 1.5, {}), null);
+});
+
+/* ---------- L11 first move ---------- */
+t('L11 the first inch fires once, before any fifth', function () {
+  var led = {};
+  var gp = gpOf({ target:100, baseline:0, current:3,
+    history:[{day:'2026-08-01',value:0},{day:'2026-08-09',value:3}] });
+  var ev = C.evaluate({ gp:gp, star:EARN, prevValue:0, ledger:led, today:'2026-08-09' });
+  eq([ev.kind, ev.key.indexOf(':first-move') > -1], ['first', true]);
+  gp.current = 5;
+  eq(C.evaluate({ gp:gp, star:EARN, prevValue:3, ledger:led, today:'2026-08-10' }), null, 'second inch is quiet');
+});
+t('L11 a real mark still outranks the first move', function () {
+  var ev = run(gpOf({ target:100, baseline:0, current:22,
+    history:[{day:'2026-06-01',value:0},{day:'2026-08-09',value:22}] }), EARN, 0, {});
+  eq(ev.kind, 'step');
 });
 
 /* ---------- L9 day ladder ---------- */

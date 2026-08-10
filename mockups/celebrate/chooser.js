@@ -39,7 +39,10 @@
    L9  Day-count goals (maintenance) use the ladder 7/30/50/100/200/365,
        then every 100 after; once-only via the same ledger.
    L10 evaluate() returns at most ONE event; the caller shows at most one
-       ceremony per app-open and the comeback moment outranks it. */
+       ceremony per app-open and the comeback moment outranks it.
+   L11 First move: the first real movement off the baseline (>= 1% of the
+       span) fires ONE quiet 'first' event before any fifth is reached, so
+       the hardest stretch, the beginning, is witnessed. Once ever. */
 (function (root) {
   'use strict';
 
@@ -145,7 +148,13 @@
         if (best === null || (dir === 'down' ? v < best : v > best)) best = v;
       }
       if (best === null) return null;                  // first pulse ever: nothing to beat
-      var margin = Math.max(1, Math.abs(best) * 0.02);
+      /* the whole-unit floor is for integer goals (users, runs). A decimal
+         goal (1.5h screen time) must not need a full unit: 1.5 -> 1.0 IS a
+         record. Malik caught this in the field-test rig. */
+      var integral = true;
+      for (var hz = 0; hz < hist.length; hz++) if (hist[hz].value !== Math.round(hist[hz].value)) { integral = false; break; }
+      var margin = Math.abs(best) * 0.02;
+      if (integral) margin = Math.max(1, margin);
       var beaten = dir === 'down' ? (to <= best - margin) : (to >= best + margin);
       if (!beaten) return null;
       var lastRec = null;
@@ -162,7 +171,20 @@
     for (var m = 0; m < marks.length; m++) {
       if (crossed(dir, from, to, marks[m])) hitMark = marks[m];      /* L3: keep the furthest */
     }
-    if (hitMark === null) return null;
+    if (hitMark === null) {
+      /* L11 first move: the hardest stretch is the first inch, and the first
+         fifth can be a month away. The FIRST real movement off the baseline
+         gets one quiet ceremony, once ever, so early progress is witnessed
+         without lying about the scale (the road stays linear). */
+      if (gp.baseline !== null) {
+        var movedBy = dir === 'down' ? gp.baseline - to : to - gp.baseline;
+        var spanAll = Math.abs(gp.target - gp.baseline);
+        if (movedBy >= Math.max(spanAll * 0.01, 0) && movedBy > 0) {
+          return fire('first', 'first-move', { milestone: null, prev: from, remaining: Math.abs(gp.target - to) });
+        }
+      }
+      return null;
+    }
     var isFinal = hitMark === gp.target;                             /* L4 */
     return fire(isFinal ? 'final' : 'step', 'mark-' + hitMark, {
       milestone: hitMark, prev: from,

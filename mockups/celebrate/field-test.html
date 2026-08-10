@@ -117,7 +117,7 @@
 </div>
 <div class="fx-wrap">
   <h1>Fuck with the values</h1>
-  <p class="fx-sub">Every phone below is driven by the same logic file the app will use (chooser.js), not by hand-placed pixels. Change the numbers and watch the layout solve itself. The line under each phone tells you whether a celebration would actually FIRE at that state, because part of being dynamic is knowing when to stay silent. Fourteen panels cover every approved screen that HAS variables; the ones missing here (qd-3's "under 200" line, ms-1's flood, ms-4's decision, op-3's proof count, the card's M pop) are words and motion around these same numbers, so tuning the panels tunes them too.</p>
+  <p class="fx-sub">Every phone below is driven by the same logic file the app will use (chooser.js), not by hand-placed pixels. Change the numbers and watch the layout solve itself. The line under each phone tells you whether a celebration would actually FIRE at that state, because part of being dynamic is knowing when to stay silent. Every approved screen with numbers in it now has its own panel, named after its gallery screen, 22 in all. The only ones without a panel are pure words or motion: ms-1's colour flood, ms-4's decision, and the card's M pop.</p>
 
   <div class="fx-presets" id="presets">
     <button data-p="users">100 users, day 216</button>
@@ -244,7 +244,7 @@
       <p class="fx-d">A binary event with the quantity engine underneath. The counts are whatever they actually logged, never invented.</p>
       <div class="ph"><div class="fxst" id="eng"></div></div>
       <div class="fx-ctl">
-        <label><span>The event</span><input type="text" id="n-event" value="You got the job."></label>
+        <label><span>The event</span><input type="text" id="n-event" value="You got the job!"></label>
         <label><span>Count</span><input type="range" id="n-count" min="1" max="900" value="87"><b class="fx-out" id="n-count-out">87</b></label>
         <label><span>Count word</span><input type="text" id="n-word" value="applications"></label>
         <label><span>Days in</span><input type="range" id="n-days" min="1" max="900" value="140"><b class="fx-out" id="n-days-out">140</b></label>
@@ -285,7 +285,7 @@
       <div class="ph"><div class="fxst" id="grid"></div></div>
       <div class="fx-ctl">
         <label><span>Weeks of history</span><input type="range" id="g-w" min="1" max="60" value="12"><b class="fx-out" id="g-w-out">12</b></label>
-        <label><span>Show-up rate</span><input type="range" id="g-r" min="10" max="100" value="72"><b class="fx-out" id="g-r-out">72%</b></label>
+        <label><span>Days showed up</span><input type="range" id="g-r" min="0" max="84" value="61"><b class="fx-out" id="g-r-out">61</b></label>
       </div>
     </div>
 
@@ -297,6 +297,109 @@
       <div class="fx-ctl">
         <label><span>Weeks running</span><input type="range" id="h-w" min="1" max="30" value="6"><b class="fx-out" id="h-w-out">6</b></label>
         <label><span>Target / week</span><input type="range" id="h-t" min="1" max="7" value="4"><b class="fx-out" id="h-t-out">4</b></label>
+      </div>
+    </div>
+
+    <!-- ================= THE NUMBER YOU CARRY ================= -->
+    <div class="fx-cell">
+      <h2>Quantity down: the number you carry (qd-3)</h2>
+      <p class="fx-d">The threshold moment: the first morning the number is under the line they named. Fires once, only when it is actually true.</p>
+      <div class="ph"><div class="fxst" id="qd3"></div></div>
+      <div class="fx-ctl">
+        <label><span>They said under</span><input type="number" id="q3-line" value="200"></label>
+        <label><span>Today</span><input type="number" id="q3-cur" value="199"></label>
+        <label><span>Not since</span><input type="text" id="q3-since" value="2019"></label>
+        <label><span>Days tracked</span><input type="range" id="q3-days" min="1" max="900" value="96"><b class="fx-out" id="q3-days-out">96</b></label>
+        <div class="fx-fire" id="q3-fire"></div>
+      </div>
+    </div>
+
+    <!-- ================= THE LOAN ================= -->
+    <div class="fx-cell">
+      <h2>Quantity down: the falling balance (qd-4)</h2>
+      <p class="fx-d">Debt in its own numbers: what is left, what closed, and the payments that did it.</p>
+      <div class="ph"><div class="fxst" id="qd4"></div></div>
+      <div class="fx-ctl">
+        <label><span>Started at</span><input type="number" id="q4-start" value="34000"></label>
+        <label><span>Left today</span><input type="number" id="q4-cur" value="29900"></label>
+        <label><span>Payments</span><input type="range" id="q4-pay" min="1" max="200" value="14"><b class="fx-out" id="q4-pay-out">14</b></label>
+        <label><span>Months in</span><input type="range" id="q4-mon" min="1" max="60" value="7"><b class="fx-out" id="q4-mon-out">7</b></label>
+        <div class="fx-fire" id="q4-fire"></div>
+      </div>
+    </div>
+
+    <!-- ================= THE AVERAGE COMING DOWN ================= -->
+    <div class="fx-cell">
+      <h2>Quantity down: the average coming down (qd-5)</h2>
+      <p class="fx-d">Screen time told as time: where the daily average was, where it is now, and the time handed back.</p>
+      <div class="ph"><div class="fxst" id="qd5"></div></div>
+      <div class="fx-ctl">
+        <label><span>Then (min/day)</span><input type="range" id="q5-then" min="10" max="600" value="188"><b class="fx-out" id="q5-then-out">3h 08m</b></label>
+        <label><span>Now (min/day)</span><input type="range" id="q5-now" min="5" max="600" value="58"><b class="fx-out" id="q5-now-out">58m</b></label>
+        <label><span>Weeks between</span><input type="range" id="q5-w" min="1" max="60" value="11"><b class="fx-out" id="q5-w-out">11</b></label>
+        <div class="fx-fire" id="q5-fire"></div>
+      </div>
+    </div>
+
+    <!-- ================= RUNS THIS WEEK ================= -->
+    <div class="fx-cell">
+      <h2>Frequency: runs this week (fr-1)</h2>
+      <p class="fx-d">The week as seven days, the ones that ran lit. Tolerant: the number is the win, not a streak.</p>
+      <div class="ph"><div class="fxst" id="fr1"></div></div>
+      <div class="fx-ctl">
+        <label><span>Runs this week</span><input type="range" id="f1-n" min="0" max="7" value="4"><b class="fx-out" id="f1-n-out">4</b></label>
+        <label><span>Word</span><input type="text" id="f1-word" value="Runs"></label>
+        <div class="fx-fire" id="f1-fire"></div>
+      </div>
+    </div>
+
+    <!-- ================= WEEKS AT RATE ================= -->
+    <div class="fx-cell">
+      <h2>Frequency: weeks at your rate (fr-2 / fr-5)</h2>
+      <p class="fx-d">The run of weeks that held the rate, plus the total count that run produced.</p>
+      <div class="ph"><div class="fxst" id="fr2"></div></div>
+      <div class="fx-ctl">
+        <label><span>Weeks at rate</span><input type="range" id="f2-w" min="1" max="52" value="6"><b class="fx-out" id="f2-w-out">6</b></label>
+        <label><span>Total count</span><input type="range" id="f2-n" min="1" max="500" value="27"><b class="fx-out" id="f2-n-out">27</b></label>
+        <label><span>Word</span><input type="text" id="f2-word" value="swims"></label>
+        <div class="fx-fire" id="f2-fire"></div>
+      </div>
+    </div>
+
+    <!-- ================= THE MINUTE ================= -->
+    <div class="fx-cell">
+      <h2>Milestone: the minute (ms-5)</h2>
+      <p class="fx-d">The minute gets kept, not only the day, next to what the years underneath it cost.</p>
+      <div class="ph"><div class="fxst" id="ms5"></div></div>
+      <div class="fx-ctl">
+        <label><span>The word</span><input type="text" id="m5-word" value="You passed"></label>
+        <label><span>The minute</span><input type="text" id="m5-time" value="4:12pm"></label>
+        <label><span>Days since day one</span><input type="range" id="m5-days" min="1" max="2000" value="874"><b class="fx-out" id="m5-days-out">874</b></label>
+        <label><span>Hours logged</span><input type="range" id="m5-hours" min="0" max="5000" value="1140"><b class="fx-out" id="m5-hours-out">1,140</b></label>
+        <div class="fx-fire" id="m5-fire"></div>
+      </div>
+    </div>
+
+    <!-- ================= WHAT YOU WROTE ================= -->
+    <div class="fx-cell">
+      <h2>Open: the day count and the words (op-2 / op-5)</h2>
+      <p class="fx-d">A day count over their own written line. Under a year reads as op-2; a year or more becomes "a year, still open" (op-5).</p>
+      <div class="ph"><div class="fxst" id="op2"></div></div>
+      <div class="fx-ctl">
+        <label><span>Days since</span><input type="range" id="p2-days" min="7" max="1200" value="180"><b class="fx-out" id="p2-days-out">180</b></label>
+        <div class="fx-fire" id="p2-fire"></div>
+      </div>
+    </div>
+
+    <!-- ================= PROOF NUMBER N ================= -->
+    <div class="fx-cell">
+      <h2>Open: proof number N (op-3)</h2>
+      <p class="fx-d">One logged moment plus the count of moments like it. The count and the first date are the only numbers an open goal honestly has.</p>
+      <div class="ph"><div class="fxst" id="op3p"></div></div>
+      <div class="fx-ctl">
+        <label><span>Proof count</span><input type="range" id="p3-n" min="1" max="300" value="14"><b class="fx-out" id="p3-n-out">14</b></label>
+        <label><span>First, days ago</span><input type="range" id="p3-first" min="1" max="900" value="145"><b class="fx-out" id="p3-first-out">145</b></label>
+        <div class="fx-fire" id="p3-fire"></div>
       </div>
     </div>
 
@@ -401,7 +504,12 @@
     h += '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
     host.innerHTML = h;
     fitHero($('road-hero'), 84, 30);
-    if (nowMark === null) fire.textContent = 'No mark crossed yet. NOTHING fires; the first ceremony waits for ' + fmt(marks[0]) + '.';
+    if (nowMark === null) {
+      var movedBy = dir === 'down' ? start - cur : cur - start;
+      fire.innerHTML = movedBy > 0
+        ? '<b>The first move fires</b> (once ever): the first real inch off ' + fmt(start) + ' gets witnessed, so nobody waits for ' + fmt(marks[0]) + ' to feel seen. The scale itself stays honest and linear.'
+        : 'No movement yet. Nothing fires; the first inch will (once), then the first mark at ' + fmt(marks[0]) + '.';
+    }
     else if (nowMark === goal) fire.innerHTML = 'The target itself: the <b>final</b> ceremony fires (and swallows any step under it).';
     else fire.innerHTML = 'A <b>step</b> fires at ' + fmt(nowMark) + ' (once, ever; recrossing after a bounce is silent). ' + marks.length + ' marks on this road.';
   }
@@ -420,7 +528,7 @@
     host.innerHTML =
       '<div class="cap" style="margin:0 0 10px">Total ' + esc(word) + '</div>'
       + '<div class="n" id="count-hero">' + fmt(n) + '</div>'
-      + '<div class="sub" style="max-width:24ch"><b>' + days + ' ' + plural(days, 'day', 'days') + '</b> of showing up made this number.</div>'
+      + '<div class="sub" style="max-width:24ch"><b>' + days + ' ' + plural(days, 'day', 'days') + '</b> of showing up made this number possible.</div>'
       + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
     fitHero($('count-hero'), 104, 34);
     var hit = ladderHit(n), next = null;
@@ -453,18 +561,22 @@
   /* ---------------- THE RECORD GRID ---------------- */
   function seededRand(seed){ return function(){ seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; }; }
   function grid(){
-    var w = +$('g-w').value, rate = +$('g-r').value;
-    $('g-w-out').textContent = w; $('g-r-out').textContent = rate + '%';
-    var shown = Math.min(w, 12), older = w - shown;
-    var rnd = seededRand(w * 97 + rate);
-    var cells = '', total = shown * 7, onCount = 0;
+    var w = +$('g-w').value, shown = Math.min(w, 12), total = shown * 7;
+    var slider = $('g-r'); slider.max = total;
+    var onCount = Math.min(+slider.value, total);
+    $('g-w-out').textContent = w; $('g-r-out').textContent = fmt(onCount);
+    var older = w - shown;
+    /* scatter the EXACT day count across the window (seeded, stable) */
+    var rnd = seededRand(w * 97 + onCount), idx = [];
+    for (var i = 0; i < total; i++) idx.push(i);
+    for (var i = total - 1; i > 0; i--) { var j = Math.floor(rnd() * (i + 1)), t2 = idx[i]; idx[i] = idx[j]; idx[j] = t2; }
+    var onSet = {}; for (var i = 0; i < onCount; i++) onSet[idx[i]] = 1;
+    var cells = '';
     for (var i = 0; i < total; i++) {
-      var on = rnd() * 100 < rate;
-      if (on) onCount++;
-      cells += '<i class="' + (on ? 'on' : '') + (i === total - 1 ? ' today' : '') + '"></i>';
+      cells += '<i class="' + (onSet[i] ? 'on' : '') + (i === total - 1 ? ' today' : '') + '"></i>';
     }
     $('grid').innerHTML =
-      '<div class="n n--big">' + onCount + '</div>'
+      '<div class="n n--big">' + fmt(onCount) + '</div>'
       + '<div class="sub">of the last ' + fmt(total) + ' days, you showed up.</div>'
       + '<div class="fxg" style="width:' + Math.round(Math.min(238, 34 * 7)) + 'px">' + cells + '</div>'
       + (older > 0 ? '<div class="cap">+ ' + older + ' earlier ' + plural(older, 'week', 'weeks') + ' in the record before this window.</div>' : '')
@@ -526,7 +638,10 @@
   /* ---------------- THE RECORD BOARD (qu-5 / qd-2) ---------------- */
   function rec(){
     var prev = +$('x-prev').value||0, cur = +$('x-cur').value||0, dir = $('x-dir').value, unit = $('x-unit').value.trim();
-    var margin = Math.max(1, Math.abs(prev)*0.02);
+    /* whole-unit floor only for integer goals; 1.5h -> 1.0h IS a record (Malik's catch) */
+    var integral = prev === Math.round(prev) && cur === Math.round(cur);
+    var margin = Math.abs(prev)*0.02;
+    if (integral) margin = Math.max(1, margin);
     var beaten = dir==='down' ? (cur <= prev - margin) : (cur >= prev + margin);
     $('rec').innerHTML =
       '<div class="n" id="rec-hero">' + fmt(cur) + '</div>'
@@ -537,7 +652,7 @@
     fitHero($('rec-hero'), 96, 34);
     $('x-fire').innerHTML = beaten
       ? '<b>A record fires</b> (clears the old best by the 2% margin; then a 7-day cooldown so records stay rare).'
-      : 'No fire: it must beat ' + fmt(prev) + ' by at least ' + fmt(Math.ceil(margin)) + ' (' + (dir==='down'?'lower':'higher') + '). A hair past the best is noise, not a record.';
+      : 'No fire: it must beat ' + fmt(prev) + ' by at least ' + (integral ? fmt(Math.ceil(margin)) : margin.toFixed(2)) + ' (' + (dir==='down'?'lower':'higher') + '). A hair past the best is noise, not a record.';
   }
 
   /* ---------------- EARLY BY (qu-3 / ms-3) ---------------- */
@@ -548,7 +663,7 @@
     if (left >= 0) {
       $('early').innerHTML =
         '<div class="n" id="early-hero">' + fmt(left) + '</div>'
-        + '<div class="sub" style="max-width:24ch">' + plural(left,'day','days') + ' you will not need.</div>'
+        + '<div class="sub" style="max-width:24ch">' + plural(left,'day','days') + ' ahead.</div>'
         + '<div class="cap">You gave it ' + fmt(total) + ' days. It took ' + fmt(used) + '.</div>'
         + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
       fitHero($('early-hero'), 104, 34);
@@ -571,7 +686,7 @@
       '<div class="n" id="mt2-hero">' + fmt(held) + '</div>'
       + '<div class="sub" style="max-width:23ch"><b>of ' + fmt(total) + ' days</b> ' + esc(what) + '.</div>'
       + (done ? '<div class="deposit" style="margin-top:20px">The date came. The line held the whole way. <b>Closed.</b></div>'
-              : '<div class="cap">' + fmt(total-held) + ' ' + plural(total-held,'day','days') + ' between you and the date.</div>')
+              : '<div class="cap"><b style="color:var(--text-mid)">' + Math.round(held/total*100) + '%</b> of the promise kept so far.</div>')
       + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
     fitHero($('mt2-hero'), 104, 34);
     $('m-fire').innerHTML = done
@@ -617,7 +732,7 @@
       +   '<div><b>' + fmt(c) + '</b><span>' + esc(plural(c, w.replace(/s$/,''), w)) + '</span></div>'
       +   '<div><b>' + fmt(dd) + '</b><span>' + plural(dd,'day','days') + '</span></div>'
       + '</div>'
-      + '<div class="deposit" style="margin-top:22px">The event was one day. <b>The engine was ' + fmt(c) + ' ' + esc(plural(c, w.replace(/s$/,''), w)) + '.</b></div>'
+      + '<div class="deposit" style="margin-top:22px">The event was one day. <b>The engine was ' + fmt(c) + ' ' + esc(plural(c, w.replace(/s$/,''), w)) + ' in ' + fmt(dd) + ' ' + plural(dd,'day','days') + '.</b></div>'
       + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
     $('n-fire').innerHTML = 'Fires when they mark the milestone done. The counts shown are whatever they actually logged; if they logged nothing, the event stands alone.';
   }
@@ -659,6 +774,158 @@
       : (d < 30 ? 'Before day 30 there is no "then" worth holding up; silent.' : 'Day ' + d + ' is not a rung; the pair waits for ' + 'the next one.');
   }
 
+  /* ---------------- durations ---------------- */
+  function dur(min){
+    min = Math.round(min);
+    var h = Math.floor(min / 60), m = min % 60;
+    if (!h) return m + 'm';
+    return h + 'h ' + (m < 10 ? '0' : '') + m + 'm';
+  }
+
+  /* ---------------- THE NUMBER YOU CARRY (qd-3) ---------------- */
+  function qd3(){
+    var line = +$('q3-line').value, cur = +$('q3-cur').value, since = $('q3-since').value.trim(), d = +$('q3-days').value;
+    $('q3-days-out').textContent = d;
+    var under = cur < line;
+    $('qd3').innerHTML = under
+      ? '<div class="n" id="qd3-hero">' + fmt(cur) + '</div>'
+        + '<div class="sub" style="max-width:24ch">You said you wanted to be under ' + fmt(line) + '. This is the first morning it is true' + (since ? ' since <b>' + esc(since) + '</b>' : '') + '.</div>'
+        + '<div class="cap">' + fmt(d) + ' days of carrying it here.</div>'
+        + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>'
+      : '<div class="fx-idle">Still at ' + fmt(cur) + ', the line is ' + fmt(line) + '. This screen does not exist until the morning it is true; nothing is congratulated early.</div>';
+    if (under) fitHero($('qd3-hero'), 104, 34);
+    $('q3-fire').innerHTML = under
+      ? '<b>Fires once:</b> the first morning under the line they named, in their own words.'
+      : 'Silent above the line. The road screens carry them until this one earns itself.';
+  }
+
+  /* ---------------- THE FALLING BALANCE (qd-4) ---------------- */
+  function qd4(){
+    var start = +$('q4-start').value, cur = +$('q4-cur').value, pay = +$('q4-pay').value, mon = +$('q4-mon').value;
+    $('q4-pay-out').textContent = fmt(pay); $('q4-mon-out').textContent = fmt(mon);
+    var closed = Math.max(0, start - cur);
+    /* the round threshold just crossed, e.g. 29,900 -> under 30,000 */
+    var mag = Math.pow(10, Math.max(2, String(Math.max(1, cur)).length - 1));
+    var thresh = Math.ceil((cur + 1) / mag) * mag;
+    $('qd4').innerHTML =
+      '<div class="fx-heroline"><span class="n" id="qd4-hero">$' + fmt(cur) + '</span></div>'
+      + '<div class="sub" style="max-width:25ch">left on the loan.' + (thresh <= start ? ' Under $' + fmt(thresh) + ' for the first time.' : '') + '</div>'
+      + '<div class="cap" style="margin-top:14px">$' + fmt(closed) + ' closed. $' + fmt(cur) + ' open.</div>'
+      + '<div class="cap">' + fmt(pay) + ' ' + plural(pay,'payment','payments') + ' over ' + fmt(mon) + ' ' + plural(mon,'month','months') + '. It has not risen once.</div>'
+      + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
+    fitHero($('qd4-hero'), 74, 28);
+    $('q4-fire').innerHTML = 'Fires on the road\'s fifths like any down goal; the "under $' + fmt(thresh) + '" line appears only when a round threshold was genuinely crossed.';
+  }
+
+  /* ---------------- THE AVERAGE COMING DOWN (qd-5) ---------------- */
+  function qd5(){
+    var then = +$('q5-then').value, now = +$('q5-now').value, w = +$('q5-w').value;
+    $('q5-then-out').textContent = dur(then); $('q5-now-out').textContent = dur(now); $('q5-w-out').textContent = w;
+    var backPerDay = then - now;
+    var backWeek = backPerDay * 7;
+    if (backPerDay <= 0) {
+      $('qd5').innerHTML = '<div class="fx-idle">The average is not lower than the start. Nothing to celebrate; the screen waits.</div>';
+      $('q5-fire').textContent = 'Silent: qd-5 only exists when time actually came back.';
+      return;
+    }
+    $('qd5').innerHTML =
+      '<div class="n" id="qd5-hero">' + dur(now) + '</div>'
+      + '<div class="sub">a day. Your average this week.</div>'
+      + '<div class="fxrc" style="margin-top:22px"><div><b>' + dur(backWeek) + '</b><span>back this week</span></div></div>'
+      + '<div class="cap" style="margin-top:16px">' + dur(then) + ' a day, ' + w + ' ' + plural(w,'week','weeks') + ' ago. ' + dur(now) + ' now.</div>'
+      + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
+    fitHero($('qd5-hero'), 88, 30);
+    $('q5-fire').innerHTML = 'The hours back are ARITHMETIC on their own logged averages, never invented. Fires on new-low records (the 2% rule, decimal-safe).';
+  }
+
+  /* ---------------- RUNS THIS WEEK (fr-1) ---------------- */
+  function fr1(){
+    var n = +$('f1-n').value, word = $('f1-word').value.trim() || 'Runs';
+    $('f1-n-out').textContent = n;
+    var days = ['M','T','W','T','F','S','S'];
+    /* deterministic spread: first n days lit */
+    var row = days.map(function(dch, i){
+      var on = i < n;
+      return '<div style="flex:1;text-align:center">'
+        + '<div style="width:26px;height:26px;margin:0 auto;border-radius:8px;background:' + (on ? 'rgba(var(--accent-rgb),.22)' : 'rgba(var(--ink),.07)') + ';box-shadow:inset 0 1px 0 rgba(var(--ink),.06);display:flex;align-items:center;justify-content:center">'
+        + (on ? '<i style="display:block;width:7px;height:7px;border-radius:50%;background:var(--accent)"></i>' : '')
+        + '</div><div style="font-size:10px;color:var(--text-lo);margin-top:5px">' + dch + '</div></div>';
+    }).join('');
+    $('fr1').innerHTML =
+      '<div class="n n--hero">' + n + '</div>'
+      + '<div class="sub">' + esc(word) + ' this week.</div>'
+      + '<div style="display:flex;gap:6px;width:100%;max-width:280px;margin-top:24px">' + row + '</div>'
+      + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
+    $('f1-fire').innerHTML = n === 0 ? 'An empty week is never shown as a ceremony; this screen fires only when the week MET the rate.' : 'Fires when the week closes at or above their chosen rate.';
+  }
+
+  /* ---------------- WEEKS AT RATE (fr-2 / fr-5) ---------------- */
+  function fr2(){
+    var w = +$('f2-w').value, n = +$('f2-n').value, word = $('f2-word').value.trim() || 'swims';
+    $('f2-w-out').textContent = w; $('f2-n-out').textContent = fmt(n);
+    var shown = Math.min(w, 10), older = w - shown, marks = '';
+    for (var i = 0; i < shown; i++) {
+      marks += '<i style="display:block;flex:1;height:4px;border-radius:2px;background:rgba(var(--accent-rgb),' + (i === shown-1 ? '1' : '.35') + ')"></i>';
+    }
+    $('fr2').innerHTML =
+      '<div class="n n--hero">' + fmt(w) + '</div>'
+      + '<div class="sub">' + plural(w,'week','weeks') + ' at your rate.</div>'
+      + '<div style="display:flex;gap:5px;width:100%;max-width:270px;margin-top:24px">' + marks + '</div>'
+      + (older > 0 ? '<div class="cap" style="margin-top:12px">+ ' + older + ' earlier ' + plural(older,'week','weeks') + ' in the run.</div>' : '')
+      + '<div class="sub" style="margin-top:18px;max-width:24ch">' + fmt(n) + ' ' + esc(plural(n, word.replace(/s$/,''), word)) + ' between here and the start line.</div>'
+      + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
+    $('f2-fire').innerHTML = 'The run of weeks fires on the ladder (' + (ladderHit(w) === w ? '<b>' + w + ' is a rung</b>' : w + ' is not a rung, silent') + '); a broken week ends the run without a funeral.';
+  }
+
+  /* ---------------- THE MINUTE (ms-5) ---------------- */
+  function ms5(){
+    var word = $('m5-word').value.trim(), tm = $('m5-time').value.trim();
+    var d = +$('m5-days').value, hrs = +$('m5-hours').value;
+    $('m5-days-out').textContent = fmt(d); $('m5-hours-out').textContent = fmt(hrs);
+    $('ms5').innerHTML =
+      '<div style="font-size:27px;font-weight:700;letter-spacing:-.02em;color:var(--text-hi)">' + esc(word) + '</div>'
+      + '<div class="n" id="ms5-hero" style="margin-top:10px">' + esc(tm) + '</div>'
+      + '<div class="sub" style="margin-top:20px"><b>' + fmt(d) + ' ' + plural(d,'day','days') + '</b> since your first study block.</div>'
+      + (hrs > 0 ? '<div class="cap">' + fmt(hrs) + ' ' + plural(hrs,'hour','hours') + ' logged.</div>' : '')
+      + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
+    fitHero($('ms5-hero'), 84, 30);
+    $('m5-fire').innerHTML = 'Fires when they mark it done; the minute is stamped from the actual moment they tapped, the days and hours are their own log.';
+  }
+
+  /* ---------------- DAY COUNT AND THE WORDS (op-2 / op-5) ---------------- */
+  function op2(){
+    var d = +$('p2-days').value;
+    $('p2-days-out').textContent = fmt(d);
+    var yearMode = d >= 365;
+    $('op2').innerHTML =
+      (yearMode ? '<div class="cap" style="margin-bottom:8px">Written ' + dateBack(d) + ', last year</div>' : '')
+      + '<div class="n" id="op2-hero">' + fmt(d) + '</div>'
+      + '<div class="sub">' + plural(d,'day','days') + ' since you wrote ' + (yearMode ? 'that' : 'it') + '.</div>'
+      + (!yearMode ? '<div class="cap" style="margin:18px 0 8px">What you wrote on ' + dateBack(d) + '</div>' : '')
+      + '<div style="max-width:290px;text-align:left;font-size:15px;line-height:1.55;color:var(--text-mid);margin-top:' + (yearMode ? '18px' : '0') + '">&ldquo;I want to stop performing my life and start living in it.&rdquo;</div>'
+      + (yearMode ? '<div class="cap" style="margin-top:16px;max-width:26ch">There is no finish on this one. The days are the record.</div>' : '')
+      + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
+    fitHero($('op2-hero'), 96, 34);
+    var hit = ladderHit(d);
+    $('p2-fire').innerHTML = (hit === d ? '<b>Day ' + fmt(d) + ' is a rung, it fires.</b>' : 'Day ' + fmt(d) + ' is quiet; the ladder decides.')
+      + (yearMode ? ' At 365+ the same numbers read as "a year, still open" (op-5), and the rungs keep coming every 100, never a year-long wait.' : '');
+  }
+
+  /* ---------------- PROOF NUMBER N (op-3) ---------------- */
+  function op3p(){
+    var n = +$('p3-n').value, back = +$('p3-first').value;
+    $('p3-n-out').textContent = fmt(n); $('p3-first-out').textContent = fmt(back);
+    $('op3p').innerHTML =
+      '<div class="cap" style="margin-bottom:8px">What you wrote tonight</div>'
+      + '<div style="max-width:268px;font-size:24px;font-weight:600;line-height:1.3;letter-spacing:-.022em;color:var(--text-hi)">&ldquo;didn\'t send the email&rdquo;</div>'
+      + '<div class="fxrc" style="margin-top:24px"><div><b>' + fmt(n) + '</b><span>' + plural(n,'time','times') + '</span></div></div>'
+      + '<div class="sub" style="max-width:26ch;margin-top:14px">you have written down a moment like this one.' + (n > 1 ? ' The first was <b>' + dateBack(back) + '</b>.' : ' This is the first.') + '</div>'
+      + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
+    $('p3-fire').innerHTML = n === 1
+      ? 'The first proof gets the quietest version; there is no count to brag about yet.'
+      : 'The count is real logged reflections; "proof number ' + fmt(n) + '" is the deposit line.';
+  }
+
   /* ---------------- presets ---------------- */
   var PRESETS = {
     users:   { rs:0, rg:100, rc:60, ru:'paying users', rd:216, c:50, cw:'runs', cd:132, d:100, g:12, gr:72, h:6, ht:4, od:30, oe:22 },
@@ -688,7 +955,15 @@
   /* the range slider mirrors the exact count field both ways */
   $('c-n').addEventListener('input', function(){ $('c-exact').value = this.value; count(); });
 
-  function all(){ road(); figs(); rec(); early(); count(); days(); mt2(); mt3(); eng(); gf(); op1(); grid(); chips(); op(); }
+  function all(){ road(); figs(); rec(); early(); count(); days(); mt2(); mt3(); eng(); gf(); op1(); grid(); chips(); op(); qd3(); qd4(); qd5(); fr1(); fr2(); ms5(); op2(); op3p(); }
+  ['q3-line','q3-cur','q3-since','q3-days'].forEach(function(id){ $(id).addEventListener('input', qd3); });
+  ['q4-start','q4-cur','q4-pay','q4-mon'].forEach(function(id){ $(id).addEventListener('input', qd4); });
+  ['q5-then','q5-now','q5-w'].forEach(function(id){ $(id).addEventListener('input', qd5); });
+  ['f1-n','f1-word'].forEach(function(id){ $(id).addEventListener('input', fr1); });
+  ['f2-w','f2-n','f2-word'].forEach(function(id){ $(id).addEventListener('input', fr2); });
+  ['m5-word','m5-time','m5-days','m5-hours'].forEach(function(id){ $(id).addEventListener('input', ms5); });
+  $('p2-days').addEventListener('input', op2);
+  ['p3-n','p3-first'].forEach(function(id){ $(id).addEventListener('input', op3p); });
   ['f-cur','f-prev','f-unit'].forEach(function(id){ $(id).addEventListener('input', figs); });
   ['x-prev','x-cur','x-dir','x-unit'].forEach(function(id){ $(id).addEventListener('input', rec); });
   ['e-total','e-used'].forEach(function(id){ $(id).addEventListener('input', early); });
