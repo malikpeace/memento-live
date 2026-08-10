@@ -4506,11 +4506,14 @@ function ccComebackSentence() {
   // one type step down past ~95 visible characters (a long name plus a long
   // variant), a second past ~120, so the sentence always fits the locked deck
   const len = hello.length + body.length;
-  const size = len > 120 ? ' cb-line--xs' : (len > 95 ? ' cb-line--sm' : '');
-  return '<div class="cb-wrap"><p class="cb-line' + size + '">' +
-    '<span class="cb-hi">' + hello + '</span> ' +
-    'You missed <b>' + gap + ' ' + dayWord + '</b>, ' + shrug + ', ' + back + end +
-    '</p></div>';
+  const size = len > 120 ? ' cb-wrap--xs' : (len > 95 ? ' cb-wrap--sm' : '');
+  // the wrapper centres the pair; greeting and sentence are their OWN blocks
+  // (Malik) so the hello lands as a greeting, not as the sentence's first
+  // clause. A <p> must never be a flex box: it would shred its own text runs.
+  return '<div class="cb-wrap' + size + '">' +
+    '<p class="cb-hi">' + hello + '</p>' +
+    '<p class="cb-line">You missed <b>' + gap + ' ' + dayWord + '</b>, ' + shrug + ', ' + back + end + '</p>' +
+    '</div>';
 }
 
 // v1153 (Malik): does a quiet stretch actually MATTER for this goal? Rest

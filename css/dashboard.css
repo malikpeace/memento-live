@@ -6387,18 +6387,23 @@ body.is-dormant .ambient{opacity:.35;transition:opacity 1.2s ease}
 /* v1155 the comeback sentence: it IS the face, so it takes the whole box.
    Clamped by vw so a long variant on a small phone shrinks instead of
    overflowing the locked deck height. */
-/* the sentence IS the face: it takes the whole space above the CTA and sits
-   optically centred in it (the beat composition law), so a short variant
-   never leaves a dead half-card the way the old stacked lines did. */
-#commandCenter .cb-wrap{flex:1 1 auto;display:flex;align-items:center;min-height:0}
+/* the greeting and the sentence are the face: the pair fills the space above
+   the CTA and sits optically centred in it (the beat composition law). Two
+   distinct blocks, so the hello reads as a greeting and the sentence carries
+   the news, separated by a real gap rather than a space. */
+#commandCenter .cb-wrap{flex:1 1 auto;display:flex;flex-direction:column;justify-content:center;min-height:0}
+#commandCenter .cb-hi{
+  margin:0 0 13px; font-size:clamp(23px, 7.2vw, 31px); line-height:1.18;
+  font-weight:760; letter-spacing:-.028em; color:var(--text-hi);
+}
 #commandCenter .cb-line{
-  margin:0; font-size:clamp(23px, 7.2vw, 31px); line-height:1.24;
-  font-weight:700; letter-spacing:-.024em; color:var(--text-hi);
+  margin:0; font-size:clamp(20px, 5.9vw, 25px); line-height:1.32;
+  font-weight:620; letter-spacing:-.016em; color:var(--text-hi);
   text-wrap:pretty;
 }
-#commandCenter .cb-line b{font-weight:700;color:var(--text-hi)}
-/* the greeting opens the sentence and starts its own line, so the box reads
-   "Welcome back, Malik." then the rest, without splitting into two blocks. */
-#commandCenter .cb-hi{display:block}
-#commandCenter .cb-line--sm{font-size:clamp(20px, 6.1vw, 26px)}
-#commandCenter .cb-line--xs{font-size:clamp(18px, 5.4vw, 23px)}
+#commandCenter .cb-line b{font-weight:760;color:var(--text-hi)}
+/* long name plus long variant: one step down, then another */
+#commandCenter .cb-wrap--sm .cb-hi{font-size:clamp(21px, 6.4vw, 27px);margin-bottom:11px}
+#commandCenter .cb-wrap--sm .cb-line{font-size:clamp(18px, 5.4vw, 22px)}
+#commandCenter .cb-wrap--xs .cb-hi{font-size:clamp(19px, 5.7vw, 24px);margin-bottom:9px}
+#commandCenter .cb-wrap--xs .cb-line{font-size:clamp(17px, 4.9vw, 20px)}
