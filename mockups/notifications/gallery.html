@@ -103,6 +103,10 @@
   .beat .day b{display:block;font-size:1.05rem;font-weight:700;letter-spacing:-.02em}
   .beat .day span{font-size:.68rem;color:var(--lo)}
   .beat .card{flex:1}
+  .beat.stop{opacity:.6}
+  .stopcard{flex:1;border-radius:22px;padding:11px 15px 13px;border:1px dashed var(--hair);background:transparent}
+  .stopcard b{display:block;font-size:.9rem;font-weight:640;color:var(--mid)}
+  .stopcard span{display:block;font-size:.86rem;color:var(--lo);margin-top:2px}
 
   .inapp{margin-top:56px;padding:20px 22px;border-radius:18px;background:rgba(255,255,255,.03);box-shadow:inset 0 0 0 1px var(--hair)}
   .inapp h2{font-size:1.15rem;font-weight:700;margin:0 0 6px;letter-spacing:-.02em}
@@ -151,8 +155,8 @@
 
   <!-- drift series -->
   <div class="section">
-    <h2>The drift intercept escalates. It is a series, not a ping.</h2>
-    <p>When someone slips, one message is easy to ignore. So it climbs in intensity, the way Duolingo does but without the guilt: a quiet check-in, then a real plea, then the app's own philosophy. Each beat sent once, the whole thing stops the instant they log anything. The day counts are for a daily goal. For a 3 to 4 times a week goal the clock starts later, because a two-day gap is normal, not a slip. This is Maya's channel as the example.</p>
+    <h2>The drift intercept escalates. It is a ladder, not a ping.</h2>
+    <p>When someone slips we do not go quiet and we do not wait. About 7 beats over three weeks, each carrying more weight than the last, then a hard stop. Roughly 5 to 6 land inside the first two weeks, which is real presence without becoming Duolingo. Each beat sent once, and the whole thing resets the instant they log anything. The day counts are for a daily goal. A 3 to 4 times a week goal stretches the same ladder later, because a two-day gap is normal, not a slip. This is Maya's channel as the example.</p>
     <div class="series" id="series"></div>
   </div>
 
@@ -238,11 +242,17 @@ const PEOPLE = [
    whyline:'You are doing this so your kids grow up remembering you were there.'},
 ];
 
-// drift SERIES (Maya as the shown example). Headline intensity climbs, days spread.
+// drift SERIES (Maya as the shown example). Intensity climbs across ~7 beats over
+// three weeks, then it stops. Days shown are for a daily goal; slower goals stretch.
 const SERIES = [
-  {day:'Day 3', tag:'a check-in', title:'Don\'t forget why you started', body:'It has been 3 days with nothing logged, just making sure you are good and still moving toward it, even if it is not perfect.'},
-  {day:'Day 6', tag:'the plea', title:'Please don\'t forget your dreams. Make yourself proud.', body:'You started the channel to reach the people who were once exactly like you.'},
-  {day:'Day 10', tag:'memento mori', title:'Memento Mori', body:'You only get so many days, and today is one of them.'},
+  {day:'Day 2',  tag:'nudge',         title:'Yesterday slipped by', body:'It happens. Pick it back up today and it is like it never broke.'},
+  {day:'Day 4',  tag:'check-in',      title:'Don\'t forget why you started', body:'A few days quiet now, just making sure you are good and still moving toward it.'},
+  {day:'Day 6',  tag:'the plea',      title:'Please don\'t forget your dreams. Make yourself proud.', body:'You started the channel to reach the people who were once exactly like you.'},
+  {day:'Day 9',  tag:'the cost',      title:'Don\'t let the quitting version win', body:'Nine days gone, and that is not the person you said you wanted to be.'},
+  {day:'Day 12', tag:'the reckoning', title:'This is how it quietly dies', body:'Two weeks of slipping is how a goal disappears without you ever deciding to quit.'},
+  {day:'Day 16', tag:'memento mori',  title:'Memento Mori', body:'You only get so many days, and today is one of them.'},
+  {day:'Day 20', tag:'last call',     title:'Last call', body:'Memento is going to go quiet now, and the door stays open whenever you are ready.'},
+  {day:'Day 21', tag:'then silence',  title:'Notifications stop', body:'Nothing more is sent. The goal waits inside the app for the day they come back.', stop:true},
 ];
 
 function cardHtml(pair){
@@ -283,11 +293,16 @@ document.getElementById('people').innerHTML = PEOPLE.map(p=>`
 document.querySelectorAll('.ptab').forEach(b=>b.addEventListener('click',()=>render(PEOPLE.find(x=>x.id===b.dataset.id))));
 
 // drift series
-document.getElementById('series').innerHTML = SERIES.map(s=>`
-  <div class="beat">
+document.getElementById('series').innerHTML = SERIES.map(s=>{
+  if(s.stop) return `<div class="beat stop">
+    <div class="day"><b>${s.day.split(' ')[1]}</b><span>${s.tag}</span></div>
+    <div class="stopcard"><b>${s.title}</b><span>${s.body}</span></div>
+  </div>`;
+  return `<div class="beat">
     <div class="day"><b>${s.day.split(' ')[1]}</b><span>${s.tag}</span></div>
     ${cardHtml([s.title, s.body, 'now'])}
-  </div>`).join('');
+  </div>`;
+}).join('');
 
 // the emotional beat, across every goal (one strong sentence, personalized)
 document.getElementById('driftgrid').innerHTML = PEOPLE.map(p=>`
