@@ -119,21 +119,79 @@ LIVE_CSS = """
 .concept--live{width:390px;max-width:100%;margin:0;border-top:0;padding-top:0}
 .concept--live .concept__hd{margin-bottom:10px}
 
-/* shared bits the live renderers use */
-.ph[data-c] .dl-warm{position:absolute;left:50%;top:44%;width:320px;height:320px;transform:translate(-50%,-50%);
-  border-radius:50%;pointer-events:none;filter:blur(3px);z-index:0}
-.ph[data-c] .dst > *{position:relative;z-index:1}
-.dl-n{font-variant-numeric:tabular-nums;font-weight:750;letter-spacing:-.04em;font-size:58px;color:var(--text-hi);margin-top:26px;line-height:1}
-.dl-u{font-size:14.5px;color:var(--text-mid);margin-top:11px}
-.dl-more{font-size:12px;color:var(--text-lo);margin-top:9px}
-.fld-dot--now{fill:var(--day)!important}
-.tp-d--now{background:var(--day)!important}
-.tk-s--now{background:var(--day)!important}
+/* ===== self-contained concept styling. NO BLUR anywhere. ===== */
+.dl-n{font-variant-numeric:tabular-nums;font-weight:750;letter-spacing:-.045em;font-size:60px;
+  color:var(--text-hi);margin-top:30px;line-height:1}
+.dl-u{font-size:15px;color:var(--text-mid);margin-top:12px;letter-spacing:-.005em}
+.dl-u b{color:var(--text-hi);font-weight:650}
+.dl-more{font-size:12px;color:var(--text-lo);margin-top:10px;letter-spacing:.01em}
 
-/* live phones render the SETTLED state; entrance fires only on tap (.on).
-   force every fragment's opacity-0 base and per-item animation off while live. */
-.ph.live .dst *{opacity:1!important;animation:none!important}
-.ph.live .dl-warm{z-index:0!important}
+/* 1 odometer */
+.dlo-date{font-size:13px;color:var(--text-lo);margin-bottom:34px}
+.dlo-drum{display:flex;gap:5px;
+  -webkit-mask-image:linear-gradient(180deg,transparent,#000 15%,#000 85%,transparent);
+          mask-image:linear-gradient(180deg,transparent,#000 15%,#000 85%,transparent)}
+.dlo-w{width:54px;height:104px;overflow:hidden;border-radius:9px;
+  background:linear-gradient(180deg,rgba(var(--ink),0),rgba(var(--ink),.02) 50%,rgba(var(--ink),0))}
+.dlo-r span{display:block;height:104px;line-height:104px;font-size:84px;font-weight:700;
+  letter-spacing:-.05em;text-align:center;font-variant-numeric:tabular-nums}
+.dlo-r--dim span{color:rgba(var(--ink),.08)}
+.dlo-r--live span{color:var(--day)}
+
+/* 2 yesterday behind you */
+.dlg-col{display:flex;flex-direction:column;align-items:center;gap:5px;margin-bottom:12px}
+.dlg-past{font-weight:650;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1}
+.dlg-now{display:flex;align-items:flex-end;gap:9px}
+.dlg-now span{font-size:74px;font-weight:750;letter-spacing:-.045em;line-height:.86;color:var(--text-hi);font-variant-numeric:tabular-nums}
+.dlg-now i{width:9px;height:9px;border-radius:50%;background:var(--day);margin-bottom:12px}
+
+/* 3 field, 4 rings, 9 thread svgs */
+.dl-field,.dl-rings,.dl-thread{display:block;margin:0 auto;overflow:visible}
+
+/* 5 rolling window */
+.dlw-cap{font-size:12px;color:var(--text-lo);margin-bottom:16px}
+.dl-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:8px;width:264px}
+.dl-grid b{width:100%;aspect-ratio:1;border-radius:5px;background:rgba(var(--ink),.06)}
+.dl-grid b.dlw-f{background:rgba(var(--day-rgb),.34)}
+.dl-grid b.dlw-t{background:rgba(var(--day-rgb),.30);box-shadow:0 0 0 1.5px rgba(var(--day-rgb),.92)}
+
+/* 6 stamp */
+.dls-stamp{display:flex;align-items:center;gap:15px}
+.dls-d{font-size:68px;font-weight:750;letter-spacing:-.05em;line-height:1;color:var(--text-hi);font-variant-numeric:tabular-nums}
+.dls-side{text-align:left}
+.dls-wd{font-size:16px;font-weight:650;color:var(--text-hi)}
+.dls-my{font-size:13px;color:var(--text-lo);margin-top:2px}
+.dls-rule{width:52px;height:2px;border-radius:2px;background:rgba(var(--day-rgb),.6);margin:22px 0 18px}
+.dls-tally{font-size:14px;color:var(--text-mid)}
+.dls-tally b{color:var(--text-hi);font-weight:700}
+.dls-rec{margin-top:20px;text-align:center}
+.dls-r{font-size:13px;color:var(--text-lo);line-height:1.85;font-variant-numeric:tabular-nums}
+.dls-more{font-size:12px;color:rgba(var(--ink),.28);margin-top:6px}
+
+/* 7 path of days, layered rows */
+.dl-path{display:flex;flex-direction:column-reverse;gap:6px;align-items:center}
+.dlp-row{display:flex;gap:5px;justify-content:center}
+.dl-path i{width:3px;height:16px;border-radius:2px;background:rgba(var(--ink),.34)}
+.dl-path i.dlp-now{background:var(--day);height:22px;box-shadow:0 0 8px rgba(var(--day-rgb),.5)}
+
+/* 8 staircase */
+.dl-steps{position:relative;margin:6px auto 0}
+.dl-steps i{position:absolute;background:rgba(var(--ink),.34);border-radius:1px}
+.dl-steps i.dlk-now{background:var(--day);box-shadow:0 0 8px rgba(var(--day-rgb),.5)}
+
+/* 9 thread text */
+.dlt-line{font-size:16.5px;font-weight:500;color:var(--text-mid);max-width:26ch;margin-bottom:20px;letter-spacing:-.01em}
+.dlt-line b{color:var(--text-hi);font-weight:650}
+
+/* ===== motion: plays on load + tap, NEVER mid-drag. clean, no blur. ===== */
+.ph.play .dst > *{animation:dlIn .5s cubic-bezier(.2,.85,.3,1) both}
+.ph.play .dst > *:nth-child(2){animation-delay:.06s}
+.ph.play .dst > *:nth-child(3){animation-delay:.12s}
+.ph.play .dst > *:nth-child(4){animation-delay:.18s}
+.ph.play .dst .dlg-now span,.ph.play .dst .dls-d{animation:dlPop .55s cubic-bezier(.2,.9,.25,1) both}
+@keyframes dlIn{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+@keyframes dlPop{from{opacity:0;transform:translateY(12px) scale(.96)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){ .ph.play .dst > *{animation:none} }
 
 @media (max-width:900px){ .concept--live{display:block;width:100%;margin-right:0} }
 """
@@ -153,7 +211,7 @@ def build():
         if '<style>' in raw:
             pre, rest = raw.split('<style>', 1)
             css, body = rest.split('</style>', 1)
-            styles.append(css.strip())
+            pass  # fragment styles unused; DL_CSS is self-contained
         else:
             body = raw
         # LIVE: one phone per concept, generated from the sliders by
@@ -197,7 +255,7 @@ def build():
   <div class="livegrid">%s</div>
 </div>
 <script>%s</script>
-<script src="_daily-live.js?v=live1"></script>
+<script src="_daily-live.js?v=live2"></script>
 </body></html>""" % (len(sections), SHELL_CSS, '\n'.join(styles), len(sections), len(sections),
                      ''.join(toc), ''.join(sections), DRIVER)
 
