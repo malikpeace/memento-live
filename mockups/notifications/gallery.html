@@ -103,10 +103,7 @@
   .beat .day b{display:block;font-size:1.05rem;font-weight:700;letter-spacing:-.02em}
   .beat .day span{font-size:.68rem;color:var(--lo)}
   .beat .card{flex:1}
-  .beat.stop{opacity:.6}
-  .stopcard{flex:1;border-radius:22px;padding:11px 15px 13px;border:1px dashed var(--hair);background:transparent}
-  .stopcard b{display:block;font-size:.9rem;font-weight:640;color:var(--mid)}
-  .stopcard span{display:block;font-size:.86rem;color:var(--lo);margin-top:2px}
+  .beat.faint{opacity:.62}
 
   .inapp{margin-top:56px;padding:20px 22px;border-radius:18px;background:rgba(255,255,255,.03);box-shadow:inset 0 0 0 1px var(--hair)}
   .inapp h2{font-size:1.15rem;font-weight:700;margin:0 0 6px;letter-spacing:-.02em}
@@ -251,8 +248,8 @@ const SERIES = [
   {day:'Day 9',  tag:'the cost',      title:'Don\'t let the quitting version win', body:'Nine days gone, and that is not the person you said you wanted to be.'},
   {day:'Day 12', tag:'the reckoning', title:'This is how it quietly dies', body:'Two weeks of slipping is how a goal disappears without you ever deciding to quit.'},
   {day:'Day 16', tag:'memento mori',  title:'Memento Mori', body:'You only get so many days, and today is one of them.'},
-  {day:'Day 20', tag:'last call',     title:'Last call', body:'Memento is going to go quiet now, and the door stays open whenever you are ready.'},
-  {day:'Day 21', tag:'then silence',  title:'Notifications stop', body:'Nothing more is sent. The goal waits inside the app for the day they come back.', stop:true},
+  {day:'Day 20', tag:'last call',     title:'Last call', body:'The daily nudges wind down now, and the door stays open whenever you are ready.'},
+  {day:'Wk 4+',  tag:'the long tail', title:'Still here', body:'From here, one small ping a week, no pressure, until the day you come back.', heartbeat:true},
 ];
 
 function cardHtml(pair){
@@ -294,12 +291,13 @@ document.querySelectorAll('.ptab').forEach(b=>b.addEventListener('click',()=>ren
 
 // drift series
 document.getElementById('series').innerHTML = SERIES.map(s=>{
-  if(s.stop) return `<div class="beat stop">
-    <div class="day"><b>${s.day.split(' ')[1]}</b><span>${s.tag}</span></div>
-    <div class="stopcard"><b>${s.title}</b><span>${s.body}</span></div>
+  const dayNum = s.day.includes(' ') ? s.day.split(' ')[1] : s.day;
+  if(s.heartbeat) return `<div class="beat faint">
+    <div class="day"><b>${dayNum}</b><span>${s.tag}</span></div>
+    ${cardHtml([s.title, s.body, 'weekly'])}
   </div>`;
   return `<div class="beat">
-    <div class="day"><b>${s.day.split(' ')[1]}</b><span>${s.tag}</span></div>
+    <div class="day"><b>${dayNum}</b><span>${s.tag}</span></div>
     ${cardHtml([s.title, s.body, 'now'])}
   </div>`;
 }).join('');
