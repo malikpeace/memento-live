@@ -57,8 +57,8 @@
     var M = Math.min(x.total, 90), col = '';
     for (var k = M - 1; k >= 1; k--) {
       var v = x.total - k;
-      var size = Math.max(6, 54 * Math.pow(0.935, k));   // slower shrink, more numbers fit
-      var op = Math.max(.03, 0.5 * Math.pow(0.92, k));
+      var size = Math.max(3.4, 40 * Math.pow(0.9, k));   // shrink faster so 30-40 fit up the tower
+      var op = Math.max(.03, 0.5 * Math.pow(0.9, k));
       col += '<div class="dlg-past" style="font-size:' + size.toFixed(1) + 'px;color:rgba(235,238,248,' + op.toFixed(3) + ')">' + v + '</div>';
     }
     dst.innerHTML =
@@ -70,18 +70,18 @@
   /* 3. THE FIELD, a phyllotaxis that never stops filling, growing to a dense,
      beautiful bloom by day 365. Dots shrink as the seed count climbs. */
   R['a-field'] = function (dst, x) {
-    var N = Math.min(x.total, 365), dots = '';
-    var c = 8.1;                                   // outer radius = c*sqrt(N-1), grows forever
-    var dr = Math.max(1.7, 6.2 - N / 78);
-    var seen = {}, rendered = 0;
+    var N = Math.min(x.total, 400), dots = '';
+    var c = 10.0;                                  // wider spacing so early dots never overlap
+    var dr = Math.max(1.6, Math.min(4.6, 46 / Math.sqrt(N + 2)));   // dots shrink as the bloom fills
     for (var i = 0; i < N; i++) {
       var rr = c * Math.sqrt(i), th = i * 2.399963;
       var cx = (rr * Math.cos(th)).toFixed(2), cy = (rr * Math.sin(th)).toFixed(2);
       var last = i === N - 1;
-      dots += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (last ? dr + 1.4 : dr) + '" fill="' +
-        (last ? 'var(--day)' : 'rgba(235,238,248,' + (0.24 + 0.16 * (i / N)).toFixed(2) + ')') + '"></circle>';
+      dots += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (last ? dr + 1.2 : dr) + '" fill="' +
+        (last ? 'var(--day)' : 'rgba(235,238,248,' + (0.22 + 0.18 * (i / N)).toFixed(2) + ')') + '"></circle>';
     }
-    var span = Math.max(60, c * Math.sqrt(Math.max(1, N - 1)) + dr + 6);
+    // a minimum frame keeps day 1-6 clean instead of zooming into an overlapping clump
+    var span = Math.max(74, c * Math.sqrt(Math.max(1, N - 1)) + dr + 8);
     dst.innerHTML =
       '<svg class="dl-field" viewBox="' + (-span) + ' ' + (-span) + ' ' + (span * 2) + ' ' + (span * 2) + '" width="300" height="300" aria-hidden="true">' + dots + '</svg>' +
       heroBlock(x.total, x.cad);
@@ -128,10 +128,11 @@
     var cellGap = C > 180 ? 3 : C > 90 ? 4 : 6;
     var cells = '';
     for (var i = 0; i < C; i++) cells += '<b class="' + (i === C - 1 ? 'dlc-t' : 'dlc-f') + '"></b>';
+    // the calendar is the focal point, the number is the accent, said once,
+    // sitting a little low and to the right, no backing plate.
     dst.innerHTML =
       '<div class="dl-cal" style="grid-template-columns:repeat(' + cols + ',1fr);gap:' + cellGap + 'px">' + cells + '</div>' +
-      '<div class="dl-calnum"><div class="dl-n" style="font-size:64px;margin:0">' + x.total + '</div>' +
-      '<div class="dl-u" style="margin-top:6px"><b>' + x.total + ' ' + unitWord(x.total, x.cad) + '</b></div></div>';
+      '<div class="dl-calnum"><b>' + x.total + '</b><i>' + unitWord(x.total, x.cad) + '</i></div>';
   };
 
   /* 6. THE STAMP, a logbook. Today pressed in, the recent record beneath. */
@@ -194,21 +195,30 @@
     var perRow = 20, rowsN = Math.max(1, Math.ceil(N / perRow));
     var top = 20, rowH = Math.max(12, Math.min(28, 320 / rowsN));
     var left = 20, right = 170, rad = Math.min(14, rowH / 2 - 1);
+    // build the path to END exactly at day N (last row is partial), so the whole
+    // line is your real days and splits cleanly into per-day marks.
     var d = 'M' + left + ' ' + top;
     for (var r = 0; r < rowsN; r++) {
       var y = top + r * rowH, ny = y + rowH;
-      var goRight = r % 2 === 0;
-      if (goRight) { d += ' L' + right + ' ' + y; if (r < rowsN - 1) d += ' A' + rad + ' ' + rad + ' 0 0 1 ' + right + ' ' + ny; }
-      else { d += ' L' + left + ' ' + y; if (r < rowsN - 1) d += ' A' + rad + ' ' + rad + ' 0 0 0 ' + left + ' ' + ny; }
+      var daysInRow = Math.min(perRow, N - r * perRow), frac = daysInRow / perRow;
+      var full = daysInRow === perRow, lastRow = r === rowsN - 1, goRight = r % 2 === 0;
+      if (goRight) {
+        d += ' L' + (left + frac * (right - left)).toFixed(1) + ' ' + y;
+        if (!lastRow && full) d += ' A' + rad + ' ' + rad + ' 0 0 1 ' + right + ' ' + ny;
+      } else {
+        d += ' L' + (right - frac * (right - left)).toFixed(1) + ' ' + y;
+        if (!lastRow && full) d += ' A' + rad + ' ' + rad + ' 0 0 0 ' + left + ' ' + ny;
+      }
     }
     var vh = top + rowsN * rowH + 10;
-    // draw the whole travelled thread (your line so far), scaled to total
-    var frac = N < perRow ? Math.max(0.12, N / perRow) : 1;   // day 1 still shows a clear first stroke
+    // indents: dash the whole travelled line into N per-day segments with a small
+    // gap between each, so day 365 reads as one long line of 365 marks.
+    var on = (1000 / N * 0.72).toFixed(2), off = (1000 / N * 0.28).toFixed(2);
     dst.innerHTML =
       '<div class="dlt-line">A single line, <b>' + x.total + ' ' + unitWord(x.total, x.cad) + '</b> long.</div>' +
-      '<svg class="dl-thread" viewBox="0 8 190 ' + vh + '" width="280" height="' + Math.min(430, (vh) * 1.5) + '" preserveAspectRatio="xMidYMin meet" aria-hidden="true">' +
-      '<path d="' + d + '" fill="none" stroke="var(--day)" stroke-width="3" stroke-linecap="round" pathLength="1000" ' +
-      'stroke-dasharray="' + (frac * 1000).toFixed(0) + ' 2000"></path>' +
+      '<svg class="dl-thread" viewBox="0 8 190 ' + vh + '" width="280" height="' + Math.min(430, vh * 1.5) + '" preserveAspectRatio="xMidYMin meet" aria-hidden="true">' +
+      '<path d="' + d + '" fill="none" stroke="var(--day)" stroke-width="3" stroke-linecap="butt" pathLength="1000" ' +
+      'stroke-dasharray="' + on + ' ' + off + '"></path>' +
       '<circle cx="' + left + '" cy="' + top + '" r="3.2" fill="var(--day)"></circle></svg>';
   };
 

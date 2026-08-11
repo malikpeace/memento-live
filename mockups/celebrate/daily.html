@@ -101,7 +101,7 @@ h1{font-size:27px;font-weight:700;letter-spacing:-.02em;margin:0 0 8px}
 
 /* 2 yesterday behind you, a tower climbing up and beyond the top */
 .dlg-tower{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
-  gap:4px;height:600px}
+  gap:2px;height:620px}
 .dlg-past{font-weight:650;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1;flex:0 0 auto}
 .dlg-now{display:flex;align-items:flex-end;gap:9px;margin-top:4px}
 .dlg-now span{font-size:66px;font-weight:750;letter-spacing:-.045em;line-height:.86;color:var(--text-hi);font-variant-numeric:tabular-nums}
@@ -115,10 +115,12 @@ h1{font-size:27px;font-weight:700;letter-spacing:-.02em;margin:0 0 8px}
 .dl-cal b{width:100%;aspect-ratio:1;border-radius:3px;background:rgba(var(--day-rgb),.26)}
 .dl-cal b.dlc-f{background:rgba(var(--day-rgb),.26)}
 .dl-cal b.dlc-t{background:var(--day)}
-.dl-calnum{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-  background:radial-gradient(circle,rgba(6,7,9,.94) 40%,rgba(6,7,9,.72) 66%,transparent 78%);
-  padding:26px 40px;border-radius:20px}
-.dl-calnum .dl-n{color:#fff}
+.dl-calnum{position:absolute;right:40px;top:62%;font-size:52px;font-weight:750;letter-spacing:-.04em;
+  color:#fff;font-variant-numeric:tabular-nums;line-height:1;
+  text-shadow:0 2px 16px rgba(0,0,0,.95),0 0 6px rgba(0,0,0,.9),0 0 2px rgba(0,0,0,.9)}
+.dl-calnum b{font-weight:750}
+.dl-calnum i{font-size:.4em;font-weight:600;font-style:normal;color:rgba(255,255,255,.85);margin-left:5px;letter-spacing:0}
+.dl-calnum::after{content:none}
 
 /* 6 stamp */
 .dls-stamp{display:flex;align-items:center;gap:15px}
@@ -202,5 +204,5 @@ h1{font-size:27px;font-weight:700;letter-spacing:-.02em;margin:0 0 8px}
   window.__playAll = function(){ phones.forEach(play); };
 })();
 </script>
-<script src="_daily-live.js?v=live3"></script>
+<script src="_daily-live.js?v=live4"></script>
 </body></html>
