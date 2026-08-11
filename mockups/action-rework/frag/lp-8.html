@@ -1,0 +1,89 @@
+<!-- archetypes: lp-6 vertical descent rail | lp-7 full-bleed typography | lp-8 canvas-center radial | lp-9 stacked ledger rows | lp-10 unit field sheet -->
+<section class="cell" data-k="lp-8">
+<style>
+[data-k=lp-8] .ph{font-variant-numeric:tabular-nums}
+[data-k=lp-8] .hd{position:absolute;left:18px;right:18px;top:22px}
+[data-k=lp-8] .hd b{display:block;font-size:17px;font-weight:700;letter-spacing:-.015em;color:rgba(var(--ink),.96)}
+[data-k=lp-8] .hd i{display:block;font-style:normal;font-size:12.5px;color:rgba(var(--ink),.9);margin-top:4px}
+
+[data-k=lp-8] .ringwrap{position:absolute;left:32px;top:90px;width:236px;height:236px}
+[data-k=lp-8] .ringwrap svg{width:236px;height:236px;display:block}
+[data-k=lp-8] .tk{fill:none;stroke-width:7;stroke-linecap:butt}
+[data-k=lp-8] .tk.dim{stroke:rgba(var(--ink),.20)}
+[data-k=lp-8] .tk.lit{stroke:rgba(var(--ink),.90)}
+[data-k=lp-8] .tk.nxt{stroke:rgba(63,217,78,.65)}
+[data-k=lp-8] .hit{fill:none;stroke:transparent;stroke-width:18;cursor:pointer}
+[data-k=lp-8] .mid{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+[data-k=lp-8] .mid .n{font-size:34px;font-weight:700;letter-spacing:-.03em;line-height:1;color:rgba(var(--ink),.97)}
+[data-k=lp-8] .mid .of{margin-top:8px;font-size:12.5px;color:rgba(var(--ink),.9)}
+[data-k=lp-8] .mid .left{margin-top:2px;font-size:12.5px;color:rgba(var(--ink),.9)}
+
+[data-k=lp-8] .card{position:absolute;left:14px;right:14px;top:340px;border-radius:15px;padding:15px;
+  background:rgba(22,25,31,.95);backdrop-filter:blur(26px) saturate(1.4);-webkit-backdrop-filter:blur(26px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.07),0 18px 40px rgba(0,0,0,.5)}
+[data-k=lp-8] .card .act{margin:0;font-size:18.5px;font-weight:700;letter-spacing:-.015em;line-height:1.26;color:rgba(var(--ink),.97)}
+[data-k=lp-8] .card .note{margin:9px 0 0;font-size:12.5px;line-height:1.45;color:rgba(var(--ink),.90)}
+[data-k=lp-8] .card .gest{margin:12px 0 0;font-size:12.5px;color:rgba(var(--ink),.82)}
+
+[data-k=lp-8] .dial{position:absolute;left:14px;right:14px;bottom:18px}
+[data-k=lp-8] .dial .t{margin:0 0 8px;font-size:12px;color:rgba(var(--ink),.9)}
+[data-k=lp-8] .chips{display:flex;gap:6px}
+[data-k=lp-8] .chips button{flex:1;font:inherit;font-size:13px;font-weight:500;font-variant-numeric:tabular-nums;color:rgba(var(--ink),.80);
+  background:rgba(22,25,31,.95);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);
+  border:0;border-radius:9px;padding:9px 0;cursor:pointer;box-shadow:inset 0 1px 0 rgba(var(--ink),.08)}
+[data-k=lp-8] .chips button.on{background:rgba(var(--ink),.90);color:#08090b;box-shadow:none}
+[data-k=lp-8] .cons{margin:10px 0 0;font-size:12.5px;line-height:1.45;color:rgba(var(--ink),.90);min-height:36px}
+</style>
+<h3>One hundred marks</h3><p class="cap">A milestone cut into 100 equal marks around a ring, where intensity is how many marks tonight lights and the gesture is lighting them.</p>
+<div class="ph">
+  <div class="grid"></div>
+  <div class="hd"><b>Save $5,000</b><i>One hundred marks. Each one is $50.</i></div>
+
+  <div class="ringwrap">
+    <svg viewBox="0 0 100 100" aria-hidden="true">
+      <defs>
+        <mask id="lp8f"><circle cx="50" cy="50" r="41" fill="none" stroke="#fff" stroke-width="14" pathLength="100" stroke-dasharray="37 63" transform="rotate(-90 50 50)"/></mask>
+        <mask id="lp8n"><circle cx="50" cy="50" r="41" fill="none" stroke="#fff" stroke-width="14" pathLength="100" stroke-dasharray="0 37 4 59" transform="rotate(-90 50 50)"/></mask>
+      </defs>
+      <circle class="tk dim" cx="50" cy="50" r="41" pathLength="100" stroke-dasharray="0.4 0.6" transform="rotate(-90 50 50)"/>
+      <circle class="tk lit" cx="50" cy="50" r="41" pathLength="100" stroke-dasharray="0.4 0.6" transform="rotate(-90 50 50)" mask="url(#lp8f)"/>
+      <circle class="tk nxt" cx="50" cy="50" r="41" pathLength="100" stroke-dasharray="0.4 0.6" transform="rotate(-90 50 50)" mask="url(#lp8n)"/>
+      <circle class="hit" cx="50" cy="50" r="41" pathLength="100" stroke-dasharray="0 37 4 59" transform="rotate(-90 50 50)"/>
+    </svg>
+    <div class="mid">
+      <div class="n">$1,850</div>
+      <div class="of">of $5,000</div>
+      <div class="left">37 marks lit</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <p class="act">Move $200 into savings before tonight.</p>
+    <p class="note">Friday is the transfer day. Nothing else on the list counts as the move.</p>
+    <p class="gest">Tap the dim marks on the ring to light them.</p>
+  </div>
+
+  <div class="dial">
+    <p class="t">This week's size</p>
+    <div class="chips">
+      <button data-n="2" data-c="Two marks a week. $5,000 arrives around March.">$100</button>
+      <button class="on" data-n="4" data-c="Four marks a week. $5,000 arrives in early December.">$200</button>
+      <button data-n="7" data-c="Seven marks a week. $5,000 arrives by mid October.">$350</button>
+    </div>
+    <p class="cons">Four marks a week. $5,000 arrives in early December.</p>
+  </div>
+</div>
+<script>(function(){var r=document.querySelector('[data-k="lp-8"]');if(!r)return;
+var lit=37,step=4,n=r.querySelector('.mid .n'),lc=r.querySelector('.mid .left'),
+    mf=r.querySelector('#lp8f circle'),mn=r.querySelector('#lp8n circle'),hit=r.querySelector('.hit'),cons=r.querySelector('.cons');
+function paint(){mf.setAttribute('stroke-dasharray',lit+' '+(100-lit));
+  var pat='0 '+lit+' '+step+' '+(100-lit-step);
+  mn.setAttribute('stroke-dasharray',pat);hit.setAttribute('stroke-dasharray',pat);
+  n.textContent='$'+(lit*50).toLocaleString('en-US');lc.textContent=lit+' marks lit';}
+r.querySelectorAll('.chips button').forEach(function(b){b.addEventListener('click',function(){
+  r.querySelectorAll('.chips button').forEach(function(x){x.classList.remove('on')});b.classList.add('on');
+  step=+b.dataset.n;cons.textContent=b.dataset.c;paint();});});
+hit.addEventListener('click',function(){lit=Math.min(100,lit+step);paint();
+  r.querySelector('.card .gest').textContent='Logged. The next marks are waiting.';});
+paint();})();</script>
+</section>

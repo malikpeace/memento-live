@@ -1,0 +1,176 @@
+<!-- ld-2..ld-5 layout archetypes (difference law)
+     ld-2 full-bleed decode field | ld-3 receding perspective corridor
+     ld-4 stacked sequential checklist | ld-5 single traversing beam
+     (ld-1 draws the plan onto the grid, none of these do) -->
+<section class="cell" data-k="ld-2">
+<style>
+[data-k=ld-2] .ph{background:#050608}
+[data-k=ld-2] .noise{position:absolute;inset:0;padding:10px 8px;overflow:hidden;
+  font-size:12.5px;line-height:21px;letter-spacing:3.2px;color:rgba(var(--ink),.05);
+  white-space:pre;user-select:none}
+[data-k=ld-2] .scrim{position:absolute;left:0;right:0;top:200px;height:320px;
+  background:radial-gradient(ellipse 62% 52% at 50% 50%,rgba(5,6,8,.97) 0%,rgba(5,6,8,.88) 46%,rgba(5,6,8,0) 76%)}
+[data-k=ld-2] .top{position:absolute;left:22px;right:22px;top:88px;font-size:13.5px;
+  line-height:1.5;color:rgba(var(--ink),.92);margin:0}
+[data-k=ld-2] .dec{position:absolute;left:12px;right:12px;top:298px;height:64px;text-align:center;
+  display:flex;flex-direction:column;justify-content:center}
+[data-k=ld-2] .dec .ln{height:24px;white-space:nowrap}
+[data-k=ld-2] .dc{display:inline-block;width:13px;height:24px;overflow:hidden;vertical-align:top}
+[data-k=ld-2] .dc>span{display:block;transform:translateY(-120px)}
+[data-k=ld-2] .dc i{display:block;height:24px;line-height:24px;font-style:normal;font-size:15px;
+  font-weight:500;letter-spacing:0;text-align:center;color:var(--text-hi);font-variant-numeric:tabular-nums}
+[data-k=ld-2] .sub{position:absolute;left:26px;right:26px;top:388px;text-align:center;
+  font-size:12.5px;line-height:1.55;color:rgba(var(--ink),.9);margin:0;font-variant-numeric:tabular-nums}
+[data-k=ld-2] .bar{position:absolute;left:22px;right:22px;bottom:56px;height:2px;border-radius:2px;
+  background:rgba(var(--ink),.10);overflow:hidden}
+[data-k=ld-2] .bar i{display:block;height:100%;width:6%;border-radius:2px;background:rgba(var(--ink),.62);
+  transition:width 1.6s cubic-bezier(.3,.05,.2,1)}
+[data-k=ld-2] .foot{position:absolute;left:22px;right:22px;bottom:30px;font-size:11.5px;
+  color:var(--text-mid);display:flex;justify-content:space-between;font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion:no-preference){
+  [data-k=ld-2] .noise{animation:ld2noise 8.4s ease-out both}
+  [data-k=ld-2] .top{animation:ld2in .7s ease-out .35s both}
+  [data-k=ld-2] .dc>span{animation:ld2roll .38s steps(5) var(--d) both}
+  [data-k=ld-2] .ln.out .dc{animation:ld2out .3s ease-in var(--o) both}
+  [data-k=ld-2] .sub.in{animation:ld2in .6s ease-out both}
+  [data-k=ld-2] .foot{animation:ld2in .7s ease-out .5s both}
+}
+@keyframes ld2roll{from{transform:translateY(0)}to{transform:translateY(-120px)}}
+@keyframes ld2out{from{opacity:1}to{opacity:0}}
+@keyframes ld2noise{0%{color:rgba(var(--ink),0)}9%{color:rgba(var(--ink),.11)}
+  74%{color:rgba(var(--ink),.10)}100%{color:rgba(var(--ink),.05)}}
+@keyframes ld2in{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+</style>
+<h3>Resolving</h3><p class="cap">The screen is pure noise and the plan burns out of it a line at a time: every wording it tries resolves, holds, then dissolves back into the field until the one that survives is left.</p>
+<div class="ph">
+  <div class="grid"></div>
+  <div class="noise"><div>13$5|9;8.2\#3*$&gt;81;63&gt;/$3^/&lt;80</div>
+<div>1\--../818:/#9$-:2%5~+|0\^-\&lt;^</div>
+<div>892;&gt;-6&gt;1#723:;0&lt;-&gt;12-;-&lt;+5/_5</div>
+<div>44|82_5\92:15&gt;:26=$^.1:#_7-$79</div>
+<div>6*=235/:1#892%8-9~|%|&lt;=&lt;|#.092</div>
+<div>#&gt;348&gt;|$.725+%+##^;_7_&lt;4#36._-</div>
+<div>58%/^.6^:~_\1$-=+6^%7~27\/8:9=</div>
+<div>#&lt;%^43$.*^0;1&lt;/~8#^338*_#|:/3=</div>
+<div>9|$%+7=&gt;6=26*0**85^.2-3;*36%|9</div>
+<div>1|8$/&gt;:*/_&gt;0931=;;~507=#1%\:71</div>
+<div>0+*~&lt;25:~+._956=#7*3\47^\54*%|</div>
+<div>/__*;.%|3&gt;.1$.+447;#$55=77~444</div>
+<div>\$+$+$\$;:%:/6.3:21/=87+#\$/4~</div>
+<div>0/&lt;6.|0232_%95##&gt;$$+1.2=/37::*</div>
+<div>9\;#&lt;;.32.+*3&lt;-&lt;&gt;2&lt;182##+_\3+/</div>
+<div>18.*8%*+6&lt;#.&lt;19:$7:$&gt;:&gt;0-#\=-\</div>
+<div>;#;4\.+&lt;_4;-^-=|4_&gt;#-^96*26-$/</div>
+<div>;917^859719&gt;#-294.-0&lt;160/1^&gt;+=</div>
+<div>.&lt;.%94.7_%\&gt;_8;$%.~^_|^_2+&gt;^^1</div>
+<div>#-*4&gt;25-33=$:*9*4:&gt;4==9;:0$$-:</div>
+<div>=%/-:|&gt;^:;+7_&gt;|8$:~^+8$00^;.2/</div>
+<div>85$*.:&lt;$.4:0=8|=:217&gt;33+830:3.</div>
+<div>+0*.&lt;;/%8#:|2*+&lt;1^+/1~&lt;05*|$\2</div>
+<div>99#*4$6;5;/&lt;3~9964:+8//:|~+/^6</div>
+<div>:2*/#5;:\=~6|_98#3=:\_:9:^-;27</div>
+<div>;7378*/%%944~86$;$535=:+2/96&gt;6</div>
+<div>3%^&lt;079~~\\&gt;6.8=|/-43%66.6-23/</div>
+<div>&gt;7~|-17=0^3%$7&gt;7=~~24/2$=-%|90</div>
+<div>6#88&gt;1*&lt;\#&gt;&lt;;8&lt;;7-=63/::=##.0%</div>
+<div>|&lt;;*6^1*600+=7*9&lt;88/==5-4$_62*</div>
+<div>8*|5|.8~8&lt;5/$+9448//^+-.5=93::</div>
+<div>64\6#%$2#0/8.0:.1$013\*2+*/4~$</div></div>
+  <div class="scrim"></div>
+  <p class="top">Reading everything you told me,<br>then writing one move.</p>
+  <div class="dec"></div>
+  <p class="sub"></p>
+  <div class="bar"><i></i></div>
+  <div class="foot"><span class="fl">Move 1 of 3</span><span>$3,000 a month</span></div>
+</div>
+<script>
+(function(){
+  var r=document.querySelector('[data-k="ld-2"]'); if(!r) return;
+  var dec=r.querySelector('.dec'), sub=r.querySelector('.sub'), bar=r.querySelector('.bar i'),
+      fl=r.querySelector('.foot .fl'),
+      reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches,
+      NOISE='0123456789$#%=+*<>|\\/:;.~^_?ABCDEFGHJKLMNPRSTUVWXYZ';
+  /* every pass writes a DIFFERENT wording, so the wait never repeats itself */
+  var LINES=[
+    ['message 4 clients today','From the 31 you have not spoken to since March.'],
+    ['start with the 8 warmest','The ones who paid you more than once.'],
+    ['one line, one ask, no pitch','You said cold pitching never worked for you.'],
+    ['the same $300 you charge','Nothing new to build before you can send it.'],
+    ['12 minutes, then stop','Your hour still has to cover the rest.'],
+    ['follow up on day 3','So nothing you send sits unanswered.'],
+    ['4 a day for 13 weeks','That is 7 clients, which closes the $2,160.'],
+    ['week 1: the 8 who paid twice','Warmest first, they cost you the least to reopen.'],
+    ['no flyers, no cold DMs','You already spent 3 months there.']
+  ];
+  var MORE=[
+    ['week %n: 4 a day','Sized against week %n of 13, still $180 ahead.'],
+    ['day %n: send before 9pm','The hour you told me you actually have.'],
+    ['week %n puts you at $%m','If half of the 4 a day never answer.'],
+    ['day %n: 2 follow ups','From the ones you wrote on day %p.'],
+    ['week %n: take 2 nights off','You asked for rest days, they stay in.']
+  ];
+  var i=0, pass=0, t=[];
+  function next(){
+    if(i<LINES.length) return LINES[i];
+    var k=i-LINES.length, w=2+(k%12), p=MORE[k%MORE.length];
+    return [p[0].replace(/%n/g,w).replace('%m',(840+w*180).toLocaleString('en-US')),
+            p[1].replace(/%n/g,w).replace('%p',1+(k%5)).replace('%m',(840+w*180).toLocaleString('en-US'))];
+  }
+  function wrap(s){
+    var out=[], line='';
+    s.split(' ').forEach(function(w){
+      if((line+' '+w).replace(/^ /,'').length>19){ out.push(line); line=w; }
+      else line=(line?line+' ':'')+w;
+    });
+    if(line) out.push(line);
+    return out;
+  }
+  function write(txt,sb,hold){
+    dec.innerHTML='';
+    var lines=wrap(txt), c=0, chars=txt.length;
+    lines.forEach(function(ln){
+      var d=document.createElement('div'); d.className='ln';
+      for(var j=0;j<ln.length;j++){
+        var b=document.createElement('b'); b.className='dc';
+        b.style.setProperty('--d',(0.055*c).toFixed(3)+'s');
+        b.style.setProperty('--o',(0.016*c).toFixed(3)+'s');
+        var sp=document.createElement('span');
+        for(var m=0;m<5;m++){
+          var q=document.createElement('i');
+          q.textContent=NOISE.charAt(Math.floor(Math.random()*NOISE.length));
+          sp.appendChild(q);
+        }
+        var f=document.createElement('i');
+        f.textContent=ln.charAt(j)===' '?' ':ln.charAt(j);
+        sp.appendChild(f); b.appendChild(sp); d.appendChild(b); c++;
+      }
+      dec.appendChild(d);
+    });
+    var done=0.055*chars+0.22;
+    if(reduce){ sub.textContent=sb; return; }
+    t.push(setTimeout(function(){
+      sub.textContent=sb; sub.classList.remove('in'); void sub.offsetWidth; sub.classList.add('in');
+    },done*1000));
+    if(hold) return;
+    t.push(setTimeout(function(){
+      for(var k=0;k<dec.children.length;k++) dec.children[k].classList.add('out');
+      t.push(setTimeout(step,180+0.016*chars*1000));
+    },(done+1.75)*1000));
+  }
+  function step(){
+    var p=next(); i++; pass++;
+    write(p[0],p[1]);
+    bar.style.width=(6+84*(1-Math.pow(.89,pass))).toFixed(1)+'%';
+    fl.textContent=pass<4?'Move 1 of 3':pass<7?'Move 2 of 3':pass<10?'Move 3 of 3':'Refining all 3';
+  }
+  /* the final beat: the real app calls this the moment the plan lands */
+  function arrive(){
+    t.forEach(clearTimeout); t=[];
+    write('message 4 clients today','This is your first move. The rest is written.',true);
+    bar.style.width='100%'; fl.textContent='Move 1 of 3';
+  }
+  r.planArrives=arrive;
+  step();
+})();
+</script>
+</section>

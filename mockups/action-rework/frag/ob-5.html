@@ -1,0 +1,42 @@
+<!-- ARCHETYPES (difference law): ob-1 full-bleed monumental type | ob-2 centered engraved object | ob-3 progressive bottom-up writing | ob-4 horizon perspective terrain | ob-5 split seam contrast -->
+<section class="cell" data-k="ob-5">
+<style>
+[data-k=ob-5] .ph{background:#050608}
+/* below the seam the same grid simply burns brighter, no hue, no second colour */
+[data-k=ob-5] .lit{position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(var(--ink),1) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(var(--ink),1) 1px,transparent 1px);
+  background-size:26px 26px;opacity:.14;
+  -webkit-mask-image:linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(0,0,0,0) 51.7%,rgba(0,0,0,.5) 62%,#000 100%);
+  mask-image:linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(0,0,0,0) 51.7%,rgba(0,0,0,.5) 62%,#000 100%)}
+[data-k=ob-5] .said{position:absolute;left:26px;right:26px;top:44px;margin:0;
+  font-size:13.5px;line-height:1.5;color:rgba(var(--ink),.92);font-variant-numeric:tabular-nums}
+[data-k=ob-5] .tag{position:absolute;left:26px;display:flex;align-items:center;gap:9px;
+  font-size:12px;color:rgba(var(--ink),.9)}
+[data-k=ob-5] .tag:after{content:'';width:16px;height:1px;background:rgba(var(--ink),.26)}
+[data-k=ob-5] .tag.a{top:126px}
+[data-k=ob-5] .tag.b{top:455px}
+[data-k=ob-5] .now{position:absolute;left:26px;right:26px;top:152px;margin:0;
+  font-size:15px;line-height:1.62;color:rgba(var(--ink),.90);font-variant-numeric:tabular-nums}
+[data-k=ob-5] .aft{position:absolute;left:26px;right:26px;top:483px;margin:0;
+  font-size:19px;font-weight:500;line-height:1.5;letter-spacing:-.012em;
+  color:rgba(var(--ink),.96);font-variant-numeric:tabular-nums}
+[data-k=ob-5] .seam{position:absolute;left:26px;right:26px;top:336px;transform:translateY(-50%);
+  display:flex;align-items:center;gap:13px}
+[data-k=ob-5] .seam i{flex:1;height:1px;background:linear-gradient(90deg,rgba(var(--ink),.06),rgba(var(--ink),.42))}
+[data-k=ob-5] .seam i+i{background:linear-gradient(90deg,rgba(var(--ink),.42),rgba(var(--ink),.06))}
+[data-k=ob-5] .seam b{font-size:17px;font-weight:700;letter-spacing:-.01em;white-space:nowrap;
+  color:rgba(var(--ink),.96);font-variant-numeric:tabular-nums}
+</style>
+<h3>The seam</h3><p class="cap">One hard line splits the screen into the day that repeats and the day the number buys, so the star reads as a consequence rather than a target.</p>
+<div class="ph">
+  <div class="grid"></div>
+  <div class="lit"></div>
+  <p class="said">I will get to $3,000 a month so I can quit the warehouse.</p>
+  <span class="tag a">now</span>
+  <p class="now">Alarm at 5:40.<br>Someone else picks the shift.<br>The same balance on the 1st.</p>
+  <div class="seam"><i></i><b>$3,000 a month</b><i></i></div>
+  <span class="tag b">after</span>
+  <p class="aft">Your own alarm.<br>Your own hours.<br>Rent covered before the 1st.</p>
+</div>
+</section>

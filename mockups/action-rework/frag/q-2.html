@@ -1,0 +1,98 @@
+<!-- archetypes: q-1 chip cloud stack | q-2 one question full-bleed | q-3 two-zone sorting board -->
+<section class="cell" data-k="q-2">
+<style>
+[data-k="q-2"] .q2-wrap{position:absolute;inset:0;display:flex;flex-direction:column;padding:26px 18px 24px}
+[data-k="q-2"] .q2-bar{display:flex;gap:5px;align-items:center}
+[data-k="q-2"] .q2-seg{height:3px;flex:1;border-radius:999px;background:rgba(var(--ink),.14);transition:background .25s ease}
+[data-k="q-2"] .q2-seg.done{background:rgba(var(--ink),.38)}
+[data-k="q-2"] .q2-seg.now{background:rgba(var(--ink),.85)}
+[data-k="q-2"] .q2-n{font-size:11.5px;font-weight:500;color:rgba(var(--ink),.9);font-variant-numeric:tabular-nums;margin-left:8px}
+[data-k="q-2"] .q2-q{margin:26px 0 0;font-size:29px;line-height:1.14;font-weight:700;letter-spacing:-.032em;
+  color:var(--text-hi);min-height:132px}
+[data-k="q-2"] .q2-as{margin-top:auto;display:flex;flex-direction:column;gap:9px}
+[data-k="q-2"] .q2-a{position:relative;display:block;width:100%;text-align:left;min-height:66px;padding:16px 44px 16px 15px;
+  border:0;border-radius:13px;font-family:inherit;font-size:15px;font-weight:500;line-height:1.3;letter-spacing:-.01em;
+  color:var(--text-hi);cursor:pointer;-webkit-tap-highlight-color:transparent;
+  background:rgba(22,25,31,.94);backdrop-filter:blur(20px) saturate(1.35);-webkit-backdrop-filter:blur(20px) saturate(1.35);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.07);transition:background .18s ease,transform .18s ease}
+[data-k="q-2"] .q2-a:hover{background:rgba(30,34,42,.96);transform:translateY(-1px)}
+[data-k="q-2"] .q2-a svg{position:absolute;right:16px;top:50%;margin-top:-6px;opacity:0;transition:opacity .18s ease}
+[data-k="q-2"] .q2-a.on{background:rgba(30,44,32,.97)}
+[data-k="q-2"] .q2-a.on svg{opacity:1}
+[data-k="q-2"] .q2-own{margin-top:12px;display:flex;align-items:center;gap:9px;padding:0 15px;height:50px;border-radius:12px;
+  background:rgba(18,20,25,.94);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.05)}
+[data-k="q-2"] .q2-own i{flex:none;display:block;width:1.5px;height:15px;border-radius:1px;background:rgba(var(--ink),.7)}
+[data-k="q-2"] .q2-own input{flex:1;min-width:0;height:100%;border:0;background:none;outline:none;font-family:inherit;
+  font-size:13.5px;color:rgba(var(--ink),.96)}
+[data-k="q-2"] .q2-own input::placeholder{color:rgba(var(--ink),.6)}
+[data-k="q-2"] .q2-done{display:flex;flex-direction:column;gap:14px;padding:18px 16px 17px;border-radius:13px;
+  background:rgba(22,25,31,.94);backdrop-filter:blur(20px) saturate(1.35);-webkit-backdrop-filter:blur(20px) saturate(1.35);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.07);animation:q2rise .45s cubic-bezier(.2,.7,.2,1) both}
+[data-k="q-2"] .q2-done p{margin:0;font-size:16px;font-weight:500;line-height:1.35;color:var(--text-hi)}
+[data-k="q-2"] .q2-done p.q2-quiet{font-size:13px;font-weight:400;color:rgba(var(--ink),.9);margin:-4px 0 2px}
+[data-k="q-2"] .q2-done i{position:relative;display:block;height:2px;border-radius:999px;
+  background:rgba(var(--ink),.14);overflow:hidden}
+[data-k="q-2"] .q2-done i b{position:absolute;left:0;top:0;bottom:0;width:8%;border-radius:999px;
+  background:rgba(var(--ink),.85);animation:q2fill 7s cubic-bezier(.3,.05,.2,1) both}
+@keyframes q2rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes q2fill{to{width:86%}}
+@media (prefers-reduced-motion:reduce){
+  [data-k="q-2"] .q2-done{animation:none}
+  [data-k="q-2"] .q2-done i b{animation:none;width:40%}
+}
+</style>
+<h3>One at a time</h3><p class="cap">The refine step is a conversation, not a form: one huge question owns the screen and the answers are slabs big enough to hit without looking.</p>
+<div class="ph">
+  <div class="grid"></div>
+  <div class="q2-wrap">
+    <div class="q2-bar">
+      <div class="q2-seg"></div><div class="q2-seg"></div><div class="q2-seg"></div>
+      <div class="q2-n">1 of 3</div>
+    </div>
+    <div class="q2-q"></div>
+    <div class="q2-as"></div>
+    <div class="q2-own"><i></i><input placeholder="Or say it in your own words"></div>
+  </div>
+</div>
+<script>
+(function(){
+  var r=document.querySelector('[data-k="q-2"]'); if(!r) return;
+  var D=[
+    {q:"What have you already done toward this?",a:["Nothing yet, this is day one","I've had the idea a while","I've made a little money from it","I do it, just not consistently"]},
+    {q:"What do you think it actually takes?",a:["Talking to more people","A better offer","Showing up every day","I honestly don't know"]},
+    {q:"How much time do you have on a normal day?",a:["Under 30 minutes","About an hour","Two to three hours","Most of the day"]}
+  ];
+  var i=0,q=r.querySelector('.q2-q'),as=r.querySelector('.q2-as'),n=r.querySelector('.q2-n'),
+      own=r.querySelector('.q2-own'),segs=r.querySelectorAll('.q2-seg'),
+      TICK='<svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M2 6.9 5.1 10 11 3.3" stroke="rgba(63,217,78,.95)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  function render(){
+    q.textContent=D[i].q; as.innerHTML='';
+    D[i].a.forEach(function(t){
+      var b=document.createElement('button'); b.type='button'; b.className='q2-a';
+      b.appendChild(document.createTextNode(t));
+      b.insertAdjacentHTML('beforeend',TICK);
+      b.addEventListener('click',function(){ b.classList.add('on'); setTimeout(next,340); });
+      as.appendChild(b);
+    });
+    for(var k=0;k<segs.length;k++) segs[k].className='q2-seg'+(k<i?' done':(k===i?' now':''));
+    n.textContent=(i+1)+' of 3';
+  }
+  /* the last answer lands on a finished state and stops, it never wraps back to question 1 */
+  function finish(){
+    q.textContent='That is everything.';
+    as.innerHTML='';
+    var d=document.createElement('div'); d.className='q2-done';
+    var p=document.createElement('p'); p.textContent='Building your plan.';
+    var q2=document.createElement('p'); q2.className='q2-quiet'; q2.textContent='All 3 answers are in it.';
+    var bar=document.createElement('i'); bar.appendChild(document.createElement('b'));
+    d.appendChild(p); d.appendChild(q2); d.appendChild(bar); as.appendChild(d);
+    own.style.display='none';
+    for(var k=0;k<segs.length;k++) segs[k].className='q2-seg done';
+    n.textContent='3 of 3';
+  }
+  function next(){ if(i>=D.length-1) return finish(); i++; render(); }
+  render();
+})();
+</script>
+</section>

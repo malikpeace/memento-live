@@ -1,0 +1,128 @@
+<!-- ld-2..ld-5 layout archetypes (difference law)
+     ld-2 full-bleed decode field | ld-3 receding perspective corridor
+     ld-4 stacked sequential checklist | ld-5 single traversing beam
+     (ld-1 draws the plan onto the grid, none of these do) -->
+<section class="cell" data-k="ld-4">
+<style>
+[data-k=ld-4] .ph{background:#050608}
+[data-k=ld-4] .col{position:absolute;left:24px;right:22px;top:70px;bottom:30px;
+  display:flex;flex-direction:column}
+[data-k=ld-4] .top{margin:0;font-size:16px;font-weight:500;line-height:1.35;color:var(--text-hi)}
+[data-k=ld-4] .sub{margin:5px 0 0;font-size:12.5px;color:rgba(var(--ink),.9)}
+[data-k=ld-4] .list{position:relative;flex:1 1 auto;margin:26px 0 0;overflow:hidden;
+  display:flex;flex-direction:column;justify-content:flex-end;gap:14px}
+[data-k=ld-4] .rail{position:absolute;left:9px;top:100%;bottom:10px;width:1px;
+  background:rgba(var(--ink),.14);transition:top .55s cubic-bezier(.3,.05,.2,1)}
+[data-k=ld-4] .it{position:relative;flex:0 0 auto;display:flex;gap:13px;align-items:flex-start;
+  transition:margin-top .45s cubic-bezier(.4,.03,.25,1),opacity .4s ease}
+[data-k=ld-4] .cb{position:relative;flex:0 0 auto;width:18px;height:18px;border-radius:6px;margin-top:1px;
+  background:rgba(22,25,31,.96);box-shadow:inset 0 1px 0 rgba(var(--ink),.07)}
+[data-k=ld-4] .cb svg{position:absolute;left:3px;top:3px;width:12px;height:12px;display:block}
+[data-k=ld-4] .cb path{fill:none;stroke:rgba(var(--ink),.88);stroke-width:1.7;stroke-linecap:round;
+  stroke-linejoin:round;stroke-dasharray:14;stroke-dashoffset:14;
+  transition:stroke-dashoffset .4s ease-out}
+[data-k=ld-4] .it.done .cb path{stroke-dashoffset:0}
+[data-k=ld-4] .it p{margin:0;font-size:13.5px;line-height:1.42;color:var(--text-hi);font-weight:500;
+  font-variant-numeric:tabular-nums;transition:color .5s ease,font-weight .1s}
+[data-k=ld-4] .it.done p{color:rgba(var(--ink),.9);font-weight:400}
+[data-k=ld-4] .it.gone{opacity:0}
+[data-k=ld-4] .foot{flex:0 0 auto;margin:20px 0 0;padding:13px 0 0;display:flex;
+  justify-content:space-between;font-size:11.5px;color:var(--text-mid);
+  font-variant-numeric:tabular-nums;
+  background:linear-gradient(rgba(var(--ink),.12) 0 1px,transparent 1px) top left/100% 1px no-repeat}
+@media (prefers-reduced-motion:no-preference){
+  [data-k=ld-4] .top{animation:ld4in .6s ease-out .1s both}
+  [data-k=ld-4] .sub{animation:ld4in .6s ease-out .25s both}
+  [data-k=ld-4] .foot{animation:ld4in .6s ease-out .45s both}
+  [data-k=ld-4] .it{animation:ld4in .5s ease-out backwards}
+}
+@keyframes ld4in{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+</style>
+<h3>The working list</h3><p class="cap">The wait shows the reasoning as it happens, written in their own numbers: the log keeps running and settling new lines until the plan is done, so it never stands still.</p>
+<div class="ph">
+  <div class="grid"></div>
+  <div class="col">
+  <p class="top">Building your plan.</p>
+  <p class="sub">Half a minute or two. You can watch.</p>
+  <div class="list"><div class="rail"></div></div>
+  <div class="foot"><span class="n">0 settled</span><span class="s">Working</span></div>
+  </div>
+</div>
+<script>
+(function(){
+  var r=document.querySelector('[data-k="ld-4"]'); if(!r) return;
+  var list=r.querySelector('.list'), rail=r.querySelector('.rail'),
+      cn=r.querySelector('.foot .n'), cs=r.querySelector('.foot .s'),
+      reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches, timer=null, n=0,
+      TICK='<div class="cb"><svg viewBox="0 0 12 12"><path d="M2.3 6.3 4.8 8.8 9.7 3.5"/></svg></div>';
+  /* every line is a new piece of reasoning, nothing is repeated back at them */
+  var STEPS=['Read your goal: $3,000 a month',
+    'Found where you are: $840 from 3 clients',
+    'Counted 31 past clients you never messaged',
+    'Set aside cold DMs and flyers, you tried those',
+    'Priced the gap: 7 clients at $300',
+    'Cut 90 days into 13 weeks',
+    'Checked your hour: 1 free hour most nights',
+    'Sorted the 31 by how recently they paid',
+    'Week 1: the 8 who paid you twice',
+    'Week 2: the 9 who went quiet in March',
+    'Wrote the first line: one ask, no pitch',
+    'Picked today: message 4 of them',
+    'Timed it: 12 minutes for 4 messages',
+    'Set the follow up for day 3',
+    'Left you 2 rest days a week'];
+  var MORE=['Sized week %n: 4 messages a day',
+    'Checked week %n against your hour',
+    'Week %n puts you at $%m',
+    'Kept 2 rest days inside week %n',
+    'Wrote the follow up for day %n',
+    'Week %n needs 20 messages, 60 minutes',
+    'Moved week %n off your busiest night'];
+  function next(){
+    if(n<STEPS.length) return STEPS[n];
+    var k=n-STEPS.length, w=2+(k%12);
+    return MORE[k%MORE.length].replace('%n',w).replace('%m',(840+w*180).toLocaleString('en-US'));
+  }
+  function add(text){
+    var prev=list.lastElementChild;
+    if(prev&&prev.classList.contains('it')) prev.classList.add('done');
+    var d=document.createElement('div');
+    d.className='it';
+    d.innerHTML=TICK+'<p></p>';
+    d.querySelector('p').textContent=text;
+    list.appendChild(d); n++;
+    var items=list.querySelectorAll('.it:not(.gone)');
+    if(items.length>7){
+      var old=items[0];
+      if(reduce) old.remove();
+      else{
+        old.classList.add('gone');
+        old.style.marginTop=(-old.offsetHeight-14)+'px';
+        setTimeout(function(){ old.remove(); },500);
+      }
+    }
+    cn.textContent=n+' settled';
+    if(!reduce) requestAnimationFrame(function(){
+      var first=list.querySelector('.it:not(.gone)');
+      if(first) rail.style.top=(first.offsetTop+4)+'px';
+    });
+  }
+  /* the final beat: the real app calls this the moment the plan lands */
+  function arrive(){
+    if(timer){ clearTimeout(timer); timer=null; }
+    add('Wrote what to say to each one');
+    setTimeout(function(){
+      var last=list.lastElementChild; if(last) last.classList.add('done');
+      cs.textContent='Plan ready';
+    },600);
+  }
+  r.planArrives=arrive;
+  function loop(){ add(next()); timer=setTimeout(loop,1650+(n%3)*280); }
+  if(reduce){
+    for(var i=0;i<6;i++) add(next());
+    var f=list.querySelector('.it'); if(f) rail.style.top=(f.offsetTop+4)+'px';
+  }
+  else{ add(next()); timer=setTimeout(loop,1400); }
+})();
+</script>
+</section>

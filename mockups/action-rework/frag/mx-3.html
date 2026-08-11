@@ -1,0 +1,198 @@
+<!--
+Difference law, layout archetypes for this set:
+  mx-1  horizontal notched rail
+  mx-2  growing block stepper
+  mx-3  vertical dragged card
+  mx-4  additive chip stack
+  mx-5  climbing rung ladder
+-->
+<section class="cell" data-k="mx-3">
+<style>
+[data-k=mx-3] .scr{position:absolute;inset:0;padding:26px 20px 20px;display:flex;flex-direction:column}
+[data-k=mx-3] .hd{font-size:13px;color:var(--text-mid)}
+[data-k=mx-3] .stage{position:relative;flex:1;margin-top:12px}
+[data-k=mx-3] .axis{position:absolute;right:0;top:0;bottom:0;width:140px}
+[data-k=mx-3] .rule{position:absolute;left:6px;width:1px;background:rgba(var(--ink),.15)}
+[data-k=mx-3] .tk{position:absolute;left:0;transform:translateY(-50%);display:flex;align-items:center;gap:5px;
+  font-size:11px;color:rgba(var(--ink),.36);font-variant-numeric:tabular-nums;transition:color .15s ease-out;
+  flex-direction:row-reverse}
+[data-k=mx-3] .tk s{text-decoration:none;width:13px;height:1px;background:rgba(var(--ink),.34);display:block}
+[data-k=mx-3] .tk.on{color:var(--text-hi);font-weight:700}
+[data-k=mx-3] .tk.on s{background:rgba(var(--ink),.85);height:2px}
+[data-k=mx-3] .band{position:absolute;right:0;width:94px;transform:translateY(-50%);font-size:11.5px;
+  color:rgba(var(--ink),.55);line-height:1.32;transition:color .15s ease-out}
+[data-k=mx-3] .band.on{color:var(--text-hi)}
+[data-k=mx-3] .card{position:absolute;left:0;width:120px;border-radius:14px;padding:14px 15px 13px;cursor:grab;touch-action:none;
+  background:rgba(22,25,31,.96);-webkit-backdrop-filter:blur(26px) saturate(1.45);backdrop-filter:blur(26px) saturate(1.45);z-index:3;
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09),0 16px 34px rgba(0,0,0,.5)}
+[data-k=mx-3] .card:active{cursor:grabbing}
+[data-k=mx-3] .card u{display:block;text-decoration:none;font-size:12px;color:var(--text-mid)}
+[data-k=mx-3] .card b{display:block;font-size:52px;font-weight:700;line-height:1;letter-spacing:-.04em;margin:5px 0 2px;font-variant-numeric:tabular-nums}
+[data-k=mx-3] .card i{font-style:normal;font-size:13px;color:var(--text-mid)}
+[data-k=mx-3] .card .cs{margin-top:11px;padding-top:9px;font-size:12.5px;font-variant-numeric:tabular-nums;
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09);display:flex;flex-direction:column;gap:3px;color:var(--text-hi)}
+[data-k=mx-3] .desk .card,[data-k=mx-3] .desk .gh{width:194px}
+[data-k=mx-3] .desk .card .cs{flex-direction:row;justify-content:space-between}
+[data-k=mx-3] .gh{position:absolute;left:0;width:120px;height:46px;border-radius:14px;background:rgba(24,27,34,.94);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.05);opacity:0;transition:opacity .18s ease-out;z-index:1}
+[data-k=mx-3] .gh.on{opacity:1}
+[data-k=mx-3] .hint{font-size:11.5px;color:var(--text-mid);text-align:center;margin-top:6px}
+
+[data-k=mx-3] .dk{position:absolute;inset:0;padding:26px 30px;display:flex;gap:26px}
+[data-k=mx-3] .dstage{position:relative;width:300px;flex:none}
+[data-k=mx-3] .daxis{position:absolute;left:0;top:0;bottom:0;width:52px;cursor:pointer;z-index:4}
+[data-k=mx-3] .daxis .rule{left:42px}
+[data-k=mx-3] .dtk{position:absolute;left:0;transform:translateY(-50%);font-size:11.5px;color:rgba(var(--ink),.36);
+  font-variant-numeric:tabular-nums;width:34px;text-align:right;transition:color .15s ease-out}
+[data-k=mx-3] .dtk.on{color:var(--text-hi);font-weight:700}
+[data-k=mx-3] .dpre{position:absolute;left:36px;right:-236px;height:1px;background:rgba(var(--ink),.3);opacity:0;pointer-events:none}
+[data-k=mx-3] .daxis:hover .dpre{opacity:1}
+[data-k=mx-3] .dside{flex:1;display:flex;flex-direction:column;padding-top:2px}
+[data-k=mx-3] .dsent{font-size:19px;line-height:1.34;letter-spacing:-.015em;min-height:52px;max-width:26ch}
+[data-k=mx-3] .dbox{margin-top:14px;border-radius:12px;padding:2px 14px;background:rgba(22,25,31,.94);
+  -webkit-backdrop-filter:blur(22px) saturate(1.4);backdrop-filter:blur(22px) saturate(1.4);box-shadow:inset 0 1px 0 rgba(var(--ink),.07),0 12px 26px rgba(0,0,0,.42)}
+[data-k=mx-3] .drow{display:flex;justify-content:space-between;padding:10px 0;font-size:13.5px}
+[data-k=mx-3] .drow+.drow{box-shadow:inset 0 1px 0 rgba(var(--ink),.08)}
+[data-k=mx-3] .drow span{color:var(--text-mid)}
+[data-k=mx-3] .drow b{font-weight:500;font-variant-numeric:tabular-nums}
+[data-k=mx-3] .dhint{margin-top:auto;font-size:12px;color:var(--text-mid)}
+</style>
+<h3>Drag the card</h3>
+<p class="cap">The task card is the only control on the screen: you lift it up a printed value axis and it visibly gains weight, stacking a layer under itself for every five you take on.</p>
+
+<div class="ph">
+  <div class="grid"></div>
+  <div class="scr">
+    <div class="hd">Message clients</div>
+    <div class="stage" id="mx3s">
+      <div class="band" data-b="3">under ten minutes, no prep</div>
+      <div class="band" data-b="10">half an hour, needs a list</div>
+      <div class="band" data-b="20">a full hour of it, back to back</div>
+      <div class="axis" id="mx3ax"><div class="rule"></div></div>
+      <div class="gh" id="mx3g1"></div>
+      <div class="gh" id="mx3g2"></div>
+      <div class="gh" id="mx3g3"></div>
+      <div class="card" id="mx3c">
+        <u>message</u>
+        <b id="mx3n">8</b>
+        <i id="mx3u">clients today</i>
+        <div class="cs"><span id="mx3t">24 min</span><span id="mx3d">done 4:54 pm</span></div>
+      </div>
+    </div>
+    <div class="hint">drag the card up to take on more</div>
+  </div>
+</div>
+
+<div class="desk">
+  <div class="grid"></div>
+  <div class="dk">
+    <div class="dstage" id="mx3ds">
+      <div class="daxis" id="mx3dax"><div class="rule"></div><div class="dpre" id="mx3dp"></div></div>
+      <div class="gh" id="mx3dg1" style="left:66px"></div>
+      <div class="gh" id="mx3dg2" style="left:66px"></div>
+      <div class="gh" id="mx3dg3" style="left:66px"></div>
+      <div class="card" id="mx3dc" style="left:66px">
+        <u>message</u>
+        <b id="mx3dn">8</b>
+        <i id="mx3du">clients today</i>
+        <div class="cs"><span id="mx3dt">24 min</span><span id="mx3dd">done 4:54 pm</span></div>
+      </div>
+    </div>
+    <div class="dside">
+      <div class="dsent" id="mx3sent">Half an hour of focus. Block it.</div>
+      <div class="dbox">
+        <div class="drow"><span>weight</span><b id="mx3w">one layer</b></div>
+        <div class="drow"><span>total time</span><b id="mx3tt">24 min</b></div>
+        <div class="drow"><span>finishes</span><b id="mx3fin">4:54 pm</b></div>
+      </div>
+      <div class="dhint">the drag stays, and the cursor adds what it is for, click anywhere on the axis to jump straight there</div>
+    </div>
+  </div>
+</div>
+
+<script>(function(){
+  var R=document.querySelector('[data-k="mx-3"]'); if(!R) return;
+  var MIN=3, BASE=16*60+30, TOP=6;
+  var LAYER=['no extra weight','one layer','two layers','three layers','four layers'];
+  function clock(m){var h=Math.floor(m/60)%24,mm=m%60,ap=h>=12?'pm':'am',hh=h%12||12;return hh+':'+(mm<10?'0':'')+mm+' '+ap;}
+  function sent(n){
+    if(n<=2) return 'A short pass. Done in one sitting.';
+    if(n<=5) return 'You will want the list in front of you first.';
+    if(n<=10) return 'Half an hour of focus. Block it.';
+    if(n<=15) return 'Three quarters of an hour. Give it its own block.';
+    return 'A full hour of messages. Decide before you start.';
+  }
+  function side(n){
+    R.querySelector('#mx3sent').textContent=sent(n);
+    R.querySelector('#mx3w').textContent=LAYER[Math.min(4,Math.floor((n-1)/5))];
+    R.querySelector('#mx3tt').textContent=(n*MIN)+' min';
+    R.querySelector('#mx3fin').textContent=clock(BASE+n*MIN);
+  }
+  function rig(o){
+    var stage=R.querySelector(o.stage), card=R.querySelector(o.card), ax=R.querySelector(o.axis);
+    var ghs=o.gh.map(function(s){return R.querySelector(s);});
+    var n=8;
+    function bot(){return stage.clientHeight-card.offsetHeight-34;}
+    function yFor(v){return TOP+(1-(v-1)/19)*(bot()-TOP);}
+    function vFor(y){return Math.max(1,Math.min(20,Math.round((1-(y-TOP)/(bot()-TOP))*19)+1));}
+    [1,5,10,15,20].forEach(function(v){
+      var e=document.createElement('div'); e.className=o.tk; e.setAttribute('data-v',v);
+      e.innerHTML=o.tk==='tk'?(v+'<s></s>'):v; ax.appendChild(e);
+    });
+    var ticks=ax.querySelectorAll('[data-v]');
+    var bands=stage.querySelectorAll('[data-b]');
+    var rule=ax.querySelector('.rule');
+    function paint(y){
+      if(y==null) y=yFor(n);
+      card.style.top=y+'px';
+      var layers=Math.min(4,Math.floor((n-1)/5)), h=card.offsetHeight;
+      // every printed value sits on the line the card's own middle travels along
+      function cy(v){return yFor(v)+h/2;}
+      ghs.forEach(function(g,i){
+        g.className='gh'+(i<layers?' on':'');
+        g.style.top=(y+h-40+(i+1)*8)+'px';
+      });
+      card.style.boxShadow='inset 0 1px 0 rgba(var(--ink),.09),0 '+(12+n)+'px '+(26+n*1.8)+'px rgba(0,0,0,'+(0.42+n*0.011).toFixed(2)+')';
+      ticks.forEach(function(e){
+        var v=+e.getAttribute('data-v');
+        e.style.top=cy(v)+'px';
+        e.className=o.tk+(Math.abs(v-n)<=1?' on':'');
+      });
+      if(rule){ rule.style.top=cy(20)+'px'; rule.style.height=Math.max(0,cy(1)-cy(20))+'px'; }
+      var band=bands.length?+bands[bands.length-1].getAttribute('data-b'):0;
+      bands.forEach(function(e){var bv=+e.getAttribute('data-b'); if(n<=bv&&bv<band) band=bv;});
+      bands.forEach(function(e){
+        var bv=+e.getAttribute('data-b');
+        e.style.top=cy(bv)+'px';
+        e.className='band'+(bv===band?' on':'');
+      });
+      R.querySelector(o.n).textContent=n;
+      R.querySelector(o.t).textContent=(n*MIN)+' min';
+      R.querySelector(o.d).textContent='done '+clock(BASE+n*MIN);
+      R.querySelector(o.u).textContent=n===1?'client today':'clients today';
+      if(o.side) side(n);
+    }
+    var dy=0, st=0, on=false;
+    card.addEventListener('pointerdown',function(e){on=true;card.setPointerCapture(e.pointerId);dy=e.clientY;st=parseFloat(card.style.top)||yFor(n);});
+    card.addEventListener('pointermove',function(e){
+      if(!on) return;
+      var y=Math.max(TOP,Math.min(bot(),st+(e.clientY-dy)));
+      n=vFor(y); paint(y);
+    });
+    function end(){on=false;paint();}
+    card.addEventListener('pointerup',end);
+    card.addEventListener('pointercancel',end);
+    if(o.clickAxis){
+      var pre=R.querySelector('#mx3dp');
+      ax.addEventListener('mousemove',function(e){pre.style.top=(e.clientY-ax.getBoundingClientRect().top)+'px';});
+      ax.addEventListener('click',function(e){n=vFor(e.clientY-ax.getBoundingClientRect().top);paint();});
+    }
+    paint();
+    setTimeout(paint,60);
+  }
+  rig({stage:'#mx3s',card:'#mx3c',axis:'#mx3ax',tk:'tk',gh:['#mx3g1','#mx3g2','#mx3g3'],
+       n:'#mx3n',t:'#mx3t',d:'#mx3d',u:'#mx3u'});
+  rig({stage:'#mx3ds',card:'#mx3dc',axis:'#mx3dax',tk:'dtk',gh:['#mx3dg1','#mx3dg2','#mx3dg3'],
+       n:'#mx3dn',t:'#mx3dt',d:'#mx3dd',u:'#mx3du',clickAxis:true,side:true});
+})();</script>
+</section>

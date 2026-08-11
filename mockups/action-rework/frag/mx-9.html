@@ -1,0 +1,154 @@
+<!-- archetypes: mx-6 vertical pressure column | mx-7 centered arc dial | mx-8 stacked sentence cards | mx-9 giant elastic numeral | mx-10 keys over timeline -->
+<section class="cell" data-k="mx-9">
+<style>
+[data-k="mx-9"] .p9{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;padding:26px 20px 22px}
+[data-k="mx-9"] .day{font-size:12px;color:var(--text-lo);margin:0}
+[data-k="mx-9"] .verb{font-size:17px;font-weight:500;color:var(--text-mid);margin:2px 0 0}
+[data-k="mx-9"] .stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  touch-action:none;user-select:none;cursor:ns-resize;position:relative}
+[data-k="mx-9"] .big{font-weight:700;letter-spacing:-.05em;line-height:.86;font-variant-numeric:tabular-nums;
+  transition:font-size .1s linear}
+[data-k="mx-9"] .unit{font-size:14px;color:var(--text-mid);margin-top:10px}
+[data-k="mx-9"] .field{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;align-content:flex-start;
+  width:100%;max-width:200px;min-height:38px;margin:22px 0 0}
+[data-k="mx-9"] .field i{width:10px;height:10px;border-radius:2px;background:rgba(var(--ink),.66);display:block}
+[data-k="mx-9"] .field i.new{background:rgba(var(--ink),.95)}
+[data-k="mx-9"] .end{border-radius:14px;padding:13px 16px;background:rgba(22,25,31,.94);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.08);display:flex;justify-content:space-between;align-items:baseline;
+  font-variant-numeric:tabular-nums;margin-top:12px}
+[data-k="mx-9"] .end span{font-size:12.5px;color:var(--text-mid)}
+[data-k="mx-9"] .end b{font-size:16px;font-weight:700}
+[data-k="mx-9"] .hint{display:flex;align-items:center;justify-content:center;gap:9px;font-size:12.5px;
+  color:var(--text-mid);margin:0 0 12px}
+[data-k="mx-9"] .pinch{display:inline-flex;align-items:center;gap:4px;opacity:.7}
+[data-k="mx-9"] .pinch i{width:9px;height:9px;border-radius:999px;background:rgba(var(--ink),.65);display:block}
+[data-k="mx-9"] .pinch s{width:16px;height:1px;background:rgba(var(--ink),.45);display:block}
+
+[data-k="mx-9"] .d9{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;padding:30px 0 26px}
+[data-k="mx-9"] .d9 .dhd{margin:0;padding:0 44px;font-size:14px;color:var(--text-mid)}
+[data-k="mx-9"] .bandwrap{flex:1;position:relative;display:flex;align-items:center;padding-left:44px;
+  overflow:hidden;margin:16px 0 18px}
+[data-k="mx-9"] .band{position:relative;z-index:1;flex:none;display:flex;align-items:center;border-radius:14px;
+  padding-left:26px;color:var(--text-hi);cursor:ew-resize;user-select:none;touch-action:none;
+  background:rgba(30,34,41,.96);-webkit-backdrop-filter:blur(22px) saturate(1.4);backdrop-filter:blur(22px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.10),0 18px 40px rgba(0,0,0,.5);
+  transition:width .1s linear,height .1s linear}
+[data-k="mx-9"] .band b{font-weight:700;letter-spacing:-.05em;line-height:.9;color:var(--text-hi);
+  font-variant-numeric:tabular-nums;transition:font-size .1s linear}
+[data-k="mx-9"] .band u{margin-left:auto;padding-right:22px;text-decoration:none;font-size:13.5px;
+  color:var(--text-mid);white-space:nowrap;opacity:0;transition:opacity .12s}
+[data-k="mx-9"] .band.wide u{opacity:1}
+[data-k="mx-9"] .usual{position:absolute;z-index:2;top:12px;bottom:12px;width:1px;
+  background:repeating-linear-gradient(180deg,rgba(var(--ink),.45) 0 5px,transparent 5px 10px)}
+[data-k="mx-9"] .usual span{position:absolute;left:9px;top:0;font-size:11.5px;white-space:nowrap;
+  color:rgba(var(--ink),.62);font-variant-numeric:tabular-nums}
+[data-k="mx-9"] .dfoot{padding:0 44px}
+[data-k="mx-9"] .dfoot .rows{margin:0;font-size:15px;color:var(--text-mid);font-variant-numeric:tabular-nums}
+[data-k="mx-9"] .dfoot .rows b{color:var(--text-hi);font-weight:700}
+[data-k="mx-9"] .dfoot .tip{margin:9px 0 0;font-size:13px;color:var(--text-mid);font-variant-numeric:tabular-nums}
+</style>
+<h3>Stretch the number</h3>
+<p class="cap">The number is the control: you pinch it open or squeeze it shut and it physically grows on the screen, so a heavy day is literally larger than a light one before you read a single word. On the desktop the same stretch runs sideways, scrolling pulls the day out into a band that reaches the far edge of the frame at 20.</p>
+
+<div class="ph">
+  <div class="grid"></div>
+  <div class="p9">
+    <p class="day">Tuesday, day 12</p>
+    <p class="verb">Message clients</p>
+    <div class="stage">
+      <div class="big n">5</div>
+      <div class="unit u">clients today</div>
+      <div class="field"></div>
+    </div>
+    <div class="hint"><span class="pinch"><i></i><s></s><i></i></span>Pinch the number to stretch today</div>
+    <div class="end"><span>Start 9:00, done by</span><b class="e">9:15</b></div>
+  </div>
+</div>
+
+<div class="desk">
+  <div class="grid"></div>
+  <div class="d9">
+    <p class="dhd">Message clients, Tuesday, day 12</p>
+    <div class="bandwrap">
+      <div class="usual"><span>the 8 you usually hold</span></div>
+      <div class="band wide"><b class="wn">5</b><u class="wu">clients today</u></div>
+    </div>
+    <div class="dfoot">
+      <p class="rows">Each message takes about 3 min. You start at 9:00 and finish by <b class="e">9:15</b>.</p>
+      <p class="tip">Scroll on the band to stretch it, one client at a time. At 20 it runs the whole width.</p>
+    </div>
+  </div>
+</div>
+
+<script>(function(){
+  var root=document.querySelector('[data-k="mx-9"]');
+  var n=5, prev=5, acc=0, MIN=3;
+  var wrap=root.querySelector('.bandwrap'), band=root.querySelector('.band');
+  function fmt(mins){ var t=9*60+mins, h=Math.floor(t/60), m=t%60; return h+':'+(m<10?'0':'')+m; }
+  function bw(v){ var avail=Math.max(240,wrap.clientWidth-44)-6; return 116+(v-1)/19*(avail-116); }
+  function paint(grew){
+    Array.prototype.forEach.call(root.querySelectorAll('.big'),function(e){
+      e.textContent=n; e.style.fontSize=(84+(n-1)/19*126)+'px';
+    });
+    Array.prototype.forEach.call(root.querySelectorAll('.unit'),function(e){ e.textContent=(n===1?'client':'clients')+' today'; });
+    Array.prototype.forEach.call(root.querySelectorAll('.e'),function(e){ e.textContent=fmt(n*MIN); });
+    Array.prototype.forEach.call(root.querySelectorAll('.field'),function(box){
+      box.innerHTML='';
+      for(var k=0;k<n;k++){ var i=document.createElement('i'); if(grew&&k>=prev) i.className='new'; box.appendChild(i); }
+    });
+    band.style.width=bw(n)+'px';
+    band.style.height=(78+n*4.2)+'px';
+    band.classList.toggle('wide',n>=3);
+    band.querySelector('b').textContent=n;
+    band.querySelector('b').style.fontSize=(44+n*3.7)+'px';
+    band.querySelector('u').textContent=(n===1?'client':'clients')+' today';
+    root.querySelector('.usual').style.left=(44+bw(8))+'px';
+  }
+  function set(v){ v=Math.max(1,Math.min(20,v)); if(v===n) return; prev=n; var up=v>n; n=v; paint(up); }
+
+  Array.prototype.forEach.call(root.querySelectorAll('.stage'),function(st){
+    var pts={}, base=null, baseN=5, y0=null;
+    st.addEventListener('pointerdown',function(e){
+      try{st.setPointerCapture(e.pointerId);}catch(err){} pts[e.pointerId]=[e.clientX,e.clientY];
+      var k=Object.keys(pts);
+      if(k.length===2){ base=dist(); baseN=n; } else { y0=e.clientY; baseN=n; }
+    });
+    function dist(){ var k=Object.keys(pts); if(k.length<2) return 0;
+      var a=pts[k[0]],b=pts[k[1]]; return Math.hypot(a[0]-b[0],a[1]-b[1]); }
+    st.addEventListener('pointermove',function(e){
+      if(!(e.pointerId in pts)) return;
+      pts[e.pointerId]=[e.clientX,e.clientY];
+      var k=Object.keys(pts);
+      if(k.length===2&&base){ set(Math.round(baseN+(dist()-base)/14)); }
+      else if(y0!==null){ set(Math.round(baseN+(y0-e.clientY)/12)); }
+    });
+    function up(e){ delete pts[e.pointerId]; if(Object.keys(pts).length<2) base=null; if(!Object.keys(pts).length) y0=null; }
+    st.addEventListener('pointerup',up); st.addEventListener('pointercancel',up);
+    st.addEventListener('wheel',function(e){
+      e.preventDefault(); acc+=e.deltaY;
+      while(acc<=-40){ acc+=40; set(n+1); }
+      while(acc>=40){ acc-=40; set(n-1); }
+    },{passive:false});
+  });
+
+  // desktop, the band stretches sideways under the wheel or a horizontal drag
+  var bacc=0, bx=null, bn=5;
+  band.addEventListener('wheel',function(e){
+    e.preventDefault(); bacc+=e.deltaY;
+    while(bacc<=-40){ bacc+=40; set(n+1); }
+    while(bacc>=40){ bacc-=40; set(n-1); }
+  },{passive:false});
+  band.addEventListener('pointerdown',function(e){
+    try{band.setPointerCapture(e.pointerId);}catch(err){} bx=e.clientX; bn=n;
+  });
+  band.addEventListener('pointermove',function(e){
+    if(bx===null) return; set(bn+Math.round((e.clientX-bx)/16));
+  });
+  function bup(){ bx=null; }
+  band.addEventListener('pointerup',bup); band.addEventListener('pointercancel',bup);
+
+  paint(false);
+  window.addEventListener('resize',function(){paint(false);});
+  setTimeout(function(){paint(false);},60);
+})();</script>
+</section>

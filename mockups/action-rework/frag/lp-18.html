@@ -1,0 +1,77 @@
+<!-- archetypes: lp-16 full-bleed horizontal corridor | lp-17 stacked ledger rows | lp-18 centered monolith numeral | lp-19 bottom-sheet hour rail | lp-20 radial week clock -->
+<section class="cell" data-k="lp-18">
+<style>
+[data-k=lp-18] .l18{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  padding:36px 22px 26px;text-align:center;font-variant-numeric:tabular-nums}
+[data-k=lp-18] .l18-goal{font-size:12.5px;color:rgba(var(--ink),.80)}
+[data-k=lp-18] .l18-core{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0}
+[data-k=lp-18] .l18-n{font-size:104px;font-weight:700;letter-spacing:-.05em;line-height:.9;color:var(--text-hi)}
+[data-k=lp-18] .l18-u{margin-top:14px;font-size:16px;font-weight:500;color:var(--text-hi)}
+[data-k=lp-18] .l18-why{margin-top:12px;max-width:230px;font-size:12.5px;line-height:1.55;color:rgba(var(--ink),.90)}
+[data-k=lp-18] .l18-foot{width:100%}
+[data-k=lp-18] .l18-state{font-size:13.5px;color:var(--text-hi);margin-bottom:14px}
+[data-k=lp-18] .l18-hold{position:relative;width:100%;height:58px;border-radius:14px;overflow:hidden;
+  background:rgba(22,25,31,.95);-webkit-backdrop-filter:blur(22px) saturate(1.3);backdrop-filter:blur(22px) saturate(1.3);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09);cursor:pointer;touch-action:none;user-select:none}
+[data-k=lp-18] .l18-hold i{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(63,217,78,.2);display:block}
+[data-k=lp-18] .l18-hold span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:500;color:var(--text-hi)}
+[data-k=lp-18] .l18-esc{margin-top:16px;width:100%;padding:12px 0;border:0;background:none;color:rgba(var(--ink),.86);
+  font:500 13px var(--font);cursor:pointer}
+[data-k=lp-18] .l18-hard{display:none;text-align:left;border-radius:14px;padding:16px;background:rgba(22,25,31,.96);
+  -webkit-backdrop-filter:blur(24px) saturate(1.3);backdrop-filter:blur(24px) saturate(1.3);box-shadow:inset 0 1px 0 rgba(var(--ink),.09)}
+[data-k=lp-18] .l18.hard .l18-hard{display:block}
+[data-k=lp-18] .l18.hard .l18-state,[data-k=lp-18] .l18.hard .l18-hold,[data-k=lp-18] .l18.hard .l18-esc{display:none}
+[data-k=lp-18] .l18-hard b{display:block;font-size:16px;font-weight:700;color:var(--text-hi)}
+[data-k=lp-18] .l18-hard p{margin:8px 0 14px;font-size:12.5px;line-height:1.55;color:rgba(var(--ink),.90)}
+[data-k=lp-18] .l18-hard .go{width:100%;height:46px;border:0;border-radius:11px;background:rgba(var(--ink),.92);
+  color:#0a0b0d;font:700 14px var(--font);cursor:pointer}
+[data-k=lp-18] .l18-hard .bk{width:100%;margin-top:8px;padding:9px 0;border:0;background:none;color:rgba(var(--ink),.82);font:500 12.5px var(--font);cursor:pointer}
+[data-k=lp-18] .l18-owned .l18-n{color:#3fd94e}
+</style>
+<h3>Days owned</h3>
+<p class="cap">Binary quitting as one object on an empty canvas. The total is the whole interface, there is no dial to turn, and the hard night has its own door.</p>
+<div class="ph">
+  <div class="grid"></div>
+  <div class="l18">
+    <div class="l18-goal">No drinking</div>
+
+    <div class="l18-core">
+      <div class="l18-n">141</div>
+      <div class="l18-u">days owned</div>
+      <div class="l18-why">Every day you kept, added up since 12 March. It is a total. A bad night subtracts nothing.</div>
+    </div>
+
+    <div class="l18-foot">
+      <div class="l18-state">Today is still open.</div>
+      <div class="l18-hold"><i></i><span>Hold to own today</span></div>
+      <button class="l18-esc">It is hard right now</button>
+
+      <div class="l18-hard">
+        <b>Then the move is one message.</b>
+        <p>Not a plan, not the rest of the night. Text Dana and stay where you are until she answers.</p>
+        <button class="go">Text Dana</button>
+        <button class="bk">Back</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>(function(){
+  var c=document.currentScript.closest('.cell');
+  var root=c.querySelector('.l18'),pad=c.querySelector('.l18-hold'),fill=pad.querySelector('i'),
+      lab=pad.querySelector('span'),n=c.querySelector('.l18-n'),st=c.querySelector('.l18-state'),t=null,done=false;
+  function start(){if(done)return;fill.style.transition='width .9s linear';fill.style.width='100%';
+    t=setTimeout(function(){done=true;root.classList.add('l18-owned');n.textContent='142';
+      st.textContent='Owned. That is 142.';lab.textContent='Today is yours';},900);}
+  function stop(){if(done)return;clearTimeout(t);fill.style.transition='width .2s ease-out';fill.style.width='0';}
+  pad.addEventListener('pointerdown',start);pad.addEventListener('pointerup',stop);
+  pad.addEventListener('pointerleave',stop);pad.addEventListener('pointercancel',stop);
+  c.querySelector('.l18-esc').addEventListener('click',function(){root.classList.add('hard');});
+  c.querySelector('.l18-hard .bk').addEventListener('click',function(){root.classList.remove('hard');});
+  c.querySelector('.l18-hard .go').addEventListener('click',function(){
+    c.querySelector('.l18-hard b').textContent='Sent to Dana.';
+    c.querySelector('.l18-hard p').textContent='That was the whole move. Stay here until she answers, nothing else is asked of you tonight.';
+    c.querySelector('.l18-hard .go').style.display='none';
+  });
+})();</script>
+</section>

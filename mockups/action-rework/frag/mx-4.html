@@ -1,0 +1,192 @@
+<!--
+Difference law, layout archetypes for this set:
+  mx-1  horizontal notched rail
+  mx-2  growing block stepper
+  mx-3  vertical dragged card
+  mx-4  additive chip stack
+  mx-5  climbing rung ladder
+-->
+<section class="cell" data-k="mx-4">
+<style>
+[data-k=mx-4] .scr{position:absolute;inset:0;padding:26px 20px 20px;display:flex;flex-direction:column}
+[data-k=mx-4] .hd{font-size:13px;color:var(--text-mid)}
+[data-k=mx-4] .tot{display:flex;align-items:baseline;gap:8px;margin-top:6px}
+[data-k=mx-4] .tot b{font-size:40px;font-weight:700;line-height:1;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+[data-k=mx-4] .tot span{font-size:13.5px;color:var(--text-mid);font-variant-numeric:tabular-nums}
+[data-k=mx-4] .stack{position:relative;flex:1;margin:14px 0 0}
+[data-k=mx-4] .seg{position:absolute;left:0;right:0;border-radius:9px;overflow:hidden;cursor:pointer;z-index:1;
+  background:rgba(28,32,39,.96);box-shadow:inset 0 1px 0 rgba(var(--ink),.09);
+  transition:top .18s cubic-bezier(.2,.7,.3,1),height .18s cubic-bezier(.2,.7,.3,1)}
+[data-k=mx-4] .seg u{position:absolute;left:11px;top:50%;transform:translateY(-50%);text-decoration:none;line-height:1;
+  font-size:13px;font-weight:500;font-variant-numeric:tabular-nums}
+[data-k=mx-4] .seg i{position:absolute;right:11px;top:50%;transform:translateY(-50%);font-style:normal;line-height:1;
+  font-size:12px;color:var(--text-mid);font-variant-numeric:tabular-nums}
+[data-k=mx-4] .seg.s1 u{font-size:10.5px;font-weight:400}
+[data-k=mx-4] .seg.s1 i{font-size:10.5px}
+[data-k=mx-4] .seg.over{background:rgba(20,23,29,.96)}
+[data-k=mx-4] .seg.over::before{content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(-45deg,rgba(var(--ink),.09) 0 2px,transparent 2px 7px)}
+[data-k=mx-4] .seg.over u,[data-k=mx-4] .seg.over i{color:var(--text-mid)}
+[data-k=mx-4] .cap2{position:absolute;left:-4px;right:-4px;height:1px;z-index:5;
+  background:repeating-linear-gradient(90deg,rgba(var(--ink),.42) 0 5px,transparent 5px 10px)}
+[data-k=mx-4] .cap2 span{position:absolute;right:0;bottom:5px;font-size:11px;color:rgba(var(--ink),.66)}
+[data-k=mx-4] .base{position:absolute;left:0;right:0;bottom:0;height:1px;background:rgba(var(--ink),.2)}
+[data-k=mx-4] .empt{position:absolute;left:0;bottom:10px;font-size:12px;color:var(--text-lo)}
+[data-k=mx-4] .note{font-size:12px;color:var(--text-mid);margin:10px 0 12px;min-height:16px;font-variant-numeric:tabular-nums}
+[data-k=mx-4] .tray{display:flex;gap:8px}
+[data-k=mx-4] .chip{flex:1;border-radius:11px;padding:11px 0 10px;text-align:center;cursor:pointer;
+  background:rgba(28,32,39,.95);box-shadow:inset 0 1px 0 rgba(var(--ink),.08);-webkit-tap-highlight-color:transparent}
+[data-k=mx-4] .chip:active{background:rgba(42,47,56,.97)}
+[data-k=mx-4] .chip b{display:block;font-size:16px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+[data-k=mx-4] .chip u{display:block;text-decoration:none;font-size:10.5px;color:var(--text-mid);margin-top:2px;font-variant-numeric:tabular-nums}
+[data-k=mx-4] .chip.off{opacity:.3;cursor:default}
+[data-k=mx-4] .chip.clr b{font-size:13px;font-weight:500;padding:4px 0}
+[data-k=mx-4] .hint{font-size:11.5px;color:var(--text-mid);text-align:center;margin-top:9px}
+
+[data-k=mx-4] .dk{position:absolute;inset:0;padding:26px 30px;display:flex;gap:26px}
+[data-k=mx-4] .dpal{width:150px;flex:none;display:flex;flex-direction:column;gap:8px}
+[data-k=mx-4] .dpal .lab{font-size:12px;color:var(--text-mid);margin-bottom:2px}
+[data-k=mx-4] .dchip{border-radius:10px;padding:9px 12px;cursor:pointer;display:flex;justify-content:space-between;align-items:baseline;
+  background:rgba(28,32,39,.95);box-shadow:inset 0 1px 0 rgba(var(--ink),.08)}
+[data-k=mx-4] .dchip:hover{background:rgba(42,47,56,.97)}
+[data-k=mx-4] .dchip b{font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}
+[data-k=mx-4] .dchip u{text-decoration:none;font-size:11.5px;color:var(--text-mid);font-variant-numeric:tabular-nums}
+[data-k=mx-4] .dchip.off{opacity:.3;cursor:default}
+[data-k=mx-4] .dmid{width:200px;flex:none;position:relative;display:flex;flex-direction:column}
+[data-k=mx-4] .dstack{position:relative;flex:1}
+[data-k=mx-4] .dled{flex:1;display:flex;flex-direction:column;min-width:0}
+[data-k=mx-4] .dled .lab{font-size:12px;color:var(--text-mid);margin-bottom:8px}
+[data-k=mx-4] .lrow{display:flex;justify-content:space-between;align-items:center;padding:7px 0;font-size:13px;
+  font-variant-numeric:tabular-nums;cursor:pointer}
+[data-k=mx-4] .lrow+.lrow{box-shadow:inset 0 1px 0 rgba(var(--ink),.08)}
+[data-k=mx-4] .lrow span{color:var(--text-mid)}
+[data-k=mx-4] .lrow .x{width:16px;height:16px;position:relative;opacity:0}
+[data-k=mx-4] .lrow:hover .x{opacity:.75}
+[data-k=mx-4] .lrow .x::before,[data-k=mx-4] .lrow .x::after{content:"";position:absolute;left:2px;right:2px;top:50%;height:1.5px;background:rgba(var(--ink),.9)}
+[data-k=mx-4] .lrow .x::before{transform:rotate(45deg)}
+[data-k=mx-4] .lrow .x::after{transform:rotate(-45deg)}
+[data-k=mx-4] .dtot{margin-top:auto;padding-top:10px;display:flex;align-items:baseline;gap:8px;box-shadow:inset 0 1px 0 rgba(var(--ink),.1)}
+[data-k=mx-4] .dtot b{font-size:32px;font-weight:700;letter-spacing:-.035em;font-variant-numeric:tabular-nums}
+[data-k=mx-4] .dtot span{font-size:12.5px;color:var(--text-mid);font-variant-numeric:tabular-nums}
+</style>
+<h3>Chip stack</h3>
+<p class="cap">Today gets built out of batches you add one at a time, stacking into a column against the dashed line where the replies stop fitting the room you have this week.</p>
+
+<div class="ph">
+  <div class="grid"></div>
+  <div class="scr">
+    <div class="hd">Message clients</div>
+    <div class="tot"><b id="mx4n">8</b><span id="mx4m">messages, about 2 replies back</span></div>
+    <div class="stack" id="mx4st">
+      <div class="base"></div>
+      <div class="empt" id="mx4e">nothing added yet</div>
+      <div class="cap2" id="mx4c"><span>room for 3 replies</span></div>
+    </div>
+    <div class="note" id="mx4note"></div>
+    <div class="tray">
+      <div class="chip" data-a="1"><b>+1</b><u>message</u></div>
+      <div class="chip" data-a="2"><b>+2</b><u>messages</u></div>
+      <div class="chip" data-a="5"><b>+5</b><u>messages</u></div>
+      <div class="chip clr" data-a="0"><b>clear</b><u>start over</u></div>
+    </div>
+    <div class="hint">tap a block in the stack to take it back out</div>
+  </div>
+</div>
+
+<div class="desk">
+  <div class="grid"></div>
+  <div class="dk">
+    <div class="dpal">
+      <div class="lab">the tray becomes a palette here</div>
+      <div class="dchip" data-a="1"><b>+1</b><u>message</u></div>
+      <div class="dchip" data-a="2"><b>+2</b><u>messages</u></div>
+      <div class="dchip" data-a="5"><b>+5</b><u>messages</u></div>
+      <div class="dchip" data-a="0"><b>clear</b><u>start over</u></div>
+    </div>
+    <div class="dmid">
+      <div class="dstack" id="mx4dst">
+        <div class="base"></div>
+        <div class="empt" id="mx4de">nothing added yet</div>
+        <div class="cap2" id="mx4dc"><span>room for 3 replies</span></div>
+      </div>
+    </div>
+    <div class="dled">
+      <div class="lab">every batch can be pulled back out here</div>
+      <div id="mx4ldg"></div>
+      <div class="dtot"><b id="mx4dn">8</b><span id="mx4dm">messages, about 2 replies back, room for 1 more reply</span></div>
+    </div>
+  </div>
+</div>
+
+<script>(function(){
+  var R=document.querySelector('[data-k="mx-4"]'); if(!R) return;
+  // one reply comes back for every four you send, and this week has room for three
+  var MAXN=20, RATE=4, ROOM=3, CAP=ROOM*RATE;
+  function reps(n){return Math.round(n/RATE);}
+  function repl(k){return k+(k===1?' reply':' replies');}
+  function back(n){var r=reps(n); if(!n) return 'nothing back yet';
+    return (r<1?'maybe 1 reply':'about '+repl(r))+' back';}
+  function more(k){return k+(k===1?' more reply':' more replies');}
+  function room(n){var d=reps(n)-ROOM;
+    return d>0 ? repl(d)+' past your room' : d<0 ? 'room for '+more(-d) : 'right at your room';}
+
+  function rig(o){
+    var stack=R.querySelector(o.stack), parts=[5,2,1], px=o.px;
+    function total(){return parts.reduce(function(a,b){return a+b;},0);}
+    function render(){
+      stack.querySelectorAll('.seg').forEach(function(e){e.remove();});
+      var H=stack.clientHeight, run=0;
+      parts.forEach(function(s,i){
+        var e=document.createElement('div');
+        e.className='seg'+(run+s>CAP?' over':'')+(s===1?' s1':'');
+        e.style.height=(s*px-3)+'px';
+        e.style.top=(H-(run+s)*px)+'px';
+        e.innerHTML='<u>'+s+(s===1?' message':' messages')+'</u><i>runs to '+(run+s)+'</i>';
+        e.addEventListener('click',function(){parts.splice(i,1);render();});
+        stack.appendChild(e);
+        run+=s;
+      });
+      var n=total(), d=reps(n)-ROOM;
+      R.querySelector(o.cap).style.top=(H-CAP*px)+'px';
+      R.querySelector(o.empt).style.display=n?'none':'block';
+      R.querySelector(o.n).textContent=n;
+      R.querySelector(o.m).textContent=(n===1?'message':'messages')+', '+back(n)
+        +(o.long?', '+room(n):'');
+      if(o.note) R.querySelector(o.note).textContent = d>0
+        ? 'about '+repl(d)+' more than you have room for this week'
+        : d<0 ? 'room for about '+more(-d)+' this week'
+        : 'right at the room you have this week';
+      if(o.ledger){
+        var l=R.querySelector(o.ledger), acc=0; l.innerHTML='';
+        parts.forEach(function(s,i){
+          acc+=s;
+          var row=document.createElement('div'); row.className='lrow';
+          row.innerHTML='<b>+'+s+'</b><span>'+(s===1?'message':'messages')+'</span><span>runs to '+acc+'</span><div class="x"></div>';
+          row.addEventListener('click',function(){parts.splice(i,1);render();});
+          l.appendChild(row);
+        });
+        if(!parts.length) l.innerHTML='<div class="lrow"><span>empty</span></div>';
+      }
+      o.chips.forEach(function(c){
+        var a=+c.getAttribute('data-a');
+        c.classList.toggle('off', a>0 && total()+a>MAXN);
+      });
+    }
+    o.chips.forEach(function(c){
+      c.addEventListener('click',function(){
+        var a=+c.getAttribute('data-a');
+        if(!a){parts=[];render();return;}
+        if(total()+a>MAXN) return;
+        parts.push(a); render();
+      });
+    });
+    render();
+    setTimeout(render,60);
+  }
+
+  rig({stack:'#mx4st',cap:'#mx4c',empt:'#mx4e',n:'#mx4n',m:'#mx4m',note:'#mx4note',px:17,
+       chips:[].slice.call(R.querySelectorAll('.chip'))});
+  rig({stack:'#mx4dst',cap:'#mx4dc',empt:'#mx4de',n:'#mx4dn',m:'#mx4dm',ledger:'#mx4ldg',long:true,px:15,
+       chips:[].slice.call(R.querySelectorAll('.dchip'))});
+})();</script>
+</section>

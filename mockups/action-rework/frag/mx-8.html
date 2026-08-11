@@ -1,0 +1,125 @@
+<!-- archetypes: mx-6 vertical pressure column | mx-7 centered arc dial | mx-8 stacked sentence cards | mx-9 giant elastic numeral | mx-10 keys over timeline -->
+<section class="cell" data-k="mx-8">
+<style>
+[data-k="mx-8"] .p8{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;padding:26px 18px 20px}
+[data-k="mx-8"] .day{font-size:12px;color:var(--text-lo);margin:0 0 4px}
+[data-k="mx-8"] .ask{font-size:19px;font-weight:700;letter-spacing:-.015em;margin:0 0 14px}
+[data-k="mx-8"] .stack{flex:1;display:flex;flex-direction:column;gap:10px}
+[data-k="mx-8"] .opt{position:relative;flex:1;border-radius:14px;padding:16px 16px 14px;cursor:pointer;overflow:hidden;
+  background:rgba(19,22,27,.92);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);box-shadow:inset 0 1px 0 rgba(var(--ink),.05);
+  transition:flex .28s cubic-bezier(.2,.7,.3,1),background .2s;display:flex;flex-direction:column;
+  font-variant-numeric:tabular-nums}
+[data-k="mx-8"] .opt .bars{display:flex;gap:3px;align-items:flex-end;height:12px;margin-bottom:9px}
+[data-k="mx-8"] .opt .bars i{width:4px;border-radius:1px;background:rgba(var(--ink),.16);display:block}
+[data-k="mx-8"] .opt .bars i.f{background:rgba(var(--ink),.85)}
+[data-k="mx-8"] .opt .s{margin:0;letter-spacing:-.015em;color:var(--text-hi);line-height:1.28}
+[data-k="mx-8"] .opt.a .s{font-size:15px;font-weight:400}
+[data-k="mx-8"] .opt.b .s{font-size:15px;font-weight:500}
+[data-k="mx-8"] .opt.c .s{font-size:15px;font-weight:700}
+[data-k="mx-8"] .opt .why{margin:0;font-size:0;opacity:0;color:var(--text-mid);line-height:1.45;
+  transition:opacity .2s .06s,font-size .2s}
+[data-k="mx-8"] .opt .cost{margin-top:auto;padding-top:14px;font-size:12.5px;color:var(--text-mid)}
+[data-k="mx-8"] .opt.on{flex:2.3;background:rgba(30,34,41,.96);box-shadow:inset 0 1px 0 rgba(var(--ink),.10)}
+[data-k="mx-8"] .opt.on .s{font-size:22px}
+[data-k="mx-8"] .opt.on .why{font-size:13px;opacity:1;margin-top:12px}
+[data-k="mx-8"] .opt .edge{position:absolute;left:0;top:16px;bottom:16px;width:3px;border-radius:0 3px 3px 0;
+  background:rgba(var(--ink),.10)}
+[data-k="mx-8"] .opt.on .edge{background:#3fd94e;opacity:.9}
+[data-k="mx-8"] .lockline{margin:14px 2px 0;font-size:12.5px;color:var(--text-mid);font-variant-numeric:tabular-nums}
+
+[data-k="mx-8"] .d8{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;padding:26px 28px 20px}
+[data-k="mx-8"] .d8 .lockline{margin:12px 2px 0}
+[data-k="mx-8"] .d8 .cols{flex:1;display:flex;gap:14px;margin-top:16px}
+[data-k="mx-8"] .d8 .opt{flex:1;padding:20px}
+[data-k="mx-8"] .d8 .opt:hover{background:rgba(26,30,36,.95)}
+[data-k="mx-8"] .d8 .opt.on{flex:1.9}
+[data-k="mx-8"] .d8 .opt .s{font-size:16px}
+[data-k="mx-8"] .d8 .opt.on .s{font-size:25px}
+[data-k="mx-8"] .d8 .opt .why{font-size:13px;opacity:1;margin-top:12px}
+[data-k="mx-8"] .d8 .opt.on .why{font-size:14px}
+[data-k="mx-8"] .d8 .opt .cost{font-size:12.5px}
+</style>
+<h3>Three ways to say today</h3>
+<p class="cap">No number to set at all: the intensity is written out as three real sentences of the same day, light to heavy, and you pick the one you can honestly say back. The one you choose becomes the task, word for word.</p>
+
+<div class="ph">
+  <div class="grid"></div>
+  <div class="p8">
+    <p class="day">Tuesday, day 12</p>
+    <p class="ask">Which one is today?</p>
+    <div class="stack">
+      <div class="opt a" data-i="0">
+        <span class="edge"></span>
+        <div class="bars"><i style="height:5px" class="f"></i><i style="height:9px"></i><i style="height:12px"></i></div>
+        <p class="s">Send one message, to the client you already spoke to.</p>
+        <p class="why">Small on purpose. Nothing moves far, but the thread stays warm and tomorrow is not starting cold.</p>
+        <p class="cost">3 min</p>
+      </div>
+      <div class="opt b on" data-i="1">
+        <span class="edge"></span>
+        <div class="bars"><i style="height:5px" class="f"></i><i style="height:9px" class="f"></i><i style="height:12px"></i></div>
+        <p class="s">Message 5 clients, two of them new.</p>
+        <p class="why">The size you can repeat. Held every weekday it puts you at $3,000 a month in about 52 days.</p>
+        <p class="cost">15 min</p>
+      </div>
+      <div class="opt c" data-i="2">
+        <span class="edge"></span>
+        <div class="bars"><i style="height:5px" class="f"></i><i style="height:9px" class="f"></i><i style="height:12px" class="f"></i></div>
+        <p class="s">Message 20 clients and follow up on last week's 6.</p>
+        <p class="why">A heavy hour. Two weeks like this pull the target about a month closer, and you will not want it twice in a row.</p>
+        <p class="cost">1 hr</p>
+      </div>
+    </div>
+    <p class="lockline">Today is the middle one. 5 clients, 15 min.</p>
+  </div>
+</div>
+
+<div class="desk">
+  <div class="grid"></div>
+  <div class="d8">
+    <p class="day">Tuesday, day 12</p>
+    <p class="ask" style="font-size:23px">Which one is today?</p>
+    <div class="cols">
+      <div class="opt a" data-i="0">
+        <span class="edge"></span>
+        <div class="bars"><i style="height:5px" class="f"></i><i style="height:9px"></i><i style="height:12px"></i></div>
+        <p class="s">Send one message, to the client you already spoke to.</p>
+        <p class="why">Small on purpose. Nothing moves far, but the thread stays warm.</p>
+        <p class="cost">3 min</p>
+      </div>
+      <div class="opt b on" data-i="1">
+        <span class="edge"></span>
+        <div class="bars"><i style="height:5px" class="f"></i><i style="height:9px" class="f"></i><i style="height:12px"></i></div>
+        <p class="s">Message 5 clients, two of them new.</p>
+        <p class="why">The size you can repeat. Held every weekday it puts you at $3,000 a month in about 52 days.</p>
+        <p class="cost">15 min</p>
+      </div>
+      <div class="opt c" data-i="2">
+        <span class="edge"></span>
+        <div class="bars"><i style="height:5px" class="f"></i><i style="height:9px" class="f"></i><i style="height:12px" class="f"></i></div>
+        <p class="s">Message 20 clients and follow up on last week's 6.</p>
+        <p class="why">A heavy hour. Two weeks like this pull the target about a month closer.</p>
+        <p class="cost">1 hr</p>
+      </div>
+    </div>
+    <p class="lockline">Today is the middle one. 5 clients, 15 min. Click another sentence to change it.</p>
+  </div>
+</div>
+
+<script>(function(){
+  var root=document.querySelector('[data-k="mx-8"]');
+  var LINE=['Today is the light one. 1 client, 3 min.',
+            'Today is the middle one. 5 clients, 15 min.',
+            'Today is the heavy one. 20 clients, 1 hr.'];
+  var TAIL=[' Tap another sentence to change it.',' Click another sentence to change it.'];
+  function pick(i){
+    Array.prototype.forEach.call(root.querySelectorAll('.opt'),function(o){ o.classList.toggle('on',+o.dataset.i===i); });
+    root.querySelector('.p8 .lockline').textContent=LINE[i]+TAIL[0];
+    root.querySelector('.d8 .lockline').textContent=LINE[i]+TAIL[1];
+  }
+  Array.prototype.forEach.call(root.querySelectorAll('.opt'),function(o){
+    o.addEventListener('click',function(){ pick(+o.dataset.i); });
+  });
+  pick(1);
+})();</script>
+</section>

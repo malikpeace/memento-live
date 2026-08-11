@@ -1,0 +1,103 @@
+<!-- archetypes: lp-16 full-bleed horizontal corridor | lp-17 stacked ledger rows | lp-18 centered monolith numeral | lp-19 bottom-sheet hour rail | lp-20 radial week clock -->
+<section class="cell" data-k="lp-19">
+<style>
+[data-k=lp-19] .l19-top{position:absolute;left:0;right:0;top:0;height:258px;padding:34px 20px 20px;
+  display:flex;flex-direction:column;font-variant-numeric:tabular-nums}
+[data-k=lp-19] .l19-goal{font-size:12.5px;color:rgba(var(--ink),.80)}
+[data-k=lp-19] .l19-tot{margin-top:auto;font-size:13px;line-height:1.45;color:rgba(var(--ink),.90)}
+[data-k=lp-19] .l19-tot b{color:var(--text-hi);font-weight:700}
+[data-k=lp-19] .l19-say{margin-top:9px;font-size:27px;font-weight:700;line-height:1.1;letter-spacing:-.03em;color:var(--text-hi)}
+
+[data-k=lp-19] .l19-sheet{position:absolute;left:0;right:0;top:258px;bottom:0;border-radius:18px 18px 0 0;
+  padding:16px 18px 18px;display:flex;flex-direction:column;overflow:hidden;background:rgba(22,25,31,.96);
+  -webkit-backdrop-filter:blur(28px) saturate(1.4);backdrop-filter:blur(28px) saturate(1.4);box-shadow:inset 0 1px 0 rgba(var(--ink),.1),0 -20px 44px rgba(0,0,0,.5);
+  font-variant-numeric:tabular-nums}
+[data-k=lp-19] .l19-h{font-size:15.5px;font-weight:700;color:var(--text-hi)}
+[data-k=lp-19] .l19-hs{margin:5px 0 12px;font-size:12.5px;line-height:1.45;color:rgba(var(--ink),.90)}
+[data-k=lp-19] .l19-rail{position:relative;flex:1;min-height:0}
+[data-k=lp-19] .l19-rail:before{content:"";position:absolute;left:46px;top:12px;bottom:18px;width:1px;background:rgba(var(--ink),.20)}
+[data-k=lp-19] .l19-r{position:relative;display:flex;align-items:flex-start;gap:0;height:44px}
+[data-k=lp-19] .l19-r .tm{width:38px;font-size:12px;color:rgba(var(--ink),.80);padding-top:1px}
+[data-k=lp-19] .l19-r .mk{position:relative;width:16px;display:flex;justify-content:center;padding-top:4px}
+[data-k=lp-19] .l19-r .mk i{width:9px;height:9px;border-radius:3px;background:rgba(var(--ink),.30);display:block;z-index:1}
+[data-k=lp-19] .l19-r.past .mk i{background:rgba(63,217,78,.55)}
+[data-k=lp-19] .l19-r .tx{flex:1;padding-left:11px;font-size:13px;line-height:1.42;color:rgba(var(--ink),.88)}
+[data-k=lp-19] .l19-r.now{border-radius:11px;background:rgba(var(--ink),.07);box-shadow:inset 0 1px 0 rgba(var(--ink),.08);
+  height:auto;padding:10px 10px 11px;margin:1px -10px 3px 0}
+[data-k=lp-19] .l19-r.now .tm{width:48px;color:var(--text-hi);font-weight:500}
+[data-k=lp-19] .l19-r.now .tx{color:var(--text-hi);font-weight:500;padding-left:1px}
+[data-k=lp-19] .l19-r.now .mk{display:none}
+[data-k=lp-19] .l19-tick{width:28px;height:28px;flex:none;margin-left:8px;border:0;border-radius:9px;
+  background:rgba(var(--ink),.09);box-shadow:inset 0 1px 0 rgba(var(--ink),.1);cursor:pointer;
+  display:flex;align-items:center;justify-content:center}
+[data-k=lp-19] .l19-tick svg{width:14px;height:14px;fill:none;stroke:rgba(var(--ink),.62);stroke-width:2.4}
+[data-k=lp-19] .l19-r.now.done{background:rgba(63,217,78,.11)}
+[data-k=lp-19] .l19-r.now.done .l19-tick{background:rgba(63,217,78,.28)}
+[data-k=lp-19] .l19-r.now.done .l19-tick svg{stroke:rgba(var(--ink),.97)}
+[data-k=lp-19] .l19-esc{margin-top:8px;width:100%;text-align:left;padding:11px 14px;border:0;border-radius:12px;
+  background:rgba(var(--ink),.07);box-shadow:inset 0 1px 0 rgba(var(--ink),.09);cursor:pointer}
+[data-k=lp-19] .l19-esc b{display:block;font:700 13.5px var(--font);color:var(--text-hi)}
+[data-k=lp-19] .l19-esc span{display:block;margin-top:4px;font:400 12px var(--font);line-height:1.4;color:rgba(var(--ink),.88)}
+
+[data-k=lp-19] .l19-note{position:absolute;left:0;right:0;bottom:0;z-index:3;padding:18px 18px 18px;border-radius:18px 18px 0 0;
+  background:#1e222a;box-shadow:inset 0 1px 0 rgba(var(--ink),.12),0 -22px 50px rgba(0,0,0,.6);
+  transform:translateY(101%);transition:transform .24s ease-out}
+[data-k=lp-19] .l19-sheet.open .l19-note{transform:translateY(0)}
+[data-k=lp-19] .l19-note .when{font-size:12px;color:rgba(var(--ink),.86)}
+[data-k=lp-19] .l19-note .body{margin-top:9px;font-size:14px;line-height:1.5;font-weight:500;color:var(--text-hi)}
+[data-k=lp-19] .l19-note .shut{margin-top:14px;width:100%;height:42px;border:0;border-radius:11px;
+  background:rgba(var(--ink),.10);box-shadow:inset 0 1px 0 rgba(var(--ink),.1);
+  color:var(--text-hi);font:500 13px var(--font);cursor:pointer}
+</style>
+<h3>The last hour</h3>
+<p class="cap">Quitting handled as the one hour it actually happens in, not the day. A sheet owns the screen, the risky hour is the only bright row, and the words you wrote on a good night slide up over it when it gets hard.</p>
+<div class="ph">
+  <div class="grid"></div>
+  <div class="l19-top">
+    <div class="l19-goal">No phone in bed</div>
+    <div class="l19-tot"><b>58</b> nights kept, counted since 14 June. A bad night takes none of them back.</div>
+    <div class="l19-say">The last hour is<br>where it goes wrong.</div>
+  </div>
+
+  <div class="l19-sheet">
+    <div class="l19-h">Tonight, from half ten</div>
+    <div class="l19-hs">You said the hour before bed is what gets you. Three moves, then the night runs itself.</div>
+
+    <div class="l19-rail">
+      <div class="l19-r past"><div class="tm">21:00</div><div class="mk"><i></i></div><div class="tx">Charger set up in the kitchen. Done.</div></div>
+
+      <div class="l19-r now">
+        <div class="tm">22:30</div>
+        <div class="tx">Phone on the kitchen charger, then walk out of the room.</div>
+        <button class="l19-tick"><svg viewBox="0 0 24 24"><path d="M5 13l4.5 4.5L19 7"/></svg></button>
+      </div>
+
+      <div class="l19-r"><div class="tm">23:00</div><div class="mk"><i></i></div><div class="tx">In bed. The book is already on the pillow.</div></div>
+      <div class="l19-r"><div class="tm">23:30</div><div class="mk"><i></i></div><div class="tx">Lights out. If you are awake, be awake without it.</div></div>
+    </div>
+
+    <button class="l19-esc">
+      <b>Hard to put it down</b>
+      <span>Open the note you wrote yourself for tonight.</span>
+    </button>
+
+    <div class="l19-note">
+      <div class="when">You wrote this on 3 June, the morning after a good night.</div>
+      <div class="body">You always tell yourself it is one quick thing. Then it is one in the morning, you are still awake and sick of yourself. Put it in the kitchen and go to bed slightly bored. That was always all it took.</div>
+      <button class="shut">Put it away</button>
+    </div>
+  </div>
+</div>
+<script>(function(){
+  var c=document.currentScript.closest('.cell');
+  var sheet=c.querySelector('.l19-sheet'),row=c.querySelector('.l19-r.now');
+  c.querySelector('.l19-tick').addEventListener('click',function(){
+    row.classList.toggle('done');
+    c.querySelector('.l19-hs').textContent=row.classList.contains('done')
+      ? 'Phone is in the kitchen. The next move is 23:00, and it is the book.'
+      : 'You said the hour before bed is what gets you. Three moves, then the night runs itself.';
+  });
+  c.querySelector('.l19-esc').addEventListener('click',function(){sheet.classList.add('open');});
+  c.querySelector('.l19-note .shut').addEventListener('click',function(){sheet.classList.remove('open');});
+})();</script>
+</section>

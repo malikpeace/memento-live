@@ -1,0 +1,86 @@
+<!-- ARCHETYPES (this agent, lp-11..lp-15):
+     lp-11 stacked ledger rows
+     lp-12 full-height week columns
+     lp-13 centered rest object
+     lp-14 split vertical panes
+     lp-15 bottom sheet first -->
+<section class="cell" data-k="lp-12">
+<style>
+[data-k=lp-12] .ph{font-variant-numeric:tabular-nums}
+[data-k=lp-12] .hd{position:absolute;left:16px;right:16px;top:20px;font-size:15px;font-weight:500;color:var(--text-hi);letter-spacing:-.01em}
+[data-k=lp-12] .card{position:absolute;left:14px;right:14px;top:52px;padding:13px 14px 14px;border-radius:14px;
+  background:rgba(22,25,31,.95);-webkit-backdrop-filter:blur(30px) saturate(1.4);backdrop-filter:blur(30px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.07), 0 18px 34px rgba(0,0,0,.5)}
+[data-k=lp-12] .card .t{display:flex;justify-content:space-between;align-items:baseline;font-size:11.5px;color:rgba(var(--ink),.9)}
+[data-k=lp-12] .card .w{margin:8px 0 10px;font-size:21px;font-weight:700;letter-spacing:-.02em;color:var(--text-hi)}
+[data-k=lp-12] .card .m{display:flex;align-items:baseline;gap:6px}
+[data-k=lp-12] .card .m b{font-size:34px;font-weight:700;letter-spacing:-.03em;line-height:.9;color:#3fd94e}
+[data-k=lp-12] .card .m span{font-size:12.5px;color:rgba(var(--ink),.86)}
+[data-k=lp-12] .card .cons{margin:10px 0 0;font-size:11.5px;line-height:1.4;color:rgba(var(--ink),.90)}
+[data-k=lp-12] .note{position:absolute;left:18px;right:18px;top:204px;margin:0;font-size:11.5px;color:rgba(var(--ink),.90);line-height:1.45}
+[data-k=lp-12] .cols{position:absolute;left:16px;right:16px;top:244px;height:304px;display:flex;gap:6px;align-items:flex-end}
+[data-k=lp-12] .ch{position:relative;flex:1;height:100%;border-radius:8px;background:rgba(22,25,31,.94);
+  backdrop-filter:blur(22px) saturate(1.35);-webkit-backdrop-filter:blur(22px) saturate(1.35);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.07);overflow:hidden}
+[data-k=lp-12] .ch .f{position:absolute;left:0;right:0;bottom:0;border-radius:8px;background:rgba(var(--ink),.30)}
+[data-k=lp-12] .ch.rest .f{height:10px;border-radius:0;background:repeating-linear-gradient(90deg,rgba(var(--ink),.42) 0 3px,transparent 3px 6px)}
+[data-k=lp-12] .ch.now{background:rgba(20,29,22,.94);touch-action:none;cursor:ns-resize}
+[data-k=lp-12] .ch.now .f{background:linear-gradient(180deg,rgba(63,217,78,.52),rgba(63,217,78,.16))}
+[data-k=lp-12] .ch.now .f:after{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:#3fd94e}
+[data-k=lp-12] .ch.done .f{background:linear-gradient(180deg,rgba(var(--ink),.26),rgba(var(--ink),.09))}
+[data-k=lp-12] .ch.done .f:after{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:rgba(var(--ink),.9)}
+[data-k=lp-12] .days{position:absolute;left:16px;right:16px;top:556px;display:flex;gap:6px}
+[data-k=lp-12] .days div{flex:1;text-align:center;font-size:11px;color:rgba(var(--ink),.80)}
+[data-k=lp-12] .days div.n{color:#3fd94e;font-weight:700}
+[data-k=lp-12] .days div em{display:block;font-style:normal;font-size:10px;color:rgba(var(--ink),.64);margin-top:3px}
+[data-k=lp-12] .fin{position:absolute;left:14px;right:14px;bottom:16px;height:46px;border:0;border-radius:12px;
+  font:700 15px var(--font);letter-spacing:-.01em;color:#06210a;background:#3fd94e;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.28);cursor:pointer}
+[data-k=lp-12] .fin.ok{background:rgba(var(--ink),.09);color:var(--text-hi);box-shadow:inset 0 1px 0 rgba(var(--ink),.07)}
+</style>
+<h3>Seven channels</h3><p class="cap">The whole week stands up as full height columns you read at a glance, and today is the one channel you drag to set its size before you press it shut.</p>
+<div class="ph">
+  <div class="grid"></div>
+  <div class="hd">Train 3 times a week</div>
+
+  <div class="card">
+    <div class="t"><span>Thursday, session 3 of 3</span><span id="l12c">2 done</span></div>
+    <div class="w">Lower body</div>
+    <div class="m"><b id="l12n">40</b><span>minutes, drag the column</span></div>
+    <p class="cons" id="l12x">40 minutes puts this week at 2 h 15</p>
+  </div>
+
+  <p class="note">Flat days are planned rest. They are part of training 3 times a week, not gaps in it.</p>
+
+  <div class="cols">
+    <div class="ch done"><div class="f" style="height:54%"></div></div>
+    <div class="ch rest"><div class="f"></div></div>
+    <div class="ch done"><div class="f" style="height:72%"></div></div>
+    <div class="ch now" id="l12ch"><div class="f" id="l12f" style="height:54%"></div></div>
+    <div class="ch rest"><div class="f"></div></div>
+    <div class="ch rest"><div class="f"></div></div>
+    <div class="ch rest"><div class="f"></div></div>
+  </div>
+
+  <div class="days">
+    <div>M<em>40</em></div><div>T<em>rest</em></div><div>W<em>55</em></div>
+    <div class="n">T<em id="l12d">40</em></div><div>F<em>rest</em></div><div>S<em>rest</em></div><div>S<em>rest</em></div>
+  </div>
+
+  <button class="fin" id="l12b">Press to finish Thursday</button>
+</div>
+<script>(function(){var r=document.querySelector('[data-k="lp-12"]');if(!r)return;
+var ch=r.querySelector('#l12ch'),f=r.querySelector('#l12f'),n=r.querySelector('#l12n'),d=r.querySelector('#l12d'),
+x=r.querySelector('#l12x'),mins=40,logged=0;
+function fmt(v){return (v/60|0)+' h '+('0'+v%60).slice(-2);}
+function say(){x.textContent=logged?('This week: '+fmt(95+mins)+' across 3 sessions')
+:(mins+' minutes puts this week at '+fmt(95+mins));}
+function set(e){var b=ch.getBoundingClientRect(),p=1-(e.clientY-b.top)/b.height;p=Math.max(.12,Math.min(1,p));
+mins=Math.round((15+p*60)/5)*5;f.style.height=((mins-15)/60*88+12)+'%';n.textContent=mins;d.textContent=mins;say();}
+ch.addEventListener('pointerdown',function(e){ch.setPointerCapture(e.pointerId);set(e);});
+ch.addEventListener('pointermove',function(e){if(ch.hasPointerCapture(e.pointerId))set(e);});
+r.querySelector('#l12b').onclick=function(){f.style.background='#3fd94e';r.querySelector('#l12c').textContent='3 done';
+logged=1;say();this.className='fin ok';this.textContent='Week complete, next one starts Monday';};
+say();
+})();</script>
+</section>

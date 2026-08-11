@@ -1,0 +1,127 @@
+<!-- ld-2..ld-5 layout archetypes (difference law)
+     ld-2 full-bleed decode field | ld-3 receding perspective corridor
+     ld-4 stacked sequential checklist | ld-5 single traversing beam
+     (ld-1 draws the plan onto the grid, none of these do) -->
+<section class="cell" data-k="ld-3">
+<style>
+[data-k=ld-3] .ph{background:#050608}
+[data-k=ld-3] .floor{position:absolute;left:-60%;right:-60%;bottom:0;height:330px;opacity:.10;
+  background-image:repeating-linear-gradient(to top,rgba(var(--ink),1) 0 1px,transparent 1px 42px),
+    repeating-linear-gradient(to right,rgba(var(--ink),1) 0 1px,transparent 1px 42px);
+  transform:perspective(300px) rotateX(73deg);transform-origin:bottom center;
+  -webkit-mask-image:linear-gradient(to top,rgba(0,0,0,.15) 0%,#000 20%,rgba(0,0,0,.5) 44%,rgba(0,0,0,0) 80%);
+          mask-image:linear-gradient(to top,rgba(0,0,0,.15) 0%,#000 20%,rgba(0,0,0,.5) 44%,rgba(0,0,0,0) 80%)}
+[data-k=ld-3] .top{position:absolute;left:22px;right:22px;top:84px;font-size:13.5px;line-height:1.5;
+  color:rgba(var(--ink),.92);margin:0}
+[data-k=ld-3] .num{position:absolute;left:0;right:0;top:196px;text-align:center;font-size:52px;
+  font-weight:700;letter-spacing:-.025em;line-height:1;color:var(--text-hi);
+  font-variant-numeric:tabular-nums;transform-origin:50% 100%}
+[data-k=ld-3] .numsub{position:absolute;left:0;right:0;top:258px;text-align:center;font-size:13px;
+  color:rgba(var(--ink),.9);margin:0}
+[data-k=ld-3] .led{position:absolute;left:24px;right:24px;top:314px;height:168px;overflow:hidden}
+[data-k=ld-3] .row{display:flex;align-items:baseline;justify-content:space-between;height:40px;
+  overflow:hidden;transition:height .5s cubic-bezier(.3,.05,.2,1),opacity .4s ease}
+[data-k=ld-3] .row.out{height:0;opacity:0}
+[data-k=ld-3] .row span{font-size:12.5px;color:rgba(var(--ink),.9);white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+[data-k=ld-3] .val{position:relative;height:20px;min-width:74px;text-align:right}
+[data-k=ld-3] .val b{position:absolute;right:0;top:0;font-size:15.5px;font-weight:500;line-height:20px;
+  color:var(--text-hi);font-variant-numeric:tabular-nums;white-space:nowrap}
+[data-k=ld-3] .val i{position:absolute;right:0;top:10px;width:18px;height:1px;opacity:0;
+  background:rgba(var(--ink),.35)}
+[data-k=ld-3] .ruler{position:absolute;left:24px;right:24px;bottom:74px;height:1px;
+  background:rgba(var(--ink),.12)}
+[data-k=ld-3] .ruler .gap{position:absolute;left:24%;right:0;top:0;height:1px;
+  background:rgba(var(--ink),.62);transform-origin:left center}
+[data-k=ld-3] .ruler .you{position:absolute;left:24%;top:-2.5px;width:6px;height:6px;border-radius:6px;
+  margin-left:-3px;background:rgba(var(--ink),.9)}
+[data-k=ld-3] .ruler .end{position:absolute;right:0;top:-4px;width:1px;height:9px;
+  background:rgba(var(--ink),.75)}
+[data-k=ld-3] .tick{position:absolute;top:12px;font-size:11.5px;color:rgba(var(--ink),.9);
+  font-variant-numeric:tabular-nums}
+[data-k=ld-3] .tick.a{left:24%;transform:translateX(-50%)}
+[data-k=ld-3] .tick.b{right:0}
+[data-k=ld-3] .togo{position:absolute;left:24px;right:24px;bottom:104px;text-align:center;
+  font-size:12.5px;color:rgba(var(--ink),.9);margin:0;font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion:no-preference){
+  [data-k=ld-3] .floor{animation:ld3floor 3.4s ease-out both}
+  [data-k=ld-3] .top{animation:ld3in .7s ease-out .2s both}
+  [data-k=ld-3] .num{animation:ld3near 3.4s cubic-bezier(.22,.6,.25,1) .3s both}
+  [data-k=ld-3] .numsub{animation:ld3in .8s ease-out 2.6s both}
+  [data-k=ld-3] .row{animation:ld3in .55s ease-out backwards}
+  [data-k=ld-3] .row .val b{animation:ld3set .45s ease-out .7s backwards}
+  [data-k=ld-3] .row .val i{animation:ld3hold 1s linear backwards}
+  [data-k=ld-3] .ruler{animation:ld3in .7s ease-out 1.1s both}
+  [data-k=ld-3] .ruler .gap{animation:ld3draw 2.4s cubic-bezier(.3,.05,.2,1) 1.9s both}
+  [data-k=ld-3] .togo{animation:ld3in .8s ease-out 4.2s both}
+}
+@keyframes ld3in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes ld3near{0%{opacity:.16;transform:translateY(96px) scale(.20)}
+  55%{opacity:.85}100%{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes ld3floor{from{opacity:0}to{opacity:.10}}
+@keyframes ld3set{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@keyframes ld3hold{0%{opacity:0}12%{opacity:1}72%{opacity:1}100%{opacity:0}}
+@keyframes ld3draw{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+</style>
+<h3>The distance</h3><p class="cap">Their number walks up out of the grid, then the ledger under it keeps measuring: a new line of the distance is settled every couple of seconds for as long as the plan takes.</p>
+<div class="ph">
+  <div class="grid"></div>
+  <div class="floor"></div>
+  <p class="top">Working out how far you are<br>from the number.</p>
+  <div class="num">$3,000</div>
+  <p class="numsub">a month</p>
+  <div class="led"></div>
+  <p class="togo">90 days to cross it</p>
+  <div class="ruler">
+    <div class="gap"></div><div class="you"></div><div class="end"></div>
+    <span class="tick a">$840</span><span class="tick b">$3,000</span>
+  </div>
+</div>
+<script>
+(function(){
+  var r=document.querySelector('[data-k="ld-3"]'); if(!r) return;
+  var led=r.querySelector('.led'), togo=r.querySelector('.togo'),
+      reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches, timer=null, n=0;
+  /* each measurement is a new one, the ledger never re-states a line it already settled */
+  var ROWS=[['where you are now','$840'],['the gap','$2,160'],['days you gave it','90'],
+    ['so each week','$180 more'],['the price you charge','$300'],['clients that closes it','7'],
+    ['past clients unmessaged','31'],['reply rate you have seen','1 in 6'],['so messages needed','42'],
+    ['messages a day','4'],['minutes for 4','12'],['your hour covers','5'],['weeks to fill','13'],
+    ['week 1 target','$180'],['today','4 messages'],['if 2 say yes','$600'],
+    ['the gap after that','$1,560'],['weeks left then','11'],['follow ups on day 3','4'],
+    ['rest days you kept','2 a week']];
+  var MORE=[['week %n target','$180'],['day %n asks for','4 messages'],
+    ['after week %n','$%m'],['week %n minutes','60'],['nights off, week %n','2'],
+    ['week %n replies','3']];
+  function next(){
+    if(n<ROWS.length) return ROWS[n];
+    var k=n-ROWS.length, w=2+(k%12), p=MORE[k%MORE.length];
+    return [p[0].replace('%n',w),p[1].replace('%m',(840+w*180).toLocaleString('en-US'))];
+  }
+  function add(pair){
+    var d=document.createElement('div'); d.className='row';
+    d.innerHTML='<span></span><div class="val"><i></i><b></b></div>';
+    d.querySelector('span').textContent=pair[0];
+    d.querySelector('b').textContent=pair[1];
+    led.appendChild(d); n++;
+    var old=led.children.length>4?led.children[0]:null;
+    if(!old) return;
+    if(reduce||old.classList.contains('out')) old.remove();
+    else{
+      old.classList.add('out');
+      setTimeout(function(){ old.remove(); },560);
+    }
+  }
+  /* the final beat: the real app calls this the moment the plan lands */
+  function arrive(){
+    if(timer){ clearTimeout(timer); timer=null; }
+    add(['your first move','message 4']);
+    togo.textContent='90 days to cross it. Day 1 is written.';
+  }
+  r.planArrives=arrive;
+  function loop(){ add(next()); timer=setTimeout(loop,1750+(n%3)*260); }
+  if(reduce){ for(var i=0;i<4;i++) add(next()); }
+  else timer=setTimeout(loop,2200);
+})();
+</script>
+</section>

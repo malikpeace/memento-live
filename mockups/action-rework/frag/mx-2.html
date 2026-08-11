@@ -1,0 +1,179 @@
+<!--
+Difference law, layout archetypes for this set:
+  mx-1  horizontal notched rail
+  mx-2  growing block stepper
+  mx-3  vertical dragged card
+  mx-4  additive chip stack
+  mx-5  climbing rung ladder
+-->
+<section class="cell" data-k="mx-2">
+<style>
+[data-k=mx-2] .scr{position:absolute;inset:0;display:flex;flex-direction:column;padding:30px 20px 24px}
+[data-k=mx-2] .hd{font-size:13px;color:var(--text-mid);margin-bottom:3px}
+[data-k=mx-2] .hd2{font-size:19px;font-weight:700;letter-spacing:-.02em;margin-bottom:16px}
+[data-k=mx-2] .col{position:relative;flex:1;display:flex;flex-direction:column}
+[data-k=mx-2] .blk{border-radius:13px;overflow:hidden;flex:none;
+  background:rgba(22,25,31,.95);-webkit-backdrop-filter:blur(24px) saturate(1.4);backdrop-filter:blur(24px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.08),0 14px 30px rgba(0,0,0,.45);
+  transition:height .22s cubic-bezier(.2,.7,.3,1)}
+[data-k=mx-2] .bhead{display:flex;justify-content:space-between;align-items:baseline;padding:12px 14px 10px}
+[data-k=mx-2] .bhead b{font-size:16px;font-weight:500;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+[data-k=mx-2] .bhead u{text-decoration:none;font-size:12.5px;color:var(--text-mid);font-variant-numeric:tabular-nums}
+[data-k=mx-2] .rows{padding:0 14px}
+[data-k=mx-2] .rows div{height:4px;border-radius:2px;background:rgba(var(--ink),.2);margin-bottom:5px}
+[data-k=mx-2] .rest{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-start;padding:11px 2px 22px}
+[data-k=mx-2] .rest span{font-size:13px;color:var(--text-hi);font-variant-numeric:tabular-nums}
+[data-k=mx-2] .rest em{display:block;font-style:normal;font-size:11.5px;color:var(--text-mid);margin-top:3px}
+[data-k=mx-2] .capline{position:absolute;left:0;right:0;top:0;height:1px;background:rgba(var(--ink),.18)}
+[data-k=mx-2] .floor{position:absolute;left:0;right:0;bottom:16px;height:1px;background:rgba(var(--ink),.18)}
+[data-k=mx-2] .floor u{position:absolute;right:0;top:5px;text-decoration:none;font-size:11.5px;color:var(--text-mid);
+  font-variant-numeric:tabular-nums}
+[data-k=mx-2] .step{display:flex;align-items:center;gap:12px;margin-top:18px}
+[data-k=mx-2] .btn{width:64px;height:56px;border-radius:12px;flex:none;position:relative;cursor:pointer;
+  background:rgba(28,32,39,.95);box-shadow:inset 0 1px 0 rgba(var(--ink),.08);-webkit-tap-highlight-color:transparent}
+[data-k=mx-2] .btn:active{background:rgba(40,45,54,.97)}
+[data-k=mx-2] .btn::before{content:"";position:absolute;left:50%;top:50%;width:17px;height:2px;background:rgba(var(--ink),.92);transform:translate(-50%,-50%);border-radius:2px}
+[data-k=mx-2] .btn.p::after{content:"";position:absolute;left:50%;top:50%;width:2px;height:17px;background:rgba(var(--ink),.92);transform:translate(-50%,-50%);border-radius:2px}
+[data-k=mx-2] .btn.off{opacity:.34;cursor:default}
+[data-k=mx-2] .stepmid{flex:1;text-align:center}
+[data-k=mx-2] .stepmid b{display:block;font-size:26px;font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1}
+[data-k=mx-2] .stepmid span{font-size:11.5px;color:var(--text-lo)}
+
+[data-k=mx-2] .dk{position:absolute;inset:0;display:flex;gap:30px;padding:28px 32px}
+[data-k=mx-2] .dcol{position:relative;width:210px;flex:none;display:flex;flex-direction:column}
+[data-k=mx-2] .dside{flex:1;display:flex;flex-direction:column;justify-content:center;padding-bottom:14px}
+[data-k=mx-2] .dnum{font-size:76px;font-weight:700;line-height:.86;letter-spacing:-.05em;font-variant-numeric:tabular-nums}
+[data-k=mx-2] .dsub{font-size:14px;color:var(--text-mid);margin-top:8px}
+[data-k=mx-2] .dstats{display:flex;gap:9px;margin-top:18px}
+[data-k=mx-2] .st{border-radius:11px;padding:9px 13px;min-width:96px;background:rgba(22,25,31,.94);
+  -webkit-backdrop-filter:blur(22px) saturate(1.4);backdrop-filter:blur(22px) saturate(1.4);box-shadow:inset 0 1px 0 rgba(var(--ink),.07),0 10px 24px rgba(0,0,0,.4)}
+[data-k=mx-2] .st u{display:block;text-decoration:none;font-size:11.5px;color:var(--text-mid);margin-bottom:3px}
+[data-k=mx-2] .st b{font-size:18px;font-weight:500;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+[data-k=mx-2] .dstep{display:flex;gap:10px;margin-top:26px;align-items:center}
+[data-k=mx-2] .dbtn{width:52px;height:40px;border-radius:10px;position:relative;cursor:pointer;background:rgba(28,32,39,.95);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.08)}
+[data-k=mx-2] .dbtn:hover{background:rgba(40,45,54,.97)}
+[data-k=mx-2] .dbtn::before{content:"";position:absolute;left:50%;top:50%;width:15px;height:2px;background:rgba(var(--ink),.92);transform:translate(-50%,-50%);border-radius:2px}
+[data-k=mx-2] .dbtn.p::after{content:"";position:absolute;left:50%;top:50%;width:2px;height:15px;background:rgba(var(--ink),.92);transform:translate(-50%,-50%);border-radius:2px}
+[data-k=mx-2] .dmarg{font-size:12.5px;color:var(--text-mid);margin-left:6px;font-variant-numeric:tabular-nums}
+[data-k=mx-2] .ghostline{position:absolute;left:0;right:0;height:0;opacity:0;transition:opacity .12s ease-out}
+[data-k=mx-2] .ghostline::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;
+  background:repeating-linear-gradient(90deg,rgba(var(--ink),.5) 0 5px,transparent 5px 10px)}
+[data-k=mx-2] .ghostline span{position:absolute;right:0;top:-16px;font-size:11px;color:rgba(var(--ink),.62);font-variant-numeric:tabular-nums}
+[data-k=mx-2] .ghostline.on{opacity:1}
+</style>
+<h3>Growing block</h3>
+<p class="cap">Intensity is a block that physically grows and eats the empty part of your day underneath it, one row per message.</p>
+
+<div class="ph">
+  <div class="grid"></div>
+  <div class="scr">
+    <div class="hd">Today</div>
+    <div class="hd2">Message clients</div>
+    <div class="col">
+      <div class="blk" id="mx2b" style="height:104px">
+        <div class="bhead"><b id="mx2bt">8 messages</b><u id="mx2bm">24 min</u></div>
+        <div class="rows" id="mx2r"></div>
+      </div>
+      <div class="rest">
+        <div class="capline"></div>
+        <span id="mx2rest">3 hr 36 min left after this</span>
+        <em>the rest of today, still yours</em>
+        <div class="floor"><u>day ends 8:30 pm</u></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="btn" id="mx2m"></div>
+      <div class="stepmid"><b id="mx2n">8</b><span>tap to resize the day</span></div>
+      <div class="btn p" id="mx2p"></div>
+    </div>
+  </div>
+</div>
+
+<div class="desk">
+  <div class="grid"></div>
+  <div class="dk">
+    <div class="dcol">
+      <div class="blk" id="mx2db" style="height:100px">
+        <div class="bhead"><b id="mx2dbt">8 messages</b><u id="mx2dbm">24 min</u></div>
+        <div class="rows" id="mx2dr"></div>
+      </div>
+      <div class="rest">
+        <div class="capline"></div>
+        <span id="mx2drest">3 hr 36 min left after this</span>
+        <em>the rest of today, still yours</em>
+        <div class="floor"><u>day ends 8:30 pm</u></div>
+      </div>
+      <div class="ghostline" id="mx2g"><span id="mx2gt"></span></div>
+    </div>
+    <div class="dside">
+      <div class="dnum" id="mx2dn">8</div>
+      <div class="dsub" id="mx2dsub">messages, at three minutes each</div>
+      <div class="dstats">
+        <div class="st"><u>this block</u><b id="mx2dt">24 min</b></div>
+        <div class="st"><u>ends</u><b id="mx2de">4:54 pm</b></div>
+        <div class="st"><u>day left</u><b id="mx2dl">3 hr 36 min</b></div>
+      </div>
+      <div class="dstep">
+        <div class="dbtn" id="mx2dm"></div>
+        <div class="dbtn p" id="mx2dp"></div>
+        <div class="dmarg" id="mx2dmarg">hold to repeat, and a dashed ghost shows where the next step lands</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>(function(){
+  var R=document.querySelector('[data-k="mx-2"]'); if(!R) return;
+  var MIN=3, DAY=240, BASE=16*60+30, n=8;
+  function clock(m){var h=Math.floor(m/60)%24,mm=m%60,ap=h>=12?'pm':'am',hh=h%12||12;return hh+':'+(mm<10?'0':'')+mm+' '+ap;}
+  function hm(m){var h=Math.floor(m/60),mm=m%60;
+    if(h&&!mm) return h+' hr';
+    return (h?h+' hr ':'')+mm+' min';}
+  function rowsHTML(k){var s='';for(var i=0;i<k;i++)s+='<div></div>';return s;}
+  function height(k,head){return head+k*9+8;}
+  function paint(){
+    var mins=n*MIN, left=DAY-mins, u=n===1?'message':'messages';
+    R.querySelector('#mx2r').innerHTML=rowsHTML(n);
+    R.querySelector('#mx2dr').innerHTML=rowsHTML(n);
+    R.querySelector('#mx2b').style.height=height(n,40)+'px';
+    R.querySelector('#mx2db').style.height=height(n,40)+'px';
+    R.querySelector('#mx2bt').textContent=n+' '+u;
+    R.querySelector('#mx2dbt').textContent=n+' '+u;
+    R.querySelector('#mx2bm').textContent=mins+' min';
+    R.querySelector('#mx2dbm').textContent=mins+' min';
+    R.querySelector('#mx2rest').textContent=hm(left)+' left after this';
+    R.querySelector('#mx2drest').textContent=hm(left)+' left after this';
+    R.querySelector('#mx2n').textContent=n;
+    R.querySelector('#mx2dn').textContent=n;
+    R.querySelector('#mx2dsub').textContent=u+', at three minutes each';
+    R.querySelector('#mx2dt').textContent=mins+' min';
+    R.querySelector('#mx2de').textContent=clock(BASE+mins);
+    R.querySelector('#mx2dl').textContent=hm(left);
+    R.querySelector('#mx2m').className='btn'+(n<=1?' off':'');
+    R.querySelector('#mx2p').className='btn p'+(n>=20?' off':'');
+  }
+  function bump(d){var v=Math.max(1,Math.min(20,n+d)); if(v===n) return; n=v; paint();}
+  ['#mx2m','#mx2dm'].forEach(function(s){R.querySelector(s).addEventListener('click',function(){bump(-1);});});
+  ['#mx2p','#mx2dp'].forEach(function(s){R.querySelector(s).addEventListener('click',function(){bump(1);});});
+
+  // cursor only, hold to repeat plus a ghost of the next step
+  var timer=null;
+  function hold(sel,d){
+    var el=R.querySelector(sel);
+    el.addEventListener('mousedown',function(){clearInterval(timer);timer=setInterval(function(){bump(d);ghost(d);},110);});
+    el.addEventListener('mouseenter',function(){ghost(d);});
+    el.addEventListener('mouseleave',function(){R.querySelector('#mx2g').className='ghostline';});
+  }
+  window.addEventListener('mouseup',function(){clearInterval(timer);});
+  function ghost(d){
+    var v=Math.max(1,Math.min(20,n+d)), g=R.querySelector('#mx2g'), blk=R.querySelector('#mx2db');
+    if(v===n){g.className='ghostline';return;}
+    g.style.top=(blk.offsetTop+height(v,40))+'px';
+    R.querySelector('#mx2gt').textContent=v+' messages, '+(v*MIN)+' min';
+    g.className='ghostline on';
+  }
+  hold('#mx2dm',-1); hold('#mx2dp',1);
+  paint();
+})();</script>
+</section>

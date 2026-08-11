@@ -1,0 +1,146 @@
+<!-- archetypes: q-2 = one-question full-bleed | q-3 = two-column sorting board | ld-1 = grid route assembly -->
+<section class="cell" data-k="ld-1">
+<style>
+[data-k="ld-1"] .l1-top{position:absolute;left:0;right:0;top:0;padding:30px 20px 0}
+[data-k="ld-1"] .l1-h{font-size:21px;font-weight:700;letter-spacing:-.028em;color:var(--text-hi);margin:0}
+[data-k="ld-1"] .l1-s{font-size:12.5px;line-height:1.4;color:rgba(var(--ink),.9);margin:6px 0 0}
+[data-k="ld-1"] .l1-canvas{position:absolute;left:0;top:104px;width:300px;height:416px;overflow:hidden}
+[data-k="ld-1"] .l1-canvas svg{position:absolute;inset:0}
+[data-k="ld-1"] .l1-g,[data-k="ld-1"] .l1-labs{transition:transform 1.05s cubic-bezier(.2,.7,.2,1)}
+[data-k="ld-1"] .l1-labs{position:absolute;inset:0}
+[data-k="ld-1"] .l1-seg{fill:none;stroke:rgba(var(--ink),.62);stroke-width:1.5;stroke-linecap:square;
+  transition:opacity .9s linear}
+[data-k="ld-1"] .l1-c{fill:rgba(var(--ink),.10);stroke:rgba(var(--ink),.30);stroke-width:1;
+  transform-box:fill-box;transform-origin:center;transition:opacity .9s linear;
+  animation:l1-cell .55s cubic-bezier(.2,.7,.2,1) .45s backwards}
+[data-k="ld-1"] .l1-c.end{fill:rgba(var(--ink),.24);stroke:rgba(var(--ink),.62)}
+[data-k="ld-1"] .l1-lab{position:absolute;max-width:148px;padding:6px 9px;border-radius:9px;font-size:11px;font-weight:500;
+  letter-spacing:-.005em;line-height:1.28;color:var(--text-hi);font-variant-numeric:tabular-nums;
+  background:rgba(22,25,31,.95);backdrop-filter:blur(16px) saturate(1.3);-webkit-backdrop-filter:blur(16px) saturate(1.3);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.07);transition:opacity .9s linear;
+  animation:l1-lab .5s cubic-bezier(.2,.7,.2,1) .6s backwards}
+[data-k="ld-1"] .l1-lab.end{font-weight:700}
+[data-k="ld-1"] .l1-foot{position:absolute;left:0;right:0;bottom:0;padding:0 20px 26px}
+[data-k="ld-1"] .l1-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  height:22px;margin-bottom:14px}
+[data-k="ld-1"] .l1-phase{font-size:14px;font-weight:500;letter-spacing:-.015em;color:var(--text-hi);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+[data-k="ld-1"] .l1-count{flex:0 0 auto;font-size:11.5px;font-weight:500;white-space:nowrap;
+  font-variant-numeric:tabular-nums;color:rgba(var(--ink),.9)}
+[data-k="ld-1"] .l1-phase.sw{animation:l1-sw .45s cubic-bezier(.2,.7,.2,1)}
+[data-k="ld-1"] .l1-rail{position:relative;height:2px;border-radius:999px;background:rgba(var(--ink),.10);overflow:hidden}
+[data-k="ld-1"] .l1-rail i{position:absolute;left:0;top:0;bottom:0;width:6%;border-radius:999px;background:rgba(var(--ink),.9);
+  transition:width 1.4s cubic-bezier(.3,.05,.2,1)}
+@keyframes l1-cell{from{opacity:0;transform:scale(.66)}to{opacity:1;transform:scale(1)}}
+@keyframes l1-lab{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+@keyframes l1-sw{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  [data-k="ld-1"] .l1-g,[data-k="ld-1"] .l1-labs,[data-k="ld-1"] .l1-c,
+  [data-k="ld-1"] .l1-lab,[data-k="ld-1"] .l1-rail i{transition:none;animation:none}
+}
+</style>
+<h3>Laid on the grid</h3><p class="cap">The route keeps climbing the graph paper for as long as the plan takes: every step that lands puts another piece of what you said in its place, so a 30 second wait and a 90 second wait both look like work.</p>
+<div class="ph">
+  <div class="grid"></div>
+  <div class="l1-top">
+    <h4 class="l1-h">Building your plan</h4>
+    <p class="l1-s">Every answer you gave is going somewhere.</p>
+  </div>
+  <div class="l1-canvas">
+    <svg viewBox="0 0 300 416" width="300" height="416" fill="none"><g class="l1-g"></g></svg>
+    <div class="l1-labs"></div>
+  </div>
+  <div class="l1-foot">
+    <div class="l1-row"><span class="l1-phase">Reading what you already have</span><b class="l1-count">0 placed</b></div>
+    <div class="l1-rail"><i></i></div>
+  </div>
+</div>
+<script>
+(function(){
+  var r=document.querySelector('[data-k="ld-1"]'); if(!r) return;
+  var NS='http://www.w3.org/2000/svg',
+      g=r.querySelector('.l1-g'), labs=r.querySelector('.l1-labs'),
+      phase=r.querySelector('.l1-phase'), count=r.querySelector('.l1-count'),
+      rail=r.querySelector('.l1-rail i'),
+      reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  /* the steps that keep arriving: each one is a different piece of their answers */
+  var WORDS=['already selling something','one hour a day, most nights','31 past clients, none messaged',
+    '3 clients paying now','$840 a month so far','cold DMs did not work','$300 is your price',
+    '7 more clients closes it','90 days you gave it','13 weeks to fill','$180 more each week',
+    '4 messages fits your hour','week 1: the 8 warmest','week 2: the next 9','the ask is one line',
+    'follow up on day 3','no rebuild of the offer','evenings are free'];
+  var TAIL=['week %n: 4 a day','day %n gets one move','%n messages written so far',
+    'week %n follow ups set','week %n lands $180 ahead','day %n leaves your evening',
+    'day %n: 12 minutes'];
+  var PHASE=['Reading what you have','Finding the shortest route','Sizing today to your hour',
+    'Laying out the first week','Writing what you say','Checking it against $180'];
+  var x=30,y=384,dir=1,n=0,off=0,live=[],timer=null;
+  function word(){
+    if(n<WORDS.length) return WORDS[n];
+    var k=n-WORDS.length;
+    return TAIL[k%TAIL.length].replace('%n',3+k);
+  }
+  function fade(){
+    for(var i=live.length-1;i>=0;i--){
+      var s=live[i], sy=s.y+off, o=(424-sy)/94;
+      if(o>1) o=1;
+      if(o<=.02){ s.p.remove(); s.c.remove(); s.l.remove(); live.splice(i,1); continue; }
+      s.p.style.opacity=o; s.c.style.opacity=o; s.l.style.opacity=o;
+    }
+  }
+  function step(text,isEnd){
+    var dx=40+(n*17)%23, dy=58+(n*11)%22;
+    if(x+dir*dx>250||x+dir*dx<36) dir=-dir;
+    var nx=x+dir*dx, ny=y-dy, sy=y, len=Math.abs(nx-x)+dy;
+    var p=document.createElementNS(NS,'path');
+    p.setAttribute('class','l1-seg');
+    p.setAttribute('d','M'+x+' '+sy+' H'+nx+' V'+ny);
+    p.style.strokeDasharray=len;
+    if(reduce){ p.style.strokeDashoffset=0; }
+    else{
+      p.style.strokeDashoffset=len;
+      g.appendChild(p); p.getBoundingClientRect();
+      p.style.transition='stroke-dashoffset .85s cubic-bezier(.3,.05,.25,1),opacity .9s linear';
+      p.style.strokeDashoffset=0;
+    }
+    if(!p.parentNode) g.appendChild(p);
+    var c=document.createElementNS(NS,'rect');
+    c.setAttribute('class','l1-c'+(isEnd?' end':''));
+    c.setAttribute('x',nx-13); c.setAttribute('y',ny-13);
+    c.setAttribute('width',26); c.setAttribute('height',26); c.setAttribute('rx',2);
+    g.appendChild(c);
+    var l=document.createElement('div');
+    l.className='l1-lab'+(isEnd?' end':'');
+    l.textContent=text||word();
+    l.style.top=(ny-14)+'px';
+    /* the word sits on the side the route just came from, unless that side is out of room */
+    var onLeft=dir>0?(nx-26>=120):(274-nx<120);
+    if(onLeft) l.style.right=(320-nx)+'px'; else l.style.left=(nx+20)+'px';
+    labs.appendChild(l);
+    live.push({p:p,c:c,l:l,y:sy});
+    x=nx; y=ny; n++;
+    var want=Math.max(0,120-y);
+    if(want!==off){ off=want; g.style.transform='translateY('+off+'px)'; labs.style.transform='translateY('+off+'px)'; }
+    fade();
+    count.textContent=n+' placed';
+    var np=PHASE[Math.floor((n-1)/3)%PHASE.length];
+    if(phase.textContent!==np){
+      phase.textContent=np;
+      if(!reduce){ phase.classList.remove('sw'); void phase.offsetWidth; phase.classList.add('sw'); }
+    }
+    rail.style.width=(6+86*(1-Math.pow(.90,n))).toFixed(1)+'%';
+  }
+  /* the final beat: the real app calls this the moment the plan lands */
+  function arrive(){
+    if(timer){ clearTimeout(timer); timer=null; }
+    step('$3,000 a month',true);
+    phase.textContent='Your plan is ready';
+    rail.style.width='100%';
+  }
+  r.planArrives=arrive;
+  function loop(){ step(); timer=setTimeout(loop,1850+(n%4)*240); }
+  if(reduce){ for(var i=0;i<6;i++) step(); }
+  else{ step(); timer=setTimeout(loop,1500); }
+})();
+</script>
+</section>

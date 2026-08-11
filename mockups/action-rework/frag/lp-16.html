@@ -1,0 +1,113 @@
+<!-- archetypes: lp-16 full-bleed horizontal corridor | lp-17 stacked ledger rows | lp-18 centered monolith numeral | lp-19 bottom-sheet hour rail | lp-20 radial week clock -->
+<section class="cell" data-k="lp-16">
+<style>
+[data-k=lp-16] .l16{position:absolute;inset:0;display:flex;flex-direction:column;padding:34px 0 26px;font-variant-numeric:tabular-nums}
+[data-k=lp-16] .l16-goal{padding:0 22px;font-size:12.5px;color:var(--text-mid)}
+[data-k=lp-16] .l16-say{padding:0 22px;margin-top:16px;font-size:32px;font-weight:700;line-height:1.04;letter-spacing:-.03em;color:var(--text-hi)}
+[data-k=lp-16] .l16-sub{padding:0 22px;margin-top:11px;font-size:13px;line-height:1.5;color:rgba(var(--ink),.90)}
+[data-k=lp-16] .l16-band{--bh:16px;position:relative;height:138px;margin-top:26px;background:rgba(22,25,31,.95);
+  -webkit-backdrop-filter:blur(22px) saturate(1.35);backdrop-filter:blur(22px) saturate(1.35);box-shadow:inset 0 1px 0 rgba(var(--ink),.07),inset 0 -1px 0 rgba(var(--ink),.05)}
+[data-k=lp-16] .l16-safe{position:absolute;left:0;right:0;top:calc(50% - var(--bh));height:calc(var(--bh)*2);
+  background:rgba(63,217,78,.07);transition:top .22s ease-out,height .22s ease-out}
+[data-k=lp-16] .l16-edge{position:absolute;left:0;right:0;height:1px;background:rgba(63,217,78,.34);transition:top .22s ease-out}
+[data-k=lp-16] .l16-edge.hi{top:calc(50% - var(--bh))}
+[data-k=lp-16] .l16-edge.lo{top:calc(50% + var(--bh))}
+[data-k=lp-16] .l16-num{position:absolute;left:14px;font-size:10.5px;color:rgba(63,217,78,.8);transition:top .22s ease-out}
+[data-k=lp-16] .l16-num.hi{top:calc(50% - var(--bh) - 14px)}
+[data-k=lp-16] .l16-num.lo{top:calc(50% + var(--bh) + 4px)}
+[data-k=lp-16] .l16-band svg{position:absolute;inset:0;width:100%;height:100%}
+[data-k=lp-16] .l16-now{position:absolute;right:14px;top:calc(50% - 40px);font-size:15px;font-weight:700;color:var(--text-hi)}
+[data-k=lp-16] .l16-nowc{position:absolute;right:14px;top:calc(50% - 22px);font-size:10.5px;color:rgba(var(--ink),.80)}
+[data-k=lp-16] .l16-int{padding:0 22px;margin-top:22px}
+[data-k=lp-16] .l16-int h4{margin:0 0 9px;font-size:12.5px;font-weight:500;color:rgba(var(--ink),.82)}
+[data-k=lp-16] .l16-chips{display:flex;gap:7px}
+[data-k=lp-16] .l16-chip{flex:1;padding:10px 0;border:0;border-radius:9px;background:rgba(22,25,31,.95);
+  backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.08);color:rgba(var(--ink),.80);font:500 13px var(--font);
+  font-variant-numeric:tabular-nums;cursor:pointer;transition:background .16s,color .16s}
+[data-k=lp-16] .l16-chip.on{background:rgba(30,52,34,.96);color:rgba(var(--ink),.97);box-shadow:inset 0 1px 0 rgba(63,217,78,.35)}
+[data-k=lp-16] .l16-note{margin:11px 0 0;font-size:12px;line-height:1.45;color:rgba(var(--ink),.90)}
+[data-k=lp-16] .l16-sp{flex:1;min-height:12px}
+[data-k=lp-16] .l16-close{position:relative;height:56px;margin:0 22px;border-radius:14px;background:rgba(22,25,31,.95);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.08);overflow:hidden;touch-action:none}
+[data-k=lp-16] .l16-fill{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(63,217,78,.16)}
+[data-k=lp-16] .l16-lab{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:13.5px;font-weight:500;color:rgba(var(--ink),.90);pointer-events:none}
+[data-k=lp-16] .l16-knob{position:absolute;left:5px;top:5px;width:46px;height:46px;border-radius:10px;
+  background:rgba(var(--ink),.92);box-shadow:0 4px 14px rgba(0,0,0,.45);cursor:grab;display:flex;align-items:center;justify-content:center}
+[data-k=lp-16] .l16-knob svg{width:16px;height:16px;stroke:#0a0b0d;stroke-width:2;fill:none}
+[data-k=lp-16] .l16-close.done .l16-fill{width:100%}
+[data-k=lp-16] .l16-close.done .l16-lab{color:rgba(var(--ink),.97)}
+[data-k=lp-16] .l16-close.done .l16-knob{opacity:0}
+</style>
+<h3>The corridor</h3>
+<p class="cap">Maintenance as a lane you stay inside, run edge to edge across the screen. The headline says the truth out loud: today asks nothing of you.</p>
+<div class="ph">
+  <div class="grid"></div>
+  <div class="l16">
+    <div class="l16-goal">Hold 180 lb. Check on Sundays.</div>
+    <div class="l16-say">Nothing to do<br>today.</div>
+    <div class="l16-sub">That is the win. You are inside the band, and staying there is the whole job.</div>
+
+    <div class="l16-band">
+      <div class="l16-safe"></div>
+      <div class="l16-edge hi"></div>
+      <div class="l16-edge lo"></div>
+      <div class="l16-num hi">181</div>
+      <div class="l16-num lo">179</div>
+      <svg viewBox="0 0 300 138" preserveAspectRatio="none" aria-hidden="true">
+        <polyline points="0,74 24,70 48,73 72,66 96,71 120,64 144,69 168,63 192,68 216,65 240,70 264,66 282,68"
+          fill="none" stroke="rgba(235,238,248,.55)" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
+        <circle cx="282" cy="68" r="3.5" fill="#3fd94e"/>
+      </svg>
+      <div class="l16-now">180.2</div>
+      <div class="l16-nowc">this morning</div>
+    </div>
+
+    <div class="l16-int">
+      <h4>How tight you hold it</h4>
+      <div class="l16-chips">
+        <button class="l16-chip on" data-w="1" data-h="16" data-note="Tight. You weigh every morning and correct the same week.">1 lb</button>
+        <button class="l16-chip" data-w="2" data-h="30" data-note="Steady. Sunday is enough, and one heavy weekend will not move you.">2 lb</button>
+        <button class="l16-chip" data-w="4" data-h="48" data-note="Loose. You only act when the number leaves the lane. Less checking, slower to catch drift.">4 lb</button>
+      </div>
+      <p class="l16-note">Tight. You weigh every morning and correct the same week.</p>
+    </div>
+
+    <div class="l16-sp"></div>
+
+    <div class="l16-close">
+      <div class="l16-fill"></div>
+      <div class="l16-lab">Swipe to close the day</div>
+      <div class="l16-knob"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div>
+    </div>
+  </div>
+</div>
+<script>(function(){
+  var c=document.currentScript.closest('.cell');
+  var band=c.querySelector('.l16-band'),note=c.querySelector('.l16-note');
+  c.querySelectorAll('.l16-chip').forEach(function(b){
+    b.addEventListener('click',function(){
+      c.querySelectorAll('.l16-chip').forEach(function(x){x.classList.remove('on');});
+      b.classList.add('on');
+      var w=parseFloat(b.dataset.w);
+      band.style.setProperty('--bh',b.dataset.h+'px');
+      c.querySelector('.l16-num.hi').textContent=(180+w).toFixed(0);
+      c.querySelector('.l16-num.lo').textContent=(180-w).toFixed(0);
+      note.textContent=b.dataset.note;
+    });
+  });
+  var track=c.querySelector('.l16-close'),knob=c.querySelector('.l16-knob'),
+      fill=c.querySelector('.l16-fill'),lab=c.querySelector('.l16-lab'),drag=false,sx=0,x=0;
+  function max(){return track.clientWidth-56;}
+  function set(v){x=Math.max(0,Math.min(max(),v));knob.style.left=(5+x)+'px';fill.style.width=(x+51)+'px';}
+  knob.addEventListener('pointerdown',function(e){if(track.classList.contains('done'))return;drag=true;sx=e.clientX-x;knob.setPointerCapture(e.pointerId);});
+  knob.addEventListener('pointermove',function(e){if(!drag)return;set(e.clientX-sx);});
+  knob.addEventListener('pointerup',function(){
+    if(!drag)return;drag=false;
+    if(x>max()*.62){track.classList.add('done');lab.textContent='Day closed. 180.2 lb, inside.';}
+    else{knob.style.transition='left .18s ease-out';fill.style.transition='width .18s ease-out';set(0);
+      setTimeout(function(){knob.style.transition='';fill.style.transition='';},200);}
+  });
+})();</script>
+</section>

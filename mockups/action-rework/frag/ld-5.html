@@ -1,0 +1,52 @@
+<!-- ld-2..ld-5 layout archetypes (difference law)
+     ld-2 full-bleed decode field | ld-3 receding perspective corridor
+     ld-4 stacked sequential checklist | ld-5 single traversing beam
+     (ld-1 draws the plan onto the grid, none of these do) -->
+<section class="cell" data-k="ld-5">
+<style>
+[data-k=ld-5] .ph{background:#050608}
+[data-k=ld-5] .grid{opacity:.05}
+[data-k=ld-5] .goal{position:absolute;left:30px;right:30px;top:78px;margin:0;font-size:13px;
+  line-height:1.5;color:rgba(var(--ink),.9);font-variant-numeric:tabular-nums}
+[data-k=ld-5] .beam{position:absolute;left:0;right:0;top:0;height:150px;transform:translateY(418px)}
+[data-k=ld-5] .beam .l{position:absolute;left:0;right:0;top:75px;height:1px;
+  background:linear-gradient(90deg,rgba(var(--ink),0) 0%,rgba(var(--ink),.9) 24%,
+    rgba(var(--ink),.9) 76%,rgba(var(--ink),0) 100%)}
+[data-k=ld-5] .beam .g{position:absolute;inset:0;
+  background:linear-gradient(to bottom,rgba(var(--ink),0) 0%,rgba(var(--ink),.085) 50%,rgba(var(--ink),0) 100%);
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 28%,#000 72%,transparent 100%);
+          mask-image:linear-gradient(90deg,transparent 0%,#000 28%,#000 72%,transparent 100%)}
+[data-k=ld-5] .say{position:absolute;left:30px;right:30px;top:276px;height:96px}
+[data-k=ld-5] .say p{position:absolute;left:0;right:0;top:0;margin:0;font-size:19px;font-weight:500;
+  line-height:1.38;letter-spacing:-.015em;color:var(--text-hi);opacity:0;
+  font-variant-numeric:tabular-nums}
+[data-k=ld-5] .say p.c{opacity:1}
+[data-k=ld-5] .foot{position:absolute;left:30px;right:30px;bottom:34px}
+[data-k=ld-5] .foot p{margin:0;font-size:11.5px;color:var(--text-mid);font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion:no-preference){
+  [data-k=ld-5] .goal{animation:ld5in 1.2s ease-out .3s both}
+  [data-k=ld-5] .foot{animation:ld5in 1.2s ease-out .7s both}
+  [data-k=ld-5] .beam{animation:ld5cross 30s linear .4s both}
+  [data-k=ld-5] .say p.a{animation:ld5say1 10.6s ease-in-out .8s both}
+  [data-k=ld-5] .say p.b{animation:ld5say2 10.6s ease-in-out 11s both}
+  [data-k=ld-5] .say p.c{animation:ld5say3 2.4s ease-in-out 21.2s both}
+}
+@keyframes ld5in{from{opacity:0}to{opacity:1}}
+@keyframes ld5cross{from{transform:translateY(-30px)}to{transform:translateY(560px)}}
+@keyframes ld5say1{0%{opacity:0}10%{opacity:1}90%{opacity:1}100%{opacity:0}}
+@keyframes ld5say2{0%{opacity:0}10%{opacity:1}90%{opacity:1}100%{opacity:0}}
+@keyframes ld5say3{from{opacity:0}to{opacity:1}}
+</style>
+<h3>Patience</h3><p class="cap">Almost nothing happens on purpose: one line of light walks the whole screen once, top to bottom, and its position is the only progress bar, so the wait reads as something being considered instead of processed.</p>
+<div class="ph">
+  <div class="grid"></div>
+  <p class="goal">$3,000 a month,<br>so you can quit the warehouse.</p>
+  <div class="beam"><div class="g"></div><div class="l"></div></div>
+  <div class="say">
+    <p class="a">Working out your first move.</p>
+    <p class="b">Weighing 31 past clients against 90 days.</p>
+    <p class="c">Writing what to send today.</p>
+  </div>
+  <div class="foot"><p>Takes about a minute. The line reaching the bottom is the plan being done.</p></div>
+</div>
+</section>

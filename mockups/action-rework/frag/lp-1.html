@@ -1,0 +1,70 @@
+<section class="cell" data-k="lp-1">
+<!-- ARCHETYPES (difference law)
+     lp-1  full-bleed statement type
+     lp-2  ledger row stack
+     lp-3  vertical split rail
+     lp-4  canvas ring object
+     lp-5  bottom sheet first -->
+<style>
+[data-k=lp-1] .s{position:absolute;inset:0;display:flex;flex-direction:column;padding:36px 22px 22px}
+[data-k=lp-1] .goal{font-size:12.5px;color:var(--text-mid);font-variant-numeric:tabular-nums;letter-spacing:-.005em}
+[data-k=lp-1] .bar{margin-top:10px;height:3px;border-radius:2px;background:rgba(var(--ink),.10);overflow:hidden}
+[data-k=lp-1] .bar i{display:block;height:100%;width:41%;background:rgba(var(--ink),.66)}
+[data-k=lp-1] .say{margin-top:auto;font-size:37px;line-height:1.0;letter-spacing:-.035em;font-weight:500;color:var(--text-hi)}
+[data-k=lp-1] .say .n{display:block;font-size:104px;font-weight:700;line-height:.82;margin:2px 0 4px -6px;
+  font-variant-numeric:tabular-nums;color:rgba(var(--ink),1);letter-spacing:-.05em}
+[data-k=lp-1] .cons{margin-top:16px;font-size:13.5px;line-height:1.45;color:rgba(var(--ink),.90);font-variant-numeric:tabular-nums}
+[data-k=lp-1] .scale{display:flex;gap:6px;margin:20px 0 16px}
+[data-k=lp-1] .scale button{flex:1;height:36px;border:0;border-radius:9px;background:rgba(22,25,31,.95);
+  backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);
+  color:rgba(var(--ink),.80);font:600 13.5px/1 var(--font);font-variant-numeric:tabular-nums;cursor:pointer;
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.08)}
+[data-k=lp-1] .scale button.on{background:rgba(var(--ink),.92);color:#08090b;box-shadow:none}
+[data-k=lp-1] .track{position:relative;height:58px;border-radius:12px;background:rgba(22,25,31,.95);
+  backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09);overflow:hidden;touch-action:none}
+[data-k=lp-1] .track .fill{position:absolute;inset:0;width:0;background:rgba(63,217,78,.20)}
+[data-k=lp-1] .track .lab{position:absolute;inset:0;display:grid;place-items:center;font-size:13.5px;
+  font-weight:500;color:rgba(var(--ink),.90);padding-left:38px}
+[data-k=lp-1] .knob{position:absolute;top:5px;left:5px;width:48px;height:48px;border-radius:9px;
+  background:rgba(var(--ink),.93);display:grid;place-items:center;cursor:grab}
+[data-k=lp-1] .knob svg{display:block}
+[data-k=lp-1] .s.done .track{background:rgba(63,217,78,.16)}
+[data-k=lp-1] .s.done .lab{color:var(--text-hi);padding-left:0}
+[data-k=lp-1] .s.done .knob{opacity:0}
+</style>
+<h3>Statement</h3><p class="cap">No cards at all. The instruction is the entire screen, set at poster scale, so the count is the biggest thing in your hand and the scale row underneath is the only other decision.</p>
+<div class="ph">
+  <div class="grid"></div>
+  <div class="s">
+    <div class="goal">$1,240 of $3,000 this month</div>
+    <div class="bar"><i></i></div>
+    <div class="say">Message<span class="n">5</span>potential clients.</div>
+    <div class="cons">Sending 5 puts you at 47 this month. Your best day so far is 8.</div>
+    <div class="scale">
+      <button data-n="1">1</button><button data-n="3">3</button><button class="on" data-n="5">5</button><button data-n="8">8</button><button data-n="12">12</button>
+    </div>
+    <div class="track">
+      <div class="fill"></div>
+      <div class="lab">Slide when they are sent</div>
+      <div class="knob"><svg width="16" height="14" viewBox="0 0 16 14"><path d="M1 7h12M9 2l5 5-5 5" fill="none" stroke="#08090b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+  </div>
+</div>
+<script>(function(){
+  var r=document.querySelector('[data-k=lp-1]'),s=r.querySelector('.s'),n=r.querySelector('.n'),c=r.querySelector('.cons');
+  r.querySelectorAll('.scale button').forEach(function(b){b.addEventListener('click',function(){
+    r.querySelectorAll('.scale button').forEach(function(x){x.classList.remove('on')});b.classList.add('on');
+    var v=+b.dataset.n;n.textContent=v;
+    c.textContent='Sending '+v+' puts you at '+(42+v)+' this month. '+(v>8?'That beats your best day of 8.':'Your best day so far is 8.');
+  })});
+  var t=r.querySelector('.track'),k=r.querySelector('.knob'),f=r.querySelector('.fill'),l=r.querySelector('.lab'),drag=0,x0=0;
+  k.addEventListener('pointerdown',function(e){drag=1;x0=e.clientX;k.setPointerCapture(e.pointerId)});
+  k.addEventListener('pointermove',function(e){if(!drag)return;
+    var max=t.clientWidth-58,d=Math.max(0,Math.min(max,e.clientX-x0));
+    k.style.left=(5+d)+'px';f.style.width=(d+53)+'px';
+    if(d>max*.72){drag=0;s.classList.add('done');l.textContent='Sent. 47 this month.';}
+  });
+  k.addEventListener('pointerup',function(){if(!drag)return;drag=0;k.style.left='5px';f.style.width='0'});
+})();</script>
+</section>

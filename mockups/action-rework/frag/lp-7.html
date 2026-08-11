@@ -1,0 +1,73 @@
+<!-- archetypes: lp-6 vertical descent rail | lp-7 poster ceiling number | lp-8 canvas-center radial | lp-9 stacked ledger rows | lp-10 unit field sheet -->
+<section class="cell" data-k="lp-7">
+<style>
+[data-k=lp-7] .ph{font-variant-numeric:tabular-nums}
+[data-k=lp-7] .w{position:absolute;left:0;right:0;top:0;bottom:110px;padding:34px 20px 0}
+[data-k=lp-7] .lab{margin:0;font-size:13px;color:rgba(var(--ink),.70)}
+[data-k=lp-7] .big{margin:6px 0 0;line-height:.92;letter-spacing:-.045em;color:rgba(var(--ink),.97);white-space:nowrap}
+[data-k=lp-7] .big .v{font-size:76px;font-weight:700}
+[data-k=lp-7] .big .u{font-size:30px;font-weight:500;color:rgba(var(--ink),.70);margin:0 8px 0 2px}
+[data-k=lp-7] .from{margin:14px 0 0;font-size:13px;line-height:1.45;color:rgba(var(--ink),.90)}
+[data-k=lp-7] .cons{margin:12px 0 0;font-size:13px;line-height:1.45;color:rgba(var(--ink),.90);min-height:38px}
+
+[data-k=lp-7] .hr{margin:22px 0 0;height:1px;background:rgba(var(--ink),.12)}
+[data-k=lp-7] .act{display:block;width:100%;margin:0;padding:22px 0 0;border:0;background:transparent;text-align:left;
+  font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+[data-k=lp-7] .act .rule{display:block;width:34px;height:3px;border-radius:2px;background:rgba(var(--ink),.16);
+  margin:0 0 15px;transition:width .22s ease-out,background .22s ease-out}
+[data-k=lp-7] .act .txt{display:block;font-size:29px;font-weight:700;letter-spacing:-.035em;line-height:1.1;
+  color:rgba(var(--ink),.97)}
+[data-k=lp-7] .act .sub{display:block;margin:14px 0 0;font-size:12.5px;color:rgba(var(--ink),.82)}
+[data-k=lp-7] .act.done .rule{width:82px;background:#3fd94e}
+[data-k=lp-7] .act.done .sub{color:#3fd94e}
+[data-k=lp-7] .note{margin:13px 0 0;font-size:13px;line-height:1.45;color:rgba(var(--ink),.90)}
+
+[data-k=lp-7] .wk{position:absolute;left:20px;right:20px;bottom:68px;font-size:12.5px;color:rgba(var(--ink),.90)}
+[data-k=lp-7] .ceil{position:absolute;left:20px;right:20px;bottom:24px;display:flex;align-items:center;gap:10px}
+[data-k=lp-7] .ceil .cl{font-size:12.5px;color:rgba(var(--ink),.72);margin-right:auto}
+[data-k=lp-7] .ceil button{width:30px;height:30px;border:0;border-radius:9px;display:grid;place-items:center;cursor:pointer;
+  background:rgba(22,25,31,.95);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09)}
+[data-k=lp-7] .ceil button svg{display:block}
+[data-k=lp-7] .ceil button:disabled{opacity:.4;cursor:default}
+</style>
+<h3>Ceiling</h3><p class="cap">The only number on screen is a limit you stay under, set at poster scale, and the whole night is confirmed by tapping the one line that does the work.</p>
+<div class="ph">
+  <div class="grid"></div>
+  <div class="w">
+    <p class="lab">Tonight you stay under</p>
+    <div class="big"><span class="v" data-h>2</span><span class="u">h</span><span class="v" data-m>40</span><span class="u">m</span></div>
+    <p class="from">5h a night when you started. 2h is where this ends.</p>
+    <p class="cons">Hold near this and 2h arrives around the middle of October.</p>
+    <div class="hr"></div>
+    <button class="act" id="lp7act">
+      <i class="rule"></i>
+      <span class="txt">Phone in the kitchen drawer at 8pm.</span>
+      <span class="sub">Tap this line once it is in the drawer.</span>
+    </button>
+    <p class="note">That is the whole ask. The ceiling takes care of itself once the phone is out of the room.</p>
+  </div>
+  <p class="wk">Four of the last seven nights landed under.</p>
+  <div class="ceil">
+    <span class="cl">Ceiling</span>
+    <button id="lp7dn" aria-label="lower the ceiling"><svg width="12" height="2" viewBox="0 0 12 2"><path d="M0 1h12" stroke="rgba(235,238,248,.85)" stroke-width="1.6"/></svg></button>
+    <button id="lp7up" aria-label="raise the ceiling"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 0v12M0 6h12" stroke="rgba(235,238,248,.85)" stroke-width="1.6"/></svg></button>
+  </div>
+</div>
+<script>(function(){var r=document.querySelector('[data-k="lp-7"]');if(!r)return;
+var h=r.querySelector('[data-h]'),m=r.querySelector('[data-m]'),c=r.querySelector('.cons'),v=160,
+    dn=r.querySelector('#lp7dn'),up=r.querySelector('#lp7up');
+function paint(){h.textContent=Math.floor(v/60);m.textContent=String(v%60).padStart(2,'0');
+  c.textContent=v<=130?'That is the finish line itself. Real, but only if tonight is quiet.'
+   :v<=180?'Hold near this and 2h arrives around the middle of October.'
+   :v<=240?'Gentler. On this ceiling 2h shows up closer to December.'
+   :'Barely under where you are now. It holds the line, it will not move it.';
+  dn.disabled=v<=120;up.disabled=v>=300;}
+dn.addEventListener('click',function(){v=Math.max(120,v-10);paint()});
+up.addEventListener('click',function(){v=Math.min(300,v+10);paint()});
+var a=r.querySelector('#lp7act');
+a.addEventListener('click',function(){if(a.classList.contains('done'))return;
+  a.classList.add('done');a.querySelector('.sub').textContent='Logged for tonight.';
+  r.querySelector('.wk').textContent='Five of the last eight nights landed under.';});
+paint();})();</script>
+</section>

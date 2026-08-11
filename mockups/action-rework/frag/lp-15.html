@@ -1,0 +1,89 @@
+<!-- ARCHETYPES (this agent, lp-11..lp-15):
+     lp-11 stacked ledger rows
+     lp-12 full-height week columns
+     lp-13 centered rest object
+     lp-14 split vertical panes
+     lp-15 bottom sheet first -->
+<section class="cell" data-k="lp-15">
+<style>
+[data-k=lp-15] .ph{font-variant-numeric:tabular-nums}
+[data-k=lp-15] .hd{position:absolute;left:16px;right:16px;top:22px;font-size:15px;font-weight:500;letter-spacing:-.01em;color:var(--text-hi)}
+[data-k=lp-15] .wk{position:absolute;left:16px;right:16px;top:92px;height:56px;display:flex;gap:8px;align-items:flex-end}
+[data-k=lp-15] .wk div{flex:1;display:flex;flex-direction:column-reverse;gap:4px}
+[data-k=lp-15] .wk i{display:block;height:16px;border-radius:4px;background:rgba(var(--ink),.12)}
+[data-k=lp-15] .wk i.on{background:rgba(var(--ink),.38)}
+[data-k=lp-15] .wk i.now{background:rgba(63,217,78,.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.16)}
+[data-k=lp-15] .wl{position:absolute;left:16px;right:16px;top:156px;display:flex;justify-content:space-between;
+  font-size:10.5px;color:rgba(var(--ink),.64)}
+[data-k=lp-15] .say{position:absolute;left:16px;right:16px;top:184px;font-size:13.5px;line-height:1.45;color:rgba(var(--ink),.94)}
+[data-k=lp-15] .sheet{position:absolute;left:0;right:0;bottom:0;top:262px;padding:14px 16px 16px;border-radius:18px 18px 0 0;
+  background:rgba(22,25,31,.96);-webkit-backdrop-filter:blur(32px) saturate(1.4);backdrop-filter:blur(32px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.08), 0 -20px 50px rgba(0,0,0,.6)}
+[data-k=lp-15] .grab{width:34px;height:4px;border-radius:999px;background:rgba(var(--ink),.18);margin:0 auto 14px}
+[data-k=lp-15] .sheet .t{font-size:11.5px;color:rgba(var(--ink),.80)}
+[data-k=lp-15] .sheet .one{margin:7px 0 16px;font-size:24px;font-weight:700;letter-spacing:-.025em;color:var(--text-hi)}
+[data-k=lp-15] .opts button{display:block;width:100%;margin-bottom:8px;padding:0 14px;height:52px;border:0;border-radius:11px;
+  text-align:left;font:500 14px var(--font);color:rgba(var(--ink),.82);background:rgba(var(--ink),.05);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.05);cursor:pointer;position:relative;overflow:hidden}
+[data-k=lp-15] .opts button b{display:block;font-weight:700;font-size:14.5px;color:inherit}
+[data-k=lp-15] .opts button em{display:block;font-style:normal;font-size:11px;margin-top:3px;color:rgba(var(--ink),.9)}
+[data-k=lp-15] .opts button.on{background:rgba(var(--ink),.11);color:var(--text-hi)}
+[data-k=lp-15] .opts button.on:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:#3fd94e}
+[data-k=lp-15] .opts button.on em{color:rgba(var(--ink),.80)}
+[data-k=lp-15] .cons{margin:4px 0 12px;font-size:11.5px;line-height:1.45;color:rgba(var(--ink),.90)}
+[data-k=lp-15] .sl{position:relative;height:52px;border-radius:13px;background:rgba(var(--ink),.06);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.06);overflow:hidden;touch-action:none}
+[data-k=lp-15] .sl .fill{position:absolute;left:0;top:0;bottom:0;width:52px;background:rgba(63,217,78,.16)}
+[data-k=lp-15] .sl .lb{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font:700 14px var(--font);letter-spacing:-.01em;color:var(--text-hi);padding-left:34px}
+[data-k=lp-15] .sl .kn{position:absolute;left:4px;top:4px;width:44px;height:44px;border-radius:10px;background:#3fd94e;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.3);cursor:grab}
+[data-k=lp-15] .sl .kn:after{content:"";position:absolute;left:17px;top:16px;width:9px;height:9px;
+  border-top:2px solid #06210a;border-right:2px solid #06210a;transform:rotate(45deg)}
+</style>
+<h3>Sheet first</h3><p class="cap">The top is just eight weeks of rhythm read at a glance, and the working half is a sheet that never leaves the bottom of the screen: pick the sentence for today, then slide it done with one thumb.</p>
+<div class="ph">
+  <div class="grid"></div>
+  <div class="hd">Run 3 times a week</div>
+
+  <div class="wk">
+    <div><i class="on"></i><i class="on"></i><i class="on"></i></div>
+    <div><i class="on"></i><i class="on"></i><i></i></div>
+    <div><i class="on"></i><i class="on"></i><i class="on"></i></div>
+    <div><i class="on"></i><i class="on"></i><i class="on"></i></div>
+    <div><i class="on"></i><i class="on"></i><i class="on"></i></div>
+    <div><i class="on"></i><i></i><i></i></div>
+    <div><i class="on"></i><i class="on"></i><i class="on"></i></div>
+    <div><i class="on"></i><i class="now"></i><i></i></div>
+  </div>
+  <div class="wl"><span>8 weeks back</span><span>this week</span></div>
+  <p class="say">You hit three in 5 of the last 7 weeks. This week has one run in it so far.</p>
+
+  <div class="sheet">
+    <div class="grab"></div>
+    <div class="t">Wednesday, run 2 of 3</div>
+    <div class="one" id="l15o">Run 5 km, easy pace</div>
+    <div class="opts" id="l15l">
+      <button data-km="3"><b>Short one, 3 km easy</b><em>For a day that got away from you</em></button>
+      <button class="on" data-km="5"><b>The normal one, 5 km easy</b><em>What you have been running</em></button>
+      <button data-km="8"><b>Long one, 8 km, last 2 hard</b><em>Costs about 50 minutes</em></button>
+    </div>
+    <p class="cons" id="l15c">Any of the three keeps this week at three. This one puts 5 km in the week.</p>
+    <div class="sl" id="l15s"><div class="fill" id="l15f"></div><div class="lb" id="l15t">Slide to log the run</div><div class="kn" id="l15k"></div></div>
+  </div>
+</div>
+<script>(function(){var r=document.querySelector('[data-k="lp-15"]');if(!r)return;
+var L=r.querySelector('#l15l'),O=r.querySelector('#l15o'),C=r.querySelector('#l15c'),km=5;
+var T={3:'Run 3 km, easy pace',5:'Run 5 km, easy pace',8:'Run 8 km, last 2 hard'};
+L.onclick=function(e){var b=e.target.closest('button');if(!b)return;
+[].forEach.call(L.children,function(x){x.className=x===b?'on':'';});km=+b.dataset.km;O.textContent=T[km];
+C.textContent='Any of the three keeps this week at three. This one puts '+km+' km in the week.';};
+var s=r.querySelector('#l15s'),k=r.querySelector('#l15k'),f=r.querySelector('#l15f'),t=r.querySelector('#l15t'),drag=0;
+k.addEventListener('pointerdown',function(e){k.setPointerCapture(e.pointerId);drag=1;});
+k.addEventListener('pointermove',function(e){if(!drag)return;var b=s.getBoundingClientRect();
+var x=Math.max(4,Math.min(b.width-48,e.clientX-b.left-22));k.style.left=x+'px';f.style.width=(x+48)+'px';
+if(x>=b.width-49){drag=0;k.style.left=(b.width-48)+'px';f.style.width='100%';t.textContent='Run 2 of 3 logged';
+r.querySelectorAll('.wk i.now')[0].className='on';}});
+k.addEventListener('pointerup',function(){if(!drag)return;drag=0;k.style.left='4px';f.style.width='52px';});
+})();</script>
+</section>

@@ -1,0 +1,136 @@
+<!-- ARCHETYPES (this agent, lp-11..lp-15):
+     lp-11 horizontal filmstrip reel
+     lp-12 full-height week columns
+     lp-13 centered rest object
+     lp-14 split vertical panes
+     lp-15 bottom sheet first -->
+<section class="cell" data-k="lp-11">
+<style>
+[data-k=lp-11] .ph{font-variant-numeric:tabular-nums}
+[data-k=lp-11] .hd{position:absolute;left:18px;right:18px;top:24px;font-size:14.5px;font-weight:500;letter-spacing:-.01em;color:rgba(var(--ink),.90)}
+[data-k=lp-11] .cnt{position:absolute;left:18px;right:18px;top:46px;display:flex;align-items:baseline;gap:7px}
+[data-k=lp-11] .cnt b{font-size:42px;font-weight:700;line-height:1;letter-spacing:-.035em;color:var(--text-hi)}
+[data-k=lp-11] .cnt span{font-size:14px;color:rgba(var(--ink),.82)}
+
+[data-k=lp-11] .strip{position:absolute;left:0;right:0;top:134px;height:208px;overflow:hidden}
+[data-k=lp-11] .rail{position:absolute;left:-700px;right:-700px;height:16px;background:rgba(22,25,31,.95);
+  -webkit-backdrop-filter:blur(20px) saturate(1.3);backdrop-filter:blur(20px) saturate(1.3);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.06);transition:transform .42s cubic-bezier(.2,.7,.3,1)}
+[data-k=lp-11] .rail.t{top:0}
+[data-k=lp-11] .rail.b{bottom:0}
+[data-k=lp-11] .rail em{position:absolute;left:0;right:0;top:5px;height:6px;
+  background:repeating-linear-gradient(90deg,rgba(5,6,8,.92) 0 9px,transparent 9px 21px)}
+[data-k=lp-11] .reel{position:absolute;left:0;right:0;top:18px;bottom:18px;touch-action:pan-y;
+  transition:transform .42s cubic-bezier(.2,.7,.3,1)}
+[data-k=lp-11] .fr{position:absolute;top:0;bottom:0;border-radius:10px;overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  background:rgba(22,25,31,.94);-webkit-backdrop-filter:blur(24px) saturate(1.35);backdrop-filter:blur(24px) saturate(1.35);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.06);
+  transition:left .34s cubic-bezier(.2,.7,.3,1),width .34s cubic-bezier(.2,.7,.3,1),background .2s}
+[data-k=lp-11] .fr .d{position:absolute;top:10px;font-size:10px;color:rgba(var(--ink),.68)}
+[data-k=lp-11] .fr b{font-size:23px;font-weight:700;letter-spacing:-.02em;color:rgba(var(--ink),.72)}
+[data-k=lp-11] .fr u{text-decoration:none;font-size:10px;color:rgba(var(--ink),.60)}
+[data-k=lp-11] .fr.zero b{color:rgba(var(--ink),.42)}
+[data-k=lp-11] .fr.soon{background:rgba(19,21,26,.92)}
+[data-k=lp-11] .fr.soon .d{color:rgba(var(--ink),.52)}
+[data-k=lp-11] .fr.soon u{font-size:11px;color:rgba(var(--ink),.82)}
+[data-k=lp-11] .fr.now{background:rgba(20,29,22,.96);cursor:ew-resize;
+  box-shadow:inset 0 1px 0 rgba(63,217,78,.30),0 16px 32px rgba(0,0,0,.5)}
+[data-k=lp-11] .fr.now .d{color:rgba(63,217,78,.92)}
+[data-k=lp-11] .fr.now b{font-size:44px;letter-spacing:-.035em;color:#3fd94e}
+[data-k=lp-11] .fr.now u{font-size:11.5px;color:rgba(var(--ink),.90)}
+[data-k=lp-11] .fr .grip{position:absolute;bottom:11px;width:26px;height:3px;border-radius:2px;background:rgba(var(--ink),.24)}
+[data-k=lp-11] .fr.done{background:rgba(24,30,26,.95);box-shadow:inset 0 1px 0 rgba(63,217,78,.18)}
+[data-k=lp-11] .fr.done b{color:rgba(63,217,78,.82)}
+
+[data-k=lp-11] .ins{position:absolute;left:18px;right:18px;top:382px;margin:0;font-size:20px;font-weight:700;
+  line-height:1.26;letter-spacing:-.02em;color:var(--text-hi)}
+[data-k=lp-11] .pace{position:absolute;left:18px;right:18px;top:452px;margin:0;font-size:12.5px;line-height:1.45;color:rgba(var(--ink),.90)}
+[data-k=lp-11] .hint{position:absolute;left:18px;right:18px;top:496px;margin:0;font-size:11.5px;color:rgba(var(--ink),.80)}
+[data-k=lp-11] .bar{position:absolute;left:14px;right:14px;bottom:80px;padding:12px 14px;border-radius:12px;
+  display:flex;justify-content:space-between;align-items:baseline;
+  background:rgba(22,25,31,.94);-webkit-backdrop-filter:blur(26px) saturate(1.3);backdrop-filter:blur(26px) saturate(1.3);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.06)}
+[data-k=lp-11] .bar b{font-size:15px;font-weight:700;color:var(--text-hi)}
+[data-k=lp-11] .bar span{font-size:11.5px;color:rgba(var(--ink),.82)}
+[data-k=lp-11] .go{position:absolute;left:14px;right:14px;bottom:18px;height:50px;border:0;border-radius:12px;
+  font:700 15px var(--font);letter-spacing:-.01em;color:#06210a;background:#3fd94e;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.28);cursor:pointer}
+[data-k=lp-11] .go:active{filter:brightness(.94)}
+[data-k=lp-11] .go.ok{background:rgba(var(--ink),.09);color:var(--text-hi);box-shadow:inset 0 1px 0 rgba(var(--ink),.07);font-size:13.5px;font-weight:500}
+</style>
+<h3>The reel</h3><p class="cap">Days are frames on one strip of film: everything already shot runs off the left edge, today is the single live frame you stretch wider or narrower to size it, and logging it advances the reel by one frame.</p>
+<div class="ph">
+  <div class="grid"></div>
+  <div class="hd">Send 40 applications</div>
+  <div class="cnt"><b id="l11tot">23</b><span>of 40 sent</span></div>
+
+  <div class="strip">
+    <div class="rail t"><em></em></div>
+    <div class="reel">
+      <div class="fr"><span class="d">Aug 3</span><b>2</b><u>sent</u></div>
+      <div class="fr"><span class="d">Aug 4</span><b>3</b><u>sent</u></div>
+      <div class="fr"><span class="d">Aug 5</span><b>4</b><u>sent</u></div>
+      <div class="fr zero"><span class="d">Aug 6</span><b>0</b><u>none</u></div>
+      <div class="fr"><span class="d">Aug 7</span><b>3</b><u>sent</u></div>
+      <div class="fr"><span class="d">Aug 8</span><b>2</b><u>sent</u></div>
+      <div class="fr"><span class="d">Aug 9</span><b>4</b><u>sent</u></div>
+      <div class="fr"><span class="d">Aug 10</span><b>5</b><u>sent</u></div>
+      <div class="fr now"><span class="d">Today</span><b id="l11n">3</b><u id="l11u">applications</u><i class="grip"></i></div>
+      <div class="fr soon"><span class="d">Aug 12</span></div>
+      <div class="fr soon"><span class="d">Aug 13</span></div>
+      <div class="fr soon"><span class="d">Aug 14</span></div>
+      <div class="fr soon"><span class="d">Aug 15</span></div>
+    </div>
+    <div class="rail b"><em></em></div>
+  </div>
+
+  <p class="ins" id="l11ins">Send 3 applications to roles you would actually take.</p>
+  <p class="pace" id="l11pace">At 3 a day the last frame lands on Aug 17.</p>
+  <p class="hint" id="l11hint">Drag the live frame sideways to make today bigger or smaller.</p>
+
+  <div class="bar"><b id="l11left">17 left</b><span id="l11more">6 more frames</span></div>
+  <button class="go" id="l11go">Log today and advance</button>
+</div>
+<script>(function(){var r=document.querySelector('[data-k="lp-11"]');if(!r)return;
+var reel=r.querySelector('.reel'),rails=[].slice.call(r.querySelectorAll('.rail')),
+    frs=[].slice.call(r.querySelectorAll('.fr')),
+    GAP=7,PW=58,ANCH=88,idx=8,n=3,total=23,GOAL=40,logged=false,curW=96,
+    tot=r.querySelector('#l11tot'),ins=r.querySelector('#l11ins'),pace=r.querySelector('#l11pace'),
+    lft=r.querySelector('#l11left'),more=r.querySelector('#l11more'),go=r.querySelector('#l11go');
+var MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function w(i){return i===idx?curW:PW;}
+function layout(){var p=0,lx=0;
+  for(var i=0;i<frs.length;i++){frs[i].style.left=p+'px';frs[i].style.width=w(i)+'px';
+    if(i===idx)lx=p;p+=w(i)+GAP;}
+  var tx=ANCH-lx;reel.style.transform='translateX('+tx+'px)';
+  rails.forEach(function(el){el.style.transform='translateX('+tx+'px)';});}
+function paint(){
+  var N=r.querySelector('#l11n'),U=r.querySelector('#l11u');
+  if(N)N.textContent=n;if(U)U.textContent=n===1?'application':'applications';
+  var rem=GOAL-total,days=Math.max(1,Math.ceil(rem/n)),
+      d=new Date(2026,7,11+(logged?days:days-1));
+  if(!logged)ins.textContent='Send '+n+' application'+(n===1?'':'s')+' to roles you would actually take.';
+  pace.textContent='At '+n+' a day the last frame lands on '+MON[d.getMonth()]+' '+d.getDate()+'.';
+  lft.textContent=rem+' left';
+  more.textContent=days+(days===1?' more frame':' more frames');}
+var drag=false,sx=0,sn=3;
+reel.addEventListener('pointerdown',function(e){if(logged)return;
+  var f=e.target.closest?e.target.closest('.fr'):null;if(f!==frs[idx])return;
+  drag=true;sx=e.clientX;sn=n;reel.setPointerCapture(e.pointerId);});
+reel.addEventListener('pointermove',function(e){if(!drag)return;
+  var v=Math.max(1,Math.min(5,sn+Math.round((e.clientX-sx)/26)));
+  if(v!==n){n=v;curW=96+(n-1)*22;paint();layout();}});
+reel.addEventListener('pointerup',function(){drag=false;});
+reel.addEventListener('pointercancel',function(){drag=false;});
+go.addEventListener('click',function(){if(logged)return;logged=true;total+=n;
+  var live=frs[idx];live.className='fr done';
+  live.innerHTML='<span class="d">Aug 11</span><b>'+n+'</b><u>sent</u>';
+  idx++;curW=96;frs[idx].className='fr soon';
+  frs[idx].innerHTML='<span class="d">Aug 12</span><u>opens tomorrow</u>';
+  tot.textContent=total;
+  ins.textContent=total+' sent. '+(GOAL-total)+' to go.';
+  r.querySelector('#l11hint').textContent='Aug 12 opens tomorrow. You size that frame then.';go.className='go ok';go.textContent='Logged. The reel sits on Aug 12.';
+  paint();layout();});
+paint();layout();})();</script>
+</section>

@@ -1,0 +1,148 @@
+<!-- archetypes: mx-6 vertical pressure column | mx-7 centered arc dial | mx-8 stacked sentence cards | mx-9 giant elastic numeral | mx-10 keys over timeline -->
+<section class="cell" data-k="mx-7">
+<style>
+[data-k="mx-7"] .p7{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;align-items:center;padding:30px 20px 24px}
+[data-k="mx-7"] .day{font-size:12px;color:var(--text-lo);margin:0;align-self:flex-start}
+[data-k="mx-7"] .mid{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center}
+[data-k="mx-7"] .dial{position:relative;touch-action:none;user-select:none;cursor:grab}
+[data-k="mx-7"] .dial:active{cursor:grabbing}
+[data-k="mx-7"] .dial svg{display:block}
+[data-k="mx-7"] .dial .track{fill:none;stroke:rgba(var(--ink),.10);stroke-linecap:round}
+[data-k="mx-7"] .dial .prog{fill:none;stroke:rgba(var(--ink),.90);stroke-linecap:round;transition:stroke-dasharray .16s cubic-bezier(.2,.7,.3,1)}
+[data-k="mx-7"] .dial .ghost{fill:none;stroke:rgba(var(--ink),.50);stroke-linecap:round}
+[data-k="mx-7"] .dial .det{stroke:rgba(var(--ink),.22)}
+[data-k="mx-7"] .dial .det.on{stroke:rgba(var(--ink),.55)}
+[data-k="mx-7"] .dial .lab{fill:rgba(var(--ink),.45);font-size:11px;font-family:var(--font);font-variant-numeric:tabular-nums}
+[data-k="mx-7"] .dial .lab.on{fill:rgba(var(--ink),.95);font-weight:700}
+[data-k="mx-7"] .dial .knob{fill:rgb(var(--ink));transition:cx .16s cubic-bezier(.2,.7,.3,1),cy .16s cubic-bezier(.2,.7,.3,1)}
+[data-k="mx-7"] .hub{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+[data-k="mx-7"] .hub .n{font-size:62px;font-weight:700;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
+[data-k="mx-7"] .hub .u{font-size:13.5px;color:var(--text-mid);margin-top:6px}
+[data-k="mx-7"] .verb{font-size:19px;font-weight:500;letter-spacing:-.01em;margin:16px 0 0}
+[data-k="mx-7"] .dots{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;max-width:210px;margin:16px 0 0;min-height:34px}
+[data-k="mx-7"] .dots i{width:11px;height:11px;border-radius:3px;background:rgba(var(--ink),.9);display:block}
+[data-k="mx-7"] .foot{margin-top:auto;width:100%;border-radius:14px;padding:13px 16px;background:rgba(22,25,31,.94);
+  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);box-shadow:inset 0 1px 0 rgba(var(--ink),.08);font-variant-numeric:tabular-nums}
+[data-k="mx-7"] .foot .fr{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0}
+[data-k="mx-7"] .foot span{font-size:12.5px;color:var(--text-mid)}
+[data-k="mx-7"] .foot b{font-size:16px;font-weight:700}
+[data-k="mx-7"] .hint{font-size:12.5px;color:var(--text-mid);margin:14px 0 0}
+
+[data-k="mx-7"] .d7{position:relative;z-index:1;height:100%;display:flex;align-items:center;gap:38px;padding:0 44px}
+[data-k="mx-7"] .d7 .hub .n{font-size:70px}
+[data-k="mx-7"] .d7 .right{flex:1}
+[data-k="mx-7"] .d7 .say{font-size:34px;font-weight:500;letter-spacing:-.025em;line-height:1.15;margin:0;
+  font-variant-numeric:tabular-nums}
+[data-k="mx-7"] .d7 .say b{font-weight:700}
+[data-k="mx-7"] .d7 .then{font-size:15px;color:var(--text-mid);margin:14px 0 0;line-height:1.5;
+  font-variant-numeric:tabular-nums}
+[data-k="mx-7"] .d7 .dots{justify-content:flex-start;max-width:330px;margin:20px 0 0}
+[data-k="mx-7"] .d7 .was{font-size:13px;color:var(--text-mid);margin:20px 0 0;line-height:1.45;
+  font-variant-numeric:tabular-nums}
+</style>
+<h3>The dial</h3>
+<p class="cap">One continuous turn instead of a list of options: your thumb sweeps the arc and today grows in your hand, with a thin inner arc holding yesterday's setting so you always see whether you just turned the day up or down.</p>
+
+<div class="ph">
+  <div class="grid"></div>
+  <div class="p7">
+    <p class="day">Tuesday, day 12</p>
+    <div class="mid">
+      <div class="dial" data-r="86" data-size="252"><div class="hub"><div class="n">5</div><div class="u">clients</div></div></div>
+      <p class="verb">Message them today</p>
+      <div class="dots"></div>
+      <p class="hint">The inner arc is yesterday, which was 3</p>
+    </div>
+    <div class="foot">
+      <div class="fr"><span>Takes about</span><b class="t">15 min</b></div>
+      <div class="fr"><span>Target reached in</span><b class="d">52 days</b></div>
+    </div>
+  </div>
+</div>
+
+<div class="desk">
+  <div class="grid"></div>
+  <div class="d7">
+    <div class="dial" data-r="100" data-size="286"><div class="hub"><div class="n">5</div><div class="u">clients</div></div></div>
+    <div class="right">
+      <p class="say">Message <b class="n">5</b> clients today</p>
+      <p class="then">About <b class="t">15 min</b> of your morning. At this size you reach $3,000 a month in <b class="d">52 days</b>.</p>
+      <div class="dots"></div>
+      <p class="was">Drag anywhere on the ring. The thin inner arc is yesterday, which was 3.</p>
+    </div>
+  </div>
+</div>
+
+<script>(function(){
+  var root=document.querySelector('[data-k="mx-7"]');
+  var N=[1,3,5,10,20], T=['3 min','9 min','15 min','30 min','1 hr'], D=[120,70,52,34,22];
+  var STEPS=[0,.25,.5,.75,1], YEST=.25, t=.5;
+  var NS='http://www.w3.org/2000/svg';
+
+  function pt(cx,cy,r,tv){ var a=(135+tv*270)*Math.PI/180; return [cx+r*Math.cos(a),cy+r*Math.sin(a)]; }
+
+  var dials=[];
+  Array.prototype.forEach.call(root.querySelectorAll('.dial'),function(d){
+    var r=+d.dataset.r, s=+d.dataset.size, c=s/2, C=2*Math.PI*r, arc=C*.75;
+    var svg=document.createElementNS(NS,'svg'); svg.setAttribute('width',s); svg.setAttribute('height',s);
+    svg.setAttribute('viewBox','0 0 '+s+' '+s);
+    function circ(cls,w,rr){ var e=document.createElementNS(NS,'circle');
+      e.setAttribute('class',cls); e.setAttribute('cx',c); e.setAttribute('cy',c); e.setAttribute('r',rr||r);
+      e.setAttribute('stroke-width',w); e.setAttribute('transform','rotate(135 '+c+' '+c+')'); svg.appendChild(e); return e; }
+    var track=circ('track',9); track.style.strokeDasharray=arc+'px '+C+'px';
+    var gr=r-19, gC=2*Math.PI*gr;
+    var ghost=circ('ghost',2.5,gr); ghost.style.strokeDasharray=(gC*.75*YEST)+'px '+gC+'px';
+    var prog=circ('prog',9);
+    var knob=document.createElementNS(NS,'circle'); knob.setAttribute('class','knob'); knob.setAttribute('r',7);
+    var dets=[], labs=[];
+    STEPS.forEach(function(sv,i){
+      var a=pt(c,c,r+9,sv), b=pt(c,c,r+15,sv), l=pt(c,c,r+27,sv);
+      var ln=document.createElementNS(NS,'line'); ln.setAttribute('class','det');
+      ln.setAttribute('x1',a[0]);ln.setAttribute('y1',a[1]);ln.setAttribute('x2',b[0]);ln.setAttribute('y2',b[1]);
+      ln.setAttribute('stroke-width',1.5); svg.appendChild(ln); dets.push(ln);
+      var tx=document.createElementNS(NS,'text'); tx.setAttribute('class','lab');
+      tx.setAttribute('x',l[0]); tx.setAttribute('y',l[1]+4); tx.setAttribute('text-anchor','middle');
+      tx.textContent=N[i]; svg.appendChild(tx); labs.push(tx);
+    });
+    svg.appendChild(knob);
+    d.insertBefore(svg,d.firstChild);
+    dials.push({d:d,c:c,r:r,C:C,arc:arc,prog:prog,knob:knob,dets:dets,labs:labs,svg:svg});
+
+    function move(e){
+      var b=svg.getBoundingClientRect();
+      var x=e.clientX-b.left-c, y=e.clientY-b.top-c;
+      var ang=Math.atan2(y,x)*180/Math.PI; if(ang<0) ang+=360;
+      var rel=(ang-135+360)%360;
+      if(rel>270) rel = rel>315 ? 0 : 270;
+      var raw=rel/270, best=STEPS[0];
+      STEPS.forEach(function(sv){ if(Math.abs(sv-raw)<Math.abs(best-raw)) best=sv; });
+      if(best!==t){ t=best; paint(); }
+    }
+    var dragging=false;
+    d.addEventListener('pointerdown',function(e){e.preventDefault();dragging=true;
+      try{d.setPointerCapture(e.pointerId);}catch(err){} move(e);});
+    d.addEventListener('pointermove',function(e){ if(dragging) move(e); });
+    d.addEventListener('pointerup',function(){dragging=false;});
+    d.addEventListener('pointercancel',function(){dragging=false;});
+  });
+
+  function paint(){
+    var i=STEPS.indexOf(t), n=N[i];
+    dials.forEach(function(g){
+      g.prog.style.strokeDasharray=(g.arc*t)+'px '+g.C+'px';
+      var p=pt(g.c,g.c,g.r,t); g.knob.setAttribute('cx',p[0]); g.knob.setAttribute('cy',p[1]);
+      g.dets.forEach(function(e,k){e.classList.toggle('on',k<=i);});
+      g.labs.forEach(function(e,k){e.classList.toggle('on',k<=i);});
+      g.d.querySelector('.hub .n').textContent=n;
+      g.d.querySelector('.hub .u').textContent=n===1?'client':'clients';
+    });
+    Array.prototype.forEach.call(root.querySelectorAll('.n'),function(e){e.textContent=n;});
+    Array.prototype.forEach.call(root.querySelectorAll('.t'),function(e){e.textContent=T[i];});
+    Array.prototype.forEach.call(root.querySelectorAll('.d'),function(e){e.textContent=D[i]+' days';});
+    Array.prototype.forEach.call(root.querySelectorAll('.dots'),function(box){
+      box.innerHTML=''; for(var k=0;k<n;k++){ box.appendChild(document.createElement('i')); }
+    });
+  }
+  paint();
+})();</script>
+</section>

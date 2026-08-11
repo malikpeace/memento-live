@@ -1,0 +1,93 @@
+<section class="cell" data-k="lp-2">
+<!-- ARCHETYPES (difference law)
+     lp-1  full-bleed statement type
+     lp-2  ledger row stack
+     lp-3  vertical split rail
+     lp-4  canvas ring object
+     lp-5  bottom sheet first -->
+<style>
+[data-k=lp-2] .s{position:absolute;inset:0;display:flex;flex-direction:column;padding:34px 16px 18px;gap:12px}
+[data-k=lp-2] .hd{display:flex;align-items:baseline;justify-content:space-between;padding:0 4px}
+[data-k=lp-2] .hd b{font-size:15px;font-weight:700;letter-spacing:-.02em}
+[data-k=lp-2] .hd span{font-size:12px;color:var(--text-mid);font-variant-numeric:tabular-nums}
+[data-k=lp-2] .cols{display:grid;grid-template-columns:46px 1fr 30px 46px 26px;gap:8px;padding:0 10px;
+  font-size:10.5px;color:var(--text-mid);letter-spacing:-.005em}
+[data-k=lp-2] .cols i{font-style:normal;text-align:right}
+[data-k=lp-2] .cols i:first-child,[data-k=lp-2] .cols i:nth-child(2){text-align:left}
+[data-k=lp-2] .live{border-radius:14px;background:rgba(22,25,31,.95);-webkit-backdrop-filter:blur(20px) saturate(1.4);backdrop-filter:blur(20px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09),0 10px 26px rgba(0,0,0,.4);padding:13px 12px 12px}
+[data-k=lp-2] .live .r1{display:flex;justify-content:space-between;align-items:baseline}
+[data-k=lp-2] .live .d{font-size:11.5px;color:var(--text-mid);font-variant-numeric:tabular-nums}
+[data-k=lp-2] .live .act{margin-top:7px;font-size:19px;font-weight:700;letter-spacing:-.025em;line-height:1.2}
+[data-k=lp-2] .live .r2{display:flex;align-items:center;gap:10px;margin-top:14px}
+[data-k=lp-2] .step{display:flex;align-items:center;gap:2px;background:rgba(var(--ink),.07);border-radius:10px;
+  padding:3px;box-shadow:inset 0 1px 0 rgba(var(--ink),.07)}
+[data-k=lp-2] .step button{width:30px;height:30px;border:0;border-radius:8px;background:transparent;color:var(--text-hi);
+  font:500 17px/1 var(--font);cursor:pointer}
+[data-k=lp-2] .step button:active{background:rgba(var(--ink),.12)}
+[data-k=lp-2] .step .q{min-width:30px;text-align:center;font-size:17px;font-weight:700;font-variant-numeric:tabular-nums}
+[data-k=lp-2] .live .hint{font-size:11.5px;color:rgba(var(--ink),.90);line-height:1.35;flex:1;font-variant-numeric:tabular-nums}
+[data-k=lp-2] .tick{margin-left:auto;width:44px;height:44px;border:0;border-radius:11px;background:rgba(var(--ink),.09);
+  display:grid;place-items:center;cursor:pointer;box-shadow:inset 0 1px 0 rgba(var(--ink),.08)}
+[data-k=lp-2] .tick path{stroke:rgba(var(--ink),.55)}
+[data-k=lp-2] .live.done{background:rgba(24,34,26,.95)}
+[data-k=lp-2] .live.done .tick{background:#3fd94e}
+[data-k=lp-2] .live.done .tick path{stroke:#08120a}
+[data-k=lp-2] .rows{display:flex;flex-direction:column;gap:2px;border-radius:11px;overflow:hidden;
+  background:rgba(20,23,29,.94);backdrop-filter:blur(20px) saturate(1.35);-webkit-backdrop-filter:blur(20px) saturate(1.35)}
+[data-k=lp-2] .row{display:grid;grid-template-columns:46px 1fr 30px 46px 26px;gap:8px;align-items:center;
+  padding:11px 10px;background:rgba(var(--ink),.045);font-size:12.5px;
+  font-variant-numeric:tabular-nums;color:rgba(var(--ink),.9)}
+[data-k=lp-2] .row:nth-child(even){background:transparent}
+[data-k=lp-2] .row .n{text-align:right;color:var(--text-hi);font-weight:700}
+[data-k=lp-2] .row .t{text-align:right;color:var(--text-hi);font-weight:500}
+[data-k=lp-2] .row .k{text-align:right;color:#3fd94e;font-size:13px}
+[data-k=lp-2] .row.rest .n,[data-k=lp-2] .row.rest .k{color:var(--text-mid);font-weight:500}
+[data-k=lp-2] .foot{margin-top:auto;padding:0 4px}
+[data-k=lp-2] .foot .fr{display:flex;justify-content:space-between;font-size:12px;color:var(--text-mid);
+  font-variant-numeric:tabular-nums;margin-bottom:8px}
+[data-k=lp-2] .foot .fb{height:4px;border-radius:2px;background:rgba(var(--ink),.10);overflow:hidden}
+[data-k=lp-2] .foot .fb i{display:block;height:100%;width:23.5%;background:rgba(var(--ink),.7)}
+</style>
+<h3>Ledger</h3><p class="cap">The day is a line in a running book. Today's row is the only one open, with its own quantity cell, and every past row keeps its number and its running total in the same columns.</p>
+<div class="ph">
+  <div class="grid"></div>
+  <div class="s">
+    <div class="hd"><b>Client outreach</b><span>$1,240 of $3,000</span></div>
+    <div class="cols"><i>Date</i><i>Entry</i><i>Qty</i><i>Total</i><i></i></div>
+    <div class="live">
+      <div class="r1"><span class="d">Tue, Aug 11</span><span class="d">open</span></div>
+      <div class="act">Message potential clients</div>
+      <div class="r2">
+        <div class="step"><button data-d="-1">&minus;</button><span class="q">5</span><button data-d="1">+</button></div>
+        <div class="hint">Posts 5 to the book. Running total 47.</div>
+        <button class="tick"><svg width="19" height="15" viewBox="0 0 19 15"><path d="M1.5 8l5.5 5.5L17.5 1.5" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+    </div>
+    <div class="rows">
+      <div class="row"><span>Aug 10</span><span>Messages</span><span class="n">5</span><span class="t">42</span><span class="k">&#10003;</span></div>
+      <div class="row"><span>Aug 9</span><span>Messages</span><span class="n">5</span><span class="t">37</span><span class="k">&#10003;</span></div>
+      <div class="row"><span>Aug 8</span><span>Messages</span><span class="n">3</span><span class="t">32</span><span class="k">&#10003;</span></div>
+      <div class="row rest"><span>Aug 7</span><span>Rest day</span><span class="n">0</span><span class="t">29</span><span class="k">&middot;</span></div>
+      <div class="row"><span>Aug 6</span><span>Messages</span><span class="n">8</span><span class="t">29</span><span class="k">&#10003;</span></div>
+      <div class="row"><span>Aug 5</span><span>Messages</span><span class="n">4</span><span class="t">21</span><span class="k">&#10003;</span></div>
+      <div class="row"><span>Aug 4</span><span>Messages</span><span class="n">6</span><span class="t">17</span><span class="k">&#10003;</span></div>
+      <div class="row"><span>Aug 3</span><span>Messages</span><span class="n">5</span><span class="t">11</span><span class="k">&#10003;</span></div>
+    </div>
+    <div class="foot">
+      <div class="fr"><span>47 messages sent</span><span>12 replied</span></div>
+      <div class="fb"><i></i></div>
+    </div>
+  </div>
+</div>
+<script>(function(){
+  var r=document.querySelector('[data-k=lp-2]'),live=r.querySelector('.live'),q=r.querySelector('.q'),h=r.querySelector('.hint'),v=5;
+  function paint(){q.textContent=v;h.textContent='Posts '+v+' to the book. Running total '+(42+v)+'.'}
+  r.querySelectorAll('.step button').forEach(function(b){b.addEventListener('click',function(){
+    v=Math.max(1,Math.min(20,v+ +b.dataset.d));paint()})});
+  r.querySelector('.tick').addEventListener('click',function(){
+    live.classList.toggle('done');
+    h.textContent=live.classList.contains('done')?'Posted. Running total '+(42+v)+'.':'Posts '+v+' to the book. Running total '+(42+v)+'.';
+  });
+})();</script>
+</section>

@@ -1,0 +1,132 @@
+<!-- archetypes: lp-6 vertical descent rail | lp-7 full-bleed typography | lp-8 canvas-center radial | lp-9 stacked ledger rows | lp-10 full-bleed receipt tape -->
+<section class="cell" data-k="lp-10">
+<style>
+[data-k=lp-10] .ph{font-variant-numeric:tabular-nums}
+[data-k=lp-10] .slot{position:absolute;left:0;right:0;top:32px;height:5px;background:rgba(5,6,8,.92);
+  box-shadow:0 5px 14px rgba(0,0,0,.6)}
+[data-k=lp-10] .tape{position:absolute;left:0;right:0;top:40px;bottom:0;
+  background:rgba(22,25,31,.96);-webkit-backdrop-filter:blur(30px) saturate(1.4);backdrop-filter:blur(30px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.08);
+  clip-path:polygon(0 0,100% 0,100% 98%,99% 100%,98% 98%,97% 100%,96% 98%,95% 100%,94% 98%,93% 100%,92% 98%,91% 100%,90% 98%,89% 100%,88% 98%,87% 100%,86% 98%,85% 100%,84% 98%,83% 100%,82% 98%,81% 100%,80% 98%,79% 100%,78% 98%,77% 100%,76% 98%,75% 100%,74% 98%,73% 100%,72% 98%,71% 100%,70% 98%,69% 100%,68% 98%,67% 100%,66% 98%,65% 100%,64% 98%,63% 100%,62% 98%,61% 100%,60% 98%,59% 100%,58% 98%,57% 100%,56% 98%,55% 100%,54% 98%,53% 100%,52% 98%,51% 100%,50% 98%,49% 100%,48% 98%,47% 100%,46% 98%,45% 100%,44% 98%,43% 100%,42% 98%,41% 100%,40% 98%,39% 100%,38% 98%,37% 100%,36% 98%,35% 100%,34% 98%,33% 100%,32% 98%,31% 100%,30% 98%,29% 100%,28% 98%,27% 100%,26% 98%,25% 100%,24% 98%,23% 100%,22% 98%,21% 100%,20% 98%,19% 100%,18% 98%,17% 100%,16% 98%,15% 100%,14% 98%,13% 100%,12% 98%,11% 100%,10% 98%,9% 100%,8% 98%,7% 100%,6% 98%,5% 100%,4% 98%,3% 100%,2% 98%,1% 100%,0% 98%)}
+[data-k=lp-10] .tape .ttl{position:absolute;left:18px;right:18px;top:18px;font-size:17px;font-weight:700;letter-spacing:-.02em;color:var(--text-hi)}
+[data-k=lp-10] .tape .sub{position:absolute;left:18px;right:18px;top:44px;font-size:11.5px;line-height:1.4;color:rgba(var(--ink),.84)}
+[data-k=lp-10] .rule{position:absolute;left:18px;right:18px;height:1px;
+  background:repeating-linear-gradient(90deg,rgba(var(--ink),.30) 0 3px,transparent 3px 7px)}
+
+[data-k=lp-10] .vp{position:absolute;left:0;right:0;top:88px;height:162px;overflow:hidden}
+[data-k=lp-10] .stack{position:absolute;left:0;right:0;top:0;transition:transform .34s cubic-bezier(.2,.7,.3,1)}
+[data-k=lp-10] .r{height:27px;display:grid;grid-template-columns:32px 1fr auto 16px;align-items:center;
+  gap:6px;padding:0 18px;font-size:12.5px;color:rgba(var(--ink),.88)}
+[data-k=lp-10] .r i{font-style:normal;color:rgba(var(--ink),.60)}
+[data-k=lp-10] .r em{font-style:normal;color:rgba(var(--ink),.84)}
+[data-k=lp-10] .r svg{width:12px;height:12px;fill:none;stroke:#3fd94e;stroke-width:2.4;opacity:0}
+[data-k=lp-10] .r.now{color:rgba(var(--ink),.97);font-weight:500}
+[data-k=lp-10] .r.now i{color:rgba(63,217,78,.92)}
+[data-k=lp-10] .r.now em{color:#3fd94e}
+[data-k=lp-10] .r.ok svg{opacity:1}
+[data-k=lp-10] .r.wait{color:rgba(var(--ink),.62)}
+[data-k=lp-10] .r.wait em{color:rgba(var(--ink),.55)}
+[data-k=lp-10] .head{position:absolute;left:0;right:0;top:250px;height:2px;background:rgba(63,217,78,.5);
+  transition:opacity .2s}
+[data-k=lp-10] .head:after{content:"";position:absolute;left:0;top:-7px;width:11px;height:16px;
+  border-radius:0 3px 3px 0;background:rgba(63,217,78,.45)}
+
+[data-k=lp-10] .lab{position:absolute;left:18px;right:18px;top:264px;font-size:11.5px;color:rgba(var(--ink),.82)}
+[data-k=lp-10] .ops{position:absolute;left:14px;right:14px;top:285px;display:flex;flex-direction:column;gap:6px}
+[data-k=lp-10] .op{position:relative;height:32px;display:grid;grid-template-columns:1fr auto;align-items:center;
+  padding:0 12px 0 14px;border:0;border-radius:8px;background:rgba(var(--ink),.05);
+  font:500 12.5px var(--font);font-variant-numeric:tabular-nums;color:rgba(var(--ink),.84);
+  text-align:left;cursor:pointer;box-shadow:inset 0 1px 0 rgba(var(--ink),.05)}
+[data-k=lp-10] .op span:last-child{color:rgba(var(--ink),.72)}
+[data-k=lp-10] .op.on{background:rgba(30,52,34,.96);color:rgba(var(--ink),.97);box-shadow:inset 0 1px 0 rgba(63,217,78,.30)}
+[data-k=lp-10] .op.on span:last-child{color:#3fd94e}
+[data-k=lp-10] .op.on:before{content:"";position:absolute;left:4px;top:9px;width:3px;height:14px;border-radius:2px;background:#3fd94e}
+[data-k=lp-10] .rest{position:absolute;left:18px;right:18px;top:300px;margin:0;display:none;font-size:12.5px;line-height:1.45;color:rgba(var(--ink),.90)}
+[data-k=lp-10] .cons{position:absolute;left:18px;right:18px;top:403px;margin:0;font-size:12.5px;line-height:1.45;color:rgba(var(--ink),.90)}
+[data-k=lp-10] .tot{position:absolute;left:18px;right:18px;top:459px;display:flex;flex-direction:column;gap:8px}
+[data-k=lp-10] .tot div{display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;color:rgba(var(--ink),.84)}
+[data-k=lp-10] .tot div b{font-size:15px;font-weight:700;color:var(--text-hi)}
+[data-k=lp-10] .feed{position:absolute;left:14px;right:14px;top:520px;height:48px;border:0;border-radius:12px;
+  overflow:hidden;background:rgba(0,0,0,.38);box-shadow:inset 0 1px 0 rgba(var(--ink),.07);
+  font:500 13.5px var(--font);color:rgba(var(--ink),.94);cursor:pointer;touch-action:none}
+[data-k=lp-10] .feed .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(63,217,78,.22)}
+[data-k=lp-10] .feed .cap2{position:relative}
+[data-k=lp-10] .feed.done{background:rgba(30,52,34,.96);box-shadow:inset 0 1px 0 rgba(63,217,78,.28)}
+</style>
+<h3>The tape</h3><p class="cap">One milestone kept as a receipt tape printing itself: every session already done is a printed line, today is the line sitting at the print head, and holding the feed prints it and moves the tape on by one.</p>
+<div class="ph">
+  <div class="grid"></div>
+  <div class="slot"></div>
+  <div class="tape">
+    <div class="ttl">120 sessions before race day</div>
+    <div class="sub">One line per session. Race day, 12 April.</div>
+    <div class="rule" style="top:80px"></div>
+
+    <div class="vp">
+      <div class="stack">
+        <div class="r"><i>089</i><span>Hills, 8 x 60 s</span><em>46 min</em><svg viewBox="0 0 24 24"><path d="M4 13l5 5L20 7"/></svg></div>
+        <div class="r"><i>090</i><span>Easy 6 k</span><em>38 min</em><svg viewBox="0 0 24 24"><path d="M4 13l5 5L20 7"/></svg></div>
+        <div class="r"><i>091</i><span>Tempo, 5 x 800</span><em>41 min</em><svg viewBox="0 0 24 24"><path d="M4 13l5 5L20 7"/></svg></div>
+        <div class="r"><i>092</i><span>Easy 5 k</span><em>31 min</em><svg viewBox="0 0 24 24"><path d="M4 13l5 5L20 7"/></svg></div>
+        <div class="r"><i>093</i><span>Recovery jog</span><em>26 min</em><svg viewBox="0 0 24 24"><path d="M4 13l5 5L20 7"/></svg></div>
+        <div class="r now"><i>094</i><span id="l10nm">Long run, 16 k</span><em id="l10tm">1 h 44</em><svg viewBox="0 0 24 24"><path d="M4 13l5 5L20 7"/></svg></div>
+        <div class="r wait"><i>095</i><span>Easy 5 k</span><em>tomorrow</em><svg viewBox="0 0 24 24"><path d="M4 13l5 5L20 7"/></svg></div>
+        <div class="r wait"><i>096</i><span>Hills, 10 x 60 s</span><em>not set</em><svg viewBox="0 0 24 24"><path d="M4 13l5 5L20 7"/></svg></div>
+      </div>
+    </div>
+    <div class="head"></div>
+
+    <div class="lab" id="l10lab">The line at the head, before you print it</div>
+    <div class="ops">
+      <button class="op" data-k2="12" data-t="1 h 18" data-c="Shorter than planned. The week stays whole.">
+        <span>Long run, 12 k</span><span>1 h 18</span></button>
+      <button class="op on" data-k2="16" data-t="1 h 44" data-c="The planned distance. Last line prints 2 April.">
+        <span>Long run, 16 k</span><span>1 h 44</span></button>
+      <button class="op" data-k2="20" data-t="2 h 10" data-c="Longer than planned. Only if last week felt easy.">
+        <span>Long run, 20 k</span><span>2 h 10</span></button>
+    </div>
+    <p class="rest" id="l10rest">Nothing else prints today. The tape waits.</p>
+    <p class="cons" id="l10cons">The planned distance. Last line prints 2 April.</p>
+    <div class="rule" style="top:449px"></div>
+
+    <div class="tot">
+      <div><span>printed</span><b id="l10p">93 of 120</b></div>
+      <div><span>left</span><b id="l10l">27 sessions</b></div>
+    </div>
+
+    <button class="feed" id="l10feed"><span class="fill"></span><span class="cap2" id="l10cap">Hold to print the line</span></button>
+  </div>
+</div>
+<script>(function(){var r=document.querySelector('[data-k="lp-10"]');if(!r)return;
+var stack=r.querySelector('.stack'),rows=[].slice.call(r.querySelectorAll('.r')),
+    feed=r.querySelector('#l10feed'),fill=feed.querySelector('.fill'),cap=r.querySelector('#l10cap'),
+    cons=r.querySelector('#l10cons'),lab=r.querySelector('#l10lab'),ops=r.querySelector('.ops'),
+    pEl=r.querySelector('#l10p'),lEl=r.querySelector('#l10l'),
+    idx=5,ty=0,PITCH=27,done=93,GOAL=120,printed=false,km=16,tm='1 h 44',timer=null;
+r.querySelectorAll('.op').forEach(function(b){b.addEventListener('click',function(){
+  if(printed)return;
+  r.querySelectorAll('.op').forEach(function(x){x.classList.remove('on');});
+  b.classList.add('on');km=+b.dataset.k2;tm=b.dataset.t;
+  r.querySelector('#l10nm').textContent='Long run, '+km+' k';
+  r.querySelector('#l10tm').textContent=tm;cons.textContent=b.dataset.c;});});
+function print(){
+  if(printed)return;printed=true;
+  var now=rows[idx];now.classList.remove('now');now.classList.add('ok');
+  done++;pEl.textContent=done+' of '+GOAL;lEl.textContent=(GOAL-done)+' sessions';
+  idx++;ty-=PITCH;stack.style.transform='translateY('+ty+'px)';
+  var nx=rows[idx];nx.classList.remove('wait');nx.classList.add('now');
+  nx.querySelector('em').textContent='opens tomorrow';
+  feed.classList.add('done');cap.textContent='Printed. Line 094 is on the tape.';
+  lab.textContent='Line 095 sits at the head tomorrow.';
+  cons.textContent='94 printed, 26 left before 12 April.';
+  ops.style.display='none';r.querySelector('#l10rest').style.display='block';}
+function start(e){if(printed)return;feed.setPointerCapture(e.pointerId);
+  fill.style.transition='width .85s linear';fill.style.width='100%';
+  timer=setTimeout(print,860);}
+function stop(){if(timer){clearTimeout(timer);timer=null;}
+  if(printed)return;fill.style.transition='width .16s ease-out';fill.style.width='0';}
+feed.addEventListener('pointerdown',start);
+feed.addEventListener('pointerup',stop);
+feed.addEventListener('pointercancel',stop);
+feed.addEventListener('pointerleave',stop);})();</script>
+</section>

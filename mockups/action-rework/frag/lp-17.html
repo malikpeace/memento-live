@@ -1,0 +1,106 @@
+<!-- archetypes: lp-16 full-bleed horizontal corridor | lp-17 stacked ledger rows | lp-18 centered monolith numeral | lp-19 bottom-sheet hour rail | lp-20 radial week clock -->
+<section class="cell" data-k="lp-17">
+<style>
+[data-k=lp-17] .l17{position:absolute;inset:0;display:flex;flex-direction:column;padding:34px 18px 24px;font-variant-numeric:tabular-nums}
+[data-k=lp-17] .l17-goal{font-size:12.5px;color:rgba(var(--ink),.80)}
+[data-k=lp-17] .l17-head{display:flex;align-items:flex-end;gap:9px;margin-top:12px}
+[data-k=lp-17] .l17-big{font-size:36px;font-weight:700;letter-spacing:-.03em;line-height:1;color:var(--text-hi)}
+[data-k=lp-17] .l17-unit{font-size:14px;color:rgba(var(--ink),.80);padding-bottom:3px}
+[data-k=lp-17] .l17-pill{margin-left:auto;padding:5px 11px;border-radius:999px;background:rgba(30,52,34,.96);
+  color:rgba(var(--ink),.97);font-size:11.5px;font-weight:500;box-shadow:inset 0 1px 0 rgba(63,217,78,.35)}
+[data-k=lp-17] .l17-line{margin-top:10px;font-size:12.5px;line-height:1.5;color:rgba(var(--ink),.90)}
+[data-k=lp-17] .l17-card{margin-top:18px;border-radius:14px;overflow:hidden;background:rgba(22,25,31,.95);
+  -webkit-backdrop-filter:blur(24px) saturate(1.35);backdrop-filter:blur(24px) saturate(1.35);box-shadow:inset 0 1px 0 rgba(var(--ink),.08)}
+[data-k=lp-17] .l17-row{display:flex;align-items:center;gap:10px;padding:0 13px;height:41px;font-size:13px;color:rgba(var(--ink),.80)}
+[data-k=lp-17] .l17-row+.l17-row{box-shadow:inset 0 1px 0 rgba(var(--ink),.06)}
+[data-k=lp-17] .l17-date{width:74px;white-space:nowrap;color:rgba(var(--ink),.9)}
+[data-k=lp-17] .l17-val{font-weight:500;color:var(--text-hi)}
+[data-k=lp-17] .l17-dot{margin-left:auto;width:8px;height:8px;border-radius:3px;background:rgba(63,217,78,.75)}
+[data-k=lp-17] .l17-dot.out{background:rgba(var(--ink),.26)}
+[data-k=lp-17] .l17-open{height:auto;flex-direction:column;align-items:stretch;gap:11px;padding:13px;background:rgba(var(--ink),.05)}
+[data-k=lp-17] .l17-open .l17-date{width:auto;color:var(--text-hi);font-weight:500}
+[data-k=lp-17] .l17-act{display:flex;align-items:center}
+[data-k=lp-17] .l17-step{display:flex;align-items:center;gap:2px}
+[data-k=lp-17] .l17-step button{width:30px;height:32px;border:0;border-radius:8px;background:rgba(var(--ink),.07);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.08);color:var(--text-hi);font:500 16px var(--font);cursor:pointer}
+[data-k=lp-17] .l17-step span{min-width:50px;text-align:center;font-size:15px;font-weight:700;color:var(--text-hi);font-variant-numeric:tabular-nums}
+[data-k=lp-17] .l17-log{margin-left:auto;padding:0 18px;height:34px;border:0;border-radius:9px;background:rgba(var(--ink),.92);
+  color:#0a0b0d;font:700 12.5px var(--font);cursor:pointer}
+[data-k=lp-17] .l17-card.logged .l17-open{background:rgba(63,217,78,.09)}
+[data-k=lp-17] .l17-card.logged .l17-step,[data-k=lp-17] .l17-card.logged .l17-log{display:none}
+[data-k=lp-17] .l17-done{display:none;margin-left:auto;align-items:center;gap:9px;font-size:15px;font-weight:700;color:var(--text-hi)}
+[data-k=lp-17] .l17-card.logged .l17-done{display:flex}
+[data-k=lp-17] .l17-done i{width:8px;height:8px;border-radius:3px;background:#3fd94e;display:block}
+[data-k=lp-17] .l17-sp{flex:1;min-height:14px}
+[data-k=lp-17] .l17-hold{border-radius:14px;padding:15px 15px 16px;background:rgba(22,25,31,.95);
+  -webkit-backdrop-filter:blur(24px) saturate(1.3);backdrop-filter:blur(24px) saturate(1.3);box-shadow:inset 0 1px 0 rgba(var(--ink),.08)}
+[data-k=lp-17] .l17-hold .t{display:flex;align-items:center;gap:10px}
+[data-k=lp-17] .l17-hold .t b{font-size:15px;font-weight:700;color:var(--text-hi)}
+[data-k=lp-17] .l17-hold .t .s{margin-left:auto;display:flex;gap:2px}
+[data-k=lp-17] .l17-hold .t button{width:32px;height:30px;border:0;border-radius:8px;background:rgba(var(--ink),.07);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.08);color:var(--text-hi);font:500 15px var(--font);cursor:pointer}
+[data-k=lp-17] .l17-hold p{margin:9px 0 0;font-size:12px;line-height:1.5;color:rgba(var(--ink),.90)}
+</style>
+<h3>The statement</h3>
+<p class="cap">Maintenance read as a bank statement: one open row waiting for this week's number, the kept weeks stacked underneath as proof.</p>
+<div class="ph">
+  <div class="grid"></div>
+  <div class="l17">
+    <div class="l17-goal">Hold 180 lb</div>
+    <div class="l17-head">
+      <div class="l17-big">180.4</div><div class="l17-unit">lb</div>
+      <div class="l17-pill">inside</div>
+    </div>
+    <div class="l17-line">Today is a check day. Put the number in and the week is done.</div>
+
+    <div class="l17-card">
+      <div class="l17-row l17-open">
+        <div class="l17-date">Sun 10 Aug, today</div>
+        <div class="l17-act">
+          <div class="l17-step">
+            <button class="dn">&minus;</button><span class="v">180.4</span><button class="up">+</button>
+          </div>
+          <button class="l17-log">Log</button>
+          <div class="l17-done"><span class="dv">180.4</span><i></i></div>
+        </div>
+      </div>
+      <div class="l17-row"><div class="l17-date">Sun 3 Aug</div><div class="l17-val">180.1</div><div class="l17-dot"></div></div>
+      <div class="l17-row"><div class="l17-date">Sun 27 Jul</div><div class="l17-val">181.3</div><div class="l17-dot out"></div></div>
+      <div class="l17-row"><div class="l17-date">Sun 20 Jul</div><div class="l17-val">180.6</div><div class="l17-dot"></div></div>
+      <div class="l17-row"><div class="l17-date">Sun 13 Jul</div><div class="l17-val">179.8</div><div class="l17-dot"></div></div>
+      <div class="l17-row"><div class="l17-date">Sun 6 Jul</div><div class="l17-val">180.2</div><div class="l17-dot"></div></div>
+      <div class="l17-row"><div class="l17-date">Sun 29 Jun</div><div class="l17-val">180.9</div><div class="l17-dot"></div></div>
+    </div>
+
+    <div class="l17-sp"></div>
+
+    <div class="l17-hold">
+      <div class="t">
+        <b><span class="n">3</span> sessions a week</b>
+        <div class="s"><button class="hd">&minus;</button><button class="hu">+</button></div>
+      </div>
+      <p class="c">Three has held the number flat since March. This is the load, not the goal.</p>
+    </div>
+  </div>
+</div>
+<script>(function(){
+  var c=document.currentScript.closest('.cell');
+  var v=c.querySelector('.l17-step .v'),card=c.querySelector('.l17-card'),val=180.4;
+  function paint(){v.textContent=val.toFixed(1);}
+  c.querySelector('.l17-step .up').addEventListener('click',function(){val=Math.round((val+.1)*10)/10;paint();});
+  c.querySelector('.l17-step .dn').addEventListener('click',function(){val=Math.round((val-.1)*10)/10;paint();});
+  c.querySelector('.l17-log').addEventListener('click',function(){
+    c.querySelector('.l17-done .dv').textContent=val.toFixed(1);
+    card.classList.add('logged');
+    c.querySelector('.l17-line').textContent='Week logged. Nothing else is asked of you today.';
+  });
+  var n=3,nEl=c.querySelector('.l17-hold .n'),cp=c.querySelector('.l17-hold .c'),
+  notes={2:'At two the number crept up half a pound a month. It works, but you will be correcting.',
+         3:'Three has held the number flat since March. This is the load, not the goal.',
+         4:'Four buys you room for a heavy weekend without the number moving.',
+         5:'Five is training, not holding. Good if you want it, more than the goal needs.'};
+  function up(){nEl.textContent=n;cp.textContent=notes[n];}
+  c.querySelector('.l17-hold .hu').addEventListener('click',function(){if(n<5){n++;up();}});
+  c.querySelector('.l17-hold .hd').addEventListener('click',function(){if(n>2){n--;up();}});
+})();</script>
+</section>

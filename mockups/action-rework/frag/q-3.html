@@ -1,0 +1,104 @@
+<!-- archetypes: q-1 chip cloud stack | q-2 one question full-bleed | q-3 two-zone sorting board -->
+<section class="cell" data-k="q-3">
+<style>
+[data-k="q-3"] .q3-wrap{position:absolute;inset:0;display:flex;flex-direction:column;padding:30px 18px 26px}
+[data-k="q-3"] .q3-t{margin:0;font-size:21px;font-weight:700;letter-spacing:-.025em;color:var(--text-hi)}
+[data-k="q-3"] .q3-s{margin:6px 0 0;font-size:13px;line-height:1.4;color:rgba(var(--ink),.92)}
+[data-k="q-3"] .q3-scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none;padding-bottom:2px}
+[data-k="q-3"] .q3-scroll::-webkit-scrollbar{width:0;height:0}
+[data-k="q-3"] .q3-zone{margin-top:14px;border-radius:14px;padding:11px 10px 12px;
+  background:rgba(18,20,25,.95);backdrop-filter:blur(22px) saturate(1.3);-webkit-backdrop-filter:blur(22px) saturate(1.3);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.06)}
+[data-k="q-3"] .q3-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:1px 4px 10px}
+[data-k="q-3"] .q3-head b{font-size:12.5px;font-weight:500;letter-spacing:-.01em;color:rgba(var(--ink),.94)}
+[data-k="q-3"] .q3-head span{font-size:12.5px;font-weight:700;font-variant-numeric:tabular-nums;color:rgba(var(--ink),.9)}
+[data-k="q-3"] .q3-done .q3-head span{color:rgba(63,217,78,.92)}
+[data-k="q-3"] .q3-list{display:flex;flex-direction:column;gap:7px}
+[data-k="q-3"] .q3-empty{margin:0;padding:11px 13px;font-size:12.5px;color:rgba(var(--ink),.8)}
+[data-k="q-3"] .q3-card{position:relative;display:block;width:100%;text-align:left;border:0;border-radius:10px;
+  padding:11px 38px 11px 13px;font-family:inherit;font-size:13px;line-height:1.3;font-weight:500;letter-spacing:-.005em;
+  color:var(--text-hi);cursor:pointer;-webkit-tap-highlight-color:transparent;
+  background:rgba(31,35,43,.97);box-shadow:inset 0 1px 0 rgba(var(--ink),.07);
+  transition:background .16s ease,transform .16s ease}
+[data-k="q-3"] .q3-card:hover{background:rgba(40,45,54,.98);transform:translateX(2px)}
+[data-k="q-3"] .q3-card svg{position:absolute;right:13px;top:50%;margin-top:-6px;transition:opacity .16s ease}
+[data-k="q-3"] .q3-card .q3-tick{opacity:0}
+[data-k="q-3"] .q3-card.done{background:rgba(26,36,28,.97)}
+[data-k="q-3"] .q3-card.done .q3-tick{opacity:1}
+[data-k="q-3"] .q3-card.done .q3-plus{opacity:0}
+[data-k="q-3"] .q3-add{margin-top:14px;display:flex;align-items:center;gap:9px;padding:0 14px;height:48px;border-radius:12px;
+  background:rgba(18,20,25,.94);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.05)}
+[data-k="q-3"] .q3-add i{flex:none;display:block;width:1.5px;height:14px;border-radius:1px;background:rgba(var(--ink),.7)}
+[data-k="q-3"] .q3-add input{flex:1;min-width:0;height:100%;border:0;background:none;outline:none;font-family:inherit;
+  font-size:13px;color:rgba(var(--ink),.96)}
+[data-k="q-3"] .q3-add input::placeholder{color:rgba(var(--ink),.6)}
+[data-k="q-3"] .q3-go{margin-top:10px;display:block;width:100%;height:50px;border:0;border-radius:12px;font-family:inherit;
+  font-size:15px;font-weight:500;letter-spacing:-.01em;color:#0a0b0d;background:rgba(var(--ink),.94);cursor:pointer}
+</style>
+<h3>The board</h3><p class="cap">Everything the goal needs is already on screen as movable cards, so the refine step is sorting what is real from what is missing instead of answering questions.</p>
+<div class="ph">
+  <div class="grid"></div>
+  <div class="q3-wrap">
+    <h4 class="q3-t">What is already true</h4>
+    <p class="q3-s">Tap a card to move it to the other list.</p>
+
+    <div class="q3-scroll">
+      <div class="q3-zone q3-done">
+        <div class="q3-head"><b>Done already</b><span class="q3-cd">0</span></div>
+        <div class="q3-list"></div>
+      </div>
+
+      <div class="q3-zone q3-todo">
+        <div class="q3-head"><b>Still to figure out</b><span class="q3-ct">0</span></div>
+        <div class="q3-list"></div>
+      </div>
+    </div>
+
+    <div class="q3-add"><i></i><input placeholder="Add something of your own"></div>
+    <button type="button" class="q3-go">Continue</button>
+  </div>
+</div>
+<script>
+(function(){
+  var r=document.querySelector('[data-k="q-3"]'); if(!r) return;
+  var D=r.querySelector('.q3-done .q3-list'), T=r.querySelector('.q3-todo .q3-list'),
+      cd=r.querySelector('.q3-cd'), ct=r.querySelector('.q3-ct'),
+      TICK='<svg class="q3-tick" width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M2 6.9 5.1 10 11 3.3" stroke="rgba(63,217,78,.95)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+      PLUS='<svg class="q3-plus" width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M6.5 2.4v8.2M2.4 6.5h8.2" stroke="rgba(235,238,248,.5)" stroke-width="1.6" stroke-linecap="round"/></svg>',
+      START=[
+        ['Picked what I sell',1],
+        ['Set a price',1],
+        ['Made a first sale',1],
+        ['A daily way to reach people',0],
+        ['Following up on a no',0],
+        ['Somewhere to send them',0],
+        ['Time blocked in the day',0]
+      ];
+  function empty(list,txt){
+    var e=list.parentNode.querySelector('.q3-empty');
+    if(list.children.length){ if(e) e.remove(); return; }
+    if(!e){ e=document.createElement('p'); e.className='q3-empty'; e.textContent=txt; list.parentNode.appendChild(e); }
+  }
+  function count(){
+    cd.textContent=D.children.length; ct.textContent=T.children.length;
+    empty(D,'Nothing here yet.'); empty(T,'Nothing left on this list.');
+  }
+  function make(txt,done){
+    var b=document.createElement('button'); b.type='button'; b.className='q3-card'+(done?' done':'');
+    b.appendChild(document.createTextNode(txt));
+    b.insertAdjacentHTML('beforeend',TICK+PLUS);
+    b.addEventListener('click',function(){
+      var toDone=b.parentNode===T;
+      b.classList.toggle('done',toDone);
+      (toDone?D:T).appendChild(b);
+      count();
+    });
+    (done?D:T).appendChild(b);
+  }
+  START.forEach(function(x){ make(x[0],x[1]); });
+  count();
+})();
+</script>
+</section>

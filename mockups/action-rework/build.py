@@ -1,0 +1,77 @@
+#!/usr/bin/env python3
+"""Assemble mockups/action-rework/frag/*.html into gallery.html.
+Order: ob, q, ld, lp, mx. Each fragment is a self-scoped <section>."""
+import pathlib, re
+
+ROOT = pathlib.Path(__file__).parent
+FRAG = ROOT / 'frag'
+ORDER = ['ob', 'q', 'ld', 'lp', 'mx']
+TITLES = {
+    'ob': ('Onboarding', 'Their Neutron Star, shown five ways. No forms, just the goal made real.'),
+    'q':  ('The refine step', 'What is already done + what they think it takes. Three structures.'),
+    'ld': ('Loading', 'The plan being produced. The wait as visible work, never a spinner.'),
+    'lp': ('The daily loop', 'Twenty universal layouts. Number slots any goal can fill.'),
+    'mx': ('Intensity mechanics', 'Ten ways to scale today up or down. Phone + desktop pair each.'),
+}
+
+def key_of(p):
+    m = re.match(r'([a-z]+)-(\d+)', p.stem)
+    return (ORDER.index(m.group(1)) if m and m.group(1) in ORDER else 99,
+            int(m.group(2)) if m else 0)
+
+HEAD = """<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Action rework — the 43</title>
+<style>
+@font-face { font-family:'Geist'; src:url('../fonts/geist-400.otf') format('opentype'); font-weight:400; font-display:swap; }
+@font-face { font-family:'Geist'; src:url('../fonts/geist-500.otf') format('opentype'); font-weight:500; font-display:swap; }
+@font-face { font-family:'Geist'; src:url('../fonts/geist-700.otf') format('opentype'); font-weight:700; font-display:swap; }
+:root{--ink:235,238,248;--text-hi:rgba(var(--ink),.96);--text-mid:rgba(var(--ink),.78);--text-lo:rgba(var(--ink),.45);
+--font:'Geist',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#0a0b0d;color:var(--text-hi);font-family:var(--font);-webkit-font-smoothing:antialiased}
+.gal{padding:26px 20px 140px;max-width:1780px;margin:0 auto}
+.gal h1{font-size:26px;font-weight:700;letter-spacing:-.02em;margin:0 0 6px}
+.gal>.sub{color:var(--text-mid);font-size:14px;margin:0 0 24px;max-width:78ch;line-height:1.55}
+.grp{margin:44px 0 0;padding-top:26px;border-top:1px solid rgba(var(--ink),.16)}
+.grp h2{font-size:19px;font-weight:700;margin:0 0 2px;letter-spacing:-.015em}
+.grp>p{color:var(--text-mid);font-size:13px;margin:0 0 18px;max-width:76ch}
+.wall{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}
+.cell{max-width:100%}
+.cell h3{font-size:13px;font-weight:700;margin:0 0 2px}
+.cell .cap{font-size:11.5px;color:var(--text-lo);margin:0 0 9px;max-width:300px;line-height:1.45;min-height:30px}
+.cell:has(.desk) .cap{max-width:720px}
+.ph{position:relative;width:300px;height:650px;border-radius:30px;overflow:hidden;background:#050608;
+  box-shadow:0 24px 60px rgba(0,0,0,.5), inset 0 0 0 1px rgba(var(--ink),.10)}
+.desk{position:relative;width:720px;max-width:100%;height:420px;border-radius:14px;overflow:hidden;background:#050608;
+  margin-top:16px;box-shadow:0 20px 50px rgba(0,0,0,.45), inset 0 0 0 1px rgba(var(--ink),.09)}
+.grid{position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(var(--ink),1) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(var(--ink),1) 1px,transparent 1px);
+  background-size:26px 26px;opacity:.04}
+</style></head><body><div class="gal">
+<h1>Action rework — the 43</h1>
+<p class="sub">The teardown set. Only the grid survived. Five onboarding, three refine steps, five loading
+screens, twenty daily-loop architectures, ten intensity mechanics (phone + desktop each).
+Built by an Opus fleet against one contract, critiqued, judged for sameness.</p>
+"""
+
+def main():
+    frags = sorted(FRAG.glob('*.html'), key=key_of)
+    out = [HEAD]
+    cur = None
+    for f in frags:
+        pre = re.match(r'([a-z]+)-', f.stem).group(1)
+        if pre != cur:
+            if cur is not None: out.append('</div></section>')
+            t, d = TITLES.get(pre, (pre, ''))
+            out.append(f'<section class="grp"><h2>{t}</h2><p>{d}</p><div class="wall">')
+            cur = pre
+        out.append(f.read_text())
+    if cur is not None: out.append('</div></section>')
+    out.append('</div></body></html>')
+    (ROOT / 'gallery.html').write_text('\n'.join(out))
+    print(f'gallery.html assembled from {len(frags)} fragments')
+
+if __name__ == '__main__':
+    main()

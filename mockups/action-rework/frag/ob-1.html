@@ -1,0 +1,44 @@
+<!-- ARCHETYPES (difference law): ob-1 full-bleed monumental type | ob-2 centered engraved object | ob-3 progressive bottom-up writing | ob-4 horizon perspective terrain | ob-5 split seam contrast -->
+<section class="cell" data-k="ob-1">
+<style>
+[data-k=ob-1] .o1-halo{position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(var(--ink),1) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(var(--ink),1) 1px,transparent 1px);
+  background-size:26px 26px;opacity:.11;
+  -webkit-mask-image:radial-gradient(circle at 50% 40%,#000 0,rgba(0,0,0,.55) 34%,transparent 66%);
+  mask-image:radial-gradient(circle at 50% 40%,#000 0,rgba(0,0,0,.55) 34%,transparent 66%)}
+[data-k=ob-1] .o1-type{position:absolute;left:22px;right:22px;top:0;bottom:0;
+  display:flex;flex-direction:column;justify-content:center;gap:0}
+[data-k=ob-1] .o1-sm{font-size:19px;font-weight:400;line-height:1.2;color:rgba(var(--ink),.90);letter-spacing:-.01em}
+[data-k=ob-1] .o1-num{font-size:70px;font-weight:700;line-height:.94;letter-spacing:-.05em;
+  color:var(--text-hi);font-variant-numeric:tabular-nums;margin:8px 0 0 -4px}
+[data-k=ob-1] .o1-mid{font-size:31px;font-weight:500;line-height:1.05;letter-spacing:-.03em;color:var(--text-hi);margin-top:4px}
+[data-k=ob-1] .o1-so{margin-top:30px}
+[data-k=ob-1] .o1-big{font-size:41px;font-weight:700;line-height:1.02;letter-spacing:-.04em;color:var(--text-hi);margin-top:7px}
+[data-k=ob-1] .o1-rule{width:34px;height:1px;background:rgba(var(--ink),.30);margin:24px 0 0}
+[data-k=ob-1] .o1-note{font-size:13.5px;font-weight:400;line-height:1.45;color:rgba(var(--ink),.92);margin-top:12px;max-width:24ch}
+[data-k=ob-1] .o1-foot{position:absolute;left:22px;right:22px;bottom:40px;padding-top:17px;
+  background:linear-gradient(rgba(var(--ink),.16),rgba(var(--ink),.16)) 0 0/100% 1px no-repeat;
+  display:flex;align-items:center;justify-content:space-between}
+[data-k=ob-1] .o1-foot b{font-size:16px;font-weight:500;letter-spacing:-.012em;color:var(--text-hi)}
+[data-k=ob-1] .o1-foot svg{display:block;width:17px;height:11px;color:rgba(var(--ink),.88)}
+</style>
+<h3>Wall of intent</h3><p class="cap">No card, no container, no chrome: the star IS the screen, scaled so the number is the largest thing they have ever seen it, with the grid brightening only where it lands.</p>
+<div class="ph">
+  <div class="grid"></div>
+  <div class="o1-halo"></div>
+  <div class="o1-type">
+    <span class="o1-sm">I will get to</span>
+    <span class="o1-num">$3,000</span>
+    <span class="o1-mid">a month</span>
+    <span class="o1-sm o1-so">so I can</span>
+    <span class="o1-big">quit the<br>warehouse</span>
+    <span class="o1-rule"></span>
+    <span class="o1-note">Every day from here is measured against this line.</span>
+  </div>
+  <div class="o1-foot">
+    <b>Continue</b>
+    <svg viewBox="0 0 17 11" fill="none" aria-hidden="true"><path d="M1 5.5h14M11 1.5l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+</div>
+</section>
