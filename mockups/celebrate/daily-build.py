@@ -16,6 +16,106 @@ MANIFEST = os.path.join(HERE, 'daily-manifest.json')
 
 STATE_LABEL = ['Day 1', 'Week 1', 'Month 1']
 
+# The consistency bench: a live panel (its own phones, not the 20 static ones)
+# that lets Malik drag total actions + recent consistency and see the humane
+# answer, the number never shames, warmth carries momentum, misses are never
+# drawn as accusations. Also shows the cautionary window that DOES expose gaps.
+BENCH = """
+<section class="bench" id="bench">
+  <div class="bench__hd">
+    <span class="bench__t">Test bench: consistency without shame</span>
+  </div>
+  <p class="bench__lede">Drag the sliders. The unit is <b>actions completed</b>, not calendar days, so a person who shows up three times a week is never told they missed four. The banked number only ever climbs. Recent momentum shows as <b>warmth</b>, cooling when you are away, warming when you return, so consistency has stakes without a streak that can break. The third phone is the one pattern to avoid: it draws your gaps back at you.</p>
+  <div class="bench__ctl">
+    <label><span>Total actions</span><input type="range" id="bTotal" min="1" max="300" value="30"><b id="bTotalOut">30</b></label>
+    <label><span>Recent consistency</span><input type="range" id="bCons" min="5" max="100" value="60"><b id="bConsOut">60%</b></label>
+    <label class="bench__seg"><span>Their cadence</span>
+      <select id="bCad"><option value="daily">daily goal</option><option value="freq">3x a week</option><option value="maint">maintenance</option></select></label>
+  </div>
+  <div class="row">
+    <div class="state"><p class="state__l">The count, immune to gaps</p>
+      <div class="ph benchph" data-b="count"><div class="dst"></div><div class="hint">only knows your total</div></div></div>
+    <div class="state state--now"><p class="state__l">The rhythm, warmth not streak</p>
+      <div class="ph benchph" data-b="rhythm"><div class="dst"></div><div class="hint">momentum, never a miss count</div></div></div>
+    <div class="state"><p class="state__l">The window, the pattern to avoid</p>
+      <div class="ph benchph" data-b="window"><div class="dst"></div><div class="hint">this one shames, shown as a warning</div></div></div>
+  </div>
+</section>
+"""
+
+BENCH_CSS = """
+.bench{margin:0 0 40px;padding:22px 22px 26px;border-radius:20px;
+  background:rgba(63,217,78,.045);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+.bench__t{font-size:16px;font-weight:700;letter-spacing:-.015em}
+.bench__lede{font-size:13px;color:rgba(235,238,248,.62);line-height:1.55;margin:8px 0 18px;max-width:80ch}
+.bench__lede b{color:rgba(235,238,248,.96);font-weight:650}
+.bench__ctl{display:flex;flex-wrap:wrap;gap:16px 30px;margin:0 0 22px;padding:14px 16px;
+  border-radius:12px;background:rgba(0,0,0,.28)}
+.bench__ctl label{display:flex;align-items:center;gap:11px;font-size:12.5px;color:rgba(235,238,248,.62)}
+.bench__ctl label span{flex:0 0 auto}
+.bench__ctl input[type=range]{width:190px;accent-color:var(--day)}
+.bench__ctl b{font-size:12.5px;font-weight:700;color:rgba(235,238,248,.96);font-variant-numeric:tabular-nums;min-width:38px}
+.bench__ctl select{background:rgba(235,238,248,.08);color:rgba(235,238,248,.96);border:0;border-radius:8px;
+  padding:7px 9px;font:600 13px/1 var(--font)}
+.benchph{cursor:default}
+/* bench phone internals */
+.benchph .bn{font-variant-numeric:tabular-nums;font-weight:700;letter-spacing:-.045em;line-height:.92;color:rgba(235,238,248,.96)}
+.benchph .bn--hero{font-size:112px}
+.benchph .bu{font-size:15px;color:rgba(235,238,248,.62);margin-top:14px}
+.benchph .bcap{font-size:12.5px;color:rgba(235,238,248,.40);margin-top:9px}
+.benchph .bwarm{position:absolute;left:50%;top:44%;width:300px;height:300px;transform:translate(-50%,-50%);
+  border-radius:50%;pointer-events:none;filter:blur(2px)}
+.benchph .brow{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;max-width:250px;margin-top:22px}
+.benchph .bdot{width:9px;height:9px;border-radius:50%}
+.benchph .bgrid{display:grid;grid-template-columns:repeat(10,1fr);gap:7px;width:262px;margin-top:20px}
+.benchph .bcell{width:100%;aspect-ratio:1;border-radius:4px}
+.benchph .bline{font-size:15px;font-weight:600;color:var(--day);margin-top:18px;letter-spacing:-.01em}
+.benchph .bmiss{font-size:13px;color:#ff6b6b;margin-top:14px}
+"""
+
+BENCH_JS = r"""
+(function(){
+  var $=function(id){return document.getElementById(id)};
+  function seeded(s){return function(){s=(s*1103515245+12345)&0x7fffffff;return s/0x7fffffff}}
+  function moods(c){ return c>=0.7?'Strong lately.':c>=0.38?'Finding your rhythm.':'Good to have you back.'; }
+  function unit(total, cad){
+    if(cad==='maint') return total===1?'day held':'days held';
+    if(cad==='freq')  return total===1?'session':'sessions';
+    return total===1?'move':'moves';
+  }
+  function warmRGBA(c, a){ // warm green when consistent, cools toward dim slate when not
+    var g=Math.round(40+c*160); return 'rgba('+Math.round(20+c*40)+','+g+','+Math.round(30+c*30)+','+a+')';
+  }
+  function render(){
+    var total=+$('bTotal').value, c=+$('bCons').value/100, cad=$('bCad').value;
+    $('bTotalOut').textContent=total; $('bConsOut').textContent=Math.round(c*100)+'%';
+    var u=unit(total,cad);
+    // 1. THE COUNT: identical at every consistency. Only the total exists.
+    document.querySelector('[data-b=count] .dst').innerHTML =
+      '<div class="bn bn--hero">'+total+'</div><div class="bu">'+u+', banked</div>'+
+      '<div class="bcap">the same screen at 20% or 100%</div>';
+    // 2. THE RHYTHM: banked number + warmth from recent consistency + kind line.
+    var warm=document.querySelector('[data-b=rhythm] .dst');
+    var last=Math.min(14,total), rnd=seeded(Math.round(c*97)+total), dots='';
+    for(var i=0;i<last;i++){ var on=rnd()<c;
+      dots+='<span class="bdot" style="background:'+(on?'var(--day)':'rgba(235,238,248,.12)')+'"></span>'; }
+    warm.innerHTML='<div class="bwarm" style="background:radial-gradient(circle,'+warmRGBA(c,.32)+',transparent 66%)"></div>'+
+      '<div class="bn bn--hero" style="position:relative">'+total+'</div>'+
+      '<div class="bu" style="position:relative">'+u+', banked</div>'+
+      '<div class="brow">'+dots+'</div>'+
+      '<div class="bline">'+moods(c)+'</div>';
+    // 3. THE WINDOW: draws misses back at you. The anti-pattern.
+    var win=document.querySelector('[data-b=window] .dst'), r2=seeded(Math.round(c*53)+7), cells='', miss=0;
+    for(var j=0;j<30;j++){ var d=r2()<c; if(!d)miss++;
+      cells+='<span class="bcell" style="background:'+(d?'rgba(63,217,78,.5)':'rgba(255,107,107,.14)')+'"></span>'; }
+    win.innerHTML='<div class="bn" style="font-size:74px">'+total+'</div><div class="bu">the last 30 days</div>'+
+      '<div class="bgrid">'+cells+'</div><div class="bmiss">'+miss+' days missed</div>';
+  }
+  ['bTotal','bCons','bCad'].forEach(function(id){ $(id).addEventListener('input',render); });
+  render();
+})();
+"""
+
 SHELL_CSS = """
 :root{
   --ink:235,238,248;
@@ -145,6 +245,7 @@ def build():
 <title>The daily reward, %d directions</title>
 <style>%s</style>
 <style>%s</style>
+<style>__BENCHCSS__</style>
 </head><body>
 <div class="bar">
   <a href="index.html">&lsaquo; All</a>
@@ -157,11 +258,17 @@ def build():
   <p class="lede">Each concept is shown at <b>day 1, week 1 and month 1</b>, because those are the states that decide whether it works. Tap a phone to replay it, or replay a whole row.</p>
   <p class="lede" style="color:rgba(235,238,248,.40)">Honest note before you start: an adversarial pass found four families that overlap, so cut fast rather than grading twenty in isolation. <b style="color:rgba(235,238,248,.62)">4, 6, 16 and 18</b> (settles, stack, stack, deposit) all resolve to a number above a pile of lines, only the entry motion differs. <b style="color:rgba(235,238,248,.62)">3 and 8</b> are both one ring per day. <b style="color:rgba(235,238,248,.62)">13 and 14</b> are both a number plus a growing green light. <b style="color:rgba(235,238,248,.62)">5 and 11</b> are both a row of strokes on a baseline. The independent sweep rated <b style="color:rgba(235,238,248,.62)">1 the odometer</b>, <b style="color:rgba(235,238,248,.62)">17 the card</b> and <b style="color:rgba(235,238,248,.62)">10 the stamp</b> strongest, and flagged <b style="color:rgba(235,238,248,.62)">12 the staircase</b> and <b style="color:rgba(235,238,248,.62)">15 the pulse</b> as the ones that saturate soonest past a year.</p>
   <div class="toc">%s</div>
+  __BENCH__
   %s
 </div>
 <script>%s</script>
+<script>__BENCHJS__</script>
 </body></html>""" % (len(sections), SHELL_CSS, '\n'.join(styles), len(sections),
                      ''.join(toc), ''.join(sections), DRIVER)
+
+    page = (page.replace('__BENCHCSS__', BENCH_CSS)
+                .replace('__BENCH__', BENCH)
+                .replace('__BENCHJS__', BENCH_JS))
 
     open(os.path.join(HERE, 'daily.html'), 'w', encoding='utf-8').write(page)
     print('built daily.html with %d concepts (%d phones)' % (len(sections), len(sections) * 3))
