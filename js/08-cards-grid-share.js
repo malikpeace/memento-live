@@ -6568,34 +6568,16 @@ function renderWidget(key) {
 // artifact first, information below. The original card inside Clarity is
 // untouched; this is a separate, smaller rendering of the same asset.
 // Additive: shown on mobile by CSS, desktop opts in via ?daycard=1.
-// Keep the ambient beams from drawing a straight edge behind the card: the
-// rays layer is masked with a radial hole centred on the card. Recomputed
-// whenever the card is rendered or the window changes; costs one style write.
+// v1177: the v1175 ray mask is RETIRED. It cut a dark hole in the beams
+// around the card, which was itself a dark region (worse than the beams it
+// tried to hide). This now only CLEARS any mask a stale build left behind.
 function _mfShieldRays() {
-  const rays = document.querySelector('.ambient .ambient__rays');
-  const card = document.getElementById('dayCard');
-  if (!rays || !card) return;
-  const face = card.querySelector('.daycard-ns') || card.querySelector('.daycard-wrap') || card;
-  const r = face.getBoundingClientRect();
-  if (!r.width || !r.height) return;
-  const host = rays.getBoundingClientRect();
-  const cx = Math.round(r.left + r.width / 2 - host.left);
-  const cy = Math.round(r.top + r.height / 2 - host.top);
-  // the hole is only as big as it needs to be: past the card's own glow, then
-  // a short ramp back to full strength. The beams keep the rest of the page,
-  // which is the point of them.
-  const span = Math.max(r.width, r.height);
-  const inner = Math.round(span * 0.55);
-  const outer = inner + 150;
-  const mask = 'radial-gradient(circle at ' + cx + 'px ' + cy + 'px, transparent 0, transparent ' +
-    inner + 'px, #000 ' + outer + 'px)';
-  rays.style.webkitMaskImage = mask;
-  rays.style.maskImage = mask;
+  try {
+    const rays = document.querySelector('.ambient .ambient__rays');
+    if (rays) { rays.style.webkitMaskImage = ''; rays.style.maskImage = ''; }
+  } catch (e) {}
 }
-try {
-  window.addEventListener('resize', () => { try { _mfShieldRays(); } catch (e) {} });
-  window.addEventListener('orientationchange', () => { setTimeout(() => { try { _mfShieldRays(); } catch (e) {} }, 220); });
-} catch (e) {}
+try { _mfShieldRays(); } catch (e) {}
 
 function renderDayCard() {
   try {
@@ -6705,14 +6687,6 @@ function renderDayCard() {
         '<span class="daycard-wrap__aura" aria-hidden="true"></span>' +
         inner +
       '</div>';
-
-    // v1175: the beams are straight shafts, and the gap between two of them
-    // is a straight-edged DARK wedge. When one passes behind the card it
-    // reads as a black shape behind the Memento, and because the card moves
-    // and the beams do not, it is loudest exactly while the card moves.
-    // The rays now carry a soft round hole centred on the card: the beams
-    // keep their run across the page and simply have no edge left near it.
-    try { _mfShieldRays(); } catch (e) {}
 
     // v1170: an entrance that never finishes must not leave the card blurred.
     // A backgrounded tab freezes the timeline (fill:both holds the FIRST
