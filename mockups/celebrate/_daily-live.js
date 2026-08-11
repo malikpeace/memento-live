@@ -90,32 +90,35 @@
   /* 4. GROWTH RINGS, the disk keeps widening as the years stack, so every fine
      inner layer stays visible. Organic wobble, green outermost. */
   R['a-rings'] = function (dst, x) {
-    var N = Math.min(x.total, 220), rings = '';
-    var outer = Math.min(150, 44 + Math.sqrt(x.total) * 8), step = outer / (N + 0.5);
+    var N = Math.min(x.total, 240), rings = '';
+    // the disk keeps widening and, by the hundreds, bleeds past the top edge
+    var outer = Math.min(210, 46 + Math.sqrt(x.total) * 10), step = outer / (N + 0.5);
     var rnd = seeded(7);
-    function ringPath(r, jitter) {
-      var pts = [], SEG = 30, dd;
+    // organic wobble from a couple of sine harmonics: it is periodic, so the
+    // ring closes PERFECTLY at 2pi (no seam), and each ring gets its own phase
+    // so the closing points never line up into a radial line.
+    function ringPath(r) {
+      var SEG = 44, dd = '';
+      var a1 = 0.028 + rnd() * 0.03, f1 = 2 + (rnd() * 2 | 0), p1 = rnd() * 6.2832;
+      var a2 = 0.018 + rnd() * 0.022, f2 = 4 + (rnd() * 3 | 0), p2 = rnd() * 6.2832;
       for (var k = 0; k <= SEG; k++) {
-        var a = k / SEG * Math.PI * 2;
-        var rr = r * (1 + (rnd() - 0.5) * jitter);
-        pts.push([(rr * Math.cos(a)).toFixed(1), (rr * Math.sin(a)).toFixed(1)]);
+        var a = k / SEG * 6.2832;
+        var rr = r * (1 + a1 * Math.sin(a * f1 + p1) + a2 * Math.sin(a * f2 + p2));
+        dd += (k ? 'L' : 'M') + (rr * Math.cos(a)).toFixed(1) + ' ' + (rr * Math.sin(a)).toFixed(1);
       }
-      dd = 'M' + pts[0][0] + ' ' + pts[0][1];
-      for (var k2 = 1; k2 < pts.length; k2++) dd += 'L' + pts[k2][0] + ' ' + pts[k2][1];
       return dd + 'Z';
     }
     for (var i = 1; i <= N; i++) {
       var r = i * step, last = i === N;
-      var jit = 0.045 + (N - i) / N * 0.05;
       var alpha = 0.10 + (i / N) * 0.18;
-      rings += '<path d="' + ringPath(r, jit) + '" fill="none" stroke="' +
+      rings += '<path d="' + ringPath(r) + '" fill="none" stroke="' +
         (last ? 'var(--day)' : 'rgba(235,238,248,' + alpha.toFixed(2) + ')') +
         '" stroke-width="' + (last ? 1.8 : 1) + '" stroke-linejoin="round"></path>';
     }
-    var vb = outer + 8;
+    var vb = outer + 8, render = Math.min(430, vb * 2);
     var more = x.total > N ? '<div class="dl-more">plus ' + (x.total - N) + ' more</div>' : '';
     dst.innerHTML =
-      '<svg class="dl-rings" viewBox="' + (-vb) + ' ' + (-vb) + ' ' + (vb * 2) + ' ' + (vb * 2) + '" width="300" height="300" aria-hidden="true">' +
+      '<svg class="dl-rings" viewBox="' + (-vb) + ' ' + (-vb) + ' ' + (vb * 2) + ' ' + (vb * 2) + '" width="' + render + '" height="' + render + '" aria-hidden="true">' +
       '<circle cx="0" cy="0" r="1.3" fill="rgba(235,238,248,.5)"></circle>' + rings + '</svg>' +
       heroBlock(x.total, x.cad) + more;
   };
@@ -124,8 +127,8 @@
      behind the number toward a whole year. No gaps drawn, each cell is earned. */
   R['t-month'] = function (dst, x) {
     var C = Math.min(x.total, 371);
-    var cols = Math.max(7, Math.min(21, Math.round(Math.sqrt(C * 1.7))));
-    var cellGap = C > 180 ? 3 : C > 90 ? 4 : 6;
+    var cols = Math.max(7, Math.min(19, Math.round(Math.sqrt(C * 1.5))));
+    var cellGap = C > 180 ? 4 : C > 90 ? 5 : 7;
     var cells = '';
     for (var i = 0; i < C; i++) cells += '<b class="' + (i === C - 1 ? 'dlc-t' : 'dlc-f') + '"></b>';
     // the calendar is the focal point, the number is the accent, said once,
