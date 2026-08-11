@@ -3871,6 +3871,8 @@ const SHEET_TEMPLATES = {
        of the Memento they chose. While it runs, the rest of Memento is
        behind the block on purpose: the only doors are pause and end. */
     _intervalId: null,
+    _ringId: null,
+    _ringStop: null,
     _elapsed: 0,
     _running: false,
     _paused: false,
@@ -3878,6 +3880,8 @@ const SHEET_TEMPLATES = {
     _targetSec: 25 * 60,
     _commit() {
       if (this._intervalId) { clearInterval(this._intervalId); this._intervalId = null; }
+      if (this._ringId) { clearInterval(this._ringId); this._ringId = null; }
+      if (this._ringStop) { clearTimeout(this._ringStop); this._ringStop = null; }
       try { const o = document.getElementById('dwFocusOverlay'); if (o) o.remove(); } catch (e) {}
       const wasRunning = this._running;
       const mins = Math.round(this._elapsed / 60);
@@ -4057,16 +4061,37 @@ const SHEET_TEMPLATES = {
         self._elapsed++;
         paintClock();
         if (self._targetSec > 0 && self._elapsed >= self._targetSec) {
-          // the block ran its full length: the screen is fully inverted, it
-          // rings, and it holds there for a beat before logging
+          // the block ran its full length: the screen is fully inverted and it
+          // RINGS, the way an alarm rings, until it is answered. It never logs
+          // itself out from under them; ending the block is their tap.
           if (self._intervalId) { clearInterval(self._intervalId); self._intervalId = null; }
-          try { if (typeof MementoSound !== 'undefined') MementoSound.play('arrival'); } catch (e) {}
-          try { feel('complete'); } catch (e) {}
           if (overlay) overlay.classList.add('is-done');
-          setTimeout(end, 2600);
+          const ring = () => {
+            try { if (typeof MementoSound !== 'undefined') MementoSound.play('arrival'); } catch (e) {}
+            try { feel('complete'); } catch (e) {}
+          };
+          ring();
+          self._ringId = setInterval(ring, 3600);
+          // a bounded alarm: a phone left face-down does not ring for an hour
+          self._ringStop = setTimeout(stopRing, 3 * 60 * 1000);
+          if (overlay) {
+            const p = overlay.querySelector('#dwPause');
+            if (p) { p.textContent = 'Silence'; p.onclick = stopRing; }
+            const e2 = overlay.querySelector('#dwEnd');
+            if (e2) e2.textContent = 'Done';
+          }
+        }
+      };
+      const stopRing = () => {
+        if (self._ringId) { clearInterval(self._ringId); self._ringId = null; }
+        if (self._ringStop) { clearTimeout(self._ringStop); self._ringStop = null; }
+        if (overlay) {
+          const p = overlay.querySelector('#dwPause');
+          if (p) { p.textContent = 'Silenced'; p.disabled = true; }
         }
       };
       const closeOverlay = () => {
+        stopRing();
         if (self._intervalId) { clearInterval(self._intervalId); self._intervalId = null; }
         if (overlay) { try { overlay.remove(); } catch (e) {} overlay = null; clockEl = null; }
         try { document.body.classList.remove('dw-blocking'); } catch (e) {}

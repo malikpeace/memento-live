@@ -25,6 +25,9 @@
     font:inherit;font-size:14.5px;font-weight:680;padding:12px 20px 12px 16px;border-radius:999px;
     background:rgba(255,255,255,.10);color:var(--hi);box-shadow:var(--inset)}
   .al__play svg{width:17px;height:17px}
+  .al__play .al__icon-stop{display:none}
+  .al__play.is-on .al__icon-play{display:none}
+  .al__play.is-on .al__icon-stop{display:inline-block}
   .al__play.is-on{background:var(--cons);color:#06210a}
   .al__meta{margin:17px 0 0;display:grid;grid-template-columns:auto 1fr;gap:5px 12px;
     font-size:12.5px;line-height:1.5;padding-bottom:16px}
@@ -38,9 +41,11 @@
     No shrill tops, no repeating buzz, nothing that sounds like a phone alarm.</p>
   <p class="lede">Every one is synthesised live on this page, exactly the way the app
     makes its own sounds, so what you hear is what would ship.</p>
-  <div class="note">Best judged on the phone speaker with the room quiet, and again
-    with music playing. The question is not which is prettiest, it is which one you
-    would still want to hear on the four hundredth time.</div>
+  <div class="note">These <b>repeat</b>, the way an alarm does: it rings, waits, and
+    rings again until it is answered. Tap once to start, tap again to stop. Judge them
+    on the third and fourth ring, not the first, and listen with music playing too.
+    The question is not which is prettiest, it is which one you would still want to
+    hear on the four hundredth time.</div>
   
     <figure class="al" id="al-bowl">
       <span class="al__no">1</span>
@@ -48,9 +53,10 @@
         <h2>The Bowl</h2>
         <p class="al__what">One struck singing bowl, left to ring out on its own.</p>
       </figcaption>
-      <button class="al__play" type="button" data-alarm="bowl">
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>
-        <span>Hear it</span>
+      <button class="al__play" type="button" data-alarm="bowl" data-gap="4.6">
+        <svg class="al__icon-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>
+        <svg class="al__icon-stop" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="1.5"/></svg>
+        <span class="al__label">Hear it</span>
       </button>
       <dl class="al__meta">
         <dt>Why it</dt><dd>The calmest of the five. It ends the block the way a meditation ends: nothing asks anything of you.</dd>
@@ -63,9 +69,10 @@
         <h2>Arrival</h2>
         <p class="al__what">The app&rsquo;s own arrival chord, the one the record already uses.</p>
       </figcaption>
-      <button class="al__play" type="button" data-alarm="arrival">
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>
-        <span>Hear it</span>
+      <button class="al__play" type="button" data-alarm="arrival" data-gap="3.6">
+        <svg class="al__icon-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>
+        <svg class="al__icon-stop" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="1.5"/></svg>
+        <span class="al__label">Hear it</span>
       </button>
       <dl class="al__meta">
         <dt>Why it</dt><dd>It already means "a thing was completed" everywhere else in Memento, so it costs the user nothing to learn.</dd>
@@ -78,9 +85,10 @@
         <h2>Sunrise</h2>
         <p class="al__what">Three tones climbing, each one opening brighter than the last.</p>
       </figcaption>
-      <button class="al__play" type="button" data-alarm="sunrise">
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>
-        <span>Hear it</span>
+      <button class="al__play" type="button" data-alarm="sunrise" data-gap="3.4">
+        <svg class="al__icon-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>
+        <svg class="al__icon-stop" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="1.5"/></svg>
+        <span class="al__label">Hear it</span>
       </button>
       <dl class="al__meta">
         <dt>Why it</dt><dd>It reads as a reward. The rise makes finishing feel like arriving somewhere.</dd>
@@ -93,9 +101,10 @@
         <h2>Two Strikes</h2>
         <p class="al__what">A low wooden strike, then its fifth, close behind.</p>
       </figcaption>
-      <button class="al__play" type="button" data-alarm="strike">
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>
-        <span>Hear it</span>
+      <button class="al__play" type="button" data-alarm="strike" data-gap="2.2">
+        <svg class="al__icon-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>
+        <svg class="al__icon-stop" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="1.5"/></svg>
+        <span class="al__label">Hear it</span>
       </button>
       <dl class="al__meta">
         <dt>Why it</dt><dd>Physical and human, like something being set down. Cuts through noise without being loud.</dd>
@@ -108,9 +117,10 @@
         <h2>Glass</h2>
         <p class="al__what">A single high bell with a long tail and no attack.</p>
       </figcaption>
-      <button class="al__play" type="button" data-alarm="glass">
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>
-        <span>Hear it</span>
+      <button class="al__play" type="button" data-alarm="glass" data-gap="3.2">
+        <svg class="al__icon-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>
+        <svg class="al__icon-stop" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="1.5"/></svg>
+        <span class="al__label">Hear it</span>
       </button>
       <dl class="al__meta">
         <dt>Why it</dt><dd>The most premium and the least sleepy: it lands clean and gets out.</dd>
@@ -239,13 +249,32 @@ var ALARMS = {
   }
 };
 
+/* It is an ALARM: it rings, waits, and rings again until it is answered.
+   Judge them on the REPEAT, not the single hit. One plays at a time. */
+var RINGING = null;   // { key, timer, btn }
+function stopRinging(){
+  if (!RINGING) return;
+  clearInterval(RINGING.timer);
+  RINGING.btn.classList.remove('is-on');
+  RINGING.btn.querySelector('.al__label').textContent = 'Hear it';
+  RINGING = null;
+}
 document.querySelectorAll('[data-alarm]').forEach(function(btn){
   btn.addEventListener('click', function(){
+    var key = btn.dataset.alarm;
+    var wasThis = RINGING && RINGING.key === key;
+    stopRinging();
+    if (wasThis) return;              // tapping the ringing one stops it
     var c = ac(); if (!c) return;
-    var master = c.createGain(); master.gain.value = 0.9; master.connect(c.destination);
-    try { ALARMS[btn.dataset.alarm](c, master); } catch(e) { console.error(e); }
+    var gapMs = parseFloat(btn.dataset.gap) * 1000;
+    var ring = function(){
+      var master = c.createGain(); master.gain.value = 0.9; master.connect(c.destination);
+      try { ALARMS[key](c, master); } catch(e) { console.error(e); }
+    };
+    ring();
+    RINGING = { key: key, btn: btn, timer: setInterval(ring, gapMs) };
     btn.classList.add('is-on');
-    setTimeout(function(){ btn.classList.remove('is-on'); }, 900);
+    btn.querySelector('.al__label').textContent = 'Ringing, tap to stop';
   });
 });
 </script>
