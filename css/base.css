@@ -1307,3 +1307,26 @@ body:has(#panelProfile.is-shown) .ambient__rays { opacity: 0 !important; }
 .you-swatches .pref-swatch--active .pref-swatch__dot {
   box-shadow: 0 0 0 2px rgba(var(--ink), 0.92) !important;
 }
+
+/* ============================================================================
+   v1176 THE DITHER. Malik keeps seeing a dark "box" edge behind the card on
+   desktop that no layer accounts for: every rect is full-bleed, every gradient
+   stop is smooth, and the beams are already masked away from the card. What
+   is left is BANDING. A huge, very low alpha gradient (the ns-bloom runs 0.38
+   to 0 across 1300px) cannot be represented in 8 bits per channel, so the
+   renderer steps it, and a step on a near-black field reads as a straight
+   edge. The cure is dither: a single tile of fine noise over the ambient, far
+   too faint to see on its own, which breaks the steps into grain.
+   It sits UNDER everything interactive and is pointer-transparent. */
+.ambient::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0.028;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+@media (prefers-reduced-motion: reduce) { .ambient::after { opacity: 0.022; } }
