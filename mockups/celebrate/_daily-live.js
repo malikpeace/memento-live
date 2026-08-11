@@ -54,7 +54,7 @@
   /* 2. YESTERDAY BEHIND YOU, a whole tower of your past numbers climbing up the
      screen and beyond, shrinking as they recede. Day 45 = look back on ~45. */
   R['n-ghost'] = function (dst, x) {
-    var M = Math.min(x.total, 90), col = '';
+    var M = Math.min(x.total, 40), col = '';
     for (var k = M - 1; k >= 1; k--) {
       var v = x.total - k;
       var size = Math.max(3.4, 40 * Math.pow(0.9, k));   // shrink faster so 30-40 fit up the tower
@@ -62,7 +62,7 @@
       col += '<div class="dlg-past" style="font-size:' + size.toFixed(1) + 'px;color:rgba(235,238,248,' + op.toFixed(3) + ')">' + v + '</div>';
     }
     dst.innerHTML =
-      '<div class="dlg-tower">' + col +
+      '<div class="dlg-tower"><div class="dlg-stack">' + col + '</div>' +
       '<div class="dlg-now"><span>' + x.total + '</span><i></i></div>' +
       '<div class="dl-u" style="margin-top:10px">' + unitWord(x.total, x.cad) + '</div></div>';
   };
@@ -134,8 +134,8 @@
     // the calendar is the focal point, the number is the accent, said once,
     // sitting a little low and to the right, no backing plate.
     dst.innerHTML =
-      '<div class="dl-cal" style="grid-template-columns:repeat(' + cols + ',1fr);gap:' + cellGap + 'px">' + cells + '</div>' +
-      '<div class="dl-calnum"><b>' + x.total + '</b><i>' + unitWord(x.total, x.cad) + '</i></div>';
+      '<div class="dl-cal" style="grid-template-columns:repeat(' + cols + ',1fr);gap:' + cellGap + 'px">' + cells +
+      '<div class="dl-calnum"><b>' + x.total + '</b><i>' + unitWord(x.total, x.cad) + '</i></div></div>';
   };
 
   /* 6. THE STAMP, a logbook. Today pressed in, the recent record beneath. */

@@ -213,6 +213,19 @@ LIVE_CSS = """
 /* odometer: faint white ghosts for the padding zeros */
 .ph.live .dlo-r--dim span{color:rgba(255,255,255,.12)}
 .ph.live .dls-rule{background:rgba(255,255,255,.5)}
+/* odometer: each digit sits in a recessed slot so the drum has depth on the flat field */
+.ph.live .dlo-w{background:rgba(3,42,20,.22);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07),inset 0 13px 20px -13px rgba(0,0,0,.42),inset 0 -13px 20px -13px rgba(0,0,0,.42)}
+/* rolling window: the count lives INSIDE the grid, bottom-right, so it always sits ON the tiles */
+.ph.live .dl-cal{position:relative}
+.ph.live .dl-calnum{right:8px;bottom:10px;top:auto}
+/* yesterday behind you: the current number holds the CENTRE, past numbers climb above it */
+.ph.live .dlg-tower{position:relative;justify-content:center}
+.ph.live .dlg-stack{position:absolute;left:0;right:0;bottom:calc(50% + 40px);
+  display:flex;flex-direction:column;align-items:center;gap:2px}
+/* the field slowly turns (higher specificity so it wins over the entrance) */
+.ph.live .dst .dl-field{animation:dlSpin 34s linear infinite;transform-origin:50% 50%}
+@keyframes dlSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
 
 /* ===== motion: plays on load + tap, NEVER mid-drag. clean, no blur. ===== */
 .ph.play .dst > *{animation:dlIn .5s cubic-bezier(.2,.85,.3,1) both}
@@ -286,7 +299,7 @@ def build():
   <div class="livegrid">%s</div>
 </div>
 <script>%s</script>
-<script src="_daily-live.js?v=live7"></script>
+<script src="_daily-live.js?v=live9"></script>
 </body></html>""" % (len(sections), SHELL_CSS, '\n'.join(styles), len(sections), len(sections),
                      ''.join(toc), ''.join(sections), DRIVER)
 
