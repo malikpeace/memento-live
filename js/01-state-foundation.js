@@ -7,7 +7,7 @@
    ONCE on mismatch. Kills the "phone silently runs old cached js under a new
    index" class (the SW's offline fallback can serve stale files on a bad
    connection; Malik hit this three times in one day). */
-window.MEMENTO_JS_BUILD = 'v1170';
+window.MEMENTO_JS_BUILD = 'v1171';
 /* ============================================
    STATE MANAGEMENT
    ============================================ */
@@ -2560,6 +2560,11 @@ const Sheet = {
   },
 
   open(widgetKey) {
+    // v1171 (Malik: "there are 2 x's in the top right"): the global
+    // full-screen close belongs to the EXPERIENCES (Clarity, Action). A sheet
+    // brings its own, so any leftover from a module has to go before this one
+    // opens, or the corner carries two doors that do different things.
+    try { if (typeof FullscreenClose !== 'undefined') FullscreenClose.hide(); } catch (e) {}
     // Paywall gate: Clarity is the free first win; the rest is paid. If this
     // module is locked, rise the paywall moment instead of opening it.
     try {

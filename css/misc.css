@@ -765,13 +765,64 @@ html.theme-light body.lite .tab-bar, html.theme-light.lowfx .tab-bar {
 /* ============================================================================
    v1168 DEEP WORK (Malik: "very very minimal", "less AI slop"). Two states.
    SET is a page with three things on it. RUN is a room with a clock in it. */
+/* v1171: the page is simple, so it sits in the MIDDLE of the screen, and the
+   room is plain black (plain white in light) until the block starts. The
+   Memento's colour belongs to the block, not to the setting of it. */
+.exp-shell--dw {
+  min-height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0;
+}
+#sheetBody:has(.exp-shell--dw), .sheet:has(.exp-shell--dw) .sheet__body { height: 100%; }
+.sheet:has(.exp-shell--dw), .sheet--exp:has(.exp-shell--dw),
+.sheet:has(.exp-shell--dw) .sheet__exp-bg {
+  background: #000 !important;
+}
+/* the sheet paints three coloured orbs behind every experience; this one is
+   meant to be an empty room until the block starts, so they are off here */
+.sheet:has(.exp-shell--dw) .sheet__exp-orb { display: none !important; }
+/* Light mode: the experience sheet pins a DARK palette for its cinema
+   surfaces (--ink 255,255,255). This one is meant to be a plain white room,
+   so the ink is flipped back with it, or the whole page prints white on
+   white. Both halves of the swap live here, together, on purpose. */
+html.theme-light .sheet:has(.exp-shell--dw),
+html.theme-light .sheet--exp:has(.exp-shell--dw),
+html.theme-light .sheet:has(.exp-shell--dw) .sheet__exp-bg {
+  background: #fff !important;
+}
+html.theme-light .sheet:has(.exp-shell--dw) {
+  --ink: 18, 20, 26;
+  --text-hi: rgba(18, 20, 26, 0.96);
+  --text-mid: rgba(18, 20, 26, 0.68);
+  --text-lo: rgba(18, 20, 26, 0.45);
+  --kfill-06: rgba(18, 20, 26, 0.06);
+  --solid-bg: #12141a;
+  --solid-fg: #ffffff;
+}
 .dw { display: flex; flex-direction: column; align-items: center; text-align: center;
-  padding: 26px 4px 8px; }
+  width: 100%; padding: 8px 4px; }
 .dw__for {
   margin: 0 0 34px; max-width: 30ch; font-size: 1.25rem; font-weight: 700;
   line-height: 1.3; letter-spacing: -0.02em; color: var(--text-hi);
 }
-.dw__dial { display: flex; align-items: center; gap: 22px; }
+/* the clock: hours, minutes, seconds, each one steppable */
+.dw__clock {
+  display: flex; align-items: baseline; gap: 4px;
+  font-size: clamp(2.6rem, 13vw, 3.6rem); font-weight: 700;
+  letter-spacing: -0.04em; font-variant-numeric: tabular-nums;
+  color: var(--text-hi);
+}
+.dw__part {
+  border: 0; background: none; cursor: pointer; font: inherit; color: inherit;
+  padding: 2px 6px; border-radius: 10px; opacity: 0.34;
+  transition: opacity .16s ease, background .16s ease;
+}
+.dw__part.is-on { opacity: 1; background: var(--kfill-06); }
+.dw__sep { opacity: 0.22; }
+.dw__unit {
+  min-width: 7ch; font-size: 0.86rem; font-weight: 600; color: var(--text-lo);
+}
+.dw__dial { display: flex; align-items: center; gap: 18px; margin-top: 18px; }
 .dw__step {
   display: grid; place-items: center; width: 46px; height: 46px; border: 0;
   border-radius: 50%; cursor: pointer; color: var(--text-hi);
@@ -784,8 +835,20 @@ html.theme-light body.lite .tab-bar, html.theme-light.lowfx .tab-bar {
   min-width: 6.2ch; font-size: 2.4rem; font-weight: 700; letter-spacing: -0.035em;
   color: var(--text-hi); font-variant-numeric: tabular-nums;
 }
+/* the shortcuts, for when somebody already knows the number they want */
+.dw__presets {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;
+  margin-top: 26px; max-width: 320px;
+}
+.dw__preset {
+  border: 0; cursor: pointer; font: inherit; font-size: 0.84rem; font-weight: 650;
+  padding: 9px 15px; border-radius: 999px; color: var(--text-mid);
+  background: var(--kfill-06); box-shadow: inset 0 1px 0 rgba(var(--ink), 0.06);
+  transition: background .16s ease, color .16s ease;
+}
+.dw__preset.is-on { background: var(--solid-bg); color: var(--solid-fg); }
 .dw__begin {
-  margin-top: 34px; width: 100%; max-width: 260px; padding: 15px;
+  margin-top: 30px; width: 100%; max-width: 260px; padding: 15px;
   border: 0; border-radius: calc(12px * var(--rx, 1)); cursor: pointer;
   font: inherit; font-size: 1rem; font-weight: 700;
   background: var(--solid-bg); color: var(--solid-fg);

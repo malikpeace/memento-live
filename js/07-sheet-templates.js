@@ -3908,34 +3908,53 @@ const SHEET_TEMPLATES = {
       const h = Math.floor(min / 60), m = min % 60;
       return m ? h + 'h ' + m + 'm' : h + (h === 1 ? ' hour' : ' hours');
     },
+    // the clock face: h : mm : ss, each part its own target
+    _parts(sec) {
+      return {
+        h: Math.floor(sec / 3600),
+        m: Math.floor((sec % 3600) / 60),
+        s: sec % 60
+      };
+    },
     render() {
       const sessions = state.deepwork.sessions || [];
       const oneThing = (state.action && state.action.primaryAction && state.action.primaryAction.title) || '';
-      const min = Math.round((this._targetSec || 1500) / 60);
       const totalH = sessions.reduce((a, s) => a + (s.minutes || 0), 0) / 60;
+      const p = this._parts(this._targetSec || 1500);
+      const pad = (n) => String(n).padStart(2, '0');
+      const PRESETS = [['5m', 300], ['15m', 900], ['30m', 1800], ['1h', 3600],
+                       ['2h', 7200], ['3h', 10800], ['4h', 14400], ['5h', 18000]];
       let html = '<div class="dw">';
-      // the one thing, at the top, in their own words
-      if (oneThing) {
-        html += '<p class="dw__for">' + esc(oneThing) + '</p>';
-      }
-      // the dial: 15 minutes to 5 hours, a quarter hour at a time
+      if (oneThing) html += '<p class="dw__for">' + esc(oneThing) + '</p>';
+      // the timer: any length from one second to ten hours. Tap a part, then
+      // step it; the presets below are the shortcuts, not the only options.
+      html += '<div class="dw__clock" id="dwClock" role="group" aria-label="Session length">' +
+          '<button class="dw__part is-on" data-part="h" type="button" aria-label="Hours">' + p.h + '</button>' +
+          '<span class="dw__sep">:</span>' +
+          '<button class="dw__part" data-part="m" type="button" aria-label="Minutes">' + pad(p.m) + '</button>' +
+          '<span class="dw__sep">:</span>' +
+          '<button class="dw__part" data-part="s" type="button" aria-label="Seconds">' + pad(p.s) + '</button>' +
+        '</div>';
       html += '<div class="dw__dial">' +
-        '<button class="dw__step" id="dwMinus" type="button" aria-label="Less time">' +
+        '<button class="dw__step" id="dwMinus" type="button" aria-label="Less">' +
           '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 12h12"/></svg>' +
         '</button>' +
-        '<div class="dw__amount"><span id="dwTargetText">' + esc(this._fmtTarget(min)) + '</span></div>' +
-        '<button class="dw__step" id="dwPlus" type="button" aria-label="More time">' +
+        '<span class="dw__unit" id="dwUnit">hours</span>' +
+        '<button class="dw__step" id="dwPlus" type="button" aria-label="More">' +
           '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 6v12M6 12h12"/></svg>' +
         '</button>' +
       '</div>';
+      html += '<div class="dw__presets" id="dwPresets">' +
+        PRESETS.map(([label, sec]) =>
+          '<button class="dw__preset' + (sec === this._targetSec ? ' is-on' : '') + '" type="button" data-sec="' + sec + '">' + label + '</button>').join('') +
+      '</div>';
       html += '<button class="dw__begin" id="dwStart" type="button">Begin</button>';
-      // one quiet line of record, and only once there is one
       if (sessions.length) {
         html += '<p class="dw__record">' + sessions.length + ' session' + (sessions.length === 1 ? '' : 's') +
           ', ' + (totalH >= 10 ? Math.round(totalH) : totalH.toFixed(1)) + ' hours deep.</p>';
       }
       html += '</div>';
-      return '<div class="exp-shell exp-shell--top">' + html + '</div>';
+      return '<div class="exp-shell exp-shell--dw">' + html + '</div>';
     },
     bind(container) {
       const self = this;
@@ -3945,26 +3964,58 @@ const SHEET_TEMPLATES = {
       self._elapsed = 0;
       if (!self._targetSec) self._targetSec = 25 * 60;
 
-      const targetText = container.querySelector('#dwTargetText');
       const oneThing = (state.action && state.action.primaryAction && state.action.primaryAction.title) || '';
-      const MIN = 15, MAX = 300, STEP = 15;
+      // one second to ten hours, and any shape in between
+      const MIN_SEC = 1, MAX_SEC = 10 * 3600;
+      const STEP = { h: 3600, m: 60, s: 1 };
+      const UNIT = { h: 'hours', m: 'minutes', s: 'seconds' };
+      let part = 'm';
+      const clockEls = {
+        h: container.querySelector('[data-part="h"]'),
+        m: container.querySelector('[data-part="m"]'),
+        s: container.querySelector('[data-part="s"]')
+      };
+      const unitEl = container.querySelector('#dwUnit');
+      const pad = (n) => String(n).padStart(2, '0');
       const paintTarget = () => {
-        const m = Math.round(self._targetSec / 60);
-        if (targetText) targetText.textContent = self._fmtTarget(m);
+        const p = self._parts(self._targetSec);
+        if (clockEls.h) clockEls.h.textContent = String(p.h);
+        if (clockEls.m) clockEls.m.textContent = pad(p.m);
+        if (clockEls.s) clockEls.s.textContent = pad(p.s);
+        Object.keys(clockEls).forEach(k => { if (clockEls[k]) clockEls[k].classList.toggle('is-on', k === part); });
+        if (unitEl) unitEl.textContent = UNIT[part];
         const minus = container.querySelector('#dwMinus'), plus = container.querySelector('#dwPlus');
-        if (minus) minus.disabled = m <= MIN;
-        if (plus) plus.disabled = m >= MAX;
+        if (minus) minus.disabled = self._targetSec - STEP[part] < MIN_SEC;
+        if (plus) plus.disabled = self._targetSec + STEP[part] > MAX_SEC;
+        container.querySelectorAll('.dw__preset').forEach(b =>
+          b.classList.toggle('is-on', parseInt(b.dataset.sec, 10) === self._targetSec));
       };
       const nudge = (dir) => {
-        const m = Math.min(MAX, Math.max(MIN, Math.round(self._targetSec / 60) + dir * STEP));
-        self._targetSec = m * 60;
+        self._targetSec = Math.min(MAX_SEC, Math.max(MIN_SEC, self._targetSec + dir * STEP[part]));
         paintTarget();
         try { feel('tick'); } catch (e) {}
       };
+      const clockWrap = container.querySelector('#dwClock');
+      if (clockWrap) clockWrap.addEventListener('click', (e) => {
+        const b = e.target.closest('.dw__part');
+        if (!b) return;
+        part = b.getAttribute('data-part');
+        paintTarget();
+      });
       const minusBtn = container.querySelector('#dwMinus');
       const plusBtn = container.querySelector('#dwPlus');
       if (minusBtn) minusBtn.addEventListener('click', () => nudge(-1));
       if (plusBtn) plusBtn.addEventListener('click', () => nudge(1));
+      const presets = container.querySelector('#dwPresets');
+      if (presets) presets.addEventListener('click', (e) => {
+        const b = e.target.closest('.dw__preset');
+        if (!b) return;
+        self._targetSec = parseInt(b.dataset.sec, 10) || 1500;
+        // jump the stepper to the part the preset actually speaks in
+        part = self._targetSec >= 3600 ? 'h' : 'm';
+        paintTarget();
+        try { feel('tick'); } catch (e) {}
+      });
       paintTarget();
 
       const fmt = (sec) => {
