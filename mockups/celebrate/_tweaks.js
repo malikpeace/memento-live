@@ -21,6 +21,26 @@
     return new Date(Date.now() + days * 86400000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   }
   function esc(s) { var d = document.createElement('i'); d.textContent = s; return d.innerHTML; }
+  /* "1 paying users" is a typo (Malik). Singularize the unit's head noun
+     when n === 1: the last word normally, the first word for "X of Y"
+     phrases (hours of screentime). users->user, dollars->dollar,
+     glasses->glass, entries->entry, lbs->lb. */
+  function singular(w) {
+    if (/ies$/.test(w)) return w.replace(/ies$/, 'y');
+    if (/(ses|xes|zes|ches|shes)$/.test(w)) return w.replace(/es$/, '');
+    if (/s$/.test(w) && !/ss$/.test(w)) return w.replace(/s$/, '');
+    return w;
+  }
+  function unitFor(n, unit) {
+    unit = String(unit || '').trim();
+    if (Math.abs(+n) === 1 && unit) {
+      var parts = unit.split(' ');
+      var i = unit.indexOf(' of ') > -1 ? 0 : parts.length - 1;
+      parts[i] = singular(parts[i]);
+      return parts.join(' ');
+    }
+    return unit;
+  }
   function seeded(seed) { return function () { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; }; }
 
   function Q(ph, sel) { return ph.querySelector(sel); }
@@ -55,7 +75,7 @@
         var passed = marks.filter(function (m) { return cur >= m; });
         var nowMark = passed.length ? passed[passed.length - 1] : null;
         cnt(ph, '.qu1-hero', cur);
-        put(ph, '.b1 .sub', esc(v.unit) + '.');
+        put(ph, '.b1 .sub', esc(unitFor(cur, v.unit)) + '.');
         var cells = '', labels = '';
         marks.forEach(function (m) {
           var isNow = m === nowMark, isPast = passed.indexOf(m) > -1 && !isNow;
@@ -73,7 +93,7 @@
         put(ph, '.qu1-cap', fmt(goal - cur) + ' still open.');
         put(ph, '.b3 .deposit', nowMark === null
           ? 'The first move is in. The first mark waits at <b>' + fmt(marks[0]) + '</b>.'
-          : 'On this day, you passed <b>' + fmt(nowMark) + ' of ' + fmt(goal) + '</b> ' + esc(v.unit) + '.');
+          : 'On this day, you passed <b>' + fmt(nowMark) + ' of ' + fmt(goal) + '</b> ' + esc(unitFor(goal, v.unit)) + '.');
       }
     },
 
@@ -129,13 +149,13 @@
       apply: function (ph, v) {
         var now = +v.now, best = +v.best;
         put(ph, '.qu5-hero', fmt(now));
-        put(ph, '.b1 .sub', esc(v.unit) + ' this week.');
+        put(ph, '.b1 .sub', esc(unitFor(now, v.unit)) + ' this week.');
         put(ph, '.qu5-board',
           '<div class="qu5-row is-new"><span class="qu5-when">this week</span><span class="qu5-v">' + fmt(now) + '</span></div>'
           + '<div class="qu5-row"><span class="qu5-when">' + dateBack(+v.stood * 7) + '</span><span class="qu5-v">' + fmt(best) + '</span></div>'
           + '<div class="qu5-row"><span class="qu5-when">' + dateBack(+v.stood * 7 + 42) + '</span><span class="qu5-v">' + fmt(Math.round(best * 0.96)) + '</span></div>');
         put(ph, '.qu5-cap', 'The one it beat stood ' + fmt(+v.stood) + ' ' + plural(+v.stood, 'week', 'weeks') + '.');
-        put(ph, '.b3 .deposit', 'On this day, you set a record. <b>' + fmt(now) + '</b> ' + esc(v.unit) + ' in a week.');
+        put(ph, '.b3 .deposit', 'On this day, you set a record. <b>' + fmt(now) + '</b> ' + esc(unitFor(now, v.unit)) + ' in a week.');
       }
     },
 
@@ -158,7 +178,7 @@
         var nowMark = passed.length ? passed[passed.length - 1] : null;
         var span = Math.abs(goal - start), frac = Math.abs(cur - start) / span;
         cnt(ph, '.b1 .n', cur, start);
-        put(ph, '.b1 .of', esc(v.unit));
+        put(ph, '.b1 .of', esc(unitFor(cur, v.unit)));
         var mid = '<div class="sl__track"></div><div class="sl__gone" style="width:' + (frac * 100).toFixed(1) + '%"></div>';
         marks.forEach(function (m) {
           if (m === goal || m === nowMark) return;
@@ -300,8 +320,8 @@
           rows += '<div class="fr2-wk">' + cells + '</div>';
         }
         put(ph, '.fr2-run', rows);
-        put(ph, '.b2 .fr2-sub', fmt(total) + ' ' + esc(v.word) + ' since ' + dateBack(w * 7) + '. Every week, ' + rate + ' or better.' + (w > shown ? ' (' + (w - shown) + ' earlier weeks off-screen, all counted.)' : ''));
-        put(ph, '.b3 .deposit', fmt(w) + ' ' + plural(w, 'week', 'weeks') + ' at rate, <b>' + fmt(total) + ' ' + esc(v.word) + '</b>.');
+        put(ph, '.b2 .fr2-sub', fmt(total) + ' ' + esc(unitFor(total, v.word)) + ' since ' + dateBack(w * 7) + '. Every week, ' + rate + ' or better.' + (w > shown ? ' (' + (w - shown) + ' earlier weeks off-screen, all counted.)' : ''));
+        put(ph, '.b3 .deposit', fmt(w) + ' ' + plural(w, 'week', 'weeks') + ' at rate, <b>' + fmt(total) + ' ' + esc(unitFor(total, v.word)) + '</b>.');
       }
     },
 
@@ -325,9 +345,9 @@
           rows += '<div class="fr3-row">' + row + '</div>';
         }
         put(ph, '.fr3-field', rows);
-        put(ph, '.fr3-sub', fmt(n) + ' ' + esc(v.word) + ' in <b>' + fmt(days) + ' days</b>.' + (n > 50 ? ' The last 50 drawn.' : ''));
+        put(ph, '.fr3-sub', fmt(n) + ' ' + esc(unitFor(n, v.word)) + ' in <b>' + fmt(days) + ' days</b>.' + (n > 50 ? ' The last 50 drawn.' : ''));
         put(ph, '.b2 .cap', 'Since ' + dateBack(days));
-        put(ph, '.b3 .deposit', 'On this day, your <b>' + fmt(n) + (n % 10 === 1 && n % 100 !== 11 ? 'st' : n % 10 === 2 && n % 100 !== 12 ? 'nd' : n % 10 === 3 && n % 100 !== 13 ? 'rd' : 'th') + ' ' + esc(v.word).replace(/s$/, '') + '</b>.');
+        put(ph, '.b3 .deposit', 'On this day, your <b>' + fmt(n) + (n % 10 === 1 && n % 100 !== 11 ? 'st' : n % 10 === 2 && n % 100 !== 12 ? 'nd' : n % 10 === 3 && n % 100 !== 13 ? 'rd' : 'th') + ' ' + esc(singular(v.word)) + '</b>.');
       }
     },
 
@@ -377,7 +397,7 @@
         cells += '<span class="fr5-end"></span>';
         put(ph, '.fr5-rail', cells);
         put(ph, '.fr5-legend', '<span>' + kept + ' ' + plural(kept, 'week', 'weeks') + ' kept</span><span>race day, ' + dateAhead(left * 7) + '</span>');
-        put(ph, '.b2 .fr5-sub', fmt(total) + ' ' + esc(v.word) + '. ' + (left ? left + ' ' + plural(left, 'week', 'weeks') + ' between here and the start line.' : 'Race week.'));
+        put(ph, '.b2 .fr5-sub', fmt(total) + ' ' + esc(unitFor(total, v.word)) + '. ' + (left ? left + ' ' + plural(left, 'week', 'weeks') + ' between here and the start line.' : 'Race week.'));
         put(ph, '.b3 .deposit', 'This week you kept the rate. <b>' + kept + ' ' + plural(kept, 'week', 'weeks') + ' at rate.</b>');
         put(ph, '.b3 .cap', 'Race day, ' + dateAhead(left * 7));
       }
@@ -465,7 +485,7 @@
       apply: function (ph, v) {
         put(ph, '.ms1-word', esc(v.event));
         cnt(ph, '.ms1-num', +v.n);
-        put(ph, '.b2 .sub', esc(v.word) + ' since ' + dateBack(+v.days) + '.');
+        put(ph, '.b2 .sub', esc(unitFor(+v.n, v.word)) + ' since ' + dateBack(+v.days) + '.');
         put(ph, '.ms1-cost', '6 final rounds.<br>' + fmt(+v.days) + ' days of looking.');
         put(ph, '.b3 .deposit', 'On this day, <b>' + esc(v.event.charAt(0).toLowerCase() + v.event.slice(1)) + '</b>');
       }
@@ -590,14 +610,14 @@
         var goal = Math.max(2, +v.goal), cur = Math.min(+v.cur, goal), prev = Math.min(+v.prev, cur);
         ctl.cur.max = goal; ctl.prev.max = goal;
         cnt(ph, '.b1 .n', cur, prev);
-        put(ph, '.b1 .sub', esc(v.unit));
+        put(ph, '.b1 .sub', esc(unitFor(cur, v.unit)));
         put(ph, '.gp__scale', '<span>0</span><span>' + fmt(goal) + '</span>');
         var f = Q(ph, '.gp__fill'); if (f) f.style.width = (cur / goal * 100).toFixed(1) + '%';
         var wm = Q(ph, '.gp__was'); if (wm) wm.style.left = (prev / goal * 100).toFixed(1) + '%';
         var nm = Q(ph, '.gp__now'); if (nm) nm.style.left = (cur / goal * 100).toFixed(1) + '%';
         put(ph, '.gp__row', '<span><b>' + fmt(cur) + '</b> closed</span><span><b>' + fmt(goal - cur) + '</b> to go</span>');
         put(ph, '.gp__cost', '<b>' + fmt(+v.daysLast) + ' days</b> closed the last ' + fmt(cur - prev) + '.');
-        put(ph, '.b3 .deposit', 'On this day, you passed <b>' + fmt(cur) + ' ' + esc(v.unit) + '</b>.');
+        put(ph, '.b3 .deposit', 'On this day, you passed <b>' + fmt(cur) + ' ' + esc(unitFor(cur, v.unit)) + '</b>.');
         put(ph, '.gp__open', fmt(goal - cur) + ' to go.');
       }
     },
@@ -614,7 +634,7 @@
         var s = +v.startLeft, left = Math.min(+v.left, s), d = +v.days;
         ctl.left.max = s;
         cnt(ph, '.fl__n', left, Math.min(s, left + 4));
-        put(ph, '.fl__sub', esc(v.unit) + ' to go');
+        put(ph, '.fl__sub', esc(unitFor(left, v.unit)) + ' to go');
         var steps = [s, Math.round(s - (s - left) / 3), Math.round(s - 2 * (s - left) / 3), left];
         var dsteps = [1, Math.round(d / 3), Math.round(2 * d / 3), d], rows = '';
         rows += '<div class="fl__hd"><span></span><span>' + esc(v.unit) + ' left</span></div>';
@@ -625,8 +645,8 @@
         put(ph, '.fl__cost', 'The last ' + fmt(steps[2] - left) + ' took <b>' + fmt(+v.daysLast) + ' days</b>.');
         var half = left <= s / 2;
         put(ph, '.b3 .deposit', half
-          ? 'On this day, you crossed halfway. <b>' + fmt(left) + ' ' + esc(v.unit) + ' left</b>.'
-          : 'On this day, <b>' + fmt(left) + ' ' + esc(v.unit) + ' left</b>.');
+          ? 'On this day, you crossed halfway. <b>' + fmt(left) + ' ' + esc(unitFor(left, v.unit)) + ' left</b>.'
+          : 'On this day, <b>' + fmt(left) + ' ' + esc(unitFor(left, v.unit)) + ' left</b>.');
       }
     },
 
@@ -641,7 +661,7 @@
         ctl.on.max = total;
         var on = Math.min(+v.on, total);
         cnt(ph, '.b1 .n', on);
-        put(ph, '.b1 .sub', esc(v.word));
+        put(ph, '.b1 .sub', esc(unitFor(on, v.word)));
         var rnd = seeded(on * 11 + weeks), idx = [];
         for (var i = 0; i < total; i++) idx.push(i);
         for (var i = total - 1; i > 0; i--) { var j = Math.floor(rnd() * (i + 1)), t2 = idx[i]; idx[i] = idx[j]; idx[j] = t2; }
@@ -653,7 +673,7 @@
         }
         put(ph, '.rc__grid', cells);
         var cost = Q(ph, '.rc__cost'); if (cost) cost.innerHTML = '<b>' + fmt(on) + '</b> of the last ' + fmt(total) + ' days.';
-        put(ph, '.b3 .deposit', 'On this day, ' + esc(v.word) + ' number <b>' + fmt(on) + '</b>. The grid remembers every one.');
+        put(ph, '.b3 .deposit', 'On this day, ' + esc(singular(v.word)) + ' number <b>' + fmt(on) + '</b>. The grid remembers every one.');
       }
     }
   };

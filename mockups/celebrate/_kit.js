@@ -1,11 +1,8 @@
-/* Beat driver. Fragments never write sequencing. Beats auto-advance AND
-   advance on tap; the last beat SITS until the user dismisses it (Malik:
-   never auto-dismiss, and no hold gesture anywhere). */
+/* Beat driver. Fragments never write sequencing. Beats advance ON TAP ONLY
+   (Malik 2026-08-10: the auto-cycle changed too fast to review; the shipped
+   app can reintroduce a dwell). The last beat SITS until dismissed; a tap on
+   a finished phone replays it. */
 (function(){
-  /* Dwell per beat before auto-advance. Malik: the pauses went by too fast
-     to look at, so these are review-friendly; a tap still advances instantly,
-     and the shipped app can shorten them again. */
-  var T = [3600, 4200];   // b1, b2 dwell; b3 persists
 
   function countUp(el){
     var p = (el.getAttribute('data-count')||'').split('|');
@@ -129,7 +126,7 @@
     [].forEach.call(b.querySelectorAll('[data-count]'), countUp);
     if (b.hasAttribute('data-confetti')) confetti(ph);
     if (ph._i === ph._beats.length - 1) { ph.classList.add('done'); return; }
-    ph._t = setTimeout(function(){ step(ph); }, T[ph._i] || 2000);
+    /* no timer: the next beat waits for a tap */
   }
 
   window.CEL = {

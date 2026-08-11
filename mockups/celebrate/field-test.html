@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Field test — fuck with the values</title>
-<link rel="stylesheet" href="_kit.css?v=tw1">
+<link rel="stylesheet" href="_kit.css?v=tw2">
 <style>
   .fx-wrap{padding:22px 20px 90px;max-width:1760px;margin:0 auto}
   .fx-wrap h1{font-size:26px;font-weight:700;letter-spacing:-.02em;margin:0 0 6px}
@@ -417,7 +417,7 @@
   </div>
 </div>
 
-<script src="chooser.js?v=tw1"></script>
+<script src="chooser.js?v=tw2"></script>
 <script>
 (function(){
   var C = MilestoneChooser;
@@ -425,6 +425,20 @@
   function fmt(n){ return Number(n).toLocaleString('en-US'); }
   function esc(s){ var d=document.createElement('i'); d.textContent=s; return d.innerHTML; }
   function plural(n, one, many){ return n === 1 ? one : many; }
+  function singular(w){
+    if (/ies$/.test(w)) return w.replace(/ies$/,'y');
+    if (/(ses|xes|zes|ches|shes)$/.test(w)) return w.replace(/es$/,'');
+    if (/s$/.test(w) && !/ss$/.test(w)) return w.replace(/s$/,'');
+    return w;
+  }
+  function unitFor(n, unit){
+    unit = String(unit||'').trim();
+    if (Math.abs(+n) === 1 && unit) {
+      var p = unit.split(' '), i = unit.indexOf(' of ') > -1 ? 0 : p.length - 1;
+      p[i] = singular(p[i]); return p.join(' ');
+    }
+    return unit;
+  }
 
   /* fit a hero number to the phone: shrink until it clears the padding box */
   function fitHero(el, max, min){
@@ -627,7 +641,7 @@
     var d = String(cur).length, dp = String(prev).length;
     $('figs').innerHTML =
       '<div class="n" id="figs-hero">' + fmt(cur) + '</div>'
-      + '<div class="sub" style="max-width:24ch">' + esc(unit) + '. ' + (d>dp ? 'First time in <b>' + figWord(d) + '</b>.' : figWord(d) + '.') + '</div>'
+      + '<div class="sub" style="max-width:24ch">' + esc(unitFor(cur, unit)) + '. ' + (d>dp ? 'First time in <b>' + figWord(d) + '</b>.' : figWord(d) + '.') + '</div>'
       + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
     fitHero($('figs-hero'), 104, 34);
     $('f-fire').innerHTML = d>dp
@@ -645,9 +659,9 @@
     var beaten = dir==='down' ? (cur <= prev - margin) : (cur >= prev + margin);
     $('rec').innerHTML =
       '<div class="n" id="rec-hero">' + fmt(cur) + '</div>'
-      + '<div class="sub" style="max-width:24ch">' + esc(unit) + '.</div>'
+      + '<div class="sub" style="max-width:24ch">' + esc(unitFor(cur, unit)) + '.</div>'
       + '<div class="cap" style="margin-top:16px">' + (beaten ? 'Old best: ' + fmt(prev) + '. It stood until today.' : 'The best is still ' + fmt(prev) + '.') + '</div>'
-      + (beaten ? '<div class="deposit" style="margin-top:20px">On this day, you set a record. <b>' + fmt(cur) + '</b> ' + esc(unit) + '.</div>' : '')
+      + (beaten ? '<div class="deposit" style="margin-top:20px">On this day, you set a record. <b>' + fmt(cur) + '</b> ' + esc(unitFor(cur, unit)) + '.</div>' : '')
       + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
     fitHero($('rec-hero'), 96, 34);
     $('x-fire').innerHTML = beaten
@@ -729,10 +743,10 @@
     $('eng').innerHTML =
       '<div style="max-width:280px;font-size:26px;font-weight:700;letter-spacing:-.02em;line-height:1.3;color:var(--text-hi)">' + esc(ev) + '</div>'
       + '<div class="fxrc" style="margin-top:26px">'
-      +   '<div><b>' + fmt(c) + '</b><span>' + esc(plural(c, w.replace(/s$/,''), w)) + '</span></div>'
+      +   '<div><b>' + fmt(c) + '</b><span>' + esc(unitFor(c, w)) + '</span></div>'
       +   '<div><b>' + fmt(dd) + '</b><span>' + plural(dd,'day','days') + '</span></div>'
       + '</div>'
-      + '<div class="deposit" style="margin-top:22px">The event was one day. <b>The engine was ' + fmt(c) + ' ' + esc(plural(c, w.replace(/s$/,''), w)) + ' in ' + fmt(dd) + ' ' + plural(dd,'day','days') + '.</b></div>'
+      + '<div class="deposit" style="margin-top:22px">The event was one day. <b>The engine was ' + fmt(c) + ' ' + esc(unitFor(c, w)) + ' in ' + fmt(dd) + ' ' + plural(dd,'day','days') + '.</b></div>'
       + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
     $('n-fire').innerHTML = 'Fires when they mark the milestone done. The counts shown are whatever they actually logged; if they logged nothing, the event stands alone.';
   }
