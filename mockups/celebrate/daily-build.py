@@ -176,7 +176,7 @@ LIVE_CSS = """
 
 /* 7 path of days, layered rows */
 .dl-path{display:flex;flex-direction:column-reverse;gap:6px;align-items:center}
-.dlp-row{display:flex;gap:5px;justify-content:center}
+.dlp-row{display:flex;gap:5px;justify-content:center;align-items:flex-end}
 .dl-path i{width:3px;height:16px;border-radius:2px;background:rgba(var(--ink),.34)}
 .dl-path i.dlp-now{background:var(--day);height:22px;box-shadow:0 0 8px rgba(var(--day-rgb),.5)}
 
@@ -261,7 +261,7 @@ def build():
   <div class="livegrid">%s</div>
 </div>
 <script>%s</script>
-<script src="_daily-live.js?v=live5"></script>
+<script src="_daily-live.js?v=live6"></script>
 </body></html>""" % (len(sections), SHELL_CSS, '\n'.join(styles), len(sections), len(sections),
                      ''.join(toc), ''.join(sections), DRIVER)
 

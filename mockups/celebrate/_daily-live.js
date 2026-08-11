@@ -218,7 +218,7 @@
     // gap between each, so day 365 reads as one long line of 365 marks.
     var on = (1000 / N * 0.72).toFixed(2), off = (1000 / N * 0.28).toFixed(2);
     dst.innerHTML =
-      '<div class="dlt-line">A single line, <b>' + x.total + ' ' + unitWord(x.total, x.cad) + '</b> long.</div>' +
+      '<div class="dlt-line"><b>' + x.total + '</b> total ' + unitWord(x.total, x.cad) + (x.cad === 'maint' ? '' : ' completed') + '</div>' +
       '<svg class="dl-thread" viewBox="0 8 190 ' + vh + '" width="280" height="' + Math.min(430, vh * 1.5) + '" preserveAspectRatio="xMidYMin meet" aria-hidden="true">' +
       '<path d="' + d + '" fill="none" stroke="var(--day)" stroke-width="3" stroke-linecap="butt" pathLength="1000" ' +
       'stroke-dasharray="' + on + ' ' + off + '"></path>' +
