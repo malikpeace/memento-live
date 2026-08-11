@@ -78,7 +78,7 @@
       var cx = (rr * Math.cos(th)).toFixed(2), cy = (rr * Math.sin(th)).toFixed(2);
       var last = i === N - 1;
       dots += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (last ? dr + 1.2 : dr) + '" fill="' +
-        (last ? 'var(--day)' : 'rgba(235,238,248,' + (0.22 + 0.18 * (i / N)).toFixed(2) + ')') + '"></circle>';
+        (last ? 'var(--day)' : 'rgba(255,255,255,' + (0.30 + 0.20 * (i / N)).toFixed(2) + ')') + '"></circle>';
     }
     // a minimum frame keeps day 1-6 clean instead of zooming into an overlapping clump
     var span = Math.max(74, c * Math.sqrt(Math.max(1, N - 1)) + dr + 8);

@@ -189,6 +189,31 @@ LIVE_CSS = """
 .dlt-line{font-size:16.5px;font-weight:500;color:var(--text-mid);max-width:26ch;margin-bottom:20px;letter-spacing:-.01em}
 .dlt-line b{color:var(--text-hi);font-weight:650}
 
+/* ===== GREEN THEME. The reward screen IS the green confirmation: when you
+   hold to complete an action, instead of a flat green flash the phone becomes
+   this living green field. Every mark you earned reads WHITE on the field,
+   body text stays high-contrast. Scoped to .ph.live so only the daily reward
+   goes green, the gallery around it stays dark. ===== */
+.ph.live{
+  background:
+    radial-gradient(130% 80% at 50% 30%, rgba(96,240,134,.26), rgba(96,240,134,0) 60%),
+    linear-gradient(179deg,#12933a 0%,#0c7530 45%,#075423 100%);
+  --ink:255,255,255; --day:#ffffff; --day-rgb:255,255,255;
+  --text-hi:rgba(255,255,255,.98); --text-mid:rgba(255,255,255,.86); --text-lo:rgba(255,255,255,.62);
+}
+/* the day you showed up today: pure white + a soft halo. earlier days: quiet white. */
+.ph.live .dl-path i,.ph.live .dl-steps i{background:rgba(255,255,255,.36)}
+.ph.live .dl-path i.dlp-now,.ph.live .dl-steps i.dlk-now{background:#fff;box-shadow:0 0 10px rgba(255,255,255,.6)}
+/* the calendar: earned days pressed in as deep-green tiles so the white count
+   never blends into them, today lit white. */
+.ph.live .dl-cal b{background:rgba(4,44,21,.42)}
+.ph.live .dl-cal b.dlc-t{background:#fff;box-shadow:0 0 10px rgba(255,255,255,.55)}
+.ph.live .dl-calnum{color:#fff;text-shadow:0 2px 20px rgba(3,40,17,.9),0 0 3px rgba(3,40,17,.85)}
+.ph.live .dl-calnum i{color:rgba(255,255,255,.82)}
+/* odometer: faint white ghosts for the padding zeros */
+.ph.live .dlo-r--dim span{color:rgba(255,255,255,.12)}
+.ph.live .dls-rule{background:rgba(255,255,255,.5)}
+
 /* ===== motion: plays on load + tap, NEVER mid-drag. clean, no blur. ===== */
 .ph.play .dst > *{animation:dlIn .5s cubic-bezier(.2,.85,.3,1) both}
 .ph.play .dst > *:nth-child(2){animation-delay:.06s}
@@ -256,12 +281,12 @@ def build():
 <div class="wrap">
   <h1>The daily reward, %d directions</h1>
   <p class="lede">The everyday hit, fired the moment someone completes their action. Not a milestone: <b>no confetti, no colour flood</b>, green rather than their Memento colour, quiet enough to see <b>every day for a year</b>. It counts <b>actions completed</b>, not calendar days, so a person who shows up three times a week is never told they missed four.</p>
-  <p class="lede">Everything below is <b>live</b>. The sliders at the top drive all %d screens at once, so you can see any of them at 1 action or 300, and at any consistency. Recent momentum shows as <b>warmth</b>, present when you are showing up, faint when you are away, never a miss count. Tap a phone to play its motion.</p>
+  <p class="lede">Everything below is <b>live</b>. The sliders at the top drive all %d screens at once, so you can see any of them at 1 action or 300. The whole screen is <b>green</b>: this is the page that replaces the plain green flash the moment you hold to confirm an action. Tap a phone to play its motion.</p>
   <div class="toc">%s</div>
   <div class="livegrid">%s</div>
 </div>
 <script>%s</script>
-<script src="_daily-live.js?v=live6"></script>
+<script src="_daily-live.js?v=live7"></script>
 </body></html>""" % (len(sections), SHELL_CSS, '\n'.join(styles), len(sections), len(sections),
                      ''.join(toc), ''.join(sections), DRIVER)
 

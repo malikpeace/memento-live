@@ -120,7 +120,7 @@ def main():
 
     total = sum(n for _,_,_,n in made)
     # the two special surfaces ride FIRST so Malik cannot miss them
-    made.insert(0, ('daily', 'THE DAILY REWARD: you showed up', 'The everyday hit (fires when you complete your action): quiet, green, banked days that never fall. Six directions for the reward seen EVERY day, the layer between the green flash and the rare milestone ceremony.', 6))
+    made.insert(0, ('daily', 'THE DAILY REWARD: you showed up', 'The everyday hit (fires when you complete your action): a full green confirmation screen that replaces the plain green flash. The count never falls. Eight directions for the reward seen EVERY day, the layer between the green flash and the rare milestone ceremony.', 6))
     made.insert(0, ('field-test', 'FIELD TEST: fuck with the values', 'YOUR sliders. Change start / goal / today / days / weeks and watch the road, the big count, the day ladder, the record grid, week chips and open receipts re-lay themselves through the REAL chooser logic, with a line saying when a ceremony fires vs stays silent.', 6))
     cards = ''.join(
       '<a class="item" style="text-decoration:none;display:block" href="%s.html">'
