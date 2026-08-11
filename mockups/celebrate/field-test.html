@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Field test — fuck with the values</title>
-<link rel="stylesheet" href="_kit.css?v=tw2">
+<link rel="stylesheet" href="_kit.css?v=tw3">
 <style>
   .fx-wrap{padding:22px 20px 90px;max-width:1760px;margin:0 auto}
   .fx-wrap h1{font-size:26px;font-weight:700;letter-spacing:-.02em;margin:0 0 6px}
@@ -47,7 +47,8 @@
     fill:rgba(255,255,255,.14)}
 
   /* posts (qu-1) */
-  .fxq-axis{width:100%;max-width:312px;margin:26px auto 0}
+  .fxq-axis{position:relative;width:100%;max-width:312px;margin:26px auto 0}
+  .fxq-gone{position:absolute;left:0;top:29px;height:1px;background:rgba(var(--ink),.40)}
   .fxq-marks{display:flex;align-items:flex-end;height:30px;border-bottom:1px solid var(--hairline)}
   .fxq-cell{flex:1;display:flex;justify-content:center}
   .fxq-p{width:2px;height:13px;border-radius:1px;background:rgba(var(--ink),.22)}
@@ -417,7 +418,7 @@
   </div>
 </div>
 
-<script src="chooser.js?v=tw2"></script>
+<script src="chooser.js?v=tw3"></script>
 <script>
 (function(){
   var C = MilestoneChooser;
@@ -492,7 +493,7 @@
         labels += '<div class="fxq-lc' + (isNow ? ' is-now' : (passed.indexOf(m) > -1 ? ' is-past' : '')) + '">'
                 + '<div class="fxq-num">' + fmt(m) + '</div><div class="fxq-date">' + when + '</div></div>';
       });
-      h += '<div class="fxq-axis"><div class="fxq-marks">' + cells + '</div><div class="fxq-labels">' + labels + '</div></div>';
+      h += '<div class="fxq-axis"><div class="fxq-gone" style="width:' + (frac * 100).toFixed(1) + '%"></div><div class="fxq-marks">' + cells + '</div><div class="fxq-labels">' + labels + '</div></div>';
       h += '<div class="sub"><b>' + days + ' days</b> made these ' + fmt(cur) + '.</div>';
       h += '<div class="cap">' + fmt(remaining) + ' still open.</div>';
     } else {

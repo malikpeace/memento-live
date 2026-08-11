@@ -63,19 +63,26 @@
     /* ================= QUANTITY UP ================= */
     'qu-1': {
       c: [
+        { k: 'start', t: 'n', l: 'Start', v: 0 },
         { k: 'goal', t: 'n', l: 'Goal', v: 100 },
-        { k: 'cur', t: 'r', l: 'Today', v: 60, min: 1, max: 100 },
+        { k: 'cur', t: 'r', l: 'Today', v: 60, min: 0, max: 100 },
         { k: 'days', t: 'r', l: 'Days in', v: 216, min: 1, max: 900 },
         { k: 'unit', t: 't', l: 'Unit', v: 'paying users' }
       ],
       apply: function (ph, v, ctl) {
-        var goal = Math.max(2, +v.goal), cur = Math.min(+v.cur, goal), days = +v.days;
-        ctl.cur.min = 1; ctl.cur.max = goal;
-        var marks = C.milestones({ target: goal, baseline: 0 }, 'up');
+        var start = Math.max(0, +v.start), goal = +v.goal, days = +v.days;
+        if (goal <= start) goal = start + 1;
+        ctl.cur.min = start; ctl.cur.max = goal;
+        var cur = Math.min(Math.max(+v.cur, start), goal);
+        var span = goal - start, frac = (cur - start) / span;
+        var marks = C.milestones({ target: goal, baseline: start }, 'up');
         var passed = marks.filter(function (m) { return cur >= m; });
         var nowMark = passed.length ? passed[passed.length - 1] : null;
         cnt(ph, '.qu1-hero', cur);
         put(ph, '.b1 .sub', esc(unitFor(cur, v.unit)) + '.');
+        /* the travelled baseline: progress reads at 3% or 93%, never a dead
+           axis before the first fifth (his 17-of-100 catch) */
+        var gone = Q(ph, '.qu1-gone'); if (gone) gone.style.width = (frac * 100).toFixed(1) + '%';
         var cells = '', labels = '';
         marks.forEach(function (m) {
           var isNow = m === nowMark, isPast = passed.indexOf(m) > -1 && !isNow;
@@ -85,14 +92,20 @@
             hpx = ' style="--ph:' + Math.round(16 + 6 * (n === 1 ? 0 : k / (n - 1))) + 'px"';
           }
           cells += '<div class="qu1-cell' + (isNow ? ' is-now' : isPast ? ' is-past' : '') + '"' + hpx + '><div class="qu1-p"></div></div>';
-          var when = isNow ? 'today' : (passed.indexOf(m) > -1 ? dateBack(Math.round(days * (1 - m / goal))) : '');
+          var when = isNow ? 'today' : (passed.indexOf(m) > -1 ? dateBack(Math.round(days * (1 - (m - start) / span))) : '');
           labels += '<div class="qu1-lc' + (isNow ? ' is-now' : passed.indexOf(m) > -1 ? ' is-past' : '') + '"><div class="qu1-num">' + fmt(m) + '</div><div class="qu1-date">' + when + '</div></div>';
         });
         put(ph, '.qu1-marks', cells); put(ph, '.qu1-labels', labels);
         put(ph, '.qu1-sub', '<b>' + fmt(days) + ' ' + plural(days, 'day', 'days') + '</b> made these ' + fmt(cur) + '.');
-        put(ph, '.qu1-cap', fmt(goal - cur) + ' still open.');
+        /* growth is REAL arithmetic on their own numbers: started at 1, at
+           17 today, that is 17x, and it deserves saying (his 1700% point) */
+        var mult = start > 0 ? cur / start : 0;
+        put(ph, '.qu1-cap', fmt(goal - cur) + ' still open.'
+          + (mult >= 2 ? ' ' + (mult >= 10 ? Math.round(mult) : (Math.round(mult * 10) / 10)) + '&times; where you started.' : ''));
         put(ph, '.b3 .deposit', nowMark === null
-          ? 'The first move is in. The first mark waits at <b>' + fmt(marks[0]) + '</b>.'
+          ? (cur > start
+            ? 'The first move is in: <b>' + fmt(cur - start) + '</b> already, from ' + fmt(start) + '. The first mark waits at ' + fmt(marks[0]) + '.'
+            : 'Nothing moved yet. The first mark waits at <b>' + fmt(marks[0]) + '</b>.')
           : 'On this day, you passed <b>' + fmt(nowMark) + ' of ' + fmt(goal) + '</b> ' + esc(unitFor(goal, v.unit)) + '.');
       }
     },
@@ -105,19 +118,35 @@
         { k: 'src', t: 't', l: 'From', v: 'writing' }
       ],
       apply: function (ph, v) {
-        var now = Math.max(1, +v.now), best = Math.max(1, +v.best), m = +v.months;
+        var now = Math.max(1, +v.now), best = Math.max(1, +v.best), m = Math.max(2, +v.months);
+        function monthName(back) {
+          var d = new Date(); d.setDate(1); d.setMonth(d.getMonth() - back);
+          return d.toLocaleDateString('en-US', { month: 'long' });
+        }
+        /* the digit claim must be TRUE: it fires only when today's month has
+           more digits than the best before it (his months=2 glitch also
+           showed 4 invented history rows; rows now follow the months slider) */
+        var crossed = String(Math.floor(now)).length > String(Math.floor(best)).length;
         var th = Math.pow(10, String(Math.floor(now)).length - 1);
         put(ph, '.qu2-hero', '$' + fmt(now));
         put(ph, '.b1 .sub', 'in one month, from ' + esc(v.src) + '.');
-        var names = ['August', 'July', 'June', 'May', 'April'];
-        var fr = [1, 1, 0.73, 0.84, 0.42], rows = '';
-        rows += '<div class="qu2-row is-new"><span class="qu2-m">' + names[0] + '</span><span class="qu2-v">$' + fmt(now) + '</span></div><div class="qu2-line"></div>';
-        rows += '<div class="qu2-row"><span class="qu2-m">' + names[1] + '</span><span class="qu2-v">$' + fmt(best) + '</span></div>';
-        for (var i = 2; i < 5; i++) rows += '<div class="qu2-row"><span class="qu2-m">' + names[i] + '</span><span class="qu2-v">$' + fmt(Math.round(best * fr[i])) + '</span></div>';
+        var fr = [1, 0.73, 0.84, 0.42], rows = '';
+        rows += '<div class="qu2-row is-new"><span class="qu2-m">' + monthName(0) + '</span><span class="qu2-v">$' + fmt(now) + '</span></div><div class="qu2-line"></div>';
+        var past = Math.min(m - 1, 4);
+        for (var i = 0; i < past; i++) {
+          rows += '<div class="qu2-row"><span class="qu2-m">' + monthName(i + 1) + '</span><span class="qu2-v">$' + fmt(Math.round(best * fr[i])) + '</span></div>';
+        }
         put(ph, '.qu2-ledger', rows);
-        put(ph, '.qu2-sub', '<b>' + m + ' months</b> to add a digit.');
-        put(ph, '.qu2-cap', '$' + fmt(best) + ' was the best month before it.');
-        put(ph, '.b3 .deposit', 'On this day, you had your first <b>$' + fmt(th) + '</b> month.');
+        put(ph, '.qu2-sub', crossed
+          ? '<b>' + m + ' months</b> to add a digit.'
+          : '<b>' + m + ' months</b> of counting so far.');
+        put(ph, '.qu2-cap', '$' + fmt(best) + ' was the best month before it.'
+          + (m - 1 > past ? ' (' + (m - 1 - past) + ' earlier months off-screen.)' : ''));
+        put(ph, '.b3 .deposit', crossed
+          ? 'On this day, you had your first <b>$' + fmt(th) + '</b> month.'
+          : (now > best
+            ? 'On this day, your best month yet: <b>$' + fmt(now) + '</b>.'
+            : 'The best month is still <b>$' + fmt(best) + '</b>. Nothing fires today.'));
       }
     },
 
@@ -144,18 +173,33 @@
         { k: 'now', t: 'n', l: 'This week', v: 1412 },
         { k: 'best', t: 'n', l: 'Old best', v: 906 },
         { k: 'stood', t: 'r', l: 'It stood (weeks)', v: 22, min: 1, max: 104 },
+        { k: 'rows', t: 'r', l: 'Old records shown', v: 2, min: 1, max: 4 },
         { k: 'unit', t: 't', l: 'Unit', v: 'new followers' }
       ],
       apply: function (ph, v) {
-        var now = +v.now, best = +v.best;
+        var now = +v.now, best = +v.best, stood = +v.stood, past = Math.max(1, Math.min(+v.rows, 4));
+        var isRec = now > best;
         put(ph, '.qu5-hero', fmt(now));
         put(ph, '.b1 .sub', esc(unitFor(now, v.unit)) + ' this week.');
-        put(ph, '.qu5-board',
-          '<div class="qu5-row is-new"><span class="qu5-when">this week</span><span class="qu5-v">' + fmt(now) + '</span></div>'
-          + '<div class="qu5-row"><span class="qu5-when">' + dateBack(+v.stood * 7) + '</span><span class="qu5-v">' + fmt(best) + '</span></div>'
-          + '<div class="qu5-row"><span class="qu5-when">' + dateBack(+v.stood * 7 + 42) + '</span><span class="qu5-v">' + fmt(Math.round(best * 0.96)) + '</span></div>');
-        put(ph, '.qu5-cap', 'The one it beat stood ' + fmt(+v.stood) + ' ' + plural(+v.stood, 'week', 'weeks') + '.');
-        put(ph, '.b3 .deposit', 'On this day, you set a record. <b>' + fmt(now) + '</b> ' + esc(unitFor(now, v.unit)) + ' in a week.');
+        /* the board GROWS with the records slider (his catch: the weeks
+           control moved dates but the board never expanded), and this week
+           only takes the top seat when it actually beat the best */
+        var rows = '';
+        if (isRec) rows += '<div class="qu5-row is-new"><span class="qu5-when">this week</span><span class="qu5-v">' + fmt(now) + '</span></div>';
+        var val = best;
+        for (var i = 0; i < past; i++) {
+          rows += '<div class="qu5-row"><span class="qu5-when">' + dateBack(stood * 7 + i * 94) + '</span><span class="qu5-v">' + fmt(Math.round(val)) + '</span></div>';
+          val *= 0.93;
+        }
+        if (!isRec) rows += '<div class="qu5-row"><span class="qu5-when">this week</span><span class="qu5-v">' + fmt(now) + '</span></div>';
+        put(ph, '.qu5-board', rows);
+        put(ph, '.qu5-sub', isRec ? 'Your best week yet.' : 'The record still stands.');
+        put(ph, '.qu5-cap', isRec
+          ? 'The one it beat stood ' + fmt(stood) + ' ' + plural(stood, 'week', 'weeks') + '.'
+          : 'The best is still ' + fmt(best) + ', set ' + fmt(stood) + ' ' + plural(stood, 'week', 'weeks') + ' ago. Nothing fires today.');
+        put(ph, '.b3 .deposit', isRec
+          ? 'On this day, you set a record. <b>' + fmt(now) + '</b> ' + esc(unitFor(now, v.unit)) + ' in a week.'
+          : 'The record to beat is <b>' + fmt(best) + '</b>. This screen waits for the week that takes it.');
       }
     },
 
@@ -208,13 +252,17 @@
         var now = +v.now, first = Math.max(+v.first, now + 5), w = +v.weeks;
         put(ph, '.b1 .n', dur(now));
         put(ph, '.b1 .sub', 'a day on your phone this week. Your lowest week since you started counting.');
-        var rows = '', steps = 4;
+        /* the book's row count follows the weeks slider: 3 weeks of counting
+           cannot show 4 past records (his dynamic-audit rule) */
+        var rows = '', steps = Math.max(1, Math.min(w - 1, 4));
         for (var i = 0; i < steps; i++) {
           var val = first - (first - now) * (i / steps) * 0.92;
           rows += '<div class="lgr"><span class="d">Week of ' + dateBack(Math.round((w - i * (w / (steps + 1))) * 7)) + '</span><span class="v">' + dur(val) + '</span></div>';
         }
         rows += '<div class="lgr lgr--now"><span class="d">this week</span><span class="v">' + dur(now) + '</span></div>';
         put(ph, '.log', rows);
+        var subs = ph.querySelectorAll('.b2 .sub');
+        if (subs[0]) subs[0].innerHTML = 'Every row here was a record when you set it.' + (w - 1 > steps ? ' (' + (w - 1 - steps) + ' earlier weeks off-screen.)' : '');
         put(ph, '.b3 .deposit', 'On this day, your week came in at <b>' + dur(now) + ' a day</b>. A new low.');
       }
     },
@@ -228,12 +276,19 @@
         { k: 'from', t: 'n', l: 'Started at', v: 214 }
       ],
       apply: function (ph, v) {
+        var under = +v.cur < +v.line;
         cnt(ph, '.b1 .n', +v.cur, +v.from);
         cnt(ph, '.b2 .n', +v.cur, +v.from);
         var subs = ph.querySelectorAll('.b2 .sub');
-        if (subs[0]) subs[0].innerHTML = 'You said you wanted to be under ' + fmt(+v.line) + '. This is the first morning it is true since <b>' + esc(v.since) + '</b>.';
+        /* the claim only exists the morning it is TRUE; above the line the
+           screen says so instead of congratulating early */
+        if (subs[0]) subs[0].innerHTML = under
+          ? 'You said you wanted to be under ' + fmt(+v.line) + '. This is the first morning it is true since <b>' + esc(v.since) + '</b>.'
+          : 'You said you wanted to be under ' + fmt(+v.line) + '. Not yet: this screen only exists the morning it is true.';
         if (subs[1]) subs[1].innerHTML = fmt(+v.days) + ' days since the scale read ' + fmt(+v.from) + '.';
-        put(ph, '.b3 .deposit', 'On this day, you weighed <b>' + fmt(+v.cur) + '</b>. First time under ' + fmt(+v.line) + ' since ' + esc(v.since) + '.');
+        put(ph, '.b3 .deposit', under
+          ? 'On this day, you weighed <b>' + fmt(+v.cur) + '</b>. First time under ' + fmt(+v.line) + ' since ' + esc(v.since) + '.'
+          : 'The line is ' + fmt(+v.line) + '. Today reads <b>' + fmt(+v.cur) + '</b>; the road screens carry this stretch.');
       }
     },
 
@@ -257,7 +312,9 @@
         var subs = ph.querySelectorAll('.b2 .sub');
         if (subs[0]) subs[0].innerHTML = fmt(+v.pay) + ' ' + plural(+v.pay, 'payment', 'payments') + ' over ' + fmt(+v.mon) + ' ' + plural(+v.mon, 'month', 'months') + '. It has not risen once.';
         if (subs[1]) subs[1].innerHTML = '$' + fmt(closed) + ' closed. $' + fmt(cur) + ' open.';
-        put(ph, '.b3 .deposit', 'On this day, the balance went under <b>$' + fmt(th) + '</b>.');
+        put(ph, '.b3 .deposit', th <= start
+          ? 'On this day, the balance went under <b>$' + fmt(th) + '</b>.'
+          : 'On this day, the balance read <b>$' + fmt(cur) + '</b>. $' + fmt(closed) + ' of it is gone.');
       }
     },
 
@@ -366,8 +423,10 @@
         for (var i = 0; i < Math.min(awayN, shown - 1); i++) awaySet[pool.splice(Math.floor(rnd() * pool.length), 1)[0]] = 1;
         for (var i = 0; i < shown; i++) {
           var away = !!awaySet[i];
-          var hits = away ? Math.floor(rnd() * (t / 2)) : t - (rnd() < 0.25 ? 1 : 0);
-          if (!away && hits >= t - 1) met++;
+          /* a week either met the rate or was away; the closing week always
+             met (that is WHY the screen fired), so the deposit stays true */
+          var hits = away ? Math.floor(rnd() * (t / 2)) : t;
+          if (!away) met++;
           total += hits;
           var dots = ''; for (var j = 0; j < hits; j++) dots += '<i></i>';
           rows += '<div class="fr4-w' + (away ? ' away' : '') + (i === shown - 1 ? ' now' : '') + '"><span class="wl">' + dateBack((shown - i) * 7) + '</span><span class="wd">' + dots + '</span></div>';
@@ -412,7 +471,12 @@
       apply: function (ph, v) {
         var d = +v.days, hit = ladderHit(d);
         cnt(ph, '.b1 .n', hit || d);
-        put(ph, '.b1 .sub', 'days ' + esc(v.what));
+        put(ph, '.b1 .sub', plural(hit || d, 'day', 'days') + ' ' + esc(v.what));
+        /* the field of days grows with the count: ~25 days per bar row,
+           capped at 8 rows so day 1500 stays composed */
+        var rows = Math.max(1, Math.min(8, Math.round((hit || d) / 25))), fh = '';
+        for (var i = 0; i < rows; i++) fh += '<div class="mt1-row"></div>';
+        put(ph, '.mt1-field', fh);
         put(ph, '.b2 .sub', 'You made the same call on ' + fmt(hit || d) + ' separate days.');
         put(ph, '.b2 .cap', dateBack(d) + ' to ' + dateBack(0));
         put(ph, '.b3 .deposit', '<b>Day ' + fmt(hit || d) + '!</b> The line held.');

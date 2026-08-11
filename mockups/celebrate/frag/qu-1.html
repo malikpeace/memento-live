@@ -3,9 +3,13 @@
 [data-c="qu-1"] .qu1-hero{font-size:104px}
 [data-c="qu-1"] .qu1-sub{max-width:24ch}
 [data-c="qu-1"] .qu1-cap{max-width:24ch}
-[data-c="qu-1"] .qu1-axis{width:288px;margin:2px auto 24px}
+[data-c="qu-1"] .qu1-axis{position:relative;width:288px;margin:2px auto 24px}
 [data-c="qu-1"] .qu1-marks{display:flex;align-items:flex-end;height:30px;
   border-bottom:1px solid var(--hairline)}
+/* the travelled stretch of the baseline, brighter (Malik: at 17 of 100 the
+   axis looked dead; progress must be visible long before the first fifth) */
+[data-c="qu-1"] .qu1-gone{position:absolute;left:0;top:29px;height:1px;
+  background:rgba(var(--ink),.40);width:60%}
 [data-c="qu-1"] .qu1-cell{flex:1;display:flex;justify-content:center}
 [data-c="qu-1"] .qu1-p{width:2px;height:13px;border-radius:1px;
   background:rgba(var(--ink),.22)}
@@ -43,6 +47,7 @@
 
     <div class="b b2">
       <div class="qu1-axis">
+        <div class="qu1-gone"></div>
         <div class="qu1-marks">
           <div class="qu1-cell is-past" style="--ph:16px"><div class="qu1-p"></div></div>
           <div class="qu1-cell is-past" style="--ph:22px"><div class="qu1-p"></div></div>

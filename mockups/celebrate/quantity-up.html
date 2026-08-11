@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Quantity up</title>
-<link rel="stylesheet" href="_kit.css?v=tw2">
+<link rel="stylesheet" href="_kit.css?v=tw3">
 </head><body data-accent="cyan">
 <div class="bar">
   <a href="index.html" style="color:var(--text-mid);text-decoration:none;font-size:13px;font-weight:600">&lsaquo; All</a>
@@ -15,9 +15,13 @@
 [data-c="qu-1"] .qu1-hero{font-size:104px}
 [data-c="qu-1"] .qu1-sub{max-width:24ch}
 [data-c="qu-1"] .qu1-cap{max-width:24ch}
-[data-c="qu-1"] .qu1-axis{width:288px;margin:2px auto 24px}
+[data-c="qu-1"] .qu1-axis{position:relative;width:288px;margin:2px auto 24px}
 [data-c="qu-1"] .qu1-marks{display:flex;align-items:flex-end;height:30px;
   border-bottom:1px solid var(--hairline)}
+/* the travelled stretch of the baseline, brighter (Malik: at 17 of 100 the
+   axis looked dead; progress must be visible long before the first fifth) */
+[data-c="qu-1"] .qu1-gone{position:absolute;left:0;top:29px;height:1px;
+  background:rgba(var(--ink),.40);width:60%}
 [data-c="qu-1"] .qu1-cell{flex:1;display:flex;justify-content:center}
 [data-c="qu-1"] .qu1-p{width:2px;height:13px;border-radius:1px;
   background:rgba(var(--ink),.22)}
@@ -55,6 +59,7 @@
 
     <div class="b b2">
       <div class="qu1-axis">
+        <div class="qu1-gone"></div>
         <div class="qu1-marks">
           <div class="qu1-cell is-past" style="--ph:16px"><div class="qu1-p"></div></div>
           <div class="qu1-cell is-past" style="--ph:22px"><div class="qu1-p"></div></div>
@@ -250,6 +255,6 @@
   <div class="hint">Tap to replay</div>
 </div>
 <p class="item__note">No target at all, so the only thing to beat is the last time you were best. The new week takes the <b>top seat</b> and pushes the old records down, and the caption says the one it beat stood 22 weeks, which is what makes it mean something. A personal record rewards the fact instead of a fraction, so a goal with no end still gets a real moment.</p></div></div></div>
-<script src="chooser.js?v=tw2"></script><script src="_kit.js?v=tw2"></script><script src="_tweaks.js?v=tw2"></script>
+<script src="chooser.js?v=tw3"></script><script src="_kit.js?v=tw3"></script><script src="_tweaks.js?v=tw3"></script>
 <script>CEL.init(); if (window.CEL_TWEAKS) CEL_TWEAKS.init();</script>
 </body></html>
