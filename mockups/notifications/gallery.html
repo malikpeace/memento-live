@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Memento Notifications — the full set</title>
+<style>
+  :root{
+    --ink:#060708; --panel:#0c0e11; --hi:rgba(255,255,255,.96); --mid:rgba(255,255,255,.60);
+    --lo:rgba(255,255,255,.38); --hair:rgba(255,255,255,.09);
+    --green:#3fd94e; --cyan:#3ad9f5; --amber:#e8b04b;
+    --glass:rgba(44,46,52,.52); --glassbrd:rgba(255,255,255,.12);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--ink);color:var(--hi);
+    font-family:ui-sans-serif,-apple-system,"SF Pro Text","Segoe UI",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:1180px;margin:0 auto;padding:38px 20px 90px}
+  header h1{font-size:clamp(1.8rem,4.4vw,2.5rem);font-weight:700;letter-spacing:-.03em;margin:0 0 10px}
+  header p{color:var(--mid);font-size:1rem;margin:0 0 4px;max-width:72ch}
+  header .sub{color:var(--lo);font-size:.86rem}
+  .legend{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 6px}
+  .badge{font-size:.7rem;font-weight:650;letter-spacing:.02em;padding:4px 9px;border-radius:999px;
+    background:rgba(128,128,128,.12);color:var(--mid);display:inline-flex;align-items:center;gap:6px}
+  .badge.built{color:#8fe89a;background:rgba(63,217,78,.12)}
+  .badge.new{color:#8fdcee;background:rgba(58,217,245,.13)}
+  .dot{width:6px;height:6px;border-radius:999px;background:currentColor;display:inline-block}
+
+  .people{display:flex;flex-wrap:wrap;gap:8px;margin:26px 0 8px}
+  .ptab{cursor:pointer;border:0;text-align:left;padding:11px 14px;border-radius:13px;
+    background:rgba(255,255,255,.045);color:var(--mid);transition:.15s;min-width:150px}
+  .ptab:hover{background:rgba(255,255,255,.08)}
+  .ptab.on{background:rgba(255,255,255,.11);color:var(--hi);box-shadow:inset 0 0 0 1px var(--hair)}
+  .ptab b{display:block;font-size:.92rem;font-weight:650;letter-spacing:-.01em}
+  .ptab span{display:block;font-size:.73rem;color:var(--lo);margin-top:2px}
+  .ptab .shape{font-size:.66rem;font-weight:650;text-transform:uppercase;letter-spacing:.06em;color:var(--cyan);margin-top:5px}
+
+  .stage{display:grid;grid-template-columns:360px 1fr;gap:40px;margin-top:26px;align-items:start}
+  @media(max-width:820px){.stage{grid-template-columns:1fr;gap:24px}}
+
+  .phone{position:sticky;top:20px;justify-self:center;width:340px;border-radius:52px;padding:12px;
+    background:linear-gradient(180deg,#15171c,#0a0b0e);
+    box-shadow:0 40px 120px rgba(0,0,0,.6),inset 0 0 0 1.5px rgba(255,255,255,.06)}
+  @media(max-width:820px){.phone{position:static}}
+  .screen{position:relative;border-radius:42px;overflow:hidden;height:720px;
+    background:
+      radial-gradient(120% 80% at 22% 8%, rgba(58,120,245,.16), transparent 52%),
+      radial-gradient(90% 60% at 85% 92%, rgba(63,217,78,.07), transparent 60%),
+      linear-gradient(180deg,#0a0d14 0%, #06070a 60%, #05060a 100%)}
+  .screen::after{content:"";position:absolute;inset:0;pointer-events:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/></filter><rect width='120' height='120' filter='url(%23n)' opacity='.4'/></svg>");
+    opacity:.03;mix-blend-mode:overlay}
+  .notch{position:absolute;top:11px;left:50%;transform:translateX(-50%);width:118px;height:32px;border-radius:20px;background:#000;z-index:5}
+  .statusbar{position:absolute;top:16px;left:0;right:0;display:flex;justify-content:space-between;padding:0 30px;font-size:.78rem;font-weight:600;color:#fff;z-index:4}
+  .clock{position:absolute;top:60px;left:0;right:0;text-align:center;z-index:3}
+  .clock .date{font-size:.92rem;color:rgba(255,255,255,.72);font-weight:500}
+  .clock .time{font-size:4.4rem;font-weight:590;letter-spacing:-.03em;line-height:1;margin-top:2px;
+    font-variant-numeric:tabular-nums;text-shadow:0 2px 30px rgba(0,0,0,.4)}
+  .feed{position:absolute;top:196px;left:0;right:0;bottom:0;padding:0 12px 26px;overflow-y:auto;z-index:3}
+  .feed::-webkit-scrollbar{width:0}
+
+  .nrow{margin-bottom:14px}
+  .nlabel{display:flex;align-items:center;gap:7px;margin:0 6px 6px;font-size:.66rem;color:rgba(255,255,255,.5);font-weight:600;letter-spacing:.02em}
+  .nlabel .t{margin-left:auto;color:rgba(255,255,255,.4);font-weight:600}
+  .b{font-size:.6rem;padding:2px 6px;border-radius:999px;font-weight:700;letter-spacing:.03em}
+  .b.built{color:#7fe08c;background:rgba(63,217,78,.16)}
+  .b.new{color:#8fdcee;background:rgba(58,217,245,.16)}
+
+  .card{background:var(--glass);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);
+    border-radius:22px;padding:11px 13px 13px;box-shadow:inset 0 0 0 .5px var(--glassbrd);display:flex;gap:11px}
+  .icon{flex:0 0 auto;width:40px;height:40px;border-radius:10px;background:linear-gradient(160deg,#141619,#050506);
+    box-shadow:inset 0 0 0 .5px rgba(255,255,255,.1);display:grid;place-items:center}
+  .icon svg{width:24px;height:24px}
+  .cbody{flex:1;min-width:0}
+  .chead{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+  .app{font-size:.68rem;font-weight:650;letter-spacing:.08em;color:rgba(255,255,255,.66);text-transform:uppercase}
+  .ago{font-size:.72rem;color:rgba(255,255,255,.5);white-space:nowrap}
+  .ctitle{font-size:.92rem;font-weight:640;letter-spacing:-.01em;margin:2px 0 1px;color:#fff}
+  .ctext{font-size:.9rem;color:rgba(255,255,255,.82)}
+
+  .doc h2{font-size:1.15rem;font-weight:700;letter-spacing:-.02em;margin:0 0 4px}
+  .doc>p{color:var(--mid);font-size:.92rem;margin:0 0 18px}
+  .type{padding:15px 0;border-top:1px solid var(--hair)}
+  .type:first-of-type{border-top:0}
+  .type .th{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+  .type .th b{font-size:.98rem;font-weight:650}
+  .type .trig{font-size:.82rem;color:var(--lo);margin:5px 0 0}
+  .type .why{font-size:.86rem;color:var(--mid);margin:7px 0 0}
+
+  .section{margin-top:56px}
+  .section h2{font-size:1.4rem;font-weight:700;letter-spacing:-.02em;margin:0 0 6px}
+  .section>p{color:var(--mid);max-width:76ch;margin:0 0 22px;font-size:.94rem}
+  .grid6{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+  .hcard{background:var(--glass);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);
+    border-radius:20px;padding:12px 14px 14px;box-shadow:inset 0 0 0 .5px var(--glassbrd)}
+  .hcard .who{font-size:.7rem;font-weight:650;letter-spacing:.04em;color:var(--cyan);text-transform:uppercase;margin-bottom:9px;display:flex;justify-content:space-between}
+  .hcard .who .d{color:var(--lo)}
+  .hcard .row{display:flex;gap:11px}
+
+  .series{max-width:420px;display:flex;flex-direction:column;gap:12px}
+  .beat{display:flex;gap:12px;align-items:flex-start}
+  .beat .day{flex:0 0 58px;text-align:right;padding-top:12px}
+  .beat .day b{display:block;font-size:1.05rem;font-weight:700;letter-spacing:-.02em}
+  .beat .day span{font-size:.68rem;color:var(--lo)}
+  .beat .card{flex:1}
+
+  .inapp{margin-top:56px;padding:20px 22px;border-radius:18px;background:rgba(255,255,255,.03);box-shadow:inset 0 0 0 1px var(--hair)}
+  .inapp h2{font-size:1.15rem;font-weight:700;margin:0 0 6px;letter-spacing:-.02em}
+  .inapp p{color:var(--mid);font-size:.9rem;margin:0 0 12px;max-width:74ch}
+  .inapp ul{margin:0;padding-left:18px;color:var(--mid);font-size:.9rem}
+  .inapp li{margin:4px 0}
+  .inapp b{color:var(--hi);font-weight:650}
+
+  .foot{margin-top:56px;padding-top:22px;border-top:1px solid var(--hair);color:var(--lo);font-size:.84rem}
+  .foot b{color:var(--mid);font-weight:650}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Memento Notifications</h1>
+    <p>Only the notifications that PULL someone back live here: the reminders that reach a locked phone. Pick a person to see their recurring notifications on the lock screen. Every message is timed to that goal, not to a fixed 9am, and every word comes from their goal, their cadence, and their why. Nobody gets a generic blast.</p>
+    <p class="sub">Voice follows MALIK_VOICE. Body copy is the action itself, nothing padded on. No "that's the whole move", no object-speak, no em dashes.</p>
+    <div class="legend">
+      <span class="badge built"><span class="dot"></span>Built today</span>
+      <span class="badge new"><span class="dot"></span>New (the work)</span>
+    </div>
+  </header>
+
+  <div class="people" id="people"></div>
+
+  <div class="stage">
+    <div class="phone">
+      <div class="screen">
+        <div class="notch"></div>
+        <div class="statusbar"><span>9:41</span><span>5G &nbsp;100%</span></div>
+        <div class="clock">
+          <div class="date">Tuesday, June 16</div>
+          <div class="time">9:41</div>
+        </div>
+        <div class="feed" id="feed"></div>
+      </div>
+    </div>
+
+    <div class="doc">
+      <h2 id="docname"></h2>
+      <p id="docgoal"></p>
+      <div id="types"></div>
+    </div>
+  </div>
+
+  <!-- drift series -->
+  <div class="section">
+    <h2>The drift intercept escalates. It is a series, not a ping.</h2>
+    <p>When someone slips, one message is easy to ignore. So it climbs in intensity, the way Duolingo does but without the guilt: a quiet check-in, then a real plea, then the app's own philosophy. Each beat sent once, the whole thing stops the instant they log anything. The day counts are for a daily goal. For a 3 to 4 times a week goal the clock starts later, because a two-day gap is normal, not a slip. This is Maya's channel as the example.</p>
+    <div class="series" id="series"></div>
+  </div>
+
+  <!-- drift across every goal -->
+  <div class="section">
+    <h2>The emotional beat, across every goal</h2>
+    <p>The middle beat is where it gets personal. One strong sentence, no second line forced on, aimed straight at the reason they started. Same headline, six completely different hearts underneath it. This is the one nobody else can send.</p>
+    <div class="grid6" id="driftgrid"></div>
+  </div>
+
+  <!-- in-app, not push -->
+  <div class="inapp">
+    <h2>These are NOT notifications. They live inside the app.</h2>
+    <p>A notification's only job is to pull someone back to a locked phone. Celebrating to a phone in a pocket is pointless, and coming-back copy makes no sense before they've come back. So these three wait inside the app for the moment they open it:</p>
+    <ul>
+      <li><b>Milestone hit</b> — the target lands. The celebration is on the card when they open it.</li>
+      <li><b>Comeback welcome</b> — the dimmed card and welcome copy that greet a return after a gap (already built in-app).</li>
+      <li><b>Consistency landmark</b> — 10, 25, 50, 100 days banked. A quiet moment inside, not a push.</li>
+    </ul>
+  </div>
+
+  <div class="foot">
+    <b>iOS reality:</b> push only reaches an installed PWA (Add to Home Screen). That's why the install push at the start matters so much. Once installed, all of the above is on the table.
+    <br><br><b>Timing is per goal, not per clock.</b> A calorie log fires midday or evening, a morning workout fires at dawn, a sobriety check fires at night. The daily move learns the goal's real time.
+  </div>
+</div>
+
+<script>
+const M = `<svg viewBox="0 0 24 24" fill="none"><path d="M3 20V5.5L12 15l9-9.5V20" stroke="#fff" stroke-width="2.1" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
+
+// recurring PUSH types only (the pulls)
+const TYPES = [
+  {key:'move',    name:'Daily move',        badge:'built', trig:'Fires at the goal\'s real time (not always morning), when there is a move and the day is not done.',
+    why:'The workhorse. Greeting adapts to the send time, body is only the action, nothing added.'},
+  {key:'open',    name:'Don\'t forget about today', badge:'built', trig:'Later in the day if it is still open. Skipped if the daily move already fired this evening.',
+    why:'A last honest window. The message: a little progress beats zero, always.'},
+  {key:'weekly',  name:'Weekly reflection', badge:'new', trig:'Sunday evening.',
+    why:'Reminds them to actually sit down and write how the week went. The re-commit ritual.'},
+];
+
+const PEOPLE = [
+  {id:'maya', name:'Maya', shape:'quantity up', time:'7:30am', goal:'Grow the channel to 100,000 subscribers, one video a week she is proud of.',
+   n:{
+    move:['Morning, today\'s move is:','Edit the intro for this week\'s video.','7:30am'],
+    open:['Don\'t forget about today','Even one clip cut tonight beats nothing.','8:40pm'],
+    weekly:['How was your week?','Take two minutes to write down how this week actually went.','Sun 7:30pm'],
+   },
+   whyline:'You started the channel to reach the people who were once exactly like you.'},
+  {id:'priya', name:'Priya', shape:'quantity down', time:'9:00pm', goal:'Get daily screen time under 2 hours, down from about 4.',
+   n:{
+    move:['This evening\'s move is:','Put your phone in the drawer by 11.','9:00pm'],
+    open:['Don\'t forget about today','Ending even an hour early beats a lost day.','10:10pm'],
+    weekly:['How was your week?','Take two minutes to write down how this week actually went.','Sun 7:30pm'],
+   },
+   whyline:'You wanted those hours back so you could actually be there for the people you love.'},
+  {id:'marcus', name:'Marcus', shape:'frequency', time:'6:30am', goal:'Run 4 times a week to finish the marathon under 4 hours in October.',
+   n:{
+    move:['Morning, today\'s move is:','Run an easy 3 miles.','6:30am (run days)'],
+    open:['Don\'t forget about today','Even a short jog still counts toward the four.','7:00pm'],
+    weekly:['How was your week?','Take two minutes to write down how this week actually went.','Sun 7:30pm'],
+   },
+   whyline:'You wanted to prove to yourself that you could do the hard thing you set out to do.'},
+  {id:'jordan', name:'Jordan', shape:'maintenance', time:'9:00pm', goal:'Stay sober. One day held at a time.',
+   n:{
+    move:['This evening\'s move is:','Confirm you held the day.','9:00pm'],
+    open:['Don\'t forget about today','Confirm the day before midnight. It still counts.','11:00pm'],
+    weekly:['How was your week?','Take two minutes to write down how this week actually went.','Sun 7:30pm'],
+   },
+   whyline:'You are doing this for the version of you that gets to stay clear and whole.'},
+  {id:'ana', name:'Ana', shape:'milestone', time:'8:00am', goal:'Land a first software engineering job by March.',
+   n:{
+    move:['Morning, today\'s move is:','Make one application and send it.','8:00am'],
+    open:['Don\'t forget about today','Even one application beats none today.','8:00pm'],
+    weekly:['How was your week?','Take two minutes to write down how this week actually went.','Sun 7:30pm'],
+   },
+   whyline:'You started this to build the kind of life you actually want to wake up to.'},
+  {id:'chris', name:'Chris', shape:'open', time:'5:30pm', goal:'Be a present dad. Actually there at dinner and bedtime.',
+   n:{
+    move:['This evening\'s move is:','Put your phone in another room at dinner.','5:30pm'],
+    open:['Don\'t forget about today','Even ten minutes before bed beats none.','8:30pm'],
+    weekly:['How was your week?','Take two minutes to write down how this week actually went.','Sun 7:30pm'],
+   },
+   whyline:'You are doing this so your kids grow up remembering you were there.'},
+];
+
+// drift SERIES (Maya as the shown example). Headline intensity climbs, days spread.
+const SERIES = [
+  {day:'Day 3', tag:'a check-in', title:'Don\'t forget why you started', body:'It has been 3 days with nothing logged, just making sure you are good and still moving toward it, even if it is not perfect.'},
+  {day:'Day 6', tag:'the plea', title:'Please don\'t forget your dreams. Make yourself proud.', body:'You started the channel to reach the people who were once exactly like you.'},
+  {day:'Day 10', tag:'memento mori', title:'Memento Mori', body:'You only get so many days, and today is one of them.'},
+];
+
+function cardHtml(pair){
+  return `<div class="card">
+    <div class="icon">${M}</div>
+    <div class="cbody">
+      <div class="chead"><span class="app">Memento</span><span class="ago">${pair[2]||'now'}</span></div>
+      <div class="ctitle">${pair[0]}</div>
+      <div class="ctext">${pair[1]}</div>
+    </div>
+  </div>`;
+}
+
+function render(p){
+  document.getElementById('feed').innerHTML = TYPES.map(t=>{
+    const pair = p.n[t.key];
+    return `<div class="nrow">
+      <div class="nlabel">${t.name}<span class="b ${t.badge}">${t.badge==='built'?'BUILT':'NEW'}</span><span class="t">${pair[2]}</span></div>
+      ${cardHtml(pair)}
+    </div>`;
+  }).join('');
+  document.getElementById('docname').textContent = p.name + ' — ' + p.shape;
+  document.getElementById('docgoal').textContent = p.goal;
+  document.getElementById('types').innerHTML = TYPES.map(t=>`
+    <div class="type">
+      <div class="th"><b>${t.name}</b><span class="badge ${t.badge}"><span class="dot"></span>${t.badge==='built'?'Built today':'New'}</span></div>
+      <div class="trig">${t.trig}</div>
+      <div class="why">${t.why}</div>
+    </div>`).join('');
+  document.querySelectorAll('.ptab').forEach(b=>b.classList.toggle('on', b.dataset.id===p.id));
+}
+
+document.getElementById('people').innerHTML = PEOPLE.map(p=>`
+  <button class="ptab" data-id="${p.id}">
+    <b>${p.name}</b><span>${p.goal.length>44?p.goal.slice(0,44)+'…':p.goal}</span>
+    <span class="shape">${p.shape}</span>
+  </button>`).join('');
+document.querySelectorAll('.ptab').forEach(b=>b.addEventListener('click',()=>render(PEOPLE.find(x=>x.id===b.dataset.id))));
+
+// drift series
+document.getElementById('series').innerHTML = SERIES.map(s=>`
+  <div class="beat">
+    <div class="day"><b>${s.day.split(' ')[1]}</b><span>${s.tag}</span></div>
+    ${cardHtml([s.title, s.body, 'now'])}
+  </div>`).join('');
+
+// the emotional beat, across every goal (one strong sentence, personalized)
+document.getElementById('driftgrid').innerHTML = PEOPLE.map(p=>`
+  <div class="hcard">
+    <div class="who"><span>${p.name} · ${p.shape}</span></div>
+    <div class="row">
+      <div class="icon">${M}</div>
+      <div class="cbody">
+        <div class="chead"><span class="app">Memento</span><span class="ago">now</span></div>
+        <div class="ctitle">Please don't forget your dreams. Make yourself proud.</div>
+        <div class="ctext">${p.whyline}</div>
+      </div>
+    </div>
+  </div>`).join('');
+
+render(PEOPLE[0]);
+</script>
+</body>
+</html>
