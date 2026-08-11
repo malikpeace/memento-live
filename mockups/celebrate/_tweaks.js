@@ -165,7 +165,7 @@
     'qu-3': {
       c: [
         { k: 'amt', t: 'n', l: 'Reached $', v: 10000 },
-        { k: 'used', t: 'r', l: 'Days it took', v: 281, min: 7, max: 900 },
+        { k: 'used', t: 'r', l: 'Days it took', v: 281, min: 1, max: 900 },
         { k: 'left', t: 'r', l: 'Days ahead', v: 53, min: 0, max: 400 }
       ],
       apply: function (ph, v) {
@@ -250,7 +250,9 @@
         var subs = ph.querySelectorAll('.b2 .sub');
         if (subs[0]) subs[0].innerHTML = 'Started at ' + fmt(start) + ', ' + fmt(days) + ' days ago.';
         if (subs[1]) subs[1].innerHTML = fmt(goal) + ' is ' + fmt(Math.abs(cur - goal)) + ' away.';
-        put(ph, '.b3 .deposit', 'On this day, the scale read <b>' + fmt(cur) + '</b>. Down ' + fmt(Math.abs(start - cur)) + ' from where you started.');
+        put(ph, '.b3 .deposit', cur === start
+          ? 'Day one. The road runs ' + fmt(start) + ' to ' + fmt(goal) + '; the first mark is <b>' + fmt(marks[0]) + '</b>.'
+          : 'On this day, the scale read <b>' + fmt(cur) + '</b>. Down ' + fmt(Math.abs(start - cur)) + ' from where you started.');
       }
     },
 
@@ -422,7 +424,7 @@
 
     'fr-4': {
       c: [
-        { k: 'w', t: 'r', l: 'Weeks running', v: 14, min: 2, max: 40 },
+        { k: 'w', t: 'r', l: 'Weeks running', v: 14, min: 1, max: 40 },
         { k: 'target', t: 'r', l: 'Target / week', v: 4, min: 1, max: 7 },
         { k: 'away', t: 'r', l: 'Weeks missed', v: 2, min: 0, max: 10 }
       ],
@@ -477,7 +479,7 @@
     /* ================= MAINTENANCE ================= */
     'mt-1': {
       c: [
-        { k: 'days', t: 'r', l: 'Days held', v: 100, min: 7, max: 1500 },
+        { k: 'days', t: 'r', l: 'Days held', v: 100, min: 1, max: 1500 },
         { k: 'what', t: 't', l: 'The line', v: 'sober' }
       ],
       apply: function (ph, v) {
@@ -489,10 +491,14 @@
         var rows = Math.max(1, Math.min(8, Math.round((hit || d) / 25))), fh = '';
         for (var i = 0; i < rows; i++) fh += '<div class="mt1-row"></div>';
         put(ph, '.mt1-field', fh);
-        put(ph, '.b2 .sub', 'You made the same call on ' + fmt(hit || d) + ' separate days.');
+        put(ph, '.b2 .sub', 'You made the same call on ' + fmt(hit || d) + ' separate ' + plural(hit || d, 'day', 'days') + '.');
         put(ph, '.b2 .cap', dateBack(d) + ' to ' + dateBack(0));
-        put(ph, '.b3 .deposit', '<b>Day ' + fmt(hit || d) + '!</b> The line held.');
-        put(ph, '.mt1-note', 'No end date on this one. The ' + fmt(hit || d) + ' days are in the record now, and nothing later takes them out.' + (hit !== d ? ' (Day ' + fmt(d) + ' itself is quiet; the last rung was ' + fmt(hit || 0) + '.)' : ''));
+        put(ph, '.b3 .deposit', hit
+          ? '<b>Day ' + fmt(hit) + '!</b> The line held.'
+          : '<b>Day ' + fmt(d) + '.</b> Banked. The first ceremony fires at day 7.');
+        put(ph, '.mt1-note', hit
+          ? 'No end date on this one. The ' + fmt(hit) + ' days are in the record now, and nothing later takes them out.' + (hit !== d ? ' (Day ' + fmt(d) + ' itself is quiet; the last rung was ' + fmt(hit) + '.)' : '')
+          : 'No end date on this one. Every day is in the record from day one; the ladder starts speaking at day 7.');
       }
     },
 
@@ -518,7 +524,7 @@
 
     'mt-3': {
       c: [
-        { k: 'days', t: 'r', l: 'Days held', v: 30, min: 7, max: 365 },
+        { k: 'days', t: 'r', l: 'Days held', v: 30, min: 1, max: 365 },
         { k: 'hard', t: 'r', l: 'Hard days logged', v: 9, min: 0, max: 60 },
         { k: 'what', t: 't', l: 'Without', v: 'a drink' }
       ],
@@ -613,24 +619,24 @@
 
     /* ================= OPEN ================= */
     'op-1': {
-      c: [{ k: 'days', t: 'r', l: 'Days apart', v: 90, min: 7, max: 500 }],
+      c: [{ k: 'days', t: 'r', l: 'Days apart', v: 90, min: 1, max: 500 }],
       apply: function (ph, v) {
         var d = +v.days;
         ph.querySelectorAll('.op1-when').forEach(function (el, i) {
           el.textContent = i < 2 ? dateBack(d) : dateBack(0);
         });
-        put(ph, '.op1-span', fmt(d) + ' days later');
+        put(ph, '.op1-span', fmt(d) + ' ' + plural(d, 'day', 'days') + ' later');
         put(ph, '.b3 .deposit', '<b>Day ' + fmt(d) + '.</b> Your first entry and today\'s are kept together.');
       }
     },
 
     'op-2': {
-      c: [{ k: 'days', t: 'r', l: 'Days since', v: 180, min: 7, max: 1200 }],
+      c: [{ k: 'days', t: 'r', l: 'Days since', v: 180, min: 1, max: 1200 }],
       apply: function (ph, v) {
         var d = +v.days;
         cnt(ph, '.b1 .n', d);
         put(ph, '.op2-lead', 'What you wrote on ' + dateBack(d));
-        put(ph, '.b3 .deposit', '<b>Day ' + fmt(d) + '.</b> ' + (d >= 60 ? Math.round(d / 30) + ' months' : fmt(d) + ' days') + ' on the same sentence.');
+        put(ph, '.b3 .deposit', '<b>Day ' + fmt(d) + '.</b> ' + (d >= 60 ? Math.round(d / 30) + ' months' : fmt(d) + ' ' + plural(d, 'day', 'days')) + ' on the same sentence.');
       }
     },
 
@@ -754,6 +760,43 @@
     }
   };
 
+  /* ---------- DAY ONE ----------
+     Malik: one tap shows what every screen looks like on day 1, the honest
+     version, including screens that would refuse to fire that early. Each
+     entry is a patch over the current values (functions see them, so day 1
+     of a 270-start weight goal is 270, not a hardcoded number). */
+  var DAY1 = {
+    'qu-1': function (v) { return { cur: (+v.start || 0) + 1, days: 1 }; },
+    'qu-2': function () { return { now: 12, best: 9, months: 2 }; },
+    'qu-3': function () { return { used: 1, left: 179 }; },
+    'qu-5': function () { return { now: 5, best: 4, stood: 1, rows: 1 }; },
+    'qd-1': function (v) { return { cur: +v.start, days: 1 }; },
+    'qd-2': function (v) { return { now: Math.max(5, +v.first - 10), weeks: 2 }; },
+    'qd-3': function (v) { return { cur: +v.from, days: 1 }; },
+    'qd-4': function (v) { return { cur: +v.start, pay: 1, mon: 1 }; },
+    'qd-5': function (v) { return { now: Math.max(5, +v.then - 1), weeks: 1 }; },
+    'fr-1': function () { return { n: 1 }; },
+    'fr-2': function () { return { w: 1, total: 1 }; },
+    'fr-3': function () { return { n: 1, days: 1 }; },
+    'fr-4': function () { return { w: 1, away: 0 }; },
+    'fr-5': function () { return { kept: 1, total: 1 }; },
+    'mt-1': function () { return { days: 1 }; },
+    'mt-2': function () { return { held: 1 }; },
+    'mt-3': function () { return { days: 1, hard: 0 }; },
+    'ms-1': function () { return { n: 1, days: 1 }; },
+    'ms-2': function () { return { n: 1 }; },
+    'ms-3': function () { return { days: 1 }; },
+    'ms-5': function () { return { days: 1, hours: 1 }; },
+    'op-1': function () { return { days: 1 }; },
+    'op-2': function () { return { days: 1 }; },
+    'op-3': function () { return { n: 1, first: 1 }; },
+    'op-4': function () { return { days: 1, entries: 1 }; },
+    'op-5': function () { return { days: 365 }; },
+    'rf-gap': function () { return { cur: 1, prev: 0, daysLast: 1 }; },
+    'rf-fall': function (v) { return { left: +v.startLeft, days: 1, daysLast: 1 }; },
+    'rf-rec': function () { return { on: 1, weeks: 1 }; }
+  };
+
   /* ---------- mount ---------- */
   function mount(ph) {
     var key = ph.getAttribute('data-c'), spec = SPECS[key];
@@ -761,10 +804,33 @@
     var box = document.createElement('div');
     box.className = 'tw';
     box.innerHTML = '<div class="tw__t">FUCK WITH THIS SCREEN</div>';
-    var vals = {}, ctls = {};
+    var vals = {}, ctls = {}, outs = {};
     spec.c.forEach(function (c) { vals[c.k] = c.v; });
     function applyNow() {
       try { spec.apply(ph, vals, ctls); } catch (e) { /* a bad value never breaks the page */ }
+    }
+    function setMany(patch) {
+      for (var k in patch) {
+        vals[k] = patch[k];
+        if (ctls[k]) ctls[k].value = patch[k];
+        if (outs[k]) outs[k].textContent = fmt(+patch[k]);
+      }
+      applyNow();
+    }
+    var d1 = DAY1[key];
+    if (d1) {
+      var btns = document.createElement('div');
+      btns.className = 'tw__btns';
+      var b1 = document.createElement('button'); b1.type = 'button'; b1.textContent = 'Day 1';
+      b1.addEventListener('click', function () { setMany(d1(vals)); });
+      var b2 = document.createElement('button'); b2.type = 'button'; b2.textContent = 'Reset';
+      b2.addEventListener('click', function () {
+        var patch = {};
+        spec.c.forEach(function (c) { patch[c.k] = c.v; });
+        setMany(patch);
+      });
+      btns.appendChild(b1); btns.appendChild(b2);
+      box.appendChild(btns);
     }
     spec.c.forEach(function (c) {
       var lab = document.createElement('label');
@@ -776,7 +842,7 @@
       else { inp.type = 'text'; }
       inp.value = c.v;
       var out = null;
-      if (c.t === 'r') { out = document.createElement('b'); out.className = 'to'; out.textContent = fmt(c.v); }
+      if (c.t === 'r') { out = document.createElement('b'); out.className = 'to'; out.textContent = fmt(c.v); outs[c.k] = out; }
       inp.addEventListener('input', function () {
         vals[c.k] = inp.value;
         if (out) out.textContent = fmt(+inp.value);
