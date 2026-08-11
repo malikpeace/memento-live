@@ -11,26 +11,6 @@
    "blurb": "Today's total lands large with a small green full stop after it, while yesterday's number rises above it, shrinking and dimming into a column of days already done. Day one has nothing above it and says so in one quiet line, at the exact height the column will grow from."
   },
   {
-   "key": "n-ring",
-   "name": "The ring closes",
-   "blurb": "A hairline green circle draws all the way around the total and closes at the top, the same full circle every day, never a meter. Each day it closes leaves its groove inside, so the disc thickens like a record, and it widens slowly enough that a year of days still sits comfortably on the screen."
-  },
-  {
-   "key": "n-settle",
-   "name": "The day settles",
-   "blurb": "The number drops in, takes its weight with one small recoil, and today's plate lands green across the stack of every day before it. The stack takes the weight, grows downward, and the oldest plates thin out and dissolve into the dark."
-  },
-  {
-   "key": "a-tally",
-   "name": "The tally",
-   "blurb": "Tally marks ruled like a ledger, four uprights and a diagonal fifth, with today's stroke drawing itself in green. The rule underneath is only as long as what has been written, so the line grows too. It suits someone who wants the reward to feel like a hand keeping count, and it pays off on day 30, where the green mark is the diagonal that closes the sixth bundle."
-  },
-  {
-   "key": "a-stack",
-   "name": "The stack",
-   "blurb": "Thin bars laid down one per day off a wide floor, today's dropping onto the top in green, separated every ten so thirty stays readable. The count sits above the pile like a level marker. It suits someone who wants to feel weight gathering underneath them, with all the room in the world still open above."
-  },
-  {
    "key": "a-field",
    "name": "The field",
    "blurb": "One dot per day on a hex lattice, every dot keeping its exact place forever while the shape grows outward, and today's arriving last with a single quiet ripple and a thin ring that stays. Day 7 closes into a perfect hexagon. It suits someone who wants the reward to be spatial and calm, a shape they recognise before they read the number."
@@ -59,41 +39,6 @@
    "key": "t-steps",
    "name": "The staircase",
    "blurb": "A drawn staircase, one riser and one tread per day, with today's plank laying green at the top and the date riding above it. The climb gets denser rather than taller as days add up, so thirty days is a fine flight inside the same height and day one is one step off the ground."
-  },
-  {
-   "key": "l-horizon",
-   "name": "The horizon",
-   "blurb": "A line of green light lies low in the frame with the number above it. Day one is a short glimmer near the floor. By day thirty it has risen, widened almost to the full width and laid down two more layers of light beneath the sky, so the light is visibly climbing toward the number. For someone who wants the days felt as light on the horizon rather than counted."
-  },
-  {
-   "key": "l-bloom",
-   "name": "The bloom",
-   "blurb": "The number is the whole screen and the light is the only applause. Day one is a modest number in a small tight halo. By day thirty the number is half again as large and two more layers of light have opened behind it. The most direct of the four, and the one that lives or dies on the number growing."
-  },
-  {
-   "key": "l-pulse",
-   "name": "The pulse",
-   "blurb": "A quiet line carrying one small beat per day, today's rising far above the rest. Day one is a single beat on an otherwise flat line, the stretch of life before they started. By day thirty the line is a dense field of thirty beats and the oldest fade off the left. It reads as a sign of life rather than a chart, because every past day is drawn at exactly the same height."
-  },
-  {
-   "key": "l-stack",
-   "name": "The stack",
-   "blurb": "One ruled line of light per day, oldest at the floor, today's landing on top as the only bright one. Day one is a single lit rule under the number. By day thirty it is a quiet block of thirty rules, faintest at the bottom where the first day sits. Replaces the earlier breath concept, which was the bloom at a wider radius. This is the one that makes the total feel countable, and the one where a person can find their first day."
-  },
-  {
-   "key": "o-card",
-   "name": "The card gains weight",
-   "blurb": "The Memento itself is the reward: a little more light has gathered in the bottom of the object every day, and one sharp waterline reads how much. The level climbs on a flattening curve, so the card takes days forever and is never full. For anyone who wants the daily hit to land on the thing they already carry."
-  },
-  {
-   "key": "o-deposit",
-   "name": "The deposit",
-   "blurb": "Today arrives as a whole plate, drops, and sets into the record as one thin line that will never move again. The stack of lines resting on a floor is the count, and every seventh line sits a shade brighter so a month reads as a measure. For anyone who wants the day put somewhere safe the moment it is done."
-  },
-  {
-   "key": "o-word",
-   "name": "The word",
-   "blurb": "One true sentence and the number, nothing else on the glass. The sentence belongs to the chapter they are in rather than to the calendar day, and two things grow with the total: the figure, and the one short green rule beneath it. For anyone who wants the reward to feel like a person speaking."
   },
   {
    "key": "o-thread",

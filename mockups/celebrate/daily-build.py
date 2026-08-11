@@ -16,106 +16,6 @@ MANIFEST = os.path.join(HERE, 'daily-manifest.json')
 
 STATE_LABEL = ['Day 1', 'Week 1', 'Month 1']
 
-# The consistency bench: a live panel (its own phones, not the 20 static ones)
-# that lets Malik drag total actions + recent consistency and see the humane
-# answer, the number never shames, warmth carries momentum, misses are never
-# drawn as accusations. Also shows the cautionary window that DOES expose gaps.
-BENCH = """
-<section class="bench" id="bench">
-  <div class="bench__hd">
-    <span class="bench__t">Test bench: consistency without shame</span>
-  </div>
-  <p class="bench__lede">Drag the sliders. The unit is <b>actions completed</b>, not calendar days, so a person who shows up three times a week is never told they missed four. The banked number only ever climbs. Recent momentum shows as <b>warmth</b>, cooling when you are away, warming when you return, so consistency has stakes without a streak that can break. The third phone is the one pattern to avoid: it draws your gaps back at you.</p>
-  <div class="bench__ctl">
-    <label><span>Total actions</span><input type="range" id="bTotal" min="1" max="300" value="30"><b id="bTotalOut">30</b></label>
-    <label><span>Recent consistency</span><input type="range" id="bCons" min="5" max="100" value="60"><b id="bConsOut">60%</b></label>
-    <label class="bench__seg"><span>Their cadence</span>
-      <select id="bCad"><option value="daily">daily goal</option><option value="freq">3x a week</option><option value="maint">maintenance</option></select></label>
-  </div>
-  <div class="row">
-    <div class="state"><p class="state__l">The count, immune to gaps</p>
-      <div class="ph benchph" data-b="count"><div class="dst"></div><div class="hint">only knows your total</div></div></div>
-    <div class="state state--now"><p class="state__l">The rhythm, warmth not streak</p>
-      <div class="ph benchph" data-b="rhythm"><div class="dst"></div><div class="hint">momentum, never a miss count</div></div></div>
-    <div class="state"><p class="state__l">The window, the pattern to avoid</p>
-      <div class="ph benchph" data-b="window"><div class="dst"></div><div class="hint">this one shames, shown as a warning</div></div></div>
-  </div>
-</section>
-"""
-
-BENCH_CSS = """
-.bench{margin:0 0 40px;padding:22px 22px 26px;border-radius:20px;
-  background:rgba(63,217,78,.045);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
-.bench__t{font-size:16px;font-weight:700;letter-spacing:-.015em}
-.bench__lede{font-size:13px;color:rgba(235,238,248,.62);line-height:1.55;margin:8px 0 18px;max-width:80ch}
-.bench__lede b{color:rgba(235,238,248,.96);font-weight:650}
-.bench__ctl{display:flex;flex-wrap:wrap;gap:16px 30px;margin:0 0 22px;padding:14px 16px;
-  border-radius:12px;background:rgba(0,0,0,.28)}
-.bench__ctl label{display:flex;align-items:center;gap:11px;font-size:12.5px;color:rgba(235,238,248,.62)}
-.bench__ctl label span{flex:0 0 auto}
-.bench__ctl input[type=range]{width:190px;accent-color:var(--day)}
-.bench__ctl b{font-size:12.5px;font-weight:700;color:rgba(235,238,248,.96);font-variant-numeric:tabular-nums;min-width:38px}
-.bench__ctl select{background:rgba(235,238,248,.08);color:rgba(235,238,248,.96);border:0;border-radius:8px;
-  padding:7px 9px;font:600 13px/1 var(--font)}
-.benchph{cursor:default}
-/* bench phone internals */
-.benchph .bn{font-variant-numeric:tabular-nums;font-weight:700;letter-spacing:-.045em;line-height:.92;color:rgba(235,238,248,.96)}
-.benchph .bn--hero{font-size:112px}
-.benchph .bu{font-size:15px;color:rgba(235,238,248,.62);margin-top:14px}
-.benchph .bcap{font-size:12.5px;color:rgba(235,238,248,.40);margin-top:9px}
-.benchph .bwarm{position:absolute;left:50%;top:44%;width:300px;height:300px;transform:translate(-50%,-50%);
-  border-radius:50%;pointer-events:none;filter:blur(2px)}
-.benchph .brow{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;max-width:250px;margin-top:22px}
-.benchph .bdot{width:9px;height:9px;border-radius:50%}
-.benchph .bgrid{display:grid;grid-template-columns:repeat(10,1fr);gap:7px;width:262px;margin-top:20px}
-.benchph .bcell{width:100%;aspect-ratio:1;border-radius:4px}
-.benchph .bline{font-size:15px;font-weight:600;color:var(--day);margin-top:18px;letter-spacing:-.01em}
-.benchph .bmiss{font-size:13px;color:#ff6b6b;margin-top:14px}
-"""
-
-BENCH_JS = r"""
-(function(){
-  var $=function(id){return document.getElementById(id)};
-  function seeded(s){return function(){s=(s*1103515245+12345)&0x7fffffff;return s/0x7fffffff}}
-  function moods(c){ return c>=0.7?'Strong lately.':c>=0.38?'Finding your rhythm.':'Good to have you back.'; }
-  function unit(total, cad){
-    if(cad==='maint') return total===1?'day held':'days held';
-    if(cad==='freq')  return total===1?'session':'sessions';
-    return total===1?'move':'moves';
-  }
-  function warmRGBA(c, a){ // warm green when consistent, cools toward dim slate when not
-    var g=Math.round(40+c*160); return 'rgba('+Math.round(20+c*40)+','+g+','+Math.round(30+c*30)+','+a+')';
-  }
-  function render(){
-    var total=+$('bTotal').value, c=+$('bCons').value/100, cad=$('bCad').value;
-    $('bTotalOut').textContent=total; $('bConsOut').textContent=Math.round(c*100)+'%';
-    var u=unit(total,cad);
-    // 1. THE COUNT: identical at every consistency. Only the total exists.
-    document.querySelector('[data-b=count] .dst').innerHTML =
-      '<div class="bn bn--hero">'+total+'</div><div class="bu">'+u+', banked</div>'+
-      '<div class="bcap">the same screen at 20% or 100%</div>';
-    // 2. THE RHYTHM: banked number + warmth from recent consistency + kind line.
-    var warm=document.querySelector('[data-b=rhythm] .dst');
-    var last=Math.min(14,total), rnd=seeded(Math.round(c*97)+total), dots='';
-    for(var i=0;i<last;i++){ var on=rnd()<c;
-      dots+='<span class="bdot" style="background:'+(on?'var(--day)':'rgba(235,238,248,.12)')+'"></span>'; }
-    warm.innerHTML='<div class="bwarm" style="background:radial-gradient(circle,'+warmRGBA(c,.32)+',transparent 66%)"></div>'+
-      '<div class="bn bn--hero" style="position:relative">'+total+'</div>'+
-      '<div class="bu" style="position:relative">'+u+', banked</div>'+
-      '<div class="brow">'+dots+'</div>'+
-      '<div class="bline">'+moods(c)+'</div>';
-    // 3. THE WINDOW: draws misses back at you. The anti-pattern.
-    var win=document.querySelector('[data-b=window] .dst'), r2=seeded(Math.round(c*53)+7), cells='', miss=0;
-    for(var j=0;j<30;j++){ var d=r2()<c; if(!d)miss++;
-      cells+='<span class="bcell" style="background:'+(d?'rgba(63,217,78,.5)':'rgba(255,107,107,.14)')+'"></span>'; }
-    win.innerHTML='<div class="bn" style="font-size:74px">'+total+'</div><div class="bu">the last 30 days</div>'+
-      '<div class="bgrid">'+cells+'</div><div class="bmiss">'+miss+' days missed</div>';
-  }
-  ['bTotal','bCons','bCad'].forEach(function(id){ $(id).addEventListener('input',render); });
-  render();
-})();
-"""
-
 SHELL_CSS = """
 :root{
   --ink:235,238,248;
@@ -200,6 +100,45 @@ DRIVER = """
 """
 
 
+LIVE_CSS = """
+/* the global control bar that drives every screen */
+.dlbar{position:sticky;top:47px;z-index:55;display:flex;flex-wrap:wrap;align-items:center;gap:14px 26px;
+  padding:13px 20px;background:rgba(10,11,13,.94);
+  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border-bottom:1px solid var(--hairline)}
+.dlbar label{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--text-mid)}
+.dlbar input[type=range]{width:180px;accent-color:var(--day)}
+.dlbar b{font-size:12.5px;font-weight:700;color:var(--text-hi);font-variant-numeric:tabular-nums;min-width:36px}
+.dlbar select{background:rgba(var(--ink),.08);color:var(--text-hi);border:0;border-radius:8px;padding:7px 9px;font:600 12.5px/1 var(--font)}
+.dl-presets{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
+.dl-presets button{-webkit-appearance:none;appearance:none;border:0;cursor:pointer;font:650 11.5px/1 var(--font);
+  color:var(--text-mid);background:rgba(var(--ink),.07);padding:8px 11px;border-radius:8px}
+.dl-presets button:active{background:rgba(var(--ink),.14)}
+
+/* live phones sit two or three across */
+.livegrid{display:flex;flex-wrap:wrap;gap:30px 26px}
+.concept--live{width:390px;max-width:100%;margin:0;border-top:0;padding-top:0}
+.concept--live .concept__hd{margin-bottom:10px}
+
+/* shared bits the live renderers use */
+.ph[data-c] .dl-warm{position:absolute;left:50%;top:44%;width:320px;height:320px;transform:translate(-50%,-50%);
+  border-radius:50%;pointer-events:none;filter:blur(3px);z-index:0}
+.ph[data-c] .dst > *{position:relative;z-index:1}
+.dl-n{font-variant-numeric:tabular-nums;font-weight:750;letter-spacing:-.04em;font-size:58px;color:var(--text-hi);margin-top:26px;line-height:1}
+.dl-u{font-size:14.5px;color:var(--text-mid);margin-top:11px}
+.dl-more{font-size:12px;color:var(--text-lo);margin-top:9px}
+.fld-dot--now{fill:var(--day)!important}
+.tp-d--now{background:var(--day)!important}
+.tk-s--now{background:var(--day)!important}
+
+/* live phones render the SETTLED state; entrance fires only on tap (.on).
+   force every fragment's opacity-0 base and per-item animation off while live. */
+.ph.live .dst *{opacity:1!important;animation:none!important}
+.ph.live .dl-warm{z-index:0!important}
+
+@media (max-width:900px){ .concept--live{display:block;width:100%;margin-right:0} }
+"""
+
+
 def build():
     man = json.load(open(MANIFEST, encoding='utf-8')) if os.path.exists(MANIFEST) else {'concepts': []}
     concepts = man.get('concepts', [])
@@ -217,26 +156,18 @@ def build():
             styles.append(css.strip())
         else:
             body = raw
-        # wrap each phone in a labelled state column, in document order.
-        # splitting on the opening tag yields one chunk per phone, each chunk
-        # already carrying its own closing </div>.
+        # LIVE: one phone per concept, generated from the sliders by
+        # _daily-live.js. The fragment's own <style> is still included (its
+        # classes are reused), but the three static states are dropped.
         rid = 'row-' + c['key']
-        chunks = body.split('<div class="ph"')
-        wrapped = []
-        for idx, ch in enumerate(chunks[1:]):
-            label = STATE_LABEL[idx] if idx < len(STATE_LABEL) else 'State %d' % (idx + 1)
-            cls = 'state state--now' if idx == len(STATE_LABEL) - 1 else 'state'
-            wrapped.append('<div class="%s"><p class="state__l">%s</p><div class="ph"%s</div>'
-                           % (cls, label, ch))
         toc.append('<a href="#%s">%d. %s</a>' % (rid, i, html.escape(c['name'])))
         sections.append(
-            '<section class="concept" id="%s">'
+            '<section class="concept concept--live" id="%s">'
             '<div class="concept__hd"><span class="concept__n">%d</span>'
-            '<span class="concept__t">%s</span>'
-            '<button class="concept__replay" data-replay="%s" type="button">Replay all three</button></div>'
-            '<p class="concept__b">%s</p>'
-            '<div class="row">%s</div></section>'
-            % (rid, i, html.escape(c['name']), rid, c.get('blurb', ''), ''.join(wrapped))
+            '<span class="concept__t">%s</span></div>'
+            '<div class="ph live" data-c="%s"><div class="dst"></div>'
+            '<div class="hint">tap to play the motion</div></div></section>'
+            % (rid, i, html.escape(c['name']), c['key'])
         )
 
     page = """<!doctype html>
@@ -245,33 +176,35 @@ def build():
 <title>The daily reward, %d directions</title>
 <style>%s</style>
 <style>%s</style>
-<style>__BENCHCSS__</style>
+<style>__LIVECSS__</style>
 </head><body>
 <div class="bar">
   <a href="index.html">&lsaquo; All</a>
   <span class="bar__t">The daily reward</span>
-  <span class="bar__n">green = consistency &middot; quiet, banked, seen every day &middot; <b>tap any phone to replay</b></span>
+  <span class="bar__n">green = consistency &middot; quiet, seen every day &middot; <b>drag the sliders, they drive every screen</b></span>
+</div>
+<div class="dlbar" id="dlbar">
+  <label><span>Total actions</span><input type="range" id="dlTotal" min="1" max="365" value="30"><b id="dlTotalOut">30</b></label>
+  <label><span>Recent consistency</span><input type="range" id="dlCons" min="5" max="100" value="70"><b id="dlConsOut">70%%</b></label>
+  <label class="dl-seg"><span>Cadence</span><select id="dlCad"><option value="daily">daily goal (moves)</option><option value="freq">3x a week (sessions)</option><option value="maint">maintenance (days)</option></select></label>
+  <span class="dl-presets"><button data-preset="1,100" type="button">Day 1</button><button data-preset="7,85" type="button">Week 1</button><button data-preset="30,70" type="button">Month 1</button><button data-preset="120,45" type="button">Inconsistent</button><button data-preset="300,90" type="button">Long haul</button></span>
 </div>
 <div class="wrap">
   <h1>The daily reward, %d directions</h1>
-  <p class="lede">The everyday hit, fired the moment someone completes their action. Not a milestone: <b>no confetti, no colour flood</b>, green rather than their Memento colour, quiet enough to see <b>every day for a year</b>. It celebrates the one thing every goal shares, <b>showing up</b>, so nothing here mentions weight, money, runs or any target. Days are <b>banked and never lost</b>, so a missed day costs nothing.</p>
-  <p class="lede">Each concept is shown at <b>day 1, week 1 and month 1</b>, because those are the states that decide whether it works. Tap a phone to replay it, or replay a whole row.</p>
-  <p class="lede" style="color:rgba(235,238,248,.40)">Honest note before you start: an adversarial pass found four families that overlap, so cut fast rather than grading twenty in isolation. <b style="color:rgba(235,238,248,.62)">4, 6, 16 and 18</b> (settles, stack, stack, deposit) all resolve to a number above a pile of lines, only the entry motion differs. <b style="color:rgba(235,238,248,.62)">3 and 8</b> are both one ring per day. <b style="color:rgba(235,238,248,.62)">13 and 14</b> are both a number plus a growing green light. <b style="color:rgba(235,238,248,.62)">5 and 11</b> are both a row of strokes on a baseline. The independent sweep rated <b style="color:rgba(235,238,248,.62)">1 the odometer</b>, <b style="color:rgba(235,238,248,.62)">17 the card</b> and <b style="color:rgba(235,238,248,.62)">10 the stamp</b> strongest, and flagged <b style="color:rgba(235,238,248,.62)">12 the staircase</b> and <b style="color:rgba(235,238,248,.62)">15 the pulse</b> as the ones that saturate soonest past a year.</p>
+  <p class="lede">The everyday hit, fired the moment someone completes their action. Not a milestone: <b>no confetti, no colour flood</b>, green rather than their Memento colour, quiet enough to see <b>every day for a year</b>. It counts <b>actions completed</b>, not calendar days, so a person who shows up three times a week is never told they missed four.</p>
+  <p class="lede">Everything below is <b>live</b>. The sliders at the top drive all %d screens at once, so you can see any of them at 1 action or 300, and at any consistency. Recent momentum shows as <b>warmth</b>, present when you are showing up, faint when you are away, never a miss count. Tap a phone to play its motion.</p>
   <div class="toc">%s</div>
-  __BENCH__
-  %s
+  <div class="livegrid">%s</div>
 </div>
 <script>%s</script>
-<script>__BENCHJS__</script>
-</body></html>""" % (len(sections), SHELL_CSS, '\n'.join(styles), len(sections),
+<script src="_daily-live.js?v=live1"></script>
+</body></html>""" % (len(sections), SHELL_CSS, '\n'.join(styles), len(sections), len(sections),
                      ''.join(toc), ''.join(sections), DRIVER)
 
-    page = (page.replace('__BENCHCSS__', BENCH_CSS)
-                .replace('__BENCH__', BENCH)
-                .replace('__BENCHJS__', BENCH_JS))
+    page = page.replace('__LIVECSS__', LIVE_CSS)
 
     open(os.path.join(HERE, 'daily.html'), 'w', encoding='utf-8').write(page)
-    print('built daily.html with %d concepts (%d phones)' % (len(sections), len(sections) * 3))
+    print('built daily.html with %d live concepts' % len(sections))
 
 
 build()
