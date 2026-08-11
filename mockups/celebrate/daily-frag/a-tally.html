@@ -1,0 +1,38 @@
+<style>
+[data-c="a-tally"]{--day:#3fd94e}
+[data-c="a-tally"] .tal-stage{opacity:0}
+[data-c="a-tally"] .tal-svg{display:block;overflow:visible}
+[data-c="a-tally"] .tal-rule path{stroke:rgba(235,238,248,.13);stroke-width:1;fill:none}
+[data-c="a-tally"] .tal-mark{stroke:rgba(235,238,248,.46);stroke-width:2.3;stroke-linecap:round;fill:none;opacity:0}
+[data-c="a-tally"] .tal-now{stroke:var(--day);stroke-width:2.8;stroke-linecap:round;fill:none;
+  stroke-dasharray:1;stroke-dashoffset:1;opacity:0}
+[data-c="a-tally"] .tal-num{margin-top:30px;display:flex;align-items:baseline;justify-content:center;opacity:0}
+[data-c="a-tally"] .tal-n{font-size:50px;font-weight:700;letter-spacing:-.045em;line-height:.9;
+  color:rgba(235,238,248,.96);font-variant-numeric:tabular-nums}
+[data-c="a-tally"] .tal-u{font-size:16px;font-weight:500;letter-spacing:-.01em;margin-left:7px;
+  color:rgba(235,238,248,.58)}
+[data-c="a-tally"] .tal-cap{margin:12px 0 0;font-size:14.5px;font-weight:500;letter-spacing:-.005em;
+  color:rgba(235,238,248,.80);opacity:0}
+
+[data-c="a-tally"].on .tal-stage{animation:talRise-a-tally .36s ease-out .04s both}
+[data-c="a-tally"].on .tal-mark{animation:talInk-a-tally .26s ease-out both;
+  animation-delay:calc(var(--i) * 7ms + 80ms)}
+[data-c="a-tally"].on .tal-now{animation:talDraw-a-tally .44s cubic-bezier(.22,.9,.28,1) both;
+  animation-delay:calc(var(--td) * 1ms)}
+[data-c="a-tally"].on .tal-num{animation:talRise-a-tally .42s cubic-bezier(.22,.9,.3,1) both;
+  animation-delay:calc(var(--td) * 1ms + 200ms)}
+[data-c="a-tally"].on .tal-cap{animation:talRise-a-tally .42s cubic-bezier(.22,.9,.3,1) both;
+  animation-delay:calc(var(--td) * 1ms + 265ms)}
+@keyframes talRise-a-tally{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+@keyframes talInk-a-tally{from{opacity:0}to{opacity:1}}
+@keyframes talDraw-a-tally{from{opacity:1;stroke-dashoffset:1}to{opacity:1;stroke-dashoffset:0}}
+@media (prefers-reduced-motion:reduce){
+  [data-c="a-tally"] *{animation:none!important;transition:none!important}
+  [data-c="a-tally"] .tal-stage,[data-c="a-tally"] .tal-mark,[data-c="a-tally"] .tal-now,
+  [data-c="a-tally"] .tal-num,[data-c="a-tally"] .tal-cap{opacity:1!important;transform:none!important}
+  [data-c="a-tally"] .tal-now{stroke-dashoffset:0!important}
+}
+</style>
+<div class="ph" data-c="a-tally" data-state="d1" style="--td:120"><div class="dst"><div class="tal-stage"><svg class="tal-svg" width="23.7" height="56" viewBox="-7 0 23.7 56" aria-hidden="true"><g class="tal-rule"><path d="M-7 49H16.7"/></g><g class="tal-past"></g><path class="tal-now" pathLength="1" d="M6.7 5L4.9 45"/></svg></div><div class="tal-num"><span class="tal-n">1</span><span class="tal-u">day</span></div><p class="tal-cap">The first mark.</p></div><div class="hint">Tap to replay</div></div>
+<div class="ph" data-c="a-tally" data-state="w1" style="--td:200"><div class="dst"><div class="tal-stage"><svg class="tal-svg" width="97.8" height="56" viewBox="-7 0 97.8 56" aria-hidden="true"><g class="tal-rule"><path d="M-7 49H90.8"/></g><g class="tal-past"><path class="tal-mark" style="--i:0" d="M6.7 5L4.9 45"/><path class="tal-mark" style="--i:1" d="M16.8 5L16.2 45"/><path class="tal-mark" style="--i:2" d="M27.1 5L26.8 45"/><path class="tal-mark" style="--i:3" d="M37.1 5L38.9 45"/><path class="tal-mark" style="--i:4" d="M1.5 47L42.5 3"/><path class="tal-mark" style="--i:5" d="M70.8 5L70.2 45"/></g><path class="tal-now" pathLength="1" d="M80.6 5L80.8 45"/></svg></div><div class="tal-num"><span class="tal-n">7</span><span class="tal-u">days</span></div><p class="tal-cap">A bundle of five, and two.</p></div><div class="hint">Tap to replay</div></div>
+<div class="ph" data-c="a-tally" data-state="m1" style="--td:330"><div class="dst"><div class="tal-stage"><svg class="tal-svg" width="187.5" height="124" viewBox="-7 0 187.5 124" aria-hidden="true"><g class="tal-rule"><path d="M-7 49H180.5"/><path d="M-7 117H180.5"/></g><g class="tal-past"><path class="tal-mark" style="--i:0" d="M6.7 5L4.9 45"/><path class="tal-mark" style="--i:1" d="M16.8 5L16.2 45"/><path class="tal-mark" style="--i:2" d="M27.1 5L26.8 45"/><path class="tal-mark" style="--i:3" d="M37.1 5L38.9 45"/><path class="tal-mark" style="--i:4" d="M1.5 47L42.5 3"/><path class="tal-mark" style="--i:5" d="M70.8 5L70.2 45"/><path class="tal-mark" style="--i:6" d="M80.6 5L80.8 45"/><path class="tal-mark" style="--i:7" d="M91.3 5L91.4 45"/><path class="tal-mark" style="--i:8" d="M101.9 5L102 45"/><path class="tal-mark" style="--i:9" d="M65.5 47L106.5 3"/><path class="tal-mark" style="--i:10" d="M134.3 5L135.1 45"/><path class="tal-mark" style="--i:11" d="M144.9 5L145.4 45"/><path class="tal-mark" style="--i:12" d="M154.9 5L154.4 45"/><path class="tal-mark" style="--i:13" d="M166.8 5L166.4 45"/><path class="tal-mark" style="--i:14" d="M129.5 47L170.5 3"/><path class="tal-mark" style="--i:15" d="M5.8 73L7.2 113"/><path class="tal-mark" style="--i:16" d="M15.8 73L16.5 113"/><path class="tal-mark" style="--i:17" d="M28.7 73L28.3 113"/><path class="tal-mark" style="--i:18" d="M38.4 73L37.8 113"/><path class="tal-mark" style="--i:19" d="M1.5 115L42.5 71"/><path class="tal-mark" style="--i:20" d="M71.1 73L70 113"/><path class="tal-mark" style="--i:21" d="M79.2 73L79.6 113"/><path class="tal-mark" style="--i:22" d="M91.6 73L90.1 113"/><path class="tal-mark" style="--i:23" d="M103.1 73L101.6 113"/><path class="tal-mark" style="--i:24" d="M65.5 115L106.5 71"/><path class="tal-mark" style="--i:25" d="M134.8 73L134.2 113"/><path class="tal-mark" style="--i:26" d="M143.6 73L143.7 113"/><path class="tal-mark" style="--i:27" d="M156.4 73L155.3 113"/><path class="tal-mark" style="--i:28" d="M164.8 73L166.5 113"/></g><path class="tal-now" pathLength="1" d="M129.5 115L170.5 71"/></svg></div><div class="tal-num"><span class="tal-n">30</span><span class="tal-u">days</span></div><p class="tal-cap">Today closed the sixth bundle.</p></div><div class="hint">Tap to replay</div></div>

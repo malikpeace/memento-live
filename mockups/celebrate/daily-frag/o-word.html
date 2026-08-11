@@ -1,0 +1,67 @@
+<style>
+/* o-word THE WORD. One true sentence and the number, nothing else on the
+   glass. Nothing here can wear out because there is almost nothing here. The
+   sentence arrives a word at a time, then the one green rule, then the count.
+   Two things grow with the total: the figure takes more room as there is more
+   of it, and the rule under it runs longer. The sentence belongs to the
+   chapter they are in rather than to the calendar day, so it changes a
+   handful of times a year and is never a fresh compliment every morning. */
+[data-c="o-word"] .owsent{margin:0;max-width:17ch;font-size:25px;line-height:1.34;
+  font-weight:600;letter-spacing:-.026em;color:var(--text-hi)}
+[data-c="o-word"] .ow{display:inline-block;opacity:0;transform:translateY(.34em)}
+/* the only colour on the screen, and it is one short line that keeps its own
+   count: longer as the total grows, on a curve that stays inside the glass */
+[data-c="o-word"] .owrule{width:var(--owr);height:2px;border-radius:1px;
+  background:rgba(var(--day-rgb),.85);margin:32px 0 24px;transform:scaleX(0);opacity:0}
+[data-c="o-word"] .ownum{display:flex;align-items:baseline;justify-content:center;gap:9px;opacity:0}
+[data-c="o-word"] .owfig{font-size:var(--owf);font-variant-numeric:tabular-nums;font-weight:700;
+  letter-spacing:-.045em;line-height:.9;color:var(--text-hi)}
+[data-c="o-word"] .owunit{font-size:15.5px;font-weight:550;color:rgba(var(--ink),.72);
+  letter-spacing:-.01em}
+[data-c="o-word"] .owcap{margin-top:18px;font-size:12.5px;color:var(--text-lo);opacity:0}
+[data-c="o-word"] .owm{position:absolute;bottom:52px;left:50%;transform:translateX(-50%);
+  width:17px;height:17px;fill:rgba(255,255,255,.14);opacity:0}
+
+[data-c="o-word"][data-state="d1"]{--owf:40px;--owr:26px;--owd:.67s;--own:.81s;--owc:1.01s;--owmk:1.15s}
+[data-c="o-word"][data-state="w1"]{--owf:54px;--owr:58px;--owd:.62s;--own:.76s;--owc:.96s;--owmk:1.10s}
+[data-c="o-word"][data-state="m1"]{--owf:72px;--owr:112px;--owd:.76s;--own:.90s;--owc:1.10s;--owmk:1.24s}
+
+[data-c="o-word"].on .ow{animation:k_oword_in .5s cubic-bezier(.2,.85,.28,1) both;
+  animation-delay:calc(var(--i) * 46ms + 130ms)}
+[data-c="o-word"].on .owrule{animation:k_oword_rule .5s cubic-bezier(.2,.85,.28,1) var(--owd) both}
+[data-c="o-word"].on .ownum{animation:k_oword_num .5s cubic-bezier(.2,.85,.28,1) var(--own) both}
+[data-c="o-word"].on .owcap{animation:k_oword_fade .45s ease-out var(--owc) both}
+[data-c="o-word"].on .owm{animation:k_oword_foot .5s ease-out var(--owmk) both}
+@keyframes k_oword_in{from{opacity:0;transform:translateY(.34em)}to{opacity:1;transform:none}}
+@keyframes k_oword_rule{from{opacity:0;transform:scaleX(0)}to{opacity:1;transform:scaleX(1)}}
+@keyframes k_oword_num{from{opacity:0;transform:translateY(9px) scale(.94)}to{opacity:1;transform:none}}
+@keyframes k_oword_fade{from{opacity:0}to{opacity:1}}
+@keyframes k_oword_foot{from{opacity:0;transform:translateX(-50%)}to{opacity:1;transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){
+  [data-c="o-word"] *{animation:none!important;transition:none!important}
+  [data-c="o-word"] .ow,[data-c="o-word"] .ownum,[data-c="o-word"] .owcap{
+    opacity:1!important;transform:none!important}
+  [data-c="o-word"] .owrule{opacity:1!important;transform:scaleX(1)!important}
+  [data-c="o-word"] .owm{opacity:1!important;transform:translateX(-50%)!important}}
+</style>
+<div class="ph" data-c="o-word" data-state="d1"><div class="dst">
+  <p class="owsent"><span class="ow" style="--i:0">Everything</span> <span class="ow" style="--i:1">long</span> <span class="ow" style="--i:2">starts</span> <span class="ow" style="--i:3">on</span> <span class="ow" style="--i:4">an</span> <span class="ow" style="--i:5">ordinary</span> <span class="ow" style="--i:6">day.</span></p>
+  <div class="owrule"></div>
+  <div class="ownum"><span class="owfig">1</span><span class="owunit">day</span></div>
+  <div class="owcap">March 4</div>
+  <svg class="owm" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+</div><div class="hint">Tap to replay</div></div>
+<div class="ph" data-c="o-word" data-state="w1"><div class="dst">
+  <p class="owsent"><span class="ow" style="--i:0">This</span> <span class="ow" style="--i:1">has</span> <span class="ow" style="--i:2">stopped</span> <span class="ow" style="--i:3">being</span> <span class="ow" style="--i:4">a</span> <span class="ow" style="--i:5">one-off.</span></p>
+  <div class="owrule"></div>
+  <div class="ownum"><span class="owfig">7</span><span class="owunit">days</span></div>
+  <div class="owcap">March 12</div>
+  <svg class="owm" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+</div><div class="hint">Tap to replay</div></div>
+<div class="ph" data-c="o-word" data-state="m1"><div class="dst">
+  <p class="owsent"><span class="ow" style="--i:0">Thirty</span> <span class="ow" style="--i:1">separate</span> <span class="ow" style="--i:2">times</span> <span class="ow" style="--i:3">you</span> <span class="ow" style="--i:4">chose</span> <span class="ow" style="--i:5">to</span> <span class="ow" style="--i:6">do</span> <span class="ow" style="--i:7">it</span> <span class="ow" style="--i:8">again.</span></p>
+  <div class="owrule"></div>
+  <div class="ownum"><span class="owfig">30</span><span class="owunit">days</span></div>
+  <div class="owcap">April 6</div>
+  <svg class="owm" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+</div><div class="hint">Tap to replay</div></div>

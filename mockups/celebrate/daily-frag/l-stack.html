@@ -1,0 +1,80 @@
+<style>
+[data-c="l-stack"]{--ink:235,238,248;--day:#3fd94e;--day-rgb:63,217,78}
+[data-c="l-stack"] .core{position:relative;z-index:2;display:flex;flex-direction:column;
+  align-items:center}
+[data-c="l-stack"] .num{font-variant-numeric:tabular-nums;font-weight:700;letter-spacing:-.05em;
+  line-height:.88;font-size:var(--ns);color:rgba(var(--ink),.96)}
+/* the stack. one ruled line per day, oldest at the floor, today landing on top
+   as the only bright one. hairlines, never a slab. */
+[data-c="l-stack"] .lst-col{display:flex;flex-direction:column-reverse;align-items:center;gap:3.5px;
+  width:118px;margin:30px 0 0;transform-origin:50% 100%}
+[data-c="l-stack"] .lst-col b{display:block;width:100%;height:1.5px;border-radius:1px;
+  background:var(--day);transform-origin:50% 50%;
+  opacity:calc(var(--o0) + var(--i) * var(--step))}
+[data-c="l-stack"] .lst-col b:last-child{height:3px;border-radius:1.5px;opacity:1;margin-bottom:3px}
+[data-c="l-stack"][data-state="d1"]{--ns:96px; --o0:1;  --step:0}
+[data-c="l-stack"][data-state="w1"]{--ns:104px;--o0:.26;--step:.062}
+[data-c="l-stack"][data-state="m1"]{--ns:112px;--o0:.22;--step:.0131}
+/* the one soft breath on the screen, radial to zero long before its own bounds */
+[data-c="l-stack"] .air{position:absolute;left:50%;top:50%;width:300px;height:300px;
+  margin:-150px 0 0 -150px;z-index:1;pointer-events:none;transform-origin:50% 50%;opacity:.82;
+  background:radial-gradient(circle at 50% 50%, rgba(var(--day-rgb),.13) 0%,
+    rgba(var(--day-rgb),0) 62%)}
+[data-c="l-stack"] .line{font-size:16px;font-weight:500;letter-spacing:-.012em;margin-top:28px;
+  color:rgba(var(--ink),.90)}
+[data-c="l-stack"] .line b{font-weight:700;color:rgba(var(--ink),.99)}
+[data-c="l-stack"] .date{font-size:12.5px;font-weight:400;margin-top:9px;color:rgba(var(--ink),.50)}
+[data-c="l-stack"] .mk{position:absolute;bottom:54px;left:50%;margin-left:-8px;width:16px;height:16px;
+  z-index:2;fill:rgba(var(--ink),.14)}
+
+[data-c="l-stack"].on .num {animation:kRiseST .6s cubic-bezier(.2,.9,.25,1) both}
+[data-c="l-stack"].on .lst-col  {animation:kFloorST .62s cubic-bezier(.2,.9,.25,1) .14s both}
+[data-c="l-stack"].on .lst-col b:last-child{animation:kLandST .46s cubic-bezier(.2,.92,.3,1) .44s both}
+[data-c="l-stack"].on .air {animation:kAirST 1.05s cubic-bezier(.16,.86,.28,1) .3s both}
+[data-c="l-stack"].on .line{animation:kFadeST .5s ease-out .54s both}
+[data-c="l-stack"].on .date{animation:kFadeST .5s ease-out .66s both}
+[data-c="l-stack"].on .mk  {animation:kFadeST .5s ease-out .82s both}
+@keyframes kRiseST{from{opacity:0;transform:translateY(11px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes kFadeST{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+@keyframes kFloorST{from{opacity:0;transform:translateY(10px) scaleY(.55)}to{opacity:1;transform:none}}
+@keyframes kLandST{from{opacity:0;transform:translateY(-9px) scaleX(.5)}to{opacity:1;transform:none}}
+@keyframes kAirST{0%{opacity:0;transform:scale(.4)}60%{opacity:1;transform:scale(1.03)}
+  100%{opacity:.82;transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){
+  [data-c="l-stack"] *{animation:none!important}
+  [data-c="l-stack"] .num,[data-c="l-stack"] .line,[data-c="l-stack"] .date,
+  [data-c="l-stack"] .lst-col,[data-c="l-stack"] .mk{opacity:1!important;transform:none!important}
+  [data-c="l-stack"] .lst-col b:last-child{opacity:1!important;transform:none!important}
+  [data-c="l-stack"] .air{opacity:.82!important;transform:none!important}
+}
+</style>
+<div class="ph" data-c="l-stack" data-state="d1"><div class="dst">
+  <div class="air"></div>
+  <div class="core">
+    <div class="num">1</div>
+    <div class="st"><b style="--i:0"></b></div>
+    <div class="line"><b>1 day</b> banked.</div>
+    <div class="date">February 13</div>
+  </div>
+  <svg class="mk" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+</div><div class="hint">Tap to replay</div></div>
+<div class="ph" data-c="l-stack" data-state="w1"><div class="dst">
+  <div class="air"></div>
+  <div class="core">
+    <div class="num">7</div>
+    <div class="st"><b style="--i:0"></b><b style="--i:1"></b><b style="--i:2"></b><b style="--i:3"></b><b style="--i:4"></b><b style="--i:5"></b><b style="--i:6"></b></div>
+    <div class="line"><b>7 days</b> banked.</div>
+    <div class="date">February 19</div>
+  </div>
+  <svg class="mk" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+</div><div class="hint">Tap to replay</div></div>
+<div class="ph" data-c="l-stack" data-state="m1"><div class="dst">
+  <div class="air"></div>
+  <div class="core">
+    <div class="num">30</div>
+    <div class="st"><b style="--i:0"></b><b style="--i:1"></b><b style="--i:2"></b><b style="--i:3"></b><b style="--i:4"></b><b style="--i:5"></b><b style="--i:6"></b><b style="--i:7"></b><b style="--i:8"></b><b style="--i:9"></b><b style="--i:10"></b><b style="--i:11"></b><b style="--i:12"></b><b style="--i:13"></b><b style="--i:14"></b><b style="--i:15"></b><b style="--i:16"></b><b style="--i:17"></b><b style="--i:18"></b><b style="--i:19"></b><b style="--i:20"></b><b style="--i:21"></b><b style="--i:22"></b><b style="--i:23"></b><b style="--i:24"></b><b style="--i:25"></b><b style="--i:26"></b><b style="--i:27"></b><b style="--i:28"></b><b style="--i:29"></b></div>
+    <div class="line"><b>30 days</b> banked.</div>
+    <div class="date">March 14</div>
+  </div>
+  <svg class="mk" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+</div><div class="hint">Tap to replay</div></div>
