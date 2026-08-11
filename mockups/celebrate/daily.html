@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The daily reward — you showed up</title>
+<link rel="stylesheet" href="_kit.css?v=tw5">
+<style>
+  /* The daily "you showed up" reward. NOT a celebration: quiet, fast,
+     glanceable, seen EVERY day, so nothing here may fatigue. Green because
+     green is the app's consistency/life colour (heatmap, Mori); their
+     Memento colour stays reserved for goal milestones. Total days BANKED,
+     never a consecutive streak that can break. */
+  :root{
+    --day: #3fd94e; --day-rgb: 63,217,78; --day-strong:#1f9e2a;
+  }
+  .d-wrap{padding:22px 20px 90px;max-width:1760px;margin:0 auto}
+  .d-wrap h1{font-size:26px;font-weight:700;letter-spacing:-.02em;margin:0 0 6px}
+  .d-sub{color:var(--text-mid);font-size:14px;line-height:1.55;margin:0 0 24px;max-width:74ch}
+  .d-sub b{color:var(--text-hi);font-weight:650}
+  .grid{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}
+  .cell{width:390px;max-width:100%}
+  .cell h2{font-size:14px;font-weight:700;letter-spacing:-.01em;margin:0 0 3px}
+  .cell .cd{font-size:12.5px;color:var(--text-mid);line-height:1.5;margin:0 0 12px;max-width:44ch}
+  .ph{cursor:pointer}
+  .dst{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+    justify-content:center;padding:34px 30px;text-align:center}
+
+  /* shared quiet type */
+  .d-n{font-variant-numeric:tabular-nums;font-weight:800;letter-spacing:-.045em;line-height:.9;
+    color:var(--text-hi);font-size:120px}
+  .d-line{font-size:16px;color:var(--text-mid);font-weight:500;margin-top:18px;letter-spacing:-.01em}
+  .d-line b{color:var(--text-hi);font-weight:650}
+  .d-date{font-size:12px;color:var(--text-lo);margin-top:10px;letter-spacing:.01em}
+  .d-mark{position:absolute;bottom:52px;left:50%;transform:translateX(-50%);width:16px;height:16px;
+    fill:rgba(255,255,255,.12)}
+  .hint{position:absolute;left:0;right:0;bottom:14px;text-align:center;font-size:10px;
+    letter-spacing:.04em;color:rgba(var(--ink),.18)}
+
+  /* entrance: the number lands, then the line. Fast (this is daily).
+     Every direct child fades in generically; the hero rises; concept-specific
+     elements (halo, today cell, card breath) override with their own motion
+     (they sit later in the sheet, so equal specificity resolves to them). */
+  .ph .dst > *{opacity:0}
+  .ph.on .dst > *{animation:dFade .5s ease-out both}
+  .ph.on .d-n{animation:dRise .5s cubic-bezier(.2,.9,.25,1) both}
+  .ph.on .grid2,.ph.on .mini,.ph.on .led,.ph.on .d-word{animation:dRise .5s cubic-bezier(.2,.9,.25,1) both}
+  .ph.on .d-line{animation-delay:.3s}
+  .ph.on .d-date{animation-delay:.46s}
+  .ph.on .d-mark{animation-delay:.62s}
+  @keyframes dRise{from{opacity:0;transform:translateY(10px) scale(.96)}to{opacity:1;transform:none}}
+  @keyframes dFade{from{opacity:0}to{opacity:1}}
+
+  /* 1 THE COUNT: the banked number, one soft green pulse behind it */
+  [data-c="d1"] .d-n{color:#fff}
+  [data-c="d1"] .halo{position:absolute;width:230px;height:230px;border-radius:50%;
+    background:radial-gradient(circle,rgba(var(--day-rgb),.20),transparent 68%);opacity:0}
+  [data-c="d1"] .d-n b{color:var(--day)}
+  [data-c="d1"].on .halo{animation:d1halo 1.1s ease-out forwards}
+  @keyframes d1halo{0%{opacity:0;transform:scale(.6)}40%{opacity:1}100%{opacity:.35;transform:scale(1)}}
+
+  /* 2 THE CHAIN: the consistency grid, today's cell lands green */
+  [data-c="d2"] .grid2{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;width:264px;margin-bottom:26px}
+  [data-c="d2"] .gc{aspect-ratio:1;border-radius:3px;background:rgba(var(--ink),.09)}
+  [data-c="d2"] .gc.f{background:rgba(var(--day-rgb),.55)}
+  [data-c="d2"] .gc.today{background:rgba(var(--day-rgb),.30);opacity:0;
+    box-shadow:0 0 0 1.5px rgba(var(--day-rgb),.9)}
+  [data-c="d2"].on .gc.today{animation:d2land .55s cubic-bezier(.2,.9,.25,1) .2s forwards}
+  @keyframes d2land{0%{opacity:0;transform:scale(.4)}60%{opacity:1;transform:scale(1.15)}100%{opacity:1;transform:scale(1);background:rgba(var(--day-rgb),.72)}}
+
+  /* 3 THE MOVE: accumulation framed as the act, not the streak */
+  [data-c="d3"] .d-n{font-size:100px}
+  [data-c="d3"] .ord{font-size:34px;font-weight:750;color:var(--text-mid);vertical-align:top;margin-left:4px}
+
+  /* 4 THE WORD: almost nothing. text-forward, calm */
+  [data-c="d4"] .d-word{font-size:40px;font-weight:700;letter-spacing:-.03em;color:var(--text-hi)}
+  [data-c="d4"] .d-word b{color:var(--day)}
+  [data-c="d4"] .d-under{font-size:15px;color:var(--text-mid);margin-top:16px}
+
+  /* 5 THE CARD BREATH: the Memento itself takes a shade + a soft pulse */
+  [data-c="d5"] .mini{position:relative;width:150px;height:196px;border-radius:20px;
+    background:linear-gradient(160deg,#14171c,#0d0f13);
+    box-shadow:0 20px 50px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.05);
+    display:flex;align-items:center;justify-content:center;margin-bottom:26px;overflow:hidden}
+  [data-c="d5"] .mini svg{width:44px;height:44px;fill:rgba(255,255,255,.16)}
+  [data-c="d5"] .mini::after{content:"";position:absolute;inset:0;
+    background:radial-gradient(120% 90% at 50% 120%,rgba(var(--day-rgb),.30),transparent 62%);opacity:0}
+  [data-c="d5"].on .mini::after{animation:d5breath 1.4s ease-out .2s forwards}
+  @keyframes d5breath{0%{opacity:0}45%{opacity:1}100%{opacity:.5}}
+
+  /* 6 THE LEDGER: today writes itself into a running list */
+  [data-c="d6"] .led{width:280px;text-align:left}
+  [data-c="d6"] .lr{display:flex;justify-content:space-between;align-items:baseline;
+    padding:10px 0;border-bottom:1px solid rgba(var(--ink),.07);font-variant-numeric:tabular-nums}
+  [data-c="d6"] .lr .ld{font-size:13.5px;color:var(--text-lo)}
+  [data-c="d6"] .lr .lv{font-size:13.5px;color:var(--text-mid)}
+  [data-c="d6"] .lr--now{opacity:0}
+  [data-c="d6"] .lr--now .ld{color:var(--text-hi);font-weight:650}
+  [data-c="d6"] .lr--now .lv{color:var(--day);font-weight:650}
+  [data-c="d6"].on .lr--now{animation:d6in .55s cubic-bezier(.2,.9,.25,1) .25s forwards}
+  @keyframes d6in{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+  [data-c="d6"] .d-line{margin-top:20px}
+
+  @media (prefers-reduced-motion:reduce){ .ph .dst > *{opacity:1} [data-c] *{animation:none!important;opacity:1!important} }
+  @media (max-width:860px){ .cell,.ph{width:100%;max-width:390px} .d-wrap{padding:16px 14px 70px} }
+</style>
+</head><body data-accent="green">
+<div class="bar">
+  <a href="index.html" style="color:var(--text-mid);text-decoration:none;font-size:13px;font-weight:600">&lsaquo; All</a>
+  <span class="bar__t">The daily reward</span>
+  <span class="bar__n">green = consistency &middot; quiet, banked, seen every day &middot; <b>tap a phone to replay</b></span>
+</div>
+<div class="d-wrap">
+  <h1>The daily reward: you showed up</h1>
+  <p class="d-sub">The everyday hit, fired the moment you complete your action. Not a celebration: <b>no confetti, no flood</b>, green not your Memento colour, fast enough to glance and gone. It counts <b>total days banked</b>, never a streak that can break, so a missed day costs nothing. The whole test is that it can appear <b>every single day for a year</b> and still feel good, which means the number growing has to carry it, not the decoration. Six directions, pick what feels right.</p>
+  <div class="grid">
+
+    <div class="cell">
+      <h2>1 &middot; The count</h2>
+      <p class="cd">The banked number is the whole thing. One soft green breath behind it, then the line. The number changing daily is what keeps it alive.</p>
+      <div class="ph" data-c="d1">
+        <div class="dst">
+          <div class="halo"></div>
+          <div class="d-n">128</div>
+          <div class="d-line"><b>128 days</b> you showed up.</div>
+          <div class="d-date">Today · March 14</div>
+          <svg class="d-mark" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+        </div>
+        <div class="hint">Tap to replay</div>
+      </div>
+    </div>
+
+    <div class="cell">
+      <h2>2 &middot; The chain</h2>
+      <p class="cd">The app's own consistency grid. Today's cell lands green. Speaks the heatmap language people already know, the wall visibly fills.</p>
+      <div class="ph" data-c="d2">
+        <div class="dst">
+          <div class="grid2" id="grid2"></div>
+          <div class="d-line"><b>Day 128.</b> Today is in the wall.</div>
+          <div class="d-date">March 14</div>
+          <svg class="d-mark" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+        </div>
+        <div class="hint">Tap to replay</div>
+      </div>
+    </div>
+
+    <div class="cell">
+      <h2>3 &middot; The move</h2>
+      <p class="cd">Framed as the act, not the run: your Nth move. Good for people who miss days, there is no streak to lose, only a total that grows.</p>
+      <div class="ph" data-c="d3">
+        <div class="dst">
+          <div class="d-n">128<span class="ord">th</span></div>
+          <div class="d-line">move made. You did the thing again.</div>
+          <div class="d-date">March 14</div>
+          <svg class="d-mark" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+        </div>
+        <div class="hint">Tap to replay</div>
+      </div>
+    </div>
+
+    <div class="cell">
+      <h2>4 &middot; The word</h2>
+      <p class="cd">Almost nothing. A word and a number. The calmest option, hardest to tire of because there is so little to tire of.</p>
+      <div class="ph" data-c="d4">
+        <div class="dst">
+          <div class="d-word">Shown up.</div>
+          <div class="d-under"><b style="color:var(--day)">128 days</b> banked. Nothing takes them back.</div>
+          <div class="d-date">March 14</div>
+          <svg class="d-mark" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+        </div>
+        <div class="hint">Tap to replay</div>
+      </div>
+    </div>
+
+    <div class="cell">
+      <h2>5 &middot; The card breath</h2>
+      <p class="cd">The reward IS the Memento. It takes a soft green breath from below, tying the daily act to the object that carries their whole story.</p>
+      <div class="ph" data-c="d5">
+        <div class="dst">
+          <div class="mini"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <div class="d-line"><b>128 days</b> are in the card.</div>
+          <div class="d-date">Today · March 14</div>
+        </div>
+        <div class="hint">Tap to replay</div>
+      </div>
+    </div>
+
+    <div class="cell">
+      <h2>6 &middot; The ledger</h2>
+      <p class="cd">Today writes itself into a running record. Each day a line drops in at the top, the proof stacks up in front of them over time.</p>
+      <div class="ph" data-c="d6">
+        <div class="dst">
+          <div class="led">
+            <div class="lr lr--now"><span class="ld">Today · Mar 14</span><span class="lv">showed up · 128</span></div>
+            <div class="lr"><span class="ld">Mar 13</span><span class="lv">showed up · 127</span></div>
+            <div class="lr"><span class="ld">Mar 12</span><span class="lv">showed up · 126</span></div>
+            <div class="lr"><span class="ld">Mar 11</span><span class="lv">showed up · 125</span></div>
+          </div>
+          <div class="d-line"><b>128 days</b> in the record.</div>
+          <svg class="d-mark" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+        </div>
+        <div class="hint">Tap to replay</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<script>
+(function(){
+  // build the consistency grid for concept 2: 90 cells, most filled, last = today
+  var g = document.getElementById('grid2');
+  if (g) {
+    for (var i=0;i<90;i++){
+      var c = document.createElement('div');
+      var today = i===89;
+      var filled = !today && (i%9!==3 && i%13!==5);   // a lived-in wall with gaps
+      c.className = 'gc' + (today ? ' today' : (filled ? ' f' : ''));
+      g.appendChild(c);
+    }
+  }
+  function play(ph){ ph.classList.remove('on'); void ph.offsetWidth; ph.classList.add('on'); }
+  [].forEach.call(document.querySelectorAll('.ph'), function(ph){
+    ph.addEventListener('click', function(){ play(ph); });
+    play(ph);
+  });
+})();
+</script>
+</body></html>
