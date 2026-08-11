@@ -4067,11 +4067,13 @@ const SHEET_TEMPLATES = {
           if (self._intervalId) { clearInterval(self._intervalId); self._intervalId = null; }
           if (overlay) overlay.classList.add('is-done');
           const ring = () => {
-            try { if (typeof MementoSound !== 'undefined') MementoSound.play('arrival'); } catch (e) {}
+            // Malik's pick: Two Strikes. Simple, calm and clear, because a
+            // deep work timer has no reason to be aggressive.
+            try { if (typeof MementoSound !== 'undefined') MementoSound.play('strike'); } catch (e) {}
             try { feel('complete'); } catch (e) {}
           };
           ring();
-          self._ringId = setInterval(ring, 3600);
+          self._ringId = setInterval(ring, 2200);
           // a bounded alarm: a phone left face-down does not ring for an hour
           self._ringStop = setTimeout(stopRing, 3 * 60 * 1000);
           if (overlay) {

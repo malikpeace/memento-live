@@ -36,7 +36,7 @@ body:not(.ns-bloom):not(.evo2-surge):not(.evo2-orb) .daycard-theme-living .dayca
    card's own 60px glow are gone pre-Clarity; only the dark lift shadow
    stays so the card still sits on the page rather than floating flat. */
 body.pre-clarity .daycard-theme-living .daycard-living-stage {
-  box-shadow: 0 12px 38px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 22px 90px rgba(0, 0, 0, 0.13);
 }
 body.pre-clarity .daycard-ns {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10), 0 26px 60px rgba(0, 0, 0, 0.45);
@@ -86,7 +86,7 @@ body:not(.ns-bloom) .daycard-theme-living .daycard-wrap__aura {
      parent), so the card itself can clip-path its corners cleanly without the
      clip eating its lift. */
   border-radius: var(--r-card);
-  box-shadow: 0 0 44px rgba(200, 210, 255, 0.10), 0 12px 38px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 0 44px rgba(200, 210, 255, 0.10), 0 22px 90px rgba(0, 0, 0, 0.13);
 }
 @media (max-width: 767.98px) {
   .daycard-theme-living .daycard-living-stage { width: min(86%, 330px); }
@@ -417,7 +417,7 @@ body.evo2 .ambient__rays { opacity: 0 !important; }
 body.evo2 .daycard-theme-living .daycard-living-stage {
   box-shadow:
     0 0 44px rgba(200, 210, 255, 0.10),
-    0 12px 38px rgba(0, 0, 0, 0.28),
+    0 22px 90px rgba(0, 0, 0, 0.13),
     0 0 10px rgba(255, 255, 255, calc(1 * var(--act, 0))),
     0 0 34px rgba(232, 246, 255, calc(0.72 * var(--act, 0))),
     0 0 84px rgba(180, 218, 255, calc(0.46 * var(--act, 0))),
@@ -579,7 +579,7 @@ html.theme-light .daycard-theme-living .daycard-ns__rim {
      the same rim, throwing light OUT into the room, not just inward. */
   box-shadow:
     0 0 44px rgba(200, 210, 255, 0.10),
-    0 12px 38px rgba(0, 0, 0, 0.28),
+    0 22px 90px rgba(0, 0, 0, 0.13),
     0 0 10px rgba(255, 255, 255, calc(0.55 * var(--act, 0))),
     0 0 34px rgba(232, 246, 255, calc(0.40 * var(--act, 0))),
     0 0 84px rgba(180, 218, 255, calc(0.26 * var(--act, 0))),
@@ -588,7 +588,7 @@ html.theme-light .daycard-theme-living .daycard-ns__rim {
 html.theme-light .daycard-theme-living .daycard-living-stage {
   box-shadow:
     0 0 44px rgba(200, 210, 255, 0.10),
-    0 12px 38px rgba(0, 0, 0, 0.28),
+    0 22px 90px rgba(0, 0, 0, 0.13),
     0 8px calc(26px * var(--act, 0)) rgba(64, 92, 134, calc(0.20 * var(--act, 0)));
 }
 
@@ -818,3 +818,15 @@ body:not(.ns-bloom) .daycard-theme-living .daycard-ns__rim {
 }
 .mfsk-acc__sw i { display: block; width: 100%; height: 100%; border-radius: 999px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.22); }
 .mfsk-acc__sw.is-on { background: rgba(255,255,255,0.14); }
+
+
+/* ============================================================================
+   v1174 (Malik, the same report twice): the card's lift was a TIGHT black
+   drop shadow (0 12px 38px rgba(0,0,0,.28)) sitting right against its rounded
+   edge. On the phone's black home it is invisible; on desktop, where the
+   beams light the page, it reads as a dark rectangle hugging the card, and it
+   travels with the card, so it is loudest exactly when the card MOVES. It is
+   now wide, low and edgeless (0 22px 90px at .13), which still gives depth
+   but cannot draw a shape. The guard below keeps it that way: a dark shadow
+   under the card may never be tighter than 60px of blur.
+   Depth on this card comes from LIGHT. */

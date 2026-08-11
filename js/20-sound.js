@@ -160,6 +160,34 @@ const MementoSound = (() => {
         o.start(t); o.stop(t + 3.2);
       });
     },
+    /* v1174 (Malik picked it): the end of a deep work block. A low wooden
+       strike, then its fifth just behind it, each with a short noise
+       transient so it reads as something SET DOWN rather than a tone. Calm
+       and clear on purpose: a deep work timer has no reason to be aggressive.
+       Levels are matched to the other cues (peak ~0.47, no clipping). */
+    strike(c, out) {
+      const t = c.currentTime;
+      const rv = verb(c, 1.9, 2.6); const rvG = c.createGain(); rvG.gain.value = 0.4;
+      rv.connect(rvG).connect(out);
+      const hit = (f, t0, peak) => {
+        [1, 2.02, 3.04, 4.4].forEach((h, i) => {
+          const o = c.createOscillator(); o.type = 'sine'; o.frequency.value = f * h;
+          const g = env(c, t0, 0.004, 0.05, 1.5 - i * 0.28, peak * [1, 0.34, 0.13, 0.05][i]);
+          o.connect(g); g.connect(out); g.connect(rv);
+          o.start(t0); o.stop(t0 + 2);
+        });
+        // the wooden knock itself: a very short filtered noise burst
+        const len = Math.floor(c.sampleRate * 0.05);
+        const b = c.createBuffer(1, len, c.sampleRate); const d = b.getChannelData(0);
+        for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 6);
+        const n = c.createBufferSource(); n.buffer = b;
+        const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = f * 3; bp.Q.value = 1.2;
+        const ng = c.createGain(); ng.gain.value = peak * 0.5;
+        n.connect(bp).connect(ng).connect(out); n.start(t0);
+      };
+      hit(146.8, t, 0.42);
+      hit(220.0, t + 0.2, 0.26);
+    },
     tick(c, out) {
       const t = c.currentTime;
       const o = c.createOscillator(); o.type = 'sine';
