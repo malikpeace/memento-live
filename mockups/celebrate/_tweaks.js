@@ -81,8 +81,20 @@
         cnt(ph, '.qu1-hero', cur);
         put(ph, '.b1 .sub', esc(unitFor(cur, v.unit)) + '.');
         /* the travelled baseline: progress reads at 3% or 93%, never a dead
-           axis before the first fifth (his 17-of-100 catch) */
-        var gone = Q(ph, '.qu1-gone'); if (gone) gone.style.width = (frac * 100).toFixed(1) + '%';
+           axis before the first fifth (his 17-of-100 catch). The posts sit
+           at the CENTERS of equal flex cells, so the line must be mapped
+           into that geometry, not drawn as a raw percentage: at 58 of 100 it
+           ends just short of the 60 post (his 58-past-60 catch). */
+        function xFor(vv) {
+          var N = marks.length, cx = function (i) { return (i + 0.5) / N * 100; };
+          if (vv <= start) return 0;
+          if (vv <= marks[0]) return (vv - start) / (marks[0] - start) * cx(0);
+          for (var i = 0; i < N - 1; i++) {
+            if (vv <= marks[i + 1]) return cx(i) + (vv - marks[i]) / (marks[i + 1] - marks[i]) * (cx(i + 1) - cx(i));
+          }
+          return cx(N - 1);
+        }
+        var gone = Q(ph, '.qu1-gone'); if (gone) gone.style.width = xFor(cur).toFixed(1) + '%';
         var cells = '', labels = '';
         marks.forEach(function (m) {
           var isNow = m === nowMark, isPast = passed.indexOf(m) > -1 && !isNow;

@@ -8,8 +8,10 @@
   border-bottom:1px solid var(--hairline)}
 /* the travelled stretch of the baseline, brighter (Malik: at 17 of 100 the
    axis looked dead; progress must be visible long before the first fifth) */
+/* width lives in POST coordinates (marks sit at cell centers, value 60 of
+   100 = the third post at 50% of the axis), set inline / by the tweak layer */
 [data-c="qu-1"] .qu1-gone{position:absolute;left:0;top:29px;height:1px;
-  background:rgba(var(--ink),.40);width:60%}
+  background:rgba(var(--ink),.40);width:50%}
 [data-c="qu-1"] .qu1-cell{flex:1;display:flex;justify-content:center}
 [data-c="qu-1"] .qu1-p{width:2px;height:13px;border-radius:1px;
   background:rgba(var(--ink),.22)}
