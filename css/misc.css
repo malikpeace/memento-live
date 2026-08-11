@@ -835,18 +835,23 @@ html.theme-light .sheet:has(.exp-shell--dw) {
   min-width: 6.2ch; font-size: 2.4rem; font-weight: 700; letter-spacing: -0.035em;
   color: var(--text-hi); font-variant-numeric: tabular-nums;
 }
-/* the shortcuts, for when somebody already knows the number they want */
-.dw__presets {
-  display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;
-  margin-top: 26px; max-width: 320px;
+/* the shortcuts, as ONE quiet control. The native menu is deliberate: on the
+   phone it is the system wheel, which is faster and more familiar than any
+   list we could draw, and it keeps the page to three things. */
+.dw__jump { position: relative; display: inline-flex; align-items: center; margin-top: 24px; }
+.dw__select {
+  appearance: none; -webkit-appearance: none;
+  border: 0; cursor: pointer; font: inherit; font-size: 0.9rem; font-weight: 650;
+  padding: 11px 38px 11px 18px; border-radius: 999px;
+  color: var(--text-mid); background: var(--kfill-06);
+  box-shadow: inset 0 1px 0 rgba(var(--ink), 0.06);
+  text-align: center; text-align-last: center;
 }
-.dw__preset {
-  border: 0; cursor: pointer; font: inherit; font-size: 0.84rem; font-weight: 650;
-  padding: 9px 15px; border-radius: 999px; color: var(--text-mid);
-  background: var(--kfill-06); box-shadow: inset 0 1px 0 rgba(var(--ink), 0.06);
-  transition: background .16s ease, color .16s ease;
+.dw__select:focus-visible { outline: none; box-shadow: inset 0 0 0 1.5px rgba(var(--ink), 0.3); }
+.dw__caret {
+  position: absolute; right: 14px; width: 15px; height: 15px;
+  color: var(--text-lo); pointer-events: none;
 }
-.dw__preset.is-on { background: var(--solid-bg); color: var(--solid-fg); }
 .dw__begin {
   margin-top: 30px; width: 100%; max-width: 260px; padding: 15px;
   border: 0; border-radius: calc(12px * var(--rx, 1)); cursor: pointer;

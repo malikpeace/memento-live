@@ -3922,8 +3922,9 @@ const SHEET_TEMPLATES = {
       const totalH = sessions.reduce((a, s) => a + (s.minutes || 0), 0) / 60;
       const p = this._parts(this._targetSec || 1500);
       const pad = (n) => String(n).padStart(2, '0');
-      const PRESETS = [['5m', 300], ['15m', 900], ['30m', 1800], ['1h', 3600],
-                       ['2h', 7200], ['3h', 10800], ['4h', 14400], ['5h', 18000]];
+      const PRESETS = [['5 minutes', 300], ['15 minutes', 900], ['30 minutes', 1800],
+                       ['1 hour', 3600], ['2 hours', 7200], ['3 hours', 10800],
+                       ['4 hours', 14400], ['5 hours', 18000]];
       let html = '<div class="dw">';
       if (oneThing) html += '<p class="dw__for">' + esc(oneThing) + '</p>';
       // the timer: any length from one second to ten hours. Tap a part, then
@@ -3944,15 +3945,17 @@ const SHEET_TEMPLATES = {
           '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 6v12M6 12h12"/></svg>' +
         '</button>' +
       '</div>';
-      html += '<div class="dw__presets" id="dwPresets">' +
-        PRESETS.map(([label, sec]) =>
-          '<button class="dw__preset' + (sec === this._targetSec ? ' is-on' : '') + '" type="button" data-sec="' + sec + '">' + label + '</button>').join('') +
+      // the shortcuts, as one quiet control instead of a wall of chips
+      const known = PRESETS.some(([, sec]) => sec === this._targetSec);
+      html += '<div class="dw__jump">' +
+        '<select class="dw__select" id="dwPresets" aria-label="Jump to a length">' +
+          (known ? '' : '<option value="" selected>Custom</option>') +
+          PRESETS.map(([label, sec]) =>
+            '<option value="' + sec + '"' + (sec === this._targetSec ? ' selected' : '') + '>' + label + '</option>').join('') +
+        '</select>' +
+        '<svg class="dw__caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>' +
       '</div>';
       html += '<button class="dw__begin" id="dwStart" type="button">Begin</button>';
-      if (sessions.length) {
-        html += '<p class="dw__record">' + sessions.length + ' session' + (sessions.length === 1 ? '' : 's') +
-          ', ' + (totalH >= 10 ? Math.round(totalH) : totalH.toFixed(1)) + ' hours deep.</p>';
-      }
       html += '</div>';
       return '<div class="exp-shell exp-shell--dw">' + html + '</div>';
     },
@@ -3987,8 +3990,21 @@ const SHEET_TEMPLATES = {
         const minus = container.querySelector('#dwMinus'), plus = container.querySelector('#dwPlus');
         if (minus) minus.disabled = self._targetSec - STEP[part] < MIN_SEC;
         if (plus) plus.disabled = self._targetSec + STEP[part] > MAX_SEC;
-        container.querySelectorAll('.dw__preset').forEach(b =>
-          b.classList.toggle('is-on', parseInt(b.dataset.sec, 10) === self._targetSec));
+        const sel = container.querySelector('#dwPresets');
+        if (sel) {
+          const match = Array.prototype.some.call(sel.options, o => o.value && parseInt(o.value, 10) === self._targetSec);
+          sel.value = match ? String(self._targetSec) : '';
+          // a hand-set length is "Custom", and the option only exists while it is
+          if (!match && !sel.querySelector('option[value=""]')) {
+            const opt = document.createElement('option');
+            opt.value = ''; opt.textContent = 'Custom';
+            sel.insertBefore(opt, sel.firstChild);
+            sel.value = '';
+          } else if (match) {
+            const c = sel.querySelector('option[value=""]');
+            if (c) c.remove();
+          }
+        }
       };
       const nudge = (dir) => {
         self._targetSec = Math.min(MAX_SEC, Math.max(MIN_SEC, self._targetSec + dir * STEP[part]));
@@ -4007,11 +4023,11 @@ const SHEET_TEMPLATES = {
       if (minusBtn) minusBtn.addEventListener('click', () => nudge(-1));
       if (plusBtn) plusBtn.addEventListener('click', () => nudge(1));
       const presets = container.querySelector('#dwPresets');
-      if (presets) presets.addEventListener('click', (e) => {
-        const b = e.target.closest('.dw__preset');
-        if (!b) return;
-        self._targetSec = parseInt(b.dataset.sec, 10) || 1500;
-        // jump the stepper to the part the preset actually speaks in
+      if (presets) presets.addEventListener('change', () => {
+        const v = parseInt(presets.value, 10);
+        if (!v) return;
+        self._targetSec = v;
+        // jump the stepper to the part the shortcut actually speaks in
         part = self._targetSec >= 3600 ? 'h' : 'm';
         paintTarget();
         try { feel('tick'); } catch (e) {}
