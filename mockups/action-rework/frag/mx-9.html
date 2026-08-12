@@ -93,8 +93,8 @@
     </div>
     <p class="hint"><span class="grip"><s></s><s></s><s></s></span><span class="htx">Drag the number up to stretch today</span></p>
     <div class="end">
-      <div class="er"><span>Start 9:00, finished by</span><b class="e">9:15</b></div>
-      <div class="er"><span>$3,000 a month in</span><b class="d">52 days</b></div>
+      <div class="er"><span>Start 9:00, done about</span><b class="e">9:15</b></div>
+      <div class="er"><span>Reached, after today</span><b class="d">52 of 100</b></div>
     </div>
     <button class="cta" type="button">Start <span class="n">5</span> <span class="uw">clients</span></button>
     <button class="quiet tog" type="button">Stretch to any number</button>
@@ -110,7 +110,7 @@
     </div>
     <div class="stops"></div>
     <div class="dfoot">
-      <p class="rows">About 3 min each. You start at 9:00 and finish by <b class="e">9:15</b>, and $3,000 a month arrives in <b class="d">52 days</b>.</p>
+      <p class="rows">About 3 min each on the plan&#8217;s estimate. You start at 9:00 and finish about <b class="e">9:15</b>, and today puts you on <b class="d">52 of 100</b> people reached.</p>
       <button class="cta" type="button">Start <span class="n">5</span> <span class="uw">clients</span></button>
       <button class="quiet tog" type="button">Stretch to any number</button>
     </div>
@@ -127,7 +127,10 @@
   function unit(n){ return n===1?'client':'clients'; }
   function mins(n){ var m=n*3; return m>=60 ? (m%60===0?(m/60)+' hr':Math.floor(m/60)+' hr '+(m%60)+' min') : m+' min'; }
   function clock(n){ var t=9*60+n*3,h=Math.floor(t/60),m=t%60; return h+':'+(m<10?'0':'')+m; }
-  function days(n){ return Math.round(260/n)+' days'; }
+  /* PROVENANCE: 47 reached is the sum of the messages they logged, 100 is the countable
+     target their own plan named. A message count is never converted into money. */
+  var REACHED=47, TARGET=100;
+  function days(n){ return Math.min(TARGET,REACHED+n)+' of '+TARGET; }
   function val(){ return fine ? Math.max(1,Math.min(20,Math.round(1+p/2*19))) : TIER[Math.round(p)].n; }
   function name(){ if(!fine) return TIER[Math.round(p)].nm;
     var n=val(); return n<=3?'Lighter than usual':(n<=7?'Around your usual':'Heavier than usual'); }

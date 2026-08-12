@@ -1,4 +1,4 @@
-<!-- ARCHETYPES, the surviving set: mx-1 notched rail | mx-2 growing time block | mx-3 drag the task card |
+<!-- ARCHETYPES, the surviving set: mx-1 notched rail | mx-2 growing time block |
      mx-5 tappable ladder | mx-6 vertical pressure column | mx-7 segmented arc dial | mx-8 three sentence cards |
      mx-9 giant elastic numeral | mx-10 keys over timeline | mx-11 five sentence cards, the deliberate counter-example -->
 <section class="cell" data-k="mx-6">
@@ -133,7 +133,10 @@
   <div class="p6">
     <p class="day">Tuesday, day 12</p>
     <p class="say">Message <b class="n">5</b> <span class="uw">clients</span> today</p>
-    <p class="sub"><b class="t">15 min</b>. At this size $3,000 a month arrives in <b class="d">52 days</b>.</p>
+    <!-- PROVENANCE: the only consequence Memento can state is the count. 47 is the sum of
+         the messages they logged, 100 is the countable target their own plan named. Memento
+         cannot turn a message into money, so no money is projected here. -->
+    <p class="sub">About <b class="t">15 min</b>. Takes you to <b class="r">52</b> of 100 reached, and the last one about <b class="d">11 days</b> out.</p>
 
     <div class="col">
       <div class="meter">
@@ -143,9 +146,9 @@
         <div class="ticks"></div>
       </div>
       <div class="rungs">
-        <div class="rung" data-i="0"><span class="nm">A light day</span><span class="pr">2 clients, 6 min</span></div>
-        <div class="rung" data-i="1"><span class="nm">Your usual day</span><span class="pr">5 clients, 15 min</span></div>
-        <div class="rung" data-i="2"><span class="nm">A heavy day</span><span class="pr">9 clients, 27 min</span></div>
+        <div class="rung" data-i="0"><span class="nm">A light day</span><span class="pr">2 clients, about 6 min</span></div>
+        <div class="rung" data-i="1"><span class="nm">Your usual day</span><span class="pr">5 clients, about 15 min</span></div>
+        <div class="rung" data-i="2"><span class="nm">A heavy day</span><span class="pr">9 clients, about 27 min</span></div>
       </div>
     </div>
 
@@ -166,7 +169,7 @@
         <div class="fv"><b class="fn">5</b><span class="funit">clients</span></div>
         <button type="button" class="fup">+</button>
       </div>
-      <p class="fmeta"><b>15 min</b>. $3,000 a month in <b>52 days</b>.</p>
+      <p class="fmeta">About <b>15 min</b>. Takes you to <b>52</b> of 100 reached.</p>
       <button class="cta usefine" type="button">Use this size</button>
       <button class="quiet closefine" type="button">Back to the three</button>
     </div>
@@ -194,24 +197,29 @@
     </div>
     <div class="panel">
       <h4>What each one costs you</h4>
-      <div class="prow" data-i="0"><span class="pn">A light day</span><span class="pv">2, 6 min</span></div>
-      <div class="prow" data-i="1"><span class="pn">Your usual day</span><span class="pv">5, 15 min</span></div>
-      <div class="prow" data-i="2"><span class="pn">A heavy day</span><span class="pv">9, 27 min</span></div>
-      <p class="tail">At <b class="n2">5</b> a day you reach $3,000 a month in <b class="d">52 days</b>. Yesterday you held 3.</p>
+      <div class="prow" data-i="0"><span class="pn">A light day</span><span class="pv">2, about 6 min</span></div>
+      <div class="prow" data-i="1"><span class="pn">Your usual day</span><span class="pv">5, about 15 min</span></div>
+      <div class="prow" data-i="2"><span class="pn">A heavy day</span><span class="pv">9, about 27 min</span></div>
+      <p class="tail">At <b class="n2">5</b> a day the last of the 100 is about <b class="d">11 days</b> out. You are on <b class="r">52</b> after today. Yesterday you logged 3.</p>
     </div>
   </div>
 </div>
 
 <script>(function(){
   var root=document.querySelector('[data-k="mx-6"]');
-  var TIER=[{n:2,nm:'A light day',t:'6 min',d:'130 days'},
-            {n:5,nm:'Your usual day',t:'15 min',d:'52 days'},
-            {n:9,nm:'A heavy day',t:'27 min',d:'29 days'}];
+  /* REACHED = the sum of every message they have logged. TARGET = the countable target
+     their own plan named. Everything priced below is arithmetic on those two numbers. */
+  var REACHED=47, TARGET=100;
+  var TIER=[{n:2,nm:'A light day',t:'about 6 min',d:'27 days'},
+            {n:5,nm:'Your usual day',t:'about 15 min',d:'11 days'},
+            {n:9,nm:'A heavy day',t:'about 27 min',d:'6 days'}];
   var REST=[16.5,50,88], BOUND=[33.333,66.666];
   var i=1, fine=false, fn=5, v=REST[1], timer=null, held=false;
 
   function mins(n){ var m=n*3; return m>=60 ? (m%60===0 ? (m/60)+' hr' : Math.floor(m/60)+' hr '+(m%60)+' min') : m+' min'; }
-  function days(n){ return Math.round(260/n)+' days'; }
+  /* days = how long the rest of the list takes at this size. Nothing about money. */
+  function days(n){ var d=Math.ceil((TARGET-REACHED)/n); return d+(d===1?' day':' days'); }
+  function reached(n){ return Math.min(TARGET,REACHED+n); }
   function unit(n){ return n===1?'client':'clients'; }
 
   var fillEl=root.querySelector('.fill'), hfillEl=root.querySelector('.hfill');
@@ -236,10 +244,11 @@
     Array.prototype.forEach.call(root.querySelectorAll('.uw'),function(e){e.textContent=unit(n);});
     Array.prototype.forEach.call(root.querySelectorAll('.t'),function(e){e.textContent=mins(n);});
     Array.prototype.forEach.call(root.querySelectorAll('.d'),function(e){e.textContent=days(n);});
+    Array.prototype.forEach.call(root.querySelectorAll('.r'),function(e){e.textContent=reached(n);});
     root.querySelector('.panel .n2').textContent=n;
     root.querySelector('.fn').textContent=fn;
     root.querySelector('.funit').textContent=unit(fn);
-    root.querySelector('.fmeta').innerHTML='<b>'+mins(fn)+'</b>. $3,000 a month in <b>'+days(fn)+'</b>.';
+    root.querySelector('.fmeta').innerHTML='About <b>'+mins(fn)+'</b>. Takes you to <b>'+reached(fn)+'</b> of '+TARGET+' reached.';
     Array.prototype.forEach.call(root.querySelectorAll('.rung'),function(e){
       e.classList.toggle('on',!fine&&+e.dataset.i===i); });
     Array.prototype.forEach.call(root.querySelectorAll('.prow'),function(e){

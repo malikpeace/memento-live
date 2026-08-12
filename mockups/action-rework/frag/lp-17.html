@@ -4,7 +4,7 @@
      lp-18 centered monolith numeral -->
 <section class="cell" data-k="lp-17">
 <style>
-[data-k=lp-17] .l17{position:absolute;inset:0;display:flex;flex-direction:column;padding:32px 18px 24px;
+[data-k=lp-17] .l17{position:absolute;inset:0;display:flex;flex-direction:column;padding:30px 18px 22px;
   font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent}
 
 [data-k=lp-17] .l17-goal{font-size:12.5px;line-height:1;color:rgba(var(--ink),.80)}
@@ -31,7 +31,8 @@
 [data-k=lp-17] .l17-three button{flex:1;min-width:0;border:0;border-radius:10px;padding:8px 4px 9px;cursor:pointer;
   font-family:var(--font);background:rgba(22,25,31,.95);
   -webkit-backdrop-filter:blur(24px) saturate(1.4);backdrop-filter:blur(24px) saturate(1.4);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.09);transition:background .16s ease-out}
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09);transition:background .16s ease-out,transform .09s ease-out}
+[data-k=lp-17] .l17-three button:active{transform:translateY(1px);background:rgba(30,34,42,.96)}
 [data-k=lp-17] .l17-three button i{display:block;font-style:normal;font-size:10.5px;line-height:1;color:rgba(var(--ink),.72)}
 [data-k=lp-17] .l17-three button b{display:block;margin-top:4px;font-size:13.5px;font-weight:500;line-height:1;
   color:rgba(var(--ink),.90);font-variant-numeric:tabular-nums}
@@ -48,32 +49,51 @@
 [data-k=lp-17] .l17-fine button:disabled{opacity:.38;cursor:default}
 [data-k=lp-17] .l17-more{margin-top:8px;border:0;border-radius:10px;padding:7px 15px;
   background:rgba(22,25,31,.92);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.07);color:rgba(var(--ink),.78);font:500 12px/1 var(--font);
-  cursor:pointer;transition:color .16s ease-out}
-[data-k=lp-17] .l17-more:hover,[data-k=lp-17] .l17-more.on{color:rgba(var(--ink),.96)}
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.07);color:rgba(var(--ink),.80);font:500 12px/1 var(--font);
+  cursor:pointer;transition:color .16s ease-out,background .16s ease-out}
+[data-k=lp-17] .l17-more:hover,[data-k=lp-17] .l17-more.on{color:rgba(var(--ink),.96);background:rgba(30,34,42,.94)}
 [data-k=lp-17] .l17-edit:not(.free) .l17-fine{display:none}
 [data-k=lp-17] .l17-edit.free .l17-three{display:none}
 [data-k=lp-17] .l17-why{margin:12px 0 0;font-size:12.5px;line-height:1.5;color:rgba(var(--ink),.90);min-height:30px}
 
-[data-k=lp-17] .l17-today{margin-top:14px;border-radius:14px;padding:13px 14px 15px;background:rgba(22,25,31,.95);
+/* ---- tonight's number: they type it, nothing measures it ---- */
+[data-k=lp-17] .l17-today{margin-top:14px;border-radius:14px;padding:12px 14px 13px;background:rgba(22,25,31,.95);
   -webkit-backdrop-filter:blur(26px) saturate(1.35);backdrop-filter:blur(26px) saturate(1.35);
   box-shadow:inset 0 1px 0 rgba(var(--ink),.09)}
-[data-k=lp-17] .l17-today .r{display:flex;align-items:baseline;gap:8px}
-[data-k=lp-17] .l17-today .u{font-size:17px;font-weight:700;letter-spacing:-.015em;color:var(--text-hi)}
-[data-k=lp-17] .l17-today .k{font-size:12px;color:rgba(var(--ink),.82)}
-[data-k=lp-17] .l17-today .lft{margin-left:auto;font-size:12.5px;font-weight:500;color:#3fd94e}
-[data-k=lp-17] .l17.over .l17-today .lft{color:rgba(var(--ink),.86)}
-[data-k=lp-17] .l17-bar{position:relative;height:8px;margin-top:12px;border-radius:999px;
-  background:rgba(var(--ink),.08);overflow:hidden}
-[data-k=lp-17] .l17-bar i{position:absolute;left:0;top:0;bottom:0;border-radius:999px;background:rgba(var(--ink),.45);
-  transition:width .22s ease-out}
-[data-k=lp-17] .l17-mark{position:absolute;top:-4px;width:2px;height:16px;border-radius:1px;background:#3fd94e;
-  transition:left .22s ease-out}
-[data-k=lp-17] .l17-scale{display:flex;margin-top:8px;font-size:10.5px;color:rgba(var(--ink),.58)}
-[data-k=lp-17] .l17-scale span:last-child{margin-left:auto}
+[data-k=lp-17] .l17-today .k{font-size:12.5px;line-height:1;color:rgba(var(--ink),.86)}
+[data-k=lp-17] .l17-slot{display:flex;align-items:center;gap:10px;width:100%;height:44px;margin-top:9px;padding:0 12px;
+  border:0;border-radius:11px;background:rgba(var(--ink),.05);box-shadow:inset 0 1px 0 rgba(var(--ink),.06);
+  font-family:var(--font);cursor:pointer;transition:background .14s ease-out}
+[data-k=lp-17] .l17-slot:active{background:rgba(var(--ink),.09)}
+[data-k=lp-17] .l17-slot em{font-style:normal;font-size:13.5px;font-weight:500;color:rgba(var(--ink),.90)}
+[data-k=lp-17] .l17-slot u{margin-left:auto;text-decoration:none;font-size:12px;color:rgba(var(--ink),.86)}
+[data-k=lp-17] .l17-src{margin:9px 0 0;font-size:11.5px;line-height:1.4;color:rgba(var(--ink),.90)}
+
+[data-k=lp-17] .l17-stp{display:none;align-items:center;gap:8px;margin-top:9px;padding:5px;border-radius:12px;
+  background:rgba(var(--ink),.05);box-shadow:inset 0 1px 0 rgba(var(--ink),.06)}
+[data-k=lp-17] .l17.typing .l17-stp{display:flex}
+[data-k=lp-17] .l17.typing .l17-slot{display:none}
+[data-k=lp-17] .l17-stp b{flex:1;text-align:center;font-size:19px;font-weight:700;letter-spacing:-.02em;
+  color:var(--text-hi);font-variant-numeric:tabular-nums}
+[data-k=lp-17] .l17-stp button{width:44px;height:36px;border:0;border-radius:9px;display:grid;place-items:center;
+  background:rgba(22,25,31,.95);box-shadow:inset 0 1px 0 rgba(var(--ink),.09);cursor:pointer;
+  transition:background .14s ease-out}
+[data-k=lp-17] .l17-stp button:active{background:rgba(34,39,48,.96)}
+[data-k=lp-17] .l17-stp button svg{display:block;stroke:rgba(var(--ink),.92);stroke-width:1.9;stroke-linecap:round}
+[data-k=lp-17] .l17-save{display:none;width:100%;height:42px;margin-top:9px;border:0;border-radius:11px;
+  background:rgba(235,238,248,.94);color:#0b0c10;font:700 14px var(--font);cursor:pointer;
+  transition:background .14s ease-out,transform .09s ease-out}
+[data-k=lp-17] .l17.typing .l17-save{display:block}
+[data-k=lp-17] .l17-save:active{background:rgba(206,211,226,.94);transform:translateY(1px)}
+[data-k=lp-17] .l17-res{display:none;align-items:baseline;gap:8px;margin-top:9px}
+[data-k=lp-17] .l17.entered .l17-res{display:flex}
+[data-k=lp-17] .l17.entered .l17-slot{display:none}
+[data-k=lp-17] .l17-res .u{font-size:20px;font-weight:700;letter-spacing:-.02em;color:var(--text-hi)}
+[data-k=lp-17] .l17-res .lft{margin-left:auto;font-size:12.5px;font-weight:500;color:#3fd94e}
+[data-k=lp-17] .l17.over .l17-res .lft{color:rgba(var(--ink),.90)}
 
 [data-k=lp-17] .l17-acc{margin-top:14px}
-[data-k=lp-17] .l17-acc h4{margin:0 0 8px;font-size:12.5px;font-weight:500;line-height:1;color:rgba(var(--ink),.82)}
+[data-k=lp-17] .l17-acc h4{margin:0 0 8px;font-size:12.5px;font-weight:500;line-height:1;color:rgba(var(--ink),.86)}
 [data-k=lp-17] .l17-rows{border-radius:14px;overflow:hidden;background:rgba(22,25,31,.95);
   -webkit-backdrop-filter:blur(24px) saturate(1.35);backdrop-filter:blur(24px) saturate(1.35);
   box-shadow:inset 0 1px 0 rgba(var(--ink),.08)}
@@ -83,26 +103,24 @@
 [data-k=lp-17] .l17-row .d{width:86px;color:rgba(var(--ink),.86)}
 [data-k=lp-17] .l17-row .v{font-weight:500;color:var(--text-hi)}
 [data-k=lp-17] .l17-row .s{margin-left:auto;font-size:11.5px;color:#3fd94e}
-[data-k=lp-17] .l17-row .s.no{color:rgba(var(--ink),.55)}
+[data-k=lp-17] .l17-row .s.no{color:rgba(var(--ink),.62)}
 
-[data-k=lp-17] .l17-sp{flex:1;min-height:12px}
-/* the ceiling picker borrows the room from the oldest settled night, nothing overflows */
-[data-k=lp-17] .l17.editing .l17-row:last-child{display:none}
+[data-k=lp-17] .l17-sp{flex:1;min-height:10px}
+/* the ceiling picker borrows the room from the oldest entries, nothing overflows */
+[data-k=lp-17] .l17.editing .l17-row:nth-last-child(-n+2){display:none}
 
-[data-k=lp-17] .l17-cta{width:100%;padding:15px 0;border:0;border-radius:14px;background:rgba(235,238,248,.94);
-  color:#0b0c10;font:700 15.5px var(--font);letter-spacing:-.01em;cursor:pointer}
-[data-k=lp-17] .l17-2nd{display:none;align-items:center;justify-content:center;width:100%;margin-top:9px;padding:14px 0;border:0;border-radius:14px;
-  background:rgba(22,25,31,.92);-webkit-backdrop-filter:blur(26px) saturate(1.35);backdrop-filter:blur(26px) saturate(1.35);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.09);color:rgba(var(--ink),.92);font:500 14px var(--font);cursor:pointer}
-[data-k=lp-17] .l17-held{display:none;align-items:center;gap:9px;padding:15px 0 0;font-size:13.5px;
+[data-k=lp-17] .l17-cta{width:100%;height:50px;border:0;border-radius:14px;background:rgba(235,238,248,.94);
+  color:#0b0c10;font:700 15.5px var(--font);letter-spacing:-.01em;cursor:pointer;
+  transition:background .14s ease-out,transform .09s ease-out}
+[data-k=lp-17] .l17-cta:active{background:rgba(206,211,226,.94);transform:translateY(1px)}
+[data-k=lp-17] .l17-held{display:none;align-items:center;gap:9px;height:50px;font-size:13.5px;
   color:rgba(var(--ink),.92)}
 [data-k=lp-17] .l17-held i{width:8px;height:8px;border-radius:3px;background:#3fd94e;display:block}
 [data-k=lp-17] .l17.signed .l17-cta{display:none}
-[data-k=lp-17] .l17.signed .l17-2nd,[data-k=lp-17] .l17.signed .l17-held{display:flex}
-[data-k=lp-17] .l17.closed .l17-2nd{display:none}
+[data-k=lp-17] .l17.signed .l17-held{display:flex}
 </style>
 <h3>The statement</h3>
-<p class="cap">The ceiling is not an object here, it is a sentence you say about today, and the number is a word inside it you tap to swap for one of three proposed ceilings. Underneath, the nights already settled read as a statement of account.</p>
+<p class="cap">The ceiling is not an object here, it is a sentence you say about today, and the number is a word inside it you tap to swap for one of three proposed ceilings. Underneath, the totals you have typed in yourself read as a statement of account.</p>
 <div class="ph">
   <div class="grid"></div>
   <div class="l17">
@@ -114,66 +132,69 @@
 
     <div class="l17-edit">
       <div class="l17-three" role="group" aria-label="tonight's ceiling">
-        <button data-v="90"><i>tighter</i><b>1h 30m</b></button>
-        <button class="on" data-v="120" aria-pressed="true"><i>tonight’s</i><b>2h 00m</b></button>
-        <button data-v="150"><i>easier</i><b>2h 30m</b></button>
+        <button type="button" data-v="90"><i>tighter</i><b>1h 30m</b></button>
+        <button type="button" class="on" data-v="120" aria-pressed="true"><i>tonight&#8217;s</i><b>2h 00m</b></button>
+        <button type="button" data-v="150"><i>easier</i><b>2h 30m</b></button>
       </div>
       <div class="l17-fine">
         <span>Ten minutes at a time</span>
-        <button class="dn" aria-label="lower the ceiling"><svg width="13" height="13" viewBox="0 0 13 13"><path d="M2 6.5h9"/></svg></button>
-        <button class="up" aria-label="raise the ceiling"><svg width="13" height="13" viewBox="0 0 13 13"><path d="M6.5 2v9M2 6.5h9"/></svg></button>
+        <button class="dn" type="button" aria-label="lower the ceiling"><svg width="13" height="13" viewBox="0 0 13 13"><path d="M2 6.5h9"/></svg></button>
+        <button class="up" type="button" aria-label="raise the ceiling"><svg width="13" height="13" viewBox="0 0 13 13"><path d="M6.5 2v9M2 6.5h9"/></svg></button>
       </div>
       <button class="l17-more" type="button">any ceiling</button>
     </div>
 
     <p class="l17-why">Under 2h on five of the last seven nights. This is the line that has actually held.</p>
 
+    <!-- the only way today's number exists: they read it off their phone and type it -->
     <div class="l17-today">
-      <div class="r">
-        <div class="u">1h 12m</div><div class="k">used so far</div>
-        <div class="lft">48m left</div>
+      <div class="k">Tonight&#8217;s total</div>
+      <button class="l17-slot" type="button"><em>Write in tonight&#8217;s total</em><u>enter</u></button>
+      <div class="l17-stp">
+        <button class="dn" type="button" aria-label="less"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M2.5 7h9"/></svg></button>
+        <b class="sv">1h 47m</b>
+        <button class="up" type="button" aria-label="more"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M7 2.5v9M2.5 7h9"/></svg></button>
       </div>
-      <div class="l17-bar"><i></i><div class="l17-mark"></div></div>
-      <div class="l17-scale"><span>0</span><span>3h 30m</span></div>
+      <button class="l17-save" type="button">Save 1h 47m</button>
+      <div class="l17-res"><div class="u">1h 47m</div><div class="lft">13m under</div></div>
+      <p class="l17-src">You read this off your phone&#8217;s Screen Time report.</p>
     </div>
 
     <div class="l17-acc">
-      <h4>Nights already settled</h4>
+      <h4>What you entered before</h4>
       <div class="l17-rows">
         <div class="l17-row"><div class="d">Mon 11 Aug</div><div class="v">1h 47m</div><div class="s">under</div></div>
         <div class="l17-row"><div class="d">Sun 10 Aug</div><div class="v">2h 31m</div><div class="s no">over by 31m</div></div>
         <div class="l17-row"><div class="d">Sat 9 Aug</div><div class="v">1h 38m</div><div class="s">under</div></div>
         <div class="l17-row"><div class="d">Fri 8 Aug</div><div class="v">1h 52m</div><div class="s">under</div></div>
-        <div class="l17-row"><div class="d">Thu 7 Aug</div><div class="v">1h 44m</div><div class="s">under</div></div>
       </div>
     </div>
 
     <div class="l17-sp"></div>
 
-    <button class="l17-cta">Say it for today</button>
-    <div class="l17-held"><i></i><span class="ht">Said at 9:04am. The ceiling is 2h 00m.</span></div>
-    <button class="l17-2nd">Close the night out</button>
+    <button class="l17-cta" type="button">Say it for today</button>
+    <div class="l17-held"><i></i><span class="ht">The ceiling is 2h 00m.</span></div>
   </div>
 </div>
 <script>(function(){
   var c=document.currentScript.closest('.cell');
   var root=c.querySelector('.l17'),tok=c.querySelector('.l17-tok'),tv=c.querySelector('.l17-tok .tv'),
       why=c.querySelector('.l17-why'),up=c.querySelector('.l17-edit .up'),dn=c.querySelector('.l17-edit .dn'),
-      bar=c.querySelector('.l17-bar i'),mark=c.querySelector('.l17-mark'),
-      lft=c.querySelector('.l17-today .lft'),held=c.querySelector('.l17-held .ht'),
-      rows=c.querySelector('.l17-rows'),cta=c.querySelector('.l17-cta'),uEl=c.querySelector('.l17-today .u'),
-      second=c.querySelector('.l17-2nd'),acc=c.querySelector('.l17-acc h4'),
-      edit=c.querySelector('.l17-edit'),three=c.querySelector('.l17-three'),more=c.querySelector('.l17-more');
-  var ceil=120,used=72,SPAN=210,signed=false,free=false,THREE=[90,120,150];
+      held=c.querySelector('.l17-held .ht'),rows=c.querySelector('.l17-rows'),
+      cta=c.querySelector('.l17-cta'),
+      edit=c.querySelector('.l17-edit'),three=c.querySelector('.l17-three'),more=c.querySelector('.l17-more'),
+      slot=c.querySelector('.l17-slot'),stp=c.querySelector('.l17-stp'),sv=c.querySelector('.l17-stp .sv'),
+      save=c.querySelector('.l17-save'),resU=c.querySelector('.l17-res .u'),resL=c.querySelector('.l17-res .lft'),
+      src=c.querySelector('.l17-src');
+  var ceil=120,typed=107,signed=false,free=false,entered=false,THREE=[90,120,150];
+  var saidAt='';
 
   function fmt(m){var h=Math.floor(m/60),r=m%60;return h?(h+'h '+String(r).padStart(2,'0')+'m'):(r+'m');}
+  /* any time this screen states is the clock at the moment they tapped, nothing else */
+  function stamp(){var d=new Date(),h=d.getHours(),m=d.getMinutes(),ap=h>=12?'pm':'am';
+    return (h%12||12)+':'+String(m).padStart(2,'0')+ap;}
   function paint(){
-    tv.textContent=fmt(ceil);uEl.textContent=fmt(used);
-    bar.style.width=Math.min(100,used/SPAN*100)+'%';
-    mark.style.left='calc('+(ceil/SPAN*100)+'% - 1px)';
-    var left=ceil-used;
-    root.classList.toggle('over',left<0);
-    lft.textContent=left>=0?fmt(left)+' left':fmt(-left)+' over';
+    tv.textContent=fmt(ceil);
     why.textContent = ceil<=90 ? 'You have been under 90m twice all month. That is a cut, not a hold.'
       : ceil<=120 ? 'Under 2h on five of the last seven nights. This is the line that has actually held.'
       : ceil<=150 ? 'Two and a half hours sits just above your average. It will not ask much of you.'
@@ -183,7 +204,13 @@
       var on=!free&&+b.dataset.v===ceil;
       b.classList.toggle('on',on);
       if(on)b.setAttribute('aria-pressed','true');else b.removeAttribute('aria-pressed');});
-    if(signed)held.textContent='Said at 9:04am. The ceiling is '+fmt(ceil)+'.';
+    sv.textContent=fmt(typed);save.textContent='Save '+fmt(typed);
+    resU.textContent=fmt(typed);
+    var left=ceil-typed;
+    root.classList.toggle('over',left<0);
+    resL.textContent=left>=0?fmt(left)+' under':fmt(-left)+' over';
+    if(signed)held.textContent=entered?('Entered '+fmt(typed)+' for today.')
+      :('Said at '+saidAt+'. The ceiling is '+fmt(ceil)+'.');
   }
   tok.addEventListener('click',function(){if(signed)return;root.classList.toggle('editing');});
   three.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;
@@ -196,17 +223,26 @@
   up.addEventListener('click',function(){ceil=Math.min(180,ceil+10);paint();});
   dn.addEventListener('click',function(){ceil=Math.max(60,ceil-10);paint();});
 
-  cta.addEventListener('click',function(){signed=true;root.classList.add('signed');root.classList.remove('editing');paint();});
-  second.addEventListener('click',function(){
-    root.classList.add('closed');
+  /* entry: starts at their own last entry, moves in 5 minute steps, banks into the rows */
+  slot.addEventListener('click',function(){if(entered)return;root.classList.add('typing');
+    root.classList.remove('editing');
+    src.textContent='Open Settings, Screen Time, and read today’s total. Then match it here.';});
+  stp.querySelector('.up').addEventListener('click',function(){typed=Math.min(900,typed+5);paint();});
+  stp.querySelector('.dn').addEventListener('click',function(){typed=Math.max(0,typed-5);paint();});
+  save.addEventListener('click',function(){
+    entered=true;root.classList.remove('typing');root.classList.add('entered');
+    src.textContent='You entered this at '+stamp()+', from your Screen Time report.';
     var r=document.createElement('div');r.className='l17-row';
-    r.innerHTML='<div class="d">Tue 12 Aug</div><div class="v">1h 41m</div><div class="s">under</div>';
+    var left=ceil-typed;
+    r.innerHTML='<div class="d">Tue 12 Aug</div><div class="v">'+fmt(typed)+'</div>'+
+      (left>=0?'<div class="s">under</div>':'<div class="s no">over by '+fmt(-left)+'</div>');
     rows.insertBefore(r,rows.firstChild);
-    if(rows.children.length>5)rows.removeChild(rows.lastElementChild);
-    used=101;paint();
-    held.textContent='Night closed at 1h 41m. Under, six of the last eight.';
-    acc.textContent='Nights already settled';
-  });
+    if(rows.children.length>4)rows.removeChild(rows.lastElementChild);
+    c.querySelector('.l17-acc h4').textContent='What you entered, tonight first';
+    paint();});
+
+  cta.addEventListener('click',function(){signed=true;saidAt=stamp();
+    root.classList.add('signed');root.classList.remove('editing');paint();});
   paint();
 })();</script>
 </section>

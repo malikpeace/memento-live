@@ -1,43 +1,52 @@
-<!-- ARCHETYPES, the surviving set: mx-1 notched rail | mx-2 growing time block | mx-3 drag the task card |
+<!-- ARCHETYPES, the surviving set: mx-1 notched rail | mx-2 growing time block |
      mx-5 tappable ladder | mx-6 vertical pressure column | mx-7 segmented arc dial | mx-8 three sentence cards |
      mx-9 giant elastic numeral | mx-10 keys over timeline | mx-11 five sentence cards, the deliberate counter-example -->
 <section class="cell" data-k="mx-11">
 <style>
-[data-k="mx-11"] .p11{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;padding:24px 16px 18px;overflow:hidden}
+[data-k="mx-11"] .p11{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;padding:26px 16px 18px;overflow:hidden}
 [data-k="mx-11"] .day{font-size:12px;color:var(--text-lo);margin:0;font-variant-numeric:tabular-nums}
-[data-k="mx-11"] .ask{font-size:21px;font-weight:700;letter-spacing:-.02em;margin:4px 0 13px}
+[data-k="mx-11"] .ask{font-size:21px;font-weight:700;letter-spacing:-.02em;margin:4px 0 14px}
 [data-k="mx-11"] .stack{flex:1;display:flex;flex-direction:column;gap:7px;min-height:0}
-[data-k="mx-11"] .opt{position:relative;flex:1;border-radius:13px;padding:11px 13px 10px 16px;cursor:pointer;overflow:hidden;
+
+/* same disclosure law as mx-8: at rest a card is a name and an opening line, nothing more.
+   with five of them that restraint is the only thing keeping the screen readable. */
+[data-k="mx-11"] .opt{position:relative;flex:1;border-radius:13px;padding:7px 13px 7px 16px;cursor:pointer;overflow:hidden;
   background:rgba(19,22,27,.92);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.05);display:flex;flex-direction:column;min-height:0;
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.05);display:flex;flex-direction:column;justify-content:center;min-height:0;
   font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent;
-  transition:flex .3s cubic-bezier(.16,.9,.3,1),background .2s,box-shadow .2s}
-[data-k="mx-11"] .opt .edge{position:absolute;left:0;top:10px;bottom:10px;width:3px;border-radius:0 3px 3px 0;
-  background:rgba(var(--ink),.12);transition:background .2s}
+  transition:flex .32s cubic-bezier(.16,.9,.3,1),background .18s,box-shadow .18s,transform .12s ease-out}
+[data-k="mx-11"] .opt:active{transform:scale(.988)}
+[data-k="mx-11"] .opt.on:active{transform:none}
+[data-k="mx-11"] .opt .edge{position:absolute;left:0;top:9px;bottom:9px;width:3px;border-radius:0 3px 3px 0;
+  background:rgba(var(--ink),.12);transition:background .18s}
 [data-k="mx-11"] .opt .hd{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex:none}
-[data-k="mx-11"] .opt .nm{font-size:13px;font-weight:500;color:rgba(var(--ink),.52);transition:color .2s}
-[data-k="mx-11"] .opt .pr{font-size:12px;color:rgba(var(--ink),.50);white-space:nowrap;transition:color .2s}
-[data-k="mx-11"] .opt .s{flex:none;margin:5px 0 0;font-size:13.5px;font-weight:400;line-height:1.3;letter-spacing:-.01em;
-  color:rgba(var(--ink),.88);display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;
-  transition:font-size .26s cubic-bezier(.16,.9,.3,1)}
-[data-k="mx-11"] .opt .why{flex:none;margin:0;font-size:0;opacity:0;color:var(--text-mid);line-height:1.46;
-  transition:opacity .2s .05s,font-size .22s,margin .22s}
-[data-k="mx-11"] .opt .meter{flex:none;display:none;gap:3px;align-items:flex-end;height:11px;margin-top:auto;padding-top:9px}
-[data-k="mx-11"] .opt .meter i{width:11px;border-radius:1px;background:rgba(var(--ink),.14);display:block}
-[data-k="mx-11"] .opt .meter i.f{background:rgba(var(--ink),.80)}
-[data-k="mx-11"] .opt.on{flex:3.4;background:rgba(31,35,43,.96);box-shadow:inset 0 1px 0 rgba(var(--ink),.11)}
+[data-k="mx-11"] .opt .nm{font-size:12px;font-weight:500;color:rgba(var(--ink),.55);transition:color .18s,font-size .2s}
+[data-k="mx-11"] .opt .pr{font-size:12px;color:var(--text-mid);white-space:nowrap;display:none}
+[data-k="mx-11"] .opt .pre{flex:none;margin:1px 0 0;font-size:14.5px;line-height:1.26;letter-spacing:-.01em;
+  color:rgba(var(--ink),.90);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+[data-k="mx-11"] .opt .s{flex:none;margin:0;height:0;overflow:hidden;font-size:17.5px;font-weight:500;line-height:1.28;
+  letter-spacing:-.018em;color:var(--text-hi);opacity:0;transition:opacity .18s}
+[data-k="mx-11"] .opt .why{flex:none;margin:0;height:0;overflow:hidden;font-size:12.5px;color:var(--text-mid);
+  line-height:1.44;opacity:0;transition:opacity .2s .04s}
+[data-k="mx-11"] .opt .meter{flex:none;display:flex;gap:3px;align-items:flex-end;height:0;overflow:hidden;
+  margin-top:auto;opacity:0;transition:opacity .18s}
+[data-k="mx-11"] .opt .meter i{width:11px;border-radius:1px;background:rgba(var(--ink),.16);display:block}
+[data-k="mx-11"] .opt .meter i.f{background:rgba(var(--ink),.82)}
+
+[data-k="mx-11"] .opt.on{flex:4.4;justify-content:flex-start;padding:11px 13px 10px 16px;background:rgba(31,35,43,.96);box-shadow:inset 0 1px 0 rgba(var(--ink),.11),0 16px 34px rgba(0,0,0,.42)}
 [data-k="mx-11"] .opt.on .edge{background:#3fd94e}
-[data-k="mx-11"] .opt.on .nm{color:var(--text-hi);font-weight:700}
-[data-k="mx-11"] .opt.on .pr{color:var(--text-mid)}
-[data-k="mx-11"] .opt.on .s{font-size:17px;font-weight:500;color:var(--text-hi);-webkit-line-clamp:3}
-[data-k="mx-11"] .opt.on .why{font-size:12.5px;opacity:1;margin-top:8px}
-[data-k="mx-11"] .d11 .opt.on .why{font-size:12px}
-[data-k="mx-11"] .opt.on .meter{display:flex}
+[data-k="mx-11"] .opt.on .nm{color:var(--text-hi);font-weight:700;font-size:13px}
+[data-k="mx-11"] .opt.on .pr{display:block}
+[data-k="mx-11"] .opt.on .pre{display:none}
+[data-k="mx-11"] .opt.on .s{height:auto;opacity:1;margin:7px 0 0}
+[data-k="mx-11"] .opt.on .why{height:auto;opacity:1;margin:8px 0 0}
+[data-k="mx-11"] .opt.on .meter{height:11px;opacity:1;margin-top:auto}
+
 [data-k="mx-11"] .lockline{margin:11px 2px 0;font-size:12.5px;color:var(--text-mid);font-variant-numeric:tabular-nums;line-height:1.4}
 [data-k="mx-11"] .cta{display:block;width:100%;border:0;border-radius:14px;background:rgba(235,238,248,.94);color:#0b0c10;
   font-family:inherit;font-weight:700;font-size:15.5px;padding:15px 16px;margin:9px 0 0;cursor:pointer;
-  font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent}
-[data-k="mx-11"] .cta:active{background:rgba(235,238,248,.84)}
+  font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent;transition:transform .12s ease-out,background .12s}
+[data-k="mx-11"] .cta:active{transform:scale(.985);background:rgba(235,238,248,1)}
 [data-k="mx-11"] .quiet{display:block;width:100%;border:0;border-radius:12px;font-family:inherit;font-size:13px;
   color:var(--text-mid);padding:11px 14px;margin:7px 0 0;cursor:pointer;background:rgba(22,25,31,.92);
   -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);box-shadow:inset 0 1px 0 rgba(var(--ink),.08);
@@ -64,25 +73,21 @@
 [data-k="mx-11"] .d11{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;padding:24px 26px 20px}
 [data-k="mx-11"] .d11 .ask{font-size:24px;margin-bottom:0}
 [data-k="mx-11"] .d11 .cols{flex:1;display:flex;gap:10px;margin:16px 0 0;min-height:0}
-[data-k="mx-11"] .d11 .opt{flex:1;padding:14px 13px 12px 16px}
+[data-k="mx-11"] .d11 .opt{flex:1;padding:13px 12px 12px 15px}
 [data-k="mx-11"] .d11 .opt:hover{background:rgba(26,30,36,.95)}
-[data-k="mx-11"] .d11 .opt.on{flex:2}
-[data-k="mx-11"] .d11 .opt .nm{font-size:12.5px}
-[data-k="mx-11"] .d11 .opt .pr{font-size:11.5px}
-[data-k="mx-11"] .d11 .opt .hd{display:block}
-[data-k="mx-11"] .d11 .opt .pr{display:block;margin-top:2px;white-space:normal}
-[data-k="mx-11"] .d11 .opt.on .hd{display:flex}
-[data-k="mx-11"] .d11 .opt.on .pr{margin-top:0}
-[data-k="mx-11"] .d11 .opt .s{font-size:12.5px;-webkit-line-clamp:5}
-[data-k="mx-11"] .d11 .opt.on .s{font-size:17px;-webkit-line-clamp:6}
-[data-k="mx-11"] .d11 .opt .meter{display:flex}
+[data-k="mx-11"] .d11 .opt.on{flex:3.3}
+[data-k="mx-11"] .d11 .opt .pre{white-space:normal;font-size:14px;margin-top:7px}
+[data-k="mx-11"] .d11 .opt .s{font-size:18px}
+[data-k="mx-11"] .d11 .opt.on .hd{display:block}
+[data-k="mx-11"] .d11 .opt.on .pr{display:block;margin-top:3px}
 [data-k="mx-11"] .d11 .foot{display:flex;align-items:center;gap:12px;margin-top:16px}
 [data-k="mx-11"] .d11 .cta{width:auto;min-width:200px;margin:0}
 [data-k="mx-11"] .d11 .quiet{width:auto;margin:0;white-space:nowrap}
 [data-k="mx-11"] .d11 .lockline{margin:0 0 0 4px;flex:1}
+@media (prefers-reduced-motion:reduce){[data-k="mx-11"] *{transition-duration:0s !important}}
 </style>
 <h3>Five ways to say today</h3>
-<p class="cap">The comparison variant of mx-8, identical design, five sentences instead of three. Same day, same honest prices, two more rungs at the ends. Built so the three and the five can be felt side by side before the law is fixed.</p>
+<p class="cap">The comparison variant of mx-8, identical design and identical disclosure, five sentences instead of three. Closed, each is a name and one line, so the extra two rungs cost almost no height. Open, they are the same honest card. Built so the three and the five can be felt side by side before the law is fixed.</p>
 
 <div class="ph">
   <div class="grid"></div>
@@ -92,41 +97,46 @@
     <div class="stack">
       <div class="opt" data-i="0">
         <span class="edge"></span>
-        <div class="hd"><span class="nm">Barely a day</span><span class="pr">1 client, 3 min</span></div>
-        <p class="s">Message the one client who is already waiting on you.</p>
-        <p class="why">For the day that got away from you. It keeps the run alive and asks for nothing else.</p>
+        <div class="hd"><span class="nm">Barely a day</span><span class="pr">1 client, about 3 min</span></div>
+        <p class="pre">Message 1 client.</p>
+        <p class="s">Message 1 client, whichever is easiest.</p>
+        <p class="why">For the day that got away from you. It keeps the run alive.</p>
         <div class="meter"><i style="height:4px" class="f"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:10px"></i><i style="height:12px"></i></div>
       </div>
       <div class="opt" data-i="1">
         <span class="edge"></span>
-        <div class="hd"><span class="nm">A light day</span><span class="pr">3 clients, 9 min</span></div>
-        <p class="s">Message 3 clients who have replied to you before.</p>
-        <p class="why">Under ten minutes, no cold openings. Small on purpose, and the thread stays warm.</p>
+        <div class="hd"><span class="nm">A light day</span><span class="pr">3 clients, about 9 min</span></div>
+        <p class="pre">Message 3 clients.</p>
+        <p class="s">Message 3 clients you have written to before.</p>
+        <p class="why">Under ten minutes on this estimate, and no cold openings.</p>
         <div class="meter"><i style="height:4px" class="f"></i><i style="height:6px" class="f"></i><i style="height:8px"></i><i style="height:10px"></i><i style="height:12px"></i></div>
       </div>
       <div class="opt on" data-i="2">
         <span class="edge"></span>
-        <div class="hd"><span class="nm">Your usual day</span><span class="pr">5 clients, 15 min</span></div>
-        <p class="s">Message 5 clients, two of them people you have never spoken to.</p>
-        <p class="why">The size you have actually repeated. Held on weekdays it puts you at $3,000 a month in about 52 days.</p>
+        <div class="hd"><span class="nm">Your usual day</span><span class="pr">5 clients, about 15 min</span></div>
+        <p class="pre">Message 5 clients.</p>
+        <p class="s">Message 5 clients, two of them new to you.</p>
+        <p class="why">The size you have logged most often. It takes you to 52 of the 100 your plan set out to reach.</p>
         <div class="meter"><i style="height:4px" class="f"></i><i style="height:6px" class="f"></i><i style="height:8px" class="f"></i><i style="height:10px"></i><i style="height:12px"></i></div>
       </div>
       <div class="opt" data-i="3">
         <span class="edge"></span>
-        <div class="hd"><span class="nm">A heavy day</span><span class="pr">9 clients, 27 min</span></div>
-        <p class="s">Message 9 clients and follow up on the 6 from last week.</p>
-        <p class="why">Half an hour that pulls the target three weeks closer. Not two days in a row.</p>
+        <div class="hd"><span class="nm">A heavy day</span><span class="pr">9 clients, about 27 min</span></div>
+        <p class="pre">Message 9 clients.</p>
+        <p class="s">Message 9 clients, and last week's follow ups.</p>
+        <p class="why">About half an hour. It takes you to 56 of 100, five days sooner to the end.</p>
         <div class="meter"><i style="height:4px" class="f"></i><i style="height:6px" class="f"></i><i style="height:8px" class="f"></i><i style="height:10px" class="f"></i><i style="height:12px"></i></div>
       </div>
       <div class="opt" data-i="4">
         <span class="edge"></span>
-        <div class="hd"><span class="nm">All of it</span><span class="pr">15 clients, 45 min</span></div>
-        <p class="s">Clear the whole list, 15 clients, new ones included.</p>
-        <p class="why">Three quarters of an hour and the list is empty tonight. Once a week at most, or it starts costing you tomorrow.</p>
+        <div class="hd"><span class="nm">All of it</span><span class="pr">15 clients, about 45 min</span></div>
+        <p class="pre">Message 15 clients.</p>
+        <p class="s">Message 15 clients, the new ones included.</p>
+        <p class="why">About three quarters of an hour. Once a week at most.</p>
         <div class="meter"><i style="height:4px" class="f"></i><i style="height:6px" class="f"></i><i style="height:8px" class="f"></i><i style="height:10px" class="f"></i><i style="height:12px" class="f"></i></div>
       </div>
     </div>
-    <p class="lockline">Today is your usual day. 5 clients, 15 min.</p>
+    <p class="lockline">Today is your usual day. 5 clients, about 15 min.</p>
     <button class="cta" type="button">Start <span class="cn">5</span> <span class="cu">clients</span></button>
     <button class="quiet openfine" type="button">Say it in my own number</button>
 
@@ -138,7 +148,7 @@
         <div class="fv"><b class="fn">5</b><span class="funit">clients</span></div>
         <button type="button" class="fup">+</button>
       </div>
-      <p class="fmeta"><b>15 min</b>. $3,000 a month in <b>52 days</b>.</p>
+      <p class="fmeta">About <b>15 min</b>. Takes you to <b>52</b> of 100 reached.</p>
       <button class="cta usefine" type="button">Use this size</button>
       <button class="quiet closefine" type="button">Back to the five sentences</button>
     </div>
@@ -153,36 +163,41 @@
     <div class="cols">
       <div class="opt" data-i="0">
         <span class="edge"></span>
-        <div class="hd"><span class="nm">Barely a day</span><span class="pr">1 client, 3 min</span></div>
-        <p class="s">Message the one client already waiting on you.</p>
+        <div class="hd"><span class="nm">Barely a day</span><span class="pr">1 client, about 3 min</span></div>
+        <p class="pre">Message 1 client.</p>
+        <p class="s">Message 1 client, whichever one is easiest to write.</p>
         <p class="why">Keeps the run alive, asks for nothing else.</p>
         <div class="meter"><i style="height:4px" class="f"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:10px"></i><i style="height:12px"></i></div>
       </div>
       <div class="opt" data-i="1">
         <span class="edge"></span>
-        <div class="hd"><span class="nm">A light day</span><span class="pr">3 clients, 9 min</span></div>
-        <p class="s">Message 3 clients who have replied before.</p>
-        <p class="why">Under ten minutes, no cold openings.</p>
+        <div class="hd"><span class="nm">A light day</span><span class="pr">3 clients, about 9 min</span></div>
+        <p class="pre">Message 3 clients.</p>
+        <p class="s">Message 3 clients you have written to before.</p>
+        <p class="why">Under ten minutes on this estimate, no cold openings.</p>
         <div class="meter"><i style="height:4px" class="f"></i><i style="height:6px" class="f"></i><i style="height:8px"></i><i style="height:10px"></i><i style="height:12px"></i></div>
       </div>
       <div class="opt on" data-i="2">
         <span class="edge"></span>
-        <div class="hd"><span class="nm">Your usual day</span><span class="pr">5 clients, 15 min</span></div>
-        <p class="s">Message 5 clients, two of them people you have never spoken to.</p>
-        <p class="why">The size you have actually repeated. Held on weekdays it puts you at $3,000 a month in about 52 days.</p>
+        <div class="hd"><span class="nm">Your usual day</span><span class="pr">5 clients, about 15 min</span></div>
+        <p class="pre">Message 5 clients.</p>
+        <p class="s">Message 5 clients, two of them people you have not written to before.</p>
+        <p class="why">The size you have logged most often. It takes you to 52 of the 100 people your plan set out to reach.</p>
         <div class="meter"><i style="height:4px" class="f"></i><i style="height:6px" class="f"></i><i style="height:8px" class="f"></i><i style="height:10px"></i><i style="height:12px"></i></div>
       </div>
       <div class="opt" data-i="3">
         <span class="edge"></span>
-        <div class="hd"><span class="nm">A heavy day</span><span class="pr">9 clients, 27 min</span></div>
-        <p class="s">Message 9 clients, follow up on last week's 6.</p>
-        <p class="why">Pulls the target three weeks closer.</p>
+        <div class="hd"><span class="nm">A heavy day</span><span class="pr">9 clients, about 27 min</span></div>
+        <p class="pre">Message 9 clients.</p>
+        <p class="s">Message 9 clients, and follow up on last week's.</p>
+        <p class="why">It takes you to 56 of 100, about five days sooner to the end of the list.</p>
         <div class="meter"><i style="height:4px" class="f"></i><i style="height:6px" class="f"></i><i style="height:8px" class="f"></i><i style="height:10px" class="f"></i><i style="height:12px"></i></div>
       </div>
       <div class="opt" data-i="4">
         <span class="edge"></span>
-        <div class="hd"><span class="nm">All of it</span><span class="pr">15 clients, 45 min</span></div>
-        <p class="s">Clear the whole list, new ones included.</p>
+        <div class="hd"><span class="nm">All of it</span><span class="pr">15 clients, about 45 min</span></div>
+        <p class="pre">Message 15 clients.</p>
+        <p class="s">Message 15 clients, the new ones included.</p>
         <p class="why">Once a week at most, or it costs you tomorrow.</p>
         <div class="meter"><i style="height:4px" class="f"></i><i style="height:6px" class="f"></i><i style="height:8px" class="f"></i><i style="height:10px" class="f"></i><i style="height:12px" class="f"></i></div>
       </div>
@@ -190,34 +205,36 @@
     <div class="foot">
       <button class="cta" type="button">Start <span class="cn">5</span> <span class="cu">clients</span></button>
       <button class="quiet dfine" type="button">Say it in my own number</button>
-      <p class="lockline">Five sentences to read instead of three. Notice how long the choice takes.</p>
+      <p class="lockline">Five closed lines to read instead of three. Notice how long the choice takes.</p>
     </div>
   </div>
 </div>
 
 <script>(function(){
   var root=document.querySelector('[data-k="mx-11"]');
-  var N=[1,3,5,9,15], NM=['barely a day','a light day','your usual day','a heavy day','all of it'],
-      PR=['3 min','9 min','15 min','27 min','45 min'];
+  var N=[1,3,5,9,15], NM=['barely a day','a light day','your usual day','a heavy day','all of it'];
   var i=2, fine=false, fn=5;
   function unit(n){ return n===1?'client':'clients'; }
   function mins(n){ var m=n*3; return m>=60 ? (m%60===0?(m/60)+' hr':Math.floor(m/60)+' hr '+(m%60)+' min') : m+' min'; }
-  function days(n){ return Math.round(260/n)+' days'; }
+  /* PROVENANCE: 47 reached is the sum of the messages they logged, 100 is the countable
+     target their own plan named. No money is projected from a message count. */
+  var REACHED=47, TARGET=100;
+  function reached(n){ return Math.min(TARGET,REACHED+n); }
   function paint(){
     var n=fine?fn:N[i];
     Array.prototype.forEach.call(root.querySelectorAll('.opt'),function(o){
       o.classList.toggle('on',!fine&&+o.dataset.i===i); });
     root.querySelector('.p11 .lockline').textContent = fine
-      ? 'Today is your own number. '+fn+' '+unit(fn)+', '+mins(fn)+'.'
-      : 'Today is '+NM[i]+'. '+N[i]+' '+unit(N[i])+', '+PR[i]+'.';
+      ? 'Today is your own number. '+fn+' '+unit(fn)+', about '+mins(fn)+'.'
+      : 'Today is '+NM[i]+'. '+N[i]+' '+unit(N[i])+', about '+mins(N[i])+'.';
     root.querySelector('.d11 .lockline').textContent = fine
       ? 'Your own number, '+fn+' '+unit(fn)+'. Click a sentence to go back to the five.'
-      : 'Five sentences to read instead of three. Notice how long the choice takes.';
+      : 'Five closed lines to read instead of three. Notice how long the choice takes.';
     Array.prototype.forEach.call(root.querySelectorAll('.cn'),function(e){e.textContent=n;});
     Array.prototype.forEach.call(root.querySelectorAll('.cu'),function(e){e.textContent=unit(n);});
     root.querySelector('.fn').textContent=fn;
     root.querySelector('.funit').textContent=unit(fn);
-    root.querySelector('.fmeta').innerHTML='<b>'+mins(fn)+'</b>. $3,000 a month in <b>'+days(fn)+'</b>.';
+    root.querySelector('.fmeta').innerHTML='About <b>'+mins(fn)+'</b>. Takes you to <b>'+reached(fn)+'</b> of '+TARGET+' reached.';
   }
   Array.prototype.forEach.call(root.querySelectorAll('.opt'),function(o){
     o.addEventListener('click',function(){ fine=false; i=+o.dataset.i; paint(); });

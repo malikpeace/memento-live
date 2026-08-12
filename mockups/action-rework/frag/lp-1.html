@@ -13,14 +13,23 @@
 [data-k=lp-1] .s{position:absolute;inset:0;display:flex;flex-direction:column;padding:34px 22px 20px;
   font-variant-numeric:tabular-nums}
 
-/* --- goal line + thread ------------------------------------------------ */
-[data-k=lp-1] .goal{display:flex;align-items:baseline;gap:6px;font-size:12.5px;letter-spacing:-.005em;
-  color:rgba(var(--ink),.92)}
-[data-k=lp-1] .goal b{font-weight:700}
+/* --- OUTPUT BAR (provenance law) ---------------------------------------
+   This bar is the literal sum of the messages they logged, counted against a
+   countable target that came out of their own plan (100 clients). Nothing is
+   interpreted and nothing is measured for them: log 5, the bar moves 5.
+   THE RULE: if the star were money only ("$3,000 a month") with no countable
+   target in the plan, there would be NO BAR HERE AT ALL. Money, weight and
+   any interpreted progress never get a bar in Action, because Memento cannot
+   see them happen, it can only count what the person logged. In that case
+   this row is cut and the screen opens on the statement. */
+[data-k=lp-1] .goal{display:flex;align-items:baseline;gap:6px;font-size:12px;letter-spacing:-.005em;
+  white-space:nowrap;color:rgba(var(--ink),.92)}
+[data-k=lp-1] .goal b{font-weight:700;font-variant-numeric:tabular-nums}
 [data-k=lp-1] .goal span{margin-left:auto;color:rgba(var(--ink),.92)}
 [data-k=lp-1] .bar{margin-top:9px;height:3px;border-radius:2px;background:rgba(var(--ink),.12);overflow:hidden}
-[data-k=lp-1] .bar i{display:block;height:100%;width:41.3%;border-radius:2px;background:rgba(var(--ink),.70);
+[data-k=lp-1] .bar i{display:block;height:100%;width:47%;border-radius:2px;background:rgba(var(--ink),.70);
   transition:width .5s cubic-bezier(.2,.7,.2,1)}
+[data-k=lp-1] .src{margin:6px 0 0;font-size:11px;line-height:1.35;color:rgba(var(--ink),.90)}
 
 /* --- the statement ------------------------------------------------------ */
 [data-k=lp-1] .say{margin-top:auto;font-size:29px;line-height:1.04;letter-spacing:-.03em;font-weight:500;
@@ -99,11 +108,12 @@
 <div class="ph">
   <div class="grid"></div>
   <div class="s">
-    <div class="goal"><b>$1,240</b> of $3,000 this month <span data-days>19 days left</span></div>
+    <div class="goal"><b data-count>47</b> of 100 clients reached out <span>19 days left</span></div>
     <div class="bar"><i></i></div>
+    <p class="src">Counted from the messages you logged.</p>
 
     <p class="say">Message<span class="n">5</span><span class="obj">potential clients.</span></p>
-    <p class="cons">Sending 5 puts you at 47 this month. Your best day so far is 8.</p>
+    <p class="cons">Sending 5 takes you to 52 of 100. Your best day so far is 8.</p>
 
     <div class="scale" role="group" aria-label="how many today"></div>
     <button type="button" class="more">more sizes</button>
@@ -122,7 +132,10 @@
       bar=r.querySelector('.bar i'),lab=r.querySelector('.track .lab'),track=r.querySelector('.track'),
       knob=r.querySelector('.knob'),fill=r.querySelector('.track .fill'),undo=r.querySelector('.undo'),
       obj=r.querySelector('.obj'),scale=r.querySelector('.scale'),more=r.querySelector('.more'),
-      pick=5,BEST=8,MONTH=42;
+      count=r.querySelector('[data-count]'),
+      /* REACHED = the sum of every message they have logged. TARGET = the
+         countable target their plan named. Both trace to their own input. */
+      pick=5,BEST=8,REACHED=47,TARGET=100;
 
   /* THREE proposed sizes in front, named and priced. Everything else lives behind "more". */
   var THREE=[{n:3,role:'lighter'},{n:5,role:'today’s'},{n:8,role:'heavier'}],
@@ -158,8 +171,8 @@
     setTimeout(function(){n.textContent=v;n.classList.remove('swap')},110);
     obj.textContent=v===1?'potential client.':'potential clients.';
     cons.textContent=v>BEST
-      ? 'Sending '+v+' puts you at '+(MONTH+v)+' this month. That beats your best day of '+BEST+'.'
-      : 'Sending '+v+' puts you at '+(MONTH+v)+' this month. Your best day so far is '+BEST+'.';
+      ? 'Sending '+v+' takes you to '+(REACHED+v)+' of '+TARGET+'. That beats your best day of '+BEST+'.'
+      : 'Sending '+v+' takes you to '+(REACHED+v)+' of '+TARGET+'. Your best day so far is '+BEST+'.';
   }
   build();
 
@@ -167,14 +180,18 @@
     if(s.classList.contains('done'))return;
     s.classList.add('done');
     lab.textContent=pick+(pick===1?' message sent':' messages sent');
-    cons.textContent=(MONTH+pick)+' this month. '+(pick>BEST?'New best day.':'Best day so far is '+BEST+'.');
-    bar.style.width=(41.3+pick*.42).toFixed(1)+'%';
+    cons.textContent=(REACHED+pick)+' of '+TARGET+' reached out. '+
+      (pick>BEST?'New best day.':'Best day so far is '+BEST+'.');
+    /* the bar is literally the new sum over the target, no smoothing */
+    count.textContent=REACHED+pick;
+    bar.style.width=((REACHED+pick)/TARGET*100)+'%';
     knob.style.left='5px';fill.style.width='0';
   }
   function reset(){
     s.classList.remove('done');
     lab.textContent='Slide when they are sent';
-    bar.style.width='41.3%';say(pick);
+    count.textContent=REACHED;
+    bar.style.width=(REACHED/TARGET*100)+'%';say(pick);
   }
   undo.addEventListener('click',function(e){e.stopPropagation();reset()});
 

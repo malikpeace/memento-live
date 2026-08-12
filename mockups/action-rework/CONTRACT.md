@@ -81,3 +81,29 @@ One file per design at mockups/action-rework/frag/<key>.html:
 Before writing, list (in a comment at the top of your file) the layout
 archetype of each of your fragments in 3 words. If two share an archetype,
 change one. The judge will kill lookalikes.
+
+## THE PROVENANCE LAW (Malik, round 3, 2026-08-12) — supreme, no exceptions
+
+Memento knows exactly three things and NOTHING else:
+1. Their words from Clarity/intake (the star, the why, the deadline).
+2. The actions they logged (completions, with accept-or-amend detail).
+3. The numbers they typed in themselves (weight, screen time from their
+   phone's own report, revenue).
+Plus arithmetic on those. EVERY number, name and claim on ANY screen must
+trace to one of these sources, and when the source is manual entry, the
+screen must make that legible (an open "write today's number" row, "from
+your Screen Time report"). No invented client names, no auto-known
+results, no sensor data a PWA cannot have. A screen that cannot answer
+"how would Memento know this" is wrong, whatever it looks like.
+
+Rulings under the law:
+- BARS IN ACTION: output bars only: a bar may exist only as the literal sum
+  of logged actions toward a countable target (47 of 100 clients reached
+  out). Money/weight/interpreted progress never gets a bar in Action.
+- RESULT ENTRY lives per goal shape: daily-measured goals (weight, screen
+  time) carry a quiet entry slot IN the daily loop; slow metrics (revenue)
+  are entered at the weekly confirm in the sync box.
+- LOGGING is accept-or-amend: one tap banks the planned thing; a quiet
+  "it went differently" lets them correct the number/duration first.
+- TIME ESTIMATES are the plan's own estimate and say so ("about 40 min"),
+  never a measured fact.

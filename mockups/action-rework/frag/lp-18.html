@@ -63,10 +63,12 @@
       <div class="l18-hold"><i></i><span>Hold to own today</span></div>
       <button class="l18-esc">It is hard right now</button>
 
+      <!-- PROVENANCE: Memento has no contacts and invents no names. The person here is the
+           one THEY named for hard nights when they set the plan, and the line says so. -->
       <div class="l18-hard">
         <b>Then the move is one message.</b>
-        <p>Not a plan, not the rest of the night. Text Dana and stay where you are until she answers.</p>
-        <button class="go">Text Dana</button>
+        <p>Not a plan, not the rest of the night. Text the person you named for hard nights when you set this up, and stay where you are until they answer.</p>
+        <button class="go">Text them now</button>
         <button class="bk">Back</button>
       </div>
     </div>
@@ -85,8 +87,8 @@
   c.querySelector('.l18-esc').addEventListener('click',function(){root.classList.add('hard');});
   c.querySelector('.l18-hard .bk').addEventListener('click',function(){root.classList.remove('hard');});
   c.querySelector('.l18-hard .go').addEventListener('click',function(){
-    c.querySelector('.l18-hard b').textContent='Sent to Dana.';
-    c.querySelector('.l18-hard p').textContent='That was the whole move. Stay here until she answers, nothing else is asked of you tonight.';
+    c.querySelector('.l18-hard b').textContent='Sent.';
+    c.querySelector('.l18-hard p').textContent='That was the whole move. Stay here until they answer, nothing else is asked of you tonight.';
     c.querySelector('.l18-hard .go').style.display='none';
     c.querySelector('.l18-hard .bk').textContent='Back';
   });

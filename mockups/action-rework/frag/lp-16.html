@@ -4,19 +4,21 @@
      lp-18 centered monolith numeral -->
 <section class="cell" data-k="lp-16">
 <style>
-[data-k=lp-16] .l16{position:absolute;inset:0;display:flex;flex-direction:column;padding:32px 0 24px;
+[data-k=lp-16] .l16{position:absolute;inset:0;display:flex;flex-direction:column;padding:30px 0 22px;
   font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent}
 [data-k=lp-16] .l16 .pad{padding:0 20px}
 
 [data-k=lp-16] .l16-goal{font-size:12.5px;line-height:1;color:rgba(var(--ink),.80)}
-[data-k=lp-16] .l16-top{display:flex;align-items:baseline;gap:7px;margin-top:15px}
+[data-k=lp-16] .l16-top{display:flex;align-items:baseline;gap:7px;margin-top:14px}
 [data-k=lp-16] .l16-in{font-size:37px;font-weight:700;letter-spacing:-.035em;line-height:1;color:var(--text-hi)}
 [data-k=lp-16] .l16-of{font-size:13.5px;white-space:nowrap;color:rgba(var(--ink),.80)}
 [data-k=lp-16] .l16-days{margin-left:auto;font-size:12px;white-space:nowrap;color:rgba(var(--ink),.80)}
-[data-k=lp-16] .l16-say{margin:11px 0 0;font-size:14px;font-weight:500;line-height:1.45;color:rgba(var(--ink),.95)}
+[data-k=lp-16] .l16-say{margin:10px 0 0;font-size:14px;font-weight:500;line-height:1.45;color:rgba(var(--ink),.95)}
 [data-k=lp-16] .l16-say b{font-weight:700;color:var(--text-hi)}
+/* provenance: this money exists because they typed it at a weekly confirm */
+[data-k=lp-16] .l16-src{margin:7px 0 0;font-size:11.5px;line-height:1.4;color:rgba(var(--ink),.90)}
 
-[data-k=lp-16] .l16-band{position:relative;flex:none;height:144px;margin-top:20px;overflow:hidden;
+[data-k=lp-16] .l16-band{position:relative;flex:none;height:132px;margin-top:16px;overflow:hidden;
   background:rgba(22,25,31,.95);
   -webkit-backdrop-filter:blur(24px) saturate(1.35);backdrop-filter:blur(24px) saturate(1.35);
   box-shadow:inset 0 1px 0 rgba(var(--ink),.07),inset 0 -1px 0 rgba(var(--ink),.05)}
@@ -28,18 +30,20 @@
 [data-k=lp-16] .l16-now{position:absolute;font-size:11.5px;font-weight:500;line-height:1;color:var(--text-hi);
   transition:top .24s cubic-bezier(.22,.61,.36,1),left .24s cubic-bezier(.22,.61,.36,1)}
 
-[data-k=lp-16] .l16-int{margin-top:20px}
-[data-k=lp-16] .l16-int h4{margin:0 0 9px;font-size:12.5px;font-weight:500;line-height:1;color:rgba(var(--ink),.82)}
+[data-k=lp-16] .l16-int{margin-top:16px}
+[data-k=lp-16] .l16-lead{margin:0 0 9px;font-size:12.5px;font-weight:500;line-height:1.45;color:rgba(var(--ink),.90)}
 [data-k=lp-16] .l16-chips{display:flex;flex:none;gap:6px}
 [data-k=lp-16] .l16-chip{flex:1;height:38px;border:0;border-radius:10px;background:rgba(22,25,31,.95);
   -webkit-backdrop-filter:blur(24px) saturate(1.4);backdrop-filter:blur(24px) saturate(1.4);
   box-shadow:inset 0 1px 0 rgba(var(--ink),.08);color:rgba(var(--ink),.82);font:500 13px var(--font);
-  font-variant-numeric:tabular-nums;cursor:pointer;transition:background .16s ease-out,color .16s ease-out,box-shadow .16s ease-out}
+  font-variant-numeric:tabular-nums;cursor:pointer;
+  transition:background .16s ease-out,color .16s ease-out,box-shadow .16s ease-out,transform .09s ease-out}
+[data-k=lp-16] .l16-chip:active{transform:translateY(1px);background:rgba(30,34,42,.96)}
 [data-k=lp-16] .l16-chip.on{background:rgba(30,52,34,.96);color:rgba(var(--ink),.97);font-weight:700;
   box-shadow:inset 0 1px 0 rgba(63,217,78,.38)}
-[data-k=lp-16] .l16-note{margin:10px 0 0;font-size:12px;line-height:1.5;color:rgba(var(--ink),.90);min-height:34px}
+[data-k=lp-16] .l16-note{margin:9px 0 0;font-size:12px;line-height:1.5;color:rgba(var(--ink),.90);min-height:18px}
 
-[data-k=lp-16] .l16-sp{flex:1;min-height:10px}
+[data-k=lp-16] .l16-sp{flex:1;min-height:8px}
 
 [data-k=lp-16] .l16-do{flex:none;border-radius:14px;padding:14px 15px 15px;background:rgba(22,25,31,.95);
   -webkit-backdrop-filter:blur(26px) saturate(1.35);backdrop-filter:blur(26px) saturate(1.35);
@@ -65,7 +69,7 @@
 [data-k=lp-16] .l16-close.done .l16-knob{opacity:0;transition:opacity .16s ease-out}
 </style>
 <h3>The corridor</h3>
-<p class="cap">A revenue floor read as a lane you travel down, edge to edge: the bright line is the money you have promised yourself, the track is where the month has actually put you, and the rest of the month is the empty space ahead.</p>
+<p class="cap">A revenue floor read as a lane you travel down, edge to edge: the bright line is the money you promised yourself, the track is where your own weekly totals have put you, and the rest of the month is the empty space ahead.</p>
 <div class="ph">
   <div class="grid"></div>
   <div class="l16">
@@ -74,13 +78,14 @@
       <div class="l16-top">
         <div class="l16-in">$2,340</div>
         <div class="l16-of">of $4,000</div>
-        <div class="l16-days">19 days left</div>
+        <div class="l16-days">11 days left</div>
       </div>
-      <p class="l16-say">You are <b>$240 under</b> the line today. One invoice puts you back over it.</p>
+      <p class="l16-say">You are <b>$240 under</b> the line for this point in the month.</p>
+      <p class="l16-src">Each step up is a weekly total you entered. Last one was Sunday.</p>
     </div>
 
     <div class="l16-band">
-      <svg viewBox="0 0 300 144" preserveAspectRatio="none" aria-hidden="true">
+      <svg viewBox="0 0 300 132" preserveAspectRatio="none" aria-hidden="true">
         <defs>
           <linearGradient id="l16up" x1="0" y1="1" x2="0" y2="0">
             <stop offset="0" stop-color="rgba(63,217,78,.16)"/>
@@ -97,10 +102,11 @@
           stroke-dasharray="3 4" vector-effect="non-scaling-stroke"/>
         <line class="floorl" x1="0" y1="0" x2="300" y2="0" stroke="rgba(63,217,78,.62)" stroke-width="1"
           vector-effect="non-scaling-stroke"/>
-        <line class="todayl" x1="0" y1="10" x2="0" y2="134" stroke="rgba(235,238,248,.13)" stroke-width="1"
+        <line class="todayl" x1="0" y1="10" x2="0" y2="122" stroke="rgba(235,238,248,.13)" stroke-width="1"
           vector-effect="non-scaling-stroke"/>
         <polyline class="track" points="" fill="none" stroke="rgba(235,238,248,.58)" stroke-width="1.6"
           stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+        <g class="marks"></g>
         <circle class="head" cx="0" cy="0" r="3.6" fill="#3fd94e"/>
       </svg>
       <div class="l16-tag floor">the floor, $4,000</div>
@@ -109,25 +115,25 @@
     </div>
 
     <div class="pad l16-int">
-      <h4>How much cushion you carry</h4>
+      <p class="l16-lead">Cushion is how far above the floor you aim, so one late payment does not put you under.</p>
       <div class="l16-chips">
         <button class="l16-chip on" data-c="0">None</button>
         <button class="l16-chip" data-c="400">+$400</button>
         <button class="l16-chip" data-c="1000">+$1,000</button>
       </div>
-      <p class="l16-note">No cushion. Every month is decided in the last week, and one late payment puts you under.</p>
+      <p class="l16-note">You aim at the floor exactly. One late payment puts you under it.</p>
     </div>
 
     <div class="l16-sp"></div>
 
     <div class="pad">
       <div class="l16-do">
-        <div class="h"><i></i><b>Send the Kessler renewal, $850.</b></div>
-        <p>Your largest open invoice, and the only one on the list that clears the line by itself.</p>
+        <div class="h"><i></i><b>Send 2 renewal invoices.</b></div>
+        <p>Today&#8217;s step. The plan puts about 20 minutes on it.</p>
       </div>
       <div class="l16-close">
         <div class="l16-fill"></div>
-        <div class="l16-lab">Swipe when it is sent</div>
+        <div class="l16-lab">Swipe when they are sent</div>
         <div class="l16-knob"><svg viewBox="0 0 24 24"><path d="M8 5l7 7-7 7"/></svg></div>
       </div>
     </div>
@@ -136,20 +142,23 @@
 <script>(function(){
   var c=document.currentScript.closest('.cell');
   var svg=c.querySelector('.l16-band svg'),
-      track=svg.querySelector('.track'),head=svg.querySelector('.head'),
+      track=svg.querySelector('.track'),head=svg.querySelector('.head'),marks=svg.querySelector('.marks'),
       floorl=svg.querySelector('.floorl'),cushl=svg.querySelector('.cushl'),
       todayl=svg.querySelector('.todayl'),under=svg.querySelector('.under'),lane=svg.querySelector('.lane'),
       tFloor=c.querySelector('.l16-tag.floor'),tCush=c.querySelector('.l16-tag.cush'),
       now=c.querySelector('.l16-now'),note=c.querySelector('.l16-note'),
-      say=c.querySelector('.l16-say'),inEl=c.querySelector('.l16-in');
+      say=c.querySelector('.l16-say'),sent=false;
 
-  var H=144,W=300,DAYS=31,PPD=.075,FY=100,cushion=0,sent=false;
-  // dollars ahead of (+) or behind (-) the floor pace, day 1..12
-  var delta=[0,-60,-20,80,40,-30,-120,-60,-180,-140,-210,-240];
-  var notes={0:'No cushion. Every month is decided in the last week, and one late payment puts you under.',
-             400:'A small cushion. One client paying late stops being an emergency.',
-             1000:'Real room. You can lose a month’s biggest invoice and still land on the floor.'};
-  function money(n){return '$'+Math.abs(n).toLocaleString('en-US');}
+  var H=132,W=300,DAYS=31,PPD=.048,FY=58,cushion=0;
+  /* dollars ahead of (+) or behind (-) the floor pace, day 1..20.
+     It steps UP on the three days they entered a weekly total, and drifts
+     down in between as the floor pace keeps moving. Nothing here is sensed. */
+  var CONF=[6,13,20];
+  var delta=[-129,-258,-387,-516,-645,126,-3,-132,-261,-390,-519,-648,73,-56,-185,-314,-443,-572,-701,-240];
+  var notes={0:'You aim at the floor exactly. One late payment puts you under it.',
+             400:'A small cushion. One late payment stops being an emergency.',
+             1000:'Real room. You can lose your biggest invoice and still land on the floor.'};
+  function money(n){return '$'+Math.abs(Math.round(n)).toLocaleString('en-US');}
   function y(v){return FY-v*PPD;}
   function x(d){return 14+(d-1)*((W-28)/(DAYS-1));}
 
@@ -158,7 +167,7 @@
     var cy=y(cushion);
     cushl.setAttribute('y1',cy);cushl.setAttribute('y2',cy);
     cushl.style.opacity=cushion?1:0;
-    lane.setAttribute('y',Math.max(0,FY-66));lane.setAttribute('height',Math.min(FY,66));
+    lane.setAttribute('y',Math.max(0,FY-58));lane.setAttribute('height',Math.min(FY,58));
     under.setAttribute('y',FY);under.setAttribute('height',H-FY);
     tFloor.style.top=(FY-16)+'px';
     tCush.style.top=Math.max(4,cy-15)+'px';tCush.style.opacity=cushion?1:0;
@@ -166,6 +175,14 @@
     var pts=[],i;
     for(i=0;i<delta.length;i++)pts.push(x(i+1).toFixed(1)+','+y(delta[i]).toFixed(1));
     track.setAttribute('points',pts.join(' '));
+    marks.textContent='';
+    CONF.forEach(function(d){
+      if(d>delta.length)return;
+      var m=document.createElementNS('http://www.w3.org/2000/svg','circle');
+      m.setAttribute('cx',x(d).toFixed(1));m.setAttribute('cy',y(delta[d-1]).toFixed(1));
+      m.setAttribute('r','2.2');m.setAttribute('fill','rgba(235,238,248,.75)');
+      marks.appendChild(m);
+    });
     var hx=x(delta.length),hy=y(delta[delta.length-1]);
     head.setAttribute('cx',hx);head.setAttribute('cy',hy);
     todayl.setAttribute('x1',hx);todayl.setAttribute('x2',hx);
@@ -187,16 +204,16 @@
       fill=c.querySelector('.l16-fill'),lab=c.querySelector('.l16-lab'),drag=false,sx=0,px=0;
   function max(){return pad.clientWidth-52;}
   function set(v){px=Math.max(0,Math.min(max(),v));knob.style.left=(4+px)+'px';fill.style.width=(px+48)+'px';}
+  /* logging the ACTION never moves the money. The money moves when they type it in. */
   function done(){
-    sent=true;pad.classList.add('done');lab.textContent='Sent. $3,190 in, over the line';
+    sent=true;pad.classList.add('done');lab.textContent='2 invoices sent';
     c.querySelector('.l16-do').classList.add('sent');
-    c.querySelector('.l16-do p').textContent='Sent just now. That $850 is already counted in the number above.';
-    inEl.textContent='$3,190';
-    say.innerHTML='You are <b>$610 over</b> the line. Nothing else is asked of you today.';
-    delta[delta.length-1]=610;paint();
+    c.querySelector('.l16-do p').textContent='Logged just now. What they pay lands here when you enter Sunday’s total.';
+    say.innerHTML='Two invoices out. The line moves at Sunday’s confirm, not before.';
   }
   knob.addEventListener('pointerdown',function(e){if(sent)return;drag=true;sx=e.clientX-px;
-    knob.style.transition='';fill.style.transition='';knob.setPointerCapture(e.pointerId);});
+    knob.style.transition='';fill.style.transition='';
+    try{knob.setPointerCapture(e.pointerId);}catch(z){}});
   knob.addEventListener('pointermove',function(e){if(!drag)return;set(e.clientX-sx);});
   function release(){
     if(!drag)return;drag=false;

@@ -1,5 +1,6 @@
-<!-- ARCHETYPES, the surviving set: ob-1 full-bleed monumental type | ob-6 sequenced ledger reveal | ob-7 why-first inverted hierarchy | ob-8 single compact plate | ob-9 live countdown row | ob-10 pressed engraved slots.
-     All six are one concept, the wall of intent, delivered six ways. -->
+<!-- ARCHETYPES, the surviving set: ob-1 full-bleed monumental type you press in | ob-6 sequenced ledger reveal | ob-7 why-first inverted hierarchy | ob-8 single compact plate | ob-9 live countdown row | ob-10 pressed engraved slots.
+     All six are one concept, the wall of intent, delivered six ways.
+     ob-1 keeps its type exactly and takes ob-10's press: each fact sinks into the wall when you touch it. -->
 <section class="cell" data-k="ob-1">
 <style>
 [data-k=ob-1] .o1-halo{position:absolute;inset:0;pointer-events:none;
@@ -25,34 +26,96 @@
 [data-k=ob-1] .o1-note{font-size:13px;font-weight:400;line-height:1.45;color:rgba(var(--ink),.92);margin-top:14px;max-width:26ch;
   display:flex;align-items:center;gap:7px}
 [data-k=ob-1] .o1-note svg{flex:none;width:12px;height:14px;color:rgba(var(--ink),.72)}
+
+/* ---- the press: each fact is a zone of the wall you can sink in. No box, no chrome, the type itself moves. ---- */
+[data-k=ob-1] .o1-z{position:relative;display:flex;flex-direction:column;align-items:stretch;width:100%;
+  margin:0;padding:0;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  transition:transform .2s cubic-bezier(.2,.7,.3,1),filter .2s ease-out}
+[data-k=ob-1] .o1-z:focus-visible{outline:2px solid rgba(var(--ink),.5);outline-offset:6px;border-radius:6px}
+[data-k=ob-1] .o1-z:active{transform:translateY(1.5px) scale(.997)}
+[data-k=ob-1] .o1-z>*{transition:text-shadow .24s ease-out,color .24s ease-out}
+[data-k=ob-1] .o1-z.o1-so{margin-top:26px}
+/* the zone owns the gap, not its first line, so the mark can sit on that first line */
+[data-k=ob-1] .o1-z.o1-zw{margin-top:16px}
+[data-k=ob-1] .o1-z .o1-when{margin-top:0}
+[data-k=ob-1] .o1-z.set{transform:translateY(1px)}
+/* engraved: a dark bite above the strokes and a hair of light under them, so the words read cut into the wall */
+[data-k=ob-1] .o1-z.set .o1-num,[data-k=ob-1] .o1-z.set .o1-mid,[data-k=ob-1] .o1-z.set .o1-big,
+[data-k=ob-1] .o1-z.set .o1-when b{color:rgba(var(--ink),.92);
+  text-shadow:0 -1px 0 rgba(0,0,0,.95),0 1px 0 rgba(var(--ink),.24)}
+[data-k=ob-1] .o1-z.set .o1-sm,[data-k=ob-1] .o1-z.set .o1-when i,[data-k=ob-1] .o1-z.set .o1-when s{
+  text-shadow:0 -1px 0 rgba(0,0,0,.9),0 1px 0 rgba(var(--ink),.16)}
+/* the mark: an empty seat before, a set tick after. Sits on the zone's first line, out at the column edge. */
+[data-k=ob-1] .o1-m{position:absolute;right:0;top:3px;width:15px;height:15px;border-radius:999px;
+  background:rgba(var(--ink),.09);box-shadow:inset 0 1px 0 rgba(var(--ink),.10);
+  display:flex;align-items:center;justify-content:center;
+  transition:background .24s ease-out,box-shadow .24s ease-out}
+[data-k=ob-1] .o1-m svg{width:9px;height:9px;color:var(--text-hi);opacity:0;transform:scale(.6);
+  transition:opacity .22s ease-out,transform .26s cubic-bezier(.2,.9,.3,1.25)}
+[data-k=ob-1] .o1-z.set .o1-m{background:rgba(var(--ink),.16);box-shadow:inset 0 1px 1px rgba(0,0,0,.6)}
+[data-k=ob-1] .o1-z.set .o1-m svg{opacity:1;transform:none}
+
 [data-k=ob-1] .o1-foot{position:absolute;left:22px;right:22px;bottom:30px}
-[data-k=ob-1] .o1-cta{display:block;width:100%;border:0;border-radius:14px;background:rgba(235,238,248,.94);
-  color:#0b0c10;font-family:inherit;font-weight:700;font-size:15.5px;letter-spacing:-.01em;padding:15px 16px;
-  text-align:center;cursor:pointer;transition:transform .16s ease-out,background .16s ease-out}
-[data-k=ob-1] .o1-cta:active{transform:scale(.985);background:rgba(235,238,248,.84)}
+[data-k=ob-1] .o1-cta{display:block;width:100%;border:0;border-radius:14px;background:rgba(22,25,31,.92);
+  -webkit-backdrop-filter:blur(28px) saturate(1.4);backdrop-filter:blur(28px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.07);color:rgba(var(--ink),.90);
+  font-family:inherit;font-weight:500;font-size:15.5px;letter-spacing:-.01em;padding:15px 16px;
+  text-align:center;cursor:default;transition:background .22s ease-out,color .22s ease-out,transform .16s ease-out}
+[data-k=ob-1] .o1-cta.live{background:rgba(235,238,248,.94);color:#0b0c10;font-weight:700;cursor:pointer;box-shadow:none}
+[data-k=ob-1] .o1-cta.live:active{transform:scale(.985);background:rgba(235,238,248,.84)}
 [data-k=ob-1] .o1-foot p{margin:11px 0 0;text-align:center;font-size:12px;color:rgba(var(--ink),.62)}
-@media (prefers-reduced-motion:reduce){[data-k=ob-1] .o1-cta{transition:none}}
+@media (prefers-reduced-motion:reduce){
+  [data-k=ob-1] .o1-cta,[data-k=ob-1] .o1-z,[data-k=ob-1] .o1-z>*,
+  [data-k=ob-1] .o1-m,[data-k=ob-1] .o1-m svg{transition:none}}
 </style>
-<h3>Wall of intent</h3><p class="cap">No card, no container, no chrome: the star IS the screen, scaled so the number is the largest thing they have ever seen it, with the deadline read back as a fact and the real Memento button under it.</p>
+<h3>Wall of intent</h3><p class="cap">No card, no container, no chrome: the star IS the screen, scaled so the number is the largest thing they have ever seen it, and each fact sinks into the wall when they press it, so agreeing is physical and the button only lives once the whole wall is set.</p>
 <div class="ph">
   <div class="grid"></div>
   <div class="o1-halo"></div>
   <div class="o1-type">
-    <span class="o1-sm">I will get to</span>
-    <span class="o1-num">$3,000</span>
-    <span class="o1-mid">a month</span>
-    <span class="o1-sm o1-so">so I can</span>
-    <span class="o1-big">quit the<br>warehouse</span>
+    <button class="o1-z" type="button" aria-pressed="false">
+      <span class="o1-sm">I will get to</span>
+      <span class="o1-num">$3,000</span>
+      <span class="o1-mid">a month</span>
+      <span class="o1-m"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 6.3l2.6 2.6L10 3.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    </button>
+    <button class="o1-z o1-so" type="button" aria-pressed="false">
+      <span class="o1-sm">so I can</span>
+      <span class="o1-big">quit the<br>warehouse</span>
+      <span class="o1-m"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 6.3l2.6 2.6L10 3.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    </button>
     <span class="o1-rule"></span>
-    <div class="o1-when"><i>by</i><b>March 1</b><s>201 days</s></div>
+    <button class="o1-z o1-zw" type="button" aria-pressed="false">
+      <span class="o1-when"><i>by</i><b>March 1</b><s>201 days</s></span>
+      <span class="o1-m"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 6.3l2.6 2.6L10 3.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    </button>
     <p class="o1-note">
       <svg viewBox="0 0 12 14" fill="none" aria-hidden="true"><path d="M2.7 6.2V4.3a3.3 3.3 0 0 1 6.6 0v1.9" stroke="currentColor" stroke-width="1.3"/><rect x="1.2" y="6.2" width="9.6" height="7" rx="1.8" fill="currentColor" opacity=".7"/></svg>
       Your words, from Clarity. Not edited here.
     </p>
   </div>
   <div class="o1-foot">
-    <button class="o1-cta" type="button">This is it</button>
-    <p>Change it later in Clarity</p>
+    <button class="o1-cta" type="button">Press each line to set it</button>
+    <p class="o1-sub">Three to press</p>
   </div>
 </div>
+<script>
+(function(){
+  var r=document.querySelector('[data-k=ob-1]'); if(!r||r.dataset.wired) return; r.dataset.wired=1;
+  var zs=[].slice.call(r.querySelectorAll('.o1-z')), cta=r.querySelector('.o1-cta'), sub=r.querySelector('.o1-sub');
+  function sync(){
+    var n=zs.filter(function(z){return z.classList.contains('set');}).length, left=zs.length-n;
+    if(left===0){ cta.classList.add('live'); cta.textContent='This is it'; sub.textContent='Change it later in Clarity'; }
+    else{ cta.classList.remove('live');
+      cta.textContent = n===0 ? 'Press each line to set it' : left+(left===1?' line left':' lines left');
+      sub.textContent = n===0 ? 'Three to press' : 'Press it again to undo'; }
+  }
+  zs.forEach(function(z){ z.addEventListener('click',function(){
+    var on=!z.classList.contains('set');
+    z.classList.toggle('set',on); z.setAttribute('aria-pressed',on?'true':'false'); sync();
+  }); });
+  sync();
+})();
+</script>
 </section>

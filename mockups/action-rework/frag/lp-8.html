@@ -8,7 +8,8 @@
 /* the field IS the grid: every mark sits in one graph-paper cell */
 [data-k=lp-8] .grid{background-position:20px 96px}
 
-[data-k=lp-8] .hd{position:absolute;left:20px;right:20px;top:20px}
+/* header block lands its baseline on the grid line one row above the field */
+[data-k=lp-8] .hd{position:absolute;left:20px;right:20px;top:23px}
 [data-k=lp-8] .hd b{display:block;font-size:17px;font-weight:700;letter-spacing:-.015em;color:rgba(var(--ink),.96)}
 [data-k=lp-8] .hd i{display:block;font-style:normal;font-size:12.5px;line-height:1.4;color:rgba(var(--ink),.90);margin-top:5px}
 
@@ -16,26 +17,32 @@
 [data-k=lp-8] .field{position:absolute;left:20px;top:96px;width:260px;height:260px;
   display:grid;grid-template-columns:repeat(10,26px);grid-template-rows:repeat(10,26px);
   touch-action:none;-webkit-tap-highlight-color:transparent}
+/* the two centre grid lines are brightened so the field reads as four blocks of 25 */
+[data-k=lp-8] .field:after{content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(90deg,transparent 129px,rgba(var(--ink),.10) 129px,rgba(var(--ink),.10) 130px,transparent 130px),
+    linear-gradient(180deg,transparent 129px,rgba(var(--ink),.10) 129px,rgba(var(--ink),.10) 130px,transparent 130px)}
 [data-k=lp-8] .field i{width:26px;height:26px;background-repeat:no-repeat;background-position:center;
-  background-size:15px 15px;background-image:linear-gradient(rgba(var(--ink),.15),rgba(var(--ink),.15));
+  background-size:14px 14px;background-image:linear-gradient(rgba(var(--ink),.14),rgba(var(--ink),.14));
   transition:background-size .22s cubic-bezier(.2,.8,.3,1),background-image .26s ease-out}
 [data-k=lp-8] .field i.lit{background-image:linear-gradient(rgba(var(--ink),.88),rgba(var(--ink),.88))}
-[data-k=lp-8] .field i.pend{cursor:pointer;background-size:9px 9px;
+[data-k=lp-8] .field i.pend{cursor:pointer;background-size:10px 10px;
   background-image:linear-gradient(rgba(63,217,78,.95),rgba(63,217,78,.95));
-  filter:drop-shadow(0 0 7px rgba(63,217,78,.40))}
-[data-k=lp-8] .field i.pend:hover{background-size:12px 12px}
+  filter:drop-shadow(0 0 8px rgba(63,217,78,.45))}
+[data-k=lp-8] .field i.pend:hover{background-size:13px 13px}
 [data-k=lp-8] .field i.just{background-size:19px 19px;filter:drop-shadow(0 0 10px rgba(63,217,78,.55));
   background-image:linear-gradient(rgba(63,217,78,.95),rgba(63,217,78,.95))}
 [data-k=lp-8] .field:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:6px;border-radius:4px}
 
 /* --- where that puts you ------------------------------------------------ */
-[data-k=lp-8] .read{position:absolute;left:20px;right:20px;top:372px;display:flex;align-items:baseline}
-[data-k=lp-8] .read .amt{font-size:24px;font-weight:700;letter-spacing:-.03em;color:rgba(var(--ink),.97)}
-[data-k=lp-8] .read .of{margin-left:6px;font-size:12.5px;color:rgba(var(--ink),.90)}
-[data-k=lp-8] .read .ct{margin-left:auto;font-size:12.5px;color:rgba(var(--ink),.90)}
+/* sits in the graph row directly under the field, same 20px column as everything else */
+[data-k=lp-8] .read{position:absolute;left:20px;right:20px;top:356px;height:26px;display:flex;align-items:baseline}
+[data-k=lp-8] .read .amt{font-size:24px;line-height:26px;font-weight:700;letter-spacing:-.03em;color:rgba(var(--ink),.97)}
+[data-k=lp-8] .read .of{margin-left:6px;font-size:12.5px;line-height:26px;color:rgba(var(--ink),.90)}
+[data-k=lp-8] .read .ct{margin-left:auto;font-size:12.5px;line-height:26px;color:rgba(var(--ink),.90)}
 
 /* --- today -------------------------------------------------------------- */
-[data-k=lp-8] .card{position:absolute;left:14px;right:14px;top:404px;bottom:16px;border-radius:16px;padding:15px;
+/* left:6 + padding:14 puts the card's text on the same 20px column as the header */
+[data-k=lp-8] .card{position:absolute;left:6px;right:6px;top:408px;bottom:16px;border-radius:16px;padding:14px 14px 15px;
   background:rgba(22,25,31,.95);backdrop-filter:blur(26px) saturate(1.4);-webkit-backdrop-filter:blur(26px) saturate(1.4);
   box-shadow:inset 0 1px 0 rgba(var(--ink),.07),0 18px 40px rgba(0,0,0,.5);display:flex;flex-direction:column}
 [data-k=lp-8] .card .act{margin:0;font-size:19px;font-weight:700;letter-spacing:-.02em;line-height:1.24;color:rgba(var(--ink),.97)}
@@ -95,7 +102,7 @@
       <button type="button" class="on" data-n="4" aria-pressed="true"><em>$200</em><u>4 marks</u></button>
       <button type="button" data-n="7"><em>$350</em><u>7 marks</u></button>
     </div>
-    <p class="cons">Last mark lights in early December.</p>
+    <p class="cons">At this size the last mark lights around early December.</p>
     <button type="button" class="fill">Fill 4 marks</button>
   </div>
 </div>
@@ -104,9 +111,11 @@ var ph=r.querySelector('.ph'),field=r.querySelector('.field'),cells=[].slice.cal
     amt=r.querySelector('.read .amt'),ct=r.querySelector('.read .ct'),cons=r.querySelector('.cons'),
     act=r.querySelector('.act'),btn=r.querySelector('.fill'),
     BASE=37,step=4,filled=0,logged=false;
-var COPY={2:'Last mark lights in March.',
-          4:'Last mark lights in early December.',
-          7:'Last mark lights by mid October.'};
+/* the date is arithmetic on the size they picked and the marks still empty, and it is
+   said as an estimate, never as a fact about the future. */
+var COPY={2:'At this size the last mark lights around March.',
+          4:'At this size the last mark lights around early December.',
+          7:'At this size the last mark lights around mid October.'};
 function lit(){return BASE+filled}
 function left(){return step-filled}
 function paint(){
@@ -150,7 +159,7 @@ var wiping=false;
 field.addEventListener('pointerdown',function(e){
   if(logged)return;var i=markAt(e.clientX,e.clientY);
   if(i<lit()||i>=BASE+step)return;
-  wiping=true;field.setPointerCapture(e.pointerId);light(i);});
+  wiping=true;try{field.setPointerCapture(e.pointerId);}catch(x){}light(i);});
 field.addEventListener('pointermove',function(e){
   if(!wiping||logged)return;var i=markAt(e.clientX,e.clientY);
   if(i>=lit()&&i<BASE+step)light(i);});

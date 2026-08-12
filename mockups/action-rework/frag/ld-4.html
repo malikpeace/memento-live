@@ -1,207 +1,203 @@
-<!-- ARCHETYPES, the surviving set: ld-4 streaming plan document | ld-5 breathing field with four real beats.
-     No invented stage names in either: every line names something the request actually does. -->
+<!-- ARCHETYPE: quiet fact cycle (ld-4, the chosen loader). One screen, one already-known
+     line at a time, a real elapsed clock, and the plan arriving at the end.
+     PROVENANCE: every line on this screen is the person's own words from Clarity and the
+     refine step, or arithmetic on the date they typed. Nothing is produced by the model,
+     nothing is a stage name, nothing is claimed on the model's behalf. -->
 <section class="cell" data-k="ld-4">
 <style>
 [data-k=ld-4] .ph{background:#050608}
-[data-k=ld-4] .grid{opacity:.05}
-[data-k=ld-4] .col{position:absolute;left:24px;right:24px;top:64px;bottom:28px;
+[data-k=ld-4] .grid{opacity:.035}
+[data-k=ld-4] .col{position:absolute;left:24px;right:24px;top:60px;bottom:26px;
   display:flex;flex-direction:column}
-[data-k=ld-4] .top{margin:0;font-size:17px;font-weight:500;letter-spacing:-.015em;
-  line-height:1.3;color:var(--text-hi)}
-[data-k=ld-4] .sub{margin:7px 0 0;font-size:12.5px;line-height:1.45;color:rgba(var(--ink),.9);
-  font-variant-numeric:tabular-nums}
 
-/* the plan document: rows hold their height from the start so nothing jumps */
-[data-k=ld-4] .mid{flex:1 1 auto;display:flex;flex-direction:column;justify-content:center}
-[data-k=ld-4] .doc{flex:0 0 auto}
-[data-k=ld-4] .doc>*+*{margin-top:22px}
-[data-k=ld-4] .row{position:relative;opacity:0;transition:opacity .35s ease}
-[data-k=ld-4] .row.on{opacity:1}
-[data-k=ld-4] .k{margin:0 0 5px;font-size:11.5px;line-height:1;color:var(--text-mid)}
-[data-k=ld-4] .v{margin:0;font-size:15px;font-weight:500;line-height:1.42;letter-spacing:-.01em;
-  color:rgba(var(--ink),.9);font-variant-numeric:tabular-nums;
-  transition:color .5s ease}
-[data-k=ld-4] .row.set .v{color:var(--text-hi)}
-[data-k=ld-4] .r-today .v{min-height:64px}
-[data-k=ld-4] .r-size .v,[data-k=ld-4] .r-time .v{min-height:21px}
-[data-k=ld-4] .pair{display:flex;gap:26px}
-[data-k=ld-4] .pair .row{flex:1 1 0}
-[data-k=ld-4] .car{display:inline-block;width:2px;height:1em;margin-left:1px;
-  vertical-align:-.14em;background:rgba(var(--ink),.9)}
+/* head: what is happening + the real clock */
+[data-k=ld-4] .head{flex:0 0 auto;display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+[data-k=ld-4] .head h4{margin:0;font-size:16px;font-weight:500;letter-spacing:-.015em;
+  line-height:1.25;color:var(--text-hi)}
+[data-k=ld-4] .clk{margin:0;font-size:13px;line-height:1.25;font-weight:500;color:var(--text-mid);
+  font-variant-numeric:tabular-nums;letter-spacing:.01em}
+[data-k=ld-4] .state{margin:6px 0 0;font-size:12px;line-height:1.45;color:rgba(var(--ink),.9);
+  transition:opacity .45s ease}
+[data-k=ld-4] .state.swap{opacity:0}
 
-/* the week shape */
-[data-k=ld-4] .wk{display:flex;gap:5px;margin:0}
-[data-k=ld-4] .wk b{flex:1 1 0;height:52px;border-radius:10px;background:rgba(22,25,31,.94);
-  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
-  box-shadow:inset 0 1px 0 rgba(235,238,248,.06);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
-  font-weight:400;opacity:0;transform:translateY(5px);
-  transition:opacity .3s ease,transform .3s ease}
-[data-k=ld-4] .wk b.on{opacity:1;transform:none}
-[data-k=ld-4] .wk .dy{font-size:9.5px;line-height:1;color:var(--text-mid)}
-[data-k=ld-4] .wk .nm{font-size:13px;line-height:1;font-weight:500;color:var(--text-hi);
-  font-variant-numeric:tabular-nums}
-[data-k=ld-4] .wk b.rest .nm{color:var(--text-mid);font-weight:400}
+/* the fact: one at a time, held, never crowded */
+[data-k=ld-4] .stage{flex:1 1 auto;display:flex;flex-direction:column;justify-content:center;
+  padding-bottom:14px}
+[data-k=ld-4] .layer{display:grid}
+[data-k=ld-4] .layer>*{grid-area:1/1}
+[data-k=ld-4] .fact{opacity:0;transform:translateY(7px);
+  transition:opacity .6s ease,transform .6s cubic-bezier(.25,.8,.3,1)}
+[data-k=ld-4] .fact.on{opacity:1;transform:none}
+[data-k=ld-4] .fact.calm{transform:none}
+[data-k=ld-4] .src{margin:0 0 9px;font-size:11.5px;line-height:1.3;color:var(--text-mid)}
+[data-k=ld-4] .say{margin:0;font-size:20px;font-weight:500;line-height:1.36;letter-spacing:-.018em;
+  color:var(--text-hi);font-variant-numeric:tabular-nums;min-height:84px}
+[data-k=ld-4] .say .q{color:var(--text-lo)}
+
+/* position in the cycle, not a claim about anything */
+[data-k=ld-4] .ticks{display:flex;gap:5px;margin:18px 0 0;transition:opacity .45s ease}
+[data-k=ld-4] .ticks.gone{opacity:0}
+[data-k=ld-4] .ticks i{width:16px;height:2px;border-radius:2px;background:rgba(var(--ink),.16);
+  transition:background .45s ease}
+[data-k=ld-4] .ticks i.on{background:rgba(var(--ink),.62)}
+
+/* arrival */
+[data-k=ld-4] .arr{align-self:start;padding-top:24px;opacity:0;transform:translateY(8px);pointer-events:none;
+  transition:opacity .5s ease,transform .5s cubic-bezier(.25,.8,.3,1)}
+[data-k=ld-4] .arr.on{opacity:1;transform:none;pointer-events:auto}
+[data-k=ld-4] .arr p{margin:0;font-size:20px;font-weight:500;line-height:1.36;letter-spacing:-.018em;
+  color:var(--text-hi)}
+[data-k=ld-4] .arr span{display:block;margin-top:9px;font-size:12.5px;line-height:1.45;
+  color:rgba(var(--ink),.9);font-variant-numeric:tabular-nums}
 
 [data-k=ld-4] .foot{flex:0 0 auto}
-[data-k=ld-4] .foot p{margin:0 0 15px;font-size:11.5px;line-height:1.5;color:var(--text-mid);
-  font-variant-numeric:tabular-nums}
+[data-k=ld-4] .foot .note{margin:0 0 12px;font-size:11.5px;line-height:1.5;color:var(--text-mid)}
+[data-k=ld-4] .foot .more{display:inline-block;padding:0;border:0;background:none;font-family:inherit;
+  font-size:11.5px;line-height:1.5;color:var(--text-lo);cursor:pointer;margin:0 0 12px}
+[data-k=ld-4] .foot .more[aria-pressed=true]{color:var(--text-mid)}
 [data-k=ld-4] .cta{flex:0 0 auto}
 [data-k=ld-4] .cta button{display:block;width:100%;border:0;border-radius:14px;padding:15px 16px;
   font-family:inherit;font-size:15.5px;line-height:1.1;letter-spacing:-.01em;cursor:pointer;
   background:rgba(235,238,248,.94);color:#0b0c10;font-weight:700;
   opacity:0;transform:translateY(6px);pointer-events:none;
-  transition:opacity .4s ease,transform .4s cubic-bezier(.25,.8,.3,1)}
+  transition:opacity .45s ease,transform .45s cubic-bezier(.25,.8,.3,1)}
 [data-k=ld-4] .cta button.on{opacity:1;transform:none;pointer-events:auto}
 [data-k=ld-4] .cta button:active{transform:scale(.985)}
 
-@media (prefers-reduced-motion:no-preference){
-  [data-k=ld-4] .top{animation:ld4in .6s ease-out .1s both}
-  [data-k=ld-4] .sub{animation:ld4in .6s ease-out .25s both}
-  [data-k=ld-4] .car{animation:ld4car 1.06s steps(1) infinite}
+@media (prefers-reduced-motion:reduce){
+  [data-k=ld-4] .fact,[data-k=ld-4] .arr,[data-k=ld-4] .cta button{transition:opacity .2s linear}
+  [data-k=ld-4] .fact{transform:none}
 }
-@keyframes ld4in{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
-@keyframes ld4car{0%,49%{opacity:1}50%,100%{opacity:0}}
 </style>
-<h3>The working list</h3><p class="cap">The ship later upgrade, once the plan can stream: the wait IS the plan writing itself, the move then its size then its time cost then the week, arriving raw in token chunks and correcting itself once before it settles.</p>
+<h3>The working list</h3><p class="cap">The wait shows only what Memento already knows, one line at a time and held for six seconds each: your star, your why, your date, and what you said you have already done. The clock is real elapsed time. Nothing on this screen is invented, and nothing is claimed on the model's behalf while it works.</p>
 <div class="ph">
   <div class="grid"></div>
   <div class="col">
-    <p class="top">Writing your plan.</p>
-    <p class="sub">You see it in the same order the model does.</p>
-    <div class="mid">
-    <div class="doc">
-      <div class="row r-today"><p class="k">Today</p><p class="v"></p></div>
-      <div class="pair">
-        <div class="row r-size"><p class="k">Size</p><p class="v"></p></div>
-        <div class="row r-time"><p class="k">Time cost</p><p class="v"></p></div>
-      </div>
-      <div class="row r-week"><p class="k">This week</p>
-        <div class="wk">
-          <b><span class="dy">M</span><span class="nm">8</span></b>
-          <b><span class="dy">T</span><span class="nm">8</span></b>
-          <b><span class="dy">W</span><span class="nm">8</span></b>
-          <b class="rest"><span class="dy">T</span><span class="nm">rest</span></b>
-          <b><span class="dy">F</span><span class="nm">8</span></b>
-          <b><span class="dy">S</span><span class="nm">6</span></b>
-          <b class="rest"><span class="dy">S</span><span class="nm">rest</span></b>
+    <div class="head">
+      <h4>Writing your plan.</h4>
+      <p class="clk">0:00</p>
+    </div>
+    <p class="state">This usually takes about 30 seconds.</p>
+
+    <div class="stage">
+      <div class="layer">
+        <div class="fact">
+          <p class="src"></p>
+          <p class="say"></p>
+        </div>
+        <div class="arr">
+          <p>Your plan is ready.</p>
+          <span class="took"></span>
         </div>
       </div>
+      <div class="ticks"><i></i><i></i><i></i><i></i><i></i></div>
     </div>
+
+    <div class="foot">
+      <p class="note">Everything above is something you told Memento. None of it was invented here.</p>
+      <button type="button" class="more" aria-pressed="false">Demo: show a longer wait</button>
     </div>
-    <div class="foot"><p>Nothing here was drawn before the model wrote it.</p></div>
     <div class="cta"><button type="button">Open your plan</button></div>
   </div>
 </div>
 <script>
 (function(){
   var r=document.querySelector('[data-k="ld-4"]'); if(!r) return;
-  var rows={today:r.querySelector('.r-today'),size:r.querySelector('.r-size'),
-            time:r.querySelector('.r-time'),week:r.querySelector('.r-week')},
-      cells=r.querySelectorAll('.wk b'), foot=r.querySelector('.foot p'),
-      cta=r.querySelector('.cta button'),
-      reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches,
-      timers=[], caret=null;
+  var fact=r.querySelector('.fact'), src=r.querySelector('.src'), say=r.querySelector('.say'),
+      arr=r.querySelector('.arr'), took=r.querySelector('.took'),
+      ticks=r.querySelectorAll('.ticks i'), tickRow=r.querySelector('.ticks'),
+      head=r.querySelector('.head h4'), clk=r.querySelector('.clk'),
+      state=r.querySelector('.state'), note=r.querySelector('.note'),
+      more=r.querySelector('.more'), cta=r.querySelector('.cta button');
 
-  var FINAL={today:'Message the 8 who paid you twice, one ask each.',
-             size:'8 messages',time:'12 minutes'};
-  /* the one correction: it starts down the wrong branch, then rewrites the tail */
-  var FIRST='Message 12 of the 31 you never followed up';
-  var KEEP=8; /* "Message " survives the rewrite */
+  /* Their own words. Star and why come from Clarity, the date is the one they typed,
+     the last two are their answers in the refine step. Nothing else exists here. */
+  var FACTS=[
+    {s:'Your star, in your words.',
+     t:'I will get to $3,000 a month so I can quit the warehouse.',q:1},
+    {s:'Why you said it matters.',
+     t:'So I stop missing my daughter going to school.',q:1},
+    {s:'The date you set.',
+     t:'31 October. That is 11 weeks from today.'},
+    {s:'The numbers you typed in the refine step.',
+     t:'31 people have bought from you. 8 of them bought twice.'},
+    {s:'What you said you already do.',
+     t:'You message past customers. You said it is not consistent.'}
+  ];
+  var HOLD=6000, STATES=['This usually takes about 30 seconds.',
+                         'Still writing. This one is taking longer.',
+                         'Still writing.'];
 
+  var timers=[], t0=0, tick=null, pass=0, idx=0, longer=false, done=false;
   function clear(){ timers.forEach(clearTimeout); timers=[]; }
   function at(ms,fn){ timers.push(setTimeout(fn,ms)); }
-  function val(k){ return rows[k].querySelector('.v'); }
+  function fmt(ms){ var s=Math.floor(ms/1000); return Math.floor(s/60)+':'+('0'+(s%60)).slice(-2); }
 
-  function moveCaret(k){
-    if(caret&&caret.parentNode) caret.parentNode.removeChild(caret);
-    if(!k) return;
-    caret=document.createElement('span'); caret.className='car';
-    val(k).appendChild(caret);
+  function setState(i){
+    var txt=STATES[Math.min(i,STATES.length-1)];
+    if(state.textContent===txt) return;
+    state.classList.add('swap');
+    at(450,function(){ state.textContent=txt; state.classList.remove('swap'); });
   }
-  function write(k,txt){
-    var v=val(k), keep=caret&&caret.parentNode===v?caret:null;
-    v.textContent=txt; if(keep) v.appendChild(keep);
-  }
-
-  /* token sized chunks, irregular pace: what a stream actually looks like */
-  function stream(k,text,from,done){
-    var i=from||0;
-    (function step(){
-      if(i>=text.length){ return done&&done(); }
-      i=Math.min(text.length,i+2+Math.floor(Math.random()*3));
-      write(k,text.slice(0,i));
-      at(42+Math.floor(Math.random()*58),step);
-    })();
-  }
-  function unwrite(k,text,to,done){
-    var i=text.length;
-    (function step(){
-      if(i<=to){ return done&&done(); }
-      i=Math.max(to,i-3);
-      write(k,text.slice(0,i));
-      at(22,step);
-    })();
+  function marks(n){
+    for(var i=0;i<ticks.length;i++) ticks[i].classList.toggle('on',i<=n);
   }
 
-  function settle(k){ rows[k].classList.add('set'); }
-  function show(k){ rows[k].classList.add('on'); }
-
-  function run(){
-    clear(); moveCaret(null); caret=null;
-    ['today','size','time','week'].forEach(function(k){ rows[k].classList.remove('on','set'); });
-    for(var c=0;c<cells.length;c++) cells[c].classList.remove('on');
-    write('today',''); write('size',''); write('time','');
-    foot.textContent='Nothing here was drawn before the model wrote it.';
-    cta.classList.remove('on');
-
-    if(reduce){
-      ['today','size','time','week'].forEach(function(k){ show(k); settle(k); });
-      write('today',FINAL.today); write('size',FINAL.size); write('time',FINAL.time);
-      for(var i=0;i<cells.length;i++) cells[i].classList.add('on');
-      foot.textContent='Written. 8 messages a day, 2 rest days, 12 minutes each morning.';
-      cta.classList.add('on');
-      return;
-    }
-
-    at(700,function(){
-      show('today'); moveCaret('today');
-      stream('today',FIRST,0,function(){
-        at(420,function(){
-          unwrite('today',FIRST,KEEP,function(){
-            at(160,function(){
-              stream('today',FINAL.today,KEEP,function(){
-                settle('today');
-                at(340,function(){
-                  show('size'); moveCaret('size');
-                  stream('size',FINAL.size,0,function(){
-                    settle('size');
-                    at(260,function(){
-                      show('time'); moveCaret('time');
-                      stream('time',FINAL.time,0,function(){
-                        settle('time'); moveCaret(null);
-                        at(320,function(){
-                          show('week');
-                          for(var i=0;i<cells.length;i++){
-                            (function(n){ at(n*130,function(){ cells[n].classList.add('on'); }); })(i);
-                          }
-                          at(cells.length*130+380,function(){
-                            settle('week');
-                            foot.textContent='Written. 8 messages a day, 2 rest days, 12 minutes each morning.';
-                            cta.classList.add('on');
-                          });
-                        });
-                      });
-                    });
-                  });
-                });
-              });
-            });
-          });
-        });
-      });
+  /* one fact in, held, out. On a repeat pass the order rotates and the entry is a
+     plain fade, so a long wait reads calmer rather than louder. */
+  function show(){
+    var order=FACTS.slice(pass).concat(FACTS.slice(0,pass)),
+        f=order[idx];
+    fact.classList.toggle('calm',pass>0);
+    src.textContent=f.s;
+    say.innerHTML = f.q ? '<span class="q">“</span>'+f.t+'<span class="q">”</span>' : f.t;
+    marks(idx);
+    at(20,function(){ fact.classList.add('on'); });
+    at(HOLD-600,function(){ fact.classList.remove('on'); });
+    at(HOLD,function(){
+      idx++;
+      if(idx<order.length) return show();
+      idx=0; pass++;
+      if(longer && pass<3){ setState(pass); return show(); }
+      land();
     });
   }
+
+  function land(){
+    done=true;
+    if(tick){ clearInterval(tick); tick=null; }
+    var el=Date.now()-t0;
+    clk.textContent=fmt(el);
+    took.textContent='Took '+fmt(el)+'. Five things you told us, one request.';
+    head.textContent='Written.';
+    state.classList.remove('swap');
+    state.textContent='From the five lines above, nothing else.';
+    note.textContent='Nothing on this screen was invented while you waited.';
+    tickRow.classList.add('gone');
+    at(60,function(){ arr.classList.add('on'); });
+    at(220,function(){ cta.classList.add('on'); });
+  }
+
+  function run(){
+    clear(); if(tick) clearInterval(tick);
+    pass=0; idx=0; done=false;
+    fact.classList.remove('on','calm'); arr.classList.remove('on'); cta.classList.remove('on');
+    tickRow.classList.remove('gone'); marks(-1);
+    head.textContent='Writing your plan.';
+    state.classList.remove('swap'); state.textContent=STATES[0];
+    note.textContent='Everything above is something you told Memento. None of it was invented here.';
+    t0=Date.now(); clk.textContent='0:00';
+    tick=setInterval(function(){ if(!done) clk.textContent=fmt(Date.now()-t0); },250);
+
+    at(650,function(){ took.textContent=''; show(); });
+  }
+
+  more.addEventListener('click',function(){
+    longer=!longer;
+    more.setAttribute('aria-pressed',longer?'true':'false');
+    more.textContent=longer?'Demo: longer wait on':'Demo: show a longer wait';
+    if(done) run();
+  });
   cta.addEventListener('click',run);
   run();
 })();

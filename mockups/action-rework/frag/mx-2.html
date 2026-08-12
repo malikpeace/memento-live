@@ -1,4 +1,4 @@
-<!-- ARCHETYPES, the surviving set: mx-1 notched rail | mx-2 growing time block | mx-3 drag the task card |
+<!-- ARCHETYPES, the surviving set: mx-1 notched rail | mx-2 growing time block |
      mx-5 tappable ladder | mx-6 vertical pressure column | mx-7 segmented arc dial | mx-8 three sentence cards |
      mx-9 giant elastic numeral | mx-10 keys over timeline | mx-11 five sentence cards, the deliberate counter-example -->
 <section class="cell" data-k="mx-2">
@@ -6,7 +6,7 @@
 [data-k=mx-2] .scr{position:absolute;inset:0;display:flex;flex-direction:column;padding:30px 20px 22px}
 [data-k=mx-2] .hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px}
 [data-k=mx-2] .hd b{font-size:15px;font-weight:500;letter-spacing:-.015em}
-[data-k=mx-2] .hd u{text-decoration:none;font-size:12px;color:var(--text-mid);font-variant-numeric:tabular-nums}
+[data-k=mx-2] .hd u{text-decoration:none;font-size:12px;color:var(--text-mid);font-variant-numeric:tabular-nums;white-space:nowrap;padding-left:10px}
 [data-k=mx-2] .sub{font-size:12.5px;color:var(--text-mid);margin-bottom:14px}
 
 [data-k=mx-2] .col{position:relative;flex:1;min-height:0;display:flex;margin-bottom:16px}
@@ -21,9 +21,10 @@
   background:rgba(22,25,31,.96);-webkit-backdrop-filter:blur(26px) saturate(1.45);backdrop-filter:blur(26px) saturate(1.45);
   box-shadow:inset 0 1px 0 rgba(var(--ink),.09),0 16px 34px rgba(0,0,0,.5);
   transition:height .26s cubic-bezier(.2,.7,.3,1)}
-[data-k=mx-2] .blk .bt{position:absolute;left:14px;top:11px;right:14px;display:flex;justify-content:space-between;align-items:baseline}
-[data-k=mx-2] .blk .bt b{font-size:26px;font-weight:700;letter-spacing:-.035em;font-variant-numeric:tabular-nums;line-height:1}
-[data-k=mx-2] .blk .bt s{text-decoration:none;font-size:12px;color:var(--text-mid)}
+[data-k=mx-2] .blk .bt{position:absolute;left:14px;top:11px;right:14px}
+[data-k=mx-2] .blk .bt b{font-size:26px;font-weight:700;letter-spacing:-.035em;font-variant-numeric:tabular-nums;line-height:1;white-space:nowrap}
+[data-k=mx-2] .blk .bt b i{display:block;font-style:normal;font-size:11.5px;font-weight:500;letter-spacing:0;color:var(--text-mid);margin-bottom:3px}
+[data-k=mx-2] .blk .bt s{display:block;text-decoration:none;font-size:12px;color:var(--text-mid);margin-top:5px;white-space:nowrap}
 [data-k=mx-2] .blk .bb{position:absolute;left:14px;bottom:10px;right:14px;font-size:11.5px;color:var(--text-mid);
   font-variant-numeric:tabular-nums;display:flex;justify-content:space-between}
 [data-k=mx-2] .brk{position:absolute;left:0;right:0;height:1px;background:repeating-linear-gradient(90deg,rgba(var(--ink),.3) 0 4px,transparent 4px 9px)}
@@ -74,6 +75,8 @@
 
 [data-k=mx-2] .dk{position:absolute;inset:0;display:flex;gap:28px;padding:26px 30px 24px}
 [data-k=mx-2] .dcolwrap{width:230px;flex:none;display:flex;flex-direction:column}
+[data-k=mx-2] .dcol .blk .bb{justify-content:flex-end}
+[data-k=mx-2] .dcol .blk .bb span:first-child{display:none}
 [data-k=mx-2] .dcol{position:relative;flex:1;display:flex;min-height:0}
 [data-k=mx-2] .dright{flex:1;display:flex;flex-direction:column;min-width:0}
 [data-k=mx-2] .dhd b{font-size:15px;font-weight:500;letter-spacing:-.015em}
@@ -109,26 +112,26 @@
 @media (prefers-reduced-motion:reduce){[data-k=mx-2] *{transition-duration:0s !important}}
 </style>
 <h3>Growing block</h3>
-<p class="cap">Built for the goals where the size of the day IS an amount of time (deep work, practice, training): the block is drawn to scale on your remaining afternoon, so 90 minutes literally looks like 90 minutes, and it offers three lengths rather than a dial.</p>
+<p class="cap">Built for the goals where the size of the day IS an amount of time (deep work, practice, training): the block is drawn to scale against the next two hours from right now, so 90 minutes literally looks like 90 minutes (the shortest block keeps a small floor so it stays readable). Every length is the plan&#8217;s own estimate, and the column is a ruler, not your calendar.</p>
 
 <div class="ph">
   <div class="grid" id="mx2g"></div>
   <div class="scr">
-    <div class="hd"><b>Deep work on the pitch deck</b><u id="mx2now">4:30 pm</u></div>
-    <div class="sub">how long you are sitting down for</div>
+    <div class="hd"><b>Deep work on the pitch deck</b><u id="mx2now">now 4:30 pm</u></div>
+    <div class="sub">how long you are sitting down for, on the plan&#8217;s estimate</div>
 
     <div class="col">
       <div class="clock" id="mx2ck"></div>
       <div class="track" id="mx2tr">
         <div class="ghostb" id="mx2gb"></div>
         <div class="blk" id="mx2b">
-          <div class="bt"><b id="mx2bm">50 min</b><s id="mx2bl">one break</s></div>
+          <div class="bt"><b id="mx2bm"><i>about</i>50 min</b><s id="mx2bl">one break</s></div>
           <div class="brk" id="mx2brk" style="display:none"><span>break</span></div>
-          <div class="bb"><span id="mx2s1">4:30 pm</span><span id="mx2s2">ends 5:20 pm</span></div>
+          <div class="bb"><span id="mx2s1">4:30 pm</span><span id="mx2s2">ends about 5:20 pm</span></div>
         </div>
         <div class="after" id="mx2af">
-          <b id="mx2left">1 hr 10 min left</b>
-          <i>the rest of the window, still yours</i>
+          <b id="mx2left">about 1 hr 10 min left</b>
+          <i>of the next two hours, not your calendar</i>
         </div>
       </div>
     </div>
@@ -160,19 +163,19 @@
         <div class="track" id="mx2dtr">
           <div class="ghostb" id="mx2dgb"></div>
           <div class="blk" id="mx2db">
-            <div class="bt"><b id="mx2dbm">50 min</b><s id="mx2dbl">one break</s></div>
+            <div class="bt"><b id="mx2dbm"><i>about</i>50 min</b><s id="mx2dbl">one break</s></div>
             <div class="brk" id="mx2dbrk" style="display:none"><span>break</span></div>
-            <div class="bb"><span id="mx2ds1">4:30 pm</span><span id="mx2ds2">ends 5:20 pm</span></div>
+            <div class="bb"><span id="mx2ds1">4:30 pm</span><span id="mx2ds2">ends about 5:20 pm</span></div>
           </div>
           <div class="after" id="mx2daf">
-            <b id="mx2dleft">1 hr 10 min left</b>
-            <i>the rest of the window</i>
+            <b id="mx2dleft">about 1 hr 10 min left</b>
+            <i>of the next two hours, not your calendar</i>
           </div>
         </div>
       </div>
     </div>
     <div class="dright">
-      <div class="dhd"><b>Deep work on the pitch deck</b><u>today, 4:30 pm</u></div>
+      <div class="dhd"><b>Deep work on the pitch deck</b><u id="mx2dnow">today, now 4:30 pm</u></div>
       <div class="dbig"><b id="mx2dn">50</b><s>minutes, sat down</s></div>
       <div class="dsent" id="mx2dsent">The standard block. One break at the end, then you are out.</div>
       <div class="dsizes" id="mx2dsz">
@@ -183,9 +186,9 @@
       <div class="dfree" id="mx2dfr">
         <button class="stepbtn" id="mx2dm" aria-label="five minutes less"></button>
         <button class="stepbtn p" id="mx2dp" aria-label="five minutes more"></button>
-        <span id="mx2dfn">50 min, five minute steps, hold to run</span>
+        <span id="mx2dfn">about 50 min, five minute steps, hold to run</span>
       </div>
-      <div class="dghost" id="mx2dghost">hover a length and the column draws where it would end before you pick it</div>
+      <div class="dghost" id="mx2dghost">hover a length and the column draws where it would end. Every time here is the plan&#8217;s estimate.</div>
       <div class="dfoot"><button class="dcta" id="mx2dcta">Start 50 minutes</button><button class="dmore" id="mx2dmore">any length</button></div>
     </div>
   </div>
@@ -193,7 +196,10 @@
 
 <script>(function(){
   var R=document.querySelector('[data-k="mx-2"]'); if(!R) return;
-  var START=16*60+30, WINDOW=120, MINV=10, MAXV=120, v=50, free=false;
+  /* PROVENANCE: the column is ruled off the real clock, and every length in it is the
+     plan's own estimate, not a measured session. */
+  var _n=new Date(), START=Math.floor((_n.getHours()*60+_n.getMinutes())/5)*5,
+      WINDOW=120, MINV=10, MAXV=120, v=50, free=false;
   function clock(m){var h=Math.floor(m/60)%24,mm=m%60,ap=h>=12?'pm':'am',hh=h%12||12;return hh+':'+(mm<10?'0':'')+mm+' '+ap;}
   function hm(m){var h=Math.floor(m/60),mm=m%60;return h?(mm?h+' hr '+mm+' min':h+' hr'):mm+' min';}
   function sent(x){
@@ -203,7 +209,7 @@
     if(x<=95) return 'Two passes with a break in the middle. Protect it, phone away.';
     return 'A long sitting. Only take this if the rest of today is clear.';
   }
-  function breaks(x){return x<=30?'no break':(x<=60?'one break':'break at '+Math.round(x/2)+' min');}
+  function breaks(x){return x<=30?'no break in it':(x<=60?'one break':'a break halfway');}
 
   function rig(o){
     var track=R.querySelector(o.track), clk=R.querySelector(o.clock), blk=R.querySelector(o.blk),
@@ -225,13 +231,15 @@
     }
     function paint(){
       var h=px(v), left=WINDOW-v;
-      blk.style.height=Math.max(64,h)+'px';
-      af.style.top=Math.max(64,h)+'px';
-      R.querySelector(o.bm).textContent=hm(v);
-      R.querySelector(o.bl).textContent=breaks(v);
+      blk.style.height=Math.max(86,h)+'px';
+      af.style.top=Math.max(86,h)+'px';
+      R.querySelector(o.bm).innerHTML='<i>about</i>'+hm(v);
+      var blEl=R.querySelector(o.bl);
+      blEl.textContent=breaks(v);
+      blEl.style.display = v<=30 ? 'none' : 'block';
       R.querySelector(o.s1).textContent=clock(START);
-      R.querySelector(o.s2).textContent='ends '+clock(START+v);
-      R.querySelector(o.left).textContent = left>0 ? hm(left)+' left' : 'this fills the window';
+      R.querySelector(o.s2).textContent='ends about '+clock(START+v);
+      R.querySelector(o.left).textContent = left>0 ? 'about '+hm(left)+' left' : 'this fills the whole two hours';
       if(v>60){brk.style.display='block';brk.style.top=(h/2)+'px';} else brk.style.display='none';
       var szs=R.querySelector(o.sizes).children;
       for(var i=0;i<szs.length;i++){
@@ -243,7 +251,7 @@
       R.querySelector(o.cta).textContent='Start '+v+' minutes';
       if(o.dn) R.querySelector(o.dn).textContent=v;
       if(o.dsent) R.querySelector(o.dsent).textContent=sent(v);
-      if(o.fn) R.querySelector(o.fn).textContent=o.fnFull?(v+' min, five minute steps, hold to run'):hm(v);
+      if(o.fn) R.querySelector(o.fn).textContent=o.fnFull?('about '+v+' min, five minute steps, hold to run'):('about '+hm(v));
       var mb=R.querySelector(o.minus), pb=R.querySelector(o.plus);
       mb.className='stepbtn'+(v<=MINV?' off':'');
       pb.className='stepbtn p'+(v>=MAXV?' off':'');
@@ -269,6 +277,8 @@
       setFree:function(f){free=f;paint();}, get free(){return free;}, setV:function(x){v=x;paint();}, marks:marks};
   }
 
+  R.querySelector('#mx2now').textContent='now '+clock(START);
+  R.querySelector('#mx2dnow').textContent='today, now '+clock(START);
   var ph=rig({track:'#mx2tr',clock:'#mx2ck',blk:'#mx2b',ghost:'#mx2gb',after:'#mx2af',brk:'#mx2brk',
     bm:'#mx2bm',bl:'#mx2bl',s1:'#mx2s1',s2:'#mx2s2',left:'#mx2left',sizes:'#mx2sz',szCls:'sz',
     freeEl:'#mx2fr',freeCls:'free',minus:'#mx2m',plus:'#mx2p',fn:'#mx2fn',cta:'#mx2cta',more:'#mx2more',grid:'#mx2g'});
@@ -283,9 +293,10 @@
   R.querySelector('#mx2dsz').addEventListener('mousemove',function(e){
     var b=e.target.closest('[data-v]'); if(!b) return;
     var x=+b.getAttribute('data-v');
-    dk.ghost.style.height=Math.max(64,dk.px(x))+'px';
+    dk.ghost.style.height=Math.max(86,dk.px(x))+'px';
     dk.ghost.classList.toggle('on',x!==dk.v);
-    dghost.textContent = x===dk.v ? 'this is the length you are on' : (x+' min, ends '+clock(START+x)+', '+breaks(x));
+    dghost.textContent = x===dk.v ? 'this is the length you are on'
+      : ('about '+x+' min, ends about '+clock(START+x)+', '+breaks(x));
   });
   R.querySelector('#mx2dsz').addEventListener('mouseleave',function(){
     dk.ghost.classList.remove('on'); dghost.textContent=rest;

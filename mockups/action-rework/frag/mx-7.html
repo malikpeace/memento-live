@@ -1,4 +1,4 @@
-<!-- ARCHETYPES, the surviving set: mx-1 notched rail | mx-2 growing time block | mx-3 drag the task card |
+<!-- ARCHETYPES, the surviving set: mx-1 notched rail | mx-2 growing time block |
      mx-5 tappable ladder | mx-6 vertical pressure column | mx-7 segmented arc dial | mx-8 three sentence cards |
      mx-9 giant elastic numeral | mx-10 keys over timeline | mx-11 five sentence cards, the deliberate counter-example -->
 <section class="cell" data-k="mx-7">
@@ -80,11 +80,11 @@
       <div class="dial" data-r="88" data-size="246">
         <div class="hub"><div class="n">5</div><div class="u">clients</div><div class="nm">Your usual day</div></div>
       </div>
-      <p class="yest">Yesterday you turned it to 3</p>
+      <p class="yest">Yesterday you logged 3</p>
     </div>
     <div class="foot">
       <div class="fr"><span>Takes about</span><b class="t">15 min</b></div>
-      <div class="fr"><span>$3,000 a month in</span><b class="d">52 days</b></div>
+      <div class="fr"><span>Reached, after today</span><b class="r">52 of 100</b></div>
     </div>
     <button class="cta" type="button">Start <span class="n">5</span> <span class="uw">clients</span></button>
     <button class="quiet tog" type="button">Turn between every number</button>
@@ -99,11 +99,13 @@
     </div>
     <div class="right">
       <p class="say">Message <b class="n">5</b> <span class="uw">clients</span> today</p>
-      <p class="then">About <b class="t">15 min</b> of the morning. Held on weekdays, $3,000 a month arrives in <b class="d">52 days</b>.</p>
+      <!-- PROVENANCE: 47 reached is the sum of the messages they logged, 100 is the target
+           their own plan named. Memento cannot price a message in money, so it does not. -->
+      <p class="then">About <b class="t">15 min</b> of the morning. That puts you on <b class="r">52 of 100</b> people reached, and at this size the last one is about <b class="d">11 days</b> out.</p>
       <div class="three">
-        <div data-i="0"><span class="tn">A light day</span><span class="tv">2, 6 min</span></div>
-        <div data-i="1"><span class="tn">Your usual day</span><span class="tv">5, 15 min</span></div>
-        <div data-i="2"><span class="tn">A heavy day</span><span class="tv">9, 27 min</span></div>
+        <div data-i="0"><span class="tn">A light day</span><span class="tv">2, about 6 min</span></div>
+        <div data-i="1"><span class="tn">Your usual day</span><span class="tv">5, about 15 min</span></div>
+        <div data-i="2"><span class="tn">A heavy day</span><span class="tv">9, about 27 min</span></div>
       </div>
       <div class="drow">
         <button class="cta" type="button">Start <span class="n">5</span> <span class="uw">clients</span></button>
@@ -121,7 +123,9 @@
   var fine=false, i=1, fn=5;
 
   function mins(n){ var m=n*3; return m>=60 ? (m%60===0?(m/60)+' hr':Math.floor(m/60)+' hr '+(m%60)+' min') : m+' min'; }
-  function days(n){ return Math.round(260/n)+' days'; }
+  var REACHED=47, TARGET=100;
+  function days(n){ var d=Math.ceil((TARGET-REACHED)/n); return d+(d===1?' day':' days'); }
+  function reached(n){ return Math.min(TARGET,REACHED+n)+' of '+TARGET; }
   function unit(n){ return n===1?'client':'clients'; }
   function curN(){ return fine?fn:TIER[i].n; }
   function curNm(){ if(!fine) return TIER[i].nm;
@@ -214,6 +218,7 @@
     Array.prototype.forEach.call(root.querySelectorAll('.uw'),function(e){e.textContent=unit(n);});
     Array.prototype.forEach.call(root.querySelectorAll('.t'),function(e){e.textContent=mins(n);});
     Array.prototype.forEach.call(root.querySelectorAll('.d'),function(e){e.textContent=days(n);});
+    Array.prototype.forEach.call(root.querySelectorAll('.r'),function(e){e.textContent=reached(n);});
     Array.prototype.forEach.call(root.querySelectorAll('.three div'),function(e){
       e.classList.toggle('on',!fine&&+e.dataset.i===i); });
     Array.prototype.forEach.call(root.querySelectorAll('.tog'),function(b){

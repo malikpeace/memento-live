@@ -1,4 +1,4 @@
-<!-- ARCHETYPES, the surviving set: mx-1 notched rail | mx-2 growing time block | mx-3 drag the task card |
+<!-- ARCHETYPES, the surviving set: mx-1 notched rail | mx-2 growing time block |
      mx-5 tappable ladder | mx-6 vertical pressure column | mx-7 segmented arc dial | mx-8 three sentence cards |
      mx-9 giant elastic numeral | mx-10 keys over timeline | mx-11 five sentence cards, the deliberate counter-example -->
 <section class="cell" data-k="mx-5">
@@ -7,31 +7,55 @@
 [data-k=mx-5] .hd{display:flex;justify-content:space-between;align-items:baseline;padding:0 2px}
 [data-k=mx-5] .hd b{font-size:15px;font-weight:500;letter-spacing:-.015em}
 [data-k=mx-5] .hd u{text-decoration:none;font-size:12px;color:var(--text-mid);font-variant-numeric:tabular-nums}
-[data-k=mx-5] .ladwrap{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;margin-top:10px}
-[data-k=mx-5] .lad{position:relative;display:flex;flex-direction:column;gap:7px;padding:14px 0}
-[data-k=mx-5] .lad::before,[data-k=mx-5] .lad::after{content:"";position:absolute;top:0;bottom:0;width:1px;background:rgba(var(--ink),.13)}
+
+/* the ladder: two stiles and rungs of a real, fixed geometry. nothing here is measured in
+   javascript, so the dashed line and the rungs can never disagree mid transition. */
+[data-k=mx-5] .ladwrap{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;margin-top:8px}
+[data-k=mx-5] .lad{position:relative;display:flex;flex-direction:column;gap:7px;padding:16px 0}
+[data-k=mx-5] .lad::before,[data-k=mx-5] .lad::after{content:"";position:absolute;top:0;bottom:0;width:1px;
+  background:linear-gradient(rgba(var(--ink),0),rgba(var(--ink),.24) 8%,rgba(var(--ink),.24) 92%,rgba(var(--ink),0))}
 [data-k=mx-5] .lad::before{left:3px}
 [data-k=mx-5] .lad::after{right:3px}
-[data-k=mx-5] .rung{position:relative;border:0;width:calc(100% - 28px);margin:0 14px;flex:none;border-radius:11px;padding:0 14px;font-family:inherit;
-  display:flex;align-items:center;justify-content:space-between;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;
-  background:rgba(20,23,29,.9);box-shadow:inset 0 1px 0 rgba(var(--ink),.05);
-  transition:height .2s cubic-bezier(.2,.7,.3,1),background .18s ease-out}
-[data-k=mx-5] .rung .lft i{display:block;font-style:normal;font-size:11px;color:rgba(var(--ink),.5);transition:color .18s}
-[data-k=mx-5] .rung .lft b{display:block;font-size:17px;font-weight:500;letter-spacing:-.02em;color:rgba(var(--ink),.6);
-  font-variant-numeric:tabular-nums;transition:color .18s,font-size .18s}
-[data-k=mx-5] .rung .rgt{text-align:right;font-size:12px;color:rgba(var(--ink),.55);font-variant-numeric:tabular-nums;line-height:1.4;transition:color .18s}
-[data-k=mx-5] .rung:active{background:rgba(28,32,40,.95)}
-[data-k=mx-5] .rung.on{background:rgba(32,37,45,.97);box-shadow:inset 0 1px 0 rgba(var(--ink),.12),0 16px 32px rgba(0,0,0,.5)}
-[data-k=mx-5] .rung.on .lft i{color:var(--text-mid)}
-[data-k=mx-5] .rung.on .lft b{font-size:34px;font-weight:700;letter-spacing:-.035em;color:var(--text-hi);line-height:1.05}
-[data-k=mx-5] .rung.on .rgt{color:var(--text-hi);font-size:12.5px}
+[data-k=mx-5] .rung{position:relative;border:0;width:calc(100% - 26px);margin:0 13px;flex:none;height:76px;border-radius:11px;
+  padding:0 15px;font-family:inherit;display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;background:rgba(20,23,29,.9);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.05);
+  transition:height .22s cubic-bezier(.2,.7,.3,1),background .16s ease-out,transform .1s ease-out}
+[data-k=mx-5] .lad.all{padding:11px 0}
+[data-k=mx-5] .lad.all .rung{height:33px}
+[data-k=mx-5] .rung:active{transform:scale(.99)}
+[data-k=mx-5] .rung .lft{min-width:0}
+[data-k=mx-5] .rung .lft i{display:block;font-style:normal;font-size:11px;color:rgba(var(--ink),.5);
+  line-height:1.2;transition:color .16s}
+[data-k=mx-5] .rung .lft b{display:block;font-size:17px;font-weight:500;letter-spacing:-.02em;color:rgba(var(--ink),.62);
+  font-variant-numeric:tabular-nums;line-height:1.15;transition:color .16s,font-size .22s cubic-bezier(.2,.7,.3,1)}
+[data-k=mx-5] .rung .rgt{flex:none;text-align:right;font-size:12px;color:rgba(var(--ink),.55);
+  font-variant-numeric:tabular-nums;line-height:1.42;transition:color .16s}
+[data-k=mx-5] .rung .rgt s{display:block;text-decoration:none}
 [data-k=mx-5] .rung.below{background:rgba(24,28,35,.93)}
-[data-k=mx-5] .rung.below .lft b{color:rgba(var(--ink),.72)}
-[data-k=mx-5] .usual{position:absolute;left:0;right:0;height:1px;pointer-events:none;
-  background:repeating-linear-gradient(90deg,rgba(var(--ink),.36) 0 5px,transparent 5px 10px);
-  transition:top .2s cubic-bezier(.2,.7,.3,1)}
-[data-k=mx-5] .usual span{position:absolute;left:14px;top:-15px;font-size:10.5px;color:rgba(var(--ink),.55)}
-[data-k=mx-5] .foot{display:flex;flex-direction:column;gap:9px;margin-top:12px}
+[data-k=mx-5] .rung.below .lft b{color:rgba(var(--ink),.74)}
+[data-k=mx-5] .rung.on{background:rgba(32,37,45,.97);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.12),0 16px 32px rgba(0,0,0,.5)}
+[data-k=mx-5] .lad .rung.on{height:106px}
+[data-k=mx-5] .lad.all .rung.on{height:66px}
+[data-k=mx-5] .rung.on .lft i{color:var(--text-mid)}
+[data-k=mx-5] .rung.on .lft b{font-size:38px;font-weight:700;letter-spacing:-.035em;color:var(--text-hi);line-height:1.02}
+[data-k=mx-5] .lad.all .rung.on .lft b{font-size:26px}
+[data-k=mx-5] .rung.on .rgt{color:var(--text-hi);font-size:12.5px}
+[data-k=mx-5] .rung .mk{position:absolute;left:0;top:14px;bottom:14px;width:2px;border-radius:0 2px 2px 0;
+  background:transparent;transition:background .16s}
+[data-k=mx-5] .rung.on .mk{background:#3fd94e}
+
+/* the normal-day line is a real row in the ladder, not a floating absolute guess */
+[data-k=mx-5] .seam{flex:none;height:23px;margin:0 13px;pointer-events:none;display:flex;align-items:center;gap:9px}
+[data-k=mx-5] .seam span{flex:none;font-size:10.5px;color:rgba(var(--ink),.58);white-space:nowrap}
+[data-k=mx-5] .seam u{flex:1;height:1px;text-decoration:none;
+  background:repeating-linear-gradient(90deg,rgba(var(--ink),.34) 0 5px,transparent 5px 10px)}
+
+[data-k=mx-5] .conseq{margin:10px 2px 0;min-height:36px;font-size:12.5px;line-height:1.45;color:var(--text-mid);
+  font-variant-numeric:tabular-nums}
+[data-k=mx-5] .conseq b{color:var(--text-hi);font-weight:500}
+[data-k=mx-5] .foot{display:flex;flex-direction:column;gap:9px;margin-top:6px}
 [data-k=mx-5] .cta{flex:1;border:0;border-radius:14px;background:rgba(235,238,248,.94);color:#0b0c10;font-family:inherit;
   font-weight:700;font-size:15.5px;letter-spacing:-.01em;padding:15px 14px;cursor:pointer;font-variant-numeric:tabular-nums;
   -webkit-tap-highlight-color:transparent;transition:transform .12s ease-out,background .12s ease-out}
@@ -41,37 +65,38 @@
   -webkit-backdrop-filter:blur(22px) saturate(1.4);backdrop-filter:blur(22px) saturate(1.4);
   box-shadow:inset 0 1px 0 rgba(var(--ink),.08);transition:color .14s ease-out}
 [data-k=mx-5] .more.on,[data-k=mx-5] .more:active{color:var(--text-hi)}
-[data-k=mx-5] .hint{font-size:11.5px;color:var(--text-mid);text-align:center;margin-top:9px}
 
 [data-k=mx-5] .dk{position:absolute;inset:0;display:flex;gap:28px;padding:26px 30px 22px}
 [data-k=mx-5] .dleft{flex:1;display:flex;flex-direction:column;min-width:0}
 [data-k=mx-5] .dhd{display:flex;justify-content:space-between;align-items:baseline}
 [data-k=mx-5] .dhd b{font-size:15px;font-weight:500;letter-spacing:-.015em}
 [data-k=mx-5] .dhd u{text-decoration:none;font-size:12.5px;color:var(--text-mid);font-variant-numeric:tabular-nums}
-[data-k=mx-5] .stair{position:relative;flex:1;display:flex;align-items:flex-end;gap:6px;margin-top:30px;padding-bottom:2px}
+[data-k=mx-5] .stair{position:relative;flex:1;display:flex;align-items:flex-end;gap:6px;margin-top:34px;padding-bottom:2px}
 [data-k=mx-5] .stp{position:relative;flex:1;border:0;padding:0;border-radius:8px 8px 0 0;cursor:pointer;font-family:inherit;
   background:rgba(20,23,29,.9);box-shadow:inset 0 1px 0 rgba(var(--ink),.05);
-  transition:background .16s ease-out,height .2s cubic-bezier(.2,.7,.3,1)}
+  transition:background .16s ease-out,height .22s cubic-bezier(.2,.7,.3,1),box-shadow .16s ease-out}
 [data-k=mx-5] .stp:hover{background:rgba(34,39,48,.96)}
 [data-k=mx-5] .stp i{position:absolute;bottom:100%;left:0;right:0;margin-bottom:6px;font-style:normal;text-align:center;
-  font-size:12.5px;font-weight:500;color:rgba(var(--ink),.45);font-variant-numeric:tabular-nums;transition:color .16s,font-size .16s}
-[data-k=mx-5] .stp s{position:absolute;bottom:100%;left:0;right:0;margin-bottom:24px;text-decoration:none;text-align:center;
-  font-size:10.5px;color:rgba(var(--ink),.42);opacity:0;transition:opacity .16s}
+  font-size:12.5px;font-weight:500;color:rgba(var(--ink),.46);font-variant-numeric:tabular-nums;
+  transition:color .16s,font-size .16s}
+[data-k=mx-5] .stp s{position:absolute;bottom:100%;left:-8px;right:-8px;margin-bottom:24px;text-decoration:none;text-align:center;
+  font-size:10.5px;color:rgba(var(--ink),.44);opacity:0;white-space:nowrap;transition:opacity .16s,color .16s}
 [data-k=mx-5] .stp.named s{opacity:1}
 [data-k=mx-5] .stp.below{background:rgba(26,30,37,.94)}
-[data-k=mx-5] .stp.below i{color:rgba(var(--ink),.66)}
-[data-k=mx-5] .stp.on{background:rgba(34,39,48,.97);box-shadow:inset 0 1px 0 rgba(var(--ink),.13),0 -3px 0 rgba(var(--ink),.88)}
+[data-k=mx-5] .stp.below i{color:rgba(var(--ink),.68)}
+[data-k=mx-5] .stp.on{background:rgba(34,39,48,.97);box-shadow:inset 0 1px 0 rgba(var(--ink),.13),0 -3px 0 #3fd94e}
 [data-k=mx-5] .stp.on i{color:var(--text-hi);font-weight:700;font-size:15px}
 [data-k=mx-5] .stp.on s{color:var(--text-mid);opacity:1}
 [data-k=mx-5] .dusual{position:absolute;left:0;right:0;height:1px;pointer-events:none;
-  background:repeating-linear-gradient(90deg,rgba(var(--ink),.36) 0 5px,transparent 5px 10px)}
-[data-k=mx-5] .dusual span{position:absolute;left:0;bottom:6px;font-size:10.5px;color:rgba(var(--ink),.55)}
-[data-k=mx-5] .dhint{font-size:12px;color:var(--text-mid);margin-top:10px;height:17px}
+  background:repeating-linear-gradient(90deg,rgba(var(--ink),.34) 0 5px,transparent 5px 10px);
+  transition:bottom .22s cubic-bezier(.2,.7,.3,1)}
+[data-k=mx-5] .dusual span{position:absolute;left:0;bottom:6px;font-size:10.5px;color:rgba(var(--ink),.58)}
+[data-k=mx-5] .dhint{font-size:12.5px;color:var(--text-mid);margin-top:12px;min-height:18px;font-variant-numeric:tabular-nums}
 [data-k=mx-5] .dside{width:216px;flex:none;display:flex;flex-direction:column}
 [data-k=mx-5] .dnum{display:flex;align-items:baseline;gap:8px;margin-top:26px}
 [data-k=mx-5] .dnum b{font-size:64px;font-weight:700;line-height:.88;letter-spacing:-.05em;font-variant-numeric:tabular-nums}
 [data-k=mx-5] .dnum s{text-decoration:none;font-size:14px;color:var(--text-mid);font-weight:500}
-[data-k=mx-5] .drole{font-size:12.5px;color:var(--text-mid);margin-top:6px;height:17px}
+[data-k=mx-5] .drole{font-size:12.5px;color:var(--text-mid);margin-top:7px;min-height:18px}
 [data-k=mx-5] .dbox{margin-top:14px;border-radius:12px;padding:2px 13px;background:rgba(22,25,31,.94);
   -webkit-backdrop-filter:blur(22px) saturate(1.4);backdrop-filter:blur(22px) saturate(1.4);
   box-shadow:inset 0 1px 0 rgba(var(--ink),.07),0 12px 26px rgba(0,0,0,.42)}
@@ -79,6 +104,7 @@
 [data-k=mx-5] .drow+.drow{box-shadow:inset 0 1px 0 rgba(var(--ink),.08)}
 [data-k=mx-5] .drow span{color:var(--text-mid)}
 [data-k=mx-5] .drow b{font-weight:500;font-variant-numeric:tabular-nums}
+[data-k=mx-5] .dnote{margin:11px 2px 0;font-size:12px;color:var(--text-mid);line-height:1.45}
 [data-k=mx-5] .dfoot{margin-top:auto;display:flex;flex-direction:column;gap:9px}
 [data-k=mx-5] .dcta{border:0;border-radius:14px;background:rgba(235,238,248,.94);color:#0b0c10;font-family:inherit;
   font-weight:700;font-size:15.5px;padding:15px 12px;cursor:pointer;font-variant-numeric:tabular-nums;
@@ -92,16 +118,16 @@
 @media (prefers-reduced-motion:reduce){[data-k=mx-5] *{transition-duration:0s !important}}
 </style>
 <h3>The ladder</h3>
-<p class="cap">Every rung is a target you tap straight onto, no stepping through the ones in between: three named rungs stand in front, the full climb is one tap away, and a dashed line marks where your own normal day already ends so going above it is a visible decision.</p>
+<p class="cap">Every rung is a target you tap straight onto, never stepped through: three named rungs stand in front, the full climb is one tap away, and a dashed line drawn from the days you have actually logged marks where your normal day ends, so going above it is a visible decision rather than a drift.</p>
 
 <div class="ph">
   <div class="grid" id="mx5g"></div>
   <div class="scr">
-    <div class="hd"><b>Message clients</b><u>4:30 pm</u></div>
+    <div class="hd"><b>Message clients</b><u id="mx5now">now 4:30 pm</u></div>
     <div class="ladwrap">
-      <div class="lad" id="mx5l"><div class="usual" id="mx5u"><span>where your day usually ends</span></div></div>
+      <div class="lad" id="mx5l"></div>
     </div>
-    <div class="hint" id="mx5h">tap any rung to jump straight to it</div>
+    <p class="conseq" id="mx5c"></p>
     <div class="foot">
       <button class="cta" id="mx5cta">Start 8 messages</button>
       <button class="more" id="mx5more">all rungs</button>
@@ -113,18 +139,19 @@
   <div class="grid" id="mx5dg"></div>
   <div class="dk">
     <div class="dleft">
-      <div class="dhd"><b>Message clients</b><u>today, 4:30 pm</u></div>
-      <div class="stair" id="mx5s"><div class="dusual" id="mx5du"><span>where your day usually ends</span></div></div>
-      <div class="dhint" id="mx5dh">click any step to jump there, hover to price it first</div>
+      <div class="dhd"><b>Message clients</b><u id="mx5dnow">today, now 4:30 pm</u></div>
+      <div class="stair" id="mx5s"><div class="dusual" id="mx5du"><span>your logged days end here</span></div></div>
+      <div class="dhint" id="mx5dh">click any step to jump straight there, hover to price it first</div>
     </div>
     <div class="dside">
       <div class="dnum"><b id="mx5dn">8</b><s id="mx5dun">messages</s></div>
-      <div class="drole" id="mx5drole">today’s size</div>
+      <div class="drole" id="mx5drole">today&#8217;s size</div>
       <div class="dbox">
-        <div class="drow"><span>each</span><b>3 min</b></div>
-        <div class="drow"><span>this takes</span><b id="mx5dt">24 min</b></div>
-        <div class="drow"><span>done by</span><b id="mx5dd">4:54 pm</b></div>
+        <div class="drow"><span>each</span><b>about 3 min</b></div>
+        <div class="drow"><span>this takes</span><b id="mx5dt">about 24 min</b></div>
+        <div class="drow"><span>done about</span><b id="mx5dd">4:54 pm</b></div>
       </div>
+      <p class="dnote" id="mx5dnote">Every time here is the plan&#8217;s estimate, not a measured one.</p>
       <div class="dfoot">
         <button class="dcta" id="mx5dcta">Start 8 messages</button>
         <button class="dmore" id="mx5dmore">all rungs</button>
@@ -135,76 +162,87 @@
 
 <script>(function(){
   var R=document.querySelector('[data-k="mx-5"]'); if(!R) return;
-  var THREE=[3,8,14], ROLE={3:'lighter',8:'today’s size',14:'heavier'};
-  var ALL=[1,2,3,5,8,12,16,20], MIN=3, BASE=16*60+30, USUAL=8;
+  var THREE=[3,8,14], ALL=[1,3,5,8,11,14,17,20];
+  var ROLE={3:'lighter',8:'your usual day',14:'heavier'};
+  /* PROVENANCE: the clock is the real one, USUAL is the size they have logged most often,
+     and every duration below is the plan's own estimate. */
+  var _n=new Date(), MIN=3, BASE=Math.floor((_n.getHours()*60+_n.getMinutes())/5)*5, USUAL=8;
   var n=8, all=false;
+
   function clock(m){var h=Math.floor(m/60)%24,mm=m%60,ap=h>=12?'pm':'am',hh=h%12||12;return hh+':'+(mm<10?'0':'')+mm+' '+ap;}
   function hm(m){var h=Math.floor(m/60),mm=m%60;return h?(mm?h+' hr '+mm+' min':h+' hr'):mm+' min';}
   function unit(x){return x===1?'message':'messages';}
   function set(){return all?ALL:THREE;}
-  function role(x){return ROLE[x]||(x<8?'below your usual':'above your usual');}
   function rlabel(x){return ROLE[x]||'';}
+  function role(x){return x===USUAL?'your usual day':(x<USUAL?'below your usual day':'above your usual day');}
 
   var lad=R.querySelector('#mx5l'), stair=R.querySelector('#mx5s');
-  var usual=R.querySelector('#mx5u'), dusual=R.querySelector('#mx5du');
-  var hint=R.querySelector('#mx5dh'), deskHint=hint.textContent;
+  var dusual=R.querySelector('#mx5du'), dhint=R.querySelector('#mx5dh');
+  var DHINT=dhint.textContent;
 
   function buildLadder(){
-    lad.querySelectorAll('.rung').forEach(function(e){e.remove();});
+    lad.innerHTML='';
+    lad.className='lad'+(all?' all':'');
     var s=set().slice().reverse();
-    s.forEach(function(v){
-      var b=document.createElement('button'); b.className='rung'; b.setAttribute('data-v',v);
-      b.innerHTML='<div class="lft"><i>'+rlabel(v)+'</i><b>'+v+'</b></div><div class="rgt"></div>';
-      b.addEventListener('click',function(){ n=v; paint(); });
+    s.forEach(function(v,k){
+      if(v<=USUAL && k>0 && s[k-1]>USUAL){
+        var seam=document.createElement('div'); seam.className='seam';
+        seam.innerHTML='<span>your logged days end here</span><u></u>';
+        lad.appendChild(seam);
+      }
+      var b=document.createElement('button'); b.type='button'; b.className='rung'; b.setAttribute('data-v',v);
+      b.innerHTML='<span class="mk"></span><span class="lft"><i>'+rlabel(v)+'</i><b>'+v+'</b></span><span class="rgt"></span>';
+      b.addEventListener('click',function(){ if(n!==v){ n=v; paint(); } });
       lad.appendChild(b);
     });
   }
   function buildStair(){
     stair.querySelectorAll('.stp').forEach(function(e){e.remove();});
     set().forEach(function(v){
-      var b=document.createElement('button'); b.className='stp'; b.setAttribute('data-v',v);
+      var b=document.createElement('button'); b.type='button'; b.className='stp'; b.setAttribute('data-v',v);
       b.innerHTML='<s>'+rlabel(v)+'</s><i>'+v+'</i>';
-      b.style.height=(34+v/20*200)+'px';
-      b.addEventListener('click',function(){ n=v; paint(); });
+      b.style.height=(16+v/20*80)+'%';
+      b.addEventListener('click',function(){ if(n!==v){ n=v; paint(); } });
       b.addEventListener('mouseenter',function(){
-        hint.textContent = v===n ? 'you are on this rung'
-          : (v+' '+unit(v)+', '+hm(v*MIN)+', done by '+clock(BASE+v*MIN)+(v>n?', '+(v-n)+' more than now':', '+(n-v)+' fewer than now'));
+        dhint.textContent = v===n ? 'you are standing on this rung'
+          : (v+' '+unit(v)+', about '+hm(v*MIN)+', done about '+clock(BASE+v*MIN)+
+             (v>n ? ', '+(v-n)+' more than you have now' : ', '+(n-v)+' fewer than you have now'));
       });
-      b.addEventListener('mouseleave',function(){hint.textContent=deskHint;});
+      b.addEventListener('mouseleave',function(){dhint.textContent=DHINT;});
       stair.appendChild(b);
     });
   }
 
   function paint(){
-    var mins=n*MIN, s=set();
+    var mins=n*MIN;
     lad.querySelectorAll('.rung').forEach(function(e){
       var v=+e.getAttribute('data-v'), on=(v===n);
       e.className='rung'+(on?' on':(v<n?' below':''));
-      e.style.height=(on?(all?66:104):(all?36:74))+'px';
-      e.style.marginTop=(v===USUAL?'26px':'');
-      e.querySelector('.lft i').textContent = rlabel(v);
+      e.querySelector('.lft i').textContent = on ? (rlabel(v)||role(v)) : rlabel(v);
       e.querySelector('.rgt').innerHTML = on
-        ? (hm(v*MIN)+'<br>done by '+clock(BASE+v*MIN))
-        : (v>n ? ('+'+(v-n)+', '+hm(v*MIN)) : ('&minus;'+(n-v)+', '+hm(v*MIN)));
+        ? ('<s>about '+hm(v*MIN)+'</s><s>done about '+clock(BASE+v*MIN)+'</s>')
+        : ('<s>'+(v>n?'+'+(v-n):'&minus;'+(n-v))+'</s><s>about '+hm(v*MIN)+'</s>');
     });
-    // the dashed line sits on the seam above the rung that matches a usual day
-    var mark=lad.querySelector('[data-v="'+(s.indexOf(USUAL)>=0?USUAL:s[Math.floor(s.length/2)])+'"]');
-    if(mark) usual.style.top=(mark.offsetTop-13)+'px';
 
     stair.querySelectorAll('.stp').forEach(function(e){
       var v=+e.getAttribute('data-v');
-      e.className='stp'+(v===n?' on named':(v<n?' below':''))+((!all&&v!==n)?' named':'');
+      e.className='stp'+(v===n?' on':(v<n?' below':''))+(ROLE[v]?' named':'');
     });
-    dusual.style.bottom=(34+USUAL/20*200)+'px';
+    dusual.style.bottom=(16+USUAL/20*80)+'%';
+
+    var diff=n-USUAL;
+    var lead = diff===0 ? 'Your usual day.'
+      : (diff>0 ? diff+' more than your usual day.' : (-diff)+' fewer than your usual day.');
+    R.querySelector('#mx5c').innerHTML = lead+' <b>'+n+' '+unit(n)+'</b>, about '+hm(mins)+
+      ' on the plan&#8217;s estimate, done about '+clock(BASE+mins)+'.';
 
     R.querySelector('#mx5dn').textContent=n;
     R.querySelector('#mx5dun').textContent=unit(n);
     R.querySelector('#mx5drole').textContent=role(n);
-    R.querySelector('#mx5dt').textContent=hm(mins);
+    R.querySelector('#mx5dt').textContent='about '+hm(mins);
     R.querySelector('#mx5dd').textContent=clock(BASE+mins);
     ['#mx5cta','#mx5dcta'].forEach(function(x){R.querySelector(x).textContent='Start '+n+' '+unit(n);});
     ['#mx5g','#mx5dg'].forEach(function(x){R.querySelector(x).style.opacity=(0.034+n/20*0.05).toFixed(3);});
-    R.querySelector('#mx5h').textContent = all ? 'every rung, still one tap each' : 'tap any rung to jump straight to it';
   }
 
   function toggle(){
@@ -214,7 +252,6 @@
       var b=R.querySelector(s2); b.textContent=all?'three rungs':'all rungs'; b.classList.toggle('on',all);
     });
     buildLadder(); buildStair(); paint();
-    setTimeout(paint,220);
   }
   ['#mx5more','#mx5dmore'].forEach(function(s2){R.querySelector(s2).addEventListener('click',toggle);});
   ['#mx5cta','#mx5dcta'].forEach(function(s2){
@@ -222,9 +259,9 @@
       var b=this, was=b.textContent; b.textContent='Started'; setTimeout(function(){b.textContent=was;},900);
     });
   });
-  lad.addEventListener('transitionend',paint);
 
+  R.querySelector('#mx5now').textContent='now '+clock(BASE);
+  R.querySelector('#mx5dnow').textContent='today, now '+clock(BASE);
   buildLadder(); buildStair(); paint();
-  setTimeout(paint,80);
 })();</script>
 </section>

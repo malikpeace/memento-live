@@ -1,4 +1,4 @@
-<!-- ARCHETYPES, the surviving set: mx-1 notched rail | mx-2 growing time block | mx-3 drag the task card |
+<!-- ARCHETYPES, the surviving set: mx-1 notched rail | mx-2 growing time block |
      mx-5 tappable ladder | mx-6 vertical pressure column | mx-7 segmented arc dial | mx-8 three sentence cards |
      mx-9 giant elastic numeral | mx-10 keys over timeline | mx-11 five sentence cards, the deliberate counter-example -->
 <section class="cell" data-k="mx-1">
@@ -119,14 +119,14 @@
 <div class="ph">
   <div class="grid" id="mx1g"></div>
   <div class="scr">
-    <div class="hd"><b>Message clients</b><u id="mx1now">4:30 pm</u></div>
+    <div class="hd"><b>Message clients</b><u id="mx1now">now 4:30 pm</u></div>
     <div class="mid">
       <div class="big"><span class="num" id="mx1n">8</span><span class="unit" id="mx1u">messages</span></div>
       <div class="sent" id="mx1s">Half an hour of focus. Block it and do not answer anything else.</div>
       <div class="box">
-        <div class="row"><span>each</span><b>3 min</b></div>
-        <div class="row"><span>this takes</span><b id="mx1t">24 min</b></div>
-        <div class="row"><span>done by</span><b id="mx1d">4:54 pm</b></div>
+        <div class="row"><span>each</span><b>about 3 min</b></div>
+        <div class="row"><span>this takes</span><b id="mx1t">about 24 min</b></div>
+        <div class="row"><span>done about</span><b id="mx1d">4:54 pm</b></div>
       </div>
     </div>
     <div class="ctl">
@@ -149,15 +149,15 @@
 <div class="desk">
   <div class="grid" id="mx1dg"></div>
   <div class="dk">
-    <div class="dhd"><b>Message clients</b><u>today, 4:30 pm</u></div>
+    <div class="dhd"><b>Message clients</b><u id="mx1dnow">today, 4:30 pm</u></div>
     <div class="dtop">
       <div class="dnum"><span id="mx1dn">8</span><s id="mx1du">messages</s></div>
       <div>
         <div class="dsent" id="mx1ds">Half an hour of focus. Block it and do not answer anything else.</div>
         <div class="dstats">
-          <div class="st"><u>each</u><b>3 min</b></div>
-          <div class="st"><u>this takes</u><b id="mx1dt">24 min</b></div>
-          <div class="st"><u>done by</u><b id="mx1dd">4:54 pm</b></div>
+          <div class="st"><u>each</u><b>about 3 min</b></div>
+          <div class="st"><u>this takes</u><b id="mx1dt">about 24 min</b></div>
+          <div class="st"><u>done about</u><b id="mx1dd">4:54 pm</b></div>
         </div>
       </div>
       <div class="dact">
@@ -172,14 +172,17 @@
         <div class="rail"><div class="fill" id="mx1df" style="width:50%"></div><div class="knob" id="mx1dk" style="left:50%"></div></div>
         <div class="dpre" id="mx1dp" style="left:50%"></div>
       </div>
-      <div class="ghost" id="mx1gh">hover the rail to price a size before you take it, arrow keys step, "more sizes" opens every number from 1 to 20</div>
+      <div class="ghost" id="mx1gh">hover the rail to price a size before you take it, arrow keys step, "more sizes" opens every number from 1 to 20. Times are the plan’s estimate.</div>
     </div>
   </div>
 </div>
 
 <script>(function(){
   var R=document.querySelector('[data-k="mx-1"]'); if(!R) return;
-  var THREE=[3,8,14], ROLE=['lighter','today’s size','heavier'], MIN=3, BASE=16*60+30;
+  var THREE=[3,8,14], ROLE=['lighter','today’s size','heavier'], MIN=3;
+  /* PROVENANCE: the only clock on this screen is the real one. "done about" is that clock
+     plus the plan's own per message estimate, never a measured duration. */
+  var _n=new Date(), BASE=Math.floor((_n.getHours()*60+_n.getMinutes())/5)*5;
   var FINE=[]; for(var i=1;i<=20;i++) FINE.push(i);
   function clock(m){var h=Math.floor(m/60)%24,mm=m%60,ap=h>=12?'pm':'am',hh=h%12||12;return hh+':'+(mm<10?'0':'')+mm+' '+ap;}
   function hm(m){var h=Math.floor(m/60),mm=m%60;return h?(mm?h+' hr '+mm+' min':h+' hr'):mm+' min';}
@@ -192,6 +195,11 @@
     if(n<=13) return 'Over half an hour of writing. Give it its own block.';
     if(n<=16) return 'Most of an hour. Decide who you are messaging before you start.';
     return 'A full hour of messages. This is a heavy day, choose it on purpose.';
+  }
+
+  function stampNow(){
+    R.querySelector('#mx1now').textContent='now '+clock(BASE);
+    R.querySelector('#mx1dnow').textContent='today, now '+clock(BASE);
   }
 
   function rig(o){
@@ -227,7 +235,7 @@
       R.querySelector(o.n).textContent=n;
       R.querySelector(o.u).textContent=unit(n);
       R.querySelector(o.s).textContent=sent(n);
-      R.querySelector(o.t).textContent=hm(mins);
+      R.querySelector(o.t).textContent='about '+hm(mins);
       R.querySelector(o.d).textContent=clock(BASE+mins);
       R.querySelector(o.f).style.width=p+'%';
       R.querySelector(o.k).style.left=p+'%';
@@ -271,6 +279,7 @@
     return {get n(){return n;}, set n(v){n=v;paint();}, get set(){return set;}, paint:paint};
   }
 
+  stampNow();
   var phone=rig({stops:'#mx1st',fticks:'#mx1ft',rail:'#mx1rail',hit:'#mx1hit',grid:'#mx1g',
     n:'#mx1n',u:'#mx1u',s:'#mx1s',t:'#mx1t',d:'#mx1d',f:'#mx1f',k:'#mx1k',cta:'#mx1cta',more:'#mx1more',
     stopCls:'stop',fticksCls:'fticks'});
@@ -288,7 +297,8 @@
     var i=Math.max(0,Math.min(s.length-1,Math.round((e.clientX-r.left)/r.width*(s.length-1))));
     dpre.style.left=(i/(s.length-1)*100)+'%';
     var v=s[i];
-    gh.textContent = v===desk.n ? 'you are here' : (v+' '+unit(v)+', '+hm(v*MIN)+', done by '+clock(BASE+v*MIN));
+    gh.textContent = v===desk.n ? 'you are here'
+      : (v+' '+unit(v)+', about '+hm(v*MIN)+', done about '+clock(BASE+v*MIN));
   });
   deskRail.addEventListener('mouseleave',function(){gh.textContent=rest;});
 
