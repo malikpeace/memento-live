@@ -329,6 +329,123 @@
     x.strokeStyle = ink(0.08); x.lineWidth = 1; x.beginPath(); x.moveTo(m, base + 2); x.lineTo(w - m, base + 2); x.stroke();
   }
 
+  /* ---- helpers for the M-themed set ---- */
+  function sampleM(cx, cy, w, h, K) {
+    var pts = mPoints(cx, cy, w, h), segs = [], tot = 0;
+    for (var i = 1; i < pts.length; i++) { var L = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); segs.push([pts[i - 1], pts[i], L]); tot += L; }
+    var out = [];
+    for (var k = 0; k < K; k++) {
+      var target = K === 1 ? 0 : (k / (K - 1)) * tot, run = 0, si = 0;
+      while (si < segs.length - 1 && run + segs[si][2] < target) { run += segs[si][2]; si++; }
+      var f = segs[si][2] ? (target - run) / segs[si][2] : 0;
+      out.push([segs[si][0][0] + (segs[si][1][0] - segs[si][0][0]) * f, segs[si][0][1] + (segs[si][1][1] - segs[si][0][1]) * f]);
+    }
+    return out;
+  }
+  function distToSeg(px, py, ax, ay, bx, by) {
+    var dx = bx - ax, dy = by - ay, l2 = dx * dx + dy * dy;
+    var t = l2 ? Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / l2)) : 0;
+    var qx = ax + t * dx, qy = ay + t * dy; return Math.hypot(px - qx, py - qy);
+  }
+
+  /* 18. THE M CONSTELLATION — days are stars; the first ~26 trace the M, then a
+        field grows around it. Subtle at a glance, a clear M by ~day 30. (Malik's) */
+  function mConstel(c, d) {
+    var s = setup(c), x = s[0], w = s[1], h = s[2], cx = w / 2, cy = h / 2;
+    var Mw = Math.min(w * 0.5, 160), Mh = Math.min(h * 0.56, 150), SK = 26;
+    var skel = sampleM(cx, cy, Mw, Mh, SK), r = rng(88), stars = [];
+    for (var i = 0; i < d.total; i++) {
+      if (i < SK) stars.push([skel[i][0] + (r() - 0.5) * 8, skel[i][1] + (r() - 0.5) * 8, 1]);
+      else { var a = r() * T, rad = Math.max(Mw, Mh) * 0.5 + (i - SK) / Math.max(1, d.total - SK) * Math.min(w, h) * 0.5 * d.maturity + r() * 22; stars.push([cx + rad * Math.cos(a), cy + rad * Math.sin(a) * 0.9, 0.3]); }
+    }
+    for (var aI = 1; aI < stars.length; aI++) { var best = -1, bd = 1e9; for (var b = 0; b < aI; b++) { var dx = stars[aI][0] - stars[b][0], dy = stars[aI][1] - stars[b][1], dd = dx * dx + dy * dy; if (dd < bd) { bd = dd; best = b; } } if (best >= 0 && bd < 3600) { x.strokeStyle = g(0.09 + 0.14 * Math.min(stars[aI][2], stars[best][2])); x.lineWidth = 1; x.beginPath(); x.moveTo(stars[aI][0], stars[aI][1]); x.lineTo(stars[best][0], stars[best][1]); x.stroke(); } }
+    for (var p = 0; p < stars.length; p++) { var stq = stars[p], last = p === stars.length - 1, br = stq[2]; if (last) { var hg = x.createRadialGradient(stq[0], stq[1], 0, stq[0], stq[1], 14); hg.addColorStop(0, g(0.85)); hg.addColorStop(1, g(0)); x.fillStyle = hg; x.beginPath(); x.arc(stq[0], stq[1], 14, 0, T); x.fill(); } x.fillStyle = last ? '#eafff0' : g(0.35 + 0.55 * br); x.beginPath(); x.arc(stq[0], stq[1], last ? 3.4 : 1.4 + 1.7 * br, 0, T); x.fill(); }
+    if (d.total === 0) { x.fillStyle = ink(0.3); x.font = '13px ' + FONT; x.textAlign = 'center'; x.fillText('day 0', cx, cy); }
+  }
+
+  /* 19. THE M RANGE — two peaks and a central valley: the top of an M as a
+        mountain range. It rises the longer you keep going. (Memento's mountain) */
+  function mRange(c, d) {
+    var s = setup(c), x = s[0], w = s[1], h = s[2], base = h - 16;
+    var sky = x.createLinearGradient(0, 0, 0, h); sky.addColorStop(0, 'rgba(9,26,16,1)'); sky.addColorStop(1, 'rgba(3,8,5,1)'); x.fillStyle = sky; x.fillRect(0, 0, w, h);
+    var ph = (0.22 + 0.72 * d.maturity) * Math.min(h * 0.72, 190);
+    var xs = [0, w * 0.12, w * 0.32, w * 0.5, w * 0.68, w * 0.88, w];
+    for (var layer = 2; layer >= 0; layer--) {
+      var f = layer === 0 ? 1 : layer === 1 ? 0.72 : 0.5, hh = ph * f, off = layer * 14;
+      var ys = [base, base - hh * 0.2, base - hh, base - hh * 0.42, base - hh, base - hh * 0.2, base];
+      var grd = x.createLinearGradient(0, base - hh, 0, base);
+      if (layer === 0) { grd.addColorStop(0, g(0.42)); grd.addColorStop(1, 'rgba(14,74,38,0.95)'); x.fillStyle = grd; }
+      else x.fillStyle = 'rgba(' + (10 + layer * 4) + ',' + (54 - layer * 10) + ',' + (30 - layer * 6) + ',0.9)';
+      x.beginPath(); x.moveTo(0, base + 4);
+      for (var i = 0; i < xs.length; i++) x.lineTo(xs[i], ys[i] + off);
+      x.lineTo(w, base + 4); x.closePath(); x.fill();
+    }
+  }
+
+  /* 20. THE M, ONE LINE — a single glowing stroke draws the mark; complete by
+        ~day 30, then it gains a halo. The tip is today. */
+  function mOneLine(c, d) {
+    var s = setup(c), x = s[0], w = s[1], h = s[2], cx = w / 2, cy = h / 2;
+    var Mw = Math.min(w * 0.5, 150), Mh = Math.min(h * 0.58, 150), lw = 13;
+    var pts = mPoints(cx, cy, Mw, Mh), segs = [], tot = 0;
+    for (var i = 1; i < pts.length; i++) { var L = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); segs.push([pts[i - 1], pts[i], L]); tot += L; }
+    strokeM(x, pts, lw, ink(0.06));
+    var frac = Math.min(1, d.total / 30), target = frac * tot, run = 0, tip = pts[0];
+    var grd = x.createLinearGradient(cx - Mw / 2, 0, cx + Mw / 2, 0); grd.addColorStop(0, g(0.6)); grd.addColorStop(1, g(1));
+    x.lineJoin = 'miter'; x.lineCap = 'round'; x.lineWidth = lw; x.strokeStyle = grd;
+    x.beginPath(); x.moveTo(pts[0][0], pts[0][1]);
+    for (var s2 = 0; s2 < segs.length; s2++) { var seg = segs[s2]; if (run + seg[2] <= target) { x.lineTo(seg[1][0], seg[1][1]); tip = seg[1]; run += seg[2]; } else { var ff = seg[2] ? (target - run) / seg[2] : 0, mx = seg[0][0] + (seg[1][0] - seg[0][0]) * ff, my = seg[0][1] + (seg[1][1] - seg[0][1]) * ff; x.lineTo(mx, my); tip = [mx, my]; break; } }
+    x.stroke();
+    if (frac >= 1) { x.globalAlpha = 0.3 + 0.35 * d.maturity; strokeM(x, pts, lw + 8 * d.maturity, g(0.14)); x.globalAlpha = 1; }
+    var hg = x.createRadialGradient(tip[0], tip[1], 0, tip[0], tip[1], lw * 1.5); hg.addColorStop(0, g(0.95)); hg.addColorStop(1, g(0)); x.fillStyle = hg; x.beginPath(); x.arc(tip[0], tip[1], lw * 1.5, 0, T); x.fill();
+    x.fillStyle = '#eafff0'; x.beginPath(); x.arc(tip[0], tip[1], lw * 0.34, 0, T); x.fill();
+  }
+
+  /* 21. THE M MOSAIC — the mark tiled in day-cells, filling from the base. One
+        tile lit per slice of the record; a missed stretch leaves it unfilled. */
+  function mMosaic(c, d) {
+    var s = setup(c), x = s[0], w = s[1], h = s[2], cx = w / 2, cy = h / 2;
+    var Mw = Math.min(w * 0.54, 176), Mh = Math.min(h * 0.6, 160), lw = Mw * 0.2;
+    var pts = mPoints(cx, cy, Mw, Mh), cell = Math.max(7, Mw / 17), cells = [];
+    for (var gy = cy - Mh / 2 - cell; gy < cy + Mh / 2 + cell; gy += cell) for (var gx = cx - Mw / 2 - cell; gx < cx + Mw / 2 + cell; gx += cell) {
+      var bestd = 1e9; for (var i = 1; i < pts.length; i++) { var ds = distToSeg(gx + cell / 2, gy + cell / 2, pts[i - 1][0], pts[i - 1][1], pts[i][0], pts[i][1]); if (ds < bestd) bestd = ds; }
+      if (bestd < lw / 2) cells.push([gx, gy]);
+    }
+    cells.sort(function (a, b) { return b[1] - a[1] || a[0] - b[0]; }); // bottom-up fill
+    var lit = Math.round(cells.length * (d.total / 365));
+    cells.forEach(function (cc, i) { x.fillStyle = i < lit ? g(0.4 + 0.5 * (i / Math.max(1, cells.length))) : ink(0.05); roundRect(x, cc[0] + 1, cc[1] + 1, cell - 2, cell - 2, 2); x.fill(); });
+  }
+
+  /* 22. THE M RADIANT — the mark shedding light; a beam for every day, more and
+        longer as the record grows. Ties to Memento's god-ray beams. */
+  function mBeams(c, d) {
+    var s = setup(c), x = s[0], w = s[1], h = s[2], cx = w / 2, cy = h / 2;
+    var Mw = Math.min(w * 0.44, 140), Mh = Math.min(h * 0.5, 140), skel = sampleM(cx, cy, Mw, Mh, 40);
+    x.globalCompositeOperation = 'lighter';
+    var nb = Math.min(d.total, 64), r = rng(55);
+    for (var i = 0; i < nb; i++) { var p = skel[(r() * skel.length) | 0], ang = Math.atan2(p[1] - cy, p[0] - cx) + (r() - 0.5) * 0.7, len = 28 + r() * 74 * (0.5 + 0.5 * d.maturity); var ex = p[0] + Math.cos(ang) * len, ey = p[1] + Math.sin(ang) * len; var grd = x.createLinearGradient(p[0], p[1], ex, ey); grd.addColorStop(0, g(0.16)); grd.addColorStop(1, g(0)); x.strokeStyle = grd; x.lineWidth = 1.5; x.beginPath(); x.moveTo(p[0], p[1]); x.lineTo(ex, ey); x.stroke(); }
+    x.globalCompositeOperation = 'source-over';
+    strokeM(x, mPoints(cx, cy, Mw, Mh), 8, g(0.85)); strokeM(x, mPoints(cx, cy, Mw, Mh), 3, '#eafff0');
+  }
+
+  /* 23. THE M CORE — the mark holds the centre from day one; your days orbit it
+        in a widening field, missed days as faint rings. */
+  function mCore(c, d) {
+    var s = setup(c), x = s[0], w = s[1], h = s[2], cx = w / 2, cy = h / 2;
+    var Mr = Math.min(w, h) * 0.14, spread = Math.min(w, h) * 0.42 / Math.sqrt(d.N + 8);
+    for (var i = 0; i < d.N; i++) { var ang = i * 2.399963, rr = Mr * 1.35 + spread * Math.sqrt(i), px = cx + rr * Math.cos(ang), py = cy + rr * Math.sin(ang); if (d.act[i]) { x.fillStyle = g(0.3 + 0.5 * (i / Math.max(1, d.N))); x.beginPath(); x.arc(px, py, 1.5, 0, T); x.fill(); } else { x.strokeStyle = ink(0.08); x.lineWidth = 1; x.beginPath(); x.arc(px, py, 1.3, 0, T); x.stroke(); } }
+    var cg = x.createRadialGradient(cx, cy, 0, cx, cy, Mr * 2.2); cg.addColorStop(0, g(0.28)); cg.addColorStop(1, g(0)); x.fillStyle = cg; x.beginPath(); x.arc(cx, cy, Mr * 2.2, 0, T); x.fill();
+    strokeM(x, mPoints(cx, cy, Mr * 1.5, Mr * 1.7), Mr * 0.3, '#eafff0');
+  }
+
+  /* 24. THE M CONTOURS — nested outlines of the mark, like a topographic map. A
+        single line at day 1, a layered relief by 365. */
+  function mContours(c, d) {
+    var s = setup(c), x = s[0], w = s[1], h = s[2], cx = w / 2, cy = h / 2;
+    var Mw = Math.min(w * 0.5, 150), Mh = Math.min(h * 0.56, 150), K = 2 + Math.round(d.maturity * 9);
+    for (var j = K; j >= 0; j--) { var sc = 0.32 + 0.98 * (j / K), alpha = 0.12 + 0.5 * (1 - j / K); strokeM(x, mPoints(cx, cy, Mw * sc, Mh * sc), Math.max(1, 2.4 * (1 - j / K) + 1), g(alpha)); }
+  }
+
   var HEROES = [
     { n: 'The aurora', why: 'Kept. Light curtains; one ribbon at day 1, a full sky at 365.', fn: aurora },
     { n: 'The constellation', why: 'Kept. Days wired to neighbours; two nodes read as intentional, 365 is a galaxy.', fn: constellation },
@@ -346,7 +463,14 @@
     { n: 'The odometer', why: 'A mechanical counter of actions completed. It only ever ticks up. Tactile, kinetic, dead simple.', fn: odometer },
     { n: 'The heartbeat', why: 'An EKG strip: a beat for every day you showed up, a flatline for the days you did not. Proof you are alive to it.', fn: heartbeat },
     { n: 'The percent', why: 'One big rate ring and a stack of the numbers that matter. The most product-analytics of the set.', fn: percent },
-    { n: 'The strata', why: 'Sediment. A band per week, colour by that week\'s rate, building upward like rock. Geological time.', fn: strata }
+    { n: 'The strata', why: 'Sediment. A band per week, colour by that week\'s rate, building upward like rock. Geological time.', fn: strata },
+    { n: 'The M constellation', why: 'Your idea. Days are stars; the first ~26 trace the mark, so a clear M emerges by day 30, then a field grows around it. Subtle at a glance.', fn: mConstel },
+    { n: 'The M range', why: 'Two peaks and a central valley: the top of an M drawn as a mountain range. It rises the longer you keep going. Memento\'s mountain.', fn: mRange },
+    { n: 'The M, one line', why: 'A single glowing stroke draws the mark, complete by ~day 30, then it gains a halo. The tip is today.', fn: mOneLine },
+    { n: 'The M mosaic', why: 'The mark tiled in day-cells, filling from the base. Honest: a thin record leaves the M unfinished.', fn: mMosaic },
+    { n: 'The M radiant', why: 'The mark shedding light, a beam for every day, more and longer as it grows. Ties to the god-ray beams.', fn: mBeams },
+    { n: 'The M core', why: 'The mark holds the centre from day one; your days orbit it in a widening field, missed days as faint rings.', fn: mCore },
+    { n: 'The M contours', why: 'Nested outlines of the mark, like a topographic map. A single line at day 1, a layered relief by 365.', fn: mContours }
   ];
 
   var wrap = document.getElementById('heroLab');
