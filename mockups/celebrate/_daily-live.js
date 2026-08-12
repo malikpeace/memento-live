@@ -170,35 +170,54 @@
       '<div class="dl-path" style="gap:' + (tickH > 12 ? 6 : 4) + 'px">' + out + '</div>' + heroBlock(x.total, x.cad) + more;
   };
 
-  /* 8. THE STAIRCASE, EVERY step, one per day. A flight climbs to the right until
-     it reaches the edge, then turns and climbs to the LEFT, then right again, a
-     switchback that stacks up the screen. All 365 steps show; the higher the
-     count, the taller and denser the climb. Today's step is lit. */
+  /* 8. THE STAIRCASE, one real step per day that accumulates. It climbs up to the
+     right; when a flight reaches full width it turns and climbs back (switchback),
+     stacking up the screen forever. Steps are a fixed chunky size and the whole
+     climb scales down only as it outgrows the frame, so day 1 is a clean single
+     step and day 365 is a tall switchback. Faint milestone lines (10, 50, 100 ...)
+     mark how far you have come; today's step is lit. */
   R['t-steps'] = function (dst, x) {
     var N = Math.min(x.total, 365);
-    var per = 30;                                   // steps in a flight before it turns
-    var tread = 6.6;                                // horizontal size of each step (steeper flight)
-    var H = 150 + 296 * Math.min(1, N / 365);       // total rise grows toward a full screen
-    var riser = H / N;                              // every step contributes one riser
-    var y = H, px = 0, d = 'M0 ' + H.toFixed(1);
+    var Wa = 206, Ha = 352;                        // frame the climb fills
+    var F = Math.max(1, Math.min(11, Math.round(N / 28)));   // flights (folds) grow with the climb
+    var per = Math.ceil(N / F);                    // steps per flight
+    var tread = Math.min(28, Wa / per);            // fill the width; chunky (capped) when steps are few
+    var riser = Math.min(26, Ha / N);              // fill the height; chunky (capped) when steps are few
+    var Htot = N * riser, Wtot = per * tread;
+
+    var y = Htot, px = 0, d = 'M0 ' + Htot.toFixed(1);   // ground at the bottom, climb up
     for (var i = 0; i < N; i++) {
       var goRight = (Math.floor(i / per) % 2 === 0);
-      y -= riser;                                   // riser up
+      y -= riser;                                  // riser up
       d += ' L' + px.toFixed(1) + ' ' + y.toFixed(1);
-      px += goRight ? tread : -tread;               // tread across (turns each flight)
+      px += goRight ? tread : -tread;              // tread across (turns each flight)
       d += ' L' + px.toFixed(1) + ' ' + y.toFixed(1);
     }
-    var fw = Math.min(N, per) * tread;              // full flights span this width
-    var sw = Math.max(1.9, Math.min(3.6, riser * 0.85));
-    var pad = 10, vbW = fw + pad * 2, vbH = H + pad * 2;
+    var sw = Math.max(1.9, Math.min(3.4, riser * 0.42));
+
+    // milestone altitude lines + labels: how far you have come
+    var marks = [10, 50, 100, 200, 300], lines = '', labels = '';
+    marks.forEach(function (m) {
+      if (m >= N) return;
+      var ly = (Htot - m * riser).toFixed(1);
+      lines += '<line x1="0" y1="' + ly + '" x2="' + Wtot.toFixed(1) + '" y2="' + ly +
+        '" stroke="rgba(255,255,255,.16)" stroke-width="1"></line>';
+      labels += '<text x="' + (Wtot + 7).toFixed(1) + '" y="' + (+ly + 3.6).toFixed(1) +
+        '" fill="rgba(255,255,255,.5)" font-size="11" font-weight="600">' + m + '</text>';
+    });
+    var ground = '<line x1="0" y1="' + Htot.toFixed(1) + '" x2="' + Wtot.toFixed(1) + '" y2="' + Htot.toFixed(1) +
+      '" stroke="rgba(255,255,255,.24)" stroke-width="1"></line>';
+
+    var pad = 9, labelSpace = 34, vbW = Wtot + labelSpace + pad * 2, vbH = Htot + pad * 2;
     dst.innerHTML =
       '<svg class="dl-stair" viewBox="' + (-pad) + ' ' + (-pad) + ' ' + vbW.toFixed(1) + ' ' + vbH.toFixed(1) + '" ' +
       'width="' + vbW.toFixed(1) + '" height="' + vbH.toFixed(1) + '" aria-hidden="true" ' +
       'style="display:block;margin:0 auto;overflow:visible">' +
-      '<path d="' + d + '" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="' + sw.toFixed(2) +
-      '" stroke-linejoin="miter" stroke-linecap="square"></path>' +
-      '<circle cx="' + px.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + (sw + 1.6).toFixed(1) +
-      '" fill="#fff" style="filter:drop-shadow(0 0 6px rgba(255,255,255,.8))"></circle>' +
+      ground + lines +
+      '<path d="' + d + '" fill="none" stroke="rgba(255,255,255,.62)" stroke-width="' + sw.toFixed(2) +
+      '" stroke-linejoin="miter" stroke-linecap="square"></path>' + labels +
+      '<circle cx="' + px.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + (sw + 1.8).toFixed(1) +
+      '" fill="#fff" style="filter:drop-shadow(0 0 6px rgba(255,255,255,.85))"></circle>' +
       '</svg>' +
       heroBlock(x.total, x.cad);
   };

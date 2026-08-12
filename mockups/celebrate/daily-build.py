@@ -298,7 +298,7 @@ def build():
   <div class="livegrid">%s</div>
 </div>
 <script>%s</script>
-<script src="_daily-live.js?v=live20"></script>
+<script src="_daily-live.js?v=live22"></script>
 </body></html>""" % (len(sections), SHELL_CSS, '\n'.join(styles), len(sections), len(sections),
                      ''.join(toc), ''.join(sections), DRIVER)
 
