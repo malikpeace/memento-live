@@ -1,175 +1,301 @@
-<!--
-Difference law, layout archetypes for this set:
-  mx-1  horizontal notched rail
-  mx-2  growing block stepper
-  mx-3  vertical dragged card
-  mx-4  additive chip stack
-  mx-5  climbing rung ladder
--->
+<!-- ARCHETYPES, the surviving set: mx-1 notched rail | mx-2 growing time block | mx-3 drag the task card |
+     mx-5 tappable ladder | mx-6 vertical pressure column | mx-7 segmented arc dial | mx-8 three sentence cards |
+     mx-9 giant elastic numeral | mx-10 keys over timeline | mx-11 five sentence cards, the deliberate counter-example -->
 <section class="cell" data-k="mx-1">
 <style>
-[data-k=mx-1] .scr{position:absolute;inset:0;display:flex;flex-direction:column;padding:34px 22px 26px}
-[data-k=mx-1] .hd{font-size:13px;color:var(--text-mid);letter-spacing:-.01em}
-[data-k=mx-1] .big{display:flex;align-items:baseline;gap:9px;margin-top:14px}
-[data-k=mx-1] .num{font-size:88px;font-weight:700;line-height:.86;letter-spacing:-.05em;font-variant-numeric:tabular-nums}
+[data-k=mx-1] .scr{position:absolute;inset:0;display:flex;flex-direction:column;padding:32px 20px 22px}
+[data-k=mx-1] .hd{display:flex;justify-content:space-between;align-items:baseline}
+[data-k=mx-1] .hd b{font-size:15px;font-weight:500;letter-spacing:-.015em;color:var(--text-hi)}
+[data-k=mx-1] .hd u{text-decoration:none;font-size:12px;color:var(--text-mid);font-variant-numeric:tabular-nums}
+[data-k=mx-1] .mid{flex:1;display:flex;flex-direction:column;min-height:0;padding:18px 0 20px}
+[data-k=mx-1] .big{display:flex;align-items:baseline;gap:9px}
+[data-k=mx-1] .num{font-size:82px;font-weight:700;line-height:.86;letter-spacing:-.05em;font-variant-numeric:tabular-nums;
+  transition:opacity .12s ease-out}
+[data-k=mx-1] .num.flip{opacity:.45}
 [data-k=mx-1] .unit{font-size:16px;color:var(--text-mid);font-weight:500}
-[data-k=mx-1] .sent{margin-top:16px;font-size:17px;line-height:1.34;letter-spacing:-.015em;min-height:46px;color:var(--text-hi)}
-[data-k=mx-1] .box{margin-top:16px;border-radius:12px;padding:4px 13px;
-  background:rgba(22,25,31,.94);-webkit-backdrop-filter:blur(22px) saturate(1.4);backdrop-filter:blur(22px) saturate(1.4);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.07),0 10px 26px rgba(0,0,0,.4)}
+[data-k=mx-1] .sent{margin-top:14px;font-size:16.5px;line-height:1.36;letter-spacing:-.015em;height:68px;color:var(--text-hi)}
+[data-k=mx-1] .box{margin-top:auto;border-radius:12px;padding:3px 13px;
+  background:rgba(22,25,31,.95);-webkit-backdrop-filter:blur(24px) saturate(1.45);backdrop-filter:blur(24px) saturate(1.45);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.08),0 12px 28px rgba(0,0,0,.44)}
 [data-k=mx-1] .row{display:flex;justify-content:space-between;align-items:baseline;padding:9px 0;font-size:13.5px}
-[data-k=mx-1] .row+.row{box-shadow:inset 0 1px 0 rgba(var(--ink),.07)}
+[data-k=mx-1] .row+.row{box-shadow:inset 0 1px 0 rgba(var(--ink),.08)}
 [data-k=mx-1] .row span{color:var(--text-mid)}
-[data-k=mx-1] .row b{font-weight:500;font-variant-numeric:tabular-nums}
-[data-k=mx-1] .mid{flex:1;display:flex;flex-direction:column;justify-content:center;padding-bottom:26px}
-[data-k=mx-1] .stops{display:flex;justify-content:space-between;margin-bottom:12px;padding:0 2px}
-[data-k=mx-1] .stops i{font-style:normal;font-size:11.5px;color:rgba(var(--ink),.34);font-variant-numeric:tabular-nums;transition:color .15s ease-out}
-[data-k=mx-1] .stops i.on{color:var(--text-hi);font-weight:700}
-[data-k=mx-1] .railhit{position:relative;height:46px;display:flex;align-items:center;touch-action:none;cursor:grab}
-[data-k=mx-1] .railhit:active{cursor:grabbing}
-[data-k=mx-1] .rail{position:relative;height:4px;width:100%;border-radius:999px;background:rgba(var(--ink),.13)}
-[data-k=mx-1] .fill{position:absolute;left:0;top:0;bottom:0;border-radius:999px;background:rgba(var(--ink),.82);transition:width .16s ease-out}
-[data-k=mx-1] .notch{position:absolute;top:-5px;width:1px;height:14px;background:rgba(var(--ink),.26);transform:translateX(-.5px)}
-[data-k=mx-1] .knob{position:absolute;top:50%;width:26px;height:26px;border-radius:999px;background:rgba(var(--ink),.97);
-  box-shadow:0 6px 16px rgba(0,0,0,.55);transform:translate(-50%,-50%);transition:left .16s ease-out}
-[data-k=mx-1] .knob::after{content:"";position:absolute;inset:10px 11px;border-radius:2px;background:rgba(10,11,13,.5)}
-[data-k=mx-1] .hint{margin-top:6px;font-size:11.5px;color:var(--text-mid);text-align:center}
+[data-k=mx-1] .row b{font-weight:500;font-variant-numeric:tabular-nums;color:var(--text-hi)}
 
-[data-k=mx-1] .dk{position:absolute;inset:0;display:flex;flex-direction:column;padding:32px 34px 26px}
-[data-k=mx-1] .dtop{flex:1;display:flex;gap:34px;align-items:center;padding-bottom:14px}
-[data-k=mx-1] .dnum{font-size:104px;font-weight:700;line-height:.84;letter-spacing:-.05em;font-variant-numeric:tabular-nums}
-[data-k=mx-1] .dsent{font-size:19px;line-height:1.35;letter-spacing:-.015em;max-width:34ch;min-height:52px}
-[data-k=mx-1] .dstats{display:flex;gap:10px;margin-top:16px}
-[data-k=mx-1] .st{border-radius:11px;padding:10px 14px;min-width:104px;
+[data-k=mx-1] .ctl{margin-top:18px}
+[data-k=mx-1] .stops{display:flex;justify-content:space-between;gap:6px;margin-bottom:2px}
+[data-k=mx-1] .stop{flex:1;padding:6px 0 5px;border-radius:9px;cursor:pointer;-webkit-tap-highlight-color:transparent;
+  background:transparent;transition:background .14s ease-out}
+[data-k=mx-1] .stop:nth-child(2){text-align:center}
+[data-k=mx-1] .stop:nth-child(3){text-align:right}
+[data-k=mx-1] .stop:active{background:rgba(var(--ink),.06)}
+[data-k=mx-1] .stop i{display:block;font-style:normal;font-size:11.5px;color:rgba(var(--ink),.5);transition:color .14s ease-out}
+[data-k=mx-1] .stop b{display:block;margin-top:2px;font-size:13px;font-weight:500;color:rgba(var(--ink),.55);
+  font-variant-numeric:tabular-nums;transition:color .14s ease-out}
+[data-k=mx-1] .stop.on i{color:var(--text-mid)}
+[data-k=mx-1] .stop.on b{color:var(--text-hi);font-weight:700}
+[data-k=mx-1] .fticks{display:none;justify-content:space-between;margin-bottom:8px;padding:0 1px}
+[data-k=mx-1] .fticks.show{display:flex}
+[data-k=mx-1] .fticks i{font-style:normal;font-size:11px;color:rgba(var(--ink),.4);font-variant-numeric:tabular-nums}
+[data-k=mx-1] .fticks i.on{color:var(--text-hi);font-weight:700}
+[data-k=mx-1] .railhit{position:relative;height:44px;display:flex;align-items:center;touch-action:none;cursor:grab;
+  outline:none;border-radius:12px}
+[data-k=mx-1] .railhit:active{cursor:grabbing}
+[data-k=mx-1] .railhit:focus-visible{box-shadow:0 0 0 2px rgba(var(--ink),.35)}
+[data-k=mx-1] .rail{position:relative;height:4px;width:100%;border-radius:999px;background:rgba(var(--ink),.14)}
+[data-k=mx-1] .fill{position:absolute;left:0;top:0;bottom:0;border-radius:999px;background:rgba(var(--ink),.85);transition:width .17s cubic-bezier(.2,.7,.3,1)}
+[data-k=mx-1] .notch{position:absolute;top:-5px;width:1px;height:14px;background:rgba(var(--ink),.26);transform:translateX(-.5px)}
+[data-k=mx-1] .notch.sm{top:-3px;height:10px;background:rgba(var(--ink),.18)}
+[data-k=mx-1] .knob{position:absolute;top:50%;width:26px;height:26px;border-radius:999px;background:rgba(var(--ink),.97);
+  box-shadow:0 6px 16px rgba(0,0,0,.55);transform:translate(-50%,-50%) scale(1);
+  transition:left .17s cubic-bezier(.2,.7,.3,1),transform .12s ease-out}
+[data-k=mx-1] .railhit.drag .knob{transform:translate(-50%,-50%) scale(1.14)}
+[data-k=mx-1] .railhit.drag .fill{transition:none}
+[data-k=mx-1] .railhit.drag .knob{transition:transform .12s ease-out}
+[data-k=mx-1] .knob::after{content:"";position:absolute;inset:10px 11px;border-radius:2px;background:rgba(10,11,13,.5)}
+
+[data-k=mx-1] .foot{display:flex;flex-direction:column;gap:9px;margin-top:14px}
+[data-k=mx-1] .cta{flex:1;border:0;border-radius:14px;background:rgba(235,238,248,.94);color:#0b0c10;font-family:inherit;
+  font-weight:700;font-size:15.5px;letter-spacing:-.01em;padding:15px 14px;cursor:pointer;font-variant-numeric:tabular-nums;
+  -webkit-tap-highlight-color:transparent;transition:transform .12s ease-out,background .12s ease-out}
+[data-k=mx-1] .cta:active{transform:scale(.985);background:rgba(235,238,248,1)}
+[data-k=mx-1] .more{align-self:center;border:0;border-radius:11px;padding:9px 17px;font-family:inherit;font-size:12.5px;font-weight:500;
+  color:var(--text-mid);cursor:pointer;background:rgba(22,25,31,.92);-webkit-tap-highlight-color:transparent;
+  -webkit-backdrop-filter:blur(22px) saturate(1.4);backdrop-filter:blur(22px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.08);transition:color .14s ease-out}
+[data-k=mx-1] .more:active{color:var(--text-hi)}
+[data-k=mx-1] .more.on{color:var(--text-hi)}
+
+[data-k=mx-1] .dk{position:absolute;inset:0;display:flex;flex-direction:column;padding:30px 32px 24px}
+[data-k=mx-1] .dhd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px}
+[data-k=mx-1] .dhd b{font-size:15px;font-weight:500;letter-spacing:-.015em}
+[data-k=mx-1] .dhd u{text-decoration:none;font-size:12.5px;color:var(--text-mid);font-variant-numeric:tabular-nums}
+[data-k=mx-1] .dtop{flex:1;display:flex;gap:30px;align-items:center;min-height:0}
+[data-k=mx-1] .dnum{font-size:96px;font-weight:700;line-height:.84;letter-spacing:-.05em;font-variant-numeric:tabular-nums;width:150px}
+[data-k=mx-1] .dnum s{display:block;text-decoration:none;font-size:14px;font-weight:500;color:var(--text-mid);letter-spacing:-.01em;margin-top:9px}
+[data-k=mx-1] .dsent{font-size:18.5px;line-height:1.36;letter-spacing:-.015em;max-width:32ch;height:50px}
+[data-k=mx-1] .dstats{display:flex;gap:9px;margin-top:14px}
+[data-k=mx-1] .st{border-radius:11px;padding:9px 14px;min-width:100px;
   background:rgba(22,25,31,.94);-webkit-backdrop-filter:blur(22px) saturate(1.4);backdrop-filter:blur(22px) saturate(1.4);
   box-shadow:inset 0 1px 0 rgba(var(--ink),.07),0 10px 24px rgba(0,0,0,.4)}
 [data-k=mx-1] .st u{display:block;text-decoration:none;font-size:11.5px;color:var(--text-mid);margin-bottom:3px}
-[data-k=mx-1] .st b{font-size:19px;font-weight:500;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
-[data-k=mx-1] .ghost{margin-top:14px;font-size:13px;color:rgba(var(--ink),.5);height:18px;font-variant-numeric:tabular-nums}
-[data-k=mx-1] .drailwrap{margin-top:auto}
-[data-k=mx-1] .dticks{position:relative;height:26px}
-[data-k=mx-1] .dticks i{position:absolute;bottom:0;transform:translateX(-50%);font-style:normal;font-size:11px;
-  color:rgba(var(--ink),.32);font-variant-numeric:tabular-nums}
-[data-k=mx-1] .dticks i.on{color:var(--text-hi);font-weight:700}
-[data-k=mx-1] .drailhit{position:relative;height:34px;display:flex;align-items:center;cursor:pointer}
-[data-k=mx-1] .dpre{position:absolute;top:50%;width:2px;height:20px;background:rgba(var(--ink),.55);transform:translate(-50%,-50%);
-  opacity:0;transition:opacity .12s ease-out}
+[data-k=mx-1] .st b{font-size:18px;font-weight:500;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+[data-k=mx-1] .dact{margin-left:auto;display:flex;flex-direction:column;gap:9px;width:186px;flex:none}
+[data-k=mx-1] .dcta{border:0;border-radius:14px;background:rgba(235,238,248,.94);color:#0b0c10;font-family:inherit;
+  font-weight:700;font-size:15.5px;padding:15px 12px;cursor:pointer;font-variant-numeric:tabular-nums;
+  transition:transform .12s ease-out,background .12s ease-out}
+[data-k=mx-1] .dcta:hover{background:rgba(255,255,255,.99)}
+[data-k=mx-1] .dcta:active{transform:scale(.985)}
+[data-k=mx-1] .dmore{border:0;border-radius:14px;padding:13px 12px;font-family:inherit;font-size:13.5px;font-weight:500;
+  color:var(--text-mid);cursor:pointer;background:rgba(22,25,31,.92);
+  -webkit-backdrop-filter:blur(22px) saturate(1.4);backdrop-filter:blur(22px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.08);transition:color .14s ease-out}
+[data-k=mx-1] .dmore:hover,[data-k=mx-1] .dmore.on{color:var(--text-hi)}
+[data-k=mx-1] .dbot{margin-top:16px}
+[data-k=mx-1] .dstops{display:flex;justify-content:space-between;gap:8px}
+[data-k=mx-1] .dstop{flex:1;padding:5px 8px 6px;border-radius:9px;cursor:pointer;transition:background .14s ease-out}
+[data-k=mx-1] .dstop:nth-child(2){text-align:center}
+[data-k=mx-1] .dstop:nth-child(3){text-align:right}
+[data-k=mx-1] .dstop:hover{background:rgba(var(--ink),.05)}
+[data-k=mx-1] .dstop i{display:block;font-style:normal;font-size:11.5px;color:rgba(var(--ink),.5)}
+[data-k=mx-1] .dstop b{display:block;margin-top:2px;font-size:13px;font-weight:500;color:rgba(var(--ink),.55);font-variant-numeric:tabular-nums}
+[data-k=mx-1] .dstop.on i{color:var(--text-mid)}
+[data-k=mx-1] .dstop.on b{color:var(--text-hi);font-weight:700}
+[data-k=mx-1] .dfticks{display:none;justify-content:space-between;padding:0 1px;margin-bottom:4px}
+[data-k=mx-1] .dfticks.show{display:flex}
+[data-k=mx-1] .dfticks i{font-style:normal;font-size:11px;color:rgba(var(--ink),.4);font-variant-numeric:tabular-nums}
+[data-k=mx-1] .dfticks i.on{color:var(--text-hi);font-weight:700}
+[data-k=mx-1] .drailhit{position:relative;height:34px;display:flex;align-items:center;cursor:pointer;outline:none;border-radius:10px}
+[data-k=mx-1] .drailhit:focus-visible{box-shadow:0 0 0 2px rgba(var(--ink),.35)}
+[data-k=mx-1] .dpre{position:absolute;top:50%;width:2px;height:18px;background:rgba(var(--ink),.5);transform:translate(-50%,-50%);
+  opacity:0;transition:opacity .12s ease-out;pointer-events:none}
 [data-k=mx-1] .drailhit:hover .dpre{opacity:1}
-[data-k=mx-1] .dhint{margin-top:8px;font-size:12px;color:var(--text-mid)}
+[data-k=mx-1] .ghost{height:17px;margin-top:5px;font-size:12.5px;color:rgba(var(--ink),.6);font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion:reduce){[data-k=mx-1] *{transition-duration:0s !important}}
 </style>
 <h3>Notched rail</h3>
-<p class="cap">One rail with eight detents, and a consequence line that rewrites under your thumb, so the size of the day is read in words and a finish time, never in a percentage.</p>
+<p class="cap">One rail, three named detents Memento already picked for you (lighter, today's, heavier), each priced in minutes and a finish time, with the fine steps kept behind a quiet "more sizes" so the choice in front of you is never a 1 to 20 range.</p>
 
 <div class="ph">
   <div class="grid" id="mx1g"></div>
   <div class="scr">
-    <div class="hd">Message clients</div>
+    <div class="hd"><b>Message clients</b><u id="mx1now">4:30 pm</u></div>
     <div class="mid">
-    <div class="big"><span class="num" id="mx1n">8</span><span class="unit" id="mx1u">messages</span></div>
-    <div class="sent" id="mx1s">Half an hour of focus. Block it.</div>
-    <div class="box">
-      <div class="row"><span>each</span><b>3 min</b></div>
-      <div class="row"><span>total</span><b id="mx1t">24 min</b></div>
-      <div class="row"><span>done by</span><b id="mx1d">4:54 pm</b></div>
-    </div>
-    </div>
-    <div class="stops" id="mx1st"></div>
-    <div class="railhit" id="mx1hit">
-      <div class="rail" id="mx1rail">
-        <div class="fill" id="mx1f" style="width:57%"></div>
-        <div class="knob" id="mx1k" style="left:57%"></div>
+      <div class="big"><span class="num" id="mx1n">8</span><span class="unit" id="mx1u">messages</span></div>
+      <div class="sent" id="mx1s">Half an hour of focus. Block it and do not answer anything else.</div>
+      <div class="box">
+        <div class="row"><span>each</span><b>3 min</b></div>
+        <div class="row"><span>this takes</span><b id="mx1t">24 min</b></div>
+        <div class="row"><span>done by</span><b id="mx1d">4:54 pm</b></div>
       </div>
     </div>
-    <div class="hint">drag to scale today</div>
+    <div class="ctl">
+      <div class="stops" id="mx1st"></div>
+      <div class="fticks" id="mx1ft"></div>
+      <div class="railhit" id="mx1hit" tabindex="0" role="slider" aria-label="how many messages today" aria-valuemin="1" aria-valuemax="20" aria-valuenow="8">
+        <div class="rail" id="mx1rail">
+          <div class="fill" id="mx1f" style="width:50%"></div>
+          <div class="knob" id="mx1k" style="left:50%"></div>
+        </div>
+      </div>
+      <div class="foot">
+        <button class="cta" id="mx1cta">Start 8 messages</button>
+        <button class="more" id="mx1more">more sizes</button>
+      </div>
+    </div>
   </div>
 </div>
 
 <div class="desk">
   <div class="grid" id="mx1dg"></div>
   <div class="dk">
+    <div class="dhd"><b>Message clients</b><u>today, 4:30 pm</u></div>
     <div class="dtop">
-      <div class="dnum" id="mx1dn">8</div>
+      <div class="dnum"><span id="mx1dn">8</span><s id="mx1du">messages</s></div>
       <div>
-        <div class="dsent" id="mx1ds">Half an hour of focus. Block it.</div>
+        <div class="dsent" id="mx1ds">Half an hour of focus. Block it and do not answer anything else.</div>
         <div class="dstats">
           <div class="st"><u>each</u><b>3 min</b></div>
-          <div class="st"><u>total</u><b id="mx1dt">24 min</b></div>
+          <div class="st"><u>this takes</u><b id="mx1dt">24 min</b></div>
           <div class="st"><u>done by</u><b id="mx1dd">4:54 pm</b></div>
         </div>
-        <div class="ghost" id="mx1gh"></div>
+      </div>
+      <div class="dact">
+        <button class="dcta" id="mx1dcta">Start 8 messages</button>
+        <button class="dmore" id="mx1dmore">more sizes</button>
       </div>
     </div>
-    <div class="drailwrap">
-      <div class="dticks" id="mx1dtk"></div>
-      <div class="drailhit" id="mx1dhit">
-        <div class="rail"><div class="fill" id="mx1df" style="width:37%"></div><div class="knob" id="mx1dk" style="left:37%"></div></div>
-        <div class="dpre" id="mx1dp" style="left:37%"></div>
+    <div class="dbot">
+      <div class="dstops" id="mx1dst"></div>
+      <div class="dfticks" id="mx1dft"></div>
+      <div class="drailhit" id="mx1dhit" tabindex="0" role="slider" aria-label="how many messages today" aria-valuemin="1" aria-valuemax="20" aria-valuenow="8">
+        <div class="rail"><div class="fill" id="mx1df" style="width:50%"></div><div class="knob" id="mx1dk" style="left:50%"></div></div>
+        <div class="dpre" id="mx1dp" style="left:50%"></div>
       </div>
-      <div class="dhint">the cursor gets all twenty ticks instead of eight detents, hover previews the value in ghost text before you commit</div>
+      <div class="ghost" id="mx1gh">hover the rail to price a size before you take it, arrow keys step, "more sizes" opens every number from 1 to 20</div>
     </div>
   </div>
 </div>
 
 <script>(function(){
   var R=document.querySelector('[data-k="mx-1"]'); if(!R) return;
-  var STOPS=[1,2,3,5,8,12,16,20], MIN=3, BASE=16*60+30;
+  var THREE=[3,8,14], ROLE=['lighter','today’s size','heavier'], MIN=3, BASE=16*60+30;
+  var FINE=[]; for(var i=1;i<=20;i++) FINE.push(i);
   function clock(m){var h=Math.floor(m/60)%24,mm=m%60,ap=h>=12?'pm':'am',hh=h%12||12;return hh+':'+(mm<10?'0':'')+mm+' '+ap;}
+  function hm(m){var h=Math.floor(m/60),mm=m%60;return h?(mm?h+' hr '+mm+' min':h+' hr'):mm+' min';}
+  function unit(n){return n===1?'message':'messages';}
   function sent(n){
     if(n<=1) return 'One message. Three minutes and it is behind you.';
-    if(n<=3) return 'A short pass. Done in one sitting.';
-    if(n<=5) return 'You will want the list in front of you first.';
-    if(n<=8) return 'Half an hour of focus. Block it.';
-    if(n<=12) return 'Over half an hour. Give it its own block.';
-    if(n<=16) return 'Long push, close to an hour of it.';
-    return 'A full hour of messages. Decide before you start.';
+    if(n<=3) return 'A short pass. One sitting, nothing to set up first.';
+    if(n<=6) return 'You will want the names in front of you before you start.';
+    if(n<=9) return 'Half an hour of focus. Block it and do not answer anything else.';
+    if(n<=13) return 'Over half an hour of writing. Give it its own block.';
+    if(n<=16) return 'Most of an hour. Decide who you are messaging before you start.';
+    return 'A full hour of messages. This is a heavy day, choose it on purpose.';
   }
-  function txt(n){return {u:n===1?'message':'messages',t:(n*MIN)+' min',d:clock(BASE+n*MIN),s:sent(n)};}
-  var g=R.querySelector('#mx1g'), dg=R.querySelector('#mx1dg');
 
-  // phone, eight detents
-  var st=R.querySelector('#mx1st');
-  STOPS.forEach(function(v,i){var e=document.createElement('i');e.textContent=v;st.appendChild(e);});
-  var rail=R.querySelector('#mx1rail');
-  STOPS.forEach(function(v,i){var e=document.createElement('div');e.className='notch';e.style.left=(i/(STOPS.length-1)*100)+'%';rail.appendChild(e);});
-  var pi=4;
-  function drawPhone(){
-    var n=STOPS[pi], o=txt(n), p=pi/(STOPS.length-1)*100;
-    R.querySelector('#mx1n').textContent=n; R.querySelector('#mx1u').textContent=o.u;
-    R.querySelector('#mx1s').textContent=o.s; R.querySelector('#mx1t').textContent=o.t;
-    R.querySelector('#mx1d').textContent=o.d;
-    R.querySelector('#mx1f').style.width=p+'%'; R.querySelector('#mx1k').style.left=p+'%';
-    st.querySelectorAll('i').forEach(function(e,i){e.className=i===pi?'on':'';});
-    g.style.opacity=(0.035+n/20*0.045).toFixed(3);
-  }
-  var hit=R.querySelector('#mx1hit'), drag=false;
-  function set(x){var r=rail.getBoundingClientRect(),rel=(x-r.left)/r.width;
-    var i=Math.max(0,Math.min(STOPS.length-1,Math.round(rel*(STOPS.length-1))));
-    if(i!==pi){pi=i;drawPhone();}}
-  hit.addEventListener('pointerdown',function(e){drag=true;hit.setPointerCapture(e.pointerId);set(e.clientX);});
-  hit.addEventListener('pointermove',function(e){if(drag)set(e.clientX);});
-  hit.addEventListener('pointerup',function(){drag=false;});
-  hit.addEventListener('pointercancel',function(){drag=false;});
-  drawPhone();
+  function rig(o){
+    var set=THREE, n=8, fine=false;
+    var stops=R.querySelector(o.stops), fticks=R.querySelector(o.fticks),
+        rail=R.querySelector(o.rail), hit=R.querySelector(o.hit), grid=R.querySelector(o.grid);
+    var notches=[];
 
-  // desktop, twenty ticks with a hover preview
-  var dtk=R.querySelector('#mx1dtk'), dhit=R.querySelector('#mx1dhit'), dn=8;
-  for(var v=1;v<=20;v++){var e=document.createElement('i');e.textContent=v;e.style.left=((v-1)/19*100)+'%';dtk.appendChild(e);}
-  function drawDesk(){
-    var o=txt(dn), p=(dn-1)/19*100;
-    R.querySelector('#mx1dn').textContent=dn; R.querySelector('#mx1ds').textContent=o.s;
-    R.querySelector('#mx1dt').textContent=o.t; R.querySelector('#mx1dd').textContent=o.d;
-    R.querySelector('#mx1df').style.width=p+'%'; R.querySelector('#mx1dk').style.left=p+'%';
-    dtk.querySelectorAll('i').forEach(function(e,i){e.className=(i+1)===dn?'on':'';});
-    dg.style.opacity=(0.035+dn/20*0.045).toFixed(3);
+    function idx(){var b=0;for(var i=1;i<set.length;i++) if(Math.abs(set[i]-n)<Math.abs(set[b]-n)) b=i; return b;}
+    function pct(){return idx()/(set.length-1)*100;}
+
+    function buildNotches(){
+      notches.forEach(function(e){e.remove();}); notches=[];
+      set.forEach(function(v,i){
+        var e=document.createElement('div'); e.className='notch'+(fine?' sm':'');
+        e.style.left=(i/(set.length-1)*100)+'%'; rail.appendChild(e); notches.push(e);
+      });
+    }
+    function buildStops(){
+      stops.innerHTML='';
+      THREE.forEach(function(v,i){
+        var e=document.createElement('div'); e.className=o.stopCls;
+        e.innerHTML='<i>'+ROLE[i]+'</i><b>'+v+' '+unit(v)+'</b>';
+        e.addEventListener('click',function(){ n=v; paint(true); });
+        stops.appendChild(e);
+      });
+      fticks.innerHTML='';
+      [1,5,10,15,20].forEach(function(v){var e=document.createElement('i');e.textContent=v;e.setAttribute('data-v',v);fticks.appendChild(e);});
+    }
+
+    function paint(anim){
+      var mins=n*MIN, p=pct();
+      R.querySelector(o.n).textContent=n;
+      R.querySelector(o.u).textContent=unit(n);
+      R.querySelector(o.s).textContent=sent(n);
+      R.querySelector(o.t).textContent=hm(mins);
+      R.querySelector(o.d).textContent=clock(BASE+mins);
+      R.querySelector(o.f).style.width=p+'%';
+      R.querySelector(o.k).style.left=p+'%';
+      R.querySelector(o.cta).textContent='Start '+n+' '+unit(n);
+      hit.setAttribute('aria-valuenow',n);
+      stops.querySelectorAll('.'+o.stopCls).forEach(function(e,i){
+        e.className=o.stopCls+(!fine&&THREE[i]===n?' on':'');
+      });
+      stops.style.display=fine?'none':'flex';
+      fticks.className=o.fticksCls+(fine?' show':'');
+      fticks.querySelectorAll('i').forEach(function(e){e.className=(+e.getAttribute('data-v')===n)?'on':'';});
+      grid.style.opacity=(0.034+n/20*0.05).toFixed(3);
+    }
+
+    function setFrom(x){
+      var r=rail.getBoundingClientRect(), rel=(x-r.left)/r.width;
+      var i=Math.max(0,Math.min(set.length-1,Math.round(rel*(set.length-1))));
+      if(set[i]!==n){ n=set[i]; paint(); }
+    }
+    var drag=false;
+    hit.addEventListener('pointerdown',function(e){drag=true;hit.classList.add('drag');hit.setPointerCapture(e.pointerId);setFrom(e.clientX);});
+    hit.addEventListener('pointermove',function(e){if(drag)setFrom(e.clientX);});
+    function end(){drag=false;hit.classList.remove('drag');paint();}
+    hit.addEventListener('pointerup',end); hit.addEventListener('pointercancel',end);
+    hit.addEventListener('keydown',function(e){
+      var i=idx(), d=(e.key==='ArrowRight'||e.key==='ArrowUp')?1:((e.key==='ArrowLeft'||e.key==='ArrowDown')?-1:0);
+      if(!d) return; e.preventDefault();
+      i=Math.max(0,Math.min(set.length-1,i+d)); n=set[i]; paint();
+    });
+
+    var more=R.querySelector(o.more);
+    more.addEventListener('click',function(){
+      fine=!fine; set=fine?FINE:THREE;
+      if(!fine){ var b=THREE[0]; THREE.forEach(function(v){if(Math.abs(v-n)<Math.abs(b-n))b=v;}); n=b; }
+      more.textContent=fine?'three sizes':'more sizes';
+      more.classList.toggle('on',fine);
+      buildNotches(); paint();
+    });
+
+    buildStops(); buildNotches(); paint();
+    return {get n(){return n;}, set n(v){n=v;paint();}, get set(){return set;}, paint:paint};
   }
-  function val(x){var r=dhit.getBoundingClientRect();return Math.max(1,Math.min(20,Math.round((x-r.left)/r.width*19)+1));}
-  dhit.addEventListener('mousemove',function(e){
-    var n=val(e.clientX), o=txt(n);
-    R.querySelector('#mx1dp').style.left=((n-1)/19*100)+'%';
-    R.querySelector('#mx1gh').textContent=n===dn?'':(n+' '+o.u+', '+o.t+', done by '+o.d);
+
+  var phone=rig({stops:'#mx1st',fticks:'#mx1ft',rail:'#mx1rail',hit:'#mx1hit',grid:'#mx1g',
+    n:'#mx1n',u:'#mx1u',s:'#mx1s',t:'#mx1t',d:'#mx1d',f:'#mx1f',k:'#mx1k',cta:'#mx1cta',more:'#mx1more',
+    stopCls:'stop',fticksCls:'fticks'});
+
+  var deskRail=R.querySelector('#mx1dhit');
+  var desk=rig({stops:'#mx1dst',fticks:'#mx1dft',rail:'#mx1dhit .rail',hit:'#mx1dhit',grid:'#mx1dg',
+    n:'#mx1dn',u:'#mx1du',s:'#mx1ds',t:'#mx1dt',d:'#mx1dd',f:'#mx1df',k:'#mx1dk',cta:'#mx1dcta',more:'#mx1dmore',
+    stopCls:'dstop',fticksCls:'dfticks'});
+
+  // cursor translation: the rail prices a size in ghost text before you commit to it
+  var gh=R.querySelector('#mx1gh'), rest=gh.textContent;
+  var dpre=R.querySelector('#mx1dp');
+  deskRail.addEventListener('mousemove',function(e){
+    var s=desk.set, r=deskRail.getBoundingClientRect();
+    var i=Math.max(0,Math.min(s.length-1,Math.round((e.clientX-r.left)/r.width*(s.length-1))));
+    dpre.style.left=(i/(s.length-1)*100)+'%';
+    var v=s[i];
+    gh.textContent = v===desk.n ? 'you are here' : (v+' '+unit(v)+', '+hm(v*MIN)+', done by '+clock(BASE+v*MIN));
   });
-  dhit.addEventListener('mouseleave',function(){R.querySelector('#mx1gh').textContent='';});
-  dhit.addEventListener('click',function(e){dn=val(e.clientX);drawDesk();R.querySelector('#mx1gh').textContent='';});
-  drawDesk();
+  deskRail.addEventListener('mouseleave',function(){gh.textContent=rest;});
+
+  [['#mx1cta','#mx1n'],['#mx1dcta','#mx1dn']].forEach(function(p){
+    R.querySelector(p[0]).addEventListener('click',function(){
+      var b=this; var was=b.textContent; b.textContent='Started'; setTimeout(function(){b.textContent=was;},900);
+    });
+  });
 })();</script>
 </section>

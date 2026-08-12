@@ -1,46 +1,85 @@
-<!-- archetypes: mx-6 vertical pressure column | mx-7 centered arc dial | mx-8 stacked sentence cards | mx-9 giant elastic numeral | mx-10 keys over timeline -->
+<!-- ARCHETYPES, the surviving set: mx-1 notched rail | mx-2 growing time block | mx-3 drag the task card |
+     mx-5 tappable ladder | mx-6 vertical pressure column | mx-7 segmented arc dial | mx-8 three sentence cards |
+     mx-9 giant elastic numeral | mx-10 keys over timeline | mx-11 five sentence cards, the deliberate counter-example -->
 <section class="cell" data-k="mx-8">
 <style>
-[data-k="mx-8"] .p8{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;padding:26px 18px 20px}
-[data-k="mx-8"] .day{font-size:12px;color:var(--text-lo);margin:0 0 4px}
-[data-k="mx-8"] .ask{font-size:19px;font-weight:700;letter-spacing:-.015em;margin:0 0 14px}
-[data-k="mx-8"] .stack{flex:1;display:flex;flex-direction:column;gap:10px}
-[data-k="mx-8"] .opt{position:relative;flex:1;border-radius:14px;padding:16px 16px 14px;cursor:pointer;overflow:hidden;
-  background:rgba(19,22,27,.92);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);box-shadow:inset 0 1px 0 rgba(var(--ink),.05);
-  transition:flex .28s cubic-bezier(.2,.7,.3,1),background .2s;display:flex;flex-direction:column;
-  font-variant-numeric:tabular-nums}
-[data-k="mx-8"] .opt .bars{display:flex;gap:3px;align-items:flex-end;height:12px;margin-bottom:9px}
-[data-k="mx-8"] .opt .bars i{width:4px;border-radius:1px;background:rgba(var(--ink),.16);display:block}
-[data-k="mx-8"] .opt .bars i.f{background:rgba(var(--ink),.85)}
-[data-k="mx-8"] .opt .s{margin:0;letter-spacing:-.015em;color:var(--text-hi);line-height:1.28}
-[data-k="mx-8"] .opt.a .s{font-size:15px;font-weight:400}
-[data-k="mx-8"] .opt.b .s{font-size:15px;font-weight:500}
-[data-k="mx-8"] .opt.c .s{font-size:15px;font-weight:700}
-[data-k="mx-8"] .opt .why{margin:0;font-size:0;opacity:0;color:var(--text-mid);line-height:1.45;
-  transition:opacity .2s .06s,font-size .2s}
-[data-k="mx-8"] .opt .cost{margin-top:auto;padding-top:14px;font-size:12.5px;color:var(--text-mid)}
-[data-k="mx-8"] .opt.on{flex:2.3;background:rgba(30,34,41,.96);box-shadow:inset 0 1px 0 rgba(var(--ink),.10)}
-[data-k="mx-8"] .opt.on .s{font-size:22px}
-[data-k="mx-8"] .opt.on .why{font-size:13px;opacity:1;margin-top:12px}
-[data-k="mx-8"] .opt .edge{position:absolute;left:0;top:16px;bottom:16px;width:3px;border-radius:0 3px 3px 0;
-  background:rgba(var(--ink),.10)}
-[data-k="mx-8"] .opt.on .edge{background:#3fd94e;opacity:.9}
-[data-k="mx-8"] .lockline{margin:14px 2px 0;font-size:12.5px;color:var(--text-mid);font-variant-numeric:tabular-nums}
+[data-k="mx-8"] .p8{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;padding:24px 16px 18px;overflow:hidden}
+[data-k="mx-8"] .day{font-size:12px;color:var(--text-lo);margin:0;font-variant-numeric:tabular-nums}
+[data-k="mx-8"] .ask{font-size:21px;font-weight:700;letter-spacing:-.02em;margin:4px 0 13px}
+[data-k="mx-8"] .stack{flex:1;display:flex;flex-direction:column;gap:9px;min-height:0}
+[data-k="mx-8"] .opt{position:relative;flex:1;border-radius:14px;padding:13px 14px 12px 17px;cursor:pointer;overflow:hidden;
+  background:rgba(19,22,27,.92);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.05);display:flex;flex-direction:column;min-height:0;
+  font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent;
+  transition:flex .3s cubic-bezier(.16,.9,.3,1),background .2s,box-shadow .2s}
+[data-k="mx-8"] .opt .edge{position:absolute;left:0;top:12px;bottom:12px;width:3px;border-radius:0 3px 3px 0;
+  background:rgba(var(--ink),.12);transition:background .2s,top .3s,bottom .3s}
+[data-k="mx-8"] .opt .hd{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex:none}
+[data-k="mx-8"] .opt .nm{font-size:13.5px;font-weight:500;color:rgba(var(--ink),.52);transition:color .2s,font-size .2s}
+[data-k="mx-8"] .opt .pr{font-size:12.5px;color:rgba(var(--ink),.50);white-space:nowrap;transition:color .2s}
+[data-k="mx-8"] .opt .s{flex:none;margin:7px 0 0;font-size:14.5px;font-weight:400;line-height:1.32;letter-spacing:-.01em;
+  color:rgba(var(--ink),.88);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  transition:font-size .26s cubic-bezier(.16,.9,.3,1)}
+[data-k="mx-8"] .opt .why{flex:none;margin:0;font-size:0;opacity:0;color:var(--text-mid);line-height:1.46;
+  transition:opacity .2s .05s,font-size .22s,margin .22s}
+[data-k="mx-8"] .opt .meter{flex:none;display:flex;gap:3px;align-items:flex-end;height:11px;margin-top:auto;padding-top:10px}
+[data-k="mx-8"] .opt .meter i{width:16px;border-radius:1px;background:rgba(var(--ink),.14);display:block}
+[data-k="mx-8"] .opt .meter i.f{background:rgba(var(--ink),.80)}
+[data-k="mx-8"] .opt.on{flex:2.4;background:rgba(31,35,43,.96);box-shadow:inset 0 1px 0 rgba(var(--ink),.11)}
+[data-k="mx-8"] .opt.on .edge{background:#3fd94e}
+[data-k="mx-8"] .opt.on .nm{color:var(--text-hi);font-weight:700}
+[data-k="mx-8"] .opt.on .pr{color:var(--text-mid)}
+[data-k="mx-8"] .opt.on .s{font-size:19.5px;font-weight:500;color:var(--text-hi);-webkit-line-clamp:4}
+[data-k="mx-8"] .opt.on .why{font-size:12.5px;opacity:1;margin-top:9px}
+[data-k="mx-8"] .lockline{margin:12px 2px 0;font-size:12.5px;color:var(--text-mid);font-variant-numeric:tabular-nums;
+  line-height:1.4}
+[data-k="mx-8"] .cta{display:block;width:100%;border:0;border-radius:14px;background:rgba(235,238,248,.94);color:#0b0c10;
+  font-family:inherit;font-weight:700;font-size:15.5px;padding:15px 16px;margin:10px 0 0;cursor:pointer;
+  font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent}
+[data-k="mx-8"] .cta:active{background:rgba(235,238,248,.84)}
+[data-k="mx-8"] .quiet{display:block;width:100%;border:0;border-radius:12px;font-family:inherit;font-size:13px;
+  color:var(--text-mid);padding:11px 14px;margin:8px 0 0;cursor:pointer;background:rgba(22,25,31,.92);
+  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);box-shadow:inset 0 1px 0 rgba(var(--ink),.08);
+  -webkit-tap-highlight-color:transparent}
+[data-k="mx-8"] .quiet:hover{background:rgba(30,34,42,.94)}
 
-[data-k="mx-8"] .d8{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;padding:26px 28px 20px}
-[data-k="mx-8"] .d8 .lockline{margin:12px 2px 0}
-[data-k="mx-8"] .d8 .cols{flex:1;display:flex;gap:14px;margin-top:16px}
-[data-k="mx-8"] .d8 .opt{flex:1;padding:20px}
+[data-k="mx-8"] .sheet{position:absolute;left:0;right:0;bottom:0;z-index:6;padding:18px;border-radius:18px 18px 0 0;
+  background:rgba(20,23,29,.97);-webkit-backdrop-filter:blur(28px) saturate(1.4);backdrop-filter:blur(28px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.10),0 -22px 50px rgba(0,0,0,.55);
+  transform:translateY(101%);transition:transform .28s cubic-bezier(.16,.9,.3,1)}
+[data-k="mx-8"] .sheet.on{transform:none}
+[data-k="mx-8"] .sheet h5{margin:0 0 3px;font-size:15.5px;font-weight:700}
+[data-k="mx-8"] .sheet p{margin:0;font-size:12.5px;color:var(--text-mid);line-height:1.45;font-variant-numeric:tabular-nums}
+[data-k="mx-8"] .fine{display:flex;align-items:center;gap:10px;margin:14px 0 6px}
+[data-k="mx-8"] .fine button{flex:none;width:56px;height:52px;border:0;border-radius:12px;background:rgba(30,34,41,.95);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09);color:var(--text-hi);font-size:22px;font-family:inherit;cursor:pointer}
+[data-k="mx-8"] .fine button:active{background:rgba(44,49,58,.97)}
+[data-k="mx-8"] .fine .fv{flex:1;height:52px;border-radius:12px;background:rgba(14,16,20,.9);display:flex;align-items:center;
+  justify-content:center;gap:7px;box-shadow:inset 0 1px 0 rgba(var(--ink),.05)}
+[data-k="mx-8"] .fine .fv b{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums}
+[data-k="mx-8"] .fine .fv span{font-size:13px;color:var(--text-mid)}
+
+[data-k="mx-8"] .d8{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;padding:24px 26px 20px}
+[data-k="mx-8"] .d8 .ask{font-size:24px;margin-bottom:0}
+[data-k="mx-8"] .d8 .cols{flex:1;display:flex;gap:12px;margin:16px 0 0;min-height:0}
+[data-k="mx-8"] .d8 .opt{flex:1;padding:16px 18px 14px 21px}
 [data-k="mx-8"] .d8 .opt:hover{background:rgba(26,30,36,.95)}
-[data-k="mx-8"] .d8 .opt.on{flex:1.9}
-[data-k="mx-8"] .d8 .opt .s{font-size:16px}
-[data-k="mx-8"] .d8 .opt.on .s{font-size:25px}
-[data-k="mx-8"] .d8 .opt .why{font-size:13px;opacity:1;margin-top:12px}
-[data-k="mx-8"] .d8 .opt.on .why{font-size:14px}
-[data-k="mx-8"] .d8 .opt .cost{font-size:12.5px}
+[data-k="mx-8"] .d8 .opt.on{flex:1.85}
+[data-k="mx-8"] .d8 .opt .hd{display:block}
+[data-k="mx-8"] .d8 .opt .pr{display:block;margin-top:3px}
+[data-k="mx-8"] .d8 .opt.on .hd{display:flex}
+[data-k="mx-8"] .d8 .opt.on .pr{margin-top:0}
+[data-k="mx-8"] .d8 .opt .s{font-size:15px;-webkit-line-clamp:4}
+[data-k="mx-8"] .d8 .opt.on .s{font-size:22px;-webkit-line-clamp:4}
+[data-k="mx-8"] .d8 .opt .why{font-size:12.5px;opacity:1;margin-top:9px}
+[data-k="mx-8"] .d8 .opt.on .why{font-size:13.5px}
+[data-k="mx-8"] .d8 .foot{display:flex;align-items:center;gap:12px;margin-top:16px}
+[data-k="mx-8"] .d8 .cta{width:auto;min-width:206px;margin:0}
+[data-k="mx-8"] .d8 .quiet{width:auto;margin:0;white-space:nowrap}
+[data-k="mx-8"] .d8 .lockline{margin:0 0 0 4px;flex:1}
 </style>
 <h3>Three ways to say today</h3>
-<p class="cap">No number to set at all: the intensity is written out as three real sentences of the same day, light to heavy, and you pick the one you can honestly say back. The one you choose becomes the task, word for word.</p>
+<p class="cap">No number to set at all. The three sizes are written out as three real sentences of the same day, priced honestly, and you pick the one you can say back without flinching. The sentence you choose becomes the task, word for word.</p>
 
 <div class="ph">
   <div class="grid"></div>
@@ -48,29 +87,44 @@
     <p class="day">Tuesday, day 12</p>
     <p class="ask">Which one is today?</p>
     <div class="stack">
-      <div class="opt a" data-i="0">
+      <div class="opt" data-i="0">
         <span class="edge"></span>
-        <div class="bars"><i style="height:5px" class="f"></i><i style="height:9px"></i><i style="height:12px"></i></div>
-        <p class="s">Send one message, to the client you already spoke to.</p>
-        <p class="why">Small on purpose. Nothing moves far, but the thread stays warm and tomorrow is not starting cold.</p>
-        <p class="cost">3 min</p>
+        <div class="hd"><span class="nm">A light day</span><span class="pr">2 clients, 6 min</span></div>
+        <p class="s">Message the two clients who already replied to you.</p>
+        <p class="why">Small on purpose. Nothing moves far today, but the thread stays warm and tomorrow does not start cold.</p>
+        <div class="meter"><i style="height:4px" class="f"></i><i style="height:7px"></i><i style="height:11px"></i></div>
       </div>
-      <div class="opt b on" data-i="1">
+      <div class="opt on" data-i="1">
         <span class="edge"></span>
-        <div class="bars"><i style="height:5px" class="f"></i><i style="height:9px" class="f"></i><i style="height:12px"></i></div>
-        <p class="s">Message 5 clients, two of them new.</p>
-        <p class="why">The size you can repeat. Held every weekday it puts you at $3,000 a month in about 52 days.</p>
-        <p class="cost">15 min</p>
+        <div class="hd"><span class="nm">Your usual day</span><span class="pr">5 clients, 15 min</span></div>
+        <p class="s">Message 5 clients, two of them people you have never spoken to.</p>
+        <p class="why">The size you have actually repeated. Held on weekdays it puts you at $3,000 a month in about 52 days.</p>
+        <div class="meter"><i style="height:4px" class="f"></i><i style="height:7px" class="f"></i><i style="height:11px"></i></div>
       </div>
-      <div class="opt c" data-i="2">
+      <div class="opt" data-i="2">
         <span class="edge"></span>
-        <div class="bars"><i style="height:5px" class="f"></i><i style="height:9px" class="f"></i><i style="height:12px" class="f"></i></div>
-        <p class="s">Message 20 clients and follow up on last week's 6.</p>
-        <p class="why">A heavy hour. Two weeks like this pull the target about a month closer, and you will not want it twice in a row.</p>
-        <p class="cost">1 hr</p>
+        <div class="hd"><span class="nm">A heavy day</span><span class="pr">9 clients, 27 min</span></div>
+        <p class="s">Message 9 clients and follow up on the 6 from last week.</p>
+        <p class="why">Half an hour that pulls the target three weeks closer. You will not want it two days in a row, and you do not have to.</p>
+        <div class="meter"><i style="height:4px" class="f"></i><i style="height:7px" class="f"></i><i style="height:11px" class="f"></i></div>
       </div>
     </div>
-    <p class="lockline">Today is the middle one. 5 clients, 15 min.</p>
+    <p class="lockline">Today is your usual day. 5 clients, 15 min.</p>
+    <button class="cta" type="button">Start <span class="cn">5</span> <span class="cu">clients</span></button>
+    <button class="quiet openfine" type="button">Say it in my own number</button>
+
+    <div class="sheet">
+      <h5>Your own number</h5>
+      <p>The three sentences are what Memento thinks today should be. If none of them is true, write the day yourself.</p>
+      <div class="fine">
+        <button type="button" class="fdn">&#8722;</button>
+        <div class="fv"><b class="fn">5</b><span class="funit">clients</span></div>
+        <button type="button" class="fup">+</button>
+      </div>
+      <p class="fmeta"><b>15 min</b>. $3,000 a month in <b>52 days</b>.</p>
+      <button class="cta usefine" type="button">Use this size</button>
+      <button class="quiet closefine" type="button">Back to the three sentences</button>
+    </div>
   </div>
 </div>
 
@@ -78,48 +132,72 @@
   <div class="grid"></div>
   <div class="d8">
     <p class="day">Tuesday, day 12</p>
-    <p class="ask" style="font-size:23px">Which one is today?</p>
+    <p class="ask">Which one is today?</p>
     <div class="cols">
-      <div class="opt a" data-i="0">
+      <div class="opt" data-i="0">
         <span class="edge"></span>
-        <div class="bars"><i style="height:5px" class="f"></i><i style="height:9px"></i><i style="height:12px"></i></div>
-        <p class="s">Send one message, to the client you already spoke to.</p>
-        <p class="why">Small on purpose. Nothing moves far, but the thread stays warm.</p>
-        <p class="cost">3 min</p>
+        <div class="hd"><span class="nm">A light day</span><span class="pr">2 clients, 6 min</span></div>
+        <p class="s">Message the two clients who already replied to you.</p>
+        <p class="why">Small on purpose. The thread stays warm and tomorrow does not start cold.</p>
+        <div class="meter"><i style="height:4px" class="f"></i><i style="height:7px"></i><i style="height:11px"></i></div>
       </div>
-      <div class="opt b on" data-i="1">
+      <div class="opt on" data-i="1">
         <span class="edge"></span>
-        <div class="bars"><i style="height:5px" class="f"></i><i style="height:9px" class="f"></i><i style="height:12px"></i></div>
-        <p class="s">Message 5 clients, two of them new.</p>
-        <p class="why">The size you can repeat. Held every weekday it puts you at $3,000 a month in about 52 days.</p>
-        <p class="cost">15 min</p>
+        <div class="hd"><span class="nm">Your usual day</span><span class="pr">5 clients, 15 min</span></div>
+        <p class="s">Message 5 clients, two of them people you have never spoken to.</p>
+        <p class="why">The size you have actually repeated. Held on weekdays it puts you at $3,000 a month in about 52 days.</p>
+        <div class="meter"><i style="height:4px" class="f"></i><i style="height:7px" class="f"></i><i style="height:11px"></i></div>
       </div>
-      <div class="opt c" data-i="2">
+      <div class="opt" data-i="2">
         <span class="edge"></span>
-        <div class="bars"><i style="height:5px" class="f"></i><i style="height:9px" class="f"></i><i style="height:12px" class="f"></i></div>
-        <p class="s">Message 20 clients and follow up on last week's 6.</p>
-        <p class="why">A heavy hour. Two weeks like this pull the target about a month closer.</p>
-        <p class="cost">1 hr</p>
+        <div class="hd"><span class="nm">A heavy day</span><span class="pr">9 clients, 27 min</span></div>
+        <p class="s">Message 9 clients and follow up on the 6 from last week.</p>
+        <p class="why">Half an hour that pulls the target three weeks closer. Not two days in a row.</p>
+        <div class="meter"><i style="height:4px" class="f"></i><i style="height:7px" class="f"></i><i style="height:11px" class="f"></i></div>
       </div>
     </div>
-    <p class="lockline">Today is the middle one. 5 clients, 15 min. Click another sentence to change it.</p>
+    <div class="foot">
+      <button class="cta" type="button">Start <span class="cn">5</span> <span class="cu">clients</span></button>
+      <button class="quiet dfine" type="button">Say it in my own number</button>
+      <p class="lockline">Click another sentence to change the day.</p>
+    </div>
   </div>
 </div>
 
 <script>(function(){
   var root=document.querySelector('[data-k="mx-8"]');
-  var LINE=['Today is the light one. 1 client, 3 min.',
-            'Today is the middle one. 5 clients, 15 min.',
-            'Today is the heavy one. 20 clients, 1 hr.'];
-  var TAIL=[' Tap another sentence to change it.',' Click another sentence to change it.'];
-  function pick(i){
-    Array.prototype.forEach.call(root.querySelectorAll('.opt'),function(o){ o.classList.toggle('on',+o.dataset.i===i); });
-    root.querySelector('.p8 .lockline').textContent=LINE[i]+TAIL[0];
-    root.querySelector('.d8 .lockline').textContent=LINE[i]+TAIL[1];
+  var N=[2,5,9], NM=['a light day','your usual day','a heavy day'], PR=['6 min','15 min','27 min'];
+  var i=1, fine=false, fn=5;
+  function unit(n){ return n===1?'client':'clients'; }
+  function mins(n){ var m=n*3; return m>=60 ? (m%60===0?(m/60)+' hr':Math.floor(m/60)+' hr '+(m%60)+' min') : m+' min'; }
+  function days(n){ return Math.round(260/n)+' days'; }
+
+  function paint(){
+    var n=fine?fn:N[i];
+    Array.prototype.forEach.call(root.querySelectorAll('.opt'),function(o){
+      o.classList.toggle('on',!fine&&+o.dataset.i===i); });
+    root.querySelector('.p8 .lockline').textContent = fine
+      ? 'Today is your own number. '+fn+' '+unit(fn)+', '+mins(fn)+'.'
+      : 'Today is '+NM[i]+'. '+N[i]+' '+unit(N[i])+', '+PR[i]+'.';
+    root.querySelector('.d8 .lockline').textContent = fine
+      ? 'Your own number, '+fn+' '+unit(fn)+'. Click a sentence to go back to the three.'
+      : 'Click another sentence to change the day.';
+    Array.prototype.forEach.call(root.querySelectorAll('.cn'),function(e){e.textContent=n;});
+    Array.prototype.forEach.call(root.querySelectorAll('.cu'),function(e){e.textContent=unit(n);});
+    root.querySelector('.fn').textContent=fn;
+    root.querySelector('.funit').textContent=unit(fn);
+    root.querySelector('.fmeta').innerHTML='<b>'+mins(fn)+'</b>. $3,000 a month in <b>'+days(fn)+'</b>.';
   }
   Array.prototype.forEach.call(root.querySelectorAll('.opt'),function(o){
-    o.addEventListener('click',function(){ pick(+o.dataset.i); });
+    o.addEventListener('click',function(){ fine=false; i=+o.dataset.i; paint(); });
   });
-  pick(1);
+  var sheet=root.querySelector('.sheet');
+  root.querySelector('.openfine').addEventListener('click',function(){ sheet.classList.add('on'); });
+  root.querySelector('.dfine').addEventListener('click',function(){ sheet.classList.add('on'); });
+  root.querySelector('.closefine').addEventListener('click',function(){ sheet.classList.remove('on'); fine=false; paint(); });
+  root.querySelector('.usefine').addEventListener('click',function(){ sheet.classList.remove('on'); fine=true; paint(); });
+  root.querySelector('.fup').addEventListener('click',function(){ fn=Math.min(20,fn+1); paint(); });
+  root.querySelector('.fdn').addEventListener('click',function(){ fn=Math.max(1,fn-1); paint(); });
+  paint();
 })();</script>
 </section>

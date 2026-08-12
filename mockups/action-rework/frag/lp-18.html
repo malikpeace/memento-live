@@ -1,33 +1,49 @@
-<!-- archetypes: lp-16 full-bleed horizontal corridor | lp-17 stacked ledger rows | lp-18 centered monolith numeral | lp-19 bottom-sheet hour rail | lp-20 radial week clock -->
+<!-- ARCHETYPES, the surviving set: lp-1 full-bleed statement type | lp-6 vertical descent rail | lp-7 poster ceiling number |
+     lp-8 hundred-mark field | lp-9 ruled ledger book | lp-10 receipt tape | lp-12 full-height week columns |
+     lp-15 bottom sheet first | lp-16 horizontal corridor band | lp-17 declarative sentence over account rows |
+     lp-18 centered monolith numeral -->
 <section class="cell" data-k="lp-18">
 <style>
 [data-k=lp-18] .l18{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
-  padding:36px 22px 26px;text-align:center;font-variant-numeric:tabular-nums}
-[data-k=lp-18] .l18-goal{font-size:12.5px;color:rgba(var(--ink),.80)}
-[data-k=lp-18] .l18-core{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0}
-[data-k=lp-18] .l18-n{font-size:104px;font-weight:700;letter-spacing:-.05em;line-height:.9;color:var(--text-hi)}
-[data-k=lp-18] .l18-u{margin-top:14px;font-size:16px;font-weight:500;color:var(--text-hi)}
-[data-k=lp-18] .l18-why{margin-top:12px;max-width:230px;font-size:12.5px;line-height:1.55;color:rgba(var(--ink),.90)}
+  padding:34px 20px 24px;text-align:center;font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent}
+[data-k=lp-18] .l18-goal{font-size:12.5px;line-height:1;color:rgba(var(--ink),.80)}
+
+[data-k=lp-18] .l18-core{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center}
+[data-k=lp-18] .l18-n{font-size:118px;font-weight:700;letter-spacing:-.055em;line-height:.86;color:var(--text-hi);
+  transform:translateX(-.014em);transition:transform .32s cubic-bezier(.22,.61,.36,1)}
+[data-k=lp-18] .l18-u{margin-top:20px;font-size:15px;font-weight:500;letter-spacing:.002em;color:rgba(var(--ink),.92);
+  transition:color .3s ease-out}
+[data-k=lp-18] .l18-why{margin-top:14px;max-width:224px;font-size:12.5px;line-height:1.55;color:rgba(var(--ink),.90)}
+[data-k=lp-18] .l18-owned .l18-n{transform:translateX(-.014em) scale(1.03)}
+[data-k=lp-18] .l18-owned .l18-u{color:#3fd94e}
+
 [data-k=lp-18] .l18-foot{width:100%}
-[data-k=lp-18] .l18-state{font-size:13.5px;color:var(--text-hi);margin-bottom:14px}
-[data-k=lp-18] .l18-hold{position:relative;width:100%;height:58px;border-radius:14px;overflow:hidden;
-  background:rgba(22,25,31,.95);-webkit-backdrop-filter:blur(22px) saturate(1.3);backdrop-filter:blur(22px) saturate(1.3);
+[data-k=lp-18] .l18-state{margin:0 0 13px;font-size:13px;line-height:1;color:rgba(var(--ink),.90)}
+
+[data-k=lp-18] .l18-hold{position:relative;width:100%;height:56px;border-radius:14px;overflow:hidden;
+  background:rgba(22,25,31,.92);-webkit-backdrop-filter:blur(26px) saturate(1.35);backdrop-filter:blur(26px) saturate(1.35);
   box-shadow:inset 0 1px 0 rgba(var(--ink),.09);cursor:pointer;touch-action:none;user-select:none}
-[data-k=lp-18] .l18-hold i{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(63,217,78,.2);display:block}
+[data-k=lp-18] .l18-hold i{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(63,217,78,.22);display:block}
 [data-k=lp-18] .l18-hold span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-size:14px;font-weight:500;color:var(--text-hi)}
-[data-k=lp-18] .l18-esc{margin-top:16px;width:100%;padding:12px 0;border:0;background:none;color:rgba(var(--ink),.86);
-  font:500 13px var(--font);cursor:pointer}
-[data-k=lp-18] .l18-hard{display:none;text-align:left;border-radius:14px;padding:16px;background:rgba(22,25,31,.96);
-  -webkit-backdrop-filter:blur(24px) saturate(1.3);backdrop-filter:blur(24px) saturate(1.3);box-shadow:inset 0 1px 0 rgba(var(--ink),.09)}
+  font-size:14px;font-weight:500;letter-spacing:-.005em;color:rgba(var(--ink),.94)}
+[data-k=lp-18] .l18-owned .l18-hold{background:rgba(63,217,78,.14);box-shadow:inset 0 1px 0 rgba(63,217,78,.30)}
+
+[data-k=lp-18] .l18-esc{width:100%;margin-top:9px;padding:14px 0;border:0;border-radius:14px;
+  background:rgba(22,25,31,.92);-webkit-backdrop-filter:blur(26px) saturate(1.35);backdrop-filter:blur(26px) saturate(1.35);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09);color:rgba(var(--ink),.92);font:500 14px var(--font);cursor:pointer}
+
+[data-k=lp-18] .l18-hard{display:none;text-align:left;border-radius:14px;padding:16px 16px 15px;
+  background:rgba(22,25,31,.96);-webkit-backdrop-filter:blur(28px) saturate(1.35);backdrop-filter:blur(28px) saturate(1.35);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09)}
 [data-k=lp-18] .l18.hard .l18-hard{display:block}
 [data-k=lp-18] .l18.hard .l18-state,[data-k=lp-18] .l18.hard .l18-hold,[data-k=lp-18] .l18.hard .l18-esc{display:none}
-[data-k=lp-18] .l18-hard b{display:block;font-size:16px;font-weight:700;color:var(--text-hi)}
-[data-k=lp-18] .l18-hard p{margin:8px 0 14px;font-size:12.5px;line-height:1.55;color:rgba(var(--ink),.90)}
-[data-k=lp-18] .l18-hard .go{width:100%;height:46px;border:0;border-radius:11px;background:rgba(var(--ink),.92);
-  color:#0a0b0d;font:700 14px var(--font);cursor:pointer}
-[data-k=lp-18] .l18-hard .bk{width:100%;margin-top:8px;padding:9px 0;border:0;background:none;color:rgba(var(--ink),.82);font:500 12.5px var(--font);cursor:pointer}
-[data-k=lp-18] .l18-owned .l18-n{color:#3fd94e}
+[data-k=lp-18] .l18-hard b{display:block;font-size:16px;font-weight:700;letter-spacing:-.015em;line-height:1.3;color:var(--text-hi)}
+[data-k=lp-18] .l18-hard p{margin:9px 0 15px;font-size:12.5px;line-height:1.55;color:rgba(var(--ink),.90)}
+[data-k=lp-18] .l18-hard .go{width:100%;padding:15px 0;border:0;border-radius:14px;background:rgba(235,238,248,.94);
+  color:#0b0c10;font:700 15.5px var(--font);letter-spacing:-.01em;cursor:pointer}
+[data-k=lp-18] .l18-hard .bk{width:100%;margin-top:8px;padding:13px 0;border:0;border-radius:14px;
+  background:rgba(var(--ink),.06);box-shadow:inset 0 1px 0 rgba(var(--ink),.08);
+  color:rgba(var(--ink),.90);font:500 13.5px var(--font);cursor:pointer}
 </style>
 <h3>Days owned</h3>
 <p class="cap">Binary quitting as one object on an empty canvas. The total is the whole interface, there is no dial to turn, and the hard night has its own door.</p>
@@ -39,11 +55,11 @@
     <div class="l18-core">
       <div class="l18-n">141</div>
       <div class="l18-u">days owned</div>
-      <div class="l18-why">Every day you kept, added up since 12 March. It is a total. A bad night subtracts nothing.</div>
+      <p class="l18-why">Every day you kept, added up since 12 March. It is a total. A bad night subtracts nothing.</p>
     </div>
 
     <div class="l18-foot">
-      <div class="l18-state">Today is still open.</div>
+      <p class="l18-state">Today is still open.</p>
       <div class="l18-hold"><i></i><span>Hold to own today</span></div>
       <button class="l18-esc">It is hard right now</button>
 
@@ -72,6 +88,7 @@
     c.querySelector('.l18-hard b').textContent='Sent to Dana.';
     c.querySelector('.l18-hard p').textContent='That was the whole move. Stay here until she answers, nothing else is asked of you tonight.';
     c.querySelector('.l18-hard .go').style.display='none';
+    c.querySelector('.l18-hard .bk').textContent='Back';
   });
 })();</script>
 </section>

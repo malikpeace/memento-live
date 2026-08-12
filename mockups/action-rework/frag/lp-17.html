@@ -1,106 +1,212 @@
-<!-- archetypes: lp-16 full-bleed horizontal corridor | lp-17 stacked ledger rows | lp-18 centered monolith numeral | lp-19 bottom-sheet hour rail | lp-20 radial week clock -->
+<!-- ARCHETYPES, the surviving set: lp-1 full-bleed statement type | lp-6 vertical descent rail | lp-7 poster ceiling number |
+     lp-8 hundred-mark field | lp-9 ruled ledger book | lp-10 receipt tape | lp-12 full-height week columns |
+     lp-15 bottom sheet first | lp-16 horizontal corridor band | lp-17 declarative sentence over account rows |
+     lp-18 centered monolith numeral -->
 <section class="cell" data-k="lp-17">
 <style>
-[data-k=lp-17] .l17{position:absolute;inset:0;display:flex;flex-direction:column;padding:34px 18px 24px;font-variant-numeric:tabular-nums}
-[data-k=lp-17] .l17-goal{font-size:12.5px;color:rgba(var(--ink),.80)}
-[data-k=lp-17] .l17-head{display:flex;align-items:flex-end;gap:9px;margin-top:12px}
-[data-k=lp-17] .l17-big{font-size:36px;font-weight:700;letter-spacing:-.03em;line-height:1;color:var(--text-hi)}
-[data-k=lp-17] .l17-unit{font-size:14px;color:rgba(var(--ink),.80);padding-bottom:3px}
-[data-k=lp-17] .l17-pill{margin-left:auto;padding:5px 11px;border-radius:999px;background:rgba(30,52,34,.96);
-  color:rgba(var(--ink),.97);font-size:11.5px;font-weight:500;box-shadow:inset 0 1px 0 rgba(63,217,78,.35)}
-[data-k=lp-17] .l17-line{margin-top:10px;font-size:12.5px;line-height:1.5;color:rgba(var(--ink),.90)}
-[data-k=lp-17] .l17-card{margin-top:18px;border-radius:14px;overflow:hidden;background:rgba(22,25,31,.95);
-  -webkit-backdrop-filter:blur(24px) saturate(1.35);backdrop-filter:blur(24px) saturate(1.35);box-shadow:inset 0 1px 0 rgba(var(--ink),.08)}
-[data-k=lp-17] .l17-row{display:flex;align-items:center;gap:10px;padding:0 13px;height:41px;font-size:13px;color:rgba(var(--ink),.80)}
+[data-k=lp-17] .l17{position:absolute;inset:0;display:flex;flex-direction:column;padding:32px 18px 24px;
+  font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent}
+
+[data-k=lp-17] .l17-goal{font-size:12.5px;line-height:1;color:rgba(var(--ink),.80)}
+
+[data-k=lp-17] .l17-say{margin:14px 0 0;font-size:26px;font-weight:700;letter-spacing:-.027em;line-height:1.28;
+  color:var(--text-hi)}
+[data-k=lp-17] .l17-say .tail{white-space:nowrap}
+[data-k=lp-17] .l17-tok{display:inline-flex;align-items:center;gap:6px;padding:1px 8px 3px;margin:0 1px;
+  border:0;border-radius:9px;background:rgba(var(--ink),.09);box-shadow:inset 0 1px 0 rgba(var(--ink),.10);
+  color:var(--text-hi);font:700 26px/1.05 var(--font);letter-spacing:-.027em;font-variant-numeric:tabular-nums;
+  cursor:pointer;vertical-align:baseline;transition:background .16s ease-out}
+[data-k=lp-17] .l17-tok svg{width:10px;height:10px;stroke:rgba(var(--ink),.55);stroke-width:2.4;fill:none;
+  stroke-linecap:round;stroke-linejoin:round;transition:transform .2s ease-out}
+[data-k=lp-17] .l17.editing .l17-tok{background:rgba(63,217,78,.16)}
+[data-k=lp-17] .l17.editing .l17-tok svg{transform:rotate(180deg)}
+
+[data-k=lp-17] .l17.signed .l17-edit{display:none}
+[data-k=lp-17] .l17.signed .l17-tok{background:rgba(var(--ink),.05);box-shadow:none;cursor:default;pointer-events:none}
+[data-k=lp-17] .l17.signed .l17-tok svg{display:none}
+/* THREE proposed ceilings in front. The 10 minute stepper only appears behind "more" */
+[data-k=lp-17] .l17-edit{display:none;margin-top:11px}
+[data-k=lp-17] .l17.editing .l17-edit{display:block}
+[data-k=lp-17] .l17-three{display:flex;gap:6px}
+[data-k=lp-17] .l17-three button{flex:1;min-width:0;border:0;border-radius:10px;padding:8px 4px 9px;cursor:pointer;
+  font-family:var(--font);background:rgba(22,25,31,.95);
+  -webkit-backdrop-filter:blur(24px) saturate(1.4);backdrop-filter:blur(24px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09);transition:background .16s ease-out}
+[data-k=lp-17] .l17-three button i{display:block;font-style:normal;font-size:10.5px;line-height:1;color:rgba(var(--ink),.72)}
+[data-k=lp-17] .l17-three button b{display:block;margin-top:4px;font-size:13.5px;font-weight:500;line-height:1;
+  color:rgba(var(--ink),.90);font-variant-numeric:tabular-nums}
+[data-k=lp-17] .l17-three button.on{background:rgba(30,52,34,.96);box-shadow:inset 0 1px 0 rgba(63,217,78,.34)}
+[data-k=lp-17] .l17-three button.on i{color:rgba(var(--ink),.82)}
+[data-k=lp-17] .l17-three button.on b{color:var(--text-hi);font-weight:700}
+[data-k=lp-17] .l17-three button:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
+[data-k=lp-17] .l17-fine{display:flex;align-items:center;gap:8px;margin-top:8px}
+[data-k=lp-17] .l17-fine span{margin-right:auto;font-size:12px;color:rgba(var(--ink),.82);font-variant-numeric:tabular-nums}
+[data-k=lp-17] .l17-fine button{width:38px;height:34px;border:0;border-radius:10px;display:grid;place-items:center;
+  background:rgba(22,25,31,.95);-webkit-backdrop-filter:blur(24px) saturate(1.4);backdrop-filter:blur(24px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09);cursor:pointer}
+[data-k=lp-17] .l17-fine button svg{display:block;stroke:rgba(var(--ink),.90);stroke-width:1.8;stroke-linecap:round}
+[data-k=lp-17] .l17-fine button:disabled{opacity:.38;cursor:default}
+[data-k=lp-17] .l17-more{margin-top:8px;border:0;border-radius:10px;padding:7px 15px;
+  background:rgba(22,25,31,.92);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.07);color:rgba(var(--ink),.78);font:500 12px/1 var(--font);
+  cursor:pointer;transition:color .16s ease-out}
+[data-k=lp-17] .l17-more:hover,[data-k=lp-17] .l17-more.on{color:rgba(var(--ink),.96)}
+[data-k=lp-17] .l17-edit:not(.free) .l17-fine{display:none}
+[data-k=lp-17] .l17-edit.free .l17-three{display:none}
+[data-k=lp-17] .l17-why{margin:12px 0 0;font-size:12.5px;line-height:1.5;color:rgba(var(--ink),.90);min-height:30px}
+
+[data-k=lp-17] .l17-today{margin-top:14px;border-radius:14px;padding:13px 14px 15px;background:rgba(22,25,31,.95);
+  -webkit-backdrop-filter:blur(26px) saturate(1.35);backdrop-filter:blur(26px) saturate(1.35);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09)}
+[data-k=lp-17] .l17-today .r{display:flex;align-items:baseline;gap:8px}
+[data-k=lp-17] .l17-today .u{font-size:17px;font-weight:700;letter-spacing:-.015em;color:var(--text-hi)}
+[data-k=lp-17] .l17-today .k{font-size:12px;color:rgba(var(--ink),.82)}
+[data-k=lp-17] .l17-today .lft{margin-left:auto;font-size:12.5px;font-weight:500;color:#3fd94e}
+[data-k=lp-17] .l17.over .l17-today .lft{color:rgba(var(--ink),.86)}
+[data-k=lp-17] .l17-bar{position:relative;height:8px;margin-top:12px;border-radius:999px;
+  background:rgba(var(--ink),.08);overflow:hidden}
+[data-k=lp-17] .l17-bar i{position:absolute;left:0;top:0;bottom:0;border-radius:999px;background:rgba(var(--ink),.45);
+  transition:width .22s ease-out}
+[data-k=lp-17] .l17-mark{position:absolute;top:-4px;width:2px;height:16px;border-radius:1px;background:#3fd94e;
+  transition:left .22s ease-out}
+[data-k=lp-17] .l17-scale{display:flex;margin-top:8px;font-size:10.5px;color:rgba(var(--ink),.58)}
+[data-k=lp-17] .l17-scale span:last-child{margin-left:auto}
+
+[data-k=lp-17] .l17-acc{margin-top:14px}
+[data-k=lp-17] .l17-acc h4{margin:0 0 8px;font-size:12.5px;font-weight:500;line-height:1;color:rgba(var(--ink),.82)}
+[data-k=lp-17] .l17-rows{border-radius:14px;overflow:hidden;background:rgba(22,25,31,.95);
+  -webkit-backdrop-filter:blur(24px) saturate(1.35);backdrop-filter:blur(24px) saturate(1.35);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.08)}
+[data-k=lp-17] .l17-row{display:flex;align-items:center;height:38px;padding:0 14px;font-size:12.5px;
+  color:rgba(var(--ink),.86)}
 [data-k=lp-17] .l17-row+.l17-row{box-shadow:inset 0 1px 0 rgba(var(--ink),.06)}
-[data-k=lp-17] .l17-date{width:74px;white-space:nowrap;color:rgba(var(--ink),.9)}
-[data-k=lp-17] .l17-val{font-weight:500;color:var(--text-hi)}
-[data-k=lp-17] .l17-dot{margin-left:auto;width:8px;height:8px;border-radius:3px;background:rgba(63,217,78,.75)}
-[data-k=lp-17] .l17-dot.out{background:rgba(var(--ink),.26)}
-[data-k=lp-17] .l17-open{height:auto;flex-direction:column;align-items:stretch;gap:11px;padding:13px;background:rgba(var(--ink),.05)}
-[data-k=lp-17] .l17-open .l17-date{width:auto;color:var(--text-hi);font-weight:500}
-[data-k=lp-17] .l17-act{display:flex;align-items:center}
-[data-k=lp-17] .l17-step{display:flex;align-items:center;gap:2px}
-[data-k=lp-17] .l17-step button{width:30px;height:32px;border:0;border-radius:8px;background:rgba(var(--ink),.07);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.08);color:var(--text-hi);font:500 16px var(--font);cursor:pointer}
-[data-k=lp-17] .l17-step span{min-width:50px;text-align:center;font-size:15px;font-weight:700;color:var(--text-hi);font-variant-numeric:tabular-nums}
-[data-k=lp-17] .l17-log{margin-left:auto;padding:0 18px;height:34px;border:0;border-radius:9px;background:rgba(var(--ink),.92);
-  color:#0a0b0d;font:700 12.5px var(--font);cursor:pointer}
-[data-k=lp-17] .l17-card.logged .l17-open{background:rgba(63,217,78,.09)}
-[data-k=lp-17] .l17-card.logged .l17-step,[data-k=lp-17] .l17-card.logged .l17-log{display:none}
-[data-k=lp-17] .l17-done{display:none;margin-left:auto;align-items:center;gap:9px;font-size:15px;font-weight:700;color:var(--text-hi)}
-[data-k=lp-17] .l17-card.logged .l17-done{display:flex}
-[data-k=lp-17] .l17-done i{width:8px;height:8px;border-radius:3px;background:#3fd94e;display:block}
-[data-k=lp-17] .l17-sp{flex:1;min-height:14px}
-[data-k=lp-17] .l17-hold{border-radius:14px;padding:15px 15px 16px;background:rgba(22,25,31,.95);
-  -webkit-backdrop-filter:blur(24px) saturate(1.3);backdrop-filter:blur(24px) saturate(1.3);box-shadow:inset 0 1px 0 rgba(var(--ink),.08)}
-[data-k=lp-17] .l17-hold .t{display:flex;align-items:center;gap:10px}
-[data-k=lp-17] .l17-hold .t b{font-size:15px;font-weight:700;color:var(--text-hi)}
-[data-k=lp-17] .l17-hold .t .s{margin-left:auto;display:flex;gap:2px}
-[data-k=lp-17] .l17-hold .t button{width:32px;height:30px;border:0;border-radius:8px;background:rgba(var(--ink),.07);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.08);color:var(--text-hi);font:500 15px var(--font);cursor:pointer}
-[data-k=lp-17] .l17-hold p{margin:9px 0 0;font-size:12px;line-height:1.5;color:rgba(var(--ink),.90)}
+[data-k=lp-17] .l17-row .d{width:86px;color:rgba(var(--ink),.86)}
+[data-k=lp-17] .l17-row .v{font-weight:500;color:var(--text-hi)}
+[data-k=lp-17] .l17-row .s{margin-left:auto;font-size:11.5px;color:#3fd94e}
+[data-k=lp-17] .l17-row .s.no{color:rgba(var(--ink),.55)}
+
+[data-k=lp-17] .l17-sp{flex:1;min-height:12px}
+/* the ceiling picker borrows the room from the oldest settled night, nothing overflows */
+[data-k=lp-17] .l17.editing .l17-row:last-child{display:none}
+
+[data-k=lp-17] .l17-cta{width:100%;padding:15px 0;border:0;border-radius:14px;background:rgba(235,238,248,.94);
+  color:#0b0c10;font:700 15.5px var(--font);letter-spacing:-.01em;cursor:pointer}
+[data-k=lp-17] .l17-2nd{display:none;align-items:center;justify-content:center;width:100%;margin-top:9px;padding:14px 0;border:0;border-radius:14px;
+  background:rgba(22,25,31,.92);-webkit-backdrop-filter:blur(26px) saturate(1.35);backdrop-filter:blur(26px) saturate(1.35);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09);color:rgba(var(--ink),.92);font:500 14px var(--font);cursor:pointer}
+[data-k=lp-17] .l17-held{display:none;align-items:center;gap:9px;padding:15px 0 0;font-size:13.5px;
+  color:rgba(var(--ink),.92)}
+[data-k=lp-17] .l17-held i{width:8px;height:8px;border-radius:3px;background:#3fd94e;display:block}
+[data-k=lp-17] .l17.signed .l17-cta{display:none}
+[data-k=lp-17] .l17.signed .l17-2nd,[data-k=lp-17] .l17.signed .l17-held{display:flex}
+[data-k=lp-17] .l17.closed .l17-2nd{display:none}
 </style>
 <h3>The statement</h3>
-<p class="cap">Maintenance read as a bank statement: one open row waiting for this week's number, the kept weeks stacked underneath as proof.</p>
+<p class="cap">The ceiling is not an object here, it is a sentence you say about today, and the number is a word inside it you tap to swap for one of three proposed ceilings. Underneath, the nights already settled read as a statement of account.</p>
 <div class="ph">
   <div class="grid"></div>
   <div class="l17">
-    <div class="l17-goal">Hold 180 lb</div>
-    <div class="l17-head">
-      <div class="l17-big">180.4</div><div class="l17-unit">lb</div>
-      <div class="l17-pill">inside</div>
-    </div>
-    <div class="l17-line">Today is a check day. Put the number in and the week is done.</div>
+    <div class="l17-goal">Phone screen time, since 2 June</div>
 
-    <div class="l17-card">
-      <div class="l17-row l17-open">
-        <div class="l17-date">Sun 10 Aug, today</div>
-        <div class="l17-act">
-          <div class="l17-step">
-            <button class="dn">&minus;</button><span class="v">180.4</span><button class="up">+</button>
-          </div>
-          <button class="l17-log">Log</button>
-          <div class="l17-done"><span class="dv">180.4</span><i></i></div>
-        </div>
+    <p class="l17-say">Today I stay under
+      <button class="l17-tok"><span class="tv">2h 00m</span><svg viewBox="0 0 12 12"><path d="M2 4.5L6 8.5l4-4"/></svg></button>
+      <span class="tail">on my phone.</span></p>
+
+    <div class="l17-edit">
+      <div class="l17-three" role="group" aria-label="tonight's ceiling">
+        <button data-v="90"><i>tighter</i><b>1h 30m</b></button>
+        <button class="on" data-v="120" aria-pressed="true"><i>tonight’s</i><b>2h 00m</b></button>
+        <button data-v="150"><i>easier</i><b>2h 30m</b></button>
       </div>
-      <div class="l17-row"><div class="l17-date">Sun 3 Aug</div><div class="l17-val">180.1</div><div class="l17-dot"></div></div>
-      <div class="l17-row"><div class="l17-date">Sun 27 Jul</div><div class="l17-val">181.3</div><div class="l17-dot out"></div></div>
-      <div class="l17-row"><div class="l17-date">Sun 20 Jul</div><div class="l17-val">180.6</div><div class="l17-dot"></div></div>
-      <div class="l17-row"><div class="l17-date">Sun 13 Jul</div><div class="l17-val">179.8</div><div class="l17-dot"></div></div>
-      <div class="l17-row"><div class="l17-date">Sun 6 Jul</div><div class="l17-val">180.2</div><div class="l17-dot"></div></div>
-      <div class="l17-row"><div class="l17-date">Sun 29 Jun</div><div class="l17-val">180.9</div><div class="l17-dot"></div></div>
+      <div class="l17-fine">
+        <span>Ten minutes at a time</span>
+        <button class="dn" aria-label="lower the ceiling"><svg width="13" height="13" viewBox="0 0 13 13"><path d="M2 6.5h9"/></svg></button>
+        <button class="up" aria-label="raise the ceiling"><svg width="13" height="13" viewBox="0 0 13 13"><path d="M6.5 2v9M2 6.5h9"/></svg></button>
+      </div>
+      <button class="l17-more" type="button">any ceiling</button>
+    </div>
+
+    <p class="l17-why">Under 2h on five of the last seven nights. This is the line that has actually held.</p>
+
+    <div class="l17-today">
+      <div class="r">
+        <div class="u">1h 12m</div><div class="k">used so far</div>
+        <div class="lft">48m left</div>
+      </div>
+      <div class="l17-bar"><i></i><div class="l17-mark"></div></div>
+      <div class="l17-scale"><span>0</span><span>3h 30m</span></div>
+    </div>
+
+    <div class="l17-acc">
+      <h4>Nights already settled</h4>
+      <div class="l17-rows">
+        <div class="l17-row"><div class="d">Mon 11 Aug</div><div class="v">1h 47m</div><div class="s">under</div></div>
+        <div class="l17-row"><div class="d">Sun 10 Aug</div><div class="v">2h 31m</div><div class="s no">over by 31m</div></div>
+        <div class="l17-row"><div class="d">Sat 9 Aug</div><div class="v">1h 38m</div><div class="s">under</div></div>
+        <div class="l17-row"><div class="d">Fri 8 Aug</div><div class="v">1h 52m</div><div class="s">under</div></div>
+        <div class="l17-row"><div class="d">Thu 7 Aug</div><div class="v">1h 44m</div><div class="s">under</div></div>
+      </div>
     </div>
 
     <div class="l17-sp"></div>
 
-    <div class="l17-hold">
-      <div class="t">
-        <b><span class="n">3</span> sessions a week</b>
-        <div class="s"><button class="hd">&minus;</button><button class="hu">+</button></div>
-      </div>
-      <p class="c">Three has held the number flat since March. This is the load, not the goal.</p>
-    </div>
+    <button class="l17-cta">Say it for today</button>
+    <div class="l17-held"><i></i><span class="ht">Said at 9:04am. The ceiling is 2h 00m.</span></div>
+    <button class="l17-2nd">Close the night out</button>
   </div>
 </div>
 <script>(function(){
   var c=document.currentScript.closest('.cell');
-  var v=c.querySelector('.l17-step .v'),card=c.querySelector('.l17-card'),val=180.4;
-  function paint(){v.textContent=val.toFixed(1);}
-  c.querySelector('.l17-step .up').addEventListener('click',function(){val=Math.round((val+.1)*10)/10;paint();});
-  c.querySelector('.l17-step .dn').addEventListener('click',function(){val=Math.round((val-.1)*10)/10;paint();});
-  c.querySelector('.l17-log').addEventListener('click',function(){
-    c.querySelector('.l17-done .dv').textContent=val.toFixed(1);
-    card.classList.add('logged');
-    c.querySelector('.l17-line').textContent='Week logged. Nothing else is asked of you today.';
+  var root=c.querySelector('.l17'),tok=c.querySelector('.l17-tok'),tv=c.querySelector('.l17-tok .tv'),
+      why=c.querySelector('.l17-why'),up=c.querySelector('.l17-edit .up'),dn=c.querySelector('.l17-edit .dn'),
+      bar=c.querySelector('.l17-bar i'),mark=c.querySelector('.l17-mark'),
+      lft=c.querySelector('.l17-today .lft'),held=c.querySelector('.l17-held .ht'),
+      rows=c.querySelector('.l17-rows'),cta=c.querySelector('.l17-cta'),uEl=c.querySelector('.l17-today .u'),
+      second=c.querySelector('.l17-2nd'),acc=c.querySelector('.l17-acc h4'),
+      edit=c.querySelector('.l17-edit'),three=c.querySelector('.l17-three'),more=c.querySelector('.l17-more');
+  var ceil=120,used=72,SPAN=210,signed=false,free=false,THREE=[90,120,150];
+
+  function fmt(m){var h=Math.floor(m/60),r=m%60;return h?(h+'h '+String(r).padStart(2,'0')+'m'):(r+'m');}
+  function paint(){
+    tv.textContent=fmt(ceil);uEl.textContent=fmt(used);
+    bar.style.width=Math.min(100,used/SPAN*100)+'%';
+    mark.style.left='calc('+(ceil/SPAN*100)+'% - 1px)';
+    var left=ceil-used;
+    root.classList.toggle('over',left<0);
+    lft.textContent=left>=0?fmt(left)+' left':fmt(-left)+' over';
+    why.textContent = ceil<=90 ? 'You have been under 90m twice all month. That is a cut, not a hold.'
+      : ceil<=120 ? 'Under 2h on five of the last seven nights. This is the line that has actually held.'
+      : ceil<=150 ? 'Two and a half hours sits just above your average. It will not ask much of you.'
+      : 'This is above where most of your nights already land, so it stops being a ceiling.';
+    up.disabled=ceil>=180;dn.disabled=ceil<=60;
+    Array.prototype.forEach.call(three.children,function(b){
+      var on=!free&&+b.dataset.v===ceil;
+      b.classList.toggle('on',on);
+      if(on)b.setAttribute('aria-pressed','true');else b.removeAttribute('aria-pressed');});
+    if(signed)held.textContent='Said at 9:04am. The ceiling is '+fmt(ceil)+'.';
+  }
+  tok.addEventListener('click',function(){if(signed)return;root.classList.toggle('editing');});
+  three.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;
+    ceil=+b.dataset.v;paint();});
+  more.addEventListener('click',function(){
+    free=!free;edit.classList.toggle('free',free);
+    if(!free){var b=THREE[0];THREE.forEach(function(v){if(Math.abs(v-ceil)<Math.abs(b-ceil))b=v;});ceil=b;}
+    more.textContent=free?'three ceilings':'any ceiling';
+    more.classList.toggle('on',free);paint();});
+  up.addEventListener('click',function(){ceil=Math.min(180,ceil+10);paint();});
+  dn.addEventListener('click',function(){ceil=Math.max(60,ceil-10);paint();});
+
+  cta.addEventListener('click',function(){signed=true;root.classList.add('signed');root.classList.remove('editing');paint();});
+  second.addEventListener('click',function(){
+    root.classList.add('closed');
+    var r=document.createElement('div');r.className='l17-row';
+    r.innerHTML='<div class="d">Tue 12 Aug</div><div class="v">1h 41m</div><div class="s">under</div>';
+    rows.insertBefore(r,rows.firstChild);
+    if(rows.children.length>5)rows.removeChild(rows.lastElementChild);
+    used=101;paint();
+    held.textContent='Night closed at 1h 41m. Under, six of the last eight.';
+    acc.textContent='Nights already settled';
   });
-  var n=3,nEl=c.querySelector('.l17-hold .n'),cp=c.querySelector('.l17-hold .c'),
-  notes={2:'At two the number crept up half a pound a month. It works, but you will be correcting.',
-         3:'Three has held the number flat since March. This is the load, not the goal.',
-         4:'Four buys you room for a heavy weekend without the number moving.',
-         5:'Five is training, not holding. Good if you want it, more than the goal needs.'};
-  function up(){nEl.textContent=n;cp.textContent=notes[n];}
-  c.querySelector('.l17-hold .hu').addEventListener('click',function(){if(n<5){n++;up();}});
-  c.querySelector('.l17-hold .hd').addEventListener('click',function(){if(n>2){n--;up();}});
+  paint();
 })();</script>
 </section>

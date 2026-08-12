@@ -1,89 +1,162 @@
-<!-- archetypes: lp-6 vertical descent rail | lp-7 full-bleed typography | lp-8 canvas-center radial | lp-9 stacked ledger rows | lp-10 unit field sheet -->
+<!-- ARCHETYPES, the surviving set: lp-1 full-bleed statement type | lp-6 vertical descent rail | lp-7 poster ceiling number |
+     lp-8 hundred-mark field | lp-9 ruled ledger book | lp-10 receipt tape | lp-12 full-height week columns |
+     lp-15 bottom sheet first | lp-16 horizontal corridor band | lp-17 declarative sentence over account rows |
+     lp-18 centered monolith numeral -->
 <section class="cell" data-k="lp-8">
 <style>
 [data-k=lp-8] .ph{font-variant-numeric:tabular-nums}
-[data-k=lp-8] .hd{position:absolute;left:18px;right:18px;top:22px}
+/* the field IS the grid: every mark sits in one graph-paper cell */
+[data-k=lp-8] .grid{background-position:20px 96px}
+
+[data-k=lp-8] .hd{position:absolute;left:20px;right:20px;top:20px}
 [data-k=lp-8] .hd b{display:block;font-size:17px;font-weight:700;letter-spacing:-.015em;color:rgba(var(--ink),.96)}
-[data-k=lp-8] .hd i{display:block;font-style:normal;font-size:12.5px;color:rgba(var(--ink),.9);margin-top:4px}
+[data-k=lp-8] .hd i{display:block;font-style:normal;font-size:12.5px;line-height:1.4;color:rgba(var(--ink),.90);margin-top:5px}
 
-[data-k=lp-8] .ringwrap{position:absolute;left:32px;top:90px;width:236px;height:236px}
-[data-k=lp-8] .ringwrap svg{width:236px;height:236px;display:block}
-[data-k=lp-8] .tk{fill:none;stroke-width:7;stroke-linecap:butt}
-[data-k=lp-8] .tk.dim{stroke:rgba(var(--ink),.20)}
-[data-k=lp-8] .tk.lit{stroke:rgba(var(--ink),.90)}
-[data-k=lp-8] .tk.nxt{stroke:rgba(63,217,78,.65)}
-[data-k=lp-8] .hit{fill:none;stroke:transparent;stroke-width:18;cursor:pointer}
-[data-k=lp-8] .mid{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
-[data-k=lp-8] .mid .n{font-size:34px;font-weight:700;letter-spacing:-.03em;line-height:1;color:rgba(var(--ink),.97)}
-[data-k=lp-8] .mid .of{margin-top:8px;font-size:12.5px;color:rgba(var(--ink),.9)}
-[data-k=lp-8] .mid .left{margin-top:2px;font-size:12.5px;color:rgba(var(--ink),.9)}
+/* --- one hundred marks -------------------------------------------------- */
+[data-k=lp-8] .field{position:absolute;left:20px;top:96px;width:260px;height:260px;
+  display:grid;grid-template-columns:repeat(10,26px);grid-template-rows:repeat(10,26px);
+  touch-action:none;-webkit-tap-highlight-color:transparent}
+[data-k=lp-8] .field i{width:26px;height:26px;background-repeat:no-repeat;background-position:center;
+  background-size:15px 15px;background-image:linear-gradient(rgba(var(--ink),.15),rgba(var(--ink),.15));
+  transition:background-size .22s cubic-bezier(.2,.8,.3,1),background-image .26s ease-out}
+[data-k=lp-8] .field i.lit{background-image:linear-gradient(rgba(var(--ink),.88),rgba(var(--ink),.88))}
+[data-k=lp-8] .field i.pend{cursor:pointer;background-size:9px 9px;
+  background-image:linear-gradient(rgba(63,217,78,.95),rgba(63,217,78,.95));
+  filter:drop-shadow(0 0 7px rgba(63,217,78,.40))}
+[data-k=lp-8] .field i.pend:hover{background-size:12px 12px}
+[data-k=lp-8] .field i.just{background-size:19px 19px;filter:drop-shadow(0 0 10px rgba(63,217,78,.55));
+  background-image:linear-gradient(rgba(63,217,78,.95),rgba(63,217,78,.95))}
+[data-k=lp-8] .field:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:6px;border-radius:4px}
 
-[data-k=lp-8] .card{position:absolute;left:14px;right:14px;top:340px;border-radius:15px;padding:15px;
+/* --- where that puts you ------------------------------------------------ */
+[data-k=lp-8] .read{position:absolute;left:20px;right:20px;top:372px;display:flex;align-items:baseline}
+[data-k=lp-8] .read .amt{font-size:24px;font-weight:700;letter-spacing:-.03em;color:rgba(var(--ink),.97)}
+[data-k=lp-8] .read .of{margin-left:6px;font-size:12.5px;color:rgba(var(--ink),.90)}
+[data-k=lp-8] .read .ct{margin-left:auto;font-size:12.5px;color:rgba(var(--ink),.90)}
+
+/* --- today -------------------------------------------------------------- */
+[data-k=lp-8] .card{position:absolute;left:14px;right:14px;top:404px;bottom:16px;border-radius:16px;padding:15px;
   background:rgba(22,25,31,.95);backdrop-filter:blur(26px) saturate(1.4);-webkit-backdrop-filter:blur(26px) saturate(1.4);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.07),0 18px 40px rgba(0,0,0,.5)}
-[data-k=lp-8] .card .act{margin:0;font-size:18.5px;font-weight:700;letter-spacing:-.015em;line-height:1.26;color:rgba(var(--ink),.97)}
-[data-k=lp-8] .card .note{margin:9px 0 0;font-size:12.5px;line-height:1.45;color:rgba(var(--ink),.90)}
-[data-k=lp-8] .card .gest{margin:12px 0 0;font-size:12.5px;color:rgba(var(--ink),.82)}
-
-[data-k=lp-8] .dial{position:absolute;left:14px;right:14px;bottom:18px}
-[data-k=lp-8] .dial .t{margin:0 0 8px;font-size:12px;color:rgba(var(--ink),.9)}
-[data-k=lp-8] .chips{display:flex;gap:6px}
-[data-k=lp-8] .chips button{flex:1;font:inherit;font-size:13px;font-weight:500;font-variant-numeric:tabular-nums;color:rgba(var(--ink),.80);
-  background:rgba(22,25,31,.95);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);
-  border:0;border-radius:9px;padding:9px 0;cursor:pointer;box-shadow:inset 0 1px 0 rgba(var(--ink),.08)}
-[data-k=lp-8] .chips button.on{background:rgba(var(--ink),.90);color:#08090b;box-shadow:none}
-[data-k=lp-8] .cons{margin:10px 0 0;font-size:12.5px;line-height:1.45;color:rgba(var(--ink),.90);min-height:36px}
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.07),0 18px 40px rgba(0,0,0,.5);display:flex;flex-direction:column}
+[data-k=lp-8] .card .act{margin:0;font-size:19px;font-weight:700;letter-spacing:-.02em;line-height:1.24;color:rgba(var(--ink),.97)}
+[data-k=lp-8] .card .sub{margin:8px 0 0;font-size:12.5px;line-height:1.4;color:rgba(var(--ink),.90)}
+[data-k=lp-8] .chips{display:flex;gap:6px;margin:14px 0 0}
+[data-k=lp-8] .chips button{flex:1;border:0;border-radius:10px;padding:8px 0 9px;cursor:pointer;font:inherit;
+  background:rgba(var(--ink),.06);box-shadow:inset 0 1px 0 rgba(var(--ink),.06);-webkit-tap-highlight-color:transparent;
+  transition:background .16s ease-out,transform .1s ease-out}
+[data-k=lp-8] .chips button:active{transform:translateY(1px)}
+[data-k=lp-8] .chips button em{display:block;font-style:normal;font-size:13px;font-weight:700;
+  font-variant-numeric:tabular-nums;color:rgba(var(--ink),.92)}
+[data-k=lp-8] .chips button u{display:block;text-decoration:none;font-size:10.5px;margin-top:3px;color:rgba(var(--ink),.72)}
+[data-k=lp-8] .chips button.on{background:rgba(var(--ink),.17)}
+[data-k=lp-8] .chips button.on em{color:rgba(var(--ink),.98)}
+[data-k=lp-8] .chips button.on u{color:rgba(var(--ink),.90)}
+[data-k=lp-8] .chips button:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
+[data-k=lp-8] .cons{margin:11px 0 0;font-size:12px;line-height:1.4;color:rgba(var(--ink),.90)}
+[data-k=lp-8] .fill{margin-top:auto;width:100%;height:50px;border:0;border-radius:14px;cursor:pointer;
+  background:rgba(235,238,248,.94);color:#0b0c10;font:700 15.5px/1 var(--font);font-variant-numeric:tabular-nums;
+  -webkit-tap-highlight-color:transparent;transition:background .26s ease-out,color .26s ease-out,transform .1s ease-out}
+[data-k=lp-8] .fill:active{transform:translateY(1px)}
+[data-k=lp-8] .fill:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
+[data-k=lp-8] .fill.done{background:rgba(63,217,78,.16);color:rgba(var(--ink),.96);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.08);cursor:default}
+[data-k=lp-8] .ph.logged .chips{pointer-events:none}
+[data-k=lp-8] .ph.logged .chips button{background:rgba(var(--ink),.05)}
+[data-k=lp-8] .ph.logged .chips button.on{background:rgba(var(--ink),.15)}
+@media (prefers-reduced-motion:reduce){[data-k=lp-8] *{transition:none!important}}
 </style>
-<h3>One hundred marks</h3><p class="cap">A milestone cut into 100 equal marks around a ring, where intensity is how many marks tonight lights and the gesture is lighting them.</p>
+<h3>One hundred marks</h3><p class="cap">The milestone cut into one hundred marks, one per cell of the graph paper, so the goal is literally drawn on the grid: tonight's marks are the small green ones and the gesture is wiping them full.</p>
 <div class="ph">
   <div class="grid"></div>
   <div class="hd"><b>Save $5,000</b><i>One hundred marks. Each one is $50.</i></div>
 
-  <div class="ringwrap">
-    <svg viewBox="0 0 100 100" aria-hidden="true">
-      <defs>
-        <mask id="lp8f"><circle cx="50" cy="50" r="41" fill="none" stroke="#fff" stroke-width="14" pathLength="100" stroke-dasharray="37 63" transform="rotate(-90 50 50)"/></mask>
-        <mask id="lp8n"><circle cx="50" cy="50" r="41" fill="none" stroke="#fff" stroke-width="14" pathLength="100" stroke-dasharray="0 37 4 59" transform="rotate(-90 50 50)"/></mask>
-      </defs>
-      <circle class="tk dim" cx="50" cy="50" r="41" pathLength="100" stroke-dasharray="0.4 0.6" transform="rotate(-90 50 50)"/>
-      <circle class="tk lit" cx="50" cy="50" r="41" pathLength="100" stroke-dasharray="0.4 0.6" transform="rotate(-90 50 50)" mask="url(#lp8f)"/>
-      <circle class="tk nxt" cx="50" cy="50" r="41" pathLength="100" stroke-dasharray="0.4 0.6" transform="rotate(-90 50 50)" mask="url(#lp8n)"/>
-      <circle class="hit" cx="50" cy="50" r="41" pathLength="100" stroke-dasharray="0 37 4 59" transform="rotate(-90 50 50)"/>
-    </svg>
-    <div class="mid">
-      <div class="n">$1,850</div>
-      <div class="of">of $5,000</div>
-      <div class="left">37 marks lit</div>
-    </div>
+  <div class="field" tabindex="0" role="button" aria-label="wipe across tonight's marks to fill them">
+    <i class="lit"></i><i class="lit"></i><i class="lit"></i><i class="lit"></i><i class="lit"></i><i class="lit"></i><i class="lit"></i><i class="lit"></i><i class="lit"></i><i class="lit"></i>
+    <i class="lit"></i><i class="lit"></i><i class="lit"></i><i class="lit"></i><i class="lit"></i><i class="lit"></i><i class="lit"></i><i class="lit"></i><i class="lit"></i><i class="lit"></i>
+    <i class="lit"></i><i class="lit"></i><i class="lit"></i><i class="lit"></i><i class="lit"></i><i class="lit"></i><i class="lit"></i><i class="lit"></i><i class="lit"></i><i class="lit"></i>
+    <i class="lit"></i><i class="lit"></i><i class="lit"></i><i class="lit"></i><i class="lit"></i><i class="lit"></i><i class="lit"></i><i class="pend"></i><i class="pend"></i><i class="pend"></i>
+    <i class="pend"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+    <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+    <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+    <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+    <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+    <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+  </div>
+
+  <div class="read">
+    <span class="amt">$1,850</span><span class="of">of $5,000</span><span class="ct">37 of 100</span>
   </div>
 
   <div class="card">
-    <p class="act">Move $200 into savings before tonight.</p>
-    <p class="note">Friday is the transfer day. Nothing else on the list counts as the move.</p>
-    <p class="gest">Tap the dim marks on the ring to light them.</p>
-  </div>
-
-  <div class="dial">
-    <p class="t">This week's size</p>
-    <div class="chips">
-      <button data-n="2" data-c="Two marks a week. $5,000 arrives around March.">$100</button>
-      <button class="on" data-n="4" data-c="Four marks a week. $5,000 arrives in early December.">$200</button>
-      <button data-n="7" data-c="Seven marks a week. $5,000 arrives by mid October.">$350</button>
+    <p class="act">Move $200 into savings.</p>
+    <p class="sub">Friday is the transfer day.</p>
+    <div class="chips" role="group" aria-label="tonight's transfer">
+      <button type="button" data-n="2"><em>$100</em><u>2 marks</u></button>
+      <button type="button" class="on" data-n="4" aria-pressed="true"><em>$200</em><u>4 marks</u></button>
+      <button type="button" data-n="7"><em>$350</em><u>7 marks</u></button>
     </div>
-    <p class="cons">Four marks a week. $5,000 arrives in early December.</p>
+    <p class="cons">Last mark lights in early December.</p>
+    <button type="button" class="fill">Fill 4 marks</button>
   </div>
 </div>
 <script>(function(){var r=document.querySelector('[data-k="lp-8"]');if(!r)return;
-var lit=37,step=4,n=r.querySelector('.mid .n'),lc=r.querySelector('.mid .left'),
-    mf=r.querySelector('#lp8f circle'),mn=r.querySelector('#lp8n circle'),hit=r.querySelector('.hit'),cons=r.querySelector('.cons');
-function paint(){mf.setAttribute('stroke-dasharray',lit+' '+(100-lit));
-  var pat='0 '+lit+' '+step+' '+(100-lit-step);
-  mn.setAttribute('stroke-dasharray',pat);hit.setAttribute('stroke-dasharray',pat);
-  n.textContent='$'+(lit*50).toLocaleString('en-US');lc.textContent=lit+' marks lit';}
+var ph=r.querySelector('.ph'),field=r.querySelector('.field'),cells=[].slice.call(field.children),
+    amt=r.querySelector('.read .amt'),ct=r.querySelector('.read .ct'),cons=r.querySelector('.cons'),
+    act=r.querySelector('.act'),btn=r.querySelector('.fill'),
+    BASE=37,step=4,filled=0,logged=false;
+var COPY={2:'Last mark lights in March.',
+          4:'Last mark lights in early December.',
+          7:'Last mark lights by mid October.'};
+function lit(){return BASE+filled}
+function left(){return step-filled}
+function paint(){
+  cells.forEach(function(c,i){
+    c.classList.toggle('lit',i<lit());
+    c.classList.toggle('pend',!logged&&i>=lit()&&i<BASE+step);
+  });
+  amt.textContent='$'+(lit()*50).toLocaleString('en-US');
+  ct.textContent=lit()+' of 100';
+  btn.textContent=logged?'Logged. '+lit()+' of 100 marks'
+    :'Fill '+left()+(left()===1?' mark':' marks');
+}
+function done(){
+  logged=true;btn.classList.add('done');ph.classList.add('logged');
+  act.textContent='$'+(step*50)+' moved into savings.';
+  paint();
+}
+function light(upTo){
+  if(logged)return;
+  var from=lit(),to=Math.min(BASE+step,upTo+1);
+  if(to<=from)return;
+  for(var i=from;i<to;i++){(function(c,k){
+    c.classList.remove('pend');c.classList.add('just');
+    setTimeout(function(){c.classList.add('lit');c.classList.remove('just')},170+k*55);
+  })(cells[i],i-from);}
+  filled=to-BASE;
+  amt.textContent='$'+(lit()*50).toLocaleString('en-US');
+  ct.textContent=lit()+' of 100';
+  btn.textContent=left()?'Fill '+left()+(left()===1?' mark':' marks'):'Logged. '+lit()+' of 100 marks';
+  if(!left())setTimeout(done,220+(to-from)*55);
+}
 r.querySelectorAll('.chips button').forEach(function(b){b.addEventListener('click',function(){
-  r.querySelectorAll('.chips button').forEach(function(x){x.classList.remove('on')});b.classList.add('on');
-  step=+b.dataset.n;cons.textContent=b.dataset.c;paint();});});
-hit.addEventListener('click',function(){lit=Math.min(100,lit+step);paint();
-  r.querySelector('.card .gest').textContent='Logged. The next marks are waiting.';});
+  if(logged||filled)return;
+  r.querySelectorAll('.chips button').forEach(function(x){x.classList.remove('on');x.removeAttribute('aria-pressed')});
+  b.classList.add('on');b.setAttribute('aria-pressed','true');
+  step=+b.dataset.n;cons.textContent=COPY[step];paint();});});
+
+function markAt(x,y){var el=document.elementFromPoint(x,y);
+  return el&&el.parentNode===field?cells.indexOf(el):-1;}
+var wiping=false;
+field.addEventListener('pointerdown',function(e){
+  if(logged)return;var i=markAt(e.clientX,e.clientY);
+  if(i<lit()||i>=BASE+step)return;
+  wiping=true;field.setPointerCapture(e.pointerId);light(i);});
+field.addEventListener('pointermove',function(e){
+  if(!wiping||logged)return;var i=markAt(e.clientX,e.clientY);
+  if(i>=lit()&&i<BASE+step)light(i);});
+['pointerup','pointercancel'].forEach(function(ev){field.addEventListener(ev,function(){wiping=false})});
+btn.addEventListener('click',function(){light(BASE+step-1)});
+field.addEventListener('keydown',function(e){
+  if(e.key==='Enter'||e.key===' '){e.preventDefault();light(BASE+step-1);}});
 paint();})();</script>
 </section>

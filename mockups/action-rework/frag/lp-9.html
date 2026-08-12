@@ -1,79 +1,133 @@
-<!-- archetypes: lp-6 vertical descent rail | lp-7 full-bleed typography | lp-8 canvas-center radial | lp-9 stacked ledger rows | lp-10 unit field sheet -->
+<!-- ARCHETYPES, the surviving set: lp-1 full-bleed statement type | lp-6 vertical descent rail | lp-7 poster ceiling number |
+     lp-8 hundred-mark field | lp-9 ruled ledger book | lp-10 receipt tape | lp-12 full-height week columns |
+     lp-15 bottom sheet first | lp-16 horizontal corridor band | lp-17 declarative sentence over account rows |
+     lp-18 centered monolith numeral -->
 <section class="cell" data-k="lp-9">
 <style>
 [data-k=lp-9] .ph{font-variant-numeric:tabular-nums}
-[data-k=lp-9] .w{position:absolute;inset:0;padding:22px 16px 16px}
-[data-k=lp-9] .big{margin:0;font-size:25px;font-weight:700;letter-spacing:-.025em;color:rgba(var(--ink),.97)}
-[data-k=lp-9] .sub{margin:6px 0 0;font-size:12.5px;line-height:1.45;color:rgba(var(--ink),.90)}
-[data-k=lp-9] .bar{margin:12px 0 0;height:3px;border-radius:3px;background:rgba(var(--ink),.10);overflow:hidden}
-[data-k=lp-9] .bar i{display:block;height:100%;width:50%;border-radius:3px;background:rgba(var(--ink),.55)}
 
-[data-k=lp-9] .today{margin:16px 0 0;border-radius:14px;padding:14px;
-  background:rgba(22,25,31,.95);backdrop-filter:blur(26px) saturate(1.4);-webkit-backdrop-filter:blur(26px) saturate(1.4);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.07),0 16px 34px rgba(0,0,0,.48)}
-[data-k=lp-9] .today .top{display:flex;justify-content:space-between;font-size:11.5px;color:rgba(var(--ink),.9);margin-bottom:8px}
-[data-k=lp-9] .today .act{margin:0;font-size:17px;font-weight:700;letter-spacing:-.012em;line-height:1.28;color:rgba(var(--ink),.97);min-height:42px}
-[data-k=lp-9] .today .chips{display:flex;gap:6px;margin:12px 0 0}
-[data-k=lp-9] .today .chips button{flex:1;font:inherit;font-size:12.5px;font-weight:500;color:rgba(var(--ink),.80);background:rgba(var(--ink),.06);
-  border:0;border-radius:9px;padding:8px 0;cursor:pointer;box-shadow:inset 0 1px 0 rgba(var(--ink),.05)}
-[data-k=lp-9] .today .chips button.on{background:rgba(var(--ink),.16);color:rgba(var(--ink),.97)}
-[data-k=lp-9] .today .cons{margin:10px 0 0;font-size:12px;line-height:1.45;color:rgba(var(--ink),.90);min-height:34px}
-[data-k=lp-9] .write{display:flex;align-items:center;justify-content:space-between;width:100%;margin:4px 0 0;font:inherit;cursor:pointer;
-  font-size:14px;font-weight:500;color:rgba(var(--ink),.95);background:rgba(var(--ink),.10);border:0;border-radius:11px;padding:13px 14px;
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.08)}
-[data-k=lp-9] .write em{font-style:normal;font-variant-numeric:tabular-nums;color:rgba(var(--ink),.9)}
-[data-k=lp-9] .write.done em{color:rgba(var(--ink),.95)}
+/* header */
+[data-k=lp-9] .hd{position:absolute;left:16px;right:16px;top:20px}
+[data-k=lp-9] .big{margin:0;font-size:26px;font-weight:700;letter-spacing:-.03em;line-height:1.05;color:rgba(var(--ink),.97)}
+[data-k=lp-9] .sub{margin:7px 0 0;font-size:12.5px;line-height:1.45;color:rgba(var(--ink),.90)}
+[data-k=lp-9] .bar{margin:11px 0 0;height:3px;border-radius:2px;background:rgba(var(--ink),.10);overflow:hidden}
+[data-k=lp-9] .bar i{display:block;height:100%;width:49.9%;border-radius:2px;background:rgba(var(--ink),.58);
+  transition:width .5s cubic-bezier(.2,.7,.3,1)}
 
-[data-k=lp-9] .colh,[data-k=lp-9] .row{display:grid;grid-template-columns:54px 1fr 58px 58px;align-items:center;gap:4px}
-[data-k=lp-9] .colh{margin:14px 0 6px;padding:0 10px;font-size:10.5px;color:rgba(var(--ink),.64)}
-[data-k=lp-9] .colh span:not(:first-child),[data-k=lp-9] .row span:not(:first-child){text-align:right}
-[data-k=lp-9] .row{margin-bottom:3px;padding:8px 10px;border-radius:8px;background:rgba(20,23,29,.94);
-  backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.05)}
-[data-k=lp-9] .row .d{font-size:12px;color:rgba(var(--ink),.9)}
-[data-k=lp-9] .row .v{font-size:15px;font-weight:700;color:rgba(var(--ink),.94)}
-[data-k=lp-9] .row .c{font-size:12.5px;color:rgba(var(--ink),.80)}
-[data-k=lp-9] .row .a{font-size:12.5px;color:rgba(var(--ink),.86)}
-[data-k=lp-9] .foot{margin:12px 0 0;font-size:12.5px;line-height:1.45;color:rgba(var(--ink),.90)}
+/* the book */
+[data-k=lp-9] .book{position:absolute;left:12px;right:12px;top:120px;bottom:14px;display:flex;flex-direction:column;
+  padding:12px 12px 13px;border-radius:14px;background:rgba(22,25,31,.955);
+  -webkit-backdrop-filter:blur(30px) saturate(1.4);backdrop-filter:blur(30px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.075),0 20px 40px rgba(0,0,0,.52)}
+/* the column the goal is actually read from */
+[data-k=lp-9] .lane{position:absolute;right:8px;top:8px;bottom:62px;width:70px;border-radius:9px;
+  background:rgba(var(--ink),.055);pointer-events:none}
+
+[data-k=lp-9] .rw{display:grid;grid-template-columns:1fr 54px 50px 62px;align-items:center;gap:4px;position:relative}
+[data-k=lp-9] .rw>span:not(:first-child){text-align:right}
+[data-k=lp-9] .colh{padding:0 0 8px;font-size:10.5px;color:rgba(var(--ink),.62)}
+[data-k=lp-9] .colh span:last-child{color:rgba(var(--ink),.88)}
+
+/* today, opened inside the book */
+[data-k=lp-9] .live{position:relative;padding:11px 0 13px 12px;
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.07),inset 0 -1px 0 rgba(var(--ink),.07)}
+[data-k=lp-9] .live:before{content:"";position:absolute;left:0;top:10px;bottom:11px;width:3px;border-radius:2px;background:#3fd94e}
+[data-k=lp-9] .live .rw{grid-template-columns:1fr 54px 50px 62px}
+[data-k=lp-9] .live .day{font-size:12.5px;font-weight:500;color:rgba(var(--ink),.97)}
+[data-k=lp-9] .live .lv{font-size:13px;font-weight:700;color:rgba(var(--ink),.97)}
+[data-k=lp-9] .live .lc{font-size:12.5px;color:rgba(var(--ink),.86)}
+[data-k=lp-9] .live .la{font-size:13px;font-weight:700;color:rgba(var(--ink),.94)}
+[data-k=lp-9] .act{margin:9px 0 0;font-size:17px;font-weight:700;line-height:1.3;letter-spacing:-.015em;
+  color:rgba(var(--ink),.97);min-height:44px}
+[data-k=lp-9] .seg{display:flex;gap:3px;margin:11px 0 0;padding:3px;border-radius:11px;background:rgba(var(--ink),.055)}
+[data-k=lp-9] .seg button{flex:1;font:500 12.5px var(--font);color:rgba(var(--ink),.80);background:transparent;border:0;
+  border-radius:8px;padding:8px 0;cursor:pointer}
+[data-k=lp-9] .seg button.on{background:rgba(var(--ink),.13);color:rgba(var(--ink),.97);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.10)}
+[data-k=lp-9] .seg.lock button{cursor:default}
+[data-k=lp-9] .cons{margin:10px 0 0;font-size:12px;line-height:1.45;color:rgba(var(--ink),.90);min-height:35px}
+[data-k=lp-9] .cta{width:100%;margin:11px 0 0;padding:15px 14px;border:0;border-radius:14px;
+  font:700 15.5px var(--font);letter-spacing:-.01em;font-variant-numeric:tabular-nums;
+  color:#0b0c10;background:rgba(235,238,248,.94);cursor:pointer}
+[data-k=lp-9] .cta:active{background:rgba(235,238,248,.82)}
+[data-k=lp-9] .wrote{width:100%;margin:11px 0 0;padding:14px;border:0;border-radius:14px;display:none;
+  align-items:center;justify-content:center;gap:8px;font:500 14px var(--font);font-variant-numeric:tabular-nums;
+  color:rgba(var(--ink),.95);background:rgba(22,25,31,.92);
+  -webkit-backdrop-filter:blur(24px) saturate(1.4);backdrop-filter:blur(24px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09)}
+[data-k=lp-9] .wrote svg{width:13px;height:13px;fill:none;stroke:#3fd94e;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+[data-k=lp-9] .done .cta{display:none}
+[data-k=lp-9] .done .wrote{display:flex}
+
+/* printed rows */
+[data-k=lp-9] .past{margin-top:2px}
+[data-k=lp-9] .past .rw{padding:9px 0 9px 12px;box-shadow:inset 0 -1px 0 rgba(var(--ink),.055)}
+[data-k=lp-9] .past .rw:last-child{box-shadow:none}
+[data-k=lp-9] .past .d{font-size:12.5px;color:rgba(var(--ink),.90)}
+[data-k=lp-9] .past .v{font-size:13px;font-weight:700;color:rgba(var(--ink),.93)}
+[data-k=lp-9] .past .c{font-size:12.5px;color:rgba(var(--ink),.80)}
+[data-k=lp-9] .past .c.up{color:rgba(var(--ink),.92)}
+[data-k=lp-9] .past .a{font-size:13px;font-weight:500;color:rgba(var(--ink),.93)}
+[data-k=lp-9] .foot{margin:auto 0 0;padding-top:12px;font-size:12px;line-height:1.45;color:rgba(var(--ink),.90)}
 </style>
-<h3>The weight book</h3><p class="cap">Today's action lives inside today's ledger row, and a day that went up is written down plainly beside the average that did not.</p>
+<h3>The weight book</h3><p class="cap">A ruled ledger where today is not a card above the book but the one row still open inside it, written straight into the column the goal is read from.</p>
 <div class="ph">
   <div class="grid"></div>
-  <div class="w">
-    <p class="big">22.1 lb to go</p>
-    <p class="sub">242.1 average. Down 21.9 since May, target 220.</p>
-    <div class="bar"><i></i></div>
+  <div class="hd">
+    <p class="big" id="l9big">22.1 lb to go</p>
+    <p class="sub" id="l9sub">242.1 average. Down 21.9 since May, target 220.</p>
+    <div class="bar"><i id="l9bi"></i></div>
+  </div>
 
-    <div class="today">
-      <div class="top"><span>Tuesday, today</span><span>not written yet</span></div>
-      <p class="act">40 minutes walking. No bread with dinner.</p>
-      <div class="chips">
-        <button data-a="20 minutes walking." data-c="Holds the average where it is. A fine day to hold." >Light</button>
-        <button class="on" data-a="40 minutes walking. No bread with dinner." data-c="The average keeps sliding about half a pound a week.">Steady</button>
+  <div class="book" id="l9book">
+    <div class="lane"></div>
+
+    <div class="rw colh"><span>day</span><span>weight</span><span>change</span><span>7 day</span></div>
+
+    <div class="live">
+      <div class="rw">
+        <span class="day">Today</span>
+        <span class="lv" id="l9lv">&mdash;</span>
+        <span class="lc" id="l9lc">&mdash;</span>
+        <span class="la" id="l9la">242.1</span>
+      </div>
+      <p class="act" id="l9act">40 minutes walking. No bread with dinner.</p>
+      <div class="seg" id="l9seg">
+        <button data-a="20 minutes walking." data-c="Holds the average where it is. Some days that is the work.">Light</button>
+        <button class="on" data-a="40 minutes walking. No bread with dinner." data-c="Keeps the seven day average sliding about half a pound a week.">Steady</button>
         <button data-a="60 minutes walking. No bread, no late snack." data-c="Closer to a pound a week, as long as you sleep tonight.">Hard</button>
       </div>
-      <p class="cons">The average keeps sliding about half a pound a week.</p>
-      <button class="write"><span>Tap to write today</span><em>___._ lb</em></button>
+      <p class="cons" id="l9cons">Keeps the seven day average sliding about half a pound a week.</p>
+      <button class="cta" id="l9cta">Write today</button>
+      <div class="wrote" id="l9wr"><svg viewBox="0 0 24 24"><path d="M4 13l5 5L20 7"/></svg><span>Written at 241.9 lb, down 0.3</span></div>
     </div>
 
-    <div class="colh"><span>day</span><span>weight</span><span>change</span><span>7 day</span></div>
-    <div class="row"><span class="d">Mon 10</span><span class="v">242.2</span><span class="c">-0.6</span><span class="a">242.1</span></div>
-    <div class="row"><span class="d">Sun 9</span><span class="v">242.8</span><span class="c">+0.3</span><span class="a">242.3</span></div>
-    <div class="row"><span class="d">Sat 8</span><span class="v">242.5</span><span class="c">-0.7</span><span class="a">242.4</span></div>
-    <div class="row"><span class="d">Fri 7</span><span class="v">243.2</span><span class="c">+0.2</span><span class="a">242.6</span></div>
+    <div class="past" id="l9past">
+      <div class="rw"><span class="d">Mon 10</span><span class="v">242.2</span><span class="c">-0.6</span><span class="a">242.1</span></div>
+      <div class="rw"><span class="d">Sun 9</span><span class="v">242.8</span><span class="c up">+0.3</span><span class="a">242.3</span></div>
+      <div class="rw"><span class="d">Sat 8</span><span class="v">242.5</span><span class="c">-0.7</span><span class="a">242.4</span></div>
+      <div class="rw"><span class="d">Fri 7</span><span class="v">243.2</span><span class="c up">+0.2</span><span class="a">242.6</span></div>
+      <div class="rw"><span class="d">Thu 6</span><span class="v">243.0</span><span class="c">-0.4</span><span class="a">242.8</span></div>
+    </div>
 
-    <p class="foot">Two of those days went up. The seven day column did not. That is the one the goal is read from.</p>
+    <p class="foot" id="l9foot">Two of those days went up. The seven day column did not. That is the one the goal is read from.</p>
   </div>
 </div>
 <script>(function(){var r=document.querySelector('[data-k="lp-9"]');if(!r)return;
-var act=r.querySelector('.act'),cons=r.querySelector('.cons');
-r.querySelectorAll('.chips button').forEach(function(b){b.addEventListener('click',function(){
-  r.querySelectorAll('.chips button').forEach(function(x){x.classList.remove('on')});b.classList.add('on');
-  act.textContent=b.dataset.a;cons.textContent=b.dataset.c;});});
-var w=r.querySelector('.write');w.addEventListener('click',function(){
-  if(w.classList.contains('done'))return;w.classList.add('done');
-  w.querySelector('span').textContent='Written';w.querySelector('em').textContent='241.9 lb';
-  r.querySelector('.top span:last-child').textContent='-0.3, average 242.0';
-  r.querySelector('.big').textContent='22.0 lb to go';});
+var act=r.querySelector('#l9act'),cons=r.querySelector('#l9cons'),seg=r.querySelector('#l9seg'),
+    book=r.querySelector('#l9book'),written=false;
+seg.addEventListener('click',function(e){var b=e.target.closest('button');if(!b||written)return;
+  [].forEach.call(seg.children,function(x){x.classList.toggle('on',x===b);});
+  act.textContent=b.dataset.a;cons.textContent=b.dataset.c;});
+r.querySelector('#l9cta').addEventListener('click',function(){
+  if(written)return;written=true;book.classList.add('done');seg.classList.add('lock');
+  r.querySelector('#l9lv').textContent='241.9';
+  r.querySelector('#l9lc').textContent='-0.3';
+  r.querySelector('#l9la').textContent='242.0';
+  r.querySelector('#l9big').textContent='22.0 lb to go';
+  r.querySelector('#l9sub').textContent='242.0 average. Down 22.0 since May, target 220.';
+  r.querySelector('#l9bi').style.width='50.2%';
+  cons.textContent='Tomorrow opens at midnight. The action stays the same unless you change it.';
+  r.querySelector('#l9foot').textContent='Two of the last seven days went up. The seven day column still fell 0.1 today.';});
 })();</script>
 </section>

@@ -1,148 +1,235 @@
-<!-- archetypes: mx-6 vertical pressure column | mx-7 centered arc dial | mx-8 stacked sentence cards | mx-9 giant elastic numeral | mx-10 keys over timeline -->
+<!-- ARCHETYPES, the surviving set: mx-1 notched rail | mx-2 growing time block | mx-3 drag the task card |
+     mx-5 tappable ladder | mx-6 vertical pressure column | mx-7 segmented arc dial | mx-8 three sentence cards |
+     mx-9 giant elastic numeral | mx-10 keys over timeline | mx-11 five sentence cards, the deliberate counter-example -->
 <section class="cell" data-k="mx-7">
 <style>
-[data-k="mx-7"] .p7{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;align-items:center;padding:30px 20px 24px}
-[data-k="mx-7"] .day{font-size:12px;color:var(--text-lo);margin:0;align-self:flex-start}
-[data-k="mx-7"] .mid{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center}
-[data-k="mx-7"] .dial{position:relative;touch-action:none;user-select:none;cursor:grab}
+[data-k="mx-7"] .p7{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;padding:24px 18px 18px;overflow:hidden}
+[data-k="mx-7"] .day{font-size:12px;color:var(--text-lo);margin:0;font-variant-numeric:tabular-nums}
+[data-k="mx-7"] .verb{font-size:19px;font-weight:500;letter-spacing:-.015em;margin:3px 0 0}
+[data-k="mx-7"] .mid{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:0}
+[data-k="mx-7"] .dial{position:relative;touch-action:none;user-select:none;cursor:grab;-webkit-tap-highlight-color:transparent}
 [data-k="mx-7"] .dial:active{cursor:grabbing}
-[data-k="mx-7"] .dial svg{display:block}
-[data-k="mx-7"] .dial .track{fill:none;stroke:rgba(var(--ink),.10);stroke-linecap:round}
-[data-k="mx-7"] .dial .prog{fill:none;stroke:rgba(var(--ink),.90);stroke-linecap:round;transition:stroke-dasharray .16s cubic-bezier(.2,.7,.3,1)}
-[data-k="mx-7"] .dial .ghost{fill:none;stroke:rgba(var(--ink),.50);stroke-linecap:round}
-[data-k="mx-7"] .dial .det{stroke:rgba(var(--ink),.22)}
-[data-k="mx-7"] .dial .det.on{stroke:rgba(var(--ink),.55)}
-[data-k="mx-7"] .dial .lab{fill:rgba(var(--ink),.45);font-size:11px;font-family:var(--font);font-variant-numeric:tabular-nums}
-[data-k="mx-7"] .dial .lab.on{fill:rgba(var(--ink),.95);font-weight:700}
-[data-k="mx-7"] .dial .knob{fill:rgb(var(--ink));transition:cx .16s cubic-bezier(.2,.7,.3,1),cy .16s cubic-bezier(.2,.7,.3,1)}
-[data-k="mx-7"] .hub{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
-[data-k="mx-7"] .hub .n{font-size:62px;font-weight:700;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
-[data-k="mx-7"] .hub .u{font-size:13.5px;color:var(--text-mid);margin-top:6px}
-[data-k="mx-7"] .verb{font-size:19px;font-weight:500;letter-spacing:-.01em;margin:16px 0 0}
-[data-k="mx-7"] .dots{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;max-width:210px;margin:16px 0 0;min-height:34px}
-[data-k="mx-7"] .dots i{width:11px;height:11px;border-radius:3px;background:rgba(var(--ink),.9);display:block}
-[data-k="mx-7"] .foot{margin-top:auto;width:100%;border-radius:14px;padding:13px 16px;background:rgba(22,25,31,.94);
-  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);box-shadow:inset 0 1px 0 rgba(var(--ink),.08);font-variant-numeric:tabular-nums}
+[data-k="mx-7"] .dial svg{display:block;overflow:visible}
+[data-k="mx-7"] .seg{fill:none;stroke:rgba(var(--ink),.11);stroke-linecap:round;transition:stroke .18s}
+[data-k="mx-7"] .seg.on{stroke:rgba(var(--ink),.88)}
+[data-k="mx-7"] .fseg{fill:none;stroke:rgba(var(--ink),.10);stroke-linecap:butt;transition:stroke .16s}
+[data-k="mx-7"] .fseg.on{stroke:rgba(var(--ink),.80)}
+[data-k="mx-7"] .knob{fill:rgb(var(--ink));transition:cx .22s cubic-bezier(.16,.9,.3,1),cy .22s cubic-bezier(.16,.9,.3,1)}
+[data-k="mx-7"] .knobring{fill:none;stroke:rgba(var(--ink),.20);stroke-width:1;
+  transition:cx .22s cubic-bezier(.16,.9,.3,1),cy .22s cubic-bezier(.16,.9,.3,1)}
+[data-k="mx-7"] .lab{fill:rgba(var(--ink),.40);font-size:11.5px;font-family:var(--font);font-variant-numeric:tabular-nums;
+  transition:fill .18s}
+[data-k="mx-7"] .lab.on{fill:rgba(var(--ink),.96);font-weight:700}
+[data-k="mx-7"] .hub{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  pointer-events:none;text-align:center}
+[data-k="mx-7"] .hub .n{font-size:66px;font-weight:700;letter-spacing:-.045em;line-height:1;font-variant-numeric:tabular-nums;
+  transition:transform .2s cubic-bezier(.16,.9,.3,1)}
+[data-k="mx-7"] .hub.pop .n{transform:scale(1.06)}
+[data-k="mx-7"] .hub .u{font-size:13.5px;color:var(--text-mid);margin-top:5px}
+[data-k="mx-7"] .hub .nm{font-size:12.5px;color:var(--text-mid);margin-top:11px;padding:4px 11px;border-radius:999px;
+  background:rgba(var(--ink),.08)}
+[data-k="mx-7"] .yest{font-size:12.5px;color:var(--text-mid);margin:16px 0 0;font-variant-numeric:tabular-nums}
+[data-k="mx-7"] .foot{width:100%;border-radius:14px;padding:11px 14px;margin-top:12px;background:rgba(22,25,31,.94);
+  -webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);box-shadow:inset 0 1px 0 rgba(var(--ink),.08);
+  font-variant-numeric:tabular-nums}
 [data-k="mx-7"] .foot .fr{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0}
 [data-k="mx-7"] .foot span{font-size:12.5px;color:var(--text-mid)}
-[data-k="mx-7"] .foot b{font-size:16px;font-weight:700}
-[data-k="mx-7"] .hint{font-size:12.5px;color:var(--text-mid);margin:14px 0 0}
+[data-k="mx-7"] .foot b{font-size:15.5px;font-weight:700}
+[data-k="mx-7"] .cta{display:block;width:100%;border:0;border-radius:14px;background:rgba(235,238,248,.94);color:#0b0c10;
+  font-family:inherit;font-weight:700;font-size:15.5px;padding:15px 16px;margin:10px 0 0;cursor:pointer;
+  font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent}
+[data-k="mx-7"] .cta:active{background:rgba(235,238,248,.84)}
+[data-k="mx-7"] .quiet{display:block;width:100%;border:0;border-radius:12px;font-family:inherit;font-size:13px;
+  color:var(--text-mid);padding:11px 14px;margin:8px 0 0;cursor:pointer;background:rgba(22,25,31,.92);
+  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);box-shadow:inset 0 1px 0 rgba(var(--ink),.08);
+  -webkit-tap-highlight-color:transparent}
+[data-k="mx-7"] .quiet:hover{background:rgba(30,34,42,.94)}
 
-[data-k="mx-7"] .d7{position:relative;z-index:1;height:100%;display:flex;align-items:center;gap:38px;padding:0 44px}
-[data-k="mx-7"] .d7 .hub .n{font-size:70px}
-[data-k="mx-7"] .d7 .right{flex:1}
-[data-k="mx-7"] .d7 .say{font-size:34px;font-weight:500;letter-spacing:-.025em;line-height:1.15;margin:0;
+[data-k="mx-7"] .d7{position:relative;z-index:1;height:100%;display:flex;align-items:center;gap:40px;padding:0 40px}
+[data-k="mx-7"] .d7 .hub .n{font-size:74px}
+[data-k="mx-7"] .right{flex:1;min-width:0}
+[data-k="mx-7"] .say{font-size:33px;font-weight:500;letter-spacing:-.025em;line-height:1.14;margin:0;
   font-variant-numeric:tabular-nums}
-[data-k="mx-7"] .d7 .say b{font-weight:700}
-[data-k="mx-7"] .d7 .then{font-size:15px;color:var(--text-mid);margin:14px 0 0;line-height:1.5;
+[data-k="mx-7"] .say b{font-weight:700}
+[data-k="mx-7"] .then{font-size:14.5px;color:var(--text-mid);margin:13px 0 0;line-height:1.5;max-width:40ch;
   font-variant-numeric:tabular-nums}
-[data-k="mx-7"] .d7 .dots{justify-content:flex-start;max-width:330px;margin:20px 0 0}
-[data-k="mx-7"] .d7 .was{font-size:13px;color:var(--text-mid);margin:20px 0 0;line-height:1.45;
-  font-variant-numeric:tabular-nums}
+[data-k="mx-7"] .then b{color:var(--text-hi);font-weight:700}
+[data-k="mx-7"] .three{display:flex;gap:8px;margin:18px 0 0}
+[data-k="mx-7"] .three div{flex:1;border-radius:11px;padding:10px 11px;background:rgba(19,22,27,.92);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.05);cursor:pointer;transition:background .18s;font-variant-numeric:tabular-nums}
+[data-k="mx-7"] .three div:hover{background:rgba(27,31,38,.94)}
+[data-k="mx-7"] .three div.on{background:rgba(32,36,44,.96);box-shadow:inset 0 1px 0 rgba(var(--ink),.10)}
+[data-k="mx-7"] .three .tn{display:block;font-size:13px;color:rgba(var(--ink),.46);transition:color .18s}
+[data-k="mx-7"] .three .tv{display:block;font-size:12.5px;color:rgba(var(--ink),.42);margin-top:3px;transition:color .18s}
+[data-k="mx-7"] .three div.on .tn{color:var(--text-hi);font-weight:700}
+[data-k="mx-7"] .three div.on .tv{color:var(--text-mid)}
+[data-k="mx-7"] .drow{display:flex;flex-direction:column;align-items:stretch;gap:9px;margin:18px 0 0}
+[data-k="mx-7"] .d7 .cta{width:100%;margin:0;white-space:nowrap;padding:13px 16px}
+[data-k="mx-7"] .d7 .quiet{width:100%;margin:0;white-space:nowrap;padding:10px 14px}
+[data-k="mx-7"] .tip{font-size:12.5px;color:var(--text-mid);margin:14px 0 0;font-variant-numeric:tabular-nums}
 </style>
 <h3>The dial</h3>
-<p class="cap">One continuous turn instead of a list of options: your thumb sweeps the arc and today grows in your hand, with a thin inner arc holding yesterday's setting so you always see whether you just turned the day up or down.</p>
+<p class="cap">One turn of the thumb, but the ring is built from the three sizes rather than a free sweep: each arc segment is a whole day, so the dial can only rest somewhere real. Ask for fine and the ring subdivides into every number between them.</p>
 
 <div class="ph">
   <div class="grid"></div>
   <div class="p7">
     <p class="day">Tuesday, day 12</p>
+    <p class="verb">Message clients</p>
     <div class="mid">
-      <div class="dial" data-r="86" data-size="252"><div class="hub"><div class="n">5</div><div class="u">clients</div></div></div>
-      <p class="verb">Message them today</p>
-      <div class="dots"></div>
-      <p class="hint">The inner arc is yesterday, which was 3</p>
+      <div class="dial" data-r="88" data-size="246">
+        <div class="hub"><div class="n">5</div><div class="u">clients</div><div class="nm">Your usual day</div></div>
+      </div>
+      <p class="yest">Yesterday you turned it to 3</p>
     </div>
     <div class="foot">
       <div class="fr"><span>Takes about</span><b class="t">15 min</b></div>
-      <div class="fr"><span>Target reached in</span><b class="d">52 days</b></div>
+      <div class="fr"><span>$3,000 a month in</span><b class="d">52 days</b></div>
     </div>
+    <button class="cta" type="button">Start <span class="n">5</span> <span class="uw">clients</span></button>
+    <button class="quiet tog" type="button">Turn between every number</button>
   </div>
 </div>
 
 <div class="desk">
   <div class="grid"></div>
   <div class="d7">
-    <div class="dial" data-r="100" data-size="286"><div class="hub"><div class="n">5</div><div class="u">clients</div></div></div>
+    <div class="dial" data-r="104" data-size="290">
+      <div class="hub"><div class="n">5</div><div class="u">clients</div><div class="nm">Your usual day</div></div>
+    </div>
     <div class="right">
-      <p class="say">Message <b class="n">5</b> clients today</p>
-      <p class="then">About <b class="t">15 min</b> of your morning. At this size you reach $3,000 a month in <b class="d">52 days</b>.</p>
-      <div class="dots"></div>
-      <p class="was">Drag anywhere on the ring. The thin inner arc is yesterday, which was 3.</p>
+      <p class="say">Message <b class="n">5</b> <span class="uw">clients</span> today</p>
+      <p class="then">About <b class="t">15 min</b> of the morning. Held on weekdays, $3,000 a month arrives in <b class="d">52 days</b>.</p>
+      <div class="three">
+        <div data-i="0"><span class="tn">A light day</span><span class="tv">2, 6 min</span></div>
+        <div data-i="1"><span class="tn">Your usual day</span><span class="tv">5, 15 min</span></div>
+        <div data-i="2"><span class="tn">A heavy day</span><span class="tv">9, 27 min</span></div>
+      </div>
+      <div class="drow">
+        <button class="cta" type="button">Start <span class="n">5</span> <span class="uw">clients</span></button>
+        <button class="quiet tog" type="button">Turn between every number</button>
+      </div>
+      <p class="tip">Drag the ring, or roll the wheel over it. It settles on a segment, never between two.</p>
     </div>
   </div>
 </div>
 
 <script>(function(){
   var root=document.querySelector('[data-k="mx-7"]');
-  var N=[1,3,5,10,20], T=['3 min','9 min','15 min','30 min','1 hr'], D=[120,70,52,34,22];
-  var STEPS=[0,.25,.5,.75,1], YEST=.25, t=.5;
-  var NS='http://www.w3.org/2000/svg';
+  var TIER=[{n:2,nm:'A light day'},{n:5,nm:'Your usual day'},{n:9,nm:'A heavy day'}];
+  var NS='http://www.w3.org/2000/svg', A0=140, SWEEP=260;
+  var fine=false, i=1, fn=5;
 
-  function pt(cx,cy,r,tv){ var a=(135+tv*270)*Math.PI/180; return [cx+r*Math.cos(a),cy+r*Math.sin(a)]; }
+  function mins(n){ var m=n*3; return m>=60 ? (m%60===0?(m/60)+' hr':Math.floor(m/60)+' hr '+(m%60)+' min') : m+' min'; }
+  function days(n){ return Math.round(260/n)+' days'; }
+  function unit(n){ return n===1?'client':'clients'; }
+  function curN(){ return fine?fn:TIER[i].n; }
+  function curNm(){ if(!fine) return TIER[i].nm;
+    return fn<=3?'Lighter than usual':(fn<=7?'Around your usual':'Heavier than usual'); }
+  function pos(){ return fine ? (fn-1)/19 : i/2; }
+  function pt(c,r,u){ var a=(A0+u*SWEEP)*Math.PI/180; return [c+r*Math.cos(a),c+r*Math.sin(a)]; }
+  function pol(c,r,a){ a=a*Math.PI/180; return [c+r*Math.cos(a),c+r*Math.sin(a)]; }
+  function arc(c,r,a1,a2){
+    var p=pol(c,r,a1), q=pol(c,r,a2);
+    return 'M'+p[0].toFixed(2)+' '+p[1].toFixed(2)+' A'+r+' '+r+' 0 '+((a2-a1)>180?1:0)+' 1 '+q[0].toFixed(2)+' '+q[1].toFixed(2);
+  }
 
   var dials=[];
   Array.prototype.forEach.call(root.querySelectorAll('.dial'),function(d){
-    var r=+d.dataset.r, s=+d.dataset.size, c=s/2, C=2*Math.PI*r, arc=C*.75;
-    var svg=document.createElementNS(NS,'svg'); svg.setAttribute('width',s); svg.setAttribute('height',s);
-    svg.setAttribute('viewBox','0 0 '+s+' '+s);
-    function circ(cls,w,rr){ var e=document.createElementNS(NS,'circle');
-      e.setAttribute('class',cls); e.setAttribute('cx',c); e.setAttribute('cy',c); e.setAttribute('r',rr||r);
-      e.setAttribute('stroke-width',w); e.setAttribute('transform','rotate(135 '+c+' '+c+')'); svg.appendChild(e); return e; }
-    var track=circ('track',9); track.style.strokeDasharray=arc+'px '+C+'px';
-    var gr=r-19, gC=2*Math.PI*gr;
-    var ghost=circ('ghost',2.5,gr); ghost.style.strokeDasharray=(gC*.75*YEST)+'px '+gC+'px';
-    var prog=circ('prog',9);
-    var knob=document.createElementNS(NS,'circle'); knob.setAttribute('class','knob'); knob.setAttribute('r',7);
-    var dets=[], labs=[];
-    STEPS.forEach(function(sv,i){
-      var a=pt(c,c,r+9,sv), b=pt(c,c,r+15,sv), l=pt(c,c,r+27,sv);
-      var ln=document.createElementNS(NS,'line'); ln.setAttribute('class','det');
-      ln.setAttribute('x1',a[0]);ln.setAttribute('y1',a[1]);ln.setAttribute('x2',b[0]);ln.setAttribute('y2',b[1]);
-      ln.setAttribute('stroke-width',1.5); svg.appendChild(ln); dets.push(ln);
-      var tx=document.createElementNS(NS,'text'); tx.setAttribute('class','lab');
-      tx.setAttribute('x',l[0]); tx.setAttribute('y',l[1]+4); tx.setAttribute('text-anchor','middle');
-      tx.textContent=N[i]; svg.appendChild(tx); labs.push(tx);
-    });
-    svg.appendChild(knob);
-    d.insertBefore(svg,d.firstChild);
-    dials.push({d:d,c:c,r:r,C:C,arc:arc,prog:prog,knob:knob,dets:dets,labs:labs,svg:svg});
+    var r=+d.dataset.r, s=+d.dataset.size, c=s/2;
+    var svg=document.createElementNS(NS,'svg');
+    svg.setAttribute('width',s); svg.setAttribute('height',s); svg.setAttribute('viewBox','0 0 '+s+' '+s);
 
-    function move(e){
+    var segs=[], gap=5;
+    for(var k=0;k<3;k++){
+      var a1=A0+k*(SWEEP/3)+gap/2, a2=A0+(k+1)*(SWEEP/3)-gap/2;
+      var p=document.createElementNS(NS,'path'); p.setAttribute('class','seg');
+      p.setAttribute('d',arc(c,r,a1,a2)); p.setAttribute('stroke-width',9); svg.appendChild(p); segs.push(p);
+    }
+    var fsegs=[], fg=1.1, step=SWEEP/20;
+    for(var j=0;j<20;j++){
+      var b1=A0+j*step+fg, b2=A0+(j+1)*step-fg;
+      var q=document.createElementNS(NS,'path'); q.setAttribute('class','fseg');
+      q.setAttribute('d',arc(c,r,b1,b2)); q.setAttribute('stroke-width',9);
+      q.style.display='none'; svg.appendChild(q); fsegs.push(q);
+    }
+    var labs=[];
+    [0,.5,1].forEach(function(u,k){
+      var l=pt(c,r+25,u);
+      var t=document.createElementNS(NS,'text'); t.setAttribute('class','lab');
+      t.setAttribute('x',l[0]); t.setAttribute('y',l[1]+4); t.setAttribute('text-anchor','middle');
+      t.textContent=TIER[k].n; svg.appendChild(t); labs.push(t);
+    });
+    var ring=document.createElementNS(NS,'circle'); ring.setAttribute('class','knobring'); ring.setAttribute('r',13);
+    var knob=document.createElementNS(NS,'circle'); knob.setAttribute('class','knob'); knob.setAttribute('r',7.5);
+    svg.appendChild(ring); svg.appendChild(knob);
+    d.insertBefore(svg,d.firstChild);
+    dials.push({d:d,c:c,r:r,segs:segs,fsegs:fsegs,labs:labs,knob:knob,ring:ring,svg:svg});
+
+    function at(e){
       var b=svg.getBoundingClientRect();
       var x=e.clientX-b.left-c, y=e.clientY-b.top-c;
       var ang=Math.atan2(y,x)*180/Math.PI; if(ang<0) ang+=360;
-      var rel=(ang-135+360)%360;
-      if(rel>270) rel = rel>315 ? 0 : 270;
-      var raw=rel/270, best=STEPS[0];
-      STEPS.forEach(function(sv){ if(Math.abs(sv-raw)<Math.abs(best-raw)) best=sv; });
-      if(best!==t){ t=best; paint(); }
+      var rel=(ang-A0+360)%360;
+      if(rel>SWEEP) rel = rel>(SWEEP+(360-SWEEP)/2) ? 0 : SWEEP;
+      var u=rel/SWEEP;
+      if(fine){ var v=Math.round(1+u*19); if(v!==fn){ fn=v; paint(true); } }
+      else { var k=Math.round(u*2); if(k!==i){ i=k; paint(true); } }
     }
     var dragging=false;
-    d.addEventListener('pointerdown',function(e){e.preventDefault();dragging=true;
-      try{d.setPointerCapture(e.pointerId);}catch(err){} move(e);});
-    d.addEventListener('pointermove',function(e){ if(dragging) move(e); });
+    d.addEventListener('pointerdown',function(e){ e.preventDefault(); dragging=true;
+      try{d.setPointerCapture(e.pointerId);}catch(err){} at(e); });
+    d.addEventListener('pointermove',function(e){ if(dragging) at(e); });
     d.addEventListener('pointerup',function(){dragging=false;});
     d.addEventListener('pointercancel',function(){dragging=false;});
+    var acc=0;
+    d.addEventListener('wheel',function(e){ e.preventDefault(); acc+=e.deltaY;
+      while(acc<=-45){ acc+=45; bump(1); }
+      while(acc>=45){ acc-=45; bump(-1); }
+    },{passive:false});
   });
 
-  function paint(){
-    var i=STEPS.indexOf(t), n=N[i];
-    dials.forEach(function(g){
-      g.prog.style.strokeDasharray=(g.arc*t)+'px '+g.C+'px';
-      var p=pt(g.c,g.c,g.r,t); g.knob.setAttribute('cx',p[0]); g.knob.setAttribute('cy',p[1]);
-      g.dets.forEach(function(e,k){e.classList.toggle('on',k<=i);});
-      g.labs.forEach(function(e,k){e.classList.toggle('on',k<=i);});
-      g.d.querySelector('.hub .n').textContent=n;
-      g.d.querySelector('.hub .u').textContent=n===1?'client':'clients';
-    });
-    Array.prototype.forEach.call(root.querySelectorAll('.n'),function(e){e.textContent=n;});
-    Array.prototype.forEach.call(root.querySelectorAll('.t'),function(e){e.textContent=T[i];});
-    Array.prototype.forEach.call(root.querySelectorAll('.d'),function(e){e.textContent=D[i]+' days';});
-    Array.prototype.forEach.call(root.querySelectorAll('.dots'),function(box){
-      box.innerHTML=''; for(var k=0;k<n;k++){ box.appendChild(document.createElement('i')); }
-    });
+  function bump(dir){
+    if(fine){ var v=Math.max(1,Math.min(20,fn+dir)); if(v===fn) return; fn=v; }
+    else { var k=Math.max(0,Math.min(2,i+dir)); if(k===i) return; i=k; }
+    paint(true);
   }
-  paint();
+
+  function paint(pop){
+    var n=curN(), u=pos();
+    dials.forEach(function(g){
+      g.segs.forEach(function(e,k){ e.style.display=fine?'none':''; e.classList.toggle('on',!fine&&k<=i); });
+      g.fsegs.forEach(function(e,k){ e.style.display=fine?'':'none'; e.classList.toggle('on',fine&&k<fn); });
+      g.labs.forEach(function(e,k){ e.classList.toggle('on',!fine&&k===i); e.style.opacity=fine?'0':'1'; });
+      var p=pt(g.c,g.r,u);
+      g.knob.setAttribute('cx',p[0]); g.knob.setAttribute('cy',p[1]);
+      g.ring.setAttribute('cx',p[0]); g.ring.setAttribute('cy',p[1]);
+      g.d.querySelector('.hub .n').textContent=n;
+      g.d.querySelector('.hub .u').textContent=unit(n);
+      g.d.querySelector('.hub .nm').textContent=curNm();
+      if(pop){ var h=g.d.querySelector('.hub'); h.classList.add('pop');
+        setTimeout(function(){h.classList.remove('pop');},190); }
+    });
+    Array.prototype.forEach.call(root.querySelectorAll('.n'),function(e){ if(!e.closest('.hub')) e.textContent=n; });
+    Array.prototype.forEach.call(root.querySelectorAll('.uw'),function(e){e.textContent=unit(n);});
+    Array.prototype.forEach.call(root.querySelectorAll('.t'),function(e){e.textContent=mins(n);});
+    Array.prototype.forEach.call(root.querySelectorAll('.d'),function(e){e.textContent=days(n);});
+    Array.prototype.forEach.call(root.querySelectorAll('.three div'),function(e){
+      e.classList.toggle('on',!fine&&+e.dataset.i===i); });
+    Array.prototype.forEach.call(root.querySelectorAll('.tog'),function(b){
+      b.textContent=fine?'Back to the three sizes':'Turn between every number'; });
+  }
+
+  Array.prototype.forEach.call(root.querySelectorAll('.tog'),function(b){
+    b.addEventListener('click',function(){
+      if(fine){ fine=false; }
+      else { fine=true; fn=TIER[i].n; }
+      paint(false);
+    });
+  });
+  Array.prototype.forEach.call(root.querySelectorAll('.three div'),function(e){
+    e.addEventListener('click',function(){ fine=false; i=+e.dataset.i; paint(true); });
+  });
+  paint(false);
 })();</script>
 </section>

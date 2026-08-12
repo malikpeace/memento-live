@@ -1,81 +1,175 @@
-<!-- archetypes: mx-6 vertical pressure column | mx-7 centered arc dial | mx-8 stacked sentence cards | mx-9 giant elastic numeral | mx-10 keys over timeline -->
+<!-- ARCHETYPES, the surviving set: mx-1 notched rail | mx-2 growing time block | mx-3 drag the task card |
+     mx-5 tappable ladder | mx-6 vertical pressure column | mx-7 segmented arc dial | mx-8 three sentence cards |
+     mx-9 giant elastic numeral | mx-10 keys over timeline | mx-11 five sentence cards, the deliberate counter-example -->
 <section class="cell" data-k="mx-6">
 <style>
-[data-k="mx-6"] .ph{display:flex;flex-direction:column}
-[data-k="mx-6"] .p6{position:relative;z-index:1;display:flex;flex-direction:column;height:100%;padding:26px 20px 22px}
-[data-k="mx-6"] .day{font-size:12px;color:var(--text-lo);margin:0 0 10px}
-[data-k="mx-6"] .say{font-size:25px;line-height:1.18;font-weight:500;letter-spacing:-.02em;margin:0;
+[data-k="mx-6"] .p6{position:relative;z-index:1;display:flex;flex-direction:column;height:100%;padding:24px 18px 18px;overflow:hidden}
+[data-k="mx-6"] .day{font-size:12px;color:var(--text-lo);margin:0 0 6px;font-variant-numeric:tabular-nums}
+[data-k="mx-6"] .say{font-size:24px;line-height:1.16;font-weight:500;letter-spacing:-.02em;margin:0;
   font-variant-numeric:tabular-nums}
 [data-k="mx-6"] .say b{font-weight:700}
-[data-k="mx-6"] .csq{display:flex;gap:16px;margin:12px 0 0}
-[data-k="mx-6"] .csq div{font-size:12.5px;color:var(--text-mid);font-variant-numeric:tabular-nums}
-[data-k="mx-6"] .csq div span{display:block;font-size:16px;color:var(--text-hi);font-weight:700;margin-top:2px}
-[data-k="mx-6"] .col{flex:1;display:flex;align-items:stretch;gap:14px;margin:20px 0 16px}
-[data-k="mx-6"] .meter{position:relative;width:86px;border-radius:12px;overflow:hidden;
-  background:rgba(22,25,31,.94);box-shadow:inset 0 1px 0 rgba(var(--ink),.07)}
-[data-k="mx-6"] .fill{position:absolute;left:0;right:0;bottom:0;height:0%;
-  background:linear-gradient(0deg,rgba(var(--ink),.9),rgba(var(--ink),.94));transition:height .06s linear}
-[data-k="mx-6"] .tick{position:absolute;left:0;right:0;height:1px;background:rgba(var(--ink),.20)}
-[data-k="mx-6"] .rungs{flex:1;position:relative}
-[data-k="mx-6"] .rung{position:absolute;left:0;right:0;transform:translateY(50%);display:flex;align-items:baseline;gap:8px;
-  color:var(--text-lo);font-size:12.5px;font-variant-numeric:tabular-nums;transition:color .12s}
-[data-k="mx-6"] .rung i{font-style:normal;font-size:15px;font-weight:700;min-width:26px}
-[data-k="mx-6"] .rung.on{color:var(--text-hi)}
-[data-k="mx-6"] .pad{position:relative;height:92px;border-radius:14px;display:flex;align-items:center;justify-content:center;
-  background:rgba(28,32,39,.95);box-shadow:inset 0 1px 0 rgba(var(--ink),.09);font-size:15px;font-weight:700;
-  color:var(--text-hi);touch-action:none;user-select:none;cursor:pointer;overflow:hidden}
-[data-k="mx-6"] .pad.down{background:rgba(38,43,52,.96)}
-[data-k="mx-6"] .pad .ripple{position:absolute;inset:0;background:radial-gradient(60% 120% at 50% 100%,rgba(var(--ink),.16),transparent 70%);
-  opacity:0;transition:opacity .12s}
-[data-k="mx-6"] .pad.down .ripple{opacity:1}
-[data-k="mx-6"] .ease{display:block;width:100%;margin:8px 0 0;border:0;-webkit-appearance:none;appearance:none;
-  font-size:13.5px;font-family:inherit;color:var(--text-mid);padding:12px 10px;border-radius:10px;cursor:pointer;
-  background:rgba(20,23,29,.92);box-shadow:inset 0 1px 0 rgba(var(--ink),.06);-webkit-tap-highlight-color:transparent}
-[data-k="mx-6"] .ease:hover{background:rgba(30,34,42,.95)}
-[data-k="mx-6"] .lock{height:2px;border-radius:2px;background:#3fd94e;opacity:0;transition:opacity .3s}
-[data-k="mx-6"] .lock.on{opacity:.9;transition:opacity .05s}
+[data-k="mx-6"] .sub{font-size:13px;color:var(--text-mid);margin:8px 0 0;line-height:1.45;font-variant-numeric:tabular-nums}
 
-[data-k="mx-6"] .d6{position:relative;z-index:1;height:100%;display:grid;grid-template-columns:1fr 250px;gap:26px;padding:30px 30px 26px}
-[data-k="mx-6"] .d6 .say{font-size:32px}
-[data-k="mx-6"] .bar{position:relative;height:74px;border-radius:12px;overflow:hidden;margin-top:26px;
-  background:rgba(22,25,31,.94);box-shadow:inset 0 1px 0 rgba(var(--ink),.07);cursor:pointer;user-select:none}
-[data-k="mx-6"] .bar .hfill{position:absolute;left:0;top:0;bottom:0;width:0%;
-  background:linear-gradient(90deg,rgba(var(--ink),.9),rgba(var(--ink),.94));transition:width .06s linear}
-[data-k="mx-6"] .bar .vtick{position:absolute;top:0;bottom:0;width:1px;background:rgba(var(--ink),.20)}
-[data-k="mx-6"] .marks{position:relative;height:22px;margin-top:8px}
-[data-k="mx-6"] .marks span{position:absolute;transform:translateX(-50%);font-size:12.5px;color:var(--text-lo);
-  font-variant-numeric:tabular-nums;transition:color .12s}
-[data-k="mx-6"] .marks span.on{color:var(--text-hi);font-weight:700}
-[data-k="mx-6"] .hint{font-size:12.5px;color:var(--text-mid);margin:0;max-width:44ch;line-height:1.45}
+[data-k="mx-6"] .col{flex:1;display:flex;gap:14px;margin:16px 0 12px;min-height:0}
+[data-k="mx-6"] .meter{position:relative;width:88px;border-radius:13px;overflow:hidden;contain:paint;
+  background:rgba(19,22,27,.94);box-shadow:inset 0 1px 0 rgba(var(--ink),.07)}
+[data-k="mx-6"] .fill{position:absolute;left:0;right:0;bottom:0;height:0%;
+  background:linear-gradient(0deg,rgba(var(--ink),.13),rgba(var(--ink),.26) 46%,rgba(var(--ink),.52) 86%,rgba(var(--ink),.80) 100%);
+  transition:height .05s linear}
+[data-k="mx-6"] .fill.snap{transition:height .3s cubic-bezier(.16,.9,.3,1)}
+[data-k="mx-6"] .fill .head{position:absolute;left:0;right:0;top:-1.5px;height:3px;border-radius:2px;
+  background:rgba(var(--ink),.96)}
+[data-k="mx-6"] .fill .bloom{position:absolute;left:-20%;right:-20%;top:-34px;height:38px;
+  background:radial-gradient(52% 100% at 50% 100%,rgba(var(--ink),.30),rgba(var(--ink),0) 72%)}
+[data-k="mx-6"] .bandline{position:absolute;left:0;right:0;height:1px;background:rgba(var(--ink),.22);z-index:3}
+[data-k="mx-6"] .bandline::after{content:'';position:absolute;left:0;right:0;top:-1px;height:3px;
+  background:rgba(var(--ink),.9);opacity:0;transition:opacity .3s ease-in}
+[data-k="mx-6"] .bandline.flash::after{opacity:1;transition:opacity .04s}
+[data-k="mx-6"] .ticks{position:absolute;left:0;right:0;top:0;bottom:0;z-index:4;pointer-events:none}
+[data-k="mx-6"] .ticks u{position:absolute;right:0;width:9px;height:1px;background:rgba(var(--ink),.14);
+  transition:background .35s ease-in,width .35s ease-in}
+[data-k="mx-6"] .ticks u.past{background:rgba(var(--ink),.30)}
+[data-k="mx-6"] .ticks u.lit{background:rgba(var(--ink),.98);width:16px;transition:none}
+
+[data-k="mx-6"] .rungs{flex:1;display:flex;flex-direction:column-reverse;min-width:0}
+[data-k="mx-6"] .rung{flex:1;display:flex;flex-direction:column;justify-content:center;gap:2px;min-width:0}
+[data-k="mx-6"] .rung .nm{font-size:14.5px;font-weight:500;color:rgba(var(--ink),.42);letter-spacing:-.01em;
+  transition:color .16s,transform .18s cubic-bezier(.16,.9,.3,1);transform-origin:left center}
+[data-k="mx-6"] .rung .pr{font-size:12.5px;color:rgba(var(--ink),.42);font-variant-numeric:tabular-nums;transition:color .16s}
+[data-k="mx-6"] .rung.on .nm{color:var(--text-hi);font-weight:700}
+[data-k="mx-6"] .rung.on .pr{color:var(--text-mid)}
+[data-k="mx-6"] .rung.pop .nm{transform:scale(1.045)}
+
+[data-k="mx-6"] .pad{position:relative;height:76px;border-radius:14px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:3px;overflow:hidden;contain:paint;
+  background:rgba(28,32,39,.95);box-shadow:inset 0 1px 0 rgba(var(--ink),.09);
+  touch-action:none;user-select:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+[data-k="mx-6"] .pad .glow{position:absolute;left:0;right:0;bottom:-30px;height:70px;opacity:0;transition:opacity .14s;
+  background:radial-gradient(50% 100% at 50% 100%,rgba(var(--ink),.22),rgba(var(--ink),0) 70%)}
+[data-k="mx-6"] .pad.down{background:rgba(37,42,51,.96)}
+[data-k="mx-6"] .pad.down .glow{opacity:1}
+[data-k="mx-6"] .pad .l1{font-size:15.5px;font-weight:700;position:relative}
+[data-k="mx-6"] .pad .l2{font-size:12.5px;color:var(--text-mid);position:relative;font-variant-numeric:tabular-nums}
+[data-k="mx-6"] .lock{height:2px;border-radius:2px;margin:9px 0 0;background:#3fd94e;opacity:0;transition:opacity .45s ease-in}
+[data-k="mx-6"] .lock.on{opacity:.92;transition:opacity .05s}
+
+[data-k="mx-6"] .cta{display:block;width:100%;border:0;border-radius:14px;background:rgba(235,238,248,.94);
+  color:#0b0c10;font-family:inherit;font-weight:700;font-size:15.5px;padding:15px 16px;margin:9px 0 0;cursor:pointer;
+  font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent}
+[data-k="mx-6"] .cta:active{background:rgba(235,238,248,.84)}
+[data-k="mx-6"] .quiet{display:block;width:100%;border:0;border-radius:12px;font-family:inherit;font-size:13px;
+  color:var(--text-mid);padding:11px 14px;margin:8px 0 0;cursor:pointer;background:rgba(22,25,31,.92);
+  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);box-shadow:inset 0 1px 0 rgba(var(--ink),.08);
+  -webkit-tap-highlight-color:transparent}
+[data-k="mx-6"] .quiet:hover{background:rgba(30,34,42,.94)}
+
+[data-k="mx-6"] .sheet{position:absolute;left:0;right:0;bottom:0;z-index:6;padding:18px 18px 18px;
+  border-radius:18px 18px 0 0;background:rgba(20,23,29,.97);-webkit-backdrop-filter:blur(28px) saturate(1.4);
+  backdrop-filter:blur(28px) saturate(1.4);box-shadow:inset 0 1px 0 rgba(var(--ink),.10),0 -22px 50px rgba(0,0,0,.55);
+  transform:translateY(101%);transition:transform .28s cubic-bezier(.16,.9,.3,1)}
+[data-k="mx-6"] .sheet.on{transform:none}
+[data-k="mx-6"] .sheet h5{margin:0 0 3px;font-size:15.5px;font-weight:700}
+[data-k="mx-6"] .sheet p{margin:0;font-size:12.5px;color:var(--text-mid);line-height:1.45;font-variant-numeric:tabular-nums}
+[data-k="mx-6"] .fine{display:flex;align-items:center;gap:10px;margin:14px 0 4px}
+[data-k="mx-6"] .fine button{flex:none;width:56px;height:52px;border:0;border-radius:12px;background:rgba(30,34,41,.95);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09);color:var(--text-hi);font-size:22px;font-family:inherit;cursor:pointer;
+  -webkit-tap-highlight-color:transparent}
+[data-k="mx-6"] .fine button:active{background:rgba(44,49,58,.97)}
+[data-k="mx-6"] .fine .fv{flex:1;height:52px;border-radius:12px;background:rgba(14,16,20,.9);display:flex;
+  align-items:center;justify-content:center;gap:7px;box-shadow:inset 0 1px 0 rgba(var(--ink),.05)}
+[data-k="mx-6"] .fine .fv b{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums}
+[data-k="mx-6"] .fine .fv span{font-size:13px;color:var(--text-mid)}
+
+[data-k="mx-6"] .d6{position:relative;z-index:1;height:100%;display:grid;grid-template-columns:1fr 254px;gap:28px;
+  padding:26px 28px 24px}
 [data-k="mx-6"] .dleft{display:flex;flex-direction:column;min-width:0}
-[data-k="mx-6"] .dfoot{margin-top:auto;padding-top:20px}
-[data-k="mx-6"] .d6 .ease{width:auto;min-width:158px;margin:12px 0 0;padding:11px 18px}
-[data-k="mx-6"] .panel{align-self:center;border-radius:14px;padding:18px 18px 16px;background:rgba(22,25,31,.95);
-  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);box-shadow:inset 0 1px 0 rgba(var(--ink),.08)}
-[data-k="mx-6"] .panel h4{margin:0 0 12px;font-size:13px;font-weight:700;color:var(--text-mid)}
-[data-k="mx-6"] .panel .row{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;font-size:13px;
-  color:var(--text-mid);font-variant-numeric:tabular-nums}
-[data-k="mx-6"] .panel .row b{font-size:16px;font-weight:700;color:var(--text-hi)}
+[data-k="mx-6"] .d6 .say{font-size:31px}
+[data-k="mx-6"] .plate{position:relative;height:92px;border-radius:13px;overflow:hidden;contain:paint;margin:20px 0 0;
+  background:rgba(19,22,27,.94);box-shadow:inset 0 1px 0 rgba(var(--ink),.07);cursor:pointer;user-select:none;touch-action:none}
+[data-k="mx-6"] .plate .hfill{position:absolute;left:0;top:0;bottom:0;width:0%;
+  background:linear-gradient(90deg,rgba(var(--ink),.13),rgba(var(--ink),.26) 46%,rgba(var(--ink),.52) 86%,rgba(var(--ink),.80) 100%);
+  transition:width .05s linear}
+[data-k="mx-6"] .plate .hfill.snap{transition:width .3s cubic-bezier(.16,.9,.3,1)}
+[data-k="mx-6"] .plate .hhead{position:absolute;top:0;bottom:0;right:-1.5px;width:3px;background:rgba(var(--ink),.96)}
+[data-k="mx-6"] .plate .hbloom{position:absolute;top:-20%;bottom:-20%;right:-34px;width:38px;
+  background:radial-gradient(100% 52% at 0% 50%,rgba(var(--ink),.30),rgba(var(--ink),0) 72%)}
+[data-k="mx-6"] .vband{position:absolute;top:0;bottom:0;width:1px;background:rgba(var(--ink),.22);z-index:3}
+[data-k="mx-6"] .vband::after{content:'';position:absolute;top:0;bottom:0;left:-1px;width:3px;background:rgba(var(--ink),.9);
+  opacity:0;transition:opacity .3s ease-in}
+[data-k="mx-6"] .vband.flash::after{opacity:1;transition:opacity .04s}
+[data-k="mx-6"] .vticks{position:absolute;left:0;right:0;bottom:0;height:100%;z-index:4;pointer-events:none}
+[data-k="mx-6"] .vticks u{position:absolute;bottom:0;width:1px;height:9px;background:rgba(var(--ink),.14);
+  transition:background .35s ease-in,height .35s ease-in}
+[data-k="mx-6"] .vticks u.past{background:rgba(var(--ink),.30)}
+[data-k="mx-6"] .vticks u.lit{background:rgba(var(--ink),.98);height:17px;transition:none}
+[data-k="mx-6"] .marks{position:relative;height:34px;margin-top:9px}
+[data-k="mx-6"] .marks span{position:absolute;transform:translateX(-50%);text-align:center;font-size:12.5px;
+  color:rgba(var(--ink),.42);font-variant-numeric:tabular-nums;line-height:1.35;transition:color .16s;white-space:nowrap}
+[data-k="mx-6"] .marks span b{display:block;font-size:13.5px;font-weight:500}
+[data-k="mx-6"] .marks span.on{color:var(--text-mid)}
+[data-k="mx-6"] .marks span.on b{color:var(--text-hi);font-weight:700}
+[data-k="mx-6"] .dfoot{margin-top:auto;display:flex;align-items:center;gap:12px;padding-top:16px}
+[data-k="mx-6"] .d6 .cta{width:auto;min-width:190px;flex:none;margin:0;white-space:nowrap}
+[data-k="mx-6"] .d6 .quiet{width:auto;flex:none;margin:0;white-space:nowrap}
+[data-k="mx-6"] .hint{font-size:12.5px;color:var(--text-mid);margin:14px 0 0;line-height:1.45}
+[data-k="mx-6"] .panel{align-self:center;border-radius:14px;padding:16px 16px 12px;background:rgba(22,25,31,.95);
+  -webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);box-shadow:inset 0 1px 0 rgba(var(--ink),.08)}
+[data-k="mx-6"] .panel h4{margin:0 0 10px;font-size:13px;font-weight:700;color:var(--text-mid)}
+[data-k="mx-6"] .prow{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:9px 10px;
+  border-radius:10px;font-variant-numeric:tabular-nums;transition:background .18s}
+[data-k="mx-6"] .prow .pn{font-size:13.5px;color:rgba(var(--ink),.46);transition:color .18s}
+[data-k="mx-6"] .prow .pv{font-size:13px;color:rgba(var(--ink),.46);transition:color .18s}
+[data-k="mx-6"] .prow.on{background:rgba(var(--ink),.07)}
+[data-k="mx-6"] .prow.on .pn{color:var(--text-hi);font-weight:700}
+[data-k="mx-6"] .prow.on .pv{color:var(--text-mid)}
+[data-k="mx-6"] .panel .tail{margin:10px 2px 2px;font-size:12px;color:var(--text-mid);line-height:1.45;
+  font-variant-numeric:tabular-nums}
 </style>
 <h3>Pressure hold</h3>
-<p class="cap">Effort is the input: you press, and today grows while you keep pressing. Let go and it locks where your patience stopped, on a column whose rungs are priced, so what you are choosing is how much money the month brings in.</p>
+<p class="cap">Patience is the input. Press and today grows through three priced tiers, each one clicking past a boundary you can feel in the ticks, and the tier you were standing in when you let go becomes the day. Three sizes only, unless you ask for the fine control.</p>
 
 <div class="ph">
   <div class="grid"></div>
   <div class="p6">
     <p class="day">Tuesday, day 12</p>
-    <p class="say">Message <b class="n">5</b> clients today</p>
-    <div class="csq">
-      <div>a month at this size<span class="m">$1,800</span></div>
-      <div>against $3,000<span class="g">$1,200 short</span></div>
-    </div>
+    <p class="say">Message <b class="n">5</b> <span class="uw">clients</span> today</p>
+    <p class="sub"><b class="t">15 min</b>. At this size $3,000 a month arrives in <b class="d">52 days</b>.</p>
+
     <div class="col">
-      <div class="meter"><div class="fill"></div></div>
-      <div class="rungs"></div>
+      <div class="meter">
+        <div class="fill"><div class="bloom"></div><div class="head"></div></div>
+        <div class="bandline" style="bottom:33.333%"></div>
+        <div class="bandline" style="bottom:66.666%"></div>
+        <div class="ticks"></div>
+      </div>
+      <div class="rungs">
+        <div class="rung" data-i="0"><span class="nm">A light day</span><span class="pr">2 clients, 6 min</span></div>
+        <div class="rung" data-i="1"><span class="nm">Your usual day</span><span class="pr">5 clients, 15 min</span></div>
+        <div class="rung" data-i="2"><span class="nm">A heavy day</span><span class="pr">9 clients, 27 min</span></div>
+      </div>
+    </div>
+
+    <div class="pad">
+      <div class="glow"></div>
+      <span class="l1">Hold to raise today</span>
+      <span class="l2 padsub">Let go on the size you mean</span>
     </div>
     <div class="lock"></div>
-    <div class="pad" style="margin-top:12px"><div class="ripple"></div><span>Hold to raise</span></div>
-    <button class="ease" type="button">Ease off one</button>
+    <button class="cta" type="button">Start <span class="n">5</span> <span class="uw">clients</span></button>
+    <button class="quiet openfine" type="button">Set the number myself</button>
+
+    <div class="sheet">
+      <h5>Any number you like</h5>
+      <p>Memento proposes three sizes because choosing from twenty is a day's work on its own. This is the door out of that.</p>
+      <div class="fine">
+        <button type="button" class="fdn">&#8722;</button>
+        <div class="fv"><b class="fn">5</b><span class="funit">clients</span></div>
+        <button type="button" class="fup">+</button>
+      </div>
+      <p class="fmeta"><b>15 min</b>. $3,000 a month in <b>52 days</b>.</p>
+      <button class="cta usefine" type="button">Use this size</button>
+      <button class="quiet closefine" type="button">Back to the three</button>
+    </div>
   </div>
 </div>
 
@@ -84,77 +178,136 @@
   <div class="d6">
     <div class="dleft">
       <p class="day">Tuesday, day 12</p>
-      <p class="say">Message <b class="n">5</b> clients today</p>
-      <div class="bar"><div class="hfill"></div></div>
+      <p class="say">Message <b class="n">5</b> <span class="uw">clients</span> today</p>
+      <div class="plate">
+        <div class="hfill"><div class="hbloom"></div><div class="hhead"></div></div>
+        <div class="vband" style="left:33.333%"></div>
+        <div class="vband" style="left:66.666%"></div>
+        <div class="vticks"></div>
+      </div>
       <div class="marks"></div>
+      <p class="hint">Hold the mouse down on the plate. It climbs through the three sizes and locks on the one you were in when you released.</p>
       <div class="dfoot">
-        <p class="hint">Hold the mouse down on the bar to raise it, release to lock. Ten clients a day is where $3,000 a month clears.</p>
-        <button class="ease" type="button">Ease off one</button>
+        <button class="cta" type="button">Start <span class="n">5</span> <span class="uw">clients</span></button>
+        <button class="quiet dfine" type="button">Set the number myself</button>
       </div>
     </div>
     <div class="panel">
-      <h4>What changes</h4>
-      <div class="row"><span>New clients a month</span><b class="c">6</b></div>
-      <div class="row"><span>Money a month</span><b class="m">$1,800</b></div>
-      <div class="row"><span>Margin of safety</span><b class="g">$1,200 short</b></div>
+      <h4>What each one costs you</h4>
+      <div class="prow" data-i="0"><span class="pn">A light day</span><span class="pv">2, 6 min</span></div>
+      <div class="prow" data-i="1"><span class="pn">Your usual day</span><span class="pv">5, 15 min</span></div>
+      <div class="prow" data-i="2"><span class="pn">A heavy day</span><span class="pv">9, 27 min</span></div>
+      <p class="tail">At <b class="n2">5</b> a day you reach $3,000 a month in <b class="d">52 days</b>. Yesterday you held 3.</p>
     </div>
   </div>
 </div>
 
 <script>(function(){
   var root=document.querySelector('[data-k="mx-6"]');
-  var N=[1,3,5,10,20], C=[1,3,6,11,22], GOAL=3000, PAYS=300;
-  var STOP=[0,22,45,70,92];
-  var v=45, raf=null;
-  function usd(x){ return '$'+String(x).replace(/\B(?=(\d{3})+(?!\d))/g,','); }
-  function money(i){ return C[i]*PAYS; }
-  function margin(i){ var d=money(i)-GOAL; return d>=0 ? usd(d)+' clear' : usd(-d)+' short'; }
+  var TIER=[{n:2,nm:'A light day',t:'6 min',d:'130 days'},
+            {n:5,nm:'Your usual day',t:'15 min',d:'52 days'},
+            {n:9,nm:'A heavy day',t:'27 min',d:'29 days'}];
+  var REST=[16.5,50,88], BOUND=[33.333,66.666];
+  var i=1, fine=false, fn=5, v=REST[1], timer=null, held=false;
 
-  var rungs=root.querySelector('.rungs'), marks=root.querySelector('.marks');
-  N.forEach(function(n,i){
-    var e=document.createElement('div'); e.className='rung'; e.style.bottom=STOP[i]+'%';
-    e.innerHTML='<i>'+n+'</i><span>'+usd(money(i))+' a month</span>'; rungs.appendChild(e);
-    var t=document.createElement('div'); t.className='tick'; t.style.bottom=STOP[i]+'%'; root.querySelector('.meter').appendChild(t);
-    var m=document.createElement('span'); m.style.left=STOP[i]+'%'; m.textContent=n; marks.appendChild(m);
-    var vt=document.createElement('div'); vt.className='vtick'; vt.style.left=STOP[i]+'%'; root.querySelector('.bar').appendChild(vt);
+  function mins(n){ var m=n*3; return m>=60 ? (m%60===0 ? (m/60)+' hr' : Math.floor(m/60)+' hr '+(m%60)+' min') : m+' min'; }
+  function days(n){ return Math.round(260/n)+' days'; }
+  function unit(n){ return n===1?'client':'clients'; }
+
+  var fillEl=root.querySelector('.fill'), hfillEl=root.querySelector('.hfill');
+  var ticksEl=root.querySelector('.ticks'), vticksEl=root.querySelector('.vticks');
+  var marksEl=root.querySelector('.marks');
+  var TICKS=[];
+  for(var k=1;k<=12;k++){
+    var p=k*100/12;
+    var a=document.createElement('u'); a.style.bottom=p+'%'; ticksEl.appendChild(a);
+    var b=document.createElement('u'); b.style.left=p+'%'; vticksEl.appendChild(b);
+    TICKS.push({p:p,els:[a,b],on:false});
+  }
+  TIER.forEach(function(T,k){
+    var s=document.createElement('span'); s.style.left=REST[k]+'%';
+    s.innerHTML='<b>'+T.nm+'</b>'+T.n+' '+unit(T.n)+', '+T.t; marksEl.appendChild(s);
   });
 
-  function idx(){ var k=0; for(var i=0;i<STOP.length;i++){ if(v>=STOP[i]) k=i; } return k; }
+  function curN(){ return fine ? fn : TIER[i].n; }
   function paint(){
-    var i=idx();
-    root.querySelector('.fill').style.height=v+'%';
-    root.querySelector('.hfill').style.width=v+'%';
-    Array.prototype.forEach.call(root.querySelectorAll('.n'),function(e){e.textContent=N[i];});
-    Array.prototype.forEach.call(root.querySelectorAll('.m'),function(e){e.textContent=usd(money(i));});
-    Array.prototype.forEach.call(root.querySelectorAll('.g'),function(e){e.textContent=margin(i);});
-    root.querySelector('.panel .c').textContent=C[i];
-    Array.prototype.forEach.call(rungs.children,function(e,k){
-      e.classList.toggle('on',k<=i);
+    var n=curN();
+    Array.prototype.forEach.call(root.querySelectorAll('.n'),function(e){e.textContent=n;});
+    Array.prototype.forEach.call(root.querySelectorAll('.uw'),function(e){e.textContent=unit(n);});
+    Array.prototype.forEach.call(root.querySelectorAll('.t'),function(e){e.textContent=mins(n);});
+    Array.prototype.forEach.call(root.querySelectorAll('.d'),function(e){e.textContent=days(n);});
+    root.querySelector('.panel .n2').textContent=n;
+    root.querySelector('.fn').textContent=fn;
+    root.querySelector('.funit').textContent=unit(fn);
+    root.querySelector('.fmeta').innerHTML='<b>'+mins(fn)+'</b>. $3,000 a month in <b>'+days(fn)+'</b>.';
+    Array.prototype.forEach.call(root.querySelectorAll('.rung'),function(e){
+      e.classList.toggle('on',!fine&&+e.dataset.i===i); });
+    Array.prototype.forEach.call(root.querySelectorAll('.prow'),function(e){
+      e.classList.toggle('on',!fine&&+e.dataset.i===i); });
+    Array.prototype.forEach.call(marksEl.children,function(e,k){ e.classList.toggle('on',!fine&&k===i); });
+  }
+  function geo(){
+    fillEl.style.height=v+'%'; hfillEl.style.width=v+'%';
+    TICKS.forEach(function(t){
+      var on=v>=t.p;
+      if(on&&!t.on){ t.els.forEach(function(e){e.classList.add('past','lit');});
+        setTimeout(function(){ t.els.forEach(function(e){e.classList.remove('lit');}); },130); }
+      if(!on&&t.on){ t.els.forEach(function(e){e.classList.remove('past','lit');}); }
+      t.on=on;
     });
-    Array.prototype.forEach.call(marks.children,function(e,k){e.classList.toggle('on',k<=i);});
   }
-  function start(el){
-    el.classList.add('down'); if(raf) return;
+  function tierOf(x){ return x>=BOUND[1] ? 2 : (x>=BOUND[0] ? 1 : 0); }
+  function flashBound(k){
+    Array.prototype.forEach.call(root.querySelectorAll('.bandline,.vband'),function(e,idx){
+      if(idx%2===k-1){ e.classList.add('flash'); setTimeout(function(){e.classList.remove('flash');},170); } });
+  }
+  function popRung(){
+    var r=root.querySelector('.rung[data-i="'+i+'"]');
+    r.classList.add('pop'); setTimeout(function(){r.classList.remove('pop');},170);
+  }
+
+  function press(el){
+    if(held) return; held=true; el.classList.add('down');
+    if(fine){ fine=false; }
+    fillEl.classList.remove('snap'); hfillEl.classList.remove('snap');
+    v=0; i=0; geo(); paint();
+    root.querySelector('.padsub').textContent='A light day, 2 clients';
     var last=Date.now();
-    raf=setInterval(function(){
-      var now=Date.now(); v=Math.min(100,v+(now-last)*0.055); last=now; paint();
-    },24);
+    timer=setInterval(function(){
+      var now=Date.now(); v=Math.min(100,v+(now-last)*0.048); last=now; geo();
+      var t=tierOf(v);
+      if(t!==i){ i=t; flashBound(t); paint(); popRung(); }
+      root.querySelector('.padsub').textContent = v>=99.5
+        ? 'That is the heaviest Memento will propose'
+        : TIER[i].nm+', '+TIER[i].n+' '+unit(TIER[i].n);
+    },22);
   }
-  function end(el){
-    el.classList.remove('down'); if(raf){clearInterval(raf);raf=null;}
-    v=STOP[idx()]; paint();
-    var l=root.querySelector('.lock'); l.classList.add('on'); setTimeout(function(){l.classList.remove('on');},220);
+  function release(el){
+    if(!held) return; held=false; el.classList.remove('down');
+    clearInterval(timer); timer=null;
+    i=tierOf(v); v=REST[i];
+    fillEl.classList.add('snap'); hfillEl.classList.add('snap');
+    geo(); paint();
+    root.querySelector('.padsub').textContent='Locked on '+TIER[i].nm.toLowerCase();
+    var l=root.querySelector('.lock'); l.classList.add('on');
+    setTimeout(function(){l.classList.remove('on');},260);
   }
-  [root.querySelector('.pad'),root.querySelector('.bar')].forEach(function(el){
-    el.addEventListener('pointerdown',function(e){e.preventDefault();
-      try{el.setPointerCapture(e.pointerId);}catch(err){} start(el);});
-    el.addEventListener('pointerup',function(){end(el);});
-    el.addEventListener('pointercancel',function(){end(el);});
-    el.addEventListener('pointerleave',function(){if(raf)end(el);});
+  Array.prototype.forEach.call(root.querySelectorAll('.pad,.plate'),function(el){
+    el.addEventListener('pointerdown',function(e){ e.preventDefault();
+      try{el.setPointerCapture(e.pointerId);}catch(err){} press(el); });
+    el.addEventListener('pointerup',function(){release(el);});
+    el.addEventListener('pointercancel',function(){release(el);});
+    el.addEventListener('pointerleave',function(){release(el);});
   });
-  Array.prototype.forEach.call(root.querySelectorAll('.ease'),function(b){
-    b.addEventListener('click',function(){ var i=Math.max(0,idx()-1); v=STOP[i]; paint(); });
-  });
-  paint();
+
+  var sheet=root.querySelector('.sheet');
+  root.querySelector('.openfine').addEventListener('click',function(){ sheet.classList.add('on'); });
+  root.querySelector('.dfine').addEventListener('click',function(){ sheet.classList.add('on'); });
+  root.querySelector('.closefine').addEventListener('click',function(){ sheet.classList.remove('on'); fine=false; paint(); });
+  root.querySelector('.usefine').addEventListener('click',function(){ sheet.classList.remove('on'); fine=true; paint(); });
+  root.querySelector('.fup').addEventListener('click',function(){ fn=Math.min(20,fn+1); paint(); });
+  root.querySelector('.fdn').addEventListener('click',function(){ fn=Math.max(1,fn-1); paint(); });
+
+  geo(); paint();
 })();</script>
 </section>

@@ -1,128 +1,209 @@
-<!-- ld-2..ld-5 layout archetypes (difference law)
-     ld-2 full-bleed decode field | ld-3 receding perspective corridor
-     ld-4 stacked sequential checklist | ld-5 single traversing beam
-     (ld-1 draws the plan onto the grid, none of these do) -->
+<!-- ARCHETYPES, the surviving set: ld-4 streaming plan document | ld-5 breathing field with four real beats.
+     No invented stage names in either: every line names something the request actually does. -->
 <section class="cell" data-k="ld-4">
 <style>
 [data-k=ld-4] .ph{background:#050608}
-[data-k=ld-4] .col{position:absolute;left:24px;right:22px;top:70px;bottom:30px;
+[data-k=ld-4] .grid{opacity:.05}
+[data-k=ld-4] .col{position:absolute;left:24px;right:24px;top:64px;bottom:28px;
   display:flex;flex-direction:column}
-[data-k=ld-4] .top{margin:0;font-size:16px;font-weight:500;line-height:1.35;color:var(--text-hi)}
-[data-k=ld-4] .sub{margin:5px 0 0;font-size:12.5px;color:rgba(var(--ink),.9)}
-[data-k=ld-4] .list{position:relative;flex:1 1 auto;margin:26px 0 0;overflow:hidden;
-  display:flex;flex-direction:column;justify-content:flex-end;gap:14px}
-[data-k=ld-4] .rail{position:absolute;left:9px;top:100%;bottom:10px;width:1px;
-  background:rgba(var(--ink),.14);transition:top .55s cubic-bezier(.3,.05,.2,1)}
-[data-k=ld-4] .it{position:relative;flex:0 0 auto;display:flex;gap:13px;align-items:flex-start;
-  transition:margin-top .45s cubic-bezier(.4,.03,.25,1),opacity .4s ease}
-[data-k=ld-4] .cb{position:relative;flex:0 0 auto;width:18px;height:18px;border-radius:6px;margin-top:1px;
-  background:rgba(22,25,31,.96);box-shadow:inset 0 1px 0 rgba(var(--ink),.07)}
-[data-k=ld-4] .cb svg{position:absolute;left:3px;top:3px;width:12px;height:12px;display:block}
-[data-k=ld-4] .cb path{fill:none;stroke:rgba(var(--ink),.88);stroke-width:1.7;stroke-linecap:round;
-  stroke-linejoin:round;stroke-dasharray:14;stroke-dashoffset:14;
-  transition:stroke-dashoffset .4s ease-out}
-[data-k=ld-4] .it.done .cb path{stroke-dashoffset:0}
-[data-k=ld-4] .it p{margin:0;font-size:13.5px;line-height:1.42;color:var(--text-hi);font-weight:500;
-  font-variant-numeric:tabular-nums;transition:color .5s ease,font-weight .1s}
-[data-k=ld-4] .it.done p{color:rgba(var(--ink),.9);font-weight:400}
-[data-k=ld-4] .it.gone{opacity:0}
-[data-k=ld-4] .foot{flex:0 0 auto;margin:20px 0 0;padding:13px 0 0;display:flex;
-  justify-content:space-between;font-size:11.5px;color:var(--text-mid);
-  font-variant-numeric:tabular-nums;
-  background:linear-gradient(rgba(var(--ink),.12) 0 1px,transparent 1px) top left/100% 1px no-repeat}
+[data-k=ld-4] .top{margin:0;font-size:17px;font-weight:500;letter-spacing:-.015em;
+  line-height:1.3;color:var(--text-hi)}
+[data-k=ld-4] .sub{margin:7px 0 0;font-size:12.5px;line-height:1.45;color:rgba(var(--ink),.9);
+  font-variant-numeric:tabular-nums}
+
+/* the plan document: rows hold their height from the start so nothing jumps */
+[data-k=ld-4] .mid{flex:1 1 auto;display:flex;flex-direction:column;justify-content:center}
+[data-k=ld-4] .doc{flex:0 0 auto}
+[data-k=ld-4] .doc>*+*{margin-top:22px}
+[data-k=ld-4] .row{position:relative;opacity:0;transition:opacity .35s ease}
+[data-k=ld-4] .row.on{opacity:1}
+[data-k=ld-4] .k{margin:0 0 5px;font-size:11.5px;line-height:1;color:var(--text-mid)}
+[data-k=ld-4] .v{margin:0;font-size:15px;font-weight:500;line-height:1.42;letter-spacing:-.01em;
+  color:rgba(var(--ink),.9);font-variant-numeric:tabular-nums;
+  transition:color .5s ease}
+[data-k=ld-4] .row.set .v{color:var(--text-hi)}
+[data-k=ld-4] .r-today .v{min-height:64px}
+[data-k=ld-4] .r-size .v,[data-k=ld-4] .r-time .v{min-height:21px}
+[data-k=ld-4] .pair{display:flex;gap:26px}
+[data-k=ld-4] .pair .row{flex:1 1 0}
+[data-k=ld-4] .car{display:inline-block;width:2px;height:1em;margin-left:1px;
+  vertical-align:-.14em;background:rgba(var(--ink),.9)}
+
+/* the week shape */
+[data-k=ld-4] .wk{display:flex;gap:5px;margin:0}
+[data-k=ld-4] .wk b{flex:1 1 0;height:52px;border-radius:10px;background:rgba(22,25,31,.94);
+  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
+  box-shadow:inset 0 1px 0 rgba(235,238,248,.06);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  font-weight:400;opacity:0;transform:translateY(5px);
+  transition:opacity .3s ease,transform .3s ease}
+[data-k=ld-4] .wk b.on{opacity:1;transform:none}
+[data-k=ld-4] .wk .dy{font-size:9.5px;line-height:1;color:var(--text-mid)}
+[data-k=ld-4] .wk .nm{font-size:13px;line-height:1;font-weight:500;color:var(--text-hi);
+  font-variant-numeric:tabular-nums}
+[data-k=ld-4] .wk b.rest .nm{color:var(--text-mid);font-weight:400}
+
+[data-k=ld-4] .foot{flex:0 0 auto}
+[data-k=ld-4] .foot p{margin:0 0 15px;font-size:11.5px;line-height:1.5;color:var(--text-mid);
+  font-variant-numeric:tabular-nums}
+[data-k=ld-4] .cta{flex:0 0 auto}
+[data-k=ld-4] .cta button{display:block;width:100%;border:0;border-radius:14px;padding:15px 16px;
+  font-family:inherit;font-size:15.5px;line-height:1.1;letter-spacing:-.01em;cursor:pointer;
+  background:rgba(235,238,248,.94);color:#0b0c10;font-weight:700;
+  opacity:0;transform:translateY(6px);pointer-events:none;
+  transition:opacity .4s ease,transform .4s cubic-bezier(.25,.8,.3,1)}
+[data-k=ld-4] .cta button.on{opacity:1;transform:none;pointer-events:auto}
+[data-k=ld-4] .cta button:active{transform:scale(.985)}
+
 @media (prefers-reduced-motion:no-preference){
   [data-k=ld-4] .top{animation:ld4in .6s ease-out .1s both}
   [data-k=ld-4] .sub{animation:ld4in .6s ease-out .25s both}
-  [data-k=ld-4] .foot{animation:ld4in .6s ease-out .45s both}
-  [data-k=ld-4] .it{animation:ld4in .5s ease-out backwards}
+  [data-k=ld-4] .car{animation:ld4car 1.06s steps(1) infinite}
 }
 @keyframes ld4in{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+@keyframes ld4car{0%,49%{opacity:1}50%,100%{opacity:0}}
 </style>
-<h3>The working list</h3><p class="cap">The wait shows the reasoning as it happens, written in their own numbers: the log keeps running and settling new lines until the plan is done, so it never stands still.</p>
+<h3>The working list</h3><p class="cap">The ship later upgrade, once the plan can stream: the wait IS the plan writing itself, the move then its size then its time cost then the week, arriving raw in token chunks and correcting itself once before it settles.</p>
 <div class="ph">
   <div class="grid"></div>
   <div class="col">
-  <p class="top">Building your plan.</p>
-  <p class="sub">Half a minute or two. You can watch.</p>
-  <div class="list"><div class="rail"></div></div>
-  <div class="foot"><span class="n">0 settled</span><span class="s">Working</span></div>
+    <p class="top">Writing your plan.</p>
+    <p class="sub">You see it in the same order the model does.</p>
+    <div class="mid">
+    <div class="doc">
+      <div class="row r-today"><p class="k">Today</p><p class="v"></p></div>
+      <div class="pair">
+        <div class="row r-size"><p class="k">Size</p><p class="v"></p></div>
+        <div class="row r-time"><p class="k">Time cost</p><p class="v"></p></div>
+      </div>
+      <div class="row r-week"><p class="k">This week</p>
+        <div class="wk">
+          <b><span class="dy">M</span><span class="nm">8</span></b>
+          <b><span class="dy">T</span><span class="nm">8</span></b>
+          <b><span class="dy">W</span><span class="nm">8</span></b>
+          <b class="rest"><span class="dy">T</span><span class="nm">rest</span></b>
+          <b><span class="dy">F</span><span class="nm">8</span></b>
+          <b><span class="dy">S</span><span class="nm">6</span></b>
+          <b class="rest"><span class="dy">S</span><span class="nm">rest</span></b>
+        </div>
+      </div>
+    </div>
+    </div>
+    <div class="foot"><p>Nothing here was drawn before the model wrote it.</p></div>
+    <div class="cta"><button type="button">Open your plan</button></div>
   </div>
 </div>
 <script>
 (function(){
   var r=document.querySelector('[data-k="ld-4"]'); if(!r) return;
-  var list=r.querySelector('.list'), rail=r.querySelector('.rail'),
-      cn=r.querySelector('.foot .n'), cs=r.querySelector('.foot .s'),
-      reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches, timer=null, n=0,
-      TICK='<div class="cb"><svg viewBox="0 0 12 12"><path d="M2.3 6.3 4.8 8.8 9.7 3.5"/></svg></div>';
-  /* every line is a new piece of reasoning, nothing is repeated back at them */
-  var STEPS=['Read your goal: $3,000 a month',
-    'Found where you are: $840 from 3 clients',
-    'Counted 31 past clients you never messaged',
-    'Set aside cold DMs and flyers, you tried those',
-    'Priced the gap: 7 clients at $300',
-    'Cut 90 days into 13 weeks',
-    'Checked your hour: 1 free hour most nights',
-    'Sorted the 31 by how recently they paid',
-    'Week 1: the 8 who paid you twice',
-    'Week 2: the 9 who went quiet in March',
-    'Wrote the first line: one ask, no pitch',
-    'Picked today: message 4 of them',
-    'Timed it: 12 minutes for 4 messages',
-    'Set the follow up for day 3',
-    'Left you 2 rest days a week'];
-  var MORE=['Sized week %n: 4 messages a day',
-    'Checked week %n against your hour',
-    'Week %n puts you at $%m',
-    'Kept 2 rest days inside week %n',
-    'Wrote the follow up for day %n',
-    'Week %n needs 20 messages, 60 minutes',
-    'Moved week %n off your busiest night'];
-  function next(){
-    if(n<STEPS.length) return STEPS[n];
-    var k=n-STEPS.length, w=2+(k%12);
-    return MORE[k%MORE.length].replace('%n',w).replace('%m',(840+w*180).toLocaleString('en-US'));
+  var rows={today:r.querySelector('.r-today'),size:r.querySelector('.r-size'),
+            time:r.querySelector('.r-time'),week:r.querySelector('.r-week')},
+      cells=r.querySelectorAll('.wk b'), foot=r.querySelector('.foot p'),
+      cta=r.querySelector('.cta button'),
+      reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches,
+      timers=[], caret=null;
+
+  var FINAL={today:'Message the 8 who paid you twice, one ask each.',
+             size:'8 messages',time:'12 minutes'};
+  /* the one correction: it starts down the wrong branch, then rewrites the tail */
+  var FIRST='Message 12 of the 31 you never followed up';
+  var KEEP=8; /* "Message " survives the rewrite */
+
+  function clear(){ timers.forEach(clearTimeout); timers=[]; }
+  function at(ms,fn){ timers.push(setTimeout(fn,ms)); }
+  function val(k){ return rows[k].querySelector('.v'); }
+
+  function moveCaret(k){
+    if(caret&&caret.parentNode) caret.parentNode.removeChild(caret);
+    if(!k) return;
+    caret=document.createElement('span'); caret.className='car';
+    val(k).appendChild(caret);
   }
-  function add(text){
-    var prev=list.lastElementChild;
-    if(prev&&prev.classList.contains('it')) prev.classList.add('done');
-    var d=document.createElement('div');
-    d.className='it';
-    d.innerHTML=TICK+'<p></p>';
-    d.querySelector('p').textContent=text;
-    list.appendChild(d); n++;
-    var items=list.querySelectorAll('.it:not(.gone)');
-    if(items.length>7){
-      var old=items[0];
-      if(reduce) old.remove();
-      else{
-        old.classList.add('gone');
-        old.style.marginTop=(-old.offsetHeight-14)+'px';
-        setTimeout(function(){ old.remove(); },500);
-      }
+  function write(k,txt){
+    var v=val(k), keep=caret&&caret.parentNode===v?caret:null;
+    v.textContent=txt; if(keep) v.appendChild(keep);
+  }
+
+  /* token sized chunks, irregular pace: what a stream actually looks like */
+  function stream(k,text,from,done){
+    var i=from||0;
+    (function step(){
+      if(i>=text.length){ return done&&done(); }
+      i=Math.min(text.length,i+2+Math.floor(Math.random()*3));
+      write(k,text.slice(0,i));
+      at(42+Math.floor(Math.random()*58),step);
+    })();
+  }
+  function unwrite(k,text,to,done){
+    var i=text.length;
+    (function step(){
+      if(i<=to){ return done&&done(); }
+      i=Math.max(to,i-3);
+      write(k,text.slice(0,i));
+      at(22,step);
+    })();
+  }
+
+  function settle(k){ rows[k].classList.add('set'); }
+  function show(k){ rows[k].classList.add('on'); }
+
+  function run(){
+    clear(); moveCaret(null); caret=null;
+    ['today','size','time','week'].forEach(function(k){ rows[k].classList.remove('on','set'); });
+    for(var c=0;c<cells.length;c++) cells[c].classList.remove('on');
+    write('today',''); write('size',''); write('time','');
+    foot.textContent='Nothing here was drawn before the model wrote it.';
+    cta.classList.remove('on');
+
+    if(reduce){
+      ['today','size','time','week'].forEach(function(k){ show(k); settle(k); });
+      write('today',FINAL.today); write('size',FINAL.size); write('time',FINAL.time);
+      for(var i=0;i<cells.length;i++) cells[i].classList.add('on');
+      foot.textContent='Written. 8 messages a day, 2 rest days, 12 minutes each morning.';
+      cta.classList.add('on');
+      return;
     }
-    cn.textContent=n+' settled';
-    if(!reduce) requestAnimationFrame(function(){
-      var first=list.querySelector('.it:not(.gone)');
-      if(first) rail.style.top=(first.offsetTop+4)+'px';
+
+    at(700,function(){
+      show('today'); moveCaret('today');
+      stream('today',FIRST,0,function(){
+        at(420,function(){
+          unwrite('today',FIRST,KEEP,function(){
+            at(160,function(){
+              stream('today',FINAL.today,KEEP,function(){
+                settle('today');
+                at(340,function(){
+                  show('size'); moveCaret('size');
+                  stream('size',FINAL.size,0,function(){
+                    settle('size');
+                    at(260,function(){
+                      show('time'); moveCaret('time');
+                      stream('time',FINAL.time,0,function(){
+                        settle('time'); moveCaret(null);
+                        at(320,function(){
+                          show('week');
+                          for(var i=0;i<cells.length;i++){
+                            (function(n){ at(n*130,function(){ cells[n].classList.add('on'); }); })(i);
+                          }
+                          at(cells.length*130+380,function(){
+                            settle('week');
+                            foot.textContent='Written. 8 messages a day, 2 rest days, 12 minutes each morning.';
+                            cta.classList.add('on');
+                          });
+                        });
+                      });
+                    });
+                  });
+                });
+              });
+            });
+          });
+        });
+      });
     });
   }
-  /* the final beat: the real app calls this the moment the plan lands */
-  function arrive(){
-    if(timer){ clearTimeout(timer); timer=null; }
-    add('Wrote what to say to each one');
-    setTimeout(function(){
-      var last=list.lastElementChild; if(last) last.classList.add('done');
-      cs.textContent='Plan ready';
-    },600);
-  }
-  r.planArrives=arrive;
-  function loop(){ add(next()); timer=setTimeout(loop,1650+(n%3)*280); }
-  if(reduce){
-    for(var i=0;i<6;i++) add(next());
-    var f=list.querySelector('.it'); if(f) rail.style.top=(f.offsetTop+4)+'px';
-  }
-  else{ add(next()); timer=setTimeout(loop,1400); }
+  cta.addEventListener('click',run);
+  run();
 })();
 </script>
 </section>

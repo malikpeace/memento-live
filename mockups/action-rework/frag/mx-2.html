@@ -1,179 +1,310 @@
-<!--
-Difference law, layout archetypes for this set:
-  mx-1  horizontal notched rail
-  mx-2  growing block stepper
-  mx-3  vertical dragged card
-  mx-4  additive chip stack
-  mx-5  climbing rung ladder
--->
+<!-- ARCHETYPES, the surviving set: mx-1 notched rail | mx-2 growing time block | mx-3 drag the task card |
+     mx-5 tappable ladder | mx-6 vertical pressure column | mx-7 segmented arc dial | mx-8 three sentence cards |
+     mx-9 giant elastic numeral | mx-10 keys over timeline | mx-11 five sentence cards, the deliberate counter-example -->
 <section class="cell" data-k="mx-2">
 <style>
-[data-k=mx-2] .scr{position:absolute;inset:0;display:flex;flex-direction:column;padding:30px 20px 24px}
-[data-k=mx-2] .hd{font-size:13px;color:var(--text-mid);margin-bottom:3px}
-[data-k=mx-2] .hd2{font-size:19px;font-weight:700;letter-spacing:-.02em;margin-bottom:16px}
-[data-k=mx-2] .col{position:relative;flex:1;display:flex;flex-direction:column}
-[data-k=mx-2] .blk{border-radius:13px;overflow:hidden;flex:none;
-  background:rgba(22,25,31,.95);-webkit-backdrop-filter:blur(24px) saturate(1.4);backdrop-filter:blur(24px) saturate(1.4);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.08),0 14px 30px rgba(0,0,0,.45);
-  transition:height .22s cubic-bezier(.2,.7,.3,1)}
-[data-k=mx-2] .bhead{display:flex;justify-content:space-between;align-items:baseline;padding:12px 14px 10px}
-[data-k=mx-2] .bhead b{font-size:16px;font-weight:500;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
-[data-k=mx-2] .bhead u{text-decoration:none;font-size:12.5px;color:var(--text-mid);font-variant-numeric:tabular-nums}
-[data-k=mx-2] .rows{padding:0 14px}
-[data-k=mx-2] .rows div{height:4px;border-radius:2px;background:rgba(var(--ink),.2);margin-bottom:5px}
-[data-k=mx-2] .rest{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-start;padding:11px 2px 22px}
-[data-k=mx-2] .rest span{font-size:13px;color:var(--text-hi);font-variant-numeric:tabular-nums}
-[data-k=mx-2] .rest em{display:block;font-style:normal;font-size:11.5px;color:var(--text-mid);margin-top:3px}
-[data-k=mx-2] .capline{position:absolute;left:0;right:0;top:0;height:1px;background:rgba(var(--ink),.18)}
-[data-k=mx-2] .floor{position:absolute;left:0;right:0;bottom:16px;height:1px;background:rgba(var(--ink),.18)}
-[data-k=mx-2] .floor u{position:absolute;right:0;top:5px;text-decoration:none;font-size:11.5px;color:var(--text-mid);
-  font-variant-numeric:tabular-nums}
-[data-k=mx-2] .step{display:flex;align-items:center;gap:12px;margin-top:18px}
-[data-k=mx-2] .btn{width:64px;height:56px;border-radius:12px;flex:none;position:relative;cursor:pointer;
-  background:rgba(28,32,39,.95);box-shadow:inset 0 1px 0 rgba(var(--ink),.08);-webkit-tap-highlight-color:transparent}
-[data-k=mx-2] .btn:active{background:rgba(40,45,54,.97)}
-[data-k=mx-2] .btn::before{content:"";position:absolute;left:50%;top:50%;width:17px;height:2px;background:rgba(var(--ink),.92);transform:translate(-50%,-50%);border-radius:2px}
-[data-k=mx-2] .btn.p::after{content:"";position:absolute;left:50%;top:50%;width:2px;height:17px;background:rgba(var(--ink),.92);transform:translate(-50%,-50%);border-radius:2px}
-[data-k=mx-2] .btn.off{opacity:.34;cursor:default}
-[data-k=mx-2] .stepmid{flex:1;text-align:center}
-[data-k=mx-2] .stepmid b{display:block;font-size:26px;font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1}
-[data-k=mx-2] .stepmid span{font-size:11.5px;color:var(--text-lo)}
+[data-k=mx-2] .scr{position:absolute;inset:0;display:flex;flex-direction:column;padding:30px 20px 22px}
+[data-k=mx-2] .hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px}
+[data-k=mx-2] .hd b{font-size:15px;font-weight:500;letter-spacing:-.015em}
+[data-k=mx-2] .hd u{text-decoration:none;font-size:12px;color:var(--text-mid);font-variant-numeric:tabular-nums}
+[data-k=mx-2] .sub{font-size:12.5px;color:var(--text-mid);margin-bottom:14px}
 
-[data-k=mx-2] .dk{position:absolute;inset:0;display:flex;gap:30px;padding:28px 32px}
-[data-k=mx-2] .dcol{position:relative;width:210px;flex:none;display:flex;flex-direction:column}
-[data-k=mx-2] .dside{flex:1;display:flex;flex-direction:column;justify-content:center;padding-bottom:14px}
-[data-k=mx-2] .dnum{font-size:76px;font-weight:700;line-height:.86;letter-spacing:-.05em;font-variant-numeric:tabular-nums}
-[data-k=mx-2] .dsub{font-size:14px;color:var(--text-mid);margin-top:8px}
-[data-k=mx-2] .dstats{display:flex;gap:9px;margin-top:18px}
-[data-k=mx-2] .st{border-radius:11px;padding:9px 13px;min-width:96px;background:rgba(22,25,31,.94);
-  -webkit-backdrop-filter:blur(22px) saturate(1.4);backdrop-filter:blur(22px) saturate(1.4);box-shadow:inset 0 1px 0 rgba(var(--ink),.07),0 10px 24px rgba(0,0,0,.4)}
-[data-k=mx-2] .st u{display:block;text-decoration:none;font-size:11.5px;color:var(--text-mid);margin-bottom:3px}
-[data-k=mx-2] .st b{font-size:18px;font-weight:500;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
-[data-k=mx-2] .dstep{display:flex;gap:10px;margin-top:26px;align-items:center}
-[data-k=mx-2] .dbtn{width:52px;height:40px;border-radius:10px;position:relative;cursor:pointer;background:rgba(28,32,39,.95);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.08)}
-[data-k=mx-2] .dbtn:hover{background:rgba(40,45,54,.97)}
-[data-k=mx-2] .dbtn::before{content:"";position:absolute;left:50%;top:50%;width:15px;height:2px;background:rgba(var(--ink),.92);transform:translate(-50%,-50%);border-radius:2px}
-[data-k=mx-2] .dbtn.p::after{content:"";position:absolute;left:50%;top:50%;width:2px;height:15px;background:rgba(var(--ink),.92);transform:translate(-50%,-50%);border-radius:2px}
-[data-k=mx-2] .dmarg{font-size:12.5px;color:var(--text-mid);margin-left:6px;font-variant-numeric:tabular-nums}
-[data-k=mx-2] .ghostline{position:absolute;left:0;right:0;height:0;opacity:0;transition:opacity .12s ease-out}
-[data-k=mx-2] .ghostline::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;
-  background:repeating-linear-gradient(90deg,rgba(var(--ink),.5) 0 5px,transparent 5px 10px)}
-[data-k=mx-2] .ghostline span{position:absolute;right:0;top:-16px;font-size:11px;color:rgba(var(--ink),.62);font-variant-numeric:tabular-nums}
-[data-k=mx-2] .ghostline.on{opacity:1}
+[data-k=mx-2] .col{position:relative;flex:1;min-height:0;display:flex;margin-bottom:16px}
+[data-k=mx-2] .clock{width:52px;flex:none;position:relative}
+[data-k=mx-2] .clock i{position:absolute;left:0;transform:translateY(-50%);font-style:normal;font-size:11px;
+  color:rgba(var(--ink),.44);font-variant-numeric:tabular-nums}
+[data-k=mx-2] .clock i.now{color:var(--text-hi);font-weight:700}
+[data-k=mx-2] .clock i.last{transform:translateY(-100%)}
+[data-k=mx-2] .track{position:relative;flex:1}
+[data-k=mx-2] .hourline{position:absolute;left:0;right:0;height:1px;background:rgba(var(--ink),.12);z-index:0}
+[data-k=mx-2] .blk{position:absolute;left:0;right:0;top:0;border-radius:12px;overflow:hidden;z-index:3;
+  background:rgba(22,25,31,.96);-webkit-backdrop-filter:blur(26px) saturate(1.45);backdrop-filter:blur(26px) saturate(1.45);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09),0 16px 34px rgba(0,0,0,.5);
+  transition:height .26s cubic-bezier(.2,.7,.3,1)}
+[data-k=mx-2] .blk .bt{position:absolute;left:14px;top:11px;right:14px;display:flex;justify-content:space-between;align-items:baseline}
+[data-k=mx-2] .blk .bt b{font-size:26px;font-weight:700;letter-spacing:-.035em;font-variant-numeric:tabular-nums;line-height:1}
+[data-k=mx-2] .blk .bt s{text-decoration:none;font-size:12px;color:var(--text-mid)}
+[data-k=mx-2] .blk .bb{position:absolute;left:14px;bottom:10px;right:14px;font-size:11.5px;color:var(--text-mid);
+  font-variant-numeric:tabular-nums;display:flex;justify-content:space-between}
+[data-k=mx-2] .brk{position:absolute;left:0;right:0;height:1px;background:repeating-linear-gradient(90deg,rgba(var(--ink),.3) 0 4px,transparent 4px 9px)}
+[data-k=mx-2] .brk span{position:absolute;right:14px;top:4px;font-size:10.5px;color:rgba(var(--ink),.55)}
+[data-k=mx-2] .ghostb{position:absolute;left:0;right:0;top:0;border-radius:12px;opacity:0;pointer-events:none;z-index:4;
+  box-shadow:inset 0 0 0 1px rgba(var(--ink),.22);transition:opacity .14s ease-out,height .18s ease-out}
+[data-k=mx-2] .ghostb.on{opacity:1}
+[data-k=mx-2] .after{position:absolute;left:0;right:0;bottom:0;padding:9px 2px 0;z-index:2;
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.14);transition:top .26s cubic-bezier(.2,.7,.3,1)}
+[data-k=mx-2] .after b{display:block;font-size:13px;font-weight:500;color:var(--text-hi);font-variant-numeric:tabular-nums}
+[data-k=mx-2] .after i{display:block;font-style:normal;font-size:11.5px;color:var(--text-mid);margin-top:2px}
+
+[data-k=mx-2] .sizes{display:flex;gap:8px}
+[data-k=mx-2] .sz{flex:1;border:0;border-radius:12px;padding:11px 11px 12px;text-align:left;font-family:inherit;cursor:pointer;
+  background:rgba(20,23,29,.9);-webkit-tap-highlight-color:transparent;box-shadow:inset 0 1px 0 rgba(var(--ink),.05);
+  transition:background .16s ease-out}
+[data-k=mx-2] .sz i{display:block;font-style:normal;font-size:11px;color:rgba(var(--ink),.5);transition:color .16s}
+[data-k=mx-2] .sz b{display:block;margin-top:3px;font-size:17px;font-weight:500;color:rgba(var(--ink),.6);
+  letter-spacing:-.02em;font-variant-numeric:tabular-nums;transition:color .16s}
+[data-k=mx-2] .sz.on{background:rgba(32,37,45,.97);box-shadow:inset 0 1px 0 rgba(var(--ink),.12),0 12px 26px rgba(0,0,0,.42)}
+[data-k=mx-2] .sz.on i{color:var(--text-mid)}
+[data-k=mx-2] .sz.on b{color:var(--text-hi);font-weight:700}
+[data-k=mx-2] .free{display:none;align-items:center;gap:10px;padding:7px 8px;border-radius:12px;
+  background:rgba(20,23,29,.9);box-shadow:inset 0 1px 0 rgba(var(--ink),.05)}
+[data-k=mx-2] .free.show{display:flex}
+[data-k=mx-2] .stepbtn{position:relative;width:56px;height:44px;flex:none;border:0;border-radius:10px;cursor:pointer;
+  background:rgba(30,34,42,.95);box-shadow:inset 0 1px 0 rgba(var(--ink),.08);-webkit-tap-highlight-color:transparent}
+[data-k=mx-2] .stepbtn::before{content:"";position:absolute;left:50%;top:50%;width:15px;height:2px;border-radius:2px;
+  background:rgba(var(--ink),.92);transform:translate(-50%,-50%)}
+[data-k=mx-2] .stepbtn.p::after{content:"";position:absolute;left:50%;top:50%;width:2px;height:15px;border-radius:2px;
+  background:rgba(var(--ink),.92);transform:translate(-50%,-50%)}
+[data-k=mx-2] .stepbtn:active{background:rgba(44,50,60,.97)}
+[data-k=mx-2] .stepbtn.off{opacity:.34;pointer-events:none}
+[data-k=mx-2] .freemid{flex:1;text-align:center}
+[data-k=mx-2] .freemid b{display:block;font-size:17px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+[data-k=mx-2] .freemid span{display:block;font-size:11px;color:var(--text-mid);margin-top:1px}
+
+[data-k=mx-2] .foot{display:flex;flex-direction:column;gap:9px;margin-top:12px}
+[data-k=mx-2] .cta{flex:1;border:0;border-radius:14px;background:rgba(235,238,248,.94);color:#0b0c10;font-family:inherit;
+  font-weight:700;font-size:15.5px;letter-spacing:-.01em;padding:15px 14px;cursor:pointer;font-variant-numeric:tabular-nums;
+  -webkit-tap-highlight-color:transparent;transition:transform .12s ease-out,background .12s ease-out}
+[data-k=mx-2] .cta:active{transform:scale(.985);background:rgba(235,238,248,1)}
+[data-k=mx-2] .more{align-self:center;border:0;border-radius:11px;padding:9px 17px;font-family:inherit;font-size:12.5px;font-weight:500;
+  color:var(--text-mid);cursor:pointer;background:rgba(22,25,31,.92);-webkit-tap-highlight-color:transparent;
+  -webkit-backdrop-filter:blur(22px) saturate(1.4);backdrop-filter:blur(22px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.08);transition:color .14s ease-out}
+[data-k=mx-2] .more.on,[data-k=mx-2] .more:active{color:var(--text-hi)}
+
+[data-k=mx-2] .dk{position:absolute;inset:0;display:flex;gap:28px;padding:26px 30px 24px}
+[data-k=mx-2] .dcolwrap{width:230px;flex:none;display:flex;flex-direction:column}
+[data-k=mx-2] .dcol{position:relative;flex:1;display:flex;min-height:0}
+[data-k=mx-2] .dright{flex:1;display:flex;flex-direction:column;min-width:0}
+[data-k=mx-2] .dhd b{font-size:15px;font-weight:500;letter-spacing:-.015em}
+[data-k=mx-2] .dhd u{text-decoration:none;font-size:12.5px;color:var(--text-mid);margin-left:8px;font-variant-numeric:tabular-nums}
+[data-k=mx-2] .dbig{display:flex;align-items:baseline;gap:9px;margin-top:14px}
+[data-k=mx-2] .dbig b{font-size:66px;font-weight:700;line-height:.86;letter-spacing:-.05em;font-variant-numeric:tabular-nums}
+[data-k=mx-2] .dbig s{text-decoration:none;font-size:15px;color:var(--text-mid);font-weight:500}
+[data-k=mx-2] .dsent{margin-top:10px;font-size:15.5px;line-height:1.36;color:var(--text-hi);height:42px;max-width:36ch}
+[data-k=mx-2] .dsizes{display:flex;gap:9px;margin-top:12px}
+[data-k=mx-2] .dsz{flex:1;border:0;border-radius:12px;padding:10px 12px 11px;text-align:left;font-family:inherit;cursor:pointer;
+  background:rgba(20,23,29,.9);box-shadow:inset 0 1px 0 rgba(var(--ink),.05);transition:background .16s ease-out}
+[data-k=mx-2] .dsz:hover{background:rgba(30,34,42,.95)}
+[data-k=mx-2] .dsz i{display:block;font-style:normal;font-size:11px;color:rgba(var(--ink),.5)}
+[data-k=mx-2] .dsz b{display:block;margin-top:3px;font-size:17px;font-weight:500;color:rgba(var(--ink),.6);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+[data-k=mx-2] .dsz.on{background:rgba(32,37,45,.97);box-shadow:inset 0 1px 0 rgba(var(--ink),.12),0 12px 26px rgba(0,0,0,.42)}
+[data-k=mx-2] .dsz.on i{color:var(--text-mid)}
+[data-k=mx-2] .dsz.on b{color:var(--text-hi);font-weight:700}
+[data-k=mx-2] .dfree{display:none;align-items:center;gap:10px;margin-top:12px}
+[data-k=mx-2] .dfree.show{display:flex}
+[data-k=mx-2] .dfree .stepbtn{width:48px;height:38px}
+[data-k=mx-2] .dfree span{font-size:12.5px;color:var(--text-mid);font-variant-numeric:tabular-nums}
+[data-k=mx-2] .dfoot{display:flex;gap:10px;margin-top:auto}
+[data-k=mx-2] .dcta{flex:1;max-width:210px;border:0;border-radius:14px;background:rgba(235,238,248,.94);color:#0b0c10;
+  font-family:inherit;font-weight:700;font-size:15.5px;padding:15px 12px;cursor:pointer;font-variant-numeric:tabular-nums;
+  transition:transform .12s ease-out,background .12s ease-out}
+[data-k=mx-2] .dcta:hover{background:rgba(255,255,255,.99)}
+[data-k=mx-2] .dcta:active{transform:scale(.985)}
+[data-k=mx-2] .dmore{border:0;border-radius:14px;padding:15px 14px;font-family:inherit;font-size:13.5px;font-weight:500;
+  color:var(--text-mid);cursor:pointer;background:rgba(22,25,31,.92);box-shadow:inset 0 1px 0 rgba(var(--ink),.08);
+  transition:color .14s ease-out}
+[data-k=mx-2] .dmore:hover,[data-k=mx-2] .dmore.on{color:var(--text-hi)}
+[data-k=mx-2] .dghost{height:17px;margin-top:9px;font-size:12.5px;color:rgba(var(--ink),.6);font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion:reduce){[data-k=mx-2] *{transition-duration:0s !important}}
 </style>
 <h3>Growing block</h3>
-<p class="cap">Intensity is a block that physically grows and eats the empty part of your day underneath it, one row per message.</p>
+<p class="cap">Built for the goals where the size of the day IS an amount of time (deep work, practice, training): the block is drawn to scale on your remaining afternoon, so 90 minutes literally looks like 90 minutes, and it offers three lengths rather than a dial.</p>
 
 <div class="ph">
-  <div class="grid"></div>
+  <div class="grid" id="mx2g"></div>
   <div class="scr">
-    <div class="hd">Today</div>
-    <div class="hd2">Message clients</div>
+    <div class="hd"><b>Deep work on the pitch deck</b><u id="mx2now">4:30 pm</u></div>
+    <div class="sub">how long you are sitting down for</div>
+
     <div class="col">
-      <div class="blk" id="mx2b" style="height:104px">
-        <div class="bhead"><b id="mx2bt">8 messages</b><u id="mx2bm">24 min</u></div>
-        <div class="rows" id="mx2r"></div>
-      </div>
-      <div class="rest">
-        <div class="capline"></div>
-        <span id="mx2rest">3 hr 36 min left after this</span>
-        <em>the rest of today, still yours</em>
-        <div class="floor"><u>day ends 8:30 pm</u></div>
+      <div class="clock" id="mx2ck"></div>
+      <div class="track" id="mx2tr">
+        <div class="ghostb" id="mx2gb"></div>
+        <div class="blk" id="mx2b">
+          <div class="bt"><b id="mx2bm">50 min</b><s id="mx2bl">one break</s></div>
+          <div class="brk" id="mx2brk" style="display:none"><span>break</span></div>
+          <div class="bb"><span id="mx2s1">4:30 pm</span><span id="mx2s2">ends 5:20 pm</span></div>
+        </div>
+        <div class="after" id="mx2af">
+          <b id="mx2left">1 hr 10 min left</b>
+          <i>the rest of the window, still yours</i>
+        </div>
       </div>
     </div>
-    <div class="step">
-      <div class="btn" id="mx2m"></div>
-      <div class="stepmid"><b id="mx2n">8</b><span>tap to resize the day</span></div>
-      <div class="btn p" id="mx2p"></div>
+
+    <div class="sizes" id="mx2sz">
+      <button class="sz" data-v="25"><i>lighter</i><b>25 min</b></button>
+      <button class="sz on" data-v="50"><i>today’s</i><b>50 min</b></button>
+      <button class="sz" data-v="90"><i>heavier</i><b>90 min</b></button>
+    </div>
+    <div class="free" id="mx2fr">
+      <button class="stepbtn" id="mx2m" aria-label="five minutes less"></button>
+      <div class="freemid"><b id="mx2fn">50 min</b><span>five minute steps</span></div>
+      <button class="stepbtn p" id="mx2p" aria-label="five minutes more"></button>
+    </div>
+
+    <div class="foot">
+      <button class="cta" id="mx2cta">Start 50 minutes</button>
+      <button class="more" id="mx2more">any length</button>
     </div>
   </div>
 </div>
 
 <div class="desk">
-  <div class="grid"></div>
+  <div class="grid" id="mx2dg"></div>
   <div class="dk">
-    <div class="dcol">
-      <div class="blk" id="mx2db" style="height:100px">
-        <div class="bhead"><b id="mx2dbt">8 messages</b><u id="mx2dbm">24 min</u></div>
-        <div class="rows" id="mx2dr"></div>
+    <div class="dcolwrap">
+      <div class="dcol">
+        <div class="clock" id="mx2dck"></div>
+        <div class="track" id="mx2dtr">
+          <div class="ghostb" id="mx2dgb"></div>
+          <div class="blk" id="mx2db">
+            <div class="bt"><b id="mx2dbm">50 min</b><s id="mx2dbl">one break</s></div>
+            <div class="brk" id="mx2dbrk" style="display:none"><span>break</span></div>
+            <div class="bb"><span id="mx2ds1">4:30 pm</span><span id="mx2ds2">ends 5:20 pm</span></div>
+          </div>
+          <div class="after" id="mx2daf">
+            <b id="mx2dleft">1 hr 10 min left</b>
+            <i>the rest of the window</i>
+          </div>
+        </div>
       </div>
-      <div class="rest">
-        <div class="capline"></div>
-        <span id="mx2drest">3 hr 36 min left after this</span>
-        <em>the rest of today, still yours</em>
-        <div class="floor"><u>day ends 8:30 pm</u></div>
-      </div>
-      <div class="ghostline" id="mx2g"><span id="mx2gt"></span></div>
     </div>
-    <div class="dside">
-      <div class="dnum" id="mx2dn">8</div>
-      <div class="dsub" id="mx2dsub">messages, at three minutes each</div>
-      <div class="dstats">
-        <div class="st"><u>this block</u><b id="mx2dt">24 min</b></div>
-        <div class="st"><u>ends</u><b id="mx2de">4:54 pm</b></div>
-        <div class="st"><u>day left</u><b id="mx2dl">3 hr 36 min</b></div>
+    <div class="dright">
+      <div class="dhd"><b>Deep work on the pitch deck</b><u>today, 4:30 pm</u></div>
+      <div class="dbig"><b id="mx2dn">50</b><s>minutes, sat down</s></div>
+      <div class="dsent" id="mx2dsent">The standard block. One break at the end, then you are out.</div>
+      <div class="dsizes" id="mx2dsz">
+        <button class="dsz" data-v="25"><i>lighter</i><b>25 min</b></button>
+        <button class="dsz on" data-v="50"><i>today’s</i><b>50 min</b></button>
+        <button class="dsz" data-v="90"><i>heavier</i><b>90 min</b></button>
       </div>
-      <div class="dstep">
-        <div class="dbtn" id="mx2dm"></div>
-        <div class="dbtn p" id="mx2dp"></div>
-        <div class="dmarg" id="mx2dmarg">hold to repeat, and a dashed ghost shows where the next step lands</div>
+      <div class="dfree" id="mx2dfr">
+        <button class="stepbtn" id="mx2dm" aria-label="five minutes less"></button>
+        <button class="stepbtn p" id="mx2dp" aria-label="five minutes more"></button>
+        <span id="mx2dfn">50 min, five minute steps, hold to run</span>
       </div>
+      <div class="dghost" id="mx2dghost">hover a length and the column draws where it would end before you pick it</div>
+      <div class="dfoot"><button class="dcta" id="mx2dcta">Start 50 minutes</button><button class="dmore" id="mx2dmore">any length</button></div>
     </div>
   </div>
 </div>
 
 <script>(function(){
   var R=document.querySelector('[data-k="mx-2"]'); if(!R) return;
-  var MIN=3, DAY=240, BASE=16*60+30, n=8;
+  var START=16*60+30, WINDOW=120, MINV=10, MAXV=120, v=50, free=false;
   function clock(m){var h=Math.floor(m/60)%24,mm=m%60,ap=h>=12?'pm':'am',hh=h%12||12;return hh+':'+(mm<10?'0':'')+mm+' '+ap;}
-  function hm(m){var h=Math.floor(m/60),mm=m%60;
-    if(h&&!mm) return h+' hr';
-    return (h?h+' hr ':'')+mm+' min';}
-  function rowsHTML(k){var s='';for(var i=0;i<k;i++)s+='<div></div>';return s;}
-  function height(k,head){return head+k*9+8;}
-  function paint(){
-    var mins=n*MIN, left=DAY-mins, u=n===1?'message':'messages';
-    R.querySelector('#mx2r').innerHTML=rowsHTML(n);
-    R.querySelector('#mx2dr').innerHTML=rowsHTML(n);
-    R.querySelector('#mx2b').style.height=height(n,40)+'px';
-    R.querySelector('#mx2db').style.height=height(n,40)+'px';
-    R.querySelector('#mx2bt').textContent=n+' '+u;
-    R.querySelector('#mx2dbt').textContent=n+' '+u;
-    R.querySelector('#mx2bm').textContent=mins+' min';
-    R.querySelector('#mx2dbm').textContent=mins+' min';
-    R.querySelector('#mx2rest').textContent=hm(left)+' left after this';
-    R.querySelector('#mx2drest').textContent=hm(left)+' left after this';
-    R.querySelector('#mx2n').textContent=n;
-    R.querySelector('#mx2dn').textContent=n;
-    R.querySelector('#mx2dsub').textContent=u+', at three minutes each';
-    R.querySelector('#mx2dt').textContent=mins+' min';
-    R.querySelector('#mx2de').textContent=clock(BASE+mins);
-    R.querySelector('#mx2dl').textContent=hm(left);
-    R.querySelector('#mx2m').className='btn'+(n<=1?' off':'');
-    R.querySelector('#mx2p').className='btn p'+(n>=20?' off':'');
+  function hm(m){var h=Math.floor(m/60),mm=m%60;return h?(mm?h+' hr '+mm+' min':h+' hr'):mm+' min';}
+  function sent(x){
+    if(x<=20) return 'A warm up. Long enough to open the file and move one thing.';
+    if(x<=30) return 'One pass. No break, nothing to set up first.';
+    if(x<=60) return 'The standard block. One break at the end, then you are out.';
+    if(x<=95) return 'Two passes with a break in the middle. Protect it, phone away.';
+    return 'A long sitting. Only take this if the rest of today is clear.';
   }
-  function bump(d){var v=Math.max(1,Math.min(20,n+d)); if(v===n) return; n=v; paint();}
-  ['#mx2m','#mx2dm'].forEach(function(s){R.querySelector(s).addEventListener('click',function(){bump(-1);});});
-  ['#mx2p','#mx2dp'].forEach(function(s){R.querySelector(s).addEventListener('click',function(){bump(1);});});
+  function breaks(x){return x<=30?'no break':(x<=60?'one break':'break at '+Math.round(x/2)+' min');}
 
-  // cursor only, hold to repeat plus a ghost of the next step
-  var timer=null;
-  function hold(sel,d){
-    var el=R.querySelector(sel);
-    el.addEventListener('mousedown',function(){clearInterval(timer);timer=setInterval(function(){bump(d);ghost(d);},110);});
-    el.addEventListener('mouseenter',function(){ghost(d);});
-    el.addEventListener('mouseleave',function(){R.querySelector('#mx2g').className='ghostline';});
+  function rig(o){
+    var track=R.querySelector(o.track), clk=R.querySelector(o.clock), blk=R.querySelector(o.blk),
+        gb=R.querySelector(o.ghost), af=R.querySelector(o.after), brk=R.querySelector(o.brk);
+    var lines=[];
+    function H(){return track.clientHeight;}
+    function px(m){return Math.max(0,Math.min(1,m/WINDOW))*H();}
+    function marks(){
+      lines.forEach(function(e){e.remove();}); lines=[];
+      clk.innerHTML='';
+      for(var m=0;m<=WINDOW;m+=30){
+        var y=px(m);
+        if(m>0){var l=document.createElement('div');l.className='hourline';l.style.top=y+'px';track.appendChild(l);lines.push(l);}
+        var i=document.createElement('i');
+        i.textContent=clock(START+m); i.style.top=y+'px';
+        if(m===0) i.className='now'; else if(m===WINDOW) i.className='last';
+        clk.appendChild(i);
+      }
+    }
+    function paint(){
+      var h=px(v), left=WINDOW-v;
+      blk.style.height=Math.max(64,h)+'px';
+      af.style.top=Math.max(64,h)+'px';
+      R.querySelector(o.bm).textContent=hm(v);
+      R.querySelector(o.bl).textContent=breaks(v);
+      R.querySelector(o.s1).textContent=clock(START);
+      R.querySelector(o.s2).textContent='ends '+clock(START+v);
+      R.querySelector(o.left).textContent = left>0 ? hm(left)+' left' : 'this fills the window';
+      if(v>60){brk.style.display='block';brk.style.top=(h/2)+'px';} else brk.style.display='none';
+      var szs=R.querySelector(o.sizes).children;
+      for(var i=0;i<szs.length;i++){
+        var on=(!free && +szs[i].getAttribute('data-v')===v);
+        szs[i].className=o.szCls+(on?' on':'');
+      }
+      R.querySelector(o.sizes).style.display=free?'none':'flex';
+      R.querySelector(o.freeEl).className=o.freeCls+(free?' show':'');
+      R.querySelector(o.cta).textContent='Start '+v+' minutes';
+      if(o.dn) R.querySelector(o.dn).textContent=v;
+      if(o.dsent) R.querySelector(o.dsent).textContent=sent(v);
+      if(o.fn) R.querySelector(o.fn).textContent=o.fnFull?(v+' min, five minute steps, hold to run'):hm(v);
+      var mb=R.querySelector(o.minus), pb=R.querySelector(o.plus);
+      mb.className='stepbtn'+(v<=MINV?' off':'');
+      pb.className='stepbtn p'+(v>=MAXV?' off':'');
+      R.querySelector(o.grid).style.opacity=(0.034+v/120*0.05).toFixed(3);
+    }
+    R.querySelector(o.sizes).addEventListener('click',function(e){
+      var b=e.target.closest('[data-v]'); if(!b) return;
+      v=+b.getAttribute('data-v'); paint();
+    });
+    function bump(d){var nv=Math.max(MINV,Math.min(MAXV,v+d*5)); if(nv===v) return; v=nv; paint();}
+    R.querySelector(o.minus).addEventListener('click',function(){bump(-1);});
+    R.querySelector(o.plus).addEventListener('click',function(){bump(1);});
+    var more=R.querySelector(o.more);
+    if(more) more.addEventListener('click',function(){
+      free=!free;
+      if(!free){ var near=[25,50,90], b=near[0]; near.forEach(function(x){if(Math.abs(x-v)<Math.abs(b-v))b=x;}); v=b; }
+      more.textContent=free?'three lengths':'any length';
+      more.classList.toggle('on',free);
+      paint();
+    });
+    marks(); paint();
+    return {ghost:gb, track:track, px:px, paint:paint, get v(){return v;},
+      setFree:function(f){free=f;paint();}, get free(){return free;}, setV:function(x){v=x;paint();}, marks:marks};
   }
-  window.addEventListener('mouseup',function(){clearInterval(timer);});
-  function ghost(d){
-    var v=Math.max(1,Math.min(20,n+d)), g=R.querySelector('#mx2g'), blk=R.querySelector('#mx2db');
-    if(v===n){g.className='ghostline';return;}
-    g.style.top=(blk.offsetTop+height(v,40))+'px';
-    R.querySelector('#mx2gt').textContent=v+' messages, '+(v*MIN)+' min';
-    g.className='ghostline on';
-  }
-  hold('#mx2dm',-1); hold('#mx2dp',1);
-  paint();
+
+  var ph=rig({track:'#mx2tr',clock:'#mx2ck',blk:'#mx2b',ghost:'#mx2gb',after:'#mx2af',brk:'#mx2brk',
+    bm:'#mx2bm',bl:'#mx2bl',s1:'#mx2s1',s2:'#mx2s2',left:'#mx2left',sizes:'#mx2sz',szCls:'sz',
+    freeEl:'#mx2fr',freeCls:'free',minus:'#mx2m',plus:'#mx2p',fn:'#mx2fn',cta:'#mx2cta',more:'#mx2more',grid:'#mx2g'});
+
+  var dk=rig({track:'#mx2dtr',clock:'#mx2dck',blk:'#mx2db',ghost:'#mx2dgb',after:'#mx2daf',brk:'#mx2dbrk',
+    bm:'#mx2dbm',bl:'#mx2dbl',s1:'#mx2ds1',s2:'#mx2ds2',left:'#mx2dleft',sizes:'#mx2dsz',szCls:'dsz',
+    freeEl:'#mx2dfr',freeCls:'dfree',minus:'#mx2dm',plus:'#mx2dp',fn:'#mx2dfn',fnFull:true,
+    cta:'#mx2dcta',more:'#mx2dmore',dn:'#mx2dn',dsent:'#mx2dsent',grid:'#mx2dg'});
+
+  // cursor translation: hovering a length draws it in the column before you commit
+  var dghost=R.querySelector('#mx2dghost'), rest=dghost.textContent;
+  R.querySelector('#mx2dsz').addEventListener('mousemove',function(e){
+    var b=e.target.closest('[data-v]'); if(!b) return;
+    var x=+b.getAttribute('data-v');
+    dk.ghost.style.height=Math.max(64,dk.px(x))+'px';
+    dk.ghost.classList.toggle('on',x!==dk.v);
+    dghost.textContent = x===dk.v ? 'this is the length you are on' : (x+' min, ends '+clock(START+x)+', '+breaks(x));
+  });
+  R.querySelector('#mx2dsz').addEventListener('mouseleave',function(){
+    dk.ghost.classList.remove('on'); dghost.textContent=rest;
+  });
+  // hold to run the five minute steps with the cursor
+  var t=null;
+  [['#mx2dm',-1],['#mx2dp',1]].forEach(function(p){
+    R.querySelector(p[0]).addEventListener('mousedown',function(){
+      clearInterval(t); t=setInterval(function(){ dk.setV(Math.max(10,Math.min(120,dk.v+p[1]*5))); },110);
+    });
+  });
+  window.addEventListener('mouseup',function(){clearInterval(t);});
+
+  [['#mx2cta'],['#mx2dcta']].forEach(function(p){
+    R.querySelector(p[0]).addEventListener('click',function(){
+      var b=this, was=b.textContent; b.textContent='Started'; setTimeout(function(){b.textContent=was;},900);
+    });
+  });
+  window.addEventListener('resize',function(){ph.marks();ph.paint();dk.marks();dk.paint();});
+  setTimeout(function(){ph.marks();ph.paint();dk.marks();dk.paint();},80);
 })();</script>
 </section>

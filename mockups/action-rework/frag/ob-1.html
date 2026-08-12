@@ -1,29 +1,39 @@
-<!-- ARCHETYPES (difference law): ob-1 full-bleed monumental type | ob-2 centered engraved object | ob-3 progressive bottom-up writing | ob-4 horizon perspective terrain | ob-5 split seam contrast -->
+<!-- ARCHETYPES, the surviving set: ob-1 full-bleed monumental type | ob-6 sequenced ledger reveal | ob-7 why-first inverted hierarchy | ob-8 single compact plate | ob-9 live countdown row | ob-10 pressed engraved slots.
+     All six are one concept, the wall of intent, delivered six ways. -->
 <section class="cell" data-k="ob-1">
 <style>
 [data-k=ob-1] .o1-halo{position:absolute;inset:0;pointer-events:none;
   background-image:linear-gradient(rgba(var(--ink),1) 1px,transparent 1px),
     linear-gradient(90deg,rgba(var(--ink),1) 1px,transparent 1px);
   background-size:26px 26px;opacity:.11;
-  -webkit-mask-image:radial-gradient(circle at 50% 40%,#000 0,rgba(0,0,0,.55) 34%,transparent 66%);
-  mask-image:radial-gradient(circle at 50% 40%,#000 0,rgba(0,0,0,.55) 34%,transparent 66%)}
-[data-k=ob-1] .o1-type{position:absolute;left:22px;right:22px;top:0;bottom:0;
-  display:flex;flex-direction:column;justify-content:center;gap:0}
-[data-k=ob-1] .o1-sm{font-size:19px;font-weight:400;line-height:1.2;color:rgba(var(--ink),.90);letter-spacing:-.01em}
-[data-k=ob-1] .o1-num{font-size:70px;font-weight:700;line-height:.94;letter-spacing:-.05em;
-  color:var(--text-hi);font-variant-numeric:tabular-nums;margin:8px 0 0 -4px}
-[data-k=ob-1] .o1-mid{font-size:31px;font-weight:500;line-height:1.05;letter-spacing:-.03em;color:var(--text-hi);margin-top:4px}
-[data-k=ob-1] .o1-so{margin-top:30px}
-[data-k=ob-1] .o1-big{font-size:41px;font-weight:700;line-height:1.02;letter-spacing:-.04em;color:var(--text-hi);margin-top:7px}
-[data-k=ob-1] .o1-rule{width:34px;height:1px;background:rgba(var(--ink),.30);margin:24px 0 0}
-[data-k=ob-1] .o1-note{font-size:13.5px;font-weight:400;line-height:1.45;color:rgba(var(--ink),.92);margin-top:12px;max-width:24ch}
-[data-k=ob-1] .o1-foot{position:absolute;left:22px;right:22px;bottom:40px;padding-top:17px;
-  background:linear-gradient(rgba(var(--ink),.16),rgba(var(--ink),.16)) 0 0/100% 1px no-repeat;
-  display:flex;align-items:center;justify-content:space-between}
-[data-k=ob-1] .o1-foot b{font-size:16px;font-weight:500;letter-spacing:-.012em;color:var(--text-hi)}
-[data-k=ob-1] .o1-foot svg{display:block;width:17px;height:11px;color:rgba(var(--ink),.88)}
+  -webkit-mask-image:radial-gradient(circle at 50% 36%,#000 0,rgba(0,0,0,.55) 32%,transparent 64%);
+  mask-image:radial-gradient(circle at 50% 36%,#000 0,rgba(0,0,0,.55) 32%,transparent 64%)}
+[data-k=ob-1] .o1-type{position:absolute;left:22px;right:22px;top:0;bottom:126px;
+  display:flex;flex-direction:column;justify-content:center}
+[data-k=ob-1] .o1-sm{font-size:18px;font-weight:400;line-height:1.2;color:rgba(var(--ink),.90);letter-spacing:-.01em}
+[data-k=ob-1] .o1-num{font-size:62px;font-weight:700;line-height:.94;letter-spacing:-.05em;
+  color:var(--text-hi);font-variant-numeric:tabular-nums;margin:8px 0 0 -3px}
+[data-k=ob-1] .o1-mid{font-size:28px;font-weight:500;line-height:1.05;letter-spacing:-.03em;color:var(--text-hi);margin-top:4px}
+[data-k=ob-1] .o1-so{margin-top:26px}
+[data-k=ob-1] .o1-big{font-size:37px;font-weight:700;line-height:1.03;letter-spacing:-.04em;color:var(--text-hi);margin-top:6px}
+[data-k=ob-1] .o1-rule{width:34px;height:1px;background:rgba(var(--ink),.30);margin:22px 0 0}
+/* deadline row: rendered ONLY when intake returned a date. Nothing else moves when it is absent. */
+[data-k=ob-1] .o1-when{display:flex;align-items:baseline;gap:9px;margin-top:16px}
+[data-k=ob-1] .o1-when i{font-style:normal;font-size:12.5px;font-weight:500;color:rgba(var(--ink),.62);letter-spacing:.005em}
+[data-k=ob-1] .o1-when b{font-size:17px;font-weight:500;letter-spacing:-.018em;color:var(--text-hi);font-variant-numeric:tabular-nums}
+[data-k=ob-1] .o1-when s{text-decoration:none;font-size:12.5px;color:rgba(var(--ink),.62);font-variant-numeric:tabular-nums}
+[data-k=ob-1] .o1-note{font-size:13px;font-weight:400;line-height:1.45;color:rgba(var(--ink),.92);margin-top:14px;max-width:26ch;
+  display:flex;align-items:center;gap:7px}
+[data-k=ob-1] .o1-note svg{flex:none;width:12px;height:14px;color:rgba(var(--ink),.72)}
+[data-k=ob-1] .o1-foot{position:absolute;left:22px;right:22px;bottom:30px}
+[data-k=ob-1] .o1-cta{display:block;width:100%;border:0;border-radius:14px;background:rgba(235,238,248,.94);
+  color:#0b0c10;font-family:inherit;font-weight:700;font-size:15.5px;letter-spacing:-.01em;padding:15px 16px;
+  text-align:center;cursor:pointer;transition:transform .16s ease-out,background .16s ease-out}
+[data-k=ob-1] .o1-cta:active{transform:scale(.985);background:rgba(235,238,248,.84)}
+[data-k=ob-1] .o1-foot p{margin:11px 0 0;text-align:center;font-size:12px;color:rgba(var(--ink),.62)}
+@media (prefers-reduced-motion:reduce){[data-k=ob-1] .o1-cta{transition:none}}
 </style>
-<h3>Wall of intent</h3><p class="cap">No card, no container, no chrome: the star IS the screen, scaled so the number is the largest thing they have ever seen it, with the grid brightening only where it lands.</p>
+<h3>Wall of intent</h3><p class="cap">No card, no container, no chrome: the star IS the screen, scaled so the number is the largest thing they have ever seen it, with the deadline read back as a fact and the real Memento button under it.</p>
 <div class="ph">
   <div class="grid"></div>
   <div class="o1-halo"></div>
@@ -34,11 +44,15 @@
     <span class="o1-sm o1-so">so I can</span>
     <span class="o1-big">quit the<br>warehouse</span>
     <span class="o1-rule"></span>
-    <span class="o1-note">Every day from here is measured against this line.</span>
+    <div class="o1-when"><i>by</i><b>March 1</b><s>201 days</s></div>
+    <p class="o1-note">
+      <svg viewBox="0 0 12 14" fill="none" aria-hidden="true"><path d="M2.7 6.2V4.3a3.3 3.3 0 0 1 6.6 0v1.9" stroke="currentColor" stroke-width="1.3"/><rect x="1.2" y="6.2" width="9.6" height="7" rx="1.8" fill="currentColor" opacity=".7"/></svg>
+      Your words, from Clarity. Not edited here.
+    </p>
   </div>
   <div class="o1-foot">
-    <b>Continue</b>
-    <svg viewBox="0 0 17 11" fill="none" aria-hidden="true"><path d="M1 5.5h14M11 1.5l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <button class="o1-cta" type="button">This is it</button>
+    <p>Change it later in Clarity</p>
   </div>
 </div>
 </section>

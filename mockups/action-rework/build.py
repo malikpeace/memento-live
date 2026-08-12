@@ -7,11 +7,11 @@ ROOT = pathlib.Path(__file__).parent
 FRAG = ROOT / 'frag'
 ORDER = ['ob', 'q', 'ld', 'lp', 'mx']
 TITLES = {
-    'ob': ('Onboarding', 'Their Neutron Star, shown five ways. No forms, just the goal made real.'),
-    'q':  ('The refine step', 'What is already done + what they think it takes. Three structures.'),
-    'ld': ('Loading', 'The plan being produced. The wait as visible work, never a spinner.'),
-    'lp': ('The daily loop', 'Twenty universal layouts. Number slots any goal can fill.'),
-    'mx': ('Intensity mechanics', 'Ten ways to scale today up or down. Phone + desktop pair each.'),
+    'ob': ('Onboarding', 'One concept, the wall of intent, delivered six ways. No forms, just the goal made real.'),
+    'q':  ('The refine step', 'What is already done + what they think it takes. One question at a time.'),
+    'ld': ('Loading', 'The plan being produced. The wait as visible work, never a spinner, never an invented stage name.'),
+    'lp': ('The daily loop', 'Eleven layout architectures. Number slots any goal can fill.'),
+    'mx': ('Intensity mechanics', 'Ways to scale today up or down, phone + desktop each. Three named sizes in front, freedom behind a quiet "more".'),
 }
 
 def key_of(p):
@@ -21,7 +21,7 @@ def key_of(p):
 
 HEAD = """<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Action rework — the 43</title>
+<title>Action rework — the survivors</title>
 <style>
 @font-face { font-family:'Geist'; src:url('../fonts/geist-400.otf') format('opentype'); font-weight:400; font-display:swap; }
 @font-face { font-family:'Geist'; src:url('../fonts/geist-500.otf') format('opentype'); font-weight:500; font-display:swap; }
@@ -50,10 +50,11 @@ body{margin:0;background:#0a0b0d;color:var(--text-hi);font-family:var(--font);-w
     linear-gradient(90deg,rgba(var(--ink),1) 1px,transparent 1px);
   background-size:26px 26px;opacity:.04}
 </style></head><body><div class="gal">
-<h1>Action rework — the 43</h1>
-<p class="sub">The teardown set. Only the grid survived. Five onboarding, three refine steps, five loading
-screens, twenty daily-loop architectures, ten intensity mechanics (phone + desktop each).
-Built by an Opus fleet against one contract, critiqued, judged for sameness.</p>
+<h1>Action rework — the survivors</h1>
+<p class="sub">The graded set: the designs Malik kept, built out from mockup to something close to shippable.
+Only the grid survived the teardown. Every intensity control now obeys the three-choice law, exactly three
+proposed sizes in front, named and honestly priced, with full freedom behind a small quiet "more".
+mx-11 is the deliberate counter-example: the same design carrying five.</p>
 """
 
 def main():

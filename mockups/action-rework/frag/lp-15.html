@@ -1,50 +1,101 @@
-<!-- ARCHETYPES (this agent, lp-11..lp-15):
-     lp-11 stacked ledger rows
-     lp-12 full-height week columns
-     lp-13 centered rest object
-     lp-14 split vertical panes
-     lp-15 bottom sheet first -->
+<!-- ARCHETYPES, the surviving set: lp-1 full-bleed statement type | lp-6 vertical descent rail | lp-7 poster ceiling number |
+     lp-8 hundred-mark field | lp-9 ruled ledger book | lp-10 receipt tape | lp-12 full-height week columns |
+     lp-15 bottom sheet first | lp-16 horizontal corridor band | lp-17 declarative sentence over account rows |
+     lp-18 centered monolith numeral -->
 <section class="cell" data-k="lp-15">
 <style>
 [data-k=lp-15] .ph{font-variant-numeric:tabular-nums}
-[data-k=lp-15] .hd{position:absolute;left:16px;right:16px;top:22px;font-size:15px;font-weight:500;letter-spacing:-.01em;color:var(--text-hi)}
-[data-k=lp-15] .wk{position:absolute;left:16px;right:16px;top:92px;height:56px;display:flex;gap:8px;align-items:flex-end}
-[data-k=lp-15] .wk div{flex:1;display:flex;flex-direction:column-reverse;gap:4px}
-[data-k=lp-15] .wk i{display:block;height:16px;border-radius:4px;background:rgba(var(--ink),.12)}
-[data-k=lp-15] .wk i.on{background:rgba(var(--ink),.38)}
-[data-k=lp-15] .wk i.now{background:rgba(63,217,78,.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.16)}
-[data-k=lp-15] .wl{position:absolute;left:16px;right:16px;top:156px;display:flex;justify-content:space-between;
-  font-size:10.5px;color:rgba(var(--ink),.64)}
-[data-k=lp-15] .say{position:absolute;left:16px;right:16px;top:184px;font-size:13.5px;line-height:1.45;color:rgba(var(--ink),.94)}
-[data-k=lp-15] .sheet{position:absolute;left:0;right:0;bottom:0;top:262px;padding:14px 16px 16px;border-radius:18px 18px 0 0;
-  background:rgba(22,25,31,.96);-webkit-backdrop-filter:blur(32px) saturate(1.4);backdrop-filter:blur(32px) saturate(1.4);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.08), 0 -20px 50px rgba(0,0,0,.6)}
-[data-k=lp-15] .grab{width:34px;height:4px;border-radius:999px;background:rgba(var(--ink),.18);margin:0 auto 14px}
-[data-k=lp-15] .sheet .t{font-size:11.5px;color:rgba(var(--ink),.80)}
-[data-k=lp-15] .sheet .one{margin:7px 0 16px;font-size:24px;font-weight:700;letter-spacing:-.025em;color:var(--text-hi)}
-[data-k=lp-15] .opts button{display:block;width:100%;margin-bottom:8px;padding:0 14px;height:52px;border:0;border-radius:11px;
-  text-align:left;font:500 14px var(--font);color:rgba(var(--ink),.82);background:rgba(var(--ink),.05);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.05);cursor:pointer;position:relative;overflow:hidden}
+[data-k=lp-15] .hd{position:absolute;left:16px;right:16px;top:22px;display:flex;justify-content:space-between;
+  align-items:baseline;font-size:13px;color:rgba(var(--ink),.90)}
+[data-k=lp-15] .hd b{font-size:15px;font-weight:500;letter-spacing:-.01em;color:rgba(var(--ink),.97)}
+
+/* eight weeks of rhythm */
+[data-k=lp-15] .wk{position:absolute;left:16px;right:16px;top:72px;height:78px;display:flex;gap:9px;align-items:flex-end}
+[data-k=lp-15] .wk div{flex:1;display:flex;flex-direction:column-reverse;gap:5px}
+[data-k=lp-15] .wk i{display:block;height:21px;border-radius:4px;background:rgba(var(--ink),.10)}
+[data-k=lp-15] .wk i.on{background:rgba(var(--ink),.34)}
+[data-k=lp-15] .wk i.now{background:rgba(63,217,78,.60);box-shadow:inset 0 1px 0 rgba(255,255,255,.18)}
+[data-k=lp-15] .wl{position:absolute;left:16px;right:16px;top:158px;display:flex;justify-content:space-between;
+  font-size:10.5px;color:rgba(var(--ink),.62)}
+[data-k=lp-15] .say{position:absolute;left:16px;right:16px;top:186px;margin:0;font-size:13.5px;line-height:1.45;
+  color:rgba(var(--ink),.94)}
+
+/* scrim, so the sheet reads as lifted off the page */
+[data-k=lp-15] .scrim{position:absolute;inset:0;background:rgba(3,4,6,.55);opacity:0;pointer-events:none;
+  transition:opacity .32s ease-out}
+[data-k=lp-15] .up .scrim{opacity:1;pointer-events:auto}
+
+/* the sheet */
+[data-k=lp-15] .stack2{position:absolute;left:14px;right:14px;height:26px;border-radius:16px 16px 0 0;
+  background:rgba(22,25,31,.55);top:370px;transition:top .42s cubic-bezier(.32,.72,0,1)}
+[data-k=lp-15] .sheet{position:absolute;left:0;right:0;bottom:0;top:376px;padding:12px 16px 16px;
+  border-radius:20px 20px 0 0;background:rgba(22,25,31,.965);
+  -webkit-backdrop-filter:blur(34px) saturate(1.4);backdrop-filter:blur(34px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09),0 -22px 54px rgba(0,0,0,.62);
+  transition:top .42s cubic-bezier(.32,.72,0,1)}
+[data-k=lp-15] .up .sheet{top:228px}
+[data-k=lp-15] .up .stack2{top:222px}
+[data-k=lp-15] .drag{position:absolute;left:0;right:0;top:0;height:34px;cursor:grab;touch-action:none}
+[data-k=lp-15] .grab{position:absolute;left:50%;top:9px;width:36px;height:4px;margin-left:-18px;border-radius:999px;
+  background:rgba(var(--ink),.20)}
+[data-k=lp-15] .t{margin:26px 0 0;font-size:11.5px;color:rgba(var(--ink),.80)}
+[data-k=lp-15] .one{margin:7px 0 0;font-size:23px;font-weight:700;letter-spacing:-.028em;line-height:1.15;
+  color:rgba(var(--ink),.97)}
+[data-k=lp-15] .peek{margin:8px 0 0;font-size:12px;line-height:1.4;color:rgba(var(--ink),.90);max-height:20px;
+  overflow:hidden;transition:opacity .18s ease-out,max-height .3s cubic-bezier(.32,.72,0,1),margin .3s}
+[data-k=lp-15] .up .peek{opacity:0;max-height:0;margin-top:0}
+
+[data-k=lp-15] .slots{margin:14px 0 0;display:flex;gap:7px;max-height:60px;overflow:hidden;
+  transition:opacity .18s ease-out,max-height .3s cubic-bezier(.32,.72,0,1),margin .3s}
+[data-k=lp-15] .up .slots{opacity:0;max-height:0;margin-top:0;pointer-events:none}
+[data-k=lp-15] .slots div{flex:1;padding:9px 10px;border-radius:10px;background:rgba(var(--ink),.05);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.05);font-size:11px;color:rgba(var(--ink),.90);line-height:1.35}
+[data-k=lp-15] .slots div b{display:block;font-size:12.5px;font-weight:700;color:rgba(var(--ink),.96);margin-bottom:2px}
+[data-k=lp-15] .slots div.n{background:rgba(19,27,21,.92);box-shadow:inset 0 1px 0 rgba(63,217,78,.22)}
+[data-k=lp-15] .slots div.n b{color:#3fd94e}
+[data-k=lp-15] .opts{margin:14px 0 0;overflow:hidden;max-height:0;opacity:0;
+  transition:max-height .42s cubic-bezier(.32,.72,0,1),opacity .22s ease-out}
+[data-k=lp-15] .up .opts{max-height:250px;opacity:1}
+[data-k=lp-15] .opts button{position:relative;display:block;width:100%;margin-bottom:7px;padding:9px 14px;
+  height:54px;border:0;border-radius:12px;text-align:left;overflow:hidden;cursor:pointer;
+  font:500 14px var(--font);color:rgba(var(--ink),.90);background:rgba(var(--ink),.05);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.05)}
 [data-k=lp-15] .opts button b{display:block;font-weight:700;font-size:14.5px;color:inherit}
-[data-k=lp-15] .opts button em{display:block;font-style:normal;font-size:11px;margin-top:3px;color:rgba(var(--ink),.9)}
-[data-k=lp-15] .opts button.on{background:rgba(var(--ink),.11);color:var(--text-hi)}
-[data-k=lp-15] .opts button.on:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:#3fd94e}
-[data-k=lp-15] .opts button.on em{color:rgba(var(--ink),.80)}
-[data-k=lp-15] .cons{margin:4px 0 12px;font-size:11.5px;line-height:1.45;color:rgba(var(--ink),.90)}
-[data-k=lp-15] .sl{position:relative;height:52px;border-radius:13px;background:rgba(var(--ink),.06);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.06);overflow:hidden;touch-action:none}
-[data-k=lp-15] .sl .fill{position:absolute;left:0;top:0;bottom:0;width:52px;background:rgba(63,217,78,.16)}
+[data-k=lp-15] .opts button em{display:block;font-style:normal;font-size:11.5px;margin-top:3px;color:rgba(var(--ink),.90)}
+[data-k=lp-15] .opts button.on{background:rgba(var(--ink),.10);color:rgba(var(--ink),.97)}
+[data-k=lp-15] .opts button.on:before{content:"";position:absolute;left:0;top:9px;bottom:9px;width:3px;
+  border-radius:0 2px 2px 0;background:#3fd94e}
+[data-k=lp-15] .cons{margin:2px 0 0;font-size:11.5px;line-height:1.45;color:rgba(var(--ink),.90);
+  opacity:0;transition:opacity .22s ease-out}
+[data-k=lp-15] .up .cons{opacity:1}
+
+/* slide to log */
+[data-k=lp-15] .sl{position:absolute;left:16px;right:16px;bottom:16px;height:56px;border-radius:14px;
+  background:rgba(var(--ink),.055);box-shadow:inset 0 1px 0 rgba(var(--ink),.06);overflow:hidden;touch-action:none}
+[data-k=lp-15] .sl .fill{position:absolute;left:0;top:0;bottom:0;width:56px;background:rgba(63,217,78,.14);
+  transition:width .18s ease-out}
 [data-k=lp-15] .sl .lb{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font:700 14px var(--font);letter-spacing:-.01em;color:var(--text-hi);padding-left:34px}
-[data-k=lp-15] .sl .kn{position:absolute;left:4px;top:4px;width:44px;height:44px;border-radius:10px;background:#3fd94e;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.3);cursor:grab}
-[data-k=lp-15] .sl .kn:after{content:"";position:absolute;left:17px;top:16px;width:9px;height:9px;
-  border-top:2px solid #06210a;border-right:2px solid #06210a;transform:rotate(45deg)}
+  padding-left:36px;font:600 14px var(--font);letter-spacing:-.01em;color:rgba(var(--ink),.94)}
+[data-k=lp-15] .sl .kn{position:absolute;left:4px;top:4px;width:48px;height:48px;border-radius:11px;
+  background:rgba(235,238,248,.94);cursor:grab;transition:left .18s ease-out}
+[data-k=lp-15] .sl .kn:after{content:"";position:absolute;left:18px;top:18px;width:10px;height:10px;
+  border-top:2.4px solid #0b0c10;border-right:2.4px solid #0b0c10;transform:rotate(45deg)}
+[data-k=lp-15] .sl.done{background:rgba(22,25,31,.92);box-shadow:inset 0 1px 0 rgba(var(--ink),.09)}
+[data-k=lp-15] .sl.done .kn{display:none}
+[data-k=lp-15] .sl.done .fill{background:rgba(63,217,78,.16)}
+[data-k=lp-15] .sl.done .lb{padding-left:0;font-weight:500;color:rgba(var(--ink),.95)}
+[data-k=lp-15] .undo{position:absolute;left:16px;right:16px;bottom:16px;display:none;padding:15px 14px;border:0;
+  border-radius:14px;font:500 14px var(--font);color:rgba(var(--ink),.95);background:rgba(22,25,31,.92);
+  -webkit-backdrop-filter:blur(24px) saturate(1.4);backdrop-filter:blur(24px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09);cursor:pointer}
+[data-k=lp-15] .logged .undo{display:block}
+[data-k=lp-15] .logged .sl{bottom:86px}
+[data-k=lp-15] .logged .slots{opacity:0;max-height:0;margin-top:0;pointer-events:none}
 </style>
-<h3>Sheet first</h3><p class="cap">The top is just eight weeks of rhythm read at a glance, and the working half is a sheet that never leaves the bottom of the screen: pick the sentence for today, then slide it done with one thumb.</p>
-<div class="ph">
+<h3>Sheet first</h3><p class="cap">Eight weeks of rhythm sit behind glass while the working half never leaves the thumb: a sheet resting at the bottom that lifts when you want to change the run, and slides shut when you log it.</p>
+<div class="ph" id="l15ph">
   <div class="grid"></div>
-  <div class="hd">Run 3 times a week</div>
+  <div class="hd"><b>Run 3 times a week</b><span id="l15h">1 of 3 this week</span></div>
 
   <div class="wk">
     <div><i class="on"></i><i class="on"></i><i class="on"></i></div>
@@ -54,36 +105,98 @@
     <div><i class="on"></i><i class="on"></i><i class="on"></i></div>
     <div><i class="on"></i><i></i><i></i></div>
     <div><i class="on"></i><i class="on"></i><i class="on"></i></div>
-    <div><i class="on"></i><i class="now"></i><i></i></div>
+    <div><i class="on"></i><i class="now" id="l15now"></i><i></i></div>
   </div>
   <div class="wl"><span>8 weeks back</span><span>this week</span></div>
-  <p class="say">You hit three in 5 of the last 7 weeks. This week has one run in it so far.</p>
+  <p class="say" id="l15say">You hit three in five of the last seven weeks. This week has one run in it so far.</p>
 
-  <div class="sheet">
-    <div class="grab"></div>
-    <div class="t">Wednesday, run 2 of 3</div>
+  <div class="scrim" id="l15sc"></div>
+  <div class="stack2"></div>
+  <div class="sheet" id="l15sh">
+    <div class="drag" id="l15dg"><div class="grab"></div></div>
+    <div class="t" id="l15t">Wednesday, run 2 of 3</div>
     <div class="one" id="l15o">Run 5 km, easy pace</div>
+    <div class="peek" id="l15pk">Pull up for the other two ways to run it</div>
+
+    <div class="slots" id="l15sl">
+      <div><b>Mon</b>5 km done</div>
+      <div class="n" id="l15s2"><b>Today</b>run 2</div>
+      <div><b>Sat</b>run 3 open</div>
+    </div>
+
     <div class="opts" id="l15l">
       <button data-km="3"><b>Short one, 3 km easy</b><em>For a day that got away from you</em></button>
-      <button class="on" data-km="5"><b>The normal one, 5 km easy</b><em>What you have been running</em></button>
+      <button class="on" data-km="5"><b>The normal one, 5 km easy</b><em>What you have been running all block</em></button>
       <button data-km="8"><b>Long one, 8 km, last 2 hard</b><em>Costs about 50 minutes</em></button>
     </div>
-    <p class="cons" id="l15c">Any of the three keeps this week at three. This one puts 5 km in the week.</p>
-    <div class="sl" id="l15s"><div class="fill" id="l15f"></div><div class="lb" id="l15t">Slide to log the run</div><div class="kn" id="l15k"></div></div>
+    <p class="cons" id="l15c">All three keep the week at three runs. This one puts 5 km in it.</p>
+
+    <div class="sl" id="l15s"><div class="fill" id="l15f"></div><div class="lb" id="l15tx">Slide to log the run</div><div class="kn" id="l15k"></div></div>
+    <button class="undo" id="l15u">Put it back, I have not run yet</button>
   </div>
 </div>
 <script>(function(){var r=document.querySelector('[data-k="lp-15"]');if(!r)return;
-var L=r.querySelector('#l15l'),O=r.querySelector('#l15o'),C=r.querySelector('#l15c'),km=5;
+var ph=r.querySelector('#l15ph'),sh=r.querySelector('#l15sh'),dg=r.querySelector('#l15dg'),
+    sc=r.querySelector('#l15sc'),L=r.querySelector('#l15l'),O=r.querySelector('#l15o'),
+    C=r.querySelector('#l15c'),km=5,logged=false,REST=376,UP=228;
 var T={3:'Run 3 km, easy pace',5:'Run 5 km, easy pace',8:'Run 8 km, last 2 hard'};
-L.onclick=function(e){var b=e.target.closest('button');if(!b)return;
-[].forEach.call(L.children,function(x){x.className=x===b?'on':'';});km=+b.dataset.km;O.textContent=T[km];
-C.textContent='Any of the three keeps this week at three. This one puts '+km+' km in the week.';};
-var s=r.querySelector('#l15s'),k=r.querySelector('#l15k'),f=r.querySelector('#l15f'),t=r.querySelector('#l15t'),drag=0;
-k.addEventListener('pointerdown',function(e){k.setPointerCapture(e.pointerId);drag=1;});
-k.addEventListener('pointermove',function(e){if(!drag)return;var b=s.getBoundingClientRect();
-var x=Math.max(4,Math.min(b.width-48,e.clientX-b.left-22));k.style.left=x+'px';f.style.width=(x+48)+'px';
-if(x>=b.width-49){drag=0;k.style.left=(b.width-48)+'px';f.style.width='100%';t.textContent='Run 2 of 3 logged';
-r.querySelectorAll('.wk i.now')[0].className='on';}});
-k.addEventListener('pointerup',function(){if(!drag)return;drag=0;k.style.left='4px';f.style.width='52px';});
+
+function open(u){ph.classList.toggle('up',u);var t=u?UP:REST;
+  sh.style.top=t+'px';r.querySelector('.stack2').style.top=(t-6)+'px';}
+dg.addEventListener('click',function(){if(!drag.moved)open(!ph.classList.contains('up'));});
+sc.addEventListener('click',function(){open(false);});
+
+var drag={on:false,y0:0,t0:0,moved:false};
+dg.addEventListener('pointerdown',function(e){if(logged)return;
+  try{dg.setPointerCapture(e.pointerId);}catch(z){}
+  drag.on=true;drag.moved=false;drag.y0=e.clientY;drag.t0=ph.classList.contains('up')?UP:REST;
+  sh.style.transition='none';r.querySelector('.stack2').style.transition='none';});
+dg.addEventListener('pointermove',function(e){if(!drag.on)return;
+  var d=e.clientY-drag.y0;if(Math.abs(d)>3)drag.moved=true;
+  var t=Math.max(UP,Math.min(REST,drag.t0+d));
+  sh.style.top=t+'px';r.querySelector('.stack2').style.top=(t-6)+'px';});
+function release(){if(!drag.on)return;drag.on=false;
+  sh.style.transition='';r.querySelector('.stack2').style.transition='';
+  var t=parseFloat(sh.style.top||drag.t0);open(t<(UP+REST)/2);}
+dg.addEventListener('pointerup',release);dg.addEventListener('pointercancel',release);
+
+L.addEventListener('click',function(e){var b=e.target.closest('button');if(!b||logged)return;
+  [].forEach.call(L.children,function(x){x.classList.toggle('on',x===b);});
+  km=+b.dataset.km;O.textContent=T[km];
+  C.textContent='All three keep the week at three runs. This one puts '+km+' km in it.';});
+
+var s=r.querySelector('#l15s'),k=r.querySelector('#l15k'),f=r.querySelector('#l15f'),
+    tx=r.querySelector('#l15tx'),sd=false;
+function reset(){k.style.transition='';f.style.transition='';k.style.left='4px';f.style.width='56px';}
+k.addEventListener('pointerdown',function(e){if(logged)return;e.preventDefault();
+  try{k.setPointerCapture(e.pointerId);}catch(z){}sd=true;k.style.transition='none';f.style.transition='none';});
+k.addEventListener('pointermove',function(e){if(!sd)return;
+  var b=s.getBoundingClientRect(),max=b.width-52,
+      x=Math.max(4,Math.min(max,e.clientX-b.left-24));
+  k.style.left=x+'px';f.style.width=(x+52)+'px';
+  if(x>=max-1){sd=false;done();}});
+function up(){if(!sd)return;sd=false;reset();}
+k.addEventListener('pointerup',up);k.addEventListener('pointercancel',up);
+function done(){logged=true;k.style.transition='';f.style.transition='';
+  s.classList.add('done');f.style.width='100%';
+  tx.textContent='Run 2 of 3 logged, '+km+' km';
+  r.querySelector('#l15now').className='on';
+  r.querySelector('#l15h').textContent='2 of 3 this week';
+  r.querySelector('#l15t').textContent='Wednesday, done';
+  O.textContent='Next run Friday';
+  r.querySelector('#l15pk').textContent='Nothing else is asked of you today';
+  r.querySelector('#l15s2').innerHTML='<b>Today</b>'+km+' km done';
+  r.querySelector('#l15say').textContent='You hit three in five of the last seven weeks. This week has two runs in it now.';
+  ph.classList.add('logged');open(false);}
+r.querySelector('#l15u').addEventListener('click',function(){logged=false;
+  ph.classList.remove('logged');s.classList.remove('done');reset();
+  tx.textContent='Slide to log the run';
+  r.querySelector('#l15now').className='now';
+  r.querySelector('#l15h').textContent='1 of 3 this week';
+  r.querySelector('#l15t').textContent='Wednesday, run 2 of 3';
+  O.textContent=T[km];
+  r.querySelector('#l15pk').textContent='Pull up for the other two ways to run it';
+  r.querySelector('#l15s2').innerHTML='<b>Today</b>run 2';
+  r.querySelector('#l15say').textContent='You hit three in five of the last seven weeks. This week has one run in it so far.';});
 })();</script>
 </section>

@@ -1,86 +1,157 @@
-<!-- ARCHETYPES (this agent, lp-11..lp-15):
-     lp-11 stacked ledger rows
-     lp-12 full-height week columns
-     lp-13 centered rest object
-     lp-14 split vertical panes
-     lp-15 bottom sheet first -->
+<!-- ARCHETYPES, the surviving set: lp-1 full-bleed statement type | lp-6 vertical descent rail | lp-7 poster ceiling number |
+     lp-8 hundred-mark field | lp-9 ruled ledger book | lp-10 receipt tape | lp-12 full-height week columns |
+     lp-15 bottom sheet first | lp-16 horizontal corridor band | lp-17 declarative sentence over account rows |
+     lp-18 centered monolith numeral -->
 <section class="cell" data-k="lp-12">
 <style>
 [data-k=lp-12] .ph{font-variant-numeric:tabular-nums}
-[data-k=lp-12] .hd{position:absolute;left:16px;right:16px;top:20px;font-size:15px;font-weight:500;color:var(--text-hi);letter-spacing:-.01em}
-[data-k=lp-12] .card{position:absolute;left:14px;right:14px;top:52px;padding:13px 14px 14px;border-radius:14px;
-  background:rgba(22,25,31,.95);-webkit-backdrop-filter:blur(30px) saturate(1.4);backdrop-filter:blur(30px) saturate(1.4);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.07), 0 18px 34px rgba(0,0,0,.5)}
-[data-k=lp-12] .card .t{display:flex;justify-content:space-between;align-items:baseline;font-size:11.5px;color:rgba(var(--ink),.9)}
-[data-k=lp-12] .card .w{margin:8px 0 10px;font-size:21px;font-weight:700;letter-spacing:-.02em;color:var(--text-hi)}
-[data-k=lp-12] .card .m{display:flex;align-items:baseline;gap:6px}
-[data-k=lp-12] .card .m b{font-size:34px;font-weight:700;letter-spacing:-.03em;line-height:.9;color:#3fd94e}
-[data-k=lp-12] .card .m span{font-size:12.5px;color:rgba(var(--ink),.86)}
-[data-k=lp-12] .card .cons{margin:10px 0 0;font-size:11.5px;line-height:1.4;color:rgba(var(--ink),.90)}
-[data-k=lp-12] .note{position:absolute;left:18px;right:18px;top:204px;margin:0;font-size:11.5px;color:rgba(var(--ink),.90);line-height:1.45}
-[data-k=lp-12] .cols{position:absolute;left:16px;right:16px;top:244px;height:304px;display:flex;gap:6px;align-items:flex-end}
-[data-k=lp-12] .ch{position:relative;flex:1;height:100%;border-radius:8px;background:rgba(22,25,31,.94);
-  backdrop-filter:blur(22px) saturate(1.35);-webkit-backdrop-filter:blur(22px) saturate(1.35);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.07);overflow:hidden}
-[data-k=lp-12] .ch .f{position:absolute;left:0;right:0;bottom:0;border-radius:8px;background:rgba(var(--ink),.30)}
-[data-k=lp-12] .ch.rest .f{height:10px;border-radius:0;background:repeating-linear-gradient(90deg,rgba(var(--ink),.42) 0 3px,transparent 3px 6px)}
-[data-k=lp-12] .ch.now{background:rgba(20,29,22,.94);touch-action:none;cursor:ns-resize}
-[data-k=lp-12] .ch.now .f{background:linear-gradient(180deg,rgba(63,217,78,.52),rgba(63,217,78,.16))}
-[data-k=lp-12] .ch.now .f:after{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:#3fd94e}
-[data-k=lp-12] .ch.done .f{background:linear-gradient(180deg,rgba(var(--ink),.26),rgba(var(--ink),.09))}
-[data-k=lp-12] .ch.done .f:after{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:rgba(var(--ink),.9)}
-[data-k=lp-12] .days{position:absolute;left:16px;right:16px;top:556px;display:flex;gap:6px}
-[data-k=lp-12] .days div{flex:1;text-align:center;font-size:11px;color:rgba(var(--ink),.80)}
-[data-k=lp-12] .days div.n{color:#3fd94e;font-weight:700}
-[data-k=lp-12] .days div em{display:block;font-style:normal;font-size:10px;color:rgba(var(--ink),.64);margin-top:3px}
-[data-k=lp-12] .fin{position:absolute;left:14px;right:14px;bottom:16px;height:46px;border:0;border-radius:12px;
-  font:700 15px var(--font);letter-spacing:-.01em;color:#06210a;background:#3fd94e;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.28);cursor:pointer}
-[data-k=lp-12] .fin.ok{background:rgba(var(--ink),.09);color:var(--text-hi);box-shadow:inset 0 1px 0 rgba(var(--ink),.07)}
+[data-k=lp-12] .hd{position:absolute;left:16px;right:16px;top:20px;display:flex;justify-content:space-between;
+  align-items:baseline;font-size:12.5px;color:rgba(var(--ink),.90)}
+[data-k=lp-12] .one{position:absolute;left:16px;right:16px;top:44px;margin:0;font-size:26px;font-weight:700;
+  letter-spacing:-.03em;line-height:1.06;color:rgba(var(--ink),.97)}
+[data-k=lp-12] .one b{font-weight:700;color:#3fd94e}
+[data-k=lp-12] .hint{position:absolute;left:16px;right:16px;top:104px;font-size:12px;color:rgba(var(--ink),.90)}
+
+/* seven channels */
+[data-k=lp-12] .cols{position:absolute;left:14px;right:14px;top:134px;height:316px;display:flex;gap:6px;align-items:stretch}
+[data-k=lp-12] .ch{position:relative;flex:1;border-radius:9px;overflow:hidden;background:rgba(22,25,31,.95);
+  -webkit-backdrop-filter:blur(24px) saturate(1.35);backdrop-filter:blur(24px) saturate(1.35);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.07)}
+[data-k=lp-12] .ch .f{position:absolute;left:0;right:0;bottom:0;height:0;background:rgba(var(--ink),.16)}
+[data-k=lp-12] .ch .f:after{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:rgba(var(--ink),.78)}
+[data-k=lp-12] .ch.rest .f{height:9px;background:rgba(var(--ink),.05)}
+[data-k=lp-12] .ch.rest .f:after{background:repeating-linear-gradient(90deg,rgba(var(--ink),.34) 0 3px,transparent 3px 7px)}
+[data-k=lp-12] .ch .f .v{position:absolute;left:0;right:0;top:8px;text-align:center;font-size:11.5px;
+  font-weight:500;color:rgba(var(--ink),.93)}
+[data-k=lp-12] .ch.rest .v{position:absolute;left:0;right:0;bottom:18px;text-align:center;font-size:11px;
+  color:rgba(var(--ink),.82)}
+
+/* today */
+[data-k=lp-12] .ch.now{flex:1.75;background:rgba(19,27,21,.95);touch-action:none;cursor:ns-resize;
+  box-shadow:inset 0 1px 0 rgba(63,217,78,.20)}
+[data-k=lp-12] .ch.now .f{background:linear-gradient(180deg,rgba(63,217,78,.34),rgba(63,217,78,.10))}
+[data-k=lp-12] .ch.now .f:after{background:#3fd94e;height:3px}
+[data-k=lp-12] .ch.now .f .v{font-size:14px;font-weight:700;color:rgba(var(--ink),.97)}
+[data-k=lp-12] .ch.now.ok .f{background:linear-gradient(180deg,rgba(63,217,78,.46),rgba(63,217,78,.14))}
+[data-k=lp-12] .ch.now.ok .f .v:after{content:"";display:block;width:11px;height:6px;margin:6px auto 0;
+  border-left:2px solid #3fd94e;border-bottom:2px solid #3fd94e;transform:rotate(-45deg)}
+[data-k=lp-12] .ch.now .ticks{position:absolute;right:0;top:0;bottom:0;width:9px}
+[data-k=lp-12] .ch.now .ticks i{position:absolute;right:0;width:6px;height:1px;background:rgba(var(--ink),.20)}
+[data-k=lp-12] .ch.now .drag{position:absolute;left:0;right:0;top:16px;text-align:center;font-size:10.5px;
+  color:rgba(var(--ink),.72);line-height:1.5}
+[data-k=lp-12] .ch.now .drag u{display:block;text-decoration:none;font-size:13px;color:rgba(var(--ink),.45)}
+[data-k=lp-12] .ch.now.set .drag{display:none}
+[data-k=lp-12] .ph:not(.free) .ch.now{cursor:default}
+[data-k=lp-12] .ph:not(.free) .ch.now .drag{display:none}
+
+/* three proposed sizes for Thursday. Free dragging only after "more" */
+[data-k=lp-12] .sizes{position:absolute;left:14px;right:14px;top:502px;display:flex;gap:6px}
+[data-k=lp-12] .sizes button{flex:1;min-width:0;border:0;border-radius:10px;padding:8px 4px 9px;cursor:pointer;
+  font-family:var(--font);background:rgba(22,25,31,.95);
+  -webkit-backdrop-filter:blur(24px) saturate(1.35);backdrop-filter:blur(24px) saturate(1.35);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.07);-webkit-tap-highlight-color:transparent;
+  transition:background .16s ease-out,transform .1s ease-out}
+[data-k=lp-12] .sizes button i{display:block;font-style:normal;font-size:10.5px;line-height:1;color:rgba(var(--ink),.72)}
+[data-k=lp-12] .sizes button b{display:block;margin-top:4px;font-size:13.5px;font-weight:500;line-height:1;
+  color:rgba(var(--ink),.90);font-variant-numeric:tabular-nums}
+[data-k=lp-12] .sizes button:active{transform:translateY(1px)}
+[data-k=lp-12] .sizes button.on{background:rgba(19,27,21,.96);box-shadow:inset 0 1px 0 rgba(63,217,78,.24)}
+[data-k=lp-12] .sizes button.on i{color:rgba(var(--ink),.82)}
+[data-k=lp-12] .sizes button.on b{color:#3fd94e;font-weight:700}
+[data-k=lp-12] .sizes button:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
+[data-k=lp-12] .more{position:absolute;left:50%;transform:translateX(-50%);top:552px;border:0;border-radius:10px;
+  padding:7px 15px;background:rgba(22,25,31,.92);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.07);color:rgba(var(--ink),.78);font:500 12px/1 var(--font);
+  cursor:pointer;-webkit-tap-highlight-color:transparent;transition:color .16s ease-out}
+[data-k=lp-12] .more:active,[data-k=lp-12] .more.on{color:rgba(var(--ink),.96)}
+[data-k=lp-12] .more:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
+[data-k=lp-12] .ph.free .sizes{display:none}
+[data-k=lp-12] .ph.logged .sizes{pointer-events:none}
+[data-k=lp-12] .ph.logged .sizes button,[data-k=lp-12] .ph.logged .more{opacity:.55;pointer-events:none}
+
+[data-k=lp-12] .days{position:absolute;left:14px;right:14px;top:458px;display:flex;gap:6px}
+[data-k=lp-12] .days div{flex:1;text-align:center;font-size:11.5px;color:rgba(var(--ink),.82)}
+[data-k=lp-12] .days div.n{flex:1.75;color:#3fd94e;font-weight:700}
+[data-k=lp-12] .week{position:absolute;left:16px;right:16px;top:478px;margin:0;font-size:12.5px;line-height:1.45;
+  color:rgba(var(--ink),.90);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+[data-k=lp-12] .fin{position:absolute;left:14px;right:14px;bottom:16px;padding:15px 14px;border:0;border-radius:14px;
+  font:700 15.5px var(--font);letter-spacing:-.01em;color:#0b0c10;background:rgba(235,238,248,.94);cursor:pointer}
+[data-k=lp-12] .fin:active{background:rgba(235,238,248,.82)}
+[data-k=lp-12] .fin.ok{background:rgba(22,25,31,.92);color:rgba(var(--ink),.95);font-weight:500;font-size:14px;
+  -webkit-backdrop-filter:blur(24px) saturate(1.4);backdrop-filter:blur(24px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09);cursor:default}
 </style>
-<h3>Seven channels</h3><p class="cap">The whole week stands up as full height columns you read at a glance, and today is the one channel you drag to set its size before you press it shut.</p>
+<h3>Seven channels</h3><p class="cap">The week stands up as seven channels you read in one look: today is the wide one, sized by the three lengths proposed under it, and the flat channels are rest that was planned, not days you lost. Free dragging lives behind "any length".</p>
 <div class="ph">
   <div class="grid"></div>
-  <div class="hd">Train 3 times a week</div>
-
-  <div class="card">
-    <div class="t"><span>Thursday, session 3 of 3</span><span id="l12c">2 done</span></div>
-    <div class="w">Lower body</div>
-    <div class="m"><b id="l12n">40</b><span>minutes, drag the column</span></div>
-    <p class="cons" id="l12x">40 minutes puts this week at 2 h 15</p>
-  </div>
-
-  <p class="note">Flat days are planned rest. They are part of training 3 times a week, not gaps in it.</p>
+  <div class="hd"><span>Train 3 times a week</span><span id="l12c">2 done</span></div>
+  <p class="one">Lower body, <b id="l12n">40</b> min</p>
+  <div class="hint" id="l12hint">Thursday, session 3 of 3. Three lengths are proposed for it.</div>
 
   <div class="cols">
-    <div class="ch done"><div class="f" style="height:54%"></div></div>
-    <div class="ch rest"><div class="f"></div></div>
-    <div class="ch done"><div class="f" style="height:72%"></div></div>
-    <div class="ch now" id="l12ch"><div class="f" id="l12f" style="height:54%"></div></div>
-    <div class="ch rest"><div class="f"></div></div>
-    <div class="ch rest"><div class="f"></div></div>
-    <div class="ch rest"><div class="f"></div></div>
+    <div class="ch"><div class="f" style="height:38%"><span class="v">40</span></div></div>
+    <div class="ch rest"><div class="f"></div><div class="v">rest</div></div>
+    <div class="ch"><div class="f" style="height:56%"><span class="v">55</span></div></div>
+    <div class="ch now" id="l12ch">
+      <div class="f" id="l12f" style="height:38%"><span class="v" id="l12v">40</span></div>
+      <div class="ticks"><i style="bottom:9%"></i><i style="bottom:28%"></i><i style="bottom:47%"></i><i style="bottom:66%"></i><i style="bottom:85%"></i></div>
+      <div class="drag">drag<u>&#8597;</u></div>
+    </div>
+    <div class="ch rest"><div class="f"></div><div class="v">rest</div></div>
+    <div class="ch rest"><div class="f"></div><div class="v">rest</div></div>
+    <div class="ch rest"><div class="f"></div><div class="v">rest</div></div>
   </div>
 
   <div class="days">
-    <div>M<em>40</em></div><div>T<em>rest</em></div><div>W<em>55</em></div>
-    <div class="n">T<em id="l12d">40</em></div><div>F<em>rest</em></div><div>S<em>rest</em></div><div>S<em>rest</em></div>
+    <div>M</div><div>T</div><div>W</div><div class="n">T</div><div>F</div><div>S</div><div>S</div>
   </div>
+  <p class="week" id="l12x">Finish it: three sessions, 2 h 15.</p>
 
-  <button class="fin" id="l12b">Press to finish Thursday</button>
+  <div class="sizes" id="l12sz" role="group" aria-label="how long Thursday is">
+    <button type="button" data-m="25"><i>lighter</i><b>25 min</b></button>
+    <button type="button" class="on" data-m="40" aria-pressed="true"><i>today’s</i><b>40 min</b></button>
+    <button type="button" data-m="55"><i>heavier</i><b>55 min</b></button>
+  </div>
+  <button class="more" id="l12more" type="button">any length</button>
+
+  <button class="fin" id="l12b">Finish Thursday</button>
 </div>
 <script>(function(){var r=document.querySelector('[data-k="lp-12"]');if(!r)return;
-var ch=r.querySelector('#l12ch'),f=r.querySelector('#l12f'),n=r.querySelector('#l12n'),d=r.querySelector('#l12d'),
-x=r.querySelector('#l12x'),mins=40,logged=0;
-function fmt(v){return (v/60|0)+' h '+('0'+v%60).slice(-2);}
-function say(){x.textContent=logged?('This week: '+fmt(95+mins)+' across 3 sessions')
-:(mins+' minutes puts this week at '+fmt(95+mins));}
-function set(e){var b=ch.getBoundingClientRect(),p=1-(e.clientY-b.top)/b.height;p=Math.max(.12,Math.min(1,p));
-mins=Math.round((15+p*60)/5)*5;f.style.height=((mins-15)/60*88+12)+'%';n.textContent=mins;d.textContent=mins;say();}
-ch.addEventListener('pointerdown',function(e){ch.setPointerCapture(e.pointerId);set(e);});
-ch.addEventListener('pointermove',function(e){if(ch.hasPointerCapture(e.pointerId))set(e);});
-r.querySelector('#l12b').onclick=function(){f.style.background='#3fd94e';r.querySelector('#l12c').textContent='3 done';
-logged=1;say();this.className='fin ok';this.textContent='Week complete, next one starts Monday';};
-say();
+var ph=r.querySelector('.ph'),ch=r.querySelector('#l12ch'),f=r.querySelector('#l12f'),v=r.querySelector('#l12v'),
+    n=r.querySelector('#l12n'),x=r.querySelector('#l12x'),sz=r.querySelector('#l12sz'),
+    more=r.querySelector('#l12more'),hint=r.querySelector('#l12hint'),mins=40,logged=false,free=false;
+function fmt(t){return (t/60|0)+' h '+('0'+(t%60)).slice(-2);}
+function paint(){var pct=(mins-15)/60*80+11;
+  f.style.height=pct+'%';v.firstChild.nodeValue=mins;n.textContent=mins;
+  sz.querySelectorAll('button').forEach(function(b){
+    var on=!free&&+b.dataset.m===mins;
+    b.classList.toggle('on',on);
+    if(on)b.setAttribute('aria-pressed','true');else b.removeAttribute('aria-pressed');});
+  x.textContent=logged?('Three sessions this week, '+fmt(95+mins)+'.')
+    :('Finish it: three sessions, '+fmt(95+mins)+'.');}
+/* THREE proposed lengths in front. The free drag only exists after "any length". */
+sz.addEventListener('click',function(e){var b=e.target.closest('button');if(!b||logged)return;
+  mins=+b.dataset.m;ch.classList.add('set');paint();});
+more.addEventListener('click',function(){
+  if(logged)return;
+  free=!free;ph.classList.toggle('free',free);
+  if(!free){var near=[25,40,55],b=near[0];near.forEach(function(m){if(Math.abs(m-mins)<Math.abs(b-mins))b=m});mins=b;}
+  more.textContent=free?'three lengths':'any length';
+  more.classList.toggle('on',free);
+  hint.textContent=free?'Thursday, session 3 of 3. Drag the green channel to any length.'
+    :'Thursday, session 3 of 3. Three lengths are proposed for it.';
+  paint();});
+function set(e){if(!free)return;var b=ch.getBoundingClientRect(),p=1-(e.clientY-b.top)/b.height;
+  p=Math.max(0,Math.min(1,p));mins=Math.round((15+p*60)/5)*5;ch.classList.add('set');paint();}
+ch.addEventListener('pointerdown',function(e){if(!free)return;e.preventDefault();
+  try{ch.setPointerCapture(e.pointerId);}catch(z){}if(!logged)set(e);});
+ch.addEventListener('pointermove',function(e){if(logged||!free)return;
+  if(ch.hasPointerCapture&&ch.hasPointerCapture(e.pointerId))set(e);});
+r.querySelector('#l12b').addEventListener('click',function(){
+  if(logged)return;logged=true;ph.classList.add('logged');ch.classList.add('set');ch.classList.add('ok');paint();
+  hint.textContent='Thursday, session 3 of 3. Logged at '+mins+' minutes.';
+  r.querySelector('#l12c').textContent='3 done';
+  this.className='fin ok';this.textContent='Thursday logged. The week is whole.';});
+paint();
 })();</script>
 </section>

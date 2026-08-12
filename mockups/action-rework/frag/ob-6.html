@@ -1,0 +1,62 @@
+<!-- ARCHETYPES, the surviving set: ob-1 full-bleed monumental type | ob-6 sequenced ledger reveal | ob-7 why-first inverted hierarchy | ob-8 single compact plate | ob-9 live countdown row | ob-10 pressed engraved slots.
+     All six are one concept, the wall of intent, delivered six ways. -->
+<section class="cell" data-k="ob-6">
+<style>
+[data-k=ob-6] .o6-wrap{position:absolute;left:22px;right:22px;top:0;bottom:126px;
+  display:flex;flex-direction:column;justify-content:center;gap:0}
+[data-k=ob-6] .o6-lead{font-size:13px;font-weight:400;color:rgba(var(--ink),.90);line-height:1.45;margin:0 0 26px}
+[data-k=ob-6] .o6-row{opacity:0;transform:translateY(9px);
+  transition:opacity .5s ease-out,transform .5s cubic-bezier(.2,.7,.3,1)}
+[data-k=ob-6] .o6-row.on{opacity:1;transform:none}
+[data-k=ob-6] .o6-row+.o6-row{margin-top:22px;padding-top:22px;
+  background:linear-gradient(rgba(var(--ink),.14),rgba(var(--ink),.14)) 0 0/100% 1px no-repeat}
+[data-k=ob-6] .o6-lab{display:block;font-size:12.5px;font-weight:500;color:rgba(var(--ink),.62);margin-bottom:7px}
+[data-k=ob-6] .o6-val{display:block;font-size:29px;font-weight:700;line-height:1.06;letter-spacing:-.035em;
+  color:var(--text-hi);font-variant-numeric:tabular-nums}
+[data-k=ob-6] .o6-val.sm{font-size:24px;font-weight:500;letter-spacing:-.026em}
+[data-k=ob-6] .o6-val em{font-style:normal;font-size:16px;font-weight:500;color:rgba(var(--ink),.72);letter-spacing:-.01em;margin-left:6px}
+[data-k=ob-6] .o6-foot{position:absolute;left:22px;right:22px;bottom:30px;
+  opacity:0;transform:translateY(9px);transition:opacity .45s ease-out,transform .45s cubic-bezier(.2,.7,.3,1)}
+[data-k=ob-6] .o6-foot.on{opacity:1;transform:none}
+[data-k=ob-6] .o6-cta{display:block;width:100%;border:0;border-radius:14px;background:rgba(235,238,248,.94);
+  color:#0b0c10;font-family:inherit;font-weight:700;font-size:15.5px;letter-spacing:-.01em;padding:15px 16px;
+  text-align:center;cursor:pointer;transition:transform .16s ease-out,background .16s ease-out}
+[data-k=ob-6] .o6-cta:active{transform:scale(.985);background:rgba(235,238,248,.84)}
+[data-k=ob-6] .o6-again{display:block;width:100%;margin-top:9px;border:0;border-radius:14px;
+  background:rgba(22,25,31,.92);-webkit-backdrop-filter:blur(28px) saturate(1.4);backdrop-filter:blur(28px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.07);color:var(--text-hi);font-family:inherit;font-weight:500;
+  font-size:13.5px;padding:12px 16px;text-align:center;cursor:pointer;transition:transform .16s ease-out}
+[data-k=ob-6] .o6-again:active{transform:scale(.985)}
+@media (prefers-reduced-motion:reduce){
+  [data-k=ob-6] .o6-row,[data-k=ob-6] .o6-foot{transition:none;opacity:1;transform:none}}
+</style>
+<h3>Wall, read back line by line</h3><p class="cap">Same wall, delivered instead of displayed: each fact settles in on its own beat so the goal, the reason and the date each get a second of silence before the button arrives.</p>
+<div class="ph">
+  <div class="grid"></div>
+  <div class="o6-wrap">
+    <p class="o6-lead">Here is what you told Clarity.</p>
+    <div class="o6-row" data-i="0"><span class="o6-lab">The goal</span><span class="o6-val">$3,000 a month</span></div>
+    <div class="o6-row" data-i="1"><span class="o6-lab">The reason</span><span class="o6-val sm">Quit the warehouse</span></div>
+    <!-- deadline row: rendered ONLY when intake returned a date -->
+    <div class="o6-row" data-i="2"><span class="o6-lab">By when</span><span class="o6-val sm">March 1<em>201 days</em></span></div>
+  </div>
+  <div class="o6-foot">
+    <button class="o6-cta" type="button">Build my plan</button>
+    <button class="o6-again" type="button">Read it again</button>
+  </div>
+</div>
+<script>
+(function(){
+  var r=document.querySelector('[data-k=ob-6]'); if(!r||r.dataset.wired) return; r.dataset.wired=1;
+  var rows=[].slice.call(r.querySelectorAll('.o6-row')), foot=r.querySelector('.o6-foot'), t=[];
+  function play(){
+    t.forEach(clearTimeout); t=[];
+    rows.forEach(function(el){el.classList.remove('on');}); foot.classList.remove('on');
+    rows.forEach(function(el,i){ t.push(setTimeout(function(){el.classList.add('on');}, 380+i*780)); });
+    t.push(setTimeout(function(){foot.classList.add('on');}, 380+rows.length*780+180));
+  }
+  r.querySelector('.o6-again').addEventListener('click',play);
+  play();
+})();
+</script>
+</section>

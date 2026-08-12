@@ -1,113 +1,209 @@
-<!-- archetypes: lp-16 full-bleed horizontal corridor | lp-17 stacked ledger rows | lp-18 centered monolith numeral | lp-19 bottom-sheet hour rail | lp-20 radial week clock -->
+<!-- ARCHETYPES, the surviving set: lp-1 full-bleed statement type | lp-6 vertical descent rail | lp-7 poster ceiling number |
+     lp-8 hundred-mark field | lp-9 ruled ledger book | lp-10 receipt tape | lp-12 full-height week columns |
+     lp-15 bottom sheet first | lp-16 horizontal corridor band | lp-17 declarative sentence over account rows |
+     lp-18 centered monolith numeral -->
 <section class="cell" data-k="lp-16">
 <style>
-[data-k=lp-16] .l16{position:absolute;inset:0;display:flex;flex-direction:column;padding:34px 0 26px;font-variant-numeric:tabular-nums}
-[data-k=lp-16] .l16-goal{padding:0 22px;font-size:12.5px;color:var(--text-mid)}
-[data-k=lp-16] .l16-say{padding:0 22px;margin-top:16px;font-size:32px;font-weight:700;line-height:1.04;letter-spacing:-.03em;color:var(--text-hi)}
-[data-k=lp-16] .l16-sub{padding:0 22px;margin-top:11px;font-size:13px;line-height:1.5;color:rgba(var(--ink),.90)}
-[data-k=lp-16] .l16-band{--bh:16px;position:relative;height:138px;margin-top:26px;background:rgba(22,25,31,.95);
-  -webkit-backdrop-filter:blur(22px) saturate(1.35);backdrop-filter:blur(22px) saturate(1.35);box-shadow:inset 0 1px 0 rgba(var(--ink),.07),inset 0 -1px 0 rgba(var(--ink),.05)}
-[data-k=lp-16] .l16-safe{position:absolute;left:0;right:0;top:calc(50% - var(--bh));height:calc(var(--bh)*2);
-  background:rgba(63,217,78,.07);transition:top .22s ease-out,height .22s ease-out}
-[data-k=lp-16] .l16-edge{position:absolute;left:0;right:0;height:1px;background:rgba(63,217,78,.34);transition:top .22s ease-out}
-[data-k=lp-16] .l16-edge.hi{top:calc(50% - var(--bh))}
-[data-k=lp-16] .l16-edge.lo{top:calc(50% + var(--bh))}
-[data-k=lp-16] .l16-num{position:absolute;left:14px;font-size:10.5px;color:rgba(63,217,78,.8);transition:top .22s ease-out}
-[data-k=lp-16] .l16-num.hi{top:calc(50% - var(--bh) - 14px)}
-[data-k=lp-16] .l16-num.lo{top:calc(50% + var(--bh) + 4px)}
-[data-k=lp-16] .l16-band svg{position:absolute;inset:0;width:100%;height:100%}
-[data-k=lp-16] .l16-now{position:absolute;right:14px;top:calc(50% - 40px);font-size:15px;font-weight:700;color:var(--text-hi)}
-[data-k=lp-16] .l16-nowc{position:absolute;right:14px;top:calc(50% - 22px);font-size:10.5px;color:rgba(var(--ink),.80)}
-[data-k=lp-16] .l16-int{padding:0 22px;margin-top:22px}
-[data-k=lp-16] .l16-int h4{margin:0 0 9px;font-size:12.5px;font-weight:500;color:rgba(var(--ink),.82)}
-[data-k=lp-16] .l16-chips{display:flex;gap:7px}
-[data-k=lp-16] .l16-chip{flex:1;padding:10px 0;border:0;border-radius:9px;background:rgba(22,25,31,.95);
-  backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.08);color:rgba(var(--ink),.80);font:500 13px var(--font);
-  font-variant-numeric:tabular-nums;cursor:pointer;transition:background .16s,color .16s}
-[data-k=lp-16] .l16-chip.on{background:rgba(30,52,34,.96);color:rgba(var(--ink),.97);box-shadow:inset 0 1px 0 rgba(63,217,78,.35)}
-[data-k=lp-16] .l16-note{margin:11px 0 0;font-size:12px;line-height:1.45;color:rgba(var(--ink),.90)}
-[data-k=lp-16] .l16-sp{flex:1;min-height:12px}
-[data-k=lp-16] .l16-close{position:relative;height:56px;margin:0 22px;border-radius:14px;background:rgba(22,25,31,.95);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.08);overflow:hidden;touch-action:none}
-[data-k=lp-16] .l16-fill{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(63,217,78,.16)}
+[data-k=lp-16] .l16{position:absolute;inset:0;display:flex;flex-direction:column;padding:32px 0 24px;
+  font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent}
+[data-k=lp-16] .l16 .pad{padding:0 20px}
+
+[data-k=lp-16] .l16-goal{font-size:12.5px;line-height:1;color:rgba(var(--ink),.80)}
+[data-k=lp-16] .l16-top{display:flex;align-items:baseline;gap:7px;margin-top:15px}
+[data-k=lp-16] .l16-in{font-size:37px;font-weight:700;letter-spacing:-.035em;line-height:1;color:var(--text-hi)}
+[data-k=lp-16] .l16-of{font-size:13.5px;white-space:nowrap;color:rgba(var(--ink),.80)}
+[data-k=lp-16] .l16-days{margin-left:auto;font-size:12px;white-space:nowrap;color:rgba(var(--ink),.80)}
+[data-k=lp-16] .l16-say{margin:11px 0 0;font-size:14px;font-weight:500;line-height:1.45;color:rgba(var(--ink),.95)}
+[data-k=lp-16] .l16-say b{font-weight:700;color:var(--text-hi)}
+
+[data-k=lp-16] .l16-band{position:relative;flex:none;height:144px;margin-top:20px;overflow:hidden;
+  background:rgba(22,25,31,.95);
+  -webkit-backdrop-filter:blur(24px) saturate(1.35);backdrop-filter:blur(24px) saturate(1.35);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.07),inset 0 -1px 0 rgba(var(--ink),.05)}
+[data-k=lp-16] .l16-band svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+[data-k=lp-16] .l16-tag{position:absolute;font-size:10.5px;line-height:1;letter-spacing:.005em;
+  transition:top .24s cubic-bezier(.22,.61,.36,1)}
+[data-k=lp-16] .l16-tag.floor{right:14px;color:rgba(63,217,78,.92);font-weight:500}
+[data-k=lp-16] .l16-tag.cush{right:14px;color:rgba(var(--ink),.62)}
+[data-k=lp-16] .l16-now{position:absolute;font-size:11.5px;font-weight:500;line-height:1;color:var(--text-hi);
+  transition:top .24s cubic-bezier(.22,.61,.36,1),left .24s cubic-bezier(.22,.61,.36,1)}
+
+[data-k=lp-16] .l16-int{margin-top:20px}
+[data-k=lp-16] .l16-int h4{margin:0 0 9px;font-size:12.5px;font-weight:500;line-height:1;color:rgba(var(--ink),.82)}
+[data-k=lp-16] .l16-chips{display:flex;flex:none;gap:6px}
+[data-k=lp-16] .l16-chip{flex:1;height:38px;border:0;border-radius:10px;background:rgba(22,25,31,.95);
+  -webkit-backdrop-filter:blur(24px) saturate(1.4);backdrop-filter:blur(24px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.08);color:rgba(var(--ink),.82);font:500 13px var(--font);
+  font-variant-numeric:tabular-nums;cursor:pointer;transition:background .16s ease-out,color .16s ease-out,box-shadow .16s ease-out}
+[data-k=lp-16] .l16-chip.on{background:rgba(30,52,34,.96);color:rgba(var(--ink),.97);font-weight:700;
+  box-shadow:inset 0 1px 0 rgba(63,217,78,.38)}
+[data-k=lp-16] .l16-note{margin:10px 0 0;font-size:12px;line-height:1.5;color:rgba(var(--ink),.90);min-height:34px}
+
+[data-k=lp-16] .l16-sp{flex:1;min-height:10px}
+
+[data-k=lp-16] .l16-do{flex:none;border-radius:14px;padding:14px 15px 15px;background:rgba(22,25,31,.95);
+  -webkit-backdrop-filter:blur(26px) saturate(1.35);backdrop-filter:blur(26px) saturate(1.35);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09)}
+[data-k=lp-16] .l16-do .h{display:flex;align-items:baseline;gap:9px}
+[data-k=lp-16] .l16-do i{display:none;flex:none;width:8px;height:8px;border-radius:3px;background:#3fd94e;transform:translateY(-2px)}
+[data-k=lp-16] .l16-do.sent i{display:block}
+[data-k=lp-16] .l16-do b{display:block;font-size:15.5px;font-weight:700;letter-spacing:-.01em;line-height:1.25;color:var(--text-hi)}
+[data-k=lp-16] .l16-do p{margin:7px 0 0;font-size:12px;line-height:1.5;color:rgba(var(--ink),.90)}
+
+[data-k=lp-16] .l16-close{position:relative;flex:none;height:52px;margin-top:10px;border-radius:14px;overflow:hidden;
+  background:rgba(235,238,248,.94);touch-action:none;user-select:none}
+[data-k=lp-16] .l16-fill{position:absolute;inset:0 auto 0 0;width:0;background:rgba(63,217,78,.85)}
 [data-k=lp-16] .l16-lab{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-size:13.5px;font-weight:500;color:rgba(var(--ink),.90);pointer-events:none}
-[data-k=lp-16] .l16-knob{position:absolute;left:5px;top:5px;width:46px;height:46px;border-radius:10px;
-  background:rgba(var(--ink),.92);box-shadow:0 4px 14px rgba(0,0,0,.45);cursor:grab;display:flex;align-items:center;justify-content:center}
-[data-k=lp-16] .l16-knob svg{width:16px;height:16px;stroke:#0a0b0d;stroke-width:2;fill:none}
-[data-k=lp-16] .l16-close.done .l16-fill{width:100%}
-[data-k=lp-16] .l16-close.done .l16-lab{color:rgba(var(--ink),.97)}
-[data-k=lp-16] .l16-close.done .l16-knob{opacity:0}
+  padding-left:26px;font-size:15.5px;font-weight:700;letter-spacing:-.01em;color:#0b0c10;pointer-events:none}
+[data-k=lp-16] .l16-knob{position:absolute;left:4px;top:4px;width:44px;height:44px;border-radius:11px;
+  background:#0b0c10;box-shadow:0 3px 10px rgba(0,0,0,.35);cursor:grab;display:flex;align-items:center;justify-content:center}
+[data-k=lp-16] .l16-knob:active{cursor:grabbing}
+[data-k=lp-16] .l16-knob svg{width:15px;height:15px;stroke:rgba(235,238,248,.94);stroke-width:2.1;fill:none;
+  stroke-linecap:round;stroke-linejoin:round}
+[data-k=lp-16] .l16-close.done{background:rgba(63,217,78,.85)}
+[data-k=lp-16] .l16-close.done .l16-lab{padding-left:0}
+[data-k=lp-16] .l16-close.done .l16-knob{opacity:0;transition:opacity .16s ease-out}
 </style>
 <h3>The corridor</h3>
-<p class="cap">Maintenance as a lane you stay inside, run edge to edge across the screen. The headline says the truth out loud: today asks nothing of you.</p>
+<p class="cap">A revenue floor read as a lane you travel down, edge to edge: the bright line is the money you have promised yourself, the track is where the month has actually put you, and the rest of the month is the empty space ahead.</p>
 <div class="ph">
   <div class="grid"></div>
   <div class="l16">
-    <div class="l16-goal">Hold 180 lb. Check on Sundays.</div>
-    <div class="l16-say">Nothing to do<br>today.</div>
-    <div class="l16-sub">That is the win. You are inside the band, and staying there is the whole job.</div>
-
-    <div class="l16-band">
-      <div class="l16-safe"></div>
-      <div class="l16-edge hi"></div>
-      <div class="l16-edge lo"></div>
-      <div class="l16-num hi">181</div>
-      <div class="l16-num lo">179</div>
-      <svg viewBox="0 0 300 138" preserveAspectRatio="none" aria-hidden="true">
-        <polyline points="0,74 24,70 48,73 72,66 96,71 120,64 144,69 168,63 192,68 216,65 240,70 264,66 282,68"
-          fill="none" stroke="rgba(235,238,248,.55)" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
-        <circle cx="282" cy="68" r="3.5" fill="#3fd94e"/>
-      </svg>
-      <div class="l16-now">180.2</div>
-      <div class="l16-nowc">this morning</div>
+    <div class="pad">
+      <div class="l16-goal">Hold a $4,000 floor, every month</div>
+      <div class="l16-top">
+        <div class="l16-in">$2,340</div>
+        <div class="l16-of">of $4,000</div>
+        <div class="l16-days">19 days left</div>
+      </div>
+      <p class="l16-say">You are <b>$240 under</b> the line today. One invoice puts you back over it.</p>
     </div>
 
-    <div class="l16-int">
-      <h4>How tight you hold it</h4>
+    <div class="l16-band">
+      <svg viewBox="0 0 300 144" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="l16up" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0" stop-color="rgba(63,217,78,.16)"/>
+            <stop offset="1" stop-color="rgba(63,217,78,0)"/>
+          </linearGradient>
+          <linearGradient id="l16dn" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="rgba(235,238,248,.075)"/>
+            <stop offset="1" stop-color="rgba(235,238,248,0)"/>
+          </linearGradient>
+        </defs>
+        <rect class="lane" x="0" y="0" width="300" height="0" fill="url(#l16up)"/>
+        <rect class="under" x="0" y="0" width="300" height="0" fill="url(#l16dn)"/>
+        <line class="cushl" x1="0" y1="0" x2="300" y2="0" stroke="rgba(235,238,248,.18)" stroke-width="1"
+          stroke-dasharray="3 4" vector-effect="non-scaling-stroke"/>
+        <line class="floorl" x1="0" y1="0" x2="300" y2="0" stroke="rgba(63,217,78,.62)" stroke-width="1"
+          vector-effect="non-scaling-stroke"/>
+        <line class="todayl" x1="0" y1="10" x2="0" y2="134" stroke="rgba(235,238,248,.13)" stroke-width="1"
+          vector-effect="non-scaling-stroke"/>
+        <polyline class="track" points="" fill="none" stroke="rgba(235,238,248,.58)" stroke-width="1.6"
+          stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+        <circle class="head" cx="0" cy="0" r="3.6" fill="#3fd94e"/>
+      </svg>
+      <div class="l16-tag floor">the floor, $4,000</div>
+      <div class="l16-tag cush">cushion</div>
+      <div class="l16-now">$240 under</div>
+    </div>
+
+    <div class="pad l16-int">
+      <h4>How much cushion you carry</h4>
       <div class="l16-chips">
-        <button class="l16-chip on" data-w="1" data-h="16" data-note="Tight. You weigh every morning and correct the same week.">1 lb</button>
-        <button class="l16-chip" data-w="2" data-h="30" data-note="Steady. Sunday is enough, and one heavy weekend will not move you.">2 lb</button>
-        <button class="l16-chip" data-w="4" data-h="48" data-note="Loose. You only act when the number leaves the lane. Less checking, slower to catch drift.">4 lb</button>
+        <button class="l16-chip on" data-c="0">None</button>
+        <button class="l16-chip" data-c="400">+$400</button>
+        <button class="l16-chip" data-c="1000">+$1,000</button>
       </div>
-      <p class="l16-note">Tight. You weigh every morning and correct the same week.</p>
+      <p class="l16-note">No cushion. Every month is decided in the last week, and one late payment puts you under.</p>
     </div>
 
     <div class="l16-sp"></div>
 
-    <div class="l16-close">
-      <div class="l16-fill"></div>
-      <div class="l16-lab">Swipe to close the day</div>
-      <div class="l16-knob"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div>
+    <div class="pad">
+      <div class="l16-do">
+        <div class="h"><i></i><b>Send the Kessler renewal, $850.</b></div>
+        <p>Your largest open invoice, and the only one on the list that clears the line by itself.</p>
+      </div>
+      <div class="l16-close">
+        <div class="l16-fill"></div>
+        <div class="l16-lab">Swipe when it is sent</div>
+        <div class="l16-knob"><svg viewBox="0 0 24 24"><path d="M8 5l7 7-7 7"/></svg></div>
+      </div>
     </div>
   </div>
 </div>
 <script>(function(){
   var c=document.currentScript.closest('.cell');
-  var band=c.querySelector('.l16-band'),note=c.querySelector('.l16-note');
+  var svg=c.querySelector('.l16-band svg'),
+      track=svg.querySelector('.track'),head=svg.querySelector('.head'),
+      floorl=svg.querySelector('.floorl'),cushl=svg.querySelector('.cushl'),
+      todayl=svg.querySelector('.todayl'),under=svg.querySelector('.under'),lane=svg.querySelector('.lane'),
+      tFloor=c.querySelector('.l16-tag.floor'),tCush=c.querySelector('.l16-tag.cush'),
+      now=c.querySelector('.l16-now'),note=c.querySelector('.l16-note'),
+      say=c.querySelector('.l16-say'),inEl=c.querySelector('.l16-in');
+
+  var H=144,W=300,DAYS=31,PPD=.075,FY=100,cushion=0,sent=false;
+  // dollars ahead of (+) or behind (-) the floor pace, day 1..12
+  var delta=[0,-60,-20,80,40,-30,-120,-60,-180,-140,-210,-240];
+  var notes={0:'No cushion. Every month is decided in the last week, and one late payment puts you under.',
+             400:'A small cushion. One client paying late stops being an emergency.',
+             1000:'Real room. You can lose a month’s biggest invoice and still land on the floor.'};
+  function money(n){return '$'+Math.abs(n).toLocaleString('en-US');}
+  function y(v){return FY-v*PPD;}
+  function x(d){return 14+(d-1)*((W-28)/(DAYS-1));}
+
+  function paint(){
+    floorl.setAttribute('y1',FY);floorl.setAttribute('y2',FY);
+    var cy=y(cushion);
+    cushl.setAttribute('y1',cy);cushl.setAttribute('y2',cy);
+    cushl.style.opacity=cushion?1:0;
+    lane.setAttribute('y',Math.max(0,FY-66));lane.setAttribute('height',Math.min(FY,66));
+    under.setAttribute('y',FY);under.setAttribute('height',H-FY);
+    tFloor.style.top=(FY-16)+'px';
+    tCush.style.top=Math.max(4,cy-15)+'px';tCush.style.opacity=cushion?1:0;
+    tCush.textContent='cushion, '+money(4000+cushion);
+    var pts=[],i;
+    for(i=0;i<delta.length;i++)pts.push(x(i+1).toFixed(1)+','+y(delta[i]).toFixed(1));
+    track.setAttribute('points',pts.join(' '));
+    var hx=x(delta.length),hy=y(delta[delta.length-1]);
+    head.setAttribute('cx',hx);head.setAttribute('cy',hy);
+    todayl.setAttribute('x1',hx);todayl.setAttribute('x2',hx);
+    var d=delta[delta.length-1];
+    now.textContent=money(d)+(d<0?' under':' over');
+    now.style.left=(hx+9)+'px';
+    now.style.top=(hy-(d<0?4:16))+'px';
+  }
+  paint();
+
   c.querySelectorAll('.l16-chip').forEach(function(b){
     b.addEventListener('click',function(){
       c.querySelectorAll('.l16-chip').forEach(function(x){x.classList.remove('on');});
-      b.classList.add('on');
-      var w=parseFloat(b.dataset.w);
-      band.style.setProperty('--bh',b.dataset.h+'px');
-      c.querySelector('.l16-num.hi').textContent=(180+w).toFixed(0);
-      c.querySelector('.l16-num.lo').textContent=(180-w).toFixed(0);
-      note.textContent=b.dataset.note;
+      b.classList.add('on');cushion=parseInt(b.dataset.c,10);note.textContent=notes[cushion];paint();
     });
   });
-  var track=c.querySelector('.l16-close'),knob=c.querySelector('.l16-knob'),
-      fill=c.querySelector('.l16-fill'),lab=c.querySelector('.l16-lab'),drag=false,sx=0,x=0;
-  function max(){return track.clientWidth-56;}
-  function set(v){x=Math.max(0,Math.min(max(),v));knob.style.left=(5+x)+'px';fill.style.width=(x+51)+'px';}
-  knob.addEventListener('pointerdown',function(e){if(track.classList.contains('done'))return;drag=true;sx=e.clientX-x;knob.setPointerCapture(e.pointerId);});
+
+  var pad=c.querySelector('.l16-close'),knob=c.querySelector('.l16-knob'),
+      fill=c.querySelector('.l16-fill'),lab=c.querySelector('.l16-lab'),drag=false,sx=0,px=0;
+  function max(){return pad.clientWidth-52;}
+  function set(v){px=Math.max(0,Math.min(max(),v));knob.style.left=(4+px)+'px';fill.style.width=(px+48)+'px';}
+  function done(){
+    sent=true;pad.classList.add('done');lab.textContent='Sent. $3,190 in, over the line';
+    c.querySelector('.l16-do').classList.add('sent');
+    c.querySelector('.l16-do p').textContent='Sent just now. That $850 is already counted in the number above.';
+    inEl.textContent='$3,190';
+    say.innerHTML='You are <b>$610 over</b> the line. Nothing else is asked of you today.';
+    delta[delta.length-1]=610;paint();
+  }
+  knob.addEventListener('pointerdown',function(e){if(sent)return;drag=true;sx=e.clientX-px;
+    knob.style.transition='';fill.style.transition='';knob.setPointerCapture(e.pointerId);});
   knob.addEventListener('pointermove',function(e){if(!drag)return;set(e.clientX-sx);});
-  knob.addEventListener('pointerup',function(){
+  function release(){
     if(!drag)return;drag=false;
-    if(x>max()*.62){track.classList.add('done');lab.textContent='Day closed. 180.2 lb, inside.';}
-    else{knob.style.transition='left .18s ease-out';fill.style.transition='width .18s ease-out';set(0);
-      setTimeout(function(){knob.style.transition='';fill.style.transition='';},200);}
-  });
+    if(px>max()*.6){knob.style.transition='left .16s ease-out';fill.style.transition='width .16s ease-out';
+      set(max());setTimeout(done,140);}
+    else{knob.style.transition='left .2s ease-out';fill.style.transition='width .2s ease-out';set(0);}
+  }
+  knob.addEventListener('pointerup',release);knob.addEventListener('pointercancel',release);
 })();</script>
 </section>

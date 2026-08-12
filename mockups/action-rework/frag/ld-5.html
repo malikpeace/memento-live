@@ -1,52 +1,179 @@
-<!-- ld-2..ld-5 layout archetypes (difference law)
-     ld-2 full-bleed decode field | ld-3 receding perspective corridor
-     ld-4 stacked sequential checklist | ld-5 single traversing beam
-     (ld-1 draws the plan onto the grid, none of these do) -->
+<!-- ARCHETYPES, the surviving set: ld-4 streaming plan document | ld-5 breathing field with four real beats.
+     No invented stage names in either: every line names something the request actually does. -->
 <section class="cell" data-k="ld-5">
 <style>
 [data-k=ld-5] .ph{background:#050608}
 [data-k=ld-5] .grid{opacity:.05}
-[data-k=ld-5] .goal{position:absolute;left:30px;right:30px;top:78px;margin:0;font-size:13px;
-  line-height:1.5;color:rgba(var(--ink),.9);font-variant-numeric:tabular-nums}
-[data-k=ld-5] .beam{position:absolute;left:0;right:0;top:0;height:150px;transform:translateY(418px)}
-[data-k=ld-5] .beam .l{position:absolute;left:0;right:0;top:75px;height:1px;
-  background:linear-gradient(90deg,rgba(var(--ink),0) 0%,rgba(var(--ink),.9) 24%,
-    rgba(var(--ink),.9) 76%,rgba(var(--ink),0) 100%)}
-[data-k=ld-5] .beam .g{position:absolute;inset:0;
-  background:linear-gradient(to bottom,rgba(var(--ink),0) 0%,rgba(var(--ink),.085) 50%,rgba(var(--ink),0) 100%);
-  -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 28%,#000 72%,transparent 100%);
-          mask-image:linear-gradient(90deg,transparent 0%,#000 28%,#000 72%,transparent 100%)}
-[data-k=ld-5] .say{position:absolute;left:30px;right:30px;top:276px;height:96px}
-[data-k=ld-5] .say p{position:absolute;left:0;right:0;top:0;margin:0;font-size:19px;font-weight:500;
-  line-height:1.38;letter-spacing:-.015em;color:var(--text-hi);opacity:0;
-  font-variant-numeric:tabular-nums}
-[data-k=ld-5] .say p.c{opacity:1}
-[data-k=ld-5] .foot{position:absolute;left:30px;right:30px;bottom:34px}
-[data-k=ld-5] .foot p{margin:0;font-size:11.5px;color:var(--text-mid);font-variant-numeric:tabular-nums}
+
+/* ---- head ---- */
+[data-k=ld-5] .hd{position:absolute;left:26px;right:26px;top:64px}
+[data-k=ld-5] .hd .t{margin:0;font-size:17px;font-weight:500;letter-spacing:-.015em;
+  line-height:1.3;color:var(--text-hi)}
+[data-k=ld-5] .hd .s{margin:7px 0 0;font-size:12.5px;line-height:1.45;
+  color:rgba(var(--ink),.9);font-variant-numeric:tabular-nums}
+
+/* ---- the breathing field: the work itself ---- */
+[data-k=ld-5] .br{position:absolute;left:0;right:0;top:158px;height:164px}
+[data-k=ld-5] .glow{position:absolute;left:50%;top:50%;width:268px;height:210px;
+  transform:translate(-50%,-50%);pointer-events:none;
+  background:radial-gradient(50% 50% at 50% 50%,rgba(235,238,248,.11),rgba(235,238,248,0) 72%)}
+[data-k=ld-5] .stk{position:absolute;left:50%;top:50%;width:182px;height:130px;
+  transform:translate(-50%,-50%);display:flex;flex-direction:column;justify-content:space-between;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 22%,#000 78%,transparent 100%);
+          mask-image:linear-gradient(90deg,transparent 0,#000 22%,#000 78%,transparent 100%);
+  transition:transform .9s cubic-bezier(.25,.8,.3,1),opacity .6s ease}
+[data-k=ld-5] .stk i{display:block;height:1px;background:rgba(var(--ink),.26)}
+[data-k=ld-5] .stk i:nth-child(4),[data-k=ld-5] .stk i:nth-child(8){background:rgba(var(--ink),.45)}
+[data-k=ld-5] .stk i:nth-child(5),[data-k=ld-5] .stk i:nth-child(7){background:rgba(var(--ink),.62)}
+[data-k=ld-5] .stk i:nth-child(6){background:rgba(var(--ink),.92)}
+[data-k=ld-5] .br.settled .stk{transform:translate(-50%,-50%) scaleY(1.06)}
+[data-k=ld-5] .br.settled .stk i{background:rgba(var(--ink),.8)}
+[data-k=ld-5] .br.settled .glow{opacity:1}
+[data-k=ld-5] .br.stopped .stk{opacity:.3}
+[data-k=ld-5] .br.stopped .glow{opacity:0}
+[data-k=ld-5] .glow{transition:opacity .7s ease}
+
+/* ---- the four beats ---- */
+[data-k=ld-5] .bts{position:absolute;left:26px;right:26px;top:352px;margin:0;padding:0;list-style:none}
+[data-k=ld-5] .bts li{position:relative;display:flex;align-items:center;gap:12px;height:38px}
+[data-k=ld-5] .mk{position:relative;flex:0 0 auto;width:16px;height:16px}
+[data-k=ld-5] .mk .d{position:absolute;left:5.5px;top:5.5px;width:5px;height:5px;border-radius:999px;
+  background:rgba(var(--ink),.42);transition:background .35s ease,transform .35s ease}
+[data-k=ld-5] .mk svg{position:absolute;left:2px;top:2px;width:12px;height:12px;display:block}
+[data-k=ld-5] .mk path{fill:none;stroke:rgba(var(--ink),.94);stroke-width:1.8;stroke-linecap:round;
+  stroke-linejoin:round;stroke-dasharray:14;stroke-dashoffset:14;transition:stroke-dashoffset .45s ease-out}
+[data-k=ld-5] .bts .lb{flex:1 1 auto;font-size:13.5px;line-height:1.3;color:var(--text-mid);
+  transition:color .35s ease}
+[data-k=ld-5] .bts .vl{flex:0 0 auto;font-size:13px;color:rgba(var(--ink),.9);
+  font-variant-numeric:tabular-nums;opacity:0;transition:opacity .3s ease}
+[data-k=ld-5] li.live .lb{color:var(--text-hi);font-weight:500}
+[data-k=ld-5] li.live .d{background:rgba(var(--ink),.96)}
+[data-k=ld-5] li.live .vl{opacity:1}
+[data-k=ld-5] li.done .lb{color:var(--text-hi)}
+[data-k=ld-5] li.done .d{opacity:0;transform:scale(.4)}
+[data-k=ld-5] li.done .mk path{stroke-dashoffset:0}
+[data-k=ld-5] li.done .vl{opacity:1}
+[data-k=ld-5] li.b2.done .lb{color:var(--text-hi)}
+
+[data-k=ld-5] .note{position:absolute;left:26px;right:26px;top:516px;margin:0;font-size:11.5px;
+  line-height:1.5;color:var(--text-mid);font-variant-numeric:tabular-nums;
+  transition:opacity .4s ease}
+
+/* ---- the app's real button recipe ---- */
+[data-k=ld-5] .cta{position:absolute;left:26px;right:26px;bottom:28px}
+[data-k=ld-5] .cta button{display:block;width:100%;border:0;border-radius:14px;padding:15px 16px;
+  font-family:inherit;font-size:15.5px;line-height:1.1;letter-spacing:-.01em;cursor:pointer;
+  transition:opacity .35s ease,transform .18s ease}
+[data-k=ld-5] .cta .pri{background:rgba(235,238,248,.94);color:#0b0c10;font-weight:700}
+[data-k=ld-5] .cta .sec{background:rgba(22,25,31,.92);color:var(--text-hi);font-weight:500;
+  -webkit-backdrop-filter:blur(24px) saturate(1.4);backdrop-filter:blur(24px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(235,238,248,.07)}
+[data-k=ld-5] .cta button:active{transform:scale(.985)}
+[data-k=ld-5] .cta button[hidden]{display:none}
+
 @media (prefers-reduced-motion:no-preference){
-  [data-k=ld-5] .goal{animation:ld5in 1.2s ease-out .3s both}
-  [data-k=ld-5] .foot{animation:ld5in 1.2s ease-out .7s both}
-  [data-k=ld-5] .beam{animation:ld5cross 30s linear .4s both}
-  [data-k=ld-5] .say p.a{animation:ld5say1 10.6s ease-in-out .8s both}
-  [data-k=ld-5] .say p.b{animation:ld5say2 10.6s ease-in-out 11s both}
-  [data-k=ld-5] .say p.c{animation:ld5say3 2.4s ease-in-out 21.2s both}
+  [data-k=ld-5] .hd .t{animation:ld5in .7s ease-out .1s both}
+  [data-k=ld-5] .hd .s{animation:ld5in .7s ease-out .28s both}
+  [data-k=ld-5] .note{animation:ld5in .7s ease-out .5s both}
+  [data-k=ld-5] .br.working .stk{animation:ld5breath 4.6s cubic-bezier(.42,0,.4,1) infinite}
+  [data-k=ld-5] .br.working .glow{animation:ld5glow 4.6s cubic-bezier(.42,0,.4,1) infinite}
 }
-@keyframes ld5in{from{opacity:0}to{opacity:1}}
-@keyframes ld5cross{from{transform:translateY(-30px)}to{transform:translateY(560px)}}
-@keyframes ld5say1{0%{opacity:0}10%{opacity:1}90%{opacity:1}100%{opacity:0}}
-@keyframes ld5say2{0%{opacity:0}10%{opacity:1}90%{opacity:1}100%{opacity:0}}
-@keyframes ld5say3{from{opacity:0}to{opacity:1}}
+@keyframes ld5in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes ld5breath{
+  0%,100%{transform:translate(-50%,-50%) scaleY(1)}
+  46%{transform:translate(-50%,-50%) scaleY(.52)}
+  62%{transform:translate(-50%,-50%) scaleY(.56)}
+}
+@keyframes ld5glow{0%,100%{opacity:.5}46%{opacity:1}62%{opacity:.94}}
 </style>
-<h3>Patience</h3><p class="cap">Almost nothing happens on purpose: one line of light walks the whole screen once, top to bottom, and its position is the only progress bar, so the wait reads as something being considered instead of processed.</p>
+<h3>Patience</h3><p class="cap">The shippable one: a field of lines that draws in and releases at breathing pace for exactly as long as the request is open, carrying the only four things that are really true, request sent, working with the honest elapsed clock, plan arrived, checks passed.</p>
 <div class="ph">
   <div class="grid"></div>
-  <p class="goal">$3,000 a month,<br>so you can quit the warehouse.</p>
-  <div class="beam"><div class="g"></div><div class="l"></div></div>
-  <div class="say">
-    <p class="a">Working out your first move.</p>
-    <p class="b">Weighing 31 past clients against 90 days.</p>
-    <p class="c">Writing what to send today.</p>
+  <div class="hd">
+    <p class="t">Making your plan.</p>
+    <p class="s">$3,000 a month, so you can quit the warehouse.</p>
   </div>
-  <div class="foot"><p>Takes about a minute. The line reaching the bottom is the plan being done.</p></div>
+  <div class="br working">
+    <div class="glow"></div>
+    <div class="stk"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  </div>
+  <ul class="bts">
+    <li class="b1"><span class="mk"><span class="d"></span><svg viewBox="0 0 12 12"><path d="M2.3 6.3 4.8 8.8 9.7 3.5"/></svg></span><span class="lb">Request sent</span><span class="vl"></span></li>
+    <li class="b2"><span class="mk"><span class="d"></span><svg viewBox="0 0 12 12"><path d="M2.3 6.3 4.8 8.8 9.7 3.5"/></svg></span><span class="lb">Working</span><span class="vl">0:00</span></li>
+    <li class="b3"><span class="mk"><span class="d"></span><svg viewBox="0 0 12 12"><path d="M2.3 6.3 4.8 8.8 9.7 3.5"/></svg></span><span class="lb">Plan arrived</span><span class="vl"></span></li>
+    <li class="b4"><span class="mk"><span class="d"></span><svg viewBox="0 0 12 12"><path d="M2.3 6.3 4.8 8.8 9.7 3.5"/></svg></span><span class="lb">Checks passed</span><span class="vl"></span></li>
+  </ul>
+  <p class="note">Most plans land inside a minute. Leaving this screen cancels the request.</p>
+  <div class="cta">
+    <button type="button" class="sec">Cancel</button>
+    <button type="button" class="pri" hidden>Open your plan</button>
+  </div>
 </div>
+<script>
+(function(){
+  var r=document.querySelector('[data-k="ld-5"]'); if(!r) return;
+  var br=r.querySelector('.br'), note=r.querySelector('.note'),
+      b=[null,r.querySelector('.b1'),r.querySelector('.b2'),r.querySelector('.b3'),r.querySelector('.b4')],
+      clock=r.querySelector('.b2 .vl'),
+      sec=r.querySelector('.cta .sec'), pri=r.querySelector('.cta .pri'),
+      reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches,
+      timers=[], tick=null, t0=0;
+  /* the demo lands the plan at 11s so the whole sequence is watchable in a gallery.
+     the clock itself is never faked: it reads real elapsed time. */
+  var ARRIVE=11000, CHECKED=12100;
+
+  function clear(){ timers.forEach(clearTimeout); timers=[]; if(tick){clearInterval(tick);tick=null;} }
+  function at(ms,fn){ timers.push(setTimeout(fn,ms)); }
+  function fmt(ms){ var s=Math.floor(ms/1000); return Math.floor(s/60)+':'+('0'+(s%60)).slice(-2); }
+  function set(li,cls){ if(li){ li.classList.remove('live','done'); if(cls) li.classList.add(cls); } }
+
+  function reset(){
+    clear();
+    for(var i=1;i<=4;i++){ set(b[i],null); }
+    b[3].querySelector('.vl').textContent='';
+    b[4].querySelector('.vl').textContent='';
+    clock.textContent='0:00';
+    br.className='br working';
+    note.textContent='Most plans land inside a minute. Leaving this screen cancels the request.';
+    note.style.opacity='';
+    sec.hidden=false; pri.hidden=true; pri.textContent='Open your plan';
+  }
+
+  function run(){
+    reset();
+    t0=Date.now();
+    at(reduce?0:450,function(){
+      set(b[1],'done');
+      set(b[2],'live');
+      tick=setInterval(function(){
+        var e=Date.now()-t0;
+        clock.textContent=fmt(e);
+        if(e>45000) note.textContent='This one is taking longer than usual. Still working.';
+      },250);
+    });
+    at(ARRIVE,function(){
+      if(tick){clearInterval(tick);tick=null;}
+      clock.textContent=fmt(Date.now()-t0);
+      set(b[2],'done'); set(b[3],'done');
+    });
+    at(CHECKED,function(){
+      set(b[4],'done');
+      br.className='br settled';
+      note.textContent='Nine steps, four weeks, one move for today.';
+      sec.hidden=true; pri.hidden=false;
+    });
+  }
+
+  sec.addEventListener('click',function(){
+    clear();
+    br.className='br stopped';
+    for(var i=2;i<=4;i++) if(!b[i].classList.contains('done')) set(b[i],null);
+    if(b[2].classList.contains('live')) set(b[2],null);
+    note.textContent='Cancelled. Nothing was saved.';
+    sec.hidden=true; pri.hidden=false; pri.textContent='Try again';
+  });
+  pri.addEventListener('click',run);
+  run();
+})();
+</script>
 </section>

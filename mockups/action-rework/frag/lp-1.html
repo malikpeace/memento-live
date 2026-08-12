@@ -1,3 +1,7 @@
+<!-- ARCHETYPES, the surviving set: lp-1 full-bleed statement type | lp-6 vertical descent rail | lp-7 poster ceiling number |
+     lp-8 hundred-mark field | lp-9 ruled ledger book | lp-10 receipt tape | lp-12 full-height week columns |
+     lp-15 bottom sheet first | lp-16 horizontal corridor band | lp-17 declarative sentence over account rows |
+     lp-18 centered monolith numeral -->
 <section class="cell" data-k="lp-1">
 <!-- ARCHETYPES (difference law)
      lp-1  full-bleed statement type
@@ -6,65 +10,194 @@
      lp-4  canvas ring object
      lp-5  bottom sheet first -->
 <style>
-[data-k=lp-1] .s{position:absolute;inset:0;display:flex;flex-direction:column;padding:36px 22px 22px}
-[data-k=lp-1] .goal{font-size:12.5px;color:var(--text-mid);font-variant-numeric:tabular-nums;letter-spacing:-.005em}
-[data-k=lp-1] .bar{margin-top:10px;height:3px;border-radius:2px;background:rgba(var(--ink),.10);overflow:hidden}
-[data-k=lp-1] .bar i{display:block;height:100%;width:41%;background:rgba(var(--ink),.66)}
-[data-k=lp-1] .say{margin-top:auto;font-size:37px;line-height:1.0;letter-spacing:-.035em;font-weight:500;color:var(--text-hi)}
-[data-k=lp-1] .say .n{display:block;font-size:104px;font-weight:700;line-height:.82;margin:2px 0 4px -6px;
-  font-variant-numeric:tabular-nums;color:rgba(var(--ink),1);letter-spacing:-.05em}
-[data-k=lp-1] .cons{margin-top:16px;font-size:13.5px;line-height:1.45;color:rgba(var(--ink),.90);font-variant-numeric:tabular-nums}
-[data-k=lp-1] .scale{display:flex;gap:6px;margin:20px 0 16px}
-[data-k=lp-1] .scale button{flex:1;height:36px;border:0;border-radius:9px;background:rgba(22,25,31,.95);
-  backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);
-  color:rgba(var(--ink),.80);font:600 13.5px/1 var(--font);font-variant-numeric:tabular-nums;cursor:pointer;
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.08)}
-[data-k=lp-1] .scale button.on{background:rgba(var(--ink),.92);color:#08090b;box-shadow:none}
-[data-k=lp-1] .track{position:relative;height:58px;border-radius:12px;background:rgba(22,25,31,.95);
-  backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.09);overflow:hidden;touch-action:none}
-[data-k=lp-1] .track .fill{position:absolute;inset:0;width:0;background:rgba(63,217,78,.20)}
-[data-k=lp-1] .track .lab{position:absolute;inset:0;display:grid;place-items:center;font-size:13.5px;
-  font-weight:500;color:rgba(var(--ink),.90);padding-left:38px}
-[data-k=lp-1] .knob{position:absolute;top:5px;left:5px;width:48px;height:48px;border-radius:9px;
-  background:rgba(var(--ink),.93);display:grid;place-items:center;cursor:grab}
+[data-k=lp-1] .s{position:absolute;inset:0;display:flex;flex-direction:column;padding:34px 22px 20px;
+  font-variant-numeric:tabular-nums}
+
+/* --- goal line + thread ------------------------------------------------ */
+[data-k=lp-1] .goal{display:flex;align-items:baseline;gap:6px;font-size:12.5px;letter-spacing:-.005em;
+  color:rgba(var(--ink),.92)}
+[data-k=lp-1] .goal b{font-weight:700}
+[data-k=lp-1] .goal span{margin-left:auto;color:rgba(var(--ink),.92)}
+[data-k=lp-1] .bar{margin-top:9px;height:3px;border-radius:2px;background:rgba(var(--ink),.12);overflow:hidden}
+[data-k=lp-1] .bar i{display:block;height:100%;width:41.3%;border-radius:2px;background:rgba(var(--ink),.70);
+  transition:width .5s cubic-bezier(.2,.7,.2,1)}
+
+/* --- the statement ------------------------------------------------------ */
+[data-k=lp-1] .say{margin-top:auto;font-size:29px;line-height:1.04;letter-spacing:-.03em;font-weight:500;
+  color:rgba(var(--ink),.96);text-wrap:pretty}
+[data-k=lp-1] .say .n{display:block;font-size:110px;font-weight:700;line-height:.80;
+  margin:6px 0 8px -5px;letter-spacing:-.055em;color:rgba(var(--ink),1);
+  font-variant-numeric:tabular-nums;transition:opacity .16s ease-out}
+[data-k=lp-1] .say .n.swap{opacity:.35}
+[data-k=lp-1] .cons{margin-top:15px;font-size:13.5px;line-height:1.46;color:rgba(var(--ink),.90);
+  min-height:39px;text-wrap:pretty}
+
+/* --- the scale row: three proposed sizes, everything else behind "more" -- */
+[data-k=lp-1] .scale{display:flex;gap:6px;margin:18px 0 0}
+[data-k=lp-1] .scale button{flex:1;min-width:0;height:48px;border:0;border-radius:10px;padding:0 4px;
+  background:rgba(22,25,31,.94);
+  backdrop-filter:blur(26px) saturate(1.4);-webkit-backdrop-filter:blur(26px) saturate(1.4);
+  font-family:var(--font);cursor:pointer;
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.08);-webkit-tap-highlight-color:transparent;
+  transition:background .16s ease-out,transform .1s ease-out}
+[data-k=lp-1] .scale button i{display:block;font-style:normal;font-size:10.5px;line-height:1;
+  color:rgba(var(--ink),.72);transition:color .16s ease-out}
+[data-k=lp-1] .scale button b{display:block;margin-top:4px;font-size:15px;font-weight:500;line-height:1;
+  color:rgba(var(--ink),.90);font-variant-numeric:tabular-nums;transition:color .16s ease-out}
+[data-k=lp-1] .scale button:active{transform:translateY(1px)}
+[data-k=lp-1] .scale button.on{background:rgba(var(--ink),.93);box-shadow:none}
+[data-k=lp-1] .scale button.on i{color:rgba(11,12,16,.68)}
+[data-k=lp-1] .scale button.on b{color:#0b0c10;font-weight:700}
+[data-k=lp-1] .scale button:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
+[data-k=lp-1] .scale.fine button{height:38px}
+[data-k=lp-1] .scale.fine button i{display:none}
+[data-k=lp-1] .scale.fine button b{margin-top:0;font-size:13.5px}
+[data-k=lp-1] .more{display:block;margin:9px auto 14px;border:0;border-radius:10px;padding:7px 15px;
+  background:rgba(22,25,31,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.07);color:rgba(var(--ink),.78);
+  font:500 12px/1 var(--font);cursor:pointer;-webkit-tap-highlight-color:transparent;
+  transition:color .16s ease-out}
+[data-k=lp-1] .more:active,[data-k=lp-1] .more.on{color:rgba(var(--ink),.96)}
+[data-k=lp-1] .more:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
+[data-k=lp-1] .s.done .more{opacity:.5;pointer-events:none}
+
+/* --- the completion gesture --------------------------------------------- */
+[data-k=lp-1] .track{position:relative;height:58px;border-radius:14px;background:rgba(22,25,31,.94);
+  backdrop-filter:blur(26px) saturate(1.4);-webkit-backdrop-filter:blur(26px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09);overflow:hidden;touch-action:none;
+  transition:background .3s ease-out}
+[data-k=lp-1] .track:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
+[data-k=lp-1] .track .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(63,217,78,.22)}
+[data-k=lp-1] .track .lab{position:absolute;inset:0;display:grid;place-items:center;padding-left:40px;
+  font-size:13.5px;font-weight:500;color:rgba(var(--ink),.90);transition:padding .26s ease-out}
+[data-k=lp-1] .knob{position:absolute;top:5px;left:5px;width:48px;height:48px;border-radius:10px;
+  background:rgba(235,238,248,.94);display:grid;place-items:center;cursor:grab;touch-action:none}
+[data-k=lp-1] .knob:active{cursor:grabbing}
 [data-k=lp-1] .knob svg{display:block}
-[data-k=lp-1] .s.done .track{background:rgba(63,217,78,.16)}
-[data-k=lp-1] .s.done .lab{color:var(--text-hi);padding-left:0}
-[data-k=lp-1] .s.done .knob{opacity:0}
+[data-k=lp-1] .track.snap .knob,[data-k=lp-1] .track.snap .fill{transition:left .22s ease-out,width .22s ease-out}
+
+/* --- confirmed ---------------------------------------------------------- */
+[data-k=lp-1] .s.done .scale{pointer-events:none}
+[data-k=lp-1] .s.done .scale button{background:rgba(var(--ink),.05)}
+[data-k=lp-1] .s.done .scale button i{color:rgba(var(--ink),.62)}
+[data-k=lp-1] .s.done .scale button b{color:rgba(var(--ink),.72)}
+[data-k=lp-1] .s.done .scale button.on{background:rgba(var(--ink),.16)}
+[data-k=lp-1] .s.done .scale button.on i{color:rgba(var(--ink),.72)}
+[data-k=lp-1] .s.done .scale button.on b{color:rgba(var(--ink),.96)}
+[data-k=lp-1] .s.done .track{background:rgba(63,217,78,.18)}
+[data-k=lp-1] .s.done .track .fill{width:100%;background:rgba(63,217,78,.18)}
+[data-k=lp-1] .s.done .lab{padding-left:0;padding-right:74px;color:rgba(var(--ink),.96);font-weight:700}
+[data-k=lp-1] .s.done .knob{opacity:0;transform:scale(.9);transition:opacity .18s ease-out,transform .18s ease-out}
+[data-k=lp-1] .undo{position:absolute;right:6px;top:6px;bottom:6px;width:62px;border:0;border-radius:10px;
+  background:rgba(22,25,31,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.10);color:rgba(var(--ink),.90);font:500 12.5px/1 var(--font);
+  cursor:pointer;opacity:0;pointer-events:none;transition:opacity .2s ease-out .12s}
+[data-k=lp-1] .s.done .undo{opacity:1;pointer-events:auto}
+@media (prefers-reduced-motion:reduce){[data-k=lp-1] *{transition:none!important}}
 </style>
-<h3>Statement</h3><p class="cap">No cards at all. The instruction is the entire screen, set at poster scale, so the count is the biggest thing in your hand and the scale row underneath is the only other decision.</p>
+<h3>Statement</h3><p class="cap">No cards at all. The instruction is the entire screen, set at poster scale, so the count is the biggest thing in your hand and the only other decision is three named sizes underneath, with every other number kept behind a quiet "more".</p>
 <div class="ph">
   <div class="grid"></div>
   <div class="s">
-    <div class="goal">$1,240 of $3,000 this month</div>
+    <div class="goal"><b>$1,240</b> of $3,000 this month <span data-days>19 days left</span></div>
     <div class="bar"><i></i></div>
-    <div class="say">Message<span class="n">5</span>potential clients.</div>
-    <div class="cons">Sending 5 puts you at 47 this month. Your best day so far is 8.</div>
-    <div class="scale">
-      <button data-n="1">1</button><button data-n="3">3</button><button class="on" data-n="5">5</button><button data-n="8">8</button><button data-n="12">12</button>
-    </div>
-    <div class="track">
+
+    <p class="say">Message<span class="n">5</span><span class="obj">potential clients.</span></p>
+    <p class="cons">Sending 5 puts you at 47 this month. Your best day so far is 8.</p>
+
+    <div class="scale" role="group" aria-label="how many today"></div>
+    <button type="button" class="more">more sizes</button>
+
+    <div class="track" role="button" tabindex="0" aria-label="slide right when they are sent">
       <div class="fill"></div>
       <div class="lab">Slide when they are sent</div>
-      <div class="knob"><svg width="16" height="14" viewBox="0 0 16 14"><path d="M1 7h12M9 2l5 5-5 5" fill="none" stroke="#08090b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="knob"><svg width="16" height="14" viewBox="0 0 16 14" aria-hidden="true"><path d="M1 7h12M9 2l5 5-5 5" fill="none" stroke="#0b0c10" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <button type="button" class="undo" tabindex="-1">Undo</button>
     </div>
   </div>
 </div>
 <script>(function(){
-  var r=document.querySelector('[data-k=lp-1]'),s=r.querySelector('.s'),n=r.querySelector('.n'),c=r.querySelector('.cons');
-  r.querySelectorAll('.scale button').forEach(function(b){b.addEventListener('click',function(){
-    r.querySelectorAll('.scale button').forEach(function(x){x.classList.remove('on')});b.classList.add('on');
-    var v=+b.dataset.n;n.textContent=v;
-    c.textContent='Sending '+v+' puts you at '+(42+v)+' this month. '+(v>8?'That beats your best day of 8.':'Your best day so far is 8.');
-  })});
-  var t=r.querySelector('.track'),k=r.querySelector('.knob'),f=r.querySelector('.fill'),l=r.querySelector('.lab'),drag=0,x0=0;
-  k.addEventListener('pointerdown',function(e){drag=1;x0=e.clientX;k.setPointerCapture(e.pointerId)});
-  k.addEventListener('pointermove',function(e){if(!drag)return;
-    var max=t.clientWidth-58,d=Math.max(0,Math.min(max,e.clientX-x0));
-    k.style.left=(5+d)+'px';f.style.width=(d+53)+'px';
-    if(d>max*.72){drag=0;s.classList.add('done');l.textContent='Sent. 47 this month.';}
+  var r=document.querySelector('[data-k="lp-1"]');if(!r)return;
+  var s=r.querySelector('.s'),n=r.querySelector('.say .n'),cons=r.querySelector('.cons'),
+      bar=r.querySelector('.bar i'),lab=r.querySelector('.track .lab'),track=r.querySelector('.track'),
+      knob=r.querySelector('.knob'),fill=r.querySelector('.track .fill'),undo=r.querySelector('.undo'),
+      obj=r.querySelector('.obj'),scale=r.querySelector('.scale'),more=r.querySelector('.more'),
+      pick=5,BEST=8,MONTH=42;
+
+  /* THREE proposed sizes in front, named and priced. Everything else lives behind "more". */
+  var THREE=[{n:3,role:'lighter'},{n:5,role:'today’s'},{n:8,role:'heavier'}],
+      ALL=[1,2,3,5,8,12,16,20],fine=false;
+
+  function build(){
+    scale.innerHTML='';
+    (fine?ALL:THREE).forEach(function(o){
+      var v=fine?o:o.n,b=document.createElement('button');
+      b.type='button';b.dataset.n=v;
+      b.innerHTML=(fine?'':'<i>'+o.role+'</i>')+'<b>'+v+'</b>';
+      if(v===pick){b.classList.add('on');b.setAttribute('aria-pressed','true');}
+      b.addEventListener('click',function(){
+        if(s.classList.contains('done'))return;
+        scale.querySelectorAll('button').forEach(function(x){x.classList.remove('on');x.removeAttribute('aria-pressed')});
+        b.classList.add('on');b.setAttribute('aria-pressed','true');
+        pick=+b.dataset.n;say(pick);
+      });
+      scale.appendChild(b);
+    });
+    scale.classList.toggle('fine',fine);
+  }
+  more.addEventListener('click',function(){
+    fine=!fine;
+    if(!fine){var b=THREE[0].n;THREE.forEach(function(o){if(Math.abs(o.n-pick)<Math.abs(b-pick))b=o.n});pick=b;say(pick);}
+    more.textContent=fine?'three sizes':'more sizes';
+    more.classList.toggle('on',fine);
+    build();
   });
-  k.addEventListener('pointerup',function(){if(!drag)return;drag=0;k.style.left='5px';f.style.width='0'});
+
+  function say(v){
+    n.classList.add('swap');
+    setTimeout(function(){n.textContent=v;n.classList.remove('swap')},110);
+    obj.textContent=v===1?'potential client.':'potential clients.';
+    cons.textContent=v>BEST
+      ? 'Sending '+v+' puts you at '+(MONTH+v)+' this month. That beats your best day of '+BEST+'.'
+      : 'Sending '+v+' puts you at '+(MONTH+v)+' this month. Your best day so far is '+BEST+'.';
+  }
+  build();
+
+  function confirm(){
+    if(s.classList.contains('done'))return;
+    s.classList.add('done');
+    lab.textContent=pick+(pick===1?' message sent':' messages sent');
+    cons.textContent=(MONTH+pick)+' this month. '+(pick>BEST?'New best day.':'Best day so far is '+BEST+'.');
+    bar.style.width=(41.3+pick*.42).toFixed(1)+'%';
+    knob.style.left='5px';fill.style.width='0';
+  }
+  function reset(){
+    s.classList.remove('done');
+    lab.textContent='Slide when they are sent';
+    bar.style.width='41.3%';say(pick);
+  }
+  undo.addEventListener('click',function(e){e.stopPropagation();reset()});
+
+  var drag=false,x0=0,max=0;
+  knob.addEventListener('pointerdown',function(e){
+    if(s.classList.contains('done'))return;
+    drag=true;x0=e.clientX;max=track.clientWidth-58;
+    track.classList.remove('snap');knob.setPointerCapture(e.pointerId);
+  });
+  knob.addEventListener('pointermove',function(e){
+    if(!drag)return;
+    var d=Math.max(0,Math.min(max,e.clientX-x0));
+    knob.style.left=(5+d)+'px';fill.style.width=(d+53)+'px';
+    if(d>=max-2){drag=false;confirm();}
+  });
+  ['pointerup','pointercancel'].forEach(function(ev){
+    knob.addEventListener(ev,function(){
+      if(!drag)return;drag=false;
+      track.classList.add('snap');knob.style.left='5px';fill.style.width='0';
+    });
+  });
+  track.addEventListener('keydown',function(e){
+    if(e.key==='Enter'||e.key===' '){e.preventDefault();s.classList.contains('done')?reset():confirm();}
+  });
 })();</script>
 </section>
