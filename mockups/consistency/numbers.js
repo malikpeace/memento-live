@@ -145,8 +145,8 @@
   var st = document.createElement('style');
   st.textContent =
     '.nf-controls{position:sticky;top:0;z-index:20;background:rgba(6,7,10,.92);backdrop-filter:blur(14px);padding:14px 2px 12px;margin:0 0 20px;border-bottom:1px solid var(--hairline)}' +
-    '.nf-slrow{display:flex;align-items:center;gap:16px;flex-wrap:wrap}' +
-    '.nf-slrow input[type=range]{flex:1;min-width:220px;accent-color:#3fd94e;height:4px}' +
+    '.nf-slrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap}' +
+    '.nf-slrow input[type=range]{flex:1;min-width:130px;accent-color:#3fd94e;height:4px}' +
     '.nf-day{font-size:15px;font-weight:750;color:var(--text-hi);min-width:96px;font-variant-numeric:tabular-nums}' +
     '.nf-chips{display:flex;gap:6px}.nf-chips button{font:inherit;font-size:12px;font-weight:600;color:var(--text-mid);background:var(--surface-1,rgba(255,255,255,.04));border:0;border-radius:7px;padding:6px 11px;cursor:pointer}' +
     '.nf-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}@media(max-width:720px){.nf-grid{grid-template-columns:1fr}}' +
@@ -196,7 +196,9 @@
 
   var controls = document.createElement('div'); controls.className = 'nf-controls';
   controls.innerHTML = '<div class="nf-slrow"><span class="nf-day" id="nfDay">Day 168</span><input type="range" id="nfSlider" min="0" max="365" value="168"><div class="nf-chips" id="nfChips">' + ['1', '7', '30', '90', '168', '365'].map(function (v) { return '<button data-d="' + v + '">Day ' + v + '</button>'; }).join('') + '</div></div>';
-  wrap.appendChild(controls);
+  // a dedicated fixed host (numbers.html) pins the controls to the top of the screen; otherwise they sit inline
+  var host = document.getElementById('numControls') || wrap;
+  host.appendChild(controls);
   var grid = document.createElement('div'); grid.className = 'nf-grid'; wrap.appendChild(grid);
 
   var cards = [];
