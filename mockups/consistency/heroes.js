@@ -473,6 +473,9 @@
     { n: 'The M contours', why: 'Nested outlines of the mark, like a topographic map. A single line at day 1, a layered relief by 365.', fn: mContours }
   ];
 
+  // Malik kept only the heatmap; the other 23 visual heroes are cut.
+  HEROES = HEROES.filter(function (h) { return h.n === 'The field'; });
+
   var wrap = document.getElementById('heroLab');
   if (!wrap) return;
   var st = document.createElement('style');
