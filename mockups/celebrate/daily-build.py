@@ -151,9 +151,9 @@ LIVE_CSS = """
 
 /* 5 the calendar, cells fill the phone, number floats in the centre */
 .dl-cal{display:grid;width:330px;margin:0 auto}
-.dl-cal b{width:100%;aspect-ratio:1;border-radius:3px;background:rgba(var(--day-rgb),.4)}
-.dl-cal b.dlc-f{background:rgba(var(--day-rgb),.4)}
-.dl-cal b.dlc-t{background:var(--day);box-shadow:0 0 8px rgba(var(--day-rgb),.6)}
+.dl-cal>b{width:100%;aspect-ratio:1;border-radius:3px;background:rgba(var(--day-rgb),.4)}
+.dl-cal>b.dlc-f{background:rgba(var(--day-rgb),.4)}
+.dl-cal>b.dlc-t{background:var(--day);box-shadow:0 0 8px rgba(var(--day-rgb),.6)}
 .dl-calnum{position:absolute;right:40px;top:62%;font-size:52px;font-weight:750;letter-spacing:-.04em;
   color:#fff;font-variant-numeric:tabular-nums;line-height:1;
   text-shadow:0 2px 16px rgba(0,0,0,.95),0 0 6px rgba(0,0,0,.9),0 0 2px rgba(0,0,0,.9)}
@@ -204,9 +204,9 @@ LIVE_CSS = """
 .ph.live .dl-path i.dlp-now,.ph.live .dl-steps i.dlk-now{background:#fff;box-shadow:0 0 10px rgba(255,255,255,.6)}
 /* the calendar: earned days pressed in as deep-green tiles so the white count
    never blends into them, today lit white. */
-.ph.live .dl-cal b{background:rgba(4,44,21,.42)}
-.ph.live .dl-cal b.dlc-t{background:#fff;box-shadow:0 0 10px rgba(255,255,255,.55)}
-.ph.live .dl-calnum{color:#fff;text-shadow:0 1px 7px rgba(3,30,14,.5)}
+.ph.live .dl-cal>b{background:rgba(4,44,21,.42)}
+.ph.live .dl-cal>b.dlc-t{background:#fff;box-shadow:0 0 10px rgba(255,255,255,.55)}
+.ph.live .dl-calnum{color:#fff;text-shadow:none}
 .ph.live .dl-calnum i{color:rgba(255,255,255,.82)}
 /* odometer: faint white ghosts for the padding zeros */
 .ph.live .dlo-r--dim span{color:rgba(255,255,255,.12)}
@@ -215,8 +215,10 @@ LIVE_CSS = """
 .ph.live .dlo-w{background:rgba(3,42,20,.22);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.07),inset 0 13px 20px -13px rgba(0,0,0,.42),inset 0 -13px 20px -13px rgba(0,0,0,.42)}
 /* rolling window: the count lives INSIDE the grid, bottom-right, so it always sits ON the tiles */
-.ph.live .dl-cal{position:relative;margin-top:auto;margin-bottom:52px}
-.ph.live .dl-calnum{left:50%;right:auto;top:auto;bottom:0;transform:translateX(-50%)}
+/* boxes stay centred; the count sits fully BELOW them and never touches a tile */
+.ph.live .dl-cal{position:relative}
+.ph.live .dl-calnum{left:50%;right:auto;top:100%;bottom:auto;transform:translateX(-50%);
+  margin-top:22px;white-space:nowrap}
 /* yesterday behind you: the current number holds the CENTRE, past numbers climb above it */
 .ph.live .dlg-tower{position:relative;justify-content:center}
 .ph.live .dlg-stack{position:absolute;left:0;right:0;bottom:calc(50% + 40px);
@@ -281,23 +283,22 @@ def build():
 <div class="bar">
   <a href="index.html">&lsaquo; All</a>
   <span class="bar__t">The daily reward</span>
-  <span class="bar__n">green = consistency &middot; quiet, seen every day &middot; <b>drag the sliders, they drive every screen</b></span>
+  <span class="bar__n">green = consistency &middot; quiet, seen every day &middot; <b>drag the slider, it drives every screen</b></span>
 </div>
 <div class="dlbar" id="dlbar">
   <label><span>Total actions</span><input type="range" id="dlTotal" min="1" max="365" value="30"><b id="dlTotalOut">30</b></label>
-  <label><span>Recent consistency</span><input type="range" id="dlCons" min="5" max="100" value="70"><b id="dlConsOut">70%%</b></label>
   <label class="dl-seg"><span>Cadence</span><select id="dlCad"><option value="daily">daily goal (moves)</option><option value="freq">3x a week (sessions)</option><option value="maint">maintenance (days)</option></select></label>
-  <span class="dl-presets"><button data-preset="1,100" type="button">Day 1</button><button data-preset="7,85" type="button">Week 1</button><button data-preset="30,70" type="button">Month 1</button><button data-preset="120,45" type="button">Inconsistent</button><button data-preset="300,90" type="button">Long haul</button></span>
+  <span class="dl-presets"><button data-preset="1" type="button">Day 1</button><button data-preset="7" type="button">Week 1</button><button data-preset="30" type="button">Month 1</button><button data-preset="180" type="button">Half year</button><button data-preset="365" type="button">One year</button></span>
 </div>
 <div class="wrap">
   <h1>The daily reward, %d directions</h1>
   <p class="lede">The everyday hit, fired the moment someone completes their action. Not a milestone: <b>no confetti, no colour flood</b>, green rather than their Memento colour, quiet enough to see <b>every day for a year</b>. It counts <b>actions completed</b>, not calendar days, so a person who shows up three times a week is never told they missed four.</p>
-  <p class="lede">Everything below is <b>live</b>. The sliders at the top drive all %d screens at once, so you can see any of them at 1 action or 300. The whole screen is <b>green</b>: this is the page that replaces the plain green flash the moment you hold to confirm an action. Tap a phone to play its motion.</p>
+  <p class="lede">Everything below is <b>live</b>. The slider at the top drives all %d screens at once, so you can see any of them at 1 action or 365. The whole screen is <b>green</b>: this is the page that replaces the plain green flash the moment you hold to confirm an action. Tap a phone to play its motion, then tap again to dismiss.</p>
   <div class="toc">%s</div>
   <div class="livegrid">%s</div>
 </div>
 <script>%s</script>
-<script src="_daily-live.js?v=live12"></script>
+<script src="_daily-live.js?v=live15"></script>
 </body></html>""" % (len(sections), SHELL_CSS, '\n'.join(styles), len(sections), len(sections),
                      ''.join(toc), ''.join(sections), DRIVER)
 

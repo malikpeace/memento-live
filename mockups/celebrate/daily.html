@@ -112,9 +112,9 @@ h1{font-size:27px;font-weight:700;letter-spacing:-.02em;margin:0 0 8px}
 
 /* 5 the calendar, cells fill the phone, number floats in the centre */
 .dl-cal{display:grid;width:330px;margin:0 auto}
-.dl-cal b{width:100%;aspect-ratio:1;border-radius:3px;background:rgba(var(--day-rgb),.4)}
-.dl-cal b.dlc-f{background:rgba(var(--day-rgb),.4)}
-.dl-cal b.dlc-t{background:var(--day);box-shadow:0 0 8px rgba(var(--day-rgb),.6)}
+.dl-cal>b{width:100%;aspect-ratio:1;border-radius:3px;background:rgba(var(--day-rgb),.4)}
+.dl-cal>b.dlc-f{background:rgba(var(--day-rgb),.4)}
+.dl-cal>b.dlc-t{background:var(--day);box-shadow:0 0 8px rgba(var(--day-rgb),.6)}
 .dl-calnum{position:absolute;right:40px;top:62%;font-size:52px;font-weight:750;letter-spacing:-.04em;
   color:#fff;font-variant-numeric:tabular-nums;line-height:1;
   text-shadow:0 2px 16px rgba(0,0,0,.95),0 0 6px rgba(0,0,0,.9),0 0 2px rgba(0,0,0,.9)}
@@ -165,9 +165,9 @@ h1{font-size:27px;font-weight:700;letter-spacing:-.02em;margin:0 0 8px}
 .ph.live .dl-path i.dlp-now,.ph.live .dl-steps i.dlk-now{background:#fff;box-shadow:0 0 10px rgba(255,255,255,.6)}
 /* the calendar: earned days pressed in as deep-green tiles so the white count
    never blends into them, today lit white. */
-.ph.live .dl-cal b{background:rgba(4,44,21,.42)}
-.ph.live .dl-cal b.dlc-t{background:#fff;box-shadow:0 0 10px rgba(255,255,255,.55)}
-.ph.live .dl-calnum{color:#fff;text-shadow:0 1px 7px rgba(3,30,14,.5)}
+.ph.live .dl-cal>b{background:rgba(4,44,21,.42)}
+.ph.live .dl-cal>b.dlc-t{background:#fff;box-shadow:0 0 10px rgba(255,255,255,.55)}
+.ph.live .dl-calnum{color:#fff;text-shadow:none}
 .ph.live .dl-calnum i{color:rgba(255,255,255,.82)}
 /* odometer: faint white ghosts for the padding zeros */
 .ph.live .dlo-r--dim span{color:rgba(255,255,255,.12)}
@@ -176,8 +176,10 @@ h1{font-size:27px;font-weight:700;letter-spacing:-.02em;margin:0 0 8px}
 .ph.live .dlo-w{background:rgba(3,42,20,.22);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.07),inset 0 13px 20px -13px rgba(0,0,0,.42),inset 0 -13px 20px -13px rgba(0,0,0,.42)}
 /* rolling window: the count lives INSIDE the grid, bottom-right, so it always sits ON the tiles */
-.ph.live .dl-cal{position:relative;margin-top:auto;margin-bottom:52px}
-.ph.live .dl-calnum{left:50%;right:auto;top:auto;bottom:0;transform:translateX(-50%)}
+/* boxes stay centred; the count sits fully BELOW them and never touches a tile */
+.ph.live .dl-cal{position:relative}
+.ph.live .dl-calnum{left:50%;right:auto;top:100%;bottom:auto;transform:translateX(-50%);
+  margin-top:22px;white-space:nowrap}
 /* yesterday behind you: the current number holds the CENTRE, past numbers climb above it */
 .ph.live .dlg-tower{position:relative;justify-content:center}
 .ph.live .dlg-stack{position:absolute;left:0;right:0;bottom:calc(50% + 40px);
@@ -202,18 +204,17 @@ h1{font-size:27px;font-weight:700;letter-spacing:-.02em;margin:0 0 8px}
 <div class="bar">
   <a href="index.html">&lsaquo; All</a>
   <span class="bar__t">The daily reward</span>
-  <span class="bar__n">green = consistency &middot; quiet, seen every day &middot; <b>drag the sliders, they drive every screen</b></span>
+  <span class="bar__n">green = consistency &middot; quiet, seen every day &middot; <b>drag the slider, it drives every screen</b></span>
 </div>
 <div class="dlbar" id="dlbar">
   <label><span>Total actions</span><input type="range" id="dlTotal" min="1" max="365" value="30"><b id="dlTotalOut">30</b></label>
-  <label><span>Recent consistency</span><input type="range" id="dlCons" min="5" max="100" value="70"><b id="dlConsOut">70%</b></label>
   <label class="dl-seg"><span>Cadence</span><select id="dlCad"><option value="daily">daily goal (moves)</option><option value="freq">3x a week (sessions)</option><option value="maint">maintenance (days)</option></select></label>
-  <span class="dl-presets"><button data-preset="1,100" type="button">Day 1</button><button data-preset="7,85" type="button">Week 1</button><button data-preset="30,70" type="button">Month 1</button><button data-preset="120,45" type="button">Inconsistent</button><button data-preset="300,90" type="button">Long haul</button></span>
+  <span class="dl-presets"><button data-preset="1" type="button">Day 1</button><button data-preset="7" type="button">Week 1</button><button data-preset="30" type="button">Month 1</button><button data-preset="180" type="button">Half year</button><button data-preset="365" type="button">One year</button></span>
 </div>
 <div class="wrap">
   <h1>The daily reward, 8 directions</h1>
   <p class="lede">The everyday hit, fired the moment someone completes their action. Not a milestone: <b>no confetti, no colour flood</b>, green rather than their Memento colour, quiet enough to see <b>every day for a year</b>. It counts <b>actions completed</b>, not calendar days, so a person who shows up three times a week is never told they missed four.</p>
-  <p class="lede">Everything below is <b>live</b>. The sliders at the top drive all 8 screens at once, so you can see any of them at 1 action or 300. The whole screen is <b>green</b>: this is the page that replaces the plain green flash the moment you hold to confirm an action. Tap a phone to play its motion.</p>
+  <p class="lede">Everything below is <b>live</b>. The slider at the top drives all 8 screens at once, so you can see any of them at 1 action or 365. The whole screen is <b>green</b>: this is the page that replaces the plain green flash the moment you hold to confirm an action. Tap a phone to play its motion, then tap again to dismiss.</p>
   <div class="toc"><a href="#row-t-path">1. The path of days (default)</a><a href="#row-n-odo">2. The odometer</a><a href="#row-n-ghost">3. Yesterday behind you</a><a href="#row-t-month">4. The rolling window</a><a href="#row-o-thread">5. The thread</a><a href="#row-t-steps">6. The staircase</a><a href="#row-a-field">7. The field</a><a href="#row-t-stamp">8. The stamp</a></div>
   <div class="livegrid"><section class="concept concept--live" id="row-t-path"><div class="concept__hd"><span class="concept__n">1</span><span class="concept__t">The path of days (default)</span></div><div class="ph live" data-c="t-path"><div class="dst"></div><div class="hint">tap to play the motion</div></div></section><section class="concept concept--live" id="row-n-odo"><div class="concept__hd"><span class="concept__n">2</span><span class="concept__t">The odometer</span></div><div class="ph live" data-c="n-odo"><div class="dst"></div><div class="hint">tap to play the motion</div></div></section><section class="concept concept--live" id="row-n-ghost"><div class="concept__hd"><span class="concept__n">3</span><span class="concept__t">Yesterday behind you</span></div><div class="ph live" data-c="n-ghost"><div class="dst"></div><div class="hint">tap to play the motion</div></div></section><section class="concept concept--live" id="row-t-month"><div class="concept__hd"><span class="concept__n">4</span><span class="concept__t">The rolling window</span></div><div class="ph live" data-c="t-month"><div class="dst"></div><div class="hint">tap to play the motion</div></div></section><section class="concept concept--live" id="row-o-thread"><div class="concept__hd"><span class="concept__n">5</span><span class="concept__t">The thread</span></div><div class="ph live" data-c="o-thread"><div class="dst"></div><div class="hint">tap to play the motion</div></div></section><section class="concept concept--live" id="row-t-steps"><div class="concept__hd"><span class="concept__n">6</span><span class="concept__t">The staircase</span></div><div class="ph live" data-c="t-steps"><div class="dst"></div><div class="hint">tap to play the motion</div></div></section><section class="concept concept--live" id="row-a-field"><div class="concept__hd"><span class="concept__n">7</span><span class="concept__t">The field</span></div><div class="ph live" data-c="a-field"><div class="dst"></div><div class="hint">tap to play the motion</div></div></section><section class="concept concept--live" id="row-t-stamp"><div class="concept__hd"><span class="concept__n">8</span><span class="concept__t">The stamp</span></div><div class="ph live" data-c="t-stamp"><div class="dst"></div><div class="hint">tap to play the motion</div></div></section></div>
 </div>
@@ -240,5 +241,5 @@ h1{font-size:27px;font-weight:700;letter-spacing:-.02em;margin:0 0 8px}
   window.__playAll = function(){ phones.forEach(play); };
 })();
 </script>
-<script src="_daily-live.js?v=live12"></script>
+<script src="_daily-live.js?v=live15"></script>
 </body></html>
