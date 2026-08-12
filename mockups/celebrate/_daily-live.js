@@ -170,33 +170,35 @@
       '<div class="dl-path" style="gap:' + (tickH > 12 ? 6 : 4) + 'px">' + out + '</div>' + heroBlock(x.total, x.cad) + more;
   };
 
-  /* 8. THE STAIRCASE, one clean flight climbing up to the right. A stepped edge
-     over a faint solid mass so it reads as ACTUAL stairs (tread + riser), not
-     blocks. One step per day up to a full flight; today's tread is lit. */
+  /* 8. THE STAIRCASE, one flight climbing up to the right that KEEPS rising and
+     filling the screen as the count grows: more steps AND a bigger footprint the
+     longer you go, so day 300 is a tall, big climb, not a frozen day-30 one.
+     A stepped edge over a faint solid mass reads as actual stairs; today lit. */
   R['t-steps'] = function (dst, x) {
-    var S = Math.max(1, Math.min(40, x.total));    // drawn steps: a full flight caps at 40
-    var stepW = Math.min(15, 300 / S);
-    var stepH = Math.min(17, 372 / S);
-    var W = S * stepW, H = S * stepH;
+    var N = x.total, t = Math.min(1, N / 300);     // 0 at the start, 1 by the year mark
+    var S = Math.max(3, Math.min(30, Math.round(3 + N * 0.2)));   // step count grows, capped so steps stay chunky (clearly stairs)
+    var W = 112 + (262 - 112) * t;                 // footprint widens as it grows
+    var H = 126 + (430 - 126) * t;                 // ...and gets TALL toward a full screen
+    var tw = W / S, rh = H / S;
     // stepped profile from the ground (bottom-left) climbing to the top-right:
-    // each day is one riser up then one tread across.
+    // each drawn step is one riser up then one tread across.
     var edge = 'M0 ' + H.toFixed(1);
     for (var i = 0; i < S; i++) {
-      var yTop = (H - (i + 1) * stepH).toFixed(1);
-      edge += ' L' + (i * stepW).toFixed(1) + ' ' + yTop + ' L' + ((i + 1) * stepW).toFixed(1) + ' ' + yTop;
+      var yTop = (H - (i + 1) * rh).toFixed(1);
+      edge += ' L' + (i * tw).toFixed(1) + ' ' + yTop + ' L' + ((i + 1) * tw).toFixed(1) + ' ' + yTop;
     }
     var fill = edge + ' L' + W.toFixed(1) + ' ' + H.toFixed(1) + ' Z';   // close down to the ground
-    var sw = Math.max(2.4, Math.min(4, stepH * 0.36));
-    var topY = (0).toFixed(1), topXl = ((S - 1) * stepW).toFixed(1), topXr = W.toFixed(1);
+    var sw = Math.max(1.8, Math.min(3.8, rh * 0.42));
+    var topXl = ((S - 1) * tw).toFixed(1), topXr = W.toFixed(1);
     var pad = 8, vbW = W + pad * 2, vbH = H + pad * 2;
     dst.innerHTML =
       '<svg class="dl-stair" viewBox="' + (-pad) + ' ' + (-pad) + ' ' + vbW.toFixed(1) + ' ' + vbH.toFixed(1) + '" ' +
-      'width="' + (W + pad * 2).toFixed(1) + '" height="' + (H + pad * 2).toFixed(1) + '" aria-hidden="true" ' +
+      'width="' + vbW.toFixed(1) + '" height="' + vbH.toFixed(1) + '" aria-hidden="true" ' +
       'style="display:block;margin:0 auto;overflow:visible">' +
       '<path d="' + fill + '" fill="rgba(255,255,255,.12)" stroke="none"></path>' +
       '<path d="' + edge + '" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="' + sw.toFixed(2) +
       '" stroke-linejoin="miter" stroke-linecap="square"></path>' +
-      '<path d="M' + topXl + ' ' + topY + ' L' + topXr + ' ' + topY + '" fill="none" stroke="#fff" ' +
+      '<path d="M' + topXl + ' 0 L' + topXr + ' 0" fill="none" stroke="#fff" ' +
       'stroke-width="' + (sw + 1.8).toFixed(2) + '" stroke-linecap="round" style="filter:drop-shadow(0 0 6px rgba(255,255,255,.7))"></path>' +
       '</svg>' +
       heroBlock(x.total, x.cad);
