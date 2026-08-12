@@ -156,9 +156,7 @@ h1{font-size:27px;font-weight:700;letter-spacing:-.02em;margin:0 0 8px}
    body text stays high-contrast. Scoped to .ph.live so only the daily reward
    goes green, the gallery around it stays dark. ===== */
 .ph.live{
-  background:
-    radial-gradient(130% 80% at 50% 30%, rgba(96,240,134,.26), rgba(96,240,134,0) 60%),
-    linear-gradient(179deg,#12933a 0%,#0c7530 45%,#075423 100%);
+  background:#12833a;
   --ink:255,255,255; --day:#ffffff; --day-rgb:255,255,255;
   --text-hi:rgba(255,255,255,.98); --text-mid:rgba(255,255,255,.86); --text-lo:rgba(255,255,255,.62);
 }
@@ -169,7 +167,7 @@ h1{font-size:27px;font-weight:700;letter-spacing:-.02em;margin:0 0 8px}
    never blends into them, today lit white. */
 .ph.live .dl-cal b{background:rgba(4,44,21,.42)}
 .ph.live .dl-cal b.dlc-t{background:#fff;box-shadow:0 0 10px rgba(255,255,255,.55)}
-.ph.live .dl-calnum{color:#fff;text-shadow:0 2px 20px rgba(3,40,17,.9),0 0 3px rgba(3,40,17,.85)}
+.ph.live .dl-calnum{color:#fff;text-shadow:0 1px 7px rgba(3,30,14,.5)}
 .ph.live .dl-calnum i{color:rgba(255,255,255,.82)}
 /* odometer: faint white ghosts for the padding zeros */
 .ph.live .dlo-r--dim span{color:rgba(255,255,255,.12)}
@@ -178,8 +176,8 @@ h1{font-size:27px;font-weight:700;letter-spacing:-.02em;margin:0 0 8px}
 .ph.live .dlo-w{background:rgba(3,42,20,.22);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.07),inset 0 13px 20px -13px rgba(0,0,0,.42),inset 0 -13px 20px -13px rgba(0,0,0,.42)}
 /* rolling window: the count lives INSIDE the grid, bottom-right, so it always sits ON the tiles */
-.ph.live .dl-cal{position:relative}
-.ph.live .dl-calnum{right:8px;bottom:10px;top:auto}
+.ph.live .dl-cal{position:relative;margin-top:auto;margin-bottom:52px}
+.ph.live .dl-calnum{left:50%;right:auto;top:auto;bottom:0;transform:translateX(-50%)}
 /* yesterday behind you: the current number holds the CENTRE, past numbers climb above it */
 .ph.live .dlg-tower{position:relative;justify-content:center}
 .ph.live .dlg-stack{position:absolute;left:0;right:0;bottom:calc(50% + 40px);
@@ -242,5 +240,5 @@ h1{font-size:27px;font-weight:700;letter-spacing:-.02em;margin:0 0 8px}
   window.__playAll = function(){ phones.forEach(play); };
 })();
 </script>
-<script src="_daily-live.js?v=live9"></script>
+<script src="_daily-live.js?v=live12"></script>
 </body></html>

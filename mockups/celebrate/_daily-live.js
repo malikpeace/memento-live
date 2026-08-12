@@ -127,7 +127,7 @@
      behind the number toward a whole year. No gaps drawn, each cell is earned. */
   R['t-month'] = function (dst, x) {
     var C = Math.min(x.total, 371);
-    var cols = Math.max(7, Math.min(19, Math.round(Math.sqrt(C * 1.5))));
+    var cols = Math.max(7, Math.min(15, Math.round(Math.sqrt(C * 1.5))));
     var cellGap = C > 180 ? 4 : C > 90 ? 5 : 7;
     var cells = '';
     for (var i = 0; i < C; i++) cells += '<b class="' + (i === C - 1 ? 'dlc-t' : 'dlc-f') + '"></b>';
