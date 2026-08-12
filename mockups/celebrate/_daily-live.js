@@ -155,19 +155,22 @@
      the phone. Day 303 shows 303 lines. Ticks shrink to keep the whole run in. */
   R['t-path'] = function (dst, x) {
     var N = Math.min(x.total, 365);
-    var per = N <= 60 ? 20 : N <= 150 ? 30 : 40;
+    // fewer per row + bigger ticks + bigger gaps when the count is low, so the path
+    // feels big and spread even early; it only packs tighter as the run grows long.
+    var per = N <= 20 ? 8 : N <= 50 ? 12 : N <= 120 ? 20 : N <= 240 ? 30 : 40;
     var rows = Math.ceil(N / per);
-    var tickH = rows <= 6 ? 16 : rows <= 10 ? 12 : 8;
-    var tickW = per <= 20 ? 3 : per <= 30 ? 2.5 : 2;
+    var tickH = rows <= 2 ? 40 : rows <= 4 ? 28 : rows <= 7 ? 18 : rows <= 11 ? 12 : 9;
+    var tickW = tickH >= 28 ? 6 : tickH >= 18 ? 4.5 : tickH >= 12 ? 3 : 2.4;
+    var gapX = Math.round(tickW * 1.9), gapY = Math.round(tickH * 0.34) + 2;
     var out = '';
     for (var i = 0; i < N; i++) {
-      if (i % per === 0) out += (i ? '</div>' : '') + '<div class="dlp-row">';
-      out += '<i class="' + (i === N - 1 ? 'dlp-now' : '') + '" style="width:' + tickW + 'px;height:' + (i === N - 1 ? tickH + 6 : tickH) + 'px"></i>';
+      if (i % per === 0) out += (i ? '</div>' : '') + '<div class="dlp-row" style="gap:' + gapX + 'px">';
+      out += '<i class="' + (i === N - 1 ? 'dlp-now' : '') + '" style="width:' + tickW + 'px;height:' + (i === N - 1 ? tickH + 8 : tickH) + 'px"></i>';
     }
     if (N) out += '</div>';
     var more = x.total > N ? '<div class="dl-more">plus ' + (x.total - N) + ' more</div>' : '';
     dst.innerHTML =
-      '<div class="dl-path" style="gap:' + (tickH > 12 ? 6 : 4) + 'px">' + out + '</div>' + heroBlock(x.total, x.cad) + more;
+      '<div class="dl-path" style="gap:' + gapY + 'px">' + out + '</div>' + heroBlock(x.total, x.cad) + more;
   };
 
   /* 8. THE STAIRCASE, one real step per day that accumulates. It climbs up to the
@@ -226,7 +229,7 @@
      longer the more days you hold, filling the phone by the hundreds. */
   R['o-thread'] = function (dst, x) {
     var N = Math.min(x.total, 300);
-    var perRow = 20, rowsN = Math.max(1, Math.ceil(N / perRow));
+    var perRow = 7, rowsN = Math.max(1, Math.ceil(N / perRow));   // ~3x longer per-day segments -> a ~3x longer thread
     var top = 20, rowH = Math.max(12, Math.min(28, 320 / rowsN));
     var left = 20, right = 170, rad = Math.min(14, rowH / 2 - 1);
     // build the path to END exactly at day N (last row is partial), so the whole
