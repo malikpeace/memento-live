@@ -34,7 +34,11 @@
   transition:transform .2s cubic-bezier(.2,.7,.3,1),filter .2s ease-out}
 [data-k=ob-1] .o1-z:focus-visible{outline:2px solid rgba(var(--ink),.5);outline-offset:6px;border-radius:6px}
 [data-k=ob-1] .o1-z:active{transform:translateY(1.5px) scale(.997)}
-[data-k=ob-1] .o1-z>*{transition:text-shadow .24s ease-out,color .24s ease-out}
+[data-k=ob-1] .o1-z>*{transition:text-shadow .24s ease-out,color .24s ease-out,opacity .26s ease-out}
+/* unconfirmed facts rest DIM: the tap confirms by bringing the words to full
+   light (deliberate interaction state, not resting body copy). */
+[data-k=ob-1] .o1-z:not(.set)>*{opacity:.38}
+[data-k=ob-1] .o1-z.set>*{opacity:1}
 [data-k=ob-1] .o1-z.o1-so{margin-top:26px}
 /* the zone owns the gap, not its first line, so the mark can sit on that first line */
 [data-k=ob-1] .o1-z.o1-zw{margin-top:16px}
@@ -46,15 +50,6 @@
   text-shadow:0 -1px 0 rgba(0,0,0,.95),0 1px 0 rgba(var(--ink),.24)}
 [data-k=ob-1] .o1-z.set .o1-sm,[data-k=ob-1] .o1-z.set .o1-when i,[data-k=ob-1] .o1-z.set .o1-when s{
   text-shadow:0 -1px 0 rgba(0,0,0,.9),0 1px 0 rgba(var(--ink),.16)}
-/* the mark: an empty seat before, a set tick after. Sits on the zone's first line, out at the column edge. */
-[data-k=ob-1] .o1-m{position:absolute;right:0;top:3px;width:15px;height:15px;border-radius:999px;
-  background:rgba(var(--ink),.09);box-shadow:inset 0 1px 0 rgba(var(--ink),.10);
-  display:flex;align-items:center;justify-content:center;
-  transition:background .24s ease-out,box-shadow .24s ease-out}
-[data-k=ob-1] .o1-m svg{width:9px;height:9px;color:var(--text-hi);opacity:0;transform:scale(.6);
-  transition:opacity .22s ease-out,transform .26s cubic-bezier(.2,.9,.3,1.25)}
-[data-k=ob-1] .o1-z.set .o1-m{background:rgba(var(--ink),.16);box-shadow:inset 0 1px 1px rgba(0,0,0,.6)}
-[data-k=ob-1] .o1-z.set .o1-m svg{opacity:1;transform:none}
 
 [data-k=ob-1] .o1-foot{position:absolute;left:22px;right:22px;bottom:30px}
 [data-k=ob-1] .o1-cta{display:block;width:100%;border:0;border-radius:14px;background:rgba(22,25,31,.92);
@@ -69,7 +64,7 @@
   [data-k=ob-1] .o1-cta,[data-k=ob-1] .o1-z,[data-k=ob-1] .o1-z>*,
   [data-k=ob-1] .o1-m,[data-k=ob-1] .o1-m svg{transition:none}}
 </style>
-<h3>Wall of intent</h3><p class="cap">No card, no container, no chrome: the star IS the screen, scaled so the number is the largest thing they have ever seen it, and each fact sinks into the wall when they press it, so agreeing is physical and the button only lives once the whole wall is set.</p>
+<h3>Wall of intent</h3><p class="cap">No card, no container, no chrome: the star IS the screen. The facts rest dim; tapping each one confirms it, the words come to full light and engrave into the wall, and the button only lives once all three are lit.</p>
 <div class="ph">
   <div class="grid"></div>
   <div class="o1-halo"></div>
@@ -78,17 +73,14 @@
       <span class="o1-sm">I will get to</span>
       <span class="o1-num">$3,000</span>
       <span class="o1-mid">a month</span>
-      <span class="o1-m"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 6.3l2.6 2.6L10 3.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
     </button>
     <button class="o1-z o1-so" type="button" aria-pressed="false">
       <span class="o1-sm">so I can</span>
       <span class="o1-big">quit the<br>warehouse</span>
-      <span class="o1-m"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 6.3l2.6 2.6L10 3.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
     </button>
     <span class="o1-rule"></span>
     <button class="o1-z o1-zw" type="button" aria-pressed="false">
       <span class="o1-when"><i>by</i><b>March 1</b><s>201 days</s></span>
-      <span class="o1-m"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 6.3l2.6 2.6L10 3.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
     </button>
     <p class="o1-note">
       <svg viewBox="0 0 12 14" fill="none" aria-hidden="true"><path d="M2.7 6.2V4.3a3.3 3.3 0 0 1 6.6 0v1.9" stroke="currentColor" stroke-width="1.3"/><rect x="1.2" y="6.2" width="9.6" height="7" rx="1.8" fill="currentColor" opacity=".7"/></svg>
@@ -97,7 +89,7 @@
   </div>
   <div class="o1-foot">
     <button class="o1-cta" type="button">Press each line to set it</button>
-    <p class="o1-sub">Three to press</p>
+    <p class="o1-sub">Tap each line to confirm it</p>
   </div>
 </div>
 <script>
@@ -109,7 +101,7 @@
     if(left===0){ cta.classList.add('live'); cta.textContent='This is it'; sub.textContent='Change it later in Clarity'; }
     else{ cta.classList.remove('live');
       cta.textContent = n===0 ? 'Press each line to set it' : left+(left===1?' line left':' lines left');
-      sub.textContent = n===0 ? 'Three to press' : 'Press it again to undo'; }
+      sub.textContent = n===0 ? 'Tap each line to confirm it' : 'Tap again to undo'; }
   }
   zs.forEach(function(z){ z.addEventListener('click',function(){
     var on=!z.classList.contains('set');
