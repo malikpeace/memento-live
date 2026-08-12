@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Consistency — the page</title>
+<link rel="stylesheet" href="_kit.css">
+<style>
+  html, body { background: #060708; }
+  body { margin: 0; padding: 72px 22px 120px; color: var(--text-hi, #fff); font-family: "Geist", -apple-system, BlinkMacSystemFont, sans-serif; }
+  #finalControls { position: fixed; top: 0; left: 0; right: 0; z-index: 200; background: rgba(6,7,10,0.94); backdrop-filter: blur(16px); border-bottom: 1px solid var(--hairline, rgba(255,255,255,0.09)); padding: 12px 22px; }
+  #finalControls .nf-controls { max-width: 430px; margin: 0 auto; }
+  .lede { max-width: 430px; margin: 0 auto 22px; }
+  .lede h1 { font-size: 19px; font-weight: 750; letter-spacing: -0.01em; margin: 2px 0 6px; }
+  .lede p { font-size: 13px; color: var(--text-lo, rgba(255,255,255,0.45)); line-height: 1.55; margin: 0; }
+</style>
+</head>
+<body>
+<div id="finalControls"></div>
+<div class="lede">
+  <h1>Consistency — the tap-in page</h1>
+  <p>The locked direction: a plain-language hero over the one number that only grows, three stats that can improve, then the heatmap carrying the honest record, then the deeper stats. Streaks are support, not the headline. No days-missed counter. Drag the day control (pinned up top) to see it from day 1 onward.</p>
+</div>
+<div id="finalLab"></div>
+<script src="_kit.js"></script>
+<script src="final.js"></script>
+<script>
+  (function () {
+    var bar = document.getElementById('finalControls');
+    function fit() { document.body.style.paddingTop = (bar.offsetHeight + 14) + 'px'; }
+    fit();
+    if (window.ResizeObserver) new ResizeObserver(fit).observe(bar);
+    window.addEventListener('resize', fit); window.addEventListener('load', fit);
+  })();
+</script>
+</body>
+</html>
