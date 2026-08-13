@@ -108,7 +108,7 @@
 
     <div class="tot">
       <div><span>printed</span><b id="l10p">87 of 100</b></div>
-      <div><span id="l10ll">left before 1 September</span><b id="l10l">13 sessions</b></div>
+      <div><span id="l10ll">left on the list</span><b id="l10l">13 sessions</b></div>
     </div>
 
     <button class="feed" id="l10feed"><span class="fill" id="l10fill"></span><span class="t" id="l10cap">Hold to print the line</span></button>
@@ -119,17 +119,17 @@ var CHK='<svg viewBox="0 0 24 24"><path d="M4 13l5 5L20 7"/></svg>';
 /* Every number below is arithmetic on two sources only: the lines they logged, and the
    date they typed at intake. Nothing here is measured for them. */
 var B={
- ship:{who:'Deep work',ttl:'100 deep work sessions',dl:'1 September',totLab:'left before 1 September',
+ ship:{who:'Deep work',ttl:'100 deep work sessions',totLab:'left on the list',
    sub:'One line each, all 100 before 1 September.',goal:100,done:87,days:20,pick:1,
    past:[['4 hours','Aug 3'],['3 hours','Aug 4'],['4 hours','Aug 5'],['5 hours','Aug 6'],
          ['4 hours','Aug 8'],['3 hours','Aug 10'],['4 hours','Aug 11']],
    opts:['3 hours','4 hours','5 hours']},
- school:{who:'Study',ttl:'60 study sessions',dl:'finals',totLab:'left before 12 December',
+ school:{who:'Study',ttl:'60 study sessions',totLab:'left on the list',
    sub:'One line each, all 60 before finals.',goal:60,done:22,days:122,pick:1,
    past:[['2 hours','Aug 2'],['1 hour','Aug 4'],['2 hours','Aug 5'],['3 hours','Aug 7'],
          ['2 hours','Aug 8'],['2 hours','Aug 10'],['1 hour','Aug 11']],
    opts:['1 hour','2 hours','3 hours']},
- race:{who:'Training',ttl:'120 training sessions',dl:'12 April',totLab:'left before 12 April',
+ race:{who:'Training',ttl:'120 training sessions',totLab:'left on the list',
    sub:'One line each, all 120 before 12 April.',goal:120,done:34,days:243,pick:1,
    past:[['60 min','Aug 3'],['45 min','Aug 5'],['80 min','Aug 6'],['60 min','Aug 7'],
          ['45 min','Aug 9'],['60 min','Aug 10'],['80 min','Aug 11']],
@@ -142,11 +142,11 @@ var st=r.querySelector('#l10st'),feed=r.querySelector('#l10feed'),fill=r.querySe
 var PITCH=28,HOLD=900,c,done,pick,printed,rows,idx,base,t0,raf=0,back=0;
 function pad(n){return ('00'+n).slice(-3);}
 function sess(n){return n+(n===1?' session':' sessions');}
-function line(n){return n+(n===1?' line':' lines');}
-function consTxt(i){var L=c.goal-done;
-  if(i===0)return 'Under the length you set. It prints the same line, and '+L+' of them still have to fit in '+c.days+' days.';
+/* consequence of the size chosen for today, nothing about pace against the date */
+function consTxt(i){
+  if(i===0)return 'Under the length you set. It still prints one line.';
   if(i===2)return 'Over the length you set. Worth it on a day with nothing after it.';
-  return 'The length you set in the plan. '+line(L)+' left, '+c.days+' days to print them.';}
+  return 'The length you set in the plan.';}
 function row(cls,num,len,date,idA,idB){
   return '<div class="r '+cls+'"><i>'+pad(num)+'</i><span'+(idA||'')+'>'+len+'</span>'+
          '<em'+(idB||'')+'>'+date+'</em>'+CHK+'</div>';}
@@ -192,7 +192,7 @@ function finish(){
   lab.textContent='Line '+pad(done+1)+' sits at the head tomorrow.';
   ops.innerHTML='<div class="pd"><span>'+pad(done)+' &nbsp;'+len+'</span><em>printed Aug 12</em></div>'+
     '<div class="pd2">Nothing else prints today. The tape waits at line '+pad(done+1)+'.</div>';
-  cons.textContent=done+' printed, '+(c.goal-done)+' left before '+c.dl+'.';}
+  cons.textContent='';}
 function tick(){var p=Math.min(1,(performance.now()-t0)/HOLD);draw(p);
   if(p>=1){finish();return;}raf=requestAnimationFrame(tick);}
 function start(e){if(printed)return;e.preventDefault();cancelAnimationFrame(back);

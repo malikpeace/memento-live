@@ -3,16 +3,16 @@
      lp-15 bottom sheet first | lp-16 horizontal corridor band | lp-17 declarative sentence over account rows |
      lp-18 centered monolith numeral -->
 <section class="cell" data-k="lp-9">
+<!-- PURITY: Action, so the book holds today and their own raw entries only.
+     No "to go" headline, no target, no seven day average: reading a measured
+     number against the goal is Clarity's face, one swipe away. What is left is
+     the ritual: write today's number, choose today's size, see what that size
+     costs, write it in. -->
 <style>
 [data-k=lp-9] .ph{font-variant-numeric:tabular-nums}
 
-/* header, no bar: weight is an interpreted number and never gets one */
-[data-k=lp-9] .hd{position:absolute;left:16px;right:16px;top:18px}
-[data-k=lp-9] .big{margin:0;font-size:25px;font-weight:700;letter-spacing:-.03em;line-height:1.05;color:rgba(var(--ink),.97)}
-[data-k=lp-9] .sub{margin:7px 0 0;font-size:12.5px;line-height:1.45;color:rgba(var(--ink),.90)}
-
 /* the book */
-[data-k=lp-9] .book{position:absolute;left:12px;right:12px;top:96px;bottom:12px;display:flex;flex-direction:column;
+[data-k=lp-9] .book{position:absolute;left:12px;right:12px;top:20px;bottom:12px;display:flex;flex-direction:column;
   padding:12px 12px 13px;border-radius:14px;background:rgba(22,25,31,.955);
   -webkit-backdrop-filter:blur(30px) saturate(1.4);backdrop-filter:blur(30px) saturate(1.4);
   box-shadow:inset 0 1px 0 rgba(var(--ink),.075),0 20px 40px rgba(0,0,0,.52)}
@@ -61,14 +61,14 @@
 [data-k=lp-9] .wrote{width:100%;margin:10px 0 0;padding:13px;border-radius:13px;display:none;
   align-items:center;justify-content:center;gap:8px;white-space:nowrap;font:500 12.5px var(--font);font-variant-numeric:tabular-nums;
   color:rgba(var(--ink),.95);background:rgba(63,217,78,.14);box-shadow:inset 0 1px 0 rgba(var(--ink),.09)}
-[data-k=lp-9] .wrote svg{width:13px;height:13px;fill:none;stroke:#3fd94e;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+[data-k=lp-9] .wrote svg{flex:0 0 auto;width:13px;height:13px;fill:none;stroke:#3fd94e;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
 [data-k=lp-9] .done .cta{display:none}
 [data-k=lp-9] .done .wrote{display:flex}
 [data-k=lp-9] .done .slot{cursor:default}
 
 /* --- the numbers they already wrote -------------------------------------- */
-[data-k=lp-9] .pastwrap{margin:14px 0 0}
-[data-k=lp-9] .rw{display:grid;grid-template-columns:1fr 62px 44px 46px;align-items:center;gap:6px;padding-left:12px}
+[data-k=lp-9] .pastwrap{margin:16px 0 0}
+[data-k=lp-9] .rw{display:grid;grid-template-columns:1fr 68px 52px;align-items:center;gap:6px;padding-left:12px}
 [data-k=lp-9] .rw>span:not(:first-child){text-align:right}
 [data-k=lp-9] .colh{padding-bottom:7px;font-size:10.5px;color:rgba(var(--ink),.62)}
 [data-k=lp-9] .colh .yw{color:rgba(var(--ink),.90)}
@@ -80,7 +80,6 @@
 /* the change column is never coloured: a day up and a day down look the same
    in the book, whichever direction the goal happens to run */
 [data-k=lp-9] .past .c{font-size:12.5px;color:rgba(var(--ink),.86)}
-[data-k=lp-9] .past .a{font-size:12.5px;color:rgba(var(--ink),.86)}
 [data-k=lp-9] .foot{margin:auto 0 0;padding-top:11px;font-size:11.5px;line-height:1.45;color:rgba(var(--ink),.90)}
 @media (prefers-reduced-motion:reduce){[data-k=lp-9] .slot .ghost:after{animation:none}}
 </style>
@@ -92,10 +91,6 @@
 </div>
 <div class="ph">
   <div class="grid"></div>
-  <div class="hd">
-    <p class="big" id="l9big"></p>
-    <p class="sub" id="l9sub"></p>
-  </div>
 
   <div class="book" id="l9book">
     <div class="open">
@@ -115,7 +110,7 @@
     </div>
 
     <div class="pastwrap">
-      <div class="rw colh"><span>day</span><span class="yw">you wrote</span><span>change</span><span>7 day</span></div>
+      <div class="rw colh"><span>day</span><span class="yw">you wrote</span><span>change</span></div>
       <div class="past" id="l9past"></div>
     </div>
 
@@ -124,61 +119,44 @@
 </div>
 <script>(function(){var r=document.querySelector('[data-k="lp-9"]');if(!r)return;
 
-/* Two directions, one book. The twelve days before today are the only raw
-   numbers in either context: every figure on screen is arithmetic on them.
-   dir = the direction the goal runs, +1 up, -1 down. A move against dir is
-   never scolded and a move with dir is never celebrated, it is just written. */
+/* Two directions, one book. The days before today are the only raw numbers in
+   either context, and the only arithmetic on them is yesterday's change. No
+   target lives here: what the numbers mean against the goal is Clarity's job. */
 var CTX={
   down:{
-    dir:-1,start:264,target:220,
     H:[244.6,244.2,244.5,243.9,244.1,243.6,243.4,243.0,243.2,242.5,242.8,242.2],
     acts:[
       {t:'Light',a:'20 minutes walking.',
-       c:'Holds the average roughly where it is. Some days that is the work.'},
+       c:'Holds you about where you are. Some days that is the work.'},
       {t:'Steady',a:'40 minutes walking. No bread with dinner.',
-       c:'The plan reckons about half a pound a week off the seven day average.'},
+       c:'At this size the plan reckons about half a pound a week off.'},
       {t:'Hard',a:'60 minutes walking. No bread, no late snack.',
-       c:'The plan reckons closer to a pound a week, as long as you sleep tonight.'}
+       c:'At this size the plan reckons closer to a pound a week off, as long as you sleep tonight.'}
     ],pick:1
   },
   up:{
-    dir:1,start:145,target:160,
     H:[148.6,149.0,148.8,149.6,150.2,150.0,150.6,151.0,150.7,151.4,151.8,151.6],
     acts:[
       {t:'Light',a:'Three full meals. No skipped lunch.',
-       c:'Holds the average roughly where it is. Some days that is the work.'},
+       c:'Holds you about where you are. Some days that is the work.'},
       {t:'Steady',a:'Three meals and a shake. Push session, 45 minutes.',
-       c:'The plan reckons about half a pound a week onto the seven day average.'},
+       c:'At this size the plan reckons about half a pound a week on.'},
       {t:'Hard',a:'Four meals, two shakes. Heavy session, 60 minutes.',
-       c:'The plan reckons closer to a pound a week, as long as you sleep tonight.'}
+       c:'At this size the plan reckons closer to a pound a week on, as long as you sleep tonight.'}
     ],pick:1
   }
 };
-var DAYS=['Fri 7','Sat 8','Sun 9','Mon 10'];
+var DAYS=['Wed 5','Thu 6','Fri 7','Sat 8','Sun 9','Mon 10'],ROWS=DAYS.length;
 
 var act=r.querySelector('#l9act'),cons=r.querySelector('#l9cons'),seg=r.querySelector('#l9seg'),
     book=r.querySelector('#l9book'),slot=r.querySelector('#l9slot'),inp=r.querySelector('#l9in'),
     calc=r.querySelector('#l9calc'),cta=r.querySelector('#l9cta'),foot=r.querySelector('#l9foot'),
-    big=r.querySelector('#l9big'),sub=r.querySelector('#l9sub'),past=r.querySelector('#l9past'),
-    when=r.querySelector('#l9when'),wrt=r.querySelector('#l9wrt'),
+    past=r.querySelector('#l9past'),when=r.querySelector('#l9when'),wrt=r.querySelector('#l9wrt'),
     C=CTX.down,pick=1,written=false;
 
 function r1(n){return (Math.round(n*10)/10).toFixed(1)}
 function sgn(n){return (n>0?'+':'')+r1(n)}
 function val(){var v=parseFloat(inp.value);return (v>=80&&v<=700)?v:null}
-/* the seven day average ending on index i of the history */
-function avgAt(i){var s=0,k;for(k=i-6;k<=i;k++)s+=C.H[k];return s/7}
-/* the seven day average if today's typed number closes the window */
-function avg7(v){var a=C.H.slice(-6),s=v,k;for(k=0;k<a.length;k++)s+=a[k];return s/7}
-function toGo(a){var g=C.dir>0?C.target-a:a-C.target;return g}
-function headline(a){
-  var g=toGo(a);
-  big.textContent=g<=0.05?'At '+C.target+'. Hold it.':r1(g)+' lb to go';
-  /* since May reads the direction it actually moved, not the one you wanted */
-  var mv=a-C.start;
-  sub.textContent=r1(a)+' is the seven day average. '+(mv>=0?'Up ':'Down ')+
-    r1(Math.abs(mv))+' since May, target '+C.target+'.';
-}
 
 function drawSeg(){
   seg.textContent='';
@@ -199,12 +177,12 @@ function drawSeg(){
 
 function drawPast(){
   past.textContent='';
-  /* newest first, four rows, all of it arithmetic on the twelve typed numbers */
+  /* newest first, all of it their own typed numbers plus the day's change */
   var n=C.H.length,i;
-  for(i=n-1;i>=n-4;i--){
+  for(i=n-1;i>=n-ROWS;i--){
     var row=document.createElement('div');row.className='rw';
-    row.innerHTML='<span class="d">'+DAYS[i-(n-4)]+'</span><span class="v">'+r1(C.H[i])+
-      '</span><span class="c">'+sgn(C.H[i]-C.H[i-1])+'</span><span class="a">'+r1(avgAt(i))+'</span>';
+    row.innerHTML='<span class="d">'+DAYS[i-(n-ROWS)]+'</span><span class="v">'+r1(C.H[i])+
+      '</span><span class="c">'+sgn(C.H[i]-C.H[i-1])+'</span>';
     past.appendChild(row);
   }
 }
@@ -213,28 +191,20 @@ inp.addEventListener('input',function(){
   if(written)return;
   slot.classList.toggle('filled',inp.value.length>0);
   var v=val();
-  if(v===null){calc.textContent='The change and the seven day average work themselves out from it.';
-    cta.disabled=true;cta.textContent="Write today's weight first";return;}
-  var d=v-C.H[C.H.length-1],a=avg7(v);
-  calc.innerHTML='That is <b>'+sgn(d)+'</b> on yesterday. Seven day average <b>'+r1(a)+'</b>.';
+  if(v===null){calc.textContent='';cta.disabled=true;cta.textContent="Write today's weight first";return;}
+  calc.innerHTML='That is <b>'+sgn(v-C.H[C.H.length-1])+'</b> on yesterday.';
   cta.disabled=false;cta.textContent='Write '+r1(v)+' into the book';});
 
 cta.addEventListener('click',function(){
   var v=val();if(written||v===null)return;
   written=true;book.classList.add('done');seg.classList.add('lock');inp.readOnly=true;
-  var d=v-C.H[C.H.length-1],a=avg7(v),prev=avgAt(C.H.length-1),mv7=a-prev;
+  var d=v-C.H[C.H.length-1];
   when.textContent='Tue 11, written';
   wrt.textContent='Written in: '+r1(v)+' lb, '+sgn(d)+' on yesterday';
-  headline(a);
-  /* the average is the primary number, so it gets the plain reading. Moving
-     with the goal is stated and left alone. Moving against it is stated too. */
-  var tail=Math.abs(+r1(mv7))<0.05?' It did not move on yesterday.'
-    :(C.dir*mv7>0?'':' That is the average moving away from '+C.target+'.');
-  calc.innerHTML='Seven day average <b>'+r1(a)+'</b>, '+sgn(+r1(a)-+r1(prev))+' on yesterday.'+tail;
+  calc.textContent='';
   cons.textContent='Tomorrow opens a new row at midnight.';
   var row=document.createElement('div');row.className='rw';
-  row.innerHTML='<span class="d">Today</span><span class="v">'+r1(v)+'</span><span class="c">'+sgn(d)+
-    '</span><span class="a">'+r1(a)+'</span>';
+  row.innerHTML='<span class="d">Today</span><span class="v">'+r1(v)+'</span><span class="c">'+sgn(d)+'</span>';
   past.insertBefore(row,past.firstElementChild);
   past.removeChild(past.lastElementChild);
   foot.textContent='Today is written in. Every number in that column is one you typed.';});
@@ -246,10 +216,9 @@ function render(key){
   inp.readOnly=false;inp.value='';slot.classList.remove('filled');
   cta.disabled=true;cta.textContent="Write today's weight first";
   when.textContent='Tue 11, still open';wrt.textContent='Written';
-  calc.textContent='The change and the seven day average work themselves out from it.';
+  calc.textContent='';
   act.textContent=C.acts[pick].a;cons.textContent=C.acts[pick].c;
-  foot.textContent='You typed every number in that column. The rest is arithmetic on them.';
-  headline(avgAt(C.H.length-1));
+  foot.textContent='You typed every number in that column.';
   drawSeg();drawPast();
 }
 r.querySelectorAll('.bk button').forEach(function(b){

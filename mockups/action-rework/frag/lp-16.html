@@ -1,40 +1,60 @@
 <!-- ARCHETYPES, the surviving set: lp-1 full-bleed statement type | lp-6 vertical descent rail | lp-7 poster ceiling number |
      lp-8 hundred-mark field | lp-9 ruled ledger book | lp-10 receipt tape | lp-12 full-height week columns |
-     lp-15 bottom sheet first | lp-16 horizontal corridor band | lp-17 declarative sentence over account rows |
+     lp-15 bottom sheet first | lp-16 low-anchored move over own marks | lp-17 declarative sentence over account rows |
      lp-18 centered monolith numeral -->
 <section class="cell" data-k="lp-16">
+<!-- MALIK, PILLAR PURITY (2026-08-13). Applied exactly:
+     CUT the corridor. The floor line, the cushion lines and their tags, the
+     over/under shading, the pace track ("$240 under the line for this point in
+     the month") and every above/below verdict are gone. That was Clarity's face
+     wearing Action's clothes.
+     The money screen is now the week's move plus the check: nothing on it reads
+     a position against $4,000, so there is no number to read one from.
+     The band SURVIVES only in Body, and only as raw own entries: the Friday
+     weigh-ins they typed, dotted between because nothing was measured in
+     between. No hold line, no band edges, no in/out verdict.
+     The intensity chips were "how much cushion above the floor" (a target rail).
+     They are now the size of TODAY'S move, which is the one intensity Action
+     owns, and the consequence is the move sentence itself changing.
+     PROVENANCE: the pen's home is named once, quietly, above the swipe, so the
+     screen says what logging does NOT do without ever reading a position. -->
 <style>
 [data-k=lp-16] .l16{position:absolute;inset:0;display:flex;flex-direction:column;padding:30px 0 22px;
   font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent}
 [data-k=lp-16] .l16 .pad{padding:0 20px}
 
-[data-k=lp-16] .l16-goal{font-size:12.5px;line-height:1;color:rgba(var(--ink),.80)}
-[data-k=lp-16] .l16-top{display:flex;align-items:baseline;gap:7px;margin-top:14px}
+[data-k=lp-16] .l16-goal{font-size:12.5px;line-height:1.35;color:rgba(var(--ink),.80)}
+
+/* the pen, for the goal they write down themselves: the value, and when it was written */
+[data-k=lp-16] .l16-pen{display:flex;align-items:baseline;gap:7px;margin-top:15px}
 [data-k=lp-16] .l16-in{font-size:37px;font-weight:700;letter-spacing:-.035em;line-height:1;color:var(--text-hi)}
 [data-k=lp-16] .l16-of{font-size:13.5px;white-space:nowrap;color:rgba(var(--ink),.80)}
-[data-k=lp-16] .l16-days{margin-left:auto;font-size:12px;white-space:nowrap;color:rgba(var(--ink),.80)}
-[data-k=lp-16] .l16-say{margin:10px 0 0;font-size:14px;font-weight:500;line-height:1.45;color:rgba(var(--ink),.95)}
-[data-k=lp-16] .l16-say b{font-weight:700;color:var(--text-hi)}
-/* provenance: every number on this screen was typed by them at their own check */
-[data-k=lp-16] .l16-src{margin:7px 0 0;font-size:11.5px;line-height:1.4;color:rgba(var(--ink),.90)}
+[data-k=lp-16] .l16-when{margin-left:auto;font-size:12px;white-space:nowrap;color:rgba(var(--ink),.80)}
 
-[data-k=lp-16] .l16-band{position:relative;flex:none;height:132px;margin-top:16px;overflow:hidden;
+/* their own marks, nothing else: no line to hold, no edges, no reading */
+[data-k=lp-16] .l16-band{position:relative;flex:none;height:96px;margin-top:14px;overflow:hidden;
   background:rgba(22,25,31,.95);
   -webkit-backdrop-filter:blur(24px) saturate(1.35);backdrop-filter:blur(24px) saturate(1.35);
   box-shadow:inset 0 1px 0 rgba(var(--ink),.07),inset 0 -1px 0 rgba(var(--ink),.05)}
 [data-k=lp-16] .l16-band svg{position:absolute;inset:0;width:100%;height:100%;display:block}
-[data-k=lp-16] .l16-tag{position:absolute;font-size:10.5px;line-height:1;letter-spacing:.005em;
-  transition:top .24s cubic-bezier(.22,.61,.36,1)}
-[data-k=lp-16] .l16-tag.floor{right:14px;color:rgba(63,217,78,.92);font-weight:500}
-[data-k=lp-16] .l16-tag.cush{right:14px;color:rgba(var(--ink),.62)}
-/* the maintenance band has two edges, so the line they hold moves to the left rail */
-[data-k=lp-16] .l16-band.two .l16-tag.floor{left:14px;right:auto}
-[data-k=lp-16] .l16-now{position:absolute;font-size:11.5px;font-weight:500;line-height:1;color:var(--text-hi);
-  transition:top .24s cubic-bezier(.22,.61,.36,1),left .24s cubic-bezier(.22,.61,.36,1)}
 
-[data-k=lp-16] .l16-int{margin-top:16px}
-[data-k=lp-16] .l16-lead{margin:0 0 9px;font-size:12.5px;font-weight:500;line-height:1.45;color:rgba(var(--ink),.90)}
-[data-k=lp-16] .l16-chips{display:flex;flex:none;gap:6px}
+/* one skeleton for both goals: the move sits optically centred in the room the
+   top block leaves, the swipe stays anchored to the bottom */
+[data-k=lp-16] .l16-sp{flex:1;min-height:12px}
+[data-k=lp-16] .l16-sp2{flex:.75;min-height:10px}
+
+[data-k=lp-16] .l16-do{flex:none;border-radius:14px;padding:15px 15px 16px;background:rgba(22,25,31,.95);
+  -webkit-backdrop-filter:blur(26px) saturate(1.35);backdrop-filter:blur(26px) saturate(1.35);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09)}
+[data-k=lp-16] .l16-do .h{display:flex;align-items:baseline;gap:9px}
+[data-k=lp-16] .l16-do i{display:none;flex:none;width:8px;height:8px;border-radius:3px;background:#3fd94e;transform:translateY(-2px)}
+[data-k=lp-16] .l16-do.sent i{display:block}
+[data-k=lp-16] .l16-do b{display:block;font-size:17.5px;font-weight:700;letter-spacing:-.015em;line-height:1.25;color:var(--text-hi)}
+[data-k=lp-16] .l16-do p{margin:7px 0 0;font-size:12px;line-height:1.5;color:rgba(var(--ink),.90)}
+[data-k=lp-16] .l16-do.sent p{display:none}
+
+[data-k=lp-16] .l16-chips{display:flex;flex:none;gap:6px;margin-top:10px}
+[data-k=lp-16] .l16-chips.lock{pointer-events:none}
 [data-k=lp-16] .l16-chip{flex:1;height:38px;border:0;border-radius:10px;background:rgba(22,25,31,.95);
   -webkit-backdrop-filter:blur(24px) saturate(1.4);backdrop-filter:blur(24px) saturate(1.4);
   box-shadow:inset 0 1px 0 rgba(var(--ink),.08);color:rgba(var(--ink),.82);font:500 13px var(--font);
@@ -43,20 +63,8 @@
 [data-k=lp-16] .l16-chip:active{transform:translateY(1px);background:rgba(30,34,42,.96)}
 [data-k=lp-16] .l16-chip.on{background:rgba(30,52,34,.96);color:rgba(var(--ink),.97);font-weight:700;
   box-shadow:inset 0 1px 0 rgba(63,217,78,.38)}
-[data-k=lp-16] .l16-note{margin:9px 0 0;font-size:12px;line-height:1.5;color:rgba(var(--ink),.90);min-height:18px}
 
-[data-k=lp-16] .l16-sp{flex:1;min-height:8px}
-
-[data-k=lp-16] .l16-do{flex:none;border-radius:14px;padding:14px 15px 15px;background:rgba(22,25,31,.95);
-  -webkit-backdrop-filter:blur(26px) saturate(1.35);backdrop-filter:blur(26px) saturate(1.35);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.09)}
-[data-k=lp-16] .l16-do .h{display:flex;align-items:baseline;gap:9px}
-[data-k=lp-16] .l16-do i{display:none;flex:none;width:8px;height:8px;border-radius:3px;background:#3fd94e;transform:translateY(-2px)}
-[data-k=lp-16] .l16-do.sent i{display:block}
-[data-k=lp-16] .l16-do b{display:block;font-size:15.5px;font-weight:700;letter-spacing:-.01em;line-height:1.25;color:var(--text-hi)}
-[data-k=lp-16] .l16-do p{margin:7px 0 0;font-size:12px;line-height:1.5;color:rgba(var(--ink),.90)}
-
-[data-k=lp-16] .l16-close{position:relative;flex:none;height:52px;margin-top:10px;border-radius:14px;overflow:hidden;
+[data-k=lp-16] .l16-close{position:relative;flex:none;height:52px;border-radius:14px;overflow:hidden;
   background:rgba(235,238,248,.94);touch-action:none;user-select:none}
 [data-k=lp-16] .l16-fill{position:absolute;inset:0 auto 0 0;width:0;background:rgba(63,217,78,.85)}
 /* the label centres in the room LEFT OF the knob's own 52px, so it can never
@@ -71,9 +79,12 @@
 [data-k=lp-16] .l16-close.done{background:rgba(63,217,78,.85)}
 [data-k=lp-16] .l16-close.done .l16-lab{padding:0}
 [data-k=lp-16] .l16-close.done .l16-knob{opacity:0;transition:opacity .16s ease-out}
+
+/* where the pen lives, said once and quietly */
+[data-k=lp-16] .l16-src{margin:10px 0 0;font-size:11.5px;line-height:1.4;color:rgba(var(--ink),.90)}
 </style>
 <h3>The corridor</h3>
-<p class="cap">A number you have to hold, read as a lane you travel down, edge to edge: the bright line is what you promised yourself, the track is where your own typed numbers put you, and the rest of the period is the empty space ahead.</p>
+<p class="cap">Today's move is the whole screen, sized by three chips and closed with a swipe, and for a goal you write down yourself your own typed marks sit above it as a quiet trace with nothing drawn to measure them against.</p>
 <div class="bk" role="group" aria-label="which goal this screen is carrying">
   <button type="button" class="on" data-b="money" aria-pressed="true">Money</button>
   <button type="button" data-b="body" aria-pressed="false">Body</button>
@@ -83,62 +94,19 @@
   <div class="l16">
     <div class="pad">
       <div class="l16-goal"></div>
-      <div class="l16-top">
+      <div class="l16-pen">
         <div class="l16-in"></div>
         <div class="l16-of"></div>
-        <div class="l16-days"></div>
+        <div class="l16-when"></div>
       </div>
-      <p class="l16-say"></p>
-      <p class="l16-src"></p>
     </div>
 
     <div class="l16-band">
-      <svg viewBox="0 0 300 132" preserveAspectRatio="none" aria-hidden="true">
-        <defs>
-          <linearGradient id="l16up" x1="0" y1="1" x2="0" y2="0">
-            <stop offset="0" stop-color="rgba(63,217,78,.16)"/>
-            <stop offset="1" stop-color="rgba(63,217,78,0)"/>
-          </linearGradient>
-          <linearGradient id="l16bd" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="rgba(63,217,78,0)"/>
-            <stop offset=".5" stop-color="rgba(63,217,78,.14)"/>
-            <stop offset="1" stop-color="rgba(63,217,78,0)"/>
-          </linearGradient>
-          <linearGradient id="l16dn" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="rgba(235,238,248,.075)"/>
-            <stop offset="1" stop-color="rgba(235,238,248,0)"/>
-          </linearGradient>
-          <linearGradient id="l16uf" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="rgba(235,238,248,0)"/>
-            <stop offset="1" stop-color="rgba(235,238,248,.075)"/>
-          </linearGradient>
-        </defs>
-        <rect class="lane" x="0" y="0" width="300" height="0" fill="url(#l16up)"/>
-        <rect class="over" x="0" y="0" width="300" height="0" fill="url(#l16uf)"/>
-        <rect class="under" x="0" y="0" width="300" height="0" fill="url(#l16dn)"/>
-        <line class="cushl" x1="0" y1="0" x2="300" y2="0" stroke="rgba(235,238,248,.18)" stroke-width="1"
-          stroke-dasharray="3 4" vector-effect="non-scaling-stroke"/>
-        <line class="cushl2" x1="0" y1="0" x2="300" y2="0" stroke="rgba(235,238,248,.18)" stroke-width="1"
-          stroke-dasharray="3 4" vector-effect="non-scaling-stroke"/>
-        <line class="floorl" x1="0" y1="0" x2="300" y2="0" stroke="rgba(63,217,78,.62)" stroke-width="1"
-          vector-effect="non-scaling-stroke"/>
-        <line class="todayl" x1="0" y1="10" x2="0" y2="122" stroke="rgba(235,238,248,.13)" stroke-width="1"
-          vector-effect="non-scaling-stroke"/>
-        <polyline class="track" points="" fill="none" stroke="rgba(235,238,248,.58)" stroke-width="1.6"
-          stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+      <svg viewBox="0 0 300 96" preserveAspectRatio="none" aria-hidden="true">
+        <polyline class="track" points="" fill="none" stroke="rgba(235,238,248,.34)" stroke-width="1.4"
+          stroke-dasharray="2 3" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
         <g class="marks"></g>
-        <circle class="head" cx="0" cy="0" r="3.6" fill="#3fd94e"/>
       </svg>
-      <div class="l16-tag floor"></div>
-      <div class="l16-tag cush"></div>
-      <div class="l16-tag cush e2"></div>
-      <div class="l16-now"></div>
-    </div>
-
-    <div class="pad l16-int">
-      <p class="l16-lead"></p>
-      <div class="l16-chips" role="group" aria-label="how much room you keep"></div>
-      <p class="l16-note"></p>
     </div>
 
     <div class="l16-sp"></div>
@@ -148,6 +116,13 @@
         <div class="h"><i></i><b></b></div>
         <p></p>
       </div>
+      <div class="l16-chips" role="group" aria-label="how big today is"></div>
+      <p class="l16-src"></p>
+    </div>
+
+    <div class="l16-sp2"></div>
+
+    <div class="pad">
       <div class="l16-close">
         <div class="l16-fill"></div>
         <div class="l16-lab"></div>
@@ -159,190 +134,97 @@
 <script>(function(){
   var c=document.currentScript.closest('.cell');
   var band=c.querySelector('.l16-band'),svg=band.querySelector('svg'),
-      track=svg.querySelector('.track'),head=svg.querySelector('.head'),marks=svg.querySelector('.marks'),
-      floorl=svg.querySelector('.floorl'),cushl=svg.querySelector('.cushl'),cushl2=svg.querySelector('.cushl2'),
-      todayl=svg.querySelector('.todayl'),under=svg.querySelector('.under'),over=svg.querySelector('.over'),
-      lane=svg.querySelector('.lane'),
-      tFloor=c.querySelector('.l16-tag.floor'),tCush=c.querySelector('.l16-tag.cush:not(.e2)'),
-      tEdge=c.querySelector('.l16-tag.e2'),
-      now=c.querySelector('.l16-now'),note=c.querySelector('.l16-note'),
-      say=c.querySelector('.l16-say'),src=c.querySelector('.l16-src'),goal=c.querySelector('.l16-goal'),
-      inEl=c.querySelector('.l16-in'),ofEl=c.querySelector('.l16-of'),daysEl=c.querySelector('.l16-days'),
-      lead=c.querySelector('.l16-lead'),chipsEl=c.querySelector('.l16-chips'),
+      track=svg.querySelector('.track'),marks=svg.querySelector('.marks'),
+      goal=c.querySelector('.l16-goal'),pen=c.querySelector('.l16-pen'),
+      inEl=c.querySelector('.l16-in'),ofEl=c.querySelector('.l16-of'),whenEl=c.querySelector('.l16-when'),
+      src=c.querySelector('.l16-src'),chipsEl=c.querySelector('.l16-chips'),
       doBox=c.querySelector('.l16-do'),doB=doBox.querySelector('b'),doP=doBox.querySelector('p'),
       pad=c.querySelector('.l16-close'),knob=c.querySelector('.l16-knob'),
       fill=c.querySelector('.l16-fill'),lab=c.querySelector('.l16-lab');
 
-  var W=300,H=132;
-  function money(n){return '$'+Math.abs(Math.round(n)).toLocaleString('en-US');}
-  function one(n){return (Math.round(n*10)/10).toFixed(1);}
-  function x(i,n){return 14+i*((W-28)/(n-1));}
-  /* the band carries a left rail of numbers, so its track starts clear of them */
-  function xb(i,n){return 34+i*((W-52)/(n-1));}
+  var W=300,H=96;
+  /* the marks sit inboard of both edges: only the Fridays they wrote, nothing ahead */
+  function xb(i,n){return 26+i*((W-52)/(n-1));}
 
-  /* ------------------------------------------------------------------ MONEY
-     Hold a revenue floor. The track is dollars ahead of (+) or behind (-) the
-     floor's own pace for this point in the month. It STEPS UP on the three days
-     they entered a weekly total and drifts down in between only because the
-     pace keeps moving. Nothing here is sensed, nothing is read off a bank. */
-  var MDELTA=[-129,-258,-387,-516,-645,126,-3,-132,-261,-390,-519,-648,73,-56,-185,-314,-443,-572,-701,-240],
-      MCONF=[6,13,20],MDAYS=31,MPPD=.048,MFY=58;
-
-  /* ------------------------------------------------------------------- BODY
-     Hold 180 lb after a cut. The floor becomes a BAND, and the only marks are
-     the Friday weigh-ins they typed at the weekly check. There is no line
-     between the Fridays because nothing was measured between them. */
-  var WB=[179.2,180.6,178.9,181.2,180.1,182.3,179.6,180.8,182.0,181.4],
-      WHOLD=180,WSLOTS=14,WPPL=5.6,WCY=66;
+  /* THE ONLY DATA ON THIS SCREEN: ten Friday weigh-ins they typed at their own
+     check. No hold value, no band, no scale drawn from a target. */
+  var WB=[179.2,180.6,178.9,181.2,180.1,182.3,179.6,180.8,182.0,181.4],WSLOTS=WB.length;
 
   var CTX={
     money:{
       goal:'Hold a $4,000 floor, every month',
-      big:'$2,340',of:'of $4,000',side:'11 days left',
-      src:'Every step up is a Sunday total you typed in.',
-      lead:'Cushion is how far above the floor you aim, so one late payment does not put you under.',
-      chips:[{v:0,t:'None'},{v:400,t:'+$400'},{v:1000,t:'+$1,000'}],pick:0,
-      note:function(v){
-        return v===0?'You aim at the floor exactly. One late payment puts you under it.'
-             :v===400?'A small cushion. One late payment stops being an emergency.'
-             :'Real room. You can lose your biggest invoice and still land on the floor.';},
-      act:'Send 2 renewal invoices.',
-      sub:'Today’s step. The plan puts about 20 minutes on it.',
-      lab:'Swipe to log 2 invoices',
-      doneLab:'2 invoices sent',
-      doneSub:'Logged just now. What they pay lands here when you enter Sunday’s total.',
-      doneSay:'Two invoices out. The line moves at Sunday’s confirm, not before.'
+      pen:false,
+      sizes:[
+        {t:'1 invoice', act:'Send 1 renewal invoice.',   sub:'About 10 min, by the plan.', lab:'Swipe to log 1 invoice',  done:'1 invoice sent'},
+        {t:'2 invoices',act:'Send 2 renewal invoices.',  sub:'About 20 min, by the plan.', lab:'Swipe to log 2 invoices', done:'2 invoices sent'},
+        {t:'4 invoices',act:'Send 4 renewal invoices.',  sub:'About 40 min, by the plan.', lab:'Swipe to log 4 invoices', done:'4 invoices sent'}
+      ],pick:1,
+      src:'Your monthly total goes in at Sunday&#8217;s confirm.'
     },
     body:{
       goal:'Hold 180 lb, after the cut',
-      big:'181.4',of:'lb',side:'next check Friday',
-      src:'Every mark is a Friday weigh-in you typed in.',
-      lead:'The band is how far you let the number swing before it means anything.',
-      chips:[{v:2,t:'±2 lb'},{v:5,t:'±5 lb'},{v:8,t:'±8 lb'}],pick:5,
-      note:function(v){
-        var lo=WHOLD-v,hi=WHOLD+v,out=0;
-        WB.forEach(function(w){if(w<lo-1e-9||w>hi+1e-9)out++;});
-        return lo+' to '+hi+'. '+(out===0?'Nothing in your last ten Fridays sits outside it.'
-          :out===1?'One of your last ten Fridays sits outside it.'
-          :out+' of your last ten Fridays sit outside it.');},
-      act:'Walk 30 minutes today.',
-      sub:'The steady habit you kept from the cut. Friday morning is the weigh-in.',
-      lab:'Swipe to log the walk',
-      doneLab:'30 minute walk logged',
-      doneSub:'Logged just now. The mark moves when you type Friday’s weight in.',
-      doneSay:'Walk logged. The mark moves at Friday’s weigh-in, not before.'
+      pen:true,big:'181.4',of:'lb',when:'typed Friday',
+      sizes:[
+        {t:'20 min',act:'Walk 20 minutes today.',sub:'',lab:'Swipe to log the walk',done:'20 minute walk logged'},
+        {t:'30 min',act:'Walk 30 minutes today.',sub:'',lab:'Swipe to log the walk',done:'30 minute walk logged'},
+        {t:'45 min',act:'Walk 45 minutes today.',sub:'',lab:'Swipe to log the walk',done:'45 minute walk logged'}
+      ],pick:1,
+      src:'Your weight goes in at Friday&#8217;s check.'
     }
   };
 
-  var mode='money',C=CTX.money,cush=0,sent=false;
+  var mode='money',C=CTX.money,size=1,sent=false;
 
-  /* one painter, and it writes EVERY element in both modes, so nothing a
-     mode set can survive into the other one */
-  function paint(){
-    var i,pts=[],hx,hy,d;
+  /* the trace: their marks, scaled to their own spread, centred on their own
+     middle. Nothing on the band comes from the goal. */
+  function paintBand(){
     marks.textContent='';
-
-    if(mode==='money'){
-      band.classList.remove('two');
-      var ym=function(v){return MFY-v*MPPD;};
-      floorl.setAttribute('y1',MFY);floorl.setAttribute('y2',MFY);floorl.style.opacity=1;
-      var cy=ym(cush);
-      cushl.setAttribute('y1',cy);cushl.setAttribute('y2',cy);cushl.style.opacity=cush?1:0;
-      cushl2.style.opacity=0;
-      lane.setAttribute('fill','url(#l16up)');
-      lane.setAttribute('y',Math.max(0,MFY-58));lane.setAttribute('height',Math.min(MFY,58));lane.style.opacity=1;
-      over.style.opacity=0;over.setAttribute('height',0);
-      under.setAttribute('y',MFY);under.setAttribute('height',H-MFY);under.style.opacity=1;
-
-      tFloor.style.top=(MFY-16)+'px';tFloor.textContent='the floor, $4,000';tFloor.style.opacity=1;
-      tCush.style.top=Math.max(4,cy-15)+'px';tCush.style.opacity=cush?1:0;
-      /* a hidden tag is emptied, not just faded: nothing a goal wrote can
-         survive into the other goal, on screen or read out loud */
-      tCush.textContent=cush?'cushion, '+money(4000+cush):'';
-      tEdge.style.opacity=0;tEdge.textContent='';
-
-      track.setAttribute('stroke','rgba(235,238,248,.58)');track.removeAttribute('stroke-dasharray');
-      for(i=0;i<MDELTA.length;i++)pts.push(x(i,MDAYS).toFixed(1)+','+ym(MDELTA[i]).toFixed(1));
-      track.setAttribute('points',pts.join(' '));
-      MCONF.forEach(function(dd){
-        if(dd>MDELTA.length)return;
-        var m=document.createElementNS('http://www.w3.org/2000/svg','circle');
-        m.setAttribute('cx',x(dd-1,MDAYS).toFixed(1));m.setAttribute('cy',ym(MDELTA[dd-1]).toFixed(1));
-        m.setAttribute('r','2.2');m.setAttribute('fill','rgba(235,238,248,.75)');
-        marks.appendChild(m);
-      });
-      hx=x(MDELTA.length-1,MDAYS);hy=ym(MDELTA[MDELTA.length-1]);
-      d=MDELTA[MDELTA.length-1];
-      now.textContent=money(d)+(d<0?' under':' over');
-      now.style.left=(hx+9)+'px';now.style.top=(hy-(d<0?4:16))+'px';
-      if(!sent)say.innerHTML='You are <b>'+money(d)+(d<0?' under':' over')+
-        '</b> the line for this point in the month.';
-    }else{
-      band.classList.add('two');
-      var yb=function(w){return WCY-(w-WHOLD)*WPPL;};
-      var top=yb(WHOLD+cush),bot=yb(WHOLD-cush);
-      floorl.setAttribute('y1',WCY);floorl.setAttribute('y2',WCY);floorl.style.opacity=1;
-      cushl.setAttribute('y1',top);cushl.setAttribute('y2',top);cushl.style.opacity=1;
-      cushl2.setAttribute('y1',bot);cushl2.setAttribute('y2',bot);cushl2.style.opacity=1;
-      lane.setAttribute('fill','url(#l16bd)');
-      lane.setAttribute('y',top);lane.setAttribute('height',bot-top);lane.style.opacity=1;
-      over.setAttribute('y',0);over.setAttribute('height',Math.max(0,top));over.style.opacity=1;
-      under.setAttribute('y',bot);under.setAttribute('height',Math.max(0,H-bot));under.style.opacity=1;
-
-      tFloor.style.top=(WCY-15)+'px';tFloor.textContent=String(WHOLD);tFloor.style.opacity=1;
-      tCush.style.top=Math.max(3,top-14)+'px';tCush.textContent=String(WHOLD+cush);tCush.style.opacity=1;
-      tEdge.style.top=Math.min(H-14,bot+3)+'px';tEdge.textContent=String(WHOLD-cush);tEdge.style.opacity=1;
-
-      track.setAttribute('stroke','rgba(235,238,248,.34)');track.setAttribute('stroke-dasharray','2 3');
-      for(i=0;i<WB.length;i++)pts.push(xb(i,WSLOTS).toFixed(1)+','+yb(WB[i]).toFixed(1));
-      track.setAttribute('points',pts.join(' '));
-      for(i=0;i<WB.length-1;i++){
-        var m2=document.createElementNS('http://www.w3.org/2000/svg','circle');
-        m2.setAttribute('cx',xb(i,WSLOTS).toFixed(1));m2.setAttribute('cy',yb(WB[i]).toFixed(1));
-        m2.setAttribute('r','2.2');m2.setAttribute('fill','rgba(235,238,248,.75)');
-        marks.appendChild(m2);
-      }
-      var w=WB[WB.length-1];
-      hx=xb(WB.length-1,WSLOTS);hy=yb(w);
-      now.textContent=one(w)+' lb';
-      now.style.left=(hx+9)+'px';now.style.top=(hy-(w>=WHOLD?16:-6))+'px';
-      if(!sent){
-        var off=w-WHOLD,inside=Math.abs(off)<=cush+1e-9;
-        say.innerHTML=inside
-          ?'You are <b>inside the band</b>, '+one(Math.abs(off))+' lb '+(off>=0?'above ':'below ')+WHOLD+'.'
-          :'You are <b>'+one(Math.abs(off)-cush)+' lb '+(off>0?'above':'below')+' the band</b>, at '+one(w)+' lb.';
-      }
+    var lo=Math.min.apply(null,WB),hi=Math.max.apply(null,WB),mid=(lo+hi)/2,
+        span=Math.max(hi-lo,.1),ppl=58/span,pts=[],i;
+    function y(w){return H/2-(w-mid)*ppl;}
+    for(i=0;i<WB.length;i++)pts.push(xb(i,WSLOTS).toFixed(1)+','+y(WB[i]).toFixed(1));
+    track.setAttribute('points',pts.join(' '));
+    for(i=0;i<WB.length;i++){
+      var m=document.createElementNS('http://www.w3.org/2000/svg','circle'),last=i===WB.length-1;
+      m.setAttribute('cx',xb(i,WSLOTS).toFixed(1));m.setAttribute('cy',y(WB[i]).toFixed(1));
+      m.setAttribute('r',last?'3.2':'2.2');
+      m.setAttribute('fill',last?'rgba(235,238,248,.94)':'rgba(235,238,248,.62)');
+      marks.appendChild(m);
     }
+  }
 
-    head.setAttribute('cx',hx);head.setAttribute('cy',hy);
-    todayl.setAttribute('x1',hx);todayl.setAttribute('x2',hx);
-    note.textContent=C.note(cush);
+  function paintSize(){
+    var s=C.sizes[size];
+    doB.textContent=s.act;
+    doP.textContent=s.sub;doP.style.display=s.sub?'':'none';
+    if(!sent)lab.textContent=s.lab;
   }
 
   function drawChips(){
     chipsEl.textContent='';
-    C.chips.forEach(function(o){
+    C.sizes.forEach(function(o,i){
       var b=document.createElement('button');
-      b.type='button';b.className='l16-chip'+(o.v===cush?' on':'');
-      b.textContent=o.t;b.setAttribute('aria-pressed',o.v===cush?'true':'false');
+      b.type='button';b.className='l16-chip'+(i===size?' on':'');
+      b.textContent=o.t;b.setAttribute('aria-pressed',i===size?'true':'false');
       b.addEventListener('click',function(){
+        if(sent)return;
         chipsEl.querySelectorAll('button').forEach(function(z){
           z.classList.remove('on');z.setAttribute('aria-pressed','false');});
         b.classList.add('on');b.setAttribute('aria-pressed','true');
-        cush=o.v;paint();
+        size=i;paintSize();
       });
       chipsEl.appendChild(b);
     });
   }
 
-  /* --- the swipe: logging the ACTION never moves the number. The number moves
-         when they type it in at their own check. ------------------------- */
+  /* --- the swipe: logging the ACTION never moves a metric. The number moves
+         when they write it in at their own check. ------------------------- */
   function max(){return pad.clientWidth-52;}
   var px=0,drag=false,sx=0;
   function set(v){px=Math.max(0,Math.min(max(),v));knob.style.left=(4+px)+'px';fill.style.width=(px+48)+'px';}
   function done(){
-    sent=true;pad.classList.add('done');lab.textContent=C.doneLab;
-    doBox.classList.add('sent');doP.textContent=C.doneSub;say.innerHTML=C.doneSay;
+    sent=true;pad.classList.add('done');lab.textContent=C.sizes[size].done;
+    doBox.classList.add('sent');chipsEl.classList.add('lock');
   }
   knob.addEventListener('pointerdown',function(e){if(sent)return;drag=true;sx=e.clientX-px;
     knob.style.transition='';fill.style.transition='';
@@ -356,15 +238,18 @@
   }
   knob.addEventListener('pointerup',release);knob.addEventListener('pointercancel',release);
 
-  /* --- swapping the goal: same corridor, the goal's own numbers and words -- */
+  /* --- swapping the goal: same skeleton, the goal's own words ------------- */
   function render(key){
-    mode=key;C=CTX[key];cush=C.pick;sent=false;
+    mode=key;C=CTX[key];size=C.pick;sent=false;
     drag=false;knob.style.transition='';fill.style.transition='';set(0);
-    pad.classList.remove('done');doBox.classList.remove('sent');
-    goal.textContent=C.goal;inEl.textContent=C.big;ofEl.textContent=C.of;daysEl.textContent=C.side;
-    src.textContent=C.src;lead.textContent=C.lead;
-    doB.textContent=C.act;doP.textContent=C.sub;lab.textContent=C.lab;
-    drawChips();paint();
+    pad.classList.remove('done');doBox.classList.remove('sent');chipsEl.classList.remove('lock');
+    goal.textContent=C.goal;
+    pen.style.display=C.pen?'':'none';
+    band.style.display=C.pen?'':'none';
+    inEl.textContent=C.pen?C.big:'';ofEl.textContent=C.pen?C.of:'';whenEl.textContent=C.pen?C.when:'';
+    src.innerHTML=C.src;
+    drawChips();paintSize();
+    if(C.pen)paintBand();
   }
   c.querySelectorAll('.bk button').forEach(function(b){
     b.addEventListener('click',function(){

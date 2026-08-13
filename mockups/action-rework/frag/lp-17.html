@@ -54,7 +54,6 @@
 [data-k=lp-17] .l17-more:hover,[data-k=lp-17] .l17-more.on{color:rgba(var(--ink),.96);background:rgba(30,34,42,.94)}
 [data-k=lp-17] .l17-edit:not(.free) .l17-fine{display:none}
 [data-k=lp-17] .l17-edit.free .l17-three{display:none}
-[data-k=lp-17] .l17-why{margin:12px 0 0;font-size:12.5px;line-height:1.5;color:rgba(var(--ink),.90);min-height:30px}
 
 /* ---- tonight's number: they type it, nothing measures it ---- */
 [data-k=lp-17] .l17-today{margin-top:14px;border-radius:14px;padding:12px 14px 13px;background:rgba(22,25,31,.95);
@@ -89,8 +88,6 @@
 [data-k=lp-17] .l17.entered .l17-res{display:flex}
 [data-k=lp-17] .l17.entered .l17-slot{display:none}
 [data-k=lp-17] .l17-res .u{font-size:20px;font-weight:700;letter-spacing:-.02em;color:var(--text-hi)}
-[data-k=lp-17] .l17-res .lft{margin-left:auto;font-size:12.5px;font-weight:500;color:#3fd94e}
-[data-k=lp-17] .l17.over .l17-res .lft{color:rgba(var(--ink),.90)}
 
 [data-k=lp-17] .l17-acc{margin-top:14px}
 [data-k=lp-17] .l17-acc h4{margin:0 0 8px;font-size:12.5px;font-weight:500;line-height:1;color:rgba(var(--ink),.86)}
@@ -102,12 +99,10 @@
 [data-k=lp-17] .l17-row+.l17-row{box-shadow:inset 0 1px 0 rgba(var(--ink),.06)}
 [data-k=lp-17] .l17-row .d{width:86px;color:rgba(var(--ink),.86)}
 [data-k=lp-17] .l17-row .v{font-weight:500;color:var(--text-hi)}
-[data-k=lp-17] .l17-row .s{margin-left:auto;font-size:11.5px;color:#3fd94e}
-[data-k=lp-17] .l17-row .s.no{color:rgba(var(--ink),.62)}
 
 [data-k=lp-17] .l17-sp{flex:1;min-height:10px}
 /* the ceiling picker borrows the room from the oldest entries, nothing overflows */
-[data-k=lp-17] .l17.editing .l17-row:nth-last-child(-n+2){display:none}
+[data-k=lp-17] .l17.editing .l17-row:nth-last-child(-n+1){display:none}
 
 [data-k=lp-17] .l17-cta{width:100%;height:50px;border:0;border-radius:14px;background:rgba(235,238,248,.94);
   color:#0b0c10;font:700 15.5px var(--font);letter-spacing:-.01em;cursor:pointer;
@@ -145,8 +140,6 @@
       <button class="l17-more" type="button">any ceiling</button>
     </div>
 
-    <p class="l17-why">Under 2h on five of the last seven nights. This is the line that has actually held.</p>
-
     <!-- the only way today's number exists: they read it off their phone and type it -->
     <div class="l17-today">
       <div class="k">Tonight&#8217;s total</div>
@@ -157,17 +150,17 @@
         <button class="up" type="button" aria-label="more"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M7 2.5v9M2.5 7h9"/></svg></button>
       </div>
       <button class="l17-save" type="button">Save 1h 47m</button>
-      <div class="l17-res"><div class="u">1h 47m</div><div class="lft">13m under</div></div>
+      <div class="l17-res"><div class="u">1h 47m</div></div>
       <p class="l17-src">You read this off your phone&#8217;s Screen Time report.</p>
     </div>
 
     <div class="l17-acc">
       <h4>What you entered before</h4>
       <div class="l17-rows">
-        <div class="l17-row"><div class="d">Mon 11 Aug</div><div class="v">1h 47m</div><div class="s">under</div></div>
-        <div class="l17-row"><div class="d">Sun 10 Aug</div><div class="v">2h 31m</div><div class="s no">over by 31m</div></div>
-        <div class="l17-row"><div class="d">Sat 9 Aug</div><div class="v">1h 38m</div><div class="s">under</div></div>
-        <div class="l17-row"><div class="d">Fri 8 Aug</div><div class="v">1h 52m</div><div class="s">under</div></div>
+        <div class="l17-row"><div class="d">Mon 11 Aug</div><div class="v">1h 47m</div></div>
+        <div class="l17-row"><div class="d">Sun 10 Aug</div><div class="v">2h 31m</div></div>
+        <div class="l17-row"><div class="d">Sat 9 Aug</div><div class="v">1h 38m</div></div>
+        <div class="l17-row"><div class="d">Fri 8 Aug</div><div class="v">1h 52m</div></div>
       </div>
     </div>
 
@@ -180,12 +173,12 @@
 <script>(function(){
   var c=document.currentScript.closest('.cell');
   var root=c.querySelector('.l17'),tok=c.querySelector('.l17-tok'),tv=c.querySelector('.l17-tok .tv'),
-      why=c.querySelector('.l17-why'),up=c.querySelector('.l17-edit .up'),dn=c.querySelector('.l17-edit .dn'),
+      up=c.querySelector('.l17-edit .up'),dn=c.querySelector('.l17-edit .dn'),
       held=c.querySelector('.l17-held .ht'),rows=c.querySelector('.l17-rows'),
       cta=c.querySelector('.l17-cta'),
       edit=c.querySelector('.l17-edit'),three=c.querySelector('.l17-three'),more=c.querySelector('.l17-more'),
       slot=c.querySelector('.l17-slot'),stp=c.querySelector('.l17-stp'),sv=c.querySelector('.l17-stp .sv'),
-      save=c.querySelector('.l17-save'),resU=c.querySelector('.l17-res .u'),resL=c.querySelector('.l17-res .lft'),
+      save=c.querySelector('.l17-save'),resU=c.querySelector('.l17-res .u'),
       src=c.querySelector('.l17-src');
   var ceil=120,typed=107,signed=false,free=false,entered=false,THREE=[90,120,150];
   var saidAt='';
@@ -196,10 +189,6 @@
     return (h%12||12)+':'+String(m).padStart(2,'0')+ap;}
   function paint(){
     tv.textContent=fmt(ceil);
-    why.textContent = ceil<=90 ? 'You have been under 90m twice all month. That is a cut, not a hold.'
-      : ceil<=120 ? 'Under 2h on five of the last seven nights. This is the line that has actually held.'
-      : ceil<=150 ? 'Two and a half hours sits just above your average. It will not ask much of you.'
-      : 'This is above where most of your nights already land, so it stops being a ceiling.';
     up.disabled=ceil>=180;dn.disabled=ceil<=60;
     Array.prototype.forEach.call(three.children,function(b){
       var on=!free&&+b.dataset.v===ceil;
@@ -207,9 +196,6 @@
       if(on)b.setAttribute('aria-pressed','true');else b.removeAttribute('aria-pressed');});
     sv.textContent=fmt(typed);save.textContent='Save '+fmt(typed);
     resU.textContent=fmt(typed);
-    var left=ceil-typed;
-    root.classList.toggle('over',left<0);
-    resL.textContent=left>=0?fmt(left)+' under':fmt(-left)+' over';
     if(signed)held.textContent=entered?('Entered '+fmt(typed)+' for today.')
       :('Said at '+saidAt+'. The ceiling is '+fmt(ceil)+'.');
   }
@@ -234,9 +220,7 @@
     entered=true;root.classList.remove('typing');root.classList.add('entered');
     src.textContent='You entered this at '+stamp()+', from your Screen Time report.';
     var r=document.createElement('div');r.className='l17-row';
-    var left=ceil-typed;
-    r.innerHTML='<div class="d">Tue 12 Aug</div><div class="v">'+fmt(typed)+'</div>'+
-      (left>=0?'<div class="s">under</div>':'<div class="s no">over by '+fmt(-left)+'</div>');
+    r.innerHTML='<div class="d">Tue 12 Aug</div><div class="v">'+fmt(typed)+'</div>';
     rows.insertBefore(r,rows.firstChild);
     if(rows.children.length>4)rows.removeChild(rows.lastElementChild);
     c.querySelector('.l17-acc h4').textContent='What you entered, tonight first';

@@ -121,3 +121,22 @@ GLANCE, in about three seconds: what do I do, where am I. Concretely:
   a lock glyph, an "As of Tuesday" that hides when fresh), never a paragraph.
 - Many small sentences scattered around a screen is the AI tell. Cut, merge,
   or let the layout say it.
+
+## PILLAR PURITY IN ACTION (Malik, 2026-08-13, on catching Descent)
+
+"The action module should literally just show the ACTION right? ...i think
+we're starting to do the thing when we merge modules together."
+Clarity = where you stand. Consistency = the pattern. ACTION = today.
+
+In an Action screen:
+- ALLOWED: today's move and this week's plan; the PEN for daily-measured
+  goals with only what writing needs (current value, tap to correct, stale
+  mark, undo). Raw own-entries context where the ritual is a book. Sums of
+  logged ACTIONS against the plan's own countable list (47 of 100 reached
+  out, 93 of 120 sessions). The consequence of today's size choice.
+  Quit's days-owned (the standing exception). Arrival day (a one-time
+  hand-off).
+- FORBIDDEN: goal-RELATIVE readings of measured metrics: "X to go",
+  target/goal rails and ticks, start/delta stacks, distance to a floor,
+  pace-vs-plan verdicts, pattern claims ("held five of the last seven").
+  Those live on the Clarity and Consistency faces, one swipe away.

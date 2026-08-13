@@ -108,7 +108,7 @@
         <div class="hd"><span class="nm">Your usual day</span><span class="pr">5 clients, about 15 min</span></div>
         <p class="pre">Message 5 clients.</p>
         <p class="s">Message 5 clients, two of them people you have not written to before.</p>
-        <p class="why">The size you have logged most often. It takes you to 52 of the 100 people your plan set out to reach.</p>
+        <p class="why">The size you have logged most often. 52 of the 100 people reached by tonight.</p>
         <div class="meter"><i style="height:4px" class="f"></i><i style="height:7px" class="f"></i><i style="height:11px"></i></div>
       </div>
       <div class="opt" data-i="2">
@@ -116,7 +116,7 @@
         <div class="hd"><span class="nm">A heavy day</span><span class="pr">9 clients, about 27 min</span></div>
         <p class="pre">Message 9 clients.</p>
         <p class="s">Message 9 clients, and follow up on last week's.</p>
-        <p class="why">About half an hour. It takes you to 56 of 100, and finishes the list about five days sooner. You will not want this two days running, and you do not have to.</p>
+        <p class="why">About half an hour. 56 of the 100 reached, and it finishes the list about five days sooner. You will not want this two days running, and you do not have to.</p>
         <div class="meter"><i style="height:4px" class="f"></i><i style="height:7px" class="f"></i><i style="height:11px" class="f"></i></div>
       </div>
     </div>
@@ -132,7 +132,7 @@
         <div class="fv"><b class="fn">5</b><span class="funit">clients</span></div>
         <button type="button" class="fup">+</button>
       </div>
-      <p class="fmeta">About <b>15 min</b>. Takes you to <b>52</b> of 100 reached.</p>
+      <p class="fmeta">About <b>15 min</b>. <b>52</b> of the 100 reached.</p>
       <button class="cta usefine" type="button">Use this size</button>
       <button class="quiet closefine" type="button">Back to the three sentences</button>
     </div>
@@ -158,7 +158,7 @@
         <div class="hd"><span class="nm">Your usual day</span><span class="pr">5 clients, about 15 min</span></div>
         <p class="pre">Message 5 clients.</p>
         <p class="s">Message 5 clients, two of them people you have not written to before.</p>
-        <p class="why">The size you have logged most often. It takes you to 52 of the 100 people your plan set out to reach.</p>
+        <p class="why">The size you have logged most often. 52 of the 100 people reached by tonight.</p>
         <div class="meter"><i style="height:4px" class="f"></i><i style="height:7px" class="f"></i><i style="height:11px"></i></div>
       </div>
       <div class="opt" data-i="2">
@@ -166,7 +166,7 @@
         <div class="hd"><span class="nm">A heavy day</span><span class="pr">9 clients, about 27 min</span></div>
         <p class="pre">Message 9 clients.</p>
         <p class="s">Message 9 clients, and follow up on last week's.</p>
-        <p class="why">About half an hour. It takes you to 56 of 100, about five days sooner to the end of the list. Not two days running.</p>
+        <p class="why">About half an hour. 56 of the 100 reached, about five days sooner to the end of the list. Not two days running.</p>
         <div class="meter"><i style="height:4px" class="f"></i><i style="height:7px" class="f"></i><i style="height:11px" class="f"></i></div>
       </div>
     </div>
@@ -204,7 +204,7 @@
     Array.prototype.forEach.call(root.querySelectorAll('.cu'),function(e){e.textContent=unit(n);});
     root.querySelector('.fn').textContent=fn;
     root.querySelector('.funit').textContent=unit(fn);
-    root.querySelector('.fmeta').innerHTML='About <b>'+mins(fn)+'</b>. Takes you to <b>'+reached(fn)+'</b> of '+TARGET+' reached.';
+    root.querySelector('.fmeta').innerHTML='About <b>'+mins(fn)+'</b>. <b>'+reached(fn)+'</b> of the '+TARGET+' reached.';
   }
   Array.prototype.forEach.call(root.querySelectorAll('.opt'),function(o){
     o.addEventListener('click',function(){ fine=false; i=+o.dataset.i; paint(); });

@@ -3,39 +3,28 @@
      lp-15 bottom sheet first | lp-16 horizontal corridor band | lp-17 declarative sentence over account rows |
      lp-18 centered monolith numeral -->
 <section class="cell" data-k="lp-6">
-<!-- PROVENANCE: every position on the rail is a number the person typed. The
-     marker sits on the last one. Nothing is measured, nothing is read off a
-     bank or a scale. The pen is now the number itself: tap the current number
-     to write today's. A slow number (a card balance) is written at the weekly
-     confirm instead, so that bucket's number is not tappable and its quiet
-     line says where it came from. Same rail, different pen.
-     GLANCE: no title, no legend, no explainer. Rail, one stack, the action. -->
+<!-- PURITY: this is Action, so the screen carries today and the pen, nothing
+     goal-relative. No start, no goal tick, no delta, no distance to a floor.
+     The rail is an abstract vertical guide holding the person's own recent
+     typed numbers, and the marker sits on the latest one.
+     PROVENANCE: every mark is a number they typed. The pen is the number
+     itself: tap it to write today's, undo puts it back. A slow number (a card
+     balance) is written at the weekly confirm instead, so that bucket's number
+     is not tappable and its quiet line says where it came from.
+     GLANCE: no title, no legend, no explainer. Rail, one number, the action. -->
 <style>
 [data-k=lp-6] .ph{font-variant-numeric:tabular-nums}
 
-/* --- the rail: nothing on it that they did not type -------------------- */
+/* --- the rail: an abstract guide, and their own recent marks on it ------- */
 [data-k=lp-6] .rail{position:absolute;left:78px;top:62px;width:1px;height:286px;background:rgba(var(--ink),.12)}
-[data-k=lp-6] .rail .trav{position:absolute;left:-1px;top:0;width:3px;height:0;border-radius:2px;
-  background:linear-gradient(180deg,rgba(var(--ink),.16),rgba(var(--ink),.66));
-  transition:height .5s cubic-bezier(.2,.7,.2,1)}
-[data-k=lp-6] .rail .tk{position:absolute;right:14px;width:64px;text-align:right;transform:translateY(-50%);
-  font-size:11.5px;color:rgba(var(--ink),.72);white-space:nowrap}
-[data-k=lp-6] .rail .tk.end{color:rgba(var(--ink),.92);font-weight:500}
-[data-k=lp-6] .rail .tk.end u{display:block;text-decoration:none;font-size:10.5px;font-weight:400;
-  color:rgba(var(--ink),.72);margin-top:2px}
-[data-k=lp-6] .rail .nub{position:absolute;left:-4px;width:9px;height:1px;background:rgba(var(--ink),.22);transform:translateY(-50%)}
 [data-k=lp-6] .rail .old{position:absolute;left:-5px;width:11px;height:1px;background:rgba(var(--ink),.34);transform:translateY(-50%)}
 [data-k=lp-6] .rail .mk{position:absolute;left:-8px;top:0;width:17px;height:3px;border-radius:2px;
   background:#e9eefb;transform:translateY(-50%);box-shadow:0 0 18px rgba(233,238,251,.42);
   transition:top .5s cubic-bezier(.2,.7,.2,1)}
-[data-k=lp-6] .rail .floor{position:absolute;left:-8px;bottom:-1px;width:17px;height:2px;border-radius:2px;background:rgba(var(--ink),.42)}
 
-/* --- one stack: where they started, what has come off, where they are --- */
+/* --- the pen: the current number, and nothing measured against it -------- */
 [data-k=lp-6] .stack{position:absolute;left:104px;right:14px;top:169px;transition:top .5s cubic-bezier(.2,.7,.2,1)}
-[data-k=lp-6] .stack .row{display:flex;align-items:baseline;gap:9px;font-size:12.5px;line-height:1;
-  color:rgba(var(--ink),.90);height:13px}
-[data-k=lp-6] .stack .row s{text-decoration:none;color:rgba(var(--ink),.72)}
-[data-k=lp-6] .num{display:block;margin-top:5px;padding:0 8px 0 0;border:0;background:none;position:relative;
+[data-k=lp-6] .num{display:block;padding:0 8px 0 0;border:0;background:none;position:relative;
   font:700 44px/1 var(--font);letter-spacing:-.03em;font-variant-numeric:tabular-nums;
   color:rgba(var(--ink),.97);text-align:left;-webkit-tap-highlight-color:transparent;
   transition:opacity .16s ease-out}
@@ -49,7 +38,7 @@
 [data-k=lp-6] .num[data-pen]:active{opacity:.55}
 [data-k=lp-6] .num:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:4px;border-radius:6px}
 [data-k=lp-6] .num.swap{opacity:.35}
-[data-k=lp-6] .ed{display:none;width:158px;height:54px;margin:5px 0 0 -9px;border:0;border-radius:10px;padding:0 9px;
+[data-k=lp-6] .ed{display:none;width:158px;height:54px;margin:-5px 0 0 -9px;border:0;border-radius:10px;padding:0 9px;
   background:rgba(var(--ink),.07);box-shadow:inset 0 1px 0 rgba(var(--ink),.06);
   font:700 40px/1 var(--font);letter-spacing:-.03em;font-variant-numeric:tabular-nums;
   color:rgba(var(--ink),.97);-webkit-appearance:none;appearance:none}
@@ -62,6 +51,15 @@
 [data-k=lp-6] .stack .stn{margin:4px 0 0;font-size:11px;line-height:1.35;color:rgba(var(--ink),.90);display:none}
 [data-k=lp-6] .ph.stale .stn{display:block}
 [data-k=lp-6] .ph.fresh .as{display:none}
+
+/* --- undo the entry they just wrote ------------------------------------- */
+[data-k=lp-6] .undo{visibility:hidden;margin:10px 0 0;border:0;border-radius:8px;padding:7px 12px;
+  background:rgba(var(--ink),.06);box-shadow:inset 0 1px 0 rgba(var(--ink),.07);
+  font:500 11.5px/1 var(--font);color:rgba(var(--ink),.90);cursor:pointer;
+  -webkit-tap-highlight-color:transparent;transition:background .16s ease-out}
+[data-k=lp-6] .undo:active{background:rgba(var(--ink),.11)}
+[data-k=lp-6] .undo:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
+[data-k=lp-6] .ph.wrote .undo{visibility:visible}
 
 /* --- the action, logged on its own ------------------------------------- */
 [data-k=lp-6] .card{position:absolute;left:14px;right:14px;top:396px;bottom:14px;border-radius:16px;padding:13px;
@@ -99,7 +97,7 @@
 [data-k=lp-6] .ph.logged .chips button.on{background:rgba(var(--ink),.15);color:rgba(var(--ink),.96)}
 @media (prefers-reduced-motion:reduce){[data-k=lp-6] *{transition:none!important}}
 </style>
-<h3>Descent</h3><p class="cap">A down goal read as a fall down a rail built only from numbers they typed, and the current number is the pen: tap it to write today's. A slow number is written at the weekly confirm instead, so the same rail carries it without asking.</p>
+<h3>Descent</h3><p class="cap">A down goal carried by the pen: the current number is the screen, tap it to write today's, undo puts it back, and the rail beside it is only the marks they themselves typed. A slow number is written at the weekly confirm instead, so the same rail carries it without asking.</p>
 <div class="bk" role="group" aria-label="which goal this screen is carrying">
   <button type="button" class="on" data-b="body" aria-pressed="true">Body</button>
   <button type="button" data-b="money" aria-pressed="false">Money</button>
@@ -110,11 +108,11 @@
   <div class="rail"></div>
 
   <div class="stack">
-    <div class="row"><s data-start></s><span data-delta></span></div>
     <button type="button" class="num" data-num><span class="v"></span><i>*</i><em></em></button>
     <input class="ed" type="text" inputmode="decimal" aria-label="today's number">
     <p class="as" data-as></p>
     <p class="stn" data-stn></p>
+    <button type="button" class="undo">Undo</button>
   </div>
 
   <div class="card">
@@ -131,15 +129,13 @@ var ph=r.querySelector('.ph'),TOP=62,H=286;
 /* --- THE BUCKETS (ACTION-BUCKETS.md) -------------------------------------
    Body: weight down, daily-measured, so the number itself is the pen.
    Money: a card balance down to zero, a slow number, written at the weekly
-   confirm, so this screen carries it but never asks for it. */
+   confirm, so this screen carries it but never asks for it.
+   recent = the numbers THEY typed, oldest first, the last one is where they
+   are now. Nothing else feeds the rail: no start, no goal, no target. */
 var B={
   body:{
-    first:264,floor:220,now:241.4,pen:true,unit:'lb',
-    ticks:[{v:264,txt:'Start'},{v:250,txt:'250'},{v:230,txt:'230'},{v:220,txt:'220',u:'goal',floor:true}],
-    olds:[44,75,104,124],
+    recent:[246.2,245.0,244.1,243.3,241.4],now:241.4,pen:true,unit:'lb',
     val:function(x){return x.toFixed(1)},
-    start:'264',
-    delta:function(x){var d=x-264;return (d>0?'+':d<0?'-':'')+Math.abs(d).toFixed(1)+' lb'},
     as:'As of Tuesday.',stale:true,staleNote:'* not logged in 2 days',
     ok:function(x){return x>=150&&x<=400},
     act:function(v){return 'Today, walk '+v+' minutes after dinner.'},
@@ -150,12 +146,8 @@ var B={
     did:function(v){return v+' minutes logged'}
   },
   money:{
-    first:6900,floor:0,now:4180,pen:false,unit:'',
-    ticks:[{v:6900,txt:'Start'},{v:5000,txt:'$5,000'},{v:2000,txt:'$2,000'},{v:0,txt:'$0',u:'goal',floor:true}],
-    olds:[20,41,65,89],
+    recent:[5240,4980,4620,4180],now:4180,pen:false,unit:'',
     val:function(x){return '$'+Math.round(x).toLocaleString('en-US')},
-    start:'$6,900',
-    delta:function(x){var d=Math.round(x-6900);return (d>0?'+$':d<0?'-$':'$')+Math.abs(d).toLocaleString('en-US')},
     as:'As of Sunday’s confirm.',stale:false,staleNote:'',
     ok:function(){return false},
     act:function(v){return 'Today, message '+v+' potential clients.'},
@@ -172,39 +164,38 @@ var C=B.body,pick=C.pick,WEEK=C.week,cur=C.now,
     act=r.querySelector('.act'),cons=r.querySelector('.cons'),
     stack=r.querySelector('.stack'),numEl=r.querySelector('.num'),
     vEl=numEl.querySelector('.v'),uEl=numEl.querySelector('em'),
-    ed=r.querySelector('.ed'),
-    stEl=r.querySelector('[data-start]'),dtEl=r.querySelector('[data-delta]'),
+    ed=r.querySelector('.ed'),undo=r.querySelector('.undo'),
     asEl=r.querySelector('[data-as]'),stnEl=r.querySelector('[data-stn]'),
     hold=r.querySelector('.hold'),txt=hold.querySelector('span'),am=r.querySelector('.amend'),
-    mk,trav;
+    mk,W={hi:1,lo:0},last=null;
 
-function pos(v){return Math.max(0,Math.min(H,(C.first-v)/(C.first-C.floor)*H))}
+/* the window the rail spans is drawn from their own recent numbers, framed so
+   the latest one sits a little below centre with room to keep moving */
+function makeWin(){
+  var v=C.recent,hi=Math.max.apply(null,v),lo=Math.min.apply(null,v),sp=(hi-lo)||1,
+      top=hi+sp*.2,rng=Math.max((top-C.now)/.58,sp*1.4);
+  W={hi:top,lo:top-rng};
+}
+function pos(v){return Math.max(0,Math.min(H,(W.hi-v)/(W.hi-W.lo)*H))}
 
 /* the rail is drawn from the entries, so nothing survives a bucket swap that
    the new bucket's own numbers did not put there */
 function drawRail(){
   var h='';
-  C.ticks.forEach(function(t){
-    var y=pos(t.v);
-    h+='<span class="tk'+(t.u?' end':'')+'" style="top:'+y+'px">'+t.txt+(t.u?'<u>'+t.u+'</u>':'')+'</span>';
-    if(!t.floor)h+='<i class="nub" style="top:'+y+'px"></i>';
-  });
-  C.olds.forEach(function(y){h+='<i class="old" style="top:'+y+'px"></i>'});
-  h+='<i class="trav"></i><i class="mk"></i><i class="floor"></i>';
+  C.recent.slice(0,-1).forEach(function(v){h+='<i class="old" style="top:'+pos(v)+'px"></i>'});
+  h+='<i class="mk"></i>';
   railEl.innerHTML=h;
-  mk=railEl.querySelector('.mk');trav=railEl.querySelector('.trav');
-  mk.style.top=pos(cur)+'px';trav.style.height=pos(cur)+'px';
+  mk=railEl.querySelector('.mk');
+  mk.style.top=pos(cur)+'px';
 }
 
-/* the stack rides the marker: writing a lower number drops it down the rail */
-function place(){stack.style.top=Math.max(74,Math.round(TOP+pos(cur)-40))+'px'}
+/* the number rides the marker: writing a lower one drops it down the rail */
+function place(){stack.style.top=Math.max(70,Math.min(258,Math.round(TOP+pos(cur)-22)))+'px'}
 
 function readNumber(x){
   cur=x;
   vEl.textContent=C.val(x);
   uEl.textContent=C.unit;
-  stEl.textContent=C.start;
-  dtEl.textContent=C.delta(x);
   numEl.setAttribute('aria-label',C.pen?C.val(x)+' '+(C.unit||'')+', tap to write today’s number':C.val(x));
   place();
 }
@@ -237,18 +228,24 @@ function open(){
   try{ed.setSelectionRange(0,ed.value.length)}catch(e){}
 }
 function close(){editing=false;ph.classList.remove('pen')}
+function swapTo(x){
+  numEl.classList.add('swap');
+  setTimeout(function(){readNumber(x);numEl.classList.remove('swap')},110);
+}
 function commit(){
   if(!editing)return;
   var x=parseFloat(ed.value);
   close();
   if(!C.ok(x)||x===cur)return;
   /* the number they had before stays as a faint mark: the rail is a stack of entries */
-  var old=document.createElement('i');old.className='old';old.style.top=pos(cur)+'px';
+  var prev=cur,wasStale=ph.classList.contains('stale'),
+      old=document.createElement('i');
+  old.className='old';old.style.top=pos(prev)+'px';
   railEl.appendChild(old);
-  mk.style.top=pos(x)+'px';trav.style.height=pos(x)+'px';
-  numEl.classList.add('swap');
-  setTimeout(function(){readNumber(x);numEl.classList.remove('swap')},110);
-  ph.classList.add('fresh');ph.classList.remove('stale');
+  mk.style.top=pos(x)+'px';
+  swapTo(x);
+  ph.classList.add('fresh','wrote');ph.classList.remove('stale');
+  last={prev:prev,mark:old,wasStale:wasStale};
 }
 numEl.addEventListener('click',open);
 ed.addEventListener('keydown',function(e){
@@ -256,6 +253,17 @@ ed.addEventListener('keydown',function(e){
   else if(e.key==='Escape'){e.preventDefault();close();}
 });
 ed.addEventListener('blur',commit);
+
+/* --- undo: the entry comes off, and so does its mark --------------------- */
+undo.addEventListener('click',function(){
+  if(!last)return;
+  if(last.mark.parentNode)last.mark.parentNode.removeChild(last.mark);
+  mk.style.top=pos(last.prev)+'px';
+  swapTo(last.prev);
+  ph.classList.remove('fresh','wrote');
+  if(last.wasStale)ph.classList.add('stale');
+  last=null;
+});
 
 /* --- logging the action, accept or amend --------------------------------- */
 var t=null;
@@ -276,15 +284,15 @@ am.addEventListener('click',function(){
 
 /* --- swapping the bucket: same rail, the goal's own numbers and pen ------- */
 function render(key){
-  C=B[key];pick=C.pick;WEEK=C.week;cur=C.now;
+  C=B[key];pick=C.pick;WEEK=C.week;cur=C.now;last=null;
   close();
-  ph.classList.remove('logged','fresh');
+  ph.classList.remove('logged','fresh','wrote');
   ph.classList.toggle('stale',!!C.stale);
   hold.classList.remove('go','done');txt.textContent=C.idle;
   if(C.pen)numEl.setAttribute('data-pen','');else numEl.removeAttribute('data-pen');
   numEl.disabled=!C.pen;
   asEl.textContent=C.as;stnEl.textContent=C.staleNote;
-  drawRail();readNumber(C.now);drawChips();paintCard();
+  makeWin();drawRail();readNumber(C.now);drawChips();paintCard();
 }
 r.querySelectorAll('.bk button').forEach(function(b){
   b.addEventListener('click',function(){

@@ -7,10 +7,24 @@
      GLANCE LAW PASS (2026-08-13): one instruction sentence, no explainer line,
      the consequence moved into the top line itself (47 -> 52 with a ghost
      segment on the bar), the three chip boxes deleted, the NUMBER IN THE
-     SENTENCE is now the control, and completion is hold, never a slider. -->
+     SENTENCE is now the control, and completion is hold, never a slider.
+     MALIK ROUND 4 (2026-08-13):
+     1. THE BAR carries the person's Memento accent (--acc on the phone, one
+        value per bucket standing in for their chosen skin). The solid segment
+        is the only coloured thing on the surface: ghost, hold and confirm are
+        all neutral ink now. ONE accent per surface.
+     2. THE NUMBER SCALES with the size chosen, 1..20 mapped to 40..64px on a
+        log curve so 3 / 5 / 8 read visibly but not massively apart. The line
+        box is reserved at the max so the sentence never shifts.
+     3. THE HOLD is 1400ms and says "Hold to confirm" for every goal. Early
+        release still aborts. -->
 <style>
 [data-k=lp-1] .s{position:absolute;inset:0;display:flex;flex-direction:column;padding:34px 22px 20px;
   font-variant-numeric:tabular-nums}
+/* THE ACCENT: the person's own Memento colour, set per phone. Demo values
+   stand in for the skin each bucket's person picked. It touches exactly one
+   thing on this screen, the bar's solid segment. */
+[data-k=lp-1] .ph{--acc:43,212,212}
 
 /* --- OUTPUT BAR (provenance law) ---------------------------------------
    The literal sum of the messages they logged, counted against a countable
@@ -23,14 +37,12 @@
 [data-k=lp-1] .goal b{font-weight:700;font-variant-numeric:tabular-nums}
 [data-k=lp-1] .goal em{font-style:normal;font-weight:400;color:rgba(var(--ink),.60);padding:0 1px}
 [data-k=lp-1] .goal u{text-decoration:none;font-weight:400;min-width:0;overflow:hidden;text-overflow:ellipsis}
-[data-k=lp-1] .goal .best{margin-left:auto;flex:none;font-weight:400;color:rgba(var(--ink),.92)}
-[data-k=lp-1] .goal .best b{font-weight:700}
 [data-k=lp-1] .s.done .goal em,[data-k=lp-1] .s.done .goal .from{display:none}
 
 [data-k=lp-1] .bar{position:relative;margin-top:9px;height:3px;border-radius:2px;
   background:rgba(var(--ink),.12);overflow:hidden}
 [data-k=lp-1] .bar i{position:absolute;left:0;top:0;bottom:0;width:47%;border-radius:2px;
-  background:rgba(var(--ink),.70);transition:width .32s cubic-bezier(.2,.7,.2,1)}
+  background:rgb(var(--acc));transition:width .32s cubic-bezier(.2,.7,.2,1)}
 /* the ghost: today's size, not yet banked */
 [data-k=lp-1] .bar u{position:absolute;top:0;bottom:0;left:47%;width:5%;border-radius:2px;
   background:rgba(var(--ink),.30);
@@ -46,16 +58,27 @@
 [data-k=lp-1] .say{margin:auto 0 22px;font-size:29px;line-height:1.04;letter-spacing:-.03em;font-weight:500;
   color:rgba(var(--ink),.96)}
 [data-k=lp-1] .say .vb,[data-k=lp-1] .say .obj{display:block}
-[data-k=lp-1] .nline{display:block;position:relative;margin:6px 0 15px}
+/* the line box is reserved at the LARGEST number so the sentence under it
+   never moves: only the numeral grows, upward off a fixed baseline. */
+[data-k=lp-1] .nline{display:flex;align-items:flex-end;position:relative;height:62px;padding-bottom:6px;
+  margin:4px 0 14px}
 
-/* THE PICKER IS THE NUMBER. Quietly marked tappable, nothing else on screen. */
-[data-k=lp-1] .n{-webkit-appearance:none;appearance:none;border:0;background:none;padding:0;margin:0 0 0 -5px;
-  font-family:var(--font);font-size:110px;font-weight:700;line-height:.80;letter-spacing:-.055em;
+/* THE PICKER IS THE NUMBER, and its SIZE IS THE SIZE. 1..20 maps to 40..64px
+   (log curve), so message 1 sits small and message 20 stands tall without the
+   sentence ever breaking. JS sets the size INLINE rather than through an
+   unregistered custom property, so the transitioned font-size never depends on
+   a var() substitution firing. Measured 1=40px, 3=48.8, 5=52.9, 16=62.2,
+   20=64px, with the verb, the object line and the hold pinned at the same
+   y at every size and no overflow either way. */
+[data-k=lp-1] .n{-webkit-appearance:none;appearance:none;border:0;background:none;padding:0;
+  margin:0 0 0 -.04em;
+  font-family:var(--font);font-size:52.9px;font-weight:700;line-height:.80;letter-spacing:-.055em;
   color:rgba(var(--ink),1);font-variant-numeric:tabular-nums;cursor:pointer;display:block;
   -webkit-tap-highlight-color:transparent;
-  text-decoration:underline;text-decoration-thickness:4px;text-underline-offset:10px;
+  text-decoration:underline;text-decoration-thickness:.04em;text-underline-offset:.10em;
   text-decoration-color:rgba(var(--ink),.20);
-  transition:opacity .16s ease-out,text-decoration-color .16s ease-out,transform .1s ease-out}
+  transition:opacity .16s ease-out,font-size .2s cubic-bezier(.2,.7,.2,1),
+    text-decoration-color .16s ease-out,transform .1s ease-out}
 [data-k=lp-1] .n:active{transform:translateY(1px);text-decoration-color:rgba(var(--ink),.45)}
 [data-k=lp-1] .n[aria-expanded=true]{text-decoration-color:rgba(var(--ink),.45)}
 [data-k=lp-1] .n.swap{opacity:.35}
@@ -94,11 +117,12 @@
   box-shadow:inset 0 1px 0 rgba(var(--ink),.09);cursor:pointer;touch-action:none;user-select:none;
   -webkit-user-select:none;-webkit-tap-highlight-color:transparent;transition:background .3s ease-out}
 [data-k=lp-1] .hold:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
-[data-k=lp-1] .hold .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(63,217,78,.22)}
+/* the hold fills in ink, not colour: the bar owns the one accent */
+[data-k=lp-1] .hold .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(var(--ink),.14)}
 [data-k=lp-1] .hold .lab{position:absolute;inset:0;display:grid;place-items:center;
   font-size:13.5px;font-weight:500;color:rgba(var(--ink),.92);transition:padding .26s ease-out}
-[data-k=lp-1] .s.done .hold{background:rgba(63,217,78,.16);box-shadow:inset 0 1px 0 rgba(63,217,78,.30)}
-[data-k=lp-1] .s.done .hold .fill{width:100%;background:rgba(63,217,78,.16)}
+[data-k=lp-1] .s.done .hold{background:rgba(28,32,39,.94);box-shadow:inset 0 1px 0 rgba(var(--ink),.14)}
+[data-k=lp-1] .s.done .hold .fill{width:100%;background:rgba(var(--ink),.10)}
 [data-k=lp-1] .s.done .lab{padding-right:74px;color:rgba(var(--ink),.96);font-weight:700}
 [data-k=lp-1] .undo{position:absolute;right:6px;top:6px;bottom:6px;width:62px;border:0;border-radius:10px;
   background:rgba(22,25,31,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
@@ -119,7 +143,6 @@
     <div class="goal">
       <b class="from" data-from>47</b><em aria-hidden="true">&#8594;</em><b data-to>52</b>
       <u data-tail>of 100 clients</u>
-      <span class="best">Best <b data-best>8</b></span>
     </div>
     <div class="bar"><i></i><u></u></div>
     <p class="src"><span data-src>From your logged messages</span><span data-left>19 days left</span></p>
@@ -136,18 +159,19 @@
 
     <div class="hold" role="button" tabindex="0">
       <div class="fill"></div>
-      <div class="lab">Hold when sent</div>
+      <div class="lab">Hold to confirm</div>
       <button type="button" class="undo" tabindex="-1">Undo</button>
     </div>
   </div>
 </div>
 <script>(function(){
   var r=document.currentScript.closest('.cell');if(!r)return;
-  var s=r.querySelector('.s'),n=r.querySelector('.n'),pop=r.querySelector('.pop'),
+  var ph=r.querySelector('.ph'),
+      s=r.querySelector('.s'),n=r.querySelector('.n'),pop=r.querySelector('.pop'),
       opts=r.querySelector('.opts'),pmore=r.querySelector('.pmore'),
       solid=r.querySelector('.bar i'),ghost=r.querySelector('.bar u'),
       goal=r.querySelector('.goal'),from=r.querySelector('[data-from]'),to=r.querySelector('[data-to]'),
-      tail=r.querySelector('[data-tail]'),bestN=r.querySelector('[data-best]'),
+      tail=r.querySelector('[data-tail]'),
       srcEl=r.querySelector('[data-src]'),leftEl=r.querySelector('[data-left]'),
       obj=r.querySelector('.obj'),vb=r.querySelector('.vb'),
       hold=r.querySelector('.hold'),fill=r.querySelector('.hold .fill'),
@@ -161,28 +185,39 @@
      not. */
   var B={
     money:{reached:47,target:100,tail:'of 100 clients',left:'19 days left',
-      src:'From your logged messages',
+      src:'From your logged messages',acc:'43,212,212',
       vb:'Message',one:'potential client.',many:'potential clients.',
-      best:8,pick:5,min:5,
+      pick:5,min:5,
       three:[{n:3,role:'lighter'},{n:5,role:'today’s'},{n:8,role:'heavier'}],
-      all:[1,2,3,5,8,12,16,20],idle:'Hold when sent',
+      all:[1,2,3,5,8,12,16,20],
       did:function(v){return v+(v===1?' message sent':' messages sent')}},
     audience:{reached:12,target:100,tail:'of 100 videos',left:'22 weeks left',
-      src:'From the videos you logged',
+      src:'From the videos you logged',acc:'255,107,157',
       vb:'Post',one:'video.',many:'videos.',
-      best:3,pick:2,min:20,
+      pick:2,min:20,
       three:[{n:1,role:'lighter'},{n:2,role:'today’s'},{n:3,role:'heavier'}],
-      all:[1,2,3,4,5,6],idle:'Hold when posted',
+      all:[1,2,3,4,5,6],
       did:function(v){return v+(v===1?' video posted':' videos posted')}},
     ship:{reached:9,target:14,tail:'of 14 blockers',left:'19 days left',
-      src:'From your own blocker list',
+      src:'From your own blocker list',acc:'79,140,255',
       vb:'Clear',one:'blocker.',many:'blockers.',
-      best:3,pick:2,min:40,
+      pick:2,min:40,
       three:[{n:1,role:'lighter'},{n:2,role:'today’s'},{n:3,role:'heavier'}],
-      all:[1,2,3,4,5],idle:'Hold when closed',
+      all:[1,2,3,4,5],
       did:function(v){return v+(v===1?' blocker cleared':' blockers cleared')}}
   };
-  var C=B.money,pick=C.pick,best=C.best,fine=false,done=false,timer=null;
+  /* the hold reads the same for every goal, and it is long enough to be a
+     decision: early release aborts. */
+  var IDLE='Hold to confirm',HOLD_MS=1400;
+  var C=B.money,pick=C.pick,fine=false,done=false,timer=null;
+
+  /* THE NUMBER IS THE SIZE. The whole ladder 1..20 maps to 40..64px on a log
+     curve, so the small end has room to separate (3 / 5 / 8 read apart) and
+     20 is the tallest the sentence can hold without breaking. */
+  function nsz(v){
+    var t=Math.log(Math.max(1,Math.min(20,v)))/Math.log(20);
+    return (40+24*t).toFixed(1)+'px';
+  }
 
   /* the plan's estimate, always hedged */
   function cost(v){
@@ -225,32 +260,31 @@
 
   /* one render path: the sentence, the arrow number and the ghost all move together */
   function say(animate){
-    if(animate){n.classList.add('swap');setTimeout(function(){n.textContent=pick;n.classList.remove('swap')},110);}
-    else n.textContent=pick;
+    if(animate){n.classList.add('swap');setTimeout(function(){
+      n.textContent=pick;n.style.fontSize=nsz(pick);n.classList.remove('swap');},110);}
+    else {n.textContent=pick;n.style.fontSize=nsz(pick);}
     obj.textContent=pick===1?C.one:C.many;
     var base=done?C.reached+pick:C.reached,land=C.reached+pick;
     from.textContent=C.reached;to.textContent=land;
-    bestN.textContent=best;
     solid.style.width=(base/C.target*100)+'%';
     ghost.style.left=(C.reached/C.target*100)+'%';
     ghost.style.width=(pick/C.target*100)+'%';
     goal.setAttribute('aria-label',done
-      ?land+' '+C.tail+'. Best day '+best+'.'
-      :pick+' today, '+C.reached+' to '+land+' '+C.tail+'. Best day '+best+'.');
-    hold.setAttribute('aria-label',done?C.did(pick):C.idle+', '+pick);
-    if(!done)lab.textContent=C.idle;
+      ?land+' '+C.tail+'.'
+      :pick+' today, '+C.reached+' to '+land+' '+C.tail+'.');
+    hold.setAttribute('aria-label',done?C.did(pick):IDLE+', '+pick);
+    if(!done)lab.textContent=IDLE;
     buildOpts();
   }
 
   function complete(){
     if(done)return;
     done=true;s.classList.add('done');
-    if(pick>best)best=pick;
     lab.textContent=C.did(pick);
     say(false);
   }
   function reset(){
-    done=false;s.classList.remove('done');best=C.best;
+    done=false;s.classList.remove('done');
     fill.style.transition='none';fill.style.width='0';
     say(false);
   }
@@ -260,8 +294,8 @@
   function start(e){
     if(done||pop.classList.contains('open'))return;
     if(e&&e.target.closest('.undo'))return;
-    fill.style.transition='width .9s linear';fill.style.width='100%';
-    timer=setTimeout(function(){timer=null;complete();},900);
+    fill.style.transition='width '+(HOLD_MS/1000)+'s linear';fill.style.width='100%';
+    timer=setTimeout(function(){timer=null;complete();},HOLD_MS);
   }
   function stop(){
     if(done)return;
@@ -276,9 +310,10 @@
 
   /* swapping the bucket: the whole screen re-reads for that goal */
   function render(key){
-    C=B[key];pick=C.pick;best=C.best;fine=false;done=false;
+    C=B[key];pick=C.pick;fine=false;done=false;
     s.classList.remove('done');setOpen(false);
     fill.style.transition='none';fill.style.width='0';
+    ph.style.setProperty('--acc',C.acc);
     tail.textContent=C.tail;leftEl.textContent=C.left;srcEl.textContent=C.src;vb.textContent=C.vb;
     say(false);
   }

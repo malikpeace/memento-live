@@ -122,7 +122,7 @@ var B={
   money:{cols:10,rows:10,n:100,base:37,htop:23,ftop:96,rtop:356,ctop:408,cx:130,cy:130,
     title:'Save $5,000',legend:'One hundred marks. Each one is $50.',
     amt:function(l){return '$'+(l*50).toLocaleString('en-US')},
-    of:'of $5,000',ct:function(l){return l+' of 100'},
+    of:'',ct:function(l){return l+' of 100'},
     sub:'Friday is the transfer day.',
     chips:[{n:2,em:'$100',u:'2 marks'},{n:4,em:'$200',u:'4 marks'},{n:7,em:'$350',u:'7 marks'}],pick:1,
     act:function(c){return 'Move $'+(c.n*50)+' into savings.'},
@@ -133,7 +133,7 @@ var B={
      one row and the card keeps its own height: the goal sets the geometry */
   body:{cols:10,rows:12,n:120,base:38,htop:14,ftop:70,rtop:382,ctop:434,cx:130,cy:156,
     title:'Run the half in January',legend:'120 marks, one for each session logged.',
-    amt:function(l){return ''+l},of:'of 120',ct:function(){return '21 weeks to race day'},
+    amt:function(l){return ''+l},of:'of 120',ct:function(){return ''},
     sub:'',
     /* length is the dial here, not marks: a session is a session, and the
        screen says so by leaving the mark count alone while the minutes move */
@@ -144,7 +144,7 @@ var B={
     did:function(c){return c.mins+' minutes logged.'}},
   school:{cols:6,rows:10,n:60,base:23,htop:23,ftop:96,rtop:356,ctop:408,cx:78,cy:130,
     title:'60 study sessions this term',legend:'60 marks, one for each block logged.',
-    amt:function(l){return ''+l},of:'of 60 this term',ct:function(){return '9 weeks to finals'},
+    amt:function(l){return ''+l},of:'of 60 this term',ct:function(){return ''},
     sub:'About 90 min each, phone in another room.',
     chips:[{n:1,em:'1 block',u:'1 mark'},{n:2,em:'2 blocks',u:'2 marks'},{n:3,em:'3 blocks',u:'3 marks'}],pick:1,
     act:function(c){return ({1:'One study block.',2:'Two study blocks.',3:'Three study blocks.'})[c.n]},
