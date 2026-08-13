@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Clarity — Where you stand, the rich version</title>
+<style>
+  :root{
+    --ink:#060708; --hi:rgba(255,255,255,.96); --mid:rgba(255,255,255,.60); --lo:rgba(255,255,255,.38);
+    --hair:rgba(255,255,255,.09); --cyan:#3ad9f5;
+    --glass:rgba(255,255,255,.05);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--ink);color:var(--hi);
+    font-family:ui-sans-serif,-apple-system,"SF Pro Text","Segoe UI",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:1500px;margin:0 auto;padding:38px 20px 90px}
+  header h1{font-size:clamp(1.7rem,4vw,2.3rem);font-weight:700;letter-spacing:-.03em;margin:0 0 10px}
+  header p{color:var(--mid);font-size:.96rem;margin:0 0 4px;max-width:80ch}
+  header .sub{color:var(--lo);font-size:.85rem;max-width:80ch}
+  .grid{display:flex;flex-wrap:wrap;gap:34px;margin-top:34px}
+  .cell{flex:0 0 auto;width:330px}
+  .cell .cap{font-size:.92rem;font-weight:700;margin:0 0 3px}
+  .cell .capsub{color:var(--lo);font-size:.8rem;margin:0 0 14px}
+  .phone{width:330px;border-radius:50px;padding:10px;
+    background:linear-gradient(180deg,#15171c,#0a0b0e);
+    box-shadow:0 34px 90px rgba(0,0,0,.6),inset 0 0 0 1.5px rgba(255,255,255,.06)}
+  .screen{position:relative;border-radius:41px;overflow:hidden;height:690px;background:#05060a}
+  .notch{position:absolute;top:9px;left:50%;transform:translateX(-50%);width:106px;height:28px;border-radius:16px;background:#000;z-index:9}
+  .scroll{position:absolute;inset:0;overflow-y:auto;scrollbar-width:none}
+  .scroll::-webkit-scrollbar{display:none}
+  .inner{position:relative;padding:0 20px 46px;
+    background:
+      radial-gradient(120% 34% at 50% -4%, rgba(58,217,245,.12), transparent 60%),
+      #05060a}
+  .stars{position:absolute;inset:0;pointer-events:none;opacity:.5;
+    background-image:radial-gradient(1px 1px at 12% 6%, rgba(255,255,255,.7) 50%, transparent 51%),
+      radial-gradient(1px 1px at 78% 3%, rgba(255,255,255,.5) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 55% 9%, rgba(255,255,255,.6) 50%, transparent 51%),
+      radial-gradient(1px 1px at 30% 14%, rgba(255,255,255,.4) 50%, transparent 51%),
+      radial-gradient(1px 1px at 88% 12%, rgba(255,255,255,.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 8% 22%, rgba(255,255,255,.35) 50%, transparent 51%),
+      radial-gradient(1.2px 1.2px at 68% 19%, rgba(255,255,255,.4) 50%, transparent 51%),
+      radial-gradient(1px 1px at 42% 27%, rgba(255,255,255,.3) 50%, transparent 51%)}
+
+  .p2head{margin:52px 0 2px;font-size:1.08rem;font-weight:700;letter-spacing:-.01em;position:relative}
+  .p2sub{color:var(--lo);font-size:.8rem;margin:0 0 20px;position:relative}
+
+  /* ===== THE CLIMB (map) ===== */
+  .climb{position:relative;height:300px;margin:6px 0 16px}
+  .climb .goalstar{position:absolute;top:2px;left:50%;transform:translateX(-50%);width:56px;height:56px}
+  .climb .goalstar::before{content:"";position:absolute;inset:-26px;border-radius:999px;
+    background:radial-gradient(circle, rgba(58,217,245,.35) 0%, rgba(58,217,245,.10) 45%, transparent 70%)}
+  .climb .goalstar::after{content:"";position:absolute;inset:6px;border-radius:999px;
+    background:radial-gradient(circle at 42% 38%, #eafcff 0%, #9feefc 34%, #3ad9f5 62%, #0a6d84 100%);
+    box-shadow:0 0 30px rgba(58,217,245,.6), 0 0 70px rgba(58,217,245,.3)}
+  .climb .goalnum{position:absolute;top:12px;left:50%;transform:translateX(64px);color:var(--mid);font-size:.78rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .rail{position:absolute;top:64px;bottom:26px;left:50%;width:2px;transform:translateX(-1px);border-radius:2px;
+    background:linear-gradient(180deg, rgba(58,217,245,.10) 0%, rgba(255,255,255,.07) 100%)}
+  .rail .lit{position:absolute;bottom:0;left:0;right:0;height:14%;border-radius:2px;
+    background:linear-gradient(0deg, #3ad9f5 0%, rgba(58,217,245,.35) 100%);
+    box-shadow:0 0 14px rgba(58,217,245,.45)}
+  .post{position:absolute;left:50%;width:7px;height:7px;border-radius:99px;background:rgba(255,255,255,.14);transform:translateX(-3.5px)}
+  .post.hit{background:var(--cyan);box-shadow:0 0 9px rgba(58,217,245,.6)}
+  .postlab{position:absolute;left:50%;transform:translateX(14px);color:var(--lo);font-size:.68rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .you{position:absolute;left:50%;transform:translateX(-50%);width:15px;height:15px;border-radius:99px;
+    background:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.14), 0 0 18px rgba(255,255,255,.7)}
+  .youlab{position:absolute;right:calc(50% + 18px);text-align:right;white-space:nowrap}
+  .youlab b{display:block;font-size:1.35rem;font-weight:750;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.1}
+  .youlab span{color:var(--mid);font-size:.72rem}
+  .startlab{position:absolute;bottom:6px;left:50%;transform:translateX(14px);color:var(--lo);font-size:.7rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .startdot{position:absolute;bottom:20px;left:50%;width:8px;height:8px;border-radius:99px;background:rgba(255,255,255,.25);transform:translateX(-4px)}
+
+  /* ===== cards ===== */
+  .card{position:relative;background:var(--glass);backdrop-filter:blur(22px) saturate(1.35);border-radius:16px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.06);padding:15px 16px;margin:0 0 12px}
+  .lab{color:var(--lo);font-size:.76rem;font-weight:650;margin-bottom:8px}
+  .tapnote{margin-top:9px;color:var(--lo);font-size:.7rem;display:flex;align-items:center;gap:5px}
+
+  /* two clocks */
+  .clockrow{display:flex;flex-direction:column;gap:11px}
+  .clock .cl-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+  .clock .cl-name{color:var(--mid);font-size:.8rem}
+  .clock .cl-val{font-size:.86rem;font-weight:650;font-variant-numeric:tabular-nums}
+  .clock .bar{height:5px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}
+  .clock .bar i{display:block;height:100%;border-radius:99px}
+  .clock.dist .bar i{background:linear-gradient(90deg, rgba(58,217,245,.6), #3ad9f5)}
+  .clock.time .bar i{background:rgba(255,255,255,.32)}
+
+  /* fork */
+  .fork .side{padding:12px 13px;border-radius:12px;background:rgba(255,255,255,.035);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+  .fork .side + .side{margin-top:9px}
+  .fork .side .flab{font-size:.72rem;font-weight:650;margin-bottom:4px}
+  .fork .side.up .flab{color:var(--cyan)}
+  .fork .side.down .flab{color:rgba(255,255,255,.42)}
+  .fork .side .ftxt{font-size:.86rem;line-height:1.5;color:rgba(255,255,255,.92)}
+  .fork .side.down .ftxt{color:rgba(255,255,255,.5)}
+  .fork .fnote{margin-top:10px;color:var(--lo);font-size:.72rem;text-align:center}
+
+  /* plan */
+  .ticks{display:flex;gap:4px;margin:4px 0 8px}
+  .ticks i{flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,.10)}
+  .ticks i.on{background:var(--cyan);box-shadow:0 0 7px rgba(58,217,245,.4)}
+  .plantxt{color:var(--mid);font-size:.82rem}
+  .plannext{margin-top:9px;padding:10px 12px;border-radius:11px;background:rgba(255,255,255,.04);color:rgba(255,255,255,.9);font-size:.84rem}
+  .plannext span{color:var(--lo);font-size:.72rem;display:block;margin-bottom:2px}
+
+  /* promise */
+  .promise .ptxt{font-size:1.0rem;line-height:1.55;color:rgba(255,255,255,.95);font-weight:560}
+  .promise .psig{margin-top:12px;color:var(--mid);font-size:.8rem;font-variant-numeric:tabular-nums}
+  .promise .pheld{margin-top:3px;color:var(--lo);font-size:.72rem;font-variant-numeric:tabular-nums}
+  .promise::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:2px;border-radius:2px;
+    background:linear-gradient(180deg, rgba(58,217,245,.55), rgba(58,217,245,.08))}
+  .promise{padding-left:20px}
+
+  .vowbig{font-size:2.6rem;font-weight:750;letter-spacing:-.025em;font-variant-numeric:tabular-nums;line-height:1}
+  .vowheld{color:var(--cyan);font-weight:650;font-size:1rem;margin:4px 0 10px}
+  .vowrow{display:flex;gap:4px;margin-top:4px}
+  .vowrow i{width:11px;height:22px;border-radius:4px;background:rgba(255,255,255,.09)}
+  .vowrow i.on{background:linear-gradient(180deg, rgba(58,217,245,.85), rgba(58,217,245,.45))}
+  .vownote{color:var(--lo);font-size:.72rem;margin-top:8px}
+
+  .notes{max-width:430px}
+  .notes h3{font-size:.95rem;font-weight:700;margin:0 0 8px}
+  .notes ul{margin:0 0 18px;padding-left:18px;color:var(--mid);font-size:.88rem}
+  .notes li{margin:6px 0}
+  .notes .q{color:var(--lo);font-size:.82rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Where you stand — the rich version</h1>
+    <p>Page 2 rebuilt to be a place, not a receipt. Five sections, all still state-only: <b>the climb</b> (the distance as a literal vertical journey toward the star, posts at each fifth), <b>the two clocks</b> (distance covered vs time spent, both plain facts), <b>the fork</b> (the future they chose vs the default, both still live from where they stand), <b>the plan</b> (how much of the built plan is cleared, your "9 of 14 blockers"), and <b>the promise</b> (their own words, their name, the date they made it, tap to read or renew).</p>
+    <p class="sub">Page 1 (the star page) is unchanged and not shown here; these phones ARE page 2, scrollable. Two personas: Maya day 41, and Jordan's vow.</p>
+  </header>
+
+  <div class="grid">
+
+    <!-- ============ MAYA ============ -->
+    <div class="cell">
+      <p class="cap">Maya · day 41 · 12,400 of 100,000</p>
+      <p class="capsub">Scroll inside the phone. The climb is live: lit rail = covered, posts = fifths.</p>
+      <div class="phone"><div class="screen"><div class="notch"></div><div class="scroll"><div class="inner"><div class="stars"></div>
+
+        <div class="p2head">Where you stand</div>
+        <div class="p2sub">Day 41 · updated 2 days ago</div>
+
+        <!-- THE CLIMB -->
+        <div class="climb">
+          <div class="goalstar"></div>
+          <div class="goalnum">100,000</div>
+          <div class="rail"><div class="lit" style="height:12.4%"></div></div>
+          <div class="post" style="bottom:calc(26px + (100% - 90px) * 0.2)"></div><div class="postlab" style="bottom:calc(22px + (100% - 90px) * 0.2)">20,000</div>
+          <div class="post" style="bottom:calc(26px + (100% - 90px) * 0.4)"></div><div class="postlab" style="bottom:calc(22px + (100% - 90px) * 0.4)">40,000</div>
+          <div class="post" style="bottom:calc(26px + (100% - 90px) * 0.6)"></div><div class="postlab" style="bottom:calc(22px + (100% - 90px) * 0.6)">60,000</div>
+          <div class="post" style="bottom:calc(26px + (100% - 90px) * 0.8)"></div><div class="postlab" style="bottom:calc(22px + (100% - 90px) * 0.8)">80,000</div>
+          <div class="you" style="bottom:calc(20px + (100% - 90px) * 0.124)"></div>
+          <div class="youlab" style="bottom:calc(14px + (100% - 90px) * 0.124)"><b>12,400</b><span>you are here</span></div>
+          <div class="startdot"></div>
+          <div class="startlab">started at 8,100</div>
+        </div>
+        <div class="tapnote" style="justify-content:center;margin:0 0 18px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Tap your number to update it</div>
+
+        <!-- TWO CLOCKS -->
+        <div class="card">
+          <div class="lab">The two clocks</div>
+          <div class="clockrow">
+            <div class="clock dist">
+              <div class="cl-top"><span class="cl-name">Distance covered</span><span class="cl-val">4.7%</span></div>
+              <div class="bar"><i style="width:4.7%"></i></div>
+            </div>
+            <div class="clock time">
+              <div class="cl-top"><span class="cl-name">Time spent</span><span class="cl-val">23%</span></div>
+              <div class="bar"><i style="width:23%"></i></div>
+            </div>
+          </div>
+          <div class="tapnote">Day 41 of 180. 4,300 of the 91,900 you set out to add.</div>
+        </div>
+
+        <!-- THE FORK -->
+        <div class="card fork">
+          <div class="lab">Both are still true from here</div>
+          <div class="side up">
+            <div class="flab">The one you chose</div>
+            <div class="ftxt">A channel strangers open every week because it actually changes their day.</div>
+          </div>
+          <div class="side down">
+            <div class="flab">The default</div>
+            <div class="ftxt">Another year of edits sitting in drafts while the ideas go stale.</div>
+          </div>
+          <div class="fnote">Every day lands on one side.</div>
+        </div>
+
+        <!-- THE PLAN -->
+        <div class="card">
+          <div class="lab">The plan</div>
+          <div class="ticks">
+            <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i>
+          </div>
+          <div class="plantxt">9 of 14 steps cleared</div>
+          <div class="plannext"><span>Standing on</span>Post the first collab video</div>
+        </div>
+
+        <!-- THE PROMISE -->
+        <div class="card promise">
+          <div class="lab">Your promise</div>
+          <div class="ptxt">"I will show up for this channel even on the days nobody watches. The people still stuck where I was are worth the boring Tuesdays."</div>
+          <div class="psig">Maya · made July 2, 2026</div>
+          <div class="pheld">Held for 41 days</div>
+        </div>
+
+        <!-- WHY (kept, compact) -->
+        <div class="card">
+          <div class="lab">Why this one</div>
+          <div style="font-size:.88rem;line-height:1.5;color:rgba(255,255,255,.92)">Watching the people who matter most scroll their lives away, and knowing the channel could reach them.</div>
+        </div>
+
+      </div></div></div></div>
+    </div>
+
+    <!-- ============ JORDAN VOW ============ -->
+    <div class="cell">
+      <p class="cap">Jordan · a vow, no number</p>
+      <p class="capsub">The state of a vow is the hold. The last 14 days shown as fact, not streak-porn.</p>
+      <div class="phone"><div class="screen"><div class="notch"></div><div class="scroll"><div class="inner"><div class="stars"></div>
+
+        <div class="p2head">Where you stand</div>
+        <div class="p2sub">Checked in last night</div>
+
+        <div class="card">
+          <div class="lab">The hold</div>
+          <div class="vowbig">Day 41</div>
+          <div class="vowheld">Held.</div>
+          <div class="vowrow">
+            <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+          </div>
+          <div class="vownote">The last 14 days. Longest hold: 41 days, right now.</div>
+        </div>
+
+        <div class="card fork">
+          <div class="lab">Both are still true from here</div>
+          <div class="side up">
+            <div class="flab">The one you chose</div>
+            <div class="ftxt">Mornings she remembers you present, clear, and there.</div>
+          </div>
+          <div class="side down">
+            <div class="flab">The default</div>
+            <div class="ftxt">More mornings she remembers you missing.</div>
+          </div>
+          <div class="fnote">Every day lands on one side.</div>
+        </div>
+
+        <div class="card">
+          <div class="lab">The plan</div>
+          <div class="ticks">
+            <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i>
+          </div>
+          <div class="plantxt">3 of 7 supports in place</div>
+          <div class="plannext"><span>Standing on</span>Find a Tuesday meeting that fits work</div>
+        </div>
+
+        <div class="card promise">
+          <div class="lab">Your promise</div>
+          <div class="ptxt">"One day at a time, for her. When it gets loud I call before I pour."</div>
+          <div class="psig">Jordan · made June 30, 2026</div>
+          <div class="pheld">Held for 41 days</div>
+        </div>
+
+        <div class="card">
+          <div class="lab">Why this one</div>
+          <div style="font-size:.88rem;line-height:1.5;color:rgba(255,255,255,.92)">Being present for your daughter instead of checked out.</div>
+        </div>
+
+      </div></div></div></div>
+    </div>
+
+    <!-- ============ NOTES ============ -->
+    <div class="cell notes" style="width:430px">
+      <h3>What each section is doing</h3>
+      <ul>
+        <li><b>The climb</b> replaces the flat bar. Distance becomes something you look UP at: the star at the summit, fifths as posts (the same fifths logic from the celebrate rigs), your white dot and number where you actually are, the lit rail behind you. Day 1 = dot at the bottom, rail unlit, still a real place.</li>
+        <li><b>The two clocks</b> is the honest tension: distance covered vs time spent, both plain facts, no verdict attached. It says what a pace line would say without saying it.</li>
+        <li><b>The fork</b> is the why made spatial: the future they chose lit, the default dimmed, both "still true from here." Stakes, not decoration.</li>
+        <li><b>The plan</b> is your "9 of 14 blockers": the built plan's state as tick marks plus the single step they are standing on.</li>
+        <li><b>The promise</b> is the new piece: written in their OWN words when the star is forged (or added here later), shown with their name, the date made, and how long it has been held. Tap to reread full-screen or renew it. No seals, no stamps, their words carry it.</li>
+        <li><b>Why this one</b> stays as the quiet closer.</li>
+      </ul>
+      <h3>Flags for your call</h3>
+      <ul>
+        <li>The two clocks brushes against Consistency's lane (comparing them implies pace). I think it belongs here because both are pure state, but it is the one section to cut if it feels like trespass.</li>
+        <li>The vow's 14-day strip is state-of-the-hold, not a streak flame. If it still reads streak-y, it goes.</li>
+        <li>Promise entry point: written during the star ceremony as a final beat, or first offered here? Ceremony makes it heavier.</li>
+      </ul>
+      <p class="q">Everything still tap-to-update: the number opens the pulse sheet, the promise opens its editor, the plan taps into Action.</p>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>
