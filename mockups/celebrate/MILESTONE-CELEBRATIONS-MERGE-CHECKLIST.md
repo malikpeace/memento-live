@@ -78,7 +78,13 @@ else:                          the daily reward (see DAILY-REWARD-MERGE-CHECKLIS
 chooser.js decides "fires" from real state:
 - fifths of a numeric target crossed (never percent-of-nothing)
 - day-count goals: a rung EVERY 7 DAYS, forever (Malik 2026-08-13; replaced
-  the old sparse 7/30/50/100/200/365 ladder; DAY_STEP in chooser.js)
+  the old sparse 7/30/50/100/200/365 ladder; DAY_STEP in chooser.js).
+  TWO INTENSITIES (his call, same day): weekly rungs are QUIET steps, full
+  quality but calmer (intensity 'step'); the big round marks 100 / 200 /
+  300 / 365, then every 100, fire ON their exact day as intensity 'bold'
+  (bolder, clearer, confetti-tier) so a year never feels like week 14. A
+  bold fire spends that week's quiet rung; they never stack. BOLD_DAYS in
+  chooser.js, tested.
 - unit-count totals (total runs, sessions): a rung EVERY 10 (COUNT_STEP)
 - records broken (2% margin, 7-day cooldown so records can't spam)
 - the first-move moment (their first ever logged action)
@@ -149,13 +155,23 @@ Phase 4 — after merge
 - Any new screen, colour, font, or layout language not already in the
   gallery (no-new-fonts-colors-ever law).
 
-## 6. OPEN QUESTIONS FOR MALIK (answer before or at merge)
+## 6. DECISIONS + REMAINING QUESTIONS
 
-1. The BIG "goal reached" ceremony: is one of the approved ms/family final
-   screens THE goal-completion moment, or does the huge top-tier ceremony
-   still need its own dedicated build before this merges?
-2. Yellow-badged screens: grade them at merge time, or treat everything
-   non-green as cut and ship green-only?
-3. The quiet toggle: daily-only, or daily + goal-type ceremonies (with
+ANSWERED by Malik 2026-08-13:
+1. The BIG "goal reached" ceremony gets ITS OWN DEDICATED BUILD: a new
+   "BIG ASS CELEBRATIONS" design family inside the celebrations gallery,
+   multiple full options for him to pick from for the moment someone
+   reaches their MASSIVE goal. He likes the current milestone screens'
+   concept + look (the full-colour flood with the M) as the direction, but
+   the grand finale must be designed separately and be FUCKING GREAT.
+   THIS FAMILY MUST EXIST AND BE PICKED BEFORE THE MERGE SHIPS a
+   goal-completion path. (Not built yet; queued.)
+2. Day-rung intensity split: weekly = quiet step, round marks = bold.
+   In chooser.js, done, tested.
+
+STILL OPEN (answer before or at merge):
+1. Yellow-badged screens: grade at merge time, or ship green-only?
+   (Only rf-card remains yellow after the 2026-08-13 round.)
+2. The quiet toggle: daily-only, or daily + goal-type ceremonies (with
    milestones always on)? Recorded intent says tier 3 always fires; confirm
    where tier 2 sits.

@@ -45,11 +45,12 @@ VERDICTS = {
   # 3 changed completely (one move + the count); 4 given receipts; 5 loved
   # but needs earlier rungs than a year
   # 2026-08-13 rig grades: op-1 good, op-2/5 good (relayout applied), op-3
-  # REJECTED (cut from the rig), op-4 decent
-  'op-1':'g','op-2':'g','op-3':'r','op-4':'y','op-5':'g',
-  # rf-gap/rf-fall: 2026-08-13 'meh, mainly wording'; his exact line now in
-  # the rig ('gone, of the $100,000. $90,000 still open.'), re-grade
-  'rf-gap':'y','rf-fall':'y','rf-rec':'g','rf-card':'y',
+  # REJECTED (cut from the rig), op-4 fine ('simple, probably rare')
+  'op-1':'g','op-2':'g','op-3':'r','op-4':'g','op-5':'g',
+  # rf-gap/rf-fall: approved 2026-08-13 after his fixes landed (gap: 'gone,
+  # of the X.' + 'Y to go.'; fall: 'left of X' under the number, carry
+  # sentence removed)
+  'rf-gap':'g','rf-fall':'g','rf-rec':'g','rf-card':'y',
   # evolution: the whole family REMOVED at his ask 2026-08-13 (page deleted)
 }
 BADGE = {

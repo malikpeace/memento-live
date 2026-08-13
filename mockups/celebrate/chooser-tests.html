@@ -196,13 +196,30 @@ t('L9 day 14 fires the 14 rung once', function () {
 t('L9 day 6 fires nothing', function () {
   eq(C.evaluate({ gp:null, star:'stay sober', ledger:{}, days:6 }), null);
 });
-t('L9 day 100 belongs to the 98 rung', function () {
+t('L9 day 100 is a BOLD rung (the round marks hit harder, on the day)', function () {
   var ev = C.evaluate({ gp:null, star:'stay sober', ledger:{}, days:100 });
-  eq(ev.milestone, 98);
+  eq([ev.milestone, ev.intensity], [100, 'bold']);
 });
-t('L9 the rhythm never stops: day 465 -> rung 462', function () {
+t('L9 weekly rungs are quiet steps: day 98 fires 98 as a step', function () {
+  var ev = C.evaluate({ gp:null, star:'stay sober', ledger:{}, days:98 });
+  eq([ev.milestone, ev.intensity], [98, 'step']);
+});
+t('L9 a bold fire spends its week: 98 then 100-bold then quiet until 105', function () {
+  var led = {};
+  eq(C.evaluate({ gp:null, star:'stay sober', ledger:led, days:98,  today:'2026-08-01' }).milestone, 98);
+  eq(C.evaluate({ gp:null, star:'stay sober', ledger:led, days:100, today:'2026-08-03' }).intensity, 'bold');
+  eq(C.evaluate({ gp:null, star:'stay sober', ledger:led, days:101, today:'2026-08-04' }), null, 'day 101 quiet');
+  eq(C.evaluate({ gp:null, star:'stay sober', ledger:led, days:105, today:'2026-08-08' }).milestone, 105);
+});
+t('L9 past a year the bold marks keep coming by hundreds: day 465', function () {
   var ev = C.evaluate({ gp:null, star:'stay sober', ledger:{}, days:465 });
-  eq(ev.milestone, 462);
+  eq([ev.milestone, ev.intensity], [465, 'bold']);
+});
+t('L9 the weekly rhythm still runs between bold marks: day 472 -> 469', function () {
+  var led = {};
+  C.evaluate({ gp:null, star:'stay sober', ledger:led, days:465, today:'2026-08-01' });
+  var ev = C.evaluate({ gp:null, star:'stay sober', ledger:led, days:472, today:'2026-08-08' });
+  eq([ev.milestone, ev.intensity], [469, 'step']);
 });
 
 /* ---------- L10 one event max ---------- */

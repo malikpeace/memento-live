@@ -205,7 +205,7 @@
     <!-- ================= DAYS HELD ================= -->
     <div class="fx-cell">
       <h2>Maintenance: the ledger of days (mt-1) / the first seven (mt-4)<span class="fxv" title="Approved by Malik 2026-08-13">&#128077;</span></h2>
-      <p class="fx-d">A rung every 7 days, forever (Malik 2026-08-13). Day 6 stays silent on purpose; day 87 belongs to the day-84 rung.</p>
+      <p class="fx-d">A rung every 7 days, forever; weekly rungs are QUIET steps, and the big round marks (100 / 200 / 300 / 365, then every 100) fire BOLD on their exact day (Malik 2026-08-13). Day 6 stays silent on purpose.</p>
       <div class="ph"><div class="fxst" id="days"></div></div>
       <div class="fx-ctl">
         <label><span>Day</span><input type="range" id="d-n" min="1" max="1500" value="100"><b class="fx-out" id="d-n-out">100</b></label>
@@ -256,7 +256,7 @@
 
     <!-- ================= THE GAP AND THE FALL ================= -->
     <div class="fx-cell">
-      <h2>Your picks: the gap (rf-gap) / the fall (rf-fall)<span class="fxv" title="Lukewarm / changed since his grade, re-grade at next review">&#129300;</span></h2>
+      <h2>Your picks: the gap (rf-gap) / the fall (rf-fall)<span class="fxv" title="Approved by Malik 2026-08-13">&#128077;</span></h2>
       <p class="fx-d">Same three numbers, two tellings: the distance closing, or the number they carry dropping. Toggle to compare.</p>
       <div class="ph"><div class="fxst" id="gf"></div></div>
       <div class="fx-ctl">
@@ -395,7 +395,7 @@
 
     <!-- ================= OPEN RECEIPTS ================= -->
     <div class="fx-cell">
-      <h2>Open: day N, the goal and the why (op-4)<span class="fxv" title="Lukewarm / changed since his grade, re-grade at next review">&#129300;</span></h2>
+      <h2>Open: day N, the goal and the why (op-4)<span class="fxv" title="Approved by Malik 2026-08-13">&#128077;</span></h2>
       <p class="fx-d">Words + counts only, since an open goal has no metric. Singular and plural both have to read like a human wrote them.</p>
       <div class="ph"><div class="fxst" id="op"></div></div>
       <div class="fx-ctl">
@@ -563,11 +563,14 @@
       + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
     fitHero($('days-hero'), 104, 34);
     var hit = ladderHit(n);
-    $('d-fire').innerHTML = hit === n
-      ? '<b>Day ' + fmt(n) + ' is a rung.</b> The ceremony fires, once ever, via the ledger.'
-      : (hit === null
-        ? 'Before day 7 nothing fires; the first deposit needs a week.'
-        : 'Day ' + fmt(n) + ' is quiet. Last rung was ' + fmt(hit) + '; the weekly rhythm decides, not the calendar.');
+    var isBold = C.BOLD_DAYS.indexOf(n) > -1 || (n >= 465 && (n - 365) % 100 === 0);
+    $('d-fire').innerHTML = isBold
+      ? '<b>Day ' + fmt(n) + ' is a BOLD rung.</b> The big round marks (100 / 200 / 300 / 365, then every 100) hit harder than the weekly steps.'
+      : (hit === n
+        ? '<b>Day ' + fmt(n) + ' is a rung.</b> A quiet weekly step; fires once ever, via the ledger.'
+        : (hit === null
+          ? 'Before day 7 nothing fires; the first deposit needs a week.'
+          : 'Day ' + fmt(n) + ' is quiet. Last rung was ' + fmt(hit) + '; the weekly rhythm decides, not the calendar.'));
   }
 
   /* ---------------- THE RECORD GRID ---------------- */
@@ -756,13 +759,14 @@
     var span = Math.abs(goal - start), closed = Math.abs(cur - start), open = Math.abs(goal - cur);
     var h;
     if (mode === 'fall') {
-      h = '<div class="cap" style="margin-bottom:10px">left of ' + esc(unit) + fmt(span) + '</div>'
-        + '<div class="n" id="gf-hero">' + esc(unit) + fmt(open) + '</div>'
-        + '<div class="sub" style="max-width:24ch">The number you carry. It only falls.</div>';
+      /* Malik 2026-08-13: "left of X" goes UNDER the number so it reads
+         "$8,000 left of $9,500"; the carry sentence is gone. */
+      h = '<div class="n" id="gf-hero">' + esc(unit) + fmt(open) + '</div>'
+        + '<div class="sub">left of ' + esc(unit) + fmt(span) + '</div>';
     } else {
       h = '<div class="n" id="gf-hero">' + esc(unit) + fmt(closed) + '</div>'
         + '<div class="sub" style="max-width:24ch">gone, of the ' + esc(unit) + fmt(span) + '.</div>'
-        + '<div class="cap">' + esc(unit) + fmt(open) + ' still open.</div>';
+        + '<div class="cap">' + esc(unit) + fmt(open) + ' to go.</div>';
     }
     $('gf').innerHTML = h + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
     fitHero($('gf-hero'), 88, 30);
