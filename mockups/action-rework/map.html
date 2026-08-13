@@ -1,0 +1,214 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Action map: bucket to screen</title>
+<style>
+@font-face { font-family:'Geist'; src:url('../fonts/geist-400.otf') format('opentype'); font-weight:400; font-display:swap; }
+@font-face { font-family:'Geist'; src:url('../fonts/geist-500.otf') format('opentype'); font-weight:500; font-display:swap; }
+@font-face { font-family:'Geist'; src:url('../fonts/geist-700.otf') format('opentype'); font-weight:700; font-display:swap; }
+:root{--ink:235,238,248;--hi:rgba(var(--ink),.96);--mid:rgba(var(--ink),.9);--lo:rgba(var(--ink),.5);
+--line:rgba(var(--ink),.22);--font:'Geist',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#0a0b0d;color:var(--hi);font-family:var(--font);-webkit-font-smoothing:antialiased}
+.page{padding:28px 24px 120px;min-width:fit-content}
+h1{font-size:24px;font-weight:700;letter-spacing:-.02em;margin:0 0 6px}
+.sub{color:rgba(var(--ink),.9);font-size:13.5px;margin:0 0 6px;max-width:88ch;line-height:1.55}
+.key{color:var(--lo);font-size:12px;margin:0 0 30px;max-width:88ch;line-height:1.6}
+.key b{color:var(--mid);font-weight:600}
+
+/* ── the tree: root left, elbowed hairlines right, keyboard-chart style ── */
+.tree{display:flex;align-items:center}
+.root{flex:none;background:rgba(235,238,248,.94);color:#0b0c10;font-weight:700;font-size:14px;
+  border-radius:10px;padding:12px 16px;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+ul{list-style:none;margin:0;padding-left:34px;position:relative}
+ul ul{padding-left:30px}
+li{position:relative;padding:7px 0 7px 26px}
+/* elbow + rail */
+li::before{content:'';position:absolute;left:0;top:0;bottom:0;border-left:1.5px solid var(--line)}
+li::after{content:'';position:absolute;left:0;top:50%;width:22px;border-top:1.5px solid var(--line)}
+li:first-child::before{top:50%}
+li:last-child::before{bottom:auto;height:50%}
+li:only-child::before{display:none}
+li:only-child::after{width:22px;left:0}
+.tree>ul>li::before{border-color:rgba(var(--ink),.3)}
+
+/* node types */
+.bucket{display:inline-block;font-weight:700;font-size:14.5px;background:rgba(22,25,31,.95);
+  border-radius:10px;padding:9px 14px;box-shadow:inset 0 1px 0 rgba(var(--ink),.1)}
+.variant{display:inline-flex;flex-direction:column;gap:2px}
+.variant b{font-size:13px;font-weight:700}
+.variant s{text-decoration:none;font-size:11px;color:var(--lo)}
+/* the leaf: one row = the person's whole path */
+.leaf{display:inline-flex;align-items:center;gap:8px;flex-wrap:nowrap;white-space:nowrap}
+.chip{font-size:11.5px;font-weight:600;border-radius:8px;padding:6px 10px;color:var(--mid);
+  background:rgba(22,25,31,.94);box-shadow:inset 0 1px 0 rgba(var(--ink),.08)}
+.chip small{display:block;font-size:9px;font-weight:700;letter-spacing:.02em;color:var(--lo);margin-bottom:1px}
+.chip--loop{background:rgba(235,238,248,.92);color:#0b0c10}
+.chip--loop small{color:rgba(11,12,16,.55)}
+.chip--gap{background:rgba(255,107,107,.12);color:#ffb3b3;box-shadow:inset 0 0 0 1.5px rgba(255,107,107,.35)}
+.chip--gap small{color:rgba(255,179,179,.8)}
+.trio{display:inline-flex;gap:5px;margin-left:2px}
+.trio i{font-style:normal;font-size:10px;font-weight:600;color:var(--lo);border-radius:7px;padding:5px 8px;
+  background:rgba(var(--ink),.05)}
+.foot{margin-top:34px;color:var(--lo);font-size:12px;max-width:88ch;line-height:1.6}
+.foot b{color:var(--mid);font-weight:600}
+</style></head><body><div class="page">
+<h1>The Action map</h1>
+<p class="sub">Every path from a Neutron Star to the exact screens that person lives in. Bucket, then the
+goal's shape (named in the sync box's own words, so you can see the two systems are one), then the leaf:
+their daily loop, their intensity control, when their goal number gets asked, and what each pillar shows them.</p>
+<p class="key"><b>Reading a leaf:</b> LOOP = the daily screen (from the action-rework gallery) · SIZE = the
+intensity mechanic · PULSE = when the goal number is asked and how · then the three faces their sync box
+deals: Clarity = standing, Action = today, Consistency = trajectory. <b>Red chips are the four honest gaps.</b></p>
+
+<div class="tree">
+<div class="root">Their<br>Neutron Star</div>
+<ul>
+  <li><span class="bucket">Money</span>
+    <ul>
+      <li><span class="variant"><b>Make it</b><s>a number and a deadline</s></span>
+        <ul><li><span class="leaf">
+          <span class="chip chip--loop"><small>LOOP</small>The statement</span>
+          <span class="chip"><small>SIZE</small>Notched rail / Three ways</span>
+          <span class="chip"><small>PULSE</small>weekly, Sundays, typed $</span>
+          <span class="trio"><i>C: $1,850 of $3,000</i><i>A: message 3 clients</i><i>Cn: arrival moves</i></span>
+        </span></li></ul></li>
+      <li><span class="variant"><b>Save it</b><s>a number, no deadline</s></span>
+        <ul><li><span class="leaf">
+          <span class="chip chip--loop"><small>LOOP</small>One hundred marks</span>
+          <span class="chip"><small>SIZE</small>Three ways</span>
+          <span class="chip"><small>PULSE</small>none: marks are logged transfers</span>
+          <span class="trio"><i>C: $1,850 banked</i><i>A: one transfer</i><i>Cn: the field fills</i></span>
+        </span></li></ul></li>
+      <li><span class="variant"><b>Kill debt</b><s>a number and a deadline, downward</s></span>
+        <ul><li><span class="leaf">
+          <span class="chip chip--loop"><small>LOOP</small>Descent (debt)</span>
+          <span class="chip"><small>SIZE</small>Three ways</span>
+          <span class="chip"><small>PULSE</small>weekly typed balance</span>
+          <span class="trio"><i>C: $4,180 left</i><i>A: today's payment move</i><i>Cn: the rail falls</i></span>
+        </span></li></ul></li>
+      <li><span class="variant"><b>Hold the floor</b><s>a rule to hold</s></span>
+        <ul><li><span class="leaf">
+          <span class="chip chip--loop"><small>LOOP</small>The corridor</span>
+          <span class="chip"><small>SIZE</small>the cushion width</span>
+          <span class="chip"><small>PULSE</small>Sunday confirm, typed total</span>
+          <span class="trio"><i>C: above the floor</i><i>A: 2 renewal invoices</i><i>Cn: weeks held</i></span>
+        </span></li></ul></li>
+    </ul></li>
+  <li><span class="bucket">Body</span>
+    <ul>
+      <li><span class="variant"><b>Gym rhythm</b><s>a rate to keep</s></span>
+        <ul><li><span class="leaf">
+          <span class="chip chip--loop"><small>LOOP</small>Seven channels / Sheet first</span>
+          <span class="chip"><small>SIZE</small>Growing block</span>
+          <span class="chip"><small>PULSE</small>none: sessions are the record</span>
+          <span class="trio"><i>C: 3x, week whole</i><i>A: push day</i><i>Cn: weeks kept</i></span>
+        </span></li></ul></li>
+      <li><span class="variant"><b>Weight down</b><s>a number and a deadline</s></span>
+        <ul><li><span class="leaf">
+          <span class="chip chip--loop"><small>LOOP</small>The weight book / Descent</span>
+          <span class="chip"><small>SIZE</small>Light / Steady / Hard</span>
+          <span class="chip"><small>PULSE</small>each morning they weigh, in-loop</span>
+          <span class="trio"><i>C: 242, 22 to go</i><i>A: 40 min walk</i><i>Cn: the 7-day line</i></span>
+        </span></li></ul></li>
+      <li><span class="variant"><b>Weight up</b><s>a number and a deadline, upward</s></span>
+        <ul><li><span class="leaf">
+          <span class="chip chip--gap"><small>GAP</small>weight book needs its GAIN direction</span>
+          <span class="chip"><small>PULSE</small>same morning ritual</span>
+        </span></li></ul></li>
+      <li><span class="variant"><b>Hold the weight</b><s>a rule to hold</s></span>
+        <ul><li><span class="leaf">
+          <span class="chip chip--gap"><small>GAP</small>no body-maintain screen (corridor fits, needs a Body context)</span>
+          <span class="chip"><small>PULSE</small>Friday check, typed</span>
+        </span></li></ul></li>
+      <li><span class="variant"><b>Race block</b><s>an event to reach</s></span>
+        <ul><li><span class="leaf">
+          <span class="chip chip--loop"><small>LOOP</small>The tape</span>
+          <span class="chip"><small>SIZE</small>Growing block</span>
+          <span class="chip"><small>PULSE</small>none: printed lines are the record</span>
+          <span class="trio"><i>C: 93 of 120</i><i>A: long run 16k</i><i>Cn: the tape feeds</i></span>
+        </span></li></ul></li>
+    </ul></li>
+  <li><span class="bucket">Audience</span>
+    <ul>
+      <li><span class="variant"><b>Grow the channel</b><s>a number, no deadline</s></span>
+        <ul><li><span class="leaf">
+          <span class="chip chip--loop"><small>LOOP</small>The statement (posted bar)</span>
+          <span class="chip"><small>SIZE</small>Three ways</span>
+          <span class="chip"><small>PULSE</small>weekly typed subs, 0 is real</span>
+          <span class="trio"><i>C: 1,240 subs</i><i>A: script one video</i><i>Cn: posts per week</i></span>
+        </span></li></ul></li>
+      <li><span class="variant"><b>Posting rhythm</b><s>a rate to keep</s></span>
+        <ul><li><span class="leaf">
+          <span class="chip chip--loop"><small>LOOP</small>Seven channels</span>
+          <span class="chip"><small>SIZE</small>Three ways</span>
+          <span class="chip"><small>PULSE</small>weekly typed subs</span>
+          <span class="trio"><i>C: 3 posts, week whole</i><i>A: edit today</i><i>Cn: weeks kept</i></span>
+        </span></li></ul></li>
+    </ul></li>
+  <li><span class="bucket">School &amp; career</span>
+    <ul>
+      <li><span class="variant"><b>GPA / cert</b><s>an event to reach, graded</s></span>
+        <ul><li><span class="leaf">
+          <span class="chip chip--loop"><small>LOOP</small>The tape / Sheet first</span>
+          <span class="chip"><small>SIZE</small>Growing block</span>
+          <span class="chip"><small>PULSE</small>only when results exist</span>
+          <span class="trio"><i>C: 3.4, next reading May</i><i>A: study 2h</i><i>Cn: 41 hours banked</i></span>
+        </span></li></ul></li>
+      <li><span class="variant"><b>Job hunt</b><s>a number and a deadline</s></span>
+        <ul><li><span class="leaf">
+          <span class="chip chip--loop"><small>LOOP</small>The statement (applications)</span>
+          <span class="chip"><small>SIZE</small>Keys / Notched rail</span>
+          <span class="chip"><small>PULSE</small>weekly: interviews landed</span>
+          <span class="trio"><i>C: 34 of 60 sent</i><i>A: 3 applications</i><i>Cn: arrival moves</i></span>
+        </span></li></ul></li>
+    </ul></li>
+  <li><span class="bucket">Screen time</span>
+    <ul>
+      <li><span class="variant"><b>Nightly ceiling</b><s>a rule to hold</s></span>
+        <ul><li><span class="leaf">
+          <span class="chip chip--loop"><small>LOOP</small>Ceiling / The statement</span>
+          <span class="chip"><small>SIZE</small>which hour: 7:30 / 8 / 9</span>
+          <span class="chip"><small>PULSE</small>nightly, typed from their report</span>
+          <span class="trio"><i>C: 1h 40 avg, aim 2h</i><i>A: drawer at 8pm</i><i>Cn: nights under</i></span>
+        </span></li></ul></li>
+    </ul></li>
+  <li><span class="bucket">Quitting</span>
+    <ul>
+      <li><span class="variant"><b>Clean break</b><s>a rule to hold, binary</s></span>
+        <ul><li><span class="leaf">
+          <span class="chip chip--loop"><small>LOOP</small>Days owned</span>
+          <span class="chip"><small>SIZE</small>none, by design: the escape door</span>
+          <span class="chip"><small>PULSE</small>none: days are arithmetic</span>
+          <span class="trio"><i>C: 58 of 90</i><i>A: not tonight</i><i>Cn: total owned</i></span>
+        </span></li></ul></li>
+    </ul></li>
+  <li><span class="bucket">Ship the project</span>
+    <ul>
+      <li><span class="variant"><b>Blockers + sessions</b><s>an event to reach</s></span>
+        <ul><li><span class="leaf">
+          <span class="chip chip--loop"><small>LOOP</small>The tape + statement (blockers)</span>
+          <span class="chip"><small>SIZE</small>Pressure hold / Three ways</span>
+          <span class="chip"><small>PULSE</small>their blocker list, checked off</span>
+          <span class="trio"><i>C: 9 of 14 cleared</i><i>A: one deep session</i><i>Cn: sessions printed</i></span>
+        </span></li></ul></li>
+      <li><span class="variant"><b>Goal reached</b><s>the loop closes</s></span>
+        <ul><li><span class="leaf">
+          <span class="chip chip--gap"><small>GAP</small>the FINISH ceremony is still unbuilt</span>
+        </span></li></ul></li>
+    </ul></li>
+  <li><span class="bucket" style="opacity:.55">Everything else</span>
+    <ul>
+      <li><span class="variant"><b>Open practice</b><s>nothing to count</s></span>
+        <ul><li><span class="leaf">
+          <span class="chip chip--gap"><small>GAP</small>open-practice loop died in the cull; sync box covers the glance</span>
+        </span></li></ul></li>
+    </ul></li>
+</ul>
+</div>
+
+<p class="foot"><b>How the systems join:</b> the shape under each variant is the sync box's own taxonomy
+(a number and a deadline / a rule to hold / a rate to keep / an event to reach / nothing to count). The sync
+box deals three faces at a glance; tapping Action walks into the LOOP screen on this map. Same machinery,
+two zoom levels. <b>The four red gaps</b> are the whole remaining distance between this map and
+"foundation-complete for the seven buckets."</p>
+</div></body></html>
