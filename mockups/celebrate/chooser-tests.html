@@ -186,19 +186,23 @@ t('L11 a real mark still outranks the first move', function () {
   eq(ev.kind, 'step');
 });
 
-/* ---------- L9 day ladder ---------- */
-t('L9 day 100 fires the 100 rung once', function () {
+/* ---------- L9 weekly day rhythm (Malik 2026-08-13: every 7 days) ---------- */
+t('L9 day 14 fires the 14 rung once', function () {
   var led = {};
-  var ev = C.evaluate({ gp:null, star:'stay sober', ledger:led, days:100, today:'2026-08-09' });
-  eq([ev.family, ev.kind, ev.milestone], ['mt', 'days', 100]);
-  eq(C.evaluate({ gp:null, star:'stay sober', ledger:led, days:101, today:'2026-08-10' }), null, 'day 101');
+  var ev = C.evaluate({ gp:null, star:'stay sober', ledger:led, days:14, today:'2026-08-09' });
+  eq([ev.family, ev.kind, ev.milestone], ['mt', 'days', 14]);
+  eq(C.evaluate({ gp:null, star:'stay sober', ledger:led, days:15, today:'2026-08-10' }), null, 'day 15 (same rung)');
 });
 t('L9 day 6 fires nothing', function () {
   eq(C.evaluate({ gp:null, star:'stay sober', ledger:{}, days:6 }), null);
 });
-t('L9 past a year it steps by hundreds: day 465', function () {
+t('L9 day 100 belongs to the 98 rung', function () {
+  var ev = C.evaluate({ gp:null, star:'stay sober', ledger:{}, days:100 });
+  eq(ev.milestone, 98);
+});
+t('L9 the rhythm never stops: day 465 -> rung 462', function () {
   var ev = C.evaluate({ gp:null, star:'stay sober', ledger:{}, days:465 });
-  eq(ev.milestone, 465 >= 465 ? 465 - (465 - 365) % 100 : 0);
+  eq(ev.milestone, 462);
 });
 
 /* ---------- L10 one event max ---------- */

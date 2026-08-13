@@ -1,4 +1,4 @@
-# THE DAILY REWARD — MERGE CHECKLIST
+# DAILY REWARD MERGE CHECKLIST
 
 Status: PARKED, approved by Malik 2026-08-13. Do not merge until he says merge.
 This file is the complete instruction set for wiring the daily reward into

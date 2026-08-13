@@ -1,6 +1,6 @@
-# THE CELEBRATIONS (milestone ceremonies) — MERGE CHECKLIST
+# MILESTONE / CELEBRATIONS MERGE CHECKLIST
 
-Status: PARKED. Companion to MERGE-CHECKLIST.md (the daily reward). Do not
+Status: PARKED. Companion to DAILY-REWARD-MERGE-CHECKLIST.md. Do not
 merge until Malik says merge. Written so any agent can execute it cold.
 Gallery: mockups/celebrate/index.html →
 https://malikpeace.github.io/memento-live/mockups/celebrate/
@@ -22,9 +22,11 @@ families and each family answers "what did you just do" differently:
 - `refinements`   (rf) — the four cross-family screens Malik picked
   (The Gap, The Fall, The Record, The Card Takes It)
 - `open`          (op) — PARKED, DO NOT WIRE (no honest trigger exists;
-  they'd need AI-detected shifts in reflections, which isn't built)
-- `evolution`     (ev) — NOT ceremonies. The card-history track (grain/rim).
-  Separate system, separate merge. Skip entirely here.
+  they'd need AI-detected shifts in reflections, which isn't built).
+  op-3 was REJECTED outright 2026-08-13; op-1/op-2/op-5 he likes.
+- `evolution`     (ev) — DELETED at Malik's ask 2026-08-13 ("they're bad,
+  can't see myself using them"). Page removed from the gallery. Nothing to
+  merge, ever, unless he restarts that track himself.
 
 Source of truth:
 - Screens: `mockups/celebrate/frag/*.html` assembled by `build.py` from
@@ -70,12 +72,14 @@ One reward per completion, highest tier wins (shared with the daily):
 ```
 if goalReached(goal):          BIG GOAL ceremony (the huge one)
 else if chooser fires:         the goal-type ceremony for that event
-else:                          the daily reward (see MERGE-CHECKLIST.md)
+else:                          the daily reward (see DAILY-REWARD-MERGE-CHECKLIST.md)
 ```
 
 chooser.js decides "fires" from real state:
 - fifths of a numeric target crossed (never percent-of-nothing)
-- the day ladder: 7 / 30 / 50 / 100 / 200 / 365
+- day-count goals: a rung EVERY 7 DAYS, forever (Malik 2026-08-13; replaced
+  the old sparse 7/30/50/100/200/365 ladder; DAY_STEP in chooser.js)
+- unit-count totals (total runs, sessions): a rung EVERY 10 (COUNT_STEP)
 - records broken (2% margin, 7-day cooldown so records can't spam)
 - the first-move moment (their first ever logged action)
 - multiple qualifying events on one day COALESCE to the furthest one
@@ -141,7 +145,7 @@ Phase 4 — after merge
 - The `open` family (parked, no honest trigger).
 - The `evolution` family (card history: grain/rim laps; separate system that
   composes under skins; its own plan lives in memory + UNLOCK-THEMES notes).
-- The daily reward (its own checklist, MERGE-CHECKLIST.md).
+- The daily reward (its own checklist, DAILY-REWARD-MERGE-CHECKLIST.md).
 - Any new screen, colour, font, or layout language not already in the
   gallery (no-new-fonts-colors-ever law).
 

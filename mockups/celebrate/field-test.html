@@ -108,6 +108,7 @@
   .fxrc span{font-size:12.5px;color:var(--text-lo)}
 
   .fx-idle{font-size:13px;color:var(--text-lo);max-width:24ch;line-height:1.5}
+.fxv{font-size:15px;margin-left:9px;vertical-align:1px}
 </style>
 </head><body data-accent="cyan">
 <div class="bar">
@@ -118,7 +119,7 @@
 </div>
 <div class="fx-wrap">
   <h1>Fuck with the values</h1>
-  <p class="fx-sub">Every phone below is driven by the same logic file the app will use (chooser.js), not by hand-placed pixels. Change the numbers and watch the layout solve itself. The line under each phone tells you whether a celebration would actually FIRE at that state, because part of being dynamic is knowing when to stay silent. Every approved screen with numbers in it now has its own panel, named after its gallery screen, 22 in all. The only ones without a panel are pure words or motion: ms-1's colour flood, ms-4's decision, and the card's M pop.</p>
+  <p class="fx-sub">Every phone below is driven by the same logic file the app will use (chooser.js), not by hand-placed pixels. Change the numbers and watch the layout solve itself. The line under each phone tells you whether a celebration would actually FIRE at that state, because part of being dynamic is knowing when to stay silent. Every approved screen with numbers in it now has its own panel, named after its gallery screen, 21 in all. The only ones without a panel are pure words or motion: ms-1's colour flood, ms-4's decision, and the card's M pop. (op-3 was cut by Malik 2026-08-13.)</p>
 
   <div class="fx-presets" id="presets">
     <button data-p="users">100 users, day 216</button>
@@ -135,7 +136,7 @@
 
     <!-- ================= THE ROAD ================= -->
     <div class="fx-cell">
-      <h2>Quantity: the marker posts (qu-1) / the slider down (qd-1)</h2>
+      <h2>Quantity: the marker posts (qu-1) / the slider down (qd-1)<span class="fxv" title="Approved by Malik 2026-08-13">&#128077;</span></h2>
       <p class="fx-d">One renderer, both directions. Goal below start = the slider down; above = the posts. Marks come from chooser.milestones(), never hand-picked.</p>
       <div class="ph"><div class="fxst" id="road"></div></div>
       <div class="fx-ctl">
@@ -150,7 +151,7 @@
 
     <!-- ================= FOUR FIGURES ================= -->
     <div class="fx-cell">
-      <h2>Quantity up, no target: four figures (qu-2)</h2>
+      <h2>Quantity up, no target: four figures (qu-2)<span class="fxv" title="Approved by Malik 2026-08-13">&#128077;</span></h2>
       <p class="fx-d">No goal number, so the win is the digit itself. Fires only the day the number grows a digit.</p>
       <div class="ph"><div class="fxst" id="figs"></div></div>
       <div class="fx-ctl">
@@ -163,7 +164,7 @@
 
     <!-- ================= THE RECORD BOARD ================= -->
     <div class="fx-cell">
-      <h2>No-target records: the record board (qu-5) / the record book (qd-2)</h2>
+      <h2>No-target records: the record board (qu-5) / the record book (qd-2)<span class="fxv" title="Approved by Malik 2026-08-13">&#128077;</span></h2>
       <p class="fx-d">The only thing to beat is themselves. A new best must clear the old one by 2% (or a whole unit), at most once a week.</p>
       <div class="ph"><div class="fxst" id="rec"></div></div>
       <div class="fx-ctl">
@@ -177,7 +178,7 @@
 
     <!-- ================= EARLY BY ================= -->
     <div class="fx-cell">
-      <h2>Deadlines: the days you will not need (qu-3) / early by (ms-3)</h2>
+      <h2>Deadlines: the days you will not need (qu-3) / early by (ms-3)<span class="fxv" title="Approved by Malik 2026-08-13">&#128077;</span></h2>
       <p class="fx-d">A deadline goal finished early. The celebration is the plain subtraction.</p>
       <div class="ph"><div class="fxst" id="early"></div></div>
       <div class="fx-ctl">
@@ -189,8 +190,8 @@
 
     <!-- ================= THE COUNT ================= -->
     <div class="fx-cell">
-      <h2>Frequency: Total runs (fr-3)</h2>
-      <p class="fx-d">The big number has to survive 5 and 5,000,000. The font fits itself; the ceremony fires on ladder rungs only.</p>
+      <h2>Frequency: Total runs (fr-3)<span class="fxv" title="Approved by Malik 2026-08-13">&#128077;</span></h2>
+      <p class="fx-d">The big number has to survive 5 and 5,000,000. The font fits itself; the ceremony fires every 10 (every 10 runs, 10 sessions...).</p>
       <div class="ph"><div class="fxst" id="count"></div></div>
       <div class="fx-ctl">
         <label><span>Total</span><input type="range" id="c-n" min="1" max="2000" value="50"><b class="fx-out" id="c-n-out">50</b></label>
@@ -203,8 +204,8 @@
 
     <!-- ================= DAYS HELD ================= -->
     <div class="fx-cell">
-      <h2>Maintenance: the ledger of days (mt-1) / the first seven (mt-4)</h2>
-      <p class="fx-d">The ladder is 7 / 30 / 50 / 100 / 200 / 365, then every 100. Day 6 and day 87 stay silent on purpose.</p>
+      <h2>Maintenance: the ledger of days (mt-1) / the first seven (mt-4)<span class="fxv" title="Approved by Malik 2026-08-13">&#128077;</span></h2>
+      <p class="fx-d">A rung every 7 days, forever (Malik 2026-08-13). Day 6 stays silent on purpose; day 87 belongs to the day-84 rung.</p>
       <div class="ph"><div class="fxst" id="days"></div></div>
       <div class="fx-ctl">
         <label><span>Day</span><input type="range" id="d-n" min="1" max="1500" value="100"><b class="fx-out" id="d-n-out">100</b></label>
@@ -215,7 +216,7 @@
 
     <!-- ================= HELD TO THE DATE ================= -->
     <div class="fx-cell">
-      <h2>Maintenance: held to the date (mt-2)</h2>
+      <h2>Maintenance: held to the date (mt-2)<span class="fxv" title="Approved by Malik 2026-08-13">&#128077;</span></h2>
       <p class="fx-d">A hold with a finish line. The goal closes the day the deadline passes with the line unbroken.</p>
       <div class="ph"><div class="fxst" id="mt2"></div></div>
       <div class="fx-ctl">
@@ -228,7 +229,7 @@
 
     <!-- ================= THE HARD ONES ================= -->
     <div class="fx-cell">
-      <h2>Maintenance: the hard ones (mt-3)</h2>
+      <h2>Maintenance: the hard ones (mt-3)<span class="fxv" title="Approved by Malik 2026-08-13">&#128077;</span></h2>
       <p class="fx-d">Only exists when hard days were REALLY logged (the log is offered on quit-a-habit goals only). The list windows to the last few; it can never overflow.</p>
       <div class="ph"><div class="fxst" id="mt3"></div></div>
       <div class="fx-ctl">
@@ -241,7 +242,7 @@
 
     <!-- ================= THE ENGINE ================= -->
     <div class="fx-cell">
-      <h2>Milestone: the engine (ms-2)</h2>
+      <h2>Milestone: the engine (ms-2)<span class="fxv" title="Approved by Malik 2026-08-13">&#128077;</span></h2>
       <p class="fx-d">A binary event with the quantity engine underneath. The counts are whatever they actually logged, never invented.</p>
       <div class="ph"><div class="fxst" id="eng"></div></div>
       <div class="fx-ctl">
@@ -255,7 +256,7 @@
 
     <!-- ================= THE GAP AND THE FALL ================= -->
     <div class="fx-cell">
-      <h2>Your picks: the gap (rf-gap) / the fall (rf-fall)</h2>
+      <h2>Your picks: the gap (rf-gap) / the fall (rf-fall)<span class="fxv" title="Lukewarm / changed since his grade, re-grade at next review">&#129300;</span></h2>
       <p class="fx-d">Same three numbers, two tellings: the distance closing, or the number they carry dropping. Toggle to compare.</p>
       <div class="ph"><div class="fxst" id="gf"></div></div>
       <div class="fx-ctl">
@@ -270,7 +271,7 @@
 
     <!-- ================= THEN VS NOW ================= -->
     <div class="fx-cell">
-      <h2>Open: then vs now (op-1)</h2>
+      <h2>Open: then vs now (op-1)<span class="fxv" title="Approved by Malik 2026-08-13">&#128077;</span></h2>
       <p class="fx-d">Two of their own entries held apart. Fires first at day 30, then on the ladder, never a surprise year later.</p>
       <div class="ph"><div class="fxst" id="op1"></div></div>
       <div class="fx-ctl">
@@ -281,7 +282,7 @@
 
     <!-- ================= THE RECORD GRID ================= -->
     <div class="fx-cell">
-      <h2>Your picks: the record (rf-rec)</h2>
+      <h2>Your picks: the record (rf-rec)<span class="fxv" title="Approved by Malik 2026-08-13">&#128077;</span></h2>
       <p class="fx-d">The grid is a WINDOW: always the last 12 weeks at most, older history becomes one quiet line. It can never grow off the screen.</p>
       <div class="ph"><div class="fxst" id="grid"></div></div>
       <div class="fx-ctl">
@@ -292,7 +293,7 @@
 
     <!-- ================= WEEK CHIPS ================= -->
     <div class="fx-cell">
-      <h2>Frequency: week chips (fr-4)</h2>
+      <h2>Frequency: week chips (fr-4)<span class="fxv" title="Approved by Malik 2026-08-13">&#128077;</span></h2>
       <p class="fx-d">Also windowed: the last 8 weeks as chips, everything older summarised. Tolerant by design, a missed week is a dimmer chip, not a broken streak.</p>
       <div class="ph"><div class="fxst" id="chips"></div></div>
       <div class="fx-ctl">
@@ -303,7 +304,7 @@
 
     <!-- ================= THE NUMBER YOU CARRY ================= -->
     <div class="fx-cell">
-      <h2>Quantity down: the number you carry (qd-3)</h2>
+      <h2>Quantity down: the number you carry (qd-3)<span class="fxv" title="Approved by Malik 2026-08-13">&#128077;</span></h2>
       <p class="fx-d">The threshold moment: the first morning the number is under the line they named. Fires once, only when it is actually true.</p>
       <div class="ph"><div class="fxst" id="qd3"></div></div>
       <div class="fx-ctl">
@@ -317,7 +318,7 @@
 
     <!-- ================= THE LOAN ================= -->
     <div class="fx-cell">
-      <h2>Quantity down: the falling balance (qd-4)</h2>
+      <h2>Quantity down: the falling balance (qd-4)<span class="fxv" title="Approved by Malik 2026-08-13">&#128077;</span></h2>
       <p class="fx-d">Debt in its own numbers: what is left, what closed, and the payments that did it.</p>
       <div class="ph"><div class="fxst" id="qd4"></div></div>
       <div class="fx-ctl">
@@ -331,7 +332,7 @@
 
     <!-- ================= THE AVERAGE COMING DOWN ================= -->
     <div class="fx-cell">
-      <h2>Quantity down: the average coming down (qd-5)</h2>
+      <h2>Quantity down: the average coming down (qd-5)<span class="fxv" title="Approved by Malik 2026-08-13">&#128077;</span></h2>
       <p class="fx-d">Screen time told as time: where the daily average was, where it is now, and the time handed back.</p>
       <div class="ph"><div class="fxst" id="qd5"></div></div>
       <div class="fx-ctl">
@@ -344,7 +345,7 @@
 
     <!-- ================= RUNS THIS WEEK ================= -->
     <div class="fx-cell">
-      <h2>Frequency: runs this week (fr-1)</h2>
+      <h2>Frequency: runs this week (fr-1)<span class="fxv" title="Approved by Malik 2026-08-13">&#128077;</span></h2>
       <p class="fx-d">The week as seven days, the ones that ran lit. Tolerant: the number is the win, not a streak.</p>
       <div class="ph"><div class="fxst" id="fr1"></div></div>
       <div class="fx-ctl">
@@ -356,7 +357,7 @@
 
     <!-- ================= WEEKS AT RATE ================= -->
     <div class="fx-cell">
-      <h2>Frequency: weeks at your rate (fr-2 / fr-5)</h2>
+      <h2>Frequency: weeks at your rate (fr-2 / fr-5)<span class="fxv" title="Approved by Malik 2026-08-13">&#128077;</span></h2>
       <p class="fx-d">The run of weeks that held the rate, plus the total count that run produced.</p>
       <div class="ph"><div class="fxst" id="fr2"></div></div>
       <div class="fx-ctl">
@@ -369,7 +370,7 @@
 
     <!-- ================= THE MINUTE ================= -->
     <div class="fx-cell">
-      <h2>Milestone: the minute (ms-5)</h2>
+      <h2>Milestone: the minute (ms-5)<span class="fxv" title="Approved by Malik 2026-08-13">&#128077;</span></h2>
       <p class="fx-d">The minute gets kept, not only the day, next to what the years underneath it cost.</p>
       <div class="ph"><div class="fxst" id="ms5"></div></div>
       <div class="fx-ctl">
@@ -383,7 +384,7 @@
 
     <!-- ================= WHAT YOU WROTE ================= -->
     <div class="fx-cell">
-      <h2>Open: the day count and the words (op-2 / op-5)</h2>
+      <h2>Open: the day count and the words (op-2 / op-5)<span class="fxv" title="Approved by Malik 2026-08-13">&#128077;</span></h2>
       <p class="fx-d">A day count over their own written line. Under a year reads as op-2; a year or more becomes "a year, still open" (op-5).</p>
       <div class="ph"><div class="fxst" id="op2"></div></div>
       <div class="fx-ctl">
@@ -392,21 +393,9 @@
       </div>
     </div>
 
-    <!-- ================= PROOF NUMBER N ================= -->
-    <div class="fx-cell">
-      <h2>Open: proof number N (op-3)</h2>
-      <p class="fx-d">One logged moment plus the count of moments like it. The count and the first date are the only numbers an open goal honestly has.</p>
-      <div class="ph"><div class="fxst" id="op3p"></div></div>
-      <div class="fx-ctl">
-        <label><span>Proof count</span><input type="range" id="p3-n" min="1" max="300" value="14"><b class="fx-out" id="p3-n-out">14</b></label>
-        <label><span>First, days ago</span><input type="range" id="p3-first" min="1" max="900" value="145"><b class="fx-out" id="p3-first-out">145</b></label>
-        <div class="fx-fire" id="p3-fire"></div>
-      </div>
-    </div>
-
     <!-- ================= OPEN RECEIPTS ================= -->
     <div class="fx-cell">
-      <h2>Open: day N, the goal and the why (op-4)</h2>
+      <h2>Open: day N, the goal and the why (op-4)<span class="fxv" title="Lukewarm / changed since his grade, re-grade at next review">&#129300;</span></h2>
       <p class="fx-d">Words + counts only, since an open goal has no metric. Singular and plural both have to read like a human wrote them.</p>
       <div class="ph"><div class="fxst" id="op"></div></div>
       <div class="fx-ctl">
@@ -474,7 +463,7 @@
     var done = Math.abs(cur - start), frac = Math.max(0, Math.min(1, done / span));
     var remaining = Math.abs(goal - cur);
     var h = '';
-    h += '<div class="fx-heroline"><span class="n" id="road-hero">' + fmt(cur) + '</span>' + (dir === 'down' && unit ? '<span class="of">' + esc(unit.split(' ')[0]) + '</span>' : '') + '</div>';
+    h += '<div class="fx-heroline"><span class="n" id="road-hero">' + fmt(cur) + '</span>' + (unit ? '<span class="of">' + esc(unit.split(' ')[0]) + '</span>' : '') + '</div>';
     if (dir === 'up') {
       /* marker posts: heights climb across the passed set */
       var cells = '', labels = '';
@@ -505,8 +494,7 @@
         return cx(N - 1);
       };
       h += '<div class="fxq-axis"><div class="fxq-gone" style="width:' + xFor(cur).toFixed(1) + '%"></div><div class="fxq-marks">' + cells + '</div><div class="fxq-labels">' + labels + '</div></div>';
-      h += '<div class="sub"><b>' + days + ' days</b> made these ' + fmt(cur) + '.</div>';
-      h += '<div class="cap">' + fmt(remaining) + ' still open.</div>';
+      h += '<div class="cap">' + fmt(remaining) + ' to go.</div>';
     } else {
       /* the slider down */
       var inner = '<div class="fxsl-track"></div><div class="fxsl-gone" style="width:' + (frac * 100).toFixed(1) + '%"></div>';
@@ -541,11 +529,9 @@
   }
 
   /* ---------------- THE COUNT ---------------- */
+  /* Malik 2026-08-13: day rungs come every 7 days, forever. */
   function ladderHit(n){
-    var hit = null;
-    C.DAY_LADDER.forEach(function(r){ if (n >= r) hit = r; });
-    if (n >= 365) hit = 365 + Math.floor((n - 365) / 100) * 100;
-    return hit;
+    return n >= C.DAY_STEP ? n - (n % C.DAY_STEP) : null;
   }
   function count(){
     var n = +$('c-exact').value || 1, word = $('c-word').value.trim() || 'runs', days = +$('c-days').value;
@@ -557,11 +543,11 @@
       + '<div class="sub" style="max-width:24ch"><b>' + days + ' ' + plural(days, 'day', 'days') + '</b> of showing up made this number possible.</div>'
       + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
     fitHero($('count-hero'), 104, 34);
-    var hit = ladderHit(n), next = null;
-    for (var i = 0; i < C.DAY_LADDER.length; i++) if (C.DAY_LADDER[i] > n) { next = C.DAY_LADDER[i]; break; }
-    if (next === null) next = (365 + Math.floor((n - 365) / 100) * 100) + 100;
+    /* Malik 2026-08-13: unit totals fire every 10 (every 10 runs, sessions...). */
+    var hit = n >= C.COUNT_STEP ? n - (n % C.COUNT_STEP) : null;
+    var next = (Math.floor(n / C.COUNT_STEP) + 1) * C.COUNT_STEP;
     $('c-fire').innerHTML = hit === n
-      ? '<b>' + fmt(n) + ' is a rung.</b> This screen fires today.'
+      ? '<b>' + fmt(n) + ' is a rung.</b> This screen fires today, every ' + C.COUNT_STEP + ' ' + esc(word) + '.'
       : 'Not a rung: the screen stays silent at ' + fmt(n) + '. Next ceremony at <b>' + fmt(next) + '</b>.';
   }
 
@@ -581,7 +567,7 @@
       ? '<b>Day ' + fmt(n) + ' is a rung.</b> The ceremony fires, once ever, via the ledger.'
       : (hit === null
         ? 'Before day 7 nothing fires; the first deposit needs a week.'
-        : 'Day ' + fmt(n) + ' is quiet. Last rung was ' + fmt(hit) + '; the ladder decides, not the calendar.');
+        : 'Day ' + fmt(n) + ' is quiet. Last rung was ' + fmt(hit) + '; the weekly rhythm decides, not the calendar.');
   }
 
   /* ---------------- THE RECORD GRID ---------------- */
@@ -775,8 +761,8 @@
         + '<div class="sub" style="max-width:24ch">The number you carry. It only falls.</div>';
     } else {
       h = '<div class="n" id="gf-hero">' + esc(unit) + fmt(closed) + '</div>'
-        + '<div class="sub" style="max-width:24ch">closed, of the ' + esc(unit) + fmt(span) + ' between you and it.</div>'
-        + '<div class="cap">' + esc(unit) + fmt(open) + ' still open. Both get said.</div>';
+        + '<div class="sub" style="max-width:24ch">gone, of the ' + esc(unit) + fmt(span) + '.</div>'
+        + '<div class="cap">' + esc(unit) + fmt(open) + ' still open.</div>';
     }
     $('gf').innerHTML = h + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
     fitHero($('gf-hero'), 88, 30);
@@ -796,8 +782,8 @@
       + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
     var hit = ladderHit(d);
     $('p-fire').innerHTML = hit === d
-      ? '<b>Day ' + d + ' is a rung:</b> the then-vs-now moment fires (first ever at day 30).'
-      : (d < 30 ? 'Before day 30 there is no "then" worth holding up; silent.' : 'Day ' + d + ' is not a rung; the pair waits for ' + 'the next one.');
+      ? '<b>Day ' + d + ' is a rung:</b> the then-vs-now moment fires (first ever at day 28, the four-week mark).'
+      : (d < 28 ? 'Before day 28 there is no "then" worth holding up; silent.' : 'Day ' + d + ' is not a rung; the pair waits for ' + 'the next one.');
   }
 
   /* ---------------- durations ---------------- */
@@ -837,7 +823,7 @@
       '<div class="fx-heroline"><span class="n" id="qd4-hero">$' + fmt(cur) + '</span></div>'
       + '<div class="sub" style="max-width:25ch">left on the loan.' + (thresh <= start ? ' Under $' + fmt(thresh) + ' for the first time.' : '') + '</div>'
       + '<div class="cap" style="margin-top:14px">$' + fmt(closed) + ' closed. $' + fmt(cur) + ' open.</div>'
-      + '<div class="cap">' + fmt(pay) + ' ' + plural(pay,'payment','payments') + ' over ' + fmt(mon) + ' ' + plural(mon,'month','months') + '. It has not risen once.</div>'
+      + '<div class="cap">' + fmt(pay) + ' ' + plural(pay,'payment','payments') + ' over ' + fmt(mon) + ' ' + plural(mon,'month','months') + '.</div>'
       + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
     fitHero($('qd4-hero'), 74, 28);
     $('q4-fire').innerHTML = 'Fires on the road\'s fifths like any down goal; the "under $' + fmt(thresh) + '" line appears only when a round threshold was genuinely crossed.';
@@ -858,7 +844,7 @@
       '<div class="n" id="qd5-hero">' + dur(now) + '</div>'
       + '<div class="sub">a day. Your average this week.</div>'
       + '<div class="fxrc" style="margin-top:22px"><div><b>' + dur(backWeek) + '</b><span>back this week</span></div></div>'
-      + '<div class="cap" style="margin-top:16px">' + dur(then) + ' a day, ' + w + ' ' + plural(w,'week','weeks') + ' ago. ' + dur(now) + ' now.</div>'
+      + '<div class="cap" style="margin-top:16px">' + dur(then) + ' a day, ' + w + ' ' + plural(w,'week','weeks') + ' ago.</div>'
       + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
     fitHero($('qd5-hero'), 88, 30);
     $('q5-fire').innerHTML = 'The hours back are ARITHMETIC on their own logged averages, never invented. Fires on new-low records (the 2% rule, decimal-safe).';
@@ -868,14 +854,14 @@
   function fr1(){
     var n = +$('f1-n').value, word = $('f1-word').value.trim() || 'Runs';
     $('f1-n-out').textContent = n;
-    var days = ['M','T','W','T','F','S','S'];
-    /* deterministic spread: first n days lit */
-    var row = days.map(function(dch, i){
+    /* no weekday letters (Malik 2026-08-13: simpler + universal, people log
+       whenever): just n lit slots of 7 */
+    var row = [0,1,2,3,4,5,6].map(function(i){
       var on = i < n;
       return '<div style="flex:1;text-align:center">'
         + '<div style="width:26px;height:26px;margin:0 auto;border-radius:8px;background:' + (on ? 'rgba(var(--accent-rgb),.22)' : 'rgba(var(--ink),.07)') + ';box-shadow:inset 0 1px 0 rgba(var(--ink),.06);display:flex;align-items:center;justify-content:center">'
         + (on ? '<i style="display:block;width:7px;height:7px;border-radius:50%;background:var(--accent)"></i>' : '')
-        + '</div><div style="font-size:10px;color:var(--text-lo);margin-top:5px">' + dch + '</div></div>';
+        + '</div></div>';
     }).join('');
     $('fr1').innerHTML =
       '<div class="n n--hero">' + n + '</div>'
@@ -923,33 +909,19 @@
     var d = +$('p2-days').value;
     $('p2-days-out').textContent = fmt(d);
     var yearMode = d >= 365;
+    /* Malik 2026-08-13 layout: count, "days since you wrote...", THE WORDS,
+       then the date quietly under the words. */
     $('op2').innerHTML =
-      (yearMode ? '<div class="cap" style="margin-bottom:8px">Written ' + dateBack(d) + ', last year</div>' : '')
-      + '<div class="n" id="op2-hero">' + fmt(d) + '</div>'
-      + '<div class="sub">' + plural(d,'day','days') + ' since you wrote ' + (yearMode ? 'that' : 'it') + '.</div>'
-      + (!yearMode ? '<div class="cap" style="margin:18px 0 8px">What you wrote on ' + dateBack(d) + '</div>' : '')
-      + '<div style="max-width:290px;text-align:left;font-size:15px;line-height:1.55;color:var(--text-mid);margin-top:' + (yearMode ? '18px' : '0') + '">&ldquo;I want to stop performing my life and start living in it.&rdquo;</div>'
+      '<div class="n" id="op2-hero">' + fmt(d) + '</div>'
+      + '<div class="sub">' + plural(d,'day','days') + ' since you wrote&hellip;</div>'
+      + '<div style="max-width:290px;text-align:left;font-size:15px;line-height:1.55;color:var(--text-mid);margin-top:18px">&ldquo;I want to stop performing my life and start living in it.&rdquo;</div>'
+      + '<div class="cap" style="margin-top:8px;align-self:flex-start;text-align:left;max-width:290px">' + dateBack(d) + '</div>'
       + (yearMode ? '<div class="cap" style="margin-top:16px;max-width:26ch">There is no finish on this one. The days are the record.</div>' : '')
       + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
     fitHero($('op2-hero'), 96, 34);
     var hit = ladderHit(d);
-    $('p2-fire').innerHTML = (hit === d ? '<b>Day ' + fmt(d) + ' is a rung, it fires.</b>' : 'Day ' + fmt(d) + ' is quiet; the ladder decides.')
-      + (yearMode ? ' At 365+ the same numbers read as "a year, still open" (op-5), and the rungs keep coming every 100, never a year-long wait.' : '');
-  }
-
-  /* ---------------- PROOF NUMBER N (op-3) ---------------- */
-  function op3p(){
-    var n = +$('p3-n').value, back = +$('p3-first').value;
-    $('p3-n-out').textContent = fmt(n); $('p3-first-out').textContent = fmt(back);
-    $('op3p').innerHTML =
-      '<div class="cap" style="margin-bottom:8px">What you wrote tonight</div>'
-      + '<div style="max-width:268px;font-size:24px;font-weight:600;line-height:1.3;letter-spacing:-.022em;color:var(--text-hi)">&ldquo;didn\'t send the email&rdquo;</div>'
-      + '<div class="fxrc" style="margin-top:24px"><div><b>' + fmt(n) + '</b><span>' + plural(n,'time','times') + '</span></div></div>'
-      + '<div class="sub" style="max-width:26ch;margin-top:14px">you have written down a moment like this one.' + (n > 1 ? ' The first was <b>' + dateBack(back) + '</b>.' : ' This is the first.') + '</div>'
-      + '<svg class="fx-mfoot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
-    $('p3-fire').innerHTML = n === 1
-      ? 'The first proof gets the quietest version; there is no count to brag about yet.'
-      : 'The count is real logged reflections; "proof number ' + fmt(n) + '" is the deposit line.';
+    $('p2-fire').innerHTML = (hit === d ? '<b>Day ' + fmt(d) + ' is a rung, it fires.</b>' : 'Day ' + fmt(d) + ' is quiet; the weekly rhythm decides.')
+      + (yearMode ? ' At 365+ the same numbers read as "a year, still open" (op-5), and the weekly rungs keep coming, never a year-long wait.' : '');
   }
 
   /* ---------------- presets ---------------- */
@@ -981,7 +953,7 @@
   /* the range slider mirrors the exact count field both ways */
   $('c-n').addEventListener('input', function(){ $('c-exact').value = this.value; count(); });
 
-  function all(){ road(); figs(); rec(); early(); count(); days(); mt2(); mt3(); eng(); gf(); op1(); grid(); chips(); op(); qd3(); qd4(); qd5(); fr1(); fr2(); ms5(); op2(); op3p(); }
+  function all(){ road(); figs(); rec(); early(); count(); days(); mt2(); mt3(); eng(); gf(); op1(); grid(); chips(); op(); qd3(); qd4(); qd5(); fr1(); fr2(); ms5(); op2(); }
   ['q3-line','q3-cur','q3-since','q3-days'].forEach(function(id){ $(id).addEventListener('input', qd3); });
   ['q4-start','q4-cur','q4-pay','q4-mon'].forEach(function(id){ $(id).addEventListener('input', qd4); });
   ['q5-then','q5-now','q5-w'].forEach(function(id){ $(id).addEventListener('input', qd5); });
@@ -989,7 +961,6 @@
   ['f2-w','f2-n','f2-word'].forEach(function(id){ $(id).addEventListener('input', fr2); });
   ['m5-word','m5-time','m5-days','m5-hours'].forEach(function(id){ $(id).addEventListener('input', ms5); });
   $('p2-days').addEventListener('input', op2);
-  ['p3-n','p3-first'].forEach(function(id){ $(id).addEventListener('input', op3p); });
   ['f-cur','f-prev','f-unit'].forEach(function(id){ $(id).addEventListener('input', figs); });
   ['x-prev','x-cur','x-dir','x-unit'].forEach(function(id){ $(id).addEventListener('input', rec); });
   ['e-total','e-used'].forEach(function(id){ $(id).addEventListener('input', early); });

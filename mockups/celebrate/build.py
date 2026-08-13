@@ -17,9 +17,8 @@ PAGES = [
   ('frequency',     'fr', 'Frequency',     'A rate of behaviour. Run 4x a week, write daily. Frequency is tolerant by definition, so a missed week is not a broken goal and none of these build streak-loss anxiety.'),
   ('maintenance',   'mt', 'Maintenance',   'A line held. Stay sober, keep under 180, a no-buy year. The design problem: celebrating a long run makes a future break hurt more, so days held are framed as deposits already banked, never as a tower that can fall.'),
   ('milestone',     'ms', 'Milestone',     'A binary event. Pass the bar, get the job, ship it. No partial credit, so these can be the boldest screens in the set. One of them celebrates the engine underneath before the event even lands.'),
-  ('open',          'op', 'Open',          'PARKED for now (decided 2026-08-09): these have no honest trigger yet. They would fire only when the AI notices a real shift in their own reflections, a feature that does not exist. The screens stay as reference for that day. Cadence, per Malik 2026-08-10: the then-vs-now moment fires first at day 30 (not 90), and the long-run screens get earlier rungs on the same 7/30/50/100/200/365 ladder as maintenance, so nobody waits a year to see one.'),
+  ('open',          'op', 'Open',          'PARKED for now (decided 2026-08-09): these have no honest trigger yet. They would fire only when the AI notices a real shift in their own reflections, a feature that does not exist. The screens stay as reference for that day. Cadence, per Malik 2026-08-10: the then-vs-now moment fires first at day 30 (not 90), and per Malik 2026-08-13 day rungs now come every 7 days (weekly rhythm, chooser.js), so nobody waits a year to see one.'),
   ('refinements',   'rf', 'The four you picked', 'The Gap, The Fall, The Record and The Card Takes It, rebuilt properly: three beats, tap to advance, the accent now driven by their chosen Memento colour, a deposit line, and the M where it earns its place.'),
-  ('evolution',     'ev', 'The card evolving',  'Not ceremonies. This is the Memento itself changing as they live with it, on the both-layers model: a permanent base that accumulates forever plus a daily surface state. Each shows the same card at day 7, day 90 and day 300 so you can see the accumulation actually working.'),
 ]
 
 # Malik's review verdicts (2026-08-10), rendered as a badge on every screen so
@@ -45,12 +44,13 @@ VERDICTS = {
   # open: 1 fine but must fire earlier than 90 days (chooser cadence);
   # 3 changed completely (one move + the count); 4 given receipts; 5 loved
   # but needs earlier rungs than a year
-  'op-1':'y','op-2':'g','op-3':'y','op-4':'y','op-5':'g',
-  'rf-gap':'g','rf-fall':'g','rf-rec':'g','rf-card':'y',
-  # evolution: laminae/strata/core REMOVED at his ask; grain + rim need
-  # real animated demos before he grades further
-  'ev-2':'g','ev-3':'g',
-  'ex-1':'y','ex-2':'y','ex-3':'y','ex-4':'y','ex-5':'g',
+  # 2026-08-13 rig grades: op-1 good, op-2/5 good (relayout applied), op-3
+  # REJECTED (cut from the rig), op-4 decent
+  'op-1':'g','op-2':'g','op-3':'r','op-4':'y','op-5':'g',
+  # rf-gap/rf-fall: 2026-08-13 'meh, mainly wording'; his exact line now in
+  # the rig ('gone, of the $100,000. $90,000 still open.'), re-grade
+  'rf-gap':'y','rf-fall':'y','rf-rec':'g','rf-card':'y',
+  # evolution: the whole family REMOVED at his ask 2026-08-13 (page deleted)
 }
 BADGE = {
   'g': '<span class="vd vd--g" title="Approved by Malik">&#128077;</span>',

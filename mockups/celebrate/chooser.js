@@ -36,8 +36,10 @@
        the star's verbs (lose/pay off/quit/under/below = down), else up.
    L8  No-target goals celebrate personal records: a new best beyond the old
        best by >= 2% of it (or >= 1 unit), at most once per 7 days.
-   L9  Day-count goals (maintenance) use the ladder 7/30/50/100/200/365,
-       then every 100 after; once-only via the same ledger.
+   L9  Day-count goals (maintenance) fire every 7 days (7, 14, 21, ...),
+       once-only via the same ledger. (Malik 2026-08-13: a weekly rhythm,
+       not the sparse 7/30/50/100/200/365 ladder.) Unit-count totals
+       (total runs, total sessions) fire every COUNT_STEP = 10.
    L10 evaluate() returns at most ONE event; the caller shows at most one
        ceremony per app-open and the comeback moment outranks it.
    L11 First move: the first real movement off the baseline (>= 1% of the
@@ -47,7 +49,8 @@
   'use strict';
 
   var DOWN_VERBS = /\b(lose|losing|lost|pay(?:ing)?\s+off|debt|quit|stop|under|below|reduce|cut|drop|sober|clean|fewer|less\s+than)\b/i;
-  var DAY_LADDER = [7, 30, 50, 100, 200, 365];
+  var DAY_STEP = 7;      // day-count goals: a rung every week
+  var COUNT_STEP = 10;   // unit-count totals (runs, sessions): a rung every 10
 
   function starHash(star) {
     var s = String(star || ''), h = 2166136261;
@@ -124,12 +127,11 @@
       return ev;
     }
 
-    /* ---- day-count goals (maintenance): L9 ---- */
+    /* ---- day-count goals (maintenance): L9, every 7 days ---- */
     if (opts.days != null) {
-      var d = opts.days, hit = null;
-      for (var i = 0; i < DAY_LADDER.length; i++) if (d >= DAY_LADDER[i]) hit = DAY_LADDER[i];
-      if (d >= 365) hit = 365 + Math.floor((d - 365) / 100) * 100;
-      if (hit !== null) {
+      var d = opts.days;
+      if (d >= DAY_STEP) {
+        var hit = d - (d % DAY_STEP);
         fam = 'mt';
         return fire('days', 'days-' + hit, { milestone: hit, days: d });
       }
@@ -192,7 +194,7 @@
     });
   }
 
-  var api = { evaluate: evaluate, milestones: milestones, direction: direction, starHash: starHash, DAY_LADDER: DAY_LADDER };
+  var api = { evaluate: evaluate, milestones: milestones, direction: direction, starHash: starHash, DAY_STEP: DAY_STEP, COUNT_STEP: COUNT_STEP };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.MilestoneChooser = api;
 })(this);
