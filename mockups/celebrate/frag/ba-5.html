@@ -1,0 +1,64 @@
+<style>
+/* ba-5 "The Road Closes". The whole road they walked, drawn one last time:
+   every mark they ever passed lights in order, the end post takes the
+   accent, and the goal closes. The receipts ARE the ceremony. */
+[data-c="ba-5"] .ba5-road{width:100%;max-width:270px;position:relative;height:64px}
+[data-c="ba-5"] .ba5-track{position:absolute;left:0;right:0;top:30px;height:2px;border-radius:2px;
+  background:rgba(var(--ink),.14)}
+[data-c="ba-5"] .ba5-fill{position:absolute;left:0;top:30px;height:2px;border-radius:2px;width:0;
+  background:var(--accent)}
+[data-c="ba-5"] .b1.on .ba5-fill{animation:ba5Fill 1.9s cubic-bezier(.3,.6,.25,1) .4s forwards}
+@keyframes ba5Fill{to{width:100%}}
+[data-c="ba-5"] .ba5-mk{position:absolute;top:24px;width:2.5px;height:14px;border-radius:2px;
+  background:rgba(var(--ink),.30);opacity:0}
+[data-c="ba-5"] .b1.on .ba5-mk{animation:ba5Mk .4s ease-out forwards}
+[data-c="ba-5"] .ba5-end{position:absolute;right:-1px;top:18px;width:3px;height:26px;border-radius:2px;
+  background:var(--accent);opacity:0}
+[data-c="ba-5"] .b1.on .ba5-end{animation:ba5Mk .5s ease-out 2.15s forwards}
+@keyframes ba5Mk{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+[data-c="ba-5"] .ba5-ends{display:flex;justify-content:space-between;width:100%;max-width:270px;
+  font-size:12.5px;color:var(--text-lo);font-variant-numeric:tabular-nums}
+[data-c="ba-5"] .ba5-ends b{color:var(--text-hi);font-weight:700}
+[data-c="ba-5"] .ba5-walked{margin-top:26px;font-size:14px;color:var(--text-mid)}
+[data-c="ba-5"] .b1.on .ba5-walked{animation:ba5Up .5s ease-out 2.5s both}
+[data-c="ba-5"] .ba5-cost{font-size:15px;line-height:1.85;color:var(--text-mid)}
+[data-c="ba-5"] .ba5-cost b{color:var(--text-hi);font-variant-numeric:tabular-nums}
+[data-c="ba-5"] .b2.on .ba5-cost{animation:ba5Up .5s ease-out .2s both}
+[data-c="ba-5"] .ba5-line{font-size:24px;font-weight:700;letter-spacing:-.028em;max-width:12ch;color:var(--text-hi)}
+[data-c="ba-5"] .b3.on .ba5-line{animation:ba5Up .5s ease-out .15s both}
+[data-c="ba-5"] .ba5-close{margin-top:13px;font-size:13.5px;color:var(--text-mid)}
+[data-c="ba-5"] .b3.on .ba5-close{animation:ba5Up .5s ease-out .5s both}
+@keyframes ba5Up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  [data-c="ba-5"] .ba5-fill{width:100%}
+  [data-c="ba-5"] .ba5-mk,[data-c="ba-5"] .ba5-end{opacity:1}
+  [data-c="ba-5"] .ba5-walked,[data-c="ba-5"] .ba5-cost,[data-c="ba-5"] .ba5-line,[data-c="ba-5"] .ba5-close{opacity:1;transform:none;animation:none}
+}
+</style>
+<div class="ph" data-c="ba-5">
+  <div class="st">
+
+    <div class="b b1" data-confetti>
+      <div class="ba5-road">
+        <div class="ba5-track"></div>
+        <div class="ba5-fill"></div>
+        <div class="ba5-marks"></div>
+        <div class="ba5-end"></div>
+      </div>
+      <div class="ba5-ends"><span><b>230</b> started</span><span><b>200</b> today</span></div>
+      <div class="ba5-walked">Every mark on this road is yours.</div>
+    </div>
+
+    <div class="b b2">
+      <div class="ba5-cost"><b>4</b> marks passed.<br><b>126</b> days.<br><b>215</b> weigh-ins.</div>
+    </div>
+
+    <div class="b b3">
+      <div class="ba5-line">Lost 30 lbs.</div>
+      <div class="ba5-close">This goal closes. The record stays.</div>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>

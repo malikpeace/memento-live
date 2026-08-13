@@ -1,0 +1,55 @@
+<style>
+/* ba-4 "The Flood". The milestone family's full-colour land beat, grown to
+   the top of the pyramid: the whole screen takes their accent with the dark
+   M, and afterwards the Memento WEARS the colour. The card ends changed. */
+[data-c="ba-4"] .ba4-flood{position:absolute;inset:0;background:var(--accent)}
+[data-c="ba-4"] .b1.on .ba4-flood{animation:ba4Flood .6s cubic-bezier(.2,.8,.3,1) both}
+@keyframes ba4Flood{from{opacity:0;transform:scale(1.05)}to{opacity:1;transform:none}}
+[data-c="ba-4"] .ba4-m{position:relative;width:84px;height:84px;fill:#0b0e12}
+[data-c="ba-4"] .b1.on .ba4-m{animation:ba4Up .5s cubic-bezier(.2,.8,.3,1) .16s both}
+[data-c="ba-4"] .ba4-word{position:relative;margin-top:28px;font-size:31px;font-weight:700;
+  letter-spacing:-.035em;line-height:1.08;color:rgba(11,14,18,.95);max-width:11ch}
+[data-c="ba-4"] .b1.on .ba4-word{animation:ba4Up .5s cubic-bezier(.2,.8,.3,1) .7s both}
+@keyframes ba4Up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+[data-c="ba-4"] .ba4-cost{font-size:15px;line-height:1.85;color:var(--text-mid)}
+[data-c="ba-4"] .ba4-cost b{color:var(--text-hi);font-variant-numeric:tabular-nums}
+[data-c="ba-4"] .b2.on .ba4-cost{animation:ba4Up .5s ease-out .2s both}
+
+[data-c="ba-4"] .ba4-card{position:relative;width:110px;height:144px;border-radius:15px;
+  background:rgba(var(--accent-rgb),.30);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12), 0 0 46px rgba(var(--accent-rgb),.30),
+    0 14px 36px rgba(0,0,0,.5);
+  display:flex;align-items:center;justify-content:center}
+[data-c="ba-4"] .ba4-card svg{width:36px;height:36px;fill:var(--accent)}
+[data-c="ba-4"] .b3.on .ba4-card{animation:ba4Rise .7s cubic-bezier(.2,.85,.25,1) both}
+@keyframes ba4Rise{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+[data-c="ba-4"] .ba4-wear{margin-top:22px;font-size:14px;color:var(--text-mid)}
+[data-c="ba-4"] .b3.on .ba4-wear{animation:ba4Up .5s ease-out .5s both}
+@media (prefers-reduced-motion:reduce){
+  [data-c="ba-4"] .ba4-m,[data-c="ba-4"] .ba4-word,[data-c="ba-4"] .ba4-cost,
+  [data-c="ba-4"] .ba4-card,[data-c="ba-4"] .ba4-wear{opacity:1;transform:none;animation:none}
+}
+</style>
+<div class="ph" data-c="ba-4">
+  <div class="st">
+
+    <div class="b b1" data-confetti>
+      <div class="ba4-flood"></div>
+      <svg class="ba4-m" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg>
+      <div class="ba4-word">Lost 30 lbs.</div>
+    </div>
+
+    <div class="b b2">
+      <div class="ba4-cost"><b>126</b> days.<br><b>215</b> weigh-ins.<br>230 &rarr; <b>200</b>.</div>
+    </div>
+
+    <div class="b b3">
+      <div class="ba4-card"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
+      <div class="ba4-wear">Your Memento wears it now.</div>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>

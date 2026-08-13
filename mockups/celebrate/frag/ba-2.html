@@ -1,0 +1,62 @@
+<style>
+/* ba-2 "The Return". The card replays its own life before taking the win:
+   blank, then cyan (the day you found clarity), white (the day you acted),
+   green (the days you kept going), and finally THEIR accent, now. His
+   original arc, made the ceremony. One prop, four true chapters. */
+[data-c="ba-2"] .ba2-card{position:relative;width:126px;height:164px;border-radius:17px;
+  background:rgba(var(--ink),.05);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09), 0 16px 40px rgba(0,0,0,.5);
+  display:flex;align-items:center;justify-content:center}
+[data-c="ba-2"] .ba2-card svg{width:40px;height:40px;fill:rgba(235,238,248,.9);position:relative}
+[data-c="ba-2"] .ba2-face{position:absolute;inset:0;border-radius:17px;opacity:0}
+[data-c="ba-2"] .b1.on .ba2-f1{animation:ba2Face 1s ease-out .7s both;background:rgba(43,212,212,.34)}
+[data-c="ba-2"] .b1.on .ba2-f2{animation:ba2Face 1s ease-out 1.7s both;background:rgba(255,255,255,.30)}
+[data-c="ba-2"] .b1.on .ba2-f3{animation:ba2Face 1s ease-out 2.7s both;background:rgba(63,217,78,.32)}
+[data-c="ba-2"] .b1.on .ba2-f4{animation:ba2Hold .9s ease-out 3.7s both;background:rgba(var(--accent-rgb),.40)}
+@keyframes ba2Face{0%{opacity:0}30%{opacity:1}100%{opacity:0}}
+@keyframes ba2Hold{from{opacity:0}to{opacity:1}}
+[data-c="ba-2"] .b1.on .ba2-card{animation:ba2Glow .9s ease-out 3.7s both}
+@keyframes ba2Glow{to{box-shadow:inset 0 1px 0 rgba(var(--ink),.09), 0 0 52px rgba(var(--accent-rgb),.32), 0 16px 40px rgba(0,0,0,.5)}}
+[data-c="ba-2"] .ba2-chap{margin-top:26px;font-size:13px;color:var(--text-lo);min-height:18px}
+[data-c="ba-2"] .b1.on .ba2-chap{animation:ba2Up .5s ease-out 4.2s both}
+[data-c="ba-2"] .ba2-cost{font-size:15px;line-height:1.8;color:var(--text-mid)}
+[data-c="ba-2"] .ba2-cost b{color:var(--text-hi);font-variant-numeric:tabular-nums}
+[data-c="ba-2"] .b2.on .ba2-cost{animation:ba2Up .5s ease-out .2s both}
+[data-c="ba-2"] .ba2-line{font-size:26px;font-weight:700;letter-spacing:-.03em;max-width:12ch;color:var(--text-hi)}
+[data-c="ba-2"] .b3.on .ba2-line{animation:ba2Up .5s ease-out .15s both}
+[data-c="ba-2"] .ba2-rem{margin-top:14px;font-size:13.5px;color:var(--text-mid)}
+[data-c="ba-2"] .b3.on .ba2-rem{animation:ba2Up .5s ease-out .5s both}
+@keyframes ba2Up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  [data-c="ba-2"] .ba2-face{opacity:0}
+  [data-c="ba-2"] .ba2-f4{opacity:1}
+  [data-c="ba-2"] .ba2-chap,[data-c="ba-2"] .ba2-cost,[data-c="ba-2"] .ba2-line,[data-c="ba-2"] .ba2-rem{opacity:1;transform:none;animation:none}
+}
+</style>
+<div class="ph" data-c="ba-2">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="ba2-card">
+        <div class="ba2-face ba2-f1"></div>
+        <div class="ba2-face ba2-f2"></div>
+        <div class="ba2-face ba2-f3"></div>
+        <div class="ba2-face ba2-f4"></div>
+        <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+      </div>
+      <div class="ba2-chap">The day you saw it. The day you moved. The days you kept going.</div>
+    </div>
+
+    <div class="b b2" data-confetti>
+      <div class="ba2-cost"><b>126</b> days.<br><b>215</b> weigh-ins.<br>230 &rarr; <b>200</b>.</div>
+    </div>
+
+    <div class="b b3">
+      <div class="ba2-line">Lost 30 lbs.</div>
+      <div class="ba2-rem">Your Memento remembers how.</div>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>

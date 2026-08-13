@@ -199,11 +199,6 @@
      "note": "The day count lands first, then what they wrote on February 8, word for word. <b>Time plus their own sentence</b>, nothing added. The accent is a small tick under the number instead of the number itself, so it never reads as a score on a goal that cannot be scored."
     },
     {
-     "key": "op-3",
-     "name": "Proof number 14",
-     "note": "CHANGED COMPLETELY 2026-08-10 (Malik did not buy the ledger wall). Tonight's logged moment held up alone, then the one honest number an open goal has: how many such moments they have written down, and the date of the first."
-    },
-    {
      "key": "op-4",
      "name": "Day 30, the goal and the why",
      "note": "ENRICHED 2026-08-10 (was goal + why alone, \"meh\"). The why quote stays the heart; the land beat now carries real receipts, days carried and entries written, before the deposit line."
@@ -240,11 +235,6 @@
      "key": "rf-rec",
      "name": "The Record",
      "note": "Twelve weeks of days, and the ones they showed up light in the order they actually happened. The empty squares stay in, because a four times a week goal has gaps and hiding them would make it a trophy instead of <b>evidence</b>. Today is the only square in their colour, the last one to land. Built from the consistency data the app already keeps, which is why it fits frequency goals better than any counter."
-    },
-    {
-     "key": "rf-card",
-     "name": "The Card Takes It",
-     "note": "The Memento is the object that carries their life, so the milestone lands <b>on it</b>. Beat three is where the deposit goes, so the card is what receives it: it rises and settles flat, light crosses the face once, and where the light passed there is a cut at the foot that was not there before. The four cuts beside it are older moments, the new one is the only colour on the screen, and the mark is debossed on the card. The light leaves. The cut stays."
     }
    ],
    "pass": true,
@@ -332,6 +322,36 @@
     "ex-5's accent glint rests at opacity .38 and is the faintest accent in the set. It reads at 1440px but may disappear on a real phone. Needs an on-device check.",
     "NOT VERIFIABLE HERE: the celebration gallery is dark-only by construction (_kit.css defines no light mode and the phone frame is #000), so the four-cell light/dark matrix does not apply to these fragments. I verified at 1440x1000 in cyan, amber and rose. I did NOT verify at 390px width or on a real device.",
     "ENVIRONMENT NOTE, not a fragment defect: I left a python http.server running on port 8231 rooted at mockups/celebrate. The 12 console 404s it produces are _kit.css requesting ../fonts/geist-*.otf, which resolves above that server root; the font files do exist at mockups/fonts and load correctly when served one level up."
+   ]
+  },
+  {
+   "job": "ba",
+   "concepts": [
+    {
+     "key": "ba-1",
+     "name": "The Seal",
+     "note": "The goal lands with confetti, the receipts follow, and then the Memento rises and the goal's plain line is sealed beneath it. The rf-card instinct done properly: the card owns the moment instead of decorating it."
+    },
+    {
+     "key": "ba-2",
+     "name": "The Return",
+     "note": "The card replays its own life first: cyan for the day you found clarity, white for the day you acted, green for the days you kept going, then THEIR accent, now. His original colour arc, made the ceremony. The receipts carry the confetti beat."
+    },
+    {
+     "key": "ba-3",
+     "name": "The Weight",
+     "note": "No props: darkness, scale, and the number they actually reached counting up. The restraint option; special = motion, scale, darkness, never a new language."
+    },
+    {
+     "key": "ba-4",
+     "name": "The Flood",
+     "note": "The milestone land beat grown to the top of the pyramid: full accent flood, dark M, their goal line. Afterwards the Memento WEARS the colour, the card ends changed."
+    },
+    {
+     "key": "ba-5",
+     "name": "The Road Closes",
+     "note": "The whole road drawn one last time, every mark they passed lighting in order, the end post taking the accent. Then: this goal closes, the record stays. The receipts ARE the ceremony."
+    }
    ]
   }
  ]

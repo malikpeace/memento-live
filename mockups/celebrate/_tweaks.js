@@ -41,6 +41,15 @@
     }
     return unit;
   }
+  /* the grand finale's receipts, adapted to the goal's shape; only real,
+     logged numbers ever appear (provenance law) */
+  function baCost(v) {
+    var rows = ['<b>' + fmt(+v.days) + '</b> ' + plural(+v.days, 'day', 'days') + '.'];
+    if (+v.moves > 0) rows.push('<b>' + fmt(+v.moves) + '</b> ' + esc(unitFor(+v.moves, v.moveWord)) + '.');
+    if (v.shape === 'target') rows.push(fmt(+v.start) + ' &rarr; <b>' + fmt(+v.value) + '</b>.');
+    if (v.shape === 'count') rows.push('The target was <b>' + fmt(+v.value) + '</b>. You hit it.');
+    return rows.join('<br>');
+  }
   function seeded(seed) { return function () { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; }; }
 
   function Q(ph, sel) { return ph.querySelector(sel); }
@@ -50,11 +59,16 @@
     el.setAttribute('data-count', (from == null ? 0 : from) + '|' + to);
     el.textContent = fmt(to);
   }
+  /* Malik 2026-08-13: day rungs every 7 days; the big round marks
+     (100/200/300/365, then every 100) fire BOLD on their exact day. */
   function ladderHit(n) {
-    var hit = null;
-    C.DAY_LADDER.forEach(function (r) { if (n >= r) hit = r; });
-    if (n >= 365) hit = 365 + Math.floor((n - 365) / 100) * 100;
-    return hit;
+    return n >= C.DAY_STEP ? n - (n % C.DAY_STEP) : null;
+  }
+  function boldHit(n) {
+    var b = null;
+    C.BOLD_DAYS.forEach(function (m) { if (n >= m) b = m; });
+    if (n >= 465) b = 365 + Math.floor((n - 365) / 100) * 100;
+    return b;
   }
 
   /* control kinds: r = range, n = number, t = text */
@@ -108,11 +122,11 @@
           labels += '<div class="qu1-lc' + (isNow ? ' is-now' : passed.indexOf(m) > -1 ? ' is-past' : '') + '"><div class="qu1-num">' + fmt(m) + '</div><div class="qu1-date">' + when + '</div></div>';
         });
         put(ph, '.qu1-marks', cells); put(ph, '.qu1-labels', labels);
-        put(ph, '.qu1-sub', '<b>' + fmt(days) + ' ' + plural(days, 'day', 'days') + '</b> made these ' + fmt(cur) + '.');
+        put(ph, '.qu1-sub', '');   /* the days-made-these line: cut, Malik 2026-08-13 */
         /* growth is REAL arithmetic on their own numbers: started at 1, at
            17 today, that is 17x, and it deserves saying (his 1700% point) */
         var mult = start > 0 ? cur / start : 0;
-        put(ph, '.qu1-cap', fmt(goal - cur) + ' still open.'
+        put(ph, '.qu1-cap', fmt(goal - cur) + ' to go.'
           + (mult >= 2 ? ' ' + (mult >= 10 ? Math.round(mult) : (Math.round(mult * 10) / 10)) + '&times; where you started.' : ''));
         put(ph, '.b3 .deposit', nowMark === null
           ? (cur > start
@@ -324,7 +338,7 @@
           + '<div class="frow"><div class="v v--was">$' + fmt(start) + '</div><div class="d">' + dateBack(+v.mon * 30) + '</div></div>'
           + '<div class="frow"><div class="v">$' + fmt(cur) + '</div><div class="d">today</div></div>');
         var subs = ph.querySelectorAll('.b2 .sub');
-        if (subs[0]) subs[0].innerHTML = fmt(+v.pay) + ' ' + plural(+v.pay, 'payment', 'payments') + ' over ' + fmt(+v.mon) + ' ' + plural(+v.mon, 'month', 'months') + '. It has not risen once.';
+        if (subs[0]) subs[0].innerHTML = fmt(+v.pay) + ' ' + plural(+v.pay, 'payment', 'payments') + ' over ' + fmt(+v.mon) + ' ' + plural(+v.mon, 'month', 'months') + '.';
         if (subs[1]) subs[1].innerHTML = '$' + fmt(closed) + ' closed. $' + fmt(cur) + ' open.';
         put(ph, '.b3 .deposit', th <= start
           ? 'On this day, the balance went under <b>$' + fmt(th) + '</b>.'
@@ -346,7 +360,7 @@
         var backH = Math.round((then - now) * 7 / 60);
         put(ph, '.b2 .lead', '<span class="n n--big" data-count="0|' + backH + '">' + backH + '</span><span class="u--sm">h</span>');
         var subs = ph.querySelectorAll('.b2 .sub');
-        if (subs[1]) subs[1].innerHTML = dur(then) + ' a day, ' + w + ' ' + plural(w, 'week', 'weeks') + ' ago. ' + dur(now) + ' a day now.';
+        if (subs[1]) subs[1].innerHTML = dur(then) + ' a day, ' + w + ' ' + plural(w, 'week', 'weeks') + ' ago.';
         put(ph, '.b3 .deposit', 'On this day, your week averaged <b>' + dur(now) + '</b> a day.' + (now < ceilH * 60 && then >= ceilH * 60 ? ' First week under ' + ceilH + 'h.' : ''));
       }
     },
@@ -363,11 +377,12 @@
         cnt(ph, '.fr1-count .n', n);
         put(ph, '.fr1-count .fr1-of', 'of ' + t);
         put(ph, '.b1 .sub', esc(v.word) + ' this week.');
-        var labs = ['M', 'T', 'W', 'T', 'F', 'S', 'S'], rnd = seeded(n * 31 + t), week = '';
+        /* no weekday letters (Malik 2026-08-13: simpler, universal) */
+        var rnd = seeded(n * 31 + t), week = '';
         var lit = [], pool = [0, 1, 2, 3, 4, 5, 6];
         for (var i = 0; i < Math.min(n, 7); i++) lit.push(pool.splice(Math.floor(rnd() * pool.length), 1)[0]);
         for (var i = 0; i < 7; i++) {
-          week += '<div class="fr1-day' + (lit.indexOf(i) > -1 ? ' is-run' : '') + (i === Math.max.apply(null, lit.concat([0])) && n ? ' is-close' : '') + '"><div class="fr1-col"></div><div class="fr1-lab">' + labs[i] + '</div></div>';
+          week += '<div class="fr1-day' + (lit.indexOf(i) > -1 ? ' is-run' : '') + (i === Math.max.apply(null, lit.concat([0])) && n ? ' is-close' : '') + '"><div class="fr1-col"></div></div>';
         }
         put(ph, '.fr1-week', week);
         put(ph, '.b3 .deposit', 'This week, you did <b>' + n + ' of ' + t + '</b>.');
@@ -484,6 +499,7 @@
       ],
       apply: function (ph, v) {
         var d = +v.days, hit = ladderHit(d);
+        if (boldHit(d) === d) hit = d;   /* a bold day IS the rung: show it */
         cnt(ph, '.b1 .n', hit || d);
         put(ph, '.b1 .sub', plural(hit || d, 'day', 'days') + ' ' + esc(v.what));
         /* the field of days grows with the count: ~25 days per bar row,
@@ -493,12 +509,15 @@
         put(ph, '.mt1-field', fh);
         put(ph, '.b2 .sub', 'You made the same call on ' + fmt(hit || d) + ' separate ' + plural(hit || d, 'day', 'days') + '.');
         put(ph, '.b2 .cap', dateBack(d) + ' to ' + dateBack(0));
-        put(ph, '.b3 .deposit', hit
-          ? '<b>Day ' + fmt(hit) + '!</b> The line held.'
-          : '<b>Day ' + fmt(d) + '.</b> Banked. The first ceremony fires at day 7.');
+        var bd = boldHit(d);
+        put(ph, '.b3 .deposit', bd === d
+          ? '<b>Day ' + fmt(d) + '.</b> One of the big ones. The line held.'
+          : (hit
+            ? '<b>Day ' + fmt(hit) + '!</b> The line held.'
+            : '<b>Day ' + fmt(d) + '.</b> Banked. The first ceremony fires at day 7.'));
         put(ph, '.mt1-note', hit
           ? 'No end date on this one. The ' + fmt(hit) + ' days are in the record now, and nothing later takes them out.' + (hit !== d ? ' (Day ' + fmt(d) + ' itself is quiet; the last rung was ' + fmt(hit) + '.)' : '')
-          : 'No end date on this one. Every day is in the record from day one; the ladder starts speaking at day 7.');
+          : 'No end date on this one. Every day is in the record from day one; the weekly rhythm starts at day 7.');
       }
     },
 
@@ -635,22 +654,9 @@
       apply: function (ph, v) {
         var d = +v.days;
         cnt(ph, '.b1 .n', d);
-        put(ph, '.op2-lead', 'What you wrote on ' + dateBack(d));
+        put(ph, '.b1 .sub', plural(d, 'day', 'days') + ' since you wrote&hellip;');
+        put(ph, '.op2-lead', dateBack(d));   /* the date sits UNDER the words (Malik 2026-08-13) */
         put(ph, '.b3 .deposit', '<b>Day ' + fmt(d) + '.</b> ' + (d >= 60 ? Math.round(d / 30) + ' months' : fmt(d) + ' ' + plural(d, 'day', 'days')) + ' on the same sentence.');
-      }
-    },
-
-    'op-3': {
-      c: [
-        { k: 'n', t: 'r', l: 'Proof count', v: 14, min: 1, max: 300 },
-        { k: 'first', t: 'r', l: 'First, days ago', v: 145, min: 1, max: 900 }
-      ],
-      apply: function (ph, v) {
-        var n = +v.n;
-        cnt(ph, '.op3-lead .n', n);
-        put(ph, '.op3-lead .u', plural(n, 'time', 'times'));
-        put(ph, '.op3-first', 'you have written down a moment like this one.' + (n > 1 ? ' The first was <b>' + dateBack(+v.first) + '</b>, when you left the room instead of answering.' : ' This is the first.'));
-        put(ph, '.b3 .deposit', 'On this day, <b>you did not send the email.</b> Proof number ' + fmt(n) + '.');
       }
     },
 
@@ -757,8 +763,210 @@
         var cost = Q(ph, '.rc__cost'); if (cost) cost.innerHTML = '<b>' + fmt(on) + '</b> of the last ' + fmt(total) + ' days.';
         put(ph, '.b3 .deposit', 'On this day, ' + esc(singular(v.word)) + ' number <b>' + fmt(on) + '</b>. The grid remembers every one.');
       }
+    },
+
+    /* ================= BIG ASS CELEBRATIONS (the grand finale) ================= */
+    'ba-1': {
+      c: [
+        { k: 'shape', t: 's', l: 'Goal shape', v: 'target', o: [
+          { v: 'target', l: 'target hit (weight, debt)' },
+          { v: 'count', l: 'count done (100 sessions)' },
+          { v: 'duration', l: 'duration held (no-buy year)' },
+          { v: 'event', l: 'event done (passed the bar)' } ] },
+        { k: 'line', t: 't', l: 'The goal, their words', v: 'Lost 30 lbs' },
+        { k: 'start', t: 'n', l: 'Start number', v: 230 },
+        { k: 'value', t: 'n', l: 'Final number', v: 200 },
+        { k: 'unit', t: 't', l: 'Unit', v: 'lbs' },
+        { k: 'days', t: 'r', l: 'Days it took', v: 126, min: 1, max: 900 },
+        { k: 'moves', t: 'r', l: 'Moves logged', v: 215, min: 0, max: 2000 },
+        { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' }
+      ],
+      apply: function (ph, v) {
+        put(ph, '.ba1-line', esc(v.line) + '.');
+        put(ph, '.ba1-cost', baCost(v));
+        put(ph, '.ba1-etch', esc(v.line) + '.');
+      }
+    },
+
+    'ba-2': {
+      c: [
+        { k: 'shape', t: 's', l: 'Goal shape', v: 'target', o: [
+          { v: 'target', l: 'target hit (weight, debt)' },
+          { v: 'count', l: 'count done (100 sessions)' },
+          { v: 'duration', l: 'duration held (no-buy year)' },
+          { v: 'event', l: 'event done (passed the bar)' } ] },
+        { k: 'line', t: 't', l: 'The goal, their words', v: 'Lost 30 lbs' },
+        { k: 'start', t: 'n', l: 'Start number', v: 230 },
+        { k: 'value', t: 'n', l: 'Final number', v: 200 },
+        { k: 'unit', t: 't', l: 'Unit', v: 'lbs' },
+        { k: 'days', t: 'r', l: 'Days it took', v: 126, min: 1, max: 900 },
+        { k: 'moves', t: 'r', l: 'Moves logged', v: 215, min: 0, max: 2000 },
+        { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' }
+      ],
+      apply: function (ph, v) {
+        put(ph, '.ba2-cost', baCost(v));
+        put(ph, '.ba2-line', esc(v.line) + '.');
+      }
+    },
+
+    'ba-3': {
+      c: [
+        { k: 'shape', t: 's', l: 'Goal shape', v: 'target', o: [
+          { v: 'target', l: 'target hit (weight, debt)' },
+          { v: 'count', l: 'count done (100 sessions)' },
+          { v: 'duration', l: 'duration held (no-buy year)' },
+          { v: 'event', l: 'event done (passed the bar)' } ] },
+        { k: 'line', t: 't', l: 'The goal, their words', v: 'Lost 30 lbs' },
+        { k: 'start', t: 'n', l: 'Start number', v: 230 },
+        { k: 'value', t: 'n', l: 'Final number', v: 200 },
+        { k: 'unit', t: 't', l: 'Unit', v: 'lbs' },
+        { k: 'days', t: 'r', l: 'Days it took', v: 126, min: 1, max: 900 },
+        { k: 'moves', t: 'r', l: 'Moves logged', v: 215, min: 0, max: 2000 },
+        { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' }
+      ],
+      apply: function (ph, v) {
+        var sh = v.shape, unit;
+        if (sh === 'target') { unit = esc(unitFor(+v.value, v.unit)) + '. The number you named.'; cnt(ph, '.ba3-hero', +v.value, +v.start); }
+        else if (sh === 'count') { unit = esc(unitFor(+v.value, v.unit)) + '. Every one logged.'; cnt(ph, '.ba3-hero', +v.value, 0); }
+        else if (sh === 'duration') { unit = plural(+v.days, 'day', 'days') + ' held, start to finish.'; cnt(ph, '.ba3-hero', +v.days, 0); }
+        else { unit = plural(+v.days, 'day', 'days') + ' from the day you named it.'; cnt(ph, '.ba3-hero', +v.days, 0); }
+        put(ph, '.ba3-unit', unit);
+        put(ph, '.ba3-rows', baCost(v));
+        put(ph, '.ba3-line', esc(v.line) + '.');
+      }
+    },
+
+    'ba-4': {
+      c: [
+        { k: 'shape', t: 's', l: 'Goal shape', v: 'target', o: [
+          { v: 'target', l: 'target hit (weight, debt)' },
+          { v: 'count', l: 'count done (100 sessions)' },
+          { v: 'duration', l: 'duration held (no-buy year)' },
+          { v: 'event', l: 'event done (passed the bar)' } ] },
+        { k: 'line', t: 't', l: 'The goal, their words', v: 'Lost 30 lbs' },
+        { k: 'start', t: 'n', l: 'Start number', v: 230 },
+        { k: 'value', t: 'n', l: 'Final number', v: 200 },
+        { k: 'unit', t: 't', l: 'Unit', v: 'lbs' },
+        { k: 'days', t: 'r', l: 'Days it took', v: 126, min: 1, max: 900 },
+        { k: 'moves', t: 'r', l: 'Moves logged', v: 215, min: 0, max: 2000 },
+        { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' }
+      ],
+      apply: function (ph, v) {
+        put(ph, '.ba4-word', esc(v.line) + '.');
+        put(ph, '.ba4-cost', baCost(v));
+      }
+    },
+
+    'ba-5': {
+      c: [
+        { k: 'shape', t: 's', l: 'Goal shape', v: 'target', o: [
+          { v: 'target', l: 'target hit (weight, debt)' },
+          { v: 'count', l: 'count done (100 sessions)' },
+          { v: 'duration', l: 'duration held (no-buy year)' },
+          { v: 'event', l: 'event done (passed the bar)' } ] },
+        { k: 'line', t: 't', l: 'The goal, their words', v: 'Lost 30 lbs' },
+        { k: 'start', t: 'n', l: 'Start number', v: 230 },
+        { k: 'value', t: 'n', l: 'Final number', v: 200 },
+        { k: 'unit', t: 't', l: 'Unit', v: 'lbs' },
+        { k: 'days', t: 'r', l: 'Days it took', v: 126, min: 1, max: 900 },
+        { k: 'moves', t: 'r', l: 'Moves logged', v: 215, min: 0, max: 2000 },
+        { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' }
+      ],
+      apply: function (ph, v) {
+        var sh = v.shape, marks = 0, endsL, endsR;
+        if (sh === 'target' && +v.start !== +v.value) {
+          var dir = +v.value < +v.start ? 'down' : 'up';
+          marks = C.milestones({ target: +v.value, baseline: +v.start }, dir).length;
+          endsL = '<b>' + fmt(+v.start) + '</b> started'; endsR = '<b>' + fmt(+v.value) + '</b> today';
+        } else if (sh === 'count') {
+          marks = Math.floor(+v.value / C.COUNT_STEP);
+          endsL = '<b>0</b> started'; endsR = '<b>' + fmt(+v.value) + '</b> done';
+        } else {
+          marks = Math.floor(+v.days / C.DAY_STEP);
+          endsL = '<b>day 1</b>'; endsR = '<b>day ' + fmt(+v.days) + '</b>';
+        }
+        var shown = Math.min(marks, 12), mks = '';
+        for (var i = 1; i <= shown; i++) {
+          mks += '<i class="ba5-mk" style="left:' + (i / (shown + 1) * 100).toFixed(1) + '%;animation-delay:' + (0.4 + 1.9 * i / (shown + 1)).toFixed(2) + 's"></i>';
+        }
+        put(ph, '.ba5-marks', mks);
+        put(ph, '.ba5-ends', '<span>' + endsL + '</span><span>' + endsR + '</span>');
+        put(ph, '.ba5-cost', '<b>' + fmt(marks) + '</b> ' + plural(marks, 'mark', 'marks') + ' passed.<br>' + baCost(v));
+        put(ph, '.ba5-line', esc(v.line) + '.');
+      }
     }
+
   };
+
+
+  /* ---------- FIRE / SILENT ----------
+     The rig's honest line, merged onto every gallery screen (Malik
+     2026-08-13): while you tweak, this says whether the ceremony would
+     actually FIRE at this state or stay quiet, from the same chooser
+     rules the app will use. */
+  function roadFire(start, goal, cur, dir) {
+    if (start === goal) return 'Start and goal are the same number; nothing to celebrate.';
+    var marks = C.milestones({ target: goal, baseline: start }, dir);
+    var passed = marks.filter(function (m) { return dir === 'down' ? cur <= m : cur >= m; });
+    if (cur === goal) return '<b>The goal itself.</b> This fires as the FINAL, and the grand finale outranks it.';
+    if (marks.indexOf(cur) > -1) return '<b>' + fmt(cur) + ' is a mark.</b> This ceremony fires today, once ever.';
+    var next = null;
+    for (var i = 0; i < marks.length; i++) if (dir === 'down' ? marks[i] < cur : marks[i] > cur) { next = marks[i]; break; }
+    if (passed.length === 0 && cur !== start) return 'Off the baseline: the FIRST-MOVE moment fires once; the first mark waits at <b>' + fmt(marks[0]) + '</b>.';
+    return 'Silent at ' + fmt(cur) + '. Next ceremony at <b>' + fmt(next === null ? goal : next) + '</b>.';
+  }
+  function dayFire(d) {
+    var bd = boldHit(d), hit = ladderHit(d);
+    if (bd === d) return '<b>Day ' + fmt(d) + ' is a BOLD rung.</b> The big round marks (100 / 200 / 300 / 365, then every 100) hit harder.';
+    if (hit === d) return '<b>Day ' + fmt(d) + ' is a rung.</b> A quiet weekly step; fires once ever.';
+    if (hit === null) return 'Before day 7 nothing fires; the first rung needs a week.';
+    return 'Day ' + fmt(d) + ' is quiet. Last rung was ' + fmt(hit) + '; the weekly rhythm decides.';
+  }
+  var FIRES = {
+    'qu-1': function (v) { return roadFire(+v.start, +v.goal, Math.min(Math.max(+v.cur, +v.start), +v.goal), 'up'); },
+    'qd-1': function (v) { return roadFire(+v.start, +v.goal, Math.max(Math.min(+v.cur, +v.start), +v.goal), 'down'); },
+    'qu-2': function (v) {
+      var crossed = String(Math.floor(Math.max(1, +v.now))).length > String(Math.floor(Math.max(1, +v.best))).length;
+      return crossed ? '<b>A new digit.</b> This fires today, the day the month first outgrew every month before it.'
+                     : 'Silent: $' + fmt(+v.now) + ' has the same digits as the best before it. This screen waits.';
+    },
+    'qu-5': function (v) {
+      var now = +v.now, best = +v.best, margin = Math.max(1, best * 0.02);
+      return now >= best + margin ? '<b>A record.</b> Beats the old best by 2%+ ; fires at most once a week (L8).'
+        : 'Silent: ' + fmt(now) + ' does not clear ' + fmt(best) + ' by the 2% margin. The record stands.';
+    },
+    'qd-2': function (v) {
+      return '<b>A new low.</b> Fires only when the week IS the lowest yet (2% rule, decimal-safe), at most once a week.';
+    },
+    'qu-3': function (v) { return +v.left > 0 ? '<b>Fires on arrival:</b> the goal reached ' + fmt(+v.left) + ' days early. Once ever.' : '<b>Fires on arrival</b>, right on the date.'; },
+    'qd-3': function (v) { return +v.cur < +v.line ? '<b>Fires this morning:</b> the first time under ' + fmt(+v.line) + '. Once ever.' : 'Silent: this screen only exists the morning the number is under ' + fmt(+v.line) + '.'; },
+    'qd-4': function (v) { return roadFire(+v.start, 0, Math.max(0, +v.cur), 'down'); },
+    'qd-5': function (v) { return '<b>A new low average.</b> Fires on records only (2% rule), never on an ordinary week.'; },
+    'fr-1': function (v) { return +v.n >= +v.target ? '<b>The week met the rate</b> (' + v.n + ' of ' + v.target + '): fires when the week closes.' : 'Silent: ' + v.n + ' of ' + v.target + ' so far. An unmet week is never shown as a ceremony.'; },
+    'fr-2': function (v) { var w = +v.w; return ladderHit(w) === w ? '<b>' + w + ' weeks is a rung</b> (every 7): fires as the run of weeks grows.' : 'Silent at ' + w + ' weeks; next rung at ' + (Math.floor(w / 7) + 1) * 7 + ' weeks.'; },
+    'fr-3': function (v) { var n = +v.n; return n % C.COUNT_STEP === 0 ? '<b>' + fmt(n) + ' is a rung.</b> Unit totals fire every ' + C.COUNT_STEP + '.' : 'Silent at ' + fmt(n) + '. Next ceremony at <b>' + fmt((Math.floor(n / C.COUNT_STEP) + 1) * C.COUNT_STEP) + '</b>.'; },
+    'fr-4': function (v) { return '<b>Fires when a week closes at rate.</b> Weeks away are quiet rows, never a funeral.'; },
+    'fr-5': function (v) { return +v.left === 0 ? '<b>Race week.</b> The deadline arrives with the rate kept: this fires as a FINAL.' : 'Fires when a week closes at rate; ' + v.left + ' ' + (+v.left === 1 ? 'week' : 'weeks') + ' to the day.'; },
+    'mt-1': function (v) { return dayFire(+v.days); },
+    'mt-2': function (v) { return +v.held >= +v.total ? '<b>The promised date arrived with the rule intact.</b> Fires as a FINAL; the grand finale outranks it.' : dayFire(+v.held); },
+    'mt-3': function (v) { return dayFire(+v.days); },
+    'mt-4': function (v) { return '<b>Day 7 exactly.</b> The first-seven moment fires once, then the weekly rhythm takes over.'; },
+    'ms-1': function (v) { return '<b>Fires when they mark it done.</b> A binary event has no partial credit.'; },
+    'ms-2': function (v) { return '<b>Fires when they mark it done.</b> The engine numbers are whatever they actually logged.'; },
+    'ms-3': function (v) { return '<b>Fires on arrival</b>, ' + fmt(+v.days) + ' days before the date they set.'; },
+    'ms-5': function (v) { return '<b>Fires when they mark it done;</b> the minute is stamped from the actual tap.'; },
+    'op-1': function (v) { var d = +v.days; return d < 28 ? 'Before day 28 there is no "then" worth holding up; silent.' : (ladderHit(d) === d ? '<b>Day ' + fmt(d) + ' is a rung:</b> the then-vs-now moment fires.' : 'Day ' + fmt(d) + ' is not a rung; the pair waits.'); },
+    'op-2': function (v) { return dayFire(+v.days); },
+    'op-4': function (v) { return dayFire(+v.days); },
+    'op-5': function (v) { return dayFire(+v.days); },
+    'rf-gap': function (v) { return roadFire(0, Math.max(2, +v.goal), Math.min(+v.cur, Math.max(2, +v.goal)), 'up'); },
+    'rf-fall': function (v) { return roadFire(+v.startLeft, 0, Math.min(+v.left, +v.startLeft), 'down'); },
+    'rf-rec': function (v) { return '<b>Fires on rungs of the count</b> (every ' + C.COUNT_STEP + '), drawn from real logged days only.' },
+    'ba-1': baFire, 'ba-2': baFire, 'ba-3': baFire, 'ba-4': baFire, 'ba-5': baFire
+  };
+  function baFire() {
+    return '<b>The top of the pyramid.</b> Fires ONCE, the day the goal itself is done; it outranks the milestone and the daily, and nothing else shows that day.';
+  }
 
   /* ---------- DAY ONE ----------
      Malik: one tap shows what every screen looks like on day 1, the honest
@@ -789,7 +997,6 @@
     'ms-5': function () { return { days: 1, hours: 1 }; },
     'op-1': function () { return { days: 1 }; },
     'op-2': function () { return { days: 1 }; },
-    'op-3': function () { return { n: 1, first: 1 }; },
     'op-4': function () { return { days: 1, entries: 1 }; },
     'op-5': function () { return { days: 365 }; },
     'rf-gap': function () { return { cur: 1, prev: 0, daysLast: 1 }; },
@@ -806,8 +1013,12 @@
     box.innerHTML = '<div class="tw__t">FUCK WITH THIS SCREEN</div>';
     var vals = {}, ctls = {}, outs = {};
     spec.c.forEach(function (c) { vals[c.k] = c.v; });
+    var fireEl = null;
     function applyNow() {
       try { spec.apply(ph, vals, ctls); } catch (e) { /* a bad value never breaks the page */ }
+      if (fireEl && FIRES[key]) {
+        try { fireEl.innerHTML = FIRES[key](vals) || ''; } catch (e) { fireEl.innerHTML = ''; }
+      }
     }
     function setMany(patch) {
       for (var k in patch) {
@@ -836,10 +1047,19 @@
       var lab = document.createElement('label');
       var name = document.createElement('span'); name.className = 'tl'; name.textContent = c.l;
       lab.appendChild(name);
-      var inp = document.createElement('input');
-      if (c.t === 'r') { inp.type = 'range'; inp.min = c.min; inp.max = c.max; }
-      else if (c.t === 'n') { inp.type = 'number'; }
-      else { inp.type = 'text'; }
+      var inp;
+      if (c.t === 's') {
+        inp = document.createElement('select');
+        (c.o || []).forEach(function (o) {
+          var op = document.createElement('option');
+          op.value = o.v; op.textContent = o.l; inp.appendChild(op);
+        });
+      } else {
+        inp = document.createElement('input');
+        if (c.t === 'r') { inp.type = 'range'; inp.min = c.min; inp.max = c.max; }
+        else if (c.t === 'n') { inp.type = 'number'; }
+        else { inp.type = 'text'; }
+      }
       inp.value = c.v;
       var out = null;
       if (c.t === 'r') { out = document.createElement('b'); out.className = 'to'; out.textContent = fmt(c.v); outs[c.k] = out; }
@@ -852,6 +1072,7 @@
       lab.appendChild(inp); if (out) lab.appendChild(out);
       box.appendChild(lab);
     });
+    if (FIRES[key]) { fireEl = document.createElement('div'); fireEl.className = 'tw__fire'; box.appendChild(fireEl); }
     ph.parentNode.insertBefore(box, ph.nextSibling);
     applyNow();
   }
