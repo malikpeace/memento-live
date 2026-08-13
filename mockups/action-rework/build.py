@@ -7,7 +7,7 @@ ROOT = pathlib.Path(__file__).parent
 FRAG = ROOT / 'frag'
 ORDER = ['ob', 'q', 'ld', 'pu', 'lp', 'mx']
 TITLES = {
-    'ob': ('Onboarding', 'One concept, the wall of intent, delivered six ways. No forms, just the goal made real.'),
+    'ob': ('Onboarding', 'The wall of intent, the one onboarding screen. No forms, just the goal made real.'),
     'q':  ('The refine step', 'What is already done + what they think it takes. One question at a time.'),
     'ld': ('Loading', 'The plan being produced. The wait as visible work, never a spinner, never an invented stage name.'),
     'pu': ('The pulse', 'Where are you now: the one screen where the goal number gets written. Clarity shows the standing, Consistency the trajectory; Action only hosts the pen.'),

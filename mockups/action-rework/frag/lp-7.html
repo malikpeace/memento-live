@@ -3,198 +3,296 @@
      lp-15 bottom sheet first | lp-16 horizontal corridor band | lp-17 declarative sentence over account rows |
      lp-18 centered monolith numeral -->
 <section class="cell" data-k="lp-7">
-<!-- MALIK ROUND 3: "a human could not tell what the action is". So the screen
-     now reads as one sentence, top to bottom: Phone in the kitchen drawer at
-     -> 8:00pm. THE ACTION is putting the phone in the drawer. COMPLETION is
-     binary, you did it or you did not, one button, nothing measured.
-     INTENSITY is which hour the ceiling is, and only that: 7:30 / 8:00 / 9:00.
-     PROVENANCE: the seven marks are the times THEY logged the phone going in.
-     The minutes at the bottom are typed by them, copied from their phone's own
-     Screen Time report, and the screen says so on the row. Memento reads
-     nothing off the device. -->
+<!-- MALIK, GRADING ROUND (2026-08-13). Applied exactly:
+     COPY DIET. Killed "Tonight, one thing.", "You did it or you did not...",
+     "You made 8:00pm on 2 of the last 7 nights.", "The hour your plan set."
+     "Phone in the kitchen drawer at" -> "Put phone away at" (universal, Memento
+     cannot know their drawer). Chart label -> "Logged screentime last 7 days".
+     Bottom "last night's screen time" box DELETED. What is left: one action
+     sentence, the hour, the chart, the button.
+     PICKER. The tap chips are gone. The big time IS the control: drag it up or
+     down and it slides 7:30 / 8:00 / 9:00, snapping to the three. Desktop gets
+     the same reel on scroll or cursor drag; arrow keys for keyboard.
+     CHART. Bar graph, height = the minutes they typed off their own Screen Time
+     report, so a bad night is taller at a glance. Bars over the hour they picked
+     (their logged put-away was later than the ceiling) go bright solid; under
+     stays quiet. Neutral ink only, no hue. Today is an empty outlined slot.
+     BUTTON. Hold to confirm the phone is away, then one field slides up for
+     today's number and typing it fills today's bar.
+     PROVENANCE: bar height = a number they typed (source named on the entry
+     row). Bright/quiet = their own logged put-away time against the hour they
+     picked. Today's logged time comes off the clock at the moment of the hold.
+     Memento reads nothing off the device. -->
 <style>
 [data-k=lp-7] .ph{font-variant-numeric:tabular-nums}
 [data-k=lp-7] .w{position:absolute;inset:0;padding:26px 20px 20px;display:flex;flex-direction:column}
 
-/* --- the sentence, ending on the hour ----------------------------------- */
-[data-k=lp-7] .lab{margin:0;font-size:12.5px;color:rgba(var(--ink),.90)}
-[data-k=lp-7] .say{margin:5px 0 0;font-size:22px;font-weight:700;letter-spacing:-.028em;line-height:1.2;
+/* --- the action sentence, landing on the hour --------------------------- */
+[data-k=lp-7] .say{margin:0;font-size:22px;font-weight:700;letter-spacing:-.028em;line-height:1.2;
   color:rgba(var(--ink),.97)}
-[data-k=lp-7] .hour{margin:4px 0 0;line-height:.92;letter-spacing:-.05em;white-space:nowrap;
-  color:rgba(var(--ink),1);transition:opacity .16s ease-out}
-[data-k=lp-7] .hour.swap{opacity:.38}
-[data-k=lp-7] .hour .v{font-size:66px;font-weight:700}
-[data-k=lp-7] .hour .u{font-size:26px;font-weight:500;color:rgba(var(--ink),.90);margin-left:3px}
-[data-k=lp-7] .rule{margin:12px 0 0;font-size:13px;line-height:1.45;color:rgba(var(--ink),.92)}
 
-/* --- what they logged, the last seven nights ---------------------------- */
-[data-k=lp-7] .lead{margin:18px 0 0;font-size:12px;line-height:1.35;color:rgba(var(--ink),.90)}
-[data-k=lp-7] .rec{display:flex;gap:4px;margin:8px 0 0}
-[data-k=lp-7] .rec .c{flex:1 1 0;min-width:0;text-align:center}
-[data-k=lp-7] .rec .c .m{height:14px;border-radius:4px;background:rgba(var(--ink),.14);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.10);transition:background .22s ease-out,box-shadow .22s ease-out}
-[data-k=lp-7] .rec .c.under .m{background:rgba(var(--ink),.86);box-shadow:none}
-[data-k=lp-7] .rec .c.none .m{background:rgba(var(--ink),.07);box-shadow:inset 0 0 0 1px rgba(var(--ink),.12)}
-[data-k=lp-7] .rec .c .t{margin:5px 0 0;font-size:9.5px;line-height:1;color:rgba(var(--ink),.90);white-space:nowrap}
-[data-k=lp-7] .rec .c .d{margin:4px 0 0;font-size:9.5px;line-height:1;color:rgba(var(--ink),.72)}
-[data-k=lp-7] .tally{margin:9px 0 0;font-size:12.5px;line-height:1.4;color:rgba(var(--ink),.92);min-height:18px}
+/* --- the hour IS the control: a reel you drag --------------------------- */
+[data-k=lp-7] .hour{margin:6px 0 0;display:flex;align-items:center;gap:2px;cursor:ns-resize;
+  touch-action:none;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+[data-k=lp-7] .hour:focus{outline:none}
+[data-k=lp-7] .hour:focus-visible{outline:2px solid rgba(var(--ink),.45);outline-offset:4px;border-radius:12px}
+/* one line tall: the neighbouring times only exist while you are dragging,
+   sliding in and out under a soft top and bottom fade */
+[data-k=lp-7] .win{height:66px;overflow:hidden;min-width:0;
+  -webkit-mask-image:linear-gradient(transparent 0,#000 10%,#000 90%,transparent 100%);
+          mask-image:linear-gradient(transparent 0,#000 10%,#000 90%,transparent 100%)}
+[data-k=lp-7] .reel{will-change:transform}
+[data-k=lp-7] .reel span{display:block;height:66px;line-height:66px;font-size:60px;font-weight:700;
+  letter-spacing:-.05em;white-space:nowrap;color:rgba(var(--ink),1)}
+[data-k=lp-7] .hour .u{font-size:25px;font-weight:500;color:rgba(var(--ink),.90);align-self:center}
+[data-k=lp-7] .hint{display:flex;align-items:center;gap:5px;margin:8px 0 0;font-size:11px;
+  color:rgba(var(--ink),.62)}
+[data-k=lp-7] .hint svg{display:block;flex:none}
 
-/* --- the only dial: which hour ------------------------------------------ */
-[data-k=lp-7] .pick{margin:16px 0 0}
-[data-k=lp-7] .pick .t{margin:0 0 8px;font-size:12.5px;color:rgba(var(--ink),.90)}
-[data-k=lp-7] .pick .row{display:flex;gap:6px}
-[data-k=lp-7] .pick button{flex:1;min-width:0;border:0;border-radius:10px;padding:8px 4px 9px;cursor:pointer;
-  font-family:var(--font);
-  background:rgba(22,25,31,.94);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.09);-webkit-tap-highlight-color:transparent;
-  transition:background .16s ease-out,transform .1s ease-out}
-[data-k=lp-7] .pick button i{display:block;font-style:normal;font-size:10.5px;line-height:1;color:rgba(var(--ink),.78);
-  transition:color .16s ease-out}
-[data-k=lp-7] .pick button b{display:block;margin-top:4px;font-size:13.5px;font-weight:500;line-height:1;
-  color:rgba(var(--ink),.92);font-variant-numeric:tabular-nums;transition:color .16s ease-out}
-[data-k=lp-7] .pick button:active{transform:translateY(1px)}
-[data-k=lp-7] .pick button.on{background:rgba(var(--ink),.93);box-shadow:none}
-[data-k=lp-7] .pick button.on i{color:rgba(11,12,16,.70)}
-[data-k=lp-7] .pick button.on b{color:#0b0c10;font-weight:700}
-[data-k=lp-7] .pick button:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
-[data-k=lp-7] .pick .cons{margin:9px 0 0;font-size:12.5px;line-height:1.4;color:rgba(var(--ink),.92);min-height:18px}
-[data-k=lp-7] .ph.done .pick .row{pointer-events:none}
-[data-k=lp-7] .ph.done .pick button{background:rgba(var(--ink),.05)}
-[data-k=lp-7] .ph.done .pick button.on{background:rgba(var(--ink),.17)}
-[data-k=lp-7] .ph.done .pick button.on i{color:rgba(var(--ink),.78)}
-[data-k=lp-7] .ph.done .pick button.on b{color:rgba(var(--ink),.97)}
+/* --- seven nights as bars, plus tonight's empty slot -------------------- */
+[data-k=lp-7] .clab{margin:30px 0 0;font-size:12.5px;color:rgba(var(--ink),.90)}
+[data-k=lp-7] .chart{position:relative;margin:10px 0 0;flex:1 1 auto;min-height:150px;max-height:300px;
+  display:flex;gap:5px;align-items:stretch}
+[data-k=lp-7] .chart .c{flex:1 1 0;min-width:0;padding:0;border:0;background:none;cursor:pointer;
+  display:flex;flex-direction:column;font-family:var(--font);-webkit-tap-highlight-color:transparent}
+[data-k=lp-7] .chart .c:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px;border-radius:6px}
+[data-k=lp-7] .chart .bw{flex:1 1 auto;min-height:0;display:flex;align-items:flex-end}
+[data-k=lp-7] .chart .b{width:100%;min-height:3px;border-radius:4px;background:rgba(var(--ink),.19);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.10);
+  transition:height .34s cubic-bezier(.2,.8,.25,1),background .2s ease-out,box-shadow .2s ease-out}
+[data-k=lp-7] .chart .c.over .b{background:rgba(var(--ink),.88);box-shadow:none}
+[data-k=lp-7] .chart .c.empty .b{background:none;box-shadow:inset 0 0 0 1px rgba(var(--ink),.17)}
+[data-k=lp-7] .chart .dy{margin:6px 0 0;font-size:9.5px;line-height:1;color:rgba(var(--ink),.72);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+[data-k=lp-7] .chart .c.now .dy{color:rgba(var(--ink),.92)}
+[data-k=lp-7] .pop{position:absolute;left:0;bottom:0;transform:translate(-50%,0);pointer-events:none;
+  padding:5px 9px 6px;border-radius:8px;white-space:nowrap;font-size:11px;line-height:1.1;
+  color:rgba(var(--ink),.96);background:rgba(22,25,31,.96);
+  backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.10),0 8px 22px rgba(0,0,0,.5);
+  opacity:0;transition:opacity .14s ease-out}
+[data-k=lp-7] .pop.show{opacity:1}
 
-/* --- did it or did not -------------------------------------------------- */
-[data-k=lp-7] .go{display:block;width:100%;margin:auto 0 0;height:50px;border:0;border-radius:14px;
-  background:rgba(235,238,248,.94);color:#0b0c10;font:700 15.5px/1 var(--font);cursor:pointer;
-  -webkit-tap-highlight-color:transparent;transition:background .26s ease-out,color .26s ease-out,transform .1s ease-out}
-[data-k=lp-7] .go:active{transform:translateY(1px)}
-[data-k=lp-7] .go:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
-[data-k=lp-7] .go.on{background:rgba(63,217,78,.18);color:rgba(var(--ink),.97);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.08);cursor:default}
-
-/* --- the number they type in themselves --------------------------------- */
-[data-k=lp-7] .st{margin:14px 0 0;border-radius:14px;padding:11px 12px 12px;
-  background:rgba(22,25,31,.94);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.07)}
-[data-k=lp-7] .st .t{margin:0;font-size:12.5px;font-weight:500;color:rgba(var(--ink),.92)}
-[data-k=lp-7] .st .in{display:flex;align-items:center;gap:8px;margin-top:9px}
-[data-k=lp-7] .st input{flex:1;min-width:0;height:36px;border:0;border-radius:10px;padding:0 11px;
-  background:rgba(var(--ink),.07);box-shadow:inset 0 1px 0 rgba(var(--ink),.06);
+/* --- the foot: entry slides up out of the hold -------------------------- */
+[data-k=lp-7] .foot{margin-top:auto}
+[data-k=lp-7] .entry{max-height:0;opacity:0;overflow:hidden;margin:0;
+  transition:max-height .3s cubic-bezier(.2,.8,.25,1),opacity .2s ease-out,margin .3s ease-out}
+[data-k=lp-7] .ph.held .entry{max-height:96px;opacity:1;margin:18px 0 12px}
+[data-k=lp-7] .ph.typed .entry{max-height:0;opacity:0;margin:0}
+[data-k=lp-7] .entry p{margin:0 0 8px;font-size:11px;color:rgba(var(--ink),.72)}
+[data-k=lp-7] .entry .in{display:flex;gap:8px}
+[data-k=lp-7] .entry input{flex:1;min-width:0;height:38px;border:0;border-radius:10px;padding:0 12px;
+  background:rgba(var(--ink),.07);box-shadow:inset 0 1px 0 rgba(var(--ink),.07);
   font:500 16px/1 var(--font);font-variant-numeric:tabular-nums;color:rgba(var(--ink),.97);
   -webkit-appearance:none;appearance:none}
-[data-k=lp-7] .st input::placeholder{color:rgba(var(--ink),.55);font-weight:400}
-[data-k=lp-7] .st input:focus{outline:2px solid rgba(var(--ink),.45);outline-offset:1px}
-[data-k=lp-7] .st .sv{height:36px;padding:0 14px;border:0;border-radius:10px;background:rgba(235,238,248,.94);
+[data-k=lp-7] .entry input::placeholder{color:rgba(var(--ink),.50);font-weight:400}
+[data-k=lp-7] .entry input:focus{outline:2px solid rgba(var(--ink),.45);outline-offset:1px}
+[data-k=lp-7] .entry .sv{height:38px;padding:0 15px;border:0;border-radius:10px;background:rgba(235,238,248,.94);
   color:#0b0c10;font:700 13px/1 var(--font);cursor:pointer;-webkit-tap-highlight-color:transparent;
   transition:opacity .16s ease-out,transform .1s ease-out}
-[data-k=lp-7] .st .sv:active{transform:translateY(1px)}
-[data-k=lp-7] .st .sv:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
-[data-k=lp-7] .st .sv[disabled]{opacity:.45;cursor:default}
-[data-k=lp-7] .st .src{margin:9px 0 0;font-size:11px;line-height:1.35;color:rgba(var(--ink),.90)}
-[data-k=lp-7] .ph.typed .st .in{display:none}
+[data-k=lp-7] .entry .sv:active{transform:translateY(1px)}
+[data-k=lp-7] .entry .sv[disabled]{opacity:.45;cursor:default}
+
+/* --- hold to confirm ---------------------------------------------------- */
+[data-k=lp-7] .go{position:relative;display:block;width:100%;height:52px;border:0;border-radius:14px;
+  overflow:hidden;background:rgba(var(--ink),.10);box-shadow:inset 0 1px 0 rgba(var(--ink),.09);
+  font-family:var(--font);cursor:pointer;touch-action:none;-webkit-tap-highlight-color:transparent;
+  transition:background .26s ease-out,box-shadow .26s ease-out}
+[data-k=lp-7] .go .fl{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(235,238,248,.94)}
+[data-k=lp-7] .go .tx{position:relative;display:block;font-size:15.5px;font-weight:700;line-height:52px;
+  color:rgba(var(--ink),.97);mix-blend-mode:difference}
+[data-k=lp-7] .go:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
+[data-k=lp-7] .go.on{background:rgba(63,217,78,.16);cursor:default}
+[data-k=lp-7] .go.on .tx{mix-blend-mode:normal}
 @media (prefers-reduced-motion:reduce){[data-k=lp-7] *{transition:none!important}}
 </style>
-<h3>Ceiling</h3><p class="cap">The whole screen is one sentence that lands on a poster-scale hour: the action is putting the phone in a drawer, the only dial is which hour that happens, and the seven marks under it are the times the person logged doing it.</p>
+<h3>Ceiling</h3><p class="cap">One sentence lands on a poster-scale hour you drag like a reel, and under it the week is a bar chart of the minutes they typed off their own Screen Time report: bad nights are simply taller, and the ones past the hour go bright.</p>
 <div class="bk"><i>Screen time</i></div>
 <div class="ph">
   <div class="grid"></div>
   <div class="w">
-    <p class="lab">Tonight, one thing.</p>
-    <p class="say">Phone in the kitchen drawer at</p>
-    <div class="hour"><span class="v" data-hr>8:00</span><span class="u">pm</span></div>
-    <p class="rule">You did it or you did not. There is nothing to measure.</p>
+    <p class="say">Put phone away at</p>
 
-    <p class="lead">The last seven nights, the time you logged putting it in.</p>
-    <div class="rec" aria-hidden="true"></div>
-    <p class="tally">You made 8:00pm on 2 of the last 7 nights.</p>
-
-    <div class="pick">
-      <p class="t">Which hour tonight</p>
-      <div class="row" role="group" aria-label="which hour tonight">
-        <button type="button" data-v="1170"><i>tighter</i><b>7:30pm</b></button>
-        <button type="button" class="on" data-v="1200" aria-pressed="true"><i>tonight’s</i><b>8:00pm</b></button>
-        <button type="button" data-v="1260"><i>easier</i><b>9:00pm</b></button>
-      </div>
-      <p class="cons">The hour your plan set.</p>
+    <div class="hour" role="slider" tabindex="0" aria-label="Pick a time" aria-valuemin="0" aria-valuemax="2" aria-valuenow="1" aria-valuetext="8:00pm">
+      <div class="win"><div class="reel"><span>7:30</span><span>8:00</span><span>9:00</span></div></div>
+      <span class="u">pm</span>
     </div>
+    <p class="hint" aria-hidden="true">
+      <svg width="9" height="14" viewBox="0 0 9 14" fill="none" aria-hidden="true">
+        <path d="M1 5.2 4.5 1.6 8 5.2M1 8.8l3.5 3.6L8 8.8" stroke="rgba(235,238,248,.62)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>Pick a time</p>
 
-    <button type="button" class="go">The phone is in the drawer</button>
+    <p class="clab">Logged screentime last 7 days</p>
+    <div class="chart"><span class="pop"></span></div>
 
-    <div class="st">
-      <p class="t">Last night's screen time</p>
-      <div class="in">
-        <input type="text" inputmode="text" aria-label="last night's screen time" placeholder="hours and minutes">
-        <button type="button" class="sv" disabled>Save</button>
+    <div class="foot">
+      <div class="entry">
+        <p>Today, from your Screen Time report</p>
+        <div class="in">
+          <input type="text" inputmode="text" aria-label="today's screen time" placeholder="4h 12m">
+          <button type="button" class="sv" disabled>Save</button>
+        </div>
       </div>
-      <p class="src">You copy this from your phone's own Screen Time report. Memento cannot read it.</p>
+      <button type="button" class="go"><span class="fl"></span><span class="tx">Confirm &amp; log screentime</span></button>
     </div>
   </div>
 </div>
 <script>(function(){var r=document.querySelector('[data-k="lp-7"]');if(!r)return;
-var ph=r.querySelector('.ph'),hour=r.querySelector('.hour'),hr=r.querySelector('[data-hr]'),
-    rec=r.querySelector('.rec'),tally=r.querySelector('.tally'),cons=r.querySelector('.pick .cons'),v=1200,
-    /* what each hour means, in words, against the hour their plan set */
-    COPY={1170:'Half an hour tighter than the hour your plan set.',
-          1200:'The hour your plan set.',
-          1260:'An hour of slack on the hour your plan set.'};
+var ph=r.querySelector('.ph'),hour=r.querySelector('.hour'),reel=r.querySelector('.reel'),
+    chart=r.querySelector('.chart'),
+    pop=r.querySelector('.pop'),go=r.querySelector('.go'),fl=r.querySelector('.go .fl'),
+    tx=r.querySelector('.go .tx'),inp=r.querySelector('.entry input'),sv=r.querySelector('.entry .sv');
 
-/* NIGHTS: the times THEY logged the phone going in the drawer. null = they
-   did not log it that night. Nothing here is sensed, it is their own record. */
-var NIGHTS=[{d:'M',t:1212},{d:'T',t:1192},{d:'W',t:null},{d:'T',t:1203},
-            {d:'F',t:1280},{d:'S',t:1166},{d:'S',t:1247}];
+/* the three the reel snaps to, in minutes of day */
+var HOURS=[1170,1200,1260],idx=1,H=66,BASE=420;
+
+/* THE WEEK. m = minutes they typed off their own Screen Time report.
+   t = the time they logged the phone going away. Nothing is sensed. */
+var NIGHTS=[{d:'M',t:1212,m:268},{d:'T',t:1192,m:214},{d:'W',t:1246,m:322},{d:'T',t:1203,m:241},
+            {d:'F',t:1288,m:401},{d:'S',t:1166,m:176},{d:'S',t:1177,m:232}];
+var today={d:'Today',t:null,m:null};
+
 function clock(x){var h=Math.floor(x/60),m=x%60,ap=h>=12?'pm':'am';h=h%12||12;
   return h+':'+String(m).padStart(2,'0')+ap}
+function hm(x){var h=Math.floor(x/60),m=x%60;return (h?h+'h':'')+(m||!h?(h?' ':'')+m+'m':'')}
 
-NIGHTS.forEach(function(n){
-  var c=document.createElement('div');c.className='c'+(n.t===null?' none':'');
-  c.innerHTML='<div class="m"></div><div class="t">'+(n.t===null?'none':clock(n.t).replace('pm',''))+
-              '</div><div class="d">'+n.d+'</div>';
-  rec.appendChild(c);
+/* --- build the bars ----------------------------------------------------- */
+var ROWS=NIGHTS.concat([today]),cells=[];
+ROWS.forEach(function(n,i){
+  var c=document.createElement('button');c.type='button';c.className='c';
+  c.innerHTML='<span class="bw"><span class="b"></span></span><span class="dy"></span>';
+  c.addEventListener('click',function(e){e.stopPropagation();showPop(i)});
+  chart.appendChild(c);cells.push(c);
 });
-var cells=[].slice.call(rec.children);
 
-function paint(anim){
-  if(anim){hour.classList.add('swap');setTimeout(function(){hour.classList.remove('swap')},170);}
-  setTimeout(function(){hr.textContent=clock(v).replace('pm','')},anim?110:0);
-  var made=0;
-  NIGHTS.forEach(function(n,i){
-    var ok=n.t!==null&&n.t<=v;cells[i].classList.toggle('under',ok);if(ok)made++;
+function scale(){var mx=BASE;ROWS.forEach(function(n){if(n.m)mx=Math.max(mx,n.m)});return mx}
+
+function paint(){
+  var v=HOURS[idx],mx=scale();
+  ROWS.forEach(function(n,i){
+    var c=cells[i],b=c.querySelector('.b'),empty=n.m===null;
+    c.classList.toggle('empty',empty);
+    c.classList.toggle('now',n===today);
+    c.classList.toggle('over',!empty&&n.t!==null&&n.t>v);
+    b.style.height=(empty?100:Math.max(2,Math.round(1000*n.m/mx)/10))+'%';
+    c.querySelector('.dy').textContent=n.d;
+    c.setAttribute('aria-label',(n===today?'Today':n.d)+', '+(empty?'not entered yet'
+      :hm(n.m)+', phone away '+clock(n.t)));
   });
-  if(!ph.classList.contains('done')){
-    tally.textContent='You made '+clock(v)+' on '+made+' of the last 7 nights.';
-  }
-  cons.textContent=COPY[v];
+  hour.setAttribute('aria-valuenow',idx);
+  hour.setAttribute('aria-valuetext',clock(v));
+  if(open>=0)showPop(open,true);
 }
-r.querySelectorAll('.pick button').forEach(function(b){b.addEventListener('click',function(){
-  r.querySelectorAll('.pick button').forEach(function(x){x.classList.remove('on');x.removeAttribute('aria-pressed')});
-  b.classList.add('on');b.setAttribute('aria-pressed','true');v=+b.dataset.v;paint(true);});});
 
-/* completion is binary: one tap, and the time it was tapped is what gets logged.
-   The time comes off the clock at the moment of the tap, it is never a stored fiction. */
-var go=r.querySelector('.go');
-go.addEventListener('click',function(){
-  if(go.classList.contains('on'))return;
-  var d=new Date(),LOGGED=d.getHours()*60+d.getMinutes();
-  go.classList.add('on');ph.classList.add('done');
-  go.textContent='In the drawer, '+clock(LOGGED);
-  tally.textContent='Logged '+clock(LOGGED)+'. '+(LOGGED>=16*60
-    ? (LOGGED<=v?'Under':'Past')+' tonight’s '+clock(v)+'.'
-    : 'Tonight’s hour is '+clock(v)+'.');
+/* --- the popover: one at a time, closes on any other tap ---------------- */
+var open=-1;
+function showPop(i,keep){
+  var n=ROWS[i];
+  if(!keep&&open===i){hidePop();return}
+  if(n.m===null&&n.t===null){hidePop();return}
+  open=i;
+  pop.textContent=n.m===null?('away '+clock(n.t)+', not entered')
+    :hm(n.m)+(n.t!==null?', away '+clock(n.t):'');
+  pop.classList.add('show');
+  var cw=chart.clientWidth,ch=chart.clientHeight,
+      cb=chart.getBoundingClientRect(),bb=cells[i].querySelector('.b').getBoundingClientRect(),
+      cx=bb.left-cb.left+bb.width/2,pw=pop.offsetWidth,half=pw/2+2;
+  pop.style.left=Math.max(half,Math.min(cw-half,cx))+'px';
+  pop.style.bottom=Math.min(cb.bottom-bb.top+8,ch-30)+'px';
+}
+function hidePop(){open=-1;pop.classList.remove('show')}
+ph.addEventListener('click',hidePop);
+
+/* --- drag the hour: pointer, wheel, keys -------------------------------- */
+function setIdx(i,anim){
+  i=Math.max(0,Math.min(2,i));if(i===idx&&anim!==false)return;
+  idx=i;reel.style.transition='transform .22s cubic-bezier(.2,.8,.25,1)';
+  reel.style.transform='translateY('+(-idx*H)+'px)';paint();
+}
+reel.style.transform='translateY('+(-idx*H)+'px)';
+
+var dragY=null,dragI=0,moved=0;
+hour.addEventListener('pointerdown',function(e){
+  dragY=e.clientY;dragI=idx;moved=0;hidePop();
+  reel.style.transition='none';
+  try{hour.setPointerCapture(e.pointerId)}catch(err){}
+});
+hour.addEventListener('pointermove',function(e){
+  if(dragY===null)return;e.preventDefault();
+  var dy=e.clientY-dragY;moved=Math.max(moved,Math.abs(dy));
+  var live=Math.max(0,Math.min(2,Math.round(dragI-dy/H)));
+  var off=Math.max(-2*H-22,Math.min(22,-dragI*H+dy));
+  reel.style.transform='translateY('+off+'px)';
+  if(live!==idx){idx=live;paint()}
+});
+function endDrag(e){
+  if(dragY===null)return;dragY=null;
+  reel.style.transition='transform .22s cubic-bezier(.2,.8,.25,1)';
+  reel.style.transform='translateY('+(-idx*H)+'px)';
+  try{hour.releasePointerCapture(e.pointerId)}catch(err){}
+}
+hour.addEventListener('pointerup',endDrag);
+hour.addEventListener('pointercancel',endDrag);
+
+var acc=0,wt=null;
+hour.addEventListener('wheel',function(e){
+  e.preventDefault();acc+=e.deltaY;
+  if(Math.abs(acc)>=26){setIdx(idx+(acc>0?1:-1));acc=0}
+  clearTimeout(wt);wt=setTimeout(function(){acc=0},220);
+},{passive:false});
+
+hour.addEventListener('keydown',function(e){
+  if(e.key==='ArrowUp'||e.key==='ArrowRight'){e.preventDefault();setIdx(idx+1)}
+  else if(e.key==='ArrowDown'||e.key==='ArrowLeft'){e.preventDefault();setIdx(idx-1)}
 });
 
-/* the typed number, with its source named on the row */
-var inp=r.querySelector('.st input'),sv=r.querySelector('.st .sv'),
-    stT=r.querySelector('.st .t'),src=r.querySelector('.st .src');
-inp.addEventListener('input',function(){sv.disabled=!inp.value.trim()});
-function save(){
-  var s=inp.value.trim();if(!s)return;
-  ph.classList.add('typed');
-  stT.textContent='Last night, '+s+', typed by you.';
-  src.textContent='Read off your own Screen Time report. Memento only holds what you write here.';
+/* --- hold to confirm, then the number ----------------------------------- */
+var HOLD=760,ht=null,rt=null,done=false;
+function startHold(e){
+  if(done||ht)return;if(e&&e.preventDefault)e.preventDefault();
+  clearTimeout(rt);hidePop();
+  fl.style.transition='width '+HOLD+'ms linear';fl.style.width='100%';
+  ht=setTimeout(finish,HOLD);
 }
-sv.addEventListener('click',save);
-inp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();save();}});
+function cancelHold(){
+  if(done||!ht)return;clearTimeout(ht);ht=null;
+  fl.style.transition='width .18s ease-out';fl.style.width='0';
+  var was=tx.textContent;tx.textContent='Hold to confirm';
+  clearTimeout(rt);rt=setTimeout(function(){if(!done)tx.textContent=was},1200);
+}
+function finish(){
+  ht=null;done=true;clearTimeout(rt);
+  var d=new Date();today.t=d.getHours()*60+d.getMinutes();
+  fl.style.transition='width .2s ease-out';fl.style.width='0';
+  go.classList.add('on');ph.classList.add('held');
+  tx.textContent='Phone away, '+clock(today.t);
+  paint();
+  try{inp.focus({preventScroll:true})}catch(err){}
+}
+go.addEventListener('pointerdown',startHold);
+go.addEventListener('pointerup',cancelHold);
+go.addEventListener('pointercancel',cancelHold);
+go.addEventListener('pointerleave',cancelHold);
+go.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' ')startHold(e)});
+go.addEventListener('keyup',cancelHold);
 
-paint(false);})();</script>
+function parse(s){
+  s=s.toLowerCase().replace(/\s+/g,'');
+  var c=s.match(/^(\d+):(\d+)$/);if(c)return +c[1]*60+ +c[2];
+  var h=s.match(/(\d+(?:\.\d+)?)h/),m=s.match(/(\d+)m/);
+  if(h||m)return Math.round((h?parseFloat(h[1])*60:0)+(m?+m[1]:0));
+  var n=s.match(/^(\d+(?:\.\d+)?)$/);
+  if(n)return parseFloat(n[1])<=12?Math.round(parseFloat(n[1])*60):Math.round(parseFloat(n[1]));
+  return null;
+}
+inp.addEventListener('input',function(){sv.disabled=parse(inp.value)===null});
+function save(){
+  var v=parse(inp.value);if(v===null||v<=0)return;
+  today.m=v;ph.classList.add('typed');paint();
+}
+sv.addEventListener('click',function(e){e.stopPropagation();save()});
+inp.addEventListener('click',function(e){e.stopPropagation()});
+inp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();save()}});
+
+paint();})();</script>
 </section>

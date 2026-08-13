@@ -3,109 +3,111 @@
      lp-15 bottom sheet first | lp-16 horizontal corridor band | lp-17 declarative sentence over account rows |
      lp-18 centered monolith numeral -->
 <section class="cell" data-k="lp-1">
-<!-- ARCHETYPES (difference law)
-     lp-1  full-bleed statement type
-     lp-2  ledger row stack
-     lp-3  vertical split rail
-     lp-4  canvas ring object
-     lp-5  bottom sheet first -->
+<!-- ARCHETYPE (difference law): lp-1 full-bleed statement type.
+     GLANCE LAW PASS (2026-08-13): one instruction sentence, no explainer line,
+     the consequence moved into the top line itself (47 -> 52 with a ghost
+     segment on the bar), the three chip boxes deleted, the NUMBER IN THE
+     SENTENCE is now the control, and completion is hold, never a slider. -->
 <style>
 [data-k=lp-1] .s{position:absolute;inset:0;display:flex;flex-direction:column;padding:34px 22px 20px;
   font-variant-numeric:tabular-nums}
 
 /* --- OUTPUT BAR (provenance law) ---------------------------------------
-   This bar is the literal sum of the messages they logged, counted against a
-   countable target that came out of their own plan (100 clients). Nothing is
-   interpreted and nothing is measured for them: log 5, the bar moves 5.
-   THE RULE: if the star were money only ("$3,000 a month") with no countable
-   target in the plan, there would be NO BAR HERE AT ALL. Money, weight and
-   any interpreted progress never get a bar in Action, because Memento cannot
-   see them happen, it can only count what the person logged. In that case
-   this row is cut and the screen opens on the statement. */
-[data-k=lp-1] .goal{display:flex;align-items:baseline;gap:6px;font-size:12px;letter-spacing:-.005em;
+   The literal sum of the messages they logged, counted against a countable
+   target their own plan named (100 clients). The GHOST segment is today's
+   chosen size laid on top of that sum, so the top line reads where today
+   lands before it is done. If the star were money only, with no countable
+   target, this row would not exist at all. */
+[data-k=lp-1] .goal{display:flex;align-items:baseline;gap:5px;font-size:12.5px;letter-spacing:-.005em;
   white-space:nowrap;color:rgba(var(--ink),.92)}
 [data-k=lp-1] .goal b{font-weight:700;font-variant-numeric:tabular-nums}
+[data-k=lp-1] .goal em{font-style:normal;font-weight:400;color:rgba(var(--ink),.60);padding:0 1px}
 [data-k=lp-1] .goal u{text-decoration:none;font-weight:400;min-width:0;overflow:hidden;text-overflow:ellipsis}
-[data-k=lp-1] .goal span{margin-left:auto;color:rgba(var(--ink),.92);flex:none}
-[data-k=lp-1] .bar{margin-top:9px;height:3px;border-radius:2px;background:rgba(var(--ink),.12);overflow:hidden}
-[data-k=lp-1] .bar i{display:block;height:100%;width:47%;border-radius:2px;background:rgba(var(--ink),.70);
-  transition:width .5s cubic-bezier(.2,.7,.2,1)}
-[data-k=lp-1] .src{margin:6px 0 0;font-size:11px;line-height:1.35;color:rgba(var(--ink),.90)}
+[data-k=lp-1] .goal .best{margin-left:auto;flex:none;font-weight:400;color:rgba(var(--ink),.92)}
+[data-k=lp-1] .goal .best b{font-weight:700}
+[data-k=lp-1] .s.done .goal em,[data-k=lp-1] .s.done .goal .from{display:none}
 
-/* --- the statement ------------------------------------------------------ */
-[data-k=lp-1] .say{margin-top:auto;font-size:29px;line-height:1.04;letter-spacing:-.03em;font-weight:500;
-  color:rgba(var(--ink),.96);text-wrap:pretty}
-[data-k=lp-1] .say .n{display:block;font-size:110px;font-weight:700;line-height:.80;
-  margin:6px 0 8px -5px;letter-spacing:-.055em;color:rgba(var(--ink),1);
-  font-variant-numeric:tabular-nums;transition:opacity .16s ease-out}
-[data-k=lp-1] .say .n.swap{opacity:.35}
-[data-k=lp-1] .cons{margin-top:15px;font-size:13.5px;line-height:1.46;color:rgba(var(--ink),.90);
-  min-height:39px;text-wrap:pretty}
+[data-k=lp-1] .bar{position:relative;margin-top:9px;height:3px;border-radius:2px;
+  background:rgba(var(--ink),.12);overflow:hidden}
+[data-k=lp-1] .bar i{position:absolute;left:0;top:0;bottom:0;width:47%;border-radius:2px;
+  background:rgba(var(--ink),.70);transition:width .32s cubic-bezier(.2,.7,.2,1)}
+/* the ghost: today's size, not yet banked */
+[data-k=lp-1] .bar u{position:absolute;top:0;bottom:0;left:47%;width:5%;border-radius:2px;
+  background:rgba(var(--ink),.30);
+  transition:left .32s cubic-bezier(.2,.7,.2,1),width .32s cubic-bezier(.2,.7,.2,1),opacity .2s ease-out}
+[data-k=lp-1] .s.done .bar u{opacity:0}
 
-/* --- the scale row: three proposed sizes, everything else behind "more" -- */
-[data-k=lp-1] .scale{display:flex;gap:6px;margin:18px 0 0}
-[data-k=lp-1] .scale button{flex:1;min-width:0;height:48px;border:0;border-radius:10px;padding:0 4px;
+/* quiet layer: where the number came from, and the deadline from their star */
+[data-k=lp-1] .src{display:flex;gap:10px;margin:7px 0 0;font-size:11px;line-height:1.35;
+  color:rgba(var(--ink),.90)}
+[data-k=lp-1] .src span:last-child{margin-left:auto;flex:none}
+
+/* --- the statement: the whole screen ------------------------------------ */
+[data-k=lp-1] .say{margin:auto 0 22px;font-size:29px;line-height:1.04;letter-spacing:-.03em;font-weight:500;
+  color:rgba(var(--ink),.96)}
+[data-k=lp-1] .say .vb,[data-k=lp-1] .say .obj{display:block}
+[data-k=lp-1] .nline{display:block;position:relative;margin:6px 0 15px}
+
+/* THE PICKER IS THE NUMBER. Quietly marked tappable, nothing else on screen. */
+[data-k=lp-1] .n{-webkit-appearance:none;appearance:none;border:0;background:none;padding:0;margin:0 0 0 -5px;
+  font-family:var(--font);font-size:110px;font-weight:700;line-height:.80;letter-spacing:-.055em;
+  color:rgba(var(--ink),1);font-variant-numeric:tabular-nums;cursor:pointer;display:block;
+  -webkit-tap-highlight-color:transparent;
+  text-decoration:underline;text-decoration-thickness:4px;text-underline-offset:10px;
+  text-decoration-color:rgba(var(--ink),.20);
+  transition:opacity .16s ease-out,text-decoration-color .16s ease-out,transform .1s ease-out}
+[data-k=lp-1] .n:active{transform:translateY(1px);text-decoration-color:rgba(var(--ink),.45)}
+[data-k=lp-1] .n[aria-expanded=true]{text-decoration-color:rgba(var(--ink),.45)}
+[data-k=lp-1] .n.swap{opacity:.35}
+[data-k=lp-1] .n:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:4px;border-radius:6px}
+[data-k=lp-1] .s.done .n{pointer-events:none;text-decoration-color:transparent}
+
+/* the sizes, popped right at the number */
+[data-k=lp-1] .pop{position:absolute;left:0;bottom:calc(100% + 44px);width:214px;padding:6px;
+  border-radius:14px;background:rgba(22,25,31,.96);
+  backdrop-filter:blur(28px) saturate(1.4);-webkit-backdrop-filter:blur(28px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09),0 18px 40px rgba(0,0,0,.55);
+  opacity:0;visibility:hidden;transform:translateY(6px) scale(.98);transform-origin:0 100%;
+  transition:opacity .16s ease-out,transform .16s ease-out,visibility 0s linear .16s;z-index:3}
+[data-k=lp-1] .pop.open{opacity:1;visibility:visible;transform:none;transition-delay:0s}
+[data-k=lp-1] .opts{max-height:196px;overflow:auto;-webkit-overflow-scrolling:touch}
+[data-k=lp-1] .opt{display:flex;align-items:baseline;gap:8px;width:100%;height:34px;padding:0 10px;
+  border:0;border-radius:9px;background:none;font-family:var(--font);cursor:pointer;text-align:left;
+  -webkit-tap-highlight-color:transparent;transition:background .14s ease-out}
+[data-k=lp-1] .opt b{font-size:16px;font-weight:700;color:rgba(var(--ink),.96);
+  font-variant-numeric:tabular-nums;min-width:19px}
+[data-k=lp-1] .opt i{font-style:normal;font-size:12px;color:rgba(var(--ink),.90)}
+[data-k=lp-1] .opt span{margin-left:auto;font-size:11px;color:rgba(var(--ink),.90);flex:none}
+[data-k=lp-1] .opt:active{background:rgba(var(--ink),.10)}
+[data-k=lp-1] .opt.on{background:rgba(var(--ink),.13)}
+[data-k=lp-1] .opt:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:-2px}
+[data-k=lp-1] .pmore{display:block;width:100%;margin-top:4px;padding:9px 10px;border:0;border-radius:9px;
+  background:none;box-shadow:inset 0 1px 0 rgba(var(--ink),.07);color:rgba(var(--ink),.90);
+  font:400 11px/1 var(--font);text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent}
+[data-k=lp-1] .pmore:active{color:rgba(var(--ink),.96)}
+[data-k=lp-1] .pmore:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:-2px}
+
+/* --- the completion gesture: HOLD (the set's pattern) ------------------- */
+[data-k=lp-1] .hold{position:relative;height:58px;border-radius:14px;overflow:hidden;
   background:rgba(22,25,31,.94);
   backdrop-filter:blur(26px) saturate(1.4);-webkit-backdrop-filter:blur(26px) saturate(1.4);
-  font-family:var(--font);cursor:pointer;
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.08);-webkit-tap-highlight-color:transparent;
-  transition:background .16s ease-out,transform .1s ease-out}
-[data-k=lp-1] .scale button i{display:block;font-style:normal;font-size:10.5px;line-height:1;
-  color:rgba(var(--ink),.72);transition:color .16s ease-out}
-[data-k=lp-1] .scale button b{display:block;margin-top:4px;font-size:15px;font-weight:500;line-height:1;
-  color:rgba(var(--ink),.90);font-variant-numeric:tabular-nums;transition:color .16s ease-out}
-[data-k=lp-1] .scale button:active{transform:translateY(1px)}
-[data-k=lp-1] .scale button.on{background:rgba(var(--ink),.93);box-shadow:none}
-[data-k=lp-1] .scale button.on i{color:rgba(11,12,16,.68)}
-[data-k=lp-1] .scale button.on b{color:#0b0c10;font-weight:700}
-[data-k=lp-1] .scale button:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
-[data-k=lp-1] .scale.fine button{height:38px}
-[data-k=lp-1] .scale.fine button i{display:none}
-[data-k=lp-1] .scale.fine button b{margin-top:0;font-size:13.5px}
-[data-k=lp-1] .more{display:block;margin:9px auto 14px;border:0;border-radius:10px;padding:7px 15px;
-  background:rgba(22,25,31,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.07);color:rgba(var(--ink),.78);
-  font:500 12px/1 var(--font);cursor:pointer;-webkit-tap-highlight-color:transparent;
-  transition:color .16s ease-out}
-[data-k=lp-1] .more:active,[data-k=lp-1] .more.on{color:rgba(var(--ink),.96)}
-[data-k=lp-1] .more:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
-[data-k=lp-1] .s.done .more{opacity:.5;pointer-events:none}
-
-/* --- the completion gesture --------------------------------------------- */
-[data-k=lp-1] .track{position:relative;height:58px;border-radius:14px;background:rgba(22,25,31,.94);
-  backdrop-filter:blur(26px) saturate(1.4);-webkit-backdrop-filter:blur(26px) saturate(1.4);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.09);overflow:hidden;touch-action:none;
-  transition:background .3s ease-out}
-[data-k=lp-1] .track:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
-[data-k=lp-1] .track .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(63,217,78,.22)}
-[data-k=lp-1] .track .lab{position:absolute;inset:0;display:grid;place-items:center;padding-left:40px;
-  font-size:13.5px;font-weight:500;color:rgba(var(--ink),.90);transition:padding .26s ease-out}
-[data-k=lp-1] .knob{position:absolute;top:5px;left:5px;width:48px;height:48px;border-radius:10px;
-  background:rgba(235,238,248,.94);display:grid;place-items:center;cursor:grab;touch-action:none}
-[data-k=lp-1] .knob:active{cursor:grabbing}
-[data-k=lp-1] .knob svg{display:block}
-[data-k=lp-1] .track.snap .knob,[data-k=lp-1] .track.snap .fill{transition:left .22s ease-out,width .22s ease-out}
-
-/* --- confirmed ---------------------------------------------------------- */
-[data-k=lp-1] .s.done .scale{pointer-events:none}
-[data-k=lp-1] .s.done .scale button{background:rgba(var(--ink),.05)}
-[data-k=lp-1] .s.done .scale button i{color:rgba(var(--ink),.62)}
-[data-k=lp-1] .s.done .scale button b{color:rgba(var(--ink),.72)}
-[data-k=lp-1] .s.done .scale button.on{background:rgba(var(--ink),.16)}
-[data-k=lp-1] .s.done .scale button.on i{color:rgba(var(--ink),.72)}
-[data-k=lp-1] .s.done .scale button.on b{color:rgba(var(--ink),.96)}
-[data-k=lp-1] .s.done .track{background:rgba(63,217,78,.18)}
-[data-k=lp-1] .s.done .track .fill{width:100%;background:rgba(63,217,78,.18)}
-[data-k=lp-1] .s.done .lab{padding-left:0;padding-right:74px;color:rgba(var(--ink),.96);font-weight:700}
-[data-k=lp-1] .s.done .knob{opacity:0;transform:scale(.9);transition:opacity .18s ease-out,transform .18s ease-out}
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09);cursor:pointer;touch-action:none;user-select:none;
+  -webkit-user-select:none;-webkit-tap-highlight-color:transparent;transition:background .3s ease-out}
+[data-k=lp-1] .hold:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
+[data-k=lp-1] .hold .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(63,217,78,.22)}
+[data-k=lp-1] .hold .lab{position:absolute;inset:0;display:grid;place-items:center;
+  font-size:13.5px;font-weight:500;color:rgba(var(--ink),.92);transition:padding .26s ease-out}
+[data-k=lp-1] .s.done .hold{background:rgba(63,217,78,.16);box-shadow:inset 0 1px 0 rgba(63,217,78,.30)}
+[data-k=lp-1] .s.done .hold .fill{width:100%;background:rgba(63,217,78,.16)}
+[data-k=lp-1] .s.done .lab{padding-right:74px;color:rgba(var(--ink),.96);font-weight:700}
 [data-k=lp-1] .undo{position:absolute;right:6px;top:6px;bottom:6px;width:62px;border:0;border-radius:10px;
   background:rgba(22,25,31,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.10);color:rgba(var(--ink),.90);font:500 12.5px/1 var(--font);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.10);color:rgba(var(--ink),.92);font:500 12.5px/1 var(--font);
   cursor:pointer;opacity:0;pointer-events:none;transition:opacity .2s ease-out .12s}
 [data-k=lp-1] .s.done .undo{opacity:1;pointer-events:auto}
 @media (prefers-reduced-motion:reduce){[data-k=lp-1] *{transition:none!important}}
 </style>
-<h3>Statement</h3><p class="cap">No cards at all. The instruction is the entire screen, set at poster scale, so the count is the biggest thing in your hand and the only other decision is three named sizes underneath, with every other number kept behind a quiet "more".</p>
+<h3>Statement</h3><p class="cap">The instruction is the entire screen: the number inside the sentence is the control, and the line at the top already shows where today lands.</p>
 <div class="bk" role="group" aria-label="which goal this screen is carrying">
   <button type="button" class="on" data-b="money" aria-pressed="true">Money</button>
   <button type="button" data-b="audience" aria-pressed="false">Audience</button>
@@ -114,124 +116,171 @@
 <div class="ph">
   <div class="grid"></div>
   <div class="s">
-    <div class="goal"><b data-count>47</b> <u data-tail>of 100 clients reached out</u><span data-left>19 days left</span></div>
-    <div class="bar"><i></i></div>
-    <p class="src">Counted from the messages you logged.</p>
+    <div class="goal">
+      <b class="from" data-from>47</b><em aria-hidden="true">&#8594;</em><b data-to>52</b>
+      <u data-tail>of 100 clients</u>
+      <span class="best">Best <b data-best>8</b></span>
+    </div>
+    <div class="bar"><i></i><u></u></div>
+    <p class="src"><span data-src>From your logged messages</span><span data-left>19 days left</span></p>
 
-    <p class="say"><span class="vb">Message</span><span class="n">5</span><span class="obj">potential clients.</span></p>
-    <p class="cons">Sending 5 takes you to 52 of 100. Your best day so far is 8.</p>
+    <div class="say"><span class="vb">Message</span>
+      <span class="nline">
+        <button type="button" class="n" aria-haspopup="true" aria-expanded="false" aria-label="how many today">5</button>
+        <div class="pop" role="group" aria-label="how many today">
+          <div class="opts"></div>
+          <button type="button" class="pmore">more sizes</button>
+        </div>
+      </span>
+      <span class="obj">potential clients.</span></div>
 
-    <div class="scale" role="group" aria-label="how many today"></div>
-    <button type="button" class="more">more sizes</button>
-
-    <div class="track" role="button" tabindex="0" aria-label="slide right when they are sent">
+    <div class="hold" role="button" tabindex="0">
       <div class="fill"></div>
-      <div class="lab">Slide when they are sent</div>
-      <div class="knob"><svg width="16" height="14" viewBox="0 0 16 14" aria-hidden="true"><path d="M1 7h12M9 2l5 5-5 5" fill="none" stroke="#0b0c10" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="lab">Hold when sent</div>
       <button type="button" class="undo" tabindex="-1">Undo</button>
     </div>
   </div>
 </div>
 <script>(function(){
-  var r=document.querySelector('[data-k="lp-1"]');if(!r)return;
-  var s=r.querySelector('.s'),n=r.querySelector('.say .n'),cons=r.querySelector('.cons'),
-      bar=r.querySelector('.bar i'),lab=r.querySelector('.track .lab'),track=r.querySelector('.track'),
-      knob=r.querySelector('.knob'),fill=r.querySelector('.track .fill'),undo=r.querySelector('.undo'),
-      obj=r.querySelector('.obj'),vb=r.querySelector('.vb'),scale=r.querySelector('.scale'),
-      more=r.querySelector('.more'),count=r.querySelector('[data-count]'),
-      tail=r.querySelector('[data-tail]'),left=r.querySelector('[data-left]'),src=r.querySelector('.src');
+  var r=document.currentScript.closest('.cell');if(!r)return;
+  var s=r.querySelector('.s'),n=r.querySelector('.n'),pop=r.querySelector('.pop'),
+      opts=r.querySelector('.opts'),pmore=r.querySelector('.pmore'),
+      solid=r.querySelector('.bar i'),ghost=r.querySelector('.bar u'),
+      goal=r.querySelector('.goal'),from=r.querySelector('[data-from]'),to=r.querySelector('[data-to]'),
+      tail=r.querySelector('[data-tail]'),bestN=r.querySelector('[data-best]'),
+      srcEl=r.querySelector('[data-src]'),leftEl=r.querySelector('[data-left]'),
+      obj=r.querySelector('.obj'),vb=r.querySelector('.vb'),
+      hold=r.querySelector('.hold'),fill=r.querySelector('.hold .fill'),
+      lab=r.querySelector('.hold .lab'),undo=r.querySelector('.undo');
 
   /* --- THE BUCKETS (ACTION-BUCKETS.md) -----------------------------------
-     One shape, three of the seven goals. In every one of them REACHED is the
-     sum of things the person logged and TARGET is the countable target their
-     own plan named, so the bar stays a literal sum over their own list. The
-     verb, the unit and the source line change; the provenance does not. */
+     One shape, three of the seven goals. REACHED is always the sum of things
+     the person logged, TARGET is the countable target their own plan named,
+     MIN is the plan's own per-unit estimate (it says "about", it is never a
+     measured fact). The verb and the source line change, the provenance does
+     not. */
   var B={
-    money:{reached:47,target:100,tail:'of 100 clients reached out',left:'19 days left',
-      src:'Counted from the messages you logged.',
-      vb:'Message',one:'potential client.',many:'potential clients.',ger:'Sending',
-      best:8,pick:5,three:[{n:3,role:'lighter'},{n:5,role:'today’s'},{n:8,role:'heavier'}],
-      all:[1,2,3,5,8,12,16,20],idle:'Slide when they are sent',
-      did:function(v){return v+(v===1?' message sent':' messages sent')},
-      tot:function(t){return t+' of 100 reached out.'}},
-    audience:{reached:12,target:100,tail:'of 100 videos posted',left:'22 weeks left',
-      src:'Counted from the videos you logged as posted.',
-      vb:'Post',one:'video.',many:'videos.',ger:'Posting',
-      best:3,pick:2,three:[{n:1,role:'lighter'},{n:2,role:'today’s'},{n:3,role:'heavier'}],
-      all:[1,2,3,4,5,6],idle:'Slide when they are up',
-      did:function(v){return v+(v===1?' video posted':' videos posted')},
-      tot:function(t){return t+' of 100 videos posted.'}},
-    ship:{reached:9,target:14,tail:'of 14 launch blockers cleared',left:'19 days left',
-      src:'Counted from your own blocker list.',
-      vb:'Clear',one:'blocker.',many:'blockers.',ger:'Clearing',
-      best:3,pick:2,three:[{n:1,role:'lighter'},{n:2,role:'today’s'},{n:3,role:'heavier'}],
-      all:[1,2,3,4,5],idle:'Slide when they are closed',
-      did:function(v){return v+(v===1?' blocker cleared':' blockers cleared')},
-      tot:function(t){return t+' of 14 blockers cleared.'}}
+    money:{reached:47,target:100,tail:'of 100 clients',left:'19 days left',
+      src:'From your logged messages',
+      vb:'Message',one:'potential client.',many:'potential clients.',
+      best:8,pick:5,min:5,
+      three:[{n:3,role:'lighter'},{n:5,role:'today’s'},{n:8,role:'heavier'}],
+      all:[1,2,3,5,8,12,16,20],idle:'Hold when sent',
+      did:function(v){return v+(v===1?' message sent':' messages sent')}},
+    audience:{reached:12,target:100,tail:'of 100 videos',left:'22 weeks left',
+      src:'From the videos you logged',
+      vb:'Post',one:'video.',many:'videos.',
+      best:3,pick:2,min:20,
+      three:[{n:1,role:'lighter'},{n:2,role:'today’s'},{n:3,role:'heavier'}],
+      all:[1,2,3,4,5,6],idle:'Hold when posted',
+      did:function(v){return v+(v===1?' video posted':' videos posted')}},
+    ship:{reached:9,target:14,tail:'of 14 blockers',left:'19 days left',
+      src:'From your own blocker list',
+      vb:'Clear',one:'blocker.',many:'blockers.',
+      best:3,pick:2,min:40,
+      three:[{n:1,role:'lighter'},{n:2,role:'today’s'},{n:3,role:'heavier'}],
+      all:[1,2,3,4,5],idle:'Hold when closed',
+      did:function(v){return v+(v===1?' blocker cleared':' blockers cleared')}}
   };
-  var C=B.money,pick=C.pick,THREE=C.three,ALL=C.all,fine=false;
+  var C=B.money,pick=C.pick,best=C.best,fine=false,done=false,timer=null;
 
-  function build(){
-    scale.innerHTML='';
-    (fine?ALL:THREE).forEach(function(o){
-      var v=fine?o:o.n,b=document.createElement('button');
-      b.type='button';b.dataset.n=v;
-      b.innerHTML=(fine?'':'<i>'+o.role+'</i>')+'<b>'+v+'</b>';
-      if(v===pick){b.classList.add('on');b.setAttribute('aria-pressed','true');}
-      b.addEventListener('click',function(){
-        if(s.classList.contains('done'))return;
-        scale.querySelectorAll('button').forEach(function(x){x.classList.remove('on');x.removeAttribute('aria-pressed')});
-        b.classList.add('on');b.setAttribute('aria-pressed','true');
-        pick=+b.dataset.n;say(pick);
-      });
-      scale.appendChild(b);
-    });
-    scale.classList.toggle('fine',fine);
+  /* the plan's estimate, always hedged */
+  function cost(v){
+    var m=C.min*v;
+    if(m<60)return 'about '+m+' min';
+    var h=Math.floor(m/60),mm=m%60;
+    return 'about '+h+' hr'+(mm?' '+mm+' min':'');
   }
-  more.addEventListener('click',function(){
-    fine=!fine;
-    if(!fine){var b=THREE[0].n;THREE.forEach(function(o){if(Math.abs(o.n-pick)<Math.abs(b-pick))b=o.n});pick=b;say(pick);}
-    more.textContent=fine?'three sizes':'more sizes';
-    more.classList.toggle('on',fine);
-    build();
+
+  function buildOpts(){
+    opts.innerHTML='';
+    (fine?C.all:C.three).forEach(function(o){
+      var v=fine?o:o.n,b=document.createElement('button');
+      b.type='button';b.className='opt';b.dataset.n=v;
+      b.innerHTML='<b>'+v+'</b>'+(fine?'':'<i>'+o.role+'</i>')+'<span>'+cost(v)+'</span>';
+      if(v===pick)b.classList.add('on');
+      b.addEventListener('click',function(){pick=v;setOpen(false);say(true);});
+      opts.appendChild(b);
+    });
+    pmore.textContent=fine?'three sizes':'more sizes';
+  }
+  pmore.addEventListener('click',function(e){e.stopPropagation();fine=!fine;buildOpts();});
+
+  function setOpen(v){
+    pop.classList.toggle('open',v);
+    n.setAttribute('aria-expanded',v?'true':'false');
+    if(!v&&fine){fine=false;buildOpts();}
+  }
+  n.addEventListener('click',function(e){
+    e.stopPropagation();
+    if(done)return;
+    setOpen(!pop.classList.contains('open'));
+  });
+  pop.addEventListener('click',function(e){e.stopPropagation();});
+  document.addEventListener('pointerdown',function(e){
+    if(!pop.classList.contains('open'))return;
+    if(e.target.closest('[data-k=lp-1] .nline'))return;
+    setOpen(false);
   });
 
-  function say(v){
-    n.classList.add('swap');
-    setTimeout(function(){n.textContent=v;n.classList.remove('swap')},110);
-    obj.textContent=v===1?C.one:C.many;
-    cons.textContent=C.ger+' '+v+' takes you to '+(C.reached+v)+' of '+C.target+'. '+
-      (v>C.best?'That beats your best day of '+C.best+'.':'Your best day so far is '+C.best+'.');
+  /* one render path: the sentence, the arrow number and the ghost all move together */
+  function say(animate){
+    if(animate){n.classList.add('swap');setTimeout(function(){n.textContent=pick;n.classList.remove('swap')},110);}
+    else n.textContent=pick;
+    obj.textContent=pick===1?C.one:C.many;
+    var base=done?C.reached+pick:C.reached,land=C.reached+pick;
+    from.textContent=C.reached;to.textContent=land;
+    bestN.textContent=best;
+    solid.style.width=(base/C.target*100)+'%';
+    ghost.style.left=(C.reached/C.target*100)+'%';
+    ghost.style.width=(pick/C.target*100)+'%';
+    goal.setAttribute('aria-label',done
+      ?land+' '+C.tail+'. Best day '+best+'.'
+      :pick+' today, '+C.reached+' to '+land+' '+C.tail+'. Best day '+best+'.');
+    hold.setAttribute('aria-label',done?C.did(pick):C.idle+', '+pick);
+    if(!done)lab.textContent=C.idle;
+    buildOpts();
   }
 
-  function confirm(){
-    if(s.classList.contains('done'))return;
-    s.classList.add('done');
+  function complete(){
+    if(done)return;
+    done=true;s.classList.add('done');
+    if(pick>best)best=pick;
     lab.textContent=C.did(pick);
-    cons.textContent=C.tot(C.reached+pick)+' '+
-      (pick>C.best?'New best day.':'Best day so far is '+C.best+'.');
-    /* the bar is literally the new sum over the target, no smoothing */
-    count.textContent=C.reached+pick;
-    bar.style.width=((C.reached+pick)/C.target*100)+'%';
-    knob.style.left='5px';fill.style.width='0';
+    say(false);
   }
   function reset(){
-    s.classList.remove('done');
-    lab.textContent=C.idle;
-    count.textContent=C.reached;
-    bar.style.width=(C.reached/C.target*100)+'%';say(pick);
+    done=false;s.classList.remove('done');best=C.best;
+    fill.style.transition='none';fill.style.width='0';
+    say(false);
   }
-  undo.addEventListener('click',function(e){e.stopPropagation();reset()});
+  undo.addEventListener('click',function(e){e.stopPropagation();reset();});
 
-  /* --- swapping the bucket: the whole screen re-reads for that goal ------- */
+  /* HOLD to complete, early release aborts */
+  function start(e){
+    if(done||pop.classList.contains('open'))return;
+    if(e&&e.target.closest('.undo'))return;
+    fill.style.transition='width .9s linear';fill.style.width='100%';
+    timer=setTimeout(function(){timer=null;complete();},900);
+  }
+  function stop(){
+    if(done)return;
+    if(timer){clearTimeout(timer);timer=null;}
+    fill.style.transition='width .2s ease-out';fill.style.width='0';
+  }
+  hold.addEventListener('pointerdown',start);
+  ['pointerup','pointerleave','pointercancel'].forEach(function(ev){hold.addEventListener(ev,stop);});
+  hold.addEventListener('keydown',function(e){
+    if(e.key==='Enter'||e.key===' '){e.preventDefault();done?reset():complete();}
+  });
+
+  /* swapping the bucket: the whole screen re-reads for that goal */
   function render(key){
-    C=B[key];THREE=C.three;ALL=C.all;pick=C.pick;fine=false;
-    more.textContent='more sizes';more.classList.remove('on');
-    tail.textContent=C.tail;left.textContent=C.left;src.textContent=C.src;
-    vb.textContent=C.vb;
-    knob.style.left='5px';fill.style.width='0';track.classList.remove('snap');
-    build();reset();
-    n.textContent=pick;
+    C=B[key];pick=C.pick;best=C.best;fine=false;done=false;
+    s.classList.remove('done');setOpen(false);
+    fill.style.transition='none';fill.style.width='0';
+    tail.textContent=C.tail;leftEl.textContent=C.left;srcEl.textContent=C.src;vb.textContent=C.vb;
+    say(false);
   }
   r.querySelectorAll('.bk button').forEach(function(b){
     b.addEventListener('click',function(){
@@ -241,27 +290,5 @@
     });
   });
   render('money');
-
-  var drag=false,x0=0,max=0;
-  knob.addEventListener('pointerdown',function(e){
-    if(s.classList.contains('done'))return;
-    drag=true;x0=e.clientX;max=track.clientWidth-58;
-    track.classList.remove('snap');knob.setPointerCapture(e.pointerId);
-  });
-  knob.addEventListener('pointermove',function(e){
-    if(!drag)return;
-    var d=Math.max(0,Math.min(max,e.clientX-x0));
-    knob.style.left=(5+d)+'px';fill.style.width=(d+53)+'px';
-    if(d>=max-2){drag=false;confirm();}
-  });
-  ['pointerup','pointercancel'].forEach(function(ev){
-    knob.addEventListener(ev,function(){
-      if(!drag)return;drag=false;
-      track.classList.add('snap');knob.style.left='5px';fill.style.width='0';
-    });
-  });
-  track.addEventListener('keydown',function(e){
-    if(e.key==='Enter'||e.key===' '){e.preventDefault();s.classList.contains('done')?reset():confirm();}
-  });
 })();</script>
 </section>

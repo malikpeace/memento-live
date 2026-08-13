@@ -107,3 +107,17 @@ Rulings under the law:
   "it went differently" lets them correct the number/duration first.
 - TIME ESTIMATES are the plan's own estimate and say so ("about 40 min"),
   never a measured fact.
+
+## THE GLANCE LAW (Malik, grading round, 2026-08-13)
+
+"A lot of them have WAY too much text... it also has the AI thing when it
+has too many sentences and little phrases." So: a loop screen must read AT A
+GLANCE, in about three seconds: what do I do, where am I. Concretely:
+- ONE instruction sentence maximum. The action statement is the screen.
+- No explainer sentences for things the layout already shows ("Every mark
+  here is a weight you typed" under a field of typed marks is noise).
+- Labels are three words or fewer unless they ARE the action.
+- Provenance stays legible but moves into the QUIET layer (a source note,
+  a lock glyph, an "As of Tuesday" that hides when fresh), never a paragraph.
+- Many small sentences scattered around a screen is the AI tell. Cut, merge,
+  or let the layout say it.

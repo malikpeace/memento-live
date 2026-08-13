@@ -3,27 +3,19 @@
      lp-15 bottom sheet first | lp-16 horizontal corridor band | lp-17 declarative sentence over account rows |
      lp-18 centered monolith numeral -->
 <section class="cell" data-k="lp-6">
-<!-- PROVENANCE (Malik round 3): Memento cannot know what a walk did to a body,
-     and it cannot see a card balance either. So the rail is NOT a progress read,
-     it is a stack of numbers the person typed in themselves. Every position on
-     it, the first mark, the faint old marks, the bright marker, comes from an
-     entry they made. The action below is logged separately, and no line on this
-     screen connects the two, because Memento has no way to connect them.
-
-     PER-SHAPE ENTRY (the ruling): a daily-measured number carries the pen IN
-     the loop, so the Body bucket has the "write today's weight" slot. A slow
-     number does not, so the Money bucket (card balance) has NO slot here: it
-     is written once a week at the confirm, and this screen says so instead of
-     asking. Same rail, different pen. That is the whole difference. -->
+<!-- PROVENANCE: every position on the rail is a number the person typed. The
+     marker sits on the last one. Nothing is measured, nothing is read off a
+     bank or a scale. The pen is now the number itself: tap the current number
+     to write today's. A slow number (a card balance) is written at the weekly
+     confirm instead, so that bucket's number is not tappable and its quiet
+     line says where it came from. Same rail, different pen.
+     GLANCE: no title, no legend, no explainer. Rail, one stack, the action. -->
 <style>
 [data-k=lp-6] .ph{font-variant-numeric:tabular-nums}
-[data-k=lp-6] .hd{position:absolute;left:18px;right:18px;top:18px}
-[data-k=lp-6] .hd b{display:block;font-size:17px;font-weight:700;letter-spacing:-.015em;color:rgba(var(--ink),.96)}
-[data-k=lp-6] .hd i{display:block;font-style:normal;font-size:12.5px;line-height:1.4;color:rgba(var(--ink),.90);margin-top:5px}
 
 /* --- the rail: nothing on it that they did not type -------------------- */
-[data-k=lp-6] .rail{position:absolute;left:78px;top:80px;width:1px;height:168px;background:rgba(var(--ink),.12)}
-[data-k=lp-6] .rail .trav{position:absolute;left:-1px;top:0;width:3px;height:86px;border-radius:2px;
+[data-k=lp-6] .rail{position:absolute;left:78px;top:62px;width:1px;height:286px;background:rgba(var(--ink),.12)}
+[data-k=lp-6] .rail .trav{position:absolute;left:-1px;top:0;width:3px;height:0;border-radius:2px;
   background:linear-gradient(180deg,rgba(var(--ink),.16),rgba(var(--ink),.66));
   transition:height .5s cubic-bezier(.2,.7,.2,1)}
 [data-k=lp-6] .rail .tk{position:absolute;right:14px;width:64px;text-align:right;transform:translateY(-50%);
@@ -33,51 +25,43 @@
   color:rgba(var(--ink),.72);margin-top:2px}
 [data-k=lp-6] .rail .nub{position:absolute;left:-4px;width:9px;height:1px;background:rgba(var(--ink),.22);transform:translateY(-50%)}
 [data-k=lp-6] .rail .old{position:absolute;left:-5px;width:11px;height:1px;background:rgba(var(--ink),.34);transform:translateY(-50%)}
-[data-k=lp-6] .rail .mk{position:absolute;left:-8px;top:86px;width:17px;height:3px;border-radius:2px;
+[data-k=lp-6] .rail .mk{position:absolute;left:-8px;top:0;width:17px;height:3px;border-radius:2px;
   background:#e9eefb;transform:translateY(-50%);box-shadow:0 0 18px rgba(233,238,251,.42);
   transition:top .5s cubic-bezier(.2,.7,.2,1)}
 [data-k=lp-6] .rail .floor{position:absolute;left:-8px;bottom:-1px;width:17px;height:2px;border-radius:2px;background:rgba(var(--ink),.42)}
 
-/* --- what their last typed number says --------------------------------- */
-[data-k=lp-6] .now{position:absolute;left:104px;top:147px}
-[data-k=lp-6] .now .n{font-size:38px;font-weight:700;letter-spacing:-.03em;line-height:1;color:rgba(var(--ink),.97);
+/* --- one stack: where they started, what has come off, where they are --- */
+[data-k=lp-6] .stack{position:absolute;left:104px;right:14px;top:169px;transition:top .5s cubic-bezier(.2,.7,.2,1)}
+[data-k=lp-6] .stack .row{display:flex;align-items:baseline;gap:9px;font-size:12.5px;line-height:1;
+  color:rgba(var(--ink),.90);height:13px}
+[data-k=lp-6] .stack .row s{text-decoration:none;color:rgba(var(--ink),.72)}
+[data-k=lp-6] .num{display:block;margin-top:5px;padding:0 8px 0 0;border:0;background:none;position:relative;
+  font:700 44px/1 var(--font);letter-spacing:-.03em;font-variant-numeric:tabular-nums;
+  color:rgba(var(--ink),.97);text-align:left;-webkit-tap-highlight-color:transparent;
   transition:opacity .16s ease-out}
-[data-k=lp-6] .now .n em{font-style:normal;font-size:15px;font-weight:500;color:rgba(var(--ink),.90);margin-left:5px}
-[data-k=lp-6] .now .n.swap{opacity:.35}
-[data-k=lp-6] .now p{margin:6px 0 0;font-size:11.5px;line-height:1.3;color:rgba(var(--ink),.90)}
-[data-k=lp-6] .zone{position:absolute;left:104px;font-size:12.5px;line-height:1.35;color:rgba(var(--ink),.90);margin:0}
-[data-k=lp-6] .zone.up{top:104px}
-[data-k=lp-6] .zone.dn{top:216px}
-
-/* --- the weigh-in slot: the only way a number gets on the rail ---------- */
-[data-k=lp-6] .weigh{position:absolute;left:14px;right:14px;top:262px;border-radius:14px;padding:11px 12px 12px;
-  background:rgba(22,25,31,.94);backdrop-filter:blur(26px) saturate(1.4);-webkit-backdrop-filter:blur(26px) saturate(1.4);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.07)}
-[data-k=lp-6] .weigh .t{margin:0;font-size:12.5px;font-weight:500;color:rgba(var(--ink),.92)}
-[data-k=lp-6] .weigh .in{display:flex;align-items:center;gap:8px;margin-top:9px}
-[data-k=lp-6] .weigh input{flex:1;min-width:0;height:38px;border:0;border-radius:10px;padding:0 11px;
+[data-k=lp-6] .num em{font-style:normal;font-size:16px;font-weight:500;color:rgba(var(--ink),.90);margin-left:6px}
+[data-k=lp-6] .num i{font-style:normal;font-size:22px;font-weight:500;color:rgba(var(--ink),.90);
+  margin-left:1px;vertical-align:14px;display:none}
+[data-k=lp-6] .ph.stale .num i{display:inline}
+[data-k=lp-6] .num[data-pen]{cursor:pointer}
+[data-k=lp-6] .num[data-pen]::after{content:'';position:absolute;left:0;right:8px;bottom:-6px;height:1px;
+  background:rgba(var(--ink),.20)}
+[data-k=lp-6] .num[data-pen]:active{opacity:.55}
+[data-k=lp-6] .num:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:4px;border-radius:6px}
+[data-k=lp-6] .num.swap{opacity:.35}
+[data-k=lp-6] .ed{display:none;width:158px;height:54px;margin:5px 0 0 -9px;border:0;border-radius:10px;padding:0 9px;
   background:rgba(var(--ink),.07);box-shadow:inset 0 1px 0 rgba(var(--ink),.06);
-  font:500 16px/1 var(--font);font-variant-numeric:tabular-nums;color:rgba(var(--ink),.97);
-  -webkit-appearance:none;appearance:none}
-[data-k=lp-6] .weigh input::placeholder{color:rgba(var(--ink),.55);font-weight:400}
-[data-k=lp-6] .weigh input:focus{outline:2px solid rgba(var(--ink),.45);outline-offset:1px}
-[data-k=lp-6] .weigh .u{font-size:13px;font-weight:500;color:rgba(var(--ink),.90)}
-[data-k=lp-6] .weigh .sv{height:38px;padding:0 15px;border:0;border-radius:10px;background:rgba(235,238,248,.94);
-  color:#0b0c10;font:700 13px/1 var(--font);cursor:pointer;-webkit-tap-highlight-color:transparent;
-  transition:opacity .16s ease-out,transform .1s ease-out}
-[data-k=lp-6] .weigh .sv:active{transform:translateY(1px)}
-[data-k=lp-6] .weigh .sv:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
-[data-k=lp-6] .weigh .sv[disabled]{opacity:.45;cursor:default}
-[data-k=lp-6] .weigh .note{margin:9px 0 0;font-size:11px;line-height:1.35;color:rgba(var(--ink),.90)}
+  font:700 40px/1 var(--font);letter-spacing:-.03em;font-variant-numeric:tabular-nums;
+  color:rgba(var(--ink),.97);-webkit-appearance:none;appearance:none}
+[data-k=lp-6] .ed:focus{outline:2px solid rgba(var(--ink),.45);outline-offset:1px}
+[data-k=lp-6] .ph.pen .num{display:none}
+[data-k=lp-6] .ph.pen .ed{display:block}
 
-/* --- the slow-number version of the same slot: no pen, just where it lives.
-       Deliberately NOT a box: an empty entry card would still read as a place
-       to write. Plain type on the paper reads as the absence of one. -------- */
-[data-k=lp-6] .wk{display:none;position:absolute;left:18px;right:18px;top:280px}
-[data-k=lp-6] .wk .t{margin:0;font-size:12.5px;font-weight:500;line-height:1.35;color:rgba(var(--ink),.92)}
-[data-k=lp-6] .wk .note{margin:8px 0 0;font-size:11.5px;line-height:1.45;color:rgba(var(--ink),.90)}
-[data-k=lp-6] .ph.slow .weigh{display:none}
-[data-k=lp-6] .ph.slow .wk{display:block}
+/* --- the quiet layer: where the number came from, only when it matters -- */
+[data-k=lp-6] .stack .as{margin:14px 0 0;font-size:11.5px;line-height:1.35;color:rgba(var(--ink),.90)}
+[data-k=lp-6] .stack .stn{margin:4px 0 0;font-size:11px;line-height:1.35;color:rgba(var(--ink),.90);display:none}
+[data-k=lp-6] .ph.stale .stn{display:block}
+[data-k=lp-6] .ph.fresh .as{display:none}
 
 /* --- the action, logged on its own ------------------------------------- */
 [data-k=lp-6] .card{position:absolute;left:14px;right:14px;top:396px;bottom:14px;border-radius:16px;padding:13px;
@@ -115,37 +99,22 @@
 [data-k=lp-6] .ph.logged .chips button.on{background:rgba(var(--ink),.15);color:rgba(var(--ink),.96)}
 @media (prefers-reduced-motion:reduce){[data-k=lp-6] *{transition:none!important}}
 </style>
-<h3>Descent</h3><p class="cap">A down goal read as a fall down a rail, except the rail is built only from numbers the person typed in: the marker sits on their last one, and whether the pen sits in the loop or at the weekly confirm is decided by the goal, not by the layout.</p>
+<h3>Descent</h3><p class="cap">A down goal read as a fall down a rail built only from numbers they typed, and the current number is the pen: tap it to write today's. A slow number is written at the weekly confirm instead, so the same rail carries it without asking.</p>
 <div class="bk" role="group" aria-label="which goal this screen is carrying">
   <button type="button" class="on" data-b="body" aria-pressed="true">Body</button>
   <button type="button" data-b="money" aria-pressed="false">Money</button>
 </div>
 <div class="ph">
   <div class="grid"></div>
-  <div class="hd"><b data-title>Get to 220 lb</b><i data-legend>Every mark here is a weight you typed.</i></div>
 
   <div class="rail"></div>
 
-  <p class="zone up"></p>
-  <div class="now">
-    <div class="n"></div>
-    <p data-when></p>
-  </div>
-  <p class="zone dn"></p>
-
-  <div class="weigh">
-    <p class="t">Write today's weight</p>
-    <div class="in">
-      <input type="text" inputmode="decimal" aria-label="today's weight in pounds" placeholder="scale reading">
-      <span class="u">lb</span>
-      <button type="button" class="sv" disabled>Save</button>
-    </div>
-    <p class="note">The rail moves only when you put a number here. Nothing is measured for you.</p>
-  </div>
-
-  <div class="wk">
-    <p class="t">The balance moves on Sunday.</p>
-    <p class="note">Card balance: $4,180 came from the weekly confirm. A balance is a slow number, so it gets written there once a week and this screen does not ask for it. Nothing is read off your bank.</p>
+  <div class="stack">
+    <div class="row"><s data-start></s><span data-delta></span></div>
+    <button type="button" class="num" data-num><span class="v"></span><i>*</i><em></em></button>
+    <input class="ed" type="text" inputmode="decimal" aria-label="today's number">
+    <p class="as" data-as></p>
+    <p class="stn" data-stn></p>
   </div>
 
   <div class="card">
@@ -157,22 +126,22 @@
   </div>
 </div>
 <script>(function(){var r=document.querySelector('[data-k="lp-6"]');if(!r)return;
-var ph=r.querySelector('.ph'),H=168;
+var ph=r.querySelector('.ph'),TOP=62,H=286;
 
 /* --- THE BUCKETS (ACTION-BUCKETS.md) -------------------------------------
-   Body: weight down, daily-eligible, so the pen is IN the loop.
-   Money: a card balance down to zero, a slow number, so the pen is at the
-   weekly confirm and there is no entry slot on this screen at all. */
+   Body: weight down, daily-measured, so the number itself is the pen.
+   Money: a card balance down to zero, a slow number, written at the weekly
+   confirm, so this screen carries it but never asks for it. */
 var B={
   body:{
-    title:'Get to 220 lb',legend:'Every mark here is a weight you typed.',
-    first:264,floor:220,now:241.4,entry:true,unit:'lb',
-    ticks:[{v:264,txt:'264',u:'first entry'},{v:250,txt:'250'},{v:230,txt:'230'},{v:220,txt:'220',u:'the floor',floor:true}],
-    olds:[26,44,61,73],
+    first:264,floor:220,now:241.4,pen:true,unit:'lb',
+    ticks:[{v:264,txt:'Start'},{v:250,txt:'250'},{v:230,txt:'230'},{v:220,txt:'220',u:'goal',floor:true}],
+    olds:[44,75,104,124],
     val:function(x){return x.toFixed(1)},
-    when:'You typed this on Tuesday.',
-    up:function(x){return (264-x).toFixed(1)+' lb since 264.'},
-    dn:function(x){return (x-220).toFixed(1)+' lb from here to 220.'},
+    start:'264',
+    delta:function(x){var d=x-264;return (d>0?'+':d<0?'-':'')+Math.abs(d).toFixed(1)+' lb'},
+    as:'As of Tuesday.',stale:true,staleNote:'* not logged in 2 days',
+    ok:function(x){return x>=150&&x<=400},
     act:function(v){return 'Today, walk '+v+' minutes after dinner.'},
     chips:[{v:25,txt:'25 min'},{v:40,txt:'40 min'},{v:60,txt:'60 min'}],pick:40,
     week:205,
@@ -181,14 +150,14 @@ var B={
     did:function(v){return v+' minutes logged'}
   },
   money:{
-    title:'Get the card to zero',legend:'Every mark here is a balance you wrote.',
-    first:6900,floor:0,now:4180,entry:false,unit:'',
-    ticks:[{v:6900,txt:'$6,900',u:'first entry'},{v:5000,txt:'$5,000'},{v:2000,txt:'$2,000'},{v:0,txt:'$0',u:'paid off',floor:true}],
-    olds:[12,24,38,52],
+    first:6900,floor:0,now:4180,pen:false,unit:'',
+    ticks:[{v:6900,txt:'Start'},{v:5000,txt:'$5,000'},{v:2000,txt:'$2,000'},{v:0,txt:'$0',u:'goal',floor:true}],
+    olds:[20,41,65,89],
     val:function(x){return '$'+Math.round(x).toLocaleString('en-US')},
-    when:'You wrote this at Sunday’s confirm.',
-    up:function(x){return '$'+Math.round(6900-x).toLocaleString('en-US')+' paid since $6,900.'},
-    dn:function(x){return '$'+Math.round(x).toLocaleString('en-US')+' from here to zero.'},
+    start:'$6,900',
+    delta:function(x){var d=Math.round(x-6900);return (d>0?'+$':d<0?'-$':'$')+Math.abs(d).toLocaleString('en-US')},
+    as:'As of Sunday’s confirm.',stale:false,staleNote:'',
+    ok:function(){return false},
     act:function(v){return 'Today, message '+v+' potential clients.'},
     chips:[{v:2,txt:'2 clients'},{v:3,txt:'3 clients'},{v:5,txt:'5 clients'}],pick:3,
     week:11,est:{2:18,3:25,5:40},
@@ -198,16 +167,16 @@ var B={
   }
 };
 
-var C=B.body,pick=C.pick,WEEK=C.week,
+var C=B.body,pick=C.pick,WEEK=C.week,cur=C.now,
     railEl=r.querySelector('.rail'),chipsEl=r.querySelector('.chips'),
     act=r.querySelector('.act'),cons=r.querySelector('.cons'),
-    nEl=r.querySelector('.now .n'),wn=r.querySelector('[data-when]'),
-    up=r.querySelector('.zone.up'),dn=r.querySelector('.zone.dn'),
-    title=r.querySelector('[data-title]'),legend=r.querySelector('[data-legend]'),
-    inp=r.querySelector('.weigh input'),sv=r.querySelector('.weigh .sv'),
-    note=r.querySelector('.weigh .note'),wt=r.querySelector('.weigh .t'),
+    stack=r.querySelector('.stack'),numEl=r.querySelector('.num'),
+    vEl=numEl.querySelector('.v'),uEl=numEl.querySelector('em'),
+    ed=r.querySelector('.ed'),
+    stEl=r.querySelector('[data-start]'),dtEl=r.querySelector('[data-delta]'),
+    asEl=r.querySelector('[data-as]'),stnEl=r.querySelector('[data-stn]'),
     hold=r.querySelector('.hold'),txt=hold.querySelector('span'),am=r.querySelector('.amend'),
-    mk,trav,wv;
+    mk,trav;
 
 function pos(v){return Math.max(0,Math.min(H,(C.first-v)/(C.first-C.floor)*H))}
 
@@ -221,16 +190,23 @@ function drawRail(){
     if(!t.floor)h+='<i class="nub" style="top:'+y+'px"></i>';
   });
   C.olds.forEach(function(y){h+='<i class="old" style="top:'+y+'px"></i>'});
-  h+='<i class="trav" style="height:'+pos(C.now)+'px"></i>'+
-     '<i class="mk" style="top:'+pos(C.now)+'px"></i><i class="floor"></i>';
+  h+='<i class="trav"></i><i class="mk"></i><i class="floor"></i>';
   railEl.innerHTML=h;
   mk=railEl.querySelector('.mk');trav=railEl.querySelector('.trav');
+  mk.style.top=pos(cur)+'px';trav.style.height=pos(cur)+'px';
 }
 
+/* the stack rides the marker: writing a lower number drops it down the rail */
+function place(){stack.style.top=Math.max(74,Math.round(TOP+pos(cur)-40))+'px'}
+
 function readNumber(x){
-  nEl.innerHTML='<span data-w>'+C.val(x)+'</span>'+(C.unit?'<em>'+C.unit+'</em>':'');
-  wv=nEl.querySelector('[data-w]');
-  up.textContent=C.up(x);dn.textContent=C.dn(x);
+  cur=x;
+  vEl.textContent=C.val(x);
+  uEl.textContent=C.unit;
+  stEl.textContent=C.start;
+  dtEl.textContent=C.delta(x);
+  numEl.setAttribute('aria-label',C.pen?C.val(x)+' '+(C.unit||'')+', tap to write today’s number':C.val(x));
+  place();
 }
 
 function paintCard(){
@@ -252,26 +228,34 @@ function drawChips(){
   });
 }
 
-/* --- the entry: their typed number is the ONLY thing that moves the rail -- */
-function ok(x){return x>=150&&x<=400}
-inp.addEventListener('input',function(){sv.disabled=!ok(parseFloat(inp.value));sv.textContent='Save'});
-function save(){
-  if(!C.entry)return;
-  var x=parseFloat(inp.value);if(!ok(x))return;
+/* --- the pen IS the number: tap it, type over it ------------------------- */
+var editing=false;
+function open(){
+  if(!C.pen||editing)return;
+  editing=true;ph.classList.add('pen');
+  ed.value=C.val(cur);ed.focus();
+  try{ed.setSelectionRange(0,ed.value.length)}catch(e){}
+}
+function close(){editing=false;ph.classList.remove('pen')}
+function commit(){
+  if(!editing)return;
+  var x=parseFloat(ed.value);
+  close();
+  if(!C.ok(x)||x===cur)return;
   /* the number they had before stays as a faint mark: the rail is a stack of entries */
-  var old=document.createElement('i');old.className='old';old.style.top=(mk.style.top||'86px');
+  var old=document.createElement('i');old.className='old';old.style.top=pos(cur)+'px';
   railEl.appendChild(old);
   mk.style.top=pos(x)+'px';trav.style.height=pos(x)+'px';
-  nEl.classList.add('swap');
-  setTimeout(function(){readNumber(x);nEl.classList.remove('swap')},110);
-  wn.textContent='You typed this just now.';
-  /* the row stays put and keeps the number, so a typo can be typed over */
-  inp.value=x.toFixed(1);sv.textContent='Saved';sv.disabled=true;
-  wt.textContent='Today’s weight, '+x.toFixed(1)+' lb';
-  note.textContent='Saved. It sits on the rail because you wrote it, not because anything watched you.';
+  numEl.classList.add('swap');
+  setTimeout(function(){readNumber(x);numEl.classList.remove('swap')},110);
+  ph.classList.add('fresh');ph.classList.remove('stale');
 }
-sv.addEventListener('click',save);
-inp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();save();}});
+numEl.addEventListener('click',open);
+ed.addEventListener('keydown',function(e){
+  if(e.key==='Enter'){e.preventDefault();commit();}
+  else if(e.key==='Escape'){e.preventDefault();close();}
+});
+ed.addEventListener('blur',commit);
 
 /* --- logging the action, accept or amend --------------------------------- */
 var t=null;
@@ -292,15 +276,14 @@ am.addEventListener('click',function(){
 
 /* --- swapping the bucket: same rail, the goal's own numbers and pen ------- */
 function render(key){
-  C=B[key];pick=C.pick;WEEK=C.week;
-  ph.classList.toggle('slow',!C.entry);
-  ph.classList.remove('logged');
+  C=B[key];pick=C.pick;WEEK=C.week;cur=C.now;
+  close();
+  ph.classList.remove('logged','fresh');
+  ph.classList.toggle('stale',!!C.stale);
   hold.classList.remove('go','done');txt.textContent=C.idle;
-  title.textContent=C.title;legend.textContent=C.legend;
-  wn.textContent=C.when;
-  inp.value='';sv.disabled=true;sv.textContent='Save';
-  wt.textContent="Write today's weight";
-  note.textContent='The rail moves only when you put a number here. Nothing is measured for you.';
+  if(C.pen)numEl.setAttribute('data-pen','');else numEl.removeAttribute('data-pen');
+  numEl.disabled=!C.pen;
+  asEl.textContent=C.as;stnEl.textContent=C.staleNote;
   drawRail();readNumber(C.now);drawChips();paintCard();
 }
 r.querySelectorAll('.bk button').forEach(function(b){
