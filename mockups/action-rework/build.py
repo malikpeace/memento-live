@@ -11,7 +11,7 @@ TITLES = {
     'q':  ('The refine step', 'What is already done + what they think it takes. One question at a time.'),
     'ld': ('Loading', 'The plan being produced. The wait as visible work, never a spinner, never an invented stage name.'),
     'pu': ('The pulse', 'Where are you now: the one screen where the goal number gets written. Clarity shows the standing, Consistency the trajectory; Action only hosts the pen.'),
-    'lp': ('The daily loop', 'Eleven layout architectures. Number slots any goal can fill.'),
+    'lp': ('The daily loop', 'Thirteen layout architectures. Number slots any goal can fill.'),
     'mx': ('Intensity mechanics', 'Ways to scale today up or down, phone + desktop each. Three named sizes in front, freedom behind a quiet "more".'),
 }
 
@@ -79,7 +79,11 @@ def main():
             t, d = TITLES.get(pre, (pre, ''))
             out.append(f'<section class="grp"><h2>{t}</h2><p>{d}</p><div class="wall">')
             cur = pre
-        out.append(f.read_text())
+        frag = f.read_text()
+        # anchor: the fragment's data-k becomes a real id for deep links
+        frag = frag.replace('<section class="cell" data-k="' + f.stem + '"',
+                            '<section class="cell" id="' + f.stem + '" data-k="' + f.stem + '"', 1)
+        out.append(frag)
     if cur is not None: out.append('</div></section>')
     out.append('</div></body></html>')
     (ROOT / 'gallery.html').write_text('\n'.join(out))

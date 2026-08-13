@@ -77,18 +77,24 @@
 /* their own number, shown in the same slot material they typed it into */
 [data-k=lp-9] .past .v{font-size:13px;font-weight:700;color:rgba(var(--ink),.96);
   border-radius:7px;padding:5px 8px;background:rgba(var(--ink),.075);box-shadow:inset 0 1px 0 rgba(var(--ink),.07)}
+/* the change column is never coloured: a day up and a day down look the same
+   in the book, whichever direction the goal happens to run */
 [data-k=lp-9] .past .c{font-size:12.5px;color:rgba(var(--ink),.86)}
 [data-k=lp-9] .past .a{font-size:12.5px;color:rgba(var(--ink),.86)}
 [data-k=lp-9] .foot{margin:auto 0 0;padding-top:11px;font-size:11.5px;line-height:1.45;color:rgba(var(--ink),.90)}
 @media (prefers-reduced-motion:reduce){[data-k=lp-9] .slot .ghost:after{animation:none}}
 </style>
 <h3>The weight book</h3><p class="cap">A ruled ledger where today is the one row still open, and that row is the writing slot itself: the number is not shown to you, you put it in, and every past weight sits in the same slot you typed it into.</p>
-<div class="bk"><i>Body</i></div>
+<div class="bk" role="group" aria-label="which way this goal runs">
+  <i>Body</i>
+  <button type="button" class="on" data-b="down" aria-pressed="true">Weight down</button>
+  <button type="button" data-b="up" aria-pressed="false">Weight up</button>
+</div>
 <div class="ph">
   <div class="grid"></div>
   <div class="hd">
-    <p class="big" id="l9big">23.0 lb to go</p>
-    <p class="sub" id="l9sub">243.0 is the seven day average. Down 21.0 since May, target 220.</p>
+    <p class="big" id="l9big"></p>
+    <p class="sub" id="l9sub"></p>
   </div>
 
   <div class="book" id="l9book">
@@ -99,48 +105,109 @@
         <span class="ghost" id="l9ghost">Tap and type it</span>
         <span class="unit">lb</span>
       </label>
-      <p class="calc" id="l9calc">The change and the seven day average work themselves out from it.</p>
+      <p class="calc" id="l9calc"></p>
 
-      <p class="act" id="l9act">40 minutes walking. No bread with dinner.</p>
-      <div class="seg" id="l9seg">
-        <button data-a="20 minutes walking." data-c="Holds the average roughly where it is. Some days that is the work.">Light</button>
-        <button class="on" data-a="40 minutes walking. No bread with dinner." data-c="The plan reckons about half a pound a week off the seven day average.">Steady</button>
-        <button data-a="60 minutes walking. No bread, no late snack." data-c="The plan reckons closer to a pound a week, as long as you sleep tonight.">Hard</button>
-      </div>
-      <p class="cons" id="l9cons">The plan reckons about half a pound a week off the seven day average.</p>
+      <p class="act" id="l9act"></p>
+      <div class="seg" id="l9seg" role="group" aria-label="how big today"></div>
+      <p class="cons" id="l9cons"></p>
       <button class="cta" id="l9cta" disabled>Write today's weight first</button>
       <div class="wrote" id="l9wr"><svg viewBox="0 0 24 24"><path d="M4 13l5 5L20 7"/></svg><span id="l9wrt">Written</span></div>
     </div>
 
     <div class="pastwrap">
       <div class="rw colh"><span>day</span><span class="yw">you wrote</span><span>change</span><span>7 day</span></div>
-      <div class="past" id="l9past">
-        <div class="rw"><span class="d">Mon 10</span><span class="v">242.2</span><span class="c">-0.6</span><span class="a">243.0</span></div>
-        <div class="rw"><span class="d">Sun 9</span><span class="v">242.8</span><span class="c">+0.3</span><span class="a">243.2</span></div>
-        <div class="rw"><span class="d">Sat 8</span><span class="v">242.5</span><span class="c">-0.7</span><span class="a">243.4</span></div>
-        <div class="rw"><span class="d">Fri 7</span><span class="v">243.2</span><span class="c">+0.2</span><span class="a">243.7</span></div>
-      </div>
+      <div class="past" id="l9past"></div>
     </div>
 
-    <p class="foot" id="l9foot">You typed every number in that column. The rest is arithmetic on them.</p>
+    <p class="foot" id="l9foot"></p>
   </div>
 </div>
 <script>(function(){var r=document.querySelector('[data-k="lp-9"]');if(!r)return;
-/* the twelve days before today, oldest first. Every figure on screen is arithmetic on these. */
-var H=[244.6,244.2,244.5,243.9,244.1,243.6,243.4,243.0,243.2,242.5,242.8,242.2],
-    START=264.0,TARGET=220,
-    act=r.querySelector('#l9act'),cons=r.querySelector('#l9cons'),seg=r.querySelector('#l9seg'),
+
+/* Two directions, one book. The twelve days before today are the only raw
+   numbers in either context: every figure on screen is arithmetic on them.
+   dir = the direction the goal runs, +1 up, -1 down. A move against dir is
+   never scolded and a move with dir is never celebrated, it is just written. */
+var CTX={
+  down:{
+    dir:-1,start:264,target:220,
+    H:[244.6,244.2,244.5,243.9,244.1,243.6,243.4,243.0,243.2,242.5,242.8,242.2],
+    acts:[
+      {t:'Light',a:'20 minutes walking.',
+       c:'Holds the average roughly where it is. Some days that is the work.'},
+      {t:'Steady',a:'40 minutes walking. No bread with dinner.',
+       c:'The plan reckons about half a pound a week off the seven day average.'},
+      {t:'Hard',a:'60 minutes walking. No bread, no late snack.',
+       c:'The plan reckons closer to a pound a week, as long as you sleep tonight.'}
+    ],pick:1
+  },
+  up:{
+    dir:1,start:145,target:160,
+    H:[148.6,149.0,148.8,149.6,150.2,150.0,150.6,151.0,150.7,151.4,151.8,151.6],
+    acts:[
+      {t:'Light',a:'Three full meals. No skipped lunch.',
+       c:'Holds the average roughly where it is. Some days that is the work.'},
+      {t:'Steady',a:'Three meals and a shake. Push session, 45 minutes.',
+       c:'The plan reckons about half a pound a week onto the seven day average.'},
+      {t:'Hard',a:'Four meals, two shakes. Heavy session, 60 minutes.',
+       c:'The plan reckons closer to a pound a week, as long as you sleep tonight.'}
+    ],pick:1
+  }
+};
+var DAYS=['Fri 7','Sat 8','Sun 9','Mon 10'];
+
+var act=r.querySelector('#l9act'),cons=r.querySelector('#l9cons'),seg=r.querySelector('#l9seg'),
     book=r.querySelector('#l9book'),slot=r.querySelector('#l9slot'),inp=r.querySelector('#l9in'),
     calc=r.querySelector('#l9calc'),cta=r.querySelector('#l9cta'),foot=r.querySelector('#l9foot'),
-    big=r.querySelector('#l9big'),sub=r.querySelector('#l9sub'),written=false;
+    big=r.querySelector('#l9big'),sub=r.querySelector('#l9sub'),past=r.querySelector('#l9past'),
+    when=r.querySelector('#l9when'),wrt=r.querySelector('#l9wrt'),
+    C=CTX.down,pick=1,written=false;
+
 function r1(n){return (Math.round(n*10)/10).toFixed(1)}
-function avg7(v){var a=H.slice(-6).concat([v]),s=0;a.forEach(function(x){s+=x});return s/7}
 function sgn(n){return (n>0?'+':'')+r1(n)}
 function val(){var v=parseFloat(inp.value);return (v>=80&&v<=700)?v:null}
+/* the seven day average ending on index i of the history */
+function avgAt(i){var s=0,k;for(k=i-6;k<=i;k++)s+=C.H[k];return s/7}
+/* the seven day average if today's typed number closes the window */
+function avg7(v){var a=C.H.slice(-6),s=v,k;for(k=0;k<a.length;k++)s+=a[k];return s/7}
+function toGo(a){var g=C.dir>0?C.target-a:a-C.target;return g}
+function headline(a){
+  var g=toGo(a);
+  big.textContent=g<=0.05?'At '+C.target+'. Hold it.':r1(g)+' lb to go';
+  /* since May reads the direction it actually moved, not the one you wanted */
+  var mv=a-C.start;
+  sub.textContent=r1(a)+' is the seven day average. '+(mv>=0?'Up ':'Down ')+
+    r1(Math.abs(mv))+' since May, target '+C.target+'.';
+}
 
-seg.addEventListener('click',function(e){var b=e.target.closest('button');if(!b||written)return;
-  [].forEach.call(seg.children,function(x){x.classList.toggle('on',x===b)});
-  act.textContent=b.dataset.a;cons.textContent=b.dataset.c;});
+function drawSeg(){
+  seg.textContent='';
+  C.acts.forEach(function(o,i){
+    var b=document.createElement('button');
+    b.type='button';b.textContent=o.t;
+    if(i===pick){b.className='on';b.setAttribute('aria-pressed','true');}
+    else b.setAttribute('aria-pressed','false');
+    b.addEventListener('click',function(){
+      if(written)return;
+      [].forEach.call(seg.children,function(z){z.classList.remove('on');z.setAttribute('aria-pressed','false')});
+      b.classList.add('on');b.setAttribute('aria-pressed','true');
+      pick=i;act.textContent=o.a;cons.textContent=o.c;
+    });
+    seg.appendChild(b);
+  });
+}
+
+function drawPast(){
+  past.textContent='';
+  /* newest first, four rows, all of it arithmetic on the twelve typed numbers */
+  var n=C.H.length,i;
+  for(i=n-1;i>=n-4;i--){
+    var row=document.createElement('div');row.className='rw';
+    row.innerHTML='<span class="d">'+DAYS[i-(n-4)]+'</span><span class="v">'+r1(C.H[i])+
+      '</span><span class="c">'+sgn(C.H[i]-C.H[i-1])+'</span><span class="a">'+r1(avgAt(i))+'</span>';
+    past.appendChild(row);
+  }
+}
 
 inp.addEventListener('input',function(){
   if(written)return;
@@ -148,27 +215,51 @@ inp.addEventListener('input',function(){
   var v=val();
   if(v===null){calc.textContent='The change and the seven day average work themselves out from it.';
     cta.disabled=true;cta.textContent="Write today's weight first";return;}
-  var d=v-H[H.length-1],a=avg7(v);
+  var d=v-C.H[C.H.length-1],a=avg7(v);
   calc.innerHTML='That is <b>'+sgn(d)+'</b> on yesterday. Seven day average <b>'+r1(a)+'</b>.';
   cta.disabled=false;cta.textContent='Write '+r1(v)+' into the book';});
 
 cta.addEventListener('click',function(){
   var v=val();if(written||v===null)return;
   written=true;book.classList.add('done');seg.classList.add('lock');inp.readOnly=true;
-  var d=v-H[H.length-1],a=avg7(v);
-  r.querySelector('#l9when').textContent='Tue 11, written';
-  r.querySelector('#l9wrt').textContent='Written in: '+r1(v)+' lb, '+sgn(d)+' on yesterday';
-  big.textContent=r1(a-TARGET)+' lb to go';
-  sub.textContent=r1(a)+' is the seven day average. Down '+r1(START-a)+' since May, target '+TARGET+'.';
-  var y=0;H.slice(-7).forEach(function(x){y+=x});y=y/7;
-  calc.innerHTML='Seven day average <b>'+r1(a)+'</b>, '+sgn(+r1(a)-+r1(y))+' on yesterday.';
+  var d=v-C.H[C.H.length-1],a=avg7(v),prev=avgAt(C.H.length-1),mv7=a-prev;
+  when.textContent='Tue 11, written';
+  wrt.textContent='Written in: '+r1(v)+' lb, '+sgn(d)+' on yesterday';
+  headline(a);
+  /* the average is the primary number, so it gets the plain reading. Moving
+     with the goal is stated and left alone. Moving against it is stated too. */
+  var tail=Math.abs(+r1(mv7))<0.05?' It did not move on yesterday.'
+    :(C.dir*mv7>0?'':' That is the average moving away from '+C.target+'.');
+  calc.innerHTML='Seven day average <b>'+r1(a)+'</b>, '+sgn(+r1(a)-+r1(prev))+' on yesterday.'+tail;
   cons.textContent='Tomorrow opens a new row at midnight.';
-  var row=document.createElement('div');
-  row.className='rw';
+  var row=document.createElement('div');row.className='rw';
   row.innerHTML='<span class="d">Today</span><span class="v">'+r1(v)+'</span><span class="c">'+sgn(d)+
     '</span><span class="a">'+r1(a)+'</span>';
-  var past=r.querySelector('#l9past');past.insertBefore(row,past.firstElementChild);
+  past.insertBefore(row,past.firstElementChild);
   past.removeChild(past.lastElementChild);
   foot.textContent='Today is written in. Every number in that column is one you typed.';});
+
+/* --- swapping the direction: same book, the goal's own numbers and words -- */
+function render(key){
+  C=CTX[key];pick=C.pick;written=false;
+  book.classList.remove('done');seg.classList.remove('lock');
+  inp.readOnly=false;inp.value='';slot.classList.remove('filled');
+  cta.disabled=true;cta.textContent="Write today's weight first";
+  when.textContent='Tue 11, still open';wrt.textContent='Written';
+  calc.textContent='The change and the seven day average work themselves out from it.';
+  act.textContent=C.acts[pick].a;cons.textContent=C.acts[pick].c;
+  foot.textContent='You typed every number in that column. The rest is arithmetic on them.';
+  headline(avgAt(C.H.length-1));
+  drawSeg();drawPast();
+}
+r.querySelectorAll('.bk button').forEach(function(b){
+  b.addEventListener('click',function(){
+    r.querySelectorAll('.bk button').forEach(function(z){
+      z.classList.remove('on');z.setAttribute('aria-pressed','false')});
+    b.classList.add('on');b.setAttribute('aria-pressed','true');
+    render(b.dataset.b);
+  });
+});
+render('down');
 })();</script>
 </section>

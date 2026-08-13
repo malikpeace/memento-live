@@ -51,6 +51,19 @@ li:only-child::after{width:22px;left:0}
   background:rgba(var(--ink),.05)}
 .foot{margin-top:34px;color:var(--lo);font-size:12px;max-width:88ch;line-height:1.6}
 .foot b{color:var(--mid);font-weight:600}
+[data-view]{cursor:pointer}
+[data-view]:hover{box-shadow:inset 0 0 0 1.5px rgba(var(--ink),.4)}
+.viewer{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;
+  background:rgba(4,5,7,.8)}
+.viewer.on{display:flex}
+.viewer__box{position:relative;width:min(1200px,94vw);height:min(860px,92vh);border-radius:16px;overflow:hidden;
+  background:#0a0b0d;box-shadow:0 40px 120px rgba(0,0,0,.7), inset 0 0 0 1px rgba(var(--ink),.12)}
+.viewer__box iframe{width:100%;height:100%;border:0;display:block}
+.viewer__x{position:absolute;top:10px;right:10px;z-index:2;-webkit-appearance:none;appearance:none;border:0;
+  cursor:pointer;width:34px;height:34px;border-radius:999px;background:rgba(22,25,31,.95);color:var(--hi);
+  font:700 15px/34px var(--font);text-align:center;box-shadow:inset 0 1px 0 rgba(var(--ink),.1)}
+.viewer__hint{position:absolute;left:14px;bottom:10px;z-index:2;font-size:11px;color:var(--lo);
+  background:rgba(10,11,13,.85);border-radius:7px;padding:5px 9px}
 </style></head><body><div class="page">
 <h1>The Action map</h1>
 <p class="sub">Every path from a Neutron Star to the exact screens that person lives in. Bucket, then the
@@ -58,7 +71,7 @@ goal's shape (named in the sync box's own words, so you can see the two systems 
 their daily loop, their intensity control, when their goal number gets asked, and what each pillar shows them.</p>
 <p class="key"><b>Reading a leaf:</b> LOOP = the daily screen (from the action-rework gallery) · SIZE = the
 intensity mechanic · PULSE = when the goal number is asked and how · then the three faces their sync box
-deals: Clarity = standing, Action = today, Consistency = trajectory. <b>Red chips are the four honest gaps.</b></p>
+deals: Clarity = standing, Action = today, Consistency = trajectory. <b>Every path lands on a real screen; tap any chip to open its live mockup.</b></p>
 
 <div class="tree">
 <div class="root">Their<br>Neutron Star</div>
@@ -67,30 +80,30 @@ deals: Clarity = standing, Action = today, Consistency = trajectory. <b>Red chip
     <ul>
       <li><span class="variant"><b>Make it</b><s>a number and a deadline</s></span>
         <ul><li><span class="leaf">
-          <span class="chip chip--loop"><small>LOOP</small>The statement</span>
-          <span class="chip"><small>SIZE</small>Notched rail / Three ways</span>
-          <span class="chip"><small>PULSE</small>weekly, Sundays, typed $</span>
+          <span class="chip chip--loop" data-view="lp-1"><small>LOOP</small>The statement</span>
+          <span class="chip" data-view="mx-1"><small>SIZE</small>Notched rail</span><span class="chip" data-view="mx-8"><small>SIZE</small>Three ways</span>
+          <span class="chip" data-view="pu-1"><small>PULSE</small>weekly, Sundays, typed $</span>
           <span class="trio"><i>C: $1,850 of $3,000</i><i>A: message 3 clients</i><i>Cn: arrival moves</i></span>
         </span></li></ul></li>
       <li><span class="variant"><b>Save it</b><s>a number, no deadline</s></span>
         <ul><li><span class="leaf">
-          <span class="chip chip--loop"><small>LOOP</small>One hundred marks</span>
-          <span class="chip"><small>SIZE</small>Three ways</span>
+          <span class="chip chip--loop" data-view="lp-8"><small>LOOP</small>One hundred marks</span>
+          <span class="chip" data-view="mx-8"><small>SIZE</small>Three ways</span>
           <span class="chip"><small>PULSE</small>none: marks are logged transfers</span>
           <span class="trio"><i>C: $1,850 banked</i><i>A: one transfer</i><i>Cn: the field fills</i></span>
         </span></li></ul></li>
       <li><span class="variant"><b>Kill debt</b><s>a number and a deadline, downward</s></span>
         <ul><li><span class="leaf">
-          <span class="chip chip--loop"><small>LOOP</small>Descent (debt)</span>
-          <span class="chip"><small>SIZE</small>Three ways</span>
-          <span class="chip"><small>PULSE</small>weekly typed balance</span>
+          <span class="chip chip--loop" data-view="lp-6"><small>LOOP</small>Descent (debt)</span>
+          <span class="chip" data-view="mx-8"><small>SIZE</small>Three ways</span>
+          <span class="chip" data-view="pu-1"><small>PULSE</small>weekly typed balance</span>
           <span class="trio"><i>C: $4,180 left</i><i>A: today's payment move</i><i>Cn: the rail falls</i></span>
         </span></li></ul></li>
       <li><span class="variant"><b>Hold the floor</b><s>a rule to hold</s></span>
         <ul><li><span class="leaf">
-          <span class="chip chip--loop"><small>LOOP</small>The corridor</span>
-          <span class="chip"><small>SIZE</small>the cushion width</span>
-          <span class="chip"><small>PULSE</small>Sunday confirm, typed total</span>
+          <span class="chip chip--loop" data-view="lp-16"><small>LOOP</small>The corridor</span>
+          <span class="chip" data-view="lp-16"><small>SIZE</small>the cushion width</span>
+          <span class="chip" data-view="pu-1"><small>PULSE</small>Sunday confirm, typed total</span>
           <span class="trio"><i>C: above the floor</i><i>A: 2 renewal invoices</i><i>Cn: weeks held</i></span>
         </span></li></ul></li>
     </ul></li>
@@ -98,32 +111,36 @@ deals: Clarity = standing, Action = today, Consistency = trajectory. <b>Red chip
     <ul>
       <li><span class="variant"><b>Gym rhythm</b><s>a rate to keep</s></span>
         <ul><li><span class="leaf">
-          <span class="chip chip--loop"><small>LOOP</small>Seven channels / Sheet first</span>
-          <span class="chip"><small>SIZE</small>Growing block</span>
+          <span class="chip chip--loop" data-view="lp-12"><small>LOOP</small>Seven channels</span><span class="chip chip--loop" data-view="lp-15"><small>LOOP</small>Sheet first</span>
+          <span class="chip" data-view="mx-2"><small>SIZE</small>Growing block</span>
           <span class="chip"><small>PULSE</small>none: sessions are the record</span>
           <span class="trio"><i>C: 3x, week whole</i><i>A: push day</i><i>Cn: weeks kept</i></span>
         </span></li></ul></li>
       <li><span class="variant"><b>Weight down</b><s>a number and a deadline</s></span>
         <ul><li><span class="leaf">
-          <span class="chip chip--loop"><small>LOOP</small>The weight book / Descent</span>
-          <span class="chip"><small>SIZE</small>Light / Steady / Hard</span>
-          <span class="chip"><small>PULSE</small>each morning they weigh, in-loop</span>
+          <span class="chip chip--loop" data-view="lp-9"><small>LOOP</small>The weight book</span><span class="chip chip--loop" data-view="lp-6"><small>LOOP</small>Descent</span>
+          <span class="chip" data-view="lp-9"><small>SIZE</small>Light / Steady / Hard</span>
+          <span class="chip" data-view="pu-1"><small>PULSE</small>each morning they weigh, in-loop</span>
           <span class="trio"><i>C: 242, 22 to go</i><i>A: 40 min walk</i><i>Cn: the 7-day line</i></span>
         </span></li></ul></li>
       <li><span class="variant"><b>Weight up</b><s>a number and a deadline, upward</s></span>
         <ul><li><span class="leaf">
-          <span class="chip chip--gap"><small>GAP</small>weight book needs its GAIN direction</span>
-          <span class="chip"><small>PULSE</small>same morning ritual</span>
+          <span class="chip chip--loop" data-view="lp-9"><small>LOOP</small>The weight book (gain)</span>
+          <span class="chip" data-view="lp-9"><small>SIZE</small>Light / Steady / Hard</span>
+          <span class="chip" data-view="pu-1"><small>PULSE</small>each morning they weigh, in-loop</span>
+          <span class="trio"><i>C: 152, 8.6 to go up</i><i>A: eat the plan</i><i>Cn: the 7-day line</i></span>
         </span></li></ul></li>
       <li><span class="variant"><b>Hold the weight</b><s>a rule to hold</s></span>
         <ul><li><span class="leaf">
-          <span class="chip chip--gap"><small>GAP</small>no body-maintain screen (corridor fits, needs a Body context)</span>
-          <span class="chip"><small>PULSE</small>Friday check, typed</span>
+          <span class="chip chip--loop" data-view="lp-16"><small>LOOP</small>The corridor (Body)</span>
+          <span class="chip" data-view="lp-16"><small>SIZE</small>the band width</span>
+          <span class="chip" data-view="pu-1"><small>PULSE</small>Friday check, typed</span>
+          <span class="trio"><i>C: 178, inside the band</i><i>A: the weekly check</i><i>Cn: Fridays held</i></span>
         </span></li></ul></li>
       <li><span class="variant"><b>Race block</b><s>an event to reach</s></span>
         <ul><li><span class="leaf">
-          <span class="chip chip--loop"><small>LOOP</small>The tape</span>
-          <span class="chip"><small>SIZE</small>Growing block</span>
+          <span class="chip chip--loop" data-view="lp-10"><small>LOOP</small>The tape</span>
+          <span class="chip" data-view="mx-2"><small>SIZE</small>Growing block</span>
           <span class="chip"><small>PULSE</small>none: printed lines are the record</span>
           <span class="trio"><i>C: 93 of 120</i><i>A: long run 16k</i><i>Cn: the tape feeds</i></span>
         </span></li></ul></li>
@@ -132,16 +149,16 @@ deals: Clarity = standing, Action = today, Consistency = trajectory. <b>Red chip
     <ul>
       <li><span class="variant"><b>Grow the channel</b><s>a number, no deadline</s></span>
         <ul><li><span class="leaf">
-          <span class="chip chip--loop"><small>LOOP</small>The statement (posted bar)</span>
-          <span class="chip"><small>SIZE</small>Three ways</span>
-          <span class="chip"><small>PULSE</small>weekly typed subs, 0 is real</span>
+          <span class="chip chip--loop" data-view="lp-1"><small>LOOP</small>The statement (posted bar)</span>
+          <span class="chip" data-view="mx-8"><small>SIZE</small>Three ways</span>
+          <span class="chip" data-view="pu-1"><small>PULSE</small>weekly typed subs, 0 is real</span>
           <span class="trio"><i>C: 1,240 subs</i><i>A: script one video</i><i>Cn: posts per week</i></span>
         </span></li></ul></li>
       <li><span class="variant"><b>Posting rhythm</b><s>a rate to keep</s></span>
         <ul><li><span class="leaf">
-          <span class="chip chip--loop"><small>LOOP</small>Seven channels</span>
-          <span class="chip"><small>SIZE</small>Three ways</span>
-          <span class="chip"><small>PULSE</small>weekly typed subs</span>
+          <span class="chip chip--loop" data-view="lp-12"><small>LOOP</small>Seven channels</span>
+          <span class="chip" data-view="mx-8"><small>SIZE</small>Three ways</span>
+          <span class="chip" data-view="pu-1"><small>PULSE</small>weekly typed subs</span>
           <span class="trio"><i>C: 3 posts, week whole</i><i>A: edit today</i><i>Cn: weeks kept</i></span>
         </span></li></ul></li>
     </ul></li>
@@ -149,16 +166,16 @@ deals: Clarity = standing, Action = today, Consistency = trajectory. <b>Red chip
     <ul>
       <li><span class="variant"><b>GPA / cert</b><s>an event to reach, graded</s></span>
         <ul><li><span class="leaf">
-          <span class="chip chip--loop"><small>LOOP</small>The tape / Sheet first</span>
-          <span class="chip"><small>SIZE</small>Growing block</span>
-          <span class="chip"><small>PULSE</small>only when results exist</span>
+          <span class="chip chip--loop" data-view="lp-10"><small>LOOP</small>The tape</span><span class="chip chip--loop" data-view="lp-15"><small>LOOP</small>Sheet first</span>
+          <span class="chip" data-view="mx-2"><small>SIZE</small>Growing block</span>
+          <span class="chip" data-view="pu-1"><small>PULSE</small>only when results exist</span>
           <span class="trio"><i>C: 3.4, next reading May</i><i>A: study 2h</i><i>Cn: 41 hours banked</i></span>
         </span></li></ul></li>
       <li><span class="variant"><b>Job hunt</b><s>a number and a deadline</s></span>
         <ul><li><span class="leaf">
-          <span class="chip chip--loop"><small>LOOP</small>The statement (applications)</span>
-          <span class="chip"><small>SIZE</small>Keys / Notched rail</span>
-          <span class="chip"><small>PULSE</small>weekly: interviews landed</span>
+          <span class="chip chip--loop" data-view="lp-1"><small>LOOP</small>The statement (applications)</span>
+          <span class="chip" data-view="mx-10"><small>SIZE</small>Keys</span><span class="chip" data-view="mx-1"><small>SIZE</small>Notched rail</span>
+          <span class="chip" data-view="pu-1"><small>PULSE</small>weekly: interviews landed</span>
           <span class="trio"><i>C: 34 of 60 sent</i><i>A: 3 applications</i><i>Cn: arrival moves</i></span>
         </span></li></ul></li>
     </ul></li>
@@ -166,9 +183,9 @@ deals: Clarity = standing, Action = today, Consistency = trajectory. <b>Red chip
     <ul>
       <li><span class="variant"><b>Nightly ceiling</b><s>a rule to hold</s></span>
         <ul><li><span class="leaf">
-          <span class="chip chip--loop"><small>LOOP</small>Ceiling / The statement</span>
-          <span class="chip"><small>SIZE</small>which hour: 7:30 / 8 / 9</span>
-          <span class="chip"><small>PULSE</small>nightly, typed from their report</span>
+          <span class="chip chip--loop" data-view="lp-7"><small>LOOP</small>Ceiling</span><span class="chip chip--loop" data-view="lp-17"><small>LOOP</small>The statement</span>
+          <span class="chip" data-view="lp-7"><small>SIZE</small>which hour: 7:30 / 8 / 9</span>
+          <span class="chip" data-view="pu-1"><small>PULSE</small>nightly, typed from their report</span>
           <span class="trio"><i>C: 1h 40 avg, aim 2h</i><i>A: drawer at 8pm</i><i>Cn: nights under</i></span>
         </span></li></ul></li>
     </ul></li>
@@ -176,8 +193,8 @@ deals: Clarity = standing, Action = today, Consistency = trajectory. <b>Red chip
     <ul>
       <li><span class="variant"><b>Clean break</b><s>a rule to hold, binary</s></span>
         <ul><li><span class="leaf">
-          <span class="chip chip--loop"><small>LOOP</small>Days owned</span>
-          <span class="chip"><small>SIZE</small>none, by design: the escape door</span>
+          <span class="chip chip--loop" data-view="lp-18"><small>LOOP</small>Days owned</span>
+          <span class="chip" data-view="lp-18"><small>SIZE</small>the escape door</span>
           <span class="chip"><small>PULSE</small>none: days are arithmetic</span>
           <span class="trio"><i>C: 58 of 90</i><i>A: not tonight</i><i>Cn: total owned</i></span>
         </span></li></ul></li>
@@ -186,21 +203,26 @@ deals: Clarity = standing, Action = today, Consistency = trajectory. <b>Red chip
     <ul>
       <li><span class="variant"><b>Blockers + sessions</b><s>an event to reach</s></span>
         <ul><li><span class="leaf">
-          <span class="chip chip--loop"><small>LOOP</small>The tape + statement (blockers)</span>
-          <span class="chip"><small>SIZE</small>Pressure hold / Three ways</span>
-          <span class="chip"><small>PULSE</small>their blocker list, checked off</span>
+          <span class="chip chip--loop" data-view="lp-10"><small>LOOP</small>The tape</span><span class="chip chip--loop" data-view="lp-1"><small>LOOP</small>Statement (blockers)</span>
+          <span class="chip" data-view="mx-6"><small>SIZE</small>Pressure hold</span><span class="chip" data-view="mx-8"><small>SIZE</small>Three ways</span>
+          <span class="chip" data-view="pu-1"><small>PULSE</small>their blocker list, checked off</span>
           <span class="trio"><i>C: 9 of 14 cleared</i><i>A: one deep session</i><i>Cn: sessions printed</i></span>
         </span></li></ul></li>
       <li><span class="variant"><b>Goal reached</b><s>the loop closes</s></span>
         <ul><li><span class="leaf">
-          <span class="chip chip--gap"><small>GAP</small>the FINISH ceremony is still unbuilt</span>
+          <span class="chip chip--loop" data-view="lp-22"><small>LOOP</small>Arrival day</span>
+          <span class="chip"><small>THEN</small>the ceremony (celebrate/milestone)</span>
+          <span class="trio"><i>C: arrived</i><i>A: no move today</i><i>Cn: sealed into the record</i></span>
         </span></li></ul></li>
     </ul></li>
-  <li><span class="bucket" style="opacity:.55">Everything else</span>
+  <li><span class="bucket">Everything else</span>
     <ul>
       <li><span class="variant"><b>Open practice</b><s>nothing to count</s></span>
         <ul><li><span class="leaf">
-          <span class="chip chip--gap"><small>GAP</small>open-practice loop died in the cull; sync box covers the glance</span>
+          <span class="chip chip--loop" data-view="lp-21"><small>LOOP</small>The practice</span>
+          <span class="chip" data-view="lp-21"><small>SIZE</small>none: the hold IS the gesture</span>
+          <span class="chip"><small>PULSE</small>none: pages banked are the record</span>
+          <span class="trio"><i>C: 19 pages, no finish line</i><i>A: one honest page</i><i>Cn: most days held</i></span>
         </span></li></ul></li>
     </ul></li>
 </ul>
@@ -209,6 +231,29 @@ deals: Clarity = standing, Action = today, Consistency = trajectory. <b>Red chip
 <p class="foot"><b>How the systems join:</b> the shape under each variant is the sync box's own taxonomy
 (a number and a deadline / a rule to hold / a rate to keep / an event to reach / nothing to count). The sync
 box deals three faces at a glance; tapping Action walks into the LOOP screen on this map. Same machinery,
-two zoom levels. <b>The four red gaps</b> are the whole remaining distance between this map and
-"foundation-complete for the seven buckets."</p>
-</div></body></html>
+two zoom levels. <b>All four gaps are closed</b>: the weight book carries its gain direction, the corridor holds a body,
+the practice covers goals with nothing to count, and Arrival day is the loop's hand-off into the
+ceremony (mockups/celebrate) and then the next star. Foundation-complete for the seven buckets.</p>
+</div>
+<div class="viewer" id="viewer" role="dialog" aria-label="Mockup viewer">
+  <div class="viewer__box">
+    <button class="viewer__x" id="viewerX" type="button" aria-label="Close">&#10005;</button>
+    <span class="viewer__hint">The live mockup. Bucket toggles work in here too. Esc closes.</span>
+    <iframe id="viewerF" title="mockup"></iframe>
+  </div>
+</div>
+<script>
+(function(){
+  var v=document.getElementById('viewer'), f=document.getElementById('viewerF');
+  function open(k){ f.src='gallery.html#'+k; v.classList.add('on'); }
+  function close(){ v.classList.remove('on'); f.src='about:blank'; }
+  document.addEventListener('click', function(e){
+    var c=e.target.closest('[data-view]');
+    if(c){ open(c.dataset.view); return; }
+    if(e.target===v) close();
+  });
+  document.getElementById('viewerX').addEventListener('click', close);
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') close(); });
+})();
+</script>
+</body></html>

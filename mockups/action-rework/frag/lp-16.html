@@ -15,7 +15,7 @@
 [data-k=lp-16] .l16-days{margin-left:auto;font-size:12px;white-space:nowrap;color:rgba(var(--ink),.80)}
 [data-k=lp-16] .l16-say{margin:10px 0 0;font-size:14px;font-weight:500;line-height:1.45;color:rgba(var(--ink),.95)}
 [data-k=lp-16] .l16-say b{font-weight:700;color:var(--text-hi)}
-/* provenance: this money exists because they typed it at a weekly confirm */
+/* provenance: every number on this screen was typed by them at their own check */
 [data-k=lp-16] .l16-src{margin:7px 0 0;font-size:11.5px;line-height:1.4;color:rgba(var(--ink),.90)}
 
 [data-k=lp-16] .l16-band{position:relative;flex:none;height:132px;margin-top:16px;overflow:hidden;
@@ -27,6 +27,8 @@
   transition:top .24s cubic-bezier(.22,.61,.36,1)}
 [data-k=lp-16] .l16-tag.floor{right:14px;color:rgba(63,217,78,.92);font-weight:500}
 [data-k=lp-16] .l16-tag.cush{right:14px;color:rgba(var(--ink),.62)}
+/* the maintenance band has two edges, so the line they hold moves to the left rail */
+[data-k=lp-16] .l16-band.two .l16-tag.floor{left:14px;right:auto}
 [data-k=lp-16] .l16-now{position:absolute;font-size:11.5px;font-weight:500;line-height:1;color:var(--text-hi);
   transition:top .24s cubic-bezier(.22,.61,.36,1),left .24s cubic-bezier(.22,.61,.36,1)}
 
@@ -57,32 +59,37 @@
 [data-k=lp-16] .l16-close{position:relative;flex:none;height:52px;margin-top:10px;border-radius:14px;overflow:hidden;
   background:rgba(235,238,248,.94);touch-action:none;user-select:none}
 [data-k=lp-16] .l16-fill{position:absolute;inset:0 auto 0 0;width:0;background:rgba(63,217,78,.85)}
+/* the label centres in the room LEFT OF the knob's own 52px, so it can never
+   tuck under the knob whichever goal's words are in it */
 [data-k=lp-16] .l16-lab{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  padding-left:26px;font-size:15.5px;font-weight:700;letter-spacing:-.01em;color:#0b0c10;pointer-events:none}
+  padding:0 12px 0 56px;font-size:15.5px;font-weight:700;letter-spacing:-.01em;color:#0b0c10;pointer-events:none}
 [data-k=lp-16] .l16-knob{position:absolute;left:4px;top:4px;width:44px;height:44px;border-radius:11px;
   background:#0b0c10;box-shadow:0 3px 10px rgba(0,0,0,.35);cursor:grab;display:flex;align-items:center;justify-content:center}
 [data-k=lp-16] .l16-knob:active{cursor:grabbing}
 [data-k=lp-16] .l16-knob svg{width:15px;height:15px;stroke:rgba(235,238,248,.94);stroke-width:2.1;fill:none;
   stroke-linecap:round;stroke-linejoin:round}
 [data-k=lp-16] .l16-close.done{background:rgba(63,217,78,.85)}
-[data-k=lp-16] .l16-close.done .l16-lab{padding-left:0}
+[data-k=lp-16] .l16-close.done .l16-lab{padding:0}
 [data-k=lp-16] .l16-close.done .l16-knob{opacity:0;transition:opacity .16s ease-out}
 </style>
 <h3>The corridor</h3>
-<p class="cap">A revenue floor read as a lane you travel down, edge to edge: the bright line is the money you promised yourself, the track is where your own weekly totals have put you, and the rest of the month is the empty space ahead.</p>
-<div class="bk"><i>Money</i></div>
+<p class="cap">A number you have to hold, read as a lane you travel down, edge to edge: the bright line is what you promised yourself, the track is where your own typed numbers put you, and the rest of the period is the empty space ahead.</p>
+<div class="bk" role="group" aria-label="which goal this screen is carrying">
+  <button type="button" class="on" data-b="money" aria-pressed="true">Money</button>
+  <button type="button" data-b="body" aria-pressed="false">Body</button>
+</div>
 <div class="ph">
   <div class="grid"></div>
   <div class="l16">
     <div class="pad">
-      <div class="l16-goal">Hold a $4,000 floor, every month</div>
+      <div class="l16-goal"></div>
       <div class="l16-top">
-        <div class="l16-in">$2,340</div>
-        <div class="l16-of">of $4,000</div>
-        <div class="l16-days">11 days left</div>
+        <div class="l16-in"></div>
+        <div class="l16-of"></div>
+        <div class="l16-days"></div>
       </div>
-      <p class="l16-say">You are <b>$240 under</b> the line for this point in the month.</p>
-      <p class="l16-src">Each step up is a weekly total you entered. Last one was Sunday.</p>
+      <p class="l16-say"></p>
+      <p class="l16-src"></p>
     </div>
 
     <div class="l16-band">
@@ -92,14 +99,26 @@
             <stop offset="0" stop-color="rgba(63,217,78,.16)"/>
             <stop offset="1" stop-color="rgba(63,217,78,0)"/>
           </linearGradient>
+          <linearGradient id="l16bd" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="rgba(63,217,78,0)"/>
+            <stop offset=".5" stop-color="rgba(63,217,78,.14)"/>
+            <stop offset="1" stop-color="rgba(63,217,78,0)"/>
+          </linearGradient>
           <linearGradient id="l16dn" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0" stop-color="rgba(235,238,248,.075)"/>
             <stop offset="1" stop-color="rgba(235,238,248,0)"/>
           </linearGradient>
+          <linearGradient id="l16uf" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="rgba(235,238,248,0)"/>
+            <stop offset="1" stop-color="rgba(235,238,248,.075)"/>
+          </linearGradient>
         </defs>
         <rect class="lane" x="0" y="0" width="300" height="0" fill="url(#l16up)"/>
+        <rect class="over" x="0" y="0" width="300" height="0" fill="url(#l16uf)"/>
         <rect class="under" x="0" y="0" width="300" height="0" fill="url(#l16dn)"/>
         <line class="cushl" x1="0" y1="0" x2="300" y2="0" stroke="rgba(235,238,248,.18)" stroke-width="1"
+          stroke-dasharray="3 4" vector-effect="non-scaling-stroke"/>
+        <line class="cushl2" x1="0" y1="0" x2="300" y2="0" stroke="rgba(235,238,248,.18)" stroke-width="1"
           stroke-dasharray="3 4" vector-effect="non-scaling-stroke"/>
         <line class="floorl" x1="0" y1="0" x2="300" y2="0" stroke="rgba(63,217,78,.62)" stroke-width="1"
           vector-effect="non-scaling-stroke"/>
@@ -110,31 +129,28 @@
         <g class="marks"></g>
         <circle class="head" cx="0" cy="0" r="3.6" fill="#3fd94e"/>
       </svg>
-      <div class="l16-tag floor">the floor, $4,000</div>
-      <div class="l16-tag cush">cushion</div>
-      <div class="l16-now">$240 under</div>
+      <div class="l16-tag floor"></div>
+      <div class="l16-tag cush"></div>
+      <div class="l16-tag cush e2"></div>
+      <div class="l16-now"></div>
     </div>
 
     <div class="pad l16-int">
-      <p class="l16-lead">Cushion is how far above the floor you aim, so one late payment does not put you under.</p>
-      <div class="l16-chips">
-        <button class="l16-chip on" data-c="0">None</button>
-        <button class="l16-chip" data-c="400">+$400</button>
-        <button class="l16-chip" data-c="1000">+$1,000</button>
-      </div>
-      <p class="l16-note">You aim at the floor exactly. One late payment puts you under it.</p>
+      <p class="l16-lead"></p>
+      <div class="l16-chips" role="group" aria-label="how much room you keep"></div>
+      <p class="l16-note"></p>
     </div>
 
     <div class="l16-sp"></div>
 
     <div class="pad">
       <div class="l16-do">
-        <div class="h"><i></i><b>Send 2 renewal invoices.</b></div>
-        <p>Today&#8217;s step. The plan puts about 20 minutes on it.</p>
+        <div class="h"><i></i><b></b></div>
+        <p></p>
       </div>
       <div class="l16-close">
         <div class="l16-fill"></div>
-        <div class="l16-lab">Swipe when they are sent</div>
+        <div class="l16-lab"></div>
         <div class="l16-knob"><svg viewBox="0 0 24 24"><path d="M8 5l7 7-7 7"/></svg></div>
       </div>
     </div>
@@ -142,75 +158,191 @@
 </div>
 <script>(function(){
   var c=document.currentScript.closest('.cell');
-  var svg=c.querySelector('.l16-band svg'),
+  var band=c.querySelector('.l16-band'),svg=band.querySelector('svg'),
       track=svg.querySelector('.track'),head=svg.querySelector('.head'),marks=svg.querySelector('.marks'),
-      floorl=svg.querySelector('.floorl'),cushl=svg.querySelector('.cushl'),
-      todayl=svg.querySelector('.todayl'),under=svg.querySelector('.under'),lane=svg.querySelector('.lane'),
-      tFloor=c.querySelector('.l16-tag.floor'),tCush=c.querySelector('.l16-tag.cush'),
+      floorl=svg.querySelector('.floorl'),cushl=svg.querySelector('.cushl'),cushl2=svg.querySelector('.cushl2'),
+      todayl=svg.querySelector('.todayl'),under=svg.querySelector('.under'),over=svg.querySelector('.over'),
+      lane=svg.querySelector('.lane'),
+      tFloor=c.querySelector('.l16-tag.floor'),tCush=c.querySelector('.l16-tag.cush:not(.e2)'),
+      tEdge=c.querySelector('.l16-tag.e2'),
       now=c.querySelector('.l16-now'),note=c.querySelector('.l16-note'),
-      say=c.querySelector('.l16-say'),sent=false;
+      say=c.querySelector('.l16-say'),src=c.querySelector('.l16-src'),goal=c.querySelector('.l16-goal'),
+      inEl=c.querySelector('.l16-in'),ofEl=c.querySelector('.l16-of'),daysEl=c.querySelector('.l16-days'),
+      lead=c.querySelector('.l16-lead'),chipsEl=c.querySelector('.l16-chips'),
+      doBox=c.querySelector('.l16-do'),doB=doBox.querySelector('b'),doP=doBox.querySelector('p'),
+      pad=c.querySelector('.l16-close'),knob=c.querySelector('.l16-knob'),
+      fill=c.querySelector('.l16-fill'),lab=c.querySelector('.l16-lab');
 
-  var H=132,W=300,DAYS=31,PPD=.048,FY=58,cushion=0;
-  /* dollars ahead of (+) or behind (-) the floor pace, day 1..20.
-     It steps UP on the three days they entered a weekly total, and drifts
-     down in between as the floor pace keeps moving. Nothing here is sensed. */
-  var CONF=[6,13,20];
-  var delta=[-129,-258,-387,-516,-645,126,-3,-132,-261,-390,-519,-648,73,-56,-185,-314,-443,-572,-701,-240];
-  var notes={0:'You aim at the floor exactly. One late payment puts you under it.',
-             400:'A small cushion. One late payment stops being an emergency.',
-             1000:'Real room. You can lose your biggest invoice and still land on the floor.'};
+  var W=300,H=132;
   function money(n){return '$'+Math.abs(Math.round(n)).toLocaleString('en-US');}
-  function y(v){return FY-v*PPD;}
-  function x(d){return 14+(d-1)*((W-28)/(DAYS-1));}
+  function one(n){return (Math.round(n*10)/10).toFixed(1);}
+  function x(i,n){return 14+i*((W-28)/(n-1));}
+  /* the band carries a left rail of numbers, so its track starts clear of them */
+  function xb(i,n){return 34+i*((W-52)/(n-1));}
 
+  /* ------------------------------------------------------------------ MONEY
+     Hold a revenue floor. The track is dollars ahead of (+) or behind (-) the
+     floor's own pace for this point in the month. It STEPS UP on the three days
+     they entered a weekly total and drifts down in between only because the
+     pace keeps moving. Nothing here is sensed, nothing is read off a bank. */
+  var MDELTA=[-129,-258,-387,-516,-645,126,-3,-132,-261,-390,-519,-648,73,-56,-185,-314,-443,-572,-701,-240],
+      MCONF=[6,13,20],MDAYS=31,MPPD=.048,MFY=58;
+
+  /* ------------------------------------------------------------------- BODY
+     Hold 180 lb after a cut. The floor becomes a BAND, and the only marks are
+     the Friday weigh-ins they typed at the weekly check. There is no line
+     between the Fridays because nothing was measured between them. */
+  var WB=[179.2,180.6,178.9,181.2,180.1,182.3,179.6,180.8,182.0,181.4],
+      WHOLD=180,WSLOTS=14,WPPL=5.6,WCY=66;
+
+  var CTX={
+    money:{
+      goal:'Hold a $4,000 floor, every month',
+      big:'$2,340',of:'of $4,000',side:'11 days left',
+      src:'Every step up is a Sunday total you typed in.',
+      lead:'Cushion is how far above the floor you aim, so one late payment does not put you under.',
+      chips:[{v:0,t:'None'},{v:400,t:'+$400'},{v:1000,t:'+$1,000'}],pick:0,
+      note:function(v){
+        return v===0?'You aim at the floor exactly. One late payment puts you under it.'
+             :v===400?'A small cushion. One late payment stops being an emergency.'
+             :'Real room. You can lose your biggest invoice and still land on the floor.';},
+      act:'Send 2 renewal invoices.',
+      sub:'Today’s step. The plan puts about 20 minutes on it.',
+      lab:'Swipe to log 2 invoices',
+      doneLab:'2 invoices sent',
+      doneSub:'Logged just now. What they pay lands here when you enter Sunday’s total.',
+      doneSay:'Two invoices out. The line moves at Sunday’s confirm, not before.'
+    },
+    body:{
+      goal:'Hold 180 lb, after the cut',
+      big:'181.4',of:'lb',side:'next check Friday',
+      src:'Every mark is a Friday weigh-in you typed in.',
+      lead:'The band is how far you let the number swing before it means anything.',
+      chips:[{v:2,t:'±2 lb'},{v:5,t:'±5 lb'},{v:8,t:'±8 lb'}],pick:5,
+      note:function(v){
+        var lo=WHOLD-v,hi=WHOLD+v,out=0;
+        WB.forEach(function(w){if(w<lo-1e-9||w>hi+1e-9)out++;});
+        return lo+' to '+hi+'. '+(out===0?'Nothing in your last ten Fridays sits outside it.'
+          :out===1?'One of your last ten Fridays sits outside it.'
+          :out+' of your last ten Fridays sit outside it.');},
+      act:'Walk 30 minutes today.',
+      sub:'The steady habit you kept from the cut. Friday morning is the weigh-in.',
+      lab:'Swipe to log the walk',
+      doneLab:'30 minute walk logged',
+      doneSub:'Logged just now. The mark moves when you type Friday’s weight in.',
+      doneSay:'Walk logged. The mark moves at Friday’s weigh-in, not before.'
+    }
+  };
+
+  var mode='money',C=CTX.money,cush=0,sent=false;
+
+  /* one painter, and it writes EVERY element in both modes, so nothing a
+     mode set can survive into the other one */
   function paint(){
-    floorl.setAttribute('y1',FY);floorl.setAttribute('y2',FY);
-    var cy=y(cushion);
-    cushl.setAttribute('y1',cy);cushl.setAttribute('y2',cy);
-    cushl.style.opacity=cushion?1:0;
-    lane.setAttribute('y',Math.max(0,FY-58));lane.setAttribute('height',Math.min(FY,58));
-    under.setAttribute('y',FY);under.setAttribute('height',H-FY);
-    tFloor.style.top=(FY-16)+'px';
-    tCush.style.top=Math.max(4,cy-15)+'px';tCush.style.opacity=cushion?1:0;
-    tCush.textContent='cushion, '+money(4000+cushion);
-    var pts=[],i;
-    for(i=0;i<delta.length;i++)pts.push(x(i+1).toFixed(1)+','+y(delta[i]).toFixed(1));
-    track.setAttribute('points',pts.join(' '));
+    var i,pts=[],hx,hy,d;
     marks.textContent='';
-    CONF.forEach(function(d){
-      if(d>delta.length)return;
-      var m=document.createElementNS('http://www.w3.org/2000/svg','circle');
-      m.setAttribute('cx',x(d).toFixed(1));m.setAttribute('cy',y(delta[d-1]).toFixed(1));
-      m.setAttribute('r','2.2');m.setAttribute('fill','rgba(235,238,248,.75)');
-      marks.appendChild(m);
-    });
-    var hx=x(delta.length),hy=y(delta[delta.length-1]);
+
+    if(mode==='money'){
+      band.classList.remove('two');
+      var ym=function(v){return MFY-v*MPPD;};
+      floorl.setAttribute('y1',MFY);floorl.setAttribute('y2',MFY);floorl.style.opacity=1;
+      var cy=ym(cush);
+      cushl.setAttribute('y1',cy);cushl.setAttribute('y2',cy);cushl.style.opacity=cush?1:0;
+      cushl2.style.opacity=0;
+      lane.setAttribute('fill','url(#l16up)');
+      lane.setAttribute('y',Math.max(0,MFY-58));lane.setAttribute('height',Math.min(MFY,58));lane.style.opacity=1;
+      over.style.opacity=0;over.setAttribute('height',0);
+      under.setAttribute('y',MFY);under.setAttribute('height',H-MFY);under.style.opacity=1;
+
+      tFloor.style.top=(MFY-16)+'px';tFloor.textContent='the floor, $4,000';tFloor.style.opacity=1;
+      tCush.style.top=Math.max(4,cy-15)+'px';tCush.style.opacity=cush?1:0;
+      /* a hidden tag is emptied, not just faded: nothing a goal wrote can
+         survive into the other goal, on screen or read out loud */
+      tCush.textContent=cush?'cushion, '+money(4000+cush):'';
+      tEdge.style.opacity=0;tEdge.textContent='';
+
+      track.setAttribute('stroke','rgba(235,238,248,.58)');track.removeAttribute('stroke-dasharray');
+      for(i=0;i<MDELTA.length;i++)pts.push(x(i,MDAYS).toFixed(1)+','+ym(MDELTA[i]).toFixed(1));
+      track.setAttribute('points',pts.join(' '));
+      MCONF.forEach(function(dd){
+        if(dd>MDELTA.length)return;
+        var m=document.createElementNS('http://www.w3.org/2000/svg','circle');
+        m.setAttribute('cx',x(dd-1,MDAYS).toFixed(1));m.setAttribute('cy',ym(MDELTA[dd-1]).toFixed(1));
+        m.setAttribute('r','2.2');m.setAttribute('fill','rgba(235,238,248,.75)');
+        marks.appendChild(m);
+      });
+      hx=x(MDELTA.length-1,MDAYS);hy=ym(MDELTA[MDELTA.length-1]);
+      d=MDELTA[MDELTA.length-1];
+      now.textContent=money(d)+(d<0?' under':' over');
+      now.style.left=(hx+9)+'px';now.style.top=(hy-(d<0?4:16))+'px';
+      if(!sent)say.innerHTML='You are <b>'+money(d)+(d<0?' under':' over')+
+        '</b> the line for this point in the month.';
+    }else{
+      band.classList.add('two');
+      var yb=function(w){return WCY-(w-WHOLD)*WPPL;};
+      var top=yb(WHOLD+cush),bot=yb(WHOLD-cush);
+      floorl.setAttribute('y1',WCY);floorl.setAttribute('y2',WCY);floorl.style.opacity=1;
+      cushl.setAttribute('y1',top);cushl.setAttribute('y2',top);cushl.style.opacity=1;
+      cushl2.setAttribute('y1',bot);cushl2.setAttribute('y2',bot);cushl2.style.opacity=1;
+      lane.setAttribute('fill','url(#l16bd)');
+      lane.setAttribute('y',top);lane.setAttribute('height',bot-top);lane.style.opacity=1;
+      over.setAttribute('y',0);over.setAttribute('height',Math.max(0,top));over.style.opacity=1;
+      under.setAttribute('y',bot);under.setAttribute('height',Math.max(0,H-bot));under.style.opacity=1;
+
+      tFloor.style.top=(WCY-15)+'px';tFloor.textContent=String(WHOLD);tFloor.style.opacity=1;
+      tCush.style.top=Math.max(3,top-14)+'px';tCush.textContent=String(WHOLD+cush);tCush.style.opacity=1;
+      tEdge.style.top=Math.min(H-14,bot+3)+'px';tEdge.textContent=String(WHOLD-cush);tEdge.style.opacity=1;
+
+      track.setAttribute('stroke','rgba(235,238,248,.34)');track.setAttribute('stroke-dasharray','2 3');
+      for(i=0;i<WB.length;i++)pts.push(xb(i,WSLOTS).toFixed(1)+','+yb(WB[i]).toFixed(1));
+      track.setAttribute('points',pts.join(' '));
+      for(i=0;i<WB.length-1;i++){
+        var m2=document.createElementNS('http://www.w3.org/2000/svg','circle');
+        m2.setAttribute('cx',xb(i,WSLOTS).toFixed(1));m2.setAttribute('cy',yb(WB[i]).toFixed(1));
+        m2.setAttribute('r','2.2');m2.setAttribute('fill','rgba(235,238,248,.75)');
+        marks.appendChild(m2);
+      }
+      var w=WB[WB.length-1];
+      hx=xb(WB.length-1,WSLOTS);hy=yb(w);
+      now.textContent=one(w)+' lb';
+      now.style.left=(hx+9)+'px';now.style.top=(hy-(w>=WHOLD?16:-6))+'px';
+      if(!sent){
+        var off=w-WHOLD,inside=Math.abs(off)<=cush+1e-9;
+        say.innerHTML=inside
+          ?'You are <b>inside the band</b>, '+one(Math.abs(off))+' lb '+(off>=0?'above ':'below ')+WHOLD+'.'
+          :'You are <b>'+one(Math.abs(off)-cush)+' lb '+(off>0?'above':'below')+' the band</b>, at '+one(w)+' lb.';
+      }
+    }
+
     head.setAttribute('cx',hx);head.setAttribute('cy',hy);
     todayl.setAttribute('x1',hx);todayl.setAttribute('x2',hx);
-    var d=delta[delta.length-1];
-    now.textContent=money(d)+(d<0?' under':' over');
-    now.style.left=(hx+9)+'px';
-    now.style.top=(hy-(d<0?4:16))+'px';
+    note.textContent=C.note(cush);
   }
-  paint();
 
-  c.querySelectorAll('.l16-chip').forEach(function(b){
-    b.addEventListener('click',function(){
-      c.querySelectorAll('.l16-chip').forEach(function(x){x.classList.remove('on');});
-      b.classList.add('on');cushion=parseInt(b.dataset.c,10);note.textContent=notes[cushion];paint();
+  function drawChips(){
+    chipsEl.textContent='';
+    C.chips.forEach(function(o){
+      var b=document.createElement('button');
+      b.type='button';b.className='l16-chip'+(o.v===cush?' on':'');
+      b.textContent=o.t;b.setAttribute('aria-pressed',o.v===cush?'true':'false');
+      b.addEventListener('click',function(){
+        chipsEl.querySelectorAll('button').forEach(function(z){
+          z.classList.remove('on');z.setAttribute('aria-pressed','false');});
+        b.classList.add('on');b.setAttribute('aria-pressed','true');
+        cush=o.v;paint();
+      });
+      chipsEl.appendChild(b);
     });
-  });
+  }
 
-  var pad=c.querySelector('.l16-close'),knob=c.querySelector('.l16-knob'),
-      fill=c.querySelector('.l16-fill'),lab=c.querySelector('.l16-lab'),drag=false,sx=0,px=0;
+  /* --- the swipe: logging the ACTION never moves the number. The number moves
+         when they type it in at their own check. ------------------------- */
   function max(){return pad.clientWidth-52;}
+  var px=0,drag=false,sx=0;
   function set(v){px=Math.max(0,Math.min(max(),v));knob.style.left=(4+px)+'px';fill.style.width=(px+48)+'px';}
-  /* logging the ACTION never moves the money. The money moves when they type it in. */
   function done(){
-    sent=true;pad.classList.add('done');lab.textContent='2 invoices sent';
-    c.querySelector('.l16-do').classList.add('sent');
-    c.querySelector('.l16-do p').textContent='Logged just now. What they pay lands here when you enter Sunday’s total.';
-    say.innerHTML='Two invoices out. The line moves at Sunday’s confirm, not before.';
+    sent=true;pad.classList.add('done');lab.textContent=C.doneLab;
+    doBox.classList.add('sent');doP.textContent=C.doneSub;say.innerHTML=C.doneSay;
   }
   knob.addEventListener('pointerdown',function(e){if(sent)return;drag=true;sx=e.clientX-px;
     knob.style.transition='';fill.style.transition='';
@@ -223,5 +355,25 @@
     else{knob.style.transition='left .2s ease-out';fill.style.transition='width .2s ease-out';set(0);}
   }
   knob.addEventListener('pointerup',release);knob.addEventListener('pointercancel',release);
+
+  /* --- swapping the goal: same corridor, the goal's own numbers and words -- */
+  function render(key){
+    mode=key;C=CTX[key];cush=C.pick;sent=false;
+    drag=false;knob.style.transition='';fill.style.transition='';set(0);
+    pad.classList.remove('done');doBox.classList.remove('sent');
+    goal.textContent=C.goal;inEl.textContent=C.big;ofEl.textContent=C.of;daysEl.textContent=C.side;
+    src.textContent=C.src;lead.textContent=C.lead;
+    doB.textContent=C.act;doP.textContent=C.sub;lab.textContent=C.lab;
+    drawChips();paint();
+  }
+  c.querySelectorAll('.bk button').forEach(function(b){
+    b.addEventListener('click',function(){
+      c.querySelectorAll('.bk button').forEach(function(z){
+        z.classList.remove('on');z.setAttribute('aria-pressed','false');});
+      b.classList.add('on');b.setAttribute('aria-pressed','true');
+      render(b.dataset.b);
+    });
+  });
+  render('money');
 })();</script>
 </section>
