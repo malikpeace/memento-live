@@ -25,7 +25,8 @@
 [data-k=lp-1] .goal{display:flex;align-items:baseline;gap:6px;font-size:12px;letter-spacing:-.005em;
   white-space:nowrap;color:rgba(var(--ink),.92)}
 [data-k=lp-1] .goal b{font-weight:700;font-variant-numeric:tabular-nums}
-[data-k=lp-1] .goal span{margin-left:auto;color:rgba(var(--ink),.92)}
+[data-k=lp-1] .goal u{text-decoration:none;font-weight:400;min-width:0;overflow:hidden;text-overflow:ellipsis}
+[data-k=lp-1] .goal span{margin-left:auto;color:rgba(var(--ink),.92);flex:none}
 [data-k=lp-1] .bar{margin-top:9px;height:3px;border-radius:2px;background:rgba(var(--ink),.12);overflow:hidden}
 [data-k=lp-1] .bar i{display:block;height:100%;width:47%;border-radius:2px;background:rgba(var(--ink),.70);
   transition:width .5s cubic-bezier(.2,.7,.2,1)}
@@ -105,14 +106,19 @@
 @media (prefers-reduced-motion:reduce){[data-k=lp-1] *{transition:none!important}}
 </style>
 <h3>Statement</h3><p class="cap">No cards at all. The instruction is the entire screen, set at poster scale, so the count is the biggest thing in your hand and the only other decision is three named sizes underneath, with every other number kept behind a quiet "more".</p>
+<div class="bk" role="group" aria-label="which goal this screen is carrying">
+  <button type="button" class="on" data-b="money" aria-pressed="true">Money</button>
+  <button type="button" data-b="audience" aria-pressed="false">Audience</button>
+  <button type="button" data-b="ship" aria-pressed="false">Ship the project</button>
+</div>
 <div class="ph">
   <div class="grid"></div>
   <div class="s">
-    <div class="goal"><b data-count>47</b> of 100 clients reached out <span>19 days left</span></div>
+    <div class="goal"><b data-count>47</b> <u data-tail>of 100 clients reached out</u><span data-left>19 days left</span></div>
     <div class="bar"><i></i></div>
     <p class="src">Counted from the messages you logged.</p>
 
-    <p class="say">Message<span class="n">5</span><span class="obj">potential clients.</span></p>
+    <p class="say"><span class="vb">Message</span><span class="n">5</span><span class="obj">potential clients.</span></p>
     <p class="cons">Sending 5 takes you to 52 of 100. Your best day so far is 8.</p>
 
     <div class="scale" role="group" aria-label="how many today"></div>
@@ -131,15 +137,39 @@
   var s=r.querySelector('.s'),n=r.querySelector('.say .n'),cons=r.querySelector('.cons'),
       bar=r.querySelector('.bar i'),lab=r.querySelector('.track .lab'),track=r.querySelector('.track'),
       knob=r.querySelector('.knob'),fill=r.querySelector('.track .fill'),undo=r.querySelector('.undo'),
-      obj=r.querySelector('.obj'),scale=r.querySelector('.scale'),more=r.querySelector('.more'),
-      count=r.querySelector('[data-count]'),
-      /* REACHED = the sum of every message they have logged. TARGET = the
-         countable target their plan named. Both trace to their own input. */
-      pick=5,BEST=8,REACHED=47,TARGET=100;
+      obj=r.querySelector('.obj'),vb=r.querySelector('.vb'),scale=r.querySelector('.scale'),
+      more=r.querySelector('.more'),count=r.querySelector('[data-count]'),
+      tail=r.querySelector('[data-tail]'),left=r.querySelector('[data-left]'),src=r.querySelector('.src');
 
-  /* THREE proposed sizes in front, named and priced. Everything else lives behind "more". */
-  var THREE=[{n:3,role:'lighter'},{n:5,role:'today’s'},{n:8,role:'heavier'}],
-      ALL=[1,2,3,5,8,12,16,20],fine=false;
+  /* --- THE BUCKETS (ACTION-BUCKETS.md) -----------------------------------
+     One shape, three of the seven goals. In every one of them REACHED is the
+     sum of things the person logged and TARGET is the countable target their
+     own plan named, so the bar stays a literal sum over their own list. The
+     verb, the unit and the source line change; the provenance does not. */
+  var B={
+    money:{reached:47,target:100,tail:'of 100 clients reached out',left:'19 days left',
+      src:'Counted from the messages you logged.',
+      vb:'Message',one:'potential client.',many:'potential clients.',ger:'Sending',
+      best:8,pick:5,three:[{n:3,role:'lighter'},{n:5,role:'today’s'},{n:8,role:'heavier'}],
+      all:[1,2,3,5,8,12,16,20],idle:'Slide when they are sent',
+      did:function(v){return v+(v===1?' message sent':' messages sent')},
+      tot:function(t){return t+' of 100 reached out.'}},
+    audience:{reached:12,target:100,tail:'of 100 videos posted',left:'22 weeks left',
+      src:'Counted from the videos you logged as posted.',
+      vb:'Post',one:'video.',many:'videos.',ger:'Posting',
+      best:3,pick:2,three:[{n:1,role:'lighter'},{n:2,role:'today’s'},{n:3,role:'heavier'}],
+      all:[1,2,3,4,5,6],idle:'Slide when they are up',
+      did:function(v){return v+(v===1?' video posted':' videos posted')},
+      tot:function(t){return t+' of 100 videos posted.'}},
+    ship:{reached:9,target:14,tail:'of 14 launch blockers cleared',left:'19 days left',
+      src:'Counted from your own blocker list.',
+      vb:'Clear',one:'blocker.',many:'blockers.',ger:'Clearing',
+      best:3,pick:2,three:[{n:1,role:'lighter'},{n:2,role:'today’s'},{n:3,role:'heavier'}],
+      all:[1,2,3,4,5],idle:'Slide when they are closed',
+      did:function(v){return v+(v===1?' blocker cleared':' blockers cleared')},
+      tot:function(t){return t+' of 14 blockers cleared.'}}
+  };
+  var C=B.money,pick=C.pick,THREE=C.three,ALL=C.all,fine=false;
 
   function build(){
     scale.innerHTML='';
@@ -169,31 +199,48 @@
   function say(v){
     n.classList.add('swap');
     setTimeout(function(){n.textContent=v;n.classList.remove('swap')},110);
-    obj.textContent=v===1?'potential client.':'potential clients.';
-    cons.textContent=v>BEST
-      ? 'Sending '+v+' takes you to '+(REACHED+v)+' of '+TARGET+'. That beats your best day of '+BEST+'.'
-      : 'Sending '+v+' takes you to '+(REACHED+v)+' of '+TARGET+'. Your best day so far is '+BEST+'.';
+    obj.textContent=v===1?C.one:C.many;
+    cons.textContent=C.ger+' '+v+' takes you to '+(C.reached+v)+' of '+C.target+'. '+
+      (v>C.best?'That beats your best day of '+C.best+'.':'Your best day so far is '+C.best+'.');
   }
-  build();
 
   function confirm(){
     if(s.classList.contains('done'))return;
     s.classList.add('done');
-    lab.textContent=pick+(pick===1?' message sent':' messages sent');
-    cons.textContent=(REACHED+pick)+' of '+TARGET+' reached out. '+
-      (pick>BEST?'New best day.':'Best day so far is '+BEST+'.');
+    lab.textContent=C.did(pick);
+    cons.textContent=C.tot(C.reached+pick)+' '+
+      (pick>C.best?'New best day.':'Best day so far is '+C.best+'.');
     /* the bar is literally the new sum over the target, no smoothing */
-    count.textContent=REACHED+pick;
-    bar.style.width=((REACHED+pick)/TARGET*100)+'%';
+    count.textContent=C.reached+pick;
+    bar.style.width=((C.reached+pick)/C.target*100)+'%';
     knob.style.left='5px';fill.style.width='0';
   }
   function reset(){
     s.classList.remove('done');
-    lab.textContent='Slide when they are sent';
-    count.textContent=REACHED;
-    bar.style.width=(REACHED/TARGET*100)+'%';say(pick);
+    lab.textContent=C.idle;
+    count.textContent=C.reached;
+    bar.style.width=(C.reached/C.target*100)+'%';say(pick);
   }
   undo.addEventListener('click',function(e){e.stopPropagation();reset()});
+
+  /* --- swapping the bucket: the whole screen re-reads for that goal ------- */
+  function render(key){
+    C=B[key];THREE=C.three;ALL=C.all;pick=C.pick;fine=false;
+    more.textContent='more sizes';more.classList.remove('on');
+    tail.textContent=C.tail;left.textContent=C.left;src.textContent=C.src;
+    vb.textContent=C.vb;
+    knob.style.left='5px';fill.style.width='0';track.classList.remove('snap');
+    build();reset();
+    n.textContent=pick;
+  }
+  r.querySelectorAll('.bk button').forEach(function(b){
+    b.addEventListener('click',function(){
+      r.querySelectorAll('.bk button').forEach(function(x){x.classList.remove('on');x.setAttribute('aria-pressed','false')});
+      b.classList.add('on');b.setAttribute('aria-pressed','true');
+      render(b.dataset.b);
+    });
+  });
+  render('money');
 
   var drag=false,x0=0,max=0;
   knob.addEventListener('pointerdown',function(e){

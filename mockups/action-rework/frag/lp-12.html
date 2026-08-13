@@ -111,80 +111,116 @@
   -webkit-backdrop-filter:blur(24px) saturate(1.4);backdrop-filter:blur(24px) saturate(1.4);
   box-shadow:inset 0 1px 0 rgba(var(--ink),.09);cursor:default;transform:none}
 </style>
-<h3>Seven channels</h3><p class="cap">The week stands up as seven channels on one floor: today is the wide one, sized by the three lengths proposed under it, and the flat channels are rest that was planned, not days you lost. Free dragging lives behind "any length".</p>
+<h3>Seven channels</h3><p class="cap">The week stands up as seven channels on one floor: today is the wide one, sized by the three lengths proposed under it, and the flat channels are days the plan left empty, not days you lost. Free dragging lives behind "any length".</p>
+<div class="bk" id="l12bk">
+  <button class="on" type="button" data-b="gym">Body</button>
+  <button type="button" data-b="school">School &amp; career</button>
+  <button type="button" data-b="audience">Audience</button>
+</div>
 <div class="ph" id="l12ph">
   <div class="grid"></div>
-  <div class="hd"><span>Train 3 times a week</span><span id="l12c">2 done</span></div>
-  <p class="one">Lower body, <b id="l12n">40</b> min</p>
+  <div class="hd"><span id="l12g">Train 3 times a week</span><span id="l12c">2 done</span></div>
+  <p class="one" id="l12one">Lower body, <b id="l12n">40</b> min</p>
   <div class="hint" id="l12hint">Thursday, session 3 of 3.</div>
 
-  <div class="cols">
-    <div class="ch"><div class="f" style="height:38%"><span class="v">40</span></div></div>
-    <div class="ch rest"><div class="f"></div><div class="v">rest</div></div>
-    <div class="ch"><div class="f" style="height:56%"><span class="v">55</span></div></div>
-    <div class="ch now" id="l12ch">
-      <div class="f" id="l12f" style="height:38%"><span class="v" id="l12v">40</span></div>
-      <div class="ticks"><i style="bottom:11%"></i><i style="bottom:31%"></i><i style="bottom:51%"></i><i style="bottom:71%"></i><i style="bottom:91%"></i></div>
-      <div class="drag">drag<u>&#8597;</u></div>
-      <div class="tdy" id="l12cap">today</div>
-    </div>
-    <div class="ch rest"><div class="f"></div><div class="v">rest</div></div>
-    <div class="ch rest"><div class="f"></div><div class="v">rest</div></div>
-    <div class="ch rest"><div class="f"></div><div class="v">rest</div></div>
-  </div>
+  <div class="cols" id="l12cols"></div>
 
-  <div class="days">
-    <div>M</div><div>T</div><div>W</div><div class="n">T</div><div>F</div><div>S</div><div>S</div>
-  </div>
+  <div class="days" id="l12days"></div>
   <p class="week"><span id="l12x">One session left in the week</span><b id="l12t">2h 15m</b></p>
 
-  <div class="sizes" id="l12sz" role="group" aria-label="how long Thursday is">
-    <button type="button" data-m="25"><i>lighter</i><b>25 min</b></button>
-    <button type="button" class="on" data-m="40" aria-pressed="true"><i>today&#8217;s</i><b>40 min</b></button>
-    <button type="button" data-m="55"><i>heavier</i><b>55 min</b></button>
-  </div>
+  <div class="sizes" id="l12sz" role="group" aria-label="how long today is"></div>
   <button class="more" id="l12more" type="button">any length</button>
 
   <button class="fin" id="l12b" type="button">Finish Thursday</button>
 </div>
 <script>(function(){var r=document.querySelector('[data-k="lp-12"]');if(!r)return;
-var ph=r.querySelector('#l12ph'),ch=r.querySelector('#l12ch'),f=r.querySelector('#l12f'),v=r.querySelector('#l12v'),
-    n=r.querySelector('#l12n'),x=r.querySelector('#l12x'),tot=r.querySelector('#l12t'),
-    sz=r.querySelector('#l12sz'),more=r.querySelector('#l12more'),hint=r.querySelector('#l12hint'),
-    cap=r.querySelector('#l12cap'),mins=40,logged=false,free=false;
+/* Channel heights are the lengths they chose and logged. The rhythm (how many a week,
+   which days) is their own plan from intake. Nothing is measured for them. */
+var B={
+ gym:{goal:'Train 3 times a week',task:'Lower body',day:'Thursday',dayIdx:3,unit:'session',units:'sessions',
+   rest:'rest',week:[40,null,55,'now',null,null,null],per:3,whole:'Three sessions, the week is whole',
+   sizes:[25,40,55],pick:1,lo:15,hi:75},
+ school:{goal:'Study 5 times a week',task:'Organic chem',day:'Friday',dayIdx:4,unit:'session',units:'sessions',
+   rest:'off',week:[60,45,60,30,'now',null,null],per:5,whole:'Five sessions, the week is whole',
+   sizes:[30,60,90],pick:1,lo:20,hi:120},
+ audience:{goal:'Post 3 times a week',task:'Film the video',day:'Thursday',dayIdx:3,unit:'post',units:'posts',
+   rest:'off',week:[50,null,40,'now',null,null,null],per:3,whole:'Three posts, the week is whole',
+   sizes:[30,45,75],pick:1,lo:20,hi:100}};
+var ph=r.querySelector('#l12ph'),cols=r.querySelector('#l12cols'),days=r.querySelector('#l12days'),
+    gEl=r.querySelector('#l12g'),cEl=r.querySelector('#l12c'),one=r.querySelector('#l12one'),
+    hint=r.querySelector('#l12hint'),x=r.querySelector('#l12x'),tot=r.querySelector('#l12t'),
+    sz=r.querySelector('#l12sz'),more=r.querySelector('#l12more'),fin=r.querySelector('#l12b'),
+    D=['M','T','W','T','F','S','S'],c,mins,base,done,logged,free;
 function fmt(t){return (t/60|0)+'h '+('0'+(t%60)).slice(-2)+'m';}
-function paint(){var pct=(mins-15)/60*80+11;
-  f.style.height=pct.toFixed(1)+'%';v.firstChild.nodeValue=mins;n.textContent=mins;
+function pct(m){return ((m-c.lo)/(c.hi-c.lo)*80+11).toFixed(1);}
+function chHTML(){return c.week.map(function(m){
+  if(m==='now')return '<div class="ch now" id="l12ch">'+
+    '<div class="f" id="l12f"><span class="v" id="l12v"></span></div>'+
+    '<div class="ticks"><i style="bottom:11%"></i><i style="bottom:31%"></i><i style="bottom:51%"></i>'+
+    '<i style="bottom:71%"></i><i style="bottom:91%"></i></div>'+
+    '<div class="drag">drag<u>&#8597;</u></div><div class="tdy" id="l12cap">today</div></div>';
+  if(m===null)return '<div class="ch rest"><div class="f"></div><div class="v">'+c.rest+'</div></div>';
+  return '<div class="ch"><div class="f" style="height:'+pct(m)+'%"><span class="v">'+m+'</span></div></div>';
+}).join('');}
+function szHTML(){var L=['lighter','today’s','heavier'];
+  return c.sizes.map(function(m,i){
+    return '<button type="button" data-m="'+m+'"><i>'+L[i]+'</i><b>'+m+' min</b></button>';}).join('');}
+function paint(){
+  var f=r.querySelector('#l12f'),v=r.querySelector('#l12v');
+  f.style.height=pct(mins)+'%';v.textContent=mins;r.querySelector('#l12n').textContent=mins;
   sz.querySelectorAll('button').forEach(function(b){
     var on=!free&&+b.dataset.m===mins;
     b.classList.toggle('on',on);
     if(on)b.setAttribute('aria-pressed','true');else b.removeAttribute('aria-pressed');});
-  tot.textContent=fmt(95+mins);
-  x.textContent=logged?'Three sessions, the week is whole':'One session left in the week';}
+  /* the week total is the sum of the sessions ALREADY LOGGED, nothing else.
+     today's length is the plan's estimate until it is finished, so it only
+     joins the total when the day is logged. */
+  tot.textContent=fmt(base+(logged?mins:0));
+  x.textContent=logged?c.whole:('One '+c.unit+' left in the week');
+  cEl.textContent=(logged?done+1:done)+' done';}
+function render(k){
+  c=B[k];mins=c.sizes[c.pick];logged=false;free=false;
+  done=c.week.filter(function(m){return typeof m==='number';}).length;
+  base=c.week.reduce(function(s,m){return s+(typeof m==='number'?m:0);},0);
+  ph.classList.remove('free','logged');
+  gEl.textContent=c.goal;
+  one.innerHTML=c.task+', <b id="l12n">'+mins+'</b> min';
+  hint.textContent=c.day+', '+c.unit+' '+(done+1)+' of '+c.per+'.';
+  cols.innerHTML=chHTML();
+  days.innerHTML=D.map(function(d,i){return '<div'+(i===c.dayIdx?' class="n"':'')+'>'+d+'</div>';}).join('');
+  sz.innerHTML=szHTML();
+  more.textContent='any length';more.classList.remove('on');
+  fin.className='fin';fin.textContent='Finish '+c.day;
+  paint();}
 /* THREE proposed lengths in front. The free drag only exists after "any length". */
 sz.addEventListener('click',function(e){var b=e.target.closest('button');if(!b||logged)return;
-  mins=+b.dataset.m;ch.classList.add('set');paint();});
+  mins=+b.dataset.m;r.querySelector('#l12ch').classList.add('set');paint();});
 more.addEventListener('click',function(){
   if(logged)return;
   free=!free;ph.classList.toggle('free',free);
-  if(!free){var near=[25,40,55],b=near[0];near.forEach(function(m){if(Math.abs(m-mins)<Math.abs(b-mins))b=m});mins=b;}
+  if(!free){var b=c.sizes[0];c.sizes.forEach(function(m){if(Math.abs(m-mins)<Math.abs(b-mins))b=m;});mins=b;}
   more.textContent=free?'three lengths':'any length';
   more.classList.toggle('on',free);
-  hint.textContent=free?'Thursday. Drag the green channel to any length.'
-    :'Thursday, session 3 of 3.';
+  hint.textContent=free?(c.day+'. Drag the green channel to any length.')
+    :(c.day+', '+c.unit+' '+(done+1)+' of '+c.per+'.');
   paint();});
-function set(e){if(!free)return;var b=ch.getBoundingClientRect(),p=1-(e.clientY-b.top)/b.height;
-  p=Math.max(0,Math.min(1,p));mins=Math.round((15+p*60)/5)*5;ch.classList.add('set');paint();}
-ch.addEventListener('pointerdown',function(e){if(!free||logged)return;e.preventDefault();
-  try{ch.setPointerCapture(e.pointerId);}catch(z){}set(e);});
-ch.addEventListener('pointermove',function(e){if(logged||!free)return;
-  if(ch.hasPointerCapture&&ch.hasPointerCapture(e.pointerId))set(e);});
-r.querySelector('#l12b').addEventListener('click',function(){
-  if(logged)return;logged=true;ph.classList.add('logged');ch.classList.add('set','ok');
-  cap.textContent='done';paint();
-  hint.textContent='Thursday, logged at '+mins+' minutes.';
-  r.querySelector('#l12c').textContent='3 done';
-  this.className='fin ok';this.textContent='Thursday logged. The week is whole.';});
-paint();
+function set(e){var ch=r.querySelector('#l12ch');if(!ch)return;
+  var b=ch.getBoundingClientRect(),p=1-(e.clientY-b.top)/b.height;
+  p=Math.max(0,Math.min(1,p));mins=Math.round((c.lo+p*(c.hi-c.lo))/5)*5;ch.classList.add('set');paint();}
+cols.addEventListener('pointerdown',function(e){if(!free||logged)return;
+  if(!e.target.closest('.ch.now'))return;e.preventDefault();
+  try{cols.setPointerCapture(e.pointerId);}catch(z){}set(e);});
+cols.addEventListener('pointermove',function(e){if(logged||!free)return;
+  if(cols.hasPointerCapture&&cols.hasPointerCapture(e.pointerId))set(e);});
+fin.addEventListener('click',function(){
+  if(logged)return;logged=true;ph.classList.add('logged');
+  var ch=r.querySelector('#l12ch');ch.classList.add('set','ok');
+  r.querySelector('#l12cap').textContent='done';paint();
+  hint.textContent=c.day+', logged at '+mins+' minutes.';
+  fin.className='fin ok';fin.textContent=c.day+' logged. The week is whole.';});
+r.querySelectorAll('#l12bk button').forEach(function(b){b.addEventListener('click',function(){
+  r.querySelectorAll('#l12bk button').forEach(function(y){y.classList.toggle('on',y===b);});
+  render(b.dataset.b);});});
+render('gym');
 })();</script>
 </section>

@@ -68,7 +68,7 @@
   line-height:1.45;color:rgba(var(--ink),.90)}
 [data-k=lp-10] .tot{position:absolute;left:18px;right:18px;top:500px;display:flex;justify-content:space-between}
 [data-k=lp-10] .tot div{display:flex;flex-direction:column;gap:5px;font-size:11.5px;color:rgba(var(--ink),.84)}
-[data-k=lp-10] .tot div:last-child{align-items:flex-end}
+[data-k=lp-10] .tot div:last-child{align-items:flex-end;text-align:right}
 [data-k=lp-10] .tot b{font-size:16px;font-weight:700;letter-spacing:-.015em;color:rgba(var(--ink),.96)}
 
 /* feed */
@@ -83,78 +83,116 @@
 [data-k=lp-10] .feed.done .fill{display:none}
 </style>
 <h3>The tape</h3><p class="cap">A milestone kept as a receipt tape of identical lines: session number, the length you chose, the date. Every session done is already printed above the head, today is the single line sitting at it, and holding the feed pulls the tape through by exactly one line.</p>
+<div class="bk" id="l10bk">
+  <button class="on" type="button" data-b="ship">Ship the project</button>
+  <button type="button" data-b="school">School &amp; career</button>
+  <button type="button" data-b="race">Body</button>
+</div>
 <div class="ph">
   <div class="grid"></div>
-  <div class="slot"><span>Deep work</span><em>day 71 of 120</em></div>
+  <div class="slot"><span id="l10who">Deep work</span><em id="l10days">20 days left</em></div>
   <div class="tape">
-    <div class="ttl">100 deep work sessions</div>
-    <div class="sub">One line each, all 100 before 30 September.</div>
+    <div class="ttl" id="l10ttl">100 deep work sessions</div>
+    <div class="sub" id="l10sub">One line each, all 100 before 1 September.</div>
     <div class="hr" style="top:70px"></div>
 
     <div class="vp">
-      <div class="stack" id="l10st">
-        <div class="r ok"><i>061</i><span>3 hours</span><em>Aug 3</em><svg viewBox="0 0 24 24"><path d="M4 13l5 5L20 7"/></svg></div>
-        <div class="r ok"><i>062</i><span>4 hours</span><em>Aug 4</em><svg viewBox="0 0 24 24"><path d="M4 13l5 5L20 7"/></svg></div>
-        <div class="r ok"><i>063</i><span>4 hours</span><em>Aug 5</em><svg viewBox="0 0 24 24"><path d="M4 13l5 5L20 7"/></svg></div>
-        <div class="r ok"><i>064</i><span>5 hours</span><em>Aug 6</em><svg viewBox="0 0 24 24"><path d="M4 13l5 5L20 7"/></svg></div>
-        <div class="r ok"><i>065</i><span>4 hours</span><em>Aug 8</em><svg viewBox="0 0 24 24"><path d="M4 13l5 5L20 7"/></svg></div>
-        <div class="r ok"><i>066</i><span>3 hours</span><em>Aug 10</em><svg viewBox="0 0 24 24"><path d="M4 13l5 5L20 7"/></svg></div>
-        <div class="r ok"><i>067</i><span>4 hours</span><em>Aug 11</em><svg viewBox="0 0 24 24"><path d="M4 13l5 5L20 7"/></svg></div>
-        <div class="r now"><i>068</i><span id="l10nm">4 hours</span><em id="l10tm">today</em><svg viewBox="0 0 24 24"><path d="M4 13l5 5L20 7"/></svg></div>
-        <div class="r wait"><i>069</i><span>not chosen</span><em>tomorrow</em><svg viewBox="0 0 24 24"><path d="M4 13l5 5L20 7"/></svg></div>
-        <div class="r wait"><i>070</i><span>not chosen</span><em>not set</em><svg viewBox="0 0 24 24"><path d="M4 13l5 5L20 7"/></svg></div>
-      </div>
+      <div class="stack" id="l10st"></div>
     </div>
     <div class="head"></div>
     <div class="lab" id="l10lab">The length is your choice, not a measurement</div>
 
-    <div class="ops" id="l10ops">
-      <button class="op" data-k2="3 hours" data-c="Under the length you set. It prints the same line, and 33 of them still have to fit in 49 days.">
-        <span>3 hours</span><span>under plan</span></button>
-      <button class="op on" data-k2="4 hours" data-c="The length you set in the plan. 33 lines left, 49 days to print them.">
-        <span>4 hours</span><span>the plan</span></button>
-      <button class="op" data-k2="5 hours" data-c="Over the length you set. Worth it on a day with nothing after it.">
-        <span>5 hours</span><span>over plan</span></button>
-    </div>
-    <p class="cons" id="l10cons">The length you set in the plan. 33 lines left, 49 days to print them.</p>
+    <div class="ops" id="l10ops"></div>
+    <p class="cons" id="l10cons"></p>
     <div class="hr" style="top:482px"></div>
 
     <div class="tot">
-      <div><span>printed</span><b id="l10p">67 of 100</b></div>
-      <div><span>left before 30 September</span><b id="l10l">33 sessions</b></div>
+      <div><span>printed</span><b id="l10p">87 of 100</b></div>
+      <div><span id="l10ll">left before 1 September</span><b id="l10l">13 sessions</b></div>
     </div>
 
     <button class="feed" id="l10feed"><span class="fill" id="l10fill"></span><span class="t" id="l10cap">Hold to print the line</span></button>
   </div>
 </div>
 <script>(function(){var r=document.querySelector('[data-k="lp-10"]');if(!r)return;
-var st=r.querySelector('#l10st'),rows=[].slice.call(r.querySelectorAll('.r')),
-    feed=r.querySelector('#l10feed'),fill=r.querySelector('#l10fill'),cap=r.querySelector('#l10cap'),
-    cons=r.querySelector('#l10cons'),lab=r.querySelector('#l10lab'),ops=r.querySelector('#l10ops'),
-    pEl=r.querySelector('#l10p'),lEl=r.querySelector('#l10l'),
-    PITCH=28,idx=7,base=168-PITCH*idx,done=67,GOAL=100,printed=false,HOLD=900,t0=0,raf=0,back=0;
-st.style.transform='translateY('+base+'px)';
-r.querySelectorAll('.op').forEach(function(b){b.addEventListener('click',function(){
-  if(printed)return;
-  r.querySelectorAll('.op').forEach(function(x){x.classList.remove('on');});
-  b.classList.add('on');
-  r.querySelector('#l10nm').textContent=b.dataset.k2;
-  cons.textContent=b.dataset.c;});});
+var CHK='<svg viewBox="0 0 24 24"><path d="M4 13l5 5L20 7"/></svg>';
+/* Every number below is arithmetic on two sources only: the lines they logged, and the
+   date they typed at intake. Nothing here is measured for them. */
+var B={
+ ship:{who:'Deep work',ttl:'100 deep work sessions',dl:'1 September',totLab:'left before 1 September',
+   sub:'One line each, all 100 before 1 September.',goal:100,done:87,days:20,pick:1,
+   past:[['4 hours','Aug 3'],['3 hours','Aug 4'],['4 hours','Aug 5'],['5 hours','Aug 6'],
+         ['4 hours','Aug 8'],['3 hours','Aug 10'],['4 hours','Aug 11']],
+   opts:['3 hours','4 hours','5 hours']},
+ school:{who:'Study',ttl:'60 study sessions',dl:'finals',totLab:'left before 12 December',
+   sub:'One line each, all 60 before finals.',goal:60,done:22,days:122,pick:1,
+   past:[['2 hours','Aug 2'],['1 hour','Aug 4'],['2 hours','Aug 5'],['3 hours','Aug 7'],
+         ['2 hours','Aug 8'],['2 hours','Aug 10'],['1 hour','Aug 11']],
+   opts:['1 hour','2 hours','3 hours']},
+ race:{who:'Training',ttl:'120 training sessions',dl:'12 April',totLab:'left before 12 April',
+   sub:'One line each, all 120 before 12 April.',goal:120,done:34,days:243,pick:1,
+   past:[['60 min','Aug 3'],['45 min','Aug 5'],['80 min','Aug 6'],['60 min','Aug 7'],
+         ['45 min','Aug 9'],['60 min','Aug 10'],['80 min','Aug 11']],
+   opts:['45 min','60 min','80 min']}};
+var st=r.querySelector('#l10st'),feed=r.querySelector('#l10feed'),fill=r.querySelector('#l10fill'),
+    cap=r.querySelector('#l10cap'),cons=r.querySelector('#l10cons'),lab=r.querySelector('#l10lab'),
+    ops=r.querySelector('#l10ops'),pEl=r.querySelector('#l10p'),lEl=r.querySelector('#l10l'),
+    llEl=r.querySelector('#l10ll'),whoEl=r.querySelector('#l10who'),dEl=r.querySelector('#l10days'),
+    ttlEl=r.querySelector('#l10ttl'),subEl=r.querySelector('#l10sub');
+var PITCH=28,HOLD=900,c,done,pick,printed,rows,idx,base,t0,raf=0,back=0;
+function pad(n){return ('00'+n).slice(-3);}
+function sess(n){return n+(n===1?' session':' sessions');}
+function line(n){return n+(n===1?' line':' lines');}
+function consTxt(i){var L=c.goal-done;
+  if(i===0)return 'Under the length you set. It prints the same line, and '+L+' of them still have to fit in '+c.days+' days.';
+  if(i===2)return 'Over the length you set. Worth it on a day with nothing after it.';
+  return 'The length you set in the plan. '+line(L)+' left, '+c.days+' days to print them.';}
+function row(cls,num,len,date,idA,idB){
+  return '<div class="r '+cls+'"><i>'+pad(num)+'</i><span'+(idA||'')+'>'+len+'</span>'+
+         '<em'+(idB||'')+'>'+date+'</em>'+CHK+'</div>';}
+function opsHTML(){var L=['under plan','the plan','over plan'];
+  return c.opts.map(function(o,i){
+    return '<button class="op'+(i===pick?' on':'')+'" type="button" data-i="'+i+'">'+
+      '<span>'+o+'</span><span>'+L[i]+'</span></button>';}).join('');}
+function render(k){
+  c=B[k];done=c.done;pick=c.pick;printed=false;
+  cancelAnimationFrame(raf);cancelAnimationFrame(back);
+  whoEl.textContent=c.who;dEl.textContent=c.days+' days left';
+  ttlEl.textContent=c.ttl;subEl.textContent=c.sub;
+  var h='',i;
+  for(i=0;i<7;i++)h+=row('ok',done-6+i,c.past[i][0],c.past[i][1]);
+  h+=row('now',done+1,c.opts[pick],'today',' id="l10nm"',' id="l10tm"');
+  h+=row('wait',done+2,'not chosen','tomorrow');
+  h+=row('wait',done+3,'not chosen','not set');
+  st.innerHTML=h;
+  rows=[].slice.call(r.querySelectorAll('.r'));idx=7;base=168-PITCH*idx;
+  st.style.transform='translateY('+base+'px)';
+  ops.innerHTML=opsHTML();
+  cons.textContent=consTxt(pick);
+  lab.textContent='The length is your choice, not a measurement';
+  pEl.textContent=done+' of '+c.goal;
+  llEl.textContent=c.totLab;lEl.textContent=sess(c.goal-done);
+  feed.classList.remove('done');cap.textContent='Hold to print the line';fill.style.width='0';}
+ops.addEventListener('click',function(e){var b=e.target.closest('.op');if(!b||printed)return;
+  pick=+b.dataset.i;
+  ops.querySelectorAll('.op').forEach(function(x){x.classList.toggle('on',x===b);});
+  r.querySelector('#l10nm').textContent=c.opts[pick];
+  cons.textContent=consTxt(pick);});
 function draw(p){fill.style.width=(p*100)+'%';st.style.transform='translateY('+(base-PITCH*p)+'px)';}
 function finish(){
   printed=true;cancelAnimationFrame(raf);
-  var now=rows[idx],len=r.querySelector('#l10nm').textContent;
+  var now=rows[idx],len=c.opts[pick];
   now.classList.remove('now');now.classList.add('ok');
   now.querySelector('em').textContent='Aug 12';
-  done++;pEl.textContent=done+' of '+GOAL;lEl.textContent=(GOAL-done)+' sessions';
+  done++;pEl.textContent=done+' of '+c.goal;lEl.textContent=sess(c.goal-done);
   idx++;base-=PITCH;draw(0);
   var nx=rows[idx];nx.classList.remove('wait');nx.classList.add('now');
   nx.querySelector('em').textContent='tomorrow';
-  feed.classList.add('done');cap.textContent='Printed. Line 068 is on the tape.';
-  lab.textContent='Line 069 sits at the head tomorrow.';
-  ops.innerHTML='<div class="pd"><span>068 &nbsp;'+len+'</span><em>printed Aug 12</em></div>'+
-    '<div class="pd2">Nothing else prints today. The tape waits at line 069.</div>';
-  cons.textContent='68 printed, 32 left before 30 September.';}
+  feed.classList.add('done');cap.textContent='Printed. Line '+pad(done)+' is on the tape.';
+  lab.textContent='Line '+pad(done+1)+' sits at the head tomorrow.';
+  ops.innerHTML='<div class="pd"><span>'+pad(done)+' &nbsp;'+len+'</span><em>printed Aug 12</em></div>'+
+    '<div class="pd2">Nothing else prints today. The tape waits at line '+pad(done+1)+'.</div>';
+  cons.textContent=done+' printed, '+(c.goal-done)+' left before '+c.dl+'.';}
 function tick(){var p=Math.min(1,(performance.now()-t0)/HOLD);draw(p);
   if(p>=1){finish();return;}raf=requestAnimationFrame(tick);}
 function start(e){if(printed)return;e.preventDefault();cancelAnimationFrame(back);
@@ -168,5 +206,9 @@ feed.addEventListener('pointerdown',start);
 feed.addEventListener('pointerup',stop);
 feed.addEventListener('pointercancel',stop);
 feed.addEventListener('pointerleave',stop);
+r.querySelectorAll('#l10bk button').forEach(function(b){b.addEventListener('click',function(){
+  r.querySelectorAll('#l10bk button').forEach(function(x){x.classList.toggle('on',x===b);});
+  render(b.dataset.b);});});
+render('ship');
 })();</script>
 </section>

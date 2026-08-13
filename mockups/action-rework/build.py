@@ -5,11 +5,12 @@ import pathlib, re
 
 ROOT = pathlib.Path(__file__).parent
 FRAG = ROOT / 'frag'
-ORDER = ['ob', 'q', 'ld', 'lp', 'mx']
+ORDER = ['ob', 'q', 'ld', 'pu', 'lp', 'mx']
 TITLES = {
     'ob': ('Onboarding', 'One concept, the wall of intent, delivered six ways. No forms, just the goal made real.'),
     'q':  ('The refine step', 'What is already done + what they think it takes. One question at a time.'),
     'ld': ('Loading', 'The plan being produced. The wait as visible work, never a spinner, never an invented stage name.'),
+    'pu': ('The pulse', 'Where are you now: the one screen where the goal number gets written. Clarity shows the standing, Consistency the trajectory; Action only hosts the pen.'),
     'lp': ('The daily loop', 'Eleven layout architectures. Number slots any goal can fill.'),
     'mx': ('Intensity mechanics', 'Ways to scale today up or down, phone + desktop each. Three named sizes in front, freedom behind a quiet "more".'),
 }
@@ -21,7 +22,7 @@ def key_of(p):
 
 HEAD = """<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Action rework — the survivors</title>
+<title>Action rework: the survivors</title>
 <style>
 @font-face { font-family:'Geist'; src:url('../fonts/geist-400.otf') format('opentype'); font-weight:400; font-display:swap; }
 @font-face { font-family:'Geist'; src:url('../fonts/geist-500.otf') format('opentype'); font-weight:500; font-display:swap; }
@@ -45,12 +46,21 @@ body{margin:0;background:#0a0b0d;color:var(--text-hi);font-family:var(--font);-w
   box-shadow:0 24px 60px rgba(0,0,0,.5), inset 0 0 0 1px rgba(var(--ink),.10)}
 .desk{position:relative;width:720px;max-width:100%;height:420px;border-radius:14px;overflow:hidden;background:#050608;
   margin-top:16px;box-shadow:0 20px 50px rgba(0,0,0,.45), inset 0 0 0 1px rgba(var(--ink),.09)}
+/* bucket labels + toggle (ACTION-BUCKETS.md): which of the seven big goals a screen serves */
+.bk{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 9px;align-items:center}
+.bk i{font-style:normal;font-size:10.5px;font-weight:700;color:rgba(var(--ink),.9);
+  background:rgba(var(--ink),.08);border-radius:7px;padding:4px 9px;
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.07)}
+.bk button{-webkit-appearance:none;appearance:none;border:0;cursor:pointer;font-family:var(--font);
+  font-size:10.5px;font-weight:700;color:rgba(var(--ink),.55);background:rgba(var(--ink),.05);
+  border-radius:7px;padding:4px 9px;box-shadow:inset 0 1px 0 rgba(var(--ink),.05)}
+.bk button.on{color:#0b0c10;background:rgba(235,238,248,.92)}
 .grid{position:absolute;inset:0;pointer-events:none;
   background-image:linear-gradient(rgba(var(--ink),1) 1px,transparent 1px),
     linear-gradient(90deg,rgba(var(--ink),1) 1px,transparent 1px);
   background-size:26px 26px;opacity:.04}
 </style></head><body><div class="gal">
-<h1>Action rework — the survivors</h1>
+<h1>Action rework: the survivors</h1>
 <p class="sub">The graded set: the designs Malik kept, built out from mockup to something close to shippable.
 Only the grid survived the teardown. Every intensity control now obeys the three-choice law, exactly three
 proposed sizes in front, named and honestly priced, with full freedom behind a small quiet "more".

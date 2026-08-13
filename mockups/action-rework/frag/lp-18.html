@@ -41,12 +41,13 @@
 [data-k=lp-18] .l18-hard p{margin:9px 0 15px;font-size:12.5px;line-height:1.55;color:rgba(var(--ink),.90)}
 [data-k=lp-18] .l18-hard .go{width:100%;padding:15px 0;border:0;border-radius:14px;background:rgba(235,238,248,.94);
   color:#0b0c10;font:700 15.5px var(--font);letter-spacing:-.01em;cursor:pointer}
-[data-k=lp-18] .l18-hard .bk{width:100%;margin-top:8px;padding:13px 0;border:0;border-radius:14px;
+[data-k=lp-18] .l18-hard .l18-bk{width:100%;margin-top:8px;padding:13px 0;border:0;border-radius:14px;
   background:rgba(var(--ink),.06);box-shadow:inset 0 1px 0 rgba(var(--ink),.08);
   color:rgba(var(--ink),.90);font:500 13.5px var(--font);cursor:pointer}
 </style>
 <h3>Days owned</h3>
 <p class="cap">Binary quitting as one object on an empty canvas. The total is the whole interface, there is no dial to turn, and the hard night has its own door.</p>
+<div class="bk"><i>Quitting</i></div>
 <div class="ph">
   <div class="grid"></div>
   <div class="l18">
@@ -69,7 +70,7 @@
         <b>Then the move is one message.</b>
         <p>Not a plan, not the rest of the night. Text the person you named for hard nights when you set this up, and stay where you are until they answer.</p>
         <button class="go">Text them now</button>
-        <button class="bk">Back</button>
+        <button class="l18-bk">Back</button>
       </div>
     </div>
   </div>
@@ -85,12 +86,12 @@
   pad.addEventListener('pointerdown',start);pad.addEventListener('pointerup',stop);
   pad.addEventListener('pointerleave',stop);pad.addEventListener('pointercancel',stop);
   c.querySelector('.l18-esc').addEventListener('click',function(){root.classList.add('hard');});
-  c.querySelector('.l18-hard .bk').addEventListener('click',function(){root.classList.remove('hard');});
+  c.querySelector('.l18-hard .l18-bk').addEventListener('click',function(){root.classList.remove('hard');});
   c.querySelector('.l18-hard .go').addEventListener('click',function(){
     c.querySelector('.l18-hard b').textContent='Sent.';
     c.querySelector('.l18-hard p').textContent='That was the whole move. Stay here until they answer, nothing else is asked of you tonight.';
     c.querySelector('.l18-hard .go').style.display='none';
-    c.querySelector('.l18-hard .bk').textContent='Back';
+    c.querySelector('.l18-hard .l18-bk').textContent='Back';
   });
 })();</script>
 </section>
