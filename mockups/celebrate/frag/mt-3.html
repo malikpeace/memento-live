@@ -5,7 +5,10 @@
 [data-c="mt-3"] .b1.on .sub{animation:mt3sub .5s cubic-bezier(.2,.8,.3,1) .26s both}
 @keyframes mt3sub{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
 
-[data-c="mt-3"] .mt3-days{display:flex;align-items:flex-end;gap:6px;height:34px}
+[data-c="mt-3"] .mt3-days{display:flex;flex-direction:column;gap:7px;align-items:center}
+[data-c="mt-3"] .mt3-hd{font-size:14.5px;font-weight:600;letter-spacing:-.01em;color:rgba(var(--accent-rgb),.92);
+  font-variant-numeric:tabular-nums}
+[data-c="mt-3"] .mt3-hd--more{color:var(--text-lo);font-weight:500}
 [data-c="mt-3"] .mt3-bar{width:4px;height:16px;background:rgba(var(--ink),.28)}
 [data-c="mt-3"] .mt3-h{height:34px;background:rgba(var(--accent-rgb),.92);transform-origin:50% 100%}
 [data-c="mt-3"] .b2.on .mt3-h{animation:mt3rise .58s cubic-bezier(.2,.8,.3,1) .36s both}

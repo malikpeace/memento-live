@@ -1,46 +1,60 @@
 <style>
-/* ba-1 "The Seal". The goal is achieved, then SEALED INTO the Memento. The
-   card is the third beat's whole stage: it rises, takes the accent, and the
-   goal's plain line engraves beneath it. The rf-card instinct, grown up. */
-[data-c="ba-1"] .ba1-line{font-size:34px;font-weight:700;letter-spacing:-.035em;line-height:1.1;
-  max-width:11ch;color:var(--text-hi)}
-[data-c="ba-1"] .b1.on .ba1-line{animation:ba1Up .5s cubic-bezier(.2,.8,.3,1) .1s both}
-[data-c="ba-1"] .ba1-done{margin-top:16px;font-size:14px;color:var(--text-mid)}
-[data-c="ba-1"] .b1.on .ba1-done{animation:ba1Up .5s cubic-bezier(.2,.8,.3,1) .5s both}
+/* ba-1 "The Seal". Beat 1 IS the explosion: the whole screen takes their
+   colour, the M lands, the goal line SLAMS in with a scale punch, confetti
+   storms. Beat 2 cuts to black for the receipts, counting up. Beat 3: the
+   Memento rises, blooms, and the goal is sealed beneath it forever. */
+[data-c="ba-1"] .ba1-flood{position:absolute;inset:0;background:var(--accent)}
+[data-c="ba-1"] .b1.on .ba1-flood{animation:ba1Flood .55s cubic-bezier(.2,.8,.3,1) both}
+@keyframes ba1Flood{from{opacity:0;transform:scale(1.06)}to{opacity:1;transform:none}}
+[data-c="ba-1"] .ba1-m{position:relative;width:64px;height:64px;fill:#0b0e12;opacity:.9}
+[data-c="ba-1"] .b1.on .ba1-m{animation:ba1Drop .5s cubic-bezier(.2,.85,.3,1) .12s both}
+@keyframes ba1Drop{from{opacity:0;transform:translateY(-14px)}to{opacity:.9;transform:none}}
+[data-c="ba-1"] .ba1-line{position:relative;margin-top:26px;font-size:44px;font-weight:750;
+  letter-spacing:-.04em;line-height:1.04;max-width:10ch;color:#0b0e12}
+[data-c="ba-1"] .b1.on .ba1-line{animation:ba1Slam .55s cubic-bezier(.16,1.3,.3,1) .5s both}
+@keyframes ba1Slam{from{opacity:0;transform:scale(1.35)}to{opacity:1;transform:scale(1)}}
+[data-c="ba-1"] .ba1-done{position:relative;margin-top:18px;font-size:15.5px;font-weight:650;
+  color:rgba(11,14,18,.78)}
+[data-c="ba-1"] .b1.on .ba1-done{animation:ba1Up .5s cubic-bezier(.2,.8,.3,1) 1.05s both}
 @keyframes ba1Up{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
 
-[data-c="ba-1"] .ba1-cost{font-size:15px;line-height:1.8;color:var(--text-mid);letter-spacing:-.01em}
-[data-c="ba-1"] .ba1-cost b{color:var(--text-hi);font-variant-numeric:tabular-nums}
-[data-c="ba-1"] .b2.on .ba1-cost{animation:ba1Up .5s cubic-bezier(.2,.8,.3,1) .2s both}
+[data-c="ba-1"] .ba1-cost{font-size:19px;line-height:2.05;color:var(--text-mid);letter-spacing:-.012em}
+[data-c="ba-1"] .ba1-cost b{color:var(--text-hi);font-size:26px;font-variant-numeric:tabular-nums}
+[data-c="ba-1"] .b2.on .ba1-cost{animation:ba1Up .55s cubic-bezier(.2,.8,.3,1) .2s both}
 
-[data-c="ba-1"] .ba1-card{position:relative;width:132px;height:172px;border-radius:18px;
-  background:linear-gradient(165deg,rgba(var(--ink),.10),rgba(var(--ink),.04) 55%,rgba(var(--ink),.07));
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.10), 0 0 54px rgba(var(--accent-rgb),.30),
-    0 18px 44px rgba(0,0,0,.5);
+[data-c="ba-1"] .ba1-card{position:relative;width:148px;height:192px;border-radius:20px;
+  background:linear-gradient(165deg,rgba(var(--ink),.11),rgba(var(--ink),.04) 55%,rgba(var(--ink),.07));
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.10), 0 0 74px rgba(var(--accent-rgb),.38),
+    0 22px 54px rgba(0,0,0,.55);
   display:flex;align-items:center;justify-content:center}
-[data-c="ba-1"] .ba1-card svg{width:44px;height:44px;fill:var(--accent)}
-[data-c="ba-1"] .b3.on .ba1-card{animation:ba1Rise .8s cubic-bezier(.2,.85,.25,1) both}
-@keyframes ba1Rise{from{opacity:0;transform:translateY(26px) scale(.94)}to{opacity:1;transform:none}}
-[data-c="ba-1"] .ba1-etch{margin-top:24px;font-size:15.5px;font-weight:600;letter-spacing:-.01em;
+[data-c="ba-1"] .ba1-card svg{width:50px;height:50px;fill:var(--accent)}
+[data-c="ba-1"] .b3.on .ba1-card{animation:ba1Rise .9s cubic-bezier(.16,1.2,.3,1) both}
+@keyframes ba1Rise{from{opacity:0;transform:translateY(34px) scale(.9)}to{opacity:1;transform:none}}
+[data-c="ba-1"] .b3.on .ba1-card svg{animation:ba1MPop .7s cubic-bezier(.2,.9,.25,1) .5s both}
+@keyframes ba1MPop{0%{transform:scale(1)}45%{transform:scale(1.18)}100%{transform:scale(1)}}
+[data-c="ba-1"] .ba1-etch{margin-top:26px;font-size:17px;font-weight:650;letter-spacing:-.012em;
   color:var(--text-hi)}
-[data-c="ba-1"] .ba1-sealed{margin-top:8px;font-size:12.5px;color:var(--text-lo)}
-[data-c="ba-1"] .b3.on .ba1-etch{animation:ba1Up .55s cubic-bezier(.2,.8,.3,1) .55s both}
-[data-c="ba-1"] .b3.on .ba1-sealed{animation:ba1Up .55s cubic-bezier(.2,.8,.3,1) .85s both}
+[data-c="ba-1"] .ba1-sealed{margin-top:9px;font-size:13px;color:var(--text-lo)}
+[data-c="ba-1"] .b3.on .ba1-etch{animation:ba1Up .55s cubic-bezier(.2,.8,.3,1) .6s both}
+[data-c="ba-1"] .b3.on .ba1-sealed{animation:ba1Up .55s cubic-bezier(.2,.8,.3,1) .95s both}
 @media (prefers-reduced-motion:reduce){
-  [data-c="ba-1"] .ba1-line,[data-c="ba-1"] .ba1-done,[data-c="ba-1"] .ba1-cost,
-  [data-c="ba-1"] .ba1-card,[data-c="ba-1"] .ba1-etch,[data-c="ba-1"] .ba1-sealed{opacity:1;transform:none;animation:none}
+  [data-c="ba-1"] .ba1-flood,[data-c="ba-1"] .ba1-m,[data-c="ba-1"] .ba1-line,
+  [data-c="ba-1"] .ba1-done,[data-c="ba-1"] .ba1-cost,[data-c="ba-1"] .ba1-card,
+  [data-c="ba-1"] .ba1-etch,[data-c="ba-1"] .ba1-sealed{opacity:1;transform:none;animation:none}
 }
 </style>
 <div class="ph" data-c="ba-1">
   <div class="st">
 
     <div class="b b1" data-confetti>
+      <div class="ba1-flood"></div>
+      <svg class="ba1-m" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
       <div class="ba1-line">Lost 30 lbs.</div>
-      <div class="ba1-done">The goal you set is done.</div>
+      <div class="ba1-done">You actually did it.</div>
     </div>
 
     <div class="b b2">
-      <div class="ba1-cost"><b>126</b> days.<br><b>215</b> weigh-ins.<br>230 &rarr; <b>200</b>.</div>
+      <div class="ba1-cost"><b data-count="0|126">126</b> days.<br><b data-count="0|215">215</b> weigh-ins.<br>230 &rarr; <b>200</b>.</div>
     </div>
 
     <div class="b b3">

@@ -1,34 +1,41 @@
 <style>
-/* ba-4 "The Flood". The milestone family's full-colour land beat, grown to
-   the top of the pyramid: the whole screen takes their accent with the dark
-   M, and afterwards the Memento WEARS the colour. The card ends changed. */
+/* ba-4 "The Flood". The milestone land beat at maximum: the whole screen
+   takes their colour, the M lands huge, the goal line slams, and the
+   ENGINE numbers count up right on the flood in dark ink. Afterwards the
+   Memento wears the colour, changed for good. */
 [data-c="ba-4"] .ba4-flood{position:absolute;inset:0;background:var(--accent)}
-[data-c="ba-4"] .b1.on .ba4-flood{animation:ba4Flood .6s cubic-bezier(.2,.8,.3,1) both}
-@keyframes ba4Flood{from{opacity:0;transform:scale(1.05)}to{opacity:1;transform:none}}
-[data-c="ba-4"] .ba4-m{position:relative;width:84px;height:84px;fill:#0b0e12}
-[data-c="ba-4"] .b1.on .ba4-m{animation:ba4Up .5s cubic-bezier(.2,.8,.3,1) .16s both}
-[data-c="ba-4"] .ba4-word{position:relative;margin-top:28px;font-size:31px;font-weight:700;
-  letter-spacing:-.035em;line-height:1.08;color:rgba(11,14,18,.95);max-width:11ch}
-[data-c="ba-4"] .b1.on .ba4-word{animation:ba4Up .5s cubic-bezier(.2,.8,.3,1) .7s both}
-@keyframes ba4Up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+[data-c="ba-4"] .b1.on .ba4-flood{animation:ba4Flood .55s cubic-bezier(.2,.8,.3,1) both}
+@keyframes ba4Flood{from{opacity:0;transform:scale(1.06)}to{opacity:1;transform:none}}
+[data-c="ba-4"] .ba4-m{position:relative;width:96px;height:96px;fill:#0b0e12}
+[data-c="ba-4"] .b1.on .ba4-m{animation:ba4MIn .6s cubic-bezier(.16,1.25,.3,1) .15s both}
+@keyframes ba4MIn{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:scale(1)}}
+[data-c="ba-4"] .ba4-word{position:relative;margin-top:26px;font-size:40px;font-weight:750;
+  letter-spacing:-.038em;line-height:1.06;color:#0b0e12;max-width:10ch}
+[data-c="ba-4"] .b1.on .ba4-word{animation:ba4Slam .55s cubic-bezier(.16,1.3,.3,1) .62s both}
+@keyframes ba4Slam{from{opacity:0;transform:scale(1.32)}to{opacity:1;transform:scale(1)}}
+[data-c="ba-4"] .ba4-engine{position:relative;margin-top:26px;font-size:16px;font-weight:650;
+  line-height:1.95;color:rgba(11,14,18,.82)}
+[data-c="ba-4"] .ba4-engine b{font-size:21px;color:#0b0e12;font-variant-numeric:tabular-nums}
+[data-c="ba-4"] .b1.on .ba4-engine{animation:ba4Up .55s cubic-bezier(.2,.8,.3,1) 1.15s both}
+@keyframes ba4Up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
-[data-c="ba-4"] .ba4-cost{font-size:15px;line-height:1.85;color:var(--text-mid)}
-[data-c="ba-4"] .ba4-cost b{color:var(--text-hi);font-variant-numeric:tabular-nums}
+[data-c="ba-4"] .ba4-cost{font-size:19px;line-height:2.05;color:var(--text-mid)}
+[data-c="ba-4"] .ba4-cost b{color:var(--text-hi);font-size:26px;font-variant-numeric:tabular-nums}
 [data-c="ba-4"] .b2.on .ba4-cost{animation:ba4Up .5s ease-out .2s both}
 
-[data-c="ba-4"] .ba4-card{position:relative;width:110px;height:144px;border-radius:15px;
-  background:rgba(var(--accent-rgb),.30);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.12), 0 0 46px rgba(var(--accent-rgb),.30),
-    0 14px 36px rgba(0,0,0,.5);
+[data-c="ba-4"] .ba4-card{position:relative;width:124px;height:160px;border-radius:17px;
+  background:rgba(var(--accent-rgb),.32);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.13), 0 0 58px rgba(var(--accent-rgb),.34),
+    0 16px 42px rgba(0,0,0,.5);
   display:flex;align-items:center;justify-content:center}
-[data-c="ba-4"] .ba4-card svg{width:36px;height:36px;fill:var(--accent)}
-[data-c="ba-4"] .b3.on .ba4-card{animation:ba4Rise .7s cubic-bezier(.2,.85,.25,1) both}
-@keyframes ba4Rise{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
-[data-c="ba-4"] .ba4-wear{margin-top:22px;font-size:14px;color:var(--text-mid)}
+[data-c="ba-4"] .ba4-card svg{width:40px;height:40px;fill:var(--accent)}
+[data-c="ba-4"] .b3.on .ba4-card{animation:ba4Rise .8s cubic-bezier(.16,1.2,.3,1) both}
+@keyframes ba4Rise{from{opacity:0;transform:translateY(24px) scale(.92)}to{opacity:1;transform:none}}
+[data-c="ba-4"] .ba4-wear{margin-top:24px;font-size:14.5px;color:var(--text-mid)}
 [data-c="ba-4"] .b3.on .ba4-wear{animation:ba4Up .5s ease-out .5s both}
 @media (prefers-reduced-motion:reduce){
-  [data-c="ba-4"] .ba4-m,[data-c="ba-4"] .ba4-word,[data-c="ba-4"] .ba4-cost,
-  [data-c="ba-4"] .ba4-card,[data-c="ba-4"] .ba4-wear{opacity:1;transform:none;animation:none}
+  [data-c="ba-4"] .ba4-m,[data-c="ba-4"] .ba4-word,[data-c="ba-4"] .ba4-engine,
+  [data-c="ba-4"] .ba4-cost,[data-c="ba-4"] .ba4-card,[data-c="ba-4"] .ba4-wear{opacity:1;transform:none;animation:none}
 }
 </style>
 <div class="ph" data-c="ba-4">
@@ -38,10 +45,11 @@
       <div class="ba4-flood"></div>
       <svg class="ba4-m" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg>
       <div class="ba4-word">Lost 30 lbs.</div>
+      <div class="ba4-engine"><b data-count="0|126">126</b> days &middot; <b data-count="0|215">215</b> weigh-ins</div>
     </div>
 
     <div class="b b2">
-      <div class="ba4-cost"><b>126</b> days.<br><b>215</b> weigh-ins.<br>230 &rarr; <b>200</b>.</div>
+      <div class="ba4-cost"><b data-count="0|126">126</b> days.<br><b data-count="0|215">215</b> weigh-ins.<br>230 &rarr; <b>200</b>.</div>
     </div>
 
     <div class="b b3">

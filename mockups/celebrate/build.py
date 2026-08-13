@@ -40,8 +40,9 @@ VERDICTS = {
   # maintenance: 3 approved IF hard days are really logged (open product
   # question); 5 deleted at his ask
   'mt-1':'g','mt-2':'g','mt-3':'g','mt-4':'g',
-  # milestone: all approved
-  'ms-1':'g','ms-2':'g','ms-3':'g','ms-4':'g','ms-5':'g',
+  # milestone: ms-4 (the fork) CUT 2026-08-14 ('feels mid, not a milestone');
+  # the rest approved, ms-2/ms-3/ms-5 re-tuned to his 2026-08-14 notes
+  'ms-1':'g','ms-2':'g','ms-3':'g','ms-5':'g',
   # open: 1 fine but must fire earlier than 90 days (chooser cadence);
   # 3 changed completely (one move + the count); 4 given receipts; 5 loved
   # but needs earlier rungs than a year
@@ -73,7 +74,7 @@ def shell(title, body, back=True):
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{html.escape(title)}</title>
-<link rel="stylesheet" href="_kit.css?v=tw6">
+<link rel="stylesheet" href="_kit.css?v=tw7">
 </head><body data-accent="cyan">
 <div class="bar">
   {'<a href="index.html" style="color:var(--text-mid);text-decoration:none;font-size:13px;font-weight:600">&lsaquo; All</a>' if back else ''}
@@ -82,7 +83,7 @@ def shell(title, body, back=True):
   <span class="bar__n">their Memento colour drives every screen &middot; <b>tap a phone to advance or replay</b></span>
 </div>
 {body}
-<script src="chooser.js?v=tw6"></script><script src="_kit.js?v=tw6"></script><script src="_tweaks.js?v=tw6"></script>
+<script src="chooser.js?v=tw7"></script><script src="_kit.js?v=tw7"></script><script src="_tweaks.js?v=tw7"></script>
 <script>CEL.init(); if (window.CEL_TWEAKS) CEL_TWEAKS.init();</script>
 </body></html>"""
 

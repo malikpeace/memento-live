@@ -1,38 +1,49 @@
 <style>
-/* ba-5 "The Road Closes". The whole road they walked, drawn one last time:
-   every mark they ever passed lights in order, the end post takes the
-   accent, and the goal closes. The receipts ARE the ceremony. */
-[data-c="ba-5"] .ba5-road{width:100%;max-width:270px;position:relative;height:64px}
-[data-c="ba-5"] .ba5-track{position:absolute;left:0;right:0;top:30px;height:2px;border-radius:2px;
+/* ba-5 "The Road Closes". The whole road they walked redraws fast, every
+   mark relighting in order; when the line hits the end post the screen
+   ERUPTS from that point, a radial burst of their colour swallowing the
+   phone, and the goal closes on the flood. The receipts follow on dark. */
+[data-c="ba-5"] .ba5-road{width:100%;max-width:280px;position:relative;height:64px}
+[data-c="ba-5"] .ba5-track{position:absolute;left:0;right:0;top:30px;height:2.5px;border-radius:2px;
   background:rgba(var(--ink),.14)}
-[data-c="ba-5"] .ba5-fill{position:absolute;left:0;top:30px;height:2px;border-radius:2px;width:0;
+[data-c="ba-5"] .ba5-fill{position:absolute;left:0;top:30px;height:2.5px;border-radius:2px;width:0;
   background:var(--accent)}
-[data-c="ba-5"] .b1.on .ba5-fill{animation:ba5Fill 1.9s cubic-bezier(.3,.6,.25,1) .4s forwards}
+[data-c="ba-5"] .b1.on .ba5-fill{animation:ba5Fill 1.5s cubic-bezier(.3,.6,.25,1) .3s forwards}
 @keyframes ba5Fill{to{width:100%}}
-[data-c="ba-5"] .ba5-mk{position:absolute;top:24px;width:2.5px;height:14px;border-radius:2px;
-  background:rgba(var(--ink),.30);opacity:0}
-[data-c="ba-5"] .b1.on .ba5-mk{animation:ba5Mk .4s ease-out forwards}
-[data-c="ba-5"] .ba5-end{position:absolute;right:-1px;top:18px;width:3px;height:26px;border-radius:2px;
+[data-c="ba-5"] .ba5-mk{position:absolute;top:23px;width:2.5px;height:16px;border-radius:2px;
+  background:rgba(var(--ink),.34);opacity:0}
+[data-c="ba-5"] .b1.on .ba5-mk{animation:ba5Mk .35s ease-out forwards}
+@keyframes ba5Mk{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+[data-c="ba-5"] .ba5-end{position:absolute;right:-1px;top:16px;width:3.5px;height:30px;border-radius:2px;
   background:var(--accent);opacity:0}
-[data-c="ba-5"] .b1.on .ba5-end{animation:ba5Mk .5s ease-out 2.15s forwards}
-@keyframes ba5Mk{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
-[data-c="ba-5"] .ba5-ends{display:flex;justify-content:space-between;width:100%;max-width:270px;
-  font-size:12.5px;color:var(--text-lo);font-variant-numeric:tabular-nums}
+[data-c="ba-5"] .b1.on .ba5-end{animation:ba5Mk .4s ease-out 1.8s forwards}
+/* the eruption: a circle born at the end post that swallows the screen */
+[data-c="ba-5"] .ba5-burst{position:absolute;right:34px;top:50%;width:20px;height:20px;margin-top:-10px;
+  border-radius:50%;background:var(--accent);opacity:0;transform:scale(0)}
+[data-c="ba-5"] .b1.on .ba5-burst{animation:ba5Burst 1s cubic-bezier(.2,.75,.3,1) 2s forwards}
+@keyframes ba5Burst{0%{opacity:1;transform:scale(0)}100%{opacity:1;transform:scale(60)}}
+[data-c="ba-5"] .ba5-closed{position:relative;margin-top:30px;font-size:34px;font-weight:750;
+  letter-spacing:-.035em;line-height:1.06;color:#0b0e12;max-width:11ch;opacity:0}
+[data-c="ba-5"] .b1.on .ba5-closed{animation:ba5Slam .55s cubic-bezier(.16,1.3,.3,1) 2.55s both}
+@keyframes ba5Slam{from{opacity:0;transform:scale(1.3)}to{opacity:1;transform:scale(1)}}
+[data-c="ba-5"] .ba5-ends{position:relative;display:flex;justify-content:space-between;width:100%;max-width:280px;
+  font-size:13px;color:var(--text-lo);font-variant-numeric:tabular-nums;margin-top:10px}
 [data-c="ba-5"] .ba5-ends b{color:var(--text-hi);font-weight:700}
-[data-c="ba-5"] .ba5-walked{margin-top:26px;font-size:14px;color:var(--text-mid)}
-[data-c="ba-5"] .b1.on .ba5-walked{animation:ba5Up .5s ease-out 2.5s both}
-[data-c="ba-5"] .ba5-cost{font-size:15px;line-height:1.85;color:var(--text-mid)}
-[data-c="ba-5"] .ba5-cost b{color:var(--text-hi);font-variant-numeric:tabular-nums}
-[data-c="ba-5"] .b2.on .ba5-cost{animation:ba5Up .5s ease-out .2s both}
-[data-c="ba-5"] .ba5-line{font-size:24px;font-weight:700;letter-spacing:-.028em;max-width:12ch;color:var(--text-hi)}
+[data-c="ba-5"] .b1.on .ba5-ends{animation:ba5Fade 2.4s ease-out both}
+@keyframes ba5Fade{0%{opacity:0}12%{opacity:1}82%{opacity:1}100%{opacity:0}}
+[data-c="ba-5"] .ba5-cost{font-size:19px;line-height:2.05;color:var(--text-mid)}
+[data-c="ba-5"] .ba5-cost b{color:var(--text-hi);font-size:26px;font-variant-numeric:tabular-nums}
+[data-c="ba-5"] .b2.on .ba5-cost{animation:ba5Up .55s ease-out .2s both}
+[data-c="ba-5"] .ba5-line{font-size:28px;font-weight:750;letter-spacing:-.03em;max-width:11ch;color:var(--text-hi)}
 [data-c="ba-5"] .b3.on .ba5-line{animation:ba5Up .5s ease-out .15s both}
-[data-c="ba-5"] .ba5-close{margin-top:13px;font-size:13.5px;color:var(--text-mid)}
+[data-c="ba-5"] .ba5-close{margin-top:14px;font-size:14px;color:var(--text-mid)}
 [data-c="ba-5"] .b3.on .ba5-close{animation:ba5Up .5s ease-out .5s both}
-@keyframes ba5Up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes ba5Up{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){
   [data-c="ba-5"] .ba5-fill{width:100%}
-  [data-c="ba-5"] .ba5-mk,[data-c="ba-5"] .ba5-end{opacity:1}
-  [data-c="ba-5"] .ba5-walked,[data-c="ba-5"] .ba5-cost,[data-c="ba-5"] .ba5-line,[data-c="ba-5"] .ba5-close{opacity:1;transform:none;animation:none}
+  [data-c="ba-5"] .ba5-mk,[data-c="ba-5"] .ba5-end,[data-c="ba-5"] .ba5-ends{opacity:1;animation:none}
+  [data-c="ba-5"] .ba5-burst{opacity:1;transform:scale(60);animation:none}
+  [data-c="ba-5"] .ba5-closed,[data-c="ba-5"] .ba5-cost,[data-c="ba-5"] .ba5-line,[data-c="ba-5"] .ba5-close{opacity:1;transform:none;animation:none}
 }
 </style>
 <div class="ph" data-c="ba-5">
@@ -46,11 +57,12 @@
         <div class="ba5-end"></div>
       </div>
       <div class="ba5-ends"><span><b>230</b> started</span><span><b>200</b> today</span></div>
-      <div class="ba5-walked">Every mark on this road is yours.</div>
+      <div class="ba5-burst"></div>
+      <div class="ba5-closed">Lost 30 lbs.</div>
     </div>
 
     <div class="b b2">
-      <div class="ba5-cost"><b>4</b> marks passed.<br><b>126</b> days.<br><b>215</b> weigh-ins.</div>
+      <div class="ba5-cost"><b>4</b> marks passed.<br><b data-count="0|126">126</b> days.<br><b data-count="0|215">215</b> weigh-ins.</div>
     </div>
 
     <div class="b b3">

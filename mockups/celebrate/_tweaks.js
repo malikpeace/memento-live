@@ -14,6 +14,13 @@
     var h = Math.floor(min / 60), m = min % 60;
     return h ? h + 'h ' + (m < 10 ? '0' : '') + m + 'm' : m + 'm';
   }
+  function durLong(min) {
+    min = Math.round(min);
+    var h = Math.floor(min / 60), m = min % 60, out = [];
+    if (h) out.push(h + ' ' + (h === 1 ? 'hour' : 'hours'));
+    if (m || !h) out.push(m + ' ' + (m === 1 ? 'minute' : 'minutes'));
+    return out.join(' ');
+  }
   function dateBack(days) {
     return new Date(Date.now() - days * 86400000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   }
@@ -50,6 +57,8 @@
     if (v.shape === 'count') rows.push('The target was <b>' + fmt(+v.value) + '</b>. You hit it.');
     return rows.join('<br>');
   }
+  /* dollar goals show the $ (Malik 2026-08-14) */
+  function isMoney(unit) { return /^\$|dollar/i.test(String(unit || '').trim()); }
   function seeded(seed) { return function () { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; }; }
 
   function Q(ph, sel) { return ph.querySelector(sel); }
@@ -89,16 +98,16 @@
         ctl.cur.min = start; ctl.cur.max = goal;
         var cur = Math.min(Math.max(+v.cur, start), goal);
         var span = goal - start, frac = (cur - start) / span;
+        var money = isMoney(v.unit);
+        var mf = function (n) { return (money ? '$' : '') + fmt(n); };
         var marks = C.milestones({ target: goal, baseline: start }, 'up');
         var passed = marks.filter(function (m) { return cur >= m; });
         var nowMark = passed.length ? passed[passed.length - 1] : null;
-        cnt(ph, '.qu1-hero', cur);
-        put(ph, '.b1 .sub', esc(unitFor(cur, v.unit)) + '.');
-        /* the travelled baseline: progress reads at 3% or 93%, never a dead
-           axis before the first fifth (his 17-of-100 catch). The posts sit
-           at the CENTERS of equal flex cells, so the line must be mapped
-           into that geometry, not drawn as a raw percentage: at 58 of 100 it
-           ends just short of the 60 post (his 58-past-60 catch). */
+        /* the big number rides WITH the road (Malik 2026-08-14), in both beats */
+        if (money) { put(ph, '.qu1-hero', mf(cur)); put(ph, '.qu1-hero2', mf(cur)); }
+        else { cnt(ph, '.qu1-hero', cur); cnt(ph, '.qu1-hero2', cur); }
+        put(ph, '.b1 .sub', esc(unitFor(cur, money ? v.unit.replace(/^\$\s*/, '') || 'dollars' : v.unit)) + '.');
+        put(ph, '.qu1-sub2', esc(unitFor(cur, money ? v.unit.replace(/^\$\s*/, '') || 'dollars' : v.unit)));
         function xFor(vv) {
           var N = marks.length, cx = function (i) { return (i + 0.5) / N * 100; };
           if (vv <= start) return 0;
@@ -109,6 +118,12 @@
           return cx(N - 1);
         }
         var gone = Q(ph, '.qu1-gone'); if (gone) gone.style.width = xFor(cur).toFixed(1) + '%';
+        /* the ladder is dense now: every mark gets a post, only the quarters,
+           the half, today's mark and the goal get NUMBERS, so 14 posts never
+           become 14 labels fighting for 288px */
+        var lblSet = {};
+        [Math.round(start + span * 0.25), Math.round(start + span * 0.5), Math.round(start + span * 0.75), goal].forEach(function (m) { lblSet[m] = 1; });
+        if (nowMark !== null) lblSet[nowMark] = 1;
         var cells = '', labels = '';
         marks.forEach(function (m) {
           var isNow = m === nowMark, isPast = passed.indexOf(m) > -1 && !isNow;
@@ -118,21 +133,19 @@
             hpx = ' style="--ph:' + Math.round(16 + 6 * (n === 1 ? 0 : k / (n - 1))) + 'px"';
           }
           cells += '<div class="qu1-cell' + (isNow ? ' is-now' : isPast ? ' is-past' : '') + '"' + hpx + '><div class="qu1-p"></div></div>';
-          var when = isNow ? 'today' : (passed.indexOf(m) > -1 ? dateBack(Math.round(days * (1 - (m - start) / span))) : '');
-          labels += '<div class="qu1-lc' + (isNow ? ' is-now' : passed.indexOf(m) > -1 ? ' is-past' : '') + '"><div class="qu1-num">' + fmt(m) + '</div><div class="qu1-date">' + when + '</div></div>';
+          var lbl = lblSet[m] ? mf(m) : '';
+          var when = lbl && isNow ? 'today' : (lbl && passed.indexOf(m) > -1 ? dateBack(Math.round(days * (1 - (m - start) / span))) : '');
+          labels += '<div class="qu1-lc' + (isNow ? ' is-now' : passed.indexOf(m) > -1 ? ' is-past' : '') + '"><div class="qu1-num">' + lbl + '</div><div class="qu1-date">' + when + '</div></div>';
         });
         put(ph, '.qu1-marks', cells); put(ph, '.qu1-labels', labels);
-        put(ph, '.qu1-sub', '');   /* the days-made-these line: cut, Malik 2026-08-13 */
-        /* growth is REAL arithmetic on their own numbers: started at 1, at
-           17 today, that is 17x, and it deserves saying (his 1700% point) */
         var mult = start > 0 ? cur / start : 0;
-        put(ph, '.qu1-cap', fmt(goal - cur) + ' to go.'
+        put(ph, '.qu1-cap', mf(goal - cur) + ' to go.'
           + (mult >= 2 ? ' ' + (mult >= 10 ? Math.round(mult) : (Math.round(mult * 10) / 10)) + '&times; where you started.' : ''));
         put(ph, '.b3 .deposit', nowMark === null
           ? (cur > start
-            ? 'The first move is in: <b>' + fmt(cur - start) + '</b> already, from ' + fmt(start) + '. The first mark waits at ' + fmt(marks[0]) + '.'
-            : 'Nothing moved yet. The first mark waits at <b>' + fmt(marks[0]) + '</b>.')
-          : 'On this day, you passed <b>' + fmt(nowMark) + ' of ' + fmt(goal) + '</b> ' + esc(unitFor(goal, v.unit)) + '.');
+            ? 'The first move is in: <b>' + mf(cur - start) + '</b> already, from ' + mf(start) + '. The first mark waits at ' + mf(marks[0]) + '.'
+            : 'Nothing moved yet. The first mark waits at <b>' + mf(marks[0]) + '</b>.')
+          : 'On this day, you passed <b>' + mf(nowMark) + ' of ' + mf(goal) + '</b>' + (money ? '' : ' ' + esc(unitFor(goal, v.unit))) + '.');
       }
     },
 
@@ -206,7 +219,7 @@
         var now = +v.now, best = +v.best, stood = +v.stood, past = Math.max(1, Math.min(+v.rows, 4));
         var isRec = now > best;
         put(ph, '.qu5-hero', fmt(now));
-        put(ph, '.b1 .sub', esc(unitFor(now, v.unit)) + ' this week.');
+        put(ph, '.b1 .sub', esc(unitFor(now, v.unit)) + '. Your best week yet.');
         /* the board GROWS with the records slider (his catch: the weeks
            control moved dates but the board never expanded), and this week
            only takes the top seat when it actually beat the best */
@@ -224,7 +237,7 @@
           ? 'The one it beat stood ' + fmt(stood) + ' ' + plural(stood, 'week', 'weeks') + '.'
           : 'The best is still ' + fmt(best) + ', set ' + fmt(stood) + ' ' + plural(stood, 'week', 'weeks') + ' ago. Nothing fires today.');
         put(ph, '.b3 .deposit', isRec
-          ? 'On this day, you set a record. <b>' + fmt(now) + '</b> ' + esc(unitFor(now, v.unit)) + ' in a week.'
+          ? 'On this day, you set a record: <b>' + fmt(now) + '</b>. ' + esc(unitFor(now, v.unit)) + '.'
           : 'The record to beat is <b>' + fmt(best) + '</b>. This screen waits for the week that takes it.');
       }
     },
@@ -339,7 +352,7 @@
           + '<div class="frow"><div class="v">$' + fmt(cur) + '</div><div class="d">today</div></div>');
         var subs = ph.querySelectorAll('.b2 .sub');
         if (subs[0]) subs[0].innerHTML = fmt(+v.pay) + ' ' + plural(+v.pay, 'payment', 'payments') + ' over ' + fmt(+v.mon) + ' ' + plural(+v.mon, 'month', 'months') + '.';
-        if (subs[1]) subs[1].innerHTML = '$' + fmt(closed) + ' closed. $' + fmt(cur) + ' open.';
+        if (subs[1]) subs[1].innerHTML = '$' + fmt(closed) + ' closed. $' + fmt(cur) + ' to go.';
         put(ph, '.b3 .deposit', th <= start
           ? 'On this day, the balance went under <b>$' + fmt(th) + '</b>.'
           : 'On this day, the balance read <b>$' + fmt(cur) + '</b>. $' + fmt(closed) + ' of it is gone.');
@@ -360,7 +373,7 @@
         var backH = Math.round((then - now) * 7 / 60);
         put(ph, '.b2 .lead', '<span class="n n--big" data-count="0|' + backH + '">' + backH + '</span><span class="u--sm">h</span>');
         var subs = ph.querySelectorAll('.b2 .sub');
-        if (subs[1]) subs[1].innerHTML = dur(then) + ' a day, ' + w + ' ' + plural(w, 'week', 'weeks') + ' ago.';
+        if (subs[1]) subs[1].innerHTML = 'You were at ' + durLong(then) + ', ' + w + ' ' + plural(w, 'week', 'weeks') + ' ago.';
         put(ph, '.b3 .deposit', 'On this day, your week averaged <b>' + dur(now) + '</b> a day.' + (now < ceilH * 60 && then >= ceilH * 60 ? ' First week under ' + ceilH + 'h.' : ''));
       }
     },
@@ -421,17 +434,23 @@
         var n = +v.n, days = +v.days;
         put(ph, '.b1 .cap', 'Total ' + esc(v.word));
         cnt(ph, '.b1 .n', n);
-        var shown = Math.min(n, 50), rows = '';
-        for (var r = 0; r < Math.ceil(shown / 10); r++) {
+        /* the field is a 50-box: full fifties become a multiplier (150 runs =
+           the box lit whole with a 3x beside it; 125 = 2x and half the box
+           lit), Malik 2026-08-14 */
+        var fifties = Math.floor(n / 50), rem = n % 50;
+        var lit = rem === 0 && n > 0 ? 50 : rem;
+        var rows = '';
+        for (var r = 0; r < 5; r++) {
           var row = '';
-          for (var i = 0; i < Math.min(10, shown - r * 10); i++) {
+          for (var i = 0; i < 10; i++) {
             var idx = r * 10 + i;
-            row += '<i class="fr3-d' + (idx === shown - 1 ? ' last' : '') + '"></i>';
+            row += '<i class="fr3-d' + (idx < lit ? '' : ' fr3-off') + (idx === lit - 1 ? ' last' : '') + '"></i>';
           }
           rows += '<div class="fr3-row">' + row + '</div>';
         }
-        put(ph, '.fr3-field', rows);
-        put(ph, '.fr3-sub', fmt(n) + ' ' + esc(unitFor(n, v.word)) + ' in <b>' + fmt(days) + ' days</b>.' + (n > 50 ? ' The last 50 drawn.' : ''));
+        var multLbl = fifties >= (rem === 0 ? 2 : 1) && n >= 50 ? '<div class="fr3-mult">' + (rem === 0 ? fifties : fifties) + '&times;</div>' : '';
+        put(ph, '.fr3-field', '<div class="fr3-box">' + rows + '</div>' + multLbl);
+        put(ph, '.fr3-sub', fmt(n) + ' ' + esc(unitFor(n, v.word)) + ' in <b>' + fmt(days) + ' days</b>.' + (n > 50 ? ' Each full box is 50.' : ''));
         put(ph, '.b2 .cap', 'Since ' + dateBack(days));
         put(ph, '.b3 .deposit', 'On this day, your <b>' + fmt(n) + (n % 10 === 1 && n % 100 !== 11 ? 'st' : n % 10 === 2 && n % 100 !== 12 ? 'nd' : n % 10 === 3 && n % 100 !== 13 ? 'rd' : 'th') + ' ' + esc(singular(v.word)) + '</b>.');
       }
@@ -463,9 +482,9 @@
         cnt(ph, '.b1 .n', met);
         put(ph, '.b1 .fr4-sub', 'of the last ' + shown + ' weeks at your rate.');
         put(ph, '.fr4-wks', rows);
-        put(ph, '.b2 .fr4-sub', awayN ? 'The ' + plural(awayN, 'week', 'weeks') + ' away ' + plural(awayN, 'is', 'are') + ' just quiet rows. Nothing to make up.' : 'No weeks away in this stretch.');
+        put(ph, '.b2 .fr4-sub', '');
         put(ph, '.b2 .cap', fmt(total) + ' across ' + w + ' weeks' + (older > 0 ? ' (+ ' + older + ' earlier)' : ''));
-        put(ph, '.b3 .deposit', 'This week, you did <b>' + t + ' of ' + t + '</b>. ' + met + ' of the last ' + shown + ' at rate.');
+        put(ph, '.b3 .deposit', 'This week, you did <b>' + t + ' of ' + t + '</b>.');
       }
     },
 
@@ -536,7 +555,7 @@
         put(ph, '.mt2-dates', '<span>' + dateBack(held) + '</span><span>' + (done ? dateBack(0) : dateAhead(total - held)) + '</span>');
         put(ph, '.b2 .sub', Math.round(total / 30) + ' months. ' + esc(v.what));
         put(ph, '.mt2-line2', done ? 'You picked the end date yourself. It arrived with the rule intact.' : '<b>' + pct + '%</b> of the promise kept so far.');
-        put(ph, '.b3 .deposit', done ? '<b>Day ' + fmt(total) + '!</b> The hold held. The goal is complete.' : '<b>Day ' + fmt(held) + '.</b> ' + pct + '% of the way to the date.');
+        put(ph, '.b3 .deposit', done ? '<b>Day ' + fmt(total) + '!</b> The hold held. The goal is complete.' : (held === Math.round(total / 2) ? '<b>Halfway.</b> Day ' + fmt(held) + ' of ' + fmt(total) + '.' : '<b>Day ' + fmt(held) + '.</b> ' + pct + '% of the way to the date.'));
         put(ph, '.mt2-note', done ? 'It closes here. There is nothing left to hold.' : 'The date is ' + dateAhead(total - held) + '.');
       }
     },
@@ -552,14 +571,18 @@
         ctl.hard.max = Math.min(60, d);
         cnt(ph, '.b1 .n', d);
         put(ph, '.b1 .sub', 'days without ' + esc(v.what));
-        var shown = Math.min(d, 30), rnd = seeded(d * 3 + hard), bars = '';
-        var hardShown = Math.round(hard * (shown / d)), set = {}, pool = [];
-        for (var i = 0; i < shown; i++) pool.push(i);
-        for (var i = 0; i < Math.min(hardShown, shown); i++) set[pool.splice(Math.floor(rnd() * pool.length), 1)[0]] = 1;
-        for (var i = 0; i < shown; i++) bars += '<span class="mt3-bar' + (set[i] ? ' mt3-h' : '') + '"></span>';
-        put(ph, '.mt3-days', bars);
+        /* every hard day shows (Malik 2026-08-14: 22 hard means you SEE 22),
+           written as the dates they actually were */
+        var rnd = seeded(d * 3 + hard), offs = [], pool = [];
+        for (var i = 0; i < d; i++) pool.push(i);
+        for (var i = 0; i < hard; i++) offs.push(pool.splice(Math.floor(rnd() * pool.length), 1)[0]);
+        offs.sort(function (a, b) { return a - b; });
+        var shown = Math.min(hard, 6), rowsH = '';
+        for (var i = 0; i < shown; i++) rowsH += '<div class="mt3-hd">' + dateBack(d - offs[i]) + '</div>';
+        if (hard > shown) rowsH += '<div class="mt3-hd mt3-hd--more">and ' + fmt(hard - shown) + ' more</div>';
+        put(ph, '.mt3-days', rowsH);
         put(ph, '.b2 .sub', hard ? fmt(hard) + ' of these days you logged as hard. You held on all ' + fmt(hard) + '.' : 'No day was logged hard. Every one counted anyway.');
-        put(ph, '.b2 .cap', dateBack(d) + ' to ' + dateBack(0) + (d > shown ? ' (last ' + shown + ' drawn)' : ''));
+        put(ph, '.b2 .cap', dateBack(d) + ' to ' + dateBack(0));
         put(ph, '.b3 .deposit', '<b>Day ' + fmt(d) + '</b> without ' + esc(v.what) + '. The line held.');
         put(ph, '.mt3-note', hard ? 'The ' + fmt(hard) + ' hard ' + plural(hard, 'day is', 'days are') + ' spent and counted. They do not come back around.' : 'The quiet days count the same as the loud ones.');
       }
@@ -594,12 +617,24 @@
 
     'ms-2': {
       c: [
-        { k: 'n', t: 'r', l: 'Hours logged', v: 300, min: 1, max: 2000 },
-        { k: 'what', t: 't', l: 'Of what', v: 'studying for the boards' }
+        { k: 'sess', t: 'r', l: 'Sessions', v: 118, min: 1, max: 1000 },
+        { k: 'len', t: 'r', l: 'Minutes each (avg)', v: 152, min: 5, max: 300 },
+        { k: 'what', t: 't', l: 'Of what', v: 'studying for the boards' },
+        { k: 'since', t: 'r', l: 'Days since the first', v: 220, min: 1, max: 900 },
+        { k: 'out', t: 'r', l: 'Days to the event', v: 41, min: 0, max: 400 }
       ],
       apply: function (ph, v) {
-        cnt(ph, '.b1 .n', +v.n);
+        var sess = +v.sess, len = +v.len, hours = Math.round(sess * len / 60);
+        cnt(ph, '.b1 .n', hours);
         put(ph, '.b1 .sub', 'hours of ' + esc(v.what) + '.');
+        var ticks = Math.min(sess, 120), rail = '';
+        for (var i = 0; i < ticks; i++) rail += '<i class="ms2-t' + (i === ticks - 1 ? ' ms2-t--now' : '') + '"></i>';
+        put(ph, '.ms2-rail', rail);
+        var railSubs = ph.querySelectorAll('.b2 .sub');
+        if (railSubs[0]) railSubs[0].innerHTML = fmt(sess) + ' ' + plural(sess, 'session', 'sessions') + ' since ' + dateBack(+v.since) + '. About ' + durLong(len) + ' each.' + (sess > ticks ? ' (Last ' + ticks + ' drawn.)' : '');
+        put(ph, '.ms2-ahead', +v.out === 0 ? 'The event is here.' : 'The event is ' + fmt(+v.out) + ' ' + plural(+v.out, 'day', 'days') + ' out.');
+        put(ph, '.b3 .deposit', 'On this day, you crossed <b>' + fmt(hours) + ' hours</b> of ' + esc(v.what) + '.');
+        put(ph, '.ms2-open', +v.out === 0 ? 'Today is the day it was for.' : 'The event is still ahead.');
       }
     },
 
@@ -611,14 +646,16 @@
         { k: 'cost', t: 't', l: 'Cost line', v: '71,400 words' }
       ],
       apply: function (ph, v) {
-        var a = +v.ahead;
+        var a = +v.ahead, onTime = a === 0;
         put(ph, '.ms3-calc',
           '<div class="ms3-row"><span>Your deadline</span><span class="ms3-v">' + dateAhead(a) + '</span></div>'
           + '<div class="ms3-row"><span>You finished</span><span class="ms3-v">' + dateBack(0) + '</span></div>'
           + '<div class="ms3-hr"></div>'
-          + '<div class="ms3-row ms3-row--sum"><span>Days ahead</span><span class="ms3-sum">' + fmt(a) + '</span></div>');
+          + (onTime
+            ? '<div class="ms3-row ms3-row--sum"><span></span><span class="ms3-sum">Right on time!</span></div>'
+            : '<div class="ms3-row ms3-row--sum"><span>Days ahead</span><span class="ms3-sum">' + fmt(a) + '</span></div>'));
         put(ph, '.ms3-cost', fmt(+v.days) + ' days of work. ' + esc(v.cost) + '.');
-        put(ph, '.b3 .deposit', 'On this day, <b>you finished ' + esc(v.what) + '</b>, ' + fmt(a) + ' ' + plural(a, 'day', 'days') + ' before your deadline.');
+        put(ph, '.b3 .deposit', onTime ? 'On this day, <b>you finished ' + esc(v.what) + '</b>. Right on time!' : 'On this day, <b>you finished ' + esc(v.what) + '</b>, ' + fmt(a) + ' ' + plural(a, 'day', 'days') + ' before your deadline.');
       }
     },
 
@@ -631,7 +668,11 @@
       apply: function (ph, v) {
         put(ph, '.ms5-stamp', esc(v.time));
         cnt(ph, '.b2 .n', +v.days);
-        put(ph, '.ms5-cost', fmt(+v.hours) + ' hours logged.<br>Your third sitting.');
+        /* the hours made visible: one bar per ~50 hours (Malik 2026-08-14) */
+        var bars = Math.max(1, Math.min(40, Math.round(+v.hours / 50))), viz = '';
+        for (var i = 0; i < bars; i++) viz += '<i></i>';
+        put(ph, '.ms5-viz', viz);
+        put(ph, '.ms5-cost', fmt(+v.hours) + ' hours logged. Each bar is 50.<br>Your third sitting.');
         put(ph, '.b3 .deposit', 'On this day at <b>' + esc(v.time) + '</b>, <b>you passed the bar!</b>');
       }
     },
@@ -804,6 +845,7 @@
         { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' }
       ],
       apply: function (ph, v) {
+        put(ph, '.ba2-now', esc(v.line) + '.');
         put(ph, '.ba2-cost', baCost(v));
         put(ph, '.ba2-line', esc(v.line) + '.');
       }
@@ -853,6 +895,7 @@
       ],
       apply: function (ph, v) {
         put(ph, '.ba4-word', esc(v.line) + '.');
+        put(ph, '.ba4-engine', '<b>' + fmt(+v.days) + '</b> ' + plural(+v.days, 'day', 'days') + ' &middot; <b>' + fmt(+v.moves) + '</b> ' + esc(unitFor(+v.moves, v.moveWord)));
         put(ph, '.ba4-cost', baCost(v));
       }
     },
@@ -885,12 +928,13 @@
           marks = Math.floor(+v.days / C.DAY_STEP);
           endsL = '<b>day 1</b>'; endsR = '<b>day ' + fmt(+v.days) + '</b>';
         }
-        var shown = Math.min(marks, 12), mks = '';
+        var shown = Math.min(marks, 14), mks = '';
         for (var i = 1; i <= shown; i++) {
-          mks += '<i class="ba5-mk" style="left:' + (i / (shown + 1) * 100).toFixed(1) + '%;animation-delay:' + (0.4 + 1.9 * i / (shown + 1)).toFixed(2) + 's"></i>';
+          mks += '<i class="ba5-mk" style="left:' + (i / (shown + 1) * 100).toFixed(1) + '%;animation-delay:' + (0.3 + 1.5 * i / (shown + 1)).toFixed(2) + 's"></i>';
         }
         put(ph, '.ba5-marks', mks);
         put(ph, '.ba5-ends', '<span>' + endsL + '</span><span>' + endsR + '</span>');
+        put(ph, '.ba5-closed', esc(v.line) + '.');
         put(ph, '.ba5-cost', '<b>' + fmt(marks) + '</b> ' + plural(marks, 'mark', 'marks') + ' passed.<br>' + baCost(v));
         put(ph, '.ba5-line', esc(v.line) + '.');
       }
@@ -918,6 +962,7 @@
   function dayFire(d) {
     var bd = boldHit(d), hit = ladderHit(d);
     if (bd === d) return '<b>Day ' + fmt(d) + ' is a BOLD rung.</b> The big round marks (100 / 200 / 300 / 365, then every 100) hit harder.';
+    if (d % C.MONTH_STEP === 0 && d > 0) return '<b>Day ' + fmt(d) + ' is a month mark</b> (' + (d / 30) + ' ' + (d === 30 ? 'month' : 'months') + '): a step up from the weekly rhythm.';
     if (hit === d) return '<b>Day ' + fmt(d) + ' is a rung.</b> A quiet weekly step; fires once ever.';
     if (hit === null) return 'Before day 7 nothing fires; the first rung needs a week.';
     return 'Day ' + fmt(d) + ' is quiet. Last rung was ' + fmt(hit) + '; the weekly rhythm decides.';
@@ -943,12 +988,12 @@
     'qd-4': function (v) { return roadFire(+v.start, 0, Math.max(0, +v.cur), 'down'); },
     'qd-5': function (v) { return '<b>A new low average.</b> Fires on records only (2% rule), never on an ordinary week.'; },
     'fr-1': function (v) { return +v.n >= +v.target ? '<b>The week met the rate</b> (' + v.n + ' of ' + v.target + '): fires when the week closes.' : 'Silent: ' + v.n + ' of ' + v.target + ' so far. An unmet week is never shown as a ceremony.'; },
-    'fr-2': function (v) { var w = +v.w; return ladderHit(w) === w ? '<b>' + w + ' weeks is a rung</b> (every 7): fires as the run of weeks grows.' : 'Silent at ' + w + ' weeks; next rung at ' + (Math.floor(w / 7) + 1) * 7 + ' weeks.'; },
-    'fr-3': function (v) { var n = +v.n; return n % C.COUNT_STEP === 0 ? '<b>' + fmt(n) + ' is a rung.</b> Unit totals fire every ' + C.COUNT_STEP + '.' : 'Silent at ' + fmt(n) + '. Next ceremony at <b>' + fmt((Math.floor(n / C.COUNT_STEP) + 1) * C.COUNT_STEP) + '</b>.'; },
+    'fr-2': function (v) { return '<b>Week ' + v.w + ' at your rate.</b> Fires as each week closes at rate (Malik 2026-08-14: every week, not every 7).'; },
+    'fr-3': function (v) { var n = +v.n; return C.countHit(n) === n ? '<b>' + fmt(n) + ' is a rung of the count ladder.</b> Fires today.' : 'Silent at ' + fmt(n) + '. Next ceremony at <b>' + fmt(C.countNext(n)) + '</b> (the ladder: 1, 5, 7, 10, 15, 20, 25, 30, 40, 50 ... every 50 past 300).'; },
     'fr-4': function (v) { return '<b>Fires when a week closes at rate.</b> Weeks away are quiet rows, never a funeral.'; },
     'fr-5': function (v) { return +v.left === 0 ? '<b>Race week.</b> The deadline arrives with the rate kept: this fires as a FINAL.' : 'Fires when a week closes at rate; ' + v.left + ' ' + (+v.left === 1 ? 'week' : 'weeks') + ' to the day.'; },
     'mt-1': function (v) { return dayFire(+v.days); },
-    'mt-2': function (v) { return +v.held >= +v.total ? '<b>The promised date arrived with the rule intact.</b> Fires as a FINAL; the grand finale outranks it.' : dayFire(+v.held); },
+    'mt-2': function (v) { if (+v.held >= +v.total) return '<b>The promised date arrived with the rule intact.</b> Fires as a FINAL; the grand finale outranks it.'; if (+v.held === Math.round(+v.total / 2)) return '<b>Halfway.</b> The 50% mark of the promise fires (Malik 2026-08-14).'; return dayFire(+v.held); },
     'mt-3': function (v) { return dayFire(+v.days); },
     'mt-4': function (v) { return '<b>Day 7 exactly.</b> The first-seven moment fires once, then the weekly rhythm takes over.'; },
     'ms-1': function (v) { return '<b>Fires when they mark it done.</b> A binary event has no partial credit.'; },
@@ -961,7 +1006,7 @@
     'op-5': function (v) { return dayFire(+v.days); },
     'rf-gap': function (v) { return roadFire(0, Math.max(2, +v.goal), Math.min(+v.cur, Math.max(2, +v.goal)), 'up'); },
     'rf-fall': function (v) { return roadFire(+v.startLeft, 0, Math.min(+v.left, +v.startLeft), 'down'); },
-    'rf-rec': function (v) { return '<b>Fires on rungs of the count</b> (every ' + C.COUNT_STEP + '), drawn from real logged days only.' },
+    'rf-rec': function (v) { return '<b>Fires on rungs of the count ladder</b>, drawn from real logged days only.' },
     'ba-1': baFire, 'ba-2': baFire, 'ba-3': baFire, 'ba-4': baFire, 'ba-5': baFire
   };
   function baFire() {

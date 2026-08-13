@@ -21,8 +21,9 @@
        milestone, target, unit, current, prev, remaining, daysSpan, key }
 
    THE LAWS (each has a test):
-   L1  Milestones are fifths of |target - baseline|, but never finer than one
-       whole unit; a target too small for fifths celebrates per unit.
+   L1  Milestones are Malik's percent ladder over |target - baseline|
+       (1/5/10/20/25/30/40/50/60/75/80/90/95, then the target), never finer
+       than one whole unit; a tiny target celebrates per unit.
    L2  A milestone fires ONCE, ever. Recrossing after a bounce is silent.
        (Same law as resume: a moment witnessed is never re-earned.)
    L3  Crossing several milestones in one pulse coalesces to the FURTHEST.
@@ -36,27 +37,40 @@
        the star's verbs (lose/pay off/quit/under/below = down), else up.
    L8  No-target goals celebrate personal records: a new best beyond the old
        best by >= 2% of it (or >= 1 unit), at most once per 7 days.
-   L9  Day-count goals (maintenance) fire every 7 days (7, 14, 21, ...),
-       once-only via the same ledger. (Malik 2026-08-13: a weekly rhythm,
-       not the sparse 7/30/50/100/200/365 ladder.) Weekly rungs are QUIET
-       steps (intensity 'step', full quality, calmer); the big round marks
-       100 / 200 / 300 / 365, then every 100, fire ON their exact day as
-       intensity 'bold' so a year never feels like week 14. A bold fire
-       spends the weekly rung of its week so the two never stack.
-       Unit-count totals (total runs, total sessions) fire every
-       COUNT_STEP = 10.
+   L9  Day-count goals (maintenance) fire every 7 days, PLUS every month
+       mark (30, 60, 90 ...) on its exact day, once-only via the ledger.
+       Weekly rungs are QUIET steps; month marks step up; the big round
+       marks 100 / 200 / 300 / 365, then every 100, fire BOLD on their
+       exact day. A month/bold fire spends its week's rung so nothing
+       stacks. Unit-count totals (total runs, sessions) fire on Malik's
+       COUNT_LADDER (1,5,7,10,15,20,25,30,40,50 ... every 50 past 300).
    L10 evaluate() returns at most ONE event; the caller shows at most one
        ceremony per app-open and the comeback moment outranks it.
-   L11 First move: the first real movement off the baseline (>= 1% of the
-       span) fires ONE quiet 'first' event before any fifth is reached, so
-       the hardest stretch, the beginning, is witnessed. Once ever. */
+   L11 First move: the 1% mark IS the first-move moment now (the ladder
+       starts at 1%), so the beginning is witnessed by a real mark; the
+       'first' event remains only for movement too small to cross it. */
 (function (root) {
   'use strict';
 
   var DOWN_VERBS = /\b(lose|losing|lost|pay(?:ing)?\s+off|debt|quit|stop|under|below|reduce|cut|drop|sober|clean|fewer|less\s+than)\b/i;
   var DAY_STEP = 7;      // day-count goals: a rung every week
-  var COUNT_STEP = 10;   // unit-count totals (runs, sessions): a rung every 10
+  var MONTH_STEP = 30;   // ...and every month mark (30, 60, 90 ...), Malik 2026-08-14
   var BOLD_DAYS = [100, 200, 300, 365];   // the big round marks fire BOLD, on the exact day
+  /* Unit-count totals (total runs, sessions): Malik's exact ladder
+     (2026-08-14), dense at the start, widening as the count grows,
+     then every 50 past 300. */
+  var COUNT_LADDER = [1, 5, 7, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100, 125, 150, 175, 200, 250, 300];
+  function countHit(n) {
+    if (n >= 300) return 300 + Math.floor((n - 300) / 50) * 50;
+    var hit = null;
+    for (var i = 0; i < COUNT_LADDER.length; i++) if (n >= COUNT_LADDER[i]) hit = COUNT_LADDER[i];
+    return hit;
+  }
+  function countNext(n) {
+    if (n >= 300) return 300 + (Math.floor((n - 300) / 50) + 1) * 50;
+    for (var i = 0; i < COUNT_LADDER.length; i++) if (COUNT_LADDER[i] > n) return COUNT_LADDER[i];
+    return 350;
+  }
 
   function starHash(star) {
     var s = String(star || ''), h = 2166136261;
@@ -77,26 +91,28 @@
     return DOWN_VERBS.test(String(star || '')) ? 'down' : 'up';
   }
 
-  /* L1: the milestone values for a goal, in crossing order, target last. */
+  /* L1: the milestone values for a goal, in crossing order, target last.
+     Malik 2026-08-14: fifths are DEAD. The road fires on his ladder of
+     percentages, tuned so the feedback loop starts immediately (1%, 5%,
+     10%), hits the quarters and half, and builds up near the end (90%,
+     95%): for a 0->100 goal that is exactly 1, 5, 10, 20, 25, 30, 40, 50,
+     60, 75, 80, 90, 95, 100. Marks stay whole units and never stack, so
+     small spans (write 3 books) still celebrate per unit. */
+  var ROAD_PCTS = [1, 5, 10, 20, 25, 30, 40, 50, 60, 75, 80, 90, 95];
   function milestones(gp, dir) {
     if (!gp || gp.target === null) return [];
     var base = gp.baseline !== null ? gp.baseline : (dir === 'down' ? null : 0);
     if (base === null) return [gp.target];             // down with no baseline: only the end is knowable
     var span = Math.abs(gp.target - base);
     if (span <= 0) return [gp.target];
-    var step = span / 5;
-    if (step < 1) step = 1;                            // never finer than a unit
-    step = Math.round(step);
     var out = [], sign = dir === 'down' ? -1 : 1;
-    for (var v = base + sign * step;
-         sign > 0 ? v < gp.target : v > gp.target;
-         v += sign * step) {
-      out.push(Math.round(v));
-    }
-    /* rounding can leave a stray mark almost on top of the target (187->11
-       gave ...47, 12, 11). A step that lands within 60% of a step of the
-       final is noise: drop it, the final IS that celebration. */
-    while (out.length && Math.abs(gp.target - out[out.length - 1]) < step * 0.6) out.pop();
+    ROAD_PCTS.forEach(function (p) {
+      var v = Math.round(base + sign * span * p / 100);
+      if (Math.abs(v - base) < 1) return;              // never finer than a unit off the start
+      if (out.length && Math.abs(v - out[out.length - 1]) < 1) return;   // no stacked marks
+      if (sign > 0 ? v >= gp.target : v <= gp.target) return;            // the target is the final
+      out.push(v);
+    });
     out.push(gp.target);
     return out;
   }
@@ -133,7 +149,7 @@
       return ev;
     }
 
-    /* ---- day-count goals (maintenance): L9, every 7 days ---- */
+    /* ---- day-count goals (maintenance): L9, weeks + months + bold ---- */
     if (opts.days != null) {
       var d = opts.days;
       if (d < DAY_STEP) return null;
@@ -146,6 +162,12 @@
         /* a bold fire spends its week's quiet rung so they never stack */
         ledger[hash + ':days-' + (bold - bold % DAY_STEP)] = today;
         return fire('days', 'days-' + bold, { milestone: bold, days: d, intensity: 'bold' });
+      }
+      /* month marks (30, 60, 90 ...) fire on their exact day, a step up
+         from the weekly rhythm (Malik 2026-08-14: months fire too) */
+      if (d % MONTH_STEP === 0 && !ledger[hash + ':days-' + d]) {
+        ledger[hash + ':days-' + (d - d % DAY_STEP)] = today;
+        return fire('days', 'days-' + d, { milestone: d, days: d, month: true });
       }
       var hit = d - (d % DAY_STEP);
       return fire('days', 'days-' + hit, { milestone: hit, days: d });
@@ -191,23 +213,30 @@
          fifth can be a month away. The FIRST real movement off the baseline
          gets one quiet ceremony, once ever, so early progress is witnessed
          without lying about the scale (the road stays linear). */
-      if (gp.baseline !== null) {
+      if (gp.baseline !== null && marks.length) {
         var movedBy = dir === 'down' ? gp.baseline - to : to - gp.baseline;
-        var spanAll = Math.abs(gp.target - gp.baseline);
-        if (movedBy >= Math.max(spanAll * 0.01, 0) && movedBy > 0) {
+        var beforeFirstMark = dir === 'down' ? to > marks[0] : to < marks[0];
+        if (movedBy > 0 && beforeFirstMark) {
           return fire('first', 'first-move', { milestone: null, prev: from, remaining: Math.abs(gp.target - to) });
         }
       }
       return null;
     }
     var isFinal = hitMark === gp.target;                             /* L4 */
+    /* the furthest mark SWALLOWS every mark crossed in the same pulse: pay
+       them all, so a later bounce-and-recross never resurrects one */
+    for (var m2 = 0; m2 < marks.length; m2++) {
+      if (marks[m2] !== hitMark && crossed(dir, from, to, marks[m2])) {
+        ledger[hash + ':mark-' + marks[m2]] = today;
+      }
+    }
     return fire(isFinal ? 'final' : 'step', 'mark-' + hitMark, {
       milestone: hitMark, prev: from,
       remaining: Math.abs(gp.target - to)
     });
   }
 
-  var api = { evaluate: evaluate, milestones: milestones, direction: direction, starHash: starHash, DAY_STEP: DAY_STEP, COUNT_STEP: COUNT_STEP, BOLD_DAYS: BOLD_DAYS };
+  var api = { evaluate: evaluate, milestones: milestones, direction: direction, starHash: starHash, DAY_STEP: DAY_STEP, MONTH_STEP: MONTH_STEP, BOLD_DAYS: BOLD_DAYS, COUNT_LADDER: COUNT_LADDER, countHit: countHit, countNext: countNext };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.MilestoneChooser = api;
 })(this);

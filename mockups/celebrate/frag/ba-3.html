@@ -1,39 +1,51 @@
 <style>
-/* ba-3 "The Weight". No props at all: darkness, scale, and the number they
-   actually reached, counting up to fill the screen. The loudest thing here
-   is restraint. Special = motion, scale, darkness, never a new language. */
-[data-c="ba-3"] .ba3-hero{font-size:96px;font-weight:750;letter-spacing:-.05em;line-height:1;
-  color:var(--text-hi);font-variant-numeric:tabular-nums}
-[data-c="ba-3"] .ba3-unit{margin-top:12px;font-size:16px;color:var(--text-mid)}
-[data-c="ba-3"] .b1.on .ba3-hero{animation:ba3In .7s cubic-bezier(.2,.85,.25,1) both}
-[data-c="ba-3"] .b1.on .ba3-unit{animation:ba3Up .5s ease-out .55s both}
-@keyframes ba3In{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:none}}
-@keyframes ba3Up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+/* ba-3 "The Weight". The number they reached, ENORMOUS on black, counting
+   up; the instant it lands the whole screen detonates into their colour
+   (a full flood pulse) and the confetti pours. Scale + darkness + one
+   detonation, no props. */
+[data-c="ba-3"] .ba3-hero{position:relative;font-size:128px;font-weight:750;letter-spacing:-.055em;
+  line-height:1;color:var(--text-hi);font-variant-numeric:tabular-nums}
+[data-c="ba-3"] .b1.on .ba3-hero{animation:ba3In .8s cubic-bezier(.16,1.15,.3,1) both}
+@keyframes ba3In{from{opacity:0;transform:scale(.86)}to{opacity:1;transform:none}}
+/* the detonation: a full-screen flood that pulses in as the count lands */
+[data-c="ba-3"] .ba3-boom{position:absolute;inset:0;background:var(--accent);opacity:0}
+[data-c="ba-3"] .b1.on .ba3-boom{animation:ba3Boom 1s cubic-bezier(.2,.8,.3,1) 1.35s both}
+@keyframes ba3Boom{0%{opacity:0}30%{opacity:1}100%{opacity:0}}
+[data-c="ba-3"] .ba3-unit{position:relative;margin-top:16px;font-size:17px;font-weight:600;color:var(--text-mid)}
+[data-c="ba-3"] .b1.on .ba3-unit{animation:ba3Up .5s ease-out 1.5s both}
+[data-c="ba-3"] .ba3-did{position:relative;margin-top:22px;font-size:20px;font-weight:700;
+  letter-spacing:-.02em;color:var(--accent)}
+[data-c="ba-3"] .b1.on .ba3-did{animation:ba3Slam .55s cubic-bezier(.16,1.3,.3,1) 1.75s both}
+@keyframes ba3Slam{from{opacity:0;transform:scale(1.3)}to{opacity:1;transform:scale(1)}}
+@keyframes ba3Up{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
 
-[data-c="ba-3"] .ba3-rows{font-size:15px;line-height:2.05;color:var(--text-mid);letter-spacing:-.01em}
-[data-c="ba-3"] .ba3-rows b{color:var(--text-hi);font-variant-numeric:tabular-nums}
+[data-c="ba-3"] .ba3-rows{font-size:19px;line-height:2.05;color:var(--text-mid);letter-spacing:-.012em}
+[data-c="ba-3"] .ba3-rows b{color:var(--text-hi);font-size:26px;font-variant-numeric:tabular-nums}
 [data-c="ba-3"] .b2.on .ba3-rows{animation:ba3Up .55s ease-out .2s both}
 
 [data-c="ba-3"] .ba3-rule{width:36px;height:1px;background:rgba(235,238,248,.18);margin-bottom:20px}
-[data-c="ba-3"] .ba3-line{font-size:24px;font-weight:700;letter-spacing:-.028em;max-width:12ch;color:var(--text-hi)}
+[data-c="ba-3"] .ba3-line{font-size:28px;font-weight:750;letter-spacing:-.03em;max-width:11ch;color:var(--text-hi)}
 [data-c="ba-3"] .b3.on .ba3-line{animation:ba3Up .5s ease-out .2s both}
-[data-c="ba-3"] .ba3-day{margin-top:12px;font-size:13px;color:var(--text-lo)}
+[data-c="ba-3"] .ba3-day{margin-top:13px;font-size:13.5px;color:var(--text-lo)}
 [data-c="ba-3"] .b3.on .ba3-day{animation:ba3Up .5s ease-out .55s both}
 @media (prefers-reduced-motion:reduce){
-  [data-c="ba-3"] .ba3-hero,[data-c="ba-3"] .ba3-unit,[data-c="ba-3"] .ba3-rows,
-  [data-c="ba-3"] .ba3-line,[data-c="ba-3"] .ba3-day{opacity:1;transform:none;animation:none}
+  [data-c="ba-3"] .ba3-boom{opacity:0;animation:none}
+  [data-c="ba-3"] .ba3-hero,[data-c="ba-3"] .ba3-unit,[data-c="ba-3"] .ba3-did,
+  [data-c="ba-3"] .ba3-rows,[data-c="ba-3"] .ba3-line,[data-c="ba-3"] .ba3-day{opacity:1;transform:none;animation:none}
 }
 </style>
 <div class="ph" data-c="ba-3">
   <div class="st">
 
     <div class="b b1" data-confetti>
+      <div class="ba3-boom"></div>
       <div class="ba3-hero" data-count="230|200">200</div>
       <div class="ba3-unit">lbs. The number you named.</div>
+      <div class="ba3-did">You actually did it.</div>
     </div>
 
     <div class="b b2">
-      <div class="ba3-rows">Started at <b>230</b>.<br><b>126</b> days.<br><b>215</b> weigh-ins.</div>
+      <div class="ba3-rows">Started at <b>230</b>.<br><b data-count="0|126">126</b> days.<br><b data-count="0|215">215</b> weigh-ins.</div>
     </div>
 
     <div class="b b3">

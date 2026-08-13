@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>BIG ASS CELEBRATIONS</title>
-<link rel="stylesheet" href="_kit.css?v=tw6">
+<link rel="stylesheet" href="_kit.css?v=tw7">
 </head><body data-accent="cyan">
 <div class="bar">
   <a href="index.html" style="color:var(--text-mid);text-decoration:none;font-size:13px;font-weight:600">&lsaquo; All</a>
@@ -11,48 +11,62 @@
   <span class="bar__n">their Memento colour drives every screen &middot; <b>tap a phone to advance or replay</b></span>
 </div>
 <div class="gal"><h1>BIG ASS CELEBRATIONS</h1><p class="gal__sub">The grand finale, the top of the reward pyramid: what fires the day someone reaches their MASSIVE goal. Five full options to pick from, every one driven by the same sliders across all four goal shapes that can finish (target hit, count done, duration held, event done). The Memento itself takes part: sealed, remembering, or wearing the colour. Fires ONCE, outranks everything, and the day it fires nothing else shows.</p><div class="grid"><div class="item"><p class="item__label"><span class="item__n">1</span><span class="item__name">The Seal</span><span class="vd vd--y" title="Changed since review / ungraded — needs your eyes">!</span></p><style>
-/* ba-1 "The Seal". The goal is achieved, then SEALED INTO the Memento. The
-   card is the third beat's whole stage: it rises, takes the accent, and the
-   goal's plain line engraves beneath it. The rf-card instinct, grown up. */
-[data-c="ba-1"] .ba1-line{font-size:34px;font-weight:700;letter-spacing:-.035em;line-height:1.1;
-  max-width:11ch;color:var(--text-hi)}
-[data-c="ba-1"] .b1.on .ba1-line{animation:ba1Up .5s cubic-bezier(.2,.8,.3,1) .1s both}
-[data-c="ba-1"] .ba1-done{margin-top:16px;font-size:14px;color:var(--text-mid)}
-[data-c="ba-1"] .b1.on .ba1-done{animation:ba1Up .5s cubic-bezier(.2,.8,.3,1) .5s both}
+/* ba-1 "The Seal". Beat 1 IS the explosion: the whole screen takes their
+   colour, the M lands, the goal line SLAMS in with a scale punch, confetti
+   storms. Beat 2 cuts to black for the receipts, counting up. Beat 3: the
+   Memento rises, blooms, and the goal is sealed beneath it forever. */
+[data-c="ba-1"] .ba1-flood{position:absolute;inset:0;background:var(--accent)}
+[data-c="ba-1"] .b1.on .ba1-flood{animation:ba1Flood .55s cubic-bezier(.2,.8,.3,1) both}
+@keyframes ba1Flood{from{opacity:0;transform:scale(1.06)}to{opacity:1;transform:none}}
+[data-c="ba-1"] .ba1-m{position:relative;width:64px;height:64px;fill:#0b0e12;opacity:.9}
+[data-c="ba-1"] .b1.on .ba1-m{animation:ba1Drop .5s cubic-bezier(.2,.85,.3,1) .12s both}
+@keyframes ba1Drop{from{opacity:0;transform:translateY(-14px)}to{opacity:.9;transform:none}}
+[data-c="ba-1"] .ba1-line{position:relative;margin-top:26px;font-size:44px;font-weight:750;
+  letter-spacing:-.04em;line-height:1.04;max-width:10ch;color:#0b0e12}
+[data-c="ba-1"] .b1.on .ba1-line{animation:ba1Slam .55s cubic-bezier(.16,1.3,.3,1) .5s both}
+@keyframes ba1Slam{from{opacity:0;transform:scale(1.35)}to{opacity:1;transform:scale(1)}}
+[data-c="ba-1"] .ba1-done{position:relative;margin-top:18px;font-size:15.5px;font-weight:650;
+  color:rgba(11,14,18,.78)}
+[data-c="ba-1"] .b1.on .ba1-done{animation:ba1Up .5s cubic-bezier(.2,.8,.3,1) 1.05s both}
 @keyframes ba1Up{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
 
-[data-c="ba-1"] .ba1-cost{font-size:15px;line-height:1.8;color:var(--text-mid);letter-spacing:-.01em}
-[data-c="ba-1"] .ba1-cost b{color:var(--text-hi);font-variant-numeric:tabular-nums}
-[data-c="ba-1"] .b2.on .ba1-cost{animation:ba1Up .5s cubic-bezier(.2,.8,.3,1) .2s both}
+[data-c="ba-1"] .ba1-cost{font-size:19px;line-height:2.05;color:var(--text-mid);letter-spacing:-.012em}
+[data-c="ba-1"] .ba1-cost b{color:var(--text-hi);font-size:26px;font-variant-numeric:tabular-nums}
+[data-c="ba-1"] .b2.on .ba1-cost{animation:ba1Up .55s cubic-bezier(.2,.8,.3,1) .2s both}
 
-[data-c="ba-1"] .ba1-card{position:relative;width:132px;height:172px;border-radius:18px;
-  background:linear-gradient(165deg,rgba(var(--ink),.10),rgba(var(--ink),.04) 55%,rgba(var(--ink),.07));
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.10), 0 0 54px rgba(var(--accent-rgb),.30),
-    0 18px 44px rgba(0,0,0,.5);
+[data-c="ba-1"] .ba1-card{position:relative;width:148px;height:192px;border-radius:20px;
+  background:linear-gradient(165deg,rgba(var(--ink),.11),rgba(var(--ink),.04) 55%,rgba(var(--ink),.07));
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.10), 0 0 74px rgba(var(--accent-rgb),.38),
+    0 22px 54px rgba(0,0,0,.55);
   display:flex;align-items:center;justify-content:center}
-[data-c="ba-1"] .ba1-card svg{width:44px;height:44px;fill:var(--accent)}
-[data-c="ba-1"] .b3.on .ba1-card{animation:ba1Rise .8s cubic-bezier(.2,.85,.25,1) both}
-@keyframes ba1Rise{from{opacity:0;transform:translateY(26px) scale(.94)}to{opacity:1;transform:none}}
-[data-c="ba-1"] .ba1-etch{margin-top:24px;font-size:15.5px;font-weight:600;letter-spacing:-.01em;
+[data-c="ba-1"] .ba1-card svg{width:50px;height:50px;fill:var(--accent)}
+[data-c="ba-1"] .b3.on .ba1-card{animation:ba1Rise .9s cubic-bezier(.16,1.2,.3,1) both}
+@keyframes ba1Rise{from{opacity:0;transform:translateY(34px) scale(.9)}to{opacity:1;transform:none}}
+[data-c="ba-1"] .b3.on .ba1-card svg{animation:ba1MPop .7s cubic-bezier(.2,.9,.25,1) .5s both}
+@keyframes ba1MPop{0%{transform:scale(1)}45%{transform:scale(1.18)}100%{transform:scale(1)}}
+[data-c="ba-1"] .ba1-etch{margin-top:26px;font-size:17px;font-weight:650;letter-spacing:-.012em;
   color:var(--text-hi)}
-[data-c="ba-1"] .ba1-sealed{margin-top:8px;font-size:12.5px;color:var(--text-lo)}
-[data-c="ba-1"] .b3.on .ba1-etch{animation:ba1Up .55s cubic-bezier(.2,.8,.3,1) .55s both}
-[data-c="ba-1"] .b3.on .ba1-sealed{animation:ba1Up .55s cubic-bezier(.2,.8,.3,1) .85s both}
+[data-c="ba-1"] .ba1-sealed{margin-top:9px;font-size:13px;color:var(--text-lo)}
+[data-c="ba-1"] .b3.on .ba1-etch{animation:ba1Up .55s cubic-bezier(.2,.8,.3,1) .6s both}
+[data-c="ba-1"] .b3.on .ba1-sealed{animation:ba1Up .55s cubic-bezier(.2,.8,.3,1) .95s both}
 @media (prefers-reduced-motion:reduce){
-  [data-c="ba-1"] .ba1-line,[data-c="ba-1"] .ba1-done,[data-c="ba-1"] .ba1-cost,
-  [data-c="ba-1"] .ba1-card,[data-c="ba-1"] .ba1-etch,[data-c="ba-1"] .ba1-sealed{opacity:1;transform:none;animation:none}
+  [data-c="ba-1"] .ba1-flood,[data-c="ba-1"] .ba1-m,[data-c="ba-1"] .ba1-line,
+  [data-c="ba-1"] .ba1-done,[data-c="ba-1"] .ba1-cost,[data-c="ba-1"] .ba1-card,
+  [data-c="ba-1"] .ba1-etch,[data-c="ba-1"] .ba1-sealed{opacity:1;transform:none;animation:none}
 }
 </style>
 <div class="ph" data-c="ba-1">
   <div class="st">
 
     <div class="b b1" data-confetti>
+      <div class="ba1-flood"></div>
+      <svg class="ba1-m" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
       <div class="ba1-line">Lost 30 lbs.</div>
-      <div class="ba1-done">The goal you set is done.</div>
+      <div class="ba1-done">You actually did it.</div>
     </div>
 
     <div class="b b2">
-      <div class="ba1-cost"><b>126</b> days.<br><b>215</b> weigh-ins.<br>230 &rarr; <b>200</b>.</div>
+      <div class="ba1-cost"><b data-count="0|126">126</b> days.<br><b data-count="0|215">215</b> weigh-ins.<br>230 &rarr; <b>200</b>.</div>
     </div>
 
     <div class="b b3">
@@ -66,56 +80,65 @@
   <div class="hint">Tap to replay</div>
 </div>
 <p class="item__note">The goal lands with confetti, the receipts follow, and then the Memento rises and the goal's plain line is sealed beneath it. The rf-card instinct done properly: the card owns the moment instead of decorating it.</p></div><div class="item"><p class="item__label"><span class="item__n">2</span><span class="item__name">The Return</span><span class="vd vd--y" title="Changed since review / ungraded — needs your eyes">!</span></p><style>
-/* ba-2 "The Return". The card replays its own life before taking the win:
-   blank, then cyan (the day you found clarity), white (the day you acted),
-   green (the days you kept going), and finally THEIR accent, now. His
-   original arc, made the ceremony. One prop, four true chapters. */
-[data-c="ba-2"] .ba2-card{position:relative;width:126px;height:164px;border-radius:17px;
-  background:rgba(var(--ink),.05);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.09), 0 16px 40px rgba(0,0,0,.5);
-  display:flex;align-items:center;justify-content:center}
-[data-c="ba-2"] .ba2-card svg{width:40px;height:40px;fill:rgba(235,238,248,.9);position:relative}
-[data-c="ba-2"] .ba2-face{position:absolute;inset:0;border-radius:17px;opacity:0}
-[data-c="ba-2"] .b1.on .ba2-f1{animation:ba2Face 1s ease-out .7s both;background:rgba(43,212,212,.34)}
-[data-c="ba-2"] .b1.on .ba2-f2{animation:ba2Face 1s ease-out 1.7s both;background:rgba(255,255,255,.30)}
-[data-c="ba-2"] .b1.on .ba2-f3{animation:ba2Face 1s ease-out 2.7s both;background:rgba(63,217,78,.32)}
-[data-c="ba-2"] .b1.on .ba2-f4{animation:ba2Hold .9s ease-out 3.7s both;background:rgba(var(--accent-rgb),.40)}
-@keyframes ba2Face{0%{opacity:0}30%{opacity:1}100%{opacity:0}}
-@keyframes ba2Hold{from{opacity:0}to{opacity:1}}
-[data-c="ba-2"] .b1.on .ba2-card{animation:ba2Glow .9s ease-out 3.7s both}
-@keyframes ba2Glow{to{box-shadow:inset 0 1px 0 rgba(var(--ink),.09), 0 0 52px rgba(var(--accent-rgb),.32), 0 16px 40px rgba(0,0,0,.5)}}
-[data-c="ba-2"] .ba2-chap{margin-top:26px;font-size:13px;color:var(--text-lo);min-height:18px}
-[data-c="ba-2"] .b1.on .ba2-chap{animation:ba2Up .5s ease-out 4.2s both}
-[data-c="ba-2"] .ba2-cost{font-size:15px;line-height:1.8;color:var(--text-mid)}
-[data-c="ba-2"] .ba2-cost b{color:var(--text-hi);font-variant-numeric:tabular-nums}
-[data-c="ba-2"] .b2.on .ba2-cost{animation:ba2Up .5s ease-out .2s both}
-[data-c="ba-2"] .ba2-line{font-size:26px;font-weight:700;letter-spacing:-.03em;max-width:12ch;color:var(--text-hi)}
+/* ba-2 "The Return". The WHOLE SCREEN replays the journey: it washes cyan
+   (the day you found clarity), white (the day you moved), green (the days
+   you kept going), then floods THEIR colour and stays, the M landing dark
+   on it. His original arc, full bleed. Then the receipts, then the seal. */
+[data-c="ba-2"] .ba2-wash{position:absolute;inset:0;opacity:0}
+[data-c="ba-2"] .b1.on .ba2-w1{animation:ba2Wash 1.15s ease-in-out .5s both;background:#2bd4d4}
+[data-c="ba-2"] .b1.on .ba2-w2{animation:ba2Wash 1.15s ease-in-out 1.55s both;background:#eef1f8}
+[data-c="ba-2"] .b1.on .ba2-w3{animation:ba2Wash 1.15s ease-in-out 2.6s both;background:#3fd94e}
+[data-c="ba-2"] .b1.on .ba2-w4{animation:ba2Stay .8s cubic-bezier(.2,.8,.3,1) 3.65s both;background:var(--accent)}
+@keyframes ba2Wash{0%{opacity:0}35%{opacity:1}100%{opacity:0}}
+@keyframes ba2Stay{from{opacity:0}to{opacity:1}}
+[data-c="ba-2"] .ba2-chap{position:relative;font-size:14.5px;font-weight:600;color:var(--text-hi);
+  min-height:20px}
+[data-c="ba-2"] .ba2-c{position:absolute;left:50%;transform:translateX(-50%);white-space:nowrap;opacity:0}
+[data-c="ba-2"] .b1.on .ba2-c1{animation:ba2Cap 1.15s ease-in-out .5s both}
+[data-c="ba-2"] .b1.on .ba2-c2{animation:ba2Cap 1.15s ease-in-out 1.55s both;color:#0b0e12}
+[data-c="ba-2"] .b1.on .ba2-c3{animation:ba2Cap 1.15s ease-in-out 2.6s both;color:#0b0e12}
+@keyframes ba2Cap{0%{opacity:0;transform:translate(-50%,7px)}30%{opacity:1;transform:translate(-50%,0)}80%{opacity:1}100%{opacity:0}}
+[data-c="ba-2"] .ba2-m{position:relative;width:70px;height:70px;fill:#0b0e12;margin-bottom:24px;opacity:0}
+[data-c="ba-2"] .b1.on .ba2-m{animation:ba2MIn .6s cubic-bezier(.16,1.2,.3,1) 3.9s both}
+@keyframes ba2MIn{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
+[data-c="ba-2"] .ba2-now{position:relative;font-size:30px;font-weight:750;letter-spacing:-.035em;
+  color:#0b0e12;opacity:0;max-width:11ch}
+[data-c="ba-2"] .b1.on .ba2-now{animation:ba2MIn .55s cubic-bezier(.16,1.2,.3,1) 4.25s both}
+
+[data-c="ba-2"] .ba2-cost{font-size:19px;line-height:2.05;color:var(--text-mid)}
+[data-c="ba-2"] .ba2-cost b{color:var(--text-hi);font-size:26px;font-variant-numeric:tabular-nums}
+[data-c="ba-2"] .b2.on .ba2-cost{animation:ba2Up .55s ease-out .2s both}
+[data-c="ba-2"] .ba2-line{font-size:30px;font-weight:750;letter-spacing:-.032em;max-width:11ch;color:var(--text-hi)}
 [data-c="ba-2"] .b3.on .ba2-line{animation:ba2Up .5s ease-out .15s both}
-[data-c="ba-2"] .ba2-rem{margin-top:14px;font-size:13.5px;color:var(--text-mid)}
-[data-c="ba-2"] .b3.on .ba2-rem{animation:ba2Up .5s ease-out .5s both}
-@keyframes ba2Up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+[data-c="ba-2"] .ba2-rem{margin-top:15px;font-size:14px;color:var(--text-mid)}
+[data-c="ba-2"] .b3.on .ba2-rem{animation:ba2Up .5s ease-out .55s both}
+@keyframes ba2Up{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){
-  [data-c="ba-2"] .ba2-face{opacity:0}
-  [data-c="ba-2"] .ba2-f4{opacity:1}
-  [data-c="ba-2"] .ba2-chap,[data-c="ba-2"] .ba2-cost,[data-c="ba-2"] .ba2-line,[data-c="ba-2"] .ba2-rem{opacity:1;transform:none;animation:none}
+  [data-c="ba-2"] .ba2-wash,[data-c="ba-2"] .ba2-c{opacity:0;animation:none}
+  [data-c="ba-2"] .ba2-w4{opacity:1}
+  [data-c="ba-2"] .ba2-m,[data-c="ba-2"] .ba2-now,[data-c="ba-2"] .ba2-cost,
+  [data-c="ba-2"] .ba2-line,[data-c="ba-2"] .ba2-rem{opacity:1;transform:none;animation:none}
 }
 </style>
 <div class="ph" data-c="ba-2">
   <div class="st">
 
-    <div class="b b1">
-      <div class="ba2-card">
-        <div class="ba2-face ba2-f1"></div>
-        <div class="ba2-face ba2-f2"></div>
-        <div class="ba2-face ba2-f3"></div>
-        <div class="ba2-face ba2-f4"></div>
-        <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+    <div class="b b1" data-confetti>
+      <div class="ba2-wash ba2-w1"></div>
+      <div class="ba2-wash ba2-w2"></div>
+      <div class="ba2-wash ba2-w3"></div>
+      <div class="ba2-wash ba2-w4"></div>
+      <svg class="ba2-m" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+      <div class="ba2-now">Lost 30 lbs.</div>
+      <div class="ba2-chap">
+        <span class="ba2-c ba2-c1">The day you saw it.</span>
+        <span class="ba2-c ba2-c2">The day you moved.</span>
+        <span class="ba2-c ba2-c3">The days you kept going.</span>
       </div>
-      <div class="ba2-chap">The day you saw it. The day you moved. The days you kept going.</div>
     </div>
 
-    <div class="b b2" data-confetti>
-      <div class="ba2-cost"><b>126</b> days.<br><b>215</b> weigh-ins.<br>230 &rarr; <b>200</b>.</div>
+    <div class="b b2">
+      <div class="ba2-cost"><b data-count="0|126">126</b> days.<br><b data-count="0|215">215</b> weigh-ins.<br>230 &rarr; <b>200</b>.</div>
     </div>
 
     <div class="b b3">
@@ -128,41 +151,53 @@
   <div class="hint">Tap to replay</div>
 </div>
 <p class="item__note">The card replays its own life first: cyan for the day you found clarity, white for the day you acted, green for the days you kept going, then THEIR accent, now. His original colour arc, made the ceremony. The receipts carry the confetti beat.</p></div><div class="item"><p class="item__label"><span class="item__n">3</span><span class="item__name">The Weight</span><span class="vd vd--y" title="Changed since review / ungraded — needs your eyes">!</span></p><style>
-/* ba-3 "The Weight". No props at all: darkness, scale, and the number they
-   actually reached, counting up to fill the screen. The loudest thing here
-   is restraint. Special = motion, scale, darkness, never a new language. */
-[data-c="ba-3"] .ba3-hero{font-size:96px;font-weight:750;letter-spacing:-.05em;line-height:1;
-  color:var(--text-hi);font-variant-numeric:tabular-nums}
-[data-c="ba-3"] .ba3-unit{margin-top:12px;font-size:16px;color:var(--text-mid)}
-[data-c="ba-3"] .b1.on .ba3-hero{animation:ba3In .7s cubic-bezier(.2,.85,.25,1) both}
-[data-c="ba-3"] .b1.on .ba3-unit{animation:ba3Up .5s ease-out .55s both}
-@keyframes ba3In{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:none}}
-@keyframes ba3Up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+/* ba-3 "The Weight". The number they reached, ENORMOUS on black, counting
+   up; the instant it lands the whole screen detonates into their colour
+   (a full flood pulse) and the confetti pours. Scale + darkness + one
+   detonation, no props. */
+[data-c="ba-3"] .ba3-hero{position:relative;font-size:128px;font-weight:750;letter-spacing:-.055em;
+  line-height:1;color:var(--text-hi);font-variant-numeric:tabular-nums}
+[data-c="ba-3"] .b1.on .ba3-hero{animation:ba3In .8s cubic-bezier(.16,1.15,.3,1) both}
+@keyframes ba3In{from{opacity:0;transform:scale(.86)}to{opacity:1;transform:none}}
+/* the detonation: a full-screen flood that pulses in as the count lands */
+[data-c="ba-3"] .ba3-boom{position:absolute;inset:0;background:var(--accent);opacity:0}
+[data-c="ba-3"] .b1.on .ba3-boom{animation:ba3Boom 1s cubic-bezier(.2,.8,.3,1) 1.35s both}
+@keyframes ba3Boom{0%{opacity:0}30%{opacity:1}100%{opacity:0}}
+[data-c="ba-3"] .ba3-unit{position:relative;margin-top:16px;font-size:17px;font-weight:600;color:var(--text-mid)}
+[data-c="ba-3"] .b1.on .ba3-unit{animation:ba3Up .5s ease-out 1.5s both}
+[data-c="ba-3"] .ba3-did{position:relative;margin-top:22px;font-size:20px;font-weight:700;
+  letter-spacing:-.02em;color:var(--accent)}
+[data-c="ba-3"] .b1.on .ba3-did{animation:ba3Slam .55s cubic-bezier(.16,1.3,.3,1) 1.75s both}
+@keyframes ba3Slam{from{opacity:0;transform:scale(1.3)}to{opacity:1;transform:scale(1)}}
+@keyframes ba3Up{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
 
-[data-c="ba-3"] .ba3-rows{font-size:15px;line-height:2.05;color:var(--text-mid);letter-spacing:-.01em}
-[data-c="ba-3"] .ba3-rows b{color:var(--text-hi);font-variant-numeric:tabular-nums}
+[data-c="ba-3"] .ba3-rows{font-size:19px;line-height:2.05;color:var(--text-mid);letter-spacing:-.012em}
+[data-c="ba-3"] .ba3-rows b{color:var(--text-hi);font-size:26px;font-variant-numeric:tabular-nums}
 [data-c="ba-3"] .b2.on .ba3-rows{animation:ba3Up .55s ease-out .2s both}
 
 [data-c="ba-3"] .ba3-rule{width:36px;height:1px;background:rgba(235,238,248,.18);margin-bottom:20px}
-[data-c="ba-3"] .ba3-line{font-size:24px;font-weight:700;letter-spacing:-.028em;max-width:12ch;color:var(--text-hi)}
+[data-c="ba-3"] .ba3-line{font-size:28px;font-weight:750;letter-spacing:-.03em;max-width:11ch;color:var(--text-hi)}
 [data-c="ba-3"] .b3.on .ba3-line{animation:ba3Up .5s ease-out .2s both}
-[data-c="ba-3"] .ba3-day{margin-top:12px;font-size:13px;color:var(--text-lo)}
+[data-c="ba-3"] .ba3-day{margin-top:13px;font-size:13.5px;color:var(--text-lo)}
 [data-c="ba-3"] .b3.on .ba3-day{animation:ba3Up .5s ease-out .55s both}
 @media (prefers-reduced-motion:reduce){
-  [data-c="ba-3"] .ba3-hero,[data-c="ba-3"] .ba3-unit,[data-c="ba-3"] .ba3-rows,
-  [data-c="ba-3"] .ba3-line,[data-c="ba-3"] .ba3-day{opacity:1;transform:none;animation:none}
+  [data-c="ba-3"] .ba3-boom{opacity:0;animation:none}
+  [data-c="ba-3"] .ba3-hero,[data-c="ba-3"] .ba3-unit,[data-c="ba-3"] .ba3-did,
+  [data-c="ba-3"] .ba3-rows,[data-c="ba-3"] .ba3-line,[data-c="ba-3"] .ba3-day{opacity:1;transform:none;animation:none}
 }
 </style>
 <div class="ph" data-c="ba-3">
   <div class="st">
 
     <div class="b b1" data-confetti>
+      <div class="ba3-boom"></div>
       <div class="ba3-hero" data-count="230|200">200</div>
       <div class="ba3-unit">lbs. The number you named.</div>
+      <div class="ba3-did">You actually did it.</div>
     </div>
 
     <div class="b b2">
-      <div class="ba3-rows">Started at <b>230</b>.<br><b>126</b> days.<br><b>215</b> weigh-ins.</div>
+      <div class="ba3-rows">Started at <b>230</b>.<br><b data-count="0|126">126</b> days.<br><b data-count="0|215">215</b> weigh-ins.</div>
     </div>
 
     <div class="b b3">
@@ -176,36 +211,43 @@
   <div class="hint">Tap to replay</div>
 </div>
 <p class="item__note">No props: darkness, scale, and the number they actually reached counting up. The restraint option; special = motion, scale, darkness, never a new language.</p></div><div class="item"><p class="item__label"><span class="item__n">4</span><span class="item__name">The Flood</span><span class="vd vd--y" title="Changed since review / ungraded — needs your eyes">!</span></p><style>
-/* ba-4 "The Flood". The milestone family's full-colour land beat, grown to
-   the top of the pyramid: the whole screen takes their accent with the dark
-   M, and afterwards the Memento WEARS the colour. The card ends changed. */
+/* ba-4 "The Flood". The milestone land beat at maximum: the whole screen
+   takes their colour, the M lands huge, the goal line slams, and the
+   ENGINE numbers count up right on the flood in dark ink. Afterwards the
+   Memento wears the colour, changed for good. */
 [data-c="ba-4"] .ba4-flood{position:absolute;inset:0;background:var(--accent)}
-[data-c="ba-4"] .b1.on .ba4-flood{animation:ba4Flood .6s cubic-bezier(.2,.8,.3,1) both}
-@keyframes ba4Flood{from{opacity:0;transform:scale(1.05)}to{opacity:1;transform:none}}
-[data-c="ba-4"] .ba4-m{position:relative;width:84px;height:84px;fill:#0b0e12}
-[data-c="ba-4"] .b1.on .ba4-m{animation:ba4Up .5s cubic-bezier(.2,.8,.3,1) .16s both}
-[data-c="ba-4"] .ba4-word{position:relative;margin-top:28px;font-size:31px;font-weight:700;
-  letter-spacing:-.035em;line-height:1.08;color:rgba(11,14,18,.95);max-width:11ch}
-[data-c="ba-4"] .b1.on .ba4-word{animation:ba4Up .5s cubic-bezier(.2,.8,.3,1) .7s both}
-@keyframes ba4Up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+[data-c="ba-4"] .b1.on .ba4-flood{animation:ba4Flood .55s cubic-bezier(.2,.8,.3,1) both}
+@keyframes ba4Flood{from{opacity:0;transform:scale(1.06)}to{opacity:1;transform:none}}
+[data-c="ba-4"] .ba4-m{position:relative;width:96px;height:96px;fill:#0b0e12}
+[data-c="ba-4"] .b1.on .ba4-m{animation:ba4MIn .6s cubic-bezier(.16,1.25,.3,1) .15s both}
+@keyframes ba4MIn{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:scale(1)}}
+[data-c="ba-4"] .ba4-word{position:relative;margin-top:26px;font-size:40px;font-weight:750;
+  letter-spacing:-.038em;line-height:1.06;color:#0b0e12;max-width:10ch}
+[data-c="ba-4"] .b1.on .ba4-word{animation:ba4Slam .55s cubic-bezier(.16,1.3,.3,1) .62s both}
+@keyframes ba4Slam{from{opacity:0;transform:scale(1.32)}to{opacity:1;transform:scale(1)}}
+[data-c="ba-4"] .ba4-engine{position:relative;margin-top:26px;font-size:16px;font-weight:650;
+  line-height:1.95;color:rgba(11,14,18,.82)}
+[data-c="ba-4"] .ba4-engine b{font-size:21px;color:#0b0e12;font-variant-numeric:tabular-nums}
+[data-c="ba-4"] .b1.on .ba4-engine{animation:ba4Up .55s cubic-bezier(.2,.8,.3,1) 1.15s both}
+@keyframes ba4Up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
-[data-c="ba-4"] .ba4-cost{font-size:15px;line-height:1.85;color:var(--text-mid)}
-[data-c="ba-4"] .ba4-cost b{color:var(--text-hi);font-variant-numeric:tabular-nums}
+[data-c="ba-4"] .ba4-cost{font-size:19px;line-height:2.05;color:var(--text-mid)}
+[data-c="ba-4"] .ba4-cost b{color:var(--text-hi);font-size:26px;font-variant-numeric:tabular-nums}
 [data-c="ba-4"] .b2.on .ba4-cost{animation:ba4Up .5s ease-out .2s both}
 
-[data-c="ba-4"] .ba4-card{position:relative;width:110px;height:144px;border-radius:15px;
-  background:rgba(var(--accent-rgb),.30);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.12), 0 0 46px rgba(var(--accent-rgb),.30),
-    0 14px 36px rgba(0,0,0,.5);
+[data-c="ba-4"] .ba4-card{position:relative;width:124px;height:160px;border-radius:17px;
+  background:rgba(var(--accent-rgb),.32);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.13), 0 0 58px rgba(var(--accent-rgb),.34),
+    0 16px 42px rgba(0,0,0,.5);
   display:flex;align-items:center;justify-content:center}
-[data-c="ba-4"] .ba4-card svg{width:36px;height:36px;fill:var(--accent)}
-[data-c="ba-4"] .b3.on .ba4-card{animation:ba4Rise .7s cubic-bezier(.2,.85,.25,1) both}
-@keyframes ba4Rise{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
-[data-c="ba-4"] .ba4-wear{margin-top:22px;font-size:14px;color:var(--text-mid)}
+[data-c="ba-4"] .ba4-card svg{width:40px;height:40px;fill:var(--accent)}
+[data-c="ba-4"] .b3.on .ba4-card{animation:ba4Rise .8s cubic-bezier(.16,1.2,.3,1) both}
+@keyframes ba4Rise{from{opacity:0;transform:translateY(24px) scale(.92)}to{opacity:1;transform:none}}
+[data-c="ba-4"] .ba4-wear{margin-top:24px;font-size:14.5px;color:var(--text-mid)}
 [data-c="ba-4"] .b3.on .ba4-wear{animation:ba4Up .5s ease-out .5s both}
 @media (prefers-reduced-motion:reduce){
-  [data-c="ba-4"] .ba4-m,[data-c="ba-4"] .ba4-word,[data-c="ba-4"] .ba4-cost,
-  [data-c="ba-4"] .ba4-card,[data-c="ba-4"] .ba4-wear{opacity:1;transform:none;animation:none}
+  [data-c="ba-4"] .ba4-m,[data-c="ba-4"] .ba4-word,[data-c="ba-4"] .ba4-engine,
+  [data-c="ba-4"] .ba4-cost,[data-c="ba-4"] .ba4-card,[data-c="ba-4"] .ba4-wear{opacity:1;transform:none;animation:none}
 }
 </style>
 <div class="ph" data-c="ba-4">
@@ -215,10 +257,11 @@
       <div class="ba4-flood"></div>
       <svg class="ba4-m" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg>
       <div class="ba4-word">Lost 30 lbs.</div>
+      <div class="ba4-engine"><b data-count="0|126">126</b> days &middot; <b data-count="0|215">215</b> weigh-ins</div>
     </div>
 
     <div class="b b2">
-      <div class="ba4-cost"><b>126</b> days.<br><b>215</b> weigh-ins.<br>230 &rarr; <b>200</b>.</div>
+      <div class="ba4-cost"><b data-count="0|126">126</b> days.<br><b data-count="0|215">215</b> weigh-ins.<br>230 &rarr; <b>200</b>.</div>
     </div>
 
     <div class="b b3">
@@ -231,40 +274,51 @@
   <div class="hint">Tap to replay</div>
 </div>
 <p class="item__note">The milestone land beat grown to the top of the pyramid: full accent flood, dark M, their goal line. Afterwards the Memento WEARS the colour, the card ends changed.</p></div><div class="item"><p class="item__label"><span class="item__n">5</span><span class="item__name">The Road Closes</span><span class="vd vd--y" title="Changed since review / ungraded — needs your eyes">!</span></p><style>
-/* ba-5 "The Road Closes". The whole road they walked, drawn one last time:
-   every mark they ever passed lights in order, the end post takes the
-   accent, and the goal closes. The receipts ARE the ceremony. */
-[data-c="ba-5"] .ba5-road{width:100%;max-width:270px;position:relative;height:64px}
-[data-c="ba-5"] .ba5-track{position:absolute;left:0;right:0;top:30px;height:2px;border-radius:2px;
+/* ba-5 "The Road Closes". The whole road they walked redraws fast, every
+   mark relighting in order; when the line hits the end post the screen
+   ERUPTS from that point, a radial burst of their colour swallowing the
+   phone, and the goal closes on the flood. The receipts follow on dark. */
+[data-c="ba-5"] .ba5-road{width:100%;max-width:280px;position:relative;height:64px}
+[data-c="ba-5"] .ba5-track{position:absolute;left:0;right:0;top:30px;height:2.5px;border-radius:2px;
   background:rgba(var(--ink),.14)}
-[data-c="ba-5"] .ba5-fill{position:absolute;left:0;top:30px;height:2px;border-radius:2px;width:0;
+[data-c="ba-5"] .ba5-fill{position:absolute;left:0;top:30px;height:2.5px;border-radius:2px;width:0;
   background:var(--accent)}
-[data-c="ba-5"] .b1.on .ba5-fill{animation:ba5Fill 1.9s cubic-bezier(.3,.6,.25,1) .4s forwards}
+[data-c="ba-5"] .b1.on .ba5-fill{animation:ba5Fill 1.5s cubic-bezier(.3,.6,.25,1) .3s forwards}
 @keyframes ba5Fill{to{width:100%}}
-[data-c="ba-5"] .ba5-mk{position:absolute;top:24px;width:2.5px;height:14px;border-radius:2px;
-  background:rgba(var(--ink),.30);opacity:0}
-[data-c="ba-5"] .b1.on .ba5-mk{animation:ba5Mk .4s ease-out forwards}
-[data-c="ba-5"] .ba5-end{position:absolute;right:-1px;top:18px;width:3px;height:26px;border-radius:2px;
+[data-c="ba-5"] .ba5-mk{position:absolute;top:23px;width:2.5px;height:16px;border-radius:2px;
+  background:rgba(var(--ink),.34);opacity:0}
+[data-c="ba-5"] .b1.on .ba5-mk{animation:ba5Mk .35s ease-out forwards}
+@keyframes ba5Mk{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+[data-c="ba-5"] .ba5-end{position:absolute;right:-1px;top:16px;width:3.5px;height:30px;border-radius:2px;
   background:var(--accent);opacity:0}
-[data-c="ba-5"] .b1.on .ba5-end{animation:ba5Mk .5s ease-out 2.15s forwards}
-@keyframes ba5Mk{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
-[data-c="ba-5"] .ba5-ends{display:flex;justify-content:space-between;width:100%;max-width:270px;
-  font-size:12.5px;color:var(--text-lo);font-variant-numeric:tabular-nums}
+[data-c="ba-5"] .b1.on .ba5-end{animation:ba5Mk .4s ease-out 1.8s forwards}
+/* the eruption: a circle born at the end post that swallows the screen */
+[data-c="ba-5"] .ba5-burst{position:absolute;right:34px;top:50%;width:20px;height:20px;margin-top:-10px;
+  border-radius:50%;background:var(--accent);opacity:0;transform:scale(0)}
+[data-c="ba-5"] .b1.on .ba5-burst{animation:ba5Burst 1s cubic-bezier(.2,.75,.3,1) 2s forwards}
+@keyframes ba5Burst{0%{opacity:1;transform:scale(0)}100%{opacity:1;transform:scale(60)}}
+[data-c="ba-5"] .ba5-closed{position:relative;margin-top:30px;font-size:34px;font-weight:750;
+  letter-spacing:-.035em;line-height:1.06;color:#0b0e12;max-width:11ch;opacity:0}
+[data-c="ba-5"] .b1.on .ba5-closed{animation:ba5Slam .55s cubic-bezier(.16,1.3,.3,1) 2.55s both}
+@keyframes ba5Slam{from{opacity:0;transform:scale(1.3)}to{opacity:1;transform:scale(1)}}
+[data-c="ba-5"] .ba5-ends{position:relative;display:flex;justify-content:space-between;width:100%;max-width:280px;
+  font-size:13px;color:var(--text-lo);font-variant-numeric:tabular-nums;margin-top:10px}
 [data-c="ba-5"] .ba5-ends b{color:var(--text-hi);font-weight:700}
-[data-c="ba-5"] .ba5-walked{margin-top:26px;font-size:14px;color:var(--text-mid)}
-[data-c="ba-5"] .b1.on .ba5-walked{animation:ba5Up .5s ease-out 2.5s both}
-[data-c="ba-5"] .ba5-cost{font-size:15px;line-height:1.85;color:var(--text-mid)}
-[data-c="ba-5"] .ba5-cost b{color:var(--text-hi);font-variant-numeric:tabular-nums}
-[data-c="ba-5"] .b2.on .ba5-cost{animation:ba5Up .5s ease-out .2s both}
-[data-c="ba-5"] .ba5-line{font-size:24px;font-weight:700;letter-spacing:-.028em;max-width:12ch;color:var(--text-hi)}
+[data-c="ba-5"] .b1.on .ba5-ends{animation:ba5Fade 2.4s ease-out both}
+@keyframes ba5Fade{0%{opacity:0}12%{opacity:1}82%{opacity:1}100%{opacity:0}}
+[data-c="ba-5"] .ba5-cost{font-size:19px;line-height:2.05;color:var(--text-mid)}
+[data-c="ba-5"] .ba5-cost b{color:var(--text-hi);font-size:26px;font-variant-numeric:tabular-nums}
+[data-c="ba-5"] .b2.on .ba5-cost{animation:ba5Up .55s ease-out .2s both}
+[data-c="ba-5"] .ba5-line{font-size:28px;font-weight:750;letter-spacing:-.03em;max-width:11ch;color:var(--text-hi)}
 [data-c="ba-5"] .b3.on .ba5-line{animation:ba5Up .5s ease-out .15s both}
-[data-c="ba-5"] .ba5-close{margin-top:13px;font-size:13.5px;color:var(--text-mid)}
+[data-c="ba-5"] .ba5-close{margin-top:14px;font-size:14px;color:var(--text-mid)}
 [data-c="ba-5"] .b3.on .ba5-close{animation:ba5Up .5s ease-out .5s both}
-@keyframes ba5Up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes ba5Up{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){
   [data-c="ba-5"] .ba5-fill{width:100%}
-  [data-c="ba-5"] .ba5-mk,[data-c="ba-5"] .ba5-end{opacity:1}
-  [data-c="ba-5"] .ba5-walked,[data-c="ba-5"] .ba5-cost,[data-c="ba-5"] .ba5-line,[data-c="ba-5"] .ba5-close{opacity:1;transform:none;animation:none}
+  [data-c="ba-5"] .ba5-mk,[data-c="ba-5"] .ba5-end,[data-c="ba-5"] .ba5-ends{opacity:1;animation:none}
+  [data-c="ba-5"] .ba5-burst{opacity:1;transform:scale(60);animation:none}
+  [data-c="ba-5"] .ba5-closed,[data-c="ba-5"] .ba5-cost,[data-c="ba-5"] .ba5-line,[data-c="ba-5"] .ba5-close{opacity:1;transform:none;animation:none}
 }
 </style>
 <div class="ph" data-c="ba-5">
@@ -278,11 +332,12 @@
         <div class="ba5-end"></div>
       </div>
       <div class="ba5-ends"><span><b>230</b> started</span><span><b>200</b> today</span></div>
-      <div class="ba5-walked">Every mark on this road is yours.</div>
+      <div class="ba5-burst"></div>
+      <div class="ba5-closed">Lost 30 lbs.</div>
     </div>
 
     <div class="b b2">
-      <div class="ba5-cost"><b>4</b> marks passed.<br><b>126</b> days.<br><b>215</b> weigh-ins.</div>
+      <div class="ba5-cost"><b>4</b> marks passed.<br><b data-count="0|126">126</b> days.<br><b data-count="0|215">215</b> weigh-ins.</div>
     </div>
 
     <div class="b b3">
@@ -295,6 +350,6 @@
   <div class="hint">Tap to replay</div>
 </div>
 <p class="item__note">The whole road drawn one last time, every mark they passed lighting in order, the end post taking the accent. Then: this goal closes, the record stays. The receipts ARE the ceremony.</p></div></div></div>
-<script src="chooser.js?v=tw6"></script><script src="_kit.js?v=tw6"></script><script src="_tweaks.js?v=tw6"></script>
+<script src="chooser.js?v=tw7"></script><script src="_kit.js?v=tw7"></script><script src="_tweaks.js?v=tw7"></script>
 <script>CEL.init(); if (window.CEL_TWEAKS) CEL_TWEAKS.init();</script>
 </body></html>

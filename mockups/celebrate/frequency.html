@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Frequency</title>
-<link rel="stylesheet" href="_kit.css?v=tw6">
+<link rel="stylesheet" href="_kit.css?v=tw7">
 </head><body data-accent="cyan">
 <div class="bar">
   <a href="index.html" style="color:var(--text-mid);text-decoration:none;font-size:13px;font-weight:600">&lsaquo; All</a>
@@ -147,6 +147,12 @@
 
 [data-c="fr-3"] .b3.on .deposit{animation:fr3Settle .5s cubic-bezier(.2,.8,.3,1) .1s backwards}
 @keyframes fr3Settle{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+[data-c="fr-3"] .fr3-box{display:flex;flex-direction:column;gap:5px;padding:10px;border-radius:10px;
+  background:rgba(var(--ink),.04);box-shadow:inset 0 1px 0 rgba(var(--ink),.05)}
+[data-c="fr-3"] .fr3-field{display:flex;align-items:center;gap:14px;justify-content:center}
+[data-c="fr-3"] .fr3-mult{font-size:30px;font-weight:750;letter-spacing:-.03em;color:var(--accent);
+  font-variant-numeric:tabular-nums}
+[data-c="fr-3"] .fr3-off{opacity:.16}
 </style>
 
 <div class="ph" data-c="fr-3"><div class="st">
@@ -320,6 +326,6 @@
 </div>
 <div class="keepbtn">Keep</div><div class="hint">Tap to replay</div></div>
 <p class="item__note">Frequency with a deadline. Nine weeks kept shown as a runway of sixteen with a tick at race day, so the deed already banked is the coloured part and the future is only a quiet marker. It states the seven weeks still open honestly, without turning them into pressure.</p></div></div></div>
-<script src="chooser.js?v=tw6"></script><script src="_kit.js?v=tw6"></script><script src="_tweaks.js?v=tw6"></script>
+<script src="chooser.js?v=tw7"></script><script src="_kit.js?v=tw7"></script><script src="_tweaks.js?v=tw7"></script>
 <script>CEL.init(); if (window.CEL_TWEAKS) CEL_TWEAKS.init();</script>
 </body></html>
