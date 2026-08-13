@@ -106,9 +106,16 @@ Phase 2 — the page
       the field's infinite spin must die with the element.
 - [ ] Full-screen sizing: `height: 100lvh` (NOT inset:0/100dvh, proven short
       on-device). Content clears `var(--safe-t)` and `var(--safe-b)`.
-- [ ] Default concept = `t-path`. Persist the user's chosen concept in state
-      (e.g. `state.dailyRewardStyle`, default `'t-path'`) even though the
-      picker ships later, so the door is open.
+- [ ] ALL 8 CONCEPTS SHIP AT MERGE, swipeable (Malik, 2026-08-13). The page
+      is a horizontal pager, iOS-Photos simple: one full-screen concept per
+      pane, swipe left/right with scroll-snap (`scroll-snap-type: x
+      mandatory`), every pane rendered from the SAME `{total, cad}` so the
+      view is identical data in 8 skins. No visible chrome needed beyond the
+      swipe itself; keep it dead simple.
+- [ ] The app REMEMBERS the last style: persist `state.dailyRewardStyle`
+      (default `'t-path'`) whenever a swipe settles; next completion opens
+      directly on that style, still swipeable. Tap still dismisses from any
+      pane (a tap, not a swipe-end, so the two gestures can't collide).
 - [ ] Entrance: the existing stagger (translateY + fade, ~0.5s, ease-out).
       Respect `prefers-reduced-motion` (mockup already does; keep it).
 - [ ] The count increments BEFORE the page renders, so the number shown
@@ -135,8 +142,6 @@ Phase 4 — after merge
 - [ ] Instrument silently (existing analytics): daily_reward_shown,
       style_key, ms_until_dismiss. The open question this layer must answer
       with data: does it move day-2 return?
-- [ ] LATER, not in this merge: the style picker ON the reward
-      (IG-story-style swipe between the 8, it sticks). Parked by Malik.
 
 ## 5. KNOWN ACCEPTED NITS (do not "fix" silently)
 
@@ -144,11 +149,13 @@ Phase 4 — after merge
 - Stamp maintenance copy "N days held recorded" is slightly clunky. Accepted.
 - Renderers clamp drawing at 365 and add "plus N more". Intentional.
 
-## 6. OPEN QUESTIONS FOR MALIK (answer before or at merge)
+## 6. DECISIONS, ANSWERED BY MALIK 2026-08-13 (no longer open)
 
-1. Multi-goal: is `total` per-goal (each goal its own count + reward) or one
-   global count? Checklist assumes PER-GOAL.
-2. Launch scope: ship all 8 concepts (picker later) or launch with t-path
-   only and add the rest with the picker?
-3. Sound: a quiet cue from 20-sound.js on fire, or silent? Assumed silent.
-4. Confirm: identity-green in light mode too (assumed yes).
+1. Count is PER-GOAL. Each goal has its own total and its own reward. A
+   global all-goals count is a memento-area idea, NOT this page.
+2. All 8 styles ship at merge, full-screen, swipe left/right between them
+   (iOS-Photos simple), all showing the same view; the app remembers the one
+   they were on and opens there next completion. (Wired into Phase 2 above.)
+3. SILENT. No sound cue, ever ("noise would be annoying after a while").
+4. The daily reward stays GREEN in light AND dark mode, always. The
+   milestone/celebration ceremonies are the themed ones; this page is not.
