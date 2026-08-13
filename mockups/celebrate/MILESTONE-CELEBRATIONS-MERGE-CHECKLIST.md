@@ -158,14 +158,17 @@ Phase 4 — after merge
 ## 6. DECISIONS + REMAINING QUESTIONS
 
 ANSWERED by Malik 2026-08-13:
-1. The BIG "goal reached" ceremony gets ITS OWN DEDICATED BUILD: a new
-   "BIG ASS CELEBRATIONS" design family inside the celebrations gallery,
-   multiple full options for him to pick from for the moment someone
-   reaches their MASSIVE goal. He likes the current milestone screens'
-   concept + look (the full-colour flood with the M) as the direction, but
-   the grand finale must be designed separately and be FUCKING GREAT.
-   THIS FAMILY MUST EXIST AND BE PICKED BEFORE THE MERGE SHIPS a
-   goal-completion path. (Not built yet; queued.)
+1. The BIG "goal reached" ceremony gets ITS OWN DEDICATED BUILD: BUILT,
+   big-ass.html, five options (The Seal / The Return / The Weight / The
+   Flood / The Road Closes), one shared slider set with a goal-shape
+   select covering all four finishable shapes, the Memento involved in
+   three of them (sealed / remembering / wearing the colour). AWAITING
+   HIS PICK; a pick must exist before the merge ships a goal-completion
+   path. rf-card and op-3 are DELETED (rf-card's instinct lives in ba-1).
+0. THE GALLERIES ARE THE MERGED SURFACE (2026-08-13): every family page
+   now carries per-screen sliders driven by the real chooser plus a
+   fire/silent line. field-test.html is banner-marked OLD / REFERENCE
+   ONLY; never port or merge from it, port from the galleries + chooser.
 2. Day-rung intensity split: weekly = quiet step, round marks = bold.
    In chooser.js, done, tested.
 
