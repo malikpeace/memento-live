@@ -64,7 +64,8 @@ body{margin:0;background:#0a0b0d;color:var(--text-hi);font-family:var(--font);-w
 <p class="sub">The graded set: the designs Malik kept, built out from mockup to something close to shippable.
 Only the grid survived the teardown. Every intensity control now obeys the three-choice law, exactly three
 proposed sizes in front, named and honestly priced, with full freedom behind a small quiet "more".
-mx-11 is the deliberate counter-example: the same design carrying five.</p>
+mx-11 is the deliberate counter-example: the same design carrying five.
+<a href="map.html" style="color:rgba(235,238,248,.92);font-weight:600">Open the Action map: every bucket's path to its screens</a></p>
 """
 
 def main():
