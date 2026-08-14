@@ -263,10 +263,24 @@
         cnt(ph, '.b1 .n', cur, start);
         put(ph, '.b1 .of', esc(unitFor(cur, v.unit)));
         var mid = '<div class="sl__track"></div><div class="sl__gone" style="width:' + (frac * 100).toFixed(1) + '%"></div>';
+        /* the ladder is dense now: every mark keeps its tick, but only the
+           QUARTER marks get numbers, and never within 9% of today's own
+           number (his 2026-08-14 "the text is fucked" catch) */
+        var lblSet = {};
+        [0.25, 0.5, 0.75].forEach(function (q) {
+          var target = start + (goal - start) * q, bestM = null, bestD = Infinity;
+          marks.forEach(function (m) {
+            if (m === goal) return;
+            var dd = Math.abs(m - target);
+            if (dd < bestD) { bestD = dd; bestM = m; }
+          });
+          if (bestM !== null) lblSet[bestM] = 1;
+        });
         marks.forEach(function (m) {
           if (m === goal || m === nowMark) return;
           var p = Math.abs(m - start) / span * 100;
-          var lbl = (p > 11 && p < 89) ? '<small>' + fmt(m) + '</small>' : '';
+          var showLbl = lblSet[m] && p > 11 && p < 89 && Math.abs(p - frac * 100) > 9;
+          var lbl = showLbl ? '<small>' + fmt(m) + '</small>' : '';
           mid += '<div class="sl__t' + (passed.indexOf(m) > -1 ? ' is-past' : '') + '" style="left:' + p.toFixed(1) + '%">' + lbl + '</div>';
         });
         mid += '<div class="sl__now" style="left:' + (frac * 100).toFixed(1) + '%"><b>' + fmt(cur) + '</b></div>';
@@ -806,7 +820,8 @@
       }
     },
 
-    /* ================= BIG ASS CELEBRATIONS (the grand finale) ================= */
+    /* ================= BIG ASS CELEBRATIONS (the grand finale, restarted
+       2026-08-14 on Malik's "make it HOLY FUCKING SHIT" note) ================= */
     'ba-1': {
       c: [
         { k: 'shape', t: 's', l: 'Goal shape', v: 'target', o: [
@@ -823,7 +838,11 @@
         { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' }
       ],
       apply: function (ph, v) {
-        put(ph, '.ba1-line', esc(v.line) + '.');
+        put(ph, '.ba1-quiet', esc(v.line) + '.');
+        var words = String(v.line).trim().split(/\s+/), spans = '';
+        for (var i = 0; i < words.length; i++) spans += '<span class="w" style="--i:' + i + '">' + esc(words[i]) + (i === words.length - 1 ? '.' : '') + '</span> ';
+        put(ph, '.ba1-line', spans.trim());
+        put(ph, '.ba1-engine', '<b>' + fmt(+v.days) + '</b> ' + plural(+v.days, 'day', 'days') + ' &middot; <b>' + fmt(+v.moves) + '</b> ' + esc(unitFor(+v.moves, v.moveWord)));
         put(ph, '.ba1-cost', baCost(v));
         put(ph, '.ba1-etch', esc(v.line) + '.');
       }
@@ -845,9 +864,20 @@
         { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' }
       ],
       apply: function (ph, v) {
-        put(ph, '.ba2-now', esc(v.line) + '.');
-        put(ph, '.ba2-cost', baCost(v));
+        var sh = v.shape, money = isMoney(v.unit);
+        var mf = function (n) { return (money ? '$' : '') + fmt(n); };
+        var hero, from, unit;
+        if (sh === 'target') { hero = mf(+v.value); from = 'From ' + mf(+v.start) + '.'; unit = esc(unitFor(+v.value, money ? 'dollars' : v.unit)) + '. The number you named.'; }
+        else if (sh === 'count') { hero = mf(+v.value); from = 'From zero.'; unit = esc(unitFor(+v.value, v.unit)) + '. Every one logged.'; }
+        else if (sh === 'duration') { hero = fmt(+v.days); from = 'From day one.'; unit = plural(+v.days, 'day', 'days') + ' held, start to finish.'; }
+        else { hero = fmt(+v.days); from = 'From the day you named it.'; unit = plural(+v.days, 'day', 'days') + ' of work, and then the day.'; }
+        put(ph, '.ba2-from', from);
+        put(ph, '.ba2-hero', hero);
+        var hEl = Q(ph, '.ba2-hero');
+        if (hEl) hEl.style.fontSize = hero.length > 6 ? '84px' : hero.length > 4 ? '104px' : '132px';
+        put(ph, '.ba2-unit', unit);
         put(ph, '.ba2-line', esc(v.line) + '.');
+        put(ph, '.ba2-cost', baCost(v));
       }
     },
 
@@ -867,14 +897,21 @@
         { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' }
       ],
       apply: function (ph, v) {
-        var sh = v.shape, unit;
-        if (sh === 'target') { unit = esc(unitFor(+v.value, v.unit)) + '. The number you named.'; cnt(ph, '.ba3-hero', +v.value, +v.start); }
-        else if (sh === 'count') { unit = esc(unitFor(+v.value, v.unit)) + '. Every one logged.'; cnt(ph, '.ba3-hero', +v.value, 0); }
-        else if (sh === 'duration') { unit = plural(+v.days, 'day', 'days') + ' held, start to finish.'; cnt(ph, '.ba3-hero', +v.days, 0); }
-        else { unit = plural(+v.days, 'day', 'days') + ' from the day you named it.'; cnt(ph, '.ba3-hero', +v.days, 0); }
-        put(ph, '.ba3-unit', unit);
-        put(ph, '.ba3-rows', baCost(v));
+        var sh = v.shape, money = isMoney(v.unit);
+        var mf = function (n) { return (money ? '$' : '') + fmt(n); };
+        put(ph, '.ba3-c1', fmt(+v.days) + '<small>' + plural(+v.days, 'day', 'days') + '</small>');
+        put(ph, '.ba3-c2', +v.moves > 0
+          ? fmt(+v.moves) + '<small>' + esc(unitFor(+v.moves, v.moveWord)) + '</small>'
+          : mf(+v.value) + '<small>' + esc(unitFor(+v.value, v.unit)) + '</small>');
+        var c3;
+        if (sh === 'target') c3 = mf(+v.start) + ' &rarr; ' + mf(+v.value) + '<small>your own numbers</small>';
+        else if (sh === 'count') c3 = mf(+v.value) + '<small>' + esc(unitFor(+v.value, v.unit)) + ', the target you set</small>';
+        else if (sh === 'duration') c3 = 'day 1 &rarr; day ' + fmt(+v.days) + '<small>the line held the whole way</small>';
+        else c3 = 'done<small>no partial credit, and none needed</small>';
+        put(ph, '.ba3-c3', c3);
         put(ph, '.ba3-line', esc(v.line) + '.');
+        put(ph, '.ba3-fin', esc(v.line) + '.');
+        put(ph, '.ba3-cost', baCost(v));
       }
     },
 
@@ -894,8 +931,7 @@
         { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' }
       ],
       apply: function (ph, v) {
-        put(ph, '.ba4-word', esc(v.line) + '.');
-        put(ph, '.ba4-engine', '<b>' + fmt(+v.days) + '</b> ' + plural(+v.days, 'day', 'days') + ' &middot; <b>' + fmt(+v.moves) + '</b> ' + esc(unitFor(+v.moves, v.moveWord)));
+        put(ph, '.ba4-line', esc(v.line) + '.');
         put(ph, '.ba4-cost', baCost(v));
       }
     },
@@ -916,29 +952,154 @@
         { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' }
       ],
       apply: function (ph, v) {
-        var sh = v.shape, marks = 0, endsL, endsR;
+        put(ph, '.ba5-line0', esc(v.line) + '.');
+        put(ph, '.ba5-line', esc(v.line) + '.');
+        put(ph, '.ba5-fin', esc(v.line) + '.');
+        put(ph, '.ba5-cost', baCost(v));
+        put(ph, '.ba5-once', +v.days >= 300 ? 'A year of showing up, paid in full.' : fmt(+v.days) + ' days of showing up, paid in full.');
+      }
+    },
+
+    'ba-6': {
+      c: [
+        { k: 'shape', t: 's', l: 'Goal shape', v: 'target', o: [
+          { v: 'target', l: 'target hit (weight, debt)' },
+          { v: 'count', l: 'count done (100 sessions)' },
+          { v: 'duration', l: 'duration held (no-buy year)' },
+          { v: 'event', l: 'event done (passed the bar)' } ] },
+        { k: 'line', t: 't', l: 'The goal, their words', v: 'Lost 30 lbs' },
+        { k: 'start', t: 'n', l: 'Start number', v: 230 },
+        { k: 'value', t: 'n', l: 'Final number', v: 200 },
+        { k: 'unit', t: 't', l: 'Unit', v: 'lbs' },
+        { k: 'days', t: 'r', l: 'Days it took', v: 126, min: 1, max: 900 },
+        { k: 'moves', t: 'r', l: 'Moves logged', v: 215, min: 0, max: 2000 },
+        { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' }
+      ],
+      apply: function (ph, v) {
+        put(ph, '.ba6-line', esc(v.line) + '.');
+        var z = { target: 'Zero left between you and it.', count: 'Every last one, logged.',
+                  duration: 'Held to the very end.', event: 'Done is done.' };
+        put(ph, '.ba6-zero', z[v.shape] || z.target);
+        put(ph, '.ba6-cost', baCost(v));
+        put(ph, '.ba6-fin', esc(v.line) + '.');
+      }
+    },
+
+    'ba-7': {
+      c: [
+        { k: 'shape', t: 's', l: 'Goal shape', v: 'target', o: [
+          { v: 'target', l: 'target hit (weight, debt)' },
+          { v: 'count', l: 'count done (100 sessions)' },
+          { v: 'duration', l: 'duration held (no-buy year)' },
+          { v: 'event', l: 'event done (passed the bar)' } ] },
+        { k: 'line', t: 't', l: 'The goal, their words', v: 'Lost 30 lbs' },
+        { k: 'start', t: 'n', l: 'Start number', v: 230 },
+        { k: 'value', t: 'n', l: 'Final number', v: 200 },
+        { k: 'unit', t: 't', l: 'Unit', v: 'lbs' },
+        { k: 'days', t: 'r', l: 'Days it took', v: 126, min: 1, max: 900 },
+        { k: 'moves', t: 'r', l: 'Moves logged', v: 215, min: 0, max: 2000 },
+        { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' }
+      ],
+      apply: function (ph, v) {
+        put(ph, '.ba7-e1', esc(v.line) + '.');
+        put(ph, '.ba7-e2', esc(v.line) + '.');
+        put(ph, '.ba7-e3', esc(v.line) + '.');
+        put(ph, '.ba7-line', esc(v.line) + '.');
+        put(ph, '.ba7-fin', esc(v.line) + '.');
+        put(ph, '.ba7-cost', baCost(v));
+      }
+    },
+
+    'ba-8': {
+      c: [
+        { k: 'shape', t: 's', l: 'Goal shape', v: 'target', o: [
+          { v: 'target', l: 'target hit (weight, debt)' },
+          { v: 'count', l: 'count done (100 sessions)' },
+          { v: 'duration', l: 'duration held (no-buy year)' },
+          { v: 'event', l: 'event done (passed the bar)' } ] },
+        { k: 'line', t: 't', l: 'The goal, their words', v: 'Lost 30 lbs' },
+        { k: 'start', t: 'n', l: 'Start number', v: 230 },
+        { k: 'value', t: 'n', l: 'Final number', v: 200 },
+        { k: 'unit', t: 't', l: 'Unit', v: 'lbs' },
+        { k: 'days', t: 'r', l: 'Days it took', v: 126, min: 1, max: 900 },
+        { k: 'moves', t: 'r', l: 'Moves logged', v: 215, min: 0, max: 2000 },
+        { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' }
+      ],
+      apply: function (ph, v) {
+        put(ph, '.ba8-find', esc(v.line) + '.');
+        put(ph, '.ba8-line', esc(v.line) + '.');
+        put(ph, '.ba8-fin', esc(v.line) + '.');
+        put(ph, '.ba8-cost', baCost(v));
+      }
+    },
+
+    'ba-9': {
+      c: [
+        { k: 'shape', t: 's', l: 'Goal shape', v: 'target', o: [
+          { v: 'target', l: 'target hit (weight, debt)' },
+          { v: 'count', l: 'count done (100 sessions)' },
+          { v: 'duration', l: 'duration held (no-buy year)' },
+          { v: 'event', l: 'event done (passed the bar)' } ] },
+        { k: 'line', t: 't', l: 'The goal, their words', v: 'Lost 30 lbs' },
+        { k: 'start', t: 'n', l: 'Start number', v: 230 },
+        { k: 'value', t: 'n', l: 'Final number', v: 200 },
+        { k: 'unit', t: 't', l: 'Unit', v: 'lbs' },
+        { k: 'days', t: 'r', l: 'Days it took', v: 126, min: 1, max: 900 },
+        { k: 'moves', t: 'r', l: 'Moves logged', v: 215, min: 0, max: 2000 },
+        { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' }
+      ],
+      apply: function (ph, v) {
+        var sh = v.shape, money = isMoney(v.unit);
+        var mf = function (n) { return (money ? '$' : '') + fmt(n); };
+        var vals = [];
         if (sh === 'target' && +v.start !== +v.value) {
           var dir = +v.value < +v.start ? 'down' : 'up';
-          marks = C.milestones({ target: +v.value, baseline: +v.start }, dir).length;
-          endsL = '<b>' + fmt(+v.start) + '</b> started'; endsR = '<b>' + fmt(+v.value) + '</b> today';
+          vals = C.milestones({ target: +v.value, baseline: +v.start }, dir).map(mf);
         } else if (sh === 'count') {
-          marks = Math.floor(+v.value / C.COUNT_STEP);
-          endsL = '<b>0</b> started'; endsR = '<b>' + fmt(+v.value) + '</b> done';
+          vals = C.COUNT_LADDER.filter(function (c) { return c < +v.value; }).map(mf);
+          vals.push(mf(+v.value));
         } else {
-          marks = Math.floor(+v.days / C.DAY_STEP);
-          endsL = '<b>day 1</b>'; endsR = '<b>day ' + fmt(+v.days) + '</b>';
+          for (var d = 30; d < +v.days; d += 30) vals.push('day ' + fmt(d));
+          vals.push('day ' + fmt(+v.days));
         }
-        var shown = Math.min(marks, 14), mks = '';
-        for (var i = 1; i <= shown; i++) {
-          mks += '<i class="ba5-mk" style="left:' + (i / (shown + 1) * 100).toFixed(1) + '%;animation-delay:' + (0.3 + 1.5 * i / (shown + 1)).toFixed(2) + 's"></i>';
+        var over = Math.max(0, vals.length - 13);
+        if (over > 0) vals = ['&hellip;'].concat(vals.slice(over));
+        var chips = '';
+        for (var i = 0; i < vals.length; i++) {
+          var last = i === vals.length - 1;
+          chips += '<span class="ba9-chip' + (last ? ' ba9-chip--goal' : '') + '" style="--i:' + i + '">' + vals[i] + '</span>';
         }
-        put(ph, '.ba5-marks', mks);
-        put(ph, '.ba5-ends', '<span>' + endsL + '</span><span>' + endsR + '</span>');
-        put(ph, '.ba5-closed', esc(v.line) + '.');
-        put(ph, '.ba5-cost', '<b>' + fmt(marks) + '</b> ' + plural(marks, 'mark', 'marks') + ' passed.<br>' + baCost(v));
-        put(ph, '.ba5-line', esc(v.line) + '.');
+        put(ph, '.ba9-chips', chips);
+        var boom = (0.25 + vals.length * 0.13 + 0.35).toFixed(2) + 's';
+        var b1 = Q(ph, '.b1'); if (b1) b1.style.setProperty('--boom', boom);
+        put(ph, '.ba9-line', esc(v.line) + '.');
+        put(ph, '.ba9-fin', esc(v.line) + '.');
+        put(ph, '.ba9-cost', baCost(v));
+      }
+    },
+
+    'ba-10': {
+      c: [
+        { k: 'shape', t: 's', l: 'Goal shape', v: 'target', o: [
+          { v: 'target', l: 'target hit (weight, debt)' },
+          { v: 'count', l: 'count done (100 sessions)' },
+          { v: 'duration', l: 'duration held (no-buy year)' },
+          { v: 'event', l: 'event done (passed the bar)' } ] },
+        { k: 'line', t: 't', l: 'The goal, their words', v: 'Lost 30 lbs' },
+        { k: 'start', t: 'n', l: 'Start number', v: 230 },
+        { k: 'value', t: 'n', l: 'Final number', v: 200 },
+        { k: 'unit', t: 't', l: 'Unit', v: 'lbs' },
+        { k: 'days', t: 'r', l: 'Days it took', v: 126, min: 1, max: 900 },
+        { k: 'moves', t: 'r', l: 'Moves logged', v: 215, min: 0, max: 2000 },
+        { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' }
+      ],
+      apply: function (ph, v) {
+        put(ph, '.ba10-line', esc(v.line) + '.');
+        put(ph, '.ba10-fin', esc(v.line) + '.');
+        put(ph, '.ba10-cost', baCost(v));
       }
     }
+
 
   };
 
@@ -1007,7 +1168,8 @@
     'rf-gap': function (v) { return roadFire(0, Math.max(2, +v.goal), Math.min(+v.cur, Math.max(2, +v.goal)), 'up'); },
     'rf-fall': function (v) { return roadFire(+v.startLeft, 0, Math.min(+v.left, +v.startLeft), 'down'); },
     'rf-rec': function (v) { return '<b>Fires on rungs of the count ladder</b>, drawn from real logged days only.' },
-    'ba-1': baFire, 'ba-2': baFire, 'ba-3': baFire, 'ba-4': baFire, 'ba-5': baFire
+    'ba-1': baFire, 'ba-2': baFire, 'ba-3': baFire, 'ba-4': baFire, 'ba-5': baFire,
+    'ba-6': baFire, 'ba-7': baFire, 'ba-8': baFire, 'ba-9': baFire, 'ba-10': baFire
   };
   function baFire() {
     return '<b>The top of the pyramid.</b> Fires ONCE, the day the goal itself is done; it outranks the milestone and the daily, and nothing else shows that day.';

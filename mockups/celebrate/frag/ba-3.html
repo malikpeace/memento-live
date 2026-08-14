@@ -1,57 +1,86 @@
 <style>
-/* ba-3 "The Weight". The number they reached, ENORMOUS on black, counting
-   up; the instant it lands the whole screen detonates into their colour
-   (a full flood pulse) and the confetti pours. Scale + darkness + one
-   detonation, no props. */
-[data-c="ba-3"] .ba3-hero{position:relative;font-size:128px;font-weight:750;letter-spacing:-.055em;
-  line-height:1;color:var(--text-hi);font-variant-numeric:tabular-nums}
-[data-c="ba-3"] .b1.on .ba3-hero{animation:ba3In .8s cubic-bezier(.16,1.15,.3,1) both}
-@keyframes ba3In{from{opacity:0;transform:scale(.86)}to{opacity:1;transform:none}}
-/* the detonation: a full-screen flood that pulses in as the count lands */
-[data-c="ba-3"] .ba3-boom{position:absolute;inset:0;background:var(--accent);opacity:0}
-[data-c="ba-3"] .b1.on .ba3-boom{animation:ba3Boom 1s cubic-bezier(.2,.8,.3,1) 1.35s both}
-@keyframes ba3Boom{0%{opacity:0}30%{opacity:1}100%{opacity:0}}
-[data-c="ba-3"] .ba3-unit{position:relative;margin-top:16px;font-size:17px;font-weight:600;color:var(--text-mid)}
-[data-c="ba-3"] .b1.on .ba3-unit{animation:ba3Up .5s ease-out 1.5s both}
-[data-c="ba-3"] .ba3-did{position:relative;margin-top:22px;font-size:20px;font-weight:700;
-  letter-spacing:-.02em;color:var(--accent)}
-[data-c="ba-3"] .b1.on .ba3-did{animation:ba3Slam .55s cubic-bezier(.16,1.3,.3,1) 1.75s both}
-@keyframes ba3Slam{from{opacity:0;transform:scale(1.3)}to{opacity:1;transform:scale(1)}}
+/* ba-3 "The Roll Call". A highlight reel: the receipts slam in one after
+   another, fast, each one hitting centre and cutting away, and when the
+   last one lands the screen floods their colour with the goal line and the
+   M. Tempo IS the dopamine here; it plays like a title sequence. */
+[data-c="ba-3"] .ba3-c{position:absolute;left:0;right:0;top:42%;text-align:center;opacity:0;
+  font-size:38px;font-weight:750;letter-spacing:-.035em;color:var(--text-hi);
+  font-variant-numeric:tabular-nums;padding:0 20px}
+[data-c="ba-3"] .ba3-c small{display:block;font-size:14px;font-weight:600;letter-spacing:0;
+  color:var(--text-mid);margin-top:10px}
+[data-c="ba-3"] .b1.on .ba3-c1{animation:ba3Card .85s cubic-bezier(.16,1.3,.3,1) .25s both}
+[data-c="ba-3"] .b1.on .ba3-c2{animation:ba3Card .85s cubic-bezier(.16,1.3,.3,1) 1.15s both}
+[data-c="ba-3"] .b1.on .ba3-c3{animation:ba3Card .85s cubic-bezier(.16,1.3,.3,1) 2.05s both}
+@keyframes ba3Card{0%{opacity:0;transform:scale(1.5)}18%{opacity:1;transform:scale(1)}
+  78%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.9)}}
+/* the landing: flood + line + M */
+[data-c="ba-3"] .ba3-flood{position:absolute;inset:0;background:var(--accent);opacity:0}
+[data-c="ba-3"] .b1.on .ba3-flood{animation:ba3Flood .3s cubic-bezier(.2,.8,.3,1) 2.95s forwards}
+@keyframes ba3Flood{from{opacity:0}to{opacity:1}}
+[data-c="ba-3"] .ba3-stage{position:relative;display:flex;flex-direction:column;align-items:center;opacity:0}
+[data-c="ba-3"] .b1.on .ba3-stage{animation:ba3StageIn .01s linear 3s forwards, ba3Shake .45s linear 3.05s}
+@keyframes ba3StageIn{to{opacity:1}}
+@keyframes ba3Shake{0%,100%{transform:none}25%{transform:translate(3px,-2px)}50%{transform:translate(-3px,2px)}
+  75%{transform:translate(2px,1px)}}
+[data-c="ba-3"] .ba3-m{width:80px;height:80px;fill:#0b0e12}
+[data-c="ba-3"] .b1.on .ba3-m{animation:ba3MSlam .5s cubic-bezier(.16,1.35,.3,1) 3.05s both}
+@keyframes ba3MSlam{from{opacity:0;transform:scale(2.2)}to{opacity:1;transform:scale(1)}}
+[data-c="ba-3"] .ba3-line{margin-top:22px;font-size:42px;font-weight:750;letter-spacing:-.04em;
+  line-height:1.05;color:#0b0e12;max-width:10ch}
+[data-c="ba-3"] .b1.on .ba3-line{animation:ba3Slam .5s cubic-bezier(.16,1.3,.3,1) 3.3s both}
+@keyframes ba3Slam{from{opacity:0;transform:scale(1.35)}to{opacity:1;transform:scale(1)}}
+[data-c="ba-3"] .ba3-once{margin-top:18px;font-size:14.5px;font-weight:650;color:rgba(11,14,18,.78)}
+[data-c="ba-3"] .b1.on .ba3-once{animation:ba3Up .5s ease-out 3.7s both}
 @keyframes ba3Up{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
 
-[data-c="ba-3"] .ba3-rows{font-size:19px;line-height:2.05;color:var(--text-mid);letter-spacing:-.012em}
-[data-c="ba-3"] .ba3-rows b{color:var(--text-hi);font-size:26px;font-variant-numeric:tabular-nums}
-[data-c="ba-3"] .b2.on .ba3-rows{animation:ba3Up .55s ease-out .2s both}
-
-[data-c="ba-3"] .ba3-rule{width:36px;height:1px;background:rgba(235,238,248,.18);margin-bottom:20px}
-[data-c="ba-3"] .ba3-line{font-size:28px;font-weight:750;letter-spacing:-.03em;max-width:11ch;color:var(--text-hi)}
-[data-c="ba-3"] .b3.on .ba3-line{animation:ba3Up .5s ease-out .2s both}
-[data-c="ba-3"] .ba3-day{margin-top:13px;font-size:13.5px;color:var(--text-lo)}
-[data-c="ba-3"] .b3.on .ba3-day{animation:ba3Up .5s ease-out .55s both}
+[data-c="ba-3"] .ba3-cost{font-size:19px;line-height:2.05;color:var(--text-mid)}
+[data-c="ba-3"] .ba3-cost b{color:var(--text-hi);font-size:26px;font-variant-numeric:tabular-nums}
+[data-c="ba-3"] .b2.on .ba3-cost{animation:ba3Up .55s ease-out .15s both}
+[data-c="ba-3"] .ba3-fin{font-size:28px;font-weight:750;letter-spacing:-.03em;max-width:11ch;color:var(--text-hi)}
+[data-c="ba-3"] .b3.on .ba3-fin{animation:ba3Up .5s ease-out .15s both}
+[data-c="ba-3"] .ba3-close{margin-top:14px;font-size:14px;color:var(--text-mid)}
+[data-c="ba-3"] .b3.on .ba3-close{animation:ba3Up .5s ease-out .55s both}
 @media (prefers-reduced-motion:reduce){
-  [data-c="ba-3"] .ba3-boom{opacity:0;animation:none}
-  [data-c="ba-3"] .ba3-hero,[data-c="ba-3"] .ba3-unit,[data-c="ba-3"] .ba3-did,
-  [data-c="ba-3"] .ba3-rows,[data-c="ba-3"] .ba3-line,[data-c="ba-3"] .ba3-day{opacity:1;transform:none;animation:none}
+  [data-c="ba-3"] .ba3fw{display:none}
+  [data-c="ba-3"] .ba3-c{display:none}
+  [data-c="ba-3"] .ba3-flood{opacity:1;animation:none}
+  [data-c="ba-3"] .ba3-stage{opacity:1;animation:none}
+  [data-c="ba-3"] .ba3-m,[data-c="ba-3"] .ba3-line,[data-c="ba-3"] .ba3-once,
+  [data-c="ba-3"] .ba3-cost,[data-c="ba-3"] .ba3-fin,[data-c="ba-3"] .ba3-close{opacity:1;transform:none;animation:none}
 }
+[data-c="ba-3"] .ba3fw{position:absolute;left:50%;top:24%;width:0;height:0}
+[data-c="ba-3"] .ba3fw i{position:absolute;width:6px;height:6px;border-radius:50%;background:#0b0e12;opacity:0}
+[data-c="ba-3"] .ba3fw i:nth-child(2n){background:#fff}
+[data-c="ba-3"] .b1.on .ba3fw i{animation:ba3Spk 1s cubic-bezier(.15,.6,.3,1) 3.15s both}
+@keyframes ba3Spk{0%{opacity:1;transform:translate(0,0)}100%{opacity:0;transform:translate(var(--dx),var(--dy))}}
 </style>
 <div class="ph" data-c="ba-3">
   <div class="st">
 
     <div class="b b1" data-confetti>
-      <div class="ba3-boom"></div>
-      <div class="ba3-hero" data-count="230|200">200</div>
-      <div class="ba3-unit">lbs. The number you named.</div>
-      <div class="ba3-did">You actually did it.</div>
+      <div class="ba3-c ba3-c1">126<small>days</small></div>
+      <div class="ba3-c ba3-c2">215<small>weigh-ins</small></div>
+      <div class="ba3-c ba3-c3">230 &rarr; 200<small>your own numbers</small></div>
+      <div class="ba3-flood"></div>
+            <div class="ba3fw" aria-hidden="true">
+        <i style="--dx:-52px;--dy:-36px"></i><i style="--dx:50px;--dy:-40px"></i><i style="--dx:-60px;--dy:14px"></i>
+        <i style="--dx:58px;--dy:18px"></i><i style="--dx:-22px;--dy:-56px"></i><i style="--dx:24px;--dy:-54px"></i>
+        <i style="--dx:-40px;--dy:46px"></i><i style="--dx:42px;--dy:48px"></i><i style="--dx:0px;--dy:-64px"></i>
+      </div>
+      <div class="ba3-stage">
+        <svg class="ba3-m" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+        <div class="ba3-line">Lost 30 lbs.</div>
+        <div class="ba3-once">Once. Ever. Yours.</div>
+      </div>
     </div>
 
     <div class="b b2">
-      <div class="ba3-rows">Started at <b>230</b>.<br><b data-count="0|126">126</b> days.<br><b data-count="0|215">215</b> weigh-ins.</div>
+      <div class="ba3-cost"><b data-count="0|126">126</b> days.<br><b data-count="0|215">215</b> weigh-ins.<br>230 &rarr; <b>200</b>.</div>
     </div>
 
     <div class="b b3">
-      <div class="ba3-rule"></div>
-      <div class="ba3-line">Lost 30 lbs.</div>
-      <div class="ba3-day">On this day, the goal you set was done.</div>
+      <div class="ba3-fin">Lost 30 lbs.</div>
+      <div class="ba3-close">This goal closes. The record stays.</div>
     </div>
 
   </div>

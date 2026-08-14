@@ -1,0 +1,97 @@
+<style>
+/* ba-7 "The Echo". Their goal line said three times, each echo LOUDER and
+   closer, each landing with a thud, until the third one detonates the
+   screen: flood, fireworks, and the line standing enormous. Typography as
+   the whole spectacle; the words they wrote become a chant. */
+[data-c="ba-7"] .ba7-e{position:absolute;left:0;right:0;top:40%;text-align:center;opacity:0;
+  font-weight:750;letter-spacing:-.035em;color:var(--text-hi);line-height:1.1;padding:0 26px}
+[data-c="ba-7"] .ba7-e1{font-size:19px;color:var(--text-lo)}
+[data-c="ba-7"] .ba7-e2{font-size:30px;color:var(--text-mid)}
+[data-c="ba-7"] .ba7-e3{font-size:44px}
+[data-c="ba-7"] .b1.on .ba7-e1{animation:ba7Echo .78s cubic-bezier(.16,1.2,.3,1) .25s both}
+[data-c="ba-7"] .b1.on .ba7-e2{animation:ba7Echo .78s cubic-bezier(.16,1.2,.3,1) 1.05s both}
+[data-c="ba-7"] .b1.on .ba7-e3{animation:ba7Echo .82s cubic-bezier(.16,1.2,.3,1) 1.85s both}
+@keyframes ba7Echo{0%{opacity:0;transform:scale(.8)}20%{opacity:1;transform:scale(1)}
+  78%{opacity:1;transform:scale(1.02)}100%{opacity:0;transform:scale(1.06)}}
+/* the third echo detonates */
+[data-c="ba-7"] .ba7-flood{position:absolute;inset:0;background:var(--accent);opacity:0}
+[data-c="ba-7"] .b1.on .ba7-flood{animation:ba7Flood .28s cubic-bezier(.2,.8,.3,1) 2.75s forwards}
+@keyframes ba7Flood{from{opacity:0}to{opacity:1}}
+[data-c="ba-7"] .ba7-fw{position:absolute;width:0;height:0}
+[data-c="ba-7"] .ba7-w1{left:30%;top:20%}
+[data-c="ba-7"] .ba7-w2{left:70%;top:24%}
+[data-c="ba-7"] .ba7-fw i{position:absolute;width:6px;height:6px;border-radius:50%;background:#0b0e12;opacity:0}
+[data-c="ba-7"] .ba7-fw i:nth-child(2n){background:#fff}
+[data-c="ba-7"] .b1.on .ba7-w1 i{animation:ba7Spark 1s cubic-bezier(.15,.6,.3,1) 2.9s both}
+[data-c="ba-7"] .b1.on .ba7-w2 i{animation:ba7Spark 1s cubic-bezier(.15,.6,.3,1) 3.1s both}
+@keyframes ba7Spark{0%{opacity:1;transform:translate(0,0)}100%{opacity:0;transform:translate(var(--dx),var(--dy))}}
+[data-c="ba-7"] .ba7-stage{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;opacity:0;padding:34px}
+[data-c="ba-7"] .b1.on .ba7-stage{animation:ba7In .01s linear 2.85s forwards, ba7Shake .45s linear 2.87s}
+@keyframes ba7In{to{opacity:1}}
+@keyframes ba7Shake{0%,100%{transform:none}25%{transform:translate(3px,-2px)}50%{transform:translate(-3px,2px)}
+  75%{transform:translate(2px,1px)}}
+[data-c="ba-7"] .ba7-m{width:78px;height:78px;fill:#0b0e12}
+[data-c="ba-7"] .b1.on .ba7-m{animation:ba7MSlam .5s cubic-bezier(.16,1.35,.3,1) 2.87s both}
+@keyframes ba7MSlam{from{opacity:0;transform:scale(2.2)}to{opacity:1;transform:scale(1)}}
+[data-c="ba-7"] .ba7-line{margin-top:22px;font-size:46px;font-weight:750;letter-spacing:-.042em;
+  line-height:1.04;color:#0b0e12;max-width:10ch}
+[data-c="ba-7"] .b1.on .ba7-line{animation:ba7Slam .5s cubic-bezier(.16,1.3,.3,1) 3.1s both}
+@keyframes ba7Slam{from{opacity:0;transform:scale(1.4)}to{opacity:1;transform:scale(1)}}
+[data-c="ba-7"] .ba7-said{margin-top:18px;font-size:14.5px;font-weight:650;color:rgba(11,14,18,.78)}
+[data-c="ba-7"] .b1.on .ba7-said{animation:ba7Up .5s ease-out 3.5s both}
+@keyframes ba7Up{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+
+[data-c="ba-7"] .ba7-cost{font-size:19px;line-height:2.05;color:var(--text-mid)}
+[data-c="ba-7"] .ba7-cost b{color:var(--text-hi);font-size:26px;font-variant-numeric:tabular-nums}
+[data-c="ba-7"] .b2.on .ba7-cost{animation:ba7Up .55s ease-out .15s both}
+[data-c="ba-7"] .ba7-fin{font-size:28px;font-weight:750;letter-spacing:-.03em;max-width:11ch;color:var(--text-hi)}
+[data-c="ba-7"] .b3.on .ba7-fin{animation:ba7Up .5s ease-out .15s both}
+[data-c="ba-7"] .ba7-close{margin-top:14px;font-size:14px;color:var(--text-mid)}
+[data-c="ba-7"] .b3.on .ba7-close{animation:ba7Up .5s ease-out .55s both}
+@media (prefers-reduced-motion:reduce){
+  [data-c="ba-7"] .ba7-e,[data-c="ba-7"] .ba7-fw{display:none}
+  [data-c="ba-7"] .ba7-flood{opacity:1;animation:none}
+  [data-c="ba-7"] .ba7-stage{opacity:1;animation:none}
+  [data-c="ba-7"] .ba7-m,[data-c="ba-7"] .ba7-line,[data-c="ba-7"] .ba7-said,
+  [data-c="ba-7"] .ba7-cost,[data-c="ba-7"] .ba7-fin,[data-c="ba-7"] .ba7-close{opacity:1;transform:none;animation:none}
+}
+</style>
+<div class="ph" data-c="ba-7">
+  <div class="st">
+
+    <div class="b b1" data-confetti>
+      <div class="ba7-e ba7-e1">Lost 30 lbs.</div>
+      <div class="ba7-e ba7-e2">Lost 30 lbs.</div>
+      <div class="ba7-e ba7-e3">Lost 30 lbs.</div>
+      <div class="ba7-flood"></div>
+      <div class="ba7-fw ba7-w1" aria-hidden="true">
+        <i style="--dx:-40px;--dy:-34px"></i><i style="--dx:42px;--dy:-30px"></i><i style="--dx:-48px;--dy:10px"></i>
+        <i style="--dx:46px;--dy:14px"></i><i style="--dx:-16px;--dy:-48px"></i><i style="--dx:18px;--dy:-46px"></i>
+        <i style="--dx:-30px;--dy:38px"></i><i style="--dx:32px;--dy:40px"></i>
+      </div>
+      <div class="ba7-fw ba7-w2" aria-hidden="true">
+        <i style="--dx:-40px;--dy:-34px"></i><i style="--dx:42px;--dy:-30px"></i><i style="--dx:-48px;--dy:10px"></i>
+        <i style="--dx:46px;--dy:14px"></i><i style="--dx:-16px;--dy:-48px"></i><i style="--dx:18px;--dy:-46px"></i>
+        <i style="--dx:-30px;--dy:38px"></i><i style="--dx:32px;--dy:40px"></i>
+      </div>
+      <div class="ba7-stage">
+        <svg class="ba7-m" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+        <div class="ba7-line">Lost 30 lbs.</div>
+        <div class="ba7-said">You said it. Then you did it.</div>
+      </div>
+    </div>
+
+    <div class="b b2">
+      <div class="ba7-cost"><b data-count="0|126">126</b> days.<br><b data-count="0|215">215</b> weigh-ins.<br>230 &rarr; <b>200</b>.</div>
+    </div>
+
+    <div class="b b3">
+      <div class="ba7-fin">Lost 30 lbs.</div>
+      <div class="ba7-close">This goal closes. The record stays.</div>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>

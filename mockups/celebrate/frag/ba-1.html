@@ -1,66 +1,108 @@
 <style>
-/* ba-1 "The Seal". Beat 1 IS the explosion: the whole screen takes their
-   colour, the M lands, the goal line SLAMS in with a scale punch, confetti
-   storms. Beat 2 cuts to black for the receipts, counting up. Beat 3: the
-   Memento rises, blooms, and the goal is sealed beneath it forever. */
+/* ba-1 "The Detonation". Beat 1 is a held breath: their goal line alone on
+   black, barely lit, with a slow-charging spark line beneath. THE TAP
+   DETONATES IT: triple shockwave, full flood, the M slamming in with a
+   screen shake, the goal line hitting word by word, the engine counting up
+   on the flood, confetti storming from the exact moment of impact. */
+[data-c="ba-1"] .ba1-quiet{font-size:19px;font-weight:600;letter-spacing:-.015em;color:var(--text-mid);
+  max-width:16ch;line-height:1.45}
+[data-c="ba-1"] .b1.on .ba1-quiet{animation:ba1Breathe 2.6s ease-in-out both}
+@keyframes ba1Breathe{0%{opacity:0;transform:translateY(8px)}25%{opacity:.85;transform:none}
+  60%{opacity:1}100%{opacity:1}}
+[data-c="ba-1"] .ba1-spark{width:0;height:2px;border-radius:2px;background:var(--accent);margin-top:26px}
+[data-c="ba-1"] .b1.on .ba1-spark{animation:ba1Charge 2.2s cubic-bezier(.5,0,.75,.4) .4s forwards}
+@keyframes ba1Charge{from{width:0;opacity:.5}to{width:132px;opacity:1}}
+[data-c="ba-1"] .ba1-tap{margin-top:30px;font-size:11.5px;letter-spacing:.03em;color:var(--text-lo)}
+[data-c="ba-1"] .b1.on .ba1-tap{animation:ba1TapIn .6s ease-out 2.4s both}
+@keyframes ba1TapIn{from{opacity:0}to{opacity:1}}
+
+/* THE DETONATION (beat 2, fires on the tap) */
 [data-c="ba-1"] .ba1-flood{position:absolute;inset:0;background:var(--accent)}
-[data-c="ba-1"] .b1.on .ba1-flood{animation:ba1Flood .55s cubic-bezier(.2,.8,.3,1) both}
-@keyframes ba1Flood{from{opacity:0;transform:scale(1.06)}to{opacity:1;transform:none}}
-[data-c="ba-1"] .ba1-m{position:relative;width:64px;height:64px;fill:#0b0e12;opacity:.9}
-[data-c="ba-1"] .b1.on .ba1-m{animation:ba1Drop .5s cubic-bezier(.2,.85,.3,1) .12s both}
-@keyframes ba1Drop{from{opacity:0;transform:translateY(-14px)}to{opacity:.9;transform:none}}
-[data-c="ba-1"] .ba1-line{position:relative;margin-top:26px;font-size:44px;font-weight:750;
-  letter-spacing:-.04em;line-height:1.04;max-width:10ch;color:#0b0e12}
-[data-c="ba-1"] .b1.on .ba1-line{animation:ba1Slam .55s cubic-bezier(.16,1.3,.3,1) .5s both}
-@keyframes ba1Slam{from{opacity:0;transform:scale(1.35)}to{opacity:1;transform:scale(1)}}
-[data-c="ba-1"] .ba1-done{position:relative;margin-top:18px;font-size:15.5px;font-weight:650;
-  color:rgba(11,14,18,.78)}
-[data-c="ba-1"] .b1.on .ba1-done{animation:ba1Up .5s cubic-bezier(.2,.8,.3,1) 1.05s both}
-@keyframes ba1Up{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+[data-c="ba-1"] .b2.on .ba1-flood{animation:ba1Flood .22s cubic-bezier(.2,.8,.3,1) both}
+@keyframes ba1Flood{from{opacity:0}to{opacity:1}}
+[data-c="ba-1"] .ba1-ring{position:absolute;left:50%;top:44%;width:60px;height:60px;margin:-30px 0 0 -30px;
+  border-radius:50%;border:3px solid rgba(11,14,18,.5);opacity:0}
+[data-c="ba-1"] .b2.on .ba1-r1{animation:ba1Ring .9s cubic-bezier(.2,.7,.3,1) .05s both}
+[data-c="ba-1"] .b2.on .ba1-r2{animation:ba1Ring 1s cubic-bezier(.2,.7,.3,1) .22s both}
+[data-c="ba-1"] .b2.on .ba1-r3{animation:ba1Ring 1.1s cubic-bezier(.2,.7,.3,1) .42s both}
+@keyframes ba1Ring{0%{opacity:.85;transform:scale(.2)}100%{opacity:0;transform:scale(9)}}
+[data-c="ba-1"] .ba1-stage{position:relative;display:flex;flex-direction:column;align-items:center}
+[data-c="ba-1"] .b2.on .ba1-stage{animation:ba1Shake .5s linear .18s both}
+@keyframes ba1Shake{0%,100%{transform:none}20%{transform:translate(3px,-3px)}40%{transform:translate(-3px,2px)}
+  60%{transform:translate(2px,2px)}80%{transform:translate(-2px,-2px)}}
+[data-c="ba-1"] .ba1-m{width:88px;height:88px;fill:#0b0e12}
+[data-c="ba-1"] .b2.on .ba1-m{animation:ba1MSlam .5s cubic-bezier(.16,1.35,.3,1) .1s both}
+@keyframes ba1MSlam{from{opacity:0;transform:scale(2.4)}to{opacity:1;transform:scale(1)}}
+[data-c="ba-1"] .ba1-line{margin-top:24px;font-size:44px;font-weight:750;letter-spacing:-.04em;
+  line-height:1.05;color:#0b0e12;max-width:10ch}
+[data-c="ba-1"] .ba1-line .w{display:inline-block;opacity:0}
+[data-c="ba-1"] .b2.on .ba1-line .w{animation:ba1Word .38s cubic-bezier(.16,1.3,.3,1) calc(.5s + var(--i)*.14s) both}
+@keyframes ba1Word{from{opacity:0;transform:translateY(18px) scale(1.25)}to{opacity:1;transform:none}}
+[data-c="ba-1"] .ba1-engine{margin-top:26px;font-size:16.5px;font-weight:650;color:rgba(11,14,18,.82)}
+[data-c="ba-1"] .ba1-engine b{font-size:22px;color:#0b0e12;font-variant-numeric:tabular-nums}
+[data-c="ba-1"] .b2.on .ba1-engine{animation:ba1Up .5s cubic-bezier(.2,.8,.3,1) 1.25s both}
+@keyframes ba1Up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+/* impact burst pieces, one-shot */
+[data-c="ba-1"] .ba1-burst{position:absolute;left:50%;top:44%}
+[data-c="ba-1"] .ba1-burst i{position:absolute;width:9px;height:6px;border-radius:1.5px;background:#0b0e12;opacity:0}
+[data-c="ba-1"] .ba1-burst i:nth-child(3n){background:#fff}
+[data-c="ba-1"] .ba1-burst i:nth-child(4n){border-radius:50%;width:7px;height:7px}
+[data-c="ba-1"] .b2.on .ba1-burst i{animation:ba1Pop 1.15s cubic-bezier(.15,.6,.3,1) .12s both}
+@keyframes ba1Pop{0%{opacity:1;transform:translate(0,0) rotate(0)}
+  100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(var(--rr))}}
 
-[data-c="ba-1"] .ba1-cost{font-size:19px;line-height:2.05;color:var(--text-mid);letter-spacing:-.012em}
+[data-c="ba-1"] .ba1-rule{width:36px;height:1px;background:rgba(235,238,248,.18);margin-bottom:20px}
+[data-c="ba-1"] .ba1-cost{font-size:19px;line-height:2.05;color:var(--text-mid)}
 [data-c="ba-1"] .ba1-cost b{color:var(--text-hi);font-size:26px;font-variant-numeric:tabular-nums}
-[data-c="ba-1"] .b2.on .ba1-cost{animation:ba1Up .55s cubic-bezier(.2,.8,.3,1) .2s both}
-
-[data-c="ba-1"] .ba1-card{position:relative;width:148px;height:192px;border-radius:20px;
-  background:linear-gradient(165deg,rgba(var(--ink),.11),rgba(var(--ink),.04) 55%,rgba(var(--ink),.07));
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.10), 0 0 74px rgba(var(--accent-rgb),.38),
-    0 22px 54px rgba(0,0,0,.55);
-  display:flex;align-items:center;justify-content:center}
-[data-c="ba-1"] .ba1-card svg{width:50px;height:50px;fill:var(--accent)}
-[data-c="ba-1"] .b3.on .ba1-card{animation:ba1Rise .9s cubic-bezier(.16,1.2,.3,1) both}
-@keyframes ba1Rise{from{opacity:0;transform:translateY(34px) scale(.9)}to{opacity:1;transform:none}}
-[data-c="ba-1"] .b3.on .ba1-card svg{animation:ba1MPop .7s cubic-bezier(.2,.9,.25,1) .5s both}
-@keyframes ba1MPop{0%{transform:scale(1)}45%{transform:scale(1.18)}100%{transform:scale(1)}}
-[data-c="ba-1"] .ba1-etch{margin-top:26px;font-size:17px;font-weight:650;letter-spacing:-.012em;
-  color:var(--text-hi)}
+[data-c="ba-1"] .b3.on .ba1-cost{animation:ba1Up .55s ease-out .15s both}
+[data-c="ba-1"] .ba1-etch{margin-top:24px;font-size:16px;font-weight:650;color:var(--text-hi)}
 [data-c="ba-1"] .ba1-sealed{margin-top:9px;font-size:13px;color:var(--text-lo)}
-[data-c="ba-1"] .b3.on .ba1-etch{animation:ba1Up .55s cubic-bezier(.2,.8,.3,1) .6s both}
-[data-c="ba-1"] .b3.on .ba1-sealed{animation:ba1Up .55s cubic-bezier(.2,.8,.3,1) .95s both}
+[data-c="ba-1"] .b3.on .ba1-etch{animation:ba1Up .5s ease-out .6s both}
+[data-c="ba-1"] .b3.on .ba1-sealed{animation:ba1Up .5s ease-out .9s both}
 @media (prefers-reduced-motion:reduce){
-  [data-c="ba-1"] .ba1-flood,[data-c="ba-1"] .ba1-m,[data-c="ba-1"] .ba1-line,
-  [data-c="ba-1"] .ba1-done,[data-c="ba-1"] .ba1-cost,[data-c="ba-1"] .ba1-card,
-  [data-c="ba-1"] .ba1-etch,[data-c="ba-1"] .ba1-sealed{opacity:1;transform:none;animation:none}
+  [data-c="ba-1"] .ba1-quiet,[data-c="ba-1"] .ba1-tap,[data-c="ba-1"] .ba1-m,
+  [data-c="ba-1"] .ba1-engine,[data-c="ba-1"] .ba1-cost,[data-c="ba-1"] .ba1-etch,
+  [data-c="ba-1"] .ba1-sealed{opacity:1;transform:none;animation:none}
+  [data-c="ba-1"] .ba1-line .w{opacity:1;transform:none;animation:none}
+  [data-c="ba-1"] .ba1-spark{width:132px;animation:none}
+  [data-c="ba-1"] .ba1-ring,[data-c="ba-1"] .ba1-burst i{display:none}
+  [data-c="ba-1"] .ba1-stage{animation:none}
 }
 </style>
 <div class="ph" data-c="ba-1">
   <div class="st">
 
-    <div class="b b1" data-confetti>
-      <div class="ba1-flood"></div>
-      <svg class="ba1-m" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
-      <div class="ba1-line">Lost 30 lbs.</div>
-      <div class="ba1-done">You actually did it.</div>
+    <div class="b b1">
+      <div class="ba1-quiet">Lost 30 lbs.</div>
+      <div class="ba1-spark" aria-hidden="true"></div>
+      <div class="ba1-tap">Tap.</div>
     </div>
 
-    <div class="b b2">
-      <div class="ba1-cost"><b data-count="0|126">126</b> days.<br><b data-count="0|215">215</b> weigh-ins.<br>230 &rarr; <b>200</b>.</div>
+    <div class="b b2" data-confetti>
+      <div class="ba1-flood"></div>
+      <div class="ba1-ring ba1-r1"></div>
+      <div class="ba1-ring ba1-r2"></div>
+      <div class="ba1-ring ba1-r3"></div>
+      <div class="ba1-burst" aria-hidden="true">
+        <i style="--dx:-130px;--dy:-100px;--rr:230deg"></i><i style="--dx:120px;--dy:-120px;--rr:-200deg"></i>
+        <i style="--dx:-160px;--dy:20px;--rr:160deg"></i><i style="--dx:150px;--dy:40px;--rr:-140deg"></i>
+        <i style="--dx:-80px;--dy:-160px;--rr:300deg"></i><i style="--dx:70px;--dy:-170px;--rr:-260deg"></i>
+        <i style="--dx:-140px;--dy:110px;--rr:190deg"></i><i style="--dx:130px;--dy:120px;--rr:-170deg"></i>
+        <i style="--dx:-40px;--dy:150px;--rr:120deg"></i><i style="--dx:50px;--dy:160px;--rr:-110deg"></i>
+        <i style="--dx:-180px;--dy:-40px;--rr:250deg"></i><i style="--dx:180px;--dy:-30px;--rr:-230deg"></i>
+      </div>
+      <div class="ba1-stage">
+        <svg class="ba1-m" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+        <div class="ba1-line"><span class="w" style="--i:0">Lost</span> <span class="w" style="--i:1">30</span> <span class="w" style="--i:2">lbs.</span></div>
+        <div class="ba1-engine"><b data-count="0|126">126</b> days &middot; <b data-count="0|215">215</b> weigh-ins</div>
+      </div>
     </div>
 
     <div class="b b3">
-      <div class="ba1-card"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+      <div class="ba1-rule"></div>
+      <div class="ba1-cost"><b data-count="0|126">126</b> days.<br><b data-count="0|215">215</b> weigh-ins.<br>230 &rarr; <b>200</b>.</div>
       <div class="ba1-etch">Lost 30 lbs.</div>
-      <div class="ba1-sealed">Sealed into your Memento.</div>
+      <div class="ba1-sealed">Sealed into your Memento, forever.</div>
     </div>
 
   </div>
