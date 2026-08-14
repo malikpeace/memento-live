@@ -57,6 +57,17 @@
   [data-c="ba-8"] .ba8-m,[data-c="ba-8"] .ba8-line,[data-c="ba-8"] .ba8-bow,
   [data-c="ba-8"] .ba8-cost,[data-c="ba-8"] .ba8-fin,[data-c="ba-8"] .ba8-close{opacity:1;transform:none;animation:none}
 }
+/* THE RECORDS BOARD: a stadium board of their own bests. */
+[data-c="ba-8"] .b2{padding:30px 26px}
+[data-c="ba-8"] .ba8-wall{width:100%;display:flex;flex-direction:column;text-align:left}
+[data-c="ba-8"] .ba8-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  padding:15px 0;border-bottom:1px solid rgba(var(--ink),.08);opacity:0}
+[data-c="ba-8"] .ba8-row span{font-size:12.5px;color:var(--text-mid)}
+[data-c="ba-8"] .ba8-row b{font-size:30px;font-weight:750;letter-spacing:-.035em;color:var(--text-hi);
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+[data-c="ba-8"] .ba8-row.hot b{color:var(--accent);font-size:38px}
+[data-c="ba-8"] .b2.on .ba8-row{animation:ba8Up .45s ease-out calc(.1s + var(--i)*.12s) both}
+@media (prefers-reduced-motion:reduce){ [data-c="ba-8"] .ba8-row{opacity:1;animation:none} }
 </style>
 <div class="ph" data-c="ba-8">
   <div class="st">
@@ -81,7 +92,7 @@
     </div>
 
     <div class="b b2">
-      <div class="ba8-cost"><b data-count="0|126">126</b> days.<br><b data-count="0|215">215</b> weigh-ins.<br>230 &rarr; <b>200</b>.</div>
+      <div class="ba8-wall"></div>
     </div>
 
     <div class="b b3">

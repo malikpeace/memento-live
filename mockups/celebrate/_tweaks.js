@@ -59,6 +59,19 @@
   }
   /* dollar goals show the $ (Malik 2026-08-14) */
   function isMoney(unit) { return /^\$|dollar/i.test(String(unit || '').trim()); }
+  /* the wall's shared arithmetic: every number derived from their own */
+  function wallData(v) {
+    var days = +v.days, moves = +v.moves, hours = +v.hours || 0, streak = +v.streak || 0;
+    var weeks = Math.max(1, Math.round(days / 7));
+    var perWeek = moves > 0 ? Math.round(moves / weeks * 10) / 10 : 0;
+    var money = isMoney(v.unit);
+    var mf = function (n) { return (money ? '$' : '') + fmt(n); };
+    var marks = 0;
+    if (v.shape === 'target' && +v.start !== +v.value) marks = C.milestones({ target: +v.value, baseline: +v.start }, +v.value < +v.start ? 'down' : 'up').length;
+    else if (v.shape === 'count') marks = C.COUNT_LADDER.filter(function (c) { return c <= +v.value; }).length;
+    else marks = Math.floor(days / 7) + Math.floor(days / 30);
+    return { days: days, moves: moves, hours: hours, streak: streak, weeks: weeks, perWeek: perWeek, money: money, mf: mf, marks: marks };
+  }
   function seeded(seed) { return function () { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; }; }
 
   function Q(ph, sel) { return ph.querySelector(sel); }
@@ -820,8 +833,12 @@
       }
     },
 
-    /* ================= BIG ASS CELEBRATIONS (the grand finale, restarted
-       2026-08-14 on Malik's "make it HOLY FUCKING SHIT" note) ================= */
+    /* ================= BIG ASS CELEBRATIONS: ten openings, ten WALLS.
+       Malik 2026-08-14 03:00: "a wall of information... the 500 runs, the
+       1293 hours, the 50 day streak... overwhelming but beautiful. people
+       might pay $500 for the biggest moment on the app." Beat 1 keeps each
+       opening; beat 2 (beat 3 for ba-1) is now a full-screen monument of
+       everything they did, a different wall on every option. ============ */
     'ba-1': {
       c: [
         { k: 'shape', t: 's', l: 'Goal shape', v: 'target', o: [
@@ -835,16 +852,29 @@
         { k: 'unit', t: 't', l: 'Unit', v: 'lbs' },
         { k: 'days', t: 'r', l: 'Days it took', v: 126, min: 1, max: 900 },
         { k: 'moves', t: 'r', l: 'Moves logged', v: 215, min: 0, max: 2000 },
-        { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' }
+        { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' },
+        { k: 'streak', t: 'r', l: 'Best streak (days)', v: 41, min: 0, max: 365 },
+        { k: 'hours', t: 'r', l: 'Hours logged', v: 184, min: 0, max: 5000 }
       ],
       apply: function (ph, v) {
         put(ph, '.ba1-quiet', esc(v.line) + '.');
         var words = String(v.line).trim().split(/\s+/), spans = '';
         for (var i = 0; i < words.length; i++) spans += '<span class="w" style="--i:' + i + '">' + esc(words[i]) + (i === words.length - 1 ? '.' : '') + '</span> ';
         put(ph, '.ba1-line', spans.trim());
-        put(ph, '.ba1-engine', '<b>' + fmt(+v.days) + '</b> ' + plural(+v.days, 'day', 'days') + ' &middot; <b>' + fmt(+v.moves) + '</b> ' + esc(unitFor(+v.moves, v.moveWord)));
-        put(ph, '.ba1-cost', baCost(v));
-        put(ph, '.ba1-etch', esc(v.line) + '.');
+        var w = wallData(v);
+        put(ph, '.ba1-engine', '<b>' + fmt(w.days) + '</b> ' + plural(w.days, 'day', 'days') + ' &middot; <b>' + fmt(w.moves) + '</b> ' + esc(unitFor(w.moves, v.moveWord)));
+        /* THE LEDGER WALL */
+        var cells = '', k = 0;
+        function cell(num, label, cls) { cells += '<div class="ba1-cell ' + (cls || '') + '" style="--i:' + (k++) + '"><b>' + num + '</b><span>' + label + '</span></div>'; }
+        cell(fmt(w.moves), esc(unitFor(w.moves, v.moveWord)) + ', every one logged', 'ba1-cell--hero');
+        cell(fmt(w.days), plural(w.days, 'day', 'days') + ' start to finish');
+        if (w.hours > 0) cell(fmt(w.hours), 'hours put in');
+        if (w.streak > 0) cell(fmt(w.streak), 'days, your longest streak');
+        cell(fmt(w.weeks), plural(w.weeks, 'week', 'weeks'));
+        if (w.perWeek > 0) cell(fmt(w.perWeek), esc(unitFor(2, v.moveWord)) + ' a week, on average');
+        cell(fmt(w.marks), plural(w.marks, 'mark passed', 'marks passed'));
+        if (v.shape === 'target') cell(w.mf(+v.start) + ' &rarr; ' + w.mf(+v.value), 'your own numbers');
+        put(ph, '.ba1-wall', cells);
       }
     },
 
@@ -861,23 +891,34 @@
         { k: 'unit', t: 't', l: 'Unit', v: 'lbs' },
         { k: 'days', t: 'r', l: 'Days it took', v: 126, min: 1, max: 900 },
         { k: 'moves', t: 'r', l: 'Moves logged', v: 215, min: 0, max: 2000 },
-        { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' }
+        { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' },
+        { k: 'streak', t: 'r', l: 'Best streak (days)', v: 41, min: 0, max: 365 },
+        { k: 'hours', t: 'r', l: 'Hours logged', v: 184, min: 0, max: 5000 }
       ],
       apply: function (ph, v) {
-        var sh = v.shape, money = isMoney(v.unit);
-        var mf = function (n) { return (money ? '$' : '') + fmt(n); };
+        var sh = v.shape, w = wallData(v);
         var hero, from, unit;
-        if (sh === 'target') { hero = mf(+v.value); from = 'From ' + mf(+v.start) + '.'; unit = esc(unitFor(+v.value, money ? 'dollars' : v.unit)) + '. The number you named.'; }
-        else if (sh === 'count') { hero = mf(+v.value); from = 'From zero.'; unit = esc(unitFor(+v.value, v.unit)) + '. Every one logged.'; }
-        else if (sh === 'duration') { hero = fmt(+v.days); from = 'From day one.'; unit = plural(+v.days, 'day', 'days') + ' held, start to finish.'; }
-        else { hero = fmt(+v.days); from = 'From the day you named it.'; unit = plural(+v.days, 'day', 'days') + ' of work, and then the day.'; }
+        if (sh === 'target') { hero = w.mf(+v.value); from = 'From ' + w.mf(+v.start) + '.'; unit = esc(unitFor(+v.value, w.money ? 'dollars' : v.unit)) + '. The number you named.'; }
+        else if (sh === 'count') { hero = w.mf(+v.value); from = 'From zero.'; unit = esc(unitFor(+v.value, v.unit)) + '. Every one logged.'; }
+        else if (sh === 'duration') { hero = fmt(w.days); from = 'From day one.'; unit = plural(w.days, 'day', 'days') + ' held, start to finish.'; }
+        else { hero = fmt(w.days); from = 'From the day you named it.'; unit = plural(w.days, 'day', 'days') + ' of work, and then the day.'; }
         put(ph, '.ba2-from', from);
         put(ph, '.ba2-hero', hero);
         var hEl = Q(ph, '.ba2-hero');
         if (hEl) hEl.style.fontSize = hero.length > 6 ? '84px' : hero.length > 4 ? '104px' : '132px';
         put(ph, '.ba2-unit', unit);
         put(ph, '.ba2-line', esc(v.line) + '.');
-        put(ph, '.ba2-cost', baCost(v));
+        /* THE COLUMN: one slat per move, stacked into a tower */
+        var slats = Math.max(1, Math.min(w.moves || w.days, 110)), t = '';
+        for (var i = 0; i < slats; i++) t += '<i class="' + (i === slats - 1 ? 'top' : '') + '" style="--i:' + i + '"></i>';
+        put(ph, '.ba2-tower', t);
+        var side = '', k = 0;
+        function stat(num, label, hot) { side += '<div class="ba2-s' + (hot ? ' hot' : '') + '" style="--i:' + (k++) + '"><b>' + num + '</b><span>' + label + '</span></div>'; }
+        stat(fmt(w.moves || w.days), w.moves ? esc(unitFor(w.moves, v.moveWord)) + ', stacked' : 'days, stacked', true);
+        stat(fmt(w.days), plural(w.days, 'day', 'days'));
+        if (w.hours > 0) stat(fmt(w.hours), 'hours');
+        if (w.streak > 0) stat(fmt(w.streak) + '-day', 'longest streak');
+        put(ph, '.ba2-side', side + (w.moves > slats ? '<div class="ba2-s" style="--i:' + k + '"><span>(' + fmt(w.moves - slats) + ' more than the tower can hold.)</span></div>' : ''));
       }
     },
 
@@ -894,24 +935,37 @@
         { k: 'unit', t: 't', l: 'Unit', v: 'lbs' },
         { k: 'days', t: 'r', l: 'Days it took', v: 126, min: 1, max: 900 },
         { k: 'moves', t: 'r', l: 'Moves logged', v: 215, min: 0, max: 2000 },
-        { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' }
+        { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' },
+        { k: 'streak', t: 'r', l: 'Best streak (days)', v: 41, min: 0, max: 365 },
+        { k: 'hours', t: 'r', l: 'Hours logged', v: 184, min: 0, max: 5000 }
       ],
       apply: function (ph, v) {
-        var sh = v.shape, money = isMoney(v.unit);
-        var mf = function (n) { return (money ? '$' : '') + fmt(n); };
-        put(ph, '.ba3-c1', fmt(+v.days) + '<small>' + plural(+v.days, 'day', 'days') + '</small>');
-        put(ph, '.ba3-c2', +v.moves > 0
-          ? fmt(+v.moves) + '<small>' + esc(unitFor(+v.moves, v.moveWord)) + '</small>'
-          : mf(+v.value) + '<small>' + esc(unitFor(+v.value, v.unit)) + '</small>');
+        var sh = v.shape, w = wallData(v);
+        put(ph, '.ba3-c1', fmt(w.days) + '<small>' + plural(w.days, 'day', 'days') + '</small>');
+        put(ph, '.ba3-c2', w.moves > 0
+          ? fmt(w.moves) + '<small>' + esc(unitFor(w.moves, v.moveWord)) + '</small>'
+          : w.mf(+v.value) + '<small>' + esc(unitFor(+v.value, v.unit)) + '</small>');
         var c3;
-        if (sh === 'target') c3 = mf(+v.start) + ' &rarr; ' + mf(+v.value) + '<small>your own numbers</small>';
-        else if (sh === 'count') c3 = mf(+v.value) + '<small>' + esc(unitFor(+v.value, v.unit)) + ', the target you set</small>';
-        else if (sh === 'duration') c3 = 'day 1 &rarr; day ' + fmt(+v.days) + '<small>the line held the whole way</small>';
+        if (sh === 'target') c3 = w.mf(+v.start) + ' &rarr; ' + w.mf(+v.value) + '<small>your own numbers</small>';
+        else if (sh === 'count') c3 = w.mf(+v.value) + '<small>' + esc(unitFor(+v.value, v.unit)) + ', the target you set</small>';
+        else if (sh === 'duration') c3 = 'day 1 &rarr; day ' + fmt(w.days) + '<small>the line held the whole way</small>';
         else c3 = 'done<small>no partial credit, and none needed</small>';
         put(ph, '.ba3-c3', c3);
         put(ph, '.ba3-line', esc(v.line) + '.');
         put(ph, '.ba3-fin', esc(v.line) + '.');
-        put(ph, '.ba3-cost', baCost(v));
+        /* THE REEL WALL: a full grid of stat cards */
+        var cards = '', k = 0;
+        function card(num, label, cls) { cards += '<div class="ba3-k ' + (cls || '') + '" style="--i:' + (k++) + '"><b>' + num + '</b><span>' + label + '</span></div>'; }
+        card(fmt(w.moves), esc(unitFor(w.moves, v.moveWord)), 'ba3-k--wide ba3-k--hot');
+        card(fmt(w.days), plural(w.days, 'day', 'days'));
+        card(fmt(w.weeks), plural(w.weeks, 'week', 'weeks'));
+        card(fmt(w.marks), 'marks');
+        if (w.hours > 0) card(fmt(w.hours), 'hours');
+        if (w.streak > 0) card(fmt(w.streak), 'day streak');
+        if (w.perWeek > 0) card(fmt(w.perWeek), 'a week, avg');
+        if (v.shape === 'target') { card(w.mf(+v.start), 'where you started'); card(w.mf(+v.value), 'where you ended', 'ba3-k--hot'); }
+        else { card(dateBack(w.days), 'day one'); card(dateBack(0), 'the day', 'ba3-k--hot'); }
+        put(ph, '.ba3-wall', cards);
       }
     },
 
@@ -928,11 +982,22 @@
         { k: 'unit', t: 't', l: 'Unit', v: 'lbs' },
         { k: 'days', t: 'r', l: 'Days it took', v: 126, min: 1, max: 900 },
         { k: 'moves', t: 'r', l: 'Moves logged', v: 215, min: 0, max: 2000 },
-        { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' }
+        { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' },
+        { k: 'streak', t: 'r', l: 'Best streak (days)', v: 41, min: 0, max: 365 },
+        { k: 'hours', t: 'r', l: 'Hours logged', v: 184, min: 0, max: 5000 }
       ],
       apply: function (ph, v) {
         put(ph, '.ba4-line', esc(v.line) + '.');
-        put(ph, '.ba4-cost', baCost(v));
+        var w = wallData(v);
+        /* THE HALO: one dot per move, orbiting the card in a golden spiral */
+        var N = Math.max(1, Math.min(w.moves || w.days, 280)), dots = '';
+        for (var i = 0; i < N; i++) {
+          var ang = i * 2.399963, r = 86 + 4.6 * Math.sqrt(i * 9);
+          var x = (Math.cos(ang) * r).toFixed(1), y = (Math.sin(ang) * r * 1.12).toFixed(1);
+          dots += '<i class="' + (i % 5 === 0 ? 'w' : '') + '" style="--i:' + i + ';margin-left:' + x + 'px;margin-top:' + y + 'px"></i>';
+        }
+        put(ph, '.ba4-halo', dots);
+        put(ph, '.ba4-under', '<b>' + fmt(w.moves || w.days) + '</b><span>' + (w.moves ? esc(unitFor(w.moves, v.moveWord)) : 'days') + ' around your Memento' + (w.moves > N ? ' (' + fmt(N) + ' drawn)' : '') + '</span>');
       }
     },
 
@@ -949,14 +1014,27 @@
         { k: 'unit', t: 't', l: 'Unit', v: 'lbs' },
         { k: 'days', t: 'r', l: 'Days it took', v: 126, min: 1, max: 900 },
         { k: 'moves', t: 'r', l: 'Moves logged', v: 215, min: 0, max: 2000 },
-        { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' }
+        { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' },
+        { k: 'streak', t: 'r', l: 'Best streak (days)', v: 41, min: 0, max: 365 },
+        { k: 'hours', t: 'r', l: 'Hours logged', v: 184, min: 0, max: 5000 }
       ],
       apply: function (ph, v) {
         put(ph, '.ba5-line0', esc(v.line) + '.');
         put(ph, '.ba5-line', esc(v.line) + '.');
         put(ph, '.ba5-fin', esc(v.line) + '.');
-        put(ph, '.ba5-cost', baCost(v));
-        put(ph, '.ba5-once', +v.days >= 300 ? 'A year of showing up, paid in full.' : fmt(+v.days) + ' days of showing up, paid in full.');
+        var w = wallData(v);
+        put(ph, '.ba5-once', w.days >= 300 ? 'A year of showing up, paid in full.' : fmt(w.days) + ' days of showing up, paid in full.');
+        /* THE FIELD: the dot flower at monument scale, one dot per move */
+        var N = Math.max(1, Math.min(w.moves || w.days, 900));
+        var dr = Math.max(1.5, Math.min(4.4, 40 / Math.sqrt(N + 2))), c = 6.6, out = '';
+        for (var i = 0; i < N; i++) {
+          var rr = c * Math.sqrt(i), th = i * 2.399963;
+          out += '<circle cx="' + (rr * Math.cos(th)).toFixed(1) + '" cy="' + (rr * Math.sin(th)).toFixed(1) + '" r="' + (i === N - 1 ? dr + 1.4 : dr) + '" fill="' + (i === N - 1 ? '#fff' : (i % 6 === 0 ? 'rgba(235,238,248,.75)' : 'rgba(var(--accent-rgb),.8)')) + '"></circle>';
+        }
+        var span = Math.max(60, c * Math.sqrt(N) + 8);
+        var svg = Q(ph, '.ba5-svg');
+        if (svg) { svg.setAttribute('viewBox', (-span) + ' ' + (-span) + ' ' + (span * 2) + ' ' + (span * 2)); svg.innerHTML = out; }
+        put(ph, '.ba5-under', '<b>' + fmt(w.moves || w.days) + '</b><span>' + (w.moves ? esc(unitFor(w.moves, v.moveWord)) : 'days') + '. One dot for every single one.</span>');
       }
     },
 
@@ -973,15 +1051,24 @@
         { k: 'unit', t: 't', l: 'Unit', v: 'lbs' },
         { k: 'days', t: 'r', l: 'Days it took', v: 126, min: 1, max: 900 },
         { k: 'moves', t: 'r', l: 'Moves logged', v: 215, min: 0, max: 2000 },
-        { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' }
+        { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' },
+        { k: 'streak', t: 'r', l: 'Best streak (days)', v: 41, min: 0, max: 365 },
+        { k: 'hours', t: 'r', l: 'Hours logged', v: 184, min: 0, max: 5000 }
       ],
       apply: function (ph, v) {
         put(ph, '.ba6-line', esc(v.line) + '.');
         var z = { target: 'Zero left between you and it.', count: 'Every last one, logged.',
                   duration: 'Held to the very end.', event: 'Done is done.' };
         put(ph, '.ba6-zero', z[v.shape] || z.target);
-        put(ph, '.ba6-cost', baCost(v));
         put(ph, '.ba6-fin', esc(v.line) + '.');
+        /* THE ODOMETER WALL: every total counts up at once, huge */
+        var w = wallData(v), rows = '', k = 0;
+        function row(n, label, hot) { rows += '<div class="ba6-row' + (hot ? ' hot' : '') + '" style="--i:' + (k++) + '"><b data-count="0|' + n + '">' + fmt(n) + '</b><span>' + label + '</span></div>'; }
+        row(w.moves || w.days, w.moves ? esc(unitFor(w.moves, v.moveWord)) : 'days', true);
+        row(w.days, plural(w.days, 'day', 'days'));
+        if (w.hours > 0) row(w.hours, 'hours logged');
+        if (w.streak > 0) row(w.streak, 'days, your longest streak');
+        put(ph, '.ba6-wall', rows);
       }
     },
 
@@ -998,7 +1085,9 @@
         { k: 'unit', t: 't', l: 'Unit', v: 'lbs' },
         { k: 'days', t: 'r', l: 'Days it took', v: 126, min: 1, max: 900 },
         { k: 'moves', t: 'r', l: 'Moves logged', v: 215, min: 0, max: 2000 },
-        { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' }
+        { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' },
+        { k: 'streak', t: 'r', l: 'Best streak (days)', v: 41, min: 0, max: 365 },
+        { k: 'hours', t: 'r', l: 'Hours logged', v: 184, min: 0, max: 5000 }
       ],
       apply: function (ph, v) {
         put(ph, '.ba7-e1', esc(v.line) + '.');
@@ -1006,7 +1095,12 @@
         put(ph, '.ba7-e3', esc(v.line) + '.');
         put(ph, '.ba7-line', esc(v.line) + '.');
         put(ph, '.ba7-fin', esc(v.line) + '.');
-        put(ph, '.ba7-cost', baCost(v));
+        /* THE TEN THOUSAND: the move word printed once per move */
+        var w = wallData(v), word = singular(v.moveWord || 'move');
+        var N = Math.max(1, Math.min(w.moves || w.days, 240)), spans = '';
+        for (var i = 0; i < N; i++) spans += '<s class="' + ((i + 1) % 10 === 0 ? 'hot' : '') + '" style="--i:' + i + '">' + esc(word) + '</s>';
+        put(ph, '.ba7-wall', spans);
+        put(ph, '.ba7-tot', '<b>' + fmt(w.moves || w.days) + '</b><span>' + (w.moves ? esc(unitFor(w.moves, v.moveWord)) : 'days') + ', written out' + (w.moves > N ? '. ' + fmt(N) + ' shown; the rest still count.' : '.') + '</span>');
       }
     },
 
@@ -1023,13 +1117,25 @@
         { k: 'unit', t: 't', l: 'Unit', v: 'lbs' },
         { k: 'days', t: 'r', l: 'Days it took', v: 126, min: 1, max: 900 },
         { k: 'moves', t: 'r', l: 'Moves logged', v: 215, min: 0, max: 2000 },
-        { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' }
+        { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' },
+        { k: 'streak', t: 'r', l: 'Best streak (days)', v: 41, min: 0, max: 365 },
+        { k: 'hours', t: 'r', l: 'Hours logged', v: 184, min: 0, max: 5000 }
       ],
       apply: function (ph, v) {
         put(ph, '.ba8-find', esc(v.line) + '.');
         put(ph, '.ba8-line', esc(v.line) + '.');
         put(ph, '.ba8-fin', esc(v.line) + '.');
-        put(ph, '.ba8-cost', baCost(v));
+        /* THE RECORDS BOARD */
+        var w = wallData(v), rows = '', k = 0;
+        function row(label, val, hot) { rows += '<div class="ba8-row' + (hot ? ' hot' : '') + '" style="--i:' + (k++) + '"><span>' + label + '</span><b>' + val + '</b></div>'; }
+        row('Total ' + esc(v.moveWord || 'moves'), fmt(w.moves), true);
+        if (w.streak > 0) row('Longest streak', fmt(w.streak) + ' days');
+        if (w.hours > 0) row('Hours put in', fmt(w.hours));
+        if (w.perWeek > 0) row('A week, on average', fmt(w.perWeek));
+        row('Marks passed', fmt(w.marks));
+        row('Day one', dateBack(w.days));
+        row('The day', dateBack(0));
+        put(ph, '.ba8-wall', rows);
       }
     },
 
@@ -1046,21 +1152,22 @@
         { k: 'unit', t: 't', l: 'Unit', v: 'lbs' },
         { k: 'days', t: 'r', l: 'Days it took', v: 126, min: 1, max: 900 },
         { k: 'moves', t: 'r', l: 'Moves logged', v: 215, min: 0, max: 2000 },
-        { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' }
+        { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' },
+        { k: 'streak', t: 'r', l: 'Best streak (days)', v: 41, min: 0, max: 365 },
+        { k: 'hours', t: 'r', l: 'Hours logged', v: 184, min: 0, max: 5000 }
       ],
       apply: function (ph, v) {
-        var sh = v.shape, money = isMoney(v.unit);
-        var mf = function (n) { return (money ? '$' : '') + fmt(n); };
+        var sh = v.shape, w = wallData(v);
         var vals = [];
         if (sh === 'target' && +v.start !== +v.value) {
           var dir = +v.value < +v.start ? 'down' : 'up';
-          vals = C.milestones({ target: +v.value, baseline: +v.start }, dir).map(mf);
+          vals = C.milestones({ target: +v.value, baseline: +v.start }, dir).map(w.mf);
         } else if (sh === 'count') {
-          vals = C.COUNT_LADDER.filter(function (c) { return c < +v.value; }).map(mf);
-          vals.push(mf(+v.value));
+          vals = C.COUNT_LADDER.filter(function (c) { return c < +v.value; }).map(w.mf);
+          vals.push(w.mf(+v.value));
         } else {
-          for (var d = 30; d < +v.days; d += 30) vals.push('day ' + fmt(d));
-          vals.push('day ' + fmt(+v.days));
+          for (var d = 30; d < w.days; d += 30) vals.push('day ' + fmt(d));
+          vals.push('day ' + fmt(w.days));
         }
         var over = Math.max(0, vals.length - 13);
         if (over > 0) vals = ['&hellip;'].concat(vals.slice(over));
@@ -1074,7 +1181,20 @@
         var b1 = Q(ph, '.b1'); if (b1) b1.style.setProperty('--boom', boom);
         put(ph, '.ba9-line', esc(v.line) + '.');
         put(ph, '.ba9-fin', esc(v.line) + '.');
-        put(ph, '.ba9-cost', baCost(v));
+        /* THE FULL WALL: every kind of chip, whole screen */
+        var wall = [], j = 0;
+        vals.forEach(function (x) { wall.push([x, '']); });
+        wall.push([fmt(w.moves) + ' ' + esc(unitFor(w.moves, v.moveWord)), 'ba9-wc--big ba9-wc--hot']);
+        wall.push([fmt(w.days) + ' days', 'ba9-wc--big']);
+        wall.push([fmt(w.weeks) + ' weeks', '']);
+        if (w.streak > 0) wall.push([fmt(w.streak) + '-day streak', 'ba9-wc--hot']);
+        if (w.hours > 0) wall.push([fmt(w.hours) + ' hours', 'ba9-wc--big']);
+        wall.push([fmt(w.marks) + ' marks', '']);
+        wall.push(['day 1: ' + dateBack(w.days), '']);
+        wall.push(['done: ' + dateBack(0), 'ba9-wc--hot']);
+        var html = '';
+        wall.forEach(function (c) { html += '<span class="ba9-wc ' + c[1] + '" style="--i:' + (j++) + '">' + c[0] + '</span>'; });
+        put(ph, '.ba9-wall', html);
       }
     },
 
@@ -1091,14 +1211,18 @@
         { k: 'unit', t: 't', l: 'Unit', v: 'lbs' },
         { k: 'days', t: 'r', l: 'Days it took', v: 126, min: 1, max: 900 },
         { k: 'moves', t: 'r', l: 'Moves logged', v: 215, min: 0, max: 2000 },
-        { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' }
+        { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' },
+        { k: 'streak', t: 'r', l: 'Best streak (days)', v: 41, min: 0, max: 365 },
+        { k: 'hours', t: 'r', l: 'Hours logged', v: 184, min: 0, max: 5000 }
       ],
       apply: function (ph, v) {
         put(ph, '.ba10-line', esc(v.line) + '.');
         put(ph, '.ba10-fin', esc(v.line) + '.');
-        put(ph, '.ba10-cost', baCost(v));
+        var w = wallData(v);
+        put(ph, '.ba10-under', '<b>' + fmt(w.moves || w.days) + '</b><span>' + (w.moves ? esc(unitFor(w.moves, v.moveWord)) : 'days') + ' in the mark. ' + fmt(w.days) + ' days. ' + (w.hours > 0 ? fmt(w.hours) + ' hours.' : '') + '</span>');
       }
     }
+
 
 
   };

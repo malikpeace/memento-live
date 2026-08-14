@@ -57,6 +57,17 @@
   [data-c="ba-9"] .ba9-m,[data-c="ba-9"] .ba9-line,[data-c="ba-9"] .ba9-every,
   [data-c="ba-9"] .ba9-cost,[data-c="ba-9"] .ba9-fin,[data-c="ba-9"] .ba9-close{opacity:1;transform:none;animation:none}
 }
+/* THE FULL WALL: the chips return and take the WHOLE screen. */
+[data-c="ba-9"] .b2{padding:26px 16px}
+[data-c="ba-9"] .ba9-wall{width:100%;display:flex;flex-wrap:wrap;gap:7px;justify-content:center;align-content:center}
+[data-c="ba-9"] .ba9-wc{padding:9px 12px;border-radius:9px;background:rgba(var(--ink),.06);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.06);font-size:14px;font-weight:700;letter-spacing:-.02em;
+  color:var(--text-mid);font-variant-numeric:tabular-nums;opacity:0}
+[data-c="ba-9"] .ba9-wc--hot{background:rgba(var(--accent-rgb),.16);color:var(--accent)}
+[data-c="ba-9"] .ba9-wc--big{font-size:19px;padding:12px 16px}
+[data-c="ba-9"] .b2.on .ba9-wc{animation:ba9C .3s cubic-bezier(.16,1.3,.3,1) calc(.06s + var(--i)*.05s) both}
+@keyframes ba9C{from{opacity:0;transform:scale(1.4)}to{opacity:1;transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){ [data-c="ba-9"] .ba9-wc{opacity:1;animation:none} }
 </style>
 <div class="ph" data-c="ba-9">
   <div class="st">
@@ -86,7 +97,7 @@
     </div>
 
     <div class="b b2">
-      <div class="ba9-cost"><b data-count="0|126">126</b> days.<br><b data-count="0|215">215</b> weigh-ins.<br>230 &rarr; <b>200</b>.</div>
+      <div class="ba9-wall"></div>
     </div>
 
     <div class="b b3">

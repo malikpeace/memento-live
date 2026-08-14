@@ -51,6 +51,23 @@
 [data-c="ba-2"] .ba2fw i:nth-child(2n){background:#fff}
 [data-c="ba-2"] .b1.on .ba2fw i{animation:ba2Spk 1s cubic-bezier(.15,.6,.3,1) 1.5s both}
 @keyframes ba2Spk{0%{opacity:1;transform:translate(0,0)}100%{opacity:0;transform:translate(var(--dx),var(--dy))}}
+/* THE COLUMN: every move stacked into a tower that fills the screen. */
+[data-c="ba-2"] .b2{padding:24px}
+[data-c="ba-2"] .ba2-wall{width:100%;height:100%;display:flex;gap:20px;align-items:stretch}
+[data-c="ba-2"] .ba2-tower{flex:0 0 96px;display:flex;flex-direction:column-reverse;gap:2px}
+[data-c="ba-2"] .ba2-tower i{display:block;flex:1;border-radius:1.5px;background:rgba(var(--accent-rgb),.5);
+  opacity:0;transform:scaleX(0);transform-origin:left center}
+[data-c="ba-2"] .ba2-tower i.top{background:var(--accent)}
+[data-c="ba-2"] .b2.on .ba2-tower i{animation:ba2Slat .3s ease-out calc(var(--i)*.012s) forwards}
+@keyframes ba2Slat{to{opacity:1;transform:scaleX(1)}}
+[data-c="ba-2"] .ba2-side{flex:1;display:flex;flex-direction:column;justify-content:center;gap:20px;text-align:left}
+[data-c="ba-2"] .ba2-s b{display:block;font-size:38px;font-weight:750;letter-spacing:-.04em;line-height:1;
+  color:var(--text-hi);font-variant-numeric:tabular-nums}
+[data-c="ba-2"] .ba2-s.hot b{color:var(--accent);font-size:52px}
+[data-c="ba-2"] .ba2-s span{display:block;margin-top:6px;font-size:11.5px;color:var(--text-lo)}
+[data-c="ba-2"] .ba2-s{opacity:0}
+[data-c="ba-2"] .b2.on .ba2-s{animation:ba2Up .5s ease-out calc(.5s + var(--i)*.15s) both}
+@media (prefers-reduced-motion:reduce){ [data-c="ba-2"] .ba2-tower i,[data-c="ba-2"] .ba2-s{opacity:1;transform:none;animation:none} }
 </style>
 <div class="ph" data-c="ba-2">
   <div class="st">
@@ -72,7 +89,10 @@
     </div>
 
     <div class="b b2">
-      <div class="ba2-cost"><b data-count="0|126">126</b> days.<br><b data-count="0|215">215</b> weigh-ins.<br>230 &rarr; <b>200</b>.</div>
+      <div class="ba2-wall">
+        <div class="ba2-tower"></div>
+        <div class="ba2-side"></div>
+      </div>
     </div>
 
     <div class="b b3">

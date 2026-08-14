@@ -56,6 +56,21 @@
   [data-c="ba-7"] .ba7-m,[data-c="ba-7"] .ba7-line,[data-c="ba-7"] .ba7-said,
   [data-c="ba-7"] .ba7-cost,[data-c="ba-7"] .ba7-fin,[data-c="ba-7"] .ba7-close{opacity:1;transform:none;animation:none}
 }
+/* THE TEN THOUSAND: the move word printed once per move, a wall of text. */
+[data-c="ba-7"] .b2{padding:28px 20px}
+[data-c="ba-7"] .ba7-wall{width:100%;display:flex;flex-wrap:wrap;gap:4px 7px;justify-content:center;
+  align-content:center;max-height:64%;overflow:hidden}
+[data-c="ba-7"] .ba7-wall s{text-decoration:none;font-size:10.5px;font-weight:600;letter-spacing:0;
+  color:rgba(235,238,248,.34);opacity:0}
+[data-c="ba-7"] .ba7-wall s.hot{color:var(--accent)}
+[data-c="ba-7"] .b2.on .ba7-wall s{animation:ba7In .25s ease-out calc(var(--i)*.006s) forwards}
+@keyframes ba7In{to{opacity:1}}
+[data-c="ba-7"] .ba7-tot{margin-top:20px;text-align:center;opacity:0}
+[data-c="ba-7"] .ba7-tot b{font-size:44px;font-weight:750;letter-spacing:-.04em;color:var(--text-hi);
+  font-variant-numeric:tabular-nums}
+[data-c="ba-7"] .ba7-tot span{display:block;margin-top:6px;font-size:12px;color:var(--text-lo)}
+[data-c="ba-7"] .b2.on .ba7-tot{animation:ba7Up .5s ease-out 1.6s both}
+@media (prefers-reduced-motion:reduce){ [data-c="ba-7"] .ba7-wall s,[data-c="ba-7"] .ba7-tot{opacity:1;animation:none} }
 </style>
 <div class="ph" data-c="ba-7">
   <div class="st">
@@ -83,7 +98,8 @@
     </div>
 
     <div class="b b2">
-      <div class="ba7-cost"><b data-count="0|126">126</b> days.<br><b data-count="0|215">215</b> weigh-ins.<br>230 &rarr; <b>200</b>.</div>
+      <div class="ba7-wall"></div>
+      <div class="ba7-tot"></div>
     </div>
 
     <div class="b b3">

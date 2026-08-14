@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>BIG ASS CELEBRATIONS</title>
-<link rel="stylesheet" href="_kit.css?v=tw9">
+<link rel="stylesheet" href="_kit.css?v=tw10">
 </head><body data-accent="cyan">
 <div class="bar">
   <a href="index.html" style="color:var(--text-mid);text-decoration:none;font-size:13px;font-weight:600">&lsaquo; All</a>
@@ -80,6 +80,21 @@
   [data-c="ba-1"] .ba1-ring,[data-c="ba-1"] .ba1-burst i{display:none}
   [data-c="ba-1"] .ba1-stage{animation:none}
 }
+/* THE LEDGER WALL: the whole record, tiled edge to edge. */
+[data-c="ba-1"] .b3{padding:26px 18px}
+[data-c="ba-1"] .ba1-wall{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+[data-c="ba-1"] .ba1-cell{padding:16px 14px;border-radius:13px;background:rgba(var(--ink),.05);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.06);text-align:left;opacity:0}
+[data-c="ba-1"] .ba1-cell b{display:block;font-size:38px;font-weight:750;letter-spacing:-.04em;
+  line-height:1;color:var(--text-hi);font-variant-numeric:tabular-nums}
+[data-c="ba-1"] .ba1-cell span{display:block;margin-top:7px;font-size:11.5px;color:var(--text-lo)}
+[data-c="ba-1"] .ba1-cell--hero{grid-column:1/-1}
+[data-c="ba-1"] .ba1-cell--hero b{font-size:60px;color:var(--accent)}
+[data-c="ba-1"] .b3.on .ba1-cell{animation:ba1Cell .45s cubic-bezier(.16,1.25,.3,1) calc(.1s + var(--i)*.09s) both}
+@keyframes ba1Cell{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}
+[data-c="ba-1"] .ba1-sealed2{width:100%;text-align:center;font-size:13px;color:var(--text-lo);margin-top:16px;opacity:0}
+[data-c="ba-1"] .b3.on .ba1-sealed2{animation:ba1Up .5s ease-out 1.1s both}
+@media (prefers-reduced-motion:reduce){ [data-c="ba-1"] .ba1-cell,[data-c="ba-1"] .ba1-sealed2{opacity:1;animation:none} }
 </style>
 <div class="ph" data-c="ba-1">
   <div class="st">
@@ -111,10 +126,8 @@
     </div>
 
     <div class="b b3">
-      <div class="ba1-rule"></div>
-      <div class="ba1-cost"><b data-count="0|126">126</b> days.<br><b data-count="0|215">215</b> weigh-ins.<br>230 &rarr; <b>200</b>.</div>
-      <div class="ba1-etch">Lost 30 lbs.</div>
-      <div class="ba1-sealed">Sealed into your Memento, forever.</div>
+      <div class="ba1-wall"></div>
+      <div class="ba1-sealed2">Sealed into your Memento, forever.</div>
     </div>
 
   </div>
@@ -174,6 +187,23 @@
 [data-c="ba-2"] .ba2fw i:nth-child(2n){background:#fff}
 [data-c="ba-2"] .b1.on .ba2fw i{animation:ba2Spk 1s cubic-bezier(.15,.6,.3,1) 1.5s both}
 @keyframes ba2Spk{0%{opacity:1;transform:translate(0,0)}100%{opacity:0;transform:translate(var(--dx),var(--dy))}}
+/* THE COLUMN: every move stacked into a tower that fills the screen. */
+[data-c="ba-2"] .b2{padding:24px}
+[data-c="ba-2"] .ba2-wall{width:100%;height:100%;display:flex;gap:20px;align-items:stretch}
+[data-c="ba-2"] .ba2-tower{flex:0 0 96px;display:flex;flex-direction:column-reverse;gap:2px}
+[data-c="ba-2"] .ba2-tower i{display:block;flex:1;border-radius:1.5px;background:rgba(var(--accent-rgb),.5);
+  opacity:0;transform:scaleX(0);transform-origin:left center}
+[data-c="ba-2"] .ba2-tower i.top{background:var(--accent)}
+[data-c="ba-2"] .b2.on .ba2-tower i{animation:ba2Slat .3s ease-out calc(var(--i)*.012s) forwards}
+@keyframes ba2Slat{to{opacity:1;transform:scaleX(1)}}
+[data-c="ba-2"] .ba2-side{flex:1;display:flex;flex-direction:column;justify-content:center;gap:20px;text-align:left}
+[data-c="ba-2"] .ba2-s b{display:block;font-size:38px;font-weight:750;letter-spacing:-.04em;line-height:1;
+  color:var(--text-hi);font-variant-numeric:tabular-nums}
+[data-c="ba-2"] .ba2-s.hot b{color:var(--accent);font-size:52px}
+[data-c="ba-2"] .ba2-s span{display:block;margin-top:6px;font-size:11.5px;color:var(--text-lo)}
+[data-c="ba-2"] .ba2-s{opacity:0}
+[data-c="ba-2"] .b2.on .ba2-s{animation:ba2Up .5s ease-out calc(.5s + var(--i)*.15s) both}
+@media (prefers-reduced-motion:reduce){ [data-c="ba-2"] .ba2-tower i,[data-c="ba-2"] .ba2-s{opacity:1;transform:none;animation:none} }
 </style>
 <div class="ph" data-c="ba-2">
   <div class="st">
@@ -195,7 +225,10 @@
     </div>
 
     <div class="b b2">
-      <div class="ba2-cost"><b data-count="0|126">126</b> days.<br><b data-count="0|215">215</b> weigh-ins.<br>230 &rarr; <b>200</b>.</div>
+      <div class="ba2-wall">
+        <div class="ba2-tower"></div>
+        <div class="ba2-side"></div>
+      </div>
     </div>
 
     <div class="b b3">
@@ -262,6 +295,21 @@
 [data-c="ba-3"] .ba3fw i:nth-child(2n){background:#fff}
 [data-c="ba-3"] .b1.on .ba3fw i{animation:ba3Spk 1s cubic-bezier(.15,.6,.3,1) 3.15s both}
 @keyframes ba3Spk{0%{opacity:1;transform:translate(0,0)}100%{opacity:0;transform:translate(var(--dx),var(--dy))}}
+/* THE REEL WALL: a full grid of stat cards, slamming in fast. */
+[data-c="ba-3"] .b2{padding:26px 16px}
+[data-c="ba-3"] .ba3-wall{width:100%;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+[data-c="ba-3"] .ba3-k{padding:14px 10px;border-radius:12px;background:rgba(var(--ink),.05);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.06);opacity:0}
+[data-c="ba-3"] .ba3-k b{display:block;font-size:24px;font-weight:750;letter-spacing:-.03em;line-height:1;
+  color:var(--text-hi);font-variant-numeric:tabular-nums}
+[data-c="ba-3"] .ba3-k span{display:block;margin-top:6px;font-size:10px;color:var(--text-lo)}
+[data-c="ba-3"] .ba3-k--hot{background:rgba(var(--accent-rgb),.14)}
+[data-c="ba-3"] .ba3-k--hot b{color:var(--accent)}
+[data-c="ba-3"] .ba3-k--wide{grid-column:1/-1}
+[data-c="ba-3"] .ba3-k--wide b{font-size:34px}
+[data-c="ba-3"] .b2.on .ba3-k{animation:ba3K .35s cubic-bezier(.16,1.3,.3,1) calc(.08s + var(--i)*.07s) both}
+@keyframes ba3K{from{opacity:0;transform:scale(1.25)}to{opacity:1;transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){ [data-c="ba-3"] .ba3-k{opacity:1;animation:none} }
 </style>
 <div class="ph" data-c="ba-3">
   <div class="st">
@@ -284,7 +332,7 @@
     </div>
 
     <div class="b b2">
-      <div class="ba3-cost"><b data-count="0|126">126</b> days.<br><b data-count="0|215">215</b> weigh-ins.<br>230 &rarr; <b>200</b>.</div>
+      <div class="ba3-wall"></div>
     </div>
 
     <div class="b b3">
@@ -366,6 +414,25 @@
 [data-c="ba-4"] .ba4fw i:nth-child(2n){background:#fff}
 [data-c="ba-4"] .b1.on .ba4fw i{animation:ba4Spk 1s cubic-bezier(.15,.6,.3,1) 3.3s both}
 @keyframes ba4Spk{0%{opacity:1;transform:translate(0,0)}100%{opacity:0;transform:translate(var(--dx),var(--dy))}}
+/* THE HALO: everything they did orbits the Memento. */
+[data-c="ba-4"] .b2{padding:0}
+[data-c="ba-4"] .ba4-wall{position:absolute;inset:0}
+[data-c="ba-4"] .ba4-halo i{position:absolute;left:50%;top:42%;width:5px;height:5px;border-radius:50%;
+  background:rgba(var(--accent-rgb),.75);opacity:0}
+[data-c="ba-4"] .ba4-halo i.w{background:rgba(235,238,248,.8)}
+[data-c="ba-4"] .b2.on .ba4-halo i{animation:ba4Dot .5s ease-out calc(var(--i)*.008s) forwards}
+@keyframes ba4Dot{to{opacity:1}}
+[data-c="ba-4"] .ba4-core{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);
+  width:92px;height:120px;border-radius:13px;background:rgba(var(--accent-rgb),.28);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12), 0 0 48px rgba(var(--accent-rgb),.35);
+  display:flex;align-items:center;justify-content:center}
+[data-c="ba-4"] .ba4-core svg{width:30px;height:30px;fill:var(--accent)}
+[data-c="ba-4"] .ba4-under{position:absolute;left:0;right:0;bottom:52px;text-align:center;opacity:0}
+[data-c="ba-4"] .ba4-under b{font-size:40px;font-weight:750;letter-spacing:-.04em;color:var(--text-hi);
+  font-variant-numeric:tabular-nums}
+[data-c="ba-4"] .ba4-under span{display:block;margin-top:7px;font-size:12px;color:var(--text-lo)}
+[data-c="ba-4"] .b2.on .ba4-under{animation:ba4Upp .5s ease-out 1.4s both}
+@media (prefers-reduced-motion:reduce){ [data-c="ba-4"] .ba4-halo i,[data-c="ba-4"] .ba4-under{opacity:1;animation:none} }
 </style>
 <div class="ph" data-c="ba-4">
   <div class="st">
@@ -389,7 +456,11 @@
     </div>
 
     <div class="b b2">
-      <div class="ba4-cost"><b data-count="0|126">126</b> days.<br><b data-count="0|215">215</b> weigh-ins.<br>230 &rarr; <b>200</b>.</div>
+      <div class="ba4-wall">
+        <div class="ba4-halo"></div>
+        <div class="ba4-core"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+        <div class="ba4-under"></div>
+      </div>
     </div>
 
     <div class="b b3">
@@ -465,6 +536,18 @@
   [data-c="ba-5"] .ba5-m,[data-c="ba-5"] .ba5-line,[data-c="ba-5"] .ba5-once,
   [data-c="ba-5"] .ba5-cost,[data-c="ba-5"] .ba5-fin,[data-c="ba-5"] .ba5-close{opacity:1;transform:none;animation:none}
 }
+/* THE FIELD: the dot flower at monument scale, one dot per move. */
+[data-c="ba-5"] .b2{padding:24px}
+[data-c="ba-5"] .ba5-wall{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%}
+[data-c="ba-5"] .ba5-svg{display:block;overflow:visible;opacity:0}
+[data-c="ba-5"] .b2.on .ba5-svg{animation:ba5Bloom 1.2s cubic-bezier(.2,.8,.3,1) .1s both}
+@keyframes ba5Bloom{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:scale(1)}}
+[data-c="ba-5"] .ba5-under{margin-top:20px;text-align:center;opacity:0}
+[data-c="ba-5"] .ba5-under b{font-size:40px;font-weight:750;letter-spacing:-.04em;color:var(--text-hi);
+  font-variant-numeric:tabular-nums}
+[data-c="ba-5"] .ba5-under span{display:block;margin-top:6px;font-size:12px;color:var(--text-lo)}
+[data-c="ba-5"] .b2.on .ba5-under{animation:ba5Up .5s ease-out 1s both}
+@media (prefers-reduced-motion:reduce){ [data-c="ba-5"] .ba5-svg,[data-c="ba-5"] .ba5-under{opacity:1;transform:none;animation:none} }
 </style>
 <div class="ph" data-c="ba-5">
   <div class="st">
@@ -498,7 +581,10 @@
     </div>
 
     <div class="b b2">
-      <div class="ba5-cost"><b data-count="0|126">126</b> days.<br><b data-count="0|215">215</b> weigh-ins.<br>230 &rarr; <b>200</b>.</div>
+      <div class="ba5-wall">
+        <svg class="ba5-svg" width="300" height="300" viewBox="-105 -105 210 210" aria-hidden="true"></svg>
+        <div class="ba5-under"></div>
+      </div>
     </div>
 
     <div class="b b3">
@@ -566,6 +652,16 @@
   [data-c="ba-6"] .ba6-m,[data-c="ba-6"] .ba6-line,[data-c="ba-6"] .ba6-zero,
   [data-c="ba-6"] .ba6-cost,[data-c="ba-6"] .ba6-fin,[data-c="ba-6"] .ba6-close{opacity:1;transform:none;animation:none}
 }
+/* THE ODOMETER WALL: every total counting up at once, huge. */
+[data-c="ba-6"] .b2{padding:30px 26px}
+[data-c="ba-6"] .ba6-wall{width:100%;display:flex;flex-direction:column;gap:22px;text-align:left}
+[data-c="ba-6"] .ba6-row b{display:block;font-size:62px;font-weight:750;letter-spacing:-.05em;line-height:1;
+  color:var(--text-hi);font-variant-numeric:tabular-nums}
+[data-c="ba-6"] .ba6-row.hot b{color:var(--accent)}
+[data-c="ba-6"] .ba6-row span{display:block;margin-top:6px;font-size:12px;color:var(--text-lo)}
+[data-c="ba-6"] .ba6-row{opacity:0}
+[data-c="ba-6"] .b2.on .ba6-row{animation:ba6Up .5s ease-out calc(.1s + var(--i)*.18s) both}
+@media (prefers-reduced-motion:reduce){ [data-c="ba-6"] .ba6-row{opacity:1;animation:none} }
 </style>
 <div class="ph" data-c="ba-6">
   <div class="st">
@@ -593,7 +689,7 @@
     </div>
 
     <div class="b b2">
-      <div class="ba6-cost"><b data-count="0|126">126</b> days.<br><b data-count="0|215">215</b> weigh-ins.<br>230 &rarr; <b>200</b>.</div>
+      <div class="ba6-wall"></div>
     </div>
 
     <div class="b b3">
@@ -663,6 +759,21 @@
   [data-c="ba-7"] .ba7-m,[data-c="ba-7"] .ba7-line,[data-c="ba-7"] .ba7-said,
   [data-c="ba-7"] .ba7-cost,[data-c="ba-7"] .ba7-fin,[data-c="ba-7"] .ba7-close{opacity:1;transform:none;animation:none}
 }
+/* THE TEN THOUSAND: the move word printed once per move, a wall of text. */
+[data-c="ba-7"] .b2{padding:28px 20px}
+[data-c="ba-7"] .ba7-wall{width:100%;display:flex;flex-wrap:wrap;gap:4px 7px;justify-content:center;
+  align-content:center;max-height:64%;overflow:hidden}
+[data-c="ba-7"] .ba7-wall s{text-decoration:none;font-size:10.5px;font-weight:600;letter-spacing:0;
+  color:rgba(235,238,248,.34);opacity:0}
+[data-c="ba-7"] .ba7-wall s.hot{color:var(--accent)}
+[data-c="ba-7"] .b2.on .ba7-wall s{animation:ba7In .25s ease-out calc(var(--i)*.006s) forwards}
+@keyframes ba7In{to{opacity:1}}
+[data-c="ba-7"] .ba7-tot{margin-top:20px;text-align:center;opacity:0}
+[data-c="ba-7"] .ba7-tot b{font-size:44px;font-weight:750;letter-spacing:-.04em;color:var(--text-hi);
+  font-variant-numeric:tabular-nums}
+[data-c="ba-7"] .ba7-tot span{display:block;margin-top:6px;font-size:12px;color:var(--text-lo)}
+[data-c="ba-7"] .b2.on .ba7-tot{animation:ba7Up .5s ease-out 1.6s both}
+@media (prefers-reduced-motion:reduce){ [data-c="ba-7"] .ba7-wall s,[data-c="ba-7"] .ba7-tot{opacity:1;animation:none} }
 </style>
 <div class="ph" data-c="ba-7">
   <div class="st">
@@ -690,7 +801,8 @@
     </div>
 
     <div class="b b2">
-      <div class="ba7-cost"><b data-count="0|126">126</b> days.<br><b data-count="0|215">215</b> weigh-ins.<br>230 &rarr; <b>200</b>.</div>
+      <div class="ba7-wall"></div>
+      <div class="ba7-tot"></div>
     </div>
 
     <div class="b b3">
@@ -761,6 +873,17 @@
   [data-c="ba-8"] .ba8-m,[data-c="ba-8"] .ba8-line,[data-c="ba-8"] .ba8-bow,
   [data-c="ba-8"] .ba8-cost,[data-c="ba-8"] .ba8-fin,[data-c="ba-8"] .ba8-close{opacity:1;transform:none;animation:none}
 }
+/* THE RECORDS BOARD: a stadium board of their own bests. */
+[data-c="ba-8"] .b2{padding:30px 26px}
+[data-c="ba-8"] .ba8-wall{width:100%;display:flex;flex-direction:column;text-align:left}
+[data-c="ba-8"] .ba8-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  padding:15px 0;border-bottom:1px solid rgba(var(--ink),.08);opacity:0}
+[data-c="ba-8"] .ba8-row span{font-size:12.5px;color:var(--text-mid)}
+[data-c="ba-8"] .ba8-row b{font-size:30px;font-weight:750;letter-spacing:-.035em;color:var(--text-hi);
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+[data-c="ba-8"] .ba8-row.hot b{color:var(--accent);font-size:38px}
+[data-c="ba-8"] .b2.on .ba8-row{animation:ba8Up .45s ease-out calc(.1s + var(--i)*.12s) both}
+@media (prefers-reduced-motion:reduce){ [data-c="ba-8"] .ba8-row{opacity:1;animation:none} }
 </style>
 <div class="ph" data-c="ba-8">
   <div class="st">
@@ -785,7 +908,7 @@
     </div>
 
     <div class="b b2">
-      <div class="ba8-cost"><b data-count="0|126">126</b> days.<br><b data-count="0|215">215</b> weigh-ins.<br>230 &rarr; <b>200</b>.</div>
+      <div class="ba8-wall"></div>
     </div>
 
     <div class="b b3">
@@ -856,6 +979,17 @@
   [data-c="ba-9"] .ba9-m,[data-c="ba-9"] .ba9-line,[data-c="ba-9"] .ba9-every,
   [data-c="ba-9"] .ba9-cost,[data-c="ba-9"] .ba9-fin,[data-c="ba-9"] .ba9-close{opacity:1;transform:none;animation:none}
 }
+/* THE FULL WALL: the chips return and take the WHOLE screen. */
+[data-c="ba-9"] .b2{padding:26px 16px}
+[data-c="ba-9"] .ba9-wall{width:100%;display:flex;flex-wrap:wrap;gap:7px;justify-content:center;align-content:center}
+[data-c="ba-9"] .ba9-wc{padding:9px 12px;border-radius:9px;background:rgba(var(--ink),.06);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.06);font-size:14px;font-weight:700;letter-spacing:-.02em;
+  color:var(--text-mid);font-variant-numeric:tabular-nums;opacity:0}
+[data-c="ba-9"] .ba9-wc--hot{background:rgba(var(--accent-rgb),.16);color:var(--accent)}
+[data-c="ba-9"] .ba9-wc--big{font-size:19px;padding:12px 16px}
+[data-c="ba-9"] .b2.on .ba9-wc{animation:ba9C .3s cubic-bezier(.16,1.3,.3,1) calc(.06s + var(--i)*.05s) both}
+@keyframes ba9C{from{opacity:0;transform:scale(1.4)}to{opacity:1;transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){ [data-c="ba-9"] .ba9-wc{opacity:1;animation:none} }
 </style>
 <div class="ph" data-c="ba-9">
   <div class="st">
@@ -885,7 +1019,7 @@
     </div>
 
     <div class="b b2">
-      <div class="ba9-cost"><b data-count="0|126">126</b> days.<br><b data-count="0|215">215</b> weigh-ins.<br>230 &rarr; <b>200</b>.</div>
+      <div class="ba9-wall"></div>
     </div>
 
     <div class="b b3">
@@ -957,6 +1091,18 @@
   [data-c="ba-10"] .ba10-m2,[data-c="ba-10"] .ba10-line,[data-c="ba-10"] .ba10-monu,
   [data-c="ba-10"] .ba10-cost,[data-c="ba-10"] .ba10-fin,[data-c="ba-10"] .ba10-close{opacity:1;transform:none;animation:none}
 }
+/* THE ENGRAVING: the M built from dots, their work in the mark. */
+[data-c="ba-10"] .b2{padding:26px}
+[data-c="ba-10"] .ba10-wall{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%}
+[data-c="ba-10"] .ba10-eng{opacity:0}
+[data-c="ba-10"] .b2.on .ba10-eng{animation:ba10E 1s cubic-bezier(.2,.8,.3,1) .1s both}
+@keyframes ba10E{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+[data-c="ba-10"] .ba10-under{margin-top:24px;text-align:center;opacity:0}
+[data-c="ba-10"] .ba10-under b{font-size:40px;font-weight:750;letter-spacing:-.04em;color:var(--text-hi);
+  font-variant-numeric:tabular-nums}
+[data-c="ba-10"] .ba10-under span{display:block;margin-top:7px;font-size:12px;color:var(--text-lo)}
+[data-c="ba-10"] .b2.on .ba10-under{animation:ba10Up .5s ease-out .9s both}
+@media (prefers-reduced-motion:reduce){ [data-c="ba-10"] .ba10-eng,[data-c="ba-10"] .ba10-under{opacity:1;transform:none;animation:none} }
 </style>
 <div class="ph" data-c="ba-10">
   <div class="st">
@@ -988,7 +1134,14 @@
     </div>
 
     <div class="b b2">
-      <div class="ba10-cost"><b data-count="0|126">126</b> days.<br><b data-count="0|215">215</b> weigh-ins.<br>230 &rarr; <b>200</b>.</div>
+      <div class="ba10-wall">
+        <svg class="ba10-eng" width="240" height="240" viewBox="0 0 512 512" aria-hidden="true">
+          <defs><pattern id="ba10dots" width="17" height="17" patternUnits="userSpaceOnUse">
+            <circle cx="8" cy="8" r="4.4" fill="var(--accent)"/></pattern></defs>
+          <path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z" fill="url(#ba10dots)"/>
+        </svg>
+        <div class="ba10-under"></div>
+      </div>
     </div>
 
     <div class="b b3">
@@ -1001,6 +1154,6 @@
   <div class="hint">Tap to replay</div>
 </div>
 <p class="item__note">The M grows from a seed of light into a monument hundreds of times its size, then the screen ignites around it and the goal line lands across its base. The brand is the trophy; a screenshot advertises the win AND Memento.</p></div></div></div>
-<script src="chooser.js?v=tw9"></script><script src="_kit.js?v=tw9"></script><script src="_tweaks.js?v=tw9"></script>
+<script src="chooser.js?v=tw10"></script><script src="_kit.js?v=tw10"></script><script src="_tweaks.js?v=tw10"></script>
 <script>CEL.init(); if (window.CEL_TWEAKS) CEL_TWEAKS.init();</script>
 </body></html>

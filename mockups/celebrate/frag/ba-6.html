@@ -54,6 +54,16 @@
   [data-c="ba-6"] .ba6-m,[data-c="ba-6"] .ba6-line,[data-c="ba-6"] .ba6-zero,
   [data-c="ba-6"] .ba6-cost,[data-c="ba-6"] .ba6-fin,[data-c="ba-6"] .ba6-close{opacity:1;transform:none;animation:none}
 }
+/* THE ODOMETER WALL: every total counting up at once, huge. */
+[data-c="ba-6"] .b2{padding:30px 26px}
+[data-c="ba-6"] .ba6-wall{width:100%;display:flex;flex-direction:column;gap:22px;text-align:left}
+[data-c="ba-6"] .ba6-row b{display:block;font-size:62px;font-weight:750;letter-spacing:-.05em;line-height:1;
+  color:var(--text-hi);font-variant-numeric:tabular-nums}
+[data-c="ba-6"] .ba6-row.hot b{color:var(--accent)}
+[data-c="ba-6"] .ba6-row span{display:block;margin-top:6px;font-size:12px;color:var(--text-lo)}
+[data-c="ba-6"] .ba6-row{opacity:0}
+[data-c="ba-6"] .b2.on .ba6-row{animation:ba6Up .5s ease-out calc(.1s + var(--i)*.18s) both}
+@media (prefers-reduced-motion:reduce){ [data-c="ba-6"] .ba6-row{opacity:1;animation:none} }
 </style>
 <div class="ph" data-c="ba-6">
   <div class="st">
@@ -81,7 +91,7 @@
     </div>
 
     <div class="b b2">
-      <div class="ba6-cost"><b data-count="0|126">126</b> days.<br><b data-count="0|215">215</b> weigh-ins.<br>230 &rarr; <b>200</b>.</div>
+      <div class="ba6-wall"></div>
     </div>
 
     <div class="b b3">
