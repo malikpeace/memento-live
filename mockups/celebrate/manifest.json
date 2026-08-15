@@ -325,27 +325,22 @@
     {
      "key": "ba-1",
      "name": "The Detonation",
-     "note": "A held breath: their goal line alone in the dark, a charge line filling beneath it. THE TAP DETONATES IT: triple shockwave, full colour, the M slamming in with a screen shake, the line landing word by word, the engine counting on the flood, confetti from the exact moment of impact."
+     "note": "An M alone in the dark, slowly filling with their colour, waiting to be tapped. THE TAP DETONATES IT: triple shockwave, full colour, the M slamming in with a screen shake, the goal line landing word by word. Then the ledger wall: the whole record, tiled edge to edge."
     },
     {
      "key": "ba-2",
      "name": "The Rise",
-     "note": "The number they chased rises up through the screen, enormous, and the instant it locks the screen pulses their colour and shakes. Adapts per shape: the final number, the count, or the days. Monumental type, nothing else."
-    },
-    {
-     "key": "ba-3",
-     "name": "The Roll Call",
-     "note": "A title sequence: the receipts slam in one after another, fast (126 DAYS / 215 WEIGH-INS / 230 to 200), and when the last card cuts, the flood lands with the goal line and the M. Tempo is the dopamine."
+     "note": "The number they chased rises up through the screen, enormous, and the instant it locks the screen pulses their colour and shakes. Then THE COLUMN: one slat for every single move, stacked into a tower, arriving one after another however many there are."
     },
     {
      "key": "ba-4",
      "name": "The Crown",
-     "note": "The Memento IS the ceremony: it charges in the dark, rings of colour collapsing into it, glow climbing, then it ERUPTS, the colour bursting out of the card to swallow the screen. The card made the moment; beat three, it wears the colour for good."
+     "note": "The Memento IS the ceremony: it charges in the dark, rings of colour collapsing into it, glow climbing, then it ERUPTS and the colour swallows the screen. Then THE HALO: one dot per move orbiting the card, the whole ring slowly turning."
     },
     {
      "key": "ba-5",
      "name": "The Fireworks",
-     "note": "Night sky: the goal line quiet while confetti already rains, three fireworks burst above it one after another, then the colour sweeps up like a curtain and the line goes massive with the M. A year of showing up, paid in full."
+     "note": "Night sky: the goal line quiet while confetti already rains, three fireworks burst above it, then the colour sweeps up like a curtain. Then THE FIELD: the dot flower at monument scale, one dot per move, slowly spinning."
     },
     {
      "key": "ba-7",
@@ -360,12 +355,7 @@
     {
      "key": "ba-9",
      "name": "The Wall",
-     "note": "Every mark they ever passed comes back at once, chips slamming into a wall, the goal chip landing last and biggest in their colour, detonating the flood. The chips are REAL: the chooser's own marks, the count ladder, or the month rungs."
-    },
-    {
-     "key": "ba-10",
-     "name": "The Monument",
-     "note": "The M grows from a seed of light into a monument hundreds of times its size, then the screen ignites around it and the goal line lands across its base. The brand is the trophy; a screenshot advertises the win AND Memento."
+     "note": "Every mark they passed slams into a wall, the goal chip landing last and biggest, detonating the flood. Then THE FULL WALL: the totals as a mosaic of mixed weights, drifting gently."
     }
    ]
   }

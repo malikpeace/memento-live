@@ -34,10 +34,10 @@
 [data-c="ba-7"] .ba7-wall s{text-decoration:none;font-weight:600;letter-spacing:0;
   font-size:calc(var(--fs)*1px);line-height:1.15;color:rgba(11,14,18,.44);opacity:0}
 [data-c="ba-7"] .ba7-wall s.hot{color:rgba(11,14,18,.96);font-weight:700}
-[data-c="ba-7"] .b2.on .ba7-wall s{animation:ba7In .25s ease-out calc(var(--i)*.005s) forwards}
+[data-c="ba-7"] .b2.on .ba7-wall s{animation:ba7In .25s ease-out calc(var(--i)*var(--step,.005)*1s) forwards}
 @keyframes ba7In{to{opacity:1}}
-[data-c="ba-7"] .b2.on .ba7-wall s.hot{animation:ba7In .25s ease-out calc(var(--i)*.005s) forwards,
-  baTwinkle 5s ease-in-out calc(2s + var(--i)*.01s) infinite}
+[data-c="ba-7"] .b2.on .ba7-wall s.hot{animation:ba7In .25s ease-out calc(var(--i)*var(--step,.005)*1s) forwards,
+  baTwinkle 5s ease-in-out calc(var(--tw,2)*1s) infinite}
 [data-c="ba-7"] .ba7-tot{margin-top:22px;text-align:center;opacity:0}
 [data-c="ba-7"] .ba7-tot b{font-size:46px;font-weight:750;letter-spacing:-.04em;color:var(--text-hi);
   font-variant-numeric:tabular-nums}
@@ -77,7 +77,6 @@
 
     <div class="b b3">
       <div class="ba7-fin">You lost 30 lbs!</div>
-      <div class="ba7-close">This goal closes. The record stays.</div>
     </div>
 
   </div>

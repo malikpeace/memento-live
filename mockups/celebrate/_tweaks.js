@@ -72,6 +72,15 @@
     el.style.fontSize = size.toFixed(1) + 'px';
     el.style.maxWidth = (n <= 18 ? 10 : n <= 34 ? 14 : 17) + 'ch';
   }
+  /* Malik 2026-08-15: a wall of 1,780 moves used to animate a few hundred and
+     then dump the rest in at once, because the per-item delay was capped. The
+     delay is DERIVED from the count now, so every item still arrives in turn
+     and the whole sweep finishes inside one fixed window, however many there
+     are. */
+  function sweep(ph, sel, n, windowSec) {
+    var el = Q(ph, sel); if (!el) return;
+    el.style.setProperty('--step', (Math.max(0.0004, (windowSec || 1.5) / Math.max(1, n))).toFixed(4));
+  }
   /* FIX 3: a wall must fit the phone it is drawn on. Shrink the scale until
      the content stops overflowing its own box, so 500 moves never spill off
      the screen and nothing is silently clipped. Returns true if it fits. */
@@ -899,14 +908,11 @@
         { k: 'hours', t: 'r', l: 'Hours logged', v: 184, min: 0, max: 5000 }
       ],
       apply: function (ph, v) {
-        put(ph, '.ba1-quiet', esc(v.line) + '.');
         var words = String(v.line).trim().split(/\s+/), spans = '';
         for (var i = 0; i < words.length; i++) spans += '<span class="w" style="--i:' + i + '">' + esc(words[i]) + (i === words.length - 1 ? '!' : '') + '</span> ';
         put(ph, '.ba1-line', spans.trim());
-        fitLine(ph, '.ba1-line', 44); fitLine(ph, '.ba1-quiet', 19);
+        fitLine(ph, '.ba1-line', 44);
         var w = wallData(v);
-        put(ph, '.ba1-engine', '<b>' + fmt(w.days) + '</b> ' + plural(w.days, 'day', 'days')
-          + (w.hasMoves ? ' &middot; <b>' + fmt(w.moves) + '</b> ' + esc(w.unitLabel) : ''));
         /* THE LEDGER WALL: the record tiled edge to edge. The first AND last
            cells run full width (his 2026-08-14 note) so it reads as a slab. */
         var cells = [];
@@ -925,6 +931,7 @@
           html += '<div class="ba1-cell ' + cells[k][2] + '" style="--i:' + k + '"><b>' + cells[k][0] + '</b><span>' + cells[k][1] + '</span></div>';
         }
         put(ph, '.ba1-wall', html);
+        sweep(ph, '.ba1-wall', cells.length, 0.9);
       }
     },
 
@@ -964,11 +971,12 @@
         var n = Math.max(1, w.count), t = '';
         for (var i = 0; i < n; i++) {
           var top = i === n - 1;
-          t += '<i class="' + (top ? 'top' : '') + '" style="--i:' + Math.min(i, 400) +
+          t += '<i class="' + (top ? 'top' : '') + '" style="--i:' + i +
                (top ? '' : ';background:rgba(11,14,18,' + (i % 2 ? '.34' : '.52') + ')') + '"></i>';
         }
         var tw = Q(ph, '.ba2-tower');
         if (tw) { tw.innerHTML = t; tw.style.gap = n <= 60 ? '2px' : n <= 160 ? '1px' : '0px'; }
+        sweep(ph, '.ba2-tower', n, 1.6);
         var side = '', k = 0;
         function stat(num, label, hot) { side += '<div class="ba2-s' + (hot ? ' hot' : '') + '" style="--i:' + (k++) + '"><b>' + num + '</b><span>' + label + '</span></div>'; }
         stat(fmt(w.count), esc(w.unitLabel) + ', every one', true);
@@ -976,52 +984,6 @@
         if (w.hours > 0) stat(fmt(w.hours), 'hours');
         if (w.streak > 0) stat(fmt(w.streak) + '-day', 'longest streak');
         put(ph, '.ba2-side', side);
-      }
-    },
-
-    'ba-3': {
-      c: [
-        { k: 'shape', t: 's', l: 'Goal shape', v: 'target', o: [
-          { v: 'target', l: 'target hit (weight, debt)' },
-          { v: 'count', l: 'count done (100 sessions)' },
-          { v: 'duration', l: 'duration held (no-buy year)' },
-          { v: 'event', l: 'event done (passed the bar)' } ] },
-        { k: 'line', t: 't', l: 'The goal, their words', v: 'You lost 30 lbs' },
-        { k: 'start', t: 'n', l: 'Start number', v: 230 },
-        { k: 'value', t: 'n', l: 'Final number', v: 200 },
-        { k: 'unit', t: 't', l: 'Unit', v: 'lbs' },
-        { k: 'days', t: 'r', l: 'Days it took', v: 126, min: 1, max: 900 },
-        { k: 'moves', t: 'r', l: 'Moves logged', v: 215, min: 0, max: 2000 },
-        { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' },
-        { k: 'streak', t: 'r', l: 'Best streak (days)', v: 41, min: 0, max: 365 },
-        { k: 'hours', t: 'r', l: 'Hours logged', v: 184, min: 0, max: 5000 }
-      ],
-      apply: function (ph, v) {
-        var sh = v.shape, w = wallData(v);
-        put(ph, '.ba3-c1', fmt(w.days) + '<small>' + plural(w.days, 'day', 'days') + '</small>');
-        put(ph, '.ba3-c2', w.hasMoves
-          ? fmt(w.moves) + '<small>' + esc(w.unitLabel) + '</small>'
-          : w.mf(+v.value) + '<small>' + esc(unitFor(+v.value, v.unit)) + '</small>');
-        var c3;
-        if (sh === 'target') c3 = w.mf(+v.start) + ' &rarr; ' + w.mf(+v.value) + '<small>your own numbers</small>';
-        else if (sh === 'count') c3 = w.mf(+v.value) + '<small>' + esc(unitFor(+v.value, v.unit)) + ', the target you set</small>';
-        else if (sh === 'duration') c3 = 'day 1 &rarr; day ' + fmt(w.days) + '<small>the line held the whole way</small>';
-        else c3 = 'done<small>no partial credit, and none needed</small>';
-        put(ph, '.ba3-c3', c3);
-        put(ph, '.ba3-line', esc(v.line) + '!'); fitLine(ph, '.ba3-line', 42);
-        put(ph, '.ba3-fin', esc(v.line) + '!'); fitLine(ph, '.ba3-fin', 28);
-        var cards = '', k = 0;
-        function card(num, label, cls) { cards += '<div class="ba3-k ' + (cls || '') + '" style="--i:' + (k++) + '"><b>' + num + '</b><span>' + label + '</span></div>'; }
-        card(fmt(w.count), esc(w.unitLabel), 'ba3-k--wide ba3-k--hot');
-        if (w.hasMoves) card(fmt(w.days), plural(w.days, 'day', 'days'));
-        card(fmt(w.weeks), plural(w.weeks, 'week', 'weeks'));
-        card(fmt(w.marks), 'marks');
-        if (w.hours > 0) card(fmt(w.hours), 'hours');
-        if (w.streak > 0) card(fmt(w.streak), 'day streak');
-        if (w.perWeek > 0) card(fmt(w.perWeek), 'a week, avg');
-        if (v.shape === 'target') { card(w.mf(+v.start), 'where you started'); card(w.mf(+v.value), 'where you ended', 'ba3-k--hot'); }
-        else { card(dateBack(w.days), 'day one'); card(dateBack(0), 'the day', 'ba3-k--hot'); }
-        put(ph, '.ba3-wall', cards);
       }
     },
 
@@ -1055,10 +1017,11 @@
           var ang = i * 2.399963;
           var r = rMin + (rMax - rMin) * Math.sqrt((i + 0.5) / N);
           var x = (Math.cos(ang) * r).toFixed(1), y = (Math.sin(ang) * r * 1.06).toFixed(1);
-          dots += '<i class="' + (i % 6 === 0 ? 'w' : '') + '" style="--i:' + Math.min(i, 420) +
+          dots += '<i class="' + (i % 6 === 0 ? 'w' : '') + '" style="--i:' + i +
                   ';width:' + size + 'px;height:' + size + 'px;margin-left:' + x + 'px;margin-top:' + y + 'px"></i>';
         }
         put(ph, '.ba4-halo', dots);
+        sweep(ph, '.ba4-halo', N, 1.7);
         put(ph, '.ba4-under', '<b>' + fmt(w.count) + '</b><span>' + esc(w.unitLabel) + '. Every one of them, around it.</span>');
       }
     },
@@ -1134,13 +1097,20 @@
            the caption says exactly how many are shown rather than clipping
            in silence (his provenance law). */
         var w = wallData(v), word = w.one;
-        var N = Math.max(1, w.count), spans = '';
-        for (var i2 = 0; i2 < N; i2++) spans += '<s class="' + ((i2 + 1) % 10 === 0 ? 'hot' : '') + '" style="--i:' + Math.min(i2, 400) + '">' + esc(word) + '</s>';
+        var N = Math.max(1, w.count), spans = '', rnd7 = seeded(N * 17 + 3);
+        /* the lit ones are picked at RANDOM, never every tenth: a pattern read
+           as a grid, and this should read as a field (his 2026-08-15 note) */
+        for (var i2 = 0; i2 < N; i2++) {
+          var hot = rnd7() < 0.12;
+          spans += '<s class="' + (hot ? 'hot' : '') + '" style="--i:' + i2 +
+                   (hot ? ';--tw:' + (1.5 + rnd7() * 4).toFixed(2) : '') + '">' + esc(word) + '</s>';
+        }
         put(ph, '.ba7-wall', spans);
+        sweep(ph, '.ba7-wall', N, 1.8);
         var start = N > 700 ? 8 : N > 400 ? 10 : N > 200 ? 12 : N > 90 ? 15 : 18;
         var fits = fitWall(ph, '.ba7-wall', '--fs', start, 3, 0.5);
         var shown = fits ? N : visibleCount(ph, '.ba7-wall', 's');
-        put(ph, '.ba7-tot', '<b>' + fmt(N) + '</b><span>' + esc(w.unitLabel) + ', written out. Every tenth one lit.'
+        put(ph, '.ba7-tot', '<b>' + fmt(N) + '</b><span>' + esc(w.unitLabel) + ', written out, one for one.'
           + (fits ? '' : ' (' + fmt(shown) + ' fit the screen; all ' + fmt(N) + ' counted.)') + '</span>');
       }
     },
@@ -1197,6 +1167,7 @@
         }
         var g = Q(ph, '.ba8-grid');
         if (g) { g.innerHTML = cells; g.style.gridTemplateColumns = 'repeat(' + cols + ',1fr)'; }
+        sweep(ph, '.ba8-grid', days, 1.5);
         var lit = 0;
         for (var q = 0; q < days; q++) if (per[q] > 0) lit++;
         put(ph, '.ba8-cap', 'Every day of it' + (w.days > days ? ' (the last ' + fmt(days) + ')' : '')
@@ -1259,76 +1230,22 @@
         if (w.hours > 0) wall.push([fmt(w.hours) + ' hours', 'ba9-wc--big']);
         wall.push([fmt(w.weeks) + ' weeks', '']);
         if (w.perWeek > 0) wall.push([fmt(w.perWeek) + ' a week', 'ba9-wc--sm']);
-        wall.push([fmt(w.marks) + ' marks', 'ba9-wc--sm']);
-        vals.forEach(function (x, ix) { wall.push([x, ix % 3 === 0 ? '' : 'ba9-wc--sm']); });
+
+        /* the bare mark numbers are gone from the wall: unlabelled they read
+           as noise (his 2026-08-15 note). They still have their moment in the
+           opening, where the caption says what they are. */
+        wall.push([fmt(vals.length) + ' marks passed', 'ba9-wc--sm']);
         wall.push(['day 1: ' + dateBack(w.days), 'ba9-wc--sm']);
         wall.push(['done: ' + dateBack(0), 'ba9-wc--big ba9-wc--hot']);
         var html = '';
         wall.forEach(function (c) { html += '<span class="ba9-wc ' + c[1] + '" style="--i:' + (j++) + '">' + c[0] + '</span>'; });
         put(ph, '.ba9-wall', html);
+        sweep(ph, '.ba9-wall', wall.length, 1.1);
         fitWall(ph, '.ba9-wall', '--s', 1, 0.45, 0.04);
       }
     },
 
-    'ba-10': {
-      c: [
-        { k: 'shape', t: 's', l: 'Goal shape', v: 'target', o: [
-          { v: 'target', l: 'target hit (weight, debt)' },
-          { v: 'count', l: 'count done (100 sessions)' },
-          { v: 'duration', l: 'duration held (no-buy year)' },
-          { v: 'event', l: 'event done (passed the bar)' } ] },
-        { k: 'line', t: 't', l: 'The goal, their words', v: 'You lost 30 lbs' },
-        { k: 'start', t: 'n', l: 'Start number', v: 230 },
-        { k: 'value', t: 'n', l: 'Final number', v: 200 },
-        { k: 'unit', t: 't', l: 'Unit', v: 'lbs' },
-        { k: 'days', t: 'r', l: 'Days it took', v: 126, min: 1, max: 900 },
-        { k: 'moves', t: 'r', l: 'Moves logged', v: 215, min: 0, max: 2000 },
-        { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' },
-        { k: 'streak', t: 'r', l: 'Best streak (days)', v: 41, min: 0, max: 365 },
-        { k: 'hours', t: 'r', l: 'Hours logged', v: 184, min: 0, max: 5000 }
-      ],
-      apply: function (ph, v) {
-        put(ph, '.ba10-line', esc(v.line) + '!'); fitLine(ph, '.ba10-line', 42);
-        put(ph, '.ba10-fin', esc(v.line) + '!'); fitLine(ph, '.ba10-fin', 28);
-        var w = wallData(v), N = Math.max(1, w.count);
-        /* THE ENGRAVING: the M is BUILT from their moves. Exactly N dots,
-           every one inside the mark (ray-cast test on the real path), the
-           spacing solved so the count comes out right, not approximated. */
-        var POLY = [[150,146],[256,252],[362,146],[362,366],[150,366]];
-        function inM(x, y) {
-          var c = false;
-          for (var a = 0, b = POLY.length - 1; a < POLY.length; b = a++) {
-            var xi = POLY[a][0], yi = POLY[a][1], xj = POLY[b][0], yj = POLY[b][1];
-            if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) c = !c;
-          }
-          return c;
-        }
-        function pts(step) {
-          var out = [];
-          for (var y = 146 + step / 2; y < 366; y += step)
-            for (var x = 150 + step / 2; x < 362; x += step) if (inM(x, y)) out.push([x, y]);
-          return out;
-        }
-        var lo = 1.6, hi = 60, best = pts(hi);
-        for (var it = 0; it < 26; it++) {
-          var mid = (lo + hi) / 2, p2 = pts(mid);
-          if (p2.length >= N) { best = p2; lo = mid; } else { hi = mid; }
-        }
-        var step = lo, take = best;
-        if (take.length > N) {
-          var picked = [], stride = take.length / N;
-          for (var k = 0; k < N; k++) picked.push(take[Math.floor(k * stride)]);
-          take = picked;
-        }
-        var r = Math.max(0.9, step * 0.3), dots = '';
-        for (var d2 = 0; d2 < take.length; d2++) {
-          dots += '<circle cx="' + take[d2][0].toFixed(1) + '" cy="' + take[d2][1].toFixed(1) + '" r="' + r.toFixed(2) + '" fill="rgba(11,14,18,.9)"></circle>';
-        }
-        var eng = Q(ph, '.ba10-eng');
-        if (eng) eng.innerHTML = dots;
-        put(ph, '.ba10-under', '<b>' + fmt(take.length) + '</b><span>' + esc(w.unitLabel) + '. The mark is made of them.</span>');
-      }
-    }
+
 
 
 
@@ -1400,8 +1317,8 @@
     'rf-gap': function (v) { return roadFire(0, Math.max(2, +v.goal), Math.min(+v.cur, Math.max(2, +v.goal)), 'up'); },
     'rf-fall': function (v) { return roadFire(+v.startLeft, 0, Math.min(+v.left, +v.startLeft), 'down'); },
     'rf-rec': function (v) { return '<b>Fires on rungs of the count ladder</b>, drawn from real logged days only.' },
-    'ba-1': baFire, 'ba-2': baFire, 'ba-3': baFire, 'ba-4': baFire, 'ba-5': baFire,
-    'ba-6': baFire, 'ba-7': baFire, 'ba-8': baFire, 'ba-9': baFire, 'ba-10': baFire
+    'ba-1': baFire, 'ba-2': baFire, 'ba-4': baFire, 'ba-5': baFire,
+    'ba-7': baFire, 'ba-8': baFire, 'ba-9': baFire
   };
   function baFire() {
     return '<b>The top of the pyramid.</b> Fires ONCE, the day the goal itself is done; it outranks the milestone and the daily, and nothing else shows that day.';

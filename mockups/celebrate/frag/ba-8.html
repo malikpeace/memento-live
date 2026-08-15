@@ -8,8 +8,8 @@
 [data-c="ba-8"] .b1.on .ba8-flood{animation:ba8Wash .3s ease-out both}
 @keyframes ba8Wash{from{opacity:0}to{opacity:1}}
 [data-c="ba-8"] .ba8-draw{position:relative;width:150px;height:150px}
-[data-c="ba-8"] .ba8-draw path{fill:none;stroke:#0b0e12;stroke-width:26;stroke-linejoin:round;
-  stroke-linecap:round;stroke-dasharray:1100;stroke-dashoffset:1100}
+[data-c="ba-8"] .ba8-draw path{fill:none;stroke:#0b0e12;stroke-width:26;stroke-linejoin:miter;stroke-miterlimit:8;
+  stroke-linecap:butt;stroke-dasharray:1100;stroke-dashoffset:1100}
 [data-c="ba-8"] .b1.on .ba8-draw path{animation:ba8Draw 1.5s cubic-bezier(.5,0,.2,1) .25s forwards,
   ba8Fill .5s ease-out 1.7s forwards}
 @keyframes ba8Draw{to{stroke-dashoffset:0}}
@@ -38,7 +38,7 @@
 [data-c="ba-8"] .ba8-grid i.h1{background:rgba(11,14,18,.30)}
 [data-c="ba-8"] .ba8-grid i.h2{background:rgba(11,14,18,.55)}
 [data-c="ba-8"] .ba8-grid i.h3{background:rgba(11,14,18,.86)}
-[data-c="ba-8"] .b2.on .ba8-grid i{animation:ba8Cell .3s ease-out calc(.15s + var(--i)*.004s) both}
+[data-c="ba-8"] .b2.on .ba8-grid i{animation:ba8Cell .3s ease-out calc(.15s + var(--i)*var(--step,.004)*1s) both}
 @keyframes ba8Cell{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:none}}
 [data-c="ba-8"] .ba8-keys{width:100%;display:flex;justify-content:space-between;gap:10px;margin-top:20px;opacity:0}
 [data-c="ba-8"] .ba8-key b{display:block;font-size:30px;font-weight:750;letter-spacing:-.035em;
@@ -81,7 +81,6 @@
 
     <div class="b b3">
       <div class="ba8-fin">You lost 30 lbs!</div>
-      <div class="ba8-close">This goal closes. The record stays.</div>
     </div>
 
   </div>

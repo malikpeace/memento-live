@@ -75,7 +75,7 @@
 [data-c="ba-4"] .ba4-halo i{position:absolute;left:50%;top:42%;width:5px;height:5px;border-radius:50%;
   background:rgba(var(--accent-rgb),.75);opacity:0}
 [data-c="ba-4"] .ba4-halo i.w{background:rgba(235,238,248,.8)}
-[data-c="ba-4"] .b2.on .ba4-halo i{animation:ba4Dot .5s ease-out calc(var(--i)*.004s) forwards}
+[data-c="ba-4"] .b2.on .ba4-halo i{animation:ba4Dot .5s ease-out calc(var(--i)*var(--step,.004)*1s) forwards}
 @keyframes ba4Dot{to{opacity:1}}
 [data-c="ba-4"] .ba4-core{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);
   width:92px;height:120px;border-radius:13px;background:rgba(var(--accent-rgb),.28);
@@ -121,7 +121,6 @@
 
     <div class="b b3">
       <div class="ba4-keepcard"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
-      <div class="ba4-wear">It wears the colour, for good!</div>
     </div>
 
   </div>

@@ -4,16 +4,16 @@
    DETONATES IT: triple shockwave, full flood, the M slamming in with a
    screen shake, the goal line hitting word by word, the engine counting up
    on the flood, confetti storming from the exact moment of impact. */
-[data-c="ba-1"] .ba1-quiet{font-size:19px;font-weight:600;letter-spacing:-.015em;color:var(--text-mid);
-  max-width:16ch;line-height:1.45}
-[data-c="ba-1"] .b1.on .ba1-quiet{animation:ba1Breathe 2.6s ease-in-out both}
 @keyframes ba1Breathe{0%{opacity:0;transform:translateY(8px)}25%{opacity:.85;transform:none}
   60%{opacity:1}100%{opacity:1}}
-[data-c="ba-1"] .ba1-spark{width:0;height:2px;border-radius:2px;background:var(--accent);margin-top:26px}
-[data-c="ba-1"] .b1.on .ba1-spark{animation:ba1Charge 2.2s cubic-bezier(.5,0,.75,.4) .4s forwards}
 @keyframes ba1Charge{from{width:0;opacity:.5}to{width:132px;opacity:1}}
+[data-c="ba-1"] .ba1-m0{width:168px;height:168px}
+[data-c="ba-1"] .ba1-m0 .gh{fill:rgba(235,238,248,.14)}
+[data-c="ba-1"] .ba1-m0 .fl{fill:var(--accent);clip-path:inset(100% 0 0 0)}
+[data-c="ba-1"] .b1.on .ba1-m0 .fl{animation:ba1Fill 2.8s cubic-bezier(.45,0,.55,1) .35s forwards}
+@keyframes ba1Fill{to{clip-path:inset(0 0 0 0)}}
 [data-c="ba-1"] .ba1-tap{margin-top:30px;font-size:11.5px;letter-spacing:.03em;color:var(--text-lo)}
-[data-c="ba-1"] .b1.on .ba1-tap{animation:ba1TapIn .6s ease-out 2.4s both}
+[data-c="ba-1"] .b1.on .ba1-tap{animation:ba1TapIn .6s ease-out 2.6s both}
 @keyframes ba1TapIn{from{opacity:0}to{opacity:1}}
 
 /* THE DETONATION (beat 2, fires on the tap) */
@@ -38,9 +38,6 @@
 [data-c="ba-1"] .ba1-line .w{display:inline-block;opacity:0}
 [data-c="ba-1"] .b2.on .ba1-line .w{animation:ba1Word .38s cubic-bezier(.16,1.3,.3,1) calc(.5s + var(--i)*.14s) both}
 @keyframes ba1Word{from{opacity:0;transform:translateY(18px) scale(1.25)}to{opacity:1;transform:none}}
-[data-c="ba-1"] .ba1-engine{margin-top:26px;font-size:16.5px;font-weight:650;color:rgba(11,14,18,.82)}
-[data-c="ba-1"] .ba1-engine b{font-size:22px;color:#0b0e12;font-variant-numeric:tabular-nums}
-[data-c="ba-1"] .b2.on .ba1-engine{animation:ba1Up .5s cubic-bezier(.2,.8,.3,1) 1.25s both}
 @keyframes ba1Up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 /* impact burst pieces, one-shot */
 [data-c="ba-1"] .ba1-burst{position:absolute;left:50%;top:44%}
@@ -60,12 +57,12 @@
 [data-c="ba-1"] .b3.on .ba1-etch{animation:ba1Up .5s ease-out .6s both}
 [data-c="ba-1"] .b3.on .ba1-sealed{animation:ba1Up .5s ease-out .9s both}
 @media (prefers-reduced-motion:reduce){
-  [data-c="ba-1"] .ba1-quiet,[data-c="ba-1"] .ba1-tap,[data-c="ba-1"] .ba1-m,
-  [data-c="ba-1"] .ba1-engine,[data-c="ba-1"] .ba1-cost,[data-c="ba-1"] .ba1-etch,
+  [data-c="ba-1"] .ba1-m0 .fl{clip-path:inset(0 0 0 0);animation:none}
+  [data-c="ba-1"] .ba1-tap,[data-c="ba-1"] .ba1-m,
+  [data-c="ba-1"] .ba1-cost,[data-c="ba-1"] .ba1-etch,
   [data-c="ba-1"] .ba1-sealed{opacity:1;transform:none;animation:none}
   [data-c="ba-1"] .ba1-line .w{opacity:1;transform:none;animation:none}
-  [data-c="ba-1"] .ba1-spark{width:132px;animation:none}
-  [data-c="ba-1"] .ba1-ring,[data-c="ba-1"] .ba1-burst i{display:none}
+    [data-c="ba-1"] .ba1-ring,[data-c="ba-1"] .ba1-burst i{display:none}
   [data-c="ba-1"] .ba1-stage{animation:none}
 }
 /* THE LEDGER WALL: the whole record, tiled edge to edge. */
@@ -89,8 +86,10 @@
   <div class="st">
 
     <div class="b b1">
-      <div class="ba1-quiet">Lost 30 lbs.</div>
-      <div class="ba1-spark" aria-hidden="true"></div>
+      <svg class="ba1-m0" viewBox="0 0 512 512" aria-hidden="true">
+        <path class="gh" d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/>
+        <path class="fl" d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/>
+      </svg>
       <div class="ba1-tap">Tap.</div>
     </div>
 
@@ -110,13 +109,11 @@
       <div class="ba1-stage">
         <svg class="ba1-m" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
         <div class="ba1-line"><span class="w" style="--i:0">Lost</span> <span class="w" style="--i:1">30</span> <span class="w" style="--i:2">lbs!</span></div>
-        <div class="ba1-engine"><b data-count="0|126">126</b> days &middot; <b data-count="0|215">215</b> weigh-ins</div>
       </div>
     </div>
 
     <div class="b b3">
       <div class="ba1-wall"></div>
-      <div class="ba1-sealed2">Sealed into your Memento, forever!</div>
     </div>
 
   </div>
