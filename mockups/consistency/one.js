@@ -114,9 +114,7 @@
     return '<div class="sec"><div class="sec__h"><b>At a glance</b></div>' +
       '<div class="glance"><div class="glance__v">' + v + '</div>' +
       '<div class="glance__bar"><u style="width:' + fill + '%"></u>' + mark + '</div>' +
-      '<div class="glance__strip">' + strip + '</div>' +
-      '<div class="glance__cap">The last ' + plural(w30, 'day') +
-      (before !== null ? ', with the 30 before marked on the bar.' : '.') + '</div></div></div>';
+      '<div class="glance__strip">' + strip + '</div></div></div>';
   }
 
   /* ---------- calendar: WEEK, a readable day list ---------- */
@@ -165,7 +163,7 @@
       if (e) { tracked = true; monthDays++; if (e.st === 'kept') { rowKept++; monthKept++; } }
       cells += big
         ? '<div class="d ' + st + (e && sameDay(date, today) ? ' today' : '') + '">' + dd + '</div>'
-        : '<b class="' + (e ? st : 'pad') + '"></b>';
+        : '<b class="' + (e ? st : 'ahead') + '"></b>';
       slot++;
       if (big && slot % 7 === 0) { cells += '<div class="wc">' + (tracked ? rowKept : '') + '</div>'; out += cells; cells = ''; rowKept = 0; tracked = false; }
     }
@@ -252,6 +250,13 @@
       }).join('') + '</div></div>';
   }
 
+  /* ---------- weekday rhythm, the self knowledge stat from the layouts ---------- */
+  function rhythm(s) {
+    if (s.N < 21) return '';
+    return '<div class="sec"><div class="sec__h"><b>Your rhythm</b><i>% kept, by weekday</i></div>' +
+      K.dowChart(s) + '</div>';
+  }
+
   /* ---------- every week so far, L07 grammar ---------- */
   function chapters(log, A) {
     var starts = A.weekStarts.slice().reverse().slice(0, 14);
@@ -315,7 +320,7 @@
         return '<button type="button" data-sc="' + sc + '"' + (sc === SCALE ? ' class="on"' : '') + '>' + sc.charAt(0).toUpperCase() + sc.slice(1) + '</button>';
       }).join('') + '</span></div>' + body + '</div>';
     return hero + '<div class="ev__grid"><div class="ev__col">' + glance(s, log, A) + cal + '</div>' +
-      '<div class="ev__col">' + tracks(log) + chapters(log, A) + monthBars(s) + ledger(s, log) + '</div></div>';
+      '<div class="ev__col">' + tracks(log) + rhythm(s) + chapters(log, A) + monthBars(s) + ledger(s, log) + '</div></div>';
   }
 
   /* ---------- render + wiring ---------- */
