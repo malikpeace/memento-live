@@ -15,6 +15,37 @@ TITLES = {
     'mx': ('Intensity mechanics', 'Ways to scale today up or down, phone + desktop each. Three named sizes in front, freedom behind a quiet "more".'),
 }
 
+# REACH x FREQUENCY: Malik's ask. How many people see this screen, how often.
+# 10 = literally everyone. Notes carry the nuance where stakes beat frequency.
+REACH = {
+    'ob-1': ('10/10', 'everyone, their first minute'),
+    'q-2':  ('10/10', 'everyone, before every plan'),
+    'ld-4': ('10/10', 'everyone, every plan build'),
+    'pu-1': ('9/10',  'most goals, weekly or better'),
+    'lp-1': ('9/10',  'money, audience, job hunt, project: the biggest buckets, daily'),
+    'lp-9': ('8/10',  'weight is a giant bucket, daily ritual'),
+    'lp-18':('8/10',  'quitting, daily, highest emotional stakes'),
+    'lp-7': ('7/10',  'screen time, nightly'),
+    'lp-12':('7/10',  'gym and posting rhythms, most days'),
+    'lp-10':('7/10',  'school, projects, race blocks, daily'),
+    'lp-6': ('6/10',  'weight and debt, the alternative book'),
+    'lp-17':('6/10',  'screen time, the alternative ceiling'),
+    'lp-15':('6/10',  'runs and study blocks'),
+    'lp-22':('6/10',  'seen once per goal, but it is the best minute: stakes over frequency'),
+    'lp-8': ('5/10',  'saving and unit milestones'),
+    'lp-16':('4/10',  'maintenance, the rarest daily shape'),
+    'lp-21':('3/10',  'open practice, rare by design'),
+    'mx-8': ('9/10',  'the default intensity surface, every count goal'),
+    'mx-1': ('8/10',  'the classic alternative, count goals'),
+    'mx-2': ('6/10',  'session-length goals'),
+    'mx-9': ('6/10',  'count goals, touch-first people'),
+    'mx-5': ('5/10',  'count goals'),
+    'mx-6': ('5/10',  'count goals'),
+    'mx-7': ('5/10',  'count goals'),
+    'mx-10':('4/10',  'desktop-first people'),
+    'mx-11':('n/a',   'comparison variant only: dies once 3 vs 5 is settled'),
+}
+
 def key_of(p):
     m = re.match(r'([a-z]+)-(\d+)', p.stem)
     return (ORDER.index(m.group(1)) if m and m.group(1) in ORDER else 99,
@@ -47,6 +78,10 @@ body{margin:0;background:#0a0b0d;color:var(--text-hi);font-family:var(--font);-w
 .desk{position:relative;width:720px;max-width:100%;height:420px;border-radius:14px;overflow:hidden;background:#050608;
   margin-top:16px;box-shadow:0 20px 50px rgba(0,0,0,.45), inset 0 0 0 1px rgba(var(--ink),.09)}
 /* bucket labels + toggle (ACTION-BUCKETS.md): which of the seven big goals a screen serves */
+.reach{display:inline-flex;align-items:baseline;gap:7px;margin:0 0 4px}
+.reach b{font-size:12px;font-weight:700;color:#0b0c10;background:rgba(235,238,248,.92);
+  border-radius:7px;padding:3px 8px;font-variant-numeric:tabular-nums}
+.reach span{font-size:10.5px;color:rgba(var(--ink),.55);font-weight:500}
 .bk{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 9px;align-items:center}
 .bk i{font-style:normal;font-size:10.5px;font-weight:700;color:rgba(var(--ink),.9);
   background:rgba(var(--ink),.08);border-radius:7px;padding:4px 9px;
@@ -83,6 +118,12 @@ def main():
         # anchor: the fragment's data-k becomes a real id for deep links
         frag = frag.replace('<section class="cell" data-k="' + f.stem + '"',
                             '<section class="cell" id="' + f.stem + '" data-k="' + f.stem + '"', 1)
+        r = REACH.get(f.stem)
+        if r:
+            badge = '<p class="reach"><b>' + r[0] + '</b><span>' + r[1] + '</span></p>'
+            i = frag.find('</h3>')
+            if i != -1:
+                frag = frag[:i+5] + badge + frag[i+5:]
         out.append(frag)
     if cur is not None: out.append('</div></section>')
     out.append('</div></body></html>')

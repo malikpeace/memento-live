@@ -17,7 +17,21 @@
         log curve so 3 / 5 / 8 read visibly but not massively apart. The line
         box is reserved at the max so the sentence never shifts.
      3. THE HOLD is 1400ms and says "Hold to confirm" for every goal. Early
-        release still aborts. -->
+        release still aborts.
+     BEAUTY PASS (2026-08-13), craft only, no mechanic touched:
+     a. COMPOSITION. Everything used to fall to the floor: a thin header, a
+        250px void, then statement and button clamped together. The void is
+        now SPLIT by two weighted spacers (1.35 above, 1 below), so the
+        statement sits just above centre with real air under it and the button
+        stops crowding the last line.
+     b. THE BAR. 4px on a full pill radius, and the ghost is separated from the
+        solid by a 3px transparent gutter (background-clip:padding-box) so
+        today's chunk reads as its own segment instead of a second colour on
+        one bar. Ghost alpha up to .34 to survive next to the accent.
+     c. THE POPOVER. Two shadow layers, a tight contact shadow plus a wide
+        ambient one, so it lifts off the statement instead of sitting on a
+        single soft blur. -->
+
 <style>
 [data-k=lp-1] .s{position:absolute;inset:0;display:flex;flex-direction:column;padding:34px 22px 20px;
   font-variant-numeric:tabular-nums}
@@ -39,13 +53,15 @@
 [data-k=lp-1] .goal u{text-decoration:none;font-weight:400;min-width:0;overflow:hidden;text-overflow:ellipsis}
 [data-k=lp-1] .s.done .goal em,[data-k=lp-1] .s.done .goal .from{display:none}
 
-[data-k=lp-1] .bar{position:relative;margin-top:9px;height:3px;border-radius:2px;
-  background:rgba(var(--ink),.12);overflow:hidden}
-[data-k=lp-1] .bar i{position:absolute;left:0;top:0;bottom:0;width:47%;border-radius:2px;
+[data-k=lp-1] .bar{position:relative;margin-top:10px;height:4px;border-radius:999px;
+  background:rgba(var(--ink),.10);overflow:hidden}
+[data-k=lp-1] .bar i{position:absolute;left:0;top:0;bottom:0;width:47%;border-radius:999px;
   background:rgb(var(--acc));transition:width .32s cubic-bezier(.2,.7,.2,1)}
-/* the ghost: today's size, not yet banked */
-[data-k=lp-1] .bar u{position:absolute;top:0;bottom:0;left:47%;width:5%;border-radius:2px;
-  background:rgba(var(--ink),.30);
+/* the ghost: today's size, not yet banked. The 3px transparent gutter on its
+   left lets the track show through, so the two segments never fuse. */
+[data-k=lp-1] .bar u{position:absolute;top:0;bottom:0;left:47%;width:5%;border-radius:999px;
+  border-left:3px solid transparent;background-clip:padding-box;
+  background:rgba(var(--ink),.34);
   transition:left .32s cubic-bezier(.2,.7,.2,1),width .32s cubic-bezier(.2,.7,.2,1),opacity .2s ease-out}
 [data-k=lp-1] .s.done .bar u{opacity:0}
 
@@ -55,7 +71,11 @@
 [data-k=lp-1] .src span:last-child{margin-left:auto;flex:none}
 
 /* --- the statement: the whole screen ------------------------------------ */
-[data-k=lp-1] .say{margin:auto 0 22px;font-size:29px;line-height:1.04;letter-spacing:-.03em;font-weight:500;
+/* the void is split, not dumped above the statement: 1.35 up, 1 down */
+[data-k=lp-1] .sp{display:block}
+[data-k=lp-1] .sp.a{flex:1.35 1 0}
+[data-k=lp-1] .sp.b{flex:1 1 0;min-height:30px}
+[data-k=lp-1] .say{margin:0;font-size:29px;line-height:1.04;letter-spacing:-.03em;font-weight:500;
   color:rgba(var(--ink),.96)}
 [data-k=lp-1] .say .vb,[data-k=lp-1] .say .obj{display:block}
 /* the line box is reserved at the LARGEST number so the sentence under it
@@ -75,8 +95,8 @@
   font-family:var(--font);font-size:52.9px;font-weight:700;line-height:.80;letter-spacing:-.055em;
   color:rgba(var(--ink),1);font-variant-numeric:tabular-nums;cursor:pointer;display:block;
   -webkit-tap-highlight-color:transparent;
-  text-decoration:underline;text-decoration-thickness:.04em;text-underline-offset:.10em;
-  text-decoration-color:rgba(var(--ink),.20);
+  text-decoration:underline;text-decoration-thickness:.03em;text-underline-offset:.13em;
+  text-decoration-color:rgba(var(--ink),.18);
   transition:opacity .16s ease-out,font-size .2s cubic-bezier(.2,.7,.2,1),
     text-decoration-color .16s ease-out,transform .1s ease-out}
 [data-k=lp-1] .n:active{transform:translateY(1px);text-decoration-color:rgba(var(--ink),.45)}
@@ -89,7 +109,7 @@
 [data-k=lp-1] .pop{position:absolute;left:0;bottom:calc(100% + 44px);width:214px;padding:6px;
   border-radius:14px;background:rgba(22,25,31,.96);
   backdrop-filter:blur(28px) saturate(1.4);-webkit-backdrop-filter:blur(28px) saturate(1.4);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.09),0 18px 40px rgba(0,0,0,.55);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09),0 2px 8px rgba(0,0,0,.45),0 26px 54px -10px rgba(0,0,0,.78);
   opacity:0;visibility:hidden;transform:translateY(6px) scale(.98);transform-origin:0 100%;
   transition:opacity .16s ease-out,transform .16s ease-out,visibility 0s linear .16s;z-index:3}
 [data-k=lp-1] .pop.open{opacity:1;visibility:visible;transform:none;transition-delay:0s}
@@ -147,6 +167,7 @@
     <div class="bar"><i></i><u></u></div>
     <p class="src"><span data-src>From your logged messages</span><span data-left>19 days left</span></p>
 
+    <span class="sp a"></span>
     <div class="say"><span class="vb">Message</span>
       <span class="nline">
         <button type="button" class="n" aria-haspopup="true" aria-expanded="false" aria-label="how many today">5</button>
@@ -156,6 +177,7 @@
         </div>
       </span>
       <span class="obj">potential clients.</span></div>
+    <span class="sp b"></span>
 
     <div class="hold" role="button" tabindex="0">
       <div class="fill"></div>

@@ -31,7 +31,9 @@
 [data-k=lp-8] .field i{width:26px;height:26px;background-repeat:no-repeat;background-position:center;
   background-size:14px 14px;background-image:linear-gradient(rgba(var(--ink),.14),rgba(var(--ink),.14));
   transition:background-size .22s cubic-bezier(.2,.8,.3,1),background-image .26s ease-out}
-[data-k=lp-8] .field i.lit{background-image:linear-gradient(rgba(var(--ink),.88),rgba(var(--ink),.88))}
+/* the banked marks read at .70, not .88: at full brightness the field
+   out-shouted the one instruction on the screen */
+[data-k=lp-8] .field i.lit{background-image:linear-gradient(rgba(var(--ink),.70),rgba(var(--ink),.70))}
 [data-k=lp-8] .field i.pend{cursor:pointer;background-size:10px 10px;
   background-image:linear-gradient(rgba(63,217,78,.95),rgba(63,217,78,.95));
   filter:drop-shadow(0 0 8px rgba(63,217,78,.45))}
@@ -44,7 +46,9 @@
 /* sits in the graph row directly under the field, same 20px column as everything else */
 [data-k=lp-8] .read{position:absolute;left:20px;right:20px;top:var(--rtop,356px);
   height:26px;display:flex;align-items:baseline}
-[data-k=lp-8] .read .amt{font-size:24px;line-height:26px;font-weight:700;letter-spacing:-.03em;color:rgba(var(--ink),.97)}
+/* the readout is the FIELD's caption, not a second headline: the one big thing
+   on this screen is the action in the card, so this reads one step quieter */
+[data-k=lp-8] .read .amt{font-size:19px;line-height:26px;font-weight:700;letter-spacing:-.025em;color:rgba(var(--ink),.97)}
 [data-k=lp-8] .read .of{margin-left:6px;font-size:12.5px;line-height:26px;color:rgba(var(--ink),.90)}
 [data-k=lp-8] .read .ct{margin-left:auto;font-size:12.5px;line-height:26px;color:rgba(var(--ink),.90);white-space:nowrap}
 
@@ -70,19 +74,25 @@
 [data-k=lp-8] .chips button.on u{color:rgba(var(--ink),.90)}
 [data-k=lp-8] .chips button:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
 [data-k=lp-8] .cons{margin:11px 0 0;font-size:12px;line-height:1.4;color:rgba(var(--ink),.90)}
-[data-k=lp-8] .fill{margin-top:auto;width:100%;height:50px;border:0;border-radius:14px;cursor:pointer;
+/* the completion is a HOLD (Malik, 2026-08-13): the marks light while the
+   press fills, and letting go early puts every one of them back */
+[data-k=lp-8] .fill{position:relative;margin-top:auto;width:100%;height:50px;border:0;border-radius:14px;
+  overflow:hidden;cursor:pointer;touch-action:none;-webkit-user-select:none;user-select:none;
   background:rgba(235,238,248,.94);color:#0b0c10;font:700 15.5px/1 var(--font);font-variant-numeric:tabular-nums;
   -webkit-tap-highlight-color:transparent;transition:background .26s ease-out,color .26s ease-out,transform .1s ease-out}
+[data-k=lp-8] .fill b{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(63,217,78,.55)}
+[data-k=lp-8] .fill span{position:relative}
 [data-k=lp-8] .fill:active{transform:translateY(1px)}
 [data-k=lp-8] .fill:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
 [data-k=lp-8] .fill.done{background:rgba(63,217,78,.16);color:rgba(var(--ink),.96);
   box-shadow:inset 0 1px 0 rgba(var(--ink),.08);cursor:default}
+[data-k=lp-8] .fill.done b{display:none}
 [data-k=lp-8] .ph.logged .chips{pointer-events:none}
 [data-k=lp-8] .ph.logged .chips button{background:rgba(var(--ink),.05)}
 [data-k=lp-8] .ph.logged .chips button.on{background:rgba(var(--ink),.15)}
 @media (prefers-reduced-motion:reduce){[data-k=lp-8] *{transition:none!important}}
 </style>
-<h3>One hundred marks</h3><p class="cap">The milestone cut into marks, one per cell of the graph paper, so the goal is literally drawn on the grid at its own size: tonight's marks are the small green ones and the gesture is wiping them full.</p>
+<h3>One hundred marks</h3><p class="cap">The milestone cut into marks, one per cell of the graph paper, so the goal is literally drawn on the grid at its own size: tonight's marks are the small green ones, and the hold fills them one at a time.</p>
 <div class="bk" role="group" aria-label="which goal this screen is carrying">
   <button type="button" class="on" data-b="money" aria-pressed="true">Money</button>
   <button type="button" data-b="body" aria-pressed="false">Body</button>
@@ -90,7 +100,7 @@
 </div>
 <div class="ph">
   <div class="grid"></div>
-  <div class="hd"><b data-title>Save $5,000</b><i data-legend>One hundred marks. Each one is $50.</i></div>
+  <div class="hd"><b data-title>Save $5,000</b><i data-legend>Each mark is $50.</i></div>
 
   <div class="field" tabindex="0" role="button" aria-label="wipe across tonight's marks to fill them"></div>
 
@@ -103,7 +113,7 @@
     <p class="sub"></p>
     <div class="chips" role="group" aria-label="tonight's size"></div>
     <p class="cons"></p>
-    <button type="button" class="fill"></button>
+    <button type="button" class="fill"><b></b><span></span></button>
   </div>
 </div>
 <script>(function(){var r=document.querySelector('[data-k="lp-8"]');if(!r)return;
@@ -111,6 +121,7 @@ var ph=r.querySelector('.ph'),field=r.querySelector('.field'),
     amt=r.querySelector('.read .amt'),of=r.querySelector('.read .of'),ct=r.querySelector('.read .ct'),
     cons=r.querySelector('.cons'),act=r.querySelector('.act'),sub=r.querySelector('.sub'),
     chipsEl=r.querySelector('.chips'),btn=r.querySelector('.fill'),
+    bar=btn.querySelector('b'),btnT=btn.querySelector('span'),
     title=r.querySelector('[data-title]'),legend=r.querySelector('[data-legend]');
 
 /* --- THE BUCKETS (ACTION-BUCKETS.md) -------------------------------------
@@ -120,7 +131,7 @@ var ph=r.querySelector('.ph'),field=r.querySelector('.field'),
    narrow column. base = the marks already logged. Nothing here is measured. */
 var B={
   money:{cols:10,rows:10,n:100,base:37,htop:23,ftop:96,rtop:356,ctop:408,cx:130,cy:130,
-    title:'Save $5,000',legend:'One hundred marks. Each one is $50.',
+    title:'Save $5,000',legend:'Each mark is $50.',
     amt:function(l){return '$'+(l*50).toLocaleString('en-US')},
     of:'',ct:function(l){return l+' of 100'},
     sub:'Friday is the transfer day.',
@@ -132,7 +143,7 @@ var B={
   /* two more rows of marks than the money field, so the whole block shifts up
      one row and the card keeps its own height: the goal sets the geometry */
   body:{cols:10,rows:12,n:120,base:38,htop:14,ftop:70,rtop:382,ctop:434,cx:130,cy:156,
-    title:'Run the half in January',legend:'120 marks, one for each session logged.',
+    title:'Run the half in January',legend:'One mark for each session.',
     amt:function(l){return ''+l},of:'of 120',ct:function(){return ''},
     sub:'',
     /* length is the dial here, not marks: a session is a session, and the
@@ -143,7 +154,7 @@ var B={
     cons:function(c){return 'About '+c.mins+' min, the plan’s estimate. Makes '+(this.week+c.mins)+' min run this week.'},
     did:function(c){return c.mins+' minutes logged.'}},
   school:{cols:6,rows:10,n:60,base:23,htop:23,ftop:96,rtop:356,ctop:408,cx:78,cy:130,
-    title:'60 study sessions this term',legend:'60 marks, one for each block logged.',
+    title:'60 study sessions this term',legend:'One mark for each block.',
     amt:function(l){return ''+l},of:'of 60 this term',ct:function(){return ''},
     sub:'About 90 min each, phone in another room.',
     chips:[{n:1,em:'1 block',u:'1 mark'},{n:2,em:'2 blocks',u:'2 marks'},{n:3,em:'3 blocks',u:'3 marks'}],pick:1,
@@ -165,11 +176,12 @@ function paint(){
   });
   amt.textContent=C.amt(lit());
   ct.textContent=C.ct(lit());
-  btn.textContent=logged?'Logged. '+lit()+' of '+C.n+' marks'
-    :'Fill '+left()+(left()===1?' mark':' marks');
+  btnT.textContent=logged?'Logged. '+lit()+' of '+C.n+' marks'
+    :'Hold to fill '+left()+(left()===1?' mark':' marks');
 }
 function done(){
-  logged=true;btn.classList.add('done');ph.classList.add('logged');
+  logged=true;clearHold();bar.style.transition='none';bar.style.width='0';
+  btn.classList.add('done');ph.classList.add('logged');
   act.textContent=C.did(chip);
   paint();
 }
@@ -184,9 +196,50 @@ function light(upTo){
   filled=to-C.base;
   amt.textContent=C.amt(lit());
   ct.textContent=C.ct(lit());
-  btn.textContent=left()?'Fill '+left()+(left()===1?' mark':' marks'):'Logged. '+lit()+' of '+C.n+' marks';
+  btnT.textContent=left()?'Hold to fill '+left()+(left()===1?' mark':' marks'):'Logged. '+lit()+' of '+C.n+' marks';
   if(!left())setTimeout(done,220+(to-from)*55);
 }
+
+/* --- the hold: the press fills the button and lights the marks with it,
+       and an early release puts every mark back where it was -------------- */
+var HOLD=1000,timers=[],from0=0;
+function setLit(n){
+  for(var i=C.base;i<C.base+step();i++){
+    var on=i<C.base+n;
+    cells[i].classList.toggle('lit',on);
+    cells[i].classList.toggle('pend',!on);
+  }
+  filled=n;
+  amt.textContent=C.amt(lit());ct.textContent=C.ct(lit());
+}
+function clearHold(){timers.forEach(clearTimeout);timers=[];}
+function holdStart(e){
+  if(logged)return;
+  if(e&&e.pointerId!=null){try{btn.setPointerCapture(e.pointerId)}catch(z){}}
+  clearHold();from0=filled;
+  var n=step()-from0;if(n<=0)return;
+  bar.style.transition='none';bar.style.width='0';
+  void bar.offsetWidth;
+  bar.style.transition='width '+HOLD+'ms linear';bar.style.width='100%';
+  for(var i=1;i<=n;i++)(function(k){
+    timers.push(setTimeout(function(){
+      setLit(from0+k);
+      btnT.textContent=left()?'Hold to fill '+left()+(left()===1?' mark':' marks'):'Logged. '+lit()+' of '+C.n+' marks';
+      if(k===n)done();
+    },Math.round(HOLD*k/n)));
+  })(i);
+}
+function holdStop(){
+  if(logged)return;
+  clearHold();
+  bar.style.transition='width .18s ease-out';bar.style.width='0';
+  setLit(from0);paint();
+}
+btn.addEventListener('pointerdown',holdStart);
+['pointerup','pointerleave','pointercancel'].forEach(function(ev){btn.addEventListener(ev,holdStop)});
+btn.addEventListener('keydown',function(e){
+  if((e.key==='Enter'||e.key===' ')&&!e.repeat){e.preventDefault();holdStart();}});
+btn.addEventListener('keyup',holdStop);
 
 function drawChips(){
   chipsEl.innerHTML='';
@@ -216,13 +269,13 @@ field.addEventListener('pointermove',function(e){
   if(!wiping||logged)return;var i=markAt(e.clientX,e.clientY);
   if(i>=lit()&&i<C.base+step())light(i);});
 ['pointerup','pointercancel'].forEach(function(ev){field.addEventListener(ev,function(){wiping=false})});
-btn.addEventListener('click',function(){light(C.base+step()-1)});
 field.addEventListener('keydown',function(e){
   if(e.key==='Enter'||e.key===' '){e.preventDefault();light(C.base+step()-1);}});
 
 /* --- swapping the bucket: the field re-rules itself to the new goal ------- */
 function render(key){
   C=B[key];chip=C.chips[C.pick];filled=0;logged=false;
+  clearHold();bar.style.transition='none';bar.style.width='0';from0=0;
   btn.classList.remove('done');ph.classList.remove('logged');
   ['cols','rows'].forEach(function(k){ph.style.setProperty('--'+k,C[k])});
   ['htop','ftop','rtop','ctop','cx','cy'].forEach(function(k){ph.style.setProperty('--'+k,C[k]+'px')});

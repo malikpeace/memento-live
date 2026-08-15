@@ -4,19 +4,16 @@
 <section class="cell" data-k="mx-5">
 <style>
 [data-k=mx-5] .scr{position:absolute;inset:0;display:flex;flex-direction:column;padding:30px 18px 22px}
-[data-k=mx-5] .hd{display:flex;justify-content:space-between;align-items:baseline;padding:0 2px}
-[data-k=mx-5] .hd b{font-size:15px;font-weight:500;letter-spacing:-.015em}
-[data-k=mx-5] .hd u{text-decoration:none;font-size:12px;color:var(--text-mid);font-variant-numeric:tabular-nums}
+/* meta above, title below: the one header shape this whole set uses */
+[data-k=mx-5] .hd{padding:0 2px}
+[data-k=mx-5] .hd u{display:block;text-decoration:none;font-size:12px;color:var(--text-lo);font-variant-numeric:tabular-nums}
+[data-k=mx-5] .hd b{display:block;margin-top:4px;font-size:17px;font-weight:700;letter-spacing:-.02em}
 
-/* the ladder: two stiles and rungs of a real, fixed geometry. nothing here is measured in
-   javascript, so the dashed line and the rungs can never disagree mid transition. */
+/* the ladder: rungs of a real, fixed geometry. the stiles are gone, they read as stray
+   hairlines on a phone and the stacked rungs carry the metaphor on their own. */
 [data-k=mx-5] .ladwrap{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;margin-top:8px}
 [data-k=mx-5] .lad{position:relative;display:flex;flex-direction:column;gap:7px;padding:16px 0}
-[data-k=mx-5] .lad::before,[data-k=mx-5] .lad::after{content:"";position:absolute;top:0;bottom:0;width:1px;
-  background:linear-gradient(rgba(var(--ink),0),rgba(var(--ink),.24) 8%,rgba(var(--ink),.24) 92%,rgba(var(--ink),0))}
-[data-k=mx-5] .lad::before{left:3px}
-[data-k=mx-5] .lad::after{right:3px}
-[data-k=mx-5] .rung{position:relative;border:0;width:calc(100% - 26px);margin:0 13px;flex:none;height:76px;border-radius:11px;
+[data-k=mx-5] .rung{position:relative;border:0;width:100%;flex:none;height:76px;border-radius:11px;
   padding:0 15px;font-family:inherit;display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;
   cursor:pointer;-webkit-tap-highlight-color:transparent;background:rgba(20,23,29,.9);
   box-shadow:inset 0 1px 0 rgba(var(--ink),.05);
@@ -47,30 +44,33 @@
 [data-k=mx-5] .rung.on .mk{background:#3fd94e}
 
 /* the normal-day line is a real row in the ladder, not a floating absolute guess */
-[data-k=mx-5] .seam{flex:none;height:23px;margin:0 13px;pointer-events:none;display:flex;align-items:center;gap:9px}
-[data-k=mx-5] .seam span{flex:none;font-size:10.5px;color:rgba(var(--ink),.58);white-space:nowrap}
+[data-k=mx-5] .seam{flex:none;height:23px;pointer-events:none;display:flex;align-items:center;gap:9px}
+[data-k=mx-5] .seam span{flex:none;font-size:11px;color:rgba(var(--ink),.62);white-space:nowrap}
 [data-k=mx-5] .seam u{flex:1;height:1px;text-decoration:none;
   background:repeating-linear-gradient(90deg,rgba(var(--ink),.34) 0 5px,transparent 5px 10px)}
 
-[data-k=mx-5] .conseq{margin:10px 2px 0;min-height:36px;font-size:12.5px;line-height:1.45;color:var(--text-mid);
+[data-k=mx-5] .conseq{margin:12px 2px 0;min-height:19px;font-size:12.5px;line-height:1.45;color:var(--text-mid);
   font-variant-numeric:tabular-nums}
-[data-k=mx-5] .conseq b{color:var(--text-hi);font-weight:500}
-[data-k=mx-5] .foot{display:flex;flex-direction:column;gap:9px;margin-top:6px}
-[data-k=mx-5] .cta{flex:1;border:0;border-radius:14px;background:rgba(235,238,248,.94);color:#0b0c10;font-family:inherit;
-  font-weight:700;font-size:15.5px;letter-spacing:-.01em;padding:15px 14px;cursor:pointer;font-variant-numeric:tabular-nums;
-  -webkit-tap-highlight-color:transparent;transition:transform .12s ease-out,background .12s ease-out}
-[data-k=mx-5] .cta:active{transform:scale(.985);background:rgba(235,238,248,1)}
-[data-k=mx-5] .more{align-self:center;border:0;border-radius:11px;padding:9px 17px;font-family:inherit;font-size:12.5px;font-weight:500;
-  color:var(--text-mid);cursor:pointer;background:rgba(22,25,31,.92);-webkit-tap-highlight-color:transparent;
-  -webkit-backdrop-filter:blur(22px) saturate(1.4);backdrop-filter:blur(22px) saturate(1.4);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.08);transition:color .14s ease-out}
-[data-k=mx-5] .more.on,[data-k=mx-5] .more:active{color:var(--text-hi)}
+[data-k=mx-5] .conseq b{color:var(--text-hi);font-weight:700}
+/* THE HOLD LAW: the rung is a tap, the day is a hold. */
+[data-k=mx-5] .foot{margin-top:14px}
+[data-k=mx-5] .cta{position:relative;display:block;width:100%;border:0;border-radius:14px;overflow:hidden;
+  background:rgba(235,238,248,.94);color:#0b0c10;font-family:inherit;font-weight:700;font-size:15.5px;
+  padding:16px 14px;cursor:pointer;font-variant-numeric:tabular-nums;touch-action:none;user-select:none;
+  -webkit-tap-highlight-color:transparent;transition:transform .12s ease-out}
+[data-k=mx-5] .cta:active{transform:scale(.99)}
+[data-k=mx-5] .cta .ink{position:absolute;left:0;top:0;bottom:0;width:0;background:#0b0c10}
+[data-k=mx-5] .cta .lb{position:relative;z-index:2;display:block}
+[data-k=mx-5] .cta .lb2{position:absolute;left:0;right:0;top:0;bottom:0;z-index:3;display:block;
+  padding:16px 14px;text-align:center;color:rgba(235,238,248,.96);clip-path:inset(0 100% 0 0)}
+[data-k=mx-5] .more{display:block;width:100%;border:0;background:none;font-family:inherit;font-size:13px;
+  color:var(--text-mid);padding:12px 8px 2px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+[data-k=mx-5] .more.on,[data-k=mx-5] .more:hover{color:var(--text-hi)}
 
 [data-k=mx-5] .dk{position:absolute;inset:0;display:flex;gap:28px;padding:26px 30px 22px}
 [data-k=mx-5] .dleft{flex:1;display:flex;flex-direction:column;min-width:0}
-[data-k=mx-5] .dhd{display:flex;justify-content:space-between;align-items:baseline}
-[data-k=mx-5] .dhd b{font-size:15px;font-weight:500;letter-spacing:-.015em}
-[data-k=mx-5] .dhd u{text-decoration:none;font-size:12.5px;color:var(--text-mid);font-variant-numeric:tabular-nums}
+[data-k=mx-5] .dhd u{display:block;text-decoration:none;font-size:12px;color:var(--text-lo);font-variant-numeric:tabular-nums}
+[data-k=mx-5] .dhd b{display:block;margin-top:4px;font-size:17px;font-weight:700;letter-spacing:-.02em}
 [data-k=mx-5] .stair{position:relative;flex:1;display:flex;align-items:flex-end;gap:6px;margin-top:34px;padding-bottom:2px}
 [data-k=mx-5] .stp{position:relative;flex:1;border:0;padding:0;border-radius:8px 8px 0 0;cursor:pointer;font-family:inherit;
   background:rgba(20,23,29,.9);box-shadow:inset 0 1px 0 rgba(var(--ink),.05);
@@ -96,24 +96,21 @@
 [data-k=mx-5] .dnum{display:flex;align-items:baseline;gap:8px;margin-top:26px}
 [data-k=mx-5] .dnum b{font-size:64px;font-weight:700;line-height:.88;letter-spacing:-.05em;font-variant-numeric:tabular-nums}
 [data-k=mx-5] .dnum s{text-decoration:none;font-size:14px;color:var(--text-mid);font-weight:500}
-[data-k=mx-5] .drole{font-size:12.5px;color:var(--text-mid);margin-top:7px;min-height:18px}
-[data-k=mx-5] .dbox{margin-top:14px;border-radius:12px;padding:2px 13px;background:rgba(22,25,31,.94);
-  -webkit-backdrop-filter:blur(22px) saturate(1.4);backdrop-filter:blur(22px) saturate(1.4);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.07),0 12px 26px rgba(0,0,0,.42)}
-[data-k=mx-5] .drow{display:flex;justify-content:space-between;padding:9px 0;font-size:13px}
-[data-k=mx-5] .drow+.drow{box-shadow:inset 0 1px 0 rgba(var(--ink),.08)}
-[data-k=mx-5] .drow span{color:var(--text-mid)}
-[data-k=mx-5] .drow b{font-weight:500;font-variant-numeric:tabular-nums}
-[data-k=mx-5] .dnote{margin:11px 2px 0;font-size:12px;color:var(--text-mid);line-height:1.45}
-[data-k=mx-5] .dfoot{margin-top:auto;display:flex;flex-direction:column;gap:9px}
-[data-k=mx-5] .dcta{border:0;border-radius:14px;background:rgba(235,238,248,.94);color:#0b0c10;font-family:inherit;
-  font-weight:700;font-size:15.5px;padding:15px 12px;cursor:pointer;font-variant-numeric:tabular-nums;
-  transition:transform .12s ease-out,background .12s ease-out}
-[data-k=mx-5] .dcta:hover{background:rgba(255,255,255,.99)}
-[data-k=mx-5] .dcta:active{transform:scale(.985)}
-[data-k=mx-5] .dmore{border:0;border-radius:14px;padding:13px 12px;font-family:inherit;font-size:13.5px;font-weight:500;
-  color:var(--text-mid);cursor:pointer;background:rgba(22,25,31,.92);box-shadow:inset 0 1px 0 rgba(var(--ink),.08);
-  transition:color .14s ease-out}
+[data-k=mx-5] .drole{font-size:13px;color:var(--text-mid);margin-top:8px;min-height:18px}
+/* the boxed table of three facts is gone: one quiet line says the same thing */
+[data-k=mx-5] .dcost{margin:14px 0 0;font-size:13px;color:var(--text-mid);font-variant-numeric:tabular-nums;line-height:1.5}
+[data-k=mx-5] .dfoot{margin-top:auto}
+[data-k=mx-5] .dcta{position:relative;display:block;width:100%;border:0;border-radius:14px;overflow:hidden;
+  background:rgba(235,238,248,.94);color:#0b0c10;font-family:inherit;font-weight:700;font-size:15.5px;
+  padding:16px 12px;cursor:pointer;font-variant-numeric:tabular-nums;touch-action:none;user-select:none;
+  transition:transform .12s ease-out}
+[data-k=mx-5] .dcta:active{transform:scale(.99)}
+[data-k=mx-5] .dcta .ink{position:absolute;left:0;top:0;bottom:0;width:0;background:#0b0c10}
+[data-k=mx-5] .dcta .lb{position:relative;z-index:2;display:block}
+[data-k=mx-5] .dcta .lb2{position:absolute;left:0;right:0;top:0;bottom:0;z-index:3;display:block;
+  padding:16px 12px;text-align:center;color:rgba(235,238,248,.96);clip-path:inset(0 100% 0 0)}
+[data-k=mx-5] .dmore{display:block;width:100%;border:0;background:none;padding:12px;font-family:inherit;font-size:13px;
+  color:var(--text-mid);cursor:pointer}
 [data-k=mx-5] .dmore:hover,[data-k=mx-5] .dmore.on{color:var(--text-hi)}
 @media (prefers-reduced-motion:reduce){[data-k=mx-5] *{transition-duration:0s !important}}
 </style>
@@ -124,14 +121,14 @@
 <div class="ph">
   <div class="grid" id="mx5g"></div>
   <div class="scr">
-    <div class="hd"><b>Message clients</b><u id="mx5now">now 4:30 pm</u></div>
+    <div class="hd"><u id="mx5now">now 4:30 pm</u><b>Message clients</b></div>
     <div class="ladwrap">
       <div class="lad" id="mx5l"></div>
     </div>
     <p class="conseq" id="mx5c"></p>
     <div class="foot">
-      <button class="cta" id="mx5cta">Start 8 messages</button>
-      <button class="more" id="mx5more">all rungs</button>
+      <button class="cta" id="mx5cta" type="button"><span class="ink"></span><span class="lb">Hold to start 8 messages</span><span class="lb2" aria-hidden="true">Hold to start 8 messages</span></button>
+      <button class="more" id="mx5more" type="button">all rungs</button>
     </div>
   </div>
 </div>
@@ -140,22 +137,17 @@
   <div class="grid" id="mx5dg"></div>
   <div class="dk">
     <div class="dleft">
-      <div class="dhd"><b>Message clients</b><u id="mx5dnow">today, now 4:30 pm</u></div>
+      <div class="dhd"><u id="mx5dnow">today, now 4:30 pm</u><b>Message clients</b></div>
       <div class="stair" id="mx5s"><div class="dusual" id="mx5du"><span>your logged days end here</span></div></div>
-      <div class="dhint" id="mx5dh">click any step to jump straight there, hover to price it first</div>
+      <div class="dhint" id="mx5dh">Click any step to jump straight there.</div>
     </div>
     <div class="dside">
       <div class="dnum"><b id="mx5dn">8</b><s id="mx5dun">messages</s></div>
       <div class="drole" id="mx5drole">today&#8217;s size</div>
-      <div class="dbox">
-        <div class="drow"><span>each</span><b>about 3 min</b></div>
-        <div class="drow"><span>this takes</span><b id="mx5dt">about 24 min</b></div>
-        <div class="drow"><span>done about</span><b id="mx5dd">4:54 pm</b></div>
-      </div>
-      <p class="dnote" id="mx5dnote">Every time here is the plan&#8217;s estimate, not a measured one.</p>
+      <p class="dcost">About <span id="mx5dt">24 min</span>, done about <span id="mx5dd">4:54 pm</span>.</p>
       <div class="dfoot">
-        <button class="dcta" id="mx5dcta">Start 8 messages</button>
-        <button class="dmore" id="mx5dmore">all rungs</button>
+        <button class="dcta" id="mx5dcta" type="button"><span class="ink"></span><span class="lb">Hold to start 8 messages</span><span class="lb2" aria-hidden="true">Hold to start 8 messages</span></button>
+        <button class="dmore" id="mx5dmore" type="button">all rungs</button>
       </div>
     </div>
   </div>
@@ -231,18 +223,22 @@
     });
     dusual.style.bottom=(16+USUAL/20*80)+'%';
 
+    /* GLANCE: the open rung already prints the number, the minutes and the finish time.
+       This line says the ONE thing the ladder cannot: where this rung sits against the
+       days they have actually logged. */
     var diff=n-USUAL;
-    var lead = diff===0 ? 'Your usual day.'
-      : (diff>0 ? diff+' more than your usual day.' : (-diff)+' fewer than your usual day.');
-    R.querySelector('#mx5c').innerHTML = lead+' <b>'+n+' '+unit(n)+'</b>, about '+hm(mins)+
-      ' on the plan&#8217;s estimate, done about '+clock(BASE+mins)+'.';
+    R.querySelector('#mx5c').innerHTML = diff===0 ? ''
+      : ('<b>'+Math.abs(diff)+'</b> '+(diff>0?'more':'fewer')+' than your usual day.');
 
     R.querySelector('#mx5dn').textContent=n;
     R.querySelector('#mx5dun').textContent=unit(n);
     R.querySelector('#mx5drole').textContent=role(n);
-    R.querySelector('#mx5dt').textContent='about '+hm(mins);
+    R.querySelector('#mx5dt').textContent=hm(mins);
     R.querySelector('#mx5dd').textContent=clock(BASE+mins);
-    ['#mx5cta','#mx5dcta'].forEach(function(x){R.querySelector(x).textContent='Start '+n+' '+unit(n);});
+    ['#mx5cta','#mx5dcta'].forEach(function(x){
+      var b=R.querySelector(x); if(b.dataset.busy) return;
+      var t='Hold to start '+n+' '+unit(n);
+      b.querySelector('.lb').textContent=t; b.querySelector('.lb2').textContent=t; });
     ['#mx5g','#mx5dg'].forEach(function(x){R.querySelector(x).style.opacity=(0.034+n/20*0.05).toFixed(3);});
   }
 
@@ -255,10 +251,30 @@
     buildLadder(); buildStair(); paint();
   }
   ['#mx5more','#mx5dmore'].forEach(function(s2){R.querySelector(s2).addEventListener('click',toggle);});
+  /* THE HOLD LAW: no bare tap banks a day. */
   ['#mx5cta','#mx5dcta'].forEach(function(s2){
-    R.querySelector(s2).addEventListener('click',function(){
-      var b=this, was=b.textContent; b.textContent='Started'; setTimeout(function(){b.textContent=was;},900);
+    var b=R.querySelector(s2);
+    var ink=b.querySelector('.ink'), lb2=b.querySelector('.lb2'), lb=b.querySelector('.lb');
+    var raf=null, t0=0, p=0, done=false, drain=null, txt=null;
+    function draw(){ ink.style.width=(p*100)+'%'; lb2.style.clipPath='inset(0 '+((1-p)*100)+'% 0 0)'; }
+    function stop(){ if(raf) cancelAnimationFrame(raf); raf=null; if(drain) cancelAnimationFrame(drain); drain=null; }
+    function finish(){ stop(); done=true; p=1; draw(); b.dataset.busy='1';
+      txt=lb.textContent; lb.textContent='Locked in'; lb2.textContent='Locked in';
+      setTimeout(function(){ done=false; p=0; draw(); delete b.dataset.busy;
+        lb.textContent=txt; lb2.textContent=txt; },1100);
+    }
+    b.addEventListener('pointerdown',function(e){ e.preventDefault(); if(done) return;
+      try{b.setPointerCapture(e.pointerId);}catch(err){}
+      stop(); t0=performance.now()-p*650;
+      (function step(t){ p=Math.min(1,(t-t0)/650); draw();
+        if(p<1){ raf=requestAnimationFrame(step); } else { finish(); } })(performance.now());
     });
+    function up(){ if(done||p===0) return; stop();
+      var from=p, s0=performance.now();
+      (function back(t){ var k=Math.min(1,(t-s0)/190); p=from*(1-k); draw();
+        if(k<1) drain=requestAnimationFrame(back); })(performance.now());
+    }
+    b.addEventListener('pointerup',up); b.addEventListener('pointercancel',up); b.addEventListener('pointerleave',up);
   });
 
   R.querySelector('#mx5now').textContent='now '+clock(BASE);

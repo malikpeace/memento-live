@@ -5,47 +5,51 @@
 <style>
 [data-k="mx-9"] .p9{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;padding:24px 18px 18px;overflow:hidden}
 [data-k="mx-9"] .day{font-size:12px;color:var(--text-lo);margin:0;font-variant-numeric:tabular-nums}
-[data-k="mx-9"] .verb{font-size:19px;font-weight:500;letter-spacing:-.015em;margin:3px 0 0}
+[data-k="mx-9"] .verb{font-size:17px;font-weight:700;letter-spacing:-.02em;margin:4px 0 0}
 [data-k="mx-9"] .stage{flex:1;position:relative;display:flex;align-items:center;justify-content:center;min-height:0;
   touch-action:none;user-select:none;cursor:ns-resize;-webkit-tap-highlight-color:transparent}
-[data-k="mx-9"] .numwrap{display:flex;flex-direction:column;align-items:center;padding-right:14px}
+[data-k="mx-9"] .numwrap{display:flex;flex-direction:column;align-items:center}
 [data-k="mx-9"] .big{font-weight:700;letter-spacing:-.05em;line-height:.84;font-variant-numeric:tabular-nums;
   color:var(--text-hi)}
 [data-k="mx-9"] .unit{font-size:14px;color:var(--text-mid);margin-top:12px}
-[data-k="mx-9"] .nm{font-size:12.5px;color:var(--text-mid);margin-top:9px;padding:4px 11px;border-radius:999px;
-  background:rgba(var(--ink),.08)}
+/* a plain line, not a pill: the set names its sizes the same way everywhere */
+[data-k="mx-9"] .nm{font-size:14.5px;font-weight:500;color:var(--text-hi);margin-top:14px}
 [data-k="mx-9"] .rail{position:absolute;right:0;top:16%;bottom:16%;width:44px}
-[data-k="mx-9"] .rail .ln{position:absolute;right:9px;top:0;bottom:0;width:1px;background:rgba(var(--ink),.12)}
+[data-k="mx-9"] .rail .ln{position:absolute;right:7px;top:0;bottom:0;width:1px;background:rgba(var(--ink),.20)}
 [data-k="mx-9"] .rail u{position:absolute;right:0;display:flex;align-items:center;justify-content:flex-end;gap:7px;
   transform:translateY(-50%);font-size:11.5px;font-style:normal;color:rgba(var(--ink),.42);
   font-variant-numeric:tabular-nums;transition:color .18s}
-[data-k="mx-9"] .rail u s{width:12px;height:1px;background:rgba(var(--ink),.26);display:block;text-decoration:none;
-  transition:background .18s,width .18s}
+/* every tick is the same length so the numbers right-align on one column: a live tick is
+   brighter, never longer, or the labels jitter sideways as you drag. */
+[data-k="mx-9"] .rail u s{width:14px;height:1px;background:rgba(var(--ink),.26);display:block;text-decoration:none;
+  transition:background .18s}
 [data-k="mx-9"] .rail u.on{color:var(--text-hi);font-weight:700}
-[data-k="mx-9"] .rail u.on s{background:rgba(var(--ink),.92);width:18px}
-[data-k="mx-9"] .rail .dot{position:absolute;right:4px;width:11px;height:11px;border-radius:999px;margin-top:-5.5px;
+[data-k="mx-9"] .rail u.on s{background:rgba(var(--ink),.92)}
+[data-k="mx-9"] .rail .dot{position:absolute;right:2px;width:11px;height:11px;border-radius:999px;margin-top:-5.5px;
   background:rgb(var(--ink))}
-[data-k="mx-9"] .rail.fine u s{width:8px}
-[data-k="mx-9"] .rail.fine u.on s{width:14px}
 [data-k="mx-9"] .hint{display:flex;align-items:center;justify-content:center;gap:8px;font-size:12.5px;
   color:var(--text-mid);margin:0 0 11px;font-variant-numeric:tabular-nums}
-[data-k="mx-9"] .grip{display:inline-flex;flex-direction:column;gap:3px;opacity:.75}
-[data-k="mx-9"] .grip s{width:16px;height:1px;background:rgba(var(--ink),.6);display:block}
-[data-k="mx-9"] .end{border-radius:14px;padding:11px 14px;background:rgba(22,25,31,.94);
-  -webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);box-shadow:inset 0 1px 0 rgba(var(--ink),.08);
+/* was a three-line grip, which read as a menu glyph sitting in the middle of a
+   sentence. The gesture is upward, so the mark is an upward one. */
+[data-k="mx-9"] .grip{display:inline-flex;align-items:center;opacity:.75}
+[data-k="mx-9"] .grip svg{display:block;width:11px;height:11px}
+/* the cost travels WITH the number instead of stacking as another line above the button:
+   one focal group (number, unit, name, price), and the foot holds only the gesture. */
+[data-k="mx-9"] .end{font-size:12.5px;color:var(--text-mid);margin:8px 0 0;text-align:center;line-height:1.5;
   font-variant-numeric:tabular-nums}
-[data-k="mx-9"] .end .er{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0}
-[data-k="mx-9"] .end span{font-size:12.5px;color:var(--text-mid)}
-[data-k="mx-9"] .end b{font-size:15.5px;font-weight:700}
-[data-k="mx-9"] .cta{display:block;width:100%;border:0;border-radius:14px;background:rgba(235,238,248,.94);color:#0b0c10;
-  font-family:inherit;font-weight:700;font-size:15.5px;padding:15px 16px;margin:10px 0 0;cursor:pointer;
-  font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent}
-[data-k="mx-9"] .cta:active{background:rgba(235,238,248,.84)}
-[data-k="mx-9"] .quiet{display:block;width:100%;border:0;border-radius:12px;font-family:inherit;font-size:13px;
-  color:var(--text-mid);padding:11px 14px;margin:8px 0 0;cursor:pointer;background:rgba(22,25,31,.92);
-  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);box-shadow:inset 0 1px 0 rgba(var(--ink),.08);
-  -webkit-tap-highlight-color:transparent}
-[data-k="mx-9"] .quiet:hover{background:rgba(30,34,42,.94)}
+/* THE HOLD LAW: the number is a drag, the day is a hold. */
+[data-k="mx-9"] .cta{position:relative;display:block;width:100%;border:0;border-radius:14px;overflow:hidden;
+  background:rgba(235,238,248,.94);color:#0b0c10;font-family:inherit;font-weight:700;font-size:15.5px;
+  padding:16px 14px;margin:14px 0 0;cursor:pointer;font-variant-numeric:tabular-nums;touch-action:none;user-select:none;
+  -webkit-tap-highlight-color:transparent;transition:transform .12s ease-out}
+[data-k="mx-9"] .cta:active{transform:scale(.99)}
+[data-k="mx-9"] .cta .ink{position:absolute;left:0;top:0;bottom:0;width:0;background:#0b0c10}
+[data-k="mx-9"] .cta .lb{position:relative;z-index:2;display:block}
+[data-k="mx-9"] .cta .lb2{position:absolute;left:0;right:0;top:0;bottom:0;z-index:3;display:block;
+  padding:16px 14px;text-align:center;color:rgba(235,238,248,.96);clip-path:inset(0 100% 0 0)}
+[data-k="mx-9"] .quiet{display:block;width:100%;border:0;background:none;font-family:inherit;font-size:13px;
+  color:var(--text-mid);padding:12px 8px 2px;margin:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+[data-k="mx-9"] .quiet:hover{color:var(--text-hi)}
 
 [data-k="mx-9"] .d9{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;padding:26px 0 22px}
 [data-k="mx-9"] .d9 .dhd{margin:0;padding:0 40px;font-size:14px;color:var(--text-mid);font-variant-numeric:tabular-nums}
@@ -59,9 +63,10 @@
 [data-k="mx-9"] .band .bu{margin-left:14px;font-size:13.5px;color:var(--text-mid);white-space:nowrap;opacity:0;
   transition:opacity .14s}
 [data-k="mx-9"] .band.wide .bu{opacity:1}
-[data-k="mx-9"] .band .grab{margin-left:auto;padding:0 12px;display:flex;flex-direction:column;gap:3px}
+/* the desk handle stays the conventional grip, but it lives on the band's edge
+   where a cursor expects one, not inside a sentence */
+[data-k="mx-9"] .band .grab{margin-left:auto;padding:0 12px;display:flex;flex-direction:row;gap:3px}
 [data-k="mx-9"] .band .grab s{width:1px;height:18px;background:rgba(var(--ink),.32);display:block}
-[data-k="mx-9"] .band .grab{flex-direction:row}
 [data-k="mx-9"] .stops{position:relative;height:36px;margin:10px 0 0;padding-left:40px}
 [data-k="mx-9"] .stops .mk{position:absolute;top:0;width:1px;height:9px;background:rgba(var(--ink),.20);
   transition:background .18s,height .18s}
@@ -69,11 +74,14 @@
 [data-k="mx-9"] .stops .lb{position:absolute;top:15px;transform:translateX(-50%);font-size:12px;white-space:nowrap;
   color:rgba(var(--ink),.44);font-variant-numeric:tabular-nums;transition:color .18s;text-align:center}
 [data-k="mx-9"] .stops .lb.on{color:var(--text-hi);font-weight:700}
-[data-k="mx-9"] .dfoot{padding:0 40px;display:flex;align-items:center;gap:14px;margin-top:auto}
-[data-k="mx-9"] .rows{margin:0;flex:1;font-size:14px;color:var(--text-mid);line-height:1.5;font-variant-numeric:tabular-nums}
+[data-k="mx-9"] .dfoot{padding:0 40px;display:flex;align-items:center;gap:12px;margin-top:auto}
+/* the price sits under the title where the eye already is, so the foot is only the gesture */
+[data-k="mx-9"] .rows{margin:6px 0 0;padding:0 40px;font-size:13.5px;color:var(--text-mid);line-height:1.5;
+  font-variant-numeric:tabular-nums}
 [data-k="mx-9"] .rows b{color:var(--text-hi);font-weight:700}
 [data-k="mx-9"] .d9 .cta{width:auto;min-width:198px;margin:0}
 [data-k="mx-9"] .d9 .quiet{width:auto;margin:0;white-space:nowrap}
+@media (prefers-reduced-motion:reduce){[data-k="mx-9"] *{transition-duration:0s !important;animation-duration:0s !important}}
 </style>
 <h3>Stretch the number</h3>
 <p class="cap">The number is the control and it physically grows in your hand, but it only comes to rest on the three sizes Memento proposed, so a heavy day is larger on the screen and still a real day. Ask for free stretch and it releases into every number between them.</p>
@@ -89,15 +97,14 @@
         <div class="big">5</div>
         <div class="unit">clients today</div>
         <div class="nm">Your usual day</div>
+        <!-- PROVENANCE: 47 reached is the sum of the messages they logged, 100 is the countable
+             target their own plan named. Times are the plan's own estimate. -->
+        <p class="end">Start 9:00, done about <span class="e">9:15</span>.<br><span class="d">52 of 100</span> reached.</p>
       </div>
       <div class="rail"><span class="ln"></span><span class="dot"></span></div>
     </div>
-    <p class="hint"><span class="grip"><s></s><s></s><s></s></span><span class="htx">Drag the number up to stretch today</span></p>
-    <div class="end">
-      <div class="er"><span>Start 9:00, done about</span><b class="e">9:15</b></div>
-      <div class="er"><span>Reached, after today</span><b class="d">52 of 100</b></div>
-    </div>
-    <button class="cta" type="button">Start <span class="n">5</span> <span class="uw">clients</span></button>
+    <p class="hint"><span class="grip"><svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M5.5 9.6V1.9M2 5.2l3.5-3.4 3.5 3.4" stroke="rgba(235,238,248,.6)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="htx">Drag the number up to stretch today</span></p>
+    <button class="cta" type="button"><span class="ink"></span><span class="lb">Hold to start <span class="n">5</span> <span class="uw">clients</span></span><span class="lb2" aria-hidden="true">Hold to start <span class="n">5</span> <span class="uw">clients</span></span></button>
     <button class="quiet tog" type="button">Stretch to any number</button>
   </div>
 </div>
@@ -106,13 +113,13 @@
   <div class="grid"></div>
   <div class="d9">
     <p class="dhd">Message clients, Tuesday, day 12</p>
+    <p class="rows">Start 9:00, done about <b class="e">9:15</b>. <b class="d">52 of 100</b> reached.</p>
     <div class="bandwrap">
       <div class="band"><b>5</b><span class="bu">clients today</span><span class="grab"><s></s><s></s><s></s></span></div>
     </div>
     <div class="stops"></div>
     <div class="dfoot">
-      <p class="rows">About 3 min each on the plan&#8217;s estimate. You start at 9:00 and finish about <b class="e">9:15</b>, and today puts you on <b class="d">52 of 100</b> people reached.</p>
-      <button class="cta" type="button">Start <span class="n">5</span> <span class="uw">clients</span></button>
+      <button class="cta" type="button"><span class="ink"></span><span class="lb">Hold to start <span class="n">5</span> <span class="uw">clients</span></span><span class="lb2" aria-hidden="true">Hold to start <span class="n">5</span> <span class="uw">clients</span></span></button>
       <button class="quiet tog" type="button">Stretch to any number</button>
     </div>
   </div>
@@ -242,6 +249,30 @@
   Array.prototype.forEach.call(root.querySelectorAll('.tog'),function(b){
     b.addEventListener('click',function(){ fine=!fine; if(!fine) p=Math.round(p);
       buildRail(); buildStops(); paint(); });
+  });
+
+  /* THE HOLD LAW: the number is a drag, the day is a hold. No bare tap banks a day. */
+  Array.prototype.forEach.call(root.querySelectorAll('.cta'),function(b){
+    var ink=b.querySelector('.ink'), lb2=b.querySelector('.lb2'), lb=b.querySelector('.lb');
+    var raf=null, t0=0, hp=0, done=false, drain=null, txt=null;
+    function draw(){ ink.style.width=(hp*100)+'%'; lb2.style.clipPath='inset(0 '+((1-hp)*100)+'% 0 0)'; }
+    function stop(){ if(raf) cancelAnimationFrame(raf); raf=null; if(drain) cancelAnimationFrame(drain); drain=null; }
+    function finish(){ stop(); done=true; hp=1; draw();
+      txt=lb.innerHTML; lb.textContent='Locked in'; lb2.textContent='Locked in';
+      setTimeout(function(){ done=false; hp=0; draw(); lb.innerHTML=txt; lb2.innerHTML=txt; paint(); },1100);
+    }
+    b.addEventListener('pointerdown',function(e){ e.preventDefault(); if(done) return;
+      try{b.setPointerCapture(e.pointerId);}catch(err){}
+      stop(); t0=performance.now()-hp*650;
+      (function step(t){ hp=Math.min(1,(t-t0)/650); draw();
+        if(hp<1){ raf=requestAnimationFrame(step); } else { finish(); } })(performance.now());
+    });
+    function up(){ if(done||hp===0) return; stop();
+      var from=hp, s0=performance.now();
+      (function back(t){ var k=Math.min(1,(t-s0)/190); hp=from*(1-k); draw();
+        if(k<1) drain=requestAnimationFrame(back); })(performance.now());
+    }
+    b.addEventListener('pointerup',up); b.addEventListener('pointercancel',up); b.addEventListener('pointerleave',up);
   });
 
   buildRail(); buildStops(); paint();

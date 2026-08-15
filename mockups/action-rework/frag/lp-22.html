@@ -36,11 +36,6 @@
 [data-k=lp-22] .meta{margin:6px 0 0;font-size:11.5px;line-height:1.5;color:rgba(var(--ink),.90);
   text-wrap:pretty}
 
-/* the one accent on the surface: the line they set, drawn once, crossed */
-[data-k=lp-22] .cross{display:flex;align-items:center;gap:9px;margin-top:14px}
-[data-k=lp-22] .cross i{flex:1;height:1px;background:rgba(63,217,78,.60)}
-[data-k=lp-22] .cross span{flex:none;font-size:10.5px;line-height:1;color:rgba(63,217,78,.92)}
-
 /* the two breathing gaps are one element twice over, so the slot always sits
    optically centred between the fact above it and the fork below it */
 [data-k=lp-22] .gap{flex:1;min-height:12px}
@@ -55,10 +50,15 @@
 [data-k=lp-22] .slot p{margin:8px 0 0;font-size:12.5px;line-height:1.5;color:rgba(var(--ink),.90)}
 
 /* --- the handoff -------------------------------------------------------- */
-[data-k=lp-22] .seal{flex:none;width:100%;height:56px;border:0;border-radius:14px;
-  background:rgba(235,238,248,.94);color:#0b0c10;font:700 15.5px/1 var(--font);letter-spacing:-.01em;
-  cursor:pointer;-webkit-tap-highlight-color:transparent;
+[data-k=lp-22] .seal{position:relative;flex:none;width:100%;height:56px;border:0;border-radius:14px;
+  overflow:hidden;background:rgba(235,238,248,.94);color:#0b0c10;font:700 15.5px/1 var(--font);
+  letter-spacing:-.01em;cursor:pointer;touch-action:none;-webkit-user-select:none;user-select:none;
+  -webkit-tap-highlight-color:transparent;
   transition:background .2s ease-out,color .2s ease-out,box-shadow .2s ease-out,transform .1s ease-out}
+[data-k=lp-22] .seal b{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(63,217,78,.55)}
+[data-k=lp-22] .seal.go b{width:100%;transition:width 1.2s linear}
+[data-k=lp-22] .seal span{position:relative}
+[data-k=lp-22] .s.sealed .seal b{display:none}
 [data-k=lp-22] .seal:active{transform:translateY(1px)}
 [data-k=lp-22] .seal:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
 [data-k=lp-22] .s.sealed .seal{background:rgba(22,25,31,.95);color:rgba(var(--ink),.96);
@@ -84,7 +84,8 @@
   letter-spacing:-.01em;line-height:1.2;color:var(--text-hi)}
 [data-k=lp-22] .door b i{display:none;flex:none;width:8px;height:8px;border-radius:3px;background:#3fd94e}
 [data-k=lp-22] .door.on b i{display:block}
-[data-k=lp-22] .door p{margin:5px 0 0;font-size:11.5px;line-height:1.45;color:rgba(var(--ink),.90)}
+[data-k=lp-22] .door p{display:none;margin:6px 0 0;font-size:11.5px;line-height:1.45;color:rgba(var(--ink),.90)}
+[data-k=lp-22] .door.on p{display:block}
 [data-k=lp-22] .door.on{background:rgba(30,52,34,.96);box-shadow:inset 0 1px 0 rgba(63,217,78,.34)}
 @media (prefers-reduced-motion:reduce){[data-k=lp-22] *{transition:none!important}}
 </style>
@@ -103,7 +104,6 @@
     <div class="hit"><span class="main"></span><span class="tail"></span></div>
     <p class="said"></p>
     <p class="meta"></p>
-    <div class="cross"><i></i><span class="mark"></span></div>
 
     <div class="gap"></div>
 
@@ -115,7 +115,7 @@
 
     <div class="gap"></div>
 
-    <button type="button" class="seal">Seal it into your Memento</button>
+    <button type="button" class="seal"><b></b><span>Hold to seal it into your Memento</span></button>
     <p class="note"></p>
 
     <button type="button" class="door" data-d="next" aria-pressed="false">
@@ -132,8 +132,8 @@
   var r=document.querySelector('[data-k="lp-22"]');if(!r)return;
   var s=r.querySelector('.s'),star=r.querySelector('.star'),main=r.querySelector('.main'),
       tail=r.querySelector('.tail'),said=r.querySelector('.said'),meta=r.querySelector('.meta'),
-      mark=r.querySelector('.mark'),slotB=r.querySelector('.slot b'),slotP=r.querySelector('.slot p'),
-      seal=r.querySelector('.seal'),note=r.querySelector('.note'),
+      slotB=r.querySelector('.slot b'),slotP=r.querySelector('.slot p'),
+      seal=r.querySelector('.seal'),sealT=seal.querySelector('span'),note=r.querySelector('.note'),
       dNext=r.querySelector('.door[data-d=next]'),dHold=r.querySelector('.door[data-d=hold]');
 
   /* THREE OF THE SEVEN BUCKETS, one arrival each. In every one the number
@@ -146,8 +146,7 @@
       star:'$3,000 a month so I can quit the warehouse.',
       main:'$3,000',size:54,tail:'a month',
       said:'You said December. It is November 12.',
-      meta:'19 days before you said. The number is the one you wrote at Sunday’s confirm.',
-      mark:'the line you set, crossed',
+      meta:'19 days before you said, from Sunday’s confirm.',
       slotB:'No move today.',slotP:'Today is the day it happened.',
       hold:'$3,000 stops being a target and becomes a floor you hold every month.',
       holdStar:'Hold $3,000 a month, every month.',
@@ -157,8 +156,7 @@
       star:'220 lb by June so I can play a full game again.',
       main:'220',size:62,tail:'lb',
       said:'You said June. It is April 3.',
-      meta:'59 days before you said. The number is the one you wrote at this morning’s weigh in.',
-      mark:'the number you set, crossed',
+      meta:'59 days before you said, from this morning’s weigh in.',
       slotB:'No move today.',slotP:'Today is the day it happened.',
       hold:'220 stops being a target and becomes a range you hold, 218 to 222.',
       holdStar:'Hold 220, anywhere from 218 to 222.',
@@ -168,8 +166,7 @@
       star:'Launch Memento September 1.',
       main:'14 of 14',size:38,tail:'blockers',
       said:'You said September 1. It is August 24.',
-      meta:'8 days before you said. Counted from your own list, you ticked the last one a minute ago.',
-      mark:'every blocker you wrote, cleared',
+      meta:'8 days before you said, counted from your own list.',
       slotB:'No move today.',slotP:'The list is empty. That was the point.',
       hold:'The list is closed. Holding it means one standing session a week.',
       holdStar:'One session a week, so the next list never gets long.',
@@ -187,12 +184,12 @@
     star.textContent = chosen==='hold' ? C.holdStar
                      : chosen==='next' ? 'That star is closed. It is in your story now.'
                      : C.star;
-    said.textContent=C.said;meta.textContent=C.meta;mark.textContent=C.mark;
+    said.textContent=C.said;meta.textContent=C.meta;
     tail.textContent=C.tail;
     slotB.textContent=C.slotB;slotP.textContent=C.slotP;
     dNext.querySelector('p').textContent=C.next;
     dHold.querySelector('p').textContent=C.hold;
-    seal.textContent=sealed?'Handed to the ceremony':'Seal it into your Memento';
+    sealT.textContent=sealed?'Handed to the ceremony':'Hold to seal it into your Memento';
     s.classList.toggle('sealed',sealed);
     note.textContent = chosen==='hold' ? C.holdNote
                      : chosen==='next' ? 'Clarity opens tomorrow. Nothing is asked of you until then.'
@@ -207,7 +204,19 @@
     main.textContent=C.main;
   }
 
-  seal.addEventListener('click',function(){sealed=!sealed;paint()});
+  /* HOLD to seal: the fill runs the width of the button, early release aborts */
+  var ht=null;
+  function doSeal(){seal.classList.remove('go');sealed=true;paint();}
+  seal.addEventListener('pointerdown',function(e){
+    if(sealed){sealed=false;paint();return;}
+    try{seal.setPointerCapture(e.pointerId)}catch(z){}
+    seal.classList.add('go');ht=setTimeout(doSeal,1200);});
+  ['pointerup','pointerleave','pointercancel'].forEach(function(ev){
+    seal.addEventListener(ev,function(){clearTimeout(ht);seal.classList.remove('go');});});
+  seal.addEventListener('keydown',function(e){
+    if((e.key==='Enter'||e.key===' ')&&!e.repeat){e.preventDefault();
+      seal.classList.add('go');ht=setTimeout(doSeal,1200);}});
+  seal.addEventListener('keyup',function(){clearTimeout(ht);seal.classList.remove('go');});
   [dNext,dHold].forEach(function(b){
     b.addEventListener('click',function(){
       chosen = chosen===b.dataset.d ? null : b.dataset.d;

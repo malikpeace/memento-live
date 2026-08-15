@@ -3,47 +3,72 @@
      lp-15 bottom sheet first | lp-16 horizontal corridor band | lp-17 declarative sentence over account rows |
      lp-18 centered monolith numeral -->
 <section class="cell" data-k="lp-18">
+<!-- BEAUTY PASS (2026-08-13). The number is the soul, so everything that was
+     competing with it is gone.
+     CUT: "Every day you kept, added up since 12 March. It is a total." (the
+     words "days owned" already say it) and "Today is still open." (the hold
+     label already says today is not owned yet). What is left under the numeral
+     is ONE quiet line carrying the two things the layout cannot say: where the
+     count starts, and that a bad night subtracts nothing.
+     HIERARCHY: one focal point (the numeral), one primary action (the hold),
+     and the hard-night door demoted to a plain text button so the screen has a
+     single filled surface instead of two identical stacked slabs.
+     OPTICS: negative tracking makes a centred numeral sit right of true centre
+     by half the tracking, so the compensation is exactly -.027em against
+     -.055em, not the eyeballed -.014em it had. Baseline is locked so 141 -> 142
+     does not shift the label under it.
+     GESTURE LAW: completion is a hold, 1400ms, early release aborts. -->
 <style>
 [data-k=lp-18] .l18{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
-  padding:34px 20px 24px;text-align:center;font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent}
-[data-k=lp-18] .l18-goal{font-size:12.5px;line-height:1;color:rgba(var(--ink),.80)}
+  padding:34px 22px 22px;text-align:center;font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent}
+[data-k=lp-18] .l18-goal{font-size:12.5px;line-height:1;letter-spacing:-.005em;color:rgba(var(--ink),.90)}
 
-[data-k=lp-18] .l18-core{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center}
-[data-k=lp-18] .l18-n{font-size:118px;font-weight:700;letter-spacing:-.055em;line-height:.86;color:var(--text-hi);
-  transform:translateX(-.014em);transition:transform .32s cubic-bezier(.22,.61,.36,1)}
-[data-k=lp-18] .l18-u{margin-top:20px;font-size:15px;font-weight:500;letter-spacing:.002em;color:rgba(var(--ink),.92);
-  transition:color .3s ease-out}
-[data-k=lp-18] .l18-why{margin-top:14px;max-width:224px;font-size:12.5px;line-height:1.55;color:rgba(var(--ink),.90)}
-[data-k=lp-18] .l18-owned .l18-n{transform:translateX(-.014em) scale(1.03)}
+/* --- the soul: one numeral, optically centred, on a locked baseline ------- */
+[data-k=lp-18] .l18-core{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding-bottom:14px}
+[data-k=lp-18] .l18-n{font-size:132px;font-weight:700;letter-spacing:-.055em;line-height:1;
+  height:114px;display:flex;align-items:center;color:rgba(var(--ink),1);
+  transform:translateX(-.027em);transition:transform .32s cubic-bezier(.22,.61,.36,1)}
+[data-k=lp-18] .l18-u{margin-top:14px;font-size:15px;font-weight:500;letter-spacing:-.005em;
+  color:rgba(var(--ink),.94);transition:color .3s ease-out}
+/* the quiet layer: where the count starts, and the rule that makes it a total */
+[data-k=lp-18] .l18-src{margin:16px 0 0;max-width:206px;font-size:12px;line-height:1.5;
+  text-wrap:balance;color:rgba(var(--ink),.90)}
+[data-k=lp-18] .l18-owned .l18-n{transform:translateX(-.027em) scale(1.03)}
 [data-k=lp-18] .l18-owned .l18-u{color:#3fd94e}
 
+/* --- the one filled surface on the screen -------------------------------- */
 [data-k=lp-18] .l18-foot{width:100%}
-[data-k=lp-18] .l18-state{margin:0 0 13px;font-size:13px;line-height:1;color:rgba(var(--ink),.90)}
-
-[data-k=lp-18] .l18-hold{position:relative;width:100%;height:56px;border-radius:14px;overflow:hidden;
-  background:rgba(22,25,31,.92);-webkit-backdrop-filter:blur(26px) saturate(1.35);backdrop-filter:blur(26px) saturate(1.35);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.09);cursor:pointer;touch-action:none;user-select:none}
+[data-k=lp-18] .l18-hold{position:relative;width:100%;height:58px;border-radius:14px;overflow:hidden;
+  background:rgba(22,25,31,.94);-webkit-backdrop-filter:blur(26px) saturate(1.4);backdrop-filter:blur(26px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09);cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none;
+  transition:background .3s ease-out,box-shadow .3s ease-out}
 [data-k=lp-18] .l18-hold i{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(63,217,78,.22);display:block}
 [data-k=lp-18] .l18-hold span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
   font-size:14px;font-weight:500;letter-spacing:-.005em;color:rgba(var(--ink),.94)}
-[data-k=lp-18] .l18-owned .l18-hold{background:rgba(63,217,78,.14);box-shadow:inset 0 1px 0 rgba(63,217,78,.30)}
+[data-k=lp-18] .l18-owned .l18-hold{background:rgba(63,217,78,.15);box-shadow:inset 0 1px 0 rgba(63,217,78,.30)}
+[data-k=lp-18] .l18-owned .l18-hold span{font-weight:700;color:rgba(var(--ink),.97)}
 
-[data-k=lp-18] .l18-esc{width:100%;margin-top:9px;padding:14px 0;border:0;border-radius:14px;
-  background:rgba(22,25,31,.92);-webkit-backdrop-filter:blur(26px) saturate(1.35);backdrop-filter:blur(26px) saturate(1.35);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.09);color:rgba(var(--ink),.92);font:500 14px var(--font);cursor:pointer}
+/* the hard-night door: a quiet text button, never a second slab */
+[data-k=lp-18] .l18-esc{display:block;width:100%;margin-top:4px;padding:14px 0;border:0;background:none;
+  color:rgba(var(--ink),.90);font:500 13px var(--font);letter-spacing:-.005em;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;transition:color .16s ease-out}
+[data-k=lp-18] .l18-esc:active{color:rgba(var(--ink),.70)}
 
-[data-k=lp-18] .l18-hard{display:none;text-align:left;border-radius:14px;padding:16px 16px 15px;
-  background:rgba(22,25,31,.96);-webkit-backdrop-filter:blur(28px) saturate(1.35);backdrop-filter:blur(28px) saturate(1.35);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.09)}
+/* --- the hard night ------------------------------------------------------ */
+[data-k=lp-18] .l18-hard{display:none;text-align:left;border-radius:14px;padding:17px 17px 15px;
+  background:rgba(22,25,31,.96);-webkit-backdrop-filter:blur(28px) saturate(1.4);backdrop-filter:blur(28px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09),0 18px 40px rgba(0,0,0,.5)}
 [data-k=lp-18] .l18.hard .l18-hard{display:block}
-[data-k=lp-18] .l18.hard .l18-state,[data-k=lp-18] .l18.hard .l18-hold,[data-k=lp-18] .l18.hard .l18-esc{display:none}
-[data-k=lp-18] .l18-hard b{display:block;font-size:16px;font-weight:700;letter-spacing:-.015em;line-height:1.3;color:var(--text-hi)}
-[data-k=lp-18] .l18-hard p{margin:9px 0 15px;font-size:12.5px;line-height:1.55;color:rgba(var(--ink),.90)}
-[data-k=lp-18] .l18-hard .go{width:100%;padding:15px 0;border:0;border-radius:14px;background:rgba(235,238,248,.94);
-  color:#0b0c10;font:700 15.5px var(--font);letter-spacing:-.01em;cursor:pointer}
-[data-k=lp-18] .l18-hard .l18-bk{width:100%;margin-top:8px;padding:13px 0;border:0;border-radius:14px;
-  background:rgba(var(--ink),.06);box-shadow:inset 0 1px 0 rgba(var(--ink),.08);
-  color:rgba(var(--ink),.90);font:500 13.5px var(--font);cursor:pointer}
+[data-k=lp-18] .l18.hard .l18-hold,[data-k=lp-18] .l18.hard .l18-esc{display:none}
+[data-k=lp-18] .l18-hard b{display:block;font-size:16px;font-weight:700;letter-spacing:-.018em;line-height:1.3;
+  color:rgba(var(--ink),.97)}
+[data-k=lp-18] .l18-hard p{margin:9px 0 16px;font-size:12.5px;line-height:1.5;color:rgba(var(--ink),.90)}
+[data-k=lp-18] .l18-hard .go{width:100%;padding:16px 0;border:0;border-radius:14px;background:rgba(235,238,248,.94);
+  color:#0b0c10;font:700 15px var(--font);letter-spacing:-.01em;cursor:pointer}
+[data-k=lp-18] .l18-hard .l18-bk{display:block;width:100%;margin-top:4px;padding:13px 0;border:0;background:none;
+  color:rgba(var(--ink),.90);font:500 13px var(--font);cursor:pointer}
+@media (prefers-reduced-motion:reduce){[data-k=lp-18] *{transition:none!important}}
 </style>
 <h3>Days owned</h3>
 <p class="cap">Binary quitting as one object on an empty canvas. The total is the whole interface, there is no dial to turn, and the hard night has its own door.</p>
@@ -56,12 +81,11 @@
     <div class="l18-core">
       <div class="l18-n">141</div>
       <div class="l18-u">days owned</div>
-      <p class="l18-why">Every day you kept, added up since 12 March. It is a total. A bad night subtracts nothing.</p>
+      <p class="l18-src">Since 12 March. A bad night subtracts nothing.</p>
     </div>
 
     <div class="l18-foot">
-      <p class="l18-state">Today is still open.</p>
-      <div class="l18-hold"><i></i><span>Hold to own today</span></div>
+      <div class="l18-hold" role="button" tabindex="0" aria-label="Hold to own today"><i></i><span>Hold to own today</span></div>
       <button class="l18-esc">It is hard right now</button>
 
       <!-- PROVENANCE: Memento has no contacts and invents no names. The person here is the
@@ -78,20 +102,27 @@
 <script>(function(){
   var c=document.currentScript.closest('.cell');
   var root=c.querySelector('.l18'),pad=c.querySelector('.l18-hold'),fill=pad.querySelector('i'),
-      lab=pad.querySelector('span'),n=c.querySelector('.l18-n'),st=c.querySelector('.l18-state'),t=null,done=false;
-  function start(){if(done)return;fill.style.transition='width .9s linear';fill.style.width='100%';
-    t=setTimeout(function(){done=true;root.classList.add('l18-owned');n.textContent='142';
-      st.textContent='Owned. That is 142.';lab.textContent='Today is yours';},900);}
+      lab=pad.querySelector('span'),n=c.querySelector('.l18-n'),t=null,done=false;
+  /* one hold length across the set: long enough to be a decision */
+  var HOLD=1400;
+  /* the fill retires once it has done its job: the confirmation is the quiet
+     green surface, not a saturated block */
+  function own(){done=true;root.classList.add('l18-owned');n.textContent='142';
+    fill.style.transition='width .24s ease-out';fill.style.width='0';
+    lab.textContent='Today is yours';pad.setAttribute('aria-label','Today is yours, 142 days owned');}
+  function start(){if(done)return;fill.style.transition='width '+HOLD+'ms linear';fill.style.width='100%';
+    t=setTimeout(own,HOLD);}
   function stop(){if(done)return;clearTimeout(t);fill.style.transition='width .2s ease-out';fill.style.width='0';}
   pad.addEventListener('pointerdown',start);pad.addEventListener('pointerup',stop);
   pad.addEventListener('pointerleave',stop);pad.addEventListener('pointercancel',stop);
+  pad.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();start();}});
+  pad.addEventListener('keyup',stop);
   c.querySelector('.l18-esc').addEventListener('click',function(){root.classList.add('hard');});
   c.querySelector('.l18-hard .l18-bk').addEventListener('click',function(){root.classList.remove('hard');});
   c.querySelector('.l18-hard .go').addEventListener('click',function(){
     c.querySelector('.l18-hard b').textContent='Sent.';
     c.querySelector('.l18-hard p').textContent='That was the whole move. Stay here until they answer, nothing else is asked of you tonight.';
     c.querySelector('.l18-hard .go').style.display='none';
-    c.querySelector('.l18-hard .l18-bk').textContent='Back';
   });
 })();</script>
 </section>

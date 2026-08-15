@@ -17,8 +17,10 @@
   background:rgba(19,22,27,.92);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
   box-shadow:inset 0 1px 0 rgba(var(--ink),.05)}
 [data-k="mx-10"] .track .hl{position:absolute;left:0;right:0;height:1px;background:rgba(var(--ink),.10)}
-[data-k="mx-10"] .blocks{position:absolute;left:11px;width:46%;top:0;bottom:0}
-[data-k="mx-10"] .blocks u{position:absolute;left:0;right:0;border-radius:2px;background:rgba(var(--ink),.62);
+[data-k="mx-10"] .blocks{position:absolute;left:14px;width:30%;top:0;bottom:0}
+/* slats, not a skeleton: each one is literally its three minutes of the ruler, so they stay
+   proportional, but they sit back in the surface instead of shouting over the finish line. */
+[data-k="mx-10"] .blocks u{position:absolute;left:0;right:0;border-radius:2px;background:rgba(var(--ink),.30);
   animation:mx10in .2s cubic-bezier(.16,.9,.3,1) both}
 @keyframes mx10in{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}
 [data-k="mx-10"] .endline{position:absolute;left:0;right:0;height:1px;background:rgba(var(--ink),.55);
@@ -26,10 +28,12 @@
 [data-k="mx-10"] .endlab{position:absolute;right:10px;padding-top:5px;font-size:11.5px;color:var(--text-hi);
   font-variant-numeric:tabular-nums;transition:top .22s cubic-bezier(.16,.9,.3,1)}
 [data-k="mx-10"] .zones{position:absolute;left:0;right:0;top:0;bottom:0;pointer-events:none}
-[data-k="mx-10"] .zones i{position:absolute;left:0;right:0;height:1px;background:rgba(var(--ink),.18)}
-[data-k="mx-10"] .zones em{position:absolute;right:10px;font-style:normal;font-size:11px;color:rgba(var(--ink),.46);
-  transform:translateY(-135%);font-variant-numeric:tabular-nums;transition:color .18s;white-space:nowrap}
-[data-k="mx-10"] .zones em.on{color:var(--text-hi);font-weight:700}
+/* the phone keeps the clock ruler and ONE bright line, your finish. The other two sizes had a
+   full-width rule each, which turned the panel into a stack of random hairlines. */
+[data-k="mx-10"] .zones i{display:none}
+/* the other sizes keep their tick on the ruler, but not a floating caption each: three
+   labels stacked inside one small box is the clutter, the keypad already names the size */
+[data-k="mx-10"] .zones em{display:none}
 
 [data-k="mx-10"] .keys{display:flex;align-items:stretch;gap:9px;margin-top:14px}
 [data-k="mx-10"] .key{flex:none;width:70px;border-radius:14px;display:flex;align-items:center;justify-content:center;
@@ -44,19 +48,22 @@
   transition:transform .18s cubic-bezier(.16,.9,.3,1)}
 [data-k="mx-10"] .cnt.pop b{transform:scale(1.07)}
 [data-k="mx-10"] .cnt .cu{font-size:11.5px;color:var(--text-mid)}
-[data-k="mx-10"] .pips{display:flex;gap:5px;margin-top:6px}
-[data-k="mx-10"] .pips i{width:14px;height:2px;border-radius:2px;background:rgba(var(--ink),.20);transition:background .18s}
-[data-k="mx-10"] .pips i.on{background:rgba(var(--ink),.92)}
-[data-k="mx-10"] .nmline{font-size:12.5px;color:var(--text-mid);margin:11px 2px 0;font-variant-numeric:tabular-nums}
-[data-k="mx-10"] .cta{display:block;width:100%;border:0;border-radius:14px;background:rgba(235,238,248,.94);color:#0b0c10;
-  font-family:inherit;font-weight:700;font-size:15.5px;padding:15px 16px;margin:9px 0 0;cursor:pointer;
-  font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent}
-[data-k="mx-10"] .cta:active{background:rgba(235,238,248,.84)}
-[data-k="mx-10"] .quiet{display:block;width:100%;border:0;border-radius:12px;font-family:inherit;font-size:13px;
-  color:var(--text-mid);padding:11px 14px;margin:8px 0 0;cursor:pointer;background:rgba(22,25,31,.92);
-  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);box-shadow:inset 0 1px 0 rgba(var(--ink),.08);
-  -webkit-tap-highlight-color:transparent}
-[data-k="mx-10"] .quiet:hover{background:rgba(30,34,42,.94)}
+/* the pips are gone: the size was already said by the number, the ruler ticks and the name */
+[data-k="mx-10"] .pips{display:none}
+[data-k="mx-10"] .nmline{font-size:14.5px;font-weight:500;color:var(--text-hi);margin:14px 2px 0;text-align:center}
+/* THE HOLD LAW: the keys are taps, the day is a hold. */
+[data-k="mx-10"] .cta{position:relative;display:block;width:100%;border:0;border-radius:14px;overflow:hidden;
+  background:rgba(235,238,248,.94);color:#0b0c10;font-family:inherit;font-weight:700;font-size:15.5px;
+  padding:16px 14px;margin:14px 0 0;cursor:pointer;font-variant-numeric:tabular-nums;touch-action:none;user-select:none;
+  -webkit-tap-highlight-color:transparent;transition:transform .12s ease-out}
+[data-k="mx-10"] .cta:active{transform:scale(.99)}
+[data-k="mx-10"] .cta .ink{position:absolute;left:0;top:0;bottom:0;width:0;background:#0b0c10}
+[data-k="mx-10"] .cta .lb{position:relative;z-index:2;display:block}
+[data-k="mx-10"] .cta .lb2{position:absolute;left:0;right:0;top:0;bottom:0;z-index:3;display:block;
+  padding:16px 14px;text-align:center;color:rgba(235,238,248,.96);clip-path:inset(0 100% 0 0)}
+[data-k="mx-10"] .quiet{display:block;width:100%;border:0;background:none;font-family:inherit;font-size:13px;
+  color:var(--text-mid);padding:12px 8px 2px;margin:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+[data-k="mx-10"] .quiet:hover{color:var(--text-hi)}
 
 [data-k="mx-10"] .d10{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;padding:26px 32px 22px;outline:none}
 [data-k="mx-10"] .d10 .say{font-size:30px;margin-bottom:5px}
@@ -65,10 +72,12 @@
 [data-k="mx-10"] .strip{position:relative;height:150px;border-radius:12px;overflow:hidden;contain:paint;
   background:rgba(19,22,27,.92);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
   box-shadow:inset 0 1px 0 rgba(var(--ink),.05)}
-[data-k="mx-10"] .strip .vl{position:absolute;top:0;bottom:0;width:1px;background:rgba(var(--ink),.10)}
-[data-k="mx-10"] .strip .zn{position:absolute;top:0;bottom:0;width:1px;background:rgba(var(--ink),.18)}
+[data-k="mx-10"] .strip .vl{position:absolute;top:0;bottom:0;width:1px;background:rgba(var(--ink),.08)}
+/* the other two sizes are ruler TICKS at the foot of the strip, tied to their own label below.
+   full-height rules cut the strip into four boxes and read as random lines. */
+[data-k="mx-10"] .strip .zn{position:absolute;bottom:0;height:9px;width:1px;background:rgba(var(--ink),.26)}
 [data-k="mx-10"] .hblocks{position:absolute;left:0;top:26px;bottom:26px}
-[data-k="mx-10"] .hblocks u{position:absolute;top:0;bottom:0;border-radius:2px;background:rgba(var(--ink),.70);
+[data-k="mx-10"] .hblocks u{position:absolute;top:0;bottom:0;border-radius:2px;background:rgba(var(--ink),.34);
   animation:mx10in .2s cubic-bezier(.16,.9,.3,1) both}
 [data-k="mx-10"] .hmark{position:absolute;top:0;bottom:0;width:1px;background:rgba(var(--ink),.55);
   transition:left .22s cubic-bezier(.16,.9,.3,1)}
@@ -79,14 +88,18 @@
   color:rgba(var(--ink),.44);transition:color .18s}
 [data-k="mx-10"] .hlabs .zl.on{color:var(--text-hi);font-weight:700}
 [data-k="mx-10"] .kb{display:flex;align-items:center;gap:10px;margin-top:auto;padding-top:12px}
-[data-k="mx-10"] .kcap{width:50px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+[data-k="mx-10"] .kcap{flex:none;width:50px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;
   background:rgba(28,32,39,.95);box-shadow:inset 0 1px 0 rgba(var(--ink),.09),0 2px 0 rgba(0,0,0,.45);
   font-size:16px;color:var(--text-hi);cursor:pointer;user-select:none;transition:opacity .18s}
 [data-k="mx-10"] .kcap.hit{background:rgba(48,54,63,.97);transform:translateY(1px);box-shadow:inset 0 1px 0 rgba(var(--ink),.09)}
 [data-k="mx-10"] .kcap.off{opacity:.34}
-[data-k="mx-10"] .cap2{font-size:12.5px;color:var(--text-mid);margin:0 4px 0 4px;flex:1;font-variant-numeric:tabular-nums}
-[data-k="mx-10"] .d10 .cta{width:auto;min-width:198px;margin:0}
-[data-k="mx-10"] .d10 .quiet{width:auto;margin:0;white-space:nowrap}
+/* the caps ARE the control, so the row carries a four word affordance and nothing else.
+   the old sentence pushed the quiet door clean off the right edge of the frame. */
+[data-k="mx-10"] .cap2{font-size:12.5px;color:var(--text-mid);margin:0 2px 0 4px;flex:0 1 auto;
+  margin-right:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+[data-k="mx-10"] .d10 .cta{width:auto;min-width:218px;flex:none;margin:0}
+[data-k="mx-10"] .d10 .quiet{width:auto;padding:12px 14px;margin:0;white-space:nowrap}
+@media (prefers-reduced-motion:reduce){[data-k="mx-10"] *{transition-duration:0s !important;animation-duration:0s !important}}
 </style>
 <h3>Keys with the day showing</h3>
 <p class="cap">Two keys, three stops. Each press moves the day between the sizes Memento proposed and writes itself straight into the start time you set: the blocks land on the ruler and the finish slides, so what you are choosing is when you are done. Every time on this screen is the plan&#8217;s estimate, built from your start time and about 3 min a message.</p>
@@ -97,7 +110,7 @@
   <div class="p10">
     <p class="day">Tuesday, day 12</p>
     <p class="say">Message <b class="n">5</b> <span class="uw">clients</span></p>
-    <p class="sub">Starts 9:00, the time you set. About 3 min each.</p>
+    <p class="sub">Starts 9:00, about 3 min each.</p>
     <div class="tl">
       <div class="hours"></div>
       <div class="track">
@@ -115,8 +128,8 @@
       </div>
       <div class="key plus">+</div>
     </div>
-    <p class="nmline">Your usual day. On this estimate you finish about <b class="e">9:15</b>.</p>
-    <button class="cta" type="button">Start <span class="n">5</span> <span class="uw">clients</span></button>
+    <p class="nmline">Your usual day</p>
+    <button class="cta" type="button"><span class="ink"></span><span class="lb">Hold to start <span class="n">5</span> <span class="uw">clients</span></span><span class="lb2" aria-hidden="true">Hold to start <span class="n">5</span> <span class="uw">clients</span></span></button>
     <button class="quiet tog" type="button">Step one at a time</button>
   </div>
 </div>
@@ -125,7 +138,7 @@
   <div class="grid"></div>
   <div class="d10">
     <p class="say">Message <b class="n">5</b> <span class="uw">clients</span> today</p>
-    <p class="sub">You set 9:00 as your start. At about 3 min a message, the estimate has you finished about <b class="e">9:15</b>, and the rest of the morning is yours.</p>
+    <p class="sub">You set 9:00 as your start. About 3 min a message, finished about <b class="e">9:15</b>.</p>
     <div class="strip">
       <div class="hblocks"></div>
       <div class="hmark"></div>
@@ -134,8 +147,8 @@
     <div class="kb">
       <div class="kcap kdown">&#8592;</div>
       <div class="kcap kup">&#8594;</div>
-      <p class="cap2">Click the frame, then the arrow keys. It stops on the three sizes.</p>
-      <button class="cta" type="button">Start <span class="n">5</span> <span class="uw">clients</span></button>
+      <p class="cap2">or the arrow keys</p>
+      <button class="cta" type="button"><span class="ink"></span><span class="lb">Hold to start <span class="n">5</span> <span class="uw">clients</span></span><span class="lb2" aria-hidden="true">Hold to start <span class="n">5</span> <span class="uw">clients</span></span></button>
       <button class="quiet tog" type="button">Step one at a time</button>
     </div>
   </div>
@@ -200,7 +213,7 @@
     var W=strip.clientWidth||640;
     for(var j=0;j<n;j++){
       var e2=document.createElement('u'); e2.style.left=(j*PER/SPAN*W+2)+'px';
-      e2.style.width=Math.max(5,Math.min(30,(PER/SPAN*W)-4))+'px';
+      e2.style.width=Math.max(4,Math.min(13,(PER/SPAN*W)-4))+'px';
       if(j<prev) e2.style.animation='none'; hb.appendChild(e2);
     }
     root.querySelector('.endline').style.top=pct+'%';
@@ -210,8 +223,7 @@
       e.style.display=(!fine&&k===i)?'none':''; });
     Array.prototype.forEach.call(hlabs.querySelectorAll('.zl'),function(e,k){ e.classList.toggle('on',!fine&&k===i); });
     Array.prototype.forEach.call(root.querySelectorAll('.pips i'),function(e,k){ e.classList.toggle('on',!fine&&k<=i); });
-    root.querySelector('.nmline').innerHTML=nameOf()+'. On this estimate you finish about <b class="e">'+fmt(mins)+'</b>.';
-    root.querySelector('.pips').style.opacity=fine?'.3':'1';
+    root.querySelector('.nmline').textContent=nameOf();
     Array.prototype.forEach.call(root.querySelectorAll('.tog'),function(bt){
       bt.textContent=fine?'Back to the three sizes':'Step one at a time'; });
     var atMin=fine?(n<=1):(i<=0), atMax=fine?(n>=20):(i>=2);
@@ -255,6 +267,30 @@
       paint(false);
     });
   });
+  /* THE HOLD LAW: no bare tap banks a day. */
+  Array.prototype.forEach.call(root.querySelectorAll('.cta'),function(b){
+    var ink=b.querySelector('.ink'), lb2=b.querySelector('.lb2'), lb=b.querySelector('.lb');
+    var raf=null, t0=0, p=0, done=false, drain=null, txt=null;
+    function draw(){ ink.style.width=(p*100)+'%'; lb2.style.clipPath='inset(0 '+((1-p)*100)+'% 0 0)'; }
+    function stop(){ if(raf) cancelAnimationFrame(raf); raf=null; if(drain) cancelAnimationFrame(drain); drain=null; }
+    function finish(){ stop(); done=true; p=1; draw();
+      txt=lb.innerHTML; lb.textContent='Locked in'; lb2.textContent='Locked in';
+      setTimeout(function(){ done=false; p=0; draw(); lb.innerHTML=txt; lb2.innerHTML=txt; paint(false); },1100);
+    }
+    b.addEventListener('pointerdown',function(e){ e.preventDefault(); if(done) return;
+      try{b.setPointerCapture(e.pointerId);}catch(err){}
+      stop(); t0=performance.now()-p*650;
+      (function step(t){ p=Math.min(1,(t-t0)/650); draw();
+        if(p<1){ raf=requestAnimationFrame(step); } else { finish(); } })(performance.now());
+    });
+    function up(){ if(done||p===0) return; stop();
+      var from=p, s0=performance.now();
+      (function back(t){ var k=Math.min(1,(t-s0)/190); p=from*(1-k); draw();
+        if(k<1) drain=requestAnimationFrame(back); })(performance.now());
+    }
+    b.addEventListener('pointerup',up); b.addEventListener('pointercancel',up); b.addEventListener('pointerleave',up);
+  });
+
   paint(false);
   window.addEventListener('resize',function(){paint(false);});
 })();</script>

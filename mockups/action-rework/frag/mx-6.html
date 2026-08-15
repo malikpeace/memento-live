@@ -3,36 +3,39 @@
      mx-9 giant elastic numeral | mx-10 keys over timeline | mx-11 five sentence cards, the deliberate counter-example -->
 <section class="cell" data-k="mx-6">
 <style>
-[data-k="mx-6"] .p6{position:relative;z-index:1;display:flex;flex-direction:column;height:100%;padding:24px 18px 18px;overflow:hidden}
+/* ONE type ladder: 12 day / 24 statement / 13 price line / 14.5 rung / 12.5 rung price / 15.5 commit. */
+[data-k="mx-6"] .p6{position:relative;z-index:1;display:flex;flex-direction:column;height:100%;padding:26px 18px 18px;overflow:hidden}
 [data-k="mx-6"] .day{font-size:12px;color:var(--text-lo);margin:0 0 6px;font-variant-numeric:tabular-nums}
 [data-k="mx-6"] .say{font-size:24px;line-height:1.16;font-weight:500;letter-spacing:-.02em;margin:0;
   font-variant-numeric:tabular-nums}
 [data-k="mx-6"] .say b{font-weight:700}
+/* no text-wrap:balance here: it breaks the line after "of" and the phrase reads worse than
+   a short last line does. */
 [data-k="mx-6"] .sub{font-size:13px;color:var(--text-mid);margin:8px 0 0;line-height:1.45;font-variant-numeric:tabular-nums}
 
-[data-k="mx-6"] .col{flex:1;display:flex;gap:14px;margin:16px 0 12px;min-height:0}
-[data-k="mx-6"] .meter{position:relative;width:88px;border-radius:13px;overflow:hidden;contain:paint;
+[data-k="mx-6"] .col{flex:1;display:flex;gap:16px;margin:20px 0 20px;min-height:0}
+[data-k="mx-6"] .meter{position:relative;width:84px;border-radius:13px;overflow:hidden;contain:paint;
   background:rgba(19,22,27,.94);box-shadow:inset 0 1px 0 rgba(var(--ink),.07)}
+/* the fill is INK, not light: it must never read as a white rectangle pasted on the screen. */
 [data-k="mx-6"] .fill{position:absolute;left:0;right:0;bottom:0;height:0%;
-  background:linear-gradient(0deg,rgba(var(--ink),.13),rgba(var(--ink),.26) 46%,rgba(var(--ink),.52) 86%,rgba(var(--ink),.80) 100%);
+  background:linear-gradient(0deg,rgba(var(--ink),.03),rgba(var(--ink),.06) 55%,rgba(var(--ink),.12) 90%,rgba(var(--ink),.19) 100%);
   transition:height .05s linear}
 [data-k="mx-6"] .fill.snap{transition:height .3s cubic-bezier(.16,.9,.3,1)}
-[data-k="mx-6"] .fill .head{position:absolute;left:0;right:0;top:-1.5px;height:3px;border-radius:2px;
-  background:rgba(var(--ink),.96)}
-[data-k="mx-6"] .fill .bloom{position:absolute;left:-20%;right:-20%;top:-34px;height:38px;
-  background:radial-gradient(52% 100% at 50% 100%,rgba(var(--ink),.30),rgba(var(--ink),0) 72%)}
-[data-k="mx-6"] .bandline{position:absolute;left:0;right:0;height:1px;background:rgba(var(--ink),.22);z-index:3}
+[data-k="mx-6"] .fill .head{position:absolute;left:0;right:0;top:-1px;height:2px;background:rgba(var(--ink),.88)}
+[data-k="mx-6"] .fill .bloom{position:absolute;left:-24%;right:-24%;top:-30px;height:34px;
+  background:radial-gradient(52% 100% at 50% 100%,rgba(var(--ink),.16),rgba(var(--ink),0) 72%)}
+[data-k="mx-6"] .bandline{position:absolute;left:0;right:0;height:1px;background:rgba(var(--ink),.16);z-index:3}
 [data-k="mx-6"] .bandline::after{content:'';position:absolute;left:0;right:0;top:-1px;height:3px;
   background:rgba(var(--ink),.9);opacity:0;transition:opacity .3s ease-in}
 [data-k="mx-6"] .bandline.flash::after{opacity:1;transition:opacity .04s}
 [data-k="mx-6"] .ticks{position:absolute;left:0;right:0;top:0;bottom:0;z-index:4;pointer-events:none}
-[data-k="mx-6"] .ticks u{position:absolute;right:0;width:9px;height:1px;background:rgba(var(--ink),.14);
+[data-k="mx-6"] .ticks u{position:absolute;right:0;width:8px;height:1px;background:rgba(var(--ink),.12);
   transition:background .35s ease-in,width .35s ease-in}
-[data-k="mx-6"] .ticks u.past{background:rgba(var(--ink),.30)}
-[data-k="mx-6"] .ticks u.lit{background:rgba(var(--ink),.98);width:16px;transition:none}
+[data-k="mx-6"] .ticks u.past{background:rgba(var(--ink),.28)}
+[data-k="mx-6"] .ticks u.lit{background:rgba(var(--ink),.96);width:15px;transition:none}
 
 [data-k="mx-6"] .rungs{flex:1;display:flex;flex-direction:column-reverse;min-width:0}
-[data-k="mx-6"] .rung{flex:1;display:flex;flex-direction:column;justify-content:center;gap:2px;min-width:0}
+[data-k="mx-6"] .rung{flex:1;display:flex;flex-direction:column;justify-content:center;gap:3px;min-width:0}
 [data-k="mx-6"] .rung .nm{font-size:14.5px;font-weight:500;color:rgba(var(--ink),.42);letter-spacing:-.01em;
   transition:color .16s,transform .18s cubic-bezier(.16,.9,.3,1);transform-origin:left center}
 [data-k="mx-6"] .rung .pr{font-size:12.5px;color:rgba(var(--ink),.42);font-variant-numeric:tabular-nums;transition:color .16s}
@@ -40,90 +43,99 @@
 [data-k="mx-6"] .rung.on .pr{color:var(--text-mid)}
 [data-k="mx-6"] .rung.pop .nm{transform:scale(1.045)}
 
-[data-k="mx-6"] .pad{position:relative;height:76px;border-radius:14px;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:3px;overflow:hidden;contain:paint;
+[data-k="mx-6"] .pad{position:relative;height:74px;border-radius:14px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:4px;overflow:hidden;contain:paint;
   background:rgba(28,32,39,.95);box-shadow:inset 0 1px 0 rgba(var(--ink),.09);
   touch-action:none;user-select:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
 [data-k="mx-6"] .pad .glow{position:absolute;left:0;right:0;bottom:-30px;height:70px;opacity:0;transition:opacity .14s;
-  background:radial-gradient(50% 100% at 50% 100%,rgba(var(--ink),.22),rgba(var(--ink),0) 70%)}
+  background:radial-gradient(50% 100% at 50% 100%,rgba(var(--ink),.20),rgba(var(--ink),0) 70%)}
 [data-k="mx-6"] .pad.down{background:rgba(37,42,51,.96)}
 [data-k="mx-6"] .pad.down .glow{opacity:1}
-[data-k="mx-6"] .pad .l1{font-size:15.5px;font-weight:700;position:relative}
+/* the pad and the slab must never read as twin buttons: the pad is a surface you lean on
+   (lighter label, dark fill), the slab is the decision (heavier label, ink on white). */
+[data-k="mx-6"] .pad .l1{font-size:14.5px;font-weight:500;position:relative}
 [data-k="mx-6"] .pad .l2{font-size:12.5px;color:var(--text-mid);position:relative;font-variant-numeric:tabular-nums}
-[data-k="mx-6"] .lock{height:2px;border-radius:2px;margin:9px 0 0;background:#3fd94e;opacity:0;transition:opacity .45s ease-in}
-[data-k="mx-6"] .lock.on{opacity:.92;transition:opacity .05s}
 
-[data-k="mx-6"] .cta{display:block;width:100%;border:0;border-radius:14px;background:rgba(235,238,248,.94);
-  color:#0b0c10;font-family:inherit;font-weight:700;font-size:15.5px;padding:15px 16px;margin:9px 0 0;cursor:pointer;
-  font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent}
-[data-k="mx-6"] .cta:active{background:rgba(235,238,248,.84)}
-[data-k="mx-6"] .quiet{display:block;width:100%;border:0;border-radius:12px;font-family:inherit;font-size:13px;
-  color:var(--text-mid);padding:11px 14px;margin:8px 0 0;cursor:pointer;background:rgba(22,25,31,.92);
-  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);box-shadow:inset 0 1px 0 rgba(var(--ink),.08);
-  -webkit-tap-highlight-color:transparent}
-[data-k="mx-6"] .quiet:hover{background:rgba(30,34,42,.94)}
+/* THE HOLD LAW: sizing is a hold on the pad, committing is a hold on the slab.
+   ink floods the slab left to right, the label inverts as it passes, early release drains it. */
+[data-k="mx-6"] .cta{position:relative;display:block;width:100%;border:0;border-radius:14px;overflow:hidden;
+  background:rgba(235,238,248,.94);color:#0b0c10;font-family:inherit;font-weight:700;font-size:15.5px;
+  padding:16px 14px;margin:16px 0 0;cursor:pointer;font-variant-numeric:tabular-nums;touch-action:none;user-select:none;
+  -webkit-tap-highlight-color:transparent;transition:transform .12s ease-out}
+[data-k="mx-6"] .cta:active{transform:scale(.99)}
+[data-k="mx-6"] .cta .ink{position:absolute;left:0;top:0;bottom:0;width:0;background:#0b0c10}
+[data-k="mx-6"] .cta .lb{position:relative;z-index:2;display:block}
+[data-k="mx-6"] .cta .lb2{position:absolute;left:0;right:0;top:0;bottom:0;z-index:3;display:block;
+  padding:16px 14px;text-align:center;color:rgba(235,238,248,.96);clip-path:inset(0 100% 0 0)}
+[data-k="mx-6"] .quiet{display:block;width:100%;border:0;background:none;font-family:inherit;font-size:13px;
+  color:var(--text-mid);padding:12px 8px 2px;margin:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+[data-k="mx-6"] .quiet:hover{color:var(--text-hi)}
 
-[data-k="mx-6"] .sheet{position:absolute;left:0;right:0;bottom:0;z-index:6;padding:18px 18px 18px;
+[data-k="mx-6"] .sheet{position:absolute;left:0;right:0;bottom:0;z-index:6;padding:20px 18px 18px;
   border-radius:18px 18px 0 0;background:rgba(20,23,29,.97);-webkit-backdrop-filter:blur(28px) saturate(1.4);
   backdrop-filter:blur(28px) saturate(1.4);box-shadow:inset 0 1px 0 rgba(var(--ink),.10),0 -22px 50px rgba(0,0,0,.55);
   transform:translateY(101%);transition:transform .28s cubic-bezier(.16,.9,.3,1)}
 [data-k="mx-6"] .sheet.on{transform:none}
-[data-k="mx-6"] .sheet h5{margin:0 0 3px;font-size:15.5px;font-weight:700}
-[data-k="mx-6"] .sheet p{margin:0;font-size:12.5px;color:var(--text-mid);line-height:1.45;font-variant-numeric:tabular-nums}
-[data-k="mx-6"] .fine{display:flex;align-items:center;gap:10px;margin:14px 0 4px}
-[data-k="mx-6"] .fine button{flex:none;width:56px;height:52px;border:0;border-radius:12px;background:rgba(30,34,41,.95);
+[data-k="mx-6"] .sheet h5{margin:0 0 4px;font-size:15.5px;font-weight:700}
+[data-k="mx-6"] .sheet p{margin:0;font-size:12.5px;color:var(--text-mid);line-height:1.46;font-variant-numeric:tabular-nums}
+[data-k="mx-6"] .fine{display:flex;align-items:center;gap:8px;margin:20px 0 14px}
+[data-k="mx-6"] .fine button{flex:none;width:56px;height:56px;border:0;border-radius:12px;background:rgba(30,34,41,.95);
   box-shadow:inset 0 1px 0 rgba(var(--ink),.09);color:var(--text-hi);font-size:22px;font-family:inherit;cursor:pointer;
   -webkit-tap-highlight-color:transparent}
 [data-k="mx-6"] .fine button:active{background:rgba(44,49,58,.97)}
-[data-k="mx-6"] .fine .fv{flex:1;height:52px;border-radius:12px;background:rgba(14,16,20,.9);display:flex;
-  align-items:center;justify-content:center;gap:7px;box-shadow:inset 0 1px 0 rgba(var(--ink),.05)}
-[data-k="mx-6"] .fine .fv b{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums}
+[data-k="mx-6"] .fine .fv{flex:1;height:56px;border-radius:12px;background:rgba(14,16,20,.9);display:flex;
+  align-items:baseline;justify-content:center;gap:7px;padding-top:15px;box-shadow:inset 0 1px 0 rgba(var(--ink),.05)}
+[data-k="mx-6"] .fine .fv b{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
 [data-k="mx-6"] .fine .fv span{font-size:13px;color:var(--text-mid)}
+[data-k="mx-6"] .sheet .fmeta{margin:0 0 20px}
 
-[data-k="mx-6"] .d6{position:relative;z-index:1;height:100%;display:grid;grid-template-columns:1fr 254px;gap:28px;
-  padding:26px 28px 24px}
+[data-k="mx-6"] .d6{position:relative;z-index:1;height:100%;display:grid;grid-template-columns:1fr 250px;gap:26px;
+  padding:26px 26px 22px}
 [data-k="mx-6"] .dleft{display:flex;flex-direction:column;min-width:0}
-[data-k="mx-6"] .d6 .say{font-size:31px}
-[data-k="mx-6"] .plate{position:relative;height:92px;border-radius:13px;overflow:hidden;contain:paint;margin:20px 0 0;
-  background:rgba(19,22,27,.94);box-shadow:inset 0 1px 0 rgba(var(--ink),.07);cursor:pointer;user-select:none;touch-action:none}
+[data-k="mx-6"] .d6 .say{font-size:29px}
+/* the desktop plate carries its own label, so the mechanic needs no paragraph explaining it */
+[data-k="mx-6"] .plate{position:relative;flex:1;min-height:104px;max-height:186px;border-radius:13px;overflow:hidden;contain:paint;margin:22px 0 0;
+  display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px;padding-left:24px;
+  background:rgba(24,27,33,.95);box-shadow:inset 0 1px 0 rgba(var(--ink),.08);cursor:pointer;user-select:none;touch-action:none}
 [data-k="mx-6"] .plate .hfill{position:absolute;left:0;top:0;bottom:0;width:0%;
-  background:linear-gradient(90deg,rgba(var(--ink),.13),rgba(var(--ink),.26) 46%,rgba(var(--ink),.52) 86%,rgba(var(--ink),.80) 100%);
+  background:linear-gradient(90deg,rgba(var(--ink),.03),rgba(var(--ink),.06) 55%,rgba(var(--ink),.12) 90%,rgba(var(--ink),.19) 100%);
   transition:width .05s linear}
 [data-k="mx-6"] .plate .hfill.snap{transition:width .3s cubic-bezier(.16,.9,.3,1)}
-[data-k="mx-6"] .plate .hhead{position:absolute;top:0;bottom:0;right:-1.5px;width:3px;background:rgba(var(--ink),.96)}
-[data-k="mx-6"] .plate .hbloom{position:absolute;top:-20%;bottom:-20%;right:-34px;width:38px;
-  background:radial-gradient(100% 52% at 0% 50%,rgba(var(--ink),.30),rgba(var(--ink),0) 72%)}
-[data-k="mx-6"] .vband{position:absolute;top:0;bottom:0;width:1px;background:rgba(var(--ink),.22);z-index:3}
+[data-k="mx-6"] .plate .hhead{position:absolute;top:0;bottom:0;right:-1px;width:2px;background:rgba(var(--ink),.88)}
+[data-k="mx-6"] .plate .hbloom{position:absolute;top:-24%;bottom:-24%;right:-30px;width:34px;
+  background:radial-gradient(100% 52% at 0% 50%,rgba(var(--ink),.16),rgba(var(--ink),0) 72%)}
+[data-k="mx-6"] .plate .pl1{position:relative;z-index:5;font-size:15px;font-weight:500}
+[data-k="mx-6"] .plate .pl2{position:relative;z-index:5;font-size:13px;color:var(--text-mid);font-variant-numeric:tabular-nums}
+[data-k="mx-6"] .vband{position:absolute;top:0;bottom:0;width:1px;background:rgba(var(--ink),.16);z-index:3}
 [data-k="mx-6"] .vband::after{content:'';position:absolute;top:0;bottom:0;left:-1px;width:3px;background:rgba(var(--ink),.9);
   opacity:0;transition:opacity .3s ease-in}
 [data-k="mx-6"] .vband.flash::after{opacity:1;transition:opacity .04s}
 [data-k="mx-6"] .vticks{position:absolute;left:0;right:0;bottom:0;height:100%;z-index:4;pointer-events:none}
-[data-k="mx-6"] .vticks u{position:absolute;bottom:0;width:1px;height:9px;background:rgba(var(--ink),.14);
+[data-k="mx-6"] .vticks u{position:absolute;bottom:0;width:1px;height:8px;background:rgba(var(--ink),.12);
   transition:background .35s ease-in,height .35s ease-in}
-[data-k="mx-6"] .vticks u.past{background:rgba(var(--ink),.30)}
-[data-k="mx-6"] .vticks u.lit{background:rgba(var(--ink),.98);height:17px;transition:none}
-[data-k="mx-6"] .marks{position:relative;height:34px;margin-top:9px}
-[data-k="mx-6"] .marks span{position:absolute;transform:translateX(-50%);text-align:center;font-size:12.5px;
-  color:rgba(var(--ink),.42);font-variant-numeric:tabular-nums;line-height:1.35;transition:color .16s;white-space:nowrap}
-[data-k="mx-6"] .marks span b{display:block;font-size:13.5px;font-weight:500}
-[data-k="mx-6"] .marks span.on{color:var(--text-mid)}
-[data-k="mx-6"] .marks span.on b{color:var(--text-hi);font-weight:700}
-[data-k="mx-6"] .dfoot{margin-top:auto;display:flex;align-items:center;gap:12px;padding-top:16px}
-[data-k="mx-6"] .d6 .cta{width:auto;min-width:190px;flex:none;margin:0;white-space:nowrap}
-[data-k="mx-6"] .d6 .quiet{width:auto;flex:none;margin:0;white-space:nowrap}
-[data-k="mx-6"] .hint{font-size:12.5px;color:var(--text-mid);margin:14px 0 0;line-height:1.45}
-[data-k="mx-6"] .panel{align-self:center;border-radius:14px;padding:16px 16px 12px;background:rgba(22,25,31,.95);
+[data-k="mx-6"] .vticks u.past{background:rgba(var(--ink),.28)}
+[data-k="mx-6"] .vticks u.lit{background:rgba(var(--ink),.96);height:16px;transition:none}
+/* names only under the plate: the prices live once, in the panel, and never collide here */
+[data-k="mx-6"] .marks{position:relative;height:20px;margin-top:10px}
+[data-k="mx-6"] .marks span{position:absolute;transform:translateX(-50%);font-size:13px;white-space:nowrap;
+  color:rgba(var(--ink),.42);transition:color .16s}
+[data-k="mx-6"] .marks span.on{color:var(--text-hi);font-weight:700}
+[data-k="mx-6"] .dfoot{margin-top:auto;display:flex;align-items:center;gap:8px;padding-top:20px}
+[data-k="mx-6"] .d6 .cta{width:auto;min-width:214px;flex:none;margin:0;white-space:nowrap}
+[data-k="mx-6"] .d6 .quiet{width:auto;padding:12px 14px;white-space:nowrap}
+[data-k="mx-6"] .panel{align-self:center;border-radius:14px;padding:16px 14px 14px;background:rgba(22,25,31,.95);
   -webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);box-shadow:inset 0 1px 0 rgba(var(--ink),.08)}
-[data-k="mx-6"] .panel h4{margin:0 0 10px;font-size:13px;font-weight:700;color:var(--text-mid)}
-[data-k="mx-6"] .prow{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:9px 10px;
+[data-k="mx-6"] .panel h4{margin:0 0 12px;font-size:13px;font-weight:700;color:var(--text-mid);padding:0 10px}
+[data-k="mx-6"] .prow{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:10px;
   border-radius:10px;font-variant-numeric:tabular-nums;transition:background .18s}
 [data-k="mx-6"] .prow .pn{font-size:13.5px;color:rgba(var(--ink),.46);transition:color .18s}
 [data-k="mx-6"] .prow .pv{font-size:13px;color:rgba(var(--ink),.46);transition:color .18s}
 [data-k="mx-6"] .prow.on{background:rgba(var(--ink),.07)}
 [data-k="mx-6"] .prow.on .pn{color:var(--text-hi);font-weight:700}
 [data-k="mx-6"] .prow.on .pv{color:var(--text-mid)}
-[data-k="mx-6"] .panel .tail{margin:10px 2px 2px;font-size:12px;color:var(--text-mid);line-height:1.45;
+[data-k="mx-6"] .panel .tail{margin:12px 10px 2px;font-size:12.5px;color:var(--text-mid);line-height:1.46;
   font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion:reduce){[data-k="mx-6"] *{transition-duration:0s !important}}
 </style>
 <h3>Pressure hold</h3>
 <p class="cap">Patience is the input. Press and today grows through three priced tiers, each one clicking past a boundary you can feel in the ticks, and the tier you were standing in when you let go becomes the day. Three sizes only, unless you ask for the fine control.</p>
@@ -137,7 +149,7 @@
     <!-- PROVENANCE: the only consequence Memento can state is the count. 47 is the sum of
          the messages they logged, 100 is the countable target their own plan named. Memento
          cannot turn a message into money, so no money is projected here. -->
-    <p class="sub">About <b class="t">15 min</b>. Takes you to <b class="r">52</b> of 100 reached, and the last one about <b class="d">11 days</b> out.</p>
+    <p class="sub">About <b class="t">15 min</b>, and <b class="r">52</b> of the 100 reached by tonight.</p>
 
     <div class="col">
       <div class="meter">
@@ -158,8 +170,7 @@
       <span class="l1">Hold to raise today</span>
       <span class="l2 padsub">Let go on the size you mean</span>
     </div>
-    <div class="lock"></div>
-    <button class="cta" type="button">Start <span class="n">5</span> <span class="uw">clients</span></button>
+    <button class="cta" type="button"><span class="ink"></span><span class="lb">Hold to start <span class="n">5</span> <span class="uw">clients</span></span><span class="lb2" aria-hidden="true">Hold to start <span class="n">5</span> <span class="uw">clients</span></span></button>
     <button class="quiet openfine" type="button">Set the number myself</button>
 
     <div class="sheet">
@@ -171,7 +182,7 @@
         <button type="button" class="fup">+</button>
       </div>
       <p class="fmeta">About <b>15 min</b>. Takes you to <b>52</b> of 100 reached.</p>
-      <button class="cta usefine" type="button">Use this size</button>
+      <button class="cta usefine" type="button"><span class="ink"></span><span class="lb">Hold to start <span class="fcn">5</span> <span class="fcu">clients</span></span><span class="lb2" aria-hidden="true">Hold to start <span class="fcn">5</span> <span class="fcu">clients</span></span></button>
       <button class="quiet closefine" type="button">Back to the three</button>
     </div>
   </div>
@@ -188,11 +199,12 @@
         <div class="vband" style="left:33.333%"></div>
         <div class="vband" style="left:66.666%"></div>
         <div class="vticks"></div>
+        <span class="pl1">Hold to raise today</span>
+        <span class="pl2 platesub">Let go on the size you mean</span>
       </div>
       <div class="marks"></div>
-      <p class="hint">Hold the mouse down on the plate. It climbs through the three sizes and locks on the one you were in when you released.</p>
       <div class="dfoot">
-        <button class="cta" type="button">Start <span class="n">5</span> <span class="uw">clients</span></button>
+        <button class="cta" type="button"><span class="ink"></span><span class="lb">Hold to start <span class="n">5</span> <span class="uw">clients</span></span><span class="lb2" aria-hidden="true">Hold to start <span class="n">5</span> <span class="uw">clients</span></span></button>
         <button class="quiet dfine" type="button">Set the number myself</button>
       </div>
     </div>
@@ -201,7 +213,7 @@
       <div class="prow" data-i="0"><span class="pn">A light day</span><span class="pv">2, about 6 min</span></div>
       <div class="prow" data-i="1"><span class="pn">Your usual day</span><span class="pv">5, about 15 min</span></div>
       <div class="prow" data-i="2"><span class="pn">A heavy day</span><span class="pv">9, about 27 min</span></div>
-      <p class="tail">At <b class="n2">5</b> a day the last of the 100 is about <b class="d">11 days</b> out. You are on <b class="r">52</b> after today. Yesterday you logged 3.</p>
+      <p class="tail"><b class="r">52</b> of the 100 reached after today. Yesterday you logged 3.</p>
     </div>
   </div>
 </div>
@@ -211,15 +223,13 @@
   /* REACHED = the sum of every message they have logged. TARGET = the countable target
      their own plan named. Everything priced below is arithmetic on those two numbers. */
   var REACHED=47, TARGET=100;
-  var TIER=[{n:2,nm:'A light day',t:'about 6 min',d:'27 days'},
-            {n:5,nm:'Your usual day',t:'about 15 min',d:'11 days'},
-            {n:9,nm:'A heavy day',t:'about 27 min',d:'6 days'}];
+  var TIER=[{n:2,nm:'A light day',t:'about 6 min'},
+            {n:5,nm:'Your usual day',t:'about 15 min'},
+            {n:9,nm:'A heavy day',t:'about 27 min'}];
   var REST=[16.5,50,88], BOUND=[33.333,66.666];
   var i=1, fine=false, fn=5, v=REST[1], timer=null, held=false;
 
   function mins(n){ var m=n*3; return m>=60 ? (m%60===0 ? (m/60)+' hr' : Math.floor(m/60)+' hr '+(m%60)+' min') : m+' min'; }
-  /* days = how long the rest of the list takes at this size. Nothing about money. */
-  function days(n){ var d=Math.ceil((TARGET-REACHED)/n); return d+(d===1?' day':' days'); }
   function reached(n){ return Math.min(TARGET,REACHED+n); }
   function unit(n){ return n===1?'client':'clients'; }
 
@@ -235,7 +245,7 @@
   }
   TIER.forEach(function(T,k){
     var s=document.createElement('span'); s.style.left=REST[k]+'%';
-    s.innerHTML='<b>'+T.nm+'</b>'+T.n+' '+unit(T.n)+', '+T.t; marksEl.appendChild(s);
+    s.textContent=T.nm; marksEl.appendChild(s);
   });
 
   function curN(){ return fine ? fn : TIER[i].n; }
@@ -244,9 +254,9 @@
     Array.prototype.forEach.call(root.querySelectorAll('.n'),function(e){e.textContent=n;});
     Array.prototype.forEach.call(root.querySelectorAll('.uw'),function(e){e.textContent=unit(n);});
     Array.prototype.forEach.call(root.querySelectorAll('.t'),function(e){e.textContent=mins(n);});
-    Array.prototype.forEach.call(root.querySelectorAll('.d'),function(e){e.textContent=days(n);});
     Array.prototype.forEach.call(root.querySelectorAll('.r'),function(e){e.textContent=reached(n);});
-    root.querySelector('.panel .n2').textContent=n;
+    Array.prototype.forEach.call(root.querySelectorAll('.fcn'),function(e){e.textContent=fn;});
+    Array.prototype.forEach.call(root.querySelectorAll('.fcu'),function(e){e.textContent=unit(fn);});
     root.querySelector('.fn').textContent=fn;
     root.querySelector('.funit').textContent=unit(fn);
     root.querySelector('.fmeta').innerHTML='About <b>'+mins(fn)+'</b>. Takes you to <b>'+reached(fn)+'</b> of '+TARGET+' reached.';
@@ -275,21 +285,24 @@
     var r=root.querySelector('.rung[data-i="'+i+'"]');
     r.classList.add('pop'); setTimeout(function(){r.classList.remove('pop');},170);
   }
+  function say(txt){
+    root.querySelector('.padsub').textContent=txt;
+    root.querySelector('.platesub').textContent=txt;
+  }
 
   function press(el){
     if(held) return; held=true; el.classList.add('down');
     if(fine){ fine=false; }
     fillEl.classList.remove('snap'); hfillEl.classList.remove('snap');
     v=0; i=0; geo(); paint();
-    root.querySelector('.padsub').textContent='A light day, 2 clients';
+    say('A light day, 2 clients');
     var last=Date.now();
     timer=setInterval(function(){
       var now=Date.now(); v=Math.min(100,v+(now-last)*0.048); last=now; geo();
       var t=tierOf(v);
       if(t!==i){ i=t; flashBound(t); paint(); popRung(); }
-      root.querySelector('.padsub').textContent = v>=99.5
-        ? 'That is the heaviest Memento will propose'
-        : TIER[i].nm+', '+TIER[i].n+' '+unit(TIER[i].n);
+      say(v>=99.5 ? 'That is the heaviest Memento will propose'
+                  : TIER[i].nm+', '+TIER[i].n+' '+unit(TIER[i].n));
     },22);
   }
   function release(el){
@@ -298,9 +311,7 @@
     i=tierOf(v); v=REST[i];
     fillEl.classList.add('snap'); hfillEl.classList.add('snap');
     geo(); paint();
-    root.querySelector('.padsub').textContent='Locked on '+TIER[i].nm.toLowerCase();
-    var l=root.querySelector('.lock'); l.classList.add('on');
-    setTimeout(function(){l.classList.remove('on');},260);
+    say('Locked on '+TIER[i].nm.toLowerCase());
   }
   Array.prototype.forEach.call(root.querySelectorAll('.pad,.plate'),function(el){
     el.addEventListener('pointerdown',function(e){ e.preventDefault();
@@ -314,9 +325,35 @@
   root.querySelector('.openfine').addEventListener('click',function(){ sheet.classList.add('on'); });
   root.querySelector('.dfine').addEventListener('click',function(){ sheet.classList.add('on'); });
   root.querySelector('.closefine').addEventListener('click',function(){ sheet.classList.remove('on'); fine=false; paint(); });
-  root.querySelector('.usefine').addEventListener('click',function(){ sheet.classList.remove('on'); fine=true; paint(); });
   root.querySelector('.fup').addEventListener('click',function(){ fn=Math.min(20,fn+1); paint(); });
   root.querySelector('.fdn').addEventListener('click',function(){ fn=Math.max(1,fn-1); paint(); });
+
+  Array.prototype.forEach.call(root.querySelectorAll('.cta'),function(b){
+    var ink=b.querySelector('.ink'), lb2=b.querySelector('.lb2'), lb=b.querySelector('.lb');
+    var raf=null, t0=0, p=0, done=false, drain=null, txt=null;
+    function draw(){ ink.style.width=(p*100)+'%'; lb2.style.clipPath='inset(0 '+((1-p)*100)+'% 0 0)'; }
+    function stop(){ if(raf) cancelAnimationFrame(raf); raf=null; if(drain) cancelAnimationFrame(drain); drain=null; }
+    function down(e){ e.preventDefault(); if(done) return;
+      try{b.setPointerCapture(e.pointerId);}catch(err){}
+      stop(); t0=performance.now()-p*650;
+      (function step(t){ p=Math.min(1,(t-t0)/650); draw();
+        if(p<1){ raf=requestAnimationFrame(step); } else { finish(); } })(performance.now());
+    }
+    function finish(){ stop(); done=true; p=1; draw();
+      txt=lb.innerHTML; lb.textContent='Locked in'; lb2.textContent='Locked in';
+      setTimeout(function(){ done=false; p=0; draw(); lb.innerHTML=txt; lb2.innerHTML=txt; },1100);
+      if(b.classList.contains('usefine')){ sheet.classList.remove('on'); fine=true; paint(); }
+    }
+    function up(){ if(done||p===0) return; stop();
+      var from=p, s0=performance.now();
+      (function back(t){ var k=Math.min(1,(t-s0)/190); p=from*(1-k); draw();
+        if(k<1) drain=requestAnimationFrame(back); })(performance.now());
+    }
+    b.addEventListener('pointerdown',down);
+    b.addEventListener('pointerup',up);
+    b.addEventListener('pointercancel',up);
+    b.addEventListener('pointerleave',up);
+  });
 
   geo(); paint();
 })();</script>

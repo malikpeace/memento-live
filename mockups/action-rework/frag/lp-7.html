@@ -22,7 +22,22 @@
      PROVENANCE: bar height = a number they typed (source named on the entry
      row). Bright/quiet = their own logged put-away time against the hour they
      picked. Today's logged time comes off the clock at the moment of the hold.
-     Memento reads nothing off the device. -->
+     Memento reads nothing off the device.
+
+     BEAUTY PASS (2026-08-13). Two things read instantly here, the hour and the
+     bars, and they were fighting: eight near-white bars out-shouted the numeral
+     that is supposed to be the subject.
+     WEIGHT: the bars drop to .58 ink over the ceiling and .14 under, so the
+     over/under split still reads across the room while the hour keeps the
+     screen. They also grow off a floor now (top corners round, bottom nearly
+     square) instead of floating as capsules.
+     CUT: the "Pick a time" line. A drag affordance does not need a caption, so
+     the chevron moved inline beside the hour, which is where the gesture is,
+     and the screen loses one more small phrase.
+     HOLD: unified with the rest of the set, 58px glass slab, 1400ms, green
+     fill on completion. The mix-blend-mode:difference label is gone with it,
+     and the label now SAYS "Hold to confirm" like every other completion in
+     the set instead of reading like a tap. -->
 <style>
 [data-k=lp-7] .ph{font-variant-numeric:tabular-nums}
 [data-k=lp-7] .w{position:absolute;inset:0;padding:26px 20px 20px;display:flex;flex-direction:column}
@@ -45,26 +60,31 @@
 [data-k=lp-7] .reel span{display:block;height:66px;line-height:66px;font-size:60px;font-weight:700;
   letter-spacing:-.05em;white-space:nowrap;color:rgba(var(--ink),1)}
 [data-k=lp-7] .hour .u{font-size:25px;font-weight:500;color:rgba(var(--ink),.90);align-self:center}
-[data-k=lp-7] .hint{display:flex;align-items:center;gap:5px;margin:8px 0 0;font-size:11px;
-  color:rgba(var(--ink),.62)}
-[data-k=lp-7] .hint svg{display:block;flex:none}
+/* the drag affordance sits ON the control, so it needs no caption under it */
+[data-k=lp-7] .hour .ch{align-self:center;margin-left:10px;flex:none;display:block;opacity:.40;
+  transition:opacity .16s ease-out}
+[data-k=lp-7] .hour:active .ch{opacity:.78}
 
 /* --- seven nights as bars, plus tonight's empty slot -------------------- */
-[data-k=lp-7] .clab{margin:30px 0 0;font-size:12.5px;color:rgba(var(--ink),.90)}
-[data-k=lp-7] .chart{position:relative;margin:10px 0 0;flex:1 1 auto;min-height:150px;max-height:300px;
-  display:flex;gap:5px;align-items:stretch}
+[data-k=lp-7] .clab{margin:34px 0 0;font-size:12.5px;color:rgba(var(--ink),.90)}
+/* the chart absorbs the slack: no cap, or the screen grows a hole above the
+   button when the entry row is closed */
+[data-k=lp-7] .chart{position:relative;margin:12px 0 0;flex:1 1 auto;min-height:150px;
+  display:flex;gap:6px;align-items:stretch}
 [data-k=lp-7] .chart .c{flex:1 1 0;min-width:0;padding:0;border:0;background:none;cursor:pointer;
   display:flex;flex-direction:column;font-family:var(--font);-webkit-tap-highlight-color:transparent}
 [data-k=lp-7] .chart .c:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px;border-radius:6px}
 [data-k=lp-7] .chart .bw{flex:1 1 auto;min-height:0;display:flex;align-items:flex-end}
-[data-k=lp-7] .chart .b{width:100%;min-height:3px;border-radius:4px;background:rgba(var(--ink),.19);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.10);
+/* bars grow off a floor: round at the top, nearly square where they sit */
+/* under the ceiling reads at .22: at .14 the good nights were nearly invisible
+   on a phone, which made the week look half empty instead of half quiet */
+[data-k=lp-7] .chart .b{width:100%;min-height:3px;border-radius:5px 5px 2px 2px;background:rgba(var(--ink),.22);
   transition:height .34s cubic-bezier(.2,.8,.25,1),background .2s ease-out,box-shadow .2s ease-out}
-[data-k=lp-7] .chart .c.over .b{background:rgba(var(--ink),.88);box-shadow:none}
-[data-k=lp-7] .chart .c.empty .b{background:none;box-shadow:inset 0 0 0 1px rgba(var(--ink),.17)}
-[data-k=lp-7] .chart .dy{margin:6px 0 0;font-size:9.5px;line-height:1;color:rgba(var(--ink),.72);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-[data-k=lp-7] .chart .c.now .dy{color:rgba(var(--ink),.92)}
+[data-k=lp-7] .chart .c.over .b{background:rgba(var(--ink),.58)}
+[data-k=lp-7] .chart .c.empty .b{background:none;box-shadow:inset 0 0 0 1px rgba(var(--ink),.13)}
+[data-k=lp-7] .chart .dy{margin:7px 0 0;font-size:9.5px;line-height:1;letter-spacing:-.01em;
+  color:rgba(var(--ink),.80);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+[data-k=lp-7] .chart .c.now .dy{color:rgba(var(--ink),.95)}
 [data-k=lp-7] .pop{position:absolute;left:0;bottom:0;transform:translate(-50%,0);pointer-events:none;
   padding:5px 9px 6px;border-radius:8px;white-space:nowrap;font-size:11px;line-height:1.1;
   color:rgba(var(--ink),.96);background:rgba(22,25,31,.96);
@@ -74,7 +94,7 @@
 [data-k=lp-7] .pop.show{opacity:1}
 
 /* --- the foot: entry slides up out of the hold -------------------------- */
-[data-k=lp-7] .foot{margin-top:auto}
+[data-k=lp-7] .foot{margin-top:22px}
 [data-k=lp-7] .entry{max-height:0;opacity:0;overflow:hidden;margin:0;
   transition:max-height .3s cubic-bezier(.2,.8,.25,1),opacity .2s ease-out,margin .3s ease-out}
 [data-k=lp-7] .ph.held .entry{max-height:96px;opacity:1;margin:18px 0 12px}
@@ -93,17 +113,19 @@
 [data-k=lp-7] .entry .sv:active{transform:translateY(1px)}
 [data-k=lp-7] .entry .sv[disabled]{opacity:.45;cursor:default}
 
-/* --- hold to confirm ---------------------------------------------------- */
-[data-k=lp-7] .go{position:relative;display:block;width:100%;height:52px;border:0;border-radius:14px;
-  overflow:hidden;background:rgba(var(--ink),.10);box-shadow:inset 0 1px 0 rgba(var(--ink),.09);
+/* --- hold to confirm: the set's one slab, 58px, 1400ms ------------------ */
+[data-k=lp-7] .go{position:relative;display:block;width:100%;height:58px;border:0;border-radius:14px;
+  overflow:hidden;background:rgba(22,25,31,.94);
+  -webkit-backdrop-filter:blur(26px) saturate(1.4);backdrop-filter:blur(26px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09);
   font-family:var(--font);cursor:pointer;touch-action:none;-webkit-tap-highlight-color:transparent;
-  transition:background .26s ease-out,box-shadow .26s ease-out}
-[data-k=lp-7] .go .fl{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(235,238,248,.94)}
-[data-k=lp-7] .go .tx{position:relative;display:block;font-size:15.5px;font-weight:700;line-height:52px;
-  color:rgba(var(--ink),.97);mix-blend-mode:difference}
+  transition:background .28s ease-out,box-shadow .28s ease-out}
+[data-k=lp-7] .go .fl{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(63,217,78,.20)}
+[data-k=lp-7] .go .tx{position:relative;display:block;font-size:14px;font-weight:500;letter-spacing:-.005em;
+  line-height:58px;color:rgba(var(--ink),.94)}
 [data-k=lp-7] .go:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
-[data-k=lp-7] .go.on{background:rgba(63,217,78,.16);cursor:default}
-[data-k=lp-7] .go.on .tx{mix-blend-mode:normal}
+[data-k=lp-7] .go.on{background:rgba(63,217,78,.14);box-shadow:inset 0 1px 0 rgba(63,217,78,.28);cursor:default}
+[data-k=lp-7] .go.on .tx{font-weight:700;color:rgba(var(--ink),.97)}
 @media (prefers-reduced-motion:reduce){[data-k=lp-7] *{transition:none!important}}
 </style>
 <h3>Ceiling</h3><p class="cap">One sentence lands on a poster-scale hour you drag like a reel, and under it the week is a bar chart of the minutes they typed off their own Screen Time report: bad nights are simply taller, and the ones past the hour go bright.</p>
@@ -116,11 +138,11 @@
     <div class="hour" role="slider" tabindex="0" aria-label="Pick a time" aria-valuemin="0" aria-valuemax="2" aria-valuenow="1" aria-valuetext="8:00pm">
       <div class="win"><div class="reel"><span>7:30</span><span>8:00</span><span>9:00</span></div></div>
       <span class="u">pm</span>
+      <svg class="ch" width="11" height="17" viewBox="0 0 11 17" fill="none" aria-hidden="true">
+        <path d="M1.4 6.4 5.5 2.2 9.6 6.4M1.4 10.6l4.1 4.2 4.1-4.2" stroke="rgba(235,238,248,.95)"
+          stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
     </div>
-    <p class="hint" aria-hidden="true">
-      <svg width="9" height="14" viewBox="0 0 9 14" fill="none" aria-hidden="true">
-        <path d="M1 5.2 4.5 1.6 8 5.2M1 8.8l3.5 3.6L8 8.8" stroke="rgba(235,238,248,.62)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>Pick a time</p>
 
     <p class="clab">Logged screentime last 7 days</p>
     <div class="chart"><span class="pop"></span></div>
@@ -133,7 +155,7 @@
           <button type="button" class="sv" disabled>Save</button>
         </div>
       </div>
-      <button type="button" class="go"><span class="fl"></span><span class="tx">Confirm &amp; log screentime</span></button>
+      <button type="button" class="go"><span class="fl"></span><span class="tx">Hold to confirm</span></button>
     </div>
   </div>
 </div>
@@ -247,7 +269,7 @@ hour.addEventListener('keydown',function(e){
 });
 
 /* --- hold to confirm, then the number ----------------------------------- */
-var HOLD=760,ht=null,rt=null,done=false;
+var HOLD=1400,ht=null,rt=null,done=false;
 function startHold(e){
   if(done||ht)return;if(e&&e.preventDefault)e.preventDefault();
   clearTimeout(rt);hidePop();
@@ -257,8 +279,6 @@ function startHold(e){
 function cancelHold(){
   if(done||!ht)return;clearTimeout(ht);ht=null;
   fl.style.transition='width .18s ease-out';fl.style.width='0';
-  var was=tx.textContent;tx.textContent='Hold to confirm';
-  clearTimeout(rt);rt=setTimeout(function(){if(!done)tx.textContent=was},1200);
 }
 function finish(){
   ht=null;done=true;clearTimeout(rt);

@@ -43,7 +43,7 @@
 [data-k=lp-16] .l16-sp{flex:1;min-height:12px}
 [data-k=lp-16] .l16-sp2{flex:.75;min-height:10px}
 
-[data-k=lp-16] .l16-do{flex:none;border-radius:14px;padding:15px 15px 16px;background:rgba(22,25,31,.95);
+[data-k=lp-16] .l16-do{flex:none;margin:0 -6px;border-radius:14px;padding:15px 21px 16px;background:rgba(22,25,31,.95);
   -webkit-backdrop-filter:blur(26px) saturate(1.35);backdrop-filter:blur(26px) saturate(1.35);
   box-shadow:inset 0 1px 0 rgba(var(--ink),.09)}
 [data-k=lp-16] .l16-do .h{display:flex;align-items:baseline;gap:9px}
@@ -53,7 +53,7 @@
 [data-k=lp-16] .l16-do p{margin:7px 0 0;font-size:12px;line-height:1.5;color:rgba(var(--ink),.90)}
 [data-k=lp-16] .l16-do.sent p{display:none}
 
-[data-k=lp-16] .l16-chips{display:flex;flex:none;gap:6px;margin-top:10px}
+[data-k=lp-16] .l16-chips{display:flex;flex:none;gap:6px;margin:8px -6px 0}
 [data-k=lp-16] .l16-chips.lock{pointer-events:none}
 [data-k=lp-16] .l16-chip{flex:1;height:38px;border:0;border-radius:10px;background:rgba(22,25,31,.95);
   -webkit-backdrop-filter:blur(24px) saturate(1.4);backdrop-filter:blur(24px) saturate(1.4);
@@ -64,27 +64,26 @@
 [data-k=lp-16] .l16-chip.on{background:rgba(30,52,34,.96);color:rgba(var(--ink),.97);font-weight:700;
   box-shadow:inset 0 1px 0 rgba(63,217,78,.38)}
 
-[data-k=lp-16] .l16-close{position:relative;flex:none;height:52px;border-radius:14px;overflow:hidden;
-  background:rgba(235,238,248,.94);touch-action:none;user-select:none}
-[data-k=lp-16] .l16-fill{position:absolute;inset:0 auto 0 0;width:0;background:rgba(63,217,78,.85)}
-/* the label centres in the room LEFT OF the knob's own 52px, so it can never
-   tuck under the knob whichever goal's words are in it */
-[data-k=lp-16] .l16-lab{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  padding:0 12px 0 56px;font-size:15.5px;font-weight:700;letter-spacing:-.01em;color:#0b0c10;pointer-events:none}
-[data-k=lp-16] .l16-knob{position:absolute;left:4px;top:4px;width:44px;height:44px;border-radius:11px;
-  background:#0b0c10;box-shadow:0 3px 10px rgba(0,0,0,.35);cursor:grab;display:flex;align-items:center;justify-content:center}
-[data-k=lp-16] .l16-knob:active{cursor:grabbing}
-[data-k=lp-16] .l16-knob svg{width:15px;height:15px;stroke:rgba(235,238,248,.94);stroke-width:2.1;fill:none;
-  stroke-linecap:round;stroke-linejoin:round}
-[data-k=lp-16] .l16-close.done{background:rgba(63,217,78,.85)}
-[data-k=lp-16] .l16-close.done .l16-lab{padding:0}
-[data-k=lp-16] .l16-close.done .l16-knob{opacity:0;transition:opacity .16s ease-out}
+[data-k=lp-16] .l16-close{position:relative;flex:none;display:block;width:calc(100% + 12px);height:52px;margin:0 -6px;border:0;
+  border-radius:14px;overflow:hidden;cursor:pointer;background:rgba(235,238,248,.94);
+  touch-action:none;-webkit-user-select:none;user-select:none;font-family:var(--font)}
+[data-k=lp-16] .l16-fill{position:absolute;inset:0 auto 0 0;width:0;background:rgba(63,217,78,.55)}
+[data-k=lp-16] .l16-close.go .l16-fill{width:100%;transition:width 1.05s linear}
+[data-k=lp-16] .l16-lab{position:relative;display:flex;align-items:center;justify-content:center;height:100%;
+  padding:0 14px;font-size:15.5px;font-weight:700;letter-spacing:-.01em;color:#0b0c10}
+[data-k=lp-16] .l16-close:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
+[data-k=lp-16] .l16-close.done{background:rgba(63,217,78,.16)}
+[data-k=lp-16] .l16-close.done .l16-fill{display:none}
+[data-k=lp-16] .l16-close.done .l16-lab{color:rgba(var(--ink),.96)}
 
-/* where the pen lives, said once and quietly */
-[data-k=lp-16] .l16-src{margin:10px 0 0;font-size:11.5px;line-height:1.4;color:rgba(var(--ink),.90)}
+/* where the pen lives, said once and quietly, right above the gesture */
+[data-k=lp-16] .l16-src{margin:0 0 10px;font-size:11.5px;line-height:1.4;color:rgba(var(--ink),.90)}
+/* with no pen block up top there is no mass to balance, so the move sits
+   dead centre of the room instead of low in it */
+[data-k=lp-16] .l16.nopen .l16-sp2{flex:1}
 </style>
 <h3>The corridor</h3>
-<p class="cap">Today's move is the whole screen, sized by three chips and closed with a swipe, and for a goal you write down yourself your own typed marks sit above it as a quiet trace with nothing drawn to measure them against.</p>
+<p class="cap">Today's move is the whole screen, sized by three chips and closed with a hold, and for a goal you write down yourself your own typed marks sit above it as a quiet trace with nothing drawn to measure them against.</p>
 <div class="bk" role="group" aria-label="which goal this screen is carrying">
   <button type="button" class="on" data-b="money" aria-pressed="true">Money</button>
   <button type="button" data-b="body" aria-pressed="false">Body</button>
@@ -117,17 +116,16 @@
         <p></p>
       </div>
       <div class="l16-chips" role="group" aria-label="how big today is"></div>
-      <p class="l16-src"></p>
     </div>
 
     <div class="l16-sp2"></div>
 
     <div class="pad">
-      <div class="l16-close">
-        <div class="l16-fill"></div>
-        <div class="l16-lab"></div>
-        <div class="l16-knob"><svg viewBox="0 0 24 24"><path d="M8 5l7 7-7 7"/></svg></div>
-      </div>
+      <p class="l16-src"></p>
+      <button type="button" class="l16-close">
+        <span class="l16-fill"></span>
+        <span class="l16-lab"></span>
+      </button>
     </div>
   </div>
 </div>
@@ -139,8 +137,7 @@
       inEl=c.querySelector('.l16-in'),ofEl=c.querySelector('.l16-of'),whenEl=c.querySelector('.l16-when'),
       src=c.querySelector('.l16-src'),chipsEl=c.querySelector('.l16-chips'),
       doBox=c.querySelector('.l16-do'),doB=doBox.querySelector('b'),doP=doBox.querySelector('p'),
-      pad=c.querySelector('.l16-close'),knob=c.querySelector('.l16-knob'),
-      fill=c.querySelector('.l16-fill'),lab=c.querySelector('.l16-lab');
+      root=c.querySelector('.l16'),pad=c.querySelector('.l16-close'),lab=c.querySelector('.l16-lab');
 
   var W=300,H=96;
   /* the marks sit inboard of both edges: only the Fridays they wrote, nothing ahead */
@@ -155,9 +152,9 @@
       goal:'Hold a $4,000 floor, every month',
       pen:false,
       sizes:[
-        {t:'1 invoice', act:'Send 1 renewal invoice.',   sub:'About 10 min, by the plan.', lab:'Swipe to log 1 invoice',  done:'1 invoice sent'},
-        {t:'2 invoices',act:'Send 2 renewal invoices.',  sub:'About 20 min, by the plan.', lab:'Swipe to log 2 invoices', done:'2 invoices sent'},
-        {t:'4 invoices',act:'Send 4 renewal invoices.',  sub:'About 40 min, by the plan.', lab:'Swipe to log 4 invoices', done:'4 invoices sent'}
+        {t:'1 invoice', act:'Send 1 renewal invoice.',   sub:'About 10 min, by the plan.', lab:'Hold to log 1 invoice',  done:'1 invoice sent'},
+        {t:'2 invoices',act:'Send 2 renewal invoices.',  sub:'About 20 min, by the plan.', lab:'Hold to log 2 invoices', done:'2 invoices sent'},
+        {t:'4 invoices',act:'Send 4 renewal invoices.',  sub:'About 40 min, by the plan.', lab:'Hold to log 4 invoices', done:'4 invoices sent'}
       ],pick:1,
       src:'Your monthly total goes in at Sunday&#8217;s confirm.'
     },
@@ -165,9 +162,9 @@
       goal:'Hold 180 lb, after the cut',
       pen:true,big:'181.4',of:'lb',when:'typed Friday',
       sizes:[
-        {t:'20 min',act:'Walk 20 minutes today.',sub:'',lab:'Swipe to log the walk',done:'20 minute walk logged'},
-        {t:'30 min',act:'Walk 30 minutes today.',sub:'',lab:'Swipe to log the walk',done:'30 minute walk logged'},
-        {t:'45 min',act:'Walk 45 minutes today.',sub:'',lab:'Swipe to log the walk',done:'45 minute walk logged'}
+        {t:'20 min',act:'Walk 20 minutes today.',sub:'',lab:'Hold to log the walk',done:'20 minute walk logged'},
+        {t:'30 min',act:'Walk 30 minutes today.',sub:'',lab:'Hold to log the walk',done:'30 minute walk logged'},
+        {t:'45 min',act:'Walk 45 minutes today.',sub:'',lab:'Hold to log the walk',done:'45 minute walk logged'}
       ],pick:1,
       src:'Your weight goes in at Friday&#8217;s check.'
     }
@@ -217,32 +214,32 @@
     });
   }
 
-  /* --- the swipe: logging the ACTION never moves a metric. The number moves
-         when they write it in at their own check. ------------------------- */
-  function max(){return pad.clientWidth-52;}
-  var px=0,drag=false,sx=0;
-  function set(v){px=Math.max(0,Math.min(max(),v));knob.style.left=(4+px)+'px';fill.style.width=(px+48)+'px';}
+  /* --- the HOLD (Malik, 2026-08-13): logging the ACTION never moves a
+         metric. The number moves when they write it in at their own check. */
+  var ht=null;
   function done(){
-    sent=true;pad.classList.add('done');lab.textContent=C.sizes[size].done;
+    sent=true;pad.classList.remove('go');pad.classList.add('done');
+    lab.textContent=C.sizes[size].done;
     doBox.classList.add('sent');chipsEl.classList.add('lock');
   }
-  knob.addEventListener('pointerdown',function(e){if(sent)return;drag=true;sx=e.clientX-px;
-    knob.style.transition='';fill.style.transition='';
-    try{knob.setPointerCapture(e.pointerId);}catch(z){}});
-  knob.addEventListener('pointermove',function(e){if(!drag)return;set(e.clientX-sx);});
-  function release(){
-    if(!drag)return;drag=false;
-    if(px>max()*.6){knob.style.transition='left .16s ease-out';fill.style.transition='width .16s ease-out';
-      set(max());setTimeout(done,140);}
-    else{knob.style.transition='left .2s ease-out';fill.style.transition='width .2s ease-out';set(0);}
+  function holdOn(e){
+    if(sent)return;
+    if(e&&e.pointerId!=null){try{pad.setPointerCapture(e.pointerId)}catch(z){}}
+    pad.classList.add('go');ht=setTimeout(done,1050);
   }
-  knob.addEventListener('pointerup',release);knob.addEventListener('pointercancel',release);
+  function holdOff(){if(sent)return;clearTimeout(ht);pad.classList.remove('go');}
+  pad.addEventListener('pointerdown',holdOn);
+  ['pointerup','pointerleave','pointercancel'].forEach(function(ev){pad.addEventListener(ev,holdOff)});
+  pad.addEventListener('keydown',function(e){
+    if((e.key==='Enter'||e.key===' ')&&!e.repeat){e.preventDefault();holdOn();}});
+  pad.addEventListener('keyup',holdOff);
 
   /* --- swapping the goal: same skeleton, the goal's own words ------------- */
   function render(key){
     mode=key;C=CTX[key];size=C.pick;sent=false;
-    drag=false;knob.style.transition='';fill.style.transition='';set(0);
-    pad.classList.remove('done');doBox.classList.remove('sent');chipsEl.classList.remove('lock');
+    clearTimeout(ht);pad.classList.remove('done','go');
+    doBox.classList.remove('sent');chipsEl.classList.remove('lock');
+    root.classList.toggle('nopen',!C.pen);
     goal.textContent=C.goal;
     pen.style.display=C.pen?'':'none';
     band.style.display=C.pen?'':'none';

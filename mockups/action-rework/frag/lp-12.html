@@ -12,11 +12,11 @@
 [data-k=lp-12] .one{position:absolute;left:16px;right:16px;top:46px;margin:0;font-size:26px;font-weight:700;
   letter-spacing:-.03em;line-height:1.08;color:rgba(var(--ink),.97)}
 [data-k=lp-12] .one b{font-weight:700;color:#3fd94e}
-[data-k=lp-12] .hint{position:absolute;left:16px;right:16px;top:106px;font-size:12px;line-height:1.4;
+[data-k=lp-12] .hint{position:absolute;left:16px;right:16px;top:86px;font-size:12px;line-height:1.4;
   color:rgba(var(--ink),.90)}
 
 /* ---- seven channels: one floor, seven lanes, today is the wide one ---- */
-[data-k=lp-12] .cols{position:absolute;left:14px;right:14px;top:132px;height:300px;display:flex;gap:6px;
+[data-k=lp-12] .cols{position:absolute;left:16px;right:16px;top:118px;height:288px;display:flex;gap:6px;
   align-items:stretch}
 [data-k=lp-12] .ch{position:relative;flex:1;min-width:0;border-radius:10px;overflow:hidden;
   background:rgba(22,25,31,.95);
@@ -33,8 +33,8 @@
 /* rest is a planned lane, not a gap: a low sill with a broken cap */
 [data-k=lp-12] .ch.rest .f{height:10px;background:rgba(var(--ink),.05)}
 [data-k=lp-12] .ch.rest .f:after{background:repeating-linear-gradient(90deg,rgba(var(--ink),.30) 0 3px,transparent 3px 7px)}
-[data-k=lp-12] .ch.rest .v{position:absolute;left:0;right:0;bottom:22px;text-align:center;font-size:11px;
-  line-height:1;color:rgba(var(--ink),.82)}
+[data-k=lp-12] .ch.rest .v{position:absolute;left:0;right:0;bottom:22px;text-align:center;font-size:10.5px;
+  line-height:1;color:rgba(var(--ink),.80)}
 
 /* ---- today ---- */
 [data-k=lp-12] .ch.now{flex:2;background:rgba(19,27,21,.95);
@@ -62,18 +62,18 @@
 [data-k=lp-12] .free .ch.now .f{transition:none}
 
 /* ---- the week line ---- */
-[data-k=lp-12] .days{position:absolute;left:14px;right:14px;top:440px;display:flex;gap:6px}
+[data-k=lp-12] .days{position:absolute;left:16px;right:16px;top:414px;display:flex;gap:6px}
 [data-k=lp-12] .days div{flex:1;min-width:0;text-align:center;font-size:11.5px;line-height:1;
   color:rgba(var(--ink),.82)}
 [data-k=lp-12] .days div.n{flex:2;color:#3fd94e;font-weight:700}
-[data-k=lp-12] .week{position:absolute;left:16px;right:16px;top:464px;margin:0;display:flex;
+[data-k=lp-12] .week{position:absolute;left:16px;right:16px;top:440px;margin:0;display:flex;
   align-items:baseline;justify-content:space-between;gap:10px;font-size:12.5px;line-height:1.4;
   color:rgba(var(--ink),.90)}
 [data-k=lp-12] .week span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 [data-k=lp-12] .week b{flex:none;font-weight:500;color:rgba(var(--ink),.96)}
 
 /* ---- three proposed lengths, freedom behind "any length" ---- */
-[data-k=lp-12] .sizes{position:absolute;left:14px;right:14px;top:492px;display:flex;gap:6px}
+[data-k=lp-12] .sizes{position:absolute;left:16px;right:16px;top:476px;display:flex;gap:6px}
 [data-k=lp-12] .sizes button{flex:1;min-width:0;border:0;border-radius:10px;padding:8px 4px 9px;cursor:pointer;
   font-family:var(--font);background:rgba(22,25,31,.95);
   -webkit-backdrop-filter:blur(24px) saturate(1.35);backdrop-filter:blur(24px) saturate(1.35);
@@ -89,22 +89,26 @@
 [data-k=lp-12] .sizes button.on b{color:#3fd94e;font-weight:700}
 [data-k=lp-12] .sizes button.on:active{background:rgba(24,36,27,.96)}
 [data-k=lp-12] .sizes button:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
-[data-k=lp-12] .more{position:absolute;left:50%;transform:translateX(-50%);top:546px;border:0;border-radius:10px;
-  padding:7px 15px;background:rgba(22,25,31,.92);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.07);color:rgba(var(--ink),.80);font:500 12px/1 var(--font);
-  cursor:pointer;-webkit-tap-highlight-color:transparent;
-  transition:color .16s ease-out,background .16s ease-out}
-[data-k=lp-12] .more:active{background:rgba(30,34,42,.94);color:rgba(var(--ink),.96)}
-[data-k=lp-12] .more.on{color:rgba(var(--ink),.96);background:rgba(30,34,42,.94)}
+[data-k=lp-12] .more{position:absolute;left:50%;transform:translateX(-50%);top:530px;border:0;border-radius:8px;
+  padding:7px 12px;background:none;color:rgba(var(--ink),.80);font:500 12px/1 var(--font);
+  cursor:pointer;-webkit-tap-highlight-color:transparent;transition:color .16s ease-out}
+[data-k=lp-12] .more:active{color:rgba(var(--ink),.96)}
+[data-k=lp-12] .more.on{color:rgba(var(--ink),.96)}
 [data-k=lp-12] .more:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
 [data-k=lp-12] .free .sizes{display:none}
-[data-k=lp-12] .free .more{top:501px}
+[data-k=lp-12] .free .more{top:480px}
 [data-k=lp-12] .logged .sizes button,[data-k=lp-12] .logged .more{opacity:.55;pointer-events:none}
 
-[data-k=lp-12] .fin{position:absolute;left:14px;right:14px;bottom:18px;height:50px;padding:0;border:0;
-  border-radius:14px;font:700 15.5px var(--font);letter-spacing:-.01em;color:#0b0c10;
-  background:rgba(235,238,248,.94);cursor:pointer;-webkit-tap-highlight-color:transparent;
-  transition:background .14s ease-out,transform .09s ease-out}
+/* the day is closed with a HOLD (Malik, 2026-08-13): the fill runs the width
+   of the button, an early release leaves the week exactly as it was */
+[data-k=lp-12] .fin{position:absolute;left:16px;right:16px;bottom:18px;height:50px;padding:0;border:0;
+  border-radius:14px;overflow:hidden;font:700 15.5px var(--font);letter-spacing:-.01em;color:#0b0c10;
+  background:rgba(235,238,248,.94);cursor:pointer;touch-action:none;-webkit-user-select:none;user-select:none;
+  -webkit-tap-highlight-color:transparent;transition:background .14s ease-out,transform .09s ease-out}
+[data-k=lp-12] .fin b{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(63,217,78,.55)}
+[data-k=lp-12] .fin span{position:relative}
+[data-k=lp-12] .fin.go b{width:100%;transition:width 1.05s linear}
+[data-k=lp-12] .fin.ok b{display:none}
 [data-k=lp-12] .fin:active{background:rgba(206,211,226,.94);transform:translateY(1px)}
 [data-k=lp-12] .fin:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
 [data-k=lp-12] .fin.ok{background:rgba(22,25,31,.92);color:rgba(var(--ink),.95);font-weight:500;font-size:14px;
@@ -131,7 +135,7 @@
   <div class="sizes" id="l12sz" role="group" aria-label="how long today is"></div>
   <button class="more" id="l12more" type="button">any length</button>
 
-  <button class="fin" id="l12b" type="button">Finish Thursday</button>
+  <button class="fin" id="l12b" type="button"><b></b><span id="l12bt">Hold to finish Thursday</span></button>
 </div>
 <script>(function(){var r=document.querySelector('[data-k="lp-12"]');if(!r)return;
 /* Channel heights are the lengths they chose and logged. The rhythm (how many a week,
@@ -150,6 +154,7 @@ var ph=r.querySelector('#l12ph'),cols=r.querySelector('#l12cols'),days=r.querySe
     gEl=r.querySelector('#l12g'),cEl=r.querySelector('#l12c'),one=r.querySelector('#l12one'),
     hint=r.querySelector('#l12hint'),x=r.querySelector('#l12x'),tot=r.querySelector('#l12t'),
     sz=r.querySelector('#l12sz'),more=r.querySelector('#l12more'),fin=r.querySelector('#l12b'),
+    finT=r.querySelector('#l12bt'),
     D=['M','T','W','T','F','S','S'],c,mins,base,done,logged,free;
 function fmt(t){return (t/60|0)+'h '+('0'+(t%60)).slice(-2)+'m';}
 function pct(m){return ((m-c.lo)/(c.hi-c.lo)*80+11).toFixed(1);}
@@ -190,7 +195,7 @@ function render(k){
   days.innerHTML=D.map(function(d,i){return '<div'+(i===c.dayIdx?' class="n"':'')+'>'+d+'</div>';}).join('');
   sz.innerHTML=szHTML();
   more.textContent='any length';more.classList.remove('on');
-  fin.className='fin';fin.textContent='Finish '+c.day;
+  fin.className='fin';finT.textContent='Hold to finish '+c.day;
   paint();}
 /* THREE proposed lengths in front. The free drag only exists after "any length". */
 sz.addEventListener('click',function(e){var b=e.target.closest('button');if(!b||logged)return;
@@ -212,12 +217,22 @@ cols.addEventListener('pointerdown',function(e){if(!free||logged)return;
   try{cols.setPointerCapture(e.pointerId);}catch(z){}set(e);});
 cols.addEventListener('pointermove',function(e){if(logged||!free)return;
   if(cols.hasPointerCapture&&cols.hasPointerCapture(e.pointerId))set(e);});
-fin.addEventListener('click',function(){
-  if(logged)return;logged=true;ph.classList.add('logged');
+/* HOLD to finish: fill runs, early release aborts and nothing is banked */
+var ht=null;
+function finish(){
+  logged=true;ph.classList.add('logged');
   var ch=r.querySelector('#l12ch');ch.classList.add('set','ok');
   r.querySelector('#l12cap').textContent='done';paint();
   hint.textContent=c.day+', logged at '+mins+' minutes.';
-  fin.className='fin ok';fin.textContent=c.day+' logged. The week is whole.';});
+  fin.className='fin ok';finT.textContent=c.day+' logged. The week is whole.';}
+function holdOn(){if(logged)return;fin.classList.add('go');ht=setTimeout(finish,1050);}
+function holdOff(){if(logged)return;clearTimeout(ht);fin.classList.remove('go');}
+fin.addEventListener('pointerdown',function(e){
+  try{fin.setPointerCapture(e.pointerId)}catch(z){}holdOn();});
+['pointerup','pointerleave','pointercancel'].forEach(function(ev){fin.addEventListener(ev,holdOff)});
+fin.addEventListener('keydown',function(e){
+  if((e.key==='Enter'||e.key===' ')&&!e.repeat){e.preventDefault();holdOn();}});
+fin.addEventListener('keyup',holdOff);
 r.querySelectorAll('#l12bk button').forEach(function(b){b.addEventListener('click',function(){
   r.querySelectorAll('#l12bk button').forEach(function(y){y.classList.toggle('on',y===b);});
   render(b.dataset.b);});});

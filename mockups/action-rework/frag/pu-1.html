@@ -5,54 +5,71 @@
    PROVENANCE: every number on this screen is either typed here by the person
    or quoted back from something they typed before ("Last Sunday you wrote
    950"). Memento measures nothing. The screen says out loud where the number
-   comes from and how often it will ask, so nobody is ever surprised by it. */
+   comes from and how often it will ask, so nobody is ever surprised by it.
+   BEAUTY PASS 2026-08-13: the number is the screen now (100px, everything else
+   demoted a step), the three phrase fragments under the question collapse to one
+   label, the "heading for 3,000" reading is gone (pillar purity: goal relative
+   readings are Clarity's, not Action's), and saving is a HOLD (gesture law). */
 [data-k=pu-1] .s{position:absolute;inset:0;display:flex;flex-direction:column;
-  padding:34px 22px 22px;font-variant-numeric:tabular-nums}
+  padding:34px 22px 24px;font-variant-numeric:tabular-nums}
 
 /* --- the middle: the whole reason the screen exists ---------------------- */
 [data-k=pu-1] .mid{flex:1;display:flex;flex-direction:column;align-items:center;
   justify-content:center;text-align:center;gap:0}
-[data-k=pu-1] .q{margin:0;font-size:19px;font-weight:500;line-height:1.2;
-  letter-spacing:-.02em;color:rgba(var(--ink),.96);min-height:23px}
-[data-k=pu-1] .unit{margin:9px 0 0;max-width:252px;font-size:12px;line-height:1.5;
-  color:rgba(var(--ink),.90);min-height:36px}
-[data-k=pu-1] .unit b{font-weight:400;white-space:nowrap}
-[data-k=pu-1] .unit em{font-style:normal;color:rgba(var(--ink),.38)}
+[data-k=pu-1] .q{margin:0;font-size:21px;font-weight:500;line-height:1.2;
+  letter-spacing:-.022em;color:rgba(var(--ink),.96);min-height:25px}
+[data-k=pu-1] .unit{margin:10px 0 0;font-size:12.5px;line-height:1.4;
+  color:rgba(var(--ink),.90);min-height:18px}
 
-[data-k=pu-1] .field{width:fit-content;min-width:150px;margin:8px auto 0}
-[data-k=pu-1] .set{display:flex;align-items:baseline;justify-content:center;gap:2px}
-[data-k=pu-1] .pre,[data-k=pu-1] .suf{font-size:20px;font-weight:500;line-height:1;
+[data-k=pu-1] .field{width:fit-content;min-width:150px;margin:26px auto 0}
+[data-k=pu-1] .set{display:flex;align-items:baseline;justify-content:center;gap:3px}
+[data-k=pu-1] .pre,[data-k=pu-1] .suf{font-size:22px;font-weight:500;line-height:1;
   letter-spacing:-.01em;color:rgba(var(--ink),.82)}
 [data-k=pu-1] .pre:empty,[data-k=pu-1] .suf:empty{display:none}
 [data-k=pu-1] .num{-webkit-appearance:none;appearance:none;border:0;outline:0;background:transparent;
-  padding:0;margin:0;width:120px;text-align:center;font-family:var(--font);font-weight:700;
-  font-size:88px;line-height:1;letter-spacing:-.055em;color:rgba(var(--ink),1);
+  padding:0;margin:0;width:140px;text-align:center;font-family:var(--font);font-weight:700;
+  font-size:100px;line-height:1;letter-spacing:-.055em;color:rgba(var(--ink),1);
   font-variant-numeric:tabular-nums;caret-color:rgba(var(--ink),.92);
   transition:font-size .14s ease-out,opacity .16s ease-out}
 [data-k=pu-1] .num::placeholder{color:rgba(var(--ink),.20)}
 [data-k=pu-1] .num::-webkit-outer-spin-button,[data-k=pu-1] .num::-webkit-inner-spin-button{
   -webkit-appearance:none;margin:0}
 /* the writing line: this is a pen, not a box. no border on any box here. */
-[data-k=pu-1] .rule{height:1px;width:100%;margin-top:10px;background:rgba(var(--ink),.28);
+[data-k=pu-1] .rule{height:1px;width:100%;margin-top:12px;background:rgba(var(--ink),.28);
   transition:background .18s ease-out}
 [data-k=pu-1] .field:focus-within .rule{background:rgba(var(--ink),.55)}
 [data-k=pu-1] .mirror{position:absolute;left:-9999px;top:0;white-space:pre;visibility:hidden;
   font-family:var(--font);font-weight:700;letter-spacing:-.055em;font-variant-numeric:tabular-nums}
 
-[data-k=pu-1] .note{margin:20px 0 0;max-width:238px;font-size:11.5px;line-height:1.45;
-  color:rgba(var(--ink),.90);min-height:34px;text-wrap:pretty}
+[data-k=pu-1] .note{margin:26px 0 0;max-width:238px;font-size:12px;line-height:1.45;
+  color:rgba(var(--ink),.62);min-height:35px;text-wrap:pretty}
 
-/* --- the foot: cadence said out loud, then one real CTA ------------------ */
+/* --- the foot: cadence said out loud, then one real hold ----------------- */
 [data-k=pu-1] .foot{flex-shrink:0}
-[data-k=pu-1] .cad{margin:0 0 13px;text-align:center;font-size:11.5px;line-height:1.4;
-  color:rgba(var(--ink),.90);min-height:16px}
-[data-k=pu-1] .save{display:block;width:100%;height:54px;border:0;border-radius:13px;
-  background:rgba(235,238,248,.94);color:#0b0c10;font:700 14px/1 var(--font);cursor:pointer;
-  -webkit-tap-highlight-color:transparent;
-  transition:background .18s ease-out,color .18s ease-out,transform .1s ease-out}
-[data-k=pu-1] .save:active{transform:translateY(1px)}
+[data-k=pu-1] .cad{margin:0 0 14px;text-align:center;font-size:12px;line-height:1.4;
+  color:rgba(var(--ink),.62);min-height:17px}
+[data-k=pu-1] .save{position:relative;display:block;width:100%;height:54px;overflow:hidden;
+  /* no backdrop-filter: a blurred backdrop inside an overflow-clipped button drops the radius
+     on WebKit, and at .94 over near-black it buys nothing */
+  border:0;border-radius:14px;padding:0;font-family:var(--font);
+  background:rgba(22,25,31,.94);box-shadow:inset 0 1px 0 rgba(var(--ink),.09);
+  cursor:pointer;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;
+  transition:background .2s ease-out,box-shadow .2s ease-out,transform .12s ease-out}
+[data-k=pu-1] .save:active{transform:scale(.99)}
 [data-k=pu-1] .save:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
-[data-k=pu-1] .skip{display:block;width:100%;height:40px;margin-top:4px;border:0;border-radius:11px;
+[data-k=pu-1] .lab{position:relative;display:flex;align-items:center;justify-content:center;height:100%;
+  font-size:15px;font-weight:500;letter-spacing:-.012em;color:rgba(var(--ink),.62);
+  transition:color .2s ease-out}
+/* armed: there is a number to commit, so the button steps forward and the hold means something */
+[data-k=pu-1] .s.armed .lab{color:rgba(var(--ink),.96);font-weight:700;font-size:15.5px;letter-spacing:-.014em}
+[data-k=pu-1] .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(235,238,248,.94);
+  transition:width .2s cubic-bezier(.2,.7,.3,1)}
+[data-k=pu-1] .inv{position:absolute;left:0;top:0;bottom:0;width:0;overflow:hidden;pointer-events:none;
+  transition:width .2s cubic-bezier(.2,.7,.3,1)}
+[data-k=pu-1] .inv span{position:absolute;left:0;top:0;bottom:0;display:flex;align-items:center;
+  justify-content:center;color:#0b0c10;font-size:15.5px;font-weight:700;letter-spacing:-.014em}
+[data-k=pu-1] .save.holding .fill,[data-k=pu-1] .save.holding .inv{width:100%;transition:width .78s linear}
+[data-k=pu-1] .skip{display:block;width:100%;height:40px;margin-top:6px;border:0;border-radius:12px;
   background:transparent;color:rgba(var(--ink),.78);font:500 13px/1 var(--font);cursor:pointer;
   -webkit-tap-highlight-color:transparent;transition:color .16s ease-out}
 [data-k=pu-1] .skip:active{color:rgba(var(--ink),.96)}
@@ -61,16 +78,15 @@
 /* --- written / skipped: the pen goes down, nothing is judged ------------- */
 [data-k=pu-1] .s.done .num{pointer-events:none}
 [data-k=pu-1] .s.done .rule{background:rgba(var(--ink),.10)}
-[data-k=pu-1] .s.done .save,[data-k=pu-1] .s.off .save{
-  background:rgba(22,25,31,.94);backdrop-filter:blur(26px) saturate(1.4);
-  -webkit-backdrop-filter:blur(26px) saturate(1.4);color:rgba(var(--ink),.96);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.09)}
+[data-k=pu-1] .s.done .lab,[data-k=pu-1] .s.off .lab{color:rgba(var(--ink),.96)}
 [data-k=pu-1] .s.done .skip,[data-k=pu-1] .s.off .skip{visibility:hidden}
 [data-k=pu-1] .s.off .field{display:none}
-@media (prefers-reduced-motion:reduce){[data-k=pu-1] *{transition:none!important}}
+@media (prefers-reduced-motion:reduce){
+  [data-k=pu-1] *{transition:none!important}
+  [data-k=pu-1] .save.holding .fill,[data-k=pu-1] .save.holding .inv{transition:width .78s linear!important}}
 </style>
 <h3>Where are you now</h3>
-<p class="cap">The one screen where the goal number gets written: full screen, one quiet question, one poster-scale field and the cadence said out loud, with quitting left out of the toggle because its days are arithmetic on logged actions, and Ship the project left out because ticking a blocker off their own list is its pulse.</p>
+<p class="cap">The one screen where the goal number gets written: full screen, one quiet question, one poster-scale field, the cadence said out loud, and a hold to put it down. Quitting is left out of the toggle because its days are arithmetic on logged actions, and Ship the project because ticking a blocker off their own list is its pulse.</p>
 <div class="bk" role="group" aria-label="which bucket is asking">
   <i>Bucket</i>
   <button type="button" class="on" data-b="money">Money</button>
@@ -98,7 +114,11 @@
     </div>
     <div class="foot">
       <p class="cad"></p>
-      <button type="button" class="save">Save</button>
+      <button type="button" class="save">
+        <span class="fill" aria-hidden="true"></span>
+        <span class="lab">Hold to save</span>
+        <span class="inv" aria-hidden="true"><span>Hold to save</span></span>
+      </button>
       <button type="button" class="skip">Not now</button>
     </div>
   </div>
@@ -109,6 +129,8 @@
       num=r.querySelector('.num'),pre=r.querySelector('.pre'),suf=r.querySelector('.suf'),
       note=r.querySelector('.note'),cad=r.querySelector('.cad'),
       save=r.querySelector('.save'),skip=r.querySelector('.skip'),
+      lab=r.querySelector('.lab'),fill=r.querySelector('.fill'),
+      inv=r.querySelector('.inv'),invLab=r.querySelector('.inv span'),
       mirror=document.createElement('span');
   mirror.className='mirror';r.appendChild(mirror);
 
@@ -116,40 +138,36 @@
      cadence is the promise: a weigh-in is not a Sunday revenue confirm and a
      GPA is not asked between semesters. Quitting has no pulse (its number is
      arithmetic on the days it logged) and Ship the project pulses through the
-     blocker list the person wrote, so neither is here. */
+     blocker list the person wrote, so neither is here.
+     One label under the question, one quoted-back line under the field. */
   var B={
-    money:{q:'Where are you now?',
-      u:['Dollars this month','heading for 3,000','0 is a real answer'],
+    money:{q:'Where are you now?',u:'Dollars this month',
       pre:'$',suf:'',dec:false,
-      note:'Last Sunday you wrote 950. Nobody else sees this.',
+      note:'Last Sunday you wrote 950.',
       cad:'Asked once a week, Sundays.',next:'Next ask: Sunday.',
       off:'We ask again Sunday. Nothing happens in between.'},
-    body:{q:'What did the scale say?',
-      u:['Pounds, this morning','heading for 195','skipping costs you nothing'],
+    body:{q:'What did the scale say?',u:'Pounds, this morning',
       pre:'',suf:'lb',dec:true,
-      note:'Last one you wrote was 214, four mornings ago.',
+      note:'Four mornings ago you wrote 214.',
       cad:'Asked each morning you weigh in.',next:'Next ask: tomorrow morning.',
       off:'We ask again tomorrow. A skipped morning is not a missed day.'},
-    audience:{q:'Where are you now?',
-      u:['Subscribers','heading for 10,000','0 growth is a real answer'],
+    audience:{q:'Where are you now?',u:'Subscribers',
       pre:'',suf:'',dec:false,
-      note:'Last Sunday you wrote 1,284. Subscribers are a result, not an action.',
+      note:'Last Sunday you wrote 1,284.',
       cad:'Asked once a week, Sundays.',next:'Next ask: Sunday.',
       off:'We ask again Sunday. Keep posting either way.'},
-    school:{q:'Grades came in?',
-      u:['GPA this semester','heading for 3.5','write it once, then nothing for months'],
+    school:{q:'Grades came in?',u:'GPA this semester',
       pre:'',suf:'',dec:true,
-      note:'Last time you wrote 3.21, in December.',
+      note:'In December you wrote 3.21.',
       cad:'Asked when results exist, never between.',next:'Next ask: when the next results land.',
       off:'We only ask when results exist. Nothing until then.'},
-    screen:{q:'What did the report say?',
-      u:['Hours on your phone today','staying under 2','a high number is still an answer'],
+    screen:{q:'What did the report say?',u:'Hours on your phone today',
       pre:'',suf:'h',dec:true,
-      note:'You read it off your phone’s Screen Time report. Memento cannot see it.',
+      note:'Last night you wrote 3.4, off your Screen Time report.',
       cad:'Asked each night at 10.',next:'Next ask: tomorrow night.',
       off:'We ask again tomorrow night. The report keeps counting without us.'}
   };
-  var cur='money',ST={};
+  var cur='money',ST={},holding=false;
   Object.keys(B).forEach(function(k){ST[k]={v:'',st:''}});
 
   function clean(k,raw){
@@ -166,31 +184,40 @@
   }
   function fit(){
     var t=num.value||num.placeholder,n=t.length,
-        px=n<=3?88:n===4?80:n===5?70:n===6?60:52;
+        px=n<=3?100:n===4?88:n===5?76:n===6?64:54;
     num.style.fontSize=px+'px';
     mirror.style.fontSize=px+'px';mirror.textContent=t;
-    num.style.width=Math.max(56,Math.ceil(mirror.getBoundingClientRect().width)+8)+'px';
+    num.style.width=Math.max(64,Math.ceil(mirror.getBoundingClientRect().width)+10)+'px';
+  }
+  function setLabel(t){lab.textContent=t;invLab.textContent=t}
+  function stopHold(){if(!holding)return;holding=false;save.classList.remove('holding')}
+  function startHold(){
+    if(holding||!s.classList.contains('armed'))return;
+    invLab.style.width=save.offsetWidth+'px';holding=true;
+    void fill.offsetWidth;save.classList.add('holding');
   }
   function paint(){
     var b=B[cur],st=ST[cur].st;
     pre.textContent=b.pre;suf.textContent=b.suf;
-    /* the separator binds to the phrase AFTER it, so a wrapped line never ends
-       on a dangling middot */
-    unit.innerHTML='<b>'+b.u[0]+'</b> <em>·&nbsp;</em><b>'+b.u[1]+'</b> <em>·&nbsp;</em><b>'+b.u[2]+'</b>';
+    unit.textContent=b.u;
     num.value=shown(cur,ST[cur].v);
     num.readOnly=(st==='done');
     s.classList.toggle('done',st==='done');
     s.classList.toggle('off',st==='off');
+    /* armed only when there is something to commit: a hold that does nothing is a lie */
+    s.classList.toggle('armed',!st&&ST[cur].v.length>0);
+    if(!s.classList.contains('armed'))stopHold();
     if(st==='done'){
+      /* once it is written the screen goes quiet: the headline and the next ask, nothing else */
       q.textContent='Written down.';
-      note.textContent='Clarity carries it from here.';
-      cad.textContent=b.next;save.textContent='Change it';
+      note.textContent='';
+      cad.textContent=b.next;setLabel('Change it');
     }else if(st==='off'){
       q.textContent='Nothing written.';
       note.textContent=b.off;
-      cad.textContent=b.cad;save.textContent='Write it now';
+      cad.textContent=b.cad;setLabel('Write it now');
     }else{
-      q.textContent=b.q;note.textContent=b.note;cad.textContent=b.cad;save.textContent='Save';
+      q.textContent=b.q;note.textContent=b.note;cad.textContent=b.cad;setLabel('Hold to save');
     }
     fit();
   }
@@ -198,19 +225,32 @@
   num.addEventListener('input',function(){
     var raw=clean(cur,num.value);
     ST[cur].v=raw;num.value=shown(cur,raw);fit();
+    s.classList.toggle('armed',!ST[cur].st&&raw.length>0);
+    if(!s.classList.contains('armed'))stopHold();
   });
+  fill.addEventListener('transitionend',function(e){
+    if(e.propertyName!=='width'||!holding)return;
+    holding=false;save.classList.remove('holding');
+    ST[cur].st='done';paint();
+  });
+  save.addEventListener('pointerdown',startHold);
+  ['pointerup','pointercancel','pointerleave'].forEach(function(ev){save.addEventListener(ev,stopHold)});
+  save.addEventListener('keydown',function(e){
+    if((e.key===' '||e.key==='Enter')&&s.classList.contains('armed')){e.preventDefault();startHold()}
+  });
+  save.addEventListener('keyup',function(e){if(e.key===' '||e.key==='Enter')stopHold()});
+  save.addEventListener('blur',stopHold);
   save.addEventListener('click',function(){
     var st=ST[cur].st;
-    if(st){ST[cur].st='';paint();num.focus();return;}
-    if(!ST[cur].v){num.focus();return;}
-    ST[cur].st='done';paint();
+    if(st){ST[cur].st='';paint();num.focus();return;}   /* change it / write it now: navigation */
+    if(!ST[cur].v){num.focus();return;}                 /* nothing to save yet: go to the pen */
   });
   skip.addEventListener('click',function(){ST[cur].st='off';paint()});
 
   r.querySelectorAll('.bk button').forEach(function(btn){
     btn.addEventListener('click',function(){
       r.querySelectorAll('.bk button').forEach(function(x){x.classList.remove('on')});
-      btn.classList.add('on');cur=btn.dataset.b;paint();
+      btn.classList.add('on');cur=btn.dataset.b;stopHold();paint();
     });
   });
   paint();

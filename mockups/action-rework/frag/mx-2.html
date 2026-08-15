@@ -4,16 +4,17 @@
 <section class="cell" data-k="mx-2">
 <style>
 [data-k=mx-2] .scr{position:absolute;inset:0;display:flex;flex-direction:column;padding:30px 20px 22px}
-[data-k=mx-2] .hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px}
-[data-k=mx-2] .hd b{font-size:15px;font-weight:500;letter-spacing:-.015em}
-[data-k=mx-2] .hd u{text-decoration:none;font-size:12px;color:var(--text-mid);font-variant-numeric:tabular-nums;white-space:nowrap;padding-left:10px}
-[data-k=mx-2] .sub{font-size:12.5px;color:var(--text-mid);margin-bottom:14px}
+/* meta above, title below: the same header shape every screen in this set uses */
+[data-k=mx-2] .hd{margin-bottom:16px}
+[data-k=mx-2] .hd u{display:block;text-decoration:none;font-size:12px;color:var(--text-lo);font-variant-numeric:tabular-nums}
+[data-k=mx-2] .hd b{display:block;margin-top:4px;font-size:17px;font-weight:700;letter-spacing:-.02em}
 
 [data-k=mx-2] .col{position:relative;flex:1;min-height:0;display:flex;margin-bottom:16px}
 [data-k=mx-2] .clock{width:52px;flex:none;position:relative}
 [data-k=mx-2] .clock i{position:absolute;left:0;transform:translateY(-50%);font-style:normal;font-size:11px;
   color:rgba(var(--ink),.44);font-variant-numeric:tabular-nums}
-[data-k=mx-2] .clock i.now{color:var(--text-hi);font-weight:700}
+/* every rail label is the same weight: the rail is a ruler, not a second clock competing
+   with the one in the header */
 [data-k=mx-2] .clock i.last{transform:translateY(-100%)}
 [data-k=mx-2] .track{position:relative;flex:1}
 [data-k=mx-2] .hourline{position:absolute;left:0;right:0;height:1px;background:rgba(var(--ink),.12);z-index:0}
@@ -25,8 +26,11 @@
 [data-k=mx-2] .blk .bt b{font-size:26px;font-weight:700;letter-spacing:-.035em;font-variant-numeric:tabular-nums;line-height:1;white-space:nowrap}
 [data-k=mx-2] .blk .bt b i{display:block;font-style:normal;font-size:11.5px;font-weight:500;letter-spacing:0;color:var(--text-mid);margin-bottom:3px}
 [data-k=mx-2] .blk .bt s{display:block;text-decoration:none;font-size:12px;color:var(--text-mid);margin-top:5px;white-space:nowrap}
+/* the start time is already printed on the ruler beside the top of the block, and repeating it
+   at the BOTTOM of the block put the same number in two places, one of them wrong. */
 [data-k=mx-2] .blk .bb{position:absolute;left:14px;bottom:10px;right:14px;font-size:11.5px;color:var(--text-mid);
-  font-variant-numeric:tabular-nums;display:flex;justify-content:space-between}
+  font-variant-numeric:tabular-nums;display:flex;justify-content:flex-end}
+[data-k=mx-2] .blk .bb span:first-child{display:none}
 [data-k=mx-2] .brk{position:absolute;left:0;right:0;height:1px;background:repeating-linear-gradient(90deg,rgba(var(--ink),.3) 0 4px,transparent 4px 9px)}
 [data-k=mx-2] .brk span{position:absolute;right:14px;top:4px;font-size:10.5px;color:rgba(var(--ink),.55)}
 [data-k=mx-2] .ghostb{position:absolute;left:0;right:0;top:0;border-radius:12px;opacity:0;pointer-events:none;z-index:4;
@@ -62,16 +66,20 @@
 [data-k=mx-2] .freemid b{display:block;font-size:17px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
 [data-k=mx-2] .freemid span{display:block;font-size:11px;color:var(--text-mid);margin-top:1px}
 
-[data-k=mx-2] .foot{display:flex;flex-direction:column;gap:9px;margin-top:12px}
-[data-k=mx-2] .cta{flex:1;border:0;border-radius:14px;background:rgba(235,238,248,.94);color:#0b0c10;font-family:inherit;
-  font-weight:700;font-size:15.5px;letter-spacing:-.01em;padding:15px 14px;cursor:pointer;font-variant-numeric:tabular-nums;
-  -webkit-tap-highlight-color:transparent;transition:transform .12s ease-out,background .12s ease-out}
-[data-k=mx-2] .cta:active{transform:scale(.985);background:rgba(235,238,248,1)}
-[data-k=mx-2] .more{align-self:center;border:0;border-radius:11px;padding:9px 17px;font-family:inherit;font-size:12.5px;font-weight:500;
-  color:var(--text-mid);cursor:pointer;background:rgba(22,25,31,.92);-webkit-tap-highlight-color:transparent;
-  -webkit-backdrop-filter:blur(22px) saturate(1.4);backdrop-filter:blur(22px) saturate(1.4);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.08);transition:color .14s ease-out}
-[data-k=mx-2] .more.on,[data-k=mx-2] .more:active{color:var(--text-hi)}
+/* THE HOLD LAW: the length is a tap, the sitting down is a hold. */
+[data-k=mx-2] .foot{margin-top:14px}
+[data-k=mx-2] .cta{position:relative;display:block;width:100%;border:0;border-radius:14px;overflow:hidden;
+  background:rgba(235,238,248,.94);color:#0b0c10;font-family:inherit;font-weight:700;font-size:15.5px;
+  padding:16px 14px;cursor:pointer;font-variant-numeric:tabular-nums;touch-action:none;user-select:none;
+  -webkit-tap-highlight-color:transparent;transition:transform .12s ease-out}
+[data-k=mx-2] .cta:active{transform:scale(.99)}
+[data-k=mx-2] .cta .ink{position:absolute;left:0;top:0;bottom:0;width:0;background:#0b0c10}
+[data-k=mx-2] .cta .lb{position:relative;z-index:2;display:block}
+[data-k=mx-2] .cta .lb2{position:absolute;left:0;right:0;top:0;bottom:0;z-index:3;display:block;
+  padding:16px 14px;text-align:center;color:rgba(235,238,248,.96);clip-path:inset(0 100% 0 0)}
+[data-k=mx-2] .more{display:block;width:100%;border:0;background:none;font-family:inherit;font-size:13px;
+  color:var(--text-mid);padding:12px 8px 2px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+[data-k=mx-2] .more.on,[data-k=mx-2] .more:hover{color:var(--text-hi)}
 
 [data-k=mx-2] .dk{position:absolute;inset:0;display:flex;gap:28px;padding:26px 30px 24px}
 [data-k=mx-2] .dcolwrap{width:230px;flex:none;display:flex;flex-direction:column}
@@ -79,9 +87,9 @@
 [data-k=mx-2] .dcol .blk .bb span:first-child{display:none}
 [data-k=mx-2] .dcol{position:relative;flex:1;display:flex;min-height:0}
 [data-k=mx-2] .dright{flex:1;display:flex;flex-direction:column;min-width:0}
-[data-k=mx-2] .dhd b{font-size:15px;font-weight:500;letter-spacing:-.015em}
-[data-k=mx-2] .dhd u{text-decoration:none;font-size:12.5px;color:var(--text-mid);margin-left:8px;font-variant-numeric:tabular-nums}
-[data-k=mx-2] .dbig{display:flex;align-items:baseline;gap:9px;margin-top:14px}
+[data-k=mx-2] .dhd u{display:block;text-decoration:none;font-size:12px;color:var(--text-lo);font-variant-numeric:tabular-nums}
+[data-k=mx-2] .dhd b{display:block;margin-top:4px;font-size:17px;font-weight:700;letter-spacing:-.02em}
+[data-k=mx-2] .dbig{display:flex;align-items:baseline;gap:9px;margin-top:18px}
 [data-k=mx-2] .dbig b{font-size:66px;font-weight:700;line-height:.86;letter-spacing:-.05em;font-variant-numeric:tabular-nums}
 [data-k=mx-2] .dbig s{text-decoration:none;font-size:15px;color:var(--text-mid);font-weight:500}
 [data-k=mx-2] .dsent{margin-top:10px;font-size:15.5px;line-height:1.36;color:var(--text-hi);height:42px;max-width:36ch}
@@ -98,15 +106,18 @@
 [data-k=mx-2] .dfree.show{display:flex}
 [data-k=mx-2] .dfree .stepbtn{width:48px;height:38px}
 [data-k=mx-2] .dfree span{font-size:12.5px;color:var(--text-mid);font-variant-numeric:tabular-nums}
-[data-k=mx-2] .dfoot{display:flex;gap:10px;margin-top:auto}
-[data-k=mx-2] .dcta{flex:1;max-width:210px;border:0;border-radius:14px;background:rgba(235,238,248,.94);color:#0b0c10;
-  font-family:inherit;font-weight:700;font-size:15.5px;padding:15px 12px;cursor:pointer;font-variant-numeric:tabular-nums;
-  transition:transform .12s ease-out,background .12s ease-out}
-[data-k=mx-2] .dcta:hover{background:rgba(255,255,255,.99)}
-[data-k=mx-2] .dcta:active{transform:scale(.985)}
-[data-k=mx-2] .dmore{border:0;border-radius:14px;padding:15px 14px;font-family:inherit;font-size:13.5px;font-weight:500;
-  color:var(--text-mid);cursor:pointer;background:rgba(22,25,31,.92);box-shadow:inset 0 1px 0 rgba(var(--ink),.08);
-  transition:color .14s ease-out}
+[data-k=mx-2] .dfoot{display:flex;align-items:center;gap:8px;margin-top:auto}
+[data-k=mx-2] .dcta{position:relative;flex:none;min-width:248px;border:0;border-radius:14px;overflow:hidden;
+  background:rgba(235,238,248,.94);color:#0b0c10;font-family:inherit;font-weight:700;font-size:15.5px;
+  padding:16px 14px;cursor:pointer;font-variant-numeric:tabular-nums;touch-action:none;user-select:none;
+  transition:transform .12s ease-out}
+[data-k=mx-2] .dcta:active{transform:scale(.99)}
+[data-k=mx-2] .dcta .ink{position:absolute;left:0;top:0;bottom:0;width:0;background:#0b0c10}
+[data-k=mx-2] .dcta .lb{position:relative;z-index:2;display:block}
+[data-k=mx-2] .dcta .lb2{position:absolute;left:0;right:0;top:0;bottom:0;z-index:3;display:block;
+  padding:16px 14px;text-align:center;color:rgba(235,238,248,.96);clip-path:inset(0 100% 0 0)}
+[data-k=mx-2] .dmore{border:0;background:none;padding:12px 14px;font-family:inherit;font-size:13px;
+  color:var(--text-mid);cursor:pointer;white-space:nowrap}
 [data-k=mx-2] .dmore:hover,[data-k=mx-2] .dmore.on{color:var(--text-hi)}
 [data-k=mx-2] .dghost{height:17px;margin-top:9px;font-size:12.5px;color:rgba(var(--ink),.6);font-variant-numeric:tabular-nums}
 @media (prefers-reduced-motion:reduce){[data-k=mx-2] *{transition-duration:0s !important}}
@@ -118,8 +129,7 @@
 <div class="ph">
   <div class="grid" id="mx2g"></div>
   <div class="scr">
-    <div class="hd"><b>Deep work on the pitch deck</b><u id="mx2now">now 4:30 pm</u></div>
-    <div class="sub">how long you are sitting down for, on the plan&#8217;s estimate</div>
+    <div class="hd"><u id="mx2now">now 4:30 pm</u><b>Deep work on the pitch deck</b></div>
 
     <div class="col">
       <div class="clock" id="mx2ck"></div>
@@ -132,7 +142,6 @@
         </div>
         <div class="after" id="mx2af">
           <b id="mx2left">about 1 hr 10 min left</b>
-          <i>of the next two hours, not your calendar</i>
         </div>
       </div>
     </div>
@@ -149,8 +158,8 @@
     </div>
 
     <div class="foot">
-      <button class="cta" id="mx2cta">Start 50 minutes</button>
-      <button class="more" id="mx2more">any length</button>
+      <button class="cta" id="mx2cta" type="button"><span class="ink"></span><span class="lb">Hold to start 50 minutes</span><span class="lb2" aria-hidden="true">Hold to start 50 minutes</span></button>
+      <button class="more" id="mx2more" type="button">any length</button>
     </div>
   </div>
 </div>
@@ -170,13 +179,12 @@
           </div>
           <div class="after" id="mx2daf">
             <b id="mx2dleft">about 1 hr 10 min left</b>
-            <i>of the next two hours, not your calendar</i>
           </div>
         </div>
       </div>
     </div>
     <div class="dright">
-      <div class="dhd"><b>Deep work on the pitch deck</b><u id="mx2dnow">today, now 4:30 pm</u></div>
+      <div class="dhd"><u id="mx2dnow">today, now 4:30 pm</u><b>Deep work on the pitch deck</b></div>
       <div class="dbig"><b id="mx2dn">50</b><s>minutes, sat down</s></div>
       <div class="dsent" id="mx2dsent">The standard block. One break at the end, then you are out.</div>
       <div class="dsizes" id="mx2dsz">
@@ -189,8 +197,8 @@
         <button class="stepbtn p" id="mx2dp" aria-label="five minutes more"></button>
         <span id="mx2dfn">about 50 min, five minute steps, hold to run</span>
       </div>
-      <div class="dghost" id="mx2dghost">hover a length and the column draws where it would end. Every time here is the plan&#8217;s estimate.</div>
-      <div class="dfoot"><button class="dcta" id="mx2dcta">Start 50 minutes</button><button class="dmore" id="mx2dmore">any length</button></div>
+      <div class="dghost" id="mx2dghost">Hover a length and the column draws where it would end.</div>
+      <div class="dfoot"><button class="dcta" id="mx2dcta" type="button"><span class="ink"></span><span class="lb">Hold to start 50 minutes</span><span class="lb2" aria-hidden="true">Hold to start 50 minutes</span></button><button class="dmore" id="mx2dmore" type="button">any length</button></div>
     </div>
   </div>
 </div>
@@ -249,7 +257,9 @@
       }
       R.querySelector(o.sizes).style.display=free?'none':'flex';
       R.querySelector(o.freeEl).className=o.freeCls+(free?' show':'');
-      R.querySelector(o.cta).textContent='Start '+v+' minutes';
+      var ctaEl=R.querySelector(o.cta);
+      if(!ctaEl.dataset.busy){ var ct='Hold to start '+v+' minutes';
+        ctaEl.querySelector('.lb').textContent=ct; ctaEl.querySelector('.lb2').textContent=ct; }
       if(o.dn) R.querySelector(o.dn).textContent=v;
       if(o.dsent) R.querySelector(o.dsent).textContent=sent(v);
       if(o.fn) R.querySelector(o.fn).textContent=o.fnFull?('about '+v+' min, five minute steps, hold to run'):('about '+hm(v));
@@ -311,10 +321,29 @@
   });
   window.addEventListener('mouseup',function(){clearInterval(t);});
 
-  [['#mx2cta'],['#mx2dcta']].forEach(function(p){
-    R.querySelector(p[0]).addEventListener('click',function(){
-      var b=this, was=b.textContent; b.textContent='Started'; setTimeout(function(){b.textContent=was;},900);
+  /* THE HOLD LAW: no bare tap banks a sitting. */
+  Array.prototype.forEach.call(R.querySelectorAll('#mx2cta,#mx2dcta'),function(b){
+    var ink=b.querySelector('.ink'), lb2=b.querySelector('.lb2'), lb=b.querySelector('.lb');
+    var raf=null, t0=0, p=0, done=false, drain=null, txt=null;
+    function draw(){ ink.style.width=(p*100)+'%'; lb2.style.clipPath='inset(0 '+((1-p)*100)+'% 0 0)'; }
+    function stop(){ if(raf) cancelAnimationFrame(raf); raf=null; if(drain) cancelAnimationFrame(drain); drain=null; }
+    function finish(){ stop(); done=true; p=1; draw(); b.dataset.busy='1';
+      txt=lb.textContent; lb.textContent='Locked in'; lb2.textContent='Locked in';
+      setTimeout(function(){ done=false; p=0; draw(); delete b.dataset.busy;
+        lb.textContent=txt; lb2.textContent=txt; },1100);
+    }
+    b.addEventListener('pointerdown',function(e){ e.preventDefault(); if(done) return;
+      try{b.setPointerCapture(e.pointerId);}catch(err){}
+      stop(); t0=performance.now()-p*650;
+      (function step(t){ p=Math.min(1,(t-t0)/650); draw();
+        if(p<1){ raf=requestAnimationFrame(step); } else { finish(); } })(performance.now());
     });
+    function up(){ if(done||p===0) return; stop();
+      var from=p, s0=performance.now();
+      (function back(t){ var k=Math.min(1,(t-s0)/190); p=from*(1-k); draw();
+        if(k<1) drain=requestAnimationFrame(back); })(performance.now());
+    }
+    b.addEventListener('pointerup',up); b.addEventListener('pointercancel',up); b.addEventListener('pointerleave',up);
   });
   window.addEventListener('resize',function(){ph.marks();ph.paint();dk.marks();dk.paint();});
   setTimeout(function(){ph.marks();ph.paint();dk.marks();dk.paint();},80);

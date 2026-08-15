@@ -18,7 +18,8 @@
 [data-k=lp-10] .sub{position:absolute;left:18px;right:18px;top:42px;font-size:12px;line-height:1.4;color:rgba(var(--ink),.90)}
 [data-k=lp-10] .hr{position:absolute;left:18px;right:18px;height:1px;background:rgba(var(--ink),.075)}
 
-/* the printed lines */
+/* the printed lines: the tape is the screen, so it gets the room the cut
+   explainer and the duplicate total used to take */
 [data-k=lp-10] .vp{position:absolute;left:0;right:0;top:78px;height:196px;overflow:hidden;
   -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 26px,#000 100%);
   mask-image:linear-gradient(180deg,transparent 0,#000 26px,#000 100%)}
@@ -44,10 +45,13 @@
   border-radius:0 3px 3px 0;background:#3fd94e}
 [data-k=lp-10] .head:after{content:"";position:absolute;right:0;top:-8px;width:9px;height:18px;
   border-radius:3px 0 0 3px;background:rgba(63,217,78,.55)}
-[data-k=lp-10] .lab{position:absolute;left:18px;right:18px;top:288px;font-size:12px;color:rgba(var(--ink),.90)}
+/* the quiet line under the head: empty until there is something true to say,
+   its height reserved so nothing below it ever jumps */
+[data-k=lp-10] .lab{position:absolute;left:18px;right:18px;top:286px;height:17px;font-size:12px;
+  line-height:17px;color:rgba(var(--ink),.90)}
 
 /* what is about to print */
-[data-k=lp-10] .ops{position:absolute;left:14px;right:14px;top:312px;border-radius:12px;overflow:hidden;
+[data-k=lp-10] .ops{position:absolute;left:14px;right:14px;top:314px;border-radius:12px;overflow:hidden;
   background:rgba(var(--ink),.05)}
 [data-k=lp-10] .op{position:relative;width:100%;height:38px;display:grid;grid-template-columns:1fr auto;
   align-items:center;padding:0 13px 0 15px;border:0;background:transparent;text-align:left;cursor:pointer;
@@ -66,9 +70,10 @@
 [data-k=lp-10] .pd2{padding:11px 15px 12px;font-size:12px;line-height:1.45;color:rgba(var(--ink),.90)}
 [data-k=lp-10] .cons{position:absolute;left:18px;right:18px;top:440px;margin:0;font-size:12.5px;
   line-height:1.45;color:rgba(var(--ink),.90)}
-[data-k=lp-10] .tot{position:absolute;left:18px;right:18px;top:500px;display:flex;justify-content:space-between}
-[data-k=lp-10] .tot div{display:flex;flex-direction:column;gap:5px;font-size:11.5px;color:rgba(var(--ink),.84)}
-[data-k=lp-10] .tot div:last-child{align-items:flex-end;text-align:right}
+/* ONE total. "13 left" was the same fact subtracted, and two label stacks
+   made a footer out of a line. */
+[data-k=lp-10] .tot{position:absolute;left:18px;right:18px;top:506px;display:flex;align-items:baseline;gap:8px}
+[data-k=lp-10] .tot span{font-size:11.5px;color:rgba(var(--ink),.84)}
 [data-k=lp-10] .tot b{font-size:16px;font-weight:700;letter-spacing:-.015em;color:rgba(var(--ink),.96)}
 
 /* feed */
@@ -100,16 +105,13 @@
       <div class="stack" id="l10st"></div>
     </div>
     <div class="head"></div>
-    <div class="lab" id="l10lab">The length is your choice, not a measurement</div>
+    <div class="lab" id="l10lab"></div>
 
     <div class="ops" id="l10ops"></div>
     <p class="cons" id="l10cons"></p>
-    <div class="hr" style="top:482px"></div>
+    <div class="hr" style="top:492px"></div>
 
-    <div class="tot">
-      <div><span>printed</span><b id="l10p">87 of 100</b></div>
-      <div><span id="l10ll">left on the list</span><b id="l10l">13 sessions</b></div>
-    </div>
+    <div class="tot"><b id="l10p">87 of 100</b><span>printed</span></div>
 
     <button class="feed" id="l10feed"><span class="fill" id="l10fill"></span><span class="t" id="l10cap">Hold to print the line</span></button>
   </div>
@@ -119,29 +121,28 @@ var CHK='<svg viewBox="0 0 24 24"><path d="M4 13l5 5L20 7"/></svg>';
 /* Every number below is arithmetic on two sources only: the lines they logged, and the
    date they typed at intake. Nothing here is measured for them. */
 var B={
- ship:{who:'Deep work',ttl:'100 deep work sessions',totLab:'left on the list',
+ ship:{who:'Deep work',ttl:'100 deep work sessions',
    sub:'One line each, all 100 before 1 September.',goal:100,done:87,days:20,pick:1,
-   past:[['4 hours','Aug 3'],['3 hours','Aug 4'],['4 hours','Aug 5'],['5 hours','Aug 6'],
+   past:[['4 hours','Aug 1'],['4 hours','Aug 3'],['3 hours','Aug 4'],['4 hours','Aug 5'],['5 hours','Aug 6'],
          ['4 hours','Aug 8'],['3 hours','Aug 10'],['4 hours','Aug 11']],
    opts:['3 hours','4 hours','5 hours']},
- school:{who:'Study',ttl:'60 study sessions',totLab:'left on the list',
+ school:{who:'Study',ttl:'60 study sessions',
    sub:'One line each, all 60 before finals.',goal:60,done:22,days:122,pick:1,
-   past:[['2 hours','Aug 2'],['1 hour','Aug 4'],['2 hours','Aug 5'],['3 hours','Aug 7'],
+   past:[['2 hours','Aug 1'],['2 hours','Aug 2'],['1 hour','Aug 4'],['2 hours','Aug 5'],['3 hours','Aug 7'],
          ['2 hours','Aug 8'],['2 hours','Aug 10'],['1 hour','Aug 11']],
    opts:['1 hour','2 hours','3 hours']},
- race:{who:'Training',ttl:'120 training sessions',totLab:'left on the list',
+ race:{who:'Training',ttl:'120 training sessions',
    sub:'One line each, all 120 before 12 April.',goal:120,done:34,days:243,pick:1,
-   past:[['60 min','Aug 3'],['45 min','Aug 5'],['80 min','Aug 6'],['60 min','Aug 7'],
+   past:[['45 min','Aug 1'],['60 min','Aug 3'],['45 min','Aug 5'],['80 min','Aug 6'],['60 min','Aug 7'],
          ['45 min','Aug 9'],['60 min','Aug 10'],['80 min','Aug 11']],
    opts:['45 min','60 min','80 min']}};
 var st=r.querySelector('#l10st'),feed=r.querySelector('#l10feed'),fill=r.querySelector('#l10fill'),
     cap=r.querySelector('#l10cap'),cons=r.querySelector('#l10cons'),lab=r.querySelector('#l10lab'),
-    ops=r.querySelector('#l10ops'),pEl=r.querySelector('#l10p'),lEl=r.querySelector('#l10l'),
-    llEl=r.querySelector('#l10ll'),whoEl=r.querySelector('#l10who'),dEl=r.querySelector('#l10days'),
+    ops=r.querySelector('#l10ops'),pEl=r.querySelector('#l10p'),
+    whoEl=r.querySelector('#l10who'),dEl=r.querySelector('#l10days'),
     ttlEl=r.querySelector('#l10ttl'),subEl=r.querySelector('#l10sub');
-var PITCH=28,HOLD=900,c,done,pick,printed,rows,idx,base,t0,raf=0,back=0;
+var PITCH=28,VPH=196,HOLD=900,c,done,pick,printed,rows,idx,base,t0,raf=0,back=0;
 function pad(n){return ('00'+n).slice(-3);}
-function sess(n){return n+(n===1?' session':' sessions');}
 /* consequence of the size chosen for today, nothing about pace against the date */
 function consTxt(i){
   if(i===0)return 'Under the length you set. It still prints one line.';
@@ -160,18 +161,17 @@ function render(k){
   whoEl.textContent=c.who;dEl.textContent=c.days+' days left';
   ttlEl.textContent=c.ttl;subEl.textContent=c.sub;
   var h='',i;
-  for(i=0;i<7;i++)h+=row('ok',done-6+i,c.past[i][0],c.past[i][1]);
+  for(i=0;i<8;i++)h+=row('ok',done-7+i,c.past[i][0],c.past[i][1]);
   h+=row('now',done+1,c.opts[pick],'today',' id="l10nm"',' id="l10tm"');
   h+=row('wait',done+2,'not chosen','tomorrow');
   h+=row('wait',done+3,'not chosen','not set');
   st.innerHTML=h;
-  rows=[].slice.call(r.querySelectorAll('.r'));idx=7;base=168-PITCH*idx;
+  rows=[].slice.call(r.querySelectorAll('.r'));idx=8;base=VPH-PITCH*(idx+1);
   st.style.transform='translateY('+base+'px)';
   ops.innerHTML=opsHTML();
   cons.textContent=consTxt(pick);
-  lab.textContent='The length is your choice, not a measurement';
+  lab.textContent='';
   pEl.textContent=done+' of '+c.goal;
-  llEl.textContent=c.totLab;lEl.textContent=sess(c.goal-done);
   feed.classList.remove('done');cap.textContent='Hold to print the line';fill.style.width='0';}
 ops.addEventListener('click',function(e){var b=e.target.closest('.op');if(!b||printed)return;
   pick=+b.dataset.i;
@@ -184,7 +184,7 @@ function finish(){
   var now=rows[idx],len=c.opts[pick];
   now.classList.remove('now');now.classList.add('ok');
   now.querySelector('em').textContent='Aug 12';
-  done++;pEl.textContent=done+' of '+c.goal;lEl.textContent=sess(c.goal-done);
+  done++;pEl.textContent=done+' of '+c.goal;
   idx++;base-=PITCH;draw(0);
   var nx=rows[idx];nx.classList.remove('wait');nx.classList.add('now');
   nx.querySelector('em').textContent='tomorrow';

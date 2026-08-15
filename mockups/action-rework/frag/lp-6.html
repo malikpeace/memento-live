@@ -15,23 +15,24 @@
 <style>
 [data-k=lp-6] .ph{font-variant-numeric:tabular-nums}
 
-/* --- the rail: an abstract guide, and their own recent marks on it ------- */
-[data-k=lp-6] .rail{position:absolute;left:78px;top:62px;width:1px;height:286px;background:rgba(var(--ink),.12)}
-[data-k=lp-6] .rail .old{position:absolute;left:-5px;width:11px;height:1px;background:rgba(var(--ink),.34);transform:translateY(-50%)}
-[data-k=lp-6] .rail .mk{position:absolute;left:-8px;top:0;width:17px;height:3px;border-radius:2px;
+/* --- the rail: an abstract guide, and their own recent marks on it -------
+   it stands at the right margin so the number can hold the one type column
+   the card below it also uses. The line fades out at both ends: a hairline
+   that stops dead reads like a cut, not like a guide. */
+[data-k=lp-6] .rail{position:absolute;left:273px;top:62px;width:1px;height:286px;
+  background:linear-gradient(180deg,transparent,rgba(var(--ink),.20) 13%,rgba(var(--ink),.20) 87%,transparent)}
+[data-k=lp-6] .rail .old{position:absolute;left:-8px;width:9px;height:1px;background:rgba(var(--ink),.40);transform:translateY(-50%)}
+[data-k=lp-6] .rail .mk{position:absolute;left:-13px;top:0;width:14px;height:3px;border-radius:2px;
   background:#e9eefb;transform:translateY(-50%);box-shadow:0 0 18px rgba(233,238,251,.42);
   transition:top .5s cubic-bezier(.2,.7,.2,1)}
 
 /* --- the pen: the current number, and nothing measured against it -------- */
-[data-k=lp-6] .stack{position:absolute;left:104px;right:14px;top:169px;transition:top .5s cubic-bezier(.2,.7,.2,1)}
+[data-k=lp-6] .stack{position:absolute;left:27px;right:48px;top:169px;transition:top .5s cubic-bezier(.2,.7,.2,1)}
 [data-k=lp-6] .num{display:block;padding:0 8px 0 0;border:0;background:none;position:relative;
   font:700 44px/1 var(--font);letter-spacing:-.03em;font-variant-numeric:tabular-nums;
   color:rgba(var(--ink),.97);text-align:left;-webkit-tap-highlight-color:transparent;
   transition:opacity .16s ease-out}
 [data-k=lp-6] .num em{font-style:normal;font-size:16px;font-weight:500;color:rgba(var(--ink),.90);margin-left:6px}
-[data-k=lp-6] .num i{font-style:normal;font-size:22px;font-weight:500;color:rgba(var(--ink),.90);
-  margin-left:1px;vertical-align:14px;display:none}
-[data-k=lp-6] .ph.stale .num i{display:inline}
 [data-k=lp-6] .num[data-pen]{cursor:pointer}
 [data-k=lp-6] .num[data-pen]::after{content:'';position:absolute;left:0;right:8px;bottom:-6px;height:1px;
   background:rgba(var(--ink),.20)}
@@ -46,10 +47,8 @@
 [data-k=lp-6] .ph.pen .num{display:none}
 [data-k=lp-6] .ph.pen .ed{display:block}
 
-/* --- the quiet layer: where the number came from, only when it matters -- */
-[data-k=lp-6] .stack .as{margin:14px 0 0;font-size:11.5px;line-height:1.35;color:rgba(var(--ink),.90)}
-[data-k=lp-6] .stack .stn{margin:4px 0 0;font-size:11px;line-height:1.35;color:rgba(var(--ink),.90);display:none}
-[data-k=lp-6] .ph.stale .stn{display:block}
+/* --- the quiet layer: ONE line, no footnote glyph, no second sentence ---- */
+[data-k=lp-6] .stack .as{margin:13px 0 0;font-size:11.5px;line-height:1.35;color:rgba(var(--ink),.90)}
 [data-k=lp-6] .ph.fresh .as{display:none}
 
 /* --- undo the entry they just wrote ------------------------------------- */
@@ -108,10 +107,9 @@
   <div class="rail"></div>
 
   <div class="stack">
-    <button type="button" class="num" data-num><span class="v"></span><i>*</i><em></em></button>
+    <button type="button" class="num" data-num><span class="v"></span><em></em></button>
     <input class="ed" type="text" inputmode="decimal" aria-label="today's number">
     <p class="as" data-as></p>
-    <p class="stn" data-stn></p>
     <button type="button" class="undo">Undo</button>
   </div>
 
@@ -136,7 +134,7 @@ var B={
   body:{
     recent:[246.2,245.0,244.1,243.3,241.4],now:241.4,pen:true,unit:'lb',
     val:function(x){return x.toFixed(1)},
-    as:'As of Tuesday.',stale:true,staleNote:'* not logged in 2 days',
+    as:'As of Tuesday, 2 days ago.',stale:true,
     ok:function(x){return x>=150&&x<=400},
     act:function(v){return 'Today, walk '+v+' minutes after dinner.'},
     chips:[{v:25,txt:'25 min'},{v:40,txt:'40 min'},{v:60,txt:'60 min'}],pick:40,
@@ -148,7 +146,7 @@ var B={
   money:{
     recent:[5240,4980,4620,4180],now:4180,pen:false,unit:'',
     val:function(x){return '$'+Math.round(x).toLocaleString('en-US')},
-    as:'As of Sunday’s confirm.',stale:false,staleNote:'',
+    as:'As of Sunday’s confirm.',stale:false,
     ok:function(){return false},
     act:function(v){return 'Today, message '+v+' potential clients.'},
     chips:[{v:2,txt:'2 clients'},{v:3,txt:'3 clients'},{v:5,txt:'5 clients'}],pick:3,
@@ -165,7 +163,7 @@ var C=B.body,pick=C.pick,WEEK=C.week,cur=C.now,
     stack=r.querySelector('.stack'),numEl=r.querySelector('.num'),
     vEl=numEl.querySelector('.v'),uEl=numEl.querySelector('em'),
     ed=r.querySelector('.ed'),undo=r.querySelector('.undo'),
-    asEl=r.querySelector('[data-as]'),stnEl=r.querySelector('[data-stn]'),
+    asEl=r.querySelector('[data-as]'),
     hold=r.querySelector('.hold'),txt=hold.querySelector('span'),am=r.querySelector('.amend'),
     mk,W={hi:1,lo:0},last=null;
 
@@ -291,7 +289,7 @@ function render(key){
   hold.classList.remove('go','done');txt.textContent=C.idle;
   if(C.pen)numEl.setAttribute('data-pen','');else numEl.removeAttribute('data-pen');
   numEl.disabled=!C.pen;
-  asEl.textContent=C.as;stnEl.textContent=C.staleNote;
+  asEl.textContent=C.as;
   makeWin();drawRail();readNumber(C.now);drawChips();paintCard();
 }
 r.querySelectorAll('.bk button').forEach(function(b){

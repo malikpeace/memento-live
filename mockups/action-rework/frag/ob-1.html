@@ -1,78 +1,109 @@
 <!-- ARCHETYPE: full-bleed monumental type you press in. The only onboarding screen (Malik, 2026-08-13: the five
-     variants are dead, this is it). Polish pass only: type rhythm, dim-to-lit states, spacing, deadline row, CTA.
+     variants are dead, this is it). BEAUTY PASS 2026-08-13: one type ladder (16 / 27 / 64, nothing else),
+     one spacing rhythm (4 / 8 / 20 / 30), ONE focal point (the number), and the confirm is now a HOLD
+     (gesture law: no bare tap confirms anywhere). Unconfirmed lines sit dim AND soft; pressing one pulls it
+     into focus and lifts the wall's own light a step, so the screen finishes brighter than it started.
      Structure is frozen: three press zones, one rule, one source note, one CTA. -->
 <section class="cell" data-k="ob-1">
 <style>
+/* TYPE LADDER: 16/400 connective, 27/500 words, 64/700 the number. Nothing else exists.
+   SPACING: 4 / 8 / 20 / 30. Every gap on this screen is one of those four. */
 [data-k=ob-1] .o1-halo{position:absolute;inset:0;pointer-events:none;
   background-image:linear-gradient(rgba(var(--ink),1) 1px,transparent 1px),
     linear-gradient(90deg,rgba(var(--ink),1) 1px,transparent 1px);
-  background-size:26px 26px;opacity:.11;
-  -webkit-mask-image:radial-gradient(circle at 50% 36%,#000 0,rgba(0,0,0,.55) 32%,transparent 64%);
-  mask-image:radial-gradient(circle at 50% 36%,#000 0,rgba(0,0,0,.55) 32%,transparent 64%)}
-[data-k=ob-1] .o1-type{position:absolute;left:22px;right:22px;top:22px;bottom:118px;
+  background-size:26px 26px;opacity:.10;
+  transition:opacity .6s cubic-bezier(.2,.7,.3,1);
+  -webkit-mask-image:radial-gradient(circle at 50% 40%,#000 0,rgba(0,0,0,.55) 34%,transparent 66%);
+  mask-image:radial-gradient(circle at 50% 40%,#000 0,rgba(0,0,0,.55) 34%,transparent 66%)}
+/* the wall lights as it is pressed: line brightness only, never a hue (grid law) */
+[data-k=ob-1] .ph[data-lit="1"] .o1-halo{opacity:.13}
+[data-k=ob-1] .ph[data-lit="2"] .o1-halo{opacity:.16}
+[data-k=ob-1] .ph[data-lit="3"] .o1-halo{opacity:.20}
+
+[data-k=ob-1] .o1-type{position:absolute;left:24px;right:24px;top:24px;bottom:126px;
   display:flex;flex-direction:column;justify-content:center}
-[data-k=ob-1] .o1-sm{font-size:17px;font-weight:400;line-height:1.22;color:rgba(var(--ink),.90);letter-spacing:-.012em}
-[data-k=ob-1] .o1-num{font-size:62px;font-weight:700;line-height:.94;letter-spacing:-.05em;
-  color:var(--text-hi);font-variant-numeric:tabular-nums;margin:7px 0 0 -4.5px}
-[data-k=ob-1] .o1-mid{font-size:28px;font-weight:500;line-height:1.05;letter-spacing:-.03em;color:var(--text-hi);margin:5px 0 0 -1px}
-[data-k=ob-1] .o1-so{margin-top:28px}
-[data-k=ob-1] .o1-big{font-size:37px;font-weight:700;line-height:1.04;letter-spacing:-.04em;color:var(--text-hi);margin:5px 0 0 -1.5px}
-[data-k=ob-1] .o1-rule{width:34px;height:1px;background:rgba(var(--ink),.30);margin:24px 0 0}
+[data-k=ob-1] .o1-sm{font-size:16px;font-weight:400;line-height:1.2;color:rgba(var(--ink),.90);letter-spacing:-.01em}
+[data-k=ob-1] .o1-num{font-size:64px;font-weight:700;line-height:.92;letter-spacing:-.052em;
+  color:var(--text-hi);font-variant-numeric:tabular-nums;margin:4px 0 0 -4px}
+[data-k=ob-1] .o1-mid,[data-k=ob-1] .o1-big{font-size:27px;font-weight:500;line-height:1.1;
+  letter-spacing:-.028em;color:var(--text-hi);margin:4px 0 0 -1px}
+[data-k=ob-1] .o1-rule{width:32px;height:1px;background:rgba(var(--ink),.26);margin:30px 0 0}
 /* deadline row: rendered ONLY when intake returned a date. Nothing else moves when it is absent. */
-[data-k=ob-1] .o1-when{display:flex;align-items:baseline;gap:8px;margin-top:18px}
-[data-k=ob-1] .o1-when i{font-style:normal;font-size:12.5px;font-weight:500;color:rgba(var(--ink),.66);letter-spacing:.005em}
-[data-k=ob-1] .o1-when b{font-size:18px;font-weight:500;letter-spacing:-.02em;color:var(--text-hi);font-variant-numeric:tabular-nums}
-[data-k=ob-1] .o1-when s{text-decoration:none;font-size:12.5px;color:rgba(var(--ink),.66);font-variant-numeric:tabular-nums;margin-left:3px}
-[data-k=ob-1] .o1-note{font-size:12px;font-weight:400;line-height:1.4;color:rgba(var(--ink),.66);margin-top:20px;
+[data-k=ob-1] .o1-when{display:flex;align-items:baseline;gap:8px}
+[data-k=ob-1] .o1-when i{font-style:normal;font-size:14px;font-weight:400;color:rgba(var(--ink),.90)}
+[data-k=ob-1] .o1-when b{font-size:19px;font-weight:500;letter-spacing:-.022em;color:var(--text-hi);font-variant-numeric:tabular-nums}
+[data-k=ob-1] .o1-when s{text-decoration:none;font-size:13px;color:rgba(var(--ink),.90);font-variant-numeric:tabular-nums}
+[data-k=ob-1] .o1-note{font-size:12px;font-weight:400;line-height:1.3;color:rgba(var(--ink),.62);margin:30px 0 0;
   display:flex;align-items:center;gap:6px}
-[data-k=ob-1] .o1-note svg{flex:none;width:11px;height:13px;color:rgba(var(--ink),.55)}
+[data-k=ob-1] .o1-note svg{flex:none;width:10px;height:12px;color:rgba(var(--ink),.5)}
 
 /* ---- the press: each fact is a zone of the wall you can sink in. No box, no chrome, the type itself moves. ---- */
 [data-k=ob-1] .o1-z{position:relative;display:flex;flex-direction:column;align-items:stretch;width:100%;
   margin:0;padding:0;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;
   -webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;
-  transition:transform .2s cubic-bezier(.2,.7,.3,1),filter .2s ease-out}
+  transition:transform .22s cubic-bezier(.2,.7,.3,1)}
 [data-k=ob-1] .o1-z:focus-visible{outline:2px solid rgba(var(--ink),.5);outline-offset:6px;border-radius:6px}
-[data-k=ob-1] .o1-z:active{transform:translateY(1.5px) scale(.997)}
-[data-k=ob-1] .o1-z>*{transition:text-shadow .24s ease-out,color .24s ease-out,opacity .26s ease-out}
-/* unconfirmed facts rest DIM: the tap confirms by bringing the words to full
-   light (deliberate interaction state, not resting body copy). */
-[data-k=ob-1] .o1-z:not(.set)>*{opacity:.42}
+[data-k=ob-1] .o1-z:active{transform:translateY(1.5px)}
+[data-k=ob-1] .o1-z>*{transition:text-shadow .3s ease-out,color .3s ease-out,opacity .32s ease-out,filter .32s ease-out}
+/* unconfirmed facts rest dim AND out of focus: pressing pulls the words into the light and into focus.
+   (deliberate interaction state, not resting body copy) */
+   BEAUTY PASS 2: the resting state was .40 + .9px blur, which made the whole
+   first screen read out of focus on arrival. It now rests legible (.58 + .5px)
+   and the press still buys a real step into full light. */
+[data-k=ob-1] .o1-z:not(.set)>*{opacity:.58;filter:blur(.5px)}
 /* the smallest line cannot afford the full dim, or the date stops being readable at all */
-[data-k=ob-1] .o1-z.o1-zw:not(.set)>*{opacity:.52}
-[data-k=ob-1] .o1-z.set>*{opacity:1}
-@media (hover:hover){[data-k=ob-1] .o1-z:not(.set):hover>*{opacity:.62}}
-[data-k=ob-1] .o1-z.o1-so{margin-top:28px}
+[data-k=ob-1] .o1-z.o1-zw:not(.set)>*{opacity:.66;filter:blur(.35px)}
+[data-k=ob-1] .o1-z.set>*{opacity:1;filter:none}
+@media (hover:hover){[data-k=ob-1] .o1-z:not(.set):hover>*{opacity:.78;filter:blur(.25px)}}
+[data-k=ob-1] .o1-z.o1-so{margin-top:30px}
 /* the zone owns the gap, not its first line, so the mark can sit on that first line */
-[data-k=ob-1] .o1-z.o1-zw{margin-top:18px}
-[data-k=ob-1] .o1-z .o1-when{margin-top:0}
+[data-k=ob-1] .o1-z.o1-zw{margin-top:20px}
 [data-k=ob-1] .o1-z.set{transform:translateY(1px)}
 /* engraved: a dark bite above the strokes and a hair of light under them, so the words read cut into the wall */
 [data-k=ob-1] .o1-z.set .o1-num,[data-k=ob-1] .o1-z.set .o1-mid,[data-k=ob-1] .o1-z.set .o1-big,
 [data-k=ob-1] .o1-z.set .o1-when b{color:rgba(var(--ink),.98);
-  text-shadow:0 -1px 0 rgba(0,0,0,.95),0 1px 0 rgba(var(--ink),.26)}
+  text-shadow:0 -1px 0 rgba(0,0,0,.95),0 1px 0 rgba(var(--ink),.19)}
 [data-k=ob-1] .o1-z.set .o1-sm,[data-k=ob-1] .o1-z.set .o1-when i,[data-k=ob-1] .o1-z.set .o1-when s{
   text-shadow:0 -1px 0 rgba(0,0,0,.9),0 1px 0 rgba(var(--ink),.16)}
-/* lit keeps the hierarchy: the fact goes to full light, its small words stay one step behind */
-[data-k=ob-1] .o1-z.set .o1-when i,[data-k=ob-1] .o1-z.set .o1-when s{color:rgba(var(--ink),.72)}
 
-[data-k=ob-1] .o1-foot{position:absolute;left:22px;right:22px;bottom:30px}
-[data-k=ob-1] .o1-cta{display:block;width:100%;border:0;border-radius:13px;background:rgba(19,22,28,.94);
-  -webkit-backdrop-filter:blur(28px) saturate(1.4);backdrop-filter:blur(28px) saturate(1.4);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.06);color:rgba(var(--ink),.90);
-  font-family:inherit;font-weight:500;font-size:16px;letter-spacing:-.015em;padding:16px;
-  font-variant-numeric:tabular-nums;
-  text-align:center;cursor:default;transition:background .22s ease-out,color .22s ease-out,box-shadow .22s ease-out,transform .16s ease-out}
-[data-k=ob-1] .o1-cta.live{background:rgba(235,238,248,.94);color:#0b0c10;font-weight:700;letter-spacing:-.02em;cursor:pointer;box-shadow:none}
-[data-k=ob-1] .o1-cta.live:active{transform:scale(.985);background:rgba(235,238,248,.84)}
-[data-k=ob-1] .o1-foot p{margin:12px 0 0;text-align:center;font-size:12px;letter-spacing:-.005em;color:rgba(var(--ink),.66)}
+/* ---- the foot: one hold, one line under it, nothing else ---- */
+[data-k=ob-1] .o1-foot{position:absolute;left:24px;right:24px;bottom:32px}
+[data-k=ob-1] .o1-cta{position:relative;display:block;width:100%;height:54px;overflow:hidden;
+  /* no backdrop-filter here on purpose: a blurred backdrop inside an overflow-clipped button
+     drops the radius on WebKit, and at .94 over near-black it buys nothing */
+  border:0;border-radius:14px;background:rgba(19,22,28,.94);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.06);
+  font-family:inherit;padding:0;cursor:default;-webkit-tap-highlight-color:transparent;
+  -webkit-user-select:none;user-select:none;
+  transition:background .24s ease-out,box-shadow .24s ease-out,transform .16s cubic-bezier(.2,.7,.3,1)}
+[data-k=ob-1] .o1-cta.live{cursor:pointer}
+[data-k=ob-1] .o1-cta:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:3px}
+/* the hold: light fills the button left to right, the label inverts exactly where the light has reached.
+   letting go before it lands takes the light straight back. */
+[data-k=ob-1] .o1-fill{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(235,238,248,.94);
+  transition:width .2s cubic-bezier(.2,.7,.3,1)}
+[data-k=ob-1] .o1-lab{position:relative;display:flex;align-items:center;justify-content:center;
+  height:100%;font-size:16px;font-weight:500;letter-spacing:-.015em;color:rgba(var(--ink),.72);
+  transition:color .24s ease-out}
+[data-k=ob-1] .o1-cta.live .o1-lab{color:rgba(var(--ink),.96);font-weight:700;letter-spacing:-.02em}
+[data-k=ob-1] .o1-inv{position:absolute;left:0;top:0;bottom:0;width:0;overflow:hidden;pointer-events:none;
+  transition:width .2s cubic-bezier(.2,.7,.3,1)}
+[data-k=ob-1] .o1-inv span{position:absolute;left:0;top:0;bottom:0;display:flex;align-items:center;
+  justify-content:center;color:#0b0c10;font-size:16px;font-weight:700;letter-spacing:-.02em}
+[data-k=ob-1] .o1-cta.holding .o1-fill,[data-k=ob-1] .o1-cta.holding .o1-inv{width:100%;transition:width .78s linear}
+[data-k=ob-1] .o1-cta.done{background:rgba(235,238,248,.94);box-shadow:none}
+[data-k=ob-1] .o1-cta.done .o1-fill,[data-k=ob-1] .o1-cta.done .o1-inv{width:100%;transition:none}
+[data-k=ob-1] .o1-cta.done{transform:scale(.995)}
+[data-k=ob-1] .o1-foot p{margin:14px 0 0;text-align:center;font-size:12.5px;letter-spacing:-.005em;
+  color:rgba(var(--ink),.62);transition:color .24s ease-out}
 @media (prefers-reduced-motion:reduce){
   [data-k=ob-1] .o1-cta,[data-k=ob-1] .o1-z,[data-k=ob-1] .o1-z>*,
-  [data-k=ob-1] .o1-m,[data-k=ob-1] .o1-m svg{transition:none}}
+  [data-k=ob-1] .o1-halo,[data-k=ob-1] .o1-lab{transition:none}
+  [data-k=ob-1] .o1-cta.holding .o1-fill,[data-k=ob-1] .o1-cta.holding .o1-inv{transition:width .78s linear}}
 </style>
-<h3>Wall of intent</h3><p class="cap">No card, no container: the star is the screen, each line rests dim until you press it into the wall, and the button only lives once all three are lit.</p>
+<h3>Wall of intent</h3><p class="cap">No card, no container: the star is the screen. Each line rests dim and out of focus until you press it into the wall, and the wall itself lights a step brighter each time. The confirm is a hold.</p>
 <div class="bk"><i>All seven buckets</i></div>
-<div class="ph">
+<div class="ph" data-lit="0">
   <div class="grid"></div>
   <div class="o1-halo"></div>
   <div class="o1-type">
@@ -83,7 +114,7 @@
     </button>
     <button class="o1-z o1-so" type="button" aria-pressed="false">
       <span class="o1-sm">so I can</span>
-      <span class="o1-big">quit the<br>warehouse</span>
+      <span class="o1-big">quit the warehouse</span>
     </button>
     <span class="o1-rule"></span>
     <button class="o1-z o1-zw" type="button" aria-pressed="false">
@@ -95,27 +126,64 @@
     </p>
   </div>
   <div class="o1-foot">
-    <button class="o1-cta" type="button">3 lines left</button>
+    <button class="o1-cta" type="button" aria-disabled="true">
+      <span class="o1-fill" aria-hidden="true"></span>
+      <span class="o1-lab">This is it</span>
+      <span class="o1-inv" aria-hidden="true"><span>This is it</span></span>
+    </button>
     <p class="o1-sub">Tap each line to confirm</p>
   </div>
 </div>
 <script>
 (function(){
   var r=document.querySelector('[data-k=ob-1]'); if(!r||r.dataset.wired) return; r.dataset.wired=1;
-  var zs=[].slice.call(r.querySelectorAll('.o1-z')), cta=r.querySelector('.o1-cta'), sub=r.querySelector('.o1-sub');
+  var ph=r.querySelector('.ph'),
+      zs=[].slice.call(r.querySelectorAll('.o1-z')), cta=r.querySelector('.o1-cta'),
+      sub=r.querySelector('.o1-sub'), fill=r.querySelector('.o1-fill'),
+      inv=r.querySelector('.o1-inv'), invLab=inv.firstElementChild;
+  var holding=false, done=false;
+
+  function measure(){ invLab.style.width=cta.offsetWidth+'px'; }
+  function lit(){ return zs.filter(function(z){return z.classList.contains('set');}).length; }
   function sync(){
-    var n=zs.filter(function(z){return z.classList.contains('set');}).length, left=zs.length-n;
-    if(left===0){ cta.classList.add('live'); cta.textContent='This is it'; sub.textContent='Change it later in Clarity'; }
-    else{ cta.classList.remove('live');
-      /* the button carries state only, the one instruction sentence lives under it and never changes */
-      cta.textContent = left+(left===1?' line left':' lines left');
-      sub.textContent = 'Tap each line to confirm'; }
+    var n=lit(), ready=(n===zs.length);
+    ph.setAttribute('data-lit',String(n));
+    cta.classList.toggle('live',ready&&!done);
+    cta.setAttribute('aria-disabled',ready?'false':'true');
+    if(done) sub.textContent='Change it later in Clarity';
+    else sub.textContent = ready ? 'Press and hold' : 'Tap each line to confirm';
   }
+  function stop(){ if(!holding) return; holding=false; cta.classList.remove('holding'); }
+  function start(){
+    if(done||!cta.classList.contains('live')||holding) return;
+    measure(); holding=true;
+    /* force the 0 width to commit before the long fill starts */
+    void fill.offsetWidth; cta.classList.add('holding');
+  }
+  fill.addEventListener('transitionend',function(e){
+    if(e.propertyName!=='width'||!holding) return;
+    holding=false; done=true;
+    cta.classList.remove('holding','live'); cta.classList.add('done');
+    zs.forEach(function(z){ z.style.pointerEvents='none'; });
+    sync();
+  });
+
+  cta.addEventListener('pointerdown',function(e){ e.preventDefault(); start(); });
+  ['pointerup','pointercancel','pointerleave'].forEach(function(ev){
+    cta.addEventListener(ev,stop);
+  });
+  cta.addEventListener('keydown',function(e){ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); start(); } });
+  cta.addEventListener('keyup',function(e){ if(e.key===' '||e.key==='Enter') stop(); });
+  cta.addEventListener('blur',stop);
+
   zs.forEach(function(z){ z.addEventListener('click',function(){
+    if(done) return;
     var on=!z.classList.contains('set');
-    z.classList.toggle('set',on); z.setAttribute('aria-pressed',on?'true':'false'); sync();
+    z.classList.toggle('set',on); z.setAttribute('aria-pressed',on?'true':'false');
+    if(!on){ stop(); }
+    sync();
   }); });
-  sync();
+  measure(); sync();
 })();
 </script>
 </section>

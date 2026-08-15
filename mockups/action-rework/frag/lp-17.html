@@ -12,17 +12,17 @@
 [data-k=lp-17] .l17-say{margin:14px 0 0;font-size:26px;font-weight:700;letter-spacing:-.027em;line-height:1.28;
   color:var(--text-hi)}
 [data-k=lp-17] .l17-say .tail{white-space:nowrap}
-[data-k=lp-17] .l17-tok{display:inline-flex;align-items:center;gap:6px;padding:1px 8px 3px;margin:0 1px;
-  border:0;border-radius:9px;background:rgba(var(--ink),.09);box-shadow:inset 0 1px 0 rgba(var(--ink),.10);
+[data-k=lp-17] .l17-tok{display:inline-flex;align-items:center;gap:6px;padding:0 1px 3px;margin:0;
+  border:0;background:none;box-shadow:inset 0 -2px 0 rgba(var(--ink),.30);
   color:var(--text-hi);font:700 26px/1.05 var(--font);letter-spacing:-.027em;font-variant-numeric:tabular-nums;
-  cursor:pointer;vertical-align:baseline;transition:background .16s ease-out}
+  cursor:pointer;vertical-align:baseline;transition:box-shadow .16s ease-out}
 [data-k=lp-17] .l17-tok svg{width:10px;height:10px;stroke:rgba(var(--ink),.55);stroke-width:2.4;fill:none;
   stroke-linecap:round;stroke-linejoin:round;transition:transform .2s ease-out}
-[data-k=lp-17] .l17.editing .l17-tok{background:rgba(63,217,78,.16)}
+[data-k=lp-17] .l17.editing .l17-tok{box-shadow:inset 0 -2px 0 #3fd94e}
 [data-k=lp-17] .l17.editing .l17-tok svg{transform:rotate(180deg)}
 
 [data-k=lp-17] .l17.signed .l17-edit{display:none}
-[data-k=lp-17] .l17.signed .l17-tok{background:rgba(var(--ink),.05);box-shadow:none;cursor:default;pointer-events:none}
+[data-k=lp-17] .l17.signed .l17-tok{box-shadow:none;cursor:default;pointer-events:none}
 [data-k=lp-17] .l17.signed .l17-tok svg{display:none}
 /* THREE proposed ceilings in front. The 10 minute stepper only appears behind "more" */
 [data-k=lp-17] .l17-edit{display:none;margin-top:11px}
@@ -47,11 +47,11 @@
   box-shadow:inset 0 1px 0 rgba(var(--ink),.09);cursor:pointer}
 [data-k=lp-17] .l17-fine button svg{display:block;stroke:rgba(var(--ink),.90);stroke-width:1.8;stroke-linecap:round}
 [data-k=lp-17] .l17-fine button:disabled{opacity:.38;cursor:default}
-[data-k=lp-17] .l17-more{margin-top:8px;border:0;border-radius:10px;padding:7px 15px;
-  background:rgba(22,25,31,.92);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.07);color:rgba(var(--ink),.80);font:500 12px/1 var(--font);
-  cursor:pointer;transition:color .16s ease-out,background .16s ease-out}
-[data-k=lp-17] .l17-more:hover,[data-k=lp-17] .l17-more.on{color:rgba(var(--ink),.96);background:rgba(30,34,42,.94)}
+/* the escape hatch is a quiet word, not a fourth box language */
+[data-k=lp-17] .l17-more{margin-top:9px;border:0;border-radius:8px;padding:6px 8px 6px 0;
+  background:none;color:rgba(var(--ink),.80);font:500 12px/1 var(--font);
+  cursor:pointer;transition:color .16s ease-out}
+[data-k=lp-17] .l17-more:hover,[data-k=lp-17] .l17-more.on{color:rgba(var(--ink),.96)}
 [data-k=lp-17] .l17-edit:not(.free) .l17-fine{display:none}
 [data-k=lp-17] .l17-edit.free .l17-three{display:none}
 
@@ -59,7 +59,11 @@
 [data-k=lp-17] .l17-today{margin-top:14px;border-radius:14px;padding:12px 14px 13px;background:rgba(22,25,31,.95);
   -webkit-backdrop-filter:blur(26px) saturate(1.35);backdrop-filter:blur(26px) saturate(1.35);
   box-shadow:inset 0 1px 0 rgba(var(--ink),.09)}
-[data-k=lp-17] .l17-today .k{font-size:12.5px;line-height:1;color:rgba(var(--ink),.86)}
+/* the label only exists once the slot's own words are gone: "Tonight's total"
+   above a button that reads "Write in tonight's total" was the same sentence twice */
+[data-k=lp-17] .l17-today .k{display:none;font-size:12.5px;line-height:1;color:rgba(var(--ink),.86)}
+[data-k=lp-17] .l17.entered .l17-today .k{display:block}
+[data-k=lp-17] .l17:not(.entered) .l17-slot{margin-top:0}
 [data-k=lp-17] .l17-slot{display:flex;align-items:center;gap:10px;width:100%;height:44px;margin-top:9px;padding:0 12px;
   border:0;border-radius:11px;background:rgba(var(--ink),.05);box-shadow:inset 0 1px 0 rgba(var(--ink),.06);
   font-family:var(--font);cursor:pointer;transition:background .14s ease-out}
@@ -104,9 +108,13 @@
 /* the ceiling picker borrows the room from the oldest entries, nothing overflows */
 [data-k=lp-17] .l17.editing .l17-row:nth-last-child(-n+1){display:none}
 
-[data-k=lp-17] .l17-cta{width:100%;height:50px;border:0;border-radius:14px;background:rgba(235,238,248,.94);
-  color:#0b0c10;font:700 15.5px var(--font);letter-spacing:-.01em;cursor:pointer;
+[data-k=lp-17] .l17-cta{position:relative;width:100%;height:50px;border:0;border-radius:14px;overflow:hidden;
+  background:rgba(235,238,248,.94);color:#0b0c10;font:700 15.5px var(--font);letter-spacing:-.01em;
+  cursor:pointer;touch-action:none;-webkit-user-select:none;user-select:none;
   transition:background .14s ease-out,transform .09s ease-out}
+[data-k=lp-17] .l17-cta b{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(63,217,78,.55)}
+[data-k=lp-17] .l17-cta.go b{width:100%;transition:width 1.05s linear}
+[data-k=lp-17] .l17-cta span{position:relative}
 [data-k=lp-17] .l17-cta:active{background:rgba(206,211,226,.94);transform:translateY(1px)}
 [data-k=lp-17] .l17-held{display:none;align-items:center;gap:9px;height:50px;font-size:13.5px;
   color:rgba(var(--ink),.92)}
@@ -151,7 +159,7 @@
       </div>
       <button class="l17-save" type="button">Save 1h 47m</button>
       <div class="l17-res"><div class="u">1h 47m</div></div>
-      <p class="l17-src">You read this off your phone&#8217;s Screen Time report.</p>
+      <p class="l17-src">From your Screen Time report.</p>
     </div>
 
     <div class="l17-acc">
@@ -166,7 +174,7 @@
 
     <div class="l17-sp"></div>
 
-    <button class="l17-cta" type="button">Say it for today</button>
+    <button class="l17-cta" type="button"><b></b><span>Hold to say it for today</span></button>
     <div class="l17-held"><i></i><span class="ht">The ceiling is 2h 00m.</span></div>
   </div>
 </div>
@@ -213,12 +221,12 @@
   /* entry: starts at their own last entry, moves in 5 minute steps, banks into the rows */
   slot.addEventListener('click',function(){if(entered)return;root.classList.add('typing');
     root.classList.remove('editing');
-    src.textContent='Open Settings, Screen Time, and read today’s total. Then match it here.';});
+    src.textContent='Read today’s total in Settings, Screen Time.';});
   stp.querySelector('.up').addEventListener('click',function(){typed=Math.min(900,typed+5);paint();});
   stp.querySelector('.dn').addEventListener('click',function(){typed=Math.max(0,typed-5);paint();});
   save.addEventListener('click',function(){
     entered=true;root.classList.remove('typing');root.classList.add('entered');
-    src.textContent='You entered this at '+stamp()+', from your Screen Time report.';
+    src.textContent='Entered at '+stamp()+', from your Screen Time report.';
     var r=document.createElement('div');r.className='l17-row';
     r.innerHTML='<div class="d">Tue 12 Aug</div><div class="v">'+fmt(typed)+'</div>';
     rows.insertBefore(r,rows.firstChild);
@@ -226,8 +234,19 @@
     c.querySelector('.l17-acc h4').textContent='What you entered, tonight first';
     paint();});
 
-  cta.addEventListener('click',function(){signed=true;saidAt=stamp();
-    root.classList.add('signed');root.classList.remove('editing');paint();});
+  /* HOLD to say it: the fill runs, an early release says nothing */
+  var ht=null;
+  function sayIt(){signed=true;saidAt=stamp();cta.classList.remove('go');
+    root.classList.add('signed');root.classList.remove('editing');paint();}
+  function holdOn(e){if(signed)return;
+    if(e&&e.pointerId!=null){try{cta.setPointerCapture(e.pointerId)}catch(z){}}
+    cta.classList.add('go');ht=setTimeout(sayIt,1050);}
+  function holdOff(){if(signed)return;clearTimeout(ht);cta.classList.remove('go');}
+  cta.addEventListener('pointerdown',holdOn);
+  ['pointerup','pointerleave','pointercancel'].forEach(function(ev){cta.addEventListener(ev,holdOff)});
+  cta.addEventListener('keydown',function(e){
+    if((e.key==='Enter'||e.key===' ')&&!e.repeat){e.preventDefault();holdOn();}});
+  cta.addEventListener('keyup',holdOff);
   paint();
 })();</script>
 </section>
