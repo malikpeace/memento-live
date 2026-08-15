@@ -1,23 +1,21 @@
 <!-- ARCHETYPES, the surviving set: lp-1 full-bleed statement type | lp-6 vertical descent rail | lp-7 poster ceiling number |
-     lp-8 hundred-mark field | lp-9 ruled ledger book | lp-10 receipt tape | lp-12 full-height week columns |
-     lp-15 bottom sheet first | lp-16 wide pen band over the move | lp-17 declarative sentence over own nights |
+     lp-8 hundred-mark field | lp-9 single ruled page | lp-10 receipt tape | lp-12 full-height week columns |
+     lp-15 bottom sheet first | lp-16 wide pen band over the move | lp-17 declarative sentence |
      lp-18 centered monolith numeral -->
 <section class="cell" data-k="lp-17">
-<!-- TIGHTENED RULE (Malik, 2026-08-15): "it is showing too much information."
-     An Action screen shows TODAY. Nothing on it may tell them how far along
-     they are.
-     KEPT: the statement, which is the whole screen, and the ceiling inside it
-     they tap to set tonight's size, and the pen for tonight's own total.
-     CUT: the goal line above the statement ("Phone screen time, since 2 June").
-     The statement already names the goal, so the line was the same fact twice,
-     and its start date was a piece of the journey, which is Clarity's.
-     CHANGED: the nights they typed were a column of figures with a heading
-     that read like a bank statement. They are now RAW BARS, one per night,
-     each as long as the number they wrote, scaled to their own longest night
-     and nothing else. There is no ceiling tick across them, no under or over,
-     no colour verdict and no line of best fit, because every one of those is a
-     reading of the goal or of the week. It is only what they typed, at a size
-     you can see. Tonight's entry joins the top of the stack when they save it. -->
+<!-- THE PEN STAYS, THE BOOKS GO (Malik, 2026-08-15, the settled flow).
+     THE ACCOUNT IS GONE. The nights they typed stood as raw bars under the
+     statement, and even with nothing drawn across them a stack of nights is a
+     record, read down the page as a run of good and bad ones. That reading is
+     Consistency's face, one swipe away. The heading over them went with them.
+     Earlier the same rule took the goal line above the statement, whose start
+     date was a piece of the journey.
+
+     WHAT REMAINS is the sentence and the pen, which is the whole point of the
+     screen: tonight's ceiling is a word inside the sentence you tap to swap for
+     one of three, the pen writes tonight's own total, and the hold says it for
+     today. With the account gone the sentence takes the room, sitting a third
+     of the way down an otherwise empty screen with the gesture on the floor. -->
 <style>
 [data-k=lp-17] .l17{position:absolute;inset:0;display:flex;flex-direction:column;padding:38px 18px 22px;
   font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent}
@@ -106,26 +104,10 @@
 [data-k=lp-17] .l17.entered .l17-slot{display:none}
 [data-k=lp-17] .l17-res .u{font-size:20px;font-weight:700;letter-spacing:-.02em;color:var(--text-hi)}
 
-/* --- the nights they typed, as raw bars ---------------------------------
-   Length is the number they wrote, scaled to their own longest night. There is
-   no ceiling drawn across them and no verdict on any of them: this is the
-   record of what they entered, not a reading of it. */
-[data-k=lp-17] .l17-acc{margin-top:16px}
-[data-k=lp-17] .l17-acc h4{margin:0 0 10px;font-size:12.5px;font-weight:500;line-height:1;color:rgba(var(--ink),.86)}
-[data-k=lp-17] .l17-bars{display:flex;flex-direction:column;gap:9px}
-[data-k=lp-17] .l17-b{display:flex;align-items:center;gap:10px;font-size:12px;color:rgba(var(--ink),.86)}
-[data-k=lp-17] .l17-b .d{flex:none;width:46px}
-[data-k=lp-17] .l17-b .t{position:relative;flex:1;height:7px;border-radius:999px;background:rgba(var(--ink),.09)}
-[data-k=lp-17] .l17-b .t i{position:absolute;left:0;top:0;bottom:0;border-radius:999px;
-  background:rgba(var(--ink),.44);transition:width .34s cubic-bezier(.2,.7,.2,1)}
-[data-k=lp-17] .l17-b .v{flex:none;width:48px;text-align:right;font-weight:500;color:var(--text-hi)}
-[data-k=lp-17] .l17-b.new .t i{background:rgba(var(--ink),.88)}
-[data-k=lp-17] .l17-b.new .d{color:var(--text-hi)}
-
-/* the void the cut goal line left is SPLIT, not dumped under the bars: the
-   statement drops off the very top and the gesture keeps its floor */
-[data-k=lp-17] .l17-sp0{flex:.55;min-height:0}
-[data-k=lp-17] .l17-sp{flex:1;min-height:10px}
+/* the room the account left is SPLIT, not dumped in one place: the statement
+   drops a third of the way down and the gesture keeps its floor */
+[data-k=lp-17] .l17-sp0{flex:.8;min-height:0}
+[data-k=lp-17] .l17-sp{flex:1.35;min-height:10px}
 
 [data-k=lp-17] .l17-cta{position:relative;width:100%;height:50px;border:0;border-radius:14px;overflow:hidden;
   background:rgba(235,238,248,.94);color:#0b0c10;font:700 15.5px var(--font);letter-spacing:-.01em;
@@ -142,7 +124,7 @@
 [data-k=lp-17] .l17.signed .l17-held{display:flex}
 </style>
 <h3>The statement</h3>
-<p class="cap">The ceiling is not an object here, it is a sentence you say about tonight, and the number is a word inside it you tap to swap for one of three proposed ceilings. Under it, the nights you typed in yourself stand as raw bars with nothing drawn across them.</p>
+<p class="cap">The ceiling is not an object here, it is a sentence you say about tonight, and the number is a word inside it you tap to swap for one of three proposed ceilings. Nothing stands under it but the pen for tonight's own total.</p>
 <div class="bk"><i>Screen time</i></div>
 <div class="ph">
   <div class="grid"></div>
@@ -180,11 +162,6 @@
       <p class="l17-src">From your Screen Time report.</p>
     </div>
 
-    <div class="l17-acc">
-      <h4>Nights you typed</h4>
-      <div class="l17-bars"></div>
-    </div>
-
     <div class="l17-sp"></div>
 
     <button class="l17-cta" type="button"><b></b><span>Hold to say it for today</span></button>
@@ -195,30 +172,17 @@
   var c=document.currentScript.closest('.cell');
   var root=c.querySelector('.l17'),tok=c.querySelector('.l17-tok'),tv=c.querySelector('.l17-tok .tv'),
       up=c.querySelector('.l17-edit .up'),dn=c.querySelector('.l17-edit .dn'),
-      held=c.querySelector('.l17-held .ht'),bars=c.querySelector('.l17-bars'),
-      cta=c.querySelector('.l17-cta'),
+      held=c.querySelector('.l17-held .ht'),cta=c.querySelector('.l17-cta'),
       edit=c.querySelector('.l17-edit'),three=c.querySelector('.l17-three'),more=c.querySelector('.l17-more'),
       slot=c.querySelector('.l17-slot'),stp=c.querySelector('.l17-stp'),sv=c.querySelector('.l17-stp .sv'),
       save=c.querySelector('.l17-save'),resU=c.querySelector('.l17-res .u'),
       src=c.querySelector('.l17-src');
   var ceil=120,typed=107,signed=false,free=false,entered=false,THREE=[90,120,150];
   var saidAt='';
-  /* the only history on this screen: five nights they read off their own phone
-     and typed in. Nothing is measured, nothing is compared. */
-  var NIGHTS=[{d:'Mon 11',m:107},{d:'Sun 10',m:151},{d:'Sat 9',m:98},{d:'Fri 8',m:112},{d:'Thu 7',m:132}];
+  /* no night but tonight's exists on this screen: the number they type is the
+     only figure here, and there is nothing beside it to read it against */
 
   function fmt(m){var h=Math.floor(m/60),r=m%60;return h?(h+'h '+String(r).padStart(2,'0')+'m'):(r+'m');}
-  /* bars are scaled to their own longest night, never to the ceiling */
-  function drawBars(){
-    var max=1,i;for(i=0;i<NIGHTS.length;i++)max=Math.max(max,NIGHTS[i].m);
-    bars.textContent='';
-    NIGHTS.forEach(function(n){
-      var el=document.createElement('div');el.className='l17-b'+(n.now?' new':'');
-      el.innerHTML='<span class="d">'+n.d+'</span><span class="t"><i style="width:'+
-        (n.m/max*100).toFixed(1)+'%"></i></span><span class="v">'+fmt(n.m)+'</span>';
-      bars.appendChild(el);
-    });
-  }
   /* any time this screen states is the clock at the moment they tapped, nothing else */
   function stamp(){var d=new Date(),h=d.getHours(),m=d.getMinutes(),ap=h>=12?'pm':'am';
     return (h%12||12)+':'+String(m).padStart(2,'0')+ap;}
@@ -255,9 +219,7 @@
   save.addEventListener('click',function(){
     entered=true;root.classList.remove('typing');root.classList.add('entered');
     src.textContent='Entered at '+stamp()+', from your Screen Time report.';
-    NIGHTS.unshift({d:'Tonight',m:typed,now:true});
-    if(NIGHTS.length>5)NIGHTS.pop();
-    drawBars();paint();});
+    paint();});
 
   /* HOLD to say it: the fill runs, an early release says nothing */
   var ht=null;
@@ -272,6 +234,6 @@
   cta.addEventListener('keydown',function(e){
     if((e.key==='Enter'||e.key===' ')&&!e.repeat){e.preventDefault();holdOn();}});
   cta.addEventListener('keyup',holdOff);
-  drawBars();paint();
+  paint();
 })();</script>
 </section>

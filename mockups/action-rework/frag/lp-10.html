@@ -1,20 +1,24 @@
 <!-- ARCHETYPES, the surviving set: lp-1 full-bleed statement type | lp-6 vertical descent rail | lp-7 poster ceiling number |
-     lp-8 hundred-mark field | lp-9 ruled ledger book | lp-10 receipt tape | lp-12 full-height week columns |
-     lp-15 bottom sheet first | lp-16 horizontal corridor band | lp-17 declarative sentence over account rows |
+     lp-8 hundred-mark field | lp-9 single ruled page | lp-10 receipt tape | lp-12 full-height week columns |
+     lp-15 bottom sheet first | lp-16 horizontal corridor band | lp-17 declarative sentence |
      lp-18 centered monolith numeral -->
 <section class="cell" data-k="lp-10">
-<!-- TIGHTENED RULE (Malik, 2026-08-15). "It is showing too much information."
-     An Action screen shows TODAY. Nothing on it may say how far along the
-     journey they are.
-     CUT: "20 days left" in the slot (a countdown on their deadline), the
-     target in the title ("100 deep work sessions") and in the line under it
-     ("all 100 before 1 September"), and the "87 of 100" footer. All four were
-     the same distance read four ways, and every one of them belongs to
-     Clarity's face.
-     LEFT: the tape itself, which is the record of the lines they printed with
-     the numbers they earned, today's line sitting at the head, the length they
-     pick for it and what that means for today, and the count of lines already
-     printed with nothing to read it against. -->
+<!-- THE PEN STAYS, THE BOOKS GO (Malik, 2026-08-15, the settled flow).
+     THE PRINTED PAST IS GONE. Eight readable sessions above the head, each with
+     its length and its date, is a record you read down: it is the ledger again,
+     rolled sideways. The line numbers went with it, because a number on a line
+     is a count of everything before it, and so did the "87 lines printed"
+     footer, which was that count said out loud.
+
+     WHAT REMAINS is the machine and today's line in it. The tape above the head
+     is blank stock now, perforated at the same pitch and fading out under the
+     mask: it says the roll continues without saying what is written on it. The
+     one line with words on it is TODAY'S, sitting at the head, carrying the
+     length they chose and the date. Holding the feed pulls the tape through by
+     exactly one line and prints it, and then the head rests on blank stock
+     again, because nothing else prints today.
+     The tape got the room the footer and the rule gave back, so the machine is
+     now most of the screen instead of a strip above a summary. -->
 <style>
 [data-k=lp-10] .ph{font-variant-numeric:tabular-nums}
 [data-k=lp-10] .slot{position:absolute;left:0;right:0;top:0;height:34px;background:#05060a;
@@ -30,15 +34,15 @@
 [data-k=lp-10] .sub{position:absolute;left:18px;right:18px;top:42px;font-size:12px;line-height:1.4;color:rgba(var(--ink),.90)}
 [data-k=lp-10] .hr{position:absolute;left:18px;right:18px;height:1px;background:rgba(var(--ink),.075)}
 
-/* the printed lines: the tape is the screen, so it gets the room the cut
-   explainer and the duplicate total used to take */
-[data-k=lp-10] .vp{position:absolute;left:0;right:0;top:78px;height:196px;overflow:hidden;
-  -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 26px,#000 100%);
-  mask-image:linear-gradient(180deg,transparent 0,#000 26px,#000 100%)}
+/* the roll: blank stock, perforated at the line pitch. It carries no reading,
+   it only says the tape continues off the top of the screen */
+[data-k=lp-10] .vp{position:absolute;left:0;right:0;top:78px;height:250px;overflow:hidden;
+  -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 40px,#000 100%);
+  mask-image:linear-gradient(180deg,transparent 0,#000 40px,#000 100%)}
 [data-k=lp-10] .stack{position:absolute;left:0;right:0;top:0}
-[data-k=lp-10] .r{position:relative;height:28px;display:grid;grid-template-columns:30px 1fr auto 16px;
-  align-items:center;gap:8px;padding:0 18px;font-size:12.5px;color:rgba(var(--ink),.90)}
-[data-k=lp-10] .r i{font-style:normal;color:rgba(var(--ink),.60)}
+[data-k=lp-10] .r{position:relative;height:28px;display:grid;grid-template-columns:1fr auto 16px;
+  align-items:center;gap:8px;padding:0 18px;font-size:12.5px;color:rgba(var(--ink),.90);
+  box-shadow:inset 0 -1px 0 rgba(var(--ink),.045)}
 [data-k=lp-10] .r em{font-style:normal;color:rgba(var(--ink),.86)}
 [data-k=lp-10] .r svg{width:12px;height:12px;fill:none;stroke:#3fd94e;stroke-width:2.6;stroke-linecap:round;
   stroke-linejoin:round;opacity:0}
@@ -46,24 +50,21 @@
 [data-k=lp-10] .r.now{font-weight:500;color:rgba(var(--ink),.97)}
 [data-k=lp-10] .r.now:before{content:"";position:absolute;left:10px;right:10px;top:1px;bottom:1px;
   border-radius:7px;background:rgba(var(--ink),.06);z-index:-1}
-[data-k=lp-10] .r.now i{color:rgba(63,217,78,.95)}
 [data-k=lp-10] .r.now em{color:#3fd94e}
-[data-k=lp-10] .r.wait{color:rgba(var(--ink),.62)}
-[data-k=lp-10] .r.wait em{color:rgba(var(--ink),.58)}
 
 /* print head */
-[data-k=lp-10] .head{position:absolute;left:0;right:0;top:274px;height:2px;background:rgba(63,217,78,.55)}
+[data-k=lp-10] .head{position:absolute;left:0;right:0;top:328px;height:2px;background:rgba(63,217,78,.55)}
 [data-k=lp-10] .head:before{content:"";position:absolute;left:0;top:-8px;width:9px;height:18px;
   border-radius:0 3px 3px 0;background:#3fd94e}
 [data-k=lp-10] .head:after{content:"";position:absolute;right:0;top:-8px;width:9px;height:18px;
   border-radius:3px 0 0 3px;background:rgba(63,217,78,.55)}
 /* the quiet line under the head: empty until there is something true to say,
    its height reserved so nothing below it ever jumps */
-[data-k=lp-10] .lab{position:absolute;left:18px;right:18px;top:286px;height:17px;font-size:12px;
+[data-k=lp-10] .lab{position:absolute;left:18px;right:18px;top:340px;height:17px;font-size:12px;
   line-height:17px;color:rgba(var(--ink),.90)}
 
 /* what is about to print */
-[data-k=lp-10] .ops{position:absolute;left:14px;right:14px;top:314px;border-radius:12px;overflow:hidden;
+[data-k=lp-10] .ops{position:absolute;left:14px;right:14px;top:372px;border-radius:12px;overflow:hidden;
   background:rgba(var(--ink),.05)}
 [data-k=lp-10] .op{position:relative;width:100%;height:38px;display:grid;grid-template-columns:1fr auto;
   align-items:center;padding:0 13px 0 15px;border:0;background:transparent;text-align:left;cursor:pointer;
@@ -80,13 +81,8 @@
   background:rgba(var(--ink),.07);box-shadow:inset 0 -1px 0 rgba(var(--ink),.05)}
 [data-k=lp-10] .pd em{font-style:normal;color:#3fd94e}
 [data-k=lp-10] .pd2{padding:11px 15px 12px;font-size:12px;line-height:1.45;color:rgba(var(--ink),.90)}
-[data-k=lp-10] .cons{position:absolute;left:18px;right:18px;top:440px;margin:0;font-size:12.5px;
+[data-k=lp-10] .cons{position:absolute;left:18px;right:18px;top:500px;margin:0;font-size:12.5px;
   line-height:1.45;color:rgba(var(--ink),.90)}
-/* ONE total. "13 left" was the same fact subtracted, and two label stacks
-   made a footer out of a line. */
-[data-k=lp-10] .tot{position:absolute;left:18px;right:18px;top:506px;display:flex;align-items:baseline;gap:8px}
-[data-k=lp-10] .tot span{font-size:11.5px;color:rgba(var(--ink),.84)}
-[data-k=lp-10] .tot b{font-size:16px;font-weight:700;letter-spacing:-.015em;color:rgba(var(--ink),.96)}
 
 /* feed */
 [data-k=lp-10] .feed{position:absolute;left:14px;right:14px;bottom:16px;height:52px;border:0;border-radius:14px;
@@ -99,7 +95,7 @@
   box-shadow:inset 0 1px 0 rgba(var(--ink),.09);cursor:default}
 [data-k=lp-10] .feed.done .fill{display:none}
 </style>
-<h3>The tape</h3><p class="cap">A milestone kept as a receipt tape of identical lines: session number, the length you chose, the date. Every session done is already printed above the head, today is the single line sitting at it, and holding the feed pulls the tape through by exactly one line.</p>
+<h3>The tape</h3><p class="cap">Today's work as a line in a machine: blank stock runs off the top of the screen, the one line with words on it is today's sitting at the print head, and holding the feed pulls the tape through by exactly one line.</p>
 <div class="bk" id="l10bk">
   <button class="on" type="button" data-b="ship">Ship the project</button>
   <button type="button" data-b="school">School &amp; career</button>
@@ -121,69 +117,54 @@
 
     <div class="ops" id="l10ops"></div>
     <p class="cons" id="l10cons"></p>
-    <div class="hr" style="top:492px"></div>
-
-    <div class="tot"><b id="l10p">87</b><span>lines printed</span></div>
 
     <button class="feed" id="l10feed"><span class="fill" id="l10fill"></span><span class="t" id="l10cap">Hold to print the line</span></button>
   </div>
 </div>
 <script>(function(){var r=document.querySelector('[data-k="lp-10"]');if(!r)return;
 var CHK='<svg viewBox="0 0 24 24"><path d="M4 13l5 5L20 7"/></svg>';
-/* Every number below is one thing only: the lines they logged. No goal total and no
-   deadline live on this screen, so nothing on it can be read as a distance. */
+/* Nothing on this screen is a record of anything but today: the stock above the
+   head is blank, so there is no total, no line number and no distance in it. */
 var B={
- ship:{who:'Deep work',ttl:'Deep work sessions',
-   sub:'One line for each session.',done:87,pick:1,
-   past:[['4 hours','Aug 1'],['4 hours','Aug 3'],['3 hours','Aug 4'],['4 hours','Aug 5'],['5 hours','Aug 6'],
-         ['4 hours','Aug 8'],['3 hours','Aug 10'],['4 hours','Aug 11']],
+ ship:{who:'Deep work',ttl:'Deep work sessions',sub:'One line for each session.',pick:1,
    opts:['3 hours','4 hours','5 hours']},
- school:{who:'Study',ttl:'Study sessions',
-   sub:'One line for each block.',done:22,pick:1,
-   past:[['2 hours','Aug 1'],['2 hours','Aug 2'],['1 hour','Aug 4'],['2 hours','Aug 5'],['3 hours','Aug 7'],
-         ['2 hours','Aug 8'],['2 hours','Aug 10'],['1 hour','Aug 11']],
+ school:{who:'Study',ttl:'Study sessions',sub:'One line for each block.',pick:1,
    opts:['1 hour','2 hours','3 hours']},
- race:{who:'Training',ttl:'Training sessions',
-   sub:'One line for each session.',done:34,pick:1,
-   past:[['45 min','Aug 1'],['60 min','Aug 3'],['45 min','Aug 5'],['80 min','Aug 6'],['60 min','Aug 7'],
-         ['45 min','Aug 9'],['60 min','Aug 10'],['80 min','Aug 11']],
+ race:{who:'Training',ttl:'Training sessions',sub:'One line for each session.',pick:1,
    opts:['45 min','60 min','80 min']}};
 var st=r.querySelector('#l10st'),feed=r.querySelector('#l10feed'),fill=r.querySelector('#l10fill'),
     cap=r.querySelector('#l10cap'),cons=r.querySelector('#l10cons'),lab=r.querySelector('#l10lab'),
-    ops=r.querySelector('#l10ops'),pEl=r.querySelector('#l10p'),
+    ops=r.querySelector('#l10ops'),
     whoEl=r.querySelector('#l10who'),dEl=r.querySelector('#l10days'),
     ttlEl=r.querySelector('#l10ttl'),subEl=r.querySelector('#l10sub');
-var PITCH=28,VPH=196,HOLD=900,c,done,pick,printed,rows,idx,base,t0,raf=0,back=0;
-function pad(n){return ('00'+n).slice(-3);}
-/* consequence of the size chosen for today, nothing about pace against the date */
+var PITCH=28,VPH=250,BLANK=9,HOLD=900,c,pick,printed,rows,idx,base,t0,raf=0,back=0;
+/* consequence of the size chosen for today, nothing about pace against a date */
 function consTxt(i){
   if(i===0)return 'Under the length you set. It still prints one line.';
   if(i===2)return 'Over the length you set. Worth it on a day with nothing after it.';
   return 'The length you set in the plan.';}
-function row(cls,num,len,date,idA,idB){
-  return '<div class="r '+cls+'"><i>'+pad(num)+'</i><span'+(idA||'')+'>'+len+'</span>'+
-         '<em'+(idB||'')+'>'+date+'</em>'+CHK+'</div>';}
+function blank(){return '<div class="r"></div>';}
+function nowRow(len){
+  return '<div class="r now"><span id="l10nm">'+len+'</span><em id="l10tm">today</em>'+CHK+'</div>';}
 function opsHTML(){var L=['under plan','the plan','over plan'];
   return c.opts.map(function(o,i){
     return '<button class="op'+(i===pick?' on':'')+'" type="button" data-i="'+i+'">'+
       '<span>'+o+'</span><span>'+L[i]+'</span></button>';}).join('');}
 function render(k){
-  c=B[k];done=c.done;pick=c.pick;printed=false;
+  c=B[k];pick=c.pick;printed=false;
   cancelAnimationFrame(raf);cancelAnimationFrame(back);
   whoEl.textContent=c.who;dEl.textContent='Aug 12';
   ttlEl.textContent=c.ttl;subEl.textContent=c.sub;
   var h='',i;
-  for(i=0;i<8;i++)h+=row('ok',done-7+i,c.past[i][0],c.past[i][1]);
-  h+=row('now',done+1,c.opts[pick],'today',' id="l10nm"',' id="l10tm"');
-  h+=row('wait',done+2,'not chosen','tomorrow');
-  h+=row('wait',done+3,'not chosen','not set');
+  for(i=0;i<BLANK;i++)h+=blank();
+  h+=nowRow(c.opts[pick]);
+  h+=blank()+blank();
   st.innerHTML=h;
-  rows=[].slice.call(r.querySelectorAll('.r'));idx=8;base=VPH-PITCH*(idx+1);
+  rows=[].slice.call(r.querySelectorAll('.r'));idx=BLANK;base=VPH-PITCH*(idx+1);
   st.style.transform='translateY('+base+'px)';
   ops.innerHTML=opsHTML();
   cons.textContent=consTxt(pick);
   lab.textContent='';
-  pEl.textContent=done;
   feed.classList.remove('done');cap.textContent='Hold to print the line';fill.style.width='0';}
 ops.addEventListener('click',function(e){var b=e.target.closest('.op');if(!b||printed)return;
   pick=+b.dataset.i;
@@ -196,14 +177,11 @@ function finish(){
   var now=rows[idx],len=c.opts[pick];
   now.classList.remove('now');now.classList.add('ok');
   now.querySelector('em').textContent='Aug 12';
-  done++;pEl.textContent=done;
   idx++;base-=PITCH;draw(0);
-  var nx=rows[idx];nx.classList.remove('wait');nx.classList.add('now');
-  nx.querySelector('em').textContent='tomorrow';
-  feed.classList.add('done');cap.textContent='Printed. Line '+pad(done)+' is on the tape.';
-  lab.textContent='Line '+pad(done+1)+' sits at the head tomorrow.';
-  ops.innerHTML='<div class="pd"><span>'+pad(done)+' &nbsp;'+len+'</span><em>printed Aug 12</em></div>'+
-    '<div class="pd2">Nothing else prints today. The tape waits at line '+pad(done+1)+'.</div>';
+  feed.classList.add('done');cap.textContent='Printed.';
+  lab.textContent='The head rests until tomorrow.';
+  ops.innerHTML='<div class="pd"><span>'+len+'</span><em>printed Aug 12</em></div>'+
+    '<div class="pd2">Nothing else prints today.</div>';
   cons.textContent='';}
 function tick(){var p=Math.min(1,(performance.now()-t0)/HOLD);draw(p);
   if(p>=1){finish();return;}raf=requestAnimationFrame(tick);}

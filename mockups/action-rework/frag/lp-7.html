@@ -1,56 +1,26 @@
 <!-- ARCHETYPES, the surviving set: lp-1 full-bleed statement type | lp-6 vertical descent rail | lp-7 poster ceiling number |
-     lp-8 hundred-mark field | lp-9 ruled ledger book | lp-10 receipt tape | lp-12 full-height week columns |
-     lp-15 bottom sheet first | lp-16 horizontal corridor band | lp-17 declarative sentence over account rows |
+     lp-8 hundred-mark field | lp-9 single ruled page | lp-10 receipt tape | lp-12 full-height week columns |
+     lp-15 bottom sheet first | lp-16 horizontal corridor band | lp-17 declarative sentence |
      lp-18 centered monolith numeral -->
 <section class="cell" data-k="lp-7">
-<!-- MALIK, GRADING ROUND (2026-08-13). Applied exactly:
-     COPY DIET. Killed "Tonight, one thing.", "You did it or you did not...",
-     "You made 8:00pm on 2 of the last 7 nights.", "The hour your plan set."
-     "Phone in the kitchen drawer at" -> "Put phone away at" (universal, Memento
-     cannot know their drawer). Chart label -> "Logged screentime last 7 days".
-     Bottom "last night's screen time" box DELETED. What is left: one action
-     sentence, the hour, the chart, the button.
-     PICKER. The tap chips are gone. The big time IS the control: drag it up or
-     down and it slides 7:30 / 8:00 / 9:00, snapping to the three. Desktop gets
-     the same reel on scroll or cursor drag; arrow keys for keyboard.
-     CHART. Bar graph, height = the minutes they typed off their own Screen Time
-     report, so a bad night is taller at a glance. Bars over the hour they picked
-     (their logged put-away was later than the ceiling) go bright solid; under
-     stays quiet. Neutral ink only, no hue. Today is an empty outlined slot.
-     BUTTON. Hold to confirm the phone is away, then one field slides up for
-     today's number and typing it fills today's bar.
-     PROVENANCE: bar height = a number they typed (source named on the entry
-     row). Bright/quiet = their own logged put-away time against the hour they
-     picked. Today's logged time comes off the clock at the moment of the hold.
-     Memento reads nothing off the device.
+<!-- THE PEN STAYS, THE BOOKS GO (Malik, 2026-08-15, the settled flow).
+     THE SEVEN NIGHTS ARE GONE. The bars were the record of what they typed
+     standing side by side, and seven of anything side by side is a pattern to
+     be read: which night was the bad one, whether the week is going well. That
+     reading is Consistency's face. With them went the chart label and the
+     popover that read a bar back in their own words.
 
-     BEAUTY PASS (2026-08-13). Two things read instantly here, the hour and the
-     bars, and they were fighting: eight near-white bars out-shouted the numeral
-     that is supposed to be the subject.
-     WEIGHT: the bars drop off full ink so the hour keeps the screen (the
-     over/under split that set their weight is gone, see the tightened rule
-     below; they are one weight now). They also grow off a floor (top corners
-     round, bottom nearly square) instead of floating as capsules.
-     CUT: the "Pick a time" line. A drag affordance does not need a caption, so
-     the chevron moved inline beside the hour, which is where the gesture is,
-     and the screen loses one more small phrase.
-     HOLD: unified with the rest of the set, 58px glass slab, 1400ms, green
-     fill on completion. The mix-blend-mode:difference label is gone with it,
-     and the label now SAYS "Hold to confirm" like every other completion in
-     the set instead of reading like a tap.
+     WHAT REMAINS, recomposed as the poster it always wanted to be: one sentence
+     landing on the hour, and the hour is the control, dragged like a reel
+     between 7:30, 8:00 and 9:00. It is now at true poster scale (76px, up from
+     60) sitting in the middle of an empty screen, because with nothing under it
+     there is nothing to share the room with. The pen for tonight's own number
+     slides up out of the hold, exactly as before, and the confirmation states
+     the time off the clock at the moment of the hold.
 
-     TIGHTENED RULE (Malik, 2026-08-15). "It is showing too much information."
-     An Action screen shows TODAY. Nothing on it may read the record against
-     the goal.
-     CUT: the over / under split on the bars. A night going bright because
-     their logged put-away was later than the ceiling is a verdict on that
-     night, and seven of them side by side is a verdict on the week, which is
-     Consistency's face wearing Action's clothes. The bars are now one weight,
-     on one scale across the week and nothing else: it is the record of what
-     they typed, at a size you can see, with no line drawn across it.
-     KEPT: the hour, which is today's size and the whole point of the screen,
-     the pen that writes tonight's number, and the tap that reads a bar back
-     in their own words. -->
+     PROVENANCE: the hour is their choice. Tonight's total is a number they read
+     off their own Screen Time report and typed. The put-away time is the clock
+     at the moment they held. Memento reads nothing off the device. -->
 <style>
 [data-k=lp-7] .ph{font-variant-numeric:tabular-nums}
 /* 34px of top padding clears the Dynamic Island: at 26 the statement's box
@@ -61,59 +31,37 @@
 [data-k=lp-7] .say{margin:0;font-size:22px;font-weight:700;letter-spacing:-.028em;line-height:1.2;
   color:rgba(var(--ink),.97)}
 
+/* the poster sits in the room the seven nights left, optically centred above
+   the gesture instead of being pushed to the top of a chart */
+[data-k=lp-7] .sp0{flex:.85;min-height:12px}
+[data-k=lp-7] .sp{flex:1;min-height:16px}
+
 /* --- the hour IS the control: a reel you drag --------------------------- */
-[data-k=lp-7] .hour{margin:6px 0 0;display:flex;align-items:center;gap:2px;cursor:ns-resize;
+[data-k=lp-7] .hour{margin:10px 0 0;display:flex;align-items:center;gap:9px;cursor:ns-resize;
   touch-action:none;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
 [data-k=lp-7] .hour:focus{outline:none}
 [data-k=lp-7] .hour:focus-visible{outline:2px solid rgba(var(--ink),.45);outline-offset:4px;border-radius:12px}
 /* one line tall: the neighbouring times only exist while you are dragging,
    sliding in and out under a soft top and bottom fade */
-[data-k=lp-7] .win{height:66px;overflow:hidden;min-width:0;
+[data-k=lp-7] .win{height:84px;overflow:hidden;min-width:0;
   -webkit-mask-image:linear-gradient(transparent 0,#000 10%,#000 90%,transparent 100%);
           mask-image:linear-gradient(transparent 0,#000 10%,#000 90%,transparent 100%)}
 [data-k=lp-7] .reel{will-change:transform}
-[data-k=lp-7] .reel span{display:block;height:66px;line-height:66px;font-size:60px;font-weight:700;
-  letter-spacing:-.05em;white-space:nowrap;color:rgba(var(--ink),1)}
-[data-k=lp-7] .hour .u{font-size:25px;font-weight:500;color:rgba(var(--ink),.90);align-self:center}
+[data-k=lp-7] .reel span{display:block;height:84px;line-height:84px;font-size:76px;font-weight:700;
+  letter-spacing:-.055em;white-space:nowrap;color:rgba(var(--ink),1)}
+[data-k=lp-7] .hour .u{font-size:28px;font-weight:500;color:rgba(var(--ink),.90);align-self:center}
 /* the drag affordance sits ON the control, so it needs no caption under it */
-[data-k=lp-7] .hour .ch{align-self:center;margin-left:10px;flex:none;display:block;opacity:.40;
+[data-k=lp-7] .hour .ch{align-self:center;margin-left:11px;flex:none;display:block;opacity:.40;
   transition:opacity .16s ease-out}
 [data-k=lp-7] .hour:active .ch{opacity:.78}
 
-/* --- seven nights as bars, plus tonight's empty slot -------------------- */
-[data-k=lp-7] .clab{margin:34px 0 0;font-size:12.5px;color:rgba(var(--ink),.90)}
-/* the chart absorbs the slack: no cap, or the screen grows a hole above the
-   button when the entry row is closed */
-[data-k=lp-7] .chart{position:relative;margin:12px 0 0;flex:1 1 auto;min-height:150px;
-  display:flex;gap:6px;align-items:stretch}
-[data-k=lp-7] .chart .c{flex:1 1 0;min-width:0;padding:0;border:0;background:none;cursor:pointer;
-  display:flex;flex-direction:column;font-family:var(--font);-webkit-tap-highlight-color:transparent}
-[data-k=lp-7] .chart .c:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px;border-radius:6px}
-[data-k=lp-7] .chart .bw{flex:1 1 auto;min-height:0;display:flex;align-items:flex-end}
-/* bars grow off a floor: round at the top, nearly square where they sit.
-   ONE weight for every night: length is the number they typed, on one scale
-   across the week, and no night is judged against the hour */
-[data-k=lp-7] .chart .b{width:100%;min-height:3px;border-radius:5px 5px 2px 2px;background:rgba(var(--ink),.40);
-  transition:height .34s cubic-bezier(.2,.8,.25,1),background .2s ease-out,box-shadow .2s ease-out}
-[data-k=lp-7] .chart .c.empty .b{background:none;box-shadow:inset 0 0 0 1px rgba(var(--ink),.13)}
-[data-k=lp-7] .chart .dy{margin:7px 0 0;font-size:9.5px;line-height:1;letter-spacing:-.01em;
-  color:rgba(var(--ink),.80);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-[data-k=lp-7] .chart .c.now .dy{color:rgba(var(--ink),.95)}
-[data-k=lp-7] .pop{position:absolute;left:0;bottom:0;transform:translate(-50%,0);pointer-events:none;
-  padding:5px 9px 6px;border-radius:8px;white-space:nowrap;font-size:11px;line-height:1.1;
-  color:rgba(var(--ink),.96);background:rgba(22,25,31,.96);
-  backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.10),0 8px 22px rgba(0,0,0,.5);
-  opacity:0;transition:opacity .14s ease-out}
-[data-k=lp-7] .pop.show{opacity:1}
-
 /* --- the foot: entry slides up out of the hold -------------------------- */
-[data-k=lp-7] .foot{margin-top:22px}
+[data-k=lp-7] .foot{flex:none}
 [data-k=lp-7] .entry{max-height:0;opacity:0;overflow:hidden;margin:0;
   transition:max-height .3s cubic-bezier(.2,.8,.25,1),opacity .2s ease-out,margin .3s ease-out}
-[data-k=lp-7] .ph.held .entry{max-height:96px;opacity:1;margin:18px 0 12px}
+[data-k=lp-7] .ph.held .entry{max-height:96px;opacity:1;margin:0 0 14px}
 [data-k=lp-7] .ph.typed .entry{max-height:0;opacity:0;margin:0}
-[data-k=lp-7] .entry p{margin:0 0 8px;font-size:11px;color:rgba(var(--ink),.72)}
+[data-k=lp-7] .entry p{margin:0 0 8px;font-size:11.5px;color:rgba(var(--ink),.90)}
 [data-k=lp-7] .entry .in{display:flex;gap:8px}
 [data-k=lp-7] .entry input{flex:1;min-width:0;height:38px;border:0;border-radius:10px;padding:0 12px;
   background:rgba(var(--ink),.07);box-shadow:inset 0 1px 0 rgba(var(--ink),.07);
@@ -126,6 +74,12 @@
   transition:opacity .16s ease-out,transform .1s ease-out}
 [data-k=lp-7] .entry .sv:active{transform:translateY(1px)}
 [data-k=lp-7] .entry .sv[disabled]{opacity:.45;cursor:default}
+/* what they wrote, once it is written: the only number the screen keeps */
+[data-k=lp-7] .wrote{display:none;margin:0 0 16px}
+[data-k=lp-7] .ph.typed .wrote{display:block}
+[data-k=lp-7] .wrote b{display:block;font-size:24px;font-weight:700;letter-spacing:-.028em;line-height:1;
+  white-space:nowrap;color:rgba(var(--ink),.97)}
+[data-k=lp-7] .wrote span{display:block;margin-top:6px;font-size:11.5px;color:rgba(var(--ink),.90)}
 
 /* --- hold to confirm: the set's one slab, 58px, 1400ms ------------------ */
 [data-k=lp-7] .go{position:relative;display:block;width:100%;height:58px;border:0;border-radius:14px;
@@ -142,11 +96,12 @@
 [data-k=lp-7] .go.on .tx{font-weight:700;color:rgba(var(--ink),.97)}
 @media (prefers-reduced-motion:reduce){[data-k=lp-7] *{transition:none!important}}
 </style>
-<h3>Ceiling</h3><p class="cap">One sentence lands on a poster-scale hour you drag like a reel, and under it the nights they typed off their own Screen Time report stand as bars at their own size, one weight, nothing drawn across them: a long night is simply taller.</p>
+<h3>Ceiling</h3><p class="cap">One sentence lands on a poster-scale hour you drag like a reel, and that hour is the whole screen: no week under it, no nights to read, just tonight's size and the pen that writes tonight's number once the phone is away.</p>
 <div class="bk"><i>Screen time</i></div>
 <div class="ph">
   <div class="grid"></div>
   <div class="w">
+    <div class="sp0"></div>
     <p class="say">Put phone away at</p>
 
     <div class="hour" role="slider" tabindex="0" aria-label="Pick a time" aria-valuemin="0" aria-valuemax="2" aria-valuenow="1" aria-valuetext="8:00pm">
@@ -158,104 +113,57 @@
       </svg>
     </div>
 
-    <p class="clab">Logged screentime last 7 days</p>
-    <div class="chart"><span class="pop"></span></div>
+    <div class="sp"></div>
 
     <div class="foot">
       <div class="entry">
-        <p>Today, from your Screen Time report</p>
+        <p>Tonight, from your Screen Time report</p>
         <div class="in">
-          <input type="text" inputmode="text" aria-label="today's screen time" placeholder="4h 12m">
+          <input type="text" inputmode="text" aria-label="tonight's screen time" placeholder="4h 12m">
           <button type="button" class="sv" disabled>Save</button>
         </div>
       </div>
+      <div class="wrote"><b class="wv"></b><span>written in, from your Screen Time report</span></div>
+      <!-- the number they typed stays on the screen, with its source under it -->
+
       <button type="button" class="go"><span class="fl"></span><span class="tx">Hold to confirm</span></button>
     </div>
   </div>
 </div>
 <script>(function(){var r=document.querySelector('[data-k="lp-7"]');if(!r)return;
 var ph=r.querySelector('.ph'),hour=r.querySelector('.hour'),reel=r.querySelector('.reel'),
-    chart=r.querySelector('.chart'),
-    pop=r.querySelector('.pop'),go=r.querySelector('.go'),fl=r.querySelector('.go .fl'),
-    tx=r.querySelector('.go .tx'),inp=r.querySelector('.entry input'),sv=r.querySelector('.entry .sv');
+    go=r.querySelector('.go'),fl=r.querySelector('.go .fl'),
+    tx=r.querySelector('.go .tx'),inp=r.querySelector('.entry input'),sv=r.querySelector('.entry .sv'),
+    wv=r.querySelector('.wrote .wv');
 
 /* the three the reel snaps to, in minutes of day */
-var HOURS=[1170,1200,1260],idx=1,H=66,BASE=420;
-
-/* THE WEEK. m = minutes they typed off their own Screen Time report.
-   t = the time they logged the phone going away. Nothing is sensed. */
-var NIGHTS=[{d:'M',t:1212,m:268},{d:'T',t:1192,m:214},{d:'W',t:1246,m:322},{d:'T',t:1203,m:241},
-            {d:'F',t:1288,m:401},{d:'S',t:1166,m:176},{d:'S',t:1177,m:232}];
-var today={d:'Today',t:null,m:null};
+var HOURS=[1170,1200,1260],idx=1,H=84;
 
 function clock(x){var h=Math.floor(x/60),m=x%60,ap=h>=12?'pm':'am';h=h%12||12;
   return h+':'+String(m).padStart(2,'0')+ap}
 function hm(x){var h=Math.floor(x/60),m=x%60;return (h?h+'h':'')+(m||!h?(h?' ':'')+m+'m':'')}
 
-/* --- build the bars ----------------------------------------------------- */
-var ROWS=NIGHTS.concat([today]),cells=[];
-ROWS.forEach(function(n,i){
-  var c=document.createElement('button');c.type='button';c.className='c';
-  c.innerHTML='<span class="bw"><span class="b"></span></span><span class="dy"></span>';
-  c.addEventListener('click',function(e){e.stopPropagation();showPop(i)});
-  chart.appendChild(c);cells.push(c);
-});
-
-function scale(){var mx=BASE;ROWS.forEach(function(n){if(n.m)mx=Math.max(mx,n.m)});return mx}
-
-function paint(){
-  var v=HOURS[idx],mx=scale();
-  ROWS.forEach(function(n,i){
-    var c=cells[i],b=c.querySelector('.b'),empty=n.m===null;
-    c.classList.toggle('empty',empty);
-    c.classList.toggle('now',n===today);
-    /* no over / under class: the hour is today's size, not a verdict on the week */
-    b.style.height=(empty?100:Math.max(2,Math.round(1000*n.m/mx)/10))+'%';
-    c.querySelector('.dy').textContent=n.d;
-    c.setAttribute('aria-label',(n===today?'Today':n.d)+', '+(empty?'not entered yet'
-      :hm(n.m)+', phone away '+clock(n.t)));
-  });
-  hour.setAttribute('aria-valuenow',idx);
-  hour.setAttribute('aria-valuetext',clock(v));
-  if(open>=0)showPop(open,true);
-}
-
-/* --- the popover: one at a time, closes on any other tap ---------------- */
-var open=-1;
-function showPop(i,keep){
-  var n=ROWS[i];
-  if(!keep&&open===i){hidePop();return}
-  if(n.m===null&&n.t===null){hidePop();return}
-  open=i;
-  pop.textContent=n.m===null?('away '+clock(n.t)+', not entered')
-    :hm(n.m)+(n.t!==null?', away '+clock(n.t):'');
-  pop.classList.add('show');
-  var cw=chart.clientWidth,ch=chart.clientHeight,
-      cb=chart.getBoundingClientRect(),bb=cells[i].querySelector('.b').getBoundingClientRect(),
-      cx=bb.left-cb.left+bb.width/2,pw=pop.offsetWidth,half=pw/2+2;
-  pop.style.left=Math.max(half,Math.min(cw-half,cx))+'px';
-  pop.style.bottom=Math.min(cb.bottom-bb.top+8,ch-30)+'px';
-}
-function hidePop(){open=-1;pop.classList.remove('show')}
-ph.addEventListener('click',hidePop);
-
 /* --- drag the hour: pointer, wheel, keys -------------------------------- */
-function setIdx(i,anim){
-  i=Math.max(0,Math.min(2,i));if(i===idx&&anim!==false)return;
+function paint(){
+  hour.setAttribute('aria-valuenow',idx);
+  hour.setAttribute('aria-valuetext',clock(HOURS[idx]));
+}
+function setIdx(i){
+  i=Math.max(0,Math.min(2,i));if(i===idx)return;
   idx=i;reel.style.transition='transform .22s cubic-bezier(.2,.8,.25,1)';
   reel.style.transform='translateY('+(-idx*H)+'px)';paint();
 }
 reel.style.transform='translateY('+(-idx*H)+'px)';
 
-var dragY=null,dragI=0,moved=0;
+var dragY=null,dragI=0;
 hour.addEventListener('pointerdown',function(e){
-  dragY=e.clientY;dragI=idx;moved=0;hidePop();
+  dragY=e.clientY;dragI=idx;
   reel.style.transition='none';
   try{hour.setPointerCapture(e.pointerId)}catch(err){}
 });
 hour.addEventListener('pointermove',function(e){
   if(dragY===null)return;e.preventDefault();
-  var dy=e.clientY-dragY;moved=Math.max(moved,Math.abs(dy));
+  var dy=e.clientY-dragY;
   var live=Math.max(0,Math.min(2,Math.round(dragI-dy/H)));
   var off=Math.max(-2*H-22,Math.min(22,-dragI*H+dy));
   reel.style.transform='translateY('+off+'px)';
@@ -283,10 +191,9 @@ hour.addEventListener('keydown',function(e){
 });
 
 /* --- hold to confirm, then the number ----------------------------------- */
-var HOLD=1400,ht=null,rt=null,done=false;
+var HOLD=1400,ht=null,done=false;
 function startHold(e){
   if(done||ht)return;if(e&&e.preventDefault)e.preventDefault();
-  clearTimeout(rt);hidePop();
   fl.style.transition='width '+HOLD+'ms linear';fl.style.width='100%';
   ht=setTimeout(finish,HOLD);
 }
@@ -295,12 +202,11 @@ function cancelHold(){
   fl.style.transition='width .18s ease-out';fl.style.width='0';
 }
 function finish(){
-  ht=null;done=true;clearTimeout(rt);
-  var d=new Date();today.t=d.getHours()*60+d.getMinutes();
+  ht=null;done=true;
+  var d=new Date(),t=d.getHours()*60+d.getMinutes();
   fl.style.transition='width .2s ease-out';fl.style.width='0';
   go.classList.add('on');ph.classList.add('held');
-  tx.textContent='Phone away, '+clock(today.t);
-  paint();
+  tx.textContent='Phone away, '+clock(t);
   try{inp.focus({preventScroll:true})}catch(err){}
 }
 go.addEventListener('pointerdown',startHold);
@@ -322,10 +228,9 @@ function parse(s){
 inp.addEventListener('input',function(){sv.disabled=parse(inp.value)===null});
 function save(){
   var v=parse(inp.value);if(v===null||v<=0)return;
-  today.m=v;ph.classList.add('typed');paint();
+  wv.textContent=hm(v);ph.classList.add('typed');
 }
 sv.addEventListener('click',function(e){e.stopPropagation();save()});
-inp.addEventListener('click',function(e){e.stopPropagation()});
 inp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();save()}});
 
 paint();})();</script>

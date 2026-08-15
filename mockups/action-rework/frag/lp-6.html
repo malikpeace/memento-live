@@ -161,8 +161,7 @@ var B={
     ok:function(x){return x>=150&&x<=400},
     act:function(v){return 'Today, walk '+v+' minutes after dinner.'},
     chips:[{v:25,txt:'25 min'},{v:40,txt:'40 min'},{v:60,txt:'60 min'}],pick:40,
-    week:205,
-    cons:function(v,w){return 'About <b>'+v+'</b> min by the plan’s estimate, making <b>'+(w+v)+'</b> min walked this week.'},
+    cons:function(v){return 'About <b>'+v+'</b> min by the plan’s estimate.'},
     did:function(v){return v+' minutes logged'}
   },
   money:{
@@ -172,13 +171,13 @@ var B={
     ok:function(){return false},
     act:function(v){return 'Today, message '+v+' potential clients.'},
     chips:[{v:2,txt:'2 clients'},{v:3,txt:'3 clients'},{v:5,txt:'5 clients'}],pick:3,
-    week:11,est:{2:18,3:25,5:40},
-    cons:function(v,w){return 'About <b>'+this.est[v]+'</b> min by the plan’s estimate, making <b>'+(w+v)+'</b> messages sent this week.'},
+    est:{2:18,3:25,5:40},
+    cons:function(v){return 'About <b>'+this.est[v]+'</b> min by the plan’s estimate.'},
     did:function(v){return v+' messages logged'}
   }
 };
 
-var C=B.body,pick=C.pick,WEEK=C.week,cur=C.now,
+var C=B.body,pick=C.pick,cur=C.now,
     chipsEl=r.querySelector('.chips'),act=r.querySelector('.act'),cons=r.querySelector('.cons'),
     pen=r.querySelector('.pen'),numEl=r.querySelector('.num'),vEl=numEl.querySelector('.v'),
     uEl=r.querySelector('.u'),ed=r.querySelector('.ed'),undo=r.querySelector('.undo'),
@@ -192,7 +191,7 @@ function readNumber(x){
   numEl.setAttribute('aria-label',C.pen?C.val(x)+' '+(C.unit||'')+', tap to write today’s number':C.val(x)+' '+(C.unit||''));
 }
 
-function paintCard(){act.textContent=C.act(pick);cons.innerHTML=C.cons(pick,WEEK);}
+function paintCard(){act.textContent=C.act(pick);cons.innerHTML=C.cons(pick);}
 
 /* the slab's label is also its name: the text sits in an absolutely placed
    layer, which not every reader picks up */
@@ -254,10 +253,11 @@ undo.addEventListener('click',function(){
 
 /* --- logging the move: hold to confirm, early release aborts ------------- */
 var t=null;
-/* logging banks the planned size: the week total the line already promised
-   becomes the week total on record, so the number does not jump on the tap */
+/* logging banks the planned size and says so, and that is the whole of it:
+   no running week figure exists on this screen to move (Malik, the settled
+   flow: a sum of the sessions behind them is Consistency's, not Action's) */
 function finish(){t=null;hold.classList.remove('go');ph.classList.add('logged');
-  setLab(C.did(pick));WEEK+=pick;}
+  setLab(C.did(pick));}
 function start(){if(ph.classList.contains('logged')||t)return;hold.classList.add('go');t=setTimeout(finish,HOLD_MS);}
 function stop(){if(!t)return;clearTimeout(t);t=null;hold.classList.remove('go');}
 hold.addEventListener('pointerdown',start);
@@ -265,12 +265,12 @@ hold.addEventListener('pointerdown',start);
 hold.addEventListener('keydown',function(e){if((e.key==='Enter'||e.key===' ')&&!e.repeat){e.preventDefault();start();}});
 hold.addEventListener('keyup',stop);
 am.addEventListener('click',function(){
-  WEEK-=pick;ph.classList.remove('logged');setLab('Hold to confirm');paintCard();
+  ph.classList.remove('logged');setLab('Hold to confirm');paintCard();
 });
 
 /* --- swapping the bucket: the same line, that goal's own number ---------- */
 function render(key){
-  C=B[key];pick=C.pick;WEEK=C.week;cur=C.now;last=null;
+  C=B[key];pick=C.pick;cur=C.now;last=null;
   close();
   ph.classList.remove('logged','fresh','wrote','go');
   hold.classList.remove('go');

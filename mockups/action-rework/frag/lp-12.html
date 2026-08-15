@@ -1,20 +1,20 @@
 <!-- ARCHETYPES, the surviving set: lp-1 full-bleed statement type | lp-6 vertical descent rail | lp-7 poster ceiling number |
-     lp-8 hundred-mark field | lp-9 ruled ledger book | lp-10 receipt tape | lp-12 full-height week columns |
-     lp-15 bottom sheet first | lp-16 horizontal corridor band | lp-17 declarative sentence over account rows |
+     lp-8 hundred-mark field | lp-9 single ruled page | lp-10 receipt tape | lp-12 full-height week columns |
+     lp-15 bottom sheet first | lp-16 horizontal corridor band | lp-17 declarative sentence |
      lp-18 centered monolith numeral -->
 <section class="cell" data-k="lp-12">
-<!-- TIGHTENED RULE (Malik, 2026-08-15). "It is showing too much information."
-     An Action screen shows TODAY. It may carry this week's plan, because that
-     is the plan Action owns, but it may not tell them where they stand in it.
-     CUT: "2 done" in the header, "session 3 of 3" under the move, "One session
-     left in the week", and "the week is whole" on the finished button. Four
-     week-position claims saying one fact four times, and that fact belongs to
-     Consistency's face.
-     LEFT: the channels, which are the lengths they logged standing at their
-     own size with nothing read off them, today as the wide one, the three
-     lengths for it, and the plan's own estimate of what today costs. The foot
-     keeps a plain sum of the minutes logged this week, with no target beside
-     it to read it against. -->
+<!-- THE PEN STAYS, THE BOOKS GO (Malik, 2026-08-15, the settled flow).
+     CUT: "Logged this week, 2h 15m". A sum of the sessions already behind them
+     is the week's record in one figure, and it grew as the week went, which is
+     a position in the week however quietly it is phrased. It is Consistency's.
+     CHANGED, so what is left is a PLAN and not a log: the six channels beside
+     today no longer stand at the length that was logged in them. They stand at
+     the height the plan asks for, with no number on them, and the rest days
+     keep their broken sill. The week now says which days are training days and
+     which are rest, which the contract keeps in Action, and says nothing about
+     which of them happened.
+     LEFT: today as the wide channel, the three lengths for it, the plan's own
+     estimate of what today costs, and the hold that closes the day. -->
 <style>
 [data-k=lp-12] .ph{font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent}
 /* clears the Dynamic Island: at top:22 the goal line ran under it */
@@ -29,7 +29,7 @@
   color:rgba(var(--ink),.90)}
 
 /* ---- seven channels: one floor, seven lanes, today is the wide one ---- */
-[data-k=lp-12] .cols{position:absolute;left:16px;right:16px;top:118px;height:288px;display:flex;gap:6px;
+[data-k=lp-12] .cols{position:absolute;left:16px;right:16px;top:118px;height:300px;display:flex;gap:6px;
   align-items:stretch}
 [data-k=lp-12] .ch{position:relative;flex:1;min-width:0;border-radius:10px;overflow:hidden;
   background:rgba(22,25,31,.95);
@@ -43,6 +43,11 @@
   background:rgba(var(--ink),.80)}
 [data-k=lp-12] .ch .f .v{position:absolute;left:0;right:0;top:9px;text-align:center;font-size:11.5px;
   font-weight:500;line-height:1;color:rgba(var(--ink),.93)}
+/* a training day the plan asks for: the lane is simply ON, floor to ceiling, with
+   no cap line, because a cap would read as a measurement and nothing here is
+   measured. Only today's channel carries a level. */
+[data-k=lp-12] .ch.plan .f{height:100%;background:linear-gradient(180deg,rgba(var(--ink),.085),rgba(var(--ink),.045))}
+[data-k=lp-12] .ch.plan .f:after{display:none}
 /* rest is a planned lane, not a gap: a low sill with a broken cap */
 [data-k=lp-12] .ch.rest .f{height:10px;background:rgba(var(--ink),.05)}
 [data-k=lp-12] .ch.rest .f:after{background:repeating-linear-gradient(90deg,rgba(var(--ink),.30) 0 3px,transparent 3px 7px)}
@@ -75,18 +80,13 @@
 [data-k=lp-12] .free .ch.now .f{transition:none}
 
 /* ---- the week line ---- */
-[data-k=lp-12] .days{position:absolute;left:16px;right:16px;top:414px;display:flex;gap:6px}
+[data-k=lp-12] .days{position:absolute;left:16px;right:16px;top:426px;display:flex;gap:6px}
 [data-k=lp-12] .days div{flex:1;min-width:0;text-align:center;font-size:11.5px;line-height:1;
   color:rgba(var(--ink),.82)}
 [data-k=lp-12] .days div.n{flex:2;color:#3fd94e;font-weight:700}
-[data-k=lp-12] .week{position:absolute;left:16px;right:16px;top:440px;margin:0;display:flex;
-  align-items:baseline;justify-content:space-between;gap:10px;font-size:12.5px;line-height:1.4;
-  color:rgba(var(--ink),.90)}
-[data-k=lp-12] .week span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-[data-k=lp-12] .week b{flex:none;font-weight:500;color:rgba(var(--ink),.96)}
 
 /* ---- three proposed lengths, freedom behind "any length" ---- */
-[data-k=lp-12] .sizes{position:absolute;left:16px;right:16px;top:476px;display:flex;gap:6px}
+[data-k=lp-12] .sizes{position:absolute;left:16px;right:16px;top:462px;display:flex;gap:6px}
 [data-k=lp-12] .sizes button{flex:1;min-width:0;border:0;border-radius:10px;padding:8px 4px 9px;cursor:pointer;
   font-family:var(--font);background:rgba(22,25,31,.95);
   -webkit-backdrop-filter:blur(24px) saturate(1.35);backdrop-filter:blur(24px) saturate(1.35);
@@ -102,14 +102,14 @@
 [data-k=lp-12] .sizes button.on b{color:#3fd94e;font-weight:700}
 [data-k=lp-12] .sizes button.on:active{background:rgba(24,36,27,.96)}
 [data-k=lp-12] .sizes button:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
-[data-k=lp-12] .more{position:absolute;left:50%;transform:translateX(-50%);top:530px;border:0;border-radius:8px;
+[data-k=lp-12] .more{position:absolute;left:50%;transform:translateX(-50%);top:516px;border:0;border-radius:8px;
   padding:7px 12px;background:none;color:rgba(var(--ink),.80);font:500 12px/1 var(--font);
   cursor:pointer;-webkit-tap-highlight-color:transparent;transition:color .16s ease-out}
 [data-k=lp-12] .more:active{color:rgba(var(--ink),.96)}
 [data-k=lp-12] .more.on{color:rgba(var(--ink),.96)}
 [data-k=lp-12] .more:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
 [data-k=lp-12] .free .sizes{display:none}
-[data-k=lp-12] .free .more{top:480px}
+[data-k=lp-12] .free .more{top:466px}
 [data-k=lp-12] .logged .sizes button,[data-k=lp-12] .logged .more{opacity:.55;pointer-events:none}
 
 /* the day is closed with a HOLD (Malik, 2026-08-13): the fill runs the width
@@ -128,7 +128,7 @@
   -webkit-backdrop-filter:blur(24px) saturate(1.4);backdrop-filter:blur(24px) saturate(1.4);
   box-shadow:inset 0 1px 0 rgba(var(--ink),.09);cursor:default;transform:none}
 </style>
-<h3>Seven channels</h3><p class="cap">The week stands up as seven channels on one floor: today is the wide one, sized by the three lengths proposed under it, and the flat channels are days the plan left empty, not days you lost. Free dragging lives behind "any length".</p>
+<h3>Seven channels</h3><p class="cap">This week's plan stands up as seven channels on one floor: today is the wide one, sized by the three lengths proposed under it, the standing channels are the days the plan asks for, and the flat ones are rest it designed. Free dragging lives behind "any length".</p>
 <div class="bk" id="l12bk">
   <button class="on" type="button" data-b="gym">Body</button>
   <button type="button" data-b="school">School &amp; career</button>
@@ -143,7 +143,6 @@
   <div class="cols" id="l12cols"></div>
 
   <div class="days" id="l12days"></div>
-  <p class="week"><span id="l12x">Logged this week</span><b id="l12t">2h 15m</b></p>
 
   <div class="sizes" id="l12sz" role="group" aria-label="how long today is"></div>
   <button class="more" id="l12more" type="button">any length</button>
@@ -151,25 +150,25 @@
   <button class="fin" id="l12b" type="button"><b></b><span id="l12bt">Hold to finish Thursday</span></button>
 </div>
 <script>(function(){var r=document.querySelector('[data-k="lp-12"]');if(!r)return;
-/* Channel heights are the lengths they chose and logged. The rhythm (how many a week,
-   which days) is their own plan from intake. Nothing is measured for them. */
+/* week[i] is the PLAN for that day: 1 = a training day, null = a rest day the plan
+   designed, 'now' = today. No channel carries a logged length, so the week cannot be
+   read for how it has gone. The rhythm is their own plan from intake. */
 var B={
  gym:{goal:'Train 3 times a week',task:'Lower body',day:'Thursday',dayIdx:3,
-   rest:'rest',week:[40,null,55,'now',null,null,null],
+   rest:'rest',week:[1,null,1,'now',null,null,null],
    sizes:[25,40,55],pick:1,lo:15,hi:75},
  school:{goal:'Study 5 times a week',task:'Organic chem',day:'Friday',dayIdx:4,
-   rest:'off',week:[60,45,60,30,'now',null,null],
+   rest:'off',week:[1,1,1,1,'now',null,null],
    sizes:[30,60,90],pick:1,lo:20,hi:120},
  audience:{goal:'Post 3 times a week',task:'Film the video',day:'Thursday',dayIdx:3,
-   rest:'off',week:[50,null,40,'now',null,null,null],
+   rest:'off',week:[1,null,1,'now',null,null,null],
    sizes:[30,45,75],pick:1,lo:20,hi:100}};
 var ph=r.querySelector('#l12ph'),cols=r.querySelector('#l12cols'),days=r.querySelector('#l12days'),
     gEl=r.querySelector('#l12g'),one=r.querySelector('#l12one'),
-    hint=r.querySelector('#l12hint'),tot=r.querySelector('#l12t'),
+    hint=r.querySelector('#l12hint'),
     sz=r.querySelector('#l12sz'),more=r.querySelector('#l12more'),fin=r.querySelector('#l12b'),
     finT=r.querySelector('#l12bt'),
-    D=['M','T','W','T','F','S','S'],c,mins,base,logged,free;
-function fmt(t){return (t/60|0)+'h '+('0'+(t%60)).slice(-2)+'m';}
+    D=['M','T','W','T','F','S','S'],c,mins,logged,free;
 function pct(m){return ((m-c.lo)/(c.hi-c.lo)*80+11).toFixed(1);}
 function chHTML(){return c.week.map(function(m){
   if(m==='now')return '<div class="ch now" id="l12ch">'+
@@ -178,7 +177,8 @@ function chHTML(){return c.week.map(function(m){
     '<i style="bottom:71%"></i><i style="bottom:91%"></i></div>'+
     '<div class="drag">drag<u>&#8597;</u></div><div class="tdy" id="l12cap">today</div></div>';
   if(m===null)return '<div class="ch rest"><div class="f"></div><div class="v">'+c.rest+'</div></div>';
-  return '<div class="ch"><div class="f" style="height:'+pct(m)+'%"><span class="v">'+m+'</span></div></div>';
+  /* a training day the plan asks for: the lane is on, and carries no number */
+  return '<div class="ch plan"><div class="f"></div></div>';
 }).join('');}
 function szHTML(){var L=['lighter','today’s','heavier'];
   return c.sizes.map(function(m,i){
@@ -190,15 +190,9 @@ function paint(){
     var on=!free&&+b.dataset.m===mins;
     b.classList.toggle('on',on);
     if(on)b.setAttribute('aria-pressed','true');else b.removeAttribute('aria-pressed');});
-  /* the week total is the sum of the sessions ALREADY LOGGED, nothing else,
-     and it is never set against a number of sessions the week wants.
-     today's length is the plan's estimate until it is finished, so it only
-     joins the total when the day is logged. */
-  tot.textContent=fmt(base+(logged?mins:0));
   if(!logged&&!free)hint.textContent='About '+mins+' min, the plan’s estimate.';}
 function render(k){
   c=B[k];mins=c.sizes[c.pick];logged=false;free=false;
-  base=c.week.reduce(function(s,m){return s+(typeof m==='number'?m:0);},0);
   ph.classList.remove('free','logged');
   gEl.textContent=c.goal;
   one.innerHTML=c.task+', <b id="l12n">'+mins+'</b> min';

@@ -140,3 +140,28 @@ In an Action screen:
   target/goal rails and ticks, start/delta stacks, distance to a floor,
   pace-vs-plan verdicts, pattern claims ("held five of the last seven").
   Those live on the Clarity and Consistency faces, one swipe away.
+
+## THE SETTLED FLOW (Malik, 2026-08-14, final: the foundation)
+
+Memento is a WITNESS WITH A CLOCK, never a coach. No encouragement register.
+The daily Action screen, complete, is FIVE beats:
+1. SEE IT: one sentence, the act. 2. SIZE IT: tap the number, three choices,
+what today costs. 3. DO IT (deep work timer optional). 4. HOLD IT DONE.
+5. THE DAY CLOSES: green beat -> Clarity's pulse asks its one number (only
+when the goal has one, at that goal's cadence) -> rest: "That's the day.
+See you tomorrow." (frequency people: "Back Thursday."). Tomorrow it resets.
+
+THE ACTS LAW: moves are ACTS with a yes/no doneWhen, never outcomes.
+"No bread with dinner" is a move. "Eat 2,400 calories" is an outcome wearing
+a move's clothes and must never be assigned. A collapsed day never
+invalidates the move (the boundary tonight survives a 12-hour morning).
+
+Final rulings on screen contents:
+- The statement's position bar DIES entirely. Sentence + size + cost + hold.
+- THE PEN STAYS (writing today's number is today's act), with NO history:
+  ledgers/books/night-charts of past rows leave Action. History is
+  Consistency's; position is Clarity's.
+- DAYS OWNED (quitting) is the ONE standing exemption: no goal number
+  exists there; the count is the identity and the reason to hold tonight.
+- This week's PLAN may show (rest-day lanes, which days are training days):
+  a plan is not history and not position.

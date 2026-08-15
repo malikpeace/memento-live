@@ -1,0 +1,420 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The room: ten backgrounds</title>
+<style>
+@font-face { font-family:'Geist'; src:url('../fonts/geist-400.otf') format('opentype'); font-weight:400; font-display:swap; }
+@font-face { font-family:'Geist'; src:url('../fonts/geist-500.otf') format('opentype'); font-weight:500; font-display:swap; }
+@font-face { font-family:'Geist'; src:url('../fonts/geist-700.otf') format('opentype'); font-weight:700; font-display:swap; }
+:root{--ink:235,238,248;--text-hi:rgba(var(--ink),.96);--text-mid:rgba(var(--ink),.78);--text-lo:rgba(var(--ink),.45);
+--font:'Geist',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#0a0b0d;color:var(--text-hi);font-family:var(--font);-webkit-font-smoothing:antialiased}
+.gal{padding:26px 34px 140px;max-width:1780px;margin:0 auto}
+.gal h1{font-size:26px;font-weight:700;letter-spacing:-.02em;margin:0 0 6px}
+.gal>.sub{color:var(--text-mid);font-size:14px;margin:0 0 24px;max-width:78ch;line-height:1.55}
+.wall{display:flex;flex-wrap:wrap;gap:46px 44px;align-items:flex-start}
+.cell{max-width:100%}
+.cell h3{font-size:13px;font-weight:700;margin:0 0 2px}
+.cell h3 s{text-decoration:none;color:var(--text-lo);font-weight:500;margin-right:6px;font-variant-numeric:tabular-nums}
+.cell .cap{font-size:11.5px;color:var(--text-lo);margin:0 0 9px;max-width:300px;line-height:1.45;min-height:30px}
+
+/* THE PHONE (copied from gallery.html: .ph IS the screen, the shell is drawn
+   outside it with box-shadow rings, so the island and home indicator double as
+   a safe-area check). */
+/* the shell rings are box-shadow, so they cost no layout: this margin is what
+   keeps them off the caption above and the neighbour beside. */
+.ph{position:relative;margin:16px 0 0;width:300px;height:650px;border-radius:44px;overflow:hidden;background:#050608;
+  box-shadow:
+    0 0 0 11px #0b0c0e,
+    0 0 0 12.5px rgba(var(--ink),.20),
+    0 0 0 13.5px rgba(0,0,0,.9),
+    0 26px 64px rgba(0,0,0,.62)}
+.ph::before{content:'';position:absolute;z-index:90;top:9px;left:50%;transform:translateX(-50%);
+  width:70px;height:21px;border-radius:999px;background:#000;pointer-events:none;
+  box-shadow:inset 0 0 0 .5px rgba(var(--ink),.06)}
+.ph::after{content:'';position:absolute;z-index:90;bottom:7px;left:50%;transform:translateX(-50%);
+  width:104px;height:4px;border-radius:999px;background:rgba(var(--ink),.32);pointer-events:none}
+
+/* ── THE ROOM LAYER ──────────────────────────────────────────────────────
+   Every background lives in .bg, absolutely behind the screen, pointer
+   transparent. Ink only, never a hue: each one is the same near-black with a
+   different amount of the app's own ink in it. Motion, where it exists, is
+   slower than attention: nothing here should ever pull the eye off the
+   sentence. */
+.bg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+
+/* ── THE SCREEN (identical on all ten) ─────────────────────────────────── */
+.s{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;padding:34px 22px 20px;
+  font-variant-numeric:tabular-nums}
+.sp{display:block}
+.sp.a{flex:1.35}
+.sp.b{flex:1}
+.say{font-size:30px;font-weight:700;line-height:1.18;letter-spacing:-.032em;color:rgba(var(--ink),.96)}
+.say b{font-weight:700;font-variant-numeric:tabular-nums}
+.hold{position:relative;height:58px;border-radius:14px;overflow:hidden;
+  background:rgba(22,25,31,.94);
+  backdrop-filter:blur(26px) saturate(1.4);-webkit-backdrop-filter:blur(26px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09);cursor:pointer;touch-action:none;user-select:none;
+  -webkit-user-select:none;-webkit-tap-highlight-color:transparent;transition:background .3s ease-out}
+.hold:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
+.hold .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(var(--ink),.14)}
+.hold .lab{position:absolute;inset:0;display:grid;place-items:center;
+  font-size:13.5px;font-weight:500;color:rgba(var(--ink),.92);white-space:nowrap;
+  transition:padding .26s ease-out}
+.s.done .hold{background:rgba(28,32,39,.94);box-shadow:inset 0 1px 0 rgba(var(--ink),.14)}
+.s.done .hold .fill{width:100%;background:rgba(var(--ink),.10)}
+.s.done .lab{padding-right:74px;color:rgba(var(--ink),.96);font-weight:700}
+.undo{position:absolute;right:6px;top:6px;bottom:6px;width:62px;border:0;border-radius:10px;
+  background:rgba(22,25,31,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.10);color:rgba(var(--ink),.92);font:500 12.5px/1 var(--font);
+  cursor:pointer;opacity:0;pointer-events:none;transition:opacity .2s ease-out .12s}
+.s.done .undo{opacity:1;pointer-events:auto}
+
+/* ── 1 BREATH ──────────────────────────────────────────────────────────
+   One pool of light sitting behind the sentence, not centred on the screen.
+   It swells and settles on a 11s cycle: slower than a breath, and its peak
+   opacity is .05 ink, under the threshold where the eye reads it as motion. */
+.bg-breath .pool{position:absolute;left:50%;top:44%;width:420px;height:420px;margin:-210px 0 0 -210px;
+  background:radial-gradient(circle at 50% 50%,rgba(var(--ink),.055) 0%,rgba(var(--ink),.028) 38%,rgba(var(--ink),0) 70%);
+  animation:breath 11s ease-in-out infinite}
+@keyframes breath{0%,100%{opacity:.45;transform:scale(.94)}50%{opacity:1;transform:scale(1.06)}}
+
+/* ── 2 DUST ────────────────────────────────────────────────────────────
+   A handful of ink specks with mass. Each drifts on its own 200-400s path,
+   which is roughly one pixel every three seconds: you can never catch one
+   moving, but the room is never twice the same. */
+.bg-dust i{position:absolute;border-radius:50%;background:rgba(var(--ink),.16);
+  animation:drift linear infinite}
+@keyframes drift{0%{transform:translate(0,0)}50%{transform:translate(14px,-22px)}100%{transform:translate(0,0)}}
+
+/* ── 3 HORIZON ─────────────────────────────────────────────────────────
+   One line of light low on the screen, fading out before it reaches either
+   edge so it can never read as a box edge. Completely still. */
+.bg-horizon .h{position:absolute;left:0;right:0;top:71%;height:1px;
+  background:linear-gradient(90deg,rgba(var(--ink),0),rgba(var(--ink),.22) 22%,rgba(var(--ink),.22) 78%,rgba(var(--ink),0))}
+/* the glow above the line is RADIAL, never a linear band in a box: a linear
+   fade in a full-width element still has two straight side edges, which is the
+   banned clipped-rectangle look. */
+.bg-horizon .hz{position:absolute;left:-10%;right:-10%;top:71%;height:200px;transform:translateY(-200px);
+  background:radial-gradient(ellipse 62% 100% at 50% 100%,rgba(var(--ink),.045),rgba(var(--ink),0) 72%)}
+
+/* ── 4 GRAIN ───────────────────────────────────────────────────────────
+   No structure at all, just a whisper of film grain so the black reads as a
+   material rather than an absence. Static: animated grain is decoration. */
+.bg-grain .g{position:absolute;inset:-20%;opacity:.14;
+  background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E")}
+
+/* ── 5 RULES ───────────────────────────────────────────────────────────
+   The grid with its verticals removed: a dark notebook. Wide spacing (54px)
+   so it is a surface to write on, not a mesh to read. */
+.bg-rules .r{position:absolute;inset:0;
+  background-image:linear-gradient(rgba(var(--ink),.05) 1px,transparent 1px);
+  background-size:100% 54px;background-position:0 26px}
+
+/* ── 6 CONTOURS ────────────────────────────────────────────────────────
+   A few topographic curves in one corner: terrain, drawn once, never moving.
+   The only background here with a hand in it. */
+.bg-contours svg{position:absolute;right:-40px;bottom:-20px;width:300px;height:300px}
+
+/* ── 7 TIDE ────────────────────────────────────────────────────────────
+   The bottom fifth of the room is a hair lighter than the rest. It rises
+   while the hold is pressed and falls back when it is released: the room
+   answers the gesture instead of the gesture answering itself. */
+.bg-tide .t{position:absolute;left:0;right:0;bottom:0;height:20%;
+  background:linear-gradient(to top,rgba(var(--ink),.05),rgba(var(--ink),0));
+  transition:height 2.2s cubic-bezier(.3,.7,.3,1)}
+/* it comes in inside the 1.4s hold and takes twice as long to go back out, so
+   the room answers the press and then settles, rather than blinking. */
+.ph.holding .bg-tide .t{height:27%;transition:height .9s cubic-bezier(.2,.7,.2,1)}
+
+/* ── 8 HOUR ────────────────────────────────────────────────────────────
+   The black itself is not one black. It sits deepest before dawn and lifts a
+   few values by late afternoon, on the app's own near-black, ink only, no
+   warmth of hue. Nobody would catch it in a day; everybody would feel it
+   over a month. The scrubber exists only so it can be seen at all. */
+.bg-hour{background:#050608;transition:background 320ms linear}
+.scrub{display:flex;align-items:center;gap:9px;margin-top:12px;width:300px}
+.scrub input{-webkit-appearance:none;appearance:none;flex:1;height:22px;background:none;cursor:pointer}
+.scrub input::-webkit-slider-runnable-track{height:3px;border-radius:999px;background:rgba(var(--ink),.14)}
+.scrub input::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:14px;height:14px;
+  border-radius:999px;background:rgba(var(--ink),.9);margin-top:-5.5px}
+.scrub input::-moz-range-track{height:3px;border-radius:999px;background:rgba(var(--ink),.14)}
+.scrub input::-moz-range-thumb{border:0;width:14px;height:14px;border-radius:999px;background:rgba(var(--ink),.9)}
+.scrub b{font-size:12px;font-weight:700;color:rgba(var(--ink),.9);font-variant-numeric:tabular-nums;min-width:44px}
+
+/* ── 9 WAKE ────────────────────────────────────────────────────────────
+   At rest the room is empty black. Touch leaves light behind it, which takes
+   about two seconds to forget. The only background that is nothing until the
+   person does something. */
+.bg-wake u{position:absolute;width:130px;height:130px;margin:-65px 0 0 -65px;
+  background:radial-gradient(circle at 50% 50%,rgba(var(--ink),.085),rgba(var(--ink),0) 68%);
+  opacity:1;animation:wake 2.2s ease-out forwards}
+@keyframes wake{0%{opacity:.9;transform:scale(.7)}100%{opacity:0;transform:scale(1.5)}}
+
+/* ── 10 THREADS ────────────────────────────────────────────────────────
+   Three long vertical hairlines at unrelated offsets, fading at both ends.
+   One of them moves: about a pixel a minute, six pixels in an hour. It is
+   never seen moving, only found somewhere else later. */
+.bg-threads i{position:absolute;top:0;bottom:0;width:1px;
+  background:linear-gradient(to bottom,rgba(var(--ink),0),rgba(var(--ink),.10) 18%,rgba(var(--ink),.10) 82%,rgba(var(--ink),0))}
+.bg-threads i.moving{animation:thread 3600s linear infinite alternate}
+@keyframes thread{0%{transform:translateX(0)}100%{transform:translateX(60px)}}
+
+/* THE FREEZE: every one of these must be able to hold perfectly still. */
+@media (prefers-reduced-motion:reduce){
+  /* the ROOM freezes. The hold's own fill is not decoration, it is the
+     progress of the gesture, so it is deliberately left alone. */
+  .bg,.bg *{animation:none!important;transition:none!important}
+  .bg-breath .pool{opacity:.8;transform:none}
+  .bg-wake u{display:none}
+  .ph.holding .bg-tide .t{height:20%}
+}
+</style></head><body><div class="gal">
+<h1>The room: ten backgrounds</h1>
+<p class="sub">One screen, ten rooms. Every phone carries the identical statement and hold bar from the settled
+flow, so the only variable is what the black is made of. Ink only, never a hue. Where there is motion it is
+slower than attention on purpose: a background that can be caught moving is decoration, and decoration is banned.
+All ten freeze completely under reduced motion.</p>
+<div class="wall">
+
+<!-- 1 BREATH -->
+<section class="cell">
+  <h3><s>1</s>Breath</h3>
+  <p class="cap">Near-black with one barely-there pool of light behind the sentence, swelling and settling on an eleven second rhythm.</p>
+  <div class="ph" data-bg="breath">
+    <div class="bg bg-breath"><div class="pool"></div></div>
+  </div>
+</section>
+
+<!-- 2 DUST -->
+<section class="cell">
+  <h3><s>2</s>Dust</h3>
+  <p class="cap">A handful of faint ink specks drifting on paths so slow the room is never twice the same and never once in motion.</p>
+  <div class="ph" data-bg="dust">
+    <div class="bg bg-dust"></div>
+  </div>
+</section>
+
+<!-- 3 HORIZON -->
+<section class="cell">
+  <h3><s>3</s>Horizon</h3>
+  <p class="cap">One thin line of light low on the screen, fading out before either edge. Nothing moves, and the sentence has a ground to stand on.</p>
+  <div class="ph" data-bg="horizon">
+    <div class="bg bg-horizon"><div class="hz"></div><div class="h"></div></div>
+  </div>
+</section>
+
+<!-- 4 GRAIN -->
+<section class="cell">
+  <h3><s>4</s>Grain</h3>
+  <p class="cap">No lines at all, a whisper of film grain, so the black reads as a material the screen is made of rather than an absence.</p>
+  <div class="ph" data-bg="grain">
+    <div class="bg bg-grain"><div class="g"></div></div>
+  </div>
+</section>
+
+<!-- 5 RULES -->
+<section class="cell">
+  <h3><s>5</s>Rules</h3>
+  <p class="cap">The grid with its verticals taken out: wide-spaced ruled lines only, a dark notebook waiting for one line of writing.</p>
+  <div class="ph" data-bg="rules">
+    <div class="bg bg-rules"><div class="r"></div></div>
+  </div>
+</section>
+
+<!-- 6 CONTOURS -->
+<section class="cell">
+  <h3><s>6</s>Contours</h3>
+  <p class="cap">A few faint topographic curves in one corner, drawn once and never animated. Terrain, not pattern.</p>
+  <div class="ph" data-bg="contours">
+    <div class="bg bg-contours">
+      <svg viewBox="0 0 300 300" fill="none" aria-hidden="true">
+        <g stroke="rgba(235,238,248,.085)" stroke-width="1">
+          <path d="M300 40C244 46 206 78 190 122c-16 44-52 66-104 70"/>
+          <path d="M300 84C256 92 226 118 213 154c-14 38-46 58-93 62"/>
+          <path d="M300 128C268 136 246 156 236 184c-11 30-36 46-72 50"/>
+          <path d="M300 172C280 179 266 194 259 214c-8 22-26 34-51 38"/>
+          <path d="M300 216C290 221 283 230 279 242c-5 13-15 20-28 23"/>
+        </g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- 7 TIDE -->
+<section class="cell">
+  <h3><s>7</s>Tide</h3>
+  <p class="cap">The bottom fifth is a hair lighter than the rest. It rises while the hold is pressed and falls back on release.</p>
+  <div class="ph" data-bg="tide">
+    <div class="bg bg-tide"><div class="t"></div></div>
+  </div>
+</section>
+
+<!-- 8 HOUR -->
+<section class="cell">
+  <h3><s>8</s>Hour</h3>
+  <p class="cap">The black itself shifts by real time of day, deepest before dawn, a few values lifted by late afternoon. Scrub a day to see it.</p>
+  <div class="ph" data-bg="hour">
+    <div class="bg bg-hour"></div>
+  </div>
+  <div class="scrub"><input type="range" min="0" max="23" step="1" value="9" aria-label="hour of day"><b>09:00</b></div>
+</section>
+
+<!-- 9 WAKE -->
+<section class="cell">
+  <h3><s>9</s>Wake</h3>
+  <p class="cap">Nothing at rest. Touch leaves a slow-fading trace of light behind it, and the room forgets in about two seconds.</p>
+  <div class="ph" data-bg="wake">
+    <div class="bg bg-wake"></div>
+  </div>
+</section>
+
+<!-- 10 THREADS -->
+<section class="cell">
+  <h3><s>10</s>Threads</h3>
+  <p class="cap">Three long vertical hairlines at unrelated offsets. One of them travels about a pixel a minute and is only ever found somewhere else.</p>
+  <div class="ph" data-bg="threads">
+    <div class="bg bg-threads"></div>
+  </div>
+</section>
+
+</div></div>
+<script>(function(){
+  var REDUCED = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* THE SCREEN: written once and stamped into all ten phones, so nobody can
+     accidentally differ. Sentence, size in the sentence, hold. */
+  var SCREEN =
+    '<div class="s">' +
+      '<span class="sp a"></span>' +
+      '<div class="say">Message <b>5</b> potential clients.</div>' +
+      '<span class="sp b"></span>' +
+      '<div class="hold" role="button" tabindex="0" aria-label="Hold to confirm, message 5 potential clients">' +
+        '<div class="fill"></div>' +
+        '<div class="lab">Hold to confirm</div>' +
+        '<button type="button" class="undo" tabindex="-1">Undo</button>' +
+      '</div>' +
+    '</div>';
+
+  var HOLD_MS = 1400;
+
+  document.querySelectorAll('.ph').forEach(function(ph){
+    ph.insertAdjacentHTML('beforeend', SCREEN);
+    var s = ph.querySelector('.s'),
+        hold = ph.querySelector('.hold'),
+        fill = ph.querySelector('.fill'),
+        lab = ph.querySelector('.lab'),
+        undo = ph.querySelector('.undo'),
+        timer = null, done = false;
+
+    function complete(){
+      done = true; if(timer){clearTimeout(timer);timer=null;}
+      ph.classList.remove('holding');
+      s.classList.add('done');
+      fill.style.transition = 'width .18s ease-out'; fill.style.width = '100%';
+      lab.textContent = 'Messaged 5 clients';
+      hold.setAttribute('aria-label','Messaged 5 clients');
+    }
+    function reset(){
+      done = false; s.classList.remove('done');
+      fill.style.transition = 'none'; fill.style.width = '0';
+      lab.textContent = 'Hold to confirm';
+      hold.setAttribute('aria-label','Hold to confirm, message 5 potential clients');
+    }
+    function start(e){
+      if(done) return;
+      if(e && e.target.closest('.undo')) return;
+      ph.classList.add('holding');
+      fill.style.transition = 'width ' + (HOLD_MS/1000) + 's linear';
+      fill.style.width = '100%';
+      timer = setTimeout(function(){ timer = null; complete(); }, HOLD_MS);
+    }
+    function stop(){
+      ph.classList.remove('holding');
+      if(done) return;
+      if(timer){ clearTimeout(timer); timer = null; }
+      fill.style.transition = 'width .2s ease-out'; fill.style.width = '0';
+    }
+    hold.addEventListener('pointerdown', start);
+    ['pointerup','pointerleave','pointercancel'].forEach(function(ev){
+      hold.addEventListener(ev, stop);
+    });
+    hold.addEventListener('keydown', function(e){
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); done ? reset() : complete(); }
+    });
+    undo.addEventListener('click', function(e){ e.stopPropagation(); reset(); });
+  });
+
+  /* 2 DUST: fixed offsets so the composition is designed, not random each
+     load. Durations are 210-390s, which is about a pixel every three seconds. */
+  (function(){
+    var host = document.querySelector('.bg-dust'); if(!host) return;
+    var SPECKS = [
+      [14, 12, 2, 240,  0.16], [62, 31, 1, 320,  0.13], [38, 58, 1.5, 290, 0.11],
+      [82, 47, 1, 210,  0.15], [24, 74, 2, 355,  0.12], [70, 88, 1.5, 265, 0.14],
+      [48, 19, 1, 390,  0.10], [89, 66, 1.5, 230, 0.12], [8,  41, 1, 310,  0.13],
+      [56, 95, 1, 275,  0.10], [33, 84, 1.5, 340, 0.11], [77, 8,  1, 300,  0.12]
+    ];
+    SPECKS.forEach(function(sp, i){
+      var el = document.createElement('i');
+      el.style.left = sp[0] + '%';
+      el.style.top = sp[1] + '%';
+      el.style.width = el.style.height = sp[2] + 'px';
+      el.style.background = 'rgba(var(--ink),' + sp[4] + ')';
+      el.style.animationDuration = sp[3] + 's';
+      el.style.animationDelay = (-i * 17) + 's';
+      host.appendChild(el);
+    });
+  })();
+
+  /* 10 THREADS: three hairlines, unrelated offsets, one of them moving. */
+  (function(){
+    var host = document.querySelector('.bg-threads'); if(!host) return;
+    [[19, false], [53, true], [86, false]].forEach(function(t){
+      var el = document.createElement('i');
+      el.style.left = t[0] + '%';
+      if(t[1]) el.className = 'moving';
+      host.appendChild(el);
+    });
+  })();
+
+  /* 8 HOUR: the near-black's own value on a day curve, deepest around 4am,
+     lifted around 4pm. Neutral throughout, it is the app's near-black with
+     more or less of itself in it. */
+  (function(){
+    var cell = document.querySelector('.ph[data-bg=hour]'); if(!cell) return;
+    var bg = cell.querySelector('.bg-hour'),
+        scrub = document.querySelector('.scrub input'),
+        read = document.querySelector('.scrub b');
+    function paint(h){
+      var lift = (1 - Math.cos(2 * Math.PI * (h - 4) / 24)) / 2;   // 0 at 4am, 1 at 4pm
+      var c = 5 + Math.round(lift * 4);   // four values across a whole day: felt, not seen
+      bg.style.background = 'rgb(' + c + ',' + (c + 1) + ',' + (c + 3) + ')';
+      read.textContent = (h < 10 ? '0' : '') + h + ':00';
+    }
+    scrub.addEventListener('input', function(){ paint(+scrub.value); });
+    var now = new Date().getHours();
+    scrub.value = now; paint(now);
+  })();
+
+  /* 9 WAKE: touch leaves light. Throttled so a fast drag lays a trail, not a
+     smear, and each trace cleans itself up. */
+  (function(){
+    var ph = document.querySelector('.ph[data-bg=wake]'); if(!ph || REDUCED) return;
+    var host = ph.querySelector('.bg-wake'), last = 0;
+    function trace(e){
+      var t = e.timeStamp || Date.now();
+      if(t - last < 90) return;
+      last = t;
+      var r = ph.getBoundingClientRect();
+      var u = document.createElement('u');
+      u.style.left = (e.clientX - r.left) + 'px';
+      u.style.top = (e.clientY - r.top) + 'px';
+      host.appendChild(u);
+      setTimeout(function(){ if(u.parentNode) u.parentNode.removeChild(u); }, 2400);
+    }
+    ph.addEventListener('pointermove', trace);
+    ph.addEventListener('pointerdown', trace);
+  })();
+})();</script>
+</body></html>

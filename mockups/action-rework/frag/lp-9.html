@@ -1,81 +1,71 @@
 <!-- ARCHETYPES, the surviving set: lp-1 full-bleed statement type | lp-6 vertical descent rail | lp-7 poster ceiling number |
-     lp-8 hundred-mark field | lp-9 ruled ledger book | lp-10 receipt tape | lp-12 full-height week columns |
-     lp-15 bottom sheet first | lp-16 horizontal corridor band | lp-17 declarative sentence over account rows |
+     lp-8 hundred-mark field | lp-9 single ruled page | lp-10 receipt tape | lp-12 full-height week columns |
+     lp-15 bottom sheet first | lp-16 horizontal corridor band | lp-17 declarative sentence |
      lp-18 centered monolith numeral -->
 <section class="cell" data-k="lp-9">
-<!-- PURITY: Action, so the book holds today and their own raw entries only.
-     No "to go" headline, no target, no seven day average: reading a measured
-     number against the goal is Clarity's face, one swipe away.
+<!-- THE PEN STAYS, THE BOOK GOES (Malik, 2026-08-15, the settled flow).
+     The ledger of past rows is out of Action. Ten days of their own numbers with
+     a change column beside each one is a record, and a record read day after day
+     is a trajectory, which is Consistency's face. Yesterday's single value went
+     with it: on a screen whose whole job is writing today's number, a number
+     from yesterday sitting next to the field exists only to be compared with,
+     and that comparison is the reading Action does not do.
 
-     BEAUTY PASS (2026-08-13). It was a data table wearing a book's name: pill
-     chips, a "day / you wrote / change" header, and six small sentences around
-     the edges. Now it is a ledger.
-     ONE SYSTEM: today's open row has the SAME anatomy as every row under it,
-     day on the left, number on the right, change last, all on one shared
-     column grid. It is simply taller, empty, and ruled in green. Nothing else
-     on the page is green, so the eye lands on the line to write on.
-     CUT: the column header (a table tell), "Tap and type it" (the caret says
-     it), "That is -0.6 on yesterday." (the change column says it), the written
-     receipt box (the hold says it) and the "You typed every number" footer (a
-     field of numbers you typed does not need a caption). What is left is ONE
-     instruction sentence: today's action.
-     RULED, NOT BOXED: every number sits ON a hairline rule instead of inside a
-     chip, which is what makes it read as a book instead of a spreadsheet.
-     GESTURE LAW: writing the day in is a completion, so it is a hold now,
-     1400ms, early release aborts.
+     WHAT REMAINS, recomposed so it is a page and not a gutted table: the paper.
+     The sheet keeps its ruling as pure texture, faint and fading toward the
+     foot, with ONE rule live, drawn in green, and today's number written on it
+     at the scale the act deserves (44px, up from 32, because it is now the
+     subject of the screen instead of the first row of a table). Under the page:
+     today's move at three sizes, where the size's only consequence is the move
+     sentence changing, and the hold that writes the day in.
+     Renamed: with no rows under it there is no book, so the screen is the page.
 
-     TIGHTENED RULE (Malik, 2026-08-15). "It is showing too much information."
-     An Action screen shows TODAY, never how far along the journey they are.
-     CUT the consequence line under the sizes: "the plan reckons about half a
-     pound a week off" is a projection, which is a reading of the goal, which
-     is Clarity's face. The size chips still make their consequence legible the
-     only way Action is allowed to, by changing the move sentence itself
-     (20 minutes walking / 60 minutes walking, no bread, no late snack).
-     What is left on the page: the row to write today's number on, today's
-     move, and the days already written. No goal, no target, no rate, no
-     distance. The room the projection gave back went to the book, which now
-     runs ten days deep instead of eight, so the ruled pages reach the foot of
-     the page and the open row keeps its air. -->
+     GESTURE LAW: writing the day in is a completion, so it is a hold, 1400ms,
+     early release aborts. -->
 <style>
 [data-k=lp-9] .ph{font-variant-numeric:tabular-nums}
 
-/* the book */
+/* the page */
 [data-k=lp-9] .book{position:absolute;left:12px;right:12px;top:16px;bottom:12px;display:flex;flex-direction:column;
-  padding:16px 16px 14px;border-radius:16px;background:rgba(22,25,31,.955);
+  padding:18px 16px 14px;border-radius:16px;overflow:hidden;background:rgba(22,25,31,.955);
   -webkit-backdrop-filter:blur(30px) saturate(1.4);backdrop-filter:blur(30px) saturate(1.4);
   box-shadow:inset 0 1px 0 rgba(var(--ink),.075),0 20px 44px rgba(0,0,0,.52)}
+/* the ruling is paper, not data: no day sits on any of these lines, and they
+   fade out before the foot so nothing reads as a row waiting to be filled */
+[data-k=lp-9] .rule{position:absolute;left:0;right:0;top:18px;bottom:0;pointer-events:none;
+  background:repeating-linear-gradient(180deg,transparent 0 33px,rgba(var(--ink),.045) 33px 34px);
+  -webkit-mask-image:linear-gradient(180deg,#000 0,#000 62%,transparent 96%);
+          mask-image:linear-gradient(180deg,#000 0,#000 62%,transparent 96%)}
 
-/* --- ONE column grid: the open row and every ruled row below share it ----- */
-[data-k=lp-9] .rw{display:grid;grid-template-columns:1fr 108px 50px;align-items:baseline;gap:8px}
-[data-k=lp-9] .rw>*:not(:first-child){text-align:right}
-
-/* --- today: the row still open, and it is the writing line --------------- */
-[data-k=lp-9] .open{position:relative;align-items:center;height:66px;padding:0 12px;border-radius:11px;
-  background:rgba(var(--ink),.055);box-shadow:inset 0 1px 0 rgba(var(--ink),.08);cursor:text}
-/* the line you write on: straight, inset from the corners, never a glow that
-   curves around the radius */
-[data-k=lp-9] .open:after{content:"";position:absolute;left:12px;right:12px;bottom:0;height:2px;
+/* --- today: the one rule still open, and it is the writing line ---------- */
+[data-k=lp-9] .open{position:relative;display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:10px;
+  height:68px;padding:0 12px;cursor:text}
+/* the live rule: straight, sitting exactly where the paper's own rule would be */
+[data-k=lp-9] .open:after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;
   border-radius:2px;background:#3fd94e;transition:background .3s ease-out}
-[data-k=lp-9] .done .open:after{background:rgba(var(--ink),.12)}
+[data-k=lp-9] .done .open:after{background:rgba(var(--ink),.14)}
 [data-k=lp-9] .open .dy{font-size:14px;font-weight:700;letter-spacing:-.015em;color:rgba(var(--ink),.97)}
-[data-k=lp-9] .open input{width:100%;height:44px;border:0;outline:0;background:transparent;padding:0;text-align:right;
-  font:700 32px/44px var(--font);letter-spacing:-.03em;font-variant-numeric:tabular-nums;
+[data-k=lp-9] .open input{width:100%;height:56px;border:0;outline:0;background:transparent;padding:0;text-align:right;
+  font:700 44px/56px var(--font);letter-spacing:-.04em;font-variant-numeric:tabular-nums;
   color:rgba(var(--ink),.98);caret-color:#3fd94e}
 [data-k=lp-9] .open input::-webkit-outer-spin-button,[data-k=lp-9] .open input::-webkit-inner-spin-button{display:none}
-[data-k=lp-9] .open .unit{font-size:13.5px;font-weight:500;color:rgba(var(--ink),.90)}
+[data-k=lp-9] .open .unit{font-size:15px;font-weight:500;color:rgba(var(--ink),.90);align-self:flex-end;padding-bottom:12px}
 /* the caret is the only invitation the line needs */
-[data-k=lp-9] .caret{position:absolute;right:70px;top:50%;width:2px;height:30px;margin-top:-15px;
+[data-k=lp-9] .caret{position:absolute;right:44px;top:50%;width:2px;height:38px;margin-top:-19px;
   background:#3fd94e;animation:l9c 1.05s step-end infinite;pointer-events:none}
 [data-k=lp-9] .filled .caret{display:none}
+/* the real caret takes over the moment the line is touched: two carets on one
+   line is a stutter */
+[data-k=lp-9] .open input:focus~.caret{display:none}
 @keyframes l9c{0%,50%{opacity:1}50.01%,100%{opacity:0}}
 [data-k=lp-9] .done .open{cursor:default}
 
 /* --- the one instruction sentence, and the dial under it ----------------- */
 /* nothing sits under the dial: the move sentence IS the consequence of the
    size, and a rate ("half a pound a week off") would be a reading of the goal */
-[data-k=lp-9] .act{margin:22px 0 0;font-size:16px;font-weight:700;line-height:1.32;letter-spacing:-.018em;
-  color:rgba(var(--ink),.97);min-height:42px}
-[data-k=lp-9] .seg{display:flex;gap:3px;margin:12px 0 0;padding:3px;border-radius:12px;background:rgba(var(--ink),.055)}
+[data-k=lp-9] .act{margin:auto 0 0;font-size:17px;font-weight:700;line-height:1.32;letter-spacing:-.02em;
+  color:rgba(var(--ink),.97);min-height:45px}
+[data-k=lp-9] .seg{display:flex;gap:3px;margin:13px 0 0;padding:3px;border-radius:12px;background:rgba(var(--ink),.055)}
 [data-k=lp-9] .seg button{flex:1;font:500 12.5px var(--font);color:rgba(var(--ink),.90);background:transparent;border:0;
   border-radius:9px;padding:9px 0;cursor:pointer;-webkit-tap-highlight-color:transparent;
   transition:background .16s ease-out,box-shadow .16s ease-out}
@@ -84,7 +74,7 @@
 [data-k=lp-9] .seg.lock button{cursor:default}
 
 /* --- the completion: a hold, like every completion in the set ------------ */
-[data-k=lp-9] .hold{position:relative;height:58px;margin:16px 0 0;border-radius:14px;overflow:hidden;
+[data-k=lp-9] .hold{position:relative;height:58px;margin:14px 0 0;border-radius:14px;overflow:hidden;
   background:rgba(var(--ink),.05);box-shadow:inset 0 1px 0 rgba(var(--ink),.07);
   cursor:default;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;
   transition:background .28s ease-out,box-shadow .28s ease-out}
@@ -99,22 +89,9 @@
 [data-k=lp-9] .hold svg{display:none;width:14px;height:14px;fill:none;stroke:#3fd94e;stroke-width:2.6;
   stroke-linecap:round;stroke-linejoin:round}
 [data-k=lp-9] .done .hold svg{display:block}
-
-/* --- the pages already written: ruled, never boxed ---------------------- */
-[data-k=lp-9] .past{margin:auto 0 0;padding-top:16px}
-/* same 12px inset as the open row, so every column in the book lines up */
-[data-k=lp-9] .past .rw{height:30px;padding:0 12px;align-items:center;
-  box-shadow:inset 0 -1px 0 rgba(var(--ink),.07)}
-[data-k=lp-9] .past .rw:last-child{box-shadow:none}
-[data-k=lp-9] .past .d{font-size:12.5px;color:rgba(var(--ink),.90)}
-[data-k=lp-9] .past .v{font-size:15px;font-weight:500;letter-spacing:-.01em;color:rgba(var(--ink),.96)}
-/* the change column is never coloured: a day up and a day down look the same
-   in the book, whichever direction the goal happens to run */
-[data-k=lp-9] .past .c{font-size:12.5px;color:rgba(var(--ink),.90)}
-[data-k=lp-9] .past .rw.new .v{color:rgba(var(--ink),1);font-weight:700}
 @media (prefers-reduced-motion:reduce){[data-k=lp-9] .caret{animation:none}[data-k=lp-9] *{transition:none!important}}
 </style>
-<h3>The weight book</h3><p class="cap">A ruled ledger where today is the one row still open, and that row has the same anatomy as every row under it: day, number, change. The number is not shown to you, you write it on the green line.</p>
+<h3>The page</h3><p class="cap">The pen ritual with the ledger taken out from under it: a ruled page whose one live line is today's, written at the scale of the act itself, with the day's move under it and nothing to read a position off.</p>
 <div class="bk" role="group" aria-label="which way this goal runs">
   <i>Body</i>
   <button type="button" class="on" data-b="down" aria-pressed="true">Weight down</button>
@@ -124,6 +101,8 @@
   <div class="grid"></div>
 
   <div class="book" id="l9book">
+    <div class="rule" aria-hidden="true"></div>
+
     <label class="rw open" id="l9slot" for="l9in">
       <span class="dy">Today</span>
       <input id="l9in" type="text" inputmode="decimal" autocomplete="off" aria-label="write today's weight in pounds">
@@ -138,19 +117,16 @@
       <span class="fl"></span>
       <span class="tx"><svg viewBox="0 0 24 24"><path d="M4 13l5 5L20 7"/></svg><b id="l9lab">Write today's weight first</b></span>
     </div>
-
-    <div class="past" id="l9past"></div>
   </div>
 </div>
 <script>(function(){var r=document.querySelector('[data-k="lp-9"]');if(!r)return;
 
-/* Two directions, one book. The days before today are the only raw numbers in
-   either context, and the only arithmetic on them is yesterday's change. No
-   target lives here, and no rate either: what the numbers mean against the
+/* Two directions, one page. Nothing is remembered on this screen: there is no
+   past value here to write against, because what the numbers mean against the
    goal, and how fast it is going, are both Clarity's face. */
 var CTX={
   down:{
-    H:[245.1,244.8,244.6,244.2,244.5,243.9,244.1,243.6,243.4,243.0,243.2,242.5,242.8,242.2],
+    unit:'lb',ask:"Write today's weight first",
     acts:[
       {t:'Light',a:'20 minutes walking.'},
       {t:'Steady',a:'40 minutes walking. No bread with dinner.'},
@@ -158,7 +134,7 @@ var CTX={
     ],pick:1
   },
   up:{
-    H:[148.2,148.5,148.6,149.0,148.8,149.6,150.2,150.0,150.6,151.0,150.7,151.4,151.8,151.6],
+    unit:'lb',ask:"Write today's weight first",
     acts:[
       {t:'Light',a:'Three full meals. No skipped lunch.'},
       {t:'Steady',a:'Three meals and a shake. Push session, 45 minutes.'},
@@ -166,16 +142,13 @@ var CTX={
     ],pick:1
   }
 };
-var DAYS=['Sat 1','Sun 2','Mon 3','Tue 4','Wed 5','Thu 6','Fri 7','Sat 8','Sun 9','Mon 10'],ROWS=DAYS.length;
 
 var act=r.querySelector('#l9act'),seg=r.querySelector('#l9seg'),
     book=r.querySelector('#l9book'),slot=r.querySelector('#l9slot'),inp=r.querySelector('#l9in'),
     hold=r.querySelector('#l9hold'),fl=hold.querySelector('.fl'),lab=r.querySelector('#l9lab'),
-    past=r.querySelector('#l9past'),
     C=CTX.down,pick=1,written=false,ready=false,HOLD=1400,ht=null;
 
 function r1(n){return (Math.round(n*10)/10).toFixed(1)}
-function sgn(n){return (n>0?'+':'')+r1(n)}
 function val(){var v=parseFloat(inp.value);return (v>=80&&v<=700)?v:null}
 
 function drawSeg(){
@@ -195,21 +168,9 @@ function drawSeg(){
   });
 }
 
-function row(d,v,c,isNew){
-  var el=document.createElement('div');el.className='rw'+(isNew?' new':'');
-  el.innerHTML='<span class="d">'+d+'</span><span class="v">'+v+'</span><span class="c">'+c+'</span>';
-  return el;
-}
-function drawPast(){
-  past.textContent='';
-  /* newest first, all of it their own typed numbers plus the day's change */
-  var n=C.H.length,i;
-  for(i=n-1;i>=n-ROWS;i--) past.appendChild(row(DAYS[i-(n-ROWS)],r1(C.H[i]),sgn(C.H[i]-C.H[i-1]),false));
-}
-
 function setReady(v){
   ready=v;hold.classList.toggle('rdy',v);hold.setAttribute('aria-disabled',v?'false':'true');
-  lab.textContent=v?('Hold to write '+r1(val())+' in'):"Write today's weight first";
+  lab.textContent=v?('Hold to write '+r1(val())+' in'):C.ask;
 }
 inp.addEventListener('input',function(){
   if(written)return;
@@ -230,29 +191,27 @@ function abort(){
 function write(){
   ht=null;var v=val();if(written||v===null)return;
   written=true;book.classList.add('done');seg.classList.add('lock');inp.readOnly=true;
+  inp.value=r1(v);
   /* the fill retires once it has done its job: the confirmation is the quiet
      green surface, not a saturated block */
   fl.style.transition='width .24s ease-out';fl.style.width='0';
-  var d=v-C.H[C.H.length-1];
   lab.textContent='Written in';
-  past.insertBefore(row('Today',r1(v),sgn(d),true),past.firstElementChild);
-  past.removeChild(past.lastElementChild);
 }
 hold.addEventListener('pointerdown',start);
 ['pointerup','pointerleave','pointercancel'].forEach(function(ev){hold.addEventListener(ev,abort)});
 hold.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' ')start(e)});
 hold.addEventListener('keyup',abort);
 
-/* --- swapping the direction: same book, the goal's own numbers and words -- */
+/* --- swapping the direction: same page, the goal's own words ------------- */
 function render(key){
   C=CTX[key];pick=C.pick;written=false;ready=false;
   book.classList.remove('done');seg.classList.remove('lock');
   inp.readOnly=false;inp.value='';slot.classList.remove('filled');
   clearTimeout(ht);ht=null;fl.style.transition='none';fl.style.width='0';
   hold.classList.remove('rdy');hold.setAttribute('aria-disabled','true');
-  lab.textContent="Write today's weight first";
+  lab.textContent=C.ask;
   act.textContent=C.acts[pick].a;
-  drawSeg();drawPast();
+  drawSeg();
 }
 r.querySelectorAll('.bk button').forEach(function(b){
   b.addEventListener('click',function(){

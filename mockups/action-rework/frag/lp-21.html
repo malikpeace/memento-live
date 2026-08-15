@@ -1,13 +1,19 @@
 <!-- ARCHETYPES, the surviving set: lp-1 full-bleed statement type | lp-6 vertical descent rail | lp-7 poster ceiling number |
-     lp-8 hundred-mark field | lp-9 ruled ledger book | lp-10 receipt tape | lp-12 full-height week columns |
-     lp-15 bottom sheet first | lp-16 horizontal corridor band | lp-17 declarative sentence over account rows |
+     lp-8 hundred-mark field | lp-9 single ruled page | lp-10 receipt tape | lp-12 full-height week columns |
+     lp-15 bottom sheet first | lp-16 horizontal corridor band | lp-17 declarative sentence |
      lp-18 centered monolith numeral | lp-21 whole-screen hold canvas -->
 <section class="cell" data-k="lp-21">
 <style>
 /* THE OPEN PRACTICE. Nothing to count toward, so nothing pretends there is:
    no dial (there is no honest way to scale "an honest page"), no deadline,
-   no day counter, no percent. One statement at poster scale, one gesture,
-   and the banked total underneath as the only number on the screen. */
+   no day counter, no percent.
+   THE PEN STAYS, THE BOOKS GO (Malik, 2026-08-15): the banked total, "19 pages
+   since 4 March", is gone too. It was arithmetic over every day they logged,
+   which is the record summed into one figure, and a figure that only ever grows
+   is a distance travelled. Quitting's days-owned is the one standing exemption
+   and this is not it: this goal has a move, and the move is the screen.
+   What is left is the statement at poster scale, the hold that makes it true
+   for today, and the door for a day that went differently. No number at all. */
 [data-k=lp-21] .p21{position:absolute;inset:0;display:flex;flex-direction:column;padding:34px 22px 24px;
   font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent;user-select:none;
   touch-action:none;cursor:pointer}
@@ -31,12 +37,6 @@
 [data-k=lp-21] .rest{margin:18px 0 0;max-width:212px;font-size:12.5px;line-height:1.55;
   color:rgba(var(--ink),.90)}
 
-[data-k=lp-21] .bank{display:flex;align-items:baseline;gap:7px}
-[data-k=lp-21] .bank b{font-size:30px;font-weight:700;letter-spacing:-.04em;line-height:1;
-  color:rgba(var(--ink),.97);transition:color .3s ease-out}
-[data-k=lp-21] .bank u{text-decoration:none;font-size:14.5px;color:rgba(var(--ink),.92)}
-[data-k=lp-21] .src{margin:9px 0 0;font-size:11.5px;line-height:1.45;color:rgba(var(--ink),.90)}
-
 /* the hold's own precision read, under the drama of the wash */
 /* the track rests at .06 so it is a hairline the hold walks along, not a rule
    drawn across the foot: at .12 it read as a divider and split the block in two */
@@ -51,8 +51,7 @@
 [data-k=lp-21] .amend:active{background:rgba(31,35,43,.95)}
 [data-k=lp-21] .amend:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
 
-/* banked */
-[data-k=lp-21] .p21.done .bank b{color:#3fd94e}
+/* banked: the wash IS the confirmation, so nothing else changes colour */
 [data-k=lp-21] .p21.done{cursor:default}
 [data-k=lp-21] .p21.off{cursor:default}
 
@@ -83,7 +82,7 @@
 [data-k=lp-21] .sheet button:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){[data-k=lp-21] *{transition:none!important}}
 </style>
-<h3>The practice</h3><p class="cap">The shape for goals with nothing to count toward: the practice itself is the whole screen, the only gesture is holding until it is true, and the banked total is the only number, growing with no finish line to measure it against.</p>
+<h3>The practice</h3><p class="cap">The shape for goals with nothing to count toward: the practice itself is the whole screen, the only gesture is holding until it is true, and there is no number anywhere, because a total would be the one thing this goal cannot honestly claim.</p>
 <div class="bk"><i>Everything else</i></div>
 <div class="ph">
   <div class="grid"></div>
@@ -100,10 +99,6 @@
     </div>
 
     <div class="foot">
-      <!-- the ONLY number: arithmetic over the pages they logged, never a percent -->
-      <div class="bank"><b class="n">19</b><u class="u">pages</u></div>
-      <p class="src">From the days you logged since 4 March.</p>
-
       <div class="rail"><i></i></div>
       <p class="hint">Press and hold anywhere to bank today.</p>
       <button type="button" class="amend">It went differently</button>
@@ -126,12 +121,10 @@
 <script>(function(){
   var r=document.querySelector('[data-k="lp-21"]');if(!r)return;
   var p=r.querySelector('.p21'),wash=r.querySelector('.wash'),fill=r.querySelector('.rail i'),
-      hint=r.querySelector('.hint'),num=r.querySelector('.bank .n'),unit=r.querySelector('.bank .u'),
+      hint=r.querySelector('.hint'),
       amend=r.querySelector('.amend'),sheet=r.querySelector('.sheet'),scrim=r.querySelector('.scrim'),
-      HOLD=1000,banked=19,pending=1,t=null,timer=null,state='open',key=false;
+      HOLD=1000,pending=1,t=null,timer=null,state='open',key=false;
 
-  function word(n){return n===1?'page':'pages';}
-  function paint(){num.textContent=banked;unit.textContent=word(banked);}
   function idle(){
     hint.textContent=pending===1?'Press and hold anywhere to bank today.'
       :(pending===0?'Set to under a page. Hold to bank the day.'
@@ -159,10 +152,11 @@
     wash.style.transition='none';wash.style.height='100%';
     fill.style.transition='none';fill.style.width='100%';
     void wash.offsetHeight;
-    banked+=pending;paint();
+    /* the day is banked, and that is the whole of it: no running total exists
+       here to say what it made, because that sum is the record */
     hint.textContent=pending===0
-      ? 'Banked. Under a page, so the count stays at '+banked+'.'
-      : 'Banked. That makes '+banked+' '+word(banked)+'.';
+      ? 'Banked. Under a page still counts as the day.'
+      : 'Banked. That is the day.';
     amend.textContent='Undo';
   }
   function offday(){
@@ -172,7 +166,7 @@
   }
   function reset(){
     state='open';p.classList.remove('done','off');
-    banked=19;pending=1;paint();drain();
+    pending=1;drain();
     amend.textContent='It went differently';idle();
   }
 
@@ -210,6 +204,6 @@
   sheet.querySelector('.off').addEventListener('click',function(e){e.stopPropagation();close();offday();});
   sheet.querySelector('.back').addEventListener('click',function(e){e.stopPropagation();close();});
 
-  paint();idle();
+  idle();
 })();</script>
 </section>
