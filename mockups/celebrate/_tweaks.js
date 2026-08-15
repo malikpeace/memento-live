@@ -859,7 +859,7 @@
       apply: function (ph, v) {
         put(ph, '.ba1-quiet', esc(v.line) + '.');
         var words = String(v.line).trim().split(/\s+/), spans = '';
-        for (var i = 0; i < words.length; i++) spans += '<span class="w" style="--i:' + i + '">' + esc(words[i]) + (i === words.length - 1 ? '.' : '') + '</span> ';
+        for (var i = 0; i < words.length; i++) spans += '<span class="w" style="--i:' + i + '">' + esc(words[i]) + (i === words.length - 1 ? '!' : '') + '</span> ';
         put(ph, '.ba1-line', spans.trim());
         var w = wallData(v);
         put(ph, '.ba1-engine', '<b>' + fmt(w.days) + '</b> ' + plural(w.days, 'day', 'days') + ' &middot; <b>' + fmt(w.moves) + '</b> ' + esc(unitFor(w.moves, v.moveWord)));
@@ -907,7 +907,7 @@
         var hEl = Q(ph, '.ba2-hero');
         if (hEl) hEl.style.fontSize = hero.length > 6 ? '84px' : hero.length > 4 ? '104px' : '132px';
         put(ph, '.ba2-unit', unit);
-        put(ph, '.ba2-line', esc(v.line) + '.');
+        put(ph, '.ba2-line', esc(v.line) + '!');
         /* THE COLUMN: one slat per move, stacked into a tower */
         var slats = Math.max(1, Math.min(w.moves || w.days, 110)), t = '';
         for (var i = 0; i < slats; i++) t += '<i class="' + (i === slats - 1 ? 'top' : '') + '" style="--i:' + i + '"></i>';
@@ -951,8 +951,8 @@
         else if (sh === 'duration') c3 = 'day 1 &rarr; day ' + fmt(w.days) + '<small>the line held the whole way</small>';
         else c3 = 'done<small>no partial credit, and none needed</small>';
         put(ph, '.ba3-c3', c3);
-        put(ph, '.ba3-line', esc(v.line) + '.');
-        put(ph, '.ba3-fin', esc(v.line) + '.');
+        put(ph, '.ba3-line', esc(v.line) + '!');
+        put(ph, '.ba3-fin', esc(v.line) + '!');
         /* THE REEL WALL: a full grid of stat cards */
         var cards = '', k = 0;
         function card(num, label, cls) { cards += '<div class="ba3-k ' + (cls || '') + '" style="--i:' + (k++) + '"><b>' + num + '</b><span>' + label + '</span></div>'; }
@@ -987,7 +987,7 @@
         { k: 'hours', t: 'r', l: 'Hours logged', v: 184, min: 0, max: 5000 }
       ],
       apply: function (ph, v) {
-        put(ph, '.ba4-line', esc(v.line) + '.');
+        put(ph, '.ba4-line', esc(v.line) + '!');
         var w = wallData(v);
         /* THE HALO: one dot per move, orbiting the card in a golden spiral */
         var N = Math.max(1, Math.min(w.moves || w.days, 280)), dots = '';
@@ -1020,10 +1020,10 @@
       ],
       apply: function (ph, v) {
         put(ph, '.ba5-line0', esc(v.line) + '.');
-        put(ph, '.ba5-line', esc(v.line) + '.');
-        put(ph, '.ba5-fin', esc(v.line) + '.');
+        put(ph, '.ba5-line', esc(v.line) + '!');
+        put(ph, '.ba5-fin', esc(v.line) + '!');
         var w = wallData(v);
-        put(ph, '.ba5-once', w.days >= 300 ? 'A year of showing up, paid in full.' : fmt(w.days) + ' days of showing up, paid in full.');
+        put(ph, '.ba5-once', w.days >= 300 ? 'A year of showing up, paid in full!' : fmt(w.days) + ' days of showing up, paid in full!');
         /* THE FIELD: the dot flower at monument scale, one dot per move */
         var N = Math.max(1, Math.min(w.moves || w.days, 900));
         var dr = Math.max(1.5, Math.min(4.4, 40 / Math.sqrt(N + 2))), c = 6.6, out = '';
@@ -1056,11 +1056,11 @@
         { k: 'hours', t: 'r', l: 'Hours logged', v: 184, min: 0, max: 5000 }
       ],
       apply: function (ph, v) {
-        put(ph, '.ba6-line', esc(v.line) + '.');
-        var z = { target: 'Zero left between you and it.', count: 'Every last one, logged.',
-                  duration: 'Held to the very end.', event: 'Done is done.' };
+        put(ph, '.ba6-line', esc(v.line) + '!');
+        var z = { target: 'Zero left between you and it!', count: 'Every last one, logged!',
+                  duration: 'Held to the very end!', event: 'Done is done!' };
         put(ph, '.ba6-zero', z[v.shape] || z.target);
-        put(ph, '.ba6-fin', esc(v.line) + '.');
+        put(ph, '.ba6-fin', esc(v.line) + '!');
         /* THE ODOMETER WALL: every total counts up at once, huge */
         var w = wallData(v), rows = '', k = 0;
         function row(n, label, hot) { rows += '<div class="ba6-row' + (hot ? ' hot' : '') + '" style="--i:' + (k++) + '"><b data-count="0|' + n + '">' + fmt(n) + '</b><span>' + label + '</span></div>'; }
@@ -1091,10 +1091,10 @@
       ],
       apply: function (ph, v) {
         put(ph, '.ba7-e1', esc(v.line) + '.');
-        put(ph, '.ba7-e2', esc(v.line) + '.');
-        put(ph, '.ba7-e3', esc(v.line) + '.');
-        put(ph, '.ba7-line', esc(v.line) + '.');
-        put(ph, '.ba7-fin', esc(v.line) + '.');
+        put(ph, '.ba7-e2', esc(v.line) + '!');
+        put(ph, '.ba7-e3', esc(v.line) + '!!');
+        put(ph, '.ba7-line', esc(v.line) + '!!');
+        put(ph, '.ba7-fin', esc(v.line) + '!');
         /* THE TEN THOUSAND: the move word printed once per move */
         var w = wallData(v), word = singular(v.moveWord || 'move');
         var N = Math.max(1, Math.min(w.moves || w.days, 240)), spans = '';
@@ -1123,8 +1123,8 @@
       ],
       apply: function (ph, v) {
         put(ph, '.ba8-find', esc(v.line) + '.');
-        put(ph, '.ba8-line', esc(v.line) + '.');
-        put(ph, '.ba8-fin', esc(v.line) + '.');
+        put(ph, '.ba8-line', esc(v.line) + '!');
+        put(ph, '.ba8-fin', esc(v.line) + '!');
         /* THE RECORDS BOARD */
         var w = wallData(v), rows = '', k = 0;
         function row(label, val, hot) { rows += '<div class="ba8-row' + (hot ? ' hot' : '') + '" style="--i:' + (k++) + '"><span>' + label + '</span><b>' + val + '</b></div>'; }
@@ -1179,8 +1179,8 @@
         put(ph, '.ba9-chips', chips);
         var boom = (0.25 + vals.length * 0.13 + 0.35).toFixed(2) + 's';
         var b1 = Q(ph, '.b1'); if (b1) b1.style.setProperty('--boom', boom);
-        put(ph, '.ba9-line', esc(v.line) + '.');
-        put(ph, '.ba9-fin', esc(v.line) + '.');
+        put(ph, '.ba9-line', esc(v.line) + '!');
+        put(ph, '.ba9-fin', esc(v.line) + '!');
         /* THE FULL WALL: every kind of chip, whole screen */
         var wall = [], j = 0;
         vals.forEach(function (x) { wall.push([x, '']); });
@@ -1216,8 +1216,8 @@
         { k: 'hours', t: 'r', l: 'Hours logged', v: 184, min: 0, max: 5000 }
       ],
       apply: function (ph, v) {
-        put(ph, '.ba10-line', esc(v.line) + '.');
-        put(ph, '.ba10-fin', esc(v.line) + '.');
+        put(ph, '.ba10-line', esc(v.line) + '!');
+        put(ph, '.ba10-fin', esc(v.line) + '!');
         var w = wallData(v);
         put(ph, '.ba10-under', '<b>' + fmt(w.moves || w.days) + '</b><span>' + (w.moves ? esc(unitFor(w.moves, v.moveWord)) : 'days') + ' in the mark. ' + fmt(w.days) + ' days. ' + (w.hours > 0 ? fmt(w.hours) + ' hours.' : '') + '</span>');
       }
