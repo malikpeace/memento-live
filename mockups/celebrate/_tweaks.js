@@ -1077,33 +1077,32 @@
           }
           put(ph, sel, html);
         });
-        /* THE SKY: one spark per move, gathered into real firework bursts, so
-           the total is counted AS fireworks (his 2026-08-15 note) rather than
-           as a flower. Every move is drawn; the bursts grow with the count. */
+        /* THE SKY, his 2026-08-15 note: ONE BIG ASS FIREWORK. It launches,
+           it explodes, and every single thing they ever did is one spark in
+           it. Not scattered little bursts: one detonation that fills the
+           screen, where the number of sparks IS the total. */
         var N = Math.max(1, w.count);
-        var K = Math.max(3, Math.min(12, Math.round(Math.sqrt(N) / 2.2)));
-        var rnd = seeded(N * 13 + K), out = '', idx = 0;
-        var W = 320, H = 360;
-        for (var b = 0; b < K; b++) {
-          var per = Math.floor(N / K) + (b < N % K ? 1 : 0);
-          if (!per) continue;
-          var cx = 46 + rnd() * (W - 92), cy = 44 + rnd() * (H - 108);
-          var maxR = Math.min(74, 16 + Math.sqrt(per) * 7);
-          var spin = rnd() * 6.2832;
-          for (var d = 0; d < per; d++) {
-            var ang = spin + d * 2.399963;
-            var rad = maxR * Math.sqrt((d + 0.6) / per);
-            var x = cx + Math.cos(ang) * rad, y = cy + Math.sin(ang) * rad * 0.92;
-            var sz = Math.max(0.9, 3.1 - rad / maxR * 1.5) * (N > 600 ? 0.7 : 1);
-            out += '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + sz.toFixed(2) +
-                   '" fill="' + (d % 5 === 0 ? 'rgba(255,255,255,.9)' : 'rgba(11,14,18,.78)') +
-                   '" style="--i:' + (idx++) + '"></circle>';
-          }
+        var W = 320, H = 380, cx = W / 2, cy = H / 2;
+        /* a shell of twelve sparks should not be as wide as a shell of two
+           thousand, so the burst grows with what they actually did */
+        var maxR = Math.min(cx - 6, 34 + Math.sqrt(N) * 9);
+        var jit = seeded(N * 7 + 3), out = '';
+        for (var d = 0; d < N; d++) {
+          var ang = d * 2.399963 + (jit() - 0.5) * 0.3;
+          var t = Math.sqrt((d + 0.6) / N);
+          var rad = maxR * t * (0.9 + jit() * 0.2);
+          var x = cx + Math.cos(ang) * rad, y = cy + Math.sin(ang) * rad * 1.13;
+          var sz = (3.4 - t * 1.7) * (N > 900 ? 0.62 : N > 380 ? 0.8 : 1);
+          out += '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + Math.max(0.85, sz).toFixed(2) +
+                 '" fill="' + (d % 6 === 0 ? 'rgba(255,255,255,.92)' : 'rgba(11,14,18,.8)') +
+                 '" style="--bx:' + (cx - x).toFixed(1) + 'px;--by:' + (cy - y).toFixed(1) + 'px;--i:' + d + '"></circle>';
         }
         var svg = Q(ph, '.ba5-svg');
         if (svg) svg.innerHTML = out;
-        sweep(ph, '.ba5-svg', N, 1.6);
-        put(ph, '.ba5-under', '<b>' + fmt(N) + '</b><span>' + esc(w.unitLabel) + ', every one a spark.</span>');
+        /* the sparks leave the centre in order, so the shell opens outward as
+           one wave instead of drawing itself like a spiral. */
+        sweep(ph, '.ba5-svg', N, 1.15);
+        put(ph, '.ba5-under', '<b>' + fmt(N) + '</b><span>' + esc(w.unitLabel) + ', every one of them a spark in it.</span>');
       }
     },
 
