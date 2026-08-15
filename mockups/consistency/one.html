@@ -110,20 +110,29 @@
   .led__r b { font-size: 14.5px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
     white-space: nowrap; }
 
-  /* ============ desktop: rail + grid ============ */
-  @media (min-width: 900px) {
-    #snap { height: auto; overflow: visible; scroll-snap-type: none; display: grid;
-      grid-template-columns: 400px 1fr; max-width: 1280px; margin: 0 auto; gap: 0 46px; padding: 0 26px; }
-    .pg { min-height: 0; scroll-snap-align: none; }
-    #pgOne { position: sticky; top: 0; height: 100vh; padding: 90px 10px 40px; }
-    .one__hint { display: none; }
-    #pgTwo { padding: 96px 0 110px; }
-    .ev { max-width: none; margin: 0; }
-    /* the rail already carries the number; saying it twice on one screen is noise */
-    .ev__hero { display: none; }
-    .ev__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 34px; align-items: start; }
-    .ev__col { min-width: 0; }
-  }
+  /* ============ desktop: rail + grid (html.vm-desk, set by JS) ============ */
+  html.vm-desk #snap { height: auto; overflow: visible; scroll-snap-type: none; display: grid;
+    grid-template-columns: 430px 1fr; max-width: 1280px; margin: 0 auto; gap: 0 46px; padding: 0 26px; }
+  html.vm-desk .pg { min-height: 0; scroll-snap-align: none; }
+  /* grid place-content is bulletproof centering; flex inside sticky drifted low */
+  html.vm-desk #pgOne { position: sticky; top: 0; height: 100vh; padding: 40px 10px;
+    display: grid; place-content: center; }
+  html.vm-desk .one__num { font-size: clamp(120px, 13vw, 190px) !important; }
+  html.vm-desk .one__hint { display: none; }
+  html.vm-desk #pgTwo { padding: 96px 0 110px; }
+  html.vm-desk .ev { max-width: none; margin: 0; }
+  /* the rail already carries the number; saying it twice on one screen is noise */
+  html.vm-desk .ev__hero { display: none; }
+  html.vm-desk .ev__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 34px; align-items: start; }
+  html.vm-desk .ev__col { min-width: 0; }
+
+  /* ============ phone view forced on a wide screen: a framed 390px device ============ */
+  html.vm-framed body { display: flex; justify-content: center; }
+  html.vm-framed #snap { width: 390px; height: 780px; margin: 118px auto 40px; border-radius: 30px;
+    outline: 1px solid var(--hairline, rgba(255,255,255,0.09));
+    box-shadow: 0 30px 80px rgba(0,0,0,0.55); background: #060708; }
+  html.vm-framed .pg { min-height: 780px; }
+  html.vm-framed #pgOne { padding-top: 40px; }
 </style>
 </head>
 <body>
@@ -133,7 +142,7 @@
     <input type="range" id="slider" min="1" max="365" value="168">
     <div class="chips" id="dayChips"></div>
   </div>
-  <div class="bar__row"><div class="chips" id="shapeChips"></div></div>
+  <div class="bar__row"><div class="chips" id="shapeChips"></div><div class="chips" id="viewChips" style="margin-left:auto"></div></div>
 </div></div>
 
 <div id="snap">

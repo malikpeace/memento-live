@@ -235,9 +235,26 @@
     render();
   });
 
-  // keep the snap container clear of the pinned lab bar
-  var bar = document.getElementById('bar');
-  function fit() { document.getElementById('snap').style.paddingTop = '0px'; }
-  if (window.ResizeObserver) new ResizeObserver(fit).observe(bar);
+  /* ---------- view mode: Desktop rail+grid vs Phone (framed on wide screens) ---------- */
+  var VIEW = null; // null = auto by width; 'desk' | 'phone' once toggled
+  function applyView() {
+    var wide = window.innerWidth >= 900;
+    var mode = VIEW || (wide ? 'desk' : 'phone');
+    var root = document.documentElement;
+    root.classList.toggle('vm-desk', mode === 'desk' && wide);
+    root.classList.toggle('vm-framed', mode === 'phone' && wide);
+    [].forEach.call(document.querySelectorAll('#viewChips button'), function (b) {
+      b.classList.toggle('on', b.getAttribute('data-v') === mode);
+    });
+  }
+  el('viewChips').innerHTML =
+    '<button data-v="desk">Desktop</button><button data-v="phone">Phone</button>';
+  el('viewChips').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    VIEW = b.getAttribute('data-v');
+    applyView();
+  });
+  window.addEventListener('resize', applyView);
+  applyView();
   render();
 })();
