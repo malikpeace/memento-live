@@ -9,19 +9,36 @@
 --font:'Geist',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif}
 *{box-sizing:border-box}
 body{margin:0;background:#0a0b0d;color:var(--text-hi);font-family:var(--font);-webkit-font-smoothing:antialiased}
-.gal{padding:26px 20px 140px;max-width:1780px;margin:0 auto}
+.gal{padding:26px 34px 140px;max-width:1780px;margin:0 auto}
 .gal h1{font-size:26px;font-weight:700;letter-spacing:-.02em;margin:0 0 6px}
 .gal>.sub{color:var(--text-mid);font-size:14px;margin:0 0 24px;max-width:78ch;line-height:1.55}
 .grp{margin:44px 0 0;padding-top:26px;border-top:1px solid rgba(var(--ink),.16)}
 .grp h2{font-size:19px;font-weight:700;margin:0 0 2px;letter-spacing:-.015em}
 .grp>p{color:var(--text-mid);font-size:13px;margin:0 0 18px;max-width:76ch}
-.wall{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}
+.wall{display:flex;flex-wrap:wrap;gap:46px 44px;align-items:flex-start}
 .cell{max-width:100%}
 .cell h3{font-size:13px;font-weight:700;margin:0 0 2px}
 .cell .cap{font-size:11.5px;color:var(--text-lo);margin:0 0 9px;max-width:300px;line-height:1.45;min-height:30px}
 .cell:has(.desk) .cap{max-width:720px}
-.ph{position:relative;width:300px;height:650px;border-radius:30px;overflow:hidden;background:#050608;
-  box-shadow:0 24px 60px rgba(0,0,0,.5), inset 0 0 0 1px rgba(var(--ink),.10)}
+/* THE PHONE. .ph IS the screen (300x650, the iPhone 390x844 ratio at 77%).
+   The device shell is drawn OUTSIDE it with box-shadow rings, so it costs zero
+   layout and no fragment had to change: bezel, then the polished edge, then the
+   drop shadow. The island and home indicator are the screen's own overlays,
+   which is also what they are on a real phone, so they double as a safe-area
+   check: anything painting under them would paint under them on the device. */
+.ph{position:relative;width:300px;height:650px;border-radius:44px;overflow:hidden;background:#050608;
+  box-shadow:
+    0 0 0 11px #0b0c0e,
+    0 0 0 12.5px rgba(var(--ink),.20),
+    0 0 0 13.5px rgba(0,0,0,.9),
+    0 26px 64px rgba(0,0,0,.62)}
+/* Dynamic Island */
+.ph::before{content:'';position:absolute;z-index:90;top:9px;left:50%;transform:translateX(-50%);
+  width:70px;height:21px;border-radius:999px;background:#000;pointer-events:none;
+  box-shadow:inset 0 0 0 .5px rgba(var(--ink),.06)}
+/* home indicator */
+.ph::after{content:'';position:absolute;z-index:90;bottom:7px;left:50%;transform:translateX(-50%);
+  width:104px;height:4px;border-radius:999px;background:rgba(var(--ink),.32);pointer-events:none}
 .desk{position:relative;width:720px;max-width:100%;height:420px;border-radius:14px;overflow:hidden;background:#050608;
   margin-top:16px;box-shadow:0 20px 50px rgba(0,0,0,.45), inset 0 0 0 1px rgba(var(--ink),.09)}
 /* bucket labels + toggle (ACTION-BUCKETS.md): which of the seven big goals a screen serves */
