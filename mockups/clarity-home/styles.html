@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Clarity page 2, four languages x six shapes</title>
+<title>Clarity page 2, eight languages, six shapes</title>
 <style>
   :root{--ink:#060708;--hi:rgba(255,255,255,.96);--mid:rgba(255,255,255,.60);--lo:rgba(255,255,255,.38);
     --hair:rgba(255,255,255,.09);--cyan:#3ad9f5;--glass:rgba(255,255,255,.05)}
@@ -31,10 +31,10 @@
   .inner{position:absolute;inset:0;overflow-y:auto;scrollbar-width:none}
   .inner::-webkit-scrollbar{display:none}
 
-  /* ============ STYLE A: CARDS (the current pick) ============ */
+  /* ===== A: CARDS ===== */
   .stA{padding:0 20px 34px;min-height:100%;
     background:radial-gradient(120% 30% at 50% -4%, rgba(58,217,245,.09), transparent 60%), #05060a}
-  .stA .head{margin:54px 0 16px;font-size:1.05rem;font-weight:700;letter-spacing:-.01em}
+  .stA .head{margin:54px 0 16px;font-size:1.05rem;font-weight:700}
   .stA .card{background:var(--glass);backdrop-filter:blur(22px) saturate(1.35);border-radius:15px;
     box-shadow:inset 0 1px 0 rgba(255,255,255,.06);padding:16px 17px;margin:0 0 12px}
   .stA .lab{color:var(--lo);font-size:.78rem;font-weight:650;margin-bottom:8px}
@@ -46,45 +46,14 @@
   .stA .bar{height:5px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;margin:13px 0 9px}
   .stA .bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,rgba(58,217,245,.6),var(--cyan))}
   .stA .meta{display:flex;justify-content:space-between;color:var(--lo);font-size:.75rem;font-variant-numeric:tabular-nums}
-  .stA .upd{margin-top:12px;display:inline-flex;align-items:center;gap:6px;padding:9px 13px;border-radius:10px;
+  .stA .upd{margin-top:12px;display:inline-flex;align-items:center;padding:9px 13px;border-radius:10px;
     background:rgba(255,255,255,.075);box-shadow:inset 0 1px 0 rgba(255,255,255,.08);color:var(--hi);font-size:.82rem;font-weight:650}
   .stA .walldays{font-size:2.1rem;font-weight:750;letter-spacing:-.025em;font-variant-numeric:tabular-nums;line-height:1}
   .stA .wallsub{color:var(--mid);font-size:.88rem;margin-top:5px}
   .stA .change{margin-top:16px;display:flex;justify-content:center;align-items:center;height:48px;border-radius:12px;
     color:var(--mid);font-size:.88rem;font-weight:600;background:rgba(255,255,255,.04);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
 
-  /* ============ STYLE B: INDUSTRIAL (graph paper, readout) ============ */
-  .stB{position:relative;padding:0 22px 34px;min-height:100%;background:#05060a}
-  .stB .paper{position:absolute;inset:0;pointer-events:none}
-  .stB .paper::before{content:'';position:absolute;inset:-90px;
-    background-image:linear-gradient(to right, rgba(255,255,255,0.032) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255,255,255,0.032) 1px, transparent 1px);
-    background-size:18px 18px}
-  .stB .paper::after{content:'';position:absolute;inset:-90px;
-    background-image:linear-gradient(to right, rgba(255,255,255,0.07) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255,255,255,0.07) 1px, transparent 1px);
-    background-size:90px 90px}
-  .stB .in{position:relative}
-  .stB .head{margin:54px 0 20px;font-size:1.02rem;font-weight:700;letter-spacing:-.01em}
-  .stB .sec{padding:15px 0 17px;box-shadow:inset 0 1px 0 var(--hair)}
-  .stB .lab{color:var(--lo);font-size:.74rem;font-weight:650;margin-bottom:9px}
-  .stB .readout{display:flex;align-items:baseline;justify-content:space-between}
-  .stB .readout b{font-size:2.35rem;font-weight:750;letter-spacing:-.03em;line-height:1;
-    font-family:ui-monospace,'SF Mono',Menlo,monospace;color:var(--cyan)}
-  .stB .readout span{color:var(--mid);font-size:.82rem;font-family:ui-monospace,Menlo,monospace}
-  .stB .rail{position:relative;height:10px;margin:14px 0 8px;
-    background:repeating-linear-gradient(to right, rgba(255,255,255,.10) 0 1px, transparent 1px 10%)}
-  .stB .rail i{position:absolute;left:0;top:3px;bottom:3px;background:var(--cyan);box-shadow:0 0 10px rgba(58,217,245,.5)}
-  .stB .kv{display:flex;justify-content:space-between;color:var(--lo);font-size:.74rem;
-    font-family:ui-monospace,Menlo,monospace;margin-top:6px}
-  .stB .txt{color:rgba(255,255,255,.93);font-size:.98rem;line-height:1.55}
-  .stB .anti{color:rgba(255,255,255,.5);font-size:.92rem;line-height:1.5}
-  .stB .upd{margin-top:12px;display:inline-flex;padding:8px 13px;border-radius:8px;
-    background:rgba(255,255,255,.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.07);color:var(--hi);font-size:.8rem;font-weight:650}
-  .stB .change{margin-top:20px;display:flex;justify-content:center;padding:14px 0;border-radius:9px;
-    color:var(--mid);font-size:.86rem;font-weight:600;background:rgba(255,255,255,.045);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
-
-  /* ============ STYLE C: EDITORIAL (typography only) ============ */
+  /* ===== C: EDITORIAL ===== */
   .stC{padding:0 24px 40px;min-height:100%;background:#05060a}
   .stC .head{margin:56px 0 26px;font-size:.9rem;font-weight:650;color:var(--lo)}
   .stC .big{font-size:2.9rem;font-weight:750;letter-spacing:-.035em;line-height:1.02;font-variant-numeric:tabular-nums}
@@ -98,7 +67,7 @@
   .stC .change{margin-top:30px;color:var(--mid);font-size:.88rem;font-weight:600;text-align:center;padding:13px 0;
     border-radius:11px;background:rgba(255,255,255,.04);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
 
-  /* ============ STYLE D: BANDS (full bleed) ============ */
+  /* ===== D: BANDS ===== */
   .stD{min-height:100%;background:#05060a;display:flex;flex-direction:column}
   .stD .head{padding:54px 22px 14px;font-size:1.02rem;font-weight:700}
   .stD .band{padding:20px 22px 22px}
@@ -119,39 +88,114 @@
     background:rgba(255,255,255,.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.07);color:var(--hi);font-size:.82rem;font-weight:650}
   .stD .change{margin:18px 22px 30px;display:flex;justify-content:center;padding:14px 0;border-radius:11px;
     color:var(--mid);font-size:.88rem;font-weight:600;background:rgba(255,255,255,.04);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+
+  /* ===== E: THE RAIL (left spine, big blocky stats) ===== */
+  .stE{min-height:100%;background:#05060a;padding:0 0 34px}
+  .stE .head{padding:54px 20px 8px;font-size:.86rem;font-weight:650;color:var(--lo)}
+  .stE .row{display:flex;gap:0;padding:16px 20px;align-items:flex-start}
+  .stE .row+.row{box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+  .stE .spine{flex:0 0 118px;padding-right:14px}
+  .stE .spine b{display:block;font-size:1.9rem;font-weight:800;letter-spacing:-.045em;line-height:.98;font-variant-numeric:tabular-nums}
+  .stE .spine b.cy{color:var(--cyan)}
+  .stE .spine span{display:block;color:var(--lo);font-size:.68rem;font-weight:650;margin-top:5px;line-height:1.3}
+  .stE .body{flex:1;min-width:0}
+  .stE .body .txt{color:rgba(255,255,255,.93);font-size:.9rem;line-height:1.5}
+  .stE .body .anti{color:rgba(255,255,255,.48);font-size:.88rem;line-height:1.48}
+  .stE .vbar{position:relative;width:4px;align-self:stretch;background:rgba(255,255,255,.08);margin-right:14px;border-radius:99px}
+  .stE .vbar i{position:absolute;bottom:0;left:0;right:0;background:var(--cyan);border-radius:99px}
+  .stE .upd{margin-top:10px;display:inline-flex;padding:8px 12px;border-radius:9px;
+    background:rgba(255,255,255,.07);box-shadow:inset 0 1px 0 rgba(255,255,255,.07);color:var(--hi);font-size:.78rem;font-weight:650}
+  .stE .change{margin:20px 20px 0;display:flex;justify-content:center;padding:13px 0;border-radius:11px;
+    color:var(--mid);font-size:.86rem;font-weight:600;background:rgba(255,255,255,.04);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+
+  /* ===== F: THE VOID (ultra minimal, centered) ===== */
+  .stF{min-height:100%;background:radial-gradient(100% 55% at 50% 0%, rgba(58,217,245,.05), transparent 62%), #04050a;
+    display:flex;flex-direction:column;justify-content:center;text-align:center;padding:40px 30px}
+  .stF .num{font-size:3.3rem;font-weight:750;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
+  .stF .numsub{color:var(--mid);font-size:.92rem;margin:8px 0 0}
+  .stF .line{width:150px;height:2px;margin:26px auto;border-radius:99px;background:rgba(255,255,255,.10);position:relative;overflow:hidden}
+  .stF .line i{position:absolute;left:0;top:0;bottom:0;background:var(--cyan)}
+  .stF .why{font-size:1.06rem;font-weight:600;line-height:1.55;color:rgba(255,255,255,.94);max-width:250px;margin:0 auto}
+  .stF .anti{font-size:.9rem;line-height:1.5;color:rgba(255,255,255,.42);max-width:240px;margin:18px auto 0}
+  .stF .upd{margin:22px auto 0;color:var(--cyan);font-size:.82rem;font-weight:650}
+  .stF .change{margin:34px auto 0;color:var(--lo);font-size:.82rem;font-weight:600}
+
+  /* ===== G: THE POSTER (maximalist) ===== */
+  .stG{position:relative;min-height:100%;background:#04050a;padding:0 22px 34px;overflow:hidden}
+  .stG .ghost{position:absolute;top:6px;right:-30px;font-size:11rem;font-weight:800;letter-spacing:-.06em;line-height:1;
+    color:transparent;-webkit-text-stroke:1px rgba(58,217,245,.13);font-variant-numeric:tabular-nums;pointer-events:none;white-space:nowrap}
+  .stG .head{margin:54px 0 4px;font-size:.88rem;font-weight:650;color:var(--lo);position:relative}
+  .stG .mega{position:relative;font-size:3.6rem;font-weight:800;letter-spacing:-.05em;line-height:.98;font-variant-numeric:tabular-nums;color:var(--cyan);
+    text-shadow:0 0 40px rgba(58,217,245,.25)}
+  .stG .megasub{position:relative;color:var(--mid);font-size:1rem;font-weight:600;margin:6px 0 0}
+  .stG .blockbar{position:relative;height:14px;background:rgba(255,255,255,.07);margin:20px 0 6px}
+  .stG .blockbar i{position:absolute;left:0;top:0;bottom:0;background:var(--cyan);box-shadow:0 0 24px rgba(58,217,245,.5)}
+  .stG .kv{position:relative;display:flex;justify-content:space-between;color:var(--lo);font-size:.78rem;font-variant-numeric:tabular-nums;font-weight:600}
+  .stG .whyblock{position:relative;margin-top:26px;padding:18px;background:rgba(58,217,245,.07)}
+  .stG .whyblock .lab{color:rgba(58,217,245,.85);font-size:.76rem;font-weight:700;margin-bottom:7px}
+  .stG .whyblock .txt{font-size:1.12rem;font-weight:650;line-height:1.45;color:rgba(255,255,255,.96)}
+  .stG .antiblock{position:relative;margin-top:12px;padding:18px;background:#010203}
+  .stG .antiblock .lab{color:var(--lo);font-size:.76rem;font-weight:700;margin-bottom:7px}
+  .stG .antiblock .txt{font-size:.98rem;line-height:1.5;color:rgba(255,255,255,.45)}
+  .stG .upd{position:relative;margin-top:14px;display:inline-flex;padding:10px 14px;background:var(--cyan);color:#04141a;font-size:.84rem;font-weight:750;border-radius:9px}
+  .stG .change{position:relative;margin-top:18px;display:flex;justify-content:center;padding:14px 0;
+    color:var(--mid);font-size:.88rem;font-weight:600;background:rgba(255,255,255,.05)}
+
+  /* ===== H: FLAT (solid panels, zero glass) ===== */
+  .stH{min-height:100%;background:#07090c;padding:0 16px 30px}
+  .stH .head{margin:54px 4px 14px;font-size:1.0rem;font-weight:700}
+  .stH .panel{background:#0d1116;border-radius:10px;padding:16px;margin-bottom:10px}
+  .stH .panel--anti{background:#0a0c10}
+  .stH .lab{color:var(--lo);font-size:.76rem;font-weight:650;margin-bottom:8px}
+  .stH .standrow{display:flex;align-items:baseline;gap:8px}
+  .stH .standrow b{font-size:2.2rem;font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1;color:var(--cyan)}
+  .stH .standrow span{color:var(--mid);font-size:.88rem;font-weight:600}
+  .stH .seg{display:flex;gap:3px;margin:14px 0 8px}
+  .stH .seg i{flex:1;height:8px;border-radius:2px;background:#161b22}
+  .stH .seg i.on{background:var(--cyan)}
+  .stH .kv{display:flex;justify-content:space-between;color:var(--lo);font-size:.74rem;font-weight:600;font-variant-numeric:tabular-nums}
+  .stH .txt{color:rgba(255,255,255,.94);font-size:.96rem;line-height:1.55;font-weight:520}
+  .stH .anti{color:rgba(255,255,255,.44);font-size:.9rem;line-height:1.5}
+  .stH .upd{margin-top:12px;display:inline-flex;padding:10px 14px;border-radius:8px;background:#161d26;color:var(--hi);font-size:.8rem;font-weight:700}
+  .stH .change{margin-top:14px;display:flex;justify-content:center;padding:14px 0;border-radius:10px;background:#0d1116;color:var(--mid);font-size:.86rem;font-weight:650}
+
+  /* ===== I: THE ATMOSPHERE (cinematic, star-lit) ===== */
+  .stI{position:relative;min-height:100%;padding:0 24px 36px;
+    background:
+      radial-gradient(140% 46% at 50% -10%, rgba(58,217,245,.20), rgba(58,217,245,.05) 55%, transparent 75%),
+      #04050a}
+  .stI .stars{position:absolute;inset:0;pointer-events:none;opacity:.55;
+    background-image:radial-gradient(1px 1px at 15% 8%, rgba(255,255,255,.8) 50%, transparent 51%),
+      radial-gradient(1px 1px at 72% 5%, rgba(255,255,255,.5) 50%, transparent 51%),
+      radial-gradient(1.4px 1.4px at 48% 13%, rgba(255,255,255,.6) 50%, transparent 51%),
+      radial-gradient(1px 1px at 88% 17%, rgba(255,255,255,.4) 50%, transparent 51%),
+      radial-gradient(1px 1px at 25% 24%, rgba(255,255,255,.35) 50%, transparent 51%)}
+  .stI .head{position:relative;margin:56px 0 24px;font-size:.88rem;font-weight:650;color:rgba(255,255,255,.55);text-align:center}
+  .stI .halo{position:relative;text-align:center;margin-bottom:26px}
+  .stI .halo b{font-size:3rem;font-weight:750;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums;color:#eafcff;
+    text-shadow:0 0 30px rgba(58,217,245,.55), 0 0 80px rgba(58,217,245,.25)}
+  .stI .halo span{display:block;color:var(--mid);font-size:.92rem;margin-top:8px}
+  .stI .arc{position:relative;width:190px;height:3px;margin:20px auto 0;border-radius:99px;background:rgba(255,255,255,.10);overflow:hidden}
+  .stI .arc i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,rgba(58,217,245,.7),#9feefc);box-shadow:0 0 12px rgba(58,217,245,.6)}
+  .stI .sect{position:relative;text-align:center;margin-top:26px}
+  .stI .sect .lab{color:rgba(255,255,255,.42);font-size:.78rem;font-weight:650;margin-bottom:8px}
+  .stI .why{font-size:1.1rem;font-weight:620;line-height:1.55;color:rgba(255,255,255,.96);max-width:262px;margin:0 auto}
+  .stI .anti{font-size:.92rem;line-height:1.52;color:rgba(255,255,255,.4);max-width:250px;margin:0 auto}
+  .stI .upd{position:relative;margin:20px auto 0;display:flex;width:fit-content;padding:9px 14px;border-radius:99px;
+    background:rgba(255,255,255,.07);backdrop-filter:blur(16px);box-shadow:inset 0 1px 0 rgba(255,255,255,.08);color:var(--hi);font-size:.8rem;font-weight:650}
+  .stI .change{position:relative;margin:30px auto 0;display:flex;width:fit-content;color:rgba(255,255,255,.45);font-size:.82rem;font-weight:600}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <h1>Clarity page 2, four languages, six shapes</h1>
-    <p>Same information in every phone: the standing (or the why leading when no honest number exists), the why, the anti-vision, the change button. The toggle switches the goal shape everywhere at once; the four phones never change WHAT they say, only HOW it looks. Style 1 is the pick from the last round, kept as the baseline.</p>
+    <h1>Clarity page 2, eight languages, six shapes</h1>
+    <p>Same information everywhere: the standing (or the why leading when no honest number exists), the why, the anti-vision, Update where a number exists, and "Tweak your Neutron Star" (reframe it or forge a new one) on every style. The toggle switches the goal shape across all eight phones at once. Industrial is dead; Cards, Editorial, and Bands survive from last round, plus five new languages.</p>
   </header>
 
   <div class="toggle" id="shapeToggle"></div>
 
-  <div class="grid">
-    <div class="cell">
-      <p class="cap">1 · Cards</p>
-      <p class="capsub">The current pick. Glass panels in the sync-box language, soft radii, one idea per card.</p>
-      <div class="phone"><div class="screen"><div class="notch"></div><div class="inner"><div class="stA" id="phA"></div></div></div></div>
-    </div>
-    <div class="cell">
-      <p class="cap">2 · Industrial</p>
-      <p class="capsub">The action-module world: graph paper, monospace readouts, a ticked rail, hairline rules instead of boxes. Instrument, not furniture.</p>
-      <div class="phone"><div class="screen"><div class="notch"></div><div class="inner"><div class="stB"><div class="paper"></div><div class="in" id="phB"></div></div></div></div></div>
-    </div>
-    <div class="cell">
-      <p class="cap">3 · Editorial</p>
-      <p class="capsub">No containers at all. Giant type, thin rules, whitespace. The information IS the interface.</p>
-      <div class="phone"><div class="screen"><div class="notch"></div><div class="inner"><div class="stC" id="phC"></div></div></div></div>
-    </div>
-    <div class="cell">
-      <p class="cap">4 · Bands</p>
-      <p class="capsub">Full-bleed tonal bands, edge to edge, no floating cards. The anti-vision band drops to near-black.</p>
-      <div class="phone"><div class="screen"><div class="notch"></div><div class="inner"><div class="stD" id="phD"></div></div></div></div>
-    </div>
-  </div>
+  <div class="grid" id="grid"></div>
 </div>
 
 <script>
@@ -178,8 +222,19 @@ const SHAPES = [
     why:'Being actually there at dinner, clear-headed and eating like someone who plans to stick around for the people who need you.',
     anti:'More evenings half-there behind a screen, feeling worse in a body you’re not taking care of.' },
 ];
+const TWEAK='Tweak your Neutron Star';
+const editIcon='<svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;margin-right:6px"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
 
-const editIcon = '<svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;margin-right:6px"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+const STYLES=[
+ {key:'A', name:'1 · Cards', sub:'The baseline pick. Glass panels in the sync-box language, soft radii, one idea per card.', cls:'stA', render:rA},
+ {key:'C', name:'2 · Editorial', sub:'No containers. Giant type, thin rules, whitespace as structure.', cls:'stC', render:rC},
+ {key:'D', name:'3 · Bands', sub:'Full-bleed tonal bands, edge to edge, the anti-vision band near-black.', cls:'stD', render:rD},
+ {key:'E', name:'4 · The rail', sub:'Your idea: big blocky stats down the left spine, the words in a right column, one row per idea.', cls:'stE', render:rE},
+ {key:'F', name:'5 · The void', sub:'Ultra minimal. Everything centered in space, one thin line of progress, nothing else on the screen.', cls:'stF', render:rF},
+ {key:'G', name:'6 · The poster', sub:'Maximalist. A ghost outline number behind everything, mega stat, solid cyan why-block, hard edges.', cls:'stG', render:rG},
+ {key:'H', name:'7 · Flat', sub:'Zero glass, zero glow, zero gradients. Solid panels, segmented meter, chunky type. The flattest possible read.', cls:'stH', render:rH},
+ {key:'I', name:'8 · The atmosphere', sub:'Cinematic. The star’s light bleeds from above, the number glows like the star itself, everything centered and lit.', cls:'stI', render:rI},
+];
 
 function rA(s){
   let stand='';
@@ -193,27 +248,8 @@ function rA(s){
     : `<div class="card"><div class="lab">Why this matters</div><div class="txt">${s.why}</div></div>`;
   return `<div class="head">Summary:</div>${stand}${why}
     <div class="card"><div class="lab">If nothing changes</div><div class="anti">${s.anti}</div></div>
-    <div class="change">Change your Neutron Star</div>`;
+    <div class="change">${TWEAK}</div>`;
 }
-
-function rB(s){
-  let stand='';
-  if(s.face==='num') stand=`<div class="sec" style="box-shadow:none"><div class="lab">Position</div>
-    <div class="readout"><b>${s.cur}</b><span>${s.of}</span></div>
-    <div class="rail"><i style="width:${s.pct}%"></i></div>
-    <div class="kv"><span>${s.meta1}</span><span>${s.meta2}</span></div>
-    <div class="upd">${editIcon}Update</div></div>`;
-  if(s.face==='wall') stand=`<div class="sec" style="box-shadow:none"><div class="lab">Position</div>
-    <div class="readout"><b>${s.days.replace(' days','')}</b><span>days</span></div>
-    <div class="kv" style="margin-top:10px"><span>${s.sub}</span></div></div>`;
-  const why = s.face==='why'
-    ? `<div class="sec" ${s.face==='why'?'style="box-shadow:none"':''}><div class="lab">The point</div><div class="txt" style="font-size:1.06rem">${s.why}</div></div>`
-    : `<div class="sec"><div class="lab">The point</div><div class="txt">${s.why}</div></div>`;
-  return `<div class="head">Summary:</div>${stand}${why}
-    <div class="sec"><div class="lab">If nothing changes</div><div class="anti">${s.anti}</div></div>
-    <div class="change">Change your Neutron Star</div>`;
-}
-
 function rC(s){
   let stand='';
   if(s.face==='num') stand=`<div class="big"><em>${s.cur}</em> <span style="font-size:1.2rem;font-weight:600;color:rgba(255,255,255,.6)">${s.of}</span></div>
@@ -224,9 +260,8 @@ function rC(s){
     : `<div class="kicker">Why this matters</div><div class="why">${s.why}</div>`;
   return `<div class="head">Summary:</div>${stand}${why}<div class="rule"></div>
     <div class="kicker">If nothing changes</div><div class="anti">${s.anti}</div>
-    <div class="change">Change your Neutron Star</div>`;
+    <div class="change">${TWEAK}</div>`;
 }
-
 function rD(s){
   let stand='';
   if(s.face==='num') stand=`<div class="band band--stand"><div class="lab">Where you stand</div>
@@ -239,17 +274,79 @@ function rD(s){
   const why = `<div class="band band--why">${s.face==='why'?'':'<div class="lab">Why this matters</div>'}<div class="txt" ${s.face==='why'?'style="font-size:1.12rem;line-height:1.6"':''}>${s.why}</div></div>`;
   return `<div class="head">Summary:</div>${stand}${why}
     <div class="band band--anti"><div class="lab">If nothing changes</div><div class="anti">${s.anti}</div></div>
-    <div style="flex:1"></div><div class="change">Change your Neutron Star</div>`;
+    <div style="flex:1"></div><div class="change">${TWEAK}</div>`;
 }
+function rE(s){
+  let rows='';
+  if(s.face==='num') rows+=`<div class="row"><div class="spine"><b class="cy">${s.cur}</b><span>${s.of}<br>${s.meta1} · ${s.meta2}</span><div class="upd">${editIcon}Update</div></div>
+    <div class="vbar"><i style="height:${s.pct}%"></i></div><div class="body"></div></div>`;
+  if(s.face==='wall') rows+=`<div class="row"><div class="spine"><b>${s.days.replace(' days','')}</b><span>days to go<br>${s.sub}</span></div><div class="body"></div></div>`;
+  rows+=`<div class="row"><div class="spine"><b style="font-size:1.15rem;letter-spacing:-.02em">The why</b></div><div class="body"><div class="txt" ${s.face==='why'?'style="font-size:1.0rem;line-height:1.6"':''}>${s.why}</div></div></div>`;
+  rows+=`<div class="row"><div class="spine"><b style="font-size:1.15rem;letter-spacing:-.02em;color:rgba(255,255,255,.45)">If not</b></div><div class="body"><div class="anti">${s.anti}</div></div></div>`;
+  return `<div class="head">Summary:</div>${rows}<div class="change">${TWEAK}</div>`;
+}
+function rF(s){
+  let top='';
+  if(s.face==='num') top=`<div class="num">${s.cur}</div><div class="numsub">${s.of} · ${s.meta2}</div>
+    <div class="line"><i style="width:${s.pct}%"></i></div><div class="upd">${editIcon}Update</div>`;
+  if(s.face==='wall') top=`<div class="num">${s.days}</div><div class="numsub">${s.sub}</div><div class="line"><i style="width:38%"></i></div>`;
+  if(s.face==='why') top=``;
+  return `${top}<div class="why" ${s.face==='why'?'style="font-size:1.2rem;max-width:262px"':''}>${s.why}</div>
+    <div class="anti">${s.anti}</div><div class="change">${TWEAK}</div>`;
+}
+function rG(s){
+  let ghost = s.face==='num' ? s.cur.replace(',','') : (s.face==='wall' ? s.days.replace(' days','') : '');
+  let stand='';
+  if(s.face==='num') stand=`<div class="mega">${s.cur}</div><div class="megasub">${s.of}</div>
+    <div class="blockbar"><i style="width:${s.pct}%"></i></div>
+    <div class="kv"><span>${s.meta1}</span><span>${s.meta2}</span></div><div class="upd">Update</div>`;
+  if(s.face==='wall') stand=`<div class="mega" style="font-size:3.1rem">${s.days}</div><div class="megasub">${s.sub}</div>`;
+  return `${ghost?`<div class="ghost">${ghost}</div>`:''}<div class="head">Summary:</div>${stand}
+    <div class="whyblock"><div class="lab">Why this matters</div><div class="txt">${s.why}</div></div>
+    <div class="antiblock"><div class="lab">If nothing changes</div><div class="txt">${s.anti}</div></div>
+    <div class="change">${TWEAK}</div>`;
+}
+function rH(s){
+  let stand='';
+  if(s.face==='num'){
+    const on=Math.round(s.pct/100*12);
+    let segs=''; for(let i=0;i<12;i++) segs+=`<i class="${i<on?'on':''}"></i>`;
+    stand=`<div class="panel"><div class="lab">Where you stand</div>
+      <div class="standrow"><b>${s.cur}</b><span>${s.of}</span></div>
+      <div class="seg">${segs}</div>
+      <div class="kv"><span>${s.meta1}</span><span>${s.meta2}</span></div>
+      <div class="upd">Update</div></div>`;
+  }
+  if(s.face==='wall') stand=`<div class="panel"><div class="lab">Where you stand</div>
+    <div class="standrow"><b>${s.days}</b></div><div class="kv" style="margin-top:8px"><span>${s.sub}</span></div></div>`;
+  const why=`<div class="panel">${s.face==='why'?'':'<div class="lab">Why this matters</div>'}<div class="txt" ${s.face==='why'?'style="font-size:1.05rem;line-height:1.6"':''}>${s.why}</div></div>`;
+  return `<div class="head">Summary:</div>${stand}${why}
+    <div class="panel panel--anti"><div class="lab">If nothing changes</div><div class="anti">${s.anti}</div></div>
+    <div class="change">${TWEAK}</div>`;
+}
+function rI(s){
+  let halo='';
+  if(s.face==='num') halo=`<div class="halo"><b>${s.cur}</b><span>${s.of} · ${s.meta2}</span>
+    <div class="arc"><i style="width:${s.pct}%"></i></div></div><div class="upd">${editIcon}Update</div>`;
+  if(s.face==='wall') halo=`<div class="halo"><b style="font-size:2.5rem">${s.days}</b><span>${s.sub}</span></div>`;
+  return `<div class="stars"></div><div class="head">Summary:</div>${halo}
+    <div class="sect">${s.face==='why'?'':'<div class="lab">Why this matters</div>'}<div class="why" ${s.face==='why'?'style="font-size:1.2rem"':''}>${s.why}</div></div>
+    <div class="sect"><div class="lab">If nothing changes</div><div class="anti">${s.anti}</div></div>
+    <div class="change">${TWEAK}</div>`;
+}
+
+const grid=document.getElementById('grid');
+grid.innerHTML=STYLES.map(st=>`
+  <div class="cell">
+    <p class="cap">${st.name}</p>
+    <p class="capsub">${st.sub}</p>
+    <div class="phone"><div class="screen"><div class="notch"></div><div class="inner"><div class="${st.cls}" id="ph${st.key}"></div></div></div></div>
+  </div>`).join('');
 
 function render(shape){
-  document.getElementById('phA').innerHTML=rA(shape);
-  document.getElementById('phB').innerHTML=rB(shape);
-  document.getElementById('phC').innerHTML=rC(shape);
-  document.getElementById('phD').innerHTML=rD(shape);
+  STYLES.forEach(st=>{ document.getElementById('ph'+st.key).innerHTML = st.render(shape); });
   document.querySelectorAll('#shapeToggle button').forEach(b=>b.classList.toggle('on', b.dataset.id===shape.id));
 }
-
 const tog=document.getElementById('shapeToggle');
 tog.innerHTML=SHAPES.map(s=>`<button data-id="${s.id}">${s.label}</button>`).join('');
 tog.addEventListener('click',e=>{const b=e.target.closest('button'); if(!b)return; render(SHAPES.find(s=>s.id===b.dataset.id));});
