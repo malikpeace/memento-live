@@ -215,23 +215,18 @@
   .inner .prog{margin:16px 0 0}
   .inner .track{position:relative;height:4px;border-radius:99px;background:rgba(255,255,255,.09)}
   .inner .track i{position:absolute;left:0;top:0;bottom:0;border-radius:99px;background:linear-gradient(90deg,rgba(58,217,245,.55),var(--cyan))}
-  .inner .track u{position:absolute;top:50%;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:99px;background:#fff;
-    box-shadow:0 0 0 3px rgba(5,6,10,.9), 0 0 12px rgba(255,255,255,.55)}
   .inner .pts{display:flex;justify-content:space-between;margin-top:9px;color:var(--lo);font-size:.72rem;font-weight:600;font-variant-numeric:tabular-nums}
   .inner .rem{display:inline-flex;align-items:baseline;gap:5px;margin-top:11px;color:var(--cyan);font-size:.92rem;font-weight:700;font-variant-numeric:tabular-nums}
   .inner .rem s{text-decoration:none;color:var(--lo);font-size:.76rem;font-weight:600}
   /* per-style rail personalities */
   .stH .track{border-radius:0;background:#161b22}
   .stH .track i{border-radius:0}
-  .stH .track u{border-radius:2px}
   .stG .track{height:12px;border-radius:0;background:rgba(255,255,255,.07)}
   .stG .track i{border-radius:0;box-shadow:0 0 24px rgba(58,217,245,.5)}
-  .stG .track u{width:4px;height:20px;margin:-10px 0 0 -2px;border-radius:0}
   .stG .rem{font-size:1.05rem}
   .stF .prog{max-width:210px;margin:22px auto 0}
   .stF .rem{margin-top:12px}
   .stI .prog{max-width:212px;margin:20px auto 0}
-  .stI .track u{box-shadow:0 0 0 3px rgba(4,5,10,.9), 0 0 16px rgba(58,217,245,.8)}
   .stE .prog{margin-top:12px}
   .stE .pts{font-size:.68rem}
 </style>
@@ -288,7 +283,7 @@ function val(s, big){ return `<b style="white-space:nowrap">${s.cur}<span class=
 /* the rail: where you started, where you are now, where you are going, and what is left */
 function rail(s){
   return `<div class="prog">
-    <div class="track"><i style="width:${s.pct}%"></i><u style="left:${s.pct}%"></u></div>
+    <div class="track"><i style="width:${s.pct}%"></i></div>
     <div class="pts"><span>${s.start}</span><span>${s.target}</span></div>
     <div class="rem">${s.rem}<s>${s.remLab}</s></div>
   </div>`;
