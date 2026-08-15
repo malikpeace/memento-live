@@ -53,6 +53,10 @@
   .stA .change{margin-top:16px;display:flex;justify-content:center;align-items:center;height:48px;border-radius:12px;
     color:var(--mid);font-size:.88rem;font-weight:600;background:rgba(255,255,255,.04);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
 
+.stA .prom{padding-left:16px;position:relative}
+  .stA .prom::before{content:"";position:absolute;left:0;top:16px;bottom:16px;width:2px;border-radius:2px;background:linear-gradient(180deg,rgba(58,217,245,.55),rgba(58,217,245,.08))}
+  .stA .sig{margin-top:10px;color:var(--lo);font-size:.75rem;font-variant-numeric:tabular-nums}
+
   /* ===== C: EDITORIAL ===== */
   .stC{padding:0 24px 40px;min-height:100%;background:#05060a}
   .stC .head{margin:56px 0 26px;font-size:.9rem;font-weight:650;color:var(--lo)}
@@ -66,6 +70,9 @@
   .stC .upd{margin-top:14px;color:var(--cyan);font-size:.85rem;font-weight:650}
   .stC .change{margin-top:30px;color:var(--mid);font-size:.88rem;font-weight:600;text-align:center;padding:13px 0;
     border-radius:11px;background:rgba(255,255,255,.04);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+
+.stC .promtxt{font-size:1.05rem;line-height:1.55;color:rgba(255,255,255,.95);font-weight:560}
+  .stC .sig{margin-top:10px;color:var(--lo);font-size:.78rem;font-variant-numeric:tabular-nums}
 
   /* ===== D: BANDS ===== */
   .stD{min-height:100%;background:#05060a;display:flex;flex-direction:column}
@@ -89,6 +96,8 @@
   .stD .change{margin:18px 22px 30px;display:flex;justify-content:center;padding:14px 0;border-radius:11px;
     color:var(--mid);font-size:.88rem;font-weight:600;background:rgba(255,255,255,.04);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
 
+  .stD .sig{margin-top:10px;color:var(--lo);font-size:.75rem;font-variant-numeric:tabular-nums}
+
   /* ===== E: THE RAIL (left spine, big blocky stats) ===== */
   .stE{min-height:100%;background:#05060a;padding:0 0 34px}
   .stE .head{padding:54px 20px 8px;font-size:.86rem;font-weight:650;color:var(--lo)}
@@ -108,6 +117,8 @@
   .stE .change{margin:20px 20px 0;display:flex;justify-content:center;padding:13px 0;border-radius:11px;
     color:var(--mid);font-size:.86rem;font-weight:600;background:rgba(255,255,255,.04);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
 
+  .stE .sig{margin-top:8px;color:var(--lo);font-size:.72rem;font-variant-numeric:tabular-nums}
+
   /* ===== F: THE VOID (ultra minimal, centered) ===== */
   .stF{min-height:100%;background:radial-gradient(100% 55% at 50% 0%, rgba(58,217,245,.05), transparent 62%), #04050a;
     display:flex;flex-direction:column;justify-content:center;text-align:center;padding:40px 30px}
@@ -119,6 +130,9 @@
   .stF .anti{font-size:.9rem;line-height:1.5;color:rgba(255,255,255,.42);max-width:240px;margin:18px auto 0}
   .stF .upd{margin:22px auto 0;color:var(--cyan);font-size:.82rem;font-weight:650}
   .stF .change{margin:34px auto 0;color:var(--lo);font-size:.82rem;font-weight:600}
+
+  .stF .prom{font-size:.95rem;line-height:1.55;color:rgba(255,255,255,.9);max-width:250px;margin:26px auto 0;font-weight:560}
+  .stF .sig{margin-top:8px;color:var(--lo);font-size:.74rem;font-variant-numeric:tabular-nums}
 
   /* ===== G: THE POSTER (maximalist) ===== */
   .stG{position:relative;min-height:100%;background:#04050a;padding:0 22px 34px;overflow:hidden}
@@ -141,6 +155,11 @@
   .stG .change{position:relative;margin-top:18px;display:flex;justify-content:center;padding:14px 0;
     color:var(--mid);font-size:.88rem;font-weight:600;background:rgba(255,255,255,.05)}
 
+  .stG .promblock{position:relative;margin-top:12px;padding:18px;background:rgba(255,255,255,.05)}
+  .stG .promblock .lab{color:var(--lo);font-size:.76rem;font-weight:700;margin-bottom:7px}
+  .stG .promblock .txt{font-size:1rem;line-height:1.5;color:rgba(255,255,255,.94)}
+  .stG .sig{margin-top:9px;color:var(--lo);font-size:.75rem;font-variant-numeric:tabular-nums}
+
   /* ===== H: FLAT (solid panels, zero glass) ===== */
   .stH{min-height:100%;background:#07090c;padding:0 16px 30px}
   .stH .head{margin:54px 4px 14px;font-size:1.0rem;font-weight:700}
@@ -158,6 +177,8 @@
   .stH .anti{color:rgba(255,255,255,.44);font-size:.9rem;line-height:1.5}
   .stH .upd{margin-top:12px;display:inline-flex;padding:10px 14px;border-radius:8px;background:#161d26;color:var(--hi);font-size:.8rem;font-weight:700}
   .stH .change{margin-top:14px;display:flex;justify-content:center;padding:14px 0;border-radius:10px;background:#0d1116;color:var(--mid);font-size:.86rem;font-weight:650}
+
+  .stH .sig{margin-top:9px;color:var(--lo);font-size:.74rem;font-weight:600;font-variant-numeric:tabular-nums}
 
   /* ===== I: THE ATMOSPHERE (cinematic, star-lit) ===== */
   .stI{position:relative;min-height:100%;padding:0 24px 36px;
@@ -184,13 +205,15 @@
   .stI .upd{position:relative;margin:20px auto 0;display:flex;width:fit-content;padding:9px 14px;border-radius:99px;
     background:rgba(255,255,255,.07);backdrop-filter:blur(16px);box-shadow:inset 0 1px 0 rgba(255,255,255,.08);color:var(--hi);font-size:.8rem;font-weight:650}
   .stI .change{position:relative;margin:30px auto 0;display:flex;width:fit-content;color:rgba(255,255,255,.45);font-size:.82rem;font-weight:600}
+.stI .prom{font-size:.98rem;line-height:1.55;color:rgba(255,255,255,.92);max-width:256px;margin:0 auto}
+  .stI .sig{margin-top:9px;color:rgba(255,255,255,.4);font-size:.74rem;font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
     <h1>Clarity page 2, eight languages, six shapes</h1>
-    <p>Same information everywhere: the standing (or the why leading when no honest number exists), the why, the anti-vision, Update where a number exists, and "Tweak your Neutron Star" (reframe it or forge a new one) on every style. The toggle switches the goal shape across all eight phones at once. Industrial is dead; Cards, Editorial, and Bands survive from last round, plus five new languages.</p>
+    <p>Same information everywhere: the standing (or the why leading when no honest number exists), the why, the anti-vision, Update progress where a number exists, your own dated note to yourself, and "Tweak your Neutron Star" (reframe it or forge a new one) on every style. The toggle switches the goal shape across all eight phones at once. Industrial is dead; Cards, Editorial, and Bands survive from last round, plus five new languages.</p>
   </header>
 
   <div class="toggle" id="shapeToggle"></div>
@@ -223,6 +246,7 @@ const SHAPES = [
     anti:'More evenings half-there behind a screen, feeling worse in a body you’re not taking care of.' },
 ];
 const TWEAK='Tweak your Neutron Star';
+const PROMISE={txt:'I will show up for this even on the days nobody sees it. The person I said I would become is worth the boring Tuesdays.', sig:'Maya · written July 2, 2026'};
 const editIcon='<svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;margin-right:6px"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
 
 const STYLES=[
@@ -241,25 +265,27 @@ function rA(s){
   if(s.face==='num') stand=`<div class="card"><div class="standrow"><b>${s.cur}</b><span>${s.of}</span></div>
     <div class="bar"><i style="width:${s.pct}%"></i></div>
     <div class="meta"><span>${s.meta1}</span><span>${s.meta2}</span></div>
-    <div class="upd">${editIcon}Update</div></div>`;
+    <div class="upd">${editIcon}Update progress</div></div>`;
   if(s.face==='wall') stand=`<div class="card"><div class="walldays">${s.days}</div><div class="wallsub">${s.sub}</div></div>`;
   const why = s.face==='why'
     ? `<div class="card"><div class="txt" style="font-size:1.1rem;line-height:1.6">${s.why}</div></div>`
     : `<div class="card"><div class="lab">Why this matters</div><div class="txt">${s.why}</div></div>`;
   return `<div class="head">Summary:</div>${stand}${why}
     <div class="card"><div class="lab">If nothing changes</div><div class="anti">${s.anti}</div></div>
+    <div class="card prom"><div class="lab">Your note to yourself</div><div class="txt">${PROMISE.txt}</div><div class="sig">${PROMISE.sig}</div></div>
     <div class="change">${TWEAK}</div>`;
 }
 function rC(s){
   let stand='';
   if(s.face==='num') stand=`<div class="big"><em>${s.cur}</em> <span style="font-size:1.2rem;font-weight:600;color:rgba(255,255,255,.6)">${s.of}</span></div>
-    <div class="bigsub">${s.meta1}. ${s.meta2}.</div><div class="upd">${editIcon}Update the number</div><div class="rule"></div>`;
+    <div class="bigsub">${s.meta1}. ${s.meta2}.</div><div class="upd">${editIcon}Update progress</div><div class="rule"></div>`;
   if(s.face==='wall') stand=`<div class="big">${s.days}</div><div class="bigsub">${s.sub}</div><div class="rule"></div>`;
   const why = s.face==='why'
     ? `<div class="why" style="font-size:1.45rem">${s.why}</div>`
     : `<div class="kicker">Why this matters</div><div class="why">${s.why}</div>`;
   return `<div class="head">Summary:</div>${stand}${why}<div class="rule"></div>
-    <div class="kicker">If nothing changes</div><div class="anti">${s.anti}</div>
+    <div class="kicker">If nothing changes</div><div class="anti">${s.anti}</div><div class="rule"></div>
+    <div class="kicker">Your note to yourself</div><div class="promtxt">${PROMISE.txt}</div><div class="sig">${PROMISE.sig}</div>
     <div class="change">${TWEAK}</div>`;
 }
 function rD(s){
@@ -268,42 +294,47 @@ function rD(s){
     <div class="standrow"><b>${s.cur}</b><span>${s.of}</span></div>
     <div class="track"><i style="width:${s.pct}%"></i></div>
     <div class="kv"><span>${s.meta1}</span><span>${s.meta2}</span></div>
-    <div class="upd">${editIcon}Update</div></div>`;
+    <div class="upd">${editIcon}Update progress</div></div>`;
   if(s.face==='wall') stand=`<div class="band band--stand"><div class="lab">Where you stand</div>
     <div class="standrow"><b>${s.days}</b></div><div class="kv" style="margin-top:8px"><span>${s.sub}</span></div></div>`;
   const why = `<div class="band band--why">${s.face==='why'?'':'<div class="lab">Why this matters</div>'}<div class="txt" ${s.face==='why'?'style="font-size:1.12rem;line-height:1.6"':''}>${s.why}</div></div>`;
   return `<div class="head">Summary:</div>${stand}${why}
     <div class="band band--anti"><div class="lab">If nothing changes</div><div class="anti">${s.anti}</div></div>
+    <div class="band band--why"><div class="lab">Your note to yourself</div><div class="txt" style="font-size:.98rem">${PROMISE.txt}</div><div class="sig">${PROMISE.sig}</div></div>
     <div style="flex:1"></div><div class="change">${TWEAK}</div>`;
 }
 function rE(s){
   let rows='';
-  if(s.face==='num') rows+=`<div class="row"><div class="spine"><b class="cy">${s.cur}</b><span>${s.of}<br>${s.meta1} · ${s.meta2}</span><div class="upd">${editIcon}Update</div></div>
+  if(s.face==='num') rows+=`<div class="row"><div class="spine"><b class="cy">${s.cur}</b><span>${s.of}<br>${s.meta1} · ${s.meta2}</span><div class="upd">${editIcon}Update progress</div></div>
     <div class="vbar"><i style="height:${s.pct}%"></i></div><div class="body"></div></div>`;
   if(s.face==='wall') rows+=`<div class="row"><div class="spine"><b>${s.days.replace(' days','')}</b><span>days to go<br>${s.sub}</span></div><div class="body"></div></div>`;
   rows+=`<div class="row"><div class="spine"><b style="font-size:1.15rem;letter-spacing:-.02em">The why</b></div><div class="body"><div class="txt" ${s.face==='why'?'style="font-size:1.0rem;line-height:1.6"':''}>${s.why}</div></div></div>`;
   rows+=`<div class="row"><div class="spine"><b style="font-size:1.15rem;letter-spacing:-.02em;color:rgba(255,255,255,.45)">If not</b></div><div class="body"><div class="anti">${s.anti}</div></div></div>`;
+  rows+=`<div class="row"><div class="spine"><b style="font-size:1.15rem;letter-spacing:-.02em">Your note</b></div><div class="body"><div class="txt" style="font-size:.88rem">${PROMISE.txt}</div><div class="sig">${PROMISE.sig}</div></div></div>`;
   return `<div class="head">Summary:</div>${rows}<div class="change">${TWEAK}</div>`;
 }
 function rF(s){
   let top='';
   if(s.face==='num') top=`<div class="num">${s.cur}</div><div class="numsub">${s.of} · ${s.meta2}</div>
-    <div class="line"><i style="width:${s.pct}%"></i></div><div class="upd">${editIcon}Update</div>`;
+    <div class="line"><i style="width:${s.pct}%"></i></div><div class="upd">${editIcon}Update progress</div>`;
   if(s.face==='wall') top=`<div class="num">${s.days}</div><div class="numsub">${s.sub}</div><div class="line"><i style="width:38%"></i></div>`;
   if(s.face==='why') top=``;
   return `${top}<div class="why" ${s.face==='why'?'style="font-size:1.2rem;max-width:262px"':''}>${s.why}</div>
-    <div class="anti">${s.anti}</div><div class="change">${TWEAK}</div>`;
+    <div class="anti">${s.anti}</div>
+    <div class="prom">${PROMISE.txt}</div><div class="sig">${PROMISE.sig}</div>
+    <div class="change">${TWEAK}</div>`;
 }
 function rG(s){
   let ghost = s.face==='num' ? s.cur.replace(',','') : (s.face==='wall' ? s.days.replace(' days','') : '');
   let stand='';
   if(s.face==='num') stand=`<div class="mega">${s.cur}</div><div class="megasub">${s.of}</div>
     <div class="blockbar"><i style="width:${s.pct}%"></i></div>
-    <div class="kv"><span>${s.meta1}</span><span>${s.meta2}</span></div><div class="upd">Update</div>`;
+    <div class="kv"><span>${s.meta1}</span><span>${s.meta2}</span></div><div class="upd">Update progress</div>`;
   if(s.face==='wall') stand=`<div class="mega" style="font-size:3.1rem">${s.days}</div><div class="megasub">${s.sub}</div>`;
   return `${ghost?`<div class="ghost">${ghost}</div>`:''}<div class="head">Summary:</div>${stand}
     <div class="whyblock"><div class="lab">Why this matters</div><div class="txt">${s.why}</div></div>
     <div class="antiblock"><div class="lab">If nothing changes</div><div class="txt">${s.anti}</div></div>
+    <div class="promblock"><div class="lab">Your note to yourself</div><div class="txt">${PROMISE.txt}</div><div class="sig">${PROMISE.sig}</div></div>
     <div class="change">${TWEAK}</div>`;
 }
 function rH(s){
@@ -315,23 +346,25 @@ function rH(s){
       <div class="standrow"><b>${s.cur}</b><span>${s.of}</span></div>
       <div class="seg">${segs}</div>
       <div class="kv"><span>${s.meta1}</span><span>${s.meta2}</span></div>
-      <div class="upd">Update</div></div>`;
+      <div class="upd">Update progress</div></div>`;
   }
   if(s.face==='wall') stand=`<div class="panel"><div class="lab">Where you stand</div>
     <div class="standrow"><b>${s.days}</b></div><div class="kv" style="margin-top:8px"><span>${s.sub}</span></div></div>`;
   const why=`<div class="panel">${s.face==='why'?'':'<div class="lab">Why this matters</div>'}<div class="txt" ${s.face==='why'?'style="font-size:1.05rem;line-height:1.6"':''}>${s.why}</div></div>`;
   return `<div class="head">Summary:</div>${stand}${why}
     <div class="panel panel--anti"><div class="lab">If nothing changes</div><div class="anti">${s.anti}</div></div>
+    <div class="panel"><div class="lab">Your note to yourself</div><div class="txt">${PROMISE.txt}</div><div class="sig">${PROMISE.sig}</div></div>
     <div class="change">${TWEAK}</div>`;
 }
 function rI(s){
   let halo='';
   if(s.face==='num') halo=`<div class="halo"><b>${s.cur}</b><span>${s.of} · ${s.meta2}</span>
-    <div class="arc"><i style="width:${s.pct}%"></i></div></div><div class="upd">${editIcon}Update</div>`;
+    <div class="arc"><i style="width:${s.pct}%"></i></div></div><div class="upd">${editIcon}Update progress</div>`;
   if(s.face==='wall') halo=`<div class="halo"><b style="font-size:2.5rem">${s.days}</b><span>${s.sub}</span></div>`;
   return `<div class="stars"></div><div class="head">Summary:</div>${halo}
     <div class="sect">${s.face==='why'?'':'<div class="lab">Why this matters</div>'}<div class="why" ${s.face==='why'?'style="font-size:1.2rem"':''}>${s.why}</div></div>
     <div class="sect"><div class="lab">If nothing changes</div><div class="anti">${s.anti}</div></div>
+    <div class="sect"><div class="lab">Your note to yourself</div><div class="prom">${PROMISE.txt}</div><div class="sig">${PROMISE.sig}</div></div>
     <div class="change">${TWEAK}</div>`;
 }
 
