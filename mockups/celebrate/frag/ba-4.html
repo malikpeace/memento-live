@@ -4,24 +4,21 @@
    climbing, until it can't hold it and ERUPTS: the colour bursts out of the
    card and swallows the screen, the M lands, the goal line crowns it. The
    card made this moment; the card keeps it. */
-[data-c="ba-4"] .ba4-card{position:relative;width:118px;height:154px;border-radius:16px;
-  background:linear-gradient(165deg,rgba(var(--ink),.10),rgba(var(--ink),.04) 55%,rgba(var(--ink),.07));
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.10), 0 14px 36px rgba(0,0,0,.5);
-  display:flex;align-items:center;justify-content:center}
-[data-c="ba-4"] .ba4-card svg{width:38px;height:38px;fill:rgba(235,238,248,.85)}
-[data-c="ba-4"] .b1.on .ba4-card{animation:ba4Grow 2.3s cubic-bezier(.4,0,.6,1) .3s both}
-@keyframes ba4Grow{0%{opacity:0;transform:scale(.9)}25%{opacity:1;transform:scale(.94)}
-  100%{opacity:1;transform:scale(1.12);box-shadow:inset 0 1px 0 rgba(var(--ink),.10),
-    0 0 90px rgba(var(--accent-rgb),.55), 0 14px 36px rgba(0,0,0,.5)}}
+[data-c="ba-4"] .ba4-card{position:absolute;left:50%;top:50%;width:156px;height:156px;
+  margin:-78px 0 0 -78px;fill:rgba(235,238,248,.28)}
+[data-c="ba-4"] .b1.on .ba4-card{animation:ba4Grow 2.4s cubic-bezier(.4,0,.6,1) .25s both}
+@keyframes ba4Grow{0%{opacity:0;transform:scale(.86);fill:rgba(235,238,248,.20)}
+  25%{opacity:1}
+  100%{opacity:1;transform:scale(1.06);fill:var(--accent)}}
 /* rings collapsing INTO the card */
-[data-c="ba-4"] .ba4-in{position:absolute;left:50%;top:44%;width:70px;height:70px;margin:-35px 0 0 -35px;
+[data-c="ba-4"] .ba4-in{position:absolute;left:50%;top:50%;width:70px;height:70px;margin:-35px 0 0 -35px;
   border-radius:50%;border:2.5px solid rgba(var(--accent-rgb),.8);opacity:0}
 [data-c="ba-4"] .b1.on .ba4-i1{animation:ba4In 1s cubic-bezier(.5,0,.75,.5) .5s both}
 [data-c="ba-4"] .b1.on .ba4-i2{animation:ba4In 1s cubic-bezier(.5,0,.75,.5) 1.1s both}
 [data-c="ba-4"] .b1.on .ba4-i3{animation:ba4In .9s cubic-bezier(.5,0,.75,.5) 1.7s both}
 @keyframes ba4In{0%{opacity:0;transform:scale(7)}30%{opacity:1}100%{opacity:0;transform:scale(.3)}}
 /* THE ERUPTION: colour bursts out of the card and takes the screen */
-[data-c="ba-4"] .ba4-erupt{position:absolute;left:50%;top:44%;width:24px;height:24px;margin:-12px 0 0 -12px;
+[data-c="ba-4"] .ba4-erupt{position:absolute;left:50%;top:50%;width:24px;height:24px;margin:-12px 0 0 -12px;
   border-radius:50%;background:var(--accent);opacity:0;transform:scale(0)}
 [data-c="ba-4"] .b1.on .ba4-erupt{animation:ba4Erupt .7s cubic-bezier(.2,.7,.3,1) 2.7s forwards}
 @keyframes ba4Erupt{0%{opacity:1;transform:scale(0)}100%{opacity:1;transform:scale(70)}}
@@ -45,11 +42,7 @@
 [data-c="ba-4"] .ba4-cost{font-size:19px;line-height:2.05;color:var(--text-mid)}
 [data-c="ba-4"] .ba4-cost b{color:var(--text-hi);font-size:26px;font-variant-numeric:tabular-nums}
 [data-c="ba-4"] .b2.on .ba4-cost{animation:ba4Upp .55s ease-out .15s both}
-[data-c="ba-4"] .ba4-keepcard{position:relative;width:110px;height:142px;border-radius:15px;
-  background:rgba(var(--accent-rgb),.30);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.13), 0 0 54px rgba(var(--accent-rgb),.32), 0 14px 36px rgba(0,0,0,.5);
-  display:flex;align-items:center;justify-content:center}
-[data-c="ba-4"] .ba4-keepcard svg{width:36px;height:36px;fill:var(--accent)}
+[data-c="ba-4"] .ba4-keepcard{position:relative;width:132px;height:132px;fill:rgba(11,14,18,.92)}
 [data-c="ba-4"] .b3.on .ba4-keepcard{animation:ba4Rise .8s cubic-bezier(.16,1.2,.3,1) both}
 @keyframes ba4Rise{from{opacity:0;transform:translateY(22px) scale(.93)}to{opacity:1;transform:none}}
 [data-c="ba-4"] .ba4-wear{margin-top:22px;font-size:14.5px;color:var(--text-mid)}
@@ -78,10 +71,7 @@
 [data-c="ba-4"] .b2.on .ba4-halo i{animation:ba4Dot .5s ease-out calc(var(--i)*var(--step,.004)*1s) forwards}
 @keyframes ba4Dot{to{opacity:1}}
 [data-c="ba-4"] .ba4-core{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);
-  width:92px;height:120px;border-radius:13px;background:rgba(var(--accent-rgb),.28);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.12), 0 0 48px rgba(var(--accent-rgb),.35);
-  display:flex;align-items:center;justify-content:center}
-[data-c="ba-4"] .ba4-core svg{width:30px;height:30px;fill:var(--accent)}
+  width:104px;height:104px;fill:rgba(11,14,18,.92)}
 [data-c="ba-4"] .ba4-under{position:absolute;left:0;right:0;bottom:52px;text-align:center;opacity:0}
 [data-c="ba-4"] .ba4-under b{font-size:40px;font-weight:750;letter-spacing:-.04em;color:var(--text-hi);
   font-variant-numeric:tabular-nums}
@@ -97,7 +87,7 @@
       <div class="ba4-in ba4-i1"></div>
       <div class="ba4-in ba4-i2"></div>
       <div class="ba4-in ba4-i3"></div>
-      <div class="ba4-card"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+      <svg class="ba4-card" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
       <div class="ba4-erupt"></div>
             <div class="ba4fw" aria-hidden="true">
         <i style="--dx:-52px;--dy:-36px"></i><i style="--dx:50px;--dy:-40px"></i><i style="--dx:-60px;--dy:14px"></i>
@@ -114,13 +104,13 @@
     <div class="b b2">
       <div class="ba4-wall">
         <div class="ba4-halo"></div>
-        <div class="ba4-core"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+        <svg class="ba4-core" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
         <div class="ba4-under"></div>
       </div>
     </div>
 
     <div class="b b3">
-      <div class="ba4-keepcard"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+      <svg class="ba4-keepcard" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
     </div>
 
   </div>

@@ -67,10 +67,22 @@
   function fitLine(ph, sel, base) {
     var el = Q(ph, sel); if (!el) return;
     var n = (el.textContent || '').replace(/\s+/g, ' ').trim().length;
-    var size = n <= 18 ? base : base * Math.pow(18 / n, 0.5);
-    size = Math.max(17, size);
+    if (!n) return;
+    /* Malik 2026-08-15: "You lost 30 lbs!" was breaking across two lines for
+       no reason. A goal that CAN sit on one line does, even if that means
+       coming down a few points; only a sentence too long to hold at a
+       readable size is allowed to wrap. */
+    var avail = 316, one = avail / (n * 0.52);
+    if (one >= base) {
+      el.style.fontSize = base + 'px'; el.style.whiteSpace = 'nowrap'; el.style.maxWidth = 'none'; return;
+    }
+    if (one >= 26) {
+      el.style.fontSize = one.toFixed(1) + 'px'; el.style.whiteSpace = 'nowrap'; el.style.maxWidth = 'none'; return;
+    }
+    el.style.whiteSpace = 'normal';
+    var size = Math.max(17, base * Math.pow(18 / n, 0.5));
     el.style.fontSize = size.toFixed(1) + 'px';
-    el.style.maxWidth = (n <= 18 ? 10 : n <= 34 ? 14 : 17) + 'ch';
+    el.style.maxWidth = (n <= 34 ? 14 : 17) + 'ch';
   }
   /* Malik 2026-08-15: a wall of 1,780 moves used to animate a few hundred and
      then dump the rest in at once, because the per-item delay was capped. The
@@ -954,20 +966,25 @@
       ],
       apply: function (ph, v) {
         var sh = v.shape, w = wallData(v);
-        var hero, from, unit;
-        if (sh === 'target') { hero = w.mf(+v.value); from = 'From ' + w.mf(+v.start) + '.'; unit = esc(unitFor(+v.value, w.money ? 'dollars' : v.unit)) + '. The number you named.'; }
-        else if (sh === 'count') { hero = w.mf(+v.value); from = 'From zero.'; unit = esc(unitFor(+v.value, v.unit)) + '. Every one logged.'; }
-        else if (sh === 'duration') { hero = fmt(w.days); from = 'From day one.'; unit = plural(w.days, 'day', 'days') + ' held, start to finish.'; }
-        else { hero = fmt(w.days); from = 'From the day you named it.'; unit = plural(w.days, 'day', 'days') + ' of work, and then the day.'; }
-        put(ph, '.ba2-from', from);
+        var hero, sub;
+        if (sh === 'target') {
+          hero = w.mf(+v.value);
+          sub = 'From ' + w.mf(+v.start) + ' to ' + w.mf(+v.value) + (w.money ? '' : ' ' + esc(unitFor(+v.value, v.unit)));
+        } else if (sh === 'count') {
+          hero = w.mf(+v.value);
+          sub = 'From zero to ' + w.mf(+v.value) + ' ' + esc(unitFor(+v.value, v.unit));
+        } else if (sh === 'duration') {
+          hero = fmt(w.days); sub = plural(w.days, 'day', 'days') + ', start to finish';
+        } else {
+          hero = fmt(w.days); sub = plural(w.days, 'day', 'days') + ' from the day you named it';
+        }
         put(ph, '.ba2-hero', hero);
         var hEl = Q(ph, '.ba2-hero');
         if (hEl) hEl.style.fontSize = hero.length > 6 ? '84px' : hero.length > 4 ? '104px' : '132px';
-        put(ph, '.ba2-unit', unit);
+        put(ph, '.ba2-unit', sub);
         put(ph, '.ba2-line', esc(v.line) + '!'); fitLine(ph, '.ba2-line', 28);
-        /* THE COLUMN: EVERY move gets a slat, no cap (his 2026-08-14 note).
-           500 moves = 500 slivers; the gap closes and the ink alternates so
-           the density stays legible instead of collapsing into a bar. */
+        /* THE COLUMN: EVERY move gets a slat, no cap. 500 moves = 500 slivers;
+           the gap closes and the ink alternates so density stays legible. */
         var n = Math.max(1, w.count), t = '';
         for (var i = 0; i < n; i++) {
           var top = i === n - 1;
@@ -1022,7 +1039,7 @@
         }
         put(ph, '.ba4-halo', dots);
         sweep(ph, '.ba4-halo', N, 1.7);
-        put(ph, '.ba4-under', '<b>' + fmt(w.count) + '</b><span>' + esc(w.unitLabel) + '. Every one of them, around it.</span>');
+        put(ph, '.ba4-under', '<b>' + fmt(w.count) + '</b><span>' + esc(w.unitLabel) + '. You can see all of them here.</span>');
       }
     },
 
@@ -1044,23 +1061,43 @@
         { k: 'hours', t: 'r', l: 'Hours logged', v: 184, min: 0, max: 5000 }
       ],
       apply: function (ph, v) {
-        put(ph, '.ba5-line', esc(v.line) + '!'); fitLine(ph, '.ba5-line', 42);
-        put(ph, '.ba5-fin', esc(v.line) + '!'); fitLine(ph, '.ba5-fin', 28);
         var w = wallData(v);
+        put(ph, '.ba5-line', esc(v.line) + '!'); fitLine(ph, '.ba5-line', 42);
         put(ph, '.ba5-once', w.days >= 300 ? 'A year of showing up, paid in full!' : fmt(w.days) + ' days of showing up, paid in full!');
-        /* THE FIELD: EVERY move is a dot, no cap; the bloom turns slowly. */
-        var N = Math.max(1, w.count);
-        var dr = Math.max(1.1, Math.min(4.4, 40 / Math.sqrt(N + 2))), c = 6.6, out = '';
-        for (var i = 0; i < N; i++) {
-          var rr = c * Math.sqrt(i), th = i * 2.399963;
-          out += '<circle cx="' + (rr * Math.cos(th)).toFixed(1) + '" cy="' + (rr * Math.sin(th)).toFixed(1) +
-                 '" r="' + (i === N - 1 ? dr + 1.4 : dr) + '" fill="' +
-                 (i === N - 1 ? '#fff' : (i % 6 === 0 ? 'rgba(255,255,255,.75)' : 'rgba(11,14,18,.72)')) + '"></circle>';
+        /* the burst sparks in beat two */
+        var burst = '';
+        for (var q = 0; q < 10; q++) {
+          var a = q / 10 * 6.2832, rr = 46 + (q % 3) * 12;
+          burst += '<i style="--dx:' + (Math.cos(a) * rr).toFixed(0) + 'px;--dy:' + (Math.sin(a) * rr).toFixed(0) + 'px"></i>';
         }
-        var span = Math.max(60, c * Math.sqrt(N) + 8);
+        ['.ba5-f1', '.ba5-f2', '.ba5-f3', '.ba5-f4', '.ba5-f5'].forEach(function (sel) { put(ph, sel, burst); });
+        /* THE SKY: one spark per move, gathered into real firework bursts, so
+           the total is counted AS fireworks (his 2026-08-15 note) rather than
+           as a flower. Every move is drawn; the bursts grow with the count. */
+        var N = Math.max(1, w.count);
+        var K = Math.max(3, Math.min(12, Math.round(Math.sqrt(N) / 2.2)));
+        var rnd = seeded(N * 13 + K), out = '', idx = 0;
+        var W = 320, H = 360;
+        for (var b = 0; b < K; b++) {
+          var per = Math.floor(N / K) + (b < N % K ? 1 : 0);
+          if (!per) continue;
+          var cx = 46 + rnd() * (W - 92), cy = 44 + rnd() * (H - 108);
+          var maxR = Math.min(74, 16 + Math.sqrt(per) * 7);
+          var spin = rnd() * 6.2832;
+          for (var d = 0; d < per; d++) {
+            var ang = spin + d * 2.399963;
+            var rad = maxR * Math.sqrt((d + 0.6) / per);
+            var x = cx + Math.cos(ang) * rad, y = cy + Math.sin(ang) * rad * 0.92;
+            var sz = Math.max(0.9, 3.1 - rad / maxR * 1.5) * (N > 600 ? 0.7 : 1);
+            out += '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + sz.toFixed(2) +
+                   '" fill="' + (d % 5 === 0 ? 'rgba(255,255,255,.9)' : 'rgba(11,14,18,.78)') +
+                   '" style="--i:' + (idx++) + '"></circle>';
+          }
+        }
         var svg = Q(ph, '.ba5-svg');
-        if (svg) { svg.setAttribute('viewBox', (-span) + ' ' + (-span) + ' ' + (span * 2) + ' ' + (span * 2)); svg.innerHTML = out; }
-        put(ph, '.ba5-under', '<b>' + fmt(w.count) + '</b><span>' + esc(w.unitLabel) + '. One dot for every single one.</span>');
+        if (svg) svg.innerHTML = out;
+        sweep(ph, '.ba5-svg', N, 1.6);
+        put(ph, '.ba5-under', '<b>' + fmt(N) + '</b><span>' + esc(w.unitLabel) + ', every one a spark.</span>');
       }
     },
 
