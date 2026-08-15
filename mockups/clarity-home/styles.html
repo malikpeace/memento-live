@@ -114,7 +114,18 @@
   .inner .asof{color:var(--lo);font-size:.74rem;font-weight:600;margin-top:6px;font-variant-numeric:tabular-nums}
   .inner .prog{margin:16px 0 0}
   .inner .track{position:relative;height:4px;border-radius:99px;background:rgba(255,255,255,.09)}
-  .inner .track i{position:absolute;left:0;top:0;bottom:0;border-radius:99px;background:linear-gradient(90deg,rgba(58,217,245,.55),var(--cyan))}
+  .inner .track i{position:absolute;left:0;top:0;bottom:0;border-radius:99px;overflow:hidden;
+    background:linear-gradient(90deg,rgba(58,217,245,.55),var(--cyan));
+    transform-origin:left center;animation:railGrow .85s cubic-bezier(.22,.61,.36,1) both}
+  .inner .track i::after{content:"";position:absolute;top:0;bottom:0;width:42%;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);
+    animation:railSweep 3.6s ease-in-out 1.1s infinite}
+  @keyframes railGrow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+  @keyframes railSweep{0%{left:-45%}55%,100%{left:105%}}
+  @media (prefers-reduced-motion: reduce){
+    .inner .track i{animation:none}
+    .inner .track i::after{display:none}
+  }
   .inner .pts{display:flex;justify-content:space-between;margin-top:9px;color:var(--lo);font-size:.72rem;font-weight:600;font-variant-numeric:tabular-nums}
   .inner .rem{display:inline-flex;align-items:baseline;gap:5px;margin-top:11px;color:var(--cyan);font-size:.92rem;font-weight:700;font-variant-numeric:tabular-nums}
   .inner .rem s{text-decoration:none;color:var(--lo);font-size:.76rem;font-weight:600}
