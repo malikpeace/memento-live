@@ -350,12 +350,7 @@
     {
      "key": "ba-8",
      "name": "The Heat",
-     "note": "New opening: the M draws itself stroke by stroke on the colour, then fills. New wall: a HEATMAP of the whole journey, one cell per day, darker where they did more, so the shape of the effort is visible at a glance."
-    },
-    {
-     "key": "ba-9",
-     "name": "The Wall",
-     "note": "Every mark they passed slams into a wall, the goal chip landing last and biggest, detonating the flood. Then THE FULL WALL: the totals as a mosaic of mixed weights, drifting gently."
+     "note": "The mark fades up slowly out of the colour, then the goal line lands. Then THE HEAT: a heatmap of the whole journey, one cell per day, darker where they did more, so the shape of the effort is visible at a glance."
     }
    ]
   }

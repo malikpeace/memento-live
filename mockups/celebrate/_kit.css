@@ -134,6 +134,14 @@ body{margin:0;background:#0a0b0d;color:var(--text-hi);font-family:var(--font);-w
   font-size:12px;line-height:1.5;color:var(--text-mid)}
 .tw__fire b{color:var(--accent);font-weight:700}
 
+/* Malik 2026-08-15: tapping from one full-colour beat to the next flashed
+   black for half a second, because every beat cross-FADES from opacity 0 and
+   the phone underneath is black. On these ceremonies the beats swap instantly
+   instead: the colour never leaves the screen, and the content inside each
+   beat still animates on arrival. */
+.ph[data-c^="ba-"] .b{opacity:1;visibility:hidden}
+.ph[data-c^="ba-"] .b.on{visibility:visible;animation:none}
+
 /* ===== BIG ASS CELEBRATIONS: THE FLOOD STAYS (Malik 2026-08-14). Once the
    colour lands it never leaves: every beat after the impact is full accent
    and the ink flips dark, so the wall of stats reads on the colour. One

@@ -14,30 +14,44 @@
 [data-c="ba-5"] .b2.on .ba5-curtain{animation:ba5Curtain .55s cubic-bezier(.2,.8,.25,1) .05s forwards}
 @keyframes ba5Curtain{to{transform:none}}
 [data-c="ba-5"] .ba5-fw{position:absolute;width:0;height:0}
-[data-c="ba-5"] .ba5-f1{left:24%;top:20%}
-[data-c="ba-5"] .ba5-f2{left:76%;top:17%}
-[data-c="ba-5"] .ba5-f3{left:50%;top:12%}
-[data-c="ba-5"] .ba5-f4{left:16%;top:34%}
-[data-c="ba-5"] .ba5-f5{left:84%;top:38%}
-[data-c="ba-5"] .ba5-fw i{position:absolute;width:6px;height:6px;border-radius:50%;background:#0b0e12;opacity:0}
-[data-c="ba-5"] .ba5-fw i:nth-child(2n){background:#fff}
-[data-c="ba-5"] .b2.on .ba5-f1 i{animation:ba5Spark 1.1s cubic-bezier(.15,.6,.3,1) .5s both}
-[data-c="ba-5"] .b2.on .ba5-f2 i{animation:ba5Spark 1.1s cubic-bezier(.15,.6,.3,1) .75s both}
-[data-c="ba-5"] .b2.on .ba5-f3 i{animation:ba5Spark 1.1s cubic-bezier(.15,.6,.3,1) 1s both}
-[data-c="ba-5"] .b2.on .ba5-f4 i{animation:ba5Spark 1.1s cubic-bezier(.15,.6,.3,1) 1.25s both}
-[data-c="ba-5"] .b2.on .ba5-f5 i{animation:ba5Spark 1.1s cubic-bezier(.15,.6,.3,1) 1.5s both}
-@keyframes ba5Spark{0%{opacity:1;transform:translate(0,0)}100%{opacity:0;transform:translate(var(--dx),var(--dy))}}
+[data-c="ba-5"] .ba5-f1{left:26%;top:26%}
+[data-c="ba-5"] .ba5-f2{left:74%;top:20%}
+[data-c="ba-5"] .ba5-f3{left:50%;top:14%}
+[data-c="ba-5"] .ba5-f4{left:16%;top:40%}
+[data-c="ba-5"] .ba5-f5{left:86%;top:44%}
+/* the launch: a streak climbing into the burst point */
+[data-c="ba-5"] .ba5-fw .tr{position:absolute;left:-1.5px;top:0;width:3px;height:92px;border-radius:2px;
+  background:linear-gradient(to top,rgba(11,14,18,0),rgba(11,14,18,.8));opacity:0}
+[data-c="ba-5"] .b2.on .ba5-fw .tr{animation:fwLaunch .48s cubic-bezier(.25,.7,.4,1) var(--t,0s) both}
+@keyframes fwLaunch{0%{opacity:0;transform:translateY(250px) scaleY(.45)}
+  22%{opacity:1}70%{opacity:1}100%{opacity:0;transform:translateY(0) scaleY(1)}}
+/* the flash at the moment it opens */
+[data-c="ba-5"] .ba5-fw .fl{position:absolute;left:-44px;top:-44px;width:88px;height:88px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.95),rgba(255,255,255,0) 68%);opacity:0}
+[data-c="ba-5"] .b2.on .ba5-fw .fl{animation:fwFlash .5s ease-out calc(var(--t,0s) + .46s) both}
+@keyframes fwFlash{0%{opacity:0;transform:scale(.15)}22%{opacity:1}100%{opacity:0;transform:scale(1.7)}}
+/* the sparks: out fast, then they arc and fall, the way they really do */
+[data-c="ba-5"] .ba5-fw .sp{position:absolute;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-radius:50%;
+  background:rgba(11,14,18,.88);opacity:0}
+[data-c="ba-5"] .ba5-fw .sp:nth-child(3n){background:#fff}
+[data-c="ba-5"] .ba5-fw .sp:nth-child(5n){width:3.5px;height:3.5px}
+[data-c="ba-5"] .b2.on .ba5-fw .sp{animation:fwSpark 1.7s cubic-bezier(.1,.62,.28,1) calc(var(--t,0s) + .46s) both}
+@keyframes fwSpark{
+  0%{opacity:0;transform:translate(0,0) scale(.5)}
+  6%{opacity:1;transform:translate(calc(var(--dx)*.22),calc(var(--dy)*.22)) scale(1.15)}
+  55%{opacity:1;transform:translate(calc(var(--dx)*.86),calc(var(--dy)*.86 + 16px)) scale(.9)}
+  100%{opacity:0;transform:translate(var(--dx),calc(var(--dy) + 104px)) scale(.45)}}
 [data-c="ba-5"] .ba5-stage{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
   justify-content:center;padding:34px}
 [data-c="ba-5"] .ba5-m{width:80px;height:80px;fill:#0b0e12;opacity:0}
-[data-c="ba-5"] .b2.on .ba5-m{animation:ba5MSlam .5s cubic-bezier(.16,1.35,.3,1) .5s both}
+[data-c="ba-5"] .b2.on .ba5-m{animation:ba5MSlam .5s cubic-bezier(.16,1.35,.3,1) .9s both}
 @keyframes ba5MSlam{from{opacity:0;transform:scale(2.2)}to{opacity:1;transform:scale(1)}}
 [data-c="ba-5"] .ba5-line{margin-top:22px;font-size:42px;font-weight:750;letter-spacing:-.04em;
   line-height:1.05;color:#0b0e12;opacity:0}
-[data-c="ba-5"] .b2.on .ba5-line{animation:ba5Slam .5s cubic-bezier(.16,1.3,.3,1) .72s both}
+[data-c="ba-5"] .b2.on .ba5-line{animation:ba5Slam .5s cubic-bezier(.16,1.3,.3,1) 1.15s both}
 @keyframes ba5Slam{from{opacity:0;transform:scale(1.35)}to{opacity:1;transform:scale(1)}}
 [data-c="ba-5"] .ba5-once{margin-top:18px;font-size:14.5px;font-weight:650;color:rgba(11,14,18,.78);opacity:0}
-[data-c="ba-5"] .b2.on .ba5-once{animation:ba5Up .5s ease-out 1.1s both}
+[data-c="ba-5"] .b2.on .ba5-once{animation:ba5Up .5s ease-out 1.55s both}
 @keyframes ba5Up{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
 
 /* THE SKY: every move is a spark, grouped into bursts */
@@ -72,11 +86,11 @@
 
     <div class="b b2" data-confetti>
       <div class="ba5-curtain"></div>
-      <div class="ba5-fw ba5-f1" aria-hidden="true"></div>
-      <div class="ba5-fw ba5-f2" aria-hidden="true"></div>
-      <div class="ba5-fw ba5-f3" aria-hidden="true"></div>
-      <div class="ba5-fw ba5-f4" aria-hidden="true"></div>
-      <div class="ba5-fw ba5-f5" aria-hidden="true"></div>
+      <div class="ba5-fw ba5-f1" style="--t:0s" aria-hidden="true"></div>
+      <div class="ba5-fw ba5-f2" style="--t:.34s" aria-hidden="true"></div>
+      <div class="ba5-fw ba5-f3" style="--t:.72s" aria-hidden="true"></div>
+      <div class="ba5-fw ba5-f4" style="--t:1.06s" aria-hidden="true"></div>
+      <div class="ba5-fw ba5-f5" style="--t:1.44s" aria-hidden="true"></div>
       <div class="ba5-stage">
         <svg class="ba5-m" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
         <div class="ba5-line">You lost 30 lbs!</div>

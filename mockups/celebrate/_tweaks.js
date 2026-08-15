@@ -1064,13 +1064,19 @@
         var w = wallData(v);
         put(ph, '.ba5-line', esc(v.line) + '!'); fitLine(ph, '.ba5-line', 42);
         put(ph, '.ba5-once', w.days >= 300 ? 'A year of showing up, paid in full!' : fmt(w.days) + ' days of showing up, paid in full!');
-        /* the burst sparks in beat two */
-        var burst = '';
-        for (var q = 0; q < 10; q++) {
-          var a = q / 10 * 6.2832, rr = 46 + (q % 3) * 12;
-          burst += '<i style="--dx:' + (Math.cos(a) * rr).toFixed(0) + 'px;--dy:' + (Math.sin(a) * rr).toFixed(0) + 'px"></i>';
-        }
-        ['.ba5-f1', '.ba5-f2', '.ba5-f3', '.ba5-f4', '.ba5-f5'].forEach(function (sel) { put(ph, sel, burst); });
+        /* REAL fireworks (his 2026-08-15 note): a launch streak climbs in, a
+           flash opens, then 26 sparks fly out and fall. Each burst gets its
+           own size and jitter so no two look stamped from the same mould. */
+        var fwr = seeded(97);
+        ['.ba5-f1', '.ba5-f2', '.ba5-f3', '.ba5-f4', '.ba5-f5'].forEach(function (sel) {
+          var n = 26, reach = 58 + fwr() * 34, html = '<i class="tr"></i><em class="fl"></em>';
+          for (var q = 0; q < n; q++) {
+            var a = (q / n) * 6.2832 + fwr() * 0.22;
+            var rr = reach * (0.62 + fwr() * 0.5);
+            html += '<i class="sp" style="--dx:' + (Math.cos(a) * rr).toFixed(0) + 'px;--dy:' + (Math.sin(a) * rr).toFixed(0) + 'px"></i>';
+          }
+          put(ph, sel, html);
+        });
         /* THE SKY: one spark per move, gathered into real firework bursts, so
            the total is counted AS fireworks (his 2026-08-15 note) rather than
            as a flower. Every move is drawn; the bursts grow with the count. */
@@ -1215,78 +1221,7 @@
           + (w.streak > 0 ? '<div class="ba8-key"><b>' + fmt(w.streak) + '</b><span>day streak</span></div>' : '')
           + (w.hours > 0 ? '<div class="ba8-key"><b>' + fmt(w.hours) + '</b><span>hours</span></div>' : ''));
       }
-    },
-
-    'ba-9': {
-      c: [
-        { k: 'shape', t: 's', l: 'Goal shape', v: 'target', o: [
-          { v: 'target', l: 'target hit (weight, debt)' },
-          { v: 'count', l: 'count done (100 sessions)' },
-          { v: 'duration', l: 'duration held (no-buy year)' },
-          { v: 'event', l: 'event done (passed the bar)' } ] },
-        { k: 'line', t: 't', l: 'The goal, their words', v: 'You lost 30 lbs' },
-        { k: 'start', t: 'n', l: 'Start number', v: 230 },
-        { k: 'value', t: 'n', l: 'Final number', v: 200 },
-        { k: 'unit', t: 't', l: 'Unit', v: 'lbs' },
-        { k: 'days', t: 'r', l: 'Days it took', v: 126, min: 1, max: 900 },
-        { k: 'moves', t: 'r', l: 'Moves logged', v: 215, min: 0, max: 2000 },
-        { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' },
-        { k: 'streak', t: 'r', l: 'Best streak (days)', v: 41, min: 0, max: 365 },
-        { k: 'hours', t: 'r', l: 'Hours logged', v: 184, min: 0, max: 5000 }
-      ],
-      apply: function (ph, v) {
-        var sh = v.shape, w = wallData(v);
-        var vals = [];
-        if (sh === 'target' && +v.start !== +v.value) {
-          var dir = +v.value < +v.start ? 'down' : 'up';
-          vals = C.milestones({ target: +v.value, baseline: +v.start }, dir).map(w.mf);
-        } else if (sh === 'count') {
-          vals = C.COUNT_LADDER.filter(function (c) { return c < +v.value; }).map(w.mf);
-          vals.push(w.mf(+v.value));
-        } else {
-          for (var d = 30; d < w.days; d += 30) vals.push('day ' + fmt(d));
-          vals.push('day ' + fmt(w.days));
-        }
-        var over = Math.max(0, vals.length - 13);
-        if (over > 0) vals = ['&hellip;'].concat(vals.slice(over));
-        var chips = '';
-        for (var i = 0; i < vals.length; i++) {
-          var last = i === vals.length - 1;
-          chips += '<span class="ba9-chip' + (last ? ' ba9-chip--goal' : '') + '" style="--i:' + i + '">' + vals[i] + '</span>';
-        }
-        put(ph, '.ba9-chips', chips);
-        var boom = (0.25 + vals.length * 0.13 + 0.35).toFixed(2) + 's';
-        var b1 = Q(ph, '.b1'); if (b1) b1.style.setProperty('--boom', boom);
-        put(ph, '.ba9-line', esc(v.line) + '!'); fitLine(ph, '.ba9-line', 42);
-        put(ph, '.ba9-fin', esc(v.line) + '!'); fitLine(ph, '.ba9-fin', 28);
-        /* THE FULL WALL: a mosaic, mixed weights, drifting gently. */
-        var wall = [], j = 0;
-        wall.push([fmt(w.count) + ' ' + esc(w.unitLabel), 'ba9-wc--xl ba9-wc--hot']);
-        wall.push([fmt(w.days) + ' days', 'ba9-wc--big']);
-        if (w.streak > 0) wall.push([fmt(w.streak) + '-day streak', 'ba9-wc--big ba9-wc--hot']);
-        if (w.hours > 0) wall.push([fmt(w.hours) + ' hours', 'ba9-wc--big']);
-        wall.push([fmt(w.weeks) + ' weeks', '']);
-        if (w.perWeek > 0) wall.push([fmt(w.perWeek) + ' a week', 'ba9-wc--sm']);
-
-        /* the bare mark numbers are gone from the wall: unlabelled they read
-           as noise (his 2026-08-15 note). They still have their moment in the
-           opening, where the caption says what they are. */
-        wall.push([fmt(vals.length) + ' marks passed', 'ba9-wc--sm']);
-        wall.push(['day 1: ' + dateBack(w.days), 'ba9-wc--sm']);
-        wall.push(['done: ' + dateBack(0), 'ba9-wc--big ba9-wc--hot']);
-        var html = '';
-        wall.forEach(function (c) { html += '<span class="ba9-wc ' + c[1] + '" style="--i:' + (j++) + '">' + c[0] + '</span>'; });
-        put(ph, '.ba9-wall', html);
-        sweep(ph, '.ba9-wall', wall.length, 1.1);
-        fitWall(ph, '.ba9-wall', '--s', 1, 0.45, 0.04);
-      }
-    },
-
-
-
-
-
-
+    }
   };
 
 
@@ -1355,7 +1290,7 @@
     'rf-fall': function (v) { return roadFire(+v.startLeft, 0, Math.min(+v.left, +v.startLeft), 'down'); },
     'rf-rec': function (v) { return '<b>Fires on rungs of the count ladder</b>, drawn from real logged days only.' },
     'ba-1': baFire, 'ba-2': baFire, 'ba-4': baFire, 'ba-5': baFire,
-    'ba-7': baFire, 'ba-8': baFire, 'ba-9': baFire
+    'ba-7': baFire, 'ba-8': baFire
   };
   function baFire() {
     return '<b>The top of the pyramid.</b> Fires ONCE, the day the goal itself is done; it outranks the milestone and the daily, and nothing else shows that day.';

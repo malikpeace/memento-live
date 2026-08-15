@@ -8,24 +8,21 @@
 [data-c="ba-8"] .b1.on .ba8-flood{animation:ba8Wash .3s ease-out both}
 @keyframes ba8Wash{from{opacity:0}to{opacity:1}}
 [data-c="ba-8"] .ba8-draw{position:relative;width:150px;height:150px}
-[data-c="ba-8"] .ba8-draw path{fill:none;stroke:#0b0e12;stroke-width:26;stroke-linejoin:miter;stroke-miterlimit:8;
-  stroke-linecap:butt;stroke-dasharray:1100;stroke-dashoffset:1100}
-[data-c="ba-8"] .b1.on .ba8-draw path{animation:ba8Draw 1.5s cubic-bezier(.5,0,.2,1) .25s forwards,
-  ba8Fill .5s ease-out 1.7s forwards}
-@keyframes ba8Draw{to{stroke-dashoffset:0}}
-@keyframes ba8Fill{to{fill:#0b0e12}}
+[data-c="ba-8"] .ba8-draw path{fill:#0b0e12;opacity:0}
+[data-c="ba-8"] .b1.on .ba8-draw path{animation:ba8FadeM 2.2s cubic-bezier(.4,0,.5,1) .3s both}
+@keyframes ba8FadeM{from{opacity:0}to{opacity:1}}
 [data-c="ba-8"] .ba8-line{position:relative;margin-top:26px;font-size:42px;font-weight:750;
   letter-spacing:-.04em;line-height:1.05;color:#0b0e12;max-width:10ch;opacity:0}
-[data-c="ba-8"] .b1.on .ba8-line{animation:ba8Slam .55s cubic-bezier(.16,1.3,.3,1) 2s both}
+[data-c="ba-8"] .b1.on .ba8-line{animation:ba8Slam .55s cubic-bezier(.16,1.3,.3,1) 2.3s both}
 @keyframes ba8Slam{from{opacity:0;transform:scale(1.32)}to{opacity:1;transform:scale(1)}}
 [data-c="ba-8"] .ba8-bow{position:relative;margin-top:18px;font-size:14.5px;font-weight:650;
   color:rgba(11,14,18,.78);opacity:0}
-[data-c="ba-8"] .b1.on .ba8-bow{animation:ba8Up .5s ease-out 2.45s both}
+[data-c="ba-8"] .b1.on .ba8-bow{animation:ba8Up .5s ease-out 2.75s both}
 @keyframes ba8Up{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
 [data-c="ba-8"] .ba8-fw{position:absolute;left:50%;top:22%;width:0;height:0}
 [data-c="ba-8"] .ba8-fw i{position:absolute;width:6px;height:6px;border-radius:50%;background:#0b0e12;opacity:0}
 [data-c="ba-8"] .ba8-fw i:nth-child(2n){background:#fff}
-[data-c="ba-8"] .b1.on .ba8-fw i{animation:ba8Spk 1s cubic-bezier(.15,.6,.3,1) 2.05s both}
+[data-c="ba-8"] .b1.on .ba8-fw i{animation:ba8Spk 1s cubic-bezier(.15,.6,.3,1) 2.35s both}
 @keyframes ba8Spk{0%{opacity:1;transform:translate(0,0)}100%{opacity:0;transform:translate(var(--dx),var(--dy))}}
 
 /* THE HEATMAP WALL */
@@ -52,7 +49,7 @@
 [data-c="ba-8"] .b3.on .ba8-close{animation:ba8Up .5s ease-out .55s both}
 @media (prefers-reduced-motion:reduce){
   [data-c="ba-8"] .ba8-fw{display:none}
-  [data-c="ba-8"] .ba8-draw path{stroke-dashoffset:0;fill:#0b0e12}
+  [data-c="ba-8"] .ba8-draw path{opacity:1;animation:none}
   [data-c="ba-8"] .ba8-line,[data-c="ba-8"] .ba8-bow,[data-c="ba-8"] .ba8-cap,
   [data-c="ba-8"] .ba8-grid i,[data-c="ba-8"] .ba8-keys,
   [data-c="ba-8"] .ba8-fin,[data-c="ba-8"] .ba8-close{opacity:1;transform:none;animation:none}
