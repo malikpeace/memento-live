@@ -57,7 +57,7 @@
     font-variant-numeric: tabular-nums; }
 
   /* at a glance: the pattern value + bar + the recent strip, one block */
-  .glance { background: rgba(255,255,255,0.035); border-radius: 14px; padding: 16px;
+  .glance { background: rgba(255,255,255,0.035); border-radius: 18px; padding: 16px;
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.06); }
   .glance__v { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
   .glance__bar { height: 6px; border-radius: 999px; background: rgba(255,255,255,0.07); margin: 12px 0 16px;
@@ -66,8 +66,9 @@
   .glance__bar i { position: absolute; top: -2px; bottom: -2px; width: 2px; background: rgba(255,255,255,0.35);
     border-radius: 1px; }
   .glance__strip { display: grid; grid-template-columns: repeat(15, 1fr); gap: 4px; }
-  .glance__strip b { aspect-ratio: 1; border-radius: 3px; background: rgba(255,255,255,0.05); }
-  .glance__strip b.on { background: rgba(63,217,78,0.62); }
+  .glance__strip b { aspect-ratio: 1; border-radius: 5px; background: rgba(255,255,255,0.05); }
+  .glance__strip b.kept { background: rgba(63,217,78,0.62); }
+  .glance__strip b.rest { background: rgba(255,255,255,0.02); }
   .glance__strip b.sup { background: rgba(63,217,78,0.22); }
   .glance__strip b.today { outline: 1.5px solid rgba(63,217,78,0.95); outline-offset: -1.5px; }
   .glance__cap { font-size: 12px; color: var(--text-lo, rgba(255,255,255,0.46)); margin-top: 10px; }
@@ -86,15 +87,19 @@
   .cal .wd { font-size: 11px; color: var(--text-lo, rgba(255,255,255,0.46)); text-align: center;
     padding-bottom: 2px; }
   .cal .wd.g { color: var(--text-lo, rgba(255,255,255,0.32)); }
-  .cal .d { aspect-ratio: 1; border-radius: 10px; background: rgba(255,255,255,0.045);
+  .cal .d { aspect-ratio: 1; border-radius: 13px; background: rgba(255,255,255,0.045);
     display: flex; align-items: center; justify-content: center;
     font-size: 13px; font-weight: 650; color: var(--text-lo, rgba(255,255,255,0.34));
     font-variant-numeric: tabular-nums; }
   .cal .d.pad { background: transparent; }
-  .cal .d.on { background: rgba(63,217,78,0.55); color: #06140a; }
+  .cal .d.kept { background: rgba(63,217,78,0.55); color: #06140a; }
   .cal .d.sup { background: rgba(63,217,78,0.2); color: rgba(255,255,255,0.72); }
-  .cal .d.miss { background: rgba(255,255,255,0.05); color: var(--text-lo, rgba(255,255,255,0.3)); }
+  .cal .d.missed { background: rgba(255,255,255,0.05); color: var(--text-lo, rgba(255,255,255,0.3)); }
+  /* a day the goal never asked for is not a miss: no fill, just a quiet number */
+  .cal .d.rest { background: transparent; color: rgba(255,255,255,0.2); }
+  .cal .d.ahead { background: transparent; color: rgba(255,255,255,0.13); }
   .cal .d.today { outline: 2px solid rgba(63,217,78,0.95); outline-offset: -2px; }
+  .key u.r { background: rgba(255,255,255,0.02); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12); }
   .cal .wc { display: flex; align-items: center; justify-content: flex-end;
     font-size: 12.5px; font-weight: 650; color: var(--text-mid, rgba(255,255,255,0.8));
     font-variant-numeric: tabular-nums; }
@@ -114,15 +119,18 @@
   .mlog__m span b { font-size: 13px; font-weight: 700; color: var(--text-mid, rgba(255,255,255,0.8));
     font-variant-numeric: tabular-nums; }
   .mlog__g { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
-  .mlog__g b { aspect-ratio: 1; border-radius: 2px; background: rgba(255,255,255,0.05); }
+  .mlog__g b { aspect-ratio: 1; border-radius: 3px; background: rgba(255,255,255,0.05); }
   .mlog__g b.on { background: rgba(63,217,78,0.55); }
   .mlog__g b.sup { background: rgba(63,217,78,0.2); }
+  .mlog__g b.kept { background: rgba(63,217,78,0.55); }
+  .mlog__g b.rest { background: rgba(255,255,255,0.02); }
   .mlog__g b.pad { background: transparent; }
   /* week view */
   .wk7 { display: grid; grid-template-columns: repeat(7, 1fr); gap: 7px; }
   .wk7 > div { text-align: center; }
-  .wk7 b { display: block; aspect-ratio: 1; border-radius: 11px; background: rgba(255,255,255,0.045); }
-  .wk7 b.on { background: rgba(63,217,78,0.55); }
+  .wk7 b { display: block; aspect-ratio: 1; border-radius: 14px; background: rgba(255,255,255,0.045); }
+  .wk7 b.kept { background: rgba(63,217,78,0.55); }
+  .wk7 b.rest { background: rgba(255,255,255,0.02); }
   .wk7 b.sup { background: rgba(63,217,78,0.2); }
   .wk7 b.today { outline: 2px solid rgba(63,217,78,0.95); outline-offset: -2px; }
   .wk7 b.pad { background: transparent; }
@@ -135,21 +143,56 @@
   .trk__l { font-size: 12.5px; color: var(--text-mid, rgba(255,255,255,0.8)); }
   .trk__n { font-size: 13px; font-weight: 700; color: var(--text-hi, #fff); font-variant-numeric: tabular-nums; }
   .trk__c { display: grid; gap: 1.5px; }
-  .trk__c b { height: 17px; border-radius: 2px; background: rgba(255,255,255,0.05); }
+  .trk__c b { height: 17px; border-radius: 3px; background: rgba(255,255,255,0.05); }
 
   /* ---- weekly chapters ---- */
+  /* chapters, L07 grammar: date label, weekday header, rounded cells, count right */
   .chap { display: flex; flex-direction: column; }
-  .chap__r { display: grid; grid-template-columns: 62px 1fr auto; align-items: center; gap: 12px;
-    padding: 10px 0; border-bottom: 1px solid var(--hairline, rgba(255,255,255,0.09)); }
-  .chap__r:last-child { border-bottom: 0; }
-  .chap__w { font-size: 11.5px; color: var(--text-lo, rgba(255,255,255,0.46)); font-variant-numeric: tabular-nums; }
-  .chap__g { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; max-width: 160px; }
-  .chap__g b { aspect-ratio: 1; border-radius: 3px; background: rgba(255,255,255,0.05); }
-  .chap__g b.on { background: rgba(63,217,78,0.55); }
+  .chap__head, .chap__r { display: grid; grid-template-columns: 60px 1fr 52px; align-items: center; gap: 12px; }
+  .chap__head { margin-bottom: 7px; }
+  .chap__wd { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+  .chap__wd span { font-size: 10px; text-align: center; color: var(--text-lo, rgba(255,255,255,0.4)); }
+  .chap__r { padding: 7px 0; }
+  .chap__w { font-size: 12px; color: var(--text-mid, rgba(255,255,255,0.8)); font-variant-numeric: tabular-nums; }
+  .chap__g { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+  .chap__g b { aspect-ratio: 1; border-radius: 7px; background: rgba(255,255,255,0.05); }
+  .chap__g b.kept { background: rgba(63,217,78,0.55); }
   .chap__g b.sup { background: rgba(63,217,78,0.2); }
+  .chap__g b.rest { background: rgba(255,255,255,0.02); }
   .chap__g b.pad { background: transparent; }
-  .chap__n { font-size: 13px; font-weight: 650; font-variant-numeric: tabular-nums;
+  .chap__n { font-size: 12.5px; font-weight: 650; font-variant-numeric: tabular-nums; text-align: right;
     color: var(--text-mid, rgba(255,255,255,0.8)); }
+  .chap__n.full { color: var(--text-hi, #fff); }
+
+  /* step arrows for month / week / year */
+  .nav { display: inline-flex; align-items: center; gap: 3px; }
+  .nav button { width: 27px; height: 27px; border-radius: 9px; background: rgba(255,255,255,0.05);
+    border: 0; color: var(--text-mid, rgba(255,255,255,0.8)); cursor: pointer;
+    display: flex; align-items: center; justify-content: center; }
+  .nav button:disabled { opacity: 0.25; cursor: default; }
+
+  /* the week as a day list */
+  .dl__r { display: grid; grid-template-columns: 74px 14px 1fr auto; align-items: center; gap: 11px;
+    padding: 9px 0; border-bottom: 1px solid var(--hairline, rgba(255,255,255,0.09)); }
+  .dl__r:last-child { border-bottom: 0; }
+  .dl__d { font-size: 13px; color: var(--text-mid, rgba(255,255,255,0.8)); font-variant-numeric: tabular-nums; }
+  .dl__d.now { color: var(--text-hi, #fff); font-weight: 650; }
+  .dl__s { width: 12px; height: 12px; border-radius: 50%; }
+  .dl__s.kept { background: rgba(63,217,78,0.8); }
+  .dl__s.sup { background: rgba(63,217,78,0.3); }
+  .dl__s.missed { background: transparent; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.2); }
+  .dl__s.rest { background: rgba(255,255,255,0.1); transform: scale(0.45); }
+  .dl__w { font-size: 12.5px; color: var(--text-lo, rgba(255,255,255,0.5)); }
+  .dl__t { font-size: 12px; color: var(--text-lo, rgba(255,255,255,0.4));
+    font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .dl__foot { font-size: 13.5px; color: var(--text-mid, rgba(255,255,255,0.8)); margin-top: 14px; }
+  .dl__foot b { color: var(--text-hi, #fff); font-weight: 700; font-variant-numeric: tabular-nums; }
+  /* year scale switch */
+  .yrsw { display: inline-flex; gap: 2px; background: rgba(255,255,255,0.05); border-radius: 8px; padding: 2px; }
+  .yrsw button { font: inherit; font-size: 11px; font-weight: 600; color: var(--text-mid, rgba(255,255,255,0.8));
+    background: transparent; border: 0; border-radius: 6px; padding: 4px 9px; cursor: pointer; }
+  .yrsw button.on { color: var(--text-hi, #fff); background: rgba(255,255,255,0.1); }
+  .yrgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px 12px; }
 
   /* month bars */
   .mb { display: flex; gap: 7px; align-items: flex-end; height: 74px; }
