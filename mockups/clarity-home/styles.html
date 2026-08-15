@@ -194,7 +194,7 @@ const STYLES=[
 function rA(s){
   let stand='';
   if(s.face==='num') stand=`<div class="card"><div class="standrow">${val(s)}</div>
-    <div class="aim">${s.aim}</div><div class="asof">${s.asOf}</div>
+    <div class="asof">${s.asOf}</div>
     ${rail(s)}
     <div class="upd">${editIcon}Update progress</div></div>`;
   if(s.face==='wall') stand=`<div class="card"><div class="walldays">${s.days}<span class="unit">${s.unit}</span></div>
@@ -210,7 +210,7 @@ function rA(s){
 function rC(s){
   let stand='';
   if(s.face==='num') stand=`<div class="big"><em style="white-space:nowrap">${s.cur}<span class="unit">${s.unit}</span></em></div>
-    <div class="bigsub">${s.aim}</div><div class="asof">${s.asOf}</div>
+    <div class="asof">${s.asOf}</div>
     ${rail(s)}
     <div class="upd">${editIcon}Update progress</div><div class="rule"></div>`;
   if(s.face==='wall') stand=`<div class="big">${s.days}<span class="unit">${s.unit}</span></div>
@@ -226,7 +226,7 @@ function rC(s){
 function rF(s){
   let top='';
   if(s.face==='num') top=`<div class="num" style="white-space:nowrap">${s.cur}<span class="unit">${s.unit}</span></div>
-    <div class="numsub">${s.aim}</div><div class="asof" style="text-align:center">${s.asOf}</div>
+    <div class="asof" style="text-align:center">${s.asOf}</div>
     ${rail(s)}<div class="upd">${editIcon}Update progress</div>`;
   if(s.face==='wall') top=`<div class="num">${s.days}<span class="unit">${s.unit}</span></div>
     <div class="numsub">${s.sub}</div><div class="asof" style="text-align:center">${s.asOf}</div>`;
@@ -238,7 +238,7 @@ function rF(s){
 function rH(s){
   let stand='';
   if(s.face==='num') stand=`<div class="panel"><div class="lab">Where you stand</div>
-    <div class="standrow">${val(s)}</div><div class="aim">${s.aim}</div><div class="asof">${s.asOf}</div>
+    <div class="standrow">${val(s)}</div><div class="asof">${s.asOf}</div>
     ${rail(s)}<div class="upd">Update progress</div></div>`;
   if(s.face==='wall') stand=`<div class="panel"><div class="lab">Where you stand</div>
     <div class="standrow"><b>${s.days}<span class="unit">${s.unit}</span></b></div>
