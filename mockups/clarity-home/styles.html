@@ -207,6 +207,33 @@
   .stI .change{position:relative;margin:30px auto 0;display:flex;width:fit-content;color:rgba(255,255,255,.45);font-size:.82rem;font-weight:600}
 .stI .prom{font-size:.98rem;line-height:1.55;color:rgba(255,255,255,.92);max-width:256px;margin:0 auto}
   .stI .sig{margin-top:9px;color:rgba(255,255,255,.4);font-size:.74rem;font-variant-numeric:tabular-nums}
+
+  /* ---- shared standing bits: unit inline, as-of, three-point rail ---- */
+  .inner .unit{font-size:.5em;font-weight:650;letter-spacing:0;margin-left:.28em;color:var(--mid)}
+  .inner .asof{color:var(--lo);font-size:.74rem;font-weight:600;margin-top:6px;font-variant-numeric:tabular-nums}
+  .inner .aim{color:var(--mid);font-size:.86rem;margin-top:4px}
+  .inner .prog{margin:16px 0 0}
+  .inner .track{position:relative;height:4px;border-radius:99px;background:rgba(255,255,255,.09)}
+  .inner .track i{position:absolute;left:0;top:0;bottom:0;border-radius:99px;background:linear-gradient(90deg,rgba(58,217,245,.55),var(--cyan))}
+  .inner .track u{position:absolute;top:50%;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:99px;background:#fff;
+    box-shadow:0 0 0 3px rgba(5,6,10,.9), 0 0 12px rgba(255,255,255,.55)}
+  .inner .pts{display:flex;justify-content:space-between;margin-top:9px;color:var(--lo);font-size:.72rem;font-weight:600;font-variant-numeric:tabular-nums}
+  .inner .rem{display:inline-flex;align-items:baseline;gap:5px;margin-top:11px;color:var(--cyan);font-size:.92rem;font-weight:700;font-variant-numeric:tabular-nums}
+  .inner .rem s{text-decoration:none;color:var(--lo);font-size:.76rem;font-weight:600}
+  /* per-style rail personalities */
+  .stH .track{border-radius:0;background:#161b22}
+  .stH .track i{border-radius:0}
+  .stH .track u{border-radius:2px}
+  .stG .track{height:12px;border-radius:0;background:rgba(255,255,255,.07)}
+  .stG .track i{border-radius:0;box-shadow:0 0 24px rgba(58,217,245,.5)}
+  .stG .track u{width:4px;height:20px;margin:-10px 0 0 -2px;border-radius:0}
+  .stG .rem{font-size:1.05rem}
+  .stF .prog{max-width:210px;margin:22px auto 0}
+  .stF .rem{margin-top:12px}
+  .stI .prog{max-width:212px;margin:20px auto 0}
+  .stI .track u{box-shadow:0 0 0 3px rgba(4,5,10,.9), 0 0 16px rgba(58,217,245,.8)}
+  .stE .prog{margin-top:12px}
+  .stE .pts{font-size:.68rem}
 </style>
 </head>
 <body>
@@ -224,19 +251,22 @@
 <script>
 const SHAPES = [
   { id:'qup', label:'Quantity up', face:'num',
-    cur:'12,400', of:'of 100,000', pct:12.4, meta1:'Started at 8,100', meta2:'Day 41',
+    cur:'12,400', unit:'subs', aim:'heading for 100,000', pct:12.4,
+    start:'8,100', target:'100,000', asOf:'as of 2 days ago', rem:'+87,600', remLab:'to go',
     why:'Watching the people who matter most scroll their lives away, and knowing the channel could reach them.',
     anti:'Another year of edits sitting in drafts while the ideas go stale.' },
   { id:'qdown', label:'Quantity down', face:'num',
-    cur:'236', of:'lbs, heading for 220', pct:27.3, meta1:'Started at 242', meta2:'Day 41',
+    cur:'232.5', unit:'lbs', aim:'heading for 220', pct:43.2,
+    start:'242', target:'220', asOf:'as of yesterday', rem:'-12.5 lbs', remLab:'to go',
     why:'Keeping up with your kids without running out of breath.',
     anti:'Feeling a little worse every season in a body that keeps getting harder to live in.' },
   { id:'screen', label:'Screen time', face:'num',
-    cur:'3h 40m', of:'a day, heading for 2h', pct:34, meta1:'Started at 4h 30m', meta2:'Day 41',
+    cur:'3h 40m', unit:'a day', aim:'heading for 2h', pct:34,
+    start:'4h 30m', target:'2h', asOf:'as of this morning', rem:'-1h 40m', remLab:'to go',
     why:'Getting those hours back for the people in the room instead of the feed.',
     anti:'Another year handed to a scroll you will not remember a single minute of.' },
   { id:'mdate', label:'Milestone, dated', face:'wall',
-    days:'112 days', sub:'to the bar exam, July 28, 2026',
+    days:'112', unit:'days', sub:'to the bar exam, July 28, 2026', asOf:'as of today',
     why:'First lawyer in the family.',
     anti:'A fourth year of telling everyone next summer.' },
   { id:'mnodate', label:'Milestone, no date', face:'why',
@@ -253,24 +283,36 @@ const TWEAK='Tweak your Neutron Star';
 const PROMISE={txt:'I will show up for this even on the days nobody sees it. The person I said I would become is worth the boring Tuesdays.', sig:'Maya · written July 2, 2026'};
 const editIcon='<svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;margin-right:6px"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
 
+/* value with its unit locked inline, never on its own line */
+function val(s, big){ return `<b style="white-space:nowrap">${s.cur}<span class="unit">${s.unit}</span></b>`; }
+/* the rail: where you started, where you are now, where you are going, and what is left */
+function rail(s){
+  return `<div class="prog">
+    <div class="track"><i style="width:${s.pct}%"></i><u style="left:${s.pct}%"></u></div>
+    <div class="pts"><span>${s.start}</span><span>${s.target}</span></div>
+    <div class="rem">${s.rem}<s>${s.remLab}</s></div>
+  </div>`;
+}
+
 const STYLES=[
  {key:'A', name:'1 · Cards', sub:'The baseline pick. Glass panels in the sync-box language, soft radii, one idea per card.', cls:'stA', render:rA},
  {key:'C', name:'2 · Editorial', sub:'No containers. Giant type, thin rules, whitespace as structure.', cls:'stC', render:rC},
  {key:'D', name:'3 · Bands', sub:'Full-bleed tonal bands, edge to edge, the anti-vision band near-black.', cls:'stD', render:rD},
- {key:'E', name:'4 · The rail', sub:'Your idea: big blocky stats down the left spine, the words in a right column, one row per idea.', cls:'stE', render:rE},
+ {key:'E', name:'4 · The rail', sub:'Big blocky stats down the left spine, the words in a right column, one row per idea.', cls:'stE', render:rE},
  {key:'F', name:'5 · The void', sub:'Ultra minimal. Everything centered in space, one thin line of progress, nothing else on the screen.', cls:'stF', render:rF},
  {key:'G', name:'6 · The poster', sub:'Maximalist. A ghost outline number behind everything, mega stat, solid cyan why-block, hard edges.', cls:'stG', render:rG},
- {key:'H', name:'7 · Flat', sub:'Zero glass, zero glow, zero gradients. Solid panels, segmented meter, chunky type. The flattest possible read.', cls:'stH', render:rH},
+ {key:'H', name:'7 · Flat', sub:'Zero glass, zero glow, zero gradients. Solid panels, square rail, chunky type. The flattest possible read.', cls:'stH', render:rH},
  {key:'I', name:'8 · The atmosphere', sub:'Cinematic. The star’s light bleeds from above, the number glows like the star itself, everything centered and lit.', cls:'stI', render:rI},
 ];
 
 function rA(s){
   let stand='';
-  if(s.face==='num') stand=`<div class="card"><div class="standrow"><b>${s.cur}</b><span>${s.of}</span></div>
-    <div class="bar"><i style="width:${s.pct}%"></i></div>
-    <div class="meta"><span>${s.meta1}</span><span>${s.meta2}</span></div>
+  if(s.face==='num') stand=`<div class="card"><div class="standrow">${val(s)}</div>
+    <div class="aim">${s.aim}</div><div class="asof">${s.asOf}</div>
+    ${rail(s)}
     <div class="upd">${editIcon}Update progress</div></div>`;
-  if(s.face==='wall') stand=`<div class="card"><div class="walldays">${s.days}</div><div class="wallsub">${s.sub}</div></div>`;
+  if(s.face==='wall') stand=`<div class="card"><div class="walldays">${s.days}<span class="unit">${s.unit}</span></div>
+    <div class="wallsub">${s.sub}</div><div class="asof">${s.asOf}</div></div>`;
   const why = s.face==='why'
     ? `<div class="card"><div class="txt" style="font-size:1.1rem;line-height:1.6">${s.why}</div></div>`
     : `<div class="card"><div class="lab">Why this matters</div><div class="txt">${s.why}</div></div>`;
@@ -281,9 +323,12 @@ function rA(s){
 }
 function rC(s){
   let stand='';
-  if(s.face==='num') stand=`<div class="big"><em style="white-space:nowrap">${s.cur}</em> <span style="font-size:1.2rem;font-weight:600;color:rgba(255,255,255,.6)">${s.of}</span></div>
-    <div class="bigsub">${s.meta1}. ${s.meta2}.</div><div class="upd">${editIcon}Update progress</div><div class="rule"></div>`;
-  if(s.face==='wall') stand=`<div class="big">${s.days}</div><div class="bigsub">${s.sub}</div><div class="rule"></div>`;
+  if(s.face==='num') stand=`<div class="big"><em style="white-space:nowrap">${s.cur}<span class="unit">${s.unit}</span></em></div>
+    <div class="bigsub">${s.aim}</div><div class="asof">${s.asOf}</div>
+    ${rail(s)}
+    <div class="upd">${editIcon}Update progress</div><div class="rule"></div>`;
+  if(s.face==='wall') stand=`<div class="big">${s.days}<span class="unit">${s.unit}</span></div>
+    <div class="bigsub">${s.sub}</div><div class="asof">${s.asOf}</div><div class="rule"></div>`;
   const why = s.face==='why'
     ? `<div class="why" style="font-size:1.45rem">${s.why}</div>`
     : `<div class="kicker">Why this matters</div><div class="why">${s.why}</div>`;
@@ -295,12 +340,12 @@ function rC(s){
 function rD(s){
   let stand='';
   if(s.face==='num') stand=`<div class="band band--stand"><div class="lab">Where you stand</div>
-    <div class="standrow"><b>${s.cur}</b><span>${s.of}</span></div>
-    <div class="track"><i style="width:${s.pct}%"></i></div>
-    <div class="kv"><span>${s.meta1}</span><span>${s.meta2}</span></div>
+    <div class="standrow">${val(s)}</div><div class="aim">${s.aim}</div><div class="asof">${s.asOf}</div>
+    ${rail(s)}
     <div class="upd">${editIcon}Update progress</div></div>`;
   if(s.face==='wall') stand=`<div class="band band--stand"><div class="lab">Where you stand</div>
-    <div class="standrow"><b>${s.days}</b></div><div class="kv" style="margin-top:8px"><span>${s.sub}</span></div></div>`;
+    <div class="standrow"><b>${s.days}<span class="unit">${s.unit}</span></b></div>
+    <div class="aim">${s.sub}</div><div class="asof">${s.asOf}</div></div>`;
   const why = `<div class="band band--why">${s.face==='why'?'':'<div class="lab">Why this matters</div>'}<div class="txt" ${s.face==='why'?'style="font-size:1.12rem;line-height:1.6"':''}>${s.why}</div></div>`;
   return `<div class="head">Summary:</div>${stand}${why}
     <div class="band band--anti"><div class="lab">If nothing changes</div><div class="anti">${s.anti}</div></div>
@@ -309,9 +354,10 @@ function rD(s){
 }
 function rE(s){
   let rows='';
-  if(s.face==='num') rows+=`<div class="row"><div class="spine"><b class="cy">${s.cur}</b><span>${s.of}<br>${s.meta1} · ${s.meta2}</span><div class="upd">${editIcon}Update progress</div></div>
-    <div class="vbar"><i style="height:${s.pct}%"></i></div><div class="body"></div></div>`;
-  if(s.face==='wall') rows+=`<div class="row"><div class="spine"><b>${s.days.replace(' days','')}</b><span>days to go<br>${s.sub}</span></div><div class="body"></div></div>`;
+  if(s.face==='num') rows+=`<div class="row"><div class="spine"><b class="cy" style="white-space:nowrap">${s.cur}<span class="unit">${s.unit}</span></b>
+    <span>${s.aim}<br>${s.asOf}</span><div class="upd">${editIcon}Update progress</div></div>
+    <div class="body">${rail(s)}</div></div>`;
+  if(s.face==='wall') rows+=`<div class="row"><div class="spine"><b>${s.days}<span class="unit">${s.unit}</span></b><span>${s.sub}<br>${s.asOf}</span></div><div class="body"></div></div>`;
   rows+=`<div class="row"><div class="spine"><b style="font-size:1.15rem;letter-spacing:-.02em">The why</b></div><div class="body"><div class="txt" ${s.face==='why'?'style="font-size:1.0rem;line-height:1.6"':''}>${s.why}</div></div></div>`;
   rows+=`<div class="row"><div class="spine"><b style="font-size:1.15rem;letter-spacing:-.02em;color:rgba(255,255,255,.45)">If not</b></div><div class="body"><div class="anti">${s.anti}</div></div></div>`;
   rows+=`<div class="row"><div class="spine"><b style="font-size:1.15rem;letter-spacing:-.02em">Your note</b></div><div class="body"><div class="txt" style="font-size:.88rem">${PROMISE.txt}</div><div class="sig">${PROMISE.sig}</div></div></div>`;
@@ -319,22 +365,24 @@ function rE(s){
 }
 function rF(s){
   let top='';
-  if(s.face==='num') top=`<div class="num">${s.cur}</div><div class="numsub">${s.of} · ${s.meta2}</div>
-    <div class="line"><i style="width:${s.pct}%"></i></div><div class="upd">${editIcon}Update progress</div>`;
-  if(s.face==='wall') top=`<div class="num">${s.days}</div><div class="numsub">${s.sub}</div><div class="line"><i style="width:38%"></i></div>`;
-  if(s.face==='why') top=``;
+  if(s.face==='num') top=`<div class="num" style="white-space:nowrap">${s.cur}<span class="unit">${s.unit}</span></div>
+    <div class="numsub">${s.aim}</div><div class="asof" style="text-align:center">${s.asOf}</div>
+    ${rail(s)}<div class="upd">${editIcon}Update progress</div>`;
+  if(s.face==='wall') top=`<div class="num">${s.days}<span class="unit">${s.unit}</span></div>
+    <div class="numsub">${s.sub}</div><div class="asof" style="text-align:center">${s.asOf}</div>`;
   return `${top}<div class="why" ${s.face==='why'?'style="font-size:1.2rem;max-width:262px"':''}>${s.why}</div>
     <div class="anti">${s.anti}</div>
     <div class="prom">${PROMISE.txt}</div><div class="sig">${PROMISE.sig}</div>
     <div class="change">${TWEAK}</div>`;
 }
 function rG(s){
-  let ghost = s.face==='num' ? s.cur.replace(',','') : (s.face==='wall' ? s.days.replace(' days','') : '');
+  let ghost = s.face==='num' ? String(s.cur).replace(/[,\s]/g,'') : (s.face==='wall' ? s.days : '');
   let stand='';
-  if(s.face==='num') stand=`<div class="mega">${s.cur}</div><div class="megasub">${s.of}</div>
-    <div class="blockbar"><i style="width:${s.pct}%"></i></div>
-    <div class="kv"><span>${s.meta1}</span><span>${s.meta2}</span></div><div class="upd">Update progress</div>`;
-  if(s.face==='wall') stand=`<div class="mega" style="font-size:3.1rem">${s.days}</div><div class="megasub">${s.sub}</div>`;
+  if(s.face==='num') stand=`<div class="mega">${s.cur}<span class="unit">${s.unit}</span></div>
+    <div class="megasub">${s.aim}</div><div class="asof">${s.asOf}</div>
+    ${rail(s)}<div class="upd">Update progress</div>`;
+  if(s.face==='wall') stand=`<div class="mega" style="font-size:3.1rem">${s.days}<span class="unit">${s.unit}</span></div>
+    <div class="megasub">${s.sub}</div><div class="asof">${s.asOf}</div>`;
   return `${ghost?`<div class="ghost">${ghost}</div>`:''}<div class="head">Summary:</div>${stand}
     <div class="whyblock"><div class="lab">Why this matters</div><div class="txt">${s.why}</div></div>
     <div class="antiblock"><div class="lab">If nothing changes</div><div class="txt">${s.anti}</div></div>
@@ -343,17 +391,12 @@ function rG(s){
 }
 function rH(s){
   let stand='';
-  if(s.face==='num'){
-    const on=Math.round(s.pct/100*12);
-    let segs=''; for(let i=0;i<12;i++) segs+=`<i class="${i<on?'on':''}"></i>`;
-    stand=`<div class="panel"><div class="lab">Where you stand</div>
-      <div class="standrow"><b>${s.cur}</b><span>${s.of}</span></div>
-      <div class="seg">${segs}</div>
-      <div class="kv"><span>${s.meta1}</span><span>${s.meta2}</span></div>
-      <div class="upd">Update progress</div></div>`;
-  }
+  if(s.face==='num') stand=`<div class="panel"><div class="lab">Where you stand</div>
+    <div class="standrow">${val(s)}</div><div class="aim">${s.aim}</div><div class="asof">${s.asOf}</div>
+    ${rail(s)}<div class="upd">Update progress</div></div>`;
   if(s.face==='wall') stand=`<div class="panel"><div class="lab">Where you stand</div>
-    <div class="standrow"><b>${s.days}</b></div><div class="kv" style="margin-top:8px"><span>${s.sub}</span></div></div>`;
+    <div class="standrow"><b>${s.days}<span class="unit">${s.unit}</span></b></div>
+    <div class="aim">${s.sub}</div><div class="asof">${s.asOf}</div></div>`;
   const why=`<div class="panel">${s.face==='why'?'':'<div class="lab">Why this matters</div>'}<div class="txt" ${s.face==='why'?'style="font-size:1.05rem;line-height:1.6"':''}>${s.why}</div></div>`;
   return `<div class="head">Summary:</div>${stand}${why}
     <div class="panel panel--anti"><div class="lab">If nothing changes</div><div class="anti">${s.anti}</div></div>
@@ -362,9 +405,10 @@ function rH(s){
 }
 function rI(s){
   let halo='';
-  if(s.face==='num') halo=`<div class="halo"><b>${s.cur}</b><span>${s.of} · ${s.meta2}</span>
-    <div class="arc"><i style="width:${s.pct}%"></i></div></div><div class="upd">${editIcon}Update progress</div>`;
-  if(s.face==='wall') halo=`<div class="halo"><b style="font-size:2.5rem">${s.days}</b><span>${s.sub}</span></div>`;
+  if(s.face==='num') halo=`<div class="halo"><b>${s.cur}<span class="unit">${s.unit}</span></b><span>${s.aim}</span>
+    <div class="asof" style="text-align:center">${s.asOf}</div>${rail(s)}</div><div class="upd">${editIcon}Update progress</div>`;
+  if(s.face==='wall') halo=`<div class="halo"><b style="font-size:2.5rem">${s.days}<span class="unit">${s.unit}</span></b><span>${s.sub}</span>
+    <div class="asof" style="text-align:center">${s.asOf}</div></div>`;
   return `<div class="stars"></div><div class="head">Summary:</div>${halo}
     <div class="sect">${s.face==='why'?'':'<div class="lab">Why this matters</div>'}<div class="why" ${s.face==='why'?'style="font-size:1.2rem"':''}>${s.why}</div></div>
     <div class="sect"><div class="lab">If nothing changes</div><div class="anti">${s.anti}</div></div>
@@ -373,7 +417,7 @@ function rI(s){
 }
 
 const grid=document.getElementById('grid');
-grid.innerHTML=STYLES.map(st=>`
+if(grid) grid.innerHTML=STYLES.map(st=>`
   <div class="cell">
     <p class="cap">${st.name}</p>
     <p class="capsub">${st.sub}</p>
@@ -381,12 +425,12 @@ grid.innerHTML=STYLES.map(st=>`
   </div>`).join('');
 
 function render(shape){
-  STYLES.forEach(st=>{ document.getElementById('ph'+st.key).innerHTML = st.render(shape); });
+  STYLES.forEach(st=>{ const el=document.getElementById('ph'+st.key); if(el) el.innerHTML = st.render(shape); });
   document.querySelectorAll('#shapeToggle button').forEach(b=>b.classList.toggle('on', b.dataset.id===shape.id));
 }
 const tog=document.getElementById('shapeToggle');
-tog.innerHTML=SHAPES.map(s=>`<button data-id="${s.id}">${s.label}</button>`).join('');
-tog.addEventListener('click',e=>{const b=e.target.closest('button'); if(!b)return; render(SHAPES.find(s=>s.id===b.dataset.id));});
+if(tog){ tog.innerHTML=SHAPES.map(s=>`<button data-id="${s.id}">${s.label}</button>`).join('');
+tog.addEventListener('click',e=>{const b=e.target.closest('button'); if(!b)return; render(SHAPES.find(s=>s.id===b.dataset.id));}); }
 render(SHAPES[0]);
 </script>
 </body>
