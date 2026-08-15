@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Consistency, the merged page</title>
+<link rel="stylesheet" href="_kit.css">
+<style>
+  html, body { background: #060708; }
+  body { margin: 0; color: var(--text-hi, #fff); font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif; }
+
+  /* pinned lab controls */
+  #bar { position: fixed; top: 0; left: 0; right: 0; z-index: 200; background: rgba(6,7,10,0.94);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4); backdrop-filter: blur(16px) saturate(1.4);
+    border-bottom: 1px solid var(--hairline, rgba(255,255,255,0.09)); padding: 10px 16px; }
+  .bar__in { max-width: 1280px; margin: 0 auto; display: flex; flex-direction: column; gap: 8px; }
+  .bar__row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .bar__row input[type=range] { flex: 1; min-width: 120px; accent-color: #3fd94e; height: 4px; }
+  .bar__day { font-size: 14px; font-weight: 700; min-width: 74px; font-variant-numeric: tabular-nums; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chips button { font: inherit; font-size: 11.5px; font-weight: 600; color: var(--text-mid, rgba(255,255,255,0.8));
+    background: rgba(255,255,255,0.05); border: 0; border-radius: 7px; padding: 5px 10px; cursor: pointer;
+    font-variant-numeric: tabular-nums; }
+  .chips button.on { color: #06140a; background: #3fd94e; }
+
+  /* ============ mobile: two snap pages ============ */
+  #snap { height: 100dvh; overflow-y: auto; scroll-snap-type: y mandatory; scrollbar-width: none; }
+  #snap::-webkit-scrollbar { display: none; }
+  .pg { scroll-snap-align: start; scroll-snap-stop: always; min-height: 100dvh; box-sizing: border-box; }
+
+  /* page one: the number */
+  #pgOne { display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 90px 26px 60px; position: relative; }
+  .one__say { font-size: 17px; color: var(--text-mid, rgba(255,255,255,0.8)); font-weight: 500; }
+  .one__num { font-weight: 700; color: var(--text-hi, #fff); line-height: 0.88; letter-spacing: -0.05em;
+    font-variant-numeric: tabular-nums; margin: 10px 0 12px; }
+  .one__sub { font-size: 15px; color: var(--text-mid, rgba(255,255,255,0.8)); line-height: 1.5; max-width: 300px; }
+  .one__never { font-size: 13px; color: var(--text-lo, rgba(255,255,255,0.46)); margin-top: 14px; }
+  .one__hint { position: absolute; bottom: 26px; left: 0; right: 0; text-align: center;
+    font-size: 12px; color: var(--text-lo, rgba(255,255,255,0.46)); }
+  .one__hint svg { display: block; margin: 6px auto 0; opacity: 0.6; }
+
+  /* page two: the evidence room */
+  #pgTwo { padding: 86px 18px 90px; }
+  .ev { max-width: 430px; margin: 0 auto; }
+  .ev__hero { margin-bottom: 4px; }
+  .ev__say { font-size: 15px; color: var(--text-mid, rgba(255,255,255,0.8)); font-weight: 500; }
+  .ev__num { font-size: 56px; font-weight: 700; letter-spacing: -0.04em; line-height: 0.95;
+    font-variant-numeric: tabular-nums; margin: 4px 0 2px; }
+  .ev__since { font-size: 13px; color: var(--text-lo, rgba(255,255,255,0.46)); }
+  .sec { margin-top: 26px; }
+  .sec__h { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 11px; }
+  .sec__h b { font-size: 14px; font-weight: 700; letter-spacing: -0.01em; }
+  .sec__h i { font-style: normal; font-size: 12px; color: var(--text-lo, rgba(255,255,255,0.46));
+    font-variant-numeric: tabular-nums; }
+  /* the professional's pattern card */
+  .card { background: rgba(255,255,255,0.035); border-radius: 14px; padding: 16px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.06); }
+  .card__v { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .card__bar { height: 6px; border-radius: 999px; background: rgba(255,255,255,0.07); margin: 11px 0 9px;
+    overflow: hidden; position: relative; }
+  .card__bar u { position: absolute; inset: 0 auto 0 0; border-radius: 999px; background: #3fd94e; }
+  .card__bar i { position: absolute; top: -2px; bottom: -2px; width: 2px; background: rgba(255,255,255,0.35);
+    border-radius: 1px; }
+  .card__l { font-size: 13px; color: var(--text-mid, rgba(255,255,255,0.8)); }
+  /* calendar scale toggle */
+  .scale { display: inline-flex; gap: 2px; background: rgba(255,255,255,0.05); border-radius: 8px; padding: 2px; }
+  .scale button { font: inherit; font-size: 12px; font-weight: 650; color: var(--text-mid, rgba(255,255,255,0.8));
+    background: transparent; border: 0; border-radius: 6px; padding: 5px 12px; cursor: pointer; }
+  .scale button.on { color: var(--text-hi, #fff); background: rgba(255,255,255,0.1); }
+  /* week view */
+  .wk7 { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+  .wk7 > div { text-align: center; }
+  .wk7 b { display: block; aspect-ratio: 1; border-radius: 10px; background: rgba(255,255,255,0.05); }
+  .wk7 b.on { background: rgba(63,217,78,0.62); }
+  .wk7 b.sup { background: rgba(63,217,78,0.22); }
+  .wk7 b.today { outline: 2px solid rgba(63,217,78,0.9); outline-offset: -2px; }
+  .wk7 b.pad { background: rgba(255,255,255,0.02); }
+  .wk7 span { display: block; font-size: 10.5px; color: var(--text-lo, rgba(255,255,255,0.46)); margin-top: 5px; }
+  .wk__line { font-size: 13px; color: var(--text-mid, rgba(255,255,255,0.8)); margin-top: 12px; }
+  /* year view */
+  .yr { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px 10px; }
+  .yr__m span { display: flex; justify-content: space-between; font-size: 10.5px;
+    color: var(--text-lo, rgba(255,255,255,0.46)); margin-bottom: 4px; font-variant-numeric: tabular-nums; }
+  .yr__g { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1.5px; }
+  .yr__g b { aspect-ratio: 1; border-radius: 1.5px; background: rgba(255,255,255,0.05); }
+  .yr__g b.on { background: rgba(63,217,78,0.62); }
+  .yr__g b.sup { background: rgba(63,217,78,0.2); }
+  .yr__g b.pad { background: transparent; }
+  /* small graph (further than before) */
+  .fg { margin-top: 2px; }
+  .fg svg { display: block; width: 100%; height: 54px; overflow: visible; }
+  .fg polyline { fill: none; stroke: #3fd94e; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round;
+    vector-effect: non-scaling-stroke; }
+  .fg__l { font-size: 13px; color: var(--text-mid, rgba(255,255,255,0.8)); margin-top: 9px; }
+  /* month bars (shape adaptive) */
+  .mb { display: flex; gap: 7px; align-items: flex-end; height: 74px; }
+  .mb > div { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; height: 100%;
+    text-align: center; gap: 4px; }
+  .mb u { display: block; border-radius: 4px 4px 2px 2px; background: rgba(63,217,78,0.4); text-decoration: none; }
+  .mb u.top { background: #3fd94e; }
+  .mb span { font-size: 10px; color: var(--text-lo, rgba(255,255,255,0.46)); }
+  .mb b { font-size: 10.5px; font-weight: 650; color: var(--text-mid, rgba(255,255,255,0.8));
+    font-variant-numeric: tabular-nums; }
+  /* ledger */
+  .led { border-top: 1px solid var(--hairline, rgba(255,255,255,0.09)); }
+  .led__r { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 11px 0;
+    border-bottom: 1px solid var(--hairline, rgba(255,255,255,0.09)); }
+  .led__r span { font-size: 13.5px; color: var(--text-mid, rgba(255,255,255,0.8)); }
+  .led__r b { font-size: 14.5px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
+    white-space: nowrap; }
+
+  /* ============ desktop: rail + grid ============ */
+  @media (min-width: 900px) {
+    #snap { height: auto; overflow: visible; scroll-snap-type: none; display: grid;
+      grid-template-columns: 400px 1fr; max-width: 1280px; margin: 0 auto; gap: 0 46px; padding: 0 26px; }
+    .pg { min-height: 0; scroll-snap-align: none; }
+    #pgOne { position: sticky; top: 0; height: 100vh; padding: 90px 10px 40px; }
+    .one__hint { display: none; }
+    #pgTwo { padding: 96px 0 110px; }
+    .ev { max-width: none; margin: 0; }
+    /* the rail already carries the number; saying it twice on one screen is noise */
+    .ev__hero { display: none; }
+    .ev__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 34px; align-items: start; }
+    .ev__col { min-width: 0; }
+  }
+</style>
+</head>
+<body>
+<div id="bar"><div class="bar__in">
+  <div class="bar__row">
+    <span class="bar__day" id="day">Day 168</span>
+    <input type="range" id="slider" min="1" max="365" value="168">
+    <div class="chips" id="dayChips"></div>
+  </div>
+  <div class="bar__row"><div class="chips" id="shapeChips"></div></div>
+</div></div>
+
+<div id="snap">
+  <section class="pg" id="pgOne"></section>
+  <section class="pg" id="pgTwo"><div class="ev" id="ev"></div></section>
+</div>
+
+<script src="_kit.js"></script>
+<script src="one.js"></script>
+</body>
+</html>
