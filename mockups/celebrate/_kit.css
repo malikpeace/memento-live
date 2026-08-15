@@ -133,3 +133,41 @@ body{margin:0;background:#0a0b0d;color:var(--text-hi);font-family:var(--font);-w
 .tw__fire{margin-top:10px;padding-top:9px;border-top:1px solid rgba(var(--ink),.08);
   font-size:12px;line-height:1.5;color:var(--text-mid)}
 .tw__fire b{color:var(--accent);font-weight:700}
+
+/* ===== BIG ASS CELEBRATIONS: THE FLOOD STAYS (Malik 2026-08-14). Once the
+   colour lands it never leaves: every beat after the impact is full accent
+   and the ink flips dark, so the wall of stats reads on the colour. One
+   root rule, no per-screen theme opt-outs. ===== */
+.ph[data-c^="ba-"] .b2,.ph[data-c^="ba-"] .b3{
+  background:var(--accent);
+  --ink:11,14,18;
+  --text-hi:rgba(11,14,18,.96);--text-mid:rgba(11,14,18,.74);--text-lo:rgba(11,14,18,.56);
+  --hairline:rgba(11,14,18,.14)}
+/* anything that used to BE the accent has to become ink on the flood */
+.ph[data-c^="ba-"] .b2 .ba1-cell--hero b,
+.ph[data-c^="ba-"] .b3 .ba1-cell--hero b,
+.ph[data-c^="ba-"] .b2 .ba2-s.hot b,
+.ph[data-c^="ba-"] .b2 .ba3-k--hot b,
+.ph[data-c^="ba-"] .b2 .ba7-wall s.hot,
+.ph[data-c^="ba-"] .b2 .ba8-k--hot b{color:rgba(11,14,18,.96)}
+.ph[data-c^="ba-"] .b2 .ba3-k--hot,
+.ph[data-c^="ba-"] .b2 .ba9-wc--hot,
+.ph[data-c^="ba-"] .b2 .ba8-k--hot{background:rgba(11,14,18,.14)}
+.ph[data-c^="ba-"] .b2 .ba9-wc--hot{color:rgba(11,14,18,.96)}
+.ph[data-c^="ba-"] .b2 .ba4-halo i{background:rgba(11,14,18,.72)}
+.ph[data-c^="ba-"] .b2 .ba4-halo i.w{background:rgba(255,255,255,.85)}
+.ph[data-c^="ba-"] .b2 .ba2-tower i.top{background:rgba(11,14,18,.96)}
+.ph[data-c^="ba-"] .b2 .ba4-core{background:rgba(11,14,18,.20);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14), 0 14px 34px rgba(0,0,0,.18)}
+.ph[data-c^="ba-"] .b2 .ba4-core svg{fill:rgba(11,14,18,.92)}
+.ph[data-c^="ba-"] .b3 .ba4-keepcard{background:rgba(11,14,18,.18);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14), 0 14px 34px rgba(0,0,0,.18)}
+.ph[data-c^="ba-"] .b3 .ba4-keepcard svg{fill:rgba(11,14,18,.92)}
+/* the walls breathe: subtle, endless, only while their beat is on */
+@keyframes baSpin{to{transform:rotate(360deg)}}
+@keyframes baFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes baTwinkle{0%,100%{opacity:.34}50%{opacity:.72}}
+@keyframes baBreathe{0%,100%{transform:scale(1)}50%{transform:scale(1.016)}}
+@media (prefers-reduced-motion:reduce){
+  .ph[data-c^="ba-"] .b2 *{animation-iteration-count:1!important}
+}

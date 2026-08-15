@@ -1,102 +1,86 @@
 <style>
-/* ba-8 "The Spotlight". Award-show energy: a beam of light hunts across the
-   dark, finds the goal line, and the flashes start, three white pops like
-   a photographers' pit, then the screen floods and the line takes the
-   stage enormous with the M. Their moment, shot from the front row. */
-[data-c="ba-8"] .ba8-spot{position:absolute;left:-70px;top:30%;width:240px;height:240px;border-radius:50%;
-  background:radial-gradient(circle, rgba(235,238,248,.16), rgba(235,238,248,0) 68%);opacity:0}
-[data-c="ba-8"] .b1.on .ba8-spot{animation:ba8Hunt 1.7s cubic-bezier(.45,.05,.4,1) .2s both}
-@keyframes ba8Hunt{0%{opacity:0;transform:translateX(0)}18%{opacity:1}
-  45%{transform:translateX(300px)}100%{opacity:1;transform:translateX(130px)}}
-[data-c="ba-8"] .ba8-find{position:absolute;left:0;right:0;top:42%;text-align:center;padding:0 26px;
-  font-size:21px;font-weight:650;letter-spacing:-.015em;color:var(--text-hi);opacity:0}
-[data-c="ba-8"] .b1.on .ba8-find{animation:ba8Reveal 1.3s ease-out 1.15s both}
-@keyframes ba8Reveal{0%{opacity:0}40%{opacity:1}85%{opacity:1}100%{opacity:0}}
-/* the flashes */
-[data-c="ba-8"] .ba8-flash{position:absolute;inset:0;background:#eef1f8;opacity:0}
-[data-c="ba-8"] .b1.on .ba8-fl1{animation:ba8Pop .24s ease-out 2.15s both}
-[data-c="ba-8"] .b1.on .ba8-fl2{animation:ba8Pop .24s ease-out 2.5s both}
-[data-c="ba-8"] .b1.on .ba8-fl3{animation:ba8Pop .3s ease-out 2.85s both}
-@keyframes ba8Pop{0%{opacity:0}30%{opacity:.85}100%{opacity:0}}
-[data-c="ba-8"] .ba8-flood{position:absolute;inset:0;background:var(--accent);opacity:0}
-[data-c="ba-8"] .b1.on .ba8-flood{animation:ba8Flood .3s cubic-bezier(.2,.8,.3,1) 3.15s forwards}
-@keyframes ba8Flood{from{opacity:0}to{opacity:1}}
+/* ba-8 "The Heat". Rebuilt on his note (the spotlight opening and the basic
+   records board are gone). Opening: the colour is there from frame one and
+   the M DRAWS ITSELF, stroke by stroke, then floods solid and the goal line
+   lands. Wall: a heatmap of the entire journey, one cell per day, darker
+   where they did more, so the SHAPE of the effort is visible at a glance. */
+[data-c="ba-8"] .ba8-flood{position:absolute;inset:0;background:var(--accent)}
+[data-c="ba-8"] .b1.on .ba8-flood{animation:ba8Wash .3s ease-out both}
+@keyframes ba8Wash{from{opacity:0}to{opacity:1}}
+[data-c="ba-8"] .ba8-draw{position:relative;width:150px;height:150px}
+[data-c="ba-8"] .ba8-draw path{fill:none;stroke:#0b0e12;stroke-width:26;stroke-linejoin:round;
+  stroke-linecap:round;stroke-dasharray:1100;stroke-dashoffset:1100}
+[data-c="ba-8"] .b1.on .ba8-draw path{animation:ba8Draw 1.5s cubic-bezier(.5,0,.2,1) .25s forwards,
+  ba8Fill .5s ease-out 1.7s forwards}
+@keyframes ba8Draw{to{stroke-dashoffset:0}}
+@keyframes ba8Fill{to{fill:#0b0e12}}
+[data-c="ba-8"] .ba8-line{position:relative;margin-top:26px;font-size:42px;font-weight:750;
+  letter-spacing:-.04em;line-height:1.05;color:#0b0e12;max-width:10ch;opacity:0}
+[data-c="ba-8"] .b1.on .ba8-line{animation:ba8Slam .55s cubic-bezier(.16,1.3,.3,1) 2s both}
+@keyframes ba8Slam{from{opacity:0;transform:scale(1.32)}to{opacity:1;transform:scale(1)}}
+[data-c="ba-8"] .ba8-bow{position:relative;margin-top:18px;font-size:14.5px;font-weight:650;
+  color:rgba(11,14,18,.78);opacity:0}
+[data-c="ba-8"] .b1.on .ba8-bow{animation:ba8Up .5s ease-out 2.45s both}
+@keyframes ba8Up{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
 [data-c="ba-8"] .ba8-fw{position:absolute;left:50%;top:22%;width:0;height:0}
 [data-c="ba-8"] .ba8-fw i{position:absolute;width:6px;height:6px;border-radius:50%;background:#0b0e12;opacity:0}
 [data-c="ba-8"] .ba8-fw i:nth-child(2n){background:#fff}
-[data-c="ba-8"] .b1.on .ba8-fw i{animation:ba8Spark 1s cubic-bezier(.15,.6,.3,1) 3.35s both}
-@keyframes ba8Spark{0%{opacity:1;transform:translate(0,0)}100%{opacity:0;transform:translate(var(--dx),var(--dy))}}
-[data-c="ba-8"] .ba8-stage{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;opacity:0;padding:34px}
-[data-c="ba-8"] .b1.on .ba8-stage{animation:ba8In .01s linear 3.3s forwards, ba8Shake .45s linear 3.32s}
-@keyframes ba8In{to{opacity:1}}
-@keyframes ba8Shake{0%,100%{transform:none}25%{transform:translate(3px,-2px)}50%{transform:translate(-3px,2px)}
-  75%{transform:translate(2px,1px)}}
-[data-c="ba-8"] .ba8-m{width:78px;height:78px;fill:#0b0e12}
-[data-c="ba-8"] .b1.on .ba8-m{animation:ba8MSlam .5s cubic-bezier(.16,1.35,.3,1) 3.32s both}
-@keyframes ba8MSlam{from{opacity:0;transform:scale(2.2)}to{opacity:1;transform:scale(1)}}
-[data-c="ba-8"] .ba8-line{margin-top:22px;font-size:42px;font-weight:750;letter-spacing:-.04em;
-  line-height:1.05;color:#0b0e12;max-width:10ch}
-[data-c="ba-8"] .b1.on .ba8-line{animation:ba8Slam .5s cubic-bezier(.16,1.3,.3,1) 3.55s both}
-@keyframes ba8Slam{from{opacity:0;transform:scale(1.35)}to{opacity:1;transform:scale(1)}}
-[data-c="ba-8"] .ba8-bow{margin-top:18px;font-size:14.5px;font-weight:650;color:rgba(11,14,18,.78)}
-[data-c="ba-8"] .b1.on .ba8-bow{animation:ba8Up .5s ease-out 3.95s both}
-@keyframes ba8Up{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+[data-c="ba-8"] .b1.on .ba8-fw i{animation:ba8Spk 1s cubic-bezier(.15,.6,.3,1) 2.05s both}
+@keyframes ba8Spk{0%{opacity:1;transform:translate(0,0)}100%{opacity:0;transform:translate(var(--dx),var(--dy))}}
 
-[data-c="ba-8"] .ba8-cost{font-size:19px;line-height:2.05;color:var(--text-mid)}
-[data-c="ba-8"] .ba8-cost b{color:var(--text-hi);font-size:26px;font-variant-numeric:tabular-nums}
-[data-c="ba-8"] .b2.on .ba8-cost{animation:ba8Up .55s ease-out .15s both}
+/* THE HEATMAP WALL */
+[data-c="ba-8"] .b2{padding:26px 20px}
+[data-c="ba-8"] .ba8-cap{width:100%;text-align:left;font-size:12px;color:var(--text-lo);margin-bottom:14px;opacity:0}
+[data-c="ba-8"] .b2.on .ba8-cap{animation:ba8Up .45s ease-out both}
+[data-c="ba-8"] .ba8-grid{display:grid;width:100%;gap:3px}
+[data-c="ba-8"] .ba8-grid i{width:100%;aspect-ratio:1;border-radius:2.5px;
+  background:rgba(11,14,18,.09);opacity:0}
+[data-c="ba-8"] .ba8-grid i.h1{background:rgba(11,14,18,.30)}
+[data-c="ba-8"] .ba8-grid i.h2{background:rgba(11,14,18,.55)}
+[data-c="ba-8"] .ba8-grid i.h3{background:rgba(11,14,18,.86)}
+[data-c="ba-8"] .b2.on .ba8-grid i{animation:ba8Cell .3s ease-out calc(.15s + var(--i)*.004s) both}
+@keyframes ba8Cell{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:none}}
+[data-c="ba-8"] .ba8-keys{width:100%;display:flex;justify-content:space-between;gap:10px;margin-top:20px;opacity:0}
+[data-c="ba-8"] .ba8-key b{display:block;font-size:30px;font-weight:750;letter-spacing:-.035em;
+  line-height:1;color:var(--text-hi);font-variant-numeric:tabular-nums}
+[data-c="ba-8"] .ba8-key span{display:block;margin-top:5px;font-size:11px;color:var(--text-lo)}
+[data-c="ba-8"] .b2.on .ba8-keys{animation:ba8Up .5s ease-out 1.15s both}
+
 [data-c="ba-8"] .ba8-fin{font-size:28px;font-weight:750;letter-spacing:-.03em;max-width:11ch;color:var(--text-hi)}
 [data-c="ba-8"] .b3.on .ba8-fin{animation:ba8Up .5s ease-out .15s both}
 [data-c="ba-8"] .ba8-close{margin-top:14px;font-size:14px;color:var(--text-mid)}
 [data-c="ba-8"] .b3.on .ba8-close{animation:ba8Up .5s ease-out .55s both}
 @media (prefers-reduced-motion:reduce){
-  [data-c="ba-8"] .ba8-spot,[data-c="ba-8"] .ba8-find,[data-c="ba-8"] .ba8-flash,[data-c="ba-8"] .ba8-fw{display:none}
-  [data-c="ba-8"] .ba8-flood{opacity:1;animation:none}
-  [data-c="ba-8"] .ba8-stage{opacity:1;animation:none}
-  [data-c="ba-8"] .ba8-m,[data-c="ba-8"] .ba8-line,[data-c="ba-8"] .ba8-bow,
-  [data-c="ba-8"] .ba8-cost,[data-c="ba-8"] .ba8-fin,[data-c="ba-8"] .ba8-close{opacity:1;transform:none;animation:none}
+  [data-c="ba-8"] .ba8-fw{display:none}
+  [data-c="ba-8"] .ba8-draw path{stroke-dashoffset:0;fill:#0b0e12}
+  [data-c="ba-8"] .ba8-line,[data-c="ba-8"] .ba8-bow,[data-c="ba-8"] .ba8-cap,
+  [data-c="ba-8"] .ba8-grid i,[data-c="ba-8"] .ba8-keys,
+  [data-c="ba-8"] .ba8-fin,[data-c="ba-8"] .ba8-close{opacity:1;transform:none;animation:none}
 }
-/* THE RECORDS BOARD: a stadium board of their own bests. */
-[data-c="ba-8"] .b2{padding:30px 26px}
-[data-c="ba-8"] .ba8-wall{width:100%;display:flex;flex-direction:column;text-align:left}
-[data-c="ba-8"] .ba8-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
-  padding:15px 0;border-bottom:1px solid rgba(var(--ink),.08);opacity:0}
-[data-c="ba-8"] .ba8-row span{font-size:12.5px;color:var(--text-mid)}
-[data-c="ba-8"] .ba8-row b{font-size:30px;font-weight:750;letter-spacing:-.035em;color:var(--text-hi);
-  font-variant-numeric:tabular-nums;white-space:nowrap}
-[data-c="ba-8"] .ba8-row.hot b{color:var(--accent);font-size:38px}
-[data-c="ba-8"] .b2.on .ba8-row{animation:ba8Up .45s ease-out calc(.1s + var(--i)*.12s) both}
-@media (prefers-reduced-motion:reduce){ [data-c="ba-8"] .ba8-row{opacity:1;animation:none} }
 </style>
 <div class="ph" data-c="ba-8">
   <div class="st">
 
     <div class="b b1" data-confetti>
-      <div class="ba8-spot" aria-hidden="true"></div>
-      <div class="ba8-find">Lost 30 lbs.</div>
-      <div class="ba8-flash ba8-fl1"></div>
-      <div class="ba8-flash ba8-fl2"></div>
-      <div class="ba8-flash ba8-fl3"></div>
       <div class="ba8-flood"></div>
       <div class="ba8-fw" aria-hidden="true">
         <i style="--dx:-52px;--dy:-36px"></i><i style="--dx:50px;--dy:-40px"></i><i style="--dx:-60px;--dy:14px"></i>
         <i style="--dx:58px;--dy:18px"></i><i style="--dx:-22px;--dy:-56px"></i><i style="--dx:24px;--dy:-54px"></i>
         <i style="--dx:-40px;--dy:46px"></i><i style="--dx:42px;--dy:48px"></i><i style="--dx:0px;--dy:-64px"></i>
       </div>
-      <div class="ba8-stage">
-        <svg class="ba8-m" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
-        <div class="ba8-line">Lost 30 lbs!</div>
-        <div class="ba8-bow">Take the bow! You earned the light!</div>
-      </div>
+      <svg class="ba8-draw" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+      <div class="ba8-line">You lost 30 lbs!</div>
+      <div class="ba8-bow">Every day of it is on the next screen.</div>
     </div>
 
     <div class="b b2">
-      <div class="ba8-wall"></div>
+      <div class="ba8-cap">Every day of it</div>
+      <div class="ba8-grid"></div>
+      <div class="ba8-keys"></div>
     </div>
 
     <div class="b b3">
-      <div class="ba8-fin">Lost 30 lbs!</div>
+      <div class="ba8-fin">You lost 30 lbs!</div>
       <div class="ba8-close">This goal closes. The record stays.</div>
     </div>
 
