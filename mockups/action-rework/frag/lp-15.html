@@ -96,16 +96,17 @@
 [data-k=lp-15] .amending .am{display:block}
 [data-k=lp-15] .amending .act{display:none}
 [data-k=lp-15] .amt{font-size:12.5px;line-height:1;color:rgba(var(--ink),.90)}
-[data-k=lp-15] .stp{display:flex;align-items:center;gap:8px;margin-top:10px;padding:6px;border-radius:13px;
-  background:rgba(var(--ink),.05);box-shadow:inset 0 1px 0 rgba(var(--ink),.06)}
-[data-k=lp-15] .stp b{flex:1;text-align:center;font-size:20px;font-weight:700;letter-spacing:-.02em;
-  color:rgba(var(--ink),.97);font-variant-numeric:tabular-nums}
-[data-k=lp-15] .stp button{width:46px;height:40px;border:0;border-radius:10px;display:grid;place-items:center;
-  background:rgba(22,25,31,.95);box-shadow:inset 0 1px 0 rgba(var(--ink),.09);cursor:pointer;
-  -webkit-tap-highlight-color:transparent;transition:background .14s ease-out}
-[data-k=lp-15] .stp button:active{background:rgba(34,39,48,.96)}
-[data-k=lp-15] .stp button svg{display:block;stroke:rgba(var(--ink),.92);stroke-width:1.9;stroke-linecap:round}
-[data-k=lp-15] .amn{margin:9px 0 11px;font-size:11.5px;line-height:1.4;color:rgba(var(--ink),.90)}
+/* ONE ASK (Malik, 2026-08-14): no stepper or write in lives on a loop screen.
+   The correction is tappable choices, the plan's own three sizes plus stopping
+   early, so nothing is typed and nothing is dialled here. */
+[data-k=lp-15] .arow{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 11px}
+[data-k=lp-15] .arow button{flex:1 1 auto;height:38px;padding:0 12px;border:0;border-radius:11px;cursor:pointer;
+  background:rgba(var(--ink),.05);box-shadow:inset 0 1px 0 rgba(var(--ink),.07);font-family:var(--font);
+  font-size:13px;font-weight:500;letter-spacing:-.005em;color:rgba(var(--ink),.90);white-space:nowrap;
+  font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent;
+  transition:background .14s ease-out,color .14s ease-out,transform .09s ease-out}
+[data-k=lp-15] .arow button:active{transform:translateY(1px);background:rgba(var(--ink),.09)}
+[data-k=lp-15] .arow button.on{background:rgba(var(--ink),.12);color:rgba(var(--ink),.97);font-weight:700}
 
 [data-k=lp-15] .fin{display:none;position:absolute;left:16px;right:16px;bottom:16px}
 [data-k=lp-15] .logged .fin{display:block}
@@ -144,14 +145,9 @@
     </div>
 
     <div class="am" id="l15am">
-      <div class="amt" id="l15aq">How far did you actually run?</div>
-      <div class="stp">
-        <button class="mn" id="l15mn" type="button" aria-label="less"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M2.5 7h9"/></svg></button>
-        <b id="l15km">5.0 km</b>
-        <button class="pl" id="l15pl" type="button" aria-label="more"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M7 2.5v9M2.5 7h9"/></svg></button>
-      </div>
-      <p class="amn" id="l15amn">Planned 5.0 km. Steps of 0.1.</p>
-      <button class="log" id="l15bank" type="button"><b></b><span id="l15bankt">Hold to bank 5.0 km</span></button>
+      <div class="amt" id="l15aq">How did it actually go?</div>
+      <div class="arow" id="l15ar" role="group" aria-label="what actually happened"></div>
+      <button class="log" id="l15bank" type="button"><b></b><span id="l15bankt">Hold to bank 5 km</span></button>
       <button class="alt" id="l15no" type="button">Never mind, it went to plan</button>
     </div>
 
@@ -164,21 +160,24 @@
 <script>(function(){var r=document.querySelector('[data-k="lp-15"]');if(!r)return;
 /* The lanes are the plan they accepted, not the record: plan[i] is 1 on a day the
    plan asks for a session. The three ways are the plan's own sizes for today.
-   The amend row is the only place a number is typed, and it is their own correction. */
+   The amend row types nothing: it is tappable choices, the plan's own sizes plus
+   stopping early, so no pen or stepper exists anywhere on this loop. */
 var B={
  run:{goal:'Run 3 times a week',unit:'run',
    plan:[1,0,1,0,1,0,0],dayIdx:2,day:'Wednesday',next:'Friday',
    peek:'Pull up for the other two ways to run it',
-   step:.1,dec:1,su:'km',min:1,max:300,stepTxt:'Steps of 0.1.',
-   ask:'How far did you actually run?',undo:'Put it back, I have not run yet',
+   step:.1,dec:1,su:'km',
+   ask:'How did the run actually go?',short:'Stopped early',
+   shortDone:'stopped early',undo:'Put it back, I have not run yet',
    opts:[[30,'Short one, 3 km easy','Run 3 km, easy pace'],
          [50,'The normal one, 5 km easy','Run 5 km, easy pace'],
          [80,'Long one, 8 km, last 2 hard','Run 8 km, last 2 hard']],pick:1},
  school:{goal:'Study 4 times a week',unit:'block',
    plan:[1,1,1,0,1,0,0],dayIdx:2,day:'Wednesday',next:'Friday',
    peek:'Pull up for the other two ways to do it',
-   step:5,dec:0,su:'min',min:1,max:60,stepTxt:'Steps of 5.',
-   ask:'How long did you actually study?',undo:'Put it back, I have not studied yet',
+   step:5,dec:0,su:'min',
+   ask:'How did the block actually go?',short:'Cut it short',
+   shortDone:'cut short',undo:'Put it back, I have not studied yet',
    opts:[[9,'Short block, 45 minutes','Study 45 minutes, phone away'],
          [18,'The normal one, 90 minutes','Study 90 minutes, phone away'],
          [24,'Long block, 2 hours','Study 2 hours, phone away']],pick:1}};
@@ -187,7 +186,7 @@ var ph=r.querySelector('#l15ph'),sh=r.querySelector('#l15sh'),dg=r.querySelector
     C=r.querySelector('#l15c'),wk=r.querySelector('#l15wk'),
     gEl=r.querySelector('#l15g'),tEl=r.querySelector('#l15t'),
     pk=r.querySelector('#l15pk'),log=r.querySelector('#l15log'),am=r.querySelector('#l15am'),
-    amv=r.querySelector('#l15km'),amn=r.querySelector('#l15amn'),aq=r.querySelector('#l15aq'),
+    ar=r.querySelector('#l15ar'),aq=r.querySelector('#l15aq'),
     bank=r.querySelector('#l15bank'),bankT=r.querySelector('#l15bankt'),
     logT=r.querySelector('#l15logt'),undo=r.querySelector('#l15u'),
     c,sel,actual,logged=false,REST=340,UP=206,AMEND=300;
@@ -216,7 +215,7 @@ function render(k){
   C.textContent='This one puts '+vs(sel)+' in today.';
   logT.textContent='Hold to log the '+c.unit+', '+vs(sel);
   aq.textContent=c.ask;undo.textContent=c.undo;
-  actual=sel;amPaint();}
+  ar.innerHTML=arHTML();actual=sel;amPaint();}
 dg.addEventListener('click',function(){if(!drag.moved&&!ph.classList.contains('amending'))
   open(!ph.classList.contains('up'));});
 sc.addEventListener('click',function(){if(!ph.classList.contains('amending'))open(false);});
@@ -242,8 +241,19 @@ L.addEventListener('click',function(e){var b=e.target.closest('button');if(!b||l
   logT.textContent='Hold to log the '+c.unit+', '+vs(sel);});
 
 /* ---- accept or amend ---- */
-function amPaint(){amv.textContent=vu(actual);bankT.textContent='Hold to bank '+vu(actual);
-  amn.textContent='Planned '+vu(sel)+'. '+c.stepTxt;}
+/* tappable choices only: the plan's own three sizes, plus the honest one that
+   carries no number. Nothing is typed and nothing is dialled. */
+function amText(a){return a==='short'?c.shortDone:vs(a);}
+function arHTML(){
+  var h=c.opts.map(function(o){
+    return '<button type="button" data-a="'+o[0]+'">'+vs(o[0])+'</button>';}).join('');
+  return h+'<button type="button" data-a="short">'+c.short+'</button>';}
+function amPaint(){
+  [].forEach.call(ar.children,function(b){
+    b.classList.toggle('on',String(actual)===b.dataset.a);});
+  bankT.textContent=actual==='short'
+    ?'Hold to bank the '+c.unit+', '+c.shortDone
+    :'Hold to bank '+vs(actual);}
 /* HOLD to log, on both doors: the fill runs, an early release banks nothing */
 function holdable(btn,run){
   var t=null;
@@ -261,14 +271,14 @@ holdable(log,function(){done(sel);});
 r.querySelector('#l15alt').addEventListener('click',function(){actual=sel;amPaint();
   ph.classList.add('amending','up');place(AMEND);});
 r.querySelector('#l15no').addEventListener('click',function(){ph.classList.remove('amending');place(UP);});
-r.querySelector('#l15pl').addEventListener('click',function(){actual=Math.min(c.max,actual+1);amPaint();});
-r.querySelector('#l15mn').addEventListener('click',function(){actual=Math.max(c.min,actual-1);amPaint();});
+ar.addEventListener('click',function(e){var b=e.target.closest('button');if(!b||logged)return;
+  actual=b.dataset.a==='short'?'short':+b.dataset.a;amPaint();});
 holdable(bank,function(){done(actual);});
 
 function done(s){logged=true;
   ph.classList.remove('amending');ph.classList.add('logged');
   r.querySelector('#l15dt').textContent=c.unit.charAt(0).toUpperCase()+c.unit.slice(1)+
-    ' logged, '+vs(s);
+    ' logged, '+amText(s);
   tEl.textContent=c.day+', done';
   O.textContent='Next '+c.unit+' '+c.next;
   pk.textContent='Nothing else is asked of you today';

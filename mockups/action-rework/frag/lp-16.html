@@ -1,324 +1,324 @@
-<!-- ARCHETYPES, the surviving set: lp-1 full-bleed statement type | lp-6 vertical descent rail | lp-7 poster ceiling number |
-     lp-8 hundred-mark field | lp-9 single ruled page | lp-10 receipt tape | lp-12 full-height week columns |
-     lp-15 bottom sheet first | lp-16 wide pen band over the move | lp-17 declarative sentence |
+<!-- ARCHETYPES, the surviving set: lp-1 full-bleed statement type | lp-6 act over a full-bleed horizon | lp-7 poster ceiling number |
+     lp-8 hundred-mark field | lp-9 type resting on ruled paper | lp-10 receipt tape | lp-12 full-height week columns |
+     lp-15 bottom sheet first | lp-16 full-bleed move band | lp-17 declarative sentence |
      lp-18 centered monolith numeral -->
 <section class="cell" data-k="lp-16">
-<!-- TIGHTENED RULE (Malik, 2026-08-15): "it is showing too much information."
-     An Action screen shows TODAY, and nothing about how far along the journey
-     they are. If a person could learn how close they are to their goal from
-     this screen, it is wrong.
+<!-- ONE ASK (Malik, 2026-08-14) — the band stops being a pen.
+     This screen wrote the week's money in on a green line and then the close
+     asked where they are now. Same question twice. The entry is gone from the
+     loop entirely: the field, the caret, the write-in hold and the "written in"
+     state are cut, and the ONLY entry moment is the close, in Clarity's voice,
+     at money's own cadence, which for a maintenance goal is once a week.
 
-     THE CORRIDOR IS GONE. Its whole geometry was a position along a track: a
-     band you are somewhere inside, with marks laid left to right. Even stripped
-     of its floor line and its cushion tags, a trace of ten weigh-ins joined by
-     a dotted line is a travelled track, and the last mark on it is a position.
-     Cut: the band, the polyline, the marks, the scale, and the pen readout that
-     sat beside a numbered goal (181.4 lb under "Hold 180 lb" is a distance to a
-     floor with the arithmetic left to the reader).
+     WHAT THE BAND IS NOW: the same full-bleed horizontal geometry, carrying the
+     week's move instead of a number. It bleeds edge to edge and sits high, a
+     lit shelf across the top with open grid under it, the sizes floating in that
+     air, and the one light bar anchored at the foot. lp-6 hangs its act over a
+     hairline horizon; lp-9 prints its act on paper; here the act is INSIDE the
+     one solid object on the screen and everything else is air.
 
-     WHAT REPLACES IT, same horizontal geometry, opposite job: the band is now
-     THE PEN. It is the writing surface for the number this goal is kept by, the
-     one Memento can only ever know because they typed it. It opens empty, it
-     carries a green line to write on, and writing is a hold with early release
-     aborting, like every other completion in the set. Written, it shows what
-     they wrote, when, and an undo. Nothing else. There is no previous value, no
-     trace, no target, so there is nothing on the screen to read a position off.
+     THE CADENCE IS THE POINT OF THIS SHAPE: a maintenance week does not get
+     asked for a number every night. Ordinary days close at the green beat and go
+     straight to rest; Friday, and only Friday, closes with the weekly pulse. The
+     toggle above the phone runs both cases honestly.
 
-     The goal line keeps their words and loses its number for the same reason.
-     Today's move sits under the band at three sizes, and the size's consequence
-     is the move sentence itself changing, which is the only consequence Action
-     owns. Two holds, two different completions: write the number, log the move. -->
+     PROVENANCE: the move and its sizes are the plan's own, the estimate says
+     "about", and the only number is the one they type on Friday. -->
 <style>
-/* the goal line clears the island: at padding-top 30 its ascender started on
-   the island's own bottom edge, which is a safe-area miss on a real phone */
-[data-k=lp-16] .l16{position:absolute;inset:0;display:flex;flex-direction:column;padding:38px 0 22px;
+[data-k=lp-16] .l16{position:absolute;inset:0;display:flex;flex-direction:column;padding:46px 0 20px;
   font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent}
-[data-k=lp-16] .l16 .pad{padding:0 20px}
+[data-k=lp-16] .pad{padding:0 20px}
+[data-k=lp-16] .l16>*{position:relative;z-index:2}
 
-[data-k=lp-16] .l16-goal{font-size:12.5px;line-height:1.35;color:rgba(var(--ink),.88)}
-
-/* --- THE BAND: full bleed across the screen, and it is a writing surface --- */
-[data-k=lp-16] .l16-pen{flex:none;margin-top:15px;padding:13px 20px 13px;background:rgba(22,25,31,.955);
+/* --- THE BAND: full bleed, and it carries the move ----------------------- */
+[data-k=lp-16] .band{flex:none;padding:15px 20px 17px;background:rgba(22,25,31,.955);
   -webkit-backdrop-filter:blur(28px) saturate(1.4);backdrop-filter:blur(28px) saturate(1.4);
   box-shadow:inset 0 1px 0 rgba(var(--ink),.075),inset 0 -1px 0 rgba(var(--ink),.05)}
-[data-k=lp-16] .l16-hd{display:flex;align-items:baseline;gap:8px;min-height:16px}
-[data-k=lp-16] .l16-lbl{font-size:13px;font-weight:700;letter-spacing:-.012em;color:rgba(var(--ink),.97)}
-[data-k=lp-16] .l16-when{margin-left:auto;display:none;align-items:baseline;gap:9px;
-  font-size:11.5px;color:rgba(var(--ink),.90)}
-[data-k=lp-16] .l16.wrote .l16-when{display:flex}
-[data-k=lp-16] .l16-undo{border:0;background:none;padding:0;cursor:pointer;font:500 11.5px var(--font);
-  color:rgba(var(--ink),.92);box-shadow:inset 0 -1px 0 rgba(var(--ink),.32)}
+[data-k=lp-16] .wk{display:flex;align-items:baseline;gap:8px;font-size:13px;font-weight:700;
+  letter-spacing:-.012em;color:rgba(var(--ink),.97)}
+[data-k=lp-16] .wk i{display:none;width:8px;height:8px;border-radius:3px;background:#3fd94e;
+  transform:translateY(-1px)}
+[data-k=lp-16] .l16.done .wk i{display:block}
+[data-k=lp-16] .mv{margin:9px 0 0;font-size:22px;line-height:1.24;letter-spacing:-.024em;font-weight:700;
+  color:rgba(var(--ink),.97);transition:opacity .16s ease-out}
+[data-k=lp-16] .mv.swap{opacity:.32}
 
-/* the line they write on: straight, full width of the band's inner box */
-[data-k=lp-16] .l16-val{position:relative;display:flex;align-items:baseline;gap:7px;padding:7px 0 11px}
-[data-k=lp-16] .l16-val:after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;border-radius:2px;
-  background:#3fd94e;transition:background .3s ease-out}
-[data-k=lp-16] .l16.wrote .l16-val:after{background:rgba(var(--ink),.12)}
-[data-k=lp-16] .l16-pre,[data-k=lp-16] .l16-unit{font-size:16.5px;font-weight:500;color:rgba(var(--ink),.90)}
-[data-k=lp-16] .l16-pre:empty,[data-k=lp-16] .l16-unit:empty{display:none}
-[data-k=lp-16] .l16-in{border:0;outline:0;background:transparent;padding:0;width:14px;min-width:0;
-  font:700 40px/1 var(--font);letter-spacing:-.035em;font-variant-numeric:tabular-nums;
-  color:rgba(var(--ink),.98);caret-color:#3fd94e}
-[data-k=lp-16] .l16-in::-webkit-outer-spin-button,[data-k=lp-16] .l16-in::-webkit-inner-spin-button{display:none}
-[data-k=lp-16] .l16-fld{position:relative;display:inline-flex;align-items:baseline}
-[data-k=lp-16] .l16-car{position:absolute;left:1px;top:5px;width:2px;height:30px;background:#3fd94e;
-  animation:l16car 1.05s step-end infinite}
-[data-k=lp-16] .l16.filled .l16-car{display:none}
-@keyframes l16car{0%,50%{opacity:1}50.01%,100%{opacity:0}}
-
-/* writing the number in is a completion, so it is a hold */
-[data-k=lp-16] .l16-write{position:relative;height:40px;margin-top:11px;border-radius:11px;overflow:hidden;
-  background:rgba(var(--ink),.05);box-shadow:inset 0 1px 0 rgba(var(--ink),.07);
-  cursor:default;touch-action:none;-webkit-user-select:none;user-select:none;
-  transition:background .26s ease-out,box-shadow .26s ease-out}
-[data-k=lp-16] .l16-write .fl{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(63,217,78,.20)}
-[data-k=lp-16] .l16-write .tx{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:8px;
-  font-size:13px;font-weight:500;color:rgba(var(--ink),.90);white-space:nowrap}
-[data-k=lp-16] .l16-write.rdy{background:rgba(30,34,42,.94);box-shadow:inset 0 1px 0 rgba(var(--ink),.10);cursor:pointer}
-[data-k=lp-16] .l16-write.rdy .tx{color:rgba(var(--ink),.97);font-weight:700}
-[data-k=lp-16] .l16.wrote .l16-write{background:rgba(63,217,78,.13);box-shadow:inset 0 1px 0 rgba(63,217,78,.26)}
-[data-k=lp-16] .l16.wrote .l16-write .tx{color:rgba(var(--ink),.97);font-weight:700}
-[data-k=lp-16] .l16-write svg{display:none;width:13px;height:13px;fill:none;stroke:#3fd94e;stroke-width:2.6;
-  stroke-linecap:round;stroke-linejoin:round}
-[data-k=lp-16] .l16.wrote .l16-write svg{display:block}
-
-/* one skeleton: the move sits optically centred in the room the band leaves,
-   the gesture stays anchored to the bottom */
-[data-k=lp-16] .l16-sp{flex:1;min-height:14px}
-[data-k=lp-16] .l16-sp2{flex:1.15;min-height:12px}
-
-[data-k=lp-16] .l16-do{flex:none;margin:0 -6px;border-radius:14px;padding:17px 21px 18px;background:rgba(22,25,31,.95);
-  -webkit-backdrop-filter:blur(26px) saturate(1.35);backdrop-filter:blur(26px) saturate(1.35);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.09)}
-[data-k=lp-16] .l16-do .h{display:flex;align-items:baseline;gap:9px}
-[data-k=lp-16] .l16-do i{display:none;flex:none;width:8px;height:8px;border-radius:3px;background:#3fd94e;transform:translateY(-2px)}
-[data-k=lp-16] .l16-do.sent i{display:block}
-[data-k=lp-16] .l16-do b{display:block;font-size:20px;font-weight:700;letter-spacing:-.02em;line-height:1.24;color:var(--text-hi)}
-[data-k=lp-16] .l16-do p{margin:7px 0 0;font-size:12px;line-height:1.5;color:rgba(var(--ink),.90)}
-[data-k=lp-16] .l16-do.sent p{display:none}
-
-[data-k=lp-16] .l16-chips{display:flex;flex:none;gap:6px;margin:8px -6px 0}
-[data-k=lp-16] .l16-chips.lock{pointer-events:none}
-[data-k=lp-16] .l16-chip{flex:1;height:38px;border:0;border-radius:10px;background:rgba(22,25,31,.95);
+/* --- the sizes, hung off the band's bottom edge --------------------------
+   they belong to the move, so they sit with it: band and sizes are one object
+   at the top of the screen, then air, then the one bar at the foot. */
+[data-k=lp-16] .sp{flex:1;min-height:12px}
+[data-k=lp-16] .chips{display:flex;gap:6px;margin-top:8px}
+[data-k=lp-16] .chips button{flex:1;height:40px;border:0;border-radius:10px;background:rgba(22,25,31,.95);
   -webkit-backdrop-filter:blur(24px) saturate(1.4);backdrop-filter:blur(24px) saturate(1.4);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.08);color:rgba(var(--ink),.82);font:500 13px var(--font);
-  font-variant-numeric:tabular-nums;cursor:pointer;
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.08);color:rgba(var(--ink),.90);
+  font:500 13px/1 var(--font);font-variant-numeric:tabular-nums;cursor:pointer;
   transition:background .16s ease-out,color .16s ease-out,box-shadow .16s ease-out,transform .09s ease-out}
-[data-k=lp-16] .l16-chip:active{transform:translateY(1px);background:rgba(30,34,42,.96)}
-[data-k=lp-16] .l16-chip.on{background:rgba(30,52,34,.96);color:rgba(var(--ink),.97);font-weight:700;
-  box-shadow:inset 0 1px 0 rgba(63,217,78,.38)}
+[data-k=lp-16] .chips button:active{transform:translateY(1px)}
+[data-k=lp-16] .chips button.on{background:rgba(30,34,42,.96);color:rgba(var(--ink),.97);font-weight:700;
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.16)}
+[data-k=lp-16] .chips button:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
+[data-k=lp-16] .l16.done .chips{pointer-events:none}
 
-[data-k=lp-16] .l16-close{position:relative;flex:none;display:block;width:calc(100% + 12px);height:52px;margin:0 -6px;border:0;
-  border-radius:14px;overflow:hidden;cursor:pointer;background:rgba(235,238,248,.94);
-  touch-action:none;-webkit-user-select:none;user-select:none;font-family:var(--font)}
-[data-k=lp-16] .l16-fill{position:absolute;inset:0 auto 0 0;width:0;background:rgba(63,217,78,.55)}
-[data-k=lp-16] .l16-close.go .l16-fill{width:100%;transition:width 1.05s linear}
-[data-k=lp-16] .l16-lab{position:relative;display:flex;align-items:center;justify-content:center;height:100%;
-  padding:0 14px;font-size:15.5px;font-weight:700;letter-spacing:-.01em;color:#0b0c10}
-[data-k=lp-16] .l16-close:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
-[data-k=lp-16] .l16-close.done{background:rgba(63,217,78,.16)}
-[data-k=lp-16] .l16-close.done .l16-fill{display:none}
-[data-k=lp-16] .l16-close.done .l16-lab{color:rgba(var(--ink),.96)}
-@media (prefers-reduced-motion:reduce){[data-k=lp-16] .l16-car{animation:none}
-  [data-k=lp-16] *{transition:none!important}}
+/* --- the one light bar at the foot --------------------------------------- */
+[data-k=lp-16] .close{position:relative;height:54px;border-radius:14px;overflow:hidden;cursor:pointer;
+  background:rgba(235,238,248,.94);touch-action:none;-webkit-user-select:none;user-select:none;
+  transition:background .3s ease-out,box-shadow .3s ease-out}
+[data-k=lp-16] .close .fill{position:absolute;inset:0 auto 0 0;width:0;background:rgba(63,217,78,.55)}
+[data-k=lp-16] .close .lab{position:relative;display:flex;align-items:center;justify-content:center;height:100%;
+  padding:0 14px;font:700 15.5px/1 var(--font);letter-spacing:-.01em;color:#0b0c10;
+  transition:padding .26s ease-out,color .26s ease-out}
+[data-k=lp-16] .close:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
+[data-k=lp-16] .l16.done .close{background:rgba(28,32,39,.94);box-shadow:inset 0 1px 0 rgba(63,217,78,.28)}
+[data-k=lp-16] .l16.done .close .fill{width:100%;background:rgba(63,217,78,.20)}
+[data-k=lp-16] .l16.done .close .lab{padding-right:74px;color:rgba(var(--ink),.96)}
+[data-k=lp-16] .undo{position:absolute;right:6px;top:6px;bottom:6px;width:62px;border:0;border-radius:10px;
+  background:rgba(22,25,31,.92);box-shadow:inset 0 1px 0 rgba(var(--ink),.10);
+  color:rgba(var(--ink),.92);font:500 12.5px/1 var(--font);cursor:pointer;opacity:0;pointer-events:none;
+  transition:opacity .2s ease-out .12s}
+[data-k=lp-16] .l16.done .undo{opacity:1;pointer-events:auto}
+
+/* --- beat 5a: the green beat --------------------------------------------- */
+[data-k=lp-16] .wash{position:absolute;left:0;right:0;bottom:0;height:0;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,rgba(63,217,78,0),rgba(63,217,78,.16));
+  transition:height .5s cubic-bezier(.2,.7,.2,1),opacity .4s ease-out}
+[data-k=lp-16] .l16.done .wash{height:50%}
+[data-k=lp-16] .l16.closed .wash{height:0;opacity:0}
+
+/* --- beat 5b: THE PULSE, Friday only ------------------------------------- */
+[data-k=lp-16] .pulse{position:absolute;inset:0;z-index:9;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:60px 24px 30px;text-align:center;
+  background:rgba(5,6,8,.972);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  opacity:0;visibility:hidden;transition:opacity .3s ease-out,visibility 0s linear .3s}
+[data-k=lp-16] .pulse.open{opacity:1;visibility:visible;transition-delay:0s}
+[data-k=lp-16] .pq{margin:0;font-size:20px;font-weight:500;line-height:1.2;letter-spacing:-.022em;
+  color:rgba(var(--ink),.96)}
+[data-k=lp-16] .pu{margin:9px 0 0;font-size:12.5px;line-height:1.4;color:rgba(var(--ink),.90)}
+[data-k=lp-16] .pfield{width:fit-content;min-width:150px;margin:24px auto 0}
+[data-k=lp-16] .pset{display:flex;align-items:baseline;justify-content:center;gap:3px}
+[data-k=lp-16] .ppre{font-size:22px;font-weight:500;line-height:1;color:rgba(var(--ink),.82)}
+[data-k=lp-16] .pnum{-webkit-appearance:none;appearance:none;border:0;outline:0;background:transparent;
+  padding:0;margin:0;width:150px;text-align:center;font-family:var(--font);font-weight:700;
+  font-size:62px;line-height:1;letter-spacing:-.05em;color:rgba(var(--ink),1);
+  font-variant-numeric:tabular-nums;caret-color:rgba(var(--ink),.92)}
+/* the field takes the number's OWN width, measured off a hidden mirror in the
+   same type, so a single digit never floats a gap away from the $ in front of it */
+[data-k=lp-16] .pmirror{position:absolute;left:-9999px;top:0;white-space:pre;visibility:hidden;
+  font-family:var(--font);font-weight:700;font-size:62px;letter-spacing:-.05em;
+  font-variant-numeric:tabular-nums}
+[data-k=lp-16] .pnum::placeholder{color:rgba(var(--ink),.20)}
+[data-k=lp-16] .prule{height:1px;margin-top:12px;background:rgba(var(--ink),.28);transition:background .18s ease-out}
+[data-k=lp-16] .pfield:focus-within .prule{background:rgba(var(--ink),.55)}
+[data-k=lp-16] .pcad{margin:26px 0 0;font-size:12px;line-height:1.4;color:rgba(var(--ink),.78)}
+[data-k=lp-16] .pfoot{position:absolute;left:22px;right:22px;bottom:26px}
+[data-k=lp-16] .psave{position:relative;display:block;width:100%;height:54px;overflow:hidden;border:0;
+  border-radius:14px;padding:0;font-family:var(--font);background:rgba(22,25,31,.94);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09);cursor:pointer;touch-action:none;
+  -webkit-user-select:none;user-select:none}
+[data-k=lp-16] .psave .pfill{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(63,217,78,.22)}
+[data-k=lp-16] .psave span{position:relative;display:grid;place-items:center;height:100%;
+  font-size:14px;font-weight:500;color:rgba(var(--ink),.62);
+  transition:color .18s ease-out,font-weight .18s ease-out}
+[data-k=lp-16] .pulse.armed .psave span{color:rgba(var(--ink),.96);font-weight:700}
+[data-k=lp-16] .psave:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
+[data-k=lp-16] .pskip{display:block;width:100%;height:40px;margin-top:6px;border:0;border-radius:12px;
+  background:none;color:rgba(var(--ink),.78);font:500 13px/1 var(--font);cursor:pointer}
+[data-k=lp-16] .pskip:active{color:rgba(var(--ink),.96)}
+[data-k=lp-16] .pskip:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
+
+/* --- beat 5c: rest ------------------------------------------------------- */
+[data-k=lp-16] .rest{position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:60px 26px 40px;text-align:center;
+  background:rgba(5,6,8,.985);
+  opacity:0;visibility:hidden;transition:opacity .42s ease-out,visibility 0s linear .42s}
+[data-k=lp-16] .rest.open{opacity:1;visibility:visible;transition-delay:0s}
+[data-k=lp-16] .rest p{margin:0;font-size:20px;font-weight:500;line-height:1.32;letter-spacing:-.02em;
+  color:rgba(var(--ink),.96)}
+[data-k=lp-16] .rest p+p{color:rgba(var(--ink),.90)}
+[data-k=lp-16] .again{position:absolute;left:0;right:0;bottom:32px;margin:0 auto;width:fit-content;
+  border:0;border-radius:999px;height:30px;padding:0 14px;background:rgba(22,25,31,.94);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09);color:rgba(var(--ink),.90);
+  font:400 12px/1 var(--font);cursor:pointer}
+[data-k=lp-16] .again:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:3px}
+@media (prefers-reduced-motion:reduce){[data-k=lp-16] *{transition:none!important}}
 </style>
-<h3>The pen band</h3>
-<p class="cap">A band across the top is the pen: the number this goal is kept by gets written on the green line and held in, and today's move sits under it at three sizes. Nothing is drawn against the goal, so there is no position to read.</p>
-<div class="bk" role="group" aria-label="which goal this screen is carrying">
-  <button type="button" class="on" data-b="money" aria-pressed="true">Money</button>
-  <button type="button" data-b="body" aria-pressed="false">Body</button>
+<h3>The band</h3>
+<p class="cap">A maintenance week: the move lives inside one lit shelf bleeding across the top with its three sizes hung off the shelf's edge, open grid below, and one light bar at the foot closes the day. Ordinary days end at the green beat; the demo is set to Friday, the one day money's pulse asks for the week's number.</p>
+<div class="bk" role="group" aria-label="which day this screen is running">
+  <i>Money, maintain</i>
+  <button type="button" data-b="tue" aria-pressed="false">Tuesday</button>
+  <button type="button" class="on" data-b="fri" aria-pressed="true">Friday</button>
 </div>
 <div class="ph">
   <div class="grid"></div>
   <div class="l16">
-    <div class="pad"><div class="l16-goal"></div></div>
+    <div class="wash" aria-hidden="true"></div>
 
-    <div class="l16-pen">
-      <div class="l16-hd">
-        <span class="l16-lbl"></span>
-        <span class="l16-when"><span class="wt"></span><button type="button" class="l16-undo">undo</button></span>
-      </div>
-      <label class="l16-val">
-        <span class="l16-pre"></span>
-        <span class="l16-fld"><input class="l16-in" type="text" inputmode="decimal" autocomplete="off"><span class="l16-car" aria-hidden="true"></span></span>
-        <span class="l16-unit"></span>
-      </label>
-      <div class="l16-write" role="button" tabindex="0" aria-disabled="true">
-        <span class="fl"></span>
-        <span class="tx"><svg viewBox="0 0 24 24"><path d="M4 13l5 5L20 7"/></svg><b class="wl"></b></span>
-      </div>
+    <div class="band">
+      <div class="wk"><i></i><span>This week</span></div>
+      <p class="mv"></p>
     </div>
 
-    <div class="l16-sp"></div>
+    <div class="pad"><div class="chips" role="group" aria-label="how big today"></div></div>
+
+    <div class="sp"></div>
 
     <div class="pad">
-      <div class="l16-do">
-        <div class="h"><i></i><b></b></div>
-        <p></p>
+      <div class="close" role="button" tabindex="0">
+        <span class="fill"></span>
+        <span class="lab">Hold to confirm</span>
+        <button type="button" class="undo" tabindex="-1">Undo</button>
       </div>
-      <div class="l16-chips" role="group" aria-label="how big today is"></div>
     </div>
+  </div>
 
-    <div class="l16-sp2"></div>
-
-    <div class="pad">
-      <button type="button" class="l16-close">
-        <span class="l16-fill"></span>
-        <span class="l16-lab"></span>
-      </button>
+  <div class="pulse" aria-hidden="true">
+    <p class="pq">Where are you now?</p>
+    <p class="pu">Dollars in this week</p>
+    <div class="pfield">
+      <div class="pset">
+        <span class="ppre">$</span>
+        <input class="pnum" type="text" inputmode="decimal" autocomplete="off" placeholder="0"
+               aria-label="dollars in this week" tabindex="-1">
+      </div>
+      <div class="prule"></div>
     </div>
+    <p class="pcad">Asked once a week, Fridays.</p>
+    <div class="pfoot">
+      <button type="button" class="psave" tabindex="-1"><i class="pfill"></i><span>Hold to save</span></button>
+      <button type="button" class="pskip" tabindex="-1">Not now</button>
+    </div>
+  </div>
+
+  <div class="rest" aria-hidden="true">
+    <p>That&#8217;s the day.</p>
+    <p>See you tomorrow.</p>
+    <button type="button" class="again" tabindex="-1">Run it again</button>
   </div>
 </div>
 <script>(function(){
-  var c=document.currentScript.closest('.cell');
-  var root=c.querySelector('.l16'),goal=c.querySelector('.l16-goal'),
-      lbl=c.querySelector('.l16-lbl'),whenT=c.querySelector('.l16-when .wt'),undo=c.querySelector('.l16-undo'),
-      pre=c.querySelector('.l16-pre'),unit=c.querySelector('.l16-unit'),inp=c.querySelector('.l16-in'),
-      wr=c.querySelector('.l16-write'),wfl=wr.querySelector('.fl'),wl=c.querySelector('.wl'),
-      chipsEl=c.querySelector('.l16-chips'),
-      doBox=c.querySelector('.l16-do'),doB=doBox.querySelector('b'),doP=doBox.querySelector('p'),
-      pad=c.querySelector('.l16-close'),lab=c.querySelector('.l16-lab');
-
-  /* PROVENANCE: every number here is one they typed on this screen, or a word
-     from their own star. Nothing is measured, nothing is remembered from before. */
-  var CTX={
-    money:{
-      goal:'Hold the floor under the business',
-      lbl:'This week&#8217;s money in',pre:'$',unit:'',idle:'Write the week in first',
-      lo:1,hi:999999,dec:0,
-      sizes:[
-        {t:'1 invoice', act:'Send 1 renewal invoice.',  sub:'About 10 min, by the plan.', lab:'Hold to log 1 invoice',  done:'1 invoice sent'},
-        {t:'2 invoices',act:'Send 2 renewal invoices.', sub:'About 20 min, by the plan.', lab:'Hold to log 2 invoices', done:'2 invoices sent'},
-        {t:'4 invoices',act:'Send 4 renewal invoices.', sub:'About 40 min, by the plan.', lab:'Hold to log 4 invoices', done:'4 invoices sent'}
-      ],pick:1
-    },
-    body:{
-      goal:'Hold the weight you cut to',
-      lbl:'Friday&#8217;s weigh-in',pre:'',unit:'lb',idle:'Write Friday in first',
-      lo:80,hi:700,dec:1,
-      sizes:[
-        {t:'20 min',act:'Walk 20 minutes today.',sub:'',lab:'Hold to log the walk',done:'20 minute walk logged'},
-        {t:'30 min',act:'Walk 30 minutes today.',sub:'',lab:'Hold to log the walk',done:'30 minute walk logged'},
-        {t:'45 min',act:'Walk 45 minutes today.',sub:'',lab:'Hold to log the walk',done:'45 minute walk logged'}
-      ],pick:1
-    }
-  };
-
-  var C=CTX.money,size=1,sent=false,wrote=false,ready=false,WHOLD=1300,wt=null;
-
-  function group(n){return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,',');}
-  function show(v){return C.dec?v.toFixed(1):group(Math.round(v));}
-  function val(){var v=parseFloat(String(inp.value).replace(/,/g,''));
-    return (isFinite(v)&&v>=C.lo&&v<=C.hi)?v:null;}
-  /* the field is exactly as wide as what they typed, measured in the field's own
-     type, so the unit and the caret always sit right against the number */
-  var sizer=document.createElement('span');
-  sizer.setAttribute('aria-hidden','true');
-  sizer.style.cssText='position:absolute;left:0;top:0;visibility:hidden;white-space:pre;pointer-events:none;'+
-    'font:700 40px/1 var(--font);letter-spacing:-.035em;font-variant-numeric:tabular-nums';
-  c.querySelector('.l16-fld').appendChild(sizer);
-  function fit(){sizer.textContent=inp.value||'';
-    inp.style.width=Math.max(sizer.getBoundingClientRect().width+1,14)+'px';}
-
-  function setReady(v){
-    ready=v;wr.classList.toggle('rdy',v);wr.setAttribute('aria-disabled',v?'false':'true');
-    wl.textContent=v?('Hold to write '+C.pre+show(val())+(C.unit?' '+C.unit:'')+' in'):C.idle;
-  }
-  inp.addEventListener('input',function(){
-    if(wrote)return;
-    root.classList.toggle('filled',inp.value.length>0);
-    fit();setReady(val()!==null);
-  });
-
-  function writeIn(){
-    wt=null;var v=val();if(wrote||v===null)return;
-    wrote=true;root.classList.add('wrote');inp.readOnly=true;inp.value=show(v);fit();
-    wfl.style.transition='width .24s ease-out';wfl.style.width='0';
-    wl.textContent='Written in';whenT.textContent='typed just now';
-  }
-  function wStart(e){
-    if(wrote||!ready)return;if(e&&e.preventDefault)e.preventDefault();
-    wfl.style.transition='width '+WHOLD+'ms linear';wfl.style.width='100%';
-    wt=setTimeout(writeIn,WHOLD);
-  }
-  function wAbort(){
-    if(wrote||!wt)return;clearTimeout(wt);wt=null;
-    wfl.style.transition='width .18s ease-out';wfl.style.width='0';
-  }
-  wr.addEventListener('pointerdown',wStart);
-  ['pointerup','pointerleave','pointercancel'].forEach(function(ev){wr.addEventListener(ev,wAbort)});
-  wr.addEventListener('keydown',function(e){if((e.key==='Enter'||e.key===' ')&&!e.repeat)wStart(e)});
-  wr.addEventListener('keyup',wAbort);
-  undo.addEventListener('click',function(){if(!wrote)return;clearPen();inp.focus();});
-
-  function clearPen(){
-    wrote=false;ready=false;root.classList.remove('wrote','filled');
-    clearTimeout(wt);wt=null;wfl.style.transition='none';wfl.style.width='0';
-    inp.readOnly=false;inp.value='';fit();
-    wr.classList.remove('rdy');wr.setAttribute('aria-disabled','true');
-    wl.textContent=C.idle;whenT.textContent='';
+  var r=document.currentScript.closest('.cell');if(!r)return;
+  var root=r.querySelector('.l16'),mv=r.querySelector('.mv'),chipsEl=r.querySelector('.chips'),
+      close=r.querySelector('.close'),fill=r.querySelector('.close .fill'),lab=r.querySelector('.close .lab'),
+      undo=r.querySelector('.undo'),
+      pulse=r.querySelector('.pulse'),pnum=r.querySelector('.pnum'),psave=r.querySelector('.psave'),
+      pfill=r.querySelector('.pfill'),pskip=r.querySelector('.pskip'),
+      rest=r.querySelector('.rest'),again=r.querySelector('.again'),
+      pmirror=document.createElement('span');
+  pmirror.className='pmirror';r.appendChild(pmirror);
+  function pfit(){
+    pmirror.textContent=pnum.value||pnum.placeholder;
+    pnum.style.width=Math.max(56,Math.ceil(pmirror.getBoundingClientRect().width)+8)+'px';
   }
 
-  function paintSize(){
-    var s=C.sizes[size];
-    doB.textContent=s.act;
-    doP.textContent=s.sub;doP.style.display=s.sub?'':'none';
-    if(!sent)lab.textContent=s.lab;
+  /* THE ACTS LAW: sending invoices is an act with a yes or no answer; the money
+     that comes back is not a move and is never assigned as one. */
+  var SZ=[
+    {t:'1 invoice', a:'Send 1 renewal invoice.',   did:'1 invoice sent'},
+    {t:'2 invoices',a:'Send 2 renewal invoices.',  did:'2 invoices sent'},
+    {t:'4 invoices',a:'Send 4 renewal invoices.',  did:'4 invoices sent'}
+  ],pick=1;
+  var IDLE='Hold to confirm',HOLD_MS=1400,BEAT_MS=1500,PULSE_MS=900;
+  var friday=true,done=false,t=null,beat=null;
+
+  function paint(animate){
+    if(animate){mv.classList.add('swap');
+      setTimeout(function(){mv.textContent=SZ[pick].a;mv.classList.remove('swap')},110);}
+    else mv.textContent=SZ[pick].a;
+    if(!done){lab.textContent=IDLE;close.setAttribute('aria-label',IDLE+', '+SZ[pick].t);}
   }
   function drawChips(){
     chipsEl.textContent='';
-    C.sizes.forEach(function(o,i){
-      var b=document.createElement('button');
-      b.type='button';b.className='l16-chip'+(i===size?' on':'');
-      b.textContent=o.t;b.setAttribute('aria-pressed',i===size?'true':'false');
+    SZ.forEach(function(o,i){
+      var b=document.createElement('button');b.type='button';b.textContent=o.t;
+      b.setAttribute('aria-pressed',i===pick?'true':'false');
+      if(i===pick)b.className='on';
       b.addEventListener('click',function(){
-        if(sent)return;
+        if(done)return;
         chipsEl.querySelectorAll('button').forEach(function(z){
-          z.classList.remove('on');z.setAttribute('aria-pressed','false');});
+          z.classList.remove('on');z.setAttribute('aria-pressed','false')});
         b.classList.add('on');b.setAttribute('aria-pressed','true');
-        size=i;paintSize();
+        pick=i;paint(true);
       });
       chipsEl.appendChild(b);
     });
   }
 
-  /* --- the move's own hold: logging the ACTION never moves the number ------ */
-  var ht=null;
-  function done(){
-    sent=true;pad.classList.remove('go');pad.classList.add('done');
-    lab.textContent=C.sizes[size].done;
-    doBox.classList.add('sent');chipsEl.classList.add('lock');
+  function toggle(el,open){
+    el.classList.toggle('open',open);
+    el.setAttribute('aria-hidden',open?'false':'true');
+    el.querySelectorAll('button,input').forEach(function(b){b.tabIndex=open?0:-1});
   }
-  function holdOn(e){
-    if(sent)return;
-    if(e&&e.pointerId!=null){try{pad.setPointerCapture(e.pointerId)}catch(z){}}
-    pad.classList.add('go');ht=setTimeout(done,1050);
+  function openPulse(){pnum.value='';pulse.classList.remove('armed');stopPHold();pfit();toggle(pulse,true);}
+  function openRest(){toggle(pulse,false);root.classList.add('closed');toggle(rest,true);}
+  function complete(){
+    if(done)return;
+    done=true;root.classList.add('done');lab.textContent=SZ[pick].did;
+    close.setAttribute('aria-label',SZ[pick].did);
+    /* the cadence lives here: Friday closes with the pulse, every other day
+       closes at the beat and goes to rest without being asked anything */
+    beat=setTimeout(function(){beat=null;friday?openPulse():openRest();},BEAT_MS);
   }
-  function holdOff(){if(sent)return;clearTimeout(ht);pad.classList.remove('go');}
-  pad.addEventListener('pointerdown',holdOn);
-  ['pointerup','pointerleave','pointercancel'].forEach(function(ev){pad.addEventListener(ev,holdOff)});
-  pad.addEventListener('keydown',function(e){
-    if((e.key==='Enter'||e.key===' ')&&!e.repeat){e.preventDefault();holdOn();}});
-  pad.addEventListener('keyup',holdOff);
+  function reset(){
+    if(beat){clearTimeout(beat);beat=null;}
+    stopPHold();
+    done=false;root.classList.remove('done','closed');
+    pulse.classList.remove('armed');toggle(pulse,false);toggle(rest,false);
+    fill.style.transition='none';fill.style.width='0';
+    paint(false);
+  }
+  undo.addEventListener('click',function(e){e.stopPropagation();reset();});
+  again.addEventListener('click',function(e){e.stopPropagation();reset();});
 
-  /* --- swapping the goal: same skeleton, the goal's own words -------------- */
-  function render(key){
-    C=CTX[key];size=C.pick;sent=false;
-    clearTimeout(ht);pad.classList.remove('done','go');
-    doBox.classList.remove('sent');chipsEl.classList.remove('lock');
-    goal.textContent=C.goal.replace(/&#8217;/g,'’');
-    lbl.innerHTML=C.lbl;pre.textContent=C.pre;unit.textContent=C.unit;
-    inp.setAttribute('aria-label',key==='money'?"write this week's money in":"write Friday's weight in");
-    clearPen();drawChips();paintSize();
+  var pt=null;
+  function stopPHold(){
+    if(pt){clearTimeout(pt);pt=null;}
+    pfill.style.transition='width .18s ease-out';pfill.style.width='0';
   }
-  c.querySelectorAll('.bk button').forEach(function(b){
+  function startPHold(){
+    if(pt||!pulse.classList.contains('armed'))return;
+    pfill.style.transition='width '+(PULSE_MS/1000)+'s linear';pfill.style.width='100%';
+    pt=setTimeout(function(){pt=null;openRest();},PULSE_MS);
+  }
+  pnum.addEventListener('input',function(){
+    pnum.value=pnum.value.replace(/[^0-9.]/g,'');
+    pfit();
+    pulse.classList.toggle('armed',pnum.value.length>0);
+    if(!pulse.classList.contains('armed'))stopPHold();
+  });
+  psave.addEventListener('pointerdown',startPHold);
+  ['pointerup','pointerleave','pointercancel'].forEach(function(ev){psave.addEventListener(ev,stopPHold)});
+  psave.addEventListener('keydown',function(e){
+    if((e.key==='Enter'||e.key===' ')&&!e.repeat){e.preventDefault();startPHold();}});
+  psave.addEventListener('keyup',stopPHold);
+  pskip.addEventListener('click',function(e){e.stopPropagation();stopPHold();openRest();});
+
+  /* HOLD to bank the move, early release aborts */
+  function start(e){
+    if(done)return;
+    if(e&&e.target.closest('.undo'))return;
+    if(e&&e.pointerId!=null){try{close.setPointerCapture(e.pointerId)}catch(z){}}
+    fill.style.transition='width '+(HOLD_MS/1000)+'s linear';fill.style.width='100%';
+    t=setTimeout(function(){t=null;complete();},HOLD_MS);
+  }
+  function stop(){
+    if(done)return;
+    if(t){clearTimeout(t);t=null;}
+    fill.style.transition='width .2s ease-out';fill.style.width='0';
+  }
+  close.addEventListener('pointerdown',start);
+  ['pointerup','pointerleave','pointercancel'].forEach(function(ev){close.addEventListener(ev,stop)});
+  close.addEventListener('keydown',function(e){
+    if(e.key==='Enter'||e.key===' '){e.preventDefault();done?reset():complete();}});
+
+  /* the day toggle: same screen, the two ways its day can end */
+  r.querySelectorAll('.bk button').forEach(function(b){
     b.addEventListener('click',function(){
-      c.querySelectorAll('.bk button').forEach(function(z){
-        z.classList.remove('on');z.setAttribute('aria-pressed','false');});
+      r.querySelectorAll('.bk button').forEach(function(z){
+        z.classList.remove('on');z.setAttribute('aria-pressed','false')});
       b.classList.add('on');b.setAttribute('aria-pressed','true');
-      render(b.dataset.b);
+      friday=b.dataset.b==='fri';reset();
     });
   });
-  render('money');
+  drawChips();paint(false);
 })();</script>
 </section>

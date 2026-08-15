@@ -10,8 +10,8 @@ TITLES = {
     'ob': ('Onboarding', 'The wall of intent, the one onboarding screen. No forms, just the goal made real.'),
     'q':  ('The refine step', 'What is already done + what they think it takes. One question at a time.'),
     'ld': ('Loading', 'The plan being produced. The wait as visible work, never a spinner, never an invented stage name.'),
-    'pu': ('The pulse', 'Where are you now: the one screen where the goal number gets written. Clarity shows the standing, Consistency the trajectory; Action only hosts the pen.'),
-    'lp': ('The daily loop', 'Thirteen layout architectures. Number slots any goal can fill.'),
+    'pu': ('The pulse', 'The module\'s one ask, at the close, at the goal\'s own cadence. No loop screen asks for a number; they all end here.'),
+    'lp': ('The daily loop', 'Thirteen layout architectures on one skeleton: the sentence, the size, the hold, the close.'),
     'mx': ('Intensity mechanics', 'Ways to scale today up or down, phone + desktop each. Three named sizes in front, freedom behind a quiet "more".'),
 }
 
@@ -28,7 +28,7 @@ REACH = {
     'lp-7': ('7/10',  'screen time, nightly'),
     'lp-12':('7/10',  'gym and posting rhythms, most days'),
     'lp-10':('7/10',  'school, projects, race blocks, daily'),
-    'lp-6': ('6/10',  'weight and debt, the alternative pen'),
+    'lp-6': ('6/10',  'weight, the alternative daily layout'),
     'lp-17':('6/10',  'screen time, the alternative ceiling'),
     'lp-15':('6/10',  'runs and study blocks'),
     'lp-22':('6/10',  'seen once per goal, but it is the best minute: stakes over frequency'),
@@ -119,7 +119,7 @@ proposed sizes in front, named and honestly priced, with full freedom behind a s
 mx-11 is the deliberate counter-example: the same design carrying five.
 <a href="map.html" style="color:rgba(235,238,248,.92);font-weight:600">Open the Action map: every bucket's path to its screens</a>
 &nbsp;&middot;&nbsp;
-<a href="bg.html" style="color:rgba(235,238,248,.92);font-weight:600">The room: ten backgrounds</a></p>
+<a href="bg.html" style="color:rgba(235,238,248,.92);font-weight:600">The room: eleven backgrounds</a></p>
 """
 
 def main():

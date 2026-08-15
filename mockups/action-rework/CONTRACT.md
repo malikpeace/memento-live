@@ -165,3 +165,21 @@ Final rulings on screen contents:
   exists there; the count is the identity and the reason to hold tonight.
 - This week's PLAN may show (rest-day lanes, which days are training days):
   a plan is not history and not position.
+
+## ONE ASK (Malik, 2026-08-14, overrides "the pen stays")
+
+His catch: the loop asking for today's weight AND the close's pulse asking
+"where are you now" is the same question twice. So: THE ONLY ENTRY MOMENT
+IN THE ENTIRE MODULE IS THE CLOSE (beat 5), in Clarity's voice, at the
+goal's cadence (daily for weight/screen time, weekly for money, on-results
+for school, never for quitting). NO in-loop entry fields, pens, write-in
+lines or stepper entries exist on any Action screen. Every loop screen is
+the same skeleton: sentence, size, hold, close. pu-1 is the one ask.
+
+## THE ROOM, round 2 (same date)
+
+All ten round-1 backgrounds killed except Rules ("not terrible"). His
+brief: minimal, MONOCHROME, STATIC (he rejected every dynamic one), mature,
+purposeful, locks you into the action. The grid worked because it felt like
+a serious WORKBENCH; find that family without copying it. No blur, no
+space, no abstract art, no motion, no mouse-following, nothing "AI".
